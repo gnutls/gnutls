@@ -52,6 +52,23 @@ struct tpm_ctx_st
 
 static void tpm_close_session(struct tpm_ctx_st *s);
 
+static int tss_err(TSS_RESULT err)
+{
+  _gnutls_debug_log("TPM error: %s (%x)\n", Trspi_Error_String(err), (unsigned int)Trspi_Error_Code(err));
+  switch(Trspi_Error_Code(err))
+    {
+      case TSS_E_COMM_FAILURE:
+      case TSS_E_NO_CONNECTION:
+      case TSS_E_CONNECTION_FAILED:
+      case TSS_E_CONNECTION_BROKEN:
+        return GNUTLS_E_TPM_SESSION_ERROR;
+      case TPM_E_AUTHFAIL:
+        return GNUTLS_E_TPM_SRK_PASSWORD_ERROR;
+      default:
+        return GNUTLS_E_TPM_ERROR;
+    }
+}
+
 static void
 tpm_deinit_fn (gnutls_privkey_t key, void *_s)
 {
@@ -122,18 +139,14 @@ int err, ret;
   if (err)
     {
       gnutls_assert ();
-      _gnutls_debug_log ("Failed to create TPM context: %s\n",
-			 Trspi_Error_String (err));
-      return GNUTLS_E_TPM_SESSION_ERROR;
+      return tss_err(err);
     }
 
   err = Tspi_Context_Connect (s->tpm_ctx, NULL);
   if (err)
     {
       gnutls_assert ();
-      _gnutls_debug_log ("Failed to connect TPM context: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_SESSION_ERROR;
+      ret = tss_err(err);
       goto out_tspi_ctx;
     }
 
@@ -143,9 +156,7 @@ int err, ret;
   if (err)
     {
       gnutls_assert ();
-      _gnutls_debug_log
-	  ("Failed to load TPM SRK key: %s\n", Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_SESSION_ERROR;
+      ret = tss_err(err);
       goto out_tspi_ctx;
     }
 
@@ -153,9 +164,7 @@ int err, ret;
   if (err)
     {
       gnutls_assert ();
-      _gnutls_debug_log ("Failed to load TPM SRK policy object: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_SESSION_ERROR;
+      ret = tss_err(err);
       goto out_srk;
     }
 
@@ -172,7 +181,7 @@ int err, ret;
       gnutls_assert ();
       _gnutls_debug_log ("Failed to set TPM PIN: %s\n",
 			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_SESSION_ERROR;
+      ret = tss_err(err);
       goto out_srkpol;
     }
   
@@ -210,9 +219,9 @@ static void tpm_close_session(struct tpm_ctx_st *s)
  * @key_password: A password for the key (optional)
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. If a password is needed to decrypt
- * the provided key or the provided password is wrong, then 
- * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the TPM password
+ * #gnutls_privkey_t structure. If a password is needed to access
+ * TPM then or the provided password is wrong, then 
+ * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the key password
  * is wrong or not provided then %GNUTLS_E_TPM_KEY_PASSWORD_ERROR
  * is returned. 
  *
@@ -281,15 +290,10 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 	       Trspi_Error_String (err));
 	}
 
-      if (err != TPM_E_AUTHFAIL)
+      if (err)
 	{
 	  gnutls_assert ();
-	  ret = GNUTLS_E_TPM_ERROR;
-	  goto out_session;
-	}
-      else
-	{
-	  ret = gnutls_assert_val (GNUTLS_E_TPM_SRK_PASSWORD_ERROR);
+	  ret = tss_err(err);
 	  goto out_session;
 	}
     }
@@ -319,7 +323,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 	      _gnutls_debug_log
 		  ("Failed to create key policy object: %s\n",
 		   Trspi_Error_String (err));
-	      ret = GNUTLS_E_TPM_ERROR;
+              ret = tss_err(err);
 	      goto out_key;
 	    }
 
@@ -329,7 +333,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 	      gnutls_assert ();
 	      _gnutls_debug_log ("Failed to assign policy to key: %s\n",
 				 Trspi_Error_String (err));
-	      ret = GNUTLS_E_TPM_ERROR;
+              ret = tss_err(err);
 	      goto out_key_policy;
 	    }
 	}
@@ -388,7 +392,7 @@ int ret;
   if (tssret != 0)
     {
       gnutls_assert();
-      return GNUTLS_E_TPM_ERROR;
+      return tss_err(tssret);
     }
     
   m.data = tdata;
@@ -400,7 +404,7 @@ int ret;
     {
       gnutls_assert();
       Tspi_Context_FreeMemory(key_ctx, m.data);
-      return GNUTLS_E_TPM_ERROR;
+      return tss_err(tssret);
     }
     
   e.data = tdata;
@@ -432,9 +436,7 @@ int ret;
  * This function will import the public key from the provided
  * TPM key structure. If a password is needed to decrypt
  * the provided key or the provided password is wrong, then 
- * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the TPM password
- * is wrong or not provided then %GNUTLS_E_TPM_KEY_PASSWORD_ERROR
- * is returned. 
+ * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -491,15 +493,10 @@ struct tpm_ctx_st s;
 	       Trspi_Error_String (err));
 	}
 
-      if (err != TPM_E_AUTHFAIL)
+      if (err)
 	{
 	  gnutls_assert ();
-	  ret = GNUTLS_E_TPM_ERROR;
-	  goto out_session;
-	}
-      else
-	{
-	  ret = gnutls_assert_val (GNUTLS_E_TPM_SRK_PASSWORD_ERROR);
+	  ret = tss_err(err);
 	  goto out_session;
 	}
     }
@@ -589,7 +586,7 @@ struct tpm_ctx_st s;
   if (tssret != 0)
     {
       gnutls_assert();
-      ret = GNUTLS_E_TPM_ERROR;
+      ret = tss_err(tssret);
       goto err_cc;
     }
     
@@ -603,7 +600,7 @@ struct tpm_ctx_st s;
   if (tssret != 0)
     {
       gnutls_assert();
-      ret = GNUTLS_E_TPM_ERROR;
+      ret = tss_err(tssret);
       goto err_sa;
     }
 
@@ -614,7 +611,7 @@ struct tpm_ctx_st s;
       if (tssret != 0)
         {
           gnutls_assert();
-          ret = GNUTLS_E_TPM_ERROR;
+          ret = tss_err(tssret);
           goto err_sa;
         }
 
@@ -623,7 +620,7 @@ struct tpm_ctx_st s;
       if (tssret != 0)
         {
           gnutls_assert();
-          ret = GNUTLS_E_TPM_ERROR;
+          ret = tss_err(tssret);
           goto err_sa;
         }
     }
@@ -632,10 +629,7 @@ struct tpm_ctx_st s;
   if (tssret != 0)
     {
       gnutls_assert();
-      if (tssret == TPM_E_AUTHFAIL)
-        ret = GNUTLS_E_TPM_SRK_PASSWORD_ERROR;
-      else
-        ret = GNUTLS_E_TPM_ERROR;
+      ret = tss_err(tssret);
       goto err_sa;
     }
 
@@ -644,7 +638,7 @@ struct tpm_ctx_st s;
   if (tssret != 0)
     {
       gnutls_assert();
-      ret = GNUTLS_E_TPM_ERROR;
+      ret = tss_err(tssret);
       goto err_sa;
     }
 
