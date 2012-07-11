@@ -50,8 +50,10 @@
 #include "tpmtool-args.h"
 
 static void cmd_parser (int argc, char **argv);
-static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits);
+static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, int reg);
 static void tpm_pubkey(FILE* infile, FILE* outfile);
+static void tpm_delete(const char* url, FILE* outfile);
+static void tpm_list(FILE* outfile);
 
 static FILE *outfile;
 static FILE *infile;
@@ -79,7 +81,7 @@ cmd_parser (int argc, char **argv)
   int ret, debug = 0;
   unsigned int optct;
   unsigned int key_type = GNUTLS_PK_UNKNOWN;
-  unsigned int bits = 0;
+  unsigned int bits = 0, reg = 0;
   const char* sec_param = NULL;
   
   optct = optionProcess( &tpmtoolOptions, argc, argv);
@@ -88,6 +90,9 @@ cmd_parser (int argc, char **argv)
  
   if (HAVE_OPT(DEBUG))
     debug = OPT_VALUE_DEBUG;
+
+  if (HAVE_OPT(REGISTER))
+    reg = 1;
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug);
@@ -125,11 +130,19 @@ cmd_parser (int argc, char **argv)
     {
       key_type = GNUTLS_PK_RSA;
       bits = get_bits (key_type, bits, sec_param);
-      tpm_generate (outfile, key_type, bits);
+      tpm_generate (outfile, key_type, bits, reg);
     }
   else if (HAVE_OPT(PUBKEY))
     {
       tpm_pubkey (infile, outfile);
+    }
+  else if (HAVE_OPT(DELETE))
+    {
+      tpm_delete (OPT_ARG(DELETE), outfile);
+    }
+  else if (HAVE_OPT(LIST))
+    {
+      tpm_list (outfile);
     }
   else 
     {
@@ -141,11 +154,15 @@ cmd_parser (int argc, char **argv)
   gnutls_global_deinit ();
 }
 
-static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits)
+static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, int reg)
 {
   int ret;
   char* srk_pass, *key_pass;
   gnutls_datum_t privkey, pubkey;
+  unsigned int flags = 0;
+  
+  if (reg)
+    flags |= GNUTLS_TPM_REGISTER_KEY;
   
   srk_pass = getpass ("Enter SRK password: ");
   if (srk_pass != NULL)
@@ -157,7 +174,7 @@ static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits
   
   ret = gnutls_tpm_privkey_generate(key_type, bits, srk_pass, key_pass,
                                     GNUTLS_X509_FMT_PEM, &privkey, &pubkey,
-                                    GNUTLS_TPM_SIG_PKCS1V15);
+                                    flags);
 
   free(key_pass);
   free(srk_pass);
@@ -168,6 +185,47 @@ static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits
   fwrite (pubkey.data, 1, pubkey.size, outfile);
   fputs ("\n", outfile);
   fwrite (privkey.data, 1, privkey.size, outfile);
+  fputs ("\n", outfile);
+}
+
+static void tpm_delete(const char* url, FILE* outfile)
+{
+  int ret;
+  char* srk_pass;
+  
+  srk_pass = getpass ("Enter SRK password: ");
+  
+  ret = gnutls_tpm_privkey_delete(url, srk_pass);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "gnutls_tpm_privkey_delete: %s", gnutls_strerror (ret));
+
+  fprintf (outfile, "Key %s deleted\n", url);
+}
+
+static void tpm_list(FILE* outfile)
+{
+  int ret;
+  gnutls_tpm_key_list_t list;
+  unsigned int i;
+  char* url;
+  
+  ret = gnutls_tpm_get_registered (&list);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "gnutls_tpm_get_registered: %s", gnutls_strerror (ret));
+    
+  fprintf(outfile, "Available keys under SRK:\n");
+  for (i=0;;i++)
+    {
+      ret = gnutls_tpm_key_list_get_url(list, i, &url);
+      if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+        break;
+      else if (ret < 0)
+        error (EXIT_FAILURE, 0, "gnutls_tpm_key_list_get_url: %s", gnutls_strerror (ret));
+  
+      fprintf(outfile, "\t%u: %s\n", i, url);
+      gnutls_free(url);
+    }
+
   fputs ("\n", outfile);
 }
 

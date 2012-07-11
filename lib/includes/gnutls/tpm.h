@@ -31,6 +31,9 @@ extern "C"
 {
 #endif
 
+struct tpm_key_list_st;
+typedef struct tpm_key_list_st *gnutls_tpm_key_list_t;
+
 #define GNUTLS_TPM_KEY_SIGNING (1<<2)
 #define GNUTLS_TPM_REGISTER_KEY (1<<3)
 
@@ -42,6 +45,12 @@ gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t pk, unsigned int bits,
                              gnutls_datum_t* privkey, 
                              gnutls_datum_t* pubkey,
                              unsigned int flags);
+
+void gnutls_tpm_key_list_deinit (gnutls_tpm_key_list_t list);
+int gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char** url);
+int gnutls_tpm_get_registered (gnutls_tpm_key_list_t *list);
+int gnutls_tpm_privkey_delete (const char* url, const char* srk_password);
+
 
 #ifdef __cplusplus
 }

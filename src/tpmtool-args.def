@@ -17,9 +17,29 @@ flag = {
 };
 
 flag = {
+    name      = register;
+    descrip   = "Any generated key will be registered in the TPM";
+    doc = "";
+};
+
+flag = {
     name      = pubkey;
     descrip   = "Prints the public key of the provided key";
     doc = "";
+};
+
+flag = {
+    name      = list;
+    descrip   = "Lists all stored keys in the TPM";
+    doc = "";
+};
+
+flag = {
+    name      = delete;
+    arg-type  = string;
+    arg-name  = "url";
+    descrip   = "Delete the key identified by the given URL (UUID).";
+    doc      = "";
 };
 
 flag = {

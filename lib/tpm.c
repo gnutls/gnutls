@@ -41,7 +41,6 @@
 #include <trousers/tss.h>
 #include <trousers/trousers.h>
 
-/* Signing function for TPM privkeys, set with gnutls_privkey_import_ext2() */
 struct tpm_ctx_st
 {
   TSS_HCONTEXT tpm_ctx;
@@ -49,6 +48,13 @@ struct tpm_ctx_st
   TSS_HPOLICY tpm_key_policy;
   TSS_HKEY srk;
   TSS_HPOLICY srk_policy;
+};
+
+struct tpm_key_list_st
+{
+  UINT32 size;
+  TSS_KM_KEYINFO * ki;
+  TSS_HCONTEXT tpm_ctx;
 };
 
 static void tpm_close_session(struct tpm_ctx_st *s);
@@ -948,7 +954,7 @@ TSS_RESULT tssret;
 int ret;
 void* tdata;
 UINT32 tint;
-gnutls_datum_t tmpkey;
+gnutls_datum_t tmpkey = {NULL, 0};
 TSS_HPOLICY key_policy;
 gnutls_pubkey_t pub;
 struct tpm_ctx_st s;
@@ -1032,7 +1038,7 @@ struct tpm_ctx_st s;
           goto err_sa;
         }
 
-      tssret = Tspi_Context_RegisterKey(s.tpm_ctx, key_ctx, TSS_PS_TYPE_SYSTEM,
+      tssret = Tspi_Context_RegisterKey(s.tpm_ctx, key_ctx, TSS_PS_TYPE_USER,
                                         key_uuid, TSS_PS_TYPE_SYSTEM, srk_uuid);
       if (tssret != 0)
         {
@@ -1046,7 +1052,7 @@ struct tpm_ctx_st s;
         {
           TSS_HKEY tkey;
 
-          Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_SYSTEM, key_uuid, &tkey);
+          Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_USER, key_uuid, &tkey);
           gnutls_assert();
           goto err_sa;
         }
@@ -1145,3 +1151,147 @@ err_cc:
   return ret;
 }
 
+
+/**
+ * gnutls_tpm_key_list_deinit:
+ * @list: a list of the keys
+ *
+ * This function will deinitialize the list of stored keys in the TPM.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ **/
+void
+gnutls_tpm_key_list_deinit (gnutls_tpm_key_list_t list)
+{
+  if (list->tpm_ctx != 0) Tspi_Context_Close (list->tpm_ctx);
+  gnutls_free(list);
+}
+
+/**
+ * gnutls_tpm_key_list_get_url:
+ * @list: a list of the keys
+ *
+ * This function will deinitialize the list of stored keys in the TPM.
+ *
+ * If the provided index is out of bounds then %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * is returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ **/
+int
+gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char** url)
+{
+  if (idx >= list->size)
+    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+  return encode_tpmkey_url(url, &list->ki[idx].keyUUID);
+}
+
+/**
+ * gnutls_tpm_get_registered:
+ * @list: a list to store the keys
+ * @srk_password: a password to protect the exported key (optional)
+ *
+ * This function will get a list of stored keys in the TPM. The uuid
+ * of those keys
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ **/
+int
+gnutls_tpm_get_registered (gnutls_tpm_key_list_t *list)
+{
+TSS_RESULT tssret;
+int ret;
+
+  *list = gnutls_calloc(1, sizeof(struct tpm_key_list_st));
+  if (*list == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  tssret = Tspi_Context_Create (&(*list)->tpm_ctx);
+  if (tssret)
+    {
+      gnutls_assert ();
+      ret = tss_err(tssret);
+      goto cleanup;
+    }
+
+  tssret = Tspi_Context_Connect ((*list)->tpm_ctx, NULL);
+  if (tssret)
+    {
+      gnutls_assert ();
+      ret = tss_err(tssret);
+      goto cleanup;
+    }
+
+  tssret =
+      Tspi_Context_GetRegisteredKeysByUUID((*list)->tpm_ctx, TSS_PS_TYPE_SYSTEM,
+				  NULL, &(*list)->size, &(*list)->ki);
+  if (tssret)
+    {
+      gnutls_assert ();
+      ret = tss_err(tssret);
+      goto cleanup;
+    }
+  return 0;
+
+cleanup:
+  gnutls_tpm_key_list_deinit(*list);
+
+  return ret;
+}
+
+/**
+ * gnutls_tpm_privkey_delete:
+ * @url: the URL describing the key
+ * @srk_password: a password for the SRK key
+ *
+ * This function will unregister the private key from the TPM
+ * chip. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ **/
+int
+gnutls_tpm_privkey_delete (const char* url, const char* srk_password)
+{
+struct tpm_ctx_st s;
+struct tpmkey_url_st durl;
+TSS_RESULT tssret;
+TSS_HKEY tkey;
+int ret;
+
+  ret = decode_tpmkey_url(url, &durl);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (durl.uuid_set == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  ret = tpm_open_session(&s, srk_password);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  tssret = Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_USER, durl.uuid, &tkey);
+  if (tssret != 0)
+    {
+      gnutls_assert();
+      ret = tss_err(tssret);
+      goto err_cc;
+    }
+
+  ret = 0;
+err_cc:
+  tpm_close_session(&s); 
+  return ret;
+}

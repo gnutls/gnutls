@@ -809,6 +809,10 @@ GNUTLS_3_1_0 {
 	gnutls_privkey_import_tpm_raw;
         gnutls_tpm_privkey_generate;
 	gnutls_pubkey_import_tpm_raw;
+	gnutls_tpm_key_list_deinit;
+	gnutls_tpm_key_list_get_url;
+	gnutls_tpm_get_registered;
+	gnutls_tpm_privkey_delete;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
