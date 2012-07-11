@@ -31,8 +31,8 @@ extern "C"
 {
 #endif
 
-#define GNUTLS_TPM_SIG_PKCS1V15 1
-#define GNUTLS_TPM_SIG_PKCS1V15_SHA1 2
+#define GNUTLS_TPM_KEY_SIGNING (1<<2)
+#define GNUTLS_TPM_REGISTER_KEY (1<<3)
 
 int
 gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t pk, unsigned int bits, 

@@ -36,6 +36,7 @@
 #include <pkcs11_int.h>
 #include <x509/common.h>
 #include <x509_b64.h>
+#include <random.h>
 
 #include <trousers/tss.h>
 #include <trousers/trousers.h>
@@ -477,6 +478,46 @@ unescape_string (char *output, const char *input, size_t * size,
   return ret;
 }
 
+#define UUID_SIZE 16
+
+static int randomize_uuid(TSS_UUID* uuid)
+{
+  uint8_t raw_uuid[16];
+  int ret;
+
+  ret = _gnutls_rnd (GNUTLS_RND_NONCE, raw_uuid, sizeof(raw_uuid));
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+    
+  memcpy(&uuid->ulTimeLow, raw_uuid, 4);
+  memcpy(&uuid->usTimeMid, &raw_uuid[4], 2);
+  memcpy(&uuid->usTimeHigh, &raw_uuid[6], 2);
+  uuid->bClockSeqHigh = raw_uuid[8];
+  uuid->bClockSeqLow = raw_uuid[9];
+  memcpy(&uuid->rgbNode, &raw_uuid[10], 6);
+
+  return 0;
+}
+
+static int encode_tpmkey_url(char** url, TSS_UUID* uuid)
+{
+size_t size = UUID_SIZE*2+4+32;
+
+  *url = gnutls_malloc(size);
+  if (*url == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  snprintf(*url, size, "tpmkey:uuid=%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x", 
+           (unsigned int)uuid->ulTimeLow, (unsigned int)uuid->usTimeMid, 
+           (unsigned int)uuid->usTimeHigh, (unsigned int)uuid->bClockSeqHigh, 
+           (unsigned int)uuid->bClockSeqLow, (unsigned int)uuid->rgbNode[0],
+           (unsigned int)uuid->rgbNode[1], (unsigned int)uuid->rgbNode[2],
+           (unsigned int)uuid->rgbNode[3], (unsigned int)uuid->rgbNode[4],
+           (unsigned int)uuid->rgbNode[5]);
+
+  return 0;
+}
+
 static int decode_tpmkey_url(const char* url, struct tpmkey_url_st *s)
 {
   char* p;
@@ -787,7 +828,12 @@ out_blob:
  * is not one of the allowed values, then it will be quantized to
  * one of 512, 1024, 2048, 4096, 8192 and 16384.
  *
- * Allowed flags are %GNUTLS_TPM_SIG_PKCS1V15 and %GNUTLS_TPM_SIG_PKCS1V15_SHA1.
+ * Allowed flags are:
+ *
+ * %GNUTLS_TPM_KEY_SIGNING: Generate a signing key instead of a legacy,
+
+ * %GNUTLS_TPM_REGISTER_KEY: Register the generate key in TPM. In that
+ * case @privkey would contain a URL with the UUID.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -803,7 +849,7 @@ gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t pk, unsigned int bits,
                              gnutls_datum_t* pubkey,
                              unsigned int flags)
 {
-TSS_FLAG tpm_flags = TSS_KEY_TYPE_LEGACY | TSS_KEY_VOLATILE;
+TSS_FLAG tpm_flags = TSS_KEY_VOLATILE;
 TSS_HKEY key_ctx; 
 TSS_RESULT tssret;
 int ret;
@@ -811,9 +857,13 @@ void* tdata;
 UINT32 tint;
 gnutls_datum_t tmpkey;
 TSS_HPOLICY key_policy;
-unsigned int sig;
 gnutls_pubkey_t pub;
 struct tpm_ctx_st s;
+
+  if (flags & GNUTLS_TPM_KEY_SIGNING)
+    tpm_flags |= TSS_KEY_TYPE_SIGNING;
+  else
+    tpm_flags |= TSS_KEY_TYPE_LEGACY;
 
   if (bits <= 512)
       tpm_flags |= TSS_KEY_SIZE_512;
@@ -840,13 +890,8 @@ struct tpm_ctx_st s;
       goto err_cc;
     }
     
-  if (flags & GNUTLS_TPM_SIG_PKCS1V15_SHA1)
-    sig = TSS_SS_RSASSAPKCS1V15_SHA1;
-  else
-    sig = TSS_SS_RSASSAPKCS1V15_DER;
-
   tssret = Tspi_SetAttribUint32(key_ctx, TSS_TSPATTRIB_KEY_INFO, TSS_TSPATTRIB_KEYINFO_SIGSCHEME,
-                                sig);
+                                TSS_SS_RSASSAPKCS1V15_DER);
   if (tssret != 0)
     {
       gnutls_assert();
@@ -883,36 +928,72 @@ struct tpm_ctx_st s;
       goto err_sa;
     }
 
-  tssret = Tspi_GetAttribData(key_ctx, TSS_TSPATTRIB_KEY_BLOB,
-                              TSS_TSPATTRIB_KEYBLOB_BLOB, &tint, (void*)&tdata);
-  if (tssret != 0)
+  if (flags & GNUTLS_TPM_REGISTER_KEY)
     {
-      gnutls_assert();
-      ret = tss_err(tssret);
-      goto err_sa;
-    }
+      TSS_UUID key_uuid;
 
-  ret = _gnutls_x509_encode_octet_string(tdata, tint, &tmpkey);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
+      ret = randomize_uuid(&key_uuid);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto err_sa;
+        }
+
+      tssret = Tspi_Context_RegisterKey(s.tpm_ctx, key_ctx, TSS_PS_TYPE_SYSTEM,
+                                        key_uuid, TSS_PS_TYPE_SYSTEM, srk_uuid);
+      if (tssret != 0)
+        {
+          gnutls_assert();
+          ret = tss_err(tssret);
+          goto err_sa;
+        }
+
+      ret = encode_tpmkey_url((char**)&privkey->data, &key_uuid);
+      if (ret < 0)
+        {
+          TSS_HKEY tkey;
+
+          Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_SYSTEM, key_uuid, &tkey);
+          gnutls_assert();
+          goto err_sa;
+        }
+      privkey->size = strlen((char*)privkey->data);
+
     }
-  
-  if (format == GNUTLS_X509_FMT_PEM)
+  else /* get the key as blob */
     {
-      ret = _gnutls_fbase64_encode ("TSS KEY BLOB", tmpkey.data, tmpkey.size, privkey);
+
+      tssret = Tspi_GetAttribData(key_ctx, TSS_TSPATTRIB_KEY_BLOB,
+                                  TSS_TSPATTRIB_KEYBLOB_BLOB, &tint, (void*)&tdata);
+      if (tssret != 0)
+        {
+          gnutls_assert();
+          ret = tss_err(tssret);
+          goto err_sa;
+        }
+
+      ret = _gnutls_x509_encode_octet_string(tdata, tint, &tmpkey);
       if (ret < 0)
         {
           gnutls_assert();
           goto cleanup;
         }
-    }
-  else
-    {
-      privkey->data = tmpkey.data;
-      privkey->size = tmpkey.size;
-      tmpkey.data = NULL;
+      
+      if (format == GNUTLS_X509_FMT_PEM)
+        {
+          ret = _gnutls_fbase64_encode ("TSS KEY BLOB", tmpkey.data, tmpkey.size, privkey);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+        }
+      else
+        {
+          privkey->data = tmpkey.data;
+          privkey->size = tmpkey.size;
+          tmpkey.data = NULL;
+        }
     }
 
   /* read the public key */
