@@ -51,6 +51,20 @@ struct tpm_ctx_st
 };
 
 static void tpm_close_session(struct tpm_ctx_st *s);
+static int import_tpm_key (gnutls_privkey_t pkey,
+                           const gnutls_datum_t * fdata,
+                           gnutls_x509_crt_fmt_t format,
+                           TSS_UUID *uuid,
+                           const char *srk_password,
+                           const char *key_password);
+
+/* TPM URL format:
+ *
+ * tpmkey:file=/path/to/file
+ * tpmkey:uuid=7f468c16-cb7f-11e1-824d-b3a4f4b20343
+ *
+ */
+
 
 static int tss_err(TSS_RESULT err)
 {
@@ -129,7 +143,6 @@ tpm_sign_fn (gnutls_privkey_t key, void *_s,
 
 static const unsigned char nullpass[20];
 const TSS_UUID srk_uuid = TSS_UUID_SRK;
-
 
 static int tpm_open_session(struct tpm_ctx_st *s, const char* srk_password)
 {
@@ -210,64 +223,25 @@ static void tpm_close_session(struct tpm_ctx_st *s)
   s->tpm_ctx = 0;
 }
 
-/**
- * gnutls_privkey_import_tpm_raw:
- * @pkey: The private key
- * @fdata: The TPM key to be imported
- * @format: The format of the private key
- * @srk_password: The password for the SRK key (optional)
- * @key_password: A password for the key (optional)
- *
- * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. If a password is needed to access
- * TPM then or the provided password is wrong, then 
- * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the key password
- * is wrong or not provided then %GNUTLS_E_TPM_KEY_PASSWORD_ERROR
- * is returned. 
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- *
- * Since: 3.1.0
- *
- **/
-int
-gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
-			       const gnutls_datum_t * fdata,
-			       gnutls_x509_crt_fmt_t format,
-			       const char *srk_password,
-			       const char *key_password)
+static int
+import_tpm_key (gnutls_privkey_t pkey,
+                const gnutls_datum_t * fdata,
+                gnutls_x509_crt_fmt_t format,
+                TSS_UUID *uuid,
+                const char *srk_password,
+                const char *key_password)
 {
-  gnutls_datum_t asn1;
+  gnutls_datum_t asn1 = { NULL, 0 };
   size_t slen;
   int err, ret;
   struct tpm_ctx_st *s;
   gnutls_datum_t tmp_sig;
 
-  ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
-  if (ret)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Error decoding TSS key blob: %s\n",
-			 gnutls_strerror (ret));
-      return ret;
-    }
-
-  slen = asn1.size;
-  ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto out_blob;
-    }
-  asn1.size = slen;
-
   s = gnutls_malloc (sizeof (*s));
   if (s == NULL)
     {
       gnutls_assert ();
-      ret = GNUTLS_E_MEMORY_ERROR;
-      goto out_blob;
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
   ret = tpm_open_session(s, srk_password);
@@ -277,25 +251,64 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
       goto out_ctx;
     }
 
-  /* ... we get it here instead. */
-  err = Tspi_Context_LoadKeyByBlob (s->tpm_ctx, s->srk,
-				    asn1.size, asn1.data, &s->tpm_key);
-  if (err != 0)
+  if (fdata != NULL)
     {
-      if (srk_password)
-	{
-	  gnutls_assert ();
-	  _gnutls_debug_log
-	      ("Failed to load TPM key blob: %s\n",
-	       Trspi_Error_String (err));
-	}
+      ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
+      if (ret)
+        {
+          gnutls_assert ();
+          _gnutls_debug_log ("Error decoding TSS key blob: %s\n",
+                             gnutls_strerror (ret));
+          goto out_session;
+        }
 
+      slen = asn1.size;
+      ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto out_blob;
+        }
+      asn1.size = slen;
+
+      /* ... we get it here instead. */
+      err = Tspi_Context_LoadKeyByBlob (s->tpm_ctx, s->srk,
+                                        asn1.size, asn1.data, &s->tpm_key);
+      if (err != 0)
+        {
+          if (srk_password)
+            {
+              gnutls_assert ();
+              _gnutls_debug_log
+                  ("Failed to load TPM key blob: %s\n",
+                   Trspi_Error_String (err));
+            }
+
+          if (err)
+            {
+              gnutls_assert ();
+              ret = tss_err(err);
+              goto out_blob;
+            }
+        }
+    }
+  else if (uuid)
+    {
+      err =
+          Tspi_Context_LoadKeyByUUID (s->tpm_ctx, TSS_PS_TYPE_USER,
+              *uuid, &s->tpm_key);
       if (err)
-	{
-	  gnutls_assert ();
-	  ret = tss_err(err);
-	  goto out_session;
-	}
+        {
+          gnutls_assert ();
+          ret = tss_err(err);
+          goto out_session;
+        }
+    }
+  else
+    {
+      gnutls_assert();
+      ret = GNUTLS_E_INVALID_REQUEST;
+      goto out_session;
     }
 
   ret =
@@ -365,14 +378,251 @@ out_key_policy:
 out_key:
   Tspi_Context_CloseObject (s->tpm_ctx, s->tpm_key);
   s->tpm_key = 0;
+out_blob:
+  gnutls_free (asn1.data);
 out_session:
   tpm_close_session(s);
 out_ctx:
   gnutls_free (s);
-out_blob:
-  gnutls_free (asn1.data);
   return ret;
 }
+
+/**
+ * gnutls_privkey_import_tpm_raw:
+ * @pkey: The private key
+ * @fdata: The TPM key to be imported
+ * @format: The format of the private key
+ * @srk_password: The password for the SRK key (optional)
+ * @key_password: A password for the key (optional)
+ *
+ * This function will import the given private key to the abstract
+ * #gnutls_privkey_t structure. If a password is needed to access
+ * TPM then or the provided password is wrong, then 
+ * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the key password
+ * is wrong or not provided then %GNUTLS_E_TPM_KEY_PASSWORD_ERROR
+ * is returned. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ *
+ **/
+int
+gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
+			       const gnutls_datum_t * fdata,
+			       gnutls_x509_crt_fmt_t format,
+			       const char *srk_password,
+			       const char *key_password)
+{
+  return import_tpm_key(pkey, fdata, format, NULL, srk_password, key_password);
+}
+
+struct tpmkey_url_st
+{
+  char* filename;
+  TSS_UUID uuid;
+  unsigned int uuid_set;
+};
+
+static void clear_tpmkey_url(struct tpmkey_url_st *s)
+{
+  gnutls_free(s->filename);
+  memset(s, 0, sizeof(*s));
+}
+
+static int
+unescape_string (char *output, const char *input, size_t * size,
+                 char terminator)
+{
+  gnutls_buffer_st str;
+  int ret = 0;
+  char *p;
+  int len;
+
+  _gnutls_buffer_init (&str);
+
+  /* find terminator */
+  p = strchr (input, terminator);
+  if (p != NULL)
+    len = p - input;
+  else
+    len = strlen (input);
+
+  ret = _gnutls_buffer_append_data (&str, input, len);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_buffer_unescape (&str);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_buffer_append_data (&str, "", 1);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  _gnutls_buffer_pop_data (&str, output, size);
+
+  _gnutls_buffer_clear (&str);
+
+  return ret;
+}
+
+static int decode_tpmkey_url(const char* url, struct tpmkey_url_st *s)
+{
+  char* p;
+  size_t size;
+  int ret;
+  unsigned int i, j;
+
+  if (strstr (url, "tpmkey:") == NULL)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+                        
+  memset(s, 0, sizeof(*s));
+
+  p = strstr(url, "file=");
+  if (p != NULL)
+    {
+      p += sizeof ("file=") - 1;
+      size = strlen(p);
+      s->filename = gnutls_malloc(size);
+      if (s->filename == NULL)
+        return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+      ret = unescape_string (s->filename, p, &size, ';');
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+
+      
+      
+    }
+  else if ((p = strstr(url, "uuid=")) != NULL)
+   {
+      char tmp_uuid[33];
+      uint8_t raw_uuid[16];
+
+      p += sizeof ("uuid=") - 1;
+      size = strlen(p);
+
+      for (j=i=0;i<size;i++)
+        {
+          if (j==sizeof(tmp_uuid)-1) 
+            {
+              break;
+            }
+          if (isalnum(p[i])) tmp_uuid[j++]=p[i];
+        }
+      tmp_uuid[j] = 0;
+
+      size = sizeof(raw_uuid);
+      ret = _gnutls_hex2bin(tmp_uuid, strlen(tmp_uuid), raw_uuid, &size);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+
+      memcpy(&s->uuid.ulTimeLow, raw_uuid, 4);
+      memcpy(&s->uuid.usTimeMid, &raw_uuid[4], 2);
+      memcpy(&s->uuid.usTimeHigh, &raw_uuid[6], 2);
+      s->uuid.bClockSeqHigh = raw_uuid[8];
+      s->uuid.bClockSeqLow = raw_uuid[9];
+      memcpy(&s->uuid.rgbNode, &raw_uuid[10], 6);
+      s->uuid_set = 1;
+    }
+  else
+    {
+      return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+    }
+
+  return 0;
+
+cleanup:
+  clear_tpmkey_url(s);
+  return ret;
+}
+
+/**
+ * gnutls_privkey_import_tpm_url:
+ * @pkey: The private key
+ * @url: The URL of the TPM key to be imported
+ * @srk_password: The password for the SRK key (optional)
+ * @key_password: A password for the key (optional)
+ *
+ * This function will import the given private key to the abstract
+ * #gnutls_privkey_t structure. If a password is needed to access
+ * TPM then or the provided password is wrong, then 
+ * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the key password
+ * is wrong or not provided then %GNUTLS_E_TPM_KEY_PASSWORD_ERROR
+ * is returned. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ *
+ **/
+int
+gnutls_privkey_import_tpm_url (gnutls_privkey_t pkey,
+                               const char* url,
+                               const char *srk_password,
+                               const char *key_password)
+{
+struct tpmkey_url_st durl;
+gnutls_datum_t fdata = { NULL, 0 };
+int ret;
+
+  ret = decode_tpmkey_url(url, &durl);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (durl.filename)
+    {
+
+      ret = gnutls_load_file(durl.filename, &fdata);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+
+      ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_X509_FMT_PEM,
+			       		                           srk_password, key_password);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+    }
+  else if (durl.uuid_set)
+    {
+      ret = import_tpm_key (pkey, NULL, 0, &durl.uuid, srk_password, key_password);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+    }
+
+  ret = 0;
+cleanup:
+  gnutls_free(fdata.data);
+  clear_tpmkey_url(&durl);
+  return ret;
+}
+
 
 /* reads the RSA public key from the given TSS key.
  * If psize is non-null it contains the total size of the parameters
