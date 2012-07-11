@@ -69,8 +69,9 @@ gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
                               unsigned int usage, unsigned int flags);
 
 int
-gnutls_privkey_import_tpm_url (gnutls_privkey_t pkey,
-          const char* url, const char *srk_password, const char *key_password);
+gnutls_pubkey_import_tpm_url (gnutls_pubkey_t pkey,
+                              const char* url,
+                              const char *srk_password);
 
 int
 gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
@@ -204,6 +205,10 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       gnutls_x509_crt_fmt_t format,
 			       const char *srk_password,
 			       const char *tpm_password);
+
+int
+gnutls_privkey_import_tpm_url (gnutls_privkey_t pkey,
+          const char* url, const char *srk_password, const char *key_password);
 
 int gnutls_privkey_import_pkcs11_url (gnutls_privkey_t key, const char *url);
 

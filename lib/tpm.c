@@ -296,7 +296,7 @@ import_tpm_key (gnutls_privkey_t pkey,
   else if (uuid)
     {
       err =
-          Tspi_Context_LoadKeyByUUID (s->tpm_ctx, TSS_PS_TYPE_USER,
+          Tspi_Context_LoadKeyByUUID (s->tpm_ctx, TSS_PS_TYPE_SYSTEM,
               *uuid, &s->tpm_key);
       if (err)
         {
@@ -716,6 +716,97 @@ int ret;
 }
 
 
+static int
+import_tpm_pubkey (gnutls_pubkey_t pkey,
+                   const gnutls_datum_t * fdata,
+                   gnutls_x509_crt_fmt_t format,
+                   TSS_UUID *uuid,
+                   const char *srk_password)
+{
+gnutls_datum_t asn1 = {NULL, 0};
+size_t slen;
+int err, ret;
+struct tpm_ctx_st s;
+
+  ret = tpm_open_session(&s, srk_password);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (fdata != NULL)
+    {
+      ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
+      if (ret)
+        {
+          gnutls_assert ();
+          _gnutls_debug_log ("Error decoding TSS key blob: %s\n",
+           gnutls_strerror (ret));
+          goto out_session;
+        }
+
+      slen = asn1.size;
+      ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto out_blob;
+        }
+      asn1.size = slen;
+
+      err = Tspi_Context_LoadKeyByBlob (s.tpm_ctx, s.srk,
+                                        asn1.size, asn1.data, &s.tpm_key);
+      if (err != 0)
+        {
+          if (srk_password)
+            {
+              gnutls_assert ();
+              _gnutls_debug_log
+                  ("Failed to load TPM key blob: %s\n",
+                   Trspi_Error_String (err));
+            }
+
+          if (err)
+            {
+              gnutls_assert ();
+              ret = tss_err(err);
+              goto out_blob;
+            }
+        }
+    }
+  else if (uuid)
+    {
+      err =
+          Tspi_Context_LoadKeyByUUID (s.tpm_ctx, TSS_PS_TYPE_SYSTEM,
+              *uuid, &s.tpm_key);
+      if (err)
+        {
+          gnutls_assert ();
+          ret = tss_err(err);
+          goto out_session;
+        }
+    }
+  else
+    {
+      gnutls_assert();
+      ret = GNUTLS_E_INVALID_REQUEST;
+      goto out_session;
+    }
+
+  ret = read_pubkey(pkey, s.tpm_key, NULL);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto out_blob;
+    }
+
+  ret = 0;
+out_blob:
+  gnutls_free (asn1.data);
+out_session:
+  tpm_close_session(&s);
+  return ret;
+}
+
+
 /**
  * gnutls_pubkey_import_tpm_raw:
  * @pkey: The public key
@@ -737,73 +828,75 @@ int ret;
  **/
 int
 gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
-			       const gnutls_datum_t * fdata,
-			       gnutls_x509_crt_fmt_t format,
-			       const char *srk_password)
+                              const gnutls_datum_t * fdata,
+                              gnutls_x509_crt_fmt_t format,
+                              const char *srk_password)
 {
-gnutls_datum_t asn1;
-size_t slen;
-int err, ret;
-struct tpm_ctx_st s;
+  return import_tpm_pubkey(pkey, fdata, format, NULL, srk_password);
+}
 
-  ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
-  if (ret)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Error decoding TSS key blob: %s\n",
-			 gnutls_strerror (ret));
-      return ret;
-    }
+/**
+ * gnutls_pubkey_import_tpm_url:
+ * @pkey: The public key
+ * @url: The URL of the TPM key to be imported
+ * @srk_password: The password for the SRK key (optional)
+ *
+ * This function will import the given private key to the abstract
+ * #gnutls_privkey_t structure. If a password is needed to access
+ * TPM then or the provided password is wrong, then 
+ * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ *
+ **/
+int
+gnutls_pubkey_import_tpm_url (gnutls_pubkey_t pkey,
+                              const char* url,
+                              const char *srk_password)
+{
+struct tpmkey_url_st durl;
+gnutls_datum_t fdata = { NULL, 0 };
+int ret;
 
-  slen = asn1.size;
-  ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
+  ret = decode_tpmkey_url(url, &durl);
   if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (durl.filename)
     {
-      gnutls_assert();
-      goto out_blob;
+
+      ret = gnutls_load_file(durl.filename, &fdata);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+
+      ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_X509_FMT_PEM,
+			       		                          srk_password);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
     }
-  asn1.size = slen;
-
-  ret = tpm_open_session(&s, srk_password);
-  if (ret < 0)
+  else if (durl.uuid_set)
     {
-      gnutls_assert();
-      goto out_blob;
-    }
-
-  /* ... we get it here instead. */
-  err = Tspi_Context_LoadKeyByBlob (s.tpm_ctx, s.srk,
-				    asn1.size, asn1.data, &s.tpm_key);
-  if (err != 0)
-    {
-      if (srk_password)
-	{
-	  gnutls_assert ();
-	  _gnutls_debug_log
-	      ("Failed to load TPM key blob: %s\n",
-	       Trspi_Error_String (err));
-	}
-
-      if (err)
-	{
-	  gnutls_assert ();
-	  ret = tss_err(err);
-	  goto out_session;
-	}
-    }
-
-  ret = read_pubkey(pkey, s.tpm_key, NULL);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto out_session;
+      ret = import_tpm_pubkey (pkey, NULL, 0, &durl.uuid, srk_password);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
     }
 
   ret = 0;
-out_session:
-  tpm_close_session(&s);
-out_blob:
-  gnutls_free (asn1.data);
+cleanup:
+  gnutls_free(fdata.data);
+  clear_tpmkey_url(&durl);
   return ret;
 }
 
