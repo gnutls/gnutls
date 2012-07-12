@@ -71,6 +71,9 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
                                       int cipher_suites_size,
                                       gnutls_pk_algorithm_t *pk_algos,
                                       size_t pk_algos_size);
+static int _gnutls_handshake_common (gnutls_session_t session);
+static int _gnutls_handshake_client (gnutls_session_t session);
+static int _gnutls_handshake_server (gnutls_session_t session);
 
 /* Empties but does not free the buffer
  */
@@ -2451,7 +2454,7 @@ gnutls_handshake (gnutls_session_t session)
  * _gnutls_handshake_client 
  * This function performs the client side of the handshake of the TLS/SSL protocol.
  */
-int
+static int
 _gnutls_handshake_client (gnutls_session_t session)
 {
   int ret = 0;
@@ -2779,7 +2782,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
  * _gnutls_handshake_server
  * This function does the server stuff of the handshake protocol.
  */
-int
+static int
 _gnutls_handshake_server (gnutls_session_t session)
 {
   int ret = 0;
@@ -2880,7 +2883,7 @@ _gnutls_handshake_server (gnutls_session_t session)
   return 0;
 }
 
-int
+static int
 _gnutls_handshake_common (gnutls_session_t session)
 {
   int ret = 0;
