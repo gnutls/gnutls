@@ -817,6 +817,8 @@ GNUTLS_3_1_0 {
 	gnutls_tpm_privkey_delete;
 	gnutls_pubkey_import_tpm_url;
 	gnutls_privkey_import_tpm_url;
+	gnutls_privkey_import_url;
+	gnutls_pubkey_import_url;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

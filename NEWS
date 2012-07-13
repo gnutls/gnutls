@@ -54,6 +54,7 @@ gnutls_privkey_import_pkcs11_url: Added
 gnutls_privkey_import_openpgp_raw: Added
 gnutls_privkey_import_x509_raw: Added
 gnutls_privkey_import_ext2: Added
+gnutls_privkey_import_url: Added
 gnutls_tpm_privkey_generate: Added
 gnutls_tpm_key_list_deinit: Added
 gnutls_tpm_key_list_get_url: Added
@@ -61,10 +62,11 @@ gnutls_tpm_get_registered: Added
 gnutls_tpm_privkey_delete: Added
 gnutls_pubkey_import_tpm_raw: Added
 gnutls_pubkey_import_tpm_url: Added
+gnutls_pubkey_import_url: Added
+gnutls_pubkey_verify_hash2: Added
 gnutls_x509_privkey_import2: Added
 gnutls_x509_privkey_import_openssl: Added
 gnutls_load_file: Added
-gnutls_pubkey_verify_hash2: Added
 gnutls_pkcs12_simple_parse: Added
 gnutls_certificate_set_x509_system_trust: Added
 gnutls_pkcs11_obj_list_import_url2: Added

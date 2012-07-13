@@ -549,27 +549,22 @@ used.
 
 @example
 #inlude <gnutls/abstract.h>
-#inlude <gnutls/pkcs11.h>
 
 void sign_cert( gnutls_x509_crt_t to_be_signed)
 @{
-gnutls_pkcs11_privkey_t ca_key;
 gnutls_x509_crt_t ca_cert;
 gnutls_privkey_t abs_key;
 
   /* load the PKCS #11 key and certificates */
-  gnutls_pkcs11_privkey_init(&ca_key);
-  gnutls_pkcs11_privkey_import_url(ca_key, key_url);
+  /* initialize the abstract key */
+  gnutls_privkey_init(&abs_key);
+  gnutls_privkey_import_url(abs_key, key_url);
 
   gnutls_x509_crt_init(&ca_cert);
   gnutls_x509_crt_import_pkcs11_url(&ca_cert, cert_url);
 
-  /* initialize the abstract key */
-  gnutls_privkey_init(&abs_key);
-  gnutls_privkey_import_pkcs11(abs_key, ca_key);
-
   /* sign the certificate to be signed */
-  gnutls_x509_crt_privkey_sign(to_be_signed, ca_cert, ca_key, 
+  gnutls_x509_crt_privkey_sign(to_be_signed, ca_cert, abs_key, 
                                GNUTLS_DIG_SHA256, 0);
 @}
 @end example
@@ -590,7 +585,7 @@ or through an ASN.1 encoding of the X.509 @code{SubjectPublicKeyInfo}
 sequence.
 
 @showfuncC{gnutls_pubkey_import_x509,gnutls_pubkey_import_openpgp,gnutls_pubkey_import_pkcs11}
-@showfuncC{gnutls_pubkey_import_pkcs11_url,gnutls_pubkey_import_privkey,gnutls_pubkey_import}
+@showfuncC{gnutls_pubkey_import_url,gnutls_pubkey_import_privkey,gnutls_pubkey_import}
 
 @showfuncdesc{gnutls_pubkey_export}
 
@@ -609,7 +604,7 @@ to allow abstraction over @acronym{PKCS} #11 keys that
 are not extractable.
 
 @showfuncC{gnutls_privkey_import_x509,gnutls_privkey_import_openpgp,gnutls_privkey_import_pkcs11}
-@showfuncC{gnutls_privkey_import_x509_raw,gnutls_privkey_import_openpgp_raw,gnutls_privkey_import_pkcs11_url}
+@showfuncC{gnutls_privkey_import_x509_raw,gnutls_privkey_import_openpgp_raw,gnutls_privkey_import_url}
 
 @showfuncB{gnutls_privkey_get_pk_algorithm,gnutls_privkey_get_type}
 

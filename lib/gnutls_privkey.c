@@ -372,6 +372,54 @@ int ret;
   return 0;
 }
 
+/**
+ * gnutls_privkey_import_pkcs11_url:
+ * @key: A key of type #gnutls_pubkey_t
+ * @url: A PKCS 11 url
+ *
+ * This function will import a PKCS 11 private key to a #gnutls_private_key_t
+ * structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ **/
+int
+gnutls_privkey_import_pkcs11_url (gnutls_privkey_t key, const char *url)
+{
+  gnutls_pkcs11_privkey_t pkey;
+  int ret;
+
+  ret = gnutls_pkcs11_privkey_init (&pkey);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = gnutls_pkcs11_privkey_import_url (pkey, url, 0);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = gnutls_privkey_import_pkcs11 (key, pkey, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  return 0;
+
+cleanup:
+  gnutls_pkcs11_privkey_deinit (pkey);
+
+  return ret;
+}
+
 #endif /* ENABLE_PKCS11 */
 
 /**
@@ -914,14 +962,14 @@ cleanup:
   return ret;
 }
 
+
 /**
- * gnutls_privkey_import_pkcs11_url:
+ * gnutls_privkey_import_url:
  * @key: A key of type #gnutls_pubkey_t
  * @url: A PKCS 11 url
- * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
- * This function will import a PKCS 11 certificate to a #gnutls_pubkey_t
- * structure.
+ * This function will import a PKCS11 or TPM URL as a
+ * private key.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -929,36 +977,15 @@ cleanup:
  * Since: 3.1.0
  **/
 int
-gnutls_privkey_import_pkcs11_url (gnutls_privkey_t key, const char *url)
+gnutls_privkey_import_url (gnutls_privkey_t key, const char *url)
 {
-  gnutls_pkcs11_privkey_t pkey;
-  int ret;
-
-  ret = gnutls_pkcs11_privkey_init (&pkey);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = gnutls_pkcs11_privkey_import_url (pkey, url, 0);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  ret = gnutls_privkey_import_pkcs11 (key, pkey, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  return 0;
-
-cleanup:
-  gnutls_pkcs11_privkey_deinit (pkey);
-
-  return ret;
+#ifdef ENABLE_PKCS11
+  if (strstr(url, "pkcs11:") != NULL)
+    return gnutls_privkey_import_pkcs11_url(key, url);
+#endif
+#ifdef HAVE_TROUSERS
+  if (strstr(url, "tpmkey:") != NULL)
+    return gnutls_privkey_import_tpm_url(key, url, NULL, NULL, 0);
+#endif
+  return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 }

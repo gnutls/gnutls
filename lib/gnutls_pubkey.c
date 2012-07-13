@@ -1048,6 +1048,35 @@ cleanup:
 #endif /* ENABLE_PKCS11 */
 
 /**
+ * gnutls_pubkey_import_url:
+ * @key: A key of type #gnutls_pubkey_t
+ * @url: A PKCS 11 url
+ * @flags: One of GNUTLS_PKCS11_OBJ_* flags
+ *
+ * This function will import a PKCS11 certificate or a TPM key 
+ * as a public key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ **/
+int
+gnutls_pubkey_import_url (gnutls_pubkey_t key, const char *url,
+                          unsigned int flags)
+{
+#ifdef ENABLE_PKCS11
+  if (strstr(url, "pkcs11:") != NULL)
+    return gnutls_pubkey_import_pkcs11_url(key, url, flags);
+#endif
+#ifdef HAVE_TROUSERS
+  if (strstr(url, "tpmkey:") != NULL)
+    return gnutls_pubkey_import_tpm_url(key, url, NULL, 0);
+#endif
+  return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+}
+
+/**
  * gnutls_pubkey_import_rsa_raw:
  * @key: Is a structure will hold the parameters
  * @m: holds the modulus

@@ -142,9 +142,6 @@ load_keys (void)
   unsigned int i;
   gnutls_datum_t data = { NULL, 0 };
   gnutls_x509_crt_t crt_list[MAX_CRT];
-#ifdef ENABLE_PKCS11
-  gnutls_pkcs11_privkey_t pkcs11_key;
-#endif
   unsigned char keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   if (x509_certfile != NULL && x509_keyfile != NULL)
@@ -227,12 +224,10 @@ load_keys (void)
                     gnutls_strerror (ret));
            exit (1);
          }
-
-#ifdef ENABLE_PKCS11
-      if (strncmp (x509_keyfile, "pkcs11:", 7) == 0)
+      else if (strncmp (x509_keyfile, "tpmkey:", 7) == 0 || strncmp (x509_keyfile, "pkcs11:", 7) == 0)
         {
           ret =
-            gnutls_privkey_import_pkcs11_url (x509_key, x509_keyfile);
+            gnutls_privkey_import_url (x509_key, x509_keyfile, 0);
           if (ret < 0)
             {
               fprintf (stderr, "*** Error loading url: %s\n",
@@ -241,21 +236,6 @@ load_keys (void)
             }
         }
       else
-#endif /* ENABLE_PKCS11 */
-#ifdef HAVE_TROUSERS
-      if (strncmp (x509_keyfile, "tpmkey:", 7) == 0)
-        {
-          ret =
-            gnutls_privkey_import_tpm_url (x509_key, x509_keyfile, NULL, NULL, 0);
-          if (ret < 0)
-            {
-              fprintf (stderr, "*** Error loading url: %s\n",
-                       gnutls_strerror (ret));
-              exit (1);
-            }
-        }
-      else
-#endif /* HAVE_TROUSERS */
         {
           ret = gnutls_load_file (x509_keyfile, &data);
           if (ret < 0)
@@ -319,20 +299,9 @@ load_keys (void)
            exit (1);
          }
 
-#ifdef ENABLE_PKCS11
-      if (strncmp (pgp_keyfile, "pkcs11:", 7) == 0)
+      if (strncmp (pgp_keyfile, "pkcs11:", 7) == 0 || strncmp (pgp_keyfile, "tpmkey:", 7) == 0)
         {
-          gnutls_pkcs11_privkey_init (&pkcs11_key);
-
-          ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, pgp_keyfile, 0);
-          if (ret < 0)
-            {
-              fprintf (stderr, "*** Error loading url: %s\n",
-                       gnutls_strerror (ret));
-              exit (1);
-            }
-
-          ret = gnutls_privkey_import_pkcs11( pgp_key, pkcs11_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+          ret = gnutls_privkey_import_url( pgp_key, pgp_keyfile, 0);
           if (ret < 0)
             {
               fprintf (stderr, "*** Error loading url: %s\n",
@@ -341,7 +310,6 @@ load_keys (void)
             }
         }
       else
-#endif /* ENABLE_PKCS11 */
         {
           ret = gnutls_load_file (pgp_keyfile, &data);
           if (ret < 0)
