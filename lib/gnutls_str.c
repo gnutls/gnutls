@@ -207,10 +207,17 @@ _gnutls_buffer_resize (gnutls_buffer_st * dest, size_t new_size)
     }
 }
 
+/* Appends the provided string. The null termination byte is appended
+ * but not included in length.
+ */
 int
 _gnutls_buffer_append_str (gnutls_buffer_st * dest, const char *src)
 {
-  return _gnutls_buffer_append_data (dest, src, strlen (src));
+int ret;
+  ret = _gnutls_buffer_append_data (dest, src, strlen (src) + 1);
+  if (ret >= 0) dest->length--;
+  
+  return ret;
 }
 
 /* returns data from a string in a constant buffer.

@@ -288,6 +288,10 @@ static const gnutls_error_entry error_algorithms[] = {
 
   ERROR_ENTRY (N_("TPM error."),
                GNUTLS_E_TPM_ERROR, 1),
+  ERROR_ENTRY (N_("TPM is not initialized."),
+               GNUTLS_E_TPM_UNINITIALIZED, 1),
+  ERROR_ENTRY (N_("TPM key was not found in persistent storage."),
+               GNUTLS_E_TPM_KEY_NOT_FOUND, 1),
   ERROR_ENTRY (N_("Cannot initialize a session with the TPM."),
                GNUTLS_E_TPM_SESSION_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error."),

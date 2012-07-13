@@ -73,22 +73,42 @@ static int import_tpm_key (gnutls_privkey_t pkey,
  */
 
 
-static int tss_err(TSS_RESULT err)
+static int tss_err_pwd(TSS_RESULT err, int pwd_error)
 {
   _gnutls_debug_log("TPM error: %s (%x)\n", Trspi_Error_String(err), (unsigned int)Trspi_Error_Code(err));
-  switch(Trspi_Error_Code(err))
+
+  switch(ERROR_LAYER(err))
     {
-      case TSS_E_COMM_FAILURE:
-      case TSS_E_NO_CONNECTION:
-      case TSS_E_CONNECTION_FAILED:
-      case TSS_E_CONNECTION_BROKEN:
-        return GNUTLS_E_TPM_SESSION_ERROR;
-      case TPM_E_AUTHFAIL:
-        return GNUTLS_E_TPM_SRK_PASSWORD_ERROR;
-      default:
-        return GNUTLS_E_TPM_ERROR;
+      case TSS_LAYER_TPM:
+        switch(ERROR_CODE(err))
+          {
+            case TPM_E_AUTHFAIL:
+              return pwd_error;
+            case TPM_E_NOSRK:
+              return GNUTLS_E_TPM_UNINITIALIZED;
+            default:
+              return GNUTLS_E_TPM_ERROR;
+          }
+      case TSS_LAYER_TCS:
+        switch(ERROR_CODE(err))
+          {
+            case TSS_E_COMM_FAILURE:
+            case TSS_E_NO_CONNECTION:
+            case TSS_E_CONNECTION_FAILED:
+            case TSS_E_CONNECTION_BROKEN:
+              return GNUTLS_E_TPM_SESSION_ERROR;
+            case TSS_E_PS_KEY_NOTFOUND:
+              return GNUTLS_E_TPM_KEY_NOT_FOUND;
+            default:
+              return GNUTLS_E_TPM_ERROR;
+          }
+       default:
+         return GNUTLS_E_TPM_ERROR;
     }
 }
+
+#define tss_err(x) tss_err_pwd(x, GNUTLS_E_TPM_SRK_PASSWORD_ERROR)
+#define tss_err_key(x) tss_err_pwd(x, GNUTLS_E_TPM_KEY_PASSWORD_ERROR)
 
 static void
 tpm_deinit_fn (gnutls_privkey_t key, void *_s)
@@ -367,7 +387,7 @@ import_tpm_key (gnutls_privkey_t pkey,
 	  gnutls_assert ();
 	  _gnutls_debug_log ("Failed to set key PIN: %s\n",
 			     Trspi_Error_String (err));
-          ret = GNUTLS_E_TPM_KEY_PASSWORD_ERROR;
+          ret = tss_err_key(err);
 	  goto out_key_policy;
 	}
     }
@@ -505,23 +525,86 @@ static int randomize_uuid(TSS_UUID* uuid)
   return 0;
 }
 
-static int encode_tpmkey_url(char** url, TSS_UUID* uuid)
+static int encode_tpmkey_url(char** url, const TSS_UUID* uuid, const TSS_UUID* parent)
 {
-size_t size = UUID_SIZE*2+4+32;
+size_t size = (UUID_SIZE*2+4)*2+32;
+uint8_t u1[UUID_SIZE];
+gnutls_buffer_st buf;
+gnutls_datum_t dret;
+int ret;
 
   *url = gnutls_malloc(size);
   if (*url == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-  snprintf(*url, size, "tpmkey:uuid=%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x", 
-           (unsigned int)uuid->ulTimeLow, (unsigned int)uuid->usTimeMid, 
-           (unsigned int)uuid->usTimeHigh, (unsigned int)uuid->bClockSeqHigh, 
-           (unsigned int)uuid->bClockSeqLow, (unsigned int)uuid->rgbNode[0],
-           (unsigned int)uuid->rgbNode[1], (unsigned int)uuid->rgbNode[2],
-           (unsigned int)uuid->rgbNode[3], (unsigned int)uuid->rgbNode[4],
-           (unsigned int)uuid->rgbNode[5]);
+  _gnutls_buffer_init(&buf);
+
+  memcpy(u1, &uuid->ulTimeLow, 4);
+  memcpy(&u1[4], &uuid->usTimeMid, 2);
+  memcpy(&u1[6], &uuid->usTimeHigh, 2);
+  u1[8] = uuid->bClockSeqHigh;
+  u1[9] = uuid->bClockSeqLow;
+  memcpy(&u1[10], uuid->rgbNode, 6);
+
+  ret = _gnutls_buffer_append_str(&buf, "tpmkey:uuid=");
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  ret = _gnutls_buffer_append_printf(&buf, "%.2x%.2x%.2x%.2x-%.2x%.2x-%.2x%.2x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x",
+    (unsigned int)u1[0], (unsigned int)u1[1], (unsigned int)u1[2], (unsigned int)u1[3],
+    (unsigned int)u1[4], (unsigned int)u1[5], (unsigned int)u1[6], (unsigned int)u1[7],
+    (unsigned int)u1[8], (unsigned int)u1[9], (unsigned int)u1[10], (unsigned int)u1[11],
+    (unsigned int)u1[12], (unsigned int)u1[13], (unsigned int)u1[14], (unsigned int)u1[15]);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  if (parent)
+    {
+      memcpy(u1, &parent->ulTimeLow, 4);
+      memcpy(&u1[4], &parent->usTimeMid, 2);
+      memcpy(&u1[6], &parent->usTimeHigh, 2);
+      u1[8] = parent->bClockSeqHigh;
+      u1[9] = parent->bClockSeqLow;
+      memcpy(&u1[10], parent->rgbNode, 6);
+
+      ret = _gnutls_buffer_append_str(&buf, ";parent=");
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+
+      ret = _gnutls_buffer_append_printf(&buf, "%.2x%.2x%.2x%.2x-%.2x%.2x-%.2x%.2x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x",
+        (unsigned int)u1[0], (unsigned int)u1[1], (unsigned int)u1[2], (unsigned int)u1[3],
+        (unsigned int)u1[4], (unsigned int)u1[5], (unsigned int)u1[6], (unsigned int)u1[7],
+        (unsigned int)u1[8], (unsigned int)u1[9], (unsigned int)u1[10], (unsigned int)u1[11],
+        (unsigned int)u1[12], (unsigned int)u1[13], (unsigned int)u1[14], (unsigned int)u1[15]);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+    }
+
+  ret = _gnutls_buffer_to_datum(&buf, &dret);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  *url = (char*)dret.data;
 
   return 0;
+cleanup:
+  _gnutls_buffer_clear(&buf);
+  return ret;
 }
 
 static int decode_tpmkey_url(const char* url, struct tpmkey_url_st *s)
@@ -551,9 +634,6 @@ static int decode_tpmkey_url(const char* url, struct tpmkey_url_st *s)
           gnutls_assert();
           goto cleanup;
         }
-
-      
-      
     }
   else if ((p = strstr(url, "uuid=")) != NULL)
    {
@@ -998,7 +1078,7 @@ struct tpm_ctx_st s;
       goto err_sa;
     }
 
-  /* set the key of the actual key */
+  /* set the password of the actual key */
   if (key_password)
     {
       tssret = Tspi_GetPolicyObject(key_ctx, TSS_POLICY_USAGE, &key_policy);
@@ -1038,7 +1118,7 @@ struct tpm_ctx_st s;
           goto err_sa;
         }
 
-      tssret = Tspi_Context_RegisterKey(s.tpm_ctx, key_ctx, TSS_PS_TYPE_USER,
+      tssret = Tspi_Context_RegisterKey(s.tpm_ctx, key_ctx, TSS_PS_TYPE_SYSTEM,
                                         key_uuid, TSS_PS_TYPE_SYSTEM, srk_uuid);
       if (tssret != 0)
         {
@@ -1047,12 +1127,12 @@ struct tpm_ctx_st s;
           goto err_sa;
         }
 
-      ret = encode_tpmkey_url((char**)&privkey->data, &key_uuid);
+      ret = encode_tpmkey_url((char**)&privkey->data, &key_uuid, &srk_uuid);
       if (ret < 0)
         {
           TSS_HKEY tkey;
 
-          Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_USER, key_uuid, &tkey);
+          Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_SYSTEM, key_uuid, &tkey);
           gnutls_assert();
           goto err_sa;
         }
@@ -1190,7 +1270,7 @@ gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char*
   if (idx >= list->size)
     return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-  return encode_tpmkey_url(url, &list->ki[idx].keyUUID);
+  return encode_tpmkey_url(url, &list->ki[idx].keyUUID, &list->ki[idx].parentKeyUUID);
 }
 
 /**
@@ -1282,7 +1362,7 @@ int ret;
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  tssret = Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_USER, durl.uuid, &tkey);
+  tssret = Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_SYSTEM, durl.uuid, &tkey);
   if (tssret != 0)
     {
       gnutls_assert();
