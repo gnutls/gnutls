@@ -47,7 +47,7 @@ gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t pk, unsigned int bits,
                              unsigned int flags);
 
 void gnutls_tpm_key_list_deinit (gnutls_tpm_key_list_t list);
-int gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char** url);
+int gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char** url, unsigned int flags);
 int gnutls_tpm_get_registered (gnutls_tpm_key_list_t *list);
 int gnutls_tpm_privkey_delete (const char* url, const char* srk_password);
 

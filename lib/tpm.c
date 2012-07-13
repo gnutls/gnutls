@@ -1255,9 +1255,12 @@ gnutls_tpm_key_list_deinit (gnutls_tpm_key_list_t list)
 /**
  * gnutls_tpm_key_list_get_url:
  * @list: a list of the keys
+ * @idx: The index of the key (starting from zero)
+ * @url: The URL to be returned
+ * @flags: should be zero
  *
- * This function will deinitialize the list of stored keys in the TPM.
- *
+ * This function will return for each given index a URL of
+ * the corresponding key.
  * If the provided index is out of bounds then %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * is returned.
  *
@@ -1267,7 +1270,7 @@ gnutls_tpm_key_list_deinit (gnutls_tpm_key_list_t list)
  * Since: 3.1.0
  **/
 int
-gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char** url)
+gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char** url, unsigned int flags)
 {
   if (idx >= list->size)
     return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
