@@ -644,6 +644,10 @@ gnutls_sec_param_t str_to_sec_param (const char *str)
     {
       return GNUTLS_SEC_PARAM_LOW;
     }
+  else if (strcasecmp (str, "legacy") == 0)
+    {
+      return GNUTLS_SEC_PARAM_LEGACY;
+    }
   else if (strcasecmp (str, "normal") == 0)
     {
       return GNUTLS_SEC_PARAM_NORMAL;
