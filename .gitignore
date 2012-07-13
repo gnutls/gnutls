@@ -585,3 +585,5 @@ tests/mini-x509-2
 tests/pkcs12_simple
 win32
 win64
+src/tpmtool
+src/libcmd-tpmtool.la

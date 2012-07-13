@@ -794,6 +794,8 @@ GNUTLS_3_0_0 {
 
 GNUTLS_3_1_0 {
   global:
+        gnutls_pkcs11_advset_pin_function;
+	gnutls_pkcs11_advset_token_function;
 	gnutls_pkcs11_obj_list_import_url2;
 	gnutls_x509_trust_list_add_system_trust;
 	gnutls_x509_trust_list_add_trust_file;
