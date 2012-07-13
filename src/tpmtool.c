@@ -222,7 +222,7 @@ static void tpm_list(FILE* outfile)
   fprintf(outfile, "Available keys:\n");
   for (i=0;;i++)
     {
-      ret = gnutls_tpm_key_list_get_url(list, i, &url);
+      ret = gnutls_tpm_key_list_get_url(list, i, &url, 0);
       if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
         break;
       else if (ret < 0)
