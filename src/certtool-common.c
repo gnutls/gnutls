@@ -516,7 +516,7 @@ load_ca_private_key (common_info_st * info)
 #endif
 
 #ifdef HAVE_TROUSERS
-  if (strncmp(info->privkey, "tpmkey:", 7) == 0)
+  if (strncmp(info->ca_privkey, "tpmkey:", 7) == 0)
     return _load_tpm_privkey(info->privkey);
 #endif
 

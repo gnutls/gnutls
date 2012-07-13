@@ -242,6 +242,20 @@ load_keys (void)
         }
       else
 #endif /* ENABLE_PKCS11 */
+#ifdef HAVE_TROUSERS
+      if (strncmp (x509_keyfile, "tpmkey:", 7) == 0)
+        {
+          ret =
+            gnutls_privkey_import_tpm_url (x509_key, x509_keyfile, NULL, NULL, 0);
+          if (ret < 0)
+            {
+              fprintf (stderr, "*** Error loading url: %s\n",
+                       gnutls_strerror (ret));
+              exit (1);
+            }
+        }
+      else
+#endif /* HAVE_TROUSERS */
         {
           ret = gnutls_load_file (x509_keyfile, &data);
           if (ret < 0)
