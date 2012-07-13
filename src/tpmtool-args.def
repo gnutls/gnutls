@@ -24,6 +24,8 @@ flag = {
 
 flag = {
     name      = pubkey;
+    arg-type  = string;
+    arg-name  = "url";
     descrip   = "Prints the public key of the provided key";
     doc = "";
 };

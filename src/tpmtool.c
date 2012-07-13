@@ -51,7 +51,7 @@
 
 static void cmd_parser (int argc, char **argv);
 static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, int reg);
-static void tpm_pubkey(FILE* infile, FILE* outfile);
+static void tpm_pubkey(const char* url, FILE* outfile);
 static void tpm_delete(const char* url, FILE* outfile);
 static void tpm_list(FILE* outfile);
 
@@ -134,7 +134,7 @@ cmd_parser (int argc, char **argv)
     }
   else if (HAVE_OPT(PUBKEY))
     {
-      tpm_pubkey (infile, outfile);
+      tpm_pubkey (OPT_ARG(PUBKEY), outfile);
     }
   else if (HAVE_OPT(DELETE))
     {
@@ -182,10 +182,13 @@ static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits
   if (ret < 0)
     error (EXIT_FAILURE, 0, "gnutls_tpm_privkey_generate: %s", gnutls_strerror (ret));
 
-  fwrite (pubkey.data, 1, pubkey.size, outfile);
-  fputs ("\n", outfile);
+/*  fwrite (pubkey.data, 1, pubkey.size, outfile);
+  fputs ("\n", outfile);*/
   fwrite (privkey.data, 1, privkey.size, outfile);
   fputs ("\n", outfile);
+  
+  gnutls_free(privkey.data);
+  gnutls_free(pubkey.data);
 }
 
 static void tpm_delete(const char* url, FILE* outfile)
@@ -213,7 +216,7 @@ static void tpm_list(FILE* outfile)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "gnutls_tpm_get_registered: %s", gnutls_strerror (ret));
     
-  fprintf(outfile, "Available keys under SRK:\n");
+  fprintf(outfile, "Available keys:\n");
   for (i=0;;i++)
     {
       ret = gnutls_tpm_key_list_get_url(list, i, &url);
@@ -229,30 +232,24 @@ static void tpm_list(FILE* outfile)
   fputs ("\n", outfile);
 }
 
-static void tpm_pubkey(FILE* infile, FILE* outfile)
+static void tpm_pubkey(const char* url, FILE* outfile)
 {
   int ret;
   char* srk_pass;
-  gnutls_datum_t data;
   gnutls_pubkey_t pubkey;
-  size_t size;
   
   srk_pass = getpass ("Enter SRK password: ");
   if (srk_pass != NULL)
     srk_pass = strdup(srk_pass);
 
-  data.data = (void*)fread_file (infile, &size);
-  data.size = size;
-  
   gnutls_pubkey_init(&pubkey);
 
-  ret = gnutls_pubkey_import_tpm_raw(pubkey, &data, GNUTLS_X509_FMT_PEM,
-                                     srk_pass);
+  ret = gnutls_pubkey_import_tpm_url(pubkey, url, srk_pass);
 
   free(srk_pass);
 
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "gnutls_pubkey_import_tpm_raw: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "gnutls_pubkey_import_tpm_url: %s", gnutls_strerror (ret));
 
   _pubkey_info(outfile, pubkey);
 
