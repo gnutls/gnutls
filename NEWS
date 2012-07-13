@@ -47,7 +47,6 @@ by Alexandre Bique.
 ** API and ABI modifications:
 GNUTLS_CERT_SIGNATURE_FAILURE: Added
 GNUTLS_CAMELLIA_192_CBC: Added
-gnutls_pubkey_import_tpm_raw: Added
 gnutls_privkey_import_tpm_raw: Added
 gnutls_privkey_import_pkcs11_url: Added
 gnutls_privkey_import_openpgp_raw: Added
@@ -58,6 +57,8 @@ gnutls_tpm_key_list_deinit: Added
 gnutls_tpm_key_list_get_url: Added
 gnutls_tpm_get_registered: Added
 gnutls_tpm_privkey_delete: Added
+gnutls_pubkey_import_tpm_raw: Added
+gnutls_pubkey_import_tpm_url: Added
 gnutls_x509_privkey_import2: Added
 gnutls_x509_privkey_import_openssl: Added
 gnutls_load_file: Added
