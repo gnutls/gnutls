@@ -82,7 +82,10 @@ cmd_parser (int argc, char **argv)
   unsigned int optct;
   unsigned int key_type = GNUTLS_PK_UNKNOWN;
   unsigned int bits = 0, reg = 0;
-  const char* sec_param = NULL;
+  /* Note that the default sec-param is legacy because several TPMs
+   * cannot handle larger keys.
+   */
+  const char* sec_param = "legacy";
   
   optct = optionProcess( &tpmtoolOptions, argc, argv);
   argc += optct;
