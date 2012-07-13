@@ -400,27 +400,8 @@ gnutls_privkey_import_ext (gnutls_privkey_t pkey,
                            gnutls_privkey_decrypt_func decrypt_func,
                            unsigned int flags)
 {
-int ret;
-
-  ret = check_if_clean(pkey);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      return ret;
-    }
-  
-  if (sign_func == NULL && decrypt_func == NULL)
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-  pkey->key.ext.sign_func = sign_func;
-  pkey->key.ext.decrypt_func = decrypt_func;
-  pkey->key.ext.deinit_func = NULL;
-  pkey->key.ext.userdata = userdata;
-  pkey->type = GNUTLS_PRIVKEY_EXT;
-  pkey->pk_algorithm = pk;
-  pkey->flags = flags;
-
-  return 0;
+  return gnutls_privkey_import_ext2( pkey, pk, userdata, sign_func, decrypt_func,
+                                     NULL, flags);
 }
 
 /**

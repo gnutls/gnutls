@@ -144,6 +144,27 @@ gnutls_x509_privkey_t xkey;
   return key;
 }
 
+#ifdef HAVE_TROUSERS
+
+static gnutls_privkey_t _load_tpm_privkey(const char* url)
+{
+int ret;
+gnutls_privkey_t key;
+
+  ret = gnutls_privkey_init (&key);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+
+  ret = gnutls_privkey_import_tpm_url(key, url, NULL, NULL, 0);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "importing TPM key: %s: %s",
+           url, gnutls_strerror (ret));
+
+  return key;
+}
+
+#endif
+
 #ifdef ENABLE_PKCS11
 
 static gnutls_privkey_t _load_pkcs11_privkey(const char* url)
@@ -278,6 +299,11 @@ load_private_key (int mand, common_info_st * info)
 #ifdef ENABLE_PKCS11
   if (strncmp(info->privkey, "pkcs11:", 7) == 0)
     return _load_pkcs11_privkey(info->privkey);
+#endif
+
+#ifdef HAVE_TROUSERS
+  if (strncmp(info->privkey, "tpmkey:", 7) == 0)
+    return _load_tpm_privkey(info->privkey);
 #endif
 
   dat.data = (void*)read_binary_file (info->privkey, &size);
@@ -489,6 +515,11 @@ load_ca_private_key (common_info_st * info)
     return _load_pkcs11_privkey(info->ca_privkey);
 #endif
 
+#ifdef HAVE_TROUSERS
+  if (strncmp(info->privkey, "tpmkey:", 7) == 0)
+    return _load_tpm_privkey(info->privkey);
+#endif
+
   dat.data = (void*)read_binary_file (info->ca_privkey, &size);
   dat.size = size;
 
@@ -596,9 +627,8 @@ int ret;
     error (EXIT_FAILURE, 0, "gnutls_pubkey_init: %s",
            gnutls_strerror (ret));
 
-  ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
-  if (ret < 0) /* could not get (e.g. on PKCS #11 */
-    {
+  if (!privkey || (ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0)) < 0)
+    { /* could not get (e.g. on PKCS #11 */
       gnutls_pubkey_deinit(pubkey);
       return load_pubkey(mand, info);
     }

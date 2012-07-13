@@ -247,7 +247,7 @@ static void tpm_pubkey(const char* url, FILE* outfile)
 
   gnutls_pubkey_init(&pubkey);
 
-  ret = gnutls_pubkey_import_tpm_url(pubkey, url, srk_pass);
+  ret = gnutls_pubkey_import_tpm_url(pubkey, url, srk_pass, 0);
 
   free(srk_pass);
 

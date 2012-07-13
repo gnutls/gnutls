@@ -64,6 +64,7 @@ static int import_tpm_key (gnutls_privkey_t pkey,
                            TSS_UUID *uuid,
                            const char *srk_password,
                            const char *key_password);
+static int encode_tpmkey_url(char** url, const TSS_UUID* uuid, const TSS_UUID* parent);
 
 /* TPM URL format:
  *
@@ -161,7 +162,7 @@ tpm_sign_fn (gnutls_privkey_t key, void *_s,
 	_gnutls_debug_log ("TPM hash signature failed: %s\n",
 			   Trspi_Error_String (err));
       if (err == TPM_E_AUTHFAIL)
-	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	return GNUTLS_E_TPM_KEY_PASSWORD_ERROR;
       else
 	return GNUTLS_E_PK_SIGN_FAILED;
     }
@@ -169,7 +170,68 @@ tpm_sign_fn (gnutls_privkey_t key, void *_s,
 }
 
 static const unsigned char nullpass[20];
+static const gnutls_datum_t nulldata = {(void*)nullpass, 20};
 const TSS_UUID srk_uuid = TSS_UUID_SRK;
+
+static int tpm_pin(const TSS_UUID* uuid, char* pin, unsigned int pin_size, 
+                   unsigned int attempts)
+{
+unsigned int flags = 0;
+const char* label;
+char* url = NULL;
+int ret;
+
+  if (attempts > 0) 
+    flags |= GNUTLS_PKCS11_PIN_WRONG;
+    
+  if (uuid)
+    {
+      if (memcmp(uuid, &srk_uuid, sizeof(TSS_UUID)) == 0)
+        label = "SRK";
+      else
+        {
+          ret = encode_tpmkey_url(&url, uuid, NULL);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+          
+          label = url;
+        }
+    }
+  else
+    label = "unknown";
+
+  ret = _gnutls_pin_func(_gnutls_pin_data, attempts, "TPM", label, flags, pin, pin_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+  
+  ret = 0;
+cleanup:
+  gnutls_free(url);
+  return ret;
+}
+
+
+static TSS_RESULT myTspi_Policy_SetSecret(TSS_HPOLICY hPolicy, 
+                                          UINT32 ulSecretLength, BYTE* rgbSecret)
+{
+  if (rgbSecret == NULL)
+    {
+      /* Well known NULL key */
+      return Tspi_Policy_SetSecret (hPolicy,
+  				   TSS_SECRET_MODE_SHA1,
+                                   sizeof (nullpass), (BYTE *) nullpass);
+    }
+  else /* key is given */
+    {
+      return Tspi_Policy_SetSecret (hPolicy, TSS_SECRET_MODE_PLAIN,
+                                    ulSecretLength, rgbSecret);
+    }
+}
+
+#define SAFE_LEN(x) (x==NULL?0:strlen(x))
 
 static int tpm_open_session(struct tpm_ctx_st *s, const char* srk_password)
 {
@@ -208,14 +270,8 @@ int err, ret;
       goto out_srk;
     }
 
-  if (srk_password)
-    err = Tspi_Policy_SetSecret (s->srk_policy,
-				 TSS_SECRET_MODE_PLAIN,
-				 strlen (srk_password), (BYTE *) srk_password);
-  else				/* Well-known NULL key */
-    err = Tspi_Policy_SetSecret (s->srk_policy,
-				 TSS_SECRET_MODE_SHA1,
-				 sizeof (nullpass), (BYTE *) nullpass);
+  err = myTspi_Policy_SetSecret (s->srk_policy,
+				 SAFE_LEN (srk_password), (BYTE *) srk_password);
   if (err)
     {
       gnutls_assert ();
@@ -249,6 +305,56 @@ static void tpm_close_session(struct tpm_ctx_st *s)
   Tspi_Context_Close (s->tpm_ctx);
   s->tpm_ctx = 0;
 }
+
+static int
+import_tpm_key_cb (gnutls_privkey_t pkey,
+                const gnutls_datum_t * fdata,
+                gnutls_x509_crt_fmt_t format,
+                TSS_UUID *uuid,
+                const char *srk_password,
+                const char *key_password)
+{
+unsigned int attempts = 0;
+char pin1[GNUTLS_PKCS11_MAX_PIN_LEN];
+char pin2[GNUTLS_PKCS11_MAX_PIN_LEN];
+int ret, ret2;
+
+  do
+    {
+      ret = import_tpm_key(pkey, fdata, format, uuid, srk_password, key_password);
+
+      if (attempts > 3 || _gnutls_pin_func == NULL)
+        break;
+
+      if (ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR)
+        {
+          ret2 = tpm_pin(&srk_uuid, pin1, sizeof(pin1), attempts++);
+          if (ret2 < 0)
+            {
+              gnutls_assert();
+              return GNUTLS_E_TPM_SRK_PASSWORD_ERROR;
+            }
+          srk_password = pin1;
+        }
+
+      if (ret == GNUTLS_E_TPM_KEY_PASSWORD_ERROR)
+        {
+          ret2 = tpm_pin(uuid, pin2, sizeof(pin2), attempts++);
+          if (ret2 < 0)
+            {
+              gnutls_assert();
+              return GNUTLS_E_TPM_KEY_PASSWORD_ERROR;
+            }
+          key_password = pin2;
+        }
+    }
+  while(ret == GNUTLS_E_TPM_KEY_PASSWORD_ERROR || ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR);
+
+  if (ret < 0)
+    gnutls_assert();
+  return ret;
+}
+
 
 static int
 import_tpm_key (gnutls_privkey_t pkey,
@@ -303,20 +409,9 @@ import_tpm_key (gnutls_privkey_t pkey,
                                         asn1.size, asn1.data, &s->tpm_key);
       if (err != 0)
         {
-          if (srk_password)
-            {
-              gnutls_assert ();
-              _gnutls_debug_log
-                  ("Failed to load TPM key blob: %s\n",
-                   Trspi_Error_String (err));
-            }
-
-          if (err)
-            {
-              gnutls_assert ();
-              ret = tss_err(err);
-              goto out_blob;
-            }
+          gnutls_assert ();
+          ret = tss_err(err);
+          goto out_blob;
         }
     }
   else if (uuid)
@@ -348,8 +443,8 @@ import_tpm_key (gnutls_privkey_t pkey,
     }
 
   ret =
-      gnutls_privkey_sign_data (pkey, GNUTLS_DIG_SHA1, 0, fdata, &tmp_sig);
-  if (ret == GNUTLS_E_INSUFFICIENT_CREDENTIALS)
+      gnutls_privkey_sign_data (pkey, GNUTLS_DIG_SHA1, 0, &nulldata, &tmp_sig);
+  if (ret == GNUTLS_E_TPM_KEY_PASSWORD_ERROR)
     {
       if (!s->tpm_key_policy)
 	{
@@ -378,9 +473,8 @@ import_tpm_key (gnutls_privkey_t pkey,
 	    }
 	}
 
-      err = Tspi_Policy_SetSecret (s->tpm_key_policy,
-				   TSS_SECRET_MODE_PLAIN,
-				   strlen (key_password), (void *) key_password);
+      err = myTspi_Policy_SetSecret (s->tpm_key_policy,
+				     SAFE_LEN(key_password), (void *) key_password);
 
       if (err)
 	{
@@ -442,7 +536,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       const char *srk_password,
 			       const char *key_password)
 {
-  return import_tpm_key(pkey, fdata, format, NULL, srk_password, key_password);
+  return import_tpm_key_cb(pkey, fdata, format, NULL, srk_password, key_password);
 }
 
 struct tpmkey_url_st
@@ -689,6 +783,7 @@ cleanup:
  * @url: The URL of the TPM key to be imported
  * @srk_password: The password for the SRK key (optional)
  * @key_password: A password for the key (optional)
+ * @flags: should be zero
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure. If a password is needed to access
@@ -707,7 +802,8 @@ int
 gnutls_privkey_import_tpm_url (gnutls_privkey_t pkey,
                                const char* url,
                                const char *srk_password,
-                               const char *key_password)
+                               const char *key_password,
+                               unsigned int flags)
 {
 struct tpmkey_url_st durl;
 gnutls_datum_t fdata = { NULL, 0 };
@@ -719,7 +815,6 @@ int ret;
 
   if (durl.filename)
     {
-
       ret = gnutls_load_file(durl.filename, &fdata);
       if (ret < 0)
         {
@@ -737,7 +832,7 @@ int ret;
     }
   else if (durl.uuid_set)
     {
-      ret = import_tpm_key (pkey, NULL, 0, &durl.uuid, srk_password, key_password);
+      ret = import_tpm_key_cb (pkey, NULL, 0, &durl.uuid, srk_password, key_password);
       if (ret < 0)
         {
           gnutls_assert();
@@ -802,6 +897,7 @@ int ret;
 
   return 0;
 }
+
 
 
 static int
@@ -894,6 +990,43 @@ out_session:
   return ret;
 }
 
+static int
+import_tpm_pubkey_cb (gnutls_pubkey_t pkey,
+                   const gnutls_datum_t * fdata,
+                   gnutls_x509_crt_fmt_t format,
+                   TSS_UUID *uuid,
+                   const char *srk_password)
+{
+unsigned int attempts = 0;
+char pin1[GNUTLS_PKCS11_MAX_PIN_LEN];
+int ret;
+
+  
+  do
+    {
+      ret = import_tpm_pubkey(pkey, fdata, format, uuid, srk_password);
+      
+      if (attempts > 3 || _gnutls_pin_func == NULL)
+        break;
+
+      if (ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR)
+        {
+          ret = tpm_pin(&srk_uuid, pin1, sizeof(pin1), attempts++);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              return GNUTLS_E_TPM_SRK_PASSWORD_ERROR;
+            }
+          srk_password = pin1;
+        }
+    }
+  while(ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR);
+
+  if (ret < 0)
+    gnutls_assert();
+  return ret;
+}
+
 
 /**
  * gnutls_pubkey_import_tpm_raw:
@@ -920,7 +1053,7 @@ gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
                               gnutls_x509_crt_fmt_t format,
                               const char *srk_password)
 {
-  return import_tpm_pubkey(pkey, fdata, format, NULL, srk_password);
+  return import_tpm_pubkey_cb(pkey, fdata, format, NULL, srk_password);
 }
 
 /**
@@ -928,6 +1061,7 @@ gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
  * @pkey: The public key
  * @url: The URL of the TPM key to be imported
  * @srk_password: The password for the SRK key (optional)
+ * @flags: should be zero
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure. If a password is needed to access
@@ -943,7 +1077,8 @@ gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
 int
 gnutls_pubkey_import_tpm_url (gnutls_pubkey_t pkey,
                               const char* url,
-                              const char *srk_password)
+                              const char *srk_password,
+                              unsigned int flags)
 {
 struct tpmkey_url_st durl;
 gnutls_datum_t fdata = { NULL, 0 };
@@ -973,7 +1108,7 @@ int ret;
     }
   else if (durl.uuid_set)
     {
-      ret = import_tpm_pubkey (pkey, NULL, 0, &durl.uuid, srk_password);
+      ret = import_tpm_pubkey_cb (pkey, NULL, 0, &durl.uuid, srk_password);
       if (ret < 0)
         {
           gnutls_assert();
@@ -1091,8 +1226,8 @@ struct tpm_ctx_st s;
           goto err_sa;
         }
 
-      tssret = Tspi_Policy_SetSecret(key_policy, TSS_SECRET_MODE_PLAIN, 
-                                     strlen(key_password), (void*)key_password);
+      tssret = myTspi_Policy_SetSecret(key_policy, 
+                                       SAFE_LEN(key_password), (void*)key_password);
       if (tssret != 0)
         {
           gnutls_assert();

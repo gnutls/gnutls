@@ -566,7 +566,7 @@ read_key_mem (gnutls_certificate_credentials_t res,
   return 0;
 }
 
-#ifdef ENABLE_TROUSERS
+#ifdef HAVE_TROUSERS
 /* Reads a private key from a token.
  */
 static int
@@ -586,7 +586,7 @@ read_key_tpmurl (gnutls_certificate_credentials_t res, const char *url)
     }
 
   ret =
-    gnutls_privkey_import_tpm_url (pkey, url, NULL, NULL);
+    gnutls_privkey_import_tpm_url (pkey, url, NULL, NULL, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -872,12 +872,12 @@ read_key_file (gnutls_certificate_credentials_t res,
     }
 #endif /* ENABLE_PKCS11 */
 
-#ifdef ENABLE_TROUSERS
+#ifdef HAVE_TROUSERS
   if (strncmp (keyfile, "tpmkey:", 7) == 0)
     {
       return read_key_tpmurl (res, keyfile);
     }
-#endif /* ENABLE_TROUSERS */
+#endif /* HAVE_TROUSERS */
 
   data = read_binary_file (keyfile, &size);
 
