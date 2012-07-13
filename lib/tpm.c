@@ -564,6 +564,7 @@ int ret;
       goto cleanup;
     }
 
+#if 0
   if (parent)
     {
       memcpy(u1, &parent->ulTimeLow, 4);
@@ -591,6 +592,7 @@ int ret;
           goto cleanup;
         }
     }
+#endif
 
   ret = _gnutls_buffer_to_datum(&buf, &dret);
   if (ret < 0)
