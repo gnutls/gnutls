@@ -517,11 +517,9 @@ out_ctx:
  * @key_password: A password for the key (optional)
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. If a password is needed to access
- * TPM then or the provided password is wrong, then 
- * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the key password
- * is wrong or not provided then %GNUTLS_E_TPM_KEY_PASSWORD_ERROR
- * is returned. 
+ * #gnutls_privkey_t structure. 
+ *
+ * With respect to passwords the same as in gnutls_privkey_import_tpm_url() apply.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -534,9 +532,13 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       const gnutls_datum_t * fdata,
 			       gnutls_x509_crt_fmt_t format,
 			       const char *srk_password,
-			       const char *key_password)
+			       const char *key_password,
+			       unsigned int flags)
 {
-  return import_tpm_key_cb(pkey, fdata, format, NULL, srk_password, key_password);
+  if (flags & GNUTLS_PRIVKEY_DISABLE_CALLBACKS)
+    return import_tpm_key(pkey, fdata, format, NULL, srk_password, key_password);
+  else
+    return import_tpm_key_cb(pkey, fdata, format, NULL, srk_password, key_password);
 }
 
 struct tpmkey_url_st
@@ -783,12 +785,16 @@ cleanup:
  * @url: The URL of the TPM key to be imported
  * @srk_password: The password for the SRK key (optional)
  * @key_password: A password for the key (optional)
- * @flags: should be zero
+ * @flags: One of the %GNUTLS_PRIVKEY flags
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. If a password is needed to access
- * TPM then or the provided password is wrong, then 
- * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the key password
+ * #gnutls_privkey_t structure. 
+ * 
+ * Note that unless %GNUTLS_PRIVKEY_DISABLE_CALLBACKS
+ * is specified, if incorrect (or NULL) passwords are given
+ * the PKCS11 callback functions will be used to obtain the
+ * correct passwords. Otherwise if the SRK password is wrong
+ * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned and if the key password
  * is wrong or not provided then %GNUTLS_E_TPM_KEY_PASSWORD_ERROR
  * is returned. 
  *
@@ -823,7 +829,7 @@ int ret;
         }
 
       ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_X509_FMT_PEM,
-			       		                           srk_password, key_password);
+       		                           srk_password, key_password, flags);
       if (ret < 0)
         {
           gnutls_assert();
@@ -832,7 +838,10 @@ int ret;
     }
   else if (durl.uuid_set)
     {
-      ret = import_tpm_key_cb (pkey, NULL, 0, &durl.uuid, srk_password, key_password);
+      if (flags & GNUTLS_PRIVKEY_DISABLE_CALLBACKS)
+        ret = import_tpm_key (pkey, NULL, 0, &durl.uuid, srk_password, key_password);
+      else
+        ret = import_tpm_key_cb (pkey, NULL, 0, &durl.uuid, srk_password, key_password);
       if (ret < 0)
         {
           gnutls_assert();
@@ -1035,11 +1044,12 @@ int ret;
  * @format: The format of the private key
  * @srk_password: The password for the SRK key (optional)
  * @key_password: A password for the key (optional)
+ * @flags: One of the %GNUTLS_PUBKEY flags
  *
  * This function will import the public key from the provided
- * TPM key structure. If a password is needed to decrypt
- * the provided key or the provided password is wrong, then 
- * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. 
+ * TPM key structure. 
+ *
+ * With respect to passwords the same as in gnutls_pubkey_import_tpm_url() apply.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1051,9 +1061,13 @@ int
 gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
                               const gnutls_datum_t * fdata,
                               gnutls_x509_crt_fmt_t format,
-                              const char *srk_password)
+                              const char *srk_password,
+                              unsigned int flags)
 {
-  return import_tpm_pubkey_cb(pkey, fdata, format, NULL, srk_password);
+  if (flags & GNUTLS_PUBKEY_DISABLE_CALLBACKS)
+    return import_tpm_pubkey_cb(pkey, fdata, format, NULL, srk_password);
+  else
+    return import_tpm_pubkey(pkey, fdata, format, NULL, srk_password);
 }
 
 /**
@@ -1064,9 +1078,13 @@ gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
  * @flags: should be zero
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. If a password is needed to access
- * TPM then or the provided password is wrong, then 
- * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. 
+ * #gnutls_privkey_t structure. 
+ *
+ * Note that unless %GNUTLS_PUBKEY_DISABLE_CALLBACKS
+ * is specified, if incorrect (or NULL) passwords are given
+ * the PKCS11 callback functions will be used to obtain the
+ * correct passwords. Otherwise if the SRK password is wrong
+ * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1099,7 +1117,7 @@ int ret;
         }
 
       ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_X509_FMT_PEM,
-			       		                          srk_password);
+       		                          srk_password, flags);
       if (ret < 0)
         {
           gnutls_assert();
@@ -1108,7 +1126,10 @@ int ret;
     }
   else if (durl.uuid_set)
     {
-      ret = import_tpm_pubkey_cb (pkey, NULL, 0, &durl.uuid, srk_password);
+      if (flags & GNUTLS_PUBKEY_DISABLE_CALLBACKS)
+        ret = import_tpm_pubkey (pkey, NULL, 0, &durl.uuid, srk_password);
+      else
+        ret = import_tpm_pubkey_cb (pkey, NULL, 0, &durl.uuid, srk_password);
       if (ret < 0)
         {
           gnutls_assert();

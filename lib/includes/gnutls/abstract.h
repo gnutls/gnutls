@@ -78,7 +78,8 @@ int
 gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
 			       const gnutls_datum_t * fdata,
 			       gnutls_x509_crt_fmt_t format,
-			       const char *srk_password);
+			       const char *srk_password,
+			       unsigned int flags);
 
 int gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
                                                 gnutls_digest_algorithm_t *
@@ -149,6 +150,10 @@ int gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt, gnutls_pubkey_t key);
 int gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq, gnutls_pubkey_t key);
 
 #define GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA 1
+/* The following flag disables call to PIN callbacks etc.
+ * Only works for TPM keys.
+ */
+#define GNUTLS_PUBKEY_DISABLE_CALLBACKS (1<<2)
 int
 gnutls_pubkey_verify_hash2 (gnutls_pubkey_t key, 
                             gnutls_sign_algorithm_t algo,
@@ -179,6 +184,10 @@ gnutls_privkey_type_t gnutls_privkey_get_type (gnutls_privkey_t key);
 
 #define GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE (1<<0)
 #define GNUTLS_PRIVKEY_IMPORT_COPY (1<<1)
+/* The following flag disables call to PIN callbacks etc.
+ * Only works for TPM keys.
+ */
+#define GNUTLS_PRIVKEY_DISABLE_CALLBACKS (1<<2)
 int gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey,
                                   gnutls_pkcs11_privkey_t key,
                                   unsigned int flags);
@@ -205,7 +214,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       const gnutls_datum_t * fdata,
 			       gnutls_x509_crt_fmt_t format,
 			       const char *srk_password,
-			       const char *tpm_password);
+			       const char *tpm_password, unsigned int flags);
 
 int
 gnutls_privkey_import_tpm_url (gnutls_privkey_t pkey,
