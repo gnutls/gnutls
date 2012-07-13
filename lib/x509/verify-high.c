@@ -350,6 +350,18 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
     uint32_t hash;
     gnutls_datum_t dn;
 
+    /* Start by truncating any disjoint list of certificates. For
+     * example, if the server presented a chain A->B->C->X->Y->Z
+     * where X is *not* actually the issuer of C, truncate at C.
+     */
+    for(i=1;i<clist_size;i++) {
+        if (!gnutls_x509_crt_check_issuer(certificate_list[i-1],
+                                          certificate_list[i])) {
+            gnutls_assert();
+            clist_size = i;
+        }
+    }
+
     if (clist_size > 1) {
         /* Check if the last certificate in the path is self signed.
          * In that case ignore it (a certificate is trusted only if it
