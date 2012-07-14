@@ -280,13 +280,46 @@ int
 gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
                              gnutls_pkcs11_obj_t obj, unsigned int flags)
 {
-  int ret;
+  int ret, type;
 
-  ret = gnutls_pkcs11_obj_get_type (obj);
-  if (ret != GNUTLS_PKCS11_OBJ_PUBKEY)
+  type = gnutls_pkcs11_obj_get_type (obj);
+  if (type != GNUTLS_PKCS11_OBJ_PUBKEY && type != GNUTLS_PKCS11_OBJ_X509_CRT)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  if (type == GNUTLS_PKCS11_OBJ_X509_CRT)
+    {
+      gnutls_x509_crt_t xcrt;
+      
+      ret = gnutls_x509_crt_init (&xcrt);
+      if (ret < 0)
+        {
+          gnutls_assert()
+          return ret;
+        }
+      
+      ret = gnutls_x509_crt_import_pkcs11 (xcrt, obj);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup_crt;
+        }
+        
+      ret = gnutls_pubkey_import_x509 (key, xcrt, 0);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup_crt;
+        }
+
+      gnutls_x509_crt_get_key_usage(xcrt, &key->key_usage, NULL);
+
+      ret = 0;
+cleanup_crt:
+      gnutls_x509_crt_deinit(xcrt);
+      return ret;
     }
 
   key->key_usage = obj->key_usage;

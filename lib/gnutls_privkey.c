@@ -970,7 +970,8 @@ cleanup:
  * @flags: should be zero
  *
  * This function will import a PKCS11 or TPM URL as a
- * private key.
+ * private key. The supported URL types can be checked
+ * using gnutls_url_is_supported().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

@@ -1737,8 +1737,10 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 			   time_t expiration,
 			   unsigned int flags);
 
-  /* Other help functions */
+  /* Other helper functions */
 int gnutls_load_file(const char* filename, gnutls_datum_t * data);
+
+int gnutls_url_is_supported (const char* url);
 
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.

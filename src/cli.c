@@ -224,7 +224,7 @@ load_keys (void)
                     gnutls_strerror (ret));
            exit (1);
          }
-      else if (strncmp (x509_keyfile, "tpmkey:", 7) == 0 || strncmp (x509_keyfile, "pkcs11:", 7) == 0)
+      else if (gnutls_url_is_supported(x509_keyfile) != 0)
         {
           ret =
             gnutls_privkey_import_url (x509_key, x509_keyfile, 0);
@@ -299,7 +299,7 @@ load_keys (void)
            exit (1);
          }
 
-      if (strncmp (pgp_keyfile, "pkcs11:", 7) == 0 || strncmp (pgp_keyfile, "tpmkey:", 7) == 0)
+      if (gnutls_url_is_supported (pgp_keyfile))
         {
           ret = gnutls_privkey_import_url( pgp_key, pgp_keyfile, 0);
           if (ret < 0)

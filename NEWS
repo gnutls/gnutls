@@ -13,11 +13,6 @@ and --benchmark-tls-ciphers
 ** certtool: generated PKCS #12 structures may hold more than one
 private key. Patch by Lucas Fisher.
 
-** libgnutls: Added support for an old version of the DTLS protocol
-used by openconnect vpn client for compatibility with Cisco's AnyConnect 
-SSL VPN. It is marked as GNUTLS_DTLS0_9. Do not use it for newer protocols
-as it has issues. Implemented by David Woodhouse.
-
 ** libgnutls: requires libnettle 2.5.
 
 ** libgnutls: Use the PKCS #1 1.5 encoding provided by nettle (2.5)
@@ -47,6 +42,7 @@ by Alexandre Bique.
 ** API and ABI modifications:
 GNUTLS_CERT_SIGNATURE_FAILURE: Added
 GNUTLS_CAMELLIA_192_CBC: Added
+gnutls_url_is_supported: Added
 gnutls_pkcs11_advset_pin_function: Added
 gnutls_pkcs11_advset_token_function: Added
 gnutls_privkey_import_tpm_raw: Added

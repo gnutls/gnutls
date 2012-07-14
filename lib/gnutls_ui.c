@@ -772,3 +772,26 @@ size_t len;
   
   return 0;
 }
+
+/**
+ * gnutls_url_is_supported:
+ * @url: A PKCS 11 url
+ *
+ * This function will return non-zero if the given URL
+ * is supported, and zero if it is not known.
+ *
+ * Since: 3.1.0
+ **/
+int
+gnutls_url_is_supported (const char* url)
+{
+#ifdef ENABLE_PKCS11
+  if (strstr(url, "pkcs11:") != NULL)
+    return 1;
+#endif
+#ifdef HAVE_TROUSERS
+  if (strstr(url, "tpmkey:") != NULL)
+    return 1;
+#endif
+  return 0;
+}
