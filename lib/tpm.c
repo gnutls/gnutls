@@ -608,7 +608,13 @@ static int randomize_uuid(TSS_UUID* uuid)
   ret = _gnutls_rnd (GNUTLS_RND_NONCE, raw_uuid, sizeof(raw_uuid));
   if (ret < 0)
     return gnutls_assert_val(ret);
-    
+   
+  /* mark it as random uuid */
+  raw_uuid[6] &= 0x0f;
+  raw_uuid[6] |= 0x40;
+  raw_uuid[8] &= 0x0f;
+  raw_uuid[8] |= 0x80;
+  
   memcpy(&uuid->ulTimeLow, raw_uuid, 4);
   memcpy(&uuid->usTimeMid, &raw_uuid[4], 2);
   memcpy(&uuid->usTimeHigh, &raw_uuid[6], 2);
