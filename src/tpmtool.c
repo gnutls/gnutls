@@ -97,7 +97,7 @@ cmd_parser (int argc, char **argv)
 
   if (HAVE_OPT(REGISTER))
     genflags |= GNUTLS_TPM_REGISTER_KEY;
-  if (HAVE_OPT(SIGNING))
+  if (!HAVE_OPT(LEGACY))
     genflags |= GNUTLS_TPM_KEY_SIGNING;
   if (HAVE_OPT(USER))
     genflags |= GNUTLS_TPM_KEY_USER;
