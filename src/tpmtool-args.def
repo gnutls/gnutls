@@ -32,6 +32,22 @@ flag = {
 };
 
 flag = {
+    name      = user;
+    descrip   = "Any registered key will be a user key";
+    flags_must = register;
+    flags_cant = system;
+    doc = "The generated key will be stored in a user specific persistent storage.";
+};
+
+flag = {
+    name      = system;
+    descrip   = "Any registred key will be a system key";
+    flags_must = register;
+    flags_cant = user;
+    doc = "The generated key will be stored in system persistent storage.";
+};
+
+flag = {
     name      = legacy;
     descrip   = "Any generated key will be a legacy key";
     flags_must = generate-rsa;

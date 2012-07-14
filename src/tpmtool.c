@@ -99,6 +99,8 @@ cmd_parser (int argc, char **argv)
     genflags |= GNUTLS_TPM_REGISTER_KEY;
   if (HAVE_OPT(SIGNING))
     genflags |= GNUTLS_TPM_KEY_SIGNING;
+  if (HAVE_OPT(USER))
+    genflags |= GNUTLS_TPM_KEY_USER;
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug);
