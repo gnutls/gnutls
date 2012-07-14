@@ -50,7 +50,7 @@
 #include "tpmtool-args.h"
 
 static void cmd_parser (int argc, char **argv);
-static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, int reg);
+static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, unsigned int flags);
 static void tpm_pubkey(const char* url, FILE* outfile);
 static void tpm_delete(const char* url, FILE* outfile);
 static void tpm_list(FILE* outfile);
@@ -81,7 +81,8 @@ cmd_parser (int argc, char **argv)
   int ret, debug = 0;
   unsigned int optct;
   unsigned int key_type = GNUTLS_PK_UNKNOWN;
-  unsigned int bits = 0, reg = 0;
+  unsigned int bits = 0;
+  unsigned int genflags = 0;
   /* Note that the default sec-param is legacy because several TPMs
    * cannot handle larger keys.
    */
@@ -95,7 +96,9 @@ cmd_parser (int argc, char **argv)
     debug = OPT_VALUE_DEBUG;
 
   if (HAVE_OPT(REGISTER))
-    reg = 1;
+    genflags |= GNUTLS_TPM_REGISTER_KEY;
+  if (HAVE_OPT(SIGNING))
+    genflags |= GNUTLS_TPM_KEY_SIGNING;
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug);
@@ -133,7 +136,7 @@ cmd_parser (int argc, char **argv)
     {
       key_type = GNUTLS_PK_RSA;
       bits = get_bits (key_type, bits, sec_param);
-      tpm_generate (outfile, key_type, bits, reg);
+      tpm_generate (outfile, key_type, bits, genflags);
     }
   else if (HAVE_OPT(PUBKEY))
     {
@@ -157,15 +160,11 @@ cmd_parser (int argc, char **argv)
   gnutls_global_deinit ();
 }
 
-static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, int reg)
+static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, unsigned int flags)
 {
   int ret;
   char* srk_pass, *key_pass;
   gnutls_datum_t privkey, pubkey;
-  unsigned int flags = 0;
-  
-  if (reg)
-    flags |= GNUTLS_TPM_REGISTER_KEY;
   
   srk_pass = getpass ("Enter SRK password: ");
   if (srk_pass != NULL)

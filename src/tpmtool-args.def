@@ -19,6 +19,23 @@ flag = {
 flag = {
     name      = register;
     descrip   = "Any generated key will be registered in the TPM";
+    flags_must = generate-rsa;
+    doc = "";
+};
+
+flag = {
+    name      = signing;
+    descrip   = "Any generated key will be a signing key";
+    flags_must = generate-rsa;
+    flags_cant = legacy;
+    doc = "";
+};
+
+flag = {
+    name      = legacy;
+    descrip   = "Any generated key will be a legacy key";
+    flags_must = generate-rsa;
+    flags_cant = signing;
     doc = "";
 };
 
