@@ -967,6 +967,7 @@ cleanup:
  * gnutls_privkey_import_url:
  * @key: A key of type #gnutls_pubkey_t
  * @url: A PKCS 11 url
+ * @flags: should be zero
  *
  * This function will import a PKCS11 or TPM URL as a
  * private key.
@@ -977,7 +978,7 @@ cleanup:
  * Since: 3.1.0
  **/
 int
-gnutls_privkey_import_url (gnutls_privkey_t key, const char *url)
+gnutls_privkey_import_url (gnutls_privkey_t key, const char *url, unsigned int flags)
 {
 #ifdef ENABLE_PKCS11
   if (strstr(url, "pkcs11:") != NULL)

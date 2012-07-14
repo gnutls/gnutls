@@ -76,7 +76,7 @@ static int encode_tpmkey_url(char** url, const TSS_UUID* uuid, const TSS_UUID* p
 
 static int tss_err_pwd(TSS_RESULT err, int pwd_error)
 {
-  _gnutls_debug_log("TPM error: %s (%x)\n", Trspi_Error_String(err), (unsigned int)Trspi_Error_Code(err));
+  _gnutls_debug_log("TPM (%s) error: %s (%x)\n", Trspi_Error_Layer(err), Trspi_Error_String(err), (unsigned int)Trspi_Error_Code(err));
 
   switch(ERROR_LAYER(err))
     {
@@ -88,9 +88,10 @@ static int tss_err_pwd(TSS_RESULT err, int pwd_error)
             case TPM_E_NOSRK:
               return GNUTLS_E_TPM_UNINITIALIZED;
             default:
-              return GNUTLS_E_TPM_ERROR;
+              return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
           }
       case TSS_LAYER_TCS:
+      case TSS_LAYER_TSP:
         switch(ERROR_CODE(err))
           {
             case TSS_E_COMM_FAILURE:
@@ -101,10 +102,10 @@ static int tss_err_pwd(TSS_RESULT err, int pwd_error)
             case TSS_E_PS_KEY_NOTFOUND:
               return GNUTLS_E_TPM_KEY_NOT_FOUND;
             default:
-              return GNUTLS_E_TPM_ERROR;
+              return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
           }
        default:
-         return GNUTLS_E_TPM_ERROR;
+         return gnutls_assert_val(GNUTLS_E_TPM_ERROR);
     }
 }
 
@@ -275,8 +276,6 @@ int err, ret;
   if (err)
     {
       gnutls_assert ();
-      _gnutls_debug_log ("Failed to set TPM PIN: %s\n",
-			 Trspi_Error_String (err));
       ret = tss_err(err);
       goto out_srkpol;
     }
@@ -455,9 +454,6 @@ import_tpm_key (gnutls_privkey_t pkey,
 	  if (err)
 	    {
 	      gnutls_assert ();
-	      _gnutls_debug_log
-		  ("Failed to create key policy object: %s\n",
-		   Trspi_Error_String (err));
               ret = tss_err(err);
 	      goto out_key;
 	    }
@@ -466,8 +462,6 @@ import_tpm_key (gnutls_privkey_t pkey,
 	  if (err)
 	    {
 	      gnutls_assert ();
-	      _gnutls_debug_log ("Failed to assign policy to key: %s\n",
-				 Trspi_Error_String (err));
               ret = tss_err(err);
 	      goto out_key_policy;
 	    }
@@ -479,8 +473,6 @@ import_tpm_key (gnutls_privkey_t pkey,
       if (err)
 	{
 	  gnutls_assert ();
-	  _gnutls_debug_log ("Failed to set key PIN: %s\n",
-			     Trspi_Error_String (err));
           ret = tss_err_key(err);
 	  goto out_key_policy;
 	}
@@ -722,7 +714,7 @@ static int decode_tpmkey_url(const char* url, struct tpmkey_url_st *s)
     {
       p += sizeof ("file=") - 1;
       size = strlen(p);
-      s->filename = gnutls_malloc(size);
+      s->filename = gnutls_malloc(size+1);
       if (s->filename == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -732,6 +724,7 @@ static int decode_tpmkey_url(const char* url, struct tpmkey_url_st *s)
           gnutls_assert();
           goto cleanup;
         }
+      s->filename[size] = 0;
     }
   else if ((p = strstr(url, "uuid=")) != NULL)
    {
@@ -825,6 +818,7 @@ int ret;
       if (ret < 0)
         {
           gnutls_assert();
+          _gnutls_debug_log("Error loading %s\n", durl.filename);
           goto cleanup;
         }
 
@@ -949,20 +943,9 @@ struct tpm_ctx_st s;
                                         asn1.size, asn1.data, &s.tpm_key);
       if (err != 0)
         {
-          if (srk_password)
-            {
-              gnutls_assert ();
-              _gnutls_debug_log
-                  ("Failed to load TPM key blob: %s\n",
-                   Trspi_Error_String (err));
-            }
-
-          if (err)
-            {
-              gnutls_assert ();
-              ret = tss_err(err);
-              goto out_blob;
-            }
+          gnutls_assert ();
+          ret = tss_err(err);
+          goto out_blob;
         }
     }
   else if (uuid)
