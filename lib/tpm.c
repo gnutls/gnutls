@@ -53,7 +53,7 @@ struct tpm_ctx_st
 struct tpm_key_list_st
 {
   UINT32 size;
-  TSS_KM_KEYINFO * ki;
+  TSS_KM_KEYINFO2 * ki;
   TSS_HCONTEXT tpm_ctx;
 };
 
@@ -62,9 +62,10 @@ static int import_tpm_key (gnutls_privkey_t pkey,
                            const gnutls_datum_t * fdata,
                            gnutls_x509_crt_fmt_t format,
                            TSS_UUID *uuid,
+                           TSS_FLAG storage_type,
                            const char *srk_password,
                            const char *key_password);
-static int encode_tpmkey_url(char** url, const TSS_UUID* uuid, const TSS_UUID* parent);
+static int encode_tpmkey_url(char** url, const TSS_UUID* uuid, TSS_FLAG storage);
 
 /* TPM URL format:
  *
@@ -174,8 +175,8 @@ static const unsigned char nullpass[20];
 static const gnutls_datum_t nulldata = {(void*)nullpass, 20};
 const TSS_UUID srk_uuid = TSS_UUID_SRK;
 
-static int tpm_pin(const TSS_UUID* uuid, char* pin, unsigned int pin_size, 
-                   unsigned int attempts)
+static int tpm_pin(const TSS_UUID* uuid, TSS_FLAG storage, char* pin, 
+                   unsigned int pin_size, unsigned int attempts)
 {
 unsigned int flags = 0;
 const char* label;
@@ -191,7 +192,7 @@ int ret;
         label = "SRK";
       else
         {
-          ret = encode_tpmkey_url(&url, uuid, NULL);
+          ret = encode_tpmkey_url(&url, uuid, storage);
           if (ret < 0)
             return gnutls_assert_val(ret);
           
@@ -310,6 +311,7 @@ import_tpm_key_cb (gnutls_privkey_t pkey,
                 const gnutls_datum_t * fdata,
                 gnutls_x509_crt_fmt_t format,
                 TSS_UUID *uuid,
+                TSS_FLAG storage,
                 const char *srk_password,
                 const char *key_password)
 {
@@ -320,14 +322,14 @@ int ret, ret2;
 
   do
     {
-      ret = import_tpm_key(pkey, fdata, format, uuid, srk_password, key_password);
+      ret = import_tpm_key(pkey, fdata, format, uuid, storage, srk_password, key_password);
 
       if (attempts > 3 || _gnutls_pin_func == NULL)
         break;
 
       if (ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR)
         {
-          ret2 = tpm_pin(&srk_uuid, pin1, sizeof(pin1), attempts++);
+          ret2 = tpm_pin(&srk_uuid, storage, pin1, sizeof(pin1), attempts++);
           if (ret2 < 0)
             {
               gnutls_assert();
@@ -338,7 +340,7 @@ int ret, ret2;
 
       if (ret == GNUTLS_E_TPM_KEY_PASSWORD_ERROR)
         {
-          ret2 = tpm_pin(uuid, pin2, sizeof(pin2), attempts++);
+          ret2 = tpm_pin(uuid, storage, pin2, sizeof(pin2), attempts++);
           if (ret2 < 0)
             {
               gnutls_assert();
@@ -360,6 +362,7 @@ import_tpm_key (gnutls_privkey_t pkey,
                 const gnutls_datum_t * fdata,
                 gnutls_x509_crt_fmt_t format,
                 TSS_UUID *uuid,
+                TSS_FLAG storage,
                 const char *srk_password,
                 const char *key_password)
 {
@@ -416,8 +419,9 @@ import_tpm_key (gnutls_privkey_t pkey,
   else if (uuid)
     {
       err =
-          Tspi_Context_LoadKeyByUUID (s->tpm_ctx, TSS_PS_TYPE_SYSTEM,
-              *uuid, &s->tpm_key);
+          Tspi_Context_LoadKeyByUUID (s->tpm_ctx, storage,
+                                      *uuid, &s->tpm_key);
+
       if (err)
         {
           gnutls_assert ();
@@ -528,15 +532,16 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       unsigned int flags)
 {
   if (flags & GNUTLS_PRIVKEY_DISABLE_CALLBACKS)
-    return import_tpm_key(pkey, fdata, format, NULL, srk_password, key_password);
+    return import_tpm_key(pkey, fdata, format, NULL, 0, srk_password, key_password);
   else
-    return import_tpm_key_cb(pkey, fdata, format, NULL, srk_password, key_password);
+    return import_tpm_key_cb(pkey, fdata, format, NULL, 0, srk_password, key_password);
 }
 
 struct tpmkey_url_st
 {
   char* filename;
   TSS_UUID uuid;
+  TSS_FLAG storage;
   unsigned int uuid_set;
 };
 
@@ -613,7 +618,7 @@ static int randomize_uuid(TSS_UUID* uuid)
   return 0;
 }
 
-static int encode_tpmkey_url(char** url, const TSS_UUID* uuid, const TSS_UUID* parent)
+static int encode_tpmkey_url(char** url, const TSS_UUID* uuid, TSS_FLAG storage)
 {
 size_t size = (UUID_SIZE*2+4)*2+32;
 uint8_t u1[UUID_SIZE];
@@ -652,35 +657,12 @@ int ret;
       goto cleanup;
     }
 
-#if 0
-  if (parent)
+  ret = _gnutls_buffer_append_printf(&buf, ";storage=%s", (storage==TSS_PS_TYPE_USER)?"user":"system");
+  if (ret < 0)
     {
-      memcpy(u1, &parent->ulTimeLow, 4);
-      memcpy(&u1[4], &parent->usTimeMid, 2);
-      memcpy(&u1[6], &parent->usTimeHigh, 2);
-      u1[8] = parent->bClockSeqHigh;
-      u1[9] = parent->bClockSeqLow;
-      memcpy(&u1[10], parent->rgbNode, 6);
-
-      ret = _gnutls_buffer_append_str(&buf, ";parent=");
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
-
-      ret = _gnutls_buffer_append_printf(&buf, "%.2x%.2x%.2x%.2x-%.2x%.2x-%.2x%.2x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x",
-        (unsigned int)u1[0], (unsigned int)u1[1], (unsigned int)u1[2], (unsigned int)u1[3],
-        (unsigned int)u1[4], (unsigned int)u1[5], (unsigned int)u1[6], (unsigned int)u1[7],
-        (unsigned int)u1[8], (unsigned int)u1[9], (unsigned int)u1[10], (unsigned int)u1[11],
-        (unsigned int)u1[12], (unsigned int)u1[13], (unsigned int)u1[14], (unsigned int)u1[15]);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
+      gnutls_assert();
+      goto cleanup;
     }
-#endif
 
   ret = _gnutls_buffer_to_datum(&buf, &dret);
   if (ret < 0)
@@ -765,6 +747,11 @@ static int decode_tpmkey_url(const char* url, struct tpmkey_url_st *s)
       return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
     }
 
+  if ((p = strstr(url, "storage=user")) != NULL)
+    s->storage = TSS_PS_TYPE_USER;
+  else
+    s->storage = TSS_PS_TYPE_SYSTEM;
+
   return 0;
 
 cleanup:
@@ -833,9 +820,9 @@ int ret;
   else if (durl.uuid_set)
     {
       if (flags & GNUTLS_PRIVKEY_DISABLE_CALLBACKS)
-        ret = import_tpm_key (pkey, NULL, 0, &durl.uuid, srk_password, key_password);
+        ret = import_tpm_key (pkey, NULL, 0, &durl.uuid, durl.storage, srk_password, key_password);
       else
-        ret = import_tpm_key_cb (pkey, NULL, 0, &durl.uuid, srk_password, key_password);
+        ret = import_tpm_key_cb (pkey, NULL, 0, &durl.uuid, durl.storage, srk_password, key_password);
       if (ret < 0)
         {
           gnutls_assert();
@@ -908,6 +895,7 @@ import_tpm_pubkey (gnutls_pubkey_t pkey,
                    const gnutls_datum_t * fdata,
                    gnutls_x509_crt_fmt_t format,
                    TSS_UUID *uuid,
+                   TSS_FLAG storage,
                    const char *srk_password)
 {
 gnutls_datum_t asn1 = {NULL, 0};
@@ -951,8 +939,8 @@ struct tpm_ctx_st s;
   else if (uuid)
     {
       err =
-          Tspi_Context_LoadKeyByUUID (s.tpm_ctx, TSS_PS_TYPE_SYSTEM,
-              *uuid, &s.tpm_key);
+          Tspi_Context_LoadKeyByUUID (s.tpm_ctx, storage,
+                                      *uuid, &s.tpm_key);
       if (err)
         {
           gnutls_assert ();
@@ -987,23 +975,23 @@ import_tpm_pubkey_cb (gnutls_pubkey_t pkey,
                    const gnutls_datum_t * fdata,
                    gnutls_x509_crt_fmt_t format,
                    TSS_UUID *uuid,
+                   TSS_FLAG storage,
                    const char *srk_password)
 {
 unsigned int attempts = 0;
 char pin1[GNUTLS_PKCS11_MAX_PIN_LEN];
 int ret;
-
   
   do
     {
-      ret = import_tpm_pubkey(pkey, fdata, format, uuid, srk_password);
+      ret = import_tpm_pubkey(pkey, fdata, format, uuid, storage, srk_password);
       
       if (attempts > 3 || _gnutls_pin_func == NULL)
         break;
 
       if (ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR)
         {
-          ret = tpm_pin(&srk_uuid, pin1, sizeof(pin1), attempts++);
+          ret = tpm_pin(&srk_uuid, storage, pin1, sizeof(pin1), attempts++);
           if (ret < 0)
             {
               gnutls_assert();
@@ -1048,9 +1036,9 @@ gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
                               unsigned int flags)
 {
   if (flags & GNUTLS_PUBKEY_DISABLE_CALLBACKS)
-    return import_tpm_pubkey_cb(pkey, fdata, format, NULL, srk_password);
+    return import_tpm_pubkey_cb(pkey, fdata, format, NULL, 0, srk_password);
   else
-    return import_tpm_pubkey(pkey, fdata, format, NULL, srk_password);
+    return import_tpm_pubkey(pkey, fdata, format, NULL, 0, srk_password);
 }
 
 /**
@@ -1110,9 +1098,9 @@ int ret;
   else if (durl.uuid_set)
     {
       if (flags & GNUTLS_PUBKEY_DISABLE_CALLBACKS)
-        ret = import_tpm_pubkey (pkey, NULL, 0, &durl.uuid, srk_password);
+        ret = import_tpm_pubkey (pkey, NULL, 0, &durl.uuid, durl.storage, srk_password);
       else
-        ret = import_tpm_pubkey_cb (pkey, NULL, 0, &durl.uuid, srk_password);
+        ret = import_tpm_pubkey_cb (pkey, NULL, 0, &durl.uuid, durl.storage, srk_password);
       if (ret < 0)
         {
           gnutls_assert();
@@ -1179,11 +1167,17 @@ gnutls_datum_t tmpkey = {NULL, 0};
 TSS_HPOLICY key_policy;
 gnutls_pubkey_t pub;
 struct tpm_ctx_st s;
+TSS_FLAG storage_type;
 
   if (flags & GNUTLS_TPM_KEY_SIGNING)
     tpm_flags |= TSS_KEY_TYPE_SIGNING;
   else
     tpm_flags |= TSS_KEY_TYPE_LEGACY;
+
+  if (flags & GNUTLS_TPM_KEY_USER)
+    storage_type = TSS_PS_TYPE_USER;
+  else
+    storage_type = TSS_PS_TYPE_SYSTEM;
 
   if (bits <= 512)
       tpm_flags |= TSS_KEY_SIZE_512;
@@ -1259,7 +1253,7 @@ struct tpm_ctx_st s;
           goto err_sa;
         }
 
-      tssret = Tspi_Context_RegisterKey(s.tpm_ctx, key_ctx, TSS_PS_TYPE_SYSTEM,
+      tssret = Tspi_Context_RegisterKey(s.tpm_ctx, key_ctx, storage_type,
                                         key_uuid, TSS_PS_TYPE_SYSTEM, srk_uuid);
       if (tssret != 0)
         {
@@ -1268,12 +1262,12 @@ struct tpm_ctx_st s;
           goto err_sa;
         }
 
-      ret = encode_tpmkey_url((char**)&privkey->data, &key_uuid, &srk_uuid);
+      ret = encode_tpmkey_url((char**)&privkey->data, &key_uuid, storage_type);
       if (ret < 0)
         {
           TSS_HKEY tkey;
 
-          Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_SYSTEM, key_uuid, &tkey);
+          Tspi_Context_UnregisterKey(s.tpm_ctx, storage_type, key_uuid, &tkey);
           gnutls_assert();
           goto err_sa;
         }
@@ -1414,7 +1408,7 @@ gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char*
   if (idx >= list->size)
     return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-  return encode_tpmkey_url(url, &list->ki[idx].keyUUID, &list->ki[idx].parentKeyUUID);
+  return encode_tpmkey_url(url, &list->ki[idx].keyUUID, list->ki[idx].persistentStorageType);
 }
 
 /**
@@ -1457,7 +1451,7 @@ int ret;
     }
 
   tssret =
-      Tspi_Context_GetRegisteredKeysByUUID((*list)->tpm_ctx, TSS_PS_TYPE_SYSTEM,
+      Tspi_Context_GetRegisteredKeysByUUID2((*list)->tpm_ctx, TSS_PS_TYPE_SYSTEM,
 				  NULL, &(*list)->size, &(*list)->ki);
   if (tssret)
     {
@@ -1506,7 +1500,7 @@ int ret;
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  tssret = Tspi_Context_UnregisterKey(s.tpm_ctx, TSS_PS_TYPE_SYSTEM, durl.uuid, &tkey);
+  tssret = Tspi_Context_UnregisterKey(s.tpm_ctx, durl.storage, durl.uuid, &tkey);
   if (tssret != 0)
     {
       gnutls_assert();
