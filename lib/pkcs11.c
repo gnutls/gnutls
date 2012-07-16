@@ -677,6 +677,7 @@ gnutls_pkcs11_get_pin_function (void **userdata)
       *userdata = _gnutls_pin_data;
       return _gnutls_pin_func;
     }
+  return NULL;
 }
 
 /**
