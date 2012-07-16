@@ -2008,9 +2008,12 @@ retrieve_pin_from_callback (const struct pin_info_st *pin_info,
   if (pin_info && pin_info->cb)
     ret = pin_info->cb (pin_info->data, attempts, (char*)token_str, label,
                         flags, pin_value, GNUTLS_PKCS11_MAX_PIN_LEN);
-  else
+  else if (_gnutls_pin_func)
     ret = _gnutls_pin_func (_gnutls_pin_data, attempts, (char*)token_str, label,
                             flags, pin_value, GNUTLS_PKCS11_MAX_PIN_LEN);
+  else
+    ret = gnutls_assert_val(GNUTLS_E_PKCS11_PIN_ERROR);
+
   free (token_str);
   free (label);
 
@@ -2044,7 +2047,7 @@ retrieve_pin (struct pin_info_st* pin_info, struct p11_kit_uri *info,
     }
 
   /* The global gnutls pin callback */
-  if (_gnutls_pin_func && ret < 0)
+  if (ret < 0)
     ret = retrieve_pin_from_callback (pin_info, token_info, attempts, user_type, pin);
 
   /* Otherwise, PIN entry is necessary for login, so fail if there's

@@ -205,8 +205,11 @@ int ret;
 
   if (pin_info && pin_info->cb)
     ret = pin_info->cb(pin_info->data, attempts, "TPM", label, flags, pin, pin_size);
-  else
+  else if (_gnutls_pin_func)
     ret = _gnutls_pin_func(_gnutls_pin_data, attempts, "TPM", label, flags, pin, pin_size);
+  else
+    ret = gnutls_assert_val(GNUTLS_E_TPM_KEY_PASSWORD_ERROR); /* doesn't really matter */
+
   if (ret < 0)
     {
       gnutls_assert();
@@ -311,13 +314,10 @@ static void tpm_close_session(struct tpm_ctx_st *s)
 }
 
 static int
-import_tpm_key_cb (gnutls_privkey_t pkey,
-                const gnutls_datum_t * fdata,
-                gnutls_x509_crt_fmt_t format,
-                TSS_UUID *uuid,
-                TSS_FLAG storage,
-                const char *srk_password,
-                const char *key_password)
+import_tpm_key_cb (gnutls_privkey_t pkey, const gnutls_datum_t * fdata,
+                   gnutls_x509_crt_fmt_t format, TSS_UUID *uuid,
+                   TSS_FLAG storage, const char *srk_password,
+                   const char *key_password)
 {
 unsigned int attempts = 0;
 char pin1[GNUTLS_PKCS11_MAX_PIN_LEN];
@@ -328,7 +328,7 @@ int ret, ret2;
     {
       ret = import_tpm_key(pkey, fdata, format, uuid, storage, srk_password, key_password);
 
-      if (attempts > 3 || _gnutls_pin_func == NULL)
+      if (attempts > 3)
         break;
 
       if (ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR)
@@ -996,7 +996,7 @@ int ret;
     {
       ret = import_tpm_pubkey(pkey, fdata, format, uuid, storage, srk_password);
       
-      if (attempts > 3 || _gnutls_pin_func == NULL)
+      if (attempts > 3)
         break;
 
       if (ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR)
