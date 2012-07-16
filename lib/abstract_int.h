@@ -25,6 +25,56 @@
 
 #include <gnutls/abstract.h>
 
+struct gnutls_privkey_st
+{
+  gnutls_privkey_type_t type;
+  gnutls_pk_algorithm_t pk_algorithm;
+
+  union
+  {
+    gnutls_x509_privkey_t x509;
+#ifdef ENABLE_PKCS11
+    gnutls_pkcs11_privkey_t pkcs11;
+#endif
+#ifdef ENABLE_OPENPGP
+    gnutls_openpgp_privkey_t openpgp;
+#endif
+    struct {
+      gnutls_privkey_sign_func sign_func;
+      gnutls_privkey_decrypt_func decrypt_func;
+      gnutls_privkey_deinit_func deinit_func;
+      void* userdata;
+    } ext;
+  } key;
+
+  unsigned int flags;
+  struct pin_info_st pin;
+};
+
+struct gnutls_pubkey_st
+{
+  gnutls_pk_algorithm_t pk_algorithm;
+  unsigned int bits;            /* an indication of the security parameter */
+
+  /* the size of params depends on the public
+   * key algorithm
+   * RSA: [0] is modulus
+   *      [1] is public exponent
+   * DSA: [0] is p
+   *      [1] is q
+   *      [2] is g
+   *      [3] is public key
+   */
+  gnutls_pk_params_st params;
+
+  uint8_t openpgp_key_id[GNUTLS_OPENPGP_KEYID_SIZE];
+  int openpgp_key_id_set;
+
+  unsigned int key_usage;       /* bits from GNUTLS_KEY_* */
+  
+  struct pin_info_st pin;
+};
+
 int _gnutls_privkey_get_public_mpis (gnutls_privkey_t key,
                                      gnutls_pk_params_st*);
 

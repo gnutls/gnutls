@@ -87,6 +87,9 @@ void gnutls_pkcs11_advset_pin_function (gnutls_pin_callback_t fn,
 
 int gnutls_pkcs11_add_provider (const char *name, const char *params);
 int gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * obj);
+void gnutls_pkcs11_obj_set_pin_function (gnutls_pkcs11_obj_t,
+                                         gnutls_pin_callback_t fn, 
+                                         void *userdata);
 
 #define GNUTLS_PKCS11_OBJ_FLAG_LOGIN (1<<0)     /* force login in the token for the operation */
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED (1<<1)      /* object marked as trusted */
@@ -286,6 +289,8 @@ int gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs,
 
 /* private key functions...*/
 int gnutls_pkcs11_privkey_init (gnutls_pkcs11_privkey_t * key);
+void gnutls_pkcs11_privkey_set_pin_function (gnutls_pkcs11_privkey_t,
+                                             gnutls_pin_callback_t fn, void *userdata);
 void gnutls_pkcs11_privkey_deinit (gnutls_pkcs11_privkey_t key);
 int gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key,
                                             unsigned int *bits);

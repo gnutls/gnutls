@@ -822,6 +822,26 @@ gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * obj)
 }
 
 /**
+ * gnutls_pkcs11_obj_set_pin_function:
+ * @obj: The object structure
+ * @fn: the callback
+ * @userdata: data associated with the callback
+ *
+ * This function will set a callback function to be used when
+ * required to access the object. This function overrides the global
+ * set using gnutls_pkcs11_set_pin_function().
+ *
+ * Since: 3.1.0
+ *
+ **/
+void gnutls_pkcs11_obj_set_pin_function (gnutls_pkcs11_obj_t obj,
+                                         gnutls_pin_callback_t fn, void *userdata)
+{
+  obj->pin.cb = fn;
+  obj->pin.data = userdata;
+}
+
+/**
  * gnutls_pkcs11_obj_deinit:
  * @obj: The structure to be initialized
  *
@@ -884,6 +904,7 @@ gnutls_pkcs11_obj_export (gnutls_pkcs11_obj_t obj,
 
 int
 pkcs11_find_object (struct pkcs11_session_info* sinfo,
+                    struct pin_info_st * pin_info,
                     ck_object_handle_t * _obj,
                     struct p11_kit_uri *info, unsigned int flags)
 {
@@ -894,7 +915,7 @@ pkcs11_find_object (struct pkcs11_session_info* sinfo,
   unsigned long count;
   ck_rv_t rv;
 
-  ret = pkcs11_open_session (sinfo, info, flags & SESSION_LOGIN);
+  ret = pkcs11_open_session (sinfo, pin_info, info, flags & SESSION_LOGIN);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -976,7 +997,9 @@ pkcs11_find_slot (struct ck_function_list ** module, ck_slot_id_t * slot,
 }
 
 int
-pkcs11_open_session (struct pkcs11_session_info *sinfo, struct p11_kit_uri *info, 
+pkcs11_open_session (struct pkcs11_session_info *sinfo, 
+                     struct pin_info_st *pin_info,
+                     struct p11_kit_uri *info, 
                      unsigned int flags)
 {
   ck_rv_t rv;
@@ -1011,7 +1034,7 @@ pkcs11_open_session (struct pkcs11_session_info *sinfo, struct p11_kit_uri *info
 
   if (flags & SESSION_LOGIN)
     {
-      ret = pkcs11_login (sinfo, &tinfo, info, (flags & SESSION_SO) ? 1 : 0);
+      ret = pkcs11_login (sinfo, pin_info, &tinfo, info, (flags & SESSION_SO) ? 1 : 0);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -1026,7 +1049,9 @@ pkcs11_open_session (struct pkcs11_session_info *sinfo, struct p11_kit_uri *info
 
 int
 _pkcs11_traverse_tokens (find_func_t find_func, void *input,
-                         struct p11_kit_uri *info, unsigned int flags)
+                         struct p11_kit_uri *info, 
+                         struct pin_info_st *pin_info,
+                         unsigned int flags)
 {
   ck_rv_t rv;
   unsigned int found = 0, x, z;
@@ -1072,7 +1097,7 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
 
           if (flags & SESSION_LOGIN)
             {
-              ret = pkcs11_login (&sinfo, &tinfo, info, (flags & SESSION_SO) ? 1 : 0);
+              ret = pkcs11_login (&sinfo, pin_info, &tinfo, info, (flags & SESSION_SO) ? 1 : 0);
               if (ret < 0)
                 {
                   gnutls_assert ();
@@ -1631,12 +1656,12 @@ pkcs11_obj_flags_to_int (unsigned int flags)
 
 /**
  * gnutls_pkcs11_obj_import_url:
- * @cert: The structure to store the parsed certificate
+ * @obj: The structure to store the object
  * @url: a PKCS 11 url identifying the key
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
- * This function will "import" a PKCS 11 URL identifying a certificate
- * key to the #gnutls_pkcs11_obj_t structure. This does not involve any
+ * This function will "import" a PKCS 11 URL identifying an object (e.g. certificate)
+ * to the #gnutls_pkcs11_obj_t structure. This does not involve any
  * parsing (such as X.509 or OpenPGP) since the #gnutls_pkcs11_obj_t is
  * format agnostic. Only data are transferred.
  *
@@ -1646,16 +1671,16 @@ pkcs11_obj_flags_to_int (unsigned int flags)
  * Since: 2.12.0
  **/
 int
-gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t cert, const char *url,
+gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t obj, const char *url,
                               unsigned int flags)
 {
   int ret;
   struct url_find_data_st find_data;
 
   /* fill in the find data structure */
-  find_data.crt = cert;
+  find_data.crt = obj;
 
-  ret = pkcs11_url_to_info (url, &cert->info);
+  ret = pkcs11_url_to_info (url, &obj->info);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1663,8 +1688,8 @@ gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t cert, const char *url,
     }
 
   ret =
-    _pkcs11_traverse_tokens (find_obj_url, &find_data, cert->info,
-                             pkcs11_obj_flags_to_int (flags));
+    _pkcs11_traverse_tokens (find_obj_url, &find_data, obj->info,
+                             &obj->pin, pkcs11_obj_flags_to_int (flags));
 
   if (ret < 0)
     {
@@ -1735,7 +1760,7 @@ gnutls_pkcs11_token_get_url (unsigned int seq,
   tn.seq = seq;
   tn.info = p11_kit_uri_new ();
 
-  ret = _pkcs11_traverse_tokens (find_token_num, &tn, NULL, 0);
+  ret = _pkcs11_traverse_tokens (find_token_num, &tn, NULL, NULL, 0);
   if (ret < 0)
     {
       p11_kit_uri_free (tn.info);
@@ -1948,8 +1973,10 @@ retrieve_pin_from_source (const char *pinfile, struct ck_token_info *token_info,
 }
 
 static int
-retrieve_pin_for_callback (struct ck_token_info *token_info, int attempts,
-                           ck_user_type_t user_type, struct p11_kit_pin **pin)
+retrieve_pin_from_callback (const struct pin_info_st *pin_info,
+                            struct ck_token_info *token_info, 
+                            int attempts, ck_user_type_t user_type, 
+                            struct p11_kit_pin **pin)
 {
   char pin_value[GNUTLS_PKCS11_MAX_PIN_LEN];
   unsigned int flags = 0;
@@ -2005,8 +2032,12 @@ retrieve_pin_for_callback (struct ck_token_info *token_info, int attempts,
   if (attempts > 0)
     flags |= GNUTLS_PKCS11_PIN_WRONG;
 
-  ret = _gnutls_pin_func (_gnutls_pin_data, attempts, (char*)token_str, label,
-                  flags, pin_value, GNUTLS_PKCS11_MAX_PIN_LEN);
+  if (pin_info && pin_info->cb)
+    ret = pin_info->cb (pin_info->data, attempts, (char*)token_str, label,
+                        flags, pin_value, GNUTLS_PKCS11_MAX_PIN_LEN);
+  else
+    ret = _gnutls_pin_func (_gnutls_pin_data, attempts, (char*)token_str, label,
+                            flags, pin_value, GNUTLS_PKCS11_MAX_PIN_LEN);
   free (token_str);
   free (label);
 
@@ -2022,8 +2053,9 @@ retrieve_pin_for_callback (struct ck_token_info *token_info, int attempts,
 }
 
 static int
-retrieve_pin (struct p11_kit_uri *info, struct ck_token_info *token_info,
-              int attempts, ck_user_type_t user_type, struct p11_kit_pin **pin)
+retrieve_pin (struct pin_info_st* pin_info, struct p11_kit_uri *info, 
+              struct ck_token_info *token_info, int attempts, 
+              ck_user_type_t user_type, struct p11_kit_pin **pin)
 {
   const char *pinfile;
   int ret = GNUTLS_E_PKCS11_PIN_ERROR;
@@ -2040,7 +2072,7 @@ retrieve_pin (struct p11_kit_uri *info, struct ck_token_info *token_info,
 
   /* The global gnutls pin callback */
   if (_gnutls_pin_func && ret < 0)
-    ret = retrieve_pin_for_callback (token_info, attempts, user_type, pin);
+    ret = retrieve_pin_from_callback (pin_info, token_info, attempts, user_type, pin);
 
   /* Otherwise, PIN entry is necessary for login, so fail if there's
    * no callback. */
@@ -2055,7 +2087,7 @@ retrieve_pin (struct p11_kit_uri *info, struct ck_token_info *token_info,
 }
 
 int
-pkcs11_login (struct pkcs11_session_info * sinfo,
+pkcs11_login (struct pkcs11_session_info * sinfo, struct pin_info_st * pin_info,
               const struct token_info *tokinfo, struct p11_kit_uri *info, int so)
 {
   struct ck_session_info session_info;
@@ -2120,7 +2152,7 @@ pkcs11_login (struct pkcs11_session_info * sinfo,
             }
         }
 
-      ret = retrieve_pin (info, &tinfo, attempt++, user_type, &pin);
+      ret = retrieve_pin (pin_info, info, &tinfo, attempt++, user_type, &pin);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -2599,6 +2631,7 @@ gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
 
   ret =
     _pkcs11_traverse_tokens (find_objs, &find_data, find_data.info,
+                             NULL,
                              pkcs11_obj_flags_to_int (flags));
   p11_kit_uri_free (find_data.info);
 
@@ -2846,7 +2879,7 @@ gnutls_pkcs11_token_get_flags (const char *url, unsigned int *flags)
       return ret;
     }
 
-  ret = _pkcs11_traverse_tokens (find_flags, &find_data, find_data.info, 0);
+  ret = _pkcs11_traverse_tokens (find_flags, &find_data, find_data.info, NULL, 0);
   p11_kit_uri_free (find_data.info);
 
   if (ret < 0)

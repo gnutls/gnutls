@@ -176,8 +176,8 @@ static const unsigned char nullpass[20];
 static const gnutls_datum_t nulldata = {(void*)nullpass, 20};
 const TSS_UUID srk_uuid = TSS_UUID_SRK;
 
-static int tpm_pin(const TSS_UUID* uuid, TSS_FLAG storage, char* pin, 
-                   unsigned int pin_size, unsigned int attempts)
+static int tpm_pin(struct pin_info_st* pin_info, const TSS_UUID* uuid, TSS_FLAG storage, 
+                   char* pin, unsigned int pin_size, unsigned int attempts)
 {
 unsigned int flags = 0;
 const char* label;
@@ -203,7 +203,10 @@ int ret;
   else
     label = "unknown";
 
-  ret = _gnutls_pin_func(_gnutls_pin_data, attempts, "TPM", label, flags, pin, pin_size);
+  if (pin_info && pin_info->cb)
+    ret = pin_info->cb(pin_info->data, attempts, "TPM", label, flags, pin, pin_size);
+  else
+    ret = _gnutls_pin_func(_gnutls_pin_data, attempts, "TPM", label, flags, pin, pin_size);
   if (ret < 0)
     {
       gnutls_assert();
@@ -330,7 +333,7 @@ int ret, ret2;
 
       if (ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR)
         {
-          ret2 = tpm_pin(&srk_uuid, storage, pin1, sizeof(pin1), attempts++);
+          ret2 = tpm_pin(&pkey->pin, &srk_uuid, storage, pin1, sizeof(pin1), attempts++);
           if (ret2 < 0)
             {
               gnutls_assert();
@@ -341,7 +344,7 @@ int ret, ret2;
 
       if (ret == GNUTLS_E_TPM_KEY_PASSWORD_ERROR)
         {
-          ret2 = tpm_pin(uuid, storage, pin2, sizeof(pin2), attempts++);
+          ret2 = tpm_pin(&pkey->pin, uuid, storage, pin2, sizeof(pin2), attempts++);
           if (ret2 < 0)
             {
               gnutls_assert();
@@ -998,7 +1001,7 @@ int ret;
 
       if (ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR)
         {
-          ret = tpm_pin(&srk_uuid, storage, pin1, sizeof(pin1), attempts++);
+          ret = tpm_pin(&pkey->pin, &srk_uuid, storage, pin1, sizeof(pin1), attempts++);
           if (ret < 0)
             {
               gnutls_assert();

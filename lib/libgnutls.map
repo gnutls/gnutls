@@ -820,6 +820,10 @@ GNUTLS_3_1_0 {
 	gnutls_privkey_import_url;
 	gnutls_pubkey_import_url;
 	gnutls_url_is_supported;
+	gnutls_privkey_set_pin_function;
+	gnutls_pubkey_set_pin_function;
+	gnutls_pkcs11_obj_set_pin_function;
+	gnutls_pkcs11_privkey_set_pin_function;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

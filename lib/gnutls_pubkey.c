@@ -41,27 +41,6 @@
 #define OPENPGP_KEY_PRIMARY 2
 #define OPENPGP_KEY_SUBKEY 1
 
-struct gnutls_pubkey_st
-{
-  gnutls_pk_algorithm_t pk_algorithm;
-  unsigned int bits;            /* an indication of the security parameter */
-
-  /* the size of params depends on the public
-   * key algorithm
-   * RSA: [0] is modulus
-   *      [1] is public exponent
-   * DSA: [0] is p
-   *      [1] is q
-   *      [2] is g
-   *      [3] is public key
-   */
-  gnutls_pk_params_st params;
-
-  uint8_t openpgp_key_id[GNUTLS_OPENPGP_KEYID_SIZE];
-  int openpgp_key_id_set;
-
-  unsigned int key_usage;       /* bits from GNUTLS_KEY_* */
-};
 
 int pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st* params)
 {
@@ -1055,6 +1034,9 @@ gnutls_pubkey_import_pkcs11_url (gnutls_pubkey_t key, const char *url,
       gnutls_assert ();
       return ret;
     }
+  
+  if (key->pin.cb)
+    gnutls_pkcs11_obj_set_pin_function(pcrt, key->pin.cb, key->pin.data);
 
   ret = gnutls_pkcs11_obj_import_url (pcrt, url, flags);
   if (ret < 0)
@@ -1870,4 +1852,27 @@ _gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* pa
       if (hash_len) *hash_len = 64;
       return GNUTLS_DIG_SHA512;
     }
+}
+
+/**
+ * gnutls_pubkey_set_pin_function:
+ * @key: A key of type #gnutls_pubkey_t
+ * @fn: the callback
+ * @userdata: data associated with the callback
+ *
+ * This function will set a callback function to be used when
+ * required to access the object. This function overrides any other
+ * global PIN functions.
+ *
+ * Note that this function must be called right after initialization
+ * to have effect.
+ *
+ * Since: 3.1.0
+ *
+ **/
+void gnutls_pubkey_set_pin_function (gnutls_pubkey_t key,
+                                      gnutls_pin_callback_t fn, void *userdata)
+{
+  key->pin.cb = fn;
+  key->pin.data = userdata;
 }

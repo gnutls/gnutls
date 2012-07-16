@@ -33,11 +33,11 @@ struct gnutls_pkcs11_privkey_st
   gnutls_pk_algorithm_t pk_algorithm;
   unsigned int flags;
   struct p11_kit_uri *info;
-  gnutls_pin_callback_t pin_func;
-  void *pin_data;
   
   struct pkcs11_session_info sinfo;
   ck_object_handle_t obj; /* the key in the session */
+
+  struct pin_info_st pin;
 };
 
 /**
@@ -128,11 +128,11 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
 }
 
 
-#define FIND_OBJECT(sinfo, obj, key) \
+#define FIND_OBJECT(sinfo, pin_info, obj, key) \
 	do { \
 		int retries = 0; \
 		int rret; \
-		ret = pkcs11_find_object (sinfo, &obj, key->info, \
+		ret = pkcs11_find_object (sinfo, pin_info, &obj, key->info, \
 		                          SESSION_LOGIN); \
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) { \
 			if (_gnutls_token_func) \
@@ -181,7 +181,7 @@ _gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
     {
       sinfo = &_sinfo;
       memset(sinfo, 0, sizeof(*sinfo));
-      FIND_OBJECT (sinfo, obj, key);
+      FIND_OBJECT (sinfo, &key->pin, obj, key);
     }
 
   mech.mechanism = pk_to_mech(key->pk_algorithm);
@@ -285,7 +285,7 @@ gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
         }
     }
 
-  FIND_OBJECT (&sinfo, obj, pkey);
+  FIND_OBJECT (&sinfo, &pkey->pin, obj, pkey);
 
   a[0].type = CKA_KEY_TYPE;
   a[0].value = &key_type;
@@ -359,7 +359,7 @@ _gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
     {
       sinfo = &_sinfo;
       memset(sinfo, 0, sizeof(*sinfo));
-      FIND_OBJECT (sinfo, obj, key);
+      FIND_OBJECT (sinfo, &key->pin, obj, key);
     }
 
   if (key->pk_algorithm != GNUTLS_PK_RSA)
@@ -460,9 +460,9 @@ gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
  * Since: 3.0
  **/
 int
-gnutls_pkcs11_privkey_generate (const char* url, 
-  gnutls_pk_algorithm_t pk, unsigned int bits, 
-  const char* label, unsigned int flags)
+gnutls_pkcs11_privkey_generate (const char* url, gnutls_pk_algorithm_t pk, 
+                                unsigned int bits, const char* label, 
+                                unsigned int flags)
 {
   int ret;
   const ck_bool_t tval = 1;
@@ -486,7 +486,7 @@ gnutls_pkcs11_privkey_generate (const char* url,
     }
 
   ret =
-    pkcs11_open_session (&sinfo, info,
+    pkcs11_open_session (&sinfo, NULL, info,
                          SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
   p11_kit_uri_free (info);
 
@@ -634,4 +634,24 @@ cleanup:
     pkcs11_close_session (&sinfo);
 
   return ret;
+}
+
+/**
+ * gnutls_pkcs11_privkey_set_pin_function:
+ * @obj: The object structure
+ * @fn: the callback
+ * @userdata: data associated with the callback
+ *
+ * This function will set a callback function to be used when
+ * required to access the object. This function overrides the global
+ * set using gnutls_pkcs11_set_pin_function().
+ *
+ * Since: 3.1.0
+ *
+ **/
+void gnutls_pkcs11_privkey_set_pin_function (gnutls_pkcs11_privkey_t key,
+                                             gnutls_pin_callback_t fn, void *userdata)
+{
+  key->pin.cb = fn;
+  key->pin.data = userdata;
 }

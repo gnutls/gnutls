@@ -62,6 +62,8 @@ struct gnutls_pkcs11_obj_st
   gnutls_datum_t pubkey[MAX_PUBLIC_PARAMS_SIZE];
   gnutls_pk_algorithm_t pk_algorithm;
   unsigned int key_usage;
+
+  struct pin_info_st pin;
 };
 
 /* thus function is called for every token in the traverse_tokens
@@ -81,8 +83,8 @@ pkcs11_find_slot (struct ck_function_list ** module, ck_slot_id_t * slot,
 int pkcs11_get_info (struct p11_kit_uri *info,
                      gnutls_pkcs11_obj_info_t itype, void *output,
                      size_t * output_size);
-int pkcs11_login (struct pkcs11_session_info * sinfo,
-              const struct token_info *tokinfo, struct p11_kit_uri *info, int so);
+int pkcs11_login (struct pkcs11_session_info * sinfo, struct pin_info_st* pin_info,
+                  const struct token_info *tokinfo, struct p11_kit_uri *info, int so);
 
 int pkcs11_call_token_func (struct p11_kit_uri *info, const unsigned retry);
 
@@ -97,9 +99,12 @@ int pkcs11_info_to_url (struct p11_kit_uri *info,
 #define SESSION_LOGIN (1<<1)
 #define SESSION_SO (1<<2)       /* security officer session */
 int pkcs11_open_session (struct pkcs11_session_info* sinfo,
+                         struct pin_info_st* pin_info,
                          struct p11_kit_uri *info, unsigned int flags);
 int _pkcs11_traverse_tokens (find_func_t find_func, void *input,
-                             struct p11_kit_uri *info, unsigned int flags);
+                             struct p11_kit_uri *info, 
+                             struct pin_info_st* pin_info,
+                             unsigned int flags);
 ck_object_class_t pkcs11_strtype_to_class (const char *type);
 
 int pkcs11_token_matches_info (struct p11_kit_uri *info,
@@ -108,8 +113,9 @@ int pkcs11_token_matches_info (struct p11_kit_uri *info,
 
 /* flags are SESSION_* */
 int pkcs11_find_object (struct pkcs11_session_info* sinfo,
-                    ck_object_handle_t * _obj,
-                    struct p11_kit_uri *info, unsigned int flags);
+                        struct pin_info_st* pin_info,
+                        ck_object_handle_t * _obj,
+                        struct p11_kit_uri *info, unsigned int flags);
 
 unsigned int pkcs11_obj_flags_to_int (unsigned int flags);
 

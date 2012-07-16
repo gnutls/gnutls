@@ -79,7 +79,7 @@ gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
     }
 
   ret =
-    pkcs11_open_session (&sinfo, info,
+    pkcs11_open_session (&sinfo, NULL, info,
                          SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
   p11_kit_uri_free (info);
 

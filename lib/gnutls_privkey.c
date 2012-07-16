@@ -33,31 +33,6 @@
 #include <gnutls_sig.h>
 #include <abstract_int.h>
 
-struct gnutls_privkey_st
-{
-  gnutls_privkey_type_t type;
-  gnutls_pk_algorithm_t pk_algorithm;
-
-  union
-  {
-    gnutls_x509_privkey_t x509;
-#ifdef ENABLE_PKCS11
-    gnutls_pkcs11_privkey_t pkcs11;
-#endif
-#ifdef ENABLE_OPENPGP
-    gnutls_openpgp_privkey_t openpgp;
-#endif
-    struct {
-      gnutls_privkey_sign_func sign_func;
-      gnutls_privkey_decrypt_func decrypt_func;
-      gnutls_privkey_deinit_func deinit_func;
-      void* userdata;
-    } ext;
-  } key;
-
-  unsigned int flags;
-};
-
 /**
  * gnutls_privkey_get_type:
  * @key: should contain a #gnutls_privkey_t structure
@@ -368,6 +343,9 @@ int ret;
   pkey->type = GNUTLS_PRIVKEY_PKCS11;
   pkey->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm (key, NULL);
   pkey->flags = flags;
+
+  if (pkey->pin.data)
+    gnutls_pkcs11_privkey_set_pin_function(key, pkey->pin.cb, pkey->pin.data);
 
   return 0;
 }
@@ -965,7 +943,7 @@ cleanup:
 
 /**
  * gnutls_privkey_import_url:
- * @key: A key of type #gnutls_pubkey_t
+ * @key: A key of type #gnutls_privkey_t
  * @url: A PKCS 11 url
  * @flags: should be zero
  *
@@ -990,4 +968,27 @@ gnutls_privkey_import_url (gnutls_privkey_t key, const char *url, unsigned int f
     return gnutls_privkey_import_tpm_url(key, url, NULL, NULL, 0);
 #endif
   return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+}
+
+/**
+ * gnutls_privkey_set_pin_function:
+ * @key: A key of type #gnutls_privkey_t
+ * @fn: the callback
+ * @userdata: data associated with the callback
+ *
+ * This function will set a callback function to be used when
+ * required to access the object. This function overrides any other
+ * global PIN functions.
+ *
+ * Note that this function must be called right after initialization
+ * to have effect.
+ *
+ * Since: 3.1.0
+ *
+ **/
+void gnutls_privkey_set_pin_function (gnutls_privkey_t key,
+                                      gnutls_pin_callback_t fn, void *userdata)
+{
+  key->pin.cb = fn;
+  key->pin.data = userdata;
 }

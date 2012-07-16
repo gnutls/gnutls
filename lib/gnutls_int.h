@@ -409,6 +409,11 @@ struct gnutls_key_st
 };
 typedef struct gnutls_key_st *gnutls_key_st;
 
+struct pin_info_st
+{
+  gnutls_pin_callback_t cb;
+  void* data;
+};
 
 struct record_state_st;
 typedef struct record_state_st record_state_st;
@@ -924,5 +929,6 @@ _gnutls_set_current_version (gnutls_session_t session,
 {
   session->security_parameters.version = version;
 }
+
 
 #endif /* GNUTLS_INT_H */
