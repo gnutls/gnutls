@@ -425,16 +425,16 @@ when accessing a protected object, such as a private key, as well as probe
 the user to insert the token. All the initialization functions are below.
 
 @showfuncdesc{gnutls_pkcs11_init}
-@showfuncC{gnutls_pkcs11_set_token_function,gnutls_pkcs11_set_pin_function,gnutls_pkcs11_add_provider}
+@showfuncD{gnutls_pkcs11_set_token_function,gnutls_pkcs11_set_pin_function,gnutls_pkcs11_add_provider,gnutls_pkcs11_get_pin_function}
 
 Note that due to limitations of @acronym{PKCS} #11 there are issues when multiple libraries 
 are sharing a module. To avoid this problem GnuTLS uses @acronym{p11-kit}
 that provides a middleware to control access to resources over the
 multiple users.
 
-To avoid conflicts with multiple registered callbacks for PIN and token functions,
-the following two functions set the callbacks if they have not already been set.
-@showfuncB{gnutls_pkcs11_advset_pin_function,gnutls_pkcs11_advset_token_function}
+To avoid conflicts with multiple registered callbacks for PIN functions,
+@funcref{gnutls_pkcs11_get_pin_function} may be used to check for any previously
+set functions.
 
 Moreover PKCS #11 modules must be reinitialized on the child processes
 after a @funcintref{fork}. @acronym{GnuTLS} provides @funcref{gnutls_pkcs11_reinit}

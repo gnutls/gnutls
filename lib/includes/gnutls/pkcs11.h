@@ -79,11 +79,7 @@ void gnutls_pkcs11_set_token_function (gnutls_pkcs11_token_callback_t fn,
 void gnutls_pkcs11_set_pin_function (gnutls_pin_callback_t fn,
                                      void *userdata);
 
-void gnutls_pkcs11_advset_token_function (gnutls_pkcs11_token_callback_t fn,
-                                       void *userdata);
-
-void gnutls_pkcs11_advset_pin_function (gnutls_pin_callback_t fn,
-                                     void *userdata);
+gnutls_pin_callback_t gnutls_pkcs11_get_pin_function (void **userdata);
 
 int gnutls_pkcs11_add_provider (const char *name, const char *params);
 int gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * obj);

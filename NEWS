@@ -43,8 +43,7 @@ by Alexandre Bique.
 GNUTLS_CERT_SIGNATURE_FAILURE: Added
 GNUTLS_CAMELLIA_192_CBC: Added
 gnutls_url_is_supported: Added
-gnutls_pkcs11_advset_pin_function: Added
-gnutls_pkcs11_advset_token_function: Added
+gnutls_pkcs11_get_pin_function: Added
 gnutls_privkey_import_tpm_raw: Added
 gnutls_privkey_import_pkcs11_url: Added
 gnutls_privkey_import_openpgp_raw: Added

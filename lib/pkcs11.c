@@ -659,27 +659,23 @@ gnutls_pkcs11_set_pin_function (gnutls_pin_callback_t fn,
 }
 
 /**
- * gnutls_pkcs11_advset_pin_function:
- * @fn: The PIN callback, a gnutls_pin_callback_t() function.
+ * gnutls_pkcs11_get_pin_function:
  * @userdata: data to be supplied to callback
  *
- * This function will set a callback function to be used when a PIN is
- * required for PKCS 11 operations.  See
- * gnutls_pin_callback_t() on how the callback should behave.
- * 
- * This function unlike gnutls_pkcs11_set_pin_function() will only
- * set the provided function if it has not previously been set. 
+ * This function will return the callback function set using
+ * gnutls_pkcs11_set_pin_function().
  *
+ * Returns: The function set or NULL otherwise.
+ * 
  * Since: 3.1.0
  **/
-void
-gnutls_pkcs11_advset_pin_function (gnutls_pin_callback_t fn,
-                                void *userdata)
+gnutls_pin_callback_t
+gnutls_pkcs11_get_pin_function (void **userdata)
 {
-  if (_gnutls_pin_func == NULL)
+  if (_gnutls_pin_func != NULL)
     {
-      _gnutls_pin_func = fn;
-      _gnutls_pin_data = userdata;
+      *userdata = _gnutls_pin_data;
+      return _gnutls_pin_func;
     }
 }
 
@@ -699,30 +695,6 @@ gnutls_pkcs11_set_token_function (gnutls_pkcs11_token_callback_t fn,
 {
   _gnutls_token_func = fn;
   _gnutls_token_data = userdata;
-}
-
-/**
- * gnutls_pkcs11_advset_token_function:
- * @fn: The token callback
- * @userdata: data to be supplied to callback
- *
- * This function will set a callback function to be used when a token
- * needs to be inserted to continue PKCS 11 operations.
- *
- * This function unlike gnutls_pkcs11_set_token_function() will only
- * set the provided function if it has not previously been set. 
- *
- * Since: 3.1.0
- **/
-void
-gnutls_pkcs11_advset_token_function (gnutls_pkcs11_token_callback_t fn,
-                                  void *userdata)
-{
-  if (_gnutls_token_func==NULL)
-    {
-      _gnutls_token_func = fn;
-      _gnutls_token_data = userdata;
-    }
 }
 
 int
