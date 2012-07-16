@@ -843,6 +843,7 @@ FUNCS += functions/gnutls_store_commitment
 FUNCS += functions/gnutls_store_pubkey
 FUNCS += functions/gnutls_load_file
 FUNCS += functions/gnutls_url_is_supported
+FUNCS += functions/gnutls_certificate_set_pin_function
 FUNCS += functions/gnutls_ocsp_req_init
 FUNCS += functions/gnutls_ocsp_req_deinit
 FUNCS += functions/gnutls_ocsp_req_import

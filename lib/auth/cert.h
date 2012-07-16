@@ -86,6 +86,7 @@ typedef struct gnutls_certificate_credentials_st
 
   gnutls_certificate_verify_function *verify_callback;
 
+  struct pin_info_st pin;
 } certificate_credentials_st;
 
 typedef struct rsa_info_st

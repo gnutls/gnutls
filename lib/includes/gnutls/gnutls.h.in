@@ -1142,6 +1142,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                           res, const char *certfile,
                                           const char *keyfile,
                                           gnutls_x509_crt_fmt_t type);
+
   int gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
                                            res, const gnutls_datum_t * cert,
                                            const gnutls_datum_t * key,
@@ -1802,6 +1803,10 @@ typedef int (*gnutls_pin_callback_t) (void *userdata, int attempt,
                                              const char *token_label,
 					     unsigned int flags,
                                              char *pin, size_t pin_max);
+
+  void gnutls_certificate_set_pin_function (gnutls_certificate_credentials_t,
+                                            gnutls_pin_callback_t fn, void *userdata);
+
 
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.

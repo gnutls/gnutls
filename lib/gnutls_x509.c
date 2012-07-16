@@ -478,51 +478,6 @@ read_cert_mem (gnutls_certificate_credentials_t res, const void *cert,
   return ret;
 }
 
-static int
-_gnutls_x509_raw_privkey_to_privkey (gnutls_privkey_t * privkey,
-                                     const gnutls_datum_t * raw_key,
-                                     gnutls_x509_crt_fmt_t type)
-{
-  gnutls_x509_privkey_t tmpkey;
-  int ret;
-
-  ret = gnutls_x509_privkey_init (&tmpkey);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = gnutls_x509_privkey_import (tmpkey, raw_key, type);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      gnutls_x509_privkey_deinit (tmpkey);
-      return ret;
-    }
-
-  ret = gnutls_privkey_init (privkey);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      gnutls_x509_privkey_deinit (tmpkey);
-      return ret;
-    }
-
-  ret =
-    gnutls_privkey_import_x509 (*privkey, tmpkey,
-                                GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      gnutls_x509_privkey_deinit (tmpkey);
-      gnutls_privkey_deinit (*privkey);
-      return ret;
-    }
-
-  return 0;
-}
-
 /* Reads a PEM encoded PKCS-1 RSA/DSA private key from memory.  Type
  * indicates the certificate format.  KEY can be NULL, to indicate
  * that GnuTLS doesn't know the private key.
@@ -540,7 +495,17 @@ read_key_mem (gnutls_certificate_credentials_t res,
       tmp.data = (uint8_t *) key;
       tmp.size = key_size;
 
-      ret = _gnutls_x509_raw_privkey_to_privkey (&privkey, &tmp, type);
+      ret = gnutls_privkey_init(&privkey);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
+      
+      if (res->pin.cb)
+        gnutls_privkey_set_pin_function(privkey, res->pin.cb, res->pin.data);
+
+      ret = gnutls_privkey_import_x509_raw (privkey, &tmp, type, NULL);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -566,87 +531,28 @@ read_key_mem (gnutls_certificate_credentials_t res,
   return 0;
 }
 
-#ifdef HAVE_TROUSERS
-/* Reads a private key from a token.
- */
-static int
-read_key_tpmurl (gnutls_certificate_credentials_t res, const char *url)
-{
-  int ret;
-  gnutls_privkey_t pkey = NULL;
 
-  /* allocate space for the pkey list
-   */
-
-  ret = gnutls_privkey_init (&pkey);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  ret =
-    gnutls_privkey_import_tpm_url (pkey, url, NULL, NULL, 0);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  ret = certificate_credentials_append_pkey (res, pkey);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  return 0;
-
-cleanup:
-  if (pkey)
-    gnutls_privkey_deinit (pkey);
-
-  return ret;
-}
-#endif
-
-#ifdef ENABLE_PKCS11
 /* Reads a private key from a token.
  */
 static int
 read_key_url (gnutls_certificate_credentials_t res, const char *url)
 {
   int ret;
-  gnutls_pkcs11_privkey_t key1 = NULL;
   gnutls_privkey_t pkey = NULL;
 
   /* allocate space for the pkey list
    */
-
-  ret = gnutls_pkcs11_privkey_init (&key1);
+  ret = gnutls_privkey_init (&pkey);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = gnutls_pkcs11_privkey_import_url (key1, url, 0);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
+  if (res->pin.cb)
+    gnutls_privkey_set_pin_function(pkey, res->pin.cb, res->pin.data);
 
-  ret = gnutls_privkey_init (&pkey);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  ret =
-    gnutls_privkey_import_pkcs11 (pkey, key1,
-                                  GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+  ret = gnutls_privkey_import_url (pkey, url, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -666,12 +572,10 @@ cleanup:
   if (pkey)
     gnutls_privkey_deinit (pkey);
 
-  if (key1)
-    gnutls_pkcs11_privkey_deinit (key1);
-
   return ret;
 }
 
+#ifdef ENABLE_PKCS11
 /* Reads a private key from a token.
  */
 static int
@@ -865,19 +769,10 @@ read_key_file (gnutls_certificate_credentials_t res,
   size_t size;
   char *data;
 
-#ifdef ENABLE_PKCS11
-  if (strncmp (keyfile, "pkcs11:", 7) == 0)
+  if (gnutls_url_is_supported(keyfile))
     {
       return read_key_url (res, keyfile);
     }
-#endif /* ENABLE_PKCS11 */
-
-#ifdef HAVE_TROUSERS
-  if (strncmp (keyfile, "tpmkey:", 7) == 0)
-    {
-      return read_key_tpmurl (res, keyfile);
-    }
-#endif /* HAVE_TROUSERS */
 
   data = read_binary_file (keyfile, &size);
 
@@ -1055,7 +950,7 @@ certificate_credentials_append_pkey (gnutls_certificate_credentials_t res,
  * @res: is a #gnutls_certificate_credentials_t structure.
  * @cert_list: contains a certificate list (path) for the specified private key
  * @cert_list_size: holds the size of the certificate list
- * @key: is a gnutls_x509_privkey_t key
+ * @key: is a #gnutls_x509_privkey_t key
  *
  * This function sets a certificate/private key pair in the
  * gnutls_certificate_credentials_t structure.  This function may be
@@ -1089,6 +984,9 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
       gnutls_assert ();
       return ret;
     }
+
+  if (res->pin.cb)
+    gnutls_privkey_set_pin_function(pkey, res->pin.cb, res->pin.data);
 
   ret = gnutls_privkey_import_x509 (pkey, key, GNUTLS_PRIVKEY_IMPORT_COPY);
   if (ret < 0)
@@ -1155,7 +1053,7 @@ cleanup:
  * @names_size: holds the size of the names list
  * @pcert_list: contains a certificate list (path) for the specified private key
  * @pcert_list_size: holds the size of the certificate list
- * @key: is a gnutls_x509_privkey_t key
+ * @key: is a #gnutls_privkey_t key
  *
  * This function sets a certificate/private key pair in the
  * gnutls_certificate_credentials_t structure.  This function may be
@@ -1196,6 +1094,9 @@ gnutls_certificate_set_key (gnutls_certificate_credentials_t res,
             }
         }
     }
+
+  if (res->pin.cb)
+    gnutls_privkey_set_pin_function(key, res->pin.cb, res->pin.data);
 
   ret = certificate_credentials_append_pkey (res, key);
   if (ret < 0)
@@ -2074,4 +1975,26 @@ gnutls_certificate_free_crls (gnutls_certificate_credentials_t sc)
 {
   /* do nothing for now */
   return;
+}
+
+/**
+ * gnutls_certificate_credentials_t:
+ * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @fn: A PIN callback
+ * @userdata: Data to be passed in the callback
+ *
+ * This function will set a callback function to be used when
+ * required to access a protected object. This function overrides any other
+ * global PIN functions.
+ *
+ * Note that this function must be called right after initialization
+ * to have effect.
+ *
+ * Since: 3.1.0
+ **/
+void gnutls_certificate_set_pin_function (gnutls_certificate_credentials_t cred,
+                                          gnutls_pin_callback_t fn, void *userdata)
+{
+  cred->pin.cb = fn;
+  cred->pin.data = userdata;
 }
