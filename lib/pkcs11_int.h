@@ -34,7 +34,7 @@
 #include <p11-kit/uri.h>
 typedef unsigned char ck_bool_t;
 
-extern gnutls_pkcs11_pin_callback_t _gnutls_pin_func;
+extern gnutls_pin_callback_t _gnutls_pin_func;
 extern void *_gnutls_pin_data;
 
 struct pkcs11_session_info {

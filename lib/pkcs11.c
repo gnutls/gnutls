@@ -74,7 +74,7 @@ static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
 static unsigned int initialized_registered = 0;
 
-gnutls_pkcs11_pin_callback_t _gnutls_pin_func;
+gnutls_pin_callback_t _gnutls_pin_func;
 void *_gnutls_pin_data;
 
 gnutls_pkcs11_token_callback_t _gnutls_token_func;
@@ -641,17 +641,17 @@ gnutls_pkcs11_deinit (void)
 
 /**
  * gnutls_pkcs11_set_pin_function:
- * @fn: The PIN callback, a gnutls_pkcs11_pin_callback_t() function.
+ * @fn: The PIN callback, a gnutls_pin_callback_t() function.
  * @userdata: data to be supplied to callback
  *
  * This function will set a callback function to be used when a PIN is
  * required for PKCS 11 operations.  See
- * gnutls_pkcs11_pin_callback_t() on how the callback should behave.
+ * gnutls_pin_callback_t() on how the callback should behave.
  *
  * Since: 2.12.0
  **/
 void
-gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
+gnutls_pkcs11_set_pin_function (gnutls_pin_callback_t fn,
                                 void *userdata)
 {
   _gnutls_pin_func = fn;
@@ -660,12 +660,12 @@ gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
 
 /**
  * gnutls_pkcs11_advset_pin_function:
- * @fn: The PIN callback, a gnutls_pkcs11_pin_callback_t() function.
+ * @fn: The PIN callback, a gnutls_pin_callback_t() function.
  * @userdata: data to be supplied to callback
  *
  * This function will set a callback function to be used when a PIN is
  * required for PKCS 11 operations.  See
- * gnutls_pkcs11_pin_callback_t() on how the callback should behave.
+ * gnutls_pin_callback_t() on how the callback should behave.
  * 
  * This function unlike gnutls_pkcs11_set_pin_function() will only
  * set the provided function if it has not previously been set. 
@@ -673,7 +673,7 @@ gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
  * Since: 3.1.0
  **/
 void
-gnutls_pkcs11_advset_pin_function (gnutls_pkcs11_pin_callback_t fn,
+gnutls_pkcs11_advset_pin_function (gnutls_pin_callback_t fn,
                                 void *userdata)
 {
   if (_gnutls_pin_func == NULL)

@@ -755,7 +755,7 @@ gnutls_pkcs11_token_init (const char *token_url,
  * @token_url: A PKCS #11 URL specifying a token
  * @oldpin: old user's PIN
  * @newpin: new user's PIN
- * @flags: one of #gnutls_pkcs11_pin_flag_t.
+ * @flags: one of #gnutls_pin_flag_t.
  *
  * This function will modify or set a user's PIN for the given token. 
  * If it is called to set a user pin for first time the oldpin must

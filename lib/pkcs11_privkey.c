@@ -33,7 +33,7 @@ struct gnutls_pkcs11_privkey_st
   gnutls_pk_algorithm_t pk_algorithm;
   unsigned int flags;
   struct p11_kit_uri *info;
-  gnutls_pkcs11_pin_callback_t pin_func;
+  gnutls_pin_callback_t pin_func;
   void *pin_data;
   
   struct pkcs11_session_info sinfo;
