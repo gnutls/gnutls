@@ -142,14 +142,14 @@ double stop_benchmark(struct benchmark_st * st, const char* metric)
   if (metric == NULL)
     { /* assume bytes/sec */
       value2human (st->size, secs, &ddata, &dspeed, imetric);
-      printf ("Processed %.2f %s in %.2f secs: ", ddata, imetric, secs);
+      printf ("  Processed %.2f %s in %.2f secs: ", ddata, imetric, secs);
       printf ("%.2f %s/sec\n", dspeed, imetric);
     }
   else
     {
       ddata = (double) st->size;
       dspeed = ddata / secs;
-      printf ("Processed %.2f %s in %.2f secs: ", ddata, metric, secs);
+      printf ("  Processed %.2f %s in %.2f secs: ", ddata, metric, secs);
       printf ("%.2f %s/sec\n", dspeed, metric);
     }
 

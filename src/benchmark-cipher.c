@@ -69,7 +69,7 @@ cipher_mac_bench (int algo, int mac_algo, int size)
   key.data = _key;
   key.size = keysize;
 
-  printf ("Checking %s with %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
+  printf ("Checking %s with %s (%dkb payload)...\n", gnutls_cipher_get_name (algo),
       gnutls_mac_get_name(mac_algo), size);
   fflush (stdout);
 
@@ -140,7 +140,7 @@ cipher_bench (int algo, int size, int aead)
   key.data = _key;
   key.size = keysize;
 
-  printf ("Checking %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
+  printf ("Checking %s (%dkb payload)...\n", gnutls_cipher_get_name (algo),
           size);
   fflush (stdout);
 
@@ -185,7 +185,7 @@ mac_bench (int algo, int size)
     return;
   memset (_key, 0xf0, blocksize);
 
-  printf ("Checking %s (%dkb payload)... ", gnutls_mac_get_name (algo), size);
+  printf ("Checking %s (%dkb payload)...\n", gnutls_mac_get_name (algo), size);
   fflush (stdout);
 
   start_benchmark(&st);

@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
+#include <math.h>
 
 #define fail(...) \
 	{ \
@@ -214,7 +215,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 
     HANDSHAKE(client, server);
 
-    fprintf(stdout, "Testing %s with %d packet size: ",
+    fprintf(stdout, "Testing %s with %d packet size...\n",
             gnutls_cipher_suite_get_name(gnutls_kx_get(server),
                                          gnutls_cipher_get(server),
                                          gnutls_mac_get(server)), size);
@@ -250,6 +251,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
     while (benchmark_must_finish == 0);
 
     stop_benchmark(&st, NULL);
+    fprintf(stdout, "\n");
 
     gnutls_bye(client, GNUTLS_SHUT_WR);
     gnutls_bye(server, GNUTLS_SHUT_WR);
@@ -263,6 +265,41 @@ static void test_ciphersuite(const char *cipher_prio, int size)
     gnutls_dh_params_deinit(dh_params);
 
 }
+
+static
+double calc_avg(unsigned int *diffs, unsigned int diffs_size)
+{
+double avg = 0;
+unsigned int i;
+
+  for(i=0;i<diffs_size;i++)
+    avg += diffs[i];
+    
+  avg /= diffs_size;
+
+  return avg;
+}
+
+static
+double calc_sstdev(unsigned int *diffs, unsigned int diffs_size, double avg)
+{
+double sum = 0, d;
+unsigned int i;
+
+  for (i=0;i<diffs_size;i++) {
+    d = ((double)diffs[i] - avg);
+    d *= d;
+    
+    sum += d;
+  }
+  sum /= diffs_size - 1;
+  
+  return sum;
+}
+
+
+unsigned int diffs[32*1024];
+unsigned int diffs_size = 0;
 
 static void test_ciphersuite_kx(const char *cipher_prio)
 {
@@ -281,6 +318,8 @@ static void test_ciphersuite_kx(const char *cipher_prio)
     /* Need to enable anonymous KX specifically. */
     int ret;
     struct benchmark_st st;
+    struct timespec tr_start, tr_stop;
+    double avg, sstddev;
 
     /* Init server */
     gnutls_certificate_allocate_credentials(&s_certcred);
@@ -305,6 +344,8 @@ static void test_ciphersuite_kx(const char *cipher_prio)
     start_benchmark(&st);
 
     do {
+        gettime(&tr_start);
+        
         gnutls_init(&server, GNUTLS_SERVER);
         ret = gnutls_priority_set_direct(server, cipher_prio, &str);
         if (ret < 0) {
@@ -342,12 +383,23 @@ static void test_ciphersuite_kx(const char *cipher_prio)
         gnutls_deinit(client);
         gnutls_deinit(server);
 
+        gettime(&tr_stop);
+
+        diffs[diffs_size++] = timespec_sub_ms(&tr_stop, &tr_start);
+        if (diffs_size > sizeof(diffs))
+          abort();
+
         st.size += 1;
     }
     while (benchmark_must_finish == 0);
 
-    fprintf(stdout, "Tested %s: ", suite);
+    fprintf(stdout, "Benchmarked %s.\n", suite);
     stop_benchmark(&st, "transactions");
+
+    avg = calc_avg(diffs, diffs_size);
+    sstddev = calc_sstdev(diffs, diffs_size, avg);
+
+    printf("  Average time: %.2f ms, sample variance: %.2f\n\n", avg, sstddev);
 
     gnutls_anon_free_client_credentials(c_anoncred);
     gnutls_anon_free_server_credentials(s_anoncred);
@@ -364,7 +416,7 @@ void benchmark_tls(int debug_level, int ciphers)
 
     if (ciphers != 0)
       {
-        printf("Testing throughput in cipher/MAC combinations:\n");
+        printf("Testing throughput in cipher/MAC combinations:\n\n");
 
         test_ciphersuite(PRIO_ARCFOUR_128_MD5, 1024);
         test_ciphersuite(PRIO_ARCFOUR_128_MD5, 4096);
@@ -388,7 +440,7 @@ void benchmark_tls(int debug_level, int ciphers)
       }
     else
       {
-        printf("\nTesting key exchanges (RSA/DH bits: %d, EC bits: %d):\n", rsa_bits, ec_bits);
+        printf("\nTesting key exchanges (RSA/DH bits: %d, EC bits: %d):\n\n", rsa_bits, ec_bits);
         test_ciphersuite_kx(PRIO_DH);
         test_ciphersuite_kx(PRIO_ECDH);
         test_ciphersuite_kx(PRIO_ECDHE_ECDSA);
