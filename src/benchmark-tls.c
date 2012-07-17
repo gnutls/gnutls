@@ -298,6 +298,10 @@ static void test_ciphersuite_kx(const char *cipher_prio)
     gnutls_certificate_set_x509_key_mem (s_certcred, &server_ecc_cert, &server_ecc_key,
                                          GNUTLS_X509_FMT_PEM);
 
+    /* Init client */
+    gnutls_anon_allocate_client_credentials(&c_anoncred);
+    gnutls_certificate_allocate_credentials(&c_certcred);
+
     start_benchmark(&st);
 
     do {
@@ -313,10 +317,6 @@ static void test_ciphersuite_kx(const char *cipher_prio)
         gnutls_transport_set_pull_function(server, server_pull);
         gnutls_transport_set_ptr(server, (gnutls_transport_ptr_t) server);
         reset_buffers();
-
-        /* Init client */
-        gnutls_anon_allocate_client_credentials(&c_anoncred);
-        gnutls_certificate_allocate_credentials(&c_certcred);
 
         gnutls_init(&client, GNUTLS_CLIENT);
 
