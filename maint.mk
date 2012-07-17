@@ -61,7 +61,7 @@ endif
 # (i.e., with no $(srcdir) prefix), this definition is careful to
 # remove any $(srcdir) prefix, and to restore what it removes.
 _sc_excl = \
-  $(if $(exclude_file_name_regexp--$@),$(exclude_file_name_regexp--$@),^$$)
+  $(or $(exclude_file_name_regexp--$@),^$$)
 VC_LIST_EXCEPT = \
   $(VC_LIST) | sed 's|^$(_dot_escaped_srcdir)/||' \
 	| if test -f $(srcdir)/.x-$@; then grep -vEf $(srcdir)/.x-$@; \
@@ -187,9 +187,11 @@ syntax-check: $(local-check)
 #
 #  in_vc_files | in_files
 #
-#     grep-E-style regexp denoting the files to check.  If no files
-#     are specified the default are all the files that are under
-#     version control.
+#     grep-E-style regexp selecting the files to check.  For in_vc_files,
+#     the regexp is used to select matching files from the list of all
+#     version-controlled files; for in_files, it's from the names printed
+#     by "find $(srcdir)".  When neither is specified, use all files that
+#     are under version control.
 #
 #  containing | non_containing
 #
@@ -261,7 +263,7 @@ define _sc_search_regexp
    : Filter by file name;						\
    if test -n "$$in_files"; then					\
      files=$$(find $(srcdir) | grep -E "$$in_files"			\
-              | grep -Ev '$(exclude_file_name_regexp--$@)');		\
+              | grep -Ev '$(_sc_excl)');				\
    else									\
      files=$$($(VC_LIST_EXCEPT));					\
      if test -n "$$in_vc_files"; then					\
@@ -775,6 +777,11 @@ sc_prohibit_always_true_header_tests:
 	'  with the corresponding gnulib module, they are always true')	\
 	  $(_sc_search_regexp)
 
+sc_prohibit_defined_have_decl_tests:
+	@prohibit='#[	 ]*if(n?def|.*\<defined)\>[	 (]+HAVE_DECL_'	\
+	halt='$(ME): HAVE_DECL macros are always defined'		\
+	  $(_sc_search_regexp)
+
 # ==================================================================
 gl_other_headers_ ?= \
   intprops.h	\
@@ -1059,7 +1066,7 @@ sc_makefile_at_at_check:
 	  && { echo '$(ME): use $$(...), not @...@' 1>&2; exit 1; } || :
 
 news-check: NEWS
-	if sed -n $(news-check-lines-spec)p $(srcdir)/NEWS		\
+	if sed -n $(news-check-lines-spec)p $<				\
 	    | grep -E $(news-check-regexp) >/dev/null; then		\
 	  :;								\
 	else								\
@@ -1214,11 +1221,20 @@ sc_prohibit_path_max_allocation:
 
 sc_vulnerable_makefile_CVE-2009-4029:
 	@prohibit='perm -777 -exec chmod a\+rwx|chmod 777 \$$\(distdir\)' \
-	in_files=$$(find $(srcdir) -name Makefile.in)			\
+	in_files=(^\|/)Makefile\\.in$$					\
 	halt=$$(printf '%s\n'						\
 	  'the above files are vulnerable; beware of running'		\
 	  '  "make dist*" rules, and upgrade to fixed automake'		\
 	  '  see http://bugzilla.redhat.com/542609 for details')	\
+	  $(_sc_search_regexp)
+
+sc_vulnerable_makefile_CVE-2012-3386:
+	@prohibit='chmod a\+w \$$\(distdir\)'				\
+	in_files=(^\|/)Makefile\\.in$$					\
+	halt=$$(printf '%s\n'						\
+	  'the above files are vulnerable; beware of running'		\
+	  '  "make distcheck", and upgrade to fixed automake'		\
+	  '  see http://bugzilla.redhat.com/CVE-2012-3386 for details')	\
 	  $(_sc_search_regexp)
 
 vc-diff-check:
@@ -1242,7 +1258,7 @@ bootstrap-tools ?= autoconf,automake,gnulib
 gpg_key_ID ?= \
   $$(git cat-file tag v$(VERSION) \
      | gpgv --status-fd 1 --keyring /dev/null - - 2>/dev/null \
-     | awk '/^\[GNUPG:\] ERRSIG / {print $3; exit}')
+     | awk '/^\[GNUPG:\] ERRSIG / {print $$3; exit}')
 
 translation_project_ ?= coordinator@translationproject.org
 
@@ -1268,6 +1284,7 @@ announcement: NEWS ChangeLog $(rel-files)
 	    --prev=$(PREV_VERSION)					\
 	    --curr=$(VERSION)						\
 	    --gpg-key-id=$(gpg_key_ID)					\
+	    --srcdir=$(srcdir)						\
 	    --news=$(srcdir)/NEWS					\
 	    --bootstrap-tools=$(bootstrap-tools)			\
 	    $$(case ,$(bootstrap-tools), in (*,gnulib,*)		\
@@ -1367,7 +1384,7 @@ release-prep:
 	fi
 	echo $(VERSION) > $(prev_version_file)
 	$(MAKE) update-NEWS-hash
-	perl -pi -e '$$. == 3 and print "$(gl_noteworthy_news_)\n\n\n"' NEWS
+	perl -pi -e '$$. == 3 and print "$(gl_noteworthy_news_)\n\n\n"' $(srcdir)/NEWS
 	$(emit-commit-log) > .ci-msg
 	$(VC) commit -F .ci-msg -a
 	rm .ci-msg

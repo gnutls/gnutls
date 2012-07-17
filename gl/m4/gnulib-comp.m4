@@ -450,6 +450,10 @@ if test $HAVE_FSEEKO = 0 || test $REPLACE_FSEEKO = 1; then
   gl_PREREQ_FSEEKO
 fi
 gl_STDIO_MODULE_INDICATOR([fseeko])
+gl_FUNC_FSETERR
+if test $ac_cv_func___fseterr = no; then
+  AC_LIBOBJ([fseterr])
+fi
 gl_FUNC_FSTAT
 if test $REPLACE_FSTAT = 1; then
   AC_LIBOBJ([fstat])
@@ -1333,6 +1337,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/frexpl.m4
   m4/fseek.m4
   m4/fseeko.m4
+  m4/fseterr.m4
   m4/fstat.m4
   m4/ftell.m4
   m4/ftello.m4

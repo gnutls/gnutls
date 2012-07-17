@@ -428,9 +428,10 @@ EXTRA_libgnu_la_SOURCES += fseeko.c
 
 ## begin gnulib module fseterr
 
-libgnu_la_SOURCES += fseterr.c
 
-EXTRA_DIST += fseterr.h stdio-impl.h
+EXTRA_DIST += fseterr.c fseterr.h stdio-impl.h
+
+EXTRA_libgnu_la_SOURCES += fseterr.c
 
 ## end   gnulib module fseterr
 
