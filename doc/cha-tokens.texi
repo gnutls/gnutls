@@ -383,7 +383,7 @@ can access TPM URLs.
 @showfuncdesc{gnutls_privkey_import_tpm_url}
 @showfuncdesc{gnutls_pubkey_import_tpm_url}
 
-@subsubheading Listing and accessing keys
+@subsubheading Listing and deleting keys
 
 The registered keys (that are stored in the TPM) can be listed using one of
 the following functions. Those keys are unfortunately only identified by
