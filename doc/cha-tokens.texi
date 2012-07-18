@@ -208,7 +208,10 @@ multiple users.
 
 To avoid conflicts with multiple registered callbacks for PIN functions,
 @funcref{gnutls_pkcs11_get_pin_function} may be used to check for any previously
-set functions.
+set functions. In addition context specific PIN functions are allowed, e.g., by
+using functions below.
+
+@showfuncC{gnutls_certificate_set_pin_function,gnutls_pubkey_set_pin_function,gnutls_privkey_set_pin_function}
 
 Moreover PKCS #11 modules must be reinitialized on the child processes
 after a @funcintref{fork}. @acronym{GnuTLS} provides @funcref{gnutls_pkcs11_reinit}
