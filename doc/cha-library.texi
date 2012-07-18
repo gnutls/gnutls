@@ -25,7 +25,7 @@ include:
 
 @item Support for keyed authentication using @acronym{TLS-PSK}.
 
-@item Support for @acronym{PKCS} #11 tokens and smart-cards.
+@item Support for TPM, @acronym{PKCS} #11 tokens and smart-cards.
 
 @end itemize
 

@@ -152,6 +152,7 @@ Documentation License''.
 * Certificate authentication::
 * Shared-key and anonymous authentication::
 * More on certificate authentication::
+* Hardware security modules and abstract key types::
 * How to use GnuTLS in applications::
 * GnuTLS application examples::
 * Other included programs::
@@ -179,6 +180,8 @@ Documentation License''.
 @include cha-shared-key.texi
 
 @include cha-cert-auth2.texi
+
+@include cha-tokens.texi
 
 @include cha-gtls-app.texi
 

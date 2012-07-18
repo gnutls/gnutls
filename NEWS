@@ -48,6 +48,7 @@ gnutls_pkcs11_obj_set_pin_function: Added
 gnutls_pkcs11_privkey_set_pin_function: Added
 gnutls_pkcs11_get_pin_function: Added
 gnutls_privkey_import_tpm_raw: Added
+gnutls_privkey_import_tpm_url: Added
 gnutls_privkey_import_pkcs11_url: Added
 gnutls_privkey_import_openpgp_raw: Added
 gnutls_privkey_import_x509_raw: Added

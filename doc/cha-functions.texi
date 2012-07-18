@@ -10,6 +10,7 @@
 * OpenPGP API::
 * PKCS 12 API::
 * PKCS 11 API::
+* TPM API::
 * Abstract key API::
 * Cryptographic API::
 * Compatibility API::
@@ -74,6 +75,14 @@ The following functions are to be used for PKCS 11 handling.
 Their prototypes lie in @file{gnutls/pkcs11.h}.
 
 @include pkcs11-api.texi
+
+@node TPM API
+@section TPM API
+
+The following functions are to be used for TPM handling.
+Their prototypes lie in @file{gnutls/tpm.h}.
+
+@include tpm-api.texi
 
 @node Abstract key API
 @section Abstract key API

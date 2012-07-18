@@ -778,7 +778,9 @@ size_t len;
  * @url: A PKCS 11 url
  *
  * This function will return non-zero if the given URL
- * is supported, and zero if it is not known.
+ * is supported, and zero if it is not known. Depending
+ * on the system libraries GnuTLS may support pkcs11 or
+ * tpmkey URLs.
  *
  * Since: 3.1.0
  **/

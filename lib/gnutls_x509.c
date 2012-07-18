@@ -1142,8 +1142,9 @@ cleanup:
  * entity certificate, e.g., also an intermediate CA cert, then the
  * @certfile must contain the ordered certificate chain.
  *
- * This function can also accept PKCS #11 URLs at @keyfile and @certfile. In that case it
- * will import the private key and certificate indicated by the URLs.
+ * This function can also accept URLs at @keyfile and @certfile. In that case it
+ * will import the private key and certificate indicated by the URLs. Note
+ * that the supported URLs are the ones indicated by gnutls_url_is_supported().
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  **/
@@ -1497,8 +1498,9 @@ cleanup:
  * the client if a certificate request is sent. This can be disabled
  * using gnutls_certificate_send_x509_rdn_sequence().
  *
- * This function can also accept PKCS #11 URLs. In that case it
- * will import all certificates that are marked as trusted.
+ * This function can also accept URLs. In that case it
+ * will import all certificates that are marked as trusted. Note
+ * that the supported URLs are the ones indicated by gnutls_url_is_supported().
  *
  * Returns: number of certificates processed, or a negative error code on
  * error.

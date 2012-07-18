@@ -415,6 +415,14 @@ already.
 
 @showfuncC{gnutls_certificate_set_openpgp_key_mem,gnutls_certificate_set_openpgp_key,gnutls_certificate_set_openpgp_key_file}
 
+Note however, that since functions like @funcref{gnutls_certificate_set_x509_key_file}
+may accept URLs that specify objects stored in token, another important 
+function is @funcref{gnutls_certificate_set_pin_function}. That
+allows setting a callback function to retrieve a PIN if the input keys are
+protected by PIN by the token.
+
+@showfuncdesc{gnutls_certificate_set_pin_function}
+
 If the imported keys and certificates need to be accessed before any TLS session
 is established, it is convenient to use @funcref{gnutls_certificate_set_key}
 in combination with @funcref{gnutls_pcert_import_x509_raw} and @funcref{gnutls_privkey_import_x509_raw}.

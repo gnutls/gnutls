@@ -36,6 +36,7 @@ SRC_DEF_OCSPTOOL =
 SRC_DEF_SRPTOOL = 
 SRC_DEF_PSKTOOL = 
 SRC_DEF_P11TOOL = 
+SRC_DEF_TPMTOOL = 
 if WANT_TEST_SUITE
 SRC_DEF_CLI += ../src/cli-args.def
 SRC_DEF_CLI_DEBUG += ../src/cli-debug-args.def
@@ -45,6 +46,7 @@ SRC_DEF_OCSPTOOL += ../src/ocsptool-args.def
 SRC_DEF_SRPTOOL += ../src/srptool-args.def
 SRC_DEF_PSKTOOL += ../src/psk-args.def
 SRC_DEF_P11TOOL += ../src/p11tool-args.def
+SRC_DEF_TPMTOOL += ../src/tpmtool-args.def
 endif
 
 invoke-gnutls-cli.texi: $(SRC_DEF_CLI)
@@ -109,6 +111,15 @@ invoke-p11tool.texi: $(SRC_DEF_P11TOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
+invoke-tpmtool.texi: $(SRC_DEF_TPMTOOL)
+	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
+	rm -f ../src/$@ && \
+	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
+	sed -i 's/@section/@subsection/g' ../doc/$@
+
 info_TEXINFOS = gnutls.texi gnutls-guile.texi
 gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-bib.texi cha-cert-auth.texi	cha-cert-auth2.texi		\
@@ -116,11 +127,13 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-gtls-app.texi cha-internals.texi cha-intro-tls.texi		\
 	cha-library.texi cha-preface.texi cha-programs.texi		\
 	sec-tls-app.texi cha-errors.texi cha-support.texi		\
-	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi
+	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi 	\
+	cha-tokens.texi
 
 gnutls_TEXINFOS += invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
-	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi
+	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi \
+	invoke-tpmtool.texi
 
 gnutls_TEXINFOS += stamp_functions
 
@@ -176,11 +189,11 @@ MAINTAINERCLEANFILES =
 # Generated texinfos.
 
 gnutls_TEXINFOS += gnutls-api.texi x509-api.texi pgp-api.texi		\
-	pkcs12-api.texi pkcs11-api.texi abstract-api.texi		\
+	pkcs12-api.texi pkcs11-api.texi abstract-api.texi tpm-api.texi	\
 	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
 
 MAINTAINERCLEANFILES += gnutls-api.texi x509-api.texi pgp-api.texi	\
-	pkcs12-api.texi pkcs11-api.texi abstract-api.texi		\
+	pkcs12-api.texi pkcs11-api.texi abstract-api.texi tpm-api.texi	\
 	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
 
 HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
@@ -238,6 +251,17 @@ pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs11.h|sort|uniq`; do \
+		echo -n "Creating documentation for $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
+
+tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/tpm.h|sort|uniq`; do \
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -351,7 +375,7 @@ enums.texi: $(HEADER_FILES)
 gnutls_TEXINFOS += $(ENUMS) $(FUNCS)
 DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
 
-stamp_functions: gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
+stamp_functions: gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi tpm-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi
 	-mkdir functions
 	for i in $^; do \
 		$(srcdir)/scripts/split-texi.pl functions < $$i; \
