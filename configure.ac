@@ -333,7 +333,8 @@ if test "x$with_default_trust_store_pkcs11" = x -a "x$with_default_trust_store_f
   for i in \
     /etc/ssl/certs/ca-certificates.crt \
     /etc/pki/tls/cert.pem \
-    /usr/local/share/certs/ca-root-nss.crt
+    /usr/local/share/certs/ca-root-nss.crt \
+    /etc/ssl/cert.pem
     do
     if test -e $i; then
       with_default_trust_store_file="$i"
