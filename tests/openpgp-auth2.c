@@ -86,12 +86,12 @@ doit ()
   if (err != 0)
     fail ("socketpair %s\n", strerror (errno));
 
-  pub_key_path = alloca (strlen (srcdir) + strlen (pub_key_file) + 2);
+  pub_key_path = malloc (strlen (srcdir) + strlen (pub_key_file) + 2);
   strcpy (pub_key_path, srcdir);
   strcat (pub_key_path, "/");
   strcat (pub_key_path, pub_key_file);
 
-  priv_key_path = alloca (strlen (srcdir) + strlen (priv_key_file) + 2);
+  priv_key_path = malloc (strlen (srcdir) + strlen (priv_key_file) + 2);
   strcpy (priv_key_path, srcdir);
   strcat (priv_key_path, "/");
   strcat (priv_key_path, priv_key_file);
@@ -250,6 +250,8 @@ doit ()
         fail ("child failed: %d\n", status);
     }
 
+  free(pub_key_path);
+  free(priv_key_path);
   gnutls_global_deinit ();
 }
 #else
