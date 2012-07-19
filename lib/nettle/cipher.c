@@ -90,7 +90,7 @@ static void _gcm_encrypt(void *_ctx, nettle_crypt_func f,
             unsigned length, uint8_t *dst,
             const uint8_t *src)
 {
-  return gcm_aes_encrypt(_ctx, length, dst, src);
+  gcm_aes_encrypt(_ctx, length, dst, src);
 }
 
 static void _gcm_decrypt(void *_ctx, nettle_crypt_func f,  
@@ -98,7 +98,7 @@ static void _gcm_decrypt(void *_ctx, nettle_crypt_func f,
             unsigned length, uint8_t *dst,
             const uint8_t *src)
 {
-  return gcm_aes_decrypt(_ctx, length, dst, src);
+  gcm_aes_decrypt(_ctx, length, dst, src);
 }
 
 static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
