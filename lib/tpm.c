@@ -1178,6 +1178,8 @@ TSS_HPOLICY key_policy;
 gnutls_pubkey_t pub;
 struct tpm_ctx_st s;
 TSS_FLAG storage_type;
+TSS_HTPM htpm;
+uint8_t buf[32];
 
   if (flags & GNUTLS_TPM_KEY_SIGNING)
     tpm_flags |= TSS_KEY_TYPE_SIGNING;
@@ -1205,6 +1207,31 @@ TSS_FLAG storage_type;
   ret = tpm_open_session(&s, srk_password);
   if (ret < 0)
     return gnutls_assert_val(ret);
+    
+  /* put some randomness into TPM. 
+   * Let's not trust it completely.
+   */
+  tssret = Tspi_Context_GetTpmObject(s.tpm_ctx, &htpm);
+  if (tssret != 0)
+    {
+      gnutls_assert();
+      ret = tss_err(tssret);
+      goto err_cc;
+    }
+
+      
+  ret = _gnutls_rnd(GNUTLS_RND_RANDOM, buf, sizeof(buf));
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto err_cc;
+    }
+
+  tssret = Tspi_TPM_StirRandom(htpm, sizeof(buf), buf);
+  if (tssret)
+    {
+      gnutls_assert();
+    }
 
   tssret = Tspi_Context_CreateObject(s.tpm_ctx, TSS_OBJECT_TYPE_RSAKEY, tpm_flags, &key_ctx);
   if (tssret != 0)
