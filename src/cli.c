@@ -151,6 +151,7 @@ load_keys (void)
         {
           crt_num = 1;
           gnutls_x509_crt_init (&crt_list[0]);
+          gnutls_x509_crt_set_pin_function(crt_list[0], pin_callback, NULL);
 
           ret =
             gnutls_x509_crt_import_pkcs11_url (crt_list[0], x509_certfile, 0);
@@ -224,7 +225,10 @@ load_keys (void)
                     gnutls_strerror (ret));
            exit (1);
          }
-      else if (gnutls_url_is_supported(x509_keyfile) != 0)
+
+      gnutls_privkey_set_pin_function(x509_key, pin_callback, NULL);
+
+      if (gnutls_url_is_supported(x509_keyfile) != 0)
         {
           ret =
             gnutls_privkey_import_url (x509_key, x509_keyfile, 0);
@@ -298,6 +302,8 @@ load_keys (void)
                     gnutls_strerror (ret));
            exit (1);
          }
+
+      gnutls_privkey_set_pin_function(pgp_key, pin_callback, NULL);
 
       if (gnutls_url_is_supported (pgp_keyfile))
         {
@@ -770,7 +776,7 @@ main (int argc, char **argv)
     }
 
 #ifdef ENABLE_PKCS11
-  pkcs11_common ();
+//  pkcs11_common ();
 #endif
 
   if (hostname == NULL)
@@ -1189,7 +1195,7 @@ do_handshake (socket_st * socket)
   if (ret == 0)
     {
       /* print some information */
-      print_info (socket->session, print_cert);
+      print_info (socket->session, print_cert, verbose);
       socket->secure = 1;
     }
   else
@@ -1311,6 +1317,7 @@ init_global_tls_stuff (void)
       fprintf (stderr, "Certificate allocation memory error\n");
       exit (1);
     }
+  gnutls_certificate_set_pin_function(xcred, pin_callback, NULL);
 
   if (x509_cafile != NULL)
     {

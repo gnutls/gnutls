@@ -45,7 +45,7 @@
 #include <version-etc.h>
 
 #include <certtool-cfg.h>
-#include <p11common.h>
+#include <common.h>
 #include "certtool-args.h"
 #include "certtool-common.h"
 

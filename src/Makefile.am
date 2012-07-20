@@ -52,9 +52,6 @@ endif
 
 if ENABLE_PKCS11
 bin_PROGRAMS += p11tool
-PKCS11_SRCS = p11common.c p11common.h
-else
-PKCS11_SRCS =
 endif
 
 noinst_LTLIBRARIES =
@@ -64,8 +61,7 @@ gnutls_serv_SOURCES =		\
   udp-serv.c udp-serv.h		\
   socket.c socket.h		\
   common.h common.c		\
-  certtool-common.h 		\
-  $(PKCS11_SRCS)
+  certtool-common.h 
 gnutls_serv_LDADD = ../lib/libgnutls.la
 gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la $(LIBOPTS_LDADD) $(LTLIBINTL)
 gnutls_serv_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB)
@@ -103,7 +99,7 @@ BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
 gnutls_cli_SOURCES = cli.c common.h common.c \
 	socket.c socket.h ocsptool-common.c \
-	$(PKCS11_SRCS) $(BENCHMARK_SRCS)
+	$(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS_LDADD) $(LTLIBINTL)
 gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME) \
@@ -113,8 +109,7 @@ libcmd_cli_la_CFLAGS =
 libcmd_cli_la_SOURCES = cli-args.def cli-args.c cli-args.h
 
 gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c \
-		socket.c socket.h common.h common.c \
-		$(PKCS11_SRCS)
+		socket.c socket.h common.h common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la 
 gnutls_cli_debug_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
 gnutls_cli_debug_LDADD += ../gl/libgnu.la $(LIBSOCKET) $(GETADDRINFO_LIB)
@@ -124,7 +119,7 @@ libcmd_cli_debug_la_SOURCES = cli-debug-args.def cli-debug-args.c cli-debug-args
 
 #certtool
 
-certtool_SOURCES = certtool.c dh.c certtool-common.c certtool-extras.c $(PKCS11_SRCS)
+certtool_SOURCES = certtool.c dh.c certtool-common.c certtool-extras.c common.c
 certtool_LDADD = ../lib/libgnutls.la 
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
 
@@ -140,7 +135,8 @@ libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 # p11 tool
 if ENABLE_PKCS11
 
-p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c certtool-extras.c p11tool.h $(PKCS11_SRCS)
+p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c \
+	certtool-extras.c p11tool.h common.c
 p11tool_LDADD = ../lib/libgnutls.la $(LIBOPTS_LDADD) $(LTLIBINTL)
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la
 
@@ -156,7 +152,7 @@ endif # ENABLE_PKCS11
 
 if ENABLE_TROUSERS
 
-tpmtool_SOURCES = tpmtool-args.def tpmtool.c certtool-common.c certtool-extras.c
+tpmtool_SOURCES = tpmtool-args.def tpmtool.c certtool-common.c certtool-extras.c common.c
 tpmtool_LDADD = ../lib/libgnutls.la $(LIBOPTS_LDADD) $(LTLIBINTL)
 tpmtool_LDADD += libcmd-tpmtool.la ../gl/libgnu.la
 

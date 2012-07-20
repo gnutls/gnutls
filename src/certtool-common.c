@@ -38,6 +38,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <error.h>
+#include <common.h>
 #include "certtool-common.h"
 #include "certtool-cfg.h"
 
@@ -714,27 +715,6 @@ print_key_usage (FILE * outfile, unsigned int usage)
     {
       fprintf (outfile, "\tKey decipher only.\n");
     }
-}
-
-const char *
-raw_to_string (const unsigned char *raw, size_t raw_size)
-{
-  static char buf[1024];
-  size_t i;
-  if (raw_size == 0)
-    return NULL;
-
-  if (raw_size * 3 + 1 >= sizeof (buf))
-    return NULL;
-
-  for (i = 0; i < raw_size; i++)
-    {
-      sprintf (&(buf[i * 3]), "%02X%s", raw[i],
-               (i == raw_size - 1) ? "" : ":");
-    }
-  buf[sizeof (buf) - 1] = '\0';
-
-  return buf;
 }
 
 void _pubkey_info(FILE* outfile, gnutls_pubkey_t pubkey)

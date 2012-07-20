@@ -31,7 +31,7 @@
 #include "certtool-common.h"
 #include <unistd.h>
 #include <string.h>
-#include <p11common.h>
+#include <common.h>
 
 void
 pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login,

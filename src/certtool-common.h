@@ -87,9 +87,6 @@ print_dsa_pkey (FILE* outfile, gnutls_datum_t * x, gnutls_datum_t * y, gnutls_da
 
 FILE *safe_open_rw (const char *file, int privkey_op);
 
-const char *
-raw_to_string (const unsigned char *raw, size_t raw_size);
-
 extern unsigned char buffer[];
 extern const int buffer_size;
 
