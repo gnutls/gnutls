@@ -81,12 +81,12 @@ dnl    fi
   AC_MSG_CHECKING([whether to use nettle])
 if test "$cryptolib" = "nettle";then
   AC_MSG_RESULT(yes)
-    AC_LIB_HAVE_LINKFLAGS([nettle], [hogweed gmp], [#include <nettle/ripemd160.h>],
-                          [ripemd160_init (0)])
+    AC_LIB_HAVE_LINKFLAGS([nettle], [hogweed gmp], [#include <nettle/rsa.h>],
+                          [rsa_decrypt_tr (0,0,0,0,0,0,0)])
     if test "$ac_cv_libnettle" != yes; then
       AC_MSG_ERROR([[
   *** 
-  *** Libnettle 2.4 was not found. You must compile nettle with gmp support.
+  *** Libnettle 2.5 was not found. Note that you must compile nettle with gmp support.
   ]])
     fi
 else
