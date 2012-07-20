@@ -2705,6 +2705,9 @@ gnutls_x509_crt_import_pkcs11_url (gnutls_x509_crt_t crt,
       gnutls_assert ();
       return ret;
     }
+  
+  if (crt->pin.cb)
+    gnutls_pkcs11_obj_set_pin_function (pcrt, crt->pin.cb, crt->pin.data);
 
   ret = gnutls_pkcs11_obj_import_url (pcrt, url, flags);
   if (ret < 0)
@@ -2727,7 +2730,6 @@ cleanup:
 
   return ret;
 }
-
 
 /**
  * gnutls_x509_crt_import_pkcs11:

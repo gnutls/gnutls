@@ -3692,3 +3692,26 @@ gnutls_x509_crt_get_authority_info_access (gnutls_x509_crt_t crt,
 
   return ret;
 }
+
+/**
+ * gnutls_x509_crt_set_pin_function:
+ * @crt: The certificate structure
+ * @fn: the callback
+ * @userdata: data associated with the callback
+ *
+ * This function will set a callback function to be used when
+ * it is required to access a protected object. This function overrides 
+ * the global function set using gnutls_pkcs11_set_pin_function().
+ *
+ * Note that this callback is currently used only during the import
+ * of a PKCS #11 certificate with gnutls_x509_crt_import_pkcs11_url().
+ *
+ * Since: 3.1.0
+ *
+ **/
+void gnutls_x509_crt_set_pin_function (gnutls_x509_crt_t crt,
+                                       gnutls_pin_callback_t fn, void *userdata)
+{
+  crt->pin.cb = fn;
+  crt->pin.data = userdata;
+}

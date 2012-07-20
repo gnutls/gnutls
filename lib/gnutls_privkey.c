@@ -375,6 +375,9 @@ gnutls_privkey_import_pkcs11_url (gnutls_privkey_t key, const char *url)
       gnutls_assert ();
       return ret;
     }
+  
+  if (key->pin.cb)
+    gnutls_pkcs11_privkey_set_pin_function(pkey, key->pin.cb, key->pin.data);
 
   ret = gnutls_pkcs11_privkey_import_url (pkey, url, 0);
   if (ret < 0)

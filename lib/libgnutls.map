@@ -824,6 +824,7 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs11_obj_set_pin_function;
 	gnutls_pkcs11_privkey_set_pin_function;
 	gnutls_certificate_set_pin_function;
+	gnutls_x509_crt_set_pin_function;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

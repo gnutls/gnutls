@@ -181,6 +181,9 @@ extern "C"
   int gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
                                             size_t * buf_size);
 
+  void gnutls_x509_crt_set_pin_function (gnutls_x509_crt_t crt,
+                                       gnutls_pin_callback_t fn, void *userdata);
+
   /**
    * gnutls_info_access_what_t:
    * @GNUTLS_IA_ACCESSMETHOD_OID: Get accessMethod OID.

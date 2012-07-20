@@ -58,6 +58,8 @@ typedef struct gnutls_x509_crt_int
 {
   ASN1_TYPE cert;
   int use_extensions;
+  
+  struct pin_info_st pin;
 } gnutls_x509_crt_int;
 
 typedef struct gnutls_x509_crq_int

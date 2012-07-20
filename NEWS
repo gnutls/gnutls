@@ -67,6 +67,7 @@ gnutls_pubkey_verify_hash2: Added
 gnutls_pubkey_set_pin_function: Added
 gnutls_x509_privkey_import2: Added
 gnutls_x509_privkey_import_openssl: Added
+gnutls_x509_crt_set_pin_function: Added
 gnutls_load_file: Added
 gnutls_pkcs12_simple_parse: Added
 gnutls_certificate_set_x509_system_trust: Added
