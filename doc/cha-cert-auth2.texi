@@ -353,6 +353,18 @@ of their usage is also shown.
 
 @verbatiminclude examples/ex-pkcs12.c
 
+@subheading Other structures
+@cindex OpenSSL encrypted keys
+Unfortunately the structures discussed in the previous sections are
+not the only structures that may hold an encrypted private key. For example
+the OpenSSL library offers a custom key encryption method. Those structures
+are also supported in GnuTLS with @funcref{gnutls_x509_privkey_import_openssl}.
+
+@showfuncdesc{gnutls_x509_privkey_import_openssl}
+
+Generic and higher level private key import functions are also available.
+@showfuncB{gnutls_x509_privkey_import2,gnutls_privkey_import_x509_raw}
+
 @include invoke-certtool.texi
 
 @include invoke-ocsptool.texi
