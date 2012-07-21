@@ -96,6 +96,7 @@ options are given.
 --disable-openpgp-authentication
 --disable-openssl-compatibility
 --without-p11-kit
+--without-tpm
 @end verbatim
 
 For the complete list, refer to the output from @code{configure --help}.
