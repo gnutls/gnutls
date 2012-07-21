@@ -350,6 +350,7 @@ multitable:
 		$line =~ s/\@image\{($match+)\,($match+)\}/\\includegraphics\[width\=$2\]\{\.\.\/$1\}/g;
 		$line =~ s/\@samp\{($spacematch+)\}/$1/g;
 		$line =~ s/\@strong\{/\{\\bf /g;
+		$line =~ s/\@noindent.*//g;
 		$line =~ s/\@exampleindent.*//g;
 		$line =~ s/\@c (.*)/\% $1/g;
 		$line =~ s/\@math\{($mathmatch+)\}/\$$1\$/g;
