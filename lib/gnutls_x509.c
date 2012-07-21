@@ -652,7 +652,7 @@ cleanup:
 }
 
 
-/* Reads a private key from a token.
+/* Reads a certificate key from a token.
  */
 static int
 read_cert_url (gnutls_certificate_credentials_t res, const char *url)
@@ -677,6 +677,9 @@ read_cert_url (gnutls_certificate_credentials_t res, const char *url)
       gnutls_assert ();
       goto cleanup;
     }
+
+  if (res->pin.cb)
+    gnutls_x509_crt_set_pin_function(crt, res->pin.cb, res->pin.data);
 
   ret = gnutls_x509_crt_import_pkcs11_url (crt, url, 0);
   if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
