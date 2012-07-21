@@ -1068,23 +1068,23 @@ pin_callback (void *user, int attempt, const char *token_url,
   static char *cached_url = NULL;
   static char cached_pin[32] = "";
 
-  if (flags & GNUTLS_PKCS11_PIN_SO)
+  if (flags & GNUTLS_PIN_SO)
     desc = "security officer";
   else
     desc = "user";
 
-  if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
+  if (flags & GNUTLS_PIN_FINAL_TRY)
     {
       cache = 0;
       printf ("*** This is the final try before locking!\n");
     }
-  if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
+  if (flags & GNUTLS_PIN_COUNT_LOW)
     {
       cache = 0;
       printf ("*** Only few tries left before locking!\n");
     }
 
-  if (flags & GNUTLS_PKCS11_PIN_WRONG)
+  if (flags & GNUTLS_PIN_WRONG)
     {
       cache = 0;
       printf ("*** Wrong PIN has been provided!\n");

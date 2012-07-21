@@ -1987,23 +1987,23 @@ retrieve_pin_from_callback (const struct pin_info_st *pin_info,
 
   if (user_type == CKU_USER)
     {
-      flags |= GNUTLS_PKCS11_PIN_USER;
+      flags |= GNUTLS_PIN_USER;
       if (token_info->flags & CKF_USER_PIN_COUNT_LOW)
-        flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
+        flags |= GNUTLS_PIN_COUNT_LOW;
       if (token_info->flags & CKF_USER_PIN_FINAL_TRY)
-        flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
+        flags |= GNUTLS_PIN_FINAL_TRY;
     }
   else if (user_type == CKU_SO)
     {
-      flags |= GNUTLS_PKCS11_PIN_SO;
+      flags |= GNUTLS_PIN_SO;
       if (token_info->flags & CKF_SO_PIN_COUNT_LOW)
-        flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
+        flags |= GNUTLS_PIN_COUNT_LOW;
       if (token_info->flags & CKF_SO_PIN_FINAL_TRY)
-        flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
+        flags |= GNUTLS_PIN_FINAL_TRY;
     }
 
   if (attempts > 0)
-    flags |= GNUTLS_PKCS11_PIN_WRONG;
+    flags |= GNUTLS_PIN_WRONG;
 
   if (pin_info && pin_info->cb)
     ret = pin_info->cb (pin_info->data, attempts, (char*)token_str, label,

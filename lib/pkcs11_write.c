@@ -784,8 +784,8 @@ gnutls_pkcs11_token_set_pin (const char *token_url,
       return ret;
     }
 
-  if (((flags & GNUTLS_PKCS11_PIN_USER) && oldpin == NULL) ||
-      (flags & GNUTLS_PKCS11_PIN_SO))
+  if (((flags & GNUTLS_PIN_USER) && oldpin == NULL) ||
+      (flags & GNUTLS_PIN_SO))
     ses_flags = SESSION_WRITE | SESSION_LOGIN | SESSION_SO;
   else
     ses_flags = SESSION_WRITE | SESSION_LOGIN;

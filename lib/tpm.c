@@ -185,7 +185,7 @@ char* url = NULL;
 int ret;
 
   if (attempts > 0) 
-    flags |= GNUTLS_PKCS11_PIN_WRONG;
+    flags |= GNUTLS_PIN_WRONG;
     
   if (uuid)
     {

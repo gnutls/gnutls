@@ -49,11 +49,11 @@ pin_callback (void *user, int attempt, const char *token_url,
 
   printf ("PIN required for token '%s' with URL '%s'\n", token_label,
           token_url);
-  if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
+  if (flags & GNUTLS_PIN_FINAL_TRY)
     printf ("*** This is the final try before locking!\n");
-  if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
+  if (flags & GNUTLS_PIN_COUNT_LOW)
     printf ("*** Only few tries left before locking!\n");
-  if (flags & GNUTLS_PKCS11_PIN_WRONG)
+  if (flags & GNUTLS_PIN_WRONG)
     printf ("*** Wrong PIN\n");
 
   password = getpass ("Enter pin: ");
