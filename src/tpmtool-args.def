@@ -96,6 +96,24 @@ flag = {
     doc      = "";
 };
 
+flag = {
+    name      = inder;
+    descrip   = "Use the DER format for keys.";
+    disabled;
+    disable   = "no";
+    doc       = "The input files will be assumed to be in the portable
+DER format of TPM. The default format is a custom format used by various
+TPM tools";
+};
+
+flag = {
+    name      = outder;
+    descrip   = "Use DER format for output keys";
+    disabled;
+    disable   = "no";
+    doc       = "The output will be in the TPM portable DER format.";
+};
+
 doc-section = {
   ds-type = 'SEE ALSO';
   ds-format = 'texi';

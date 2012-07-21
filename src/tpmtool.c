@@ -55,6 +55,9 @@ static void tpm_pubkey(const char* url, FILE* outfile);
 static void tpm_delete(const char* url, FILE* outfile);
 static void tpm_list(FILE* outfile);
 
+static gnutls_x509_crt_fmt_t incert_format, outcert_format;
+static gnutls_tpmkey_fmt_t inkey_format, outkey_format;
+
 static FILE *outfile;
 static FILE *infile;
 int batch = 0;
@@ -94,6 +97,28 @@ cmd_parser (int argc, char **argv)
  
   if (HAVE_OPT(DEBUG))
     debug = OPT_VALUE_DEBUG;
+
+  if (HAVE_OPT(INDER))
+    {
+      incert_format = GNUTLS_X509_FMT_DER;
+      inkey_format = GNUTLS_TPMKEY_FMT_DER;
+    }
+  else
+    {
+      incert_format = GNUTLS_X509_FMT_PEM;
+      inkey_format = GNUTLS_TPMKEY_FMT_PEM;
+    }
+
+  if (HAVE_OPT(OUTDER))
+    {
+      outcert_format = GNUTLS_X509_FMT_DER;
+      outkey_format = GNUTLS_TPMKEY_FMT_DER;
+    }
+  else
+    {
+      outcert_format = GNUTLS_X509_FMT_PEM;
+      outkey_format = GNUTLS_TPMKEY_FMT_PEM;
+    }
 
   if (HAVE_OPT(REGISTER))
     genflags |= GNUTLS_TPM_REGISTER_KEY;
@@ -177,7 +202,8 @@ static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits
     key_pass = strdup(srk_pass);
   
   ret = gnutls_tpm_privkey_generate(key_type, bits, srk_pass, key_pass,
-                                    GNUTLS_X509_FMT_PEM, &privkey, &pubkey,
+                                    outkey_format, outcert_format, 
+                                    &privkey, &pubkey,
                                     flags);
 
   free(key_pass);
