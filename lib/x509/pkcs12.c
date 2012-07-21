@@ -1388,8 +1388,7 @@ skip:
  * and both may be set to %NULL. If either is non-%NULL, then both must
  * be.
  * 
- * MAC:ed PKCS#12 files are supported.  Encrypted PKCS#12 bags are
- * supported.  Encrypted PKCS#8 private keys are supported.  However,
+ * Encrypted PKCS#12 bags and PKCS#8 private keys are supported.  However,
  * only password based security, and the same password for all
  * operations, are supported.
  *
