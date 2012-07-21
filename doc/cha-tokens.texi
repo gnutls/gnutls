@@ -74,7 +74,7 @@ sequence.
 @showfuncdesc{gnutls_pubkey_export}
 
 An important function is @funcref{gnutls_pubkey_import_url} which will import
-public keys from URLs that identify objects stored in tokens (see @ref{Smart cards and HSMs,Trusted platform module}).
+public keys from URLs that identify objects stored in tokens (see @ref{Smart cards and HSMs} and @ref{Trusted platform module}).
 A function to check for a supported by GnuTLS URL is @funcref{gnutls_url_is_supported}.
 
 @showfuncdesc{gnutls_url_is_supported}
