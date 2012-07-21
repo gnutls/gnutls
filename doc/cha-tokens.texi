@@ -175,6 +175,7 @@ system, being the @acronym{Gnome Keyring}.
 
 @menu
 * PKCS11 Initialization::
+* Accessing objects that require a PIN::
 * Reading objects::
 * Writing objects::
 * Using a PKCS11 token with TLS::
@@ -194,12 +195,46 @@ module: /usr/lib/opensc-pkcs11.so
 @end example
 
 If you use this file, then there is no need for other initialization in
-@acronym{GnuTLS}, except for the PIN and token functions. Those allow retrieving a PIN
-when accessing a protected object, such as a private key, as well as probe
-the user to insert the token. All the initialization functions are below.
+@acronym{GnuTLS}, except for the PIN and token functions (see next section).  
+However, you may manually initialize the PKCS #11 subsystem if the default
+settings are not desirable.
 
 @showfuncdesc{gnutls_pkcs11_init}
+
+Note that PKCS #11 modules must be reinitialized on the child processes
+after a @funcintref{fork}. @acronym{GnuTLS} provides @funcref{gnutls_pkcs11_reinit}
+to be called for this purpose.
+
+@showfuncdesc{gnutls_pkcs11_reinit}
+
+@node Accessing objects that require a PIN
+@subsection Accessing objects that require a PIN
+
+Objects stored in token such as a private keys are typically protected
+from access by a PIN or password. This PIN may be required to either read
+the object (if allowed) or to perform operations with it. To allow obtaining
+the PIN when accessing a protected object, as well as probe
+the user to insert the token the following functions allow to set a callback.
+
 @showfuncD{gnutls_pkcs11_set_token_function,gnutls_pkcs11_set_pin_function,gnutls_pkcs11_add_provider,gnutls_pkcs11_get_pin_function}
+
+The callback is of type @funcintref{gnutls_pin_callback_t} and will have as
+input the provided userdata, the PIN attempt number, a URL describing the
+token, a label describing the object and flags. The PIN must be at most 
+of @code{pin_max} size and must be copied to pin variable. The function must
+return 0 on success or a negative error code otherwise.
+
+@verbatim
+typedef int (*gnutls_pin_callback_t) (void *userdata, int attempt,
+                                      const char *token_url,
+                                      const char *token_label,
+                                      unsigned int flags,
+                                      char *pin, size_t pin_max);
+@end verbatim
+
+The flags are of @code{gnutls_pin_flag_t} type and are explained below.
+
+@showenumdesc{gnutls_pin_flag_t,The @code{gnutls_pin_@-flag_t} enumeration.}
 
 Note that due to limitations of @acronym{PKCS} #11 there are issues when multiple libraries 
 are sharing a module. To avoid this problem GnuTLS uses @acronym{p11-kit}
@@ -212,12 +247,6 @@ set functions. In addition context specific PIN functions are allowed, e.g., by
 using functions below.
 
 @showfuncE{gnutls_certificate_set_pin_function,gnutls_pubkey_set_pin_function,gnutls_privkey_set_pin_function,gnutls_pkcs11_obj_set_pin_function,gnutls_x509_crt_set_pin_function}
-
-Moreover PKCS #11 modules must be reinitialized on the child processes
-after a @funcintref{fork}. @acronym{GnuTLS} provides @funcref{gnutls_pkcs11_reinit}
-to be called for this purpose.
-
-@showfuncdesc{gnutls_pkcs11_reinit}
 
 @node Reading objects
 @subsection Reading objects
@@ -356,6 +385,9 @@ identified by a URL of the form:
 @verbatim
 tpmkey:file=/path/to/file
 @end verbatim
+
+When objects require a PIN to be accessed the same callbacks as with PKCS #11
+objects are expected (see @ref{Accessing objects that require a PIN}).
 
 @node Key generation
 @subsection Key generation

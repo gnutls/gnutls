@@ -481,6 +481,7 @@ ENUMS += enums/gnutls_mac_algorithm_t
 ENUMS += enums/gnutls_openpgp_crt_fmt_t
 ENUMS += enums/gnutls_openpgp_crt_status_t
 ENUMS += enums/gnutls_params_type_t
+ENUMS += enums/gnutls_pin_flag_t
 ENUMS += enums/gnutls_pk_algorithm_t
 ENUMS += enums/gnutls_pkcs11_obj_attr_t
 ENUMS += enums/gnutls_pkcs11_obj_info_t
