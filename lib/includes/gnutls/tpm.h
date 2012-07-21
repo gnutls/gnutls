@@ -38,11 +38,25 @@ typedef struct tpm_key_list_st *gnutls_tpm_key_list_t;
 #define GNUTLS_TPM_REGISTER_KEY (1<<2)
 #define GNUTLS_TPM_KEY_USER (1<<3)
 
+/**
+ * gnutls_tpmkey_fmt_t:
+ * @GNUTLS_TPM_FMT_DER: The portable data format.
+ * @GNUTLS_TPM_FMT_PEM: A custom data format used by some openssl tools.
+ *
+ * Enumeration of different certificate encoding formats.
+ */
+  typedef enum
+  {
+    GNUTLS_TPMKEY_FMT_DER = 0,
+    GNUTLS_TPMKEY_FMT_PEM = 1
+  } gnutls_tpmkey_fmt_t;
+
 int
 gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t pk, unsigned int bits, 
                              const char* srk_password,
                              const char* key_password,
-                             gnutls_x509_crt_fmt_t format,
+                             gnutls_tpmkey_fmt_t format,
+                             gnutls_x509_crt_fmt_t pub_format,
                              gnutls_datum_t* privkey, 
                              gnutls_datum_t* pubkey,
                              unsigned int flags);

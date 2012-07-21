@@ -60,7 +60,7 @@ struct tpm_key_list_st
 static void tpm_close_session(struct tpm_ctx_st *s);
 static int import_tpm_key (gnutls_privkey_t pkey,
                            const gnutls_datum_t * fdata,
-                           gnutls_x509_crt_fmt_t format,
+                           gnutls_tpmkey_fmt_t format,
                            TSS_UUID *uuid,
                            TSS_FLAG storage_type,
                            const char *srk_password,
@@ -315,7 +315,7 @@ static void tpm_close_session(struct tpm_ctx_st *s)
 
 static int
 import_tpm_key_cb (gnutls_privkey_t pkey, const gnutls_datum_t * fdata,
-                   gnutls_x509_crt_fmt_t format, TSS_UUID *uuid,
+                   gnutls_tpmkey_fmt_t format, TSS_UUID *uuid,
                    TSS_FLAG storage, const char *srk_password,
                    const char *key_password)
 {
@@ -360,18 +360,88 @@ int ret, ret2;
   return ret;
 }
 
+static int load_key(TSS_HCONTEXT tpm_ctx, TSS_HKEY srk, 
+                    const gnutls_datum_t * fdata, gnutls_tpmkey_fmt_t format,
+                    TSS_HKEY* tpm_key)
+{
+int ret, err;
+gnutls_datum_t asn1 = { NULL, 0 };
+size_t slen;
+
+  if (format == GNUTLS_TPMKEY_FMT_PEM)
+    {
+      ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
+      if (ret)
+        {
+          gnutls_assert ();
+          _gnutls_debug_log ("Error decoding TSS key blob: %s\n",
+                             gnutls_strerror (ret));
+          return ret;
+        }
+
+      slen = asn1.size;
+      ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+      asn1.size = slen;
+    }
+  else /* DER */
+    {
+      UINT32 tint2;
+      UINT32 type;
+      
+      asn1.size = fdata->size;
+      asn1.data = gnutls_malloc(asn1.size);
+      if (asn1.data == NULL)
+        {
+          gnutls_assert();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
+      
+      tint2 = asn1.size;
+      err = Tspi_DecodeBER_TssBlob(fdata->size, fdata->data, &type,
+                                      &tint2, asn1.data);
+      if (err != 0)
+        {
+          gnutls_assert();
+          ret = tss_err(err);
+          goto cleanup;
+        }
+
+      asn1.size = tint2; 
+    }
+
+  /* ... we get it here instead. */
+  err = Tspi_Context_LoadKeyByBlob (tpm_ctx, srk,
+                                    asn1.size, asn1.data, tpm_key);
+  if (err != 0)
+    {
+      gnutls_assert ();
+      ret = tss_err(err);
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+  gnutls_free (asn1.data);
+
+  return ret;
+}
+
 
 static int
 import_tpm_key (gnutls_privkey_t pkey,
                 const gnutls_datum_t * fdata,
-                gnutls_x509_crt_fmt_t format,
+                gnutls_tpmkey_fmt_t format,
                 TSS_UUID *uuid,
                 TSS_FLAG storage,
                 const char *srk_password,
                 const char *key_password)
 {
-  gnutls_datum_t asn1 = { NULL, 0 };
-  size_t slen;
   int err, ret;
   struct tpm_ctx_st *s;
   gnutls_datum_t tmp_sig;
@@ -392,32 +462,11 @@ import_tpm_key (gnutls_privkey_t pkey,
 
   if (fdata != NULL)
     {
-      ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
-      if (ret)
-        {
-          gnutls_assert ();
-          _gnutls_debug_log ("Error decoding TSS key blob: %s\n",
-                             gnutls_strerror (ret));
-          goto out_session;
-        }
-
-      slen = asn1.size;
-      ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
+      ret = load_key(s->tpm_ctx, s->srk, fdata, format, &s->tpm_key);
       if (ret < 0)
         {
           gnutls_assert();
-          goto out_blob;
-        }
-      asn1.size = slen;
-
-      /* ... we get it here instead. */
-      err = Tspi_Context_LoadKeyByBlob (s->tpm_ctx, s->srk,
-                                        asn1.size, asn1.data, &s->tpm_key);
-      if (err != 0)
-        {
-          gnutls_assert ();
-          ret = tss_err(err);
-          goto out_blob;
+          goto out_session;
         }
     }
   else if (uuid)
@@ -454,44 +503,43 @@ import_tpm_key (gnutls_privkey_t pkey,
   if (ret == GNUTLS_E_TPM_KEY_PASSWORD_ERROR)
     {
       if (!s->tpm_key_policy)
-	{
-	  err = Tspi_Context_CreateObject (s->tpm_ctx,
-					   TSS_OBJECT_TYPE_POLICY,
-					   TSS_POLICY_USAGE,
-					   &s->tpm_key_policy);
-	  if (err)
-	    {
-	      gnutls_assert ();
-              ret = tss_err(err);
-	      goto out_key;
-	    }
+        {
+          err = Tspi_Context_CreateObject (s->tpm_ctx,
+                   TSS_OBJECT_TYPE_POLICY,
+                   TSS_POLICY_USAGE,
+                   &s->tpm_key_policy);
+          if (err)
+            {
+              gnutls_assert ();
+                    ret = tss_err(err);
+              goto out_key;
+            }
 
-	  err = Tspi_Policy_AssignToObject (s->tpm_key_policy, s->tpm_key);
-	  if (err)
-	    {
-	      gnutls_assert ();
-              ret = tss_err(err);
-	      goto out_key_policy;
-	    }
-	}
+          err = Tspi_Policy_AssignToObject (s->tpm_key_policy, s->tpm_key);
+          if (err)
+            {
+              gnutls_assert ();
+                    ret = tss_err(err);
+              goto out_key_policy;
+            }
+        }
 
       err = myTspi_Policy_SetSecret (s->tpm_key_policy,
-				     SAFE_LEN(key_password), (void *) key_password);
+                   SAFE_LEN(key_password), (void *) key_password);
 
       if (err)
-	{
-	  gnutls_assert ();
-          ret = tss_err_key(err);
-	  goto out_key_policy;
-	}
+        {
+          gnutls_assert ();
+                ret = tss_err_key(err);
+          goto out_key_policy;
+        }
     }
   else if (ret < 0)
     {
       gnutls_assert ();
-      goto out_blob;
+      goto out_session;
     }
 
-  gnutls_free (asn1.data);
   return 0;
 out_key_policy:
   Tspi_Context_CloseObject (s->tpm_ctx, s->tpm_key_policy);
@@ -499,8 +547,6 @@ out_key_policy:
 out_key:
   Tspi_Context_CloseObject (s->tpm_ctx, s->tpm_key);
   s->tpm_key = 0;
-out_blob:
-  gnutls_free (asn1.data);
 out_session:
   tpm_close_session(s);
 out_ctx:
@@ -530,7 +576,7 @@ out_ctx:
 int
 gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       const gnutls_datum_t * fdata,
-			       gnutls_x509_crt_fmt_t format,
+			       gnutls_tpmkey_fmt_t format,
 			       const char *srk_password,
 			       const char *key_password,
 			       unsigned int flags)
@@ -819,8 +865,12 @@ int ret;
           goto cleanup;
         }
 
-      ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_X509_FMT_PEM,
+      ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_PEM,
        		                           srk_password, key_password, flags);
+      if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
+        ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_DER,
+                                             srk_password, key_password, flags);
+
       if (ret < 0)
         {
           gnutls_assert();
@@ -903,13 +953,11 @@ int ret;
 static int
 import_tpm_pubkey (gnutls_pubkey_t pkey,
                    const gnutls_datum_t * fdata,
-                   gnutls_x509_crt_fmt_t format,
+                   gnutls_tpmkey_fmt_t format,
                    TSS_UUID *uuid,
                    TSS_FLAG storage,
                    const char *srk_password)
 {
-gnutls_datum_t asn1 = {NULL, 0};
-size_t slen;
 int err, ret;
 struct tpm_ctx_st s;
 
@@ -919,31 +967,11 @@ struct tpm_ctx_st s;
 
   if (fdata != NULL)
     {
-      ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
-      if (ret)
-        {
-          gnutls_assert ();
-          _gnutls_debug_log ("Error decoding TSS key blob: %s\n",
-           gnutls_strerror (ret));
-          goto out_session;
-        }
-
-      slen = asn1.size;
-      ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
+      ret = load_key(s.tpm_ctx, s.srk, fdata, format, &s.tpm_key);
       if (ret < 0)
         {
           gnutls_assert();
-          goto out_blob;
-        }
-      asn1.size = slen;
-
-      err = Tspi_Context_LoadKeyByBlob (s.tpm_ctx, s.srk,
-                                        asn1.size, asn1.data, &s.tpm_key);
-      if (err != 0)
-        {
-          gnutls_assert ();
-          ret = tss_err(err);
-          goto out_blob;
+          goto out_session;
         }
     }
   else if (uuid)
@@ -969,12 +997,10 @@ struct tpm_ctx_st s;
   if (ret < 0)
     {
       gnutls_assert();
-      goto out_blob;
+      goto out_session;
     }
 
   ret = 0;
-out_blob:
-  gnutls_free (asn1.data);
 out_session:
   tpm_close_session(&s);
   return ret;
@@ -982,11 +1008,11 @@ out_session:
 
 static int
 import_tpm_pubkey_cb (gnutls_pubkey_t pkey,
-                   const gnutls_datum_t * fdata,
-                   gnutls_x509_crt_fmt_t format,
-                   TSS_UUID *uuid,
-                   TSS_FLAG storage,
-                   const char *srk_password)
+                     const gnutls_datum_t * fdata,
+                     gnutls_tpmkey_fmt_t format,
+                     TSS_UUID *uuid,
+                     TSS_FLAG storage,
+                     const char *srk_password)
 {
 unsigned int attempts = 0;
 char pin1[GNUTLS_PKCS11_MAX_PIN_LEN];
@@ -1041,7 +1067,7 @@ int ret;
 int
 gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
                               const gnutls_datum_t * fdata,
-                              gnutls_x509_crt_fmt_t format,
+                              gnutls_tpmkey_fmt_t format,
                               const char *srk_password,
                               unsigned int flags)
 {
@@ -1097,8 +1123,11 @@ int ret;
           goto cleanup;
         }
 
-      ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_X509_FMT_PEM,
-       		                          srk_password, flags);
+      ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_PEM,
+       		                                srk_password, flags);
+      if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
+        ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_DER,
+         		                                srk_password, flags);
       if (ret < 0)
         {
           gnutls_assert();
@@ -1132,8 +1161,10 @@ cleanup:
  * @bits: the security bits
  * @srk_password: a password to protect the exported key (optional)
  * @key_password: the password for the TPM (optional)
+ * @format: the format of the private key
+ * @pub_format: the format of the public key
  * @privkey: the generated key
- * @pubkey: the corresponding public key
+ * @pubkey: the corresponding public key (may be null)
  * @flags: should be a list of %GNUTLS_TPM flags
  *
  * This function will generate a private key in the TPM
@@ -1162,7 +1193,8 @@ int
 gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t pk, unsigned int bits, 
                              const char* srk_password,
                              const char* key_password,
-                             gnutls_x509_crt_fmt_t format,
+                             gnutls_tpmkey_fmt_t format,
+                             gnutls_x509_crt_fmt_t pub_format,
                              gnutls_datum_t* privkey, 
                              gnutls_datum_t* pubkey,
                              unsigned int flags)
@@ -1323,15 +1355,16 @@ uint8_t buf[32];
           goto err_sa;
         }
 
-      ret = _gnutls_x509_encode_octet_string(tdata, tint, &tmpkey);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
       
-      if (format == GNUTLS_X509_FMT_PEM)
+      if (format == GNUTLS_TPMKEY_FMT_PEM)
         {
+          ret = _gnutls_x509_encode_octet_string(tdata, tint, &tmpkey);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+
           ret = _gnutls_fbase64_encode ("TSS KEY BLOB", tmpkey.data, tmpkey.size, privkey);
           if (ret < 0)
             {
@@ -1341,6 +1374,29 @@ uint8_t buf[32];
         }
       else
         {
+          UINT32 tint2;
+          
+          tmpkey.size = tint + 32; /* spec says no more than 20 */
+          tmpkey.data = gnutls_malloc(tmpkey.size);
+          if (tmpkey.data == NULL)
+            {
+              gnutls_assert();
+              ret = GNUTLS_E_MEMORY_ERROR;
+              goto cleanup;
+            }
+          
+          tint2 = tmpkey.size;
+          tssret = Tspi_EncodeDER_TssBlob(tint, tdata, TSS_BLOB_TYPE_PRIVATEKEY,
+                                          &tint2, tmpkey.data);
+          if (tssret != 0)
+            {
+              gnutls_assert();
+              ret = tss_err(tssret);
+              goto cleanup;
+            }
+          
+          tmpkey.size = tint2;
+
           privkey->data = tmpkey.data;
           privkey->size = tmpkey.size;
           tmpkey.data = NULL;
@@ -1348,7 +1404,8 @@ uint8_t buf[32];
     }
 
   /* read the public key */
-  {
+  if (pubkey != NULL)
+    {
     size_t psize;
 
     ret = gnutls_pubkey_init(&pub);
@@ -1374,7 +1431,7 @@ uint8_t buf[32];
         goto pubkey_cleanup;
       }
     
-    ret = gnutls_pubkey_export(pub, format, pubkey->data, &psize);
+    ret = gnutls_pubkey_export(pub, pub_format, pubkey->data, &psize);
     if (ret < 0)
       {
         gnutls_assert();
@@ -1383,7 +1440,7 @@ uint8_t buf[32];
     pubkey->size = psize;
 
     gnutls_pubkey_deinit(pub);
-  }
+    }
 
   ret = 0;
   goto cleanup;

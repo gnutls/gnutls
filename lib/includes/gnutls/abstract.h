@@ -27,6 +27,7 @@
 #include <gnutls/x509.h>
 #include <gnutls/pkcs11.h>
 #include <gnutls/openpgp.h>
+#include <gnutls/tpm.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -85,7 +86,7 @@ gnutls_pubkey_import_url (gnutls_pubkey_t key, const char *url,
 int
 gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
 			       const gnutls_datum_t * fdata,
-			       gnutls_x509_crt_fmt_t format,
+			       gnutls_tpmkey_fmt_t format,
 			       const char *srk_password,
 			       unsigned int flags);
 
@@ -224,7 +225,7 @@ int gnutls_privkey_import_x509_raw (gnutls_privkey_t pkey,
 int
 gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       const gnutls_datum_t * fdata,
-			       gnutls_x509_crt_fmt_t format,
+			       gnutls_tpmkey_fmt_t format,
 			       const char *srk_password,
 			       const char *tpm_password, unsigned int flags);
 
