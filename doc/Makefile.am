@@ -1061,6 +1061,7 @@ FUNCS += functions/gnutls_x509_crt_get_authority_key_gn_serial
 FUNCS += functions/gnutls_x509_crt_get_subject_key_id
 FUNCS += functions/gnutls_x509_crt_get_subject_unique_id
 FUNCS += functions/gnutls_x509_crt_get_issuer_unique_id
+FUNCS += functions/gnutls_x509_crt_set_pin_function
 FUNCS += functions/gnutls_x509_crt_get_authority_info_access
 FUNCS += functions/gnutls_x509_crt_get_crl_dist_points
 FUNCS += functions/gnutls_x509_crt_set_crl_dist_points2
