@@ -41,14 +41,14 @@ typedef struct tpm_key_list_st *gnutls_tpm_key_list_t;
 /**
  * gnutls_tpmkey_fmt_t:
  * @GNUTLS_TPM_FMT_DER: The portable data format.
- * @GNUTLS_TPM_FMT_PEM: A custom data format used by some openssl tools.
+ * @GNUTLS_TPM_FMT_CTK_PEM: A custom data format used by some TPM tools.
  *
  * Enumeration of different certificate encoding formats.
  */
   typedef enum
   {
     GNUTLS_TPMKEY_FMT_DER = 0,
-    GNUTLS_TPMKEY_FMT_PEM = 1
+    GNUTLS_TPMKEY_FMT_CTK_PEM = 1
   } gnutls_tpmkey_fmt_t;
 
 int

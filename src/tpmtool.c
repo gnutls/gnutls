@@ -106,7 +106,7 @@ cmd_parser (int argc, char **argv)
   else
     {
       incert_format = GNUTLS_X509_FMT_PEM;
-      inkey_format = GNUTLS_TPMKEY_FMT_PEM;
+      inkey_format = GNUTLS_TPMKEY_FMT_CTK_PEM;
     }
 
   if (HAVE_OPT(OUTDER))
@@ -117,7 +117,7 @@ cmd_parser (int argc, char **argv)
   else
     {
       outcert_format = GNUTLS_X509_FMT_PEM;
-      outkey_format = GNUTLS_TPMKEY_FMT_PEM;
+      outkey_format = GNUTLS_TPMKEY_FMT_CTK_PEM;
     }
 
   if (HAVE_OPT(REGISTER))

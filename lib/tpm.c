@@ -368,7 +368,7 @@ int ret, err;
 gnutls_datum_t asn1 = { NULL, 0 };
 size_t slen;
 
-  if (format == GNUTLS_TPMKEY_FMT_PEM)
+  if (format == GNUTLS_TPMKEY_FMT_CTK_PEM)
     {
       ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
       if (ret)
@@ -865,7 +865,7 @@ int ret;
           goto cleanup;
         }
 
-      ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_PEM,
+      ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_CTK_PEM,
        		                           srk_password, key_password, flags);
       if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
         ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_DER,
@@ -1123,7 +1123,7 @@ int ret;
           goto cleanup;
         }
 
-      ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_PEM,
+      ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_CTK_PEM,
        		                                srk_password, flags);
       if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
         ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_DER,
@@ -1356,7 +1356,7 @@ uint8_t buf[32];
         }
 
       
-      if (format == GNUTLS_TPMKEY_FMT_PEM)
+      if (format == GNUTLS_TPMKEY_FMT_CTK_PEM)
         {
           ret = _gnutls_x509_encode_octet_string(tdata, tint, &tmpkey);
           if (ret < 0)
