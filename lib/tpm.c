@@ -37,6 +37,7 @@
 #include <x509/common.h>
 #include <x509_b64.h>
 #include <random.h>
+#include <pin.h>
 
 #include <trousers/tss.h>
 #include <trousers/trousers.h>

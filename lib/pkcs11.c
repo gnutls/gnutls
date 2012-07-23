@@ -30,7 +30,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
 
-
+#include <pin.h>
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
 #include <p11-kit/pin.h>
@@ -73,9 +73,6 @@ struct crt_find_data_st
 static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
 static unsigned int initialized_registered = 0;
-
-gnutls_pin_callback_t _gnutls_pin_func;
-void *_gnutls_pin_data;
 
 gnutls_pkcs11_token_callback_t _gnutls_token_func;
 void *_gnutls_token_data;
@@ -637,47 +634,6 @@ gnutls_pkcs11_deinit (void)
   
   gnutls_pkcs11_set_pin_function (NULL, NULL);
   gnutls_pkcs11_set_token_function (NULL, NULL);
-}
-
-/**
- * gnutls_pkcs11_set_pin_function:
- * @fn: The PIN callback, a gnutls_pin_callback_t() function.
- * @userdata: data to be supplied to callback
- *
- * This function will set a callback function to be used when a PIN is
- * required for PKCS 11 operations.  See
- * gnutls_pin_callback_t() on how the callback should behave.
- *
- * Since: 2.12.0
- **/
-void
-gnutls_pkcs11_set_pin_function (gnutls_pin_callback_t fn,
-                                void *userdata)
-{
-  _gnutls_pin_func = fn;
-  _gnutls_pin_data = userdata;
-}
-
-/**
- * gnutls_pkcs11_get_pin_function:
- * @userdata: data to be supplied to callback
- *
- * This function will return the callback function set using
- * gnutls_pkcs11_set_pin_function().
- *
- * Returns: The function set or NULL otherwise.
- * 
- * Since: 3.1.0
- **/
-gnutls_pin_callback_t
-gnutls_pkcs11_get_pin_function (void **userdata)
-{
-  if (_gnutls_pin_func != NULL)
-    {
-      *userdata = _gnutls_pin_data;
-      return _gnutls_pin_func;
-    }
-  return NULL;
 }
 
 /**
