@@ -49,8 +49,6 @@
 #include "certtool-args.h"
 #include "certtool-common.h"
 
-#define SIGN_HASH GNUTLS_DIG_SHA256
-
 static void privkey_info_int (common_info_st*, gnutls_x509_privkey_t key);
 static void print_crl_info (gnutls_x509_crl_t crl, FILE * out);
 void pkcs7_info (void);
@@ -727,12 +725,32 @@ generate_crl (gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 }
 
 static gnutls_digest_algorithm_t
+get_dig_for_pub (gnutls_pubkey_t pubkey)
+{
+  gnutls_digest_algorithm_t dig;
+  int result;
+  unsigned int mand;
+
+  result = gnutls_pubkey_get_preferred_hash_algorithm (pubkey, &dig, &mand);
+  if (result < 0)
+    {
+      error (EXIT_FAILURE, 0, "crt_get_preferred_hash_algorithm: %s",
+             gnutls_strerror (result));
+    }
+
+  /* if algorithm allows alternatives */
+  if (mand == 0 && default_dig != GNUTLS_DIG_UNKNOWN)
+    dig = default_dig;
+
+  return dig;
+}
+
+static gnutls_digest_algorithm_t
 get_dig (gnutls_x509_crt_t crt)
 {
   gnutls_digest_algorithm_t dig;
   gnutls_pubkey_t pubkey;
   int result;
-  unsigned int mand;
 
   gnutls_pubkey_init(&pubkey);
 
@@ -743,18 +761,9 @@ get_dig (gnutls_x509_crt_t crt)
              gnutls_strerror (result));
     }
 
-  result = gnutls_pubkey_get_preferred_hash_algorithm (pubkey, &dig, &mand);
-  if (result < 0)
-    {
-      error (EXIT_FAILURE, 0, "crt_get_preferred_hash_algorithm: %s",
-             gnutls_strerror (result));
-    }
+  dig = get_dig_for_pub (pubkey);
 
   gnutls_pubkey_deinit(pubkey);
-
-  /* if algorithm allows alternatives */
-  if (mand == 0 && default_dig != GNUTLS_DIG_UNKNOWN)
-    dig = default_dig;
 
   return dig;
 }
@@ -899,7 +908,7 @@ generate_signed_crl (common_info_st * cinfo)
   crl = generate_crl (ca_crt, cinfo);
 
   fprintf (stderr, "\n");
-  result = gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_key, SIGN_HASH, 0);
+  result = gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_key, get_dig (ca_crt), 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crl_privkey_sign: %s", gnutls_strerror (result));
 
@@ -1973,7 +1982,7 @@ generate_request (common_info_st * cinfo)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "set_key: %s", gnutls_strerror (ret));
 
-  ret = gnutls_x509_crq_privkey_sign (crq, pkey, SIGN_HASH, 0);
+  ret = gnutls_x509_crq_privkey_sign (crq, pkey, get_dig_for_pub (pubkey), 0);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "sign: %s", gnutls_strerror (ret));
 
