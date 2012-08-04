@@ -172,7 +172,7 @@ cipher_to_flags (const char *cipher)
   return -1;
 }
 
-static const char* get_password(common_info_st * cinfo, unsigned int *flags)
+static const char* get_password(common_info_st * cinfo, unsigned int *flags, int confirm)
 {
   if (cinfo->null_password)
     {
@@ -186,7 +186,12 @@ static const char* get_password(common_info_st * cinfo, unsigned int *flags)
       return cinfo->password;
     }
   else
-    return get_pass ();
+    {
+      if (confirm)
+        return get_confirmed_pass (true);
+      else
+        return get_pass ();
+    }
 }
 
 
@@ -215,7 +220,7 @@ print_private_key (common_info_st* cinfo, gnutls_x509_privkey_t key)
       unsigned int flags = 0;
       const char *pass;
 
-      pass = get_password(cinfo, &flags);
+      pass = get_password(cinfo, &flags, 0);
       flags |= cipher_to_flags (cinfo->pkcs_cipher);
 
       size = buffer_size;
@@ -1712,7 +1717,7 @@ privkey_info (common_info_st* cinfo)
   if (ret == GNUTLS_E_DECRYPTION_FAILED)
     {
           fprintf(stderr, "Encrypted structure detected...\n");
-          pass = get_password(cinfo, &flags);
+          pass = get_password(cinfo, &flags, 0);
 
           ret = gnutls_x509_privkey_import2 (key, &pem,
                                                   incert_format, pass, flags);
@@ -2295,7 +2300,7 @@ generate_pkcs8 (common_info_st * cinfo)
 
   key = load_x509_private_key (1, cinfo);
 
-  password = get_password(cinfo, &flags);
+  password = get_password(cinfo, &flags, 1);
 
   flags |= cipher_to_flags (cinfo->pkcs_cipher);
 
@@ -2344,7 +2349,7 @@ generate_pkcs12 (common_info_st * cinfo)
   if (result < 0)
     error (EXIT_FAILURE, 0, "pkcs12_init: %s", gnutls_strerror (result));
 
-  pass = get_password(cinfo, &flags);
+  pass = get_password(cinfo, &flags, 1);
   flags |= cipher_to_flags (cinfo->pkcs_cipher);
     
   for (i = 0; i < ncrts; i++)
@@ -2575,7 +2580,7 @@ pkcs12_info (common_info_st* cinfo)
   if (result < 0)
     error (EXIT_FAILURE, 0, "p12_import: %s", gnutls_strerror (result));
 
-  pass = get_password(cinfo, NULL);
+  pass = get_password(cinfo, NULL, 0);
 
   result = gnutls_pkcs12_verify_mac (pkcs12, pass);
   if (result < 0)
