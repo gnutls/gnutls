@@ -75,7 +75,7 @@ load_keys (void)
 
   gnutls_privkey_init (&key);
 
-  ret = gnutls_privkey_import_x509_raw (key, &data, GNUTLS_X509_FMT_PEM, NULL);
+  ret = gnutls_privkey_import_x509_raw (key, &data, GNUTLS_X509_FMT_PEM, NULL, 0);
   if (ret < 0)
     {
       fprintf (stderr, "*** Error loading key file: %s\n",
