@@ -562,6 +562,7 @@ out_ctx:
  * @format: The format of the private key
  * @srk_password: The password for the SRK key (optional)
  * @key_password: A password for the key (optional)
+ * @flags: should be zero
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure. 

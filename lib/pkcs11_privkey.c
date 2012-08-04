@@ -638,7 +638,7 @@ cleanup:
 
 /**
  * gnutls_pkcs11_privkey_set_pin_function:
- * @obj: The object structure
+ * @key: The private key
  * @fn: the callback
  * @userdata: data associated with the callback
  *
