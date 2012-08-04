@@ -377,11 +377,13 @@ DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
 
 stamp_functions: gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi tpm-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi
 	-mkdir functions
+	-mkdir functions.short
 	for i in $^; do \
 		$(srcdir)/scripts/split-texi.pl functions < $$i; \
 	done
 	sed -i 's/\@anchor{.*//g' functions/*
 	sed -i 's/\@subheading.*//g' functions/*
+	cd functions && for i in *;do grep ^"@deftypefun" $$i | sed 's/@deftypefun/@item/g;s/ {/ @var{/;s/ {/ @ref{/' > ../functions.short/$$i;done
 	echo $@ > $@
 	$(MAKE) compare-makefile
 
