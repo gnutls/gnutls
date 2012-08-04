@@ -1228,7 +1228,7 @@ gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
       need_free = 1;
     }
 
-  if (password == NULL || (flags & GNUTLS_PKCS_PLAIN))
+  if (flags & GNUTLS_PKCS_PLAIN)
     {
       result = decode_private_key_info (&_data, key);
     }
