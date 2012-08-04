@@ -16,6 +16,7 @@ which now may (again) accept a NULL password.
 
 ** certtool: Allow the user to choose the hash algorithm
 when signing certificate request or certificate revocation list.
+Patch by Petr Písař.
 
 ** API and ABI modifications:
 No changes since last version.
