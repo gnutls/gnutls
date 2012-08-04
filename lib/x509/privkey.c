@@ -564,6 +564,7 @@ failover:
  * @data: The DER or PEM encoded certificate.
  * @format: One of DER or PEM
  * @password: A password (optional)
+ * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
  *
  * This function will import the given DER or PEM encoded key, to 
  * the native #gnutls_x509_privkey_t format, irrespective of the
@@ -582,11 +583,11 @@ int
 gnutls_x509_privkey_import2 (gnutls_x509_privkey_t key,
                             const gnutls_datum_t * data,
                             gnutls_x509_crt_fmt_t format,
-                            const char* password)
+                            const char* password, unsigned int flags)
 {
   int ret = 0;
   
-  if (password == NULL)
+  if (password == NULL && !(flags & GNUTLS_PKCS_NULL_PASSWORD))
     {
       ret = gnutls_x509_privkey_import(key, data, format);
       if (ret < 0)
@@ -595,12 +596,12 @@ gnutls_x509_privkey_import2 (gnutls_x509_privkey_t key,
         }
     }
   
-  if (password != NULL || ret < 0)
+  if ((password != NULL || (flags & GNUTLS_PKCS_NULL_PASSWORD)) || ret < 0)
     {
-      ret = gnutls_x509_privkey_import_pkcs8(key, data, format, password, 0);
+      ret = gnutls_x509_privkey_import_pkcs8(key, data, format, password, flags);
       if (ret < 0)
         {
-          if (format == GNUTLS_X509_FMT_PEM)
+          if (format == GNUTLS_X509_FMT_PEM && password != NULL)
             {
               int err;
               err = gnutls_x509_privkey_import_openssl(key, data, password);
@@ -611,8 +612,12 @@ gnutls_x509_privkey_import2 (gnutls_x509_privkey_t key,
                   goto cleanup;
                 }
             }
+          else
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
         }
-    
     }
 
   ret = 0;

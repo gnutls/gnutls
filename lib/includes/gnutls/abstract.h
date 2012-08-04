@@ -220,7 +220,7 @@ int gnutls_privkey_import_openpgp_raw (gnutls_privkey_t pkey,
 int gnutls_privkey_import_x509_raw (gnutls_privkey_t pkey,
                                     const gnutls_datum_t * data,
                                     gnutls_x509_crt_fmt_t format,
-                                    const char* password);
+                                    const char* password, unsigned int flags);
 
 int
 gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,

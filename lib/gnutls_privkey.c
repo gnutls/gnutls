@@ -839,6 +839,7 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
  * @data: The private key data to be imported
  * @format: The format of the private key
  * @password: A password (optional)
+ * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure. 
@@ -851,7 +852,7 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
 int gnutls_privkey_import_x509_raw (gnutls_privkey_t pkey,
                                     const gnutls_datum_t * data,
                                     gnutls_x509_crt_fmt_t format,
-                                    const char* password)
+                                    const char* password, unsigned int flags)
 {
   gnutls_x509_privkey_t xpriv;
   int ret;
@@ -860,7 +861,7 @@ int gnutls_privkey_import_x509_raw (gnutls_privkey_t pkey,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = gnutls_x509_privkey_import2(xpriv, data, format, password);
+  ret = gnutls_x509_privkey_import2(xpriv, data, format, password, flags);
   if (ret < 0)
     {
       gnutls_assert();

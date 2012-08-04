@@ -150,6 +150,12 @@ flag = {
 };
 
 flag = {
+    name      = null-password;
+    descrip   = "Enforce a NULL password";
+    doc   = "This option enforces a NULL password. This may be different than the empty password in some schemas.";
+};
+
+flag = {
     name      = certificate-info;
     value     = i;
     descrip   = "Print information on the given certificate";

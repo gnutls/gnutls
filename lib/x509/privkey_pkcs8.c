@@ -626,7 +626,7 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
 
   schema = _gnutls_pkcs_flags_to_schema (flags);
 
-  if ((flags & GNUTLS_PKCS_PLAIN) || password == NULL)
+  if (((flags & GNUTLS_PKCS_PLAIN) || password == NULL) && !(flags & GNUTLS_PKCS_NULL_PASSWORD))
     {
       _gnutls_free_datum (&tmp);
 
@@ -640,7 +640,7 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
   else
     {
       asn1_delete_structure (&pkey_info);       /* we don't need it */
-
+      
       ret = encode_to_pkcs8_key (schema, &tmp, password, &pkcs8_asn);
       _gnutls_free_datum (&tmp);
 
@@ -1239,7 +1239,11 @@ gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
       need_free = 1;
     }
 
-  if (password == NULL || (flags & GNUTLS_PKCS_PLAIN))
+  /* Here we don't check for password == NULL to maintain a backwards
+   * compatibility behavior, with old versions that were encrypting using
+   * a NULL password.
+   */
+  if (flags & GNUTLS_PKCS_PLAIN)
     {
       result = decode_private_key_info (&_data, key);
       if (result < 0)

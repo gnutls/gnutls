@@ -505,7 +505,7 @@ read_key_mem (gnutls_certificate_credentials_t res,
       if (res->pin.cb)
         gnutls_privkey_set_pin_function(privkey, res->pin.cb, res->pin.data);
 
-      ret = gnutls_privkey_import_x509_raw (privkey, &tmp, type, NULL);
+      ret = gnutls_privkey_import_x509_raw (privkey, &tmp, type, NULL, 0);
       if (ret < 0)
         {
           gnutls_assert ();

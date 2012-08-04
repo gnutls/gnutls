@@ -48,5 +48,13 @@ for p12 in 'client.p12 foobar' noclient.p12 unclient.p12 pkcs12_2certs.p12; do
     fi
 done
 
+file=test-null.p12
+$CERTTOOL --p12-info --inder --null-password --infile $file >/dev/null 2>&1
+rc=$?
+if test $rc != 0; then
+	echo "PKCS12 FATAL $file"
+	ret=1
+fi
+
 #echo "NEON PKCS12 DONE (rc $ret)"
 exit $ret

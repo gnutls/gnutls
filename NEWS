@@ -13,6 +13,10 @@ and --benchmark-tls-ciphers
 ** certtool: generated PKCS #12 structures may hold more than one
 private key. Patch by Lucas Fisher.
 
+** certtool: Added option --null-password to generate/decrypt keys
+that use a NULL password (in schemas that distinguish between NULL
+an empty passwords).
+
 ** libgnutls: requires libnettle 2.5.
 
 ** libgnutls: Use the PKCS #1 1.5 encoding provided by nettle (2.5)
@@ -42,6 +46,7 @@ by Alexandre Bique.
 ** API and ABI modifications:
 GNUTLS_CERT_SIGNATURE_FAILURE: Added
 GNUTLS_CAMELLIA_192_CBC: Added
+GNUTLS_PKCS_NULL_PASSWORD: Added
 gnutls_url_is_supported: Added
 gnutls_pkcs11_obj_list_import_url2: Added
 gnutls_pkcs11_obj_set_pin_function: Added

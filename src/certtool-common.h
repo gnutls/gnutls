@@ -48,6 +48,7 @@ typedef struct common_info
   const char* sec_param;
   const char* pkcs_cipher;
   const char* password;
+  int null_password;
   unsigned int crq_extensions;
   unsigned int v1_cert;
 } common_info_st;

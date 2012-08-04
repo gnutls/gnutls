@@ -172,6 +172,23 @@ cipher_to_flags (const char *cipher)
   return -1;
 }
 
+static const char* get_password(common_info_st * cinfo, unsigned int *flags)
+{
+  if (cinfo->null_password)
+    {
+      if (flags) *flags |= GNUTLS_PKCS_NULL_PASSWORD;
+      return NULL;
+    }
+  else if (cinfo->password)
+    {
+      if (cinfo->password[0] == 0 && flags)
+        *flags |= GNUTLS_PKCS_PLAIN;
+      return cinfo->password;
+    }
+  else
+    return get_pass ();
+}
+
 
 static void
 print_private_key (common_info_st* cinfo, gnutls_x509_privkey_t key)
@@ -195,13 +212,11 @@ print_private_key (common_info_st* cinfo, gnutls_x509_privkey_t key)
     }
   else
     {
-      unsigned int flags;
+      unsigned int flags = 0;
       const char *pass;
 
-      flags = cipher_to_flags (cinfo->pkcs_cipher);
-
-      if ((pass = get_confirmed_pass (true)) == NULL || *pass == '\0')
-        flags = GNUTLS_PKCS_PLAIN;
+      pass = get_password(cinfo, &flags);
+      flags |= cipher_to_flags (cinfo->pkcs_cipher);
 
       size = buffer_size;
       ret =
@@ -1009,6 +1024,12 @@ cmd_parser (int argc, char **argv)
   if (HAVE_OPT(PASSWORD))
     cinfo.password = OPT_ARG(PASSWORD);
 
+  if (HAVE_OPT(NULL_PASSWORD))
+    {
+      cinfo.null_password = 1;
+      cinfo.password = "";
+    }
+
   if (HAVE_OPT(GENERATE_SELF_SIGNED))
     generate_self_signed (&cinfo);
   else if (HAVE_OPT(GENERATE_CERTIFICATE))
@@ -1675,6 +1696,7 @@ privkey_info (common_info_st* cinfo)
   int ret;
   gnutls_datum_t pem;
   const char *pass;
+  unsigned int flags = 0;
 
   size = fread (buffer, 1, buffer_size - 1, infile);
   buffer[size] = 0;
@@ -1684,19 +1706,16 @@ privkey_info (common_info_st* cinfo)
   pem.data = buffer;
   pem.size = size;
 
-  ret = gnutls_x509_privkey_import2 (key, &pem, incert_format, NULL);
+  ret = gnutls_x509_privkey_import2 (key, &pem, incert_format, NULL, 0);
 
   /* If we failed to import the certificate previously try PKCS #8 */
   if (ret == GNUTLS_E_DECRYPTION_FAILED)
     {
           fprintf(stderr, "Encrypted structure detected...\n");
-          if (cinfo->password)
-            pass = cinfo->password;
-          else
-            pass = get_pass ();
+          pass = get_password(cinfo, &flags);
 
           ret = gnutls_x509_privkey_import2 (key, &pem,
-                                                  incert_format, pass);
+                                                  incert_format, pass, flags);
     }
   if (ret < 0)
     error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
@@ -2262,30 +2281,23 @@ verify_crl (common_info_st * cinfo)
 }
 
 
+
 void
 generate_pkcs8 (common_info_st * cinfo)
 {
   gnutls_x509_privkey_t key;
   int result;
   size_t size;
-  int flags = 0;
+  unsigned int flags = 0;
   const char *password;
 
   fprintf (stderr, "Generating a PKCS #8 key structure...\n");
 
   key = load_x509_private_key (1, cinfo);
 
-  if (cinfo->password)
-    password = cinfo->password;
-  else
-    password = get_pass ();
+  password = get_password(cinfo, &flags);
 
-  flags = cipher_to_flags (cinfo->pkcs_cipher);
-
-  if (password == NULL || password[0] == 0)
-    {
-      flags = GNUTLS_PKCS_PLAIN;
-    }
+  flags |= cipher_to_flags (cinfo->pkcs_cipher);
 
   size = buffer_size;
   result =
@@ -2314,7 +2326,7 @@ generate_pkcs12 (common_info_st * cinfo)
   gnutls_datum_t data;
   const char *pass;
   const char *name;
-  unsigned int flags, i;
+  unsigned int flags = 0, i;
   gnutls_datum_t key_id;
   unsigned char _key_id[32];
   int indx;
@@ -2332,18 +2344,9 @@ generate_pkcs12 (common_info_st * cinfo)
   if (result < 0)
     error (EXIT_FAILURE, 0, "pkcs12_init: %s", gnutls_strerror (result));
 
-  if (cinfo->password)
-    pass = cinfo->password;
-  else
-    pass = get_pass ();
+  pass = get_password(cinfo, &flags);
+  flags |= cipher_to_flags (cinfo->pkcs_cipher);
     
-  if (pass == NULL)
-    {
-      fprintf(stderr, "No password given for PKCS #12. Assuming null password...\n");
-      pass = "";
-    }
-    
-
   for (i = 0; i < ncrts; i++)
     {
       gnutls_pkcs12_bag_t bag;
@@ -2381,8 +2384,6 @@ generate_pkcs12 (common_info_st * cinfo)
         error (EXIT_FAILURE, 0, "bag_set_key_id: %s",
                gnutls_strerror (result));
 
-      flags = cipher_to_flags (cinfo->pkcs_cipher);
-
       result = gnutls_pkcs12_bag_encrypt (bag, pass, flags);
       if (result < 0)
         error (EXIT_FAILURE, 0, "bag_encrypt: %s", gnutls_strerror (result));
@@ -2399,8 +2400,6 @@ generate_pkcs12 (common_info_st * cinfo)
       result = gnutls_pkcs12_bag_init (&kbag);
       if (result < 0)
         error (EXIT_FAILURE, 0, "bag_init: %s", gnutls_strerror (result));
-
-      flags = cipher_to_flags (cinfo->pkcs_cipher);
 
       size = buffer_size;
       result =
@@ -2576,10 +2575,7 @@ pkcs12_info (common_info_st* cinfo)
   if (result < 0)
     error (EXIT_FAILURE, 0, "p12_import: %s", gnutls_strerror (result));
 
-  if (cinfo->password)
-    pass = cinfo->password;
-  else
-    pass = get_pass ();
+  pass = get_password(cinfo, NULL);
 
   result = gnutls_pkcs12_verify_mac (pkcs12, pass);
   if (result < 0)

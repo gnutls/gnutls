@@ -674,16 +674,18 @@ extern "C"
 /* Flags for the gnutls_x509_privkey_export_pkcs8() function.
  */
 
+#define GNUTLS_PKCS8_PLAIN GNUTLS_PKCS_PLAIN
+#define GNUTLS_PKCS8_USE_PKCS12_3DES GNUTLS_PKCS_USE_PKCS12_3DES
+#define GNUTLS_PKCS8_USE_PKCS12_ARCFOUR GNUTLS_PKCS_USE_PKCS12_ARCFOUR
+#define GNUTLS_PKCS8_USE_PKCS12_RC2_40 GNUTLS_PKCS_USE_PKCS12_RC2_40
+
 /**
  * gnutls_pkcs_encrypt_flags_t:
  * @GNUTLS_PKCS_PLAIN: Unencrypted private key.
- * @GNUTLS_PKCS8_PLAIN: Same as %GNUTLS_PKCS_PLAIN.
+ * @GNUTLS_PKCS_NULL_PASSWORD: Some schemas distinguish between an empty and a NULL password.
  * @GNUTLS_PKCS_USE_PKCS12_3DES: PKCS-12 3DES.
- * @GNUTLS_PKCS8_USE_PKCS12_3DES: Same as %GNUTLS_PKCS_USE_PKCS12_3DES.
  * @GNUTLS_PKCS_USE_PKCS12_ARCFOUR: PKCS-12 ARCFOUR.
- * @GNUTLS_PKCS8_USE_PKCS12_ARCFOUR: Same as %GNUTLS_PKCS_USE_PKCS12_ARCFOUR.
  * @GNUTLS_PKCS_USE_PKCS12_RC2_40: PKCS-12 RC2-40.
- * @GNUTLS_PKCS8_USE_PKCS12_RC2_40: Same as %GNUTLS_PKCS_USE_PKCS12_RC2_40.
  * @GNUTLS_PKCS_USE_PBES2_3DES: PBES2 3DES.
  * @GNUTLS_PKCS_USE_PBES2_AES_128: PBES2 AES-128.
  * @GNUTLS_PKCS_USE_PBES2_AES_192: PBES2 AES-192.
@@ -694,17 +696,14 @@ extern "C"
   typedef enum gnutls_pkcs_encrypt_flags_t
   {
     GNUTLS_PKCS_PLAIN = 1,
-    GNUTLS_PKCS8_PLAIN = GNUTLS_PKCS_PLAIN,
     GNUTLS_PKCS_USE_PKCS12_3DES = 2,
-    GNUTLS_PKCS8_USE_PKCS12_3DES = GNUTLS_PKCS_USE_PKCS12_3DES,
     GNUTLS_PKCS_USE_PKCS12_ARCFOUR = 4,
-    GNUTLS_PKCS8_USE_PKCS12_ARCFOUR = GNUTLS_PKCS_USE_PKCS12_ARCFOUR,
     GNUTLS_PKCS_USE_PKCS12_RC2_40 = 8,
-    GNUTLS_PKCS8_USE_PKCS12_RC2_40 = GNUTLS_PKCS_USE_PKCS12_RC2_40,
     GNUTLS_PKCS_USE_PBES2_3DES = 16,
     GNUTLS_PKCS_USE_PBES2_AES_128 = 32,
     GNUTLS_PKCS_USE_PBES2_AES_192 = 64,
-    GNUTLS_PKCS_USE_PBES2_AES_256 = 128
+    GNUTLS_PKCS_USE_PBES2_AES_256 = 128,
+    GNUTLS_PKCS_NULL_PASSWORD = 256
   } gnutls_pkcs_encrypt_flags_t;
 
   int gnutls_x509_privkey_init (gnutls_x509_privkey_t * key);
@@ -728,7 +727,7 @@ extern "C"
   int gnutls_x509_privkey_import2 (gnutls_x509_privkey_t key,
                                    const gnutls_datum_t * data,
                                    gnutls_x509_crt_fmt_t format,
-                                   const char* password);
+                                   const char* password, unsigned int flags);
 
   int gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
                                           const gnutls_datum_t * m,

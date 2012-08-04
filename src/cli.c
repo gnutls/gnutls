@@ -248,7 +248,7 @@ load_keys (void)
               exit (1);
             }
 
-          ret = gnutls_privkey_import_x509_raw( x509_key, &data, x509ctype, NULL);
+          ret = gnutls_privkey_import_x509_raw( x509_key, &data, x509ctype, NULL, 0);
           if (ret < 0)
             {
               fprintf (stderr, "*** Error loading url: %s\n",
