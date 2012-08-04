@@ -2562,7 +2562,7 @@ pkcs12_info (common_info_st* cinfo)
   size_t size;
   gnutls_datum_t data;
   const char *pass;
-  int indx;
+  int indx, fail = 0;
 
   result = gnutls_pkcs12_init (&pkcs12);
   if (result < 0)
@@ -2583,7 +2583,10 @@ pkcs12_info (common_info_st* cinfo)
 
   result = gnutls_pkcs12_verify_mac (pkcs12, pass);
   if (result < 0)
-    error (0, 0, "verify_mac: %s", gnutls_strerror (result));
+    {
+      fail = 1;
+      error (0, 0, "verify_mac: %s", gnutls_strerror (result));
+    }
 
   for (indx = 0;; indx++)
     {
@@ -2614,6 +2617,7 @@ pkcs12_info (common_info_st* cinfo)
 
           if (result < 0)
             {
+              fail = 1;
               error (0, 0, "bag_decrypt: %s", gnutls_strerror (result));
               continue;
             }
@@ -2628,6 +2632,9 @@ pkcs12_info (common_info_st* cinfo)
 
       gnutls_pkcs12_bag_deinit (bag);
     }
+
+  if (fail)
+    error (EXIT_FAILURE, 0, "There were errors parsing the structure\n");
 }
 
 void
