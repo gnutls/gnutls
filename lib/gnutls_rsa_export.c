@@ -149,10 +149,10 @@ gnutls_rsa_params_generate2 (gnutls_rsa_params_t params, unsigned int bits)
 /**
  * gnutls_rsa_params_import_pkcs1:
  * @params: A structure where the parameters will be copied to
- * @pkcs1_params: should contain a PKCS1 RSAPublicKey structure PEM or DER encoded
+ * @pkcs1_params: should contain a PKCS1 RSAPrivateKey structure PEM or DER encoded
  * @format: the format of params. PEM or DER.
  *
- * This function will extract the RSAPublicKey found in a PKCS1 formatted
+ * This function will extract the RSAPrivateKey found in a PKCS1 formatted
  * structure.
  *
  * If the structure is PEM encoded, it should have a header
@@ -172,11 +172,11 @@ gnutls_rsa_params_import_pkcs1 (gnutls_rsa_params_t params,
  * gnutls_rsa_params_export_pkcs1:
  * @params: Holds the RSA parameters
  * @format: the format of output params. One of PEM or DER.
- * @params_data: will contain a PKCS1 RSAPublicKey structure PEM or DER encoded
+ * @params_data: will contain a PKCS1 RSAPrivateKey structure PEM or DER encoded
  * @params_data_size: holds the size of params_data (and will be replaced by the actual size of parameters)
  *
  * This function will export the given RSA parameters to a PKCS1
- * RSAPublicKey structure. If the buffer provided is not long enough to
+ * RSAPrivateKey structure. If the buffer provided is not long enough to
  * hold the output, then GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
  *
  * If the structure is PEM encoded, it will have a header
