@@ -2,13 +2,20 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.22 (unreleased)
+* Version 3.0.22 (released 2012-08-04)
+
+** libgnutls: gnutls_certificate_set_x509_system_trust()
+is now supported on OpenBSD.
+
+** libgnutls: When verifying a certificate chain make sure it is chain.
+If the chain is wronly interrupted at some point then truncate it,
+and only try to verify the correct part. Patch by David Woodhouse
+
+** libgnutls: Restored the behavior of gnutls_x509_privkey_import_pkcs8()
+which now may (again) accept a NULL password.
 
 ** certtool: Allow the user to choose the hash algorithm
 when signing certificate request or certificate revocation list.
-
-** Restored the behavior of gnutls_x509_privkey_import_pkcs8()
-which now may (again) accept a NULL password.
 
 ** API and ABI modifications:
 No changes since last version.
