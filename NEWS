@@ -4,18 +4,8 @@ See the end for copying conditions.
 
 * Version 3.1.0 (unreleased)
 
-** tpmtool: Added. It is a tool to generate private keys in the
-TPM.
-
-** gnutls-cli: --benchmark-tls was split to --benchmark-tls-kx
-and --benchmark-tls-ciphers
-
-** certtool: generated PKCS #12 structures may hold more than one
-private key. Patch by Lucas Fisher.
-
-** certtool: Added option --null-password to generate/decrypt keys
-that use a NULL password (in schemas that distinguish between NULL
-an empty passwords).
+** libgnutls: Added direct support for TPM as a cryptographic module 
+in gnutls/tpm.h. 
 
 ** libgnutls: requires libnettle 2.5.
 
@@ -40,6 +30,19 @@ password was provided.
 
 ** libgnutlsxx: Added session::set_transport_vec_push_function. Patch
 by Alexandre Bique.
+
+** tpmtool: Added. It is a tool to generate private keys in the
+TPM.
+
+** gnutls-cli: --benchmark-tls was split to --benchmark-tls-kx
+and --benchmark-tls-ciphers
+
+** certtool: generated PKCS #12 structures may hold more than one
+private key. Patch by Lucas Fisher.
+
+** certtool: Added option --null-password to generate/decrypt keys
+that use a NULL password (in schemas that distinguish between NULL
+an empty passwords).
 
 ** minitasn1: Upgraded to libtasn1 version 2.13.
 
