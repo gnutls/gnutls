@@ -23,7 +23,7 @@ function @funcref{gnutls_record_check_pending} has to be used to achieve the sam
 functionality as described in @ref{Asynchronous operation}.
 @end itemize
 
-@heading Upgrading to 3.0.x from previous versions
+@heading Upgrading to 3.0.x from 2.12.x
 
 GnuTLS 3.0.x is source compatible with previous versions except for the functions
 listed below.
@@ -69,6 +69,24 @@ They are replaced by the safer function @funcref{gnutls_session_get_random}
 
 @item @funcintref{gnutls_ia_*}
 @tab Removed. The inner application extensions were completely removed (they failed to be standardized).
+
+@end multitable
+
+@heading Upgrading to 3.1.x from 3.0.x
+
+GnuTLS 3.1.x is source and binary compatible with GnuTLS 3.0.x releases. Few
+functions have been deprecated and are listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item @funcintref{gnutls_pubkey_verify_hash} 
+@tab The function @funcref{gnutls_pubkey_verify_hash2} is provided and
+is functionally equivalent and safer to use.
+
+@item @funcintref{gnutls_pubkey_verify_data} 
+@tab The function @funcref{gnutls_pubkey_verify_data2} is provided and
+is functionally equivalent and safer to use.
 
 @end multitable
 
