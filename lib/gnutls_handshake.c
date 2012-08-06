@@ -2364,8 +2364,30 @@ cleanup:
 int
 gnutls_handshake (gnutls_session_t session)
 {
+  return gnutls_handshake_timeout( session, 0);
+}
+
+/**
+ * gnutls_handshake_timeout:
+ * @session: is a #gnutls_session_t structure.
+ * @sec: is a timeout value in seconds
+ *
+ * This function is identical to the gnutls_handshake() but
+ * it also ensures that the handshake is completed within
+ * the provided timeout value.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, %GNUTLS_E_TIMED_OUT on timeout, otherwise a negative error code.
+ **/
+int
+gnutls_handshake_timeout (gnutls_session_t session, unsigned int sec)
+{
   int ret;
   record_parameters_st *params;
+  
+  if (sec > 0)
+    session->internals.handshake_endtime = gnutls_time(0) + sec;
+  else
+    session->internals.handshake_endtime = 0;
   
   /* sanity check. Verify that there are priorities setup.
    */

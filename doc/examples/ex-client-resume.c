@@ -65,7 +65,7 @@ main (void)
        */
       do
         {
-          ret = gnutls_handshake (session);
+          ret = gnutls_handshake_timeout (session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
         }
       while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
 

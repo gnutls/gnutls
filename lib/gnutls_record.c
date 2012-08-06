@@ -861,7 +861,9 @@ record_read_headers (gnutls_session_t session,
 
 
 static int recv_headers( gnutls_session_t session, content_type_t type, 
-  gnutls_handshake_description_t htype, struct tls_record_st* record)
+                         gnutls_handshake_description_t htype, 
+                         struct tls_record_st* record,
+                         unsigned int ms)
 {
 int ret;
 gnutls_datum_t raw; /* raw headers */
@@ -870,7 +872,7 @@ gnutls_datum_t raw; /* raw headers */
   record->header_size = record->packet_size = RECORD_HEADER_SIZE(session);
 
   if ((ret =
-       _gnutls_io_read_buffered (session, record->header_size, -1)) != record->header_size)
+       _gnutls_io_read_buffered (session, record->header_size, -1, ms)) != record->header_size)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
         return ret;
@@ -941,6 +943,9 @@ gnutls_datum_t raw; /* raw headers */
 
 /* This will receive record layer packets and add them to 
  * application_data_buffer and handshake_data_buffer.
+ *
+ * If the htype is not -1 then handshake timeouts
+ * will be enforced.
  */
 ssize_t
 _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
@@ -954,6 +959,7 @@ _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
   record_parameters_st *record_params;
   record_state_st *record_state;
   struct tls_record_st record;
+  time_t now, tleft = 0;
 
 begin:
 
@@ -986,8 +992,17 @@ begin:
 
   record_state = &record_params->read;
 
+  if (htype != -1 && session->internals.handshake_endtime > 0)
+    {
+      now = gnutls_time(0);
+      if (now < session->internals.handshake_endtime)
+        tleft = (session->internals.handshake_endtime - now) * 1000;
+      else
+        return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+    }
+
   /* receive headers */
-  ret = recv_headers(session, type, htype, &record);
+  ret = recv_headers(session, type, htype, &record, tleft);
   if (ret < 0)
     {
       ret = gnutls_assert_val_fatal(ret);
@@ -999,11 +1014,20 @@ begin:
   else
     packet_sequence = &record_state->sequence_number;
 
+  if (htype != -1 && session->internals.handshake_endtime > 0)
+    {
+      now = gnutls_time(0);
+      if (now < session->internals.handshake_endtime)
+        tleft = (session->internals.handshake_endtime - now) * 1000;
+      else
+        return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+    }
+
   /* Read the packet data and insert it to record_recv_buffer.
    */
   ret =
        _gnutls_io_read_buffered (session, record.packet_size,
-                                 record.type);
+                                 record.type, tleft);
   if (ret != record.packet_size)
     {
       gnutls_assert();

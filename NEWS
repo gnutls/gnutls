@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.0pre0 (released 2012-08-05)
+* Version 3.1.0 (unreleased)
 
 ** libgnutls: Added direct support for TPM as a cryptographic module 
 in gnutls/tpm.h. 
@@ -84,6 +84,7 @@ gnutls_x509_trust_list_add_system_trust: Added
 gnutls_x509_trust_list_add_trust_file: Added
 gnutls_x509_trust_list_add_trust_mem: Added
 gnutls_pk_to_sign: Added
+gnutls_handshake_timeout: Added
 gnutls_pubkey_verify_hash: Deprecated (use gnutls_pubkey_verify_hash2)
 gnutls_pubkey_verify_data: Deprecated (use gnutls_pubkey_verify_data2)
 

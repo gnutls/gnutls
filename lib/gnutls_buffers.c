@@ -174,7 +174,7 @@ int errno_to_gerr(int err)
 
 static ssize_t
 _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
-		    gnutls_pull_func pull_func)
+		    gnutls_pull_func pull_func, unsigned int ms)
 {
   ssize_t i, ret;
   uint8_t *ptr;
@@ -185,14 +185,21 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
   if (recv_size > max_size)
     recv_size = max_size;
 
+  session->internals.direction = 0;
+
+  if (ms)
+    {
+      ret = _gnutls_io_check_recv(session, ms);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+    }
+
   *bufel = _mbuffer_alloc (0, max_size);
   if (*bufel == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
   ptr = (*bufel)->msg.data;
-
-  session->internals.direction = 0;
-
+  
   reset_errno (session);
   i = pull_func (fd, ptr, recv_size);
 
@@ -232,13 +239,18 @@ cleanup:
 
 static ssize_t
 _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
-		     size_t size, gnutls_pull_func pull_func)
+		     size_t size, gnutls_pull_func pull_func, unsigned int ms)
 {
   size_t left;
   ssize_t i = 0;
   size_t max_size = _gnutls_get_max_decrypted_data(session);
   uint8_t *ptr;
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
+  int ret;
+  struct timespec t1, t2;
+  unsigned int diff;
+
+  session->internals.direction = 0;
 
   *bufel = _mbuffer_alloc (0, MAX(max_size, size));
   if (!*bufel)
@@ -248,11 +260,18 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
     }
   ptr = (*bufel)->msg.data;
 
-  session->internals.direction = 0;
-
   left = size;
   while (left > 0)
     {
+      if (ms)
+        {
+          ret = _gnutls_io_check_recv(session, ms);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+            
+          gettime(&t1);
+        }
+
       reset_errno (session);
 
       i = pull_func (fd, &ptr[size - left], left);
@@ -291,9 +310,19 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
           if (i == 0)
             break;              /* EOF */
         }
-
+        
       left -= i;
       (*bufel)->msg.size += i;
+
+      if (ms && left)
+        {
+          gettime(&t2);
+          diff = _dtls_timespec_sub_ms(&t2, &t1);
+          if (diff < ms)
+            ms -= diff;
+          else
+            return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+        }
     }
 
 finish:
@@ -312,13 +341,13 @@ finish:
  */
 static ssize_t
 _gnutls_read (gnutls_session_t session, mbuffer_st **bufel,
-	      size_t size, gnutls_pull_func pull_func)
+	      size_t size, gnutls_pull_func pull_func, unsigned int ms)
 {
   if (IS_DTLS (session))
     /* Size is not passed, since a whole datagram will be read. */
-    return _gnutls_dgram_read (session, bufel, pull_func);
+    return _gnutls_dgram_read (session, bufel, pull_func, ms);
   else
-    return _gnutls_stream_read (session, bufel, size, pull_func);
+    return _gnutls_stream_read (session, bufel, size, pull_func, ms);
 }
 
 static ssize_t
@@ -381,10 +410,13 @@ _gnutls_writev (gnutls_session_t session, const giovec_t * giovec,
  * This is not a general purpose function. It returns EXACTLY the data requested,
  * which are stored in a local (in the session) buffer.
  *
+ * If the @ms parameter is non zero then this function will return before
+ * the given amount of milliseconds or return GNUTLS_E_TIMEDOUT.
+ *
  */
 ssize_t
 _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
-                          content_type_t recv_type)
+                          content_type_t recv_type, unsigned int ms)
 {
   ssize_t ret = 0;
   size_t min;
@@ -440,7 +472,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
     {
       ret =
         _gnutls_read (session, &bufel, readsize,
-                      session->internals.pull_func);
+                      session->internals.pull_func, ms);
 
       /* return immediately if we got an interrupt or eagain
        * error.
@@ -1145,6 +1177,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
                                handshake_buffer_st * hsk, unsigned int optional)
 {
   int ret;
+  time_t tleft = 0;
 
   ret = get_last_packet(session, htype, hsk, optional);
   if (ret != GNUTLS_E_AGAIN && ret != GNUTLS_E_INTERRUPTED && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)

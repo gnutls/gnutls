@@ -733,6 +733,8 @@ exchange.
 
 @showfuncdesc{gnutls_handshake}
 
+@showfuncdesc{gnutls_handshake_timeout}
+
 The handshake process doesn't ensure the verification
 of the peer's identity. When certificates are in use,
 this can be done, either after the handshake is complete, or during 

@@ -1183,7 +1183,7 @@ do_handshake (socket_st * socket)
                             gl_fd_to_handle (socket->fd));
   do
     {
-      ret = gnutls_handshake (socket->session);
+      ret = gnutls_handshake_timeout (socket->session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
       if (ret < 0)
         {
