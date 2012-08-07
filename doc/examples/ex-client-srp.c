@@ -59,12 +59,13 @@ main (void)
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
+  gnutls_handshake_set_timeout (session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
   /* Perform the TLS handshake
    */
   do
     {
-      ret = gnutls_handshake_timeout (session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
+      ret = gnutls_handshake (session);
     }
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
 

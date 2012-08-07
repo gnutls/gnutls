@@ -69,11 +69,12 @@ main (void)
 
   /* set the connection MTU */
   gnutls_dtls_set_mtu (session, 1000);
+  gnutls_handshake_set_timeout (session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
   /* Perform the TLS handshake */
   do
     {
-      ret = gnutls_handshake_timeout (session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
+      ret = gnutls_handshake (session);
     }
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
 

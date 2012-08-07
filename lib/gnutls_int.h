@@ -878,6 +878,7 @@ typedef struct
   unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
   
   unsigned int handshake_endtime; /* end time in seconds */
+  unsigned int handshake_timeout_ms; /* timeout in milliseconds */
 
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */

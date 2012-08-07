@@ -752,8 +752,8 @@ typedef enum
 
   int gnutls_handshake (gnutls_session_t session);
 
-#define GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT 60
-  int gnutls_handshake_timeout (gnutls_session_t session, unsigned int sec);
+#define GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT ((unsigned int)-1)
+  void gnutls_handshake_set_timeout (gnutls_session_t session, unsigned int sec);
   int gnutls_rehandshake (gnutls_session_t session);
 
   gnutls_alert_description_t gnutls_alert_get (gnutls_session_t session);
