@@ -3,7 +3,6 @@
 @setfilename gnutls.info
 @include version.texi
 @settitle GnuTLS @value{VERSION}
-
 @c don't indent the paragraphs.
 @paragraphindent 0
 
