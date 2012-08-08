@@ -2446,6 +2446,9 @@ gnutls_handshake (gnutls_session_t session)
  * This function sets the timeout for the handshake process
  * to the provided value.
  *
+ * Note that in order for the timeout to be enforced
+ * gnutls_transport_set_pull_timeout_function() must be set.
+ *
  **/
 void
 gnutls_handshake_set_timeout (gnutls_session_t session, unsigned int ms)
