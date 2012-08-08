@@ -144,6 +144,7 @@ web:
 	echo generating documentation for $(PACKAGE)
 	cd doc && $(SHELL) ../build-aux/gendocs.sh \
 		--html "--css-include=texinfo.css" \
+		--html "--set FLOAT_NAME_IN_XREF=1" \
 		-o ../$(htmldir)/manual/ $(PACKAGE) "$(PACKAGE_NAME)"
 	-cd doc && make gnutls.epub && cp gnutls.epub ../$(htmldir)/manual/
 	cd doc && cp *.png ../$(htmldir)/manual/html_node/
