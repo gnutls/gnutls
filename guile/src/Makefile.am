@@ -95,7 +95,7 @@ priorities.i.c: $(srcdir)/make-session-priorities.scm
 # `$(GUILE_CFLAGS)' may contain a series of `-I' switches so it must be
 # included here, even though we'd really want `$(GUILE_CPPFLAGS)'.
 snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	       $(CFLAGS) $(AM_CFLAGS) $(GUILE_CFLAGS)
+	       $(CFLAGS) $(guile_gnutls_v_2_la_CFLAGS)
 
 .c.x: $(BUILT_SOURCES)
 	$(guile_snarf) -o $@ $< $(snarfcppopts)
