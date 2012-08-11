@@ -2444,7 +2444,8 @@ gnutls_handshake (gnutls_session_t session)
  * @ms: is a timeout value in milliseconds
  *
  * This function sets the timeout for the handshake process
- * to the provided value.
+ * to the provided value. Use an @ms value of zero to disable
+ * timeout.
  *
  * Note that in order for the timeout to be enforced
  * gnutls_transport_set_pull_timeout_function() must be set.
