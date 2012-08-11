@@ -143,7 +143,7 @@ upload:
 web:
 	echo generating documentation for $(PACKAGE)
 	cd doc && $(SHELL) ../build-aux/gendocs.sh \
-		--html "--css-include=./texinfo.css --set FLOAT_NAME_IN_XREF=1" \
+		--html "--css-include=./texinfo.css" \
 		-o ../$(htmldir)/manual/ $(PACKAGE) "$(PACKAGE_NAME)"
 	-cd doc && make gnutls.epub && cp gnutls.epub ../$(htmldir)/manual/
 	cd doc && cp *.png ../$(htmldir)/manual/html_node/
