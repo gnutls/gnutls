@@ -119,20 +119,23 @@ client (int fd, int wait)
     {
       if (ret != GNUTLS_E_TIMEDOUT || wait == 0) 
         {
-          if (debug) success("client: unexpected error: %s\n", gnutls_strerror(ret));
+          if (debug) fail("client: unexpected error: %s\n", gnutls_strerror(ret));
           exit(1);
         }
       if (debug) success("client: expected timeout occured\n");
-      gnutls_perror (ret);
       exit(0);
     }
   else
     {
-      if (wait != 0) fail ("client: handshake was completed unexpectedly\n");
-      gnutls_perror (ret);
+      if (wait != 0) 
+        {
+          fail ("client: handshake was completed unexpectedly\n");
+          gnutls_perror (ret);
+          exit(1);
+        }
     }
 
-  exit(1);
+  exit(0);
 }
 
 
@@ -224,7 +227,6 @@ static void start (int wait)
       close(fd[1]);
       server (fd[0], wait);
       close(fd[0]);
-      kill(child, SIGTERM);
     }
   else 
     {
