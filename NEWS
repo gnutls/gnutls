@@ -10,6 +10,9 @@ using URLs of the following types:
   tpmkey:file=/path/to/file
   tpmkey:uuid=7f468c16-cb7f-11e1-824d-b3a4f4b20343;storage=user
 
+** libgnutls: Priority string level keywords can be combined.
+For example the string "SECURE256:+SUITEB128" is now allowed.
+
 ** libgnutls: requires libnettle 2.5.
 
 ** libgnutls: Use the PKCS #1 1.5 encoding provided by nettle (2.5)
