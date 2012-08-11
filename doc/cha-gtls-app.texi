@@ -892,8 +892,11 @@ the overall security level refers to off-line adversaries
 (e.g. adversaries breaking the ciphertext years after it was captured).
 
 The NONE keyword, if used, must followed by keywords specifying 
-the algorithms and protocols to be enabled. The other initial keywords may be 
-followed by such keywords.
+the algorithms and protocols to be enabled. The other initial keywords 
+do not require, but may be followed by such keywords. All level keywords
+can be combined, and for example a level of "SECURE256:+SECURE128" is
+allowed.
+
 The order with which every algorithm or protocol
 is specified is significant. Algorithms specified before others
 will take precedence. The supported algorithms and protocols

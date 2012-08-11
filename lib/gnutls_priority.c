@@ -86,6 +86,37 @@ _set_priority (priority_st * st, const int *list)
   return;
 }
 
+inline static void
+_add_priority (priority_st * st, const int *list)
+{
+  int num = 0, i, j, init;
+
+  init = i = st->algorithms;
+
+  while (list[num] != 0)
+    {
+      if (i+1 > MAX_ALGOS)
+        {
+          return;
+        }
+      
+      for (j=0;j<init;j++)
+        {
+          if (st->priority[j] == list[num])
+            {
+              num++;
+              continue;
+            }
+        }
+
+      st->priority[i++] = list[num];
+      st->algorithms++;
+      num++;
+    }
+    
+  return;
+}
+
 static void
 _clear_priorities (priority_st * st, const int *list)
 {
@@ -587,6 +618,106 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
 
 #define MAX_ELEMENTS 48
 
+#define LEVEL_NONE "NONE"
+#define LEVEL_NORMAL "NORMAL"
+#define LEVEL_PERFORMANCE "PERFORMANCE"
+#define LEVEL_SECURE128 "SECURE128"
+#define LEVEL_SECURE192 "SECURE192"
+#define LEVEL_SECURE256 "SECURE256"
+#define LEVEL_SUITEB128 "SUITEB128"
+#define LEVEL_SUITEB192 "SUITEB192"
+#define LEVEL_EXPORT "EXPORT"
+
+static
+int check_level(const char* level, gnutls_priority_t priority_cache, int add)
+{
+bulk_rmadd_func *func;
+
+  if (add) func = _add_priority;
+  else func = _set_priority;
+
+  if (strcasecmp (level, LEVEL_PERFORMANCE) == 0)
+    {
+      func (&priority_cache->cipher,
+                     cipher_priority_performance);
+      func (&priority_cache->kx, kx_priority_performance);
+      func (&priority_cache->mac, mac_priority_normal);
+      func (&priority_cache->sign_algo,
+                     sign_priority_default);
+      func (&priority_cache->supported_ecc, supported_ecc_normal);
+      return 1;
+    }
+  else if (strcasecmp (level, LEVEL_NORMAL) == 0)
+    {
+      func (&priority_cache->cipher, cipher_priority_normal);
+      func (&priority_cache->kx, kx_priority_secure);
+      func (&priority_cache->mac, mac_priority_normal);
+      func (&priority_cache->sign_algo,
+                     sign_priority_default);
+      func (&priority_cache->supported_ecc, supported_ecc_normal);
+      return 1;
+    }
+  else if (strcasecmp (level, LEVEL_SECURE256) == 0
+           || strcasecmp (level, LEVEL_SECURE192) == 0)
+    {
+      func (&priority_cache->cipher,
+                     cipher_priority_secure192);
+      func (&priority_cache->kx, kx_priority_secure);
+      func (&priority_cache->mac, mac_priority_secure192);
+      func (&priority_cache->sign_algo,
+                     sign_priority_secure192);
+      func (&priority_cache->supported_ecc, supported_ecc_secure192);
+      return 1;
+    }
+  else if (strcasecmp (level, LEVEL_SECURE128) == 0
+           || strcasecmp (level, "SECURE") == 0)
+    {
+      func (&priority_cache->cipher,
+                     cipher_priority_secure128);
+      func (&priority_cache->kx, kx_priority_secure);
+      func (&priority_cache->mac, mac_priority_secure128);
+      func (&priority_cache->sign_algo,
+                     sign_priority_secure128);
+      func (&priority_cache->supported_ecc, supported_ecc_secure128);
+      return 1;
+    }
+  else if (strcasecmp (level, LEVEL_SUITEB128) == 0)
+    {
+      func (&priority_cache->protocol, protocol_priority_suiteb);
+      func (&priority_cache->cipher,
+                     cipher_priority_suiteb128);
+      func (&priority_cache->kx, kx_priority_suiteb);
+      func (&priority_cache->mac, mac_priority_suiteb128);
+      func (&priority_cache->sign_algo,
+                     sign_priority_suiteb128);
+      func (&priority_cache->supported_ecc, supported_ecc_suiteb128);
+      return 1;
+    }
+  else if (strcasecmp (level, LEVEL_SUITEB192) == 0)
+    {
+      func (&priority_cache->protocol, protocol_priority_suiteb);
+      func (&priority_cache->cipher,
+                     cipher_priority_suiteb192);
+      func (&priority_cache->kx, kx_priority_suiteb);
+      func (&priority_cache->mac, mac_priority_suiteb192);
+      func (&priority_cache->sign_algo,
+                     sign_priority_suiteb192);
+      func (&priority_cache->supported_ecc, supported_ecc_suiteb192);
+      return 1;
+    }
+  else if (strcasecmp (level, LEVEL_EXPORT) == 0)
+    {
+      func (&priority_cache->cipher, cipher_priority_export);
+      func (&priority_cache->kx, kx_priority_export);
+      func (&priority_cache->mac, mac_priority_secure128);
+      func (&priority_cache->sign_algo,
+                     sign_priority_default);
+      func (&priority_cache->supported_ecc, supported_ecc_normal);
+      return 1;
+    }
+  return 0;
+}
+
 /**
  * gnutls_priority_init:
  * @priority_cache: is a #gnutls_prioritity_t structure.
@@ -647,7 +778,9 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+ECDHE-RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1:+CURVE-SECP256R1", 
  *
- * "NORMAL:%COMPAT" is the most compatible mode.
+ * "SECURE256:+SECURE128",
+ *
+ * Note that "NORMAL:%COMPAT" is the most compatible mode.
  *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
  * %GNUTLS_E_SUCCESS on success, or an error code.
@@ -677,7 +810,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
   (*priority_cache)->ssl3_record_version = 1;
 
   if (priorities == NULL)
-    priorities = "NORMAL";
+    priorities = LEVEL_NORMAL;
 
   darg = gnutls_strdup (priorities);
   if (darg == NULL)
@@ -690,7 +823,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
   /* This is our default set of protocol version, certificate types and
    * compression methods.
    */
-  if (strcasecmp (broken_list[0], "NONE") != 0)
+  if (strcasecmp (broken_list[0], LEVEL_NONE) != 0)
     {
       _set_priority (&(*priority_cache)->protocol, protocol_priority);
       _set_priority (&(*priority_cache)->compression, comp_priority);
@@ -706,78 +839,10 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 
   for (; i < broken_list_size; i++)
     {
-      if (strcasecmp (broken_list[i], "PERFORMANCE") == 0)
+      if (check_level(broken_list[i], *priority_cache, 0) != 0)
         {
-          _set_priority (&(*priority_cache)->cipher,
-                         cipher_priority_performance);
-          _set_priority (&(*priority_cache)->kx, kx_priority_performance);
-          _set_priority (&(*priority_cache)->mac, mac_priority_normal);
-          _set_priority (&(*priority_cache)->sign_algo,
-                         sign_priority_default);
-          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
+          continue;
         }
-      else if (strcasecmp (broken_list[i], "NORMAL") == 0)
-        {
-          _set_priority (&(*priority_cache)->cipher, cipher_priority_normal);
-          _set_priority (&(*priority_cache)->kx, kx_priority_secure);
-          _set_priority (&(*priority_cache)->mac, mac_priority_normal);
-          _set_priority (&(*priority_cache)->sign_algo,
-                         sign_priority_default);
-          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
-        }
-      else if (strcasecmp (broken_list[i], "SECURE256") == 0
-               || strcasecmp (broken_list[i], "SECURE192") == 0)
-        {
-          _set_priority (&(*priority_cache)->cipher,
-                         cipher_priority_secure192);
-          _set_priority (&(*priority_cache)->kx, kx_priority_secure);
-          _set_priority (&(*priority_cache)->mac, mac_priority_secure192);
-          _set_priority (&(*priority_cache)->sign_algo,
-                         sign_priority_secure192);
-          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_secure192);
-        }
-      else if (strcasecmp (broken_list[i], "SECURE128") == 0
-               || strcasecmp (broken_list[i], "SECURE") == 0)
-        {
-          _set_priority (&(*priority_cache)->cipher,
-                         cipher_priority_secure128);
-          _set_priority (&(*priority_cache)->kx, kx_priority_secure);
-          _set_priority (&(*priority_cache)->mac, mac_priority_secure128);
-          _set_priority (&(*priority_cache)->sign_algo,
-                         sign_priority_secure128);
-          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_secure128);
-        }
-      else if (strcasecmp (broken_list[i], "SUITEB128") == 0)
-        {
-          _set_priority (&(*priority_cache)->protocol, protocol_priority_suiteb);
-          _set_priority (&(*priority_cache)->cipher,
-                         cipher_priority_suiteb128);
-          _set_priority (&(*priority_cache)->kx, kx_priority_suiteb);
-          _set_priority (&(*priority_cache)->mac, mac_priority_suiteb128);
-          _set_priority (&(*priority_cache)->sign_algo,
-                         sign_priority_suiteb128);
-          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_suiteb128);
-        }
-      else if (strcasecmp (broken_list[i], "SUITEB192") == 0)
-        {
-          _set_priority (&(*priority_cache)->protocol, protocol_priority_suiteb);
-          _set_priority (&(*priority_cache)->cipher,
-                         cipher_priority_suiteb192);
-          _set_priority (&(*priority_cache)->kx, kx_priority_suiteb);
-          _set_priority (&(*priority_cache)->mac, mac_priority_suiteb192);
-          _set_priority (&(*priority_cache)->sign_algo,
-                         sign_priority_suiteb192);
-          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_suiteb192);
-        }
-      else if (strcasecmp (broken_list[i], "EXPORT") == 0)
-        {
-          _set_priority (&(*priority_cache)->cipher, cipher_priority_export);
-          _set_priority (&(*priority_cache)->kx, kx_priority_export);
-          _set_priority (&(*priority_cache)->mac, mac_priority_secure128);
-          _set_priority (&(*priority_cache)->sign_algo,
-                         sign_priority_default);
-          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
-        }                       /* now check if the element is something like -ALGO */
       else if (broken_list[i][0] == '!' || broken_list[i][0] == '+'
                || broken_list[i][0] == '-')
         {
@@ -792,7 +857,11 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
               bulk_fn = _clear_priorities;
             }
 
-          if ((algo =
+          if (broken_list[i][0] == '+' && check_level(&broken_list[i][1], *priority_cache, 1) != 0)
+            {
+              continue;
+            }
+          else if ((algo =
                gnutls_mac_get_id (&broken_list[i][1])) != GNUTLS_MAC_UNKNOWN)
             fn (&(*priority_cache)->mac, algo);
           else if ((algo = gnutls_cipher_get_id (&broken_list[i][1])) !=
