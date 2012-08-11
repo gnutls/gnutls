@@ -5,7 +5,10 @@ See the end for copying conditions.
 * Version 3.1.0 (unreleased)
 
 ** libgnutls: Added direct support for TPM as a cryptographic module 
-in gnutls/tpm.h. 
+in gnutls/tpm.h. TPM keys can be used in functions accepting files
+using URLs of the following types:
+  tpmkey:file=/path/to/file
+  tpmkey:uuid=7f468c16-cb7f-11e1-824d-b3a4f4b20343;storage=user
 
 ** libgnutls: requires libnettle 2.5.
 
