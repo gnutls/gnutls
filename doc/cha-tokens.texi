@@ -80,9 +80,12 @@ A function to check for a supported by GnuTLS URL is @funcref{gnutls_url_is_supp
 @showfuncdesc{gnutls_url_is_supported}
 
 Additional functions are available that will return
-information over a public key.
+information over a public key, as well as a function that given a public
+key fingerprint would provide a memorable sketch.
 
-@showfuncC{gnutls_pubkey_get_pk_algorithm,gnutls_pubkey_get_preferred_hash_algorithm,gnutls_pubkey_get_key_id}
+@showfuncD{gnutls_pubkey_get_pk_algorithm,gnutls_pubkey_get_preferred_hash_algorithm,gnutls_pubkey_get_key_id,gnutls_random_art}
+
+
 
 @node Abstract private keys
 @subsection Private keys
