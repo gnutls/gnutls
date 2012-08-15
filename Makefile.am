@@ -38,7 +38,6 @@ dist-hook:
 	make ChangeLog
 	cp -f ChangeLog $(distdir)/
 	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
-	sed 's/\@\@VERSION\@\@/$(VERSION)/g' -i $(distdir)/doc/invoke-*.texi
 	cd $(distdir)/src/ && for i in *.def;do \
 		if test x"$$i" = x"args-std.def";then  continue; fi; \
 		autogen $$i; \
@@ -48,3 +47,4 @@ dist-hook:
 		rm -f $$i.tmp; \
 		mv -f *.1 ../doc/manpages/; \
 	done
+	sed 's/\@\@VERSION\@\@/$(VERSION)/g' -i $(distdir)/doc/invoke-*.texi

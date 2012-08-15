@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.0 (unreleased)
+* Version 3.1.0 (released 2012-08-15)
 
 ** libgnutls: Added direct support for TPM as a cryptographic module 
 in gnutls/tpm.h. TPM keys can be used in functions accepting files
@@ -98,11 +98,96 @@ gnutls_pubkey_verify_hash: Deprecated (use gnutls_pubkey_verify_hash2)
 gnutls_pubkey_verify_data: Deprecated (use gnutls_pubkey_verify_data2)
 
 
-* Version 3.0.19 (unreleased)
+* Version 3.0.22 (released 2012-08-04)
+
+** libgnutls: gnutls_certificate_set_x509_system_trust()
+is now supported on OpenBSD.
+
+** libgnutls: When verifying a certificate chain make sure it is chain.
+If the chain is wronly interrupted at some point then truncate it,
+and only try to verify the correct part. Patch by David Woodhouse
+
+** libgnutls: Restored the behavior of gnutls_x509_privkey_import_pkcs8()
+which now may (again) accept a NULL password.
+
+** certtool: Allow the user to choose the hash algorithm
+when signing certificate request or certificate revocation list.
+Patch by Petr Písař.
+
+** API and ABI modifications:
+No changes since last version.
+
+
+* Version 3.0.21 (released 2012-07-02)
+
+** libgnutls: fixed bug in gnutls_x509_privkey_import() 
+that prevented the loading of EC private keys when DER
+encoded. Reported by David Woodhouse.
+
+** libgnutls: In DTLS larger to mtu records result to 
+GNUTLS_E_LARGE_PACKET instead of being truncated.
+
+** libgnutls: gnutls_dtls_get_data_mtu() is more precise. Based
+on patch by David Woodhouse.
+
+** libgnutls: Fixed memory leak in PKCS #8 key import.
+
+** libgnutls: Added support for an old version of the DTLS protocol
+used by openconnect vpn client for compatibility with Cisco's AnyConnect 
+SSL VPN. It is marked as GNUTLS_DTLS0_9. Do not use it for newer protocols
+as it has issues.
+
+** libgnutls: Corrected bug that prevented resolving PKCS #11 URLs 
+if only the label is specified. Patch by David Woodhouse.
+
+** libgnutls: When EMSGSIZE errno is seen then GNUTLS_E_LARGE_PACKET
+is returned.
+
+** API and ABI modifications:
+gnutls_dtls_set_data_mtu: Added
+gnutls_session_set_premaster: Added
+
+
+* Version 3.0.20 (released 2012-06-05)
+
+** libgnutls: Corrected bug which prevented the parsing of
+handshake packets spanning multiple records.
+
+** libgnutls: Check key identifiers when checking for an issuer.
+
+** libgnutls: Added gnutls_pubkey_verify_hash2()
+
+** libgnutls: Added gnutls_certificate_set_x509_system_trust()
+that loads the trusted CA certificates from system locations
+(e.g. trusted storage in windows and CA bundle files in other systems).
+
+** certtool: Added support for the URI subject alternative
+name type in certtool.
+
+** certtool: Increase to 128 the maximum number of distinct options
+(e.g. dns_names) allowed.
+
+** gnutls-cli: If --print-cert is given, print the certificate, 
+even on verification failure.
+
+** API and ABI modifications:
+gnutls_pk_to_sign: Added
+gnutls_pubkey_verify_hash2: Added
+gnutls_certificate_set_x509_system_trust: Added
+
+
+* Version 3.0.19 (released 2012-04-22)
+
+** libgnutls: When decoding a PKCS #11 URL the pin-source field
+is assumed to be a file that stores the pin. Based on patch
+by David Smith.
 
 ** libgnutls: gnutls_record_check_pending() no longer
 returns unprocessed data, and thus ensure the non-blocking
 of the next call to gnutls_record_recv(). 
+
+** libgnutls: Added strict tests in Diffie-Hellman and
+SRP key exchange public keys.
 
 ** libgnutls: in ECDSA and DSA TLS 1.2 authentication be less
 strict in hash selection, and allow a stronger hash to
@@ -113,7 +198,7 @@ with openssl.
 in pkcs12 decoding tests.
 
 ** API and ABI modifications:
-gnutls_pubkey_verify_hash2: Added
+No changes since last version.
 
 
 * Version 3.0.18 (released 2012-04-02)
