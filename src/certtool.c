@@ -273,8 +273,8 @@ generate_certificate (gnutls_privkey_t * ret_key,
   if (crq == NULL)
     {
 
-      key = load_private_key (1, cinfo);
-      
+      key = load_private_key (0, cinfo);
+
       pubkey = load_public_key_or_import (1, key, cinfo);
 
       if (!batch)
