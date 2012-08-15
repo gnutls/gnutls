@@ -113,6 +113,7 @@ client (int fd, int wait)
   while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
   
   gnutls_deinit(session);
+  gnutls_anon_free_client_credentials(anoncred);
   gnutls_global_deinit();
 
   if (ret < 0)
@@ -190,6 +191,7 @@ int ret;
   while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
   gnutls_deinit (session);
+  gnutls_anon_free_server_credentials(anoncred);
   gnutls_global_deinit();
 
   if (ret < 0)
