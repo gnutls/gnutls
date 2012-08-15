@@ -72,7 +72,7 @@ libcmd_serv_la_SOURCES = serv-args.def serv-args.c serv-args.h
 if ENABLE_SRP
 srptool_SOURCES = srptool.c
 srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la ../gl/libgnu.la 
-srptool_LDADD += $(LIBOPTS_LDADD) 
+srptool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
 noinst_LTLIBRARIES += libcmd-srp.la
 libcmd_srp_la_CFLAGS =
 libcmd_srp_la_SOURCES = srptool-args.def srptool-args.c srptool-args.h
