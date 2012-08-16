@@ -30,7 +30,7 @@
 
 #ifdef _WIN32
 # include <windows.h>
-# include <Wincrypt.h>
+# include <wincrypt.h>
 
 #else
 # ifdef HAVE_PTHREAD_LOCKS
