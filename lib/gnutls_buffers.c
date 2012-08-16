@@ -1177,7 +1177,6 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
                                handshake_buffer_st * hsk, unsigned int optional)
 {
   int ret;
-  time_t tleft = 0;
 
   ret = get_last_packet(session, htype, hsk, optional);
   if (ret != GNUTLS_E_AGAIN && ret != GNUTLS_E_INTERRUPTED && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)

@@ -992,7 +992,7 @@ begin:
 
   record_state = &record_params->read;
 
-  if (htype != -1 && session->internals.handshake_endtime > 0)
+  if (htype != (unsigned)-1 && session->internals.handshake_endtime > 0)
     {
       now = gnutls_time(0);
       if (now < session->internals.handshake_endtime)
@@ -1014,7 +1014,7 @@ begin:
   else
     packet_sequence = &record_state->sequence_number;
 
-  if (htype != -1 && session->internals.handshake_endtime > 0)
+  if (htype != (unsigned)-1 && session->internals.handshake_endtime > 0)
     {
       now = gnutls_time(0);
       if (now < session->internals.handshake_endtime)

@@ -102,7 +102,7 @@ _add_priority (priority_st * st, const int *list)
       
       for (j=0;j<init;j++)
         {
-          if (st->priority[j] == list[num])
+          if (st->priority[j] == (unsigned)list[num])
             {
               num++;
               continue;
