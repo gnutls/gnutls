@@ -190,16 +190,19 @@ cmd_parser (int argc, char **argv)
 static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, unsigned int flags)
 {
   int ret;
-  char* srk_pass, *key_pass;
+  char* srk_pass, *key_pass = NULL;
   gnutls_datum_t privkey, pubkey;
   
   srk_pass = getpass ("Enter SRK password: ");
   if (srk_pass != NULL)
     srk_pass = strdup(srk_pass);
 
-  key_pass = getpass ("Enter key password: ");
-  if (key_pass != NULL)
-    key_pass = strdup(srk_pass);
+  if (!(flags & GNUTLS_TPM_REGISTER_KEY))
+    {
+      key_pass = getpass ("Enter key password: ");
+      if (key_pass != NULL)
+        key_pass = strdup(srk_pass);
+    }
   
   ret = gnutls_tpm_privkey_generate(key_type, bits, srk_pass, key_pass,
                                     outkey_format, outcert_format, 
