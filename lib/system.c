@@ -437,7 +437,6 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
   if (ret > 0)
     r += ret;
 # endif
-#endif
-
   return r;
+#endif
 }
