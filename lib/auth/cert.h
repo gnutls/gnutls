@@ -162,4 +162,7 @@ int _gnutls_selected_cert_supported_kx (struct gnutls_session_int *session,
                                         gnutls_kx_algorithm_t * alg,
                                         int *alg_size);
 
+int
+_gnutls_check_key_cert_match (gnutls_certificate_credentials_t res);
+
 #endif

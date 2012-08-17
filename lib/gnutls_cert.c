@@ -825,4 +825,21 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
   return session->internals.sign_func;
 }
 
+/* returns error if the certificate has different algorithm than
+ * the given key parameters.
+ */
+int
+_gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
+{
+  int pk = gnutls_pubkey_get_pk_algorithm(res->certs[res->ncerts-1].cert_list[0].pubkey, NULL);
+  int pk2 = gnutls_privkey_get_pk_algorithm (res->pkey[res->ncerts - 1], NULL);
+fprintf(stderr, "pk(pub): %d, pk(priv): pk2\n", pk);
 
+  if (pk2 != pk)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
+    }
+
+  return 0;
+}

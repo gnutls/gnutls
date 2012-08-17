@@ -157,7 +157,12 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
 
   res->ncerts++;
 
-  /* FIXME: Check if the keys match. */
+  ret = _gnutls_check_key_cert_match (res);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
 
   return 0;
 

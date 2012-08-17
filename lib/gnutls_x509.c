@@ -193,23 +193,6 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
  * Read certificates and private keys, from files, memory etc.
  */
 
-/* returns error if the certificate has different algorithm than
- * the given key parameters.
- */
-static int
-_gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
-{
-  int pk = gnutls_pubkey_get_pk_algorithm(res->certs[res->ncerts-1].cert_list[0].pubkey, NULL);
-
-  if (gnutls_privkey_get_pk_algorithm (res->pkey[res->ncerts - 1], NULL) !=
-      pk)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
-    }
-
-  return 0;
-}
 
 /* Returns the name of the certificate of a null name
  */

@@ -367,7 +367,8 @@ gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
                                      unsigned int *bits)
 {
   cdk_packet_t pkt;
-  int algo;
+  int algo = 0, ret;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   if (!key)
     {
@@ -375,13 +376,24 @@ gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
       return GNUTLS_PK_UNKNOWN;
     }
 
-  algo = 0;
-  pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_PUBLIC_KEY);
-  if (pkt)
+  ret = gnutls_openpgp_crt_get_preferred_key_id (key, keyid);
+  if (ret == 0)
     {
-      if (bits)
-        *bits = cdk_pk_get_nbits (pkt->pkt.public_key);
-      algo = _gnutls_openpgp_get_algo (pkt->pkt.public_key->pubkey_algo);
+      int idx;
+
+      idx = gnutls_openpgp_crt_get_subkey_idx (key, keyid);
+      algo =
+        gnutls_openpgp_crt_get_subkey_pk_algorithm (key, idx, NULL);
+    }
+  else
+    {
+      pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_PUBLIC_KEY);
+      if (pkt)
+        {
+          if (bits)
+            *bits = cdk_pk_get_nbits (pkt->pkt.public_key);
+          algo = _gnutls_openpgp_get_algo (pkt->pkt.public_key->pubkey_algo);
+        }
     }
 
   return algo;
