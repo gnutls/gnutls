@@ -68,7 +68,6 @@ client_log_func (int level, const char *str)
  */
 
 static int counter;
-static int packet_to_lose;
 gnutls_session_t session;
 
 static void
