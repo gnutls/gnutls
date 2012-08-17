@@ -97,7 +97,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
                 GNUTLS_RANDOM_SIZE);
   _gnutls_hash (&td_sha, params->data, params->size);
 
-  switch (gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL))
+  switch (gnutls_privkey_get_pk_algorithm(pkey, NULL))
     {
     case GNUTLS_PK_RSA:
       if (!_gnutls_version_has_selectable_sighash (ver))
@@ -602,11 +602,11 @@ _gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
   digest_hd_st td_md5;
   digest_hd_st td_sha;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
-  gnutls_pk_algorithm_t pk = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
+  gnutls_pk_algorithm_t pk = gnutls_privkey_get_pk_algorithm(pkey, NULL);
 
   if (_gnutls_version_has_selectable_sighash(ver))
     return _gnutls_handshake_sign_crt_vrfy12 (session, cert, pkey,
-                                                 signature);
+                                              signature);
 
   ret =
     _gnutls_hash_init (&td_sha, GNUTLS_DIG_SHA1);
