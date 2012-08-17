@@ -833,7 +833,6 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
 {
   int pk = gnutls_pubkey_get_pk_algorithm(res->certs[res->ncerts-1].cert_list[0].pubkey, NULL);
   int pk2 = gnutls_privkey_get_pk_algorithm (res->pkey[res->ncerts - 1], NULL);
-fprintf(stderr, "pk(pub): %d, pk(priv): pk2\n", pk);
 
   if (pk2 != pk)
     {
