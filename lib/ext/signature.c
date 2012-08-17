@@ -274,6 +274,9 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_pcert_st* cert)
           if (_gnutls_pubkey_compatible_with_sig(cert->pubkey, ver, priv->sign_algorithms[i]) < 0)
             continue;
 
+          if (_gnutls_session_sign_algo_enabled(session, priv->sign_algorithms[i]) < 0)
+            continue;
+
           return priv->sign_algorithms[i];
         }
     }
