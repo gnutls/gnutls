@@ -477,7 +477,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
       goto cleanup;
     }
 
-  hash_algo = _gnutls_sign_get_hash_algorithm(result);
+  hash_algo = gnutls_sign_get_hash_algorithm(result);
 
   result =
     _gnutls_x509_verify_data (hash_algo, &cert_signed_data, &cert_signature,
@@ -1034,7 +1034,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
       goto cleanup;
     }
 
-  hash_algo = _gnutls_sign_get_hash_algorithm(result);
+  hash_algo = gnutls_sign_get_hash_algorithm(result);
 
   result =
     _gnutls_x509_verify_data (hash_algo, &crl_signed_data, &crl_signature,

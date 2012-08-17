@@ -218,8 +218,19 @@ _gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t pk,
   return ret;
 }
 
+/**
+ * gnutls_sign_get_hash_algorithm:
+ * @sign: is a signature algorithm
+ *
+ * This function returns the digest algorithm corresponding to
+ * the given signature algorithms.
+ *
+ * Since: 3.1.1
+ *
+ * Returns: return a #gnutls_digest_algorithm_t value, or %GNUTLS_DIG_UNKNOWN on error.
+ **/
 gnutls_digest_algorithm_t
-_gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t sign)
+gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t sign)
 {
   gnutls_digest_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
 
@@ -228,8 +239,19 @@ _gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t sign)
   return ret;
 }
 
+/**
+ * gnutls_sign_get_pk_algorithm:
+ * @sign: is a signature algorithm
+ *
+ * This function returns the public key algorithm corresponding to
+ * the given signature algorithms.
+ *
+ * Since: 3.1.1
+ *
+ * Returns: return a #gnutls_pk_algorithm_t value, or %GNUTLS_PK_UNKNOWN on error.
+ **/
 gnutls_pk_algorithm_t
-_gnutls_sign_get_pk_algorithm (gnutls_sign_algorithm_t sign)
+gnutls_sign_get_pk_algorithm (gnutls_sign_algorithm_t sign)
 {
   gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
 

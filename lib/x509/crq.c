@@ -2512,7 +2512,7 @@ int ret;
       goto cleanup;
     }
   
-  algo = _gnutls_sign_get_hash_algorithm(ret);
+  algo = gnutls_sign_get_hash_algorithm(ret);
 
   ret = _gnutls_x509_get_signature (crq->crq, "signature", &signature);
   if (ret < 0)

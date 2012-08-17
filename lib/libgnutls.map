@@ -826,6 +826,8 @@ GNUTLS_3_1_0 {
 	gnutls_certificate_set_pin_function;
 	gnutls_x509_crt_set_pin_function;
 	gnutls_handshake_set_timeout;
+	gnutls_sign_get_pk_algorithm;
+	gnutls_sign_get_hash_algorithm;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

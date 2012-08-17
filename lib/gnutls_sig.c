@@ -77,7 +77,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
-  hash_algo = _gnutls_sign_get_hash_algorithm (*sign_algo);
+  hash_algo = gnutls_sign_get_hash_algorithm (*sign_algo);
 
   _gnutls_handshake_log ("HSK[%p]: signing handshake data: using %s\n",
                     session, gnutls_sign_algorithm_get_name (*sign_algo));
@@ -326,7 +326,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      hash_algo = _gnutls_sign_get_hash_algorithm (sign_algo);
+      hash_algo = gnutls_sign_get_hash_algorithm (sign_algo);
     }
   else
     {
@@ -380,7 +380,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
                             dconcat.size -
                             _gnutls_hash_get_algo_len (hash_algo),
                             sign_algo,
-                            _gnutls_sign_get_pk_algorithm (sign_algo));
+                            gnutls_sign_get_pk_algorithm (sign_algo));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -413,7 +413,7 @@ _gnutls_handshake_verify_crt_vrfy12 (gnutls_session_t session,
   if (ret < 0)
     return gnutls_assert_val(ret);
   
-  hash_algo = _gnutls_sign_get_hash_algorithm(sign_algo);
+  hash_algo = gnutls_sign_get_hash_algorithm(sign_algo);
   
   ret = _gnutls_hash_fast(hash_algo, session->internals.handshake_hash_buffer.data, 
                           session->internals.handshake_hash_buffer_prev_len,
@@ -553,7 +553,7 @@ _gnutls_handshake_sign_crt_vrfy12 (gnutls_session_t session,
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
-  hash_algo = _gnutls_sign_get_hash_algorithm (sign_algo);
+  hash_algo = gnutls_sign_get_hash_algorithm (sign_algo);
 
   _gnutls_debug_log ("sign handshake cert vrfy: picked %s with %s\n",
                     gnutls_sign_algorithm_get_name (sign_algo),

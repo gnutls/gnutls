@@ -1402,7 +1402,7 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = pubkey_verify_data( pubkey->pk_algorithm, _gnutls_sign_get_hash_algorithm(algo), 
+  ret = pubkey_verify_data( pubkey->pk_algorithm, gnutls_sign_get_hash_algorithm(algo), 
                             data, signature, &pubkey->params);
   if (ret < 0)
     {
@@ -1479,7 +1479,7 @@ gnutls_pubkey_verify_hash2 (gnutls_pubkey_t key,
     return _gnutls_pk_verify (GNUTLS_PK_RSA, hash, signature, &key->params);
   else
     {
-      return pubkey_verify_hashed_data (key->pk_algorithm, _gnutls_sign_get_hash_algorithm(algo),
+      return pubkey_verify_hashed_data (key->pk_algorithm, gnutls_sign_get_hash_algorithm(algo),
                                         hash, signature, &key->params);
     }
 }
@@ -1564,7 +1564,7 @@ unsigned int hash_algo;
         }
       else if (sign != GNUTLS_SIGN_UNKNOWN)
         {
-          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) < hash_size)
+          if (_gnutls_hash_get_algo_len(gnutls_sign_get_hash_algorithm(sign)) < hash_size)
             return GNUTLS_E_UNWANTED_ALGORITHM;
         }
         
@@ -1575,7 +1575,7 @@ unsigned int hash_algo;
         {
           hash_algo = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
 
-          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) < hash_size)
+          if (_gnutls_hash_get_algo_len(gnutls_sign_get_hash_algorithm(sign)) < hash_size)
             return GNUTLS_E_UNWANTED_ALGORITHM;
         }
         

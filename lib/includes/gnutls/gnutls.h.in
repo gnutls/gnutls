@@ -801,6 +801,8 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                                 type);
   const char *gnutls_pk_get_name (gnutls_pk_algorithm_t algorithm);
   const char *gnutls_sign_get_name (gnutls_sign_algorithm_t algorithm);
+  gnutls_digest_algorithm_t gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t);
+  gnutls_pk_algorithm_t gnutls_sign_get_pk_algorithm (gnutls_sign_algorithm_t);
   
   gnutls_sign_algorithm_t gnutls_pk_to_sign (gnutls_pk_algorithm_t pk,
                                              gnutls_digest_algorithm_t d);
