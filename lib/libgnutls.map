@@ -828,6 +828,7 @@ GNUTLS_3_1_0 {
 	gnutls_handshake_set_timeout;
 	gnutls_sign_get_pk_algorithm;
 	gnutls_sign_get_hash_algorithm;
+	gnutls_sign_algorithm_get;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

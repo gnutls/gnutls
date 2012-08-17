@@ -37,4 +37,10 @@ int _gnutls_sign_algorithm_write_params (gnutls_session_t session,
                                          uint8_t * data, size_t max_data_size);
 int _gnutls_session_sign_algo_enabled (gnutls_session_t session,
                                        gnutls_sign_algorithm_t sig);
+
+static inline void   
+gnutls_sign_algorithm_set (gnutls_session_t session, gnutls_sign_algorithm_t sign)
+{
+  session->security_parameters.sign_algo = sign;
+}
 #endif

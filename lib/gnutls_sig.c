@@ -76,6 +76,8 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
       gnutls_assert ();
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
+    
+  gnutls_sign_algorithm_set(session, *sign_algo);
 
   hash_algo = gnutls_sign_get_hash_algorithm (*sign_algo);
 
@@ -552,6 +554,8 @@ _gnutls_handshake_sign_crt_vrfy12 (gnutls_session_t session,
       gnutls_assert ();
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
+  
+  gnutls_sign_algorithm_set(session, sign_algo);
 
   hash_algo = gnutls_sign_get_hash_algorithm (sign_algo);
 

@@ -499,6 +499,9 @@ typedef struct
   gnutls_ecc_curve_t ecc_curve; /* holds the first supported ECC curve requested by client */
   gnutls_protocol_t version;    /* moved here */
 
+  /* Holds the signature algorithm used in this session - If any */
+  gnutls_sign_algorithm_t sign_algo;
+
   /* FIXME: The following are not saved in the session storage
    * for session resumption.
    */

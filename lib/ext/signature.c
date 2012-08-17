@@ -437,3 +437,20 @@ gnutls_sign_algorithm_get_requested (gnutls_session_t session,
   else
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
+
+/**
+ * gnutls_sign_algorithm_get:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Returns the signature algorithm that is (or will be) used in this 
+ * session to sign data.
+ *
+ * Returns: The sign algorithm or %GNUTLS_SIGN_UNKNOWN.
+ *
+ * Since: 3.1.1
+ **/
+int
+gnutls_sign_algorithm_get (gnutls_session_t session)
+{
+  return session->security_parameters.sign_algo;
+}
