@@ -646,10 +646,7 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
  * gnutls_certificate_set_verify_limits().
  *
  * Note that you must also check the peer's name in order to check if
- * the verified certificate belongs to the actual peer.
- *
- * This function uses gnutls_x509_crt_list_verify() with the CAs in
- * the credentials as trusted CAs.
+ * the verified certificate belongs to the actual peer, see gnutls_x509_crt_check_hostname().
  *
  * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
  **/
