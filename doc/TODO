@@ -3,7 +3,6 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-* Added heartbeat support (http://tools.ietf.org/html/draft-ietf-tls-dtls-heartbeat-04)
 * When importing a PKCS #11 certificate, check for its issuers to generate a
   chain (e.g. use the DN to retrieve possible signers).
 - Add DTLS 1.2 support (RFC6347)
