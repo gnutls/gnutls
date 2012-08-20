@@ -7,6 +7,14 @@ Current list:
   chain (e.g. use the DN to retrieve possible signers).
 - Add DTLS 1.2 support (RFC6347)
 - Add certificate image support (see RFC3709, RFC6170)
+- RFC 3280 compliant certificate path validation.
+  - Check path length constraints.
+  - Check keyCertSign key usages.
+  - Reject extensions in v1 certificates.
+- Certificate chain validation improvements:
+  - Implement "correct" DN comparison (instead of memcmp).
+  - Support critical key usage KeyCertSign and cRLSign.
+  - Support path length constraints.
 - Perform signature calculation in PKCS #11 using not plain
   RSA but rather the combination of RSA-SHA256, RSA-SHA1 etc.
   That will allow the usage of more secure tokens that do not
@@ -16,7 +24,6 @@ Current list:
 - Add support for generating empty CRLs
 - Document the format for the supported DN attributes.
 - Audit the code
-- Implement TLS-PSK with PKCS #11.
 - Allow setting a PKCS #11 module to gnutls_x509_trust_list_t, to verify 
   against, similarly to NSS way.
 - Support replacing individual algorithms via a PKCS #11 module -
@@ -28,25 +35,12 @@ Current list:
    firstElement, bit_mask, ...) for platforms that libtool's
    -export-symbols-regex doesn't work.
 - Add Kerberos ciphersuites
-- Certificate chain validation improvements:
-  - Implement "correct" DN comparison (instead of memcmp).
-  - Support critical key usage KeyCertSign and cRLSign.
-  - Support path length constraints.
-- RFC 3280 compliant certificate path validation.
-- Add progress handler gnutls_{dh,rsa}_params_generate2, to allow
-  application to give progress feedback to user.
-- Chain verifications.
-  - Check path length constraints.
-  - Check keyCertSign key usages.
-  - Reject extensions in v1 certificates.
 - Exhaustive test suite, using NIST's PKI Test vectors,
   see http://csrc.nist.gov/pki/testing/x509paths_old.html
   and http://csrc.nist.gov/pki/testing/x509paths.html
 - Make gnutls-cli-debug exit with better error messages if the
   handshake fails, rather than saying that the server doesn't support
   TLS.
-- Make gnutls_certificate_get_ours return a zero-terminated array (or
-  add a new API that return the size of the array).
 
 (+) Means high priority 
 (*) Means medium priority
