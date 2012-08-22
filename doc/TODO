@@ -5,6 +5,11 @@ in order to avoid having people working on the same thing.
 Current list:
 * When importing a PKCS #11 certificate, check for its issuers to generate a
   chain (e.g. use the DN to retrieve possible signers).
+* Improve AES assembly. AES in nettle can be improved in x86, arm and
+  x86-64.
+* Add support for RSA-PSS. This signature algorithm is seen in some
+  passport CAs. Should be added in nettle and then in gnutls.
+* Move ECC code to nettle.
 - Add DTLS 1.2 support (RFC6347)
 - Add certificate image support (see RFC3709, RFC6170)
 - RFC 3280 compliant certificate path validation.
