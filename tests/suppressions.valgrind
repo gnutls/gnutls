@@ -16,10 +16,6 @@
    fun:_gnutls_epoch_set_keys
    fun:_gnutls_write_connection_state_init
    fun:_gnutls_send_handshake_final
-   fun:_gnutls_handshake_common
-   fun:gnutls_handshake
-   fun:doit
-   fun:main
 }
 
 {
@@ -199,5 +195,18 @@
    fun:gcry_create_nonce
    fun:wrap_gcry_rnd_init
    fun:_gnutls_rnd_init
+   fun:gnutls_global_init
+}
+
+{
+   ignore p11 leaks
+   Memcheck:Leak
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:p11_kit_initialize_registered
+   fun:gnutls_pkcs11_init
    fun:gnutls_global_init
 }
