@@ -383,7 +383,7 @@ if test "$opt_guile_bindings" = "yes"; then
       CFLAGS="$CFLAGS $GUILE_CFLAGS"
       LIBS="$LIBS $GUILE_LDFLAGS"
       AC_MSG_CHECKING([whether GNU Guile is recent enough])
-      AC_LINK_IFELSE(AC_LANG_CALL([], [scm_from_locale_string]),
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([], [scm_from_locale_string ("")])],
         [], [opt_guile_bindings=no])
       CFLAGS="$save_CFLAGS"
       LIBS="$save_LIBS"
