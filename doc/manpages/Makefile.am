@@ -991,5 +991,19 @@ doit:
 		echo -n "."; \
 	done
 	@echo ""
+	@echo -n "Creating man pages for tpm.h..." && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/tpm.h`; do \
+		$(top_srcdir)/doc/scripts/gdoc -man \
+			-module $(PACKAGE) -sourceversion $(VERSION) \
+			-bugsto $(PACKAGE_BUGREPORT) \
+			-pkg-name "$(PACKAGE_NAME)" \
+			-include "gnutls/tpm.h" \
+			-seeinfo $(PACKAGE) -verbatimcopying \
+			-copyright "2012 Free Software Foundation, Inc." \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+		echo -n "."; \
+	done
+	@echo ""
 
 .PHONY: update-makefile doit
