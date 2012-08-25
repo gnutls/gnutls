@@ -1577,6 +1577,10 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
   cipher_hd_st ch;
   int ch_init = 0;
   int key_size;
+  unsigned int pass_len = 0;
+  
+  if (password)
+    pass_len = strlen(password);
 
   data_size = 0;
   result = asn1_read_value (pkcs8_asn, root, NULL, &data_size);
@@ -1625,7 +1629,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
     case PBES2_AES_192:
     case PBES2_AES_256:
 
-      result = _gnutls_pbkdf2_sha1 (password, strlen (password),
+      result = _gnutls_pbkdf2_sha1 (password, pass_len,
                                     kdf_params->salt, kdf_params->salt_size,
                                     kdf_params->iter_count, key, key_size);
 
@@ -1879,8 +1883,12 @@ generate_key (schema_id schema,
               struct pbkdf2_params *kdf_params,
               struct pbe_enc_params *enc_params, gnutls_datum_t * key)
 {
-  opaque rnd[2];
+  unsigned char rnd[2];
+  unsigned int pass_len = 0;
   int ret;
+
+  if (password)
+    pass_len = strlen(password);
 
   ret = _gnutls_rnd (GNUTLS_RND_RANDOM, rnd, 2);
   if (ret < 0)
@@ -1955,7 +1963,7 @@ generate_key (schema_id schema,
     case PBES2_AES_192:
     case PBES2_AES_256:
 
-      ret = _gnutls_pbkdf2_sha1 (password, strlen (password),
+      ret = _gnutls_pbkdf2_sha1 (password, pass_len,
                                  kdf_params->salt, kdf_params->salt_size,
                                  kdf_params->iter_count,
                                  key->data, kdf_params->key_size);
