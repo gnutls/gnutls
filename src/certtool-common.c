@@ -102,46 +102,57 @@ load_secret_key (int mand, common_info_st * info)
   return &key;
 }
 
+const char* get_password(common_info_st * cinfo, unsigned int *flags, int confirm)
+{
+  if (cinfo->null_password)
+    {
+      if (flags) *flags |= GNUTLS_PKCS_NULL_PASSWORD;
+      return NULL;
+    }
+  else if (cinfo->password)
+    {
+      if (cinfo->password[0] == 0 && flags)
+        *flags |= GNUTLS_PKCS_PLAIN;
+      return cinfo->password;
+    }
+  else
+    {
+      if (confirm)
+        return get_confirmed_pass (true);
+      else
+        return get_pass ();
+    }
+}
+
 static gnutls_privkey_t _load_privkey(gnutls_datum_t *dat, common_info_st * info)
 {
 int ret;
 gnutls_privkey_t key;
-gnutls_x509_privkey_t xkey;
-
-  ret = gnutls_x509_privkey_init (&xkey);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "x509_privkey_init: %s", gnutls_strerror (ret));
+unsigned int flags = 0;
+const char* pass;
 
   ret = gnutls_privkey_init (&key);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
 
-  if (info->pkcs8)
+  ret = gnutls_privkey_import_x509_raw (key, dat, info->incert_format, NULL, 0);
+  if (ret == GNUTLS_E_DECRYPTION_FAILED)
     {
-      const char *pass = get_pass ();
-      ret =
-        gnutls_x509_privkey_import_pkcs8 (xkey, dat, info->incert_format,
-                                          pass, 0);
+      pass = get_password (info, &flags, 0);
+      ret = gnutls_privkey_import_x509_raw (key, dat, info->incert_format, pass, flags);
     }
-  else
-    ret = gnutls_x509_privkey_import (xkey, dat, info->incert_format);
 
   if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       error (EXIT_FAILURE, 0,
              "import error: could not find a valid PEM header; "
-             "check if your key is PKCS #8 or PKCS #12 encoded");
+             "check if your key is PKCS #12 encoded");
     }
 
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-privkey: %s: %s",
            info->privkey, gnutls_strerror (ret));
 
-  ret = gnutls_privkey_import_x509(key, xkey, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "gnutls_privkey_import_x509: %s",
-           gnutls_strerror (ret));
-  
   return key;
 }
 
@@ -229,6 +240,8 @@ load_x509_private_key (int mand, common_info_st * info)
   int ret;
   gnutls_datum_t dat;
   size_t size;
+  unsigned int flags = 0;
+  const char* pass;
 
   if (!info->privkey && !mand)
     return NULL;
@@ -248,13 +261,20 @@ load_x509_private_key (int mand, common_info_st * info)
 
   if (info->pkcs8)
     {
-      const char *pass = get_pass ();
+      pass = get_password (info, &flags, 0);
       ret =
         gnutls_x509_privkey_import_pkcs8 (key, &dat, info->incert_format,
-                                          pass, 0);
+                                          pass, flags);
     }
   else
-    ret = gnutls_x509_privkey_import (key, &dat, info->incert_format);
+    {
+      ret = gnutls_x509_privkey_import2 (key, &dat, info->incert_format, NULL, 0);
+      if (ret == GNUTLS_E_DECRYPTION_FAILED)
+        {
+          pass = get_password (info, &flags, 0);
+          ret = gnutls_x509_privkey_import2 (key, &dat, info->incert_format, pass, flags);
+        }
+    }
 
   free (dat.data);
 
@@ -262,7 +282,7 @@ load_x509_private_key (int mand, common_info_st * info)
     {
       error (EXIT_FAILURE, 0,
              "import error: could not find a valid PEM header; "
-             "check if your key is PKCS #8 or PKCS #12 encoded");
+             "check if your key is PKCS #12 encoded");
     }
 
   if (ret < 0)

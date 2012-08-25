@@ -88,6 +88,8 @@ print_dsa_pkey (FILE* outfile, gnutls_datum_t * x, gnutls_datum_t * y, gnutls_da
 
 FILE *safe_open_rw (const char *file, int privkey_op);
 
+const char* get_password(common_info_st * cinfo, unsigned int *flags, int confirm);
+
 extern unsigned char buffer[];
 extern const int buffer_size;
 

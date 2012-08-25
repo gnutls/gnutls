@@ -172,28 +172,6 @@ cipher_to_flags (const char *cipher)
   return -1;
 }
 
-static const char* get_password(common_info_st * cinfo, unsigned int *flags, int confirm)
-{
-  if (cinfo->null_password)
-    {
-      if (flags) *flags |= GNUTLS_PKCS_NULL_PASSWORD;
-      return NULL;
-    }
-  else if (cinfo->password)
-    {
-      if (cinfo->password[0] == 0 && flags)
-        *flags |= GNUTLS_PKCS_PLAIN;
-      return cinfo->password;
-    }
-  else
-    {
-      if (confirm)
-        return get_confirmed_pass (true);
-      else
-        return get_pass ();
-    }
-}
-
 
 static void
 print_private_key (common_info_st* cinfo, gnutls_x509_privkey_t key)
@@ -1027,7 +1005,14 @@ cmd_parser (int argc, char **argv)
     cinfo.pkcs_cipher = OPT_ARG(PKCS_CIPHER);
 
   if (HAVE_OPT(PASSWORD))
-    cinfo.password = OPT_ARG(PASSWORD);
+    {
+      cinfo.password = OPT_ARG(PASSWORD);
+      if (HAVE_OPT(GENERATE_PRIVKEY) && cinfo.pkcs8 == 0)
+        {
+          fprintf(stderr, "Assuming PKCS #8 format...\n");
+          cinfo.pkcs8 = 1;
+        }
+    }
 
   if (HAVE_OPT(NULL_PASSWORD))
     {
