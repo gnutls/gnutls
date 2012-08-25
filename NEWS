@@ -4,13 +4,17 @@ See the end for copying conditions.
 
 * Version 3.1.1 (unreleased)
 
+** certtool: Changes in password handling of certtool.
+Ask password when required and only if the '--password' option is not
+given. If the '--password' option is given during key generation then 
+assume the PKCS #8 file format, instead of ignoring the password.
+
 ** tpmtool: No longer asks for key password in registered keys.
 
 ** API and ABI modifications:
 gnutls_sign_algorithm_get: Added
 gnutls_sign_get_hash_algorithm: Added
 gnutls_sign_get_pk_algorithm: Added
-GNUTLS_PK_RSA_HASH_ONLY: Added
 
 
 * Version 3.1.0 (released 2012-08-15)
