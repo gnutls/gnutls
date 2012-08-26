@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.23 (unreleased)
+
+** libgnutls: Fixed DSA and ECDSA signature generation in
+smart cards.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.22 (released 2012-08-04)
 
 ** libgnutls: gnutls_certificate_set_x509_system_trust()
