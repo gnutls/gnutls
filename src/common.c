@@ -159,7 +159,7 @@ print_x509_info (gnutls_session_t session, int flag, int print_cert)
                                             &size);
                 if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
                   {
-                      p = malloc (size);
+                      p = malloc (size+1);
                       if (!p)
                         {
                             fprintf (stderr, "gnutls_malloc\n");
@@ -177,6 +177,7 @@ print_x509_info (gnutls_session_t session, int flag, int print_cert)
                       return;
                   }
 
+                p[size] = 0;
                 fputs ("\n", stdout);
                 fputs (p, stdout);
                 fputs ("\n", stdout);
