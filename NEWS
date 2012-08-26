@@ -11,6 +11,10 @@ assume the PKCS #8 file format, instead of ignoring the password.
 
 ** tpmtool: No longer asks for key password in registered keys.
 
+** libgnutls: Fixed DSA and ECDSA signature generation in smart
+cards. Thanks to Andreas Schwier from cardcontact.de for providing
+me with ECDSA capable smart cards.
+
 ** API and ABI modifications:
 gnutls_sign_algorithm_get: Added
 gnutls_sign_get_hash_algorithm: Added
