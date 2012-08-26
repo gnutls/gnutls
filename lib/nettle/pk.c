@@ -481,15 +481,10 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
         _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
-
         if (hash_len > vdata->size)
-          {
-            gnutls_assert ();
-            _gnutls_debug_log("Security level of algorithm requires a hash of %d bytes or better (have %d)\n", hash_len, (int)vdata->size);
-            hash_len = vdata->size;
-          }
+          hash_len = vdata->size;
 
-        ret = ecc_verify_hash(&sig, vdata->data, vdata->size, &stat, &pub);
+        ret = ecc_verify_hash(&sig, vdata->data, hash_len, &stat, &pub);
         if (ret != 0 || stat != 1)
           {
             gnutls_assert();
@@ -521,13 +516,9 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
 
         _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
         if (hash_len > vdata->size)
-          {
-            gnutls_assert ();
-            _gnutls_debug_log("Security level of algorithm requires a hash of %d bytes or better (have %d)\n", hash_len, (int)vdata->size);
-            hash_len = vdata->size;
-          }
+          hash_len = vdata->size;
 
-        ret = _dsa_verify (&pub, vdata->size, vdata->data, &sig);
+        ret = _dsa_verify (&pub, hash_len, vdata->data, &sig);
         if (ret == 0)
           {
             gnutls_assert();
