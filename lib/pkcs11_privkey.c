@@ -26,6 +26,7 @@
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
 #include <gnutls_sig.h>
+#include <gnutls_pk.h>
 #include <p11-kit/uri.h>
 
 struct gnutls_pkcs11_privkey_st
@@ -141,6 +142,23 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
                 } \
 	} while (0);
 
+
+static int read_rs(bigint_t *r, bigint_t *s, uint8_t *data, size_t data_size)
+{
+unsigned int dhalf = data_size/2;
+
+  if (_gnutls_mpi_scan_nz (r, data, dhalf) != 0)
+    return gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+
+  if (_gnutls_mpi_scan_nz (s, &data[dhalf], dhalf) != 0)
+    {
+      _gnutls_mpi_release(r);
+      return gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+    }
+
+  return 0;
+}
+
 /*-
  * _gnutls_pkcs11_privkey_sign_hash:
  * @key: Holds the key
@@ -205,6 +223,36 @@ _gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
     }
 
   signature->size = siglen;
+  
+  if (key->pk_algorithm == GNUTLS_PK_EC || key->pk_algorithm == GNUTLS_PK_DSA)
+    {
+      bigint_t r,s;
+
+      if (siglen % 2 != 0)
+        {
+          gnutls_assert();
+          ret = GNUTLS_E_PK_SIGN_FAILED;
+          goto cleanup;
+        }
+
+      ret = read_rs(&r, &s, signature->data, signature->size);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+      
+      gnutls_free(signature->data);
+      ret = _gnutls_encode_ber_rs (signature, r, s);
+      _gnutls_mpi_release(&r);
+      _gnutls_mpi_release(&s);
+      
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+    }
 
   ret = 0;
 
