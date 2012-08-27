@@ -148,22 +148,6 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
 	} while (0);
 
 
-static int read_rs(bigint_t *r, bigint_t *s, uint8_t *data, size_t data_size)
-{
-unsigned int dhalf = data_size/2;
-
-  if (_gnutls_mpi_scan_nz (r, data, dhalf) != 0)
-    return gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
-
-  if (_gnutls_mpi_scan_nz (s, &data[dhalf], dhalf) != 0)
-    {
-      _gnutls_mpi_release(r);
-      return gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
-    }
-
-  return 0;
-}
-
 /*-
  * _gnutls_pkcs11_privkey_sign_hash:
  * @key: Holds the key
@@ -185,6 +169,7 @@ _gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
   ck_rv_t rv;
   int ret;
   struct ck_mechanism mech;
+  gnutls_datum_t tmp = {NULL, 0};
   unsigned long siglen;
   struct pkcs11_session_info _sinfo;
   struct pkcs11_session_info *sinfo;
@@ -225,23 +210,22 @@ _gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
       goto cleanup;
     }
 
-  signature->data = gnutls_malloc (siglen);
-  signature->size = siglen;
+  tmp.data = gnutls_malloc (siglen);
+  tmp.size = siglen;
 
-  rv = pkcs11_sign (sinfo->module, sinfo->pks, hash->data, hash->size, signature->data, &siglen);
+  rv = pkcs11_sign (sinfo->module, sinfo->pks, hash->data, hash->size, tmp.data, &siglen);
   if (rv != CKR_OK)
     {
-      gnutls_free (signature->data);
       gnutls_assert ();
       ret = pkcs11_rv_to_err (rv);
       goto cleanup;
     }
 
-  signature->size = siglen;
   
   if (key->pk_algorithm == GNUTLS_PK_EC || key->pk_algorithm == GNUTLS_PK_DSA)
     {
-      bigint_t r,s;
+      unsigned int hlen = siglen / 2;
+      gnutls_datum_t r, s;
 
       if (siglen % 2 != 0)
         {
@@ -250,23 +234,26 @@ _gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
           goto cleanup;
         }
 
-      ret = read_rs(&r, &s, signature->data, signature->size);
+      r.data = tmp.data;
+      r.size = hlen;
+
+      s.data = &tmp.data[hlen];
+      s.size = hlen;
+      
+      ret = _gnutls_encode_ber_rs_raw (signature, &r, &s);
       if (ret < 0)
         {
           gnutls_assert();
           goto cleanup;
         }
-      
-      gnutls_free(signature->data);
-      ret = _gnutls_encode_ber_rs (signature, r, s);
-      _gnutls_mpi_release(&r);
-      _gnutls_mpi_release(&s);
-      
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
+
+      gnutls_free(tmp.data);
+      tmp.data = NULL;
+    }
+  else
+    {
+      signature->size = siglen;
+      signature->data = tmp.data;
     }
 
   ret = 0;
@@ -274,6 +261,8 @@ _gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
 cleanup:
   if (sinfo != &key->sinfo)
     pkcs11_close_session (sinfo);
+  if (ret < 0)
+    gnutls_free(tmp.data);
 
   return ret;
 }

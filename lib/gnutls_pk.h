@@ -49,6 +49,10 @@ int _gnutls_pk_params_copy (gnutls_pk_params_st * dst, const gnutls_pk_params_st
 /* The internal PK interface */
 int
 _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s);
+int
+_gnutls_encode_ber_rs_raw (gnutls_datum_t * sig_value, 
+                           const gnutls_datum_t *r, 
+                           const gnutls_datum_t *s);
 
 int
 _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
