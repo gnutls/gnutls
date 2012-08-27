@@ -46,9 +46,11 @@
 #include "gnutls_datum.h"
 #include "gnutls_constate.h"
 #include "ext/max_record.h"
+#include <ext/heartbeat.h>
 #include <gnutls_state.h>
 #include <gnutls_dtls.h>
 #include <gnutls_dh.h>
+#include <random.h>
 
 struct tls_record_st {
   uint16_t header_size;
@@ -485,6 +487,7 @@ check_recv_type (gnutls_session_t session, content_type_t recv_type)
     case GNUTLS_CHANGE_CIPHER_SPEC:
     case GNUTLS_ALERT:
     case GNUTLS_HANDSHAKE:
+    case GNUTLS_HEARTBEAT:
     case GNUTLS_APPLICATION_DATA:
       return 0;
     default:
@@ -505,6 +508,7 @@ check_buffers (gnutls_session_t session, content_type_t type,
 {
   if ((type == GNUTLS_APPLICATION_DATA ||
        type == GNUTLS_HANDSHAKE ||
+       type == GNUTLS_HEARTBEAT ||
        type == GNUTLS_CHANGE_CIPHER_SPEC)
       && _gnutls_record_buffer_get_size (session) > 0)
     {
@@ -587,6 +591,7 @@ record_add_to_buffers (gnutls_session_t session,
   if ((recv->type == type)
       && (type == GNUTLS_APPLICATION_DATA ||
           type == GNUTLS_CHANGE_CIPHER_SPEC ||
+	  type == GNUTLS_HEARTBEAT ||
           type == GNUTLS_HANDSHAKE))
     {
       _gnutls_record_buffer_put (session, type, seq, bufel);
@@ -650,6 +655,12 @@ record_add_to_buffers (gnutls_session_t session,
           _gnutls_record_buffer_put (session, recv->type, seq, bufel);
 
           break;
+
+        case GNUTLS_HEARTBEAT:
+	    ret = _gnutls_heartbeat_handle (session, bufel);
+	    goto cleanup;
+	    break;
+
         case GNUTLS_APPLICATION_DATA:
           if (session->internals.initial_negotiation_completed == 0)
             {
@@ -683,6 +694,7 @@ record_add_to_buffers (gnutls_session_t session,
             }
 
           break;
+
         case GNUTLS_HANDSHAKE:
           /* In DTLS we might receive a handshake replay from the peer to indicate
            * the our last TLS handshake messages were not received.
@@ -747,8 +759,8 @@ record_add_to_buffers (gnutls_session_t session,
         default:
 
           _gnutls_record_log
-            ("REC[%p]: Received Unknown packet %d expecting %d\n",
-             session, recv->type, type);
+            ("REC[%p]: Received unexpected packet %d (%s) expecting %d (%s)\n",
+             session, recv->type, _gnutls_packet2str(recv->type), type, _gnutls_packet2str(type));
 
           gnutls_assert ();
           ret = GNUTLS_E_UNEXPECTED_PACKET;
@@ -1237,7 +1249,6 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
   return check_buffers (session, type, data, data_size, seq);
 }
 
-
 /**
  * gnutls_record_send:
  * @session: is a #gnutls_session_t structure.
@@ -1302,10 +1313,8 @@ gnutls_record_send (gnutls_session_t session, const void *data,
  * The number of bytes received might be less than the requested @data_size.
  **/
 ssize_t
-gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size)
-{
-  return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data,
-                           data_size, NULL);
+gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size) {
+    return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data, data_size, NULL);
 }
 
 /**

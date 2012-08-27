@@ -32,6 +32,7 @@
 #include <ext/cert_type.h>
 #include <ext/server_name.h>
 #include <ext/srp.h>
+#include <ext/heartbeat.h>
 #include <ext/session_ticket.h>
 #include <ext/safe_renegotiation.h>
 #include <ext/signature.h>
@@ -328,6 +329,10 @@ _gnutls_ext_init (void)
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 #endif
+
+  ret = _gnutls_ext_register (&ext_mod_heartbeat);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
 
   ret = _gnutls_ext_register (&ext_mod_session_ticket);
   if (ret != GNUTLS_E_SUCCESS)

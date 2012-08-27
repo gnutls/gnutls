@@ -56,6 +56,8 @@ _gnutls_packet2str (content_type_t packet)
       return "Handshake";
     case GNUTLS_APPLICATION_DATA:
       return "Application Data";
+    case GNUTLS_HEARTBEAT:
+      return "HeartBeat";
     default:
       return "Unknown Packet";
     }

@@ -246,6 +246,7 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_SUPPORTED_ECC_PF = 11,
   GNUTLS_EXTENSION_SRP = 12,
   GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
+  GNUTLS_EXTENSION_HEARTBEAT = 15,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
   GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281   /* aka: 0xff01 */
 } extensions_t;
@@ -261,6 +262,7 @@ typedef enum content_type_t
 {
   GNUTLS_CHANGE_CIPHER_SPEC = 20, GNUTLS_ALERT,
   GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA,
+  GNUTLS_HEARTBEAT
 } content_type_t;
 
 
@@ -648,7 +650,10 @@ typedef struct
    * has terminated. Required to handle retransmissions.
    */
   time_t async_term;
-  
+
+  struct timespec heartbeat_sent; /* timestamp: when last HeartBeat Request was sent*/
+  time_t heartbeat_timeout; /* current timeout, in milliseconds*/
+
   /* last retransmission triggered by record layer */
   struct timespec last_retransmit;
   unsigned int packets_dropped;
@@ -882,6 +887,9 @@ typedef struct
   
   unsigned int handshake_endtime; /* end time in seconds */
   unsigned int handshake_timeout_ms; /* timeout in milliseconds */
+
+  gnutls_buffer_st heartbeat_payload; /* store in-flight payload for heartbeat extension*/
+  int heartbeat_policy_set;
 
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */

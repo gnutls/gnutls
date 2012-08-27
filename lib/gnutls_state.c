@@ -322,8 +322,11 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
   /* the default certificate type for TLS */
   (*session)->security_parameters.cert_type = DEFAULT_CERT_TYPE;
 
+  (*session)->internals.heartbeat_policy_set = 0;
+
   /* Initialize buffers */
   _gnutls_buffer_init (&(*session)->internals.handshake_hash_buffer);
+  _gnutls_buffer_init (&(*session)->internals.heartbeat_payload);
 
   _mbuffer_head_init (&(*session)->internals.record_buffer);
   _mbuffer_head_init (&(*session)->internals.record_send_buffer);
@@ -438,7 +441,9 @@ gnutls_deinit (gnutls_session_t session)
       }
 
   _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
-  _mbuffer_head_clear (&session->internals.record_buffer);
+  _gnutls_buffer_clear (&session->internals.heartbeat_payload);
+  if (&session->internals.record_buffer)
+      _mbuffer_head_clear (&session->internals.record_buffer);
   _mbuffer_head_clear (&session->internals.record_recv_buffer);
   _mbuffer_head_clear (&session->internals.record_send_buffer);
 

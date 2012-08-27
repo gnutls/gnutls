@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
 #include <gnutls/openpgp.h>
 #include <sys/time.h>
 #include <sys/select.h>
@@ -80,10 +81,10 @@ const char *x509_ecccertfile = NULL;
 const char *x509_cafile = NULL;
 const char *dh_params_file = NULL;
 const char *x509_crlfile = NULL;
-const char * priorities = NULL;
+const char *priorities = NULL;
 
 gnutls_datum_t session_ticket_key;
-static void tcp_server(const char* name, int port);
+static void tcp_server (const char *name, int port);
 
 /* end of globals */
 
@@ -128,13 +129,11 @@ static void cmd_parser (int argc, char **argv);
 #define HTTP_STATE_RESPONSE	2
 #define HTTP_STATE_CLOSING	3
 
-LIST_TYPE_DECLARE (listener_item, char *http_request; char *http_response;
-                   int request_length; int response_length;
-                   int response_written; int http_state;
-                   int listen_socket; int fd;
-                   gnutls_session_t tls_session;
-                   int handshake_ok;
-  );
+LIST_TYPE_DECLARE (listener_item, char *http_request;
+                   char *http_response; int request_length;
+                   int response_length; int response_written;
+                   int http_state; int listen_socket;
+                   int fd; gnutls_session_t tls_session; int handshake_ok;);
 
 static const char *
 safe_strerror (int value)
@@ -171,7 +170,8 @@ gnutls_rsa_params_t rsa_params = NULL;
 static int
 generate_dh_primes (void)
 {
-  int prime_bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_NORMAL);
+  int prime_bits =
+    gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_NORMAL);
 
   if (gnutls_dh_params_init (&dh_params) < 0)
     {
@@ -252,7 +252,7 @@ static char pkcs3[] =
 static int
 static_dh_params (void)
 {
-  gnutls_datum_t params = { (void*)pkcs3, sizeof (pkcs3) };
+  gnutls_datum_t params = { (void *) pkcs3, sizeof (pkcs3) };
   int ret;
 
   if (gnutls_dh_params_init (&dh_params) < 0)
@@ -329,7 +329,8 @@ generate_rsa_params (void)
 
 LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 
-gnutls_session_t initialize_session (int dtls)
+gnutls_session_t
+initialize_session (int dtls)
 {
   gnutls_session_t session;
   const char *err;
@@ -338,7 +339,7 @@ gnutls_session_t initialize_session (int dtls)
     priorities = "NORMAL";
 
   if (dtls)
-    gnutls_init (&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
+    gnutls_init (&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
   else
     gnutls_init (&session, GNUTLS_SERVER);
 
@@ -384,6 +385,10 @@ gnutls_session_t initialize_session (int dtls)
       else
         gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
     }
+
+  if (HAVE_OPT (HEARTBEAT))
+    fprintf (stderr, "Set HeartBeat policy: %d.\n",
+             gnutls_heartbeat_allow (session));
 
   return session;
 }
@@ -489,7 +494,8 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 
     if (gnutls_server_name_get (session, dns, &dns_size, &type, 0) == 0)
       {
-        snprintf (tmp_buffer, tmp_buffer_size, "\n<p>Server Name: %s</p>\n", dns);
+        snprintf (tmp_buffer, tmp_buffer_size, "\n<p>Server Name: %s</p>\n",
+                  dns);
       }
 
   }
@@ -500,7 +506,8 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 #ifdef ENABLE_SRP
   if (kx_alg == GNUTLS_KX_SRP)
     {
-      snprintf (tmp_buffer, tmp_buffer_size, "<p>Connected as user '%s'.</p>\n",
+      snprintf (tmp_buffer, tmp_buffer_size,
+                "<p>Connected as user '%s'.</p>\n",
                 gnutls_srp_server_get_username (session));
     }
 #endif
@@ -508,7 +515,8 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 #ifdef ENABLE_PSK
   if (kx_alg == GNUTLS_KX_PSK)
     {
-      snprintf (tmp_buffer, tmp_buffer_size, "<p>Connected as user '%s'.</p>\n",
+      snprintf (tmp_buffer, tmp_buffer_size,
+                "<p>Connected as user '%s'.</p>\n",
                 gnutls_psk_server_get_username (session));
     }
 #endif
@@ -546,45 +554,51 @@ peer_print_info (gnutls_session_t session, int *ret_length,
                                           (session));
       if (tmp == NULL)
         tmp = str_unknown;
-      snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Certificate Type:</TD><TD>%s</TD></TR>\n",
-                tmp);
+      snprintf (tmp_buffer, tmp_buffer_size,
+                "<TR><TD>Certificate Type:</TD><TD>%s</TD></TR>\n", tmp);
     }
 
   tmp = gnutls_kx_get_name (kx_alg);
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Key Exchange:</TD><TD>%s</TD></TR>\n", tmp);
+  snprintf (tmp_buffer, tmp_buffer_size,
+            "<TR><TD>Key Exchange:</TD><TD>%s</TD></TR>\n", tmp);
 
   tmp = gnutls_compression_get_name (gnutls_compression_get (session));
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Compression</TD><TD>%s</TD></TR>\n", tmp);
+  snprintf (tmp_buffer, tmp_buffer_size,
+            "<TR><TD>Compression</TD><TD>%s</TD></TR>\n", tmp);
 
   tmp = gnutls_cipher_get_name (gnutls_cipher_get (session));
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Cipher</TD><TD>%s</TD></TR>\n", tmp);
+  snprintf (tmp_buffer, tmp_buffer_size,
+            "<TR><TD>Cipher</TD><TD>%s</TD></TR>\n", tmp);
 
   tmp = gnutls_mac_get_name (gnutls_mac_get (session));
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>MAC</TD><TD>%s</TD></TR>\n", tmp);
+  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>MAC</TD><TD>%s</TD></TR>\n",
+            tmp);
 
   tmp = gnutls_cipher_suite_get_name (kx_alg,
                                       gnutls_cipher_get (session),
                                       gnutls_mac_get (session));
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
-            tmp);
+  snprintf (tmp_buffer, tmp_buffer_size,
+            "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n", tmp);
 
   if (crtinfo)
     {
-      snprintf (tmp_buffer, tmp_buffer_size, "<hr><PRE>%s\n</PRE>\n", crtinfo);
+      snprintf (tmp_buffer, tmp_buffer_size, "<hr><PRE>%s\n</PRE>\n",
+                crtinfo);
       free (crtinfo);
     }
 
-  snprintf (tmp_buffer, tmp_buffer_size, "<hr><P>Your HTTP header was:<PRE>%s</PRE></P>\n" HTTP_END,
+  snprintf (tmp_buffer, tmp_buffer_size,
+            "<hr><P>Your HTTP header was:<PRE>%s</PRE></P>\n" HTTP_END,
             header);
 
   *ret_length = strlen (http_buffer);
@@ -640,7 +654,8 @@ human_addr (const struct sockaddr *sa, socklen_t salen,
   return save_buf;
 }
 
-int wait_for_connection(void)
+int
+wait_for_connection (void)
 {
   listener_item *j;
   fd_set rd, wr;
@@ -672,14 +687,14 @@ int wait_for_connection(void)
 
   /* find which one is ready */
   lloopstart (listener_list, j)
-    {
-      /* a new connection has arrived */
-      if (FD_ISSET (j->fd, &rd) && j->listen_socket)
-        {
-          sock = j->fd;
-          break;
-        }
-    }
+  {
+    /* a new connection has arrived */
+    if (FD_ISSET (j->fd, &rd) && j->listen_socket)
+      {
+        sock = j->fd;
+        break;
+      }
+  }
   lloopend (listener_list, j);
   return sock;
 }
@@ -698,9 +713,9 @@ listen_socket (const char *name, int listen_port, int socktype)
   hints.ai_socktype = socktype;
   hints.ai_flags = AI_PASSIVE
 #ifdef AI_ADDRCONFIG
-   | AI_ADDRCONFIG
+    | AI_ADDRCONFIG
 #endif
-   ;
+    ;
 
   if ((s = getaddrinfo (NULL, portname, &hints, &res)) != 0)
     {
@@ -711,7 +726,8 @@ listen_socket (const char *name, int listen_port, int socktype)
   for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
 #ifndef HAVE_IPV6
-      if (ptr->ai_family != AF_INET) continue;
+      if (ptr->ai_family != AF_INET)
+        continue;
 #endif
 
       /* Print what we are doing. */
@@ -758,12 +774,12 @@ listen_socket (const char *name, int listen_port, int socktype)
           yes = 1;
           if (setsockopt (s, IPPROTO_IP, IP_DONTFRAG,
                           (const void *) &yes, sizeof (yes)) < 0)
-              perror ("setsockopt(IP_DF) failed");
+            perror ("setsockopt(IP_DF) failed");
 #elif defined(IP_MTU_DISCOVER)
           yes = IP_PMTUDISC_DO;
-          if (setsockopt(s, IPPROTO_IP, IP_MTU_DISCOVER, 
-                         (const void*) &yes, sizeof (yes)) < 0)
-              perror ("setsockopt(IP_DF) failed");
+          if (setsockopt (s, IPPROTO_IP, IP_MTU_DISCOVER,
+                          (const void *) &yes, sizeof (yes)) < 0)
+            perror ("setsockopt(IP_DF) failed");
 #endif
         }
 
@@ -779,7 +795,7 @@ listen_socket (const char *name, int listen_port, int socktype)
           if (listen (s, 10) < 0)
             {
               perror ("listen() failed");
-              exit(1);
+              exit (1);
             }
         }
 
@@ -850,7 +866,7 @@ get_response (gnutls_session_t session, char *request,
     {
       strip (request);
       fprintf (stderr, "received: %s\n", request);
-      if (check_command(session, request))
+      if (check_command (session, request))
         {
           *response = NULL;
           *response_length = 0;
@@ -913,7 +929,7 @@ main (int argc, char **argv)
   char name[256];
 
   set_program_name (argv[0]);
-  cmd_parser(argc, argv);
+  cmd_parser (argc, argv);
 
 #ifndef _WIN32
   signal (SIGHUP, SIG_IGN);
@@ -927,9 +943,10 @@ main (int argc, char **argv)
   if (nodb == 0)
     wrap_db_init ();
 
-  if (HAVE_OPT(UDP))
-    strcpy(name, "UDP ");
-  else name[0] = 0;
+  if (HAVE_OPT (UDP))
+    strcpy (name, "UDP ");
+  else
+    name[0] = 0;
 
   if (http == 1)
     {
@@ -1020,11 +1037,11 @@ main (int argc, char **argv)
         }
     }
 
-  if (HAVE_OPT(PGPCERTFILE))
+  if (HAVE_OPT (PGPCERTFILE))
     {
-      if (HAVE_OPT(PGPSUBKEY))
+      if (HAVE_OPT (PGPSUBKEY))
         ret = gnutls_certificate_set_openpgp_key_file2
-          (cert_cred, pgp_certfile, pgp_keyfile, OPT_ARG(PGPSUBKEY),
+          (cert_cred, pgp_certfile, pgp_keyfile, OPT_ARG (PGPSUBKEY),
            GNUTLS_OPENPGP_FMT_BASE64);
       else
         ret = gnutls_certificate_set_openpgp_key_file
@@ -1111,10 +1128,10 @@ main (int argc, char **argv)
           GERR (ret);
         }
 
-      if (HAVE_OPT(PSKHINT))
+      if (HAVE_OPT (PSKHINT))
         {
           ret = gnutls_psk_set_server_credentials_hint (psk_cred,
-                                                        OPT_ARG(PSKHINT));
+                                                        OPT_ARG (PSKHINT));
           if (ret)
             {
               fprintf (stderr, "Error setting PSK identity hint.\n");
@@ -1138,22 +1155,24 @@ main (int argc, char **argv)
     gnutls_session_ticket_key_generate (&session_ticket_key);
 #endif
 
-  if (HAVE_OPT(MTU))
+  if (HAVE_OPT (MTU))
     mtu = OPT_VALUE_MTU;
-  else mtu = 1300;
+  else
+    mtu = 1300;
 
-  if (HAVE_OPT(PORT))
+  if (HAVE_OPT (PORT))
     port = OPT_VALUE_PORT;
   else
     port = 5556;
 
-  if (HAVE_OPT(UDP))
-    udp_server(name, port, mtu);
+  if (HAVE_OPT (UDP))
+    udp_server (name, port, mtu);
   else
-    tcp_server(name, port);
+    tcp_server (name, port);
 }
 
-static void tcp_server(const char* name, int port)
+static void
+tcp_server (const char *name, int port)
 {
   int n, s;
   char topbuf[512];
@@ -1312,8 +1331,9 @@ static void tcp_server(const char* name, int port)
                                             &client_address, calen, topbuf,
                                             sizeof (topbuf)));
                         print_info (j->tls_session, verbose, verbose);
-                        if (gnutls_auth_get_type (j->tls_session) == GNUTLS_CRD_CERTIFICATE)
-                          cert_verify(j->tls_session, NULL);
+                        if (gnutls_auth_get_type (j->tls_session) ==
+                            GNUTLS_CRD_CERTIFICATE)
+                          cert_verify (j->tls_session, NULL);
                       }
                     j->handshake_ok = 1;
                   }
@@ -1355,12 +1375,19 @@ static void tcp_server(const char* name, int port)
                       }
                     else
                       {
-                        j->http_state = HTTP_STATE_CLOSING;
-                        if (r < 0 && r != GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
+                        if (r < 0)
                           {
-                            check_alert (j->tls_session, r);
-                            fprintf (stderr, "Error while receiving data\n");
-                            GERR (r);
+                            if (GNUTLS_E_HEARTBEAT_PONG_FAILED == r)
+                              fprintf (stderr,
+                                       "HeartBeat pong failed, ping dropped\n");
+                            else if (r != GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
+                              {
+                                j->http_state = HTTP_STATE_CLOSING;
+                                check_alert (j->tls_session, r);
+                                fprintf (stderr,
+                                         "Error while receiving data\n");
+                                GERR (r);
+                              }
                           }
                       }
                   }
@@ -1437,8 +1464,9 @@ static void tcp_server(const char* name, int port)
                                             sizeof (topbuf)));
 
                         print_info (j->tls_session, verbose, verbose);
-                        if (gnutls_auth_get_type (j->tls_session) == GNUTLS_CRD_CERTIFICATE)
-                          cert_verify(j->tls_session, NULL);
+                        if (gnutls_auth_get_type (j->tls_session) ==
+                            GNUTLS_CRD_CERTIFICATE)
+                          cert_verify (j->tls_session, NULL);
                       }
                     j->handshake_ok = 1;
                   }
@@ -1545,80 +1573,82 @@ static void tcp_server(const char* name, int port)
 
 }
 
-static void cmd_parser (int argc, char **argv)
+static void
+cmd_parser (int argc, char **argv)
 {
-  optionProcess( &gnutls_servOptions, argc, argv);
+  optionProcess (&gnutls_servOptions, argc, argv);
 
-  disable_client_cert = HAVE_OPT(DISABLE_CLIENT_CERT);
-  require_cert = HAVE_OPT(REQUIRE_CLIENT_CERT);
-  if (HAVE_OPT(DEBUG))
+  disable_client_cert = HAVE_OPT (DISABLE_CLIENT_CERT);
+  require_cert = HAVE_OPT (REQUIRE_CLIENT_CERT);
+  if (HAVE_OPT (DEBUG))
     debug = OPT_VALUE_DEBUG;
 
-  if (HAVE_OPT(QUIET))
+  if (HAVE_OPT (QUIET))
     verbose = 0;
 
-  if (HAVE_OPT(PRIORITY)) 
-    priorities = OPT_ARG(PRIORITY);
-  
-  if (HAVE_OPT(LIST))
+  if (HAVE_OPT (PRIORITY))
+    priorities = OPT_ARG (PRIORITY);
+
+  if (HAVE_OPT (LIST))
     {
-      print_list(priorities, verbose);
-      exit(0);
+      print_list (priorities, verbose);
+      exit (0);
     }
 
-  nodb = HAVE_OPT(NODB);
-  noticket = HAVE_OPT(NOTICKET);
+  nodb = HAVE_OPT (NODB);
+  noticket = HAVE_OPT (NOTICKET);
 
-  if (HAVE_OPT(ECHO))
+  if (HAVE_OPT (ECHO))
     http = 0;
-  else http = 1;
+  else
+    http = 1;
 
-  if (HAVE_OPT(X509FMTDER))
+  if (HAVE_OPT (X509FMTDER))
     x509ctype = GNUTLS_X509_FMT_DER;
   else
     x509ctype = GNUTLS_X509_FMT_PEM;
 
-  generate = HAVE_OPT(GENERATE);
+  generate = HAVE_OPT (GENERATE);
 
-  if (HAVE_OPT(DHPARAMS))
-    dh_params_file = OPT_ARG(DHPARAMS);
+  if (HAVE_OPT (DHPARAMS))
+    dh_params_file = OPT_ARG (DHPARAMS);
 
-  if (HAVE_OPT(X509KEYFILE))
-    x509_keyfile = OPT_ARG(X509KEYFILE);
-  if (HAVE_OPT(X509CERTFILE))
-    x509_certfile = OPT_ARG(X509CERTFILE);
+  if (HAVE_OPT (X509KEYFILE))
+    x509_keyfile = OPT_ARG (X509KEYFILE);
+  if (HAVE_OPT (X509CERTFILE))
+    x509_certfile = OPT_ARG (X509CERTFILE);
 
-  if (HAVE_OPT(X509DSAKEYFILE))
-    x509_dsakeyfile = OPT_ARG(X509DSAKEYFILE);
-  if (HAVE_OPT(X509DSACERTFILE))
-    x509_dsacertfile = OPT_ARG(X509DSACERTFILE);
+  if (HAVE_OPT (X509DSAKEYFILE))
+    x509_dsakeyfile = OPT_ARG (X509DSAKEYFILE);
+  if (HAVE_OPT (X509DSACERTFILE))
+    x509_dsacertfile = OPT_ARG (X509DSACERTFILE);
 
 
-  if (HAVE_OPT(X509ECCKEYFILE))
-    x509_ecckeyfile = OPT_ARG(X509ECCKEYFILE);
-  if (HAVE_OPT(X509CERTFILE))
-    x509_ecccertfile = OPT_ARG(X509ECCCERTFILE);
-  
-  if (HAVE_OPT(X509CAFILE))
-    x509_cafile = OPT_ARG(X509CAFILE);
-  if (HAVE_OPT(X509CRLFILE))
-    x509_crlfile = OPT_ARG(X509CRLFILE);
+  if (HAVE_OPT (X509ECCKEYFILE))
+    x509_ecckeyfile = OPT_ARG (X509ECCKEYFILE);
+  if (HAVE_OPT (X509CERTFILE))
+    x509_ecccertfile = OPT_ARG (X509ECCCERTFILE);
 
-  if (HAVE_OPT(PGPKEYFILE))
-    pgp_keyfile = OPT_ARG(PGPKEYFILE);
-  if (HAVE_OPT(PGPCERTFILE))
-    pgp_certfile = OPT_ARG(PGPCERTFILE);
+  if (HAVE_OPT (X509CAFILE))
+    x509_cafile = OPT_ARG (X509CAFILE);
+  if (HAVE_OPT (X509CRLFILE))
+    x509_crlfile = OPT_ARG (X509CRLFILE);
 
-  if (HAVE_OPT(PGPKEYRING))
-    pgp_keyring = OPT_ARG(PGPKEYRING);
+  if (HAVE_OPT (PGPKEYFILE))
+    pgp_keyfile = OPT_ARG (PGPKEYFILE);
+  if (HAVE_OPT (PGPCERTFILE))
+    pgp_certfile = OPT_ARG (PGPCERTFILE);
 
-  if (HAVE_OPT(SRPPASSWD))
-    srp_passwd = OPT_ARG(SRPPASSWD);
-  if (HAVE_OPT(SRPPASSWDCONF))
-    srp_passwd_conf = OPT_ARG(SRPPASSWDCONF);
+  if (HAVE_OPT (PGPKEYRING))
+    pgp_keyring = OPT_ARG (PGPKEYRING);
 
-  if (HAVE_OPT(PSKPASSWD))
-    psk_passwd = OPT_ARG(PSKPASSWD);
+  if (HAVE_OPT (SRPPASSWD))
+    srp_passwd = OPT_ARG (SRPPASSWD);
+  if (HAVE_OPT (SRPPASSWDCONF))
+    srp_passwd_conf = OPT_ARG (SRPPASSWDCONF);
+
+  if (HAVE_OPT (PSKPASSWD))
+    psk_passwd = OPT_ARG (PSKPASSWD);
 
 }
 

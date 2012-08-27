@@ -34,6 +34,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
+#include <gnutls/crypto.h>
 #include <time.h>
 #include <common.h>
 
@@ -1040,18 +1041,20 @@ print_list (const char *priorities, int verbose)
 
 int check_command(gnutls_session_t session, const char* str)
 {
-int len = strlen(str);
-
+  size_t len = strnlen(str, 128);
+  fprintf (stderr, "*** Processing %zu bytes command: %s\n", len, str);
   if (len > 2 && str[0] == str[1] && str[0] == '*')
-    {
-      if (strncmp(str, "**REHANDSHAKE**",
-          sizeof ("**REHANDSHAKE**") - 1) == 0)
-        {
+  {
+      if (strncmp(str, "**REHANDSHAKE**", sizeof ("**REHANDSHAKE**") - 1) == 0)
+      {
           fprintf (stderr, "*** Sending rehandshake request\n");
-                   gnutls_rehandshake (session);
+	  gnutls_rehandshake (session);
           return 1;
-        }
-    }
+      } else if (strncmp(str, "**HEARTBEAT**", sizeof ("**HEARTBEAT**") - 1) == 0) {
+	  gnutls_heartbeat_ping_rnd (session);
+	  return 2;
+      }
+  }
   return 0;
 }
 

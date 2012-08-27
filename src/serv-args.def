@@ -76,6 +76,13 @@ flag = {
 };
 
 flag = {
+    name      = heartbeat;
+    value     = b;
+    descrip   = "Activate heartbeat support";
+    doc      = "Regularly ping client via heartbeat extension messages";
+};
+
+flag = {
     name      = x509fmtder;
     descrip   = "Use DER format for certificates to read from";
     doc      = "";

@@ -124,7 +124,36 @@ int _gnutls_hostname_compare (const char *certname, size_t certnamesize,
     }
 
 #define BUFFER_APPEND_PFX(b, x, s) { \
+    BUFFER_APPEND_PFX4(b, x, s) \
+    }
+
+/* append data prefixed with 4-bytes length field*/
+#define BUFFER_APPEND_PFX4(b, x, s) { \
         ret = _gnutls_buffer_append_data_prefix(b, 32, x, s); \
+        if (ret < 0) { \
+            gnutls_assert(); \
+            return ret; \
+        } \
+    }
+
+#define BUFFER_APPEND_PFX3(b, x, s) { \
+        ret = _gnutls_buffer_append_data_prefix(b, 24, x, s); \
+        if (ret < 0) { \
+            gnutls_assert(); \
+            return ret; \
+        } \
+    }
+
+#define BUFFER_APPEND_PFX2(b, x, s) { \
+        ret = _gnutls_buffer_append_data_prefix(b, 16, x, s); \
+        if (ret < 0) { \
+            gnutls_assert(); \
+            return ret; \
+        } \
+    }
+
+#define BUFFER_APPEND_PFX1(b, x, s) { \
+        ret = _gnutls_buffer_append_data_prefix(b, 8, x, s); \
         if (ret < 0) { \
             gnutls_assert(); \
             return ret; \
@@ -138,7 +167,6 @@ int _gnutls_hostname_compare (const char *certname, size_t certnamesize,
             return ret; \
         } \
     }
-
 
 #define BUFFER_POP(b, x, s) { \
         size_t is = s; \

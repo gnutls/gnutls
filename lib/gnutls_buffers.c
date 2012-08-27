@@ -61,8 +61,8 @@
  */
 #define MAX_QUEUE 32
 
-/* Buffers received packets of type APPLICATION DATA and
- * HANDSHAKE DATA.
+/* Buffers received packets of type APPLICATION DATA,
+ * HANDSHAKE DATA and HEARTBEAT.
  */
 int
 _gnutls_record_buffer_put (gnutls_session_t session,
@@ -132,7 +132,7 @@ mbuffer_st* bufel;
 
   memcpy(data, msg.data, length);
   _mbuffer_head_remove_bytes(&session->internals.record_buffer, length);
-  
+
   return length;
 }
 

@@ -856,6 +856,8 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
 /* Record layer functions.
  */
+  ssize_t gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size);
+  ssize_t gnutls_heartbeat_ping_rnd (gnutls_session_t session);
   ssize_t gnutls_record_send (gnutls_session_t session, const void *data,
                               size_t data_size);
   ssize_t gnutls_record_recv (gnutls_session_t session, void *data,
@@ -905,6 +907,13 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   int gnutls_server_name_get (gnutls_session_t session,
                               void *data, size_t * data_length,
                               unsigned int *type, unsigned int indx);
+
+    /* Heartbeat */
+    int gnutls_heartbeat_allow (gnutls_session_t session);
+    int gnutls_heartbeat_deny (gnutls_session_t session);
+    int gnutls_heartbeat_enabled_local (gnutls_session_t session);
+    int gnutls_heartbeat_enabled_remote (gnutls_session_t session);
+    int gnutls_heartbeat_timeout (gnutls_session_t session, int check_only);
 
   /* Safe renegotiation */
   int gnutls_safe_renegotiation_status (gnutls_session_t session);
@@ -1965,6 +1974,9 @@ typedef int (*gnutls_pin_callback_t) (void *userdata, int attempt,
 #define GNUTLS_E_BAD_COOKIE -214
 #define GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR -215
 #define GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL -216
+
+#define GNUTLS_E_HEARTBEAT_FLIGHT -298
+#define GNUTLS_E_HEARTBEAT_PONG_FAILED -299
 
 /* PKCS11 related */
 #define GNUTLS_E_PKCS11_ERROR -300

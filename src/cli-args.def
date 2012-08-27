@@ -36,6 +36,13 @@ flag = {
 };
 
 flag = {
+    name      = heartbeat;
+    value     = b;
+    descrip   = "Activate heartbeat support";
+    doc      = "";
+};
+
+flag = {
     name      = rehandshake;
     value     = e;
     descrip   = "Establish a session and rehandshake";

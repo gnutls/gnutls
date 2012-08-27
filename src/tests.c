@@ -946,7 +946,48 @@ test_hello_extension (gnutls_session_t session)
   gnutls_record_set_max_size (session, 4096);
 
   ret = do_handshake (session);
+
+
   return ret;
+}
+
+test_code_t
+test_heartbeat_extension (gnutls_session_t session)
+{
+  sprintf (prio_str,
+           INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+           ":" ALL_KX ":%s", protocol_str, rest);
+  _gnutls_priority_set_direct (session, prio_str);
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
+  gnutls_record_set_max_size (session, 4096);
+
+  gnutls_heartbeat_allow (session);
+  do_handshake (session);
+
+  switch (gnutls_heartbeat_enabled_remote (session)) {
+    case 1: return TEST_SUCCEED;
+    case 0: return TEST_FAILED;
+    default: return TEST_UNSURE;
+  }
+}
+
+test_code_t
+test_heartbeat_policy (gnutls_session_t session)
+{
+  sprintf (prio_str,
+           INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+           ":" ALL_KX ":%s", protocol_str, rest);
+  _gnutls_priority_set_direct (session, prio_str);
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
+  gnutls_record_set_max_size (session, 4096);
+
+  gnutls_heartbeat_deny (session);
+  if (gnutls_heartbeat_enabled_local(session)) return TEST_FAILED;
+
+  gnutls_heartbeat_allow (session);
+  if (gnutls_heartbeat_enabled_local(session)) return TEST_SUCCEED;
+
+  return TEST_FAILED;
 }
 
 test_code_t

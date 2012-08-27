@@ -625,6 +625,9 @@ init_tls_session (const char *hostname)
         }
     }
 
+  if (HAVE_OPT(HEARTBEAT))
+    fprintf (stderr, "Set HeartBeat policy: %d.\n", gnutls_heartbeat_allow (session));
+
 #ifdef ENABLE_SESSION_TICKET
   if (disable_extensions == 0 && !HAVE_OPT(NOTICKET)t)
     gnutls_session_ticket_enable_client (session);
@@ -942,7 +945,8 @@ after_handshake:
         }
 
       if (inp == IN_KEYBOARD)
-        {
+      {
+	  if (HAVE_OPT(HEARTBEAT)) fprintf (stderr, "*** HeartBeat: %zu\n", gnutls_heartbeat_ping_rnd (hd.session));
           if ((bytes = read (fileno (stdin), buffer, MAX_BUF - 1)) <= 0)
             {
               if (hd.secure == 0)

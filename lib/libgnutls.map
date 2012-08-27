@@ -301,6 +301,8 @@ GNUTLS_1_4
     gnutls_record_recv;
     gnutls_record_send;
     gnutls_record_set_max_size;
+    gnutls_heartbeat_ping;
+    gnutls_heartbeat_ping_rnd;
     gnutls_rehandshake;
     gnutls_rsa_export_get_modulus_bits;
     gnutls_rsa_export_get_pubkey;
@@ -333,6 +335,11 @@ GNUTLS_1_4
     gnutls_sign_get_id;
     gnutls_sign_get_name;
     gnutls_sign_list;
+    gnutls_heartbeat_allow;
+    gnutls_heartbeat_deny;
+    gnutls_heartbeat_enabled_local;
+    gnutls_heartbeat_enabled_remote;
+    gnutls_heartbeat_timeout;
     gnutls_srp_1024_group_generator;
     gnutls_srp_1024_group_prime;
     gnutls_srp_1536_group_generator;

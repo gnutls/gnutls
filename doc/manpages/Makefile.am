@@ -281,6 +281,7 @@ APIMANS += gnutls_prf.3
 APIMANS += gnutls_prf_raw.3
 APIMANS += gnutls_server_name_set.3
 APIMANS += gnutls_server_name_get.3
+APIMANS += gnutls_heartbeat_policy_set.3
 APIMANS += gnutls_safe_renegotiation_status.3
 APIMANS += gnutls_supplemental_get_name.3
 APIMANS += gnutls_session_ticket_key_generate.3

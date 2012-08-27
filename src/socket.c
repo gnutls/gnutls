@@ -53,6 +53,10 @@ socket_recv (const socket_st * socket, void *buffer, int buffer_size)
     do
       {
         ret = gnutls_record_recv (socket->session, buffer, buffer_size);
+	if (GNUTLS_E_HEARTBEAT_PONG_FAILED == ret) {
+	    fprintf (stderr, "HeartBeat pong failed, ping dropped\n");
+	    ret = GNUTLS_E_AGAIN;
+	}
       }
     while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
   else

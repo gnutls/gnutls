@@ -33,7 +33,6 @@ ssize_t _gnutls_send_int (gnutls_session_t session, content_type_t type,
 ssize_t _gnutls_recv_int (gnutls_session_t session, content_type_t type,
                           gnutls_handshake_description_t, uint8_t * data,
                           size_t sizeofdata, void* seq);
-
 int _gnutls_get_max_decrypted_data(gnutls_session_t session);
 
 #endif
