@@ -442,8 +442,8 @@ gnutls_deinit (gnutls_session_t session)
 
   _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
   _gnutls_buffer_clear (&session->internals.heartbeat_payload);
-  if (&session->internals.record_buffer)
-      _mbuffer_head_clear (&session->internals.record_buffer);
+
+  _mbuffer_head_clear (&session->internals.record_buffer);
   _mbuffer_head_clear (&session->internals.record_recv_buffer);
   _mbuffer_head_clear (&session->internals.record_send_buffer);
 
