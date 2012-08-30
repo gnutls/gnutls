@@ -167,8 +167,8 @@ typedef struct
 /* GCM-PSK */
 #define GNUTLS_PSK_AES_128_GCM_SHA256 { 0x00, 0xA8 }
 #define GNUTLS_DHE_PSK_AES_128_GCM_SHA256 { 0x00, 0xAA }
-#define GNUTLS_PSK_WITH_AES_256_GCM_SHA384 { 0x00, 0xA9 }
-#define GNUTLS_DHE_PSK_WITH_AES_256_GCM_SHA384 { 0x00, 0xAB }
+#define GNUTLS_PSK_AES_256_GCM_SHA384 { 0x00, 0xA9 }
+#define GNUTLS_DHE_PSK_AES_256_GCM_SHA384 { 0x00, 0xAB }
 
 /* PSK - SHA256 HMAC */
 #define GNUTLS_PSK_AES_128_CBC_SHA256 { 0x00, 0xAE }
@@ -611,11 +611,11 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                                 GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ECDHE_ECDSA,
                                 GNUTLS_MAC_SHA384, GNUTLS_TLS1_2,
                                 GNUTLS_VERSION_MAX, 1, GNUTLS_DIG_SHA384),
-  ENTRY_PRF(GNUTLS_PSK_WITH_AES_256_GCM_SHA384,
+  ENTRY_PRF(GNUTLS_PSK_AES_256_GCM_SHA384,
                                 GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_PSK,
                                 GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                                 GNUTLS_VERSION_MAX, 1, GNUTLS_DIG_SHA384),
-  ENTRY_PRF(GNUTLS_DHE_PSK_WITH_AES_256_GCM_SHA384,
+  ENTRY_PRF(GNUTLS_DHE_PSK_AES_256_GCM_SHA384,
                                 GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_DHE_PSK,
                                 GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                                 GNUTLS_VERSION_MAX, 1, GNUTLS_DIG_SHA384),
