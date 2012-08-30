@@ -36,25 +36,52 @@
    @param R        [out] The destination of the double
    @param a        Curve's a value
    @param modulus  The modulus of the field the ECC curve is in
-   @return 0 on success
+   @return         GNUTLS_E_SUCCESS on success
 */
 int
 ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
                               mpz_t a, mpz_t modulus)
 {
+  /* Using "(m)add-2004-hmv" algorithm
+   * It costs 12M + 4S + half. */
   mpz_t t1, t2, x, y, z;
   int err;
 
   if (P == NULL || Q == NULL || R == NULL || modulus == NULL)
-    return -1;
+    return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+
+  /* check for neutral points */
+  if ( (err = ecc_projective_isneutral(Q, modulus)) == 0 ) {
+    /* P + Q = P + neutral = P */
+
+    mpz_set (R->x, P->x);
+    mpz_set (R->y, P->y);
+    mpz_set (R->z, P->z);
+
+    return GNUTLS_E_SUCCESS;
+  } else if (err < 0) {
+    return err;
+  }
+
+  if ( (err = ecc_projective_isneutral(P, modulus)) == 0 ) {
+    /* P + Q = neutral + Q = Q */
+
+    mpz_set (R->x, Q->x);
+    mpz_set (R->y, Q->y);
+    mpz_set (R->z, Q->z);
+
+    return GNUTLS_E_SUCCESS;
+  } else if (err < 0) {
+    return err;
+  }
 
   if ((err = mp_init_multi (&t1, &t2, &x, &y, &z, NULL)) != 0)
     {
       return err;
     }
 
-  /* Check if P == Q and do doubling in that case 
-   * If Q == -P then P+Q=point at infinity
+  /* Check if P == Q and do doubling in that case
+   * If Q == -P then P + Q = neutral element
    */
   if ((mpz_cmp (P->x, Q->x) == 0) &&
       (mpz_cmp (P->z, Q->z) == 0))
@@ -66,7 +93,7 @@ ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
           mp_clear_multi (&t1, &t2, &x, &y, &z, NULL);
           return ecc_projective_dbl_point (P, R, a, modulus);
         }
-      
+
       mpz_sub (t1, modulus, Q->y);
       if (mpz_cmp (P->y, t1) == 0)
         {
@@ -74,7 +101,7 @@ ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
           mpz_set_ui(R->x, 1);
           mpz_set_ui(R->y, 1);
           mpz_set_ui(R->z, 0);
-          return 0;
+          return GNUTLS_E_SUCCESS;
         }
     }
 
@@ -217,7 +244,7 @@ ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
   mpz_set (R->y, y);
   mpz_set (R->z, z);
 
-  err = 0;
+  err = GNUTLS_E_SUCCESS;
 
   mp_clear_multi (&t1, &t2, &x, &y, &z, NULL);
   return err;

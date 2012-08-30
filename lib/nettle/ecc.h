@@ -42,6 +42,13 @@
 /* max private key size */
 #define ECC_MAXSIZE  66
 
+/* wMNAF window size */
+#define WMNAF_WINSIZE 4
+
+/* length of a single array of precomputed values for wMNAF
+ * we have two such arrays for positive and negative multipliers */
+#define WMNAF_PRECOMPUTED_LENGTH (1 << (WMNAF_WINSIZE - 1))
+
 /** Structure defines a NIST GF(p) curve */
 typedef struct {
    /** The size of the curve in octets */
@@ -61,10 +68,10 @@ typedef struct {
 
    /** The order of the curve (hex) */
    const char *order;
-  
+
    /** The x co-ordinate of the base point on the curve (hex) */
    const char *Gx;
- 
+
    /** The y co-ordinate of the base point on the curve (hex) */
    const char *Gy;
 } ecc_set_type;
@@ -103,35 +110,55 @@ typedef struct {
 void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
-int ecc_make_key(void *random_ctx, nettle_random_func random, ecc_key *key, const ecc_set_type *dp);
-int ecc_make_key_ex(void *random_ctx, nettle_random_func random, ecc_key *key, mpz_t prime, mpz_t order, mpz_t A, mpz_t B, mpz_t Gx, mpz_t Gy, int timing_res);
+int ecc_make_key(void *random_ctx, nettle_random_func random, ecc_key *key, const ecc_set_type *dp, gnutls_ecc_curve_t id);
+int ecc_make_key_ex(void *random_ctx, nettle_random_func random, ecc_key *key, mpz_t prime, mpz_t order, mpz_t A, mpz_t B, mpz_t Gx, mpz_t Gy, gnutls_ecc_curve_t id, int timing_res);
 void ecc_free(ecc_key *key);
 
-int  ecc_shared_secret(ecc_key *private_key, ecc_key *public_key, 
+int  ecc_shared_secret(ecc_key *private_key, ecc_key *public_key,
                        unsigned char *out, unsigned long *outlen);
 
-int ecc_sign_hash(const unsigned char *in,  unsigned long inlen, 
+int ecc_sign_hash(const unsigned char *in,  unsigned long inlen,
                         struct dsa_signature *signature,
-                        void *random_ctx, nettle_random_func random, ecc_key *key);
+                        void *random_ctx, nettle_random_func random,
+                        ecc_key *key, gnutls_ecc_curve_t id);
 
 int  ecc_verify_hash(struct dsa_signature * signature,
-                     const unsigned char *hash, unsigned long hashlen, 
-                     int *stat, ecc_key *key);
+                     const unsigned char *hash, unsigned long hashlen,
+                     int *stat, ecc_key *key, gnutls_ecc_curve_t id);
 
 /* low level functions */
 ecc_point *ecc_new_point(void);
 void       ecc_del_point(ecc_point *p);
 
 /* point ops (mp == montgomery digit) */
+/* R = -P */
+int ecc_projective_negate_point(ecc_point *P, ecc_point *R, mpz_t modulus);
+
 /* R = 2P */
 int ecc_projective_dbl_point(ecc_point *P, ecc_point *R, mpz_t a,  mpz_t modulus);
 
 /* R = P + Q */
 int ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, mpz_t A, mpz_t modulus);
+int ecc_projective_add_point_ng(ecc_point *P, ecc_point *Q, ecc_point *R, mpz_t A, mpz_t modulus);
+int ecc_projective_madd (ecc_point* P, ecc_point* Q, ecc_point* R, mpz_t a, mpz_t modulus);
 
 /* R = kG */
 int ecc_mulmod(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
 int ecc_mulmod_timing(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
+
+/* wMNAF-based mulmod */
+signed char* ecc_wMNAF(mpz_t x, size_t *ret_len);
+int ecc_mulmod_wmnaf(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
+
+/* cache-enabled wMNAF-based mulmod */
+int  ecc_wmnaf_cache_init(void);
+void ecc_wmnaf_cache_free(void);
+int ecc_mulmod_wmnaf_cached (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R, mpz_t a, mpz_t modulus, int map);
+int ecc_mulmod_wmnaf_cached_timing (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R, mpz_t a, mpz_t modulus, int map);
+int ecc_mulmod_wmnaf_cached_lookup (mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
+
+/* check if the given point is neutral point */
+int ecc_projective_isneutral(ecc_point *P, mpz_t modulus);
 
 /* map P to affine from projective */
 int ecc_map(ecc_point *P, mpz_t modulus);

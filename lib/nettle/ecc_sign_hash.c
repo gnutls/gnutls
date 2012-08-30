@@ -38,12 +38,14 @@
   @param prng      An active PRNG state
   @param wprng     The index of the PRNG you wish to use
   @param key       A private ECC key
+  @param curve_id  The id of the curve we are working with
   @return 0 if successful
 */
 int
 ecc_sign_hash (const unsigned char *in, unsigned long inlen,
                struct dsa_signature *sig,
-               void *random_ctx, nettle_random_func random, ecc_key * key)
+               void *random_ctx, nettle_random_func random,
+               ecc_key * key, gnutls_ecc_curve_t curve_id)
 {
   ecc_key pubkey;
   mpz_t e;
@@ -72,7 +74,7 @@ ecc_sign_hash (const unsigned char *in, unsigned long inlen,
     {
       if ((err =
            ecc_make_key_ex (random_ctx, random, &pubkey, key->prime,
-                            key->order, key->A, key->B, key->Gx, key->Gy, 1)) != 0)
+                            key->order, key->A, key->B, key->Gx, key->Gy, curve_id, 1)) != 0)
         {
           goto errnokey;
         }

@@ -38,6 +38,7 @@
   @param A            The "a" parameter of the curve
   @param Gx           The x coordinate of the base point
   @param Gy           The y coordinate of the base point
+  @param curve_id     The id of the curve we are working with
   @timing_res         If non zero the function will try to return in constant time.
   @return 0 if successful, upon error all allocated memory will be freed
 */
@@ -45,7 +46,7 @@
 int
 ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
                  mpz_t prime, mpz_t order, mpz_t A, mpz_t B, mpz_t Gx, mpz_t Gy,
-                 int timing_res)
+                 gnutls_ecc_curve_t curve_id, int timing_res)
 {
   int err;
   ecc_point *base;
@@ -92,7 +93,7 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
   mpz_set (base->x, key->Gx);
   mpz_set (base->y, key->Gy);
   mpz_set_ui (base->z, 1);
-  
+
   nettle_mpz_set_str_256_u (key->k, keysize, buf);
 
   /* the key should be smaller than the order of base point */
@@ -102,9 +103,9 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
     }
   /* make the public key */
   if (timing_res)
-    err = ecc_mulmod_timing (key->k, base, &key->pubkey, key->A, key->prime, 1);
+    err = ecc_mulmod_wmnaf_cached_timing (key->k, curve_id, &key->pubkey, key->A, key->prime, 1);
   else
-    err = ecc_mulmod (key->k, base, &key->pubkey, key->A, key->prime, 1);
+    err = ecc_mulmod_wmnaf_cached (key->k, curve_id, &key->pubkey, key->A, key->prime, 1);
 
   if (err != 0)
     goto errkey;
@@ -127,7 +128,7 @@ ERR_BUF:
 
 int
 ecc_make_key (void *random_ctx, nettle_random_func random, ecc_key * key,
-              const ecc_set_type * dp)
+              const ecc_set_type * dp, gnutls_ecc_curve_t curve_id)
 {
   mpz_t prime, order, Gx, Gy, A, B;
   int err;
@@ -146,7 +147,7 @@ ecc_make_key (void *random_ctx, nettle_random_func random, ecc_key * key,
   mpz_set_str (A, (char *) dp->A, 16);
   mpz_set_str (B, (char *) dp->B, 16);
 
-  err = ecc_make_key_ex (random_ctx, random, key, prime, order, A, B, Gx, Gy, 0);
+  err = ecc_make_key_ex (random_ctx, random, key, prime, order, A, B, Gx, Gy, curve_id, 0);
 
   mp_clear_multi (&prime, &order, &A, &B, &Gx, &Gy, NULL);
 cleanup:

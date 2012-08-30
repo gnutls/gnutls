@@ -327,6 +327,10 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
       {
         ecc_key priv;
         struct dsa_signature sig;
+        int curve_id = pk_params->flags;
+
+        if (is_supported_curve(curve_id) == 0)
+          return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
         _ecc_params_to_privkey(pk_params, &priv);
 
@@ -340,8 +344,8 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
             hash_len = vdata->size;
           }
 
-        ret = ecc_sign_hash(vdata->data, hash_len, 
-                            &sig, NULL, rnd_func, &priv);
+        ret = ecc_sign_hash(vdata->data, hash_len,
+                            &sig, NULL, rnd_func, &priv, curve_id);
         if (ret != 0)
           {
             gnutls_assert ();
@@ -468,6 +472,10 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         ecc_key pub;
         struct dsa_signature sig;
         int stat;
+        int curve_id = pk_params->flags;
+
+        if (is_supported_curve(curve_id) == 0)
+          return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
         ret = _gnutls_decode_ber_rs (signature, &tmp[0], &tmp[1]);
         if (ret < 0)
@@ -484,7 +492,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         if (hash_len > vdata->size)
           hash_len = vdata->size;
 
-        ret = ecc_verify_hash(&sig, vdata->data, hash_len, &stat, &pub);
+        ret = ecc_verify_hash(&sig, vdata->data, hash_len, &stat, &pub, curve_id);
         if (ret != 0 || stat != 1)
           {
             gnutls_assert();
@@ -709,7 +717,7 @@ rsa_fail:
         tls_ecc_set.A = st->A;
         tls_ecc_set.B = st->B;
 
-        ret = ecc_make_key(NULL, rnd_func, &key, &tls_ecc_set);
+        ret = ecc_make_key(NULL, rnd_func, &key, &tls_ecc_set, st->id);
         if (ret != 0)
           return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
@@ -889,7 +897,7 @@ dsa_cleanup:
         memcpy(&zero.z, ecc_priv.pubkey.z, sizeof(mpz_t)); /* z = 1 */
 
         /* verify that k*(Gx,Gy)=(x,y) */
-        ret = ecc_mulmod(ecc_priv.k, &zero, R, TOMPZ(params->params[ECC_A]), TOMPZ(params->params[ECC_PRIME]), 1);
+        ret = ecc_mulmod_wmnaf_cached(ecc_priv.k, curve, R, TOMPZ(params->params[ECC_A]), TOMPZ(params->params[ECC_PRIME]), 1);
         if (ret != 0)
           {
             ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);

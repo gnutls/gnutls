@@ -295,6 +295,7 @@ gnutls_global_deinit (void)
   if (_gnutls_init == 1)
     {
       gl_sockets_cleanup ();
+      gnutls_crypto_deinit();
       _gnutls_rnd_deinit ();
       _gnutls_ext_deinit ();
       asn1_delete_structure (&_gnutls_gnutls_asn);

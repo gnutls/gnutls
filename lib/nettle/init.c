@@ -24,6 +24,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 #include <gnutls_mpi.h>
+#include "ecc.h"
 
 /* Functions that refer to the initialization of the nettle library.
  */
@@ -31,5 +32,14 @@
 int
 gnutls_crypto_init (void)
 {
-  return 0;
+  return ecc_wmnaf_cache_init();
+}
+
+/* Functions that refer to the deinitialization of the nettle library.
+ */
+
+void
+gnutls_crypto_deinit (void)
+{
+  ecc_wmnaf_cache_free();
 }
