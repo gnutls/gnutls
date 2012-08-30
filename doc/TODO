@@ -5,6 +5,7 @@ in order to avoid having people working on the same thing.
 Current list:
 * When importing a PKCS #11 certificate, check for its issuers to generate a
   chain (e.g. use the DN to retrieve possible signers).
+* Added support for Certificate Status Request (OCSP) extension (RFC6066)
 * Improve AES assembly. AES in nettle can be improved in x86, arm and
   x86-64.
 * Add support for RSA-PSS. This signature algorithm is seen in some
