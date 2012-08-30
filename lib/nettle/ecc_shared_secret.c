@@ -63,7 +63,7 @@ ecc_shared_secret (ecc_key * private_key, ecc_key * public_key,
     }
 
   if ((err =
-       ecc_mulmod (private_key->k, &public_key->pubkey, result,
+       ecc_mulmod_wmnaf (private_key->k, &public_key->pubkey, result,
                        private_key->A, private_key->prime, 1)) != 0)
     {
       goto done;

@@ -27,126 +27,150 @@
 /*
   @file ecc_projective_dbl_point.c
   ECC Crypto, Tom St Denis
-*/  
+*/
 
 #ifdef ECC_SECP_CURVES_ONLY
 
 /*
    Double an ECC point
-   @param P   The point to double
+   @param P         The point to double
    @param R   [out] The destination of the double
-   @param modulus  The modulus of the field the ECC curve is in
-   @param mp       The "b" value from montgomery_setup()
-   @return 0 on success
+   @param a         Curve's a value
+   @param modulus   The modulus of the field the ECC curve is in
+   @return          GNUTLS_E_SUCCESS on success
 */
 int
-ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a /* a is -3 */,
+ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a,
                               mpz_t modulus)
 {
+   /* Using "dbl-2004-hmv" algorithm.
+    * It costs 4M + 4S + half. */
    mpz_t t1, t2;
-   int   err;
+   int err;
 
    if (P == NULL || R == NULL || modulus == NULL)
-     return -1;
+     return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 
-   if ((err = mp_init_multi(&t1, &t2, NULL)) != 0) {
-      return err;
-   }
+   if ( (err = ecc_projective_isneutral(P, modulus)) == 1 ) {
 
-   if (P != R) {
-      mpz_set(R->x, P->x);
-      mpz_set(R->y, P->y);
-      mpz_set(R->z, P->z);
-   }
+     if ((err = mp_init_multi(&t1, &t2, NULL)) != 0) {
+        return err;
+     }
 
-   /* t1 = Z * Z */
-   mpz_mul(t1, R->z, R->z);
-   mpz_mod(t1, t1, modulus);
-   /* Z = Y * Z */
-   mpz_mul(R->z, R->y, R->z);
-   mpz_mod(R->z, R->z, modulus);
-   /* Z = 2Z */
-   mpz_add(R->z, R->z, R->z);
-   if (mpz_cmp(R->z, modulus) >= 0) {
-      mpz_sub(R->z, R->z, modulus);
-   }
-   
-   /* T2 = X - T1 */
-   mpz_sub(t2, R->x, t1);
-   if (mpz_cmp_ui(t2, 0) < 0) {
-      mpz_add(t2, t2, modulus);
-   }
-   /* T1 = X + T1 */
-   mpz_add(t1, t1, R->x);
-   if (mpz_cmp(t1, modulus) >= 0) {
-      mpz_sub(t1, t1, modulus);
-   }
-   /* T2 = T1 * T2 */
-   mpz_mul(t2, t1, t2);
-   mpz_mod(t2, t2, modulus);
-   /* T1 = 2T2 */
-   mpz_add(t1, t2, t2);
-   if (mpz_cmp(t1, modulus) >= 0) {
-      mpz_sub(t1, t1, modulus);
-   }
-   /* T1 = T1 + T2 */
-   mpz_add(t1, t1, t2);
-   if (mpz_cmp(t1, modulus) >= 0) {
-      mpz_sub(t1, t1, modulus);
-   }
+     if (P != R) {
+       mpz_set(R->x, P->x);
+       mpz_set(R->y, P->y);
+       mpz_set(R->z, P->z);
+     }
 
-   /* Y = 2Y */
-   mpz_add(R->y, R->y, R->y);
-   if (mpz_cmp(R->y, modulus) >= 0) {
-      mpz_sub(R->y, R->y, modulus);
-   }
-   /* Y = Y * Y */
-   mpz_mul(R->y, R->y, R->y);
-   mpz_mod(R->y, R->y, modulus);
-   /* T2 = Y * Y */
-   mpz_mul(t2, R->y, R->y);
-   mpz_mod(t2, t2, modulus);
-   /* T2 = T2/2 */
-   if (mpz_odd_p(t2)) {
-      mpz_add(t2, t2, modulus);
-   }
-   mpz_divexact_ui(t2, t2, 2);
-   /* Y = Y * X */
-   mpz_mul(R->y, R->y, R->x);
-   mpz_mod(R->y, R->y, modulus);
+     if (mpz_cmp_ui (P->z, 1) != 0) {
+         /* t1 = Z * Z */
+         mpz_mul(t1, R->z, R->z);
+         mpz_mod(t1, t1, modulus);
+         /* Z = Y * Z */
+         mpz_mul(R->z, R->y, R->z);
+         mpz_mod(R->z, R->z, modulus);
+         /* Z = 2Z */
+         mpz_add(R->z, R->z, R->z);
+         if (mpz_cmp(R->z, modulus) >= 0) {
+            mpz_sub(R->z, R->z, modulus);
+         }
+     } else {
+         /* t1 = 1 */
+         mpz_set(t1, P->z);
+         /* Z = 2Y */
+         mpz_add(R->z, R->y, R->y);
+         if (mpz_cmp(R->z, modulus) >= 0) {
+            mpz_sub(R->z, R->z, modulus);
+         }
+     }
 
-   /* X  = T1 * T1 */
-   mpz_mul(R->x, t1, t1);
-   mpz_mod(R->x, R->x, modulus);
-   /* X = X - Y */
-   mpz_sub(R->x, R->x, R->y);
-   if (mpz_cmp_ui(R->x, 0) < 0) {
-      mpz_add(R->x, R->x, modulus);
-   }
-   /* X = X - Y */
-   mpz_sub(R->x, R->x, R->y);
-   if (mpz_cmp_ui(R->x, 0) < 0) {
-      mpz_add(R->x, R->x, modulus);
-   }
+     /* T2 = X - T1 */
+     mpz_sub(t2, R->x, t1);
+     if (mpz_cmp_ui(t2, 0) < 0) {
+        mpz_add(t2, t2, modulus);
+     }
+     /* T1 = X + T1 */
+     mpz_add(t1, t1, R->x);
+     if (mpz_cmp(t1, modulus) >= 0) {
+        mpz_sub(t1, t1, modulus);
+     }
+     /* T2 = T1 * T2 */
+     mpz_mul(t2, t1, t2);
+     mpz_mod(t2, t2, modulus);
+     /* T1 = 2T2 */
+     mpz_add(t1, t2, t2);
+     if (mpz_cmp(t1, modulus) >= 0) {
+        mpz_sub(t1, t1, modulus);
+     }
+     /* T1 = T1 + T2 */
+     mpz_add(t1, t1, t2);
+     if (mpz_cmp(t1, modulus) >= 0) {
+        mpz_sub(t1, t1, modulus);
+     }
 
-   /* Y = Y - X */     
-   mpz_sub(R->y, R->y, R->x);
-   if (mpz_cmp_ui(R->y, 0) < 0) {
-      mpz_add(R->y, R->y, modulus);
-   }
-   /* Y = Y * T1 */
-   mpz_mul(R->y, R->y, t1);
-   mpz_mod(R->y, R->y, modulus);
-   /* Y = Y - T2 */
-   mpz_sub(R->y, R->y, t2);
-   if (mpz_cmp_ui(R->y, 0) < 0) {
-      mpz_add( R->y, R->y, modulus);
-   }
- 
-   err = 0;
+     /* Y = 2Y */
+     mpz_add(R->y, R->y, R->y);
+     if (mpz_cmp(R->y, modulus) >= 0) {
+        mpz_sub(R->y, R->y, modulus);
+     }
+     /* Y = Y * Y */
+     mpz_mul(R->y, R->y, R->y);
+     mpz_mod(R->y, R->y, modulus);
+     /* T2 = Y * Y */
+     mpz_mul(t2, R->y, R->y);
+     mpz_mod(t2, t2, modulus);
+     /* T2 = T2/2 */
+     if (mpz_odd_p(t2)) {
+        mpz_add(t2, t2, modulus);
+     }
+     mpz_divexact_ui(t2, t2, 2);
+     /* Y = Y * X */
+     mpz_mul(R->y, R->y, R->x);
+     mpz_mod(R->y, R->y, modulus);
 
-   mp_clear_multi(&t1, &t2, NULL);
-   return err;
+     /* X  = T1 * T1 */
+     mpz_mul(R->x, t1, t1);
+     mpz_mod(R->x, R->x, modulus);
+     /* X = X - Y */
+     mpz_sub(R->x, R->x, R->y);
+     if (mpz_cmp_ui(R->x, 0) < 0) {
+        mpz_add(R->x, R->x, modulus);
+     }
+     /* X = X - Y */
+     mpz_sub(R->x, R->x, R->y);
+     if (mpz_cmp_ui(R->x, 0) < 0) {
+        mpz_add(R->x, R->x, modulus);
+     }
+
+     /* Y = Y - X */
+     mpz_sub(R->y, R->y, R->x);
+     if (mpz_cmp_ui(R->y, 0) < 0) {
+        mpz_add(R->y, R->y, modulus);
+     }
+     /* Y = Y * T1 */
+     mpz_mul(R->y, R->y, t1);
+     mpz_mod(R->y, R->y, modulus);
+     /* Y = Y - T2 */
+     mpz_sub(R->y, R->y, t2);
+     if (mpz_cmp_ui(R->y, 0) < 0) {
+        mpz_add( R->y, R->y, modulus);
+     }
+
+     err = GNUTLS_E_SUCCESS;
+
+     mp_clear_multi(&t1, &t2, NULL);
+     return err;
+   } else if (err == 0) {
+     /* 2*neutral = neutral */
+     mpz_set_ui(R->x, 1);
+     mpz_set_ui(R->y, 1);
+     mpz_set_ui(R->z, 0);
+
+     return GNUTLS_E_SUCCESS;
+   } else {
+     return err;
+   }
 }
 #endif
 /* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ecc_projective_dbl_point.c,v $ */
