@@ -226,8 +226,8 @@ _gnutls_srp_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
   if (priv->password)
     password_len = strlen (priv->password);
 
-  BUFFER_APPEND_PFX (ps, priv->username, username_len);
-  BUFFER_APPEND_PFX (ps, priv->password, password_len);
+  BUFFER_APPEND_PFX4 (ps, priv->username, username_len);
+  BUFFER_APPEND_PFX4 (ps, priv->password, password_len);
 
   return 0;
 }

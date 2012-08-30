@@ -422,7 +422,7 @@ session_ticket_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
   session_ticket_ext_st *priv = epriv.ptr;
   int ret;
 
-  BUFFER_APPEND_PFX (ps, priv->session_ticket, priv->session_ticket_len);
+  BUFFER_APPEND_PFX4 (ps, priv->session_ticket, priv->session_ticket_len);
   BUFFER_APPEND_NUM (ps, priv->session_ticket_enable);
 
   return 0;

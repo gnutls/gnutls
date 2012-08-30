@@ -424,7 +424,7 @@ _gnutls_server_name_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
   for (i = 0; i < priv->server_names_size; i++)
     {
       BUFFER_APPEND_NUM (ps, priv->server_names[i].type);
-      BUFFER_APPEND_PFX (ps, priv->server_names[i].name,
+      BUFFER_APPEND_PFX4 (ps, priv->server_names[i].name,
                          priv->server_names[i].name_length);
     }
   return 0;

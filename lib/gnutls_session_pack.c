@@ -311,20 +311,20 @@ pack_certificate_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
     {
 
       BUFFER_APPEND_NUM (ps, info->dh.secret_bits);
-      BUFFER_APPEND_PFX (ps, info->dh.prime.data, info->dh.prime.size);
-      BUFFER_APPEND_PFX (ps, info->dh.generator.data,
+      BUFFER_APPEND_PFX4 (ps, info->dh.prime.data, info->dh.prime.size);
+      BUFFER_APPEND_PFX4 (ps, info->dh.generator.data,
                          info->dh.generator.size);
-      BUFFER_APPEND_PFX (ps, info->dh.public_key.data,
+      BUFFER_APPEND_PFX4 (ps, info->dh.public_key.data,
                          info->dh.public_key.size);
-      BUFFER_APPEND_PFX (ps, info->rsa_export.modulus.data,
+      BUFFER_APPEND_PFX4 (ps, info->rsa_export.modulus.data,
                          info->rsa_export.modulus.size);
-      BUFFER_APPEND_PFX (ps, info->rsa_export.exponent.data,
+      BUFFER_APPEND_PFX4 (ps, info->rsa_export.exponent.data,
                          info->rsa_export.exponent.size);
 
       BUFFER_APPEND_NUM (ps, info->ncerts);
 
       for (i = 0; i < info->ncerts; i++)
-        BUFFER_APPEND_PFX (ps, info->raw_certificate_list[i].data,
+        BUFFER_APPEND_PFX4 (ps, info->raw_certificate_list[i].data,
                            info->raw_certificate_list[i].size);
     }
 
@@ -443,7 +443,7 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_APPEND_NUM (ps, 0);
   cur_size = ps->length;
 
-  BUFFER_APPEND_PFX (ps, info->username, len);
+  BUFFER_APPEND_PFX4 (ps, info->username, len);
 
   /* write the real size */
   _gnutls_write_uint32 (ps->length - cur_size, ps->data + size_offset);
@@ -522,10 +522,10 @@ pack_anon_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   if (info)
     {
       BUFFER_APPEND_NUM (ps, info->dh.secret_bits);
-      BUFFER_APPEND_PFX (ps, info->dh.prime.data, info->dh.prime.size);
-      BUFFER_APPEND_PFX (ps, info->dh.generator.data,
+      BUFFER_APPEND_PFX4 (ps, info->dh.prime.data, info->dh.prime.size);
+      BUFFER_APPEND_PFX4 (ps, info->dh.generator.data,
                          info->dh.generator.size);
-      BUFFER_APPEND_PFX (ps, info->dh.public_key.data,
+      BUFFER_APPEND_PFX4 (ps, info->dh.public_key.data,
                          info->dh.public_key.size);
     }
 
@@ -629,13 +629,13 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_APPEND_NUM (ps, 0);
   cur_size = ps->length;
 
-  BUFFER_APPEND_PFX (ps, info->username, username_len);
-  BUFFER_APPEND_PFX (ps, info->hint, hint_len);
+  BUFFER_APPEND_PFX4 (ps, info->username, username_len);
+  BUFFER_APPEND_PFX4 (ps, info->hint, hint_len);
 
   BUFFER_APPEND_NUM (ps, info->dh.secret_bits);
-  BUFFER_APPEND_PFX (ps, info->dh.prime.data, info->dh.prime.size);
-  BUFFER_APPEND_PFX (ps, info->dh.generator.data, info->dh.generator.size);
-  BUFFER_APPEND_PFX (ps, info->dh.public_key.data, info->dh.public_key.size);
+  BUFFER_APPEND_PFX4 (ps, info->dh.prime.data, info->dh.prime.size);
+  BUFFER_APPEND_PFX4 (ps, info->dh.generator.data, info->dh.generator.size);
+  BUFFER_APPEND_PFX4 (ps, info->dh.public_key.data, info->dh.public_key.size);
 
   /* write the real size */
   _gnutls_write_uint32 (ps->length - cur_size, ps->data + size_offset);

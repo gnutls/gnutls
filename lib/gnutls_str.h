@@ -123,10 +123,6 @@ int _gnutls_hostname_compare (const char *certname, size_t certnamesize,
         } \
     }
 
-#define BUFFER_APPEND_PFX(b, x, s) { \
-    BUFFER_APPEND_PFX4(b, x, s) \
-    }
-
 /* append data prefixed with 4-bytes length field*/
 #define BUFFER_APPEND_PFX4(b, x, s) { \
         ret = _gnutls_buffer_append_data_prefix(b, 32, x, s); \
