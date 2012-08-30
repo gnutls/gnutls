@@ -114,7 +114,6 @@ static const TLS_TEST tls_tests[] = {
    test_rsa_pms_version_check, "yes", "no", "dunno"},
   {"whether the server can accept Hello Extensions",
    test_hello_extension, "yes", "no", "dunno"},
-  {"whether local HeartBeat Extension policy works", test_heartbeat_policy, "yes", "no", "dunno"},
   {"whether the server can accept HeartBeat Extension", test_heartbeat_extension, "yes", "no", "dunno"},
   {"whether the server can accept small records (512 bytes)",
    test_small_records, "yes", "no", "dunno"},

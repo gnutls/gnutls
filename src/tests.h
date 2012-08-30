@@ -29,7 +29,6 @@ test_code_t test_export (gnutls_session_t state);
 test_code_t test_export_info (gnutls_session_t state);
 test_code_t test_hello_extension (gnutls_session_t state);
 test_code_t test_heartbeat_extension (gnutls_session_t state);
-test_code_t test_heartbeat_policy (gnutls_session_t state);
 test_code_t test_small_records (gnutls_session_t state);
 test_code_t test_dhe (gnutls_session_t state);
 test_code_t test_dhe_group (gnutls_session_t state);
