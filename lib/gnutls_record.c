@@ -659,7 +659,6 @@ record_add_to_buffers (gnutls_session_t session,
         case GNUTLS_HEARTBEAT:
 	    ret = _gnutls_heartbeat_handle (session, bufel);
 	    goto cleanup;
-	    break;
 
         case GNUTLS_APPLICATION_DATA:
           if (session->internals.initial_negotiation_completed == 0)

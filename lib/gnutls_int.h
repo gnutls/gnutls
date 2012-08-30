@@ -889,7 +889,6 @@ typedef struct
   unsigned int handshake_timeout_ms; /* timeout in milliseconds */
 
   gnutls_buffer_st heartbeat_payload; /* store in-flight payload for heartbeat extension*/
-  int heartbeat_policy_set;
 
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */

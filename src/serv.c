@@ -387,8 +387,7 @@ initialize_session (int dtls)
     }
 
   if (HAVE_OPT (HEARTBEAT))
-    fprintf (stderr, "Set HeartBeat policy: %d.\n",
-             gnutls_heartbeat_allow (session));
+    gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 
   return session;
 }

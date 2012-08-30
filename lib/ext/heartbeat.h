@@ -32,27 +32,15 @@
 #define HEARTBEAT_TIMEOUT 1000
 #define MAX_HEARTBEAT_TIMEOUT 60000
 
-#define PEER_ALLOWED_TO_SEND 1
-#define PEER_NOT_ALLOWED_TO_SEND 2
+#define LOCAL_ALLOWED_TO_SEND (1<<2)
+#define LOCAL_NOT_ALLOWED_TO_SEND (1<<3)
 
 #define HEARTBEAT_DEFAULT_POLICY PEER_NOT_ALLOWED_TO_SEND
 
 extern extension_entry_st ext_mod_heartbeat;
 
-typedef union
-{
-  uint32_t num;
-  struct
-  {
-    uint8_t local:1;
-    uint8_t remote:1;
-  } set;
-} heartbeat_policy_t;
+typedef uint8_t heartbeat_policy_t;
 
-int _gnutls_heartbeat_policy_set (gnutls_session_t session, unsigned policy);
-int gnutls_heartbeat_allow (gnutls_session_t session);
-int gnutls_heartbeat_deny (gnutls_session_t session);
-unsigned _gnutls_heartbeat_policy_get (gnutls_session_t session);
 int _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel);
 ssize_t _gnutls_heartbeat_send_data (gnutls_session_t session,
                                      const void *data, size_t data_size,
@@ -60,8 +48,5 @@ ssize_t _gnutls_heartbeat_send_data (gnutls_session_t session,
 ssize_t gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size);
 ssize_t gnutls_heartbeat_ping_rnd (gnutls_session_t session);
 int _gnutls_heartbeat_enabled (gnutls_session_t session, int local);
-int gnutls_heartbeat_enabled_local (gnutls_session_t session);
-int gnutls_heartbeat_enabled_remote (gnutls_session_t session);
 int gnutls_heartbeat_timeout (gnutls_session_t session, int check_only);
-const char * _gnutls_heartbeat (int policy);
 #endif

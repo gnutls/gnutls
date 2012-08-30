@@ -322,8 +322,6 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
   /* the default certificate type for TLS */
   (*session)->security_parameters.cert_type = DEFAULT_CERT_TYPE;
 
-  (*session)->internals.heartbeat_policy_set = 0;
-
   /* Initialize buffers */
   _gnutls_buffer_init (&(*session)->internals.handshake_hash_buffer);
   _gnutls_buffer_init (&(*session)->internals.heartbeat_payload);

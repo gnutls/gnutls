@@ -335,10 +335,8 @@ GNUTLS_1_4
     gnutls_sign_get_id;
     gnutls_sign_get_name;
     gnutls_sign_list;
-    gnutls_heartbeat_allow;
-    gnutls_heartbeat_deny;
-    gnutls_heartbeat_enabled_local;
-    gnutls_heartbeat_enabled_remote;
+    gnutls_heartbeat_enable;
+    gnutls_heartbeat_allowed;
     gnutls_heartbeat_timeout;
     gnutls_srp_1024_group_generator;
     gnutls_srp_1024_group_prime;
