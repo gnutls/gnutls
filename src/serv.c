@@ -730,6 +730,17 @@ listen_socket (const char *name, int listen_port, int socktype)
           continue;
         }
 
+#ifdef HAVE_IPV6
+      if (ptr->ai_family == AF_INET6)
+        {
+          yes = 1;
+          /* avoid listen on ipv6 addresses failing
+	   * because already listening on ipv4 addresses: */
+          setsockopt (s, IPPROTO_IPV6, IPV6_V6ONLY,
+                          (const void *) &yes, sizeof (yes));
+        }
+#endif
+
       if (socktype == SOCK_STREAM)
         {
           yes = 1;
