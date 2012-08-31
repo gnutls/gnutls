@@ -112,18 +112,18 @@ ecc_verify_hash (struct dsa_signature *signature,
   mpz_set (mQ->z, key->pubkey.z);
 
   /* compute u1*mG + u2*mQ = mG */
-  if ((err = ecc_mulmod_wmnaf_cached (u1, curve_id, mG, key->A, key->prime, 0)) != 0)
+  if ((err = ecc_mulmod_cached (u1, curve_id, mG, key->A, key->prime, 0)) != 0)
     {
       goto error;
     }
-  if ((err = ecc_mulmod_wmnaf (u2, mQ, mQ, key->A, key->prime, 0)) != 0)
+  if ((err = ecc_mulmod (u2, mQ, mQ, key->A, key->prime, 0)) != 0)
     {
       goto error;
     }
 
   /* add them */
   if ((err =
-       ecc_projective_add_point_ng (mQ, mG, mG, key->A, key->prime)) != 0)
+       ecc_projective_add_point (mQ, mG, mG, key->A, key->prime)) != 0)
     {
       goto error;
     }

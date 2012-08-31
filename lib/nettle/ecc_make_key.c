@@ -103,9 +103,9 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
     }
   /* make the public key */
   if (timing_res)
-    err = ecc_mulmod_wmnaf_cached_timing (key->k, curve_id, &key->pubkey, key->A, key->prime, 1);
+    err = ecc_mulmod_cached_timing (key->k, curve_id, &key->pubkey, key->A, key->prime, 1);
   else
-    err = ecc_mulmod_wmnaf_cached (key->k, curve_id, &key->pubkey, key->A, key->prime, 1);
+    err = ecc_mulmod_cached (key->k, curve_id, &key->pubkey, key->A, key->prime, 1);
 
   if (err != 0)
     goto errkey;

@@ -69,7 +69,7 @@
    It will work in general case without a change.
 */
 int
-ecc_projective_add_point_ng (ecc_point * P, ecc_point * Q, ecc_point * R,
+ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
                              mpz_t a, mpz_t modulus)
 {
   mpz_t t0, t1, S1, H, HHH, r, V;

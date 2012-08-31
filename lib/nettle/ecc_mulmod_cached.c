@@ -146,7 +146,7 @@ _ecc_wmnaf_cache_entry_init (gnutls_ecc_curve_cache_entry_t * p,
 
   /* pos[1] == 3G */
   if ((err =
-       ecc_projective_add_point_ng (p->pos[0], G, p->pos[1], a,
+       ecc_projective_add_point (p->pos[0], G, p->pos[1], a,
                                     modulus)) != 0)
     goto done;
 
@@ -154,7 +154,7 @@ _ecc_wmnaf_cache_entry_init (gnutls_ecc_curve_cache_entry_t * p,
   for (j = 2; j < WMNAF_PRECOMPUTED_LENGTH; ++j)
     {
       if ((err =
-           ecc_projective_add_point_ng (p->pos[j - 1], p->pos[0], p->pos[j],
+           ecc_projective_add_point (p->pos[j - 1], p->pos[0], p->pos[j],
                                         a, modulus)) != 0)
         goto done;
     }
@@ -243,7 +243,7 @@ done:
    @return     GNUTLS_E_SUCCESS on success
 */
 int
-ecc_mulmod_wmnaf_cached (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R,
+ecc_mulmod_cached (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R,
                          mpz_t a, mpz_t modulus, int map)
 {
   int j, err;
@@ -327,7 +327,7 @@ done:
    @return     GNUTLS_E_SUCCESS on success
 */
 int
-ecc_mulmod_wmnaf_cached_timing (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R,
+ecc_mulmod_cached_timing (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R,
                                 mpz_t a, mpz_t modulus, int map)
 {
   int j, err;
@@ -436,7 +436,7 @@ done:
    @return     GNUTLS_E_SUCCESS on success
 */
 int
-ecc_mulmod_wmnaf_cached_lookup (mpz_t k, ecc_point * G, ecc_point * R,
+ecc_mulmod_cached_lookup (mpz_t k, ecc_point * G, ecc_point * R,
                                 mpz_t a, mpz_t modulus, int map)
 {
   int i, id;
@@ -453,5 +453,5 @@ ecc_mulmod_wmnaf_cached_lookup (mpz_t k, ecc_point * G, ecc_point * R,
         }
     }
 
-  return ecc_mulmod_wmnaf_cached (k, id, R, a, modulus, map);
+  return ecc_mulmod_cached (k, id, R, a, modulus, map);
 }

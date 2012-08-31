@@ -897,7 +897,7 @@ dsa_cleanup:
         memcpy(&zero.z, ecc_priv.pubkey.z, sizeof(mpz_t)); /* z = 1 */
 
         /* verify that k*(Gx,Gy)=(x,y) */
-        ret = ecc_mulmod_wmnaf_cached(ecc_priv.k, curve, R, TOMPZ(params->params[ECC_A]), TOMPZ(params->params[ECC_PRIME]), 1);
+        ret = ecc_mulmod_cached(ecc_priv.k, curve, R, TOMPZ(params->params[ECC_A]), TOMPZ(params->params[ECC_PRIME]), 1);
         if (ret != 0)
           {
             ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);

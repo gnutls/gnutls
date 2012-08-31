@@ -139,23 +139,19 @@ int ecc_projective_dbl_point(ecc_point *P, ecc_point *R, mpz_t a,  mpz_t modulus
 
 /* R = P + Q */
 int ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, mpz_t A, mpz_t modulus);
-int ecc_projective_add_point_ng(ecc_point *P, ecc_point *Q, ecc_point *R, mpz_t A, mpz_t modulus);
 int ecc_projective_madd (ecc_point* P, ecc_point* Q, ecc_point* R, mpz_t a, mpz_t modulus);
 
 /* R = kG */
-int ecc_mulmod(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
-int ecc_mulmod_timing(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
-
 /* wMNAF-based mulmod */
 signed char* ecc_wMNAF(mpz_t x, size_t *ret_len);
-int ecc_mulmod_wmnaf(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
+int ecc_mulmod(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
 
 /* cache-enabled wMNAF-based mulmod */
 int  ecc_wmnaf_cache_init(void);
 void ecc_wmnaf_cache_free(void);
-int ecc_mulmod_wmnaf_cached (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R, mpz_t a, mpz_t modulus, int map);
-int ecc_mulmod_wmnaf_cached_timing (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R, mpz_t a, mpz_t modulus, int map);
-int ecc_mulmod_wmnaf_cached_lookup (mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
+int ecc_mulmod_cached (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R, mpz_t a, mpz_t modulus, int map);
+int ecc_mulmod_cached_timing (mpz_t k, gnutls_ecc_curve_t id, ecc_point * R, mpz_t a, mpz_t modulus, int map);
+int ecc_mulmod_cached_lookup (mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
 
 /* check if the given point is neutral point */
 int ecc_projective_isneutral(ecc_point *P, mpz_t modulus);
