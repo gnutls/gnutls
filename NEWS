@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.1.1 (unreleased)
 
+** gnutls-serv: Listens on IPv6. Patch by Bernhard R. Link.
+
 ** certtool: Changes in password handling of certtool.
 Ask password when required and only if the '--password' option is not
 given. If the '--password' option is given during key generation then 
