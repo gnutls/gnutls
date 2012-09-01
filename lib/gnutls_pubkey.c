@@ -1506,12 +1506,18 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
 
 }
 
-
-int _gnutls_pubkey_compatible_with_sig(gnutls_pubkey_t pubkey, gnutls_protocol_t ver, 
-  gnutls_sign_algorithm_t sign)
+/* Checks whether the public key given is compatible with the
+ * signature algorithm used. The session is only used for audit logging, and
+ * it may be null.
+ */
+int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
+                                       gnutls_pubkey_t pubkey, 
+                                       gnutls_protocol_t ver, 
+                                       gnutls_sign_algorithm_t sign)
 {
 unsigned int hash_size;
 unsigned int hash_algo;
+unsigned int sig_hash_size;
 
   if (pubkey->pk_algorithm == GNUTLS_PK_DSA)
     {
@@ -1525,8 +1531,9 @@ unsigned int hash_algo;
         }
       else if (sign != GNUTLS_SIGN_UNKNOWN)
         {
-          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) < hash_size)
-            return GNUTLS_E_UNWANTED_ALGORITHM;
+          sig_hash_size = _gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign));
+          if (sig_hash_size < hash_size)
+            _gnutls_audit_log(session, "The hash size used in signature (%u) is less than the expected (%u)\n", sig_hash_size, hash_size);
         }
         
     }
@@ -1535,9 +1542,10 @@ unsigned int hash_algo;
       if (_gnutls_version_has_selectable_sighash (ver) && sign != GNUTLS_SIGN_UNKNOWN)
         {
           hash_algo = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
+          sig_hash_size = _gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign));
 
-          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) < hash_size)
-            return GNUTLS_E_UNWANTED_ALGORITHM;
+          if (sig_hash_size < hash_size)
+            _gnutls_audit_log(session, "The hash size used in signature (%u) is less than the expected (%u)\n", sig_hash_size, hash_size);
         }
         
     }

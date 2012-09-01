@@ -271,7 +271,7 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_pcert_st* cert)
     {
       if (_gnutls_sign_get_pk_algorithm (priv->sign_algorithms[i]) == cert_algo)
         {
-          if (_gnutls_pubkey_compatible_with_sig(cert->pubkey, ver, priv->sign_algorithms[i]) < 0)
+          if (_gnutls_pubkey_compatible_with_sig(session, cert->pubkey, ver, priv->sign_algorithms[i]) < 0)
             continue;
 
           if (_gnutls_session_sign_algo_enabled(session, priv->sign_algorithms[i]) < 0)
