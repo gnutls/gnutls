@@ -320,7 +320,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
       _gnutls_handshake_log ("HSK[%p]: verify handshake data: using %s\n",
                     session, gnutls_sign_algorithm_get_name (sign_algo));
 
-      ret = _gnutls_pubkey_compatible_with_sig(cert->pubkey, ver, sign_algo);
+      ret = _gnutls_pubkey_compatible_with_sig(session, cert->pubkey, ver, sign_algo);
       if (ret < 0)
         return gnutls_assert_val(ret);
 
@@ -639,7 +639,7 @@ _gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
     _gnutls_hash_deinit (&td_sha, &concat[16]);
 
   /* ensure 1024 bit DSA keys are used */
-  ret = _gnutls_pubkey_compatible_with_sig(cert->pubkey, ver, GNUTLS_SIGN_UNKNOWN);
+  ret = _gnutls_pubkey_compatible_with_sig(session, cert->pubkey, ver, GNUTLS_SIGN_UNKNOWN);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
