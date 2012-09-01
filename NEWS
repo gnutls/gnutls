@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.0.23 (unreleased)
 
+** gnutls-serv: Listens on IPv6. Patch by Bernhard R. Link.
+
 ** libgnutls: Fixed DSA and ECDSA signature generation in
 smart cards.
 
