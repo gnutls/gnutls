@@ -1532,6 +1532,7 @@ unsigned int sig_hash_size;
       else if (sign != GNUTLS_SIGN_UNKNOWN)
         {
           sig_hash_size = _gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign));
+
           if (sig_hash_size < hash_size)
             _gnutls_audit_log(session, "The hash size used in signature (%u) is less than the expected (%u)\n", sig_hash_size, hash_size);
         }
