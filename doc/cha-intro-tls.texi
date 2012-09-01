@@ -446,21 +446,19 @@ idea, which is implemented in GnuTLS.
 The TLS extension which allows to request response from the peer in a
 way similar to ping command described in @xcite{RFC6520}. This
 extension is disabled by default - user have to call
-@funcref{gnutls_heartbeat_allow} to enable it. Note: this will set
+@funcref{gnutls_heartbeat_enable} to enable it. Note: this will set
 local policy affecting HeartBeat messages coming from the peer - the policy
-could be checked via @funcref{gnutls_heartbeat_enabled_local}. The
-same policy set by the peer for our messages could be checked via
-@funcref{gnutls_heartbeat_enabled_remote}. The requests coming from
-peer are answered automatically (if policy permits) inside
-@funcref{record_add_to_buffers}, requests to peer could be send via
+could be checked via @funcref{gnutls_heartbeat_allowed}. 
+The requests coming from peer are answered automatically (if policy permits) 
+inside @funcref{gnutls_record_recv}, requests to peer could be send via
 @funcref{gnutls_heartbeat_ping} or
 @funcref{gnutls_heartbeat_ping_rnd}. Each request triggers timeout
 which could be checked and manipulated with @funcref{gnutls_heartbeat_timeout}.
 
 Policy-related functions:
-@showfuncB{gnutls_heartbeat_allow,gnutls_heartbeat_deny}, @showfuncB{gnutls_heartbeat_enabled_local,gnutls_heartbeat_enabled_remote}
+@showfuncB{gnutls_heartbeat_allowed,gnutls_heartbeat_enable}
 Operational functions:
-@showfuncB{gnutls_heartbeat_timeout},@showfuncB{gnutls_heartbeat_ping,gnutls_heartbeat_ping_rnd}
+@showfuncC{gnutls_heartbeat_timeout,gnutls_heartbeat_ping,gnutls_heartbeat_ping_rnd}
 
 @node Safe renegotiation
 @subsection Safe renegotiation
