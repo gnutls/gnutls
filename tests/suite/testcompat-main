@@ -59,6 +59,9 @@ CA_ECC_CERT=$srcdir/../certs/ca-cert-ecc.pem
 ECC224_CERT=$srcdir/../certs/cert-ecc.pem
 ECC224_KEY=$srcdir/../certs/ecc.pem
 
+ECC256_CERT=$srcdir/../certs/cert-ecc256.pem
+ECC256_KEY=$srcdir/../certs/ecc256.pem
+
 ECC521_CERT=$srcdir/../certs/cert-ecc521.pem
 ECC521_KEY=$srcdir/../certs/ecc521.pem
 
@@ -374,12 +377,45 @@ $OPENSSL_CLI s_client  -host localhost -tls1 -port $PORT -cert $CLI_CERT -key $C
 kill $PID
 wait
 
-echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC_CERT --x509keyfile $ECC_KEY --x509cafile $CA_ECC_CERT & PID=$!
+echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP224R1)"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY --x509cafile $CA_ECC_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-ECDSA-AES128-SHA 
-$OPENSSL_CLI s_client  -host localhost -tls1 -port $PORT -cert $ECC_CERT -key $ECC_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
+$OPENSSL_CLI s_client  -host localhost -tls1 -port $PORT -cert $ECC224_CERT -key $ECC224_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP256R1)"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC256_CERT --x509keyfile $ECC256_KEY --x509cafile $CA_ECC_CERT & PID=$!
+wait_server $PID
+
+#-cipher ECDHE-ECDSA-AES128-SHA 
+$OPENSSL_CLI s_client  -host localhost -tls1 -port $PORT -cert $ECC256_CERT -key $ECC256_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP384R1)"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY --x509cafile $CA_ECC_CERT & PID=$!
+wait_server $PID
+
+#-cipher ECDHE-ECDSA-AES128-SHA 
+$OPENSSL_CLI s_client  -host localhost -tls1 -port $PORT -cert $ECC384_CERT -key $ECC384_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP521R1)"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY --x509cafile $CA_ECC_CERT & PID=$!
+wait_server $PID
+
+#-cipher ECDHE-ECDSA-AES128-SHA 
+$OPENSSL_CLI s_client  -host localhost -tls1 -port $PORT -cert $ECC521_CERT -key $ECC521_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
   fail $PID "Failed"
 
 kill $PID
@@ -418,12 +454,45 @@ $OPENSSL_CLI s_client  -host localhost -tls1_2 -port $PORT -cert $CLI_CERT -key 
 kill $PID
 wait
 
-echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC_CERT --x509keyfile $ECC_KEY --x509cafile $CA_ECC_CERT & PID=$!
+echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP224R1)"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY --x509cafile $CA_ECC_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-ECDSA-AES128-SHA 
-$OPENSSL_CLI s_client  -host localhost -tls1_2 -port $PORT -cert $ECC_CERT -key $ECC_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
+$OPENSSL_CLI s_client  -host localhost -tls1_2 -port $PORT -cert $ECC224_CERT -key $ECC224_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP256R1)"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC256_CERT --x509keyfile $ECC256_KEY --x509cafile $CA_ECC_CERT & PID=$!
+wait_server $PID
+
+#-cipher ECDHE-ECDSA-AES128-SHA 
+$OPENSSL_CLI s_client  -host localhost -tls1_2 -port $PORT -cert $ECC256_CERT -key $ECC256_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP384R1)"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY --x509cafile $CA_ECC_CERT & PID=$!
+wait_server $PID
+
+#-cipher ECDHE-ECDSA-AES128-SHA 
+$OPENSSL_CLI s_client  -host localhost -tls1_2 -port $PORT -cert $ECC384_CERT -key $ECC384_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP521R1)"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY --x509cafile $CA_ECC_CERT & PID=$!
+wait_server $PID
+
+#-cipher ECDHE-ECDSA-AES128-SHA 
+$OPENSSL_CLI s_client  -host localhost -tls1_2 -port $PORT -cert $ECC521_CERT -key $ECC521_KEY -CAfile $CA_ECC_CERT </dev/null 2>&1 | grep "\:error\:" && \
   fail $PID "Failed"
 
 kill $PID
