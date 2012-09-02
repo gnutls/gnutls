@@ -125,7 +125,7 @@ int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 fd_set rfds;
 struct timeval tv;
-int ret, ret2;
+int ret;
 int fd = GNUTLS_POINTER_TO_INT(ptr);
 
   FD_ZERO(&rfds);
@@ -144,10 +144,6 @@ int fd = GNUTLS_POINTER_TO_INT(ptr);
   if (ret <= 0)
     return ret;
 
-  ret2 = recv(fd, NULL, 0, MSG_PEEK);
-  if (ret2 == -1)
-    return ret2;
-      
   return ret;
 }
 
