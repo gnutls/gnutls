@@ -1,15 +1,15 @@
-GNUTLS_VERSION:=3.0.20
+GNUTLS_VERSION:=3.1.1
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
-GMP_FILE:=gmp-5.0.4.tar.bz2
-GMP_DIR:=gmp-5.0.4
+GMP_FILE:=gmp-5.0.5.tar.bz2
+GMP_DIR:=gmp-5.0.5
 
-P11_KIT_FILE:=p11-kit-0.12.tar.gz
-P11_KIT_DIR:=p11-kit-0.12
+P11_KIT_FILE:=p11-kit-0.13.tar.gz
+P11_KIT_DIR:=p11-kit-0.13
 
-NETTLE_FILE:=nettle-2.4.tar.gz
-NETTLE_DIR:=nettle-2.4
+NETTLE_FILE:=nettle-2.5.tar.gz
+NETTLE_DIR:=nettle-2.5
 
 CROSS_DIR:=$(PWD)/win32
 BIN_DIR:=$(CROSS_DIR)/bin
