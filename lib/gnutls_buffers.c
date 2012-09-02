@@ -657,8 +657,12 @@ _gnutls_io_check_recv (gnutls_session_t session, unsigned int ms)
   ret = session->internals.pull_timeout_func(fd, ms);
 
   err = get_errno (session);
-  if (ret == -1)                 
-    return errno_to_gerr(err);
+  if (ret == -1)
+    {
+      _gnutls_read_log ("READ_TIMEOUT: %d returned from %p, errno=%d (timeout: %u)\n",
+			(int) ret, fd, err, ms);
+      return errno_to_gerr(err);
+    }
 
   if (ret > 0)
     return 0;
