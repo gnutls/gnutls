@@ -275,6 +275,8 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
   deinit_internal_params (session);
   
   _gnutls_epoch_gc(session);
+
+  session->internals.handshake_endtime = 0;
 }
 
 #define MIN_DH_BITS 727
