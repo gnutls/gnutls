@@ -13,6 +13,10 @@ assume the PKCS #8 file format, instead of ignoring the password.
 
 ** tpmtool: No longer asks for key password in registered keys.
 
+** libgnutls: The default pull_timeout_function only uses select
+instead of a combination of select() and recv() to prevent issues
+when used in stream sockets in some systems.
+
 ** libgnutls: Be tolerant in ECDSA signature violations (e.g. using
 SHA256 with a SECP384 curve instead of SHA-384), to interoperate with
 openssl.
