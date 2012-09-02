@@ -460,12 +460,6 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
   /* READ DATA
    */
   if (readsize > 0)
