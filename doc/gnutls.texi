@@ -75,52 +75,52 @@ Documentation License''.
 
 @macro showfuncA{ref}
 @table @code
-@include functions.short/\ref\
+@include functions/\ref\.short
 @end table
 @end macro
 
 @macro showfuncB{ref1,ref2}
 @table @code
-@include functions.short/\ref1\
-@include functions.short/\ref2\
+@include functions/\ref1\.short
+@include functions/\ref2\.short
 @end table
 @end macro
 
 @macro showfuncC{ref1,ref2,ref3}
 @table @code
-@include functions.short/\ref1\
-@include functions.short/\ref2\
-@include functions.short/\ref3\
+@include functions/\ref1\.short
+@include functions/\ref2\.short
+@include functions/\ref3\.short
 @end table
 @end macro
 
 @macro showfuncD{ref1,ref2,ref3,ref4}
 @table @code
-@include functions.short/\ref1\
-@include functions.short/\ref2\
-@include functions.short/\ref3\
-@include functions.short/\ref4\
+@include functions/\ref1\.short
+@include functions/\ref2\.short
+@include functions/\ref3\.short
+@include functions/\ref4\.short
 @end table
 @end macro
 
 @macro showfuncE{ref1,ref2,ref3,ref4,ref5}
 @table @code
-@include functions.short/\ref1\
-@include functions.short/\ref2\
-@include functions.short/\ref3\
-@include functions.short/\ref4\
-@include functions.short/\ref5\
+@include functions/\ref1\.short
+@include functions/\ref2\.short
+@include functions/\ref3\.short
+@include functions/\ref4\.short
+@include functions/\ref5\.short
 @end table
 @end macro
 
 @macro showfuncF{ref1,ref2,ref3,ref4,ref5,ref6}
 @table @code
-@include functions.short/\ref1\
-@include functions.short/\ref2\
-@include functions.short/\ref3\
-@include functions.short/\ref4\
-@include functions.short/\ref5\
-@include functions.short/\ref6\
+@include functions/\ref1\.short
+@include functions/\ref2\.short
+@include functions/\ref3\.short
+@include functions/\ref4\.short
+@include functions/\ref5\.short
+@include functions/\ref6\.short
 @end table
 @end macro
 
