@@ -67,14 +67,12 @@ client_log_func (int level, const char *str)
 /* A very basic TLS client, with anonymous authentication.
  */
 
-static int counter;
-gnutls_session_t session;
-
 static void
 client (int fd, int wait)
 {
   int ret;
   gnutls_anon_client_credentials_t anoncred;
+  gnutls_session_t session;
   /* Need to enable anonymous KX specifically. */
 
   gnutls_global_init ();
@@ -90,7 +88,7 @@ client (int fd, int wait)
   /* Initialize TLS session
    */
   gnutls_init (&session, GNUTLS_CLIENT);
-  gnutls_handshake_set_timeout( session, 10*1000);
+  gnutls_handshake_set_timeout( session, 20*1000);
 
   /* Use default priorities */
   gnutls_priority_set_direct (session, "NORMAL:+ANON-ECDH", NULL);
@@ -98,8 +96,6 @@ client (int fd, int wait)
   /* put the anonymous credentials to the current session
    */
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
-
-  counter = 0;
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
 
@@ -138,32 +134,24 @@ client (int fd, int wait)
   exit(0);
 }
 
-
-/* These are global */
-gnutls_anon_server_credentials_t anoncred;
-pid_t child;
-
-static gnutls_session_t
-initialize_tls_session (void)
+static void
+initialize_tls_session (gnutls_session_t * session)
 {
-  gnutls_session_t session;
-
-  gnutls_init (&session, GNUTLS_SERVER);
+  gnutls_init (session, GNUTLS_SERVER);
 
   /* avoid calling all the priority functions, since the defaults
    * are adequate.
    */
-  gnutls_priority_set_direct (session, "NORMAL:+ANON-ECDH", NULL);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
-
-  return session;
+  gnutls_priority_set_direct (*session, "NORMAL:+ANON-ECDH", NULL);
 }
 
 static void
 server (int fd, int wait)
 {
 int ret;
+gnutls_session_t session;
+gnutls_anon_server_credentials_t anoncred;
+
   /* this must be called once in the program
    */
   gnutls_global_init ();
@@ -176,13 +164,12 @@ int ret;
 
   gnutls_anon_allocate_server_credentials (&anoncred);
 
-  session = initialize_tls_session ();
-
-  counter = 0;
+  initialize_tls_session (&session);
+  gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
 
-  if (wait) sleep(15);
+  if (wait) sleep(25);
   else do 
     {
       ret = gnutls_handshake (session);
@@ -192,17 +179,13 @@ int ret;
   gnutls_deinit (session);
   gnutls_anon_free_server_credentials(anoncred);
   gnutls_global_deinit();
-
-  if (ret < 0)
-    {
-      return;
-    }
 }
 
 static void start (int wait)
 {
   int fd[2];
   int ret;
+  pid_t child;
   
   if (debug && wait)
     fprintf(stderr, "\nWill test timeout\n");
