@@ -663,13 +663,9 @@ _gnutls_io_check_recv (gnutls_session_t session, unsigned int ms)
   ret = session->internals.pull_timeout_func(fd, ms);
 
   err = get_errno (session);
-  if (ret == -1 && err == EINTR)
-    return GNUTLS_E_INTERRUPTED;
-  else if (ret == -1 && err == EAGAIN)
-    return GNUTLS_E_AGAIN;
-  else if (ret == -1)
-    return gnutls_assert_val(GNUTLS_E_PULL_ERROR);
-  
+  if (ret == -1)                 
+    return errno_to_gerr(err);
+
   if (ret > 0)
     return 0;
   else return GNUTLS_E_TIMEDOUT;
