@@ -745,7 +745,7 @@ listen_socket (const char *name, int listen_port, int socktype)
           continue;
         }
 
-#ifdef HAVE_IPV6
+#if defined(HAVE_IPV6) && !defined(_WIN32)
       if (ptr->ai_family == AF_INET6)
         {
           yes = 1;

@@ -28,6 +28,14 @@
  *  66a5cedaf62c4b2637025f049f9b826f pkg/libopts/COPYING.mbsd
  */
 
+#include <config.h>
+
+/* Work around problem reported in
+   <http://permalink.gmane.org/gmane.comp.lib.gnulib.bugs/15755>.*/
+#if GETTIMEOFDAY_CLOBBERS_LOCALTIME
+#undef localtime
+#endif
+
 tOptions * optionParseShellOptions = NULL;
 
 static char const * shell_prog = NULL;
