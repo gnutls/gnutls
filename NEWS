@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.1 (unreleased)
+* Version 3.1.1 (released 2012-09-02)
 
 ** gnutls-serv: Listens on IPv6. Patch by Bernhard R. Link.
 
@@ -12,6 +12,10 @@ given. If the '--password' option is given during key generation then
 assume the PKCS #8 file format, instead of ignoring the password.
 
 ** tpmtool: No longer asks for key password in registered keys.
+
+** libgnutls: Elliptic curve code was optimized by Ilya Tumaykin.
+wmNAF is now used for point multiplication and other optimizations.
+(the major part of the work was done during Google Summer of Code).
 
 ** libgnutls: The default pull_timeout_function only uses select
 instead of a combination of select() and recv() to prevent issues
