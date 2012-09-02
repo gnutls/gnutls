@@ -19,6 +19,10 @@ DEVCPP_DIR:=$(PWD)/devcpp
 
 all: update-gpg-keys gnutls-w32
 
+upload: gnutls-w32 devpak
+	../build-aux/gnupload --to ftp.gnu.org:gnutls/w32 $(GNUTLS_DIR)-w32.zip
+	../build-aux/gnupload --to ftp.gnu.org:gnutls/w32 gnutls-$(GNUTLS_VERSION)-1gn.DevPak
+
 update-gpg-keys:
 	gpg --recv-keys 96865171 B565716F D92765AF A8F4C2FD DB899F46
 
