@@ -69,7 +69,7 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
   
   if (cas != NULL && cas->data != NULL)
     {
-      ret = gnutls_x509_crt_list_import2( &x509_ca_list, &x509_ncas, cas, GNUTLS_X509_FMT_PEM, 0);
+      ret = gnutls_x509_crt_list_import2( &x509_ca_list, &x509_ncas, cas, type, 0);
       if (ret < 0)
         return gnutls_assert_val(ret);
 
@@ -84,7 +84,7 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
 
   if (crls != NULL && crls->data != NULL)
     {
-      ret = gnutls_x509_crl_list_import2( &x509_crl_list, &x509_ncrls, crls, GNUTLS_X509_FMT_PEM, 0);
+      ret = gnutls_x509_crl_list_import2( &x509_crl_list, &x509_ncrls, crls, type, 0);
       if (ret < 0)
         return gnutls_assert_val(ret);
 
