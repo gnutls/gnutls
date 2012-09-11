@@ -33,19 +33,23 @@
 
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
 
+/* GMP lacks this typedef in versions prior to 5 */
+#if __GNU_MP__ < 5
+typedef unsigned long int mp_bitcnt_t;
+#endif
+
 /*
  * A local replacement for mpz_tstbit.
- * It is needed because for negative numbers original mpz_tstbit
- * returns an infinite number of `1`s after all bits of input number.
- * For positive numbers it returns zeros after all bits of input number.
+ * It is needed because original mpz_tstbit process negative numbers
+ * in a two-complement manner and we don't want it.
  * This function mimics mpz_tstbit behavior for positive numbers in both cases.
  */
 static int
-mpz_unitstbit (mpz_srcptr u, mp_bitcnt_t bit_index)
+mpz_unitstbit (mpz_t u, mp_bitcnt_t bit_index)
   __GMP_NOTHROW
 {
-  mp_srcptr u_ptr = (u)->_mp_d;
-  mp_size_t size = (u)->_mp_size;
+  mp_srcptr u_ptr = u->_mp_d;
+  mp_size_t size = u->_mp_size;
   unsigned abs_size = ABS (size);
   mp_size_t limb_index = bit_index / GMP_NUMB_BITS;
   mp_srcptr p = u_ptr + limb_index;
