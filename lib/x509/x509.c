@@ -2153,10 +2153,12 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
                             int irdn, int iava, gnutls_x509_ava_st * ava)
 {
   ASN1_TYPE rdn, elem;
+  ASN1_DATA_NODE vnode;
   long len;
   int lenlen, remlen, ret;
   char rbuf[ASN1_MAX_NAME_SIZE];
-  unsigned char cls, *ptr;
+  unsigned char cls;
+  const unsigned char *ptr;
 
   iava++;
   irdn++;                       /* 0->1, 1->2 etc */
@@ -2177,8 +2179,15 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
       return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
     }
 
-  ava->oid.data = elem->value;
-  ava->oid.size = elem->value_len;
+  ret = asn1_read_node_value(elem, &vnode);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+    }
+
+  ava->oid.data = (void*)vnode.value;
+  ava->oid.size = vnode.value_len;
 
   snprintf (rbuf, sizeof (rbuf), "?%d.value", iava);
   elem = asn1_find_node (rdn, rbuf);
@@ -2188,12 +2197,18 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
       return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
     }
 
+  ret = asn1_read_node_value(elem, &vnode);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+    }
   /* The value still has the previous tag's length bytes, plus the
    * current value's tag and length bytes. Decode them.
    */
 
-  ptr = elem->value;
-  remlen = elem->value_len;
+  ptr = vnode.value;
+  remlen = vnode.value_len;
   len = asn1_get_length_der (ptr, remlen, &lenlen);
   if (len < 0)
     {
@@ -2224,7 +2239,7 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
       }
     ava->value.size = tmp;
   }
-  ava->value.data = ptr + lenlen;
+  ava->value.data = (void*)(ptr + lenlen);
 
   return 0;
 }
