@@ -255,9 +255,7 @@ doit (void)
   if (ret < 1)
     fail("gnutls_x509_trust_list_add_trust_mem: %d\n", __LINE__);
 
-  gnutls_x509_crt_deinit(ca_crt);
-  gnutls_x509_crt_deinit(server_crt);
-  gnutls_x509_trust_list_deinit(tl, 0);
+  gnutls_x509_trust_list_deinit(tl, 1);
   
   gnutls_global_deinit();
   
