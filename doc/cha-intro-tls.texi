@@ -188,6 +188,9 @@ on @xcite{RFC3749}. The supported algorithms are shown below.
 
 @showenumdesc{gnutls_compression_method_t,Supported compression algorithms}
 
+Note that compression enables attacks such as traffic analysis, or even
+plaintext recovery under certain circumstances.
+
 @node Weaknesses and countermeasures
 @subsection Weaknesses and countermeasures
 
