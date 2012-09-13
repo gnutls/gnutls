@@ -17,7 +17,7 @@ RSAPublicKey ::= SEQUENCE {
 -- CRT algorithm.
 --
 RSAPrivateKey ::= SEQUENCE {
-  version          Version,
+  version          INTEGER,
   modulus          INTEGER, -- (Usually large) n
   publicExponent   INTEGER, -- (Usually small) e
   privateExponent  INTEGER, -- (Usually large) d
@@ -28,9 +28,6 @@ RSAPrivateKey ::= SEQUENCE {
   coefficient      INTEGER, -- (Usually large) (inverse of q) mod p
   otherPrimeInfos  OtherPrimeInfos OPTIONAL
 }
-
-Version ::= INTEGER { two-prime(0), multi(1) }
--- (CONSTRAINED BY { version must be multi if otherPrimeInfos present }) --
 
 OtherPrimeInfos ::= SEQUENCE SIZE(1..MAX) OF OtherPrimeInfo
 
