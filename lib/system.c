@@ -31,6 +31,11 @@
 #ifdef _WIN32
 # include <windows.h>
 # include <wincrypt.h>
+#  if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
+typedef PCCRL_CONTEXT WINAPI (*Type_CertEnumCRLsInStore) (HCERTSTORE hCertStore, PCCRL_CONTEXT pPrevCrlContext);
+static Type_CertEnumCRLsInStore Loaded_CertEnumCRLsInStore;
+static HMODULE Crypt32_dll;
+#  endif
 
 #else
 # ifdef HAVE_PTHREAD_LOCKS
@@ -51,10 +56,7 @@
 /* System specific function wrappers.
  */
 
-/* wrappers for write() and writev()
- */
 #ifdef _WIN32
-
 int
 system_errno (gnutls_transport_ptr p)
 {
@@ -150,9 +152,6 @@ int fd = GNUTLS_POINTER_TO_INT(ptr);
 /* Thread stuff */
 
 #ifdef HAVE_WIN32_LOCKS
-
-
-/* FIXME: win32 locks are untested */
 static int
 gnutls_system_mutex_init (void **priv)
 {
@@ -285,6 +284,41 @@ mutex_deinit_func gnutls_mutex_deinit = gnutls_system_mutex_deinit;
 mutex_lock_func gnutls_mutex_lock = gnutls_system_mutex_lock;
 mutex_unlock_func gnutls_mutex_unlock = gnutls_system_mutex_unlock;
 
+int
+gnutls_system_global_init ()
+{
+#ifdef _WIN32
+# if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
+  HMODULE crypto;
+  crypto = LoadLibraryA ("Crypt32.dll");
+
+  if (crypto == NULL)
+    return GNUTLS_E_CRYPTO_INIT_FAILED;
+
+  Loaded_CertEnumCRLsInStore = (Type_CertEnumCRLsInStore) GetProcAddress (crypto, "CertEnumCRLsInStore");
+  if (Loaded_CertEnumCRLsInStore == NULL)
+    {
+      FreeLibrary (crypto);
+      return GNUTLS_E_CRYPTO_INIT_FAILED;
+    }
+
+  Crypt32_dll = crypto;
+# endif
+#endif
+  return 0;
+}
+
+void
+gnutls_system_global_deinit ()
+{
+#ifdef _WIN32
+# if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
+  FreeLibrary (Crypt32_dll);
+# endif
+#endif
+}
+
+
 #define CONFIG_PATH ".gnutls"
 
 /* Returns a path to store user-specific configuration
@@ -392,7 +426,7 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
     if (store == NULL) return GNUTLS_E_FILE_ERROR;
 
     cert = CertEnumCertificatesInStore(store, NULL);
-    crl = CertEnumCRLsInStore(store, NULL);
+    crl = Loaded_CertEnumCRLsInStore(store, NULL);
 
     while(cert != NULL) 
       {
@@ -414,7 +448,7 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
             data.size = crl->cbCrlEncoded;
             gnutls_x509_trust_list_add_trust_mem(list, NULL, &data, GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
           }
-        crl = CertEnumCRLsInStore(store, crl);
+        crl = Loaded_CertEnumCRLsInStore(store, crl);
       }
     CertCloseStore(store, 0);
   }
