@@ -53,6 +53,8 @@ rpl_ioctl (int fd, int request, ... /* {void *,char *} arg */)
 # include "fd-hook.h"
 /* Get _get_osfhandle.  */
 # include "msvc-nothrow.h"
+/* Get HANDLE */
+# include <windows.h>
 
 static int
 primary_ioctl (int fd, int request, void *arg)
