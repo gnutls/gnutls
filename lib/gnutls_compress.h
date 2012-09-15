@@ -48,7 +48,7 @@ int _gnutls_decompress (comp_hd_st* handle, uint8_t * compressed,
                         size_t compressed_size, uint8_t * plain,
                         size_t max_plain_size);
 int _gnutls_compress (comp_hd_st*, const uint8_t * plain, size_t plain_size,
-                      uint8_t * compressed, size_t max_comp_size);
+                      uint8_t * compressed, size_t max_comp_size, unsigned int stateless);
 
 struct gnutls_compression_entry
 {
