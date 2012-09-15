@@ -767,6 +767,7 @@ extern "C"
                                           const gnutls_datum_t * x);
 
   int gnutls_x509_privkey_get_pk_algorithm (gnutls_x509_privkey_t key);
+  int gnutls_x509_privkey_get_pk_algorithm2 (gnutls_x509_privkey_t key, unsigned int *bits);
   int gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
                                       unsigned int flags,
                                       unsigned char *output_data,

@@ -1576,15 +1576,15 @@ const char *cprint;
   /* Public key algorithm
    */
   fprintf (outfile, "Public Key Info:\n");
-  ret = gnutls_x509_privkey_get_pk_algorithm (key);
+  ret = gnutls_x509_privkey_get_pk_algorithm2 (key, &bits);
   fprintf (outfile, "\tPublic Key Algorithm: ");
 
   key_type = ret;
 
   cprint = gnutls_pk_algorithm_get_name (key_type);
   fprintf (outfile, "%s\n", cprint ? cprint : "Unknown");
-  fprintf (outfile, "\tKey Security Level: %s\n\n",
-           gnutls_sec_param_get_name (gnutls_x509_privkey_sec_param (key)));
+  fprintf (outfile, "\tKey Security Level: %s (%u bits)\n\n",
+           gnutls_sec_param_get_name (gnutls_x509_privkey_sec_param (key)), bits);
 
   /* Print the raw public and private keys
    */
@@ -1601,7 +1601,6 @@ const char *cprint;
       else
         {
           print_rsa_pkey (outfile, &m, &e, &d, &p, &q, &u, &exp1, &exp2);
-          bits = m.size * 8;
 
           gnutls_free (m.data);
           gnutls_free (e.data);
@@ -1624,7 +1623,6 @@ const char *cprint;
       else
         {
           print_dsa_pkey (outfile, &x, &y, &p, &q, &g);
-          bits = y.size * 8;
 
           gnutls_free (x.data);
           gnutls_free (y.data);
@@ -1645,7 +1643,6 @@ const char *cprint;
       else
         {
           print_ecc_pkey (outfile, curve, &k, &x, &y);
-          bits = gnutls_ecc_curve_get_size(curve) * 8;
 
           gnutls_free (x.data);
           gnutls_free (y.data);

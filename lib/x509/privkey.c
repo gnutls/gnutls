@@ -985,6 +985,38 @@ gnutls_x509_privkey_get_pk_algorithm (gnutls_x509_privkey_t key)
 }
 
 /**
+ * gnutls_x509_privkey_get_pk_algorithm2:
+ * @key: should contain a #gnutls_x509_privkey_t structure
+ * @bits: The number of bits in the public key algorithm
+ *
+ * This function will return the public key algorithm of a private
+ * key.
+ *
+ * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
+ *   success, or a negative error code on error.
+ **/
+int
+gnutls_x509_privkey_get_pk_algorithm2 (gnutls_x509_privkey_t key, unsigned int *bits)
+{
+int ret;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  if (bits)
+    {
+      ret = pubkey_to_bits(key->pk_algorithm, &key->params);
+      if (ret < 0) ret = 0;
+      *bits = ret;
+    }
+
+  return key->pk_algorithm;
+}
+
+/**
  * gnutls_x509_privkey_export:
  * @key: Holds the key
  * @format: the format of output params. One of PEM or DER.
