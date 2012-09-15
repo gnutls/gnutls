@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.24 (unreleased)
+
+** libgnutls: The %COMPAT keyword, if specified, will tolerate
+key usage violation errors (they are far too common to ignore).
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.23 (released 2012-09-02)
 
 ** gnutls-serv: Listens on IPv6. Patch by Bernhard R. Link.
