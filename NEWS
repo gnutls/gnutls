@@ -7,6 +7,10 @@ See the end for copying conditions.
 ** libgnutls: The %COMPAT keyword, if specified, will tolerate
 key usage violation errors (they are far too common to ignore).
 
+** libgnutls: Added GNUTLS_STATELESS_COMPRESSION flag to gnutls_init(),
+which provides a tool to counter compression-related attacks where
+parts of the data are controlled by the attacker.
+
 ** API and ABI modifications:
 No changes since last version.
 
