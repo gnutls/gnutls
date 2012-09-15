@@ -222,7 +222,10 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
         if (!(cert->key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
           {
             gnutls_assert ();
-            return GNUTLS_E_KEY_USAGE_VIOLATION;
+            if (session->internals.priorities.allow_key_usage_violation == 0)
+              return GNUTLS_E_KEY_USAGE_VIOLATION;
+            else
+              _gnutls_debug_log("Key usage violation was detected (ignored).\n");
           }
 
       /* External signing. */
@@ -270,7 +273,7 @@ es_cleanup:
 }
 
 static int
-verify_tls_hash (gnutls_protocol_t ver, gnutls_cert * cert,
+verify_tls_hash (gnutls_session_t session, gnutls_protocol_t ver, gnutls_cert * cert,
                     const gnutls_datum_t * hash_concat,
                     gnutls_datum_t * signature, size_t sha1pos,
                     gnutls_pk_algorithm_t pk_algo)
@@ -292,7 +295,10 @@ verify_tls_hash (gnutls_protocol_t ver, gnutls_cert * cert,
     if (!(cert->key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
       {
         gnutls_assert ();
-        return GNUTLS_E_KEY_USAGE_VIOLATION;
+        if (session->internals.priorities.allow_key_usage_violation == 0)
+          return GNUTLS_E_KEY_USAGE_VIOLATION;
+        else
+          _gnutls_debug_log("Key usage violation was detected (ignored).\n");
       }
 
   if (pk_algo == GNUTLS_PK_UNKNOWN)
@@ -425,7 +431,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
       dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
     }
 
-  ret = verify_tls_hash (ver, cert, &dconcat, signature,
+  ret = verify_tls_hash (session, ver, cert, &dconcat, signature,
                             dconcat.size -
                             _gnutls_hash_get_algo_len (hash_algo),
                             _gnutls_sign_get_pk_algorithm (algo));
@@ -490,7 +496,7 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
   dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
 
   ret =
-    verify_tls_hash (ver, cert, &dconcat, signature, 0,
+    verify_tls_hash (session, ver, cert, &dconcat, signature, 0,
                         cert->subject_pk_algorithm);
   if (ret < 0)
     {
@@ -581,7 +587,7 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
   dconcat.size = 20 + 16;       /* md5+ sha */
 
   ret =
-    verify_tls_hash (ver, cert, &dconcat, signature, 16,
+    verify_tls_hash (session, ver, cert, &dconcat, signature, 16,
                         cert->subject_pk_algorithm);
   if (ret < 0)
     {

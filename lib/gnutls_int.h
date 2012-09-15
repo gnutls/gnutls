@@ -447,6 +447,7 @@ struct gnutls_priority_st
   safe_renegotiation_t sr;
   int ssl3_record_version:1;
   int additional_verify_flags;
+  unsigned int allow_key_usage_violation:1;
 };
 
 
