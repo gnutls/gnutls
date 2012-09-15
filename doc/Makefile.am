@@ -364,7 +364,7 @@ stamp_functions: gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi pkcs
 
 stamp_enums: enums.texi
 	-mkdir enums
-	$(srcdir)/scripts/split-texi.pl enums enum < enums.texi
+	$(srcdir)/scripts/split-texi.pl enums enum < $(srcdir)/enums.texi
 	echo $@ > $@
 	$(MAKE) compare-makefile
 
@@ -373,7 +373,7 @@ $(ENUMS): stamp_enums
 $(FUNCS): stamp_functions
 
 compare-makefile: enums.texi
-	ENUMS=`grep '^@c ' enums.texi | sed 's/@c //g' | sort`; \
+	ENUMS=`grep '^@c ' $(srcdir)/enums.texi | sed 's/@c //g' | sort`; \
 	STR=""; \
 	for i in $$ENUMS; do \
 		STR="$$STR\nENUMS += enums/$$i"; \
@@ -382,14 +382,14 @@ compare-makefile: enums.texi
 		perl -p -e "s,^ENUMS =,ENUMS =$$STR," > tmp-$@; \
 	diff -u $(srcdir)/Makefile.am tmp-$@
 	rm -f tmp-$@
-	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl`; \
+	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h $(top_builddir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl`; \
 	MANS=""; \
 	for i in $$FUNCS; do \
 		MANS="$$MANS\nFUNCS += functions/$$i\nFUNCS += functions/$$i.short"; \
 	done; \
-	grep -v -e '^FUNCS += ' Makefile.am | \
-		perl -p -e "s,^FUNCS =,FUNCS =$$MANS," > tmp-$@; \
-	diff -u $(srcdir)/Makefile.am tmp-$@
+	grep -v -e '^FUNCS += ' $(srcdir)/Makefile.am | \
+		perl -p -e "s,^FUNCS =,FUNCS =$$MANS," | sort > tmp-$@; \
+	sort $(srcdir)/Makefile.am | diff -u - tmp-$@
 	rm -f tmp-$@
 
 .PHONY: compare-makefile

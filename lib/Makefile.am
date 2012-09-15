@@ -68,7 +68,9 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_auth.c gnutls_v2_compat.c gnutls_datum.c			\
 	gnutls_session_pack.c gnutls_mpi.c gnutls_pk.c gnutls_cert.c	\
 	gnutls_global.c gnutls_constate.c gnutls_anon_cred.c		\
-	pkix_asn1_tab.c gnutls_asn1_tab.c gnutls_mem.c gnutls_ui.c	\
+	$(srcdir)/pkix_asn1_tab.c				\
+	$(srcdir)/gnutls_asn1_tab.c				\
+	gnutls_mem.c gnutls_ui.c					\
 	gnutls_sig.c gnutls_ecc.c gnutls_dh_primes.c gnutls_alert.c	\
 	system.c gnutls_str.c gnutls_state.c gnutls_x509.c		\
 	gnutls_rsa_export.c gnutls_helper.c gnutls_supplemental.c	\
@@ -175,8 +177,8 @@ libgnutlsxx_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutlsxx.map
 endif
 endif
 
-pkix_asn1_tab.c: pkix.asn
-	-asn1Parser pkix.asn pkix_asn1_tab.c
+pkix_asn1_tab.c: $(srcdir)/pkix.asn
+	-asn1Parser $(srcdir)/pkix.asn pkix_asn1_tab.c
 
-gnutls_asn1_tab.c: gnutls.asn
-	-asn1Parser gnutls.asn gnutls_asn1_tab.c
+gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
+	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
