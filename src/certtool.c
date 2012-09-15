@@ -421,9 +421,8 @@ generate_certificate (gnutls_privkey_t * ret_key,
 
           pk = gnutls_x509_crt_get_pk_algorithm (crt, NULL);
 
-          if (pk != GNUTLS_PK_DSA)
-            {                   /* DSA keys can only sign.
-                                 */
+          if (pk == GNUTLS_PK_RSA)
+            { /* DSA and ECDSA keys can only sign. */
               result = get_sign_status (server);
               if (result)
                 usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
@@ -1734,7 +1733,7 @@ generate_request (common_info_st * cinfo)
   gnutls_x509_privkey_t xkey;
   gnutls_pubkey_t pubkey;
   gnutls_privkey_t pkey;
-  int ret, ca_status, path_len;
+  int ret, ca_status, path_len, pk;
   const char *pass;
   unsigned int usage = 0;
 
@@ -1764,6 +1763,8 @@ generate_request (common_info_st * cinfo)
     }
 
   pubkey = load_public_key_or_import (1, pkey, cinfo);
+
+  pk = gnutls_pubkey_get_pk_algorithm (pubkey, NULL);
 
   /* Set the DN.
    */
@@ -1804,14 +1805,21 @@ generate_request (common_info_st * cinfo)
         error (EXIT_FAILURE, 0, "set_basic_constraints: %s",
                gnutls_strerror (ret));
 
-      ret = get_sign_status (1);
-      if (ret)
-        usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+      if (pk == GNUTLS_PK_RSA)
+        {
+          ret = get_sign_status (1);
+          if (ret)
+            usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
-      ret = get_encrypt_status (1);
-      if (ret)
-        usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
-      else
+          /* Only ask for an encryption certificate
+           * if it is an RSA one */
+          ret = get_encrypt_status (1);
+          if (ret)
+            usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
+          else
+            usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+        }
+      else /* DSA and ECDSA are always signing */
         usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
       if (ca_status)
