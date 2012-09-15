@@ -330,7 +330,7 @@ _gnutls_comp_deinit (comp_hd_st* handle, int d)
 int
 _gnutls_compress (comp_hd_st *handle, const uint8_t * plain,
                   size_t plain_size, uint8_t * compressed,
-                  size_t max_comp_size)
+                  size_t max_comp_size, unsigned int stateless)
 {
   int compressed_size = GNUTLS_E_COMPRESSION_FAILED;
 
@@ -349,6 +349,15 @@ _gnutls_compress (comp_hd_st *handle, const uint8_t * plain,
       {
         z_stream *zhandle;
         int err;
+        int type;
+        
+        if (stateless)
+          {
+fprintf(stderr, "FULL FLUSH\n");
+            type = Z_FULL_FLUSH;
+          }
+        else
+          type = Z_SYNC_FLUSH;
 
         zhandle = handle->handle;
 
@@ -357,7 +366,7 @@ _gnutls_compress (comp_hd_st *handle, const uint8_t * plain,
         zhandle->next_out = (Bytef *) compressed;
         zhandle->avail_out = max_comp_size;
 
-        err = deflate (zhandle, Z_SYNC_FLUSH);
+        err = deflate (zhandle, type);
         if (err != Z_OK || zhandle->avail_in != 0)
           return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
 

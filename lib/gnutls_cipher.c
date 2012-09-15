@@ -104,7 +104,8 @@ _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
       if (comp.data == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
       
-      ret = _gnutls_compress( &params->write.compression_state, data, data_size, comp.data, comp.size);
+      ret = _gnutls_compress(&params->write.compression_state, data, data_size, 
+                             comp.data, comp.size, session->internals.stateless_compression);
       if (ret < 0)
         {
           gnutls_free(comp.data);
