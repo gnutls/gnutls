@@ -250,7 +250,7 @@ doit (void)
     fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
 
   data.data = cert_der;
-  data.size = sizeof((char*)cert_der);
+  data.size = sizeof(cert_der);
   ret = gnutls_x509_trust_list_add_trust_mem(tl, &data, NULL, GNUTLS_X509_FMT_DER, 0, 0);
   if (ret < 1)
     fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
