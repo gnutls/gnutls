@@ -28,14 +28,6 @@
 
 #include <libtasn1.h>
 
-/* Remove these when we require libtasn1 v1.6 or later. */
-#ifndef ASN1_MAX_NAME_SIZE
-#define ASN1_MAX_NAME_SIZE MAX_NAME_SIZE
-#endif
-#ifndef ASN1_MAX_ERROR_DESCRIPTION_SIZE
-#define ASN1_MAX_ERROR_DESCRIPTION_SIZE MAX_ERROR_DESCRIPTION_SIZE
-#endif
-
 #define MAX_CRQ_EXTENSIONS_SIZE 8*1024
 #define MAX_OID_SIZE 128
 
