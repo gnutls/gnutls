@@ -229,9 +229,6 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
   return 0;
 }
 
-
-
-
 /* this function reads a (small) unsigned integer
  * from asn1 structs. Combines the read and the convertion
  * steps.
