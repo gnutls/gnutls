@@ -11,6 +11,8 @@ key usage violation errors (they are far too common to ignore).
 which provides a tool to counter compression-related attacks where
 parts of the data are controlled by the attacker.
 
+** libgnutls: Depends on libtasn1 2.14 or later.
+
 ** API and ABI modifications:
 No changes since last version.
 
