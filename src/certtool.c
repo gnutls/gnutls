@@ -1568,7 +1568,8 @@ crq_info (void)
 
 static void privkey_info_int (common_info_st* cinfo, gnutls_x509_privkey_t key)
 {
-int ret, key_type, bits = 0;
+int ret, key_type;
+unsigned int bits = 0;
 size_t size;
 const char *cprint;
 
