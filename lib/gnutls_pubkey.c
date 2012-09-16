@@ -1660,16 +1660,18 @@ _pkcs1_rsa_verify_sig (gnutls_digest_algorithm_t hash_algo,
 /* Hashes input data and verifies a signature.
  */
 static int
-dsa_verify_hashed_data (const gnutls_datum_t * hash,
+dsa_verify_hashed_data (gnutls_pk_algorithm_t pk,
+                gnutls_digest_algorithm_t algo,
+                const gnutls_datum_t * hash,
                 const gnutls_datum_t * signature,
-                gnutls_pk_algorithm_t pk,
                 gnutls_pk_params_st* params)
 {
   gnutls_datum_t digest;
-  unsigned int algo;
   unsigned int hash_len;
 
-  algo = _gnutls_dsa_q_to_hash (pk, params, &hash_len);
+  if (algo == GNUTLS_DIG_UNKNOWN)
+    algo = _gnutls_dsa_q_to_hash (pk, params, &hash_len);
+  else hash_len = _gnutls_hash_get_algo_len(algo);
 
   /* SHA1 or better allowed */
   if (!hash->data || hash->size < hash_len)
@@ -1742,7 +1744,7 @@ pubkey_verify_hashed_data (gnutls_pk_algorithm_t pk,
 
     case GNUTLS_PK_EC:
     case GNUTLS_PK_DSA:
-      if (dsa_verify_hashed_data(hash, signature, pk, issuer_params) != 0)
+      if (dsa_verify_hashed_data(pk, hash_algo, hash, signature, issuer_params) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;
