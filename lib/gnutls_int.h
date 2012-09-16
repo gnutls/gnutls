@@ -579,6 +579,8 @@ struct gnutls_priority_st
   unsigned int ssl3_record_version:1;
   unsigned int server_precedence:1;
   unsigned int allow_key_usage_violation:1;
+  /* Whether stateless compression will be used */
+  unsigned int stateless_compression:1;
   unsigned int additional_verify_flags;
 };
 
@@ -869,8 +871,6 @@ typedef struct
   /* if set it means that the master key was set using
    * gnutls_session_set_master() rather than being negotiated. */
   unsigned int premaster_set:1;
-  /* Whether stateless compression will be used */
-  unsigned int stateless_compression:1;
 
   unsigned int cb_tls_unique_len;
   unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
