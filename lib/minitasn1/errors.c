@@ -21,7 +21,7 @@
 
 #include <int.h>
 #ifdef STDC_HEADERS
-# include <stdarg.h>
+#include <stdarg.h>
 #endif
 
 #define LIBTASN1_ERROR_ENTRY(name) { #name, name }
