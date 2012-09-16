@@ -244,16 +244,16 @@ doit (void)
 
   /* test convenience functions in verify-high2.c */
   data.data = cert_pem;
-  data.size = strlen(cert_pem);
+  data.size = strlen((char*)cert_pem);
   ret = gnutls_x509_trust_list_add_trust_mem(tl, &data, NULL, GNUTLS_X509_FMT_PEM, 0, 0);
   if (ret < 1)
-    fail("gnutls_x509_trust_list_add_trust_mem: %d\n", __LINE__);
+    fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
 
   data.data = cert_der;
-  data.size = sizeof(cert_der);
+  data.size = sizeof((char*)cert_der);
   ret = gnutls_x509_trust_list_add_trust_mem(tl, &data, NULL, GNUTLS_X509_FMT_DER, 0, 0);
   if (ret < 1)
-    fail("gnutls_x509_trust_list_add_trust_mem: %d\n", __LINE__);
+    fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
 
   gnutls_x509_trust_list_deinit(tl, 1);
   
