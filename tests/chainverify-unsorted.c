@@ -613,7 +613,7 @@ doit (void)
   gnutls_x509_crt_t *crts;
   unsigned int crts_size, i;
   gnutls_x509_trust_list_t tl;
-  unsigned int status;
+  unsigned int status, flags = GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN;
 
   /* this must be called once in the program
    */
@@ -644,7 +644,7 @@ doit (void)
       exit(1);
     }
   
-  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, 0, &status, NULL);
+  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, flags, &status, NULL);
   if (ret < 0 || status != 0)
     {
       fail("gnutls_x509_trust_list_verify_crt - 1\n");
@@ -665,10 +665,10 @@ doit (void)
       exit(1);
     }
   
-  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, 0, &status, NULL);
+  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, flags, &status, NULL);
   if (ret < 0 || status != 0)
     {
-      fail("gnutls_x509_trust_list_verify_crt - 1\n");
+      fail("gnutls_x509_trust_list_verify_crt - 2\n");
       exit(1);
     }
     
@@ -686,10 +686,10 @@ doit (void)
       exit(1);
     }
   
-  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, 0, &status, NULL);
+  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, flags, &status, NULL);
   if (ret < 0 || status != 0)
     {
-      fail("gnutls_x509_trust_list_verify_crt - 1\n");
+      fail("gnutls_x509_trust_list_verify_crt - 3\n");
       exit(1);
     }
     
@@ -707,10 +707,31 @@ doit (void)
       exit(1);
     }
   
-  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, 0, &status, NULL);
+  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, flags, &status, NULL);
   if (ret < 0 || status != 0)
     {
-      fail("gnutls_x509_trust_list_verify_crt - 1\n");
+      fail("gnutls_x509_trust_list_verify_crt - 4\n");
+      exit(1);
+    }
+    
+  for (i=0;i<crts_size;i++)
+    gnutls_x509_crt_deinit(crts[i]);
+  gnutls_free(crts);
+
+  /* Check if an unsorted list would fail if the unsorted flag is not given */
+  data.data = (void*) chain2;
+  data.size = sizeof(chain2);
+  ret = gnutls_x509_crt_list_import2(&crts, &crts_size, &data, GNUTLS_X509_FMT_PEM, 0);
+  if (ret < 0)
+    {
+      fail("gnutls_x509_crt_list_import2: %s\n", gnutls_strerror(ret));
+      exit(1);
+    }
+  
+  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, 0, &status, NULL);
+  if (ret < 0 || status == 0)
+    {
+      fail("gnutls_x509_trust_list_verify_crt - 5\n");
       exit(1);
     }
     

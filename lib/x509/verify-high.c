@@ -559,7 +559,8 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
     if (cert_list == NULL || cert_list_size < 1)
         return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-    cert_list = sort_clist(sorted, cert_list, &cert_list_size);
+    if (flags & GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN)
+      cert_list = sort_clist(sorted, cert_list, &cert_list_size);
 
     cert_list_size = shorten_clist(list, cert_list, cert_list_size);
     if (cert_list_size <= 0)

@@ -231,6 +231,7 @@ int ret;
     }
   (*res)->verify_bits = DEFAULT_VERIFY_BITS;
   (*res)->verify_depth = DEFAULT_VERIFY_DEPTH;
+  (*res)->verify_flags = GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN;
 
   return 0;
 }

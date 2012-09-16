@@ -598,6 +598,8 @@ extern "C"
  * @GNUTLS_VERIFY_DO_NOT_ALLOW_SAME: If a certificate is not signed by
  *   anyone trusted but exists in the trusted CA list do not treat it
  *   as trusted.
+ * @GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN: A certificate chain is tolerated
+ *   if unsorted (the case with many TLS servers out there).
  * @GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT: Allow CA certificates that
  *   have version 1 (both root and intermediate). This might be
  *   dangerous since those haven't the basicConstraints
@@ -627,6 +629,7 @@ extern "C"
     GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 128,
     GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT = 256,
     GNUTLS_VERIFY_DISABLE_CRL_CHECKS = 512,
+    GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN = 1024,
   } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,

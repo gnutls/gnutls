@@ -658,7 +658,8 @@ gnutls_certificate_set_params_function (gnutls_certificate_credentials_t res,
  *
  * This function will set the flags to be used at verification of the
  * certificates.  Flags must be OR of the
- * #gnutls_certificate_verify_flags enumerations.
+ * #gnutls_certificate_verify_flags enumerations. The default
+ * for TLS sessions is GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN.
  *
  **/
 void
