@@ -206,7 +206,7 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
       need_free = 1;
     }
 
-  if (cert->cert)
+  if (cert->expanded)
     {
       /* Any earlier asn1_der_decoding will modify the ASN.1
          structure, so we need to replace it with a fresh
@@ -230,6 +230,8 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
       gnutls_assert ();
       goto cleanup;
     }
+  
+  cert->expanded = 1;
 
   /* Since we do not want to disable any extension
    */
