@@ -411,6 +411,71 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
     return clist_size;
 }
 
+#define MAX_CERTS_TO_SORT 10
+
+/* Takes a certificate list and orders it with subject, issuer order.
+ *
+ * Returns the size of the ordered list (which is always less or
+ * equal to the original).
+ */
+static gnutls_x509_crt_t* sort_clist(gnutls_x509_crt_t sorted[MAX_CERTS_TO_SORT], 
+                                     gnutls_x509_crt_t * clist,
+                                     unsigned int *clist_size)
+{
+  int prev;
+  unsigned int j, i;
+  int issuer[MAX_CERTS_TO_SORT]; /* contain the index of the issuers */
+    
+    /* Do not bother sorting if too many certificates are given.
+     * Prevent any DoS attacks.
+     */
+  if (*clist_size > MAX_CERTS_TO_SORT)
+    return clist;
+
+  for (i=0;i<MAX_CERTS_TO_SORT;i++)
+    issuer[i] = -1;
+
+    /* Start by truncating any disjoint list of certificates. For
+     * example, if the server presented a chain A->B->C->X->Y->Z
+     * where X is *not* actually the issuer of C, truncate at C.
+     */
+  for(i=0;i<*clist_size;i++) 
+    {
+      for (j=1;j<*clist_size;j++) 
+        {
+          if (i==j) continue;
+        
+          if (gnutls_x509_crt_check_issuer(clist[i],
+                                           clist[j])) 
+            {
+              issuer[i] = j;
+              break;
+            }
+        }
+    }
+  
+  if (issuer[0] == -1)
+    {
+      *clist_size = 1;
+      return clist;
+    }
+  
+  prev = 0;
+  sorted[0] = clist[0];
+  for (i=1;i<*clist_size;i++)
+    {
+      prev = issuer[prev];
+      if (prev == -1) /* no issuer */
+        {
+          *clist_size = i;
+          break;
+        }
+      sorted[i] = clist[prev];
+    }
+  
+  return sorted;
+}
+
 /**
  * gnutls_x509_trust_list_get_issuer:
  * @list: The structure of the list
@@ -489,9 +554,12 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
     int ret;
     unsigned int i;
     uint32_t hash;
+    gnutls_x509_crt_t sorted[MAX_CERTS_TO_SORT];
 
     if (cert_list == NULL || cert_list_size < 1)
         return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+    cert_list = sort_clist(sorted, cert_list, &cert_list_size);
 
     cert_list_size = shorten_clist(list, cert_list, cert_list_size);
     if (cert_list_size <= 0)
