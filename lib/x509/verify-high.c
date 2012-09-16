@@ -35,7 +35,7 @@
 
 struct named_cert_st {
   gnutls_x509_crt_t cert;
-  uint8_t name[MAX_NAME_SIZE];
+  uint8_t name[MAX_SERVER_NAME_SIZE];
   unsigned int name_size;
 };
 
@@ -223,7 +223,7 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
     int ret;
     uint32_t hash;
 
-    if (name_size >= MAX_NAME_SIZE)
+    if (name_size >= MAX_SERVER_NAME_SIZE)
         return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
     ret = gnutls_x509_crt_get_raw_issuer_dn(cert, &dn);
