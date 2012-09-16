@@ -44,7 +44,7 @@ extern "C"
 {
 #endif
 
-#define ASN1_VERSION "2.13"
+#define ASN1_VERSION "2.14"
 
   typedef int asn1_retCode;	/* type returned by libtasn1 functions */
 
@@ -141,6 +141,39 @@ extern "C"
   };
   typedef struct static_struct_asn ASN1_ARRAY_TYPE;
 
+/* List of constants for field type of typedef node_asn  */
+#define ASN1_ETYPE_CONSTANT       1
+#define ASN1_ETYPE_IDENTIFIER     2
+#define ASN1_ETYPE_INTEGER        3
+#define ASN1_ETYPE_BOOLEAN        4
+#define ASN1_ETYPE_SEQUENCE       5
+#define ASN1_ETYPE_BIT_STRING     6
+#define ASN1_ETYPE_OCTET_STRING   7
+#define ASN1_ETYPE_TAG            8
+#define ASN1_ETYPE_DEFAULT        9
+#define ASN1_ETYPE_SIZE          10
+#define ASN1_ETYPE_SEQUENCE_OF   11
+#define ASN1_ETYPE_OBJECT_ID     12
+#define ASN1_ETYPE_ANY           13
+#define ASN1_ETYPE_SET           14
+#define ASN1_ETYPE_SET_OF        15
+#define ASN1_ETYPE_DEFINITIONS   16
+#define ASN1_ETYPE_TIME          17
+#define ASN1_ETYPE_CHOICE        18
+#define ASN1_ETYPE_IMPORTS       19
+#define ASN1_ETYPE_NULL          20
+#define ASN1_ETYPE_ENUMERATED    21
+#define ASN1_ETYPE_GENERALSTRING 27
+
+  struct node_data_struct
+  {
+    const char *name;		/* Node name */
+    const void *value;		/* Node value */
+    unsigned int value_len;     /* Node value size */
+    unsigned int type;		/* Node value type (ASN1_ETYPE_*) */
+  };
+  typedef struct node_data_struct ASN1_DATA_NODE;
+
   /***********************************/
   /*  Fixed constants                */
   /***********************************/
@@ -191,6 +224,9 @@ extern "C"
   extern ASN1_API asn1_retCode
     asn1_read_value (ASN1_TYPE root, const char *name,
 		     void *ivalue, int *len);
+
+  extern ASN1_API asn1_retCode
+    asn1_read_node_value (ASN1_TYPE node, ASN1_DATA_NODE* data);
 
   extern ASN1_API asn1_retCode
     asn1_number_of_elements (ASN1_TYPE element, const char *name, int *num);

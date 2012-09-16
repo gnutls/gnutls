@@ -83,28 +83,28 @@ struct node_asn_struct
 #define type_field(x)     (x&0xFF)
 
 /* List of constants for field type of typedef node_asn  */
-#define TYPE_CONSTANT       1
-#define TYPE_IDENTIFIER     2
-#define TYPE_INTEGER        3
-#define TYPE_BOOLEAN        4
-#define TYPE_SEQUENCE       5
-#define TYPE_BIT_STRING     6
-#define TYPE_OCTET_STRING   7
-#define TYPE_TAG            8
-#define TYPE_DEFAULT        9
-#define TYPE_SIZE          10
-#define TYPE_SEQUENCE_OF   11
-#define TYPE_OBJECT_ID     12
-#define TYPE_ANY           13
-#define TYPE_SET           14
-#define TYPE_SET_OF        15
-#define TYPE_DEFINITIONS   16
-#define TYPE_TIME          17
-#define TYPE_CHOICE        18
-#define TYPE_IMPORTS       19
-#define TYPE_NULL          20
-#define TYPE_ENUMERATED    21
-#define TYPE_GENERALSTRING 27
+#define TYPE_CONSTANT      ASN1_ETYPE_CONSTANT
+#define TYPE_IDENTIFIER    ASN1_ETYPE_IDENTIFIER
+#define TYPE_INTEGER       ASN1_ETYPE_INTEGER
+#define TYPE_BOOLEAN       ASN1_ETYPE_BOOLEAN
+#define TYPE_SEQUENCE      ASN1_ETYPE_SEQUENCE
+#define TYPE_BIT_STRING    ASN1_ETYPE_BIT_STRING
+#define TYPE_OCTET_STRING  ASN1_ETYPE_OCTET_STRING
+#define TYPE_TAG           ASN1_ETYPE_TAG
+#define TYPE_DEFAULT       ASN1_ETYPE_DEFAULT
+#define TYPE_SIZE          ASN1_ETYPE_SIZE
+#define TYPE_SEQUENCE_OF   ASN1_ETYPE_SEQUENCE_OF
+#define TYPE_OBJECT_ID     ASN1_ETYPE_OBJECT_ID
+#define TYPE_ANY           ASN1_ETYPE_ANY
+#define TYPE_SET           ASN1_ETYPE_SET
+#define TYPE_SET_OF        ASN1_ETYPE_SET_OF
+#define TYPE_DEFINITIONS   ASN1_ETYPE_DEFINITIONS
+#define TYPE_TIME          ASN1_ETYPE_TIME
+#define TYPE_CHOICE        ASN1_ETYPE_CHOICE
+#define TYPE_IMPORTS       ASN1_ETYPE_IMPORTS
+#define TYPE_NULL          ASN1_ETYPE_NULL
+#define TYPE_ENUMERATED    ASN1_ETYPE_ENUMERATED
+#define TYPE_GENERALSTRING ASN1_ETYPE_GENERALSTRING
 
 
 /***********************************************************************/

@@ -976,3 +976,23 @@ asn1_read_tag (ASN1_TYPE root, const char *name, int *tagValue,
 
   return ASN1_SUCCESS;
 }
+
+/**
+ * asn1_read_node_value:
+ * @node: pointer to a node.
+ * @data: a point to a node_data_struct
+ *
+ * Returns the value a data node inside a ASN1_TYPE structure.
+ * The data returned should be handled as constant values.
+ *
+ * Returns: %ASN1_SUCCESS if the node exists.
+ **/
+asn1_retCode asn1_read_node_value (ASN1_TYPE node, ASN1_DATA_NODE* data)
+{
+  data->name = node->name;
+  data->value = node->value;
+  data->value_len = node->value_len;
+  data->type = type_field(node->type);
+  
+  return ASN1_SUCCESS;
+}
