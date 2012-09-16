@@ -37,6 +37,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/includes			\
 	-I$(builddir)/includes			\
 	-I$(srcdir)/x509			\
+	$(LIBTASN1_CFLAGS)			\
 	$(P11_KIT_CFLAGS)
 
 if ENABLE_OPENPGP
@@ -134,7 +135,7 @@ endif
 if ENABLE_MINITASN1
 libgnutls_la_LIBADD += minitasn1/libminitasn1.la
 else
-libgnutls_la_LDFLAGS += $(LTLIBTASN1)
+libgnutls_la_LDFLAGS += $(LIBTASN1_LIBS)
 endif
 
 if ENABLE_NETTLE
