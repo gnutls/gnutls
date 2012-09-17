@@ -39,8 +39,9 @@ typedef struct
 } gnutls_sec_params_entry;
 
 static const gnutls_sec_params_entry sec_params[] = {
-  {"Weak", GNUTLS_SEC_PARAM_WEAK, 0, 0, 0, 0, 0},
-  {"Low", GNUTLS_SEC_PARAM_LOW, 80, 1248, 2048, 160, 160},
+  {"Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0},
+  {"Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1024, 160, 160},
+  {"Low", GNUTLS_SEC_PARAM_LOW, 80, 1248, 2048, 160, 160}, 
   {"Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192},
   {"Normal", GNUTLS_SEC_PARAM_NORMAL, 112, 2432, 3072, 224, 224},
   {"High", GNUTLS_SEC_PARAM_HIGH, 128, 3248, 3072, 256, 256},

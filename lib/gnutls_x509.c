@@ -73,7 +73,7 @@ check_bits (gnutls_session_t session, gnutls_x509_crt_t crt, unsigned int max_bi
       return GNUTLS_E_CONSTRAINT_ERROR;
     }
 
-  if (gnutls_pk_bits_to_sec_param(pk, bits) == GNUTLS_SEC_PARAM_WEAK)
+  if (gnutls_pk_bits_to_sec_param(pk, bits) == GNUTLS_SEC_PARAM_INSECURE)
     {
       gnutls_assert();
       _gnutls_audit_log(session, "The security level of the certificate (%s: %u) is weak\n", gnutls_pk_get_name(pk), bits);
