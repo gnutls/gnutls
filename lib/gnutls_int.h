@@ -200,7 +200,7 @@ typedef enum transport_t
 
 /* defaults for verification functions
  */
-#define DEFAULT_VERIFY_DEPTH 32
+#define DEFAULT_VERIFY_DEPTH 16
 #define DEFAULT_VERIFY_BITS 16*1024
 
 #include <gnutls_mem.h>
