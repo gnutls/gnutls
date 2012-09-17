@@ -272,6 +272,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wconversion"             # Too many warnings for now
   nw="$nw -Wsign-conversion"        # Too many warnings for now
   nw="$nw -Wformat-y2k"             # Too many warnings for now
+  nw="$nw -Woverlength-strings"     # We use some in tests/
   nw="$nw -Wvla"                    # There is no point to avoid C99 variable length arrays
   nw="$nw -Wformat-nonliteral"      # Incompatible with gettext _()
   nw="$nw -Wunsafe-loop-optimizations"
