@@ -589,6 +589,7 @@ struct gnutls_priority_st
   unsigned int ssl3_record_version:1;
   unsigned int server_precedence:1;
   unsigned int allow_key_usage_violation:1;
+  unsigned int allow_weak_keys:1;
   /* Whether stateless compression will be used */
   unsigned int stateless_compression:1;
   unsigned int additional_verify_flags;

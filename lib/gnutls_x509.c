@@ -54,9 +54,9 @@
  * is unacceptable.
   */
 inline static int
-check_bits (gnutls_x509_crt_t crt, unsigned int max_bits)
+check_bits (gnutls_session_t session, gnutls_x509_crt_t crt, unsigned int max_bits)
 {
-  int ret;
+  int ret, pk;
   unsigned int bits;
 
   ret = gnutls_x509_crt_get_pk_algorithm (crt, &bits);
@@ -65,11 +65,20 @@ check_bits (gnutls_x509_crt_t crt, unsigned int max_bits)
       gnutls_assert ();
       return ret;
     }
+  pk = ret;
 
   if (bits > max_bits && max_bits > 0)
     {
       gnutls_assert ();
       return GNUTLS_E_CONSTRAINT_ERROR;
+    }
+
+  if (gnutls_pk_bits_to_sec_param(pk, bits) == GNUTLS_SEC_PARAM_WEAK)
+    {
+      gnutls_assert();
+      _gnutls_audit_log(session, "The security level of the certificate (%s: %u) is weak\n", gnutls_pk_get_name(pk), bits);
+      if (session->internals.priorities.allow_weak_keys == 0)
+        return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
     }
 
   return 0;
@@ -159,7 +168,7 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
           return ret;
         }
 
-      ret = check_bits (peer_certificate_list[i], cred->verify_bits);
+      ret = check_bits (session, peer_certificate_list[i], cred->verify_bits);
       if (ret < 0)
         {
           gnutls_assert ();

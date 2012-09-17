@@ -39,6 +39,7 @@ typedef struct
 } gnutls_sec_params_entry;
 
 static const gnutls_sec_params_entry sec_params[] = {
+  {"Weak", GNUTLS_SEC_PARAM_WEAK, 0, 0, 0, 0, 0},
   {"Low", GNUTLS_SEC_PARAM_LOW, 80, 1248, 2048, 160, 160},
   {"Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192},
   {"Normal", GNUTLS_SEC_PARAM_NORMAL, 112, 2432, 3072, 224, 224},
@@ -73,34 +74,18 @@ gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
   unsigned int ret = 0;
 
   /* handle DSA differently */
-  if (algo == GNUTLS_PK_DSA)
-    {
-      GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
+  GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
                              {
-                               ret = p->dsa_bits; break;
+                               if (algo == GNUTLS_PK_DSA)
+                                 ret = p->dsa_bits;
+                               else if (algo == GNUTLS_PK_EC)
+                                 ret = p->ecc_bits;
+                               else
+                                 ret = p->pk_bits;
+                               break;
                              }
       );
       return ret;
-    }
-  else if (algo == GNUTLS_PK_EC)
-    {
-      GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
-                             {
-                               ret = p->ecc_bits; break;
-                             }
-      );
-      return ret;
-    }
-  else
-    {
-      GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
-                         {
-                           ret = p->pk_bits; break;
-                         }
-      );
-
-      return ret;
-    }
 }
 
 /* Returns the corresponding size for subgroup bits (q),
@@ -161,7 +146,7 @@ gnutls_sec_param_get_name (gnutls_sec_param_t param)
 gnutls_sec_param_t
 gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo, unsigned int bits)
 {
-  gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_LOW;
+  gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_WEAK;
 
   if (bits == 0)
     return GNUTLS_SEC_PARAM_UNKNOWN;

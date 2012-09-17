@@ -662,12 +662,11 @@ typedef enum
   GNUTLS_ECC_CURVE_SECP192R1,
 } gnutls_ecc_curve_t;
 
-#define GNUTLS_SEC_PARAM_WEAK GNUTLS_SEC_PARAM_LOW
-
 /**
  * gnutls_sec_param_t:
+ * @GNUTLS_SEC_PARAM_WEAK: security level known to be weak
  * @GNUTLS_SEC_PARAM_UNKNOWN: Cannot be known
- * @GNUTLS_SEC_PARAM_LOW: low security level
+ * @GNUTLS_SEC_PARAM_LOW: 80 bits of security
  * @GNUTLS_SEC_PARAM_LEGACY: 96 bits of security
  * @GNUTLS_SEC_PARAM_NORMAL: 112 bits of security
  * @GNUTLS_SEC_PARAM_HIGH: 128 bits of security
@@ -677,7 +676,8 @@ typedef enum
  */
   typedef enum
   {
-    GNUTLS_SEC_PARAM_UNKNOWN,
+    GNUTLS_SEC_PARAM_WEAK = -10,
+    GNUTLS_SEC_PARAM_UNKNOWN = 0,
     GNUTLS_SEC_PARAM_LOW = 1,
     GNUTLS_SEC_PARAM_LEGACY = 2,
     GNUTLS_SEC_PARAM_NORMAL = 3,
