@@ -485,12 +485,6 @@ gnutls_deinit (gnutls_session_t session)
 /* Returns the minimum prime bits that are acceptable.
  */
 int
-_gnutls_dh_get_allowed_prime_bits (gnutls_session_t session)
-{
-  return session->internals.dh_prime_bits;
-}
-
-int
 _gnutls_dh_set_peer_public (gnutls_session_t session, bigint_t public)
 {
   dh_info_st *dh;
@@ -1309,8 +1303,8 @@ gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
  *
  * This function can be used to disable certain (security) features in
  * TLS in order to maintain maximum compatibility with buggy
- * clients. It is equivalent to calling:
- * gnutls_record_disable_padding()
+ * clients. Because several trade-offs with security are enabled,
+ * if required they will be reported through the audit subsystem.
  *
  * Normally only servers that require maximum compatibility with
  * everything out there, need to call this function.
@@ -1318,7 +1312,7 @@ gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
 void
 gnutls_session_enable_compatibility_mode (gnutls_session_t session)
 {
-  gnutls_record_disable_padding (session);
+  ENABLE_COMPAT(&session->internals.priorities);
 }
 
 /**

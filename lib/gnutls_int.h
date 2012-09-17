@@ -595,6 +595,11 @@ struct gnutls_priority_st
   unsigned int additional_verify_flags;
 };
 
+#define ENABLE_COMPAT(x) \
+              (x)->no_padding = 1; \
+              (x)->allow_large_records = 1; \
+              (x)->allow_key_usage_violation = 1; \
+              (x)->allow_weak_keys = 1
 
 /* DH and RSA parameters types.
  */
