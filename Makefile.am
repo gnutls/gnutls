@@ -36,6 +36,7 @@ EXTRA_DIST = cfg.mk maint.mk .clcopying
 dist-hook: 
 	rm -f ChangeLog
 	make ChangeLog
+	make -C doc/ compare-makefile
 	cp -f ChangeLog $(distdir)/
 	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
 	cd $(distdir)/src/ && for i in *.def;do \
