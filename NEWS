@@ -7,9 +7,16 @@ See the end for copying conditions.
 ** libgnutls: The %COMPAT keyword, if specified, will tolerate
 key usage violation errors (they are far too common to ignore).
 
+** libgnutls: Added X.509 certificate verification flag 
+GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN. This flag allows the verification
+of unsorted certificate chains and is enabled by default for
+TLS certificate verification (if gnutls_certificate_set_verify_flags() 
+does not override it).
+
 ** libgnutls: Added GNUTLS_STATELESS_COMPRESSION flag to gnutls_init(),
 which provides a tool to counter compression-related attacks where
-parts of the data are controlled by the attacker.
+parts of the data are controlled by the attacker _and_ placed in
+separate records (use with care - do not use compression if not sure).
 
 ** libgnutls: Depends on libtasn1 2.14 or later.
 
