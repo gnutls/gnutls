@@ -982,7 +982,9 @@ renegotiation thus this option must be used with care.
 @item %STATELESS_COMPRESSION @tab
 will disable keeping state across records when compressing. This may
 help to mitigate attacks when compression is used but an attacker
-is in control of input data.
+is in control of input data. This has to be used only when the
+data that are possibly controlled by an attacker are placed in
+separate records.
 
 @item %SERVER_PRECEDENCE @tab
 The ciphersuite will be selected according to server priorities

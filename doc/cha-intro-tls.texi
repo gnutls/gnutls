@@ -191,7 +191,9 @@ on @xcite{RFC3749}. The supported algorithms are shown below.
 Note that compression enables attacks such as traffic analysis, or even
 plaintext recovery under certain circumstances. To avoid some of these
 attacks GnuTLS allows each record to be compressed independently (i.e.,
-stateless compression), by using the "%STATELESS_COMPRESSION" priority string.
+stateless compression), by using the "%STATELESS_COMPRESSION" priority string,
+in order to be used in cases where the attacker controlled data are
+pt in separate records.
 
 @node Weaknesses and countermeasures
 @subsection Weaknesses and countermeasures
