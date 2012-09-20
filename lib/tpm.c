@@ -823,11 +823,11 @@ cleanup:
  * @url: The URL of the TPM key to be imported
  * @srk_password: The password for the SRK key (optional)
  * @key_password: A password for the key (optional)
- * @flags: One of the %GNUTLS_PRIVKEY flags
+ * @flags: One of the GNUTLS_PRIVKEY_* flags
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. 
- * 
+ * #gnutls_privkey_t structure.
+ *
  * Note that unless %GNUTLS_PRIVKEY_DISABLE_CALLBACKS
  * is specified, if incorrect (or NULL) passwords are given
  * the PKCS11 callback functions will be used to obtain the
@@ -1052,7 +1052,7 @@ int ret;
  * @fdata: The TPM key to be imported
  * @format: The format of the private key
  * @srk_password: The password for the SRK key (optional)
- * @flags: One of the %GNUTLS_PUBKEY flags
+ * @flags: One of the GNUTLS_PUBKEY_* flags
  *
  * This function will import the public key from the provided TPM key
  * structure.

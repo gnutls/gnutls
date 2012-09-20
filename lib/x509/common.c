@@ -174,7 +174,7 @@ _gnutls_x509_oid_data_choice (const char *oid)
 /**
  * gnutls_x509_dn_oid_name:
  * @oid: holds an Object Identifier in a null terminated string
- * @flags: 0 or %GNUTLS_X509_DN_OID_*
+ * @flags: 0 or GNUTLS_X509_DN_OID_*
  *
  * This function will return the name of a known DN OID. If
  * %GNUTLS_X509_DN_OID_RETURN_OID is specified this function
