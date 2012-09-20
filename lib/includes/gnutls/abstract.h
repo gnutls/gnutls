@@ -227,7 +227,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       const gnutls_datum_t * fdata,
 			       gnutls_tpmkey_fmt_t format,
 			       const char *srk_password,
-			       const char *tpm_password, unsigned int flags);
+			       const char *key_password, unsigned int flags);
 
 int
 gnutls_privkey_import_tpm_url (gnutls_privkey_t pkey,

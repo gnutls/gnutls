@@ -686,8 +686,10 @@ cleanup:
  * Since: 3.1.0
  *
  **/
-void gnutls_pkcs11_privkey_set_pin_function (gnutls_pkcs11_privkey_t key,
-                                             gnutls_pin_callback_t fn, void *userdata)
+void
+gnutls_pkcs11_privkey_set_pin_function (gnutls_pkcs11_privkey_t key,
+					gnutls_pin_callback_t fn,
+					void *userdata)
 {
   key->pin.cb = fn;
   key->pin.data = userdata;

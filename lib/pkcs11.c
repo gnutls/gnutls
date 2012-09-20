@@ -761,10 +761,11 @@ gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * obj)
  * set using gnutls_pkcs11_set_pin_function().
  *
  * Since: 3.1.0
- *
  **/
-void gnutls_pkcs11_obj_set_pin_function (gnutls_pkcs11_obj_t obj,
-                                         gnutls_pin_callback_t fn, void *userdata)
+void
+gnutls_pkcs11_obj_set_pin_function (gnutls_pkcs11_obj_t obj,
+				    gnutls_pin_callback_t fn,
+				    void *userdata)
 {
   obj->pin.cb = fn;
   obj->pin.data = userdata;

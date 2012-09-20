@@ -1052,19 +1052,18 @@ int ret;
  * @fdata: The TPM key to be imported
  * @format: The format of the private key
  * @srk_password: The password for the SRK key (optional)
- * @key_password: A password for the key (optional)
  * @flags: One of the %GNUTLS_PUBKEY flags
  *
- * This function will import the public key from the provided
- * TPM key structure. 
+ * This function will import the public key from the provided TPM key
+ * structure.
  *
- * With respect to passwords the same as in gnutls_pubkey_import_tpm_url() apply.
+ * With respect to passwords the same as in
+ * gnutls_pubkey_import_tpm_url() apply.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 3.1.0
- *
  **/
 int
 gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
@@ -1469,9 +1468,6 @@ err_cc:
  *
  * This function will deinitialize the list of stored keys in the TPM.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- *
  * Since: 3.1.0
  **/
 void
@@ -1510,7 +1506,6 @@ gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char*
 /**
  * gnutls_tpm_get_registered:
  * @list: a list to store the keys
- * @srk_password: a password to protect the exported key (optional)
  *
  * This function will get a list of stored keys in the TPM. The uuid
  * of those keys

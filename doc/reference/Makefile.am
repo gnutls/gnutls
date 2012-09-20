@@ -65,7 +65,7 @@ EXTRA_HFILES=
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h private_code
 IGNORE_HFILES=
 
-# find lib -name \*.h -exec basename {} \; | grep -v -e ^abstract.h$ -e ^crypto.h$ -e ^dtls.h$ -e ^gnutls.h$ -e ^openpgp.h$ -e ^pkcs11.h$ -e ^pkcs12.h$ -e ^x509.h$ | sort | uniq | sed -e 's/^/\t/' -e 's/$/ \\/'
+# find lib -name \*.h -exec basename {} \; | grep -v -e ^abstract.h$ -e ^crypto.h$ -e ^dtls.h$ -e ^gnutls.h$ -e ^openpgp.h$ -e ^pkcs11.h$ -e ^pkcs12.h$ -e ^x509.h$ -e ^ocsp.h$  -e ^tpm.h$ | sort | uniq | sed -e 's/^/\t/' -e 's/$/ \\/'
 IGNORE_HFILES += \
 	abstract_int.h \
 	accelerated.h \
@@ -127,6 +127,7 @@ IGNORE_HFILES += \
 	gnutlsxx.h \
 	gstr.h \
 	hash.h \
+	heartbeat.h \
 	int.h \
 	keydb.h \
 	libtasn1.h \
@@ -138,9 +139,11 @@ IGNORE_HFILES += \
 	packet.h \
 	parser_aux.h \
 	pbkdf2-sha1.h \
+	pin.h \
 	pkcs11_int.h \
 	psk.h \
 	psk_passwd.h \
+	randomart.h \
 	random.h \
 	safe_renegotiation.h \
 	server_name.h \
@@ -153,6 +156,7 @@ IGNORE_HFILES += \
 	structure.h \
 	system.h \
 	types.h \
+	verify-high.h \
 	x509_b64.h \
 	x509_int.h \
 	x86.h
