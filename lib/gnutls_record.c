@@ -508,7 +508,6 @@ check_buffers (gnutls_session_t session, content_type_t type,
 {
   if ((type == GNUTLS_APPLICATION_DATA ||
        type == GNUTLS_HANDSHAKE ||
-       type == GNUTLS_HEARTBEAT ||
        type == GNUTLS_CHANGE_CIPHER_SPEC)
       && _gnutls_record_buffer_get_size (session) > 0)
     {
@@ -591,7 +590,6 @@ record_add_to_buffers (gnutls_session_t session,
   if ((recv->type == type)
       && (type == GNUTLS_APPLICATION_DATA ||
           type == GNUTLS_CHANGE_CIPHER_SPEC ||
-	  type == GNUTLS_HEARTBEAT ||
           type == GNUTLS_HANDSHAKE))
     {
       _gnutls_record_buffer_put (session, type, seq, bufel);
@@ -1161,7 +1159,7 @@ cleanup:
   return ret;
 
 recv_error:
-  if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
+  if (ret < 0 && (gnutls_error_is_fatal (ret) == 0 || ret == GNUTLS_E_TIMEDOUT))
     return ret;
 
   if (IS_DTLS(session))
@@ -1198,10 +1196,8 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
 {
   int ret;
 
-  if (type != GNUTLS_ALERT && (data_size == 0 || data == NULL))
-    {
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+  if ((type != GNUTLS_ALERT && type != GNUTLS_HEARTBEAT) && (data_size == 0 || data == NULL))
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   if (session->internals.read_eof != 0)
     {

@@ -96,13 +96,13 @@ gnutls_heartbeat_allowed (gnutls_session_t session, unsigned int type)
 static int
 heartbeat_allow_recv (gnutls_session_t session)
 {
-  return gnutls_heartbeat_allowed(session, 0);
+  return gnutls_heartbeat_allowed(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 }
 
 static int
 heartbeat_allow_send (gnutls_session_t session)
 {
-  return gnutls_heartbeat_allowed(session, 1);
+  return gnutls_heartbeat_allowed(session, GNUTLS_HB_LOCAL_ALLOWED_TO_SEND);
 }
 
 /*-
@@ -148,7 +148,7 @@ heartbeat_send_data (gnutls_session_t session, const void *data,
   _gnutls_record_log ("REC[%p]: HB sent: %d\n", session, ret);
 
   _gnutls_buffer_clear (&response);
-  return gnutls_assert_val (ret);
+  return ret;
 }
 
 /**
@@ -172,13 +172,13 @@ gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size,
                        unsigned int max_tries, unsigned int flags)
 {
   int ret;
-  unsigned int retries = 0;
+  unsigned int retries = 1;
 
   if (data_size > MAX_HEARTBEAT_LENGTH)
     return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
   if (!heartbeat_allow_send (session))
-    return GNUTLS_E_INVALID_REQUEST;
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   switch(session->internals.hb_state)
     {
@@ -195,8 +195,8 @@ gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size,
         ret = _gnutls_rnd (GNUTLS_RND_NONCE, session->internals.hb_local_data.data, data_size);
         if (ret < 0)
           return gnutls_assert_val(ret);
-        session->internals.hb_local_data.length = data_size;
 
+        session->internals.hb_local_data.length = data_size;
         session->internals.hb_state = SHB_SEND2;
       case SHB_SEND2:
         session->internals.hb_timeout = HEARTBEAT_TIMEOUT;
@@ -317,7 +317,7 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
       memcpy(session->internals.hb_remote_data.data, msg+3, hb_len);
       session->internals.hb_remote_data.length = hb_len;
 
-      return GNUTLS_E_HEARTBEAT_PING_RECEIVED;
+      return gnutls_assert_val(GNUTLS_E_HEARTBEAT_PING_RECEIVED);
 
     case HEARTBEAT_RESPONSE:
 
@@ -335,7 +335,7 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
 
       _gnutls_buffer_reset (&session->internals.hb_local_data);
 
-      return GNUTLS_E_HEARTBEAT_PONG_RECEIVED;
+      return gnutls_assert_val(GNUTLS_E_HEARTBEAT_PONG_RECEIVED);
     default:
       _gnutls_record_log
           ("REC[%p]: HB: received unknown type %u\n",

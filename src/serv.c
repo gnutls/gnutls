@@ -1342,6 +1342,10 @@ tcp_server (const char *name, int port)
               {
                 r = gnutls_record_recv (j->tls_session, buf,
                                         MIN (1024, SMALL_READ_TEST));
+                if (r == GNUTLS_E_HEARTBEAT_PING_RECEIVED)
+                  {
+                    gnutls_heartbeat_pong(j->tls_session, 0);
+                  }
                 if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN)
                   {
                     /* do nothing */
@@ -1376,10 +1380,7 @@ tcp_server (const char *name, int port)
                       {
                         if (r < 0)
                           {
-                            if (GNUTLS_E_HEARTBEAT_PONG_FAILED == r)
-                              fprintf (stderr,
-                                       "HeartBeat pong failed, ping dropped\n");
-                            else if (r != GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
+                            if (r != GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
                               {
                                 j->http_state = HTTP_STATE_CLOSING;
                                 check_alert (j->tls_session, r);

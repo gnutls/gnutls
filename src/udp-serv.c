@@ -144,9 +144,13 @@ void udp_server(const char* name, int port, int mtu)
 
         for(;;)
           {
-            do {
-              ret = gnutls_record_recv_seq(session, buffer, MAX_BUFFER, sequence);
-            } while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+            do 
+              {
+                ret = gnutls_record_recv_seq(session, buffer, MAX_BUFFER, sequence);
+                if (ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED)
+                  gnutls_heartbeat_pong(session, 0);
+              }
+            while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED);
 
             if (ret == GNUTLS_E_REHANDSHAKE)
               {

@@ -1042,6 +1042,8 @@ print_list (const char *priorities, int verbose)
 int check_command(gnutls_session_t session, const char* str)
 {
   size_t len = strnlen(str, 128);
+  int ret;
+
   fprintf (stderr, "*** Processing %zu bytes command: %s\n", len, str);
   if (len > 2 && str[0] == str[1] && str[0] == '*')
   {
@@ -1051,7 +1053,19 @@ int check_command(gnutls_session_t session, const char* str)
 	  gnutls_rehandshake (session);
           return 1;
       } else if (strncmp(str, "**HEARTBEAT**", sizeof ("**HEARTBEAT**") - 1) == 0) {
-	  gnutls_heartbeat_ping_rnd (session);
+	  ret = gnutls_heartbeat_ping (session, 300, 5, GNUTLS_HEARTBEAT_WAIT);
+	  if (ret < 0)
+	    {
+	      if (ret == GNUTLS_E_INVALID_REQUEST)
+	        {
+	          fprintf(stderr, "No heartbeat in this session\n");
+	        }
+              else
+                {
+   	          fprintf(stderr, "ping: %s\n", gnutls_strerror(ret));
+	          exit(1);
+                }
+	    }
 	  return 2;
       }
   }
