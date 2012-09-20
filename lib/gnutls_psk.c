@@ -188,7 +188,7 @@ gnutls_psk_allocate_server_credentials (gnutls_psk_server_credentials_t * sc)
  * @password_file: is the PSK password file (passwd.psk)
  *
  * This function sets the password file, in a
- * %gnutls_psk_server_credentials_t structure.  This password file
+ * #gnutls_psk_server_credentials_t structure.  This password file
  * holds usernames and keys and will be used for PSK authentication.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
@@ -228,7 +228,7 @@ gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
  * @hint: is the PSK identity hint string
  *
  * This function sets the identity hint, in a
- * %gnutls_psk_server_credentials_t structure.  This hint is sent to
+ * #gnutls_psk_server_credentials_t structure.  This hint is sent to
  * the client to help it chose a good PSK credential (i.e., username
  * and password).
  *

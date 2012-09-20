@@ -1166,7 +1166,7 @@ cleanup:
  * @pub_format: the format of the public key
  * @privkey: the generated key
  * @pubkey: the corresponding public key (may be null)
- * @flags: should be a list of %GNUTLS_TPM flags
+ * @flags: should be a list of GNUTLS_TPM_* flags
  *
  * This function will generate a private key in the TPM
  * chip. The private key will be generated within the chip

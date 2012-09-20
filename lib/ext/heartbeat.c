@@ -31,7 +31,7 @@
 /**
   * gnutls_heartbeat_enable:
   * @session: is a #gnutls_session_t structure.
-  * @type: one of %GNUTLS_HB_*
+  * @type: one of the GNUTLS_HB_* flags
   *
   * This function will allow heartbeat messages to be
   * received.
