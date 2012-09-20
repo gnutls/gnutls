@@ -456,14 +456,13 @@ local policy affecting HeartBeat messages coming from the peer - the policy
 could be checked via @funcref{gnutls_heartbeat_allowed}. 
 The requests coming from peer are answered automatically (if policy permits) 
 inside @funcref{gnutls_record_recv}, requests to peer could be send via
-@funcref{gnutls_heartbeat_ping} or
-@funcref{gnutls_heartbeat_ping_rnd}. Each request triggers timeout
-which could be checked and manipulated with @funcref{gnutls_heartbeat_timeout}.
+@funcref{gnutls_heartbeat_ping}. 
 
 Policy-related functions:
 @showfuncB{gnutls_heartbeat_allowed,gnutls_heartbeat_enable}
+
 Operational functions:
-@showfuncC{gnutls_heartbeat_timeout,gnutls_heartbeat_ping,gnutls_heartbeat_ping_rnd}
+@showfuncB{gnutls_heartbeat_ping,gnutls_heartbeat_pong}
 
 @node Safe renegotiation
 @subsection Safe renegotiation
