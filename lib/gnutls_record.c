@@ -220,7 +220,7 @@ gnutls_bye (gnutls_session_t session, gnutls_close_request_t how)
         {
           do
             {
-              ret = _gnutls_recv_int (session, GNUTLS_ALERT, -1, NULL, 0, NULL);
+              ret = _gnutls_recv_int (session, GNUTLS_ALERT, -1, NULL, 0, NULL, 0);
             }
           while (ret == GNUTLS_E_GOT_APPLICATION_DATA);
 
@@ -874,7 +874,7 @@ record_read_headers (gnutls_session_t session,
 static int recv_headers( gnutls_session_t session, content_type_t type, 
                          gnutls_handshake_description_t htype, 
                          struct tls_record_st* record,
-                         unsigned int ms)
+                         unsigned int *ms)
 {
 int ret;
 gnutls_datum_t raw; /* raw headers */
@@ -952,7 +952,9 @@ gnutls_datum_t raw; /* raw headers */
 
 #define MAX_EMPTY_PACKETS_SEQUENCE 4
 
-/* This will receive record layer packets and add them to 
+/* @ms: is the number of milliseconds to wait for data. Use zero for indefinite.
+ *
+ * This will receive record layer packets and add them to 
  * application_data_buffer and handshake_data_buffer.
  *
  * If the htype is not -1 then handshake timeouts
@@ -960,7 +962,7 @@ gnutls_datum_t raw; /* raw headers */
  */
 ssize_t
 _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
-                         gnutls_handshake_description_t htype)
+                         gnutls_handshake_description_t htype, unsigned int ms)
 {
   uint64 *packet_sequence;
   uint8_t *ciphertext;
@@ -970,7 +972,6 @@ _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
   record_parameters_st *record_params;
   record_state_st *record_state;
   struct tls_record_st record;
-  time_t now, tleft = 0;
 
 begin:
 
@@ -1003,17 +1004,8 @@ begin:
 
   record_state = &record_params->read;
 
-  if (htype != (unsigned)-1 && session->internals.handshake_endtime > 0)
-    {
-      now = gnutls_time(0);
-      if (now < session->internals.handshake_endtime)
-        tleft = (session->internals.handshake_endtime - now) * 1000;
-      else
-        return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
-    }
-
   /* receive headers */
-  ret = recv_headers(session, type, htype, &record, tleft);
+  ret = recv_headers(session, type, htype, &record, &ms);
   if (ret < 0)
     {
       ret = gnutls_assert_val_fatal(ret);
@@ -1025,20 +1017,11 @@ begin:
   else
     packet_sequence = &record_state->sequence_number;
 
-  if (htype != (unsigned)-1 && session->internals.handshake_endtime > 0)
-    {
-      now = gnutls_time(0);
-      if (now < session->internals.handshake_endtime)
-        tleft = (session->internals.handshake_endtime - now) * 1000;
-      else
-        return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
-    }
-
   /* Read the packet data and insert it to record_recv_buffer.
    */
   ret =
        _gnutls_io_read_buffered (session, record.packet_size,
-                                 record.type, tleft);
+                                 record.type, &ms);
   if (ret != record.packet_size)
     {
       gnutls_assert();
@@ -1210,7 +1193,8 @@ recv_error:
 ssize_t
 _gnutls_recv_int (gnutls_session_t session, content_type_t type,
                   gnutls_handshake_description_t htype,
-                  uint8_t * data, size_t data_size, void* seq)
+                  uint8_t * data, size_t data_size, void* seq,
+                  unsigned int ms)
 {
   int ret;
 
@@ -1241,7 +1225,7 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
   if (ret != 0)
     return ret;
 
-  ret = _gnutls_recv_in_buffers(session, type, htype);
+  ret = _gnutls_recv_in_buffers(session, type, htype, ms);
   if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
     return gnutls_assert_val(ret);
 
@@ -1312,8 +1296,9 @@ gnutls_record_send (gnutls_session_t session, const void *data,
  * The number of bytes received might be less than the requested @data_size.
  **/
 ssize_t
-gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size) {
-    return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data, data_size, NULL);
+gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size) 
+{
+    return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data, data_size, NULL, 0);
 }
 
 /**
@@ -1341,5 +1326,5 @@ gnutls_record_recv_seq (gnutls_session_t session, void *data, size_t data_size,
   unsigned char *seq)
 {
   return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data,
-                           data_size, seq);
+                           data_size, seq, 0);
 }

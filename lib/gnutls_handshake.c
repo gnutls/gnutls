@@ -2725,6 +2725,12 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
   int ret = 0;
   uint8_t ch;
   unsigned int ccs_len = 1;
+  unsigned int tleft;
+  
+  ret = handshake_remaining_time(session);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  tleft = ret;
 
   switch (STATE)
     {
@@ -2747,7 +2753,8 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
       if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
         ccs_len = 3;
 
-      ret = _gnutls_recv_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, &ch, ccs_len, NULL);
+      ret = _gnutls_recv_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, &ch, ccs_len, NULL, 
+                              tleft);
       if (ret <= 0)
         {
           ERR ("recv ChangeCipherSpec", ret);

@@ -230,6 +230,13 @@ typedef enum handshake_state_t
   STATE60 = 60, STATE61, STATE62, STATE70, STATE71
 } handshake_state_t;
 
+typedef enum heartbeat_state_t
+{  
+  SHB_SEND1 = 0, 
+  SHB_SEND2, 
+  SHB_RECV, 
+} heartbeat_state_t;
+
 #include <gnutls_str.h>
 
 /* This is the maximum number of algorithms (ciphers or macs etc).
@@ -660,9 +667,6 @@ typedef struct
    */
   time_t async_term;
 
-  struct timespec heartbeat_sent; /* timestamp: when last HeartBeat Request was sent*/
-  time_t heartbeat_timeout; /* current timeout, in milliseconds*/
-
   /* last retransmission triggered by record layer */
   struct timespec last_retransmit;
   unsigned int packets_dropped;
@@ -890,14 +894,19 @@ typedef struct
   /* if set it means that the master key was set using
    * gnutls_session_set_master() rather than being negotiated. */
   unsigned int premaster_set:1;
-
+  
   unsigned int cb_tls_unique_len;
   unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
   
   unsigned int handshake_endtime; /* end time in seconds */
   unsigned int handshake_timeout_ms; /* timeout in milliseconds */
 
-  gnutls_buffer_st heartbeat_payload; /* store in-flight payload for heartbeat extension*/
+  gnutls_buffer_st hb_local_data;
+  gnutls_buffer_st hb_remote_data;
+  struct timespec hb_ping_sent; /* timestamp: when last HeartBeat ping was sent*/
+  unsigned int hb_timeout; /* current timeout, in milliseconds*/
+
+  heartbeat_state_t hb_state; /* for ping */
   
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */

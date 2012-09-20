@@ -65,10 +65,10 @@ _gnutls_heartbeat (unsigned policy)
 /**
   * gnutls_heartbeat_allowed:
   * @session: is a #gnutls_session_t structure.
-  * @type: non zero is for sending, and zero for receiving
+  * @type: one of %GNUTLS_HB_LOCAL_ALLOWED_TO_SEND and %GNUTLS_HB_PEER_ALLOWED_TO_SEND
   *
   * This function will check whether heartbeats are allowed
-  * in this session.
+  * to be sent or received in this session. 
   *
   * Returns: Non zero if heartbeats are allowed.
   *
@@ -82,7 +82,7 @@ gnutls_heartbeat_allowed (gnutls_session_t session, unsigned int type)
       (session, GNUTLS_EXTENSION_HEARTBEAT, &epriv) < 0)
     return 0;                   /* Not enabled */
 
-  if (type != 0)
+  if (type == GNUTLS_HB_LOCAL_ALLOWED_TO_SEND)
     {
       if (epriv.num & LOCAL_ALLOWED_TO_SEND)
         return 1;
@@ -105,12 +105,12 @@ heartbeat_allow_send (gnutls_session_t session)
   return gnutls_heartbeat_allowed(session, 1);
 }
 
-/**
- * _gnutls_heartbeat_send_data:
+/*-
+ * heartbeat_send_data:
  * @session: is a #gnutls_session_t structure.
  * @data: contains the data to send.
  * @data_size: is the length of the data.
- * @request: true if Request message is about to be send.
+ * @start_timer: true if the heartbeat timer is to be started.
  *
  * This function has the similar semantics with gnutls_record_send() The only
  * difference is that it uses GNUTLS_HEARTBEAT content type.
@@ -123,16 +123,14 @@ heartbeat_allow_send (gnutls_session_t session)
  *   number of bytes sent might be less than @data_size.  The maximum
  *   number of bytes this function can send in a single call depends
  *   on the negotiated maximum record size.
- **/
-ssize_t
-_gnutls_heartbeat_send_data (gnutls_session_t session, const void *data,
-                             size_t data_size, int request)
+ -*/
+static int
+heartbeat_send_data (gnutls_session_t session, const void *data,
+                     size_t data_size, uint8_t type)
 {
   int ret;
-  char pr[128];
   gnutls_buffer_st response;
   uint8_t payload[16];
-  uint8_t type = request ? HEARTBEAT_REQUEST : HEARTBEAT_RESPONSE;
   _gnutls_buffer_init (&response);
 
   ret = gnutls_rnd (GNUTLS_RND_RANDOM, payload, 16);
@@ -146,23 +144,7 @@ _gnutls_heartbeat_send_data (gnutls_session_t session, const void *data,
   ret = _gnutls_send_int (session, GNUTLS_HEARTBEAT, -1,
                           EPOCH_WRITE_CURRENT, response.data,
                           response.length, MBUFFER_FLUSH);
-  if (request)
-    {
-      if (ret >= 0)
-        {
-          _gnutls_record_log
-              ("REC[%p]: HB %zu bytes sent OK [%d in packet], saved for response verification:%s\n",
-               session, data_size, ret, _gnutls_bin2hex ((uint8_t *) data,
-                                                         data_size, pr,
-                                                         sizeof (pr),
-                                                         NULL));
-          session->internals.dtls.heartbeat_timeout = HEARTBEAT_TIMEOUT;
-          gettime (&session->internals.dtls.heartbeat_sent);
-          _gnutls_buffer_reset (&session->internals.heartbeat_payload);
-          BUFFER_APPEND (&session->internals.heartbeat_payload, data,
-                         data_size);
-        }
-    }
+
   _gnutls_record_log ("REC[%p]: HB sent: %d\n", session, ret);
 
   _gnutls_buffer_clear (&response);
@@ -172,27 +154,25 @@ _gnutls_heartbeat_send_data (gnutls_session_t session, const void *data,
 /**
  * gnutls_heartbeat_ping:
  * @session: is a #gnutls_session_t structure.
- * @data_size: is the length of the random data.
- * @wait_for_it: wait for pong or timeout instead of returning
- * immediately.
+ * @data_size: is the length of the ping payload.
+ * @max_tries: if flags is %GNUTLS_HEARTBEAT_WAIT then this sets the number of retransmissions.
+ * @flags: if %GNUTLS_HEARTBEAT_WAIT then wait for pong or timeout instead of returning immediately.
  *
- * This function has the similar semantics with gnutls_record_send().
- * The only difference is that it uses GNUTLS_HEARTBEAT content type
- * and auto-generate data to send.
+ * This function sends a ping to the peer. If the @flags is set
+ * to %GNUTLS_HEARTBEAT_WAIT then it waits for a reply from the peer.
+ * 
+ * Note that it is highly recommended to use this function with the
+ * flag %GNUTLS_HEARTBEAT_WAIT, or you need to handle retransmissions
+ * and timeouts manually.
  *
- * This function send HeartBeat request message with proper padding.
- *
- *
- * Returns: The number of bytes sent, or a negative error code. The
- *   number of bytes sent might be less than @data_size.  The maximum
- *   number of bytes this function can send in a single call depends
- *   on the negotiated maximum record size. GNUTLS_E_HEARTBEAT_FLIGHT
- *   is returned if HB Request is alredy in flight.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
-ssize_t
-gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size)
+int
+gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size, 
+                       unsigned int max_tries, unsigned int flags)
 {
-  int ret = GNUTLS_E_HEARTBEAT_FLIGHT;
+  int ret;
+  unsigned int retries = 0;
 
   if (data_size > MAX_HEARTBEAT_LENGTH)
     return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
@@ -200,42 +180,101 @@ gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size)
   if (!heartbeat_allow_send (session))
     return GNUTLS_E_INVALID_REQUEST;
 
-  _gnutls_record_log
-      ("REC[%p]: sending HB_REQUEST with length: %zu to peer\n",
-       session, data_size);
-
-  if (gnutls_heartbeat_timeout (session, 1) == GNUTLS_E_ILLEGAL_PARAMETER)
+  switch(session->internals.hb_state)
     {
-      uint8_t data[data_size];
-      ret = _gnutls_rnd (GNUTLS_RND_NONCE, data, data_size);
-      if (ret >= 0)
-        ret = _gnutls_heartbeat_send_data (session, data, data_size, 1);
-    }
-  else
-    _gnutls_record_log
-        ("REC[%p]: HB_REQUEST with length %zu already in-flight: %d\n",
-         session, data_size, gnutls_heartbeat_timeout (session, 1));
+      case SHB_SEND1:
+        _gnutls_record_log
+         ("REC[%p]: sending HB_REQUEST with length: %zu to peer\n", session, data_size);
 
+        _gnutls_buffer_reset(&session->internals.hb_local_data);
+
+        ret = _gnutls_buffer_resize (&session->internals.hb_local_data, data_size);
+        if (ret < 0)
+          return gnutls_assert_val(ret);
+
+        ret = _gnutls_rnd (GNUTLS_RND_NONCE, session->internals.hb_local_data.data, data_size);
+        if (ret < 0)
+          return gnutls_assert_val(ret);
+        session->internals.hb_local_data.length = data_size;
+
+        session->internals.hb_state = SHB_SEND2;
+      case SHB_SEND2:
+        session->internals.hb_timeout = HEARTBEAT_TIMEOUT;
+retry:
+        ret = heartbeat_send_data (session, session->internals.hb_local_data.data, 
+                                   session->internals.hb_local_data.length, 
+                                   HEARTBEAT_REQUEST);
+        if (ret < 0)
+          return gnutls_assert_val(ret);
+
+        gettime (&session->internals.hb_ping_sent);
+            
+        if (!(flags & GNUTLS_HEARTBEAT_WAIT))
+          {
+            session->internals.hb_state = SHB_SEND1;
+            break;
+          }
+        
+        session->internals.hb_state = SHB_RECV;
+
+      case SHB_RECV:
+        ret = _gnutls_recv_int(session, GNUTLS_HEARTBEAT, -1, NULL, 0, NULL, session->internals.hb_timeout);
+        if (ret == GNUTLS_E_HEARTBEAT_PONG_RECEIVED)
+          {
+            session->internals.hb_state = SHB_SEND1;
+            break;
+          }
+        else if (ret == GNUTLS_E_TIMEDOUT)
+          {
+            retries++;
+            if (retries > max_tries)
+              {
+                session->internals.hb_state = SHB_SEND1;
+                return gnutls_assert_val(ret);
+              }
+
+            session->internals.hb_timeout *= 2;
+            session->internals.hb_timeout %= MAX_DTLS_TIMEOUT;
+            
+            session->internals.hb_state = SHB_SEND2;
+            goto retry;
+          }
+        else if (ret < 0)
+          {
+            session->internals.hb_state = SHB_SEND1;
+            return gnutls_assert_val(ret);
+          }
+    }
+
+  return 0;
+}
+
+/**
+ * gnutls_heartbeat_pong:
+ * @session: is a #gnutls_session_t structure.
+ * @flags: should be zero
+ *
+ * This function replies to a ping by sending a pong to the peer.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ **/
+int
+gnutls_heartbeat_pong (gnutls_session_t session, unsigned int flags)
+{
+int ret;
+
+  if (session->internals.hb_remote_data.length == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  ret = heartbeat_send_data (session, session->internals.hb_remote_data.data, 
+                             session->internals.hb_remote_data.length, 
+                             HEARTBEAT_RESPONSE);
+
+  _gnutls_buffer_reset (&session->internals.hb_remote_data);
   return ret;
 }
 
-/**
- * simple wrapper for ping with random length
- **/
-ssize_t
-gnutls_heartbeat_ping_rnd (gnutls_session_t session)
-{
-  uint8_t rnd;
-  int ret;
-  
-  ret = gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-  
-  return gnutls_heartbeat_ping (session, rnd + 1);
-}
-
-/**
+/*-
  * Process HB message in buffer.
  * @bufel: the (suspected) HeartBeat message (TLV+padding)
  *
@@ -244,11 +283,12 @@ gnutls_heartbeat_ping_rnd (gnutls_session_t session)
  * GNUTLS_E_AGAIN if processed OK
  * GNUTLS_E_HEARTBEAT_PONG_FAILED on response send failure for request message
  * GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER on payload mismatch for response message
- **/
+ -*/
 int
 _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
 {
   char pr[128];
+  int ret;
   uint8_t *msg = _mbuffer_get_udata_ptr (bufel);
   size_t hb_len, len = _mbuffer_get_udata_size (bufel);
 
@@ -261,108 +301,49 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
   hb_len = _gnutls_read_uint16 (msg + 1);
   if (hb_len > len - 3)
     return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
-
+  
   switch (msg[0])
     {
     case HEARTBEAT_REQUEST:
       _gnutls_record_log
-          ("REC[%p]: received HEARTBEAT_REQUEST, responding...\n",
-           session);
-      if (_gnutls_heartbeat_send_data (session, msg + 3, hb_len, 0) >= 0)
-        return GNUTLS_E_AGAIN;  /* HB responded, no APP_DATA so needs to be called again */
-      else
-        {                       /* immediate response failed, TBD: save received data somewhere and let upper layers handle it, loosing single ping is non-critical for HB */
-          return GNUTLS_E_HEARTBEAT_PONG_FAILED;
-        }
-      break;
+          ("REC[%p]: received HEARTBEAT_REQUEST\n", session);
+
+      _gnutls_buffer_reset(&session->internals.hb_remote_data);
+
+      ret = _gnutls_buffer_resize (&session->internals.hb_remote_data, hb_len);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      
+      memcpy(session->internals.hb_remote_data.data, msg+3, hb_len);
+      session->internals.hb_remote_data.length = hb_len;
+
+      return GNUTLS_E_HEARTBEAT_PING_RECEIVED;
 
     case HEARTBEAT_RESPONSE:
 
-      if (session->internals.heartbeat_payload.length != hb_len)
-        return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+      if (hb_len != session->internals.hb_local_data.length)
+        return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
 
-      if (memcmp (msg + 3, session->internals.heartbeat_payload.data,
+      if (memcmp (msg + 3, session->internals.hb_local_data.data,
                   hb_len) != 0)
         {
           _gnutls_record_log ("REC[%p]: HB: %s - received\n", session,
                               _gnutls_bin2hex (msg + 3, hb_len, pr,
                                                sizeof (pr), NULL));
-          _gnutls_record_log ("REC[%p]: HB: %s - expected\n", session,
-                              _gnutls_bin2hex (session->internals.
-                                               heartbeat_payload.data,
-                                               hb_len, pr, sizeof (pr),
-                                               NULL));
-          return gnutls_assert_val (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+          return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
         }
-      _gnutls_record_log
-          ("REC[%p]: HB: %zu response bytes received OK (%d msec. left before timeout)\n",
-           session, hb_len, gnutls_heartbeat_timeout (session, 1));
 
-      session->internals.dtls.heartbeat_timeout = HEARTBEAT_TIMEOUT;
-      _gnutls_buffer_reset (&session->internals.heartbeat_payload);
-      return GNUTLS_E_AGAIN;
+      _gnutls_buffer_reset (&session->internals.hb_local_data);
 
+      return GNUTLS_E_HEARTBEAT_PONG_RECEIVED;
     default:
       _gnutls_record_log
           ("REC[%p]: HB: received unknown type %u\n",
            session, msg[0]);
       return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
     }
-
-  return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
 }
 
-/**
- * Update HB timeouts: should be called on retransmit to set new timeout.
- * @check_only: guarantees lack of side-effects (no variables are written)
- *
- * Returns:
- * number of milliseconds left before timeout expiration OR
- * GNUTLS_E_TIMEDOUT if timeout expired
- * GNUTLS_E_SUCCESS if timeout updated
- * GNUTLS_E_ILLEGAL_PARAMETER if no HB message is in-flight
- **/
-int
-gnutls_heartbeat_timeout (gnutls_session_t session, int check_only)
-{
-  struct timespec now;
-  unsigned int ms;
-  if (session->internals.heartbeat_payload.length)
-    {
-      _gnutls_debug_log
-          ("HB: %zu bytes are in-flight already: %u msec timeout.\n",
-           session->internals.heartbeat_payload.length,
-           (unsigned int) session->internals.dtls.heartbeat_timeout);
-      gettime (&now);
-      ms = _dtls_timespec_sub_ms (&now,
-                                  &session->internals.dtls.heartbeat_sent);
-      if (ms > session->internals.dtls.heartbeat_timeout)
-        {
-          if (check_only)
-            return GNUTLS_E_TIMEDOUT;
-          _gnutls_buffer_reset (&session->internals.heartbeat_payload);
-
-          if (session->internals.dtls.heartbeat_timeout * 2 >
-              MAX_HEARTBEAT_TIMEOUT)
-            {                   /* update impossible */
-              session->internals.dtls.heartbeat_timeout =
-                  HEARTBEAT_TIMEOUT;
-              return GNUTLS_E_TIMEDOUT;
-            }
-          else
-            {
-              session->internals.dtls.heartbeat_timeout *= 2;
-              gettime (&session->internals.dtls.heartbeat_sent);
-              return GNUTLS_E_SUCCESS;
-            }
-        }
-      else
-        {
-          return ms;
-        }
-    }
-  return GNUTLS_E_ILLEGAL_PARAMETER;
-}
 
 static int
 _gnutls_heartbeat_recv_params (gnutls_session_t session,

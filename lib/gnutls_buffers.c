@@ -49,6 +49,7 @@
 #include <gnutls_dtls.h>
 #include <system.h>
 #include <gnutls_constate.h> /* gnutls_epoch_get */
+#include <gnutls_handshake.h> /* remaining_time() */
 #include <errno.h>
 #include <system.h>
 #include "debug.h"
@@ -174,24 +175,27 @@ int errno_to_gerr(int err)
 
 static ssize_t
 _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
-		    gnutls_pull_func pull_func, unsigned int ms)
+		    gnutls_pull_func pull_func, unsigned int *ms)
 {
   ssize_t i, ret;
   uint8_t *ptr;
+  struct timespec t1, t2;
   size_t max_size = _gnutls_get_max_decrypted_data(session);
   size_t recv_size = MAX_RECV_SIZE(session);
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
+  unsigned int diff;
 
   if (recv_size > max_size)
     recv_size = max_size;
 
   session->internals.direction = 0;
 
-  if (ms)
+  if (ms && *ms > 0)
     {
-      ret = _gnutls_io_check_recv(session, ms);
+      ret = _gnutls_io_check_recv(session, *ms);
       if (ret < 0)
         return gnutls_assert_val(ret);
+      gettime(&t1);
     }
 
   *bufel = _mbuffer_alloc (0, max_size);
@@ -228,6 +232,16 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
       _mbuffer_set_udata_size (*bufel, i);
     }
 
+  if (ms && *ms > 0)
+    {
+      gettime(&t2);
+      diff = _dtls_timespec_sub_ms(&t2, &t1);
+      if (diff < *ms)
+        *ms -= diff;
+      else
+        return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+    }
+
   _gnutls_read_log ("READ: read %d bytes from %p\n", (int) i, fd);
   
   return i;
@@ -239,7 +253,7 @@ cleanup:
 
 static ssize_t
 _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
-		     size_t size, gnutls_pull_func pull_func, unsigned int ms)
+		     size_t size, gnutls_pull_func pull_func, unsigned int *ms)
 {
   size_t left;
   ssize_t i = 0;
@@ -263,9 +277,9 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
   left = size;
   while (left > 0)
     {
-      if (ms)
+      if (ms && *ms > 0)
         {
-          ret = _gnutls_io_check_recv(session, ms);
+          ret = _gnutls_io_check_recv(session, *ms);
           if (ret < 0)
             return gnutls_assert_val(ret);
             
@@ -314,12 +328,12 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
       left -= i;
       (*bufel)->msg.size += i;
 
-      if (ms && left)
+      if (ms && *ms > 0)
         {
           gettime(&t2);
           diff = _dtls_timespec_sub_ms(&t2, &t1);
-          if (diff < ms)
-            ms -= diff;
+          if (diff < *ms)
+            *ms -= diff;
           else
             return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
         }
@@ -341,7 +355,7 @@ finish:
  */
 static ssize_t
 _gnutls_read (gnutls_session_t session, mbuffer_st **bufel,
-	      size_t size, gnutls_pull_func pull_func, unsigned int ms)
+	      size_t size, gnutls_pull_func pull_func, unsigned int *ms)
 {
   if (IS_DTLS (session))
     /* Size is not passed, since a whole datagram will be read. */
@@ -402,7 +416,10 @@ _gnutls_writev (gnutls_session_t session, const giovec_t * giovec,
   return i;
 }
 
-/* This function is like recv(with MSG_PEEK). But it does not return -1 on error.
+/* 
+ * @ms: a pointer to the number of milliseconds to wait for data. Use zero or NULL for indefinite.
+ *
+ * This function is like recv(with MSG_PEEK). But it does not return -1 on error.
  * It does return gnutls_errno instead.
  * This function reads data from the socket and keeps them in a buffer, of up to
  * MAX_RECV_SIZE. 
@@ -416,7 +433,7 @@ _gnutls_writev (gnutls_session_t session, const giovec_t * giovec,
  */
 ssize_t
 _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
-                          content_type_t recv_type, unsigned int ms)
+                          content_type_t recv_type, unsigned int *ms)
 {
   ssize_t ret = 0;
   size_t min;
@@ -1170,6 +1187,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
                                handshake_buffer_st * hsk, unsigned int optional)
 {
   int ret;
+  unsigned int tleft = 0;
 
   ret = get_last_packet(session, htype, hsk, optional);
   if (ret != GNUTLS_E_AGAIN && ret != GNUTLS_E_INTERRUPTED && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
@@ -1195,9 +1213,17 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
         return gnutls_assert_val(ret);
     }
 
+  if (htype != (unsigned)-1)
+    {
+      ret = handshake_remaining_time(session);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      tleft = ret;
+    }
+
   /* if we don't have a complete message waiting for us, try 
    * receiving more */
-  ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, htype);
+  ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, htype, tleft);
   if (ret < 0)
     return gnutls_assert_val_fatal(ret);
 

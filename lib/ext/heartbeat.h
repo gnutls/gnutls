@@ -28,7 +28,7 @@
 #define HEARTBEAT_REQUEST 1
 #define HEARTBEAT_RESPONSE 2
 
-#define MAX_HEARTBEAT_LENGTH 16384
+#define MAX_HEARTBEAT_LENGTH DEFAULT_MAX_RECORD_SIZE
 #define HEARTBEAT_TIMEOUT 1000
 #define MAX_HEARTBEAT_TIMEOUT 60000
 
@@ -42,11 +42,6 @@ extern extension_entry_st ext_mod_heartbeat;
 typedef uint8_t heartbeat_policy_t;
 
 int _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel);
-ssize_t _gnutls_heartbeat_send_data (gnutls_session_t session,
-                                     const void *data, size_t data_size,
-                                     int request);
-ssize_t gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size);
-ssize_t gnutls_heartbeat_ping_rnd (gnutls_session_t session);
 int _gnutls_heartbeat_enabled (gnutls_session_t session, int local);
 int gnutls_heartbeat_timeout (gnutls_session_t session, int check_only);
 #endif

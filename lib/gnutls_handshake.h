@@ -23,6 +23,8 @@
 #ifndef HANDSHAKE_H
 #define HANDSHAKE_H
 
+#include <gnutls_errors.h>
+
 int _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
                             gnutls_handshake_description_t type);
 int _gnutls_recv_hello_request (gnutls_session_t session, void *data,
@@ -54,5 +56,18 @@ void _gnutls_handshake_hash_buffers_clear (gnutls_session_t session);
  */
 #define AGAIN(target) (STATE==target?1:0)
 #define AGAIN2(state, target) (state==target?1:0)
+
+inline static int handshake_remaining_time(gnutls_session_t session)
+{
+  if (session->internals.handshake_endtime)
+    {
+      time_t now = gnutls_time(0);
+      if (now < session->internals.handshake_endtime)
+        return (session->internals.handshake_endtime - now) * 1000;
+      else 
+        return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+    }
+  return 0;
+}
 
 #endif

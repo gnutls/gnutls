@@ -53,7 +53,7 @@ record_check_unprocessed (gnutls_session_t session)
 int _gnutls_record_buffer_get (content_type_t type,
                                gnutls_session_t session, uint8_t * data,
                                size_t length, uint8_t seq[8]);
-ssize_t _gnutls_io_read_buffered (gnutls_session_t, size_t n, content_type_t, unsigned int ms);
+ssize_t _gnutls_io_read_buffered (gnutls_session_t, size_t n, content_type_t, unsigned int *ms);
 int _gnutls_io_clear_peeked_data (gnutls_session_t session);
 
 ssize_t _gnutls_io_write_buffered (gnutls_session_t session,
@@ -109,7 +109,7 @@ _gnutls_parse_record_buffered_msgs (gnutls_session_t session);
 
 ssize_t
 _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
-                         gnutls_handshake_description_t htype);
+                         gnutls_handshake_description_t htype, unsigned int ms);
 
 #define _gnutls_handshake_io_buffer_clear( session) \
         _mbuffer_head_clear( &session->internals.handshake_send_buffer); \

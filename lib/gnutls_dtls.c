@@ -179,7 +179,7 @@ static int is_next_hpacket_expected(gnutls_session_t session)
 int ret;
 
   /* htype is arbitrary */
-  ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, GNUTLS_HANDSHAKE_FINISHED);
+  ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, GNUTLS_HANDSHAKE_FINISHED, 0);
   if (ret < 0)
     return gnutls_assert_val(ret);
   
