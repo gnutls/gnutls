@@ -178,6 +178,12 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
           len = 0;
           result = asn1_read_value (asn1_struct, tmpbuffer3, NULL, &len);
+          if (result != ASN1_MEM_ERROR)
+            {
+              gnutls_assert ();
+              result = _gnutls_asn2err (result);
+              goto cleanup;
+            }
 
           value2 = gnutls_malloc (len);
           if (value2 == NULL)

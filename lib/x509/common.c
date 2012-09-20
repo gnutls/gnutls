@@ -538,7 +538,6 @@ time2gtime (const char *ttime, int year)
     {
       memcpy (xx, ttime, 2);
       etime.tm_sec = atoi (xx);
-      ttime += 2;
     }
   else
     etime.tm_sec = 0;
