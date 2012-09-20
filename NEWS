@@ -2,7 +2,47 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.1 (unreleased)
+* Version 3.1.2 (unreleased)
+
+** libgnutls: Fixed bug in gnutls_x509_trust_list_add_system_trust()
+and gnutls_x509_trust_list_add_trust_mem() that prevented the loading
+of certificates in the windows platform.
+
+** libgnutls: Added X.509 certificate verification flag 
+GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN. This flag allows the verification
+of unsorted certificate chains and is enabled by default for
+TLS certificate verification (if gnutls_certificate_set_verify_flags() 
+does not override it).
+
+** libgnutls: Prints warning on certificates that contain keys of
+an insecure level. If the %COMPAT priority flag is not specified
+the TLS connection fails.
+
+** libgnutls: Better mingw32 support (patch by LRN).
+
+** libgnutls: The %COMPAT keyword, if specified, will tolerate
+key usage violation errors (they are far too common to ignore).
+
+** libgnutls: Added GNUTLS_STATELESS_COMPRESSION flag to gnutls_init(),
+which provides a tool to counter compression-related attacks where
+parts of the data are controlled by the attacker _and_ placed in
+separate records (use with care - do not use compression if not sure).
+
+** libgnutls: Depends on libtasn1 2.14 or later.
+
+** certtool: Prints the number of bits of the public key algorithm
+parameter in a private key.
+
+** API and ABI modifications:
+gnutls_x509_privkey_get_pk_algorithm2: Added
+gnutls_heartbeat_ping: Added
+gnutls_heartbeat_pong: Added
+gnutls_heartbeat_allowed: Added
+gnutls_heartbeat_enable: Added
+GNUTLS_SEC_PARAM_WEAK: Added
+GNUTLS_SEC_PARAM_INSECURE: Added
+
+* Version 3.1.1 (released 2012-09-02)
 
 ** gnutls-serv: Listens on IPv6. Patch by Bernhard R. Link.
 
@@ -12,6 +52,14 @@ given. If the '--password' option is given during key generation then
 assume the PKCS #8 file format, instead of ignoring the password.
 
 ** tpmtool: No longer asks for key password in registered keys.
+
+** libgnutls: Elliptic curve code was optimized by Ilya Tumaykin.
+wmNAF is now used for point multiplication and other optimizations.
+(the major part of the work was done during Google Summer of Code).
+
+** libgnutls: The default pull_timeout_function only uses select
+instead of a combination of select() and recv() to prevent issues
+when used in stream sockets in some systems.
 
 ** libgnutls: Be tolerant in ECDSA signature violations (e.g. using
 SHA256 with a SECP384 curve instead of SHA-384), to interoperate with
