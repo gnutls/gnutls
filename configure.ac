@@ -279,6 +279,11 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wstrict-overflow"
   nw="$nw -Wmissing-noreturn"
   nw="$nw -Winline"                 # Too compiler dependent
+  nw="$nw -Wsuggest-attribute=pure" # Is it worth using attributes?
+  nw="$nw -Wsuggest-attribute=const" # Is it worth using attributes?
+  nw="$nw -Wsuggest-attribute=noreturn" # Is it worth using attributes?
+  nw="$nw -Wstack-protector"        # Some functions cannot be protected
+  nw="$nw -Wredundant-decls"        # Some files cannot be compiled with that (gl_fd_to_handle)
 
   gl_MANYWARN_ALL_GCC([ws])
   gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
@@ -288,16 +293,11 @@ if test "$gl_gcc_warnings" = yes; then
 
   gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
   gl_WARN_ADD([-Wno-format-y2k])     # Too many warnings for now
-  gl_WARN_ADD([-Wno-suggest-attribute=pure])     # Too many warnings for now
-  gl_WARN_ADD([-Wno-suggest-attribute=const])     # Too many warnings for now
-  gl_WARN_ADD([-Wno-suggest-attribute=noreturn])     # Too many warnings for now
   gl_WARN_ADD([-Wno-unused-value]) # warnings for things we don't want to get
   gl_WARN_ADD([-Wno-unused-result]) # warnings for things we don't want to get
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
-  gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
   gl_WARN_ADD([-Wno-stack-protector])  # Some functions cannot be protected
   gl_WARN_ADD([-Wno-int-to-pointer-cast])  # Some files cannot be compiled with that (gl_fd_to_handle)
-  gl_WARN_ADD([-Wno-redundant-decls])  # Some files cannot be compiled with that (gl_fd_to_handle)
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
 
