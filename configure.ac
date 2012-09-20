@@ -278,6 +278,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wunsafe-loop-optimizations"
   nw="$nw -Wstrict-overflow"
   nw="$nw -Wmissing-noreturn"
+  nw="$nw -Winline"                 # Too compiler dependent
 
   gl_MANYWARN_ALL_GCC([ws])
   gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
