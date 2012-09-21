@@ -240,6 +240,7 @@ retry:
                 return gnutls_assert_val(ret);
               }
 
+            gettime(&now);
             diff = _dtls_timespec_sub_ms(&now, &session->internals.hb_ping_start);
             if (diff > session->internals.hb_total_timeout_ms)
               {
