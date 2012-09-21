@@ -158,7 +158,7 @@ heartbeat_send_data (gnutls_session_t session, const void *data,
  * gnutls_heartbeat_ping:
  * @session: is a #gnutls_session_t structure.
  * @data_size: is the length of the ping payload.
- * @max_tries: if flags is %GNUTLS_HEARTBEAT_WAIT then this sets the number of retransmissions.
+ * @max_tries: if flags is %GNUTLS_HEARTBEAT_WAIT then this sets the number of retransmissions. Use zero for indefinite (until timeout).
  * @flags: if %GNUTLS_HEARTBEAT_WAIT then wait for pong or timeout instead of returning immediately.
  *
  * This function sends a ping to the peer. If the @flags is set
@@ -234,7 +234,7 @@ retry:
         else if (ret == GNUTLS_E_TIMEDOUT)
           {
             retries++;
-            if (retries > max_tries)
+            if (max_tries > 0 && retries > max_tries)
               {
                 session->internals.hb_state = SHB_SEND1;
                 return gnutls_assert_val(ret);
