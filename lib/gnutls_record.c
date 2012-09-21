@@ -694,7 +694,7 @@ record_add_to_buffers (gnutls_session_t session,
                   ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
                   goto unexpected_packet;
                 }
-                
+
               if (_dtls_is_async(session) && _dtls_async_timer_active(session))
                 {
                   if (session->security_parameters.entity == GNUTLS_SERVER &&
@@ -705,9 +705,11 @@ record_add_to_buffers (gnutls_session_t session,
                     }
                   else
                     {
+                      session->internals.recv_state = RECV_STATE_DTLS_RETRANSMIT;
                       ret = _dtls_retransmit(session);
                       if (ret == 0) 
                         {
+                          session->internals.recv_state = RECV_STATE_0;
                           ret = gnutls_assert_val(GNUTLS_E_AGAIN);
                           goto unexpected_packet;
                         }
@@ -1196,21 +1198,33 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
       gnutls_assert ();
       return GNUTLS_E_INVALID_SESSION;
     }
+    
+  switch(session->internals.recv_state)
+    {
+      case RECV_STATE_DTLS_RETRANSMIT:
+        ret = _dtls_retransmit(session);
+        if (ret < 0)
+          return gnutls_assert_val(ret);
+        
+        session->internals.recv_state = RECV_STATE_0;
+      case RECV_STATE_0:
 
-  _dtls_async_timer_check(session);
-  
-  /* If we have enough data in the cache do not bother receiving
-   * a new packet. (in order to flush the cache)
-   */
-  ret = check_buffers (session, type, data, data_size, seq);
-  if (ret != 0)
-    return ret;
+        _dtls_async_timer_check(session);
+        /* If we have enough data in the cache do not bother receiving
+         * a new packet. (in order to flush the cache)
+         */ 
+        ret = check_buffers (session, type, data, data_size, seq);
+        if (ret != 0)
+          return ret;
 
-  ret = _gnutls_recv_in_buffers(session, type, htype);
-  if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
-    return gnutls_assert_val(ret);
+        ret = _gnutls_recv_in_buffers(session, type, htype);
+        if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
+          return gnutls_assert_val(ret);
 
-  return check_buffers (session, type, data, data_size, seq);
+        return check_buffers (session, type, data, data_size, seq);
+      default:
+        return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+    }
 }
 
 

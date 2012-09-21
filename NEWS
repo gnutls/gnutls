@@ -13,6 +13,9 @@ of unsorted certificate chains and is enabled by default for
 TLS certificate verification (if gnutls_certificate_set_verify_flags() 
 does not override it).
 
+** libgnutls: Correctly restore gnutls_record_recv() in DTLS mode
+if interrupted during the retrasmition of handshake data.
+
 ** libgnutls: Added GNUTLS_STATELESS_COMPRESSION flag to gnutls_init(),
 which provides a tool to counter compression-related attacks where
 parts of the data are controlled by the attacker _and_ placed in

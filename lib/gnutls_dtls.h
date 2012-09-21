@@ -31,7 +31,6 @@
 #include <timespec.h>
 
 int _dtls_transmit(gnutls_session_t session);
-int _dtls_retransmit(gnutls_session_t session);
 int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq);
 void _dtls_reset_hsk_state(gnutls_session_t session);
 
@@ -120,6 +119,16 @@ inline static int _dtls_async_timer_active(gnutls_session_t session)
     return 0;
 
   return session->internals.dtls.async_term;
+}
+
+/* This function is to be called from record layer once
+ * a handshake replay is detected. It will make sure
+ * it transmits only once per few seconds. Otherwise
+ * it is the same as _dtls_transmit().
+ */
+inline static int _dtls_retransmit(gnutls_session_t session)
+{
+  return _dtls_transmit(session);
 }
 
 #endif

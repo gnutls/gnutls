@@ -157,15 +157,6 @@ static int drop_usage_count(gnutls_session_t session, mbuffer_head_st *const sen
   return 0;
 }
 
-/* This function is to be called from record layer once
- * a handshake replay is detected. It will make sure
- * it transmits only once per few seconds. Otherwise
- * it is the same as _dtls_transmit().
- */
-int _dtls_retransmit(gnutls_session_t session)
-{
-  return _dtls_transmit(session);
-}
 
 /* Checks whether the received packet contains a handshake
  * packet with sequence higher that the previously received.
