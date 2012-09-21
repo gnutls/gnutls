@@ -8,6 +8,9 @@ See the end for copying conditions.
 and gnutls_x509_trust_list_add_trust_mem() that prevented the loading
 of certificates in the windows platform.
 
+** libgnutls: Added support for DTLS/TLS heartbeats by Olga Smolenchuk.
+(the work was done during Google Summer of Code).
+
 ** libgnutls: Added X.509 certificate verification flag 
 GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN. This flag allows the verification
 of unsorted certificate chains and is enabled by default for
@@ -39,6 +42,8 @@ gnutls_heartbeat_ping: Added
 gnutls_heartbeat_pong: Added
 gnutls_heartbeat_allowed: Added
 gnutls_heartbeat_enable: Added
+gnutls_heartbeat_set_timeouts: Added
+gnutls_heartbeat_get_timeout: Added
 GNUTLS_SEC_PARAM_WEAK: Added
 GNUTLS_SEC_PARAM_INSECURE: Added
 
