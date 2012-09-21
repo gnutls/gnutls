@@ -1591,7 +1591,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
     }
 
   result =
-    _gnutls_x509_privkey_sign_hash2 (key, digest, flags, &hash, signature);
+    _gnutls_x509_privkey_sign_hash2 (key, digest, flags, &hash, &sig);
 
   _gnutls_free_datum(&hash);
 
