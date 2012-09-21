@@ -686,7 +686,7 @@ function implies to restoring the same function that was interrupted, in
 the DTLS protocol this requirement isn't true.
 There are cases where a retransmission is required, which are indicated by
 a received message and thus @funcref{gnutls_record_get_direction} must be called 
-to decide which operation to restore, i.e., send or receive.
+to decide which direction to check prior to restoring a function call.
 @showfuncdesc{gnutls_record_get_direction}
 
 Moreover, to prevent blocking from DTLS' retransmission timers to block a

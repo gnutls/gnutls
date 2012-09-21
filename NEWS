@@ -21,6 +21,9 @@ does not override it).
 an insecure level. If the %COMPAT priority flag is not specified
 the TLS connection fails.
 
+** libgnutls: Correctly restore gnutls_record_recv() in DTLS mode
+if interrupted during the retrasmition of handshake data.
+
 ** libgnutls: Better mingw32 support (patch by LRN).
 
 ** libgnutls: The %COMPAT keyword, if specified, will tolerate

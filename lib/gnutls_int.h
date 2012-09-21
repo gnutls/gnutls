@@ -237,6 +237,12 @@ typedef enum heartbeat_state_t
   SHB_RECV, 
 } heartbeat_state_t;
 
+typedef enum recv_state_t
+{  
+  RECV_STATE_0 = 0, 
+  RECV_STATE_DTLS_RETRANSMIT,
+} recv_state_t;
+
 #include <gnutls_str.h>
 
 /* This is the maximum number of algorithms (ciphers or macs etc).
@@ -910,6 +916,8 @@ typedef struct
   unsigned int hb_total_timeout_ms; /* the total timeout, in milliseconds*/
 
   heartbeat_state_t hb_state; /* for ping */
+  
+  recv_state_t recv_state; /* state of the receive function */
   
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */
