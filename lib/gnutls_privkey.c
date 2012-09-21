@@ -619,6 +619,67 @@ uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   return 0;
 }
+
+/**
+ * gnutls_privkey_import_openpgp_raw:
+ * @pkey: The private key
+ * @data: The private key data to be imported
+ * @format: The format of the private key
+ * @keyid: The key id to use (optional)
+ * @password: A password (optional)
+ *
+ * This function will import the given private key to the abstract
+ * #gnutls_privkey_t structure. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ **/
+int gnutls_privkey_import_openpgp_raw (gnutls_privkey_t pkey,
+                                    const gnutls_datum_t * data,
+                                    gnutls_openpgp_crt_fmt_t format,
+                                    const gnutls_openpgp_keyid_t keyid,
+                                    const char* password)
+{
+  gnutls_openpgp_privkey_t xpriv;
+  int ret;
+  
+  ret = gnutls_openpgp_privkey_init(&xpriv);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  ret = gnutls_openpgp_privkey_import(xpriv, data, format, password, 0);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  if(keyid)
+    {
+      ret = gnutls_openpgp_privkey_set_preferred_key_id(xpriv, keyid);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+    }
+
+  ret = gnutls_privkey_import_openpgp(pkey, xpriv, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+    
+  ret = 0;
+  
+cleanup:
+  gnutls_openpgp_privkey_deinit(xpriv);
+  
+  return ret;
+}
 #endif
 
 /**
@@ -886,66 +947,6 @@ cleanup:
   return ret;
 }
 
-/**
- * gnutls_privkey_import_openpgp_raw:
- * @pkey: The private key
- * @data: The private key data to be imported
- * @format: The format of the private key
- * @keyid: The key id to use (optional)
- * @password: A password (optional)
- *
- * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. 
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- *
- * Since: 3.1.0
- **/
-int gnutls_privkey_import_openpgp_raw (gnutls_privkey_t pkey,
-                                    const gnutls_datum_t * data,
-                                    gnutls_openpgp_crt_fmt_t format,
-                                    const gnutls_openpgp_keyid_t keyid,
-                                    const char* password)
-{
-  gnutls_openpgp_privkey_t xpriv;
-  int ret;
-  
-  ret = gnutls_openpgp_privkey_init(&xpriv);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-
-  ret = gnutls_openpgp_privkey_import(xpriv, data, format, password, 0);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-
-  if(keyid)
-    {
-      ret = gnutls_openpgp_privkey_set_preferred_key_id(xpriv, keyid);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
-    }
-
-  ret = gnutls_privkey_import_openpgp(pkey, xpriv, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-    
-  ret = 0;
-  
-cleanup:
-  gnutls_openpgp_privkey_deinit(xpriv);
-  
-  return ret;
-}
 
 
 /**
