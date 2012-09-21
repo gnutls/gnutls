@@ -383,6 +383,9 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
   gnutls_transport_set_errno_function (*session, system_errno);
   gnutls_transport_set_pull_timeout_function (*session, system_recv_timeout);
 
+  (*session)->internals.hb_retrans_timeout_ms = 1000;
+  (*session)->internals.hb_total_timeout_ms = 60000;
+
   if (flags & GNUTLS_DATAGRAM)
     {
       (*session)->internals.dtls.mtu = DTLS_DEFAULT_MTU;

@@ -35,6 +35,8 @@
   *
   * This function will allow heartbeat messages to be
   * received.
+  *
+  * Since: 3.1.2
   **/
 void
 gnutls_heartbeat_enable (gnutls_session_t session, unsigned int type)
@@ -72,6 +74,7 @@ _gnutls_heartbeat (unsigned policy)
   *
   * Returns: Non zero if heartbeats are allowed.
   *
+  * Since: 3.1.2
   **/
 int
 gnutls_heartbeat_allowed (gnutls_session_t session, unsigned int type)
@@ -166,13 +169,16 @@ heartbeat_send_data (gnutls_session_t session, const void *data,
  * and timeouts manually.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.1.2
  **/
 int
 gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size, 
                        unsigned int max_tries, unsigned int flags)
 {
   int ret;
-  unsigned int retries = 1;
+  unsigned int retries = 1, diff;
+  struct timespec now;
 
   if (data_size > MAX_HEARTBEAT_LENGTH)
     return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
@@ -196,10 +202,11 @@ gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size,
         if (ret < 0)
           return gnutls_assert_val(ret);
 
+        gettime (&session->internals.hb_ping_start);
         session->internals.hb_local_data.length = data_size;
         session->internals.hb_state = SHB_SEND2;
       case SHB_SEND2:
-        session->internals.hb_timeout = HEARTBEAT_TIMEOUT;
+        session->internals.hb_actual_retrans_timeout_ms = session->internals.hb_retrans_timeout_ms;
 retry:
         ret = heartbeat_send_data (session, session->internals.hb_local_data.data, 
                                    session->internals.hb_local_data.length, 
@@ -218,7 +225,7 @@ retry:
         session->internals.hb_state = SHB_RECV;
 
       case SHB_RECV:
-        ret = _gnutls_recv_int(session, GNUTLS_HEARTBEAT, -1, NULL, 0, NULL, session->internals.hb_timeout);
+        ret = _gnutls_recv_int(session, GNUTLS_HEARTBEAT, -1, NULL, 0, NULL, session->internals.hb_actual_retrans_timeout_ms);
         if (ret == GNUTLS_E_HEARTBEAT_PONG_RECEIVED)
           {
             session->internals.hb_state = SHB_SEND1;
@@ -233,8 +240,15 @@ retry:
                 return gnutls_assert_val(ret);
               }
 
-            session->internals.hb_timeout *= 2;
-            session->internals.hb_timeout %= MAX_DTLS_TIMEOUT;
+            diff = _dtls_timespec_sub_ms(&now, &session->internals.hb_ping_start);
+            if (diff > session->internals.hb_total_timeout_ms)
+              {
+                session->internals.hb_state = SHB_SEND1;
+                return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+              }
+
+            session->internals.hb_actual_retrans_timeout_ms *= 2;
+            session->internals.hb_actual_retrans_timeout_ms %= MAX_DTLS_TIMEOUT;
             
             session->internals.hb_state = SHB_SEND2;
             goto retry;
@@ -257,6 +271,8 @@ retry:
  * This function replies to a ping by sending a pong to the peer.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.1.2
  **/
 int
 gnutls_heartbeat_pong (gnutls_session_t session, unsigned int flags)
@@ -342,6 +358,60 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
            session, msg[0]);
       return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
     }
+}
+
+/**
+ * gnutls_heartbeat_get_timeout:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will return the milliseconds remaining
+ * for a retransmission of the previously sent ping
+ * message. This function is useful when ping is used in
+ * non-blocking mode, to estimate when to call gnutls_heartbeat_ping()
+ * if no packets have been received.
+ *
+ * Returns: the remaining time in milliseconds.
+ *
+ * Since: 3.1.2
+ **/
+unsigned int gnutls_heartbeat_get_timeout (gnutls_session_t session)
+{
+struct timespec now;
+unsigned int diff;
+
+  gettime(&now);
+  diff = _dtls_timespec_sub_ms(&now, &session->internals.hb_ping_sent);
+  if (diff >= session->internals.hb_actual_retrans_timeout_ms)
+    return 0;
+  else
+    return session->internals.hb_actual_retrans_timeout_ms - diff;
+}
+
+/**
+ * gnutls_heartbeat_set_timeouts:
+ * @session: is a #gnutls_session_t structure.
+ * @retrans_timeout: The time at which a retransmission will occur in milliseconds
+ * @total_timeout: The time at which the connection will be aborted, in milliseconds.
+ *
+ * This function will set the timeouts required for the DTLS handshake
+ * protocol. The retransmission timeout is the time after which a
+ * message from the peer is not received, the previous messages will
+ * be retransmitted. The total timeout is the time after which the
+ * handshake will be aborted with %GNUTLS_E_TIMEDOUT.
+ *
+ * The DTLS protocol recommends the values of 1 sec and 60 seconds
+ * respectively.
+ *
+ * If the retransmission timeout is zero then the handshake will operate
+ * in a non-blocking way, i.e., return %GNUTLS_E_AGAIN.
+ *
+ * Since: 3.1.2
+ **/
+void gnutls_heartbeat_set_timeouts (gnutls_session_t session, unsigned int retrans_timeout,
+                                    unsigned int total_timeout)
+{
+  session->internals.hb_retrans_timeout_ms = retrans_timeout;
+  session->internals.hb_total_timeout_ms = total_timeout;
 }
 
 

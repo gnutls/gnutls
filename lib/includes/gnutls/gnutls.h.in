@@ -915,6 +915,10 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                               void *data, size_t * data_length,
                               unsigned int *type, unsigned int indx);
 
+  unsigned int gnutls_heartbeat_get_timeout (gnutls_session_t session);
+  void gnutls_heartbeat_set_timeouts (gnutls_session_t session, unsigned int retrans_timeout,
+                                      unsigned int total_timeout);
+
 #define GNUTLS_HB_PEER_ALLOWED_TO_SEND (1)
 #define GNUTLS_HB_PEER_NOT_ALLOWED_TO_SEND (1<<1)
 

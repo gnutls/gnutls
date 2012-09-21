@@ -464,7 +464,7 @@ Policy-related functions:
 @showfuncB{gnutls_heartbeat_allowed,gnutls_heartbeat_enable}
 
 Operational functions:
-@showfuncB{gnutls_heartbeat_ping,gnutls_heartbeat_pong}
+@showfuncD{gnutls_heartbeat_ping,gnutls_heartbeat_pong,gnutls_heartbeat_set_timeouts,gnutls_heartbeat_get_timeout}
 
 @node Safe renegotiation
 @subsection Safe renegotiation

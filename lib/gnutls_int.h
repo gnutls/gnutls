@@ -903,8 +903,11 @@ typedef struct
 
   gnutls_buffer_st hb_local_data;
   gnutls_buffer_st hb_remote_data;
+  struct timespec hb_ping_start; /* timestamp: when first HeartBeat ping was sent*/
   struct timespec hb_ping_sent; /* timestamp: when last HeartBeat ping was sent*/
-  unsigned int hb_timeout; /* current timeout, in milliseconds*/
+  unsigned int hb_actual_retrans_timeout_ms; /* current timeout, in milliseconds*/
+  unsigned int hb_retrans_timeout_ms; /* the default timeout, in milliseconds*/
+  unsigned int hb_total_timeout_ms; /* the total timeout, in milliseconds*/
 
   heartbeat_state_t hb_state; /* for ping */
   
