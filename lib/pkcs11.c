@@ -997,8 +997,6 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
         {
           struct token_info tinfo;
 
-          ret = GNUTLS_E_PKCS11_ERROR;
-
           if (pkcs11_get_token_info (module, providers[x].slots[z],
                &tinfo.tinfo) != CKR_OK)
             {

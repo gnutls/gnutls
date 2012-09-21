@@ -526,10 +526,9 @@ cdk_armor_encode_buffer (const byte * inbuf, size_t inlen,
       return 0;
     }
 
-  pos = 0;
   memset (outbuf, 0, outlen);
-  memcpy (outbuf + pos, "-----", 5);
-  pos += 5;
+  memcpy (outbuf, "-----", 5);
+  pos = 5;
   memcpy (outbuf + pos, head, strlen (head));
   pos += strlen (head);
   memcpy (outbuf + pos, "-----", 5);

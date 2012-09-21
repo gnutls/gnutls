@@ -228,7 +228,6 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
 
   DECR_LEN (data_size, n_Y);
   data_Y = &data[i];
-  i += n_Y;
 
   _n_Y = n_Y;
   _n_g = n_g;
@@ -297,26 +296,27 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
   ret = _gnutls_buffer_append_mpi(data, 16, p, 0);
   if (ret < 0)
     {
-      ret = gnutls_assert_val(ret);
+      gnutls_assert();
       goto cleanup;
     }
 
   ret = _gnutls_buffer_append_mpi(data, 16, g, 0);
   if (ret < 0)
     {
-      ret = gnutls_assert_val(ret);
+      gnutls_assert();
       goto cleanup;
     }
 
   ret = _gnutls_buffer_append_mpi(data, 16, Y, 0);
   if (ret < 0)
     {
-      ret = gnutls_assert_val(ret);
+      gnutls_assert();
       goto cleanup;
     }
-
+  
+  ret = data->length;
 cleanup:
   _gnutls_mpi_release (&Y);
 
-  return data->length;
+  return ret;
 }

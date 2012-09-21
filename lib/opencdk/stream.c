@@ -1042,7 +1042,7 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
       return EOF;
     }
 
-  if (!buf && !count)
+  if (!buf || !count)
     return stream_flush (s);
 
   if (s->cache.on)

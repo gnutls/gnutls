@@ -471,7 +471,7 @@ _gnutls_heartbeat_send_params (gnutls_session_t session,
 
   if (epriv.num & GNUTLS_HB_PEER_ALLOWED_TO_SEND)
     p = 1;
-  else if (epriv.num & GNUTLS_HB_PEER_NOT_ALLOWED_TO_SEND)
+  else /*if (epriv.num & GNUTLS_HB_PEER_NOT_ALLOWED_TO_SEND)*/
     p = 2;
 
   _gnutls_debug_log ("HB: sending parameter %u\n", (unsigned)p);

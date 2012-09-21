@@ -103,7 +103,7 @@ _gnutls_session_pack (gnutls_session_t session,
       if (ret < 0)
         {
           gnutls_assert ();
-          return ret;
+          goto fail;
         }
       break;
 #endif
@@ -113,7 +113,7 @@ _gnutls_session_pack (gnutls_session_t session,
       if (ret < 0)
         {
           gnutls_assert ();
-          return ret;
+          goto fail;
         }
       break;
 #endif
@@ -123,7 +123,7 @@ _gnutls_session_pack (gnutls_session_t session,
       if (ret < 0)
         {
           gnutls_assert ();
-          return ret;
+          goto fail;
         }
       break;
 #endif
@@ -132,7 +132,7 @@ _gnutls_session_pack (gnutls_session_t session,
       if (ret < 0)
         {
           gnutls_assert ();
-          return ret;
+          goto fail;
         }
       break;
     default:
@@ -147,20 +147,20 @@ _gnutls_session_pack (gnutls_session_t session,
   if (ret < 0)
     {
       gnutls_assert ();
-      _gnutls_buffer_clear (&sb);
-      return ret;
+      goto fail;
     }
 
   ret = _gnutls_ext_pack (session, &sb);
   if (ret < 0)
     {
       gnutls_assert ();
-      _gnutls_buffer_clear (&sb);
-      return ret;
+      goto fail;
     }
 
-  ret = _gnutls_buffer_to_datum (&sb, packed_session);
+  return _gnutls_buffer_to_datum (&sb, packed_session);
 
+fail:
+  _gnutls_buffer_clear (&sb);
   return ret;
 }
 
@@ -363,10 +363,7 @@ unpack_certificate_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
 
   info = _gnutls_get_auth_info (session);
   if (info == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   BUFFER_POP_NUM (ps, info->dh.secret_bits);
 
@@ -433,9 +430,13 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   int len, ret;
   int size_offset;
   size_t cur_size;
+  const char* username = NULL;
 
   if (info && info->username)
-    len = strlen (info->username) + 1;  /* include the terminating null */
+    {
+      username = info->username;
+      len = strlen (info->username) + 1;  /* include the terminating null */
+    }
   else
     len = 0;
 
@@ -443,7 +444,7 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_APPEND_NUM (ps, 0);
   cur_size = ps->length;
 
-  BUFFER_APPEND_PFX4 (ps, info->username, len);
+  BUFFER_APPEND_PFX4 (ps, username, len);
 
   /* write the real size */
   _gnutls_write_uint32 (ps->length - cur_size, ps->data + size_offset);
@@ -466,7 +467,6 @@ unpack_srp_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-
   ret =
     _gnutls_auth_info_set (session, GNUTLS_CRD_SRP,
                            sizeof (srp_server_auth_info_st), 1);
@@ -478,12 +478,11 @@ unpack_srp_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
 
   info = _gnutls_get_auth_info (session);
   if (info == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   BUFFER_POP (ps, info->username, username_size);
+  if (username_size == 0)
+    info->username[0] = 0;
 
   ret = 0;
 
@@ -518,15 +517,15 @@ pack_anon_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   size_offset = ps->length;
   BUFFER_APPEND_NUM (ps, 0);
   cur_size = ps->length;
-
+  
   if (info)
     {
       BUFFER_APPEND_NUM (ps, info->dh.secret_bits);
       BUFFER_APPEND_PFX4 (ps, info->dh.prime.data, info->dh.prime.size);
       BUFFER_APPEND_PFX4 (ps, info->dh.generator.data,
-                         info->dh.generator.size);
+                          info->dh.generator.size);
       BUFFER_APPEND_PFX4 (ps, info->dh.public_key.data,
-                         info->dh.public_key.size);
+                          info->dh.public_key.size);
     }
 
   /* write the real size */
@@ -561,10 +560,7 @@ unpack_anon_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
 
   info = _gnutls_get_auth_info (session);
   if (info == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   BUFFER_POP_NUM (ps, info->dh.secret_bits);
 
@@ -614,13 +610,15 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   size_t cur_size;
 
   info = _gnutls_get_auth_info (session);
+  if (info == NULL)
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  if (info && info->username)
+  if (info->username)
     username_len = strlen (info->username) + 1; /* include the terminating null */
   else
     username_len = 0;
 
-  if (info && info->hint)
+  if (info->hint)
     hint_len = strlen (info->hint) + 1; /* include the terminating null */
   else
     hint_len = 0;
@@ -661,10 +659,7 @@ unpack_psk_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
 
   info = _gnutls_get_auth_info (session);
   if (info == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   BUFFER_POP_NUM (ps, username_size);
   if (username_size > sizeof (info->username))

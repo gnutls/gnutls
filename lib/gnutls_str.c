@@ -254,8 +254,9 @@ _gnutls_buffer_pop_datum (gnutls_buffer_st * str, gnutls_datum_t * data,
   return;
 }
 
-/* converts the buffer to a datum if possible. After this call the buffer
- * is at an usable state and might not be used or deinitialized */
+/* converts the buffer to a datum if possible. After this call 
+ * (failed or not) the buffer should be considered deinitialized.
+ */
 int
 _gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
 {
@@ -264,6 +265,7 @@ _gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
     {
       data->data = NULL;
       data->size = 0;
+      _gnutls_buffer_clear (str);
       return 0;
     }
 
@@ -273,6 +275,7 @@ _gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
       if (data->data == NULL)
         {
           gnutls_assert ();
+          _gnutls_buffer_clear (str);
           return GNUTLS_E_MEMORY_ERROR;
         }
       memcpy (data->data, str->data, str->length);
@@ -283,6 +286,7 @@ _gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
     {
       data->data = str->data;
       data->size = str->length;
+      _gnutls_buffer_init(str);
     }
 
   return 0;

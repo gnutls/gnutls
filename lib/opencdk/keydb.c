@@ -1198,7 +1198,7 @@ _cdk_keydb_get_sk_byusage (cdk_keydb_hd_t hd, const char *name,
       return CDK_Unusable_Key;
     }
   node = find_selfsig_node (knode, pk_node->pkt->pkt.secret_key->pk);
-  if (sk->pk->uid && node)
+  if (sk && sk->pk && sk->pk->uid && node)
     _cdk_copy_signature (&sk->pk->uid->selfsig, node->pkt->pkt.signature);
 
   /* We only release the outer packet. */
@@ -1275,7 +1275,7 @@ _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char *name,
       return CDK_Unusable_Key;
     }
   node = find_selfsig_node (knode, pk_node->pkt->pkt.public_key);
-  if (pk->uid && node)
+  if (pk && pk->uid && node)
     _cdk_copy_signature (&pk->uid->selfsig, node->pkt->pkt.signature);
   cdk_kbnode_release (knode);
 

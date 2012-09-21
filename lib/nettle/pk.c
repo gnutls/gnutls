@@ -150,6 +150,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
 
         _ecc_params_to_pubkey(pub, &ecc_pub);
         _ecc_params_to_privkey(priv, &ecc_priv);
+        sz = ECC_BUF_SIZE;
         
         if (ecc_projective_check_point(&ecc_pub.pubkey, pub->params[ECC_B], pub->params[ECC_PRIME]) != 0)
           {
@@ -157,7 +158,6 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
             goto ecc_cleanup;
           }
 
-        sz = ECC_BUF_SIZE;
         out->data = gnutls_malloc(sz);
         if (out->data == NULL)
           {

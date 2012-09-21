@@ -1580,7 +1580,7 @@ unsigned int sig_hash_size;
     {
       if (_gnutls_version_has_selectable_sighash (ver) && sign != GNUTLS_SIGN_UNKNOWN)
         {
-          hash_algo = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
+          _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
           sig_hash_size = _gnutls_hash_get_algo_len(gnutls_sign_get_hash_algorithm(sign));
 
           if (sig_hash_size < hash_size)

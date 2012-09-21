@@ -130,7 +130,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 cleanup:
   gnutls_pcert_deinit (&peer_cert);
 
-  return 0;
+  return ret;
 }
 
 static int
