@@ -406,8 +406,10 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
 
 /* Takes a certificate list and orders it with subject, issuer order.
  *
- * Returns the size of the ordered list (which is always less or
+ * *clist_size contains the size of the ordered list (which is always less or
  * equal to the original).
+ *
+ * Returns the sorted list which may be the original clist.
  */
 static gnutls_x509_crt_t* sort_clist(gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH], 
                                      gnutls_x509_crt_t * clist,
