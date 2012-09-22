@@ -146,9 +146,9 @@ pkt_encode_len (cdk_stream_t out, size_t pktlen)
 {
   cdk_error_t rc;
 
-  assert (out);
+  if (!out)
+    return CDK_Inv_Value;
 
-  rc = 0;
   if (!pktlen)
     {
       /* Block mode, partial bodies, with 'DEF_BLOCKSIZE' from main.h */
@@ -179,7 +179,8 @@ write_head_new (cdk_stream_t out, size_t size, int type)
 {
   cdk_error_t rc;
 
-  assert (out);
+  if (!out)
+    return CDK_Inv_Value;
 
   if (type < 0 || type > 63)
     return CDK_Inv_Packet;
@@ -196,7 +197,8 @@ write_head_old (cdk_stream_t out, size_t size, int type)
   cdk_error_t rc;
   int ctb;
 
-  assert (out);
+  if (!out)
+    return CDK_Inv_Value;
 
   if (type < 0 || type > 16)
     return CDK_Inv_Packet;
@@ -257,8 +259,8 @@ write_pubkey_enc (cdk_stream_t out, cdk_pkt_pubkey_enc_t pke, int old_ctb)
   size_t size;
   int rc, nenc;
 
-  assert (out);
-  assert (pke);
+  if (!out || !pke)
+    return CDK_Inv_Value;
 
   if (pke->version < 2 || pke->version > 3)
     return CDK_Inv_Packet;
@@ -292,8 +294,8 @@ write_mdc (cdk_stream_t out, cdk_pkt_mdc_t mdc)
 {
   cdk_error_t rc;
 
-  assert (mdc);
-  assert (out);
+  if (!out || !mdc)
+    return CDK_Inv_Value;
 
   if (DEBUG_PKT)
     _gnutls_write_log ("write_mdc:\n");
@@ -363,8 +365,8 @@ write_signature (cdk_stream_t out, cdk_pkt_signature_t sig, int old_ctb)
   size_t nbytes, size, nsig;
   cdk_error_t rc;
 
-  assert (out);
-  assert (sig);
+  if (!out || !sig)
+    return CDK_Inv_Value;
 
   if (!KEY_CAN_SIGN (sig->pubkey_algo))
     return CDK_Inv_Algo;
@@ -429,8 +431,8 @@ write_public_key (cdk_stream_t out, cdk_pkt_pubkey_t pk,
   size_t npkey = 0, size = 6;
   cdk_error_t rc;
 
-  assert (out);
-  assert (pk);
+  if (!out || !pk)
+    return CDK_Inv_Value;
 
   if (pk->version < 2 || pk->version > 4)
     return CDK_Inv_Packet;
@@ -506,8 +508,8 @@ write_secret_key (cdk_stream_t out, cdk_pkt_seckey_t sk,
   int pkttype, s2k_mode;
   cdk_error_t rc;
 
-  assert (out);
-  assert (sk);
+  if (!out || !sk)
+    return CDK_Inv_Value;
 
   if (!sk->pk)
     return CDK_Inv_Value;
@@ -626,8 +628,8 @@ write_compressed (cdk_stream_t out, cdk_pkt_compressed_t cd)
 {
   cdk_error_t rc;
 
-  assert (out);
-  assert (cd);
+  if (!out || !cd)
+    return CDK_Inv_Value;
 
   if (DEBUG_PKT)
     _gnutls_write_log ("packet: write_compressed\n");
@@ -647,8 +649,8 @@ write_literal (cdk_stream_t out, cdk_pkt_literal_t pt, int old_ctb)
   size_t size;
   cdk_error_t rc;
 
-  assert (out);
-  assert (pt);
+  if (!out || !pt)
+    return CDK_Inv_Value;
 
   /* We consider a packet without a body as an invalid packet.
      At least one octet must be present. */
@@ -694,8 +696,8 @@ write_onepass_sig (cdk_stream_t out, cdk_pkt_onepass_sig_t sig)
 {
   cdk_error_t rc;
 
-  assert (out);
-  assert (sig);
+  if (!out || !sig)
+    return CDK_Inv_Value;
 
   if (sig->version != 3)
     return CDK_Inv_Packet;

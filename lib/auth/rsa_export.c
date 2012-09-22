@@ -409,7 +409,6 @@ proc_rsa_export_server_kx (gnutls_session_t session,
 
   DECR_LEN (data_size, n_e);
   data_e = &data[i];
-  i += n_e;
 
   _n_e = n_e;
   _n_m = n_m;

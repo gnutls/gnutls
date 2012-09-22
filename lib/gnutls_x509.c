@@ -681,10 +681,9 @@ read_cas_url (gnutls_certificate_credentials_t res, const char *url)
   ret =
     gnutls_x509_crt_list_import_pkcs11 (xcrt_list, pcrt_list_size, pcrt_list,
                                         0);
-  if (xcrt_list == NULL)
+  if (ret < 0)
     {
       gnutls_assert ();
-      ret = GNUTLS_E_MEMORY_ERROR;
       goto cleanup;
     }
 

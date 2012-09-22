@@ -215,7 +215,6 @@ literal_encode (void *data, FILE * in, FILE * out)
   pt->buf = si;
   pkt->old_ctb = 1;
   pkt->pkttype = CDK_PKT_LITERAL;
-  pkt->pkt.literal = pt;
   rc = _cdk_pkt_write_fp (out, pkt);
 
   cdk_pkt_release (pkt);

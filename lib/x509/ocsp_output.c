@@ -571,8 +571,13 @@ print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 		  {
 		    ret = gnutls_x509_crt_export (certs[i], GNUTLS_X509_FMT_PEM,
 						  out.data, &s);
-		    out.size = s;
-		    addf (str, "%.*s", out.size, out.data);
+   	            if (ret < 0)
+ 	              addf (str, "error: crt_export: %s\n", gnutls_strerror (ret));
+                    else
+                      {
+  		        out.size = s;
+		        addf (str, "%.*s", out.size, out.data);
+                      }
 		    gnutls_free (out.data);
 		  }
 	      }

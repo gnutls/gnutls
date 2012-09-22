@@ -248,8 +248,6 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
           (&server_write->IV, &key_block[pos], IV_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
-      pos += IV_size;
-
     }
   else if (IV_size > 0 && export_flag != 0)
     {

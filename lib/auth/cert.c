@@ -1209,16 +1209,15 @@ cleanup:
 #ifdef ENABLE_OPENPGP
 static int
 _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
-                                         uint8_t * data, size_t data_size)
+                                 uint8_t * data, size_t data_size)
 {
   int size, ret, len;
   uint8_t *p = data;
   cert_auth_info_t info;
   gnutls_certificate_credentials_t cred;
   ssize_t dsize = data_size;
-  int x, key_type;
+  int key_type;
   gnutls_pcert_st *peer_certificate_list = NULL;
-  int peer_certificate_list_size = 0;
   gnutls_datum_t tmp, akey = { NULL, 0 };
   uint8_t subkey_id[GNUTLS_OPENPGP_KEYID_SIZE];
   unsigned int subkey_id_set = 0;
@@ -1285,8 +1284,8 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
     }
 
   /* read the actual key or fingerprint */
-  if (key_type == PGP_KEY_FINGERPRINT
-      || key_type == PGP_KEY_FINGERPRINT_SUBKEY)
+  if (key_type == PGP_KEY_FINGERPRINT ||
+      key_type == PGP_KEY_FINGERPRINT_SUBKEY)
     {                           /* the fingerprint */
 
       DECR_LEN (dsize, 1);
@@ -1311,8 +1310,6 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
           return ret;
         }
       tmp = akey;
-      peer_certificate_list_size++;
-
     }
   else if (key_type == PGP_KEY || key_type == PGP_KEY_SUBKEY)
     {                           /* the whole key */
@@ -1330,7 +1327,6 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
         }
 
       DECR_LEN (dsize, len);
-      peer_certificate_list_size++;
 
       tmp.size = len;
       tmp.data = p;
@@ -1344,16 +1340,9 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
 
   /* ok we now have the peer's key in tmp datum
    */
-
-  if (peer_certificate_list_size == 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-    }
-
   peer_certificate_list =
     gnutls_calloc (1,
-                   sizeof (gnutls_pcert_st) * (peer_certificate_list_size));
+                   sizeof (gnutls_pcert_st));
   if (peer_certificate_list == NULL)
     {
       gnutls_assert ();
@@ -1376,7 +1365,7 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
   ret =
     _gnutls_copy_certificate_auth_info (info,
                                         peer_certificate_list,
-                                        peer_certificate_list_size,
+                                        1,
                                         subkey_id_set,
                                         (subkey_id_set !=
                                          0) ? subkey_id : NULL);
@@ -1399,7 +1388,7 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
 cleanup:
 
   _gnutls_free_datum (&akey);
-  CLEAR_CERTS;
+  gnutls_pcert_deinit(&peer_certificate_list[0]);
   gnutls_free (peer_certificate_list);
   return ret;
 
@@ -1586,7 +1575,6 @@ _gnutls_gen_cert_client_crt_vrfy (gnutls_session_t session,
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
   gnutls_datum_t signature = { NULL, 0 };
-  int total_data;
   gnutls_sign_algorithm_t sign_algo;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
@@ -1614,14 +1602,6 @@ _gnutls_gen_cert_client_crt_vrfy (gnutls_session_t session,
   else
     {
       return 0;
-    }
-
-  total_data = signature.size + 2;
-
-  /* add hash and signature algorithms */
-  if (_gnutls_version_has_selectable_sighash (ver))
-    {
-      total_data += 2;
     }
 
   if (_gnutls_version_has_selectable_sighash (ver))
@@ -1740,7 +1720,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session,
                                   gnutls_buffer_st * data)
 {
   gnutls_certificate_credentials_t cred;
-  int size, ret;
+  int ret;
   uint8_t tmp_data[CERTTYPE_SIZE];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
@@ -1756,18 +1736,6 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session,
       gnutls_assert ();
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
-
-  size = CERTTYPE_SIZE + 2;     /* 2 for gnutls_certificate_type_t + 2 for size of rdn_seq 
-                                 */
-
-  if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
-      session->internals.ignore_rdn_sequence == 0)
-    size += cred->x509_rdn_sequence.size;
-
-  if (_gnutls_version_has_selectable_sighash (ver))
-    /* Need two bytes to announce the number of supported hash
-       functions (see below).  */
-    size += MAX_SIGN_ALGO_SIZE;
 
   tmp_data[0] = CERTTYPE_SIZE - 1;
   tmp_data[1] = RSA_SIGN;
@@ -1789,9 +1757,6 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session,
           gnutls_assert ();
           return ret;
         }
-
-      /* recalculate size */
-      size -= MAX_SIGN_ALGO_SIZE + ret;
 
       ret = _gnutls_buffer_append_data (data, p, ret);
       if (ret < 0)

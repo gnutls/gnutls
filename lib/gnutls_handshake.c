@@ -1119,7 +1119,7 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
 
       /* Fragment length */
       _gnutls_write_uint24 (i_datasize, &data[pos]);
-      pos += 3;
+      /* pos += 3; */
     }
 
   _gnutls_handshake_log ("HSK[%p]: %s was queued [%ld bytes]\n",
@@ -1882,7 +1882,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
         {
           data[pos++] = session->internals.dtls.cookie_len;
           memcpy(&data[pos], &session->internals.dtls.cookie, session->internals.dtls.cookie_len);
-          pos += session->internals.dtls.cookie_len;
+          /* pos += session->internals.dtls.cookie_len; */
         }
 
       /* Copy the ciphersuites.
@@ -1973,8 +1973,6 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
   uint8_t session_id_len = session->security_parameters.session_id_size;
   char buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
 
-  datalen = 0;
-
   _gnutls_buffer_init(&extdata);
 
   if (again == 0)
@@ -2028,7 +2026,6 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 
       if (extdata.length > 0)
         {
-          datalen += extdata.length;
           memcpy (&data[pos], extdata.data, extdata.length);
         }
     }
@@ -2141,8 +2138,6 @@ _gnutls_recv_hello_verify_request (gnutls_session_t session,
 
   session->internals.dtls.cookie_len = cookie_len;
   memcpy (session->internals.dtls.cookie, &data[pos], cookie_len);
-
-  pos += cookie_len;
 
   if (len != 0)
     {

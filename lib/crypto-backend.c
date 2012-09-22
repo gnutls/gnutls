@@ -52,6 +52,9 @@ _algo_register (algo_list * al, int algorithm, int priority, const void *s)
 {
   algo_list *cl;
   algo_list *last_cl = al;
+  
+  if (al == NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   /* look if there is any cipher with lowest priority. In that case do not add.
    */

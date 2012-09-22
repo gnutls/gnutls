@@ -271,8 +271,6 @@ _gnutls_ext_sr_send_cs (gnutls_session_t session)
         }
       epriv.ptr = priv;
     }
-  else
-    priv = epriv.ptr;
 
   if (set != 0)
     _gnutls_ext_set_session_data (session,
