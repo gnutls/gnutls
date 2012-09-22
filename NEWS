@@ -18,7 +18,7 @@ if interrupted during the retrasmition of handshake data.
 
 ** libgnutls: Added GNUTLS_STATELESS_COMPRESSION flag to gnutls_init(),
 which provides a tool to counter compression-related attacks where
-parts of the data are controlled by the attacker _and_ placed in
+parts of the data are controlled by the attacker _and_ are placed in
 separate records (use with care - do not use compression if not sure).
 
 ** libgnutls: Depends on libtasn1 2.14 or later.
