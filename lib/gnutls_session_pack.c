@@ -444,7 +444,7 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_APPEND_NUM (ps, 0);
   cur_size = ps->length;
 
-  BUFFER_APPEND_PFX (ps, info->username, len);
+  BUFFER_APPEND_PFX (ps, username, len);
 
   /* write the real size */
   _gnutls_write_uint32 (ps->length - cur_size, ps->data + size_offset);
@@ -608,7 +608,6 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   int hint_len, ret;
   int size_offset;
   size_t cur_size;
-  const char* username = NULL;
 
   info = _gnutls_get_auth_info (session);
   if (info == NULL)
