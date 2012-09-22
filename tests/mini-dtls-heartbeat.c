@@ -180,8 +180,6 @@ client (int fd, int server_init)
 
     gnutls_bye (session, GNUTLS_SHUT_WR);
 
-  end:
-
     close (fd);
 
     gnutls_deinit (session);
