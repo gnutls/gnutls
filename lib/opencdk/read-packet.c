@@ -130,7 +130,7 @@ read_mpi (cdk_stream_t inp, bigint_t * ret_m, int secure)
   if (nbits > MAX_MPI_BITS || nbits == 0)
     {
       _gnutls_write_log ("read_mpi: too large %d bits\n", (int) nbits);
-      return CDK_MPI_Error;     /* Sanity check */
+      return gnutls_assert_val(CDK_MPI_Error);     /* Sanity check */
     }
 
   rc = stream_read (inp, buf + 2, nread, &nread);
@@ -138,7 +138,7 @@ read_mpi (cdk_stream_t inp, bigint_t * ret_m, int secure)
     {
       _gnutls_write_log ("read_mpi: too short %d < %d\n", (int) nread,
                          (int) ((nbits + 7) / 8));
-      return CDK_MPI_Error;
+      return gnutls_assert_val(CDK_MPI_Error);
     }
 
   buf[0] = nbits >> 8;
@@ -146,7 +146,7 @@ read_mpi (cdk_stream_t inp, bigint_t * ret_m, int secure)
   nread += 2;
   err = _gnutls_mpi_scan_pgp (&m, buf, nread);
   if (err < 0)
-    return map_gnutls_error (err);
+    return gnutls_assert_val(map_gnutls_error (err));
 
   *ret_m = m;
   return rc;
@@ -217,7 +217,7 @@ read_pubkey_enc (cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_enc_t pke)
     {
       cdk_error_t rc = read_mpi (inp, &pke->mpi[i], 0);
       if (rc)
-        return rc;
+        return gnutls_assert_val(rc);
     }
 
   return 0;
@@ -309,7 +309,7 @@ read_public_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_t pk)
     {
       cdk_error_t rc = read_mpi (inp, &pk->mpi[i], 0);
       if (rc)
-        return rc;
+        return gnutls_assert_val(rc);
     }
 
   /* This value is just for the first run and will be
@@ -351,6 +351,9 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
     {
       sk->protect.sha1chk = (sk->s2k_usage == 254);
       sk->protect.algo = _pgp_cipher_to_gnutls (cdk_stream_getc (inp));
+      if (sk->protect.algo == GNUTLS_CIPHER_UNKNOWN)
+        return gnutls_assert_val(CDK_Inv_Algo);
+
       sk->protect.s2k = cdk_calloc (1, sizeof *sk->protect.s2k);
       if (!sk->protect.s2k)
         return CDK_Out_Of_Core;
@@ -374,7 +377,9 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
     }
   else
     sk->protect.algo = _pgp_cipher_to_gnutls (sk->s2k_usage);
-  if (sk->protect.algo == GNUTLS_CIPHER_NULL)
+  if (sk->protect.algo == GNUTLS_CIPHER_UNKNOWN)
+    return gnutls_assert_val(CDK_Inv_Algo);
+  else if (sk->protect.algo == GNUTLS_CIPHER_NULL)
     {
       sk->csum = 0;
       nskey = cdk_pk_get_nskey (sk->pk->pubkey_algo);
@@ -387,7 +392,7 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
         {
           rc = read_mpi (inp, &sk->mpi[i], 1);
           if (rc)
-            return rc;
+            return gnutls_assert_val(rc);
         }
       sk->csum = read_16 (inp);
       sk->is_protected = 0;
@@ -405,7 +410,7 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
         {
           rc = read_mpi (inp, &sk->mpi[i], 1);
           if (rc)
-            return rc;
+            return gnutls_assert_val(rc);
         }
       sk->csum = read_16 (inp);
       sk->is_protected = 1;
@@ -726,20 +731,21 @@ static cdk_error_t
 read_signature (cdk_stream_t inp, size_t pktlen, cdk_pkt_signature_t sig)
 {
   size_t nbytes;
-  size_t i, size, nsig;
+  size_t i, nsig;
+  ssize_t size;
   cdk_error_t rc;
 
   if (!inp || !sig)
-    return CDK_Inv_Value;
+    return gnutls_assert_val(CDK_Inv_Value);
 
   if (DEBUG_PKT)
     _gnutls_write_log ("read_signature: %d octets\n", (int) pktlen);
 
   if (pktlen < 16)
-    return CDK_Inv_Packet;
+    return gnutls_assert_val(CDK_Inv_Packet);
   sig->version = cdk_stream_getc (inp);
   if (sig->version < 2 || sig->version > 4)
-    return CDK_Inv_Packet_Ver;
+    return gnutls_assert_val(CDK_Inv_Packet_Ver);
 
   sig->flags.exportable = 1;
   sig->flags.revocable = 1;
@@ -747,7 +753,7 @@ read_signature (cdk_stream_t inp, size_t pktlen, cdk_pkt_signature_t sig)
   if (sig->version < 4)
     {
       if (cdk_stream_getc (inp) != 5)
-        return CDK_Inv_Packet;
+        return gnutls_assert_val(CDK_Inv_Packet);
       sig->sig_class = cdk_stream_getc (inp);
       sig->timestamp = read_32 (inp);
       sig->keyid[0] = read_32 (inp);
@@ -758,12 +764,12 @@ read_signature (cdk_stream_t inp, size_t pktlen, cdk_pkt_signature_t sig)
       sig->digest_start[1] = cdk_stream_getc (inp);
       nsig = cdk_pk_get_nsig (sig->pubkey_algo);
       if (!nsig)
-        return CDK_Inv_Algo;
+        return gnutls_assert_val(CDK_Inv_Algo);
       for (i = 0; i < nsig; i++)
         {
           rc = read_mpi (inp, &sig->mpi[i], 0);
           if (rc)
-            return rc;
+            return gnutls_assert_val(rc);
         }
     }
   else
@@ -778,7 +784,7 @@ read_signature (cdk_stream_t inp, size_t pktlen, cdk_pkt_signature_t sig)
         {
           rc = read_subpkt (inp, &sig->hashed, &nbytes);
           if (rc)
-            return rc;
+            return gnutls_assert_val(rc);
           size -= nbytes;
         }
       sig->unhashed_size = read_16 (inp);
@@ -788,24 +794,24 @@ read_signature (cdk_stream_t inp, size_t pktlen, cdk_pkt_signature_t sig)
         {
           rc = read_subpkt (inp, &sig->unhashed, &nbytes);
           if (rc)
-            return rc;
+            return gnutls_assert_val(rc);
           size -= nbytes;
         }
 
       rc = parse_sig_subpackets (sig);
       if (rc)
-        return rc;
+        return gnutls_assert_val(rc);
 
       sig->digest_start[0] = cdk_stream_getc (inp);
       sig->digest_start[1] = cdk_stream_getc (inp);
       nsig = cdk_pk_get_nsig (sig->pubkey_algo);
       if (!nsig)
-        return CDK_Inv_Algo;
+        return gnutls_assert_val(CDK_Inv_Algo);
       for (i = 0; i < nsig; i++)
         {
           rc = read_mpi (inp, &sig->mpi[i], 0);
           if (rc)
-            return rc;
+            return gnutls_assert_val(rc);
         }
     }
 
@@ -955,7 +961,7 @@ cdk_pkt_read (cdk_stream_t inp, cdk_packet_t pkt)
   if (cdk_stream_eof (inp) || ctb == EOF)
     return CDK_EOF;
   else if (!ctb)
-    return CDK_Inv_Packet;
+    return gnutls_assert_val(CDK_Inv_Packet);
 
   pktsize++;
   if (!(ctb & 0x80))
@@ -963,7 +969,7 @@ cdk_pkt_read (cdk_stream_t inp, cdk_packet_t pkt)
       _cdk_log_info ("cdk_pkt_read: no openpgp data found. "
                      "(ctb=%02X; fpos=%02X)\n", (int) ctb,
                      (int) cdk_stream_tell (inp));
-      return CDK_Inv_Packet;
+      return gnutls_assert_val(CDK_Inv_Packet);
     }
 
   if (ctb & 0x40)               /* RFC2440 packet format. */
@@ -981,7 +987,7 @@ cdk_pkt_read (cdk_stream_t inp, cdk_packet_t pkt)
   if (pkttype > 63)
     {
       _cdk_log_info ("cdk_pkt_read: unknown type %d\n", pkttype);
-      return CDK_Inv_Packet;
+      return gnutls_assert_val(CDK_Inv_Packet);
     }
 
   if (is_newctb)
@@ -1002,100 +1008,124 @@ cdk_pkt_read (cdk_stream_t inp, cdk_packet_t pkt)
       pkt->pkt.user_id = cdk_calloc (1, sizeof *pkt->pkt.user_id
                                      + NAME_SIZE);
       if (!pkt->pkt.user_id)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       pkt->pkt.user_id->name =
         (char *) pkt->pkt.user_id + sizeof (*pkt->pkt.user_id);
 
       rc = read_attribute (inp, pktlen, pkt->pkt.user_id, NAME_SIZE);
       pkt->pkttype = CDK_PKT_ATTRIBUTE;
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_USER_ID:
       pkt->pkt.user_id = cdk_calloc (1, sizeof *pkt->pkt.user_id
                                      + pkt->pktlen + 1);
       if (!pkt->pkt.user_id)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       pkt->pkt.user_id->name =
         (char *) pkt->pkt.user_id + sizeof (*pkt->pkt.user_id);
       rc = read_user_id (inp, pktlen, pkt->pkt.user_id);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_PUBLIC_KEY:
       pkt->pkt.public_key = cdk_calloc (1, sizeof *pkt->pkt.public_key);
       if (!pkt->pkt.public_key)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_public_key (inp, pktlen, pkt->pkt.public_key);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_PUBLIC_SUBKEY:
       pkt->pkt.public_key = cdk_calloc (1, sizeof *pkt->pkt.public_key);
       if (!pkt->pkt.public_key)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_public_subkey (inp, pktlen, pkt->pkt.public_key);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_SECRET_KEY:
       pkt->pkt.secret_key = cdk_calloc (1, sizeof *pkt->pkt.secret_key);
       if (!pkt->pkt.secret_key)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       pkt->pkt.secret_key->pk = cdk_calloc (1,
                                             sizeof *pkt->pkt.secret_key->pk);
       if (!pkt->pkt.secret_key->pk)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_secret_key (inp, pktlen, pkt->pkt.secret_key);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_SECRET_SUBKEY:
       pkt->pkt.secret_key = cdk_calloc (1, sizeof *pkt->pkt.secret_key);
       if (!pkt->pkt.secret_key)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       pkt->pkt.secret_key->pk = cdk_calloc (1,
                                             sizeof *pkt->pkt.secret_key->pk);
       if (!pkt->pkt.secret_key->pk)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_secret_subkey (inp, pktlen, pkt->pkt.secret_key);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_LITERAL:
       pkt->pkt.literal = cdk_calloc (1, sizeof *pkt->pkt.literal);
       if (!pkt->pkt.literal)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_literal (inp, pktlen, &pkt->pkt.literal, is_partial);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_ONEPASS_SIG:
       pkt->pkt.onepass_sig = cdk_calloc (1, sizeof *pkt->pkt.onepass_sig);
       if (!pkt->pkt.onepass_sig)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_onepass_sig (inp, pktlen, pkt->pkt.onepass_sig);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_SIGNATURE:
       pkt->pkt.signature = cdk_calloc (1, sizeof *pkt->pkt.signature);
       if (!pkt->pkt.signature)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_signature (inp, pktlen, pkt->pkt.signature);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_PUBKEY_ENC:
       pkt->pkt.pubkey_enc = cdk_calloc (1, sizeof *pkt->pkt.pubkey_enc);
       if (!pkt->pkt.pubkey_enc)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_pubkey_enc (inp, pktlen, pkt->pkt.pubkey_enc);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_COMPRESSED:
       pkt->pkt.compressed = cdk_calloc (1, sizeof *pkt->pkt.compressed);
       if (!pkt->pkt.compressed)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_compressed (inp, pktlen, pkt->pkt.compressed);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     case CDK_PKT_MDC:
       pkt->pkt.mdc = cdk_calloc (1, sizeof *pkt->pkt.mdc);
       if (!pkt->pkt.mdc)
-        return CDK_Out_Of_Core;
+        return gnutls_assert_val(CDK_Out_Of_Core);
       rc = read_mdc (inp, pkt->pkt.mdc);
+      if (rc)
+        return gnutls_assert_val(rc);
       break;
 
     default:

@@ -82,7 +82,9 @@ _cdk_stream_open_mode (const char *file, const char *mode,
       return CDK_Inv_Value;
     }
 
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("open stream `%s'\n", file);
+#endif
   *ret_s = NULL;
   s = cdk_calloc (1, sizeof *s);
   if (!s)
@@ -105,7 +107,9 @@ _cdk_stream_open_mode (const char *file, const char *mode,
       gnutls_assert ();
       return CDK_File_Error;
     }
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("open stream fd=%d\n", fileno (s->fp));
+#endif
   s->flags.write = 0;
   *ret_s = s;
   return 0;
@@ -175,7 +179,9 @@ cdk_stream_new (const char *file, cdk_stream_t * ret_s)
       return CDK_Inv_Value;
     }
 
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("new stream `%s'\n", file ? file : "[temp]");
+#endif
   *ret_s = NULL;
   s = cdk_calloc (1, sizeof *s);
   if (!s)
@@ -204,7 +210,9 @@ cdk_stream_new (const char *file, cdk_stream_t * ret_s)
       gnutls_assert ();
       return CDK_File_Error;
     }
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("new stream fd=%d\n", fileno (s->fp));
+#endif
   *ret_s = s;
   return 0;
 }
@@ -229,7 +237,9 @@ cdk_stream_create (const char *file, cdk_stream_t * ret_s)
       return CDK_Inv_Value;
     }
 
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("create stream `%s'\n", file);
+#endif
   *ret_s = NULL;
   s = cdk_calloc (1, sizeof *s);
   if (!s)
@@ -254,7 +264,9 @@ cdk_stream_create (const char *file, cdk_stream_t * ret_s)
       gnutls_assert ();
       return CDK_File_Error;
     }
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("stream create fd=%d\n", fileno (s->fp));
+#endif
   *ret_s = s;
   return 0;
 }
@@ -323,7 +335,9 @@ _cdk_stream_fpopen (FILE * fp, unsigned write_mode, cdk_stream_t * ret_out)
       return CDK_Out_Of_Core;
     }
 
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("stream ref fd=%d\n", fileno (fp));
+#endif
   s->fp = fp;
   s->fp_ref = 1;
   s->flags.filtrated = 1;
@@ -457,8 +471,10 @@ cdk_stream_close (cdk_stream_t s)
       return CDK_Inv_Value;
     }
 
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("close stream ref=%d `%s'\n",
                     s->fp_ref, s->fname ? s->fname : "[temp]");
+#endif
 
   /* In the user callback mode, we call the release cb if possible
      and just free the stream. */
@@ -481,7 +497,9 @@ cdk_stream_close (cdk_stream_t s)
     {
       int err;
 
+#ifdef DEBUG_STREAM
       _gnutls_read_log ("close stream fd=%d\n", fileno (s->fp));
+#endif
       err = fclose (s->fp);
       s->fp = NULL;
       if (err)
@@ -510,7 +528,10 @@ cdk_stream_close (cdk_stream_t s)
   s->cache.alloced = 0;
 
   cdk_free (s);
-  gnutls_assert ();
+  
+  if (rc)
+    gnutls_assert ();
+
   return rc;
 }
 
@@ -754,8 +775,10 @@ stream_fp_replace (cdk_stream_t s, FILE ** tmp)
 
   assert (s);
 
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("replace stream fd=%d with fd=%d\n",
                     fileno (s->fp), fileno (*tmp));
+#endif
   rc = fclose (s->fp);
   if (rc)
     {
@@ -791,8 +814,10 @@ stream_filter_write (cdk_stream_t s)
       if (!f->flags.enabled)
         continue;
       /* if there is no next filter, create the final output file */
+#ifdef DEBUG_STREAM
       _gnutls_read_log ("filter [write]: last filter=%d fname=%s\n",
                         f->next ? 1 : 0, s->fname);
+#endif
       if (!f->next && s->fname)
         f->tmp = fopen (s->fname, "w+b");
       else
@@ -812,14 +837,18 @@ stream_filter_write (cdk_stream_t s)
             break;
         }
       rc = f->fnct (f->uint8_t, f->ctl, s->fp, f->tmp);
+#ifdef DEBUG_STREAM
       _gnutls_read_log ("filter [write]: type=%d rc=%d\n", f->type, rc);
+#endif
       if (!rc)
         rc = stream_fp_replace (s, &f->tmp);
       if (!rc)
         rc = cdk_stream_seek (s, 0);
       if (rc)
         {
+#ifdef DEBUG_STREAM
           _gnutls_read_log ("filter [close]: fd=%d\n", fileno (f->tmp));
+#endif
           fclose (f->tmp);
           f->tmp = NULL;
           break;
@@ -851,8 +880,10 @@ stream_filter_read (cdk_stream_t s)
         continue;
       if (f->flags.error)
         {
+#ifdef DEBUG_STREAM
           _gnutls_read_log ("filter %s [read]: has the error flag; skipped\n",
                             s->fname ? s->fname : "[temp]");
+#endif
           continue;
         }
 
@@ -863,8 +894,10 @@ stream_filter_read (cdk_stream_t s)
           break;
         }
       rc = f->fnct (f->uint8_t, f->ctl, s->fp, f->tmp);
+#ifdef DEBUG_STREAM
       _gnutls_read_log ("filter %s [read]: type=%d rc=%d\n",
                         s->fname ? s->fname : "[temp]", f->type, rc);
+#endif
       if (rc)
         {
           f->flags.error = 1;
@@ -1047,6 +1080,10 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
 
   if (s->cache.on)
     {
+#ifdef DEBUG_STREAM
+      _gnutls_read_log ("stream[ref=%u]: written %d bytes\n", s->fp_ref, (int) count);
+#endif
+
       /* We need to resize the buffer if the additional data wouldn't
          fit into it. We allocate more memory to avoid to resize it the
          next time the function is used. */
@@ -1059,13 +1096,20 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
           s->cache.alloced += (count + STREAM_BUFSIZE);
           memcpy (s->cache.buf, old, s->cache.size);
           cdk_free (old);
+#ifdef DEBUG_STREAM
           _gnutls_read_log ("stream: enlarge cache to %d octets\n",
                             (int) s->cache.alloced);
+#endif
         }
+
       memcpy (s->cache.buf + s->cache.size, buf, count);
       s->cache.size += count;
       return count;
     }
+
+#ifdef DEBUG_STREAM
+  _gnutls_read_log ("stream[fd=%u]: written %d bytes\n", fileno (s->fp), (int) count);
+#endif
 
   nwritten = fwrite (buf, 1, count, s->fp);
   if (!nwritten)
@@ -1197,7 +1241,9 @@ cdk_stream_set_literal_flag (cdk_stream_t s, cdk_lit_format_t mode,
   struct stream_filter_s *f;
   const char *orig_fname;
 
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("stream: enable literal mode.\n");
+#endif
 
   if (!s)
     {
@@ -1242,20 +1288,6 @@ cdk_stream_set_compress_flag (cdk_stream_t s, int algo, int level)
 
   gnutls_assert ();
   return CDK_Not_Implemented;
-
-#if 0
-  struct stream_filter_s *f;
-
-  if (!s)
-    return CDK_Inv_Value;
-  f = filter_add (s, _cdk_filter_compress, fCOMPRESS);
-  if (!f)
-    return CDK_Out_Of_Core;
-  f->ctl = stream_get_mode (s);
-  f->u.zfx.algo = algo;
-  f->u.zfx.level = level;
-  return 0;
-#endif
 }
 
 
@@ -1349,8 +1381,10 @@ cdk_stream_enable_cache (cdk_stream_t s, int val)
     {
       s->cache.buf = cdk_calloc (1, STREAM_BUFSIZE);
       s->cache.alloced = STREAM_BUFSIZE;
+#ifdef DEBUG_STREAM
       _gnutls_read_log ("stream: allocate cache of %d octets\n",
                         STREAM_BUFSIZE);
+#endif
     }
   return 0;
 }
@@ -1455,7 +1489,9 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
   /* Memory mapping is not supported on custom I/O objects. */
   if (s->cbs_hd)
     {
+#ifdef DEBUG_STREAM
       _gnutls_read_log ("cdk_stream_mmap_part: not supported on callbacks\n");
+#endif
       gnutls_assert ();
       return CDK_Inv_Mode;
     }
@@ -1579,8 +1615,10 @@ _cdk_stream_set_blockmode (cdk_stream_t s, size_t nbytes)
 {
   assert (s);
 
+#ifdef DEBUG_STREAM
   _gnutls_read_log ("stream: activate block mode with blocksize %d\n",
                     (int) nbytes);
+#endif
   s->blkmode = nbytes;
   return 0;
 }
