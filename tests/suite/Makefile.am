@@ -86,6 +86,6 @@ nodist_eagain_cli_SOURCES = mini-eagain2.c
 
 noinst_PROGRAMS = eagain-cli
 
-nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert
+nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom
 
 TESTS = eagain testsrn testcompat chain invalid-cert
