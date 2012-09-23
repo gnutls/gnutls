@@ -159,9 +159,9 @@ pkt_encode_len (cdk_stream_t out, size_t pktlen)
   else if (pktlen < 8384)
     {
       pktlen -= 192;
-      rc = stream_putc (out, (pktlen / 256) + 192);
+      rc = stream_putc (out, (pktlen >> 8) + 192);
       if (!rc)
-        rc = stream_putc (out, (pktlen % 256));
+        rc = stream_putc (out, (pktlen & 0xff));
     }
   else
     {
