@@ -415,11 +415,11 @@ cdk_kbnode_read_from_mem (cdk_kbnode_t * ret_node,
 
   *ret_node = NULL;
   if (!buflen)
-    return CDK_Too_Short;
+    return gnutls_assert_val(CDK_Too_Short);
 
   rc = cdk_stream_tmp_from_mem (buf, buflen, &inp);
   if (rc)
-    return rc;
+    return gnutls_assert_val(rc);
   
   if (armor)
     cdk_stream_set_armor_flag (inp, 0);

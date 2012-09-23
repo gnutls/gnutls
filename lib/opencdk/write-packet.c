@@ -369,57 +369,81 @@ write_signature (cdk_stream_t out, cdk_pkt_signature_t sig, int old_ctb)
     return CDK_Inv_Value;
 
   if (!KEY_CAN_SIGN (sig->pubkey_algo))
-    return CDK_Inv_Algo;
+    return gnutls_assert_val(CDK_Inv_Algo);
   if (sig->version < 2 || sig->version > 4)
-    return CDK_Inv_Packet;
+    return gnutls_assert_val(CDK_Inv_Packet);
 
   if (DEBUG_PKT)
     _gnutls_write_log ("write_signature:\n");
 
   nsig = cdk_pk_get_nsig (sig->pubkey_algo);
   if (!nsig)
-    return CDK_Inv_Algo;
+    return gnutls_assert_val(CDK_Inv_Algo);
   if (sig->version < 4)
     return write_v3_sig (out, sig, nsig);
 
   size = 10 + calc_subpktsize (sig->hashed)
     + calc_subpktsize (sig->unhashed) + calc_mpisize (sig->mpi, nsig);
+
   rc = pkt_write_head (out, 0, size, CDK_PKT_SIGNATURE);
-  if (!rc)
-    rc = stream_putc (out, 4);
-  if (!rc)
-    rc = stream_putc (out, sig->sig_class);
-  if (!rc)
-    rc = stream_putc (out, _cdk_pub_algo_to_pgp (sig->pubkey_algo));
-  if (!rc)
-    rc = stream_putc (out, _gnutls_hash_algo_to_pgp (sig->digest_algo));
-  if (!rc)
-    rc = write_16 (out, sig->hashed_size);
-  if (!rc)
-    {
-      buf = _cdk_subpkt_get_array (sig->hashed, 0, &nbytes);
-      if (!buf)
-        return CDK_Out_Of_Core;
-      rc = stream_write (out, buf, nbytes);
-      cdk_free (buf);
-    }
-  if (!rc)
-    rc = write_16 (out, sig->unhashed_size);
-  if (!rc)
-    {
-      buf = _cdk_subpkt_get_array (sig->unhashed, 0, &nbytes);
-      if (!buf)
-        return CDK_Out_Of_Core;
-      rc = stream_write (out, buf, nbytes);
-      cdk_free (buf);
-    }
-  if (!rc)
-    rc = stream_putc (out, sig->digest_start[0]);
-  if (!rc)
-    rc = stream_putc (out, sig->digest_start[1]);
-  if (!rc)
-    rc = write_mpibuf (out, sig->mpi, nsig);
-  return rc;
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  rc = stream_putc (out, 4);
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  rc = stream_putc (out, sig->sig_class);
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  rc = stream_putc (out, _cdk_pub_algo_to_pgp (sig->pubkey_algo));
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  rc = stream_putc (out, _gnutls_hash_algo_to_pgp (sig->digest_algo));
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  rc = write_16 (out, sig->hashed_size);
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  buf = _cdk_subpkt_get_array (sig->hashed, 0, &nbytes);
+  if (!buf)
+    return gnutls_assert_val(CDK_Out_Of_Core);
+
+  rc = stream_write (out, buf, nbytes);
+  cdk_free (buf);
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  rc = write_16 (out, sig->unhashed_size);
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  buf = _cdk_subpkt_get_array (sig->unhashed, 0, &nbytes);
+  if (!buf)
+    return gnutls_assert_val(CDK_Out_Of_Core);
+
+  rc = stream_write (out, buf, nbytes);
+  cdk_free (buf);
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  rc = stream_putc (out, sig->digest_start[0]);
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  rc = stream_putc (out, sig->digest_start[1]);
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  rc = write_mpibuf (out, sig->mpi, nsig);
+  if (rc)
+    return gnutls_assert_val(rc);
+
+  return 0;
 }
 
 
@@ -776,7 +800,9 @@ cdk_pkt_write (cdk_stream_t out, cdk_packet_t pkt)
   if (!out || !pkt)
     return CDK_Inv_Value;
 
-  _gnutls_write_log ("write packet pkttype=%d\n", pkt->pkttype);
+  if (DEBUG_PKT)
+    _gnutls_write_log ("write packet pkttype=%d\n", pkt->pkttype);
+
   switch (pkt->pkttype)
     {
     case CDK_PKT_LITERAL:

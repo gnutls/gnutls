@@ -276,6 +276,8 @@ _pgp_cipher_to_gnutls (int cipher)
 {
   switch (cipher)
     {
+    case 0:
+      return GNUTLS_CIPHER_NULL;
     case 1:
       return GNUTLS_CIPHER_IDEA_PGP_CFB;
     case 2:
@@ -297,7 +299,8 @@ _pgp_cipher_to_gnutls (int cipher)
 
     default:
       gnutls_assert ();
-      return GNUTLS_CIPHER_NULL;
+      _gnutls_debug_log("Unknown openpgp cipher %u\n", cipher);
+      return GNUTLS_CIPHER_UNKNOWN;
     }
 }
 
@@ -306,7 +309,8 @@ _gnutls_cipher_to_pgp (int cipher)
 {
   switch (cipher)
     {
-
+    case GNUTLS_CIPHER_NULL:
+      return 0;
     case GNUTLS_CIPHER_IDEA_PGP_CFB:
       return 1;
     case GNUTLS_CIPHER_3DES_PGP_CFB:

@@ -68,12 +68,12 @@ cdk_error_t map_gnutls_error (int err);
 #define IS_UID_SIG(s) (((s)->sig_class & ~3) == 0x10)
 #define IS_UID_REV(s) ((s)->sig_class == 0x30)
 
-#define DEBUG_PKT (_cdk_get_log_level () == (CDK_LOG_DEBUG+1))
-
 /* Helper to find out if a key has the requested capability. */
 #define KEY_CAN_ENCRYPT(a) ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_ENCR)
 #define KEY_CAN_SIGN(a)    ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_SIGN)
 #define KEY_CAN_AUTH(a)    ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_AUTH)
+
+#define DEBUG_PKT 0
 
 /*-- main.c --*/
 char *_cdk_passphrase_get (cdk_ctx_t hd, const char *prompt);
