@@ -7,6 +7,8 @@ See the end for copying conditions.
 ** libgnutls: The %COMPAT keyword, if specified, will tolerate
 key usage violation errors (they are far too common to ignore).
 
+** libgnutls: Corrected bug in OpenPGP subpacket encoding.
+
 ** libgnutls: Added X.509 certificate verification flag 
 GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN. This flag allows the verification
 of unsorted certificate chains and is enabled by default for
