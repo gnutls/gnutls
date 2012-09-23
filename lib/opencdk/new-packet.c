@@ -711,8 +711,9 @@ _cdk_subpkt_get_array (cdk_subpkt_t s, int count, size_t * r_nbytes)
         buf[n++] = nbytes;
       else if (nbytes < 8384)
         {
+          nbytes -= 192;
           buf[n++] = nbytes / 256 + 192;
-          buf[n++] = nbytes % 256;
+          buf[n++] = nbytes & 0xff;
         }
       else
         {
@@ -722,6 +723,7 @@ _cdk_subpkt_get_array (cdk_subpkt_t s, int count, size_t * r_nbytes)
           buf[n++] = nbytes >> 8;
           buf[n++] = nbytes;
         }
+
       buf[n++] = list->type;
       memcpy (buf + n, list->d, list->size);
       n += list->size;
