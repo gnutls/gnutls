@@ -8,6 +8,8 @@ See the end for copying conditions.
 and gnutls_x509_trust_list_add_trust_mem() that prevented the loading
 of certificates in the windows platform.
 
+** libgnutls: Corrected bug in OpenPGP subpacket encoding.
+
 ** libgnutls: Added support for DTLS/TLS heartbeats by Olga Smolenchuk.
 (the work was done during Google Summer of Code).
 
