@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 #
-# Copyright David Howells <dhowells@redhat.com>
+# Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+# Written by David Howells (dhowells@redhat.com)
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
