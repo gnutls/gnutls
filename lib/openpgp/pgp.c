@@ -1586,14 +1586,10 @@ gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
  * gnutls_openpgp_crt_get_auth_subkey:
  * @crt: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
- * @flag: Non (0) indicates that a valid subkey is always returned.
+ * @flag: Non-zero indicates that a valid subkey is always returned.
  *
  * Returns the 64-bit keyID of the first valid OpenPGP subkey marked
- * for authentication.  If flag is non (0) and no authentication
- * subkey exists, then a valid subkey will be returned even if it is
- * not marked for authentication.
- * Returns the 64-bit keyID of the first valid OpenPGP subkey marked
- * for authentication.  If flag is non (0) and no authentication
+ * for authentication.  If flag is non-zero and no authentication
  * subkey exists, then a valid subkey will be returned even if it is
  * not marked for authentication.
  *
