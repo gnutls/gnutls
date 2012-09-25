@@ -201,7 +201,7 @@ HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
 	$(top_srcdir)/lib/includes/gnutls/pkcs12.h $(top_srcdir)/lib/includes/gnutls/pkcs11.h \
 	$(top_srcdir)/lib/includes/gnutls/abstract.h $(top_srcdir)/lib/includes/gnutls/compat.h \
 	$(top_srcdir)/lib/includes/gnutls/dtls.h $(top_srcdir)/lib/includes/gnutls/crypto.h \
-	$(top_srcdir)/lib/includes/gnutls/ocsp.h
+	$(top_srcdir)/lib/includes/gnutls/ocsp.h $(top_srcdir)/lib/includes/gnutls/tpm.h
 
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
@@ -1554,6 +1554,16 @@ FUNCS += functions/gnutls_tdb_set_store_func
 FUNCS += functions/gnutls_tdb_set_store_func.short
 FUNCS += functions/gnutls_tdb_set_verify_func
 FUNCS += functions/gnutls_tdb_set_verify_func.short
+FUNCS += functions/gnutls_tpm_get_registered
+FUNCS += functions/gnutls_tpm_get_registered.short
+FUNCS += functions/gnutls_tpm_key_list_deinit
+FUNCS += functions/gnutls_tpm_key_list_deinit.short
+FUNCS += functions/gnutls_tpm_key_list_get_url
+FUNCS += functions/gnutls_tpm_key_list_get_url.short
+FUNCS += functions/gnutls_tpm_privkey_delete
+FUNCS += functions/gnutls_tpm_privkey_delete.short
+FUNCS += functions/gnutls_tpm_privkey_generate
+FUNCS += functions/gnutls_tpm_privkey_generate.short
 FUNCS += functions/gnutls_transport_get_ptr
 FUNCS += functions/gnutls_transport_get_ptr.short
 FUNCS += functions/gnutls_transport_get_ptr2
