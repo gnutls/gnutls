@@ -260,7 +260,7 @@ _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
 
   max_len = *der_len;
 
-  temp = _asn1_malloc (str_len + 2);
+  temp = malloc (str_len + 2);
   if (temp == NULL)
     return ASN1_MEM_ALLOC_ERROR;
 
@@ -313,7 +313,7 @@ _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
     }
   *der_len += len_len;
 
-  _asn1_free (temp);
+  free (temp);
 
   if (max_len < (*der_len))
     return ASN1_MEM_ERROR;
@@ -638,7 +638,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, ASN1_TYPE node)
   first = last = NULL;
   while (p)
     {
-      p_vet = (struct vet *) _asn1_malloc (sizeof (struct vet));
+      p_vet = malloc (sizeof (struct vet));
       if (p_vet == NULL)
 	return;
 
@@ -679,7 +679,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, ASN1_TYPE node)
 	  if (p_vet->value > p2_vet->value)
 	    {
 	      /* change position */
-	      temp = (unsigned char *) _asn1_malloc (p_vet->end - counter);
+	      temp = malloc (p_vet->end - counter);
 	      if (temp == NULL)
 		return;
 
@@ -688,7 +688,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, ASN1_TYPE node)
 		      p2_vet->end - p_vet->end);
 	      memcpy (der + counter + p2_vet->end - p_vet->end, temp,
 		      p_vet->end - counter);
-	      _asn1_free (temp);
+	      free (temp);
 
 	      tag = p_vet->value;
 	      p_vet->value = p2_vet->value;
@@ -706,7 +706,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, ASN1_TYPE node)
 	p_vet->prev->next = NULL;
       else
 	first = NULL;
-      _asn1_free (p_vet);
+      free (p_vet);
       p_vet = first;
     }
 }
@@ -752,7 +752,7 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, ASN1_TYPE node)
   first = last = NULL;
   while (p)
     {
-      p_vet = (struct vet *) _asn1_malloc (sizeof (struct vet));
+      p_vet = malloc (sizeof (struct vet));
       if (p_vet == NULL)
 	return;
 
@@ -817,7 +817,7 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, ASN1_TYPE node)
 	  if (change == 1)
 	    {
 	      /* change position */
-	      temp = (unsigned char *) _asn1_malloc (p_vet->end - counter);
+	      temp = malloc (p_vet->end - counter);
 	      if (temp == NULL)
 		return;
 
@@ -826,7 +826,7 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, ASN1_TYPE node)
 		      (p2_vet->end) - (p_vet->end));
 	      memcpy (der + counter + (p2_vet->end) - (p_vet->end), temp,
 		      (p_vet->end) - counter);
-	      _asn1_free (temp);
+	      free (temp);
 
 	      p_vet->end = counter + (p2_vet->end - p_vet->end);
 	    }
@@ -840,7 +840,7 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, ASN1_TYPE node)
 	p_vet->prev->next = NULL;
       else
 	first = NULL;
-      _asn1_free (p_vet);
+      free (p_vet);
       p_vet = first;
     }
 }

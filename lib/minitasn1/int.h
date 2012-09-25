@@ -46,7 +46,8 @@
 struct node_asn_struct
 {
   /* public fields: */
-  char *name;			/* Node name */
+  char name[ASN1_MAX_NAME_SIZE+1];			/* Node name */
+  unsigned int name_hash;
   unsigned int type;		/* Node type */
   unsigned char *value;		/* Node value */
   int value_len;
@@ -57,17 +58,13 @@ struct node_asn_struct
   unsigned char small_value[ASN1_SMALL_VALUE_SIZE];	/* For small values */
 };
 
-#define _asn1_malloc malloc
-#define _asn1_free free
-#define _asn1_calloc calloc
-#define _asn1_realloc realloc
-#define _asn1_strdup strdup
 #define _asn1_strlen(s) strlen((const char *) s)
 #define _asn1_strtol(n,e,b) strtol((const char *) n, e, b)
 #define _asn1_strtoul(n,e,b) strtoul((const char *) n, e, b)
 #define _asn1_strcmp(a,b) strcmp((const char *)a, (const char *)b)
 #define _asn1_strcpy(a,b) strcpy((char *)a, (const char *)b)
 #define _asn1_strcat(a,b) strcat((char *)a, (const char *)b)
+uint32_t _asn1_bhash( const void *key, size_t length);
 
 #define MAX_LOG_SIZE 1024	/* maximum number of characters of a log message */
 

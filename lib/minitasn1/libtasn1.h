@@ -44,7 +44,7 @@ extern "C"
 {
 #endif
 
-#define ASN1_VERSION "2.14"
+#define ASN1_VERSION "3.0"
 
   typedef int asn1_retCode;	/* type returned by libtasn1 functions */
 
@@ -108,25 +108,13 @@ extern "C"
   /* that represent an ASN.1 DEFINITION.                */
   /******************************************************/
 
-#if !defined ASN1_BUILDING
-  /* This structure is also in internal.h, but then contains more
-     fields.  You cannot make any modifications to these fields
-     without breaking ABI.  */
-  struct node_asn_struct
-  {
-    char *name;			/* Node name */
-    unsigned int type;		/* Node type */
-    unsigned char *value;	/* Node value */
-    int value_len;
-    struct node_asn_struct *down;	/* Pointer to the son node */
-    struct node_asn_struct *right;	/* Pointer to the brother node */
-    struct node_asn_struct *left;	/* Pointer to the next list element */
-  };
-#endif
-
   typedef struct node_asn_struct node_asn;
 
   typedef node_asn *ASN1_TYPE;
+
+  /* maximum number of characters of a name */
+  /* inside a file with ASN1 definitons     */
+#define ASN1_MAX_NAME_SIZE 64
 
 #define ASN1_TYPE_EMPTY  NULL
 
@@ -178,9 +166,6 @@ extern "C"
   /*  Fixed constants                */
   /***********************************/
 
-  /* maximum number of characters of a name */
-  /* inside a file with ASN1 definitons     */
-#define ASN1_MAX_NAME_SIZE 128
 
   /* maximum number of characters */
   /* of a description message     */
@@ -314,37 +299,6 @@ extern "C"
   extern ASN1_API asn1_retCode
     asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
 		    ASN1_TYPE src, const char *src_name);
-
-  /* Deprecated stuff. */
-
-#ifndef ASN1_DISABLE_DEPRECATED
-
-#define LIBTASN1_VERSION ASN1_VERSION
-
-#ifndef MAX_NAME_SIZE
-# define MAX_NAME_SIZE ASN1_MAX_NAME_SIZE
-#endif
-
-#ifndef MAX_ERROR_DESCRIPTION_SIZE
-# define MAX_ERROR_DESCRIPTION_SIZE ASN1_MAX_ERROR_DESCRIPTION_SIZE
-#endif
-
-#ifndef __attribute__
-  /* This feature is available in gcc versions 2.5 and later.  */
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#  define __attribute__(Spec)	/* empty */
-# endif
-#endif
-
-  /* Use asn1_strerror instead. */
-  extern ASN1_API const char *libtasn1_strerror (asn1_retCode error)
-    __attribute__ ((deprecated));
-
-  /* Use asn1_perror instead. */
-  extern ASN1_API void
-    libtasn1_perror (asn1_retCode error) __attribute__ ((deprecated));
-
-#endif
 
 #ifdef __cplusplus
 }

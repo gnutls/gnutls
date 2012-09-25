@@ -728,8 +728,6 @@ _asn1_get_octet_string (const unsigned char *der, ASN1_TYPE node, int *len)
 	  asn1_length_der (tot_len, temp, &len2);
 	  _asn1_set_value (node, temp, len2);
 
-	  tot_len += len2;
-
 	  ret = _asn1_extract_der_octet (node, der, *len);
 	  if (ret != ASN1_SUCCESS)
 	    return ret;
@@ -741,9 +739,10 @@ _asn1_get_octet_string (const unsigned char *der, ASN1_TYPE node, int *len)
       len2 = asn1_get_length_der (der, *len, &len3);
       if (len2 < 0)
 	return ASN1_DER_ERROR;
-      if (node)
-	_asn1_set_value (node, der, len3 + len2);
+
       counter = len3 + len2;
+      if (node)
+	_asn1_set_value (node, der, counter);
     }
 
   *len = counter;
@@ -1428,7 +1427,7 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
       goto cleanup;
     }
 
-  if ((*structure)->name)
+  if ((*structure)->name[0] != 0)
     {				/* Has *structure got a name? */
       nameLen -= strlen ((*structure)->name);
       if (nameLen > 0)
@@ -2248,6 +2247,9 @@ asn1_der_decoding_startEnd (ASN1_TYPE element, const void *ider, int len,
   p = node;
   while (1)
     {
+      if (p == NULL)
+        return ASN1_DER_ERROR;
+
       ris = ASN1_SUCCESS;
 
       if (move != UP)
@@ -2255,6 +2257,9 @@ asn1_der_decoding_startEnd (ASN1_TYPE element, const void *ider, int len,
 	  if (p->type & CONST_SET)
 	    {
 	      p2 = _asn1_find_up (p);
+              if (p2 == NULL)
+                return ASN1_DER_ERROR;
+
 	      len2 = _asn1_strtol (p2->value, NULL, 10);
 	      if (len2 == -1)
 		{
@@ -2274,7 +2279,9 @@ asn1_der_decoding_startEnd (ASN1_TYPE element, const void *ider, int len,
 		}
 	      else if (counter > len2)
 		return ASN1_DER_ERROR;
+
 	      p2 = p2->down;
+
 	      while (p2)
 		{
 		  if ((p2->type & CONST_SET) && (p2->type & CONST_NOT_USED))
@@ -2286,6 +2293,9 @@ asn1_der_decoding_startEnd (ASN1_TYPE element, const void *ider, int len,
 		      else
 			{
 			  p3 = p2->down;
+                          if (p3 == NULL)
+                            return ASN1_DER_ERROR;
+
 			  ris =
 			    _asn1_extract_tag_der (p3, der + counter,
 						   len - counter, &len2);
@@ -2309,6 +2319,9 @@ asn1_der_decoding_startEnd (ASN1_TYPE element, const void *ider, int len,
 	  if (type_field (p->type) == TYPE_CHOICE)
 	    {
 	      p = p->down;
+              if (p == NULL)
+                return ASN1_DER_ERROR;
+
 	      ris =
 		_asn1_extract_tag_der (p, der + counter, len - counter,
 				       &len2);
@@ -2596,7 +2609,7 @@ asn1_expand_any_defined_by (ASN1_TYPE definitions, ASN1_TYPE * element)
 	      p3 = p3->down;
 	      while (p3)
 		{
-		  if ((p3->name) && !(strcmp (p3->name, p2->name)))
+		  if (!(strcmp (p3->name, p2->name)))
 		    break;
 		  p3 = p3->right;
 		}
@@ -2618,7 +2631,7 @@ asn1_expand_any_defined_by (ASN1_TYPE definitions, ASN1_TYPE * element)
 
 		  while (p3)
 		    {
-		      if ((p3->name) && !(strcmp (p3->name, p2->name)))
+		      if (!(strcmp (p3->name, p2->name)))
 			break;
 		      p3 = p3->right;
 		    }
@@ -2662,7 +2675,7 @@ asn1_expand_any_defined_by (ASN1_TYPE definitions, ASN1_TYPE * element)
 				asn1_create_element (definitions, name, &aux);
 			      if (result == ASN1_SUCCESS)
 				{
-				  _asn1_set_name (aux, p->name);
+				  _asn1_cpy_name (aux, p);
 				  len2 =
 				    asn1_get_length_der (p->value,
 							 p->value_len, &len3);
@@ -2844,7 +2857,7 @@ asn1_expand_octet_string (ASN1_TYPE definitions, ASN1_TYPE * element,
 		  result = asn1_create_element (definitions, name, &aux);
 		  if (result == ASN1_SUCCESS)
 		    {
-		      _asn1_set_name (aux, octetNode->name);
+		      _asn1_cpy_name (aux, octetNode);
 		      len2 =
 			asn1_get_length_der (octetNode->value,
 					     octetNode->value_len, &len3);

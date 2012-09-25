@@ -45,7 +45,7 @@ _asn1_hierarchical_name (ASN1_TYPE node, char *name, int name_size)
 
   while (p != NULL)
     {
-      if (p->name != NULL)
+      if (p->name[0] != 0)
 	{
 	  _asn1_str_cpy (tmp_name, sizeof (tmp_name), name),
 	    _asn1_str_cpy (name, name_size, p->name);
@@ -145,7 +145,7 @@ _asn1_append_sequence_set (ASN1_TYPE node)
     p = p->right;
   _asn1_set_right (p, p2);
 
-  if (p->name == NULL)
+  if (p->name[0] == 0)
     _asn1_str_cpy (temp, sizeof (temp), "?1");
   else
     {
@@ -343,8 +343,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	{
 	  if ((isdigit (value[0])) || (value[0] == '-'))
 	    {
-	      value_temp =
-		(unsigned char *) _asn1_malloc (SIZEOF_UNSIGNED_LONG_INT);
+	      value_temp = malloc (SIZEOF_UNSIGNED_LONG_INT);
 	      if (value_temp == NULL)
 		return ASN1_MEM_ALLOC_ERROR;
 
@@ -360,11 +359,9 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 		{
 		  if (type_field (p->type) == TYPE_CONSTANT)
 		    {
-		      if ((p->name) && (!_asn1_strcmp (p->name, value)))
+		      if (!_asn1_strcmp (p->name, value))
 			{
-			  value_temp =
-			    (unsigned char *)
-			    _asn1_malloc (SIZEOF_UNSIGNED_LONG_INT);
+			  value_temp = malloc (SIZEOF_UNSIGNED_LONG_INT);
 			  if (value_temp == NULL)
 			    return ASN1_MEM_ALLOC_ERROR;
 
@@ -383,7 +380,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	}
       else
 	{			/* len != 0 */
-	  value_temp = (unsigned char *) _asn1_malloc (len);
+	  value_temp = malloc (len);
 	  if (value_temp == NULL)
 	    return ASN1_MEM_ALLOC_ERROR;
 	  memcpy (value_temp, value, len);
@@ -397,7 +394,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 
       if (negative && (type_field (node->type) == TYPE_ENUMERATED))
 	{
-	  _asn1_free (value_temp);
+	  free (value_temp);
 	  return ASN1_VALUE_NOT_VALID;
 	}
 
@@ -420,11 +417,10 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	    p = p->right;
 	  if ((isdigit (p->value[0])) || (p->value[0] == '-'))
 	    {
-	      default_temp =
-		(unsigned char *) _asn1_malloc (SIZEOF_UNSIGNED_LONG_INT);
+	      default_temp = malloc (SIZEOF_UNSIGNED_LONG_INT);
 	      if (default_temp == NULL)
 		{
-		  _asn1_free (value_temp);
+		  free (value_temp);
 		  return ASN1_MEM_ALLOC_ERROR;
 		}
 
@@ -435,7 +431,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	    {			/* is an identifier like v1 */
 	      if (!(node->type & CONST_LIST))
 		{
-		  _asn1_free (value_temp);
+		  free (value_temp);
 		  return ASN1_VALUE_NOT_VALID;
 		}
 	      p2 = node->down;
@@ -443,14 +439,12 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 		{
 		  if (type_field (p2->type) == TYPE_CONSTANT)
 		    {
-		      if ((p2->name) && (!_asn1_strcmp (p2->name, p->value)))
+		      if (!_asn1_strcmp (p2->name, p->value))
 			{
-			  default_temp =
-			    (unsigned char *)
-			    _asn1_malloc (SIZEOF_UNSIGNED_LONG_INT);
+			  default_temp = malloc (SIZEOF_UNSIGNED_LONG_INT);
 			  if (default_temp == NULL)
 			    {
-			      _asn1_free (value_temp);
+			      free (value_temp);
 			      return ASN1_MEM_ALLOC_ERROR;
 			    }
 
@@ -465,7 +459,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 		}
 	      if (p2 == NULL)
 		{
-		  _asn1_free (value_temp);
+		  free (value_temp);
 		  return ASN1_VALUE_NOT_VALID;
 		}
 	    }
@@ -481,9 +475,9 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	      if (k2 == len2)
 		_asn1_set_value (node, NULL, 0);
 	    }
-	  _asn1_free (default_temp);
+	  free (default_temp);
 	}
-      _asn1_free (value_temp);
+      free (value_temp);
       break;
     case TYPE_OBJECT_ID:
       for (i = 0; i < _asn1_strlen (value); i++)
@@ -562,7 +556,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
       if (len == 0)
 	len = _asn1_strlen (value);
       asn1_length_der ((len >> 3) + 2, NULL, &len2);
-      temp = (unsigned char *) _asn1_malloc ((len >> 3) + 2 + len2);
+      temp = malloc ((len >> 3) + 2 + len2);
       if (temp == NULL)
 	return ASN1_MEM_ALLOC_ERROR;
 
@@ -767,7 +761,7 @@ asn1_read_value (ASN1_TYPE root, const char *name, void *ivalue, int *len)
 		{
 		  if (type_field (p2->type) == TYPE_CONSTANT)
 		    {
-		      if ((p2->name) && (!_asn1_strcmp (p2->name, p->value)))
+		      if (!_asn1_strcmp (p2->name, p->value))
 			{
 			  if (_asn1_convert_integer
 			      (p2->value, value, value_size,
