@@ -1,12 +1,12 @@
-GNUTLS_VERSION:=3.1.1
+GNUTLS_VERSION:=3.1.2
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
 GMP_FILE:=gmp-5.0.5.tar.bz2
 GMP_DIR:=gmp-5.0.5
 
-P11_KIT_FILE:=p11-kit-0.13.tar.gz
-P11_KIT_DIR:=p11-kit-0.13
+P11_KIT_FILE:=p11-kit-0.14.tar.gz
+P11_KIT_DIR:=p11-kit-0.14
 
 NETTLE_FILE:=nettle-2.5.tar.gz
 NETTLE_DIR:=nettle-2.5
@@ -119,7 +119,7 @@ $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 		P11_KIT_LIBS="$(LIB_DIR)/libp11-kit.la" \
 		LDFLAGS="-L$(LIB_DIR)" CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" \
 		./configure $(CONFIG_FLAGS) --enable-local-libopts --with-libnettle-prefix=$(LIB_DIR) \
-		--disable-openssl-compatibility && cd ..
+		--disable-openssl-compatibility --with-included-libtasn1 && cd ..
 	touch $@
 
 clean:
