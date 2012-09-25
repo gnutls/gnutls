@@ -118,15 +118,11 @@ libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-if WINDOWS
-libgnutls_la_LDFLAGS += -lcrypt32
-endif
-
 libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	accelerated/libaccelerated.la ext/libgnutls_ext.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
-	extras/libgnutls_extras.la \
-	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL) \
+	extras/libgnutls_extras.la
+thirdparty_libadd = $(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL) \
 	$(LTLIBPTHREAD) $(P11_KIT_LIBS) $(LIB_SELECT) $(TSS_LIBS)
 
 if ENABLE_OPENPGP
@@ -143,11 +139,11 @@ endif
 if ENABLE_MINITASN1
 libgnutls_la_LIBADD += minitasn1/libminitasn1.la
 else
-libgnutls_la_LDFLAGS += $(LIBTASN1_LIBS)
+thirdparty_libadd += $(LIBTASN1_LIBS)
 endif
 
 if ENABLE_NETTLE
-libgnutls_la_LDFLAGS += $(LTLIBNETTLE)
+thirdparty_libadd += $(LTLIBNETTLE)
 libgnutls_la_LIBADD += nettle/libcrypto.la
 endif
 
@@ -158,6 +154,12 @@ defexecdir = $(bindir)
 defexec_DATA = libgnutls-$(DLL_VERSION).def
 DISTCLEANFILES += $(defexec_DATA)
 endif
+
+if WINDOWS
+thirdparty_libadd += -lcrypt32
+endif
+
+libgnutls_la_LIBADD += $(thirdparty_libadd)
 
 # C++ library
 

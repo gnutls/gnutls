@@ -37,8 +37,8 @@ LDADD = libexamples.la				\
 	../../gl/libgnu.la			\
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
-CXX_LDADD = $(LDADD) \
-	../../lib/libgnutlsxx.la
+CXX_LDADD = ../../lib/libgnutlsxx.la \
+	$(LDADD)
 
 noinst_PROGRAMS = ex-client-resume ex-client-dtls
 noinst_PROGRAMS += ex-cert-select ex-client-x509

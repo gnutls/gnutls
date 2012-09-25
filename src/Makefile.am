@@ -63,7 +63,8 @@ gnutls_serv_SOURCES =		\
   common.h common.c		\
   certtool-common.h 
 gnutls_serv_LDADD = ../lib/libgnutls.la
-gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la $(LIBOPTS_LDADD) $(LTLIBINTL)
+gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
+gnutls_serv_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
 gnutls_serv_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_CFLAGS =
@@ -111,8 +112,9 @@ libcmd_cli_la_SOURCES = cli-args.def cli-args.c cli-args.h
 gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c \
 		socket.c socket.h common.h common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la 
+gnutls_cli_debug_LDADD += ../gl/libgnu.la
 gnutls_cli_debug_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
-gnutls_cli_debug_LDADD += ../gl/libgnu.la $(LIBSOCKET) $(GETADDRINFO_LIB)
+gnutls_cli_debug_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-cli-debug.la
 libcmd_cli_debug_la_CFLAGS =
 libcmd_cli_debug_la_SOURCES = cli-debug-args.def cli-debug-args.c cli-debug-args.h
@@ -127,42 +129,42 @@ noinst_LTLIBRARIES += libcmd-certtool.la
 libcmd_certtool_la_CFLAGS =
 libcmd_certtool_la_SOURCES = certtool-args.c certtool-args.def certtool-args.h	\
 	certtool-cfg.h certtool-cfg.c
-libcmd_certtool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE) 
+libcmd_certtool_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
 libcmd_certtool_la_LIBADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
-libcmd_certtool_la_LIBADD += ../lib/libgnutls.la 
-libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
+libcmd_certtool_la_LIBADD += $(LTLIBREADLINE)
+libcmd_certtool_la_LIBADD += $(INET_PTON_LIB)
 
 # p11 tool
 if ENABLE_PKCS11
 
 p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c \
 	certtool-extras.c p11tool.h common.c
-p11tool_LDADD = ../lib/libgnutls.la $(LIBOPTS_LDADD) $(LTLIBINTL)
+p11tool_LDADD = ../lib/libgnutls.la
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la
+p11tool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
 
 noinst_LTLIBRARIES += libcmd-p11tool.la
 libcmd_p11tool_la_CFLAGS =
 libcmd_p11tool_la_SOURCES = p11tool-args.def p11tool-args.c p11tool-args.h \
 	certtool-cfg.h certtool-cfg.c
-libcmd_p11tool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
-libcmd_p11tool_la_LIBADD += ../lib/libgnutls.la
-libcmd_p11tool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
+libcmd_p11tool_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
+libcmd_p11tool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB)
 
 endif # ENABLE_PKCS11
 
 if ENABLE_TROUSERS
 
 tpmtool_SOURCES = tpmtool-args.def tpmtool.c certtool-common.c certtool-extras.c common.c
-tpmtool_LDADD = ../lib/libgnutls.la $(LIBOPTS_LDADD) $(LTLIBINTL)
+tpmtool_LDADD = ../lib/libgnutls.la
 tpmtool_LDADD += libcmd-tpmtool.la ../gl/libgnu.la
+tpmtool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
 
 noinst_LTLIBRARIES += libcmd-tpmtool.la
 libcmd_tpmtool_la_CFLAGS =
 libcmd_tpmtool_la_SOURCES = tpmtool-args.def tpmtool-args.c tpmtool-args.h \
 	certtool-cfg.h certtool-cfg.c
-libcmd_tpmtool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
-libcmd_tpmtool_la_LIBADD += ../lib/libgnutls.la
-libcmd_tpmtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
+libcmd_tpmtool_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
+libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB)
 
 endif # ENABLE_TROUSERS
 

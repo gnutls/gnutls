@@ -78,7 +78,7 @@ endif
 
 if ENABLE_OPENSSL
 ctests +=  openssl
-openssl_LDADD = $(LDADD) ../extra/libgnutls-openssl.la
+openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
 endif
 
 if ENABLE_OPENPGP
