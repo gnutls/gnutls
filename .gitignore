@@ -588,3 +588,6 @@ tests/x509sign-verify
 tests/x509signself
 win32
 win64
+tests/chainverify-unsorted
+tests/mini-dtls-heartbeat
+tests/mini-handshake-timeout
