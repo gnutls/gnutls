@@ -102,6 +102,12 @@ Thompson, "Internet X.509 Public Key Infrastructure (PKI) Proxy
 Certificate Profile", June 2004, available from
 @url{http://www.ietf.org/rfc/rfc3820}.
 
+@item @anchor{RFC6520}[RFC6520]
+R. Seggelmann, M. Tuexen, and M. Williams, "Transport Layer Security (TLS) and
+Datagram Transport Layer Security (DTLS) Heartbeat Extension", February 2012, available from
+@url{http://www.ietf.org/rfc/rfc6520}.
+
+
 @item @anchor{RFC5746}[RFC5746]
 E. Rescorla, M. Ray, S. Dispensa, and N. Oskov, "Transport Layer
 Security (TLS) Renegotiation Indication Extension", February 2010,

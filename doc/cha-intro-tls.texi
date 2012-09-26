@@ -450,14 +450,13 @@ idea, which is implemented in GnuTLS.
 @cindex TLS extensions
 @cindex heartbeat
 
-The TLS extension which allows to request response from the peer in a
-way similar to ping command described in @xcite{RFC6520}. This
-extension is disabled by default - user have to call
-@funcref{gnutls_heartbeat_enable} to enable it. Note: this will set
-local policy affecting HeartBeat messages coming from the peer - the policy
-could be checked via @funcref{gnutls_heartbeat_allowed}. 
-The requests coming from peer are answered automatically (if policy permits) 
-inside @funcref{gnutls_record_recv}, requests to peer could be send via
+The TLS extension which allows to ping and receive replies from the peer,
+described in @xcite{RFC6520}. This extension is disabled by default and
+@funcref{gnutls_heartbeat_enable} can be used to enable it. A policy
+may be negotiated to only allow sending heartbeat messages or sending and receiving.
+The session policy can be checked with @funcref{gnutls_heartbeat_allowed}. 
+The requests coming from the peer result to @code{GNUTLS_@-E_@-HERTBEAT_@-PING_@-RECEIVED}
+being returned from the receive function. Ping requests to peer can be send via
 @funcref{gnutls_heartbeat_ping}. 
 
 Policy-related functions:
