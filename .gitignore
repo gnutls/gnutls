@@ -110,6 +110,7 @@ doc/gnutls.vrs
 doc/gnutls.xml
 doc/ia-api.texi
 doc/latex/cha-upgrade.tex
+doc/latex/cha-tokens.tex
 doc/latex/enums
 doc/latex/gnutls-enums.tex
 doc/latex/gnutls.lof
