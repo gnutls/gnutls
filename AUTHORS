@@ -5,77 +5,83 @@ See the end for copying conditions.
 The copyright holder for GnuTLS is Free Software Foundation, Inc., 51
 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-Simon Josefsson <simon [at] josefsson.org>
+Simon Josefsson *simon [at] josefsson.org*
 Current maintainer; draft TLS 1.2 support.
 
-Nikos Mavrogiannopoulos <nmav [at] gnutls.org>
+Nikos Mavrogiannopoulos *nmav [at] gnutls.org*
 Original author and maintainer of GnuTLS.
 
-Fabio Fiorina <Fabio.Fiorina [at] alcatel.it>
+Fabio Fiorina *Fabio.Fiorina [at] alcatel.it*
 ASN.1 structures parser library (libtasn1).
 
-Timo Schulz <twoaday [at] freakmail.de>
+Timo Schulz *twoaday [at] freakmail.de*
 OpenPGP support (OpenCDK library).
 
-Andrew McDonald <andrew [at] mcdonald.org.uk>
+Andrew McDonald *andrew [at] mcdonald.org.uk*
 OpenSSL compatible interface.
 
-Ludovic Courtes <ludo [at] gnu.org>
+Ludovic Courtes *ludo [at] gnu.org*
 Guile bindings, OpenPGP bug fixes.
 
-Mario Lenz <m [at] riolenz.de>
+Mario Lenz *m [at] riolenz.de*
 Fixes to OpenCDK.
 
-Howard Chu <hyc [at] symas.com>
+Howard Chu *hyc [at] symas.com*
 APIs to extract X.500 DN's from Certificates.
 
-Ivo Timmermans <ivo [at] o2w.nl>
+Ivo Timmermans *ivo [at] o2w.nl*
 Man pages, OpenCDK, fixes.
 
-Stefan Walter <stef [at] memberwebs.com>
+Stefan Walter *stef [at] memberwebs.com*
 PKCS8 fix, PKCS #11 backend move to p11-kit.
 
-Yoshisato YANAGISAWA <yanagisawa [at] csg.is.titech.ac.jp>
+Yoshisato YANAGISAWA *yanagisawa [at] csg.is.titech.ac.jp*
 Camellia support.
 
-Emile Van Bergen <emile [at] e-advies.nl>
+Emile Van Bergen *emile [at] e-advies.nl*
 TLS/IA fixes.
 
-Joe Orton <jorton [at] redhat.com>
+Joe Orton *jorton [at] redhat.com*
 Certificate name import/export, build fixes, test vectors.
 
-Daniel Kahn Gillmor <dkg-debian.org [at] fifthhorseman.net>
+Daniel Kahn Gillmor *dkg-debian.org [at] fifthhorseman.net*
 OpenPGP discussion and improvements.
 
-David Marín Carreño <davefx [at] gmail.com>
+David Marín Carreño *davefx [at] gmail.com*
 Added gnutls_x509_crq_get_key_id.
 
-Daiki Ueno <ueno [at] unixuser.org>
+Daiki Ueno *ueno [at] unixuser.org*
 Added TLS Session Ticket (RFC 5077) support,
 finished client-side TLS 1.2 support.
 
-Brad Hards <bradh [at] frogmouth.net>
+Brad Hards *bradh [at] frogmouth.net*
 Add X.509 Issuer Alternative Name functions.
 
-Boyan Kasarov <bkasarov [at] gmail.com>
+Boyan Kasarov *bkasarov [at] gmail.com*
 C++ fixes.
 
-Steve Dispensa <dispensa [at] phonefactor.com>
+Steve Dispensa *dispensa [at] phonefactor.com*
 Initial TLS safe renegotiation patch.
 
-Jonathan Bastien-Filiatrault <joe [at] x2a.org>
+Jonathan Bastien-Filiatrault *joe [at] x2a.org*
 Fix TLS-version checks.
 Redesign and implementation of the buffering layer.
 Initial DTLS implementation.
 
-Ruslan Ijbulatov (LRN) <lrn1986 [at] gmail.com>
+Ruslan Ijbulatov (LRN) *lrn1986 [at] gmail.com*
 Win32 patches.
 
-Andy Polyakov <appro [at] openssl.org>
+Andy Polyakov *appro [at] openssl.org*
 AES-NI and Padlock assembler code (at lib/accelerated/intel/asm/)
 
-David Woodhouse <dwmw2 [at] infradead.org>
+David Woodhouse *dwmw2 [at] infradead.org*
 DTLS 0.9 implementation.
+
+Olga Smolenchuk *olyasib12 [at] gmail.com*
+DTLS/TLS heartbeat implementation.
+
+Ilya Tumaykin *itumaykin [at] gmail.com*
+Elliptic curve support improvements (wmNAF implementation and others).
 
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,
