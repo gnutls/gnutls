@@ -118,7 +118,7 @@ _gnutls_max_record_recv_params (gnutls_session_t session,
 
           new_size = _gnutls_mre_num2record (data[0]);
 
-          if (new_size < 0 || new_size != epriv.num)
+          if (new_size < 0 || new_size != (ssize_t)epriv.num)
             {
               gnutls_assert ();
               return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;

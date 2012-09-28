@@ -50,7 +50,7 @@ mpz_unitstbit (mpz_t u, mp_bitcnt_t bit_index)
 {
   mp_srcptr u_ptr = u->_mp_d;
   mp_size_t size = u->_mp_size;
-  unsigned abs_size = ABS (size);
+  mp_size_t abs_size = ABS (size);
   mp_size_t limb_index = bit_index / GMP_NUMB_BITS;
   mp_srcptr p = u_ptr + limb_index;
   mp_limb_t limb;

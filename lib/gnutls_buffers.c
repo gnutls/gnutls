@@ -1057,7 +1057,7 @@ _gnutls_parse_record_buffered_msgs (gnutls_session_t session)
           /* this is the rest of a previous message */
           if (session->internals.handshake_recv_buffer_size > 0 && recv_buf[0].length > 0 && remain > 0)
             {
-              if (msg.size <= remain)
+              if ((ssize_t)msg.size <= remain)
                 append = msg.size;
               else
                 append = remain;
