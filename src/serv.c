@@ -330,14 +330,6 @@ generate_rsa_params (void)
 
 LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 
-static int
-ocsp_callback (gnutls_session_t session,
-	       void *ptr,
-	       gnutls_datum_t *ocsp_response)
-{
-  return GNUTLS_E_NO_CERTIFICATE_STATUS;
-}
-
 gnutls_session_t initialize_session (int dtls)
 {
   gnutls_session_t session;
@@ -370,7 +362,7 @@ gnutls_session_t initialize_session (int dtls)
   /* OCSP status-request TLS extension */
   if (status_response_ocsp)
     {
-      if (gnutls_status_request_ocsp_server (session, ocsp_callback, NULL) < 0)
+      if (gnutls_status_request_ocsp_server_file (session, status_response_ocsp, 0) < 0)
 	{
 	  fprintf (stderr, "Cannot set OCSP status request callback.\n");
 	  exit (1);
@@ -495,6 +487,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   strcpy (http_buffer, HTTP_BEGIN);
 
   /* print session_id */
+  sesid_size = sizeof(sesid);
   gnutls_session_get_id (session, sesid, &sesid_size);
   snprintf (tmp_buffer, tmp_buffer_size, "\n<p>Session ID: <i>");
   for (i = 0; i < sesid_size; i++)
