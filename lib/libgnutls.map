@@ -790,8 +790,6 @@ GNUTLS_3_0_0 {
 	gnutls_pk_to_sign;
 	gnutls_certificate_set_x509_system_trust;
 	gnutls_session_set_premaster;
-	gnutls_status_request_ocsp_client;
-	gnutls_status_request_ocsp_server;
 } GNUTLS_2_12;
 
 GNUTLS_3_1_0 {
@@ -838,6 +836,10 @@ GNUTLS_3_1_0 {
         gnutls_heartbeat_allowed;
 	gnutls_heartbeat_get_timeout;
 	gnutls_heartbeat_set_timeouts;
+	gnutls_status_request_ocsp_client;
+	gnutls_status_request_get_ocsp;
+	gnutls_status_request_ocsp_server;
+	gnutls_status_request_ocsp_server_file;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

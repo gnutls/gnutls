@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Free Software Foundation, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -29,18 +29,20 @@
 #include "gnutls_errors.h"
 #include <gnutls_extensions.h>
 #include <ext/status_request.h>
+#include <gnutls_mbuffers.h>
+#include <gnutls_handshake.h>
 
 typedef struct
 {
   gnutls_datum_t *responder_id;
   size_t responder_id_size;
   gnutls_datum_t request_extensions;
-  int dealloc;
+  gnutls_datum_t response;
 
   gnutls_status_request_ocsp_func ocsp_func;
   void *ocsp_func_ptr;
-
-  int expect_certificate_status;
+  char *response_file;
+  unsigned int expect_cstatus;
 } status_request_ext_st;
 
 /*
@@ -113,31 +115,33 @@ server_recv (gnutls_session_t session,
 	     size_t size)
 {
   size_t i;
-
-  _gnutls_handshake_log ("EXT[%p]: got ocsp\n", session);
+  ssize_t data_size = size;
 
   /* minimum message is type (1) + responder_id_list (2) +
      request_extension (2) = 5 */
-  if (size < 5)
+  if (data_size < 5)
     return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
   /* We ignore non-ocsp CertificateStatusType.  The spec is unclear
      what should be done. */
-  if (data[0] != '\x01')
+  if (data[0] != 0x01)
     {
       gnutls_assert ();
       _gnutls_handshake_log ("EXT[%p]: unknown status_type %d\n",
 			     session, data[0]);
       return 0;
     }
-  size--, data++;
-
-  priv->dealloc = 1;
+  DECR_LEN(data_size, 1);
+  data++;
 
   priv->responder_id_size = _gnutls_read_uint16 (data);
-  size -= 2, data += 2;
+  
+  _gnutls_debug_log("Status Request: Responder ID size: %u\n", priv->responder_id_size);
+  
+  DECR_LEN(data_size, 2);
+  data += 2;
 
-  if (size <= priv->responder_id_size * 2)
+  if (data_size <= (ssize_t)(priv->responder_id_size * 2))
     return gnutls_assert_val (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
   priv->responder_id = gnutls_malloc (priv->responder_id_size
@@ -149,14 +153,12 @@ server_recv (gnutls_session_t session,
     {
       size_t l;
 
-      if (size <= 2)
-	return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+      DECR_LEN(data_size, 2);
 
       l = _gnutls_read_uint16 (data);
-      size -= 2, data += 2;
+      data += 2;
 
-      if (size <= l)
-	return gnutls_assert_val (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
+      DECR_LEN(data_size, l);
 
       priv->responder_id[i].data = gnutls_malloc (l);
       if (priv->responder_id[i].data == NULL)
@@ -165,7 +167,7 @@ server_recv (gnutls_session_t session,
       memcpy (priv->responder_id[i].data, data, l);
       priv->responder_id[i].size = l;
 
-      size -= l, data += l;
+      data += l;
     }
 
   return 0;
@@ -191,19 +193,13 @@ server_send (gnutls_session_t session,
   if (priv->ocsp_func == NULL)
     return gnutls_assert_val (GNUTLS_E_SUCCESS);
 
-  ret = priv->ocsp_func (session, priv->ocsp_func_ptr, NULL);
+  ret = priv->ocsp_func (session, priv->ocsp_func_ptr, &priv->response);
   if (ret == GNUTLS_E_NO_CERTIFICATE_STATUS)
     return 0;
-  else if (ret != GNUTLS_E_SUCCESS)
+  else if (ret < 0)
     return gnutls_assert_val (ret);
-
-  ret = _gnutls_buffer_append_data (extdata, "", 0);
-  if (ret < 0)
-    return gnutls_assert_val (ret);
-
-  priv->expect_certificate_status = 1;
-
-  return 0;
+  
+  return GNUTLS_E_INT_RET_0;
 }
 
 static int
@@ -213,11 +209,12 @@ client_recv (gnutls_session_t session,
 	     size_t size)
 {
   if (size != 0)
-    return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
-
-  priv->expect_certificate_status = 1;
-
-  return 0;
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+  else
+    {
+      priv->expect_cstatus = 1;
+      return 0;
+    }
 }
 
 static int
@@ -231,7 +228,8 @@ _gnutls_status_request_send_params (gnutls_session_t session,
   ret = _gnutls_ext_get_session_data (session,
 				      GNUTLS_EXTENSION_STATUS_REQUEST,
 				      &epriv);
-  if (ret < 0)              /* it is ok not to have it */
+
+  if (ret < 0 || epriv.ptr == NULL) /* it is ok not to have it */
     return 0;
 
   priv = epriv.ptr;
@@ -253,7 +251,7 @@ _gnutls_status_request_recv_params (gnutls_session_t session,
   ret = _gnutls_ext_get_session_data (session,
 				      GNUTLS_EXTENSION_STATUS_REQUEST,
 				      &epriv);
-  if (ret < 0)              /* it is ok not to have it */
+  if (ret < 0 || epriv.ptr == NULL) /* it is ok not to have it */
     return 0;
 
   priv = epriv.ptr;
@@ -268,11 +266,12 @@ _gnutls_status_request_recv_params (gnutls_session_t session,
  * @session: is a #gnutls_session_t structure.
  * @responder_id: array with #gnutls_datum_t with DER data of responder id
  * @responder_id_size: number of members in @responder_id array
- * @request_extensions: a #gnutls_datum_t with DER encoded OCSP extensions
+ * @extensions: a #gnutls_datum_t with DER encoded OCSP extensions
  *
  * This function is to be used by clients to request OCSP response
  * from the server, using the "status_request" TLS extension.  Only
- * OCSP status type is supported.
+ * OCSP status type is supported. Typically @responder_id and @extensions
+ * should be null.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -281,7 +280,7 @@ int
 gnutls_status_request_ocsp_client (gnutls_session_t session,
 				   gnutls_datum_t *responder_id,
 				   size_t responder_id_size,
-				   gnutls_datum_t *request_extensions)
+				   gnutls_datum_t *extensions)
 {
   status_request_ext_st *priv;
   extension_priv_data_t epriv;
@@ -295,15 +294,56 @@ gnutls_status_request_ocsp_client (gnutls_session_t session,
 
   priv->responder_id = responder_id;
   priv->responder_id_size = responder_id_size;
-  if (request_extensions)
+  if (extensions)
     {
-      priv->request_extensions.data = request_extensions->data;
-      priv->request_extensions.size = request_extensions->size;
+      priv->request_extensions.data = extensions->data;
+      priv->request_extensions.size = extensions->size;
     }
 
   _gnutls_ext_set_session_data (session,
 				GNUTLS_EXTENSION_STATUS_REQUEST,
 				epriv);
+
+  return 0;
+}
+
+/**
+ * gnutls_status_request_get_ocsp:
+ * @session: is a #gnutls_session_t structure.
+ * @response: a #gnutls_datum_t with DER encoded OCSP response
+ *
+ * This function returns the OCSP status response received
+ * from the TLS server. The @response should be treated as
+ * constant. If no OCSP response is available then
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ **/
+int
+gnutls_status_request_get_ocsp (gnutls_session_t session,
+			        gnutls_datum_t *response)
+{
+  status_request_ext_st *priv;
+  extension_priv_data_t epriv;
+  int ret;
+
+  if (session->security_parameters.entity == GNUTLS_SERVER)
+    return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
+
+  ret = _gnutls_ext_get_session_data (session,
+				      GNUTLS_EXTENSION_STATUS_REQUEST,
+				      &epriv);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  priv = epriv.ptr;
+  
+  if (priv == NULL ||  priv->response.data == NULL)
+    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+  
+  response->data = priv->response.data;
+  response->size = priv->response.size;
 
   return 0;
 }
@@ -322,25 +362,13 @@ gnutls_status_request_ocsp_client (gnutls_session_t session,
  * typedef int (*gnutls_status_request_ocsp_func)
  *    (gnutls_session_t session, void *ptr, gnutls_datum_t *ocsp_response);
  *
- * The callback may be invoked up to two times for each handshake.  It
- * is called the first time when the client hello requested the status
- * request extension.  In this case, ocsp_response is NULL.  The
- * purpose of the first callback invocation is to determine whether
- * the server will acknowledge the client's request to use the
- * extension.  The callback may return
- * %GNUTLS_E_NO_CERTIFICATE_STATUS, in which case the server will not
- * enable the extension.  If the callback returns %GNUTLS_E_SUCCESS,
- * the server enable the extension.  If the callback returns another
- * error code, the handshake will terminate.
+ * The callback will be invoked if the client requests an OCSP certificate
+ * status.  The callback may return %GNUTLS_E_NO_CERTIFICATE_STATUS, if
+ * there is no recent OCSP response. If the callback returns %GNUTLS_E_SUCCESS,
+ * the server will provide the client with the ocsp_response.
  *
- * If the first call to the callback enabled the extension, there will
- * usually be a second phase, with a non-NULL ocsp_response.  Now the
- * server is ready to send the CertificateStatus, and it expects the
- * callback to provide the OCSP response data.  The callback can at
- * this point return %GNUTLS_E_NO_CERTIFICATE_STATUS to avoid sending
- * a CertificateStatus message.  If the callback returns
- * %GNUTLS_E_SUCCESS the ocsp_response will be sent off to the client.
- * If the callback returns an error, the handshake will terminate.
+ * The response must be a value allocated using gnutls_malloc(), and will be
+ * deinitialized when needed.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -350,23 +378,79 @@ gnutls_status_request_ocsp_server (gnutls_session_t session,
 				   gnutls_status_request_ocsp_func ocsp_func,
 				   void *ptr)
 {
-  status_request_ext_st *priv;
   extension_priv_data_t epriv;
+  status_request_ext_st* priv;
 
   if (session->security_parameters.entity == GNUTLS_CLIENT)
-    return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  epriv.ptr = priv = gnutls_calloc (1, sizeof (*priv));
+  priv = gnutls_calloc(1, sizeof(*priv));
   if (priv == NULL)
-    return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
   priv->ocsp_func = ocsp_func;
   priv->ocsp_func_ptr = ptr;
+
+  epriv.ptr = priv;
 
   _gnutls_ext_set_session_data (session,
 				GNUTLS_EXTENSION_STATUS_REQUEST,
 				epriv);
 
+  return 0;
+}
+
+static int file_ocsp_func(gnutls_session_t session, void *ptr, gnutls_datum_t *ocsp_response)
+{
+int ret;
+status_request_ext_st* priv = ptr;
+
+  ret = gnutls_load_file(priv->response_file, ocsp_response);
+  if (ret < 0)
+    return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_STATUS);
+  
+  return 0;
+}
+
+/**
+ * gnutls_status_request_ocsp_server_file:
+ * @session: is a #gnutls_session_t structure.
+ * @response_file: a filename of the OCSP response
+ * @flags: should be zero
+ *
+ * This function sets the filename of an OCSP response, that will be
+ * sent to the client if requests an OCSP certificate status.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ **/
+int
+gnutls_status_request_ocsp_server_file (gnutls_session_t session,
+				   const char* response_file,
+				   unsigned int flags)
+{
+  extension_priv_data_t epriv;
+  status_request_ext_st* priv;
+
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  priv = gnutls_calloc(1, sizeof(*priv));
+  if (priv == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  priv->response_file = gnutls_strdup(response_file);
+  if (priv->response_file == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  priv->ocsp_func = file_ocsp_func;
+  priv->ocsp_func_ptr = priv;
+  
+  epriv.ptr = priv;
+
+  _gnutls_ext_set_session_data (session,
+				GNUTLS_EXTENSION_STATUS_REQUEST,
+				epriv);
   return 0;
 }
 
@@ -376,14 +460,16 @@ _gnutls_status_request_deinit_data (extension_priv_data_t epriv)
   status_request_ext_st *priv = epriv.ptr;
   size_t i;
 
-  if (priv->dealloc)
-    {
-      for (i = 0; i < priv->responder_id_size; i++)
-	gnutls_free (priv->responder_id[i].data);
-      gnutls_free (priv->responder_id);
-      gnutls_free (priv->request_extensions.data);
-    }
+  if (priv == NULL)
+    return;
 
+  for (i = 0; i < priv->responder_id_size; i++)
+    gnutls_free (priv->responder_id[i].data);
+
+  gnutls_free (priv->responder_id);
+  gnutls_free (priv->request_extensions.data);
+  gnutls_free (priv->response.data);
+  gnutls_free (priv->response_file);
   gnutls_free (priv);
 }
 
@@ -411,3 +497,109 @@ extension_entry_st ext_mod_status_request = {
   .unpack_func = _gnutls_status_request_unpack,
   .deinit_func = _gnutls_status_request_deinit_data
 };
+
+/* Functions to be called from handshake */
+
+int
+_gnutls_send_server_certificate_status (gnutls_session_t session, int again)
+{
+  mbuffer_st *bufel = NULL;
+  uint8_t * data;
+  int data_size = 0;
+  int ret;
+  status_request_ext_st *priv = NULL;
+  extension_priv_data_t epriv;
+  if (again == 0)
+    {
+      ret =
+        _gnutls_ext_get_session_data (session,
+                                      GNUTLS_EXTENSION_STATUS_REQUEST,
+                                      &epriv);
+      if (ret < 0)
+        return 0;
+      priv = epriv.ptr;
+
+      if (!priv->response.size)
+        return 0;
+
+      data_size = priv->response.size + 4;
+      bufel = _gnutls_handshake_alloc (session, data_size, data_size);
+      if (!bufel)
+        return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+      data = _mbuffer_get_udata_ptr (bufel);
+      
+      data[0] = 0x01;
+      _gnutls_write_uint24(priv->response.size, &data[1]);
+      memcpy(&data[4], priv->response.data, priv->response.size);
+    }
+  return _gnutls_send_handshake (session, data_size ? bufel : NULL,
+                                 GNUTLS_HANDSHAKE_CERTIFICATE_STATUS);
+}
+
+int
+_gnutls_recv_server_certificate_status (gnutls_session_t session)
+{
+  uint8_t *data;
+  int data_size;
+  size_t r_size;
+  gnutls_buffer_st buf;
+  int ret;
+  status_request_ext_st *priv = NULL;
+  extension_priv_data_t epriv;
+  
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_STATUS_REQUEST,
+                                  &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return 0;
+    }
+  priv = epriv.ptr;
+
+  if (!priv->expect_cstatus)
+    return 0;
+
+  ret = _gnutls_recv_handshake (session, 
+                                GNUTLS_HANDSHAKE_CERTIFICATE_STATUS,
+                                0, &buf);
+  if (ret < 0)
+    return gnutls_assert_val_fatal(ret);
+
+  data = buf.data;
+  data_size = buf.length;
+
+  /* minimum message is type (1) + response (3) + data */
+  if (data_size == 0)
+    return 0;
+  else if (data_size < 4)
+    return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
+  if (data[0] != 0x01)
+    {
+      gnutls_assert ();
+      _gnutls_handshake_log ("EXT[%p]: unknown status_type %d\n",
+			     session, data[0]);
+      return 0;
+    }
+  DECR_LENGTH_COM (data_size, 1, ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH; goto error);
+  data++;
+
+  DECR_LENGTH_COM (data_size, 3, ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH; goto error);
+  r_size = _gnutls_read_uint24(data);
+  data += 3;
+
+  DECR_LENGTH_COM (data_size, r_size, ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH; goto error);
+
+  ret = _gnutls_set_datum(&priv->response, data, r_size);
+  if (ret < 0)
+    goto error;
+
+  ret = 0;
+
+error:
+  _gnutls_buffer_clear (&buf);
+  
+  return ret;
+}

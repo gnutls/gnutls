@@ -851,8 +851,8 @@ parse_handshake_header (gnutls_session_t session, mbuffer_st* bufel,
   /* make the length offset */
   if (hsk->end_offset > 0) hsk->end_offset--;
 
-  _gnutls_handshake_log ("HSK[%p]: %s was received. Length %d[%d], frag offset %d, frag length: %d, sequence: %d\n",
-                         session, _gnutls_handshake2str (hsk->htype),
+  _gnutls_handshake_log ("HSK[%p]: %s (%u) was received. Length %d[%d], frag offset %d, frag length: %d, sequence: %d\n",
+                         session, _gnutls_handshake2str (hsk->htype), (unsigned)hsk->htype,
                          (int) hsk->length, (int)data_size, hsk->start_offset, hsk->end_offset-hsk->start_offset+1, (int)hsk->sequence);
 
   hsk->header_size = handshake_header_size;

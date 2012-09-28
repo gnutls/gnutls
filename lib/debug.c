@@ -108,6 +108,9 @@ _gnutls_handshake2str (gnutls_handshake_description_t handshake)
     case GNUTLS_HANDSHAKE_SUPPLEMENTAL:
       return "SUPPLEMENTAL";
       break;
+    case GNUTLS_HANDSHAKE_CERTIFICATE_STATUS:
+      return "CERTIFICATE STATUS";
+      break;
     case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET:
       return "NEW SESSION TICKET";
       break;
