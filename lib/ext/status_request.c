@@ -136,8 +136,6 @@ server_recv (gnutls_session_t session,
 
   priv->responder_id_size = _gnutls_read_uint16 (data);
   
-  _gnutls_debug_log("Status Request: Responder ID size: %u\n", priv->responder_id_size);
-  
   DECR_LEN(data_size, 2);
   data += 2;
 
@@ -270,7 +268,8 @@ _gnutls_status_request_recv_params (gnutls_session_t session,
  *
  * This function is to be used by clients to request OCSP response
  * from the server, using the "status_request" TLS extension.  Only
- * OCSP status type is supported. Typically @responder_id and @extensions
+ * OCSP status type is supported. A typical server has a single
+ * OCSP response cached, so @responder_id and @extensions
  * should be null.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,

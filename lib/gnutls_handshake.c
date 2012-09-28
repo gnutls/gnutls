@@ -2473,6 +2473,27 @@ gnutls_handshake_set_timeout (gnutls_session_t session, unsigned int ms)
 	} } while (0)
 
 
+static int run_verify_callback(gnutls_session_t session)
+{
+  gnutls_certificate_credentials_t cred;
+  int ret;
+
+  cred =
+    (gnutls_certificate_credentials_t) _gnutls_get_cred (session->key,
+                                                         GNUTLS_CRD_CERTIFICATE,
+                                                         NULL);
+  if (cred == NULL)
+    return 0;
+
+  if (cred->verify_callback != NULL)
+    {
+      ret = cred->verify_callback (session);
+      if (ret != 0)
+        return GNUTLS_E_CERTIFICATE_ERROR;
+    }
+  
+  return 0;
+}
 
 /*
  * _gnutls_handshake_client 
@@ -2503,14 +2524,14 @@ _gnutls_handshake_client (gnutls_session_t session)
       STATE = STATE1;
       IMED_RET ("send hello", ret, 1);
 
-    case STATE11:
+    case STATE2:
       if (IS_DTLS (session))
         {
           ret =
             _gnutls_recv_handshake (session, 
                   GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST,
                   1, NULL);
-          STATE = STATE11;
+          STATE = STATE2;
           IMED_RET ("recv hello verify", ret, 1);
 
           if (ret == 1)
@@ -2519,91 +2540,96 @@ _gnutls_handshake_client (gnutls_session_t session)
               return 1;
             }
         }
-    case STATE2:
+    case STATE3:
       /* receive the server hello */
       ret =
         _gnutls_recv_handshake (session,
                                 GNUTLS_HANDSHAKE_SERVER_HELLO,
                                 0, NULL);
-      STATE = STATE2;
+      STATE = STATE3;
       IMED_RET ("recv hello", ret, 1);
 
-    case STATE70:
+    case STATE4:
       if (session->security_parameters.do_recv_supplemental)
         {
           ret = _gnutls_recv_supplemental (session);
-          STATE = STATE70;
+          STATE = STATE4;
           IMED_RET ("recv supplemental", ret, 1);
         }
 
-    case STATE3:
+    case STATE5:
       /* RECV CERTIFICATE */
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
         ret = _gnutls_recv_server_certificate (session);
-      STATE = STATE3;
+      STATE = STATE5;
       IMED_RET ("recv server certificate", ret, 1);
 
-    case STATE4:
+    case STATE6:
       /* RECV CERTIFICATE STATUS */
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
         ret = _gnutls_recv_server_certificate_status (session);
-      STATE = STATE4;
+      STATE = STATE6;
       IMED_RET ("recv server certificate", ret, 1);
 
-    case STATE5:
+    case STATE7:
+      ret = run_verify_callback(session);
+      STATE = STATE7;
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+    case STATE8:
       /* receive the server key exchange */
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
         ret = _gnutls_recv_server_kx_message (session);
-      STATE = STATE5;
+      STATE = STATE8;
       IMED_RET ("recv server kx message", ret, 1);
 
-    case STATE6:
+    case STATE9:
       /* receive the server certificate request - if any 
        */
 
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
         ret = _gnutls_recv_server_crt_request (session);
-      STATE = STATE6;
+      STATE = STATE9;
       IMED_RET ("recv server certificate request message", ret, 1);
 
-    case STATE7:
+    case STATE10:
       /* receive the server hello done */
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
         ret =
           _gnutls_recv_handshake (session,
                                   GNUTLS_HANDSHAKE_SERVER_HELLO_DONE,
                                   0, NULL);
-      STATE = STATE7;
+      STATE = STATE10;
       IMED_RET ("recv server hello done", ret, 1);
 
-    case STATE71:
+    case STATE11:
       if (session->security_parameters.do_send_supplemental)
         {
-          ret = _gnutls_send_supplemental (session, AGAIN (STATE71));
-          STATE = STATE71;
+          ret = _gnutls_send_supplemental (session, AGAIN (STATE11));
+          STATE = STATE11;
           IMED_RET ("send supplemental", ret, 0);
         }
 
-    case STATE8:
+    case STATE12:
       /* send our certificate - if any and if requested
        */
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
-        ret = _gnutls_send_client_certificate (session, AGAIN (STATE8));
-      STATE = STATE8;
+        ret = _gnutls_send_client_certificate (session, AGAIN (STATE12));
+      STATE = STATE12;
       IMED_RET ("send client certificate", ret, 0);
 
-    case STATE9:
+    case STATE13:
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
-        ret = _gnutls_send_client_kx_message (session, AGAIN (STATE9));
-      STATE = STATE9;
+        ret = _gnutls_send_client_kx_message (session, AGAIN (STATE13));
+      STATE = STATE13;
       IMED_RET ("send client kx", ret, 0);
 
-    case STATE10:
+    case STATE14:
       /* send client certificate verify */
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
         ret =
-          _gnutls_send_client_certificate_verify (session, AGAIN (STATE10));
-      STATE = STATE10;
+          _gnutls_send_client_certificate_verify (session, AGAIN (STATE14));
+      STATE = STATE14;
       IMED_RET ("send client certificate verify", ret, 1);
 
       STATE = STATE0;

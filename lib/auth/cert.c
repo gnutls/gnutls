@@ -1396,8 +1396,7 @@ cleanup:
 #endif
 
 int
-_gnutls_proc_crt (gnutls_session_t session,
-                                      uint8_t * data, size_t data_size)
+_gnutls_proc_crt (gnutls_session_t session, uint8_t * data, size_t data_size)
 {
   int ret;
   gnutls_certificate_credentials_t cred;
@@ -1426,13 +1425,6 @@ _gnutls_proc_crt (gnutls_session_t session,
     default:
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  if (ret == 0 && cred->verify_callback != NULL)
-    {
-      ret = cred->verify_callback (session);
-      if (ret != 0)
-        ret = GNUTLS_E_CERTIFICATE_ERROR;
     }
 
   return ret;
