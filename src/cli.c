@@ -403,7 +403,7 @@ cert_verify_callback (gnutls_session_t session)
       if (!insecure && !ssh)
         return -1;
     }
-  else if (ENABLED_OPT(OCSP))
+  else if (ENABLED_OPT(OCSP) || status_request_ocsp)
     { /* off-line verification succeeded. Try OCSP */
       rc = cert_verify_ocsp(session);
       if (rc == 0)
@@ -1104,6 +1104,9 @@ const char* rest = NULL;
 
   record_max_size = OPT_VALUE_RECORDSIZE;
   status_request_ocsp = HAVE_OPT(STATUS_REQUEST_OCSP);
+  if (ENABLED_OPT(OCSP))
+    status_request_ocsp = 1;
+  
   fingerprint = HAVE_OPT(FINGERPRINT);
 
   if (HAVE_OPT(X509FMTDER))
@@ -1482,6 +1485,26 @@ cert_verify_ocsp (gnutls_session_t session)
       ret = -1;
       goto cleanup;
     }
+
+  if (status_request_ocsp)
+    { /* try the server's OCSP response */
+      ret = gnutls_status_request_get_ocsp(session, &resp);
+      if (ret < 0 && !ENABLED_OPT(OCSP))
+        {
+          if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+            fprintf(stderr, "gnutls_status_request_get_ocsp: %s\n", gnutls_strerror(ret));
+          ret = -1;
+          goto cleanup;
+        }
+      
+      if (ret >= 0)
+        {
+          ret = check_ocsp_response(issuer, &resp);
+          if (ret >= 0 || !ENABLED_OPT(OCSP))
+            goto cleanup;
+        }
+    }
+    
     
   ret = send_ocsp_request(NULL, crt, issuer, &resp, 1);
   if (ret < 0)
