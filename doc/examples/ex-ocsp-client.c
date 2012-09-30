@@ -20,10 +20,11 @@ size_t get_data (void *buffer, size_t size, size_t nmemb,
 static gnutls_x509_crt_t load_cert (const char *cert_file);
 static void _response_info (const gnutls_datum_t * data);
 static void
-_generate_request (gnutls_datum_t * rdata, const char *cert_file,
-                   const char *issuer_file);
-static int _verify_response (gnutls_datum_t * data,
-                             const char *signer_file);
+_generate_request (gnutls_datum_t * rdata, gnutls_x509_crt_t cert,
+                   gnutls_x509_crt_t issuer);
+static int
+_verify_response (gnutls_datum_t * data, gnutls_x509_crt_t cert, 
+                  gnutls_x509_crt_t signer);
 
 /* This program queries an OCSP server.
    It expects three files. argv[1] containing the certificate to
@@ -40,6 +41,7 @@ main (int argc, char *argv[])
     gnutls_datum_t ud, tmp;
     int ret;
     gnutls_datum_t req;
+    gnutls_x509_crt_t cert, issuer, signer;
 #ifndef NO_LIBCURL
     CURL *handle;
     struct curl_slist *headers = NULL;
@@ -55,9 +57,12 @@ main (int argc, char *argv[])
     if (argc > 4)
         hostname = argv[4];
 
+    cert = load_cert (cert_file);
+    issuer = load_cert (issuer_file);
+    signer = load_cert (signer_file);
+
     if (hostname == NULL)
       {
-          gnutls_x509_crt_t cert = load_cert (cert_file);
 
           for (seq = 0;; seq++)
             {
@@ -90,7 +95,6 @@ main (int argc, char *argv[])
                 break;
             }
 
-          gnutls_x509_crt_deinit (cert);
       }
 
     /* Note that the OCSP servers hostname might be available
@@ -100,7 +104,7 @@ main (int argc, char *argv[])
     memset (&ud, 0, sizeof (ud));
     fprintf (stderr, "Connecting to %s\n", hostname);
 
-    _generate_request (&req, cert_file, issuer_file);
+    _generate_request (&req, cert, issuer);
 
 #ifndef NO_LIBCURL
     curl_global_init (CURL_GLOBAL_ALL);
@@ -132,8 +136,11 @@ main (int argc, char *argv[])
 
     _response_info (&ud);
 
-    v = _verify_response (&ud, signer_file);
+    v = _verify_response (&ud, cert, signer);
 
+    gnutls_x509_crt_deinit (cert);
+    gnutls_x509_crt_deinit (issuer);
+    gnutls_x509_crt_deinit (signer);
     gnutls_global_deinit ();
 
     return v;
@@ -198,12 +205,11 @@ load_cert (const char *cert_file)
 }
 
 static void
-_generate_request (gnutls_datum_t * rdata, const char *cert_file,
-                   const char *issuer_file)
+_generate_request (gnutls_datum_t * rdata, gnutls_x509_crt_t cert,
+                   gnutls_x509_crt_t issuer)
 {
     gnutls_ocsp_req_t req;
     int ret;
-    gnutls_x509_crt_t issuer, cert;
     unsigned char noncebuf[23];
     gnutls_datum_t nonce = { noncebuf, sizeof (noncebuf) };
 
@@ -211,15 +217,10 @@ _generate_request (gnutls_datum_t * rdata, const char *cert_file,
     if (ret < 0)
         exit (1);
 
-    issuer = load_cert (issuer_file);
-    cert = load_cert (cert_file);
 
     ret = gnutls_ocsp_req_add_cert (req, GNUTLS_DIG_SHA1, issuer, cert);
     if (ret < 0)
         exit (1);
-
-    gnutls_x509_crt_deinit (issuer);
-    gnutls_x509_crt_deinit (cert);
 
     ret = gnutls_rnd (GNUTLS_RND_RANDOM, nonce.data, nonce.size);
     if (ret < 0)
@@ -239,14 +240,12 @@ _generate_request (gnutls_datum_t * rdata, const char *cert_file,
 }
 
 static int
-_verify_response (gnutls_datum_t * data, const char *signer_file)
+_verify_response (gnutls_datum_t * data, gnutls_x509_crt_t cert, 
+                  gnutls_x509_crt_t signer)
 {
     gnutls_ocsp_resp_t resp;
     int ret;
-    size_t size;
-    gnutls_x509_crt_t signer;
     unsigned verify;
-    gnutls_datum_t dat;
 
     ret = gnutls_ocsp_resp_init (&resp);
     if (ret < 0)
@@ -255,21 +254,10 @@ _verify_response (gnutls_datum_t * data, const char *signer_file)
     ret = gnutls_ocsp_resp_import (resp, data);
     if (ret < 0)
         exit (1);
-
-    ret = gnutls_x509_crt_init (&signer);
+        
+    ret = gnutls_ocsp_resp_check_crt (resp, cert);
     if (ret < 0)
-        exit (1);
-
-    dat.data = (void *) read_binary_file (signer_file, &size);
-    if (dat.data == NULL)
-        exit (1);
-
-    dat.size = size;
-
-    ret = gnutls_x509_crt_import (signer, &dat, GNUTLS_X509_FMT_PEM);
-    free (dat.data);
-    if (ret < 0)
-        exit (1);
+      exit(1);
 
     ret = gnutls_ocsp_resp_verify_direct (resp, signer, &verify, 0);
     if (ret < 0)

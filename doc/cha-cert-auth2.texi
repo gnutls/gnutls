@@ -283,9 +283,10 @@ automatically parsed when an OCSP Response is imported.
 @showfuncE{gnutls_ocsp_resp_init,gnutls_ocsp_resp_deinit,gnutls_ocsp_resp_import,gnutls_ocsp_resp_export,gnutls_ocsp_resp_print}
 
 The OCSP response needs to be verified against some set of trust
-anchors before it can be relied upon.
+anchors before it can be relied upon, and it is wise to check whether
+the OCSP response corresponds to the certificate being checked.
 
-@showfuncB{gnutls_ocsp_resp_verify,gnutls_ocsp_resp_verify_direct}
+@showfuncC{gnutls_ocsp_resp_verify,gnutls_ocsp_resp_verify_direct,gnutls_ocsp_resp_check_crt}
 
 @node Managing encrypted keys
 @section Managing encrypted keys
