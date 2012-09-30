@@ -223,8 +223,9 @@ typedef struct
 
 typedef enum handshake_state_t
 { STATE0 = 0, STATE1, STATE2,
-  STATE3, STATE4, STATE5,
-  STATE6, STATE7, STATE8, STATE9, STATE11 = 11,
+  STATE3, STATE4, STATE5, STATE6, STATE7, STATE8, 
+  STATE9, STATE10, STATE11, STATE12, STATE13, STATE14,
+  STATE15, STATE16, STATE17,
   STATE20 = 20, STATE21, STATE22,
   STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
   STATE60 = 60, STATE61, STATE62, STATE70, STATE71
@@ -673,6 +674,7 @@ typedef struct
                                                  * message */
   unsigned int resumable:1;              /* TRUE or FALSE - if we can resume that session */
   unsigned int ticket_sent:1;            /* whether a session ticket was sent */
+  handshake_state_t handshake_final_state;
   handshake_state_t handshake_state;    /* holds
                                          * a number which indicates where
                                          * the handshake procedure has been

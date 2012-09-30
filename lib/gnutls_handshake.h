@@ -33,9 +33,6 @@ int _gnutls_recv_handshake (gnutls_session_t session,
                         gnutls_handshake_description_t type,
                         unsigned int optional, gnutls_buffer_st* buf);
 int _gnutls_generate_session_id (uint8_t * session_id, uint8_t * len);
-int _gnutls_handshake_common (gnutls_session_t session);
-int _gnutls_handshake_client (gnutls_session_t session);
-int _gnutls_handshake_server (gnutls_session_t session);
 void _gnutls_set_server_random (gnutls_session_t session, uint8_t * rnd);
 void _gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd);
 int _gnutls_tls_create_random (uint8_t * dst);
@@ -52,10 +49,12 @@ int _gnutls_user_hello_func (gnutls_session_t session,
 void _gnutls_handshake_hash_buffers_clear (gnutls_session_t session);
 
 #define STATE session->internals.handshake_state
+#define FINAL_STATE session->internals.handshake_final_state
 /* This returns true if we have got there
  * before (and not finished due to an interrupt).
  */
 #define AGAIN(target) (STATE==target?1:0)
+#define FAGAIN(target) (FINAL_STATE==target?1:0)
 #define AGAIN2(state, target) (state==target?1:0)
 
 #endif
