@@ -2645,14 +2645,22 @@ _gnutls_handshake_client (gnutls_session_t session)
         }
       else
         {
-          ret = _gnutls_recv_handshake_final (session, TRUE);
-          IMED_RET ("recv handshake final", ret, 1);
+          ret = _gnutls_recv_new_session_ticket (session);
+          IMED_RET ("recv handshake new session ticket", ret, 1);
         }
 
     case STATE16:
-      ret = _gnutls_recv_new_session_ticket (session);
       STATE = STATE16;
-      IMED_RET ("recv handshake new session ticket", ret, 1);
+      if (session->internals.resumed == RESUME_FALSE)
+        {
+          ret = _gnutls_recv_new_session_ticket (session);
+          IMED_RET ("recv handshake new session ticket", ret, 1);
+        }
+      else
+        {
+          ret = _gnutls_recv_handshake_final (session, TRUE);
+          IMED_RET ("recv handshake final", ret, 1);
+        }
 
     case STATE17:
       STATE = STATE17;
