@@ -535,37 +535,36 @@ static int
 wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
   if (debug)
-    success ("resume db storing... (%d-%d)\n", key.size, data.size);
-
-  if (debug)
     {
       unsigned int i;
-      printf ("key:\n");
+      fprintf (stderr, "resume db storing (%d-%d): ", key.size, data.size);
       for (i = 0; i < key.size; i++)
         {
-          printf ("%02x ", key.data[i] & 0xFF);
-          if ((i + 1) % 16 == 0)
-            printf ("\n");
+          fprintf (stderr, "%02x", key.data[i] & 0xFF);
         }
-      printf ("\n");
-      printf ("data:\n");
+      fprintf (stderr, "\n");
+      fprintf (stderr, "data: ");
       for (i = 0; i < data.size; i++)
         {
-          printf ("%02x ", data.data[i] & 0xFF);
-          if ((i + 1) % 16 == 0)
-            printf ("\n");
+          fprintf (stderr, "%02x", data.data[i] & 0xFF);
         }
-      printf ("\n");
+      fprintf (stderr, "\n");
     }
 
   if (cache_db == NULL)
     return -1;
 
   if (key.size > MAX_SESSION_ID_SIZE)
-    return -1;
+    {
+      fail("Key size is too large\n");
+      return -1;
+    }
 
   if (data.size > MAX_SESSION_DATA_SIZE)
-    return -1;
+    {
+      fail("Data size is too large\n");
+      return -1;
+    }
 
   memcpy (cache_db[cache_db_ptr].session_id, key.data, key.size);
   cache_db[cache_db_ptr].session_id_size = key.size;
@@ -586,18 +585,15 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
   int i;
 
   if (debug)
-    success ("resume db fetch... (%d)\n", key.size);
-  if (debug)
     {
       unsigned int i;
-      printf ("key:\n");
+
+      fprintf (stderr, "resume db looking for (%d): ", key.size);
       for (i = 0; i < key.size; i++)
         {
-          printf ("%02x ", key.data[i] & 0xFF);
-          if ((i + 1) % 16 == 0)
-            printf ("\n");
+          fprintf (stderr, "%02x", key.data[i] & 0xFF);
         }
-      printf ("\n");
+      fprintf (stderr, "\n");
     }
 
   if (cache_db == NULL)
