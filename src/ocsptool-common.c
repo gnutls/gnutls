@@ -311,7 +311,8 @@ print_ocsp_verify_res (unsigned int output)
  *  -1: dunno
  */
 int
-check_ocsp_response (gnutls_x509_crt_t issuer,
+check_ocsp_response (gnutls_x509_crt_t cert,
+                     gnutls_x509_crt_t issuer,
                      gnutls_datum_t *data)
 {
   gnutls_ocsp_resp_t resp;
@@ -328,6 +329,14 @@ check_ocsp_response (gnutls_x509_crt_t issuer,
   ret = gnutls_ocsp_resp_import (resp, data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing response: %s", gnutls_strerror (ret));
+  
+  ret = gnutls_ocsp_resp_check_crt(resp, cert);
+  if (ret < 0)
+    {
+      printf ("*** Got OCSP response on an unrelated certificate (ignoring)\n");
+      ret = -1;
+      goto cleanup;
+    }
 
   ret = gnutls_ocsp_resp_verify_direct( resp, issuer, &status, 0);
   if (ret < 0)

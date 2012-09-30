@@ -632,7 +632,7 @@ init_tls_session (const char *hostname)
   /* OCSP status-request TLS extension */
   if (status_request_ocsp > 0 && disable_extensions == 0)
     {
-      if (gnutls_status_request_ocsp_client (session, NULL, 0, NULL) < 0)
+      if (gnutls_ocsp_status_request_enable_client (session, NULL, 0, NULL) < 0)
         {
           fprintf (stderr, "Cannot set OCSP status request information.\n");
           exit (1);
@@ -1103,7 +1103,7 @@ const char* rest = NULL;
     }
 
   record_max_size = OPT_VALUE_RECORDSIZE;
-  status_request_ocsp = HAVE_OPT(STATUS_REQUEST_OCSP);
+  status_request_ocsp = HAVE_OPT(OCSP_STATUS_REQUEST);
   if (ENABLED_OPT(OCSP))
     status_request_ocsp = 1;
   
@@ -1488,18 +1488,18 @@ cert_verify_ocsp (gnutls_session_t session)
 
   if (status_request_ocsp)
     { /* try the server's OCSP response */
-      ret = gnutls_status_request_get_ocsp(session, &resp);
+      ret = gnutls_ocsp_status_request_get(session, &resp);
       if (ret < 0 && !ENABLED_OPT(OCSP))
         {
           if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-            fprintf(stderr, "gnutls_status_request_get_ocsp: %s\n", gnutls_strerror(ret));
+            fprintf(stderr, "gnutls_ocsp_status_request_get: %s\n", gnutls_strerror(ret));
           ret = -1;
           goto cleanup;
         }
       
       if (ret >= 0)
         {
-          ret = check_ocsp_response(issuer, &resp);
+          ret = check_ocsp_response(crt, issuer, &resp);
           if (ret >= 0 || !ENABLED_OPT(OCSP))
             goto cleanup;
         }
@@ -1515,7 +1515,7 @@ cert_verify_ocsp (gnutls_session_t session)
     }
 
   /* verify and check the response for revoked cert */
-  ret = check_ocsp_response(issuer, &resp);
+  ret = check_ocsp_response(crt, issuer, &resp);
 
 cleanup:
   if (deinit_issuer)

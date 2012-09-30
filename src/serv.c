@@ -359,15 +359,6 @@ gnutls_session_t initialize_session (int dtls)
     gnutls_session_ticket_enable_server (session, &session_ticket_key);
 #endif
 
-  /* OCSP status-request TLS extension */
-  if (status_response_ocsp)
-    {
-      if (gnutls_status_request_ocsp_server_file (session, status_response_ocsp, 0) < 0)
-	{
-	  fprintf (stderr, "Cannot set OCSP status request callback.\n");
-	  exit (1);
-	}
-    }
 
   if (noticket == 0)
     gnutls_session_ticket_enable_server (session, &session_ticket_key);
@@ -1100,6 +1091,16 @@ main (int argc, char **argv)
         exit (1);
       }
 
+  /* OCSP status-request TLS extension */
+  if (status_response_ocsp)
+    {
+      if (gnutls_certificate_set_ocsp_status_request_file (cert_cred, status_response_ocsp, 0) < 0)
+	{
+	  fprintf (stderr, "Cannot set OCSP status request file: %s\n", gnutls_strerror(ret));
+	  exit (1);
+	}
+    }
+
   gnutls_certificate_set_params_function (cert_cred, get_params);
 /*     gnutls_certificate_set_dh_params(cert_cred, dh_params);
  *     gnutls_certificate_set_rsa_export_params(cert_cred, rsa_params);
@@ -1664,8 +1665,8 @@ cmd_parser (int argc, char **argv)
   if (HAVE_OPT (PSKPASSWD))
     psk_passwd = OPT_ARG (PSKPASSWD);
 
-  if (HAVE_OPT(STATUS_RESPONSE_OCSP))
-    status_response_ocsp = OPT_ARG(STATUS_RESPONSE_OCSP);
+  if (HAVE_OPT(OCSP_RESPONSE))
+    status_response_ocsp = OPT_ARG(OCSP_RESPONSE);
 
 }
 

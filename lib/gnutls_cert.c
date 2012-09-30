@@ -193,6 +193,7 @@ gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
   gnutls_x509_trust_list_deinit(sc->tlist, 1);
   gnutls_certificate_free_keys (sc);
   gnutls_certificate_free_ca_names (sc);
+  gnutls_free(sc->ocsp_response_file);
 
 #ifdef ENABLE_OPENPGP
   gnutls_openpgp_keyring_deinit (sc->keyring);

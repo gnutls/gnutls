@@ -87,6 +87,11 @@ typedef struct gnutls_certificate_credentials_st
   gnutls_certificate_verify_function *verify_callback;
 
   struct pin_info_st pin;
+  
+  /* OCSP */
+  gnutls_status_request_ocsp_func ocsp_func;
+  void *ocsp_func_ptr;
+  char *ocsp_response_file;
 } certificate_credentials_st;
 
 typedef struct rsa_info_st

@@ -955,24 +955,6 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   int gnutls_key_generate (gnutls_datum_t * key, unsigned int key_size);
 
-  /* OCSP status request extension, RFC 6066 */
-  typedef int (*gnutls_status_request_ocsp_func)
-  (gnutls_session_t session, void *ptr, gnutls_datum_t *ocsp_response);
-  int gnutls_status_request_ocsp_server (gnutls_session_t session,
-				 gnutls_status_request_ocsp_func ocsp_func,
-					 void *ptr);
-
-  int gnutls_status_request_ocsp_server_file (gnutls_session_t session,
-				   const char* response_file,
-				   unsigned int flags);
-
-  int gnutls_status_request_ocsp_client (gnutls_session_t session,
-					 gnutls_datum_t *responder_id,
-					 size_t responder_id_size,
-					 gnutls_datum_t *request_extensions);
-
-  int gnutls_status_request_get_ocsp (gnutls_session_t session, gnutls_datum_t *response);
-
 /* if you just want some defaults, use the following.
  */
   int gnutls_priority_init (gnutls_priority_t * priority_cache,
@@ -1218,6 +1200,25 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   int gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,
                                        gnutls_x509_crl_t * crl_list,
                                        int crl_list_size);
+
+  /* OCSP status request extension, RFC 6066 */
+  typedef int (*gnutls_status_request_ocsp_func)
+  (gnutls_session_t session, void *ptr, gnutls_datum_t *ocsp_response);
+
+  void gnutls_certificate_set_ocsp_status_request_function (gnutls_certificate_credentials_t res,
+                                                           gnutls_status_request_ocsp_func ocsp_func,
+                                                           void *ptr);
+
+  int gnutls_certificate_set_ocsp_status_request_file (gnutls_certificate_credentials_t res,
+                                                       const char* response_file, unsigned int flags);
+
+  int gnutls_ocsp_status_request_enable_client (gnutls_session_t session,
+					        gnutls_datum_t *responder_id,
+                                                size_t responder_id_size,
+					        gnutls_datum_t *request_extensions);
+
+  int gnutls_ocsp_status_request_get (gnutls_session_t session, gnutls_datum_t *response);
+
 
 /* global state functions
  */
@@ -2049,7 +2050,8 @@ typedef int (*gnutls_pin_callback_t) (void *userdata, int attempt,
 #define GNUTLS_E_TPM_KEY_NOT_FOUND -333
 #define GNUTLS_E_TPM_UNINITIALIZED -334
 
-#define GNUTLS_E_NO_CERTIFICATE_STATUS -329
+#define GNUTLS_E_NO_CERTIFICATE_STATUS -340
+#define GNUTLS_E_OCSP_RESPONSE_ERROR -341
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

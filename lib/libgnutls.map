@@ -836,10 +836,11 @@ GNUTLS_3_1_0 {
         gnutls_heartbeat_allowed;
 	gnutls_heartbeat_get_timeout;
 	gnutls_heartbeat_set_timeouts;
-	gnutls_status_request_ocsp_client;
-	gnutls_status_request_get_ocsp;
-	gnutls_status_request_ocsp_server;
-	gnutls_status_request_ocsp_server_file;
+	gnutls_certificate_set_ocsp_status_request_function;
+	gnutls_certificate_set_ocsp_status_request_file;
+	gnutls_ocsp_status_request_enable_client;
+	gnutls_ocsp_status_request_get;
+	gnutls_ocsp_resp_check_crt;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

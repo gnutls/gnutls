@@ -11,10 +11,11 @@ extension.
 Reported by danblack at http://savannah.gnu.org/support/?108146
 
 ** API and ABI modifications:
-gnutls_status_request_ocsp_client: Added
-gnutls_status_request_get_ocsp: Added
-gnutls_status_request_ocsp_server: Added
-gnutls_status_request_ocsp_server_file: Added
+gnutls_certificate_set_ocsp_status_request_function: Added
+gnutls_certificate_set_ocsp_status_request_file: Added
+gnutls_ocsp_status_request_enable_client: Added
+gnutls_ocsp_status_request_get: Added
+gnutls_ocsp_resp_check_crt: Added
 
 
 * Version 3.1.2 (released 2012-09-26)
