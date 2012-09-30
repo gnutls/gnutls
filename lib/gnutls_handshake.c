@@ -2473,19 +2473,28 @@ gnutls_handshake_set_timeout (gnutls_session_t session, unsigned int ms)
 	} } while (0)
 
 
-static int run_verify_callback(gnutls_session_t session)
+/* Runs the certificate verification callback.
+ * side is either GNUTLS_CLIENT or GNUTLS_SERVER.
+ */
+static int run_verify_callback(gnutls_session_t session, unsigned int side)
 {
   gnutls_certificate_credentials_t cred;
-  int ret;
+  int ret, type;
 
   cred =
     (gnutls_certificate_credentials_t) _gnutls_get_cred (session->key,
                                                          GNUTLS_CRD_CERTIFICATE,
                                                          NULL);
-  if (cred == NULL)
+
+  if (side == GNUTLS_CLIENT)
+    type = gnutls_auth_server_get_type(session);
+  else
+    type = gnutls_auth_client_get_type(session);
+
+  if (type != GNUTLS_CRD_CERTIFICATE)
     return 0;
 
-  if (cred->verify_callback != NULL)
+  if (cred != NULL && cred->verify_callback != NULL)
     {
       ret = cred->verify_callback (session);
       if (ret != 0)
@@ -2572,7 +2581,7 @@ _gnutls_handshake_client (gnutls_session_t session)
       IMED_RET ("recv server certificate", ret, 1);
 
     case STATE7:
-      ret = run_verify_callback(session);
+      ret = run_verify_callback(session, GNUTLS_CLIENT);
       STATE = STATE7;
       if (ret < 0)
         return gnutls_assert_val(ret);
@@ -2933,17 +2942,23 @@ _gnutls_handshake_server (gnutls_session_t session)
       IMED_RET ("recv client certificate", ret, 1);
 
     case STATE9:
+      ret = run_verify_callback(session, GNUTLS_SERVER);
+      STATE = STATE9;
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+    case STATE10:
       /* receive the client key exchange message */
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
         ret = _gnutls_recv_client_kx_message (session);
-      STATE = STATE9;
+      STATE = STATE10;
       IMED_RET ("recv client kx", ret, 1);
 
-    case STATE10:
+    case STATE11:
       /* receive the client certificate verify message */
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
         ret = _gnutls_recv_client_certificate_verify_message (session);
-      STATE = STATE10;
+      STATE = STATE11;
       IMED_RET ("recv client certificate verify", ret, 1);
 
       STATE = STATE0;           /* finished thus clear session */

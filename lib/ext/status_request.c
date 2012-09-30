@@ -577,10 +577,8 @@ _gnutls_recv_server_certificate_status (gnutls_session_t session)
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_STATUS_REQUEST,
                                   &epriv);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return 0;
-    }
+    return 0;
+
   priv = epriv.ptr;
 
   if (!priv->expect_cstatus)
