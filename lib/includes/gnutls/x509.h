@@ -212,16 +212,34 @@ extern "C"
 						 gnutls_datum_t * data,
 						 unsigned int *critical);
 
-#define GNUTLS_CRL_REASON_UNUSED 128
-#define GNUTLS_CRL_REASON_KEY_COMPROMISE 64
-#define GNUTLS_CRL_REASON_CA_COMPROMISE 32
-#define GNUTLS_CRL_REASON_AFFILIATION_CHANGED 16
-#define GNUTLS_CRL_REASON_SUPERSEDED 8
-#define GNUTLS_CRL_REASON_SUPERSEEDED GNUTLS_CRL_REASON_SUPERSEDED
-#define GNUTLS_CRL_REASON_CESSATION_OF_OPERATION 4
-#define GNUTLS_CRL_REASON_CERTIFICATE_HOLD 2
-#define GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN 1
-#define GNUTLS_CRL_REASON_AA_COMPROMISE 32768
+#define GNUTLS_CRL_REASON_SUPERSEEDED GNUTLS_CRL_REASON_SUPERSEDED,
+  /**
+   * gnutls_x509_crl_reason_flags_t:
+   * @GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN: The privileges were withdrawn from the owner.
+   * @GNUTLS_CRL_REASON_CERTIFICATE_HOLD: The certificate is on hold.
+   * @GNUTLS_CRL_REASON_CESSATION_OF_OPERATION: The end-entity is no longer operating.
+   * @GNUTLS_CRL_REASON_SUPERSEDED: There is a newer certificate of the owner.
+   * @GNUTLS_CRL_REASON_AFFILIATION_CHANGED: The end-entity affiliation has changed.
+   * @GNUTLS_CRL_REASON_CA_COMPROMISE: The CA was compromised.
+   * @GNUTLS_CRL_REASON_KEY_COMPROMISE: The certificate's key was compromised.
+   * @GNUTLS_CRL_REASON_UNUSED: The key was never used.
+   * @GNUTLS_CRL_REASON_AA_COMPROMISE: AA compromised.
+   *
+   * Enumeration of types for the CRL revocation reasons. 
+   */
+  typedef enum gnutls_x509_crl_reason_flags_t
+    {
+      GNUTLS_CRL_REASON_UNSPECIFIED=0,
+      GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN=1,
+      GNUTLS_CRL_REASON_CERTIFICATE_HOLD=2,
+      GNUTLS_CRL_REASON_CESSATION_OF_OPERATION=4,
+      GNUTLS_CRL_REASON_SUPERSEDED=8,
+      GNUTLS_CRL_REASON_AFFILIATION_CHANGED=16,
+      GNUTLS_CRL_REASON_CA_COMPROMISE=32,
+      GNUTLS_CRL_REASON_KEY_COMPROMISE=64,
+      GNUTLS_CRL_REASON_UNUSED=128,
+      GNUTLS_CRL_REASON_AA_COMPROMISE=32768
+    } gnutls_x509_crl_reason_flags_t;
 
   int gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
                                            unsigned int seq, void *ret,

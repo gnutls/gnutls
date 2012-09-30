@@ -2758,22 +2758,12 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
  * @seq: specifies the sequence number of the distribution point (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the distribution point will be copied to
  * @ret_size: holds the size of ret.
- * @reason_flags: Revocation reasons flags.
+ * @reason_flags: Revocation reasons. An ORed sequence of flags from %gnutls_x509_crl_reason_flags_t.
  * @critical: will be non (0) if the extension is marked as critical (may be null)
  *
  * This function retrieves the CRL distribution points (2.5.29.31),
  * contained in the given certificate in the X509v3 Certificate
  * Extensions.
- *
- * @reason_flags should be an ORed sequence of
- * %GNUTLS_CRL_REASON_UNUSED, %GNUTLS_CRL_REASON_KEY_COMPROMISE,
- * %GNUTLS_CRL_REASON_CA_COMPROMISE,
- * %GNUTLS_CRL_REASON_AFFILIATION_CHANGED,
- * %GNUTLS_CRL_REASON_SUPERSEEDED,
- * %GNUTLS_CRL_REASON_CESSATION_OF_OPERATION,
- * %GNUTLS_CRL_REASON_CERTIFICATE_HOLD,
- * %GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN,
- * %GNUTLS_CRL_REASON_AA_COMPROMISE, or (0) for all possible reasons.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER and updates @ret_size if
  *   @ret_size is not enough to hold the distribution point, or the
