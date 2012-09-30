@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** libgnutls: Added support for the OCSP Certificate Status
 extension.
 
+** libgnutls: Fixed the receipt of session tickets during session resumption.
+Reported by danblack at http://savannah.gnu.org/support/?108146
+
 ** API and ABI modifications:
 gnutls_status_request_ocsp_client: Added
 gnutls_status_request_get_ocsp: Added
