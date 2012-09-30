@@ -790,6 +790,7 @@ GNUTLS_3_0_0 {
 	gnutls_pk_to_sign;
 	gnutls_certificate_set_x509_system_trust;
 	gnutls_session_set_premaster;
+	gnutls_ocsp_resp_check_crt;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

@@ -7,8 +7,11 @@ See the end for copying conditions.
 ** libgnutls: Fixed the receipt of session tickets during session resumption.
 Reported by danblack at http://savannah.gnu.org/support/?108146
 
+** libgnutls: Added gnutls_ocsp_resp_check_crt() to check whether the OCSP
+response corresponds to the given certificate.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_ocsp_resp_check_crt: Added
 
 
 * Version 3.0.24 (released 2012-09-26)

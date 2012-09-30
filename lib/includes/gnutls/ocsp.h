@@ -249,6 +249,10 @@ extern "C"
 			       unsigned int *verify,
 			       unsigned int flags);
 
+int
+gnutls_ocsp_resp_check_crt (gnutls_ocsp_resp_t resp,
+			    gnutls_x509_crt_t crt);
+
 #ifdef __cplusplus
 }
 #endif
