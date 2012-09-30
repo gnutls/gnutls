@@ -72,9 +72,13 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
                                       int cipher_suites_size,
                                       gnutls_pk_algorithm_t *pk_algos,
                                       size_t pk_algos_size);
-static int _gnutls_handshake_common (gnutls_session_t session);
 static int _gnutls_handshake_client (gnutls_session_t session);
 static int _gnutls_handshake_server (gnutls_session_t session);
+
+static int
+_gnutls_recv_handshake_final (gnutls_session_t session, int init);
+static int
+_gnutls_send_handshake_final (gnutls_session_t session, int init);
 
 /* Empties but does not free the buffer
  */
@@ -2409,17 +2413,8 @@ gnutls_handshake (gnutls_session_t session)
       return ret;
     }
 
-  ret = _gnutls_handshake_common (session);
-
-  if (ret < 0)
-    {
-      if (_gnutls_abort_handshake (session, ret) == 0)
-        STATE = STATE0;
-
-      return ret;
-    }
-
-  STATE = STATE0;
+  /* clear handshake buffer */
+  _gnutls_handshake_hash_buffers_clear (session);
 
   if (IS_DTLS(session)==0)
     {
@@ -2641,11 +2636,41 @@ _gnutls_handshake_client (gnutls_session_t session)
       STATE = STATE14;
       IMED_RET ("send client certificate verify", ret, 1);
 
+    case STATE15:
+      STATE = STATE15;
+      if (session->internals.resumed == RESUME_FALSE)
+        {
+          ret = _gnutls_send_handshake_final (session, TRUE);
+          IMED_RET ("send handshake final 2", ret, 1);
+        }
+      else
+        {
+          ret = _gnutls_recv_handshake_final (session, TRUE);
+          IMED_RET ("recv handshake final", ret, 1);
+        }
+
+    case STATE16:
+      ret = _gnutls_recv_new_session_ticket (session);
+      STATE = STATE16;
+      IMED_RET ("recv handshake new session ticket", ret, 1);
+
+    case STATE17:
+      STATE = STATE17;
+      if (session->internals.resumed == RESUME_FALSE)
+        {
+          ret = _gnutls_recv_handshake_final (session, FALSE);
+          IMED_RET ("recv handshake final 2", ret, 1);
+        }
+      else
+        {
+          ret = _gnutls_send_handshake_final (session, FALSE);
+          IMED_RET ("send handshake final", ret, 1);
+        }
+
       STATE = STATE0;
     default:
       break;
     }
-
 
   return 0;
 }
@@ -2705,12 +2730,12 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
 
   /* Send the CHANGE CIPHER SPEC PACKET */
 
-  switch (STATE)
+  switch (FINAL_STATE)
     {
     case STATE0:
-    case STATE20:
-      ret = send_change_cipher_spec (session, AGAIN (STATE20));
-      STATE = STATE0;
+    case STATE1:
+      ret = send_change_cipher_spec (session, FAGAIN (STATE1));
+      FINAL_STATE = STATE0;
 
       if (ret < 0)
         {
@@ -2737,10 +2762,10 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
           return ret;
         }
 
-    case STATE21:
+    case STATE2:
       /* send the finished message */
-      ret = _gnutls_send_finished (session, AGAIN (STATE21));
-      STATE = STATE21;
+      ret = _gnutls_send_finished (session, FAGAIN (STATE2));
+      FINAL_STATE = STATE2;
       if (ret < 0)
         {
           ERR ("send Finished", ret);
@@ -2748,7 +2773,7 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
           return ret;
         }
 
-      STATE = STATE0;
+      FINAL_STATE = STATE0;
     default:
       break;
     }
@@ -2773,11 +2798,11 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
     return gnutls_assert_val(ret);
   tleft = ret;
 
-  switch (STATE)
+  switch (FINAL_STATE)
     {
     case STATE0:
     case STATE30:
-      STATE = STATE30;
+      FINAL_STATE = STATE30;
 
       /* This is the last flight and peer cannot be sure
        * we have received it unless we notify him. So we
@@ -2825,7 +2850,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
         }
 
     case STATE31:
-      STATE = STATE31;
+      FINAL_STATE = STATE31;
 
        if (IS_DTLS(session) && !_dtls_is_async(session) && 
            (gnutls_record_check_pending( session) +
@@ -2843,7 +2868,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
           gnutls_assert ();
           return ret;
         }
-      STATE = STATE0;
+      FINAL_STATE = STATE0;
     default:
       break;
     }
@@ -2961,7 +2986,44 @@ _gnutls_handshake_server (gnutls_session_t session)
       STATE = STATE11;
       IMED_RET ("recv client certificate verify", ret, 1);
 
-      STATE = STATE0;           /* finished thus clear session */
+    case STATE12:
+      STATE = STATE12;
+      if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
+        {
+          ret = _gnutls_recv_handshake_final (session, TRUE);
+          IMED_RET ("recv handshake final", ret, 1);
+        }
+      else
+        {
+          ret = _gnutls_send_handshake_final (session, TRUE);
+          IMED_RET ("send handshake final 2", ret, 1);
+        }
+
+    case STATE13:
+        ret = _gnutls_send_new_session_ticket (session, AGAIN (STATE13));
+        STATE = STATE13;
+        IMED_RET ("send handshake new session ticket", ret, 0);
+
+    case STATE14:
+      STATE = STATE14;
+      if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
+        {
+          ret = _gnutls_send_handshake_final (session, FALSE);
+          IMED_RET ("send handshake final", ret, 1);
+        }
+      else
+        {
+          ret = _gnutls_recv_handshake_final (session, FALSE);
+          IMED_RET ("recv handshake final 2", ret, 1);
+        }
+
+      if (session->security_parameters.entity == GNUTLS_SERVER && session->internals.ticket_sent == 0)
+        {
+          /* if no ticket, save session data */
+          _gnutls_server_register_current_session (session);
+        }
+
+      STATE = STATE0;
     default:
       break;
     }
@@ -2969,73 +3031,6 @@ _gnutls_handshake_server (gnutls_session_t session)
   return 0;
 }
 
-static int
-_gnutls_handshake_common (gnutls_session_t session)
-{
-  int ret = 0;
-
-  /* send and recv the change cipher spec and finished messages */
-  if ((session->internals.resumed != RESUME_FALSE
-       && session->security_parameters.entity == GNUTLS_CLIENT)
-      || (session->internals.resumed == RESUME_FALSE
-          && session->security_parameters.entity == GNUTLS_SERVER))
-    {
-      /* if we are a client resuming - or we are a server not resuming */
-      ret = _gnutls_recv_handshake_final (session, TRUE);
-      IMED_RET ("recv handshake final", ret, 1);
-
-      switch (STATE)
-        {
-        case STATE0:
-        case STATE40:
-          ret = _gnutls_send_new_session_ticket (session, AGAIN (STATE40));
-          STATE = STATE40;
-          IMED_RET ("send handshake new session ticket", ret, 0);
-          STATE = STATE0;
-        default:
-          break;
-        }
-
-      ret = _gnutls_send_handshake_final (session, FALSE);
-      IMED_RET ("send handshake final", ret, 1);
-
-      /* only store if we are not resuming a session and we didn't previously send a ticket 
-       */
-      if (session->security_parameters.entity == GNUTLS_SERVER && session->internals.ticket_sent == 0)
-        {
-          /* in order to support session resuming */
-          _gnutls_server_register_current_session (session);
-        }
-    }
-  else
-    {                           /* if we are a client not resuming - or we are a server resuming */
-
-      ret = _gnutls_send_handshake_final (session, TRUE);
-      IMED_RET ("send handshake final 2", ret, 1);
-
-      switch (STATE)
-        {
-        case STATE0:
-        case STATE41:
-          ret = _gnutls_recv_new_session_ticket (session);
-          STATE = STATE41;
-          IMED_RET ("recv handshake new session ticket", ret, 1);
-          STATE = STATE0;
-        default:
-          break;
-        }
-
-      ret = _gnutls_recv_handshake_final (session, FALSE);
-      IMED_RET ("recv handshake final 2", ret, 1);
-
-    }
-
-
-  /* clear handshake buffer */
-  _gnutls_handshake_hash_buffers_clear (session);
-  return ret;
-
-}
 
 int
 _gnutls_generate_session_id (uint8_t * session_id, uint8_t * len)

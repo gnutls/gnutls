@@ -51,10 +51,12 @@ int _gnutls_user_hello_func (gnutls_session_t session,
 void _gnutls_handshake_hash_buffers_clear (gnutls_session_t session);
 
 #define STATE session->internals.handshake_state
+#define FINAL_STATE session->internals.handshake_final_state
 /* This returns true if we have got there
  * before (and not finished due to an interrupt).
  */
 #define AGAIN(target) (STATE==target?1:0)
+#define FAGAIN(target) (FINAL_STATE==target?1:0)
 #define AGAIN2(state, target) (state==target?1:0)
 
 inline static int handshake_remaining_time(gnutls_session_t session)
