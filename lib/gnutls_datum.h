@@ -23,11 +23,6 @@
 #ifndef GNUTLS_DATUM_H
 #define GNUTLS_DATUM_H
 
-void _gnutls_write_datum16 (uint8_t * dest, gnutls_datum_t dat);
-void _gnutls_write_datum24 (uint8_t * dest, gnutls_datum_t dat);
-void _gnutls_write_datum32 (uint8_t * dest, gnutls_datum_t dat);
-void _gnutls_write_datum8 (uint8_t * dest, gnutls_datum_t dat);
-
 int _gnutls_set_datum (gnutls_datum_t * dat, const void *data,
                          size_t data_size);
 

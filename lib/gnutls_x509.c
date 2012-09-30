@@ -1176,7 +1176,7 @@ add_new_crt_to_rdn_seq (gnutls_certificate_credentials_t res, gnutls_x509_crt_t*
   gnutls_datum_t tmp;
   int ret;
   size_t newsize;
-  unsigned char *newdata;
+  unsigned char *newdata, *p;
   unsigned i;
 
   /* Add DN of the last added CAs to the RDN sequence
@@ -1216,7 +1216,11 @@ add_new_crt_to_rdn_seq (gnutls_certificate_credentials_t res, gnutls_x509_crt_t*
           return GNUTLS_E_MEMORY_ERROR;
         }
 
-      _gnutls_write_datum16 (newdata + res->x509_rdn_sequence.size, tmp);
+      p = newdata + res->x509_rdn_sequence.size;
+      _gnutls_write_uint16 (tmp.size, p);
+      if (tmp.data != NULL)
+        memcpy (p+2, tmp.data, tmp.size);
+
       _gnutls_free_datum (&tmp);
 
       res->x509_rdn_sequence.size = newsize;

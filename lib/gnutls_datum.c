@@ -30,40 +30,6 @@
 #include <gnutls_datum.h>
 #include <gnutls_errors.h>
 
-
-void
-_gnutls_write_datum16 (uint8_t * dest, gnutls_datum_t dat)
-{
-  _gnutls_write_uint16 (dat.size, dest);
-  if (dat.data != NULL)
-    memcpy (&dest[2], dat.data, dat.size);
-}
-
-void
-_gnutls_write_datum24 (uint8_t * dest, gnutls_datum_t dat)
-{
-  _gnutls_write_uint24 (dat.size, dest);
-  if (dat.data != NULL)
-    memcpy (&dest[3], dat.data, dat.size);
-}
-
-void
-_gnutls_write_datum32 (uint8_t * dest, gnutls_datum_t dat)
-{
-  _gnutls_write_uint32 (dat.size, dest);
-  if (dat.data != NULL)
-    memcpy (&dest[4], dat.data, dat.size);
-}
-
-void
-_gnutls_write_datum8 (uint8_t * dest, gnutls_datum_t dat)
-{
-  dest[0] = (uint8_t) dat.size;
-  if (dat.data != NULL)
-    memcpy (&dest[1], dat.data, dat.size);
-}
-
-
 int
 _gnutls_set_datum (gnutls_datum_t * dat, const void *data,
                      size_t data_size)

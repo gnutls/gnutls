@@ -68,6 +68,7 @@ _gnutls_set_psk_session_key (gnutls_session_t session,
 {
   gnutls_datum_t pwd_psk = { NULL, 0 };
   size_t dh_secret_size;
+  uint8_t * p;
   int ret;
 
   if (dh_secret == NULL)
@@ -92,12 +93,18 @@ _gnutls_set_psk_session_key (gnutls_session_t session,
    * (uint16_t) psk_size
    * the psk
    */
-  _gnutls_write_uint16 (dh_secret_size, session->key->key.data);
+  p = session->key->key.data;
+  _gnutls_write_uint16 (dh_secret_size, p);
+  p+=2;
   if (dh_secret == NULL)
-    memset (&session->key->key.data[2], 0, dh_secret_size);
+    memset (p, 0, dh_secret_size);
   else
-    memcpy (&session->key->key.data[2], dh_secret->data, dh_secret->size);
-  _gnutls_write_datum16 (&session->key->key.data[dh_secret_size + 2], *ppsk);
+    memcpy (p, dh_secret->data, dh_secret->size);
+
+  p += dh_secret_size;
+  _gnutls_write_uint16 (ppsk->size, p);
+  if (ppsk->data != NULL)
+    memcpy (p+2, ppsk->data, ppsk->size);
 
   ret = 0;
 
