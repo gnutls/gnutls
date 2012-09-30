@@ -10,6 +10,9 @@ extension.
 ** libgnutls: Fixed the receipt of session tickets during session resumption.
 Reported by danblack at http://savannah.gnu.org/support/?108146
 
+** libgnutls: Added gnutls_ocsp_resp_check_crt() to check whether the OCSP
+response corresponds to the given certificate.
+
 ** API and ABI modifications:
 gnutls_certificate_set_ocsp_status_request_function: Added
 gnutls_certificate_set_ocsp_status_request_file: Added
