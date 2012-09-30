@@ -172,11 +172,6 @@ _gnutls_parse_extensions (gnutls_session_t session,
       type = _gnutls_read_uint16 (&data[pos]);
       pos += 2;
 
-#if 0
-      _gnutls_handshake_log ("EXT[%p]: Found extension '%s/%d'\n", session,
-                         _gnutls_extension_get_name (type), type);
-#endif
-
       if ((ret = _gnutls_extension_list_check (session, type)) < 0)
         {
           gnutls_assert ();
@@ -193,7 +188,12 @@ _gnutls_parse_extensions (gnutls_session_t session,
 
       ext_recv = _gnutls_ext_func_recv (type, parse_type);
       if (ext_recv == NULL)
-        continue;
+        {
+          _gnutls_handshake_log ("EXT[%p]: Found extension '%s/%d'\n", session,
+                                 _gnutls_extension_get_name (type), type);
+
+          continue;
+        }
 
       _gnutls_handshake_log ("EXT[%p]: Parsing extension '%s/%d' (%d bytes)\n",
                          session, _gnutls_extension_get_name (type), type,
