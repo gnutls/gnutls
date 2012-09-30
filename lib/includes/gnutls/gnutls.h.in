@@ -398,8 +398,9 @@ extern "C"
  * @GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY: Certificate verify.
  * @GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE: Client key exchange.
  * @GNUTLS_HANDSHAKE_FINISHED: Finished.
+ * @GNUTLS_HANDSHAKE_CERTIFICATE_STATUS: Certificate status (OCSP).
  * @GNUTLS_HANDSHAKE_SUPPLEMENTAL: Supplemental.
- * @GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: Change Cipher Spec
+ * @GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: Change Cipher Spec.
  * @GNUTLS_HANDSHAKE_CLIENT_HELLO_V2: SSLv2 Client Hello.
  *
  * Enumeration of different TLS handshake packets.

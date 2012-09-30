@@ -36,111 +36,110 @@ extern "C"
 
 #define GNUTLS_OCSP_NONCE "1.3.6.1.5.5.7.48.1.2"
 
-  /**
-   * gnutls_ocsp_print_formats_t:
-   * @GNUTLS_OCSP_PRINT_FULL: Full information about OCSP request/response.
-   * @GNUTLS_OCSP_PRINT_COMPACT: More compact information about OCSP request/response.
-   *
-   * Enumeration of different OCSP printing variants.
-   */
-  typedef enum gnutls_ocsp_print_formats_t
-    {
-      GNUTLS_OCSP_PRINT_FULL = 0,
-      GNUTLS_OCSP_PRINT_COMPACT = 1,
-    } gnutls_ocsp_print_formats_t;
+/**
+ * gnutls_ocsp_print_formats_t:
+ * @GNUTLS_OCSP_PRINT_FULL: Full information about OCSP request/response.
+ * @GNUTLS_OCSP_PRINT_COMPACT: More compact information about OCSP request/response.
+ *
+ * Enumeration of different OCSP printing variants.
+ */
+typedef enum gnutls_ocsp_print_formats_t
+  {
+    GNUTLS_OCSP_PRINT_FULL = 0,
+    GNUTLS_OCSP_PRINT_COMPACT = 1,
+  } gnutls_ocsp_print_formats_t;
 
-  /**
-   * gnutls_ocsp_resp_status_t:
-   * @GNUTLS_OCSP_RESP_SUCCESSFUL: Response has valid confirmations.
-   * @GNUTLS_OCSP_RESP_MALFORMEDREQUEST: Illegal confirmation request
-   * @GNUTLS_OCSP_RESP_INTERNALERROR: Internal error in issuer
-   * @GNUTLS_OCSP_RESP_TRYLATER: Try again later
-   * @GNUTLS_OCSP_RESP_SIGREQUIRED: Must sign the request
-   * @GNUTLS_OCSP_RESP_UNAUTHORIZED: Request unauthorized
-   *
-   * Enumeration of different OCSP response status codes.
-   */
-  typedef enum gnutls_ocsp_resp_status_t
-    {
-      GNUTLS_OCSP_RESP_SUCCESSFUL = 0,
-      GNUTLS_OCSP_RESP_MALFORMEDREQUEST = 1,
-      GNUTLS_OCSP_RESP_INTERNALERROR = 2,
-      GNUTLS_OCSP_RESP_TRYLATER = 3,
-      GNUTLS_OCSP_RESP_SIGREQUIRED = 5,
-      GNUTLS_OCSP_RESP_UNAUTHORIZED = 6
-    } gnutls_ocsp_resp_status_t;
+/**
+ * gnutls_ocsp_resp_status_t:
+ * @GNUTLS_OCSP_RESP_SUCCESSFUL: Response has valid confirmations.
+ * @GNUTLS_OCSP_RESP_MALFORMEDREQUEST: Illegal confirmation request
+ * @GNUTLS_OCSP_RESP_INTERNALERROR: Internal error in issuer
+ * @GNUTLS_OCSP_RESP_TRYLATER: Try again later
+ * @GNUTLS_OCSP_RESP_SIGREQUIRED: Must sign the request
+ * @GNUTLS_OCSP_RESP_UNAUTHORIZED: Request unauthorized
+ *
+ * Enumeration of different OCSP response status codes.
+ */
+typedef enum gnutls_ocsp_resp_status_t
+  {
+    GNUTLS_OCSP_RESP_SUCCESSFUL = 0,
+    GNUTLS_OCSP_RESP_MALFORMEDREQUEST = 1,
+    GNUTLS_OCSP_RESP_INTERNALERROR = 2,
+    GNUTLS_OCSP_RESP_TRYLATER = 3,
+    GNUTLS_OCSP_RESP_SIGREQUIRED = 5,
+    GNUTLS_OCSP_RESP_UNAUTHORIZED = 6
+  } gnutls_ocsp_resp_status_t;
 
-  /**
-   * gnutls_ocsp_cert_status_t:
-   * @GNUTLS_OCSP_CERT_GOOD: Positive response to status inquiry.
-   * @GNUTLS_OCSP_CERT_REVOKED: Certificate has been revoked.
-   * @GNUTLS_OCSP_CERT_UNKNOWN: The responder doesn't know about the
-   *   certificate.
-   *
-   * Enumeration of different OCSP response certificate status codes.
-   */
-  typedef enum gnutls_ocsp_cert_status_t
-    {
-      GNUTLS_OCSP_CERT_GOOD = 0,
-      GNUTLS_OCSP_CERT_REVOKED = 1,
-      GNUTLS_OCSP_CERT_UNKNOWN = 2
-    } gnutls_ocsp_cert_status_t;
+/**
+ * gnutls_ocsp_cert_status_t:
+ * @GNUTLS_OCSP_CERT_GOOD: Positive response to status inquiry.
+ * @GNUTLS_OCSP_CERT_REVOKED: Certificate has been revoked.
+ * @GNUTLS_OCSP_CERT_UNKNOWN: The responder doesn't know about the
+ *   certificate.
+ *
+ * Enumeration of different OCSP response certificate status codes.
+ */
+typedef enum gnutls_ocsp_cert_status_t
+  {
+    GNUTLS_OCSP_CERT_GOOD = 0,
+    GNUTLS_OCSP_CERT_REVOKED = 1,
+    GNUTLS_OCSP_CERT_UNKNOWN = 2
+  } gnutls_ocsp_cert_status_t;
 
-  /**
-   * gnutls_x509_crl_reason_t:
-   * @GNUTLS_X509_CRLREASON_UNSPECIFIED: Unspecified reason.
-   * @GNUTLS_X509_CRLREASON_KEYCOMPROMISE: Private key compromised.
-   * @GNUTLS_X509_CRLREASON_CACOMPROMISE: CA compromised.
-   * @GNUTLS_X509_CRLREASON_AFFILIATIONCHANGED: Affiliation has changed.
-   * @GNUTLS_X509_CRLREASON_SUPERSEDED: Certificate superseded.
-   * @GNUTLS_X509_CRLREASON_CESSATIONOFOPERATION: Operation has ceased.
-   * @GNUTLS_X509_CRLREASON_CERTIFICATEHOLD: Certificate is on hold.
-   * @GNUTLS_X509_CRLREASON_REMOVEFROMCRL: Will be removed from delta CRL.
-   * @GNUTLS_X509_CRLREASON_PRIVILEGEWITHDRAWN: Privilege withdrawn.
-   * @GNUTLS_X509_CRLREASON_AACOMPROMISE: AA compromised.
-   *
-   * Enumeration of different reason codes.  Note that this
-   * corresponds to the CRLReason ASN.1 enumeration type, and not the
-   * ReasonFlags ASN.1 bit string.
-   */
-  typedef enum gnutls_x509_crl_reason_t
-    {
-      GNUTLS_X509_CRLREASON_UNSPECIFIED = 0,
-      GNUTLS_X509_CRLREASON_KEYCOMPROMISE = 1,
-      GNUTLS_X509_CRLREASON_CACOMPROMISE = 2,
-      GNUTLS_X509_CRLREASON_AFFILIATIONCHANGED = 3,
-      GNUTLS_X509_CRLREASON_SUPERSEDED = 4,
-      GNUTLS_X509_CRLREASON_CESSATIONOFOPERATION = 5,
-      GNUTLS_X509_CRLREASON_CERTIFICATEHOLD = 6,
-      /* -- value 7 is not used */
-      GNUTLS_X509_CRLREASON_REMOVEFROMCRL = 8,
-      GNUTLS_X509_CRLREASON_PRIVILEGEWITHDRAWN = 9,
-      GNUTLS_X509_CRLREASON_AACOMPROMISE = 10
-    } gnutls_x509_crl_reason_t;
+/**
+ * gnutls_x509_crl_reason_t:
+ * @GNUTLS_X509_CRLREASON_UNSPECIFIED: Unspecified reason.
+ * @GNUTLS_X509_CRLREASON_KEYCOMPROMISE: Private key compromised.
+ * @GNUTLS_X509_CRLREASON_CACOMPROMISE: CA compromised.
+ * @GNUTLS_X509_CRLREASON_AFFILIATIONCHANGED: Affiliation has changed.
+ * @GNUTLS_X509_CRLREASON_SUPERSEDED: Certificate superseded.
+ * @GNUTLS_X509_CRLREASON_CESSATIONOFOPERATION: Operation has ceased.
+ * @GNUTLS_X509_CRLREASON_CERTIFICATEHOLD: Certificate is on hold.
+ * @GNUTLS_X509_CRLREASON_REMOVEFROMCRL: Will be removed from delta CRL.
+ * @GNUTLS_X509_CRLREASON_PRIVILEGEWITHDRAWN: Privilege withdrawn.
+ * @GNUTLS_X509_CRLREASON_AACOMPROMISE: AA compromised.
+ *
+ * Enumeration of different reason codes.  Note that this
+ * corresponds to the CRLReason ASN.1 enumeration type, and not the
+ * ReasonFlags ASN.1 bit string.
+ */
+typedef enum gnutls_x509_crl_reason_t
+  {
+    GNUTLS_X509_CRLREASON_UNSPECIFIED = 0,
+    GNUTLS_X509_CRLREASON_KEYCOMPROMISE = 1,
+    GNUTLS_X509_CRLREASON_CACOMPROMISE = 2,
+    GNUTLS_X509_CRLREASON_AFFILIATIONCHANGED = 3,
+    GNUTLS_X509_CRLREASON_SUPERSEDED = 4,
+    GNUTLS_X509_CRLREASON_CESSATIONOFOPERATION = 5,
+    GNUTLS_X509_CRLREASON_CERTIFICATEHOLD = 6,
+    GNUTLS_X509_CRLREASON_REMOVEFROMCRL = 8,
+    GNUTLS_X509_CRLREASON_PRIVILEGEWITHDRAWN = 9,
+    GNUTLS_X509_CRLREASON_AACOMPROMISE = 10
+  } gnutls_x509_crl_reason_t;
 
-  /**
-   * gnutls_ocsp_verify_reason_t:
-   * @GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND: Signer cert not found.
-   * @GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR: Signer keyusage bits incorrect.
-   * @GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER: Signer is not trusted.
-   * @GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM: Signature using insecure algorithm.
-   * @GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE: Signature mismatch.
-   * @GNUTLS_OCSP_VERIFY_CERT_NOT_ACTIVATED: Signer cert is not yet activated.
-   * @GNUTLS_OCSP_VERIFY_CERT_EXPIRED: Signer cert has expired.
-   *
-   * Enumeration of OCSP verify status codes, used by
-   * gnutls_ocsp_resp_verify() and gnutls_ocsp_resp_verify_direct().
-   */
-  typedef enum gnutls_ocsp_verify_reason_t
-    {
-      GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND = 1,
-      GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR = 2,
-      GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER = 4,
-      GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM = 8,
-      GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE = 16,
-      GNUTLS_OCSP_VERIFY_CERT_NOT_ACTIVATED = 32,
-      GNUTLS_OCSP_VERIFY_CERT_EXPIRED = 64
-    } gnutls_ocsp_verify_reason_t;
+/**
+ * gnutls_ocsp_verify_reason_t:
+ * @GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND: Signer cert not found.
+ * @GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR: Signer keyusage bits incorrect.
+ * @GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER: Signer is not trusted.
+ * @GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM: Signature using insecure algorithm.
+ * @GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE: Signature mismatch.
+ * @GNUTLS_OCSP_VERIFY_CERT_NOT_ACTIVATED: Signer cert is not yet activated.
+ * @GNUTLS_OCSP_VERIFY_CERT_EXPIRED: Signer cert has expired.
+ *
+ * Enumeration of OCSP verify status codes, used by
+ * gnutls_ocsp_resp_verify() and gnutls_ocsp_resp_verify_direct().
+ */
+typedef enum gnutls_ocsp_verify_reason_t
+  {
+    GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND = 1,
+    GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR = 2,
+    GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER = 4,
+    GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM = 8,
+    GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE = 16,
+    GNUTLS_OCSP_VERIFY_CERT_NOT_ACTIVATED = 32,
+    GNUTLS_OCSP_VERIFY_CERT_EXPIRED = 64
+  } gnutls_ocsp_verify_reason_t;
 
   struct gnutls_ocsp_req_int;
   typedef struct gnutls_ocsp_req_int *gnutls_ocsp_req_t;
