@@ -473,17 +473,41 @@ _gnutls_status_request_deinit_data (extension_priv_data_t epriv)
 }
 
 static int
-_gnutls_status_request_pack (extension_priv_data_t epriv,
-			     gnutls_buffer_st * ps)
+_gnutls_status_request_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
 {
-  return -1;
+  status_request_ext_st *priv = epriv.ptr;
+  int ret;
+
+  BUFFER_APPEND_PFX4 (ps, priv->response.data,
+                      priv->response.size);
+
+  return 0;
+
 }
 
 static int
 _gnutls_status_request_unpack (gnutls_buffer_st * ps,
-			       extension_priv_data_t * _priv)
+                               extension_priv_data_t * epriv)
 {
-  return -1;
+  status_request_ext_st *priv;
+  int ret;
+
+  priv = gnutls_calloc (1, sizeof (*priv));
+  if (priv == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  BUFFER_POP_DATUM (ps, &priv->response);
+
+  epriv->ptr = priv;
+
+  return 0;
+
+error:
+  gnutls_free (priv);
+  return ret;
 }
 
 extension_entry_st ext_mod_status_request = {
@@ -531,6 +555,8 @@ _gnutls_send_server_certificate_status (gnutls_session_t session, int again)
       data[0] = 0x01;
       _gnutls_write_uint24(priv->response.size, &data[1]);
       memcpy(&data[4], priv->response.data, priv->response.size);
+
+      _gnutls_free_datum(&priv->response);
     }
   return _gnutls_send_handshake (session, data_size ? bufel : NULL,
                                  GNUTLS_HANDSHAKE_CERTIFICATE_STATUS);
@@ -559,6 +585,8 @@ _gnutls_recv_server_certificate_status (gnutls_session_t session)
 
   if (!priv->expect_cstatus)
     return 0;
+
+  priv->expect_cstatus = 0;
 
   ret = _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_CERTIFICATE_STATUS,
