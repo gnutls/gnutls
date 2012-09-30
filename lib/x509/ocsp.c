@@ -1386,32 +1386,8 @@ cleanup:
  *
  * This function will return the certificate information of the
  * @indx'ed response in the Basic OCSP Response @resp.  The
- * information returned corresponds to the SingleResponse structure
- * except the final singleExtensions, reproduced here for illustration:
- *
- * <informalexample><programlisting>
- * SingleResponse ::= SEQUENCE {
- *    certID                       CertID,
- *    certStatus                   CertStatus,
- *    thisUpdate                   GeneralizedTime,
- *    nextUpdate         [0]       EXPLICIT GeneralizedTime OPTIONAL,
- *    singleExtensions   [1]       EXPLICIT Extensions OPTIONAL }
- *
- *    CertID          ::=     SEQUENCE {
- *        hashAlgorithm       AlgorithmIdentifier,
- *        issuerNameHash      OCTET STRING, -- Hash of Issuer's DN
- *        issuerKeyHash       OCTET STRING, -- Hash of Issuers public key
- *        serialNumber        CertificateSerialNumber }
- *
- * CertStatus ::= CHOICE {
- *     good                [0]     IMPLICIT NULL,
- *     revoked             [1]     IMPLICIT RevokedInfo,
- *     unknown             [2]     IMPLICIT UnknownInfo }
- * 
- * RevokedInfo ::= SEQUENCE {
- *     revocationTime              GeneralizedTime,
- *     revocationReason    [0]     EXPLICIT CRLReason OPTIONAL }
- * </programlisting></informalexample>
+ * information returned corresponds to the OCSP SingleResponse structure
+ * except the final singleExtensions.
  *
  * Each of the pointers to output variables may be NULL to indicate
  * that the caller is not interested in that value.
