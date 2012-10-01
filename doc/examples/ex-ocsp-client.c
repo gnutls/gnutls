@@ -255,7 +255,7 @@ _verify_response (gnutls_datum_t * data, gnutls_x509_crt_t cert,
     if (ret < 0)
         exit (1);
         
-    ret = gnutls_ocsp_resp_check_crt (resp, cert);
+    ret = gnutls_ocsp_resp_check_crt (resp, 0, cert);
     if (ret < 0)
       exit(1);
 

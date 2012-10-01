@@ -330,7 +330,7 @@ check_ocsp_response (gnutls_x509_crt_t cert,
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing response: %s", gnutls_strerror (ret));
   
-  ret = gnutls_ocsp_resp_check_crt(resp, cert);
+  ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
   if (ret < 0)
     {
       printf ("*** Got OCSP response on an unrelated certificate (ignoring)\n");
