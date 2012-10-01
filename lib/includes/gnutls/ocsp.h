@@ -249,6 +249,7 @@ typedef enum gnutls_ocsp_verify_reason_t
 			       unsigned int flags);
 
   int gnutls_ocsp_resp_check_crt (gnutls_ocsp_resp_t resp,
+                                  unsigned int indx,
                                   gnutls_x509_crt_t crt);
 
 #ifdef __cplusplus
