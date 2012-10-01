@@ -1277,6 +1277,7 @@ gnutls_ocsp_resp_get_produced (gnutls_ocsp_resp_t resp)
 /**
  * gnutls_ocsp_resp_check_crt:
  * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @indx: Specifies response number to get. Use (0) to get the first one.
  * @crt: The certificate to check
  *
  * This function will check whether the OCSP response
@@ -1287,6 +1288,7 @@ gnutls_ocsp_resp_get_produced (gnutls_ocsp_resp_t resp)
  **/
 int
 gnutls_ocsp_resp_check_crt (gnutls_ocsp_resp_t resp,
+                            unsigned int indx,
 			    gnutls_x509_crt_t crt)
 {
 int ret;
@@ -1297,7 +1299,7 @@ gnutls_datum_t dn = {NULL, 0};
 uint8_t cdn_hash[MAX_HASH_SIZE];
 size_t t, hash_len;
 
-  ret = gnutls_ocsp_resp_get_single (resp, 0, &digest, &rdn_hash, NULL,
+  ret = gnutls_ocsp_resp_get_single (resp, indx, &digest, &rdn_hash, NULL,
                                      &rserial, NULL, NULL, NULL, NULL, NULL);
   if (ret < 0)
     return gnutls_assert_val(ret);
@@ -1374,7 +1376,7 @@ cleanup:
 /**
  * gnutls_ocsp_resp_get_single:
  * @resp: should contain a #gnutls_ocsp_resp_t structure
- * @indx: Specifies which extension OID to get. Use (0) to get the first one.
+ * @indx: Specifies response number to get. Use (0) to get the first one.
  * @digest: output variable with #gnutls_digest_algorithm_t hash algorithm
  * @issuer_name_hash: output buffer with hash of issuer's DN
  * @issuer_key_hash: output buffer with hash of issuer's public key
