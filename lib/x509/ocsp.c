@@ -1414,7 +1414,7 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
   gnutls_datum_t sa;
   char name[ASN1_MAX_NAME_SIZE];
   int ret;
-
+  
   snprintf (name, sizeof (name),
 	    "tbsResponseData.responses.?%u.certID.hashAlgorithm.algorithm",
 	    indx + 1);
@@ -1583,7 +1583,7 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
       ret = _gnutls_x509_read_uint (resp->basicresp, name,
                                     revocation_reason);
       if (ret < 0)
-        return gnutls_assert_val(ret);
+        *revocation_reason = GNUTLS_X509_CRLREASON_UNSPECIFIED;
     }
 
   return GNUTLS_E_SUCCESS;
