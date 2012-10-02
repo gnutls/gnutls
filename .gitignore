@@ -592,3 +592,4 @@ win64
 tests/chainverify-unsorted
 tests/mini-dtls-heartbeat
 tests/mini-handshake-timeout
+tests/mini-x509-callbacks
