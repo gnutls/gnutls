@@ -26,6 +26,13 @@ if ENABLE_SRP
 dist_man_MANS += srptool.1
 endif
 
+HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
+	$(top_srcdir)/lib/includes/gnutls/x509.h $(top_srcdir)/lib/includes/gnutls/openpgp.h \
+	$(top_srcdir)/lib/includes/gnutls/pkcs12.h $(top_srcdir)/lib/includes/gnutls/pkcs11.h \
+	$(top_srcdir)/lib/includes/gnutls/abstract.h $(top_srcdir)/lib/includes/gnutls/compat.h \
+	$(top_srcdir)/lib/includes/gnutls/dtls.h $(top_srcdir)/lib/includes/gnutls/crypto.h \
+	$(top_srcdir)/lib/includes/gnutls/ocsp.h $(top_srcdir)/lib/includes/gnutls/tpm.h
+
 # Note that our .def files depend on autogen
 # supporting the @subheading texi keyword. This
 # is not currently the case so we do remove it
@@ -844,8 +851,7 @@ APIMANS += gnutls_x509_trust_list_verify_named_crt.3
 
 dist_man_MANS += $(APIMANS)
 
-$(APIMANS):
-	make doit
+$(APIMANS): stamp_mans
 
 compare-makefile:
 	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl|sort`; \
@@ -857,7 +863,7 @@ compare-makefile:
 		perl -p -e "s/^APIMANS =/APIMANS =$$MANS/" > tmp-$@; \
 	diff -u $(srcdir)/Makefile.am tmp-$@
 
-doit:
+stamp_mans: $(HEADER_FILES)
 	@echo -n "Creating man pages for gnutls.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/gnutls.h.in`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
@@ -1012,5 +1018,6 @@ doit:
 		echo -n "."; \
 	done
 	@echo ""
+	echo $@ > $@
 
-.PHONY: update-makefile doit
+.PHONY: update-makefile
