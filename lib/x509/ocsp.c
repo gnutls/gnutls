@@ -28,7 +28,6 @@
 #include <libtasn1.h>
 #include <gnutls_pk.h>
 #include "common.h"
-#include "hash.h"
 #include "verify-high.h"
 
 #include <gnutls/ocsp.h>

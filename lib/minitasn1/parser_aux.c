@@ -20,6 +20,7 @@
  */
 
 #include <int.h>
+#include <hash-pjw-bare.h>
 #include "parser_aux.h"
 #include "gstr.h"
 #include "structure.h"
@@ -118,12 +119,12 @@ asn1_find_node (ASN1_TYPE pointer, const char *name)
 	  n_start = n_end;
 	  n_start++;
 
-          nhash = _asn1_bhash(n, nsize);
+          nhash = hash_pjw_bare(n, nsize);
 	}
       else
 	{
 	  nsize = _asn1_str_cpy (n, sizeof (n), n_start);
-          nhash = _asn1_bhash(n, nsize);
+          nhash = hash_pjw_bare(n, nsize);
 
 	  n_start = NULL;
 	}
@@ -156,12 +157,12 @@ asn1_find_node (ASN1_TYPE pointer, const char *name)
 	  n_start = n_end;
 	  n_start++;
 
-          nhash = _asn1_bhash(n, nsize);
+          nhash = hash_pjw_bare(n, nsize);
 	}
       else
 	{
 	  nsize = _asn1_str_cpy (n, sizeof (n), n_start);
-          nhash = _asn1_bhash(n, nsize);
+          nhash = hash_pjw_bare(n, nsize);
 	  n_start = NULL;
 	}
 
@@ -365,12 +366,12 @@ unsigned int nsize;
   if (name == NULL)
     {
       node->name[0] = 0;
-      node->name_hash = _asn1_bhash(node->name, 0);
+      node->name_hash = hash_pjw_bare(node->name, 0);
       return node;
     }
 
   nsize = _asn1_str_cpy (node->name, sizeof (node->name), name);
-  node->name_hash = _asn1_bhash(node->name, nsize);
+  node->name_hash = hash_pjw_bare(node->name, nsize);
 
   return node;
 }
@@ -394,7 +395,7 @@ unsigned int nsize;
   if (src == NULL)
     {
       dst->name[0] = 0;
-      dst->name_hash = _asn1_bhash(dst->name, 0);
+      dst->name_hash = hash_pjw_bare(dst->name, 0);
       return dst;
     }
 

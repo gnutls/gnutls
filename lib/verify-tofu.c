@@ -28,7 +28,6 @@
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-#include <hash.h>
 #include "x509_int.h"
 #include <common.h>
 #include <base64.h>

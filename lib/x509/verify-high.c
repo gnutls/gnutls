@@ -28,7 +28,7 @@
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-#include <hash.h>
+#include <hash-pjw-bare.h>
 #include "x509_int.h"
 #include <common.h>
 #include "verify-high.h"
@@ -57,7 +57,6 @@ struct gnutls_x509_trust_list_st {
   struct node_st *node;
 };
 
-#define INIT_HASH 0x33a1
 #define DEFAULT_SIZE 503
 
 /**
@@ -171,7 +170,7 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
             return i;
         }
 
-        hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+        hash = hash_pjw_bare(dn.data, dn.size);
         hash %= list->size;
 
         _gnutls_free_datum(&dn);
@@ -237,7 +236,7 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
         return ret;
     }
 
-    hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+    hash = hash_pjw_bare(dn.data, dn.size);
     hash %= list->size;
 
     _gnutls_free_datum(&dn);
@@ -305,7 +304,7 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
             return i;
         }
 
-        hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+        hash = hash_pjw_bare(dn.data, dn.size);
         hash %= list->size;
 
         _gnutls_free_datum(&dn);
@@ -384,7 +383,7 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
             return ret;
         }
 
-        hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+        hash = hash_pjw_bare(dn.data, dn.size);
         hash %= list->size;
 
         _gnutls_free_datum(&dn);
@@ -499,7 +498,7 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
         return ret;
     }
 
-    hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+    hash = hash_pjw_bare(dn.data, dn.size);
     hash %= list->size;
 
     _gnutls_free_datum(&dn);
@@ -568,7 +567,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
         return ret;
     }
 
-    hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+    hash = hash_pjw_bare(dn.data, dn.size);
     hash %= list->size;
 
     _gnutls_free_datum(&dn);
@@ -602,7 +601,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
             return ret;
         }
 
-        hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+        hash = hash_pjw_bare(dn.data, dn.size);
         hash %= list->size;
 
         _gnutls_free_datum(&dn);
@@ -660,7 +659,7 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
         return ret;
     }
 
-    hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+    hash = hash_pjw_bare(dn.data, dn.size);
     hash %= list->size;
 
     _gnutls_free_datum(&dn);
@@ -714,7 +713,7 @@ _gnutls_trustlist_inlist (gnutls_x509_trust_list_t list,
       return ret;
     }
 
-  hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+  hash = hash_pjw_bare(dn.data, dn.size);
   hash %= list->size;
 
   _gnutls_free_datum (&dn);

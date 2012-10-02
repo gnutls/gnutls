@@ -64,7 +64,6 @@ struct node_asn_struct
 #define _asn1_strcmp(a,b) strcmp((const char *)a, (const char *)b)
 #define _asn1_strcpy(a,b) strcpy((char *)a, (const char *)b)
 #define _asn1_strcat(a,b) strcat((char *)a, (const char *)b)
-uint32_t _asn1_bhash( const void *key, size_t length);
 
 #define MAX_LOG_SIZE 1024	/* maximum number of characters of a log message */
 
