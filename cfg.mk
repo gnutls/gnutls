@@ -131,13 +131,13 @@ prepare:
 	git commit -m Generated. ChangeLog
 	git tag -u b565716f! -m $(VERSION) $(tag)
 
-upload:
+upload-tarballs:
 	git push
 	git push --tags
-	build-aux/gnupload --to alpha.gnu.org:$(PACKAGE) $(distdir).tar.bz2
-	scp $(distdir).tar.bz2 $(distdir).tar.bz2.sig igloo.linux.gr:~ftp/pub/gnutls/devel/
-	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.bz2 > CHECKSUMS'
-	cp $(distdir).tar.bz2 $(distdir).tar.bz2.sig ../releases/$(PACKAGE)/
+	build-aux/gnupload --to alpha.gnu.org:$(PACKAGE) $(distdir).tar.xz
+	build-aux/gnupload --to alpha.gnu.org:$(PACKAGE) $(distdir).tar.lz
+	cp $(distdir).tar.xz $(distdir).tar.xz.sig ../releases/$(PACKAGE)/
+	cp $(distdir).tar.lz $(distdir).tar.lz.sig ../releases/$(PACKAGE)/
 
 
 web:
