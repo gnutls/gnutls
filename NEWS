@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** libgnutls: Added support for the OCSP Certificate Status
 extension.
 
+** libgnutls: gnutls_certificate_verify_peers2() will use the OCSP
+certificate status extension in verification.
+
 ** libgnutls: Fixed the receipt of session tickets during session resumption.
 Reported by danblack at http://savannah.gnu.org/support/?108146
 
