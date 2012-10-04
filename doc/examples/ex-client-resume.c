@@ -47,6 +47,9 @@ main (void)
       sd = tcp_connect ();
 
       gnutls_init (&session, GNUTLS_CLIENT);
+      /* enable useful extensions */
+      gnutls_session_ticket_enable_client(session);
+      gnutls_ocsp_status_request_enable_client(session, NULL, 0, NULL);
 
       gnutls_priority_set_direct (session, "PERFORMANCE:!ARCFOUR-128", NULL);
 

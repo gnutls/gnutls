@@ -52,8 +52,13 @@ int main (void)
   /* Initialize TLS session 
    */
   gnutls_init (&session, GNUTLS_CLIENT);
-
+  
   gnutls_session_set_ptr (session, (void *) "my_host_name");
+
+  /* enable useful extensions */
+  gnutls_session_ticket_enable_client(session);
+  gnutls_ocsp_status_request_enable_client(session, NULL, 0, NULL);
+
   gnutls_server_name_set (session, GNUTLS_NAME_DNS, "my_host_name", 
                           strlen("my_host_name"));
 
