@@ -398,6 +398,7 @@ and they will be discussed in the subsections that follow.
 * Session tickets::
 * HeartBeat::
 * Safe renegotiation::
+* OCSP status request::
 @end menu
 
 @node Maximum fragment length negotiation
@@ -459,10 +460,8 @@ The requests coming from the peer result to @code{GNUTLS_@-E_@-HERTBEAT_@-PING_@
 being returned from the receive function. Ping requests to peer can be send via
 @funcref{gnutls_heartbeat_ping}. 
 
-Policy-related functions:
 @showfuncB{gnutls_heartbeat_allowed,gnutls_heartbeat_enable}
 
-Operational functions:
 @showfuncD{gnutls_heartbeat_ping,gnutls_heartbeat_pong,gnutls_heartbeat_set_timeouts,gnutls_heartbeat_get_timeout}
 
 @node Safe renegotiation
@@ -563,6 +562,28 @@ For applications we have introduced a new API related to safe
 renegotiation.  The @funcref{gnutls_safe_renegotiation_status} function is
 used to check if the extension has been negotiated on a session, and
 can be used both by clients and servers.
+
+@node OCSP status request
+@subsection OCSP status request
+@cindex OCSP status request
+@cindex Certificate status request
+
+The Online Certificate Status Protocol (OCSP) is a protocol that allows the
+client to verify the server certificate for revocation without messing with
+certificate revocation lists. Its drawback is that it requires the client
+to connect to the server's CA OCSP server and ask for the status of the
+certificate. This extension however, enables a TLS server to include
+its CA OCSP server response in the handshake. That is an HTTPS server
+may periodically run @code{ocsptool} (see @ref{ocsptool Invocation}) to obtain
+its certificate revocation status and serve it to the clients. This
+reduces the number of connections a client needs to perform to access a
+secure server.
+
+Server functions:
+@showfuncB{gnutls_certificate_set_ocsp_status_request_function,gnutls_certificate_set_ocsp_status_request_file}
+
+Client functions:
+@showfuncA{gnutls_ocsp_status_request_enable_client}
 
 @include sec-tls-app.texi
 

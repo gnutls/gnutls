@@ -644,8 +644,10 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
  * be one or more of the gnutls_certificate_status_t enumerated
  * elements bitwise or'd. To avoid denial of service attacks some
  * default upper limits regarding the certificate key size and chain
- * size are set. To override them use
- * gnutls_certificate_set_verify_limits().
+ * size are set. To override them use gnutls_certificate_set_verify_limits().
+ *
+ * This function will utilize the OCSP Certificate Status extension if
+ * negotiated --to enable see gnutls_ocsp_status_request_enable_client().
  *
  * Note that you must also check the peer's name in order to check if
  * the verified certificate belongs to the actual peer, see gnutls_x509_crt_check_hostname().
