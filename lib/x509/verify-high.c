@@ -526,7 +526,8 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
  * @func: If non-null will be called on each chain element verification with the output.
  *
  * This function will try to verify the given certificate and return
- * its status.
+ * its status. The @verify parameter will hold an OR'ed sequence of
+ * %gnutls_certificate_status_t flags.
  *
  * Limitation: Pathlen constraints or key usage flags are not consulted.
  *
@@ -630,9 +631,10 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * @verify: will hold the certificate verification output.
  * @func: If non-null will be called on each chain element verification with the output.
  *
- * This function will try to find a matching named certificate. If a
- * match is found the certificate is considered valid. In addition to that
- * this function will also check CRLs.
+ * This function will try to find a certificate that is associated with the provided 
+ * name --see gnutls_x509_trust_list_add_named_crt(). If a match is found the certificate is considered valid. In addition to that
+ * this function will also check CRLs. The @verify parameter will hold an OR'ed sequence of
+ * %gnutls_certificate_status_t flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
