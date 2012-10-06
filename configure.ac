@@ -115,6 +115,94 @@ dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
 
+
+
+GTK_DOC_CHECK(1.1)
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.18])
+
+AC_C_BIGENDIAN
+
+gl_INIT
+
+dnl GCC warnings to enable
+
+AC_ARG_ENABLE([gcc-warnings],
+  [AS_HELP_STRING([--enable-gcc-warnings],
+		  [turn on lots of GCC warnings (for developers)])],
+  [case $enableval in
+     yes|no) ;;
+     *)      AC_MSG_ERROR([bad value $enableval for gcc-warnings option]) ;;
+   esac
+   gl_gcc_warnings=$enableval],
+  [gl_gcc_warnings=no]
+)
+
+if test "$gl_gcc_warnings" = yes; then
+  gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
+  gl_WARN_ADD([-Wframe-larger-than=5120], [WSTACK_CFLAGS])
+
+  nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
+  nw="$nw -Wc++-compat"             # We don't care about C++ compilers
+  nw="$nw -Wundef"                  # Warns on '#if GNULIB_FOO' etc in gnulib
+  nw="$nw -Wtraditional"            # Warns on #elif which we use often
+  nw="$nw -Wlogical-op"             # Too many false positives
+  nw="$nw -Wold-style-definition"   # 
+  nw="$nw -Wpadded"                 # Our structs are not padded
+  nw="$nw -Wunreachable-code"       # Too many false positives
+  nw="$nw -Wtraditional-conversion" # Too many warnings for now
+  nw="$nw -Wcast-qual"              # Too many warnings for now
+  nw="$nw -Waggregate-return"       # Too many warnings for now
+  nw="$nw -Wshadow"                 # Too many warnings for now
+  nw="$nw -Wswitch-default"         # Too many warnings for now
+  nw="$nw -Wswitch-enum"            # Too many warnings for now
+  nw="$nw -Wconversion"             # Too many warnings for now
+  nw="$nw -Wsign-conversion"        # Too many warnings for now
+  nw="$nw -Wformat-y2k"             # Too many warnings for now
+  nw="$nw -Woverlength-strings"     # We use some in tests/
+  nw="$nw -Wvla"                    # There is no point to avoid C99 variable length arrays
+  nw="$nw -Wformat-nonliteral"      # Incompatible with gettext _()
+  nw="$nw -Wunsafe-loop-optimizations"
+  nw="$nw -Wstrict-overflow"
+  nw="$nw -Wmissing-noreturn"
+  nw="$nw -Winline"                 # Too compiler dependent
+  nw="$nw -Wsuggest-attribute=pure" # Is it worth using attributes?
+  nw="$nw -Wsuggest-attribute=const" # Is it worth using attributes?
+  nw="$nw -Wsuggest-attribute=noreturn" # Is it worth using attributes?
+  nw="$nw -Wstack-protector"        # Some functions cannot be protected
+  nw="$nw -Wredundant-decls"        # Some files cannot be compiled with that (gl_fd_to_handle)
+
+  gl_MANYWARN_ALL_GCC([ws])
+  gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
+  for w in $ws; do
+    gl_WARN_ADD([$w])
+  done
+
+  gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
+  gl_WARN_ADD([-Wno-format-y2k])     # Too many warnings for now
+  gl_WARN_ADD([-Wno-unused-value]) # warnings for things we don't want to get
+  gl_WARN_ADD([-Wno-unused-result]) # warnings for things we don't want to get
+  gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
+  gl_WARN_ADD([-Wno-stack-protector])  # Some functions cannot be protected
+  gl_WARN_ADD([-Wno-int-to-pointer-cast])  # Some files cannot be compiled with that (gl_fd_to_handle)
+  gl_WARN_ADD([-fdiagnostics-show-option])
+fi
+
+AC_SUBST([WERROR_CFLAGS])
+AC_SUBST([WSTACK_CFLAGS])
+AC_SUBST([WARN_CFLAGS])
+
+dnl Programs for compilation or development
+AC_PROG_LN_S
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+
+
+dnl No fork on MinGW, disable some self-tests until we fix them.
+AC_CHECK_FUNCS([fork getrusage getpwuid_r daemon],,)
+AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
+AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
     AS_HELP_STRING([--disable-libdane],
@@ -148,24 +236,16 @@ AM_CONDITIONAL(ENABLE_DANE, test "$enable_dane" = "yes")
 AC_ARG_WITH(unbound-root-key-file, AS_HELP_STRING([--with-unbound-root-key-file],
                                  [specify the unbound root key file]),
             unbound_root_key_file="$withval", 
-            unbound_root_key_file="/etc/unbound/root.key")
+if test "$have_win" = yes; then
+    unbound_root_key_file="C:\\Program Files\\Unbound\\root.key"
+else
+    unbound_root_key_file="/etc/unbound/root.key"
+fi
+)
 
 AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
   ["$unbound_root_key_file"], [The DNSSEC root key file])
 
-
-GTK_DOC_CHECK(1.1)
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.18])
-
-AC_C_BIGENDIAN
-
-
-
-dnl No fork on MinGW, disable some self-tests until we fix them.
-AC_CHECK_FUNCS([fork getrusage getpwuid_r daemon],,)
-AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
-AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
 
 dnl Check for p11-kit
 AC_ARG_WITH(p11-kit,
@@ -275,79 +355,6 @@ AC_SUBST(GNUTLS_ZLIB_LIBS_PRIVATE)
 
 
 
-gl_INIT
-
-dnl GCC warnings to enable
-
-AC_ARG_ENABLE([gcc-warnings],
-  [AS_HELP_STRING([--enable-gcc-warnings],
-		  [turn on lots of GCC warnings (for developers)])],
-  [case $enableval in
-     yes|no) ;;
-     *)      AC_MSG_ERROR([bad value $enableval for gcc-warnings option]) ;;
-   esac
-   gl_gcc_warnings=$enableval],
-  [gl_gcc_warnings=no]
-)
-
-if test "$gl_gcc_warnings" = yes; then
-  gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
-  gl_WARN_ADD([-Wframe-larger-than=5120], [WSTACK_CFLAGS])
-
-  nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
-  nw="$nw -Wc++-compat"             # We don't care about C++ compilers
-  nw="$nw -Wundef"                  # Warns on '#if GNULIB_FOO' etc in gnulib
-  nw="$nw -Wtraditional"            # Warns on #elif which we use often
-  nw="$nw -Wlogical-op"             # Too many false positives
-  nw="$nw -Wold-style-definition"   # 
-  nw="$nw -Wpadded"                 # Our structs are not padded
-  nw="$nw -Wunreachable-code"       # Too many false positives
-  nw="$nw -Wtraditional-conversion" # Too many warnings for now
-  nw="$nw -Wcast-qual"              # Too many warnings for now
-  nw="$nw -Waggregate-return"       # Too many warnings for now
-  nw="$nw -Wshadow"                 # Too many warnings for now
-  nw="$nw -Wswitch-default"         # Too many warnings for now
-  nw="$nw -Wswitch-enum"            # Too many warnings for now
-  nw="$nw -Wconversion"             # Too many warnings for now
-  nw="$nw -Wsign-conversion"        # Too many warnings for now
-  nw="$nw -Wformat-y2k"             # Too many warnings for now
-  nw="$nw -Woverlength-strings"     # We use some in tests/
-  nw="$nw -Wvla"                    # There is no point to avoid C99 variable length arrays
-  nw="$nw -Wformat-nonliteral"      # Incompatible with gettext _()
-  nw="$nw -Wunsafe-loop-optimizations"
-  nw="$nw -Wstrict-overflow"
-  nw="$nw -Wmissing-noreturn"
-  nw="$nw -Winline"                 # Too compiler dependent
-  nw="$nw -Wsuggest-attribute=pure" # Is it worth using attributes?
-  nw="$nw -Wsuggest-attribute=const" # Is it worth using attributes?
-  nw="$nw -Wsuggest-attribute=noreturn" # Is it worth using attributes?
-  nw="$nw -Wstack-protector"        # Some functions cannot be protected
-  nw="$nw -Wredundant-decls"        # Some files cannot be compiled with that (gl_fd_to_handle)
-
-  gl_MANYWARN_ALL_GCC([ws])
-  gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
-  for w in $ws; do
-    gl_WARN_ADD([$w])
-  done
-
-  gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
-  gl_WARN_ADD([-Wno-format-y2k])     # Too many warnings for now
-  gl_WARN_ADD([-Wno-unused-value]) # warnings for things we don't want to get
-  gl_WARN_ADD([-Wno-unused-result]) # warnings for things we don't want to get
-  gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
-  gl_WARN_ADD([-Wno-stack-protector])  # Some functions cannot be protected
-  gl_WARN_ADD([-Wno-int-to-pointer-cast])  # Some files cannot be compiled with that (gl_fd_to_handle)
-  gl_WARN_ADD([-fdiagnostics-show-option])
-fi
-
-AC_SUBST([WERROR_CFLAGS])
-AC_SUBST([WSTACK_CFLAGS])
-AC_SUBST([WARN_CFLAGS])
-
-dnl Programs for compilation or development
-AC_PROG_LN_S
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
 
 AC_ARG_WITH([default-trust-store-pkcs11],
   [AS_HELP_STRING([--with-default-trust-store-pkcs11=URI],
