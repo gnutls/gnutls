@@ -130,8 +130,7 @@ typedef enum dane_verify_status_t
  */
 typedef enum dane_verify_flags_t 
 {
-  DANE_F_REQUIRE_DNSSEC = 1,
-  DANE_F_IGNORE_LOCAL_RESOLVER = 1<<2,
+  DANE_F_IGNORE_LOCAL_RESOLVER = 1,
 } dane_verify_flags_t;
 
 int dane_verify_crt (

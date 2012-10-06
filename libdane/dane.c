@@ -240,13 +240,11 @@ int dane_query_resolve_tlsa(dane_query_t q, const char* host, const char* proto,
 	
 	q->data_entries = i;
 
-	if (q->flags & DANE_F_REQUIRE_DNSSEC) {
-		if (!q->result->secure) {
-			if (q->result->bogus)
-				ret = DANE_E_INVALID_DNSSEC_SIG;
-			else
-				ret = DANE_E_NO_DNSSEC_SIG;
-		}
+	if (!q->result->secure) {
+		if (q->result->bogus)
+			ret = DANE_E_INVALID_DNSSEC_SIG;
+		else
+			ret = DANE_E_NO_DNSSEC_SIG;
 	}
 
 	/* show security status */
@@ -445,9 +443,6 @@ cleanup:
  * If no information via DANE can be obtained the flag %DANE_VERIFY_NO_DANE_INFO
  * is set. If a DNSSEC signature is not available for the DANE 
  * record then the verify flag %DANE_VERIFY_NO_DNSSEC_DATA is set.
- * 
- * Note that when verifying untrusted certificates, it is recommended to 
- * use the %DANE_F_REQUIRE_DNSSEC flag.
  * 
  * Due to the many possible options of DANE, there is no single threat
  * model countered. When notifying the user about DANE verification results
