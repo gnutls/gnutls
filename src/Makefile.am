@@ -35,6 +35,7 @@ AM_CPPFLAGS = \
 	-I$(builddir)/../gl			\
 	-I$(builddir)/../lib/includes		\
 	-I$(srcdir)/../lib/includes		\
+	-I$(srcdir)/../libdane/includes		\
 	-I$(srcdir)/../extra/includes	\
 	$(LIBOPTS_CFLAGS)
 
@@ -102,6 +103,9 @@ gnutls_cli_SOURCES = cli.c common.h common.c \
 	socket.c socket.h ocsptool-common.c \
 	$(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la
+if ENABLE_DANE
+gnutls_cli_LDADD += ../libdane/libdane.la
+endif
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS_LDADD) $(LTLIBINTL)
 gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME) \
 	 $(SERVENT_LIB)

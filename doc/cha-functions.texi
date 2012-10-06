@@ -12,6 +12,7 @@
 * PKCS 11 API::
 * TPM API::
 * Abstract key API::
+* DANE API::
 * Cryptographic API::
 * Compatibility API::
 @end menu
@@ -91,6 +92,15 @@ The following functions are to be used for abstract key handling.
 Their prototypes lie in @file{gnutls/abstract.h}.
 
 @include abstract-api.texi
+
+@node DANE API
+@section DANE API
+
+The following functions are to be used for DANE certificate verification.
+Their prototypes lie in @file{gnutls/dane.h}. Note that you need to link
+with the @code{libdane} library to use them.
+
+@include dane-api.texi
 
 @node Cryptographic API
 @section Cryptographic API

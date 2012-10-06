@@ -190,18 +190,21 @@ MAINTAINERCLEANFILES =
 
 gnutls_TEXINFOS += gnutls-api.texi x509-api.texi pgp-api.texi		\
 	pkcs12-api.texi pkcs11-api.texi abstract-api.texi tpm-api.texi	\
-	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
+	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi     \
+	dane-api.texi
 
 MAINTAINERCLEANFILES += gnutls-api.texi x509-api.texi pgp-api.texi	\
 	pkcs12-api.texi pkcs11-api.texi abstract-api.texi tpm-api.texi	\
-	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
+	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi	\
+	dane-api.texi
 
 HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
 	$(top_srcdir)/lib/includes/gnutls/x509.h $(top_srcdir)/lib/includes/gnutls/openpgp.h \
 	$(top_srcdir)/lib/includes/gnutls/pkcs12.h $(top_srcdir)/lib/includes/gnutls/pkcs11.h \
 	$(top_srcdir)/lib/includes/gnutls/abstract.h $(top_srcdir)/lib/includes/gnutls/compat.h \
 	$(top_srcdir)/lib/includes/gnutls/dtls.h $(top_srcdir)/lib/includes/gnutls/crypto.h \
-	$(top_srcdir)/lib/includes/gnutls/ocsp.h $(top_srcdir)/lib/includes/gnutls/tpm.h
+	$(top_srcdir)/lib/includes/gnutls/ocsp.h $(top_srcdir)/lib/includes/gnutls/tpm.h \
+	$(top_srcdir)/libdane/includes/gnutls/dane.h
 
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
@@ -210,6 +213,17 @@ gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
+
+dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$^|sort|uniq`; do \
+		echo -n "Creating documentation for $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/libdane/*.c >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -375,7 +389,7 @@ enums.texi: $(HEADER_FILES)
 gnutls_TEXINFOS += $(ENUMS) $(FUNCS)
 DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
 
-stamp_functions: gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi tpm-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi
+stamp_functions: gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi tpm-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi dane-api.texi
 	-mkdir functions
 	for i in $^; do \
 		$(srcdir)/scripts/split-texi.pl functions < $$i; \

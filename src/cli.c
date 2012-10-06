@@ -55,6 +55,10 @@
 #include "sockets.h"
 #include "benchmark.h"
 
+#ifdef HAVE_DANE
+#include <gnutls/dane.h>
+#endif
+
 #include <common.h>
 #include <socket.h>
 
@@ -394,6 +398,7 @@ cert_verify_callback (gnutls_session_t session)
   int rc;
   unsigned int status = 0;
   int ssh = ENABLED_OPT(TOFU);
+  int dane = ENABLED_OPT(DANE);
   const char* txt_service;
 
   rc = cert_verify(session, hostname);
@@ -469,6 +474,42 @@ cert_verify_callback (gnutls_session_t session)
             fprintf(stderr, "Could not store key: %s\n", gnutls_strerror(rc));
         }
     }
+
+#ifdef HAVE_DANE
+  if (dane) /* try DANE auth */
+    {
+      rc = dane_verify_session_crt( session, hostname, udp?"udp":"tcp", atoi(service), 
+              DANE_F_REQUIRE_DNSSEC|DANE_F_IGNORE_LOCAL_RESOLVER, &status);
+      if (rc < 0)
+        {
+          fprintf(stderr, "*** DANE verification error: %s\n", dane_strerror(rc));
+          if (!insecure)
+            return -1;
+        }
+      else
+        {
+          if (status != 0)
+            {
+              fprintf(stderr, "*** DANE certificate verification failed (flags %x).\n", status);
+              if (status & DANE_VERIFY_CA_CONSTRAINS_VIOLATED)
+                fprintf(stderr, "- CA constrains were violated.\n");
+              if (status & DANE_VERIFY_CERT_DIFFERS)
+                fprintf(stderr, "- The certificate differs.\n");
+              if (status & DANE_VERIFY_NO_DANE_INFO)
+                fprintf(stderr, "- There was no DANE information.\n");
+              if (status & DANE_VERIFY_DNSSEC_DATA_INVALID)
+                fprintf(stderr, "- The DNSSEC signature is invalid.\n");
+              if (status & DANE_VERIFY_NO_DNSSEC_DATA)
+                fprintf(stderr, "- There was no DNSSEC signature.\n");
+              if (!insecure)
+                return -1;
+            }
+          else
+            printf("- DANE verification didn't reject the certificate.\n");
+        }
+
+    }
+#endif
 
   return 0;
 }

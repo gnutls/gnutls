@@ -16,12 +16,24 @@ Reported by danblack at http://savannah.gnu.org/support/?108146
 ** libgnutls: Added gnutls_ocsp_resp_check_crt() to check whether the OCSP
 response corresponds to the given certificate.
 
+** libdane: Added. It is a library to provide DANE with DNSSEC certificate
+verification.
+
 ** API and ABI modifications:
 gnutls_certificate_set_ocsp_status_request_function: Added
 gnutls_certificate_set_ocsp_status_request_file: Added
 gnutls_ocsp_status_request_enable_client: Added
 gnutls_ocsp_status_request_get: Added
 gnutls_ocsp_resp_check_crt: Added
+dane_query_init: Added
+dane_query_deinit: Added
+dane_query_resolve_tlsa: Added
+dane_query_data: Added
+dane_query_status: Added
+dane_query_entries: Added
+dane_verify_crt: Added
+dane_verify_session_crt: Added
+dane_strerror: Added
 
 
 * Version 3.1.2 (released 2012-09-26)

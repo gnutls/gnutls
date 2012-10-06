@@ -21,7 +21,7 @@
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --disable-valgrind-tests
 
-SUBDIRS = gl lib extra po
+SUBDIRS = gl lib extra libdane po
 
 SUBDIRS += src doc tests
 

@@ -60,6 +60,7 @@ to use this key exchange algorithm.
 @menu
 * X.509 certificates::
 * OpenPGP certificates::
+* Advanced certificate verification::
 * Digital signatures::
 @end menu
 
@@ -88,7 +89,6 @@ acceptable.  The framework is illustrated on @ref{fig:x509}.
 * X.509 distinguished names::
 * Verifying X.509 certificate paths::
 * Verifying a certificate in the context of TLS session::
-* Verifying a certificate using trust on first use authentication::
 @end menu
 
 @node X.509 certificate structure
@@ -301,42 +301,6 @@ about the peer's identity. It is required to verify if the
 certificate's owner is the one you expect. For more information
 consult @ref{gnutls_x509_crt_check_hostname}, section @ref{ex:verify} for an example, and @xcite{RFC2818}.
 
-@node Verifying a certificate using trust on first use authentication
-@subsection Verifying a certificate using trust on first use authentication
-@cindex verifying certificate paths
-@cindex SSH-style authentication
-@cindex Trust on first use
-@cindex Key pinning
-@tindex gnutls_certificate_verify_flags
-
-It is possible to use a trust on first use (similar to SSH) authentication 
-method in GnuTLS. That is the concept used by the SSH programs, where the 
-public key of the peer is not verified, or verified in an out-of-bound way,
-but subsequent connections to the same peer require the public key to 
-remain the same.  Such a system in combination with the typical CA 
-verification of a certificate, and OCSP revocation checks,
-can help to provide multiple factor verification, where a single point of
-failure is not enough to compromise the system. For example a server compromise
-may be detected using OCSP, and a CA compromise can be detected using
-the trust on first use method.
-Such a hybrid system with X.509 and trust on first use authentication is 
-shown in @ref{Simple client example with SSH-style certificate verification}.
-
-@showfuncdesc{gnutls_verify_stored_pubkey}
-@showfuncdesc{gnutls_store_pubkey}
-
-In addition to the above the @funcref{gnutls_store_commitment} can be 
-used to implement a key-pinning architecture as in @xcite{KEYPIN}. 
-This provides a way for web server to commit on a public key that is
-not yet active.
-
-@showfuncdesc{gnutls_store_commitment}
-
-The storage and verification functions may be used with the default
-text file based back-end, or another back-end may be specified. That
-should contain storage and retrieval functions and specified as below.
-
-@showfuncE{gnutls_tdb_init,gnutls_tdb_deinit,gnutls_tdb_set_verify_func,gnutls_tdb_set_store_func,gnutls_tdb_set_store_commitment_func}
 
 @node OpenPGP certificates
 @section @acronym{OpenPGP} certificates
@@ -474,7 +438,83 @@ to verify the signatures in the certificate sent by the peer.
 
 @showfuncdesc{gnutls_certificate_set_openpgp_keyring_file}
 
+@node Advanced certificate verification
+@section Advanced certificate verification
+@cindex Certificate verification
 
+@menu
+* Verifying a certificate using trust on first use authentication::
+* Verifying a certificate using DANE (DNSSEC)::
+@end menu
+
+@node Verifying a certificate using trust on first use authentication
+@subsection Verifying a certificate using trust on first use authentication
+@cindex verifying certificate paths
+@cindex SSH-style authentication
+@cindex Trust on first use
+@cindex Key pinning
+@tindex gnutls_certificate_verify_flags
+
+It is possible to use a trust on first use (TOFU) authentication 
+method in GnuTLS. That is the concept used by the SSH programs, where the 
+public key of the peer is not verified, or verified in an out-of-bound way,
+but subsequent connections to the same peer require the public key to 
+remain the same.  Such a system in combination with the typical CA 
+verification of a certificate, and OCSP revocation checks,
+can help to provide multiple factor verification, where a single point of
+failure is not enough to compromise the system. For example a server compromise
+may be detected using OCSP, and a CA compromise can be detected using
+the trust on first use method.
+Such a hybrid system with X.509 and trust on first use authentication is 
+shown in @ref{Simple client example with SSH-style certificate verification}.
+
+@showfuncdesc{gnutls_verify_stored_pubkey}
+@showfuncdesc{gnutls_store_pubkey}
+
+In addition to the above the @funcref{gnutls_store_commitment} can be 
+used to implement a key-pinning architecture as in @xcite{KEYPIN}. 
+This provides a way for web server to commit on a public key that is
+not yet active.
+
+@showfuncdesc{gnutls_store_commitment}
+
+The storage and verification functions may be used with the default
+text file based back-end, or another back-end may be specified. That
+should contain storage and retrieval functions and specified as below.
+
+@showfuncE{gnutls_tdb_init,gnutls_tdb_deinit,gnutls_tdb_set_verify_func,gnutls_tdb_set_store_func,gnutls_tdb_set_store_commitment_func}
+
+@node Verifying a certificate using DANE (DNSSEC)
+@subsection Verifying a certificate using DANE (DNSSEC)
+@cindex verifying certificate paths
+@cindex DANE
+@cindex DNSSEC
+@tindex gnutls_certificate_verify_flags
+
+The DANE protocol is a protocol that can be used to verify TLS certificates
+using the DNS (or better DNSSEC) protocols. The DNS security extensions (DNSSEC)
+provide an alternative public key infrastructure to the commercial CAs that
+are typically used to sign TLS certificates. The DANE protocol takes advantage
+of the DNSSEC infrastructure to verify TLS certificates. This can be 
+in addition to the verification by commercial CA infrastructure or 
+could even replace it where DNSSEC is deployed.
+
+The DANE functionality is provided by the @code{libdane} library that is shipped
+with GnuTLS and the function prototypes are in @code{gnutls/dane.h}. The
+high level verification functions are shown below.
+
+@showfuncdesc{dane_verify_crt}
+
+@showfuncB{dane_verify_session_crt,dane_strerror}
+
+The allowed flags for the verification function follow.
+
+@showenumdesc{dane_verify_flags_t,The DANE verification flags.}
+
+The following flags are returned by the verify functions to
+indicate the status of the verification.
+
+@showenumdesc{dane_verify_status_t,The DANE verification status flags.}
 
 
 @node Digital signatures

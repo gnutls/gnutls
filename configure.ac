@@ -115,6 +115,45 @@ dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
 
+AC_MSG_CHECKING([whether to build libdane])
+AC_ARG_ENABLE(libdane,
+    AS_HELP_STRING([--disable-libdane],
+                   [disable the built of libdane]),
+    enable_dane=$enableval, enable_dane=yes)
+AC_MSG_RESULT($enable_dane)
+
+if test "$enable_dane" != "no"; then
+    LIBS="$oldlibs -lunbound"
+    AC_MSG_CHECKING([for unbound library])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([
+		   #include <unbound.h>],[
+		   struct ub_ctx* ctx;
+		   ctx = ub_ctx_create();])],
+		  [AC_MSG_RESULT(yes)
+		   AC_SUBST([UNBOUND_LIBS], [-lunbound])
+		   AC_SUBST([UNBOUND_CFLAGS], [])
+		   AC_DEFINE([HAVE_DANE], 1, [Enable the DANE library])
+		   enable_dane=yes],
+		  [AC_MSG_RESULT(no)
+   	           AC_MSG_WARN([[
+*** 
+*** libunbound was not found. Libdane will not be built.
+*** ]])
+		  enable_dane=no])
+    LIBS="$oldlibs"
+fi
+
+AM_CONDITIONAL(ENABLE_DANE, test "$enable_dane" = "yes")
+
+AC_ARG_WITH(unbound-root-key-file, AS_HELP_STRING([--with-unbound-root-key-file],
+                                 [specify the unbound root key file]),
+            unbound_root_key_file="$withval", 
+            unbound_root_key_file="/etc/unbound/root.key")
+
+AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
+  ["$unbound_root_key_file"], [The DNSSEC root key file])
+
+
 GTK_DOC_CHECK(1.1)
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.18])
@@ -521,6 +560,8 @@ AC_CONFIG_FILES([
   doc/scripts/Makefile
   extra/Makefile
   extra/includes/Makefile
+  libdane/Makefile
+  libdane/includes/Makefile
   gl/Makefile
   gl/tests/Makefile
   guile/Makefile
@@ -579,6 +620,14 @@ AC_MSG_NOTICE([summary of build options:
   Valgrind:         $opt_valgrind_tests ${VALGRIND}
 ])
 
+AC_MSG_NOTICE([Hardware acceleration/support:
+
+  /dev/crypto:      $enable_cryptodev
+  Hardware accel:   $hw_accel
+  PKCS#11 support:  $with_p11_kit
+  TPM support:      $with_tpm
+])
+
 AC_MSG_NOTICE([Optional features:
 (note that included applications might not compile properly
 if features are disabled)
@@ -588,10 +637,6 @@ if features are disabled)
   SRP support:      $ac_enable_srp
   PSK support:      $ac_enable_psk
   Anon auth support:$ac_enable_anon
-
-  Trust store pkcs: $with_default_trust_store_pkcs11
-  Trust store file: $with_default_trust_store_file
-  CRL file: $with_default_crl_file
 ])
 
 AC_MSG_NOTICE([Optional applications:
@@ -604,13 +649,24 @@ AC_MSG_NOTICE([Optional libraries:
 
   Guile wrappers:   $opt_guile_bindings
   C++ library:      $use_cxx
+  DANE library:     $enable_dane
   OpenSSL compat:   $enable_openssl
 ])
 
-AC_MSG_NOTICE([Hardware acceleration/support:
+AC_MSG_NOTICE([System files:
 
-  /dev/crypto:      $enable_cryptodev
-  Hardware accel:   $hw_accel
-  PKCS#11 support:  $with_p11_kit
-  TPM support:      $with_tpm
+  Trust store pkcs:     $with_default_trust_store_pkcs11
+  Trust store file:     $with_default_trust_store_file
+  CRL file:             $with_default_crl_file
+  DNSSEC root key file: $unbound_root_key_file
 ])
+
+if test ! -f "$unbound_root_key_file"; then
+AC_MSG_WARN([[
+*** 
+*** The DNSSEC root key file in $unbound_root_key_file was not found. 
+*** This file is needed for the verification of DNSSEC responses.
+*** Use the command: unbound-anchor -a "$unbound_root_key_file"
+*** to generate or update it.
+*** ]])
+fi

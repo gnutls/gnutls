@@ -21,6 +21,16 @@ flag = {
 };
 
 flag = {
+    name      = dane;
+    descrip   = "Enable DANE certificate verification (DNSSEC)";
+    disabled;
+    disable   = "no";
+    doc       = "This option will, in addition to certificate authentication using 
+the trusted CAs, verify the server certificates using on the DANE information
+available via DNSSEC.";
+};
+
+flag = {
     name      = ocsp;
     descrip   = "Enable OCSP certificate verification";
     disabled;
