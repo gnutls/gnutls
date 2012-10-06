@@ -399,28 +399,32 @@ cert_verify_callback (gnutls_session_t session)
   unsigned int status = 0;
   int ssh = ENABLED_OPT(TOFU);
   int dane = ENABLED_OPT(DANE);
+  int ca_verify = ENABLED_OPT(CA_VERIFICATION);
   const char* txt_service;
 
   print_cert_info (session, verbose, print_cert);
 
-  rc = cert_verify(session, hostname);
-  if (rc == 0)
+  if (ca_verify)
     {
-      printf ("*** Verifying server certificate failed...\n");
-      if (!insecure && !ssh)
-        return -1;
-    }
-  else if (ENABLED_OPT(OCSP))
-    { /* off-line verification succeeded. Try OCSP */
-      rc = cert_verify_ocsp(session);
+      rc = cert_verify(session, hostname);
       if (rc == 0)
         {
-          printf ("*** Verifying (with OCSP) server certificate failed...\n");
+          printf ("*** Verifying server certificate failed...\n");
           if (!insecure && !ssh)
             return -1;
         }
-      else if (rc == -1)
-        printf("*** OCSP response ignored\n");
+      else if (ENABLED_OPT(OCSP))
+        { /* off-line verification succeeded. Try OCSP */
+          rc = cert_verify_ocsp(session);
+          if (rc == 0)
+            {
+              printf ("*** Verifying (with OCSP) server certificate failed...\n");
+              if (!insecure && !ssh)
+                return -1;
+            }
+          else if (rc == -1)
+            printf("*** OCSP response ignored\n");
+        }
     }
 
   if (ssh) /* try ssh auth */

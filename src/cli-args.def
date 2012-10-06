@@ -31,6 +31,14 @@ available via DNSSEC.";
 };
 
 flag = {
+    name      = ca-verification;
+    descrip   = "Disable CA certificate verification";
+    enabled;
+    disable   = "no";
+    doc       = "This option will disable CA certificate verification. It is to be used with the --dane or --tofu options.";
+};
+
+flag = {
     name      = ocsp;
     descrip   = "Enable OCSP certificate verification";
     disabled;
