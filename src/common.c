@@ -583,7 +583,7 @@ print_ecdh_info (gnutls_session_t session, const char *str)
 }
 
 int
-print_info (gnutls_session_t session, int print_cert, int verbose)
+print_info (gnutls_session_t session, int verbose, int print_cert)
 {
     const char *tmp;
     gnutls_credentials_type_t cred;
@@ -656,7 +656,8 @@ print_info (gnutls_session_t session, int print_cert, int verbose)
                 }
           }
 
-          print_cert_info (session, verbose, print_cert);
+          if (print_cert)
+            print_cert_info (session, verbose, print_cert);
 
           if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
               print_dh_info (session, "Ephemeral ", verbose);

@@ -401,6 +401,8 @@ cert_verify_callback (gnutls_session_t session)
   int dane = ENABLED_OPT(DANE);
   const char* txt_service;
 
+  print_cert_info (session, verbose, print_cert);
+
   rc = cert_verify(session, hostname);
   if (rc == 0)
     {
@@ -1254,12 +1256,11 @@ do_handshake (socket_st * socket)
   if (ret == 0)
     {
       /* print some information */
-      print_info (socket->session, print_cert, verbose);
+      print_info (socket->session, verbose, 0);
       socket->secure = 1;
     }
   else
     {
-      print_cert_info (socket->session, verbose, print_cert);
       gnutls_alert_send_appropriate (socket->session, ret);
       shutdown (socket->fd, SHUT_RDWR);
     }

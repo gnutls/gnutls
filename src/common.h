@@ -48,7 +48,7 @@
 
 extern const char str_unknown[];
 
-int print_info (gnutls_session_t state, int print_cert, int verbose);
+int print_info (gnutls_session_t state, int verbose, int print_cert);
 void print_cert_info (gnutls_session_t, int flag, int print_cert);
 void print_cert_info_compact (gnutls_session_t session);
 
