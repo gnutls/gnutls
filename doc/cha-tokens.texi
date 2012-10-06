@@ -15,7 +15,7 @@ preventing their extraction.
 @menu
 * Abstract key types::
 * Smart cards and HSMs::
-* Trusted platform module::
+* Trusted Platform Module::
 @end menu
 
 @node Abstract key types
@@ -74,7 +74,7 @@ sequence.
 @showfuncdesc{gnutls_pubkey_export}
 
 An important function is @funcref{gnutls_pubkey_import_url} which will import
-public keys from URLs that identify objects stored in tokens (see @ref{Smart cards and HSMs} and @ref{Trusted platform module}).
+public keys from URLs that identify objects stored in tokens (see @ref{Smart cards and HSMs} and @ref{Trusted Platform Module}).
 A function to check for a supported by GnuTLS URL is @funcref{gnutls_url_is_supported}.
 
 @showfuncdesc{gnutls_url_is_supported}
@@ -344,16 +344,21 @@ certificates by specifying a PKCS #11 URL instead of a filename.
 
 @include invoke-p11tool.texi
 
-@node Trusted platform module
-@section Trusted platform module
+@node Trusted Platform Module
+@section Trusted Platform Module (TPM)
 @cindex trusted platform module
 @cindex TPM
 
 In this section we present the Trusted Platform Module (TPM) support 
-in @acronym{GnuTLS}. The TPM chip allows for storing and using RSA keys in a
-similar way as a @acronym{PKCS} #11 module, but with slight differences
-that require different handling. The basic operations supported, and used
-by GnuTLS, are key generation and signing. 
+in @acronym{GnuTLS}. There was a big hype when the TPM chip was introduced into 
+computers. Briefly it is a co-processor in your PC that allows it to perform 
+calculations independently of the main processor. This has good and bad 
+side-effects. In this section we focus on the good ones, which are the fact that 
+you can use it to perform cryptographic operations the similarly to a
+@acronym{PKCS} #11 smart card. 
+It allows for storing and using RSA keys but with slight differences
+from a @acronym{PKCS} #11 module that require different handling. 
+The basic operations supported, and used by GnuTLS, are key generation and signing. 
 
 In GnuTLS the TPM functionality is available in @code{gnutls/tpm.h}.
 
