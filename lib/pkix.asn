@@ -116,11 +116,11 @@ AccessDescription  ::=  SEQUENCE {
 
 -- CRL number extension OID and syntax
 
-CRLNumber ::= INTEGER (0..MAX)
+-- CRLNumber ::= INTEGER (0..MAX)
 
 -- certificate issuer CRL entry extension OID and syntax
 
-CertificateIssuer ::= GeneralNames
+-- CertificateIssuer ::= GeneralNames
 
 -- --------------------------------------
 --  EXPLICIT
@@ -182,13 +182,13 @@ id-at           OBJECT IDENTIFIER ::= {joint-iso-ccitt(2) ds(5) 4}
 -- Maybe this is inefficient and memory consuming. Should we replace with
 -- a table that maps OIDs to structures?
 
-PostalAddress ::= SEQUENCE OF DirectoryString
+-- PostalAddress ::= SEQUENCE OF DirectoryString
 
  -- Legacy attributes
 
 emailAddress AttributeType      ::= { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 1 }
 
-Pkcs9email ::= IA5String (SIZE (1..ub-emailaddress-length))
+-- Pkcs9email ::= IA5String (SIZE (1..ub-emailaddress-length))
 
 -- naming data types --
 
@@ -612,11 +612,9 @@ ResponseData ::= SEQUENCE {
 
 ResponderID ::= CHOICE {
 -- Changed to work with the libtasn1 parser.
-   byName   [1] EXPLICIT RDNSequence, --Name,
-   byKey    [2] KeyHash }
-
-KeyHash ::= OCTET STRING --SHA-1 hash of responder's public key
-                         --(excluding the tag and length fields)
+   byName   [1] EXPLICIT RDNSequence, --Name
+   byKey    [2] OCTET STRING --SHA-1 hash of responder's public key 
+}
 
 SingleResponse ::= SEQUENCE {
    certID                       CertID,
@@ -635,14 +633,6 @@ RevokedInfo ::= SEQUENCE {
     revocationReason    [0]     EXPLICIT CRLReason OPTIONAL }
 
 UnknownInfo ::= NULL -- this can be replaced with an enumeration
-
-ArchiveCutoff ::= GeneralizedTime
-
-AcceptableResponses ::= SEQUENCE OF OBJECT IDENTIFIER
-
-ServiceLocator ::= SEQUENCE {
-    issuer    Name,
-    locator   AuthorityInfoAccessSyntax }
 
 -- rfc5280
 
