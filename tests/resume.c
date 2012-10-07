@@ -113,7 +113,7 @@ client (struct params_res *params)
 
       /* Initialize TLS session
        */
-      gnutls_init (&session, GNUTLS_CLIENT);
+      gnutls_init (&session, GNUTLS_CLIENT|GNUTLS_NO_EXTENSIONS);
 
       /* Use default priorities */
       gnutls_priority_set_direct (session, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);

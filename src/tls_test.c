@@ -275,7 +275,7 @@ main (int argc, char **argv)
               continue;
             }
         }
-      ERR (err, "connect") gnutls_init (&state, GNUTLS_CLIENT);
+      ERR (err, "connect") gnutls_init (&state, GNUTLS_CLIENT|GNUTLS_NO_EXTENSIONS);
       gnutls_transport_set_ptr (state, (gnutls_transport_ptr_t)
                                 gl_fd_to_handle (sd));
 

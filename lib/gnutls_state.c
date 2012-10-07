@@ -295,6 +295,11 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
  * also available. The latter flag will enable a non-blocking
  * operation of the DTLS timers. 
  *
+ * Note that since version 3.1.2 this function enables some common
+ * TLS extensions such as session tickets and OCSP certificate status
+ * request in client side by default. To prevent that use the %GNUTLS_NO_EXTENSIONS
+ * flag.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
@@ -401,6 +406,13 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
     (*session)->internals.dtls.blocking = 0;
   else
     (*session)->internals.dtls.blocking = 1;
+
+  /* Enable useful extensions */
+  if ((flags & GNUTLS_CLIENT) && !(flags & GNUTLS_NO_EXTENSIONS))
+    {
+      gnutls_session_ticket_enable_client(*session);
+      gnutls_ocsp_status_request_enable_client(*session, NULL, 0, NULL);
+    }
 
   return 0;
 }
