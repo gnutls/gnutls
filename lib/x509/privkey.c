@@ -1087,7 +1087,7 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since 3.1
+ * Since 3.1.3
  **/
 int
 gnutls_x509_privkey_export2 (gnutls_x509_privkey_t key,

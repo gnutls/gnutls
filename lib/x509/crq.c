@@ -1172,7 +1172,7 @@ gnutls_x509_crq_export (gnutls_x509_crq_t crq,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since 3.1
+ * Since 3.1.3
  **/
 int
 gnutls_x509_crq_export2 (gnutls_x509_crq_t crq,
