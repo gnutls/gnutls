@@ -1291,6 +1291,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                      gnutls_x509_crt_fmt_t format,
                                      unsigned char *params_data,
                                      size_t * params_data_size);
+  int gnutls_dh_params_export2_pkcs3 (gnutls_dh_params_t params,
+                                      gnutls_x509_crt_fmt_t format,
+                                      gnutls_datum_t *out);
   int gnutls_dh_params_export_raw (gnutls_dh_params_t params,
                                    gnutls_datum_t * prime,
                                    gnutls_datum_t * generator,

@@ -637,6 +637,37 @@ gnutls_x509_crl_export (gnutls_x509_crl_t crl,
                                   output_data, output_data_size);
 }
 
+/**
+ * gnutls_x509_crl_export2:
+ * @crl: Holds the revocation list
+ * @format: the format of output params. One of PEM or DER.
+ * @out: will contain a private key PEM or DER encoded
+ *
+ * This function will export the revocation list to DER or PEM format.
+ *
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN X509 CRL".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on failure.
+ *
+ * Since 3.1
+ **/
+int
+gnutls_x509_crl_export2 (gnutls_x509_crl_t crl,
+                        gnutls_x509_crt_fmt_t format, gnutls_datum_t *out)
+{
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_export_int2 (crl->crl, format, PEM_CRL, out);
+}
+
 /*-
  * _gnutls_x509_crl_cpy - This function copies a gnutls_x509_crl_t structure
  * @dest: The structure where to copy
@@ -651,37 +682,15 @@ int
 _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
 {
   int ret;
-  size_t der_size;
-  uint8_t *der;
   gnutls_datum_t tmp;
 
-  ret = gnutls_x509_crl_export (src, GNUTLS_X509_FMT_DER, NULL, &der_size);
-  if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  der = gnutls_malloc (der_size);
-  if (der == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  ret = gnutls_x509_crl_export (src, GNUTLS_X509_FMT_DER, der, &der_size);
+  ret = gnutls_x509_crl_export2 (src, GNUTLS_X509_FMT_DER, &tmp);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      gnutls_free (der);
-      return ret;
-    }
+    return gnutls_assert_val(ret);
 
-  tmp.data = der;
-  tmp.size = der_size;
   ret = gnutls_x509_crl_import (dest, &tmp, GNUTLS_X509_FMT_DER);
 
-  gnutls_free (der);
+  gnutls_free (tmp.data);
 
   if (ret < 0)
     {

@@ -1156,6 +1156,38 @@ gnutls_x509_crq_export (gnutls_x509_crq_t crq,
 }
 
 /**
+ * gnutls_x509_crq_export2:
+ * @crq: should contain a #gnutls_x509_crq_t structure
+ * @format: the format of output params. One of PEM or DER.
+ * @out: will contain a certificate request PEM or DER encoded
+ *
+ * This function will export the certificate request to a PEM or DER
+ * encoded PKCS10 structure.
+ *
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header of "BEGIN
+ * NEW CERTIFICATE REQUEST".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since 3.1
+ **/
+int
+gnutls_x509_crq_export2 (gnutls_x509_crq_t crq,
+                        gnutls_x509_crt_fmt_t format, gnutls_datum_t *out)
+{
+  if (crq == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_export_int2 (crq->crq, format, PEM_CRQ, out);
+}
+
+/**
  * gnutls_x509_crq_get_pk_algorithm:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @bits: if bits is non-%NULL it will hold the size of the parameters' in bits

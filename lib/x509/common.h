@@ -95,17 +95,21 @@ int _gnutls_x509_der_encode_and_copy (ASN1_TYPE src, const char *src_name,
 int _gnutls_x509_der_encode (ASN1_TYPE src, const char *src_name,
                              gnutls_datum_t * res, int str);
 
-int _gnutls_x509_export_int (ASN1_TYPE asn1_data,
-                             gnutls_x509_crt_fmt_t format,
-                             const char *pem_header,
-                             unsigned char *output_data,
-                             size_t * output_data_size);
+#define _gnutls_x509_export_int(asn1, format, header, out, out_size) \
+  _gnutls_x509_export_int_named(asn1, "", format, header, out, out_size)
 
 int _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
                                    gnutls_x509_crt_fmt_t format,
                                    const char *pem_header,
                                    unsigned char *output_data,
                                    size_t * output_data_size);
+
+#define _gnutls_x509_export_int2(asn1, format, header, out) \
+  _gnutls_x509_export_int_named2(asn1, "", format, header, out)
+int _gnutls_x509_export_int_named2 (ASN1_TYPE asn1_data, const char *name,
+                                    gnutls_x509_crt_fmt_t format,
+                                    const char *pem_header,
+                                    gnutls_datum_t * out);
 
 int _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
                              gnutls_datum_t * ret, int str);

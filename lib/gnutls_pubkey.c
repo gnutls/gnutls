@@ -540,7 +540,74 @@ cleanup:
   asn1_delete_structure (&spk);
 
   return result;
+}
 
+/**
+ * gnutls_pubkey_export2:
+ * @key: Holds the certificate
+ * @format: the format of output params. One of PEM or DER.
+ * @out: will contain a certificate PEM or DER encoded
+ *
+ * This function will export the public key to DER or PEM format.
+ * The contents of the exported data is the SubjectPublicKeyInfo
+ * X.509 structure.
+ *
+ * The output buffer will be allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN CERTIFICATE".
+ *
+ * Returns: In case of failure a negative error code will be
+ *   returned, and 0 on success.
+ *
+ * Since: 3.1.3
+ **/
+int
+gnutls_pubkey_export2 (gnutls_pubkey_t key,
+                       gnutls_x509_crt_fmt_t format, 
+                       gnutls_datum_t * out)
+{
+  int result;
+  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  if ((result = asn1_create_element
+       (_gnutls_get_pkix (), "PKIX1.SubjectPublicKeyInfo", &spk))
+      != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result =
+    _gnutls_x509_encode_and_copy_PKI_params (spk, "",
+                                             key->pk_algorithm,
+                                             &key->params);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_export_int_named2 (spk, "",
+                                           format, PK_PEM_HEADER, out);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  result = 0;
+
+cleanup:
+  asn1_delete_structure (&spk);
+
+  return result;
 }
 
 /**

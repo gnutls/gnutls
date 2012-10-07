@@ -230,6 +230,31 @@ gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
                                  output_data_size, 1);
 }
 
+/**
+ * gnutls_openpgp_privkey_export2:
+ * @key: Holds the key.
+ * @format: One of gnutls_openpgp_crt_fmt_t elements.
+ * @password: the password that will be used to encrypt the key. (unused for now)
+ * @flags: (0) for future compatibility
+ * @out: will contain the raw or based64 encoded key
+ *
+ * This function will convert the given key to RAW or Base64 format.
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.1
+ **/
+int
+gnutls_openpgp_privkey_export2 (gnutls_openpgp_privkey_t key,
+                                gnutls_openpgp_crt_fmt_t format,
+                                const char *password, unsigned int flags,
+                                gnutls_datum_t *out)
+{
+  /* FIXME for now we do not export encrypted keys */
+  return _gnutls_openpgp_export2 (key->knode, format, out, 1);
+}
+
 
 /**
  * gnutls_openpgp_privkey_get_pk_algorithm:

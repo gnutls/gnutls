@@ -108,6 +108,10 @@ int gnutls_pubkey_export (gnutls_pubkey_t key,
                           gnutls_x509_crt_fmt_t format,
                           void *output_data, size_t * output_data_size);
 
+int gnutls_pubkey_export2 (gnutls_pubkey_t key,
+                           gnutls_x509_crt_fmt_t format,
+                           gnutls_datum_t * out);
+
 int gnutls_pubkey_get_key_id (gnutls_pubkey_t key, unsigned int flags,
                               unsigned char *output_data,
                               size_t * output_data_size);

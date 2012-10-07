@@ -120,7 +120,8 @@ void gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t obj);
 
 int gnutls_pkcs11_obj_export (gnutls_pkcs11_obj_t obj,
                               void *output_data, size_t * output_data_size);
-
+int gnutls_pkcs11_obj_export2 (gnutls_pkcs11_obj_t obj,
+                               gnutls_datum_t *out);
 
 int gnutls_pkcs11_copy_x509_crt (const char *token_url, gnutls_x509_crt_t crt,
                                  const char *label, unsigned int flags

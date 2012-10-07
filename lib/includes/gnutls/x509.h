@@ -123,6 +123,9 @@ extern "C"
   int gnutls_x509_crt_export (gnutls_x509_crt_t cert,
                               gnutls_x509_crt_fmt_t format,
                               void *output_data, size_t * output_data_size);
+  int gnutls_x509_crt_export2 (gnutls_x509_crt_t cert,
+                               gnutls_x509_crt_fmt_t format,
+                               gnutls_datum_t* out);
   int gnutls_x509_crt_get_private_key_usage_period (gnutls_x509_crt_t cert, time_t* activation, time_t* expiration, 
                                      unsigned int *critical);
 
@@ -463,6 +466,9 @@ extern "C"
   int gnutls_x509_dn_export (gnutls_x509_dn_t dn,
                              gnutls_x509_crt_fmt_t format, void *output_data,
                              size_t * output_data_size);
+  int gnutls_x509_dn_export2 (gnutls_x509_dn_t dn,
+                             gnutls_x509_crt_fmt_t format,
+                             gnutls_datum_t * out);
 
   void gnutls_x509_dn_deinit (gnutls_x509_dn_t dn);
 
@@ -478,6 +484,9 @@ extern "C"
   int gnutls_x509_crl_export (gnutls_x509_crl_t crl,
                               gnutls_x509_crt_fmt_t format,
                               void *output_data, size_t * output_data_size);
+  int gnutls_x509_crl_export2 (gnutls_x509_crl_t crl,
+                               gnutls_x509_crt_fmt_t format,
+                               gnutls_datum_t *out);
 
   int
   gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
@@ -580,6 +589,9 @@ extern "C"
   int gnutls_pkcs7_export (gnutls_pkcs7_t pkcs7,
                            gnutls_x509_crt_fmt_t format,
                            void *output_data, size_t * output_data_size);
+  int gnutls_pkcs7_export2 (gnutls_pkcs7_t pkcs7,
+                            gnutls_x509_crt_fmt_t format,
+                            gnutls_datum_t *out);
 
   int gnutls_pkcs7_get_crt_count (gnutls_pkcs7_t pkcs7);
   int gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7, int indx,
@@ -803,12 +815,20 @@ extern "C"
                                   gnutls_x509_crt_fmt_t format,
                                   void *output_data,
                                   size_t * output_data_size);
+  int gnutls_x509_privkey_export2 (gnutls_x509_privkey_t key,
+                                   gnutls_x509_crt_fmt_t format,
+                                   gnutls_datum_t * out);
   int gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
                                         gnutls_x509_crt_fmt_t format,
                                         const char *password,
                                         unsigned int flags,
                                         void *output_data,
                                         size_t * output_data_size);
+  int gnutls_x509_privkey_export2_pkcs8 (gnutls_x509_privkey_t key,
+                                         gnutls_x509_crt_fmt_t format,
+                                         const char *password,
+                                         unsigned int flags,
+                                         gnutls_datum_t * out);
   int gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
                                            gnutls_datum_t * m,
                                            gnutls_datum_t * e,
@@ -887,6 +907,9 @@ extern "C"
   int gnutls_x509_crq_export (gnutls_x509_crq_t crq,
                               gnutls_x509_crt_fmt_t format,
                               void *output_data, size_t * output_data_size);
+  int gnutls_x509_crq_export2 (gnutls_x509_crq_t crq,
+                               gnutls_x509_crt_fmt_t format,
+                               gnutls_datum_t * out);
 
   int gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
   int gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,

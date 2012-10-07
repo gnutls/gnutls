@@ -306,7 +306,6 @@ static int crt_to_pubkey(const gnutls_datum_t *raw_crt, gnutls_datum_t * out)
 gnutls_pubkey_t pub = NULL;
 gnutls_x509_crt_t crt = NULL;
 int ret;
-size_t size;
 
 	out->data = NULL;
 
@@ -332,27 +331,12 @@ size_t size;
 		goto cleanup;
 	}
 
-	size = 0;
-	ret = gnutls_pubkey_export(pub, GNUTLS_X509_FMT_DER, NULL, &size);
-	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		ret = DANE_E_PUBKEY_ERROR;
-		goto cleanup;
-	}
-	
-	out->data = malloc(size);
-	if (out->data == NULL) {
-		ret = DANE_E_MEMORY_ERROR;
-		goto cleanup;
-	}
-
-	ret = gnutls_pubkey_export(pub, GNUTLS_X509_FMT_DER, out->data, &size);
+	ret = gnutls_pubkey_export2(pub, GNUTLS_X509_FMT_DER, out);
 	if (ret < 0) {
 		ret = DANE_E_PUBKEY_ERROR;
 		goto cleanup;
 	}
 	
-	out->size = size;
-
 	ret = 0;
 	goto clean_certs;
 

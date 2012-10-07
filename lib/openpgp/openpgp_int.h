@@ -63,7 +63,11 @@ int _gnutls_map_cdk_rc (int rc);
 int _gnutls_openpgp_export (cdk_kbnode_t node,
                             gnutls_openpgp_crt_fmt_t format,
                             void *output_data, size_t * output_data_size,
-                            int private);
+                            int priv);
+
+int _gnutls_openpgp_export2 (cdk_kbnode_t node,
+                             gnutls_openpgp_crt_fmt_t format,
+                             gnutls_datum_t* out, int priv);
 
 cdk_packet_t _gnutls_get_valid_subkey (cdk_kbnode_t knode, int key_type);
 

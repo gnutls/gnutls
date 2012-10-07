@@ -13,6 +13,8 @@ certificate status extension in verification.
 ** libgnutls: Fixed the receipt of session tickets during session resumption.
 Reported by danblack at http://savannah.gnu.org/support/?108146
 
+** libgnutls: Added functions to export structures in an allocated buffer.
+
 ** libgnutls: Added gnutls_ocsp_resp_check_crt() to check whether the OCSP
 response corresponds to the given certificate.
 
@@ -25,6 +27,19 @@ gnutls_certificate_set_ocsp_status_request_file: Added
 gnutls_ocsp_status_request_enable_client: Added
 gnutls_ocsp_status_request_get: Added
 gnutls_ocsp_resp_check_crt: Added
+gnutls_dh_params_export2_pkcs3: Added
+gnutls_pubkey_export2: Added
+gnutls_x509_crt_export2: Added
+gnutls_x509_dn_export2: Added
+gnutls_x509_crl_export2: Added
+gnutls_pkcs7_export2: Added
+gnutls_x509_privkey_export2: Added
+gnutls_x509_privkey_export2_pkcs8: Added
+gnutls_x509_crq_export2: Added
+gnutls_openpgp_crt_export2: Added
+gnutls_openpgp_privkey_export2: Added
+gnutls_pkcs11_obj_export2: Added
+gnutls_pkcs12_export2: Added
 dane_query_init: Added
 dane_query_deinit: Added
 dane_query_resolve_tlsa: Added

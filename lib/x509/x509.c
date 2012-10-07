@@ -2340,6 +2340,36 @@ gnutls_x509_crt_export (gnutls_x509_crt_t cert,
                                   output_data, output_data_size);
 }
 
+/**
+ * gnutls_x509_crt_export2:
+ * @cert: Holds the certificate
+ * @format: the format of output params. One of PEM or DER.
+ * @out: will contain a certificate PEM or DER encoded
+ *
+ * This function will export the certificate to DER or PEM format.
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN CERTIFICATE".
+ *
+ * Returns: In case of failure a negative error code will be
+ *   returned, and 0 on success.
+ *
+ * Since: 3.1
+ **/
+int
+gnutls_x509_crt_export2 (gnutls_x509_crt_t cert,
+                        gnutls_x509_crt_fmt_t format, gnutls_datum_t * out)
+{
+  if (cert == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_export_int2 (cert->cert, format, "CERTIFICATE", out);
+}
+
 int
 _gnutls_get_key_id (gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params,
                     unsigned char *output_data,

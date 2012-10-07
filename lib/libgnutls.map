@@ -841,6 +841,19 @@ GNUTLS_3_1_0 {
 	gnutls_certificate_set_ocsp_status_request_file;
 	gnutls_ocsp_status_request_enable_client;
 	gnutls_ocsp_status_request_get;
+	gnutls_dh_params_export2_pkcs3;
+	gnutls_pubkey_export2;
+	gnutls_x509_crt_export2;
+	gnutls_x509_dn_export2;
+	gnutls_x509_crl_export2;
+	gnutls_pkcs7_export2;
+	gnutls_x509_privkey_export2;
+	gnutls_x509_privkey_export2_pkcs8;
+	gnutls_x509_crq_export2;
+	gnutls_openpgp_crt_export2;
+	gnutls_openpgp_privkey_export2;
+	gnutls_pkcs11_obj_export2;
+	gnutls_pkcs12_export2;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

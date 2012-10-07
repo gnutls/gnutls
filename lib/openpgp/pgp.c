@@ -119,13 +119,39 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
   return 0;
 }
 
+int _gnutls_openpgp_export2 (cdk_kbnode_t node,
+                             gnutls_openpgp_crt_fmt_t format,
+                             gnutls_datum_t* out, int priv)
+{
+int ret;
+size_t size = 0;
+
+  ret = _gnutls_openpgp_export(node, format, NULL, &size, priv);
+  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+    {
+      out->data = gnutls_malloc(size);
+    
+      ret = _gnutls_openpgp_export(node, format, out->data, &size, priv);
+      if (ret < 0)
+        {
+          gnutls_free(out->data);
+          return gnutls_assert_val(ret);
+        }
+      out->size = size;
+    }
+  else if (ret < 0)
+    return gnutls_assert_val(ret);
+    
+  return 0;
+}
+
 /* internal version of export
  */
 int
 _gnutls_openpgp_export (cdk_kbnode_t node,
                         gnutls_openpgp_crt_fmt_t format,
                         void *output_data,
-                        size_t * output_data_size, int private)
+                        size_t * output_data_size, int priv)
 {
   size_t input_data_size = *output_data_size;
   size_t calc_size;
@@ -141,7 +167,7 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
 
   /* If the caller uses output_data == NULL then return what he expects.
    */
-  if (!output_data)
+  if (!output_data && format != GNUTLS_OPENPGP_FMT_BASE64)
     {
       gnutls_assert ();
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -156,7 +182,7 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
          buffer is large enough. */
       rc = cdk_armor_encode_buffer (in, *output_data_size,
                                     NULL, 0, &calc_size,
-                                    private ? CDK_ARMOR_SECKEY :
+                                    priv ? CDK_ARMOR_SECKEY :
                                     CDK_ARMOR_PUBKEY);
       if (rc || calc_size > input_data_size)
         {
@@ -168,7 +194,7 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
 
       rc = cdk_armor_encode_buffer (in, *output_data_size,
                                     output_data, input_data_size, &calc_size,
-                                    private ? CDK_ARMOR_SECKEY :
+                                    priv ? CDK_ARMOR_SECKEY :
                                     CDK_ARMOR_PUBKEY);
       gnutls_free (in);
       *output_data_size = calc_size;
@@ -189,7 +215,7 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
  * gnutls_openpgp_crt_export:
  * @key: Holds the key.
  * @format: One of gnutls_openpgp_crt_fmt_t elements.
- * @output_data: will contain the key base64 encoded or raw
+ * @output_data: will contain the raw or base64 encoded key
  * @output_data_size: holds the size of output_data (and will
  *   be replaced by the actual size of parameters)
  *
@@ -206,6 +232,25 @@ gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
 {
   return _gnutls_openpgp_export (key->knode, format, output_data,
                                  output_data_size, 0);
+}
+
+/**
+ * gnutls_openpgp_crt_export2:
+ * @key: Holds the key.
+ * @format: One of gnutls_openpgp_crt_fmt_t elements.
+ * @out: will contain the raw or base64 encoded key
+ *
+ * This function will convert the given key to RAW or Base64 format.
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
+int
+gnutls_openpgp_crt_export2 (gnutls_openpgp_crt_t key,
+                            gnutls_openpgp_crt_fmt_t format,
+                            gnutls_datum_t *out)
+{
+  return _gnutls_openpgp_export2 (key->knode, format, out, 0);
 }
 
 /**

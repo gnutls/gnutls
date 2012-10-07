@@ -46,6 +46,9 @@ extern "C"
   int gnutls_pkcs12_export (gnutls_pkcs12_t pkcs12,
                             gnutls_x509_crt_fmt_t format,
                             void *output_data, size_t * output_data_size);
+  int gnutls_pkcs12_export2 (gnutls_pkcs12_t pkcs12,
+                             gnutls_x509_crt_fmt_t format,
+                             gnutls_datum_t *out);
 
   int gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
                              int indx, gnutls_pkcs12_bag_t bag);

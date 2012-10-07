@@ -276,6 +276,37 @@ gnutls_pkcs12_export (gnutls_pkcs12_t pkcs12,
                                   output_data, output_data_size);
 }
 
+/**
+ * gnutls_pkcs12_export2:
+ * @pkcs12: Holds the pkcs12 structure
+ * @format: the format of output params. One of PEM or DER.
+ * @out: will contain a structure PEM or DER encoded
+ *
+ * This function will export the pkcs12 structure to DER or PEM format.
+ *
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN PKCS12".
+ *
+ * Returns: In case of failure a negative error code will be
+ *   returned, and 0 on success.
+ *
+ * Since: 3.1
+ **/
+int
+gnutls_pkcs12_export2 (gnutls_pkcs12_t pkcs12,
+                      gnutls_x509_crt_fmt_t format, gnutls_datum_t *out)
+{
+  if (pkcs12 == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_export_int2 (pkcs12->pkcs12, format, PEM_PKCS12, out);
+}
+
 static int
 oid2bag (const char *oid)
 {

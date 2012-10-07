@@ -660,6 +660,95 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
   return ret;
 }
 
+/**
+ * gnutls_x509_privkey_export2_pkcs8:
+ * @key: Holds the key
+ * @format: the format of output params. One of PEM or DER.
+ * @password: the password that will be used to encrypt the key.
+ * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
+ * @out: will contain a private key PEM or DER encoded
+ *
+ * This function will export the private key to a PKCS8 structure.
+ * Both RSA and DSA keys can be exported. For DSA keys we use
+ * PKCS #11 definitions. If the flags do not specify the encryption
+ * cipher, then the default 3DES (PBES2) will be used.
+ *
+ * The @password can be either ASCII or UTF-8 in the default PBES2
+ * encryption schemas, or ASCII for the PKCS12 schemas.
+ *
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN ENCRYPTED PRIVATE KEY" or "BEGIN PRIVATE KEY" if
+ * encryption is not used.
+ *
+ * Returns: In case of failure a negative error code will be
+ *   returned, and 0 on success.
+ *
+ * Since 3.1
+ **/
+int
+gnutls_x509_privkey_export2_pkcs8 (gnutls_x509_privkey_t key,
+                                   gnutls_x509_crt_fmt_t format,
+                                   const char *password,
+                                   unsigned int flags,
+                                   gnutls_datum_t *out)
+{
+  ASN1_TYPE pkcs8_asn, pkey_info;
+  int ret;
+  gnutls_datum_t tmp;
+  schema_id schema;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* Get the private key info
+   * tmp holds the DER encoding.
+   */
+  ret = encode_to_private_key_info (key, &tmp, &pkey_info);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  schema = _gnutls_pkcs_flags_to_schema (flags);
+
+  if (((flags & GNUTLS_PKCS_PLAIN) || password == NULL) && !(flags & GNUTLS_PKCS_NULL_PASSWORD))
+    {
+      _gnutls_free_datum (&tmp);
+
+      ret =
+        _gnutls_x509_export_int2 (pkey_info, format,
+                                 PEM_UNENCRYPTED_PKCS8, out);
+
+      asn1_delete_structure (&pkey_info);
+    }
+  else
+    {
+      asn1_delete_structure (&pkey_info);       /* we don't need it */
+      
+      ret = encode_to_pkcs8_key (schema, &tmp, password, &pkcs8_asn);
+      _gnutls_free_datum (&tmp);
+
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
+
+      ret =
+        _gnutls_x509_export_int2 (pkcs8_asn, format, PEM_PKCS8, out);
+
+      asn1_delete_structure (&pkcs8_asn);
+    }
+
+  return ret;
+}
+
 
 /* Read the parameters cipher, IV, salt etc using the given
  * schema ID.

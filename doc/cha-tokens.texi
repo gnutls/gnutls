@@ -71,7 +71,7 @@ sequence.
 
 @showfuncC{gnutls_pubkey_import_url,gnutls_pubkey_import_privkey,gnutls_pubkey_import}
 
-@showfuncdesc{gnutls_pubkey_export}
+@showfuncB{gnutls_pubkey_export,gnutls_pubkey_export2}
 
 An important function is @funcref{gnutls_pubkey_import_url} which will import
 public keys from URLs that identify objects stored in tokens (see @ref{Smart cards and HSMs} and @ref{Trusted Platform Module}).

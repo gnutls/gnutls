@@ -1016,6 +1016,18 @@ int ret;
   return key->pk_algorithm;
 }
 
+static const char* set_msg(gnutls_x509_privkey_t key)
+{
+  if (key->pk_algorithm == GNUTLS_PK_RSA)
+    return PEM_KEY_RSA;
+  else if (key->pk_algorithm == GNUTLS_PK_DSA)
+    return PEM_KEY_DSA;
+  else if (key->pk_algorithm == GNUTLS_PK_EC)
+    return PEM_KEY_ECC;
+  else
+    return "UNKNOWN";
+}
+
 /**
  * gnutls_x509_privkey_export:
  * @key: Holds the key
@@ -1051,17 +1063,48 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (key->pk_algorithm == GNUTLS_PK_RSA)
-    msg = PEM_KEY_RSA;
-  else if (key->pk_algorithm == GNUTLS_PK_DSA)
-    msg = PEM_KEY_DSA;
-  else if (key->pk_algorithm == GNUTLS_PK_EC)
-    msg = PEM_KEY_ECC;
-  else
-    msg = "UNKNOWN";
+  msg = set_msg(key);
 
   return _gnutls_x509_export_int (key->key, format, msg,
                                   output_data, output_data_size);
+}
+
+/**
+ * gnutls_x509_privkey_export2:
+ * @key: Holds the key
+ * @format: the format of output params. One of PEM or DER.
+ * @out: will contain a private key PEM or DER encoded
+ *
+ * This function will export the private key to a PKCS1 structure for
+ * RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
+ * the same format with the parameters used by openssl.
+ *
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN RSA PRIVATE KEY".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since 3.1
+ **/
+int
+gnutls_x509_privkey_export2 (gnutls_x509_privkey_t key,
+                            gnutls_x509_crt_fmt_t format,
+                            gnutls_datum_t * out)
+{
+  const char *msg;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  msg = set_msg(key);
+
+  return _gnutls_x509_export_int2 (key->key, format, msg, out);
 }
 
 /**

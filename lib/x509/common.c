@@ -776,89 +776,76 @@ _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
                                unsigned char *output_data,
                                size_t * output_data_size)
 {
-  int result, len;
+  int ret;
+  gnutls_datum_t out;
+  size_t size;
+
+  ret = _gnutls_x509_export_int_named2 (asn1_data, name,
+                                        format, pem_header, &out);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (format == GNUTLS_X509_FMT_PEM)
+    size = out.size+1;
+  else
+    size = out.size;
+
+  if (*output_data_size < size)
+    {
+      *output_data_size = size;
+      ret = gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+      goto cleanup;
+    }
+
+  *output_data_size = (size_t)out.size;
+  if (output_data)
+    {
+      memcpy (output_data, out.data, (size_t)out.size);
+      if (format == GNUTLS_X509_FMT_PEM)
+        output_data[out.size] = 0;
+    }
+
+  ret = 0;
+
+cleanup:
+  gnutls_free (out.data);
+
+  return ret;
+}
+
+/* A generic export function. Will export the given ASN.1 encoded data
+ * to PEM or DER raw data.
+ */
+int
+_gnutls_x509_export_int_named2 (ASN1_TYPE asn1_data, const char *name,
+                                gnutls_x509_crt_fmt_t format,
+                                const char *pem_header,
+                                gnutls_datum_t *out)
+{
+  int ret;
 
   if (format == GNUTLS_X509_FMT_DER)
     {
-
-      if (output_data == NULL)
-        *output_data_size = 0;
-
-      len = *output_data_size;
-
-      if ((result =
-           asn1_der_coding (asn1_data, name, output_data, &len,
-                            NULL)) != ASN1_SUCCESS)
-        {
-          *output_data_size = (size_t)len;
-          if (result == ASN1_MEM_ERROR)
-            {
-              return GNUTLS_E_SHORT_MEMORY_BUFFER;
-            }
-          gnutls_assert ();
-          return _gnutls_asn2err (result);
-        }
-
-      *output_data_size = (size_t)len;
-
+      ret = _gnutls_x509_der_encode(asn1_data, name, out, 0);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
   else
     {                           /* PEM */
-      gnutls_datum_t out;
       gnutls_datum_t tmp;
 
-      result = _gnutls_x509_der_encode (asn1_data, name, &tmp, 0);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          return result;
-        }
+      ret = _gnutls_x509_der_encode (asn1_data, name, &tmp, 0);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
 
-      result = _gnutls_fbase64_encode (pem_header, tmp.data, tmp.size, &out);
-
+      ret = _gnutls_fbase64_encode (pem_header, tmp.data, tmp.size, out);
       _gnutls_free_datum (&tmp);
 
-      if (result < 0)
-        {
-          gnutls_assert ();
-          return result;
-        }
-
-      if ((size_t) out.size > *output_data_size)
-        {
-          gnutls_assert ();
-          gnutls_free (out.data);
-          *output_data_size = (size_t)out.size+1;
-          return GNUTLS_E_SHORT_MEMORY_BUFFER;
-        }
-
-      *output_data_size = (size_t)out.size;
-
-      if (output_data)
-        {
-          memcpy (output_data, out.data, (size_t)out.size);
-
-          /* do not include the null character into output size.
-           */
-          *output_data_size = (size_t)result - 1;
-        }
-      gnutls_free (out.data);
-
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
   return 0;
-}
-
-int
-_gnutls_x509_export_int (ASN1_TYPE asn1_data,
-                         gnutls_x509_crt_fmt_t format,
-                         const char *pem_header,
-                         unsigned char *output_data,
-                         size_t * output_data_size)
-{
-  return _gnutls_x509_export_int_named (asn1_data, "",
-                                        format, pem_header, output_data,
-                                        output_data_size);
 }
 
 /* Decodes an octet string. Leave string_type null for a normal

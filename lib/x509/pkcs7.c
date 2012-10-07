@@ -432,6 +432,32 @@ gnutls_pkcs7_export (gnutls_pkcs7_t pkcs7,
                                   output_data, output_data_size);
 }
 
+/**
+ * gnutls_pkcs7_export2:
+ * @pkcs7: Holds the pkcs7 structure
+ * @format: the format of output params. One of PEM or DER.
+ * @out: will contain a structure PEM or DER encoded
+ *
+ * This function will export the pkcs7 structure to DER or PEM format.
+ *
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN PKCS7".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+  **/
+int
+gnutls_pkcs7_export2 (gnutls_pkcs7_t pkcs7,
+                     gnutls_x509_crt_fmt_t format, gnutls_datum_t *out)
+{
+  if (pkcs7 == NULL)
+    return GNUTLS_E_INVALID_REQUEST;
+
+  return _gnutls_x509_export_int2 (pkcs7->pkcs7, format, PEM_PKCS7, out);
+}
+
 /* Creates an empty signed data structure in the pkcs7
  * structure and returns a handle to the signed data.
  */

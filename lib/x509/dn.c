@@ -1241,3 +1241,35 @@ gnutls_x509_dn_export (gnutls_x509_dn_t dn,
                                         format, "NAME",
                                         output_data, output_data_size);
 }
+
+/**
+ * gnutls_x509_dn_export2:
+ * @dn: Holds the uint8_t DN object
+ * @format: the format of output params. One of PEM or DER.
+ * @out: will contain a DN PEM or DER encoded
+ *
+ * This function will export the DN to DER or PEM format.
+ *
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN NAME".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_dn_export2 (gnutls_x509_dn_t dn,
+                        gnutls_x509_crt_fmt_t format, gnutls_datum_t *out)
+{
+  ASN1_TYPE asn1 = dn;
+
+  if (asn1 == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_export_int_named2 (asn1, "rdnSequence",
+                                         format, "NAME", out);
+}

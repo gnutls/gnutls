@@ -68,6 +68,9 @@ extern "C"
                                  gnutls_openpgp_crt_fmt_t format,
                                  void *output_data,
                                  size_t * output_data_size);
+  int gnutls_openpgp_crt_export2 (gnutls_openpgp_crt_t key,
+                                  gnutls_openpgp_crt_fmt_t format,
+                                  gnutls_datum_t * out);
 
   int gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
                                 gnutls_certificate_print_formats_t format,
@@ -241,6 +244,11 @@ extern "C"
                                      unsigned int flags,
                                      void *output_data,
                                      size_t * output_data_size);
+  int gnutls_openpgp_privkey_export2 (gnutls_openpgp_privkey_t key,
+                                      gnutls_openpgp_crt_fmt_t format,
+                                      const char *password,
+                                      unsigned int flags,
+                                      gnutls_datum_t * out);
 
   int
     gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,

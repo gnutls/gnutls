@@ -99,7 +99,7 @@ Optional CRL structure extensions.
 
 The basic CRL structure functions follow.
 
-@showfuncC{gnutls_x509_crl_init,gnutls_x509_crl_import,gnutls_x509_crl_export}
+@showfuncD{gnutls_x509_crl_init,gnutls_x509_crl_import,gnutls_x509_crl_export,gnutls_x509_crl_export}
 
 @subheading Reading a CRL
 
@@ -322,7 +322,7 @@ enumeration. Note however, that GnuTLS only supports the PKCS #5 PBES2
 encryption scheme. Keys encrypted with the obsolete PBES1 scheme cannot 
 be decrypted.
 
-@showfuncB{gnutls_x509_privkey_import_pkcs8,gnutls_x509_privkey_export_pkcs8}
+@showfuncC{gnutls_x509_privkey_import_pkcs8,gnutls_x509_privkey_export_pkcs8,gnutls_x509_privkey_export2_pkcs8}
 
 @showenumdesc{gnutls_pkcs_encrypt_flags_t,Encryption flags}
 

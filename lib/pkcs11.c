@@ -832,6 +832,38 @@ gnutls_pkcs11_obj_export (gnutls_pkcs11_obj_t obj,
   return 0;
 }
 
+/**
+ * gnutls_pkcs11_obj_export2:
+ * @obj: Holds the object
+ * @out: will contain a certificate PEM or DER encoded
+ *
+ * This function will export the PKCS11 object data.  It is normal for
+ * data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
+ * will be returned.
+ *
+ * The output buffer is allocated using gnutls_malloc().
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN CERTIFICATE".
+ *
+ * Returns: In case of failure a negative error code will be
+ *   returned, and %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Since: 3.1
+ **/
+int
+gnutls_pkcs11_obj_export2 (gnutls_pkcs11_obj_t obj,
+                           gnutls_datum_t *out)
+{
+  if (obj == NULL || obj->raw.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_set_datum(out, obj->raw.data, obj->raw.size);
+}
+
 int
 pkcs11_find_object (struct pkcs11_session_info* sinfo,
                     struct pin_info_st * pin_info,
