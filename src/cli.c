@@ -503,10 +503,6 @@ cert_verify_callback (gnutls_session_t session)
                 fprintf(stderr, "- The certificate differs.\n");
               if (status & DANE_VERIFY_NO_DANE_INFO)
                 fprintf(stderr, "- There was no DANE information.\n");
-              if (status & DANE_VERIFY_DNSSEC_DATA_INVALID)
-                fprintf(stderr, "- The DNSSEC signature is invalid.\n");
-              if (status & DANE_VERIFY_NO_DNSSEC_DATA)
-                fprintf(stderr, "- There was no DNSSEC signature.\n");
               if (!insecure)
                 return -1;
             }

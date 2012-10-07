@@ -234,7 +234,7 @@ int dane_query_resolve_tlsa(dane_query_t q, const char* host, const char* proto,
 		q->type[i] = q->result->data[i][1];
 		q->match[i] = q->result->data[i][2];
 		q->data[i].data = (void*)&q->result->data[i][3];
-		q->data[i].size = q->result->len[i];
+		q->data[i].size = q->result->len[i] - 3;
 		i++;
 	} while(q->result->data[i] != NULL);
 	
@@ -273,7 +273,7 @@ int ret;
 		return 1;
 	} else if (match == DANE_MATCH_SHA2_256) {
 
-		if (raw2->size < 32)
+		if (raw2->size != 32)
 			return 0;
 		
 		ret = gnutls_hash_fast(GNUTLS_DIG_SHA256, raw1->data, raw1->size, digest);
@@ -285,7 +285,7 @@ int ret;
 		
 		return 1;
 	} else if (match == DANE_MATCH_SHA2_512) {
-		if (raw2->size < 64)
+		if (raw2->size != 64)
 			return 0;
 		
 		ret = gnutls_hash_fast(GNUTLS_DIG_SHA512, raw1->data, raw1->size, digest);
@@ -445,7 +445,7 @@ int dane_verify_crt (
 {
 dane_query_t q;
 int ret;
-unsigned int usage, type, match, idx, status;
+unsigned int usage, type, match, idx;
 gnutls_datum_t data;
 	
 	if (chain_type != GNUTLS_CRT_X509)
@@ -460,15 +460,6 @@ gnutls_datum_t data;
 	
 	ret = dane_query_resolve_tlsa(q, hostname, proto, port);
 	if (ret < 0) {
-		goto cleanup;
-	}
-
-	status = dane_query_status(q);
-	if (status == DANE_QUERY_BOGUS) {
-		*verify |= DANE_VERIFY_DNSSEC_DATA_INVALID;
-		goto cleanup;
-	} else if (status == DANE_QUERY_NO_DNSSEC) {
-		*verify |= DANE_VERIFY_NO_DNSSEC_DATA;
 		goto cleanup;
 	}
 

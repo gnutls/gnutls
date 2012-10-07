@@ -107,8 +107,6 @@ unsigned int dane_query_entries(dane_query_t q);
  * @DANE_VERIFY_CA_CONSTRAINS_VIOLATED: The CA constrains was violated.
  * @DANE_VERIFY_CERT_DIFFERS: The certificate obtained via DNS differs.
  * @DANE_VERIFY_NO_DANE_INFO: No DANE data were found in the DNS record.
- * @DANE_VERIFY_DNSSEC_DATA_INVALID: The DNSSEC data are invalid.
- * @DANE_VERIFY_NO_DNSSEC_DATA: The DNS data were not signed using DNSSEC.
  *
  * Enumeration of different verification status flags.
  */
@@ -117,8 +115,6 @@ typedef enum dane_verify_status_t
   DANE_VERIFY_CA_CONSTRAINS_VIOLATED = 1,
   DANE_VERIFY_CERT_DIFFERS = 1<<1,
   DANE_VERIFY_NO_DANE_INFO = 1<<2,
-  DANE_VERIFY_DNSSEC_DATA_INVALID = 1<<3,
-  DANE_VERIFY_NO_DNSSEC_DATA = 1<<4,
 } dane_verify_status_t;
 
 /**
