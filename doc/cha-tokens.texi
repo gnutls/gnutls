@@ -73,6 +73,11 @@ sequence.
 
 @showfuncB{gnutls_pubkey_export,gnutls_pubkey_export2}
 
+Other helper functions that allow directly importing from raw X.509 or
+OpenPGP structures are shown below. 
+
+@showfuncB{gnutls_pubkey_import_x509_raw,gnutls_pubkey_import_openpgp_raw}
+
 An important function is @funcref{gnutls_pubkey_import_url} which will import
 public keys from URLs that identify objects stored in tokens (see @ref{Smart cards and HSMs} and @ref{Trusted Platform Module}).
 A function to check for a supported by GnuTLS URL is @funcref{gnutls_url_is_supported}.

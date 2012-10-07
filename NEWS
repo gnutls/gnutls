@@ -40,6 +40,8 @@ gnutls_openpgp_crt_export2: Added
 gnutls_openpgp_privkey_export2: Added
 gnutls_pkcs11_obj_export2: Added
 gnutls_pkcs12_export2: Added
+gnutls_pubkey_import_openpgp_raw: Added
+gnutls_pubkey_import_x509_raw: Added
 dane_query_init: Added
 dane_query_deinit: Added
 dane_query_resolve_tlsa: Added

@@ -467,6 +467,67 @@ gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
   return 0;
 }
 
+/**
+ * gnutls_pubkey_import_openpgp_raw:
+ * @pkey: The public key
+ * @data: The public key data to be imported
+ * @format: The format of the public key
+ * @keyid: The key id to use (optional)
+ * @flags: Should be zero
+ *
+ * This function will import the given public key to the abstract
+ * #gnutls_pubkey_t structure. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.3
+ **/
+int gnutls_pubkey_import_openpgp_raw (gnutls_pubkey_t pkey,
+                                      const gnutls_datum_t * data,
+                                      gnutls_openpgp_crt_fmt_t format,
+                                      const gnutls_openpgp_keyid_t keyid,
+                                      unsigned int flags)
+{
+  gnutls_openpgp_crt_t xpriv;
+  int ret;
+  
+  ret = gnutls_openpgp_crt_init(&xpriv);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  ret = gnutls_openpgp_crt_import(xpriv, data, format);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  if(keyid)
+    {
+      ret = gnutls_openpgp_crt_set_preferred_key_id(xpriv, keyid);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+    }
+
+  ret = gnutls_pubkey_import_openpgp(pkey, xpriv, flags);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+    
+  ret = 0;
+  
+cleanup:
+  gnutls_openpgp_crt_deinit(xpriv);
+  
+  return ret;
+}
+
 #endif
 
 /**
@@ -1951,3 +2012,53 @@ void gnutls_pubkey_set_pin_function (gnutls_pubkey_t key,
   key->pin.cb = fn;
   key->pin.data = userdata;
 }
+
+/**
+ * gnutls_pubkey_import_x509_raw:
+ * @pkey: The public key
+ * @data: The public key data to be imported
+ * @format: The format of the public key
+ * @flags: should be zero
+ *
+ * This function will import the given public key to the abstract
+ * #gnutls_pubkey_t structure. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ **/
+int gnutls_pubkey_import_x509_raw (gnutls_pubkey_t pkey,
+                                    const gnutls_datum_t * data,
+                                    gnutls_x509_crt_fmt_t format,
+                                    unsigned int flags)
+{
+  gnutls_x509_crt_t xpriv;
+  int ret;
+  
+  ret = gnutls_x509_crt_init(&xpriv);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  ret = gnutls_x509_crt_import(xpriv, data, format);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  ret = gnutls_pubkey_import_x509(pkey, xpriv, flags);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  return 0;
+  
+cleanup:
+  gnutls_x509_crt_deinit(xpriv);
+
+  return ret;
+}
+

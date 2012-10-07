@@ -69,6 +69,17 @@ int gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
 int gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
                                   gnutls_openpgp_crt_t crt,
                                   unsigned int flags);
+
+int gnutls_pubkey_import_openpgp_raw (gnutls_pubkey_t pkey,
+                                      const gnutls_datum_t * data,
+                                      gnutls_openpgp_crt_fmt_t format,
+                                      const gnutls_openpgp_keyid_t keyid,
+                                      unsigned int flags);
+int gnutls_pubkey_import_x509_raw (gnutls_pubkey_t pkey,
+                                    const gnutls_datum_t * data,
+                                    gnutls_x509_crt_fmt_t format,
+                                    unsigned int flags);
+
 int
 gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
                               unsigned int usage, unsigned int flags);

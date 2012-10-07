@@ -947,8 +947,6 @@ cleanup:
   return ret;
 }
 
-
-
 /**
  * gnutls_privkey_import_url:
  * @key: A key of type #gnutls_privkey_t
