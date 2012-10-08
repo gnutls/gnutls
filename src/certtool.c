@@ -26,6 +26,7 @@
 #include <gnutls/pkcs12.h>
 #include <gnutls/pkcs11.h>
 #include <gnutls/abstract.h>
+#include <gnutls/crypto.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,6 +73,8 @@ void generate_request (common_info_st *);
 static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
                                     unsigned int all);
 static void verify_certificate (common_info_st * cinfo);
+static void dane_info(const char* host, const char* proto, unsigned int port, 
+                      unsigned int ca, unsigned int local, common_info_st * cinfo);
 
 FILE *outfile;
 FILE *infile;
@@ -1075,6 +1078,9 @@ cmd_parser (int argc, char **argv)
 #endif
   else if (HAVE_OPT(CRQ_INFO))
     crq_info ();
+  else if (HAVE_OPT(DANE_RR))
+    dane_info (OPT_ARG(DANE_HOST), OPT_ARG(DANE_PROTO), OPT_VALUE_DANE_PORT, 
+               HAVE_OPT(DANE_CA), HAVE_OPT(DANE_LOCAL), &cinfo);
   else
     USAGE(1);
 
@@ -1085,6 +1091,90 @@ cmd_parser (int argc, char **argv)
 #endif
   gnutls_global_deinit ();
 }
+
+static void dane_info(const char* host, const char* proto, unsigned int port, 
+                      unsigned int ca, unsigned int local, common_info_st * cinfo)
+{
+  gnutls_pubkey_t pubkey;
+  gnutls_x509_crt_t crt;
+  unsigned char digest[64];
+  gnutls_datum_t t;
+  int ret;
+  unsigned int usage, selector, type;
+  size_t size;
+  
+  if (proto == NULL)
+    proto = "tcp";
+  if (port == 0)
+    port = 443;
+    
+  crt = load_cert (0, cinfo);
+
+  ret = gnutls_pubkey_init (&pubkey);
+  if (ret < 0)
+    {
+      error (EXIT_FAILURE, 0, "pubkey_init: %s", gnutls_strerror (ret));
+    }
+
+  if (crt != NULL)
+    {
+      ret = gnutls_pubkey_import_x509 (pubkey, crt, 0);
+      if (ret < 0)
+        {
+          error (EXIT_FAILURE, 0, "pubkey_import_x509: %s",
+                 gnutls_strerror (ret));
+        }
+    }
+  else
+    {
+      pubkey = load_pubkey (1, cinfo);
+    }
+
+  size = buffer_size;
+  ret = gnutls_pubkey_export (pubkey, GNUTLS_X509_FMT_DER, buffer, &size);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
+
+  gnutls_pubkey_deinit (pubkey);
+ 
+  if (default_dig != GNUTLS_DIG_SHA256 && default_dig != GNUTLS_DIG_SHA512)
+    default_dig = GNUTLS_DIG_SHA256;
+  
+  ret = gnutls_hash_fast(default_dig, buffer, size, digest);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "hash error: %s", gnutls_strerror (ret));
+
+  selector = 1;
+  if (default_dig == GNUTLS_DIG_SHA256)
+    type = 1;
+  else type = 2;
+
+  /* DANE certificate classification crap */
+  if (local==0)
+    {  
+      if (ca) usage = 0;
+      else usage = 1;
+    }
+  else
+    {
+      if (ca) usage = 2;
+      else usage = 3;
+    }
+
+  t.data = digest;
+  t.size = gnutls_hash_get_len(default_dig);
+
+  size = buffer_size;
+  ret = gnutls_hex_encode(&t, (void*)buffer, &size);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "hex encode error: %s", gnutls_strerror (ret));
+
+  fprintf(outfile, "_%u._%s.%s. IN TLSA ( %u %u %u %s )\n", port, proto, host, usage, selector, type, buffer);
+
+     
+
+}
+
 
 #define MAX_CRTS 500
 void

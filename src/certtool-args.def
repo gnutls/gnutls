@@ -353,6 +353,49 @@ flag = {
     doc   = "Cipher may be one of 3des, 3des-pkcs12, aes-128, aes-192, aes-256, rc2-40, arcfour.";
 };
 
+flag = {
+    name      = dane-rr;
+    descrip   = "Print the DANE RR data on a certificate or public key";
+    flags_must = dane-host;
+    doc = "This command prints the DANE RR data needed to enable DANE on a DNS server.";
+};
+
+flag = {
+    name      = dane-host;
+    descrip   = "Specify the hostname to be used in the DANE RR";
+    arg-type  = string;
+    arg-name  = "Hostname";
+    doc = "This command sets the hostname for the DANE RR.";
+};
+
+flag = {
+    name      = dane-proto;
+    descrip   = "The protocol set for DANE data (tcp, udp etc.)";
+    arg-type  = string;
+    arg-name  = "Protocol";
+    doc = "This command specifies the protocol for the service set in the DANE data.";
+};
+
+flag = {
+    name      = dane-port;
+    arg-type  = number;
+    descrip   = "Specify the port number for the DANE data.";
+    default-value = 443;
+    doc      = "";
+};
+
+flag = {
+    name      = dane-ca;
+    descrip   = "Whether the provided certificate or public key is a Certificate authority.";
+    doc      = "Marks the DANE RR as a CA certificate if specified.";
+};
+
+flag = {
+    name      = dane-local;
+    descrip   = "Whether the provided certificate or public key is an unsigned local entity.";
+    doc      = "DANE distinguishes certificates and public keys offered via the DNSSEC to trusted and local entities. Use this flag if this is a local entity.";
+};
+
 doc-section = {
   ds-type = 'SEE ALSO';
   ds-format = 'texi';
@@ -480,6 +523,25 @@ To verify a Certificate Revocation List (CRL) do:
 
 @example
 $ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
+@end example
+
+@subheading DANE RR generation
+To create a DANE resource record for a CA signed certificate use the following commands.
+
+@example
+$ certtool --dane-rr --dane-host www.example.com --load-certificate cert.pem
+@end example
+
+For a self signed certificate use:
+@example
+$ certtool --dane-rr --dane-host www.example.com --load-certificate cert.pem \
+  --dane-local
+@end example
+
+In order to create a record for the signer of your certificate use:
+@example
+$ certtool --dane-rr --dane-host www.example.com --load-certificate cert.pem \
+  --dane-ca
 @end example
 _EOT_;
 };
