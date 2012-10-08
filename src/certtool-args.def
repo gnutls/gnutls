@@ -525,8 +525,8 @@ To verify a Certificate Revocation List (CRL) do:
 $ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
 @end example
 
-@subheading DANE RR generation
-To create a DANE resource record for a CA signed certificate use the following commands.
+@subheading DANE TLSA RR generation
+To create a DANE TLSA resource record for a CA signed certificate use the following commands.
 
 @example
 $ certtool --dane-rr --dane-host www.example.com --load-certificate cert.pem

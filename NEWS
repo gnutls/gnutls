@@ -25,7 +25,7 @@ GNUTLS_NO_EXTENSIONS can be used to prevent that.
 ** libdane: Added. It is a library to provide DANE with DNSSEC certificate
 verification.
 
-** certtool: The --dane-rr option generates DANE Resource Records (RR).
+** certtool: The --dane-rr option generates DANE TLSA Resource Records (RR).
 
 ** API and ABI modifications:
 gnutls_certificate_set_ocsp_status_request_function: Added
