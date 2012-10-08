@@ -22,8 +22,8 @@ response corresponds to the given certificate.
 OCSP certificate status request extensions by default. The flag
 GNUTLS_NO_EXTENSIONS can be used to prevent that.
 
-** libdane: Added. It is a library to provide DANE with DNSSEC certificate
-verification.
+** libgnutls-dane: Added. It is a library to provide DANE with DNSSEC 
+certificate verification.
 
 ** certtool: The --dane-rr option generates DANE TLSA Resource Records (RR).
 

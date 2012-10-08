@@ -35,31 +35,31 @@ defexecdir = $(bindir)
 defexec_DATA = 
 
 
-libdane_la_LDFLAGS = -no-undefined
+libgnutls_dane_la_LDFLAGS = -no-undefined
 
 if ENABLE_DANE
-lib_LTLIBRARIES = libdane.la
+lib_LTLIBRARIES = libgnutls-dane.la
 
-libdane_la_SOURCES = dane.c errors.c libdane.map
+libgnutls_dane_la_SOURCES = dane.c errors.c libdane.map
 
-libdane_la_LIBADD = ../gl/libgnu.la \
+libgnutls_dane_la_LIBADD = ../gl/libgnu.la \
 	../lib/libgnutls.la
 
-libdane_la_LDFLAGS += -version-info $(LT_DANE_CURRENT):$(LT_DANE_REVISION):$(LT_DANE_AGE)
+libgnutls_dane_la_LDFLAGS += -version-info $(LT_DANE_CURRENT):$(LT_DANE_REVISION):$(LT_DANE_AGE)
 
-libdane_la_LIBADD += $(LIBSOCKET) $(UNBOUND_LIBS)
+libgnutls_dane_la_LIBADD += $(LIBSOCKET) $(UNBOUND_LIBS)
 
 if HAVE_LD_VERSION_SCRIPT
-libdane_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libdane.map
+libgnutls_dane_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libdane.map
 else
-libdane_la_LDFLAGS += -export-symbols-regex '^(dane).*'
+libgnutls_dane_la_LDFLAGS += -export-symbols-regex '^(dane).*'
 endif
 
 if HAVE_LD_OUTPUT_DEF
-libdane_la_LDFLAGS += \
-	-Wl,--output-def,libdane-$(DLL_VERSION).def
-libdane-$(DLL_VERSION).def: libdane.la
-defexec_DATA += libdane-$(DLL_VERSION).def
+libgnutls_dane_la_LDFLAGS += \
+	-Wl,--output-def,libgnutls-dane-$(DLL_VERSION).def
+libgnutls_dane-$(DLL_VERSION).def: libgnutls-dane.la
+defexec_DATA += libgnutls-dane-$(DLL_VERSION).def
 endif
 endif
 

@@ -98,7 +98,7 @@ Their prototypes lie in @file{gnutls/abstract.h}.
 
 The following functions are to be used for DANE certificate verification.
 Their prototypes lie in @file{gnutls/dane.h}. Note that you need to link
-with the @code{libdane} library to use them.
+with the @code{libgnutls-dane} library to use them.
 
 @include dane-api.texi
 

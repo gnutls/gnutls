@@ -499,7 +499,7 @@ of the DNSSEC infrastructure to verify TLS certificates. This can be
 in addition to the verification by commercial CA infrastructure or 
 could even replace it where DNSSEC is deployed.
 
-The DANE functionality is provided by the @code{libdane} library that is shipped
+The DANE functionality is provided by the @code{libgnutls-dane} library that is shipped
 with GnuTLS and the function prototypes are in @code{gnutls/dane.h}. The
 high level verification functions are shown below.
 
@@ -516,6 +516,8 @@ indicate the status of the verification.
 
 @showenumdesc{dane_verify_status_t,The DANE verification status flags.}
 
+In order to generate a DANE TLSA entry to use in a DNS server 
+you may use certtool's DANE commands (see @ref{certtool Invocation}).
 
 @node Digital signatures
 @section Digital signatures
