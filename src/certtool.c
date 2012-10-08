@@ -1172,7 +1172,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
   if (ret < 0)
     error (EXIT_FAILURE, 0, "hex encode error: %s", gnutls_strerror (ret));
 
-  fprintf(outfile, "_%u._%s.%s. IN TLSA ( %u %u %u %s )\n", port, proto, host, usage, selector, type, buffer);
+  fprintf(outfile, "_%u._%s.%s. IN TLSA ( %x %x %x %s )\n", port, proto, host, usage, selector, type, buffer);
 
      
 
