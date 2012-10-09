@@ -114,7 +114,7 @@ gnutls-api.tex: $(srcdir)/../../lib/*.c $(srcdir)/../../lib/ext/*.c $(srcdir)/..
 	rm -f $@-tmp
 	mv -f $@-tmp2 $@
 
-gnutls-enums.tex: $(srcdir)/../../lib/includes/gnutls/*.h
+gnutls-enums.tex: $(srcdir)/../../lib/includes/gnutls/*.h $(srcdir)/../../libdane/includes/gnutls/*.h 
 	echo "" > $@-tmp
 	for i in $^; do \
 		echo -n "Creating documentation for file $$i... " && \
@@ -136,6 +136,18 @@ x509-api.tex: $(srcdir)/../../lib/x509/*.c
 	rm -f $@-tmp
 	mv -f $@-tmp2 $@
 
+dane-api.tex: $(srcdir)/../../libdane/*.c
+	echo "" > $@-tmp
+	for i in $^; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/../scripts/gdoc -tex $$i >> $@-tmp && \
+		echo "ok"; \
+	done
+	$(srcdir)/../scripts/sort1.pl < $@-tmp > $@-tmp2 2>/dev/null
+	$(srcdir)/../scripts/split.pl functions < $@-tmp 2>/dev/null
+	rm -f $@-tmp
+	mv -f $@-tmp2 $@
+
 pgp-api.tex: $(srcdir)/../../lib/openpgp/*.c
 	echo "" > $@-tmp
 	for i in $^; do \
@@ -148,7 +160,7 @@ pgp-api.tex: $(srcdir)/../../lib/openpgp/*.c
 	rm -f $@-tmp
 	mv -f $@-tmp2 $@
 
-SOURCE_GEN_FILES =  pgp-api.tex x509-api.tex gnutls-api.tex gnutls-enums.tex
+SOURCE_GEN_FILES =  pgp-api.tex x509-api.tex gnutls-api.tex gnutls-enums.tex dane-api.tex
 
 PDF_FILES = gnutls-client-server-use-case.pdf gnutls-crypto-layers.pdf \
 	gnutls-handshake-sequence.pdf gnutls-handshake-state.pdf \
