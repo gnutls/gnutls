@@ -484,7 +484,7 @@ cert_verify_callback (gnutls_session_t session)
 #ifdef HAVE_DANE
   if (dane) /* try DANE auth */
     {
-      rc = dane_verify_session_crt( session, hostname, udp?"udp":"tcp", atoi(service), 
+      rc = dane_verify_session_crt( NULL, session, hostname, udp?"udp":"tcp", atoi(service), 
                                     DANE_F_IGNORE_LOCAL_RESOLVER, &status);
       if (rc < 0)
         {

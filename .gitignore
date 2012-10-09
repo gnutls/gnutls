@@ -596,4 +596,5 @@ tests/mini-dtls-heartbeat
 tests/mini-handshake-timeout
 tests/mini-x509-callbacks
 doc/manpages/stamp_mans
-libdane/libdane.la
+libdane/libgnutls-dane.la
+doc/latex/dane-api.tex

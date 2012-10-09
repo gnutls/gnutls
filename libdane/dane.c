@@ -35,22 +35,27 @@
 
 #define MAX_DATA_ENTRIES 4
 
+struct dane_state_st
+{
+	struct ub_ctx* ctx;
+	unsigned int flags;
+};
+
 struct dane_query_st
 {
+        struct ub_result* result;
 	unsigned int data_entries;
 	dane_cert_usage_t usage[MAX_DATA_ENTRIES];
 	dane_cert_type_t  type[MAX_DATA_ENTRIES];
 	dane_match_type_t match[MAX_DATA_ENTRIES];
 	gnutls_datum_t data[MAX_DATA_ENTRIES];
-	struct ub_ctx* ctx;
-	struct ub_result* result;
 	unsigned int flags;
 	dane_query_status_t status;
 };
 
 /**
  * dane_query_status:
- * @q: The query structure
+ * @q: The query result structure
  *
  * This function will return the status of the query response.
  * See %dane_query_status_t for the possible types.
@@ -64,7 +69,7 @@ dane_query_status_t dane_query_status(dane_query_t q)
 
 /**
  * dane_query_entries:
- * @q: The query structure
+ * @q: The query result structure
  *
  * This function will return the number of entries in a query.
  *
@@ -77,7 +82,7 @@ unsigned int dane_query_entries(dane_query_t q)
 
 /**
  * dane_query_data:
- * @q: The query structure
+ * @q: The query result structure
  * @idx: The index of the query response.
  * @usage: The certificate usage (see %dane_cert_usage_t)
  * @type: The certificate type (see %dane_cert_type_t)
@@ -112,22 +117,22 @@ int dane_query_data(dane_query_t q, unsigned int idx,
 }
 
 /**
- * dane_query_init:
- * @q: The structure to be initialized
- * @flags: flags from the DANE_F_* definitions
+ * dane_state_init:
+ * @s: The structure to be initialized
+ * @flags: flags from the %dane_state_flags enumeration
  *
  * This function will initialize a DANE query structure.
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int dane_query_init(dane_query_t* q, unsigned int flags)
+int dane_state_init(dane_state_t* s, unsigned int flags)
 {
 	struct ub_ctx* ctx;
 	int ret;
 
-	*q = calloc(1, sizeof(struct dane_query_st));
-	if (*q == NULL)
+	*s = calloc(1, sizeof(struct dane_state_st));
+	if (*s == NULL)
 		return DANE_E_MEMORY_ERROR;
 
 	ctx = ub_ctx_create();
@@ -155,38 +160,50 @@ int dane_query_init(dane_query_t* q, unsigned int flags)
 		goto cleanup;
 	}
 
-	(*q)->ctx = ctx;
-	(*q)->flags = flags;
+	(*s)->ctx = ctx;
+	(*s)->flags = flags;
 	
 	return DANE_E_SUCCESS;
 cleanup:
 
 	if (ctx)
 		ub_ctx_delete(ctx);
-	free(*q);
+	free(*s);
 	
 	return ret;
 }
 
 /**
- * dane_query_init:
- * @q: The structure to be deinitialized
+ * dane_state_deinit:
+ * @s: The structure to be deinitialized
  *
  * This function will deinitialize a DANE query structure.
  *
  **/
+void dane_state_deinit(dane_state_t s)
+{
+	ub_ctx_delete(s->ctx);
+	free(s);
+}
+
+
+/**
+ * dane_query_deinit:
+ * @q: The structure to be deinitialized
+ *
+ * This function will deinitialize a DANE query result structure.
+ *
+ **/
 void dane_query_deinit(dane_query_t q)
 {
-	if (q->result)
-	ub_ctx_delete(q->ctx);
-		ub_resolve_free(q->result);
-
+	ub_resolve_free(q->result);
 	free(q);
 }
 
 /**
- * dane_query_resolve_tlsa:
- * @q: The query structure
+ * dane_query_tlsa:
+ * @s: The DANE state structure
+ * @r: A structure to place the result
  * @host: The host name to resolve.
  * @proto: The protocol type (tcp, udp, etc.)
  * @port: The service port number (eg. 443).
@@ -197,62 +214,61 @@ void dane_query_deinit(dane_query_t q)
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int dane_query_resolve_tlsa(dane_query_t q, const char* host, const char* proto, unsigned int port)
+int dane_query_tlsa(dane_state_t s, dane_query_t *r, const char* host, const char* proto, unsigned int port)
 {
 	char ns[1024];
 	int ret;
 	unsigned int i;
 
-	if (q->result) {
-		ub_resolve_free(q->result);
-		q->result = NULL;
-	}
-	
+	*r = calloc(1, sizeof(struct dane_query_st));
+	if (*r == NULL)
+		return DANE_E_MEMORY_ERROR;
+
 	snprintf(ns, sizeof(ns), "_%u._%s.%s", port, proto, host);
 
 	/* query for webserver */
-	ret = ub_resolve(q->ctx, ns, 52, 1, &q->result);
+	ret = ub_resolve(s->ctx, ns, 52, 1, &(*r)->result);
 	if(ret != 0) {
 		return DANE_E_RESOLVING_ERROR;
 	}
 
 /* show first result */
-	if(!q->result->havedata) {
+	if(!(*r)->result->havedata) {
 		return DANE_E_NO_DANE_DATA;
 	}
 
 	i = 0;
 	do {
 
-		if (q->result->len[i] > 3)
+		if ((*r)->result->len[i] > 3)
 			ret = DANE_E_SUCCESS;
 		else {
 			return DANE_E_RECEIVED_CORRUPT_DATA;
 		}
 	
-		q->usage[i] = q->result->data[i][0];
-		q->type[i] = q->result->data[i][1];
-		q->match[i] = q->result->data[i][2];
-		q->data[i].data = (void*)&q->result->data[i][3];
-		q->data[i].size = q->result->len[i] - 3;
+		(*r)->usage[i] = (*r)->result->data[i][0];
+		(*r)->type[i] = (*r)->result->data[i][1];
+		(*r)->match[i] = (*r)->result->data[i][2];
+		(*r)->data[i].data = (void*)&(*r)->result->data[i][3];
+		(*r)->data[i].size = (*r)->result->len[i] - 3;
 		i++;
-	} while(q->result->data[i] != NULL);
+	} while((*r)->result->data[i] != NULL);
 	
-	q->data_entries = i;
+	(*r)->data_entries = i;
 
-	if (!q->result->secure) {
-		if (q->result->bogus)
+	if (!(*r)->result->secure) {
+		if ((*r)->result->bogus)
 			ret = DANE_E_INVALID_DNSSEC_SIG;
 		else
 			ret = DANE_E_NO_DNSSEC_SIG;
 	}
 
 	/* show security status */
-	if (q->result->secure)
-		q->status = DANE_QUERY_DNSSEC_VERIFIED;
-	else if (q->result->bogus)
-		q->status = DANE_QUERY_BOGUS;
-	else q->status = DANE_QUERY_NO_DNSSEC;
+	if ((*r)->result->secure)
+		(*r)->status = DANE_QUERY_DNSSEC_VERIFIED;
+	else if ((*r)->result->bogus)
+		(*r)->status = DANE_QUERY_BOGUS;
+	else (*r)->status = DANE_QUERY_NO_DNSSEC;
 
 	return ret;
 }
@@ -413,13 +429,14 @@ cleanup:
 
 /**
  * dane_verify_crt:
+ * @s: A DANE state structure (may be NULL)
  * @chain: A certificate chain
  * @chain_size: The size of the chain
  * @chain_type: The type of the certificate chain
  * @hostname: The hostname associated with the chain
  * @proto: The protocol of the service connecting (e.g. tcp)
  * @port: The port of the service connecting (e.g. 443)
- * @flags: The %DANE_F flags.
+ * @flags: should be zero
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
  * This function will verify the given certificate chain against the
@@ -433,17 +450,20 @@ cleanup:
  * it may be better to mention: DANE verification did not reject the certificate,
  * rather than mentioning a successful DANE verication.
  * 
+ * If the @q parameter is provided it will be used for caching entries.
+ *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  **/
-int dane_verify_crt (
+int dane_verify_crt (dane_state_t s,
 	const gnutls_datum_t *chain, unsigned chain_size,
 	gnutls_certificate_type_t chain_type,
 	const char * hostname, const char* proto, unsigned int port,
 	unsigned int flags, unsigned int *verify)
 {
-dane_query_t q;
+dane_state_t _s = NULL;
+dane_query_t r = NULL;
 int ret;
 unsigned int usage, type, match, idx;
 gnutls_datum_t data;
@@ -453,19 +473,22 @@ gnutls_datum_t data;
 	
 	*verify = 0;
 	
-	ret = dane_query_init(&q, flags);
-	if (ret < 0) {
-		return ret;
-	}
+	if (s == NULL) {
+		ret = dane_state_init(&_s, flags);
+		if (ret < 0) {
+			return ret;
+		}
+	} else
+		_s = s;
 	
-	ret = dane_query_resolve_tlsa(q, hostname, proto, port);
+	ret = dane_query_tlsa(_s, &r, hostname, proto, port);
 	if (ret < 0) {
 		goto cleanup;
 	}
 
 	idx = 0;
 	do {
-		ret = dane_query_data(q, idx++, &usage, &type, &match, &data);
+		ret = dane_query_data(r, idx++, &usage, &type, &match, &data);
 		if (ret == DANE_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;
 
@@ -488,17 +511,19 @@ gnutls_datum_t data;
 	ret = 0;
 
 cleanup:
-	dane_query_deinit(q);
+	if (s == NULL) dane_state_deinit(_s);
+	if (r != NULL) dane_query_deinit(r);
 	return ret;
 }
 
 /**
  * dane_verify_session_crt:
+ * @s: A DANE state structure (may be NULL)
  * @session: A gnutls session
  * @hostname: The hostname associated with the chain
  * @proto: The protocol of the service connecting (e.g. tcp)
  * @port: The port of the service connecting (e.g. 443)
- * @flags: The %DANE_F flags.
+ * @flags: should be zero.
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
  * This function will verify session's certificate chain against the
@@ -510,6 +535,7 @@ cleanup:
  *
  **/
 int dane_verify_session_crt (
+        dane_state_t s,
 	gnutls_session_t session,
 	const char * hostname, const char* proto, unsigned int port,
 	unsigned int flags, unsigned int *verify)
@@ -525,5 +551,5 @@ unsigned int type;
 	
 	type = gnutls_certificate_type_get(session);
 	
-	return dane_verify_crt(cert_list, cert_list_size, type, hostname, proto, port, flags, verify);
+	return dane_verify_crt(s, cert_list, cert_list_size, type, hostname, proto, port, flags, verify);
 }

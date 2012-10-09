@@ -89,17 +89,31 @@ typedef enum dane_query_status_t
   DANE_QUERY_NO_DNSSEC
 } dane_query_status_t;
 
+typedef struct dane_state_st *dane_state_t;
 typedef struct dane_query_st *dane_query_t;
 
+/**
+ * dane_state_flags_t:
+ * @DANE_F_IGNORE_LOCAL_RESOLVER: Many systems are not DNSSEC-ready. In that case the local resolver is ignored, and a direct recursive resolve occurs.
+ *
+ * Enumeration of different verification flags.
+ */
+typedef enum dane_state_flags_t 
+{
+  DANE_F_IGNORE_LOCAL_RESOLVER = 1,
+} dane_verify_flags_t;
 
-int dane_query_init (dane_query_t* q, unsigned int flags);
-void dane_query_deinit (dane_query_t q);
-int dane_query_resolve_tlsa (dane_query_t q, const char* host, const char* proto, unsigned int port);
-int dane_query_data(dane_query_t q, unsigned int idx,
-					unsigned int *usage, unsigned int *type,
-					unsigned int *match, gnutls_datum_t * data);
+int dane_state_init (dane_state_t* s, unsigned int flags);
+void dane_state_deinit (dane_state_t s);
+
+int dane_query_tlsa(dane_state_t s, dane_query_t *r, const char* host, const char* proto, unsigned int port);
+
 dane_query_status_t dane_query_status(dane_query_t q);
 unsigned int dane_query_entries(dane_query_t q);
+int dane_query_data(dane_query_t q, unsigned int idx,
+			unsigned int *usage, unsigned int *type,
+			unsigned int *match, gnutls_datum_t * data);
+void dane_query_deinit(dane_query_t q);
 
 
 /**
@@ -117,25 +131,15 @@ typedef enum dane_verify_status_t
   DANE_VERIFY_NO_DANE_INFO = 1<<2,
 } dane_verify_status_t;
 
-/**
- * dane_verify_flags_t:
- * @DANE_F_REQUIRE_DNSSEC: Require DNSSEC for verification.
- * @DANE_F_IGNORE_LOCAL_RESOLVER: Many systems are not DNSSEC-ready. In that case the local resolver is ignored, and a direct recursive resolve occurs.
- *
- * Enumeration of different verification flags.
- */
-typedef enum dane_verify_flags_t 
-{
-  DANE_F_IGNORE_LOCAL_RESOLVER = 1,
-} dane_verify_flags_t;
 
-int dane_verify_crt (
+int dane_verify_crt (dane_state_t s,
 	const gnutls_datum_t *chain, unsigned chain_size,
 	gnutls_certificate_type_t chain_type,
 	const char * hostname, const char* proto, unsigned int port,
 	unsigned int flags, unsigned int *verify);
 
 int dane_verify_session_crt (
+        dane_state_t s,
 	gnutls_session_t session,
 	const char * hostname, const char* proto, unsigned int port,
 	unsigned int flags, unsigned int *verify);

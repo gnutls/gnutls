@@ -4,15 +4,15 @@ DANE_0_0
 {
   global:
 	dane_strerror;
-	dane_verify_session_crt;
-	dane_verify_crt;
-	dane_query_init;
-	dane_query_deinit;
-	dane_query_resolve_tlsa;
-	dane_query_data;
+	dane_state_init;
+	dane_state_deinit;
+	dane_query_tlsa;
 	dane_query_status;
 	dane_query_entries;
-
+	dane_query_data;
+	dane_query_deinit;
+	dane_verify_session_crt;
+	dane_verify_crt;
   local:
     *;
 };

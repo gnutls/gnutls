@@ -104,7 +104,7 @@ gnutls_cli_SOURCES = cli.c common.h common.c \
 	$(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la
 if ENABLE_DANE
-gnutls_cli_LDADD += ../libdane/libdane.la
+gnutls_cli_LDADD += ../libdane/libgnutls-dane.la
 endif
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS_LDADD) $(LTLIBINTL)
 gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME) \

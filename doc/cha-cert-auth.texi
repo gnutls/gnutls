@@ -507,10 +507,9 @@ high level verification functions are shown below.
 
 @showfuncB{dane_verify_session_crt,dane_strerror}
 
-The allowed flags for the verification function follow.
-
-@showenumdesc{dane_verify_flags_t,The DANE verification flags.}
-
+Note that the @code{dane_state_t} structure that is accepted by both
+verification functions is optional. It is required when many queries
+are performed to facilitate caching.
 The following flags are returned by the verify functions to
 indicate the status of the verification.
 
