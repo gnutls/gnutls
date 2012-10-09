@@ -35,8 +35,9 @@
 typedef PCCRL_CONTEXT WINAPI (*Type_CertEnumCRLsInStore) (HCERTSTORE hCertStore, PCCRL_CONTEXT pPrevCrlContext);
 static Type_CertEnumCRLsInStore Loaded_CertEnumCRLsInStore;
 static HMODULE Crypt32_dll;
+#  else
+#   define Loaded_CertEnumCRLsInStore CertEnumCRLsInStore
 #  endif
-
 #else
 # ifdef HAVE_PTHREAD_LOCKS
 #  include <pthread.h>
