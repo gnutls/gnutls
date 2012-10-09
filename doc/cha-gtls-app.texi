@@ -961,9 +961,10 @@ for the acceptable security levels.} than their elliptic curves counterpart
 requires parameters to be generated and associated with a credentials
 structure by the server (see @ref{Parameter generation}). 
 
-The available special keywords are shown in @ref{tab:prio-special}. 
+The available special keywords are shown in @ref{tab:prio-special1}
+and @ref{tab:prio-special2}. 
 
-@float Table,tab:prio-special
+@float Table,tab:prio-special1
 @multitable @columnfractions .45 .45
 @headitem Keyword @tab Description
 
@@ -979,6 +980,25 @@ will prevent the sending of any TLS extensions in client side. Note
 that TLS 1.2 requires extensions to be used, as well as safe
 renegotiation thus this option must be used with care.
 
+@item %SERVER_PRECEDENCE @tab
+The ciphersuite will be selected according to server priorities
+and not the client's.
+
+@item %SSL3_RECORD_VERSION @tab
+will use SSL3.0 record version in client hello.
+This is the default.
+
+@item %LATEST_RECORD_VERSION @tab
+will use the latest TLS version record version in client hello.
+
+@end multitable
+@caption{Special priority string keywords.}
+@end float
+
+@float Table,tab:prio-special2
+@multitable @columnfractions .45 .45
+@headitem Keyword @tab Description
+
 @item %STATELESS_COMPRESSION @tab
 will disable keeping state across records when compressing. This may
 help to mitigate attacks when compression is used but an attacker
@@ -986,14 +1006,9 @@ is in control of input data. This has to be used only when the
 data that are possibly controlled by an attacker are placed in
 separate records.
 
-@item %SERVER_PRECEDENCE @tab
-The ciphersuite will be selected according to server priorities
-and not the client's.
-
 @item %DISABLE_SAFE_RENEGOTIATION @tab
-will disable safe renegotiation
+will completely disable safe renegotiation
 completely.  Do not use unless you know what you are doing.
-Testing purposes only.
 
 @item %UNSAFE_RENEGOTIATION @tab
 will allow handshakes and re-handshakes
@@ -1015,13 +1030,6 @@ will enforce safe renegotiation.  Clients and
 servers will refuse to talk to an insecure peer.  Currently this
 causes interoperability problems, but is required for full protection.
 
-@item %SSL3_RECORD_VERSION @tab
-will use SSL3.0 record version in client hello.
-This is the default.
-
-@item %LATEST_RECORD_VERSION @tab
-will use the latest TLS version record version in client hello.
-
 @item %VERIFY_ALLOW_SIGN_RSA_MD5 @tab
 will allow RSA-MD5 signatures in certificate chains.
 
@@ -1029,13 +1037,14 @@ will allow RSA-MD5 signatures in certificate chains.
 will allow V1 CAs in chains.
 
 @end multitable
-@caption{Special priority string keywords.}
+@caption{More priority string keywords.}
 @end float
 
 Finally the ciphersuites enabled by any priority string can be
 listed using the @code{gnutls-cli} application (see @ref{gnutls-cli Invocation}), 
 or by using the priority functions as in @ref{Listing the ciphersuites in a priority string}.
 
+@page
 Example priority strings are:
 @example
 The default priority without the HMAC-MD5:
@@ -1047,9 +1056,12 @@ Specifying RSA with AES-128-CBC:
 Specifying the defaults except ARCFOUR-128:
     "NORMAL:-ARCFOUR-128"
 
-Enabling the 128-bit secure ciphers, while disabling SSL 3.0 and 
-enabling compression:
+Enabling the 128-bit secure ciphers, while disabling SSL 3.0 and enabling compression:
     "SECURE128:-VERS-SSL3.0:+COMP-DEFLATE"
+
+Enabling the 128-bit and 192-bit secure ciphers, while disabling all TLS versions 
+except TLS 1.2:
+    "SECURE128:+SECURE192:-VERS-TLS-ALL:+VERS-TLS1.2"
 @end example
 
 @node Advanced and other topics
@@ -1085,12 +1097,6 @@ on the server, and a server may choose not to resume a session
 even when requested to.  The expiration is to prevent temporal session keys
 from becoming long-term keys. Also note that as a client you must enable, 
 using the priority functions, at least the algorithms used in the last session.
-
-It is highly recommended for clients to enable the session ticket extension using
-@funcref{gnutls_session_ticket_enable_client} in order to allow resumption with 
-servers that do not store any state.
-
-@showfuncA{gnutls_session_ticket_enable_client}
 
 @showfuncdesc{gnutls_session_is_resumed}
 
@@ -1366,6 +1372,18 @@ authentication.
 @multitable @columnfractions .10 .12 .10 .20 .32
 
 @headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter @tab Description
+
+@item <72
+@tab <1008
+@tab <160
+@tab @code{INSECURE}
+@tab Considered to be insecure
+
+@item 72
+@tab 1008
+@tab 160
+@tab @code{WEAK}
+@tab Short term protection against small organizations
 
 @item 80
 @tab 1248

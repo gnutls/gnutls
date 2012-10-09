@@ -443,19 +443,20 @@ To resume a TLS session the server normally store session parameters.  This
 complicates deployment, and could be avoiding by delegating the storage
 to the client. Because session parameters are sensitive they are encrypted
 and authenticated with a key only known to the server and then sent to the
-client. The Session Tickets in RFC 5077 @xcite{TLSTKT}, describe this 
-idea, which is implemented in GnuTLS.
+client. The Session Tickets extension is described in RFC 5077 @xcite{TLSTKT}.
+
+Since version 3.1.3 GnuTLS clients transparently support session tickets.
 
 @node HeartBeat
 @subsection HeartBeat
 @cindex TLS extensions
 @cindex heartbeat
 
-The TLS extension which allows to ping and receive replies from the peer,
-described in @xcite{RFC6520}. This extension is disabled by default and
+This TLS extension allows to ping and receive confirmation from the peer,
+is described in @xcite{RFC6520}. The extension is disabled by default and
 @funcref{gnutls_heartbeat_enable} can be used to enable it. A policy
 may be negotiated to only allow sending heartbeat messages or sending and receiving.
-The session policy can be checked with @funcref{gnutls_heartbeat_allowed}. 
+The current session policy can be checked with @funcref{gnutls_heartbeat_allowed}. 
 The requests coming from the peer result to @code{GNUTLS_@-E_@-HERTBEAT_@-PING_@-RECEIVED}
 being returned from the receive function. Ping requests to peer can be send via
 @funcref{gnutls_heartbeat_ping}. 
@@ -571,7 +572,7 @@ can be used both by clients and servers.
 The Online Certificate Status Protocol (OCSP) is a protocol that allows the
 client to verify the server certificate for revocation without messing with
 certificate revocation lists. Its drawback is that it requires the client
-to connect to the server's CA OCSP server and ask for the status of the
+to connect to the server's CA OCSP server and request the status of the
 certificate. This extension however, enables a TLS server to include
 its CA OCSP server response in the handshake. That is an HTTPS server
 may periodically run @code{ocsptool} (see @ref{ocsptool Invocation}) to obtain
@@ -579,11 +580,12 @@ its certificate revocation status and serve it to the clients. This
 reduces the number of connections a client needs to perform to access a
 secure server.
 
-Server functions:
 @showfuncB{gnutls_certificate_set_ocsp_status_request_function,gnutls_certificate_set_ocsp_status_request_file}
 
-Client functions:
 @showfuncA{gnutls_ocsp_status_request_enable_client}
+
+Since version 3.1.3 GnuTLS clients transparently support the certificate status
+request.
 
 @include sec-tls-app.texi
 

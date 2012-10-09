@@ -116,7 +116,8 @@ functions that return other fields of the CRL structure are also provided.
 
 The following functions can be used to generate a CRL.
 
-@showfuncE{gnutls_x509_crl_set_version,gnutls_x509_crl_set_crt_serial,gnutls_x509_crl_set_crt,gnutls_x509_crl_set_next_update,gnutls_x509_crl_set_this_update}
+@showfuncB{gnutls_x509_crl_set_version,gnutls_x509_crl_set_crt_serial}
+@showfuncC{gnutls_x509_crl_set_crt,gnutls_x509_crl_set_next_update,gnutls_x509_crl_set_this_update}
 
 The @funcref{gnutls_x509_crl_sign2} and @funcref{gnutls_x509_crl_privkey_sign} 
 functions sign the revocation list with a private key. The latter function
@@ -255,16 +256,18 @@ The issuing time of the revocation information.
 @item nextUpdate @tab
 The issuing time of the revocation information that will update that one.
 
+@item @tab Revoked certificates
+
 @item certificate status @tab
 The status of the certificate.
 
 @item certificate serial @tab
 The certificate's serial number.
 
-@item Revocation time @tab
+@item revocationTime @tab
 The time the certificate was revoked.
 
-@item Revocation reason @tab
+@item revocationReason @tab
 The reason the certificate was revoked.
 
 @end multitable
@@ -345,11 +348,12 @@ helper function @funcref{gnutls_pkcs12_simple_parse} is provided. For more
 advanced uses, manual parsing of the structure is required using the
 functions below.
 
+@showfuncD{gnutls_pkcs12_get_bag,gnutls_pkcs12_verify_mac,gnutls_pkcs12_bag_decrypt,gnutls_pkcs12_bag_get_count}
+
 @showfuncdesc{gnutls_pkcs12_simple_parse}
+@showfuncC{gnutls_pkcs12_bag_get_data,gnutls_pkcs12_bag_get_key_id,gnutls_pkcs12_bag_get_friendly_name}
 
-@showfuncC{gnutls_pkcs12_get_bag,gnutls_pkcs12_verify_mac,gnutls_pkcs12_bag_decrypt}
-
-@showfuncD{gnutls_pkcs12_bag_get_count,gnutls_pkcs12_bag_get_data,gnutls_pkcs12_bag_get_key_id,gnutls_pkcs12_bag_get_friendly_name}
+@page
 
 The functions below are used to generate a PKCS #12 structure. An example
 of their usage is also shown.

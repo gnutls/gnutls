@@ -95,6 +95,7 @@ options are given.
 --disable-extra-pki
 --disable-openpgp-authentication
 --disable-openssl-compatibility
+--disable-libdane
 --without-p11-kit
 --without-tpm
 @end verbatim

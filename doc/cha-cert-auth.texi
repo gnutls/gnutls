@@ -299,7 +299,7 @@ Although the verification of a certificate path indicates that the
 certificate is signed by trusted authority, does not reveal anything
 about the peer's identity. It is required to verify if the
 certificate's owner is the one you expect. For more information
-consult @ref{gnutls_x509_crt_check_hostname}, section @ref{ex:verify} for an example, and @xcite{RFC2818}.
+consult @funcref{gnutls_x509_crt_check_hostname}, section @ref{ex:verify} for an example, and @xcite{RFC2818}.
 
 
 @node OpenPGP certificates
