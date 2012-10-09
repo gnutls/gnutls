@@ -79,7 +79,8 @@ load_secret_key (int mand, common_info_st * info)
   gnutls_datum_t hex_key;
   int ret;
 
-  fprintf (stderr, "Loading secret key...\n");
+  if (info->verbose)
+    fprintf (stderr, "Loading secret key...\n");
 
   if (info->secret_key == NULL)
     {
@@ -324,7 +325,8 @@ load_cert_list (int mand, size_t * crt_size, common_info_st * info)
   int ptr_size;
 
   *crt_size = 0;
-  fprintf (stderr, "Loading certificate list...\n");
+  if (info->verbose)
+    fprintf (stderr, "Loading certificate list...\n");
 
   if (info->cert == NULL)
     {
@@ -375,7 +377,8 @@ load_cert_list (int mand, size_t * crt_size, common_info_st * info)
 
       (*crt_size)++;
     }
-  fprintf (stderr, "Loaded %d certificates.\n", (int) *crt_size);
+  if (info->verbose)
+    fprintf (stderr, "Loaded %d certificates.\n", (int) *crt_size);
 
   return crt;
 }

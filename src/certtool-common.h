@@ -51,6 +51,8 @@ typedef struct common_info
   int null_password;
   unsigned int crq_extensions;
   unsigned int v1_cert;
+  
+  unsigned int verbose;
 } common_info_st;
 
 gnutls_pubkey_t load_public_key_or_import(int mand, gnutls_privkey_t privkey, common_info_st * info);

@@ -971,6 +971,9 @@ cmd_parser (int argc, char **argv)
 
   memset (&cinfo, 0, sizeof (cinfo));
   
+  if (HAVE_OPT(VERBOSE))
+    cinfo.verbose = 1;
+  
   if (HAVE_OPT(LOAD_PRIVKEY))
     cinfo.privkey = OPT_ARG(LOAD_PRIVKEY);
 
@@ -1109,7 +1112,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
     port = 443;
     
   crt = load_cert (0, cinfo);
-  if (crt != NULL)
+  if (crt != NULL && HAVE_OPT(DANE_FULL_X509))
     {
       selector = 0; /* X.509 */
 
@@ -1120,7 +1123,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
 
       gnutls_x509_crt_deinit (crt);
     }
-  else
+  else /* use public key only */
     {
       selector = 1;
 
@@ -1128,19 +1131,42 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
       if (ret < 0)
         error (EXIT_FAILURE, 0, "pubkey_init: %s", gnutls_strerror (ret));
 
-      pubkey = load_pubkey (1, cinfo);
+      if (crt != NULL)
+        {
+          
+          ret = gnutls_pubkey_import_x509 (pubkey, crt, 0);
+          if (ret < 0)
+            {
+              error (EXIT_FAILURE, 0, "pubkey_import_x509: %s",
+                     gnutls_strerror (ret));
+            }
 
-      size = buffer_size;
-      ret = gnutls_pubkey_export (pubkey, GNUTLS_X509_FMT_DER, buffer, &size);
-      if (ret < 0)
-        error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
-    
+          size = buffer_size;
+          ret = gnutls_pubkey_export (pubkey, GNUTLS_X509_FMT_DER, buffer, &size);
+          if (ret < 0)
+            {
+              error (EXIT_FAILURE, 0, "pubkey_export: %s",
+                     gnutls_strerror (ret));
+            }
+          
+          gnutls_x509_crt_deinit(crt);
+        }
+      else
+        {
+          pubkey = load_pubkey (1, cinfo);
+
+          size = buffer_size;
+          ret = gnutls_pubkey_export (pubkey, GNUTLS_X509_FMT_DER, buffer, &size);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
+        }
+
       gnutls_pubkey_deinit (pubkey);
     }
  
   if (default_dig != GNUTLS_DIG_SHA256 && default_dig != GNUTLS_DIG_SHA512)
     {
-      fprintf(stderr, "Unsupported digest. Assuming SHA256.\n");
+      if (default_dig != GNUTLS_DIG_UNKNOWN) fprintf(stderr, "Unsupported digest. Assuming SHA256.\n");
       default_dig = GNUTLS_DIG_SHA256;
     }
   
