@@ -1081,7 +1081,7 @@ cmd_parser (int argc, char **argv)
 #endif
   else if (HAVE_OPT(CRQ_INFO))
     crq_info ();
-  else if (HAVE_OPT(DANE_RR))
+  else if (HAVE_OPT(DANE_TLSA_RR))
     dane_info (OPT_ARG(DANE_HOST), OPT_ARG(DANE_PROTO), OPT_VALUE_DANE_PORT, 
                HAVE_OPT(DANE_CA), HAVE_OPT(DANE_LOCAL), &cinfo);
   else
@@ -1112,7 +1112,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
     port = 443;
     
   crt = load_cert (0, cinfo);
-  if (crt != NULL && HAVE_OPT(DANE_FULL_X509))
+  if (crt != NULL && HAVE_OPT(DANE_X509))
     {
       selector = 0; /* X.509 */
 

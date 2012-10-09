@@ -355,7 +355,7 @@ flag = {
 };
 
 flag = {
-    name      = dane-rr;
+    name      = dane-tlsa-rr;
     descrip   = "Print the DANE RR data on a certificate or public key";
     flags_must = dane-host;
     doc = "This command prints the DANE RR data needed to enable DANE on a DNS server.";
@@ -392,7 +392,7 @@ flag = {
 };
 
 flag = {
-    name      = dane-full-x509;
+    name      = dane-x509;
     descrip   = "Use the hash of the X.509 certificate, rather than the public key.";
     doc      = "This option forces the generated record to contain the hash of the full X.509 certificate. By default only the hash of the public key is used.";
 };
@@ -538,12 +538,12 @@ $ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
 To create a DANE TLSA resource record for a CA signed certificate use the following commands.
 
 @example
-$ certtool --dane-rr --dane-host www.example.com --load-certificate cert.pem
+$ certtool --dane-tlsa-rr --dane-host www.example.com --load-certificate cert.pem
 @end example
 
 For a self signed certificate use:
 @example
-$ certtool --dane-rr --dane-host www.example.com --load-certificate cert.pem \
+$ certtool --dane-tlsa-rr --dane-host www.example.com --load-certificate cert.pem \
   --dane-local
 @end example
 
@@ -553,7 +553,7 @@ certificate using DANE.
 
 In order to create a record for the signer of your certificate use:
 @example
-$ certtool --dane-rr --dane-host www.example.com --load-certificate cert.pem \
+$ certtool --dane-tlsa-rr --dane-host www.example.com --load-certificate cert.pem \
   --dane-ca
 @end example
 _EOT_;
