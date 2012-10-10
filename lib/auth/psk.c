@@ -78,9 +78,9 @@ _gnutls_set_psk_session_key (gnutls_session_t session,
 
   /* set the session key
    */
-  session->key->key.size = 4 + dh_secret_size + ppsk->size;
-  session->key->key.data = gnutls_malloc (session->key->key.size);
-  if (session->key->key.data == NULL)
+  session->key.key.size = 4 + dh_secret_size + ppsk->size;
+  session->key.key.data = gnutls_malloc (session->key.key.size);
+  if (session->key.key.data == NULL)
     {
       gnutls_assert ();
       ret = GNUTLS_E_MEMORY_ERROR;
@@ -93,7 +93,7 @@ _gnutls_set_psk_session_key (gnutls_session_t session,
    * (uint16_t) psk_size
    * the psk
    */
-  p = session->key->key.data;
+  p = session->key.key.data;
   _gnutls_write_uint16 (dh_secret_size, p);
   p+=2;
   if (dh_secret == NULL)
@@ -168,7 +168,7 @@ _gnutls_gen_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_psk_client_credentials_t cred;
 
   cred = (gnutls_psk_client_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
     {
@@ -217,7 +217,7 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, uint8_t * data,
   psk_auth_info_t info;
 
   cred = (gnutls_psk_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
     {
@@ -292,7 +292,7 @@ _gnutls_gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_datum_t hint;
 
   cred = (gnutls_psk_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
     {
@@ -327,7 +327,7 @@ _gnutls_proc_psk_server_kx (gnutls_session_t session, uint8_t * data,
   psk_auth_info_t info;
 
   cred = (gnutls_psk_client_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
     {

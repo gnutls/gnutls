@@ -53,14 +53,14 @@ const mod_auth_st srp_auth_struct = {
 };
 
 
-#define _b session->key->b
-#define B session->key->B
-#define _a session->key->a
-#define A session->key->A
-#define N session->key->client_p
-#define G session->key->client_g
-#define V session->key->x
-#define S session->key->KEY
+#define _b session->key.b
+#define B session->key.B
+#define _a session->key.a
+#define A session->key.A
+#define N session->key.client_p
+#define G session->key.client_g
+#define V session->key.x
+#define S session->key.KEY
 
 /* Checks if a%n==0,+1,-1%n which is a fatal srp error.
  * Returns a proper error code in that case, and 0 when
@@ -250,7 +250,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
   priv = epriv.ptr;
 
   cred = (gnutls_srp_client_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_SRP, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_SRP, NULL);
 
   if (cred == NULL)
     {
@@ -295,17 +295,17 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
    */
 
   /* calculate u */
-  session->key->u = _gnutls_calc_srp_u (A, B, N);
-  if (session->key->u == NULL)
+  session->key.u = _gnutls_calc_srp_u (A, B, N);
+  if (session->key.u == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_mpi_log ("SRP U: ", session->key->u);
+  _gnutls_mpi_log ("SRP U: ", session->key.u);
 
   /* S = (B - g^x) ^ (a + u * x) % N */
-  S = _gnutls_calc_srp_S2 (B, G, session->key->x, _a, session->key->u, N);
+  S = _gnutls_calc_srp_S2 (B, G, session->key.x, _a, session->key.u, N);
   if (S == NULL)
     {
       gnutls_assert ();
@@ -316,10 +316,10 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
   _gnutls_mpi_release (&_b);
   _gnutls_mpi_release (&V);
-  _gnutls_mpi_release (&session->key->u);
+  _gnutls_mpi_release (&session->key.u);
   _gnutls_mpi_release (&B);
 
-  ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
+  ret = _gnutls_mpi_dprint (session->key.KEY, &session->key.key);
   _gnutls_mpi_release (&S);
 
   if (ret < 0)
@@ -373,18 +373,18 @@ _gnutls_proc_srp_client_kx (gnutls_session_t session, uint8_t * data,
   /* Start the SRP calculations.
    * - Calculate u 
    */
-  session->key->u = _gnutls_calc_srp_u (A, B, N);
-  if (session->key->u == NULL)
+  session->key.u = _gnutls_calc_srp_u (A, B, N);
+  if (session->key.u == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_mpi_log ("SRP U: ", session->key->u);
+  _gnutls_mpi_log ("SRP U: ", session->key.u);
 
   /* S = (A * v^u) ^ b % N 
    */
-  S = _gnutls_calc_srp_S1 (A, _b, session->key->u, V, N);
+  S = _gnutls_calc_srp_S1 (A, _b, session->key.u, V, N);
   if (S == NULL)
     {
       gnutls_assert ();
@@ -396,10 +396,10 @@ _gnutls_proc_srp_client_kx (gnutls_session_t session, uint8_t * data,
   _gnutls_mpi_release (&A);
   _gnutls_mpi_release (&_b);
   _gnutls_mpi_release (&V);
-  _gnutls_mpi_release (&session->key->u);
+  _gnutls_mpi_release (&session->key.u);
   _gnutls_mpi_release (&B);
 
-  ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
+  ret = _gnutls_mpi_dprint (session->key.KEY, &session->key.key);
   _gnutls_mpi_release (&S);
 
   if (ret < 0)
@@ -812,7 +812,7 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, uint8_t * data,
   priv = epriv.ptr;
 
   cred = (gnutls_srp_client_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_SRP, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_SRP, NULL);
 
   if (cred == NULL)
     {
@@ -936,7 +936,7 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, uint8_t * data,
       return ret;
     }
 
-  if (_gnutls_mpi_scan_nz (&session->key->x, hd, _n_g) != 0)
+  if (_gnutls_mpi_scan_nz (&session->key.x, hd, _n_g) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;

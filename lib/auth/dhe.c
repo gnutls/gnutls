@@ -128,7 +128,7 @@ gen_dhe_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -346,7 +346,7 @@ proc_dhe_client_kx (gnutls_session_t session, uint8_t * data,
   gnutls_dh_params_t dh_params;
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();

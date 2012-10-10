@@ -67,7 +67,7 @@ gen_anon_ecdh_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_anon_server_credentials_t cred;
 
   cred = (gnutls_anon_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_ANON, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_ANON, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -99,7 +99,7 @@ proc_anon_ecdh_client_kx (gnutls_session_t session, uint8_t * data,
   gnutls_anon_server_credentials_t cred;
 
   cred = (gnutls_anon_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_ANON, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_ANON, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();

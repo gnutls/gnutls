@@ -475,7 +475,7 @@ call_get_cert_callback (gnutls_session_t session,
   unsigned int pcert_length = 0;
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -698,7 +698,7 @@ _select_client_cert (gnutls_session_t session,
   gnutls_datum_t *issuers_dn = NULL;
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -1080,7 +1080,7 @@ _gnutls_proc_x509_server_crt (gnutls_session_t session,
   gnutls_datum_t tmp;
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -1223,7 +1223,7 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
   unsigned int subkey_id_set = 0;
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -1402,7 +1402,7 @@ _gnutls_proc_crt (gnutls_session_t session, uint8_t * data, size_t data_size)
   gnutls_certificate_credentials_t cred;
 
   cred =
-    (gnutls_certificate_credentials_t) _gnutls_get_cred (session->key,
+    (gnutls_certificate_credentials_t) _gnutls_get_cred (session,
                                                          GNUTLS_CRD_CERTIFICATE,
                                                          NULL);
   if (cred == NULL)
@@ -1465,7 +1465,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, uint8_t * data,
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -1553,7 +1553,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, uint8_t * data,
   /* We should reply with a certificate message, 
    * even if we have no certificate to send.
    */
-  session->key->crt_requested = 1;
+  session->key.crt_requested = 1;
 
   return 0;
 }
@@ -1722,7 +1722,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session,
    */
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -2082,7 +2082,7 @@ _gnutls_server_select_cert (gnutls_session_t session,
   char server_name[MAX_CN];
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();

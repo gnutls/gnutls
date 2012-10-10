@@ -93,7 +93,7 @@ gen_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_datum_t username, key;
 
   cred = (gnutls_psk_client_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
     return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
@@ -144,7 +144,7 @@ gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_psk_server_credentials_t cred;
 
   cred = (gnutls_psk_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -225,7 +225,7 @@ proc_psk_client_kx (gnutls_session_t session, uint8_t * data,
   ssize_t data_size = _data_size;
 
   cred = (gnutls_psk_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
     {
@@ -301,7 +301,7 @@ proc_ecdhe_psk_client_kx (gnutls_session_t session, uint8_t * data,
   ssize_t data_size = _data_size;
 
   cred = (gnutls_psk_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
     {

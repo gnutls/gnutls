@@ -2477,7 +2477,7 @@ static int run_verify_callback(gnutls_session_t session, unsigned int side)
   int ret, type;
 
   cred =
-    (gnutls_certificate_credentials_t) _gnutls_get_cred (session->key,
+    (gnutls_certificate_credentials_t) _gnutls_get_cred (session,
                                                          GNUTLS_CRD_CERTIFICATE,
                                                          NULL);
 
@@ -3108,7 +3108,7 @@ check_server_params (gnutls_session_t session,
     {
       int delete;
       gnutls_certificate_credentials_t x509_cred =
-        (gnutls_certificate_credentials_t) _gnutls_get_cred (session->key,
+        (gnutls_certificate_credentials_t) _gnutls_get_cred (session,
                                                              cred_type, NULL);
 
       if (x509_cred != NULL)
@@ -3143,7 +3143,7 @@ check_server_params (gnutls_session_t session,
   else if (cred_type == GNUTLS_CRD_ANON)
     {
       gnutls_anon_server_credentials_t anon_cred =
-        (gnutls_anon_server_credentials_t) _gnutls_get_cred (session->key,
+        (gnutls_anon_server_credentials_t) _gnutls_get_cred (session,
                                                              cred_type, NULL);
 
       if (anon_cred != NULL)
@@ -3158,7 +3158,7 @@ check_server_params (gnutls_session_t session,
   else if (cred_type == GNUTLS_CRD_PSK)
     {
       gnutls_psk_server_credentials_t psk_cred =
-        (gnutls_psk_server_credentials_t) _gnutls_get_cred (session->key,
+        (gnutls_psk_server_credentials_t) _gnutls_get_cred (session,
                                                             cred_type, NULL);
 
       if (psk_cred != NULL)
@@ -3229,7 +3229,7 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
    */
 
   cert_cred =
-    (gnutls_certificate_credentials_t) _gnutls_get_cred (session->key,
+    (gnutls_certificate_credentials_t) _gnutls_get_cred (session,
                                                          GNUTLS_CRD_CERTIFICATE,
                                                          NULL);
 
@@ -3303,7 +3303,7 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
          SRP credential too.  */
       if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS)
         {
-          if (!_gnutls_get_cred (session->key, GNUTLS_CRD_SRP, NULL))
+          if (!_gnutls_get_cred (session, GNUTLS_CRD_SRP, NULL))
             {
               delete = 1;
             }

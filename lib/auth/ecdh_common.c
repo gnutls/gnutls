@@ -47,22 +47,22 @@ gnutls_pk_params_st pub;
 int ret;
 
   memset(&pub,0,sizeof(pub));
-  pub.params[ECC_PRIME] = session->key->ecdh_params.params[ECC_PRIME];
-  pub.params[ECC_ORDER] = session->key->ecdh_params.params[ECC_ORDER];
-  pub.params[ECC_A] = session->key->ecdh_params.params[ECC_A];
-  pub.params[ECC_B] = session->key->ecdh_params.params[ECC_B];
-  pub.params[ECC_GX] = session->key->ecdh_params.params[ECC_GX];
-  pub.params[ECC_GY] = session->key->ecdh_params.params[ECC_GY];
-  pub.params[ECC_X] = session->key->ecdh_x;
-  pub.params[ECC_Y] = session->key->ecdh_y;
+  pub.params[ECC_PRIME] = session->key.ecdh_params.params[ECC_PRIME];
+  pub.params[ECC_ORDER] = session->key.ecdh_params.params[ECC_ORDER];
+  pub.params[ECC_A] = session->key.ecdh_params.params[ECC_A];
+  pub.params[ECC_B] = session->key.ecdh_params.params[ECC_B];
+  pub.params[ECC_GX] = session->key.ecdh_params.params[ECC_GX];
+  pub.params[ECC_GY] = session->key.ecdh_params.params[ECC_GY];
+  pub.params[ECC_X] = session->key.ecdh_x;
+  pub.params[ECC_Y] = session->key.ecdh_y;
 
   if (psk_key == NULL)
-    ret = _gnutls_pk_derive(GNUTLS_PK_EC, &session->key->key, &session->key->ecdh_params, &pub);
+    ret = _gnutls_pk_derive(GNUTLS_PK_EC, &session->key.key, &session->key.ecdh_params, &pub);
   else
     {
       gnutls_datum_t tmp_dh_key;
 
-      ret = _gnutls_pk_derive(GNUTLS_PK_EC, &tmp_dh_key, &session->key->ecdh_params, &pub);
+      ret = _gnutls_pk_derive(GNUTLS_PK_EC, &tmp_dh_key, &session->key.ecdh_params, &pub);
       if (ret < 0)
         {
           ret = gnutls_assert_val(ret);
@@ -84,9 +84,9 @@ int ret;
 
 cleanup:
   /* no longer needed */
-  _gnutls_mpi_release (&session->key->ecdh_x);
-  _gnutls_mpi_release (&session->key->ecdh_y);
-  gnutls_pk_params_release( &session->key->ecdh_params);
+  _gnutls_mpi_release (&session->key.ecdh_x);
+  _gnutls_mpi_release (&session->key.ecdh_y);
+  gnutls_pk_params_release( &session->key.ecdh_params);
   return ret;
 
 }
@@ -110,7 +110,7 @@ _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
   i+=1;
 
   DECR_LEN (data_size, point_size);
-  ret = _gnutls_ecc_ansi_x963_import(&data[i], point_size, &session->key->ecdh_x, &session->key->ecdh_y);
+  ret = _gnutls_ecc_ansi_x963_import(&data[i], point_size, &session->key.ecdh_x, &session->key.ecdh_y);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -139,12 +139,12 @@ _gnutls_gen_ecdh_common_client_kx_int (gnutls_session_t session,
   int curve = _gnutls_session_ecc_curve_get(session);
 
   /* generate temporal key */
-  ret = _gnutls_pk_generate(GNUTLS_PK_EC, curve, &session->key->ecdh_params);
+  ret = _gnutls_pk_generate(GNUTLS_PK_EC, curve, &session->key.ecdh_params);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = _gnutls_ecc_ansi_x963_export(curve, session->key->ecdh_params.params[6] /* x */,
-    session->key->ecdh_params.params[7] /* y */, &out);
+  ret = _gnutls_ecc_ansi_x963_export(curve, session->key.ecdh_params.params[6] /* x */,
+    session->key.ecdh_params.params[7] /* y */, &out);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -192,7 +192,7 @@ _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
   i++;
 
   DECR_LEN (data_size, point_size);
-  ret = _gnutls_ecc_ansi_x963_import(&data[i], point_size, &session->key->ecdh_x, &session->key->ecdh_y);
+  ret = _gnutls_ecc_ansi_x963_import(&data[i], point_size, &session->key.ecdh_x, &session->key.ecdh_y);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -225,12 +225,12 @@ int _gnutls_ecdh_common_print_server_kx (gnutls_session_t session, gnutls_buffer
     return gnutls_assert_val(ret);
 
   /* generate temporal key */
-  ret = _gnutls_pk_generate(GNUTLS_PK_EC, curve, &session->key->ecdh_params);
+  ret = _gnutls_pk_generate(GNUTLS_PK_EC, curve, &session->key.ecdh_params);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = _gnutls_ecc_ansi_x963_export(curve, session->key->ecdh_params.params[6] /* x */,
-    session->key->ecdh_params.params[7] /* y */, &out);
+  ret = _gnutls_ecc_ansi_x963_export(curve, session->key.ecdh_params.params[6] /* x */,
+    session->key.ecdh_params.params[7] /* y */, &out);
   if (ret < 0)
     return gnutls_assert_val(ret);
 

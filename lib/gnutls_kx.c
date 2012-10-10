@@ -79,7 +79,7 @@ int
 _gnutls_generate_master (gnutls_session_t session, int keep_premaster)
 {
   if (session->internals.resumed == RESUME_FALSE)
-    return generate_normal_master (session, &session->key->key, keep_premaster);
+    return generate_normal_master (session, &session->key.key, keep_premaster);
   else if (session->internals.premaster_set)  
     {
       gnutls_datum_t premaster;
@@ -306,7 +306,7 @@ _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
 
   /* if certificate verify is not needed just exit 
    */
-  if (session->key->crt_requested == 0)
+  if (session->key.crt_requested == 0)
     return 0;
 
 
@@ -357,7 +357,7 @@ _gnutls_send_client_certificate (gnutls_session_t session, int again)
   int ret = 0;
 
 
-  if (session->key->crt_requested == 0)
+  if (session->key.crt_requested == 0)
     return 0;
 
   if (session->internals.auth_struct->gnutls_generate_client_certificate ==
@@ -651,7 +651,7 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
   if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND && optional != 0)
     ret = 0;
   else
-    session->key->crt_requested = 1;
+    session->key.crt_requested = 1;
 
 cleanup:
   _gnutls_buffer_clear(&buf);
@@ -708,7 +708,7 @@ _gnutls_recv_client_certificate_verify_message (gnutls_session_t session)
     return 0;
 
   if (session->internals.send_cert_req == 0 ||
-      session->key->crt_requested == 0)
+      session->key.crt_requested == 0)
     {
       return 0;
     }

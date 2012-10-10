@@ -505,7 +505,7 @@ gnutls_certificate_get_ours (gnutls_session_t session)
   CHECK_AUTH (GNUTLS_CRD_CERTIFICATE, NULL);
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL || cred->certs == NULL)
     {
       gnutls_assert ();
@@ -566,7 +566,7 @@ gnutls_certificate_get_peers (gnutls_session_t
 int
 gnutls_certificate_client_get_request_status (gnutls_session_t session)
 {
-  return session->key->crt_requested;
+  return session->key.crt_requested;
 }
 
 /**

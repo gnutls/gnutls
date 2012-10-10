@@ -183,7 +183,7 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
   if (session->security_parameters.entity == GNUTLS_SERVER)
     {
       cred = (gnutls_certificate_credentials_t)
-        _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+        _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
 
       if (cred == NULL)
         return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
@@ -341,14 +341,6 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
   _mbuffer_head_init (&(*session)->internals.handshake_send_buffer);
   _gnutls_handshake_recv_buffer_init(*session);
 
-  (*session)->key = gnutls_calloc (1, sizeof (struct gnutls_key_st));
-  if ((*session)->key == NULL)
-    {
-      gnutls_free (*session);
-      *session = NULL;
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
   (*session)->internals.expire_time = DEFAULT_EXPIRE_TIME;      /* one hour default */
 
   gnutls_dh_set_prime_bits ((*session), MIN_DH_BITS);
@@ -467,33 +459,27 @@ gnutls_deinit (gnutls_session_t session)
   gnutls_credentials_clear (session);
   _gnutls_selected_certs_deinit (session);
 
-  if (session->key != NULL)
-    {
-      gnutls_pk_params_release(&session->key->ecdh_params);
-      _gnutls_mpi_release (&session->key->ecdh_x);
-      _gnutls_mpi_release (&session->key->ecdh_y);
+  gnutls_pk_params_release(&session->key.ecdh_params);
+  _gnutls_mpi_release (&session->key.ecdh_x);
+  _gnutls_mpi_release (&session->key.ecdh_y);
 
-      _gnutls_mpi_release (&session->key->KEY);
-      _gnutls_mpi_release (&session->key->client_Y);
-      _gnutls_mpi_release (&session->key->client_p);
-      _gnutls_mpi_release (&session->key->client_g);
+  _gnutls_mpi_release (&session->key.KEY);
+  _gnutls_mpi_release (&session->key.client_Y);
+  _gnutls_mpi_release (&session->key.client_p);
+  _gnutls_mpi_release (&session->key.client_g);
 
-      _gnutls_mpi_release (&session->key->u);
-      _gnutls_mpi_release (&session->key->a);
-      _gnutls_mpi_release (&session->key->x);
-      _gnutls_mpi_release (&session->key->A);
-      _gnutls_mpi_release (&session->key->B);
-      _gnutls_mpi_release (&session->key->b);
+  _gnutls_mpi_release (&session->key.u);
+  _gnutls_mpi_release (&session->key.a);
+  _gnutls_mpi_release (&session->key.x);
+  _gnutls_mpi_release (&session->key.A);
+  _gnutls_mpi_release (&session->key.B);
+  _gnutls_mpi_release (&session->key.b);
 
-      /* RSA */
-      _gnutls_mpi_release (&session->key->rsa[0]);
-      _gnutls_mpi_release (&session->key->rsa[1]);
+  /* RSA */
+  _gnutls_mpi_release (&session->key.rsa[0]);
+  _gnutls_mpi_release (&session->key.rsa[1]);
 
-      _gnutls_mpi_release (&session->key->dh_secret);
-      gnutls_free (session->key);
-
-      session->key = NULL;
-    }
+  _gnutls_mpi_release (&session->key.dh_secret);
 
   memset (session, 0, sizeof (struct gnutls_session_int));
   gnutls_free (session);

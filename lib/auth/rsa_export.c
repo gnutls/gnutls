@@ -76,7 +76,7 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
   gnutls_rsa_params_t rsa_params;
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -193,9 +193,9 @@ proc_rsa_export_client_kx (gnutls_session_t session, uint8_t * data,
 
   if (randomize_key != 0)
     {
-      session->key->key.size = GNUTLS_MASTER_SIZE;
-      session->key->key.data = gnutls_malloc (session->key->key.size);
-      if (session->key->key.data == NULL)
+      session->key.key.size = GNUTLS_MASTER_SIZE;
+      session->key.key.data = gnutls_malloc (session->key.key.size);
+      if (session->key.key.data == NULL)
         {
           gnutls_assert ();
           return GNUTLS_E_MEMORY_ERROR;
@@ -203,8 +203,8 @@ proc_rsa_export_client_kx (gnutls_session_t session, uint8_t * data,
 
       /* we do not need strong random numbers here.
        */
-      ret = _gnutls_rnd (GNUTLS_RND_NONCE, session->key->key.data,
-                         session->key->key.size);
+      ret = _gnutls_rnd (GNUTLS_RND_NONCE, session->key.key.data,
+                         session->key.key.size);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -214,15 +214,15 @@ proc_rsa_export_client_kx (gnutls_session_t session, uint8_t * data,
     }
   else
     {
-      session->key->key.data = plaintext.data;
-      session->key->key.size = plaintext.size;
+      session->key.key.data = plaintext.data;
+      session->key.key.size = plaintext.size;
     }
 
   /* This is here to avoid the version check attack
    * discussed above.
    */
-  session->key->key.data[0] = _gnutls_get_adv_version_major (session);
-  session->key->key.data[1] = _gnutls_get_adv_version_minor (session);
+  session->key.key.data[0] = _gnutls_get_adv_version_major (session);
+  session->key.key.data[1] = _gnutls_get_adv_version_minor (session);
 
   return 0;
 }
@@ -242,7 +242,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   unsigned int bits = 0;
 
   cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -413,20 +413,20 @@ proc_rsa_export_server_kx (gnutls_session_t session,
   _n_e = n_e;
   _n_m = n_m;
 
-  if (_gnutls_mpi_scan_nz (&session->key->rsa[0], data_m, _n_m) != 0)
+  if (_gnutls_mpi_scan_nz (&session->key.rsa[0], data_m, _n_m) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-  if (_gnutls_mpi_scan_nz (&session->key->rsa[1], data_e, _n_e) != 0)
+  if (_gnutls_mpi_scan_nz (&session->key.rsa[1], data_e, _n_e) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-  _gnutls_rsa_export_set_pubkey (session, session->key->rsa[1],
-                                 session->key->rsa[0]);
+  _gnutls_rsa_export_set_pubkey (session, session->key.rsa[1],
+                                 session->key.rsa[0]);
 
   /* VERIFY SIGNATURE */
 

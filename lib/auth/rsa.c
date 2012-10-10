@@ -102,7 +102,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
       GNUTLS_KX_RSA_EXPORT &&
       _gnutls_pubkey_is_over_rsa_512(peer_cert.pubkey) == 0)
     {
-      if (session->key->rsa[0] == NULL || session->key->rsa[1] == NULL)
+      if (session->key.rsa[0] == NULL || session->key.rsa[1] == NULL)
         {
           gnutls_assert ();
           ret = GNUTLS_E_INTERNAL_ERROR;
@@ -111,7 +111,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 
       for (i = 0; i < params->params_nr; i++)
         {
-          params->params[i] = _gnutls_mpi_copy (session->key->rsa[i]);
+          params->params[i] = _gnutls_mpi_copy (session->key.rsa[i]);
         }
 
       ret = 0;
@@ -202,9 +202,9 @@ proc_rsa_client_kx (gnutls_session_t session, uint8_t * data,
 
   if (randomize_key != 0)
     {
-      session->key->key.size = GNUTLS_MASTER_SIZE;
-      session->key->key.data = gnutls_malloc (session->key->key.size);
-      if (session->key->key.data == NULL)
+      session->key.key.size = GNUTLS_MASTER_SIZE;
+      session->key.key.data = gnutls_malloc (session->key.key.size);
+      if (session->key.key.data == NULL)
         {
           gnutls_assert ();
           return GNUTLS_E_MEMORY_ERROR;
@@ -212,8 +212,8 @@ proc_rsa_client_kx (gnutls_session_t session, uint8_t * data,
 
       /* we do not need strong random numbers here.
        */
-      ret = _gnutls_rnd (GNUTLS_RND_NONCE, session->key->key.data,
-                         session->key->key.size);
+      ret = _gnutls_rnd (GNUTLS_RND_NONCE, session->key.key.data,
+                         session->key.key.size);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -223,15 +223,15 @@ proc_rsa_client_kx (gnutls_session_t session, uint8_t * data,
     }
   else
     {
-      session->key->key.data = plaintext.data;
-      session->key->key.size = plaintext.size;
+      session->key.key.data = plaintext.data;
+      session->key.key.size = plaintext.size;
     }
 
   /* This is here to avoid the version check attack
    * discussed above.
    */
-  session->key->key.data[0] = _gnutls_get_adv_version_major (session);
-  session->key->key.data[1] = _gnutls_get_adv_version_minor (session);
+  session->key.key.data[0] = _gnutls_get_adv_version_major (session);
+  session->key.key.data[1] = _gnutls_get_adv_version_minor (session);
 
   return 0;
 }
@@ -243,7 +243,7 @@ proc_rsa_client_kx (gnutls_session_t session, uint8_t * data,
 int
 _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
-  cert_auth_info_t auth = session->key->auth_info;
+  cert_auth_info_t auth = session->key.auth_info;
   gnutls_datum_t sdata;         /* data to send */
   gnutls_pk_params_st params;
   int ret;
@@ -258,17 +258,17 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  session->key->key.size = GNUTLS_MASTER_SIZE;
-  session->key->key.data = gnutls_malloc (session->key->key.size);
+  session->key.key.size = GNUTLS_MASTER_SIZE;
+  session->key.key.data = gnutls_malloc (session->key.key.size);
 
-  if (session->key->key.data == NULL)
+  if (session->key.key.data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, session->key->key.data,
-                     session->key->key.size);
+  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, session->key.key.data,
+                     session->key.key.size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -279,13 +279,13 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
   if (session->internals.rsa_pms_version[0] == 0)
     {
-      session->key->key.data[0] = _gnutls_version_get_major (ver);
-      session->key->key.data[1] = _gnutls_version_get_minor (ver);
+      session->key.key.data[0] = _gnutls_version_get_major (ver);
+      session->key.key.data[1] = _gnutls_version_get_minor (ver);
     }
   else
     {                           /* use the version provided */
-      session->key->key.data[0] = session->internals.rsa_pms_version[0];
-      session->key->key.data[1] = session->internals.rsa_pms_version[1];
+      session->key.key.data[0] = session->internals.rsa_pms_version[0];
+      session->key.key.data[1] = session->internals.rsa_pms_version[1];
     }
 
   /* move RSA parameters to key (session).
@@ -298,7 +298,7 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
     }
 
   ret =
-       _gnutls_pk_encrypt (GNUTLS_PK_RSA, &sdata, &session->key->key,
+       _gnutls_pk_encrypt (GNUTLS_PK_RSA, &sdata, &session->key.key,
                                   &params);
 
   gnutls_pk_params_release(&params);

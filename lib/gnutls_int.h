@@ -424,7 +424,7 @@ struct gnutls_key_st
    * for a client certificate verify
    */
 };
-typedef struct gnutls_key_st *gnutls_key_st;
+typedef struct gnutls_key_st gnutls_key_st;
 
 struct pin_info_st
 {

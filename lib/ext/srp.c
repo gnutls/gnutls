@@ -124,7 +124,7 @@ _gnutls_srp_send_params (gnutls_session_t session,
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       gnutls_srp_client_credentials_t cred = (gnutls_srp_client_credentials_t)
-        _gnutls_get_cred (session->key, GNUTLS_CRD_SRP, NULL);
+        _gnutls_get_cred (session, GNUTLS_CRD_SRP, NULL);
 
       if (cred == NULL)
         return 0;

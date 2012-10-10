@@ -131,7 +131,7 @@ _gnutls_psk_pwd_find_entry (gnutls_session_t session, char *username,
   int ret;
 
   cred = (gnutls_psk_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+    _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();

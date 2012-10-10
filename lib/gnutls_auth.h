@@ -47,7 +47,7 @@ typedef struct mod_auth_st_int
                                                     uint8_t *, size_t);
 } mod_auth_st;
 
-const void *_gnutls_get_cred (gnutls_key_st key,
+const void *_gnutls_get_cred (gnutls_session_t session,
                               gnutls_credentials_type_t kx, int *err);
 const void *_gnutls_get_kx_cred (gnutls_session_t session,
                                  gnutls_kx_algorithm_t algo, int *err);
