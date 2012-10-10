@@ -66,11 +66,17 @@ openssl_hash_password (const char *pass, gnutls_datum_t * key, gnutls_datum_t * 
         {
           err = gnutls_hash (hash, pass, strlen (pass));
           if (err)
-            goto hash_err;
+            {
+              gnutls_assert();
+              goto hash_err;
+            }
         }
       err = gnutls_hash (hash, salt->data, 8);
       if (err)
-        goto hash_err;
+        {
+          gnutls_assert();
+          goto hash_err;
+        }
 
       gnutls_hash_deinit (hash, md5);
 
@@ -131,7 +137,7 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
   const char *pem_header = (void*)data->data;
   const char *pem_header_start = (void*)data->data;
   ssize_t pem_header_size;
-  int ret, err;
+  int ret;
   unsigned int i, iv_size, l;
 
   pem_header_size = data->size;
@@ -178,7 +184,7 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
   salt.size = iv_size;
   salt.data = gnutls_malloc (salt.size);
   if (!salt.data)
-    return GNUTLS_E_MEMORY_ERROR;
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
     
   for (i = 0; i < salt.size * 2; i++)
     {
@@ -231,35 +237,43 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
   enc_key.size = gnutls_cipher_get_key_size (cipher);
   enc_key.data = gnutls_malloc (enc_key.size);
   if (!enc_key.data)
-    goto out_b64;
+    {
+      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+      goto out_b64;
+    }
 
   key_data = gnutls_malloc (b64_data.size);
   if (!key_data)
-    goto out_enc_key;
+    {
+      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+      goto out_enc_key;
+    }
 
   while (1)
     {
       memcpy (key_data, b64_data.data, b64_data.size);
 
       ret = openssl_hash_password (password, &enc_key, &salt);
-      if (ret)
-        goto out;
-
-      err = gnutls_cipher_init (&handle, cipher, &enc_key, &salt);
-      if (err)
+      if (ret < 0)
         {
           gnutls_assert();
-          gnutls_cipher_deinit (handle);
-          ret = err;
           goto out;
         }
 
-      err = gnutls_cipher_decrypt (handle, key_data, b64_data.size);
-      gnutls_cipher_deinit (handle);
-      if (err)
+      ret = gnutls_cipher_init (&handle, cipher, &enc_key, &salt);
+      if (ret < 0)
         {
           gnutls_assert();
-          ret = -err;
+          gnutls_cipher_deinit (handle);
+          goto out;
+        }
+
+      ret = gnutls_cipher_decrypt (handle, key_data, b64_data.size);
+      gnutls_cipher_deinit (handle);
+
+      if (ret < 0)
+        {
+          gnutls_assert();
           goto out;
         }
 
@@ -278,7 +292,10 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
               keylen = 0;
 
               if (lenlen > 3)
-                goto fail;
+                {
+                  gnutls_assert();
+                  goto fail;
+                }
 
               while (lenlen)
                 {
@@ -290,28 +307,31 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
           keylen += ofs;
 
           /* If there appears to be more padding than required, fail */
-          if (b64_data.size - keylen >= blocksize)
-            goto fail;
+          if (b64_data.size - keylen > blocksize)
+            {
+              gnutls_assert();
+              goto fail;
+            }
 
           /* If the padding bytes aren't all equal to the amount of padding, fail */
           ofs = keylen;
           while (ofs < b64_data.size)
             {
               if (key_data[ofs] != b64_data.size - keylen)
-                goto fail;
+                {
+                  gnutls_assert();
+                  goto fail;
+                }
               ofs++;
             }
 
           key_datum.data = key_data;
           key_datum.size = keylen;
-          err =
+          ret =
               gnutls_x509_privkey_import (key, &key_datum,
                                           GNUTLS_X509_FMT_DER);
-          if (!err)
-            {
-              ret = 0;
-              goto out;
-            }
+          if (ret == 0)
+            goto out;
         }
     fail:
       ret = GNUTLS_E_DECRYPTION_FAILED;
