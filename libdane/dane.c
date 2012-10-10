@@ -436,7 +436,8 @@ cleanup:
  * @hostname: The hostname associated with the chain
  * @proto: The protocol of the service connecting (e.g. tcp)
  * @port: The port of the service connecting (e.g. 443)
- * @flags: should be zero
+ * @sflags: Flags for the the initialization of @s (if NULL)
+ * @vflags: Verification flags; should be zero
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
  * This function will verify the given certificate chain against the
@@ -460,7 +461,8 @@ int dane_verify_crt (dane_state_t s,
 	const gnutls_datum_t *chain, unsigned chain_size,
 	gnutls_certificate_type_t chain_type,
 	const char * hostname, const char* proto, unsigned int port,
-	unsigned int flags, unsigned int *verify)
+	unsigned int sflags, unsigned int vflags,
+	unsigned int *verify)
 {
 dane_state_t _s = NULL;
 dane_query_t r = NULL;
@@ -474,7 +476,7 @@ gnutls_datum_t data;
 	*verify = 0;
 	
 	if (s == NULL) {
-		ret = dane_state_init(&_s, flags);
+		ret = dane_state_init(&_s, sflags);
 		if (ret < 0) {
 			return ret;
 		}
@@ -523,7 +525,8 @@ cleanup:
  * @hostname: The hostname associated with the chain
  * @proto: The protocol of the service connecting (e.g. tcp)
  * @port: The port of the service connecting (e.g. 443)
- * @flags: should be zero.
+ * @sflags: Flags for the the initialization of @s (if NULL)
+ * @vflags: Verification flags; should be zero
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
  * This function will verify session's certificate chain against the
@@ -538,7 +541,8 @@ int dane_verify_session_crt (
         dane_state_t s,
 	gnutls_session_t session,
 	const char * hostname, const char* proto, unsigned int port,
-	unsigned int flags, unsigned int *verify)
+	unsigned int sflags, unsigned int vflags,
+	unsigned int *verify)
 {
 const gnutls_datum_t *cert_list;
 unsigned int cert_list_size = 0;
@@ -551,5 +555,5 @@ unsigned int type;
 	
 	type = gnutls_certificate_type_get(session);
 	
-	return dane_verify_crt(s, cert_list, cert_list_size, type, hostname, proto, port, flags, verify);
+	return dane_verify_crt(s, cert_list, cert_list_size, type, hostname, proto, port, sflags, vflags, verify);
 }

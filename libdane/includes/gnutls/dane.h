@@ -136,13 +136,15 @@ int dane_verify_crt (dane_state_t s,
 	const gnutls_datum_t *chain, unsigned chain_size,
 	gnutls_certificate_type_t chain_type,
 	const char * hostname, const char* proto, unsigned int port,
-	unsigned int flags, unsigned int *verify);
+	unsigned int sflags, unsigned int vflags,
+	unsigned int *verify);
 
 int dane_verify_session_crt (
         dane_state_t s,
 	gnutls_session_t session,
 	const char * hostname, const char* proto, unsigned int port,
-	unsigned int flags, unsigned int *verify);
+	unsigned int sflags, unsigned int vflags,
+	unsigned int *verify);
 
 const char * dane_strerror (int error);
 
