@@ -43,6 +43,8 @@ _pkcs12_check_pass (const char *pass, size_t plen)
   return 0;
 }
 
+#define MAX_PASS_LEN 128
+
 /* ID should be:
  * 3 for MAC
  * 2 for IV
@@ -60,9 +62,10 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
   bigint_t num_b1 = NULL, num_ij = NULL;
   bigint_t mpi512 = NULL;
   unsigned int pwlen;
-  uint8_t hash[20], buf_b[64], buf_i[128], *p;
+  uint8_t hash[20], buf_b[64], buf_i[MAX_PASS_LEN*2+64], *p;
+  uint8_t d[64];
   size_t cur_keylen;
-  size_t n, m;
+  size_t n, m, p_size, i_size;
   const uint8_t buf_512[] =      /* 2^64 */
   { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -79,7 +82,7 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
   else
     pwlen = strlen (pw);
 
-  if (pwlen > 63 / 2)
+  if (pwlen > MAX_PASS_LEN)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -99,12 +102,17 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
     }
 
   /* Store salt and password in BUF_I */
+  p_size = ((pwlen/64)*64) + 64;
+  
+  if (p_size > sizeof(buf_i)-64)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+  
   p = buf_i;
   for (i = 0; i < 64; i++)
     *p++ = salt[i % salt_size];
   if (pw)
     {
-      for (i = j = 0; i < 64; i += 2)
+      for (i = j = 0; i < p_size; i += 2)
         {
           *p++ = 0;
           *p++ = pw[j];
@@ -113,7 +121,9 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
         }
     }
   else
-    memset (p, 0, 64);
+    memset (p, 0, p_size);
+
+  i_size = 64+p_size;
 
   for (;;)
     {
@@ -123,12 +133,9 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
           gnutls_assert ();
           goto cleanup;
         }
-      for (i = 0; i < 64; i++)
-        {
-          unsigned char lid = id & 0xFF;
-          _gnutls_hash (&md, &lid, 1);
-        }
-      _gnutls_hash (&md, buf_i, pw ? 128 : 64);
+      memset(d, id & 0xff, 64);
+      _gnutls_hash (&md, d, 64);
+      _gnutls_hash (&md, buf_i, pw ? i_size : 64);
       _gnutls_hash_deinit (&md, hash);
       for (i = 1; i < iter; i++)
         {
