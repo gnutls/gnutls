@@ -10,8 +10,9 @@ Reported by danblack at http://savannah.gnu.org/support/?108146
 ** libgnutls: Added gnutls_ocsp_resp_check_crt() to check whether the OCSP
 response corresponds to the given certificate.
 
-** libgnutls: Compatibility code with RFC5081 was removed. The OpenPGP
-code now is RFC6091 compliant only.
+** libgnutls: Several updates in the OpenPGP code. The generating code
+is fully RFC6091 compliant and RFC5081 support is only supported in client
+mode.
 
 ** API and ABI modifications:
 gnutls_ocsp_resp_check_crt: Added

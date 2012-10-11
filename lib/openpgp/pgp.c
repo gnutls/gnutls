@@ -1588,6 +1588,9 @@ gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
  * This allows setting a preferred key id for the given certificate.
  * This key will be used by functions that involve key handling.
  *
+ * If the provided @keyid is %NULL then the master key is
+ * set as preferred.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
@@ -1601,6 +1604,20 @@ gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
+    }
+    
+  if (keyid == NULL) /* set the master as preferred */
+    {
+      uint8_t tmp[GNUTLS_OPENPGP_KEYID_SIZE];
+      
+      ret = gnutls_openpgp_crt_get_key_id (key, tmp);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+        
+      key->preferred_set = 1;
+      memcpy (key->preferred_keyid, tmp, GNUTLS_OPENPGP_KEYID_SIZE);
+
+      return 0;
     }
 
   /* check if the id is valid */

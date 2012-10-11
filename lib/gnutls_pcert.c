@@ -336,14 +336,11 @@ gnutls_openpgp_crt_t crt;
       goto cleanup;
     }
 
-  if (keyid != NULL)
+  ret = gnutls_openpgp_crt_set_preferred_key_id(crt, keyid);
+  if (ret < 0)
     {
-      ret = gnutls_openpgp_crt_set_preferred_key_id(crt, keyid);
-      if (ret < 0)
-        {
-          ret = gnutls_assert_val(ret);
-          goto cleanup;
-        }
+      ret = gnutls_assert_val(ret);
+      goto cleanup;
     }
 
   ret = gnutls_pcert_import_openpgp(pcert, crt, flags);

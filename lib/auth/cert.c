@@ -1180,6 +1180,7 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
   int key_type;
   gnutls_pcert_st *peer_certificate_list = NULL;
   gnutls_datum_t tmp, akey = { NULL, 0 };
+  unsigned int compat = 0;
   uint8_t subkey_id[GNUTLS_OPENPGP_KEYID_SIZE];
 
   cred = (gnutls_certificate_credentials_t)
@@ -1294,10 +1295,18 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
       len = _gnutls_read_uint24 (p);
       p += 3;
 
-      if (len != 0) /* PGP_EMPTY_KEY */
-        return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
-      else
+      if (len == 0) /* PGP_EMPTY_KEY */
         return GNUTLS_E_NO_CERTIFICATE_FOUND;
+      /* Uncomment to remove compatibility with RFC5081.
+      else
+        return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);*/
+
+      DECR_LEN (dsize, len);
+
+      tmp.size = len;
+      tmp.data = p;
+      
+      compat = 1;
     }
   else
     {
@@ -1320,12 +1329,18 @@ _gnutls_proc_openpgp_server_crt (gnutls_session_t session,
     gnutls_pcert_import_openpgp_raw (&peer_certificate_list[0],
                                      &tmp,
                                      GNUTLS_OPENPGP_FMT_RAW,
-                                     subkey_id,
+                                     (compat==0)?subkey_id:NULL,
                                      0);
   if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
+    }
+  
+  if (compat != 0)
+    {
+      size_t t = sizeof(subkey_id);
+      gnutls_pubkey_get_openpgp_key_id(peer_certificate_list[0].pubkey, 0, subkey_id, &t, NULL);
     }
 
   ret =
