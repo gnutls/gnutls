@@ -10,6 +10,11 @@ extension.
 ** libgnutls: gnutls_certificate_verify_peers2() will use the OCSP
 certificate status extension in verification.
 
+** libgnutls: Bug fixes in gnutls_x509_privkey_import_openssl().
+
+** libgnutls: Increased maximum password length in the PKCS #12
+functions.
+
 ** libgnutls: Fixed the receipt of session tickets during session resumption.
 Reported by danblack at http://savannah.gnu.org/support/?108146
 
