@@ -125,7 +125,7 @@ int
 _gnutls_openpgp_export (cdk_kbnode_t node,
                         gnutls_openpgp_crt_fmt_t format,
                         void *output_data,
-                        size_t * output_data_size, int private)
+                        size_t * output_data_size, int priv)
 {
   size_t input_data_size = *output_data_size;
   size_t calc_size;
@@ -141,7 +141,7 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
 
   /* If the caller uses output_data == NULL then return what he expects.
    */
-  if (!output_data)
+  if (!output_data && format != GNUTLS_OPENPGP_FMT_BASE64)
     {
       gnutls_assert ();
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -156,7 +156,7 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
          buffer is large enough. */
       rc = cdk_armor_encode_buffer (in, *output_data_size,
                                     NULL, 0, &calc_size,
-                                    private ? CDK_ARMOR_SECKEY :
+                                    priv ? CDK_ARMOR_SECKEY :
                                     CDK_ARMOR_PUBKEY);
       if (rc || calc_size > input_data_size)
         {
@@ -168,7 +168,7 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
 
       rc = cdk_armor_encode_buffer (in, *output_data_size,
                                     output_data, input_data_size, &calc_size,
-                                    private ? CDK_ARMOR_SECKEY :
+                                    priv ? CDK_ARMOR_SECKEY :
                                     CDK_ARMOR_PUBKEY);
       gnutls_free (in);
       *output_data_size = calc_size;
@@ -189,7 +189,7 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
  * gnutls_openpgp_crt_export:
  * @key: Holds the key.
  * @format: One of gnutls_openpgp_crt_fmt_t elements.
- * @output_data: will contain the key base64 encoded or raw
+ * @output_data: will contain the raw or base64 encoded key
  * @output_data_size: holds the size of output_data (and will
  *   be replaced by the actual size of parameters)
  *
@@ -367,7 +367,8 @@ gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
                                      unsigned int *bits)
 {
   cdk_packet_t pkt;
-  int algo;
+  int algo = 0, ret;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   if (!key)
     {
@@ -375,7 +376,20 @@ gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
       return GNUTLS_PK_UNKNOWN;
     }
 
-  algo = 0;
+  ret = gnutls_openpgp_crt_get_preferred_key_id (key, keyid);
+  if (ret == 0)
+    {
+      int idx;
+
+      idx = gnutls_openpgp_crt_get_subkey_idx (key, keyid);
+      if (idx != GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+        {
+          algo =
+            gnutls_openpgp_crt_get_subkey_pk_algorithm (key, idx, bits);
+          return algo;
+        }
+    }
+
   pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_PUBLIC_KEY);
   if (pkt)
     {
@@ -799,6 +813,9 @@ gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
+  if (idx == GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+    return gnutls_openpgp_crt_get_revoked_status(key);
+
   pkt = _get_public_subkey (key, idx);
   if (!pkt)
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
@@ -840,6 +857,9 @@ gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
       return GNUTLS_PK_UNKNOWN;
     }
 
+  if (idx == GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+    return gnutls_openpgp_crt_get_pk_algorithm(key, bits);
+
   pkt = _get_public_subkey (key, idx);
 
   algo = 0;
@@ -874,6 +894,9 @@ gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key,
   if (!key)
     return (time_t) - 1;
 
+  if (idx == GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+    return gnutls_openpgp_crt_get_creation_time(key);
+
   pkt = _get_public_subkey (key, idx);
   if (pkt)
     timestamp = pkt->pkt.public_key->timestamp;
@@ -905,6 +928,9 @@ gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key,
 
   if (!key)
     return (time_t) - 1;
+
+  if (idx == GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+    return gnutls_openpgp_crt_get_expiration_time(key);
 
   pkt = _get_public_subkey (key, idx);
   if (pkt)
@@ -938,6 +964,9 @@ gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key,
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
+  
+  if (idx == GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+    return gnutls_openpgp_crt_get_key_id(key, keyid);
 
   pkt = _get_public_subkey (key, idx);
   if (!pkt)
@@ -977,6 +1006,9 @@ gnutls_openpgp_crt_get_subkey_fingerprint (gnutls_openpgp_crt_t key,
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
+  
+  if (idx == GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+    return gnutls_openpgp_crt_get_fingerprint(key, fpr, fprlen);
 
   *fprlen = 0;
 
@@ -1012,12 +1044,19 @@ gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key,
 {
   int ret;
   uint32_t kid[2];
+  uint8_t master_id[GNUTLS_OPENPGP_KEYID_SIZE];
 
   if (!key)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
+
+  ret = gnutls_openpgp_crt_get_key_id (key, master_id);
+  if (ret < 0)
+    return gnutls_assert_val(ret);  
+  if (memcmp(master_id, keyid, GNUTLS_OPENPGP_KEYID_SIZE)==0)
+    return GNUTLS_OPENPGP_MASTER_KEYID_IDX;
 
   KEYID_IMPORT (kid, keyid);
   ret = _gnutls_openpgp_find_subkey_idx (key->knode, kid, 0);
@@ -1058,6 +1097,9 @@ gnutls_openpgp_crt_get_subkey_usage (gnutls_openpgp_crt_t key,
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
+
+  if (idx == GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+    return gnutls_openpgp_crt_get_key_usage(key, key_usage);
 
   pkt = _get_public_subkey (key, idx);
   if (!pkt)
@@ -1456,6 +1498,9 @@ gnutls_openpgp_crt_get_subkey_pk_rsa_raw (gnutls_openpgp_crt_t crt,
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
 
+  if (idx == GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+    return gnutls_openpgp_crt_get_pk_rsa_raw(crt, m, e);
+
   ret = gnutls_openpgp_crt_get_subkey_id (crt, idx, keyid);
   if (ret < 0)
     {
@@ -1493,6 +1538,9 @@ gnutls_openpgp_crt_get_subkey_pk_dsa_raw (gnutls_openpgp_crt_t crt,
 {
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
+
+  if (idx == GNUTLS_OPENPGP_MASTER_KEYID_IDX)
+    return gnutls_openpgp_crt_get_pk_dsa_raw(crt, p,q, g, y);
 
   ret = gnutls_openpgp_crt_get_subkey_id (crt, idx, keyid);
   if (ret < 0)
@@ -1574,14 +1622,10 @@ gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
  * gnutls_openpgp_crt_get_auth_subkey:
  * @crt: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
- * @flag: Non (0) indicates that a valid subkey is always returned.
+ * @flag: Non-zero indicates that a valid subkey is always returned.
  *
  * Returns the 64-bit keyID of the first valid OpenPGP subkey marked
- * for authentication.  If flag is non (0) and no authentication
- * subkey exists, then a valid subkey will be returned even if it is
- * not marked for authentication.
- * Returns the 64-bit keyID of the first valid OpenPGP subkey marked
- * for authentication.  If flag is non (0) and no authentication
+ * for authentication.  If flag is non-zero and no authentication
  * subkey exists, then a valid subkey will be returned even if it is
  * not marked for authentication.
  *

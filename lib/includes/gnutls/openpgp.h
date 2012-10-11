@@ -28,6 +28,7 @@
 #define GNUTLS_OPENPGP_H
 
 #include <gnutls/gnutls.h>
+#include <limits.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -76,6 +77,8 @@ extern "C"
 /* The key_usage flags are defined in gnutls.h. They are
  * the GNUTLS_KEY_* definitions.
  */
+#define GNUTLS_OPENPGP_MASTER_KEYID_IDX INT_MAX
+
   int gnutls_openpgp_crt_get_key_usage (gnutls_openpgp_crt_t key,
                                         unsigned int *key_usage);
   int gnutls_openpgp_crt_get_fingerprint (gnutls_openpgp_crt_t key, void *fpr,
