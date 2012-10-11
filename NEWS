@@ -27,8 +27,9 @@ response corresponds to the given certificate.
 OCSP certificate status request extensions by default. The flag
 GNUTLS_NO_EXTENSIONS can be used to prevent that.
 
-** libgnutls: Compatibility code with RFC5081 was removed. The OpenPGP
-code now is RFC6091 compliant only.
+** libgnutls: Several updates in the OpenPGP code. The generating code
+is fully RFC6091 compliant and RFC5081 support is only supported in client
+mode.
 
 ** libgnutls-dane: Added. It is a library to provide DANE with DNSSEC 
 certificate verification.
