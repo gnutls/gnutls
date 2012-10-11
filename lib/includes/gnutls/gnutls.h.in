@@ -1684,6 +1684,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   const gnutls_datum_t *gnutls_certificate_get_ours (gnutls_session_t
                                                      session);
 
+  int gnutls_certificate_get_peers_subkey_id(gnutls_session_t session,
+                                             gnutls_datum_t *id);
+
   time_t gnutls_certificate_activation_time_peers (gnutls_session_t session);
   time_t gnutls_certificate_expiration_time_peers (gnutls_session_t session);
 

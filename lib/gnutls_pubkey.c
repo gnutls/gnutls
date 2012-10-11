@@ -420,14 +420,13 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
  *   replaced by the actual size of parameters)
  * @subkey: Will be non zero if the key ID corresponds to a subkey
  *
- * This function will return a unique ID the depends on the public
- * key parameters. This ID can be used in checking whether a
- * certificate corresponds to the given public key.
+ * This function returned the OpenPGP key ID of the corresponding key.
+ * The key is a unique ID the depends on the public
+ * key parameters. 
  *
  * If the buffer provided is not long enough to hold the output, then
  * *output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
- * be returned.  The output will normally be a SHA-1 hash output,
- * which is 20 bytes.
+ * be returned.  The output is %GNUTLS_OPENPGP_KEYID_SIZE bytes long.
  *
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
