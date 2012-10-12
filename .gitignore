@@ -598,3 +598,5 @@ tests/mini-x509-callbacks
 doc/manpages/stamp_mans
 libdane/libgnutls-dane.la
 doc/latex/dane-api.tex
+src/libcmd-danetool.la
+src/danetool

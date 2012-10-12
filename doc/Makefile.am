@@ -33,6 +33,7 @@ SRC_DEF_CLI_DEBUG =
 SRC_DEF_SERV = 
 SRC_DEF_CERTTOOL = 
 SRC_DEF_OCSPTOOL = 
+SRC_DEF_DANETOOL = 
 SRC_DEF_SRPTOOL = 
 SRC_DEF_PSKTOOL = 
 SRC_DEF_P11TOOL = 
@@ -43,6 +44,7 @@ SRC_DEF_CLI_DEBUG += ../src/cli-debug-args.def
 SRC_DEF_SERV += ../src/serv-args.def
 SRC_DEF_CERTTOOL += ../src/certtool-args.def
 SRC_DEF_OCSPTOOL += ../src/ocsptool-args.def
+SRC_DEF_DANETOOL += ../src/danetool-args.def
 SRC_DEF_SRPTOOL += ../src/srptool-args.def
 SRC_DEF_PSKTOOL += ../src/psk-args.def
 SRC_DEF_P11TOOL += ../src/p11tool-args.def
@@ -78,6 +80,13 @@ invoke-certtool.texi: $(SRC_DEF_CERTTOOL)
 	rm -f ../src/$@
 
 invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL)
+	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
+	rm -f ../src/$@
+
+invoke-danetool.texi: $(SRC_DEF_DANETOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
@@ -133,7 +142,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 gnutls_TEXINFOS += invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
 	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi \
-	invoke-tpmtool.texi
+	invoke-tpmtool.texi invoke-danetool.texi
 
 gnutls_TEXINFOS += stamp_functions
 

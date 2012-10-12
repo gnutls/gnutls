@@ -36,7 +36,7 @@ certificate verification.
 
 ** gnutls-cli: Added --dane option to enable DANE certificate verification.
 
-** certtool: The --dane-tlsa-rr option generates DANE TLSA Resource Records (RR).
+** danetool: Added tool to generate DANE TLSA Resource Records (RR).
 
 ** API and ABI modifications:
 gnutls_certificate_get_peers_subkey_id: Added

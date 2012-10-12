@@ -46,6 +46,9 @@ endif
 if ENABLE_OCSP
 bin_PROGRAMS += ocsptool
 endif
+if ENABLE_DANE
+bin_PROGRAMS += danetool
+endif
 
 if ENABLE_TROUSERS
 bin_PROGRAMS += tpmtool
@@ -138,6 +141,23 @@ libcmd_certtool_la_LIBADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
 libcmd_certtool_la_LIBADD += $(LTLIBREADLINE)
 libcmd_certtool_la_LIBADD += $(INET_PTON_LIB)
 
+if ENABLE_DANE
+
+danetool_SOURCES = danetool.c certtool-common.c certtool-extras.c common.c
+danetool_LDADD = ../lib/libgnutls.la 
+danetool_LDADD += libcmd-danetool.la ../gl/libgnu.la
+
+noinst_LTLIBRARIES += libcmd-danetool.la
+libcmd_danetool_la_CFLAGS =
+libcmd_danetool_la_SOURCES = danetool-args.c danetool-args.def danetool-args.h \
+	certtool-cfg.h certtool-cfg.c
+libcmd_danetool_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
+libcmd_danetool_la_LIBADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+libcmd_danetool_la_LIBADD += $(LTLIBREADLINE)
+libcmd_danetool_la_LIBADD += $(INET_PTON_LIB)
+
+endif #ENABLE_DANE
+
 # p11 tool
 if ENABLE_PKCS11
 
@@ -175,6 +195,8 @@ endif # ENABLE_TROUSERS
 BUILT_SOURCES = ocsptool-args.c p11tool-args.c psk-args.c cli-debug-args.c \
 		cli-args.c serv-args.c srptool-args.c certtool-args.c
 
+danetool-args.c: $(srcdir)/args-std.def $(srcdir)/danetool-args.def
+	-autogen danetool-args.def
 ocsptool-args.c: $(srcdir)/args-std.def $(srcdir)/ocsptool-args.def
 	-autogen ocsptool-args.def
 tpmtool-args.c: $(srcdir)/args-std.def $(srcdir)/tpmtool-args.def

@@ -516,7 +516,7 @@ indicate the status of the verification.
 @showenumdesc{dane_verify_status_t,The DANE verification status flags.}
 
 In order to generate a DANE TLSA entry to use in a DNS server 
-you may use certtool's DANE commands (see @ref{certtool Invocation}).
+you may use danetool (see @ref{danetool Invocation}).
 
 @node Digital signatures
 @section Digital signatures

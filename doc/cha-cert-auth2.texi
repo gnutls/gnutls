@@ -14,6 +14,7 @@ structures, etc., are discussed in this chapter.
 * Managing encrypted keys::
 * certtool Invocation::            Invoking certtool
 * ocsptool Invocation::            Invoking ocsptool
+* danetool Invocation::            Invoking danetool
 @end menu
 
 @node PKCS 10 certificate requests
@@ -379,3 +380,4 @@ Generic and higher level private key import functions are also available.
 
 @include invoke-ocsptool.texi
 
+@include invoke-danetool.texi
