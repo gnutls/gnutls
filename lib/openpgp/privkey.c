@@ -1310,6 +1310,7 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
   gnutls_pk_params_st params;
   int pk_algorithm;
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
+  char buf[2*GNUTLS_OPENPGP_KEYID_SIZE+1];
 
   if (key == NULL)
     {
@@ -1324,6 +1325,8 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
       int idx;
 
       KEYID_IMPORT (kid, keyid);
+      
+      _gnutls_hard_log("Signing using PGP key ID %s\n", _gnutls_bin2hex(keyid, GNUTLS_OPENPGP_KEYID_SIZE, buf, sizeof(buf), NULL));
 
       idx = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
       pk_algorithm =
@@ -1333,6 +1336,8 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
     }
   else
     {
+      _gnutls_hard_log("Signing using master PGP key\n");
+
       pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
       result = _gnutls_openpgp_privkey_get_mpis (key, NULL, &params);
     }
@@ -1345,7 +1350,7 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 
 
   result =
-    _gnutls_pk_sign (pk_algorithm, signature, hash, &params);
+    _gnutls_soft_sign (pk_algorithm, &params, hash, signature);
 
   gnutls_pk_params_release(&params);
 
@@ -1382,6 +1387,7 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
   gnutls_pk_params_st params;
   int pk_algorithm;
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
+  char buf[2*GNUTLS_OPENPGP_KEYID_SIZE+1];
 
   if (key == NULL)
     {
@@ -1395,6 +1401,9 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
       uint32_t kid[2];
 
       KEYID_IMPORT (kid, keyid);
+
+      _gnutls_hard_log("Decrypting using PGP key ID %s\n", _gnutls_bin2hex(keyid, GNUTLS_OPENPGP_KEYID_SIZE, buf, sizeof(buf), NULL));
+
       result = _gnutls_openpgp_privkey_get_mpis (key, kid, &params);
 
       i = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
@@ -1403,6 +1412,8 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
     }
   else
     {
+      _gnutls_hard_log("Decrypting using master PGP key\n");
+
       pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
 
       result = _gnutls_openpgp_privkey_get_mpis (key, NULL, &params);
@@ -1415,7 +1426,10 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
       return result;
     }
 
-  result = _gnutls_pk_decrypt (pk_algorithm, plaintext, ciphertext, &params);
+  if (pk_algorithm != GNUTLS_PK_RSA)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+  
+  result = _gnutls_pkcs1_rsa_decrypt (plaintext, ciphertext, &params, 2);
 
   gnutls_pk_params_release(&params);
 

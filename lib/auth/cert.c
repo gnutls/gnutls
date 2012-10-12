@@ -856,8 +856,10 @@ _gnutls_gen_openpgp_certificate (gnutls_session_t session,
   gnutls_pcert_st *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
+  unsigned int subkey;
   uint8_t type;
   uint8_t fpr[20];
+  char buf[2*GNUTLS_OPENPGP_KEYID_SIZE+1];
   size_t fpr_size;
 
   /* find the appropriate certificate */
@@ -871,18 +873,18 @@ _gnutls_gen_openpgp_certificate (gnutls_session_t session,
 
   ret = 3 + 1 + 3;
 
-
-
   if (apr_cert_list_length > 0)
     {
       fpr_size = sizeof (fpr);
       ret =
         gnutls_pubkey_get_openpgp_key_id (apr_cert_list[0].pubkey, 0, fpr,
-                                          &fpr_size, NULL);
+                                          &fpr_size, &subkey);
       if (ret < 0)
         return gnutls_assert_val (ret);
 
       ret += 1 + fpr_size;    /* for the keyid */
+      _gnutls_handshake_log("Sending PGP key ID %s (%s)\n", _gnutls_bin2hex(fpr, GNUTLS_OPENPGP_KEYID_SIZE, buf, sizeof(buf), NULL), 
+                        subkey?"subkey":"master");
 
       ret += apr_cert_list[0].cert.size;
     }
