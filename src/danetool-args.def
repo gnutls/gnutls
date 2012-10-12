@@ -126,12 +126,12 @@ doc-section = {
 To create a DANE TLSA resource record for a CA signed certificate use the following commands.
 
 @example
-$ certtool --tlsa-rr --host www.example.com --load-certificate cert.pem
+$ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem
 @end example
 
 For a self signed certificate use:
 @example
-$ certtool --tlsa-rr --host www.example.com --load-certificate cert.pem \
+$ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem \
   --local
 @end example
 
@@ -141,7 +141,7 @@ certificate using DANE.
 
 In order to create a record for the signer of your certificate use:
 @example
-$ certtool --tlsa-rr --host www.example.com --load-certificate cert.pem \
+$ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem \
   --ca
 @end example
 
