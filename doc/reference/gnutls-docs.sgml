@@ -39,6 +39,7 @@
     <xi:include href="xml/pkcs12.xml"/>
     <xi:include href="xml/ocsp.xml"/>
     <xi:include href="xml/tpm.xml"/>
+    <xi:include href="xml/dane.xml"/>
 
   </chapter>
   <index id="api-index-full">

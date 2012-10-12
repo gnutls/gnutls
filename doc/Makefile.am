@@ -21,12 +21,15 @@
 
 EXTRA_DIST = TODO certtool.cfg gnutls.pdf gnutls.html	\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
-	gnutls-guile.pdf gnutls-guile.html stamp_enums stamp_functions
+	gnutls-guile.pdf gnutls-guile.html stamp_enums stamp_functions \
+	doc.mk
 
 SUBDIRS = examples cyclo scripts manpages credentials latex
 if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif
+
+-include $(top_srcdir)/doc/doc.mk
 
 SRC_DEF_CLI = 
 SRC_DEF_CLI_DEBUG = 
@@ -207,13 +210,6 @@ MAINTAINERCLEANFILES += gnutls-api.texi x509-api.texi pgp-api.texi	\
 	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi	\
 	dane-api.texi
 
-HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
-	$(top_srcdir)/lib/includes/gnutls/x509.h $(top_srcdir)/lib/includes/gnutls/openpgp.h \
-	$(top_srcdir)/lib/includes/gnutls/pkcs12.h $(top_srcdir)/lib/includes/gnutls/pkcs11.h \
-	$(top_srcdir)/lib/includes/gnutls/abstract.h $(top_srcdir)/lib/includes/gnutls/compat.h \
-	$(top_srcdir)/lib/includes/gnutls/dtls.h $(top_srcdir)/lib/includes/gnutls/crypto.h \
-	$(top_srcdir)/lib/includes/gnutls/ocsp.h $(top_srcdir)/lib/includes/gnutls/tpm.h \
-	$(top_srcdir)/libdane/includes/gnutls/dane.h
 
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
@@ -221,7 +217,7 @@ gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -232,7 +228,7 @@ dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/libdane/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -243,7 +239,7 @@ x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -254,7 +250,7 @@ pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -266,7 +262,7 @@ pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -277,7 +273,7 @@ pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -288,7 +284,7 @@ tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -299,7 +295,7 @@ abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -310,7 +306,7 @@ compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -321,7 +317,7 @@ dtls-api.texi: $(top_srcdir)/lib/includes/gnutls/dtls.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -332,7 +328,7 @@ crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 		echo -n "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -343,7 +339,7 @@ ocsp-api.texi: $(top_srcdir)/lib/includes/gnutls/ocsp.h
 		echo -n "Creating documentation for file $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -418,7 +414,7 @@ $(ENUMS): stamp_enums
 $(FUNCS): stamp_functions
 
 compare-makefile: enums.texi
-	ENUMS=`grep '^@c ' $(srcdir)/enums.texi | sed 's/@c //g' | sort`; \
+	ENUMS=`grep '^@c ' $(srcdir)/enums.texi | sed 's/@c //g' | sort -d`; \
 	STR=""; \
 	for i in $$ENUMS; do \
 		STR="$$STR\nENUMS += enums/$$i"; \
@@ -427,7 +423,7 @@ compare-makefile: enums.texi
 		perl -p -e "s,^ENUMS =,ENUMS =$$STR," > tmp-$@; \
 	diff -u $(srcdir)/Makefile.am tmp-$@
 	rm -f tmp-$@
-	FUNCS=`cat $(HEADER_FILES) | $(top_srcdir)/doc/scripts/getfuncs.pl|sort`; \
+	FUNCS=`cat $(HEADER_FILES) | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d`; \
 	MANS=""; \
 	for i in $$FUNCS; do \
 		MANS="$$MANS\nFUNCS += functions/$$i\nFUNCS += functions/$$i.short"; \
@@ -482,6 +478,12 @@ gnutls.epub: gnutls.xml
 	epub-fix --delete-unmanifested gnutls.epub
 
 ENUMS =
+ENUMS += enums/dane_cert_type_t
+ENUMS += enums/dane_cert_usage_t
+ENUMS += enums/dane_match_type_t
+ENUMS += enums/dane_query_status_t
+ENUMS += enums/dane_verify_flags_t
+ENUMS += enums/dane_verify_status_t
 ENUMS += enums/gnutls_alert_description_t
 ENUMS += enums/gnutls_alert_level_t
 ENUMS += enums/gnutls_certificate_import_flags
@@ -500,6 +502,10 @@ ENUMS += enums/gnutls_ecc_curve_t
 ENUMS += enums/gnutls_handshake_description_t
 ENUMS += enums/gnutls_kx_algorithm_t
 ENUMS += enums/gnutls_mac_algorithm_t
+ENUMS += enums/gnutls_ocsp_cert_status_t
+ENUMS += enums/gnutls_ocsp_print_formats_t
+ENUMS += enums/gnutls_ocsp_resp_status_t
+ENUMS += enums/gnutls_ocsp_verify_reason_t
 ENUMS += enums/gnutls_openpgp_crt_fmt_t
 ENUMS += enums/gnutls_openpgp_crt_status_t
 ENUMS += enums/gnutls_params_type_t
@@ -520,10 +526,31 @@ ENUMS += enums/gnutls_server_name_type_t
 ENUMS += enums/gnutls_sign_algorithm_t
 ENUMS += enums/gnutls_supplemental_data_format_type_t
 ENUMS += enums/gnutls_tpmkey_fmt_t
+ENUMS += enums/gnutls_x509_crl_reason_t
 ENUMS += enums/gnutls_x509_crt_fmt_t
 ENUMS += enums/gnutls_x509_subject_alt_name_t
 
 FUNCS =
+FUNCS += functions/dane_query_data
+FUNCS += functions/dane_query_data.short
+FUNCS += functions/dane_query_deinit
+FUNCS += functions/dane_query_deinit.short
+FUNCS += functions/dane_query_entries
+FUNCS += functions/dane_query_entries.short
+FUNCS += functions/dane_query_status
+FUNCS += functions/dane_query_status.short
+FUNCS += functions/dane_query_tlsa
+FUNCS += functions/dane_query_tlsa.short
+FUNCS += functions/dane_state_deinit
+FUNCS += functions/dane_state_deinit.short
+FUNCS += functions/dane_state_init
+FUNCS += functions/dane_state_init.short
+FUNCS += functions/dane_strerror
+FUNCS += functions/dane_strerror.short
+FUNCS += functions/dane_verify_crt
+FUNCS += functions/dane_verify_crt.short
+FUNCS += functions/dane_verify_session_crt
+FUNCS += functions/dane_verify_session_crt.short
 FUNCS += functions/gnutls_alert_get
 FUNCS += functions/gnutls_alert_get.short
 FUNCS += functions/gnutls_alert_get_name
@@ -580,6 +607,8 @@ FUNCS += functions/gnutls_certificate_get_ours
 FUNCS += functions/gnutls_certificate_get_ours.short
 FUNCS += functions/gnutls_certificate_get_peers
 FUNCS += functions/gnutls_certificate_get_peers.short
+FUNCS += functions/gnutls_certificate_get_peers_subkey_id
+FUNCS += functions/gnutls_certificate_get_peers_subkey_id.short
 FUNCS += functions/gnutls_certificate_send_x509_rdn_sequence
 FUNCS += functions/gnutls_certificate_send_x509_rdn_sequence.short
 FUNCS += functions/gnutls_certificate_server_set_request
@@ -588,6 +617,10 @@ FUNCS += functions/gnutls_certificate_set_dh_params
 FUNCS += functions/gnutls_certificate_set_dh_params.short
 FUNCS += functions/gnutls_certificate_set_key
 FUNCS += functions/gnutls_certificate_set_key.short
+FUNCS += functions/gnutls_certificate_set_ocsp_status_request_file
+FUNCS += functions/gnutls_certificate_set_ocsp_status_request_file.short
+FUNCS += functions/gnutls_certificate_set_ocsp_status_request_function
+FUNCS += functions/gnutls_certificate_set_ocsp_status_request_function.short
 FUNCS += functions/gnutls_certificate_set_openpgp_key
 FUNCS += functions/gnutls_certificate_set_openpgp_key.short
 FUNCS += functions/gnutls_certificate_set_openpgp_key_file
@@ -738,6 +771,8 @@ FUNCS += functions/gnutls_dh_params_cpy
 FUNCS += functions/gnutls_dh_params_cpy.short
 FUNCS += functions/gnutls_dh_params_deinit
 FUNCS += functions/gnutls_dh_params_deinit.short
+FUNCS += functions/gnutls_dh_params_export2_pkcs3
+FUNCS += functions/gnutls_dh_params_export2_pkcs3.short
 FUNCS += functions/gnutls_dh_params_export_pkcs3
 FUNCS += functions/gnutls_dh_params_export_pkcs3.short
 FUNCS += functions/gnutls_dh_params_export_raw
@@ -912,6 +947,8 @@ FUNCS += functions/gnutls_ocsp_req_set_extension
 FUNCS += functions/gnutls_ocsp_req_set_extension.short
 FUNCS += functions/gnutls_ocsp_req_set_nonce
 FUNCS += functions/gnutls_ocsp_req_set_nonce.short
+FUNCS += functions/gnutls_ocsp_resp_check_crt
+FUNCS += functions/gnutls_ocsp_resp_check_crt.short
 FUNCS += functions/gnutls_ocsp_resp_deinit
 FUNCS += functions/gnutls_ocsp_resp_deinit.short
 FUNCS += functions/gnutls_ocsp_resp_export
@@ -948,12 +985,18 @@ FUNCS += functions/gnutls_ocsp_resp_verify
 FUNCS += functions/gnutls_ocsp_resp_verify.short
 FUNCS += functions/gnutls_ocsp_resp_verify_direct
 FUNCS += functions/gnutls_ocsp_resp_verify_direct.short
+FUNCS += functions/gnutls_ocsp_status_request_enable_client
+FUNCS += functions/gnutls_ocsp_status_request_enable_client.short
+FUNCS += functions/gnutls_ocsp_status_request_get
+FUNCS += functions/gnutls_ocsp_status_request_get.short
 FUNCS += functions/gnutls_openpgp_crt_check_hostname
 FUNCS += functions/gnutls_openpgp_crt_check_hostname.short
 FUNCS += functions/gnutls_openpgp_crt_deinit
 FUNCS += functions/gnutls_openpgp_crt_deinit.short
 FUNCS += functions/gnutls_openpgp_crt_export
 FUNCS += functions/gnutls_openpgp_crt_export.short
+FUNCS += functions/gnutls_openpgp_crt_export2
+FUNCS += functions/gnutls_openpgp_crt_export2.short
 FUNCS += functions/gnutls_openpgp_crt_get_auth_subkey
 FUNCS += functions/gnutls_openpgp_crt_get_auth_subkey.short
 FUNCS += functions/gnutls_openpgp_crt_get_creation_time
@@ -1030,6 +1073,8 @@ FUNCS += functions/gnutls_openpgp_privkey_deinit
 FUNCS += functions/gnutls_openpgp_privkey_deinit.short
 FUNCS += functions/gnutls_openpgp_privkey_export
 FUNCS += functions/gnutls_openpgp_privkey_export.short
+FUNCS += functions/gnutls_openpgp_privkey_export2
+FUNCS += functions/gnutls_openpgp_privkey_export2.short
 FUNCS += functions/gnutls_openpgp_privkey_export_dsa_raw
 FUNCS += functions/gnutls_openpgp_privkey_export_dsa_raw.short
 FUNCS += functions/gnutls_openpgp_privkey_export_rsa_raw
@@ -1122,6 +1167,8 @@ FUNCS += functions/gnutls_pkcs11_obj_deinit
 FUNCS += functions/gnutls_pkcs11_obj_deinit.short
 FUNCS += functions/gnutls_pkcs11_obj_export
 FUNCS += functions/gnutls_pkcs11_obj_export.short
+FUNCS += functions/gnutls_pkcs11_obj_export2
+FUNCS += functions/gnutls_pkcs11_obj_export2.short
 FUNCS += functions/gnutls_pkcs11_obj_export_url
 FUNCS += functions/gnutls_pkcs11_obj_export_url.short
 FUNCS += functions/gnutls_pkcs11_obj_get_info
@@ -1206,6 +1253,8 @@ FUNCS += functions/gnutls_pkcs12_deinit
 FUNCS += functions/gnutls_pkcs12_deinit.short
 FUNCS += functions/gnutls_pkcs12_export
 FUNCS += functions/gnutls_pkcs12_export.short
+FUNCS += functions/gnutls_pkcs12_export2
+FUNCS += functions/gnutls_pkcs12_export2.short
 FUNCS += functions/gnutls_pkcs12_generate_mac
 FUNCS += functions/gnutls_pkcs12_generate_mac.short
 FUNCS += functions/gnutls_pkcs12_get_bag
@@ -1228,6 +1277,8 @@ FUNCS += functions/gnutls_pkcs7_delete_crt
 FUNCS += functions/gnutls_pkcs7_delete_crt.short
 FUNCS += functions/gnutls_pkcs7_export
 FUNCS += functions/gnutls_pkcs7_export.short
+FUNCS += functions/gnutls_pkcs7_export2
+FUNCS += functions/gnutls_pkcs7_export2.short
 FUNCS += functions/gnutls_pkcs7_get_crl_count
 FUNCS += functions/gnutls_pkcs7_get_crl_count.short
 FUNCS += functions/gnutls_pkcs7_get_crl_raw
@@ -1362,6 +1413,8 @@ FUNCS += functions/gnutls_pubkey_encrypt_data
 FUNCS += functions/gnutls_pubkey_encrypt_data.short
 FUNCS += functions/gnutls_pubkey_export
 FUNCS += functions/gnutls_pubkey_export.short
+FUNCS += functions/gnutls_pubkey_export2
+FUNCS += functions/gnutls_pubkey_export2.short
 FUNCS += functions/gnutls_pubkey_get_key_id
 FUNCS += functions/gnutls_pubkey_get_key_id.short
 FUNCS += functions/gnutls_pubkey_get_key_usage
@@ -1392,6 +1445,8 @@ FUNCS += functions/gnutls_pubkey_import_ecc_x962
 FUNCS += functions/gnutls_pubkey_import_ecc_x962.short
 FUNCS += functions/gnutls_pubkey_import_openpgp
 FUNCS += functions/gnutls_pubkey_import_openpgp.short
+FUNCS += functions/gnutls_pubkey_import_openpgp_raw
+FUNCS += functions/gnutls_pubkey_import_openpgp_raw.short
 FUNCS += functions/gnutls_pubkey_import_pkcs11
 FUNCS += functions/gnutls_pubkey_import_pkcs11.short
 FUNCS += functions/gnutls_pubkey_import_pkcs11_url
@@ -1408,6 +1463,8 @@ FUNCS += functions/gnutls_pubkey_import_url
 FUNCS += functions/gnutls_pubkey_import_url.short
 FUNCS += functions/gnutls_pubkey_import_x509
 FUNCS += functions/gnutls_pubkey_import_x509.short
+FUNCS += functions/gnutls_pubkey_import_x509_raw
+FUNCS += functions/gnutls_pubkey_import_x509_raw.short
 FUNCS += functions/gnutls_pubkey_init
 FUNCS += functions/gnutls_pubkey_init.short
 FUNCS += functions/gnutls_pubkey_set_key_usage
@@ -1558,10 +1615,6 @@ FUNCS += functions/gnutls_srp_set_server_credentials_function
 FUNCS += functions/gnutls_srp_set_server_credentials_function.short
 FUNCS += functions/gnutls_srp_verifier
 FUNCS += functions/gnutls_srp_verifier.short
-FUNCS += functions/gnutls_status_request_ocsp_client
-FUNCS += functions/gnutls_status_request_ocsp_client.short
-FUNCS += functions/gnutls_status_request_ocsp_server
-FUNCS += functions/gnutls_status_request_ocsp_server.short
 FUNCS += functions/gnutls_store_commitment
 FUNCS += functions/gnutls_store_commitment.short
 FUNCS += functions/gnutls_store_pubkey
@@ -1622,6 +1675,8 @@ FUNCS += functions/gnutls_x509_crl_deinit
 FUNCS += functions/gnutls_x509_crl_deinit.short
 FUNCS += functions/gnutls_x509_crl_export
 FUNCS += functions/gnutls_x509_crl_export.short
+FUNCS += functions/gnutls_x509_crl_export2
+FUNCS += functions/gnutls_x509_crl_export2.short
 FUNCS += functions/gnutls_x509_crl_get_authority_key_gn_serial
 FUNCS += functions/gnutls_x509_crl_get_authority_key_gn_serial.short
 FUNCS += functions/gnutls_x509_crl_get_authority_key_id
@@ -1692,6 +1747,8 @@ FUNCS += functions/gnutls_x509_crq_deinit
 FUNCS += functions/gnutls_x509_crq_deinit.short
 FUNCS += functions/gnutls_x509_crq_export
 FUNCS += functions/gnutls_x509_crq_export.short
+FUNCS += functions/gnutls_x509_crq_export2
+FUNCS += functions/gnutls_x509_crq_export2.short
 FUNCS += functions/gnutls_x509_crq_get_attribute_by_oid
 FUNCS += functions/gnutls_x509_crq_get_attribute_by_oid.short
 FUNCS += functions/gnutls_x509_crq_get_attribute_data
@@ -1782,6 +1839,8 @@ FUNCS += functions/gnutls_x509_crt_deinit
 FUNCS += functions/gnutls_x509_crt_deinit.short
 FUNCS += functions/gnutls_x509_crt_export
 FUNCS += functions/gnutls_x509_crt_export.short
+FUNCS += functions/gnutls_x509_crt_export2
+FUNCS += functions/gnutls_x509_crt_export2.short
 FUNCS += functions/gnutls_x509_crt_get_activation_time
 FUNCS += functions/gnutls_x509_crt_get_activation_time.short
 FUNCS += functions/gnutls_x509_crt_get_authority_info_access
@@ -1960,6 +2019,8 @@ FUNCS += functions/gnutls_x509_dn_deinit
 FUNCS += functions/gnutls_x509_dn_deinit.short
 FUNCS += functions/gnutls_x509_dn_export
 FUNCS += functions/gnutls_x509_dn_export.short
+FUNCS += functions/gnutls_x509_dn_export2
+FUNCS += functions/gnutls_x509_dn_export2.short
 FUNCS += functions/gnutls_x509_dn_get_rdn_ava
 FUNCS += functions/gnutls_x509_dn_get_rdn_ava.short
 FUNCS += functions/gnutls_x509_dn_import
@@ -1976,6 +2037,10 @@ FUNCS += functions/gnutls_x509_privkey_deinit
 FUNCS += functions/gnutls_x509_privkey_deinit.short
 FUNCS += functions/gnutls_x509_privkey_export
 FUNCS += functions/gnutls_x509_privkey_export.short
+FUNCS += functions/gnutls_x509_privkey_export2
+FUNCS += functions/gnutls_x509_privkey_export2.short
+FUNCS += functions/gnutls_x509_privkey_export2_pkcs8
+FUNCS += functions/gnutls_x509_privkey_export2_pkcs8.short
 FUNCS += functions/gnutls_x509_privkey_export_dsa_raw
 FUNCS += functions/gnutls_x509_privkey_export_dsa_raw.short
 FUNCS += functions/gnutls_x509_privkey_export_ecc_raw

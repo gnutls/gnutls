@@ -22,17 +22,11 @@
 dist_man_MANS = gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
 	certtool.1 psktool.1 p11tool.1 ocsptool.1 tpmtool.1
 
+-include $(top_srcdir)/doc/doc.mk
+
 if ENABLE_SRP
 dist_man_MANS += srptool.1
 endif
-
-HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
-	$(top_srcdir)/lib/includes/gnutls/x509.h $(top_srcdir)/lib/includes/gnutls/openpgp.h \
-	$(top_srcdir)/lib/includes/gnutls/pkcs12.h $(top_srcdir)/lib/includes/gnutls/pkcs11.h \
-	$(top_srcdir)/lib/includes/gnutls/abstract.h $(top_srcdir)/lib/includes/gnutls/compat.h \
-	$(top_srcdir)/lib/includes/gnutls/dtls.h $(top_srcdir)/lib/includes/gnutls/crypto.h \
-	$(top_srcdir)/lib/includes/gnutls/ocsp.h $(top_srcdir)/lib/includes/gnutls/tpm.h \
-	$(top_srcdir)/libdane/includes/gnutls/dane.h
 
 # Note that our .def files depend on autogen
 # supporting the @subheading texi keyword. This
@@ -114,10 +108,13 @@ APIMANS += gnutls_certificate_free_keys.3
 APIMANS += gnutls_certificate_get_issuer.3
 APIMANS += gnutls_certificate_get_ours.3
 APIMANS += gnutls_certificate_get_peers.3
+APIMANS += gnutls_certificate_get_peers_subkey_id.3
 APIMANS += gnutls_certificate_send_x509_rdn_sequence.3
 APIMANS += gnutls_certificate_server_set_request.3
 APIMANS += gnutls_certificate_set_dh_params.3
 APIMANS += gnutls_certificate_set_key.3
+APIMANS += gnutls_certificate_set_ocsp_status_request_file.3
+APIMANS += gnutls_certificate_set_ocsp_status_request_function.3
 APIMANS += gnutls_certificate_set_openpgp_key.3
 APIMANS += gnutls_certificate_set_openpgp_key_file.3
 APIMANS += gnutls_certificate_set_openpgp_key_file2.3
@@ -193,6 +190,7 @@ APIMANS += gnutls_dh_get_pubkey.3
 APIMANS += gnutls_dh_get_secret_bits.3
 APIMANS += gnutls_dh_params_cpy.3
 APIMANS += gnutls_dh_params_deinit.3
+APIMANS += gnutls_dh_params_export2_pkcs3.3
 APIMANS += gnutls_dh_params_export_pkcs3.3
 APIMANS += gnutls_dh_params_export_raw.3
 APIMANS += gnutls_dh_params_generate2.3
@@ -280,6 +278,7 @@ APIMANS += gnutls_ocsp_req_print.3
 APIMANS += gnutls_ocsp_req_randomize_nonce.3
 APIMANS += gnutls_ocsp_req_set_extension.3
 APIMANS += gnutls_ocsp_req_set_nonce.3
+APIMANS += gnutls_ocsp_resp_check_crt.3
 APIMANS += gnutls_ocsp_resp_deinit.3
 APIMANS += gnutls_ocsp_resp_export.3
 APIMANS += gnutls_ocsp_resp_get_certs.3
@@ -298,9 +297,12 @@ APIMANS += gnutls_ocsp_resp_init.3
 APIMANS += gnutls_ocsp_resp_print.3
 APIMANS += gnutls_ocsp_resp_verify.3
 APIMANS += gnutls_ocsp_resp_verify_direct.3
+APIMANS += gnutls_ocsp_status_request_enable_client.3
+APIMANS += gnutls_ocsp_status_request_get.3
 APIMANS += gnutls_openpgp_crt_check_hostname.3
 APIMANS += gnutls_openpgp_crt_deinit.3
 APIMANS += gnutls_openpgp_crt_export.3
+APIMANS += gnutls_openpgp_crt_export2.3
 APIMANS += gnutls_openpgp_crt_get_auth_subkey.3
 APIMANS += gnutls_openpgp_crt_get_creation_time.3
 APIMANS += gnutls_openpgp_crt_get_expiration_time.3
@@ -339,6 +341,7 @@ APIMANS += gnutls_openpgp_keyring_import.3
 APIMANS += gnutls_openpgp_keyring_init.3
 APIMANS += gnutls_openpgp_privkey_deinit.3
 APIMANS += gnutls_openpgp_privkey_export.3
+APIMANS += gnutls_openpgp_privkey_export2.3
 APIMANS += gnutls_openpgp_privkey_export_dsa_raw.3
 APIMANS += gnutls_openpgp_privkey_export_rsa_raw.3
 APIMANS += gnutls_openpgp_privkey_export_subkey_dsa_raw.3
@@ -385,6 +388,7 @@ APIMANS += gnutls_pkcs11_get_pin_function.3
 APIMANS += gnutls_pkcs11_init.3
 APIMANS += gnutls_pkcs11_obj_deinit.3
 APIMANS += gnutls_pkcs11_obj_export.3
+APIMANS += gnutls_pkcs11_obj_export2.3
 APIMANS += gnutls_pkcs11_obj_export_url.3
 APIMANS += gnutls_pkcs11_obj_get_info.3
 APIMANS += gnutls_pkcs11_obj_get_type.3
@@ -427,6 +431,7 @@ APIMANS += gnutls_pkcs12_bag_set_friendly_name.3
 APIMANS += gnutls_pkcs12_bag_set_key_id.3
 APIMANS += gnutls_pkcs12_deinit.3
 APIMANS += gnutls_pkcs12_export.3
+APIMANS += gnutls_pkcs12_export2.3
 APIMANS += gnutls_pkcs12_generate_mac.3
 APIMANS += gnutls_pkcs12_get_bag.3
 APIMANS += gnutls_pkcs12_import.3
@@ -438,6 +443,7 @@ APIMANS += gnutls_pkcs7_deinit.3
 APIMANS += gnutls_pkcs7_delete_crl.3
 APIMANS += gnutls_pkcs7_delete_crt.3
 APIMANS += gnutls_pkcs7_export.3
+APIMANS += gnutls_pkcs7_export2.3
 APIMANS += gnutls_pkcs7_get_crl_count.3
 APIMANS += gnutls_pkcs7_get_crl_raw.3
 APIMANS += gnutls_pkcs7_get_crt_count.3
@@ -505,6 +511,7 @@ APIMANS += gnutls_psk_set_server_params_function.3
 APIMANS += gnutls_pubkey_deinit.3
 APIMANS += gnutls_pubkey_encrypt_data.3
 APIMANS += gnutls_pubkey_export.3
+APIMANS += gnutls_pubkey_export2.3
 APIMANS += gnutls_pubkey_get_key_id.3
 APIMANS += gnutls_pubkey_get_key_usage.3
 APIMANS += gnutls_pubkey_get_openpgp_key_id.3
@@ -520,6 +527,7 @@ APIMANS += gnutls_pubkey_import_dsa_raw.3
 APIMANS += gnutls_pubkey_import_ecc_raw.3
 APIMANS += gnutls_pubkey_import_ecc_x962.3
 APIMANS += gnutls_pubkey_import_openpgp.3
+APIMANS += gnutls_pubkey_import_openpgp_raw.3
 APIMANS += gnutls_pubkey_import_pkcs11.3
 APIMANS += gnutls_pubkey_import_pkcs11_url.3
 APIMANS += gnutls_pubkey_import_privkey.3
@@ -528,6 +536,7 @@ APIMANS += gnutls_pubkey_import_tpm_raw.3
 APIMANS += gnutls_pubkey_import_tpm_url.3
 APIMANS += gnutls_pubkey_import_url.3
 APIMANS += gnutls_pubkey_import_x509.3
+APIMANS += gnutls_pubkey_import_x509_raw.3
 APIMANS += gnutls_pubkey_init.3
 APIMANS += gnutls_pubkey_set_key_usage.3
 APIMANS += gnutls_pubkey_set_pin_function.3
@@ -603,8 +612,6 @@ APIMANS += gnutls_srp_set_prime_bits.3
 APIMANS += gnutls_srp_set_server_credentials_file.3
 APIMANS += gnutls_srp_set_server_credentials_function.3
 APIMANS += gnutls_srp_verifier.3
-APIMANS += gnutls_status_request_ocsp_client.3
-APIMANS += gnutls_status_request_ocsp_server.3
 APIMANS += gnutls_store_commitment.3
 APIMANS += gnutls_store_pubkey.3
 APIMANS += gnutls_strerror.3
@@ -635,6 +642,7 @@ APIMANS += gnutls_verify_stored_pubkey.3
 APIMANS += gnutls_x509_crl_check_issuer.3
 APIMANS += gnutls_x509_crl_deinit.3
 APIMANS += gnutls_x509_crl_export.3
+APIMANS += gnutls_x509_crl_export2.3
 APIMANS += gnutls_x509_crl_get_authority_key_gn_serial.3
 APIMANS += gnutls_x509_crl_get_authority_key_id.3
 APIMANS += gnutls_x509_crl_get_crt_count.3
@@ -670,6 +678,7 @@ APIMANS += gnutls_x509_crl_sign2.3
 APIMANS += gnutls_x509_crl_verify.3
 APIMANS += gnutls_x509_crq_deinit.3
 APIMANS += gnutls_x509_crq_export.3
+APIMANS += gnutls_x509_crq_export2.3
 APIMANS += gnutls_x509_crq_get_attribute_by_oid.3
 APIMANS += gnutls_x509_crq_get_attribute_data.3
 APIMANS += gnutls_x509_crq_get_attribute_info.3
@@ -715,6 +724,7 @@ APIMANS += gnutls_x509_crt_check_revocation.3
 APIMANS += gnutls_x509_crt_cpy_crl_dist_points.3
 APIMANS += gnutls_x509_crt_deinit.3
 APIMANS += gnutls_x509_crt_export.3
+APIMANS += gnutls_x509_crt_export2.3
 APIMANS += gnutls_x509_crt_get_activation_time.3
 APIMANS += gnutls_x509_crt_get_authority_info_access.3
 APIMANS += gnutls_x509_crt_get_authority_key_gn_serial.3
@@ -804,6 +814,7 @@ APIMANS += gnutls_x509_crt_verify_data.3
 APIMANS += gnutls_x509_crt_verify_hash.3
 APIMANS += gnutls_x509_dn_deinit.3
 APIMANS += gnutls_x509_dn_export.3
+APIMANS += gnutls_x509_dn_export2.3
 APIMANS += gnutls_x509_dn_get_rdn_ava.3
 APIMANS += gnutls_x509_dn_import.3
 APIMANS += gnutls_x509_dn_init.3
@@ -812,6 +823,8 @@ APIMANS += gnutls_x509_dn_oid_name.3
 APIMANS += gnutls_x509_privkey_cpy.3
 APIMANS += gnutls_x509_privkey_deinit.3
 APIMANS += gnutls_x509_privkey_export.3
+APIMANS += gnutls_x509_privkey_export2.3
+APIMANS += gnutls_x509_privkey_export2_pkcs8.3
 APIMANS += gnutls_x509_privkey_export_dsa_raw.3
 APIMANS += gnutls_x509_privkey_export_ecc_raw.3
 APIMANS += gnutls_x509_privkey_export_pkcs8.3
@@ -855,7 +868,7 @@ dist_man_MANS += $(APIMANS)
 $(APIMANS): stamp_mans
 
 compare-makefile:
-	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl|sort`; \
+	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d`; \
 	MANS=""; \
 	for i in $$FUNCS; do \
 		MANS="$$MANS\nAPIMANS += $$i.3"; \
@@ -875,7 +888,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -889,7 +902,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -903,7 +916,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/libdane/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -917,7 +930,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -931,7 +944,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -945,7 +958,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -959,7 +972,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -973,7 +986,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -987,7 +1000,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -1001,7 +1014,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -1015,7 +1028,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""
@@ -1029,7 +1042,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
-			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
 	@echo ""

@@ -47,15 +47,13 @@ MKHTML_OPTIONS=
 # e.g. FIXXREF_OPTIONS=--extra-dir=../gdk-pixbuf/html --extra-dir=../gdk/html
 FIXXREF_OPTIONS=
 
+-include $(top_srcdir)/doc/doc.mk
+
 # Used for dependencies. The docs will be rebuilt if any of these change.
 # e.g. HFILE_GLOB=$(top_srcdir)/gtk/*.h
 # e.g. CFILE_GLOB=$(top_srcdir)/gtk/*.c
-HFILE_GLOB=$(top_srcdir)/lib/includes/gnutls/*.h \
-	$(top_builddir)/lib/includes/gnutls/*.h
-CFILE_GLOB=$(top_srcdir)/lib/*.c \
-	$(top_srcdir)/lib/x509/*.c \
-	$(top_srcdir)/lib/openpgp/*.c \
-	$(top_srcdir)/lib/minitasn1/*.c
+HFILE_GLOB=$(HEADER_FILES)
+CFILE_GLOB=$(C_SOURCE_FILES)
 
 # Extra header to include when scanning, which are not under DOC_SOURCE_DIR
 # e.g. EXTRA_HFILES=$(top_srcdir}/contrib/extra.h
@@ -66,100 +64,7 @@ EXTRA_HFILES=
 IGNORE_HFILES=
 
 # find lib -name \*.h -exec basename {} \; | grep -v -e ^abstract.h$ -e ^crypto.h$ -e ^dtls.h$ -e ^gnutls.h$ -e ^openpgp.h$ -e ^pkcs11.h$ -e ^pkcs12.h$ -e ^x509.h$ -e ^ocsp.h$  -e ^tpm.h$ | sort | uniq | sed -e 's/^/\t/' -e 's/$/ \\/'
-IGNORE_HFILES += \
-	abstract_int.h \
-	accelerated.h \
-	aes-padlock.h \
-	aes-x86.h \
-	algorithms.h \
-	anon.h \
-	cert.h \
-	cert_type.h \
-	common.h \
-	compat.h \
-	context.h \
-	crypto-backend.h \
-	cryptodev.h \
-	debug.h \
-	dh_common.h \
-	ecc.h \
-	ecdh_common.h \
-	egd.h \
-	element.h \
-	filters.h \
-	gnettle.h \
-	gnutls_auth.h \
-	gnutls_buffers.h \
-	gnutls_cipher.h \
-	gnutls_cipher_int.h \
-	gnutls_compress.h \
-	gnutls_constate.h \
-	gnutls_datum.h \
-	gnutls_db.h \
-	gnutls_dh.h \
-	gnutls_dtls.h \
-	gnutls_ecc.h \
-	gnutls_errors.h \
-	gnutls_extensions.h \
-	gnutls_global.h \
-	gnutls_handshake.h \
-	gnutls_hash_int.h \
-	gnutls_helper.h \
-	gnutls_int.h \
-	gnutls_kx.h \
-	gnutls_mbuffers.h \
-	gnutls_mem.h \
-	gnutls_mpi.h \
-	gnutls_num.h \
-	gnutls_openpgp.h \
-	gnutls_pk.h \
-	gnutls_record.h \
-	gnutls_rsa_export.h \
-	gnutls_session_pack.h \
-	gnutls_sig.h \
-	gnutls_srp.h \
-	gnutls_state.h \
-	gnutls_str_array.h \
-	gnutls_str.h \
-	gnutls_supplemental.h \
-	gnutls_v2_compat.h \
-	gnutls_x509.h \
-	gnutlsxx.h \
-	gstr.h \
-	hash.h \
-	heartbeat.h \
-	int.h \
-	keydb.h \
-	libtasn1.h \
-	locks.h \
-	main.h \
-	max_record.h \
-	opencdk.h \
-	openpgp_int.h \
-	packet.h \
-	parser_aux.h \
-	pbkdf2-sha1.h \
-	pin.h \
-	pkcs11_int.h \
-	psk.h \
-	psk_passwd.h \
-	randomart.h \
-	random.h \
-	safe_renegotiation.h \
-	server_name.h \
-	session_ticket.h \
-	sha-padlock.h \
-	signature.h \
-	srp.h \
-	srp_passwd.h \
-	stream.h \
-	structure.h \
-	system.h \
-	types.h \
-	verify-high.h \
-	x509_b64.h \
-	x509_int.h \
-	x86.h
+IGNORE_HFILES += $(top_srcdir)/lib/*.h $(top_srcdir)/lib/*/*.h $(top_srcdir)/libdane/*.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
