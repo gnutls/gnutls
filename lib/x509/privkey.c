@@ -1537,7 +1537,7 @@ gnutls_x509_privkey_verify_params (gnutls_x509_privkey_t key)
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
  *
- * This function will return a unique ID the depends on the public key
+ * This function will return a unique ID that depends on the public key
  * parameters. This ID can be used in checking whether a certificate
  * corresponds to the given key.
  *
