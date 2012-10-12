@@ -79,7 +79,7 @@ gnutls_global_set_log_function (gnutls_log_func log_func)
  * that session might be null if there is no corresponding TLS session.
  *
  * @gnutls_audit_log_func is of the form,
- * void (*gnutls_audit_log_func)( gnutls_session_t, int level, const char*);
+ * void (*gnutls_audit_log_func)( gnutls_session_t, const char*);
  *
  * Since: 3.0
  **/

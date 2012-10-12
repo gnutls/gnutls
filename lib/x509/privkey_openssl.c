@@ -117,7 +117,8 @@ static const struct pem_cipher {
  * the native gnutls_x509_privkey_t format. The
  * output will be stored in @key.  
  *
- * The @password should be in ASCII.
+ * The @password should be in ASCII. If the password is not provided
+ * or wrong then %GNUTLS_E_DECRYPTION_FAILED will be returned.
  *
  * If the Certificate is PEM encoded it should have a header of
  * "PRIVATE KEY" and the "DEK-Info" header. 
