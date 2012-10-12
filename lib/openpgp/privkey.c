@@ -1336,6 +1336,7 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
   gnutls_pk_params_st params;
   int pk_algorithm;
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
+  char buf[2*GNUTLS_OPENPGP_KEYID_SIZE+1];
 
   if (key == NULL)
     {
@@ -1350,6 +1351,8 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
       int idx;
 
       KEYID_IMPORT (kid, keyid);
+      
+      _gnutls_hard_log("Signing using PGP key ID %s\n", _gnutls_bin2hex(keyid, GNUTLS_OPENPGP_KEYID_SIZE, buf, sizeof(buf), NULL));
 
       idx = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
       pk_algorithm =
@@ -1359,6 +1362,8 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
     }
   else
     {
+      _gnutls_hard_log("Signing using master PGP key\n");
+
       pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
       result = _gnutls_openpgp_privkey_get_mpis (key, NULL, &params);
     }
@@ -1408,6 +1413,7 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
   gnutls_pk_params_st params;
   int pk_algorithm;
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
+  char buf[2*GNUTLS_OPENPGP_KEYID_SIZE+1];
 
   if (key == NULL)
     {
@@ -1421,6 +1427,9 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
       uint32_t kid[2];
 
       KEYID_IMPORT (kid, keyid);
+
+      _gnutls_hard_log("Decrypting using PGP key ID %s\n", _gnutls_bin2hex(keyid, GNUTLS_OPENPGP_KEYID_SIZE, buf, sizeof(buf), NULL));
+
       result = _gnutls_openpgp_privkey_get_mpis (key, kid, &params);
 
       i = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
@@ -1429,6 +1438,8 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
     }
   else
     {
+      _gnutls_hard_log("Decrypting using master PGP key\n");
+
       pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
 
       result = _gnutls_openpgp_privkey_get_mpis (key, NULL, &params);
