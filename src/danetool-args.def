@@ -144,6 +144,11 @@ In order to create a record for the signer of your certificate use:
 $ certtool --tlsa-rr --host www.example.com --load-certificate cert.pem \
   --ca
 @end example
+
+To read a server's DANE TLSA entry, using the dig tool, use:
+@example
+$ dig +short TYPE52 _443._tcp.www.example.com
+@end example
 _EOT_;
 };
 

@@ -27,6 +27,9 @@ dist_man_MANS = gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
 if ENABLE_SRP
 dist_man_MANS += srptool.1
 endif
+if ENABLE_DANE
+dist_man_MANS += danetool.1
+endif
 
 # Note that our .def files depend on autogen
 # supporting the @subheading texi keyword. This
@@ -40,6 +43,11 @@ certtool.1: ../../src/certtool-args.def
 	rm -f "$<".tmp
 
 ocsptool.1: ../../src/ocsptool-args.def
+	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
+	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
+	rm -f "$<".tmp
+
+danetool.1: ../../src/danetool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
 	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
