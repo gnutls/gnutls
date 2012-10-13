@@ -2,6 +2,14 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.4 (unreleased)
+
+** gnutls-cli: Added --local-dns option.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.3 (released 2012-10-12)
 
 ** libgnutls: Added support for the OCSP Certificate Status
