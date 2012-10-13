@@ -3,7 +3,7 @@ prog-name     = danetool;
 prog-title    = "GnuTLS DANE tool";
 prog-desc     = "Generate DANE TLSA RR entries.";
 detail    = "Tool generate DNS resource records for the DANE protocol.";
-short-usage   = "danetool [options] [url]\ndanetool --help for usage instructions.\n";
+short-usage   = "danetool [options]\ndanetool --help for usage instructions.\n";
 explain       = "";
 
 #define  INFILE_OPT    1

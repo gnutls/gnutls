@@ -5,7 +5,7 @@ prog-desc     = "Manipulate certificates and private keys.";
 detail    = "Tool to parse and generate X.509 certificates, requests and private keys.
 It can be used interactively or non interactively by
 specifying the template command line option.";
-short-usage   = "certtool [options] [url]\ncerttool --help for usage instructions.\n";
+short-usage   = "certtool [options]\ncerttool --help for usage instructions.\n";
 explain       = "";
 
 #define  INFILE_OPT    1
