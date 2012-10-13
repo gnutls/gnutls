@@ -153,6 +153,11 @@ identity of a peer will verify the certificate against a set of
 trusted certificates and then check whether the certificate is listed
 in a CRL and/or perform an OCSP check for the certificate.
 
+Note that in the context of a TLS session the server may provide an
+OCSP response that will used during the TLS certificate verification 
+(see @funcref{gnutls_certificate_verify_peers2}).
+You may obtain this response using @funcref{gnutls_ocsp_status_request_get}.
+
 Before performing the OCSP query, the application will need to figure
 out the address of the OCSP server.  The OCSP server address can be
 provided by the local user in manual configuration or may be stored

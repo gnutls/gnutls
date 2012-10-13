@@ -576,13 +576,17 @@ to connect to the server's CA OCSP server and request the status of the
 certificate. This extension however, enables a TLS server to include
 its CA OCSP server response in the handshake. That is an HTTPS server
 may periodically run @code{ocsptool} (see @ref{ocsptool Invocation}) to obtain
-its certificate revocation status and serve it to the clients. This
-reduces the number of connections a client needs to perform to access a
-secure server.
+its certificate revocation status and serve it to the clients. That
+way a client avoids an additional connection to the OCSP server.
 
-@showfuncB{gnutls_certificate_set_ocsp_status_request_function,gnutls_certificate_set_ocsp_status_request_file}
+@showfuncC{gnutls_certificate_set_ocsp_status_request_function,gnutls_certificate_set_ocsp_status_request_file,gnutls_ocsp_status_request_enable_client}
 
-@showfuncA{gnutls_ocsp_status_request_enable_client}
+A server is required to provide the OCSP server's response using the @funcref{gnutls_certificate_set_ocsp_status_request_file}.
+The response may be obtained periodically using the following command.
+@begin example
+ocsptool --ask --load-cert server_cert.pem --load-issuer the_issuer.pem
+         --load-signer the_issuer.pem --outfile ocsp.response
+@end example
 
 Since version 3.1.3 GnuTLS clients transparently support the certificate status
 request.
