@@ -125,7 +125,7 @@ flag = {
 flag = {
     name      = disable-extensions;
     descrip   = "Disable all the TLS extensions";
-    doc      = "";
+    doc      = "This option disables all TLS extensions. Deprecated option. Use the priority string.";
 };
 
 flag = {

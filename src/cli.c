@@ -89,6 +89,7 @@ const char *x509_cafile = NULL;
 const char *x509_crlfile = NULL;
 static int x509ctype;
 static int disable_extensions;
+static unsigned int init_flags = GNUTLS_CLIENT;
 static const char * priorities = NULL;
 
 const char *psk_username = NULL;
@@ -612,12 +613,12 @@ init_tls_session (const char *hostname)
   
   if (udp)
     {
-      gnutls_init (&session, GNUTLS_CLIENT|GNUTLS_DATAGRAM);
+      gnutls_init (&session, GNUTLS_DATAGRAM|init_flags);
       if (mtu)
         gnutls_dtls_set_mtu(session, mtu);
     }
   else
-    gnutls_init (&session, GNUTLS_CLIENT);
+    gnutls_init (&session, init_flags);
 
   if ((ret = gnutls_priority_set_direct (session, priorities, &err)) < 0)
     {
@@ -670,21 +671,6 @@ init_tls_session (const char *hostname)
 
   if (HAVE_OPT(HEARTBEAT))
     gnutls_heartbeat_enable (session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
-
-  /* OCSP status-request TLS extension */
-  if (status_request_ocsp > 0 && disable_extensions == 0)
-    {
-      if (gnutls_ocsp_status_request_enable_client (session, NULL, 0, NULL) < 0)
-        {
-          fprintf (stderr, "Cannot set OCSP status request information.\n");
-          exit (1);
-        }
-    }
-
-#ifdef ENABLE_SESSION_TICKET
-  if (disable_extensions == 0 && !HAVE_OPT(NOTICKET)t)
-    gnutls_session_ticket_enable_client (session);
-#endif
 
   return session;
 }
@@ -1127,6 +1113,9 @@ const char* rest = NULL;
     }
 
   disable_extensions = HAVE_OPT( DISABLE_EXTENSIONS);
+  if (disable_extensions)
+    init_flags |= GNUTLS_NO_EXTENSIONS;
+  
   starttls = HAVE_OPT(STARTTLS);
   resume = HAVE_OPT(RESUME);
   rehandshake = HAVE_OPT(REHANDSHAKE);
