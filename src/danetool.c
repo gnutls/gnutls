@@ -157,6 +157,8 @@ cmd_parser (int argc, char **argv)
 
   memset (&cinfo, 0, sizeof (cinfo));
   
+  cinfo.incert_format = incert_format;
+
   if (HAVE_OPT(VERBOSE))
     cinfo.verbose = 1;
   
