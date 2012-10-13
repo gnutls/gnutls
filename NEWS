@@ -11,6 +11,8 @@ the available revocation data validity.
 
 ** gnutls-cli: Added --local-dns option.
 
+** danetool: Corrected bug that prevented loading PEM files.
+
 ** API and ABI modifications:
 GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added.
 GNUTLS_CERT_REVOCATION_DATA_INVALID: Added.
