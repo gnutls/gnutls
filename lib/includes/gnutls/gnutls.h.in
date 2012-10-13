@@ -444,9 +444,11 @@ extern "C"
  *   should not be trusted.
  * @GNUTLS_CERT_NOT_ACTIVATED: The certificate is not yet activated.
  * @GNUTLS_CERT_EXPIRED: The certificate has expired.
+ * @GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: The OCSP revocation data are too old.
+ * @GNUTLS_CERT_REVOCATION_DATA_INVALID: The OCSP revocation data are invalid.
  *
  * Enumeration of certificate status codes.  Note that the status
- * bits have different meanings in OpenPGP keys and X.509
+ * bits may have different meanings in OpenPGP keys and X.509
  * certificate verification.
  */
   typedef enum
@@ -458,7 +460,9 @@ extern "C"
     GNUTLS_CERT_INSECURE_ALGORITHM = 256,
     GNUTLS_CERT_NOT_ACTIVATED = 512,
     GNUTLS_CERT_EXPIRED = 1024,
-    GNUTLS_CERT_SIGNATURE_FAILURE = 2048
+    GNUTLS_CERT_SIGNATURE_FAILURE = 2048,
+    GNUTLS_CERT_REVOCATION_DATA_TOO_OLD = 4096,
+    GNUTLS_CERT_REVOCATION_DATA_INVALID = 8192,
   } gnutls_certificate_status_t;
 
 /**

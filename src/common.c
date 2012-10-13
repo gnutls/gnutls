@@ -439,6 +439,10 @@ cert_verify (gnutls_session_t session, const char* hostname)
 
           if (status & GNUTLS_CERT_REVOKED)
               printf ("- Peer's certificate chain revoked\n");
+          if (status & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
+              printf ("- The revocation data provided by the peer are too old\n");
+          if (status & GNUTLS_CERT_REVOCATION_DATA_INVALID)
+              printf ("- The revocation data provided by the peer are invalid\n");
           if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
               printf ("- Peer's certificate issuer is unknown\n");
           if (status & GNUTLS_CERT_SIGNER_NOT_CA)

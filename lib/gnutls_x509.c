@@ -88,15 +88,15 @@ check_bits (gnutls_session_t session, gnutls_x509_crt_t crt, unsigned int max_bi
 /* three days */
 #define MAX_OCSP_VALIDITY_SECS (3*60*60*24)
 
-/* Returns:
- *  -1: certificate is revoked
- *  1: certificate is ok
- *  0: dunno
+/* If the certificate is revoked status will be GNUTLS_CERT_REVOKED.
+ * 
+ * Returns:
+ *  Zero on success, a negative error code otherwise.
  */
 static int
 check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
                      gnutls_x509_crt_t issuer,
-                     gnutls_datum_t *data)
+                     gnutls_datum_t *data, unsigned int * ostatus)
 {
   gnutls_ocsp_resp_t resp;
   int ret;
@@ -107,23 +107,22 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
 
   ret = gnutls_ocsp_resp_init (&resp);
   if (ret < 0)
-    return gnutls_assert_val(0);
+    return gnutls_assert_val(ret);
 
   ret = gnutls_ocsp_resp_import (resp, data);
   if (ret < 0)
-    return gnutls_assert_val(0);
+    return gnutls_assert_val(ret);
   
   ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
   if (ret < 0)
     {
-      _gnutls_audit_log (session, "Got OCSP response on an unrelated certificate (ignoring)\n");
-      ret = 0;
+      _gnutls_audit_log (session, "Got OCSP response on an unrelated certificate.\n");
       goto cleanup;
     }
 
   ret = gnutls_ocsp_resp_verify_direct( resp, issuer, &status, 0);
   if (ret < 0)
-    return gnutls_assert_val(0);
+    return gnutls_assert_val(ret);
 
   /* do not consider revocation data if response was not verified */
   if (status != 0)
@@ -137,13 +136,15 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
   if (ret < 0)
     {
       ret = gnutls_assert_val(0);
+      *ostatus |= GNUTLS_CERT_REVOCATION_DATA_INVALID;
       goto cleanup;
     }
   
   if (cert_status == GNUTLS_OCSP_CERT_REVOKED)
     {
       _gnutls_audit_log(session, "The certificate was revoked via OCSP\n");
-      ret = gnutls_assert_val(-1);
+      *ostatus |= GNUTLS_CERT_REVOKED;
+      ret = gnutls_assert_val(0);
       goto cleanup;
     }
   
@@ -160,10 +161,12 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
       if (ntime < now)
         {
           _gnutls_audit_log(session, "There is a newer OCSP response but was not provided by the server\n");
+         if (now-ntime > MAX_OCSP_VALIDITY_SECS)
+           *ostatus |= GNUTLS_CERT_REVOCATION_DATA_TOO_OLD;
         }
     }
   
-  ret = 1;
+  ret = 0;
 cleanup:
   gnutls_ocsp_resp_deinit (resp);
   
@@ -284,9 +287,12 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
         }
     }
 
-  ret = check_ocsp_response(session, peer_certificate_list[0], issuer, &resp);
-  if (ret < 0) /* revoked */
-    ocsp_status |= GNUTLS_CERT_REVOKED;
+  ret = check_ocsp_response(session, peer_certificate_list[0], issuer, &resp, &ocsp_status);
+  if (ret < 0)
+    {
+      CLEAR_CERTS;
+      return gnutls_assert_val(ret);
+    }
 
 skip_ocsp:
   /* Verify certificate 
@@ -309,11 +315,6 @@ skip_ocsp:
 
   return 0;
 }
-
-/*
- * Read certificates and private keys, from files, memory etc.
- */
-
 
 /* Returns the name of the certificate of a null name
  */
