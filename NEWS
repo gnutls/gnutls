@@ -7,6 +7,8 @@ See the end for copying conditions.
 ** libgnutls: gnutls_certificate_verify_peers2() will set flags depending on
 the available revocation data validity.
 
+** libgnutls: Added priority string %VERIFY_DISABLE_CRL_CHECKS.
+
 ** gnutls-cli: Added --local-dns option.
 
 ** API and ABI modifications:

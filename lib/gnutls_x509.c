@@ -200,6 +200,7 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
   int peer_certificate_list_size, i, x, ret;
   gnutls_x509_crt_t issuer;
   unsigned int ocsp_status = 0;
+  unsigned int verify_flags;
 
   CHECK_AUTH (GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
@@ -227,6 +228,7 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
       return GNUTLS_E_CONSTRAINT_ERROR;
     }
 
+  verify_flags = cred->verify_flags | session->internals.priorities.additional_verify_flags;
   /* generate a list of gnutls_certs based on the auth info
    * raw certs.
    */
@@ -271,6 +273,9 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
     }
 
   /* Use the OCSP extension if any */
+  if (verify_flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS)
+    goto skip_ocsp;
+  
   ret = gnutls_ocsp_status_request_get(session, &resp);
   if (ret < 0)
     goto skip_ocsp;
@@ -299,9 +304,7 @@ skip_ocsp:
    */
   ret = gnutls_x509_trust_list_verify_crt (cred->tlist, peer_certificate_list,
                                      peer_certificate_list_size,
-                                     cred->verify_flags | session->internals.
-                                     priorities.additional_verify_flags,
-                                     status, NULL);
+                                     verify_flags, status, NULL);
 
   CLEAR_CERTS;
 

@@ -996,6 +996,12 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
                 GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5;
             }
           else if (strcasecmp (&broken_list[i][1],
+                               "VERIFY_DISABLE_CRL_CHECKS") == 0)
+            {
+              (*priority_cache)->additional_verify_flags |=
+                GNUTLS_VERIFY_DISABLE_CRL_CHECKS;
+            }
+          else if (strcasecmp (&broken_list[i][1],
                                "SSL3_RECORD_VERSION") == 0)
             (*priority_cache)->ssl3_record_version = 1;
           else if (strcasecmp (&broken_list[i][1],

@@ -646,7 +646,7 @@ extern "C"
  *   and expiration validity periods of certificate chains. Don't set
  *   this unless you understand the security implications.
  * @GNUTLS_VERIFY_DISABLE_CRL_CHECKS: Disable checking for validity
- *   using certificate revocation lists.
+ *   using certificate revocation lists or the available OCSP data.
  *
  * Enumeration of different certificate verify flags.
  */
