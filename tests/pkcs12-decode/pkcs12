@@ -22,7 +22,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool}
+top_builddir=${top_builddir:-../..}
+CERTTOOL=${CERTTOOL:-${top_builddir}/src/certtool}
 DEBUG=""
 
 if test "x$1" != "x";then
@@ -49,7 +50,7 @@ for p12 in 'client.p12 foobar' noclient.p12 unclient.p12 pkcs12_2certs.p12; do
 done
 
 file=test-null.p12
-$CERTTOOL --p12-info --inder --null-password --infile $file >/dev/null 2>&1
+$CERTTOOL --p12-info --inder --null-password --infile $srcdir/$file >/dev/null 2>&1
 rc=$?
 if test $rc != 0; then
 	echo "PKCS12 FATAL $file"
