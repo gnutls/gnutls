@@ -321,6 +321,8 @@ static void test_ciphersuite_kx(const char *cipher_prio)
     struct timespec tr_start, tr_stop;
     double avg, sstddev;
 
+    diffs_size = 0;
+
     /* Init server */
     gnutls_certificate_allocate_credentials(&s_certcred);
     gnutls_anon_allocate_server_credentials(&s_anoncred);
@@ -344,7 +346,6 @@ static void test_ciphersuite_kx(const char *cipher_prio)
     start_benchmark(&st);
 
     do {
-        gettime(&tr_start);
         
         gnutls_init(&server, GNUTLS_SERVER);
         ret = gnutls_priority_set_direct(server, cipher_prio, &str);
@@ -373,7 +374,11 @@ static void test_ciphersuite_kx(const char *cipher_prio)
         gnutls_transport_set_pull_function(client, client_pull);
         gnutls_transport_set_ptr(client, (gnutls_transport_ptr_t) client);
 
+        gettime(&tr_start);
+
         HANDSHAKE(client, server);
+
+        gettime(&tr_stop);
 
         if (suite == NULL)
             suite = gnutls_cipher_suite_get_name(gnutls_kx_get(server),
@@ -382,8 +387,6 @@ static void test_ciphersuite_kx(const char *cipher_prio)
 
         gnutls_deinit(client);
         gnutls_deinit(server);
-
-        gettime(&tr_stop);
 
         diffs[diffs_size++] = timespec_sub_ms(&tr_stop, &tr_start);
         if (diffs_size > sizeof(diffs))
