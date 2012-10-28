@@ -14,6 +14,7 @@ the available revocation data validity.
 ** danetool: Corrected bug that prevented loading PEM files.
 
 ** API and ABI modifications:
+gnutls_session_get_id2: Added
 GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added.
 GNUTLS_CERT_REVOCATION_DATA_INVALID: Added.
 
