@@ -402,7 +402,7 @@ static void test_ciphersuite_kx(const char *cipher_prio)
     avg = calc_avg(diffs, diffs_size);
     sstddev = calc_sstdev(diffs, diffs_size, avg);
 
-    printf("  Average time: %.2f ms, sample variance: %.2f\n\n", avg, sstddev);
+    printf("  Average handshake time: %.2f ms, sample variance: %.2f\n\n", avg, sstddev);
 
     gnutls_anon_free_client_credentials(c_anoncred);
     gnutls_anon_free_server_credentials(s_anoncred);
