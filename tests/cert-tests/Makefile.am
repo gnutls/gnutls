@@ -21,10 +21,10 @@
 
 EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	template-test.key template-test.pem template-test.tmpl \
-	funny-spacing.pem ca-certs.pem
+	funny-spacing.pem ca-certs.pem dane-test.rr
 
-dist_check_SCRIPTS = pathlen aki template-test pem-decoding
+dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane
 
-TESTS = pathlen aki template-test pem-decoding
+TESTS = pathlen aki template-test pem-decoding dane
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
