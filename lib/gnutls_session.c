@@ -31,14 +31,10 @@
  * @session_data: is a pointer to space to hold the session.
  * @session_data_size: is the session_data's size, or it will be set by the function.
  *
- * Returns all session parameters, in order to support resuming.  The
- * client should call this, and keep the returned session, if he
- * wants to resume that current version later by calling
- * gnutls_session_set_data() This function must be called after a
- * successful handshake.
- *
- * Resuming sessions is really useful and speedups connections after
- * a successful one.
+ * Returns all session parameters needed to be stored to support resumption.
+ * The client should call this, and store the returned session data. A session
+ * may be resumed later by calling gnutls_session_set_data().  
+ * This function must be called after a successful handshake. 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -86,15 +82,11 @@ error:
  * @session: is a #gnutls_session_t structure.
  * @data: is a pointer to a datum that will hold the session.
  *
- * Returns all session parameters, in order to support resuming.  The
- * client should call this, and keep the returned session, if he wants
- * to resume that current version later by calling
- * gnutls_session_set_data().  This function must be called after a
- * successful handshake.  The returned datum must be freed with
- * gnutls_free().
- *
- * Resuming sessions is really useful and speedups connections after
- * a successful one.
+ * Returns all session parameters needed to be stored to support resumption.
+ * The client should call this, and store the returned session data. A session
+ * may be resumed later by calling gnutls_session_set_data().  
+ * This function must be called after a successful handshake. 
+ * The returned @data are allocated and must be released using gnutls_free().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
