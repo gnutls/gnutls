@@ -1024,7 +1024,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 #define GNUTLS_MAX_SESSION_ID 32
   int gnutls_session_get_id (gnutls_session_t session, void *session_id,
                              size_t * session_id_size);
-
+  int gnutls_session_get_id2 (gnutls_session_t session, gnutls_datum_t *session_id);
 
   int gnutls_session_channel_binding (gnutls_session_t session,
                                       gnutls_channel_binding_t cbtype,

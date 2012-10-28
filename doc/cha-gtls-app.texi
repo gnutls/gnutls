@@ -1093,7 +1093,7 @@ the session parameters. Before establishing a new session to the same
 server the parameters must be re-associated with the GnuTLS session
 using @funcref{gnutls_session_set_data}.
 
-@showfuncC{gnutls_session_get_data,gnutls_session_get_id,gnutls_session_set_data}
+@showfuncC{gnutls_session_get_data,gnutls_session_get_id2,gnutls_session_set_data}
 
 Keep in mind that sessions will be expired after some time, depending
 on the server, and a server may choose not to resume a session

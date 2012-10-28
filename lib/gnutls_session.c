@@ -128,14 +128,14 @@ gnutls_session_get_data2 (gnutls_session_t session, gnutls_datum_t * data)
  * gnutls_session_get_id:
  * @session: is a #gnutls_session_t structure.
  * @session_id: is a pointer to space to hold the session id.
- * @session_id_size: is the session id's size, or it will be set by the function.
+ * @session_id_size: initially should contain the maximum @session_id size and will be updated.
  *
- * Returns the current session id. This can be used if you want to
+ * Returns the current session ID. This can be used if you want to
  * check if the next session you tried to resume was actually
- * resumed.  This is because resumed sessions have the same sessionID
+ * resumed.  That is because resumed sessions share the same session ID
  * with the original session.
  *
- * Session id is some data set by the server, that identify the
+ * The session ID is selected by the server, that identify the
  * current session.  In TLS 1.0 and SSL 3.0 session id is always less
  * than 32 bytes.
  *
@@ -163,6 +163,27 @@ gnutls_session_get_id (gnutls_session_t session,
 
   memcpy (session_id, &session->security_parameters.session_id,
           *session_id_size);
+
+  return 0;
+}
+
+/**
+ * gnutls_session_get_id2:
+ * @session: is a #gnutls_session_t structure.
+ * @session_id: will point to the session ID.
+ *
+ * Returns the current session ID. The returned data should be
+ * treated as constant.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
+int
+gnutls_session_get_id2 (gnutls_session_t session,
+                        gnutls_datum_t *session_id)
+{
+  session_id->size = session->security_parameters.session_id_size;
+  session_id->data = session->security_parameters.session_id;
 
   return 0;
 }
