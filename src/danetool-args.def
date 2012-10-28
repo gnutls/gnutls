@@ -6,7 +6,7 @@ detail    = "Tool generate DNS resource records for the DANE protocol.";
 short-usage   = "danetool [options]\ndanetool --help for usage instructions.\n";
 explain       = "";
 
-#define  INFILE_OPT    1
+#define  INFILE_OPT    0
 #define  OUTFILE_OPT   1
 #define  VERBOSE_OPT 1
 #include args-std.def
@@ -45,19 +45,6 @@ certificates), when reading in DER format a single data structure is read.";
 flag = {
     name      = inraw;
     aliases   = inder;
-};
-
-flag = {
-    name      = outder;
-    descrip   = "Use DER format for output certificates and private keys";
-    disabled;
-    disable   = "no";
-    doc       = "The output will be in DER or RAW format.";
-};
-
-flag = {
-    name      = outraw;
-    aliases   = outder;
 };
 
 flag = {

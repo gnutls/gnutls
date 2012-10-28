@@ -54,9 +54,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
                       unsigned int ca, unsigned int local, common_info_st * cinfo);
 
 FILE *outfile;
-FILE *infile;
 static gnutls_digest_algorithm_t default_dig;
-static unsigned int incert_format, outcert_format;
 
 /* non interactive operation if set
  */
@@ -95,25 +93,6 @@ cmd_parser (int argc, char **argv)
     }
   else
     outfile = stdout;
-
-  if (HAVE_OPT(INFILE))
-    {
-      infile = fopen (OPT_ARG(INFILE), "rb");
-      if (infile == NULL)
-        error (EXIT_FAILURE, errno, "%s", OPT_ARG(INFILE));
-    }
-  else
-    infile = stdin;
-
-  if (HAVE_OPT(INDER) || HAVE_OPT(INRAW))
-    incert_format = GNUTLS_X509_FMT_DER;
-  else
-    incert_format = GNUTLS_X509_FMT_PEM;
-
-  if (HAVE_OPT(OUTDER) || HAVE_OPT(OUTRAW))
-    outcert_format = GNUTLS_X509_FMT_DER;
-  else
-    outcert_format = GNUTLS_X509_FMT_PEM;
 
   default_dig = GNUTLS_DIG_UNKNOWN;
   if (HAVE_OPT(HASH))
@@ -157,7 +136,10 @@ cmd_parser (int argc, char **argv)
 
   memset (&cinfo, 0, sizeof (cinfo));
   
-  cinfo.incert_format = incert_format;
+  if (HAVE_OPT(INDER) || HAVE_OPT(INRAW))
+    cinfo.incert_format = GNUTLS_X509_FMT_DER;
+  else
+    cinfo.incert_format = GNUTLS_X509_FMT_PEM;
 
   if (HAVE_OPT(VERBOSE))
     cinfo.verbose = 1;
