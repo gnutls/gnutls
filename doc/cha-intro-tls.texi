@@ -583,7 +583,8 @@ way a client avoids an additional connection to the OCSP server.
 
 A server is required to provide the OCSP server's response using the @funcref{gnutls_certificate_set_ocsp_status_request_file}.
 The response may be obtained periodically using the following command.
-@begin example
+
+@example
 ocsptool --ask --load-cert server_cert.pem --load-issuer the_issuer.pem
          --load-signer the_issuer.pem --outfile ocsp.response
 @end example
