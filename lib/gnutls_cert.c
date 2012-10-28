@@ -639,15 +639,18 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
  * @session: is a gnutls session
  * @status: is the output of the verification
  *
- * This function will try to verify the peer's certificate and return
- * its status (trusted, invalid etc.).  The value of @status should
- * be one or more of the gnutls_certificate_status_t enumerated
- * elements bitwise or'd. To avoid denial of service attacks some
+ * This function will verify the peer's certificate and return
+ * its status (trusted, invalid etc.).  The value of @status will
+ * be one or more of the gnutls_certificate_status_t flags
+ * bitwise or'd. Note that verification failure does not imply a
+ * negative return value. Only the @status is updated.
+ *
+ * If available the OCSP Certificate Status extension will be
+ * utilized by this function.
+ * 
+ * To avoid denial of service attacks some
  * default upper limits regarding the certificate key size and chain
  * size are set. To override them use gnutls_certificate_set_verify_limits().
- *
- * This function will utilize the OCSP Certificate Status extension if
- * negotiated --to enable see gnutls_ocsp_status_request_enable_client().
  *
  * Note that you must also check the peer's name in order to check if
  * the verified certificate belongs to the actual peer, see gnutls_x509_crt_check_hostname().
