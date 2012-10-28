@@ -68,7 +68,7 @@ static const libtasn1_error_entry error_algorithms[] = {
  * Since: 1.6
  **/
 void
-asn1_perror (asn1_retCode error)
+asn1_perror (int error)
 {
   const char *str = asn1_strerror (error);
   fprintf (stderr, "LIBTASN1 ERROR: %s\n", str ? str : "(null)");
@@ -90,7 +90,7 @@ asn1_perror (asn1_retCode error)
  * Since: 1.6
  **/
 const char *
-asn1_strerror (asn1_retCode error)
+asn1_strerror (int error)
 {
   const libtasn1_error_entry *p;
 
