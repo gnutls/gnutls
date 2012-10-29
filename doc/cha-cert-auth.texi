@@ -500,8 +500,29 @@ in addition to the verification by commercial CA infrastructure or
 could even replace it where DNSSEC is deployed.
 
 The DANE functionality is provided by the @code{libgnutls-dane} library that is shipped
-with GnuTLS and the function prototypes are in @code{gnutls/dane.h}. The
-high level verification functions are shown below.
+with GnuTLS and the function prototypes are in @code{gnutls/dane.h}. 
+
+@subsubheading Using the DANE library
+Since the DANE library is not included in GnuTLS it requires programs
+to be linked against it. This can be achieved with the following commands.
+
+@example
+gcc -o foo foo.c `pkg-config gnutls-dane --cflags --libs`
+@end example
+
+When a program uses the GNU autoconf system, then the following
+line or similar can be used to detect the presence of the library.
+
+@example
+PKG_CHECK_MODULES([LIBDANE], [gnutls-dane >= 3.0.0])
+
+AC_SUBST([LIBDANE_CFLAGS])
+AC_SUBST([LIBDANE_LIBS])
+@end example
+
+@subsubheading DANE library functionality
+
+The library provides high level verification functions which are shown below.
 
 @showfuncdesc{dane_verify_crt}
 

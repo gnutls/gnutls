@@ -119,6 +119,7 @@ doc/latex/gnutls.lot
 doc/manpages/Makefile
 doc/manpages/Makefile.in
 doc/manpages/certtool.1
+doc/manpages/danetool.1
 doc/manpages/gnutls-cli-debug.1
 doc/manpages/gnutls-cli.1
 doc/manpages/gnutls-serv.1
@@ -597,6 +598,7 @@ tests/mini-handshake-timeout
 tests/mini-x509-callbacks
 doc/manpages/stamp_mans
 libdane/libgnutls-dane.la
+libdane/gnutls-dane.pc
 doc/latex/dane-api.tex
 src/libcmd-danetool.la
 src/danetool
