@@ -63,4 +63,8 @@ defexec_DATA += libgnutls-dane-$(DLL_VERSION).def
 endif
 endif
 
-DISTCLEANFILES = $(defexec_DATA)
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = gnutls-dane.pc
+DISTCLEANFILES = $(pkgconfig_DATA)
+
+DISTCLEANFILES += $(defexec_DATA)

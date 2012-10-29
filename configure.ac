@@ -569,6 +569,7 @@ AC_CONFIG_FILES([
   extra/includes/Makefile
   libdane/Makefile
   libdane/includes/Makefile
+  libdane/gnutls-dane.pc
   gl/Makefile
   gl/tests/Makefile
   guile/Makefile
