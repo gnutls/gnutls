@@ -499,7 +499,8 @@ the following functions, applicable to X.509 and OpenPGP certificates.
 The peer's certificate is not automatically verified and one 
 must call @funcref{gnutls_certificate_verify_peers3}
 after a successful handshake to verify the certificate's signature and the owner 
-of the certificate.
+of the certificate. The verification status returned can be printed using
+@funcref{gnutls_certificate_verification_status_print}.
 
 Alternatively the verification can occur during the handshake
 by using @funcref{gnutls_certificate_set_verify_function}.

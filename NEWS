@@ -23,9 +23,9 @@ gnutls_session_get_id2: Added
 gnutls_certificate_update_verify_flags: Added
 gnutls_certificate_verify_peers3: Added
 gnutls_certificate_verification_status_print: Added
-GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added.
-GNUTLS_CERT_REVOCATION_DATA_INVALID: Added.
-
+GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added
+GNUTLS_CERT_REVOCATION_DATA_INVALID: Added
+GNUTLS_CERT_UNEXPECTED_OWNER: Added
 
 * Version 3.1.3 (released 2012-10-12)
 
