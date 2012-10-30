@@ -603,7 +603,7 @@ gnutls_openpgp_crt_get_revoked_status (gnutls_openpgp_crt_t key)
  * given hostname. This is a basic implementation of the matching
  * described in RFC2818 (HTTPS), which takes into account wildcards.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: non-zero for a successful match, and zero on failure.
  **/
 int
 gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,

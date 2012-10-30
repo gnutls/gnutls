@@ -281,25 +281,19 @@ authority list may also be set using:
 @showfuncC{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_crl_file,gnutls_certificate_set_x509_system_trust}
 
 Then it is not required to setup a trusted list as above.
-The function @funcref{gnutls_certificate_verify_peers2} 
-may then be used to verify the peer's certificate chain. The flags
+The function @funcref{gnutls_certificate_verify_peers3} 
+may then be used to verify the peer's certificate chain and identity. The flags
 are set similarly to the verification functions in the previous section.
 
 There is also the possibility to pass some input to the verification
 functions in the form of flags. For @funcref{gnutls_x509_trust_list_verify_crt} the
 flags are passed straightforward, but
-@funcref{gnutls_certificate_verify_peers2} depends on the flags set by
+@funcref{gnutls_certificate_verify_peers3} depends on the flags set by
 calling @funcref{gnutls_certificate_set_verify_flags}.  All the available
 flags are part of the enumeration
 @code{gnutls_@-certificate_@-verify_@-flags} shown in @ref{gnutls_certificate_verify_flags}.
 
 @showenumdesc{gnutls_certificate_verify_flags,The @code{gnutls_@-certificate_@-verify_@-flags} enumeration.}
-
-Although the verification of a certificate path indicates that the
-certificate is signed by trusted authority, does not reveal anything
-about the peer's identity. It is required to verify if the
-certificate's owner is the one you expect. For more information
-consult @funcref{gnutls_x509_crt_check_hostname}, section @ref{ex:verify} for an example, and @xcite{RFC2818}.
 
 
 @node OpenPGP certificates
@@ -433,7 +427,7 @@ of verification status flags is the same as in the @acronym{X.509} certificates
 
 Similarly with X.509 certificates, one needs to specify
 the OpenPGP keyring file in the credentials structure. The certificates
-in this file will be  used by @funcref{gnutls_certificate_verify_peers2}
+in this file will be  used by @funcref{gnutls_certificate_verify_peers3}
 to verify the signatures in the certificate sent by the peer.
 
 @showfuncdesc{gnutls_certificate_set_openpgp_keyring_file}
@@ -578,7 +572,7 @@ certificates self-signed using @code{RSA-MD2} or @code{RSA-MD5}. The
 certificates in the trusted list are considered trusted irrespective
 of the signature.
 
-If you are using @funcref{gnutls_certificate_verify_peers2} to verify the
+If you are using @funcref{gnutls_certificate_verify_peers3} to verify the
 certificate chain, you can call
 @funcref{gnutls_certificate_update_verify_flags} or
 @funcref{gnutls_certificate_set_verify_flags} with the flags:

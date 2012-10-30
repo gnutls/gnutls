@@ -446,6 +446,7 @@ extern "C"
  * @GNUTLS_CERT_EXPIRED: The certificate has expired.
  * @GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: The OCSP revocation data are too old.
  * @GNUTLS_CERT_REVOCATION_DATA_INVALID: The OCSP revocation data are invalid.
+ * @GNUTLS_CERT_UNEXPECTED_OWNER: The owner is not the expected one.
  *
  * Enumeration of certificate status codes.  Note that the status
  * bits may have different meanings in OpenPGP keys and X.509
@@ -463,6 +464,7 @@ extern "C"
     GNUTLS_CERT_SIGNATURE_FAILURE = 2048,
     GNUTLS_CERT_REVOCATION_DATA_TOO_OLD = 4096,
     GNUTLS_CERT_REVOCATION_DATA_INVALID = 8192,
+    GNUTLS_CERT_UNEXPECTED_OWNER = 16384,
   } gnutls_certificate_status_t;
 
 /**
@@ -1698,6 +1700,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   int gnutls_certificate_client_get_request_status (gnutls_session_t session);
   int gnutls_certificate_verify_peers2 (gnutls_session_t session,
+                                        unsigned int *status);
+  int gnutls_certificate_verify_peers3 (gnutls_session_t session,
+                                        const char* hostname,
                                         unsigned int *status);
 
   int gnutls_pem_base64_encode (const char *msg, const gnutls_datum_t * data,

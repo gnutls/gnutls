@@ -859,6 +859,7 @@ GNUTLS_3_1_0 {
 	gnutls_certificate_get_peers_subkey_id;
 	gnutls_session_get_id2;
 	gnutls_certificate_update_verify_flags;
+	gnutls_certificate_verify_peers3;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

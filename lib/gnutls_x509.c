@@ -191,6 +191,7 @@ cleanup:
  -*/
 int
 _gnutls_x509_cert_verify_peers (gnutls_session_t session,
+                                const char* hostname,
                                 unsigned int *status)
 {
   cert_auth_info_t info;
@@ -306,13 +307,21 @@ skip_ocsp:
                                      peer_certificate_list_size,
                                      verify_flags, status, NULL);
 
-  CLEAR_CERTS;
-
   if (ret < 0)
     {
       gnutls_assert ();
+      CLEAR_CERTS;
       return ret;
     }
+
+  if (hostname)
+    {
+      ret = gnutls_x509_crt_check_hostname( peer_certificate_list[0], hostname);
+      if (ret == 0)
+        *status |= GNUTLS_CERT_UNEXPECTED_OWNER;
+    }
+
+  CLEAR_CERTS;
 
   *status |= ocsp_status;
 

@@ -581,6 +581,7 @@ _gnutls_x509_get_raw_crt_expiration_time (const gnutls_datum_t * cert)
  -*/
 static int
 _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
+                                  const char* hostname,
                                   unsigned int *status)
 {
   cert_auth_info_t info;
@@ -621,7 +622,7 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
   /* Verify certificate 
    */
   ret =
-    _gnutls_openpgp_verify_key (cred, &info->raw_certificate_list[0],
+    _gnutls_openpgp_verify_key (cred, hostname, &info->raw_certificate_list[0],
                                 peer_certificate_list_size, status);
 
   if (ret < 0)
@@ -629,7 +630,7 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
       gnutls_assert ();
       return ret;
     }
-
+    
   return 0;
 }
 #endif
@@ -677,10 +678,65 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
   switch (gnutls_certificate_type_get (session))
     {
     case GNUTLS_CRT_X509:
-      return _gnutls_x509_cert_verify_peers (session, status);
+      return _gnutls_x509_cert_verify_peers (session, NULL, status);
 #ifdef ENABLE_OPENPGP
     case GNUTLS_CRT_OPENPGP:
-      return _gnutls_openpgp_crt_verify_peers (session, status);
+      return _gnutls_openpgp_crt_verify_peers (session, NULL, status);
+#endif
+    default:
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+}
+
+/**
+ * gnutls_certificate_verify_peers3:
+ * @session: is a gnutls session
+ * @hostname: is the expected name of the peer
+ * @status: is the output of the verification
+ *
+ * This function will verify the peer's certificate and its name and 
+ * return its status (trusted, invalid etc.).  The value of @status will
+ * be one or more of the gnutls_certificate_status_t flags
+ * bitwise or'd. Note that verification failure does not imply a
+ * negative return value. Only the @status is updated.
+ *
+ * In case the @hostname does not match the %GNUTLS_CERT_UNEXPECTED_OWNER
+ * status flag will be set.
+ *
+ * If available the OCSP Certificate Status extension will be
+ * utilized by this function.
+ * 
+ * To avoid denial of service attacks some
+ * default upper limits regarding the certificate key size and chain
+ * size are set. To override them use gnutls_certificate_set_verify_limits().
+ *
+ * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
+ **/
+int
+gnutls_certificate_verify_peers3 (gnutls_session_t session,
+                                  const char* hostname,
+                                  unsigned int *status)
+{
+  cert_auth_info_t info;
+
+  CHECK_AUTH (GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+
+  info = _gnutls_get_auth_info (session);
+  if (info == NULL)
+    {
+      return GNUTLS_E_NO_CERTIFICATE_FOUND;
+    }
+
+  if (info->raw_certificate_list == NULL || info->ncerts == 0)
+    return GNUTLS_E_NO_CERTIFICATE_FOUND;
+
+  switch (gnutls_certificate_type_get (session))
+    {
+    case GNUTLS_CRT_X509:
+      return _gnutls_x509_cert_verify_peers (session, hostname, status);
+#ifdef ENABLE_OPENPGP
+    case GNUTLS_CRT_OPENPGP:
+      return _gnutls_openpgp_crt_verify_peers (session, hostname, status);
 #endif
     default:
       return GNUTLS_E_INVALID_REQUEST;

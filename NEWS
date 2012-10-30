@@ -9,6 +9,9 @@ the available revocation data validity.
 
 ** libgnutls: Added priority string %VERIFY_DISABLE_CRL_CHECKS.
 
+** libgnutls: Simplified certificate verification by adding
+gnutls_certificate_verify_peers3().
+
 ** gnutls-cli: Added --local-dns option.
 
 ** danetool: Corrected bug that prevented loading PEM files.
@@ -18,6 +21,7 @@ the available revocation data validity.
 ** API and ABI modifications:
 gnutls_session_get_id2: Added
 gnutls_certificate_update_verify_flags: Added
+gnutls_certificate_verify_peers3: Added
 GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added.
 GNUTLS_CERT_REVOCATION_DATA_INVALID: Added.
 

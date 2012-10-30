@@ -30,6 +30,7 @@
 
 /*-
  * gnutls_openpgp_verify_key:
+ * @hostname: the name of the certificate holder
  * @cert_list: the structure that holds the certificates.
  * @cert_list_lenght: the items in the cert_list.
  * @status: the output of the verification function
@@ -44,6 +45,7 @@
  -*/
 int
 _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
+                            const char* hostname,
                             const gnutls_datum_t * cert_list,
                             int cert_list_length, unsigned int *status)
 {
@@ -95,6 +97,13 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
   /* If we only checked the self signature. */
   if (!cred->keyring)
     *status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+    
+  if (hostname)
+    {
+      ret = gnutls_openpgp_crt_check_hostname(key, hostname);
+      if (ret == 0)
+        *status |= GNUTLS_CERT_UNEXPECTED_OWNER;
+    }
 
   ret = 0;
 

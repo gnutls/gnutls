@@ -13,10 +13,7 @@
 int verify_certificate_callback (gnutls_session_t session)
 {
   unsigned int status;
-  const gnutls_datum_t *cert_list;
-  unsigned int cert_list_size;
   int ret;
-  gnutls_x509_crt_t cert;
   const char *hostname;
 
   /* read hostname */
@@ -25,7 +22,7 @@ int verify_certificate_callback (gnutls_session_t session)
   /* This verification function uses the trusted CAs in the credentials
    * structure. So you must have installed one or more CA certificates.
    */
-  ret = gnutls_certificate_verify_peers2 (session, &status);
+  ret = gnutls_certificate_verify_peers3 (session, hostname, &status);
   if (ret < 0)
     {
       printf ("Error\n");
@@ -46,45 +43,6 @@ int verify_certificate_callback (gnutls_session_t session)
 
   if (status & GNUTLS_CERT_NOT_ACTIVATED)
     printf ("The certificate is not yet activated\n");
-
-  /* Up to here the process is the same for X.509 certificates and
-   * OpenPGP keys. From now on X.509 certificates are assumed. This can
-   * be easily extended to work with openpgp keys as well.
-   */
-  if (gnutls_certificate_type_get (session) != GNUTLS_CRT_X509)
-    return GNUTLS_E_CERTIFICATE_ERROR;
-
-  if (gnutls_x509_crt_init (&cert) < 0)
-    {
-      printf ("error in initialization\n");
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-  cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
-  if (cert_list == NULL)
-    {
-      printf ("No certificate was found!\n");
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-  /* This is not a real world example, since we only check the first 
-   * certificate in the given chain.
-   */
-  if (gnutls_x509_crt_import (cert, &cert_list[0], GNUTLS_X509_FMT_DER) < 0)
-    {
-      printf ("error parsing certificate\n");
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-
-  if (!gnutls_x509_crt_check_hostname (cert, hostname))
-    {
-      printf ("The certificate's owner does not match hostname '%s'\n",
-              hostname);
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-  gnutls_x509_crt_deinit (cert);
 
   /* notify gnutls to continue handshake normally */
   return 0;

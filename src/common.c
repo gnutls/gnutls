@@ -192,110 +192,7 @@ print_x509_info (gnutls_session_t session, int flag, int print_cert)
       }
 }
 
-/* returns true or false, depending on whether the hostname
- * matches to certificate */
-static int
-verify_x509_hostname (gnutls_session_t session, const char *hostname)
-{
-  gnutls_x509_crt_t crt;
-  const gnutls_datum_t *cert_list;
-  unsigned int cert_list_size = 0;
-  int ret;
-
-  cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
-  if (cert_list_size == 0)
-    {
-      fprintf (stderr, "No certificates found!\n");
-      return 0;
-    }
-
-  gnutls_x509_crt_init (&crt);
-  ret =
-      gnutls_x509_crt_import (crt, &cert_list[0],
-                              GNUTLS_X509_FMT_DER);
-  if (ret < 0)
-    {
-      fprintf (stderr, "Decoding error: %s\n",
-               gnutls_strerror (ret));
-      return 0;
-    }
-
-  /* Check the hostname of the first certificate if it matches
-   * the name of the host we connected to.
-   */
-  if (hostname != NULL)
-    {
-      if (gnutls_x509_crt_check_hostname (crt, hostname) == 0)
-        {
-          printf
-             ("- The hostname in the certificate does NOT match '%s'\n",
-              hostname);
-          ret = 0;
-        }
-      else
-        {
-          printf ("- The hostname in the certificate matches '%s'.\n",
-                  hostname);
-          ret = 1;
-        }
-    }
-
-  gnutls_x509_crt_deinit (crt);
-
-  return ret;
-}
-
 #ifdef ENABLE_OPENPGP
-/* returns true or false, depending on whether the hostname
- * matches to certificate */
-static int
-verify_openpgp_hostname (gnutls_session_t session, const char *hostname)
-{
-  gnutls_openpgp_crt_t crt;
-  const gnutls_datum_t *cert_list;
-  unsigned int cert_list_size = 0;
-  int ret;
-
-  cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
-  if (cert_list_size == 0)
-    {
-      fprintf (stderr, "No certificates found!\n");
-      return 0;
-    }
-
-  gnutls_openpgp_crt_init (&crt);
-  ret =
-      gnutls_openpgp_crt_import (crt, &cert_list[0],
-                              GNUTLS_OPENPGP_FMT_RAW);
-  if (ret < 0)
-    {
-      fprintf (stderr, "Decoding error: %s\n",
-               gnutls_strerror (ret));
-      return 0;
-    }
-
-  /* Check the hostname of the first certificate if it matches
-   * the name of the host we connected to.
-   */
-  if (gnutls_openpgp_crt_check_hostname (crt, hostname) == 0)
-    {
-      printf
-             ("- The hostname in the certificate does NOT match '%s'\n",
-              hostname);
-      ret = 0;
-    }
-  else
-    {
-      printf ("- The hostname in the certificate matches '%s'.\n",
-              hostname);
-      ret = 1;
-    }
-
-  gnutls_openpgp_crt_deinit (crt);
-
-  return ret;
-}
-
 static void
 print_openpgp_info_compact (gnutls_session_t session)
 {
@@ -419,7 +316,7 @@ cert_verify (gnutls_session_t session, const char* hostname)
     unsigned int status = 0;
     int type;
 
-    rc = gnutls_certificate_verify_peers2 (session, &status);
+    rc = gnutls_certificate_verify_peers3 (session, hostname, &status);
     if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND)
       {
           printf ("- Peer did not send any certificate.\n");
@@ -460,9 +357,6 @@ cert_verify (gnutls_session_t session, const char* hostname)
               printf ("- Peer's certificate is NOT trusted\n");
           else
               printf ("- Peer's certificate is trusted\n");
-
-          rc = verify_x509_hostname (session, hostname);
-          if (rc == 0) status |= GNUTLS_CERT_INVALID;
       }
     else if (type == GNUTLS_CRT_OPENPGP)
       {
@@ -472,9 +366,6 @@ cert_verify (gnutls_session_t session, const char* hostname)
               printf ("- Peer's key is valid\n");
           if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
               printf ("- Could not find a signer of the peer's key\n");
-
-          rc = verify_openpgp_hostname (session, hostname);
-          if (rc == 0) status |= GNUTLS_CERT_INVALID;
       }
     else
       {
