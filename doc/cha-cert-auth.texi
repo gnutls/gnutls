@@ -625,6 +625,7 @@ of the signature.
 
 If you are using @funcref{gnutls_certificate_verify_peers2} to verify the
 certificate chain, you can call
+@funcref{gnutls_certificate_update_verify_flags} or
 @funcref{gnutls_certificate_set_verify_flags} with the flags:
 @itemize
 @item @code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2}
@@ -633,11 +634,11 @@ certificate chain, you can call
 as in the following example:
 
 @example
-  gnutls_certificate_set_verify_flags (x509cred,
+  gnutls_certificate_update_verify_flags (x509cred,
                                        GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5);
 @end example
 
-This will tell the verifier algorithm to enable @code{RSA-MD5} when
+This will signal the verifier algorithm to enable @code{RSA-MD5} when
 verifying the certificates.
 
 If you are using @funcref{gnutls_x509_crt_verify} or

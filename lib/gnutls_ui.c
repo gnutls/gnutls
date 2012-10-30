@@ -684,10 +684,9 @@ gnutls_certificate_set_params_function (gnutls_certificate_credentials_t res,
  * @res: is a gnutls_certificate_credentials_t structure
  * @flags: are the flags
  *
- * This function will set the flags to be used at verification of the
- * certificates.  Flags must be OR of the
- * #gnutls_certificate_verify_flags enumerations. The default
- * for TLS sessions is GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN.
+ * This function will set the flags to be used for verification 
+ * of certificates and override any defaults.  The provided flags must be an OR of the
+ * #gnutls_certificate_verify_flags enumerations. 
  *
  **/
 void
@@ -695,6 +694,24 @@ gnutls_certificate_set_verify_flags (gnutls_certificate_credentials_t
                                      res, unsigned int flags)
 {
   res->verify_flags = flags;
+}
+
+/**
+ * gnutls_certificate_update_verify_flags:
+ * @res: is a gnutls_certificate_credentials_t structure
+ * @flags: are the new flags
+ *
+ * This function will update the default flags to be used for verification 
+ * of certificates.  The provided flags must be an OR of the
+ * #gnutls_certificate_verify_flags enumerations. The default
+ * for TLS sessions is GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN.
+ *
+ **/
+void
+gnutls_certificate_update_verify_flags (gnutls_certificate_credentials_t
+                                     res, unsigned int flags)
+{
+  res->verify_flags |= flags;
 }
 
 /**
