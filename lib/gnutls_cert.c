@@ -41,6 +41,8 @@
 #ifdef ENABLE_OPENPGP
 #include "openpgp/gnutls_openpgp.h"
 #endif
+#include "gettext.h"
+#define _(String) dgettext (PACKAGE, String)
 
 /**
  * gnutls_certificate_free_keys:
@@ -901,4 +903,87 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
     }
 
   return 0;
+}
+
+/**
+ * gnutls_certificate_verification_status_print:
+ * @status: The status flags to be printed
+ * @type: The certificate type
+ * @out: Newly allocated datum with (0) terminated string.
+ * @flags: should be zero
+ *
+ * This function will pretty print the status of a verification
+ * process -- eg. the one obtained by gnutls_certificate_verify_peers3().
+ *
+ * The output @out needs to be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_certificate_verification_status_print (unsigned int status,
+                       gnutls_certificate_type_t type,
+                       gnutls_datum_t * out, unsigned int flags)
+{
+  gnutls_buffer_st str;
+  int ret;
+
+  _gnutls_buffer_init (&str);
+
+  if (type == GNUTLS_CRT_X509)
+    {
+      if (status == 0)
+        _gnutls_buffer_append_str (&str, _("- Peer's certificate is trusted\n"));
+      else
+        {
+          if (status & GNUTLS_CERT_INVALID)
+            _gnutls_buffer_append_str (&str, _("- Peer's certificate is NOT trusted\n"));
+
+          if (status & GNUTLS_CERT_REVOKED)
+            _gnutls_buffer_append_str (&str, _("- Peer's certificate chain revoked\n"));
+
+          if (status & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
+              _gnutls_buffer_append_str (&str, _("- The revocation data provided by the peer are too old\n"));
+
+          if (status & GNUTLS_CERT_REVOCATION_DATA_INVALID)
+              _gnutls_buffer_append_str (&str, _("- The revocation data provided by the peer are invalid\n"));
+
+          if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
+              _gnutls_buffer_append_str (&str, _("- Peer's certificate issuer is unknown\n"));
+
+          if (status & GNUTLS_CERT_SIGNER_NOT_CA)
+              _gnutls_buffer_append_str (&str, _("- Peer's certificate issuer is not a CA\n"));
+        }
+      }
+    else if (type == GNUTLS_CRT_OPENPGP)
+      {
+        if (status == 0)
+          _gnutls_buffer_append_str (&str, _("- Peer's key is valid\n"));
+
+        if (status & GNUTLS_CERT_INVALID)
+          _gnutls_buffer_append_str (&str, _("- Peer's certificate is invalid\n"));
+
+        if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
+          _gnutls_buffer_append_str (&str, _("- Could not find a signer of the peer's certificate\n"));
+
+        if (status & GNUTLS_CERT_REVOKED)
+          _gnutls_buffer_append_str (&str, _("- Peer's certificate is revoked\n"));
+      }
+
+  if (status & GNUTLS_CERT_INSECURE_ALGORITHM)
+    _gnutls_buffer_append_str (&str, _("- Peer's certificate chain uses insecure algorithm\n"));
+
+  if (status & GNUTLS_CERT_NOT_ACTIVATED)
+    _gnutls_buffer_append_str (&str, _("- Peer's certificate chain uses not yet valid certificate\n"));
+
+  if (status & GNUTLS_CERT_EXPIRED)
+    _gnutls_buffer_append_str (&str, _("- Peer's certificate chain uses expired certificate\n"));
+
+  if (status & GNUTLS_CERT_UNEXPECTED_OWNER)
+    _gnutls_buffer_append_str (&str, _("- The name in the certificate does not match the expected\n"));
+
+  ret = _gnutls_buffer_to_datum( &str, out);
+  if (out->size > 0) out->size--;
+      
+  return ret;
 }

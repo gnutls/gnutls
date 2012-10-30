@@ -1711,7 +1711,7 @@ print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
  * %GNUTLS_CRT_PRINT_ONELINE format will generate one line with some
  * selected fields, which is useful for logging purposes.
  *
- * The output @out needs to be deallocate using gnutls_free().
+ * The output @out needs to be deallocated using gnutls_free().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -2086,7 +2086,7 @@ print_crl (gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
  * This function will pretty print a X.509 certificate revocation
  * list, suitable for display to a human.
  *
- * The output @out needs to be deallocate using gnutls_free().
+ * The output @out needs to be deallocated using gnutls_free().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -2400,7 +2400,7 @@ print_crq_other (gnutls_buffer_st * str, gnutls_x509_crq_t crq)
  * This function will pretty print a certificate request, suitable for
  * display to a human.
  *
- * The output @out needs to be deallocate using gnutls_free().
+ * The output @out needs to be deallocated using gnutls_free().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

@@ -22,6 +22,7 @@ gnutls_certificate_verify_peers3().
 gnutls_session_get_id2: Added
 gnutls_certificate_update_verify_flags: Added
 gnutls_certificate_verify_peers3: Added
+gnutls_certificate_verification_status_print: Added
 GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added.
 GNUTLS_CERT_REVOCATION_DATA_INVALID: Added.
 

@@ -1705,6 +1705,10 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                         const char* hostname,
                                         unsigned int *status);
 
+  int gnutls_certificate_verification_status_print (unsigned int status,
+                       gnutls_certificate_type_t type,
+                       gnutls_datum_t * out, unsigned int flags);
+
   int gnutls_pem_base64_encode (const char *msg, const gnutls_datum_t * data,
                                 char *result, size_t * result_size);
   int gnutls_pem_base64_decode (const char *header,

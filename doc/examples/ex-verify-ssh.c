@@ -22,7 +22,8 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
   unsigned int status;
   const gnutls_datum_t *cert_list;
   unsigned int cert_list_size;
-  int ret;
+  int ret, type;
+  gnutls_datum_t out;
   const char *hostname;
 
   /* read hostname */
@@ -37,22 +38,21 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
       printf ("Error\n");
       return GNUTLS_E_CERTIFICATE_ERROR;
     }
+  
+  type = gnutls_certificate_type_get (session);
 
-  if (status & GNUTLS_CERT_INVALID)
-    printf ("The certificate is not trusted.\n");
+  ret = gnutls_certificate_verification_status_print( status, type, &out, 0);
+  if (ret < 0)
+    {
+      printf ("Error\n");
+      return GNUTLS_E_CERTIFICATE_ERROR;
+    }
+  
+  printf ("%s", out.data);
+  
+  gnutls_free(out.data);
 
-  if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-    printf ("The certificate hasn't got a known issuer.\n");
-
-  if (status & GNUTLS_CERT_REVOKED)
-    printf ("The certificate has been revoked.\n");
-
-  if (status & GNUTLS_CERT_EXPIRED)
-    printf ("The certificate has expired\n");
-
-  if (status & GNUTLS_CERT_NOT_ACTIVATED)
-    printf ("The certificate is not yet activated\n");
-
+  /* Do SSH verification */
   cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
   if (cert_list == NULL)
     {
@@ -62,8 +62,7 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
 
   /* service may be obtained alternatively using getservbyport() */
   ret = gnutls_verify_stored_pubkey(NULL, NULL, hostname, "https", 
-                                    gnutls_certificate_type_get (session), 
-                                    &cert_list[0], 0);
+                                    type, &cert_list[0], 0);
   if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
     {
       printf("Host %s is not known.", hostname);
@@ -99,8 +98,7 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
   if (ret != 0)
     {
       ret = gnutls_store_pubkey(NULL, NULL, hostname, "https", 
-                                gnutls_certificate_type_get (session), 
-                                &cert_list[0], 0, 0);
+                                type, &cert_list[0], 0, 0);
       if (ret < 0)
         printf("gnutls_store_pubkey: %s\n", gnutls_strerror(ret));
     }

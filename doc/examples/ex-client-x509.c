@@ -142,8 +142,9 @@ static int
 _verify_certificate_callback (gnutls_session_t session)
 {
   unsigned int status;
-  int ret;
+  int ret, type;
   const char *hostname;
+  gnutls_datum_t out;
 
   /* read hostname */
   hostname = gnutls_session_get_ptr (session);
@@ -158,23 +159,18 @@ _verify_certificate_callback (gnutls_session_t session)
       return GNUTLS_E_CERTIFICATE_ERROR;
     }
 
-  if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-    printf ("The certificate hasn't got a known issuer.\n");
+  type = gnutls_certificate_type_get (session);
 
-  if (status & GNUTLS_CERT_REVOKED)
-    printf ("The certificate has been revoked.\n");
-
-  if (status & GNUTLS_CERT_EXPIRED)
-    printf ("The certificate has expired\n");
-
-  if (status & GNUTLS_CERT_NOT_ACTIVATED)
-    printf ("The certificate is not yet activated\n");
-
-  if (status & GNUTLS_CERT_INVALID)
+  ret = gnutls_certificate_verification_status_print( status, type, &out, 0);
+  if (ret < 0)
     {
-      printf ("The certificate is not trusted.\n");
+      printf ("Error\n");
       return GNUTLS_E_CERTIFICATE_ERROR;
     }
+  
+  printf ("%s", out.data);
+  
+  gnutls_free(out.data);
 
   /* notify gnutls to continue handshake normally */
   return 0;

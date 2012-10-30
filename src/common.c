@@ -314,6 +314,7 @@ cert_verify (gnutls_session_t session, const char* hostname)
 {
     int rc;
     unsigned int status = 0;
+    gnutls_datum_t out;
     int type;
 
     rc = gnutls_certificate_verify_peers3 (session, hostname, &status);
@@ -331,47 +332,17 @@ cert_verify (gnutls_session_t session, const char* hostname)
       }
 
     type = gnutls_certificate_type_get (session);
-    if (type == GNUTLS_CRT_X509)
+    rc = gnutls_certificate_verification_status_print( status, type, &out, 0);
+    if (rc < 0)
       {
+          printf ("- Could not print verification flags (err: %s)\n",
+                  gnutls_strerror (rc));
+          return 0;
+      }
 
-          if (status & GNUTLS_CERT_REVOKED)
-              printf ("- Peer's certificate chain revoked\n");
-          if (status & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
-              printf ("- The revocation data provided by the peer are too old\n");
-          if (status & GNUTLS_CERT_REVOCATION_DATA_INVALID)
-              printf ("- The revocation data provided by the peer are invalid\n");
-          if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-              printf ("- Peer's certificate issuer is unknown\n");
-          if (status & GNUTLS_CERT_SIGNER_NOT_CA)
-              printf ("- Peer's certificate issuer is not a CA\n");
-          if (status & GNUTLS_CERT_INSECURE_ALGORITHM)
-              printf
-                  ("- Peer's certificate chain uses insecure algorithm\n");
-          if (status & GNUTLS_CERT_NOT_ACTIVATED)
-              printf
-                  ("- Peer's certificate chain uses not yet valid certificate\n");
-          if (status & GNUTLS_CERT_EXPIRED)
-              printf
-                  ("- Peer's certificate chain uses expired certificate\n");
-          if (status & GNUTLS_CERT_INVALID)
-              printf ("- Peer's certificate is NOT trusted\n");
-          else
-              printf ("- Peer's certificate is trusted\n");
-      }
-    else if (type == GNUTLS_CRT_OPENPGP)
-      {
-          if (status & GNUTLS_CERT_INVALID)
-              printf ("- Peer's key is invalid\n");
-          else
-              printf ("- Peer's key is valid\n");
-          if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-              printf ("- Could not find a signer of the peer's key\n");
-      }
-    else
-      {
-        fprintf(stderr, "Unknown certificate type\n");
-        status |= GNUTLS_CERT_INVALID;
-      }
+    printf ("%s", out.data);
+    
+    gnutls_free(out.data);
 
     if (status)
       return 0;
