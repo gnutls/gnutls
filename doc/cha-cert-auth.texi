@@ -442,6 +442,13 @@ to verify the signatures in the certificate sent by the peer.
 @section Advanced certificate verification
 @cindex Certificate verification
 
+The verification of X.509 certificates in the HTTPS and other Internet protocols is typically 
+done by loading a trusted list of commercial Certificate Authorities
+(see @funcref{gnutls_certificate_set_x509_system_trust}), and using them as trusted anchors.
+However, there are several examples (eg. the Diginotar incident) where one of these
+authorities was compromised. This risk can be mitigated by using in addition to CA certificate verification,
+other verification methods. In this section we list the available in GnuTLS methods.
+
 @menu
 * Verifying a certificate using trust on first use authentication::
 * Verifying a certificate using DANE (DNSSEC)::
@@ -453,7 +460,6 @@ to verify the signatures in the certificate sent by the peer.
 @cindex SSH-style authentication
 @cindex Trust on first use
 @cindex Key pinning
-@tindex gnutls_certificate_verify_flags
 
 It is possible to use a trust on first use (TOFU) authentication 
 method in GnuTLS. That is the concept used by the SSH programs, where the 
@@ -468,76 +474,25 @@ the trust on first use method.
 Such a hybrid system with X.509 and trust on first use authentication is 
 shown in @ref{Simple client example with SSH-style certificate verification}.
 
-@showfuncdesc{gnutls_verify_stored_pubkey}
-@showfuncdesc{gnutls_store_pubkey}
-
-In addition to the above the @funcref{gnutls_store_commitment} can be 
-used to implement a key-pinning architecture as in @xcite{KEYPIN}. 
-This provides a way for web server to commit on a public key that is
-not yet active.
-
-@showfuncdesc{gnutls_store_commitment}
-
-The storage and verification functions may be used with the default
-text file based back-end, or another back-end may be specified. That
-should contain storage and retrieval functions and specified as below.
-
-@showfuncE{gnutls_tdb_init,gnutls_tdb_deinit,gnutls_tdb_set_verify_func,gnutls_tdb_set_store_func,gnutls_tdb_set_store_commitment_func}
+See @ref{Certificate verification} on how to use the available functionality.
 
 @node Verifying a certificate using DANE (DNSSEC)
 @subsection Verifying a certificate using DANE (DNSSEC)
 @cindex verifying certificate paths
 @cindex DANE
 @cindex DNSSEC
-@tindex gnutls_certificate_verify_flags
 
 The DANE protocol is a protocol that can be used to verify TLS certificates
 using the DNS (or better DNSSEC) protocols. The DNS security extensions (DNSSEC)
 provide an alternative public key infrastructure to the commercial CAs that
 are typically used to sign TLS certificates. The DANE protocol takes advantage
 of the DNSSEC infrastructure to verify TLS certificates. This can be 
-in addition to the verification by commercial CA infrastructure or 
+in addition to the verification by CA infrastructure or 
 could even replace it where DNSSEC is deployed.
 
 The DANE functionality is provided by the @code{libgnutls-dane} library that is shipped
 with GnuTLS and the function prototypes are in @code{gnutls/dane.h}. 
-
-@subsubheading Using the DANE library
-Since the DANE library is not included in GnuTLS it requires programs
-to be linked against it. This can be achieved with the following commands.
-
-@example
-gcc -o foo foo.c `pkg-config gnutls-dane --cflags --libs`
-@end example
-
-When a program uses the GNU autoconf system, then the following
-line or similar can be used to detect the presence of the library.
-
-@example
-PKG_CHECK_MODULES([LIBDANE], [gnutls-dane >= 3.0.0])
-
-AC_SUBST([LIBDANE_CFLAGS])
-AC_SUBST([LIBDANE_LIBS])
-@end example
-
-@subsubheading DANE library functionality
-
-The library provides high level verification functions which are shown below.
-
-@showfuncdesc{dane_verify_crt}
-
-@showfuncB{dane_verify_session_crt,dane_strerror}
-
-Note that the @code{dane_state_t} structure that is accepted by both
-verification functions is optional. It is required when many queries
-are performed to facilitate caching.
-The following flags are returned by the verify functions to
-indicate the status of the verification.
-
-@showenumdesc{dane_verify_status_t,The DANE verification status flags.}
-
-In order to generate a DANE TLSA entry to use in a DNS server 
-you may use danetool (see @ref{danetool Invocation}).
+See @ref{Certificate verification} for information on how to use the library.
 
 @node Digital signatures
 @section Digital signatures

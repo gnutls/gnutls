@@ -11,7 +11,7 @@
 * Data transfer and termination::
 * Handling alerts::
 * Priority Strings::
-* Advanced and other topics::
+* Advanced topics::
 * Using the cryptographic library::
 * Selecting cryptographic key sizes::
 @end menu
@@ -1067,11 +1067,12 @@ except TLS 1.2:
     "SECURE128:+SECURE192:-VERS-TLS-ALL:+VERS-TLS1.2"
 @end example
 
-@node Advanced and other topics
-@section Advanced and other topics
+@node Advanced topics
+@section Advanced topics
 
 @menu
 * Session resumption::
+* Certificate verification::
 * Parameter generation::
 * Keying Material Exporters::
 * Channel Bindings::
@@ -1129,6 +1130,77 @@ Those keys should be associated with the GnuTLS session using
 
 A server enabling both session tickets and a storage for session data
 would use session tickets when clients support it and the storage otherwise.
+
+@node Certificate verification
+@subsection Certificate verification
+@cindex DANE
+@cindex DNSSEC
+@cindex SSH-style authentication
+@cindex Trust on first use
+@cindex Key pinning
+@tindex gnutls_certificate_verify_flags
+
+In this section the functionality for additional certificate verification methods is listed. 
+These methods are intended to be used in addition to normal PKI verification, in order to reduce 
+the risk of a compromised CA being undetected.
+
+@subsubsection Trust on first use
+
+The GnuTLS library includes functionlity to use an SSH-like trust on first use authentication.
+The available functions to store and verify public keys are listed below.
+
+@showfuncdesc{gnutls_verify_stored_pubkey}
+@showfuncdesc{gnutls_store_pubkey}
+
+In addition to the above the @funcref{gnutls_store_commitment} can be 
+used to implement a key-pinning architecture as in @xcite{KEYPIN}. 
+This provides a way for web server to commit on a public key that is
+not yet active.
+
+@showfuncdesc{gnutls_store_commitment}
+
+The storage and verification functions may be used with the default
+text file based back-end, or another back-end may be specified. That
+should contain storage and retrieval functions and specified as below.
+
+@showfuncE{gnutls_tdb_init,gnutls_tdb_deinit,gnutls_tdb_set_verify_func,gnutls_tdb_set_store_func,gnutls_tdb_set_store_commitment_func}
+
+@subsubsection DANE verification
+Since the DANE library is not included in GnuTLS it requires programs
+to be linked against it. This can be achieved with the following commands.
+
+@example
+gcc -o foo foo.c `pkg-config gnutls-dane --cflags --libs`
+@end example
+
+When a program uses the GNU autoconf system, then the following
+line or similar can be used to detect the presence of the library.
+
+@example
+PKG_CHECK_MODULES([LIBDANE], [gnutls-dane >= 3.0.0])
+
+AC_SUBST([LIBDANE_CFLAGS])
+AC_SUBST([LIBDANE_LIBS])
+@end example
+
+The high level functionality provided by the DANE library is shown below.
+
+@showfuncdesc{dane_verify_crt}
+
+@showfuncB{dane_verify_session_crt,dane_strerror}
+
+Note that the @code{dane_state_t} structure that is accepted by both
+verification functions is optional. It is required when many queries
+are performed to facilitate caching.
+The following flags are returned by the verify functions to
+indicate the status of the verification.
+
+@showenumdesc{dane_verify_status_t,The DANE verification status flags.}
+
+In order to generate a DANE TLSA entry to use in a DNS server 
+you may use danetool (see @ref{danetool Invocation}).
+
+
 
 @node Parameter generation
 @subsection Parameter generation
@@ -1282,6 +1354,8 @@ that only allows the stream cipher ARCFOUR is below.
 @verbatim
 NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:-CIPHER-ALL:+ARCFOUR-128:%COMPAT
 @end verbatim
+
+
 
 @node Compatibility with the OpenSSL library
 @subsection Compatibility with the OpenSSL library
