@@ -399,7 +399,9 @@ cert_verify_callback (gnutls_session_t session)
   int rc;
   unsigned int status = 0;
   int ssh = ENABLED_OPT(TOFU);
+#ifdef HAVE_DANE
   int dane = ENABLED_OPT(DANE);
+#endif
   int ca_verify = ENABLED_OPT(CA_VERIFICATION);
   const char* txt_service;
 
