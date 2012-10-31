@@ -398,7 +398,7 @@ gnutls_server_name_set (gnutls_session_t session,
   memcpy (priv->server_names[server_names - 1].name, name, name_length);
   priv->server_names[server_names - 1].name_length = name_length;
 
-  priv->server_names_size++;
+  priv->server_names_size = server_names;
 
   if (set != 0)
     _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_SERVER_NAME,
