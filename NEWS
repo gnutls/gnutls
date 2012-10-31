@@ -26,6 +26,12 @@ gnutls_certificate_verification_status_print: Added
 GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added
 GNUTLS_CERT_REVOCATION_DATA_INVALID: Added
 GNUTLS_CERT_UNEXPECTED_OWNER: Added
+gnutls_srtp_profile_t: Added
+gnutls_srtp_set_profile: Added
+gnutls_srtp_set_profile_direct: Added
+gnutls_srtp_get_selected_profile: Added
+gnutls_srtp_get_profile_name: Added
+gnutls_srtp_get_profile_by_name: Added
 
 * Version 3.1.3 (released 2012-10-12)
 

@@ -39,6 +39,7 @@
 #include <ext/safe_renegotiation.h>
 #include <ext/ecc.h>
 #include <ext/status_request.h>
+#include <ext/srtp.h>
 #include <gnutls_num.h>
 
 
@@ -351,6 +352,10 @@ _gnutls_ext_init (void)
     return ret;
 
   ret = _gnutls_ext_register (&ext_mod_sig);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
+
+  ret = _gnutls_ext_register (&ext_mod_srtp);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 
