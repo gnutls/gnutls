@@ -113,6 +113,13 @@ flag = {
 };
 
 flag = {
+    name      = srtp_profiles;
+    arg-type  = string;
+    descrip   = "Offer SRTP profiles";
+    doc       = "";
+};
+
+flag = {
     name      = crlf;
     descrip   = "Send CR LF instead of LF";
     doc      = "";

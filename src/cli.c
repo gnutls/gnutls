@@ -675,6 +675,9 @@ init_tls_session (const char *hostname)
   if (HAVE_OPT(HEARTBEAT))
     gnutls_heartbeat_enable (session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 
+  if (HAVE_OPT(SRTP_PROFILES))
+    gnutls_srtp_set_profile_direct (session, OPT_ARG(SRTP_PROFILES), NULL);
+
   return session;
 }
 

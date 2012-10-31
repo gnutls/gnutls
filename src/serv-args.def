@@ -62,6 +62,13 @@ flag = {
 };
 
 flag = {
+    name      = srtp_profiles;
+    arg-type  = string;
+    descrip   = "Offer SRTP profiles";
+    doc       = "";
+};
+
+flag = {
     name      = disable-client-cert;
     value     = a;
     descrip   = "Do not request a client certificate";

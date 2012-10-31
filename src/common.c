@@ -456,6 +456,8 @@ print_info (gnutls_session_t session, int verbose, int print_cert)
     gnutls_kx_algorithm_t kx;
     unsigned char session_id[33];
     size_t session_id_size = sizeof (session_id);
+    gnutls_srtp_profile_t srtp_profile;
+    int rc;
 
     /* print session ID */
     gnutls_session_get_id (session, session_id, &session_id_size);
@@ -551,10 +553,13 @@ print_info (gnutls_session_t session, int verbose, int print_cert)
             (gnutls_compression_get (session)));
     printf ("- Compression: %s\n", tmp);
 
+    rc = gnutls_srtp_get_selected_profile (session, &srtp_profile);
+    if (rc == 0)
+      printf ("- SRTP profile: %s\n", gnutls_srtp_get_profile_name (srtp_profile));
+
     if (verbose)
       {
           gnutls_datum_t cb;
-          int rc;
 
           rc = gnutls_session_channel_binding (session,
                                                GNUTLS_CB_TLS_UNIQUE, &cb);
