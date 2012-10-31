@@ -645,8 +645,8 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
  * This function will verify the peer's certificate and return
  * its status (trusted, invalid etc.).  The value of @status will
  * be one or more of the gnutls_certificate_status_t flags
- * bitwise or'd. Note that verification failure does not imply a
- * negative return value. Only the @status is updated.
+ * bitwise or'd or zero if the certificate is trusted. Note that verification 
+ * does not imply a negative return value. Only the @status is updated.
  *
  * If available the OCSP Certificate Status extension will be
  * utilized by this function.
@@ -699,8 +699,8 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
  * This function will verify the peer's certificate and its name and 
  * return its status (trusted, invalid etc.).  The value of @status will
  * be one or more of the gnutls_certificate_status_t flags
- * bitwise or'd. Note that verification failure does not imply a
- * negative return value. Only the @status is updated.
+ * bitwise or'd or zero if the certificate is trusted. Note that verification 
+ * failure does not imply a negative return value. Only the @status is updated.
  *
  * In case the @hostname does not match the %GNUTLS_CERT_UNEXPECTED_OWNER
  * status flag will be set.
