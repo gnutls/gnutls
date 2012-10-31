@@ -430,7 +430,8 @@ extern "C"
 /**
  * gnutls_certificate_status_t:
  * @GNUTLS_CERT_INVALID: The certificate is not signed by one of the
- *   known authorities or the signature is invalid.
+ *   known authorities or the signature is invalid (deprecated by the flags 
+ *   %GNUTLS_CERT_SIGNATURE_FAILURE and %GNUTLS_CERT_SIGNER_NOT_FOUND).
  * @GNUTLS_CERT_SIGNATURE_FAILURE: The signature verification failed.
  * @GNUTLS_CERT_REVOKED: Certificate is revoked by its authority.  In X.509 this will be
  *   set only if CRLs are checked.
