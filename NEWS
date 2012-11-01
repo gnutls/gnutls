@@ -34,6 +34,7 @@ gnutls_srtp_set_profile_direct: Added
 gnutls_srtp_get_selected_profile: Added
 gnutls_srtp_get_profile_name: Added
 gnutls_srtp_get_profile_id: Added
+gnutls_srtp_get_keys: Added
 gnutls_srtp_profile_t: Added
 dane_cert_type_name: Added
 dane_match_type_name: Added
