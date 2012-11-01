@@ -25,6 +25,8 @@
 
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
+#include "gettext.h"
+#define _(String) dgettext (PACKAGE, String)
 
 void _gnutls_str_cpy (char *dest, size_t dest_tot_size, const char *src);
 void _gnutls_mem_cpy (char *dest, size_t dest_tot_size, const char *src,

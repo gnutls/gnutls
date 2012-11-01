@@ -31,10 +31,6 @@
 #include <gnutls_errors.h>
 #include <extras/randomart.h>
 
-/* I18n of error codes. */
-#include "gettext.h"
-#define _(String) dgettext (PACKAGE, String)
-
 #define addf _gnutls_buffer_append_printf
 #define adds _gnutls_buffer_append_str
 
