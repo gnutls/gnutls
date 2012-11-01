@@ -359,8 +359,6 @@ functions below.
 @showfuncdesc{gnutls_pkcs12_simple_parse}
 @showfuncC{gnutls_pkcs12_bag_get_data,gnutls_pkcs12_bag_get_key_id,gnutls_pkcs12_bag_get_friendly_name}
 
-@page
-
 The functions below are used to generate a PKCS #12 structure. An example
 of their usage is also shown.
 

@@ -607,6 +607,10 @@ To enable use the following functions.
 
 @showfuncB{gnutls_srtp_set_profile,gnutls_srtp_set_profile_direct}
 
+To obtain the negotiated keys use the function below.
+
+@showfuncdesc{gnutls_srtp_get_keys}
+
 Other helper functions are listed below.
 
 @showfuncC{gnutls_srtp_get_selected_profile,gnutls_srtp_get_profile_name,gnutls_srtp_get_profile_id}

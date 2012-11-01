@@ -1049,7 +1049,6 @@ Finally the ciphersuites enabled by any priority string can be
 listed using the @code{gnutls-cli} application (see @ref{gnutls-cli Invocation}), 
 or by using the priority functions as in @ref{Listing the ciphersuites in a priority string}.
 
-@page
 Example priority strings are:
 @example
 The default priority without the HMAC-MD5:
