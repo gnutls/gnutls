@@ -113,6 +113,8 @@ static gnutls_srtp_profile_t find_profile (const char *str, const char *end)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
+ *
+ * Since 3.1.4
  **/
 int gnutls_srtp_get_profile_by_name (const char *name,
                                      gnutls_srtp_profile_t *profile)
@@ -134,6 +136,8 @@ int gnutls_srtp_get_profile_by_name (const char *name,
  *
  * Returns: On success, the name of a SRTP profile as a string,
  *   otherwise NULL.
+ *
+ * Since 3.1.4
  **/
 const char *gnutls_srtp_get_profile_name (gnutls_srtp_profile_t profile)
 {
@@ -264,6 +268,8 @@ _gnutls_srtp_send_params (gnutls_session_t session,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
+ *
+ * Since 3.1.4
  **/
 int
 gnutls_srtp_get_selected_profile (gnutls_session_t session,
@@ -304,6 +310,8 @@ gnutls_srtp_get_selected_profile (gnutls_session_t session,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
+ *
+ * Since 3.1.4
  **/
 int
 gnutls_srtp_set_profile (gnutls_session_t session,
@@ -348,8 +356,10 @@ gnutls_srtp_set_profile (gnutls_session_t session,
  * This function is to be used by both clients and servers, to declare
  * what SRTP profiles they support, to negotiate with the peer.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
- *   otherwise a negative error code is returned.
+ * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
+ * %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since 3.1.4
  **/
 int
 gnutls_srtp_set_profile_direct (gnutls_session_t session,
@@ -391,7 +401,7 @@ gnutls_srtp_set_profile_direct (gnutls_session_t session,
               gnutls_free (priv);
           if (err_pos != NULL)
             *err_pos = profiles;
-          return GNUTLS_E_ILLEGAL_PARAMETER;
+          return GNUTLS_E_INVALID_REQUEST;
         }
 
       if (priv->profiles_size < MAX_SRTP_PROFILES)
