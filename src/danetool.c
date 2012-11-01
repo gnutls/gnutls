@@ -155,7 +155,7 @@ cmd_parser (int argc, char **argv)
 
   if (HAVE_OPT(LOAD_CERTIFICATE))
     cinfo.cert = OPT_ARG(LOAD_CERTIFICATE);
-  
+
   if (HAVE_OPT(PORT))
     port = OPT_VALUE_PORT;
   if (HAVE_OPT(PROTO))
@@ -166,7 +166,7 @@ cmd_parser (int argc, char **argv)
                HAVE_OPT(CA), HAVE_OPT(LOCAL), &cinfo);
   else if (HAVE_OPT(CHECK))
     dane_check (OPT_ARG(CHECK), proto, port, 
-               &cinfo);
+                &cinfo);
   else
     USAGE(1);
 
@@ -186,7 +186,7 @@ dane_query_t q;
 int ret;
 unsigned int flags = DANE_F_IGNORE_LOCAL_RESOLVER, i;
 unsigned int usage, type, match;
-gnutls_datum_t data;
+gnutls_datum_t data, file;
 size_t size;
 
   if (ENABLED_OPT(LOCAL_DNS))
@@ -221,6 +221,54 @@ size_t size;
       fprintf(outfile, "_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n", port, proto, host, usage, type, match, buffer);
     }
   
+  /* Verify the DANE data */
+  if (cinfo->cert)
+    {
+      gnutls_x509_crt_t *clist;
+      unsigned int clist_size, status;
+      
+      ret = gnutls_load_file(cinfo->cert, &file);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "gnutls_load_file: %s", gnutls_strerror (ret));
+    
+      ret = gnutls_x509_crt_list_import2( &clist, &clist_size, &file, cinfo->incert_format, 0);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_import2: %s", gnutls_strerror (ret));
+      
+      if (clist_size > 0)
+        {
+          gnutls_datum_t certs[clist_size];
+          gnutls_datum_t out;
+          unsigned int i;
+          
+          for (i=0;i<clist_size;i++)
+            {
+              ret = gnutls_x509_crt_export2( clist[i], GNUTLS_X509_FMT_DER, &certs[i]);
+              if (ret < 0)
+                error (EXIT_FAILURE, 0, "gnutls_x509_crt_export2: %s", gnutls_strerror (ret));
+            }
+          
+          ret = dane_verify_crt( s, certs, clist_size, GNUTLS_CRT_X509, 
+                                 host, proto, port, 0, 0, &status);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "dane_verify_crt: %s", dane_strerror (ret));
+            
+          ret = dane_verification_status_print(status, &out, 0);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "dane_verification_status_print: %s", dane_strerror (ret));
+          
+          printf("\n%s\n", out.data);
+          gnutls_free(out.data);
+
+          for (i=0;i<clist_size;i++)
+            {
+              gnutls_free(certs[i].data);
+              gnutls_x509_crt_deinit(clist[i]);
+            }
+          gnutls_free(clist);
+        }
+    }
+
   dane_query_deinit(q);
   dane_state_deinit(s);
 

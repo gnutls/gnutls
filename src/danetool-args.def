@@ -96,7 +96,7 @@ flag = {
 
 flag = {
     name      = ca;
-    descrip   = "Whether the provided certificate or public key is a Certificate authority.";
+    descrip   = "Whether the provided certificate or public key is a Certificate Authority.";
     doc      = "Marks the DANE RR as a CA certificate if specified.";
 };
 
@@ -153,9 +153,9 @@ To read a server's DANE TLSA entry, use:
 $ danetool --check www.example.com --proto tcp --port 443
 @end example
 
-To read a server's DANE TLSA entry, using the dig tool, use:
+To verify a server's DANE TLSA entry, use:
 @example
-$ dig +short TYPE52 _443._tcp.www.example.com
+$ danetool --check www.example.com --proto tcp --port 443 --load-certificate chain.pem
 @end example
 _EOT_;
 };

@@ -22,12 +22,13 @@ ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
 AM_CFLAGS = $(WERROR_CFLAGS) $(WSTACK_CFLAGS) $(WARN_CFLAGS)
 AM_CPPFLAGS = \
-	-I$(srcdir)/../gl			\
-	-I$(builddir)/../gl			\
+	-I$(srcdir)/../gl		\
+	-I$(builddir)/../gl		\
 	-I$(builddir)/../lib/includes	\
 	-I$(srcdir)/../lib/includes	\
 	-I$(srcdir)/includes		\
-	-I$(builddir)/includes
+	-I$(builddir)/includes		\
+	-I$(srcdir)/../lib
 
 SUBDIRS = includes
 

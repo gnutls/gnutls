@@ -32,6 +32,7 @@
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
 #include <gnutls/crypto.h>
+#include "../lib/gnutls_int.h"
 
 #define MAX_DATA_ENTRIES 4
 
@@ -602,3 +603,46 @@ unsigned int type;
 	return dane_verify_crt(s, cert_list, cert_list_size, type, hostname, proto, port, sflags, vflags, verify);
 }
 
+/**
+ * dane_verification_status_print:
+ * @status: The status flags to be printed
+ * @type: The certificate type
+ * @out: Newly allocated datum with (0) terminated string.
+ * @flags: should be zero
+ *
+ * This function will pretty print the status of a verification
+ * process -- eg. the one obtained by dane_verify_crt().
+ *
+ * The output @out needs to be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+dane_verification_status_print (unsigned int status,
+                       gnutls_datum_t * out, unsigned int flags)
+{
+  gnutls_buffer_st str;
+  int ret;
+
+  _gnutls_buffer_init (&str);
+
+  if (status == 0)
+    _gnutls_buffer_append_str (&str, _("DANE verification didn't reject the certificate. "));
+  else
+    _gnutls_buffer_append_str (&str, _("DANE verification failed. "));
+
+  if (status & DANE_VERIFY_CA_CONSTRAINS_VIOLATED)
+    _gnutls_buffer_append_str (&str, _("CA constrains were violated. "));
+
+  if (status & DANE_VERIFY_CERT_DIFFERS)
+    _gnutls_buffer_append_str (&str, _("The certificate differs. "));
+
+  if (status & DANE_VERIFY_NO_DANE_INFO)
+    _gnutls_buffer_append_str (&str, _("There was no DANE information. "));
+
+  ret = _gnutls_buffer_to_datum( &str, out);
+  if (out->size > 0) out->size--;
+      
+  return ret;
+}

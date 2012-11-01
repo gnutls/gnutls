@@ -498,20 +498,18 @@ cert_verify_callback (gnutls_session_t session)
         }
       else
         {
-          if (status != 0)
+          gnutls_datum_t out;
+
+          rc = dane_verification_status_print( status, &out, 0);
+          if (rc < 0)
             {
-              fprintf(stderr, "*** DANE certificate verification failed (flags %x).\n", status);
-              if (status & DANE_VERIFY_CA_CONSTRAINS_VIOLATED)
-                fprintf(stderr, "- CA constrains were violated.\n");
-              if (status & DANE_VERIFY_CERT_DIFFERS)
-                fprintf(stderr, "- The certificate differs.\n");
-              if (status & DANE_VERIFY_NO_DANE_INFO)
-                fprintf(stderr, "- There was no DANE information.\n");
+              fprintf(stderr, "*** DANE error: %s\n", dane_strerror(rc));
               if (!insecure)
                 return -1;
             }
-          else
-            printf("- DANE verification didn't reject the certificate.\n");
+          
+          fprintf(stderr, "- %s\n", out.data);
+          gnutls_free(out.data);
         }
 
     }

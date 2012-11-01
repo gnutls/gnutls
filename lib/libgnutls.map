@@ -896,7 +896,9 @@ GNUTLS_PRIVATE {
     _gnutls_buffer_append_data_prefix;
     _gnutls_buffer_pop_data;
     _gnutls_buffer_pop_prefix;
-
+    _gnutls_buffer_init;
+    _gnutls_buffer_append_str;
+    _gnutls_buffer_to_datum;
     # Internal symbols needed by psktool:
 
     # Internal symbols needed by gnutls-cli-debug:
