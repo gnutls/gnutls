@@ -83,7 +83,7 @@ static const srtp_profile_st profile_names[] = {
 static gnutls_srtp_profile_t find_profile (const char *str, const char *end)
 {
   const srtp_profile_st *prof = profile_names;
-  int len;
+  unsigned int len;
   if (end != NULL)
     {
       len = end - str;
@@ -155,7 +155,8 @@ static int
 _gnutls_srtp_recv_params (gnutls_session_t session,
                           const uint8_t *data, size_t _data_size)
 {
-  int i, j, ret;
+  unsigned int i, j;
+  int ret;
   const uint8_t *p = data;
   int len;
   ssize_t data_size = _data_size;
@@ -205,7 +206,6 @@ static int
 _gnutls_srtp_send_params (gnutls_session_t session,
                           gnutls_buffer_st* extdata)
 {
-  uint16_t len;
   unsigned i;
   int total_size = 0, ret;
   srtp_ext_st *priv;
