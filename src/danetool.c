@@ -207,18 +207,19 @@ size_t size;
       if (ret < 0)
         error (EXIT_FAILURE, 0, "dane_query_data: %s", dane_strerror (ret));
       
-      printf("\nCertificate usage: %s\n", dane_cert_usage_name(usage));
-      printf("Certificate type: %s\n", dane_cert_type_name(type));
-      printf("Contents: %s\n", dane_match_type_name(match));
       
       size = buffer_size;
       ret = gnutls_hex_encode(&data, (void*)buffer, &size);
       if (ret < 0)
         error (EXIT_FAILURE, 0, "gnutls_hex_encode: %s", dane_strerror (ret));
 
-      printf("Data: %s\n\n", buffer);
-
       fprintf(outfile, "_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n", port, proto, host, usage, type, match, buffer);
+
+      printf("\nCertificate usage: %s\n", dane_cert_usage_name(usage));
+      printf("Certificate type: %s\n", dane_cert_type_name(type));
+      printf("Contents: %s\n", dane_match_type_name(match));
+      printf("Data: %s\n", buffer);
+
     }
   
   /* Verify the DANE data */
@@ -257,7 +258,7 @@ size_t size;
           if (ret < 0)
             error (EXIT_FAILURE, 0, "dane_verification_status_print: %s", dane_strerror (ret));
           
-          printf("\n%s\n", out.data);
+          printf("\nVerification: %s\n", out.data);
           gnutls_free(out.data);
 
           for (i=0;i<clist_size;i++)
