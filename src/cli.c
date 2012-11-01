@@ -678,7 +678,7 @@ init_tls_session (const char *hostname)
       ret = gnutls_srtp_set_profile_direct (session, OPT_ARG(SRTP_PROFILES), &err);
       if (ret == GNUTLS_E_INVALID_REQUEST) fprintf (stderr, "Syntax error at: %s\n", err);
       else 
-        fprintf(stderr, "Error in priorities: %s\n", gnutls_strerror(ret));
+        fprintf(stderr, "Error in profiles: %s\n", gnutls_strerror(ret));
       exit (1);
     }
 
