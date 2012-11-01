@@ -628,9 +628,9 @@ dane_verification_status_print (unsigned int status,
   _gnutls_buffer_init (&str);
 
   if (status == 0)
-    _gnutls_buffer_append_str (&str, _("DANE verification didn't reject the certificate. "));
+    _gnutls_buffer_append_str (&str, _("Certificate matches. "));
   else
-    _gnutls_buffer_append_str (&str, _("DANE verification failed. "));
+    _gnutls_buffer_append_str (&str, _("Verification failed. "));
 
   if (status & DANE_VERIFY_CA_CONSTRAINS_VIOLATED)
     _gnutls_buffer_append_str (&str, _("CA constrains were violated. "));
@@ -639,7 +639,7 @@ dane_verification_status_print (unsigned int status,
     _gnutls_buffer_append_str (&str, _("The certificate differs. "));
 
   if (status & DANE_VERIFY_NO_DANE_INFO)
-    _gnutls_buffer_append_str (&str, _("There was no DANE information. "));
+    _gnutls_buffer_append_str (&str, _("There were no DANE information. "));
 
   ret = _gnutls_buffer_to_datum( &str, out);
   if (out->size > 0) out->size--;
