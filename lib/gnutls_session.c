@@ -169,6 +169,8 @@ gnutls_session_get_id (gnutls_session_t session,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
+ *
+ * Since: 3.1.4
  **/
 int
 gnutls_session_get_id2 (gnutls_session_t session,

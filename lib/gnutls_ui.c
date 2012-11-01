@@ -706,6 +706,7 @@ gnutls_certificate_set_verify_flags (gnutls_certificate_credentials_t
  * #gnutls_certificate_verify_flags enumerations. The default
  * for TLS sessions is GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN.
  *
+ * Since: 3.1.4
  **/
 void
 gnutls_certificate_update_verify_flags (gnutls_certificate_credentials_t

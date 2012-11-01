@@ -713,6 +713,8 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
  * size are set. To override them use gnutls_certificate_set_verify_limits().
  *
  * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Since: 3.1.4
  **/
 int
 gnutls_certificate_verify_peers3 (gnutls_session_t session,
@@ -919,6 +921,8 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.1.4
  **/
 int
 gnutls_certificate_verification_status_print (unsigned int status,
