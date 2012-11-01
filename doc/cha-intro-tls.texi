@@ -399,6 +399,7 @@ and they will be discussed in the subsections that follow.
 * HeartBeat::
 * Safe renegotiation::
 * OCSP status request::
+* SRTP::
 @end menu
 
 @node Maximum fragment length negotiation
@@ -591,6 +592,24 @@ ocsptool --ask --load-cert server_cert.pem --load-issuer the_issuer.pem
 
 Since version 3.1.3 GnuTLS clients transparently support the certificate status
 request.
+
+@node SRTP
+@subsection SRTP
+@cindex SRTP
+@cindex Secure RTP
+
+The TLS protocol was extended in @xcite{RFC5764} to provide keying material to the
+Secure RTP (SRTP) protocol. The SRTP protocol provides an encapsulation of encrypted
+data that is optimized for voice data. With the SRTP TLS extension two peers can
+negotiate keys using TLS or DTLS and obtain keying material for use with SRTP.
+
+To enable use the following functions.
+
+@showfuncB{gnutls_srtp_set_profile,gnutls_srtp_set_profile_direct}
+
+Other helper functions are listed below.
+
+@showfuncC{gnutls_srtp_get_selected_profile,gnutls_srtp_get_profile_name,gnutls_srtp_get_profile_id}
 
 @include sec-tls-app.texi
 

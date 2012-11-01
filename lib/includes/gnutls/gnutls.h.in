@@ -990,8 +990,8 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                         gnutls_srtp_profile_t *profile);
 
   const char *gnutls_srtp_get_profile_name (gnutls_srtp_profile_t profile);
-  int gnutls_srtp_get_profile_by_name (const char *name,
-                                       gnutls_srtp_profile_t *profile);
+  int gnutls_srtp_get_profile_id (const char *name,
+                                  gnutls_srtp_profile_t *profile);
 
   int gnutls_key_generate (gnutls_datum_t * key, unsigned int key_size);
 

@@ -105,7 +105,7 @@ static gnutls_srtp_profile_t find_profile (const char *str, const char *end)
 }
 
 /**
- * gnutls_srtp_get_profile_by_name
+ * gnutls_srtp_get_profile_id
  * @name: The name of the profile to look up
  * @profile: Will hold the profile id
  *
@@ -116,8 +116,8 @@ static gnutls_srtp_profile_t find_profile (const char *str, const char *end)
  *
  * Since 3.1.4
  **/
-int gnutls_srtp_get_profile_by_name (const char *name,
-                                     gnutls_srtp_profile_t *profile)
+int gnutls_srtp_get_profile_id (const char *name,
+                                gnutls_srtp_profile_t *profile)
 {
   *profile = find_profile (name, NULL);
   if (*profile == 0)

@@ -354,11 +354,6 @@ GNUTLS_1_4
     gnutls_srp_set_server_credentials_file;
     gnutls_srp_set_server_credentials_function;
     gnutls_srp_verifier;
-    gnutls_srtp_get_profile_by_name;
-    gnutls_srtp_get_profile_name;
-    gnutls_srtp_get_selected_profile;
-    gnutls_srtp_set_profile;
-    gnutls_srtp_set_profile_direct;
     gnutls_strdup;
     gnutls_strerror;
     gnutls_strerror_name;
@@ -866,6 +861,11 @@ GNUTLS_3_1_0 {
 	gnutls_certificate_update_verify_flags;
 	gnutls_certificate_verify_peers3;
 	gnutls_certificate_verification_status_print;
+	gnutls_srtp_get_profile_id;
+	gnutls_srtp_get_profile_name;
+	gnutls_srtp_get_selected_profile;
+	gnutls_srtp_set_profile;
+	gnutls_srtp_set_profile_direct;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
