@@ -601,3 +601,4 @@ unsigned int type;
 	
 	return dane_verify_crt(s, cert_list, cert_list_size, type, hostname, proto, port, sflags, vflags, verify);
 }
+

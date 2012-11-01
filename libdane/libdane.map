@@ -13,6 +13,9 @@ DANE_0_0
 	dane_query_deinit;
 	dane_verify_session_crt;
 	dane_verify_crt;
+        dane_cert_type_name;
+	dane_match_type_name;
+	dane_cert_usage_name;
   local:
     *;
 };

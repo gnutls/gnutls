@@ -40,7 +40,7 @@ libgnutls_dane_la_LDFLAGS = -no-undefined
 if ENABLE_DANE
 lib_LTLIBRARIES = libgnutls-dane.la
 
-libgnutls_dane_la_SOURCES = dane.c errors.c libdane.map
+libgnutls_dane_la_SOURCES = dane.c dane-params.c errors.c libdane.map
 
 libgnutls_dane_la_LIBADD = ../gl/libgnu.la \
 	../lib/libgnutls.la

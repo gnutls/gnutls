@@ -101,7 +101,7 @@ typedef struct dane_query_st *dane_query_t;
 typedef enum dane_state_flags_t 
 {
   DANE_F_IGNORE_LOCAL_RESOLVER = 1,
-} dane_verify_flags_t;
+} dane_state_flags_t;
 
 int dane_state_init (dane_state_t* s, unsigned int flags);
 void dane_state_deinit (dane_state_t s);
@@ -115,6 +115,9 @@ int dane_query_data(dane_query_t q, unsigned int idx,
 			unsigned int *match, gnutls_datum_t * data);
 void dane_query_deinit(dane_query_t q);
 
+const char* dane_cert_type_name(dane_cert_type_t type);
+const char* dane_match_type_name(dane_match_type_t type);
+const char* dane_cert_usage_name(dane_cert_usage_t usage);
 
 /**
  * dane_verify_status_t:
