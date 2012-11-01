@@ -982,8 +982,6 @@ gnutls_certificate_verification_status_print (unsigned int status,
   if (status & GNUTLS_CERT_UNEXPECTED_OWNER)
     _gnutls_buffer_append_str (&str, _("The name in the certificate does not match the expected. "));
 
-  _gnutls_buffer_append_str (&str, "\n");
-
   ret = _gnutls_buffer_to_datum( &str, out);
   if (out->size > 0) out->size--;
       
