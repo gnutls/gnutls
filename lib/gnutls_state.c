@@ -977,7 +977,7 @@ _gnutls_PRF (gnutls_session_t session,
  * @seed_size: length of the @seed variable.
  * @seed: optional extra data to seed the PRF with.
  * @outsize: size of pre-allocated output buffer to hold the output.
- * @out: pre-allocate buffer to hold the generated data.
+ * @out: pre-allocated buffer to hold the generated data.
  *
  * Apply the TLS Pseudo-Random-Function (PRF) on the master secret
  * and the provided data.
@@ -1024,7 +1024,7 @@ gnutls_prf_raw (gnutls_session_t session,
  * @extra_size: length of the @extra variable.
  * @extra: optional extra data to seed the PRF with.
  * @outsize: size of pre-allocated output buffer to hold the output.
- * @out: pre-allocate buffer to hold the generated data.
+ * @out: pre-allocated buffer to hold the generated data.
  *
  * Apply the TLS Pseudo-Random-Function (PRF) on the master secret
  * and the provided data, seeded with the client and server random fields.
