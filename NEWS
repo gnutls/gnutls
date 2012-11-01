@@ -12,6 +12,9 @@ the available revocation data validity.
 ** libgnutls: Simplified certificate verification by adding
 gnutls_certificate_verify_peers3().
 
+** libgnutls: Added support for extension to establish keys
+for SRTP.
+
 ** gnutls-cli: Added --local-dns option.
 
 ** danetool: Corrected bug that prevented loading PEM files.
@@ -23,15 +26,15 @@ gnutls_session_get_id2: Added
 gnutls_certificate_update_verify_flags: Added
 gnutls_certificate_verify_peers3: Added
 gnutls_certificate_verification_status_print: Added
-GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added
-GNUTLS_CERT_REVOCATION_DATA_INVALID: Added
-GNUTLS_CERT_UNEXPECTED_OWNER: Added
-gnutls_srtp_profile_t: Added
 gnutls_srtp_set_profile: Added
 gnutls_srtp_set_profile_direct: Added
 gnutls_srtp_get_selected_profile: Added
 gnutls_srtp_get_profile_name: Added
 gnutls_srtp_get_profile_by_name: Added
+gnutls_srtp_profile_t: Added
+GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added
+GNUTLS_CERT_REVOCATION_DATA_INVALID: Added
+GNUTLS_CERT_UNEXPECTED_OWNER: Added
 
 * Version 3.1.3 (released 2012-10-12)
 
