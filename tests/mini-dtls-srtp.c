@@ -69,7 +69,8 @@ client_log_func (int level, const char *str)
 /* These are global */
 static pid_t child;
 
-/* A very basic DTLS client, with anonymous authentication, that exchanges heartbeats.
+#define MAX_KEY_MATERIAL 64*4
+/* A very basic DTLS client, with anonymous authentication, that negotiates SRTP
  */
 
 static void
@@ -78,6 +79,9 @@ client (int fd, int profile)
     gnutls_session_t session;
     int ret;
     gnutls_anon_client_credentials_t anoncred;
+    uint8_t km[MAX_KEY_MATERIAL];
+    char buf[2*MAX_KEY_MATERIAL];
+    gnutls_datum_t cli_key, cli_salt, server_key, server_salt;
     /* Need to enable anonymous KX specifically. */
 
     gnutls_global_init ();
@@ -144,14 +148,33 @@ client (int fd, int profile)
                  gnutls_protocol_get_name (gnutls_protocol_get_version
                                            (session)));
 
-/*
-    ret = gnutls_prf(session, sizeof("EXTRACTOR-dtls_srtp")-1, "EXTRACTOR-dtls_srtp", 0, ctx_len, ctx, 32, out);
+    ret = gnutls_srtp_get_keys (session, km, sizeof(km), &cli_key, &cli_salt, &server_key, &server_salt);
     if (ret < 0)
       {
         gnutls_perror(ret);
         exit(1);
       }
-*/
+
+    if (debug)
+      {
+        size_t size = sizeof(buf);
+        gnutls_hex_encode(&cli_key, buf, &size);
+        success ("Client key: %s\n", buf);
+
+        size = sizeof(buf);
+        gnutls_hex_encode(&cli_salt, buf, &size);
+        success ("Client salt: %s\n", buf);
+
+        size = sizeof(buf);
+        gnutls_hex_encode(&server_key, buf, &size);
+        success ("Server key: %s\n", buf);
+
+        size = sizeof(buf);
+        gnutls_hex_encode(&server_salt, buf, &size);
+        success ("Server salt: %s\n", buf);
+      }
+
+
     gnutls_bye (session, GNUTLS_SHUT_WR);
 
     close (fd);
@@ -179,6 +202,10 @@ server (int fd, int profile)
     int ret;
     gnutls_session_t session;
     gnutls_anon_server_credentials_t anoncred;
+    uint8_t km[MAX_KEY_MATERIAL];
+    char buf[2*MAX_KEY_MATERIAL];
+    gnutls_datum_t cli_key, cli_salt, server_key, server_salt;
+
     /* this must be called once in the program
      */
     gnutls_global_init ();
@@ -239,14 +266,31 @@ server (int fd, int profile)
                  gnutls_protocol_get_name (gnutls_protocol_get_version
                                            (session)));
 
-/*
-    ret = gnutls_prf(session, sizeof("EXTRACTOR-dtls_srtp")-1, "EXTRACTOR-dtls_srtp", 0, ctx_len, ctx, 32, out);
+    ret = gnutls_srtp_get_keys (session, km, sizeof(km), &cli_key, &cli_salt, &server_key, &server_salt);
     if (ret < 0)
       {
         gnutls_perror(ret);
         exit(1);
       }
-*/
+    
+    if (debug)
+      {
+        size_t size = sizeof(buf);
+        gnutls_hex_encode(&cli_key, buf, &size);
+        success ("Client key: %s\n", buf);
+
+        size = sizeof(buf);
+        gnutls_hex_encode(&cli_salt, buf, &size);
+        success ("Client salt: %s\n", buf);
+
+        size = sizeof(buf);
+        gnutls_hex_encode(&server_key, buf, &size);
+        success ("Server key: %s\n", buf);
+
+        size = sizeof(buf);
+        gnutls_hex_encode(&server_salt, buf, &size);
+        success ("Server salt: %s\n", buf);
+      }
 
     /* do not wait for the peer to close the connection.
      */

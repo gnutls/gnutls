@@ -55,30 +55,48 @@ typedef struct
 {
   const char *name;
   gnutls_srtp_profile_t id;
+  unsigned int key_length;
+  unsigned int salt_length;
 } srtp_profile_st;
 
 static const srtp_profile_st profile_names[] = {
   {
     "SRTP_AES128_CM_SHA1_80",
     GNUTLS_SRTP_AES128_CM_SHA1_80,
+    16,14
   },
   {
     "SRTP_AES128_CM_SHA1_32",
     GNUTLS_SRTP_AES128_CM_SHA1_32,
+    16,14
   },
   {
     "SRTP_NULL_SHA1_80",
     GNUTLS_SRTP_NULL_SHA1_80,
+    16,14
   },
   {
     "SRTP_NULL_SHA1_32",
     GNUTLS_SRTP_NULL_SHA1_32,
+    16,14
   },
   {
     NULL,
-    0
+    0,0,0
   }
 };
+
+static const srtp_profile_st *get_profile (gnutls_srtp_profile_t profile)
+{
+  const srtp_profile_st *p = profile_names;
+  while (p->name != NULL)
+    {
+      if (p->id == profile)
+        return p;
+      p++;
+    }
+  return NULL;
+}
 
 static gnutls_srtp_profile_t find_profile (const char *str, const char *end)
 {
@@ -141,13 +159,11 @@ int gnutls_srtp_get_profile_id (const char *name,
  **/
 const char *gnutls_srtp_get_profile_name (gnutls_srtp_profile_t profile)
 {
-  const srtp_profile_st *p = profile_names;
-  while (p->name != NULL)
-    {
-      if (p->id == profile)
-        return p->name;
-      p++;
-    }
+  const srtp_profile_st *p = get_profile(profile);
+  
+  if (p != NULL)
+    return p->name;
+  
   return NULL;
 }
 
@@ -415,6 +431,89 @@ gnutls_srtp_set_profile_direct (gnutls_session_t session,
   if (set != 0)
     _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_SRTP,
                                   epriv);
+
+  return 0;
+}
+
+/**
+ * gnutls_srtp_get_keys:
+ * @session: is a #gnutls_session_t structure.
+ * @key_material: Space to hold the generated key material
+ * @key_material_size: The maximum size of the key material
+ * @client_key: The master client write key, pointing inside the key material
+ * @server_key: The master server write key, pointing inside the key material
+ * @client_salt: The master client write salt, pointing inside the key material
+ * @server_salt: The master server write salt, pointing inside the key material
+ *
+ * This is a helper function to generate the keying material for SRTP.
+ * It requires the space of the key material to be pre-allocated (should be at least
+ * 2x the maximum key size and salt size). The @client_key, @client_salt, @server_key
+ * and @server_salt are convenience datums that point inside the key material. The may
+ * be %NULL.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not sufficient, 
+ * %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since 3.1.4
+ **/
+int
+gnutls_srtp_get_keys (gnutls_session_t session, 
+                      void *key_material,
+                      unsigned int key_material_size,
+                      gnutls_datum_t *client_key, 
+                      gnutls_datum_t *client_salt,
+                      gnutls_datum_t *server_key, 
+                      gnutls_datum_t *server_salt)
+{  
+int ret;
+const srtp_profile_st *p;
+gnutls_srtp_profile_t profile;
+unsigned int msize;
+uint8_t *km = key_material;
+
+  ret = gnutls_srtp_get_selected_profile (session, &profile);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  p = get_profile(profile);
+  if (p == NULL)
+    return gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
+  
+  msize = 2*(p->key_length+p->salt_length);
+  if (msize > key_material_size)
+    return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+    
+  if (msize == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  ret = gnutls_prf(session, sizeof("EXTRACTOR-dtls_srtp")-1, "EXTRACTOR-dtls_srtp", 0, 0, 
+                   NULL, msize, key_material);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (client_key)
+    {
+      client_key->data = km;
+      client_key->size = p->key_length;
+    }
+
+  if (server_key)
+    {
+      server_key->data = km + p->key_length;
+      server_key->size = p->key_length;
+    }
+
+  if (client_salt)
+    {
+      client_salt->data = km + 2*p->key_length;
+      client_salt->size = p->salt_length;
+    }
+  
+  if (server_salt)
+    {
+      server_salt->data = km + 2*p->key_length + p->salt_length;
+      server_salt->size = p->salt_length;
+    }
 
   return 0;
 }

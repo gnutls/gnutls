@@ -992,6 +992,13 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   const char *gnutls_srtp_get_profile_name (gnutls_srtp_profile_t profile);
   int gnutls_srtp_get_profile_id (const char *name,
                                   gnutls_srtp_profile_t *profile);
+  int gnutls_srtp_get_keys (gnutls_session_t session, 
+                      void *key_material,
+                      unsigned int key_material_size,
+                      gnutls_datum_t *client_key, 
+                      gnutls_datum_t *client_salt,
+                      gnutls_datum_t *server_key, 
+                      gnutls_datum_t *server_salt);
 
   int gnutls_key_generate (gnutls_datum_t * key, unsigned int key_size);
 
