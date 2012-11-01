@@ -333,6 +333,7 @@ LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 gnutls_session_t initialize_session (int dtls)
 {
   gnutls_session_t session;
+  int ret;
   const char *err;
 
   if (priorities == NULL)
@@ -394,7 +395,13 @@ gnutls_session_t initialize_session (int dtls)
     gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 
   if (HAVE_OPT (SRTP_PROFILES))
-    gnutls_srtp_set_profile_direct (session, OPT_ARG(SRTP_PROFILES), NULL);
+    {
+      ret = gnutls_srtp_set_profile_direct (session, OPT_ARG(SRTP_PROFILES), &err);
+      if (ret == GNUTLS_E_INVALID_REQUEST) fprintf (stderr, "Syntax error at: %s\n", err);
+      else 
+        fprintf(stderr, "Error in priorities: %s\n", gnutls_strerror(ret));
+      exit (1);
+    }
 
   return session;
 }
