@@ -146,6 +146,7 @@ if ENABLE_DANE
 danetool_SOURCES = danetool.c certtool-common.c certtool-extras.c common.c
 danetool_LDADD = ../lib/libgnutls.la 
 danetool_LDADD += libcmd-danetool.la ../gl/libgnu.la
+danetool_LDADD += ../libdane/libgnutls-dane.la
 
 noinst_LTLIBRARIES += libcmd-danetool.la
 libcmd_danetool_la_CFLAGS =

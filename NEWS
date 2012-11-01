@@ -19,6 +19,9 @@ for SRTP.
 
 ** danetool: Corrected bug that prevented loading PEM files.
 
+** danetool: Added --check option to allow querying sites for
+DANE data.
+
 ** libgnutls-dane: Added pkg-config file for the library.
 
 ** API and ABI modifications:

@@ -27,6 +27,7 @@
 #include <gnutls/pkcs11.h>
 #include <gnutls/abstract.h>
 #include <gnutls/crypto.h>
+#include <gnutls/dane.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,6 +53,9 @@
 static void cmd_parser (int argc, char **argv);
 static void dane_info(const char* host, const char* proto, unsigned int port, 
                       unsigned int ca, unsigned int local, common_info_st * cinfo);
+
+static void dane_check(const char* host, const char* proto, unsigned int port,
+                       common_info_st * cinfo);
 
 FILE *outfile;
 static gnutls_digest_algorithm_t default_dig;
@@ -82,6 +86,8 @@ cmd_parser (int argc, char **argv)
 {
   int ret, privkey_op = 0;
   common_info_st cinfo;
+  const char* proto = "tcp";
+  unsigned int port = 443;
 
   optionProcess( &danetoolOptions, argc, argv);
   
@@ -149,10 +155,18 @@ cmd_parser (int argc, char **argv)
 
   if (HAVE_OPT(LOAD_CERTIFICATE))
     cinfo.cert = OPT_ARG(LOAD_CERTIFICATE);
+  
+  if (HAVE_OPT(PORT))
+    port = OPT_VALUE_PORT;
+  if (HAVE_OPT(PROTO))
+    proto = OPT_ARG(PROTO);
 
   if (HAVE_OPT(TLSA_RR))
-    dane_info (OPT_ARG(HOST), OPT_ARG(PROTO), OPT_VALUE_PORT, 
+    dane_info (OPT_ARG(HOST), proto, port,
                HAVE_OPT(CA), HAVE_OPT(LOCAL), &cinfo);
+  else if (HAVE_OPT(CHECK))
+    dane_check (OPT_ARG(CHECK), proto, port, 
+               &cinfo);
   else
     USAGE(1);
 
@@ -162,6 +176,54 @@ cmd_parser (int argc, char **argv)
   gnutls_pkcs11_deinit ();
 #endif
   gnutls_global_deinit ();
+}
+
+static void dane_check(const char* host, const char* proto, unsigned int port,
+                       common_info_st * cinfo)
+{
+dane_state_t s;
+dane_query_t q;
+int ret;
+unsigned int flags = DANE_F_IGNORE_LOCAL_RESOLVER, i;
+unsigned int usage, type, match;
+gnutls_datum_t data;
+size_t size;
+
+  if (ENABLED_OPT(LOCAL_DNS))
+    flags = 0;
+
+  printf("Querying on %s (%s:%d)...\n", host, proto, port);
+  ret = dane_state_init(&s, flags);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "dane_state_init: %s", dane_strerror (ret));
+  
+  ret = dane_query_tlsa(s, &q, host, proto, port);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "dane_query_tlsa: %s", dane_strerror (ret));
+  
+  for (i=0;i<dane_query_entries(q);i++)
+    {
+      ret = dane_query_data(q, i, &usage, &type, &match, &data);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "dane_query_data: %s", dane_strerror (ret));
+      
+      printf("\nCertificate usage: %s\n", dane_cert_usage_name(usage));
+      printf("Certificate type: %s\n", dane_cert_type_name(type));
+      printf("Contents: %s\n", dane_match_type_name(match));
+      
+      size = buffer_size;
+      ret = gnutls_hex_encode(&data, (void*)buffer, &size);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "gnutls_hex_encode: %s", dane_strerror (ret));
+
+      printf("Data: %s\n\n", buffer);
+
+      fprintf(outfile, "_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n", port, proto, host, usage, type, match, buffer);
+    }
+  
+  dane_query_deinit(q);
+  dane_state_deinit(s);
+
 }
 
 static void dane_info(const char* host, const char* proto, unsigned int port, 
