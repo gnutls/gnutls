@@ -989,7 +989,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
 /* CRL is ignored for now */
   gnutls_datum_t crl_signed_data = { NULL, 0 };
   gnutls_datum_t crl_signature = { NULL, 0 };
-  gnutls_x509_crt_t issuer;
+  gnutls_x509_crt_t issuer = NULL;
   int result, hash_algo;
   time_t now = gnutls_time(0);
   unsigned int usage;
@@ -999,13 +999,6 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
 
   if (tcas_size >= 1)
     issuer = find_crl_issuer (crl, trusted_cas, tcas_size);
-  else
-    {
-      gnutls_assert ();
-      if (output)
-        *output |= GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
-      return 0;
-    }
 
   /* issuer is not in trusted certificate
    * authorities.
