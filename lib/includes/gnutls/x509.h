@@ -632,7 +632,10 @@ extern "C"
  *   anyone trusted but exists in the trusted CA list do not treat it
  *   as trusted.
  * @GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN: A certificate chain is tolerated
- *   if unsorted (the case with many TLS servers out there).
+ *   if unsorted (the case with many TLS servers out there). This is the
+ *   default since GnuTLS 3.1.4.
+ * @GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN: Do not tolerate an unsorted
+ *   certificate chain.
  * @GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT: Allow CA certificates that
  *   have version 1 (both root and intermediate). This might be
  *   dangerous since those haven't the basicConstraints
@@ -652,17 +655,18 @@ extern "C"
  */
   typedef enum gnutls_certificate_verify_flags
   {
-    GNUTLS_VERIFY_DISABLE_CA_SIGN = 1,
-    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT = 2,
-    GNUTLS_VERIFY_DO_NOT_ALLOW_SAME = 4,
-    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 8,
-    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 16,
-    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32,
-    GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 64,
-    GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 128,
-    GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT = 256,
-    GNUTLS_VERIFY_DISABLE_CRL_CHECKS = 512,
-    GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN = 1024,
+    GNUTLS_VERIFY_DISABLE_CA_SIGN = 1<<0,
+    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT = 1<<1,
+    GNUTLS_VERIFY_DO_NOT_ALLOW_SAME = 1<<2,
+    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 1<<3,
+    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 1<<4,
+    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 1<<5,
+    GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 1<<6,
+    GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 1<<7,
+    GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT = 1<<8,
+    GNUTLS_VERIFY_DISABLE_CRL_CHECKS = 1<<9,
+    GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN = 1<<10,
+    GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN = 1<<11,
   } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,

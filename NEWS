@@ -22,6 +22,9 @@ if check fails.
 ** libgnutls: gnutls_x509_crl_verify() includes the time
 checks.
 
+** libgnutls: Added verification flag GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN
+and made GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN the default.
+
 ** gnutls-cli: Added --local-dns option.
 
 ** danetool: Corrected bug that prevented loading PEM files.
@@ -33,7 +36,6 @@ a site's DANE data.
 
 ** API and ABI modifications:
 gnutls_session_get_id2: Added
-gnutls_certificate_update_verify_flags: Added
 gnutls_certificate_verify_peers3: Added
 gnutls_certificate_verification_status_print: Added
 gnutls_srtp_set_profile: Added
@@ -50,6 +52,7 @@ dane_verification_status_print: Added
 GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added
 GNUTLS_CERT_REVOCATION_DATA_INVALID: Added
 GNUTLS_CERT_UNEXPECTED_OWNER: Added
+GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN: Added
 
 * Version 3.1.3 (released 2012-10-12)
 

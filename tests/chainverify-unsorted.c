@@ -614,6 +614,7 @@ doit (void)
   unsigned int crts_size, i;
   gnutls_x509_trust_list_t tl;
   unsigned int status, flags = GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN;
+  unsigned int not_flags = GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN;
 
   /* this must be called once in the program
    */
@@ -728,7 +729,7 @@ doit (void)
       exit(1);
     }
   
-  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, 0, &status, NULL);
+  ret = gnutls_x509_trust_list_verify_crt(tl, crts, crts_size, not_flags, &status, NULL);
   if (ret < 0 || status == 0)
     {
       fail("gnutls_x509_trust_list_verify_crt - 5\n");

@@ -697,25 +697,6 @@ gnutls_certificate_set_verify_flags (gnutls_certificate_credentials_t
 }
 
 /**
- * gnutls_certificate_update_verify_flags:
- * @res: is a gnutls_certificate_credentials_t structure
- * @flags: are the new flags
- *
- * This function will update the default flags to be used for verification 
- * of certificates.  The provided flags must be an OR of the
- * #gnutls_certificate_verify_flags enumerations. The default
- * for TLS sessions is GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN.
- *
- * Since: 3.1.4
- **/
-void
-gnutls_certificate_update_verify_flags (gnutls_certificate_credentials_t
-                                     res, unsigned int flags)
-{
-  res->verify_flags |= flags;
-}
-
-/**
  * gnutls_certificate_set_verify_limits:
  * @res: is a gnutls_certificate_credentials structure
  * @max_bits: is the number of bits of an acceptable certificate (default 8200)

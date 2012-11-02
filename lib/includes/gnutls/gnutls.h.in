@@ -1197,8 +1197,6 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                          gnutls_dh_params_t dh_params);
   void gnutls_certificate_set_verify_flags (gnutls_certificate_credentials_t
                                             res, unsigned int flags);
-  void gnutls_certificate_update_verify_flags (gnutls_certificate_credentials_t
-                                            res, unsigned int flags);
   void gnutls_certificate_set_verify_limits (gnutls_certificate_credentials_t
                                              res, unsigned int max_bits,
                                              unsigned int max_depth);
