@@ -1,4 +1,4 @@
-GNUTLS_VERSION:=3.1.2
+GNUTLS_VERSION:=3.1.4
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -109,7 +109,7 @@ $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	cp $(GNUTLS_DIR)/COPYING $(GNUTLS_DIR)/COPYING.LESSER $(CROSS_DIR)
 	touch $@
 
-$(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed $(UNBOUND_DIR)/.installed
+$(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnu.org/gnu/gnutls/$(GNUTLS_FILE)
 	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnu.org/gnu/gnutls/$(GNUTLS_FILE).sig
 	gpg --verify $(GNUTLS_FILE).sig
