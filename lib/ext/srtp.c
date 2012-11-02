@@ -451,8 +451,9 @@ gnutls_srtp_set_profile_direct (gnutls_session_t session,
  * and @server_salt are convenience datums that point inside the key material. The may
  * be %NULL.
  *
- * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not sufficient, 
- * %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: On success the size of the key material is returned,
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not sufficient, 
+ * or a negative error code.
  *
  * Since 3.1.4
  **/
@@ -515,7 +516,7 @@ uint8_t *km = key_material;
       server_salt->size = p->salt_length;
     }
 
-  return 0;
+  return msize;
 }
 
 static void
