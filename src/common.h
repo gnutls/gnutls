@@ -34,6 +34,7 @@
 #ifdef _WIN32
 #include <io.h>
 #include <winbase.h>
+#undef OCSP_RESPONSE
 #endif
 
 #ifndef __attribute__
