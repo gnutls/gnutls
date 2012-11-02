@@ -858,7 +858,6 @@ GNUTLS_3_1_0 {
 	gnutls_pubkey_import_x509_raw;
 	gnutls_certificate_get_peers_subkey_id;
 	gnutls_session_get_id2;
-	gnutls_certificate_update_verify_flags;
 	gnutls_certificate_verify_peers3;
 	gnutls_certificate_verification_status_print;
 	gnutls_srtp_get_profile_id;
