@@ -2089,58 +2089,27 @@ _verify_x509_mem (const void *cert, int cert_size, const void* ca, int ca_size)
 static void
 print_verification_res (FILE* outfile, unsigned int output)
 {
-  int comma = 0;
+  gnutls_datum_t pout;
+  int ret;
 
-  if (output & GNUTLS_CERT_INVALID)
+  if (output)
     {
-      fprintf (outfile, "Not verified");
-      comma = 1;
+      fprintf (outfile, "Not verified.");
     }
   else
     {
       fprintf (outfile, "Verified");
-      comma = 1;
     }
 
-  if (output & GNUTLS_CERT_SIGNER_NOT_CA)
+  ret = gnutls_certificate_verification_status_print( output, GNUTLS_CRT_X509, &pout, 0);
+  if (ret < 0)
     {
-      if (comma)
-        fprintf (outfile, ", ");
-      fprintf (outfile, "Issuer is not a CA");
-      comma = 1;
+      fprintf(stderr, "error: %s\n", gnutls_strerror(ret);
+      exit(EXIT_FAILURE);
     }
 
-  if (output & GNUTLS_CERT_INSECURE_ALGORITHM)
-    {
-      if (comma)
-        fprintf (outfile, ", ");
-      fprintf (outfile, "Insecure algorithm");
-      comma = 1;
-    }
-
-  if (output & GNUTLS_CERT_NOT_ACTIVATED)
-    {
-      if (comma)
-        fprintf (outfile, ", ");
-      fprintf (outfile, "Not activated");
-      comma = 1;
-    }
-
-  if (output & GNUTLS_CERT_EXPIRED)
-    {
-      if (comma)
-        fprintf (outfile, ", ");
-      fprintf (outfile, "Expired");
-      comma = 1;
-    }
-
-  if (output & GNUTLS_CERT_REVOKED)
-    {
-      if (comma)
-        fprintf (outfile, ", ");
-      fprintf (outfile, "Revoked");
-      comma = 1;
-    }
+  fprintf (outfile, " %s", pout.data);
+  gnutls_free(pout.data);
 }
 
 static void
@@ -2196,7 +2165,7 @@ verify_crl (common_info_st * cinfo)
   unsigned int output;
   int comma = 0;
   int ret;
-  gnutls_datum_t pem;
+  gnutls_datum_t pem, pout;
   gnutls_x509_crl_t crl;
   time_t now = time (0);
   gnutls_x509_crt_t issuer;
@@ -2231,51 +2200,24 @@ verify_crl (common_info_st * cinfo)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "verification error: %s", gnutls_strerror (ret));
 
-  if (output & GNUTLS_CERT_INVALID)
+  if (output)
     {
-      fprintf (outfile, "Not verified");
-      comma = 1;
+      fprintf (outfile, "Not verified. ");
     }
   else
     {
-      fprintf (outfile, "Verified");
-      comma = 1;
+      fprintf (outfile, "Verified.");
     }
 
-  if (output & GNUTLS_CERT_SIGNER_NOT_CA)
+  ret = gnutls_certificate_verification_status_print( output, GNUTLS_CRT_X509, &pout, 0);
+  if (ret < 0)
     {
-      if (comma)
-        fprintf (outfile, ", ");
-      fprintf (outfile, "Issuer is not a CA");
-      comma = 1;
+      fprintf(stderr, "error: %s\n", gnutls_strerror(ret);
+      exit(EXIT_FAILURE);
     }
 
-  if (output & GNUTLS_CERT_INSECURE_ALGORITHM)
-    {
-      if (comma)
-        fprintf (outfile, ", ");
-      fprintf (outfile, "Insecure algorithm");
-      comma = 1;
-    }
-
-  /* Check expiration dates.
-   */
-
-  if (gnutls_x509_crl_get_this_update (crl) > now)
-    {
-      if (comma)
-        fprintf (outfile, ", ");
-      comma = 1;
-      fprintf (outfile, "Issued in the future!");
-    }
-
-  if (gnutls_x509_crl_get_next_update (crl) < now)
-    {
-      if (comma)
-        fprintf (outfile, ", ");
-      comma = 1;
-      fprintf (outfile, "CRL is not up to date");
-    }
+  fprintf (outfile, " %s", pout.data);
+  gnutls_free(pout.data);
 
   fprintf (outfile, "\n");
 }

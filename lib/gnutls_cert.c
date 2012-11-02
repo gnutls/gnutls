@@ -945,10 +945,13 @@ gnutls_certificate_verification_status_print (unsigned int status,
         _gnutls_buffer_append_str (&str, _("Peer's certificate chain revoked. "));
 
       if (status & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
-         _gnutls_buffer_append_str (&str, _("The revocation data provided by the peer are too old. "));
+         _gnutls_buffer_append_str (&str, _("The revocation data are too old. "));
 
       if (status & GNUTLS_CERT_REVOCATION_DATA_INVALID)
-         _gnutls_buffer_append_str (&str, _("The revocation data provided by the peer are invalid. "));
+         _gnutls_buffer_append_str (&str, _("The revocation data are invalid. "));
+
+      if (status & GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE)
+         _gnutls_buffer_append_str (&str, _("The revocation data are issued with a future date. "));
 
       if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
          _gnutls_buffer_append_str (&str, _("Peer's certificate issuer is unknown. "));

@@ -15,6 +15,9 @@ gnutls_certificate_verify_peers3().
 ** libgnutls: Added support for extension to establish keys
 for SRTP.
 
+** libgnutls: gnutls_x509_crl_verify() includes the time
+checks.
+
 ** gnutls-cli: Added --local-dns option.
 
 ** danetool: Corrected bug that prevented loading PEM files.
