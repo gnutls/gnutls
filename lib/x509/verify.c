@@ -943,7 +943,8 @@ gnutls_x509_crl_check_issuer (gnutls_x509_crl_t crl,
  *
  * This function will try to verify the given crl and return its status.
  * See gnutls_x509_crt_list_verify() for a detailed description of
- * return values.
+ * return values. Note that since GnuTLS 3.1.4 this function includes
+ * the time checks.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1039,6 +1040,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
   gnutls_datum_t crl_signature = { NULL, 0 };
   gnutls_x509_crt_t issuer;
   int result, hash_algo;
+  time_t now = gnutls_time(0);
 
   if (output)
     *output = 0;
@@ -1127,12 +1129,21 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
          !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5)))
       {
         if (output)
-          *output |= GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
+          *output |= GNUTLS_CERT_INSECURE_ALGORITHM;
         result = 0;
       }
   }
+  
+  if (gnutls_x509_crl_get_this_update (crl) > now)
+    *output |= GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE;
+    
+  if (gnutls_x509_crl_get_next_update (crl) < now)
+    *output |= GNUTLS_CERT_REVOCATION_DATA_TOO_OLD;
+
 
 cleanup:
+  if (*output) *output |= GNUTLS_CERT_INVALID;
+
   _gnutls_free_datum (&crl_signed_data);
   _gnutls_free_datum (&crl_signature);
 

@@ -826,4 +826,3 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
   return session->internals.sign_func;
 }
 
-

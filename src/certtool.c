@@ -2223,6 +2223,22 @@ print_verification_res (FILE* outfile, unsigned int output)
       comma = 1;
     }
 
+  if (output & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
+    {
+      if (comma)
+        fprintf (outfile, ", ");
+      fprintf (outfile, "Newer CRL is available");
+      comma = 1;
+    }
+
+  if (output & GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE)
+    {
+      if (comma)
+        fprintf (outfile, ", ");
+      fprintf (outfile, "CRL has future date");
+      comma = 1;
+    }
+
   if (output & GNUTLS_CERT_REVOKED)
     {
       if (comma)

@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.26 (unreleased)
+
+** libgnutls: gnutls_x509_crl_verify() includes the time checks.
+
+** API and ABI modifications:
+GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added
+GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE: Added
+
+
 * Version 3.0.25 (released 2012-10-12)
 
 ** libgnutls: Fixed the receipt of session tickets during session resumption.
