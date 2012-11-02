@@ -602,3 +602,5 @@ libdane/gnutls-dane.pc
 doc/latex/dane-api.tex
 src/libcmd-danetool.la
 src/danetool
+tests/key-openssl
+tests/mini-dtls-srtp
