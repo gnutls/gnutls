@@ -36,9 +36,9 @@ cat client1.pem ca.pem > chain1.pem
 cat client2.pem ca.pem > chain2.pem
 
 $CERTTOOL --verify-chain < chain1.pem | \
-    grep 'Not verified, Insecure algorithm.'
+    grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
 $CERTTOOL --verify-chain < chain2.pem | \
-    grep 'Not verified, Insecure algorithm.'
+    grep 'Not verified.' | grep 'insecure algorithm' >/dev/null
 
 rm -f ca.pem client1.pem client2.pem \
    chain1.pem chain2.pem \
