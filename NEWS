@@ -7,6 +7,10 @@ See the end for copying conditions.
 ** libgnutls: gnutls_certificate_verify_peers2() will set flags depending on
 the available revocation data validity.
 
+** libgnutls: Added gnutls_certificate_verification_status_print(),
+a function to print the verification status code in human
+readable text.
+
 ** libgnutls: Added priority string %VERIFY_DISABLE_CRL_CHECKS.
 
 ** libgnutls: Simplified certificate verification by adding
@@ -16,8 +20,8 @@ gnutls_certificate_verify_peers3().
 for SRTP.
 
 ** libgnutls: The X.509 verification functions check the key
-usage bits and output @GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE
-if check fails.
+usage bits and pathlen constraints and on failure output 
+GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE.
 
 ** libgnutls: gnutls_x509_crl_verify() includes the time
 checks.

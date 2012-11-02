@@ -113,13 +113,15 @@ cleanup:
  */
 static int
 check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+             unsigned int *max_path,
              unsigned int flags)
 {
   gnutls_datum_t cert_signed_data = { NULL, 0 };
   gnutls_datum_t issuer_signed_data = { NULL, 0 };
   gnutls_datum_t cert_signature = { NULL, 0 };
   gnutls_datum_t issuer_signature = { NULL, 0 };
-  int result;
+  int pathlen, result;
+  unsigned int ca_status;
 
   /* Check if the issuer is the same with the
    * certificate. This is added in order for trusted
@@ -176,9 +178,21 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
             goto cleanup;
           }
       }
+  
+  result = gnutls_x509_crt_get_basic_constraints( issuer, NULL, &ca_status, &pathlen);
+  if (result < 0)
+    {
+      ca_status = 0;
+      pathlen = -1;
+    }
+    
+  if (ca_status != 0 && pathlen != -1)
+    {
+      if ((unsigned)pathlen < *max_path)
+        *max_path = pathlen;
+    }
 
-  result = gnutls_x509_crt_get_ca_status (issuer, NULL);
-  if (result == 1)
+  if (ca_status != 0)
     {
       result = 1;
       goto cleanup;
@@ -392,6 +406,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
                              unsigned int *output,
                              gnutls_x509_crt_t * _issuer,
                              time_t now,
+                             unsigned int *max_path,
                              gnutls_verify_output_function func)
 {
   gnutls_datum_t cert_signed_data = { NULL, 0 };
@@ -402,18 +417,20 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
 
   if (output)
     *output = 0;
-
-  if (tcas_size >= 1)
-    issuer = find_issuer (cert, trusted_cas, tcas_size);
-  else
+    
+  if (*max_path == 0)
     {
-      gnutls_assert ();
-      out = GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
+      out = GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE | GNUTLS_CERT_INVALID;
       if (output)
         *output |= out;
+      gnutls_assert ();
       result = 0;
       goto cleanup;
     }
+  (*max_path)--;
+
+  if (tcas_size >= 1)
+    issuer = find_issuer (cert, trusted_cas, tcas_size);
 
   /* issuer is not in trusted certificate
    * authorities.
@@ -437,12 +454,12 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
       gnutls_assert ();
       return issuer_version;
     }
-
+  
   if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
       ((flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT)
        || issuer_version != 1))
     {
-      if (check_if_ca (cert, issuer, flags) == 0)
+      if (check_if_ca (cert, issuer, max_path, flags) == 0)
         {
           gnutls_assert ();
           out = GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID;
@@ -603,6 +620,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
   unsigned int status = 0, output;
   time_t now = gnutls_time (0);
   gnutls_x509_crt_t issuer = NULL;
+  unsigned int max_path;
 
   if (clist_size > 1)
     {
@@ -676,9 +694,10 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
    * in self signed etc certificates.
    */
   output = 0;
+  max_path = MAX_VERIFY_DEPTH;
   ret = _gnutls_verify_certificate2 (certificate_list[clist_size - 1],
                                      trusted_cas, tcas_size, flags, &output,
-                                     &issuer, now, func);
+                                     &issuer, now, &max_path, func);
   if (ret == 0)
     {
       /* if the last certificate in the certificate
@@ -707,7 +726,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
       if ((ret =
            _gnutls_verify_certificate2 (certificate_list[i - 1],
                                         &certificate_list[i], 1, flags,
-                                        &output, NULL, now, func)) == 0)
+                                        &output, NULL, now, &max_path, func)) == 0)
         {
           status |= output;
           status |= GNUTLS_CERT_INVALID;

@@ -202,6 +202,7 @@ typedef enum transport_t
  */
 #define DEFAULT_MAX_VERIFY_DEPTH 16
 #define DEFAULT_MAX_VERIFY_BITS 16*1024
+#define MAX_VERIFY_DEPTH 4096
 
 #include <gnutls_mem.h>
 

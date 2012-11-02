@@ -934,14 +934,14 @@ gnutls_certificate_verification_status_print (unsigned int status,
   _gnutls_buffer_init (&str);
 
   if (status == 0)
-    _gnutls_buffer_append_str (&str, _("Peer's certificate is trusted. "));
+    _gnutls_buffer_append_str (&str, _("The certificate is trusted. "));
   else
-    _gnutls_buffer_append_str (&str, _("Peer's certificate is NOT trusted. "));
+    _gnutls_buffer_append_str (&str, _("The certificate is NOT trusted. "));
 
   if (type == GNUTLS_CRT_X509)
     {
       if (status & GNUTLS_CERT_REVOKED)
-        _gnutls_buffer_append_str (&str, _("Peer's certificate chain revoked. "));
+        _gnutls_buffer_append_str (&str, _("The certificate chain revoked. "));
 
       if (status & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
          _gnutls_buffer_append_str (&str, _("The revocation data are too old. "));
@@ -953,30 +953,33 @@ gnutls_certificate_verification_status_print (unsigned int status,
          _gnutls_buffer_append_str (&str, _("The revocation data are issued with a future date. "));
 
       if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-         _gnutls_buffer_append_str (&str, _("Peer's certificate issuer is unknown. "));
+         _gnutls_buffer_append_str (&str, _("The certificate issuer is unknown. "));
 
       if (status & GNUTLS_CERT_SIGNER_NOT_CA)
-         _gnutls_buffer_append_str (&str, _("Peer's certificate issuer is not a CA. "));
+         _gnutls_buffer_append_str (&str, _("The certificate issuer is not a CA. "));
       }
     else if (type == GNUTLS_CRT_OPENPGP)
       {
-        _gnutls_buffer_append_str (&str, _("Peer's certificate is not trusted. "));
+        _gnutls_buffer_append_str (&str, _("The certificate is not trusted. "));
 
         if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-          _gnutls_buffer_append_str (&str, _("Could not find a signer of the peer's certificate. "));
+          _gnutls_buffer_append_str (&str, _("Could not find a signer of the certificate. "));
 
         if (status & GNUTLS_CERT_REVOKED)
-          _gnutls_buffer_append_str (&str, _("Peer's certificate is revoked. "));
+          _gnutls_buffer_append_str (&str, _("The certificate is revoked. "));
       }
 
   if (status & GNUTLS_CERT_INSECURE_ALGORITHM)
-    _gnutls_buffer_append_str (&str, _("Peer's certificate chain uses insecure algorithm. "));
+    _gnutls_buffer_append_str (&str, _("The certificate chain uses insecure algorithm. "));
+
+  if (status & GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE)
+    _gnutls_buffer_append_str (&str, _("The certificate chain violates the signer's constraints. "));
 
   if (status & GNUTLS_CERT_NOT_ACTIVATED)
-    _gnutls_buffer_append_str (&str, _("Peer's certificate chain uses not yet valid certificate. "));
+    _gnutls_buffer_append_str (&str, _("The certificate chain uses not yet valid certificate. "));
 
   if (status & GNUTLS_CERT_EXPIRED)
-    _gnutls_buffer_append_str (&str, _("Peer's certificate chain uses expired certificate. "));
+    _gnutls_buffer_append_str (&str, _("The certificate chain uses expired certificate. "));
 
   if (status & GNUTLS_CERT_SIGNATURE_FAILURE)
     _gnutls_buffer_append_str (&str, _("The signature in the certificate is invalid. "));

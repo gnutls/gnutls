@@ -27,4 +27,3 @@ that can verify CRLs on addition. (there is an issue there since the
 CRLs that are being added are typically of an intermediate CA which
 is not in the trust list to verify them)
 
-Chain 54-55,58-61: We don't check path length constraints properly. XXX
