@@ -109,7 +109,7 @@ $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	cp $(GNUTLS_DIR)/COPYING $(GNUTLS_DIR)/COPYING.LESSER $(CROSS_DIR)
 	touch $@
 
-$(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
+$(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed $(UNBOUND_DIR)/.installed
 	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnu.org/gnu/gnutls/$(GNUTLS_FILE)
 	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnu.org/gnu/gnutls/$(GNUTLS_FILE).sig
 	gpg --verify $(GNUTLS_FILE).sig
@@ -119,7 +119,7 @@ $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 		P11_KIT_LIBS="$(LIB_DIR)/libp11-kit.la" \
 		LDFLAGS="-L$(LIB_DIR)" CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" \
 		./configure $(CONFIG_FLAGS) --enable-local-libopts --with-libnettle-prefix=$(LIB_DIR) \
-		--disable-openssl-compatibility --with-included-libtasn1 && cd ..
+		--disable-libdane --disable-openssl-compatibility --with-included-libtasn1 && cd ..
 	touch $@
 
 clean:
