@@ -1982,7 +1982,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
   fprintf (outfile, "\tOutput: ");
   print_verification_res(outfile, verification_output);
 
-  fputs(".\n\n", outfile);
+  fputs("\n\n", outfile);
 
   return 0;
 }
@@ -2075,7 +2075,7 @@ _verify_x509_mem (const void *cert, int cert_size, const void* ca, int ca_size)
   fprintf (outfile, "Chain verification output: ");
   print_verification_res(outfile, output);
 
-  fprintf (outfile, ".\n\n");
+  fprintf (outfile, "\n\n");
 
   gnutls_free(x509_cert_list);
   gnutls_x509_trust_list_deinit(list, 1);
@@ -2098,13 +2098,13 @@ print_verification_res (FILE* outfile, unsigned int output)
     }
   else
     {
-      fprintf (outfile, "Verified");
+      fprintf (outfile, "Verified.");
     }
 
   ret = gnutls_certificate_verification_status_print( output, GNUTLS_CRT_X509, &pout, 0);
   if (ret < 0)
     {
-      fprintf(stderr, "error: %s\n", gnutls_strerror(ret);
+      fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
       exit(EXIT_FAILURE);
     }
 
@@ -2163,11 +2163,9 @@ verify_crl (common_info_st * cinfo)
   size_t size, dn_size;
   char dn[128];
   unsigned int output;
-  int comma = 0;
   int ret;
   gnutls_datum_t pem, pout;
   gnutls_x509_crl_t crl;
-  time_t now = time (0);
   gnutls_x509_crt_t issuer;
 
   issuer = load_ca_cert (cinfo);
@@ -2212,7 +2210,7 @@ verify_crl (common_info_st * cinfo)
   ret = gnutls_certificate_verification_status_print( output, GNUTLS_CRT_X509, &pout, 0);
   if (ret < 0)
     {
-      fprintf(stderr, "error: %s\n", gnutls_strerror(ret);
+      fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
       exit(EXIT_FAILURE);
     }
 

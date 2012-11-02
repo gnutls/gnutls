@@ -440,6 +440,8 @@ extern "C"
  * @GNUTLS_CERT_SIGNER_NOT_CA: The certificate's signer was not a CA. This
  *   may happen if this was a version 1 certificate, which is common with 
  *   some CAs, or a version 3 certificate without the basic constrains extension.
+ * @GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE: The certificate's signer constraints were
+ *   violated.
  * @GNUTLS_CERT_INSECURE_ALGORITHM:  The certificate was signed using an insecure
  *   algorithm such as MD2 or MD5. These algorithms have been broken and
  *   should not be trusted.
@@ -447,8 +449,8 @@ extern "C"
  * @GNUTLS_CERT_EXPIRED: The certificate has expired.
  * @GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: The OCSP revocation data are too old.
  * @GNUTLS_CERT_REVOCATION_DATA_INVALID: The OCSP revocation data are invalid.
- * @GNUTLS_CERT_UNEXPECTED_OWNER: The owner is not the expected one.
  * @GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE: The revocation data have a future issue date.
+ * @GNUTLS_CERT_UNEXPECTED_OWNER: The owner is not the expected one.
  *
  * Enumeration of certificate status codes.  Note that the status
  * bits may have different meanings in OpenPGP keys and X.509
@@ -457,17 +459,18 @@ extern "C"
   typedef enum
   {
     GNUTLS_CERT_INVALID = 1<<1,
-    GNUTLS_CERT_REVOKED = 1<<6,
-    GNUTLS_CERT_SIGNER_NOT_FOUND = 1<<7,
-    GNUTLS_CERT_SIGNER_NOT_CA = 1<<8,
-    GNUTLS_CERT_INSECURE_ALGORITHM = 1<<9,
-    GNUTLS_CERT_NOT_ACTIVATED = 1<<10,
-    GNUTLS_CERT_EXPIRED = 1<<11,
-    GNUTLS_CERT_SIGNATURE_FAILURE = 1<<12,
-    GNUTLS_CERT_REVOCATION_DATA_TOO_OLD = 1<<13,
-    GNUTLS_CERT_REVOCATION_DATA_INVALID = 1<<14,
-    GNUTLS_CERT_UNEXPECTED_OWNER = 1<<15,
-    GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE = 1<<16,
+    GNUTLS_CERT_REVOKED = 1<<5,
+    GNUTLS_CERT_SIGNER_NOT_FOUND = 1<<6,
+    GNUTLS_CERT_SIGNER_NOT_CA = 1<<7,
+    GNUTLS_CERT_INSECURE_ALGORITHM = 1<<8,
+    GNUTLS_CERT_NOT_ACTIVATED = 1<<9,
+    GNUTLS_CERT_EXPIRED = 1<<10,
+    GNUTLS_CERT_SIGNATURE_FAILURE = 1<<11,
+    GNUTLS_CERT_REVOCATION_DATA_TOO_OLD = 1<<12,
+    GNUTLS_CERT_REVOCATION_DATA_INVALID = 1<<13,
+    GNUTLS_CERT_UNEXPECTED_OWNER = 1<<14,
+    GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE = 1<<15,
+    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE = 1<<16,
   } gnutls_certificate_status_t;
 
 /**

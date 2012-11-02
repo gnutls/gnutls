@@ -15,6 +15,10 @@ gnutls_certificate_verify_peers3().
 ** libgnutls: Added support for extension to establish keys
 for SRTP.
 
+** libgnutls: The X.509 verification functions check the key
+usage bits and output @GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE
+if check fails.
+
 ** libgnutls: gnutls_x509_crl_verify() includes the time
 checks.
 

@@ -398,7 +398,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   gnutls_datum_t cert_signature = { NULL, 0 };
   gnutls_x509_crt_t issuer = NULL;
   int issuer_version, result, hash_algo;
-  unsigned int out = 0;
+  unsigned int out = 0, usage;
 
   if (output)
     *output = 0;
@@ -450,6 +450,20 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
             *output |= out;
           result = 0;
           goto cleanup;
+        }
+      
+      result = gnutls_x509_crt_get_key_usage(issuer, &usage, NULL);
+      if (result >= 0)
+        {
+          if (!(usage & GNUTLS_KEY_KEY_CERT_SIGN))
+            {
+              gnutls_assert();
+              out = GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE | GNUTLS_CERT_INVALID;
+              if (output)
+                *output |= out;
+              result = 0;
+              goto cleanup;
+            }
         }
     }
 
@@ -978,6 +992,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
   gnutls_x509_crt_t issuer;
   int result, hash_algo;
   time_t now = gnutls_time(0);
+  unsigned int usage;
 
   if (output)
     *output = 0;
@@ -1011,6 +1026,18 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
           if (output)
             *output |= GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID;
           return 0;
+        }
+
+      result = gnutls_x509_crt_get_key_usage(issuer, &usage, NULL);
+      if (result >= 0)
+        {
+          if (!(usage & GNUTLS_KEY_CRL_SIGN))
+            {
+              gnutls_assert();
+              if (output)
+                *output |= GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE | GNUTLS_CERT_INVALID;
+              return 0;
+            }
         }
     }
 

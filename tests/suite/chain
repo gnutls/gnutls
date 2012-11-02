@@ -24,7 +24,7 @@ CERTTOOL=../../../src/certtool
 
 SUCCESS=" 1 4 7 12 15 16 17 18 24 26 27 30 33 56 57 62 63 "
 FAILURE=" 2 3 5 6 8 9 10 11 13 14 19 20 21 22 23 25 28 29 31 32 54 55 58 59 60 61 "
-KNOWN_BUGS=" 15 16 17 18 19 28 29 31 32 54 55 58 59 60 61 "
+KNOWN_BUGS=" 15 16 17 18 19 31 32 54 55 58 59 60 61 "
 
 cd x509paths
 
@@ -49,14 +49,14 @@ while test -d X509tests/test$i; do
 	if echo "$KNOWN_BUGS" | grep " $i " > /dev/null 2>&1; then
 		echo "Chain $i verification was skipped due to known bug."
 	elif echo "$SUCCESS" | grep " $i " > /dev/null 2>&1; then
-	    if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.$' > /dev/null 2>&1; then
+	    if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null 2>&1; then
 		echo "Chain $i verification failure UNEXPECTED."
 		RET=1
 	    else
 		echo "Chain $i verification success as expected."
 	    fi
 	elif echo "$FAILURE" | grep " $i " >/dev/null 2>&1; then
-	    if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.$' > /dev/null 2>&1; then
+	    if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null 2>&1; then
 		echo "Chain $i verification failure as expected."
 	    else
 		echo "Chain $i verification success UNEXPECTED. "
