@@ -23,7 +23,7 @@
 #define INT_H
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <string.h>
@@ -33,7 +33,7 @@
 #include <stdint.h>
 
 #ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>
+#include <sys/types.h>
 #endif
 
 #include <libtasn1.h>
@@ -43,25 +43,21 @@
 /* This structure is also in libtasn1.h, but then contains less
    fields.  You cannot make any modifications to these first fields
    without breaking ABI.  */
-struct node_asn_struct
+struct asn1_node_st
 {
   /* public fields: */
-  char *name;			/* Node name */
+  char name[ASN1_MAX_NAME_SIZE+1];			/* Node name */
+  unsigned int name_hash;
   unsigned int type;		/* Node type */
   unsigned char *value;		/* Node value */
   int value_len;
-  ASN1_TYPE down;		/* Pointer to the son node */
-  ASN1_TYPE right;		/* Pointer to the brother node */
-  ASN1_TYPE left;		/* Pointer to the next list element */
+  asn1_node down;		/* Pointer to the son node */
+  asn1_node right;		/* Pointer to the brother node */
+  asn1_node left;		/* Pointer to the next list element */
   /* private fields: */
   unsigned char small_value[ASN1_SMALL_VALUE_SIZE];	/* For small values */
 };
 
-#define _asn1_malloc malloc
-#define _asn1_free free
-#define _asn1_calloc calloc
-#define _asn1_realloc realloc
-#define _asn1_strdup strdup
 #define _asn1_strlen(s) strlen((const char *) s)
 #define _asn1_strtol(n,e,b) strtol((const char *) n, e, b)
 #define _asn1_strtoul(n,e,b) strtoul((const char *) n, e, b)
@@ -78,37 +74,37 @@ struct node_asn_struct
 
 /****************************************/
 /* Returns the first 8 bits.            */
-/* Used with the field type of node_asn */
+/* Used with the field type of asn1_node_st */
 /****************************************/
 #define type_field(x)     (x&0xFF)
 
-/* List of constants for field type of typedef node_asn  */
-#define TYPE_CONSTANT       1
-#define TYPE_IDENTIFIER     2
-#define TYPE_INTEGER        3
-#define TYPE_BOOLEAN        4
-#define TYPE_SEQUENCE       5
-#define TYPE_BIT_STRING     6
-#define TYPE_OCTET_STRING   7
-#define TYPE_TAG            8
-#define TYPE_DEFAULT        9
-#define TYPE_SIZE          10
-#define TYPE_SEQUENCE_OF   11
-#define TYPE_OBJECT_ID     12
-#define TYPE_ANY           13
-#define TYPE_SET           14
-#define TYPE_SET_OF        15
-#define TYPE_DEFINITIONS   16
-#define TYPE_TIME          17
-#define TYPE_CHOICE        18
-#define TYPE_IMPORTS       19
-#define TYPE_NULL          20
-#define TYPE_ENUMERATED    21
-#define TYPE_GENERALSTRING 27
+/* List of constants for field type of typedef asn1_node_st  */
+#define TYPE_CONSTANT      ASN1_ETYPE_CONSTANT
+#define TYPE_IDENTIFIER    ASN1_ETYPE_IDENTIFIER
+#define TYPE_INTEGER       ASN1_ETYPE_INTEGER
+#define TYPE_BOOLEAN       ASN1_ETYPE_BOOLEAN
+#define TYPE_SEQUENCE      ASN1_ETYPE_SEQUENCE
+#define TYPE_BIT_STRING    ASN1_ETYPE_BIT_STRING
+#define TYPE_OCTET_STRING  ASN1_ETYPE_OCTET_STRING
+#define TYPE_TAG           ASN1_ETYPE_TAG
+#define TYPE_DEFAULT       ASN1_ETYPE_DEFAULT
+#define TYPE_SIZE          ASN1_ETYPE_SIZE
+#define TYPE_SEQUENCE_OF   ASN1_ETYPE_SEQUENCE_OF
+#define TYPE_OBJECT_ID     ASN1_ETYPE_OBJECT_ID
+#define TYPE_ANY           ASN1_ETYPE_ANY
+#define TYPE_SET           ASN1_ETYPE_SET
+#define TYPE_SET_OF        ASN1_ETYPE_SET_OF
+#define TYPE_DEFINITIONS   ASN1_ETYPE_DEFINITIONS
+#define TYPE_TIME          ASN1_ETYPE_TIME
+#define TYPE_CHOICE        ASN1_ETYPE_CHOICE
+#define TYPE_IMPORTS       ASN1_ETYPE_IMPORTS
+#define TYPE_NULL          ASN1_ETYPE_NULL
+#define TYPE_ENUMERATED    ASN1_ETYPE_ENUMERATED
+#define TYPE_GENERALSTRING ASN1_ETYPE_GENERALSTRING
 
 
 /***********************************************************************/
-/* List of constants to better specify the type of typedef node_asn.   */
+/* List of constants to better specify the type of typedef asn1_node_st.   */
 /***********************************************************************/
 /*  Used with TYPE_TAG  */
 #define CONST_UNIVERSAL   (1<<8)

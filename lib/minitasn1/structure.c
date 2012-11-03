@@ -37,19 +37,19 @@ extern char _asn1_identifierMissing[];
 
 
 /******************************************************/
-/* Function : _asn1_add_node_only                     */
+/* Function : _asn1_add_single_node                     */
 /* Description: creates a new NODE_ASN element.       */
 /* Parameters:                                        */
 /*   type: type of the new element (see TYPE_         */
 /*         and CONST_ constants).                     */
 /* Return: pointer to the new element.                */
 /******************************************************/
-ASN1_TYPE
-_asn1_add_node_only (unsigned int type)
+asn1_node
+_asn1_add_single_node (unsigned int type)
 {
-  ASN1_TYPE punt;
+  asn1_node punt;
 
-  punt = (ASN1_TYPE) _asn1_calloc (1, sizeof (struct node_asn_struct));
+  punt = calloc (1, sizeof (struct asn1_node_st));
   if (punt == NULL)
     return NULL;
 
@@ -67,8 +67,8 @@ _asn1_add_node_only (unsigned int type)
 /*   node: NODE_ASN element pointer.                              */
 /* Return: NULL if not found.                                     */
 /******************************************************************/
-ASN1_TYPE
-_asn1_find_left (ASN1_TYPE node)
+asn1_node
+_asn1_find_left (asn1_node node)
 {
   if ((node == NULL) || (node->left == NULL) || (node->left->down == node))
     return NULL;
@@ -77,12 +77,12 @@ _asn1_find_left (ASN1_TYPE node)
 }
 
 
-asn1_retCode
-_asn1_create_static_structure (ASN1_TYPE pointer, char *output_file_name,
+int
+_asn1_create_static_structure (asn1_node pointer, char *output_file_name,
 			       char *vector_name)
 {
   FILE *file;
-  ASN1_TYPE p;
+  asn1_node p;
   unsigned long t;
 
   file = fopen (output_file_name, "w");
@@ -96,7 +96,7 @@ _asn1_create_static_structure (ASN1_TYPE pointer, char *output_file_name,
 
   fprintf (file, "#include <libtasn1.h>\n\n");
 
-  fprintf (file, "const ASN1_ARRAY_TYPE %s[] = {\n", vector_name);
+  fprintf (file, "const asn1_static_node_t %s[] = {\n", vector_name);
 
   p = pointer;
 
@@ -104,7 +104,7 @@ _asn1_create_static_structure (ASN1_TYPE pointer, char *output_file_name,
     {
       fprintf (file, "  { ");
 
-      if (p->name)
+      if (p->name[0] != 0)
 	fprintf (file, "\"%s\", ", p->name);
       else
 	fprintf (file, "NULL, ");
@@ -168,22 +168,22 @@ _asn1_create_static_structure (ASN1_TYPE pointer, char *output_file_name,
  * @array is a vector created by asn1_parser2array().
  *
  * Returns: %ASN1_SUCCESS if structure was created correctly,
- *   %ASN1_ELEMENT_NOT_EMPTY if *@definitions not ASN1_TYPE_EMPTY,
+ *   %ASN1_ELEMENT_NOT_EMPTY if *@definitions not NULL,
  *   %ASN1_IDENTIFIER_NOT_FOUND if in the file there is an identifier
  *   that is not defined (see @errorDescription for more information),
  *   %ASN1_ARRAY_ERROR if the array pointed by @array is wrong.
  **/
-asn1_retCode
-asn1_array2tree (const ASN1_ARRAY_TYPE * array, ASN1_TYPE * definitions,
+int
+asn1_array2tree (const asn1_static_node_t * array, asn1_node * definitions,
 		 char *errorDescription)
 {
-  ASN1_TYPE p, p_last = NULL;
+  asn1_node p, p_last = NULL;
   unsigned long k;
   int move;
-  asn1_retCode result;
+  int result;
 
 
-  if (*definitions != ASN1_TYPE_EMPTY)
+  if (*definitions != NULL)
     return ASN1_ELEMENT_NOT_EMPTY;
 
   move = UP;
@@ -191,7 +191,7 @@ asn1_array2tree (const ASN1_ARRAY_TYPE * array, ASN1_TYPE * definitions,
   k = 0;
   while (array[k].value || array[k].type || array[k].name)
     {
-      p = _asn1_add_node (array[k].type & (~CONST_DOWN));
+      p = _asn1_add_static_node (array[k].type & (~CONST_DOWN));
       if (array[k].name)
 	_asn1_set_name (p, array[k].name);
       if (array[k].value)
@@ -263,7 +263,7 @@ asn1_array2tree (const ASN1_ARRAY_TYPE * array, ASN1_TYPE * definitions,
   if (result != ASN1_SUCCESS)
     {
       _asn1_delete_list_and_nodes ();
-      *definitions = ASN1_TYPE_EMPTY;
+      *definitions = NULL;
     }
   else
     _asn1_delete_list ();
@@ -276,17 +276,17 @@ asn1_array2tree (const ASN1_ARRAY_TYPE * array, ASN1_TYPE * definitions,
  * @structure: pointer to the structure that you want to delete.
  *
  * Deletes the structure *@structure.  At the end, *@structure is set
- * to ASN1_TYPE_EMPTY.
+ * to NULL.
  *
  * Returns: %ASN1_SUCCESS if successful, %ASN1_ELEMENT_NOT_FOUND if
- *   *@structure was ASN1_TYPE_EMPTY.
+ *   *@structure was NULL.
  **/
-asn1_retCode
-asn1_delete_structure (ASN1_TYPE * structure)
+int
+asn1_delete_structure (asn1_node * structure)
 {
-  ASN1_TYPE p, p2, p3;
+  asn1_node p, p2, p3;
 
-  if (*structure == ASN1_TYPE_EMPTY)
+  if (*structure == NULL)
     return ASN1_ELEMENT_NOT_FOUND;
 
   p = *structure;
@@ -328,7 +328,7 @@ asn1_delete_structure (ASN1_TYPE * structure)
 	}
     }
 
-  *structure = ASN1_TYPE_EMPTY;
+  *structure = NULL;
   return ASN1_SUCCESS;
 }
 
@@ -345,14 +345,14 @@ asn1_delete_structure (ASN1_TYPE * structure)
  * Returns: %ASN1_SUCCESS if successful, %ASN1_ELEMENT_NOT_FOUND if
  *   the @element_name was not found.
  **/
-asn1_retCode
-asn1_delete_element (ASN1_TYPE structure, const char *element_name)
+int
+asn1_delete_element (asn1_node structure, const char *element_name)
 {
-  ASN1_TYPE p2, p3, source_node;
+  asn1_node p2, p3, source_node;
 
   source_node = asn1_find_node (structure, element_name);
 
-  if (source_node == ASN1_TYPE_EMPTY)
+  if (source_node == NULL)
     return ASN1_ELEMENT_NOT_FOUND;
 
   p2 = source_node->right;
@@ -371,16 +371,16 @@ asn1_delete_element (ASN1_TYPE structure, const char *element_name)
   return asn1_delete_structure (&source_node);
 }
 
-ASN1_TYPE
-_asn1_copy_structure3 (ASN1_TYPE source_node)
+asn1_node
+_asn1_copy_structure3 (asn1_node source_node)
 {
-  ASN1_TYPE dest_node, p_s, p_d, p_d_prev;
+  asn1_node dest_node, p_s, p_d, p_d_prev;
   int move;
 
   if (source_node == NULL)
     return NULL;
 
-  dest_node = _asn1_add_node_only (source_node->type);
+  dest_node = _asn1_add_single_node (source_node->type);
 
   p_s = source_node;
   p_d = dest_node;
@@ -391,48 +391,37 @@ _asn1_copy_structure3 (ASN1_TYPE source_node)
     {
       if (move != UP)
 	{
-	  if (p_s->name)
-	    _asn1_set_name (p_d, p_s->name);
+	  if (p_s->name[0] != 0)
+	    _asn1_cpy_name (p_d, p_s);
 	  if (p_s->value)
 	    _asn1_set_value (p_d, p_s->value, p_s->value_len);
-	  move = DOWN;
-	}
-      else
-	move = RIGHT;
-
-      if (move == DOWN)
-	{
 	  if (p_s->down)
 	    {
 	      p_s = p_s->down;
 	      p_d_prev = p_d;
-	      p_d = _asn1_add_node_only (p_s->type);
+	      p_d = _asn1_add_single_node (p_s->type);
 	      _asn1_set_down (p_d_prev, p_d);
+	      continue;
 	    }
-	  else
-	    move = RIGHT;
 	}
 
       if (p_s == source_node)
-	break;
+        break;
 
-      if (move == RIGHT)
-	{
-	  if (p_s->right)
-	    {
-	      p_s = p_s->right;
-	      p_d_prev = p_d;
-	      p_d = _asn1_add_node_only (p_s->type);
-	      _asn1_set_right (p_d_prev, p_d);
-	    }
-	  else
+      if (p_s->right)
+        {
+	    move = RIGHT;
+	    p_s = p_s->right;
+	    p_d_prev = p_d;
+	    p_d = _asn1_add_single_node (p_s->type);
+	    _asn1_set_right (p_d_prev, p_d);
+        }
+      else
+        {
 	    move = UP;
-	}
-      if (move == UP)
-	{
-	  p_s = _asn1_find_up (p_s);
-	  p_d = _asn1_find_up (p_d);
-	}
+	    p_s = _asn1_find_up (p_s);
+	    p_d = _asn1_find_up (p_d);
+        }
     }
   while (p_s != source_node);
 
@@ -440,10 +429,10 @@ _asn1_copy_structure3 (ASN1_TYPE source_node)
 }
 
 
-static ASN1_TYPE
-_asn1_copy_structure2 (ASN1_TYPE root, const char *source_name)
+static asn1_node
+_asn1_copy_structure2 (asn1_node root, const char *source_name)
 {
-  ASN1_TYPE source_node;
+  asn1_node source_node;
 
   source_node = asn1_find_node (root, source_name);
 
@@ -452,10 +441,10 @@ _asn1_copy_structure2 (ASN1_TYPE root, const char *source_name)
 }
 
 
-static asn1_retCode
-_asn1_type_choice_config (ASN1_TYPE node)
+static int
+_asn1_type_choice_config (asn1_node node)
 {
-  ASN1_TYPE p, p2, p3, p4;
+  asn1_node p, p2, p3, p4;
   int move, tlen;
 
   if (node == NULL)
@@ -481,7 +470,7 @@ _asn1_type_choice_config (ASN1_TYPE node)
 			{
 			  if (type_field (p3->type) == TYPE_TAG)
 			    {
-			      p4 = _asn1_add_node_only (p3->type);
+			      p4 = _asn1_add_single_node (p3->type);
 			      tlen = _asn1_strlen (p3->value);
 			      if (tlen > 0)
 				_asn1_set_value (p4, p3->value, tlen + 1);
@@ -537,10 +526,10 @@ _asn1_type_choice_config (ASN1_TYPE node)
 }
 
 
-static asn1_retCode
-_asn1_expand_identifier (ASN1_TYPE * node, ASN1_TYPE root)
+static int
+_asn1_expand_identifier (asn1_node * node, asn1_node root)
 {
-  ASN1_TYPE p, p2, p3;
+  asn1_node p, p2, p3;
   char name2[ASN1_MAX_NAME_SIZE + 2];
   int move;
 
@@ -556,15 +545,13 @@ _asn1_expand_identifier (ASN1_TYPE * node, ASN1_TYPE root)
 	{
 	  if (type_field (p->type) == TYPE_IDENTIFIER)
 	    {
-	      _asn1_str_cpy (name2, sizeof (name2), root->name);
-	      _asn1_str_cat (name2, sizeof (name2), ".");
-	      _asn1_str_cat (name2, sizeof (name2), (char *) p->value);
+	      snprintf(name2, sizeof (name2), "%s.%s", root->name, p->value);
 	      p2 = _asn1_copy_structure2 (root, name2);
 	      if (p2 == NULL)
 		{
 		  return ASN1_IDENTIFIER_NOT_FOUND;
 		}
-	      _asn1_set_name (p2, p->name);
+	      _asn1_cpy_name (p2, p);
 	      p2->right = p->right;
 	      p2->left = p->left;
 	      if (p->right)
@@ -661,11 +648,11 @@ _asn1_expand_identifier (ASN1_TYPE * node, ASN1_TYPE root)
  * Returns: %ASN1_SUCCESS if creation OK, %ASN1_ELEMENT_NOT_FOUND if
  *   @source_name is not known.
  **/
-asn1_retCode
-asn1_create_element (ASN1_TYPE definitions, const char *source_name,
-		     ASN1_TYPE * element)
+int
+asn1_create_element (asn1_node definitions, const char *source_name,
+		     asn1_node * element)
 {
-  ASN1_TYPE dest_node;
+  asn1_node dest_node;
   int res;
 
   dest_node = _asn1_copy_structure2 (definitions, source_name);
@@ -697,10 +684,10 @@ asn1_create_element (ASN1_TYPE definitions, const char *source_name,
  * from the @name element inside the structure @structure.
  **/
 void
-asn1_print_structure (FILE * out, ASN1_TYPE structure, const char *name,
+asn1_print_structure (FILE * out, asn1_node structure, const char *name,
 		      int mode)
 {
-  ASN1_TYPE p, root;
+  asn1_node p, root;
   int k, indent = 0, len, len2, len3;
 
   if (out == NULL)
@@ -719,7 +706,7 @@ asn1_print_structure (FILE * out, ASN1_TYPE structure, const char *name,
 	  for (k = 0; k < indent; k++)
 	    fprintf (out, " ");
 	  fprintf (out, "name:");
-	  if (p->name)
+	  if (p->name[0] != 0)
 	    fprintf (out, "%s  ", p->name);
 	  else
 	    fprintf (out, "NULL  ");
@@ -736,7 +723,7 @@ asn1_print_structure (FILE * out, ASN1_TYPE structure, const char *name,
 	      for (k = 0; k < indent; k++)
 		fprintf (out, " ");
 	      fprintf (out, "name:");
-	      if (p->name)
+	      if (p->name[0] != 0)
 		fprintf (out, "%s  ", p->name);
 	      else
 		fprintf (out, "NULL  ");
@@ -1060,10 +1047,10 @@ asn1_print_structure (FILE * out, ASN1_TYPE structure, const char *name,
  * Returns: %ASN1_SUCCESS if successful, %ASN1_ELEMENT_NOT_FOUND if
  *   @name is not known, %ASN1_GENERIC_ERROR if pointer @num is %NULL.
  **/
-asn1_retCode
-asn1_number_of_elements (ASN1_TYPE element, const char *name, int *num)
+int
+asn1_number_of_elements (asn1_node element, const char *name, int *num)
 {
-  ASN1_TYPE node, p;
+  asn1_node node, p;
 
   if (num == NULL)
     return ASN1_GENERIC_ERROR;
@@ -1078,7 +1065,7 @@ asn1_number_of_elements (ASN1_TYPE element, const char *name, int *num)
 
   while (p)
     {
-      if ((p->name) && (p->name[0] == '?'))
+      if (p->name[0] == '?')
 	(*num)++;
       p = p->right;
     }
@@ -1099,15 +1086,15 @@ asn1_number_of_elements (ASN1_TYPE element, const char *name, int *num)
  *   the OID.
  **/
 const char *
-asn1_find_structure_from_oid (ASN1_TYPE definitions, const char *oidValue)
+asn1_find_structure_from_oid (asn1_node definitions, const char *oidValue)
 {
   char definitionsName[ASN1_MAX_NAME_SIZE], name[2 * ASN1_MAX_NAME_SIZE + 1];
   char value[ASN1_MAX_NAME_SIZE];
-  ASN1_TYPE p;
+  asn1_node p;
   int len;
-  asn1_retCode result;
+  int result;
 
-  if ((definitions == ASN1_TYPE_EMPTY) || (oidValue == NULL))
+  if ((definitions == NULL) || (oidValue == NULL))
     return NULL;		/* ASN1_ELEMENT_NOT_FOUND; */
 
 
@@ -1144,24 +1131,24 @@ asn1_find_structure_from_oid (ASN1_TYPE definitions, const char *oidValue)
 
 /**
  * asn1_copy_node:
- * @dst: Destination ASN1_TYPE node.
+ * @dst: Destination asn1_node node.
  * @dst_name: Field name in destination node.
- * @src: Source ASN1_TYPE node.
+ * @src: Source asn1_node node.
  * @src_name: Field name in source node.
  *
- * Create a deep copy of a ASN1_TYPE variable.
+ * Create a deep copy of a asn1_node variable.
  *
  * Returns: Return %ASN1_SUCCESS on success.
  **/
-asn1_retCode
-asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
-		ASN1_TYPE src, const char *src_name)
+int
+asn1_copy_node (asn1_node dst, const char *dst_name,
+		asn1_node src, const char *src_name)
 {
 /* FIXME: rewrite using copy_structure().
  * It seems quite hard to do.
  */
   int result;
-  ASN1_TYPE dst_node;
+  asn1_node dst_node;
   void *data = NULL;
   int size = 0;
 
@@ -1169,27 +1156,27 @@ asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
   if (result != ASN1_MEM_ERROR)
     return result;
 
-  data = _asn1_malloc (size);
+  data = malloc (size);
   if (data == NULL)
     return ASN1_MEM_ERROR;
 
   result = asn1_der_coding (src, src_name, data, &size, NULL);
   if (result != ASN1_SUCCESS)
     {
-      _asn1_free (data);
+      free (data);
       return result;
     }
 
   dst_node = asn1_find_node (dst, dst_name);
   if (dst_node == NULL)
     {
-      _asn1_free (data);
+      free (data);
       return ASN1_ELEMENT_NOT_FOUND;
     }
 
   result = asn1_der_decoding (&dst_node, data, size, NULL);
 
-  _asn1_free (data);
+  free (data);
 
   return result;
 }

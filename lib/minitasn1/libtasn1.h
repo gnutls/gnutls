@@ -44,9 +44,7 @@ extern "C"
 {
 #endif
 
-#define ASN1_VERSION "2.12"
-
-  typedef int asn1_retCode;	/* type returned by libtasn1 functions */
+#define ASN1_VERSION "3.0"
 
   /*****************************************/
   /* Errors returned by libtasn1 functions */
@@ -108,46 +106,63 @@ extern "C"
   /* that represent an ASN.1 DEFINITION.                */
   /******************************************************/
 
-#if !defined ASN1_BUILDING
-  /* This structure is also in internal.h, but then contains more
-     fields.  You cannot make any modifications to these fields
-     without breaking ABI.  */
-  struct node_asn_struct
-  {
-    char *name;			/* Node name */
-    unsigned int type;		/* Node type */
-    unsigned char *value;	/* Node value */
-    int value_len;
-    struct node_asn_struct *down;	/* Pointer to the son node */
-    struct node_asn_struct *right;	/* Pointer to the brother node */
-    struct node_asn_struct *left;	/* Pointer to the next list element */
-  };
-#endif
+  typedef struct asn1_node_st asn1_node_st;
 
-  typedef struct node_asn_struct node_asn;
+  typedef asn1_node_st *asn1_node;
 
-  typedef node_asn *ASN1_TYPE;
+  /* maximum number of characters of a name */
+  /* inside a file with ASN1 definitons     */
+#define ASN1_MAX_NAME_SIZE 64
 
-#define ASN1_TYPE_EMPTY  NULL
 
   /*****************************************/
   /* For the on-disk format of ASN.1 trees */
   /*****************************************/
-  struct static_struct_asn
+  struct asn1_static_node_st
   {
     const char *name;		/* Node name */
     unsigned int type;		/* Node type */
     const void *value;		/* Node value */
   };
-  typedef struct static_struct_asn ASN1_ARRAY_TYPE;
+  typedef struct asn1_static_node_st asn1_static_node_t;
+
+/* List of constants for field type of typedef node_asn  */
+#define ASN1_ETYPE_CONSTANT       1
+#define ASN1_ETYPE_IDENTIFIER     2
+#define ASN1_ETYPE_INTEGER        3
+#define ASN1_ETYPE_BOOLEAN        4
+#define ASN1_ETYPE_SEQUENCE       5
+#define ASN1_ETYPE_BIT_STRING     6
+#define ASN1_ETYPE_OCTET_STRING   7
+#define ASN1_ETYPE_TAG            8
+#define ASN1_ETYPE_DEFAULT        9
+#define ASN1_ETYPE_SIZE          10
+#define ASN1_ETYPE_SEQUENCE_OF   11
+#define ASN1_ETYPE_OBJECT_ID     12
+#define ASN1_ETYPE_ANY           13
+#define ASN1_ETYPE_SET           14
+#define ASN1_ETYPE_SET_OF        15
+#define ASN1_ETYPE_DEFINITIONS   16
+#define ASN1_ETYPE_TIME          17
+#define ASN1_ETYPE_CHOICE        18
+#define ASN1_ETYPE_IMPORTS       19
+#define ASN1_ETYPE_NULL          20
+#define ASN1_ETYPE_ENUMERATED    21
+#define ASN1_ETYPE_GENERALSTRING 27
+
+  struct asn1_data_node_st
+  {
+    const char *name;		/* Node name */
+    const void *value;		/* Node value */
+    unsigned int value_len;     /* Node value size */
+    unsigned int type;		/* Node value type (ASN1_ETYPE_*) */
+  };
+  typedef struct asn1_data_node_st asn1_data_node_st;
 
   /***********************************/
   /*  Fixed constants                */
   /***********************************/
 
-  /* maximum number of characters of a name */
-  /* inside a file with ASN1 definitons     */
-#define ASN1_MAX_NAME_SIZE 128
 
   /* maximum number of characters */
   /* of a description message     */
@@ -158,85 +173,88 @@ extern "C"
   /*  Functions definitions          */
   /***********************************/
 
-  extern ASN1_API asn1_retCode
+  extern ASN1_API int
     asn1_parser2tree (const char *file_name,
-		      ASN1_TYPE * definitions, char *errorDescription);
+		      asn1_node * definitions, char *errorDescription);
 
-  extern ASN1_API asn1_retCode
+  extern ASN1_API int
     asn1_parser2array (const char *inputFileName,
 		       const char *outputFileName,
 		       const char *vectorName, char *errorDescription);
 
-  extern ASN1_API asn1_retCode
-    asn1_array2tree (const ASN1_ARRAY_TYPE * array,
-		     ASN1_TYPE * definitions, char *errorDescription);
+  extern ASN1_API int
+    asn1_array2tree (const asn1_static_node_t * array,
+		     asn1_node * definitions, char *errorDescription);
 
   extern ASN1_API void
-    asn1_print_structure (FILE * out, ASN1_TYPE structure,
+    asn1_print_structure (FILE * out, asn1_node structure,
 			  const char *name, int mode);
 
-  extern ASN1_API asn1_retCode
-    asn1_create_element (ASN1_TYPE definitions,
-			 const char *source_name, ASN1_TYPE * element);
+  extern ASN1_API int
+    asn1_create_element (asn1_node definitions,
+			 const char *source_name, asn1_node * element);
 
-  extern ASN1_API asn1_retCode asn1_delete_structure (ASN1_TYPE * structure);
+  extern ASN1_API int asn1_delete_structure (asn1_node * structure);
 
-  extern ASN1_API asn1_retCode
-    asn1_delete_element (ASN1_TYPE structure, const char *element_name);
+  extern ASN1_API int
+    asn1_delete_element (asn1_node structure, const char *element_name);
 
-  extern ASN1_API asn1_retCode
-    asn1_write_value (ASN1_TYPE node_root, const char *name,
+  extern ASN1_API int
+    asn1_write_value (asn1_node node_root, const char *name,
 		      const void *ivalue, int len);
 
-  extern ASN1_API asn1_retCode
-    asn1_read_value (ASN1_TYPE root, const char *name,
+  extern ASN1_API int
+    asn1_read_value (asn1_node root, const char *name,
 		     void *ivalue, int *len);
 
-  extern ASN1_API asn1_retCode
-    asn1_number_of_elements (ASN1_TYPE element, const char *name, int *num);
+  extern ASN1_API int
+    asn1_read_node_value (asn1_node node, asn1_data_node_st* data);
 
-  extern ASN1_API asn1_retCode
-    asn1_der_coding (ASN1_TYPE element, const char *name,
+  extern ASN1_API int
+    asn1_number_of_elements (asn1_node element, const char *name, int *num);
+
+  extern ASN1_API int
+    asn1_der_coding (asn1_node element, const char *name,
 		     void *ider, int *len, char *ErrorDescription);
 
-  extern ASN1_API asn1_retCode
-    asn1_der_decoding (ASN1_TYPE * element, const void *ider,
+  extern ASN1_API int
+    asn1_der_decoding (asn1_node * element, const void *ider,
 		       int len, char *errorDescription);
 
-  extern ASN1_API asn1_retCode
-    asn1_der_decoding_element (ASN1_TYPE * structure,
+  extern ASN1_API int
+    asn1_der_decoding_element (asn1_node * structure,
 			       const char *elementName,
 			       const void *ider, int len,
 			       char *errorDescription);
 
-  extern ASN1_API asn1_retCode
-    asn1_der_decoding_startEnd (ASN1_TYPE element,
+  extern ASN1_API int
+    asn1_der_decoding_startEnd (asn1_node element,
 				const void *ider, int len,
 				const char *name_element,
 				int *start, int *end);
 
-  extern ASN1_API asn1_retCode
-    asn1_expand_any_defined_by (ASN1_TYPE definitions, ASN1_TYPE * element);
+  extern ASN1_API int
+    asn1_expand_any_defined_by (asn1_node definitions, asn1_node * element);
 
-  extern ASN1_API asn1_retCode
-    asn1_expand_octet_string (ASN1_TYPE definitions,
-			      ASN1_TYPE * element,
+  extern ASN1_API int
+    asn1_expand_octet_string (asn1_node definitions,
+			      asn1_node * element,
 			      const char *octetName, const char *objectName);
 
-  extern ASN1_API asn1_retCode
-    asn1_read_tag (ASN1_TYPE root, const char *name,
+  extern ASN1_API int
+    asn1_read_tag (asn1_node root, const char *name,
 		   int *tagValue, int *classValue);
 
-  extern ASN1_API const char *asn1_find_structure_from_oid (ASN1_TYPE
+  extern ASN1_API const char *asn1_find_structure_from_oid (asn1_node
 							    definitions,
 							    const char
 							    *oidValue);
 
   extern ASN1_API const char *asn1_check_version (const char *req_version);
 
-  extern ASN1_API const char *asn1_strerror (asn1_retCode error);
+  extern ASN1_API const char *asn1_strerror (int error);
 
-  extern ASN1_API void asn1_perror (asn1_retCode error);
+  extern ASN1_API void asn1_perror (int error);
 
   /* DER utility functions. */
 
@@ -248,7 +266,7 @@ extern "C"
     asn1_octet_der (const unsigned char *str, int str_len,
 		    unsigned char *der, int *der_len);
 
-  extern ASN1_API asn1_retCode
+  extern ASN1_API int
     asn1_get_octet_der (const unsigned char *der, int der_len,
 			int *ret_len, unsigned char *str,
 			int str_size, int *str_len);
@@ -256,15 +274,15 @@ extern "C"
   extern ASN1_API void asn1_bit_der (const unsigned char *str, int bit_len,
 				     unsigned char *der, int *der_len);
 
-  extern ASN1_API asn1_retCode
+  extern ASN1_API int
     asn1_get_bit_der (const unsigned char *der, int der_len,
 		      int *ret_len, unsigned char *str,
 		      int str_size, int *bit_len);
 
-  extern ASN1_API signed long
+  extern ASN1_API long
     asn1_get_length_der (const unsigned char *der, int der_len, int *len);
 
-  extern ASN1_API signed long
+  extern ASN1_API long
     asn1_get_length_ber (const unsigned char *ber, int ber_len, int *len);
 
   extern ASN1_API void
@@ -272,43 +290,27 @@ extern "C"
 
   /* Other utility functions. */
 
-  extern ASN1_API ASN1_TYPE
-    asn1_find_node (ASN1_TYPE pointer, const char *name);
+  extern ASN1_API asn1_node
+    asn1_find_node (asn1_node pointer, const char *name);
 
-  extern ASN1_API asn1_retCode
-    asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
-		    ASN1_TYPE src, const char *src_name);
+  extern ASN1_API int
+    asn1_copy_node (asn1_node dst, const char *dst_name,
+		    asn1_node src, const char *src_name);
 
-  /* Deprecated stuff. */
+/* Compatibility types */
 
-#ifndef ASN1_DISABLE_DEPRECATED
+typedef int asn1_retCode;	/* type returned by libtasn1 functions */
 
-#define LIBTASN1_VERSION ASN1_VERSION
+#define node_asn_struct asn1_node_st
+#define node_asn asn1_node_st
+#define ASN1_TYPE asn1_node
+#define ASN1_TYPE_EMPTY NULL
 
-#ifndef MAX_NAME_SIZE
-# define MAX_NAME_SIZE ASN1_MAX_NAME_SIZE
-#endif
+#define static_struct_asn asn1_static_node_st
+#define ASN1_ARRAY_TYPE asn1_static_node_t
 
-#ifndef MAX_ERROR_DESCRIPTION_SIZE
-# define MAX_ERROR_DESCRIPTION_SIZE ASN1_MAX_ERROR_DESCRIPTION_SIZE
-#endif
-
-#ifndef __attribute__
-  /* This feature is available in gcc versions 2.5 and later.  */
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#  define __attribute__(Spec)	/* empty */
-# endif
-#endif
-
-  /* Use asn1_strerror instead. */
-  extern ASN1_API const char *libtasn1_strerror (asn1_retCode error)
-    __attribute__ ((deprecated));
-
-  /* Use asn1_perror instead. */
-  extern ASN1_API void
-    libtasn1_perror (asn1_retCode error) __attribute__ ((deprecated));
-
-#endif
+#define node_data_struct asn1_data_node_st
+#define ASN1_DATA_NODE asn1_data_node_st
 
 #ifdef __cplusplus
 }

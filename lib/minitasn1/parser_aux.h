@@ -27,36 +27,28 @@
 /***************************************/
 /*  Functions used by ASN.1 parser     */
 /***************************************/
-ASN1_TYPE _asn1_add_node (unsigned int type);
+asn1_node _asn1_add_static_node (unsigned int type);
 
-ASN1_TYPE
-_asn1_set_value (ASN1_TYPE node, const void *value, unsigned int len);
+asn1_node
+_asn1_set_value (asn1_node node, const void *value, unsigned int len);
 
-ASN1_TYPE _asn1_set_value_m (ASN1_TYPE node, void *value, unsigned int len);
+asn1_node _asn1_set_value_m (asn1_node node, void *value, unsigned int len);
 
-ASN1_TYPE
-_asn1_set_value_octet (ASN1_TYPE node, const void *value, unsigned int len);
+asn1_node
+_asn1_set_value_octet (asn1_node node, const void *value, unsigned int len);
 
-ASN1_TYPE
-_asn1_append_value (ASN1_TYPE node, const void *value, unsigned int len);
+asn1_node
+_asn1_append_value (asn1_node node, const void *value, unsigned int len);
 
-ASN1_TYPE _asn1_set_name (ASN1_TYPE node, const char *name);
+asn1_node _asn1_set_name (asn1_node node, const char *name);
 
-ASN1_TYPE _asn1_set_right (ASN1_TYPE node, ASN1_TYPE right);
+asn1_node _asn1_cpy_name (asn1_node dst, asn1_node src);
 
-ASN1_TYPE _asn1_get_right (ASN1_TYPE node);
+asn1_node _asn1_set_right (asn1_node node, asn1_node right);
 
-ASN1_TYPE _asn1_get_last_right (ASN1_TYPE node);
+asn1_node _asn1_get_last_right (asn1_node node);
 
-ASN1_TYPE _asn1_set_down (ASN1_TYPE node, ASN1_TYPE down);
-
-char *_asn1_get_name (ASN1_TYPE node);
-
-ASN1_TYPE _asn1_get_down (ASN1_TYPE node);
-
-ASN1_TYPE _asn1_mod_type (ASN1_TYPE node, unsigned int value);
-
-void _asn1_remove_node (ASN1_TYPE node);
+void _asn1_remove_node (asn1_node node);
 
 void _asn1_delete_list (void);
 
@@ -64,16 +56,103 @@ void _asn1_delete_list_and_nodes (void);
 
 char *_asn1_ltostr (long v, char *str);
 
-ASN1_TYPE _asn1_find_up (ASN1_TYPE node);
+asn1_node _asn1_find_up (asn1_node node);
 
-asn1_retCode _asn1_change_integer_value (ASN1_TYPE node);
+int _asn1_change_integer_value (asn1_node node);
 
-asn1_retCode _asn1_expand_object_id (ASN1_TYPE node);
+int _asn1_expand_object_id (asn1_node node);
 
-asn1_retCode _asn1_type_set_config (ASN1_TYPE node);
+int _asn1_type_set_config (asn1_node node);
 
-asn1_retCode _asn1_check_identifier (ASN1_TYPE node);
+int _asn1_check_identifier (asn1_node node);
 
-asn1_retCode _asn1_set_default_tag (ASN1_TYPE node);
+int _asn1_set_default_tag (asn1_node node);
+
+/******************************************************************/
+/* Function : _asn1_get_right                                     */
+/* Description: returns the element pointed by the RIGHT field of */
+/*              a NODE_ASN element.                               */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/* Return: field RIGHT of NODE.                                   */
+/******************************************************************/
+inline static asn1_node
+_asn1_get_right (asn1_node node)
+{
+  if (node == NULL)
+    return NULL;
+  return node->right;
+}
+
+/******************************************************************/
+/* Function : _asn1_set_down                                      */
+/* Description: sets the field DOWN in a NODE_ASN element.        */
+/* Parameters:                                                    */
+/*   node: element pointer.                                       */
+/*   down: pointer to a NODE_ASN element that you want be pointed */
+/*          by NODE.                                              */
+/* Return: pointer to *NODE.                                      */
+/******************************************************************/
+inline static asn1_node
+_asn1_set_down (asn1_node node, asn1_node down)
+{
+  if (node == NULL)
+    return node;
+  node->down = down;
+  if (down)
+    down->left = node;
+  return node;
+}
+
+/******************************************************************/
+/* Function : _asn1_get_down                                      */
+/* Description: returns the element pointed by the DOWN field of  */
+/*              a NODE_ASN element.                               */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/* Return: field DOWN of NODE.                                    */
+/******************************************************************/
+inline static asn1_node
+_asn1_get_down (asn1_node node)
+{
+  if (node == NULL)
+    return NULL;
+  return node->down;
+}
+
+/******************************************************************/
+/* Function : _asn1_get_name                                      */
+/* Description: returns the name of a NODE_ASN element.           */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/* Return: a null terminated string.                              */
+/******************************************************************/
+inline static char *
+_asn1_get_name (asn1_node node)
+{
+  if (node == NULL)
+    return NULL;
+  return node->name;
+}
+
+/******************************************************************/
+/* Function : _asn1_mod_type                                      */
+/* Description: change the field TYPE of an NODE_ASN element.     */
+/*              The new value is the old one | (bitwise or) the   */
+/*              paramener VALUE.                                  */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/*   value: the integer value that must be or-ed with the current */
+/*          value of field TYPE.                                  */
+/* Return: NODE pointer.                                          */
+/******************************************************************/
+inline static asn1_node
+_asn1_mod_type (asn1_node node, unsigned int value)
+{
+  if (node == NULL)
+    return node;
+  node->type |= value;
+  return node;
+}
 
 #endif

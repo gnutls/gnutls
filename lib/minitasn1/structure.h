@@ -28,14 +28,14 @@
 #ifndef _STRUCTURE_H
 #define _STRUCTURE_H
 
-asn1_retCode _asn1_create_static_structure (ASN1_TYPE pointer,
+int _asn1_create_static_structure (asn1_node pointer,
 					    char *output_file_name,
 					    char *vector_name);
 
-ASN1_TYPE _asn1_copy_structure3 (ASN1_TYPE source_node);
+asn1_node _asn1_copy_structure3 (asn1_node source_node);
 
-ASN1_TYPE _asn1_add_node_only (unsigned int type);
+asn1_node _asn1_add_single_node (unsigned int type);
 
-ASN1_TYPE _asn1_find_left (ASN1_TYPE node);
+asn1_node _asn1_find_left (asn1_node node);
 
 #endif

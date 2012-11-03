@@ -19,7 +19,7 @@
  * 02110-1301, USA
  */
 
-void _asn1_str_cpy (char *dest, size_t dest_tot_size, const char *src);
+unsigned int _asn1_str_cpy (char *dest, size_t dest_tot_size, const char *src);
 void _asn1_str_cat (char *dest, size_t dest_tot_size, const char *src);
 
 #define Estrcpy(x,y) _asn1_str_cpy(x,ASN1_MAX_ERROR_DESCRIPTION_SIZE,y)

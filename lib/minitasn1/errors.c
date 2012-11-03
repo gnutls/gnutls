@@ -21,7 +21,7 @@
 
 #include <int.h>
 #ifdef STDC_HEADERS
-# include <stdarg.h>
+#include <stdarg.h>
 #endif
 
 #define LIBTASN1_ERROR_ENTRY(name) { #name, name }
@@ -68,7 +68,7 @@ static const libtasn1_error_entry error_algorithms[] = {
  * Since: 1.6
  **/
 void
-asn1_perror (asn1_retCode error)
+asn1_perror (int error)
 {
   const char *str = asn1_strerror (error);
   fprintf (stderr, "LIBTASN1 ERROR: %s\n", str ? str : "(null)");
@@ -90,7 +90,7 @@ asn1_perror (asn1_retCode error)
  * Since: 1.6
  **/
 const char *
-asn1_strerror (asn1_retCode error)
+asn1_strerror (int error)
 {
   const libtasn1_error_entry *p;
 
@@ -100,44 +100,3 @@ asn1_strerror (asn1_retCode error)
 
   return NULL;
 }
-
-#ifndef ASN1_DISABLE_DEPRECATED
-
-/* Compatibility mappings to preserve ABI. */
-
-/**
- * libtasn1_perror:
- * @error: is an error returned by a libtasn1 function.
- *
- * Prints a string to stderr with a description of an error.  This
- * function is like perror(). The only difference is that it accepts
- * an error returned by a libtasn1 function.
- *
- * Deprecated: Use asn1_perror() instead.
- **/
-void
-libtasn1_perror (asn1_retCode error)
-{
-  asn1_perror (error);
-}
-
-/**
- * libtasn1_strerror:
- * @error: is an error returned by a libtasn1 function.
- *
- * Returns a string with a description of an error.  This function is
- * similar to strerror.  The only difference is that it accepts an
- * error (number) returned by a libtasn1 function.
- *
- * Returns: Pointer to static zero-terminated string describing error
- *   code.
- *
- * Deprecated: Use asn1_strerror() instead.
- **/
-const char *
-libtasn1_strerror (asn1_retCode error)
-{
-  return asn1_strerror (error);
-}
-
-#endif
