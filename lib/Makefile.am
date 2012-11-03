@@ -37,6 +37,7 @@ AM_CPPFLAGS = \
 	-I$(builddir)/gl			\
 	-I$(srcdir)/includes			\
 	-I$(builddir)/includes			\
+	$(LIBTASN1_CFLAGS)			\
 	-I$(srcdir)/x509
 
 if ENABLE_OPENPGP
@@ -140,7 +141,7 @@ endif
 if ENABLE_MINITASN1
 libgnutls_la_LIBADD += minitasn1/libminitasn1.la
 else
-libgnutls_la_LDFLAGS += $(LTLIBTASN1)
+libgnutls_la_LIBADD += $(LIBTASN1_LIBS)
 endif
 
 libgnutls_la_LDFLAGS += $(LTLIBPAKCHOIS)
