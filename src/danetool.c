@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012 Free Software Foundation, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -220,55 +220,55 @@ size_t size;
       printf("Contents: %s\n", dane_match_type_name(match));
       printf("Data: %s\n", buffer);
 
-    }
-  
-  /* Verify the DANE data */
-  if (cinfo->cert)
-    {
-      gnutls_x509_crt_t *clist;
-      unsigned int clist_size, status;
-      
-      ret = gnutls_load_file(cinfo->cert, &file);
-      if (ret < 0)
-        error (EXIT_FAILURE, 0, "gnutls_load_file: %s", gnutls_strerror (ret));
-    
-      ret = gnutls_x509_crt_list_import2( &clist, &clist_size, &file, cinfo->incert_format, 0);
-      if (ret < 0)
-        error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_import2: %s", gnutls_strerror (ret));
-      
-      if (clist_size > 0)
+      /* Verify the DANE data */
+      if (cinfo->cert)
         {
-          gnutls_datum_t certs[clist_size];
-          gnutls_datum_t out;
-          unsigned int i;
+          gnutls_x509_crt_t *clist;
+          unsigned int clist_size, status;
           
-          for (i=0;i<clist_size;i++)
+          ret = gnutls_load_file(cinfo->cert, &file);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "gnutls_load_file: %s", gnutls_strerror (ret));
+        
+          ret = gnutls_x509_crt_list_import2( &clist, &clist_size, &file, cinfo->incert_format, 0);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_import2: %s", gnutls_strerror (ret));
+          
+          if (clist_size > 0)
             {
-              ret = gnutls_x509_crt_export2( clist[i], GNUTLS_X509_FMT_DER, &certs[i]);
+              gnutls_datum_t certs[clist_size];
+              gnutls_datum_t out;
+              unsigned int i;
+              
+              for (i=0;i<clist_size;i++)
+                {
+                  ret = gnutls_x509_crt_export2( clist[i], GNUTLS_X509_FMT_DER, &certs[i]);
+                  if (ret < 0)
+                    error (EXIT_FAILURE, 0, "gnutls_x509_crt_export2: %s", gnutls_strerror (ret));
+                }
+              
+              ret = dane_verify_crt( s, certs, clist_size, GNUTLS_CRT_X509, 
+                                     host, proto, port, 0, 0, &status);
               if (ret < 0)
-                error (EXIT_FAILURE, 0, "gnutls_x509_crt_export2: %s", gnutls_strerror (ret));
-            }
-          
-          ret = dane_verify_crt( s, certs, clist_size, GNUTLS_CRT_X509, 
-                                 host, proto, port, 0, 0, &status);
-          if (ret < 0)
-            error (EXIT_FAILURE, 0, "dane_verify_crt: %s", dane_strerror (ret));
-            
-          ret = dane_verification_status_print(status, &out, 0);
-          if (ret < 0)
-            error (EXIT_FAILURE, 0, "dane_verification_status_print: %s", dane_strerror (ret));
-          
-          printf("\nVerification: %s\n", out.data);
-          gnutls_free(out.data);
+                error (EXIT_FAILURE, 0, "dane_verify_crt: %s", dane_strerror (ret));
+                
+              ret = dane_verification_status_print(status, &out, 0);
+              if (ret < 0)
+                error (EXIT_FAILURE, 0, "dane_verification_status_print: %s", dane_strerror (ret));
+              
+              printf("\nVerification: %s\n", out.data);
+              gnutls_free(out.data);
 
-          for (i=0;i<clist_size;i++)
-            {
-              gnutls_free(certs[i].data);
-              gnutls_x509_crt_deinit(clist[i]);
+              for (i=0;i<clist_size;i++)
+                {
+                  gnutls_free(certs[i].data);
+                  gnutls_x509_crt_deinit(clist[i]);
+                }
+              gnutls_free(clist);
             }
-          gnutls_free(clist);
         }
     }
+  
 
   dane_query_deinit(q);
   dane_state_deinit(s);
