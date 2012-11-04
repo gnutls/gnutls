@@ -2,7 +2,7 @@ AutoGen Definitions options;
 prog-name     = danetool;
 prog-title    = "GnuTLS DANE tool";
 prog-desc     = "Generate DANE TLSA RR entries.";
-detail    = "Tool generate DNS resource records for the DANE protocol.";
+detail    = "Tool to generate DNS resource records for the DANE protocol.";
 short-usage   = "danetool [options]\ndanetool --help for usage instructions.\n";
 explain       = "";
 
@@ -116,7 +116,7 @@ doc-section = {
   ds-type = 'SEE ALSO';
   ds-format = 'texi';
   ds-text   = <<-_EOT_
-    p11tool (1)
+    certtool (1)
 _EOT_;
 };
 
