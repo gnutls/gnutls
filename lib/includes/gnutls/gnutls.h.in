@@ -972,19 +972,19 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
 /**
  * gnutls_srtp_profile_t:
- * @GNUTLS_SRTP_AES128_CM_SHA1_80: 128 bit AES with a 80 bit HMAC-SHA1
- * @GNUTLS_SRTP_AES128_CM_SHA1_32: 128 bit AES with a 32 bit HMAC-SHA1
- * @GNUTLS_SRTP_NULL_SHA1_80: NULL cipher with a 80 bit HMAC-SHA1
- * @GNUTLS_SRTP_NULL_SHA1_32: NULL cipher with a 32 bit HMAC-SHA1
+ * @GNUTLS_SRTP_AES128_CM_HMAC_SHA1_80: 128 bit AES with a 80 bit HMAC-SHA1
+ * @GNUTLS_SRTP_AES128_CM_HMAC_SHA1_32: 128 bit AES with a 32 bit HMAC-SHA1
+ * @GNUTLS_SRTP_NULL_HMAC_SHA1_80: NULL cipher with a 80 bit HMAC-SHA1
+ * @GNUTLS_SRTP_NULL_HMAC_SHA1_32: NULL cipher with a 32 bit HMAC-SHA1
  *
  * Enumeration of different SRTP protection profiles.
  */
   typedef enum
   {
-    GNUTLS_SRTP_AES128_CM_SHA1_80 = 0x0001,
-    GNUTLS_SRTP_AES128_CM_SHA1_32 = 0x0002,
-    GNUTLS_SRTP_NULL_SHA1_80      = 0x0005,
-    GNUTLS_SRTP_NULL_SHA1_32      = 0x0006
+    GNUTLS_SRTP_AES128_CM_HMAC_SHA1_80 = 0x0001,
+    GNUTLS_SRTP_AES128_CM_HMAC_SHA1_32 = 0x0002,
+    GNUTLS_SRTP_NULL_HMAC_SHA1_80      = 0x0005,
+    GNUTLS_SRTP_NULL_HMAC_SHA1_32      = 0x0006
   } gnutls_srtp_profile_t;
 
   int gnutls_srtp_set_profile (gnutls_session_t session,

@@ -61,23 +61,23 @@ typedef struct
 
 static const srtp_profile_st profile_names[] = {
   {
-    "SRTP_AES128_CM_SHA1_80",
-    GNUTLS_SRTP_AES128_CM_SHA1_80,
+    "SRTP_AES128_CM_HMAC_SHA1_80",
+    GNUTLS_SRTP_AES128_CM_HMAC_SHA1_80,
     16,14
   },
   {
-    "SRTP_AES128_CM_SHA1_32",
-    GNUTLS_SRTP_AES128_CM_SHA1_32,
+    "SRTP_AES128_CM_HMAC_SHA1_32",
+    GNUTLS_SRTP_AES128_CM_HMAC_SHA1_32,
     16,14
   },
   {
-    "SRTP_NULL_SHA1_80",
-    GNUTLS_SRTP_NULL_SHA1_80,
+    "SRTP_NULL_HMAC_SHA1_80",
+    GNUTLS_SRTP_NULL_HMAC_SHA1_80,
     16,14
   },
   {
     "SRTP_NULL_SHA1_32",
-    GNUTLS_SRTP_NULL_SHA1_32,
+    GNUTLS_SRTP_NULL_HMAC_SHA1_32,
     16,14
   },
   {
@@ -448,12 +448,12 @@ gnutls_srtp_set_profile_direct (gnutls_session_t session,
  * This is a helper function to generate the keying material for SRTP.
  * It requires the space of the key material to be pre-allocated (should be at least
  * 2x the maximum key size and salt size). The @client_key, @client_salt, @server_key
- * and @server_salt are convenience datums that point inside the key material. The may
+ * and @server_salt are convenience datums that point inside the key material. They may
  * be %NULL.
  *
  * Returns: On success the size of the key material is returned,
- * %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not sufficient, 
- * or a negative error code.
+ * otherwise, %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not 
+ * sufficient, or a negative error code.
  *
  * Since 3.1.4
  **/

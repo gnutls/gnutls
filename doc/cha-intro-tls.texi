@@ -601,7 +601,10 @@ request.
 The TLS protocol was extended in @xcite{RFC5764} to provide keying material to the
 Secure RTP (SRTP) protocol. The SRTP protocol provides an encapsulation of encrypted
 data that is optimized for voice data. With the SRTP TLS extension two peers can
-negotiate keys using TLS or DTLS and obtain keying material for use with SRTP.
+negotiate keys using TLS or DTLS and obtain keying material for use with SRTP. The
+available SRTP profiles are listed below.
+
+@showenumdesc{gnutls_srtp_profile_t,Supported SRTP profiles}
 
 To enable use the following functions.
 
