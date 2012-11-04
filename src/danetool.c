@@ -213,7 +213,8 @@ size_t size;
       if (ret < 0)
         error (EXIT_FAILURE, 0, "gnutls_hex_encode: %s", dane_strerror (ret));
 
-      fprintf(outfile, "\nEntry %d:\n_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n", i+1, port, proto, host, usage, type, match, buffer);
+      printf("\nEntry %d:\n", i+1);
+      fprintf(outfile, "_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n", port, proto, host, usage, type, match, buffer);
 
       printf("\nCertificate usage: %s\n", dane_cert_usage_name(usage));
       printf("Certificate type: %s\n", dane_cert_type_name(type));
