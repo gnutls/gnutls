@@ -134,6 +134,21 @@ fi
     AC_MSG_WARN([C99 macros not supported. This may affect compiling.])
   ])
 
+  ac_enable_srtp=yes
+  AC_MSG_CHECKING([whether to disable DTLS-SRTP extension])
+  AC_ARG_ENABLE(dtls-srtp-support,
+    AS_HELP_STRING([--disable-dtls-srtp-support],
+                   [disable support for the DTLS-SRTP extension]),
+    ac_enable_srtp=no)
+  if test x$ac_enable_srtp != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ENABLE_DTLS_SRTP], 1, [enable DTLS-SRTP support])
+  else
+   ac_full=0
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(ENABLE_DTLS_SRTP, test "$ac_enable_srtp" != "no")
+
   ac_enable_srp=yes
   AC_MSG_CHECKING([whether to disable SRP authentication support])
   AC_ARG_ENABLE(srp-authentication,

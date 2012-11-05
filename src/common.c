@@ -553,9 +553,11 @@ print_info (gnutls_session_t session, int verbose, int print_cert)
             (gnutls_compression_get (session)));
     printf ("- Compression: %s\n", tmp);
 
+#ifdef ENABLE_DTLS_SRTP
     rc = gnutls_srtp_get_selected_profile (session, &srtp_profile);
     if (rc == 0)
       printf ("- SRTP profile: %s\n", gnutls_srtp_get_profile_name (srtp_profile));
+#endif
 
     if (verbose)
       {

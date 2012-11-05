@@ -394,6 +394,7 @@ gnutls_session_t initialize_session (int dtls)
   if (HAVE_OPT (HEARTBEAT))
     gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 
+#ifdef ENABLE_DTLS_SRTP
   if (HAVE_OPT (SRTP_PROFILES))
     {
       ret = gnutls_srtp_set_profile_direct (session, OPT_ARG(SRTP_PROFILES), &err);
@@ -402,6 +403,7 @@ gnutls_session_t initialize_session (int dtls)
         fprintf(stderr, "Error in profiles: %s\n", gnutls_strerror(ret));
       exit (1);
     }
+#endif
 
   return session;
 }

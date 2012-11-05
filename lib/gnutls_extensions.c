@@ -355,9 +355,11 @@ _gnutls_ext_init (void)
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 
+#ifdef ENABLE_DTLS_SRTP
   ret = _gnutls_ext_register (&ext_mod_srtp);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
+#endif
 
   return GNUTLS_E_SUCCESS;
 }

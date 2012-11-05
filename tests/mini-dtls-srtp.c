@@ -27,10 +27,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(_WIN32)
+#if defined(_WIN32) || !defined(ENABLE_DTLS_SRTP)
 
 int
-main ()
+main (int argc, char** argv)
 {
     exit (77);
 }

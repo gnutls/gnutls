@@ -39,5 +39,8 @@ libgnutls_ext_la_SOURCES = max_record.c cert_type.c \
 	max_record.h cert_type.h server_name.h srp.h \
 	session_ticket.h signature.h safe_renegotiation.h \
 	session_ticket.c srp.c ecc.c ecc.h heartbeat.c heartbeat.h \
-	status_request.h status_request.c srtp.c srtp.h
+	status_request.h status_request.c
 
+if ENABLE_DTLS_SRTP
+libgnutls_ext_la_SOURCES += srtp.c srtp.h
+endif

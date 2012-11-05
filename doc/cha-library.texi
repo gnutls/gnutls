@@ -98,6 +98,7 @@ options are given.
 --disable-libdane
 --without-p11-kit
 --without-tpm
+--disable-dtls-srtp-support
 @end verbatim
 
 For the complete list, refer to the output from @code{configure --help}.
