@@ -171,15 +171,14 @@ static int
 _gnutls_srtp_recv_params (gnutls_session_t session,
                           const uint8_t *data, size_t _data_size)
 {
-  unsigned int i, j;
+  unsigned int i;
   int ret;
   const uint8_t *p = data;
   int len;
   ssize_t data_size = _data_size;
   srtp_ext_st *priv;
   extension_priv_data_t epriv;
-  uint16_t profiles[MAX_SRTP_PROFILES];
-  unsigned int profiles_size = 0;
+  uint16_t profile;
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SRTP,
@@ -195,24 +194,19 @@ _gnutls_srtp_recv_params (gnutls_session_t session,
 
   while (len > 0)
     {
-      DECR_LENGTH_RET (data_size, 2, 0);
-      if (profiles_size < MAX_SRTP_PROFILES)
-        profiles_size++;
-      profiles[profiles_size - 1] = _gnutls_read_uint16 (p);
-      p += 2;
-      len -= 2;
-    }
+      DECR_LEN (data_size, 2);
+      profile = _gnutls_read_uint16 (p);
 
-  for (i = 0; i < priv->profiles_size && priv->selected_profile == 0; i++)
-    {
-      for (j = 0; j < profiles_size; j++)
+      for (i = 0; i < priv->profiles_size;i++)
         {
-          if (priv->profiles[i] == profiles[j])
+          if (priv->profiles[i] == profile)
             {
-              priv->selected_profile = profiles[j];
+              priv->selected_profile = profile;
               break;
             }
         }
+      p += 2;
+      len -= 2;
     }
 
   return 0;
