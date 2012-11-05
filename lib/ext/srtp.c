@@ -145,6 +145,8 @@ int gnutls_srtp_get_profile_id (const char *name,
   return 0;
 }
 
+#define MAX_PROFILES_IN_SRTP_EXTENSION 256
+
 /**
  * gnutls_srtp_get_profile_name
  * @profile: The profile to look up a string for
@@ -191,6 +193,12 @@ _gnutls_srtp_recv_params (gnutls_session_t session,
   DECR_LENGTH_RET (data_size, 2, 0);
   len = _gnutls_read_uint16 (p);
   p += 2;
+
+  if (len+1 > data_size)
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+  
+  if (len > MAX_PROFILES_IN_SRTP_EXTENSION*2)
+    return 0;
 
   while (len > 0)
     {
