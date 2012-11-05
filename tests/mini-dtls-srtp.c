@@ -105,10 +105,10 @@ client (int fd, int profile)
                                 "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
                                 NULL);
     if (profile)
-      ret = gnutls_srtp_set_profile_direct(session, "SRTP_AES128_CM_SHA1_80",
+      ret = gnutls_srtp_set_profile_direct(session, "SRTP_AES128_CM_HMAC_SHA1_80",
                                            NULL);
     else
-      ret = gnutls_srtp_set_profile_direct(session, "SRTP_NULL_SHA1_80",
+      ret = gnutls_srtp_set_profile_direct(session, "SRTP_NULL_HMAC_SHA1_80",
                                            NULL);
     if (ret < 0)
       {
@@ -230,10 +230,10 @@ server (int fd, int profile)
                                 NULL);
 
     if (profile)
-      ret = gnutls_srtp_set_profile_direct(session, "SRTP_AES128_CM_SHA1_80",
+      ret = gnutls_srtp_set_profile_direct(session, "SRTP_AES128_CM_HMAC_SHA1_80",
                                            NULL);
     else
-      ret = gnutls_srtp_set_profile_direct(session, "SRTP_NULL_SHA1_80",
+      ret = gnutls_srtp_set_profile_direct(session, "SRTP_NULL_HMAC_SHA1_80",
                                            NULL);
     if (ret < 0)
       {
