@@ -919,6 +919,9 @@ typedef struct
   unsigned int hb_actual_retrans_timeout_ms; /* current timeout, in milliseconds*/
   unsigned int hb_retrans_timeout_ms; /* the default timeout, in milliseconds*/
   unsigned int hb_total_timeout_ms; /* the total timeout, in milliseconds*/
+  
+  unsigned int ocsp_check_ok; /* will be zero if the OCSP response TLS extension
+                               * check failed (OCSP was old/unrelated or so). */
 
   heartbeat_state_t hb_state; /* for ping */
   

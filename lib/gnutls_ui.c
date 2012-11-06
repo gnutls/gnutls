@@ -825,3 +825,23 @@ gnutls_url_is_supported (const char* url)
 #endif
   return 0;
 }
+
+/**
+ * gnutls_ocsp_status_request_is_checked:
+ * @session: is a gnutls session
+ * @flags: should be zero
+ *
+ * Check whether an OCSP status response was included in the handshake
+ * and whether it was checked and valid (not too old or superseded). 
+ * This is a helper function when needing to decide whether to perform an
+ * OCSP validity check on the peer's certificate. Must be called after
+ * gnutls_certificate_verify_peers3() is called.
+ *
+ * Returns: non zero it was valid, or a zero if it wasn't sent,
+ * or sent and was invalid.
+ **/
+int
+gnutls_ocsp_status_request_is_checked (gnutls_session_t session, unsigned int flags)
+{
+  return session->internals.ocsp_check_ok;
+}

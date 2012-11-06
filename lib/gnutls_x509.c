@@ -102,6 +102,7 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
   int ret;
   unsigned int status, cert_status;
   time_t rtime, vtime, ntime, now;
+  int check_failed;
   
   now = gnutls_time(0);
 
@@ -157,6 +158,7 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
       if (now - vtime > MAX_OCSP_VALIDITY_SECS)
         {
           _gnutls_audit_log(session, "The OCSP response is old\n");
+          check_failed = 1;
         }
     }
   else
@@ -165,9 +167,13 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
       if (ntime < now)
         {
           _gnutls_audit_log(session, "There is a newer OCSP response but was not provided by the server\n");
+          check_failed = 1;
         }
     }
   
+  if (check_failed == 0)
+    session->internals.ocsp_check_ok = 1;
+
   ret = 0;
 cleanup:
   gnutls_ocsp_resp_deinit (resp);
@@ -204,6 +210,9 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
   gnutls_x509_crt_t issuer;
   unsigned int ocsp_status = 0;
   unsigned int verify_flags;
+
+  /* No OCSP check so far */
+  session->internals.ocsp_check_ok = 0;
 
   CHECK_AUTH (GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 

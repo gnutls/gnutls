@@ -38,6 +38,7 @@ a site's DANE data.
 ** API and ABI modifications:
 gnutls_session_get_id2: Added
 gnutls_certificate_verify_peers3: Added
+gnutls_ocsp_status_request_is_checked: Added
 gnutls_certificate_verification_status_print: Added
 gnutls_srtp_set_profile: Added
 gnutls_srtp_set_profile_direct: Added
