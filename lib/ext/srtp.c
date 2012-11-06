@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 Martin Storsjo
+ * Copyright (C) 2012 Free Software Foundation
  * 
  * Author: Martin Storsjo
  *
@@ -197,8 +198,16 @@ _gnutls_srtp_recv_params (gnutls_session_t session,
   if (len+1 > data_size)
     return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
   
-  if (len > MAX_PROFILES_IN_SRTP_EXTENSION*2)
-    return 0;
+  if (session->security_parameters.entity == GNUTLS_SERVER)
+    {
+      if (len > MAX_PROFILES_IN_SRTP_EXTENSION*2)
+        return 0;
+    }
+  else
+    {
+      if (len != 2)
+        return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+    }
 
   while (len > 0)
     {
@@ -215,6 +224,16 @@ _gnutls_srtp_recv_params (gnutls_session_t session,
         }
       p += 2;
       len -= 2;
+    }
+
+  DECR_LEN (data_size, 1);
+  priv->mki_size = *p;
+  p++;
+  
+  if (priv->mki_size > 0)
+    {
+      DECR_LEN (data_size, priv->mki_size);
+      memcpy(priv->mki, p, priv->mki_size);
     }
 
   return 0;
@@ -269,8 +288,8 @@ _gnutls_srtp_send_params (gnutls_session_t session,
       total_size = 2 + 2 * priv->profiles_size;
     }
 
-  /* use_mki, not supported yet */
-  ret = _gnutls_buffer_append_prefix(extdata, 8, 0);
+  /* use_mki */
+  ret = _gnutls_buffer_append_data_prefix(extdata, 8, priv->mki, priv->mki_size);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -315,6 +334,95 @@ gnutls_srtp_get_selected_profile (gnutls_session_t session,
 
   *profile = priv->selected_profile;
 
+  return 0;
+}
+
+/**
+ * gnutls_srtp_get_mki:
+ * @session: is a #gnutls_session_t structure.
+ * @mki: will hold the MKI
+ *
+ * This function exports the negotiated Master Key Identifier,
+ * if any. The returned value in @mki should be treated as
+ * constant and valid only during the session's lifetime.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ *
+ * Since 3.1.4
+ **/
+int
+gnutls_srtp_get_mki (gnutls_session_t session,
+                     gnutls_datum_t *mki)
+{
+  srtp_ext_st *priv;
+  int ret;
+  extension_priv_data_t epriv;
+
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SRTP,
+                                  &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+  priv = epriv.ptr;
+  
+  mki->data = priv->mki;
+  mki->size = priv->mki_size;
+
+  return 0;
+}
+
+/**
+ * gnutls_srtp_set_mki:
+ * @session: is a #gnutls_session_t structure.
+ * @mki: holds the MKI
+ *
+ * This function sets the Master Key Identifier, to be
+ * used by this session (if any).
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ *
+ * Since 3.1.4
+ **/
+int
+gnutls_srtp_set_mki (gnutls_session_t session,
+                     const gnutls_datum_t *mki)
+{
+  int ret;
+  srtp_ext_st *priv;
+  extension_priv_data_t epriv;
+
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SRTP,
+                                  &epriv);
+  if (ret < 0)
+    {
+      priv = gnutls_calloc (1, sizeof (*priv));
+      if (priv == NULL)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
+      epriv.ptr = priv;
+      _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_SRTP,
+                                    epriv);
+    }
+  else
+    priv = epriv.ptr;
+
+  if (mki->size > 0 && mki->size <= sizeof(priv->mki))
+    {
+      priv->mki_size = mki->size;
+      memcpy(priv->mki, mki->data, mki->size);
+    }
+  else
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+  
   return 0;
 }
 

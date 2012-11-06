@@ -866,6 +866,8 @@ GNUTLS_3_1_0 {
 	gnutls_srtp_set_profile;
 	gnutls_srtp_set_profile_direct;
 	gnutls_srtp_get_keys;
+	gnutls_srtp_get_mki;
+	gnutls_srtp_set_mki;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

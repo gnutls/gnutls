@@ -1005,6 +1005,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                       gnutls_datum_t *server_key, 
                       gnutls_datum_t *server_salt);
 
+  int gnutls_srtp_set_mki (gnutls_session_t session, const gnutls_datum_t *mki);
+  int gnutls_srtp_get_mki (gnutls_session_t session, gnutls_datum_t *mki);
+
   int gnutls_key_generate (gnutls_datum_t * key, unsigned int key_size);
 
 /* if you just want some defaults, use the following.
