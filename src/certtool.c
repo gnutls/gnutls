@@ -2180,14 +2180,14 @@ print_verification_res (FILE* outfile, unsigned int output)
 {
   int comma = 0;
 
-  if (output & GNUTLS_CERT_INVALID)
+  if (output == 0)
     {
-      fprintf (outfile, "Not verified");
+      fprintf (outfile, "Verified");
       comma = 1;
     }
   else
     {
-      fprintf (outfile, "Verified");
+      fprintf (outfile, "Not verified");
       comma = 1;
     }
 
@@ -2220,22 +2220,6 @@ print_verification_res (FILE* outfile, unsigned int output)
       if (comma)
         fprintf (outfile, ", ");
       fprintf (outfile, "Expired");
-      comma = 1;
-    }
-
-  if (output & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
-    {
-      if (comma)
-        fprintf (outfile, ", ");
-      fprintf (outfile, "Newer CRL is available");
-      comma = 1;
-    }
-
-  if (output & GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE)
-    {
-      if (comma)
-        fprintf (outfile, ", ");
-      fprintf (outfile, "CRL has future date");
       comma = 1;
     }
 
@@ -2303,7 +2287,6 @@ verify_crl (common_info_st * cinfo)
   int ret;
   gnutls_datum_t pem;
   gnutls_x509_crl_t crl;
-  time_t now = time (0);
   gnutls_x509_crt_t issuer;
 
   issuer = load_ca_cert (cinfo);
@@ -2363,23 +2346,20 @@ verify_crl (common_info_st * cinfo)
       comma = 1;
     }
 
-  /* Check expiration dates.
-   */
-
-  if (gnutls_x509_crl_get_this_update (crl) > now)
+  if (output & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
     {
       if (comma)
         fprintf (outfile, ", ");
+      fprintf (outfile, "CRL is not up to date");
       comma = 1;
-      fprintf (outfile, "Issued in the future!");
     }
 
-  if (gnutls_x509_crl_get_next_update (crl) < now)
+  if (output & GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE)
     {
       if (comma)
         fprintf (outfile, ", ");
+      fprintf (outfile, "Issued in the future!");
       comma = 1;
-      fprintf (outfile, "CRL is not up to date");
     }
 
   fprintf (outfile, "\n");
