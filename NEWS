@@ -53,7 +53,7 @@ dane_cert_type_name: Added
 dane_match_type_name: Added
 dane_cert_usage_name: Added
 dane_verification_status_print: Added
-GNUTLS_CERT_REVOCATION_DATA_TOO_OLD: Added
+GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED: Added
 GNUTLS_CERT_REVOCATION_DATA_INVALID: Added
 GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE: Added
 GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE: Added
