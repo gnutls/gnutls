@@ -2346,7 +2346,7 @@ verify_crl (common_info_st * cinfo)
       comma = 1;
     }
 
-  if (output & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
+  if (output & GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED)
     {
       if (comma)
         fprintf (outfile, ", ");
