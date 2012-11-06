@@ -692,7 +692,7 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
 /**
  * gnutls_certificate_verify_peers3:
  * @session: is a gnutls session
- * @hostname: is the expected name of the peer
+ * @hostname: is the expected name of the peer; may be %NULL
  * @status: is the output of the verification
  *
  * This function will verify the peer's certificate and its name and 
@@ -701,8 +701,9 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
  * bitwise or'd or zero if the certificate is trusted. Note that verification 
  * failure does not imply a negative return value. Only the @status is updated.
  *
- * In case the @hostname does not match the %GNUTLS_CERT_UNEXPECTED_OWNER
- * status flag will be set.
+ * If the @hostname provided is non-NULL then this function will compare
+ * the hostname in the certificate against the given. If they do not match 
+ * the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  *
  * If available the OCSP Certificate Status extension will be
  * utilized by this function.
