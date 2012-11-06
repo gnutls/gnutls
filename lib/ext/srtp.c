@@ -234,6 +234,7 @@ _gnutls_srtp_recv_params (gnutls_session_t session,
     {
       DECR_LEN (data_size, priv->mki_size);
       memcpy(priv->mki, p, priv->mki_size);
+      priv->mki_received = 1;
     }
 
   return 0;
@@ -343,8 +344,8 @@ gnutls_srtp_get_selected_profile (gnutls_session_t session,
  * @mki: will hold the MKI
  *
  * This function exports the negotiated Master Key Identifier,
- * if any. The returned value in @mki should be treated as
- * constant and valid only during the session's lifetime.
+ * received by the peer if any. The returned value in @mki should be 
+ * treated as constant and valid only during the session's lifetime.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -363,12 +364,12 @@ gnutls_srtp_get_mki (gnutls_session_t session,
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SRTP,
                                   &epriv);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-    }
+    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
   priv = epriv.ptr;
+
+  if (priv->mki_received == 0)
+    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
   
   mki->data = priv->mki;
   mki->size = priv->mki_size;
@@ -647,7 +648,13 @@ _gnutls_srtp_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
     {
       BUFFER_APPEND_NUM (ps, priv->profiles[i]);
     }
-  BUFFER_APPEND_NUM (ps, priv->selected_profile);
+
+  BUFFER_APPEND_NUM (ps, priv->mki_received);
+  if (priv->mki_received)
+    {
+      BUFFER_APPEND_NUM (ps, priv->selected_profile);
+      BUFFER_APPEND_PFX4 (ps, priv->mki, priv->mki_size);
+    }
   return 0;
 }
 
@@ -673,6 +680,13 @@ _gnutls_srtp_unpack (gnutls_buffer_st * ps,
       BUFFER_POP_NUM (ps, priv->profiles[i]);
     }
   BUFFER_POP_NUM (ps, priv->selected_profile);
+
+  BUFFER_POP_NUM (ps, priv->mki_received);
+  if (priv->mki_received)
+    {
+      BUFFER_POP_NUM (ps, priv->mki_size);
+      BUFFER_POP (ps, priv->mki, priv->mki_size);
+    }
 
   epriv.ptr = priv;
   *_priv = epriv;

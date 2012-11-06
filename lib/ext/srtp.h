@@ -33,6 +33,7 @@ typedef struct
   gnutls_srtp_profile_t selected_profile;
   uint8_t mki[256];
   unsigned mki_size;
+  unsigned int mki_received;
 } srtp_ext_st;
 
 extern extension_entry_st ext_mod_srtp;
