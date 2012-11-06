@@ -1114,7 +1114,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
     *output |= GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE;
     
   if (gnutls_x509_crl_get_next_update (crl) < now)
-    *output |= GNUTLS_CERT_REVOCATION_DATA_TOO_OLD;
+    *output |= GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED;
 
 
 cleanup:

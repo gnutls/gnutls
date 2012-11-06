@@ -148,6 +148,10 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
       goto cleanup;
     }
   
+  /* Report but do not fail on the following errors. That is
+   * because including the OCSP response in the handshake shouldn't 
+   * cause more problems that not including it.
+   */
   if (ntime == -1)
     {
       if (now - vtime > MAX_OCSP_VALIDITY_SECS)
@@ -161,8 +165,6 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
       if (ntime < now)
         {
           _gnutls_audit_log(session, "There is a newer OCSP response but was not provided by the server\n");
-         if (now-ntime > MAX_OCSP_VALIDITY_SECS)
-           *ostatus |= GNUTLS_CERT_REVOCATION_DATA_TOO_OLD;
         }
     }
   

@@ -944,8 +944,8 @@ gnutls_certificate_verification_status_print (unsigned int status,
       if (status & GNUTLS_CERT_REVOKED)
         _gnutls_buffer_append_str (&str, _("The certificate chain revoked. "));
 
-      if (status & GNUTLS_CERT_REVOCATION_DATA_TOO_OLD)
-         _gnutls_buffer_append_str (&str, _("The revocation data are too old. "));
+      if (status & GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED)
+         _gnutls_buffer_append_str (&str, _("The revocation data are old and have been superseded. "));
 
       if (status & GNUTLS_CERT_REVOCATION_DATA_INVALID)
          _gnutls_buffer_append_str (&str, _("The revocation data are invalid. "));
