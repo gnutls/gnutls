@@ -8,23 +8,20 @@ See the end for copying conditions.
 the available revocation data validity.
 
 ** libgnutls: Added gnutls_certificate_verification_status_print(),
-a function to print the verification status code in human
-readable text.
+a function to print the verification status code in human readable text.
 
 ** libgnutls: Added priority string %VERIFY_DISABLE_CRL_CHECKS.
 
 ** libgnutls: Simplified certificate verification by adding
 gnutls_certificate_verify_peers3().
 
-** libgnutls: Added support for extension to establish keys
-for SRTP.
+** libgnutls: Added support for extension to establish keys for SRTP.
 
 ** libgnutls: The X.509 verification functions check the key
 usage bits and pathlen constraints and on failure output 
 GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE.
 
-** libgnutls: gnutls_x509_crl_verify() includes the time
-checks.
+** libgnutls: gnutls_x509_crl_verify() includes the time checks.
 
 ** libgnutls: Added verification flag GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN
 and made GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN the default.
