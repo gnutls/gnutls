@@ -87,6 +87,7 @@ acceptable.  The framework is illustrated on @ref{fig:x509}.
 * X.509 certificate structure::
 * Importing an X.509 certificate::
 * X.509 distinguished names::
+* X.509 public and private keys::
 * Verifying X.509 certificate paths::
 * Verifying a certificate in the context of TLS session::
 @end menu
@@ -239,6 +240,21 @@ Similar functions exist to access the distinguished name
 of the issuer of the certificate.
 
 @showfuncD{gnutls_x509_crt_get_issuer_dn,gnutls_x509_crt_get_issuer_dn_by_oid,gnutls_x509_crt_get_issuer_dn_oid,gnutls_x509_crt_get_issuer}
+
+@node X.509 public and private keys
+@subsection Accessing public and private keys
+
+Each X.509 certificate contains a public key that corresponds to a private key. To
+get a unique identifier of the public key the @funcref{gnutls_x509_crt_get_key_id}
+function is provided. To export the public key or its parameters you may need
+to convert the X.509 structure to a @code{gnutls_pubkey_t}. See 
+@ref{Abstract public keys} for more information.
+
+@showfuncdesc{gnutls_x509_crt_get_key_id}
+
+The private key parameters may be directly accessed by using one of the following functions.
+
+@showfuncE{gnutls_x509_privkey_get_pk_algorithm2,gnutls_x509_privkey_export_rsa_raw2,gnutls_x509_privkey_export_ecc_raw,gnutls_x509_privkey_export_dsa_raw,gnutls_x509_privkey_get_key_id}
 
 @node Verifying X.509 certificate paths
 @subsection Verifying @acronym{X.509} certificate paths
