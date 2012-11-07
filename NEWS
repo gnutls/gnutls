@@ -26,6 +26,9 @@ GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE.
 ** libgnutls: Added verification flag GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN
 and made GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN the default.
 
+** libgnutls: Always tolerate key usage violation errors from the side
+of the peer, but also notify via an audit message.
+
 ** gnutls-cli: Added --local-dns option.
 
 ** danetool: Corrected bug that prevented loading PEM files.

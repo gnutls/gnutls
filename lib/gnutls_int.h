@@ -605,7 +605,6 @@ struct gnutls_priority_st
   safe_renegotiation_t sr;
   unsigned int ssl3_record_version:1;
   unsigned int server_precedence:1;
-  unsigned int allow_key_usage_violation:1;
   unsigned int allow_weak_keys:1;
   /* Whether stateless compression will be used */
   unsigned int stateless_compression:1;
@@ -615,7 +614,6 @@ struct gnutls_priority_st
 #define ENABLE_COMPAT(x) \
               (x)->no_padding = 1; \
               (x)->allow_large_records = 1; \
-              (x)->allow_key_usage_violation = 1; \
               (x)->allow_weak_keys = 1
 
 /* DH and RSA parameters types.
