@@ -116,7 +116,7 @@ noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS = 
 libcmd_cli_la_SOURCES = cli-args.def cli-args.c cli-args.h
 
-gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c \
+gnutls_cli_debug_SOURCES = cli-debug.c tests.h tests.c \
 		socket.c socket.h common.h common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la 
 gnutls_cli_debug_LDADD += ../gl/libgnu.la

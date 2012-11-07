@@ -33,6 +33,7 @@
 #endif
 #include <tests.h>
 #include <common.h>
+#include <ctype.h>
 #include <cli-debug-args.h>
 #include <socket.h>
 
@@ -275,9 +276,15 @@ main (int argc, char **argv)
               continue;
             }
         }
-      ERR (err, "connect") gnutls_init (&state, GNUTLS_CLIENT|GNUTLS_NO_EXTENSIONS);
+      ERR (err, "connect");
+
+      gnutls_init (&state, GNUTLS_CLIENT|GNUTLS_NO_EXTENSIONS);
+
       gnutls_transport_set_ptr (state, (gnutls_transport_ptr_t)
                                 gl_fd_to_handle (sd));
+      if (hostname && !isdigit(hostname[0]) && strchr(hostname, ':') == 0)
+        gnutls_server_name_set (state, GNUTLS_NAME_DNS, hostname,
+                                strlen (hostname));
 
       do
         {
