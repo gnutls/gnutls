@@ -221,10 +221,7 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
         if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
           {
             gnutls_assert ();
-            if (session->internals.priorities.allow_key_usage_violation == 0)
-              return GNUTLS_E_KEY_USAGE_VIOLATION;
-            else
-              _gnutls_audit_log(session, "Key usage violation was detected (ignored).\n");
+            _gnutls_audit_log(session, "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
           }
 
       /* External signing. Deprecated. To be removed. */
@@ -296,10 +293,7 @@ verify_tls_hash (gnutls_session_t session, gnutls_protocol_t ver, gnutls_pcert_s
     if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
       {
         gnutls_assert ();
-        if (session->internals.priorities.allow_key_usage_violation == 0)
-          return GNUTLS_E_KEY_USAGE_VIOLATION;
-        else
-          _gnutls_audit_log(session, "Key usage violation was detected (ignored).\n");
+        _gnutls_audit_log(session, "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
       }
 
   if (pk_algo == GNUTLS_PK_UNKNOWN)
