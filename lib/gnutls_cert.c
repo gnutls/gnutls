@@ -947,9 +947,6 @@ gnutls_certificate_verification_status_print (unsigned int status,
       if (status & GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED)
          _gnutls_buffer_append_str (&str, _("The revocation data are old and have been superseded. "));
 
-      if (status & GNUTLS_CERT_REVOCATION_DATA_INVALID)
-         _gnutls_buffer_append_str (&str, _("The revocation data are invalid. "));
-
       if (status & GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE)
          _gnutls_buffer_append_str (&str, _("The revocation data are issued with a future date. "));
 

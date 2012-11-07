@@ -447,7 +447,6 @@ extern "C"
  *   should not be trusted.
  * @GNUTLS_CERT_NOT_ACTIVATED: The certificate is not yet activated.
  * @GNUTLS_CERT_EXPIRED: The certificate has expired.
- * @GNUTLS_CERT_REVOCATION_DATA_INVALID: The OCSP revocation data are invalid.
  * @GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED: The revocation data are old and have been superseded.
  * @GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE: The revocation data have a future issue date.
  * @GNUTLS_CERT_UNEXPECTED_OWNER: The owner is not the expected one.
@@ -467,7 +466,6 @@ extern "C"
     GNUTLS_CERT_EXPIRED = 1<<10,
     GNUTLS_CERT_SIGNATURE_FAILURE = 1<<11,
     GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED = 1<<12,
-    GNUTLS_CERT_REVOCATION_DATA_INVALID = 1<<13,
     GNUTLS_CERT_UNEXPECTED_OWNER = 1<<14,
     GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE = 1<<15,
     GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE = 1<<16,

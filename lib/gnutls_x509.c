@@ -112,12 +112,19 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
 
   ret = gnutls_ocsp_resp_import (resp, data);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      _gnutls_audit_log (session, "There was an error parsing the OCSP response: %s.\n", gnutls_strerror(ret));
+      ret = gnutls_assert_val(0);
+      check_failed = 1;
+      goto cleanup;
+    }
   
   ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
   if (ret < 0)
     {
-      _gnutls_audit_log (session, "Got OCSP response on an unrelated certificate.\n");
+      ret = gnutls_assert_val(0);
+      _gnutls_audit_log (session, "Got OCSP response with an unrelated certificate.\n");
+      check_failed = 1;
       goto cleanup;
     }
 
@@ -129,6 +136,7 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
   if (status != 0)
     {
       ret = gnutls_assert_val(0);
+      check_failed = 1;
       goto cleanup;
     }
 
@@ -136,8 +144,9 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
         &cert_status, &vtime, &ntime, &rtime, NULL);
   if (ret < 0)
     {
+      _gnutls_audit_log (session, "There was an error parsing the OCSP response: %s.\n", gnutls_strerror(ret));
       ret = gnutls_assert_val(0);
-      *ostatus |= GNUTLS_CERT_REVOCATION_DATA_INVALID;
+      check_failed = 1;
       goto cleanup;
     }
   
@@ -159,6 +168,7 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
         {
           _gnutls_audit_log(session, "The OCSP response is old\n");
           check_failed = 1;
+          goto cleanup;
         }
     }
   else
@@ -168,14 +178,15 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
         {
           _gnutls_audit_log(session, "There is a newer OCSP response but was not provided by the server\n");
           check_failed = 1;
+          goto cleanup;
         }
     }
   
+  ret = 0;
+cleanup:
   if (check_failed == 0)
     session->internals.ocsp_check_ok = 1;
 
-  ret = 0;
-cleanup:
   gnutls_ocsp_resp_deinit (resp);
   
   return ret;
