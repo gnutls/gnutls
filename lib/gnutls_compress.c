@@ -353,7 +353,6 @@ _gnutls_compress (comp_hd_st *handle, const uint8_t * plain,
         
         if (stateless)
           {
-fprintf(stderr, "FULL FLUSH\n");
             type = Z_FULL_FLUSH;
           }
         else
