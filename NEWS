@@ -2,12 +2,12 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.26 (unreleased)
+* Version 3.0.26 (released 2012-11-09)
 
 ** libgnutls: Always tolerate key usage violation errors from the side
 of the peer, but also notify via an audit message.
 
-** libgnutls: gnutls_x509_crl_verify() includes the time checks.
+** libgnutls: gnutls_x509_crl_verify() includes time checks.
 
 ** libgnutls: Increased maximum password length in the PKCS #12
 functions.
