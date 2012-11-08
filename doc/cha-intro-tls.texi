@@ -371,7 +371,7 @@ established keys, meaning the server needs to store the state of established
 connections (unless session tickets are used -- @ref{Session tickets}).
 
 Session resumption is an integral part of @acronym{GnuTLS}, and 
-@ref{Session resumption} and @ref{ex:resume-client} illustrate typical 
+@ref{Session resumption}, @ref{ex:resume-client} illustrate typical 
 uses of it.
 
 @node TLS Extensions
