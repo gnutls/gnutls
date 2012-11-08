@@ -857,7 +857,7 @@ sub dump_function {
 sub dump_enum {
     my $prototype = shift @_;
 
-    if (($prototype =~ m/^\s*typedef\s+enum\s*[a-zA-Z0-9_~:]*\s*\{([a-zA-Z0-9_~=,:\s]+)\s*\}\s*([a-zA-Z0-9_]+);.*/)) {
+    if (($prototype =~ m/^\s*typedef\s+enum\s*[a-zA-Z0-9_~:]*\s*\{([\-a-zA-Z0-9_~=,:\s\(\)\<]+)\s*\}\s*([a-zA-Z0-9_]+);.*/)) {
 #        || $prototype =~ m/^\s*enum\s+([a-zA-Z0-9_~:]+).*/) {
         $args = $1;
 	$name = $2;

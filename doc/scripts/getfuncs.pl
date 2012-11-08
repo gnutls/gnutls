@@ -42,7 +42,7 @@ while ($line=<STDIN>) {
         $func = $1;
     }
     
-    if ($func ne '' && $func =~ m/gnutls_.*/) {
+    if ($func ne '' && ($func =~ m/gnutls_.*/ || $func =~ m/dane_.*/)) {
       print $func . "\n";
     }
   }
