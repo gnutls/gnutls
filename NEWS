@@ -11,6 +11,8 @@ Minimum libtasn1 dependency is now 2.14.
 ** libgnutls: Always tolerate key usage violation errors from the side
 of the peer, but also notify via an audit message.
 
+** minitasn1: Upgraded to libtasn1 version 3.0.
+
 ** API and ABI modifications:
 No changes since last version.
 
