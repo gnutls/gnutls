@@ -51,6 +51,12 @@ while ($line = <>) {
     $line = "\@subheading $1\n";
   }
 
+  if ($line =~ /\@cindex\s(.*)/) {
+    if ($line !~ /help/) {
+      next;
+    }
+  }
+
   print $line;
   $i++;
 }
