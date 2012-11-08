@@ -892,8 +892,13 @@ doit (void)
 
       if (verify_status != chains[i].expected_verify_result)
         {
-          fail ("chain[%s]: verify_status: %d expected: %d\n", chains[i].name,
-                verify_status, chains[i].expected_verify_result);
+          gnutls_datum_t out1, out2;
+          gnutls_certificate_verification_status_print(verify_status, GNUTLS_CRT_X509, &out1, 0);
+          gnutls_certificate_verification_status_print(chains[i].expected_verify_result, GNUTLS_CRT_X509, &out2, 0);
+          fail ("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name,
+                verify_status, out1.data, chains[i].expected_verify_result, out2.data);
+          gnutls_free(out1.data);
+          gnutls_free(out2.data);
 
 #if 0
           j = 0;

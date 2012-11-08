@@ -1420,7 +1420,7 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
             name = _("unknown");
           addf (str, _("\tSignature Algorithm: %s\n"), name);
         }
-      if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
+      if (gnutls_sign_is_secure(err) == 0)
         {
           adds (str, _("warning: signed using a broken signature "
                        "algorithm that can be forged.\n"));
@@ -1608,7 +1608,7 @@ print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
         const char *name = gnutls_sign_algorithm_get_name (err);
         if (name == NULL)
           name = _("unknown");
-        if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
+        if (gnutls_sign_is_secure(err) == 0)
           addf (str, _("signed using %s (broken!), "), name);
         else
           addf (str, _("signed using %s, "), name);
@@ -2037,7 +2037,7 @@ print_crl (gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
             name = _("unknown");
           addf (str, _("\tSignature Algorithm: %s\n"), name);
         }
-      if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
+      if (gnutls_sign_is_secure(err) == 0)
         {
           adds (str, _("warning: signed using a broken signature "
                        "algorithm that can be forged.\n"));

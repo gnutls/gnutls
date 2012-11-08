@@ -700,7 +700,7 @@ FILE* fd = NULL;
 int ret;
 char local_file[MAX_FILENAME];
 
-  if (hash_algo == GNUTLS_DIG_MD5 || hash_algo == GNUTLS_DIG_MD2)
+  if (_gnutls_digest_is_secure(hash_algo) == 0)
     return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
     
   if (_gnutls_hash_get_algo_len(hash_algo) != hash->size)

@@ -387,6 +387,16 @@ check_time (gnutls_x509_crt_t crt, time_t now)
   return 0;
 }
 
+static
+int is_broken_allowed( gnutls_sign_algorithm_t sig, unsigned int flags)
+{
+  if ((sig == GNUTLS_SIGN_RSA_MD2) && (flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2))
+    return 1;
+  if ((sig == GNUTLS_SIGN_RSA_MD5) && (flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5))
+    return 1;
+  return 0;
+}
+
 /* 
  * Verifies the given certificate again a certificate list of
  * trusted CAs.
@@ -538,10 +548,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
 
       sigalg = gnutls_x509_crt_get_signature_algorithm (cert);
 
-      if (((sigalg == GNUTLS_SIGN_RSA_MD2) &&
-           !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2)) ||
-          ((sigalg == GNUTLS_SIGN_RSA_MD5) &&
-           !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5)))
+      if (gnutls_sign_is_secure(sigalg) == 0 && is_broken_allowed(sigalg, flags) == 0)
         {
           out = GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
           if (output)
