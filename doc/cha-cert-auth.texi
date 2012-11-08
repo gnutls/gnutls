@@ -498,7 +498,9 @@ provide an alternative public key infrastructure to the commercial CAs that
 are typically used to sign TLS certificates. The DANE protocol takes advantage
 of the DNSSEC infrastructure to verify TLS certificates. This can be 
 in addition to the verification by CA infrastructure or 
-could even replace it where DNSSEC is deployed.
+may even replace it where DNSSEC is fully deployed. Note however, that DNSSEC deployment is
+fairly new and it would be better to use it as an additional verification
+method rather than the only one.
 
 The DANE functionality is provided by the @code{libgnutls-dane} library that is shipped
 with GnuTLS and the function prototypes are in @code{gnutls/dane.h}. 
