@@ -222,10 +222,7 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
         if (!(cert->key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
           {
             gnutls_assert ();
-            if (session->internals.priorities.allow_key_usage_violation == 0)
-              return GNUTLS_E_KEY_USAGE_VIOLATION;
-            else
-              _gnutls_debug_log("Key usage violation was detected (ignored).\n");
+            _gnutls_debug_log("Key usage violation was detected (ignored).\n");
           }
 
       /* External signing. */
@@ -295,10 +292,7 @@ verify_tls_hash (gnutls_session_t session, gnutls_protocol_t ver, gnutls_cert * 
     if (!(cert->key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
       {
         gnutls_assert ();
-        if (session->internals.priorities.allow_key_usage_violation == 0)
-          return GNUTLS_E_KEY_USAGE_VIOLATION;
-        else
-          _gnutls_debug_log("Key usage violation was detected (ignored).\n");
+        _gnutls_debug_log("Key usage violation was detected (ignored).\n");
       }
 
   if (pk_algo == GNUTLS_PK_UNKNOWN)

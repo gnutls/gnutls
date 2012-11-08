@@ -8,8 +8,8 @@ Version 2.12.21 (unreleased)
 ** libgnutls: Backported patch to compile with libtasn1 3.0.
 Minimum libtasn1 dependency is now 2.14.
 
-** libgnutls: The %COMPAT keyword, if specified, will tolerate
-key usage violation errors (they are far too common to ignore).
+** libgnutls: Always tolerate key usage violation errors from the side
+of the peer, but also notify via an audit message.
 
 ** API and ABI modifications:
 No changes since last version.

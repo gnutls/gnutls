@@ -729,7 +729,6 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
             {
               (*priority_cache)->no_padding = 1;
               (*priority_cache)->allow_large_records = 1;
-              (*priority_cache)->allow_key_usage_violation = 1;
             }
           else if (strcasecmp (&broken_list[i][1],
                                "VERIFY_ALLOW_SIGN_RSA_MD5") == 0)
