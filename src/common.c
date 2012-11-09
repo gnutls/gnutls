@@ -340,7 +340,7 @@ cert_verify (gnutls_session_t session, const char* hostname)
           return 0;
       }
 
-    printf ("- %s\n", out.data);
+    printf ("- Status: %s\n", out.data);
     
     gnutls_free(out.data);
 
