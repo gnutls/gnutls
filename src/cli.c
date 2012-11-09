@@ -72,7 +72,6 @@ int resume, starttls, insecure, rehandshake, udp, mtu;
 const char *hostname = NULL;
 const char *service = NULL;
 int record_max_size;
-int status_request_ocsp;
 int fingerprint;
 int crlf;
 unsigned int verbose = 0;
@@ -416,7 +415,7 @@ cert_verify_callback (gnutls_session_t session)
           if (!insecure && !ssh)
             return -1;
         }
-      else if (ENABLED_OPT(OCSP))
+      else if (ENABLED_OPT(OCSP) && gnutls_ocsp_status_request_is_checked(session, 0) == 0)
         { /* off-line verification succeeded. Try OCSP */
           rc = cert_verify_ocsp(session);
           if (rc == 0)
@@ -1146,9 +1145,6 @@ const char* rest = NULL;
     }
 
   record_max_size = OPT_VALUE_RECORDSIZE;
-  status_request_ocsp = ENABLED_OPT(OCSP_STATUS_REQUEST);
-  if (ENABLED_OPT(OCSP))
-    status_request_ocsp = 1;
   
   fingerprint = HAVE_OPT(FINGERPRINT);
 
