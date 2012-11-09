@@ -83,6 +83,9 @@ DTLS/TLS heartbeat implementation.
 Ilya Tumaykin *itumaykin [at] gmail.com*
 Elliptic curve support improvements (wmNAF implementation and others).
 
+Martin Storjo *martin [at] martin.st*
+DTLS-SRTP support.
+
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright

@@ -16,6 +16,7 @@ a function to print the verification status code in human readable text.
 gnutls_certificate_verify_peers3().
 
 ** libgnutls: Added support for extension to establish keys for SRTP.
+Contributed by Martin Storsjo.
 
 ** libgnutls: The X.509 verification functions check the key
 usage bits and pathlen constraints and on failure output 
@@ -40,7 +41,7 @@ a site's DANE data.
 
 ** API and ABI modifications:
 gnutls_session_get_id2: Added
-+gnutls_sign_is_secure: Added
+gnutls_sign_is_secure: Added
 gnutls_certificate_verify_peers3: Added
 gnutls_ocsp_status_request_is_checked: Added
 gnutls_certificate_verification_status_print: Added
