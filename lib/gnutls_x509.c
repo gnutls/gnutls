@@ -102,7 +102,7 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
   int ret;
   unsigned int status, cert_status;
   time_t rtime, vtime, ntime, now;
-  int check_failed;
+  int check_failed = 0;
   
   now = gnutls_time(0);
 
@@ -130,7 +130,12 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
 
   ret = gnutls_ocsp_resp_verify_direct( resp, issuer, &status, 0);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      ret = gnutls_assert_val(0);
+      gnutls_assert();
+      check_failed = 1;
+      goto cleanup;
+    }
 
   /* do not consider revocation data if response was not verified */
   if (status != 0)
@@ -153,6 +158,7 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
   if (cert_status == GNUTLS_OCSP_CERT_REVOKED)
     {
       _gnutls_audit_log(session, "The certificate was revoked via OCSP\n");
+      check_failed = 1;
       *ostatus |= GNUTLS_CERT_REVOKED;
       ret = gnutls_assert_val(0);
       goto cleanup;
@@ -181,7 +187,7 @@ check_ocsp_response (gnutls_session_t session, gnutls_x509_crt_t cert,
           goto cleanup;
         }
     }
-  
+
   ret = 0;
 cleanup:
   if (check_failed == 0)
