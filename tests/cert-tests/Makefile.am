@@ -25,6 +25,10 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 
 dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane
 
-TESTS = pathlen aki template-test pem-decoding dane
+TESTS = pathlen aki template-test pem-decoding
+
+if ENABLE_DANE
+TESTS += dane
+endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
