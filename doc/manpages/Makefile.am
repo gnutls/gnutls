@@ -19,6 +19,8 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+EXTRA_DIST = stamp_mans
+
 dist_man_MANS = gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
 	certtool.1 psktool.1 p11tool.1 ocsptool.1 tpmtool.1
 

@@ -25,7 +25,7 @@ set -e
 srcdir=${srcdir:-.}
 DANETOOL=${DANETOOL:-../../src/danetool$EXEEXT}
 
-$DANETOOL --tlsa-rr --load-certificate $srcdir/../certs/cert-ecc256.pem --host www.example.com --outfile tmp-dane.rr 2>/dev/null
+$DANETOOL --tlsa-rr --load-certificate $srcdir/cert-ecc256.pem --host www.example.com --outfile tmp-dane.rr 2>/dev/null
 
 diff $srcdir/dane-test.rr tmp-dane.rr
 rc=$?

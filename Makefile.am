@@ -50,3 +50,4 @@ dist-hook:
 		mv -f *.1 ../doc/manpages/; \
 	done
 	sed 's/\@\@VERSION\@\@/$(VERSION)/g' -i $(distdir)/doc/invoke-*.texi
+	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf
