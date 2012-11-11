@@ -52,6 +52,9 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
   
   gnutls_free(out.data);
 
+  if (status != 0) /* Certificate is not trusted */
+      return GNUTLS_E_CERTIFICATE_ERROR;
+
   /* Do SSH verification */
   cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
   if (cert_list == NULL)
