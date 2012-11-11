@@ -2705,6 +2705,7 @@ void
 pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
 {
   gnutls_pubkey_t pubkey;
+  gnutls_privkey_t privkey;
   int ret;
   size_t size;
 
@@ -2723,14 +2724,25 @@ pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
     {
       ret = gnutls_pubkey_import_x509 (pubkey, crt, 0);
       if (ret < 0)
-        {
-          error (EXIT_FAILURE, 0, "pubkey_import_x509: %s",
-                 gnutls_strerror (ret));
-        }
+        error (EXIT_FAILURE, 0, "pubkey_import_x509: %s",
+               gnutls_strerror (ret));
     }
   else
     {
-      pubkey = load_pubkey (1, cinfo);
+      privkey = load_private_key (0, cinfo);
+      
+      if (privkey != NULL)
+        {
+          ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "pubkey_import_privkey: %s",
+                   gnutls_strerror (ret));
+        }
+      else
+        {
+          gnutls_pubkey_deinit(pubkey);
+          pubkey = load_pubkey (1, cinfo);
+        }
     }
 
   if (outcert_format == GNUTLS_X509_FMT_DER)

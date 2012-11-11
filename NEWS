@@ -2,6 +2,16 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.5 (unreleased)
+
+** certtool: The --pubkey-info option can be combined with the
+--load-privkey in order to print the corresponding public key of a private 
+key.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.4 (released 2012-11-10)
 
 ** libgnutls: gnutls_certificate_verify_peers2() will set flags depending on
