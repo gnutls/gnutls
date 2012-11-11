@@ -63,11 +63,11 @@ AC_DEFUN([xgl_INIT],
   m4_pushdef([xgl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl'
-gl_MD5
-gl_LD_OUTPUT_DEF
-gl_LD_VERSION_SCRIPT
-gl_MEMXOR
-gl_STDALIGN_H
+  gl_MD5
+  gl_LD_OUTPUT_DEF
+  gl_LD_VERSION_SCRIPT
+  gl_MEMXOR
+  gl_STDALIGN_H
   # End of code from modules
   m4_ifval(xgl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([xgl_LIBSOURCES_DIR])[ ||

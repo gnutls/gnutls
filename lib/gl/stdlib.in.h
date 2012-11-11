@@ -87,11 +87,19 @@ struct random_data
 #endif
 
 #if (@GNULIB_MKSTEMP@ || @GNULIB_MKSTEMPS@ || @GNULIB_GETSUBOPT@ || defined GNULIB_POSIXCHECK) && ! defined __GLIBC__ && !((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__)
-/* On MacOS X 10.3, only <unistd.h> declares mkstemp.  */
-/* On MacOS X 10.5, only <unistd.h> declares mkstemps.  */
+/* On Mac OS X 10.3, only <unistd.h> declares mkstemp.  */
+/* On Mac OS X 10.5, only <unistd.h> declares mkstemps.  */
 /* On Cygwin 1.7.1, only <unistd.h> declares getsubopt.  */
 /* But avoid namespace pollution on glibc systems and native Windows.  */
 # include <unistd.h>
+#endif
+
+/* The __attribute__ feature is available in gcc versions 2.5 and later.
+   The attribute __pure__ was added in gcc 2.96.  */
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 96)
+# define _GL_ATTRIBUTE_PURE __attribute__ ((__pure__))
+#else
+# define _GL_ATTRIBUTE_PURE /* empty */
 #endif
 
 /* The definition of _Noreturn is copied here.  */
@@ -138,7 +146,9 @@ _GL_WARN_ON_USE (_Exit, "_Exit is unportable - "
 /* Parse a signed decimal integer.
    Returns the value of the integer.  Errors are not detected.  */
 # if !@HAVE_ATOLL@
-_GL_FUNCDECL_SYS (atoll, long long, (const char *string) _GL_ARG_NONNULL ((1)));
+_GL_FUNCDECL_SYS (atoll, long long, (const char *string)
+                                    _GL_ATTRIBUTE_PURE
+                                    _GL_ARG_NONNULL ((1)));
 # endif
 _GL_CXXALIAS_SYS (atoll, long long, (const char *string));
 _GL_CXXALIASWARN (atoll);
@@ -447,10 +457,19 @@ _GL_WARN_ON_USE (posix_openpt, "posix_openpt is not portable - "
 #if @GNULIB_PTSNAME@
 /* Return the pathname of the pseudo-terminal slave associated with
    the master FD is open on, or NULL on errors.  */
-# if !@HAVE_PTSNAME@
+# if @REPLACE_PTSNAME@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef ptsname
+#   define ptsname rpl_ptsname
+#  endif
+_GL_FUNCDECL_RPL (ptsname, char *, (int fd));
+_GL_CXXALIAS_RPL (ptsname, char *, (int fd));
+# else
+#  if !@HAVE_PTSNAME@
 _GL_FUNCDECL_SYS (ptsname, char *, (int fd));
-# endif
+#  endif
 _GL_CXXALIAS_SYS (ptsname, char *, (int fd));
+# endif
 _GL_CXXALIASWARN (ptsname);
 #elif defined GNULIB_POSIXCHECK
 # undef ptsname

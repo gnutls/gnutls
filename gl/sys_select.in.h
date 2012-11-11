@@ -63,7 +63,7 @@
 
 /* On OSF/1 4.0, <sys/select.h> provides only a forward declaration
    of 'struct timeval', and no definition of this type.
-   Also, MacOS X, AIX, HP-UX, IRIX, Solaris, Interix declare select()
+   Also, Mac OS X, AIX, HP-UX, IRIX, Solaris, Interix declare select()
    in <sys/time.h>.
    But avoid namespace pollution on glibc systems.  */
 # ifndef __GLIBC__
@@ -130,7 +130,7 @@
 
 /* Re-define FD_ISSET to avoid a WSA call while we are not using
    network sockets.  */
-static inline int
+static int
 rpl_fd_isset (SOCKET fd, fd_set * set)
 {
   u_int i;

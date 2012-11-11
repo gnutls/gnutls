@@ -207,6 +207,14 @@ else
   fi
 fi
 
+# If this is bash, turn off all aliases.
+test -n "$BASH_VERSION" && unalias -a
+
+# Note that when supporting $EXEEXT (transparently mapping from PROG_NAME to
+# PROG_NAME.exe), we want to support hyphen-containing names like test-acos.
+# That is part of the shell-selection test above.  Why use aliases rather
+# than functions?  Because support for hyphen-containing aliases is more
+# widespread than that for hyphen-containing function names.
 test -n "$EXEEXT" && shopt -s expand_aliases
 
 # Enable glibc's malloc-perturbing option.
@@ -403,8 +411,7 @@ path_prepend_ ()
     case $path_dir_ in
       '') fail_ "invalid path dir: '$1'";;
       /*) abs_path_dir_=$path_dir_;;
-      *) abs_path_dir_=`cd "$initial_cwd_/$path_dir_" && echo "$PWD"` \
-           || fail_ "invalid path dir: $path_dir_";;
+      *) abs_path_dir_=$initial_cwd_/$path_dir_;;
     esac
     case $abs_path_dir_ in
       *:*) fail_ "invalid path dir: '$abs_path_dir_'";;
@@ -440,7 +447,7 @@ setup_ ()
   pfx_=`testdir_prefix_`
   test_dir_=`mktempd_ "$initial_cwd_" "$pfx_-$ME_.XXXX"` \
     || fail_ "failed to create temporary directory in $initial_cwd_"
-  cd "$test_dir_"
+  cd "$test_dir_" || fail_ "failed to cd to temporary directory"
 
   # As autoconf-generated configure scripts do, ensure that IFS
   # is defined initially, so that saving and restoring $IFS works.

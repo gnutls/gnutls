@@ -175,6 +175,15 @@ EXTRA_libgnu_la_SOURCES += connect.c
 
 ## end   gnulib module connect
 
+## begin gnulib module dup2
+
+
+EXTRA_DIST += dup2.c
+
+EXTRA_libgnu_la_SOURCES += dup2.c
+
+## end   gnulib module dup2
+
 ## begin gnulib module errno
 
 BUILT_SOURCES += $(ERRNO_H)
@@ -370,7 +379,7 @@ EXTRA_libgnu_la_SOURCES += gettimeofday.c
 
 distclean-local: clean-GNUmakefile
 clean-GNUmakefile:
-	test x'$(VPATH)' != x && rm -f $(top_builddir)/GNUmakefile || :
+	test '$(srcdir)' = . || rm -f $(top_builddir)/GNUmakefile
 
 EXTRA_DIST += $(top_srcdir)/GNUmakefile
 
@@ -992,7 +1001,6 @@ stdio.h: stdio.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) 
 	      -e 's/@''GNULIB_GETCHAR''@/$(GNULIB_GETCHAR)/g' \
 	      -e 's/@''GNULIB_GETDELIM''@/$(GNULIB_GETDELIM)/g' \
 	      -e 's/@''GNULIB_GETLINE''@/$(GNULIB_GETLINE)/g' \
-	      -e 's/@''GNULIB_GETS''@/$(GNULIB_GETS)/g' \
 	      -e 's/@''GNULIB_OBSTACK_PRINTF''@/$(GNULIB_OBSTACK_PRINTF)/g' \
 	      -e 's/@''GNULIB_OBSTACK_PRINTF_POSIX''@/$(GNULIB_OBSTACK_PRINTF_POSIX)/g' \
 	      -e 's/@''GNULIB_PCLOSE''@/$(GNULIB_PCLOSE)/g' \
@@ -1162,6 +1170,7 @@ stdlib.h: stdlib.in.h $(top_builddir)/config.status $(CXXDEFS_H) \
 	      -e 's|@''REPLACE_MALLOC''@|$(REPLACE_MALLOC)|g' \
 	      -e 's|@''REPLACE_MBTOWC''@|$(REPLACE_MBTOWC)|g' \
 	      -e 's|@''REPLACE_MKSTEMP''@|$(REPLACE_MKSTEMP)|g' \
+	      -e 's|@''REPLACE_PTSNAME''@|$(REPLACE_PTSNAME)|g' \
 	      -e 's|@''REPLACE_PTSNAME_R''@|$(REPLACE_PTSNAME_R)|g' \
 	      -e 's|@''REPLACE_PUTENV''@|$(REPLACE_PUTENV)|g' \
 	      -e 's|@''REPLACE_RANDOM_R''@|$(REPLACE_RANDOM_R)|g' \
@@ -1410,6 +1419,7 @@ sys/stat.h: sys_stat.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNU
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
 	      -e 's|@''NEXT_SYS_STAT_H''@|$(NEXT_SYS_STAT_H)|g' \
+	      -e 's|@''WINDOWS_64_BIT_ST_SIZE''@|$(WINDOWS_64_BIT_ST_SIZE)|g' \
 	      -e 's/@''GNULIB_FCHMODAT''@/$(GNULIB_FCHMODAT)/g' \
 	      -e 's/@''GNULIB_FSTAT''@/$(GNULIB_FSTAT)/g' \
 	      -e 's/@''GNULIB_FSTATAT''@/$(GNULIB_FSTATAT)/g' \
@@ -1505,6 +1515,7 @@ sys/types.h: sys_types.in.h $(top_builddir)/config.status
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
 	      -e 's|@''NEXT_SYS_TYPES_H''@|$(NEXT_SYS_TYPES_H)|g' \
+	      -e 's|@''WINDOWS_64_BIT_OFF_T''@|$(WINDOWS_64_BIT_OFF_T)|g' \
 	      < $(srcdir)/sys_types.in.h; \
 	} > $@-t && \
 	mv $@-t $@
@@ -1592,6 +1603,7 @@ EXTRA_DIST += time.in.h
 
 ## begin gnulib module timespec
 
+libgnu_la_SOURCES += timespec.c
 
 EXTRA_DIST += timespec.h
 
@@ -1612,6 +1624,7 @@ unistd.h: unistd.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
 	      -e 's|@''NEXT_UNISTD_H''@|$(NEXT_UNISTD_H)|g' \
+	      -e 's|@''WINDOWS_64_BIT_OFF_T''@|$(WINDOWS_64_BIT_OFF_T)|g' \
 	      -e 's/@''GNULIB_CHDIR''@/$(GNULIB_CHDIR)/g' \
 	      -e 's/@''GNULIB_CHOWN''@/$(GNULIB_CHOWN)/g' \
 	      -e 's/@''GNULIB_CLOSE''@/$(GNULIB_CLOSE)/g' \
@@ -1710,6 +1723,7 @@ unistd.h: unistd.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 	      -e 's|@''REPLACE_DUP''@|$(REPLACE_DUP)|g' \
 	      -e 's|@''REPLACE_DUP2''@|$(REPLACE_DUP2)|g' \
 	      -e 's|@''REPLACE_FCHOWNAT''@|$(REPLACE_FCHOWNAT)|g' \
+	      -e 's|@''REPLACE_FTRUNCATE''@|$(REPLACE_FTRUNCATE)|g' \
 	      -e 's|@''REPLACE_GETCWD''@|$(REPLACE_GETCWD)|g' \
 	      -e 's|@''REPLACE_GETDOMAINNAME''@|$(REPLACE_GETDOMAINNAME)|g' \
 	      -e 's|@''REPLACE_GETLOGIN_R''@|$(REPLACE_GETLOGIN_R)|g' \
@@ -1917,7 +1931,7 @@ EXTRA_DIST += wchar.in.h
 
 ## begin gnulib module xsize
 
-libgnu_la_SOURCES += xsize.h
+libgnu_la_SOURCES += xsize.h xsize.c
 
 ## end   gnulib module xsize
 

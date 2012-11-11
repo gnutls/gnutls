@@ -50,6 +50,7 @@ AC_DEFUN([lgl_EARLY],
   # Code from module errno-tests:
   # Code from module extensions:
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  # Code from module extern-inline:
   # Code from module fcntl-h:
   # Code from module fcntl-h-tests:
   # Code from module fd-hook:
@@ -81,6 +82,7 @@ AC_DEFUN([lgl_EARLY],
   # Code from module getpagesize:
   # Code from module gettext:
   # Code from module gettext-h:
+  # Code from module hash-pjw-bare:
   # Code from module havelib:
   # Code from module include_next:
   # Code from module intprops:
@@ -179,144 +181,148 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([lgl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl'
-gl_FUNC_ALLOCA
-gl_BYTESWAP
-gl_HEADER_ERRNO_H
-gl_FLOAT_H
-if test $REPLACE_FLOAT_LDBL = 1; then
-  AC_LIBOBJ([float])
-fi
-if test $REPLACE_ITOLD = 1; then
-  AC_LIBOBJ([itold])
-fi
-gl_FUNC_FSEEK
-if test $REPLACE_FSEEK = 1; then
-  AC_LIBOBJ([fseek])
-fi
-gl_STDIO_MODULE_INDICATOR([fseek])
-gl_FUNC_FSEEKO
-if test $HAVE_FSEEKO = 0 || test $REPLACE_FSEEKO = 1; then
-  AC_LIBOBJ([fseeko])
-fi
-gl_STDIO_MODULE_INDICATOR([fseeko])
-gl_FUNC_FSTAT
-if test $REPLACE_FSTAT = 1; then
-  AC_LIBOBJ([fstat])
-  gl_PREREQ_FSTAT
-fi
-gl_SYS_STAT_MODULE_INDICATOR([fstat])
-gl_FUNC_FTELL
-if test $REPLACE_FTELL = 1; then
-  AC_LIBOBJ([ftell])
-fi
-gl_STDIO_MODULE_INDICATOR([ftell])
-gl_FUNC_FTELLO
-if test $HAVE_FTELLO = 0 || test $REPLACE_FTELLO = 1; then
-  AC_LIBOBJ([ftello])
-fi
-gl_STDIO_MODULE_INDICATOR([ftello])
-gl_FUNC
-dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
-AM_GNU_GETTEXT_VERSION([0.18.1])
-AC_SUBST([LIBINTL])
-AC_SUBST([LTLIBINTL])
-gl_LD_OUTPUT_DEF
-gl_LD_VERSION_SCRIPT
-gl_FUNC_LSEEK
-if test $REPLACE_LSEEK = 1; then
-  AC_LIBOBJ([lseek])
-fi
-gl_UNISTD_MODULE_INDICATOR([lseek])
-gl_FUNC_MALLOC_POSIX
-if test $REPLACE_MALLOC = 1; then
-  AC_LIBOBJ([malloc])
-fi
-gl_STDLIB_MODULE_INDICATOR([malloc-posix])
-gl_FUNC_MEMCHR
-if test $HAVE_MEMCHR = 0 || test $REPLACE_MEMCHR = 1; then
-  AC_LIBOBJ([memchr])
-  gl_PREREQ_MEMCHR
-fi
-gl_STRING_MODULE_INDICATOR([memchr])
-gl_FUNC_MEMMEM_SIMPLE
-if test $HAVE_MEMMEM = 0 || test $REPLACE_MEMMEM = 1; then
-  AC_LIBOBJ([memmem])
-fi
-gl_STRING_MODULE_INDICATOR([memmem])
-gl_MINMAX
-gl_MSVC_INVAL
-if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
-  AC_LIBOBJ([msvc-inval])
-fi
-gl_MSVC_NOTHROW
-if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
-  AC_LIBOBJ([msvc-nothrow])
-fi
-gl_MULTIARCH
-gl_HEADER_NETDB
-gl_PREREQ_READ_FILE
-gl_FUNC_REALLOC_POSIX
-if test $REPLACE_REALLOC = 1; then
-  AC_LIBOBJ([realloc])
-fi
-gl_STDLIB_MODULE_INDICATOR([realloc-posix])
-gl_SIZE_MAX
-gl_FUNC_SNPRINTF
-gl_STDIO_MODULE_INDICATOR([snprintf])
-gl_MODULE_INDICATOR([snprintf])
-gl_SOCKETLIB
-gl_SOCKETS
-gl_TYPE_SOCKLEN_T
-gt_TYPE_SSIZE_T
-gl_STDALIGN_H
-AM_STDBOOL_H
-gl_STDDEF_H
-gl_STDINT_H
-gl_STDIO_H
-gl_STDLIB_H
-gl_STRCASE
-if test $HAVE_STRCASECMP = 0; then
-  AC_LIBOBJ([strcasecmp])
-  gl_PREREQ_STRCASECMP
-fi
-if test $HAVE_STRNCASECMP = 0; then
-  AC_LIBOBJ([strncasecmp])
-  gl_PREREQ_STRNCASECMP
-fi
-gl_HEADER_STRING_H
-gl_HEADER_STRINGS_H
-gl_FUNC_STRVERSCMP
-if test $HAVE_STRVERSCMP = 0; then
-  AC_LIBOBJ([strverscmp])
-  gl_PREREQ_STRVERSCMP
-fi
-gl_STRING_MODULE_INDICATOR([strverscmp])
-gl_HEADER_SYS_SOCKET
-AC_PROG_MKDIR_P
-gl_HEADER_SYS_STAT_H
-AC_PROG_MKDIR_P
-gl_SYS_TYPES_H
-AC_PROG_MKDIR_P
-gl_HEADER_SYS_UIO
-AC_PROG_MKDIR_P
-gl_HEADER_TIME_H
-gl_TIME_R
-if test $HAVE_LOCALTIME_R = 0 || test $REPLACE_LOCALTIME_R = 1; then
-  AC_LIBOBJ([time_r])
-  gl_PREREQ_TIME_R
-fi
-gl_TIME_MODULE_INDICATOR([time_r])
-gl_UNISTD_H
-gl_FUNC_VASNPRINTF
-gl_FUNC_VASPRINTF
-gl_STDIO_MODULE_INDICATOR([vasprintf])
-m4_ifdef([AM_XGETTEXT_OPTION],
-  [AM_][XGETTEXT_OPTION([--flag=asprintf:2:c-format])
-   AM_][XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
-gl_FUNC_VSNPRINTF
-gl_STDIO_MODULE_INDICATOR([vsnprintf])
-gl_WCHAR_H
-gl_XSIZE
+  gl_FUNC_ALLOCA
+  gl_BYTESWAP
+  gl_HEADER_ERRNO_H
+  AC_REQUIRE([gl_EXTERN_INLINE])
+  gl_FLOAT_H
+  if test $REPLACE_FLOAT_LDBL = 1; then
+    AC_LIBOBJ([float])
+  fi
+  if test $REPLACE_ITOLD = 1; then
+    AC_LIBOBJ([itold])
+  fi
+  gl_FUNC_FSEEK
+  if test $REPLACE_FSEEK = 1; then
+    AC_LIBOBJ([fseek])
+  fi
+  gl_STDIO_MODULE_INDICATOR([fseek])
+  gl_FUNC_FSEEKO
+  if test $HAVE_FSEEKO = 0 || test $REPLACE_FSEEKO = 1; then
+    AC_LIBOBJ([fseeko])
+    gl_PREREQ_FSEEKO
+  fi
+  gl_STDIO_MODULE_INDICATOR([fseeko])
+  gl_FUNC_FSTAT
+  if test $REPLACE_FSTAT = 1; then
+    AC_LIBOBJ([fstat])
+    gl_PREREQ_FSTAT
+  fi
+  gl_SYS_STAT_MODULE_INDICATOR([fstat])
+  gl_FUNC_FTELL
+  if test $REPLACE_FTELL = 1; then
+    AC_LIBOBJ([ftell])
+  fi
+  gl_STDIO_MODULE_INDICATOR([ftell])
+  gl_FUNC_FTELLO
+  if test $HAVE_FTELLO = 0 || test $REPLACE_FTELLO = 1; then
+    AC_LIBOBJ([ftello])
+    gl_PREREQ_FTELLO
+  fi
+  gl_STDIO_MODULE_INDICATOR([ftello])
+  gl_FUNC
+  dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
+  AM_GNU_GETTEXT_VERSION([0.18.1])
+  AC_SUBST([LIBINTL])
+  AC_SUBST([LTLIBINTL])
+  AC_REQUIRE([gl_LARGEFILE])
+  gl_LD_OUTPUT_DEF
+  gl_LD_VERSION_SCRIPT
+  gl_FUNC_LSEEK
+  if test $REPLACE_LSEEK = 1; then
+    AC_LIBOBJ([lseek])
+  fi
+  gl_UNISTD_MODULE_INDICATOR([lseek])
+  gl_FUNC_MALLOC_POSIX
+  if test $REPLACE_MALLOC = 1; then
+    AC_LIBOBJ([malloc])
+  fi
+  gl_STDLIB_MODULE_INDICATOR([malloc-posix])
+  gl_FUNC_MEMCHR
+  if test $HAVE_MEMCHR = 0 || test $REPLACE_MEMCHR = 1; then
+    AC_LIBOBJ([memchr])
+    gl_PREREQ_MEMCHR
+  fi
+  gl_STRING_MODULE_INDICATOR([memchr])
+  gl_FUNC_MEMMEM_SIMPLE
+  if test $HAVE_MEMMEM = 0 || test $REPLACE_MEMMEM = 1; then
+    AC_LIBOBJ([memmem])
+  fi
+  gl_STRING_MODULE_INDICATOR([memmem])
+  gl_MINMAX
+  gl_MSVC_INVAL
+  if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
+    AC_LIBOBJ([msvc-inval])
+  fi
+  gl_MSVC_NOTHROW
+  if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
+    AC_LIBOBJ([msvc-nothrow])
+  fi
+  gl_MULTIARCH
+  gl_HEADER_NETDB
+  gl_PREREQ_READ_FILE
+  gl_FUNC_REALLOC_POSIX
+  if test $REPLACE_REALLOC = 1; then
+    AC_LIBOBJ([realloc])
+  fi
+  gl_STDLIB_MODULE_INDICATOR([realloc-posix])
+  gl_SIZE_MAX
+  gl_FUNC_SNPRINTF
+  gl_STDIO_MODULE_INDICATOR([snprintf])
+  gl_MODULE_INDICATOR([snprintf])
+  gl_SOCKETLIB
+  gl_SOCKETS
+  gl_TYPE_SOCKLEN_T
+  gt_TYPE_SSIZE_T
+  gl_STDALIGN_H
+  AM_STDBOOL_H
+  gl_STDDEF_H
+  gl_STDINT_H
+  gl_STDIO_H
+  gl_STDLIB_H
+  gl_STRCASE
+  if test $HAVE_STRCASECMP = 0; then
+    AC_LIBOBJ([strcasecmp])
+    gl_PREREQ_STRCASECMP
+  fi
+  if test $HAVE_STRNCASECMP = 0; then
+    AC_LIBOBJ([strncasecmp])
+    gl_PREREQ_STRNCASECMP
+  fi
+  gl_HEADER_STRING_H
+  gl_HEADER_STRINGS_H
+  gl_FUNC_STRVERSCMP
+  if test $HAVE_STRVERSCMP = 0; then
+    AC_LIBOBJ([strverscmp])
+    gl_PREREQ_STRVERSCMP
+  fi
+  gl_STRING_MODULE_INDICATOR([strverscmp])
+  gl_HEADER_SYS_SOCKET
+  AC_PROG_MKDIR_P
+  gl_HEADER_SYS_STAT_H
+  AC_PROG_MKDIR_P
+  gl_SYS_TYPES_H
+  AC_PROG_MKDIR_P
+  gl_HEADER_SYS_UIO
+  AC_PROG_MKDIR_P
+  gl_HEADER_TIME_H
+  gl_TIME_R
+  if test $HAVE_LOCALTIME_R = 0 || test $REPLACE_LOCALTIME_R = 1; then
+    AC_LIBOBJ([time_r])
+    gl_PREREQ_TIME_R
+  fi
+  gl_TIME_MODULE_INDICATOR([time_r])
+  gl_UNISTD_H
+  gl_FUNC_VASNPRINTF
+  gl_FUNC_VASPRINTF
+  gl_STDIO_MODULE_INDICATOR([vasprintf])
+  m4_ifdef([AM_XGETTEXT_OPTION],
+    [AM_][XGETTEXT_OPTION([--flag=asprintf:2:c-format])
+     AM_][XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
+  gl_FUNC_VSNPRINTF
+  gl_STDIO_MODULE_INDICATOR([vsnprintf])
+  gl_WCHAR_H
+  gl_XSIZE
   # End of code from modules
   m4_ifval(lgl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([lgl_LIBSOURCES_DIR])[ ||
@@ -363,31 +369,31 @@ changequote([, ])dnl
   AC_SUBST([lgltests_WITNESS])
   gl_module_indicator_condition=$lgltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
-gl_FCNTL_H
-gl_FUNC_FDOPEN
-if test $REPLACE_FDOPEN = 1; then
-  AC_LIBOBJ([fdopen])
-  gl_PREREQ_FDOPEN
-fi
-gl_STDIO_MODULE_INDICATOR([fdopen])
-gl_FUNC_UNGETC_WORKS
-gl_FUNC_UNGETC_WORKS
-gl_FUNC_UNGETC_WORKS
-gl_FUNC_UNGETC_WORKS
-gl_FUNC_GETPAGESIZE
-if test $REPLACE_GETPAGESIZE = 1; then
-  AC_LIBOBJ([getpagesize])
-fi
-gl_UNISTD_MODULE_INDICATOR([getpagesize])
-gl_INTTYPES_H
-gl_INTTYPES_INCOMPLETE
-dnl Check for prerequisites for memory fence checks.
-gl_FUNC_MMAP_ANON
-AC_CHECK_HEADERS_ONCE([sys/mman.h])
-AC_CHECK_FUNCS_ONCE([mprotect])
-gt_TYPE_WCHAR_T
-gt_TYPE_WINT_T
-AC_CHECK_FUNCS_ONCE([shutdown])
+  gl_FCNTL_H
+  gl_FUNC_FDOPEN
+  if test $REPLACE_FDOPEN = 1; then
+    AC_LIBOBJ([fdopen])
+    gl_PREREQ_FDOPEN
+  fi
+  gl_STDIO_MODULE_INDICATOR([fdopen])
+  gl_FUNC_UNGETC_WORKS
+  gl_FUNC_UNGETC_WORKS
+  gl_FUNC_UNGETC_WORKS
+  gl_FUNC_UNGETC_WORKS
+  gl_FUNC_GETPAGESIZE
+  if test $REPLACE_GETPAGESIZE = 1; then
+    AC_LIBOBJ([getpagesize])
+  fi
+  gl_UNISTD_MODULE_INDICATOR([getpagesize])
+  gl_INTTYPES_H
+  gl_INTTYPES_INCOMPLETE
+  dnl Check for prerequisites for memory fence checks.
+  gl_FUNC_MMAP_ANON
+  AC_CHECK_HEADERS_ONCE([sys/mman.h])
+  AC_CHECK_FUNCS_ONCE([mprotect])
+  gt_TYPE_WCHAR_T
+  gt_TYPE_WINT_T
+  AC_CHECK_FUNCS_ONCE([shutdown])
   m4_popdef([gl_MODULE_INDICATOR_CONDITION])
   m4_ifval(lgltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([lgltests_LIBSOURCES_DIR])[ ||
@@ -503,6 +509,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/ftell.c
   lib/ftello.c
   lib/gettext.h
+  lib/hash-pjw-bare.c
+  lib/hash-pjw-bare.h
   lib/itold.c
   lib/lseek.c
   lib/malloc.c
@@ -553,6 +561,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vsnprintf.c
   lib/w32sock.h
   lib/wchar.in.h
+  lib/xsize.c
   lib/xsize.h
   m4/00gnulib.m4
   m4/alloca.m4
@@ -561,6 +570,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/errno_h.m4
   m4/exponentd.m4
   m4/extensions.m4
+  m4/extern-inline.m4
   m4/fcntl-o.m4
   m4/fcntl_h.m4
   m4/fdopen.m4
@@ -609,6 +619,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/multiarch.m4
   m4/netdb_h.m4
   m4/nls.m4
+  m4/off_t.m4
   m4/po.m4
   m4/printf-posix.m4
   m4/printf.m4
@@ -721,8 +732,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-vsnprintf.c
   tests/test-wchar.c
   tests/zerosize-ptr.h
+  tests=lib/binary-io.c
   tests=lib/binary-io.h
-  tests=lib/dummy.c
   tests=lib/fcntl.in.h
   tests=lib/fdopen.c
   tests=lib/fpucw.h

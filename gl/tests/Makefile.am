@@ -86,7 +86,7 @@ EXTRA_DIST += test-arpa_inet.c
 
 ## begin gnulib module binary-io
 
-libtests_a_SOURCES += binary-io.h
+libtests_a_SOURCES += binary-io.h binary-io.c
 
 ## end   gnulib module binary-io
 
@@ -140,15 +140,6 @@ EXTRA_DIST += test-connect.c signature.h macros.h
 EXTRA_DIST += dosname.h
 
 ## end   gnulib module dosname
-
-## begin gnulib module dup2
-
-
-EXTRA_DIST += dup2.c
-
-EXTRA_libtests_a_SOURCES += dup2.c
-
-## end   gnulib module dup2
 
 ## begin gnulib module dup2-tests
 

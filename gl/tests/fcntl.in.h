@@ -25,6 +25,8 @@
 #if defined __need_system_fcntl_h
 /* Special invocation convention.  */
 
+/* Needed before <sys/stat.h>.
+   May also define off_t to a 64-bit type on native Windows.  */
 #include <sys/types.h>
 /* On some systems other than glibc, <sys/stat.h> is a prerequisite of
    <fcntl.h>.  On glibc systems, we would like to avoid namespace pollution.
@@ -42,6 +44,8 @@
 
 #ifndef _@GUARD_PREFIX@_FCNTL_H
 
+/* Needed before <sys/stat.h>.
+   May also define off_t to a 64-bit type on native Windows.  */
 #include <sys/types.h>
 /* On some systems other than glibc, <sys/stat.h> is a prerequisite of
    <fcntl.h>.  On glibc systems, we would like to avoid namespace pollution.
@@ -212,6 +216,10 @@ _GL_WARN_ON_USE (openat, "openat is not portable - "
 # define O_EXEC O_RDONLY /* This is often close enough in older systems.  */
 #endif
 
+#ifndef O_IGNORE_CTTY
+# define O_IGNORE_CTTY 0
+#endif
+
 #ifndef O_NDELAY
 # define O_NDELAY 0
 #endif
@@ -245,8 +253,16 @@ _GL_WARN_ON_USE (openat, "openat is not portable - "
 # define O_NOFOLLOW 0
 #endif
 
+#ifndef O_NOLINK
+# define O_NOLINK 0
+#endif
+
 #ifndef O_NOLINKS
 # define O_NOLINKS 0
+#endif
+
+#ifndef O_NOTRANS
+# define O_NOTRANS 0
 #endif
 
 #ifndef O_RSYNC
@@ -265,7 +281,7 @@ _GL_WARN_ON_USE (openat, "openat is not portable - "
 # define O_TTY_INIT 0
 #endif
 
-#if O_ACCMODE != (O_RDONLY | O_WRONLY | O_RDWR | O_EXEC | O_SEARCH)
+#if ~O_ACCMODE & (O_RDONLY | O_WRONLY | O_RDWR | O_EXEC | O_SEARCH)
 # undef O_ACCMODE
 # define O_ACCMODE (O_RDONLY | O_WRONLY | O_RDWR | O_EXEC | O_SEARCH)
 #endif

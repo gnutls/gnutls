@@ -69,7 +69,7 @@ EXTRA_DIST += test-alloca-opt.c
 
 ## begin gnulib module binary-io
 
-libtests_a_SOURCES += binary-io.h
+libtests_a_SOURCES += binary-io.h binary-io.c
 
 ## end   gnulib module binary-io
 
@@ -635,12 +635,6 @@ check_PROGRAMS += test-wchar
 EXTRA_DIST += test-wchar.c
 
 ## end   gnulib module wchar-tests
-
-## begin gnulib module dummy
-
-libtests_a_SOURCES += dummy.c
-
-## end   gnulib module dummy
 
 # Clean up after Solaris cc.
 clean-local:

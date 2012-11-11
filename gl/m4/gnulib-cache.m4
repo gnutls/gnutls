@@ -84,5 +84,5 @@ gl_MAKEFILE_NAME([])
 gl_LIBTOOL
 gl_MACRO_PREFIX([gl])
 gl_PO_DOMAIN([])
-gl_WITNESS_C_DOMAIN([])
+gl_WITNESS_C_MACRO([])
 gl_VC_FILES([false])
