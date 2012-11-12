@@ -113,7 +113,7 @@ generate_private_key_int (common_info_st * cinfo)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
 
-  bits = get_bits (key_type, cinfo->bits, cinfo->sec_param);
+  bits = get_bits (key_type, cinfo->bits, cinfo->sec_param, 1);
 
   fprintf (stderr, "Generating a %d bit %s private key...\n",
            bits, gnutls_pk_algorithm_get_name (key_type));

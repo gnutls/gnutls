@@ -577,7 +577,6 @@ pkcs11_generate (FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
     }
   
   fwrite (pubkey.data, 1, pubkey.size, outfile);
-  fputs ("\n", outfile);
   gnutls_free(pubkey.data);
 
   return;

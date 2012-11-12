@@ -551,7 +551,7 @@ int ret;
 }
 
 int
-get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_sec_param)
+get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_sec_param, int warn)
 {
   int bits;
 
@@ -559,7 +559,7 @@ get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_sec_pa
     {
       static int warned = 0;
 
-      if (warned == 0)
+      if (warned == 0 && warn != 0)
         {
           warned = 1;
           fprintf (stderr,

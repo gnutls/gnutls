@@ -241,21 +241,21 @@ cmd_parser (int argc, char **argv)
   else if (HAVE_OPT(GENERATE_ECC))
     {
       key_type = GNUTLS_PK_EC;
-      pkcs11_generate (outfile, url, key_type, get_bits(key_type, bits, sec_param), 
+      pkcs11_generate (outfile, url, key_type, get_bits(key_type, bits, sec_param, 0), 
                        label, ENABLED_OPT(PRIVATE), detailed_url, login, 
                        &cinfo);
     }
   else if (HAVE_OPT(GENERATE_RSA))
     {
       key_type = GNUTLS_PK_RSA;
-      pkcs11_generate (outfile, url, key_type, get_bits(key_type, bits, sec_param), 
+      pkcs11_generate (outfile, url, key_type, get_bits(key_type, bits, sec_param, 0), 
                        label, ENABLED_OPT(PRIVATE), detailed_url, login, 
                        &cinfo);
     }
   else if (HAVE_OPT(GENERATE_DSA))
     {
       key_type = GNUTLS_PK_DSA;
-      pkcs11_generate (outfile, url, key_type, get_bits(key_type, bits, sec_param), 
+      pkcs11_generate (outfile, url, key_type, get_bits(key_type, bits, sec_param, 0), 
                        label, ENABLED_OPT(PRIVATE), detailed_url, login, 
                        &cinfo);
     }

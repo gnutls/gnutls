@@ -137,7 +137,7 @@ generate_prime (int how, common_info_st * info)
   int ret;
   gnutls_dh_params_t dh_params;
   gnutls_datum_t p, g;
-  int bits = get_bits (GNUTLS_PK_DH, info->bits, info->sec_param);
+  int bits = get_bits (GNUTLS_PK_DH, info->bits, info->sec_param, 1);
   unsigned int q_bits = 0;
 
   gnutls_dh_params_init (&dh_params);

@@ -68,7 +68,8 @@ gnutls_datum_t *load_secret_key (int mand, common_info_st * info);
 gnutls_pubkey_t load_pubkey (int mand, common_info_st * info);
 gnutls_x509_crt_t *load_cert_list (int mand, size_t * size,
                                    common_info_st * info);
-int get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_sec_param);
+int get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_sec_param, int warn);
+
 gnutls_sec_param_t str_to_sec_param (const char *str);
 
 /* prime.c */

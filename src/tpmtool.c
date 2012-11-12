@@ -162,7 +162,7 @@ cmd_parser (int argc, char **argv)
   if (HAVE_OPT(GENERATE_RSA))
     {
       key_type = GNUTLS_PK_RSA;
-      bits = get_bits (key_type, bits, sec_param);
+      bits = get_bits (key_type, bits, sec_param, 0);
       tpm_generate (outfile, key_type, bits, genflags);
     }
   else if (HAVE_OPT(PUBKEY))
