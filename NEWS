@@ -8,8 +8,11 @@ See the end for copying conditions.
 --load-privkey in order to print the corresponding public key of a private 
 key.
 
+** Added PKCS #11 key generation function that returns the public key
+on generation.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_privkey_generate2: Added
 
 
 * Version 3.1.4 (released 2012-11-10)
