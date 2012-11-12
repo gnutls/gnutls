@@ -113,12 +113,6 @@ int pkcs11_token_matches_info (struct p11_kit_uri *info,
                                struct ck_token_info *tinfo,
                                struct ck_info *lib_info);
 
-/* flags are SESSION_* */
-int pkcs11_find_object (struct pkcs11_session_info* sinfo,
-                        struct pin_info_st* pin_info,
-                        ck_object_handle_t * _obj,
-                        struct p11_kit_uri *info, unsigned int flags);
-
 unsigned int pkcs11_obj_flags_to_int (unsigned int flags);
 
 int

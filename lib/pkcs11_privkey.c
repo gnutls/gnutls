@@ -128,12 +128,56 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
   return pkcs11_get_info (pkey->info, itype, output, output_size);
 }
 
+static int
+find_object (struct pkcs11_session_info* sinfo,
+                    struct pin_info_st * pin_info,
+                    ck_object_handle_t * _obj,
+                    struct p11_kit_uri *info, unsigned int flags)
+{
+  int ret;
+  ck_object_handle_t obj;
+  struct ck_attribute *attrs;
+  unsigned long attr_count;
+  unsigned long count;
+  ck_rv_t rv;
+
+  ret = pkcs11_open_session (sinfo, pin_info, info, flags & SESSION_LOGIN);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  attrs = p11_kit_uri_get_attributes (info, &attr_count);
+  rv = pkcs11_find_objects_init (sinfo->module, sinfo->pks, attrs, attr_count);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("pk11: FindObjectsInit failed.\n");
+      ret = pkcs11_rv_to_err (rv);
+      goto fail;
+    }
+
+  if (pkcs11_find_objects (sinfo->module, sinfo->pks, &obj, 1, &count) == CKR_OK && count == 1)
+    {
+      *_obj = obj;
+      pkcs11_find_objects_final (sinfo);
+      return 0;
+    }
+
+  ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  pkcs11_find_objects_final (sinfo);
+fail:
+  pkcs11_close_session (sinfo);
+
+  return ret;
+}
 
 #define FIND_OBJECT(sinfo, pin_info, obj, key) \
 	do { \
 		int retries = 0; \
 		int rret; \
-		ret = pkcs11_find_object (sinfo, pin_info, &obj, key->info, \
+		ret = find_object (sinfo, pin_info, &obj, key->info, \
 		                          SESSION_LOGIN); \
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) { \
 			if (_gnutls_token_func) \
@@ -701,7 +745,6 @@ gnutls_pkcs11_privkey_generate2 (const char* url, gnutls_pk_algorithm_t pk,
   /* extract the public key */
   if (pubkey)
     {
-      
       ret = gnutls_pubkey_init(&pkey);
       if (ret < 0)
         {
