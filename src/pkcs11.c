@@ -573,6 +573,10 @@ pkcs11_generate (FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
     {
       fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
                gnutls_strerror (ret));
+      if (login == 0)
+        fprintf(stderr, "Note that --login was not specified and it may be required for generation.\n");
+      else if (bits != 1024)
+        fprintf (stderr, "Note that several smart cards do not support arbitrary size keys.\nTry --bits 1024 or 2048.\n");
       exit(1);
     }
   
