@@ -113,17 +113,9 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
 
   /* give some initial value to avoid asking for the pkcs11 pin twice.
    */
-  crt_list_size = 128;
-  crt_list = malloc (sizeof (*crt_list) * crt_list_size);
-  if (crt_list == NULL)
-    {
-      fprintf (stderr, "Memory error\n");
-      exit (1);
-    }
-
-  ret = gnutls_pkcs11_obj_list_import_url (crt_list, &crt_list_size, url,
+  ret = gnutls_pkcs11_obj_list_import_url2 (&crt_list, &crt_list_size, url,
                                            attrs, obj_flags);
-  if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+  if (ret < 0)
     {
       fprintf (stderr, "Error in crt_list_import (1): %s\n",
                gnutls_strerror (ret));
@@ -134,26 +126,6 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
     {
       fprintf (stderr, "No matching objects found\n");
       exit (0);
-    }
-
-  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      crt_list = realloc (crt_list, sizeof (*crt_list) * crt_list_size);
-      if (crt_list == NULL)
-        {
-          fprintf (stderr, "Memory error\n");
-          exit (1);
-        }
-
-      ret =
-        gnutls_pkcs11_obj_list_import_url (crt_list, &crt_list_size, url,
-                                           attrs, obj_flags);
-      if (ret < 0)
-        {
-          fprintf (stderr, "Error in crt_list_import: %s\n",
-                   gnutls_strerror (ret));
-          exit (1);
-        }
     }
 
   for (i = 0; i < crt_list_size; i++)
