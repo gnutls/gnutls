@@ -1491,7 +1491,6 @@ find_obj_url (struct pkcs11_session_info *sinfo,
 
   while (pkcs11_find_objects (sinfo->module, sinfo->pks, &obj, 1, &count) == CKR_OK && count == 1)
     {
-
       a[0].type = CKA_VALUE;
       a[0].value = cert_data;
       a[0].value_len = MAX_CERT_SIZE;
@@ -2260,6 +2259,16 @@ find_objs (struct pkcs11_session_info* sinfo,
           gnutls_assert ();
           return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
         }
+    }
+
+  /* Find objects with given class and type */
+  attr = p11_kit_uri_get_attribute (find_data->info, CKA_CLASS);
+  if (attr)
+    {
+      if(attr->value && attr->value_len == sizeof (ck_object_class_t))
+        class = *((ck_object_class_t*)attr->value);
+      if (class == CKO_CERTIFICATE)
+        type = CKC_X_509;
     }
 
   cert_data = gnutls_malloc (MAX_CERT_SIZE);
