@@ -78,6 +78,10 @@ int
 pkcs11_find_slot (struct ck_function_list ** module, ck_slot_id_t * slot,
                   struct p11_kit_uri *info, struct token_info *_tinfo);
 
+int pkcs11_read_pubkey(struct ck_function_list *module,
+                              ck_session_handle_t pks, ck_object_handle_t obj,
+                              ck_key_type_t key_type, gnutls_datum_t * pubkey);
+
 int pkcs11_get_info (struct p11_kit_uri *info,
                      gnutls_pkcs11_obj_info_t itype, void *output,
                      size_t * output_size);

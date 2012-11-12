@@ -552,6 +552,7 @@ pkcs11_generate (FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 {
   int ret;
   unsigned int flags = 0;
+  gnutls_datum_t pubkey;
 
   if (login)
     flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
@@ -566,13 +567,18 @@ pkcs11_generate (FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
   else if (private == 0)
     flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE;
 
-  ret = gnutls_pkcs11_privkey_generate(url, pk, bits, label, flags);
+  ret = gnutls_pkcs11_privkey_generate2(url, pk, bits, label, GNUTLS_X509_FMT_PEM,
+                                        &pubkey, flags);
   if (ret < 0)
     {
       fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
                gnutls_strerror (ret));
       exit(1);
     }
+  
+  fwrite (pubkey.data, 1, pubkey.size, outfile);
+  fputs ("\n", outfile);
+  gnutls_free(pubkey.data);
 
   return;
 }

@@ -501,6 +501,37 @@ gnutls_pkcs11_privkey_generate (const char* url, gnutls_pk_algorithm_t pk,
                                 unsigned int bits, const char* label, 
                                 unsigned int flags)
 {
+  return gnutls_pkcs11_privkey_generate2( url, pk, bits, label, 0, NULL, flags);
+}
+
+/**
+ * gnutls_pkcs11_privkey_generate2:
+ * @url: a token URL
+ * @pk: the public key algorithm
+ * @bits: the security bits
+ * @label: a label
+ * @fmt: the format of output params. PEM or DER.
+ * @pubkey: will hold the public key (may be %NULL)
+ * @flags: should be zero
+ *
+ * This function will generate a private key in the specified
+ * by the @url token. The private key will be generate within
+ * the token and will not be exportable. This function will
+ * store the DER-encoded public key in the SubjectPublicKeyInfo format 
+ * in @pubkey. The @pubkey should be deinitialized using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1
+ **/
+int
+gnutls_pkcs11_privkey_generate2 (const char* url, gnutls_pk_algorithm_t pk, 
+                                unsigned int bits, const char* label, 
+                                gnutls_x509_crt_fmt_t fmt, 
+                                gnutls_datum_t * pubkey,
+                                unsigned int flags)
+{
   int ret;
   const ck_bool_t tval = 1;
   const ck_bool_t fval = 0;
@@ -512,6 +543,8 @@ gnutls_pkcs11_privkey_generate (const char* url, gnutls_pk_algorithm_t pk,
   unsigned long _bits = bits;
   int a_val, p_val;
   struct ck_mechanism mech;
+  gnutls_pubkey_t pkey = NULL;
+  gnutls_pkcs11_obj_t obj = NULL;
 
   memset(&sinfo, 0, sizeof(sinfo));
 
@@ -664,9 +697,55 @@ gnutls_pkcs11_privkey_generate (const char* url, gnutls_pk_algorithm_t pk,
       ret = pkcs11_rv_to_err (rv);
       goto cleanup;
     }
+  
+  /* extract the public key */
+  if (pubkey)
+    {
+      
+      ret = gnutls_pubkey_init(&pkey);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
+
+      ret = gnutls_pkcs11_obj_init(&obj);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
+
+      obj->pk_algorithm = pk;
+      obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
+      ret = pkcs11_read_pubkey(sinfo.module, sinfo.pks, pub, mech.mechanism, obj->pubkey);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
+      
+      ret = gnutls_pubkey_import_pkcs11 (pkey, obj, 0);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
+
+      ret = gnutls_pubkey_export2 (pkey, fmt, pubkey);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
+    }
     
 
 cleanup:
+  if (obj != NULL)
+    gnutls_pkcs11_obj_deinit(obj);
+  if (pkey != NULL)
+    gnutls_pubkey_deinit(pkey);
   if (sinfo.pks != 0)
     pkcs11_close_session (&sinfo);
 

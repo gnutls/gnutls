@@ -1193,7 +1193,7 @@ pkcs11_obj_import (ck_object_class_t class, gnutls_pkcs11_obj_t obj,
   return 0;
 }
 
-static int read_pkcs11_pubkey(struct ck_function_list *module,
+int pkcs11_read_pubkey(struct ck_function_list *module,
                               ck_session_handle_t pks, ck_object_handle_t obj,
                               ck_key_type_t key_type, gnutls_datum_t * pubkey)
 {
@@ -1369,7 +1369,7 @@ pkcs11_obj_import_pubkey (struct ck_function_list *module,
     {
       crt->pk_algorithm = mech_to_pk(key_type);
 
-      ret = read_pkcs11_pubkey(module, pks, obj, key_type, crt->pubkey);
+      ret = pkcs11_read_pubkey(module, pks, obj, key_type, crt->pubkey);
       if (ret < 0)
         return gnutls_assert_val(ret);
     }
