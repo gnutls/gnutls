@@ -184,6 +184,7 @@ static void dane_check(const char* host, const char* proto, unsigned int port,
 dane_state_t s;
 dane_query_t q;
 int ret;
+unsigned entries;
 unsigned int flags = DANE_F_IGNORE_LOCAL_RESOLVER, i;
 unsigned int usage, type, match;
 gnutls_datum_t data, file;
@@ -192,7 +193,7 @@ size_t size;
   if (ENABLED_OPT(LOCAL_DNS))
     flags = 0;
 
-  printf("Querying on %s (%s:%d)...\n", host, proto, port);
+  printf("Querying %s (%s:%d)...\n", host, proto, port);
   ret = dane_state_init(&s, flags);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "dane_state_init: %s", dane_strerror (ret));
@@ -201,7 +202,8 @@ size_t size;
   if (ret < 0)
     error (EXIT_FAILURE, 0, "dane_query_tlsa: %s", dane_strerror (ret));
   
-  for (i=0;i<dane_query_entries(q);i++)
+  entries = dane_query_entries(q);
+  for (i=0;i<entries;i++)
     {
       ret = dane_query_data(q, i, &usage, &type, &match, &data);
       if (ret < 0)
@@ -213,13 +215,13 @@ size_t size;
       if (ret < 0)
         error (EXIT_FAILURE, 0, "gnutls_hex_encode: %s", dane_strerror (ret));
 
-      printf("\nEntry %d:\n", i+1);
-      fprintf(outfile, "_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n", port, proto, host, usage, type, match, buffer);
+      if (entries > 1) printf("\nEntry %d:\n", i+1);
 
-      printf("\nCertificate usage: %s\n", dane_cert_usage_name(usage));
-      printf("Certificate type: %s\n", dane_cert_type_name(type));
-      printf("Contents: %s\n", dane_match_type_name(match));
-      printf("Data: %s\n", buffer);
+      fprintf(outfile, "_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n", port, proto, host, usage, type, match, buffer);
+      printf("Certificate usage: %s (%.2x)\n", dane_cert_usage_name(usage), usage);
+      printf("Certificate type:  %s (%.2x)\n", dane_cert_type_name(type), type);
+      printf("Contents:          %s (%.2x)\n", dane_match_type_name(match), match);
+      printf("Data:              %s\n", buffer);
 
       /* Verify the DANE data */
       if (cinfo->cert)
