@@ -1846,7 +1846,7 @@ gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t res,
  * gnutls_certificate_verify_peers2().  This function may be called
  * multiple times.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: number of CRLs processed, or a negative error code on error.
  *
  * Since: 2.4.0
  **/
