@@ -89,11 +89,11 @@ _set_priority (priority_st * st, const int *list)
 inline static void
 _add_priority (priority_st * st, const int *list)
 {
-  int num = 0, i, j, init;
+  int num, i, j, init;
 
   init = i = st->algorithms;
 
-  while (list[num] != 0)
+  for (num=0;list[num]!=0;++num)
     {
       if (i+1 > MAX_ALGOS)
         {
@@ -104,14 +104,15 @@ _add_priority (priority_st * st, const int *list)
         {
           if (st->priority[j] == (unsigned)list[num])
             {
-              num++;
-              continue;
+              break;
             }
         }
 
-      st->priority[i++] = list[num];
-      st->algorithms++;
-      num++;
+      if (j == init)
+        {
+          st->priority[i++] = list[num];
+          st->algorithms++;
+        }
     }
     
   return;
