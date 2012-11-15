@@ -43,6 +43,7 @@ CXX_LDADD = ../../lib/libgnutlsxx.la \
 noinst_PROGRAMS = ex-client-resume ex-client-dtls
 noinst_PROGRAMS += ex-cert-select ex-client-x509
 noinst_PROGRAMS += ex-serv-dtls
+noinst_PROGRAMS += print-ciphersuites
 
 if ENABLE_CXX
 ex_cxx_SOURCES = ex-cxx.cpp
@@ -79,5 +80,4 @@ endif
 
 libexamples_la_SOURCES = examples.h ex-alert.c ex-pkcs12.c \
 	ex-session-info.c ex-x509-info.c ex-verify.c	\
-	tcp.c udp.c ex-pkcs11-list.c verify.c ex-verify-ssh.c \
-	print-ciphersuites.c
+	tcp.c udp.c ex-pkcs11-list.c verify.c ex-verify-ssh.c
