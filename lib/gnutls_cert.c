@@ -641,11 +641,11 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
  * @session: is a gnutls session
  * @status: is the output of the verification
  *
- * This function will verify the peer's certificate and return
- * its status (trusted, invalid etc.).  The value of @status will
- * be one or more of the gnutls_certificate_status_t flags
- * bitwise or'd or zero if the certificate is trusted. Note that verification 
- * failure does not imply a negative return value. Only the @status is updated.
+ * This function will verify the peer's certificate and store
+ * the status in the @status variable as a bitwise or'd gnutls_certificate_status_t
+ * values or zero if the certificate is trusted. Note that value in @status
+ * is set only when the return value of this function is success (i.e, failure 
+ * to trust a certificate does not imply a negative return value).
  *
  * If available the OCSP Certificate Status extension will be
  * utilized by this function.
@@ -696,11 +696,11 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
  * @hostname: is the expected name of the peer; may be %NULL
  * @status: is the output of the verification
  *
- * This function will verify the peer's certificate and its name and 
- * return its status (trusted, invalid etc.).  The value of @status will
- * be one or more of the gnutls_certificate_status_t flags
- * bitwise or'd or zero if the certificate is trusted. Note that verification 
- * failure does not imply a negative return value. Only the @status is updated.
+ * This function will verify the peer's certificate and store the
+ * status in the @status variable as a bitwise or'd gnutls_certificate_status_t
+ * values or zero if the certificate is trusted. Note that value in @status
+ * is set only when the return value of this function is success (i.e, failure 
+ * to trust a certificate does not imply a negative return value).
  *
  * If the @hostname provided is non-NULL then this function will compare
  * the hostname in the certificate against the given. If they do not match 
