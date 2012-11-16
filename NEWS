@@ -14,6 +14,9 @@ on generation.
 ** Corrected bug in priority string parsing, that mostly affected combined
 levels. Patch by Tim Kosse.
 
+** p11tool: After key generation, outputs the public key (useful in
+tokens that do not store the public key).
+
 ** API and ABI modifications:
 gnutls_pkcs11_privkey_generate2: Added
 
