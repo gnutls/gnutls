@@ -237,11 +237,18 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wconversion"             # Too many warnings for now
   nw="$nw -Wsign-conversion"        # Too many warnings for now
   nw="$nw -Wformat-y2k"             # Too many warnings for now
+  nw="$nw -Woverlength-strings"     # We use some in tests/
   nw="$nw -Wvla"                    # There is no point to avoid C99 variable length arrays
   nw="$nw -Wformat-nonliteral"      # Incompatible with gettext _()
   nw="$nw -Wunsafe-loop-optimizations"
   nw="$nw -Wstrict-overflow"
   nw="$nw -Wmissing-noreturn"
+  nw="$nw -Winline"                 # Too compiler dependent
+  nw="$nw -Wsuggest-attribute=pure" # Is it worth using attributes?
+  nw="$nw -Wsuggest-attribute=const" # Is it worth using attributes?
+  nw="$nw -Wsuggest-attribute=noreturn" # Is it worth using attributes?
+  nw="$nw -Wstack-protector"        # Some functions cannot be protected
+  nw="$nw -Wredundant-decls"        # Some files cannot be compiled with that (gl_fd_to_handle)
 
   gl_MANYWARN_ALL_GCC([ws])
   gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
