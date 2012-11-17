@@ -561,7 +561,7 @@ failover:
 /**
  * gnutls_x509_privkey_import2:
  * @key: The structure to store the parsed key
- * @data: The DER or PEM encoded certificate.
+ * @data: The DER or PEM encoded key.
  * @format: One of DER or PEM
  * @password: A password (optional)
  * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t

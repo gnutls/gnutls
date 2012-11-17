@@ -154,6 +154,7 @@ Documentation License''.
 * Hardware security modules and abstract key types::
 * How to use GnuTLS in applications::
 * GnuTLS application examples::
+* Using GnuTLS as a cryptographic library::
 * Other included programs::
 * Internal architecture of GnuTLS::
 * Upgrading from previous versions::
@@ -185,6 +186,8 @@ Documentation License''.
 @include cha-gtls-app.texi
 
 @include cha-gtls-examples.texi
+
+@include cha-crypto.texi
 
 @include cha-programs.texi
 

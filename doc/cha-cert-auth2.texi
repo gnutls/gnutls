@@ -306,20 +306,27 @@ whether the received OCSP response corresponds to the certificate being checked.
 @section Managing encrypted keys
 @cindex Encrypted keys
 
-Transferring or storing private keys in plain might not be a
-good idea. Any access on the keys becomes a fatal compromise.
+Transferring or storing private keys in plain may not be a
+good idea, since any compromise is irreparable.
 Storing the keys in hardware security modules (see @ref{Smart cards and HSMs})
 could solve the storage problem but it is not always practical
-or efficient enough. This section describes alternative ways
-that involve encryption of the private keys to store and
-transfer.
+or efficient enough. This section describes ways to store and
+transfer encrypted private keys.
 
-There are two alternatives to use for key encryption, 
-PKCS #8 and #12 methods of private key encryption. The PKCS #8
-method only allows encryption of the private key, whilst the
-PKCS #12 method allows in addition the bundling of other
-data into the structure. That could be bundling together the
-certificate as well as the trusted CA certificate.
+There are methods for key encryption, namely the
+PKCS #8, PKCS #12 and OpenSSL's custom encrypted private key formats. 
+The PKCS #8 and the OpenSSL's method allow encryption of the private key, 
+while the PKCS #12 method allows, in addition, the bundling of accompanying 
+data into the structure. That is typically the corresponding certificate, as 
+well as a trusted CA certificate.
+
+@subheading High level functionality
+Generic and higher level private key import functions are available, that
+will auto-detect the encrypted key format.
+
+@showfuncdesc{gnutls_x509_privkey_import2}
+
+@showfuncdesc{gnutls_privkey_import_x509_raw}
 
 @subheading @acronym{PKCS} #8 structures
 @cindex PKCS #8
@@ -367,7 +374,7 @@ of their usage is also shown.
 
 @verbatiminclude examples/ex-pkcs12.c
 
-@subheading Other structures
+@subheading OpenSSL encrypted keys
 @cindex OpenSSL encrypted keys
 Unfortunately the structures discussed in the previous sections are
 not the only structures that may hold an encrypted private key. For example
@@ -375,9 +382,6 @@ the OpenSSL library offers a custom key encryption method. Those structures
 are also supported in GnuTLS with @funcref{gnutls_x509_privkey_import_openssl}.
 
 @showfuncdesc{gnutls_x509_privkey_import_openssl}
-
-Generic and higher level private key import functions are also available.
-@showfuncB{gnutls_x509_privkey_import2,gnutls_privkey_import_x509_raw}
 
 @include invoke-certtool.texi
 

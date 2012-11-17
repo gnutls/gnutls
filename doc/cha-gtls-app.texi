@@ -11,9 +11,8 @@
 * Data transfer and termination::
 * Handling alerts::
 * Priority Strings::
-* Advanced topics::
-* Using the cryptographic library::
 * Selecting cryptographic key sizes::
+* Advanced topics::
 @end menu
 
 @node Introduction to the library
@@ -1074,6 +1073,108 @@ except TLS 1.2:
     "SECURE128:+SECURE192:-VERS-TLS-ALL:+VERS-TLS1.2"
 @end example
 
+@node Selecting cryptographic key sizes
+@section Selecting cryptographic key sizes
+@cindex key sizes
+
+Because many algorithms are involved in TLS, it is not easy to set
+a consistent security level.  For this reason in @ref{tab:key-sizes} we
+present some correspondence between key sizes of symmetric algorithms
+and public key algorithms based on @xcite{ECRYPT}. 
+Those can be used to generate certificates with
+appropriate key sizes as well as select parameters for Diffie-Hellman and SRP
+authentication.
+
+@float Table,tab:key-sizes
+@multitable @columnfractions .10 .12 .10 .20 .32
+
+@headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter @tab Description
+
+@item <72
+@tab <1008
+@tab <160
+@tab @code{INSECURE}
+@tab Considered to be insecure
+
+@item 72
+@tab 1008
+@tab 160
+@tab @code{WEAK}
+@tab Short term protection against small organizations
+
+@item 80
+@tab 1248
+@tab 160
+@tab @code{LOW}
+@tab Very short term protection against agencies
+
+@item 96
+@tab 1776
+@tab 192
+@tab @code{LEGACY}
+@tab Legacy standard level
+
+@item 112
+@tab 2432
+@tab 224
+@tab @code{NORMAL}
+@tab Medium-term protection
+
+@item 128
+@tab 3248
+@tab 256
+@tab @code{HIGH}
+@tab Long term protection
+
+@item 256
+@tab 15424
+@tab 512
+@tab @code{ULTRA}
+@tab Foreseeable future
+
+@end multitable
+@caption{Key sizes and security parameters.}
+@end float
+
+The first column  provides a security parameter in a number of bits. This
+gives an indication of the number of combinations to be tried by an adversary
+to brute force a key. For example to test all possible keys in a 112 bit security parameter
+@math{2^{112}} combinations have to be tried. For today's technology this is infeasible.
+The next two columns correlate the security
+parameter with actual bit sizes of parameters for DH, RSA, SRP and ECC algorithms.
+A mapping to @code{gnutls_sec_param_t} value is given for each security parameter, on
+the next column, and finally a brief description of the level.
+
+@c @showenumdesc{gnutls_sec_param_t,The @code{gnutls_sec_@-param_t} enumeration.}
+
+Note, however, that the values suggested here are nothing more than an
+educated guess that is valid today. There are no guarantees that an
+algorithm will remain unbreakable or that these values will remain
+constant in time. There could be scientific breakthroughs that cannot
+be predicted or total failure of the current public key systems by
+quantum computers. On the other hand though the cryptosystems used in
+TLS are selected in a conservative way and such catastrophic
+breakthroughs or failures are believed to be unlikely.
+The NIST publication SP 800-57 @xcite{NISTSP80057} contains a similar
+table.
+
+When using @acronym{GnuTLS} and a decision on bit sizes for a public
+key algorithm is required, use of the following functions is  
+recommended:
+
+@showfuncdesc{gnutls_sec_param_to_pk_bits}
+
+@showfuncdesc{gnutls_pk_bits_to_sec_param}
+
+Those functions will convert a human understandable security parameter
+of @code{gnutls_sec_param_t} type, to a number of bits suitable for a public 
+key algorithm.
+
+The following functions will set the minimum acceptable group size for Diffie-Hellman
+and SRP authentication. 
+@showfuncB{gnutls_dh_set_prime_bits,gnutls_srp_set_prime_bits}
+
+
 @node Advanced topics
 @section Advanced topics
 
@@ -1385,158 +1486,3 @@ imposed by the compatibility layer include:
 
 @end itemize
 
-@node Using the cryptographic library
-@section Using the cryptographic library
-
-@acronym{GnuTLS} is not a low-level cryptographic library, i.e., 
-it does not provide access to basic cryptographic primitives. However
-it abstracts the internal cryptographic back-end (see @ref{Cryptographic Backend}),
-providing symmetric crypto, hash and HMAC algorithms, as well access
-to the random number generation.
-
-@menu
-* Symmetric cryptography::
-* Hash and HMAC functions::
-* Random number generation::
-@end menu
-
-@node Symmetric cryptography
-@subsection Symmetric cryptography
-@cindex symmetric cryptography
-
-The available functions to access symmetric crypto algorithms operations
-are shown below. The supported algorithms are the algorithms required by the TLS protocol.
-They are listed in @ref{tab:ciphers}.
-
-@showfuncE{gnutls_cipher_init,gnutls_cipher_encrypt2,gnutls_cipher_decrypt2,gnutls_cipher_set_iv,gnutls_cipher_deinit}
-
-In order to support authenticated encryption with associated data (AEAD) algorithms the following
-functions are provided to set the associated data and retrieve the authentication tag.
-
-@showfuncB{gnutls_cipher_add_auth,gnutls_cipher_tag}
-
-@node Hash and HMAC functions
-@subsection Hash and HMAC functions
-@cindex hash functions
-@cindex HMAC functions
-
-The available operations to access hash functions and hash-MAC (HMAC) algorithms
-are shown below. HMAC algorithms provided keyed hash functionality. They supported HMAC algorithms are listed in @ref{tab:macs}.
-
-@showfuncF{gnutls_hmac_init,gnutls_hmac,gnutls_hmac_output,gnutls_hmac_deinit,gnutls_hmac_get_len,gnutls_hmac_fast}
-
-The available functions to access hash functions are shown below. The supported hash functions
-are the same as the HMAC algorithms.
-
-@showfuncF{gnutls_hash_init,gnutls_hash,gnutls_hash_output,gnutls_hash_deinit,gnutls_hash_get_len,gnutls_hash_fast}
-
-@node Random number generation
-@subsection Random number generation
-@cindex random numbers
-
-Access to the random number generator is provided using the @funcref{gnutls_rnd}
-function. It allows obtaining random data of various levels.
-
-@showenumdesc{gnutls_rnd_level_t,The random number levels.}
-@showfuncdesc{gnutls_rnd}
-
-@node Selecting cryptographic key sizes
-@section Selecting cryptographic key sizes
-@cindex key sizes
-
-Because many algorithms are involved in TLS, it is not easy to set
-a consistent security level.  For this reason in @ref{tab:key-sizes} we
-present some correspondence between key sizes of symmetric algorithms
-and public key algorithms based on @xcite{ECRYPT}. 
-Those can be used to generate certificates with
-appropriate key sizes as well as select parameters for Diffie-Hellman and SRP
-authentication.
-
-@float Table,tab:key-sizes
-@multitable @columnfractions .10 .12 .10 .20 .32
-
-@headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter @tab Description
-
-@item <72
-@tab <1008
-@tab <160
-@tab @code{INSECURE}
-@tab Considered to be insecure
-
-@item 72
-@tab 1008
-@tab 160
-@tab @code{WEAK}
-@tab Short term protection against small organizations
-
-@item 80
-@tab 1248
-@tab 160
-@tab @code{LOW}
-@tab Very short term protection against agencies
-
-@item 96
-@tab 1776
-@tab 192
-@tab @code{LEGACY}
-@tab Legacy standard level
-
-@item 112
-@tab 2432
-@tab 224
-@tab @code{NORMAL}
-@tab Medium-term protection
-
-@item 128
-@tab 3248
-@tab 256
-@tab @code{HIGH}
-@tab Long term protection
-
-@item 256
-@tab 15424
-@tab 512
-@tab @code{ULTRA}
-@tab Foreseeable future
-
-@end multitable
-@caption{Key sizes and security parameters.}
-@end float
-
-The first column  provides a security parameter in a number of bits. This
-gives an indication of the number of combinations to be tried by an adversary
-to brute force a key. For example to test all possible keys in a 112 bit security parameter
-@math{2^{112}} combinations have to be tried. For today's technology this is infeasible.
-The next two columns correlate the security
-parameter with actual bit sizes of parameters for DH, RSA, SRP and ECC algorithms.
-A mapping to @code{gnutls_sec_param_t} value is given for each security parameter, on
-the next column, and finally a brief description of the level.
-
-@c @showenumdesc{gnutls_sec_param_t,The @code{gnutls_sec_@-param_t} enumeration.}
-
-Note, however, that the values suggested here are nothing more than an
-educated guess that is valid today. There are no guarantees that an
-algorithm will remain unbreakable or that these values will remain
-constant in time. There could be scientific breakthroughs that cannot
-be predicted or total failure of the current public key systems by
-quantum computers. On the other hand though the cryptosystems used in
-TLS are selected in a conservative way and such catastrophic
-breakthroughs or failures are believed to be unlikely.
-The NIST publication SP 800-57 @xcite{NISTSP80057} contains a similar
-table.
-
-When using @acronym{GnuTLS} and a decision on bit sizes for a public
-key algorithm is required, use of the following functions is  
-recommended:
-
-@showfuncdesc{gnutls_sec_param_to_pk_bits}
-
-@showfuncdesc{gnutls_pk_bits_to_sec_param}
-
-Those functions will convert a human understandable security parameter
-of @code{gnutls_sec_param_t} type, to a number of bits suitable for a public 
-key algorithm.
-
-The following functions will set the minimum acceptable group size for Diffie-Hellman
-and SRP authentication. 
-@showfuncB{gnutls_dh_set_prime_bits,gnutls_srp_set_prime_bits}
