@@ -297,9 +297,10 @@ gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
  * is not specified the output is always null terminated, although the
  * @buf_size will not include the null character.
  *
- * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
- *   long enough, and in that case the @buf_size will be updated
- *   with the required size.  On success 0 is returned.
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+ *   long enough, and in that case the @buf_size will be updated with
+ *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there 
+ *   are no data in the current index. On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
@@ -332,9 +333,10 @@ gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
  * returned will be null terminated, although @oid_size will not
  * account for the trailing null.
  *
- * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
- *   long enough, and in that case the @oid_size will be updated
- *   with the required size.  On success 0 is returned.
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+ *   long enough, and in that case the @buf_size will be updated with
+ *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there 
+ *   are no data in the current index. On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert,
@@ -407,9 +409,10 @@ gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
  * is not specified the output is always null terminated, although the
  * @buf_size will not include the null character.
  *
- * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
- *   not long enough, and in that case the *buf_size will be updated
- *   with the required size.  On success 0 is returned.
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+ *   long enough, and in that case the @buf_size will be updated with
+ *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there 
+ *   are no data in the current index. On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
@@ -441,9 +444,10 @@ gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
  * returned will be null terminated, although @oid_size will not
  * account for the trailing null.
  *
- * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
- *   not long enough, and in that case the @oid_size will be updated
- *   with the required size.  On success 0 is returned.
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+ *   long enough, and in that case the @buf_size will be updated with
+ *   the required size. %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if there 
+ *   are no data in the current index. On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_dn_oid (gnutls_x509_crt_t cert,
@@ -1754,6 +1758,264 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
 
   return 0;
 }
+
+/**
+ * gnutls_certificate_policy_release:
+ * @policy: a certificate policy
+ *
+ * This function will deinitialize all memory associated with the provided
+ * @policy. The policy is allocated using gnutls_x509_crt_get_policy().
+ *
+ **/
+void gnutls_certificate_policy_release(struct gnutls_certificate_policy_st* policy)
+{
+unsigned i;
+
+  gnutls_free(policy->policy_oid);
+  for (i=0;i<policy->qualifiers;i++)
+    gnutls_free(policy->qualifier_data[i]);
+}
+
+static int decode_user_notice(const void* data, size_t size, char** txt)
+{
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  int ret, len;
+  char choice_type[64];
+  char name[128];
+  gnutls_datum_t td, td2;
+
+  ret = asn1_create_element
+    (_gnutls_get_pkix (), "PKIX1.UserNotice", &c2);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (ret);
+      goto cleanup;
+    }
+
+  ret = asn1_der_decoding (&c2, data, size, NULL);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (ret);
+      goto cleanup;
+    }
+  
+  len = sizeof(choice_type);
+  ret = asn1_read_value(c2, "explicitText", choice_type, &len);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (ret);
+      goto cleanup;
+    }
+
+  if (strcmp(choice_type, "utf8String") != 0 && strcmp(choice_type, "IA5String") != 0 &&
+      strcmp(choice_type, "bmpString") != 0)
+    {
+      gnutls_assert();
+      ret = GNUTLS_E_PARSING_ERROR;
+      goto cleanup;
+    }
+
+  snprintf (name, sizeof (name), "explicitText.%s", choice_type);
+
+  ret = _gnutls_x509_read_value(c2, name, &td);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  if (strcmp(choice_type, "bmpString") == 0)
+    { /* convert to UTF-8 */
+      ret = _gnutls_ucs2_to_utf8(td.data, td.size, &td2);
+      _gnutls_free_datum(&td);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+        
+      td.data = td2.data;
+      td.size = td2.size;
+    }
+  else
+    {
+      /* _gnutls_x509_read_value allows that */
+      td.data[td.size] = 0;
+    }
+
+  *txt = (void*)td.data;
+  ret = 0;
+
+cleanup:
+  asn1_delete_structure (&c2);
+  return ret;
+
+}
+
+/**
+ * gnutls_x509_crt_get_policy:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @indx: This specifies which policy to return. Use (0) to get the first one.
+ * @policy: A pointer to a policy structure.
+ * @critical: will be non (0) if the extension is marked as critical
+ *
+ * This function will extract the certificate policy specified by the
+ * given index. 
+ *
+ * If @oid is null then only the size will be filled. The @oid
+ * returned will be null terminated, although @oid_size will not
+ * account for the trailing null.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * if the extension is not present, otherwise a negative error value.
+ **/
+int
+gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx, struct gnutls_certificate_policy_st* policy, unsigned int *critical)
+{
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  char tmpstr[128];
+  char tmpoid[MAX_OID_SIZE];
+  gnutls_datum_t tmpd = {NULL, 0};
+  int ret, len;
+  unsigned i;
+ 
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+    
+  memset(policy, 0, sizeof(*policy));
+
+  if ((ret =
+       _gnutls_x509_crt_get_extension (crt, "2.5.29.32", 0, &tmpd,
+                                       critical)) < 0)
+    {
+      return ret;
+    }
+
+  if (tmpd.size == 0 || tmpd .data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+  ret = asn1_create_element
+    (_gnutls_get_pkix (), "PKIX1.certificatePolicies", &c2);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (ret);
+      goto cleanup;
+    }
+
+  ret = asn1_der_decoding (&c2, tmpd.data, tmpd.size, NULL);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (ret);
+      goto cleanup;
+    }
+  _gnutls_free_datum (&tmpd);
+
+  indx++;
+  /* create a string like "?1"
+   */
+  snprintf (tmpstr, sizeof (tmpstr), "?%u.policyIdentifier", indx);
+
+  ret = _gnutls_x509_read_value(c2, tmpstr, &tmpd);
+  
+  if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+    ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+  policy->policy_oid = (void*)tmpd.data;
+  tmpd.data = NULL;
+  
+  for (i=0;i<GNUTLS_MAX_QUALIFIERS;i++)
+    {
+      gnutls_datum_t td;
+
+      snprintf (tmpstr, sizeof (tmpstr), "?%u.policyQualifiers.?%u.policyQualifierId", indx, i+1);
+
+      len = sizeof(tmpoid);
+      ret = asn1_read_value(c2, tmpstr, tmpoid, &len);
+      
+      if (ret == ASN1_ELEMENT_NOT_FOUND && i > 0)
+        break; /* finished */
+      
+      if (ret != ASN1_SUCCESS)
+        {
+          gnutls_assert();
+          ret = _gnutls_asn2err (ret);
+          goto cleanup;
+        }
+
+      if (strcmp(tmpoid, "1.3.6.1.5.5.7.2.1") == 0)
+        {
+          snprintf (tmpstr, sizeof (tmpstr), "?%u.policyQualifiers.?%u.qualifier", indx, i+1);
+
+          ret = _gnutls_x509_read_string(c2, tmpstr, &td, RV_IA5STRING);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              goto full_cleanup;
+            }
+
+          policy->qualifier_data[i] = (void*)td.data;
+          td.data = NULL;
+          policy->qualifier_type[i] = GNUTLS_X509_QUALIFIER_URI;
+        }
+      else if (strcmp(tmpoid, "1.3.6.1.5.5.7.2.2") == 0)
+        {
+          snprintf (tmpstr, sizeof (tmpstr), "?%u.policyQualifiers.?%u.qualifier", indx, i+1);
+
+          ret = _gnutls_x509_read_string(c2, tmpstr, &td, RV_RAW);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              goto full_cleanup;
+            }
+
+          ret = decode_user_notice(td.data, td.size, &policy->qualifier_data[i]);
+          gnutls_free(td.data);
+          td.data = NULL;
+
+          if (ret < 0)
+            {
+              gnutls_assert();
+              goto full_cleanup;
+            }
+
+          policy->qualifier_type[i] = GNUTLS_X509_QUALIFIER_NOTICE;
+        }
+      else
+        policy->qualifier_type[i] = GNUTLS_X509_QUALIFIER_UNKNOWN;
+      
+      policy->qualifiers++;
+    
+    }
+  
+
+  ret = 0;
+  goto cleanup;
+  
+full_cleanup:
+  gnutls_certificate_policy_release(policy);
+
+cleanup:
+  _gnutls_free_datum (&tmpd);
+  asn1_delete_structure (&c2);
+  return ret;
+}
+
 
 /**
  * gnutls_x509_crt_get_extension_by_oid:
@@ -3443,8 +3705,8 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
   gnutls_datum_t datum = { NULL, 0 };
 
   result =
-    _gnutls_x509_read_value (crt->cert, "tbsCertificate.subjectUniqueID",
-                             &datum, 2);
+    _gnutls_x509_read_string (crt->cert, "tbsCertificate.subjectUniqueID",
+                             &datum, RV_BIT_STRING);
 
   if (datum.size > *buf_size)
     {                           /* then we're not going to fit */
@@ -3489,8 +3751,8 @@ gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
   gnutls_datum_t datum = { NULL, 0 };
 
   result =
-    _gnutls_x509_read_value (crt->cert, "tbsCertificate.issuerUniqueID",
-                             &datum, 2);
+    _gnutls_x509_read_string (crt->cert, "tbsCertificate.issuerUniqueID",
+                             &datum, RV_BIT_STRING);
 
   if (datum.size > *buf_size)
     {                           /* then we're not going to fit */

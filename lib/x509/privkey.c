@@ -300,7 +300,7 @@ _gnutls_privkey_decode_ecc_key (const gnutls_datum_t * raw_key,
     }
 
   /* read the public key */
-  ret = _gnutls_x509_read_value(pkey_asn, "publicKey", &out, 2);
+  ret = _gnutls_x509_read_string(pkey_asn, "publicKey", &out, RV_BIT_STRING);
   if (ret < 0)
     {
       gnutls_assert();

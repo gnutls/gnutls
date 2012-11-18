@@ -367,10 +367,11 @@ static int load_key(TSS_HCONTEXT tpm_ctx, TSS_HKEY srk,
 {
 int ret, err;
 gnutls_datum_t asn1 = { NULL, 0 };
-size_t slen;
 
   if (format == GNUTLS_TPMKEY_FMT_CTK_PEM)
     {
+      gnutls_datum_t td;
+
       ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
       if (ret)
         {
@@ -380,14 +381,15 @@ size_t slen;
           return ret;
         }
 
-      slen = asn1.size;
-      ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
+      ret = _gnutls_x509_decode_string(NULL, asn1.data, asn1.size, &td);
       if (ret < 0)
         {
           gnutls_assert();
           goto cleanup;
         }
-      asn1.size = slen;
+      gnutls_free(asn1.data);
+      asn1.data = td.data;
+      asn1.size = td.size;
     }
   else /* DER */
     {
@@ -1359,7 +1361,7 @@ uint8_t buf[32];
       
       if (format == GNUTLS_TPMKEY_FMT_CTK_PEM)
         {
-          ret = _gnutls_x509_encode_octet_string(tdata, tint, &tmpkey);
+          ret = _gnutls_x509_encode_string(NULL, tdata, tint, &tmpkey);
           if (ret < 0)
             {
               gnutls_assert();

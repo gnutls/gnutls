@@ -70,6 +70,7 @@ struct timespec ts;
 }
 
 int _gnutls_find_config_path(char* path, size_t max_size);
+int _gnutls_ucs2_to_utf8(const void* data, size_t size, gnutls_datum_t *output);
 
 int gnutls_system_global_init (void);
 void gnutls_system_global_deinit (void);

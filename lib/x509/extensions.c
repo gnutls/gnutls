@@ -122,7 +122,7 @@ get_extension (ASN1_TYPE asn, const char *root,
               _gnutls_str_cpy (name2, sizeof (name2), name);
               _gnutls_str_cat (name2, sizeof (name2), ".extnValue");
 
-              result = _gnutls_x509_read_value (asn, name2, &value, 0);
+              result = _gnutls_x509_read_value (asn, name2, &value);
               if (result < 0)
                 {
                   gnutls_assert ();
@@ -1254,7 +1254,7 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
     }
 
   result = _gnutls_x509_read_value (ext, "proxyPolicy.policyLanguage",
-                                    &value, 0);
+                                    &value);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1265,7 +1265,7 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
   if (policyLanguage)
     *policyLanguage = gnutls_strdup ((char*)value.data);
 
-  result = _gnutls_x509_read_value (ext, "proxyPolicy.policy", &value, 0);
+  result = _gnutls_x509_read_value (ext, "proxyPolicy.policy", &value);
   if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
     {
       if (policy)

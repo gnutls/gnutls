@@ -335,6 +335,34 @@ extern "C"
                                  char **policyLanguage,
                                  char **policy, size_t * sizeof_policy);
 
+#define GNUTLS_MAX_QUALIFIERS 16
+
+  /**
+   * gnutls_x509_qualifier_t:
+   * @GNUTLS_X509_QUALIFIER_UNKNOWN: Unknown qualifier.
+   * @GNUTLS_X509_QUALIFIER_URI: A URL
+   * @GNUTLS_X509_QUALIFIER_NOICE: A text notice.
+   *
+   * Enumeration of types for the X.509 qualifiers, of the certificate policy extension. 
+   */
+  typedef enum gnutls_x509_qualifier_t 
+  {
+    GNUTLS_X509_QUALIFIER_UNKNOWN = 0, GNUTLS_X509_QUALIFIER_URI, 
+    GNUTLS_X509_QUALIFIER_NOTICE
+  } gnutls_x509_qualifier_t;
+
+  struct gnutls_certificate_policy_st 
+    {
+      char* policy_oid;
+      unsigned int qualifiers;
+      gnutls_x509_qualifier_t qualifier_type[GNUTLS_MAX_QUALIFIERS];
+      char *qualifier_data[GNUTLS_MAX_QUALIFIERS];
+    };
+
+  void gnutls_certificate_policy_release(struct gnutls_certificate_policy_st* policy);
+  int gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx, 
+                                  struct gnutls_certificate_policy_st* policy,
+                                  unsigned int * critical);
   int gnutls_x509_dn_oid_known (const char *oid);
 
 #define GNUTLS_X509_DN_OID_RETURN_OID 1

@@ -1055,7 +1055,7 @@ _decode_pkcs8_rsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
   int ret;
   gnutls_datum_t tmp;
 
-  ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp, 0);
+  ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1084,7 +1084,7 @@ _decode_pkcs8_ecc_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
   int ret;
   gnutls_datum_t tmp;
 
-  ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp, 0);
+  ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1114,7 +1114,7 @@ _decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
   int ret;
   gnutls_datum_t tmp;
 
-  ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp, 0);
+  ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1132,7 +1132,7 @@ _decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 
   ret =
     _gnutls_x509_read_value (pkcs8_asn, "privateKeyAlgorithm.parameters",
-                             &tmp, 0);
+                             &tmp);
   if (ret < 0)
     {
       gnutls_assert ();

@@ -195,7 +195,7 @@ _pkcs12_decode_crt_bag (gnutls_pkcs12_bag_type_t type,
           goto cleanup;
         }
 
-      ret = _gnutls_x509_read_value (c2, "certValue", out, 1);
+      ret = _gnutls_x509_read_string (c2, "certValue", out, RV_OCTET_STRING);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -221,7 +221,7 @@ _pkcs12_decode_crt_bag (gnutls_pkcs12_bag_type_t type,
           goto cleanup;
         }
 
-      ret = _gnutls_x509_read_value (c2, "crlValue", out, 1);
+      ret = _gnutls_x509_read_string (c2, "crlValue", out, RV_OCTET_STRING);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -247,7 +247,7 @@ _pkcs12_decode_crt_bag (gnutls_pkcs12_bag_type_t type,
           goto cleanup;
         }
 
-      ret = _gnutls_x509_read_value (c2, "secretValue", out, 1);
+      ret = _gnutls_x509_read_string (c2, "secretValue", out, RV_OCTET_STRING);
       if (ret < 0)
         {
           gnutls_assert ();

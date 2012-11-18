@@ -871,6 +871,8 @@ GNUTLS_3_1_0 {
 	gnutls_ocsp_status_request_is_checked;
 	gnutls_sign_is_secure;
 	gnutls_pkcs11_privkey_generate2;
+	gnutls_x509_crt_get_policy;
+	gnutls_certificate_policy_release;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

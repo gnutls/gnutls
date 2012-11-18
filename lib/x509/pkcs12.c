@@ -68,7 +68,7 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
    */
 
   result =
-    _gnutls_x509_read_value (pkcs12, "authSafe.content", &auth_safe, 1);
+    _gnutls_x509_read_string (pkcs12, "authSafe.content", &auth_safe, RV_OCTET_STRING);
   if (result < 0)
     {
       gnutls_assert ();
@@ -373,8 +373,8 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
   int len, result;
   int bag_type;
   gnutls_datum_t attr_val;
+  gnutls_datum_t t;
   int count = 0, i, attributes, j;
-  size_t size;
 
   /* Step 1. Extract the SEQUENCE.
    */
@@ -437,7 +437,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 
       snprintf (root, sizeof (root), "?%u.bagValue", i + 1);
 
-      result = _gnutls_x509_read_value (c2, root, &bag->element[i].data, 0);
+      result = _gnutls_x509_read_value (c2, root, &bag->element[i].data);
       if (result < 0)
         {
           gnutls_assert ();
@@ -495,38 +495,39 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 
             if (strcmp (oid, KEY_ID_OID) == 0)
               {
-                size = attr_val.size;
-
                 result =
-                  _gnutls_x509_decode_octet_string (NULL, attr_val.data, size,
-                                                    attr_val.data, &size);
-                attr_val.size = size;
+                  _gnutls_x509_decode_string (NULL, attr_val.data, attr_val.size, &t);
+                _gnutls_free_datum (&attr_val);
                 if (result < 0)
                   {
-                    _gnutls_free_datum (&attr_val);
                     gnutls_assert ();
                     _gnutls_debug_log
                       ("Error decoding PKCS12 Bag Attribute OID '%s'\n", oid);
                     continue;
                   }
+                
+                attr_val.data = t.data;
+                attr_val.size = t.size;
+                
                 bag->element[i].local_key_id = attr_val;
               }
             else if (strcmp (oid, FRIENDLY_NAME_OID) == 0)
               {
-                size = attr_val.size;
                 result =
-                  _gnutls_x509_decode_octet_string ("BMPString",
-                                                    attr_val.data, size,
-                                                    attr_val.data, &size);
-                attr_val.size = size;
+                  _gnutls_x509_decode_string ("BMPString",
+                                              attr_val.data, attr_val.size, &t);
+                _gnutls_free_datum (&attr_val);
                 if (result < 0)
                   {
-                    _gnutls_free_datum (&attr_val);
                     gnutls_assert ();
                     _gnutls_debug_log
                       ("Error decoding PKCS12 Bag Attribute OID '%s'\n", oid);
                     continue;
                   }
+
+                attr_val.data = t.data;
+                attr_val.size = t.size;
+
                 bag->element[i].friendly_name =
                   ucs2_to_ascii ((char*)attr_val.data, attr_val.size);
               }
@@ -566,7 +567,7 @@ _parse_safe_contents (ASN1_TYPE sc, const char *sc_name,
   /* Step 1. Extract the content.
    */
 
-  result = _gnutls_x509_read_value (sc, sc_name, &content, 1);
+  result = _gnutls_x509_read_string (sc, sc_name, &content, RV_OCTET_STRING);
   if (result < 0)
     {
       gnutls_assert ();
@@ -665,7 +666,7 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
   bag->element[0].type = GNUTLS_BAG_ENCRYPTED;
   bag->bag_elements = 1;
 
-  result = _gnutls_x509_read_value (c2, root2, &bag->element[0].data, 0);
+  result = _gnutls_x509_read_value (c2, root2, &bag->element[0].data);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1048,7 +1049,7 @@ gnutls_pkcs12_verify_mac (gnutls_pkcs12_t pkcs12, const char *pass)
   /* Read the salt from the structure.
    */
   result =
-    _gnutls_x509_read_value (pkcs12->pkcs12, "macData.macSalt", &salt, 0);
+    _gnutls_x509_read_value (pkcs12->pkcs12, "macData.macSalt", &salt);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();

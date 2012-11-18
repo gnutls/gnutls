@@ -230,8 +230,8 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
                               int value_size, char *res, size_t * res_size)
 {
   char str[MAX_STRING_LEN], tmpname[128];
-  const char *ANAME = NULL;
-  int CHOICE = -1, len = -1, result;
+  const char *aname = NULL;
+  int choice = -1, len = -1, result;
   ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
   char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
 
@@ -247,17 +247,17 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  ANAME = _gnutls_x509_oid2asn_string (oid);
-  CHOICE = _gnutls_x509_oid_data_choice (oid);
+  aname = _gnutls_x509_oid2asn_string (oid);
+  choice = _gnutls_x509_oid_data_choice (oid);
 
-  if (ANAME == NULL)
+  if (aname == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   if ((result =
-       asn1_create_element (_gnutls_get_pkix (), ANAME,
+       asn1_create_element (_gnutls_get_pkix (), aname,
                             &tmpasn)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -285,7 +285,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       return _gnutls_asn2err (result);
     }
 
-  if (CHOICE == 0)
+  if (choice == 0)
     {
       str[len] = 0;
 
@@ -300,7 +300,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       asn1_delete_structure (&tmpasn);
     }
   else
-    {                           /* CHOICE */
+    {                           /* choice */
       int non_printable = 0, teletex = 0;
       str[len] = 0;
 
@@ -335,7 +335,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
            * characters then treat it as printable.
            */
           for (i = 0; i < len; i++)
-            if (!isascii (str[i]))
+            if (!isprint (str[i]))
               ascii = 1;
 
           if (ascii == 0)
@@ -664,7 +664,7 @@ _gnutls_x509_get_time (ASN1_TYPE c2, const char *when, int nochoice)
     {
       _gnutls_str_cpy (name, sizeof (name), when);
 
-      /* CHOICE */
+      /* choice */
       if (strcmp (ttime, "generalTime") == 0)
         {
           _gnutls_str_cat (name, sizeof (name), ".generalTime");
@@ -853,15 +853,15 @@ _gnutls_x509_export_int_named2 (ASN1_TYPE asn1_data, const char *name,
  * etc.
  */
 int
-_gnutls_x509_decode_octet_string (const char *string_type,
-                                  const uint8_t * der, size_t der_size,
-                                  uint8_t * output, size_t * output_size)
+_gnutls_x509_decode_string (const char *string_type,
+                            const uint8_t * der, size_t der_size,
+                            gnutls_datum_t * output)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  int result, tmp_output_size;
+  int result;
   char strname[64];
 
-  if (string_type == NULL)
+  if (string_type == NULL) /* assume octet string */
     _gnutls_str_cpy (strname, sizeof (strname), "PKIX1.pkcs-7-Data");
   else
     {
@@ -885,16 +885,15 @@ _gnutls_x509_decode_octet_string (const char *string_type,
       goto cleanup;
     }
 
-  tmp_output_size = *output_size;
-  result = asn1_read_value (c2, "", output, &tmp_output_size);
-  *output_size = (size_t)tmp_output_size;
-
-  if (result != ASN1_SUCCESS)
+  result = _gnutls_x509_read_value(c2, "", output);
+  if (result < 0)
     {
       gnutls_assert ();
-      result = _gnutls_asn2err (result);
       goto cleanup;
     }
+  
+  /* This is allowed since _gnutls_x509_read_value allocates one more */
+  output->data[output->size] = 0;
 
   result = 0;
 
@@ -908,16 +907,15 @@ cleanup:
 
 /* Reads a value from an ASN1 tree, and puts the output
  * in an allocated variable in the given datum.
- * flags == 0 do nothing  with the DER output
- * flags == 1 parse the DER output as OCTET STRING
- * flags == 2 the value is a BIT STRING
+ *
+ * Note that this function always places allocates one plus
+ * the required data size (to allow for a null byte).
  */
 int
 _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
-                         gnutls_datum_t * ret, int flags)
+                         gnutls_datum_t * ret)
 {
   int len = 0, result;
-  size_t slen;
   uint8_t *tmp = NULL;
 
   result = asn1_read_value (c, root, NULL, &len);
@@ -928,10 +926,7 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
       return result;
     }
 
-  if (flags == 2)
-    len /= 8;
-
-  tmp = gnutls_malloc ((size_t)len);
+  tmp = gnutls_malloc ((size_t)len+1);
   if (tmp == NULL)
     {
       gnutls_assert ();
@@ -947,24 +942,6 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
       goto cleanup;
     }
 
-  if (flags == 2)
-    len /= 8;
-
-  /* Extract the OCTET STRING.
-   */
-
-  if (flags == 1)
-    {
-      slen = (size_t)len;
-      result = _gnutls_x509_decode_octet_string (NULL, tmp, slen, tmp, &slen);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
-      len = slen;
-    }
-
   ret->data = tmp;
   ret->size = (unsigned)len;
 
@@ -973,17 +950,105 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
 cleanup:
   gnutls_free (tmp);
   return result;
-
 }
 
-int _gnutls_x509_encode_octet_string(const void* input_data, size_t input_size,
-                                     gnutls_datum_t* output)
+/* Reads a value from an ASN1 tree, and puts the output
+ * in an allocated variable in the given datum.
+ *
+ * Note that this function always places a null character
+ * at the end of a readable string value (which is not accounted into size)
+ */
+int
+_gnutls_x509_read_string (ASN1_TYPE c, const char *root,
+                          gnutls_datum_t * ret, x509_string_type type)
+{
+  int len = 0, result;
+  size_t slen;
+  uint8_t *tmp = NULL;
+
+  result = asn1_read_value (c, root, NULL, &len);
+  if (result != ASN1_MEM_ERROR)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      return result;
+    }
+
+  if (type == RV_BIT_STRING)
+    len /= 8;
+
+  tmp = gnutls_malloc ((size_t)len+1);
+  if (tmp == NULL)
+    {
+      gnutls_assert ();
+      result = GNUTLS_E_MEMORY_ERROR;
+      goto cleanup;
+    }
+
+  result = asn1_read_value (c, root, tmp, &len);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  if (type == RV_BIT_STRING)
+    len /= 8;
+
+  /* Extract the STRING.
+   */
+  if (type == RV_IA5STRING || type == RV_UTF8STRING || type == RV_OCTET_STRING)
+    {
+      const char* sname;
+      slen = (size_t)len;
+
+      if (type == RV_UTF8STRING)
+        sname = "UTF8String";
+      else if (type == RV_IA5STRING)
+        sname = "IA5String";
+      else
+        sname = NULL;
+
+      result = _gnutls_x509_decode_string (sname, tmp, slen, ret);
+      if (result < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
+      gnutls_free(tmp);
+    }
+  else
+    {
+      ret->data = tmp;
+      ret->size = (unsigned)len;
+    }
+
+  return 0;
+
+cleanup:
+  gnutls_free (tmp);
+  return result;
+}
+
+/* The string type should be IA5String, UTF8String etc. Leave
+ * null for octet string */
+int _gnutls_x509_encode_string(const char* string_type, 
+                               const void* input_data, size_t input_size,
+                               gnutls_datum_t* output)
 {
   int ret;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-
+  char strname[64];
+  
+  _gnutls_str_cpy (strname, sizeof (strname), "PKIX1.");
+  if (string_type == NULL)
+    _gnutls_str_cat (strname, sizeof (strname), "pkcs-7-Data");
+  else
+    _gnutls_str_cat (strname, sizeof (strname), string_type);
+  
   if ((ret = asn1_create_element
-       (_gnutls_get_pkix (), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS)
+       (_gnutls_get_pkix (), strname, &c2)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       ret = _gnutls_asn2err (ret);
@@ -1140,39 +1205,27 @@ _gnutls_x509_der_encode_and_copy (ASN1_TYPE src, const char *src_name,
  */
 int
 _gnutls_x509_write_value (ASN1_TYPE c, const char *root,
-                          const gnutls_datum_t * data, int str)
+                          const gnutls_datum_t * data, x509_string_type type)
 {
-  int result;
+  int ret;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   gnutls_datum_t val = { NULL, 0 };
+  const char* sname = NULL;
 
-  if (str)
+  if (type == RV_OCTET_STRING || type == RV_IA5STRING || type == RV_UTF8STRING)
     {
-      /* Convert it to OCTET STRING
-       */
-      if ((result = asn1_create_element
-           (_gnutls_get_pkix (), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          result = _gnutls_asn2err (result);
-          goto cleanup;
-        }
+    
+      if (type == RV_IA5STRING)
+        sname = "IA5String";
+      else if (type == RV_UTF8STRING)
+        sname = "UTF8String";
 
-      result = asn1_write_value (c2, "", data->data, data->size);
-      if (result != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          result = _gnutls_asn2err (result);
-          goto cleanup;
-        }
-
-      result = _gnutls_x509_der_encode (c2, "", &val, 0);
-      if (result < 0)
+      ret = _gnutls_x509_encode_string(sname, data->data, data->size, &val);
+      if (ret < 0)
         {
           gnutls_assert ();
           goto cleanup;
         }
-
     }
   else
     {
@@ -1182,21 +1235,21 @@ _gnutls_x509_write_value (ASN1_TYPE c, const char *root,
 
   /* Write the data.
    */
-  result = asn1_write_value (c, root, val.data, val.size);
-  if (result != ASN1_SUCCESS)
+  ret = asn1_write_value (c, root, val.data, val.size);
+  if (ret != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      result = _gnutls_asn2err (result);
+      ret = _gnutls_asn2err (ret);
       goto cleanup;
     }
 
-  result = 0;
+  ret = 0;
 
 cleanup:
   asn1_delete_structure (&c2);
   if (val.data != data->data)
     _gnutls_free_datum (&val);
-  return result;
+  return ret;
 }
 
 void
@@ -1443,7 +1496,7 @@ _gnutls_x509_get_signature_algorithm (ASN1_TYPE src, const char *src_name)
    * read. They will be read from the issuer's certificate if needed.
    */
   result =
-    _gnutls_x509_read_value (src, src_name, &sa, 0);
+    _gnutls_x509_read_value (src, src_name, &sa);
 
   if (result < 0)
     {

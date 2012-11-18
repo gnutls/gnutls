@@ -834,8 +834,10 @@ _gnutls_x509_decode_and_read_attribute (ASN1_TYPE asn1_struct,
   if (multi)
     _gnutls_str_cat (tmpbuffer, sizeof (tmpbuffer), "s.?1");    /* .values.?1 */
 
-  result =
-    _gnutls_x509_read_value (asn1_struct, tmpbuffer, value, octet_string);
+  if (octet_string)
+    result = _gnutls_x509_read_string (asn1_struct, tmpbuffer, value, RV_OCTET_STRING);
+  else
+    result = _gnutls_x509_read_value (asn1_struct, tmpbuffer, value);
   if (result < 0)
     {
       gnutls_assert ();

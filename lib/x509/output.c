@@ -882,7 +882,8 @@ static void
 print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
                   cert_type_t cert)
 {
-  int i, err;
+  unsigned i, j;
+  int err;
   int san_idx = 0;
   int ian_idx = 0;
   int proxy_idx = 0;
@@ -956,6 +957,39 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
             print_ski (str, cert.crt);
 
           ski_idx++;
+        }
+      else if (strcmp (oid, "2.5.29.32") == 0)
+        {
+          struct gnutls_certificate_policy_st policy;
+          const char* name;
+          int x;
+
+          for (x=0;;x++)
+            {
+              err = gnutls_x509_crt_get_policy (cert.crt, x, &policy, &critical);
+              if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+                break;
+              
+              if (err < 0)
+                {
+                  addf (str, "error: certificate policy: %s\n", gnutls_strerror(err));
+                  break;
+                }
+
+              addf (str, "%s\t\tCertificate Policies (%s):\n", prefix, critical ? _("critical") : _("not critical"));
+              addf (str, "%s\t\t\t%s\n", prefix, policy.policy_oid);
+              for (j=0;j<policy.qualifiers;j++)
+                {
+                  if (policy.qualifier_type[j]==GNUTLS_X509_QUALIFIER_URI)
+                    name = "URI";
+                  else if (policy.qualifier_type[j]==GNUTLS_X509_QUALIFIER_NOTICE)
+                    name = "Note";
+                  else name = "Unknown qualifier";
+                  addf (str, "%s\t\t\t\t%s: %s\n", prefix, name, policy.qualifier_data[j]);
+                }
+          
+              gnutls_certificate_policy_release (&policy);
+            }
         }
       else if (strcmp (oid, "2.5.29.35") == 0)
         {
@@ -1532,11 +1566,12 @@ print_other (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
 static void
 print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
+int err;
+
   /* Subject. */
   {
     char *dn;
     size_t dn_size = 0;
-    int err;
 
     err = gnutls_x509_crt_get_dn (cert, NULL, &dn_size);
     if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
@@ -1563,7 +1598,6 @@ print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
   {
     char *dn;
     size_t dn_size = 0;
-    int err;
 
     err = gnutls_x509_crt_get_issuer_dn (cert, NULL, &dn_size);
     if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
@@ -1598,8 +1632,6 @@ print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 
   /* Signature Algorithm. */
   {
-    int err;
-
     err = gnutls_x509_crt_get_signature_algorithm (cert);
     if (err < 0)
       addf (str, "unknown signature algorithm (%s), ", gnutls_strerror (err));
@@ -1651,7 +1683,6 @@ print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
   {
     int pathlen;
     char *policyLanguage;
-    int err;
 
     err = gnutls_x509_crt_get_proxy (cert, NULL,
                                      &pathlen, &policyLanguage, NULL, NULL);
@@ -1675,7 +1706,6 @@ print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
   {
     char buffer[20];
     size_t size = sizeof (buffer);
-    int err;
 
     err = gnutls_x509_crt_get_fingerprint (cert, GNUTLS_DIG_SHA1,
                                            buffer, &size);

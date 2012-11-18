@@ -267,7 +267,7 @@ gnutls_ocsp_resp_import (gnutls_ocsp_resp_t resp,
     return GNUTLS_E_SUCCESS;
 
   ret = _gnutls_x509_read_value (resp->resp, "responseBytes.responseType",
-				 &resp->response_type_oid, 0);
+				 &resp->response_type_oid);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -296,7 +296,7 @@ gnutls_ocsp_resp_import (gnutls_ocsp_resp_t resp,
 	}
 
       ret = _gnutls_x509_read_value (resp->resp, "responseBytes.response",
-				     &d, 0);
+				     &d);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -482,7 +482,7 @@ gnutls_ocsp_req_get_cert_id (gnutls_ocsp_req_t req,
   snprintf (name, sizeof (name),
 	    "tbsRequest.requestList.?%u.reqCert.hashAlgorithm.algorithm",
 	    indx + 1);
-  ret = _gnutls_x509_read_value (req->req, name, &sa, 0);
+  ret = _gnutls_x509_read_value (req->req, name, &sa);
   if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   else if (ret < 0)
@@ -506,7 +506,7 @@ gnutls_ocsp_req_get_cert_id (gnutls_ocsp_req_t req,
     {
       snprintf (name, sizeof (name),
 		"tbsRequest.requestList.?%u.reqCert.issuerNameHash", indx + 1);
-      ret = _gnutls_x509_read_value (req->req, name, issuer_name_hash, 0);
+      ret = _gnutls_x509_read_value (req->req, name, issuer_name_hash);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -518,7 +518,7 @@ gnutls_ocsp_req_get_cert_id (gnutls_ocsp_req_t req,
     {
       snprintf (name, sizeof (name),
 		"tbsRequest.requestList.?%u.reqCert.issuerKeyHash", indx + 1);
-      ret = _gnutls_x509_read_value (req->req, name, issuer_key_hash, 0);
+      ret = _gnutls_x509_read_value (req->req, name, issuer_key_hash);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -532,7 +532,7 @@ gnutls_ocsp_req_get_cert_id (gnutls_ocsp_req_t req,
     {
       snprintf (name, sizeof (name),
 		"tbsRequest.requestList.?%u.reqCert.serialNumber", indx + 1);
-      ret = _gnutls_x509_read_value (req->req, name, serial_number, 0);
+      ret = _gnutls_x509_read_value (req->req, name, serial_number);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -718,9 +718,9 @@ gnutls_ocsp_req_add_cert (gnutls_ocsp_req_t req,
   inh.size = inhlen;
   inh.data = inh_buf;
 
-  ret = _gnutls_x509_read_value
+  ret = _gnutls_x509_read_string
     (issuer->cert, "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-     &tmp, 2);
+     &tmp, RV_BIT_STRING);
   if (ret != GNUTLS_E_SUCCESS)
     {
       gnutls_assert ();
@@ -738,7 +738,7 @@ gnutls_ocsp_req_add_cert (gnutls_ocsp_req_t req,
   ikh.data = ikh_buf;
 
   ret = _gnutls_x509_read_value (cert->cert, "tbsCertificate.serialNumber",
-				 &sn, 0);
+				 &sn);
   if (ret != GNUTLS_E_SUCCESS)
     {
       gnutls_assert ();
@@ -821,7 +821,7 @@ gnutls_ocsp_req_get_extension (gnutls_ocsp_req_t req,
     {
       snprintf (name, sizeof (name),
 		"tbsRequest.requestExtensions.?%u.extnID", indx + 1);
-      ret = _gnutls_x509_read_value (req->req, name, oid, 0);
+      ret = _gnutls_x509_read_value (req->req, name, oid);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -833,7 +833,7 @@ gnutls_ocsp_req_get_extension (gnutls_ocsp_req_t req,
     {
       snprintf (name, sizeof (name),
 		"tbsRequest.requestExtensions.?%u.extnValue", indx + 1);
-      ret = _gnutls_x509_read_value (req->req, name, data, 0);
+      ret = _gnutls_x509_read_value (req->req, name, data);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -896,7 +896,6 @@ gnutls_ocsp_req_get_nonce (gnutls_ocsp_req_t req,
 			   gnutls_datum_t *nonce)
 {
   int ret;
-  size_t l = 0;
   gnutls_datum_t tmp;
 
   if (req == NULL || nonce == NULL)
@@ -914,32 +913,16 @@ gnutls_ocsp_req_get_nonce (gnutls_ocsp_req_t req,
       return ret;
     }
 
-  ret = _gnutls_x509_decode_octet_string (NULL, tmp.data, (size_t) tmp.size,
-					  NULL, &l);
-  if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+  ret = _gnutls_x509_decode_string (NULL, tmp.data, (size_t) tmp.size,
+			            nonce);
+  if (ret < 0)
     {
       gnutls_assert ();
       gnutls_free (tmp.data);
       return ret;
     }
 
-  nonce->data = gnutls_malloc (l);
-  if (nonce->data == NULL)
-    {
-      gnutls_assert ();
-      gnutls_free (tmp.data);
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  ret = _gnutls_x509_decode_octet_string (NULL, tmp.data, (size_t) tmp.size,
-					  nonce->data, &l);
   gnutls_free (tmp.data);
-  if (ret != GNUTLS_E_SUCCESS)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-  nonce->size = l;
 
   return GNUTLS_E_SUCCESS;
 }
@@ -1121,7 +1104,7 @@ gnutls_ocsp_resp_get_response (gnutls_ocsp_resp_t resp,
   if (response_type_oid != NULL)
     {
       ret = _gnutls_x509_read_value (resp->resp, "responseBytes.responseType",
-				     response_type_oid, 0);
+				     response_type_oid);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1132,7 +1115,7 @@ gnutls_ocsp_resp_get_response (gnutls_ocsp_resp_t resp,
   if (response != NULL)
     {
       ret = _gnutls_x509_read_value (resp->resp, "responseBytes.response",
-				     response, 0);
+				     response);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1418,7 +1401,7 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
   snprintf (name, sizeof (name),
 	    "tbsResponseData.responses.?%u.certID.hashAlgorithm.algorithm",
 	    indx + 1);
-  ret = _gnutls_x509_read_value (resp->basicresp, name, &sa, 0);
+  ret = _gnutls_x509_read_value (resp->basicresp, name, &sa);
   if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   else if (ret < 0)
@@ -1444,7 +1427,7 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
 		"tbsResponseData.responses.?%u.certID.issuerNameHash",
 		indx + 1);
       ret = _gnutls_x509_read_value (resp->basicresp, name,
-				     issuer_name_hash, 0);
+				     issuer_name_hash);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -1458,7 +1441,7 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
 		"tbsResponseData.responses.?%u.certID.issuerKeyHash",
 		indx + 1);
       ret = _gnutls_x509_read_value (resp->basicresp, name,
-				     issuer_key_hash, 0);
+				     issuer_key_hash);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -1474,7 +1457,7 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
 		"tbsResponseData.responses.?%u.certID.serialNumber",
 		indx + 1);
       ret = _gnutls_x509_read_value (resp->basicresp, name,
-				     serial_number, 0);
+				     serial_number);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -1491,7 +1474,7 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
       snprintf (name, sizeof (name),
 		"tbsResponseData.responses.?%u.certStatus",
 		indx + 1);
-      ret = _gnutls_x509_read_value (resp->basicresp, name, &sa, 0);
+      ret = _gnutls_x509_read_value (resp->basicresp, name, &sa);
       if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
       else if (ret < 0)
@@ -1655,7 +1638,7 @@ gnutls_ocsp_resp_get_extension (gnutls_ocsp_resp_t resp,
     {
       snprintf (name, sizeof (name),
 		"tbsResponseData.responseExtensions.?%u.extnID", indx + 1);
-      ret = _gnutls_x509_read_value (resp->basicresp, name, oid, 0);
+      ret = _gnutls_x509_read_value (resp->basicresp, name, oid);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -1667,7 +1650,7 @@ gnutls_ocsp_resp_get_extension (gnutls_ocsp_resp_t resp,
     {
       snprintf (name, sizeof (name),
 		"tbsResponseData.responseExtensions.?%u.extnValue", indx + 1);
-      ret = _gnutls_x509_read_value (resp->basicresp, name, data, 0);
+      ret = _gnutls_x509_read_value (resp->basicresp, name, data);
       if (ret != GNUTLS_E_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -1701,7 +1684,6 @@ gnutls_ocsp_resp_get_nonce (gnutls_ocsp_resp_t resp,
 			    gnutls_datum_t *nonce)
 {
   int ret;
-  size_t l = 0;
   gnutls_datum_t tmp;
 
   ret = get_extension (resp->basicresp, "tbsResponseData.responseExtensions",
@@ -1713,32 +1695,16 @@ gnutls_ocsp_resp_get_nonce (gnutls_ocsp_resp_t resp,
       return ret;
     }
 
-  ret = _gnutls_x509_decode_octet_string (NULL, tmp.data, (size_t) tmp.size,
-					  NULL, &l);
-  if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+  ret = _gnutls_x509_decode_string (NULL, tmp.data, (size_t) tmp.size,
+			   	    nonce);
+  if (ret < 0)
     {
       gnutls_assert ();
       gnutls_free (tmp.data);
       return ret;
     }
 
-  nonce->data = gnutls_malloc (l);
-  if (nonce->data == NULL)
-    {
-      gnutls_assert ();
-      gnutls_free (tmp.data);
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  ret = _gnutls_x509_decode_octet_string (NULL, tmp.data, (size_t) tmp.size,
-					  nonce->data, &l);
   gnutls_free (tmp.data);
-  if (ret != GNUTLS_E_SUCCESS)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-  nonce->size = l;
 
   return GNUTLS_E_SUCCESS;
 }
@@ -1761,7 +1727,7 @@ gnutls_ocsp_resp_get_signature_algorithm (gnutls_ocsp_resp_t resp)
   gnutls_datum_t sa;
 
   ret = _gnutls_x509_read_value (resp->basicresp,
-				 "signatureAlgorithm.algorithm", &sa, 0);
+				 "signatureAlgorithm.algorithm", &sa);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1797,7 +1763,7 @@ gnutls_ocsp_resp_get_signature (gnutls_ocsp_resp_t resp,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_x509_read_value (resp->basicresp, "signature", sig, 2);
+  ret = _gnutls_x509_read_string (resp->basicresp, "signature", sig, RV_BIT_STRING);
   if (ret != GNUTLS_E_SUCCESS)
     {
       gnutls_assert ();

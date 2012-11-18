@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <c-ctype.h>
 
 #ifdef _WIN32
 # include <windows.h>
@@ -471,3 +472,80 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
   return r;
 #endif
 }
+
+#if defined(HAVE_ICONV)
+
+# include <iconv.h>
+
+int _gnutls_ucs2_to_utf8(const void* data, size_t size, gnutls_datum_t *output)
+{
+iconv_t conv;
+int ret;
+size_t orig, dstlen = size*2;
+char* src = (void*)data;
+char* dst, *pdst;
+
+  if (size == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+    
+  conv = iconv_open("UTF-8", "UTF-16BE");
+  if (conv == (iconv_t)-1)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+  
+  pdst = dst = gnutls_malloc(dstlen+1);
+  if (dst == NULL)
+    {
+      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+      goto cleanup;
+    }
+
+  orig = dstlen;
+  ret = iconv(conv, &src, &size, &pdst, &dstlen);
+  if (ret == -1)
+    {
+      ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+      goto cleanup;
+    }
+    
+
+  output->data = (void*)dst;
+  output->size = orig-dstlen;
+  output->data[output->size] = 0;
+
+  ret = 0;
+  
+cleanup:
+  iconv_close(conv);
+  
+  return ret;
+}
+#else
+
+/* Can convert only english */
+int _gnutls_ucs2_to_utf8(const void* data, size_t size, gnutls_datum_t *output)
+{
+unsigned int i, j;
+char* dst;
+const char *src = data;
+
+  if (size == 0 || size % 2 != 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  dst = gnutls_malloc(size+1);
+  if (dst == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  for (i=j=0;i<size;i+=2,j++)
+    {
+      if (src[i] != 0 || !isprint(src[i+1]))
+        return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+      dst[j] = src[i+1];
+    }
+    
+  output->data = (void*)dst;
+  output->size = j;
+  output->data[output->size] = 0;
+
+  return 0;
+}
+#endif
