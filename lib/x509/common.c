@@ -302,12 +302,13 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
   else
     {                           /* choice */
       int non_printable = 0, teletex = 0;
+      int ucs2 = 0;
       str[len] = 0;
 
       /* Note that we do not support strings other than
        * UTF-8 (thus ASCII as well).
        */
-      if (strcmp (str, "printableString") != 0 &&
+      if (strcmp (str, "printableString") != 0 && strcmp (str, "bmpString") != 0 && 
           strcmp (str, "ia5String") != 0 && strcmp (str, "utf8String") != 0)
         {
           non_printable = 1;
@@ -315,6 +316,8 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       if (strcmp (str, "teletexString") == 0)
         teletex = 1;
 
+      if (strcmp (str, "bmpString") == 0)
+        ucs2 = 1;
 
       _gnutls_str_cpy (tmpname, sizeof (tmpname), str);
 
@@ -327,8 +330,27 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
         }
 
       asn1_delete_structure (&tmpasn);
+      
+      if (ucs2 != 0)
+        {
+          gnutls_datum_t td;
 
-      if (teletex != 0)
+          result = _gnutls_ucs2_to_utf8(str, len, &td);
+          if (result < 0)
+            return gnutls_assert_val(result);
+            
+          if (td.size >= sizeof(str))
+            {
+              gnutls_free(td.data);
+              return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+            }
+            
+          memcpy(str, td.data, td.size);
+          len = td.size;
+          
+          gnutls_free(td.data);
+        }
+      else if (teletex != 0)
         {
           int ascii = 0, i;
           /* HACK: if the teletex string contains only ascii
