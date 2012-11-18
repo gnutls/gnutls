@@ -357,7 +357,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
            * characters then treat it as printable.
            */
           for (i = 0; i < len; i++)
-            if (!isprint (str[i]))
+            if (!isascii (str[i]))
               ascii = 1;
 
           if (ascii == 0)

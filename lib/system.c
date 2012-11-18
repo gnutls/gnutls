@@ -537,7 +537,7 @@ const char *src = data;
 
   for (i=j=0;i<size;i+=2,j++)
     {
-      if (src[i] != 0 || !isprint(src[i+1]))
+      if (src[i] != 0 || !isascii(src[i+1]))
         return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
       dst[j] = src[i+1];
     }
