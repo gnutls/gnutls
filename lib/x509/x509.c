@@ -1865,9 +1865,8 @@ cleanup:
  * This function will extract the certificate policy specified by the
  * given index. 
  *
- * If @oid is null then only the size will be filled. The @oid
- * returned will be null terminated, although @oid_size will not
- * account for the trailing null.
+ * The policy returned by this function must be deinitialized by using
+ * gnutls_certificate_policy_release().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * if the extension is not present, otherwise a negative error value.
