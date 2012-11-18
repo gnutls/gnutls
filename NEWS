@@ -4,21 +4,26 @@ See the end for copying conditions.
 
 * Version 3.1.5 (unreleased)
 
+** libgnutls: Added functions to parse the certificates policies
+extension.
+
+** libgnutls: Added PKCS #11 key generation function that returns the 
+public key on generation.
+
+** libgnutls: Corrected bug in priority string parsing, that mostly 
+affected combined levels. Patch by Tim Kosse.
+
 ** certtool: The --pubkey-info option can be combined with the
 --load-privkey in order to print the corresponding public key of a private 
 key.
-
-** Added PKCS #11 key generation function that returns the public key
-on generation.
-
-** Corrected bug in priority string parsing, that mostly affected combined
-levels. Patch by Tim Kosse.
 
 ** p11tool: After key generation, outputs the public key (useful in
 tokens that do not store the public key).
 
 ** API and ABI modifications:
 gnutls_pkcs11_privkey_generate2: Added
+gnutls_x509_crt_get_policy: Added
+gnutls_certificate_policy_release: Added
 
 
 * Version 3.1.4 (released 2012-11-10)
