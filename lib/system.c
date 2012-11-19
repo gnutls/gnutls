@@ -519,6 +519,67 @@ cleanup:
   
   return ret;
 }
+#elif defined(_WIN32)
+#include <Winnls.h>
+
+/* Can convert only english */
+int _gnutls_ucs2_to_utf8(const void* data, size_t size, gnutls_datum_t *output)
+{
+int ret;
+int len = 0, src_len;
+char* dst = NULL;
+char* src = NULL;
+
+  src_len = size/2;
+
+  src = gnutls_malloc(size);
+  if (src == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  /* convert to LE */
+  for (i=0;i<size;i+=2)
+    {
+      src[i] = ((char*)data)[1+i];
+      src[1+i] = ((char*)data)[i];
+    }
+  
+  ret = WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, src, src_len,
+                            NULL, 0, NULL, NULL);
+  if (ret == 0)
+    {
+      ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+      goto fail;
+    }
+
+  len = ret+1;
+  dst = gnutls_malloc(len);
+  if (dst == NULL)
+    {
+      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+      goto fail;
+    }
+  
+  ret = WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, data, size/2,
+                            dst, len, NULL, NULL);
+  if (ret == 0)
+    {
+      ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+      goto fail;
+    }
+  
+  output->data = dst;
+  output->size = ret;
+  ret = 0;
+  goto cleanup;
+  
+fail:
+  gnutls_free(dst);
+
+cleanup:
+  gnutls_free(src);
+  return ret;
+}
+
 #else
 
 /* Can convert only english */
