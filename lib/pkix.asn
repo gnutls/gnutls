@@ -147,6 +147,7 @@ BMPString ::= [UNIVERSAL 30] IMPLICIT OCTET STRING
 UTF8String ::= [UNIVERSAL 12] IMPLICIT OCTET STRING
         -- The content of this type conforms to RFC 2279.
 
+VisibleString ::= [UNIVERSAL 26] IMPLICIT OCTET STRING
 
 -- attribute data types --
 
@@ -577,6 +578,7 @@ NoticeReference ::= SEQUENCE {
 
 DisplayText ::= CHOICE {
   ia5String        IA5String      (SIZE (1..200)),
+  visibleString    VisibleString  (SIZE (1..200)),
   bmpString        BMPString      (SIZE (1..200)),
   utf8String       UTF8String     (SIZE (1..200)) }
 
