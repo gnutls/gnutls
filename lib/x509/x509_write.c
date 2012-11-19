@@ -382,7 +382,7 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
  * @oid: holds an Object Identified in null terminated string
  * @buf: a pointer to a DER encoded data
  * @sizeof_buf: holds the size of @buf
- * @critical: should be non (0) if the extension is to be marked as critical
+ * @critical: should be non-zero if the extension is to be marked as critical
  *
  * This function will set an the extension, by the specified OID, in
  * the certificate.  The extension data should be binary data DER
@@ -1543,4 +1543,225 @@ cleanup:
   asn1_delete_structure (&c2);
   
   return ret;
+}
+
+static int encode_user_notice(const gnutls_datum_t* txt, gnutls_datum_t *der_data)
+{
+  int result;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+  if ((result =
+       asn1_create_element (_gnutls_get_pkix (),
+                            "PKIX1.UserNotice",
+                            &c2)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto error;
+    }
+
+  /* delete noticeRef */
+  result =
+    asn1_write_value (c2, "noticeRef", NULL, 0);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto error;
+    }
+
+  result =
+    asn1_write_value (c2, "explicitText", "utf8String", 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto error;
+    }
+
+  result =
+    asn1_write_value (c2, "explicitText.utf8String", txt->data, txt->size);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto error;
+    }
+
+  result = _gnutls_x509_der_encode(c2, "", der_data, 0);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto error;
+    }
+
+  result = 0;
+
+error:
+  asn1_delete_structure (&c2);
+  return result;
+
+}
+
+/**
+ * gnutls_x509_crt_set_policy:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @policy: A pointer to a policy structure.
+ * @critical: use non-zero if the extension is marked as critical
+ *
+ * This function will set the certificate policy extension (2.5.29.32).
+ * Multiple calls to this function append a new policy.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_set_policy (gnutls_x509_crt_t crt, struct gnutls_x509_policy_st* policy,
+                            unsigned int critical)
+{
+  int result;
+  unsigned i;
+  gnutls_datum_t der_data, tmpd, prev_der_data = {NULL, 0};
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  const char* oid;
+
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result = _gnutls_x509_crt_get_extension (crt, "2.5.29.32", 0,
+                                           &prev_der_data, NULL);
+  if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  result =
+    asn1_create_element (_gnutls_get_pkix (), "PKIX1.certificatePolicies", &c2);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+  
+  if (prev_der_data.data != NULL)
+    {
+      result =
+        asn1_der_decoding (&c2, prev_der_data.data, prev_der_data.size,
+                           NULL);
+
+      if (result != ASN1_SUCCESS)
+        {
+          gnutls_assert ();
+          result = _gnutls_asn2err (result);
+          goto cleanup;
+        }
+    }
+
+  /* 1. write a new policy */
+  result = asn1_write_value (c2, "", "NEW", 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  /* 2. Add the OID.
+   */
+  result = asn1_write_value (c2, "?LAST.policyIdentifier", policy->oid, 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  for (i=0;i<MIN(policy->qualifiers,GNUTLS_MAX_QUALIFIERS);i++)
+    {
+      result = asn1_write_value (c2, "?LAST.policyQualifiers", "NEW", 1);
+      if (result != ASN1_SUCCESS)
+        {
+          gnutls_assert ();
+          result = _gnutls_asn2err (result);
+          goto cleanup;
+        }
+
+      if (policy->qualifier[i].type == GNUTLS_X509_QUALIFIER_URI)
+        oid = "1.3.6.1.5.5.7.2.1";
+      else if (policy->qualifier[i].type == GNUTLS_X509_QUALIFIER_NOTICE)
+        oid = "1.3.6.1.5.5.7.2.2";
+      else
+        {
+          result = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+          goto cleanup;
+        }
+
+      result = asn1_write_value (c2, "?LAST.policyQualifiers.?LAST.policyQualifierId", oid, 1);
+      if (result != ASN1_SUCCESS)
+        {
+          gnutls_assert ();
+          result = _gnutls_asn2err (result);
+          goto cleanup;
+        }
+
+      if (policy->qualifier[i].type == GNUTLS_X509_QUALIFIER_URI)
+        {
+          tmpd.data = (void*)policy->qualifier[i].data;
+          tmpd.size = policy->qualifier[i].size;
+          
+          result = _gnutls_x509_write_value(c2, "?LAST.policyQualifiers.?LAST.qualifier", 
+                                            &tmpd, RV_IA5STRING);
+          if (result < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+        }
+      else if (policy->qualifier[i].type == GNUTLS_X509_QUALIFIER_NOTICE)
+        {
+          tmpd.data = (void*)policy->qualifier[i].data;
+          tmpd.size = policy->qualifier[i].size;
+
+          result = encode_user_notice(&tmpd, &der_data);
+          if (result < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+
+          result = _gnutls_x509_write_value(c2, "?LAST.policyQualifiers.?LAST.qualifier", 
+                                            &der_data, RV_RAW);
+          _gnutls_free_datum(&der_data);
+          if (result < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+        }
+    }
+
+  result = _gnutls_x509_der_encode (c2, "", &der_data, 0);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_crt_set_extension (crt, "2.5.29.32",
+                                           &der_data, 0);
+
+  _gnutls_free_datum(&der_data);
+
+  crt->use_extensions = 1;
+
+cleanup:
+  asn1_delete_structure (&c2);
+  _gnutls_free_datum(&prev_der_data);
+
+  return result;
 }

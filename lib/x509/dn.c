@@ -623,6 +623,17 @@ cleanup:
   return result;
 }
 
+static int is_printable(char p)
+{
+  if ((p >= 'a' && p <= 'z') || (p >= 'A' && p <= 'Z') ||
+      (p >= '0' && p <= '9') || p == ' ' || p == '(' || p == ')' ||
+      p == '(' || p == '+' || p == ',' || p == '-' || p == '.' || 
+      p == '/' || p == ':' || p == '=' || p == '?')
+    return 1;
+    
+  return 0;
+}
+
 /* This will encode and write the AttributeTypeAndValue field.
  * 'multi' must be (0) if writing an AttributeTypeAndValue, and 1 if Attribute.
  * In all cases only one value is written.
@@ -667,12 +678,12 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
 
       string_type = "printableString";
 
-      /* Check if the data is plain ascii, and use
+      /* Check if the data is ASN.1 printable, and use
        * the UTF8 string type if not.
        */
       for (i = 0; i < sizeof_data; i++)
         {
-          if (!isascii (data[i]))
+          if (!is_printable (data[i]))
             {
               string_type = "utf8String";
               break;

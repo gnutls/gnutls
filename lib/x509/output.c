@@ -977,15 +977,15 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
                 }
 
               addf (str, "%s\t\tCertificate Policies (%s):\n", prefix, critical ? _("critical") : _("not critical"));
-              addf (str, "%s\t\t\t%s\n", prefix, policy.policy_oid);
+              addf (str, "%s\t\t\t%s\n", prefix, policy.oid);
               for (j=0;j<policy.qualifiers;j++)
                 {
-                  if (policy.qualifier_type[j]==GNUTLS_X509_QUALIFIER_URI)
+                  if (policy.qualifier[j].type==GNUTLS_X509_QUALIFIER_URI)
                     name = "URI";
-                  else if (policy.qualifier_type[j]==GNUTLS_X509_QUALIFIER_NOTICE)
+                  else if (policy.qualifier[j].type==GNUTLS_X509_QUALIFIER_NOTICE)
                     name = "Note";
                   else name = "Unknown qualifier";
-                  addf (str, "%s\t\t\t\t%s: %s\n", prefix, name, policy.qualifier_data[j]);
+                  addf (str, "%s\t\t\t\t%s: %s\n", prefix, name, policy.qualifier[j].data);
                 }
           
               gnutls_x509_policy_release (&policy);

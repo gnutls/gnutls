@@ -1771,25 +1771,25 @@ void gnutls_x509_policy_release(struct gnutls_x509_policy_st* policy)
 {
 unsigned i;
 
-  gnutls_free(policy->policy_oid);
+  gnutls_free(policy->oid);
   for (i=0;i<policy->qualifiers;i++)
-    gnutls_free(policy->qualifier_data[i]);
+    gnutls_free(policy->qualifier[i].data);
 }
 
-static int decode_user_notice(const void* data, size_t size, char** txt)
+static int decode_user_notice(const void* data, size_t size, gnutls_datum_t *txt)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int ret, len;
   char choice_type[64];
   char name[128];
-  gnutls_datum_t td, td2;
+  gnutls_datum_t td, utd;
 
   ret = asn1_create_element
     (_gnutls_get_pkix (), "PKIX1.UserNotice", &c2);
   if (ret != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      ret = _gnutls_asn2err (ret);
+      ret = GNUTLS_E_PARSING_ERROR;
       goto cleanup;
     }
 
@@ -1797,7 +1797,7 @@ static int decode_user_notice(const void* data, size_t size, char** txt)
   if (ret != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      ret = _gnutls_asn2err (ret);
+      ret = GNUTLS_E_PARSING_ERROR;
       goto cleanup;
     }
   
@@ -1806,7 +1806,7 @@ static int decode_user_notice(const void* data, size_t size, char** txt)
   if (ret != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      ret = _gnutls_asn2err (ret);
+      ret = GNUTLS_E_PARSING_ERROR;
       goto cleanup;
     }
 
@@ -1821,7 +1821,7 @@ static int decode_user_notice(const void* data, size_t size, char** txt)
   snprintf (name, sizeof (name), "explicitText.%s", choice_type);
 
   ret = _gnutls_x509_read_value(c2, name, &td);
-  if (ret != ASN1_SUCCESS)
+  if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
@@ -1829,7 +1829,7 @@ static int decode_user_notice(const void* data, size_t size, char** txt)
 
   if (strcmp(choice_type, "bmpString") == 0)
     { /* convert to UTF-8 */
-      ret = _gnutls_ucs2_to_utf8(td.data, td.size, &td2);
+      ret = _gnutls_ucs2_to_utf8(td.data, td.size, &utd);
       _gnutls_free_datum(&td);
       if (ret < 0)
         {
@@ -1837,8 +1837,8 @@ static int decode_user_notice(const void* data, size_t size, char** txt)
           goto cleanup;
         }
         
-      td.data = td2.data;
-      td.size = td2.size;
+      td.data = utd.data;
+      td.size = utd.size;
     }
   else
     {
@@ -1846,7 +1846,8 @@ static int decode_user_notice(const void* data, size_t size, char** txt)
       td.data[td.size] = 0;
     }
 
-  *txt = (void*)td.data;
+  txt->data = (void*)td.data;
+  txt->size = td.size;
   ret = 0;
 
 cleanup:
@@ -1937,7 +1938,7 @@ gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx,
       gnutls_assert();
       goto cleanup;
     }
-  policy->policy_oid = (void*)tmpd.data;
+  policy->oid = (void*)tmpd.data;
   tmpd.data = NULL;
   
   for (i=0;i<GNUTLS_MAX_QUALIFIERS;i++)
@@ -1970,12 +1971,15 @@ gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx,
               goto full_cleanup;
             }
 
-          policy->qualifier_data[i] = (void*)td.data;
+          policy->qualifier[i].data = (void*)td.data;
+          policy->qualifier[i].size = td.size;
           td.data = NULL;
-          policy->qualifier_type[i] = GNUTLS_X509_QUALIFIER_URI;
+          policy->qualifier[i].type = GNUTLS_X509_QUALIFIER_URI;
         }
       else if (strcmp(tmpoid, "1.3.6.1.5.5.7.2.2") == 0)
         {
+          gnutls_datum_t txt;
+
           snprintf (tmpstr, sizeof (tmpstr), "?%u.policyQualifiers.?%u.qualifier", indx, i+1);
 
           ret = _gnutls_x509_read_string(c2, tmpstr, &td, RV_RAW);
@@ -1985,7 +1989,7 @@ gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx,
               goto full_cleanup;
             }
 
-          ret = decode_user_notice(td.data, td.size, &policy->qualifier_data[i]);
+          ret = decode_user_notice(td.data, td.size, &txt);
           gnutls_free(td.data);
           td.data = NULL;
 
@@ -1995,15 +1999,16 @@ gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx,
               goto full_cleanup;
             }
 
-          policy->qualifier_type[i] = GNUTLS_X509_QUALIFIER_NOTICE;
+          policy->qualifier[i].data = (void*)txt.data;
+          policy->qualifier[i].size = txt.size;
+          policy->qualifier[i].type = GNUTLS_X509_QUALIFIER_NOTICE;
         }
       else
-        policy->qualifier_type[i] = GNUTLS_X509_QUALIFIER_UNKNOWN;
+        policy->qualifier[i].type = GNUTLS_X509_QUALIFIER_UNKNOWN;
       
       policy->qualifiers++;
     
     }
-  
 
   ret = 0;
   goto cleanup;
