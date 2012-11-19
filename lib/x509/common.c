@@ -337,18 +337,23 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 
           result = _gnutls_ucs2_to_utf8(str, len, &td);
           if (result < 0)
-            return gnutls_assert_val(result);
-            
-          if (td.size >= sizeof(str))
             {
-              gnutls_free(td.data);
-              return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+              /* could not convert. Handle it as non-printable */
+              non_printable = 1;
+              ucs2 = 0;
             }
-            
-          memcpy(str, td.data, td.size);
-          len = td.size;
+          else
+            {
+              if (td.size >= sizeof(str))
+                {
+                  gnutls_free(td.data);
+                  return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+                }
+              memcpy(str, td.data, td.size);
+              len = td.size;
           
-          gnutls_free(td.data);
+              gnutls_free(td.data);
+            }
         }
       else if (teletex != 0)
         {
@@ -370,7 +375,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 
           /* Refuse to deal with strings containing NULs. */
           if (strlen (str) != (size_t)len)
-            return GNUTLS_E_ASN1_DER_ERROR;
+            return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
 
           if (res)
             _gnutls_str_cpy (res, *res_size, str);
@@ -380,10 +385,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
         {
           result = _gnutls_x509_data2hex (str, (size_t)len, res, res_size);
           if (result < 0)
-            {
-              gnutls_assert ();
-              return result;
-            }
+            return gnutls_assert_val(result);
         }
     }
 
