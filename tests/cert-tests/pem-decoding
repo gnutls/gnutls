@@ -25,6 +25,7 @@ set -e
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
+#check whether "funny" spaces can be interpreted
 $CERTTOOL --certificate-info --infile $srcdir/funny-spacing.pem >/dev/null 2>&1
 rc=$?
 
@@ -32,5 +33,22 @@ rc=$?
 if test "$rc" != "0"; then
   exit $rc
 fi
+
+#check whether a BMPString attribute can be properly decoded
+$CERTTOOL --certificate-info --infile $srcdir/bmpstring.pem >tmp-pem.pem
+rc=$?
+
+if test "$rc" != "0"; then
+  exit $rc
+fi
+
+diff $srcdir/bmpstring.pem tmp-pem.pem
+rc=$?
+
+if test "$rc" != "0"; then
+  exit $rc
+fi
+
+rm -f tmp-pem.pem
 
 exit 0
