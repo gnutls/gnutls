@@ -1228,7 +1228,7 @@ write_attributes (gnutls_pkcs12_bag_t bag, int elem,
 
 
 /* Encodes the bag into a SafeContents structure, and puts the output in
- * the given datum. Enc is set to non (0) if the data are encrypted;
+ * the given datum. Enc is set to non-zero if the data are encrypted;
  */
 int
 _pkcs12_encode_safe_contents (gnutls_pkcs12_bag_t bag, ASN1_TYPE * contents,

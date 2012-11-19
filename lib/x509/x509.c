@@ -278,7 +278,7 @@ gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use (0) to get the first one.
- * @raw_flag: If non (0) returns the raw DER data of the DN part.
+ * @raw_flag: If non-zero returns the raw DER data of the DN part.
  * @buf: a pointer to a structure to hold the name (may be null)
  * @buf_size: initially holds the size of @buf
  *
@@ -390,7 +390,7 @@ gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use (0) to get the first one.
- * @raw_flag: If non (0) returns the raw DER data of the DN part.
+ * @raw_flag: If non-zero returns the raw DER data of the DN part.
  * @buf: a pointer where the DN part will be copied (may be null).
  * @buf_size: initially holds the size of @buf
  *
@@ -735,7 +735,7 @@ gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @ret: The place where the identifier will be copied
  * @ret_size: Holds the size of the result field.
- * @critical: will be non (0) if the extension is marked as critical (may be null)
+ * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function will return the X.509v3 certificate's subject key
  * identifier.  This is obtained by the X.509 Subject Key identifier
@@ -876,7 +876,7 @@ _get_authority_key_id (gnutls_x509_crt_t cert, ASN1_TYPE *c2,
  * @alt_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
  * @serial: buffer to store the serial number (may be null)
  * @serial_size: Holds the size of the serial field (may be null)
- * @critical: will be non (0) if the extension is marked as critical (may be null)
+ * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function will return the X.509 authority key
  * identifier when stored as a general name (authorityCertIssuer) 
@@ -941,7 +941,7 @@ fail:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @id: The place where the identifier will be copied
  * @id_size: Holds the size of the id field.
- * @critical: will be non (0) if the extension is marked as critical (may be null)
+ * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function will return the X.509v3 certificate authority's key
  * identifier.  This is obtained by the X.509 Authority Key
@@ -1315,7 +1315,7 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @san: is the place where the alternative name will be copied to
  * @san_size: holds the size of san.
- * @critical: will be non (0) if the extension is marked as critical (may be null)
+ * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function retrieves the Alternative Name (2.5.29.17), contained
  * in the given certificate in the X509v3 Certificate Extensions.
@@ -1355,7 +1355,7 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ian: is the place where the alternative name will be copied to
  * @ian_size: holds the size of ian.
- * @critical: will be non (0) if the extension is marked as critical (may be null)
+ * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function retrieves the Issuer Alternative Name (2.5.29.18),
  * contained in the given certificate in the X509v3 Certificate
@@ -1399,7 +1399,7 @@ gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
  * @san: is the place where the alternative name will be copied to
  * @san_size: holds the size of ret.
  * @san_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
- * @critical: will be non (0) if the extension is marked as critical (may be null)
+ * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function will return the alternative names, contained in the
  * given certificate. It is the same as
@@ -1434,7 +1434,7 @@ gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
  * @ian: is the place where the alternative name will be copied to
  * @ian_size: holds the size of ret.
  * @ian_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
- * @critical: will be non (0) if the extension is marked as critical (may be null)
+ * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function will return the alternative names, contained in the
  * given certificate. It is the same as
@@ -1546,7 +1546,7 @@ gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
 /**
  * gnutls_x509_crt_get_basic_constraints:
  * @cert: should contain a #gnutls_x509_crt_t structure
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  * @ca: pointer to output integer indicating CA status, may be NULL,
  *   value is 1 if the certificate CA flag is set, 0 otherwise.
  * @pathlen: pointer to output integer indicating path length (may be
@@ -1612,7 +1612,7 @@ gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
 /**
  * gnutls_x509_crt_get_ca_status:
  * @cert: should contain a #gnutls_x509_crt_t structure
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  *
  * This function will return certificates CA status, by reading the
  * basicConstraints X.509 extension (2.5.29.19). If the certificate is
@@ -1639,7 +1639,7 @@ gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
  * gnutls_x509_crt_get_key_usage:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @key_usage: where the key usage bits will be stored
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  *
  * This function will return certificate's key usage, by reading the
  * keyUsage X.509 extension (2.5.29.15). The key usage value will ORed
@@ -1700,7 +1700,7 @@ gnutls_x509_crt_get_key_usage (gnutls_x509_crt_t cert,
 /**
  * gnutls_x509_crt_get_proxy:
  * @cert: should contain a #gnutls_x509_crt_t structure
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  * @pathlen: pointer to output integer indicating path length (may be
  *   NULL), non-negative error codes indicate a present pCPathLenConstraint
  *   field and the actual value, -1 indicate that the field is absent.
@@ -1860,7 +1860,7 @@ cleanup:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: This specifies which policy to return. Use (0) to get the first one.
  * @policy: A pointer to a policy structure.
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  *
  * This function will extract the certificate policy (extension 2.5.29.32) 
  * specified by the given index. 
@@ -2025,7 +2025,7 @@ cleanup:
  * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use (0) to get the first one.
  * @buf: a pointer to a structure to hold the name (may be null)
  * @buf_size: initially holds the size of @buf
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  *
  * This function will return the extension specified by the OID in the
  * certificate.  The extensions will be returned as binary data DER
@@ -2903,7 +2903,7 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
  * gnutls_x509_crt_get_preferred_hash_algorithm:
  * @crt: Holds the certificate
  * @hash: The result of the call with the hash algorithm used for signature
- * @mand: If non (0) it means that the algorithm MUST use this hash. May be NULL.
+ * @mand: If non-zero it means that the algorithm MUST use this hash. May be NULL.
  *
  * This function will read the certifcate and return the appropriate digest
  * algorithm to use for signing with this certificate. Some certificates (i.e.
@@ -3052,7 +3052,7 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
  * @ret: is the place where the distribution point will be copied to
  * @ret_size: holds the size of ret.
  * @reason_flags: Revocation reasons. An ORed sequence of flags from %gnutls_x509_crl_reason_flags_t.
- * @critical: will be non (0) if the extension is marked as critical (may be null)
+ * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function retrieves the CRL distribution points (2.5.29.31),
  * contained in the given certificate in the X509v3 Certificate

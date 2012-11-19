@@ -261,7 +261,7 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies
  *   which to send. Use (0) to get the first one.
- * @raw_flag: If non (0) returns the raw DER data of the DN part.
+ * @raw_flag: If non-zero returns the raw DER data of the DN part.
  * @buf: a pointer to a structure to hold the name (may be %NULL)
  * @sizeof_buf: initially holds the size of @buf
  *
@@ -1572,7 +1572,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t crq, int indx,
  * gnutls_x509_crq_get_key_usage:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @key_usage: where the key usage bits will be stored
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  *
  * This function will return certificate's key usage, by reading the
  * keyUsage X.509 extension (2.5.29.15).  The key usage value will
@@ -1629,7 +1629,7 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t crq,
 /**
  * gnutls_x509_crq_get_basic_constraints:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  * @ca: pointer to output integer indicating CA status, may be NULL,
  *   value is 1 if the certificate CA flag is set, 0 otherwise.
  * @pathlen: pointer to output integer indicating path length (may be
@@ -1777,7 +1777,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
  * @ret: is the place where the alternative name will be copied to
  * @ret_size: holds the size of ret.
  * @ret_type: holds the #gnutls_x509_subject_alt_name_t name type
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  *   (may be null)
  *
  * This function will return the alternative names, contained in the
@@ -1852,7 +1852,7 @@ gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t crq,
  *   specifies which to send. Use (0) to get the first one.
  * @buf: a pointer to a structure to hold the name (may be null)
  * @sizeof_buf: initially holds the size of @buf
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  *
  * This function will return the extension specified by the OID in
  * the certificate.  The extensions will be returned as binary data

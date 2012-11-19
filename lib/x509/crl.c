@@ -188,7 +188,7 @@ gnutls_x509_crl_get_issuer_dn (const gnutls_x509_crl_t crl, char *buf,
  * @crl: should contain a gnutls_x509_crl_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use (0) to get the first one.
- * @raw_flag: If non (0) returns the raw DER data of the DN part.
+ * @raw_flag: If non-zero returns the raw DER data of the DN part.
  * @buf: a pointer to a structure to hold the peer's name (may be null)
  * @sizeof_buf: initially holds the size of @buf
  *
@@ -761,7 +761,7 @@ _get_authority_key_id (gnutls_x509_crl_t cert, ASN1_TYPE *c2,
  * @alt_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
  * @serial: buffer to store the serial number (may be null)
  * @serial_size: Holds the size of the serial field (may be null)
- * @critical: will be non (0) if the extension is marked as critical (may be null)
+ * @critical: will be non-zero if the extension is marked as critical (may be null)
  *
  * This function will return the X.509 authority key
  * identifier when stored as a general name (authorityCertIssuer) 
@@ -830,7 +830,7 @@ fail:
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @id: The place where the identifier will be copied
  * @id_size: Holds the size of the result field.
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  *   (may be null)
  *
  * This function will return the CRL authority's key identifier.  This
@@ -881,7 +881,7 @@ gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *id,
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @ret: The place where the number will be copied
  * @ret_size: Holds the size of the result field.
- * @critical: will be non (0) if the extension is marked as critical
+ * @critical: will be non-zero if the extension is marked as critical
  *   (may be null)
  *
  * This function will return the CRL number extension.  This is

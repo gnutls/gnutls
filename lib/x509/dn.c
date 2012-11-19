@@ -796,7 +796,7 @@ _gnutls_x509_write_attribute (const char *given_oid,
 /* Decodes an X.509 Attribute (if multi==1) or an AttributeTypeAndValue
  * otherwise.
  *
- * octet_string should be non (0) if we are to decode octet strings after
+ * octet_string should be non-zero if we are to decode octet strings after
  * decoding.
  *
  * The output is allocated and stored in value.
@@ -1075,7 +1075,7 @@ gnutls_x509_rdn_get (const gnutls_datum_t * idn,
  * @oid: an Object Identifier
  * @indx: In case multiple same OIDs exist in the RDN indicates which
  *   to send. Use 0 for the first one.
- * @raw_flag: If non (0) then the raw DER data are returned.
+ * @raw_flag: If non-zero then the raw DER data are returned.
  * @buf: a pointer to a structure to hold the peer's name
  * @sizeof_buf: holds the size of @buf
  *
