@@ -520,12 +520,13 @@ cleanup:
   return ret;
 }
 #elif defined(_WIN32)
-#include <Winnls.h>
+#include <winnls.h>
 
 /* Can convert only english */
 int _gnutls_ucs2_to_utf8(const void* data, size_t size, gnutls_datum_t *output)
 {
 int ret;
+unsigned i;
 int len = 0, src_len;
 char* dst = NULL;
 char* src = NULL;
@@ -543,7 +544,7 @@ char* src = NULL;
       src[1+i] = ((char*)data)[i];
     }
   
-  ret = WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, src, src_len,
+  ret = WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, (void*)src, src_len,
                             NULL, 0, NULL, NULL);
   if (ret == 0)
     {
@@ -559,7 +560,7 @@ char* src = NULL;
       goto fail;
     }
   
-  ret = WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, data, size/2,
+  ret = WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS, (void*)src, src_len,
                             dst, len, NULL, NULL);
   if (ret == 0)
     {
