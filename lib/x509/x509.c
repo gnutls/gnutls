@@ -1862,8 +1862,8 @@ cleanup:
  * @policy: A pointer to a policy structure.
  * @critical: will be non (0) if the extension is marked as critical
  *
- * This function will extract the certificate policy specified by the
- * given index. 
+ * This function will extract the certificate policy (extension 2.5.29.32) 
+ * specified by the given index. 
  *
  * The policy returned by this function must be deinitialized by using
  * gnutls_certificate_policy_release().
