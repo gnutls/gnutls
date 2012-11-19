@@ -399,6 +399,7 @@ generate_certificate (gnutls_privkey_t * ret_key,
       get_dns_name_set (TYPE_CRT, crt);
       get_uri_set (TYPE_CRT, crt);
       get_ip_addr_set (TYPE_CRT, crt);
+      get_policy_set (crt);
 
       if (server != 0)
         {

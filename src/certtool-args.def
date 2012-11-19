@@ -633,8 +633,19 @@ signing_key
 # CA issuers URI
 # ca_issuers_uri = http://my.ca.issuer
 
+# Certificate policies
+# policy = 1.3.6.1.4.1.5484.1.10.99.1.0
+# policy1_txt = "This is a long policy to summarize"
+# policy1_url = http://www.example.com/a-policy-to-read
+
+# policy = 1.3.6.1.4.1.5484.1.10.99.1.1
+# policy2_txt = "This is a short policy"
+# policy2_url = http://www.example.com/another-policy-to-read
+
+
 # Options for proxy certificates
 # proxy_policy_language = 1.3.6.1.5.5.7.21.1
+
 
 # Options for generating a CRL
 

@@ -19,6 +19,8 @@ affected combined levels. Patch by Tim Kosse.
 --load-privkey in order to print the corresponding public key of a private 
 key.
 
+** certtool: It is able to set certificate policies via a template.
+
 ** p11tool: After key generation, outputs the public key (useful in
 tokens that do not store the public key).
 

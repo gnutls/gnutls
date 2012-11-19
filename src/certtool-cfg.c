@@ -61,6 +61,9 @@ typedef struct _cfg_ctx
   char *challenge_password;
   char *pkcs9_email;
   char *country;
+  char **policy_oid;
+  char *policy_txt[MAX_ENTRIES];
+  char *policy_url[MAX_ENTRIES];
   char **dc;
   char **dns_name;
   char **uri;
@@ -182,6 +185,7 @@ template_parse (const char *template)
   unsigned int i;
   tOptionValue const * pov;
   const tOptionValue* val;
+  char tmpstr[256];
 
   pov = configFileLoad(template);
   if (pov == NULL)
@@ -231,6 +235,29 @@ template_parse (const char *template)
   val = optionGetValue(pov, "country");
   if (val != NULL && val->valType == OPARG_TYPE_STRING)
     cfg.country = strdup(val->v.strVal);
+  
+  READ_MULTI_LINE("policy", cfg.policy_oid);
+  
+  if (cfg.policy_oid != NULL) 
+    {
+      int i = 0;
+      while(cfg.policy_oid[i] != NULL) 
+        {
+          snprintf(tmpstr, sizeof(tmpstr), "policy%d_url", i+1);
+          val = optionGetValue(pov, tmpstr);
+          if (val != NULL && val->valType == OPARG_TYPE_STRING)
+            cfg.policy_url[i] = strdup(val->v.strVal);
+
+          snprintf(tmpstr, sizeof(tmpstr), "policy%d_txt", i+1);
+          val = optionGetValue(pov, tmpstr);
+          if (val != NULL && val->valType == OPARG_TYPE_STRING)
+            {
+              cfg.policy_txt[i] = strdup(val->v.strVal);
+            }
+          
+          i++;
+        }
+    }
   
   READ_MULTI_LINE("dc", cfg.dc);
   READ_MULTI_LINE("dns_name", cfg.dns_name);
@@ -1207,6 +1234,54 @@ get_dns_name_set (int type, void *crt)
   if (ret < 0)
     {
       fprintf (stderr, "set_subject_alt_name: %s\n", gnutls_strerror (ret));
+      exit (1);
+    }
+}
+
+void
+get_policy_set (gnutls_x509_crt_t crt)
+{
+  int ret = 0, i;
+  gnutls_x509_policy_st policy;
+
+  if (batch)
+    {
+      if (!cfg.policy_oid)
+        return;
+
+      for (i = 0; cfg.policy_oid[i] != NULL; i++)
+        {
+          memset(&policy, 0, sizeof(policy));
+          policy.oid = cfg.policy_oid[i];
+          
+          if (cfg.policy_txt[i] != NULL)
+            {
+              policy.qualifier[policy.qualifiers].type = GNUTLS_X509_QUALIFIER_NOTICE;
+              policy.qualifier[policy.qualifiers].data = cfg.policy_txt[i];
+              policy.qualifier[policy.qualifiers].size = strlen(cfg.policy_txt[i]);
+              policy.qualifiers++;
+            }
+
+          if (cfg.policy_url[i] != NULL)
+            {
+              policy.qualifier[policy.qualifiers].type = GNUTLS_X509_QUALIFIER_URI;
+              policy.qualifier[policy.qualifiers].data = cfg.policy_url[i];
+              policy.qualifier[policy.qualifiers].size = strlen(cfg.policy_url[i]);
+              policy.qualifiers++;
+            }
+
+fprintf(stderr, "setting policy %s with %d qualifiers\n", policy.oid, policy.qualifiers);
+          
+          ret =
+            gnutls_x509_crt_set_policy (crt, &policy, 0);
+          if (ret < 0)
+            break;
+        }
+    }
+
+  if (ret < 0)
+    {
+      fprintf (stderr, "set_policy: %s\n", gnutls_strerror (ret));
       exit (1);
     }
 }
