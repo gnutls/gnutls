@@ -582,7 +582,7 @@ cleanup:
 
 #else
 
-/* Can convert only english */
+/* Can convert only english (ASCII) */
 int _gnutls_ucs2_to_utf8(const void* data, size_t size, gnutls_datum_t *output)
 {
 unsigned int i, j;
