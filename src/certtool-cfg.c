@@ -49,6 +49,7 @@
 extern int batch;
 
 #define MAX_ENTRIES 128
+#define MAX_POLICIES 8
 
 typedef struct _cfg_ctx
 {
@@ -61,9 +62,9 @@ typedef struct _cfg_ctx
   char *challenge_password;
   char *pkcs9_email;
   char *country;
-  char **policy_oid;
-  char *policy_txt[MAX_ENTRIES];
-  char *policy_url[MAX_ENTRIES];
+  char *policy_oid[MAX_POLICIES];
+  char *policy_txt[MAX_POLICIES];
+  char *policy_url[MAX_POLICIES];
   char **dc;
   char **dns_name;
   char **uri;
@@ -236,12 +237,14 @@ template_parse (const char *template)
   if (val != NULL && val->valType == OPARG_TYPE_STRING)
     cfg.country = strdup(val->v.strVal);
   
-  READ_MULTI_LINE("policy", cfg.policy_oid);
-  
-  if (cfg.policy_oid != NULL) 
+  for (i=0;i<MAX_POLICIES;i++)
     {
-      int i = 0;
-      while(cfg.policy_oid[i] != NULL) 
+      snprintf(tmpstr, sizeof(tmpstr), "policy%d", i+1);
+      val = optionGetValue(pov, tmpstr);
+      if (val != NULL && val->valType == OPARG_TYPE_STRING)
+        cfg.policy_oid[i] = strdup(val->v.strVal);
+  
+      if (cfg.policy_oid[i] != NULL)
         {
           snprintf(tmpstr, sizeof(tmpstr), "policy%d_url", i+1);
           val = optionGetValue(pov, tmpstr);
@@ -254,8 +257,6 @@ template_parse (const char *template)
             {
               cfg.policy_txt[i] = strdup(val->v.strVal);
             }
-          
-          i++;
         }
     }
   
@@ -1270,8 +1271,6 @@ get_policy_set (gnutls_x509_crt_t crt)
               policy.qualifiers++;
             }
 
-fprintf(stderr, "setting policy %s with %d qualifiers\n", policy.oid, policy.qualifiers);
-          
           ret =
             gnutls_x509_crt_set_policy (crt, &policy, 0);
           if (ret < 0)
