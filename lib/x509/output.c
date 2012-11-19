@@ -976,7 +976,8 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
                   break;
                 }
 
-              addf (str, "%s\t\tCertificate Policies (%s):\n", prefix, critical ? _("critical") : _("not critical"));
+              if (x==0) addf (str, "%s\t\tCertificate Policies (%s):\n", prefix, critical ? _("critical") : _("not critical"));
+
               addf (str, "%s\t\t\t%s\n", prefix, policy.oid);
               for (j=0;j<policy.qualifiers;j++)
                 {
