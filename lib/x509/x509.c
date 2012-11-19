@@ -1760,14 +1760,14 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_policy_release:
+ * gnutls_x509_policy_release:
  * @policy: a certificate policy
  *
  * This function will deinitialize all memory associated with the provided
  * @policy. The policy is allocated using gnutls_x509_crt_get_policy().
  *
  **/
-void gnutls_x509_crt_policy_release(struct gnutls_x509_crt_policy_st* policy)
+void gnutls_x509_policy_release(struct gnutls_x509_policy_st* policy)
 {
 unsigned i;
 
@@ -1866,14 +1866,14 @@ cleanup:
  * specified by the given index. 
  *
  * The policy returned by this function must be deinitialized by using
- * gnutls_x509_crt_policy_release().
+ * gnutls_x509_policy_release().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * if the extension is not present, otherwise a negative error value.
  **/
 int
 gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx, 
-                            struct gnutls_x509_crt_policy_st* policy, 
+                            struct gnutls_x509_policy_st* policy, 
                             unsigned int *critical)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -2009,7 +2009,7 @@ gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx,
   goto cleanup;
   
 full_cleanup:
-  gnutls_x509_crt_policy_release(policy);
+  gnutls_x509_policy_release(policy);
 
 cleanup:
   _gnutls_free_datum (&tmpd);

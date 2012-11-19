@@ -25,7 +25,7 @@ tokens that do not store the public key).
 ** API and ABI modifications:
 gnutls_pkcs11_privkey_generate2: Added
 gnutls_x509_crt_get_policy: Added
-gnutls_x509_crt_policy_release: Added
+gnutls_x509_policy_release: Added
 
 
 * Version 3.1.4 (released 2012-11-10)

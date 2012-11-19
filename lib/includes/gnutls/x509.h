@@ -351,7 +351,7 @@ extern "C"
     GNUTLS_X509_QUALIFIER_NOTICE
   } gnutls_x509_qualifier_t;
 
-  struct gnutls_x509_crt_policy_st 
+  struct gnutls_x509_policy_st 
     {
       char* policy_oid;
       unsigned int qualifiers;
@@ -359,9 +359,9 @@ extern "C"
       char *qualifier_data[GNUTLS_MAX_QUALIFIERS];
     };
 
-  void gnutls_x509_crt_policy_release(struct gnutls_x509_crt_policy_st* policy);
+  void gnutls_x509_policy_release(struct gnutls_x509_policy_st* policy);
   int gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx, 
-                                  struct gnutls_x509_crt_policy_st* policy,
+                                  struct gnutls_x509_policy_st* policy,
                                   unsigned int * critical);
   int gnutls_x509_dn_oid_known (const char *oid);
 

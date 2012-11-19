@@ -960,7 +960,7 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
         }
       else if (strcmp (oid, "2.5.29.32") == 0)
         {
-          struct gnutls_x509_crt_policy_st policy;
+          struct gnutls_x509_policy_st policy;
           const char* name;
           int x;
 
@@ -988,7 +988,7 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
                   addf (str, "%s\t\t\t\t%s: %s\n", prefix, name, policy.qualifier_data[j]);
                 }
           
-              gnutls_x509_crt_policy_release (&policy);
+              gnutls_x509_policy_release (&policy);
             }
         }
       else if (strcmp (oid, "2.5.29.35") == 0)
