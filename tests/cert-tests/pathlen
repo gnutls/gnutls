@@ -35,10 +35,12 @@ rc1=$?
 diff $srcdir/no-ca-or-pathlen.pem new-no-ca-or-pathlen.pem
 rc2=$?
 
-rm -f new-ca-no-pathlen.pem new-no-ca-or-pathlen.pem
 
 # We're done.
 if test "$rc1" != "0"; then
   exit $rc1
 fi
+
+rm -f new-ca-no-pathlen.pem new-no-ca-or-pathlen.pem
+
 exit $rc2
