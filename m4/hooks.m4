@@ -250,4 +250,9 @@ fi
    else
       AC_DEFINE([GNUTLS_POINTER_TO_INT_CAST], [])
    fi
+
+dnl this is called from somewhere else
+dnl #AM_ICONV
+dnl m4_ifdef([gl_ICONV_MODULE_INDICATOR],
+dnl  [gl_ICONV_MODULE_INDICATOR([iconv])])
 ])

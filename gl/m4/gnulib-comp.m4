@@ -143,6 +143,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module hash-pjw-bare:
   # Code from module havelib:
   # Code from module hostent:
+  # Code from module iconv:
+  # Code from module iconv-tests:
   # Code from module ignore-value:
   # Code from module ignore-value-tests:
   # Code from module include_next:
@@ -415,6 +417,12 @@ AC_SUBST([LTALLOCA])
   gl_DIRENT_H
   gl_DIRNAME_LGPL
   gl_DOUBLE_SLASH_ROOT
+  gl_FUNC_DUP2
+  if test $HAVE_DUP2 = 0 || test $REPLACE_DUP2 = 1; then
+    AC_LIBOBJ([dup2])
+    gl_PREREQ_DUP2
+  fi
+  gl_UNISTD_MODULE_INDICATOR([dup2])
   gl_HEADER_ERRNO_H
   gl_ERROR
   if test $ac_cv_lib_error_at_line = no; then
@@ -552,6 +560,9 @@ AC_SUBST([LTALLOCA])
         [AC_CONFIG_LINKS([$GNUmakefile:$GNUmakefile], [],
           [GNUmakefile=$GNUmakefile])])
   gl_HOSTENT
+  AM_ICONV
+  m4_ifdef([gl_ICONV_MODULE_INDICATOR],
+    [gl_ICONV_MODULE_INDICATOR([iconv])])
   gl_FUNC_INET_NTOP
   if test $HAVE_INET_NTOP = 0 || test $REPLACE_INET_NTOP = 1; then
     AC_LIBOBJ([inet_ntop])
@@ -891,12 +902,6 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
-  gl_FUNC_DUP2
-  if test $HAVE_DUP2 = 0 || test $REPLACE_DUP2 = 1; then
-    AC_LIBOBJ([dup2])
-    gl_PREREQ_DUP2
-  fi
-  gl_UNISTD_MODULE_INDICATOR([dup2])
   gl_ENVIRON
   gl_UNISTD_MODULE_INDICATOR([environ])
   gl_FCNTL_H
@@ -1160,6 +1165,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/dirname-lgpl.c
   lib/dirname.h
   lib/dosname.h
+  lib/dup2.c
   lib/errno.in.h
   lib/error.c
   lib/error.h
@@ -1562,6 +1568,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getopt_long.h
   tests/test-getpeername.c
   tests/test-gettimeofday.c
+  tests/test-iconv.c
   tests/test-ignore-value.c
   tests/test-inet_ntop.c
   tests/test-inet_pton.c
@@ -1662,7 +1669,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/zerosize-ptr.h
   tests=lib/binary-io.c
   tests=lib/binary-io.h
-  tests=lib/dup2.c
   tests=lib/fcntl.in.h
   tests=lib/fdopen.c
   tests=lib/ftruncate.c

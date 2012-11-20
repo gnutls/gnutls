@@ -199,10 +199,9 @@ AC_PROG_LIBTOOL
 
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
-AC_CHECK_FUNCS([fork getrusage getpwuid_r daemon iconv],,)
+AC_CHECK_FUNCS([fork getrusage getpwuid_r daemon],,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
-AC_LIB_HAVE_LINKFLAGS(iconv,, [#include <iconv.h>], [iconv_open (0,0);])
 
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,

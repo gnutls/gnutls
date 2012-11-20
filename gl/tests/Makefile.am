@@ -167,15 +167,6 @@ EXTRA_DIST += test-dirent.c
 
 ## end   gnulib module dirent-tests
 
-## begin gnulib module dup2
-
-
-EXTRA_DIST += dup2.c
-
-EXTRA_libtests_a_SOURCES += dup2.c
-
-## end   gnulib module dup2
-
 ## begin gnulib module dup2-tests
 
 TESTS += test-dup2
@@ -476,6 +467,16 @@ check_PROGRAMS += test-gettimeofday
 EXTRA_DIST += signature.h test-gettimeofday.c
 
 ## end   gnulib module gettimeofday-tests
+
+## begin gnulib module iconv-tests
+
+TESTS += test-iconv
+check_PROGRAMS += test-iconv
+test_iconv_LDADD = $(LDADD) @LIBICONV@
+
+EXTRA_DIST += test-iconv.c signature.h macros.h
+
+## end   gnulib module iconv-tests
 
 ## begin gnulib module ignore-value
 
