@@ -477,13 +477,15 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
 
 # include <iconv.h>
 
+#define INC(x) (2*x)
+
 int _gnutls_ucs2_to_utf8(const void* data, size_t size, gnutls_datum_t *output)
 {
 iconv_t conv;
 int ret;
-size_t orig, dstlen = size*2;
+size_t orig, dstlen = INC(size), tmp;
 char* src = (void*)data;
-char* dst, *pdst;
+char* dst = NULL, *pdst;
 
   if (size == 0)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -496,23 +498,49 @@ char* dst, *pdst;
   if (dst == NULL)
     {
       ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-      goto cleanup;
+      goto fail;
     }
 
   orig = dstlen;
   ret = iconv(conv, &src, &size, &pdst, &dstlen);
   if (ret == -1)
     {
-      ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-      goto cleanup;
+      if (dstlen != 0 || size == 0)
+        {
+          ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+          goto fail;
+        }
+
+      /* otherwise the buffer wasn't sufficient */
+      tmp = orig + INC(orig);
+      dstlen += INC(orig);
+
+      dst = gnutls_realloc_fast(dst, tmp);
+      if (dst == NULL)
+        {
+          ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+          goto fail;
+        }
+      pdst = dst + orig;
+      orig = tmp;
+
+      ret = iconv(conv, &src, &size, &pdst, &dstlen);
+      if (ret == -1)
+        {
+          ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+          goto fail;
+        }
     }
-    
 
   output->data = (void*)dst;
   output->size = orig-dstlen;
   output->data[output->size] = 0;
 
   ret = 0;
+  goto cleanup;
+  
+fail:
+  gnutls_free(dst);
   
 cleanup:
   iconv_close(conv);

@@ -8,7 +8,7 @@ See the end for copying conditions.
 extension.
 
 ** libgnutls: Handle BMPString (UCS-2) encoding in the Distinguished
-Name by translating it to UTF-8 (works on windows or systems with libiconv).
+Name by translating it to UTF-8 (works on windows or systems with iconv).
 
 ** libgnutls: Added PKCS #11 key generation function that returns the 
 public key on generation.
