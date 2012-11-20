@@ -22,8 +22,8 @@ key.
 
 ** certtool: It is able to set certificate policies via a template.
 
-** certtool: Added --numbers option which prints big numbers in an
-easier to parser format.
+** certtool: Added --simple-numbers option which prints big numbers in 
+an easier to parse format.
 
 ** p11tool: After key generation, outputs the public key (useful in
 tokens that do not store the public key).
@@ -35,6 +35,7 @@ gnutls_x509_crt_set_policy: Added
 gnutls_x509_policy_release: Added
 gnutls_pubkey_import_x509_crq: Added
 gnutls_pubkey_print: Added
+GNUTLS_CRT_PRINT_FULL_NUMBERS: Added
 
 
 * Version 3.1.4 (released 2012-11-10)
