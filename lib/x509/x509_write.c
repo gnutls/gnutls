@@ -1612,6 +1612,10 @@ error:
  * This function will set the certificate policy extension (2.5.29.32).
  * Multiple calls to this function append a new policy.
  *
+ * Note the maximum text size for the qualifier %GNUTLS_X509_QUALIFIER_NOTICE
+ * is 200 characters. This function will fail with %GNUTLS_E_INVALID_REQUEST
+ * if this is exceeded.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
@@ -1726,6 +1730,13 @@ gnutls_x509_crt_set_policy (gnutls_x509_crt_t crt, struct gnutls_x509_policy_st*
         {
           tmpd.data = (void*)policy->qualifier[i].data;
           tmpd.size = policy->qualifier[i].size;
+          
+          if (tmpd.size > 200) 
+            {
+              gnutls_assert();
+              result = GNUTLS_E_INVALID_REQUEST;
+              goto cleanup;
+            }
 
           result = encode_user_notice(&tmpd, &der_data);
           if (result < 0)
