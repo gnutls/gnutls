@@ -572,6 +572,7 @@ extern "C"
 /**
  * gnutls_certificate_print_formats_t:
  * @GNUTLS_CRT_PRINT_FULL: Full information about certificate.
+ * @GNUTLS_CRT_PRINT_FULL_NUMBERS: Full information about certificate and include easy to parse public key parameters.
  * @GNUTLS_CRT_PRINT_COMPACT: Information about certificate name in one line, plus identification of the public key.
  * @GNUTLS_CRT_PRINT_ONELINE: Information about certificate in one line.
  * @GNUTLS_CRT_PRINT_UNSIGNED_FULL: All info for an unsigned certificate.
@@ -583,7 +584,8 @@ extern "C"
     GNUTLS_CRT_PRINT_FULL = 0,
     GNUTLS_CRT_PRINT_ONELINE = 1,
     GNUTLS_CRT_PRINT_UNSIGNED_FULL = 2,
-    GNUTLS_CRT_PRINT_COMPACT = 3
+    GNUTLS_CRT_PRINT_COMPACT = 3,
+    GNUTLS_CRT_PRINT_FULL_NUMBERS = 4,
   } gnutls_certificate_print_formats_t;
 
 #define GNUTLS_PK_ECC GNUTLS_PK_EC

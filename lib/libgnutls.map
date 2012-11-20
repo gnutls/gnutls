@@ -874,6 +874,8 @@ GNUTLS_3_1_0 {
 	gnutls_x509_crt_get_policy;
 	gnutls_certificate_policy_release;
 	gnutls_x509_crt_set_policy;
+	gnutls_pubkey_import_x509_crq;
+	gnutls_pubkey_print;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

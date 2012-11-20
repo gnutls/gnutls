@@ -691,142 +691,18 @@ print_rsa_pkey (FILE* outfile, gnutls_datum_t * m, gnutls_datum_t * e, gnutls_da
     }
 }
 
-static void
-print_key_usage (FILE * outfile, unsigned int usage)
+void _pubkey_info(FILE* outfile, gnutls_certificate_print_formats_t format, gnutls_pubkey_t pubkey)
 {
-  if (usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
-    {
-      fprintf (outfile, "\tDigital signature.\n");
-    }
-
-  if (usage & GNUTLS_KEY_NON_REPUDIATION)
-    {
-      fprintf (outfile, "\tNon repudiation.\n");
-    }
-
-  if (usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
-    {
-      fprintf (outfile, "\tKey encipherment.\n");
-    }
-
-  if (usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
-    {
-      fprintf (outfile, "\tData encipherment.\n");
-    }
-
-  if (usage & GNUTLS_KEY_KEY_AGREEMENT)
-    {
-      fprintf (outfile, "\tKey agreement.\n");
-    }
-
-  if (usage & GNUTLS_KEY_KEY_CERT_SIGN)
-    {
-      fprintf (outfile, "\tCertificate signing.\n");
-    }
-
-  if (usage & GNUTLS_KEY_NON_REPUDIATION)
-    {
-      fprintf (outfile, "\tCRL signing.\n");
-    }
-
-  if (usage & GNUTLS_KEY_ENCIPHER_ONLY)
-    {
-      fprintf (outfile, "\tKey encipher only.\n");
-    }
-
-  if (usage & GNUTLS_KEY_DECIPHER_ONLY)
-    {
-      fprintf (outfile, "\tKey decipher only.\n");
-    }
-}
-
-void _pubkey_info(FILE* outfile, gnutls_pubkey_t pubkey)
-{
-unsigned int usage;
+gnutls_datum_t data;
 int ret;
 size_t size;
-unsigned int bits;
-const char *cprint;
 
-  fprintf (outfile, "Public Key Info:\n\n");
-  ret = gnutls_pubkey_get_pk_algorithm (pubkey, &bits);
-  fprintf (outfile, "Public Key Algorithm: ");
-  cprint = gnutls_pk_algorithm_get_name (ret);
-  fprintf (outfile, "%s (%u bits)\n", cprint ? cprint : "Unknown", bits);
-
-  /* Print the raw public and private keys
-   */
-  if (ret == GNUTLS_PK_RSA)
-    {
-      gnutls_datum_t m, e;
-
-      ret = gnutls_pubkey_get_pk_rsa_raw (pubkey, &m, &e);
-      if (ret < 0)
-        fprintf (stderr, "Error in key RSA data export: %s\n",
-                 gnutls_strerror (ret));
-      else
-        {
-          print_rsa_pkey (outfile, &m, &e, NULL, NULL, NULL, NULL, NULL, NULL);
-          gnutls_free (m.data);
-          gnutls_free (e.data);
-        }
-    }
-  else if (ret == GNUTLS_PK_DSA)
-    {
-      gnutls_datum_t p, q, g, y;
-
-      ret = gnutls_pubkey_get_pk_dsa_raw (pubkey, &p, &q, &g, &y);
-      if (ret < 0)
-        fprintf (stderr, "Error in key DSA data export: %s\n",
-                 gnutls_strerror (ret));
-      else
-        {
-          print_dsa_pkey (outfile, NULL, &y, &p, &q, &g);
-          gnutls_free (y.data);
-          gnutls_free (p.data);
-          gnutls_free (q.data);
-          gnutls_free (g.data);
-        }
-    }
-  else if (ret == GNUTLS_PK_EC)
-    {
-      gnutls_datum_t x, y;
-      gnutls_ecc_curve_t curve;
-
-      ret = gnutls_pubkey_get_pk_ecc_raw (pubkey, &curve, &x, &y);
-      if (ret < 0)
-        fprintf (stderr, "Error in key ECC data export: %s\n",
-                 gnutls_strerror (ret));
-      else
-        {
-          print_ecc_pkey (outfile, curve, NULL, &y, &x);
-          gnutls_free (y.data);
-          gnutls_free (x.data);
-        }
-    }
-
-  ret = gnutls_pubkey_get_key_usage (pubkey, &usage);
+  ret = gnutls_pubkey_print(pubkey, format, &data);
   if (ret < 0)
-    {
-      error (EXIT_FAILURE, 0, "pubkey_get_key_usage: %s",
-             gnutls_strerror (ret));
-    }
+    error (EXIT_FAILURE, 0, "pubkey_print error: %s", gnutls_strerror (ret));
 
-  fprintf (outfile, "Public Key Usage:\n");
-  print_key_usage (outfile, usage);
-
-  fprintf (outfile, "\n");
-
-  size = buffer_size;
-  if ((ret = gnutls_pubkey_get_key_id (pubkey, 0, buffer, &size)) < 0)
-    {
-      fprintf (stderr, "Error in key id calculation: %s\n",
-               gnutls_strerror (ret));
-    }
-  else
-    {
-      fprintf (outfile, "Public Key ID: %s\n", raw_to_string (buffer, size));
-    }
+  fprintf (outfile, "%s\n", data.data);
+  gnutls_free (data.data);
 
   size = buffer_size;
   ret = gnutls_pubkey_export (pubkey, GNUTLS_X509_FMT_PEM, buffer, &size);

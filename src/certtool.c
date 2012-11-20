@@ -79,6 +79,7 @@ FILE *infile;
 static gnutls_digest_algorithm_t default_dig;
 static unsigned int incert_format, outcert_format;
 static unsigned int req_key_type;
+gnutls_certificate_print_formats_t full_format = GNUTLS_CRT_PRINT_FULL;
 
 /* non interactive operation if set
  */
@@ -885,6 +886,9 @@ cmd_parser (int argc, char **argv)
   if (HAVE_OPT(GENERATE_PRIVKEY) || HAVE_OPT(GENERATE_REQUEST) ||
       HAVE_OPT(KEY_INFO) || HAVE_OPT(PGP_KEY_INFO))
     privkey_op = 1;
+    
+  if (HAVE_OPT(SIMPLE_NUMBERS))
+    full_format = GNUTLS_CRT_PRINT_FULL_NUMBERS;
 
   if (HAVE_OPT(OUTFILE))
     {
@@ -1436,7 +1440,7 @@ print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned int all)
   int ret;
 
   if (all)
-    ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &data);
+    ret = gnutls_x509_crt_print (crt, full_format, &data);
   else
     ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_UNSIGNED_FULL, &data);
   if (ret == 0)
@@ -1459,7 +1463,7 @@ print_crl_info (gnutls_x509_crl_t crl, FILE * out)
   int ret;
   size_t size;
 
-  ret = gnutls_x509_crl_print (crl, GNUTLS_CRT_PRINT_FULL, &data);
+  ret = gnutls_x509_crl_print (crl, full_format, &data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crl_print: %s", gnutls_strerror (ret));
 
@@ -1514,7 +1518,7 @@ print_crq_info (gnutls_x509_crq_t crq, FILE * out)
 
   if (outcert_format == GNUTLS_X509_FMT_PEM)
     {
-      ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &data);
+      ret = gnutls_x509_crq_print (crq, full_format, &data);
       if (ret < 0)
         error (EXIT_FAILURE, 0, "crq_print: %s", gnutls_strerror (ret));
 
@@ -2706,7 +2710,8 @@ void
 pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
 {
   gnutls_pubkey_t pubkey;
-  gnutls_privkey_t privkey;
+  gnutls_privkey_t privkey = NULL;
+  gnutls_x509_crq_t crq = NULL;
   int ret;
   size_t size;
 
@@ -2721,11 +2726,23 @@ pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
       crt = load_cert (0, cinfo);
     }
 
+  if (crq == NULL)
+    {
+      crq = load_request (cinfo);
+    }
+
   if (crt != NULL)
     {
       ret = gnutls_pubkey_import_x509 (pubkey, crt, 0);
       if (ret < 0)
         error (EXIT_FAILURE, 0, "pubkey_import_x509: %s",
+               gnutls_strerror (ret));
+    }
+  else if (crq != NULL)
+    {
+      ret = gnutls_pubkey_import_x509_crq (pubkey, crq, 0);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "pubkey_import_x509_crq: %s",
                gnutls_strerror (ret));
     }
   else
@@ -2762,6 +2779,6 @@ pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
     
   /* PEM */
 
-  _pubkey_info(outfile, pubkey);
+  _pubkey_info(outfile, full_format, pubkey);
   gnutls_pubkey_deinit (pubkey);
 }

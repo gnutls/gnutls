@@ -63,66 +63,67 @@ ip_to_string (void *_ip, int ip_size, char *string, int string_size)
   switch (ip_size)
     {
     case 4:
-      snprintf (string, string_size, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
+      snprintf (string, string_size, "%u.%u.%u.%u", ip[0], ip[1], ip[2],
+                ip[3]);
       break;
     case 16:
       snprintf (string, string_size, "%x:%x:%x:%x:%x:%x:%x:%x",
-               (ip[0] << 8) | ip[1], (ip[2] << 8) | ip[3],
-               (ip[4] << 8) | ip[5], (ip[6] << 8) | ip[7],
-               (ip[8] << 8) | ip[9], (ip[10] << 8) | ip[11],
-               (ip[12] << 8) | ip[13], (ip[14] << 8) | ip[15]);
+                (ip[0] << 8) | ip[1], (ip[2] << 8) | ip[3],
+                (ip[4] << 8) | ip[5], (ip[6] << 8) | ip[7],
+                (ip[8] << 8) | ip[9], (ip[10] << 8) | ip[11],
+                (ip[12] << 8) | ip[13], (ip[14] << 8) | ip[15]);
       break;
     }
 
   return string;
 }
 
-static void add_altname(gnutls_buffer_st * str, const char* prefix, unsigned int alt_type, 
-                        char* name, size_t name_size)
+static void
+add_altname (gnutls_buffer_st * str, const char *prefix,
+             unsigned int alt_type, char *name, size_t name_size)
 {
-char str_ip[64];
-char *p;
+  char str_ip[64];
+  char *p;
 
-      if ((alt_type == GNUTLS_SAN_DNSNAME
-           || alt_type == GNUTLS_SAN_RFC822NAME
-           || alt_type == GNUTLS_SAN_URI) && strlen (name) != name_size)
-        {
-          adds (str, _("warning: altname contains an embedded NUL, "
-                       "replacing with '!'\n"));
-          while (strlen (name) < name_size)
-            name[strlen (name)] = '!';
-        }
+  if ((alt_type == GNUTLS_SAN_DNSNAME
+       || alt_type == GNUTLS_SAN_RFC822NAME
+       || alt_type == GNUTLS_SAN_URI) && strlen (name) != name_size)
+    {
+      adds (str, _("warning: altname contains an embedded NUL, "
+                   "replacing with '!'\n"));
+      while (strlen (name) < name_size)
+        name[strlen (name)] = '!';
+    }
 
-      switch (alt_type)
-        {
-        case GNUTLS_SAN_DNSNAME:
-          addf (str, "%s\t\t\tDNSname: %.*s\n", prefix, (int) name_size, name);
-          break;
+  switch (alt_type)
+    {
+    case GNUTLS_SAN_DNSNAME:
+      addf (str, "%s\t\t\tDNSname: %.*s\n", prefix, (int) name_size, name);
+      break;
 
-        case GNUTLS_SAN_RFC822NAME:
-          addf (str, "%s\t\t\tRFC822name: %.*s\n", prefix, (int) name_size,
-                name);
-          break;
+    case GNUTLS_SAN_RFC822NAME:
+      addf (str, "%s\t\t\tRFC822name: %.*s\n", prefix, (int) name_size, name);
+      break;
 
-        case GNUTLS_SAN_URI:
-          addf (str, "%s\t\t\tURI: %.*s\n", prefix, (int) name_size, name);
-          break;
+    case GNUTLS_SAN_URI:
+      addf (str, "%s\t\t\tURI: %.*s\n", prefix, (int) name_size, name);
+      break;
 
-        case GNUTLS_SAN_IPADDRESS:
-          p = ip_to_string (name, name_size, str_ip, sizeof (str_ip));
-          if (p == NULL)
-            p = ERROR_STR;
-          addf (str, "%s\t\t\tIPAddress: %s\n", prefix, p);
-          break;
+    case GNUTLS_SAN_IPADDRESS:
+      p = ip_to_string (name, name_size, str_ip, sizeof (str_ip));
+      if (p == NULL)
+        p = ERROR_STR;
+      addf (str, "%s\t\t\tIPAddress: %s\n", prefix, p);
+      break;
 
-        case GNUTLS_SAN_DN:
-          addf (str, "%s\t\t\tdirectoryName: %.*s\n", prefix,
-                (int) name_size, name);
-          break;
-        default:
-          addf (str, "error: unknown altname\n");
-          break;
-        }
+    case GNUTLS_SAN_DN:
+      addf (str, "%s\t\t\tdirectoryName: %.*s\n", prefix,
+            (int) name_size, name);
+      break;
+    default:
+      addf (str, "error: unknown altname\n");
+      break;
+    }
 }
 
 static void
@@ -172,48 +173,48 @@ print_aia (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
   for (;;)
     {
       err = gnutls_x509_crt_get_authority_info_access
-	(cert, seq, GNUTLS_IA_ACCESSMETHOD_OID, &data, NULL);
+        (cert, seq, GNUTLS_IA_ACCESSMETHOD_OID, &data, NULL);
       if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-	return;
+        return;
       if (err < 0)
-	{
-	  addf (str, "error: get_aia: %s\n", gnutls_strerror (err));
-	  return;
-	}
+        {
+          addf (str, "error: get_aia: %s\n", gnutls_strerror (err));
+          return;
+        }
 
       addf (str, _("\t\t\tAccess Method: %.*s"), data.size, data.data);
       if (data.size == sizeof (GNUTLS_OID_AD_OCSP) &&
-	  memcmp (data.data, GNUTLS_OID_AD_OCSP, data.size) == 0)
-	adds (str, " (id-ad-ocsp)\n");
+          memcmp (data.data, GNUTLS_OID_AD_OCSP, data.size) == 0)
+        adds (str, " (id-ad-ocsp)\n");
       else if (data.size == sizeof (GNUTLS_OID_AD_CAISSUERS) &&
-	       memcmp (data.data, GNUTLS_OID_AD_CAISSUERS, data.size) == 0)
-	adds (str, " (id-ad-caIssuers)\n");
+               memcmp (data.data, GNUTLS_OID_AD_CAISSUERS, data.size) == 0)
+        adds (str, " (id-ad-caIssuers)\n");
       else
-	adds (str, " (UNKNOWN)\n");
+        adds (str, " (UNKNOWN)\n");
 
       err = gnutls_x509_crt_get_authority_info_access
-	(cert, seq, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, &data, NULL);
+        (cert, seq, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, &data, NULL);
       if (err < 0)
-	{
-	  addf (str, "error: get_aia type: %s\n", gnutls_strerror (err));
-	  return;
-	}
+        {
+          addf (str, "error: get_aia type: %s\n", gnutls_strerror (err));
+          return;
+        }
 
       if (data.size == sizeof ("uniformResourceIdentifier") &&
-	  memcmp (data.data, "uniformResourceIdentifier", data.size) == 0)
-	{
-	  adds (str, "\t\t\tAccess Location URI: ");
-	  err = gnutls_x509_crt_get_authority_info_access
-	    (cert, seq, GNUTLS_IA_URI, &data, NULL);
-	  if (err < 0)
-	    {
-	      addf (str, "error: get_aia uri: %s\n", gnutls_strerror (err));
-	      return;
-	    }
-	  addf (str, "%.*s\n", data.size, data.data);
-	}
+          memcmp (data.data, "uniformResourceIdentifier", data.size) == 0)
+        {
+          adds (str, "\t\t\tAccess Location URI: ");
+          err = gnutls_x509_crt_get_authority_info_access
+            (cert, seq, GNUTLS_IA_URI, &data, NULL);
+          if (err < 0)
+            {
+              addf (str, "error: get_aia uri: %s\n", gnutls_strerror (err));
+              return;
+            }
+          addf (str, "%.*s\n", data.size, data.data);
+        }
       else
-	adds (str, "\t\t\tUnsupported accessLocation type\n");
+        adds (str, "\t\t\tUnsupported accessLocation type\n");
 
       seq++;
     }
@@ -259,6 +260,7 @@ print_ski (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 #define TYPE_CRL 1
 #define TYPE_CRT 2
 #define TYPE_CRQ 3
+#define TYPE_PUBKEY 4
 
 #define TYPE_CRT_SAN TYPE_CRT
 #define TYPE_CRQ_SAN TYPE_CRQ
@@ -269,6 +271,7 @@ typedef union
   gnutls_x509_crt_t crt;
   gnutls_x509_crq_t crq;
   gnutls_x509_crl_t crl;
+  gnutls_pubkey_t pubkey;
 } cert_type_t;
 
 static void
@@ -276,27 +279,30 @@ print_aki_gn_serial (gnutls_buffer_st * str, int type, cert_type_t cert)
 {
   char *buffer = NULL;
   char serial[128];
-  size_t size = 0, serial_size = sizeof(serial);
+  size_t size = 0, serial_size = sizeof (serial);
   unsigned int alt_type;
   int err;
 
   if (type == TYPE_CRT)
     err =
-      gnutls_x509_crt_get_authority_key_gn_serial(cert.crt, 0, NULL, &size, 
-                                                  &alt_type, serial, &serial_size, NULL);
+      gnutls_x509_crt_get_authority_key_gn_serial (cert.crt, 0, NULL, &size,
+                                                   &alt_type, serial,
+                                                   &serial_size, NULL);
   else if (type == TYPE_CRL)
     err =
-      gnutls_x509_crl_get_authority_key_gn_serial(cert.crl, 0, NULL, &size, 
-                                                  &alt_type, serial, &serial_size, NULL);
+      gnutls_x509_crl_get_authority_key_gn_serial (cert.crl, 0, NULL, &size,
+                                                   &alt_type, serial,
+                                                   &serial_size, NULL);
   else
     {
       gnutls_assert ();
       return;
     }
-  
+
   if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
-      addf (str, "error: get_authority_key_gn_serial: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_authority_key_gn_serial: %s\n",
+            gnutls_strerror (err));
       return;
     }
 
@@ -310,21 +316,24 @@ print_aki_gn_serial (gnutls_buffer_st * str, int type, cert_type_t cert)
 
   if (type == TYPE_CRT)
     err =
-      gnutls_x509_crt_get_authority_key_gn_serial(cert.crt, 0, buffer, &size, 
-                                                  &alt_type, serial, &serial_size, NULL);
+      gnutls_x509_crt_get_authority_key_gn_serial (cert.crt, 0, buffer, &size,
+                                                   &alt_type, serial,
+                                                   &serial_size, NULL);
   else
     err =
-      gnutls_x509_crl_get_authority_key_gn_serial(cert.crl, 0, buffer, &size, 
-                                                  &alt_type, serial, &serial_size, NULL);
+      gnutls_x509_crl_get_authority_key_gn_serial (cert.crl, 0, buffer, &size,
+                                                   &alt_type, serial,
+                                                   &serial_size, NULL);
 
   if (err < 0)
     {
       gnutls_free (buffer);
-      addf (str, "error: get_authority_key_gn_serial2: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_authority_key_gn_serial2: %s\n",
+            gnutls_strerror (err));
       return;
     }
 
-  add_altname(str, "", alt_type, buffer, size);
+  add_altname (str, "", alt_type, buffer, size);
   adds (str, "\t\t\tserial: ");
   _gnutls_buffer_hexprint (str, serial, serial_size);
   adds (str, "\n");
@@ -350,11 +359,11 @@ print_aki (gnutls_buffer_st * str, int type, cert_type_t cert)
       gnutls_assert ();
       return;
     }
-  
+
   if (err == GNUTLS_E_X509_UNSUPPORTED_EXTENSION)
     {
       /* Check if an alternative name is there */
-      print_aki_gn_serial(str, type, cert);
+      print_aki_gn_serial (str, type, cert);
       return;
     }
 
@@ -404,6 +413,8 @@ print_key_usage (gnutls_buffer_st * str, const char *prefix, int type,
     err = gnutls_x509_crt_get_key_usage (cert.crt, &key_usage, NULL);
   else if (type == TYPE_CRQ)
     err = gnutls_x509_crq_get_key_usage (cert.crq, &key_usage, NULL);
+  else if (type == TYPE_PUBKEY)
+    err = gnutls_pubkey_get_key_usage (cert.pubkey, &key_usage);
   else
     return;
 
@@ -414,28 +425,28 @@ print_key_usage (gnutls_buffer_st * str, const char *prefix, int type,
     }
 
   if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
-    addf (str, _("%s\t\t\tDigital signature.\n"), prefix);
+    addf (str, _("%sDigital signature.\n"), prefix);
   if (key_usage & GNUTLS_KEY_NON_REPUDIATION)
-    addf (str, _("%s\t\t\tNon repudiation.\n"), prefix);
+    addf (str, _("%sNon repudiation.\n"), prefix);
   if (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
-    addf (str, _("%s\t\t\tKey encipherment.\n"), prefix);
+    addf (str, _("%sKey encipherment.\n"), prefix);
   if (key_usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
-    addf (str, _("%s\t\t\tData encipherment.\n"), prefix);
+    addf (str, _("%sData encipherment.\n"), prefix);
   if (key_usage & GNUTLS_KEY_KEY_AGREEMENT)
-    addf (str, _("%s\t\t\tKey agreement.\n"), prefix);
+    addf (str, _("%sKey agreement.\n"), prefix);
   if (key_usage & GNUTLS_KEY_KEY_CERT_SIGN)
-    addf (str, _("%s\t\t\tCertificate signing.\n"), prefix);
+    addf (str, _("%sCertificate signing.\n"), prefix);
   if (key_usage & GNUTLS_KEY_CRL_SIGN)
-    addf (str, _("%s\t\t\tCRL signing.\n"), prefix);
+    addf (str, _("%sCRL signing.\n"), prefix);
   if (key_usage & GNUTLS_KEY_ENCIPHER_ONLY)
-    addf (str, _("%s\t\t\tKey encipher only.\n"), prefix);
+    addf (str, _("%sKey encipher only.\n"), prefix);
   if (key_usage & GNUTLS_KEY_DECIPHER_ONLY)
-    addf (str, _("%s\t\t\tKey decipher only.\n"), prefix);
+    addf (str, _("%sKey decipher only.\n"), prefix);
 }
 
 static void
-print_private_key_usage_period (gnutls_buffer_st * str, const char *prefix, int type,
-                                cert_type_t cert)
+print_private_key_usage_period (gnutls_buffer_st * str, const char *prefix,
+                                int type, cert_type_t cert)
 {
   time_t activation, expiration;
   int err;
@@ -444,15 +455,20 @@ print_private_key_usage_period (gnutls_buffer_st * str, const char *prefix, int 
   size_t max;
 
   if (type == TYPE_CRT)
-    err = gnutls_x509_crt_get_private_key_usage_period (cert.crt, &activation, &expiration, NULL);
+    err =
+      gnutls_x509_crt_get_private_key_usage_period (cert.crt, &activation,
+                                                    &expiration, NULL);
   else if (type == TYPE_CRQ)
-    err = gnutls_x509_crq_get_private_key_usage_period (cert.crq, &activation, &expiration, NULL);
+    err =
+      gnutls_x509_crq_get_private_key_usage_period (cert.crq, &activation,
+                                                    &expiration, NULL);
   else
     return;
 
   if (err < 0)
     {
-      addf (str, "error: get_private_key_usage_period: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_private_key_usage_period: %s\n",
+            gnutls_strerror (err));
       return;
     }
 
@@ -668,8 +684,8 @@ print_basic (gnutls_buffer_st * str, const char *prefix, int type,
 
 
 static void
-print_altname (gnutls_buffer_st * str, const char *prefix, unsigned int altname_type,
-               cert_type_t cert)
+print_altname (gnutls_buffer_st * str, const char *prefix,
+               unsigned int altname_type, cert_type_t cert)
 {
   unsigned int altname_idx;
 
@@ -734,84 +750,84 @@ print_altname (gnutls_buffer_st * str, const char *prefix, unsigned int altname_
 
       if (err == GNUTLS_SAN_OTHERNAME)
         {
-            char *oid = NULL;
-            size_t oidsize;
+          char *oid = NULL;
+          size_t oidsize;
 
-            oidsize = 0;
-            if (altname_type == TYPE_CRT_SAN)
-              err = gnutls_x509_crt_get_subject_alt_othername_oid
-                (cert.crt, altname_idx, oid, &oidsize);
-            else if (altname_type == TYPE_CRQ_SAN)
-              err = gnutls_x509_crq_get_subject_alt_othername_oid
-                (cert.crq, altname_idx, oid, &oidsize);
-            else if (altname_type == TYPE_CRT_IAN)
-              err = gnutls_x509_crt_get_issuer_alt_othername_oid
-                (cert.crt, altname_idx, oid, &oidsize);
+          oidsize = 0;
+          if (altname_type == TYPE_CRT_SAN)
+            err = gnutls_x509_crt_get_subject_alt_othername_oid
+              (cert.crt, altname_idx, oid, &oidsize);
+          else if (altname_type == TYPE_CRQ_SAN)
+            err = gnutls_x509_crq_get_subject_alt_othername_oid
+              (cert.crq, altname_idx, oid, &oidsize);
+          else if (altname_type == TYPE_CRT_IAN)
+            err = gnutls_x509_crt_get_issuer_alt_othername_oid
+              (cert.crt, altname_idx, oid, &oidsize);
 
-            if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-              {
-                gnutls_free (buffer);
-                addf (str,
-                      "error: get_subject/issuer_alt_othername_oid: %s\n",
-                      gnutls_strerror (err));
-                return;
-              }
+          if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+            {
+              gnutls_free (buffer);
+              addf (str,
+                    "error: get_subject/issuer_alt_othername_oid: %s\n",
+                    gnutls_strerror (err));
+              return;
+            }
 
-            oid = gnutls_malloc (oidsize);
-            if (!oid)
-              {
-                gnutls_free (buffer);
-                addf (str, "error: malloc: %s\n",
-                      gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
-                return;
-              }
+          oid = gnutls_malloc (oidsize);
+          if (!oid)
+            {
+              gnutls_free (buffer);
+              addf (str, "error: malloc: %s\n",
+                    gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+              return;
+            }
 
-            if (altname_type == TYPE_CRT_SAN)
-              err = gnutls_x509_crt_get_subject_alt_othername_oid
-                (cert.crt, altname_idx, oid, &oidsize);
-            else if (altname_type == TYPE_CRQ_SAN)
-              err = gnutls_x509_crq_get_subject_alt_othername_oid
-                (cert.crq, altname_idx, oid, &oidsize);
-            else if (altname_type == TYPE_CRT_IAN)
-              err = gnutls_x509_crt_get_issuer_alt_othername_oid
-                (cert.crt, altname_idx, oid, &oidsize);
+          if (altname_type == TYPE_CRT_SAN)
+            err = gnutls_x509_crt_get_subject_alt_othername_oid
+              (cert.crt, altname_idx, oid, &oidsize);
+          else if (altname_type == TYPE_CRQ_SAN)
+            err = gnutls_x509_crq_get_subject_alt_othername_oid
+              (cert.crq, altname_idx, oid, &oidsize);
+          else if (altname_type == TYPE_CRT_IAN)
+            err = gnutls_x509_crt_get_issuer_alt_othername_oid
+              (cert.crt, altname_idx, oid, &oidsize);
 
-            if (err < 0)
-              {
-                gnutls_free (buffer);
-                gnutls_free (oid);
-                addf (str, "error: get_subject_alt_othername_oid2: %s\n",
-                      gnutls_strerror (err));
-                return;
-              }
+          if (err < 0)
+            {
+              gnutls_free (buffer);
+              gnutls_free (oid);
+              addf (str, "error: get_subject_alt_othername_oid2: %s\n",
+                    gnutls_strerror (err));
+              return;
+            }
 
-            if (err == GNUTLS_SAN_OTHERNAME_XMPP)
-              {
-                if (strlen (buffer) != size)
-                  {
-                    adds (str, _("warning: altname contains an embedded NUL, "
-                                 "replacing with '!'\n"));
-                    while (strlen (buffer) < size)
-                      buffer[strlen (buffer)] = '!';
-                  }
+          if (err == GNUTLS_SAN_OTHERNAME_XMPP)
+            {
+              if (strlen (buffer) != size)
+                {
+                  adds (str, _("warning: altname contains an embedded NUL, "
+                               "replacing with '!'\n"));
+                  while (strlen (buffer) < size)
+                    buffer[strlen (buffer)] = '!';
+                }
 
-                addf (str, _("%s\t\t\tXMPP Address: %.*s\n"), prefix,
-                      (int) size, buffer);
-              }
-            else
-              {
-                addf (str, _("%s\t\t\totherName OID: %.*s\n"), prefix,
-                      (int) oidsize, oid);
-                addf (str, _("%s\t\t\totherName DER: "), prefix);
-                _gnutls_buffer_hexprint (str, buffer, size);
-                addf (str, _("\n%s\t\t\totherName ASCII: "), prefix);
-                _gnutls_buffer_asciiprint (str, buffer, size);
-                addf (str, "\n");
-              }
-            gnutls_free (oid);
-          }
+              addf (str, _("%s\t\t\tXMPP Address: %.*s\n"), prefix,
+                    (int) size, buffer);
+            }
+          else
+            {
+              addf (str, _("%s\t\t\totherName OID: %.*s\n"), prefix,
+                    (int) oidsize, oid);
+              addf (str, _("%s\t\t\totherName DER: "), prefix);
+              _gnutls_buffer_hexprint (str, buffer, size);
+              addf (str, _("\n%s\t\t\totherName ASCII: "), prefix);
+              _gnutls_buffer_asciiprint (str, buffer, size);
+              addf (str, "\n");
+            }
+          gnutls_free (oid);
+        }
       else
-        add_altname(str, prefix, err, buffer, size);
+        add_altname (str, prefix, err, buffer, size);
 
       gnutls_free (buffer);
     }
@@ -893,6 +909,7 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
   int ski_idx = 0;
   int aki_idx = 0;
   int crldist_idx = 0, pkey_usage_period_idx = 0;
+  char pfx[16];
 
   for (i = 0;; i++)
     {
@@ -961,34 +978,41 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
       else if (strcmp (oid, "2.5.29.32") == 0)
         {
           struct gnutls_x509_policy_st policy;
-          const char* name;
+          const char *name;
           int x;
 
-          for (x=0;;x++)
+          for (x = 0;; x++)
             {
-              err = gnutls_x509_crt_get_policy (cert.crt, x, &policy, &critical);
+              err =
+                gnutls_x509_crt_get_policy (cert.crt, x, &policy, &critical);
               if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
                 break;
-              
+
               if (err < 0)
                 {
-                  addf (str, "error: certificate policy: %s\n", gnutls_strerror(err));
+                  addf (str, "error: certificate policy: %s\n",
+                        gnutls_strerror (err));
                   break;
                 }
 
-              if (x==0) addf (str, "%s\t\tCertificate Policies (%s):\n", prefix, critical ? _("critical") : _("not critical"));
+              if (x == 0)
+                addf (str, "%s\t\tCertificate Policies (%s):\n", prefix,
+                      critical ? _("critical") : _("not critical"));
 
               addf (str, "%s\t\t\t%s\n", prefix, policy.oid);
-              for (j=0;j<policy.qualifiers;j++)
+              for (j = 0; j < policy.qualifiers; j++)
                 {
-                  if (policy.qualifier[j].type==GNUTLS_X509_QUALIFIER_URI)
+                  if (policy.qualifier[j].type == GNUTLS_X509_QUALIFIER_URI)
                     name = "URI";
-                  else if (policy.qualifier[j].type==GNUTLS_X509_QUALIFIER_NOTICE)
+                  else if (policy.qualifier[j].type ==
+                           GNUTLS_X509_QUALIFIER_NOTICE)
                     name = "Note";
-                  else name = "Unknown qualifier";
-                  addf (str, "%s\t\t\t\t%s: %s\n", prefix, name, policy.qualifier[j].data);
+                  else
+                    name = "Unknown qualifier";
+                  addf (str, "%s\t\t\t\t%s: %s\n", prefix, name,
+                        policy.qualifier[j].data);
                 }
-          
+
               gnutls_x509_policy_release (&policy);
             }
         }
@@ -1020,7 +1044,8 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
           addf (str, _("%s\t\tKey Usage (%s):\n"), prefix,
                 critical ? _("critical") : _("not critical"));
 
-          print_key_usage (str, prefix, type, cert);
+          snprintf(pfx, sizeof(pfx), "%s\t\t\t", prefix);
+          print_key_usage (str, pfx, type, cert);
 
           keyusage_idx++;
         }
@@ -1028,7 +1053,8 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
         {
           if (pkey_usage_period_idx)
             {
-              addf (str, "error: more than one private key usage period extension\n");
+              addf (str,
+                    "error: more than one private key usage period extension\n");
               continue;
             }
 
@@ -1117,7 +1143,7 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
       else if (strcmp (oid, "1.3.6.1.5.5.7.1.1") == 0)
         {
           addf (str, _("%s\t\tAuthority Information "
-		       "Access (%s):\n"), prefix,
+                       "Access (%s):\n"), prefix,
                 critical ? _("critical") : _("not critical"));
 
           if (type == TYPE_CRT)
@@ -1189,7 +1215,173 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
 }
 
 static void
-print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
+print_pubkey (gnutls_buffer_st * str, const char* key_name, gnutls_pubkey_t pubkey, gnutls_certificate_print_formats_t format)
+{
+  int err, pk;
+  const char *name;
+  unsigned bits;
+
+  err = gnutls_pubkey_get_pk_algorithm (pubkey, &bits);
+  if (err < 0)
+    {
+      addf (str, "error: get_pk_algorithm: %s\n", gnutls_strerror (err));
+      return;
+    }
+
+  name = gnutls_pk_algorithm_get_name (err);
+  if (name == NULL)
+    name = _("unknown");
+
+  pk = err;
+
+  addf (str, _("\t%sPublic Key Algorithm: %s\n"), key_name, name);
+  addf (str, _("\tAlgorithm Security Level: %s (%d bits)\n"),
+        gnutls_sec_param_get_name (gnutls_pk_bits_to_sec_param
+                                   (err, bits)), bits);
+  switch (pk)
+    {
+    case GNUTLS_PK_RSA:
+      {
+        gnutls_datum_t m, e;
+
+        err = gnutls_pubkey_get_pk_rsa_raw (pubkey, &m, &e);
+        if (err < 0)
+          addf (str, "error: get_pk_rsa_raw: %s\n", gnutls_strerror (err));
+        else
+          {
+            if (format == GNUTLS_CRT_PRINT_FULL_NUMBERS)
+              {
+                addf (str, _("\t\tModulus (bits %d): "), bits);
+                _gnutls_buffer_hexprint (str, m.data, m.size);
+                adds (str, "\n");
+                addf (str, _("\t\tExponent (bits %d): "), e.size * 8);
+                _gnutls_buffer_hexprint (str, e.data, e.size);
+                adds (str, "\n");
+              }
+            else
+              {
+                addf (str, _("\t\tModulus (bits %d):\n"), bits);
+                _gnutls_buffer_hexdump (str, m.data, m.size, "\t\t\t");
+                addf (str, _("\t\tExponent (bits %d):\n"), e.size * 8);
+                _gnutls_buffer_hexdump (str, e.data, e.size, "\t\t\t");
+              }
+
+            gnutls_free (m.data);
+            gnutls_free (e.data);
+          }
+
+      }
+      break;
+
+    case GNUTLS_PK_EC:
+      {
+        gnutls_datum_t x, y;
+        gnutls_ecc_curve_t curve;
+
+        err = gnutls_pubkey_get_pk_ecc_raw (pubkey, &curve, &x, &y);
+        if (err < 0)
+          addf (str, "error: get_pk_ecc_raw: %s\n", gnutls_strerror (err));
+        else
+          {
+            addf (str, _("\t\tCurve:\t%s\n"),
+                  gnutls_ecc_curve_get_name (curve));
+            if (format == GNUTLS_CRT_PRINT_FULL_NUMBERS)
+              {
+                addf (str, _("\t\tX: "));
+                _gnutls_buffer_hexprint (str, x.data, x.size);
+                adds (str, "\n");
+                addf (str, _("\t\tY: "));
+                _gnutls_buffer_hexprint (str, y.data, y.size);
+                adds (str, "\n");
+              }
+            else
+              {
+                addf (str, _("\t\tX:\n"));
+                _gnutls_buffer_hexdump (str, x.data, x.size, "\t\t\t");
+                adds (str, _("\t\tY:\n"));
+                _gnutls_buffer_hexdump (str, y.data, y.size, "\t\t\t");
+              }
+
+            gnutls_free (x.data);
+            gnutls_free (y.data);
+
+          }
+      }
+      break;
+    case GNUTLS_PK_DSA:
+      {
+        gnutls_datum_t p, q, g, y;
+
+        err = gnutls_pubkey_get_pk_dsa_raw (pubkey, &p, &q, &g, &y);
+        if (err < 0)
+          addf (str, "error: get_pk_dsa_raw: %s\n", gnutls_strerror (err));
+        else
+          {
+            if (format == GNUTLS_CRT_PRINT_FULL_NUMBERS)
+              {
+                addf (str, _("\t\tPublic key (bits %d): "), bits);
+                _gnutls_buffer_hexprint (str, y.data, y.size);
+                adds (str, "\n");
+                addf (str, _("\t\tP: "));
+                _gnutls_buffer_hexprint (str, p.data, p.size);
+                adds (str, "\n");
+                addf (str, _("\t\tQ: "));
+                _gnutls_buffer_hexprint (str, q.data, q.size);
+                adds (str, "\n");
+                addf (str, _("\t\tG: "));
+                _gnutls_buffer_hexprint (str, g.data, g.size);
+                adds (str, "\n");
+              }
+            else
+              {
+                addf (str, _("\t\tPublic key (bits %d):\n"), bits);
+                _gnutls_buffer_hexdump (str, y.data, y.size, "\t\t\t");
+                adds (str, _("\t\tP:\n"));
+                _gnutls_buffer_hexdump (str, p.data, p.size, "\t\t\t");
+                adds (str, _("\t\tQ:\n"));
+                _gnutls_buffer_hexdump (str, q.data, q.size, "\t\t\t");
+                adds (str, _("\t\tG:\n"));
+                _gnutls_buffer_hexdump (str, g.data, g.size, "\t\t\t");
+              }
+
+            gnutls_free (p.data);
+            gnutls_free (q.data);
+            gnutls_free (g.data);
+            gnutls_free (y.data);
+
+          }
+      }
+      break;
+
+    default:
+      break;
+    }
+}
+
+static void
+print_crt_pubkey (gnutls_buffer_st * str, gnutls_x509_crt_t crt, gnutls_certificate_print_formats_t format)
+{
+  gnutls_pubkey_t pubkey;
+  int ret;
+
+  ret = gnutls_pubkey_init (&pubkey);
+  if (ret < 0)
+    return;
+
+  ret = gnutls_pubkey_import_x509 (pubkey, crt, 0);
+  if (ret < 0)
+    goto cleanup;
+
+  print_pubkey (str, _("Subject "), pubkey, format);
+
+cleanup:
+  gnutls_pubkey_deinit (pubkey);
+  return;
+}
+
+static void
+print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
+            gnutls_certificate_print_formats_t format)
 {
   /* Version. */
   {
@@ -1218,7 +1410,7 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
   }
 
   /* Issuer. */
-  if (!notsigned)
+  if (format != GNUTLS_CRT_PRINT_UNSIGNED_FULL)
     {
       char *dn;
       size_t dn_size = 0;
@@ -1309,122 +1501,7 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
   }
 
   /* SubjectPublicKeyInfo. */
-  {
-    int err, pk;
-    unsigned int bits;
-
-    err = gnutls_x509_crt_get_pk_algorithm (cert, &bits);
-    if (err < 0)
-      addf (str, "error: get_pk_algorithm: %s\n", gnutls_strerror (err));
-    else
-      {
-        gnutls_pubkey_t pubkey;
-        const char *name = gnutls_pk_algorithm_get_name (err);
-        if (name == NULL)
-          name = _("unknown");
-          
-        pk = err;
-
-        addf (str, _("\tSubject Public Key Algorithm: %s\n"), name);
-        addf (str, _("\tCertificate Security Level: %s (%d bits)\n"),
-              gnutls_sec_param_get_name (gnutls_pk_bits_to_sec_param
-                                         (err, bits)), bits);
-        err = gnutls_pubkey_init(&pubkey);
-        if (err < 0)
-         {
-            addf (str, "error: gnutls_pubkey_init: %s\n", gnutls_strerror (err));
-            return;
-          }
-
-        err = gnutls_pubkey_import_x509(pubkey, cert, 0);
-        if (err < 0)
-          {
-            addf (str, "error: gnutls_pubkey_import_x509: %s\n", gnutls_strerror (err));
-            return;
-          }
-
-        switch (pk)
-          {
-          case GNUTLS_PK_RSA:
-            {
-              gnutls_datum_t m, e;
-
-              err = gnutls_pubkey_get_pk_rsa_raw (pubkey, &m, &e);
-              if (err < 0)
-                addf (str, "error: get_pk_rsa_raw: %s\n",
-                      gnutls_strerror (err));
-              else
-                {
-                  addf (str, _("\t\tModulus (bits %d):\n"), bits);
-                  _gnutls_buffer_hexdump (str, m.data, m.size, "\t\t\t");
-                  addf (str, _("\t\tExponent (bits %d):\n"), e.size * 8);
-                  _gnutls_buffer_hexdump (str, e.data, e.size, "\t\t\t");
-
-                  gnutls_free (m.data);
-                  gnutls_free (e.data);
-                }
-
-            }
-            break;
-
-          case GNUTLS_PK_EC:
-            {
-              gnutls_datum_t x, y;
-              gnutls_ecc_curve_t curve;
-
-              err = gnutls_pubkey_get_pk_ecc_raw (pubkey, &curve, &x, &y);
-              if (err < 0)
-                addf (str, "error: get_pk_ecc_raw: %s\n",
-                      gnutls_strerror (err));
-              else
-                {
-                  addf (str, _("\t\tCurve:\t%s\n"), gnutls_ecc_curve_get_name(curve));
-                  addf (str, _("\t\tX:\n"));
-                  _gnutls_buffer_hexdump (str, x.data, x.size, "\t\t\t");
-                  adds (str, _("\t\tY:\n"));
-                  _gnutls_buffer_hexdump (str, y.data, y.size, "\t\t\t");
-
-                  gnutls_free (x.data);
-                  gnutls_free (y.data);
-
-                }
-            }
-            break;
-          case GNUTLS_PK_DSA:
-            {
-              gnutls_datum_t p, q, g, y;
-
-              err = gnutls_pubkey_get_pk_dsa_raw (pubkey, &p, &q, &g, &y);
-              if (err < 0)
-                addf (str, "error: get_pk_dsa_raw: %s\n",
-                      gnutls_strerror (err));
-              else
-                {
-                  addf (str, _("\t\tPublic key (bits %d):\n"), bits);
-                  _gnutls_buffer_hexdump (str, y.data, y.size, "\t\t\t");
-                  adds (str, _("\t\tP:\n"));
-                  _gnutls_buffer_hexdump (str, p.data, p.size, "\t\t\t");
-                  adds (str, _("\t\tQ:\n"));
-                  _gnutls_buffer_hexdump (str, q.data, q.size, "\t\t\t");
-                  adds (str, _("\t\tG:\n"));
-                  _gnutls_buffer_hexdump (str, g.data, g.size, "\t\t\t");
-
-                  gnutls_free (p.data);
-                  gnutls_free (q.data);
-                  gnutls_free (g.data);
-                  gnutls_free (y.data);
-
-                }
-            }
-            break;
-
-          default:
-            break;
-          }
-        
-        gnutls_pubkey_deinit(pubkey);
-      }
-  }
+  print_crt_pubkey(str, cert, format);
 
   print_unique_ids (str, cert);
 
@@ -1438,7 +1515,7 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
     }
 
   /* Signature. */
-  if (!notsigned)
+  if (format != GNUTLS_CRT_PRINT_UNSIGNED_FULL)
     {
       int err;
       size_t size = 0;
@@ -1455,7 +1532,7 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
             name = _("unknown");
           addf (str, _("\tSignature Algorithm: %s\n"), name);
         }
-      if (gnutls_sign_is_secure(err) == 0)
+      if (gnutls_sign_is_secure (err) == 0)
         {
           adds (str, _("warning: signed using a broken signature "
                        "algorithm that can be forged.\n"));
@@ -1498,7 +1575,7 @@ print_fingerprint (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
   int err;
   char buffer[MAX_HASH_SIZE];
   size_t size = sizeof (buffer);
-  
+
   err = gnutls_x509_crt_get_fingerprint (cert, algo, buffer, &size);
   if (err < 0)
     {
@@ -1519,9 +1596,9 @@ print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
   int err;
   unsigned char buffer[32];
-  size_t size = sizeof(buffer);
-  const char* name;
-  char* p;
+  size_t size = sizeof (buffer);
+  const char *name;
+  char *p;
   unsigned int bits;
 
   err = gnutls_x509_crt_get_key_id (cert, 0, buffer, &size);
@@ -1538,26 +1615,27 @@ print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
   err = gnutls_x509_crt_get_pk_algorithm (cert, &bits);
   if (err < 0)
     return;
-    
-  name = gnutls_pk_get_name(err);
+
+  name = gnutls_pk_get_name (err);
   if (name == NULL)
     return;
 
-  p = _gnutls_key_fingerprint_randomart(buffer, size, name, bits, "\t\t");
+  p = _gnutls_key_fingerprint_randomart (buffer, size, name, bits, "\t\t");
   if (p == NULL)
     return;
-  
+
   adds (str, _("\tPublic key's random art:\n"));
   adds (str, p);
   adds (str, "\n");
 
-  gnutls_free(p);
+  gnutls_free (p);
 }
 
 static void
-print_other (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
+print_other (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
+             gnutls_certificate_print_formats_t format)
 {
-  if (!notsigned)
+  if (format != GNUTLS_CRT_PRINT_UNSIGNED_FULL)
     {
       print_fingerprint (str, cert, GNUTLS_DIG_SHA1);
     }
@@ -1567,7 +1645,7 @@ print_other (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
 static void
 print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
-int err;
+  int err;
 
   /* Subject. */
   {
@@ -1641,7 +1719,7 @@ int err;
         const char *name = gnutls_sign_algorithm_get_name (err);
         if (name == NULL)
           name = _("unknown");
-        if (gnutls_sign_is_secure(err) == 0)
+        if (gnutls_sign_is_secure (err) == 0)
           addf (str, _("signed using %s (broken!), "), name);
         else
           addf (str, _("signed using %s, "), name);
@@ -1751,27 +1829,7 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
   gnutls_buffer_st str;
   int ret;
 
-  if (format == GNUTLS_CRT_PRINT_FULL
-      || format == GNUTLS_CRT_PRINT_UNSIGNED_FULL)
-    {
-      _gnutls_buffer_init (&str);
-
-      _gnutls_buffer_append_str (&str, _("X.509 Certificate Information:\n"));
-
-      print_cert (&str, cert, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
-
-      _gnutls_buffer_append_str (&str, _("Other Information:\n"));
-
-      print_other (&str, cert, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
-
-      _gnutls_buffer_append_data (&str, "\0", 1);
-
-      ret = _gnutls_buffer_to_datum( &str, out);
-      if (out->size > 0) out->size--;
-      
-      return ret;
-    }
-  else if (format == GNUTLS_CRT_PRINT_COMPACT)
+  if (format == GNUTLS_CRT_PRINT_COMPACT)
     {
       _gnutls_buffer_init (&str);
 
@@ -1782,9 +1840,10 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 
       _gnutls_buffer_append_data (&str, "\0", 1);
 
-      ret = _gnutls_buffer_to_datum( &str, out);
-      if (out->size > 0) out->size--;
-      
+      ret = _gnutls_buffer_to_datum (&str, out);
+      if (out->size > 0)
+        out->size--;
+
       return ret;
     }
   else if (format == GNUTLS_CRT_PRINT_ONELINE)
@@ -1795,15 +1854,31 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 
       _gnutls_buffer_append_data (&str, "\0", 1);
 
-      ret = _gnutls_buffer_to_datum( &str, out);
-      if (out->size > 0) out->size--;
-      
+      ret = _gnutls_buffer_to_datum (&str, out);
+      if (out->size > 0)
+        out->size--;
+
       return ret;
     }
   else
     {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
+      _gnutls_buffer_init (&str);
+
+      _gnutls_buffer_append_str (&str, _("X.509 Certificate Information:\n"));
+
+      print_cert (&str, cert, format);
+
+      _gnutls_buffer_append_str (&str, _("Other Information:\n"));
+
+      print_other (&str, cert, format);
+
+      _gnutls_buffer_append_data (&str, "\0", 1);
+
+      ret = _gnutls_buffer_to_datum (&str, out);
+      if (out->size > 0)
+        out->size--;
+
+      return ret;
     }
 }
 
@@ -2068,7 +2143,7 @@ print_crl (gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
             name = _("unknown");
           addf (str, _("\tSignature Algorithm: %s\n"), name);
         }
-      if (gnutls_sign_is_secure(err) == 0)
+      if (gnutls_sign_is_secure (err) == 0)
         {
           adds (str, _("warning: signed using a broken signature "
                        "algorithm that can be forged.\n"));
@@ -2134,15 +2209,37 @@ gnutls_x509_crl_print (gnutls_x509_crl_t crl,
   print_crl (&str, crl, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
   _gnutls_buffer_append_data (&str, "\0", 1);
-  
-  ret = _gnutls_buffer_to_datum( &str, out);
-  if (out->size > 0) out->size--;
- 
+
+  ret = _gnutls_buffer_to_datum (&str, out);
+  if (out->size > 0)
+    out->size--;
+
   return ret;
 }
 
 static void
-print_crq (gnutls_buffer_st * str, gnutls_x509_crq_t cert)
+print_crq_pubkey (gnutls_buffer_st * str, gnutls_x509_crq_t crq, gnutls_certificate_print_formats_t format)
+{
+  gnutls_pubkey_t pubkey;
+  int ret;
+
+  ret = gnutls_pubkey_init (&pubkey);
+  if (ret < 0)
+    return;
+
+  ret = gnutls_pubkey_import_x509_crq (pubkey, crq, 0);
+  if (ret < 0)
+    goto cleanup;
+
+  print_pubkey (str, _("Subject "), pubkey, format);
+
+cleanup:
+  gnutls_pubkey_deinit (pubkey);
+  return;
+}
+
+static void
+print_crq (gnutls_buffer_st * str, gnutls_x509_crq_t cert, gnutls_certificate_print_formats_t format)
 {
   /* Version. */
   {
@@ -2189,68 +2286,7 @@ print_crq (gnutls_buffer_st * str, gnutls_x509_crq_t cert)
     if (err < 0)
       addf (str, "error: get_pk_algorithm: %s\n", gnutls_strerror (err));
     else
-      {
-        const char *name = gnutls_pk_algorithm_get_name (err);
-        if (name == NULL)
-          name = _("unknown");
-
-        addf (str, _("\tSubject Public Key Algorithm: %s\n"), name);
-        switch (err)
-          {
-          case GNUTLS_PK_RSA:
-            {
-              gnutls_datum_t m, e;
-
-              err = gnutls_x509_crq_get_key_rsa_raw (cert, &m, &e);
-              if (err < 0)
-                addf (str, "error: get_pk_rsa_raw: %s\n",
-                      gnutls_strerror (err));
-              else
-                {
-                  addf (str, _("\t\tModulus (bits %d):\n"), bits);
-                  _gnutls_buffer_hexdump (str, m.data, m.size, "\t\t\t");
-                  adds (str, _("\t\tExponent:\n"));
-                  _gnutls_buffer_hexdump (str, e.data, e.size, "\t\t\t");
-
-                  gnutls_free (m.data);
-                  gnutls_free (e.data);
-                }
-
-            }
-            break;
-#if 0                           /* not implemented yet */
-          case GNUTLS_PK_DSA:
-            {
-              gnutls_datum_t p, q, g, y;
-
-              err = gnutls_x509_crq_get_key_dsa_raw (cert, &p, &q, &g, &y);
-              if (err < 0)
-                addf (str, "error: get_pk_dsa_raw: %s\n",
-                      gnutls_strerror (err));
-              else
-                {
-                  addf (str, _("\t\tPublic key (bits %d):\n"), bits);
-                  _gnutls_buffer_hexdump (str, y.data, y.size, "\t\t\t");
-                  addf (str, _("\t\tP:\n"));
-                  _gnutls_buffer_hexdump (str, p.data, p.size, "\t\t\t");
-                  addf (str, _("\t\tQ:\n"));
-                  _gnutls_buffer_hexdump (str, q.data, q.size, "\t\t\t");
-                  addf (str, _("\t\tG:\n"));
-                  _gnutls_buffer_hexdump (str, g.data, g.size, "\t\t\t");
-
-                  gnutls_free (p.data);
-                  gnutls_free (q.data);
-                  gnutls_free (g.data);
-                  gnutls_free (y.data);
-
-                }
-            }
-            break;
-#endif
-          default:
-            break;
-          }
-      }
+      print_crq_pubkey (str, cert, format);
   }
 
   /* parse attributes */
@@ -2447,7 +2483,7 @@ gnutls_x509_crq_print (gnutls_x509_crq_t crq,
   _gnutls_buffer_append_str
     (&str, _("PKCS #10 Certificate Request Information:\n"));
 
-  print_crq (&str, crq);
+  print_crq (&str, crq, format);
 
   _gnutls_buffer_append_str (&str, _("Other Information:\n"));
 
@@ -2455,9 +2491,85 @@ gnutls_x509_crq_print (gnutls_x509_crq_t crq,
 
   _gnutls_buffer_append_data (&str, "\0", 1);
 
-  ret = _gnutls_buffer_to_datum( &str, out);
-  if (out->size > 0) out->size--;
- 
+  ret = _gnutls_buffer_to_datum (&str, out);
+  if (out->size > 0)
+    out->size--;
+
   return ret;
 }
 
+static void
+print_pubkey_other (gnutls_buffer_st * str, gnutls_pubkey_t pubkey, gnutls_certificate_print_formats_t format)
+{
+  uint8_t buffer[MAX_HASH_SIZE];
+  size_t size = sizeof(buffer);
+  int ret;
+  unsigned int usage;
+  cert_type_t ccert;
+
+  ccert.pubkey = pubkey;
+
+  ret = gnutls_pubkey_get_key_usage (pubkey, &usage);
+  if (ret < 0)
+    {
+      addf (str, "error: get_key_usage: %s\n", gnutls_strerror (ret));
+      return;
+    }
+    
+  adds (str, "\n");
+  adds (str, _("Public Key Usage:\n"));
+  print_key_usage (str, "\t", TYPE_PUBKEY, ccert);
+
+  ret = gnutls_pubkey_get_key_id (pubkey, 0, buffer, &size);
+  if (ret < 0)
+    {
+      addf (str, "error: get_key_id: %s\n", gnutls_strerror (ret));
+      return;
+    }
+    
+  adds (str, "\n");
+  adds (str, _("Public Key ID: "));
+  _gnutls_buffer_hexprint (str, buffer, size);
+  adds (str, "\n");
+}
+
+/**
+ * gnutls_pubkey_print:
+ * @pubkey: The structure to be printed
+ * @format: Indicate the format to use
+ * @out: Newly allocated datum with (0) terminated string.
+ *
+ * This function will pretty print public key information, suitable for
+ * display to a human.
+ *
+ * Only %GNUTLS_CRT_PRINT_FULL and %GNUTLS_CRT_PRINT_FULL_NUMBERS
+ * are implemented.
+ *
+ * The output @out needs to be deallocated using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_pubkey_print (gnutls_pubkey_t pubkey,
+                     gnutls_certificate_print_formats_t format,
+                     gnutls_datum_t * out)
+{
+  gnutls_buffer_st str;
+  int ret;
+
+  _gnutls_buffer_init (&str);
+
+  _gnutls_buffer_append_str (&str, _("Public Key Information:\n"));
+
+  print_pubkey (&str, "", pubkey, format);
+  print_pubkey_other (&str, pubkey, format);
+
+  _gnutls_buffer_append_data (&str, "\0", 1);
+
+  ret = _gnutls_buffer_to_datum (&str, out);
+  if (out->size > 0)
+    out->size--;
+
+  return ret;
+}

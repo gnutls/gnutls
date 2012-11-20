@@ -106,8 +106,12 @@ See @ref{Error codes}, for a description of the available error codes.
 @node Common types
 @subsection Common types
 
-Several functions in @acronym{GnuTLS} use @code{gnutls_datum_t} which is
-convenient way to combine a pointer to data and data's size. Its definition is
+All strings that are to provided as input to @acronym{GnuTLS} functions
+should be in UTF-8 unless otherwise specified. Output strings are also
+in UTF-8 format unless otherwise specified.
+
+When data of a fixed size are provided to @acronym{GnuTLS} functions then
+the helper structure @code{gnutls_datum_t} is often used. Its definition is
 shown below.
 @verbatim
   typedef struct

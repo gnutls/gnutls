@@ -151,6 +151,12 @@ flag = {
 };
 
 flag = {
+    name      = simple-numbers;
+    descrip   = "Print big number in an easier format to parse";
+    doc   = "";
+};
+
+flag = {
     name      = null-password;
     descrip   = "Enforce a NULL password";
     doc   = "This option enforces a NULL password. This may be different than the empty password in some schemas.";
@@ -235,7 +241,7 @@ flag = {
 flag = {
     name      = pubkey-info;
     descrip   = "Print information on a public key";
-    doc = "The option combined with --load-pubkey, --load-privkey and --load-certificate will extract the public key of the object in question.";
+    doc = "The option combined with --load-request, --load-pubkey, --load-privkey and --load-certificate will extract the public key of the object in question.";
 };
 
 flag = {

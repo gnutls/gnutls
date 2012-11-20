@@ -179,6 +179,42 @@ gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
 }
 
 /**
+ * gnutls_pubkey_import_x509_crq:
+ * @key: The public key
+ * @crq: The certificate to be imported
+ * @flags: should be zero
+ *
+ * This function will import the given public key to the abstract
+ * #gnutls_pubkey_t structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.5
+ **/
+int
+gnutls_pubkey_import_x509_crq (gnutls_pubkey_t key, gnutls_x509_crq_t crq,
+                           unsigned int flags)
+{
+  int ret;
+
+  key->pk_algorithm = gnutls_x509_crq_get_pk_algorithm (crq, &key->bits);
+
+  ret = gnutls_x509_crq_get_key_usage (crq, &key->key_usage, NULL);
+  if (ret < 0)
+    key->key_usage = 0;
+
+  ret = _gnutls_x509_crq_get_mpis (crq, &key->params);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  return 0;
+}
+
+/**
  * gnutls_pubkey_import_privkey:
  * @key: The public key
  * @pkey: The private key

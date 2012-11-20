@@ -284,7 +284,7 @@ static void tpm_pubkey(const char* url, FILE* outfile)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "gnutls_pubkey_import_tpm_url: %s", gnutls_strerror (ret));
 
-  _pubkey_info(outfile, pubkey);
+  _pubkey_info(outfile, GNUTLS_CRT_PRINT_FULL, pubkey);
 
   gnutls_pubkey_deinit(pubkey);
 }
