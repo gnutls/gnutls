@@ -7,7 +7,8 @@ See the end for copying conditions.
 ** libgnutls: Added functions to parse the certificates policies
 extension.
 
-** libgnutls: Handle BMPString (UCS-2) encoding in the DN.
+** libgnutls: Handle BMPString (UCS-2) encoding in the Distinguished
+Name by translating it to UTF-8 (works on windows or systems with libiconv).
 
 ** libgnutls: Added PKCS #11 key generation function that returns the 
 public key on generation.
