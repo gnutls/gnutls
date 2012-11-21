@@ -46,9 +46,8 @@ endif
 if ENABLE_OCSP
 bin_PROGRAMS += ocsptool
 endif
-if ENABLE_DANE
+
 bin_PROGRAMS += danetool
-endif
 
 if ENABLE_TROUSERS
 bin_PROGRAMS += tpmtool
@@ -141,12 +140,12 @@ libcmd_certtool_la_LIBADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
 libcmd_certtool_la_LIBADD += $(LTLIBREADLINE)
 libcmd_certtool_la_LIBADD += $(INET_PTON_LIB)
 
-if ENABLE_DANE
-
 danetool_SOURCES = danetool.c certtool-common.c certtool-extras.c common.c
 danetool_LDADD = ../lib/libgnutls.la 
 danetool_LDADD += libcmd-danetool.la ../gl/libgnu.la
+if ENABLE_DANE
 danetool_LDADD += ../libdane/libgnutls-dane.la
+endif
 
 noinst_LTLIBRARIES += libcmd-danetool.la
 libcmd_danetool_la_CFLAGS =
@@ -156,8 +155,6 @@ libcmd_danetool_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
 libcmd_danetool_la_LIBADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
 libcmd_danetool_la_LIBADD += $(LTLIBREADLINE)
 libcmd_danetool_la_LIBADD += $(INET_PTON_LIB)
-
-endif #ENABLE_DANE
 
 # p11 tool
 if ENABLE_PKCS11

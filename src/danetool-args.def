@@ -35,7 +35,7 @@ flag = {
 flag = {
     name      = check;
     arg-type  = string;
-    descrip   = "Check DANE TLSA entry.";
+    descrip   = "Check a host's DANE TLSA entry.";
     doc = "Obtains the DANE TLSA entry from the given hostname and prints information.";
 };
 

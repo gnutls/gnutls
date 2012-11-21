@@ -27,7 +27,10 @@
 #include <gnutls/pkcs11.h>
 #include <gnutls/abstract.h>
 #include <gnutls/crypto.h>
-#include <gnutls/dane.h>
+
+#ifdef HAVE_DANE
+# include <gnutls/dane.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -181,6 +184,7 @@ cmd_parser (int argc, char **argv)
 static void dane_check(const char* host, const char* proto, unsigned int port,
                        common_info_st * cinfo)
 {
+#ifdef HAVE_DANE
 dane_state_t s;
 dane_query_t q;
 int ret;
@@ -236,7 +240,7 @@ size_t size;
           ret = gnutls_x509_crt_list_import2( &clist, &clist_size, &file, cinfo->incert_format, 0);
           if (ret < 0)
             error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_import2: %s", gnutls_strerror (ret));
-          
+
           if (clist_size > 0)
             {
               gnutls_datum_t certs[clist_size];
@@ -249,7 +253,7 @@ size_t size;
                   if (ret < 0)
                     error (EXIT_FAILURE, 0, "gnutls_x509_crt_export2: %s", gnutls_strerror (ret));
                 }
-              
+
               ret = dane_verify_crt( s, certs, clist_size, GNUTLS_CRT_X509, 
                                      host, proto, port, 0, 0, &status);
               if (ret < 0)
@@ -275,7 +279,10 @@ size_t size;
 
   dane_query_deinit(q);
   dane_state_deinit(s);
-
+#else
+  fprintf(stderr, "This functionality was disabled (GnuTLS was not compiled with support for DANE).\n");
+  return;
+#endif
 }
 
 static void dane_info(const char* host, const char* proto, unsigned int port, 

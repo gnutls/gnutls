@@ -27,6 +27,9 @@ an easier to parse format.
 ** p11tool: After key generation, outputs the public key (useful in
 tokens that do not store the public key).
 
+** danetool: It is being built even without libgnutls-dane (the
+--check functionality is disabled though).
+
 ** API and ABI modifications:
 gnutls_pkcs11_privkey_generate2: Added
 gnutls_x509_crt_get_policy: Added
