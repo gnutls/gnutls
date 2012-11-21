@@ -59,6 +59,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module byteswap-tests:
   # Code from module c-ctype:
   # Code from module c-ctype-tests:
+  # Code from module c-strcase:
+  # Code from module c-strcase-tests:
   # Code from module clock-time:
   # Code from module close:
   # Code from module close-tests:
@@ -140,11 +142,17 @@ AC_DEFUN([gl_EARLY],
   # Code from module gettimeofday:
   # Code from module gettimeofday-tests:
   # Code from module gnumakefile:
+  # Code from module gperf:
   # Code from module hash-pjw-bare:
   # Code from module havelib:
   # Code from module hostent:
   # Code from module iconv:
+  # Code from module iconv-h:
+  # Code from module iconv-h-tests:
   # Code from module iconv-tests:
+  # Code from module iconv_open:
+  # Code from module iconv_open-utf:
+  # Code from module iconv_open-utf-tests:
   # Code from module ignore-value:
   # Code from module ignore-value-tests:
   # Code from module include_next:
@@ -152,6 +160,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module inet_ntop-tests:
   # Code from module inet_pton:
   # Code from module inet_pton-tests:
+  # Code from module inline:
   # Code from module intprops:
   # Code from module intprops-tests:
   # Code from module inttypes:
@@ -171,6 +180,10 @@ AC_DEFUN([gl_EARLY],
   # Code from module lib-symbol-versions:
   # Code from module listen:
   # Code from module listen-tests:
+  # Code from module locale:
+  # Code from module locale-tests:
+  # Code from module localename:
+  # Code from module localename-tests:
   # Code from module lock:
   # Code from module lseek:
   # Code from module lstat:
@@ -235,6 +248,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module servent:
   # Code from module setenv:
   # Code from module setenv-tests:
+  # Code from module setlocale:
+  # Code from module setlocale-tests:
   # Code from module setsockopt:
   # Code from module setsockopt-tests:
   # Code from module shutdown:
@@ -249,6 +264,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module snippet/_Noreturn:
   # Code from module snippet/arg-nonnull:
   # Code from module snippet/c++defs:
+  # Code from module snippet/unused-parameter:
   # Code from module snippet/warn-on-use:
   # Code from module snprintf:
   # Code from module snprintf-tests:
@@ -328,6 +344,12 @@ AC_DEFUN([gl_EARLY],
   # Code from module u64-tests:
   # Code from module unistd:
   # Code from module unistd-tests:
+  # Code from module unistr/base:
+  # Code from module unistr/u8-mbtoucr:
+  # Code from module unistr/u8-mbtoucr-tests:
+  # Code from module unistr/u8-uctomb:
+  # Code from module unistr/u8-uctomb-tests:
+  # Code from module unitypes:
   # Code from module unsetenv:
   # Code from module unsetenv-tests:
   # Code from module useless-if-before-free:
@@ -563,6 +585,16 @@ AC_SUBST([LTALLOCA])
   AM_ICONV
   m4_ifdef([gl_ICONV_MODULE_INDICATOR],
     [gl_ICONV_MODULE_INDICATOR([iconv])])
+  gl_ICONV_H
+  gl_FUNC_ICONV_OPEN
+  if test $REPLACE_ICONV_OPEN = 1; then
+    AC_LIBOBJ([iconv_open])
+  fi
+  if test $REPLACE_ICONV = 1; then
+    AC_LIBOBJ([iconv])
+    AC_LIBOBJ([iconv_close])
+  fi
+  gl_FUNC_ICONV_OPEN_UTF
   gl_FUNC_INET_NTOP
   if test $HAVE_INET_NTOP = 0 || test $REPLACE_INET_NTOP = 1; then
     AC_LIBOBJ([inet_ntop])
@@ -575,6 +607,7 @@ AC_SUBST([LTALLOCA])
     gl_PREREQ_INET_PTON
   fi
   gl_ARPA_INET_MODULE_INDICATOR([inet_pton])
+  gl_INLINE
   gl_FUNC_ISNAND_NO_LIBM
   if test $gl_func_isnand_no_libm != yes; then
     AC_LIBOBJ([isnand])
@@ -840,6 +873,12 @@ AC_SUBST([LTALLOCA])
   gl_TIMER_TIME
   gl_TIMESPEC
   gl_UNISTD_H
+  gl_LIBUNISTRING_LIBHEADER([0.9.2], [unistr.h])
+  gl_MODULE_INDICATOR([unistr/u8-mbtoucr])
+  gl_LIBUNISTRING_MODULE([0.9], [unistr/u8-mbtoucr])
+  gl_MODULE_INDICATOR([unistr/u8-uctomb])
+  gl_LIBUNISTRING_MODULE([0.9], [unistr/u8-uctomb])
+  gl_LIBUNISTRING_LIBHEADER([0.9], [unitypes.h])
   gl_VALGRIND_TESTS
   gl_FUNC_VASNPRINTF
   gl_FUNC_VASPRINTF
@@ -902,6 +941,8 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
+  gt_LOCALE_FR
+  gt_LOCALE_TR_UTF8
   gl_ENVIRON
   gl_UNISTD_MODULE_INDICATOR([environ])
   gl_FCNTL_H
@@ -944,6 +985,10 @@ changequote([, ])dnl
   gl_FLOAT_EXPONENT_LOCATION
   gl_LONG_DOUBLE_EXPONENT_LOCATION
   AC_REQUIRE([gl_LONG_DOUBLE_VS_DOUBLE])
+  gl_LOCALE_H
+  AC_CHECK_FUNCS_ONCE([newlocale])
+  gl_LOCALENAME
+  AC_CHECK_FUNCS_ONCE([newlocale])
   gl_LOCK
   gl_FUNC_LSTAT
   if test $REPLACE_LSTAT = 1; then
@@ -988,6 +1033,16 @@ changequote([, ])dnl
     AC_LIBOBJ([setenv])
   fi
   gl_STDLIB_MODULE_INDICATOR([setenv])
+  gl_FUNC_SETLOCALE
+  if test $REPLACE_SETLOCALE = 1; then
+    AC_LIBOBJ([setlocale])
+    gl_PREREQ_SETLOCALE
+  fi
+  gl_LOCALE_MODULE_INDICATOR([setlocale])
+  gt_LOCALE_FR
+  gt_LOCALE_FR_UTF8
+  gt_LOCALE_JA
+  gt_LOCALE_ZH_CN
   AC_REQUIRE([gl_FLOAT_EXPONENT_LOCATION])
   AC_REQUIRE([gl_DOUBLE_EXPONENT_LOCATION])
   AC_REQUIRE([gl_LONG_DOUBLE_EXPONENT_LOCATION])
@@ -1126,6 +1181,7 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/snippet/_Noreturn.h
   build-aux/snippet/arg-nonnull.h
   build-aux/snippet/c++defs.h
+  build-aux/snippet/unused-parameter.h
   build-aux/snippet/warn-on-use.h
   build-aux/useless-if-before-free
   build-aux/vc-list-files
@@ -1157,6 +1213,9 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/byteswap.in.h
   lib/c-ctype.c
   lib/c-ctype.h
+  lib/c-strcase.h
+  lib/c-strcasecmp.c
+  lib/c-strncasecmp.c
   lib/close.c
   lib/closedir.c
   lib/connect.c
@@ -1203,6 +1262,15 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/glthread/threadlib.c
   lib/hash-pjw-bare.c
   lib/hash-pjw-bare.h
+  lib/iconv.c
+  lib/iconv.in.h
+  lib/iconv_close.c
+  lib/iconv_open-aix.gperf
+  lib/iconv_open-hpux.gperf
+  lib/iconv_open-irix.gperf
+  lib/iconv_open-osf.gperf
+  lib/iconv_open-solaris.gperf
+  lib/iconv_open.c
   lib/inet_ntop.c
   lib/inet_pton.c
   lib/intprops.h
@@ -1302,6 +1370,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/u64.c
   lib/u64.h
   lib/unistd.in.h
+  lib/unistr.in.h
+  lib/unistr/u8-mbtoucr.c
+  lib/unistr/u8-uctomb-aux.c
+  lib/unistr/u8-uctomb.c
+  lib/unitypes.in.h
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/vasprintf.c
@@ -1371,9 +1444,13 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/gnulib-common.m4
   m4/hostent.m4
   m4/iconv.m4
+  m4/iconv_h.m4
+  m4/iconv_open-utf.m4
+  m4/iconv_open.m4
   m4/include_next.m4
   m4/inet_ntop.m4
   m4/inet_pton.m4
+  m4/inline.m4
   m4/intdiv0.m4
   m4/intl.m4
   m4/intldir.m4
@@ -1395,6 +1472,13 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
+  m4/libunistring-base.m4
+  m4/locale-fr.m4
+  m4/locale-ja.m4
+  m4/locale-tr.m4
+  m4/locale-zh.m4
+  m4/locale_h.m4
+  m4/localename.m4
   m4/lock.m4
   m4/longlong.m4
   m4/lseek.m4
@@ -1437,6 +1521,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/select.m4
   m4/servent.m4
   m4/setenv.m4
+  m4/setlocale.m4
   m4/signal_h.m4
   m4/signbit.m4
   m4/size_max.m4
@@ -1517,6 +1602,9 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-bind.c
   tests/test-byteswap.c
   tests/test-c-ctype.c
+  tests/test-c-strcase.sh
+  tests/test-c-strcasecmp.c
+  tests/test-c-strncasecmp.c
   tests/test-close.c
   tests/test-connect.c
   tests/test-dirent.c
@@ -1568,6 +1656,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getopt_long.h
   tests/test-getpeername.c
   tests/test-gettimeofday.c
+  tests/test-iconv-h.c
+  tests/test-iconv-utf.c
   tests/test-iconv.c
   tests/test-ignore-value.c
   tests/test-inet_ntop.c
@@ -1583,6 +1673,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-isnanl-nolibm.c
   tests/test-isnanl.h
   tests/test-listen.c
+  tests/test-locale.c
+  tests/test-localename.c
   tests/test-lstat.c
   tests/test-lstat.h
   tests/test-malloc-gnu.c
@@ -1615,6 +1707,10 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-send.c
   tests/test-sendto.c
   tests/test-setenv.c
+  tests/test-setlocale1.c
+  tests/test-setlocale1.sh
+  tests/test-setlocale2.c
+  tests/test-setlocale2.sh
   tests/test-setsockopt.c
   tests/test-shutdown.c
   tests/test-signal-h.c
@@ -1666,6 +1762,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-vprintf-posix.sh
   tests/test-vsnprintf.c
   tests/test-wchar.c
+  tests/unistr/test-u8-mbtoucr.c
+  tests/unistr/test-u8-uctomb.c
   tests/zerosize-ptr.h
   tests=lib/binary-io.c
   tests=lib/binary-io.h
@@ -1679,6 +1777,9 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/ignore-value.h
   tests=lib/inttypes.in.h
   tests=lib/ioctl.c
+  tests=lib/locale.in.h
+  tests=lib/localename.c
+  tests=lib/localename.h
   tests=lib/lstat.c
   tests=lib/malloca.c
   tests=lib/malloca.h
@@ -1690,6 +1791,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/putenv.c
   tests=lib/same-inode.h
   tests=lib/setenv.c
+  tests=lib/setlocale.c
   tests=lib/stat.c
   tests=lib/strerror_r.c
   tests=lib/symlink.c

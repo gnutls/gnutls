@@ -604,3 +604,12 @@ src/libcmd-danetool.la
 src/danetool
 tests/key-openssl
 tests/mini-dtls-srtp
+gl/tests/test-iconv
+gl/unused-parameter.h
+gl/unitypes.h
+.dirstamp
+gl/unistr.h
+gl/tests/unused-parameter.h
+gl/tests/locale.h
+gl/iconv.h
+build-aux/snippet/unused-parameter.h
