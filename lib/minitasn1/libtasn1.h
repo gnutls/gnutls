@@ -124,7 +124,7 @@ extern "C"
     unsigned int type;		/* Node type */
     const void *value;		/* Node value */
   };
-  typedef struct asn1_static_node_st asn1_static_node_t;
+  typedef struct asn1_static_node_st asn1_static_node;
 
 /* List of constants for field type of typedef node_asn  */
 #define ASN1_ETYPE_CONSTANT       1
@@ -183,7 +183,7 @@ extern "C"
 		       const char *vectorName, char *errorDescription);
 
   extern ASN1_API int
-    asn1_array2tree (const asn1_static_node_t * array,
+    asn1_array2tree (const asn1_static_node * array,
 		     asn1_node * definitions, char *errorDescription);
 
   extern ASN1_API void
@@ -307,7 +307,8 @@ typedef int asn1_retCode;	/* type returned by libtasn1 functions */
 #define ASN1_TYPE_EMPTY NULL
 
 #define static_struct_asn asn1_static_node_st
-#define ASN1_ARRAY_TYPE asn1_static_node_t
+#define ASN1_ARRAY_TYPE asn1_static_node
+#define asn1_static_node_t asn1_static_node
 
 #define node_data_struct asn1_data_node_st
 #define ASN1_DATA_NODE asn1_data_node_st
