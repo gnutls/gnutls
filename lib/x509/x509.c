@@ -2421,6 +2421,9 @@ gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
  *    unsigned long value_tag;
  *  };
  *
+ * The X.509 distinguished name is a sequence of sequences of strings
+ * and this is what the @irdn and @iava indexes model.
+ *
  * Note that @ava will contain pointers into the @dn structure, so you
  * should not modify any data or deallocate it.  Note also that the DN
  * in turn points into the original certificate structure, and thus
