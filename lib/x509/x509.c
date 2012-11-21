@@ -2370,12 +2370,12 @@ get_dn (gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t * dn)
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @dn: output variable with pointer to uint8_t DN.
  *
- * Return the Certificate's Subject DN as an uint8_t data type.  You
- * may use gnutls_x509_dn_get_rdn_ava() to decode the DN. 
+ * Return the Certificate's Subject DN as a %gnutls_x509_dn_t data type,
+ * that can be decoded using gnutls_x509_dn_get_rdn_ava(). 
  *
- * Note that @dn should be treated as constant. Because points 
- * into the @cert object, you may not deallocate @cert 
- * and continue to access @dn.
+ * Note that @dn should be treated as constant. Because it points 
+ * into the @cert object, you should not use @dn after @cert is
+ * deallocated.
  *
  * Returns: Returns 0 on success, or an error code.
  **/
@@ -2390,12 +2390,12 @@ gnutls_x509_crt_get_subject (gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @dn: output variable with pointer to uint8_t DN
  *
- * Return the Certificate's Issuer DN as an uint8_t data type.  You may
- * use gnutls_x509_dn_get_rdn_ava() to decode the DN.
+ * Return the Certificate's Issuer DN as a %gnutls_x509_dn_t data type,
+ * that can be decoded using gnutls_x509_dn_get_rdn_ava(). 
  *
- * Note that @dn should be treated as constant. Because points 
- * into the @cert object, you may not deallocate @cert 
- * and continue to access @dn.
+ * Note that @dn should be treated as constant. Because it points 
+ * into the @cert object, you should not use @dn after @cert is
+ * deallocated.
  *
  * Returns: Returns 0 on success, or an error code.
  **/
@@ -2407,12 +2407,19 @@ gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
 
 /**
  * gnutls_x509_dn_get_rdn_ava:
- * @dn: input variable with uint8_t DN pointer
+ * @dn: a pointer to DN
  * @irdn: index of RDN
  * @iava: index of AVA.
  * @ava: Pointer to structure which will hold output information.
  *
- * Get pointers to data within the DN.
+ * Get pointers to data within the DN. The format of the @ava structure
+ * is shown below.
+ *
+ *  struct gnutls_x509_ava_st {
+ *    gnutls_datum_t oid;
+ *    gnutls_datum_t value;
+ *    unsigned long value_tag;
+ *  };
  *
  * Note that @ava will contain pointers into the @dn structure, so you
  * should not modify any data or deallocate it.  Note also that the DN

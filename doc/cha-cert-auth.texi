@@ -229,17 +229,18 @@ can be accessed using @funcref{gnutls_x509_crt_get_dn_by_oid}.
 @showfuncdesc{gnutls_x509_crt_get_dn_by_oid}
 @showfuncdesc{gnutls_x509_crt_get_dn_oid}
 
-The more powerful @funcref{gnutls_x509_crt_get_subject} and 
-@funcref{gnutls_x509_dn_get_rdn_ava} provide efficient access
-to the contents of the distinguished name structure.
-
-@showfuncdesc{gnutls_x509_crt_get_subject}
-@showfuncdesc{gnutls_x509_dn_get_rdn_ava}
-
 Similar functions exist to access the distinguished name
 of the issuer of the certificate.
 
 @showfuncD{gnutls_x509_crt_get_issuer_dn,gnutls_x509_crt_get_issuer_dn_by_oid,gnutls_x509_crt_get_issuer_dn_oid,gnutls_x509_crt_get_issuer}
+
+The more powerful @funcref{gnutls_x509_crt_get_subject} and 
+@funcref{gnutls_x509_dn_get_rdn_ava} provide efficient but low-level access
+to the contents of the distinguished name structure.
+
+@showfuncB{gnutls_x509_crt_get_subject,gnutls_x509_crt_get_issuer}
+@showfuncdesc{gnutls_x509_dn_get_rdn_ava}
+
 
 @node X.509 public and private keys
 @subsection Accessing public and private keys
