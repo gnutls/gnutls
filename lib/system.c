@@ -477,13 +477,11 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
 
 # include <iconv.h>
 
-#define INC(x) (2*x)
-
 int _gnutls_ucs2_to_utf8(const void* data, size_t size, gnutls_datum_t *output)
 {
 iconv_t conv;
 int ret;
-size_t orig, dstlen = INC(size), tmp;
+size_t orig, dstlen = size*2;
 char* src = (void*)data;
 char* dst = NULL, *pdst;
 
@@ -494,6 +492,10 @@ char* dst = NULL, *pdst;
   if (conv == (iconv_t)-1)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
   
+  /* Note that dstlen has enough size for every possible input characters.
+   * (remember the in UTF-16 the characters in data are at most size/2, 
+   *  and we allocate 4 bytes per character).
+   */
   pdst = dst = gnutls_malloc(dstlen+1);
   if (dst == NULL)
     {
@@ -505,31 +507,8 @@ char* dst = NULL, *pdst;
   ret = iconv(conv, &src, &size, &pdst, &dstlen);
   if (ret == -1)
     {
-      if (dstlen != 0 || size == 0)
-        {
-          ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-          goto fail;
-        }
-
-      /* otherwise the buffer wasn't sufficient */
-      tmp = orig + INC(orig);
-      dstlen += INC(orig);
-
-      dst = gnutls_realloc_fast(dst, tmp);
-      if (dst == NULL)
-        {
-          ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-          goto fail;
-        }
-      pdst = dst + orig;
-      orig = tmp;
-
-      ret = iconv(conv, &src, &size, &pdst, &dstlen);
-      if (ret == -1)
-        {
-          ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-          goto fail;
-        }
+      ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+      goto fail;
     }
 
   output->data = (void*)dst;
