@@ -322,7 +322,7 @@ well as a trusted CA certificate.
 
 @subheading High level functionality
 Generic and higher level private key import functions are available, that
-will auto-detect the encrypted key format.
+import plain or encrypted keys and will auto-detect the encrypted key format.
 
 @showfuncdesc{gnutls_x509_privkey_import2}
 

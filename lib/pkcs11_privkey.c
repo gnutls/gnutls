@@ -567,7 +567,7 @@ gnutls_pkcs11_privkey_generate (const char* url, gnutls_pk_algorithm_t pk,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.1
+ * Since: 3.1.5
  **/
 int
 gnutls_pkcs11_privkey_generate2 (const char* url, gnutls_pk_algorithm_t pk, 

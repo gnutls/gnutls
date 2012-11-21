@@ -1766,6 +1766,7 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
  * This function will deinitialize all memory associated with the provided
  * @policy. The policy is allocated using gnutls_x509_crt_get_policy().
  *
+ * Since: 3.1.5
  **/
 void gnutls_x509_policy_release(struct gnutls_x509_policy_st* policy)
 {
@@ -1871,6 +1872,8 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * if the extension is not present, otherwise a negative error value.
+ *
+ * Since: 3.1.5
  **/
 int
 gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx, 

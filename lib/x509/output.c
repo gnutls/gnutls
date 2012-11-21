@@ -2549,6 +2549,8 @@ print_pubkey_other (gnutls_buffer_st * str, gnutls_pubkey_t pubkey, gnutls_certi
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.1.5
  **/
 int
 gnutls_pubkey_print (gnutls_pubkey_t pubkey,
