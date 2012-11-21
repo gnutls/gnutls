@@ -151,7 +151,7 @@ flag = {
 };
 
 flag = {
-    name      = simple-numbers;
+    name      = hex-numbers;
     descrip   = "Print big number in an easier format to parse";
     doc   = "";
 };
@@ -273,19 +273,24 @@ flag = {
 flag = {
     name      = rsa;
     descrip   = "Generate RSA key";
-    doc = "";
+    doc = "When combined with --generate-privkey generates an RSA private key.";
 };
 
 flag = {
     name      = dsa;
     descrip   = "Generate DSA key";
-    doc = "";
+    doc = "When combined with --generate-privkey generates a DSA private key.";
 };
 
 flag = {
     name      = ecc;
     descrip   = "Generate ECC (ECDSA) key";
-    doc = "";
+    doc = "When combined with --generate-privkey generates an elliptic curve private key to be used with ECDSA.";
+};
+
+flag = {
+    name      = ecdsa;
+    aliases   = ecc;
 };
 
 flag = {

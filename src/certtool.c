@@ -121,7 +121,7 @@ generate_private_key_int (common_info_st * cinfo)
 
   if (bits > 1024 && key_type == GNUTLS_PK_DSA)
     fprintf (stderr,
-             "Note that DSA keys with size over 1024 can only be used with TLS 1.2 or later.\n\n");
+             "Note that DSA keys with size over 1024 may cause incompatibility problems when used with earlier than TLS 1.2 versions.\n\n");
 
   ret = gnutls_x509_privkey_generate (key, key_type, bits, 0);
   if (ret < 0)
@@ -887,7 +887,7 @@ cmd_parser (int argc, char **argv)
       HAVE_OPT(KEY_INFO) || HAVE_OPT(PGP_KEY_INFO))
     privkey_op = 1;
     
-  if (HAVE_OPT(SIMPLE_NUMBERS))
+  if (HAVE_OPT(HEX_NUMBERS))
     full_format = GNUTLS_CRT_PRINT_FULL_NUMBERS;
 
   if (HAVE_OPT(OUTFILE))

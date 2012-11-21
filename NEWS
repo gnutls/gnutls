@@ -17,12 +17,11 @@ public key on generation.
 affected combined levels. Patch by Tim Kosse.
 
 ** certtool: The --pubkey-info option can be combined with the
---load-privkey in order to print the corresponding public key of a private 
-key.
+--load-privkey or --load-request to print the corresponding public keys.
 
 ** certtool: It is able to set certificate policies via a template.
 
-** certtool: Added --simple-numbers option which prints big numbers in 
+** certtool: Added --hex-numbers option which prints big numbers in 
 an easier to parse format.
 
 ** p11tool: After key generation, outputs the public key (useful in
