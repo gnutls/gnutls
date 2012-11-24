@@ -195,7 +195,7 @@ _pkcs12_decode_crt_bag (gnutls_pkcs12_bag_type_t type,
           goto cleanup;
         }
 
-      ret = _gnutls_x509_read_string (c2, "certValue", out, RV_OCTET_STRING);
+      ret = _gnutls_x509_read_string (c2, "certValue", out, ASN1_ETYPE_OCTET_STRING);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -221,7 +221,7 @@ _pkcs12_decode_crt_bag (gnutls_pkcs12_bag_type_t type,
           goto cleanup;
         }
 
-      ret = _gnutls_x509_read_string (c2, "crlValue", out, RV_OCTET_STRING);
+      ret = _gnutls_x509_read_string (c2, "crlValue", out, ASN1_ETYPE_OCTET_STRING);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -247,7 +247,7 @@ _pkcs12_decode_crt_bag (gnutls_pkcs12_bag_type_t type,
           goto cleanup;
         }
 
-      ret = _gnutls_x509_read_string (c2, "secretValue", out, RV_OCTET_STRING);
+      ret = _gnutls_x509_read_string (c2, "secretValue", out, ASN1_ETYPE_OCTET_STRING);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -300,7 +300,7 @@ _pkcs12_encode_crt_bag (gnutls_pkcs12_bag_type_t type,
           goto cleanup;
         }
 
-      ret = _gnutls_x509_write_value (c2, "certValue", raw, 1);
+      ret = _gnutls_x509_write_string (c2, "certValue", raw, ASN1_ETYPE_OCTET_STRING);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -326,7 +326,7 @@ _pkcs12_encode_crt_bag (gnutls_pkcs12_bag_type_t type,
           goto cleanup;
         }
 
-      ret = _gnutls_x509_write_value (c2, "crlValue", raw, 1);
+      ret = _gnutls_x509_write_string (c2, "crlValue", raw, ASN1_ETYPE_OCTET_STRING);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -352,7 +352,7 @@ _pkcs12_encode_crt_bag (gnutls_pkcs12_bag_type_t type,
           goto cleanup;
         }
 
-      ret = _gnutls_x509_write_value (c2, "secretValue", raw, 1);
+      ret = _gnutls_x509_write_string (c2, "secretValue", raw, ASN1_ETYPE_OCTET_STRING);
       if (ret < 0)
         {
           gnutls_assert ();

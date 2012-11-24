@@ -68,7 +68,7 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
    */
 
   result =
-    _gnutls_x509_read_string (pkcs12, "authSafe.content", &auth_safe, RV_OCTET_STRING);
+    _gnutls_x509_read_string (pkcs12, "authSafe.content", &auth_safe, ASN1_ETYPE_OCTET_STRING);
   if (result < 0)
     {
       gnutls_assert ();
@@ -343,24 +343,6 @@ bag_to_oid (int bag)
   return NULL;
 }
 
-static inline char *
-ucs2_to_ascii (char *data, int size)
-{
-  int i, j;
-
-  for (i = 0; i < size / 2; i++)
-    {
-      j = 2 * i + 1;
-      if (isascii (data[j]))
-        data[i] = data[i * 2 + 1];
-      else
-        data[i] = '?';
-    }
-  data[i] = 0;
-
-  return data;
-}
-
 /* Decodes the SafeContents, and puts the output in
  * the given bag. 
  */
@@ -496,7 +478,8 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
             if (strcmp (oid, KEY_ID_OID) == 0)
               {
                 result =
-                  _gnutls_x509_decode_string (NULL, attr_val.data, attr_val.size, &t);
+                  _gnutls_x509_decode_string (ASN1_ETYPE_OCTET_STRING, attr_val.data, 
+                                              attr_val.size, &t);
                 _gnutls_free_datum (&attr_val);
                 if (result < 0)
                   {
@@ -514,7 +497,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
             else if (strcmp (oid, FRIENDLY_NAME_OID) == 0)
               {
                 result =
-                  _gnutls_x509_decode_string ("BMPString",
+                  _gnutls_x509_decode_string (ASN1_ETYPE_BMP_STRING,
                                               attr_val.data, attr_val.size, &t);
                 _gnutls_free_datum (&attr_val);
                 if (result < 0)
@@ -528,8 +511,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
                 attr_val.data = t.data;
                 attr_val.size = t.size;
 
-                bag->element[i].friendly_name =
-                  ucs2_to_ascii ((char*)attr_val.data, attr_val.size);
+                bag->element[i].friendly_name = (char*)t.data;
               }
             else
               {
@@ -567,7 +549,7 @@ _parse_safe_contents (ASN1_TYPE sc, const char *sc_name,
   /* Step 1. Extract the content.
    */
 
-  result = _gnutls_x509_read_string (sc, sc_name, &content, RV_OCTET_STRING);
+  result = _gnutls_x509_read_string (sc, sc_name, &content, ASN1_ETYPE_OCTET_STRING);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1320,7 +1302,7 @@ _pkcs12_encode_safe_contents (gnutls_pkcs12_bag_t bag, ASN1_TYPE * contents,
               goto cleanup;
             }
 
-          result = _gnutls_x509_write_value (c2, "?LAST.bagValue", &tmp, 0);
+          result = _gnutls_x509_write_value (c2, "?LAST.bagValue", &tmp);
 
           _gnutls_free_datum (&tmp);
 
@@ -1329,7 +1311,7 @@ _pkcs12_encode_safe_contents (gnutls_pkcs12_bag_t bag, ASN1_TYPE * contents,
         {
 
           result = _gnutls_x509_write_value (c2, "?LAST.bagValue",
-                                             &bag->element[i].data, 0);
+                                             &bag->element[i].data);
         }
 
       if (result < 0)

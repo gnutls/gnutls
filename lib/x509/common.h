@@ -66,34 +66,20 @@
 #define ASN1_NULL "\x05\x00"
 #define ASN1_NULL_SIZE 2
 
-typedef enum x509_string_type {
-  RV_RAW,
-  RV_OCTET_STRING,
-  RV_BIT_STRING,
-  RV_IA5STRING,
-  RV_UTF8STRING
-} x509_string_type;
-
 int _gnutls_x509_set_time (ASN1_TYPE c2, const char *where, time_t tim, int general);
 
-int _gnutls_x509_decode_string (const char *string_type,
+int _gnutls_x509_decode_string (unsigned int etype,
                                 const uint8_t * der, size_t der_size,
                                 gnutls_datum_t *output);
 
-int _gnutls_x509_encode_string(const char* string_type,
+int _gnutls_x509_encode_string(unsigned int etype,
                                const void* input_data, size_t input_size,
                                gnutls_datum_t* output);
 
-int _gnutls_x509_oid_data2string (const char *OID, void *value,
-                                  int value_size, char *res,
-                                  size_t * res_size);
+int _gnutls_x509_dn_to_string (const char *OID, void *value,
+                                  int value_size, gnutls_datum_t* out);
 int _gnutls_x509_data2hex (const void * data, size_t data_size,
                            void * out, size_t * sizeof_out);
-
-const char *_gnutls_x509_oid2asn_string (const char *oid);
-
-int _gnutls_x509_oid_data_choice (const char *OID);
-int _gnutls_x509_oid_data_printable (const char *OID);
 
 time_t _gnutls_x509_get_time (ASN1_TYPE c2, const char *when, int general);
 
@@ -124,9 +110,12 @@ int _gnutls_x509_export_int_named2 (ASN1_TYPE asn1_data, const char *name,
 int _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
                              gnutls_datum_t * ret);
 int _gnutls_x509_read_string (ASN1_TYPE c, const char *root,
-                             gnutls_datum_t * ret, x509_string_type type);
+                             gnutls_datum_t * ret, unsigned int etype);
 int _gnutls_x509_write_value (ASN1_TYPE c, const char *root,
-                              const gnutls_datum_t * data, x509_string_type type);
+                              const gnutls_datum_t * data);
+
+int _gnutls_x509_write_string (ASN1_TYPE c, const char *root,
+                              const gnutls_datum_t * data, unsigned int etype);
 
 int _gnutls_x509_encode_and_write_attribute (const char *given_oid,
                                              ASN1_TYPE asn1_struct,
@@ -182,5 +171,7 @@ int get_extension (ASN1_TYPE asn, const char *root,
 int set_extension (ASN1_TYPE asn, const char *root,
 		   const char *ext_id,
 		   const gnutls_datum_t * ext_data, unsigned int critical);
+
+int _gnutls_strdatum_to_buf (gnutls_datum_t * d, void* buf, size_t * sizeof_buf);
 
 #endif

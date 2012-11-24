@@ -32,94 +32,91 @@
 #include "x509_int.h"
 #include <common.h>
 
-struct oid2string
+struct oid_to_string
 {
   const char *oid;
   const char *ldap_desc;
-  int choice;                   /* of type DirectoryString */
-  int printable;
-  const char *asn_desc;         /* description in the pkix file */
+  const char *asn_desc;         /* description in the pkix file if complex type */
+  unsigned int etype;           /* the libtasn1 ASN1_ETYPE or INVALID
+                                 * if cannot be simply parsed */
 };
 
 /* This list contains all the OIDs that may be
  * contained in a rdnSequence and are printable.
  */
-static const struct oid2string _oid2str[] = {
+static const struct oid_to_string _oid2str[] = {
   /* PKIX
    */
-  {"1.3.6.1.5.5.7.9.1", "dateOfBirth", 0, 1, "PKIX1.GeneralizedTime"},
-  {"1.3.6.1.5.5.7.9.2", "placeOfBirth", 1, 1, "PKIX1.DirectoryString"},
-  {"1.3.6.1.5.5.7.9.3", "gender", 0, 1, "PKIX1.PrintableString"},
-  {"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", 0, 1,
-   "PKIX1.PrintableString"},
-  {"1.3.6.1.5.5.7.9.5", "countryOfResidence", 0, 1, "PKIX1.PrintableString"},
+  {"1.3.6.1.5.5.7.9.1", "dateOfBirth", NULL, ASN1_ETYPE_GENERALIZED_TIME},
+  {"1.3.6.1.5.5.7.9.2", "placeOfBirth", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"1.3.6.1.5.5.7.9.3", "gender", NULL, ASN1_ETYPE_PRINTABLE_STRING},
+  {"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", NULL, ASN1_ETYPE_PRINTABLE_STRING},
+  {"1.3.6.1.5.5.7.9.5", "countryOfResidence", NULL, ASN1_ETYPE_PRINTABLE_STRING},
 
-  {"2.5.4.6", "C", 0, 1, "PKIX1.PrintableString"},
-  {"2.5.4.9", "STREET", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.12", "T", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.10", "O", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.11", "OU", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.3", "CN", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.7", "L", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.8", "ST", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.6", "C", NULL, ASN1_ETYPE_PRINTABLE_STRING},
+  {"2.5.4.9", "STREET", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.12", "T", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.10", "O", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.11", "OU", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.3", "CN", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.7", "L", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.8", "ST", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
 
-  {"2.5.4.5", "serialNumber", 0, 1, "PKIX1.PrintableString"},
-  {"2.5.4.20", "telephoneNumber", 0, 1, "PKIX1.PrintableString"},
-  {"2.5.4.4", "surName", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.43", "initials", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.44", "generationQualifier", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.42", "givenName", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.65", "pseudonym", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.46", "dnQualifier", 0, 1, "PKIX1.PrintableString"},
-  {"2.5.4.17", "postalCode", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.41", "Name", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.15", "businessCategory", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.5", "serialNumber", NULL, ASN1_ETYPE_PRINTABLE_STRING},
+  {"2.5.4.20", "telephoneNumber", NULL, ASN1_ETYPE_PRINTABLE_STRING},
+  {"2.5.4.4", "surName", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.43", "initials", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.44", "generationQualifier", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.42", "givenName", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.65", "pseudonym", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.46", "dnQualifier", NULL, ASN1_ETYPE_PRINTABLE_STRING},
+  {"2.5.4.17", "postalCode", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.41", "Name", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.15", "businessCategory", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
 
-  {"0.9.2342.19200300.100.1.25", "DC", 0, 1, "PKIX1.IA5String"},
-  {"0.9.2342.19200300.100.1.1", "UID", 1, 1, "PKIX1.DirectoryString"},
+  {"0.9.2342.19200300.100.1.25", "DC", NULL, ASN1_ETYPE_IA5_STRING},
+  {"0.9.2342.19200300.100.1.1", "UID", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
 
   /* Extended validation
    */
-  {"1.3.6.1.4.1.311.60.2.1.1", "jurisdictionOfIncorporationLocalityName", 1,
-   1, "PKIX1.DirectoryString"},
+  {"1.3.6.1.4.1.311.60.2.1.1", "jurisdictionOfIncorporationLocalityName",
+   "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
   {"1.3.6.1.4.1.311.60.2.1.2",
-   "jurisdictionOfIncorporationStateOrProvinceName", 1, 1,
-   "PKIX1.DirectoryString"},
-  {"1.3.6.1.4.1.311.60.2.1.3", "jurisdictionOfIncorporationCountryName", 0, 1,
-   "PKIX1.PrintableString"},
+   "jurisdictionOfIncorporationStateOrProvinceName",
+   "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"1.3.6.1.4.1.311.60.2.1.3", "jurisdictionOfIncorporationCountryName",
+   NULL, ASN1_ETYPE_PRINTABLE_STRING},
 
   /* PKCS #9
    */
-  {"1.2.840.113549.1.9.1", "EMAIL", 0, 1, "PKIX1.IA5String"},
-  {"1.2.840.113549.1.9.7", NULL, 1, 1, "PKIX1.pkcs-9-challengePassword"},
+  {"1.2.840.113549.1.9.1", "EMAIL", NULL, ASN1_ETYPE_IA5_STRING},
+  {"1.2.840.113549.1.9.7", NULL, "PKIX1.pkcs-9-challengePassword", ASN1_ETYPE_INVALID},
 
   /* friendly name */
-  {"1.2.840.113549.1.9.20", NULL, 0, 1, "PKIX1.BMPString"},
+  {"1.2.840.113549.1.9.20", NULL, NULL, ASN1_ETYPE_BMP_STRING},
   /* local key id */
-  {"1.2.840.113549.1.9.21", NULL, 0, 1, "PKIX1.pkcs-9-localKeyId"},
+  {"1.2.840.113549.1.9.21", NULL, NULL, ASN1_ETYPE_OCTET_STRING},
 
   /* rfc3920 section 5.1.1 */
-  {"1.3.6.1.5.5.7.8.5", "XmppAddr", 0, 1, "PKIX1.UTF8String"},
+  {"1.3.6.1.5.5.7.8.5", "XmppAddr", NULL, ASN1_ETYPE_UTF8_STRING},
 
-  {NULL, NULL, 0, 0, ""}
+  {NULL, NULL, NULL, 0}
 };
 
-/* Returns 1 if the data defined by the OID are printable.
- */
-int
-_gnutls_x509_oid_data_printable (const char *oid)
+static const struct oid_to_string* get_oid_entry (const char* oid)
 {
   unsigned int i = 0;
 
   do
     {
       if (strcmp (_oid2str[i].oid, oid) == 0)
-        return _oid2str[i].printable;
+        return &_oid2str[i];
       i++;
     }
   while (_oid2str[i].oid != NULL);
 
-  return 0;
+  return NULL;
+
 }
 
 /**
@@ -145,25 +142,6 @@ gnutls_x509_dn_oid_known (const char *oid)
     {
       if (strcmp (_oid2str[i].oid, oid) == 0)
         return 1;
-      i++;
-    }
-  while (_oid2str[i].oid != NULL);
-
-  return 0;
-}
-
-/* Returns 1 if the data defined by the OID are of a choice
- * type.
- */
-int
-_gnutls_x509_oid_data_choice (const char *oid)
-{
-  unsigned int i = 0;
-
-  do
-    {
-      if (strcmp (_oid2str[i].oid, oid) == 0)
-        return _oid2str[i].choice;
       i++;
     }
   while (_oid2str[i].oid != NULL);
@@ -202,62 +180,95 @@ gnutls_x509_dn_oid_name (const char *oid, unsigned int flags)
   else return NULL;
 }
 
-const char *
-_gnutls_x509_oid2asn_string (const char *oid)
+static int
+make_printable_string(unsigned etype, const gnutls_datum_t *input, gnutls_datum_t *out)
 {
-  unsigned int i = 0;
+int printable = 0;
+int ret;
+unsigned int i;
+size_t size;
 
-  do
+  if (etype == ASN1_ETYPE_BMP_STRING)
     {
-      if (strcmp (_oid2str[i].oid, oid) == 0)
-        return _oid2str[i].asn_desc;
-      i++;
+      ret = _gnutls_ucs2_to_utf8(input->data, input->size, out);
+      if (ret < 0)
+        {
+          /* could not convert. Handle it as non-printable */
+          printable = 0;
+        }
+      else
+        printable = 1;
     }
-  while (_oid2str[i].oid != NULL);
+  else if (etype == ASN1_ETYPE_TELETEX_STRING)
+    {
+      int ascii = 0;
+      /* HACK: if the teletex string contains only ascii
+       * characters then treat it as printable.
+       */
+      for (i = 0; i < input->size; i++)
+        if (!isascii (input->data[i]))
+          ascii = 1;
 
-  return NULL;
+      if (ascii == 0)
+        {
+          out->data = gnutls_malloc(input->size+1);
+          if (out->data == NULL)
+            return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+          
+          memcpy(out->data, input->data, input->size);
+          out->size = input->size;
+          
+          out->data[out->size] = 0;
+          
+          printable = 1;
+        }
+    }
+  else
+    return GNUTLS_E_INVALID_REQUEST;
+
+  if (printable == 0)
+    { /* need to allocate out */
+      out->size = input->size*2+2;
+      out->data = gnutls_malloc(out->size);
+      if (out->data == NULL)
+        return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+      size = out->size;
+      ret = _gnutls_x509_data2hex (input->data, input->size, out->data, &size);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+      out->size = size;
+    }
+
+  return 0;
+
+cleanup:
+  _gnutls_free_datum(out);
+  return ret;
 }
 
-
-/* This function will convert an attribute value, specified by the OID,
- * to a string. The result will be a null terminated string.
- *
- * res may be null. This will just return the res_size, needed to
- * hold the string.
- */
-int
-_gnutls_x509_oid_data2string (const char *oid, void *value,
-                              int value_size, char *res, size_t * res_size)
+static int
+decode_complex_string (const struct oid_to_string* oentry, void *value,
+                       int value_size, gnutls_datum_t* out)
 {
   char str[MAX_STRING_LEN], tmpname[128];
-  const char *aname = NULL;
-  int choice = -1, len = -1, result;
+  int len = -1, result;
   ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
   char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
+  int etype = ASN1_ETYPE_INVALID;
+  gnutls_datum_t td;
 
-  if (value == NULL || value_size <= 0 || res_size == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  if (_gnutls_x509_oid_data_printable (oid) == 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  aname = _gnutls_x509_oid2asn_string (oid);
-  choice = _gnutls_x509_oid_data_choice (oid);
-
-  if (aname == NULL)
+  if (oentry->asn_desc == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   if ((result =
-       asn1_create_element (_gnutls_get_pkix (), aname,
+       asn1_create_element (_gnutls_get_pkix (), oentry->asn_desc,
                             &tmpasn)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -269,123 +280,119 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
                           asn1_err)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      _gnutls_debug_log ("asn1_der_decoding: %s:%s\n", str, asn1_err);
+      _gnutls_debug_log ("asn1_der_decoding: %s\n", asn1_err);
       asn1_delete_structure (&tmpasn);
       return _gnutls_asn2err (result);
     }
 
-  /* If this is a choice then we read the choice. Otherwise it
-   * is the value;
+  /* Read the type of choice.
    */
   len = sizeof (str) - 1;
   if ((result = asn1_read_value (tmpasn, "", str, &len)) != ASN1_SUCCESS)
-    {                           /* CHOICE */
+    { /* CHOICE */
       gnutls_assert ();
       asn1_delete_structure (&tmpasn);
       return _gnutls_asn2err (result);
     }
 
-  if (choice == 0)
+  str[len] = 0;
+
+  /* Note that we do not support strings other than
+   * UTF-8 (thus ASCII as well).
+   */
+  if (strcmp (str, "teletexString") == 0)
+    etype = ASN1_ETYPE_TELETEX_STRING;
+
+  if (strcmp (str, "bmpString") == 0)
+    etype = ASN1_ETYPE_BMP_STRING;
+
+  _gnutls_str_cpy (tmpname, sizeof (tmpname), str);
+
+  result = _gnutls_x509_read_value(tmpasn, tmpname, &td);
+  asn1_delete_structure (&tmpasn);
+  if (result < 0)
+    return gnutls_assert_val(result);
+
+  if (etype != ASN1_ETYPE_INVALID)
     {
-      str[len] = 0;
-
-      /* Refuse to deal with strings containing NULs. */
-      if (strlen (str) != (size_t)len)
-        return GNUTLS_E_ASN1_DER_ERROR;
-
-      if (res)
-        _gnutls_str_cpy (res, *res_size, str);
-      *res_size = (size_t)len;
-
-      asn1_delete_structure (&tmpasn);
+      result = make_printable_string(etype, &td, out);
+      
+      _gnutls_free_datum(&td);
+      
+      if (result < 0)
+        return gnutls_assert_val(result);
     }
   else
-    {                           /* choice */
-      int non_printable = 0, teletex = 0;
-      int ucs2 = 0;
-      str[len] = 0;
+    {
+      out->data = td.data;
+      out->size = td.size;
+      out->data[out->size] = 0;
+    }
 
-      /* Note that we do not support strings other than
-       * UTF-8 (thus ASCII as well).
-       */
-      if (strcmp (str, "printableString") != 0 && strcmp (str, "bmpString") != 0 && 
-          strcmp (str, "ia5String") != 0 && strcmp (str, "utf8String") != 0)
+   /* Refuse to deal with strings containing NULs. */
+  if (strlen ((void*)out->data) != (size_t)out->size)
+    {
+      _gnutls_free_datum(out);
+      return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+    }
+
+  return 0;
+}
+
+
+/* This function will convert an attribute value, specified by the OID,
+ * to a string. The result will be a null terminated string.
+ *
+ * res may be null. This will just return the res_size, needed to
+ * hold the string.
+ */
+int
+_gnutls_x509_dn_to_string (const char *oid, void *value,
+                           int value_size, gnutls_datum_t *str)
+{
+  const struct oid_to_string* oentry;
+  int ret;
+  size_t size;
+
+  if (value == NULL || value_size <= 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  oentry = get_oid_entry(oid);
+  if (oentry == NULL)
+    { /* unknown OID -> hex */
+      str->size = value_size*2+2;
+      str->data = gnutls_malloc(str->size);
+      if (str->data == NULL)
+        return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+      size = str->size;
+      ret = _gnutls_x509_data2hex (value, value_size, str->data, &size);
+      if (ret < 0)
         {
-          non_printable = 1;
+          gnutls_assert();
+          gnutls_free(str->data);
+          return ret;
         }
-      if (strcmp (str, "teletexString") == 0)
-        teletex = 1;
-
-      if (strcmp (str, "bmpString") == 0)
-        ucs2 = 1;
-
-      _gnutls_str_cpy (tmpname, sizeof (tmpname), str);
-
-      len = sizeof (str) - 1;
-      if ((result =
-           asn1_read_value (tmpasn, tmpname, str, &len)) != ASN1_SUCCESS)
+      str->size = size;
+      return 0;
+    }
+  
+  if (oentry->asn_desc != NULL)
+    { /* complex */
+      ret = decode_complex_string(oentry, value, value_size, str);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+    }
+  else
+    {
+      ret = _gnutls_x509_decode_string(oentry->etype, value, value_size,
+                                       str);
+      if (ret < 0)
         {
-          asn1_delete_structure (&tmpasn);
-          return _gnutls_asn2err (result);
-        }
-
-      asn1_delete_structure (&tmpasn);
-      
-      if (ucs2 != 0)
-        {
-          gnutls_datum_t td;
-
-          result = _gnutls_ucs2_to_utf8(str, len, &td);
-          if (result < 0)
-            {
-              /* could not convert. Handle it as non-printable */
-              non_printable = 1;
-              ucs2 = 0;
-            }
-          else
-            {
-              if (td.size >= sizeof(str))
-                {
-                  gnutls_free(td.data);
-                  return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
-                }
-              memcpy(str, td.data, td.size);
-              len = td.size;
-          
-              gnutls_free(td.data);
-            }
-        }
-      else if (teletex != 0)
-        {
-          int ascii = 0, i;
-          /* HACK: if the teletex string contains only ascii
-           * characters then treat it as printable.
-           */
-          for (i = 0; i < len; i++)
-            if (!isascii (str[i]))
-              ascii = 1;
-
-          if (ascii == 0)
-            non_printable = 0;
-        }
-
-      if (non_printable == 0)
-        {
-          str[len] = 0;
-
-          /* Refuse to deal with strings containing NULs. */
-          if (strlen (str) != (size_t)len)
-            return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
-
-          if (res)
-            _gnutls_str_cpy (res, *res_size, str);
-          *res_size = (size_t)len;
-        }
-      else
-        {
-          result = _gnutls_x509_data2hex (str, (size_t)len, res, res_size);
-          if (result < 0)
-            return gnutls_assert_val(result);
+          return gnutls_assert_val(ret);
         }
     }
 
@@ -872,60 +879,59 @@ _gnutls_x509_export_int_named2 (ASN1_TYPE asn1_data, const char *name,
   return 0;
 }
 
-/* Decodes an octet string. Leave string_type null for a normal
- * octet string. Otherwise put something like BMPString, PrintableString
- * etc.
+/* Decodes an octet string. The etype specifies the string type.
+ * The returned string is always null terminated (but null is not
+ * included in size).
  */
 int
-_gnutls_x509_decode_string (const char *string_type,
+_gnutls_x509_decode_string (unsigned int etype,
                             const uint8_t * der, size_t der_size,
                             gnutls_datum_t * output)
 {
-  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  int result;
-  char strname[64];
-
-  if (string_type == NULL) /* assume octet string */
-    _gnutls_str_cpy (strname, sizeof (strname), "PKIX1.pkcs-7-Data");
-  else
-    {
-      _gnutls_str_cpy (strname, sizeof (strname), "PKIX1.");
-      _gnutls_str_cat (strname, sizeof (strname), string_type);
-    }
-
-  if ((result = asn1_create_element
-       (_gnutls_get_pkix (), strname, &c2)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  result = asn1_der_decoding (&c2, der, der_size, NULL);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  result = _gnutls_x509_read_value(c2, "", output);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
+  int ret;
+  const uint8_t *str;
+  unsigned int str_size;
+  gnutls_datum_t td;
   
-  /* This is allowed since _gnutls_x509_read_value allocates one more */
-  output->data[output->size] = 0;
+  ret = asn1_decode_simple_der (etype, der, der_size, &str, &str_size);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (ret);
+      return ret;
+    }
+    
+  td.size = str_size;
+  td.data = gnutls_malloc(str_size+1);
+  if (td.data == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+  
+  memcpy(td.data, str, str_size);
+  td.data[str_size] = 0;
 
-  result = 0;
+  ret = make_printable_string(etype, &td, output);
+  if (ret == GNUTLS_E_INVALID_REQUEST) /* unsupported etype */
+    {
+      output->data = td.data;
+      output->size = td.size;
+      ret = 0;
+    }
+  else if (ret <= 0)
+    {
+      _gnutls_free_datum(&td);
+    }
 
-cleanup:
-  if (c2)
-    asn1_delete_structure (&c2);
+  /* Refuse to deal with strings containing NULs. */
+  if (etype != ASN1_ETYPE_OCTET_STRING)
+    {
+      if (strlen ((void*)output->data) != (size_t)output->size)
+        {
+          _gnutls_free_datum(output);
+          ret = gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+        }
+    }
 
-  return result;
+  return ret;
 }
 
 
@@ -941,14 +947,18 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
 {
   int len = 0, result;
   uint8_t *tmp = NULL;
+  unsigned int etype;
 
-  result = asn1_read_value (c, root, NULL, &len);
+  result = asn1_read_value_type (c, root, NULL, &len, &etype);
   if (result != ASN1_MEM_ERROR)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
       return result;
     }
+  
+  if (etype == ASN1_ETYPE_BIT_STRING)
+    len /= 8;
 
   tmp = gnutls_malloc ((size_t)len+1);
   if (tmp == NULL)
@@ -965,6 +975,9 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
       result = _gnutls_asn2err (result);
       goto cleanup;
     }
+
+  if (etype == ASN1_ETYPE_BIT_STRING)
+    len /= 8;
 
   ret->data = tmp;
   ret->size = (unsigned)len;
@@ -976,21 +989,22 @@ cleanup:
   return result;
 }
 
-/* Reads a value from an ASN1 tree, and puts the output
- * in an allocated variable in the given datum.
+/* Reads a value from an ASN1 tree, then interprets it as the provided
+ * type of string and returns the output in an allocated variable.
  *
  * Note that this function always places a null character
  * at the end of a readable string value (which is not accounted into size)
  */
 int
 _gnutls_x509_read_string (ASN1_TYPE c, const char *root,
-                          gnutls_datum_t * ret, x509_string_type type)
+                          gnutls_datum_t * ret, unsigned int etype)
 {
   int len = 0, result;
   size_t slen;
   uint8_t *tmp = NULL;
+  unsigned rtype;
 
-  result = asn1_read_value (c, root, NULL, &len);
+  result = asn1_read_value_type (c, root, NULL, &len, &rtype);
   if (result != ASN1_MEM_ERROR)
     {
       gnutls_assert ();
@@ -998,7 +1012,7 @@ _gnutls_x509_read_string (ASN1_TYPE c, const char *root,
       return result;
     }
 
-  if (type == RV_BIT_STRING)
+  if (rtype == ASN1_ETYPE_BIT_STRING)
     len /= 8;
 
   tmp = gnutls_malloc ((size_t)len+1);
@@ -1017,36 +1031,20 @@ _gnutls_x509_read_string (ASN1_TYPE c, const char *root,
       goto cleanup;
     }
 
-  if (type == RV_BIT_STRING)
+  if (rtype == ASN1_ETYPE_BIT_STRING)
     len /= 8;
 
   /* Extract the STRING.
    */
-  if (type == RV_IA5STRING || type == RV_UTF8STRING || type == RV_OCTET_STRING)
-    {
-      const char* sname;
-      slen = (size_t)len;
+  slen = (size_t)len;
 
-      if (type == RV_UTF8STRING)
-        sname = "UTF8String";
-      else if (type == RV_IA5STRING)
-        sname = "IA5String";
-      else
-        sname = NULL;
-
-      result = _gnutls_x509_decode_string (sname, tmp, slen, ret);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
-      gnutls_free(tmp);
-    }
-  else
+  result = _gnutls_x509_decode_string (etype, tmp, slen, ret);
+  if (result < 0)
     {
-      ret->data = tmp;
-      ret->size = (unsigned)len;
+      gnutls_assert ();
+      goto cleanup;
     }
+  gnutls_free(tmp);
 
   return 0;
 
@@ -1057,48 +1055,33 @@ cleanup:
 
 /* The string type should be IA5String, UTF8String etc. Leave
  * null for octet string */
-int _gnutls_x509_encode_string(const char* string_type, 
+int _gnutls_x509_encode_string(unsigned int etype, 
                                const void* input_data, size_t input_size,
                                gnutls_datum_t* output)
 {
+  uint8_t tl[ASN1_MAX_TL_SIZE];
+  unsigned int tl_size;
   int ret;
-  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  char strname[64];
   
-  _gnutls_str_cpy (strname, sizeof (strname), "PKIX1.");
-  if (string_type == NULL)
-    _gnutls_str_cat (strname, sizeof (strname), "pkcs-7-Data");
-  else
-    _gnutls_str_cat (strname, sizeof (strname), string_type);
-  
-  if ((ret = asn1_create_element
-       (_gnutls_get_pkix (), strname, &c2)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      ret = _gnutls_asn2err (ret);
-      goto cleanup;
-    }
-
-  ret = asn1_write_value (c2, "", input_data, input_size);
+  tl_size = sizeof(tl);
+  ret = asn1_encode_simple_der (etype, input_data, input_size, tl, &tl_size);
   if (ret != ASN1_SUCCESS)
     {
       gnutls_assert ();
       ret = _gnutls_asn2err (ret);
-      goto cleanup;
+      return ret;
     }
-
-  ret = _gnutls_x509_der_encode(c2, "", output, 0);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  ret = 0;
-
-cleanup:
-  asn1_delete_structure (&c2);
-  return ret;
+  
+  output->data = gnutls_malloc(tl_size + input_size);
+  if (output->data == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+  
+  memcpy(output->data, tl, tl_size);
+  memcpy(output->data+tl_size, input_data, input_size);
+  
+  output->size = tl_size + input_size;
+  
+  return 0;
 }
 
 /* DER Encodes the src ASN1_TYPE and stores it to
@@ -1224,38 +1207,38 @@ _gnutls_x509_der_encode_and_copy (ASN1_TYPE src, const char *src_name,
   return 0;
 }
 
-/* Writes the value of the datum in the given ASN1_TYPE. If str is non
- * (0) it encodes it as OCTET STRING.
+/* Writes the value of the datum in the given ASN1_TYPE. 
  */
 int
 _gnutls_x509_write_value (ASN1_TYPE c, const char *root,
-                          const gnutls_datum_t * data, x509_string_type type)
+                          const gnutls_datum_t * data)
 {
   int ret;
-  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+  /* Write the data.
+   */
+  ret = asn1_write_value (c, root, data->data, data->size);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (ret);
+    }
+
+  return 0;
+}
+
+/* Writes the value of the datum in the given ASN1_TYPE as a string. 
+ */
+int
+_gnutls_x509_write_string (ASN1_TYPE c, const char *root,
+                           const gnutls_datum_t * data, unsigned int etype)
+{
+  int ret;
   gnutls_datum_t val = { NULL, 0 };
-  const char* sname = NULL;
 
-  if (type == RV_OCTET_STRING || type == RV_IA5STRING || type == RV_UTF8STRING)
-    {
-    
-      if (type == RV_IA5STRING)
-        sname = "IA5String";
-      else if (type == RV_UTF8STRING)
-        sname = "UTF8String";
-
-      ret = _gnutls_x509_encode_string(sname, data->data, data->size, &val);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
-    }
-  else
-    {
-      val.data = data->data;
-      val.size = data->size;
-    }
+  ret = _gnutls_x509_encode_string(etype, data->data, data->size, &val);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   /* Write the data.
    */
@@ -1270,9 +1253,7 @@ _gnutls_x509_write_value (ASN1_TYPE c, const char *root,
   ret = 0;
 
 cleanup:
-  asn1_delete_structure (&c2);
-  if (val.data != data->data)
-    _gnutls_free_datum (&val);
+  _gnutls_free_datum (&val);
   return ret;
 }
 
@@ -1597,4 +1578,198 @@ _gnutls_x509_get_signature (ASN1_TYPE src, const char *src_name,
 
 cleanup:
   return result;
+}
+
+/* ASN.1 PrintableString rules */
+static int is_printable(char p)
+{
+  if ((p >= 'a' && p <= 'z') || (p >= 'A' && p <= 'Z') ||
+      (p >= '0' && p <= '9') || p == ' ' || p == '(' || p == ')' ||
+      p == '+' || p == ',' || p == '-' || p == '.' || p == '/' || 
+      p == ':' || p == '=' || p == '?')
+    return 1;
+    
+  return 0;
+}
+
+static int write_complex_string(ASN1_TYPE asn_struct, const char* where,
+                                const struct oid_to_string* oentry, const uint8_t *data, 
+                                size_t data_size)
+{
+  char tmp[128];
+  ASN1_TYPE c2;
+  int result;
+  const char *string_type;
+  unsigned int i;
+
+  result = asn1_create_element (_gnutls_get_pkix (), oentry->asn_desc, &c2);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  tmp[0] = 0;
+
+  string_type = "printableString";
+
+  /* Check if the data is ASN.1 printable, and use
+   * the UTF8 string type if not.
+   */
+  for (i = 0; i < data_size; i++)
+    {
+      if (!is_printable (data[i]))
+        {
+          string_type = "utf8String";
+          break;
+        }
+    }
+
+  /* if the type is a CHOICE then write the
+   * type we'll use.
+   */
+  result = asn1_write_value (c2, "", string_type, 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto error;
+    }
+
+  _gnutls_str_cpy (tmp, sizeof (tmp), string_type);
+
+  result = asn1_write_value (c2, tmp, data, data_size);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto error;
+    }
+
+  result = _gnutls_x509_der_encode_and_copy (c2, "", asn_struct, where, 0);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto error;
+    }
+
+  result = 0;
+
+error:
+  asn1_delete_structure (&c2);
+  return result;
+}
+
+
+/* This will encode and write the AttributeTypeAndValue field.
+ * 'multi' must be (0) if writing an AttributeTypeAndValue, and 1 if Attribute.
+ * In all cases only one value is written.
+ */
+int
+_gnutls_x509_encode_and_write_attribute (const char *given_oid,
+                                         ASN1_TYPE asn1_struct,
+                                         const char *where,
+                                         const void *_data,
+                                         int data_size, int multi)
+{
+  const uint8_t *data = _data;
+  char tmp[128];
+  int result;
+  const struct oid_to_string* oentry;
+
+  oentry = get_oid_entry(given_oid);
+  if (oentry == NULL)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Cannot find OID: %s\n", given_oid);
+      return GNUTLS_E_X509_UNSUPPORTED_OID;
+    }
+
+  /* write the data (value)
+   */
+
+  _gnutls_str_cpy (tmp, sizeof (tmp), where);
+  _gnutls_str_cat (tmp, sizeof (tmp), ".value");
+
+  if (multi != 0)
+    { /* if not writing an AttributeTypeAndValue, but an Attribute */
+      _gnutls_str_cat (tmp, sizeof (tmp), "s"); /* values */
+
+      result = asn1_write_value (asn1_struct, tmp, "NEW", 1);
+      if (result != ASN1_SUCCESS)
+        {
+          gnutls_assert ();
+          result = _gnutls_asn2err (result);
+          goto error;
+        }
+
+      _gnutls_str_cat (tmp, sizeof (tmp), ".?LAST");
+    }
+
+  if (oentry->asn_desc != NULL) /* write a complex string API */
+    {
+      result = write_complex_string(asn1_struct, tmp, oentry, data, data_size);
+      if (result < 0)
+        return gnutls_assert_val(result);
+    }
+  else /* write a simple string */
+    {
+      gnutls_datum_t td;
+
+      td.data = (void*)data;
+      td.size = data_size;
+      result = _gnutls_x509_write_string (asn1_struct, tmp, &td, oentry->etype);
+      if (result < 0)
+        {
+          gnutls_assert ();
+          goto error;
+        }
+    }
+
+  /* write the type
+   */
+  _gnutls_str_cpy (tmp, sizeof (tmp), where);
+  _gnutls_str_cat (tmp, sizeof (tmp), ".type");
+
+  result = asn1_write_value (asn1_struct, tmp, given_oid, 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      result = _gnutls_asn2err (result);
+      goto error;
+    }
+
+  result = 0;
+
+error:
+  return result;
+}
+
+/* copies a datum to a buffer. If it doesn't fit it returns
+ * GNUTLS_E_SHORT_MEMORY_BUFFER. It always deinitializes the datum
+ * after the copy.
+ *
+ * The buffer will always be null terminated.
+ */
+int _gnutls_strdatum_to_buf (gnutls_datum_t * d, void* buf, size_t * sizeof_buf)
+{
+int ret;
+uint8_t *_buf = buf;
+
+  if (*sizeof_buf < d->size+1)
+    {
+      *sizeof_buf = d->size+1;
+      ret = gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+      goto cleanup;
+    }
+  memcpy(buf, d->data, d->size);
+  _buf[d->size] = 0;
+
+  *sizeof_buf = d->size;
+  ret = 0;
+
+cleanup:
+  _gnutls_free_datum(d);
+  
+  return ret;                          
 }

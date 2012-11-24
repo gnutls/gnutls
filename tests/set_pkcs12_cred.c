@@ -25,8 +25,15 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "utils.h"
+
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "<%d>| %s", level, str);
+}
 
 void
 doit (void)
@@ -38,6 +45,10 @@ doit (void)
   ret = gnutls_global_init ();
   if (ret < 0)
     fail ("gnutls_global_init failed %d\n", ret);
+
+  gnutls_global_set_log_function (tls_log_func);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   ret = gnutls_certificate_allocate_credentials (&x509cred);
   if (ret < 0)

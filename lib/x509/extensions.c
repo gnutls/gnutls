@@ -353,7 +353,7 @@ add_extension (ASN1_TYPE asn, const char *root, const char *extension_id,
   else
     snprintf (name, sizeof (name), "?LAST.extnValue");
 
-  result = _gnutls_x509_write_value (asn, name, ext_data, 0);
+  result = _gnutls_x509_write_value (asn, name, ext_data);
   if (result < 0)
     {
       gnutls_assert ();
@@ -397,7 +397,7 @@ overwrite_extension (ASN1_TYPE asn, const char *root, unsigned int indx,
   _gnutls_str_cpy (name2, sizeof (name2), name);
   _gnutls_str_cat (name2, sizeof (name2), ".extnValue");
 
-  result = _gnutls_x509_write_value (asn, name2, ext_data, 0);
+  result = _gnutls_x509_write_value (asn, name2, ext_data);
   if (result < 0)
     {
       gnutls_assert ();

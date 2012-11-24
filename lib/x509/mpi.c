@@ -97,7 +97,7 @@ _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
   /* Read the algorithm's parameters
    */
   _asnstr_append_name (name, sizeof (name), root, ".subjectPublicKey");
-  result = _gnutls_x509_read_string (asn, name, &tmp, RV_BIT_STRING);
+  result = _gnutls_x509_read_value (asn, name, &tmp);
 
   if (result < 0)
     {

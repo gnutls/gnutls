@@ -381,7 +381,7 @@ gnutls_datum_t asn1 = { NULL, 0 };
           return ret;
         }
 
-      ret = _gnutls_x509_decode_string(NULL, asn1.data, asn1.size, &td);
+      ret = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING, asn1.data, asn1.size, &td);
       if (ret < 0)
         {
           gnutls_assert();
@@ -1361,7 +1361,7 @@ uint8_t buf[32];
       
       if (format == GNUTLS_TPMKEY_FMT_CTK_PEM)
         {
-          ret = _gnutls_x509_encode_string(NULL, tdata, tint, &tmpkey);
+          ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING, tdata, tint, &tmpkey);
           if (ret < 0)
             {
               gnutls_assert();

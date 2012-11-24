@@ -308,15 +308,22 @@ gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
                                       unsigned int raw_flag, void *buf,
                                       size_t * buf_size)
 {
+gnutls_datum_t td;
+int ret;
+
   if (cert == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return _gnutls_x509_parse_dn_oid (cert->cert,
+  ret = _gnutls_x509_parse_dn_oid (cert->cert,
                                     "tbsCertificate.issuer.rdnSequence",
-                                    oid, indx, raw_flag, buf, buf_size);
+                                    oid, indx, raw_flag, &td);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  
+  return _gnutls_strdatum_to_buf (&td, buf, buf_size);
 }
 
 /**
@@ -419,15 +426,22 @@ gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
                                int indx, unsigned int raw_flag,
                                void *buf, size_t * buf_size)
 {
+gnutls_datum_t td;
+int ret;
+
   if (cert == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return _gnutls_x509_parse_dn_oid (cert->cert,
+  ret = _gnutls_x509_parse_dn_oid (cert->cert,
                                     "tbsCertificate.subject.rdnSequence",
-                                    oid, indx, raw_flag, buf, buf_size);
+                                    oid, indx, raw_flag, &td);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  
+  return _gnutls_strdatum_to_buf (&td, buf, buf_size);
 }
 
 /**
@@ -1967,7 +1981,7 @@ gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx,
         {
           snprintf (tmpstr, sizeof (tmpstr), "?%u.policyQualifiers.?%u.qualifier", indx, i+1);
 
-          ret = _gnutls_x509_read_string(c2, tmpstr, &td, RV_IA5STRING);
+          ret = _gnutls_x509_read_string(c2, tmpstr, &td, ASN1_ETYPE_IA5_STRING);
           if (ret < 0)
             {
               gnutls_assert();
@@ -1985,7 +1999,7 @@ gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx,
 
           snprintf (tmpstr, sizeof (tmpstr), "?%u.policyQualifiers.?%u.qualifier", indx, i+1);
 
-          ret = _gnutls_x509_read_string(c2, tmpstr, &td, RV_RAW);
+          ret = _gnutls_x509_read_value(c2, tmpstr, &td);
           if (ret < 0)
             {
               gnutls_assert();
@@ -2424,10 +2438,12 @@ gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
  * The X.509 distinguished name is a sequence of sequences of strings
  * and this is what the @irdn and @iava indexes model.
  *
- * Note that @ava will contain pointers into the @dn structure, so you
- * should not modify any data or deallocate it.  Note also that the DN
- * in turn points into the original certificate structure, and thus
- * you may not deallocate the certificate and continue to access @dn.
+ * Note that @ava will contain pointers into the @dn structure which
+ * in turns points to the original certificate. Thus you should not
+ * modify any data or deallocate any of those.
+ *
+ * This is a low-level function that depends on the internals of
+ * libtasn1.
  *
  * Returns: Returns 0 on success, or an error code.
  **/
@@ -3724,8 +3740,8 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
   gnutls_datum_t datum = { NULL, 0 };
 
   result =
-    _gnutls_x509_read_string (crt->cert, "tbsCertificate.subjectUniqueID",
-                             &datum, RV_BIT_STRING);
+    _gnutls_x509_read_value (crt->cert, "tbsCertificate.subjectUniqueID",
+                             &datum);
 
   if (datum.size > *buf_size)
     {                           /* then we're not going to fit */
@@ -3770,8 +3786,8 @@ gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
   gnutls_datum_t datum = { NULL, 0 };
 
   result =
-    _gnutls_x509_read_string (crt->cert, "tbsCertificate.issuerUniqueID",
-                             &datum, RV_BIT_STRING);
+    _gnutls_x509_read_value (crt->cert, "tbsCertificate.issuerUniqueID",
+                              &datum);
 
   if (datum.size > *buf_size)
     {                           /* then we're not going to fit */

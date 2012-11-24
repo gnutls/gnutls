@@ -1720,8 +1720,8 @@ gnutls_x509_crt_set_policy (gnutls_x509_crt_t crt, struct gnutls_x509_policy_st*
           tmpd.data = (void*)policy->qualifier[i].data;
           tmpd.size = policy->qualifier[i].size;
           
-          result = _gnutls_x509_write_value(c2, "?LAST.policyQualifiers.?LAST.qualifier", 
-                                            &tmpd, RV_IA5STRING);
+          result = _gnutls_x509_write_string(c2, "?LAST.policyQualifiers.?LAST.qualifier", 
+                                             &tmpd, ASN1_ETYPE_IA5_STRING);
           if (result < 0)
             {
               gnutls_assert();
@@ -1748,7 +1748,7 @@ gnutls_x509_crt_set_policy (gnutls_x509_crt_t crt, struct gnutls_x509_policy_st*
             }
 
           result = _gnutls_x509_write_value(c2, "?LAST.policyQualifiers.?LAST.qualifier", 
-                                            &der_data, RV_RAW);
+                                            &der_data);
           _gnutls_free_datum(&der_data);
           if (result < 0)
             {

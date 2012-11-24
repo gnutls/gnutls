@@ -4,7 +4,7 @@
 
 #include <libtasn1.h>
 
-const ASN1_ARRAY_TYPE gnutls_asn1_tab[] = {
+const asn1_static_node gnutls_asn1_tab[] = {
   { "GNUTLS", 536872976, NULL },
   { NULL, 1073741836, NULL },
   { "RSAPublicKey", 1610612741, NULL },

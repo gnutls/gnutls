@@ -718,9 +718,9 @@ gnutls_ocsp_req_add_cert (gnutls_ocsp_req_t req,
   inh.size = inhlen;
   inh.data = inh_buf;
 
-  ret = _gnutls_x509_read_string
+  ret = _gnutls_x509_read_value
     (issuer->cert, "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-     &tmp, RV_BIT_STRING);
+     &tmp);
   if (ret != GNUTLS_E_SUCCESS)
     {
       gnutls_assert ();
@@ -913,7 +913,7 @@ gnutls_ocsp_req_get_nonce (gnutls_ocsp_req_t req,
       return ret;
     }
 
-  ret = _gnutls_x509_decode_string (NULL, tmp.data, (size_t) tmp.size,
+  ret = _gnutls_x509_decode_string (ASN1_ETYPE_OCTET_STRING, tmp.data, (size_t) tmp.size,
 			            nonce);
   if (ret < 0)
     {
@@ -1695,7 +1695,7 @@ gnutls_ocsp_resp_get_nonce (gnutls_ocsp_resp_t resp,
       return ret;
     }
 
-  ret = _gnutls_x509_decode_string (NULL, tmp.data, (size_t) tmp.size,
+  ret = _gnutls_x509_decode_string (ASN1_ETYPE_OCTET_STRING, tmp.data, (size_t) tmp.size,
 			   	    nonce);
   if (ret < 0)
     {
@@ -1763,7 +1763,7 @@ gnutls_ocsp_resp_get_signature (gnutls_ocsp_resp_t resp,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_x509_read_string (resp->basicresp, "signature", sig, RV_BIT_STRING);
+  ret = _gnutls_x509_read_value (resp->basicresp, "signature", sig);
   if (ret != GNUTLS_E_SUCCESS)
     {
       gnutls_assert ();

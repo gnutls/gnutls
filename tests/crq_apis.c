@@ -118,7 +118,7 @@ doit (void)
 
   ret = gnutls_x509_crq_get_challenge_password (crq, NULL, &s);
   if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-    fail ("gnutls_x509_crq_get_challenge_password %d\n", ret);
+    fail ("%d: gnutls_x509_crq_get_challenge_password %d: %s\n", __LINE__, ret, gnutls_strerror(ret));
 
   ret = gnutls_x509_crq_set_challenge_password (crq, "foo");
   if (ret != 0)
@@ -126,14 +126,14 @@ doit (void)
 
   s = 0;
   ret = gnutls_x509_crq_get_challenge_password (crq, NULL, &s);
-  if (ret != 0 || s != 3)
-    fail ("gnutls_x509_crq_get_challenge_password2 %d/%d\n", ret, (int) s);
+  if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER || s != 4)
+    fail ("%d: gnutls_x509_crq_get_challenge_password %d: %s (passlen: %d)\n", __LINE__, ret, gnutls_strerror(ret), (int)s);
 
   s = 10;
   ret = gnutls_x509_crq_get_challenge_password (crq, smallbuf, &s);
   if (ret != 0 || s != 3 || strcmp (smallbuf, "foo") != 0)
-    fail ("gnutls_x509_crq_get_challenge_password3 %d/%d/%s\n",
-          ret, (int) s, smallbuf);
+    fail ("%d: gnutls_x509_crq_get_challenge_password3 %d/%d/%s\n",
+          __LINE__, ret, (int) s, smallbuf);
 
   s = 0;
   ret = gnutls_x509_crq_get_extension_info (crq, 0, NULL, &s, NULL);

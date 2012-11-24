@@ -78,12 +78,12 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
   char tmpbuffer2[ASN1_MAX_NAME_SIZE];
   char tmpbuffer3[ASN1_MAX_NAME_SIZE];
   uint8_t value[MAX_STRING_LEN], *value2 = NULL;
+  gnutls_datum_t td;
   char *escaped = NULL;
   const char *ldap_desc;
   char oid[MAX_OID_SIZE];
-  int len, printable;
-  char *string = NULL;
-  size_t sizeof_string, sizeof_escaped;
+  int len;
+  size_t sizeof_escaped;
 
   if (sizeof_buf == NULL)
     {
@@ -226,7 +226,6 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
             }
 
           ldap_desc = gnutls_x509_dn_oid_name (oid, GNUTLS_X509_DN_OID_RETURN_OID);
-          printable = _gnutls_x509_oid_data_printable (oid);
 
           /* leading #, hex encoded value and terminating NULL */
           sizeof_escaped = 2 * len + 2;
@@ -239,43 +238,22 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
               goto cleanup;
             }
 
-          sizeof_string = 2 * len + 2;  /* in case it is not printable */
-
-          string = gnutls_malloc (sizeof_string);
-          if (string == NULL)
-            {
-              gnutls_assert ();
-              result = GNUTLS_E_MEMORY_ERROR;
-              goto cleanup;
-            }
-
           STR_APPEND (ldap_desc);
           STR_APPEND ("=");
-          result = 0;
 
-          if (printable)
-            result =
-              _gnutls_x509_oid_data2string (oid,
-                                            value2, len,
-                                            string, &sizeof_string);
-
-          if (!printable || result < 0)
-            result =
-              _gnutls_x509_data2hex (value2, len, string, &sizeof_string);
-
+          result =
+              _gnutls_x509_dn_to_string (oid, value2, len, &td);
           if (result < 0)
             {
               gnutls_assert ();
               _gnutls_debug_log
-                ("Found OID: '%s' with value '%s'\n",
+                ("Cannot parse OID: '%s' with value '%s'\n",
                  oid, _gnutls_bin2hex (value2, len, escaped, sizeof_escaped,
                                        NULL));
               goto cleanup;
             }
-          STR_APPEND (str_escape (string, escaped, sizeof_escaped));
-          gnutls_free (string);
-          string = NULL;
-
+          STR_APPEND (str_escape ((char*)td.data, escaped, sizeof_escaped));
+          _gnutls_free_datum (&td);
           gnutls_free (escaped);
           escaped = NULL;
           gnutls_free (value2);
@@ -307,7 +285,6 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
 cleanup:
   gnutls_free (value2);
-  gnutls_free (string);
   gnutls_free (escaped);
   _gnutls_buffer_clear (&out_str);
   return result;
@@ -330,22 +307,17 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
                            const char *asn1_rdn_name,
                            const char *given_oid, int indx,
                            unsigned int raw_flag,
-                           void *buf, size_t * sizeof_buf)
+                           gnutls_datum_t* out)
 {
   int k2, k1, result;
   char tmpbuffer1[ASN1_MAX_NAME_SIZE];
   char tmpbuffer2[ASN1_MAX_NAME_SIZE];
   char tmpbuffer3[ASN1_MAX_NAME_SIZE];
+  gnutls_datum_t td;
   uint8_t value[256];
   char oid[MAX_OID_SIZE];
-  int len, printable;
+  int len;
   int i = 0;
-  char *cbuf = buf;
-
-  if (cbuf == NULL)
-    *sizeof_buf = 0;
-  else
-    cbuf[0] = 0;
 
   k1 = 0;
   do
@@ -431,43 +403,26 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
               _gnutls_str_cpy (tmpbuffer3, sizeof (tmpbuffer3), tmpbuffer2);
               _gnutls_str_cat (tmpbuffer3, sizeof (tmpbuffer3), ".value");
 
-              len = *sizeof_buf;
-              result = asn1_read_value (asn1_struct, tmpbuffer3, buf, &len);
-
-              if (result != ASN1_SUCCESS)
+              result = _gnutls_x509_read_value(asn1_struct, tmpbuffer3, &td);
+              if (result < 0)
                 {
                   gnutls_assert ();
-                  if (result == ASN1_MEM_ERROR)
-                    *sizeof_buf = len;
-                  result = _gnutls_asn2err (result);
                   goto cleanup;
                 }
 
               if (raw_flag != 0)
                 {
-                  if ((unsigned) len > *sizeof_buf)
-                    {
-                      *sizeof_buf = len;
-                      result = GNUTLS_E_SHORT_MEMORY_BUFFER;
-                      goto cleanup;
-                    }
-                  *sizeof_buf = len;
-
+                  out->data = td.data;
+                  out->size = td.size;
                   return 0;
 
                 }
               else
                 {               /* parse data. raw_flag == 0 */
-                  printable = _gnutls_x509_oid_data_printable (oid);
-
-                  if (printable == 1)
-                    result =
-                      _gnutls_x509_oid_data2string (oid, buf, len,
-                                                    cbuf, sizeof_buf);
-                  else
-                    result =
-                      _gnutls_x509_data2hex (buf, len, cbuf, sizeof_buf);
-
+                  result =
+                    _gnutls_x509_dn_to_string (oid, td.data, td.size, out);
+                    
+                  _gnutls_free_datum(&td);
                   if (result < 0)
                     {
                       gnutls_assert ();
@@ -623,146 +578,6 @@ cleanup:
   return result;
 }
 
-static int is_printable(char p)
-{
-  if ((p >= 'a' && p <= 'z') || (p >= 'A' && p <= 'Z') ||
-      (p >= '0' && p <= '9') || p == ' ' || p == '(' || p == ')' ||
-      p == '+' || p == ',' || p == '-' || p == '.' || p == '/' || 
-      p == ':' || p == '=' || p == '?')
-    return 1;
-    
-  return 0;
-}
-
-/* This will encode and write the AttributeTypeAndValue field.
- * 'multi' must be (0) if writing an AttributeTypeAndValue, and 1 if Attribute.
- * In all cases only one value is written.
- */
-int
-_gnutls_x509_encode_and_write_attribute (const char *given_oid,
-                                         ASN1_TYPE asn1_struct,
-                                         const char *where,
-                                         const void *_data,
-                                         int sizeof_data, int multi)
-{
-  const char *val_name;
-  const uint8_t *data = _data;
-  char tmp[128];
-  ASN1_TYPE c2;
-  int result;
-
-
-  /* Find how to encode the data.
-   */
-  val_name = _gnutls_x509_oid2asn_string (given_oid);
-  if (val_name == NULL)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Cannot find OID: %s\n", given_oid);
-      return GNUTLS_E_X509_UNSUPPORTED_OID;
-    }
-
-  result = asn1_create_element (_gnutls_get_pkix (), val_name, &c2);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  tmp[0] = 0;
-
-  if ((result = _gnutls_x509_oid_data_choice (given_oid)) > 0)
-    {
-      const char *string_type;
-      int i;
-
-      string_type = "printableString";
-
-      /* Check if the data is ASN.1 printable, and use
-       * the UTF8 string type if not.
-       */
-      for (i = 0; i < sizeof_data; i++)
-        {
-          if (!is_printable (data[i]))
-            {
-              string_type = "utf8String";
-              break;
-            }
-        }
-
-      /* if the type is a CHOICE then write the
-       * type we'll use.
-       */
-      result = asn1_write_value (c2, "", string_type, 1);
-      if (result != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          result = _gnutls_asn2err (result);
-          goto error;
-        }
-
-      _gnutls_str_cpy (tmp, sizeof (tmp), string_type);
-    }
-
-  result = asn1_write_value (c2, tmp, data, sizeof_data);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto error;
-    }
-
-
-  /* write the data (value)
-   */
-
-  _gnutls_str_cpy (tmp, sizeof (tmp), where);
-  _gnutls_str_cat (tmp, sizeof (tmp), ".value");
-
-  if (multi != 0)
-    {                           /* if not writing an AttributeTypeAndValue, but an Attribute */
-      _gnutls_str_cat (tmp, sizeof (tmp), "s"); /* values */
-
-      result = asn1_write_value (asn1_struct, tmp, "NEW", 1);
-      if (result != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          result = _gnutls_asn2err (result);
-          goto error;
-        }
-
-      _gnutls_str_cat (tmp, sizeof (tmp), ".?LAST");
-
-    }
-
-  result = _gnutls_x509_der_encode_and_copy (c2, "", asn1_struct, tmp, 0);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto error;
-    }
-
-  /* write the type
-   */
-  _gnutls_str_cpy (tmp, sizeof (tmp), where);
-  _gnutls_str_cat (tmp, sizeof (tmp), ".type");
-
-  result = asn1_write_value (asn1_struct, tmp, given_oid, 1);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto error;
-    }
-
-  result = 0;
-
-error:
-  asn1_delete_structure (&c2);
-  return result;
-}
-
 /* This will write the AttributeTypeAndValue field. The data must be already DER encoded.
  * 'multi' must be (0) if writing an AttributeTypeAndValue, and 1 if Attribute.
  * In all cases only one value is written.
@@ -846,7 +661,7 @@ _gnutls_x509_decode_and_read_attribute (ASN1_TYPE asn1_struct,
     _gnutls_str_cat (tmpbuffer, sizeof (tmpbuffer), "s.?1");    /* .values.?1 */
 
   if (octet_string)
-    result = _gnutls_x509_read_string (asn1_struct, tmpbuffer, value, RV_OCTET_STRING);
+    result = _gnutls_x509_read_string (asn1_struct, tmpbuffer, value, ASN1_ETYPE_OCTET_STRING);
   else
     result = _gnutls_x509_read_value (asn1_struct, tmpbuffer, value);
   if (result < 0)
@@ -1106,6 +921,7 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
 {
   int result;
   ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+  gnutls_datum_t td;
 
   if (sizeof_buf == 0)
     {
@@ -1131,11 +947,13 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
 
   result =
     _gnutls_x509_parse_dn_oid (dn, "rdnSequence", oid, indx,
-                               raw_flag, buf, sizeof_buf);
+                               raw_flag, &td);
 
   asn1_delete_structure (&dn);
-  return result;
+  if (result < 0)
+    return gnutls_assert_val(result);
 
+  return _gnutls_strdatum_to_buf (&td, buf, sizeof_buf);
 }
 
 /**

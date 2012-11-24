@@ -285,16 +285,23 @@ gnutls_x509_crq_get_dn_by_oid (gnutls_x509_crq_t crq, const char *oid,
                                int indx, unsigned int raw_flag,
                                void *buf, size_t * sizeof_buf)
 {
+gnutls_datum_t td;
+int ret;
+
   if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return _gnutls_x509_parse_dn_oid
+  ret = _gnutls_x509_parse_dn_oid
     (crq->crq,
      "certificationRequestInfo.subject.rdnSequence",
-     oid, indx, raw_flag, buf, sizeof_buf);
+     oid, indx, raw_flag, &td);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  
+  return _gnutls_strdatum_to_buf (&td, buf, sizeof_buf);
 }
 
 /**
@@ -339,14 +346,15 @@ gnutls_x509_crq_get_dn_oid (gnutls_x509_crq_t crq,
 static int
 parse_attribute (ASN1_TYPE asn1_struct,
                  const char *attr_name, const char *given_oid, int indx,
-                 int raw, char *buf, size_t * sizeof_buf)
+                 int raw, gnutls_datum_t * out)
 {
   int k1, result;
   char tmpbuffer1[ASN1_MAX_NAME_SIZE];
   char tmpbuffer3[ASN1_MAX_NAME_SIZE];
   char value[200];
+  gnutls_datum_t td;
   char oid[MAX_OID_SIZE];
-  int len, printable;
+  int len;
 
   k1 = 0;
   do
@@ -404,7 +412,7 @@ parse_attribute (ASN1_TYPE asn1_struct,
                     tmpbuffer1, indx + 1);
 
           len = sizeof (value) - 1;
-          result = asn1_read_value (asn1_struct, tmpbuffer3, value, &len);
+          result = _gnutls_x509_read_value (asn1_struct, tmpbuffer3, &td);
 
           if (result != ASN1_SUCCESS)
             {
@@ -415,38 +423,25 @@ parse_attribute (ASN1_TYPE asn1_struct,
 
           if (raw == 0)
             {
-              printable = _gnutls_x509_oid_data_printable (oid);
-              if (printable == 1)
-                {
-                  if ((result =
-                       _gnutls_x509_oid_data2string
-                       (oid, value, len, buf, sizeof_buf)) < 0)
-                    {
-                      gnutls_assert ();
-                      goto cleanup;
-                    }
-                  return 0;
-                }
-              else
+              result =
+                   _gnutls_x509_dn_to_string
+                   (oid, td.data, td.size, out);
+              
+              _gnutls_free_datum(&td);
+
+              if (result < 0)
                 {
                   gnutls_assert ();
-                  return GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE;
+                  goto cleanup;
                 }
+              return 0;
             }
           else
             {                   /* raw!=0 */
-              if (*sizeof_buf >= (size_t) len && buf != NULL)
-                {
-                  *sizeof_buf = len;
-                  memcpy (buf, value, len);
-
-                  return 0;
-                }
-              else
-                {
-                  *sizeof_buf = len;
-                  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-                }
+              out->data = td.data;
+              out->size = td.size;
+              
+              return 0;
             }
         }
 
@@ -464,8 +459,8 @@ cleanup:
 /**
  * gnutls_x509_crq_get_challenge_password:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @pass: will hold a (0)-terminated password string
- * @sizeof_pass: Initially holds the size of @pass.
+ * @buf: will hold a (0)-terminated password string
+ * @sizeof_buf: Initially holds the size of @pass.
  *
  * This function will return the challenge password in the request.
  * The challenge password is intended to be used for requesting a
@@ -476,16 +471,23 @@ cleanup:
  **/
 int
 gnutls_x509_crq_get_challenge_password (gnutls_x509_crq_t crq,
-                                        char *pass, size_t * sizeof_pass)
+                                        char *buf, size_t * sizeof_buf)
 {
+gnutls_datum_t td;
+int ret;
+
   if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return parse_attribute (crq->crq, "certificationRequestInfo.attributes",
-                          "1.2.840.113549.1.9.7", 0, 0, pass, sizeof_pass);
+  ret = parse_attribute (crq->crq, "certificationRequestInfo.attributes",
+                          "1.2.840.113549.1.9.7", 0, 0, &td);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  
+  return _gnutls_strdatum_to_buf (&td, buf, sizeof_buf);
 }
 
 /* This function will attempt to set the requested attribute in
@@ -531,7 +533,7 @@ add_attribute (ASN1_TYPE asn, const char *root, const char *attribute_id,
 
   snprintf (name, sizeof (name), "%s.?LAST.values.?LAST", root);
 
-  result = _gnutls_x509_write_value (asn, name, ext_data, 0);
+  result = _gnutls_x509_write_value (asn, name, ext_data);
   if (result < 0)
     {
       gnutls_assert ();
@@ -556,7 +558,7 @@ overwrite_attribute (ASN1_TYPE asn, const char *root, unsigned int indx,
   _gnutls_str_cpy (name2, sizeof (name2), name);
   _gnutls_str_cat (name2, sizeof (name2), ".values.?LAST");
 
-  result = _gnutls_x509_write_value (asn, name2, ext_data, 0);
+  result = _gnutls_x509_write_value (asn, name2, ext_data);
   if (result < 0)
     {
       gnutls_assert ();
@@ -700,14 +702,21 @@ gnutls_x509_crq_get_attribute_by_oid (gnutls_x509_crq_t crq,
                                       const char *oid, int indx, void *buf,
                                       size_t * sizeof_buf)
 {
+int ret;
+gnutls_datum_t td;
+
   if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return parse_attribute (crq->crq, "certificationRequestInfo.attributes",
-                          oid, indx, 1, buf, sizeof_buf);
+  ret = parse_attribute (crq->crq, "certificationRequestInfo.attributes",
+                          oid, indx, 1, &td);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  
+  return _gnutls_strdatum_to_buf (&td, buf, sizeof_buf);
 }
 
 /**
