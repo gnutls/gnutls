@@ -613,3 +613,14 @@ gl/tests/unused-parameter.h
 gl/tests/locale.h
 gl/iconv.h
 build-aux/snippet/unused-parameter.h
+gl/tests/test-c-strcasecmp
+gl/tests/test-c-strncasecmp
+gl/tests/test-iconv-h
+gl/tests/test-iconv-utf
+gl/tests/test-locale
+gl/tests/test-localename
+gl/tests/test-setlocale1
+gl/tests/test-setlocale2
+gl/tests/test-u8-mbtoucr
+gl/tests/test-u8-uctomb
+tmp-compare-makefile
