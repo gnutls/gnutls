@@ -48,7 +48,7 @@ static const struct oid2string _oid2str[] = {
   /* PKIX
    */
   {"1.3.6.1.5.5.7.9.1", "dateOfBirth", 0, 1, "PKIX1.GeneralizedTime"},
-  {"1.3.6.1.5.5.7.9.2", "placeOfBirth", 0, 1, "PKIX1.DirectoryString"},
+  {"1.3.6.1.5.5.7.9.2", "placeOfBirth", 1, 1, "PKIX1.DirectoryString"},
   {"1.3.6.1.5.5.7.9.3", "gender", 0, 1, "PKIX1.PrintableString"},
   {"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", 0, 1,
    "PKIX1.PrintableString"},
