@@ -2,6 +2,14 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.6 (unreleased)
+
+** libgnutls: Several updates in the ASN.1 string handling subsystem.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.5 (released 2012-11-24)
 
 ** libgnutls: Added functions to parse the certificates policies
