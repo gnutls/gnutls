@@ -69,6 +69,7 @@ ecc_wmnaf_cache_free (void)
         }
 
       free (ecc_wmnaf_cache);
+      ecc_wmnaf_cache = NULL;
     }
 }
 
