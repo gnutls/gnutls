@@ -242,7 +242,6 @@ gnutls_global_init (void)
   res = asn1_array2tree (gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
   if (res != ASN1_SUCCESS)
     {
-      asn1_delete_structure (&_gnutls_pkix1_asn);
       result = _gnutls_asn2err (res);
       goto out;
     }
