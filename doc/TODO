@@ -13,8 +13,6 @@ Current list:
 - Add DTLS 1.2 support (RFC6347)
 - Add certificate image support (see RFC3709, RFC6170)
 - RFC 3280 compliant certificate path validation.
-  - Check path length constraints.
-  - Check keyCertSign key usages.
   - Reject extensions in v1 certificates.
 - Certificate chain validation improvements:
   - Implement "correct" DN comparison (instead of memcmp).
@@ -22,8 +20,7 @@ Current list:
   - Support path length constraints.
 - Perform signature calculation in PKCS #11 using not plain
   RSA but rather the combination of RSA-SHA256, RSA-SHA1 etc.
-  That will allow the usage of more secure tokens that do not
-  allow plain RSA.
+  That will allow the usage of tokens that do not allow plain RSA.
 - Support PKCS#8 DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
   (openssl seems to use DES-MD5 to encrypt keys by default)
 - Add support for generating empty CRLs
@@ -40,9 +37,8 @@ Current list:
    firstElement, bit_mask, ...) for platforms that libtool's
    -export-symbols-regex doesn't work.
 - Add Kerberos ciphersuites
-- Exhaustive test suite, using NIST's PKI Test vectors,
-  see http://csrc.nist.gov/pki/testing/x509paths_old.html
-  and http://csrc.nist.gov/pki/testing/x509paths.html
+- Update the current test suite, using the newest NIST's PKI Test vectors,
+  see http://csrc.nist.gov/pki/testing/x509paths.html
 - Make gnutls-cli-debug exit with better error messages if the
   handshake fails, rather than saying that the server doesn't support
   TLS.
