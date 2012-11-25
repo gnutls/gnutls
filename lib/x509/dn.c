@@ -35,30 +35,53 @@
 
 /* Escapes a string following the rules from RFC4514.
  */
-static char *
-str_escape (char *str, char *buffer, unsigned int buffer_size)
+static int
+str_escape (const gnutls_datum_t* str, gnutls_datum_t * escaped)
 {
-  int str_length, j, i;
+  unsigned int j, i;
+  uint8_t *buffer = NULL;
+  int ret;
 
-  if (str == NULL || buffer == NULL)
-    return NULL;
+  if (str == NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+  
+  /* the string will be at most twice the original */
+  buffer = gnutls_malloc(str->size*2+2);
+  if (buffer == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-  str_length = MIN (strlen (str), buffer_size - 1);
-
-  for (i = j = 0; i < str_length; i++)
+  for (i = j = 0; i < str->size; i++)
     {
-      if (str[i] == ',' || str[i] == '+' || str[i] == '"'
-          || str[i] == '\\' || str[i] == '<' || str[i] == '>'
-          || str[i] == ';')
-        buffer[j++] = '\\';
+      if (str->data[i] == 0)
+        {
+          /* this is handled earlier */
+          ret = gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+          goto cleanup;
+        }
 
-      buffer[j++] = str[i];
+      if (str->data[i] == ',' || str->data[i] == '+' || str->data[i] == '"'
+          || str->data[i] == '\\' || str->data[i] == '<' || str->data[i] == '>'
+          || str->data[i] == ';' || str->data[i] == 0)
+        buffer[j++] = '\\';
+      else if (i==0 && str->data[i] == '#')
+        buffer[j++] = '\\';
+      else if (i==0 && str->data[i] == ' ')
+        buffer[j++] = '\\';
+      else if (i==(str->size-1) && str->data[i] == ' ')
+        buffer[j++] = '\\';
+      
+      buffer[j++] = str->data[i];
     }
 
   /* null terminate the string */
   buffer[j] = 0;
+  escaped->data = buffer;
+  escaped->size = j;
 
-  return buffer;
+  return 0;
+cleanup:
+  gnutls_free(buffer);
+  return ret;
 }
 
 /* Parses an X509 DN in the asn1_struct, and puts the output into
@@ -78,12 +101,10 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
   char tmpbuffer2[ASN1_MAX_NAME_SIZE];
   char tmpbuffer3[ASN1_MAX_NAME_SIZE];
   uint8_t value[MAX_STRING_LEN], *value2 = NULL;
-  gnutls_datum_t td;
-  char *escaped = NULL;
+  gnutls_datum_t td, escaped = {NULL, 0};
   const char *ldap_desc;
   char oid[MAX_OID_SIZE];
   int len;
-  size_t sizeof_escaped;
 
   if (sizeof_buf == NULL)
     {
@@ -205,6 +226,10 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 	gnutls_assert(); \
 	goto cleanup; \
 }
+#define DATA_APPEND(x,y) if ((result=_gnutls_buffer_append_data( &out_str, x,y)) < 0) { \
+	gnutls_assert(); \
+	goto cleanup; \
+}
           /*   The encodings of adjoining RelativeDistinguishedNames are separated
            *   by a comma character (',' ASCII 44).
            */
@@ -227,16 +252,6 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
           ldap_desc = gnutls_x509_dn_oid_name (oid, GNUTLS_X509_DN_OID_RETURN_OID);
 
-          /* leading #, hex encoded value and terminating NULL */
-          sizeof_escaped = 2 * len + 2;
-
-          escaped = gnutls_malloc (sizeof_escaped);
-          if (escaped == NULL)
-            {
-              gnutls_assert ();
-              result = GNUTLS_E_MEMORY_ERROR;
-              goto cleanup;
-            }
 
           STR_APPEND (ldap_desc);
           STR_APPEND ("=");
@@ -248,14 +263,21 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
               gnutls_assert ();
               _gnutls_debug_log
                 ("Cannot parse OID: '%s' with value '%s'\n",
-                 oid, _gnutls_bin2hex (value2, len, escaped, sizeof_escaped,
+                 oid, _gnutls_bin2hex (value2, len, tmpbuffer3, sizeof(tmpbuffer3),
                                        NULL));
               goto cleanup;
             }
-          STR_APPEND (str_escape ((char*)td.data, escaped, sizeof_escaped));
+
+          result = str_escape(&td, &escaped);
+          if (result < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+          
+          DATA_APPEND (escaped.data, escaped.size);
           _gnutls_free_datum (&td);
-          gnutls_free (escaped);
-          escaped = NULL;
+          _gnutls_free_datum (&escaped);
           gnutls_free (value2);
           value2 = NULL;
 
@@ -285,7 +307,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
 cleanup:
   gnutls_free (value2);
-  gnutls_free (escaped);
+  _gnutls_free_datum (&escaped);
   _gnutls_buffer_clear (&out_str);
   return result;
 }
