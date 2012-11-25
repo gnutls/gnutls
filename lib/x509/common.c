@@ -223,7 +223,7 @@ size_t size;
           printable = 1;
         }
     }
-  else
+  else if (etype != ASN1_ETYPE_UNIVERSAL_STRING) /* supported but not printable */
     return GNUTLS_E_INVALID_REQUEST;
 
   if (printable == 0)
@@ -258,7 +258,7 @@ decode_complex_string (const struct oid_to_string* oentry, void *value,
   int len = -1, result;
   ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
   char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
-  int etype = ASN1_ETYPE_INVALID;
+  unsigned int etype;
   gnutls_datum_t td;
 
   if (oentry->asn_desc == NULL)
@@ -297,14 +297,16 @@ decode_complex_string (const struct oid_to_string* oentry, void *value,
 
   str[len] = 0;
 
-  /* Note that we do not support strings other than
-   * UTF-8 (thus ASCII as well).
-   */
+  /* We set the etype on the strings that may need
+   * some conversion to UTF-8. The INVALID flag indicates
+   * no conversion needed */
   if (strcmp (str, "teletexString") == 0)
     etype = ASN1_ETYPE_TELETEX_STRING;
-
-  if (strcmp (str, "bmpString") == 0)
+  else if (strcmp (str, "bmpString") == 0)
     etype = ASN1_ETYPE_BMP_STRING;
+  else if (strcmp (str, "universalString") == 0)
+    etype = ASN1_ETYPE_UNIVERSAL_STRING;
+  else etype = ASN1_ETYPE_INVALID;
 
   _gnutls_str_cpy (tmpname, sizeof (tmpname), str);
 
