@@ -34,6 +34,12 @@ fi
 # time set using datefudge could have changed since the generation
 # (if example the system was busy)
 
+rc=1
+counter=1
+
+while [ "$rc" != "0" -a $counter -le 3 ]
+do
+      
 datefudge "2007-04-22" \
     $CERTTOOL --generate-self-signed \
     --load-privkey $srcdir/template-test.key \
@@ -42,6 +48,8 @@ datefudge "2007-04-22" \
 
 diff $srcdir/template-test.pem tmp-tt.pem
 rc=$?
+counter=`expr $counter + 1` 
+done
 
 # We're done.
 if test "$rc" != "0"; then
@@ -51,6 +59,11 @@ fi
 
 rm -f tmp-tt.pem
 
+rc=1
+counter=1
+
+while [ "$rc" != "0" -a $counter -le 3 ]
+do
 datefudge "2007-04-22" \
     $CERTTOOL --generate-self-signed \
     --load-privkey $srcdir/template-test.key \
@@ -59,6 +72,8 @@ datefudge "2007-04-22" \
 
 diff $srcdir/template-utf8.pem tmp-tt.pem
 rc=$?
+counter=`expr $counter + 1` 
+done
 
 # We're done.
 if test "$rc" != "0"; then
