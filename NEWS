@@ -9,6 +9,9 @@ See the end for copying conditions.
 ** libgnutls: gnutls_x509_crt_get_policy() allows for a list of zero
 policy qualifiers.
 
+** gnutls-cli: It will try to connect to all possible returned addresses
+before failing.
+
 ** API and ABI modifications:
 No changes since last version.
 
