@@ -1967,7 +1967,7 @@ gnutls_x509_crt_get_policy (gnutls_x509_crt_t crt, int indx,
       len = sizeof(tmpoid);
       ret = asn1_read_value(c2, tmpstr, tmpoid, &len);
       
-      if (ret == ASN1_ELEMENT_NOT_FOUND && i > 0)
+      if (ret == ASN1_ELEMENT_NOT_FOUND)
         break; /* finished */
       
       if (ret != ASN1_SUCCESS)

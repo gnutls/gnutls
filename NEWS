@@ -6,6 +6,9 @@ See the end for copying conditions.
 
 ** libgnutls: Several updates in the ASN.1 string handling subsystem.
 
+** libgnutls: gnutls_x509_crt_get_policy() allows for a list of zero
+policy qualifiers.
+
 ** API and ABI modifications:
 No changes since last version.
 
