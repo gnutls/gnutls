@@ -156,8 +156,7 @@ socket_open (socket_st * hd, const char *hostname, const char *service, int udp)
                               NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
         {
           fprintf (stderr, "getnameinfo(): %s\n", gai_strerror (err));
-          freeaddrinfo (res);
-          exit (1);
+          continue;
         }
 
       if (hints.ai_socktype == SOCK_DGRAM)
@@ -176,17 +175,20 @@ socket_open (socket_st * hd, const char *hostname, const char *service, int udp)
         }
 
 
-      printf ("Connecting to '%s:%s'...\n", hostname, portname);
+      printf ("Connecting to '%s:%s'...\n", buffer, portname);
 
       err = connect (sd, ptr->ai_addr, ptr->ai_addrlen);
       if (err < 0)
         {
-          fprintf (stderr, "Cannot connect to %s:%s: %s\n", hostname,
+          fprintf (stderr, "Cannot connect to %s:%s: %s\n", buffer,
                    portname, strerror (errno));
-          exit (1);
+          continue;
         }
       break;
     }
+
+  if (err != 0)
+    exit(1);
 
   if (sd == -1)
     {
