@@ -35,7 +35,7 @@ _asn1_set_value (asn1_node node, const void *value, unsigned int len);
 asn1_node _asn1_set_value_m (asn1_node node, void *value, unsigned int len);
 
 asn1_node
-_asn1_set_value_octet (asn1_node node, const void *value, unsigned int len);
+_asn1_set_value_lv (asn1_node node, const void *value, unsigned int len);
 
 asn1_node
 _asn1_append_value (asn1_node node, const void *value, unsigned int len);

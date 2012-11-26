@@ -137,8 +137,8 @@ _asn1_append_sequence_set (asn1_node node)
     return ASN1_GENERIC_ERROR;
 
   p = node->down;
-  while ((type_field (p->type) == TYPE_TAG)
-	 || (type_field (p->type) == TYPE_SIZE))
+  while ((type_field (p->type) == ASN1_ETYPE_TAG)
+	 || (type_field (p->type) == ASN1_ETYPE_SIZE))
     p = p->right;
   p2 = _asn1_copy_structure3 (p);
   while (p->right)
@@ -276,6 +276,7 @@ asn1_write_value (asn1_node node_root, const char *name,
   int len2, k, k2, negative;
   size_t i;
   const unsigned char *value = ivalue;
+  unsigned int type;
 
   node = asn1_find_node (node_root, name);
   if (node == NULL)
@@ -286,13 +287,15 @@ asn1_write_value (asn1_node node_root, const char *name,
       asn1_delete_structure (&node);
       return ASN1_SUCCESS;
     }
+  
+  type = type_field(node->type);
 
-  if ((type_field (node->type) == TYPE_SEQUENCE_OF) && (value == NULL)
+  if ((type == ASN1_ETYPE_SEQUENCE_OF) && (value == NULL)
       && (len == 0))
     {
       p = node->down;
-      while ((type_field (p->type) == TYPE_TAG)
-	     || (type_field (p->type) == TYPE_SIZE))
+      while ((type_field (p->type) == ASN1_ETYPE_TAG)
+	     || (type_field (p->type) == ASN1_ETYPE_SIZE))
 	p = p->right;
 
       while (p->right)
@@ -301,15 +304,15 @@ asn1_write_value (asn1_node node_root, const char *name,
       return ASN1_SUCCESS;
     }
 
-  switch (type_field (node->type))
+  switch (type)
     {
-    case TYPE_BOOLEAN:
+    case ASN1_ETYPE_BOOLEAN:
       if (!_asn1_strcmp (value, "TRUE"))
 	{
 	  if (node->type & CONST_DEFAULT)
 	    {
 	      p = node->down;
-	      while (type_field (p->type) != TYPE_DEFAULT)
+	      while (type_field (p->type) != ASN1_ETYPE_DEFAULT)
 		p = p->right;
 	      if (p->type & CONST_TRUE)
 		_asn1_set_value (node, NULL, 0);
@@ -324,7 +327,7 @@ asn1_write_value (asn1_node node_root, const char *name,
 	  if (node->type & CONST_DEFAULT)
 	    {
 	      p = node->down;
-	      while (type_field (p->type) != TYPE_DEFAULT)
+	      while (type_field (p->type) != ASN1_ETYPE_DEFAULT)
 		p = p->right;
 	      if (p->type & CONST_FALSE)
 		_asn1_set_value (node, NULL, 0);
@@ -337,8 +340,8 @@ asn1_write_value (asn1_node node_root, const char *name,
       else
 	return ASN1_VALUE_NOT_VALID;
       break;
-    case TYPE_INTEGER:
-    case TYPE_ENUMERATED:
+    case ASN1_ETYPE_INTEGER:
+    case ASN1_ETYPE_ENUMERATED:
       if (len == 0)
 	{
 	  if ((isdigit (value[0])) || (value[0] == '-'))
@@ -357,7 +360,7 @@ asn1_write_value (asn1_node node_root, const char *name,
 	      p = node->down;
 	      while (p)
 		{
-		  if (type_field (p->type) == TYPE_CONSTANT)
+		  if (type_field (p->type) == ASN1_ETYPE_CONSTANT)
 		    {
 		      if (!_asn1_strcmp (p->name, value))
 			{
@@ -386,13 +389,12 @@ asn1_write_value (asn1_node node_root, const char *name,
 	  memcpy (value_temp, value, len);
 	}
 
-
       if (value_temp[0] & 0x80)
 	negative = 1;
       else
 	negative = 0;
 
-      if (negative && (type_field (node->type) == TYPE_ENUMERATED))
+      if (negative && (type_field (node->type) == ASN1_ETYPE_ENUMERATED))
 	{
 	  free (value_temp);
 	  return ASN1_VALUE_NOT_VALID;
@@ -408,12 +410,12 @@ asn1_write_value (asn1_node node_root, const char *name,
 	  (!negative && (value_temp[k] & 0x80)))
 	k--;
 
-      _asn1_set_value_octet (node, value_temp + k, len - k);
+      _asn1_set_value_lv (node, value_temp + k, len - k);
 
       if (node->type & CONST_DEFAULT)
 	{
 	  p = node->down;
-	  while (type_field (p->type) != TYPE_DEFAULT)
+	  while (type_field (p->type) != ASN1_ETYPE_DEFAULT)
 	    p = p->right;
 	  if ((isdigit (p->value[0])) || (p->value[0] == '-'))
 	    {
@@ -437,7 +439,7 @@ asn1_write_value (asn1_node node_root, const char *name,
 	      p2 = node->down;
 	      while (p2)
 		{
-		  if (type_field (p2->type) == TYPE_CONSTANT)
+		  if (type_field (p2->type) == ASN1_ETYPE_CONSTANT)
 		    {
 		      if (!_asn1_strcmp (p2->name, p->value))
 			{
@@ -479,14 +481,14 @@ asn1_write_value (asn1_node node_root, const char *name,
 	}
       free (value_temp);
       break;
-    case TYPE_OBJECT_ID:
+    case ASN1_ETYPE_OBJECT_ID:
       for (i = 0; i < _asn1_strlen (value); i++)
 	if ((!isdigit (value[i])) && (value[i] != '.') && (value[i] != '+'))
 	  return ASN1_VALUE_NOT_VALID;
       if (node->type & CONST_DEFAULT)
 	{
 	  p = node->down;
-	  while (type_field (p->type) != TYPE_DEFAULT)
+	  while (type_field (p->type) != ASN1_ETYPE_DEFAULT)
 	    p = p->right;
 	  if (!_asn1_strcmp (value, p->value))
 	    {
@@ -496,15 +498,15 @@ asn1_write_value (asn1_node node_root, const char *name,
 	}
       _asn1_set_value (node, value, _asn1_strlen (value) + 1);
       break;
-    case TYPE_TIME:
-      if (node->type & CONST_UTC)
+    case ASN1_ETYPE_UTC_TIME:
 	{
-	  if (_asn1_strlen (value) < 11)
+	  len = _asn1_strlen(value);
+	  if (len < 11)
 	    return ASN1_VALUE_NOT_VALID;
 	  for (k = 0; k < 10; k++)
 	    if (!isdigit (value[k]))
 	      return ASN1_VALUE_NOT_VALID;
-	  switch (_asn1_strlen (value))
+	  switch (len)
 	    {
 	    case 11:
 	      if (value[10] != 'Z')
@@ -534,25 +536,28 @@ asn1_write_value (asn1_node node_root, const char *name,
 	    default:
 	      return ASN1_VALUE_NOT_FOUND;
 	    }
-	  _asn1_set_value (node, value, _asn1_strlen (value) + 1);
-	}
-      else
-	{			/* GENERALIZED TIME */
-	  if (value)
-	    _asn1_set_value (node, value, _asn1_strlen (value) + 1);
+	  _asn1_set_value (node, value, len);
 	}
       break;
-    case TYPE_OCTET_STRING:
+    case ASN1_ETYPE_GENERALIZED_TIME:
+      len = _asn1_strlen(value);
+      _asn1_set_value (node, value, len);
+      break;
+    case ASN1_ETYPE_OCTET_STRING:
+    case ASN1_ETYPE_GENERALSTRING:
+    case ASN1_ETYPE_NUMERIC_STRING:
+    case ASN1_ETYPE_IA5_STRING:
+    case ASN1_ETYPE_TELETEX_STRING:
+    case ASN1_ETYPE_PRINTABLE_STRING:
+    case ASN1_ETYPE_UNIVERSAL_STRING:
+    case ASN1_ETYPE_BMP_STRING:
+    case ASN1_ETYPE_UTF8_STRING:
+    case ASN1_ETYPE_VISIBLE_STRING:
       if (len == 0)
 	len = _asn1_strlen (value);
-      _asn1_set_value_octet (node, value, len);
+      _asn1_set_value_lv (node, value, len);
       break;
-    case TYPE_GENERALSTRING:
-      if (len == 0)
-	len = _asn1_strlen (value);
-      _asn1_set_value_octet (node, value, len);
-      break;
-    case TYPE_BIT_STRING:
+    case ASN1_ETYPE_BIT_STRING:
       if (len == 0)
 	len = _asn1_strlen (value);
       asn1_length_der ((len >> 3) + 2, NULL, &len2);
@@ -564,7 +569,7 @@ asn1_write_value (asn1_node node_root, const char *name,
       _asn1_set_value_m (node, temp, len2);
       temp = NULL;
       break;
-    case TYPE_CHOICE:
+    case ASN1_ETYPE_CHOICE:
       p = node->down;
       while (p)
 	{
@@ -588,11 +593,11 @@ asn1_write_value (asn1_node node_root, const char *name,
       if (!p)
 	return ASN1_ELEMENT_NOT_FOUND;
       break;
-    case TYPE_ANY:
-      _asn1_set_value_octet (node, value, len);
+    case ASN1_ETYPE_ANY:
+      _asn1_set_value_lv (node, value, len);
       break;
-    case TYPE_SEQUENCE_OF:
-    case TYPE_SET_OF:
+    case ASN1_ETYPE_SEQUENCE_OF:
+    case ASN1_ETYPE_SET_OF:
       if (_asn1_strcmp (value, "NEW"))
 	return ASN1_VALUE_NOT_VALID;
       _asn1_append_sequence_set (node);
@@ -621,6 +626,16 @@ asn1_write_value (asn1_node node_root, const char *name,
 	} else { \
 		/* this strcpy is checked */ \
 		_asn1_strcpy(ptr, data); \
+	}
+
+#define PUT_AS_STR_VALUE( ptr, ptr_size, data, data_size) \
+	*len = data_size + 1; \
+	if (ptr_size < *len) { \
+		return ASN1_MEM_ERROR; \
+	} else { \
+		/* this strcpy is checked */ \
+		memcpy(ptr, data, data_size); \
+		ptr[data_size] = 0; \
 	}
 
 #define ADD_STR_VALUE( ptr, ptr_size, data) \
@@ -696,31 +711,105 @@ asn1_write_value (asn1_node node_root, const char *name,
 int
 asn1_read_value (asn1_node root, const char *name, void *ivalue, int *len)
 {
+  return asn1_read_value_type( root, name, ivalue, len, NULL);
+}
+
+/**
+ * asn1_read_value_type:
+ * @root: pointer to a structure.
+ * @name: the name of the element inside a structure that you want to read.
+ * @ivalue: vector that will contain the element's content, must be a
+ *   pointer to memory cells already allocated.
+ * @len: number of bytes of *value: value[0]..value[len-1]. Initialy
+ *   holds the sizeof value.
+ * @etype: The type of the value read (ASN1_ETYPE)
+ *
+ * Returns the value of one element inside a structure.
+ *
+ * If an element is OPTIONAL and the function "read_value" returns
+ * %ASN1_ELEMENT_NOT_FOUND, it means that this element wasn't present
+ * in the der encoding that created the structure.  The first element
+ * of a SEQUENCE_OF or SET_OF is named "?1". The second one "?2" and
+ * so on.
+ *
+ * INTEGER: VALUE will contain a two's complement form integer.
+ *
+ *            integer=-1  -> value[0]=0xFF , len=1.
+ *            integer=1   -> value[0]=0x01 , len=1.
+ *
+ * ENUMERATED: As INTEGER (but only with not negative numbers).
+ *
+ * BOOLEAN: VALUE will be the null terminated string "TRUE" or
+ *   "FALSE" and LEN=5 or LEN=6.
+ *
+ * OBJECT IDENTIFIER: VALUE will be a null terminated string with
+ *   each number separated by a dot (i.e. "1.2.3.543.1").
+ *
+ *                      LEN = strlen(VALUE)+1
+ *
+ * UTCTime: VALUE will be a null terminated string in one of these
+ *   formats: "YYMMDDhhmmss+hh'mm'" or "YYMMDDhhmmss-hh'mm'".
+ *   LEN=strlen(VALUE)+1.
+ *
+ * GeneralizedTime: VALUE will be a null terminated string in the
+ *   same format used to set the value.
+ *
+ * OCTET STRING: VALUE will contain the octet string and LEN will be
+ *   the number of octets.
+ *
+ * GeneralString: VALUE will contain the generalstring and LEN will
+ *   be the number of octets.
+ *
+ * BIT STRING: VALUE will contain the bit string organized by bytes
+ *   and LEN will be the number of bits.
+ *
+ * CHOICE: If NAME indicates a choice type, VALUE will specify the
+ *   alternative selected.
+ *
+ * ANY: If NAME indicates an any type, VALUE will indicate the DER
+ *   encoding of the structure actually used.
+ *
+ * Returns: %ASN1_SUCCESS if value is returned,
+ *   %ASN1_ELEMENT_NOT_FOUND if @name is not a valid element,
+ *   %ASN1_VALUE_NOT_FOUND if there isn't any value for the element
+ *   selected, and %ASN1_MEM_ERROR if The value vector isn't big enough
+ *   to store the result, and in this case @len will contain the number of
+ *   bytes needed.
+ **/
+int
+asn1_read_value_type (asn1_node root, const char *name, void *ivalue, int *len,
+                      unsigned int *etype)
+{
   asn1_node node, p, p2;
   int len2, len3;
   int value_size = *len;
   unsigned char *value = ivalue;
+  unsigned type;
 
   node = asn1_find_node (root, name);
   if (node == NULL)
     return ASN1_ELEMENT_NOT_FOUND;
 
-  if ((type_field (node->type) != TYPE_NULL) &&
-      (type_field (node->type) != TYPE_CHOICE) &&
+  type = type_field (node->type);
+
+  if ((type != ASN1_ETYPE_NULL) &&
+      (type != ASN1_ETYPE_CHOICE) &&
       !(node->type & CONST_DEFAULT) && !(node->type & CONST_ASSIGN) &&
       (node->value == NULL))
     return ASN1_VALUE_NOT_FOUND;
 
-  switch (type_field (node->type))
+  if (etype)
+    *etype = type;
+  switch (type)
     {
-    case TYPE_NULL:
+    case ASN1_ETYPE_NULL:
       PUT_STR_VALUE (value, value_size, "NULL");
       break;
-    case TYPE_BOOLEAN:
+    case ASN1_ETYPE_BOOLEAN:
       if ((node->type & CONST_DEFAULT) && (node->value == NULL))
 	{
 	  p = node->down;
-	  while (type_field (p->type) != TYPE_DEFAULT)
+	  while (type_field (p->type) != ASN1_ETYPE_DEFAULT)
 	    p = p->right;
 	  if (p->type & CONST_TRUE)
 	    {
@@ -740,12 +829,12 @@ asn1_read_value (asn1_node root, const char *name, void *ivalue, int *len)
 	  PUT_STR_VALUE (value, value_size, "FALSE");
 	}
       break;
-    case TYPE_INTEGER:
-    case TYPE_ENUMERATED:
+    case ASN1_ETYPE_INTEGER:
+    case ASN1_ETYPE_ENUMERATED:
       if ((node->type & CONST_DEFAULT) && (node->value == NULL))
 	{
 	  p = node->down;
-	  while (type_field (p->type) != TYPE_DEFAULT)
+	  while (type_field (p->type) != ASN1_ETYPE_DEFAULT)
 	    p = p->right;
 	  if ((isdigit (p->value[0])) || (p->value[0] == '-')
 	      || (p->value[0] == '+'))
@@ -759,7 +848,7 @@ asn1_read_value (asn1_node root, const char *name, void *ivalue, int *len)
 	      p2 = node->down;
 	      while (p2)
 		{
-		  if (type_field (p2->type) == TYPE_CONSTANT)
+		  if (type_field (p2->type) == ASN1_ETYPE_CONSTANT)
 		    {
 		      if (!_asn1_strcmp (p2->name, p->value))
 			{
@@ -783,14 +872,14 @@ asn1_read_value (asn1_node root, const char *name, void *ivalue, int *len)
 	    return ASN1_MEM_ERROR;
 	}
       break;
-    case TYPE_OBJECT_ID:
+    case ASN1_ETYPE_OBJECT_ID:
       if (node->type & CONST_ASSIGN)
 	{
 	  value[0] = 0;
 	  p = node->down;
 	  while (p)
 	    {
-	      if (type_field (p->type) == TYPE_CONSTANT)
+	      if (type_field (p->type) == ASN1_ETYPE_CONSTANT)
 		{
 		  ADD_STR_VALUE (value, value_size, p->value);
 		  if (p->right)
@@ -805,7 +894,7 @@ asn1_read_value (asn1_node root, const char *name, void *ivalue, int *len)
       else if ((node->type & CONST_DEFAULT) && (node->value == NULL))
 	{
 	  p = node->down;
-	  while (type_field (p->type) != TYPE_DEFAULT)
+	  while (type_field (p->type) != ASN1_ETYPE_DEFAULT)
 	    p = p->right;
 	  PUT_STR_VALUE (value, value_size, p->value);
 	}
@@ -814,34 +903,37 @@ asn1_read_value (asn1_node root, const char *name, void *ivalue, int *len)
 	  PUT_STR_VALUE (value, value_size, node->value);
 	}
       break;
-    case TYPE_TIME:
-      PUT_STR_VALUE (value, value_size, node->value);
+    case ASN1_ETYPE_GENERALIZED_TIME:
+    case ASN1_ETYPE_UTC_TIME:
+      PUT_AS_STR_VALUE (value, value_size, node->value, node->value_len);
       break;
-    case TYPE_OCTET_STRING:
+    case ASN1_ETYPE_OCTET_STRING:
+    case ASN1_ETYPE_GENERALSTRING:
+    case ASN1_ETYPE_NUMERIC_STRING:
+    case ASN1_ETYPE_IA5_STRING:
+    case ASN1_ETYPE_TELETEX_STRING:
+    case ASN1_ETYPE_PRINTABLE_STRING:
+    case ASN1_ETYPE_UNIVERSAL_STRING:
+    case ASN1_ETYPE_BMP_STRING:
+    case ASN1_ETYPE_UTF8_STRING:
+    case ASN1_ETYPE_VISIBLE_STRING:
       len2 = -1;
       if (asn1_get_octet_der
 	  (node->value, node->value_len, &len2, value, value_size,
 	   len) != ASN1_SUCCESS)
 	return ASN1_MEM_ERROR;
       break;
-    case TYPE_GENERALSTRING:
-      len2 = -1;
-      if (asn1_get_octet_der
-	  (node->value, node->value_len, &len2, value, value_size,
-	   len) != ASN1_SUCCESS)
-	return ASN1_MEM_ERROR;
-      break;
-    case TYPE_BIT_STRING:
+    case ASN1_ETYPE_BIT_STRING:
       len2 = -1;
       if (asn1_get_bit_der
 	  (node->value, node->value_len, &len2, value, value_size,
 	   len) != ASN1_SUCCESS)
 	return ASN1_MEM_ERROR;
       break;
-    case TYPE_CHOICE:
+    case ASN1_ETYPE_CHOICE:
       PUT_STR_VALUE (value, value_size, node->down->name);
       break;
-    case TYPE_ANY:
+    case ASN1_ETYPE_ANY:
       len3 = -1;
       len2 = asn1_get_length_der (node->value, node->value_len, &len3);
       if (len2 < 0)
@@ -889,7 +981,7 @@ asn1_read_tag (asn1_node root, const char *name, int *tagValue,
     {
       while (p)
 	{
-	  if (type_field (p->type) == TYPE_TAG)
+	  if (type_field (p->type) == ASN1_ETYPE_TAG)
 	    {
 	      if ((p->type & CONST_IMPLICIT) && (pTag == NULL))
 		pTag = p;
@@ -915,53 +1007,18 @@ asn1_read_tag (asn1_node root, const char *name, int *tagValue,
     }
   else
     {
+      unsigned type = type_field (node->type);
       *classValue = ASN1_CLASS_UNIVERSAL;
 
-      switch (type_field (node->type))
+      switch (type)
 	{
-	case TYPE_NULL:
-	  *tagValue = ASN1_TAG_NULL;
+	CASE_HANDLED_ETYPES:
+	  *tagValue = _asn1_tags[type].tag;
 	  break;
-	case TYPE_BOOLEAN:
-	  *tagValue = ASN1_TAG_BOOLEAN;
-	  break;
-	case TYPE_INTEGER:
-	  *tagValue = ASN1_TAG_INTEGER;
-	  break;
-	case TYPE_ENUMERATED:
-	  *tagValue = ASN1_TAG_ENUMERATED;
-	  break;
-	case TYPE_OBJECT_ID:
-	  *tagValue = ASN1_TAG_OBJECT_ID;
-	  break;
-	case TYPE_TIME:
-	  if (node->type & CONST_UTC)
-	    {
-	      *tagValue = ASN1_TAG_UTCTime;
-	    }
-	  else
-	    *tagValue = ASN1_TAG_GENERALIZEDTime;
-	  break;
-	case TYPE_OCTET_STRING:
-	  *tagValue = ASN1_TAG_OCTET_STRING;
-	  break;
-	case TYPE_GENERALSTRING:
-	  *tagValue = ASN1_TAG_GENERALSTRING;
-	  break;
-	case TYPE_BIT_STRING:
-	  *tagValue = ASN1_TAG_BIT_STRING;
-	  break;
-	case TYPE_SEQUENCE:
-	case TYPE_SEQUENCE_OF:
-	  *tagValue = ASN1_TAG_SEQUENCE;
-	  break;
-	case TYPE_SET:
-	case TYPE_SET_OF:
-	  *tagValue = ASN1_TAG_SET;
-	  break;
-	case TYPE_TAG:
-	case TYPE_CHOICE:
-	case TYPE_ANY:
+	case ASN1_ETYPE_TAG:
+	case ASN1_ETYPE_CHOICE:
+	case ASN1_ETYPE_ANY:
+	  *tagValue = -1;
 	  break;
 	default:
 	  break;

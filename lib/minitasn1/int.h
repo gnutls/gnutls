@@ -58,6 +58,46 @@ struct asn1_node_st
   unsigned char small_value[ASN1_SMALL_VALUE_SIZE];	/* For small values */
 };
 
+typedef struct tag_and_class_st {
+  unsigned tag;
+  unsigned class;
+  const char* desc;
+} tag_and_class_st;
+
+/* the types that are handled in _asn1_tags */
+#define CASE_HANDLED_ETYPES \
+	case ASN1_ETYPE_NULL: \
+	case ASN1_ETYPE_BOOLEAN: \
+	case ASN1_ETYPE_INTEGER: \
+	case ASN1_ETYPE_ENUMERATED: \
+	case ASN1_ETYPE_OBJECT_ID: \
+	case ASN1_ETYPE_OCTET_STRING: \
+	case ASN1_ETYPE_GENERALSTRING: \
+        case ASN1_ETYPE_NUMERIC_STRING: \
+        case ASN1_ETYPE_IA5_STRING: \
+        case ASN1_ETYPE_TELETEX_STRING: \
+        case ASN1_ETYPE_PRINTABLE_STRING: \
+        case ASN1_ETYPE_UNIVERSAL_STRING: \
+        case ASN1_ETYPE_BMP_STRING: \
+        case ASN1_ETYPE_UTF8_STRING: \
+        case ASN1_ETYPE_VISIBLE_STRING: \
+	case ASN1_ETYPE_BIT_STRING: \
+	case ASN1_ETYPE_SEQUENCE: \
+	case ASN1_ETYPE_SEQUENCE_OF: \
+	case ASN1_ETYPE_SET: \
+	case ASN1_ETYPE_UTC_TIME: \
+	case ASN1_ETYPE_GENERALIZED_TIME: \
+	case ASN1_ETYPE_SET_OF
+
+#define ETYPE_TAG(etype) (_asn1_tags[etype].tag)
+#define ETYPE_CLASS(etype) (_asn1_tags[etype].class)
+#define ETYPE_OK(etype) ((etype != ASN1_ETYPE_INVALID && \
+                          etype <= _asn1_tags_size && \
+                          _asn1_tags[etype].desc != NULL)?1:0)
+
+extern unsigned int _asn1_tags_size;
+extern const tag_and_class_st _asn1_tags[];
+
 #define _asn1_strlen(s) strlen((const char *) s)
 #define _asn1_strtol(n,e,b) strtol((const char *) n, e, b)
 #define _asn1_strtoul(n,e,b) strtoul((const char *) n, e, b)
@@ -71,37 +111,6 @@ struct asn1_node_st
 #define UP     1
 #define RIGHT  2
 #define DOWN   3
-
-/****************************************/
-/* Returns the first 8 bits.            */
-/* Used with the field type of asn1_node_st */
-/****************************************/
-#define type_field(x)     (x&0xFF)
-
-/* List of constants for field type of typedef asn1_node_st  */
-#define TYPE_CONSTANT      ASN1_ETYPE_CONSTANT
-#define TYPE_IDENTIFIER    ASN1_ETYPE_IDENTIFIER
-#define TYPE_INTEGER       ASN1_ETYPE_INTEGER
-#define TYPE_BOOLEAN       ASN1_ETYPE_BOOLEAN
-#define TYPE_SEQUENCE      ASN1_ETYPE_SEQUENCE
-#define TYPE_BIT_STRING    ASN1_ETYPE_BIT_STRING
-#define TYPE_OCTET_STRING  ASN1_ETYPE_OCTET_STRING
-#define TYPE_TAG           ASN1_ETYPE_TAG
-#define TYPE_DEFAULT       ASN1_ETYPE_DEFAULT
-#define TYPE_SIZE          ASN1_ETYPE_SIZE
-#define TYPE_SEQUENCE_OF   ASN1_ETYPE_SEQUENCE_OF
-#define TYPE_OBJECT_ID     ASN1_ETYPE_OBJECT_ID
-#define TYPE_ANY           ASN1_ETYPE_ANY
-#define TYPE_SET           ASN1_ETYPE_SET
-#define TYPE_SET_OF        ASN1_ETYPE_SET_OF
-#define TYPE_DEFINITIONS   ASN1_ETYPE_DEFINITIONS
-#define TYPE_TIME          ASN1_ETYPE_TIME
-#define TYPE_CHOICE        ASN1_ETYPE_CHOICE
-#define TYPE_IMPORTS       ASN1_ETYPE_IMPORTS
-#define TYPE_NULL          ASN1_ETYPE_NULL
-#define TYPE_ENUMERATED    ASN1_ETYPE_ENUMERATED
-#define TYPE_GENERALSTRING ASN1_ETYPE_GENERALSTRING
-
 
 /***********************************************************************/
 /* List of constants to better specify the type of typedef asn1_node_st.   */
@@ -128,6 +137,7 @@ struct asn1_node_st
 
 #define CONST_DEFINED_BY  (1<<22)
 
+/* Those two are deprecated and used for backwards compatibility */
 #define CONST_GENERALIZED (1<<23)
 #define CONST_UTC         (1<<24)
 
@@ -139,5 +149,37 @@ struct asn1_node_st
 
 #define CONST_DOWN        (1<<29)
 #define CONST_RIGHT       (1<<30)
+
+
+#define ASN1_ETYPE_TIME 17
+/****************************************/
+/* Returns the first 8 bits.            */
+/* Used with the field type of asn1_node_st */
+/****************************************/
+inline static unsigned int type_field(unsigned int ntype)
+{
+  return (ntype & 0xff);
+}
+
+/* To convert old types from a static structure */
+inline static unsigned int convert_old_type(unsigned int ntype)
+{
+unsigned int type = ntype & 0xff;
+  if (type == ASN1_ETYPE_TIME)
+    {
+      if (ntype & CONST_UTC)
+        type = ASN1_ETYPE_UTC_TIME;
+      else
+        type = ASN1_ETYPE_GENERALIZED_TIME;
+
+      ntype &= ~(CONST_UTC|CONST_GENERALIZED);
+      ntype &= 0xffffff00;
+      ntype |= type;
+
+      return ntype;
+    }
+  else
+    return ntype;
+}
 
 #endif /* INT_H */

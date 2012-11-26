@@ -48,7 +48,7 @@ list_type *firstElement = NULL;
 /* Description: creates a new NODE_ASN element and    */
 /* puts it in the list pointed by firstElement.       */
 /* Parameters:                                        */
-/*   type: type of the new element (see TYPE_         */
+/*   type: type of the new element (see ASN1_ETYPE_   */
 /*         and CONST_ constants).                     */
 /* Return: pointer to the new element.                */
 /******************************************************/
@@ -241,10 +241,10 @@ _asn1_set_value (asn1_node node, const void *value, unsigned int len)
 }
 
 /******************************************************************/
-/* Function : _asn1_set_value_octet                               */
+/* Function : _asn1_set_value_lv                                  */
 /* Description: sets the field VALUE in a NODE_ASN element. The   */
 /*              previous value (if exist) will be lost. The value */
-/*		given is stored as an octet string.               */
+/*		given is stored as an length-value format (LV     */
 /* Parameters:                                                    */
 /*   node: element pointer.                                       */
 /*   value: pointer to the value that you want to set.            */
@@ -252,7 +252,7 @@ _asn1_set_value (asn1_node node, const void *value, unsigned int len)
 /* Return: pointer to the NODE_ASN element.                       */
 /******************************************************************/
 asn1_node
-_asn1_set_value_octet (asn1_node node, const void *value, unsigned int len)
+_asn1_set_value_lv (asn1_node node, const void *value, unsigned int len)
 {
   int len2;
   void *temp;
@@ -581,7 +581,7 @@ _asn1_change_integer_value (asn1_node node)
   p = node;
   while (p)
     {
-      if ((type_field (p->type) == TYPE_INTEGER) && (p->type & CONST_ASSIGN))
+      if ((type_field (p->type) == ASN1_ETYPE_INTEGER) && (p->type & CONST_ASSIGN))
 	{
 	  if (p->value)
 	    {
@@ -653,11 +653,11 @@ _asn1_expand_object_id (asn1_node node)
     {
       if (move != UP)
 	{
-	  if ((type_field (p->type) == TYPE_OBJECT_ID)
+	  if ((type_field (p->type) == ASN1_ETYPE_OBJECT_ID)
 	      && (p->type & CONST_ASSIGN))
 	    {
 	      p2 = p->down;
-	      if (p2 && (type_field (p2->type) == TYPE_CONSTANT))
+	      if (p2 && (type_field (p2->type) == ASN1_ETYPE_CONSTANT))
 		{
 		  if (p2->value && !isdigit (p2->value[0]))
 		    {
@@ -666,7 +666,7 @@ _asn1_expand_object_id (asn1_node node)
 		      _asn1_str_cat (name2, sizeof (name2),
 				     (char *) p2->value);
 		      p3 = asn1_find_node (node, name2);
-		      if (!p3 || (type_field (p3->type) != TYPE_OBJECT_ID) ||
+		      if (!p3 || (type_field (p3->type) != ASN1_ETYPE_OBJECT_ID) ||
 			  !(p3->type & CONST_ASSIGN))
 			return ASN1_ELEMENT_NOT_FOUND;
 		      _asn1_set_down (p, p2->right);
@@ -675,9 +675,9 @@ _asn1_expand_object_id (asn1_node node)
 		      p4 = p3->down;
 		      while (p4)
 			{
-			  if (type_field (p4->type) == TYPE_CONSTANT)
+			  if (type_field (p4->type) == ASN1_ETYPE_CONSTANT)
 			    {
-			      p5 = _asn1_add_single_node (TYPE_CONSTANT);
+			      p5 = _asn1_add_single_node (ASN1_ETYPE_CONSTANT);
 			      _asn1_set_name (p5, p4->name);
 			      tlen = _asn1_strlen (p4->value);
 			      if (tlen > 0)
@@ -742,24 +742,24 @@ _asn1_expand_object_id (asn1_node node)
     {
       if (move != UP)
 	{
-	  if ((type_field (p->type) == TYPE_OBJECT_ID) &&
+	  if ((type_field (p->type) == ASN1_ETYPE_OBJECT_ID) &&
 	      (p->type & CONST_DEFAULT))
 	    {
 	      p2 = p->down;
-	      if (p2 && (type_field (p2->type) == TYPE_DEFAULT))
+	      if (p2 && (type_field (p2->type) == ASN1_ETYPE_DEFAULT))
 		{
 		  _asn1_str_cpy (name2, sizeof (name2), name_root);
 		  _asn1_str_cat (name2, sizeof (name2), ".");
 		  _asn1_str_cat (name2, sizeof (name2), (char *) p2->value);
 		  p3 = asn1_find_node (node, name2);
-		  if (!p3 || (type_field (p3->type) != TYPE_OBJECT_ID) ||
+		  if (!p3 || (type_field (p3->type) != ASN1_ETYPE_OBJECT_ID) ||
 		      !(p3->type & CONST_ASSIGN))
 		    return ASN1_ELEMENT_NOT_FOUND;
 		  p4 = p3->down;
 		  name2[0] = 0;
 		  while (p4)
 		    {
-		      if (type_field (p4->type) == TYPE_CONSTANT)
+		      if (type_field (p4->type) == ASN1_ETYPE_CONSTANT)
 			{
 			  if (name2[0])
 			    _asn1_str_cat (name2, sizeof (name2), ".");
@@ -833,12 +833,12 @@ _asn1_type_set_config (asn1_node node)
     {
       if (move != UP)
 	{
-	  if (type_field (p->type) == TYPE_SET)
+	  if (type_field (p->type) == ASN1_ETYPE_SET)
 	    {
 	      p2 = p->down;
 	      while (p2)
 		{
-		  if (type_field (p2->type) != TYPE_TAG)
+		  if (type_field (p2->type) != ASN1_ETYPE_TAG)
 		    p2->type |= CONST_SET | CONST_NOT_USED;
 		  p2 = p2->right;
 		}
@@ -902,7 +902,7 @@ _asn1_check_identifier (asn1_node node)
   p = node;
   while (p)
     {
-      if (type_field (p->type) == TYPE_IDENTIFIER)
+      if (type_field (p->type) == ASN1_ETYPE_IDENTIFIER)
 	{
 	  _asn1_str_cpy (name2, sizeof (name2), node->name);
 	  _asn1_str_cat (name2, sizeof (name2), ".");
@@ -917,29 +917,29 @@ _asn1_check_identifier (asn1_node node)
 	      return ASN1_IDENTIFIER_NOT_FOUND;
 	    }
 	}
-      else if ((type_field (p->type) == TYPE_OBJECT_ID) &&
+      else if ((type_field (p->type) == ASN1_ETYPE_OBJECT_ID) &&
 	       (p->type & CONST_DEFAULT))
 	{
 	  p2 = p->down;
-	  if (p2 && (type_field (p2->type) == TYPE_DEFAULT))
+	  if (p2 && (type_field (p2->type) == ASN1_ETYPE_DEFAULT))
 	    {
 	      _asn1_str_cpy (name2, sizeof (name2), node->name);
 	      _asn1_str_cat (name2, sizeof (name2), ".");
 	      _asn1_str_cat (name2, sizeof (name2), (char *) p2->value);
 	      _asn1_strcpy (_asn1_identifierMissing, p2->value);
 	      p2 = asn1_find_node (node, name2);
-	      if (!p2 || (type_field (p2->type) != TYPE_OBJECT_ID) ||
+	      if (!p2 || (type_field (p2->type) != ASN1_ETYPE_OBJECT_ID) ||
 		  !(p2->type & CONST_ASSIGN))
 		return ASN1_IDENTIFIER_NOT_FOUND;
 	      else
 		_asn1_identifierMissing[0] = 0;
 	    }
 	}
-      else if ((type_field (p->type) == TYPE_OBJECT_ID) &&
+      else if ((type_field (p->type) == ASN1_ETYPE_OBJECT_ID) &&
 	       (p->type & CONST_ASSIGN))
 	{
 	  p2 = p->down;
-	  if (p2 && (type_field (p2->type) == TYPE_CONSTANT))
+	  if (p2 && (type_field (p2->type) == ASN1_ETYPE_CONSTANT))
 	    {
 	      if (p2->value && !isdigit (p2->value[0]))
 		{
@@ -948,7 +948,7 @@ _asn1_check_identifier (asn1_node node)
 		  _asn1_str_cat (name2, sizeof (name2), (char *) p2->value);
 		  _asn1_strcpy (_asn1_identifierMissing, p2->value);
 		  p2 = asn1_find_node (node, name2);
-		  if (!p2 || (type_field (p2->type) != TYPE_OBJECT_ID) ||
+		  if (!p2 || (type_field (p2->type) != ASN1_ETYPE_OBJECT_ID) ||
 		      !(p2->type & CONST_ASSIGN))
 		    return ASN1_IDENTIFIER_NOT_FOUND;
 		  else
@@ -1002,13 +1002,13 @@ _asn1_set_default_tag (asn1_node node)
 {
   asn1_node p;
 
-  if ((node == NULL) || (type_field (node->type) != TYPE_DEFINITIONS))
+  if ((node == NULL) || (type_field (node->type) != ASN1_ETYPE_DEFINITIONS))
     return ASN1_ELEMENT_NOT_FOUND;
 
   p = node;
   while (p)
     {
-      if ((type_field (p->type) == TYPE_TAG) &&
+      if ((type_field (p->type) == ASN1_ETYPE_TAG) &&
 	  !(p->type & CONST_EXPLICIT) && !(p->type & CONST_IMPLICIT))
 	{
 	  if (node->type & CONST_EXPLICIT)
