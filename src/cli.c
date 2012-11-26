@@ -843,7 +843,6 @@ main (int argc, char **argv)
   init_global_tls_stuff ();
 
   socket_open (&hd, hostname, service, udp);
-  socket_connect (&hd);
 
   hd.session = init_tls_session (hostname);
   if (starttls)
@@ -897,7 +896,6 @@ main (int argc, char **argv)
           printf
             ("\n\n- Connecting again- trying to resume previous session\n");
           socket_open (&hd, hostname, service, udp);
-          socket_connect (&hd);
         }
       else
         {

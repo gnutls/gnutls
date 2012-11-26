@@ -16,7 +16,6 @@ ssize_t socket_recv (const socket_st * socket, void *buffer, int buffer_size);
 ssize_t socket_send (const socket_st * socket, const void *buffer,
                      int buffer_size);
 void socket_open (socket_st * hd, const char *hostname, const char *service, int udp);
-void socket_connect (const socket_st * hd);
 void socket_bye (socket_st * socket);
 
 void sockets_init (void);

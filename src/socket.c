@@ -126,22 +126,6 @@ socket_bye (socket_st * socket)
 }
 
 void
-socket_connect (const socket_st * hd)
-{
-  int err;
-
-  printf ("Connecting to '%s:%s'...\n", hd->ip, hd->service);
-
-  err = connect (hd->fd, hd->ptr->ai_addr, hd->ptr->ai_addrlen);
-  if (err < 0)
-    {
-      fprintf (stderr, "Cannot connect to %s:%s: %s\n", hd->hostname,
-               hd->service, strerror (errno));
-      exit (1);
-    }
-}
-
-void
 socket_open (socket_st * hd, const char *hostname, const char *service, int udp)
 {
   struct addrinfo hints, *res, *ptr;
@@ -176,28 +160,38 @@ socket_open (socket_st * hd, const char *hostname, const char *service, int udp)
           exit (1);
         }
 
+      if (hints.ai_socktype == SOCK_DGRAM)
+        {
+#if defined(IP_DONTFRAG)
+          int yes = 1;
+          if (setsockopt (sd, IPPROTO_IP, IP_DONTFRAG,
+                        (const void *) &yes, sizeof (yes)) < 0)
+            perror ("setsockopt(IP_DF) failed");
+#elif defined(IP_MTU_DISCOVER)
+          int yes = IP_PMTUDISC_DO;
+          if (setsockopt(sd, IPPROTO_IP, IP_MTU_DISCOVER, 
+                         (const void*) &yes, sizeof (yes)) < 0)
+            perror ("setsockopt(IP_DF) failed");
+#endif
+        }
+
+
+      printf ("Connecting to '%s:%s'...\n", hostname, portname);
+
+      err = connect (sd, ptr->ai_addr, ptr->ai_addrlen);
+      if (err < 0)
+        {
+          fprintf (stderr, "Cannot connect to %s:%s: %s\n", hostname,
+                   portname, strerror (errno));
+          exit (1);
+        }
       break;
     }
 
   if (sd == -1)
     {
-      fprintf (stderr, "socket(): %s\n", strerror (errno));
+      fprintf (stderr, "Could not find a supported socket\n");
       exit (1);
-    }
-
-  if (hints.ai_socktype == SOCK_DGRAM)
-    {
-#if defined(IP_DONTFRAG)
-      int yes = 1;
-      if (setsockopt (sd, IPPROTO_IP, IP_DONTFRAG,
-                      (const void *) &yes, sizeof (yes)) < 0)
-        perror ("setsockopt(IP_DF) failed");
-#elif defined(IP_MTU_DISCOVER)
-      int yes = IP_PMTUDISC_DO;
-      if (setsockopt(sd, IPPROTO_IP, IP_MTU_DISCOVER, 
-                     (const void*) &yes, sizeof (yes)) < 0)
-        perror ("setsockopt(IP_DF) failed");
-#endif
     }
 
   hd->secure = 0;

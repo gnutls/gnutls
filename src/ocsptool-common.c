@@ -191,7 +191,6 @@ socket_st hd;
   headers_size = strlen(headers);
   
   socket_open(&hd, hostname, service, 0);
-  socket_connect (&hd);
   
   socket_send(&hd, headers, headers_size);
   socket_send(&hd, req.data, req.size);
