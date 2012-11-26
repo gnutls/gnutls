@@ -2442,8 +2442,8 @@ gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
  * in turns points to the original certificate. Thus you should not
  * modify any data or deallocate any of those.
  *
- * This is a low-level function that depends on the internals of
- * libtasn1.
+ * This is a low-level function that requires the caller to do the
+ * value conversions when necessary (e.g. from UCS-2).
  *
  * Returns: Returns 0 on success, or an error code.
  **/
