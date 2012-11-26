@@ -612,7 +612,6 @@ gl/unistr.h
 gl/tests/unused-parameter.h
 gl/tests/locale.h
 gl/iconv.h
-build-aux/snippet/unused-parameter.h
 gl/tests/test-c-strcasecmp
 gl/tests/test-c-strncasecmp
 gl/tests/test-iconv-h
