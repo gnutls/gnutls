@@ -5,6 +5,12 @@ in order to avoid having people working on the same thing.
 Current list:
 * When importing a PKCS #11 certificate, check for its issuers to generate a
   chain (e.g. use the DN to retrieve possible signers).
+* Handle the following X.509 extensions:
+   2.5.29.36: Policy Constraints
+   2.5.29.33: Policy Mappings
+   2.5.29.54: Inhibit Any-policy
+   2.5.29.46: Freshest CRL
+   2.5.29.30: Name Constraints
 * Improve AES assembly. AES in nettle can be improved in x86, arm and
   x86-64.
 * Add support for RSA-PSS. This signature algorithm is seen in some
