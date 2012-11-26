@@ -782,6 +782,13 @@ prt_one_usage(tOptions * pOptions, tOptDesc * pOD, arg_types_t * pAT)
         default:                     goto bogus_desc;
         }
 
+#ifdef _WIN32
+        if (pAT->pzOptFmt == zGnuOptFmt)
+            snprintf(z, sizeof(z), "--%s%s", pOD->pz_Name, pzArgType);
+        else if (pAT->pzOptFmt == zGnuOptFmt + 2)
+            snprintf(z, sizeof(z), "%s%s", pOD->pz_Name, pzArgType);
+        else
+#endif
         snprintf(z, sizeof(z), pAT->pzOptFmt, pzArgType, pOD->pz_Name,
                  (pOD->optMinCt != 0) ? pAT->pzReq : pAT->pzOpt);
 
