@@ -146,6 +146,7 @@ web:
 	cd doc && cp gnutls.html *.png ../$(htmldir)/manual/
 	cd doc && makeinfo --html --split=node -o ../$(htmldir)/manual/html_node/ --css-include=./texinfo.css gnutls.texi
 	cd doc && cp *.png ../$(htmldir)/manual/html_node/
+	sed 's/\@VERSION\@/$(VERSION)/g' -i $(htmldir)/manual/html_node/*.html $(htmldir)/manual/gnutls.html
 	-cd doc && make gnutls.epub && cp gnutls.epub ../$(htmldir)/manual/
 	cd doc/latex && make gnutls.pdf && cp gnutls.pdf ../../$(htmldir)/manual/
 	#cd doc/doxygen && doxygen && cd ../.. && cp -v doc/doxygen/html/* $(htmldir)/devel/doxygen/ && cd doc/doxygen/latex && make refman.pdf && cd ../../../ && cp doc/doxygen/latex/refman.pdf $(htmldir)/devel/doxygen/$(PACKAGE).pdf
