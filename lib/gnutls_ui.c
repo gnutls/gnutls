@@ -610,7 +610,7 @@ gnutls_certificate_client_get_request_status (gnutls_session_t session)
  *
  * This is the usual way to calculate a fingerprint of an X.509 DER
  * encoded certificate.  Note however that the fingerprint of an
- * OpenPGP is not just a hash and cannot be calculated with this
+ * OpenPGP certificate is not just a hash and cannot be calculated with this
  * function.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise

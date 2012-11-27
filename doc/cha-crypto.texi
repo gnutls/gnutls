@@ -8,13 +8,14 @@ providing symmetric crypto, hash and HMAC algorithms, as well access
 to the random number generation.
 
 @menu
-* Symmetric cryptography::
+* Encryption algorithms::
 * Hash and HMAC functions::
 * Random number generation::
 @end menu
 
-@node Symmetric cryptography
-@section Symmetric cryptography
+@node Encryption algorithms
+@section Encryption algorithms
+@cindex encryption algorithms
 @cindex symmetric cryptography
 
 The available functions to access symmetric crypto algorithms operations
@@ -42,6 +43,7 @@ The available functions to access hash functions are shown below. The supported 
 are the same as the HMAC algorithms.
 
 @showfuncF{gnutls_hash_init,gnutls_hash,gnutls_hash_output,gnutls_hash_deinit,gnutls_hash_get_len,gnutls_hash_fast}
+@showfuncA{gnutls_fingerprint}
 
 @node Random number generation
 @section Random number generation
