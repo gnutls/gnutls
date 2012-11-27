@@ -1174,6 +1174,8 @@ Those functions will convert a human understandable security parameter
 of @code{gnutls_sec_param_t} type, to a number of bits suitable for a public 
 key algorithm.
 
+@showfuncA{gnutls_sec_param_get_name}
+
 The following functions will set the minimum acceptable group size for Diffie-Hellman
 and SRP authentication. 
 @showfuncB{gnutls_dh_set_prime_bits,gnutls_srp_set_prime_bits}
