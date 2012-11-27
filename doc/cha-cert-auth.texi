@@ -178,6 +178,10 @@ maximum path lengths of certificate chains.
 This extension is set by the CA, in order to inform about the issued
 CRLs.
 
+@item Certificate policy @tab 2.5.29.32 @tab
+This extension is set to indicate the certificate policy as object
+identifier and may contain a descriptive string or URL.
+
 @item Proxy Certification Information @tab 1.3.6.1.5.5.7.1.14 @tab
 Proxy Certificates includes this extension that contains the OID of
 the proxy policy language used, and can specify limits on the maximum
