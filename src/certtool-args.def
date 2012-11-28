@@ -578,7 +578,10 @@ expiration_days = 700
 email = "none@@none.org"
 
 # Challenge password used in certificate requests
-challenge_passwd = 123456
+challenge_password = 123456
+
+# Password when encrypting a private key
+#password = secret
 
 # An URL that has CRLs (certificate revocation lists)
 # available. Needed in CA certificates.
