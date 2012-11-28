@@ -2342,7 +2342,7 @@ print_crq (gnutls_buffer_st * str, gnutls_x509_crq_t cert, gnutls_certificate_pr
               }
 
             err = gnutls_x509_crq_get_challenge_password (cert, NULL, &size);
-            if (err < 0)
+            if (err < 0 && err != GNUTLS_E_SHORT_MEMORY_BUFFER)
               {
                 addf (str, "error: get_challenge_password: %s\n",
                       gnutls_strerror (err));
