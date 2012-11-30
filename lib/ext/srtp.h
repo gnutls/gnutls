@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Martin Storsjo
+ * Copyright (C) 2012 Free Software Foundation
  *
  * Author: Martin Storsjo
  *
