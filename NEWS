@@ -2,6 +2,14 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.27 (unreleased)
+
+** libgnutls-guile: Fixed parallel compilation issue.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.26 (released 2012-11-09)
 
 ** libgnutls: Always tolerate key usage violation errors from the side
