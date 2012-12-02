@@ -106,8 +106,21 @@ doit (void)
     {
       fail ("gnutls_x509_privkey_import_openssl (key2): %s\n", gnutls_strerror(ret)) ;
     }
+
   gnutls_x509_privkey_deinit (pkey);
 
+  ret = gnutls_x509_privkey_init (&pkey);
+  if (ret < 0)
+     fail ("gnutls_x509_privkey_init: %d\n", ret);
+
+  key.data = (void*)key1;
+  key.size = sizeof(key1);
+  ret = gnutls_x509_privkey_import2 (pkey, &key, GNUTLS_X509_FMT_PEM, "123456", 0);
+  if (ret < 0)
+    {
+      fail ("gnutls_x509_privkey_import2: %s\n", gnutls_strerror(ret)) ;
+    }
+  gnutls_x509_privkey_deinit (pkey);
 
   gnutls_global_deinit ();
 }

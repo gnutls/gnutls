@@ -558,6 +558,49 @@ failover:
   return result;
 }
 
+static int import_pkcs12_privkey (gnutls_x509_privkey_t key,
+                                  const gnutls_datum_t * data,
+                                  gnutls_x509_crt_fmt_t format,
+                                  const char* password, unsigned int flags)
+{
+int ret;
+gnutls_pkcs12_t p12;
+gnutls_x509_privkey_t newkey;
+
+  ret = gnutls_pkcs12_init(&p12);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  
+  ret = gnutls_pkcs12_import(p12, data, format, flags);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto fail;
+    }
+
+  ret = gnutls_pkcs12_simple_parse (p12, password, &newkey, NULL, NULL, NULL, NULL, NULL, 0);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto fail;
+    }
+
+  ret = gnutls_x509_privkey_cpy (key, newkey);
+  gnutls_x509_privkey_deinit (newkey);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto fail;
+    }
+  
+  ret = 0;
+fail:
+  
+  gnutls_pkcs12_deinit(p12);
+  
+  return ret;
+}
+
 /**
  * gnutls_x509_privkey_import2:
  * @key: The structure to store the parsed key
@@ -570,8 +613,8 @@ failover:
  * the native #gnutls_x509_privkey_t format, irrespective of the
  * input format. The input format is auto-detected.
  *
- * The supported formats are typical X.509, PKCS #8 and the openssl
- * format.
+ * The supported formats are basic unencrypted key, PKCS #8, PKCS #12,
+ * and the openssl format.
  *
  * If the provided key is encrypted but no password was given, then
  * %GNUTLS_E_DECRYPTION_FAILED is returned.
@@ -601,7 +644,8 @@ gnutls_x509_privkey_import2 (gnutls_x509_privkey_t key,
       ret = gnutls_x509_privkey_import_pkcs8(key, data, format, password, flags);
       if (ret < 0)
         {
-          if (format == GNUTLS_X509_FMT_PEM)
+          ret = import_pkcs12_privkey(key, data, format, password, flags);
+          if (ret < 0 && format == GNUTLS_X509_FMT_PEM)
             {
               int err;
               err = gnutls_x509_privkey_import_openssl(key, data, password);

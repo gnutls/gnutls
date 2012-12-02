@@ -30,6 +30,12 @@
 #include <gnutls/x509.h>
 #include "utils.h"
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "<%d>| %s", level, str);
+}
+
 void
 doit (void)
 {
@@ -46,6 +52,10 @@ doit (void)
   ret = gnutls_global_init ();
   if (ret < 0)
     fail ("gnutls_global_init failed %d\n", ret);
+
+  gnutls_global_set_log_function (tls_log_func);
+  if (debug)
+    gnutls_global_set_log_level (2);
 
   ret = gnutls_pkcs12_init(&pkcs12);
   if (ret < 0)
@@ -69,8 +79,6 @@ doit (void)
   ret = gnutls_pkcs12_import(pkcs12, &data, GNUTLS_X509_FMT_DER, 0);
   if (ret < 0)
     fail ("pkcs12_import failed %d: %s\n", ret, gnutls_strerror (ret));
-
-  free(file_data);
 
   if (debug)
     success ("Read file OK\n");
@@ -116,6 +124,18 @@ doit (void)
   for (i=0;i<extras_size;i++)
     gnutls_x509_crt_deinit(extras[i]);
   gnutls_free(extras);
+  
+  /* Try gnutls_x509_privkey_import2() */
+  ret = gnutls_x509_privkey_init(&pkey);
+  if (ret < 0)
+    fail ("gnutls_x509_privkey_init failed %d: %s\n", ret, gnutls_strerror (ret));
+
+  ret = gnutls_x509_privkey_import2(pkey, &data, GNUTLS_X509_FMT_DER, password, 0);
+  if (ret < 0)
+    fail ("gnutls_x509_privkey_import2 failed %d: %s\n", ret, gnutls_strerror (ret));
+  gnutls_x509_privkey_deinit(pkey);
+
+  free(file_data);
 
   gnutls_global_deinit ();
 }

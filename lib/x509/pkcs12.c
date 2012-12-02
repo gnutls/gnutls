@@ -1385,13 +1385,13 @@ skip:
  * @p12: the PKCS#12 blob.
  * @password: optional password used to decrypt PKCS#12 blob, bags and keys.
  * @key: a structure to store the parsed private key.
- * @chain: the corresponding to key certificate chain
- * @chain_len: will be updated with the number of additional
+ * @chain: the corresponding to key certificate chain (may be %NULL)
+ * @chain_len: will be updated with the number of additional (may be %NULL)
  * @extra_certs: optional pointer to receive an array of additional
- *                   certificates found in the PKCS#12 blob.
+ *               certificates found in the PKCS#12 blob (may be %NULL).
  * @extra_certs_len: will be updated with the number of additional
- *                       certs.
- * @crl: an optional structure to store the parsed CRL.
+ *                   certs (may be %NULL).
+ * @crl: an optional structure to store the parsed CRL (may be %NULL).
  * @flags: should be zero or one of GNUTLS_PKCS12_SP_*
  *
  * This function parses a PKCS#12 blob in @p12blob and extracts the
@@ -1718,7 +1718,7 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
                 }
               else
                 {
-                  if (_chain_len == 0)
+                  if (chain && _chain_len == 0)
                     {
                       _chain = gnutls_malloc (sizeof(_chain[0]) * (++_chain_len));
                       if (!_chain)
@@ -1773,17 +1773,20 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
       gnutls_pkcs12_bag_deinit (bag);
     }
 
-  if (_chain_len != 1)
+  if (chain != NULL)
     {
-      ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-      goto done;
-    }
+      if (_chain_len != 1)
+        {
+          ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+          goto done;
+        }
 
-  ret = make_chain(&_chain, &_chain_len, &_extra_certs, &_extra_certs_len, flags);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto done;
+      ret = make_chain(&_chain, &_chain_len, &_extra_certs, &_extra_certs_len, flags);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto done;
+        }
     }
 
   ret = 0;
@@ -1829,8 +1832,11 @@ done:
       gnutls_free(_extra_certs);
     }
       
-  *chain = _chain;
-  *chain_len = _chain_len;
+  if (chain != NULL)
+    {
+      *chain = _chain;
+      *chain_len = _chain_len;
+    }
 
   return ret;
 }
