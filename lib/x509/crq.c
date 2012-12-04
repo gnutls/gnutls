@@ -258,9 +258,9 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
 /**
  * gnutls_x509_crq_get_dn_by_oid:
  * @crq: should contain a gnutls_x509_crq_t structure
- * @oid: holds an Object Identified in null terminated string
+ * @oid: holds an Object Identifier in a null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies
- *   which to send. Use (0) to get the first one.
+ *   which to get. Use (0) to get the first one.
  * @raw_flag: If non-zero returns the raw DER data of the DN part.
  * @buf: a pointer to a structure to hold the name (may be %NULL)
  * @sizeof_buf: initially holds the size of @buf
@@ -307,7 +307,7 @@ int ret;
 /**
  * gnutls_x509_crq_get_dn_oid:
  * @crq: should contain a gnutls_x509_crq_t structure
- * @indx: Specifies which DN OID to send. Use (0) to get the first one.
+ * @indx: Specifies which DN OID to get. Use (0) to get the first one.
  * @oid: a pointer to a structure to hold the name (may be %NULL)
  * @sizeof_oid: initially holds the size of @oid
  *
@@ -650,13 +650,16 @@ set_attribute (ASN1_TYPE asn, const char *root,
 /**
  * gnutls_x509_crq_set_attribute_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @oid: holds an Object Identified in (0)-terminated string
+ * @oid: holds an Object Identifier in a null-terminated string
  * @buf: a pointer to a structure that holds the attribute data
  * @sizeof_buf: holds the size of @buf
  *
  * This function will set the attribute in the certificate request
- * specified by the given Object ID.  The attribute must be be DER
+ * specified by the given Object ID. The provided attribute must be be DER
  * encoded.
+ *
+ * Attributes in a certificate request is an optional set of data
+ * appended to the request. Their interpretation depends on the CA policy.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -684,15 +687,18 @@ gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
 /**
  * gnutls_x509_crq_get_attribute_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @oid: holds an Object Identified in (0)-terminated string
+ * @oid: holds an Object Identifier in null-terminated string
  * @indx: In case multiple same OIDs exist in the attribute list, this
- *   specifies which to send, use (0) to get the first one
+ *   specifies which to get, use (0) to get the first one
  * @buf: a pointer to a structure to hold the attribute data (may be %NULL)
  * @sizeof_buf: initially holds the size of @buf
  *
  * This function will return the attribute in the certificate request
  * specified by the given Object ID.  The attribute will be DER
  * encoded.
+ *
+ * Attributes in a certificate request is an optional set of data
+ * appended to the request. Their interpretation depends on the CA policy.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1235,7 +1241,7 @@ gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq, unsigned int *bits)
 /**
  * gnutls_x509_crq_get_attribute_info:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @indx: Specifies which attribute OID to send. Use (0) to get the first one.
+ * @indx: Specifies which attribute number to get. Use (0) to get the first one.
  * @oid: a pointer to a structure to hold the OID
  * @sizeof_oid: initially holds the maximum size of @oid, on return
  *   holds actual size of @oid.
@@ -1292,7 +1298,7 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t crq, int indx,
 /**
  * gnutls_x509_crq_get_attribute_data:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @indx: Specifies which attribute OID to send. Use (0) to get the first one.
+ * @indx: Specifies which attribute number to get. Use (0) to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
  * @sizeof_data: initially holds the size of @oid
  *
@@ -1346,7 +1352,7 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t crq, int indx,
 /**
  * gnutls_x509_crq_get_extension_info:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @indx: Specifies which extension OID to send. Use (0) to get the first one.
+ * @indx: Specifies which extension number to get. Use (0) to get the first one.
  * @oid: a pointer to a structure to hold the OID
  * @sizeof_oid: initially holds the maximum size of @oid, on return
  *   holds actual size of @oid.
@@ -1478,7 +1484,7 @@ out:
 /**
  * gnutls_x509_crq_get_extension_data:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @indx: Specifies which extension OID to send. Use (0) to get the first one.
+ * @indx: Specifies which extension number to get. Use (0) to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
  * @sizeof_data: initially holds the size of @oid
  *
@@ -1856,9 +1862,9 @@ gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t crq,
 /**
  * gnutls_x509_crq_get_extension_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @oid: holds an Object Identified in null terminated string
+ * @oid: holds an Object Identifier in a null terminated string
  * @indx: In case multiple same OIDs exist in the extensions, this
- *   specifies which to send. Use (0) to get the first one.
+ *   specifies which to get. Use (0) to get the first one.
  * @buf: a pointer to a structure to hold the name (may be null)
  * @sizeof_buf: initially holds the size of @buf
  * @critical: will be non-zero if the extension is marked as critical
