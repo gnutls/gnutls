@@ -440,10 +440,10 @@ ciphertext_to_compressed (gnutls_session_t session,
                           uint64* sequence)
 {
   uint8_t tag[MAX_HASH_SIZE];
-  uint8_t pad;
+  unsigned int pad, i;
   int length, length_to_decrypt;
   uint16_t blocksize;
-  int ret, i, pad_failed = 0;
+  int ret, pad_failed = 0;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   unsigned int preamble_size;
   unsigned int ver = gnutls_protocol_get_version (session);
@@ -540,7 +540,7 @@ ciphertext_to_compressed (gnutls_session_t session,
       pad = ciphertext->data[ciphertext->size - 1] + 1;   /* pad */
 
 
-      if ((int) pad > (int) ciphertext->size - tag_size)
+      if (pad > (int) ciphertext->size - tag_size)
         {
           gnutls_assert ();
           _gnutls_record_log
@@ -558,7 +558,7 @@ ciphertext_to_compressed (gnutls_session_t session,
       /* Check the pading bytes (TLS 1.x)
        */
       if (ver != GNUTLS_SSL3)
-        for (i = 2; i < pad; i++)
+        for (i = 2; i <= pad; i++)
           {
             if (ciphertext->data[ciphertext->size - i] !=
                 ciphertext->data[ciphertext->size - 1])
