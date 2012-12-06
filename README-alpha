@@ -50,7 +50,7 @@ apt-get install automake autogen nettle-dev libp11-kit-dev
 
 To download the version controlled sources:
 
-$ git clone git://git.savannah.gnu.org/gnutls.git
+$ git clone git://repo.or.cz/gnutls.git
 $ cd gnutls
 
 The next step is to run autoreconf (etc) and then ./configure:

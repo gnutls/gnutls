@@ -119,8 +119,7 @@ configuration to reproduce a scenario.  Notifying the developers about a
 possible bug will greatly help the project.  
 
 If you believe you have found a bug, please report it to bug-gnutls@gnu.org
-together with any applicable information.  A web interface for the system
-is available at http://savannah.gnu.org/support/?group=gnutls.
+together with any applicable information. 
 
 Applicable information would include why the issue is a GnuTLS bug (if
 not readily apparent), output from 'uname -a', the version of the library or
