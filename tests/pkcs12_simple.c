@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012 Nikos Mavrogiannopoulos
  *
  * Author: Simon Josefsson
  *
