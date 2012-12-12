@@ -37,7 +37,6 @@ LDADD = ../../lib/libgnutls.la \
 	$(LTLIBGCRYPT)	\
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
-noinst_LTLIBRARIES = libecore.la
 
 libecore_la_CPPFLAGS = -I$(top_srcdir)/tests/suite/ecore/		\
 	-I$(top_srcdir)/tests/suite/ecore/src/include			\
@@ -81,11 +80,20 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 	ecore/src/lib/eina_unicode.c ecore/src/lib/eina_ustrbuf.c	\
 	ecore/src/lib/eina_ustringshare.c ecore/src/lib/eina_value.c
 
+
+
+nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom
+
+TESTS = eagain testsrn testcompat chain invalid-cert
+
+if !MACOSX
+noinst_LTLIBRARIES = libecore.la
+
 eagain_cli_LDADD = libecore.la -lrt -lm -ldl -lpthread $(LDADD)
 nodist_eagain_cli_SOURCES = mini-eagain2.c
 
 noinst_PROGRAMS = eagain-cli
 
-nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom
+TESTS += eagain-cli
+endif
 
-TESTS = eagain testsrn testcompat chain invalid-cert
