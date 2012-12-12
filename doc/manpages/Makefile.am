@@ -907,7 +907,7 @@ compare-makefile:
 	diff -u $(srcdir)/Makefile.am tmp-$@
 
 stamp_mans: $(HEADER_FILES)
-	@echo -n "Creating man pages for gnutls.h..." && \
+	@echo $(ECHO_N) "Creating man pages for gnutls.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/gnutls.h.in`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -918,10 +918,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for compat.h..." && \
+	@echo $(ECHO_N) "Creating man pages for compat.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/compat.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -932,10 +932,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for dane.h..." && \
+	@echo $(ECHO_N) "Creating man pages for dane.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/libdane/includes/gnutls/dane.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -946,10 +946,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for x509.h..." && \
+	@echo $(ECHO_N) "Creating man pages for x509.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/x509.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -960,10 +960,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for ocsp.h..." && \
+	@echo $(ECHO_N) "Creating man pages for ocsp.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/ocsp.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -974,10 +974,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for abstract.h..." && \
+	@echo $(ECHO_N) "Creating man pages for abstract.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/abstract.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -988,10 +988,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for pkcs12.h..." && \
+	@echo $(ECHO_N) "Creating man pages for pkcs12.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs12.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -1002,10 +1002,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for pkcs11.h..." && \
+	@echo $(ECHO_N) "Creating man pages for pkcs11.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs11.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -1016,10 +1016,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for dtls.h..." && \
+	@echo $(ECHO_N) "Creating man pages for dtls.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/dtls.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -1030,10 +1030,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for openpgp.h..." && \
+	@echo $(ECHO_N) "Creating man pages for openpgp.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/openpgp.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -1044,10 +1044,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for crypto.h..." && \
+	@echo $(ECHO_N) "Creating man pages for crypto.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/crypto.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -1058,10 +1058,10 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
-	@echo -n "Creating man pages for tpm.h..." && \
+	@echo $(ECHO_N) "Creating man pages for tpm.h..." && \
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/tpm.h`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
@@ -1072,7 +1072,7 @@ stamp_mans: $(HEADER_FILES)
 			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo -n "."; \
+		echo $(ECHO_N) "."; \
 	done
 	@echo ""
 	echo $@ > $@

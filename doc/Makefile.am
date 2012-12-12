@@ -214,7 +214,7 @@ MAINTAINERCLEANFILES += gnutls-api.texi x509-api.texi pgp-api.texi	\
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/gnutls.h.in|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -225,7 +225,7 @@ gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$^|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -236,7 +236,7 @@ dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/x509.h|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -247,7 +247,7 @@ x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/openpgp.h|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -259,7 +259,7 @@ pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
 pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs12.h|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -270,7 +270,7 @@ pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs11.h|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -281,7 +281,7 @@ pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
 tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/tpm.h|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -292,7 +292,7 @@ tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
 abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/abstract.h|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -303,7 +303,7 @@ abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h
 compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/compat.h|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -314,7 +314,7 @@ compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h
 dtls-api.texi: $(top_srcdir)/lib/includes/gnutls/dtls.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/dtls.h|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -325,7 +325,7 @@ dtls-api.texi: $(top_srcdir)/lib/includes/gnutls/dtls.h
 crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/crypto.h|sort|uniq`; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -336,7 +336,7 @@ crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 ocsp-api.texi: $(top_srcdir)/lib/includes/gnutls/ocsp.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/ocsp.h|sort|uniq`; do \
-		echo -n "Creating documentation for file $$i... " && \
+		echo $(ECHO_N) "Creating documentation for file $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -385,7 +385,7 @@ alerts.texi: $(top_srcdir)/lib/gnutls_alert.c $(srcdir)/alert-printlist.c
 enums.texi: $(HEADER_FILES)
 	echo "" > $@-tmp
 	for i in $^; do \
-		echo -n "Creating documentation for $$i... " && \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
 		echo "ok"; \
 	done
