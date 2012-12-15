@@ -57,7 +57,8 @@ flag = {
     name      = generate-request;
     value     = q;
     descrip   = "Generate a PKCS #10 certificate request";
-    doc = "";
+    flags_cant = infile;
+    doc = "Will generate a PKCS #10 certificate request. To specify a private key use --load-privkey.";
 };
 
 flag = {
