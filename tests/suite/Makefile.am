@@ -94,6 +94,6 @@ nodist_eagain_cli_SOURCES = mini-eagain2.c
 
 noinst_PROGRAMS = eagain-cli
 
-TESTS += eagain-cli
+TESTS += eagain
 endif
 
