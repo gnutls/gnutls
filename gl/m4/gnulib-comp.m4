@@ -1285,6 +1285,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/listen.c
   lib/lseek.c
   lib/malloc.c
+  lib/math.c
   lib/math.in.h
   lib/memchr.c
   lib/memchr.valgrind
@@ -1338,6 +1339,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/stddef.in.h
   lib/stdint.in.h
   lib/stdio-impl.h
+  lib/stdio.c
   lib/stdio.in.h
   lib/stdlib.in.h
   lib/str-two-way.h
@@ -1357,6 +1359,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/strtok_r.c
   lib/strverscmp.c
   lib/sys_select.in.h
+  lib/sys_socket.c
   lib/sys_socket.in.h
   lib/sys_stat.in.h
   lib/sys_time.in.h
@@ -1369,6 +1372,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/timespec.h
   lib/u64.c
   lib/u64.h
+  lib/unistd.c
   lib/unistd.in.h
   lib/unistr.in.h
   lib/unistr/u8-mbtoucr.c

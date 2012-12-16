@@ -793,6 +793,7 @@ EXTRA_libgnu_la_SOURCES += malloc.c
 ## begin gnulib module math
 
 BUILT_SOURCES += math.h
+libgnu_la_SOURCES += math.c
 
 # We need the following in order to create <math.h> when the system
 # doesn't have one that works with the given compiler.
@@ -1691,6 +1692,7 @@ EXTRA_DIST += stdint.in.h
 ## begin gnulib module stdio
 
 BUILT_SOURCES += stdio.h
+libgnu_la_SOURCES += stdio.c
 
 # We need the following in order to create <stdio.h> when the system
 # doesn't have one that works with the given compiler.
@@ -2166,6 +2168,7 @@ EXTRA_DIST += sys_select.in.h
 ## begin gnulib module sys_socket
 
 BUILT_SOURCES += sys/socket.h
+libgnu_la_SOURCES += sys_socket.c
 
 # We need the following in order to create <sys/socket.h> when the system
 # doesn't have one that works with the given compiler.
@@ -2468,6 +2471,7 @@ EXTRA_DIST += u64.h
 ## begin gnulib module unistd
 
 BUILT_SOURCES += unistd.h
+libgnu_la_SOURCES += unistd.c
 
 # We need the following in order to create an empty placeholder for
 # <unistd.h> when the system doesn't have one.
