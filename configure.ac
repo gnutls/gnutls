@@ -628,7 +628,7 @@ AC_MSG_NOTICE([summary of build options:
   Valgrind:         $opt_valgrind_tests ${VALGRIND}
 ])
 
-AC_MSG_NOTICE([Hardware acceleration/support:
+AC_MSG_NOTICE([External hardware support:
 
   /dev/crypto:      $enable_cryptodev
   Hardware accel:   $hw_accel
