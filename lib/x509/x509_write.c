@@ -932,9 +932,11 @@ gnutls_x509_crt_set_expiration_time (gnutls_x509_crt_t cert, time_t exp_time)
  * @serial_size: Holds the size of the serial field.
  *
  * This function will set the X.509 certificate's serial number.
- * Serial is not always a 32 or 64bit number.  Some CAs use large
- * serial numbers, thus it may be wise to handle it as something
- * uint8_t.
+ * While the serial number is an integer, it is often handled
+ * as an opaque field by several CAs. For this reason this function
+ * accepts any kind of data as a serial number. To be consistent
+ * with the X.509/PKIX specifications the provided @serial should be 
+ * a big-endian positive number (i.e. it's leftmost bit should be zero).
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
