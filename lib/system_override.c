@@ -97,7 +97,7 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
  * The callback function is used in DTLS only.
  *
  * @gnutls_pull_timeout_func is of the form,
- * ssize_t (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);
+ * int (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);
  *
  * Since: 3.0
  **/
