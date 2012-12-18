@@ -27,6 +27,6 @@ int _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
                      record_parameters_st * params);
 
 int _gnutls_decrypt (gnutls_session_t session, uint8_t * ciphertext,
-                     size_t ciphertext_size, uint8_t * data, size_t data_size,
+                     size_t ciphertext_size, gnutls_datum_t *output,
                      content_type_t type, record_parameters_st * params,
                      uint64* sequence);

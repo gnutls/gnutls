@@ -47,15 +47,13 @@ static int compressed_to_ciphertext (gnutls_session_t session,
                                    record_parameters_st * params);
 static int ciphertext_to_compressed (gnutls_session_t session,
                                    gnutls_datum_t *ciphertext, 
-                                   uint8_t * compress_data,
-                                   int compress_size,
+                                   gnutls_datum_t * compressed,
                                    uint8_t type,
                                    record_parameters_st * params, uint64* sequence);
 
 static int ciphertext_to_compressed_new (gnutls_session_t session,
                                    gnutls_datum_t *ciphertext, 
-                                   uint8_t * compress_data,
-                                   int compress_size,
+                                   gnutls_datum_t * compressed,
                                    uint8_t type,
                                    record_parameters_st * params, uint64* sequence);
 
@@ -157,15 +155,17 @@ _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
 
 /* Decrypts the given data.
  * Returns the decrypted data length.
+ *
+ * The output is preallocated with the maximum allowed data size.
  */
 int
 _gnutls_decrypt (gnutls_session_t session, uint8_t * ciphertext,
-                 size_t ciphertext_size, uint8_t * data,
-                 size_t max_data_size, content_type_t type,
+                 size_t ciphertext_size, gnutls_datum_t *output, 
+                 content_type_t type,
                  record_parameters_st * params, uint64 *sequence)
 {
   gnutls_datum_t gcipher;
-  int ret, data_size;
+  int ret;
 
   if (ciphertext_size == 0)
     return 0;
@@ -177,11 +177,11 @@ _gnutls_decrypt (gnutls_session_t session, uint8_t * ciphertext,
     {
       if (session->security_parameters.new_record_padding != 0)
         ret =
-          ciphertext_to_compressed_new (session, &gcipher, data, max_data_size,
+          ciphertext_to_compressed_new (session, &gcipher, output, 
                                         type, params, sequence);
       else
         ret =
-          ciphertext_to_compressed (session, &gcipher, data, max_data_size,
+          ciphertext_to_compressed (session, &gcipher, output,
                                     type, params, sequence);
       if (ret < 0)
         return gnutls_assert_val(ret);
@@ -190,34 +190,36 @@ _gnutls_decrypt (gnutls_session_t session, uint8_t * ciphertext,
     }
   else
     {
-      uint8_t* tmp_data;
+      gnutls_datum_t tmp;
       
-      tmp_data = gnutls_malloc(max_data_size);
-      if (tmp_data == NULL)
+      tmp.data = gnutls_malloc(output->size);
+      if (tmp.data == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
       if (session->security_parameters.new_record_padding != 0)
         ret =
-          ciphertext_to_compressed_new (session, &gcipher, tmp_data, max_data_size,
+          ciphertext_to_compressed_new (session, &gcipher, &tmp,
                                         type, params, sequence);
       else
         ret =
-          ciphertext_to_compressed (session, &gcipher, tmp_data, max_data_size,
+          ciphertext_to_compressed (session, &gcipher, &tmp, 
                                     type, params, sequence);
       if (ret < 0)
         goto leave;
       
-      data_size = ret;
+      tmp.size = ret;
         
       if (ret != 0)
         {
-          ret = _gnutls_decompress( &params->read.compression_state, tmp_data, data_size, data, max_data_size);
+          ret = _gnutls_decompress( &params->read.compression_state, 
+                                    tmp.data, tmp.size, 
+                                    output->data, output->size);
           if (ret < 0)
             goto leave;
         }
         
 leave:
-      gnutls_free(tmp_data);
+      gnutls_free(tmp.data);
       return ret;
     }
 }
@@ -623,8 +625,7 @@ compressed_to_ciphertext_new (gnutls_session_t session,
 static int
 ciphertext_to_compressed (gnutls_session_t session,
                           gnutls_datum_t *ciphertext, 
-                          uint8_t * compress_data,
-                          int compress_size,
+                          gnutls_datum_t * compressed,
                           uint8_t type, record_parameters_st * params, 
                           uint64* sequence)
 {
@@ -795,11 +796,11 @@ ciphertext_to_compressed (gnutls_session_t session,
 
   /* copy the decrypted stuff to compress_data.
    */
-  if (compress_size < length)
+  if (compressed->size < (unsigned)length)
     return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
 
-  if (compress_data != ciphertext->data)
-    memcpy (compress_data, ciphertext->data, length);
+  if (compressed->data != ciphertext->data)
+    memcpy (compressed->data, ciphertext->data, length);
 
   return length;
 }
@@ -807,8 +808,7 @@ ciphertext_to_compressed (gnutls_session_t session,
 static int
 ciphertext_to_compressed_new (gnutls_session_t session,
                               gnutls_datum_t *ciphertext, 
-                              uint8_t * compress_data,
-                              int compress_size,
+                              gnutls_datum_t * compressed,
                               uint8_t type, record_parameters_st * params, 
                               uint64* sequence)
 {
@@ -862,35 +862,14 @@ ciphertext_to_compressed_new (gnutls_session_t session,
   
           length_to_decrypt = ciphertext->size;
         }
-
-      length = ciphertext->size - tag_size;
-
-      /* Pass the type, version, length and compressed through
-       * MAC.
-       */
-      preamble_size =
-        make_preamble (UINT64DATA(*sequence), type,
-                       length, ver, preamble);
-
-      ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-
-      if ((ret =
-           _gnutls_auth_cipher_decrypt2 (&params->read.cipher_state,
-             ciphertext->data, length_to_decrypt,
-             ciphertext->data, ciphertext->size)) < 0)
-        return gnutls_assert_val(ret);
-
-      pad = _gnutls_read_uint16(ciphertext->data);
-
       break;
     case CIPHER_BLOCK:
       if (ciphertext->size < blocksize || (ciphertext->size % blocksize != 0))
         return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-      /* ignore the IV in TLS 1.1+
-       */
+      if (ciphertext->size < tag_size)
+        return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
       if (explicit_iv)
         {
           _gnutls_auth_cipher_setiv(&params->read.cipher_state,
@@ -899,44 +878,34 @@ ciphertext_to_compressed_new (gnutls_session_t session,
           ciphertext->size -= blocksize;
           ciphertext->data += blocksize;
         }
-
-      if (ciphertext->size < tag_size)
-        return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
-
-      /* we don't use the auth_cipher interface here, since
-       * TLS with block ciphers is impossible to be used under such
-       * an API. (the length of plaintext is required to calculate
-       * auth_data, but it is not available before decryption).
-       */
-      if ((ret =
-           _gnutls_cipher_decrypt (&params->read.cipher_state.cipher,
-             ciphertext->data, ciphertext->size)) < 0)
-        return gnutls_assert_val(ret);
-
-      length = ciphertext->size - tag_size;
-      pad = _gnutls_read_uint16(ciphertext->data);
-
-      /* Pass the type, version, length and compressed through
-       * MAC.
-       */
-      preamble_size =
-        make_preamble (UINT64DATA(*sequence), type,
-                       length, ver, preamble);
-      ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-
-      ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, ciphertext->data, length);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-
+      
+      length_to_decrypt = ciphertext->size;
       break;
+
     default:
       return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
     }
 
-  tag_ptr = &ciphertext->data[length];
+  length = ciphertext->size - tag_size;
 
+  preamble_size =
+    make_preamble (UINT64DATA(*sequence), type,
+                   length, ver, preamble);
+
+  ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  ret =
+       _gnutls_auth_cipher_decrypt2 (&params->read.cipher_state,
+                                     ciphertext->data, length_to_decrypt,
+                                     ciphertext->data, ciphertext->size);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  pad = _gnutls_read_uint16(ciphertext->data);
+
+  tag_ptr = &ciphertext->data[length];
   ret = _gnutls_auth_cipher_tag(&params->read.cipher_state, tag, tag_size);
   if (ret < 0)
     return gnutls_assert_val(ret);
@@ -950,13 +919,13 @@ ciphertext_to_compressed_new (gnutls_session_t session,
 
   /* copy the decrypted stuff to compress_data.
    */
-  if (compress_size < length)
+  if (compressed->size < (unsigned)length)
     return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
 
-  if (compress_data != ciphertext->data)
-    memcpy (compress_data, &ciphertext->data[2+pad], length);
+  if (compressed->data != ciphertext->data)
+    memcpy (compressed->data, &ciphertext->data[2+pad], length);
   else
-    memmove (compress_data, &ciphertext->data[2+pad], length);
+    memmove (compressed->data, &ciphertext->data[2+pad], length);
 
   return length;
 }
