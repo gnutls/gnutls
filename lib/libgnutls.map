@@ -876,6 +876,7 @@ GNUTLS_3_1_0 {
 	gnutls_x509_crt_set_policy;
 	gnutls_pubkey_import_x509_crq;
 	gnutls_pubkey_print;
+	gnutls_record_get_new_padding;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

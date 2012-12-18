@@ -2429,6 +2429,10 @@ gnutls_handshake (gnutls_session_t session)
 
   session->security_parameters.epoch_next++;
 
+  ret = _gnutls_ext_after_handshake(session);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
   return 0;
 }
 
@@ -3035,6 +3039,7 @@ _gnutls_handshake_server (gnutls_session_t session)
     default:
       break;
     }
+   
 
   return 0;
 }

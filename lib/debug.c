@@ -41,6 +41,16 @@ _gnutls_dump_mpi (const char *prefix, bigint_t a)
                      _gnutls_bin2hex (buf, n, buf_hex, sizeof (buf_hex),
                                       NULL));
 }
+
+void
+_gnutls_dump_vector (const char *prefix, const uint8_t *a, size_t a_size)
+{
+  char buf_hex[2 * a_size];
+
+  _gnutls_debug_log ("Vector: length: %d\n\t%s%s\n", (int) a_size, prefix,
+                     _gnutls_bin2hex (a, a_size, buf_hex, sizeof (buf_hex),
+                                      NULL));
+}
 #endif
 
 const char *

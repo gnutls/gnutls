@@ -900,6 +900,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   size_t gnutls_record_get_max_size (gnutls_session_t session);
   ssize_t gnutls_record_set_max_size (gnutls_session_t session, size_t size);
+  int gnutls_record_get_new_padding (gnutls_session_t session);
 
   size_t gnutls_record_check_pending (gnutls_session_t session);
 

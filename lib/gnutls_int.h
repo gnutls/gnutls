@@ -265,6 +265,7 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_SRTP = 14,
   GNUTLS_EXTENSION_HEARTBEAT = 15,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
+  GNUTLS_EXTENSION_NEW_RECORD_PADDING = 48015,  /* aka: 0xbeaf */
   GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281   /* aka: 0xff01 */
 } extensions_t;
 
@@ -507,6 +508,9 @@ typedef struct
   uint8_t session_id[TLS_MAX_SESSION_ID_SIZE];
   uint8_t session_id_size;
   time_t timestamp;
+  
+  /* if non-zero the new record padding is used */
+  unsigned int new_record_padding;
 
   /* The send size is the one requested by the programmer.
    * The recv size is the one negotiated with the peer.
@@ -603,6 +607,7 @@ struct gnutls_priority_st
   unsigned int no_extensions:1;
   unsigned int no_padding:1;
   unsigned int allow_large_records:1;
+  unsigned int new_record_padding:1;
   safe_renegotiation_t sr;
   unsigned int ssl3_record_version:1;
   unsigned int server_precedence:1;

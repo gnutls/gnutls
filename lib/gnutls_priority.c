@@ -1036,6 +1036,11 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
             {
               (*priority_cache)->server_precedence = 1;
             }
+          else if (strcasecmp (&broken_list[i][1],
+                               "NEW_RECORD_PADDING") == 0)
+            {
+              (*priority_cache)->new_record_padding = 1;
+            }
           else
             goto error;
         }

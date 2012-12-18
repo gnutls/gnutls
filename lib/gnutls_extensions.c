@@ -40,6 +40,7 @@
 #include <ext/ecc.h>
 #include <ext/status_request.h>
 #include <ext/srtp.h>
+#include <ext/new_record_padding.h>
 #include <gnutls_num.h>
 
 
@@ -339,6 +340,10 @@ _gnutls_ext_init (void)
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 
+  ret = _gnutls_ext_register (&ext_mod_new_record_padding);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
+
   ret = _gnutls_ext_register (&ext_mod_session_ticket);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
@@ -394,6 +399,26 @@ _gnutls_ext_register (extension_entry_st * mod)
 }
 
 int
+_gnutls_ext_after_handshake (gnutls_session_t session)
+{
+  unsigned int i;
+  int ret;
+
+  for (i = 0; i < extfunc_size; i++)
+    {
+      if (extfunc[i].handshake_func != NULL)
+        {
+          ret = extfunc[i].handshake_func (session);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+        }
+    }
+
+  return 0;
+}
+
+
+int
 _gnutls_ext_pack (gnutls_session_t session, gnutls_buffer_st * packed)
 {
   unsigned int i;
@@ -436,7 +461,6 @@ _gnutls_ext_pack (gnutls_session_t session, gnutls_buffer_st * packed)
   _gnutls_write_uint32 (exts, packed->data + total_exts_pos);
 
   return 0;
-
 }
 
 void

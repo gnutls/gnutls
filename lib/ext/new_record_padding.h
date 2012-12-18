@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2001-2012 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -20,7 +20,10 @@
  *
  */
 
-const char *_gnutls_packet2str (content_type_t packet);
-const char *_gnutls_handshake2str (gnutls_handshake_description_t handshake);
-void _gnutls_dump_mpi (const char *prefix, bigint_t a);
-void _gnutls_dump_vector (const char *prefix, const uint8_t *a, size_t a_size);
+#ifndef EXT_NEW_RECORD_PADDING_H
+#define EXT_NEW_RECORD_PADDING_H
+
+#include <gnutls_extensions.h>
+
+extern extension_entry_st ext_mod_new_record_padding;
+#endif

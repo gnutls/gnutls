@@ -389,10 +389,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
   if (data_size > MAX_RECORD_SEND_SIZE(session))
     {
       if (IS_DTLS(session))
-        {
-          gnutls_assert ();
-          return GNUTLS_E_LARGE_PACKET;
-        }
+        return gnutls_assert_val(GNUTLS_E_LARGE_PACKET);
+
       send_data_size = MAX_RECORD_SEND_SIZE(session);
     }
   else
@@ -415,7 +413,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
     {
       /* now proceed to packet encryption
        */
-      cipher_size = send_data_size + MAX_RECORD_OVERHEAD + CIPHER_SLACK_SIZE;
+      cipher_size = MAX_RECORD_SEND_SIZE(session) + MAX_RECORD_OVERHEAD + CIPHER_SLACK_SIZE;
       bufel = _mbuffer_alloc (cipher_size, cipher_size);
       if (bufel == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
