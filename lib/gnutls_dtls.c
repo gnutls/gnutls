@@ -619,12 +619,16 @@ int total = 0, ret, iv_size;
       total += iv_size; /* iv_size == block_size in DTLS */
 
       /* We always pad with at least one byte; never 0. */
-      total++;
+      if (session->security_parameters.new_record_padding == 0)
+        total++;
     }
   else
     {
       *blocksize = 1;
     }
+
+  if (session->security_parameters.new_record_padding != 0)
+    total += 2;
   
   if (params->mac_algorithm == GNUTLS_MAC_AEAD)
     total += _gnutls_cipher_get_tag_size(params->cipher_algorithm);
