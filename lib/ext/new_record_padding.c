@@ -56,7 +56,6 @@ new_record_padding_recv_params (gnutls_session_t session,
   ssize_t data_size = _data_size;
   extension_priv_data_t epriv;
 
-fprintf(stderr, "HERE: %d\n", __LINE__);
   if (data_size > 0)
     return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
@@ -72,10 +71,8 @@ fprintf(stderr, "HERE: %d\n", __LINE__);
     }
   else /* client */
     {
-fprintf(stderr, "HERE: %d\n", __LINE__);
       if (session->internals.priorities.new_record_padding != 0)
         {
-fprintf(stderr, "HERE: %d\n", __LINE__);
           epriv.num = 1;
           _gnutls_ext_set_session_data (session,
 				GNUTLS_EXTENSION_NEW_RECORD_PADDING,
@@ -91,14 +88,12 @@ static int new_record_padding_after_handshake(gnutls_session_t session)
   extension_priv_data_t epriv;
   int ret;
 
-fprintf(stderr, "HERE: %d\n", __LINE__);
   ret = _gnutls_ext_get_session_data (session,
 				      GNUTLS_EXTENSION_NEW_RECORD_PADDING,
 				      &epriv);
   if (ret < 0)
     return 0; /* fine */
   
-fprintf(stderr, "HERE: %d: %d\n", __LINE__, epriv.num);
   if (epriv.num != 0)
     session->security_parameters.new_record_padding = 1;
   
