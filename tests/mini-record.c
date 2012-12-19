@@ -115,6 +115,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 #define MAX_BUF 1024
 
 static int to_send = -1;
+static int mtu = 0;
 
 static ssize_t
 push (gnutls_transport_ptr_t tr, const void *data, size_t len)
@@ -137,8 +138,11 @@ uint8_t* _data = (void*)data;
     return send(fd, data, len, 0);
   else
     {
-//      _len = ((uint8_t*)data)[11] << 8 | ((uint8_t*)data)[12];
-//fprintf(stderr, "len : %d\n", (int)_len);
+#if 0
+      _len = ((uint8_t*)data)[11] << 8 | ((uint8_t*)data)[12];
+fprintf(stderr, "mtu: %d, len: %d", mtu, (int)_len);
+fprintf(stderr, " send: %d\n", (int)to_send);
+#endif
   
       _len = to_send;
       _data[11] = _len >> 8;
@@ -252,28 +256,7 @@ end:
 
 
 /* These are global */
-gnutls_anon_server_credentials_t anoncred;
-gnutls_certificate_credentials_t x509_cred;
 pid_t child;
-
-static gnutls_session_t
-initialize_tls_session (const char* prio)
-{
-  gnutls_session_t session;
-
-  gnutls_init (&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
-  gnutls_dtls_set_mtu( session, 1500);
-
-  /* avoid calling all the priority functions, since the defaults
-   * are adequate.
-   */
-  gnutls_priority_set_direct (session, prio, NULL);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-
-  return session;
-}
 
 static void terminate(void)
 {
@@ -287,6 +270,8 @@ server (int fd, const char* prio)
 int ret;
 char buffer[MAX_BUF + 1];
 gnutls_session_t session;
+gnutls_anon_server_credentials_t anoncred;
+gnutls_certificate_credentials_t x509_cred;
 
   /* this must be called once in the program
    */
@@ -305,7 +290,16 @@ gnutls_session_t session;
 
   gnutls_anon_allocate_server_credentials (&anoncred);
 
-  session = initialize_tls_session (prio);
+  gnutls_init (&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
+  gnutls_dtls_set_mtu(session, 1500);
+
+  /* avoid calling all the priority functions, since the defaults
+   * are adequate.
+   */
+  gnutls_priority_set_direct (session, prio, NULL);
+
+  gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
   gnutls_transport_set_push_function (session, push_crippled);
@@ -329,6 +323,8 @@ gnutls_session_t session;
     success ("server: TLS version is: %s\n",
              gnutls_protocol_get_name (gnutls_protocol_get_version
                                        (session)));
+  mtu = gnutls_dtls_get_mtu(session);
+  
   do
     {
       do {
@@ -401,6 +397,10 @@ static void start (const char* prio)
 #define AES_CBC_SHA256 "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 #define AES_GCM "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 
+#define NEW_AES_CBC "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL:%NEW_RECORD_PADDING"
+#define NEW_AES_CBC_SHA256 "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL:%NEW_RECORD_PADDING"
+#define NEW_AES_GCM "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL:%NEW_RECORD_PADDING"
+
 static void ch_handler(int sig)
 {
 int status;
@@ -421,6 +421,10 @@ void
 doit (void)
 {
   signal(SIGCHLD, ch_handler);
+
+  start(NEW_AES_CBC);
+  start(NEW_AES_CBC_SHA256);
+  start(NEW_AES_GCM);
 
   start(AES_CBC);
   start(AES_CBC_SHA256);
