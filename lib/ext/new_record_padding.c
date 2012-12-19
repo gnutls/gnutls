@@ -131,14 +131,14 @@ int ret;
 
 
 /**
- * gnutls_record_get_new_padding:
+ * gnutls_record_get_random_padding_status:
  * @session: is a #gnutls_session_t structure.
  *
  * Returns: non-zero if the new padding scheme is enabled.
  *
  **/
 int
-gnutls_record_get_new_padding (gnutls_session_t session)
+gnutls_record_get_random_padding_status (gnutls_session_t session)
 {
   return session->security_parameters.new_record_padding;
 }

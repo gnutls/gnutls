@@ -1002,6 +1002,11 @@ This is the default.
 @item %LATEST_RECORD_VERSION @tab
 will use the latest TLS version record version in client hello.
 
+@item %RANDOM_PADDING @tab
+will use random padding to all sent TLS records. This is negotiated
+using an extension. Use @funcref{gnutls_record_get_random_padding_status}
+to check whether this has been negotiated in the current session.
+
 @end multitable
 @caption{Special priority string keywords.}
 @end float
