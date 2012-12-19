@@ -838,7 +838,7 @@ ciphertext_to_compressed_new (gnutls_session_t session,
           if (params->read.IV.data == NULL || params->read.IV.size != 4)
             return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
           
-          if (ciphertext->size < tag_size+AEAD_EXPLICIT_DATA_SIZE)
+          if (ciphertext->size < tag_size+AEAD_EXPLICIT_DATA_SIZE + 2)
             return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
           memcpy(nonce, params->read.IV.data, AEAD_IMPLICIT_DATA_SIZE);
@@ -863,9 +863,6 @@ ciphertext_to_compressed_new (gnutls_session_t session,
       if (ciphertext->size < blocksize || (ciphertext->size % blocksize != 0))
         return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-      if (ciphertext->size < tag_size)
-        return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
-
       if (explicit_iv)
         {
           _gnutls_auth_cipher_setiv(&params->read.cipher_state,
@@ -874,6 +871,9 @@ ciphertext_to_compressed_new (gnutls_session_t session,
           ciphertext->size -= blocksize;
           ciphertext->data += blocksize;
         }
+
+      if (ciphertext->size < tag_size + 2)
+        return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
       
       length_to_decrypt = ciphertext->size;
       break;

@@ -413,8 +413,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
     {
       /* now proceed to packet encryption
        */
-      cipher_size = MAX_RECORD_SEND_SIZE(session) + CIPHER_SLACK_SIZE;
-      bufel = _mbuffer_alloc (cipher_size, cipher_size);
+      cipher_size = MAX_RECORD_SEND_SIZE(session);
+      bufel = _mbuffer_alloc (0, cipher_size+CIPHER_SLACK_SIZE);
       if (bufel == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -881,8 +881,9 @@ gnutls_datum_t raw; /* raw headers */
    */
   record->header_size = record->packet_size = RECORD_HEADER_SIZE(session);
 
-  if ((ret =
-       _gnutls_io_read_buffered (session, record->header_size, -1, ms)) != record->header_size)
+  ret =
+       _gnutls_io_read_buffered (session, record->header_size, -1, ms);
+  if (ret != record->header_size)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
         return ret;
