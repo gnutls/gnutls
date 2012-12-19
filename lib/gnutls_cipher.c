@@ -189,7 +189,8 @@ _gnutls_decrypt (gnutls_session_t session,
     {
       gnutls_datum_t tmp;
       
-      tmp.data = gnutls_malloc(output->size);
+      tmp.size = output->size;
+      tmp.data = gnutls_malloc(tmp.size);
       if (tmp.data == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
