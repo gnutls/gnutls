@@ -964,7 +964,7 @@ _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
                          gnutls_handshake_description_t htype, unsigned int ms)
 {
   uint64 *packet_sequence;
-  uint8_t *ciphertext;
+  gnutls_datum_t ciphertext;
   mbuffer_st* bufel = NULL, *decrypted = NULL;
   gnutls_datum_t t;
   int ret;
@@ -1047,14 +1047,15 @@ begin:
   if (decrypted == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-  ciphertext = (uint8_t*)_mbuffer_get_udata_ptr(bufel) + record.header_size;
+  ciphertext.data = (uint8_t*)_mbuffer_get_udata_ptr(bufel) + record.header_size;
+  ciphertext.size = record.length;
 
   /* decrypt the data we got. 
    */
   t.data = _mbuffer_get_udata_ptr(decrypted);
   t.size = _mbuffer_get_udata_size(decrypted);
   ret =
-    _gnutls_decrypt (session, ciphertext, record.length, &t,
+    _gnutls_decrypt (session, &ciphertext, &t,
 		     record.type, record_params, packet_sequence);
   if (ret >= 0) _mbuffer_set_udata_size(decrypted, ret);
 
