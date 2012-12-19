@@ -134,7 +134,7 @@ _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
   else
     ret = compressed_to_ciphertext (session, &ciphertext[headers_size],
                                     ciphertext_size - headers_size,
-                                     &comp, type, params);
+                                    &comp, type, params);
 
   if (free_comp)
     gnutls_free(comp.data);
@@ -489,9 +489,9 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  /* We don't use long padding if requested or if we are in DTLS.
+  /* We don't use long padding if requested.
    */
-  if (session->internals.priorities.no_padding == 0 && !IS_DTLS(session))
+  if (session->internals.priorities.no_padding == 0)
     memcpy(&pad, &nonce[blocksize], 2);
 
   /* cipher_data points to the start of data to be encrypted */

@@ -175,7 +175,8 @@ typedef enum transport_t
 #define RECORD_HEADER_SIZE(session) (IS_DTLS(session) ? DTLS_RECORD_HEADER_SIZE : TLS_RECORD_HEADER_SIZE)
 #define MAX_RECORD_HEADER_SIZE DTLS_RECORD_HEADER_SIZE
 
-#define MAX_RECORD_SEND_SIZE(session) (IS_DTLS(session)?((size_t)gnutls_dtls_get_data_mtu(session)):(size_t)session->security_parameters.max_record_send_size)
+#define MAX_USER_SEND_SIZE(session) (IS_DTLS(session)?((size_t)gnutls_dtls_get_data_mtu(session)):(size_t)session->security_parameters.max_record_send_size)
+#define MAX_RECORD_SEND_SIZE(session) (IS_DTLS(session)?((size_t)gnutls_dtls_get_mtu(session)):(size_t)session->security_parameters.max_record_send_size+MAX_RECORD_OVERHEAD)
 #define MAX_RECORD_RECV_SIZE(session) ((size_t)session->security_parameters.max_record_recv_size)
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
