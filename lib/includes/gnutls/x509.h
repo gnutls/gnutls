@@ -655,10 +655,10 @@ extern "C"
  *   unless you know what this means.
  * @GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS: If set a signer in the trusted
  *   list is never checked for expiration or activation.
- * @GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT: Allow trusted CA certiﬁcates
+ * @GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT: Allow trusted CA certificates
  *   with version 1. This is safer than %GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT,
  *   and should be used instead. That way only signers in your trusted list
- *   will be allowed to have certiﬁcates of version 1. This is the default.
+ *   will be allowed to have certificates of version 1. This is the default.
  * @GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT: Do not allow trusted CA
  *   certificates that have version 1.  This option is to be used
  *   to deprecate all certificates of version 1.
