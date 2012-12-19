@@ -208,12 +208,14 @@ _gnutls_srtp_recv_params (gnutls_session_t session,
         return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
     }
 
+  priv->selected_profile = 0;
+
   while (len > 0)
     {
       DECR_LEN (data_size, 2);
       profile = _gnutls_read_uint16 (p);
 
-      for (i = 0; i < priv->profiles_size;i++)
+      for (i = 0; i < priv->profiles_size && priv->selected_profile == 0; i++)
         {
           if (priv->profiles[i] == profile)
             {
