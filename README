@@ -4,7 +4,7 @@ See the end of this document for copying conditions.
 
 GnuTLS implements the TLS/SSL (Transport Layer Security aka Secure
 Sockets Layer) protocol.  GnuTLS is a GNU project.  Additional
-information can be found at <http://www.gnu.org/software/gnutls/>
+information can be found at <http://www.gnutls.org/>
 and <http://www.gnutls.org/>.
 
 
@@ -14,7 +14,7 @@ This README is targeted for users of the library who build from
 sources but do not necessarily develop.  If you are interested
 in developing and contributing to the GnuTLS project, please
 see README-alpha and visit
-http://www.gnu.org/software/gnutls/manual/html_node/Contributing.html.
+http://www.gnutls.org/manual/html_node/Contributing.html.
 
 
 COMPILATION
@@ -32,8 +32,17 @@ The commands above build and install the static archive (libgnutls.a),
 the shared object (libgnutls.so), and additional binaries such as certtool 
 and gnutls-cli.
 
-The library depends on libnettle. Optionally it may use the 
-following libraries:
+The library depends on libnettle and gmplib. 
+ * gmplib: for big number arithmetic
+     http://gmplib.org/
+ * nettle: for cryptographic algorithms
+     http://www.lysator.liu.se/~nisse/nettle/
+
+Versions 2.10.3 and prior used libgcrypt as the default cryptographic library.
+
+Optionally it may use the following libraries:
+ * libtasn1: For ASN.1 parsing (a copy is included, if not found)
+     http://www.gnu.org/software/libtasn1/
  * p11-kit: for smart card support
      http://p11-glue.freedesktop.org/p11-kit.html
  * libtspi: for Trusted Platform Module (TPM) support, 
@@ -42,12 +51,6 @@ following libraries:
      http://unbound.net/
  * libz: For compression support.
      http://www.zlib.net/
- * libtasn1: For ASN.1 parsing (a copy is included, if not found)
-     http://www.gnu.org/software/libtasn1/
-
-Versions 2.10.3 and prior used libgcrypt as the default cryptographic library.
-Nettle can be found at http://www.gnu.org/software/nettle/, while
-p11-kit can be found at <http://p11-glue.freedesktop.org/p11-kit.html>.
 
 To configure libnettle for installation and use by GnuTLS, a typical
 command sequence would be:
@@ -72,13 +75,13 @@ and zlib, may be required.
 DOCUMENTATION
 -------------
 See the documentation in doc/ and online at
-http://www.gnu.org/software/gnutls/manual.
+http://www.gnutls.org/manual.
 
 
 EXAMPLES
 --------
 See the examples in doc/examples/ and online at 'How To Use GnuTLS in
-Applications' at http://www.gnu.org/software/gnutls/manual.
+Applications' at http://www.gnutls.org/manual.
 
 
 SECURITY ADVISORIES
@@ -87,13 +90,13 @@ The project collects and publishes information on past security
 incidents and vulnerabilities.  Open information exchange, including
 information which is [sometimes] suppressed in non-open or non-free
 projects, is one of the goals of the GnuTLS project.  Please visit
-http://www.gnu.org/software/gnutls/security.html.
+http://www.gnutls.org/security.html.
 
 
 MAILING LISTS
 -------------
 The GnuTLS project maintains mailing lists for users, developers, and
-commits.  Please see http://www.gnu.org/software/gnutls/lists.html.
+commits.  Please see http://www.gnutls.org/lists.html.
 
 
 LICENSING
