@@ -517,7 +517,7 @@ gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
  * created key.
  * @key_size: The number of bytes of the key.
  *
- * Generates a random key of @key_bytes size.
+ * Generates a random key of @key_size bytes.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  * error code.
