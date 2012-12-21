@@ -29,31 +29,6 @@
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
 
-/* These are global */
-gnutls_srp_server_credentials_t srp_cred;
-gnutls_certificate_credentials_t cert_cred;
-
-static gnutls_session_t
-initialize_tls_session (void)
-{
-  gnutls_session_t session;
-
-  gnutls_init (&session, GNUTLS_SERVER);
-
-  gnutls_priority_set_direct (session, "NORMAL:-KX-ALL:+SRP:+SRP-DSS:+SRP-RSA", NULL);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);
-  /* for the certificate authenticated ciphersuites.
-   */
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
-
-  /* request client certificate if any.
-   */
-  gnutls_certificate_server_set_request (session, GNUTLS_CERT_IGNORE);
-
-  return session;
-}
-
 int
 main (void)
 {
@@ -64,6 +39,8 @@ main (void)
   socklen_t client_len;
   char topbuf[512];
   gnutls_session_t session;
+  gnutls_srp_server_credentials_t srp_cred;
+  gnutls_certificate_credentials_t cert_cred;
   char buffer[MAX_BUF + 1];
   int optval = 1;
   char name[256];
@@ -107,7 +84,17 @@ main (void)
   client_len = sizeof (sa_cli);
   for (;;)
     {
-      session = initialize_tls_session ();
+      gnutls_init (&session, GNUTLS_SERVER);
+      gnutls_priority_set_direct (session, 
+        "NORMAL:-KX-ALL:+SRP:+SRP-DSS:+SRP-RSA", NULL);
+      gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);
+      /* for the certificate authenticated ciphersuites.
+       */
+      gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
+
+      /* request client certificate if any.
+       */
+      gnutls_certificate_server_set_request (session, GNUTLS_CERT_IGNORE);
 
       sd = accept (listen_sd, (struct sockaddr *) & sa_cli, &client_len);
 

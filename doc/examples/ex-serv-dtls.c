@@ -45,7 +45,6 @@ static ssize_t pull_func (gnutls_transport_ptr_t p, void *data, size_t size);
 static const char *human_addr (const struct sockaddr *sa, socklen_t salen,
                                char *buf, size_t buflen);
 static int wait_for_connection (int fd);
-static gnutls_session_t initialize_tls_session (void);
 static int generate_dh_params (void);
 
 /* Use global credentials and parameters to simplify
@@ -173,7 +172,10 @@ main (void)
       else
         continue;
 
-      session = initialize_tls_session ();
+      gnutls_init (&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
+      gnutls_priority_set (session, priority_cache);
+      gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+
       gnutls_dtls_prestate_set (session, &prestate);
       gnutls_dtls_set_mtu (session, mtu);
 
@@ -409,24 +411,11 @@ human_addr (const struct sockaddr *sa, socklen_t salen,
   return save_buf;
 }
 
-static gnutls_session_t
-initialize_tls_session (void)
-{
-  gnutls_session_t session;
-
-  gnutls_init (&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-
-  gnutls_priority_set (session, priority_cache);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-
-  return session;
-}
-
 static int
 generate_dh_params (void)
 {
-  int bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LOW);
+  int bits = 
+    gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
 
   /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. When short bit length is used, it might

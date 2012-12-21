@@ -30,29 +30,6 @@
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_credentials_t x509_cred;
-gnutls_psk_server_credentials_t psk_cred;
-gnutls_priority_t priority_cache;
-
-static gnutls_session_t
-initialize_tls_session (void)
-{
-  gnutls_session_t session;
-
-  gnutls_init (&session, GNUTLS_SERVER);
-
-  gnutls_priority_set (session, priority_cache);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-  gnutls_credentials_set (session, GNUTLS_CRD_PSK, psk_cred);
-
-  /* request client certificate if any.
-   */
-  gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
-
-  return session;
-}
-
 static gnutls_dh_params_t dh_params;
 
 static int
@@ -95,6 +72,9 @@ main (void)
   socklen_t client_len;
   char topbuf[512];
   gnutls_session_t session;
+  gnutls_certificate_credentials_t x509_cred;
+  gnutls_psk_server_credentials_t psk_cred;
+  gnutls_priority_t priority_cache;
   char buffer[MAX_BUF + 1];
   int optval = 1;
   int kx;
@@ -145,7 +125,14 @@ main (void)
   client_len = sizeof (sa_cli);
   for (;;)
     {
-      session = initialize_tls_session ();
+      gnutls_init (&session, GNUTLS_SERVER);
+      gnutls_priority_set (session, priority_cache);
+      gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+      gnutls_credentials_set (session, GNUTLS_CRD_PSK, psk_cred);
+
+      /* request client certificate if any.
+       */
+      gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
 
       sd = accept (listen_sd, (struct sockaddr *) & sa_cli, &client_len);
 

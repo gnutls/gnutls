@@ -27,34 +27,13 @@
 #define PORT 5556               /* listen to 5556 port */
 
 /* These are global */
-gnutls_certificate_credentials_t x509_cred;
-gnutls_priority_t priority_cache;
-
-static gnutls_session_t
-initialize_tls_session (void)
-{
-  gnutls_session_t session;
-
-  gnutls_init (&session, GNUTLS_SERVER);
-
-  gnutls_priority_set (session, priority_cache);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-
-  /* We don't request any certificate from the client.
-   * If we did we would need to verify it.
-   */
-  gnutls_certificate_server_set_request (session, GNUTLS_CERT_IGNORE);
-
-  return session;
-}
-
 static gnutls_dh_params_t dh_params;
 
 static int
 generate_dh_params (void)
 {
-  int bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LOW);
+  unsigned int bits = 
+    gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
 
   /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. When short bit length is used, it might
@@ -71,6 +50,8 @@ main (void)
 {
   int listen_sd;
   int sd, ret;
+  gnutls_certificate_credentials_t x509_cred;
+  gnutls_priority_t priority_cache;
   struct sockaddr_in sa_serv;
   struct sockaddr_in sa_cli;
   socklen_t client_len;
@@ -127,7 +108,13 @@ main (void)
   client_len = sizeof (sa_cli);
   for (;;)
     {
-      session = initialize_tls_session ();
+      gnutls_init (&session, GNUTLS_SERVER);
+      gnutls_priority_set (session, priority_cache);
+      gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+      /* We don't request any certificate from the client.
+       * If we did we would need to verify it.
+       */
+      gnutls_certificate_server_set_request (session, GNUTLS_CERT_IGNORE);
 
       sd = accept (listen_sd, (struct sockaddr *) & sa_cli, &client_len);
 

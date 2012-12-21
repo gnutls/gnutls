@@ -22,40 +22,22 @@
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
-#define DH_BITS 1024
 
 /* These are global */
-gnutls_anon_server_credentials_t anoncred;
-
-static gnutls_session_t
-initialize_tls_session (void)
-{
-  gnutls_session_t session;
-
-  gnutls_init (&session, GNUTLS_SERVER);
-
-  gnutls_priority_set_direct (session, "NORMAL:+ANON-ECDH:+ANON-DH", NULL);
-
-  gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
-
-  gnutls_dh_set_prime_bits (session, DH_BITS);
-
-  return session;
-}
-
 static gnutls_dh_params_t dh_params;
 
 static int
 generate_dh_params (void)
 {
-
+  unsigned int bits = 
+    gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
   /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a day, once a week or once a month. Depending on the
    * security requirements.
    */
   gnutls_dh_params_init (&dh_params);
-  gnutls_dh_params_generate2 (dh_params, DH_BITS);
+  gnutls_dh_params_generate2 (dh_params, bits);
 
   return 0;
 }
@@ -70,6 +52,7 @@ main (void)
   socklen_t client_len;
   char topbuf[512];
   gnutls_session_t session;
+  gnutls_anon_server_credentials_t anoncred;
   char buffer[MAX_BUF + 1];
   int optval = 1;
 
@@ -106,7 +89,9 @@ main (void)
   client_len = sizeof (sa_cli);
   for (;;)
     {
-      session = initialize_tls_session ();
+      gnutls_init (&session, GNUTLS_SERVER);
+      gnutls_priority_set_direct (session, "NORMAL:+ANON-ECDH:+ANON-DH", NULL);
+      gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
 
       sd = accept (listen_sd, (struct sockaddr *) & sa_cli, &client_len);
 
