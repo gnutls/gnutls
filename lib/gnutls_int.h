@@ -560,6 +560,7 @@ struct record_parameters_st
 
   /* for DTLS */
   uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];
+  unsigned int record_sw_head_idx;
   unsigned int record_sw_size;
 
   record_state_st read;

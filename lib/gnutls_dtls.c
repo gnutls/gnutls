@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2009-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * Authors: Jonathan Bastien-Filiatrault
  *          Nikos Mavrogiannopoulos
@@ -435,21 +436,28 @@ int ret;
   return 0;
 }
 
-
 #define window_table rp->record_sw
 #define window_size rp->record_sw_size
+#define window_head_idx rp->record_sw_head_idx
 
-/* FIXME: could we modify that code to avoid using
- * uint64_t?
- */
-
-static void rot_window(struct record_parameters_st * rp, int places)
+static void slide_window(struct record_parameters_st * rp, unsigned int places)
 {
-  window_size -= places;
-  memmove(window_table, &window_table[places], window_size*sizeof(window_table[0]));
+unsigned int old_head = window_head_idx;
+
+  if (places < window_size)
+    {
+      window_head_idx += places;
+      window_head_idx %= DTLS_RECORD_WINDOW_SIZE;
+      
+      window_table[window_head_idx] = window_table[old_head] + places;
+    }
+  else
+    {
+      unsigned int last_idx = (window_head_idx + window_size - 1) % window_size;
+      window_table[window_head_idx] = window_table[last_idx];
+    }
 }
 
-#define MOVE_SIZE 20
 /* Checks if a sequence number is not replayed. If replayed
  * returns a negative error code, otherwise zero.
  */
@@ -457,6 +465,7 @@ int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq)
 {
 uint64_t seq = 0, diff;
 unsigned int i, offset = 0;
+unsigned int last_idx;
 
   for (i=2;i<8;i++)
     {
@@ -464,68 +473,71 @@ unsigned int i, offset = 0;
       seq |= _seq->i[i] & 0xff;
     }
 
+  /* only two values allowed in window_size */
   if (window_size == 0)
     {
       window_size = 1;
-      window_table[0] = seq;
+      window_head_idx = 0;
+      last_idx = window_size - 1;
+      window_table[last_idx] = window_table[window_head_idx] = seq;
       return 0;
     }
 
-  if (seq <= window_table[0])
+  last_idx = (window_head_idx + window_size - 1) % window_size;
+
+  if (seq <= window_table[window_head_idx])
     {
       return -1;
     }
 
-  if (window_size == DTLS_RECORD_WINDOW_SIZE) 
-    {
-      rot_window(rp, MOVE_SIZE);
-    }
-
-  if (seq < window_table[window_size-1])
+  if (seq <= window_table[last_idx])
     {
       /* is between first and last */
-      diff = window_table[window_size-1] - seq;
+      diff = window_table[last_idx] - seq;
 
       if (diff >= window_size) 
-        return -1;
-
-      offset = window_size-1-diff;
-
-      if (window_table[offset] == seq)
-        return -1;
-      else
-        window_table[offset] = seq;
-    }
-  else /* seq >= last */
-    {
-      if (seq == window_table[window_size-1]) 
         {
           return -1;
         }
 
-      diff = seq - window_table[window_size-1];
-      if (diff <= DTLS_RECORD_WINDOW_SIZE - window_size)
-        { /* fits in our empty space */
-          offset = diff + window_size-1;
+      if (diff > last_idx)
+        {
+          diff = diff - last_idx;
+          offset = window_size - 1 - diff;
+        }
+      else
+        offset = last_idx - diff;
 
-          window_table[offset] = seq;
-          window_size = offset + 1;
+      if (window_table[offset] == seq)
+        {
+          return -1;
+        }
+      else
+        window_table[offset] = seq;
+    }
+  else /* seq > last */
+    {
+      diff = seq - window_table[last_idx];
+
+      if (window_size + diff <= DTLS_RECORD_WINDOW_SIZE)
+        {
+          window_size += diff;
         }
       else
         {
-          if (diff > DTLS_RECORD_WINDOW_SIZE/2)
-            { /* difference is too big */
-              window_table[DTLS_RECORD_WINDOW_SIZE-1] = seq;
-              window_size = DTLS_RECORD_WINDOW_SIZE;
-            }
-          else
+          if (window_size < DTLS_RECORD_WINDOW_SIZE)
             {
-              rot_window(rp, diff);
-              offset = diff + window_size-1;
-              window_table[offset] = seq;
-              window_size = offset + 1;            
+              offset = DTLS_RECORD_WINDOW_SIZE-window_size;
+              window_size = DTLS_RECORD_WINDOW_SIZE;
+              diff -= offset;
             }
+          
+	  /* diff > 0 */
+          slide_window(rp, diff);
         }
+
+      offset = (window_head_idx + window_size - 1) % window_size;
+      window_table[offset] = seq;
     }
   return 0;
 }
