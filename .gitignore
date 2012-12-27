@@ -623,3 +623,5 @@ gl/tests/test-setlocale2
 gl/tests/test-u8-mbtoucr
 gl/tests/test-u8-uctomb
 tmp-compare-makefile
+tests/mini-dtls-record
+tests/mini-x509-rehandshake
