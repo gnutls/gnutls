@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1161,8 +1162,15 @@ cleanup:
   return ret;
 
 recv_error:
-  if (ret < 0 && (gnutls_error_is_fatal (ret) == 0 || ret == GNUTLS_E_TIMEDOUT))
+  if (ret < 0 && (gnutls_error_is_fatal (ret) == 0 || ret == GNUTLS_E_TIMEDOUT)
     return ret;
+
+  if (type == GNUTLS_ALERT) /* we were expecting close notify */
+    {
+      session_invalidate (session);
+      gnutls_assert ();
+      return 0;             
+    }
 
   if (IS_DTLS(session))
     {
@@ -1170,11 +1178,6 @@ recv_error:
     }
 
   session_invalidate (session);
-  if (type == GNUTLS_ALERT) /* we were expecting close notify */
-    {
-      gnutls_assert ();
-      return 0;             
-    }
   session_unresumable (session);
 
   if (ret == 0)
