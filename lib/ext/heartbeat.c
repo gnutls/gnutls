@@ -188,6 +188,12 @@ gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size,
   if (!heartbeat_allow_send (session))
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
   
+  /* resume previous call if interrupted */
+  if (session->internals.record_send_buffer.byte_length > 0 && 
+      session->internals.record_send_buffer.head != NULL && 
+      session->internals.record_send_buffer.head->type == GNUTLS_HEARTBEAT)
+    return _gnutls_io_write_flush (session);
+
   switch(session->internals.hb_state)
     {
       case SHB_SEND1:
@@ -287,6 +293,11 @@ gnutls_heartbeat_pong (gnutls_session_t session, unsigned int flags)
 {
 int ret;
 
+  if (session->internals.record_send_buffer.byte_length > 0 && 
+      session->internals.record_send_buffer.head != NULL && 
+      session->internals.record_send_buffer.head->type == GNUTLS_HEARTBEAT)
+    return _gnutls_io_write_flush (session);
+
   if (session->internals.hb_remote_data.length == 0)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
@@ -324,7 +335,7 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
 
   hb_len = _gnutls_read_uint16 (msg + 1);
   if (hb_len > len - 3)
-    return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
+    return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
   
   switch (msg[0])
     {
@@ -352,10 +363,13 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
       if (hb_len > 0 && memcmp (msg + 3, session->internals.hb_local_data.data,
                   hb_len) != 0)
         {
-          _gnutls_record_log ("REC[%p]: HB: %s - received\n", session,
+          _gnutls_record_log ("REC[%p]: unexpected HB: %s - received\n", session,
                               _gnutls_bin2hex (msg + 3, hb_len, pr,
                                                sizeof (pr), NULL));
-          return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
+          if (IS_DTLS(session))
+            return gnutls_assert_val( GNUTLS_E_AGAIN); /* ignore it */
+          else
+            return gnutls_assert_val( GNUTLS_E_UNEXPECTED_PACKET);
         }
 
       _gnutls_buffer_reset (&session->internals.hb_local_data);

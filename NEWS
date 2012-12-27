@@ -12,6 +12,9 @@ Patterson and Nadhem Alfardan.
 ** libgnutls: gnutls_x509_crt_get_policy() allows for a list of zero
 policy qualifiers.
 
+** libgnutls: Ignore heartbeat messages when received out-of-order,
+instead of issuing an error.
+
 ** libgnutls-guile: Fixed parallel compilation issue.
 
 ** gnutls-cli: It will try to connect to all possible returned addresses
