@@ -145,13 +145,16 @@ main (void)
 
       for (;;)
         {
-          memset (buffer, 0, MAX_BUF + 1);
           ret = gnutls_record_recv (session, buffer, MAX_BUF);
 
           if (ret == 0)
             {
               printf ("\n- Peer has closed the GnuTLS connection\n");
               break;
+            }
+          else if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
+            {
+              fprintf (stderr, "*** Warning: %s\n", gnutls_strerror (ret));
             }
           else if (ret < 0)
             {
@@ -163,7 +166,7 @@ main (void)
             {
               /* echo data back to the client
                */
-              gnutls_record_send (session, buffer, strlen (buffer));
+              gnutls_record_send (session, buffer, ret);
             }
         }
       printf ("\n");

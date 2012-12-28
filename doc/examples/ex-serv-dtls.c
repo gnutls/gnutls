@@ -214,17 +214,24 @@ main (void)
             }
           while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
-          if (ret < 0)
+          if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
+            {
+              fprintf (stderr, "*** Warning: %s\n", gnutls_strerror (ret));
+              continue;
+            }
+          else if (ret < 0)
             {
               fprintf (stderr, "Error in recv(): %s\n",
                        gnutls_strerror (ret));
               break;
             }
+
           if (ret == 0)
             {
               printf ("EOF\n\n");
               break;
             }
+
           buffer[ret] = 0;
           printf ("received[%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x]: %s\n",
                   sequence[0], sequence[1], sequence[2], sequence[3],

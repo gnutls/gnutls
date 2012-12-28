@@ -117,18 +117,25 @@ main (void)
           printf ("- Peer has closed the TLS connection\n");
           goto end;
         }
+      else if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
+        {
+          fprintf (stderr, "*** Warning: %s\n", gnutls_strerror (ret));
+        }
       else if (ret < 0)
         {
           fprintf (stderr, "*** Error: %s\n", gnutls_strerror (ret));
           goto end;
         }
 
-      printf ("- Received %d bytes: ", ret);
-      for (ii = 0; ii < ret; ii++)
+      if (ret > 0)
         {
-          fputc (buffer[ii], stdout);
+          printf ("- Received %d bytes: ", ret);
+          for (ii = 0; ii < ret; ii++)
+            {
+              fputc (buffer[ii], stdout);
+            }
+          fputs ("\n", stdout);
         }
-      fputs ("\n", stdout);
 
       gnutls_bye (session, GNUTLS_SHUT_RDWR);
 
