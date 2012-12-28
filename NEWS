@@ -15,6 +15,9 @@ policy qualifiers.
 ** libgnutls: Ignore heartbeat messages when received out-of-order,
 instead of issuing an error.
 
+** libgnutls: Stricter RSA PKCS #1 1.5 encoding and decoding. Reported
+by Kikuchi Masashi.
+
 ** libgnutls-guile: Fixed parallel compilation issue.
 
 ** gnutls-cli: It will try to connect to all possible returned addresses

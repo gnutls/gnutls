@@ -221,7 +221,7 @@ _wrap_nettle_pk_encrypt (gnutls_pk_algorithm_t algo,
             goto cleanup;
           }
 
-        ret = _gnutls_mpi_dprint_size (p, ciphertext, plaintext->size);
+        ret = _gnutls_mpi_dprint_size (p, ciphertext, pub.size);
         if (ret < 0)
           {
             gnutls_assert ();
@@ -266,6 +266,9 @@ _wrap_nettle_pk_decrypt (gnutls_pk_algorithm_t algo,
 
         _rsa_params_to_privkey (pk_params, &priv);
         _rsa_params_to_pubkey (pk_params, &pub);
+
+        if (ciphertext->size != pub.size)
+          return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
         if (_gnutls_mpi_scan_nz (&c, ciphertext->data, ciphertext->size) != 0)
           {
@@ -429,7 +432,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
             goto rsa_fail;
           }
 
-        ret = _gnutls_mpi_dprint (s, signature);
+        ret = _gnutls_mpi_dprint_size (s, signature, pub.size);
 
 rsa_fail:
         mpz_clear(s);
@@ -544,6 +547,9 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         struct rsa_public_key pub;
         
         _rsa_params_to_pubkey (pk_params, &pub);
+
+        if (signature->size != pub.size)
+          return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
         ret = _gnutls_mpi_scan_nz (&tmp[0], signature->data, signature->size);
         if (ret < 0)
