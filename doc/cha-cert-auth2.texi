@@ -1,5 +1,5 @@
 @node More on certificate authentication
-@chapter More on certificate authentication
+@section More on certificate authentication
 @cindex certificate authentication
 
 Certificates are not the only structures involved in a public key
@@ -18,7 +18,7 @@ structures, etc., are discussed in this chapter.
 @end menu
 
 @node PKCS 10 certificate requests
-@section @acronym{PKCS} #10 certificate requests
+@subsection @acronym{PKCS} #10 certificate requests
 @cindex certificate requests
 @cindex PKCS #10
 
@@ -53,7 +53,7 @@ which should return a signed certificate.
 @verbatiminclude examples/ex-crq.c
 
 @node PKIX certificate revocation lists
-@section PKIX certificate revocation lists
+@subsection PKIX certificate revocation lists
 @cindex certificate revocation lists
 @cindex CRL
 
@@ -102,7 +102,7 @@ The basic CRL structure functions follow.
 
 @showfuncD{gnutls_x509_crl_init,gnutls_x509_crl_import,gnutls_x509_crl_export,gnutls_x509_crl_export}
 
-@subheading Reading a CRL
+@subsubheading Reading a CRL
 
 The most important function that extracts the certificate revocation
 information from a CRL is @funcref{gnutls_x509_crl_get_crt_serial}. Other
@@ -113,7 +113,7 @@ functions that return other fields of the CRL structure are also provided.
 @showfuncE{gnutls_x509_crl_get_version,gnutls_x509_crl_get_issuer_dn,gnutls_x509_crl_get_this_update,gnutls_x509_crl_get_next_update,gnutls_x509_crl_get_crt_count}
 
 
-@subheading Generation of a CRL
+@subsubheading Generation of a CRL
 
 The following functions can be used to generate a CRL.
 
@@ -133,7 +133,7 @@ CRL number extension and the authority key identifier.
 @showfuncB{gnutls_x509_crl_set_number,gnutls_x509_crl_set_authority_key_id}
 
 @node OCSP certificate status checking
-@section @acronym{OCSP} certificate status checking
+@subsection @acronym{OCSP} certificate status checking
 @cindex certificate status
 @cindex Online Certificate Status Protocol
 @cindex OCSP
@@ -303,7 +303,7 @@ whether the received OCSP response corresponds to the certificate being checked.
 @showfuncC{gnutls_ocsp_resp_verify,gnutls_ocsp_resp_verify_direct,gnutls_ocsp_resp_check_crt}
 
 @node Managing encrypted keys
-@section Managing encrypted keys
+@subsection Managing encrypted keys
 @cindex Encrypted keys
 
 Transferring or storing private keys in plain may not be a
@@ -320,7 +320,7 @@ while the PKCS #12 method allows, in addition, the bundling of accompanying
 data into the structure. That is typically the corresponding certificate, as 
 well as a trusted CA certificate.
 
-@subheading High level functionality
+@subsubheading High level functionality
 Generic and higher level private key import functions are available, that
 import plain or encrypted keys and will auto-detect the encrypted key format.
 
@@ -328,7 +328,7 @@ import plain or encrypted keys and will auto-detect the encrypted key format.
 
 @showfuncdesc{gnutls_privkey_import_x509_raw}
 
-@subheading @acronym{PKCS} #8 structures
+@subsubheading @acronym{PKCS} #8 structures
 @cindex PKCS #8
 
 PKCS #8 keys can be imported and exported as normal private keys using
@@ -342,7 +342,7 @@ be decrypted.
 
 @showenumdesc{gnutls_pkcs_encrypt_flags_t,Encryption flags}
 
-@subheading @acronym{PKCS} #12 structures
+@subsubheading @acronym{PKCS} #12 structures
 @cindex PKCS #12
 
 A @acronym{PKCS} #12 structure @xcite{PKCS12} usually contains a user's
@@ -374,7 +374,7 @@ of their usage is also shown.
 
 @verbatiminclude examples/ex-pkcs12.c
 
-@subheading OpenSSL encrypted keys
+@subsubheading OpenSSL encrypted keys
 @cindex OpenSSL encrypted keys
 Unfortunately the structures discussed in the previous sections are
 not the only structures that may hold an encrypted private key. For example

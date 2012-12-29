@@ -80,21 +80,27 @@ invoke-certtool.texi: $(SRC_DEF_CERTTOOL)
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
-	rm -f ../src/$@
+	rm -f ../src/$@ && \
+	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
+	sed -i 's/@section/@subsection/g' ../doc/$@
 
 invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
-	rm -f ../src/$@
+	rm -f ../src/$@ && \
+	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
+	sed -i 's/@section/@subsection/g' ../doc/$@
 
 invoke-danetool.texi: $(SRC_DEF_DANETOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
-	rm -f ../src/$@
+	rm -f ../src/$@ && \
+	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
+	sed -i 's/@section/@subsection/g' ../doc/$@
 
 invoke-srptool.texi: $(SRC_DEF_SRPTOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
@@ -103,7 +109,7 @@ invoke-srptool.texi: $(SRC_DEF_SRPTOOL)
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@ && \
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
-	sed -i 's/@section/@subsection/g' ../doc/$@
+	sed -i 's/@section/@subsubsection/g' ../doc/$@
 
 invoke-psktool.texi: $(SRC_DEF_PSKTOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
@@ -112,7 +118,7 @@ invoke-psktool.texi: $(SRC_DEF_PSKTOOL)
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@ && \
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
-	sed -i 's/@section/@subsection/g' ../doc/$@
+	sed -i 's/@section/@subsubsection/g' ../doc/$@
 
 invoke-p11tool.texi: $(SRC_DEF_P11TOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
@@ -140,7 +146,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-library.texi cha-preface.texi cha-programs.texi		\
 	sec-tls-app.texi cha-errors.texi cha-support.texi		\
 	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi 	\
-	cha-tokens.texi cha-crypto.texi
+	cha-tokens.texi cha-crypto.texi cha-auth.texi
 
 gnutls_TEXINFOS += invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \

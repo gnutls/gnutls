@@ -2,6 +2,16 @@
 @chapter Authentication methods
 @cindex authentication methods
 
+@menu
+* Selecting the appropriate authentication method::
+* Certificate authentication::
+* More on certificate authentication::
+* Shared-key and anonymous authentication::
+@end menu
+
+@node Selecting the appropriate authentication method
+@section Selecting the appropriate authentication method
+
 The initial key exchange of the TLS protocol performs authentication
 of the peers. In typical scenarios the server is authenticated to
 the client, and optionally the client to the server.
@@ -12,7 +22,7 @@ including pre-shared keys, and passwords. The rest of this section
 provides some guidance on how to use the available authentication
 methods in @acronym{GnuTLS} in various scenarios.
 
-@section Two peers with an out-of-band channel
+@subsection Two peers with an out-of-band channel
 
 Let's consider two peers need to communicate over an untrusted channel
 (the Internet), but have an out-of-band channel available. The latter
@@ -41,7 +51,7 @@ bootstrapping of a user's PC in a corporate environment, in person
 communication, communication over an alternative network (e.g. the phone
 network) etc.
 
-@section Two peers without an out-of-band channel
+@subsection Two peers without an out-of-band channel
 
 When an out-of-band channel is not available the peer cannot be reliably
 authenticated. What can be done, however, is to allow some form of
@@ -59,7 +69,7 @@ authentication}).
 To mitigate the uncertainty of the information exchanged in the first 
 connection other channels over the Internet may be used (e.g., @ref{Verifying a certificate using DANE}).
 
-@section A trusted third party is available
+@subsection A trusted third party is available
 
 When a trusted third party is available the most suitable option is to use 
 certificate authentication (see @ref{Certificate authentication}). 
@@ -89,4 +99,11 @@ certificate and the server verifies that the client's public key remained
 the same (see @ref{Verifying a certificate using trust on first use
 authentication}).
 @end itemize
+
+
+@include cha-cert-auth.texi
+
+@include cha-cert-auth2.texi
+
+@include cha-shared-key.texi
 

@@ -1,5 +1,5 @@
 @node Certificate authentication
-@chapter Certificate authentication
+@section Certificate authentication
 @cindex certificate authentication
 
 The most known authentication method of @acronym{TLS} are certificates.
@@ -65,7 +65,7 @@ to use this key exchange algorithm.
 @end menu
 
 @node X.509 certificates
-@section @acronym{X.509} certificates
+@subsection @acronym{X.509} certificates
 @cindex X.509 certificates
 
 The @acronym{X.509} protocols rely on a hierarchical trust model. In
@@ -93,7 +93,7 @@ acceptable.  The framework is illustrated on @ref{fig:x509}.
 @end menu
 
 @node X.509 certificate structure
-@subsection @acronym{X.509} certificate structure
+@subsubsection @acronym{X.509} certificate structure
 
 An @acronym{X.509} certificate usually contains information about the
 certificate holder, the signer, a unique serial number, expiration
@@ -201,7 +201,7 @@ demonstrate the @acronym{X.509} parsing capabilities can be found in
 @ref{ex:x509-info}.
 
 @node Importing an X.509 certificate
-@subsection Importing an X.509 certificate
+@subsubsection Importing an X.509 certificate
 
 The certificate structure should be initialized using @funcref{gnutls_x509_crt_init}, and 
 a certificate structure can be imported using @funcref{gnutls_x509_crt_import}. 
@@ -218,7 +218,7 @@ Note that although the functions above apply to @code{gnutls_x509_crt_t} structu
 exist for the CRL structure @code{gnutls_x509_crl_t}.
 
 @node X.509 distinguished names
-@subsection X.509 distinguished names
+@subsubsection X.509 distinguished names
 @cindex X.509 distinguished name
 
 The ``subject'' of an X.509 certificate is not described by
@@ -247,7 +247,7 @@ to the contents of the distinguished name structure.
 
 
 @node X.509 public and private keys
-@subsection Accessing public and private keys
+@subsubsection Accessing public and private keys
 
 Each X.509 certificate contains a public key that corresponds to a private key. To
 get a unique identifier of the public key the @funcref{gnutls_x509_crt_get_key_id}
@@ -262,7 +262,7 @@ The private key parameters may be directly accessed by using one of the followin
 @showfuncE{gnutls_x509_privkey_get_pk_algorithm2,gnutls_x509_privkey_export_rsa_raw2,gnutls_x509_privkey_export_ecc_raw,gnutls_x509_privkey_export_dsa_raw,gnutls_x509_privkey_get_key_id}
 
 @node Verifying X.509 certificate paths
-@subsection Verifying @acronym{X.509} certificate paths
+@subsubsection Verifying @acronym{X.509} certificate paths
 @cindex verifying certificate paths
 
 Verifying certificate paths is important in @acronym{X.509}
@@ -293,7 +293,7 @@ are trusted for a particular server but not to authorize other certificates.
 This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_named_crt} and @funcref{gnutls_x509_trust_list_verify_named_crt}.
 
 @node Verifying a certificate in the context of TLS session
-@subsection Verifying a certificate in the context of TLS session
+@subsubsection Verifying a certificate in the context of TLS session
 @cindex verifying certificate paths
 @tindex gnutls_certificate_verify_flags
 
@@ -318,7 +318,7 @@ flags are part of the enumeration
 
 
 @node OpenPGP certificates
-@section @acronym{OpenPGP} certificates
+@subsection @acronym{OpenPGP} certificates
 @cindex OpenPGP certificates
 
 The @acronym{OpenPGP} key authentication relies on a distributed trust
@@ -379,7 +379,7 @@ The expiration time of the subkey.
 @end float
 
 
-@subsection @acronym{OpenPGP} certificate structure
+@subsubsection @acronym{OpenPGP} certificate structure
 
 In @acronym{GnuTLS} the @acronym{OpenPGP} certificate structures
 @xcite{RFC2440} are handled using the @code{gnutls_openpgp_crt_t} type.
@@ -421,7 +421,7 @@ The corresponding private keys are stored in the
 @code{gnutls_openpgp_privkey_t} type. All the prototypes for the key
 handling functions can be found in @file{gnutls/openpgp.h}.
 
-@subsection Verifying an @acronym{OpenPGP} certificate
+@subsubsection Verifying an @acronym{OpenPGP} certificate
 
 The verification functions of @acronym{OpenPGP} keys, included in
 @acronym{GnuTLS}, are simple ones, and do not use the features of the
@@ -444,7 +444,7 @@ of verification status flags is the same as in the @acronym{X.509} certificates
 
 @showfuncdesc{gnutls_openpgp_crt_verify_self}
 
-@subsection Verifying a certificate in the context of a TLS session
+@subsubsection Verifying a certificate in the context of a TLS session
 
 Similarly with X.509 certificates, one needs to specify
 the OpenPGP keyring file in the credentials structure. The certificates
@@ -454,7 +454,7 @@ to verify the signatures in the certificate sent by the peer.
 @showfuncdesc{gnutls_certificate_set_openpgp_keyring_file}
 
 @node Advanced certificate verification
-@section Advanced certificate verification
+@subsection Advanced certificate verification
 @cindex Certificate verification
 
 The verification of X.509 certificates in the HTTPS and other Internet protocols is typically 
@@ -466,11 +466,11 @@ other verification methods. In this section we list the available in GnuTLS meth
 
 @menu
 * Verifying a certificate using trust on first use authentication::
-* Verifying a certificate using DANE (DNSSEC)::
+* Verifying a certificate using DANE::
 @end menu
 
 @node Verifying a certificate using trust on first use authentication
-@subsection Verifying a certificate using trust on first use authentication
+@subsubsection Verifying a certificate using trust on first use authentication
 @cindex verifying certificate paths
 @cindex SSH-style authentication
 @cindex Trust on first use
@@ -491,8 +491,8 @@ shown in @ref{Simple client example with SSH-style certificate verification}.
 
 See @ref{Certificate verification} on how to use the available functionality.
 
-@node Verifying a certificate using DANE (DNSSEC)
-@subsection Verifying a certificate using DANE (DNSSEC)
+@node Verifying a certificate using DANE
+@subsubsection Verifying a certificate using DANE (DNSSEC)
 @cindex verifying certificate paths
 @cindex DANE
 @cindex DNSSEC
@@ -512,7 +512,7 @@ with GnuTLS and the function prototypes are in @code{gnutls/dane.h}.
 See @ref{Certificate verification} for information on how to use the library.
 
 @node Digital signatures
-@section Digital signatures
+@subsection Digital signatures
 @cindex digital signatures
 
 In this section we will provide some information about digital
@@ -576,7 +576,7 @@ sometime in the future, SHA-1 will be disabled as well.  The collision
 attacks on SHA-1 may also get better, given the new interest in tools
 for creating them.
 
-@subsection Trading security for interoperability
+@subsubsection Trading security for interoperability
 
 If you connect to a server and use GnuTLS' functions to verify the
 certificate chain, and get a @code{GNUTLS_CERT_INSECURE_ALGORITHM}

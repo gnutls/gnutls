@@ -150,9 +150,6 @@ Documentation License''.
 * Introduction to GnuTLS::
 * Introduction to TLS::
 * Authentication methods::
-* Certificate authentication::
-* Shared-key and anonymous authentication::
-* More on certificate authentication::
 * Hardware security modules and abstract key types::
 * How to use GnuTLS in applications::
 * GnuTLS application examples::
@@ -178,12 +175,6 @@ Documentation License''.
 @include cha-intro-tls.texi
 
 @include cha-auth.texi
-
-@include cha-cert-auth.texi
-
-@include cha-shared-key.texi
-
-@include cha-cert-auth2.texi
 
 @include cha-tokens.texi
 

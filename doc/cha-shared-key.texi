@@ -1,5 +1,5 @@
 @node Shared-key and anonymous authentication
-@chapter Shared-key and anonymous authentication
+@section Shared-key and anonymous authentication
 
 In addition to certificate authentication, the TLS protocol may be
 used with password, shared-key and anonymous authentication methods.
@@ -12,7 +12,7 @@ The rest of this chapter discusses details of these methods.
 @end menu
 
 @node SRP authentication
-@section SRP authentication
+@subsection SRP authentication
 
 @menu
 * Authentication using SRP::
@@ -20,7 +20,7 @@ The rest of this chapter discusses details of these methods.
 @end menu
 
 @node Authentication using SRP
-@subsection Authentication using @acronym{SRP}
+@subsubsection Authentication using @acronym{SRP}
 @cindex SRP authentication
 
 @acronym{GnuTLS} supports authentication via the Secure Remote Password 
@@ -78,7 +78,7 @@ authenticated using a certificate with RSA parameters.
 @include invoke-srptool.texi
 
 @node PSK authentication
-@section PSK authentication
+@subsection PSK authentication
 
 @menu
 * Authentication using PSK::
@@ -86,7 +86,7 @@ authenticated using a certificate with RSA parameters.
 @end menu
 
 @node Authentication using PSK
-@subsection Authentication using @acronym{PSK}
+@subsubsection Authentication using @acronym{PSK}
 @cindex PSK authentication
 
 Authentication using Pre-shared keys is a method to authenticate using
@@ -121,7 +121,7 @@ in @acronym{GnuTLS}.
 @include invoke-psktool.texi
 
 @node Anonymous authentication
-@section Anonymous authentication
+@subsection Anonymous authentication
 @cindex anonymous authentication
 
 The anonymous key exchange offers encryption without any
