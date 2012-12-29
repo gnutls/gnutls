@@ -56,16 +56,16 @@ authentication}).
 
 Provided that the out-of-band channel is trusted all of the above provide
 a similar level of protection. An out-of-band channel may be the initial
-bootstrapping of a user's PC in a corporate environment, in person
+bootstrapping of a user's PC in a corporate environment, in-person
 communication, communication over an alternative network (e.g. the phone
-network) etc.
+network), etc.
 
 @subsection Two peers without an out-of-band channel
 
 When an out-of-band channel is not available the peer cannot be reliably
 authenticated. What can be done, however, is to allow some form of
 registration of users connecting for the first time and ensure that their
-keys remain the same after the initial connection. This is often called
+keys remain the same after that initial connection. This is termed
 key continuity or trust on first use (TOFU).
 
 The available option is to use public key authentication (see @ref{Certificate authentication}). 
@@ -90,19 +90,21 @@ using the trusted third party's certificate.
 While the above is the typical authentication method for servers in the
 Internet by using the commercial CAs, the users that act as clients in the
 protocol rarely possess such certificates. In that case a hybrid method
-can be used where the server is authenticate by the client using the
+can be used where the server is authenticated by the client using the
 commercial CAs and the client is authenticated based on some information
 the client provided over the initial server-authenticated channel. The
 available options are:
 @itemize
 @item Passwords (see @ref{SRP authentication}). The client communicates
-to the server his username and password of choice and uses it to
-negotiate further sessions. The SRP protocol allows for the server
-to be authenticated using a certificate and the client using the
+to the server his username and password of choice on the initial
+server-authenticated connection and uses it to negotiate further sessions. 
+This is possible because the SRP protocol allows for the server to be 
+authenticated using a certificate and the client using the
 password.
 
 @item Public keys (see @ref{Certificate authentication}). The client 
-sends its public key to the server (or a fingerprint of it). 
+sends its public key to the server (or a fingerprint of it) over the
+initial server-authenticated connection. 
 On future sessions the client verifies the server using the third party
 certificate and the server verifies that the client's public key remained 
 the same (see @ref{Verifying a certificate using trust on first use
