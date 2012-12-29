@@ -149,6 +149,7 @@ Documentation License''.
 * Preface::
 * Introduction to GnuTLS::
 * Introduction to TLS::
+* Authentication methods::
 * Certificate authentication::
 * Shared-key and anonymous authentication::
 * More on certificate authentication::
@@ -175,6 +176,8 @@ Documentation License''.
 @include cha-library.texi
 
 @include cha-intro-tls.texi
+
+@include cha-auth.texi
 
 @include cha-cert-auth.texi
 
