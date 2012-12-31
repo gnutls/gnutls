@@ -208,7 +208,7 @@ _wrap_nettle_pk_encrypt (gnutls_pk_algorithm_t algo,
         mpz_powm (p, p, TOMPZ (pk_params->params[1]) /*e */ ,
                   TOMPZ (pk_params->params[0] /*m */ ));
 
-        ret = _gnutls_mpi_dprint_size (p, ciphertext, plaintext->size);
+        ret = _gnutls_mpi_dprint_size (p, ciphertext, nettle_mpz_sizeinbase_256_u(TOMPZ (pk_params->params[0])));
         _gnutls_mpi_release (&p);
 
         if (ret < 0)
@@ -487,7 +487,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         rsa_unblind (nc, ri, pk_params->params[0] /*m */ );
 
-        ret = _gnutls_mpi_dprint (nc, signature);
+        ret = _gnutls_mpi_dprint_size (nc, signature, nettle_mpz_sizeinbase_256_u(TOMPZ (pk_params->params[0])));
 
 rsa_fail:
         _gnutls_mpi_release (&nc);

@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** libgnutls: Fixed record padding parsing issue. Reported by Kenny
 Patterson and Nadhem Alfardan.
 
+** libgnutls: Stricter RSA PKCS #1 1.5 encoding. Reported
+by Kikuchi Masashi.
+
 ** libgnutls-guile: Fixed parallel compilation issue.
 
 ** API and ABI modifications:
