@@ -4,7 +4,7 @@ See the end for copying conditions.
 
 * Version 3.0.27 (unreleased)
 
-** libgnutls: Fixed record parsing issue. Reported by Kenny
+** libgnutls: Fixed record padding parsing issue. Reported by Kenny
 Patterson and Nadhem Alfardan.
 
 ** libgnutls-guile: Fixed parallel compilation issue.
