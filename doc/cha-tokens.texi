@@ -25,7 +25,7 @@ preventing their extraction.
 Since there are many forms of a public or private keys supported by @acronym{GnuTLS} such as
 @acronym{X.509}, @acronym{OpenPGP}, @acronym{PKCS} #11 or TPM it is desirable to allow common operations
 on them. For these reasons the abstract @code{gnutls_privkey_t} and @code{gnutls_pubkey_t} were
-introduced in @code{gnutls/abstract.h} header. Those types are initialized using a specific type of 
+introduced in @code{gnutls/@-abstract.h} header. Those types are initialized using a specific type of 
 key and then can be used to perform operations in an abstract way. For example in order
 to sign an X.509 certificate with a key that resides in a token the following steps must be
 used.

@@ -35,20 +35,21 @@ methods in @acronym{GnuTLS} in various scenarios.
 
 Let's consider two peers need to communicate over an untrusted channel
 (the Internet), but have an out-of-band channel available. The latter
-channel is considered safe from eavesdropping or modification and thus
-may be used for an initial bootstrapping of the protocol. The options 
+channel is considered safe from eavesdropping and message modification and thus
+can be used for an initial bootstrapping of the protocol. The options 
 available are:
 @itemize
 @item Pre-shared keys (see @ref{PSK authentication}). The server and a
-client communicate a shared randomly generated key and use it to
-negotiate further sessions over the untrusted channel.
+client communicate a shared randomly generated key over the trusted
+channel and use it to negotiate further sessions over the untrusted channel.
 
 @item Passwords (see @ref{SRP authentication}). The client communicates
 to the server his username and password of choice and uses it to
 negotiate further sessions over the untrusted channel.
 
 @item Public keys (see @ref{Certificate authentication}). The client 
-and the server exchange their public keys (or fingerprints of them). 
+and the server exchange their public keys (or fingerprints of them)
+over the trusted channel. 
 On future sessions over the untrusted channel they verify the key
 being the same (similar to @ref{Verifying a certificate using trust on first use
 authentication}).
@@ -62,7 +63,7 @@ network), etc.
 
 @subsection Two peers without an out-of-band channel
 
-When an out-of-band channel is not available the peer cannot be reliably
+When an out-of-band channel is not available a peer cannot be reliably
 authenticated. What can be done, however, is to allow some form of
 registration of users connecting for the first time and ensure that their
 keys remain the same after that initial connection. This is termed
@@ -76,7 +77,8 @@ being the same (see @ref{Verifying a certificate using trust on first use
 authentication}).
 
 To mitigate the uncertainty of the information exchanged in the first 
-connection other channels over the Internet may be used (e.g., @ref{Verifying a certificate using DANE}).
+connection other channels over the Internet may be used, e.g., @acronym{DNSSEC}
+(see @ref{Verifying a certificate using DANE}).
 
 @subsection Two peers and a trusted third party
 

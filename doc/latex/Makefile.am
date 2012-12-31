@@ -7,7 +7,8 @@ GEN_TEX_OBJECTS = cha-preface.tex cha-library.tex cha-intro-tls.tex cha-cert-aut
   cha-errors.tex alerts.tex cha-internals.tex cha-gtls-examples.tex cha-upgrade.tex \
   invoke-certtool.tex invoke-gnutls-cli.tex invoke-gnutls-serv.tex cha-tokens.tex \
   invoke-srptool.tex invoke-psktool.tex invoke-gnutls-cli-debug.tex \
-  invoke-p11tool.tex invoke-ocsptool.tex invoke-tpmtool.tex invoke-danetool.tex
+  invoke-p11tool.tex invoke-ocsptool.tex invoke-tpmtool.tex invoke-danetool.tex \
+  cha-auth.tex
 
 invoke-certtool.tex: ../invoke-certtool.texi
 	../scripts/mytexi2latex $< > $@
@@ -16,6 +17,9 @@ cha-upgrade.tex: ../cha-upgrade.texi
 	../scripts/mytexi2latex $< > $@
 
 cha-tokens.tex: ../cha-tokens.texi
+	../scripts/mytexi2latex $< > $@
+
+cha-auth.tex: ../cha-auth.texi
 	../scripts/mytexi2latex $< > $@
 
 invoke-gnutls-cli.tex: ../invoke-gnutls-cli.texi
