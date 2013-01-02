@@ -18,6 +18,9 @@ instead of issuing an error.
 ** libgnutls: Stricter RSA PKCS #1 1.5 encoding and decoding. Reported
 by Kikuchi Masashi.
 
+** libgnutls: TPM support is disabled by default because GPL programs
+cannot link with it. Use --with-tpm to enable it.
+
 ** libgnutls-guile: Fixed parallel compilation issue.
 
 ** gnutls-cli: It will try to connect to all possible returned addresses
