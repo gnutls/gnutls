@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.6 (released 2012-01-02)
+* Version 3.1.6 (released 2013-01-02)
 
 ** libgnutls: Fixed record padding parsing issue. Reported by Kenny
 Patterson and Nadhem Alfardan.
