@@ -1164,7 +1164,7 @@ cleanup:
   return ret;
 
 recv_error:
-  if (ret < 0 && (gnutls_error_is_fatal (ret) == 0 || ret == GNUTLS_E_TIMEDOUT)
+  if (ret < 0 && (gnutls_error_is_fatal (ret) == 0 || ret == GNUTLS_E_TIMEDOUT))
     return ret;
 
   if (type == GNUTLS_ALERT) /* we were expecting close notify */
