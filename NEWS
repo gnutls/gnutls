@@ -4,10 +4,16 @@ See the end for copying conditions.
 
 * Version 3.1.7 (unreleased)
 
-** libgnutls: Simplified DTLS sliding window implementation.
+** libgnutls: Simplified the DTLS sliding window implementation.
+
+** libgnutls: Added %RANDOM_PADDING priority string. It enables a new
+random padding mechanism in TLS allowing random padding in TLS records
+in all ciphersuites. Both the server and the client must support this
+extension. Its status can be checked using gnutls_record_get_random_padding_status().
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_record_get_random_padding_status: Added
+
 
 * Version 3.1.6 (released 2013-01-02)
 
