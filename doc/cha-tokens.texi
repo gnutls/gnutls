@@ -357,7 +357,11 @@ certificates by specifying a PKCS #11 URL instead of a filename.
 @cindex TPM
 
 In this section we present the Trusted Platform Module (TPM) support 
-in @acronym{GnuTLS}. There was a big hype when the TPM chip was introduced into 
+in @acronym{GnuTLS}. Note that this functionality is disabled by default
+because the @code{trousers} libraries GnuTLS depends on for that functionality
+are under the Common Public License which is not compatible with the GPL license.
+
+There was a big hype when the TPM chip was introduced into 
 computers. Briefly it is a co-processor in your PC that allows it to perform 
 calculations independently of the main processor. This has good and bad 
 side-effects. In this section we focus on the good ones, which are the fact that 

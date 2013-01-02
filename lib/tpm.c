@@ -30,8 +30,10 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 #include <gnutls/tpm.h>
-
 #include <gnutls_int.h>
+
+#ifdef HAVE_TROUSERS
+
 #include <gnutls_errors.h>
 #include <pkcs11_int.h>
 #include <x509/common.h>
@@ -1606,3 +1608,82 @@ err_cc:
   tpm_close_session(&s); 
   return ret;
 }
+#else /* HAVE_TROUSERS */
+int
+gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
+			       const gnutls_datum_t * fdata,
+			       gnutls_tpmkey_fmt_t format,
+			       const char *srk_password,
+			       const char *key_password,
+			       unsigned int flags)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_privkey_import_tpm_url (gnutls_privkey_t pkey,
+                               const char* url,
+                               const char *srk_password,
+                               const char *key_password,
+                               unsigned int flags)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
+                              const gnutls_datum_t * fdata,
+                              gnutls_tpmkey_fmt_t format,
+                              const char *srk_password,
+                              unsigned int flags)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_pubkey_import_tpm_url (gnutls_pubkey_t pkey,
+                              const char* url,
+                              const char *srk_password,
+                              unsigned int flags)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t pk, unsigned int bits, 
+                             const char* srk_password,
+                             const char* key_password,
+                             gnutls_tpmkey_fmt_t format,
+                             gnutls_x509_crt_fmt_t pub_format,
+                             gnutls_datum_t* privkey, 
+                             gnutls_datum_t* pubkey,
+                             unsigned int flags)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+void
+gnutls_tpm_key_list_deinit (gnutls_tpm_key_list_t list)
+{
+  return;
+}
+
+int
+gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char** url, unsigned int flags)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_tpm_get_registered (gnutls_tpm_key_list_t *list)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int
+gnutls_tpm_privkey_delete (const char* url, const char* srk_password)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+#endif /* HAVE_TROUSERS */
+
