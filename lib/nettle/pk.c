@@ -549,7 +549,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         _rsa_params_to_pubkey (pk_params, &pub);
 
         if (signature->size != pub.size)
-          return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+          return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
 
         ret = _gnutls_mpi_scan_nz (&tmp[0], signature->data, signature->size);
         if (ret < 0)
