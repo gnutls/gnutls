@@ -461,7 +461,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 {
   uint8_t MAC[MAX_HASH_SIZE];
   uint16_t c_length;
-  uint8_t pad;
+  unsigned int pad;
   int length;
   uint16_t blocksize;
   int ret, i, pad_failed = 0;
@@ -537,7 +537,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       /* Check the pading bytes (TLS 1.x)
        */
       if (_gnutls_version_has_variable_padding (ver) && pad_failed == 0)
-        for (i = 2; i < pad; i++)
+        for (i = 2; i <= pad; i++)
           {
             if (ciphertext.data[ciphertext.size - i] !=
                 ciphertext.data[ciphertext.size - 1])

@@ -8,6 +8,9 @@ Version 2.12.22 (unreleased)
 ** libgnutls: Stricter RSA PKCS #1 1.5 encoding and decoding. Reported
 by Kikuchi Masashi.
 
+** libgnutls: Fixed record padding parsing issue. Reported by Kenny
+Patterson and Nadhem Alfardan.
+
 ** libgnutls: Updated gnulib
 
 ** API and ABI modifications:
