@@ -1,15 +1,18 @@
-GNUTLS_VERSION:=3.1.5
+GNUTLS_VERSION:=3.1.6
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
-GMP_FILE:=gmp-5.0.5.tar.bz2
-GMP_DIR:=gmp-5.0.5
+GMP_VERSION=5.1.0
+GMP_FILE:=gmp-$(GMP_VERSION).tar.bz2
+GMP_DIR:=gmp-$(GMP_VERSION)
 
-P11_KIT_FILE:=p11-kit-0.14.tar.gz
-P11_KIT_DIR:=p11-kit-0.14
+P11_KIT_VERSION=0.14
+P11_KIT_FILE:=p11-kit-$(P11_KIT_VERSION).tar.gz
+P11_KIT_DIR:=p11-kit-$(P11_KIT_VERSION)
 
-NETTLE_FILE:=nettle-2.5.tar.gz
-NETTLE_DIR:=nettle-2.5
+NETTLE_VERSION=2.5
+NETTLE_FILE:=nettle-$(NETTLE_VERSION).tar.gz
+NETTLE_DIR:=nettle-$(NETTLE_VERSION)
 
 CROSS_DIR:=$(PWD)/win32
 BIN_DIR:=$(CROSS_DIR)/bin
@@ -110,8 +113,8 @@ $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	touch $@
 
 $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
-	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnu.org/gnu/gnutls/$(GNUTLS_FILE)
-	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnu.org/gnu/gnutls/$(GNUTLS_FILE).sig
+	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.1/$(GNUTLS_FILE)
+	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.1/$(GNUTLS_FILE).sig
 	gpg --verify $(GNUTLS_FILE).sig
 	test -d $(GNUTLS_DIR) || tar -xf $(GNUTLS_FILE)
 	cd $(GNUTLS_DIR) && \
