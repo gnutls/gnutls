@@ -312,6 +312,12 @@ _wrap_nettle_pk_decrypt (gnutls_pk_algorithm_t algo,
       {
         struct rsa_private_key priv;
         bigint_t c, ri, nc;
+        
+        if (ciphertext->size != nettle_mpz_sizeinbase_256_u(TOMPZ (pk_params->params[0])))
+          {
+            gnutls_assert ();
+            return GNUTLS_E_DECRYPTION_FAILED;
+          }
 
         if (_gnutls_mpi_scan_nz (&c, ciphertext->data, ciphertext->size) != 0)
           {
@@ -627,12 +633,18 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
       {
         bigint_t hash;
 
+        if (signature->size != nettle_mpz_sizeinbase_256_u(TOMPZ (pk_params->params[0])))
+          {
+            gnutls_assert ();
+            return GNUTLS_E_PK_SIG_VERIFY_FAILED;
+          }
+
         if (_gnutls_mpi_scan_nz (&hash, vdata->data, vdata->size) != 0)
           {
             gnutls_assert ();
             return GNUTLS_E_MPI_SCAN_FAILED;
           }
-
+        
         ret = _gnutls_mpi_scan_nz (&tmp[0], signature->data, signature->size);
         if (ret < 0)
           {
