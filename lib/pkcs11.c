@@ -2534,22 +2534,22 @@ gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
                                    unsigned int flags)
 {
   int ret;
-  struct crt_find_data_st find_data;
+  struct crt_find_data_st priv;
 
-  memset (&find_data, 0, sizeof (find_data));
+  memset (&priv, 0, sizeof (priv));
 
   /* fill in the find data structure */
-  find_data.p_list = p_list;
-  find_data.n_list = n_list;
-  find_data.flags = attrs;
-  find_data.current = 0;
+  priv.p_list = p_list;
+  priv.n_list = n_list;
+  priv.flags = attrs;
+  priv.current = 0;
 
   if (url == NULL || url[0] == 0)
     {
       url = "pkcs11:";
     }
 
-  ret = pkcs11_url_to_info (url, &find_data.info);
+  ret = pkcs11_url_to_info (url, &priv.info);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2557,10 +2557,10 @@ gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
     }
 
   ret =
-    _pkcs11_traverse_tokens (find_objs, &find_data, find_data.info,
+    _pkcs11_traverse_tokens (find_objs, &priv, priv.info,
                              NULL,
                              pkcs11_obj_flags_to_int (flags));
-  p11_kit_uri_free (find_data.info);
+  p11_kit_uri_free (priv.info);
 
   if (ret < 0)
     {
@@ -2595,7 +2595,7 @@ gnutls_pkcs11_obj_list_import_url2 (gnutls_pkcs11_obj_t ** p_list,
                                    gnutls_pkcs11_obj_attr_t attrs,
                                    unsigned int flags)
 {
-unsigned int init = 1024;
+unsigned int init = 128;
 int ret;
 
   *p_list = gnutls_malloc(sizeof(gnutls_pkcs11_obj_t)*init);
