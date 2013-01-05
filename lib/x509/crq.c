@@ -230,7 +230,7 @@ cleanup:
  * gnutls_x509_crq_get_dn:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @buf: a pointer to a structure to hold the name (may be %NULL)
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  *
  * This function will copy the name of the Certificate request subject
  * to the provided buffer.  The name will be in the form
@@ -239,11 +239,11 @@ cleanup:
  * data.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
- *   long enough, and in that case the *@sizeof_buf will be updated with
+ *   long enough, and in that case the *@buf_size will be updated with
  *   the required size.  On success 0 is returned.
  **/
 int
-gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
+gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * buf_size)
 {
   if (crq == NULL)
     {
@@ -253,7 +253,7 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
 
   return _gnutls_x509_parse_dn (crq->crq,
                                 "certificationRequestInfo.subject.rdnSequence",
-                                buf, sizeof_buf);
+                                buf, buf_size);
 }
 
 /**
@@ -264,7 +264,7 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
  *   which to get. Use (0) to get the first one.
  * @raw_flag: If non-zero returns the raw DER data of the DN part.
  * @buf: a pointer to a structure to hold the name (may be %NULL)
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  *
  * This function will extract the part of the name of the Certificate
  * request subject, specified by the given OID. The output will be
@@ -278,13 +278,13 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
  * using gnutls_x509_dn_oid_known().
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
- *   not long enough, and in that case the *@sizeof_buf will be
+ *   not long enough, and in that case the *@buf_size will be
  *   updated with the required size.  On success 0 is returned.
  **/
 int
 gnutls_x509_crq_get_dn_by_oid (gnutls_x509_crq_t crq, const char *oid,
                                int indx, unsigned int raw_flag,
-                               void *buf, size_t * sizeof_buf)
+                               void *buf, size_t * buf_size)
 {
 gnutls_datum_t td;
 int ret;
@@ -302,7 +302,7 @@ int ret;
   if (ret < 0)
     return gnutls_assert_val(ret);
   
-  return _gnutls_strdatum_to_buf (&td, buf, sizeof_buf);
+  return _gnutls_strdatum_to_buf (&td, buf, buf_size);
 }
 
 /**
@@ -460,8 +460,8 @@ cleanup:
 /**
  * gnutls_x509_crq_get_challenge_password:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @buf: will hold a (0)-terminated password string
- * @sizeof_buf: Initially holds the size of @pass.
+ * @pass: will hold a (0)-terminated password string
+ * @pass_size: Initially holds the size of @pass.
  *
  * This function will return the challenge password in the request.
  * The challenge password is intended to be used for requesting a
@@ -472,7 +472,7 @@ cleanup:
  **/
 int
 gnutls_x509_crq_get_challenge_password (gnutls_x509_crq_t crq,
-                                        char *buf, size_t * sizeof_buf)
+                                        char *pass, size_t * pass_size)
 {
 gnutls_datum_t td;
 int ret;
@@ -488,7 +488,7 @@ int ret;
   if (ret < 0)
     return gnutls_assert_val(ret);
   
-  return _gnutls_strdatum_to_buf (&td, buf, sizeof_buf);
+  return _gnutls_strdatum_to_buf (&td, pass, pass_size);
 }
 
 /* This function will attempt to set the requested attribute in
@@ -653,7 +653,7 @@ set_attribute (ASN1_TYPE asn, const char *root,
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @oid: holds an Object Identifier in a null-terminated string
  * @buf: a pointer to a structure that holds the attribute data
- * @sizeof_buf: holds the size of @buf
+ * @buf_size: holds the size of @buf
  *
  * This function will set the attribute in the certificate request
  * specified by the given Object ID. The provided attribute must be be DER
@@ -668,12 +668,12 @@ set_attribute (ASN1_TYPE asn, const char *root,
 int
 gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
                                       const char *oid, void *buf,
-                                      size_t sizeof_buf)
+                                      size_t buf_size)
 {
   gnutls_datum_t data;
 
   data.data = buf;
-  data.size = sizeof_buf;
+  data.size = buf_size;
 
   if (crq == NULL)
     {
@@ -692,7 +692,7 @@ gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
  * @indx: In case multiple same OIDs exist in the attribute list, this
  *   specifies which to get, use (0) to get the first one
  * @buf: a pointer to a structure to hold the attribute data (may be %NULL)
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  *
  * This function will return the attribute in the certificate request
  * specified by the given Object ID.  The attribute will be DER
@@ -707,7 +707,7 @@ gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
 int
 gnutls_x509_crq_get_attribute_by_oid (gnutls_x509_crq_t crq,
                                       const char *oid, int indx, void *buf,
-                                      size_t * sizeof_buf)
+                                      size_t * buf_size)
 {
 int ret;
 gnutls_datum_t td;
@@ -723,7 +723,7 @@ gnutls_datum_t td;
   if (ret < 0)
     return gnutls_assert_val(ret);
   
-  return _gnutls_strdatum_to_buf (&td, buf, sizeof_buf);
+  return _gnutls_strdatum_to_buf (&td, buf, buf_size);
 }
 
 /**
@@ -1867,7 +1867,7 @@ gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t crq,
  * @indx: In case multiple same OIDs exist in the extensions, this
  *   specifies which to get. Use (0) to get the first one.
  * @buf: a pointer to a structure to hold the name (may be null)
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  * @critical: will be non-zero if the extension is marked as critical
  *
  * This function will return the extension specified by the OID in
@@ -1884,7 +1884,7 @@ gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t crq,
 int
 gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t crq,
                                       const char *oid, int indx,
-                                      void *buf, size_t * sizeof_buf,
+                                      void *buf, size_t * buf_size,
                                       unsigned int *critical)
 {
   int result;
@@ -1908,7 +1908,7 @@ gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t crq,
         {                       /* found */
           if (indx == 0)
             return gnutls_x509_crq_get_extension_data (crq, i, buf,
-                                                       sizeof_buf);
+                                                       buf_size);
           else
             indx--;
         }
