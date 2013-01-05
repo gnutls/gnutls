@@ -562,6 +562,8 @@ gnutls_certificate_get_peers (gnutls_session_t
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
+ *
+ * Since: 3.1.3
  **/
 int gnutls_certificate_get_peers_subkey_id(gnutls_session_t session,
                                            gnutls_datum_t *id)

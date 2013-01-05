@@ -291,6 +291,8 @@ _gnutls_status_request_recv_params (gnutls_session_t session,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
+ *
+ * Since: 3.1.3
  **/
 int
 gnutls_ocsp_status_request_enable_client (gnutls_session_t session,
@@ -335,6 +337,8 @@ gnutls_ocsp_status_request_enable_client (gnutls_session_t session,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
+ *
+ * Since: 3.1.3
  **/
 int
 gnutls_ocsp_status_request_get (gnutls_session_t session,
@@ -388,6 +392,8 @@ gnutls_ocsp_status_request_get (gnutls_session_t session,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
+ *
+ * Since: 3.1.3
  **/
 void
 gnutls_certificate_set_ocsp_status_request_function (
@@ -427,6 +433,8 @@ gnutls_certificate_credentials_t sc = ptr;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
+ *
+ * Since: 3.1.3
  **/
 int
 gnutls_certificate_set_ocsp_status_request_file (

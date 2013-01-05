@@ -2652,7 +2652,7 @@ gnutls_x509_crt_export (gnutls_x509_crt_t cert,
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  *
- * Since: 3.1
+ * Since: 3.1.3
  **/
 int
 gnutls_x509_crt_export2 (gnutls_x509_crt_t cert,

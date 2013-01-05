@@ -1267,6 +1267,8 @@ gnutls_ocsp_resp_get_produced (gnutls_ocsp_resp_t resp)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error code is returned.  
+ * 
+ * Since: 3.1.3
  **/
 int
 gnutls_ocsp_resp_check_crt (gnutls_ocsp_resp_t resp,

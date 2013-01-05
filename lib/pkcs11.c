@@ -849,7 +849,7 @@ gnutls_pkcs11_obj_export (gnutls_pkcs11_obj_t obj,
  * Returns: In case of failure a negative error code will be
  *   returned, and %GNUTLS_E_SUCCESS (0) on success.
  *
- * Since: 3.1
+ * Since: 3.1.3
  **/
 int
 gnutls_pkcs11_obj_export2 (gnutls_pkcs11_obj_t obj,

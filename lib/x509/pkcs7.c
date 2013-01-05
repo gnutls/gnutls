@@ -447,7 +447,9 @@ gnutls_pkcs7_export (gnutls_pkcs7_t pkcs7,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
-  **/
+ *
+ * Since: 3.1.3
+ **/
 int
 gnutls_pkcs7_export2 (gnutls_pkcs7_t pkcs7,
                      gnutls_x509_crt_fmt_t format, gnutls_datum_t *out)

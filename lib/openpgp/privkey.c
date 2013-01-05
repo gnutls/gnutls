@@ -243,7 +243,7 @@ gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  *
- * Since: 3.1
+ * Since: 3.1.3
  **/
 int
 gnutls_openpgp_privkey_export2 (gnutls_openpgp_privkey_t key,

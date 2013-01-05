@@ -384,6 +384,8 @@ int ret;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
+ *
+ * Since: 3.1.3
  **/
 int
 gnutls_dh_params_export2_pkcs3 (gnutls_dh_params_t params,

@@ -293,7 +293,7 @@ gnutls_pkcs12_export (gnutls_pkcs12_t pkcs12,
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  *
- * Since: 3.1
+ * Since: 3.1.3
  **/
 int
 gnutls_pkcs12_export2 (gnutls_pkcs12_t pkcs12,

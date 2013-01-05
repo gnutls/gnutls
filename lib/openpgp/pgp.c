@@ -244,6 +244,8 @@ gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
  * The output buffer is allocated using gnutls_malloc().
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.1.3
  **/
 int
 gnutls_openpgp_crt_export2 (gnutls_openpgp_crt_t key,
