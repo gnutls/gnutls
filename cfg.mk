@@ -20,8 +20,10 @@
 
 WFLAGS ?= --enable-gcc-warnings
 ADDFLAGS ?=
-CFGFLAGS ?= --enable-gtk-doc --enable-gtk-doc-pdf $(ADDFLAGS) $(WFLAGS)
+CFGFLAGS ?= --enable-gtk-doc --enable-gtk-doc-pdf --enable-gtk-doc-html $(ADDFLAGS) $(WFLAGS)
 PACKAGE ?= gnutls
+
+.PHONY: config
 
 INDENT_SOURCES = `find . -name \*.[ch] -o -name gnutls.h.in | grep -v -e ^./build-aux/ -e ^./lib/minitasn1/ -e ^./lib/build-aux/ -e ^./gl/ -e ^./src/libopts/ -e -gaa.[ch] -e asn1_tab.c -e ^./tests/suite/`
 
@@ -70,8 +72,10 @@ update-po: refresh-po
 	git add $(PODIR)/*.po.in
 	git commit -m "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
 
-bootstrap: autoreconf
+config:
 	./configure $(CFGFLAGS)
+
+bootstrap: autoreconf
 
 # The only non-lgpl modules used are: gettime progname timespec. Those
 # are not used (and must not be used) in the library)
