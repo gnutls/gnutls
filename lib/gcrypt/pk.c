@@ -121,7 +121,7 @@ _wrap_gcry_pk_encrypt (gnutls_pk_algorithm_t algo,
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint_size (res, ciphertext, plaintext->size);
+  ret = _gnutls_mpi_dprint_size (res, ciphertext, (_gnutls_mpi_get_nbits(pk_params->params[0])+7)/8);
   _gnutls_mpi_release (&res);
   if (ret < 0)
     {
@@ -164,6 +164,12 @@ _wrap_gcry_pk_decrypt (gnutls_pk_algorithm_t algo,
   switch (algo)
     {
     case GNUTLS_PK_RSA:
+        if (ciphertext->size != (_gnutls_mpi_get_nbits(pk_params->params[0])+7)/8)
+          {
+            gnutls_assert ();
+            return GNUTLS_E_DECRYPTION_FAILED;
+          }
+
       if (pk_params->params_nr >= 6)
         rc = gcry_sexp_build (&s_pkey, NULL,
                               "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
@@ -363,7 +369,7 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
         res[0] = gcry_sexp_nth_mpi (list, 1, GCRYMPI_FMT_USG);
         gcry_sexp_release (list);
 
-        ret = _gnutls_mpi_dprint (res[0], signature);
+        ret = _gnutls_mpi_dprint_size (res[0], signature, (_gnutls_mpi_get_nbits(pk_params->params[0])+7)/8);
         if (ret < 0)
           {
             gnutls_assert ();
@@ -424,6 +430,12 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
                               pk_params->params[2], pk_params->params[3]);
       break;
     case GNUTLS_PK_RSA:
+      if (signature->size != (_gnutls_mpi_get_nbits(pk_params->params[0])+7)/8)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_PK_SIG_VERIFY_FAILED;
+        }
+
       if (pk_params->params_nr >= 2)
         rc = gcry_sexp_build (&s_pkey, NULL,
                               "(public-key(rsa(n%m)(e%m)))",
