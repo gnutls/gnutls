@@ -12,7 +12,7 @@
 #include "examples.h"
 
 /* A very basic TLS client, with X.509 authentication and server certificate
- * verification. Note that error checking for missing files etc. is missing
+ * verification. Note that error checking for missing files etc. is omitted
  * for simplicity.
  */
 
