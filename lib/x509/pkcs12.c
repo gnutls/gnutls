@@ -1399,21 +1399,21 @@ skip:
  * private key, the corresponding certificate chain, and any additional
  * certificates and a CRL.
  *
- * The @extra_certs_ret and @extra_certs_ret_len parameters are optional
+ * The @extra_certs_ret and @extra_certs_len parameters are optional
  * and both may be set to %NULL. If either is non-%NULL, then both must
- * be.
+ * be set.
  * 
  * Encrypted PKCS#12 bags and PKCS#8 private keys are supported.  However,
  * only password based security, and the same password for all
  * operations, are supported.
  *
- * PKCS#12 file may contain many keys and/or certificates, and there
+ * A PKCS#12 file may contain many keys and/or certificates, and there
  * is no way to identify which key/certificate pair you want.  You
  * should make sure the PKCS#12 file only contain one key/certificate
  * pair and/or one CRL.
  *
- * It is believed that the limitations of this function is acceptable
- * for most usage, and that any more flexibility would introduce
+ * It is believed that the limitations of this function are acceptable
+ * for common usage, and that any more flexibility would introduce
  * complexity that would make it harder to use this functionality at
  * all.
  *
