@@ -148,6 +148,11 @@ _rndegd_connect_socket (void)
     }
 
   name = find_egd_name ();
+  if (name == NULL)
+    {
+      _gnutls_debug_log ("Could not detect an egd device.\n");
+      return -1;
+    }
 
   if (strlen (name) + 1 >= sizeof addr.sun_path)
     {
