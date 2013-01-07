@@ -2124,6 +2124,7 @@ typedef int (*gnutls_pin_callback_t) (void *userdata, int attempt,
 
 #define GNUTLS_E_NO_CERTIFICATE_STATUS -340
 #define GNUTLS_E_OCSP_RESPONSE_ERROR -341
+#define GNUTLS_E_RANDOM_DEVICE_ERROR -342
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

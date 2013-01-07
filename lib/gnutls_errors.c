@@ -351,6 +351,8 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_OCSP_RESPONSE_ERROR, 1),
   ERROR_ENTRY (N_("There is no certificate status (OCSP)."),
                GNUTLS_E_NO_CERTIFICATE_STATUS, 1),
+  ERROR_ENTRY (N_("Error in the system's randomness device."),
+               GNUTLS_E_RANDOM_DEVICE_ERROR, 1),
   {NULL, NULL, 0, 0}
 };
 

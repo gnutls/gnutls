@@ -106,7 +106,7 @@ do_device_source (int init)
            CRYPT_SILENT | CRYPT_VERIFYCONTEXT))
         {
           _gnutls_debug_log ("error in CryptAcquireContext!\n");
-          return GNUTLS_E_INTERNAL_ERROR;
+          return GNUTLS_E_RANDOM_DEVICE_ERROR;
         }
       device_last_read = now;
       read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
@@ -123,7 +123,7 @@ do_device_source (int init)
         {
           _gnutls_debug_log ("Error in CryptGenRandom: %s\n",
                              GetLastError ());
-          return GNUTLS_E_INTERNAL_ERROR;
+          return GNUTLS_E_RANDOM_DEVICE_ERROR;
         }
 
       device_last_read = now;
@@ -274,7 +274,7 @@ do_device_source_urandom (int init)
                     ("Failed to read /dev/urandom: end of file\n");
                 }
 
-              return GNUTLS_E_INTERNAL_ERROR;
+              return GNUTLS_E_RANDOM_DEVICE_ERROR;
             }
 
           done += res;
@@ -300,7 +300,7 @@ do_device_source_egd (int init)
       if (device_fd < 0)
         {
           _gnutls_debug_log ("Cannot open egd socket!\n");
-          return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+          return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
         }
 
       device_last_read = now;
@@ -331,7 +331,7 @@ do_device_source_egd (int init)
                   _gnutls_debug_log ("Failed to read egd: end of file\n");
                 }
 
-              return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+              return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
             }
           done += res;
         }
