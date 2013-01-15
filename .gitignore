@@ -179,6 +179,8 @@ extra/Makefile.in
 extra/includes/Makefile
 extra/includes/Makefile.in
 extra/libgnutls-openssl.la
+gl/byteswap.h
+gl/stdint.h
 gl/Makefile
 gl/Makefile.in
 gl/alloca.h
