@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Free Software Foundation
+ * Copyright (C) 2012 KU Leuven
  *
  * Author: Nikos Mavrogiannopoulos
  *
