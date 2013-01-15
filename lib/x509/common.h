@@ -78,6 +78,8 @@ int _gnutls_x509_encode_string(unsigned int etype,
 
 int _gnutls_x509_dn_to_string (const char *OID, void *value,
                                   int value_size, gnutls_datum_t* out);
+const char* _gnutls_ldap_string_to_oid (const char* str, unsigned str_len);
+
 int _gnutls_x509_data2hex (const void * data, size_t data_size,
                            void * out, size_t * sizeof_out);
 

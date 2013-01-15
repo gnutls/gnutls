@@ -44,6 +44,8 @@ void get_unit_crt_set (gnutls_x509_crt_t crt);
 void get_state_crt_set (gnutls_x509_crt_t crt);
 void get_locality_crt_set (gnutls_x509_crt_t crt);
 void get_cn_crt_set (gnutls_x509_crt_t crt);
+void get_dn_crt_set (gnutls_x509_crt_t crt);
+void get_dn_crq_set (gnutls_x509_crq_t crt);
 void get_uid_crt_set (gnutls_x509_crt_t crt);
 void get_pkcs9_email_crt_set (gnutls_x509_crt_t crt);
 void get_oid_crt_set (gnutls_x509_crt_t crt);

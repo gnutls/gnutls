@@ -53,7 +53,7 @@ libgnutls_x509_la_SOURCES =	\
 	rfc2818_hostname.c	\
 	sign.c			\
 	verify.c		\
-	x509.c			\
+	x509.c x509_dn.c	\
 	x509_int.h		\
 	x509_write.c		\
 	verify-high.c		\

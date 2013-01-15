@@ -3,6 +3,8 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* Add gnutls_x509_crt_set_dn() to allow setting a DN using an RFC4514
+  string (as well as the x509_crq_set_dn).
 * When importing a PKCS #11 certificate, check for its issuers to generate a
   chain (e.g. use the DN to retrieve possible signers).
 * Think about supporting the groups in RFC3526 and RFC5114. If other

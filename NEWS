@@ -4,6 +4,12 @@ See the end for copying conditions.
 
 * Version 3.1.7 (unreleased)
 
+** certtool: Added option "dn" which allows to directly set the DN
+in a template from an RFC4514 string.
+
+** libgnutls: Added functions to directly set the DN in a certificate
+or request from an RFC4514 string.
+
 ** libgnutls: Simplified the DTLS sliding window implementation.
 
 ** libgnutls: Added the gnutls_sbuf_t structure and accompanying 
@@ -20,6 +26,8 @@ gnutls_sbuf_deinit: Added
 gnutls_sbuf_init: Added
 gnutls_sbuf_flush: Added
 gnutls_sbuf_queue: Added
+gnutls_x509_crt_set_dn: Added
+gnutls_x509_crq_set_dn: Added
 
 
 * Version 3.1.6 (released 2013-01-02)

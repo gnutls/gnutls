@@ -57,6 +57,7 @@ typedef struct _cfg_ctx
   char *unit;
   char *locality;
   char *state;
+  char *dn;
   char *cn;
   char *uid;
   char *challenge_password;
@@ -212,6 +213,10 @@ template_parse (const char *template)
   val = optionGetValue(pov, "state");
   if (val != NULL && val->valType == OPARG_TYPE_STRING)
     cfg.state = strdup(val->v.strVal);
+
+  val = optionGetValue(pov, "dn");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.dn = strdup(val->v.strVal);
 
   val = optionGetValue(pov, "cn");
   if (val != NULL && val->valType == OPARG_TYPE_STRING)
@@ -661,6 +666,26 @@ get_cn_crt_set (gnutls_x509_crt_t crt)
       read_crt_set (crt, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
     }
 
+}
+
+void
+get_dn_crt_set (gnutls_x509_crt_t crt)
+{
+  int ret;
+  const char* err;
+
+  if (batch)
+    {
+      if (!cfg.dn)
+        return;
+      ret =
+        gnutls_x509_crt_set_dn (crt, cfg.dn, &err);
+      if (ret < 0)
+        {
+          fprintf (stderr, "set_dn: %s at: %s\n", gnutls_strerror (ret), err);
+          exit (1);
+        }
+    }
 }
 
 void
@@ -1666,6 +1691,26 @@ get_locality_crq_set (gnutls_x509_crq_t crq)
       read_crq_set (crq, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
     }
 
+}
+
+void
+get_dn_crq_set (gnutls_x509_crq_t crq)
+{
+  int ret;
+  const char* err;
+
+  if (batch)
+    {
+      if (!cfg.dn)
+        return;
+      ret =
+        gnutls_x509_crq_set_dn (crq, cfg.dn, &err);
+      if (ret < 0)
+        {
+          fprintf (stderr, "set_dn: %s at: %s\n", gnutls_strerror (ret), err);
+          exit (1);
+        }
+    }
 }
 
 void

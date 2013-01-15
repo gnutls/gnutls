@@ -271,18 +271,22 @@ generate_certificate (gnutls_privkey_t * ret_key,
             error (EXIT_FAILURE, 0, "set_proxy_dn: %s",
                    gnutls_strerror (result));
 
+          get_dn_crt_set (crt);
           get_cn_crt_set (crt);
         }
       else
         {
+          get_dn_crt_set (crt);
+
           get_country_crt_set (crt);
+          get_state_crt_set (crt);
+          get_locality_crt_set (crt);
           get_organization_crt_set (crt);
           get_unit_crt_set (crt);
-          get_locality_crt_set (crt);
-          get_state_crt_set (crt);
           get_cn_crt_set (crt);
           get_dc_set (TYPE_CRT, crt);
           get_uid_crt_set (crt);
+
           get_oid_crt_set (crt);
           get_key_purpose_set (crt);
 
@@ -1778,11 +1782,13 @@ generate_request (common_info_st * cinfo)
 
   /* Set the DN.
    */
+  get_dn_crq_set (crq);
+
   get_country_crq_set (crq);
+  get_state_crq_set (crq);
+  get_locality_crq_set (crq);
   get_organization_crq_set (crq);
   get_unit_crq_set (crq);
-  get_locality_crq_set (crq);
-  get_state_crq_set (crq);
   get_cn_crq_set (crq);
   get_dc_set (TYPE_CRQ, crq);
   get_uid_crq_set (crq);

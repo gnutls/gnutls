@@ -397,6 +397,8 @@ extern "C"
 
 /* X.509 Certificate writing.
  */
+  int gnutls_x509_crt_set_dn (gnutls_x509_crt_t crt, const char *dn, const char** err);
+
   int gnutls_x509_crt_set_dn_by_oid (gnutls_x509_crt_t crt,
                                      const char *oid,
                                      unsigned int raw_flag,
@@ -918,6 +920,7 @@ extern "C"
                                      const char *oid, int indx,
                                      unsigned int raw_flag, void *buf,
                                      size_t * sizeof_buf);
+  int gnutls_x509_crq_set_dn (gnutls_x509_crq_t crq, const char *dn, const char** err);
   int gnutls_x509_crq_set_dn_by_oid (gnutls_x509_crq_t crq,
                                      const char *oid,
                                      unsigned int raw_flag,

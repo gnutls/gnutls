@@ -35,7 +35,7 @@ subject's information and finally self signing it.
 The last step ensures that the requester is in
 possession of the private key.
 
-@showfuncE{gnutls_x509_crq_set_version,gnutls_x509_crq_set_dn_by_oid,gnutls_x509_crq_set_key_usage,gnutls_x509_crq_set_key_purpose_oid,gnutls_x509_crq_set_basic_constraints}
+@showfuncF{gnutls_x509_crq_set_version,gnutls_x509_crq_set_dn,gnutls_x509_crq_set_dn_by_oid,gnutls_x509_crq_set_key_usage,gnutls_x509_crq_set_key_purpose_oid,gnutls_x509_crq_set_basic_constraints}
 
 The @funcref{gnutls_x509_crq_set_key} and @funcref{gnutls_x509_crq_sign2} 
 functions associate the request with a private key and sign it. If a 

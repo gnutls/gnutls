@@ -47,15 +47,14 @@ struct oid_to_string
 static const struct oid_to_string _oid2str[] = {
   /* PKIX
    */
-  {"1.3.6.1.5.5.7.9.1", "dateOfBirth", NULL, ASN1_ETYPE_GENERALIZED_TIME},
   {"1.3.6.1.5.5.7.9.2", "placeOfBirth", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
   {"1.3.6.1.5.5.7.9.3", "gender", NULL, ASN1_ETYPE_PRINTABLE_STRING},
   {"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", NULL, ASN1_ETYPE_PRINTABLE_STRING},
   {"1.3.6.1.5.5.7.9.5", "countryOfResidence", NULL, ASN1_ETYPE_PRINTABLE_STRING},
 
   {"2.5.4.6", "C", NULL, ASN1_ETYPE_PRINTABLE_STRING},
-  {"2.5.4.9", "STREET", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-  {"2.5.4.12", "T", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.9", "street", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.12", "title", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
   {"2.5.4.10", "O", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
   {"2.5.4.11", "OU", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
   {"2.5.4.3", "CN", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
@@ -71,7 +70,7 @@ static const struct oid_to_string _oid2str[] = {
   {"2.5.4.65", "pseudonym", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
   {"2.5.4.46", "dnQualifier", NULL, ASN1_ETYPE_PRINTABLE_STRING},
   {"2.5.4.17", "postalCode", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-  {"2.5.4.41", "Name", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.41", "name", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
   {"2.5.4.15", "businessCategory", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
 
   {"0.9.2342.19200300.100.1.25", "DC", NULL, ASN1_ETYPE_IA5_STRING},
@@ -116,8 +115,25 @@ static const struct oid_to_string* get_oid_entry (const char* oid)
   while (_oid2str[i].oid != NULL);
 
   return NULL;
-
 }
+
+const char* _gnutls_ldap_string_to_oid (const char* str, unsigned str_len)
+{
+  unsigned int i = 0;
+
+  do
+    {
+      if ((_oid2str[i].ldap_desc != NULL) &&
+          (str_len == strlen(_oid2str[i].ldap_desc)) && 
+          (strncasecmp (_oid2str[i].ldap_desc, str, str_len) == 0))
+        return _oid2str[i].oid;
+      i++;
+    }
+  while (_oid2str[i].oid != NULL);
+
+  return NULL;
+}
+
 
 /**
  * gnutls_x509_dn_oid_known:

@@ -881,6 +881,8 @@ GNUTLS_3_1_0 {
 	gnutls_sbuf_init;
 	gnutls_sbuf_flush;
 	gnutls_sbuf_queue;
+	gnutls_x509_crt_set_dn;
+	gnutls_x509_crq_set_dn;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

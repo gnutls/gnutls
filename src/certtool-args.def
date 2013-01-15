@@ -557,6 +557,18 @@ cn = "Cindy Lauper"
 # certificates.
 # pkcs9_email = "none@@none.org"
 
+# An alternative way to set the certificate's distinguished name directly
+# is with the "dn" option. The attribute names allowed are:
+# C (country), street, O (organization), OU (unit), title, CN (common name),
+# L (locality), ST (state), placeOfBirth, gender, countryOfCitizenship, 
+# countryOfResidence, serialNumber, telephoneNumber, surName, initials, 
+# generationQualifier, givenName, pseudonym, dnQualifier, postalCode, name, 
+# businessCategory, DC, UID, jurisdictionOfIncorporationLocalityName, 
+# jurisdictionOfIncorporationStateOrProvinceName,
+# jurisdictionOfIncorporationCountryName, XmppAddr, and numeric OIDs.
+
+#dn = "cn=Nik,st=Attiki,C=GR,surName=Mavrogiannopoulos,2.5.4.9=Arkadias"
+
 # The serial number of the certificate
 serial = 007
 
