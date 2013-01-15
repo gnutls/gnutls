@@ -6,6 +6,9 @@ See the end for copying conditions.
 
 ** libgnutls: Simplified the DTLS sliding window implementation.
 
+** libgnutls: Added the gnutls_sbuf_t structure and accompanying 
+functions to enable buffering in sending application data.
+
 ** libgnutls: Added %RANDOM_PADDING priority string. It enables a new
 random padding mechanism in TLS allowing random padding in TLS records
 in all ciphersuites. Both the server and the client must support this
@@ -13,6 +16,10 @@ extension. Its status can be checked using gnutls_record_get_random_padding_stat
 
 ** API and ABI modifications:
 gnutls_record_get_random_padding_status: Added
+gnutls_sbuf_deinit: Added
+gnutls_sbuf_init: Added
+gnutls_sbuf_flush: Added
+gnutls_sbuf_queue: Added
 
 
 * Version 3.1.6 (released 2013-01-02)
