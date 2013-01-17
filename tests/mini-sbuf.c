@@ -152,6 +152,7 @@ doit (void)
   gnutls_bye (client, GNUTLS_SHUT_RDWR);
   gnutls_bye (server, GNUTLS_SHUT_RDWR);
 
+  gnutls_sbuf_deinit (ssbuf);
   gnutls_deinit (client);
   gnutls_deinit (server);
 
