@@ -31,10 +31,10 @@
 #include <gnutls_x509.h>
 #include <x509_b64.h>
 
-enum { CRQ, CRT };
-
+typedef int (*set_dn_func) (void*, const char *oid, unsigned int raw_flag, const void *name, unsigned int name_size);
+                                                                                                                                                       
 static
-int dn_attr_crt_set( unsigned crt_type, void* crt, const char *attr, unsigned attr_len, 
+int dn_attr_crt_set( set_dn_func f, void* crt, const char *attr, unsigned attr_len, 
                      const char *value, unsigned value_len)
 {
   char _oid[MAX_OID_SIZE];
@@ -74,11 +74,7 @@ int dn_attr_crt_set( unsigned crt_type, void* crt, const char *attr, unsigned at
   if (value[0] == '#')
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
   
-  ret = GNUTLS_E_INTERNAL_ERROR;
-  if (crt_type == CRT)
-    ret = gnutls_x509_crt_set_dn_by_oid(crt, oid, 0, value, value_len);
-  else if (crt_type == CRQ)
-    ret = gnutls_x509_crq_set_dn_by_oid(crt, oid, 0, value, value_len);
+  ret = f(crt, oid, 0, value, value_len);
   if (ret < 0)
     return gnutls_assert_val(ret);
     
@@ -86,7 +82,7 @@ int dn_attr_crt_set( unsigned crt_type, void* crt, const char *attr, unsigned at
 }
 
 static int
-crt_set_dn (unsigned crt_type, void* crt, const char *dn, const char** err)
+crt_set_dn (set_dn_func f, void* crt, const char *dn, const char** err)
 {
 const char *p = dn;
 const char *name_start;
@@ -147,7 +143,7 @@ int ret;
       name_len = name_end - name_start;
       value_len = value_end - value_start;
 
-      ret = dn_attr_crt_set(crt_type, crt, name_start, name_len, value_start, value_len);
+      ret = dn_attr_crt_set(f, crt, name_start, name_len, value_start, value_len);
       if (ret < 0)
         return gnutls_assert_val(ret);
     }
@@ -171,7 +167,25 @@ int ret;
 int
 gnutls_x509_crt_set_dn (gnutls_x509_crt_t crt, const char *dn, const char** err)
 {
-  return crt_set_dn( CRT, crt, dn, err);
+  return crt_set_dn( (set_dn_func)gnutls_x509_crt_set_dn_by_oid, crt, dn, err);
+}
+
+/**
+ * gnutls_x509_crt_set_issuer_dn:
+ * @crt: a certificate of type #gnutls_x509_crt_t
+ * @dn: a comma separated DN string (RFC4514)
+ * @err: indicates the error position (if any)
+ *
+ * This function will set the DN on the provided certificate.
+ * The input string should be plain ASCII or UTF-8 encoded.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_set_issuer_dn (gnutls_x509_crt_t crt, const char *dn, const char** err)
+{
+  return crt_set_dn( (set_dn_func)gnutls_x509_crt_set_issuer_dn_by_oid, crt, dn, err);
 }
 
 /**
@@ -189,5 +203,5 @@ gnutls_x509_crt_set_dn (gnutls_x509_crt_t crt, const char *dn, const char** err)
 int
 gnutls_x509_crq_set_dn (gnutls_x509_crq_t crq, const char *dn, const char** err)
 {
-  return crt_set_dn( CRQ, crq, dn, err);
+  return crt_set_dn( (set_dn_func)gnutls_x509_crq_set_dn_by_oid, crq, dn, err);
 }

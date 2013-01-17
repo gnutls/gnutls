@@ -27,6 +27,7 @@ gnutls_sbuf_init: Added
 gnutls_sbuf_flush: Added
 gnutls_sbuf_queue: Added
 gnutls_x509_crt_set_dn: Added
+gnutls_x509_crt_set_issuer_dn: Added
 gnutls_x509_crq_set_dn: Added
 
 

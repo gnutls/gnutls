@@ -409,6 +409,8 @@ extern "C"
                                             unsigned int raw_flag,
                                             const void *name,
                                             unsigned int sizeof_name);
+  int gnutls_x509_crt_set_issuer_dn (gnutls_x509_crt_t crt, const char *dn, const char** err);
+
   int gnutls_x509_crt_set_version (gnutls_x509_crt_t crt,
                                    unsigned int version);
   int gnutls_x509_crt_set_key (gnutls_x509_crt_t crt,
