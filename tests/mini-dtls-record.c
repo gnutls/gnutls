@@ -180,6 +180,8 @@ client (int fd)
     unsigned current = 0;
     struct timespec ts;
     
+    memset(buffer, 0, sizeof(buffer));
+    
     ts.tv_sec = 0;
     ts.tv_nsec = 100*1000*1000;
     /* Need to enable anonymous KX specifically. */
