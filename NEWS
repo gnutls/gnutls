@@ -7,6 +7,8 @@ See the end for copying conditions.
 ** certtool: Added option "dn" which allows to directly set the DN
 in a template from an RFC4514 string.
 
+** libgnutls: DN variable 'T' was expanded to 'title'.
+
 ** libgnutls: Added functions to directly set the DN in a certificate
 or request from an RFC4514 string.
 
