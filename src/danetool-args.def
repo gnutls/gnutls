@@ -26,6 +26,13 @@ flag = {
 };
 
 flag = {
+    name      = dlv;
+    descrip   = "Sets a DLV file";
+    arg-type  = string;
+    doc = "This sets a DLV file to be used for DNSSEC verification.";
+};
+
+flag = {
     name      = hash;
     arg-type  = string;
     descrip   = "Hash algorithm to use for signing.";

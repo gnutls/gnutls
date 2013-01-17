@@ -104,6 +104,7 @@ typedef enum dane_state_flags_t
 } dane_state_flags_t;
 
 int dane_state_init (dane_state_t* s, unsigned int flags);
+int dane_state_set_dlv_file(dane_state_t s, const char* file);
 void dane_state_deinit (dane_state_t s);
 
 int dane_query_tlsa(dane_state_t s, dane_query_t *r, const char* host, const char* proto, unsigned int port);
@@ -166,4 +167,5 @@ const char * dane_strerror (int error);
 #define DANE_E_INVALID_REQUEST -9
 #define DANE_E_PUBKEY_ERROR -10
 #define DANE_E_NO_CERT -11
+#define DANE_E_FILE_ERROR -12
 

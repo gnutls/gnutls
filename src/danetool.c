@@ -201,6 +201,13 @@ size_t size;
   ret = dane_state_init(&s, flags);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "dane_state_init: %s", dane_strerror (ret));
+
+  if (HAVE_OPT(DLV))
+    {
+      ret = dane_state_set_dlv_file(s, OPT_ARG(DLV));
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "dane_state_set_dlv_file: %s", dane_strerror (ret));
+    }
   
   ret = dane_query_tlsa(s, &q, host, proto, port);
   if (ret < 0)

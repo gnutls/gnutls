@@ -17,6 +17,7 @@ DANE_0_0
 	dane_match_type_name;
 	dane_cert_usage_name;
 	dane_verification_status_print;
+	dane_state_set_dlv_file;
   local:
     *;
 };

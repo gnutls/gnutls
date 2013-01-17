@@ -204,6 +204,25 @@ void dane_state_deinit(dane_state_t s)
 	free(s);
 }
 
+/**
+ * dane_state_set_dlv_file:
+ * @s: The structure to be deinitialized
+ * @file: The file holding the DLV keys.
+ *
+ * This function will set a file with trusted keys 
+ * for DLV  (DNSSEC  Lookaside  Validation).
+ *
+ **/
+int dane_state_set_dlv_file(dane_state_t s, const char* file)
+{
+int ret;
+  
+  ret = ub_ctx_set_option(s->ctx, (char*)"dlv-anchor-file:", (void*)file);
+  if (ret != 0)
+    return gnutls_assert_val(DANE_E_FILE_ERROR);
+  
+  return 0;
+}
 
 /**
  * dane_query_deinit:

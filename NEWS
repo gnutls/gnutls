@@ -20,6 +20,8 @@ random padding mechanism in TLS allowing random padding in TLS records
 in all ciphersuites. Both the server and the client must support this
 extension. Its status can be checked using gnutls_record_get_random_padding_status().
 
+** libgnutls-dane: Added function to specify a DLV file.
+
 ** API and ABI modifications:
 gnutls_record_get_random_padding_status: Added
 gnutls_sbuf_deinit: Added
@@ -29,6 +31,7 @@ gnutls_sbuf_queue: Added
 gnutls_x509_crt_set_dn: Added
 gnutls_x509_crt_set_issuer_dn: Added
 gnutls_x509_crq_set_dn: Added
+dane_state_set_dlv_file: Added
 
 
 * Version 3.1.6 (released 2013-01-02)

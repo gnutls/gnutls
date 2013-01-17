@@ -63,6 +63,8 @@ static const error_entry error_algorithms[] = {
                DANE_E_PUBKEY_ERROR),
   ERROR_ENTRY (N_("No certificate was found."),
                DANE_E_NO_CERT),
+  ERROR_ENTRY (N_("Error in file."),
+               DANE_E_FILE_ERROR),
   {NULL, NULL, 0}
 };
 
