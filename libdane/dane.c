@@ -293,7 +293,7 @@ int dane_query_tlsa(dane_state_t s, dane_query_t *r, const char* host, const cha
 	
 	(*r)->data_entries = i;
 
-	if (!(*r)->result->secure) {
+	if (!(s->flags & DANE_F_INSECURE) && !(*r)->result->secure) {
 		if ((*r)->result->bogus)
 			ret = gnutls_assert_val(DANE_E_INVALID_DNSSEC_SIG);
 		else

@@ -2,7 +2,7 @@ AutoGen Definitions options;
 prog-name     = danetool;
 prog-title    = "GnuTLS DANE tool";
 prog-desc     = "Generate DANE TLSA RR entries.";
-detail    = "Tool to generate DNS resource records for the DANE protocol.";
+detail    = "Tool to generate and check DNS resource records for the DANE protocol.";
 short-usage   = "danetool [options]\ndanetool --help for usage instructions.\n";
 explain       = "";
 
@@ -44,6 +44,12 @@ flag = {
     arg-type  = string;
     descrip   = "Check a host's DANE TLSA entry.";
     doc = "Obtains the DANE TLSA entry from the given hostname and prints information.";
+};
+
+flag = {
+    name      = insecure;
+    descrip   = "Do not verify any DNSSEC signature.";
+    doc = "Ignores any DNSSEC signature verification results.";
 };
 
 flag = {

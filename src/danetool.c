@@ -197,6 +197,9 @@ size_t size;
   if (ENABLED_OPT(LOCAL_DNS))
     flags = 0;
 
+  if (HAVE_OPT(INSECURE))
+    flags |= DANE_F_INSECURE;
+
   printf("Querying %s (%s:%d)...\n", host, proto, port);
   ret = dane_state_init(&s, flags);
   if (ret < 0)
