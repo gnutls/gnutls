@@ -9,6 +9,18 @@ The rules here are not always used, although we try to stick to them.
  to the main TLS protocol implementation.
 
 
+*** Indentation style:
+  In general, use the GNU Coding Standard.  You may indent the source
+  using GNU indent, e.g. "indent -gnu -i2 -nut *.c".
+
+
+*** Git commits:
+  The original author of the changes should be the author of the commit.
+The "Signed-off-by" git flag is used to indicate the one who reviewed
+and approved the changes (note that this flag is used differently in
+other projects).
+
+
 *** Function names:
   All the function names use underscore "_", to separate words,
  functions like gnutlsDoThat are not used. The function names
@@ -35,6 +47,7 @@ The rules here are not always used, although we try to stick to them.
  All exported functions must be listed in libgnutls.map and libgnutls-extra.map
  in order to be exported.
 
+
 *** Constructed types:
   The constructed types in gnutls always have the "gnutls_" prefix.
  Definitions, value defaults and enumerated values should be in
@@ -46,6 +59,7 @@ The rules here are not always used, although we try to stick to them.
 
  Other constructed types should have the '_t' suffix. A pointer
  to a structure also has the '_t' suffix.
+
 
 *** Function parameters:
   The gnutls functions accept parameters in the order:
@@ -71,9 +85,6 @@ The rules here are not always used, although we try to stick to them.
  error codes are defined in gnutls.h and a description
  is available in gnutls_errors.c
 
-*** Indentation style:
-  In general, use the GNU Coding Standard.  You may indent the source
-  using GNU indent, e.g. "indent *.c".
 
 *** Guile bindings:
 
