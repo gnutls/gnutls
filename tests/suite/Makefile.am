@@ -92,7 +92,7 @@ noinst_LTLIBRARIES = libecore.la
 eagain_cli_LDADD = libecore.la -lrt -lm -ldl -lpthread $(LDADD)
 nodist_eagain_cli_SOURCES = mini-eagain2.c
 
-noinst_PROGRAMS = eagain-cli
+noinst_PROGRAMS = eagain-cli mini-record-timing
 
 TESTS += eagain
 endif

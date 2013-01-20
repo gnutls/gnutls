@@ -524,6 +524,7 @@ tests/mini-loss
 tests/mini-loss-time
 tests/mini-loss2
 tests/mini-record
+tests/suite/mini-record-timing
 tests/mini-rehandshake
 tests/mini-tdb
 tests/mini-termination
@@ -627,3 +628,5 @@ gl/tests/test-u8-uctomb
 tmp-compare-makefile
 tests/mini-dtls-record
 tests/mini-x509-rehandshake
+tests/mini-sbuf
+tests/suite/mini-record-timing
