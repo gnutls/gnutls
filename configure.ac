@@ -347,13 +347,9 @@ if test x$ac_zlib != xno; then
     else
       GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, zlib"
     fi
-  else
-    GNUTLS_ZLIB_LIBS_PRIVATE="$LTLIBZ"
   fi
 fi
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
-AC_SUBST(GNUTLS_ZLIB_LIBS_PRIVATE)
-
 
 
 
