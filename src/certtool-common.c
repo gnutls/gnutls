@@ -627,7 +627,7 @@ print_hex_datum (FILE* outfile, gnutls_datum_t * dat, int cprint)
         {
           fprintf (outfile, "\\x%.2x", (unsigned char) dat->data[j]);
           if ((j + 1) % 15 == 0)
-            fprintf (outfile, "\"\n" SPACE);
+            fprintf (outfile, "\"\n" SPACE"\"");
         }
       fprintf (outfile, "\";\n\n");
     
