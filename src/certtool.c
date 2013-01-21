@@ -928,7 +928,7 @@ cmd_parser (int argc, char **argv)
     req_key_type = GNUTLS_PK_ECC;
   else
     req_key_type = GNUTLS_PK_RSA;
-
+    
   default_dig = GNUTLS_DIG_UNKNOWN;
   if (HAVE_OPT(HASH))
     {
@@ -980,6 +980,8 @@ cmd_parser (int argc, char **argv)
   
   if (HAVE_OPT(VERBOSE))
     cinfo.verbose = 1;
+    
+  cinfo.cprint = HAVE_OPT(CPRINT);
   
   if (HAVE_OPT(LOAD_PRIVKEY))
     cinfo.privkey = OPT_ARG(LOAD_PRIVKEY);
@@ -1055,7 +1057,7 @@ cmd_parser (int argc, char **argv)
   else if (HAVE_OPT(CERTIFICATE_INFO))
     certificate_info (0, &cinfo);
   else if (HAVE_OPT(DH_INFO))
-    dh_info (&cinfo);
+    dh_info (infile, outfile, &cinfo);
   else if (HAVE_OPT(CERTIFICATE_PUBKEY))
     certificate_info (1, &cinfo);
   else if (HAVE_OPT(KEY_INFO))
@@ -1067,9 +1069,9 @@ cmd_parser (int argc, char **argv)
   else if (HAVE_OPT(P12_INFO))
     pkcs12_info (&cinfo);
   else if (HAVE_OPT(GENERATE_DH_PARAMS))
-    generate_prime (1, &cinfo);
+    generate_prime (outfile, 1, &cinfo);
   else if (HAVE_OPT(GET_DH_PARAMS))
-    generate_prime (0, &cinfo);
+    generate_prime (outfile, 0, &cinfo);
   else if (HAVE_OPT(CRL_INFO))
     crl_info ();
   else if (HAVE_OPT(P7_INFO))
@@ -1300,7 +1302,7 @@ pgp_privkey_info (void)
             fprintf (stderr, "Error in key RSA data export: %s\n",
                      gnutls_strerror (ret));
           else
-            print_rsa_pkey (outfile, &m, &e, &d, &p, &q, &u, NULL, NULL);
+            print_rsa_pkey (outfile, &m, &e, &d, &p, &q, &u, NULL, NULL, HAVE_OPT(CPRINT));
 
           bits = m.size * 8;
         }
@@ -1319,7 +1321,7 @@ pgp_privkey_info (void)
             fprintf (stderr, "Error in key DSA data export: %s\n",
                      gnutls_strerror (ret));
           else
-            print_dsa_pkey (outfile, &x, &y, &p, &q, &g);
+            print_dsa_pkey (outfile, &x, &y, &p, &q, &g, HAVE_OPT(CPRINT));
             
           bits = y.size * 8;
         }
@@ -1613,7 +1615,7 @@ const char *cprint;
                  gnutls_strerror (ret));
       else
         {
-          print_rsa_pkey (outfile, &m, &e, &d, &p, &q, &u, &exp1, &exp2);
+          print_rsa_pkey (outfile, &m, &e, &d, &p, &q, &u, &exp1, &exp2, HAVE_OPT(CPRINT));
 
           gnutls_free (m.data);
           gnutls_free (e.data);
@@ -1635,7 +1637,7 @@ const char *cprint;
                  gnutls_strerror (ret));
       else
         {
-          print_dsa_pkey (outfile, &x, &y, &p, &q, &g);
+          print_dsa_pkey (outfile, &x, &y, &p, &q, &g, HAVE_OPT(CPRINT));
 
           gnutls_free (x.data);
           gnutls_free (y.data);
@@ -1655,7 +1657,7 @@ const char *cprint;
                  gnutls_strerror (ret));
       else
         {
-          print_ecc_pkey (outfile, curve, &k, &x, &y);
+          print_ecc_pkey (outfile, curve, &k, &x, &y, HAVE_OPT(CPRINT));
 
           gnutls_free (x.data);
           gnutls_free (y.data);

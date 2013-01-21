@@ -158,6 +158,12 @@ flag = {
 };
 
 flag = {
+    name      = cprint;
+    descrip   = "In certain operations it prints the information is C-friendly format";
+    doc   = "In certain operations it prints the information is C-friendly format, suitable for including into C programs.";
+};
+
+flag = {
     name      = null-password;
     descrip   = "Enforce a NULL password";
     doc   = "This option enforces a NULL password. This may be different than the empty password in some schemas.";

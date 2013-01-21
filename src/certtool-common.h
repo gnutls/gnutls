@@ -52,6 +52,8 @@ typedef struct common_info
   unsigned int crq_extensions;
   unsigned int v1_cert;
   
+  int cprint;
+  
   unsigned int verbose;
 } common_info_st;
 
@@ -73,21 +75,22 @@ int get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_se
 gnutls_sec_param_t str_to_sec_param (const char *str);
 
 /* prime.c */
-int generate_prime (int how, common_info_st * info);
-void dh_info (common_info_st * ci);
+int generate_prime (FILE* outfile, int how, common_info_st * info);
+void dh_info (FILE* infile, FILE* outfile, common_info_st * ci);
 
 gnutls_x509_privkey_t * load_privkey_list (int mand, size_t * privkey_size, common_info_st * info);
 
 void _pubkey_info(FILE* outfile, gnutls_certificate_print_formats_t, gnutls_pubkey_t pubkey);
 void
-print_ecc_pkey (FILE* outfile, gnutls_ecc_curve_t curve, gnutls_datum_t* k, gnutls_datum_t * x, gnutls_datum_t * y);
+print_ecc_pkey (FILE* outfile, gnutls_ecc_curve_t curve, gnutls_datum_t* k, gnutls_datum_t * x, 
+                gnutls_datum_t * y, int cprint);
 void
 print_rsa_pkey (FILE* outfile, gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
                 gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * u,
-                gnutls_datum_t * exp1, gnutls_datum_t * exp2);
+                gnutls_datum_t * exp1, gnutls_datum_t * exp2, int cprint);
 void
 print_dsa_pkey (FILE* outfile, gnutls_datum_t * x, gnutls_datum_t * y, gnutls_datum_t * p,
-                gnutls_datum_t * q, gnutls_datum_t * g);
+                gnutls_datum_t * q, gnutls_datum_t * g, int cprint);
 
 FILE *safe_open_rw (const char *file, int privkey_op);
 

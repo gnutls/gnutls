@@ -40,6 +40,7 @@
 #include <error.h>
 #include <common.h>
 #include "certtool-common.h"
+#include "certtool-args.h"
 #include "certtool-cfg.h"
 
 /* Gnulib portability files. */
@@ -613,11 +614,26 @@ gnutls_sec_param_t str_to_sec_param (const char *str)
 
 }
 
+#define SPACE "\t"
 static void
-print_hex_datum (FILE* outfile, gnutls_datum_t * dat)
+print_hex_datum (FILE* outfile, gnutls_datum_t * dat, int cprint)
 {
   unsigned int j;
-#define SPACE "\t"
+  
+  if (cprint != 0)
+    {
+      fprintf (outfile, "\n" SPACE"\"");
+      for (j = 0; j < dat->size; j++)
+        {
+          fprintf (outfile, "\\x%.2x", (unsigned char) dat->data[j]);
+          if ((j + 1) % 15 == 0)
+            fprintf (outfile, "\"\n" SPACE);
+        }
+      fprintf (outfile, "\";\n\n");
+    
+      return;
+    }
+  
   fprintf (outfile, "\n" SPACE);
   for (j = 0; j < dat->size; j++)
     {
@@ -625,68 +641,100 @@ print_hex_datum (FILE* outfile, gnutls_datum_t * dat)
       if ((j + 1) % 15 == 0)
         fprintf (outfile, "\n" SPACE);
     }
-  fprintf (outfile, "\n");
+  fprintf (outfile, "\n\n");
+}
+
+static void print_head(FILE* out, const char* txt, unsigned int size, int cprint)
+{
+unsigned i;
+char* p, * ntxt;
+
+  if (cprint != 0)
+    {
+      if (size > 0)
+        asprintf(&ntxt, "const unsigned char %s[%u] =", txt, size);
+      else
+        asprintf(&ntxt, "const unsigned char %s[] =\n", txt);
+        
+      p = strstr(ntxt, "char");
+      p += 5;
+      
+      for (i=0;i<strlen(txt);i++)
+        if (p[i] == ' ') p[i] = '_';
+      
+      fprintf(out, "%s", ntxt);
+      free(ntxt);
+      
+      return;
+    }
+    fprintf(out, "%s:", txt);
 }
 
 void
 print_dsa_pkey (FILE* outfile, gnutls_datum_t * x, gnutls_datum_t * y, gnutls_datum_t * p,
-                gnutls_datum_t * q, gnutls_datum_t * g)
+                gnutls_datum_t * q, gnutls_datum_t * g, int cprint)
 {
   if (x)
     {
-      fprintf (outfile, "private key:");
-      print_hex_datum (outfile, x);
+      print_head (outfile, "private key", x->size, cprint);
+      print_hex_datum (outfile, x, cprint);
     }
-  fprintf (outfile, "public key:");
-  print_hex_datum (outfile, y);
-  fprintf (outfile, "p:");
-  print_hex_datum (outfile, p);
-  fprintf (outfile, "q:");
-  print_hex_datum (outfile, q);
-  fprintf (outfile, "g:");
-  print_hex_datum (outfile, g);
+  print_head (outfile, "public key", y->size, cprint);
+  print_hex_datum (outfile, y, cprint);
+  print_head (outfile, "p", p->size, cprint);
+  print_hex_datum (outfile, p, cprint);
+  print_head (outfile, "q", q->size, cprint);
+  print_hex_datum (outfile, q, cprint);
+  print_head (outfile, "g", g->size, cprint);
+  print_hex_datum (outfile, g, cprint);
 }
 
 void
-print_ecc_pkey (FILE* outfile, gnutls_ecc_curve_t curve, gnutls_datum_t* k, gnutls_datum_t * x, gnutls_datum_t * y)
+print_ecc_pkey (FILE* outfile, gnutls_ecc_curve_t curve, gnutls_datum_t* k, 
+                gnutls_datum_t * x, gnutls_datum_t * y, int cprint)
 {
-  fprintf (outfile, "curve:\t%s\n", gnutls_ecc_curve_get_name(curve));
+  if (cprint != 0)
+    fprintf (outfile, "/* curve: %s */\n", gnutls_ecc_curve_get_name(curve));
+  else
+    fprintf (outfile, "curve:\t%s\n", gnutls_ecc_curve_get_name(curve));
+
   if (k)
     {
-      fprintf (outfile, "private key:");
-      print_hex_datum (outfile, k);
+      print_head (outfile, "private key", k->size, cprint);
+      print_hex_datum (outfile, k, cprint);
     }
-  fprintf (outfile, "x:");
-  print_hex_datum (outfile, x);
-  fprintf (outfile, "y:");
-  print_hex_datum (outfile, y);
+  print_head (outfile, "x", x->size, cprint);
+  print_hex_datum (outfile, x, cprint);
+  print_head (outfile, "y", y->size, cprint);
+  print_hex_datum (outfile, y, cprint);
 }
+
 
 void
 print_rsa_pkey (FILE* outfile, gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
                 gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * u,
-                gnutls_datum_t * exp1, gnutls_datum_t * exp2)
+                gnutls_datum_t * exp1, gnutls_datum_t * exp2, int cprint)
 {
-  fprintf (outfile, "modulus:");
-  print_hex_datum (outfile, m);
-  fprintf (outfile, "public exponent:");
-  print_hex_datum (outfile, e);
+  print_head (outfile, "modulus", m->size, cprint);
+  print_hex_datum (outfile, m, cprint);
+  print_head (outfile, "public exponent", e->size, cprint);
+  print_hex_datum (outfile, e, cprint);
   if (d)
     {
-      fprintf (outfile, "private exponent:");
-      print_hex_datum (outfile, d);
-      fprintf (outfile, "prime1:");
-      print_hex_datum (outfile, p);
-      fprintf (outfile, "prime2:");
-      print_hex_datum (outfile, q);
-      fprintf (outfile, "coefficient:");
-      print_hex_datum (outfile, u);
+      print_head (outfile, "private exponent", d->size, cprint);
+      print_hex_datum (outfile, d, cprint);
+      print_head (outfile, "prime1", p->size, cprint);
+      print_hex_datum (outfile, p, cprint);
+      print_head (outfile, "prime2", q->size, cprint);
+      print_hex_datum (outfile, q, cprint);
+      print_head (outfile, "coefficient", u->size, cprint);
+      print_hex_datum (outfile, u, cprint);
       if (exp1 && exp2)
         {
-          fprintf (outfile, "exp1:");
-          print_hex_datum (outfile, exp1);
-          fprintf (outfile, "exp2:");
-          print_hex_datum (outfile, exp2);
+          print_head (outfile, "exp1", exp1->size, cprint);
+          print_hex_datum (outfile, exp1, cprint);
+          print_head (outfile, "exp2", exp2->size, cprint);
+          print_hex_datum (outfile, exp2, cprint);
         }
     }
 }
@@ -711,3 +759,191 @@ size_t size;
 
   fprintf (outfile, "\n%s\n", buffer);
 }
+
+static void
+print_dh_info (FILE* outfile, gnutls_datum_t * p, gnutls_datum_t * g, unsigned int q_bits, int cprint)
+{
+  if (q_bits > 0)
+    {
+      if (cprint != 0)
+        fprintf (outfile, "\n /* recommended key length: %d bytes */\n\n", (7+q_bits)/8);
+      else
+        fprintf (outfile, "\nRecommended key length: %d bits\n\n", q_bits);
+    }
+
+  print_head (outfile, "generator", g->size, cprint);
+  print_hex_datum (outfile, g, cprint);
+
+  print_head (outfile, "prime", p->size, cprint);
+  print_hex_datum (outfile, p, cprint);
+
+
+}
+
+void dh_info (FILE* infile, FILE* outfile, common_info_st * ci)
+{
+  gnutls_datum_t params;
+  size_t size;
+  int ret;
+  gnutls_dh_params_t dh_params;
+  gnutls_datum_t p, g;
+  unsigned int q_bits = 0;
+
+  if (gnutls_dh_params_init (&dh_params) < 0)
+    {
+      fprintf (stderr, "Error in dh parameter initialization\n");
+      exit (1);
+    }
+
+  params.data = (void*)fread_file (infile, &size);
+  params.size = size;
+
+  ret =
+    gnutls_dh_params_import_pkcs3 (dh_params, &params, GNUTLS_X509_FMT_PEM);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error parsing dh params: %s\n", gnutls_strerror (ret));
+      exit (1);
+    }
+
+  ret = gnutls_dh_params_export_raw (dh_params, &p, &g, &q_bits);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error exporting parameters: %s\n",
+               gnutls_strerror (ret));
+      exit (1);
+    }
+    
+  print_dh_info (outfile, &p, &g, q_bits, ci->cprint);
+
+  if (!ci->cprint)
+    {                             /* generate a PKCS#3 structure */
+    size_t len = buffer_size;
+
+    ret = gnutls_dh_params_export_pkcs3 (dh_params, GNUTLS_X509_FMT_PEM,
+                                         buffer, &len);
+
+    if (ret == 0)
+      {
+        fprintf (outfile, "\n%s", buffer);
+      }
+    else
+      {
+        fprintf (stderr, "Error: %s\n", gnutls_strerror (ret));
+      }
+    }
+
+  gnutls_dh_params_deinit(dh_params);
+}
+
+/* If how is zero then the included parameters are used.
+ */
+int
+generate_prime (FILE* outfile, int how, common_info_st * info)
+{
+  int ret;
+  gnutls_dh_params_t dh_params;
+  gnutls_datum_t p, g;
+  int bits = get_bits (GNUTLS_PK_DH, info->bits, info->sec_param, 1);
+  unsigned int q_bits = 0;
+
+  gnutls_dh_params_init (&dh_params);
+
+  if (how != 0)
+    {
+      fprintf (stderr, "Generating DH parameters (%d bits)...\n", bits);
+      fprintf (stderr, "(might take long time)\n");
+    }
+  else
+    fprintf (stderr, "Retrieving DH parameters...\n");
+
+  if (how != 0)
+    {
+      ret = gnutls_dh_params_generate2 (dh_params, bits);
+      if (ret < 0)
+        {
+          fprintf (stderr, "Error generating parameters: %s\n",
+                   gnutls_strerror (ret));
+          exit (1);
+        }
+
+      ret = gnutls_dh_params_export_raw (dh_params, &p, &g, &q_bits);
+      if (ret < 0)
+        {
+          fprintf (stderr, "Error exporting parameters: %s\n",
+                   gnutls_strerror (ret));
+          exit (1);
+        }
+    }
+  else
+    {
+#ifdef ENABLE_SRP
+      if (bits <= 1024)
+        {
+          p = gnutls_srp_1024_group_prime;
+          g = gnutls_srp_1024_group_generator;
+          bits = 1024;
+        }
+      else if (bits <= 1536)
+        {
+          p = gnutls_srp_1536_group_prime;
+          g = gnutls_srp_1536_group_generator;
+          bits = 1536;
+        }
+      else if (bits <= 2048)
+        {
+          p = gnutls_srp_2048_group_prime;
+          g = gnutls_srp_2048_group_generator;
+          bits = 2048;
+        }
+      else if (bits <= 3072)
+        {
+          p = gnutls_srp_3072_group_prime;
+          g = gnutls_srp_3072_group_generator;
+          bits = 3072;
+        }
+      else
+        {
+          p = gnutls_srp_4096_group_prime;
+          g = gnutls_srp_4096_group_generator;
+          bits = 4096;
+        }
+
+      ret = gnutls_dh_params_import_raw (dh_params, &p, &g);
+      if (ret < 0)
+        {
+          fprintf (stderr, "Error exporting parameters: %s\n",
+                   gnutls_strerror (ret));
+          exit (1);
+        }
+#else
+      fprintf (stderr, "Parameters unavailable as SRP is disabled.\n");
+      exit (1);
+#endif
+    }
+
+  print_dh_info (outfile, &p, &g, q_bits, info->cprint);
+
+  if (!info->cprint)
+    {                             /* generate a PKCS#3 structure */
+    size_t len = buffer_size;
+
+    ret = gnutls_dh_params_export_pkcs3 (dh_params, GNUTLS_X509_FMT_PEM,
+                                         buffer, &len);
+
+    if (ret == 0)
+      {
+        fprintf (outfile, "\n%s", buffer);
+      }
+    else
+      {
+        fprintf (stderr, "Error: %s\n", gnutls_strerror (ret));
+      }
+
+    }
+
+  gnutls_dh_params_deinit(dh_params);
+
+  return 0;
+}
+
