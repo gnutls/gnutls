@@ -1937,20 +1937,6 @@ typedef int (*gnutls_pin_callback_t) (void *userdata, int attempt,
   void gnutls_certificate_set_pin_function (gnutls_certificate_credentials_t,
                                             gnutls_pin_callback_t fn, void *userdata);
 
-/* Buffered session I/O */
-typedef struct gnutls_sbuf_st *gnutls_sbuf_t;
-
-ssize_t gnutls_sbuf_queue (gnutls_sbuf_t sb, const void *data,
-                           size_t data_size);
-
-ssize_t gnutls_sbuf_flush (gnutls_sbuf_t sb);
-
-#define GNUTLS_SBUF_QUEUE_FLUSHES 1
-int gnutls_sbuf_init (gnutls_sbuf_t * sb, gnutls_session_t session,
-                      unsigned int flags);
-void gnutls_sbuf_deinit(gnutls_sbuf_t sb);
-
-
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.
    */

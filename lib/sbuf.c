@@ -24,6 +24,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 #include <gnutls_str.h>
+#include <gnutls/sbuf.h>
 
 struct gnutls_sbuf_st {
   gnutls_session_t session;
@@ -81,7 +82,7 @@ void gnutls_sbuf_deinit(gnutls_sbuf_t sb)
 }
 
 /**
- * gnutls_sbuf_queue:
+ * gnutls_sbuf_write:
  * @sb: is a #gnutls_sbuf_t structure.
  * @data: contains the data to send
  * @data_size: is the length of the data
@@ -93,12 +94,12 @@ void gnutls_sbuf_deinit(gnutls_sbuf_t sb)
  *
  * This function must only be used with blocking sockets.
  *
- * Returns: On success, if no data were sent then zero is returned, otherwise the 
- * number of bytes sent. If an error occurs a negative error code is returned.
+ * Returns: On success, the number of bytes written is returned, otherwise
+ *  an error code is returned.
  *
  * Since: 3.1.7
  **/
-ssize_t gnutls_sbuf_queue (gnutls_sbuf_t sb, const void *data,
+ssize_t gnutls_sbuf_write (gnutls_sbuf_t sb, const void *data,
                            size_t data_size)
 {
 int ret;
@@ -120,10 +121,45 @@ int ret;
 
       sb->buf.data += ret;
       sb->buf.length -= ret;
-      return ret;
     }
   
-  return 0;
+  return data_size;
+}
+
+/**
+ * gnutls_sbuf_printf:
+ * @sb: is a #gnutls_sbuf_t structure.
+ * @fmt: printf-style format 
+ *
+ * This function allows writing to a %gnutls_sbuf_t using printf
+ * style arguments.
+ *
+ * This function must only be used with blocking sockets.
+ *
+ * Returns: On success, the number of bytes written is returned, otherwise
+ *  an error code is returned.
+ *
+ * Since: 3.1.7
+ **/
+ssize_t gnutls_sbuf_printf (gnutls_sbuf_t sb, const char *fmt, ...)
+{
+int ret;
+va_list args;
+int len;
+char* str;
+
+  va_start(args, fmt);
+  len = vasprintf(&str, fmt, args);
+  va_end(args);
+  
+  if (len < 0 || !str)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+  
+  ret = gnutls_sbuf_write (sb, str, len);
+  
+  gnutls_free(str);
+
+  return ret;
 }
 
 /**
@@ -159,4 +195,68 @@ ssize_t total = 0;
     }
 
   return total;
+}
+
+/**
+ * gnutls_sbuf_handshake:
+ * @sb: is a #gnutls_sbuf_t structure.
+ *
+ * This function performs a handshake on the underlying session.
+ * Only fatal errors are returned by this function.
+ *
+ * Returns: On success, zero is returned, otherwise a negative error code.
+ *
+ * Since: 3.1.7
+ **/
+int gnutls_sbuf_handshake(gnutls_sbuf_t sb)
+{
+int ret, ret2;
+
+  do
+    {
+      ret = gnutls_handshake(sb->session);
+    }
+  while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+  if (ret < 0)
+    {
+      do
+        {
+          ret2 = gnutls_alert_send_appropriate(sb->session, ret);
+        }
+      while (ret2 < 0 && gnutls_error_is_fatal(ret2) == 0);
+
+      return gnutls_assert_val(ret);
+    }
+    
+  return 0;
+}
+
+/**
+ * gnutls_sbuf_read:
+ * @sb: is a #gnutls_sbuf_t structure.
+ * @data: the buffer that the data will be read into
+ * @data_size: the number of requested bytes
+ *
+ * This function receives data from the underlying session.
+ * Only fatal errors are returned by this function.
+ *
+ * Returns: The number of bytes received and zero on EOF (for stream
+ * connections) or a negative error code.
+ *
+ * Since: 3.1.7
+ **/
+ssize_t gnutls_sbuf_read(gnutls_sbuf_t sb, void* data, size_t data_size)
+{
+int ret;
+
+  do
+    {
+      ret = gnutls_record_recv(sb->session, data, data_size);
+    }
+  while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  return 0;
 }
