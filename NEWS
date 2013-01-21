@@ -25,6 +25,7 @@ extension. Its status can be checked using gnutls_record_get_random_padding_stat
 ** libgnutls-dane: Added function to specify a DLV file.
 
 ** API and ABI modifications:
+gnutls_record_set_timeout: Added
 gnutls_record_get_random_padding_status: Added
 gnutls_sbuf_deinit: Added
 gnutls_sbuf_init: Added

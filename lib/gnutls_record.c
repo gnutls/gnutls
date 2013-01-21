@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
- * Copyright (C) 2012 Nikos Mavrogiannopoulos
+ * Copyright (C) 2000-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2012,2013 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -221,7 +221,8 @@ gnutls_bye (gnutls_session_t session, gnutls_close_request_t how)
         {
           do
             {
-              ret = _gnutls_recv_int (session, GNUTLS_ALERT, -1, NULL, 0, NULL, 0);
+              ret = _gnutls_recv_int (session, GNUTLS_ALERT, -1, NULL, 0, NULL, 
+                                      session->internals.record_timeout_ms);
             }
           while (ret == GNUTLS_E_GOT_APPLICATION_DATA);
 
@@ -1313,7 +1314,8 @@ gnutls_record_send (gnutls_session_t session, const void *data,
 ssize_t
 gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size) 
 {
-    return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data, data_size, NULL, 0);
+    return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data, data_size, 
+                             NULL, session->internals.record_timeout_ms);
 }
 
 /**
@@ -1341,5 +1343,27 @@ gnutls_record_recv_seq (gnutls_session_t session, void *data, size_t data_size,
   unsigned char *seq)
 {
   return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data,
-                           data_size, seq, 0);
+                           data_size, seq, session->internals.record_timeout_ms);
+}
+
+/**
+ * gnutls_record_set_timeout:
+ * @session: is a #gnutls_session_t structure.
+ * @ms: is a timeout value in milliseconds
+ *
+ * This function sets the receive timeout for the record layer
+ * to the provided value. Use an @ms value of zero to disable
+ * timeout (the default).
+ *
+ * Note that in order for the timeout to be enforced
+ * gnutls_transport_set_pull_timeout_function() must be set
+ * (it is set by default in most systems).
+ *
+ * Since: 3.1.7
+ *
+ **/
+void
+gnutls_record_set_timeout (gnutls_session_t session, unsigned int ms)
+{
+  session->internals.record_timeout_ms = ms;
 }

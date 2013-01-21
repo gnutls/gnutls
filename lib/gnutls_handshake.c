@@ -2446,7 +2446,8 @@ gnutls_handshake (gnutls_session_t session)
  * timeout.
  *
  * Note that in order for the timeout to be enforced
- * gnutls_transport_set_pull_timeout_function() must be set.
+ * gnutls_transport_set_pull_timeout_function() must be set
+ * (it is set by default in most systems).
  *
  **/
 void

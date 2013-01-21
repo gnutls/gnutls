@@ -883,6 +883,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                        unsigned int max_tries, unsigned int flags);
   int gnutls_heartbeat_pong (gnutls_session_t session, unsigned int flags);
 
+  void gnutls_record_set_timeout (gnutls_session_t session, unsigned int ms);
   ssize_t gnutls_record_send (gnutls_session_t session, const void *data,
                               size_t data_size);
   ssize_t gnutls_record_recv (gnutls_session_t session, void *data,

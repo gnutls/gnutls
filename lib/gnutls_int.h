@@ -916,6 +916,7 @@ typedef struct
   
   time_t handshake_endtime; /* end time in seconds */
   unsigned int handshake_timeout_ms; /* timeout in milliseconds */
+  unsigned int record_timeout_ms; /* timeout in milliseconds */
 
   gnutls_buffer_st hb_local_data;
   gnutls_buffer_st hb_remote_data;
