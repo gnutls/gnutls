@@ -42,7 +42,7 @@
 /* created by asn1c */
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
-extern void *_gnutls_file_mutex;
+void *_gnutls_file_mutex;
 
 ASN1_TYPE _gnutls_pkix1_asn;
 ASN1_TYPE _gnutls_gnutls_asn;
