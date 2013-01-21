@@ -19,6 +19,6 @@ Description: Transport Security Layer implementation for the GNU system
 URL: http://www.gnu.org/software/gnutls/
 Version: @VERSION@
 Libs: -L${libdir} -lgnutls
-Libs.private: @LTLIBNETTLE@ @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@
+Libs.private: @LTLIBNETTLE@ @LTLIBZ@ @LTLIBINTL@ @LIBSOCKET@ @LTLIBPTHREAD@ @LTLIBICONV@ @P11_KIT_LIBS@ @LIB_SELECT@ @TSS_LIBS@ @LIB_CLOCK_GETTIME@
 @GNUTLS_REQUIRES_PRIVATE@
 Cflags: -I${includedir}
