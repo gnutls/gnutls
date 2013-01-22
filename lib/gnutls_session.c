@@ -224,3 +224,20 @@ gnutls_session_set_data (gnutls_session_t session,
 
   return 0;
 }
+
+/**
+ * gnutls_session_clear_invalid:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Clears the invalid flag in a session. That means
+ * that sessions were corrupt or invalid data were received 
+ * can be re-used. Use only when debugging or experimenting
+ * with the TLS protocol. Should not be used in typical
+ * applications.
+ *
+ **/
+void
+gnutls_session_clear_invalid (gnutls_session_t session)
+{
+  session->internals.invalid_connection = 0;
+}

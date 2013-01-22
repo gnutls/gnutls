@@ -905,6 +905,8 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   size_t gnutls_record_check_pending (gnutls_session_t session);
 
+  void gnutls_session_clear_invalid (gnutls_session_t session);
+
   int gnutls_prf (gnutls_session_t session,
                   size_t label_size, const char *label,
                   int server_random_first,
