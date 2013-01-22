@@ -226,7 +226,7 @@ gnutls_session_set_data (gnutls_session_t session,
 }
 
 /**
- * gnutls_session_clear_invalid:
+ * gnutls_session_force_valid:
  * @session: is a #gnutls_session_t structure.
  *
  * Clears the invalid flag in a session. That means
@@ -237,7 +237,7 @@ gnutls_session_set_data (gnutls_session_t session,
  *
  **/
 void
-gnutls_session_clear_invalid (gnutls_session_t session)
+gnutls_session_force_valid (gnutls_session_t session)
 {
   session->internals.invalid_connection = 0;
 }
