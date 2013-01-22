@@ -803,6 +803,9 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
+  
+  if (err_pos)
+    *err_pos = priorities;
 
   /* for now unsafe renegotiation is default on everyone. To be removed
    * when we make it the default.
