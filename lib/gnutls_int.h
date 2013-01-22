@@ -606,9 +606,9 @@ struct gnutls_priority_st
 
   /* to disable record padding */
   unsigned int no_extensions:1;
-  unsigned int no_padding:1;
   unsigned int allow_large_records:1;
   unsigned int new_record_padding:1;
+  unsigned int max_empty_records;
   safe_renegotiation_t sr;
   unsigned int ssl3_record_version:1;
   unsigned int server_precedence:1;
@@ -618,8 +618,12 @@ struct gnutls_priority_st
   unsigned int additional_verify_flags;
 };
 
+/* Allow around 50KB of length-hiding padding
+ * when using legacy padding,
+ * or around 3.2MB when using new padding. */
+#define DEFAULT_MAX_EMPTY_RECORDS 200
+
 #define ENABLE_COMPAT(x) \
-              (x)->no_padding = 1; \
               (x)->allow_large_records = 1; \
               (x)->allow_weak_keys = 1
 

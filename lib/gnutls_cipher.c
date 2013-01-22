@@ -43,6 +43,7 @@
 static int compressed_to_ciphertext (gnutls_session_t session,
                                    uint8_t * cipher_data, int cipher_size,
                                    gnutls_datum_t *compressed,
+                                   size_t target_size,
                                    content_type_t _type, 
                                    record_parameters_st * params);
 static int ciphertext_to_compressed (gnutls_session_t session,
@@ -61,6 +62,7 @@ static int
 compressed_to_ciphertext_new (gnutls_session_t session,
                                uint8_t * cipher_data, int cipher_size,
                                gnutls_datum_t *compressed,
+                               size_t target_size,
                                content_type_t type, 
                                record_parameters_st * params);
 
@@ -86,12 +88,11 @@ is_read_comp_null (record_parameters_st * record_params)
 /* returns ciphertext which contains the headers too. This also
  * calculates the size in the header field.
  * 
- * If random pad != 0 then the random pad data will be appended.
  */
 int
 _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
                  size_t headers_size, const uint8_t * data,
-                 size_t data_size, uint8_t * ciphertext,
+                 size_t data_size, size_t target_size, uint8_t * ciphertext,
                  size_t ciphertext_size, content_type_t type, 
                  record_parameters_st * params)
 {
@@ -130,11 +131,11 @@ _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
   if (session->security_parameters.new_record_padding != 0)
     ret = compressed_to_ciphertext_new (session, &ciphertext[headers_size],
                                         ciphertext_size - headers_size,
-                                        &comp, type, params);
+                                        &comp, target_size, type, params);
   else
     ret = compressed_to_ciphertext (session, &ciphertext[headers_size],
                                     ciphertext_size - headers_size,
-                                    &comp, type, params);
+                                    &comp, target_size, type, params);
 
   if (free_comp)
     gnutls_free(comp.data);
@@ -228,32 +229,15 @@ calc_enc_length_block (gnutls_session_t session, int data_size,
                  int hash_size, uint8_t * pad, 
                  unsigned auth_cipher, uint16_t blocksize)
 {
-  uint8_t rnd = *pad;
-  unsigned int length;
+  /* pad is the LH pad the user wants us to add. Besides
+   * this LH pad, we only add minimal padding
+   */
+  unsigned int pre_length = data_size + hash_size + *pad;
 
-  *pad = 0;
+  *pad = (uint8_t) (blocksize - (pre_length % blocksize)) + *pad;
 
-  /* make rnd a multiple of blocksize */
-  if (session->security_parameters.version == GNUTLS_SSL3)
-    {
-      rnd = 0;
-    }
-  
-  if (rnd > 0)
-    {
-      rnd = (rnd / blocksize) * blocksize;
-      /* added to avoid the case of pad calculated 0
-       * seen below for pad calculation.
-       */
-      if (rnd > blocksize)
-        rnd -= blocksize;
-    }
+  unsigned int length = data_size + hash_size + *pad;
 
-  length = data_size + hash_size;
-
-  *pad = (uint8_t) (blocksize - (length % blocksize)) + rnd;
-
-  length += *pad;
   if (_gnutls_version_has_explicit_iv
       (session->security_parameters.version))
     length += blocksize;    /* for the IV */
@@ -315,11 +299,12 @@ static int
 compressed_to_ciphertext (gnutls_session_t session,
                                uint8_t * cipher_data, int cipher_size,
                                gnutls_datum_t *compressed,
+                               size_t target_size,
                                content_type_t type, 
                                record_parameters_st * params)
 {
   uint8_t * tag_ptr = NULL;
-  uint8_t pad = 0;
+  uint8_t pad = target_size - compressed->size;
   int length, length_to_encrypt, ret;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
@@ -331,7 +316,7 @@ compressed_to_ciphertext (gnutls_session_t session,
   int ver = gnutls_protocol_get_version (session);
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
-  uint8_t nonce[MAX_CIPHER_BLOCK_SIZE+1];
+  uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
 
 
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
@@ -347,17 +332,11 @@ compressed_to_ciphertext (gnutls_session_t session,
    */
   if (block_algo == CIPHER_BLOCK)
     {
-      /* Call _gnutls_rnd() once. Get data used for the IV + 1 for 
-       * the random padding.
+      /* Call _gnutls_rnd() once. Get data used for the IV
        */
-      ret = _gnutls_rnd (GNUTLS_RND_NONCE, nonce, blocksize+1);
+      ret = _gnutls_rnd (GNUTLS_RND_NONCE, nonce, blocksize);
       if (ret < 0)
         return gnutls_assert_val(ret);
-
-      /* We don't use long padding if requested or if we are in DTLS.
-       */
-      if (session->internals.priorities.no_padding == 0 && !IS_DTLS(session))
-        pad = nonce[blocksize];
 
       length_to_encrypt = length =
         calc_enc_length_block (session, compressed->size, tag_size, &pad,
@@ -461,11 +440,12 @@ static int
 compressed_to_ciphertext_new (gnutls_session_t session,
                                uint8_t * cipher_data, int cipher_size,
                                gnutls_datum_t *compressed,
+                               size_t target_size,
                                content_type_t type, 
                                record_parameters_st * params)
 {
   uint8_t * tag_ptr = NULL;
-  uint16_t pad = 0;
+  uint16_t pad = target_size - compressed->size;
   int length, length_to_encrypt, ret;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
@@ -477,23 +457,17 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   int ver = gnutls_protocol_get_version (session);
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
-  uint8_t nonce[MAX_CIPHER_BLOCK_SIZE+2];
+  uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
 
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
     session, gnutls_cipher_get_name(params->cipher_algorithm), gnutls_mac_get_name(params->mac_algorithm),
     (unsigned int)params->epoch);
 
-  /* Call _gnutls_rnd() once. Get data used for the IV + 2 for 
-   * the random padding.
+  /* Call _gnutls_rnd() once. Get data used for the IV
    */
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, nonce, blocksize+2);
+  ret = _gnutls_rnd (GNUTLS_RND_NONCE, nonce, blocksize);
   if (ret < 0)
     return gnutls_assert_val(ret);
-
-  /* We don't use long padding if requested.
-   */
-  if (session->internals.priorities.no_padding == 0)
-    memcpy(&pad, &nonce[blocksize], 2);
 
   /* cipher_data points to the start of data to be encrypted */
   data_ptr = cipher_data;
@@ -548,16 +522,13 @@ compressed_to_ciphertext_new (gnutls_session_t session,
 
   DECR_LEN(cipher_size, 2);
 
-  pad %= (cipher_size - (compressed->size + tag_size));
-
   if (block_algo == CIPHER_BLOCK) /* make pad a multiple of blocksize */
     {
       unsigned t = (2 + pad + compressed->size + tag_size) % blocksize;
-      
-      if (pad > t)
-        pad -= t;
-      else
-        pad += blocksize - t;
+      if (t > 0)
+        {
+    	  pad += blocksize - t;
+        }
     }
   
   _gnutls_write_uint16 (pad, data_ptr);

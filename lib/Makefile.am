@@ -61,7 +61,8 @@ SRP_COBJECTS = gnutls_srp.c
 
 PSK_COBJECTS = gnutls_psk.c
 
-COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
+COBJECTS = gnutls_range.c gnutls_record.c \
+	gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_mbuffers.c gnutls_buffers.c gnutls_handshake.c		\
 	gnutls_num.c gnutls_errors.c gnutls_dh.c gnutls_kx.c		\
 	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c		\

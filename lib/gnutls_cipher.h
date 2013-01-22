@@ -22,7 +22,7 @@
 
 int _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
                      size_t headers_size, const uint8_t * data,
-                     size_t data_size, uint8_t * ciphertext,
+                     size_t data_size, size_t target_size, uint8_t * ciphertext,
                      size_t ciphertext_size, content_type_t type,
                      record_parameters_st * params);
 

@@ -230,10 +230,16 @@ Working Group mailing list and @xcite{CBCATT}.
 @cindex record padding
 @cindex bad_record_mac
 
-The TLS protocol allows for random padding of records in CBC ciphers, to prevent
+The TLS protocol allows for extra padding of records in CBC ciphers, to prevent
 statistical analysis based on the length of exchanged messages (see @xcite{RFC5246} section 6.2.3.2).  
-GnuTLS appears to be one of few implementation that take advantage of this text, 
-and pad records by a random length.
+GnuTLS appears to be one of few implementations that take advantage of this feature: 
+the user can provide some plaintext data with a range of lengths she wishes to hide,
+and GnuTLS adds extra padding to make sure the attacker cannot tell the real plaintext
+length is in a range smaller than the user-provided one.
+Use @funcref{gnutls_range_send_message} to send length-hidden messages and
+@funcref{gnutls_range_can_use_length_hiding} to check whether the current
+session supports length hiding. Using the standard @funcref{gnutls_record_send}
+will only add minimal padding.
 
 The TLS implementation in the Symbian operating system, frequently
 used by Nokia and Sony-Ericsson mobile phones, cannot handle
@@ -244,10 +250,8 @@ the correct MAC for the record.  The client sends a TLS alert
 in error messages such as 'A TLS fatal alert has been received', 'Bad
 record MAC', or both, on the GnuTLS server side.
 
-GnuTLS implements a work around for this problem.  However, it has to
-be enabled specifically.  It can be enabled by using
-@funcref{gnutls_record_disable_padding}, or @funcref{gnutls_priority_set} with
-the @code{%COMPAT} priority string (see @ref{Priority Strings}).
+If compatibility with such devices is a concern, not sending length-hidden messages
+solves the problem by using minimal padding.
 
 If you implement an application that have a configuration file, we
 recommend that you make it possible for users or administrators to

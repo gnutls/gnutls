@@ -813,6 +813,8 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
   (*priority_cache)->sr = SR_PARTIAL;
   (*priority_cache)->ssl3_record_version = 1;
 
+  (*priority_cache)->max_empty_records = DEFAULT_MAX_EMPTY_RECORDS;
+
   if (priorities == NULL)
     priorities = LEVEL_NORMAL;
 
@@ -1040,7 +1042,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
               (*priority_cache)->server_precedence = 1;
             }
           else if (strcasecmp (&broken_list[i][1],
-                               "RANDOM_PADDING") == 0)
+                               "NEW_PADDING") == 0)
             {
               (*priority_cache)->new_record_padding = 1;
             }

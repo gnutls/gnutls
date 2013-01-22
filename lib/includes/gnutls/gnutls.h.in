@@ -884,8 +884,16 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   int gnutls_heartbeat_pong (gnutls_session_t session, unsigned int flags);
 
   void gnutls_record_set_timeout (gnutls_session_t session, unsigned int ms);
+
+  typedef struct {
+    size_t low;
+    size_t high;
+  } gnutls_range_st;
+
   ssize_t gnutls_record_send (gnutls_session_t session, const void *data,
                               size_t data_size);
+  ssize_t gnutls_range_send_message (gnutls_session_t session, const void *data,
+                                     size_t data_size, gnutls_range_st range);
   ssize_t gnutls_record_recv (gnutls_session_t session, void *data,
                               size_t data_size);
 #define gnutls_read gnutls_record_recv
@@ -895,13 +903,14 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   void gnutls_session_enable_compatibility_mode (gnutls_session_t session);
 
-  void gnutls_record_disable_padding (gnutls_session_t session);
+  void gnutls_record_max_empty_records (gnutls_session_t session, const unsigned int i);
+  
+  int gnutls_range_can_use_length_hiding (gnutls_session_t session);
 
   int gnutls_record_get_direction (gnutls_session_t session);
 
   size_t gnutls_record_get_max_size (gnutls_session_t session);
   ssize_t gnutls_record_set_max_size (gnutls_session_t session, size_t size);
-  int gnutls_record_get_random_padding_status (gnutls_session_t session);
 
   size_t gnutls_record_check_pending (gnutls_session_t session);
 

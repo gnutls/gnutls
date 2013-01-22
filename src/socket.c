@@ -73,12 +73,23 @@ socket_recv (const socket_st * socket, void *buffer, int buffer_size)
 ssize_t
 socket_send (const socket_st * socket, const void *buffer, int buffer_size)
 {
+  return socket_send_range(socket, buffer, buffer_size, NULL);
+}
+
+
+ssize_t
+socket_send_range (const socket_st * socket, const void *buffer, int buffer_size, gnutls_range_st *range)
+{
   int ret;
 
   if (socket->secure)
     do
       {
-        ret = gnutls_record_send (socket->session, buffer, buffer_size);
+    	if (range == NULL) {
+    		ret = gnutls_record_send (socket->session, buffer, buffer_size);
+    	} else {
+    		ret = gnutls_range_send_message(socket->session, buffer, buffer_size, *range);
+    	}
       }
     while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
   else

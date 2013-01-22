@@ -26,6 +26,11 @@
 #include <gnutls/gnutls.h>
 #include <gnutls_buffers.h>
 
+ssize_t _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
+                               gnutls_handshake_description_t htype,
+                               unsigned int epoch_rel, const void *data,
+                               size_t sizeofdata, unsigned int mflags,
+                               size_t targetlength);
 ssize_t _gnutls_send_int (gnutls_session_t session, content_type_t type,
                           gnutls_handshake_description_t htype,
                           unsigned int epoch_rel, const void *data,

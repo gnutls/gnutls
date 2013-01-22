@@ -272,6 +272,12 @@ flag = {
 };
 
 flag = {
+    name      = ranges;
+    descrip   = "When possible, use length-hiding padding to prevent traffic analysis";
+    doc      = "";
+};
+
+flag = {
     name      = benchmark-ciphers;
     descrip   = "Benchmark individual ciphers";
     doc      = "";

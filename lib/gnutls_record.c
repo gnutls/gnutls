@@ -66,22 +66,24 @@ struct tls_record_st {
 };
 
 /**
- * gnutls_record_disable_padding:
+ * gnutls_record_max_empty_records:
  * @session: is a #gnutls_session_t structure.
+ * @i: is the desired value of maximum empty records that can be accepted in a row.
  *
- * Used to disabled padding in TLS 1.0 and above.  Normally you do not
- * need to use this function, but there are buggy clients that
- * complain if a server pads the encrypted data.  This of course will
- * disable protection against statistical attacks on the data.
- *
- * Normally only servers that require maximum compatibility with everything
- * out there, need to call this function.
+ * Used to set the maximum number of empty fragments that can be accepted
+ * in a row. Accepting many empty fragments is useful for receiving length-hidden
+ * content, where empty fragments filled with pad are sent to hide the real
+ * length of a message. However, a malicious peer could send empty fragments to
+ * mount a DoS attack, so as a safety measure, a maximum number of empty fragments
+ * is accepted by default. If you know your application must accept a given number
+ * of empty fragments in a row, you can use this function to set the desired value.
  **/
 void
-gnutls_record_disable_padding (gnutls_session_t session)
+gnutls_record_max_empty_records (gnutls_session_t session, const unsigned int i)
 {
-  session->internals.priorities.no_padding = 1;
+  session->internals.priorities.max_empty_records = i;
 }
+
 
 /**
  * gnutls_transport_set_ptr:
@@ -333,6 +335,15 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
                   unsigned int epoch_rel, const void *_data,
                   size_t data_size, unsigned int mflags)
 {
+  return _gnutls_send_tlen_int(session,type,htype,epoch_rel,_data,data_size,mflags,data_size);
+}
+
+ssize_t
+_gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
+		gnutls_handshake_description_t htype,
+		unsigned int epoch_rel, const void *_data,
+		size_t data_size, unsigned int mflags, size_t target_length)
+{
   mbuffer_st *bufel;
   ssize_t cipher_size;
   int retval, ret;
@@ -384,8 +395,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
     memcpy(&headers[3], &record_state->sequence_number.i, 8);
 
   _gnutls_record_log
-    ("REC[%p]: Preparing Packet %s(%d) with length: %d\n", session,
-     _gnutls_packet2str (type), type, (int) data_size);
+    ("REC[%p]: Preparing Packet %s(%d) with length: %d and target length: %d\n", session,
+     _gnutls_packet2str (type), type, (int) data_size, (int) target_length);
 
   if (data_size > MAX_USER_SEND_SIZE(session))
     {
@@ -421,7 +432,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       ret =
         _gnutls_encrypt (session, headers, header_size, data,
-                         send_data_size, _mbuffer_get_udata_ptr (bufel),
+                         send_data_size, target_length, _mbuffer_get_udata_ptr (bufel),
                          cipher_size, type, record_params);
       if (ret <= 0)
         {
@@ -951,8 +962,6 @@ gnutls_datum_t raw; /* raw headers */
   return 0;
 }
 
-#define MAX_EMPTY_PACKETS_SEQUENCE 4
-
 /* @ms: is the number of milliseconds to wait for data. Use zero for indefinite.
  *
  * This will receive record layer packets and add them to 
@@ -970,14 +979,14 @@ _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
   mbuffer_st* bufel = NULL, *decrypted = NULL;
   gnutls_datum_t t;
   int ret;
-  int empty_packet = 0;
+  unsigned int empty_fragments = 0;
   record_parameters_st *record_params;
   record_state_st *record_state;
   struct tls_record_st record;
 
 begin:
 
-  if (empty_packet > MAX_EMPTY_PACKETS_SEQUENCE)
+  if (empty_fragments > session->internals.priorities.max_empty_records)
     {
       gnutls_assert ();
       return GNUTLS_E_TOO_MANY_EMPTY_PACKETS;
@@ -1118,7 +1127,7 @@ begin:
   if (_mbuffer_get_udata_size(decrypted) == 0)
     {
       _mbuffer_xfree(&decrypted);
-      empty_packet++;
+      empty_fragments++;
       goto begin;
     }
 
