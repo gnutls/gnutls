@@ -1287,16 +1287,16 @@ print_pubkey (gnutls_buffer_st * str, const char* key_name, gnutls_pubkey_t pubk
                   gnutls_ecc_curve_get_name (curve));
             if (format == GNUTLS_CRT_PRINT_FULL_NUMBERS)
               {
-                addf (str, _("\t\tX: "));
+                adds (str, _("\t\tX: "));
                 _gnutls_buffer_hexprint (str, x.data, x.size);
                 adds (str, "\n");
-                addf (str, _("\t\tY: "));
+                adds (str, _("\t\tY: "));
                 _gnutls_buffer_hexprint (str, y.data, y.size);
                 adds (str, "\n");
               }
             else
               {
-                addf (str, _("\t\tX:\n"));
+                adds (str, _("\t\tX:\n"));
                 _gnutls_buffer_hexdump (str, x.data, x.size, "\t\t\t");
                 adds (str, _("\t\tY:\n"));
                 _gnutls_buffer_hexdump (str, y.data, y.size, "\t\t\t");

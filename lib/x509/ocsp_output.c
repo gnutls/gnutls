@@ -136,11 +136,11 @@ print_req (gnutls_buffer_st * str, gnutls_ocsp_req_t req)
 	  addf (str, "\t\tUnknown extension %s (%s):\n", oid.data,
 		critical ? "critical" : "not critical");
 
-	  addf (str, _("\t\t\tASCII: "));
+	  adds (str, _("\t\t\tASCII: "));
 	  _gnutls_buffer_asciiprint (str, (char*)data.data, data.size);
 	  addf (str, "\n");
 
-	  addf (str, _("\t\t\tHexdump: "));
+	  adds (str, _("\t\t\tHexdump: "));
 	  _gnutls_buffer_hexprint (str, (char*)data.data, data.size);
 	  adds (str, "\n");
 	}
@@ -484,11 +484,11 @@ print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 	  addf (str, "\t\tUnknown extension %s (%s):\n", oid.data,
 		critical ? "critical" : "not critical");
 
-	  addf (str, _("\t\t\tASCII: "));
+	  adds (str, _("\t\t\tASCII: "));
 	  _gnutls_buffer_asciiprint (str, (char*)data.data, data.size);
 	  addf (str, "\n");
 
-	  addf (str, _("\t\t\tHexdump: "));
+	  adds (str, _("\t\t\tHexdump: "));
 	  _gnutls_buffer_hexprint (str, (char*)data.data, data.size);
 	  adds (str, "\n");
 	}
@@ -504,7 +504,7 @@ print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 
     ret = gnutls_ocsp_resp_get_signature_algorithm (resp);
     if (ret < 0)
-      addf (str, "retor: get_signature_algorithm: %s\n",
+      addf (str, "error: get_signature_algorithm: %s\n",
 	    gnutls_strerror (ret));
     else
       {
