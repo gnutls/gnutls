@@ -35,6 +35,10 @@ gnutls_x509_crt_set_dn: Added
 gnutls_x509_crt_set_issuer_dn: Added
 gnutls_x509_crq_set_dn: Added
 dane_state_set_dlv_file: Added
+gnutls_record_send_range: Added
+gnutls_record_set_max_empty_records: Added
+gnutls_range_send_message: Added
+gnutls_record_can_use_length_hiding: Added
 
 
 * Version 3.1.6 (released 2013-01-02)
