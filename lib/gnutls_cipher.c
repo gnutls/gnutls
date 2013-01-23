@@ -233,10 +233,15 @@ calc_enc_length_block (gnutls_session_t session, int data_size,
    * this LH pad, we only add minimal padding
    */
   unsigned int pre_length = data_size + hash_size + *pad;
+  unsigned int length, new_pad;
 
-  *pad = (uint8_t) (blocksize - (pre_length % blocksize)) + *pad;
+  new_pad = (uint8_t) (blocksize - (pre_length % blocksize)) + *pad;
+  
+  if (new_pad > 255)
+    new_pad -= blocksize;
+  *pad = new_pad;
 
-  unsigned int length = data_size + hash_size + *pad;
+  length = data_size + hash_size + *pad;
 
   if (_gnutls_version_has_explicit_iv
       (session->security_parameters.version))
@@ -297,11 +302,11 @@ make_preamble (uint8_t * uint64_data, uint8_t type, unsigned int length,
  */
 static int
 compressed_to_ciphertext (gnutls_session_t session,
-                               uint8_t * cipher_data, int cipher_size,
-                               gnutls_datum_t *compressed,
-                               size_t target_size,
-                               content_type_t type, 
-                               record_parameters_st * params)
+                          uint8_t * cipher_data, int cipher_size,
+                          gnutls_datum_t *compressed,
+                          size_t target_size,
+                          content_type_t type, 
+                          record_parameters_st * params)
 {
   uint8_t * tag_ptr = NULL;
   uint8_t pad = target_size - compressed->size;
@@ -438,11 +443,11 @@ compressed_to_ciphertext (gnutls_session_t session,
 
 static int
 compressed_to_ciphertext_new (gnutls_session_t session,
-                               uint8_t * cipher_data, int cipher_size,
-                               gnutls_datum_t *compressed,
-                               size_t target_size,
-                               content_type_t type, 
-                               record_parameters_st * params)
+                              uint8_t * cipher_data, int cipher_size,
+                              gnutls_datum_t *compressed,
+                              size_t target_size,
+                              content_type_t type, 
+                              record_parameters_st * params)
 {
   uint8_t * tag_ptr = NULL;
   uint16_t pad = target_size - compressed->size;

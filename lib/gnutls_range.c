@@ -44,6 +44,8 @@ _gnutls_range_max_lh_pad (gnutls_session_t session, ssize_t data_length,
                           ssize_t max_frag)
 {
   int ret;
+  ssize_t max_pad;
+  unsigned int fixed_pad;
   record_parameters_st *record_params;
 
   ret = _gnutls_epoch_get (session, EPOCH_WRITE_CURRENT, &record_params);
@@ -51,9 +53,6 @@ _gnutls_range_max_lh_pad (gnutls_session_t session, ssize_t data_length,
     {
       return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
     }
-
-  ssize_t max_pad;
-  unsigned int fixed_pad;
 
   if (session->security_parameters.new_record_padding != 0)
     {
@@ -260,8 +259,9 @@ gnutls_record_send_range (gnutls_session_t session, const void *data,
       ret = _gnutls_send_tlen_int (session, GNUTLS_APPLICATION_DATA, -1,
                                    EPOCH_WRITE_CURRENT,
                                    &(((char *) data)[sent]),
-                                   next_fragment_length, MBUFFER_FLUSH,
-                                   cur_range.high);
+                                   next_fragment_length, 
+                                   cur_range.high,
+                                   MBUFFER_FLUSH);
       if (ret < 0)
         {
           return ret;           /* already gnutls_assert_val'd */

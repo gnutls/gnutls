@@ -29,8 +29,9 @@
 ssize_t _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
                                gnutls_handshake_description_t htype,
                                unsigned int epoch_rel, const void *data,
-                               size_t sizeofdata, unsigned int mflags,
-                               size_t targetlength);
+                               size_t sizeofdata, 
+                               size_t targetlength,
+                               unsigned int mflags);
 
 inline static ssize_t
 _gnutls_send_int (gnutls_session_t session, content_type_t type,
@@ -38,7 +39,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
                   unsigned int epoch_rel, const void *_data,
                   size_t data_size, unsigned int mflags)
 {
-  return _gnutls_send_tlen_int(session,type,htype,epoch_rel,_data,data_size,mflags,data_size);
+  return _gnutls_send_tlen_int(session,type,htype,epoch_rel,_data,data_size,data_size,mflags);
 }
 
 ssize_t _gnutls_recv_int (gnutls_session_t session, content_type_t type,

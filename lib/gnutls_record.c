@@ -351,7 +351,7 @@ ssize_t
 _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
 		gnutls_handshake_description_t htype,
 		unsigned int epoch_rel, const void *_data,
-		size_t data_size, unsigned int mflags, size_t target_length)
+		size_t data_size, size_t target_length, unsigned int mflags)
 {
   mbuffer_st *bufel;
   ssize_t cipher_size;
