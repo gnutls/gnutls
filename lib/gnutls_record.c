@@ -65,8 +65,27 @@ struct tls_record_st {
   /* the data */
 };
 
+/*
+ * gnutls_record_disable_padding:  
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Used to disabled padding in TLS 1.0 and above.  Normally you do not
+ * need to use this function, but there are buggy clients that
+ * complain if a server pads the encrypted data.  This of course will
+ * disable protection against statistical attacks on the data.
+ *
+ * This functions is defunt since 3.1.7. Random padding is disabled
+ * by default unless requested using gnutls_range_send_message().
+ *
+ **/
+void
+gnutls_record_disable_padding (gnutls_session_t session)
+{
+  return;
+}
+
 /**
- * gnutls_record_max_empty_records:
+ * gnutls_record_set_max_empty_records:
  * @session: is a #gnutls_session_t structure.
  * @i: is the desired value of maximum empty records that can be accepted in a row.
  *
@@ -79,11 +98,10 @@ struct tls_record_st {
  * of empty fragments in a row, you can use this function to set the desired value.
  **/
 void
-gnutls_record_max_empty_records (gnutls_session_t session, const unsigned int i)
+gnutls_record_set_max_empty_records (gnutls_session_t session, const unsigned int i)
 {
   session->internals.priorities.max_empty_records = i;
 }
-
 
 /**
  * gnutls_transport_set_ptr:
@@ -329,15 +347,6 @@ sequence_increment (gnutls_session_t session,
  * and only if the previous send was interrupted for some reason.
  *
  */
-ssize_t
-_gnutls_send_int (gnutls_session_t session, content_type_t type,
-                  gnutls_handshake_description_t htype,
-                  unsigned int epoch_rel, const void *_data,
-                  size_t data_size, unsigned int mflags)
-{
-  return _gnutls_send_tlen_int(session,type,htype,epoch_rel,_data,data_size,mflags,data_size);
-}
-
 ssize_t
 _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
 		gnutls_handshake_description_t htype,

@@ -273,8 +273,8 @@ flag = {
 
 flag = {
     name      = ranges;
-    descrip   = "When possible, use length-hiding padding to prevent traffic analysis";
-    doc      = "";
+    descrip   = "Use length-hiding padding to prevent traffic analysis";
+    doc      = "When possible (e.g., when %NEW_PADDING is specified), use length-hiding padding to prevent traffic analysis.";
 };
 
 flag = {

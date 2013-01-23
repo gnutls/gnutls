@@ -236,8 +236,8 @@ GnuTLS appears to be one of few implementations that take advantage of this feat
 the user can provide some plaintext data with a range of lengths she wishes to hide,
 and GnuTLS adds extra padding to make sure the attacker cannot tell the real plaintext
 length is in a range smaller than the user-provided one.
-Use @funcref{gnutls_range_send_message} to send length-hidden messages and
-@funcref{gnutls_range_can_use_length_hiding} to check whether the current
+Use @funcref{gnutls_record_send_range} to send length-hidden messages and
+@funcref{gnutls_record_can_use_length_hiding} to check whether the current
 session supports length hiding. Using the standard @funcref{gnutls_record_send}
 will only add minimal padding.
 

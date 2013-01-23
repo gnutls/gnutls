@@ -1030,14 +1030,18 @@ after_handshake:
                   bytes++;
                 }
             }
-          if (ranges && gnutls_range_can_use_length_hiding(hd.session)) {
-			  gnutls_range_st range;
-			  range.low = 0;
-			  range.high = MAX_BUF;
-			  ret = socket_send_range (&hd, buffer, bytes, &range);
-          } else {
+
+          if (ranges && gnutls_record_can_use_length_hiding(hd.session)) 
+            {
+	      gnutls_range_st range;
+	      range.low = 0;
+	      range.high = MAX_BUF;
+              ret = socket_send_range (&hd, buffer, bytes, &range);
+            }
+          else 
+            {
         	  ret = socket_send(&hd, buffer, bytes);
-          }
+            }
 
           if (ret > 0)
             {
