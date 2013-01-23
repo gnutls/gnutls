@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
+#include <gnutls/sbuf.h>
 #include "eagain-common.h"
 
 #include "utils.h"
@@ -46,6 +47,9 @@ tls_log_func (int level, const char *str)
 
 static unsigned char server_buf[MAX_BUF];
 static unsigned char client_buf[MAX_BUF];
+
+#define LINE1 "hello there people\n"
+#define LINE2 "how are you doing today, all well?\n"
 
 void
 doit (void)
@@ -64,6 +68,8 @@ doit (void)
   /* Need to enable anonymous KX specifically. */
   int ret;
   ssize_t left, spos, cpos;
+  char *abuf = NULL;
+  size_t abuf_size = 0;
 
   /* General init. */
   gnutls_global_init ();
@@ -112,20 +118,23 @@ doit (void)
     {
       if (left > SEND_SIZE)
         {
-          ret = gnutls_sbuf_queue(ssbuf, server_buf+spos, SEND_SIZE);
-          left -= SEND_SIZE;
-          spos += SEND_SIZE;
+          ret = gnutls_sbuf_write(ssbuf, server_buf+spos, SEND_SIZE);
         }
       else
         {
-          gnutls_sbuf_queue(ssbuf, server_buf+spos, left);
-          ret = gnutls_sbuf_flush(ssbuf);
-          left = 0;
+          ret = gnutls_sbuf_write(ssbuf, server_buf+spos, left);
         }
-      
+
+      if (ret >= 0)
+        {
+          left -= ret;
+          spos += ret;
+          ret = gnutls_sbuf_flush(ssbuf);
+        }
+
       if (ret < 0)
         {
-          fail("Error sending\n");
+          fail("Error sending %s\n", gnutls_strerror(ret));
           abort();
         }
       
@@ -137,7 +146,7 @@ doit (void)
 
           if (ret < 0)
             {
-              fail("Error sending\n");
+              fail("Error receiving %s\n", gnutls_strerror(ret));
               abort();
             }
         }
@@ -146,6 +155,35 @@ doit (void)
   if (memcmp(client_buf, server_buf, sizeof(server_buf)) != 0)
     {
       fail("Data do not match!\n");
+      abort();
+    }
+  
+  gnutls_record_send(client, LINE1, sizeof(LINE1)-1);
+  gnutls_record_send(client, LINE2, sizeof(LINE2)-1);
+  
+  ret = gnutls_sbuf_getline(ssbuf, &abuf, &abuf_size);
+  if (ret < 0)
+    {
+      fail("sbuf_getline error %s!\n", gnutls_strerror(ret));
+      abort();
+    }
+
+  if (strcmp(abuf, LINE1) != 0)
+    {
+      fail("LINE1 Data do not match!\n");
+      abort();
+    }
+
+  ret = gnutls_sbuf_getline(ssbuf, &abuf, &abuf_size);
+  if (ret < 0)
+    {
+      fail("sbuf_getline error %s!\n", gnutls_strerror(ret));
+      abort();
+    }
+
+  if (strcmp(abuf, LINE2) != 0)
+    {
+      fail("LINE2 Data do not match!\n");
       abort();
     }
 

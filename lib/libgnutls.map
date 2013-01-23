@@ -880,7 +880,7 @@ GNUTLS_3_1_0 {
 	gnutls_sbuf_deinit;
 	gnutls_sbuf_init;
 	gnutls_sbuf_flush;
-	gnutls_sbuf_queue;
+	gnutls_sbuf_read;
 	gnutls_x509_crt_set_dn;
 	gnutls_x509_crq_set_dn;
 	gnutls_x509_crt_set_issuer_dn;
@@ -889,6 +889,8 @@ GNUTLS_3_1_0 {
 	gnutls_range_send_message;
 	gnutls_record_set_max_empty_records;
 	gnutls_record_send_range;
+	gnutls_sbuf_getdelim;
+	gnutls_sbuf_write;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

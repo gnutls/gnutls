@@ -5,7 +5,7 @@
  *
  * This file is part of GnuTLS.
  *
- * The libdane library is free software; you can redistribute it
+ * The gnutls library is free software; you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
@@ -23,14 +23,9 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
-#include <gnutls_str.h>
 #include <gnutls/sbuf.h>
 
-struct gnutls_sbuf_st {
-  gnutls_session_t session;
-  gnutls_buffer_st buf;
-  unsigned int flags;
-};
+#include <sbuf.h>
 
 /**
  * gnutls_init:

@@ -40,6 +40,11 @@ ssize_t gnutls_sbuf_flush (gnutls_sbuf_t sb);
 int gnutls_sbuf_handshake(gnutls_sbuf_t sb);
 ssize_t gnutls_sbuf_read(gnutls_sbuf_t sb, void* data, size_t data_size);
 
+ssize_t
+gnutls_sbuf_getdelim (gnutls_sbuf_t sbuf, char **lineptr, size_t *n, int delimiter);
+
+#define gnutls_sbuf_getline(sbuf, ptr, n) gnutls_sbuf_getdelim(sbuf, ptr, n, '\n')
+
 #define GNUTLS_SBUF_QUEUE_FLUSHES 1
 int gnutls_sbuf_init (gnutls_sbuf_t * sb, gnutls_session_t session,
                       unsigned int flags);

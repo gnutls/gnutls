@@ -30,7 +30,10 @@ gnutls_record_get_random_padding_status: Added
 gnutls_sbuf_deinit: Added
 gnutls_sbuf_init: Added
 gnutls_sbuf_flush: Added
-gnutls_sbuf_queue: Added
+gnutls_sbuf_write: Added
+gnutls_sbuf_getdelim: Added
+gnutls_sbuf_read: Added
+gnutls_sbuf_handshake: Added
 gnutls_x509_crt_set_dn: Added
 gnutls_x509_crt_set_issuer_dn: Added
 gnutls_x509_crq_set_dn: Added
