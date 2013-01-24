@@ -103,7 +103,7 @@ int ret;
   if (ret < 0)
     return gnutls_assert_val(ret);
   
-  if ((sb->flags & GNUTLS_SBUF_QUEUE_FLUSHES) && 
+  while ((sb->flags & GNUTLS_SBUF_QUEUE_FLUSHES) && 
        sb->buf.length >= MAX_RECORD_SEND_SIZE(sb->session))
     {
       do
