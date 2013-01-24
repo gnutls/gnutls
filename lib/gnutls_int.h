@@ -166,6 +166,12 @@ typedef enum transport_t
   GNUTLS_DGRAM
 } transport_t;
 
+typedef enum record_flush_t
+{
+  RECORD_FLUSH = 0,
+  RECORD_CORKED,
+} record_flush_t;
+
 /* the maximum size of encrypted packets */
 #define IS_DTLS(session) (session->internals.transport == GNUTLS_DGRAM)
 
@@ -758,6 +764,12 @@ typedef struct
   size_t record_send_buffer_user_size;  /* holds the
                                          * size of the user specified data to
                                          * send.
+                                         */
+
+  record_flush_t record_flush_mode; /* GNUTLS_FLUSH or GNUTLS_CORKED */
+  gnutls_buffer_st record_presend_buffer;/* holds cached data
+                                         * for the gnutls_record_send()
+                                         * function.
                                          */
 
   int expire_time;              /* after expire_time seconds this session will expire */

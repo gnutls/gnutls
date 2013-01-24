@@ -886,6 +886,10 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   void gnutls_record_set_timeout (gnutls_session_t session, unsigned int ms);
   void gnutls_record_disable_padding (gnutls_session_t session);
 
+  void gnutls_record_cork (gnutls_session_t session);
+#define GNUTLS_RECORD_WAIT 1
+  int gnutls_record_uncork (gnutls_session_t session, unsigned int flags);
+ 
   typedef struct {
     size_t low;
     size_t high;

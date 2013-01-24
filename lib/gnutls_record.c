@@ -1297,9 +1297,93 @@ ssize_t
 gnutls_record_send (gnutls_session_t session, const void *data,
                     size_t data_size)
 {
-  return _gnutls_send_int (session, GNUTLS_APPLICATION_DATA, -1,
-                           EPOCH_WRITE_CURRENT, data, data_size,
-                           MBUFFER_FLUSH);
+  if (session->internals.record_flush_mode == RECORD_FLUSH)
+    {
+      return _gnutls_send_int (session, GNUTLS_APPLICATION_DATA, -1,
+                               EPOCH_WRITE_CURRENT, data, data_size,
+                               MBUFFER_FLUSH);
+    }
+  else /* GNUTLS_CORKED */
+    {
+      int ret;
+
+      ret = _gnutls_buffer_append_data(&session->internals.record_presend_buffer, data, data_size);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      
+      return data_size;
+    }
+}
+
+/**
+ * gnutls_cork:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * If called gnutls_record_send() will no longer send partial records.
+ * All queued records will be sent when gnutls_uncork() is called, or
+ * when the maximum record size is reached.
+ *
+ * Since: 3.1.7
+ **/
+void
+gnutls_record_cork (gnutls_session_t session)
+{
+  session->internals.record_flush_mode = RECORD_CORKED;
+}
+
+/**
+ * gnutls_uncork:
+ * @session: is a #gnutls_session_t structure.
+ * @flags: Could be zero or %GNUTLS_RECORD_WAIT
+ *
+ * This resets the effect of gnutls_cork(), and flushes any pending
+ * data. If the %GNUTLS_RECORD_WAIT flag is specified then this
+ * function will block until the data is sent or a fatal error
+ * occurs (i.e., the function will retry on %GNUTLS_E_AGAIN and
+ * %GNUTLS_E_INTERRUPTED).
+ *
+ * Returns: On success the number of transmitted data is returned, or 
+ * otherwise a negative error code. 
+ *
+ * Since: 3.1.7
+ **/
+int
+gnutls_record_uncork (gnutls_session_t session, unsigned int flags)
+{
+int ret;
+ssize_t total = 0;
+
+  session->internals.record_flush_mode = RECORD_FLUSH;
+
+  while(session->internals.record_presend_buffer.length > 0)
+    {
+      if (flags == GNUTLS_RECORD_WAIT)
+        {
+          do
+            {
+              ret = gnutls_record_send(session, session->internals.record_presend_buffer.data, 
+                                       session->internals.record_presend_buffer.length);
+            }
+          while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+        }
+      else
+        {
+          ret = gnutls_record_send(session, session->internals.record_presend_buffer.data, 
+                                   session->internals.record_presend_buffer.length);
+        }
+      if (ret < 0)
+        goto fail;
+
+      session->internals.record_presend_buffer.data += ret;
+      session->internals.record_presend_buffer.length -= ret;
+      total += ret;
+    }
+
+  return total;
+
+fail:
+  session->internals.record_flush_mode = RECORD_CORKED;
+  return ret;
 }
 
 /**

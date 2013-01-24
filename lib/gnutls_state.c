@@ -333,6 +333,7 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
   _gnutls_buffer_init (&(*session)->internals.handshake_hash_buffer);
   _gnutls_buffer_init (&(*session)->internals.hb_remote_data);
   _gnutls_buffer_init (&(*session)->internals.hb_local_data);
+  _gnutls_buffer_init (&(*session)->internals.record_presend_buffer);
 
   _mbuffer_head_init (&(*session)->internals.record_buffer);
   _mbuffer_head_init (&(*session)->internals.record_send_buffer);
@@ -451,6 +452,7 @@ gnutls_deinit (gnutls_session_t session)
   _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
   _gnutls_buffer_clear (&session->internals.hb_remote_data);
   _gnutls_buffer_clear (&session->internals.hb_local_data);
+  _gnutls_buffer_clear (&session->internals.record_presend_buffer);
 
   _mbuffer_head_clear (&session->internals.record_buffer);
   _mbuffer_head_clear (&session->internals.record_recv_buffer);
