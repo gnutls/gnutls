@@ -137,11 +137,27 @@ gnutls_record_can_use_length_hiding (gnutls_session_t session)
     }
 }
 
-static ssize_t
-_gnutls_range_split (gnutls_session_t session,
-                     const gnutls_range_st orig,
-                     gnutls_range_st * small_range,
-                     gnutls_range_st * rem_range)
+/**
+ * gnutls_range_split:
+ * @session: is a #gnutls_session_t structure
+ * @orig: is the original range provided by the user
+ * @small_range: is the returned range that can be conveyed in a TLS record
+ * @rem_range: is the returned remaining range
+ *
+ * Use this function to split an arbitrary range into a smaller range
+ * that can be conveyed into a single TLS record fragment, and
+ * a remaining range, on which this function can be invoked again.
+ * When the returned #rem_range is (0,0) the splitting process can terminate.
+ *
+ * Returns: 0 in case splitting succeeds, non zero in case of error.
+ * Note that #orig is not changed, while the values of #small_range
+ * and #rem_range are modified to store the resulting values.
+ */
+ssize_t
+gnutls_range_split (gnutls_session_t session,
+                    const gnutls_range_st orig,
+                    gnutls_range_st * small_range,
+                    gnutls_range_st * rem_range)
 {
   int ret;
   ssize_t max_frag = MAX_USER_SEND_SIZE (session);
@@ -240,7 +256,7 @@ gnutls_record_send_range (gnutls_session_t session, const void *data,
   while (cur_range.high != 0)
     {
       ret =
-          _gnutls_range_split (session, cur_range, &cur_range,
+          gnutls_range_split (session, cur_range, &cur_range,
                                &next_range);
       if (ret < 0)
         {

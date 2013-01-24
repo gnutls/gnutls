@@ -895,6 +895,11 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
     size_t high;
   } gnutls_range_st;
 
+  ssize_t gnutls_range_split (gnutls_session_t session,
+                              const gnutls_range_st orig,
+                              gnutls_range_st * small_range,
+                              gnutls_range_st * rem_range);
+
   ssize_t gnutls_record_send (gnutls_session_t session, const void *data,
                               size_t data_size);
   ssize_t gnutls_record_send_range (gnutls_session_t session, const void *data,
