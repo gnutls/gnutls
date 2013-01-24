@@ -164,6 +164,7 @@ doc/reference/tmpl.stamp
 doc/reference/tmpl/
 doc/reference/version.xml
 doc/reference/xml/
+doc/sbuf-api.texi
 doc/scripts/Makefile
 doc/scripts/Makefile.in
 doc/stamp-1

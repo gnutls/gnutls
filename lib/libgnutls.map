@@ -886,7 +886,6 @@ GNUTLS_3_1_0 {
 	gnutls_x509_crt_set_issuer_dn;
 	gnutls_session_force_valid;
 	gnutls_record_can_use_length_hiding;
-	gnutls_range_send_message;
 	gnutls_record_set_max_empty_records;
 	gnutls_record_send_range;
 	gnutls_sbuf_getdelim;
