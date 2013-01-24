@@ -281,6 +281,15 @@ gnutls_record_send_range (gnutls_session_t session, const void *data,
                                    next_fragment_length, 
                                    cur_range.high,
                                    MBUFFER_FLUSH);
+
+      while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED)
+        {
+    	  ret = _gnutls_send_tlen_int (session, GNUTLS_APPLICATION_DATA, -1,
+    			  	  	  	  	  	   EPOCH_WRITE_CURRENT,
+    			  	  	  	  	  	   NULL, 0, 0,
+    			  	  	  	  	  	   MBUFFER_FLUSH);
+        }
+
       if (ret < 0)
         {
           return ret;           /* already gnutls_assert_val'd */
