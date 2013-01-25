@@ -54,8 +54,18 @@ gnutls_digest_algorithm_t _gnutls_x509_oid_to_digest (const char *oid);
 const char *_gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t mac);
 
 /* Functions for digests. */
-const char *_gnutls_x509_digest_to_oid (gnutls_digest_algorithm_t algorithm);
-const char *_gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm);
+inline static const char *
+_gnutls_x509_digest_to_oid (gnutls_digest_algorithm_t algorithm)
+{
+  return _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) algorithm);
+}
+
+inline static const char *
+_gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm)
+{
+  return gnutls_mac_get_name ((gnutls_mac_algorithm_t) algorithm);
+}
+
 int _gnutls_digest_is_secure (gnutls_digest_algorithm_t algorithm);
 
 /* Functions for cipher suites. */
