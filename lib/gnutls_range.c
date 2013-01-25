@@ -155,14 +155,14 @@ gnutls_record_can_use_length_hiding (gnutls_session_t session)
  */
 ssize_t
 gnutls_range_split (gnutls_session_t session,
-                    const gnutls_range_st orig,
+                    const gnutls_range_st *orig,
                     gnutls_range_st * small_range,
                     gnutls_range_st * rem_range)
 {
   int ret;
   ssize_t max_frag = MAX_USER_SEND_SIZE (session);
-  ssize_t orig_low = (ssize_t) orig.low;
-  ssize_t orig_high = (ssize_t) orig.high;
+  ssize_t orig_low = (ssize_t) orig->low;
+  ssize_t orig_high = (ssize_t) orig->high;
 
   if (orig_high == orig_low)
     {
@@ -256,7 +256,7 @@ gnutls_record_send_range (gnutls_session_t session, const void *data,
   while (cur_range.high != 0)
     {
       ret =
-          gnutls_range_split (session, cur_range, &cur_range,
+          gnutls_range_split (session, &cur_range, &cur_range,
                                &next_range);
       if (ret < 0)
         {
