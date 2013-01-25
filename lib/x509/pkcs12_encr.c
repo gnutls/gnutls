@@ -24,6 +24,7 @@
 #include <gnutls_mpi.h>
 #include <gnutls_errors.h>
 #include <x509_int.h>
+#include <c-ctype.h>
 
 /* Returns 0 if the password is ok, or a negative error
  * code instead.
@@ -35,7 +36,7 @@ _pkcs12_check_pass (const char *pass, size_t plen)
 
   for (i = 0; i < plen; i++)
     {
-      if (isascii (pass[i]))
+      if (c_isascii (pass[i]))
         continue;
       return GNUTLS_E_INVALID_PASSWORD;
     }

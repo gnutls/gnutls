@@ -31,6 +31,7 @@
 #include <x509_b64.h>
 #include "x509_int.h"
 #include <common.h>
+#include <c-ctype.h>
 
 struct oid_to_string
 {
@@ -222,7 +223,7 @@ size_t size;
        * characters then treat it as printable.
        */
       for (i = 0; i < input->size; i++)
-        if (!isascii (input->data[i]))
+        if (!c_isascii (input->data[i]))
           ascii = 1;
 
       if (ascii == 0)

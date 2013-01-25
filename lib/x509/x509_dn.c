@@ -30,6 +30,7 @@
 #include <common.h>
 #include <gnutls_x509.h>
 #include <x509_b64.h>
+#include <c-ctype.h>
 
 typedef int (*set_dn_func) (void*, const char *oid, unsigned int raw_flag, const void *name, unsigned int name_size);
                                                                                                                                                        
@@ -44,7 +45,7 @@ int dn_attr_crt_set( set_dn_func f, void* crt, const char *attr, unsigned attr_l
   if (value_len == 0 || attr_len == 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
     
-  if (isdigit(attr[0]) != 0)
+  if (c_isdigit(attr[0]) != 0)
     {
       if (attr_len >= sizeof(_oid))
         return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
@@ -100,7 +101,7 @@ int ret;
   while (*p != 0 && *p != '\n')
     {
       /* Skip leading whitespace */
-      while (isspace(*p))
+      while (c_isspace(*p))
         p++;
       
       if (err)
@@ -113,7 +114,7 @@ int ret;
       name_end = p;
 
       /* Whitespace */
-      while (isspace(*p))
+      while (c_isspace(*p))
         p++;
 
       /* Equals sign */
@@ -125,7 +126,7 @@ int ret;
       p++;
 
       /* Whitespace */
-      while (isspace(*p))
+      while (c_isspace(*p))
         p++;
 
       /* Attribute value */
@@ -133,7 +134,7 @@ int ret;
       while (*p != 0 && (*p != ',' || (*p == ',' && *(p-1) == '\\')) && *p != '\n')
         p++;
       value_end = p;
-      while (value_end > value_start && isspace(value_end[-1]))
+      while (value_end > value_start && c_isspace(value_end[-1]))
         value_end--;
 
       /* Comma, or the end of the string */

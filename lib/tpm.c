@@ -40,6 +40,7 @@
 #include <x509_b64.h>
 #include <random.h>
 #include <pin.h>
+#include <c-ctype.h>
 
 #include <trousers/tss.h>
 #include <trousers/trousers.h>
@@ -784,7 +785,7 @@ static int decode_tpmkey_url(const char* url, struct tpmkey_url_st *s)
             {
               break;
             }
-          if (isalnum(p[i])) tmp_uuid[j++]=p[i];
+          if (c_isalnum(p[i])) tmp_uuid[j++]=p[i];
         }
       tmp_uuid[j] = 0;
 
