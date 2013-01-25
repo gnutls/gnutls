@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2013 Nikos Mavrogiannopoulos
- * Copyright (C) 2005 Andrew Suffield <asuffield@debian.org>
  *
  * This file is part of GnuTLS.
  *
@@ -35,23 +34,23 @@
 typedef int (*set_dn_func) (void*, const char *oid, unsigned int raw_flag, const void *name, unsigned int name_size);
                                                                                                                                                        
 static
-int dn_attr_crt_set( set_dn_func f, void* crt, const char *attr, unsigned attr_len, 
-                     const char *value, unsigned value_len)
+int dn_attr_crt_set( set_dn_func f, void* crt, const gnutls_datum_t * name,
+                     const gnutls_datum_t * val)
 {
   char _oid[MAX_OID_SIZE];
   const char *oid;
   int ret;
   
-  if (value_len == 0 || attr_len == 0)
+  if (name->size == 0 || val->size == 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
     
-  if (c_isdigit(attr[0]) != 0)
+  if (c_isdigit(name->data[0]) != 0)
     {
-      if (attr_len >= sizeof(_oid))
+      if (name->size >= sizeof(_oid))
         return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
         
-      memcpy(_oid, attr, attr_len);
-      _oid[attr_len] = 0;
+      memcpy(_oid, name->data, name->size);
+      _oid[name->size] = 0;
       
       oid = _oid;
 
@@ -63,22 +62,66 @@ int dn_attr_crt_set( set_dn_func f, void* crt, const char *attr, unsigned attr_l
     }
   else
     {
-      oid = _gnutls_ldap_string_to_oid(attr, attr_len);
+      oid = _gnutls_ldap_string_to_oid((char*)name->data, name->size);
     }
 
   if (oid == NULL)
     {
-      _gnutls_debug_log("Unknown DN attribute: '%.*s'\n", attr_len, attr);
+      _gnutls_debug_log("Unknown DN attribute: '%.*s'\n", (int)name->size, name->data);
       return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
     }
     
-  if (value[0] == '#')
+  if (val->data[0] == '#')
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
   
-  ret = f(crt, oid, 0, value, value_len);
+  ret = f(crt, oid, 0, val->data, val->size);
   if (ret < 0)
     return gnutls_assert_val(ret);
     
+  return 0;
+}
+
+static int read_attr_and_val(const char** ptr,
+                              gnutls_datum_t * name,
+                              gnutls_datum_t * val)
+{
+const unsigned char* p = (void*)*ptr;
+  
+  /* skip any space */
+  while (c_isspace(*p))
+    p++;
+      
+  /* Read the name */
+  name->data = (void*)p;
+  while (*p != '=' && *p != 0 && !c_isspace(*p))
+    p++;
+    
+  name->size = p - name->data;
+
+  /* skip any space */
+  while (c_isspace(*p))
+    p++;
+
+  if (*p != '=')
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+  p++;
+
+  while (c_isspace(*p))
+    p++;
+
+  /* Read value */
+  val->data = (void*)p;
+  while (*p != 0 && !c_isspace(*p) && (*p != ',' || (*p == ',' && *(p-1) == '\\')) && *p != '\n')
+    p++;
+  val->size = p - (val->data);
+  
+  if (val->size == 0 || name->size == 0)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+fprintf(stderr, "name[%d]: %s\nval[%d]: %s\n",name->size, name->data, val->size, val->data);
+
+  *ptr = (void*)p;
+
   return 0;
 }
 
@@ -86,13 +129,8 @@ static int
 crt_set_dn (set_dn_func f, void* crt, const char *dn, const char** err)
 {
 const char *p = dn;
-const char *name_start;
-const char *name_end;
-const char *value_start;
-const char *value_end;
-unsigned name_len;
-unsigned value_len;
 int ret;
+gnutls_datum_t name, val;
 
   if (crt == NULL || dn == NULL)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -100,53 +138,27 @@ int ret;
   /* For each element */
   while (*p != 0 && *p != '\n')
     {
-      /* Skip leading whitespace */
-      while (c_isspace(*p))
-        p++;
-      
       if (err)
         *err = p;
 
-      /* Attribute name */
-      name_start = p;
-      while (*p != '=' && *p != 0)
-        p++;
-      name_end = p;
-
-      /* Whitespace */
-      while (c_isspace(*p))
-        p++;
-
-      /* Equals sign */
-      if (*p != '=')
-        {
-          *err = p;
-          return GNUTLS_E_PARSING_ERROR;
-        }
-      p++;
-
-      /* Whitespace */
-      while (c_isspace(*p))
-        p++;
-
-      /* Attribute value */
-      value_start = p;
-      while (*p != 0 && (*p != ',' || (*p == ',' && *(p-1) == '\\')) && *p != '\n')
-        p++;
-      value_end = p;
-      while (value_end > value_start && c_isspace(value_end[-1]))
-        value_end--;
-
-      /* Comma, or the end of the string */
-      if (*p)
-        p++;
-
-      name_len = name_end - name_start;
-      value_len = value_end - value_start;
-
-      ret = dn_attr_crt_set(f, crt, name_start, name_len, value_start, value_len);
+      ret = read_attr_and_val(&p, &name, &val);
       if (ret < 0)
         return gnutls_assert_val(ret);
+
+      /* skip spaces and look for comma */
+      while (c_isspace(*p))
+        p++;
+
+      ret = dn_attr_crt_set(f, crt, &name, &val);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      if (err)
+        *err = p;
+
+      if (*p != ',' && *p != 0 && *p != '\n')
+        return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+      p++;
     }
     
   return 0;
