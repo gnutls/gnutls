@@ -32,6 +32,7 @@
 #include <locks.h>
 #include <gnutls_num.h>
 #include <nettle/yarrow.h>
+#include <timespec.h>
 
 #define SOURCES 2
 
@@ -172,7 +173,7 @@ do_trivia_source (int init)
 {
   struct
   {
-    struct timeval now;
+    struct timespec now;
 #ifdef HAVE_GETRUSAGE
     struct rusage rusage;
 #endif
@@ -182,11 +183,7 @@ do_trivia_source (int init)
 
   unsigned entropy = 0;
 
-  if (gettimeofday (&event.now, NULL) < 0)
-    {
-      _gnutls_debug_log ("gettimeofday failed: %s\n", strerror (errno));
-      abort ();
-    }
+  gettime (&event.now);
 #ifdef HAVE_GETRUSAGE
   if (getrusage (RUSAGE_SELF, &event.rusage) < 0)
     {
