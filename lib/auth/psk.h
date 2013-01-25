@@ -72,7 +72,7 @@ int _gnutls_find_psk_key( gnutls_session_t session, gnutls_psk_client_credential
   gnutls_datum_t * username, gnutls_datum_t* key, int* free);
 
 #else
-#define _gnutls_set_psk_session_key(x,y) GNUTLS_E_INTERNAL_ERROR
+#define _gnutls_set_psk_session_key(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
 #endif /* ENABLE_PSK */
 
 #endif
