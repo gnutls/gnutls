@@ -167,6 +167,7 @@ wrap_nettle_rnd_deinit (void *ctx)
 
 static int device_fd;
 static time_t trivia_previous_time = 0;
+static pid_t pid; /* detect fork() */
 
 static int
 do_trivia_source (int init)
@@ -214,7 +215,7 @@ do_trivia_source (int init)
         }
     }
   trivia_previous_time = event.now.tv_sec;
-  event.pid = getpid ();
+  event.pid = pid;
 
   return yarrow256_update (&yctx, RANDOM_SOURCE_TRIVIA, entropy,
                            sizeof (event), (const uint8_t *) &event);
@@ -343,7 +344,6 @@ do_device_source_egd (int init)
 static int
 do_device_source (int init)
 {
-  static pid_t pid; /* detect fork() */
   int ret, reseed = 0;
   static int (*do_source) (int init) = NULL;
 /* using static var here is ok since we are
