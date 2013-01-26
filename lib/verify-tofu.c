@@ -58,7 +58,6 @@ int store_pubkey(const char* db_name, const char* host,
                  const char* service, time_t expiration, const gnutls_datum_t* pubkey);
 
 static int find_config_file(char* file, size_t max_size);
-#define MAX_FILENAME 512
 
 extern void *_gnutls_file_mutex;
 

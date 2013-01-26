@@ -28,7 +28,7 @@
 #include <sbuf.h>
 
 /**
- * gnutls_init:
+ * gnutls_sbuf_sinit:
  * @isb: is a pointer to a #gnutls_sbuf_t structure.
  * @session: a GnuTLS session
  * @flags: should be zero or %GNUTLS_SBUF_QUEUE_FLUSHES
@@ -42,8 +42,8 @@
  *
  * Since: 3.1.7
  **/
-int gnutls_sbuf_init (gnutls_sbuf_t * isb, gnutls_session_t session,
-                      unsigned int flags)
+int gnutls_sbuf_sinit (gnutls_sbuf_t * isb, gnutls_session_t session,
+                       unsigned int flags)
 {
 struct gnutls_sbuf_st* sb;
 
@@ -58,6 +58,306 @@ struct gnutls_sbuf_st* sb;
   *isb = sb;
   
   return 0;
+}
+
+
+/**
+ * gnutls_credentials_deinit:
+ * @cred: is a #gnutls_credentials_t structure.
+ *
+ * This function deinitializes a #gnutls_credentials_t structure.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.1.7
+ **/
+void gnutls_credentials_deinit (gnutls_credentials_t cred)
+{
+  if (cred->xcred)
+    gnutls_certificate_free_credentials(cred->xcred);
+  gnutls_free(cred);
+}
+
+/**
+ * gnutls_credentials_init:
+ * @cred: is a pointer to a #gnutls_credentials_t structure.
+ *
+ * This function initializes a #gnutls_credentials_t structure.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.1.7
+ **/
+int gnutls_credentials_init (gnutls_credentials_t* cred)
+{
+  *cred = gnutls_calloc(1, sizeof(*cred));
+  if (*cred == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+  
+  return 0;
+}
+
+static int
+_verify_certificate_callback (gnutls_session_t session)
+{
+  unsigned int status;
+  gnutls_sbuf_t sb;
+  int ret, type;
+  const char *hostname = NULL;
+  const char *service = NULL;
+  const char *tofu_file = NULL;
+  
+  sb = gnutls_session_get_ptr(session);
+  if (sb == NULL)
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+  if (sb->server_name[0] != 0)
+    hostname = sb->server_name;
+
+  if (sb->service_name[0] != 0)
+    service = sb->service_name;
+
+  if (sb->cred->tofu_file[0] != 0)
+    tofu_file = sb->cred->tofu_file;
+
+  /* This verification function uses the trusted CAs in the credentials
+   * structure. So you must have installed one or more CA certificates.
+   */
+  if (sb->cred->vflags & GNUTLS_VMETHOD_SYSTEM_CAS || sb->cred->vflags & GNUTLS_VMETHOD_SINGLE_CA)
+    {
+      ret = gnutls_certificate_verify_peers3 (session, hostname, &status);
+      if (ret < 0)
+        return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+
+      if (status != 0) /* Certificate is not trusted */
+        return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+    }
+
+  if (sb->cred->vflags & GNUTLS_VMETHOD_TOFU)
+    {
+      const gnutls_datum_t *cert_list;
+      unsigned int cert_list_size;
+
+      type = gnutls_certificate_type_get (session);
+
+      /* Do SSH verification */
+      cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
+      if (cert_list == NULL)
+        return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+
+      /* service may be obtained alternatively using getservbyport() */
+      ret = gnutls_verify_stored_pubkey(tofu_file, NULL, hostname, service, 
+                                    type, &cert_list[0], 0);
+      if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
+        {
+          /* host was not seen before. Store the key */
+          gnutls_store_pubkey(tofu_file, NULL, hostname, service, 
+                              type, &cert_list[0], 0, 0);
+        }
+      else if (ret == GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
+        return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+      else if (ret < 0)
+        return gnutls_assert_val(ret);
+    }
+  
+  /* notify gnutls to continue handshake normally */
+  return 0;
+}
+
+/**
+ * gnutls_credentials_set_trust:
+ * @cred: is a #gnutls_credentials_t structure.
+ * @vflags: the requested peer verification methods
+ * @ca_file: a PEM file storing the certificate authority
+ * @crl_file: a PEM file storing any CRLs of the certificate authority
+ * @tofu_file: a file to store the trust on first use database
+ *
+ * This function initializes X.509 certificates in 
+ * a #gnutls_credentials_t structure.
+ *
+ * The @ca_file and @crl_file are required only if @vflags includes
+ * %GNUTLS_VMETHOD_SINGLE_CA. The @tofu_file may be set if 
+ * %GNUTLS_VMETHOD_TOFU is specified.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.1.7
+ **/
+int gnutls_credentials_set_trust (gnutls_credentials_t cred, unsigned vflags, 
+                                  const char* ca_file, const char* crl_file,
+                                  const char* tofu_file)
+{
+int ret;
+unsigned len;
+
+  if (cred->xcred == NULL)
+    {
+      ret = gnutls_certificate_allocate_credentials(&cred->xcred);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+    }
+  
+  if (vflags & GNUTLS_VMETHOD_SYSTEM_CAS)
+    {
+      ret = gnutls_certificate_set_x509_system_trust(cred->xcred);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto fail1;
+        }
+    }
+
+  if (vflags & GNUTLS_VMETHOD_SINGLE_CA)
+    {
+      ret = gnutls_certificate_set_x509_trust_file(cred->xcred, ca_file, GNUTLS_X509_FMT_PEM);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto fail1;
+        }
+
+      ret = gnutls_certificate_set_x509_crl_file(cred->xcred, crl_file, GNUTLS_X509_FMT_PEM);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto fail1;
+        }
+    }
+  
+  if (vflags & GNUTLS_VMETHOD_TOFU)
+    {
+      len = strlen(tofu_file);
+      
+      if (len >= sizeof(cred->tofu_file))
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+      memcpy(cred->tofu_file, tofu_file, len+1);
+    }
+  
+  gnutls_certificate_set_verify_function (cred->xcred, _verify_certificate_callback);
+
+  return 0;
+fail1:
+  gnutls_certificate_free_credentials(cred->xcred);
+  cred->xcred = NULL;
+  return ret;
+}
+
+
+/**
+ * gnutls_sbuf_client_init:
+ * @isb: is a pointer to a #gnutls_sbuf_t structure.
+ * @hostname: The name of the host to connect to
+ * @service: The name of the host to connect to
+ * @fd: a socket descriptor
+ * @priority: A priority string to use (use %NULL for default)
+ * @cred: A credentials structure
+ * @flags: should be zero or %GNUTLS_SBUF_QUEUE_FLUSHES
+ *
+ * This function initializes a #gnutls_sbuf_t structure associated
+ * with the provided session. If the flag %GNUTLS_SBUF_QUEUE_FLUSHES
+ * is set then gnutls_sbuf_queue() will flush when the maximum
+ * data size for a record is reached.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.1.7
+ **/
+int gnutls_sbuf_client_init (gnutls_sbuf_t * isb, const char* hostname, 
+                             const char* service,
+                             gnutls_transport_ptr fd, 
+                             const char* priority, gnutls_credentials_t cred,
+                             unsigned int flags)
+{
+struct gnutls_sbuf_st* sb;
+gnutls_session_t session;
+int ret;
+unsigned len;
+
+  ret = gnutls_init(&session, GNUTLS_CLIENT);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  sb = gnutls_calloc(1, sizeof(*sb));
+  if (sb == NULL)
+    {
+      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+      goto fail1;
+    }
+  _gnutls_buffer_init(&sb->buf);
+  sb->session = session;
+  sb->flags = flags;
+  
+  /* set session/handshake info 
+   */
+  gnutls_handshake_set_timeout(session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
+  
+  ret = gnutls_priority_set_direct(session, priority, NULL);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto fail1;
+    }
+  
+  if (cred->xcred)
+    {
+      ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred->xcred);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto fail1;
+        }
+    }
+
+  if (hostname)
+    {
+      len = strlen(hostname);
+      
+      if (len >= sizeof(sb->server_name))
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+      memcpy(sb->server_name, hostname, len+1);
+
+      ret = gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname, len);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto fail1;
+        }
+    }
+
+  if (service)
+    {
+      len = strlen(service);
+      
+      if (len >= sizeof(sb->service_name))
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+      memcpy(sb->service_name, service, len+1);
+    }
+
+  gnutls_transport_set_ptr (session, fd);
+  
+  do
+    {
+      ret = gnutls_handshake(session);
+    }
+  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
+
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto fail1;
+    }
+  
+  *isb = sb;
+  gnutls_session_set_ptr( session, sb);
+  
+  return 0;
+
+fail1:
+  if (sb)
+    gnutls_sbuf_deinit(sb);
+  gnutls_deinit(session);
+  
+  return ret;
 }
 
 /**
