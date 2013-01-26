@@ -33,6 +33,13 @@
 #include <gnutls_num.h>
 #include <nettle/yarrow.h>
 #include <timespec.h>
+#ifdef HAVE_GETPID
+# include <unistd.h> /* getpid */
+#endif
+#ifdef HAVE_GETRUSAGE
+# include <sys/resource.h>
+#endif
+#include <errno.h>
 
 #define SOURCES 2
 
@@ -47,13 +54,97 @@ enum
 
 static struct yarrow256_ctx yctx;
 static struct yarrow_source ysources[SOURCES];
-static time_t device_last_read = 0;
+
+static struct timespec device_last_read = { 0, 0 };
+static struct timespec current_time = { 0, 0 };
+
+static time_t trivia_previous_time = 0;
 static time_t trivia_time_count = 0;
+#ifdef HAVE_GETPID
+static pid_t pid; /* detect fork() */
+#endif
 
 static void *rnd_mutex;
 
-#define DEVICE_READ_INTERVAL 1200
+inline static unsigned int
+timespec_sub_sec (struct timespec *a, struct timespec *b)
+{
+  return (a->tv_sec - b->tv_sec);
+}
 
+#define DEVICE_READ_INTERVAL (1200)
+#define CACHED_TRIVIA_EVENTS 16
+/* universal functions */
+
+static int
+do_trivia_source (int init)
+{
+  static struct
+  {
+    struct timespec now;
+#ifdef HAVE_GETRUSAGE
+    struct rusage rusage;
+#endif
+#ifdef HAVE_GETPID
+    pid_t pid;
+#endif
+    unsigned count;
+  } event[CACHED_TRIVIA_EVENTS];
+  static int idx = 0;
+  static unsigned entropy = 0;
+  int ret;
+
+  memcpy(&event[idx].now, &current_time, sizeof(event[idx].now));
+#ifdef HAVE_GETRUSAGE
+  if (getrusage (RUSAGE_SELF, &event[idx].rusage) < 0)
+    {
+      _gnutls_debug_log ("getrusage failed: %s\n", strerror (errno));
+      abort ();
+    }
+#endif
+
+  event[idx].count = 0;
+  if (init)
+    {
+      trivia_time_count = 0;
+    }
+  else
+    {
+      event[idx].count = trivia_time_count++;
+
+      if (event[idx].now.tv_sec != trivia_previous_time)
+        {
+          /* Count one bit of entropy if we either have more than two
+           * invocations in one second, or more than two seconds
+           * between invocations. */
+          if ((trivia_time_count > 2)
+              || ((event[idx].now.tv_sec - trivia_previous_time) > 2))
+            entropy++;
+
+          trivia_time_count = 0;
+        }
+    }
+  trivia_previous_time = event[idx].now.tv_sec;
+#ifdef HAVE_GETPID
+  event[idx].pid = pid;
+#endif
+  
+  idx++;
+  if (idx == CACHED_TRIVIA_EVENTS)
+    {
+      ret = yarrow256_update (&yctx, RANDOM_SOURCE_TRIVIA, entropy,
+                              sizeof (event), (void *) &event);
+      idx = entropy = 0;
+    }
+  else
+    ret = 0;
+    
+  return ret;
+}
+
+
+
+/* System specific functions */
 #ifdef _WIN32
 
 #include <windows.h>
@@ -65,37 +156,8 @@ static void *rnd_mutex;
 static HCRYPTPROV device_fd = 0;
 
 static int
-do_trivia_source (int init)
-{
-  struct
-  {
-    FILETIME now;
-    unsigned count;
-  } event;
-
-  unsigned entropy = 0;
-
-  GetSystemTimeAsFileTime (&event.now);
-  event.count = 0;
-
-  if (init)
-    {
-      trivia_time_count = 0;
-    }
-  else
-    {
-      event.count = trivia_time_count++;
-      entropy = 1;
-    }
-
-  return yarrow256_update (&yctx, RANDOM_SOURCE_TRIVIA, entropy,
-                           sizeof (event), (const uint8_t *) &event);
-}
-
-static int
 do_device_source (int init)
 {
-  time_t now = gnutls_time (NULL);
   int read_size = DEVICE_READ_SIZE;
 
   if (init)
@@ -109,12 +171,12 @@ do_device_source (int init)
           _gnutls_debug_log ("error in CryptAcquireContext!\n");
           return GNUTLS_E_RANDOM_DEVICE_ERROR;
         }
-      device_last_read = now;
+      gettime(&device_last_read);
       read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
     }
 
   if ((device_fd != 0)
-      && (init || ((now - device_last_read) > DEVICE_READ_INTERVAL)))
+      && (init || timespec_sub_sec(&current_time, &device_last_read) > DEVICE_READ_INTERVAL)))
     {
 
       /* More than 20 minutes since we last read the device */
@@ -127,7 +189,7 @@ do_device_source (int init)
           return GNUTLS_E_RANDOM_DEVICE_ERROR;
         }
 
-      device_last_read = now;
+      memcpy(&device_last_read, &current_time, sizeof(device_last_read));
       return yarrow256_update (&yctx, RANDOM_SOURCE_DEVICE,
                                read_size * 8 /
                                2 /* we trust the system RNG */ ,
@@ -150,81 +212,21 @@ wrap_nettle_rnd_deinit (void *ctx)
 #else /* POSIX */
 
 #include <time.h>
-#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <fcntl.h>
 #include <locks.h>
-#include <unistd.h> /* getpid */
-#ifdef HAVE_GETRUSAGE
-#include <sys/resource.h>
-#endif
 #include "egd.h"
 
 #define DEVICE_READ_SIZE 16
 #define DEVICE_READ_SIZE_MAX 32
 
 static int device_fd;
-static time_t trivia_previous_time = 0;
-static pid_t pid; /* detect fork() */
-
-static int
-do_trivia_source (int init)
-{
-  struct
-  {
-    struct timespec now;
-#ifdef HAVE_GETRUSAGE
-    struct rusage rusage;
-#endif
-    unsigned count;
-    pid_t pid;
-  } event;
-
-  unsigned entropy = 0;
-
-  gettime (&event.now);
-#ifdef HAVE_GETRUSAGE
-  if (getrusage (RUSAGE_SELF, &event.rusage) < 0)
-    {
-      _gnutls_debug_log ("getrusage failed: %s\n", strerror (errno));
-      abort ();
-    }
-#endif
-
-  event.count = 0;
-  if (init)
-    {
-      trivia_time_count = 0;
-    }
-  else
-    {
-      event.count = trivia_time_count++;
-
-      if (event.now.tv_sec != trivia_previous_time)
-        {
-          /* Count one bit of entropy if we either have more than two
-           * invocations in one second, or more than two seconds
-           * between invocations. */
-          if ((trivia_time_count > 2)
-              || ((event.now.tv_sec - trivia_previous_time) > 2))
-            entropy++;
-
-          trivia_time_count = 0;
-        }
-    }
-  trivia_previous_time = event.now.tv_sec;
-  event.pid = pid;
-
-  return yarrow256_update (&yctx, RANDOM_SOURCE_TRIVIA, entropy,
-                           sizeof (event), (const uint8_t *) &event);
-}
 
 static int
 do_device_source_urandom (int init)
 {
-  time_t now = gnutls_time (NULL);
   unsigned int read_size = DEVICE_READ_SIZE;
 
   if (init)
@@ -240,13 +242,12 @@ do_device_source_urandom (int init)
 
       old = fcntl (device_fd, F_GETFD);
       fcntl (device_fd, F_SETFD, old | 1);
-      device_last_read = now;
+      memcpy(&device_last_read, &current_time, sizeof(device_last_read));
 
       read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
     }
 
-  if ((device_fd > 0)
-      && (init || ((now - device_last_read) > DEVICE_READ_INTERVAL)))
+  if ((init || (timespec_sub_sec(&current_time, &device_last_read) > DEVICE_READ_INTERVAL)) && (device_fd > 0))
     {
       /* More than 20 minutes since we last read the device */
       uint8_t buf[DEVICE_READ_SIZE_MAX];
@@ -278,7 +279,7 @@ do_device_source_urandom (int init)
           done += res;
         }
 
-      device_last_read = now;
+      memcpy(&device_last_read, &current_time, sizeof(device_last_read));
       return yarrow256_update (&yctx, RANDOM_SOURCE_DEVICE,
                                read_size * 8 / 2 /* we trust the RNG */ ,
                                read_size, buf);
@@ -289,7 +290,6 @@ do_device_source_urandom (int init)
 static int
 do_device_source_egd (int init)
 {
-  time_t now = gnutls_time (NULL);
   unsigned int read_size = DEVICE_READ_SIZE;
 
   if (init)
@@ -301,13 +301,13 @@ do_device_source_egd (int init)
           return gnutls_assert_val(GNUTLS_E_RANDOM_DEVICE_ERROR);
         }
 
-      device_last_read = now;
+      memcpy(&device_last_read, &current_time, sizeof(device_last_read));
 
       read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
     }
 
   if ((device_fd > 0)
-      && (init || ((now - device_last_read) > DEVICE_READ_INTERVAL)))
+      && (init || (timespec_sub_sec(&current_time, &device_last_read) > DEVICE_READ_INTERVAL)))
     {
 
       /* More than 20 minutes since we last read the device */
@@ -334,7 +334,7 @@ do_device_source_egd (int init)
           done += res;
         }
 
-      device_last_read = now;
+      memcpy(&device_last_read, &current_time, sizeof(device_last_read));
       return yarrow256_update (&yctx, RANDOM_SOURCE_DEVICE, read_size * 8 / 2,
                                read_size, buf);
     }
@@ -349,10 +349,11 @@ do_device_source (int init)
 /* using static var here is ok since we are
  * always called with mutexes down 
  */
-
   if (init == 1)
     {
+#ifdef HAVE_GETPID
       pid = getpid();
+#endif
 
       do_source = do_device_source_urandom;
       ret = do_source (init);
@@ -372,12 +373,14 @@ do_device_source (int init)
     }
   else
     {
+#ifdef HAVE_GETPID
       if (getpid() != pid) 
         { /* fork() detected */
-          device_last_read = 0;
+          memset(&device_last_read, 0, sizeof(device_last_read));
           pid = getpid();
           reseed = 1;
         }
+#endif
     
       ret = do_source (init);
       
@@ -403,6 +406,8 @@ wrap_nettle_rnd_deinit (void *ctx)
 #endif
 
 
+/* API functions */
+
 static int
 wrap_nettle_rnd_init (void **ctx)
 {
@@ -416,6 +421,7 @@ wrap_nettle_rnd_init (void **ctx)
     }
 
   yarrow256_init (&yctx, SOURCES, ysources);
+  gettime(&current_time);
 
   ret = do_device_source (1);
   if (ret < 0)
@@ -443,6 +449,7 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
   int ret;
 
   RND_LOCK;
+  gettime(&current_time);
 
   ret = do_trivia_source (0);
   if (ret < 0)
