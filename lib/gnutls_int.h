@@ -623,11 +623,11 @@ struct gnutls_priority_st
   unsigned int stateless_compression:1;
   unsigned int additional_verify_flags;
 
-  /* bits to use for DHE and DHA 
-   * use _gnutls_dh_get_prime_bits() and gnutls_dh_set_prime_bits() 
-   * to access it.
+  /* The session's expected security level.
+   * Will be used to determine the minimum DH bits,
+   * (or the acceptable certificate security level).
    */
-  uint16_t dh_prime_bits;
+  gnutls_sec_param_t level;
 };
 
 /* Allow around 50KB of length-hiding padding

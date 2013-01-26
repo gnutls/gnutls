@@ -49,6 +49,8 @@ gnutls_range_split: Added
 gnutls_record_send_range: Added
 gnutls_record_set_max_empty_records: Added
 gnutls_record_can_use_length_hiding: Added
+GNUTLS_SEC_PARAM_EXPORT: Added
+GNUTLS_SEC_PARAM_VERY_WEAK: Added
 
 
 * Version 3.1.6 (released 2013-01-02)

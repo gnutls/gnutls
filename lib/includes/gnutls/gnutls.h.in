@@ -680,9 +680,11 @@ typedef enum
 
 /**
  * gnutls_sec_param_t:
- * @GNUTLS_SEC_PARAM_INSECURE: Less than 72 bits of security
- * @GNUTLS_SEC_PARAM_WEAK: 72 bits of security
  * @GNUTLS_SEC_PARAM_UNKNOWN: Cannot be known
+ * @GNUTLS_SEC_PARAM_INSECURE: Less than 42 bits of security
+ * @GNUTLS_SEC_PARAM_EXPORT: 42 bits of security
+ * @GNUTLS_SEC_PARAM_VERY_WEAK: 64 bits of security
+ * @GNUTLS_SEC_PARAM_WEAK: 72 bits of security
  * @GNUTLS_SEC_PARAM_LOW: 80 bits of security
  * @GNUTLS_SEC_PARAM_LEGACY: 96 bits of security
  * @GNUTLS_SEC_PARAM_NORMAL: 112 bits of security
@@ -694,6 +696,8 @@ typedef enum
   typedef enum
   {
     GNUTLS_SEC_PARAM_INSECURE = -20,
+    GNUTLS_SEC_PARAM_EXPORT = -15,
+    GNUTLS_SEC_PARAM_VERY_WEAK = -12,
     GNUTLS_SEC_PARAM_WEAK = -10,
     GNUTLS_SEC_PARAM_UNKNOWN = 0,
     GNUTLS_SEC_PARAM_LOW = 1,
