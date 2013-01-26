@@ -14,6 +14,11 @@ or request from an RFC4514 string.
 
 ** libgnutls: Simplified the DTLS sliding window implementation.
 
+** libgnutls: The minimum DH bits accepted by a client are now set
+by the specified priority string. The current values correspond to the
+previous weak defaults (727 bits), except for the SECURE128 and SECURE192
+strings which increase the minimum to 1248 and 1776 respectively.
+
 ** libgnutls: Added the gnutls_sbuf_t structure and accompanying 
 functions to enable buffering in sending application data.
 

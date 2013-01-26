@@ -668,6 +668,9 @@ bulk_rmadd_func *func;
       func (&priority_cache->sign_algo,
                      sign_priority_secure192);
       func (&priority_cache->supported_ecc, supported_ecc_secure192);
+      
+      /* be conservative for now. Set the bits to correspond to an 80-bit level */
+      priority_cache->dh_prime_bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LOW);
       return 1;
     }
   else if (strcasecmp (level, LEVEL_SECURE128) == 0
@@ -680,6 +683,9 @@ bulk_rmadd_func *func;
       func (&priority_cache->sign_algo,
                      sign_priority_secure128);
       func (&priority_cache->supported_ecc, supported_ecc_secure128);
+
+      /* be conservative for now. Set the bits to correspond to 96-bit level */
+      priority_cache->dh_prime_bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
       return 1;
     }
   else if (strcasecmp (level, LEVEL_SUITEB128) == 0)
@@ -714,6 +720,7 @@ bulk_rmadd_func *func;
       func (&priority_cache->sign_algo,
                      sign_priority_default);
       func (&priority_cache->supported_ecc, supported_ecc_normal);
+      priority_cache->dh_prime_bits = 512;
       return 1;
     }
   return 0;
@@ -812,7 +819,12 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
    */
   (*priority_cache)->sr = SR_PARTIAL;
   (*priority_cache)->ssl3_record_version = 1;
-
+  
+  (*priority_cache)->dh_prime_bits = 727;
+  /* Should be changed to the following in the long term:
+    (*priority_cache)->dh_prime_bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LEGACY);
+   */
+  
   (*priority_cache)->max_empty_records = DEFAULT_MAX_EMPTY_RECORDS;
 
   if (priorities == NULL)

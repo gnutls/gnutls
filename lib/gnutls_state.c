@@ -279,7 +279,6 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
   session->internals.handshake_endtime = 0;
 }
 
-#define MIN_DH_BITS 727
 /**
  * gnutls_init:
  * @session: is a pointer to a #gnutls_session_t structure.
@@ -343,8 +342,6 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
   _gnutls_handshake_recv_buffer_init(*session);
 
   (*session)->internals.expire_time = DEFAULT_EXPIRE_TIME;      /* one hour default */
-
-  gnutls_dh_set_prime_bits ((*session), MIN_DH_BITS);
 
   gnutls_handshake_set_max_packet_length ((*session),
                                           MAX_HANDSHAKE_PACKET_SIZE);

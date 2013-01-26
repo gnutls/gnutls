@@ -622,6 +622,12 @@ struct gnutls_priority_st
   /* Whether stateless compression will be used */
   unsigned int stateless_compression:1;
   unsigned int additional_verify_flags;
+
+  /* bits to use for DHE and DHA 
+   * use _gnutls_dh_get_prime_bits() and gnutls_dh_set_prime_bits() 
+   * to access it.
+   */
+  uint16_t dh_prime_bits;
 };
 
 /* Allow around 50KB of length-hiding padding
@@ -788,12 +794,6 @@ typedef struct
    * supports it.
    */
   int send_cert_req;
-
-  /* bits to use for DHE and DHA 
-   * use _gnutls_dh_get_prime_bits() and gnutls_dh_set_prime_bits() 
-   * to access it.
-   */
-  uint16_t dh_prime_bits;
 
   size_t max_handshake_data_buffer_size;
 

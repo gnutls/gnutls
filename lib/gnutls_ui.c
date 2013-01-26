@@ -88,14 +88,17 @@ int gnutls_random_art (gnutls_random_art_t type,
  * Note that values lower than 512 bits may allow decryption of the
  * exchanged data.
  *
- * This function has no effect in server side.
+ * This function must be called after gnutls_priority_set_direct()
+ * or the set value may be overriden by the selected priority options.
+ *
+ * The function has no effect in server side.
  *
  **/
 void
 gnutls_dh_set_prime_bits (gnutls_session_t session, unsigned int bits)
 {
   if (bits <= 512) _gnutls_audit_log(session, "Note that the security level of the Diffie-Hellman key exchange has been lowered to %u bits and this may allow decryption of the session data\n", bits);
-  session->internals.dh_prime_bits = bits;
+  session->internals.priorities.dh_prime_bits = bits;
 }
 
 

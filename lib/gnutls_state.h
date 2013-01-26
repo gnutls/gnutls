@@ -61,9 +61,9 @@ int _gnutls_dh_set_group (gnutls_session_t session, bigint_t gen,
                           bigint_t prime);
 
 static inline int
-_gnutls_dh_get_allowed_prime_bits (gnutls_session_t session)
+_gnutls_dh_get_min_prime_bits (gnutls_session_t session)
 {
-  return session->internals.dh_prime_bits;
+  return session->internals.priorities.dh_prime_bits;
 }
 
 void _gnutls_handshake_internal_state_clear (gnutls_session_t);

@@ -250,7 +250,7 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-  bits = _gnutls_dh_get_allowed_prime_bits (session);
+  bits = _gnutls_dh_get_min_prime_bits (session);
   if (bits < 0)
     {
       gnutls_assert ();
