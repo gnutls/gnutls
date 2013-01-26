@@ -1419,3 +1419,10 @@ gnutls_session_get_random (gnutls_session_t session, gnutls_datum_t* client, gnu
       server->size = sizeof(session->security_parameters.server_random);
     }
 }
+
+unsigned int
+timespec_sub_ms (struct timespec *a, struct timespec *b)
+{
+  return (a->tv_sec * 1000 + a->tv_nsec / (1000 * 1000) -
+          (b->tv_sec * 1000 + b->tv_nsec / (1000 * 1000)));
+}

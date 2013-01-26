@@ -36,14 +36,13 @@ void _dtls_reset_hsk_state(gnutls_session_t session);
 
 #define MAX_DTLS_TIMEOUT 60000
 
-unsigned int _dtls_timespec_sub_ms (struct timespec *a, struct timespec *b);
 
 #define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r) { \
   struct timespec now; \
   unsigned int diff; \
   gettime(&now); \
    \
-  diff = _dtls_timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time); \
+  diff = timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time); \
   if (diff > session->internals.dtls.total_timeout_ms) \
     { \
       _gnutls_dtls_log("Session timeout: %u ms\n", diff); \

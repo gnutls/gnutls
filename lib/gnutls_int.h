@@ -1002,5 +1002,8 @@ _gnutls_set_current_version (gnutls_session_t session,
   session->security_parameters.version = version;
 }
 
+unsigned int
+/* returns a-b in ms */
+timespec_sub_ms (struct timespec *a, struct timespec *b);
 
 #endif /* GNUTLS_INT_H */

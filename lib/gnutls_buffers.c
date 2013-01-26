@@ -235,7 +235,7 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
   if (ms && *ms > 0)
     {
       gettime(&t2);
-      diff = _dtls_timespec_sub_ms(&t2, &t1);
+      diff = timespec_sub_ms(&t2, &t1);
       if (diff < *ms)
         *ms -= diff;
       else
@@ -331,7 +331,7 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
       if (ms && *ms > 0)
         {
           gettime(&t2);
-          diff = _dtls_timespec_sub_ms(&t2, &t1);
+          diff = timespec_sub_ms(&t2, &t1);
           if (diff < *ms)
             *ms -= diff;
           else

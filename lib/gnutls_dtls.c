@@ -38,14 +38,6 @@
 #include <timespec.h>
 #include <algorithms.h>
 
-/* returns a-b in ms */
-unsigned int
-_dtls_timespec_sub_ms (struct timespec *a, struct timespec *b)
-{
-  return (a->tv_sec * 1000 + a->tv_nsec / (1000 * 1000) -
-          (b->tv_sec * 1000 + b->tv_nsec / (1000 * 1000)));
-}
-
 void
 _dtls_async_timer_delete (gnutls_session_t session)
 {
@@ -248,7 +240,7 @@ unsigned int timeout;
             {
               /* if no retransmission is required yet just return 
                */
-              if (_dtls_timespec_sub_ms(&now, &session->internals.dtls.last_retransmit) < TIMER_WINDOW)
+              if (timespec_sub_ms(&now, &session->internals.dtls.last_retransmit) < TIMER_WINDOW)
                 {
                   gnutls_assert();
                   goto nb_timeout;
@@ -279,7 +271,7 @@ unsigned int timeout;
     {
       timeout = TIMER_WINDOW;
 
-      diff = _dtls_timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time);
+      diff = timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time);
       if (diff >= session->internals.dtls.total_timeout_ms) 
         {
           _gnutls_dtls_log("Session timeout: %u ms\n", diff);
@@ -287,7 +279,7 @@ unsigned int timeout;
           goto end_flight;
         }
 
-      diff = _dtls_timespec_sub_ms(&now, &session->internals.dtls.last_retransmit);
+      diff = timespec_sub_ms(&now, &session->internals.dtls.last_retransmit);
       if (session->internals.dtls.flight_init == 0 || diff >= TIMER_WINDOW)
         {
           _gnutls_dtls_log ("DTLS[%p]: %sStart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
@@ -755,7 +747,7 @@ unsigned int diff;
 
   gettime(&now);
   
-  diff = _dtls_timespec_sub_ms(&now, &session->internals.dtls.last_retransmit);
+  diff = timespec_sub_ms(&now, &session->internals.dtls.last_retransmit);
   if (diff >= TIMER_WINDOW)
     return 0;
   else

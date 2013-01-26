@@ -254,7 +254,7 @@ retry:
               }
 
             gettime(&now);
-            diff = _dtls_timespec_sub_ms(&now, &session->internals.hb_ping_start);
+            diff = timespec_sub_ms(&now, &session->internals.hb_ping_start);
             if (diff > session->internals.hb_total_timeout_ms)
               {
                 session->internals.hb_state = SHB_SEND1;
@@ -403,7 +403,7 @@ struct timespec now;
 unsigned int diff;
 
   gettime(&now);
-  diff = _dtls_timespec_sub_ms(&now, &session->internals.hb_ping_sent);
+  diff = timespec_sub_ms(&now, &session->internals.hb_ping_sent);
   if (diff >= session->internals.hb_actual_retrans_timeout_ms)
     return 0;
   else
