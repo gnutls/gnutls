@@ -138,7 +138,7 @@ heartbeat_send_data (gnutls_session_t session, const void *data,
   uint8_t payload[DEFAULT_PAYLOAD_SIZE];
   _gnutls_buffer_init (&response);
 
-  ret = gnutls_rnd (GNUTLS_RND_RANDOM, payload, DEFAULT_PAYLOAD_SIZE);
+  ret = gnutls_rnd (GNUTLS_RND_NONCE, payload, DEFAULT_PAYLOAD_SIZE);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
