@@ -12,6 +12,8 @@ in a template from an RFC4514 string.
 ** libgnutls: Added functions to directly set the DN in a certificate
 or request from an RFC4514 string.
 
+** libgnutls: Several optimizations in the random generator.
+
 ** libgnutls: Simplified the DTLS sliding window implementation.
 
 ** libgnutls: The minimum DH bits accepted by a client are now set

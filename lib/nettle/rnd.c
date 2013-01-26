@@ -73,7 +73,6 @@ timespec_sub_sec (struct timespec *a, struct timespec *b)
 }
 
 #define DEVICE_READ_INTERVAL (1200)
-#define CACHED_TRIVIA_EVENTS 16
 /* universal functions */
 
 static int
@@ -89,57 +88,46 @@ do_trivia_source (int init)
     pid_t pid;
 #endif
     unsigned count;
-  } event[CACHED_TRIVIA_EVENTS];
-  static int idx = 0;
-  static unsigned entropy = 0;
-  int ret;
+  } event;
+  unsigned entropy = 0;
 
-  memcpy(&event[idx].now, &current_time, sizeof(event[idx].now));
+  memcpy(&event.now, &current_time, sizeof(event.now));
 #ifdef HAVE_GETRUSAGE
-  if (getrusage (RUSAGE_SELF, &event[idx].rusage) < 0)
+  if (getrusage (RUSAGE_SELF, &event.rusage) < 0)
     {
       _gnutls_debug_log ("getrusage failed: %s\n", strerror (errno));
       abort ();
     }
 #endif
 
-  event[idx].count = 0;
+  event.count = 0;
   if (init)
     {
       trivia_time_count = 0;
     }
   else
     {
-      event[idx].count = trivia_time_count++;
+      event.count = trivia_time_count++;
 
-      if (event[idx].now.tv_sec != trivia_previous_time)
+      if (event.now.tv_sec != trivia_previous_time)
         {
           /* Count one bit of entropy if we either have more than two
            * invocations in one second, or more than two seconds
            * between invocations. */
           if ((trivia_time_count > 2)
-              || ((event[idx].now.tv_sec - trivia_previous_time) > 2))
+              || ((event.now.tv_sec - trivia_previous_time) > 2))
             entropy++;
 
           trivia_time_count = 0;
         }
     }
-  trivia_previous_time = event[idx].now.tv_sec;
+  trivia_previous_time = event.now.tv_sec;
 #ifdef HAVE_GETPID
-  event[idx].pid = pid;
+  event.pid = pid;
 #endif
   
-  idx++;
-  if (idx == CACHED_TRIVIA_EVENTS)
-    {
-      ret = yarrow256_update (&yctx, RANDOM_SOURCE_TRIVIA, entropy,
-                              sizeof (event), (void *) &event);
-      idx = entropy = 0;
-    }
-  else
-    ret = 0;
-    
-  return ret;
+  return yarrow256_update (&yctx, RANDOM_SOURCE_TRIVIA, entropy,
+                           sizeof (event), (void *) &event);
 }
 
 
@@ -452,7 +440,10 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
   gettime(&current_time);
 
   /* update state only when having a non-nonce or if nonce
-   * and nsecs%4096 == 0, i.e., one out of 4096 times called */
+   * and nsecs%4096 == 0, i.e., one out of 4096 times called .
+   *
+   * The reason we do that is to avoid any delays when generating nonces.
+   */
   if (level != GNUTLS_RND_NONCE || ((current_time.tv_nsec & 0x0fff) == 0))
     {
       ret = do_trivia_source (0);
