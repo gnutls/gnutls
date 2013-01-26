@@ -199,7 +199,7 @@ AC_PROG_LIBTOOL
 
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
-AC_CHECK_FUNCS([fork getrusage getpwuid_r daemon],,)
+AC_CHECK_FUNCS([fork getrusage getpwuid_r daemon getpid],,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
 
