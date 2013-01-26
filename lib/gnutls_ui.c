@@ -552,6 +552,7 @@ gnutls_certificate_get_peers (gnutls_session_t
   return info->raw_certificate_list;
 }
 
+#ifdef ENABLE_OPENPGP
 /**
  * gnutls_certificate_get_peers_subkey_id:
  * @session: is a gnutls session
@@ -581,6 +582,7 @@ int gnutls_certificate_get_peers_subkey_id(gnutls_session_t session,
 
   return 0;
 }
+#endif
 
 /**
  * gnutls_certificate_client_get_request_status:
