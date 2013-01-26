@@ -451,20 +451,25 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
   RND_LOCK;
   gettime(&current_time);
 
-  ret = do_trivia_source (0);
-  if (ret < 0)
+  /* update state only when having a non-nonce or if nonce
+   * and nsecs%4096 == 0, i.e., one out of 4096 times called */
+  if (level != GNUTLS_RND_NONCE || ((current_time.tv_nsec & 0x0fff) == 0))
     {
-      RND_UNLOCK;
-      gnutls_assert ();
-      return ret;
-    }
+      ret = do_trivia_source (0);
+      if (ret < 0)
+        {
+          RND_UNLOCK;
+          gnutls_assert ();
+          return ret;
+        }
 
-  ret = do_device_source (0);
-  if (ret < 0)
-    {
-      RND_UNLOCK;
-      gnutls_assert ();
-      return ret;
+      ret = do_device_source (0);
+      if (ret < 0)
+        {
+          RND_UNLOCK;
+          gnutls_assert ();
+          return ret;
+        }
     }
 
   yarrow256_random (&yctx, datasize, data);
