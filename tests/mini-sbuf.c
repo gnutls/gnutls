@@ -187,6 +187,7 @@ doit (void)
       abort();
     }
 
+  gnutls_free(abuf);
   gnutls_bye (client, GNUTLS_SHUT_RDWR);
   gnutls_bye (server, GNUTLS_SHUT_RDWR);
 
