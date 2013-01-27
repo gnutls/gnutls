@@ -243,7 +243,11 @@ gnutls_cipher_decrypt2 (gnutls_cipher_hd_t handle, const void *ciphertext,
 {
 api_cipher_hd_st * h = handle;
 
-  return _gnutls_cipher_decrypt2 (&h->ctx_dec, ciphertext,
+  if (_gnutls_cipher_is_aead( &h->ctx_enc)!=0)
+    return _gnutls_cipher_decrypt2 (&h->ctx_enc, ciphertext,
+                                  ciphertextlen, text, textlen);
+  else
+    return _gnutls_cipher_decrypt2 (&h->ctx_dec, ciphertext,
                                   ciphertextlen, text, textlen);
 }
 
