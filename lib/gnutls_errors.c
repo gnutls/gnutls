@@ -154,6 +154,8 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_RECORD_LIMIT_REACHED, 1),
   ERROR_ENTRY (N_("Error in the certificate."), GNUTLS_E_CERTIFICATE_ERROR,
                1),
+  ERROR_ENTRY (N_("Could not authenticate peer."), GNUTLS_E_AUTH_ERROR,
+               1),
   ERROR_ENTRY (N_("Unknown Subject Alternative name in X.509 certificate."),
                GNUTLS_E_X509_UNKNOWN_SAN, 1),
 

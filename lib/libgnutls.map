@@ -885,18 +885,19 @@ GNUTLS_3_1_0 {
 	gnutls_record_set_max_empty_records;
 	gnutls_range_split;
 	gnutls_record_send_range;
-	gnutls_sbuf_deinit;
-	gnutls_sbuf_flush;
-	gnutls_sbuf_read;
-	gnutls_sbuf_getdelim;
-	gnutls_sbuf_write;
-	gnutls_sbuf_printf;
-	gnutls_sbuf_sinit;
-	gnutls_sbuf_client_init;
-	gnutls_sbuf_get_session;
-	gnutls_credentials_init;
-	gnutls_credentials_deinit;
-	gnutls_credentials_set_trust;
+	xssl_deinit;
+	xssl_flush;
+	xssl_read;
+	xssl_getdelim;
+	xssl_write;
+	xssl_printf;
+	xssl_sinit;
+	xssl_client_init;
+	xssl_server_init;
+	xssl_get_session;
+	xssl_get_verify_status;
+	xssl_cred_init;
+	xssl_cred_deinit;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

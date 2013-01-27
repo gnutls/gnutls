@@ -24,45 +24,46 @@
 #include <gnutls/gnutls.h>
 
 /* Buffered session I/O */
-typedef struct gnutls_sbuf_st *gnutls_sbuf_t;
-typedef struct gnutls_credentials_st *gnutls_credentials_t;
+typedef struct xssl_st *xssl_t;
+typedef struct xssl_cred_st *xssl_cred_t;
 
-ssize_t gnutls_sbuf_printf (gnutls_sbuf_t sb, const char *fmt, ...)
+ssize_t xssl_printf (xssl_t sb, const char *fmt, ...)
 #ifdef __GNUC__
    __attribute__ ((format (printf, 2, 3)))
 #endif
 ;
 
-ssize_t gnutls_sbuf_write (gnutls_sbuf_t sb, const void *data,
+ssize_t xssl_write (xssl_t sb, const void *data,
                            size_t data_size);
 
-ssize_t gnutls_sbuf_flush (gnutls_sbuf_t sb);
+ssize_t xssl_flush (xssl_t sb);
 
-int gnutls_sbuf_handshake(gnutls_sbuf_t sb);
-ssize_t gnutls_sbuf_read(gnutls_sbuf_t sb, void* data, size_t data_size);
+ssize_t xssl_read(xssl_t sb, void* data, size_t data_size);
 
 ssize_t
-gnutls_sbuf_getdelim (gnutls_sbuf_t sbuf, char **lineptr, size_t *n, int delimiter);
+xssl_getdelim (xssl_t sbuf, char **lineptr, size_t *n, int delimiter);
 
-#define gnutls_sbuf_getline(sbuf, ptr, n) gnutls_sbuf_getdelim(sbuf, ptr, n, '\n')
+#define xssl_getline(sbuf, ptr, n) xssl_getdelim(sbuf, ptr, n, '\n')
 
-void gnutls_sbuf_deinit(gnutls_sbuf_t sb);
+void xssl_deinit(xssl_t sb);
 
-#define GNUTLS_SBUF_WRITE_FLUSHES 1
-int gnutls_sbuf_sinit (gnutls_sbuf_t * isb, gnutls_session_t session,
+#define GNUTLS_SBUF_WRITE_FLUSHES (1<<0)
+int xssl_sinit (xssl_t * isb, gnutls_session_t session,
                        unsigned int flags);
 
-gnutls_session_t gnutls_sbuf_get_session(gnutls_sbuf_t sb);
+gnutls_session_t xssl_get_session(xssl_t sb);
 
-int gnutls_sbuf_client_init (gnutls_sbuf_t * isb, const char* hostname, 
+int xssl_client_init (xssl_t * isb, const char* hostname, 
                              const char* service,
                              gnutls_transport_ptr fd, 
-                             const char* priority, gnutls_credentials_t cred,
+                             const char* priority, xssl_cred_t cred,
+                             unsigned int *status,
                              unsigned int flags);
 
-int gnutls_sbuf_server_init (gnutls_sbuf_t * isb, 
+int xssl_server_init (xssl_t * isb, 
                              gnutls_transport_ptr fd, 
-                             const char* priority, gnutls_credentials_t cred,
+                             const char* priority, xssl_cred_t cred,
+                             unsigned int *status,
                              unsigned int flags);
 
 /* High level credential structures */
@@ -76,8 +77,9 @@ typedef enum
 
 typedef enum
 {
-  GNUTLS_CRED_FILE = 0,
-  GNUTLS_CRED_MEM = 1,
+  GNUTLS_CINPUT_TYPE_FILE = 0,
+  GNUTLS_CINPUT_TYPE_MEM = 1,
+  GNUTLS_CINPUT_TYPE_PIN_FUNC = 2,
 } gnutls_cinput_type_t;
 
 typedef enum
@@ -85,24 +87,33 @@ typedef enum
   GNUTLS_CINPUT_CAS = 1,
   GNUTLS_CINPUT_CRLS = 2,
   GNUTLS_CINPUT_TOFU_DB = 3,
+  GNUTLS_CINPUT_KEYPAIR = 4,
 } gnutls_cinput_contents_t;
 
 typedef struct gnutls_cinput_st {
   gnutls_cinput_type_t type;
-  gnutls_x509_crt_fmt_t fmt; /* if applicable */
   gnutls_cinput_contents_t contents;
+  gnutls_x509_crt_fmt_t fmt; /* if applicable */
+
   union {
+    gnutls_pin_callback_t pin_fn;
     const char* file;
     gnutls_datum_t mem;
-  } i;
+  } i1;
+
+  union {
+    void* udata;
+    const char* file;
+    gnutls_datum_t mem;
+  } i2;
+  
+  unsigned long future_pad[8];
 } gnutls_cinput_st;
 
-int gnutls_credentials_init (gnutls_credentials_t* cred);
-void gnutls_credentials_deinit (gnutls_credentials_t cred);
-
-int gnutls_credentials_set_trust (gnutls_credentials_t cred, unsigned vflags, 
-                                  gnutls_cinput_st* aux,
-                                  unsigned aux_size);
+int xssl_cred_init (xssl_cred_t *c, unsigned vflags, 
+                             gnutls_cinput_st* aux,
+                             unsigned aux_size);
+void xssl_cred_deinit (xssl_cred_t cred);
 
 
 #endif /* GNUTLS_SBUF_H */

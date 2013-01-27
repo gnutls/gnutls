@@ -22,16 +22,16 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <gnutls/sbuf.h>
-#include <sbuf.h>
+#include <gnutls/xssl.h>
+#include <xssl.h>
 
 #ifndef SSIZE_MAX
 # define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
 #endif
 
 /**
- * gnutls_sbuf_get_delim:
- * @sb: is a #gnutls_sbuf_t structure.
+ * xssl_get_delim:
+ * @sb: is a #xssl_t structure.
  * @lineptr: a pointer.
  * @n: The size of @lineptr.
  * @delimiter: The delimiter to stop reading at.
@@ -49,7 +49,7 @@
  * Since: 3.1.7
  **/
 ssize_t
-gnutls_sbuf_getdelim (gnutls_sbuf_t sbuf, char **lineptr, size_t *n, int delimiter)
+xssl_getdelim (xssl_t sbuf, char **lineptr, size_t *n, int delimiter)
 {
   ssize_t result;
   size_t cur_len = 0;
@@ -76,7 +76,7 @@ gnutls_sbuf_getdelim (gnutls_sbuf_t sbuf, char **lineptr, size_t *n, int delimit
     {
       char c;
       
-      result = gnutls_sbuf_read(sbuf, &c, 1);
+      result = xssl_read(sbuf, &c, 1);
       if (result < 0)
         {
           gnutls_assert();

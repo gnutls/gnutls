@@ -37,13 +37,6 @@ extension. Whether length-hiding can be used on a given session can be checked u
 ** API and ABI modifications:
 gnutls_record_set_timeout: Added
 gnutls_record_get_random_padding_status: Added
-gnutls_sbuf_deinit: Added
-gnutls_sbuf_init: Added
-gnutls_sbuf_flush: Added
-gnutls_sbuf_write: Added
-gnutls_sbuf_getdelim: Added
-gnutls_sbuf_read: Added
-gnutls_sbuf_handshake: Added
 gnutls_x509_crt_set_dn: Added
 gnutls_x509_crt_set_issuer_dn: Added
 gnutls_x509_crq_set_dn: Added
@@ -55,6 +48,19 @@ gnutls_record_send_range: Added
 gnutls_record_set_max_empty_records: Added
 gnutls_record_can_use_length_hiding: Added
 gnutls_rnd_refresh: Added
+xssl_deinit: Added
+xssl_flush: Added
+xssl_read: Added
+xssl_getdelim: Added
+xssl_write: Added
+xssl_printf: Added
+xssl_sinit: Added
+xssl_client_init: Added
+xssl_server_init: Added
+xssl_get_session: Added
+xssl_get_verify_status: Added
+xssl_cred_init: Added
+xssl_cred_deinit: Added
 GNUTLS_SEC_PARAM_EXPORT: Added
 GNUTLS_SEC_PARAM_VERY_WEAK: Added
 

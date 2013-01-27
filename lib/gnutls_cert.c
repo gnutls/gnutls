@@ -943,7 +943,10 @@ gnutls_certificate_verification_status_print (unsigned int status,
   if (type == GNUTLS_CRT_X509)
     {
       if (status & GNUTLS_CERT_REVOKED)
-        _gnutls_buffer_append_str (&str, _("The certificate chain revoked. "));
+        _gnutls_buffer_append_str (&str, _("The certificate chain is revoked. "));
+
+      if (status & GNUTLS_CERT_MISMATCH)
+        _gnutls_buffer_append_str (&str, _("The certificate doesn't match the local copy (TOFU). "));
 
       if (status & GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED)
          _gnutls_buffer_append_str (&str, _("The revocation data are old and have been superseded. "));

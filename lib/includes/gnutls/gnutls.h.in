@@ -450,6 +450,7 @@ extern "C"
  * @GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED: The revocation data are old and have been superseded.
  * @GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE: The revocation data have a future issue date.
  * @GNUTLS_CERT_UNEXPECTED_OWNER: The owner is not the expected one.
+ * @GNUTLS_CERT_MISMATCH: The certificate presented isn't the expected one (TOFU)
  *
  * Enumeration of certificate status codes.  Note that the status
  * bits may have different meanings in OpenPGP keys and X.509
@@ -469,6 +470,7 @@ extern "C"
     GNUTLS_CERT_UNEXPECTED_OWNER = 1<<14,
     GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE = 1<<15,
     GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE = 1<<16,
+    GNUTLS_CERT_MISMATCH = 1<<17,
   } gnutls_certificate_status_t;
 
 /**
@@ -2149,6 +2151,7 @@ typedef int (*gnutls_pin_callback_t) (void *userdata, int attempt,
 #define GNUTLS_E_NO_CERTIFICATE_STATUS -340
 #define GNUTLS_E_OCSP_RESPONSE_ERROR -341
 #define GNUTLS_E_RANDOM_DEVICE_ERROR -342
+#define GNUTLS_E_AUTH_ERROR -343
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
