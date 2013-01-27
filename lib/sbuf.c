@@ -31,10 +31,10 @@
  * gnutls_sbuf_sinit:
  * @isb: is a pointer to a #gnutls_sbuf_t structure.
  * @session: a GnuTLS session
- * @flags: should be zero or %GNUTLS_SBUF_QUEUE_FLUSHES
+ * @flags: should be zero or %GNUTLS_SBUF_WRITE_FLUSHES
  *
  * This function initializes a #gnutls_sbuf_t structure associated
- * with the provided session. If the flag %GNUTLS_SBUF_QUEUE_FLUSHES
+ * with the provided session. If the flag %GNUTLS_SBUF_WRITE_FLUSHES
  * is set then gnutls_sbuf_queue() will flush when the maximum
  * data size for a record is reached.
  *
@@ -123,7 +123,7 @@ _verify_certificate_callback (gnutls_session_t session)
   /* This verification function uses the trusted CAs in the credentials
    * structure. So you must have installed one or more CA certificates.
    */
-  if (sb->cred->vflags & GNUTLS_VMETHOD_SYSTEM_CAS || sb->cred->vflags & GNUTLS_VMETHOD_SINGLE_CA)
+  if (sb->cred->vflags & GNUTLS_VMETHOD_SYSTEM_CAS || sb->cred->vflags & GNUTLS_VMETHOD_GIVEN_CAS)
     {
       ret = gnutls_certificate_verify_peers3 (session, hostname, &status);
       if (ret < 0)
@@ -168,15 +168,14 @@ _verify_certificate_callback (gnutls_session_t session)
  * gnutls_credentials_set_trust:
  * @cred: is a #gnutls_credentials_t structure.
  * @vflags: the requested peer verification methods
- * @ca_file: a PEM file storing the certificate authority
- * @crl_file: a PEM file storing any CRLs of the certificate authority
- * @tofu_file: a file to store the trust on first use database
+ * @aux: Auxilary data to input any required CA certificate etc.
+ * @aux_size: the number of the auxillary data provided
  *
  * This function initializes X.509 certificates in 
  * a #gnutls_credentials_t structure.
  *
  * The @ca_file and @crl_file are required only if @vflags includes
- * %GNUTLS_VMETHOD_SINGLE_CA. The @tofu_file may be set if 
+ * %GNUTLS_VMETHOD_GIVEN_CAS. The @tofu_file may be set if 
  * %GNUTLS_VMETHOD_TOFU is specified.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
@@ -184,11 +183,11 @@ _verify_certificate_callback (gnutls_session_t session)
  * Since: 3.1.7
  **/
 int gnutls_credentials_set_trust (gnutls_credentials_t cred, unsigned vflags, 
-                                  const char* ca_file, const char* crl_file,
-                                  const char* tofu_file)
+                                  gnutls_cinput_st* aux,
+                                  unsigned aux_size)
 {
 int ret;
-unsigned len;
+unsigned len, i;
 
   if (cred->xcred == NULL)
     {
@@ -207,30 +206,49 @@ unsigned len;
         }
     }
 
-  if (vflags & GNUTLS_VMETHOD_SINGLE_CA)
+  if (vflags & GNUTLS_VMETHOD_GIVEN_CAS)
     {
-      ret = gnutls_certificate_set_x509_trust_file(cred->xcred, ca_file, GNUTLS_X509_FMT_PEM);
-      if (ret < 0)
+      for (i=0;i<aux_size;i++)
         {
-          gnutls_assert();
-          goto fail1;
-        }
-
-      ret = gnutls_certificate_set_x509_crl_file(cred->xcred, crl_file, GNUTLS_X509_FMT_PEM);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto fail1;
+          if (aux[i].contents == GNUTLS_CINPUT_CAS && aux[i].type == GNUTLS_CRED_FILE)
+            ret = gnutls_certificate_set_x509_trust_file(cred->xcred, aux[i].i.file, aux[i].fmt);
+          else if (aux[i].contents == GNUTLS_CINPUT_CAS && aux[i].type == GNUTLS_CRED_MEM)
+            ret = gnutls_certificate_set_x509_trust_mem(cred->xcred, &aux[i].i.mem, aux[i].fmt);
+          else if (aux[i].contents == GNUTLS_CINPUT_CRLS && aux[i].type == GNUTLS_CRED_FILE)
+            ret = gnutls_certificate_set_x509_crl_file(cred->xcred, aux[i].i.file, aux[i].fmt);
+          else if (aux[i].contents == GNUTLS_CINPUT_CRLS && aux[i].type == GNUTLS_CRED_MEM)
+            ret = gnutls_certificate_set_x509_crl_mem(cred->xcred, &aux[i].i.mem, aux[i].fmt);
+          else
+            ret = 0;
+          if (ret < 0)
+            {
+              gnutls_assert();
+              goto fail1;
+            }
         }
     }
-  
+
   if (vflags & GNUTLS_VMETHOD_TOFU)
     {
-      len = strlen(tofu_file);
+      for (i=0;i<aux_size;i++)
+        {
+          if (aux[i].contents == GNUTLS_CINPUT_TOFU_DB)
+            {
+              if (aux[i].type != GNUTLS_CRED_FILE)
+                {
+                  ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+                  goto fail1;
+                }
+              len = strlen(aux[i].i.file);
       
-      if (len >= sizeof(cred->tofu_file))
-        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-      memcpy(cred->tofu_file, tofu_file, len+1);
+              if (len >= sizeof(cred->tofu_file))
+                {
+                  ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+                  goto fail1;
+                }
+              memcpy(cred->tofu_file, aux[i].i.file, len+1);
+            }
+        }
     }
   
   gnutls_certificate_set_verify_function (cred->xcred, _verify_certificate_callback);
@@ -251,10 +269,10 @@ fail1:
  * @fd: a socket descriptor
  * @priority: A priority string to use (use %NULL for default)
  * @cred: A credentials structure
- * @flags: should be zero or %GNUTLS_SBUF_QUEUE_FLUSHES
+ * @flags: should be zero or %GNUTLS_SBUF_WRITE_FLUSHES
  *
- * This function initializes a #gnutls_sbuf_t structure associated
- * with the provided session. If the flag %GNUTLS_SBUF_QUEUE_FLUSHES
+ * This function initializes a #gnutls_sbuf_t structure.
+ * If the flag %GNUTLS_SBUF_WRITE_FLUSHES
  * is set then gnutls_sbuf_queue() will flush when the maximum
  * data size for a record is reached.
  *
@@ -291,6 +309,7 @@ unsigned len;
    */
   gnutls_handshake_set_timeout(session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
   
+  if (priority == NULL) priority = "NORMAL:%COMPAT";
   ret = gnutls_priority_set_direct(session, priority, NULL);
   if (ret < 0)
     {
@@ -334,6 +353,7 @@ unsigned len;
     }
 
   gnutls_transport_set_ptr (session, fd);
+  gnutls_session_set_ptr( session, sb);
   
   do
     {
@@ -348,7 +368,95 @@ unsigned len;
     }
   
   *isb = sb;
+  
+  return 0;
+
+fail1:
+  if (sb)
+    gnutls_sbuf_deinit(sb);
+  gnutls_deinit(session);
+  
+  return ret;
+}
+
+/**
+ * gnutls_sbuf_server_init:
+ * @isb: is a pointer to a #gnutls_sbuf_t structure.
+ * @fd: a socket descriptor
+ * @priority: A priority string to use (use %NULL for default)
+ * @cred: A credentials structure
+ * @flags: should be zero or %GNUTLS_SBUF_WRITE_FLUSHES
+ *
+ * This function initializes a #gnutls_sbuf_t structure.
+ * If the flag %GNUTLS_SBUF_WRITE_FLUSHES
+ * is set then gnutls_sbuf_queue() will flush when the maximum
+ * data size for a record is reached.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.1.7
+ **/
+int gnutls_sbuf_server_init (gnutls_sbuf_t * isb,
+                             gnutls_transport_ptr fd, 
+                             const char* priority, gnutls_credentials_t cred,
+                             unsigned int flags)
+{
+struct gnutls_sbuf_st* sb;
+gnutls_session_t session;
+int ret;
+
+  ret = gnutls_init(&session, GNUTLS_SERVER);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  sb = gnutls_calloc(1, sizeof(*sb));
+  if (sb == NULL)
+    {
+      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+      goto fail1;
+    }
+  _gnutls_buffer_init(&sb->buf);
+  sb->session = session;
+  sb->flags = flags;
+  
+  /* set session/handshake info 
+   */
+  gnutls_handshake_set_timeout(session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
+  
+  if (priority == NULL) priority = "NORMAL:%COMPAT";
+  ret = gnutls_priority_set_direct(session, priority, NULL);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto fail1;
+    }
+  
+  if (cred->xcred)
+    {
+      ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred->xcred);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto fail1;
+        }
+    }
+
+  gnutls_transport_set_ptr (session, fd);
   gnutls_session_set_ptr( session, sb);
+
+  do
+    {
+      ret = gnutls_handshake(session);
+    }
+  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
+
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto fail1;
+    }
+  
+  *isb = sb;
   
   return 0;
 
@@ -372,6 +480,11 @@ fail1:
  **/
 void gnutls_sbuf_deinit(gnutls_sbuf_t sb)
 {
+  if (sb->session)
+    {
+      gnutls_bye(sb->session, GNUTLS_SHUT_WR);
+      gnutls_deinit(sb->session);
+    }
   _gnutls_buffer_clear(&sb->buf);
   gnutls_free(sb);
 }
@@ -384,7 +497,7 @@ void gnutls_sbuf_deinit(gnutls_sbuf_t sb)
  *
  * This function is the buffered equivalent of gnutls_record_send().
  * Instead of sending the data immediately the data are buffered
- * until gnutls_sbuf_queue() is called, or if the flag %GNUTLS_SBUF_QUEUE_FLUSHES
+ * until gnutls_sbuf_queue() is called, or if the flag %GNUTLS_SBUF_WRITE_FLUSHES
  * is set, until the number of bytes for a full record is reached.
  *
  * This function must only be used with blocking sockets.
@@ -403,7 +516,7 @@ int ret;
   if (ret < 0)
     return gnutls_assert_val(ret);
   
-  while ((sb->flags & GNUTLS_SBUF_QUEUE_FLUSHES) && 
+  while ((sb->flags & GNUTLS_SBUF_WRITE_FLUSHES) && 
        sb->buf.length >= MAX_RECORD_SEND_SIZE(sb->session))
     {
       do
@@ -554,4 +667,17 @@ int ret;
     return gnutls_assert_val(ret);
 
   return 0;
+}
+
+/**
+ * gnutls_sbuf_get_session:
+ * @sb: is a #gnutls_sbuf_t structure.
+ *
+ * Returns: The associated session or %NULL.
+ *
+ * Since: 3.1.7
+ **/
+gnutls_session_t gnutls_sbuf_get_session(gnutls_sbuf_t sb)
+{
+  return sb->session;
 }
