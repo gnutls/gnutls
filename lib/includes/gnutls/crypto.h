@@ -99,6 +99,8 @@ extern "C"
 
   int gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len);
 
+  void gnutls_rnd_refresh (void);
+
 #ifdef __cplusplus
 }
 #endif

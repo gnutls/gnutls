@@ -40,6 +40,12 @@ _gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len)
   return 0;
 }
 
+inline static void
+_gnutls_rnd_refresh (void)
+{
+  _gnutls_rnd_ops.rnd_refresh (gnutls_rnd_ctx);
+}
+
 void _gnutls_rnd_deinit (void);
 int _gnutls_rnd_init (void);
 

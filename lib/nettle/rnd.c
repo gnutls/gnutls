@@ -437,15 +437,16 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
   int ret;
 
   RND_LOCK;
-  gettime(&current_time);
 
   /* update state only when having a non-nonce or if nonce
    * and nsecs%4096 == 0, i.e., one out of 4096 times called .
    *
    * The reason we do that is to avoid any delays when generating nonces.
    */
-  if (level != GNUTLS_RND_NONCE || ((current_time.tv_nsec & 0x0fff) == 0))
+  if (level != GNUTLS_RND_NONCE)
     {
+      gettime(&current_time);
+
       ret = do_trivia_source (0);
       if (ret < 0)
         {
@@ -468,10 +469,24 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
   return 0;
 }
 
+static void
+wrap_nettle_rnd_refresh (void *_ctx)
+{
+  RND_LOCK;
+  gettime(&current_time);
+
+  do_trivia_source (0);
+  do_device_source (0);
+
+  RND_UNLOCK;
+  return;
+}
+
 int crypto_rnd_prio = INT_MAX;
 
 gnutls_crypto_rnd_st _gnutls_rnd_ops = {
   .init = wrap_nettle_rnd_init,
   .deinit = wrap_nettle_rnd_deinit,
   .rnd = wrap_nettle_rnd,
+  .rnd_refresh = wrap_nettle_rnd_refresh,
 };

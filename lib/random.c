@@ -73,3 +73,20 @@ gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len)
 {
   return _gnutls_rnd(level, data, len);
 }
+
+/**
+ * gnutls_rnd_refresh:
+ *
+ * This function refreshes the random generator state.
+ * That is the current precise time, CPU usage, and
+ * other values are input into its state.
+ *
+ * On a slower rate input from /dev/urandom is mixed too.
+ *
+ * Since: 3.1.7
+ **/
+void
+gnutls_rnd_refresh ()
+{
+  _gnutls_rnd_refresh();
+}

@@ -14,7 +14,8 @@ in a template from an RFC4514 string.
 ** libgnutls: Added functions to directly set the DN in a certificate
 or request from an RFC4514 string.
 
-** libgnutls: Optimizations in the nonce level of the random generator.
+** libgnutls: Optimizations in the random generator. The re-seeding of
+it is now explicitly done on every session deinit.
 
 ** libgnutls: Simplified the DTLS sliding window implementation.
 
@@ -53,6 +54,7 @@ gnutls_range_split: Added
 gnutls_record_send_range: Added
 gnutls_record_set_max_empty_records: Added
 gnutls_record_can_use_length_hiding: Added
+gnutls_rnd_refresh: Added
 GNUTLS_SEC_PARAM_EXPORT: Added
 GNUTLS_SEC_PARAM_VERY_WEAK: Added
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2013 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -45,6 +45,7 @@
 #include <gnutls_rsa_export.h>
 #include <gnutls_extensions.h>
 #include <system.h>
+#include <random.h>
 #include <gnutls/dtls.h>
 #include <timespec.h>
 
@@ -431,6 +432,8 @@ gnutls_deinit (gnutls_session_t session)
 
   if (session == NULL)
     return;
+
+  _gnutls_rnd_refresh();
 
   /* remove auth info firstly */
   _gnutls_free_auth_info (session);
