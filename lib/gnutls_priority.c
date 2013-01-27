@@ -646,6 +646,9 @@ bulk_rmadd_func *func;
       func (&priority_cache->sign_algo,
                      sign_priority_default);
       func (&priority_cache->supported_ecc, supported_ecc_normal);
+
+      if (priority_cache->level == 0)
+        priority_cache->level = GNUTLS_SEC_PARAM_VERY_WEAK;
       return 1;
     }
   else if (strcasecmp (level, LEVEL_NORMAL) == 0)
@@ -656,6 +659,9 @@ bulk_rmadd_func *func;
       func (&priority_cache->sign_algo,
                      sign_priority_default);
       func (&priority_cache->supported_ecc, supported_ecc_normal);
+
+      if (priority_cache->level == 0)
+        priority_cache->level = GNUTLS_SEC_PARAM_VERY_WEAK;
       return 1;
     }
   else if (strcasecmp (level, LEVEL_SECURE256) == 0
@@ -670,7 +676,8 @@ bulk_rmadd_func *func;
       func (&priority_cache->supported_ecc, supported_ecc_secure192);
       
       /* be conservative for now. Set the bits to correspond to 96-bit level */
-      priority_cache->level = GNUTLS_SEC_PARAM_LEGACY;
+      if (priority_cache->level == 0)
+        priority_cache->level = GNUTLS_SEC_PARAM_LEGACY;
       return 1;
     }
   else if (strcasecmp (level, LEVEL_SECURE128) == 0
@@ -685,7 +692,8 @@ bulk_rmadd_func *func;
       func (&priority_cache->supported_ecc, supported_ecc_secure128);
 
       /* be conservative for now. Set the bits to correspond to an 80-bit level */
-      priority_cache->level = GNUTLS_SEC_PARAM_LOW;
+      if (priority_cache->level == 0)
+        priority_cache->level = GNUTLS_SEC_PARAM_LOW;
       return 1;
     }
   else if (strcasecmp (level, LEVEL_SUITEB128) == 0)
@@ -699,7 +707,8 @@ bulk_rmadd_func *func;
                      sign_priority_suiteb128);
       func (&priority_cache->supported_ecc, supported_ecc_suiteb128);
 
-      priority_cache->level = GNUTLS_SEC_PARAM_HIGH;
+      if (priority_cache->level == 0)
+        priority_cache->level = GNUTLS_SEC_PARAM_HIGH;
       return 1;
     }
   else if (strcasecmp (level, LEVEL_SUITEB192) == 0)
@@ -713,7 +722,8 @@ bulk_rmadd_func *func;
                      sign_priority_suiteb192);
       func (&priority_cache->supported_ecc, supported_ecc_suiteb192);
 
-      priority_cache->level = GNUTLS_SEC_PARAM_ULTRA;
+      if (priority_cache->level == 0)
+        priority_cache->level = GNUTLS_SEC_PARAM_ULTRA;
       return 1;
     }
   else if (strcasecmp (level, LEVEL_EXPORT) == 0)
@@ -724,7 +734,9 @@ bulk_rmadd_func *func;
       func (&priority_cache->sign_algo,
                      sign_priority_default);
       func (&priority_cache->supported_ecc, supported_ecc_normal);
-      priority_cache->level = GNUTLS_SEC_PARAM_EXPORT;
+
+      if (priority_cache->level == 0)
+        priority_cache->level = GNUTLS_SEC_PARAM_EXPORT;
       return 1;
     }
   return 0;
@@ -824,7 +836,6 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
   (*priority_cache)->sr = SR_PARTIAL;
   (*priority_cache)->ssl3_record_version = 1;
   
-  (*priority_cache)->level = GNUTLS_SEC_PARAM_VERY_WEAK;
   
   (*priority_cache)->max_empty_records = DEFAULT_MAX_EMPTY_RECORDS;
 
@@ -849,6 +860,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       _set_priority (&(*priority_cache)->cert_type, cert_type_priority_default);
       _set_priority (&(*priority_cache)->sign_algo, sign_priority_default);
       _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
+      (*priority_cache)->level = GNUTLS_SEC_PARAM_VERY_WEAK;
       i = 0;
     }
   else

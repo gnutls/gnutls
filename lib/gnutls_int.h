@@ -629,6 +629,7 @@ struct gnutls_priority_st
    * (or the acceptable certificate security level).
    */
   gnutls_sec_param_t level;
+  unsigned int dh_prime_bits; /* old (deprecated) variable */
 };
 
 /* Allow around 50KB of length-hiding padding
