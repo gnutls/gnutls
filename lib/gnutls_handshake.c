@@ -2497,7 +2497,9 @@ static int run_verify_callback(gnutls_session_t session, unsigned int side)
   if (cred != NULL && cred->verify_callback != NULL)
     {
       ret = cred->verify_callback (session);
-      if (ret != 0)
+      if (ret < -1)
+        return ret;
+      else if (ret != 0)
         return GNUTLS_E_CERTIFICATE_ERROR;
     }
   
