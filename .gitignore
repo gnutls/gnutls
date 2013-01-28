@@ -631,3 +631,4 @@ tests/mini-dtls-record
 tests/mini-x509-rehandshake
 tests/mini-sbuf
 tests/suite/mini-record-timing
+tests/mini-xssl

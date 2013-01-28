@@ -32,6 +32,9 @@ padding mechanism in TLS allowing arbitrary padding in TLS records
 in all ciphersuites, which makes length-hiding more efficient and solves some timing attacks. Both the server and the client must support this
 extension. Whether length-hiding can be used on a given session can be checked using gnutls_record_can_use_length_hiding().
 
+** libgnutls: Corrected gnutls_cipher_decrypt2() when used with AEAD
+ciphers (i.e., AES-GCM).
+
 ** libgnutls-dane: Added function to specify a DLV file.
 
 ** API and ABI modifications:
