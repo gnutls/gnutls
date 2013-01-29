@@ -286,7 +286,11 @@ priority string.
 
 XSSL is an experimental API available in the @code{gnutls-xssl} library
 and in @code{gnutls/xssl.h} header. It is intended to be a very simple
-to use API avoid the GnuTLS API.
+to use API avoid the GnuTLS API. The API however has the following limitations
+@itemize
+@item It is applicable to blocking sockets only.
+@item The server verification is based on its DNS name.
+@end itemize
 
 @menu
 * Example client with X.509 certificate authentication::
