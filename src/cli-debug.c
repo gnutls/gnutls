@@ -267,14 +267,15 @@ main (int argc, char **argv)
 
           getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
                        NULL, 0, NI_NUMERICHOST);
-          if (tt++ == 0)
-            printf ("Connecting to '%s:%d'...\n", buffer, port);
+          printf ("Connecting to '%s:%d'...\n", buffer, port);
           if ((err = connect (sd, ptr->ai_addr, ptr->ai_addrlen)) != 0)
             {
               close (sd);
               sd = -1;
               continue;
             }
+          else
+            break;
         }
       ERR (err, "connect");
 
