@@ -210,7 +210,7 @@ MAINTAINERCLEANFILES =
 API_FILES=gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi \
 	tpm-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi \
 	dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi dane-api.texi \
-	sbuf-api.texi
+	xssl-api.texi
 
 gnutls_TEXINFOS += $(API_FILES)
 
@@ -249,7 +249,7 @@ x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 	done
 	mv -f $@-tmp $@
 
-sbuf-api.texi: $(top_srcdir)/lib/includes/gnutls/sbuf.h
+xssl-api.texi: $(top_srcdir)/lib/includes/gnutls/xssl.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \

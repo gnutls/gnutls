@@ -24,6 +24,6 @@ HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
 	$(top_srcdir)/lib/includes/gnutls/abstract.h $(top_srcdir)/lib/includes/gnutls/compat.h \
 	$(top_srcdir)/lib/includes/gnutls/dtls.h $(top_srcdir)/lib/includes/gnutls/crypto.h \
 	$(top_srcdir)/lib/includes/gnutls/ocsp.h $(top_srcdir)/lib/includes/gnutls/tpm.h \
-	$(top_srcdir)/libdane/includes/gnutls/dane.h $(top_srcdir)/lib/includes/gnutls/sbuf.h
+	$(top_srcdir)/libdane/includes/gnutls/dane.h $(top_srcdir)/lib/includes/gnutls/xssl.h
 
 C_SOURCE_FILES = $(top_srcdir)/lib/*/*.c $(top_srcdir)/lib/*.c  $(top_srcdir)/libdane/*.c 
