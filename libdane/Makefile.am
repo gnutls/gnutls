@@ -32,13 +32,8 @@ AM_CPPFLAGS = \
 
 SUBDIRS = includes
 
-defexecdir = $(bindir)
-defexec_DATA = 
-
-
 libgnutls_dane_la_LDFLAGS = -no-undefined
 
-if ENABLE_DANE
 lib_LTLIBRARIES = libgnutls-dane.la
 
 libgnutls_dane_la_SOURCES = dane.c dane-params.c errors.c libdane.map
@@ -56,16 +51,16 @@ else
 libgnutls_dane_la_LDFLAGS += -export-symbols-regex '^(dane).*'
 endif
 
-if HAVE_LD_OUTPUT_DEF
-libgnutls_dane_la_LDFLAGS += \
-	-Wl,--output-def,libgnutls-dane-$(DLL_VERSION).def
-libgnutls_dane-$(DLL_VERSION).def: libgnutls-dane.la
-defexec_DATA += libgnutls-dane-$(DLL_VERSION).def
-endif
-endif
-
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls-dane.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
+if HAVE_LD_OUTPUT_DEF
+libgnutls_dane_la_LDFLAGS += \
+	-Wl,--output-def,libgnutls-dane-$(DLL_VERSION).def
+libgnutls_dane-$(DLL_VERSION).def: libgnutls-dane.la
+
+defexecdir = $(bindir)
+defexec_DATA = libgnutls-dane-$(DLL_VERSION).def
 DISTCLEANFILES += $(defexec_DATA)
+endif

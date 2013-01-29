@@ -18,8 +18,4 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-nobase_include_HEADERS = 
-
-if ENABLE_DANE
-nobase_include_HEADERS += gnutls/dane.h
-endif
+nobase_include_HEADERS = gnutls/dane.h

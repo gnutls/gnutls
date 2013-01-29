@@ -21,9 +21,13 @@
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --disable-valgrind-tests
 
-SUBDIRS = gl lib extra libdane po
+SUBDIRS = gl lib extra
 
-SUBDIRS += src doc tests
+if ENABLE_DANE
+SUBDIRS += libdane
+endif
+
+SUBDIRS += po src doc tests
 
 if HAVE_GUILE
 SUBDIRS += guile
