@@ -78,7 +78,7 @@ COBJECTS = gnutls_range.c gnutls_record.c \
 	gnutls_rsa_export.c gnutls_helper.c gnutls_supplemental.c	\
 	random.c crypto-api.c gnutls_privkey.c gnutls_pcert.c		\
 	gnutls_pubkey.c locks.c gnutls_dtls.c system_override.c	\
-	crypto-backend.c verify-tofu.c pin.c tpm.c xssl.c xssl_getline.c
+	crypto-backend.c verify-tofu.c pin.c tpm.c 
 
 if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c
@@ -100,7 +100,7 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_state.h gnutls_x509.h crypto-backend.h			\
 	gnutls_rsa_export.h gnutls_srp.h auth/srp.h auth/srp_passwd.h	\
 	gnutls_helper.h gnutls_supplemental.h crypto.h random.h system.h\
-	locks.h gnutls_mbuffers.h gnutls_ecc.h pin.h xssl.h
+	locks.h gnutls_mbuffers.h gnutls_ecc.h pin.h 
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h
@@ -183,3 +183,21 @@ pkix_asn1_tab.c: $(srcdir)/pkix.asn
 
 gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
 	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
+
+
+libgnutls_xssl_la_LDFLAGS = -no-undefined
+
+lib_LTLIBRARIES += libgnutls-xssl.la
+
+libgnutls_xssl_la_SOURCES = xssl.c xssl_getline.c xssl.h
+
+libgnutls_xssl_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
+
+libgnutls_xssl_la_LDFLAGS += -version-info $(LT_XSSL_CURRENT):$(LT_XSSL_REVISION):$(LT_XSSL_AGE)
+
+if HAVE_LD_OUTPUT_DEF
+libgnutls_xssl_la_LDFLAGS += \
+	-Wl,--output-def,libgnutls-xssl-$(DLL_VERSION).def
+libgnutls-xssl-$(DLL_VERSION).def: libgnutls-xssl.la
+defexec_DATA += libgnutls-xssl-$(DLL_VERSION).def
+endif
