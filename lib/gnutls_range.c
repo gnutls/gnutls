@@ -141,23 +141,25 @@ gnutls_record_can_use_length_hiding (gnutls_session_t session)
  * gnutls_range_split:
  * @session: is a #gnutls_session_t structure
  * @orig: is the original range provided by the user
- * @small_range: is the returned range that can be conveyed in a TLS record
- * @rem_range: is the returned remaining range
+ * @next: is the returned range that can be conveyed in a TLS record
+ * @remainder: is the returned remaining range
  *
- * Use this function to split an arbitrary range into a smaller range
- * that can be conveyed into a single TLS record fragment, and
- * a remaining range, on which this function can be invoked again.
- * When the returned #rem_range is (0,0) the splitting process can terminate.
+ * This function should be used when it is required to hide the length
+ * of very long data that cannot be directly provided to gnutls_record_send_range().
+ * In that case this function should be called with the desired length
+ * hiding range in @orig. The returned @next value should then be used in
+ * the next call to gnutls_record_send_range() with the partial data.
+ * That process should be repeated until @remainder is (0,0).
  *
  * Returns: 0 in case splitting succeeds, non zero in case of error.
- * Note that #orig is not changed, while the values of #small_range
- * and #rem_range are modified to store the resulting values.
+ * Note that @orig is not changed, while the values of @next
+ * and @remainder are modified to store the resulting values.
  */
-ssize_t
+int
 gnutls_range_split (gnutls_session_t session,
                     const gnutls_range_st *orig,
-                    gnutls_range_st * small_range,
-                    gnutls_range_st * rem_range)
+                    gnutls_range_st * next,
+                    gnutls_range_st * remainder)
 {
   int ret;
   ssize_t max_frag = MAX_USER_SEND_SIZE (session);
@@ -168,31 +170,32 @@ gnutls_range_split (gnutls_session_t session,
     {
       int length = MIN (orig_high, max_frag);
       int rem = orig_high - length;
-      _gnutls_set_range (small_range, length, length);
-      _gnutls_set_range (rem_range, rem, rem);
+      _gnutls_set_range (next, length, length);
+      _gnutls_set_range (remainder, rem, rem);
+
       return 0;
     }
   else
     {
       if (orig_low >= max_frag)
         {
-          _gnutls_set_range (small_range, max_frag, max_frag);
-          _gnutls_set_range (rem_range, orig_low - max_frag,
+          _gnutls_set_range (next, max_frag, max_frag);
+          _gnutls_set_range (remainder, orig_low - max_frag,
                              orig_high - max_frag);
         }
       else
         {
           ret = _gnutls_range_max_lh_pad (session, orig_low, max_frag);
           if (ret < 0)
-            {
-              return ret;       /* already gnutls_assert_val'd */
-            }
+            return gnutls_assert_val(ret);
+
           ssize_t this_pad = MIN (ret, orig_high - orig_low);
 
-          _gnutls_set_range (small_range, orig_low, orig_low + this_pad);
-          _gnutls_set_range (rem_range, 0,
+          _gnutls_set_range (next, orig_low, orig_low + this_pad);
+          _gnutls_set_range (remainder, 0,
                              orig_high - (orig_low + this_pad));
         }
+
       return 0;
     }
 }
