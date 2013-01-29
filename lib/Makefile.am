@@ -191,7 +191,7 @@ lib_LTLIBRARIES += libgnutls-xssl.la
 
 libgnutls_xssl_la_SOURCES = xssl.c xssl_getline.c xssl.h
 
-libgnutls_xssl_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
+libgnutls_xssl_la_LIBADD = ../gl/libgnu.la libgnutls.la
 
 libgnutls_xssl_la_LDFLAGS += -version-info $(LT_XSSL_CURRENT):$(LT_XSSL_REVISION):$(LT_XSSL_AGE)
 

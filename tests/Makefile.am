@@ -82,6 +82,8 @@ ctests +=  openssl
 openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
 endif
 
+mini_xssl_LDADD = $(LDADD) ../lib/libgnutls-xssl.la
+
 if ENABLE_OPENPGP
 ctests += openpgp-auth openpgp-auth2 openpgp-keyring pgps2kgnu
 endif

@@ -925,6 +925,8 @@ GNUTLS_PRIVATE {
     _gnutls_ext_set_session_data;
     _gnutls_ext_register;
     _gnutls_buffer_append_prefix;
+    _gnutls_buffer_append_data;
+    _gnutls_buffer_clear;
     _gnutls_buffer_append_data_prefix;
     _gnutls_buffer_pop_data;
     _gnutls_buffer_pop_prefix;
