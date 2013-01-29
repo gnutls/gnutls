@@ -13,6 +13,7 @@ no error checking.
 * Server examples::
 * OCSP example::
 * Miscellaneous examples::
+* XSSL examples::
 @end menu
 
 @node Client examples
@@ -279,3 +280,26 @@ This is a small program to list the enabled ciphersuites by a
 priority string.
 
 @verbatiminclude examples/print-ciphersuites.c
+
+@node XSSL examples
+@section XSSL examples
+
+XSSL is an experimental API available in the @code{gnutls-xssl} library
+and in @code{gnutls/xssl.h} header. It is intended to be a very simple
+to use API avoid the GnuTLS API.
+
+@menu
+* Example client with X.509 certificate authentication::
+* Example client with X.509 certificate authentication and TOFU::
+@end menu
+
+@node Example client with X.509 certificate authentication
+@subsection Example client with X.509 certificate authentication
+
+@verbatiminclude examples/ex-client-xssl1.c
+
+@node Example client with X.509 certificate authentication and TOFU
+@subsection Example client with X.509 certificate authentication and TOFU
+
+@verbatiminclude examples/ex-client-xssl2.c
+
