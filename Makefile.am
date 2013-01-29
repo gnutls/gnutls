@@ -27,7 +27,11 @@ if ENABLE_DANE
 SUBDIRS += libdane
 endif
 
-SUBDIRS += po src doc tests
+SUBDIRS += po src
+if ENABLE_DOC
+SUBDIRS += doc
+endif
+SUBDIRS += tests
 
 if HAVE_GUILE
 SUBDIRS += guile

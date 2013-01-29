@@ -115,7 +115,10 @@ dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
 
-
+AC_ARG_ENABLE(doc,
+  AS_HELP_STRING([--disable-doc], [don't generate any documentation]),
+    enable_doc=$enableval, enable_doc=yes)
+AM_CONDITIONAL(ENABLE_DOC, test "$enable_doc" != "no")
 
 GTK_DOC_CHECK(1.1)
 AM_GNU_GETTEXT([external])
