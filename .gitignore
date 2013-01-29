@@ -632,3 +632,6 @@ tests/mini-x509-rehandshake
 tests/mini-sbuf
 tests/suite/mini-record-timing
 tests/mini-xssl
+doc/examples/ex-client-xssl1
+doc/examples/ex-client-xssl2
+lib/libgnutls-xssl.la
