@@ -51,7 +51,6 @@ gnutls_record_get_random_padding_status: Added
 gnutls_x509_crt_set_dn: Added
 gnutls_x509_crt_set_issuer_dn: Added
 gnutls_x509_crq_set_dn: Added
-dane_state_set_dlv_file: Added
 gnutls_record_cork: Added
 gnutls_record_uncork: Added
 gnutls_range_split: Added
@@ -72,6 +71,7 @@ xssl_get_session: Added
 xssl_get_verify_status: Added
 xssl_cred_init: Added
 xssl_cred_deinit: Added
+dane_state_set_dlv_file: Added
 GNUTLS_SEC_PARAM_EXPORT: Added
 GNUTLS_SEC_PARAM_VERY_WEAK: Added
 
