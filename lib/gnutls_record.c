@@ -1353,6 +1353,9 @@ gnutls_record_uncork (gnutls_session_t session, unsigned int flags)
 int ret;
 ssize_t total = 0;
 
+  if (session->internals.record_flush_mode == RECORD_FLUSH)
+    return 0; /* nothing to be done */
+
   session->internals.record_flush_mode = RECORD_FLUSH;
 
   while(session->internals.record_presend_buffer.length > 0)
