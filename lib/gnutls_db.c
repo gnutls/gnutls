@@ -148,6 +148,27 @@ gnutls_db_check_entry (gnutls_session_t session, gnutls_datum_t session_entry)
   return 0;
 }
 
+/**
+ * gnutls_db_check_entry_time:
+ * @entry: is a pointer to a #gnutls_datum_t structure.
+ * @t: is the time of the session handshake
+ *
+ * This function returns the time that this entry was active.
+ * It can be used for database entry expiration.
+ *
+ **/
+time_t
+gnutls_db_check_entry_time (gnutls_datum_t *entry)
+{
+uint32_t t;
+
+  if (entry->size < 4)
+    return gnutls_assert_val(0);
+  
+  memcpy(&t, entry->data, 4);
+  return t;
+}
+
 /* Checks if both db_store and db_retrieve functions have
  * been set up.
  */

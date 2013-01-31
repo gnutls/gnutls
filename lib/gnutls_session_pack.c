@@ -93,6 +93,9 @@ _gnutls_session_pack (gnutls_session_t session,
 
   _gnutls_buffer_init (&sb);
 
+  /* first is the timestamp */
+  BUFFER_APPEND_NUM(&sb, session->security_parameters.timestamp);
+
   id = gnutls_auth_get_type (session);
   BUFFER_APPEND (&sb, &id, 1);
 
@@ -192,6 +195,9 @@ _gnutls_session_unpack (gnutls_session_t session,
       gnutls_assert ();
       return ret;
     }
+
+  /* the timestamp is first */
+  BUFFER_POP_NUM (&sb, session->security_parameters.timestamp);
 
   if (_gnutls_get_auth_info (session) != NULL)
     {
@@ -725,7 +731,6 @@ error:
  *      1 byte the session ID size
  *      x bytes the session ID (32 bytes max)
  *
- *      4 bytes a timestamp
  *      4 bytes the new record padding flag
  *      4 bytes the ECC curve
  *            -------------------
@@ -783,7 +788,6 @@ pack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
 
   BUFFER_APPEND_NUM (ps, session->security_parameters.max_record_send_size);
   BUFFER_APPEND_NUM (ps, session->security_parameters.max_record_recv_size);
-  BUFFER_APPEND_NUM (ps, session->security_parameters.timestamp);
   BUFFER_APPEND_NUM (ps, session->security_parameters.new_record_padding);
   BUFFER_APPEND_NUM (ps, session->security_parameters.ecc_curve);
 
@@ -840,8 +844,6 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_POP_NUM (ps,
                   session->internals.
                   resumed_security_parameters.max_record_recv_size);
-  BUFFER_POP_NUM (ps,
-                  session->internals.resumed_security_parameters.timestamp);
 
   BUFFER_POP_NUM (ps,
                   session->internals.resumed_security_parameters.new_record_padding);

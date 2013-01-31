@@ -1131,6 +1131,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   void *gnutls_db_get_ptr (gnutls_session_t session);
   int gnutls_db_check_entry (gnutls_session_t session,
                              gnutls_datum_t session_entry);
+  time_t gnutls_db_check_entry_time (gnutls_datum_t *entry);
 
   typedef int (*gnutls_handshake_post_client_hello_func) (gnutls_session_t);
   void
