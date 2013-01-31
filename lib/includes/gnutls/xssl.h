@@ -90,7 +90,6 @@ typedef enum
   GNUTLS_CINPUT_KEYPAIR = 4, /* i1 contains the certificate, i2 the key 
                               * or i1.pin_fn contains the pin function, 
                               * and i2.udata the user pointer */
-                              */
 } gnutls_cinput_contents_t;
 
 typedef struct gnutls_cinput_st {
