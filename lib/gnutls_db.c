@@ -137,9 +137,7 @@ gnutls_db_set_cache_expiration (gnutls_session_t session, int seconds)
  * @session: is a #gnutls_session_t structure.
  * @session_entry: is the session data (not key)
  *
- * Check if database entry has expired.  This function is to be used
- * when you want to clear unnecessary sessions which occupy space in
- * your backend.
+ * This function has no effect. 
  *
  * Returns: Returns %GNUTLS_E_EXPIRED, if the database entry has
  *   expired or 0 otherwise.
@@ -147,19 +145,6 @@ gnutls_db_set_cache_expiration (gnutls_session_t session, int seconds)
 int
 gnutls_db_check_entry (gnutls_session_t session, gnutls_datum_t session_entry)
 {
-  time_t timestamp;
-
-  timestamp = gnutls_time (0);
-
-  if (session_entry.data != NULL)
-    if (timestamp -
-        ((security_parameters_st *) (session_entry.data))->timestamp <=
-        session->internals.expire_time
-        || ((security_parameters_st *) (session_entry.data))->timestamp >
-        timestamp
-        || ((security_parameters_st *) (session_entry.data))->timestamp == 0)
-      return GNUTLS_E_EXPIRED;
-
   return 0;
 }
 
