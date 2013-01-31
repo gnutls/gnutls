@@ -1244,13 +1244,16 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
       if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9) 
         {
 	  /* Old DTLS doesn't include the header in the MAC */
-	  if (datalen <= 12) 
+	  if (datalen < 12) 
 	    {
 	      gnutls_assert ();
-	      return GNUTLS_E_INVALID_REQUEST;
+	      return GNUTLS_E_INTERNAL_ERROR;
 	    }
 	  dataptr += 12;
 	  datalen -= 12;
+	  
+	  if (datalen == 0)
+	  	return 0;
         }
 
       ret = _gnutls_buffer_append_data(&session->internals.handshake_hash_buffer,

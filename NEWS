@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.0.28 (unreleased)
 
+** libgnutls: Fixes in server side of DTLS-0.9.
+
 ** libgnutls: Corrected gnutls_cipher_decrypt2() when used with AEAD  
 ciphers (i.e., AES-GCM).
 

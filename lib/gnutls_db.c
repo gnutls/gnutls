@@ -281,6 +281,13 @@ _gnutls_server_restore_session (gnutls_session_t session,
   gnutls_datum_t key;
   int ret;
 
+  if (session->internals.premaster_set != 0) 
+    { /* hack for CISCO's DTLS-0.9 */
+      if (session_id_size == session->internals.resumed_security_parameters.session_id_size &&
+        memcmp(session_id, session->internals.resumed_security_parameters.session_id, session_id_size) == 0)
+        return 0;
+    }
+
   key.data = session_id;
   key.size = session_id_size;
 
