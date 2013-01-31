@@ -41,6 +41,7 @@
 #include <gnutls_extensions.h>
 #include <gnutls_constate.h>
 #include <algorithms.h>
+#include <gnutls_state.h>
 
 static int pack_certificate_auth_info (gnutls_session_t,
                                        gnutls_buffer_st * packed_session);
@@ -905,7 +906,7 @@ gnutls_session_set_premaster (gnutls_session_t session, unsigned int entity,
     return gnutls_assert_val(ret);
 
   session->internals.resumed_security_parameters.compression_method = comp;
-  session->internals.resumed_security_parameters.cert_type = GNUTLS_CRT_UNKNOWN;
+  session->internals.resumed_security_parameters.cert_type = DEFAULT_CERT_TYPE;
   session->internals.resumed_security_parameters.version = version;
 
   if (master->size != GNUTLS_MASTER_SIZE)

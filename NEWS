@@ -12,6 +12,8 @@ in a template from an RFC4514 string.
 ** libgnutls-xssl: Added an experimental TLS library with an very simple
 API.
 
+** libgnutls: Fixes in server side of DTLS-0.9.
+
 ** libgnutls: DN variable 'T' was expanded to 'title'.
 
 ** libgnutls: Added functions to directly set the DN in a certificate
