@@ -88,6 +88,7 @@ const char *x509_cafile = NULL;
 const char *x509_crlfile = NULL;
 static int x509ctype;
 static int disable_extensions;
+static int disable_sni;
 static unsigned int init_flags = GNUTLS_CLIENT;
 static const char * priorities = NULL;
 
@@ -630,7 +631,7 @@ init_tls_session (const char *hostname)
 
   /* allow the use of private ciphersuites.
    */
-  if (disable_extensions == 0)
+  if (disable_extensions == 0 && disable_sni == 0)
     {
       if (!isdigit(hostname[0]) && strchr(hostname, ':') == 0)
         gnutls_server_name_set (session, GNUTLS_NAME_DNS, hostname,
@@ -1131,6 +1132,7 @@ const char* rest = NULL;
       exit(0);
     }
 
+  disable_sni = HAVE_OPT(DISABLE_SNI);
   disable_extensions = HAVE_OPT( DISABLE_EXTENSIONS);
   if (disable_extensions)
     init_flags |= GNUTLS_NO_EXTENSIONS;

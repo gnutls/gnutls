@@ -308,6 +308,12 @@ flag = {
     doc      = "Print a list of the supported algorithms and modes. If a priority string is given then only the enabled ciphersuites are shown.";
 };
 
+flag = {
+    name      = disable-sni;
+    descrip   = "Do not send a Server Name Indication (SNI)";
+    doc      = "";
+};
+
 
 
 doc-section = {
