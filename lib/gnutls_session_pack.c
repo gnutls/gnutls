@@ -93,10 +93,11 @@ _gnutls_session_pack (gnutls_session_t session,
 
   _gnutls_buffer_init (&sb);
 
-  /* first is the timestamp */
-  BUFFER_APPEND_NUM(&sb, session->security_parameters.timestamp);
 
   id = gnutls_auth_get_type (session);
+
+  /* first is the timestamp */
+  BUFFER_APPEND_NUM(&sb, session->security_parameters.timestamp);
   BUFFER_APPEND (&sb, &id, 1);
 
   switch (id)
@@ -196,14 +197,13 @@ _gnutls_session_unpack (gnutls_session_t session,
       return ret;
     }
 
-  /* the timestamp is first */
-  BUFFER_POP_NUM (&sb, session->security_parameters.timestamp);
-
   if (_gnutls_get_auth_info (session) != NULL)
     {
       _gnutls_free_auth_info (session);
     }
 
+  /* the timestamp is first */
+  BUFFER_POP_NUM (&sb, session->internals.resumed_security_parameters.timestamp);
   BUFFER_POP (&sb, &id, 1);
 
   switch (id)
@@ -801,15 +801,20 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
 {
   size_t pack_size;
   int ret;
-  time_t timestamp = gnutls_time (0);
-
+  time_t timestamp;
+  
   BUFFER_POP_NUM (ps, pack_size);
 
   if (pack_size == 0)
     return GNUTLS_E_INVALID_REQUEST;
 
+  timestamp = session->internals.resumed_security_parameters.timestamp;
   memset (&session->internals.resumed_security_parameters, 0,
           sizeof (session->internals.resumed_security_parameters));
+  session->internals.resumed_security_parameters.timestamp = timestamp;
+ 
+  timestamp = gnutls_time (0);
+
 
   BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.entity);
   BUFFER_POP_NUM (ps,
