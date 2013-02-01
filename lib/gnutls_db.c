@@ -176,8 +176,7 @@ static int
 db_func_is_ok (gnutls_session_t session)
 {
   if (session->internals.db_store_func != NULL &&
-      session->internals.db_retrieve_func != NULL &&
-      session->internals.db_remove_func != NULL)
+      session->internals.db_retrieve_func != NULL)
     return 0;
   else
     return GNUTLS_E_DB_ERROR;
@@ -345,7 +344,7 @@ gnutls_db_remove_session (gnutls_session_t session)
   session_id.data = session->security_parameters.session_id;
   session_id.size = session->security_parameters.session_id_size;
 
-  if (db_func_is_ok (session) != 0)
+  if (session->internals.db_remove_func != NULL)
     {
       gnutls_assert ();
       return /* GNUTLS_E_DB_ERROR */;
