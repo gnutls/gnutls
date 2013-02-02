@@ -48,6 +48,7 @@ ciphers (i.e., AES-GCM). Reported by William McGovern.
 ** libgnutls-dane: Added function to specify a DLV file.
 
 ** API and ABI modifications:
+gnutls_db_check_entry_time: Added
 gnutls_record_set_timeout: Added
 gnutls_record_get_random_padding_status: Added
 gnutls_x509_crt_set_dn: Added
