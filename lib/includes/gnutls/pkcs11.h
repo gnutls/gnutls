@@ -228,6 +228,7 @@ int gnutls_pkcs11_obj_get_info (gnutls_pkcs11_obj_t crt,
  * gnutls_pkcs11_obj_attr_t:
  * @GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL: Specify all certificates.
  * @GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED: Specify all certificates marked as trusted.
+ * @GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA: Specify all certificates marked as trusted and are CAs.
  * @GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY: Specify all certificates with a corresponding private key.
  * @GNUTLS_PKCS11_OBJ_ATTR_PUBKEY: Specify all public keys.
  * @GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY: Specify all private keys.
@@ -242,7 +243,8 @@ typedef enum
     GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY,      /* certificates with corresponding private key */
     GNUTLS_PKCS11_OBJ_ATTR_PUBKEY,        /* public keys */
     GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY,       /* private keys */
-    GNUTLS_PKCS11_OBJ_ATTR_ALL    /* everything! */
+    GNUTLS_PKCS11_OBJ_ATTR_ALL,    /* everything! */
+    GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA,
   } gnutls_pkcs11_obj_attr_t;
 
 /**

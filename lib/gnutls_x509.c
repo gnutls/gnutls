@@ -641,7 +641,7 @@ read_cas_url (gnutls_certificate_credentials_t res, const char *url)
   /* FIXME: should we use login? */
   ret =
     gnutls_pkcs11_obj_list_import_url (NULL, &pcrt_list_size, url,
-                                       GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED, 0);
+                                       GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA, 0);
   if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       gnutls_assert ();
@@ -663,7 +663,7 @@ read_cas_url (gnutls_certificate_credentials_t res, const char *url)
 
   ret =
     gnutls_pkcs11_obj_list_import_url (pcrt_list, &pcrt_list_size, url,
-                                       GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED, 0);
+                                       GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA, 0);
   if (ret < 0)
     {
       gnutls_assert ();
