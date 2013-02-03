@@ -109,7 +109,7 @@ unsigned int pcrt_list_size = 0, i;
 int ret;
       
   ret = gnutls_pkcs11_obj_list_import_url2(&pcrt_list, &pcrt_list_size, ca_file, 
-                                           GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED, 0);
+                                           GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA, 0);
   if (ret < 0)
     return gnutls_assert_val(ret);
      

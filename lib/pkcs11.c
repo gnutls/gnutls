@@ -2207,11 +2207,11 @@ find_objs (struct pkcs11_session_info* sinfo,
            struct token_info *info, struct ck_info *lib_info, void *input)
 {
   struct crt_find_data_st *find_data = input;
-  struct ck_attribute a[4];
+  struct ck_attribute a[6];
   struct ck_attribute *attr;
   ck_object_class_t class = (ck_object_class_t)-1;
   ck_certificate_type_t type = (ck_certificate_type_t)-1;
-  unsigned int trusted;
+  unsigned int trusted, category;
   ck_rv_t rv;
   ck_object_handle_t obj;
   unsigned long count;
@@ -2316,6 +2316,28 @@ find_objs (struct pkcs11_session_info* sinfo,
       a[tot_values].value_len = sizeof trusted;
       tot_values++;
 
+    }
+  else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA)
+    {
+      class = CKO_CERTIFICATE;
+      type = CKC_X_509;
+      trusted = 1;
+
+      a[tot_values].type = CKA_CLASS;
+      a[tot_values].value = &class;
+      a[tot_values].value_len = sizeof class;
+      tot_values++;
+
+      a[tot_values].type = CKA_TRUSTED;
+      a[tot_values].value = &trusted;
+      a[tot_values].value_len = sizeof trusted;
+      tot_values++;
+
+      category = 2;
+      a[tot_values].type = CKA_CATEGORY;
+      a[tot_values].value = &category;
+      a[tot_values].value_len = sizeof trusted;
+      tot_values++;
     }
   else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_PUBKEY)
     {
