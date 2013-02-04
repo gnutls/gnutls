@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -592,6 +593,36 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   return length;
 }
 
+static void dummy_wait(record_parameters_st * params, gnutls_datum_t* plaintext, 
+                       unsigned pad_failed, unsigned int pad, unsigned total)
+{
+  /* this hack is only needed on CBC ciphers */
+  if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
+    {
+      uint16_t len;
+
+      /* force an additional hash compression function evaluation to prevent timing 
+       * attacks that distinguish between wrong-mac + correct pad, from wrong-mac + incorrect pad.
+       */
+      if (pad_failed == 0 && pad > 0) 
+        {
+          len = _gnutls_get_hash_block_len(params->mac_algorithm);
+          if (len > 0)
+            {
+              /* This is really specific to the current hash functions.
+               * It should be removed once a protocol fix is in place.
+               */
+	      if ((pad+total) % len > len-9 && total % len <= len-9) 
+	        {
+	          if (len < plaintext->size)
+                    _gnutls_auth_cipher_add_auth (&params->read.cipher_state, plaintext->data, len);
+                  else
+                    _gnutls_auth_cipher_add_auth (&params->read.cipher_state, plaintext->data, plaintext->size);
+                }
+            }
+        }
+    }
+}
 
 /* Deciphers the ciphertext packet, and puts the result to compress_data, of compress_size.
  * Returns the actual compressed packet size.
@@ -604,10 +635,12 @@ ciphertext_to_compressed (gnutls_session_t session,
                           uint64* sequence)
 {
   uint8_t tag[MAX_HASH_SIZE];
-  unsigned int pad, i;
+  unsigned int pad = 0, i;
   int length, length_to_decrypt;
   uint16_t blocksize;
-  int ret, pad_failed = 0;
+  int ret;
+  unsigned int tmp_pad_failed = 0;
+  unsigned int pad_failed = 0;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   unsigned int preamble_size;
   unsigned int ver = gnutls_protocol_get_version (session);
@@ -615,6 +648,7 @@ ciphertext_to_compressed (gnutls_session_t session,
   unsigned int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
 
   blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
+
 
   /* actual decryption (inplace)
    */
@@ -688,7 +722,7 @@ ciphertext_to_compressed (gnutls_session_t session,
           ciphertext->data += blocksize;
         }
 
-      if (ciphertext->size < tag_size)
+      if (ciphertext->size < tag_size+1)
         return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
       /* we don't use the auth_cipher interface here, since
@@ -701,41 +735,29 @@ ciphertext_to_compressed (gnutls_session_t session,
              ciphertext->data, ciphertext->size)) < 0)
         return gnutls_assert_val(ret);
 
-      pad = ciphertext->data[ciphertext->size - 1] + 1;   /* pad */
+      pad = ciphertext->data[ciphertext->size - 1];   /* pad */
 
+      /* Check the pading bytes (TLS 1.x). 
+       * Note that we access all 256 bytes of ciphertext for padding check
+       * because there is a timing channel in that memory access (in certain CPUs).
+       */
+      if (ver != GNUTLS_SSL3)
+        for (i = 2; i <= MIN(256, ciphertext->size); i++)
+          {
+            tmp_pad_failed |= (ciphertext->data[ciphertext->size - i] != pad);
+            pad_failed |= ((i<= (1+pad)) & (tmp_pad_failed));
+          }
 
-      if (pad > (int) ciphertext->size - tag_size)
+      if (pad_failed != 0 || (1+pad > ((int) ciphertext->size - tag_size)))
         {
-          gnutls_assert ();
-          _gnutls_record_log
-            ("REC[%p]: Short record length %d > %d - %d (under attack?)\n",
-             session, pad, ciphertext->size, tag_size);
           /* We do not fail here. We check below for the
            * the pad_failed. If zero means success.
            */
-          pad_failed = GNUTLS_E_DECRYPTION_FAILED;
-          pad %= blocksize;
+          pad_failed = 1;
+          pad = 0;
         }
 
-      length = ciphertext->size - tag_size - pad;
-
-      /* Check the pading bytes (TLS 1.x)
-       */
-      if (ver != GNUTLS_SSL3)
-        for (i = 2; i <= pad; i++)
-          {
-            if (ciphertext->data[ciphertext->size - i] !=
-                ciphertext->data[ciphertext->size - 1])
-              pad_failed = GNUTLS_E_DECRYPTION_FAILED;
-          }
-
-      if (length < 0)
-        {
-          /* Setting a proper length to prevent timing differences in
-           * processing of records with invalid encryption.
-           */
-          length = ciphertext->size - tag_size;
-        }
+      length = ciphertext->size - tag_size - pad - 1;
 
       /* Pass the type, version, length and compressed through
        * MAC.
@@ -760,15 +782,15 @@ ciphertext_to_compressed (gnutls_session_t session,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  /* This one was introduced to avoid a timing attack against the TLS
-   * 1.0 protocol.
-   */
-  /* HMAC was not the same. 
-   */
   if (memcmp (tag, &ciphertext->data[length], tag_size) != 0 || pad_failed != 0)
-    return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+    {
+      /* HMAC was not the same. */
+      dummy_wait(params, compressed, pad_failed, pad, length+preamble_size);
 
-  /* copy the decrypted stuff to compress_data.
+      return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+    }
+
+  /* copy the decrypted stuff to compressed_data.
    */
   if (compressed->size < (unsigned)length)
     return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
