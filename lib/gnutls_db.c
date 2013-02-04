@@ -156,16 +156,24 @@ gnutls_db_check_entry (gnutls_session_t session, gnutls_datum_t session_entry)
  * This function returns the time that this entry was active.
  * It can be used for database entry expiration.
  *
+ * Returns: The time this entry was created, or zero on error.
  **/
 time_t
 gnutls_db_check_entry_time (gnutls_datum_t *entry)
 {
 uint32_t t;
+uint32_t magic;
 
-  if (entry->size < 4)
+  if (entry->size < 8)
     return gnutls_assert_val(0);
   
-  memcpy(&t, entry->data, 4);
+  memcpy(&magic, entry->data, 4);
+  
+  if (magic != PACKED_SESSION_MAGIC)
+    return gnutls_assert_val(0);
+  
+  memcpy(&t, &entry->data[4], 4);
+
   return t;
 }
 

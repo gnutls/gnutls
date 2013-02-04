@@ -42,6 +42,7 @@
 #include <gnutls_constate.h>
 #include <algorithms.h>
 #include <gnutls_state.h>
+#include <gnutls_db.h>
 
 static int pack_certificate_auth_info (gnutls_session_t,
                                        gnutls_buffer_st * packed_session);
@@ -97,6 +98,7 @@ _gnutls_session_pack (gnutls_session_t session,
   id = gnutls_auth_get_type (session);
 
   /* first is the timestamp */
+  BUFFER_APPEND_NUM(&sb, PACKED_SESSION_MAGIC);
   BUFFER_APPEND_NUM(&sb, session->security_parameters.timestamp);
   BUFFER_APPEND (&sb, &id, 1);
 
@@ -178,6 +180,7 @@ _gnutls_session_unpack (gnutls_session_t session,
 {
   int ret;
   gnutls_buffer_st sb;
+  uint32_t magic;
   uint8_t id;
 
   _gnutls_buffer_init (&sb);
@@ -203,6 +206,10 @@ _gnutls_session_unpack (gnutls_session_t session,
     }
 
   /* the timestamp is first */
+  BUFFER_POP_NUM (&sb, magic);
+  if (magic != PACKED_SESSION_MAGIC)
+    return gnutls_assert_val(GNUTLS_E_DB_ERROR);
+
   BUFFER_POP_NUM (&sb, session->internals.resumed_security_parameters.timestamp);
   BUFFER_POP (&sb, &id, 1);
 
