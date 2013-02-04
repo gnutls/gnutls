@@ -809,14 +809,11 @@ Although @funcref{gnutls_record_send} is sufficient to transmit data
 to the peer, when many small chunks of data are to be transmitted
 it is inefficient and wastes bandwidth due to the TLS record
 overhead. In that case it is preferrable to combine the small chunks
-before transmission. The @emph{gnutls_sbuf} interface is a helper interface
-that provides that functionality.
+before transmission. The following functions provide that functionality.
 
-@showfuncdesc{gnutls_sbuf_init}
+@showfuncdesc{gnutls_record_cork}
 
-@showfuncdesc{gnutls_sbuf_queue}
-
-@showfuncB{gnutls_sbuf_flush,gnutls_sbuf_deinit}
+@showfuncdesc{gnutls_record_uncork}
 
 
 @node Handling alerts

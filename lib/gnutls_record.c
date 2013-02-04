@@ -65,7 +65,7 @@ struct tls_record_st {
   /* the data */
 };
 
-/*
+/**
  * gnutls_record_disable_padding:  
  * @session: is a #gnutls_session_t structure.
  *
