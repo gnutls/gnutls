@@ -599,7 +599,7 @@ static void dummy_wait(record_parameters_st * params, gnutls_datum_t* plaintext,
   /* this hack is only needed on CBC ciphers */
   if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
     {
-      uint16_t len;
+      unsigned len;
 
       /* force an additional hash compression function evaluation to prevent timing 
        * attacks that distinguish between wrong-mac + correct pad, from wrong-mac + incorrect pad.
