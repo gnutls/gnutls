@@ -8,6 +8,9 @@ Version 2.12.23 (unreleased)
 ** libgnutls: Eliminated memory leak in PCKS #11 initialization.
 Report and fix by Sam Varshavchik.
 
+** libgnutls: Fixes in record padding parsing to prevent a timing attack. 
+Issue reported by Kenny Patterson and Nadhem Alfardan.
+
 ** API and ABI modifications:
 No changes since last version.
 
