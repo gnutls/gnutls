@@ -49,8 +49,6 @@ the issues with timing attacks on CBC ciphersuites.
 ** libgnutls: Corrected gnutls_cipher_decrypt2() when used with AEAD
 ciphers (i.e., AES-GCM). Reported by William McGovern.
 
-** libgnutls: Licensed under LGPLv2.1.
-
 ** API and ABI modifications:
 gnutls_db_check_entry_time: Added
 gnutls_record_set_timeout: Added
