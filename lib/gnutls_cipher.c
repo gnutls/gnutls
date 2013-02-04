@@ -449,12 +449,22 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 }
 
 static void dummy_wait(record_parameters_st * params, gnutls_datum_t* plaintext, 
-                       unsigned pad_failed, unsigned int pad, unsigned total)
+                       unsigned pad_failed, unsigned int pad, unsigned total, int ver)
 {
   /* this hack is only needed on CBC ciphers */
   if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
     {
+      uint8_t MAC[MAX_HASH_SIZE];
       unsigned len;
+      digest_hd_st td;
+      int ret;
+
+      ret = mac_init (&td, params->mac_algorithm,
+                      params->read.mac_secret.data,
+                      params->read.mac_secret.size, ver);
+
+      if (ret < 0)
+        return;
 
       /* force an additional hash compression function evaluation to prevent timing 
        * attacks that distinguish between wrong-mac + correct pad, from wrong-mac + incorrect pad.
@@ -470,12 +480,14 @@ static void dummy_wait(record_parameters_st * params, gnutls_datum_t* plaintext,
 	      if ((pad+total) % len > len-9 && total % len <= len-9) 
 	        {
 	          if (len < plaintext->size)
-                    _gnutls_auth_cipher_add_auth (&params->read.cipher_state, plaintext->data, len);
+                    mac_hash (&td, plaintext->data, len, ver);
                   else
-                    _gnutls_auth_cipher_add_auth (&params->read.cipher_state, plaintext->data, plaintext->size);
+                    mac_hash (&td, plaintext->data, plaintext->size, ver);
                 }
             }
         }
+
+      mac_deinit (&td, MAC, ver);
     }
 }
 
@@ -491,12 +503,12 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 {
   uint8_t MAC[MAX_HASH_SIZE];
   uint16_t c_length;
-  unsigned int pad;
+  unsigned int pad = 0;
   int length;
   uint16_t blocksize;
   int ret, i, pad_failed = 0;
   opaque preamble[PREAMBLE_SIZE];
-  int preamble_size;
+  int preamble_size = 0;
   int ver = gnutls_protocol_get_version (session);
   int hash_size = _gnutls_hash_get_algo_len (params->mac_algorithm);
 
@@ -557,14 +569,13 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       if (_gnutls_version_has_variable_padding (ver) && pad_failed == 0)
         for (i = 2; i <= pad; i++)
           {
-            if (ciphertext.data[ciphertext.size - i] !=
-                ciphertext.data[ciphertext.size - 1])
+            if (ciphertext.data[ciphertext.size - i] != pad)
               pad_failed = GNUTLS_E_DECRYPTION_FAILED;
           }
           
       if (pad_failed)
         pad = 0;
-      length = ciphertext.size - hash_size - pad;
+      length = ciphertext.size - hash_size - pad - 1;
 
       break;
     default:
@@ -610,7 +621,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
     {
       gnutls_datum_t compressed = {compress_data, compress_size};
       /* HMAC was not the same. */
-      dummy_wait(params, &compressed, pad_failed, pad, length+preamble_size);
+      dummy_wait(params, &compressed, pad_failed, pad, length+preamble_size, ver);
 
       gnutls_assert ();
       return GNUTLS_E_DECRYPTION_FAILED;
