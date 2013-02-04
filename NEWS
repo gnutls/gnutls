@@ -2,15 +2,14 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.7 (unreleased)
+* Version 3.1.7 (released 2012-02-04)
 
 ** certtool: Added option "dn" which allows to directly set the DN
 in a template from an RFC4514 string.
 
 ** danetool: Added options: --dlv and --insecure. Suggested by Paul Wouters.
 
-** libgnutls-xssl: Added an experimental TLS library with an very simple
-API.
+** libgnutls-xssl: Added a new library to simplify GnuTLS usage.
 
 ** libgnutls-dane: Added function to specify a DLV file.
 
@@ -36,8 +35,8 @@ by the specified priority string. The current values correspond to the
 previous defaults (727 bits), except for the SECURE128 and SECURE192
 strings which increase the minimum to 1248 and 1776 respectively.
 
-** libgnutls: Added the gnutls_sbuf_t structure and accompanying 
-functions to enable buffering in sending application data.
+** libgnutls: Added the gnutls_record_cork() and uncork API to enable 
+buffering in sending application data.
 
 ** libgnutls: Removed default random padding, and added a length-hiding interface 
 instead.  Both the server and the client must support this extension. Whether 
