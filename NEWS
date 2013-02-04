@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.28 (unreleased)
+* Version 3.0.28 (2012-02-04)
 
 ** libgnutls: Fixes in server side of DTLS-0.9.
 
