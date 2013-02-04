@@ -164,7 +164,7 @@ do_device_source (int init)
     }
 
   if ((device_fd != 0)
-      && (init || timespec_sub_sec(&current_time, &device_last_read) > DEVICE_READ_INTERVAL)))
+      && (init || timespec_sub_sec(&current_time, &device_last_read) > DEVICE_READ_INTERVAL))
     {
 
       /* More than 20 minutes since we last read the device */
