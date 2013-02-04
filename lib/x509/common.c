@@ -56,7 +56,7 @@ static const struct oid2string _oid2str[] = {
 
   {"2.5.4.6", "C", 0, 1, "PKIX1.PrintableString"},
   {"2.5.4.9", "STREET", 1, 1, "PKIX1.DirectoryString"},
-  {"2.5.4.12", "T", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.12", "title", 1, 1, "PKIX1.DirectoryString"},
   {"2.5.4.10", "O", 1, 1, "PKIX1.DirectoryString"},
   {"2.5.4.11", "OU", 1, 1, "PKIX1.DirectoryString"},
   {"2.5.4.3", "CN", 1, 1, "PKIX1.DirectoryString"},
