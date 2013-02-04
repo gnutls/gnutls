@@ -30,9 +30,9 @@ The prototypes for the following functions lie in
 @section High level TLS API
 
 The prototypes for the following functions lie in
-@file{gnutls/sbuf.h}.
+@file{gnutls/xssl.h}.
 
-@include sbuf-api.texi
+@include xssl-api.texi
 
 @node Datagram TLS API
 @section Datagram TLS API
