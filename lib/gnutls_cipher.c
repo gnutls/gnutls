@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2010
- * Free Software Foundation, Inc.
+ * Copyright (C) 2000-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -448,6 +448,36 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   return length;
 }
 
+static void dummy_wait(record_parameters_st * params, gnutls_datum_t* plaintext, 
+                       unsigned pad_failed, unsigned int pad, unsigned total)
+{
+  /* this hack is only needed on CBC ciphers */
+  if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
+    {
+      unsigned len;
+
+      /* force an additional hash compression function evaluation to prevent timing 
+       * attacks that distinguish between wrong-mac + correct pad, from wrong-mac + incorrect pad.
+       */
+      if (pad_failed == 0 && pad > 0) 
+        {
+          len = _gnutls_get_hash_block_len(params->mac_algorithm);
+          if (len > 0)
+            {
+              /* This is really specific to the current hash functions.
+               * It should be removed once a protocol fix is in place.
+               */
+	      if ((pad+total) % len > len-9 && total % len <= len-9) 
+	        {
+	          if (len < plaintext->size)
+                    _gnutls_auth_cipher_add_auth (&params->read.cipher_state, plaintext->data, len);
+                  else
+                    _gnutls_auth_cipher_add_auth (&params->read.cipher_state, plaintext->data, plaintext->size);
+                }
+            }
+        }
+    }
+}
 
 /* Deciphers the ciphertext packet, and puts the result to compress_data, of compress_size.
  * Returns the actual compressed packet size.
@@ -518,23 +548,11 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
           gnutls_assert ();
           return GNUTLS_E_DECRYPTION_FAILED;
         }
-      pad = ciphertext.data[ciphertext.size - 1] + 1;   /* pad */
+      pad = ciphertext.data[ciphertext.size - 1];   /* pad */
 
-      if ((int) pad > (int) ciphertext.size - hash_size)
-        {
-          gnutls_assert ();
-          _gnutls_record_log
-            ("REC[%p]: Short record length %d > %d - %d (under attack?)\n",
-             session, pad, ciphertext.size, hash_size);
-          /* We do not fail here. We check below for the
-           * the pad_failed. If zero means success.
-           */
-          pad_failed = GNUTLS_E_DECRYPTION_FAILED;
-        }
-
-      length = ciphertext.size - hash_size - pad;
-
-      /* Check the pading bytes (TLS 1.x)
+      /* Check the pading bytes (TLS 1.x). 
+       * Note that we access all 256 bytes of ciphertext for padding check
+       * because there is a timing channel in that memory access (in certain CPUs).
        */
       if (_gnutls_version_has_variable_padding (ver) && pad_failed == 0)
         for (i = 2; i <= pad; i++)
@@ -543,6 +561,11 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
                 ciphertext.data[ciphertext.size - 1])
               pad_failed = GNUTLS_E_DECRYPTION_FAILED;
           }
+          
+      if (pad_failed)
+        pad = 0;
+      length = ciphertext.size - hash_size - pad;
+
       break;
     default:
       gnutls_assert ();
@@ -581,24 +604,19 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       mac_deinit (&td, MAC, ver);
     }
 
-  /* This one was introduced to avoid a timing attack against the TLS
-   * 1.0 protocol.
-   */
-  if (pad_failed != 0)
-    {
-      gnutls_assert ();
-      return pad_failed;
-    }
-
   /* HMAC was not the same. 
    */
-  if (memcmp (MAC, &ciphertext.data[length], hash_size) != 0)
+  if (memcmp (MAC, &ciphertext.data[length], hash_size) != 0 || pad_failed != 0)
     {
+      gnutls_datum_t compressed = {compress_data, compress_size};
+      /* HMAC was not the same. */
+      dummy_wait(params, &compressed, pad_failed, pad, length+preamble_size);
+
       gnutls_assert ();
       return GNUTLS_E_DECRYPTION_FAILED;
     }
 
-  /* copy the decrypted stuff to compress_data.
+  /* copy the decrypted stuff to compressed_data.
    */
   if (compress_size < length)
     {
