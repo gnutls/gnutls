@@ -153,6 +153,20 @@ fi
   fi
   AM_CONDITIONAL(ENABLE_DTLS_SRTP, test "$ac_enable_srtp" != "no")
 
+  ac_enable_heartbeat=yes
+  AC_MSG_CHECKING([whether to disable DTLS-SRTP extension])
+  AC_ARG_ENABLE(heartbeat-support,
+    AS_HELP_STRING([--enable-heartbeat-support],
+                   [enable support for the heartbeat extension (LGPLv3)]),
+    ac_enable_heartbeat=$enableval,ac_enable_heartbeat=no)
+  if test x$ac_enable_heartbeat != xno; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE([ENABLE_HEARTBEAT], 1, [enable heartbeat support])
+  else
+   AC_MSG_RESULT(no)
+  fi
+  AM_CONDITIONAL(ENABLE_HEARTBEAT, test "$ac_enable_heartbeat" != "no")
+
   ac_enable_srp=yes
   AC_MSG_CHECKING([whether to disable SRP authentication support])
   AC_ARG_ENABLE(srp-authentication,

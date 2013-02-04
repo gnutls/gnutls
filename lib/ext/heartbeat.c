@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2012 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
- * Author: Olga Smolenchuk
+ * Author: Olga Smolenchuk, Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -28,6 +29,7 @@
 #include <gnutls_extensions.h>
 #include <random.h>
 
+#ifdef ENABLE_HEARTBEAT
 /**
   * gnutls_heartbeat_enable:
   * @session: is a #gnutls_session_t structure.
@@ -46,22 +48,6 @@ gnutls_heartbeat_enable (gnutls_session_t session, unsigned int type)
   epriv.num = type;
   _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_HEARTBEAT,
                                 epriv);
-}
-
-/*-
- * Convenience helper:
- *
- * Returns:
- * textual policy description or NULL.
- -*/
-static inline const char *
-_gnutls_heartbeat (unsigned policy)
-{
-  if (policy & GNUTLS_HB_PEER_ALLOWED_TO_SEND)
-    return "PEER ALLOWED TO SEND";
-  else if (policy & GNUTLS_HB_PEER_NOT_ALLOWED_TO_SEND)
-    return "PEER NOT ALLOWED TO SEND";
-  return "Unknown policy";
 }
 
 /**
@@ -96,63 +82,40 @@ gnutls_heartbeat_allowed (gnutls_session_t session, unsigned int type)
   return 0;
 }
 
-static int
-heartbeat_allow_recv (gnutls_session_t session)
-{
-  return gnutls_heartbeat_allowed(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
-}
-
-static int
-heartbeat_allow_send (gnutls_session_t session)
-{
-  return gnutls_heartbeat_allowed(session, GNUTLS_HB_LOCAL_ALLOWED_TO_SEND);
-}
-
 #define DEFAULT_PAYLOAD_SIZE 16
 
-/*-
- * heartbeat_send_data:
- * @session: is a #gnutls_session_t structure.
- * @data: contains the data to send.
- * @data_size: is the length of the data.
- * @start_timer: true if the heartbeat timer is to be started.
- *
- * This function has the similar semantics with gnutls_record_send() The only
- * difference is that it uses GNUTLS_HEARTBEAT content type.
- *
- * This function send either HeartBeat request or response message
- * with proper padding. It set timeout and timestamp without check - it's up to
- * caller to make sure no messages are already in-flight and handle timeout expiration.
- *
- * Returns: The number of bytes sent, or a negative error code.  The
- *   number of bytes sent might be less than @data_size.  The maximum
- *   number of bytes this function can send in a single call depends
- *   on the negotiated maximum record size.
- -*/
+/*
+ * Sends heartbeat data.
+ */
 static int
 heartbeat_send_data (gnutls_session_t session, const void *data,
                      size_t data_size, uint8_t type)
 {
-  int ret;
-  gnutls_buffer_st response;
-  uint8_t payload[DEFAULT_PAYLOAD_SIZE];
-  _gnutls_buffer_init (&response);
+  int ret, pos;
+  uint8_t * response;
 
-  ret = gnutls_rnd (GNUTLS_RND_NONCE, payload, DEFAULT_PAYLOAD_SIZE);
+  response = gnutls_malloc(1+data_size+DEFAULT_PAYLOAD_SIZE);
+  if (response == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+  
+  pos = 0;
+  response[pos++] = 1;
+  memcpy(&response[pos], data, data_size);
+  pos += data_size;
+
+  ret = gnutls_rnd (GNUTLS_RND_NONCE, &response[pos], DEFAULT_PAYLOAD_SIZE);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+  pos += DEFAULT_PAYLOAD_SIZE;
 
-  BUFFER_APPEND (&response, &type, 1);
-  BUFFER_APPEND_PFX2 (&response, data, data_size);
+  ret = _gnutls_send_int (session, GNUTLS_HEARTBEAT, -1, EPOCH_WRITE_CURRENT,
+                          response, pos, MBUFFER_FLUSH);
 
-  BUFFER_APPEND (&response, payload, DEFAULT_PAYLOAD_SIZE);
-  ret = _gnutls_send_int (session, GNUTLS_HEARTBEAT, -1,
-                          EPOCH_WRITE_CURRENT, response.data,
-                          response.length, MBUFFER_FLUSH);
-
-  _gnutls_record_log ("REC[%p]: HB sent: %d\n", session, ret);
-
-  _gnutls_buffer_clear (&response);
+cleanup:
+  gnutls_free(response);
   return ret;
 }
 
@@ -185,7 +148,7 @@ gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size,
   if (data_size > MAX_HEARTBEAT_LENGTH)
     return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-  if (!heartbeat_allow_send (session))
+  if (gnutls_heartbeat_allowed(session, GNUTLS_HB_LOCAL_ALLOWED_TO_SEND)==0)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
   
   /* resume previous call if interrupted */
@@ -197,9 +160,6 @@ gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size,
   switch(session->internals.hb_state)
     {
       case SHB_SEND1:
-        _gnutls_record_log
-         ("REC[%p]: sending HB_REQUEST with length: %zu to peer\n", session, data_size);
-         
         if (data_size > DEFAULT_PAYLOAD_SIZE)
           data_size -= DEFAULT_PAYLOAD_SIZE;
         else
@@ -327,7 +287,7 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
   uint8_t *msg = _mbuffer_get_udata_ptr (bufel);
   size_t hb_len, len = _mbuffer_get_udata_size (bufel);
 
-  if (!heartbeat_allow_recv (session))
+  if (gnutls_heartbeat_allowed(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND) == 0)
     return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
 
   if (len < 4)
@@ -340,9 +300,6 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
   switch (msg[0])
     {
     case HEARTBEAT_REQUEST:
-      _gnutls_record_log
-          ("REC[%p]: received HEARTBEAT_REQUEST\n", session);
-
       _gnutls_buffer_reset(&session->internals.hb_remote_data);
 
       ret = _gnutls_buffer_resize (&session->internals.hb_remote_data, hb_len);
@@ -363,9 +320,6 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
       if (hb_len > 0 && memcmp (msg + 3, session->internals.hb_local_data.data,
                   hb_len) != 0)
         {
-          _gnutls_record_log ("REC[%p]: unexpected HB: %s - received\n", session,
-                              _gnutls_bin2hex (msg + 3, hb_len, pr,
-                                               sizeof (pr), NULL));
           if (IS_DTLS(session))
             return gnutls_assert_val( GNUTLS_E_AGAIN); /* ignore it */
           else
@@ -504,26 +458,31 @@ _gnutls_heartbeat_send_params (gnutls_session_t session,
 }
 
 static int
-_gnutls_heartbeat_pack (extension_priv_data_t _priv, gnutls_buffer_st * ps)
+_gnutls_heartbeat_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
 {
   int ret;
-  BUFFER_APPEND_NUM (ps, _priv.num);
-  return GNUTLS_E_SUCCESS;
+
+  BUFFER_APPEND_NUM (ps, epriv.num);
+
+  return 0;
+
 }
 
 static int
 _gnutls_heartbeat_unpack (gnutls_buffer_st * ps,
-                          extension_priv_data_t * _priv)
+                           extension_priv_data_t * _priv)
 {
-  int ret;
   extension_priv_data_t epriv;
+  int ret;
+
   BUFFER_POP_NUM (ps, epriv.num);
+
   *_priv = epriv;
+
   ret = 0;
 error:
   return ret;
 }
-
 
 extension_entry_st ext_mod_heartbeat = {
   .name = "HEARTBEAT",
@@ -536,3 +495,40 @@ extension_entry_st ext_mod_heartbeat = {
   .unpack_func = _gnutls_heartbeat_unpack,
   .deinit_func = NULL
 };
+
+#else
+void
+gnutls_heartbeat_enable (gnutls_session_t session, unsigned int type)
+{
+}
+
+int
+gnutls_heartbeat_allowed (gnutls_session_t session, unsigned int type)
+{
+  return 0;
+}
+
+int
+gnutls_heartbeat_ping (gnutls_session_t session, size_t data_size, 
+                       unsigned int max_tries, unsigned int flags)
+{
+  return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+}
+
+int
+gnutls_heartbeat_pong (gnutls_session_t session, unsigned int flags)
+{
+  return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+}
+
+unsigned int gnutls_heartbeat_get_timeout (gnutls_session_t session)
+{
+  return 0;
+}
+
+void gnutls_heartbeat_set_timeouts (gnutls_session_t session, unsigned int retrans_timeout,
+                                    unsigned int total_timeout)
+{
+  return;
+}
+#endif

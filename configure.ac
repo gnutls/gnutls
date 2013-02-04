@@ -642,6 +642,7 @@ if features are disabled)
   SRP support:      $ac_enable_srp
   PSK support:      $ac_enable_psk
   Anon auth support:$ac_enable_anon
+  Heartbeat support:$ac_enable_heartbeat
 ])
 
 AC_MSG_NOTICE([Optional applications:
