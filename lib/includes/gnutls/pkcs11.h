@@ -192,7 +192,7 @@ typedef enum
     GNUTLS_PKCS11_OBJ_ATTR_PUBKEY,        /* public keys */
     GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY,       /* private keys */
     GNUTLS_PKCS11_OBJ_ATTR_ALL,    /* everything! */
-    GNUTLS_PKCS11_OBJ_ATTR_TRUSTED_CA,       /* CAs */
+    GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA,       /* CAs */
   } gnutls_pkcs11_obj_attr_t;
 
 /**

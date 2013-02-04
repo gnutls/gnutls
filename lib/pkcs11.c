@@ -2211,7 +2211,8 @@ find_objs (struct pkcs11_session_info* sinfo,
   struct ck_attribute *attr;
   ck_object_class_t class = (ck_object_class_t)-1;
   ck_certificate_type_t type = (ck_certificate_type_t)-1;
-  unsigned int trusted, category;
+  unsigned int trusted;
+  unsigned long category;
   ck_rv_t rv;
   ck_object_handle_t obj;
   unsigned long count;
@@ -2334,9 +2335,9 @@ find_objs (struct pkcs11_session_info* sinfo,
       tot_values++;
 
       category = 2;
-      a[tot_values].type = CKA_CATEGORY;
+      a[tot_values].type = CKA_CERTIFICATE_CATEGORY;
       a[tot_values].value = &category;
-      a[tot_values].value_len = sizeof trusted;
+      a[tot_values].value_len = sizeof category;
       tot_values++;
     }
   else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_PUBKEY)
