@@ -20,6 +20,9 @@ API.
 
 ** libgnutls: DN variable 'T' was expanded to 'title'.
 
+** libgnutls: Fixes in record padding parsing to prevent a timing attack. 
+Issue reported by Kenny Patterson and Nadhem Alfardan.
+
 ** libgnutls: Added functions to directly set the DN in a certificate
 or request from an RFC4514 string.
 
