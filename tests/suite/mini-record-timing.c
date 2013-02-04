@@ -221,6 +221,7 @@ double med;
   return med;
 }
 
+#if 0
 static
 unsigned long calc_min(unsigned long *diffs, unsigned int diffs_size)
 {
@@ -256,7 +257,7 @@ unsigned int stop = diffs_size-diffs_size/20;
   
   return sum;
 }
-
+#endif
 
 static void
 client (int fd, const char* prio, unsigned int text_size, struct test_st *test)
@@ -269,7 +270,6 @@ client (int fd, const char* prio, unsigned int text_size, struct test_st *test)
   struct timespec start, stop;
   static unsigned long taken = 0;
   static unsigned long measurement;
-  static unsigned long min = 0;
   const char* err;
 
   gnutls_global_init ();
@@ -383,7 +383,7 @@ restart:
   gnutls_bye (session, GNUTLS_SHUT_WR);
   
   {
-    double avg2, var, med, savg, smed;
+    double avg2, med, savg, smed;
     unsigned i;
     FILE* fp = NULL;
     
