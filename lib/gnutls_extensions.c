@@ -336,9 +336,11 @@ _gnutls_ext_init (void)
     return ret;
 #endif
 
+#ifdef ENABLE_HEARTBEAT
   ret = _gnutls_ext_register (&ext_mod_heartbeat);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
+#endif
 
   ret = _gnutls_ext_register (&ext_mod_new_record_padding);
   if (ret != GNUTLS_E_SUCCESS)
