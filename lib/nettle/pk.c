@@ -1042,8 +1042,8 @@ extract_digest_info(const struct rsa_public_key *key,
 
   i++;
   
-  di.data = em;
-  di.size = key->size - i;
+  di->data = em;
+  di->size = key->size - i;
   
   return 1;
 
