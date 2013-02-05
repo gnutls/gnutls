@@ -1000,7 +1000,7 @@ wrap_nettle_pk_fixup (gnutls_pk_algorithm_t algo,
 
 static int
 extract_digest_info(const struct rsa_public_key *key,
-		 unsigned *length, uint8_t *digest_info,
+		 gnutls_datum_t *di,
 		 const mpz_t signature)
 {
   unsigned i;
@@ -1008,7 +1008,7 @@ extract_digest_info(const struct rsa_public_key *key,
   mpz_t m;
   uint8_t *em;
 
-  if (key->size == 0 || *length < key->size)
+  if (key->size == 0)
     return 0;
 
   em = gnutls_malloc(key->size);
@@ -1041,10 +1041,12 @@ extract_digest_info(const struct rsa_public_key *key,
     }
 
   i++;
-  memcpy(digest_info, &em[i], key->size-i);
-  *length = key->size-i;
   
-  ret = 1;
+  di.data = em;
+  di.size = key->size - i;
+  
+  return 1;
+
 cleanup:
   gnutls_free(em);
 
@@ -1061,8 +1063,7 @@ static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk,
     gnutls_digest_algorithm_t* hash_algo)
 {
   uint8_t digest[MAX_HASH_SIZE];
-  uint8_t digest_info[MAX_HASH_SIZE*3];
-  gnutls_datum_t di;
+  gnutls_datum_t di = {NULL, 0};
   unsigned digest_size;
   mpz_t s;
   struct rsa_public_key pub;
@@ -1094,8 +1095,7 @@ static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk,
       
       nettle_mpz_set_str_256_u(s, sig->size, sig->data);
       
-      digest_size = sizeof (digest_info);
-      ret = extract_digest_info( &pub, &digest_size, digest_info, s);
+      ret = extract_digest_info( &pub, &di, s);
       if (ret == 0)
         {
           ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -1103,9 +1103,6 @@ static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk,
           goto cleanup;
         }
 
-      di.data = digest_info;
-      di.size = digest_size;
-      
       digest_size = sizeof(digest);
       if ((ret =
            decode_ber_digest_info (&di, hash_algo, digest,
@@ -1132,6 +1129,7 @@ static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk,
 
 cleanup:
   mpz_clear(s);
+  gnutls_free(di.data);
   return ret;
 
 }
