@@ -1504,10 +1504,11 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
+ * Deprecated. This function cannot be easily used securely. 
+ * Use gnutls_pubkey_verify_data2() instead.
+ *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and zero or positive code on success. 
- *
- * Deprecated. Use gnutls_pubkey_verify_data2() instead of this function.
  *
  * Since: 2.12.0
  **/
@@ -1586,7 +1587,9 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
  * This function will verify the given signed digest, using the
  * parameters from the public key. 
  *
- * Deprecated. Use gnutls_pubkey_verify_hash2() instead of this function.
+ * Deprecated. This function cannot be easily used securely. 
+ * Use gnutls_pubkey_verify_hash2() instead.
+ *
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and zero or positive code on success.
