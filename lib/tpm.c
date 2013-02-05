@@ -71,7 +71,7 @@ static int import_tpm_key (gnutls_privkey_t pkey,
                            const char *key_password);
 static int encode_tpmkey_url(char** url, const TSS_UUID* uuid, TSS_FLAG storage);
 
-/* TPM URL format:
+/* TPM URL format: (draft-mavrogiannopoulos-tpmuri-01)
  *
  * tpmkey:file=/path/to/file
  * tpmkey:uuid=7f468c16-cb7f-11e1-824d-b3a4f4b20343;storage=user
