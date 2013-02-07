@@ -644,14 +644,15 @@ gnutls_x509_privkey_import2 (gnutls_x509_privkey_t key,
       ret = gnutls_x509_privkey_import_pkcs8(key, data, format, password, flags);
       if (ret < 0)
         {
+          if (ret == GNUTLS_E_DECRYPTION_FAILED) goto cleanup;
           ret = import_pkcs12_privkey(key, data, format, password, flags);
           if (ret < 0 && format == GNUTLS_X509_FMT_PEM)
             {
-              int err;
-              err = gnutls_x509_privkey_import_openssl(key, data, password);
-              if (err < 0)
+	      if (ret == GNUTLS_E_DECRYPTION_FAILED) goto cleanup;
+
+              ret = gnutls_x509_privkey_import_openssl(key, data, password);
+              if (ret < 0)
                 {
-                  if (err == GNUTLS_E_DECRYPTION_FAILED) ret = err;
                   gnutls_assert();
                   goto cleanup;
                 }
