@@ -61,7 +61,7 @@ struct tls_record_st {
   uint16_t packet_size; /* header_size + length */
   content_type_t type;
   uint16_t epoch; /* valid in DTLS only */
-  int v2:1; /* whether an SSLv2 client hello */
+  unsigned v2:1; /* whether an SSLv2 client hello */
   /* the data */
 };
 
@@ -854,6 +854,7 @@ record_read_headers (gnutls_session_t session,
        */
       record->v2 = 1;
       record->epoch = 0;
+      memset(&record->sequence, 0, sizeof(record->sequence));
 
       _gnutls_record_log ("REC[%p]: SSL 2.0 %s packet received. Length: %d\n",
                           session, 
@@ -878,6 +879,7 @@ record_read_headers (gnutls_session_t session,
         }
       else
         {
+	  memset(&record->sequence, 0, sizeof(record->sequence));
           record->length = _gnutls_read_uint16 (&headers[3]);
           record->epoch = 0;
         }
@@ -1002,8 +1004,6 @@ begin:
       gnutls_assert ();
       return GNUTLS_E_TOO_MANY_EMPTY_PACKETS;
     }
-
-  memset(&record, 0, sizeof(record));
 
   if (session->internals.read_eof != 0)
     {
