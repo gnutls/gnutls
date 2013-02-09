@@ -262,6 +262,8 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
       /* the prime used by the peer is not acceptable
        */
       gnutls_assert ();
+      _gnutls_debug_log("Received a prime of %u bits, limit is %u\n", (unsigned)_gnutls_mpi_get_nbits (session->key.client_p),
+      	(unsigned)bits);
       return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
     }
 
