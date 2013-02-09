@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** Fixed issue in gnutls_x509_privkey_import2() which didn't return
 GNUTLS_E_DECRYPTION_FAILED in all cases.
 
+** libgnutls: The minimum DH bits accepted by priorities NORMAL and
+PERFORMANCE was set to previous defaults 727 bits.
+
 ** API and ABI modifications:
 No changes since last version.
 
