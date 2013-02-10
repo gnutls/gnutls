@@ -691,9 +691,9 @@ bulk_rmadd_func *func;
                      sign_priority_secure128);
       func (&priority_cache->supported_ecc, supported_ecc_secure128);
 
-      /* be conservative for now. Set the bits to correspond to an 80-bit level */
+      /* be conservative for now. Set the bits to correspond to an 72-bit level */
       if (priority_cache->level == 0)
-        priority_cache->level = GNUTLS_SEC_PARAM_LOW;
+        priority_cache->level = GNUTLS_SEC_PARAM_WEAK;
       return 1;
     }
   else if (strcasecmp (level, LEVEL_SUITEB128) == 0)
