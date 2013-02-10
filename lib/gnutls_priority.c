@@ -321,9 +321,13 @@ static const int kx_priority_secure[] = {
    */
   GNUTLS_KX_ECDHE_ECDSA,
   GNUTLS_KX_ECDHE_RSA,
+  GNUTLS_KX_RSA,
+  /* KX-RSA is now ahead of DHE-RSA and DHE-DSS due to the compatibility
+   * issues the DHE ciphersuites have. That is, one cannot enforce a specific
+   * security level without dropping the connection. 
+   */
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
-  GNUTLS_KX_RSA,
   /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
    * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
    */
