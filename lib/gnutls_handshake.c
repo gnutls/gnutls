@@ -2498,7 +2498,8 @@ static int run_verify_callback(gnutls_session_t session, unsigned int side)
     return 0;
 
   if (cred != NULL && cred->verify_callback != NULL && 
-  	session->internals.send_cert_req != GNUTLS_CERT_IGNORE)
+  	(session->security_parameters.entity == GNUTLS_CLIENT || 
+  		session->internals.send_cert_req != GNUTLS_CERT_IGNORE))
     {
       ret = cred->verify_callback (session);
       if (ret < -1)
