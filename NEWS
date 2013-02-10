@@ -2,19 +2,24 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.8 (unreleased)
+* Version 3.1.8 (released 2013-02-10)
 
-** Fixed issue in gnutls_x509_privkey_import2() which didn't return
-GNUTLS_E_DECRYPTION_FAILED in all cases.
+** libgnutls: Fixed issue in gnutls_x509_privkey_import2() which didn't return
+GNUTLS_E_DECRYPTION_FAILED in all cases, and affect certtool operation
+with encrypted keys. Reported by Yan Fiz.
 
 ** libgnutls: The minimum DH bits accepted by priorities NORMAL and
-PERFORMANCE was set to previous defaults 727 bits.
+PERFORMANCE was set to previous defaults 727 bits. Reported by Diego
+Elio Petteno.
+
+** libgnutls: Corrected issue which prevented gnutls_pubkey_verify_hash() 
+to operate with long keys. Reported by Erik A Jensen.
 
 ** API and ABI modifications:
 No changes since last version.
 
 
-* Version 3.1.7 (released 2012-02-04)
+* Version 3.1.7 (released 2013-02-04)
 
 ** certtool: Added option "dn" which allows to directly set the DN
 in a template from an RFC4514 string.
