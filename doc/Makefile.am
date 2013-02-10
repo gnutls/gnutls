@@ -31,6 +31,7 @@ endif
 
 -include $(top_srcdir)/doc/doc.mk
 
+
 SRC_DEF_CLI = 
 SRC_DEF_CLI_DEBUG = 
 SRC_DEF_SERV = 
@@ -206,11 +207,15 @@ MAINTAINERCLEANFILES =
 
 # Generated texinfos.
 
-
 API_FILES=gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi \
 	tpm-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi \
 	dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi dane-api.texi \
 	xssl-api.texi
+
+clean-local:
+	-rm -f stamp_enums stamp_functions
+	-rm -rf functions/ enums/
+	-rm -f $(API_FILES)
 
 gnutls_TEXINFOS += $(API_FILES)
 
