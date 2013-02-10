@@ -238,8 +238,11 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
       diff = timespec_sub_ms(&t2, &t1);
       if (diff < *ms)
         *ms -= diff;
-      else
-        return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+      else 
+        {
+          ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+          goto cleanup;
+        }
     }
 
   _gnutls_read_log ("READ: read %d bytes from %p\n", (int) i, fd);
@@ -281,7 +284,10 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
         {
           ret = _gnutls_io_check_recv(session, *ms);
           if (ret < 0)
-            return gnutls_assert_val(ret);
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
             
           gettime(&t1);
         }
@@ -308,12 +314,14 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
                   goto finish;
                 }
 
-              return errno_to_gerr(err);
+              ret = errno_to_gerr(err);
+              goto cleanup;
             }
           else
             {
               gnutls_assert ();
-              return GNUTLS_E_PULL_ERROR;
+              ret = GNUTLS_E_PULL_ERROR;
+              goto cleanup;
             }
         }
       else
@@ -335,7 +343,10 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
           if (diff < *ms)
             *ms -= diff;
           else
-            return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+            {
+              ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+              goto cleanup;
+            }
         }
     }
 
@@ -345,6 +356,10 @@ finish:
                         (int) (size - left), fd);
 
   return (size - left);
+  
+cleanup:
+  _mbuffer_xfree(bufel);
+  return ret;
 }
 
 
@@ -435,7 +450,7 @@ ssize_t
 _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
                           content_type_t recv_type, unsigned int *ms)
 {
-  ssize_t ret = 0;
+  ssize_t ret;
   size_t min;
   mbuffer_st *bufel = NULL;
   size_t recvdata, readsize;
@@ -488,53 +503,35 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
       /* return immediately if we got an interrupt or eagain
        * error.
        */
-      if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
+      if (ret < 0)
         {
-          _mbuffer_xfree (&bufel);
-          return ret;
+          return gnutls_assert_val(ret);
         }
-    }
 
-  /* copy fresh data to our buffer.
-   */
-  if (ret > 0)
-    {
-      _gnutls_read_log
-        ("RB: Have %d bytes into buffer. Adding %d bytes.\n",
-         (int) session->internals.record_recv_buffer.byte_length, (int) ret);
-      _gnutls_read_log ("RB: Requested %d bytes\n", (int) total);
+      if (ret == 0) /* EOF */
+        return gnutls_assert_val(0);
 
-      _mbuffer_enqueue (&session->internals.record_recv_buffer, bufel);
-    }
-  else
-    _mbuffer_xfree (&bufel);
+	/* copy fresh data to our buffer.
+         */
+        _gnutls_read_log
+          ("RB: Have %d bytes into buffer. Adding %d bytes.\n",
+          (int) session->internals.record_recv_buffer.byte_length, (int) ret);
+        _gnutls_read_log ("RB: Requested %d bytes\n", (int) total);
 
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+        _mbuffer_enqueue (&session->internals.record_recv_buffer, bufel);
 
-  if (ret == 0)
-    {                           /* EOF */
-      gnutls_assert ();
-      return 0;
-    }
+        if(IS_DTLS(session))
+          ret = MIN(total, session->internals.record_recv_buffer.byte_length);
+        else
+          ret = session->internals.record_recv_buffer.byte_length;
 
-  if(IS_DTLS(session))
-    ret = MIN(total, session->internals.record_recv_buffer.byte_length);
-  else
-    ret = session->internals.record_recv_buffer.byte_length;
-
-  if ((ret > 0) && ((size_t) ret < total))
-    {
-      /* Short Read */
-      return gnutls_assert_val(GNUTLS_E_AGAIN);
+        if ((ret > 0) && ((size_t) ret < total)) /* Short Read */
+          return gnutls_assert_val(GNUTLS_E_AGAIN);
+        else
+          return ret;
     }
   else
-    {
-      return ret;
-    }
+    return gnutls_assert_val(0);
 }
 
 /* This function is like write. But it does not return -1 on error.
