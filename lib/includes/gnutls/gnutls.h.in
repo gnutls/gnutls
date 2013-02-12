@@ -877,7 +877,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
  */
   void gnutls_handshake_set_private_extensions (gnutls_session_t session,
                                                 int allow);
-  int gnutls_handshake_set_random (gnutls_session_t session, gnutls_datum_t* random);
+  int gnutls_handshake_set_random (gnutls_session_t session, const gnutls_datum_t* random);
 
     gnutls_handshake_description_t
     gnutls_handshake_get_last_out (gnutls_session_t session);

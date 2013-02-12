@@ -1446,7 +1446,7 @@ timespec_sub_ms (struct timespec *a, struct timespec *b)
  * Since 3.1.9
  **/
 int
-gnutls_handshake_set_random (gnutls_session_t session, gnutls_datum_t* random)
+gnutls_handshake_set_random (gnutls_session_t session, const gnutls_datum_t* random)
 {
   if (random->size != GNUTLS_RANDOM_SIZE)
     return GNUTLS_E_INVALID_REQUEST;
