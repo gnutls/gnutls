@@ -229,7 +229,8 @@ do_device_source_urandom (int init)
         }
 
       old = fcntl (device_fd, F_GETFD);
-      fcntl (device_fd, F_SETFD, old | 1);
+      if (old != -1)
+        fcntl (device_fd, F_SETFD, old | FD_CLOEXEC);
       memcpy(&device_last_read, &current_time, sizeof(device_last_read));
 
       read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
