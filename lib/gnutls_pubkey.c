@@ -250,6 +250,9 @@ gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
  * algorithm to use for signing with this certificate. Some certificates (i.e.
  * DSA might not be able to sign without the preferred algorithm).
  *
+ * To get the signature algorithm instead of just the hash use gnutls_pk_to_sign()
+ * with the algorithm of the certificate/key and the provided @hash.
+ *
  * Returns: the 0 if the hash algorithm is found. A negative error code is
  * returned on error.
  *
