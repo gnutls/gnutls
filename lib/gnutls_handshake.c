@@ -428,8 +428,17 @@ _gnutls_read_client_hello (gnutls_session_t session, uint8_t * data,
   _gnutls_set_client_random (session, &data[pos]);
   pos += GNUTLS_RANDOM_SIZE;
 
-  _gnutls_tls_create_random (rnd);
-  _gnutls_set_server_random (session, rnd);
+  if (session->internals.server_random_set != 0) 
+    {
+      _gnutls_set_server_random (session, session->internals.resumed_security_parameters.server_random);
+      /* make sure it is used only once */
+      session->internals.server_random_set = 0;
+    }
+  else
+    {
+      _gnutls_tls_create_random (rnd);
+      _gnutls_set_server_random (session, rnd);
+    } 
 
   session->security_parameters.timestamp = gnutls_time (NULL);
 
