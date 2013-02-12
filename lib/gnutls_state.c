@@ -1428,13 +1428,13 @@ timespec_sub_ms (struct timespec *a, struct timespec *b)
 }
 
 /**
- * gnutls_handshake_set_server_random:
+ * gnutls_handshake_set_random:
  * @session: is a #gnutls_session_t structure.
  * @random: a random value of 32-bytes
  *
- * This function will explicitly set the server hello random value
- * in the subsequent TLS handshake. The random value should be
- * a 32-byte value.
+ * This function will explicitly set the server or client hello 
+ * random value in the subsequent TLS handshake. The random value 
+ * should be a 32-byte value.
  *
  * Note that this function should not normally be used as gnutls
  * will select automatically a random value for the handshake.
@@ -1446,13 +1446,16 @@ timespec_sub_ms (struct timespec *a, struct timespec *b)
  * Since 3.1.9
  **/
 int
-gnutls_handshake_set_server_random (gnutls_session_t session, gnutls_datum_t* random)
+gnutls_handshake_set_random (gnutls_session_t session, gnutls_datum_t* random)
 {
   if (random->size != GNUTLS_RANDOM_SIZE)
     return GNUTLS_E_INVALID_REQUEST;
   
-  session->internals.server_random_set = 1;
-  memcpy(session->internals.resumed_security_parameters.server_random, random->data, random->size);
+  session->internals.sc_random_set = 1;
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    memcpy(session->internals.resumed_security_parameters.client_random, random->data, random->size);
+  else
+    memcpy(session->internals.resumed_security_parameters.server_random, random->data, random->size);
 
   return 0;
 }

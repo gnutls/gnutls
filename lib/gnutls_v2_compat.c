@@ -202,8 +202,6 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, uint8_t * data,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-
-
   /* read random new values -skip session id for now */
   DECR_LEN (len, session_id_len);       /* skip session id for now */
   memcpy (session_id, &data[pos], session_id_len);
@@ -214,12 +212,14 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, uint8_t * data,
 
   memcpy (&rnd[GNUTLS_RANDOM_SIZE - challenge], &data[pos], challenge);
 
-  _gnutls_set_client_random (session, rnd);
+  ret = _gnutls_set_client_random (session, rnd);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   /* generate server random value */
-
-  _gnutls_tls_create_random (rnd);
-  _gnutls_set_server_random (session, rnd);
+  ret = _gnutls_set_server_random (session, NULL);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   session->security_parameters.timestamp = gnutls_time (NULL);
 

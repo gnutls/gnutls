@@ -168,18 +168,87 @@ resume_copy_required_values (gnutls_session_t session)
 
 }
 
-void
-_gnutls_set_server_random (gnutls_session_t session, uint8_t * rnd)
+
+/* this function will produce GNUTLS_RANDOM_SIZE==32 bytes of random data
+ * and put it to dst.
+ */
+static int
+_gnutls_tls_create_random (uint8_t * dst)
 {
-  memcpy (session->security_parameters.server_random, rnd,
-          GNUTLS_RANDOM_SIZE);
+  uint32_t tim;
+  int ret;
+
+  /* Use weak random numbers for the most of the
+   * buffer except for the first 4 that are the
+   * system's time.
+   */
+
+  tim = gnutls_time (NULL);
+  /* generate server random value */
+  _gnutls_write_uint32 (tim, dst);
+
+  ret = _gnutls_rnd (GNUTLS_RND_NONCE, &dst[4], GNUTLS_RANDOM_SIZE - 4);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  return 0;
 }
 
-void
+int
 _gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd)
 {
-  memcpy (session->security_parameters.client_random, rnd,
-          GNUTLS_RANDOM_SIZE);
+int ret;
+
+  if (rnd != NULL)
+    memcpy (session->security_parameters.client_random, rnd,
+            GNUTLS_RANDOM_SIZE);
+  else
+    {
+      /* no random given, we generate. */
+      if (session->internals.sc_random_set != 0)
+        {
+          memcpy (session->security_parameters.client_random, 
+                  session->internals.resumed_security_parameters.client_random,
+                  GNUTLS_RANDOM_SIZE);
+        }
+      else
+        {
+          ret = _gnutls_tls_create_random (session->security_parameters.client_random);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+         }
+    }
+  return 0;
+}
+
+int
+_gnutls_set_server_random (gnutls_session_t session, uint8_t * rnd)
+{
+int ret;
+
+  if (rnd != NULL)
+    memcpy (session->security_parameters.server_random, rnd,
+            GNUTLS_RANDOM_SIZE);
+  else
+    {
+      /* no random given, we generate. */
+      if (session->internals.sc_random_set != 0)
+        {
+          memcpy (session->security_parameters.server_random, 
+                  session->internals.resumed_security_parameters.server_random,
+                  GNUTLS_RANDOM_SIZE);
+        }
+      else
+        {
+          ret = _gnutls_tls_create_random (session->security_parameters.server_random);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+         }
+    }
+  return 0;
 }
 
 /* Calculate The SSL3 Finished message
@@ -301,33 +370,6 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret, int sending)
                       GNUTLS_MASTER_SIZE, mesg, siz, concat, hash_len, 12, ret);
 }
 
-/* this function will produce GNUTLS_RANDOM_SIZE==32 bytes of random data
- * and put it to dst.
- */
-int
-_gnutls_tls_create_random (uint8_t * dst)
-{
-  uint32_t tim;
-  int ret;
-
-  /* Use weak random numbers for the most of the
-   * buffer except for the first 4 that are the
-   * system's time.
-   */
-
-  tim = gnutls_time (NULL);
-  /* generate server random value */
-  _gnutls_write_uint32 (tim, dst);
-
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, &dst[4], GNUTLS_RANDOM_SIZE - 4);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  return 0;
-}
 
 /* returns the 0 on success or a negative error code.
  */
@@ -404,7 +446,7 @@ _gnutls_read_client_hello (gnutls_session_t session, uint8_t * data,
   gnutls_protocol_t adv_version;
   int neg_version;
   int len = datalen;
-  uint8_t rnd[GNUTLS_RANDOM_SIZE], *suite_ptr, *comp_ptr, *session_id;
+  uint8_t *suite_ptr, *comp_ptr, *session_id;
 
   DECR_LEN (len, 2);
 
@@ -425,20 +467,15 @@ _gnutls_read_client_hello (gnutls_session_t session, uint8_t * data,
   /* Read client random value.
    */
   DECR_LEN (len, GNUTLS_RANDOM_SIZE);
-  _gnutls_set_client_random (session, &data[pos]);
+  ret = _gnutls_set_client_random (session, &data[pos]);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
   pos += GNUTLS_RANDOM_SIZE;
 
-  if (session->internals.server_random_set != 0) 
-    {
-      _gnutls_set_server_random (session, session->internals.resumed_security_parameters.server_random);
-      /* make sure it is used only once */
-      session->internals.server_random_set = 0;
-    }
-  else
-    {
-      _gnutls_tls_create_random (rnd);
-      _gnutls_set_server_random (session, rnd);
-    } 
+  ret = _gnutls_set_server_random (session, NULL);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   session->security_parameters.timestamp = gnutls_time (NULL);
 
@@ -1608,7 +1645,10 @@ _gnutls_read_server_hello (gnutls_session_t session,
   pos += 2;
 
   DECR_LEN (len, GNUTLS_RANDOM_SIZE);
-  _gnutls_set_server_random (session, &data[pos]);
+  ret = _gnutls_set_server_random (session, &data[pos]);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
   pos += GNUTLS_RANDOM_SIZE;
 
 
@@ -1781,7 +1821,6 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
   uint8_t *data = NULL;
   int pos = 0, type;
   int datalen = 0, ret = 0;
-  uint8_t rnd[GNUTLS_RANDOM_SIZE];
   gnutls_protocol_t hver;
   gnutls_buffer_st extdata;
   int rehandshake = 0;
@@ -1876,10 +1915,11 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       if (!IS_DTLS (session)
         || session->internals.dtls.hsk_hello_verify_requests == 0)
         {
-          _gnutls_tls_create_random (rnd);
-          _gnutls_set_client_random (session, rnd);
+          ret = _gnutls_set_client_random (session, NULL);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
 
-          memcpy (&data[pos], rnd, GNUTLS_RANDOM_SIZE);
+          memcpy (&data[pos], session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
         }
       else
         memcpy (&data[pos], session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
