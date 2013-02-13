@@ -1314,6 +1314,7 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
 			   const gnutls_datum_t * signature)
 {
   int ret;
+  gnutls_digest_algorithm_t hash;
 
   if (pubkey == NULL)
     {
@@ -1321,7 +1322,11 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = pubkey_verify_data( pubkey->pk_algorithm, GNUTLS_DIG_UNKNOWN, data, signature,
+  ret = gnutls_pubkey_get_verify_algorithm (pubkey, signature, &hash);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  ret = pubkey_verify_data( pubkey->pk_algorithm, hash, data, signature,
     &pubkey->params);
   if (ret < 0)
     {
@@ -1380,8 +1385,10 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
  * @signature: contains the signature
  *
  * This function will verify the given signed digest, using the
- * parameters from the public key. Use gnutls_pubkey_verify_hash2()
- * instead of this function.
+ * parameters from the public key. 
+ *
+ * Deprecated. This function cannot be easily used securely. 
+ * Use gnutls_pubkey_verify_hash2() instead.
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and zero or positive code on success.
