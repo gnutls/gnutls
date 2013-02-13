@@ -887,6 +887,8 @@ GNUTLS_3_1_0 {
 	gnutls_record_send_range;
 	gnutls_db_check_entry_time;
 	gnutls_handshake_set_server_random;
+	gnutls_record_cork;
+	gnutls_record_uncork;
 	xssl_deinit;
 	xssl_flush;
 	xssl_read;
