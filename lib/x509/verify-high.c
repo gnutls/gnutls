@@ -58,7 +58,7 @@ struct gnutls_x509_trust_list_st {
 };
 
 #define INIT_HASH 0x33a1
-#define DEFAULT_SIZE 503
+#define DEFAULT_SIZE 127
 
 /**
  * gnutls_x509_trust_list_init:
