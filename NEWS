@@ -11,6 +11,8 @@ a PKCS #12 file from an encrypted key file. Reported by Yan Fiz.
 
 ** API and ABI modifications:
 gnutls_handshake_set_random: Added
+gnutls_record_cork: Exported
+gnutls_record_uncork: Exported
 
 
 * Version 3.1.8 (released 2013-02-10)
@@ -86,8 +88,6 @@ gnutls_record_get_random_padding_status: Added
 gnutls_x509_crt_set_dn: Added
 gnutls_x509_crt_set_issuer_dn: Added
 gnutls_x509_crq_set_dn: Added
-gnutls_record_cork: Added
-gnutls_record_uncork: Added
 gnutls_range_split: Added
 gnutls_record_send_range: Added
 gnutls_record_set_max_empty_records: Added
