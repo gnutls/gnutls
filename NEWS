@@ -7,6 +7,8 @@ See the end for copying conditions.
 ** certtool: option --to-p12 will now ask for a password to generate
 a PKCS #12 file from an encrypted key file. Reported by Yan Fiz.
 
+** libgnutls: Corrected issue in gnutls_pubkey_verify_data().
+
 ** API and ABI modifications:
 gnutls_handshake_set_random: Added
 
