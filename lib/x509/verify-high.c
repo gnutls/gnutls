@@ -57,7 +57,7 @@ struct gnutls_x509_trust_list_st {
   struct node_st *node;
 };
 
-#define DEFAULT_SIZE 503
+#define DEFAULT_SIZE 127
 
 /**
  * gnutls_x509_trust_list_init:
