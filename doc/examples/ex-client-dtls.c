@@ -76,7 +76,8 @@ main (void)
     {
       ret = gnutls_handshake (session);
     }
-  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
+  while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+  /* Note that DTLS may also receive GNUTLS_E_LARGE_PACKET */
 
   if (ret < 0)
     {
