@@ -1147,46 +1147,29 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 
           if ((unsigned)len > strlen (XMPP_OID) && strcmp (oid, XMPP_OID) == 0)
             {
-              ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-              size_t orig_name_size = *name_size;
+              gnutls_datum_t out;
 
-              result = asn1_create_element
-                (_gnutls_get_pkix (), "PKIX1.UTF8String", &c2);
-              if (result != ASN1_SUCCESS)
+              result = _gnutls_x509_decode_string(ASN1_ETYPE_UTF8_STRING,
+              	name, *name_size, &out);
+	      if (result < 0)
+	        {
+	          gnutls_assert();
+	          return result;
+	        }
+
+              if (*name_size <= out.size)
                 {
                   gnutls_assert ();
-                  return _gnutls_asn2err (result);
-                }
-
-              result = asn1_der_decoding (&c2, name, *name_size, NULL);
-              if (result != ASN1_SUCCESS)
-                {
-                  gnutls_assert ();
-                  asn1_delete_structure (&c2);
-                  return _gnutls_asn2err (result);
-                }
-
-              len = *name_size;
-              result = asn1_read_value (c2, "", name, &len);
-              if (result != ASN1_SUCCESS)
-                {
-                  gnutls_assert ();
-                  asn1_delete_structure (&c2);
-                  *name_size = len + 1;
-                  return _gnutls_asn2err (result);
-                }
-              asn1_delete_structure (&c2);
-
-              if ((unsigned)len + 1 > orig_name_size)
-                {
-                  gnutls_assert ();
+                  gnutls_free(out.data);
                   *name_size = len + 1;
                   return GNUTLS_E_SHORT_MEMORY_BUFFER;
                 }
 
-              *name_size = len;
+              *name_size = out.size;
+              memcpy(name, out.data, out.size);
               /* null terminate it */
               ((char *) name)[*name_size] = 0;
+              gnutls_free(out.data);
             }
         }
     }
