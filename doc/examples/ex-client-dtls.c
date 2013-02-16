@@ -65,7 +65,7 @@ main (void)
   /* connect to the peer */
   sd = udp_connect ();
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
+  gnutls_transport_set_int (session, sd);
 
   /* set the connection MTU */
   gnutls_dtls_set_mtu (session, 1000);

@@ -58,7 +58,7 @@ main (void)
   gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
+  gnutls_transport_set_int (session, sd);
   gnutls_handshake_set_timeout (session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
   /* Perform the TLS handshake

@@ -59,7 +59,7 @@ main (void)
           free (session_data);
         }
 
-      gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
+      gnutls_transport_set_int (session, sd);
       gnutls_handshake_set_timeout (session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
       /* Perform the TLS handshake

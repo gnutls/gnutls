@@ -608,19 +608,25 @@ The initialization functions for the credentials are shown below.
 
 The next step is to setup the underlying transport layer details. The
 Berkeley sockets are implicitly used by GnuTLS, thus a
-call to @funcref{gnutls_transport_set_ptr2} would be sufficient to
-specify the socket descriptor.
+call to @funcref{gnutls_transport_set_int} would be sufficient to
+specify the socket descriptor. 
 
-@showfuncdesc{gnutls_transport_set_ptr2}
-
-@showfuncA{gnutls_transport_set_ptr}
+@showfuncB{gnutls_transport_set_int,gnutls_transport_set_int2}
 
 If however another transport layer than TCP is selected, then
-the following functions have to be specified.
+a pointer should be used instead to express the parameter to be
+passed to custom functions. In that case the following functions should
+be used instead.
+
+@showfuncB{gnutls_transport_set_ptr,gnutls_transport_set_ptr2}
+
+Moreover all of the following push and pull callbacks should be set.
 
 @showfuncdesc{gnutls_transport_set_push_function}
 @showfuncdesc{gnutls_transport_set_vec_push_function}
 @showfuncdesc{gnutls_transport_set_pull_function}
+@showfuncdesc{gnutls_transport_set_pull_timeout_function}
+
 
 The functions above accept a callback function which
 should return the number of bytes written, or -1 on

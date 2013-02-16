@@ -11,6 +11,9 @@ a PKCS #12 file from an encrypted key file. Reported by Yan Fiz.
 
 ** API and ABI modifications:
 gnutls_handshake_set_random: Added
+gnutls_transport_set_int2: Added
+gnutls_transport_get_int2: Added
+gnutls_transport_get_int: Added
 gnutls_record_cork: Exported
 gnutls_record_uncork: Exported
 

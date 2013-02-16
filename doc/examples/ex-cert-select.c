@@ -129,7 +129,7 @@ main (void)
    */
   sd = tcp_connect ();
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
+  gnutls_transport_set_int (session, sd);
 
   /* Perform the TLS handshake
    */

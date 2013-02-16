@@ -1246,9 +1246,7 @@ do_handshake (socket_st * socket)
 {
   int ret;
 
-  gnutls_transport_set_ptr (socket->session,
-                            (gnutls_transport_ptr_t)
-                            gl_fd_to_handle (socket->fd));
+  gnutls_transport_set_int (socket->session, socket->fd);
   do
     {
       gnutls_handshake_set_timeout( socket->session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);

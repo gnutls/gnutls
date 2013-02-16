@@ -889,19 +889,9 @@ GNUTLS_3_1_0 {
 	gnutls_handshake_set_server_random;
 	gnutls_record_cork;
 	gnutls_record_uncork;
-	xssl_deinit;
-	xssl_flush;
-	xssl_read;
-	xssl_getdelim;
-	xssl_write;
-	xssl_printf;
-	xssl_sinit;
-	xssl_client_init;
-	xssl_server_init;
-	xssl_get_session;
-	xssl_get_verify_status;
-	xssl_cred_init;
-	xssl_cred_deinit;
+	gnutls_transport_set_int2;
+	gnutls_transport_get_int2;
+	gnutls_transport_get_int;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

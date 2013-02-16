@@ -111,6 +111,7 @@ gnutls_record_set_max_empty_records (gnutls_session_t session, const unsigned in
  * Used to set the first argument of the transport function (for push
  * and pull callbacks). In berkeley style sockets this function will set the
  * connection descriptor.
+ * 
  **/
 void
 gnutls_transport_set_ptr (gnutls_session_t session,
@@ -139,6 +140,49 @@ gnutls_transport_set_ptr2 (gnutls_session_t session,
   session->internals.transport_send_ptr = send_ptr;
   session->internals.transport_recv_ptr = recv_ptr;
 }
+
+/**
+ * gnutls_transport_set_int2:
+ * @session: is a #gnutls_session_t structure.
+ * @recv_int: is the value for the pull function
+ * @send_int: is the value for the push function
+ *
+ * Used to set the first argument of the transport function (for push
+ * and pull callbacks), when using the berkeley style sockets. 
+ * With this function you can set two different
+ * pointers for receiving and sending.
+ *
+ * Since: 3.1.9
+ **/
+void
+gnutls_transport_set_int2 (gnutls_session_t session,
+                           int recv_int,
+                           int send_int)
+{
+  session->internals.transport_send_ptr = (gnutls_transport_ptr_t)(long)send_int;
+  session->internals.transport_recv_ptr = (gnutls_transport_ptr_t)(long)recv_int;
+}
+
+#if 0
+/* this will be a macro */
+/**
+ * gnutls_transport_set_int:
+ * @session: is a #gnutls_session_t structure.
+ * @i: is the value.
+ *
+ * Used to set the first argument of the transport function (for push
+ * and pull callbacks) for berkeley style sockets.
+ *
+ * Since: 3.1.9
+ * 
+ **/
+void
+gnutls_transport_set_ptr (gnutls_session_t session, int i)
+{
+  session->internals.transport_recv_ptr = (gnutls_transport_ptr_t)(long)i;
+  session->internals.transport_send_ptr = (gnutls_transport_ptr_t)(long)i;
+}
+#endif
 
 /**
  * gnutls_transport_get_ptr:
@@ -174,6 +218,46 @@ gnutls_transport_get_ptr2 (gnutls_session_t session,
 
   *recv_ptr = session->internals.transport_recv_ptr;
   *send_ptr = session->internals.transport_send_ptr;
+}
+
+/**
+ * gnutls_transport_get_int2:
+ * @session: is a #gnutls_session_t structure.
+ * @recv_int: will hold the value for the pull function
+ * @send_int: will hold the value for the push function
+ *
+ * Used to get the arguments of the transport functions (like PUSH
+ * and PULL).  These should have been set using
+ * gnutls_transport_set_int2().
+ *
+ * Since: 3.1.9
+ **/
+void
+gnutls_transport_get_int2 (gnutls_session_t session,
+                           int * recv_int,
+                           int * send_int)
+{
+
+  *recv_int = (long)session->internals.transport_recv_ptr;
+  *send_int = (long)session->internals.transport_send_ptr;
+}
+
+/**
+ * gnutls_transport_get_int:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Used to get the first argument of the transport function (like
+ * PUSH and PULL).  This must have been set using
+ * gnutls_transport_set_int().
+ *
+ * Returns: The first argument of the transport function.
+ *
+ * Since: 3.1.9
+ **/
+int
+gnutls_transport_get_int (gnutls_session_t session)
+{
+  return (long)session->internals.transport_recv_ptr;
 }
 
 /**
@@ -1325,7 +1409,7 @@ gnutls_record_send (gnutls_session_t session, const void *data,
  * All queued records will be sent when gnutls_uncork() is called, or
  * when the maximum record size is reached.
  *
- * Since: 3.1.7
+ * Since: 3.1.9
  **/
 void
 gnutls_record_cork (gnutls_session_t session)
@@ -1347,7 +1431,7 @@ gnutls_record_cork (gnutls_session_t session)
  * Returns: On success the number of transmitted data is returned, or 
  * otherwise a negative error code. 
  *
- * Since: 3.1.7
+ * Since: 3.1.9
  **/
 int
 gnutls_record_uncork (gnutls_session_t session, unsigned int flags)
