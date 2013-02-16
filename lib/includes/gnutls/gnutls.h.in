@@ -1409,7 +1409,10 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                            const giovec_t * iov, int iovcnt);
 
   typedef int (*gnutls_errno_func) (gnutls_transport_ptr_t);
-  
+
+/* This will be defined as macro.
+  void gnutls_transport_set_int (gnutls_session_t session, int r);
+ */
   void gnutls_transport_set_int2 (gnutls_session_t session, int r, int s);
   #define gnutls_transport_set_int(s, i) gnutls_transport_set_int2(s, i, i)
   

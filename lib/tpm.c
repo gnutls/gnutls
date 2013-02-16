@@ -194,23 +194,29 @@ int ret;
   if (uuid)
     {
       if (memcmp(uuid, &srk_uuid, sizeof(TSS_UUID)) == 0)
-        label = "SRK";
-      else
         {
+          label = "SRK";
+
           ret = encode_tpmkey_url(&url, uuid, storage);
           if (ret < 0)
             return gnutls_assert_val(ret);
-          
-          label = url;
+        }
+      else
+        {
+          label = "TPM";
+
+          ret = encode_tpmkey_url(&url, uuid, storage);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
         }
     }
   else
     label = "unknown";
 
   if (pin_info && pin_info->cb)
-    ret = pin_info->cb(pin_info->data, attempts, "TPM", label, flags, pin, pin_size);
+    ret = pin_info->cb(pin_info->data, attempts, url, label, flags, pin, pin_size);
   else if (_gnutls_pin_func)
-    ret = _gnutls_pin_func(_gnutls_pin_data, attempts, "TPM", label, flags, pin, pin_size);
+    ret = _gnutls_pin_func(_gnutls_pin_data, attempts, url, label, flags, pin, pin_size);
   else
     ret = gnutls_assert_val(GNUTLS_E_TPM_KEY_PASSWORD_ERROR); /* doesn't really matter */
 

@@ -406,7 +406,10 @@ tpmkey:file=/path/to/file
 @end verbatim
 
 When objects require a PIN to be accessed the same callbacks as with PKCS #11
-objects are expected (see @ref{Accessing objects that require a PIN}).
+objects are expected (see @ref{Accessing objects that require a PIN}). Note
+that the PIN function may be called multiple times to unlock the SRK and
+the specific key in use. The label in the key function will then be set to
+`SRK' when unlocking the SRK key, or to `TPM' when unlocking any other key.
 
 @node Key generation
 @subsection Key generation

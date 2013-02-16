@@ -984,7 +984,7 @@ pin_callback (void *user, int attempt, const char *token_url,
     
   if (cache > 0 && cached_url != NULL)
     {
-      if (strcmp (cached_url, token_url) == 0)
+      if (token_url != NULL && strcmp (cached_url, token_url) == 0)
         {
           if (strlen(pin) >= sizeof(cached_pin))
             {
@@ -1016,7 +1016,11 @@ pin_callback (void *user, int attempt, const char *token_url,
   /* cache */
   strcpy (cached_pin, pin);
   free (cached_url);
-  cached_url = strdup (token_url);
+  if (token_url)
+    cached_url = strdup (token_url);
+  else
+    cached_url = NULL;
+
   cache = MAX_CACHE_TRIES;
 
   return 0;

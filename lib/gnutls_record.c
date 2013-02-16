@@ -177,7 +177,7 @@ gnutls_transport_set_int2 (gnutls_session_t session,
  * 
  **/
 void
-gnutls_transport_set_ptr (gnutls_session_t session, int i)
+gnutls_transport_set_int (gnutls_session_t session, int i)
 {
   session->internals.transport_recv_ptr = (gnutls_transport_ptr_t)(long)i;
   session->internals.transport_send_ptr = (gnutls_transport_ptr_t)(long)i;
