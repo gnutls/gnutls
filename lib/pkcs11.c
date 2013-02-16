@@ -625,6 +625,7 @@ gnutls_pkcs11_deinit (void)
     {
       if (providers[i].initialized)
         p11_kit_finalize_module (providers[i].module);
+      gnutls_free (providers[i].slots);
     }
   active_providers = 0;
   
@@ -634,6 +635,8 @@ gnutls_pkcs11_deinit (void)
   
   gnutls_pkcs11_set_pin_function (NULL, NULL);
   gnutls_pkcs11_set_token_function (NULL, NULL);
+  p11_kit_pin_unregister_callback (P11_KIT_PIN_FALLBACK, p11_kit_pin_file_callback,
+                                   NULL);
 }
 
 /**
