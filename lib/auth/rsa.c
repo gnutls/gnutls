@@ -94,7 +94,6 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
     }
 
   gnutls_pk_params_init(params);
-  params->params_nr = RSA_PUBLIC_PARAMS;
 
   /* EXPORT case: */
   if (_gnutls_cipher_suite_get_kx_algo
@@ -109,25 +108,36 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
           goto cleanup;
         }
 
-      for (i = 0; i < params->params_nr; i++)
+      for (i = 0; i < RSA_PUBLIC_PARAMS; i++)
         {
           params->params[i] = _gnutls_mpi_copy (session->key.rsa[i]);
+          if (params->params[i] != NULL)
+            params->params_nr++;
+          else
+            {
+              ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+              goto cleanup;
+            }
         }
-
-      ret = 0;
-      goto cleanup;
+      
+      goto done;
     }
 
   ret = _gnutls_pubkey_get_mpis(peer_cert.pubkey, params);
   if (ret < 0)
     {
       ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-      goto cleanup;
+      goto cleanup2;
     }
 
-  ret = 0;
+done:
+  gnutls_pcert_deinit (&peer_cert);
+  return 0;
   
 cleanup:
+  for (i=0;i<params->params_nr;i++)
+    _gnutls_mpi_release(params->params[i]);
+cleanup2:
   gnutls_pcert_deinit (&peer_cert);
 
   return ret;
