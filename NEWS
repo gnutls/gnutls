@@ -9,6 +9,9 @@ a PKCS #12 file from an encrypted key file. Reported by Yan Fiz.
 
 ** libgnutls: Corrected issue in gnutls_pubkey_verify_data().
 
+** libgnutls: corrected parsing issue in XMPP within a subject 
+alternative name. Reported by James Cloos.
+
 ** API and ABI modifications:
 gnutls_handshake_set_random: Added
 gnutls_transport_set_int2: Added
