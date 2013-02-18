@@ -589,15 +589,12 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
  **/
 int gnutls_pkcs11_reinit (void)
 {
-  int rv;
+  unsigned i;
 
-  rv = p11_kit_initialize_registered ();
-  if (rv != CKR_OK)
+  for (i = 0; i < active_providers; i++)
     {
-      gnutls_assert ();
-      _gnutls_debug_log ("Cannot initialize registered module: %s\n",
-                         p11_kit_strerror (rv));
-      return GNUTLS_E_INTERNAL_ERROR;
+      if (providers[i].module != NULL)
+        p11_kit_initialize_module(providers[i].module);
     }
 
   return 0;

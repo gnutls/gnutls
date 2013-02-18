@@ -6,6 +6,9 @@ See the end for copying conditions.
 
 ** libgnutls: Corrected issue in gnutls_pubkey_verify_data().
 
+** libgnutls: gnutls_pkcs11_reinit() will reinitialize all PKCS #11
+modules, and not only the ones loaded via p11-kit.
+
 ** API and ABI modifications:
 No changes since last version.
 
