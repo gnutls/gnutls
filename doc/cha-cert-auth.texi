@@ -511,6 +511,13 @@ The DANE functionality is provided by the @code{libgnutls-dane} library that is 
 with GnuTLS and the function prototypes are in @code{gnutls/dane.h}. 
 See @ref{Certificate verification} for information on how to use the library.
 
+Note however, that the DANE RFC mandates the verification methods
+one should use in addition to the validation via DNSSEC TLSA entries.
+GnuTLS doesn't follow that RFC requirement, and the term DANE verification
+in this manual refers to the TLSA entry verification. In GnuTLS any 
+other verification methods can be used (e.g., PKIX or TOFU) on top of
+DANE.
+
 @node Digital signatures
 @subsection Digital signatures
 @cindex digital signatures
