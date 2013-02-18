@@ -1359,7 +1359,7 @@ add_new_crt_to_rdn_seq (gnutls_certificate_credentials_t res, gnutls_x509_crt_t*
           return GNUTLS_E_SHORT_MEMORY_BUFFER;
         }
 
-      newdata = gnutls_realloc (res->x509_rdn_sequence.data, newsize);
+      newdata = gnutls_realloc_fast (res->x509_rdn_sequence.data, newsize);
       if (newdata == NULL)
         {
           gnutls_assert ();

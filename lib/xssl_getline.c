@@ -63,7 +63,7 @@ xssl_getdelim (xssl_t sbuf, char **lineptr, size_t *n, int delimiter)
     {
       char *new_lineptr;
       *n = 120;
-      new_lineptr = (char *) gnutls_realloc (*lineptr, *n);
+      new_lineptr = (char *) gnutls_realloc_fast (*lineptr, *n);
       if (new_lineptr == NULL)
         {
           result = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -99,7 +99,7 @@ xssl_getdelim (xssl_t sbuf, char **lineptr, size_t *n, int delimiter)
               goto fail;
             }
 
-          new_lineptr = (char *) gnutls_realloc (*lineptr, needed);
+          new_lineptr = (char *) gnutls_realloc_fast (*lineptr, needed);
           if (new_lineptr == NULL)
             {
               result = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);

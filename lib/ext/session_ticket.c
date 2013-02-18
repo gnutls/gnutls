@@ -707,7 +707,7 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
   p += 2;
 
   DECR_LENGTH_COM (data_size, ticket_len, ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH; goto error);
-  priv->session_ticket = gnutls_realloc (priv->session_ticket, ticket_len);
+  priv->session_ticket = gnutls_realloc_fast (priv->session_ticket, ticket_len);
   if (!priv->session_ticket)
     {
       gnutls_assert ();

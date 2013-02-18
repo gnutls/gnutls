@@ -1834,7 +1834,7 @@ gnutls_ocsp_resp_get_certs (gnutls_ocsp_resp_t resp,
 	  goto error;
 	}
 
-      tmpcerts2 = gnutls_realloc (tmpcerts, (ctr + 2) * sizeof (*tmpcerts));
+      tmpcerts2 = gnutls_realloc_fast (tmpcerts, (ctr + 2) * sizeof (*tmpcerts));
       if (tmpcerts2 == NULL)
 	{
 	  gnutls_assert ();

@@ -149,7 +149,7 @@ _gnutls_buffer_append_data (gnutls_buffer_st * dest, const void *data,
       size_t new_len =
         MAX (data_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
 
-      dest->allocd = gnutls_realloc (dest->allocd, new_len);
+      dest->allocd = gnutls_realloc_fast (dest->allocd, new_len);
       if (dest->allocd == NULL)
         {
           gnutls_assert ();
@@ -190,7 +190,7 @@ _gnutls_buffer_resize (gnutls_buffer_st * dest, size_t new_size)
       size_t alloc_len =
         MAX (new_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
 
-      dest->allocd = gnutls_realloc (dest->allocd, alloc_len);
+      dest->allocd = gnutls_realloc_fast (dest->allocd, alloc_len);
       if (dest->allocd == NULL)
         {
           gnutls_assert ();

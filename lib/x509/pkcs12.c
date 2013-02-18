@@ -1359,7 +1359,7 @@ unsigned int i;
               gnutls_x509_crt_check_issuer((*extra_certs)[i], (*extra_certs)[i]) != 0)
             goto skip;
 
-          *chain = gnutls_realloc (*chain, sizeof((*chain)[0]) *
+          *chain = gnutls_realloc_fast (*chain, sizeof((*chain)[0]) *
                                                      ++(*chain_len));
           if (*chain == NULL)
             {
@@ -1700,7 +1700,7 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
                 { /* they don't match - skip the certificate */
                   if (extra_certs)
                     {
-                      _extra_certs = gnutls_realloc (_extra_certs,
+                      _extra_certs = gnutls_realloc_fast (_extra_certs,
                                                      sizeof(_extra_certs[0]) *
                                                      ++_extra_certs_len);
                       if (!_extra_certs)

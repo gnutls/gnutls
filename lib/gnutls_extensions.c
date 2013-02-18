@@ -384,7 +384,7 @@ _gnutls_ext_register (extension_entry_st * mod)
 {
   extension_entry_st *p;
 
-  p = gnutls_realloc (extfunc, sizeof (*extfunc) * (extfunc_size + 1));
+  p = gnutls_realloc_fast (extfunc, sizeof (*extfunc) * (extfunc_size + 1));
   if (!p)
     {
       gnutls_assert ();

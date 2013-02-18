@@ -56,7 +56,7 @@ _gnutls_datum_append (gnutls_datum_t * dst, const void *data,
                         size_t data_size)
 {
 
-  dst->data = gnutls_realloc (dst->data, data_size + dst->size);
+  dst->data = gnutls_realloc_fast (dst->data, data_size + dst->size);
   if (dst->data == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
