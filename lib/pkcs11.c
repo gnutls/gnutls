@@ -587,11 +587,17 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
 int gnutls_pkcs11_reinit (void)
 {
   unsigned i;
+  int rv;
 
   for (i = 0; i < active_providers; i++)
     {
-      if (providers[i].module != NULL)
-        p11_kit_initialize_module(providers[i].module);
+      if (providers[i].module != NULL) 
+        {
+          rv = p11_kit_initialize_module(providers[i].module);
+          if (rv != CKR_OK)
+            _gnutls_debug_log ("Cannot initialize registered module '%s': %s\n", 
+              providers[i].info.library_description, p11_kit_strerror (rv));
+        }
     }
 
   return 0;
