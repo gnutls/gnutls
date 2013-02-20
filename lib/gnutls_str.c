@@ -534,6 +534,65 @@ _gnutls_hex2bin (const char * hex_data, size_t hex_size, uint8_t * bin_data,
   return 0;
 }
 
+/**
+ * gnutls_hex_decode:
+ * @hex_data: contain the encoded data
+ * @result: the place where decoded data will be copied
+ * @result_size: holds the size of the result
+ *
+ * This function will decode the given encoded data, using the hex
+ * encoding used by PSK password files.
+ *
+ * Note that hex_data should be null terminated.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
+ *   long enough, or 0 on success.
+ **/
+int
+gnutls_hex_decode (const gnutls_datum_t * hex_data, void *result,
+                   size_t * result_size)
+{
+  int ret;
+
+  ret =
+    _gnutls_hex2bin ((char*)hex_data->data, hex_data->size, (uint8_t *) result,
+                     result_size);
+  if (ret < 0)
+    return ret;
+
+  return 0;
+}
+
+/**
+ * gnutls_hex_encode:
+ * @data: contain the raw data
+ * @result: the place where hex data will be copied
+ * @result_size: holds the size of the result
+ *
+ * This function will convert the given data to printable data, using
+ * the hex encoding, as used in the PSK password files.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
+ * long enough, or 0 on success.
+ **/
+int
+gnutls_hex_encode (const gnutls_datum_t * data, char *result,
+                   size_t * result_size)
+{
+  size_t res = data->size + data->size + 1;
+
+  if (*result_size < res)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+
+  _gnutls_bin2hex (data->data, data->size, result, *result_size, NULL);
+  *result_size = res;
+
+  return 0;
+}
+
 
 /* compare hostname against certificate, taking account of wildcards
  * return 1 on success or 0 on error
