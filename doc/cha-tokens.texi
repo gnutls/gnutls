@@ -206,8 +206,13 @@ module: /usr/lib/opensc-pkcs11.so
 
 If you use this file, then there is no need for other initialization in
 @acronym{GnuTLS}, except for the PIN and token functions (see next section).  
-However, you may manually initialize the PKCS #11 subsystem if the default
-settings are not desirable.
+In several cases, however, it is desirable to limit badly behaving modules 
+(e.g., modules that add an unacceptable delay on initialization)
+to single applications. That can be done using the ``enable-in:'' option
+followed by the base name of applications that this module should be used.
+
+In all cases, you may also manually initialize the PKCS #11 subsystem if the 
+default settings are not desirable.
 
 @showfuncdesc{gnutls_pkcs11_init}
 
