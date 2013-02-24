@@ -871,7 +871,8 @@ int i, ret;
  * @verify: will hold the certificate verification output.
  *
  * This function will try to verify the given certificate and return
- * its status.
+ * its status. Note that a verification error does not imply a negative
+ * return status. In that case the @verify status is set.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
