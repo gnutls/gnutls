@@ -170,4 +170,6 @@ const char * dane_strerror (int error);
 #define DANE_E_PUBKEY_ERROR -10
 #define DANE_E_NO_CERT -11
 #define DANE_E_FILE_ERROR -12
+#define DANE_E_CERT_ERROR -13
+#define DANE_E_UNKNOWN_DANE_DATA -14
 
