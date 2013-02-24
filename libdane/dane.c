@@ -502,6 +502,9 @@ cleanup:
  * If no information via DANE can be obtained the flag %DANE_VERIFY_NO_DANE_INFO
  * is set. If a DNSSEC signature is not available for the DANE 
  * record then the verify flag %DANE_VERIFY_NO_DNSSEC_DATA is set.
+ *
+ * Note that the CA constraint only applies for the directly certifying CA
+ * and does not account for long CA chains.
  * 
  * Due to the many possible options of DANE, there is no single threat
  * model countered. When notifying the user about DANE verification results
