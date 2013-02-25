@@ -304,6 +304,7 @@ int gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
 int gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
 				      gnutls_pkcs11_url_type_t detailed,
 				      char **url);
+int gnutls_pkcs11_privkey_status (gnutls_pkcs11_privkey_t key);
 
 int gnutls_pkcs11_privkey_generate (const char* url,
 				    gnutls_pk_algorithm_t pk,

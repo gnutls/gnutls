@@ -312,6 +312,55 @@ cleanup:
 }
 
 /**
+ * gnutls_pkcs11_privkey_status:
+ * @key: Holds the key
+ *
+ * Checks the status of the private key token.
+ *
+ * Returns: this function will return non-zero if the token 
+ * holding the private key is still available (inserted), and zero otherwise.
+ * 
+ * Since: 3.1.9
+ *
+ **/
+int
+gnutls_pkcs11_privkey_status (gnutls_pkcs11_privkey_t key)
+{
+  ck_rv_t rv;
+  int ret;
+  struct pkcs11_session_info _sinfo;
+  struct pkcs11_session_info *sinfo;
+  ck_object_handle_t obj;
+  struct ck_session_info session_info;
+
+  if (key->sinfo.init != 0)
+    {
+      sinfo = &key->sinfo;
+      obj = key->obj;
+    }
+  else
+    {
+      sinfo = &_sinfo;
+      memset(sinfo, 0, sizeof(*sinfo));
+      FIND_OBJECT (sinfo, &key->pin, obj, key);
+    }
+  
+  rv = (sinfo->module)->C_GetSessionInfo (sinfo->pks, &session_info);
+  if (rv != CKR_OK)
+    {
+      ret = 0;
+      goto cleanup;
+    }
+  ret = 1;
+
+cleanup:
+  if (sinfo != &key->sinfo)
+    pkcs11_close_session (sinfo);
+
+  return ret;
+}
+
+/**
  * gnutls_pkcs11_privkey_import_url:
  * @pkey: The structure to store the parsed key
  * @url: a PKCS 11 url identifying the key

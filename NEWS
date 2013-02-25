@@ -15,6 +15,9 @@ alternative name. Reported by James Cloos.
 ** libgnutls: gnutls_pkcs11_reinit() will reinitialize all PKCS #11
 modules, and not only the ones loaded via p11-kit.
 
+** libgnutls: Added function to check whether the private key is
+still available (inserted).
+
 ** API and ABI modifications:
 gnutls_handshake_set_random: Added
 gnutls_transport_set_int2: Added
@@ -22,6 +25,7 @@ gnutls_transport_get_int2: Added
 gnutls_transport_get_int: Added
 gnutls_record_cork: Exported
 gnutls_record_uncork: Exported
+gnutls_pkcs11_privkey_status: Added
 
 
 * Version 3.1.8 (released 2013-02-10)
