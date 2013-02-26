@@ -333,7 +333,7 @@ do_device_source_egd (int init)
 static int
 do_device_source (int init)
 {
-  int ret, reseed = 0;
+  int ret;
   static int (*do_source) (int init) = NULL;
 /* using static var here is ok since we are
  * always called with mutexes down 
@@ -362,19 +362,7 @@ do_device_source (int init)
     }
   else
     {
-#ifdef HAVE_GETPID
-      if (getpid() != pid) 
-        { /* fork() detected */
-          memset(&device_last_read, 0, sizeof(device_last_read));
-          pid = getpid();
-          reseed = 1;
-        }
-#endif
-    
       ret = do_source (init);
-      
-      if (reseed)
-        yarrow256_slow_reseed (&yctx);
       
       return ret;
     }
@@ -435,16 +423,25 @@ wrap_nettle_rnd_init (void **ctx)
 static int
 wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
 {
-  int ret;
+  int ret, reseed = 0;
 
   RND_LOCK;
+
+#ifdef HAVE_GETPID
+  if (getpid() != pid) 
+    { /* fork() detected */
+      memset(&device_last_read, 0, sizeof(device_last_read));
+      pid = getpid();
+      reseed = 1;
+    }
+#endif
 
   /* update state only when having a non-nonce or if nonce
    * and nsecs%4096 == 0, i.e., one out of 4096 times called .
    *
    * The reason we do that is to avoid any delays when generating nonces.
    */
-  if (level != GNUTLS_RND_NONCE)
+  if (level != GNUTLS_RND_NONCE || reseed != 0)
     {
       gettime(&current_time);
 
@@ -463,6 +460,9 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
           gnutls_assert ();
           return ret;
         }
+
+      if (reseed)
+        yarrow256_slow_reseed (&yctx);
     }
 
   yarrow256_random (&yctx, datasize, data);

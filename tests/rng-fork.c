@@ -64,7 +64,7 @@ doit (void)
       if (fp == NULL)
         fail("cannot open file");
       
-      gnutls_rnd (GNUTLS_RND_RANDOM, buf1, sizeof (buf1));
+      gnutls_rnd (GNUTLS_RND_NONCE, buf1, sizeof (buf1));
       if (debug) dump("buf1", buf1, sizeof(buf1));
       
       fwrite(buf1, 1, sizeof(buf1), fp);
@@ -73,7 +73,7 @@ doit (void)
   else
     {
       /* daddy */
-      gnutls_rnd (GNUTLS_RND_RANDOM, buf2, sizeof (buf2));
+      gnutls_rnd (GNUTLS_RND_NONCE, buf2, sizeof (buf2));
       if (debug) dump("buf2", buf2, sizeof(buf2));
       waitpid(pid, NULL, 0);
       

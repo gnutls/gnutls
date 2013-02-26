@@ -4,12 +4,12 @@ See the end for copying conditions.
 
 * Version 3.1.9 (unreleased)
 
-** certtool: option --to-p12 will now ask for a password to generate
+** certtool: Option --to-p12 will now ask for a password to generate
 a PKCS #12 file from an encrypted key file. Reported by Yan Fiz.
 
 ** libgnutls: Corrected issue in gnutls_pubkey_verify_data().
 
-** libgnutls: corrected parsing issue in XMPP within a subject 
+** libgnutls: Corrected parsing issue in XMPP within a subject 
 alternative name. Reported by James Cloos.
 
 ** libgnutls: gnutls_pkcs11_reinit() will reinitialize all PKCS #11
@@ -17,6 +17,8 @@ modules, and not only the ones loaded via p11-kit.
 
 ** libgnutls: Added function to check whether the private key is
 still available (inserted).
+
+** libgnutls: Try to detect fork even during nonce generation.
 
 ** API and ABI modifications:
 gnutls_handshake_set_random: Added
