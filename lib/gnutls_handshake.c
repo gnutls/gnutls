@@ -3101,7 +3101,6 @@ _gnutls_handshake_server (gnutls_session_t session)
   return 0;
 }
 
-
 int
 _gnutls_generate_session_id (uint8_t * session_id, uint8_t * len)
 {
@@ -3109,7 +3108,7 @@ _gnutls_generate_session_id (uint8_t * session_id, uint8_t * len)
 
   *len = TLS_MAX_SESSION_ID_SIZE;
 
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, session_id, *len);
+  ret = _gnutls_rnd (GNUTLS_RND_NONCE, session_id, TLS_MAX_SESSION_ID_SIZE);
   if (ret < 0)
     {
       gnutls_assert ();

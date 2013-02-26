@@ -306,13 +306,14 @@ _gnutls_server_restore_session (gnutls_session_t session,
 
   /* expiration check is performed inside */
   ret = gnutls_session_set_data (session, data.data, data.size);
+  gnutls_free (data.data);
+
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  gnutls_free (data.data);
 
   return 0;
 }

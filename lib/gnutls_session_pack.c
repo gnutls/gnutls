@@ -822,7 +822,6 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
  
   timestamp = gnutls_time (0);
 
-
   BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.entity);
   BUFFER_POP_NUM (ps,
               session->internals.resumed_security_parameters.kx_algorithm);
@@ -862,6 +861,12 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
 
   BUFFER_POP_NUM (ps,
                   session->internals.resumed_security_parameters.ecc_curve);
+
+  if (session->internals.resumed_security_parameters.max_record_recv_size == 0 ||
+      session->internals.resumed_security_parameters.max_record_send_size == 0)
+    {
+      return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+    }
 
   if (timestamp - session->internals.resumed_security_parameters.timestamp >
       session->internals.expire_time
