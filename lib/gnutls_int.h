@@ -518,7 +518,7 @@ typedef struct
   time_t timestamp;
   
   /* if non-zero the new record padding is used */
-  unsigned int new_record_padding;
+  uint8_t new_record_padding;
 
   /* The send size is the one requested by the programmer.
    * The recv size is the one negotiated with the peer.

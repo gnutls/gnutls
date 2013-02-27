@@ -97,7 +97,6 @@ _gnutls_session_pack (gnutls_session_t session,
 
   id = gnutls_auth_get_type (session);
 
-  /* first is the timestamp */
   BUFFER_APPEND_NUM(&sb, PACKED_SESSION_MAGIC);
   BUFFER_APPEND_NUM(&sb, session->security_parameters.timestamp);
   BUFFER_APPEND (&sb, &id, 1);
@@ -205,10 +204,12 @@ _gnutls_session_unpack (gnutls_session_t session,
       _gnutls_free_auth_info (session);
     }
 
-  /* the timestamp is first */
   BUFFER_POP_NUM (&sb, magic);
   if (magic != PACKED_SESSION_MAGIC)
-    return gnutls_assert_val(GNUTLS_E_DB_ERROR);
+    {
+      ret = gnutls_assert_val(GNUTLS_E_DB_ERROR);
+      goto error;
+    }
 
   BUFFER_POP_NUM (&sb, session->internals.resumed_security_parameters.timestamp);
   BUFFER_POP (&sb, &id, 1);
@@ -789,13 +790,13 @@ pack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_APPEND (ps, session->security_parameters.server_random,
                  GNUTLS_RANDOM_SIZE);
 
-  BUFFER_APPEND_NUM (ps, session->security_parameters.session_id_size);
+  BUFFER_APPEND (ps, &session->security_parameters.session_id_size, 1);
   BUFFER_APPEND (ps, session->security_parameters.session_id,
                  session->security_parameters.session_id_size);
 
   BUFFER_APPEND_NUM (ps, session->security_parameters.max_record_send_size);
   BUFFER_APPEND_NUM (ps, session->security_parameters.max_record_recv_size);
-  BUFFER_APPEND_NUM (ps, session->security_parameters.new_record_padding);
+  BUFFER_APPEND (ps, &session->security_parameters.new_record_padding, 1);
   BUFFER_APPEND_NUM (ps, session->security_parameters.ecc_curve);
 
   _gnutls_write_uint32 (ps->length - cur_size, ps->data + size_offset);
@@ -842,9 +843,8 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_POP (ps,
               session->internals.resumed_security_parameters.server_random,
               GNUTLS_RANDOM_SIZE);
-  BUFFER_POP_NUM (ps,
-                  session->internals.
-                  resumed_security_parameters.session_id_size);
+  BUFFER_POP (ps, &session->internals.
+                  resumed_security_parameters.session_id_size, 1);
 
   BUFFER_POP (ps, session->internals.resumed_security_parameters.session_id,
               session->internals.resumed_security_parameters.session_id_size);
@@ -856,8 +856,7 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
                   session->internals.
                   resumed_security_parameters.max_record_recv_size);
 
-  BUFFER_POP_NUM (ps,
-                  session->internals.resumed_security_parameters.new_record_padding);
+  BUFFER_POP (ps, &session->internals.resumed_security_parameters.new_record_padding, 1);
 
   BUFFER_POP_NUM (ps,
                   session->internals.resumed_security_parameters.ecc_curve);
@@ -942,7 +941,7 @@ gnutls_session_set_premaster (gnutls_session_t session, unsigned int entity,
   session->internals.resumed_security_parameters.max_record_send_size = 
   session->internals.resumed_security_parameters.max_record_recv_size = DEFAULT_MAX_RECORD_SIZE;
 
-  session->internals.resumed_security_parameters.timestamp = time(0);
+  session->internals.resumed_security_parameters.timestamp = gnutls_time(0);
 
   session->internals.resumed_security_parameters.ecc_curve = GNUTLS_ECC_CURVE_INVALID;
 

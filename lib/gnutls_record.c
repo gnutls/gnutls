@@ -500,6 +500,9 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
     }
   else
     send_data_size = data_size;
+  
+  if (unlikely(send_data_size == 0))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   /* Only encrypt if we don't have data to send 
    * from the previous run. - probably interrupted.
