@@ -483,7 +483,6 @@ gnutls_deinit (gnutls_session_t session)
 
   _gnutls_mpi_release (&session->key.dh_secret);
 
-  memset (session, 0, sizeof (struct gnutls_session_int));
   gnutls_free (session);
 }
 
