@@ -892,6 +892,7 @@ GNUTLS_3_1_0 {
 	gnutls_transport_set_int2;
 	gnutls_transport_get_int2;
 	gnutls_transport_get_int;
+	gnutls_pkcs11_privkey_status;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
