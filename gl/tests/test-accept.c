@@ -1,5 +1,5 @@
 /* Test accepting a connection to a server socket.
-   Copyright (C) 2011-2012 Free Software Foundation, Inc.
+   Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ SIGNATURE_CHECK (accept, int, (int, struct sockaddr *, socklen_t *));
 
 #include <errno.h>
 #include <netinet/in.h>
+#include <unistd.h>
 
 #include "sockets.h"
 #include "macros.h"
@@ -45,6 +46,7 @@ main (void)
     struct sockaddr_in addr;
     socklen_t addrlen = sizeof (addr);
 
+    close (99);
     errno = 0;
     ASSERT (accept (99, (struct sockaddr *) &addr, &addrlen) == -1);
     ASSERT (errno == EBADF);

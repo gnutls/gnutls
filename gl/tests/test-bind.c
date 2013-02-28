@@ -1,5 +1,5 @@
 /* Test binding a server socket to a port.
-   Copyright (C) 2011-2012 Free Software Foundation, Inc.
+   Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ SIGNATURE_CHECK (bind, int, (int, const struct sockaddr *, socklen_t));
 #include <errno.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #include "sockets.h"
 #include "macros.h"
@@ -46,6 +47,7 @@ main (void)
       ASSERT (errno == EBADF);
     }
     {
+      close (99);
       errno = 0;
       ASSERT (bind (99, (const struct sockaddr *) &addr, sizeof (addr)) == -1);
       ASSERT (errno == EBADF);

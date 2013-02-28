@@ -2,7 +2,7 @@
 # This Makefile fragment tries to be general-purpose enough to be
 # used by many projects via the gnulib maintainer-makefile module.
 
-## Copyright (C) 2001-2012 Free Software Foundation, Inc.
+## Copyright (C) 2001-2013 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -1370,7 +1370,8 @@ endef
 
 .PHONY: no-submodule-changes
 no-submodule-changes:
-	$(AM_V_GEN)if test -d $(srcdir)/.git; then			\
+	$(AM_V_GEN)if test -d $(srcdir)/.git				\
+		&& git --version >/dev/null 2>&1; then			\
 	  diff=$$(cd $(srcdir) && git submodule -q foreach		\
 		  git diff-index --name-only HEAD)			\
 	    || exit 1;							\
@@ -1388,7 +1389,8 @@ submodule-checks ?= no-submodule-changes public-submodule-commit
 # cannot be built from a fresh clone.
 .PHONY: public-submodule-commit
 public-submodule-commit:
-	$(AM_V_GEN)if test -d $(srcdir)/.git; then			\
+	$(AM_V_GEN)if test -d $(srcdir)/.git				\
+		&& git --version >/dev/null 2>&1; then			\
 	  cd $(srcdir) &&						\
 	  git submodule --quiet foreach					\
 	      test '"$$(git rev-parse "$$sha1")"'			\

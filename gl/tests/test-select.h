@@ -1,5 +1,5 @@
 /* Test of select() substitute.
-   Copyright (C) 2008-2012 Free Software Foundation, Inc.
+   Copyright (C) 2008-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -297,6 +297,7 @@ test_bad_fd (select_fn my_select)
 # else
   fd = 99;
 # endif
+  close (fd);
 
   if (do_select_bad_fd_nowait (fd, SEL_IN, my_select) == 0 || errno != EBADF)
     failed ("invalid fd among rfds");

@@ -1,5 +1,5 @@
 /* Test opening a stream with a file descriptor.
-   Copyright (C) 2011-2012 Free Software Foundation, Inc.
+   Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 SIGNATURE_CHECK (fdopen, FILE *, (int, const char *));
 
 #include <errno.h>
+#include <unistd.h>
 
 #include "macros.h"
 
@@ -42,6 +43,7 @@ main (void)
   {
     FILE *fp;
 
+    close (99);
     errno = 0;
     fp = fdopen (99, "r");
     if (fp == NULL)
