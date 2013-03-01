@@ -123,6 +123,21 @@ const char* dane_match_type_name(dane_match_type_t type);
 const char* dane_cert_usage_name(dane_cert_usage_t usage);
 
 /**
+ * dane_verify_flags_t:
+ * @DANE_VFLAG_FAIL_IF_NOT_CHECKED: If irrelevant to this certificate DANE entries are received fail instead of succeeding.
+ * @DANE_VFLAG_CHECK_EE_USAGE: The provided certificates will be verified only against any EE field. Combine with %DANE_VFLAG_FAIL_IF_NOT_CHECKED to fail if EE entries are not present.
+ * @DANE_VFLAG_CHECK_CA_USAGE: The provided certificates will be verified only against any CA field. Combine with %DANE_VFLAG_FAIL_IF_NOT_CHECKED to fail if CA entries are not present.
+ *
+ * Enumeration of different verification status flags.
+ */
+typedef enum dane_verify_flags_t 
+{
+  DANE_VFLAG_FAIL_IF_NOT_CHECKED = 1,
+  DANE_VFLAG_ONLY_CHECK_EE_USAGE = 1<<1,
+  DANE_VFLAG_ONLY_CHECK_CA_USAGE = 1<<2,
+} dane_verify_flags_t;
+
+/**
  * dane_verify_status_t:
  * @DANE_VERIFY_CA_CONSTRAINS_VIOLATED: The CA constrains was violated.
  * @DANE_VERIFY_CERT_DIFFERS: The certificate obtained via DNS differs.

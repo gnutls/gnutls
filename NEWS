@@ -2,6 +2,14 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.10 (unreleased)
+
+** libgnutls-dane: Updated DANE verification options.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.9 (released 2013-02-27)
 
 ** certtool: Option --to-p12 will now ask for a password to generate

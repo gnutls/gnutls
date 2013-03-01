@@ -43,7 +43,19 @@ flag = {
     name      = check;
     arg-type  = string;
     descrip   = "Check a host's DANE TLSA entry.";
-    doc = "Obtains the DANE TLSA entry from the given hostname and prints information.";
+    doc = "Obtains the DANE TLSA entry from the given hostname and prints information. Note that the actual certificate of the host has to be provided using --load-certificate.";
+};
+
+flag = {
+    name      = check-ee;
+    descrip   = "Check only the end-entity's certificate.";
+    doc = "Checks the end-entity's certificate only. Trust anchors or CAs are not considered.";
+};
+
+flag = {
+    name      = check-ca;
+    descrip   = "Check only the CA's certificate.";
+    doc = "Checks the trust anchor's and CA's certificate only. End-entities are not considered.";
 };
 
 flag = {

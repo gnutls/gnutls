@@ -86,6 +86,10 @@ nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom
 
 TESTS = eagain testsrn testcompat chain invalid-cert
 
+if ENABLE_DANE
+TESTS += testdane
+endif
+
 if !MACOSX
 noinst_LTLIBRARIES = libecore.la
 

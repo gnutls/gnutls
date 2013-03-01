@@ -187,18 +187,25 @@ static void dane_check(const char* host, const char* proto, unsigned int port,
 #ifdef HAVE_DANE
 dane_state_t s;
 dane_query_t q;
-int ret;
+int ret, retcode = 0;
 unsigned entries;
 unsigned int flags = DANE_F_IGNORE_LOCAL_RESOLVER, i;
 unsigned int usage, type, match;
 gnutls_datum_t data, file;
 size_t size;
+unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
 
   if (ENABLED_OPT(LOCAL_DNS))
     flags = 0;
 
   if (HAVE_OPT(INSECURE))
     flags |= DANE_F_INSECURE;
+
+  if (HAVE_OPT(CHECK_EE))
+    vflags |= DANE_VFLAG_ONLY_CHECK_EE_USAGE;
+
+  if (HAVE_OPT(CHECK_CA))
+    vflags |= DANE_VFLAG_ONLY_CHECK_CA_USAGE;
 
   printf("Querying %s (%s:%d)...\n", host, proto, port);
   ret = dane_state_init(&s, flags);
@@ -265,7 +272,7 @@ size_t size;
                 }
 
               ret = dane_verify_crt( s, certs, clist_size, GNUTLS_CRT_X509, 
-                                     host, proto, port, 0, 0, &status);
+                                     host, proto, port, 0, vflags, &status);
               if (ret < 0)
                 error (EXIT_FAILURE, 0, "dane_verify_crt: %s", dane_strerror (ret));
                 
@@ -275,6 +282,8 @@ size_t size;
               
               printf("\nVerification: %s\n", out.data);
               gnutls_free(out.data);
+              
+              if (status != 0) retcode = 1;
 
               for (i=0;i<clist_size;i++)
                 {
@@ -289,6 +298,8 @@ size_t size;
 
   dane_query_deinit(q);
   dane_state_deinit(s);
+  
+  exit(retcode);
 #else
   fprintf(stderr, "This functionality was disabled (GnuTLS was not compiled with support for DANE).\n");
   return;

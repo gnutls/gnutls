@@ -545,7 +545,7 @@ cleanup:
  * @proto: The protocol of the service connecting (e.g. tcp)
  * @port: The port of the service connecting (e.g. 443)
  * @sflags: Flags for the the initialization of @s (if NULL)
- * @vflags: Verification flags; should be zero
+ * @vflags: Verification flags; an OR'ed list of %dane_verify_flags_t.
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
  * This function will verify the given certificate chain against the
@@ -578,6 +578,7 @@ int dane_verify_crt (dane_state_t s,
 dane_state_t _s = NULL;
 dane_query_t r = NULL;
 int ret;
+unsigned checked = 0;
 unsigned int usage, type, match, idx;
 gnutls_datum_t data;
 	
@@ -611,24 +612,28 @@ gnutls_datum_t data;
 			gnutls_assert();
 			goto cleanup;
 		}
-	
-		if (usage == DANE_CERT_USAGE_LOCAL_CA || usage == DANE_CERT_USAGE_CA) {
+		
+		if (!(vflags & DANE_VFLAG_ONLY_CHECK_EE_USAGE) && (usage == DANE_CERT_USAGE_LOCAL_CA || usage == DANE_CERT_USAGE_CA)) {
 			ret = verify_ca(chain, chain_size, chain_type, type, match, &data, verify);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
                         }
-		
-		} else if (usage == DANE_CERT_USAGE_LOCAL_EE || usage == DANE_CERT_USAGE_EE) {
+                        checked = 1;
+		} else if (!(vflags & DANE_VFLAG_ONLY_CHECK_CA_USAGE) && (usage == DANE_CERT_USAGE_LOCAL_EE || usage == DANE_CERT_USAGE_EE)) {
 			ret = verify_ee(&chain[0], chain_type, type, match, &data, verify);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
                         }
+                        checked = 1;
 		}
 	} while(1);
 
-	ret = 0;
+	if ((vflags & DANE_VFLAG_FAIL_IF_NOT_CHECKED) && checked == 0)
+		ret = gnutls_assert_val(DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
+	else
+		ret = 0;
 
 cleanup:
 	if (s == NULL) dane_state_deinit(_s);

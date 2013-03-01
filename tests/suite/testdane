@@ -1,0 +1,71 @@
+#!/bin/sh
+
+# Copyright (C) 2013 Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+srcdir="${srcdir:-.}"
+CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
+DANETOOL="${DANETOOL:-../../src/danetool$EXEEXT}"
+unset RETCODE
+
+if test "${WINDIR}" != "";then
+  exit 77
+fi 
+
+. $srcdir/../scripts/common.sh
+
+# Not ok
+HOSTS="bad-hash.dane.verisignlabs.com dane-broken.rd.nic.fr bad-params.dane.verisignlabs.com"
+HOSTS="$HOSTS bad-sig.dane.verisignlabs.com"
+for i in $HOSTS;do
+rm -f tmp
+$CLI $i -p 443 --print-cert --insecure >tmp 2>&1 </dev/null
+if [ $? != 0 ];then
+	echo "Error connecting to $i"
+	exit 1
+fi
+
+$DANETOOL --load-certificate tmp --check $i >/dev/null 2>&1
+if [ $? = 0 ];then
+	echo "Checking $i should have failed"
+	exit 1
+fi
+done
+
+# Fine hosts
+
+HOSTS="torproject.org jhcloos.com good.dane.verisignlabs.com \
+www.kumari.net"
+HOSTS="$HOSTS nohats.ca dane.nox.su"
+for i in $HOSTS;do
+rm -f tmp
+$CLI $i -p 443 --print-cert --insecure >tmp 2>&1 </dev/null
+if [ $? != 0 ];then
+	echo "Error connecting to $i"
+	exit 1
+fi
+
+$DANETOOL --load-certificate tmp --check $i >/dev/null 2>&1
+if [ $? != 0 ];then
+	echo "Error checking $i"
+	exit 1
+fi
+done
+
+
+exit 0
