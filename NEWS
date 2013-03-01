@@ -4,6 +4,10 @@ See the end for copying conditions.
 
 * Version 3.0.29 (unreleased)
 
+** certtool: When generating PKCS #12 files use by default the 
+ARCFOUR (RC4) cipher to be compatible with devices that don't
+support AES with PKCS #12.
+
 ** libgnutls: Corrected issue in gnutls_pubkey_verify_data().
 
 ** libgnutls: gnutls_pkcs11_reinit() will reinitialize all PKCS #11
