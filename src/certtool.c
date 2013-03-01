@@ -139,7 +139,7 @@ cipher_to_flags (const char *cipher)
 {
   if (cipher == NULL)
     {
-      return GNUTLS_PKCS_USE_PBES2_AES_128;
+      return GNUTLS_PKCS_USE_PKCS12_ARCFOUR;
     }
   else if (strcasecmp (cipher, "3des") == 0)
     {
