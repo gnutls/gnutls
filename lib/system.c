@@ -383,36 +383,10 @@ const char *home_dir = getenv ("HOME");
   return 0;
 }
 
-/**
- * gnutls_x509_trust_list_add_system_trust:
- * @list: The structure of the list
- * @tl_flags: GNUTLS_TL_*
- * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
- *
- * This function adds the system's default trusted certificate
- * authorities to the trusted list. Note that on unsupported system
- * this function returns %GNUTLS_E_UNIMPLEMENTED_FEATURE.
- *
- * Returns: The number of added elements or a negative error code on error.
- *
- * Since: 3.1
- **/
-int
-gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
-                                        unsigned int tl_flags, unsigned int tl_vflags)
+#ifdef _WIN32
+static
+int add_win32_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
 {
-#if !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE) && !defined(_WIN32)
-  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-#else
-  int ret, r = 0;
-  const char* crl_file = 
-# ifdef DEFAULT_CRL_FILE
-  DEFAULT_CRL_FILE;
-# else
-  NULL;
-# endif
-
-# ifdef _WIN32
   unsigned int i;
 
   for (i=0;i<2;i++)
@@ -454,23 +428,57 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
       }
     CertCloseStore(store, 0);
   }
-# endif
+}
+#endif
 
-# if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
+/**
+ * gnutls_x509_trust_list_add_system_trust:
+ * @list: The structure of the list
+ * @tl_flags: GNUTLS_TL_*
+ * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
+ *
+ * This function adds the system's default trusted certificate
+ * authorities to the trusted list. Note that on unsupported system
+ * this function returns %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Returns: The number of added elements or a negative error code on error.
+ *
+ * Since: 3.1
+ **/
+int
+gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
+                                        unsigned int tl_flags, unsigned int tl_vflags)
+{
+#if defined(_WIN32)
+  return add_win32_system_trust(list, tl_flags, tl_vflags);
+#else
+
+# if !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+# else
+  int ret, r = 0;
+  const char* crl_file = 
+#  ifdef DEFAULT_CRL_FILE
+  DEFAULT_CRL_FILE;
+#  else
+  NULL;
+#  endif
+
+#  if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
   ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_PKCS11, crl_file, 
                                               GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
   if (ret > 0)
     r += ret;
-# endif
+#  endif
 
-# ifdef DEFAULT_TRUST_STORE_FILE
+#  ifdef DEFAULT_TRUST_STORE_FILE
   ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_FILE, crl_file, 
                                               GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
   if (ret > 0)
     r += ret;
-# endif
+#  endif
   return r;
-#endif
+# endif
 }
 
 #if defined(HAVE_ICONV)
