@@ -388,6 +388,7 @@ static
 int add_win32_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
 {
   unsigned int i;
+  int r = 0;
 
   for (i=0;i<2;i++)
   {
@@ -428,6 +429,8 @@ int add_win32_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
       }
     CertCloseStore(store, 0);
   }
+  
+  return r;
 }
 #endif
 
@@ -449,36 +452,37 @@ int
 gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
                                         unsigned int tl_flags, unsigned int tl_vflags)
 {
-#if defined(_WIN32)
-  return add_win32_system_trust(list, tl_flags, tl_vflags);
-#else
-
-# if !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
-  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-# else
   int ret, r = 0;
   const char* crl_file = 
-#  ifdef DEFAULT_CRL_FILE
+# ifdef DEFAULT_CRL_FILE
   DEFAULT_CRL_FILE;
-#  else
+# else
   NULL;
-#  endif
+# endif
 
-#  if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
+# if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
   ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_PKCS11, crl_file, 
                                               GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
   if (ret > 0)
     r += ret;
-#  endif
+# endif
 
-#  ifdef DEFAULT_TRUST_STORE_FILE
+# ifdef DEFAULT_TRUST_STORE_FILE
   ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_FILE, crl_file, 
                                               GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
   if (ret > 0)
     r += ret;
-#  endif
-  return r;
 # endif
+
+#if defined(_WIN32)
+  ret = add_win32_system_trust(list, tl_flags, tl_vflags);
+  if (ret > 0)
+    r += ret;
+#elif !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
+  r = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+#endif
+
+  return r;
 }
 
 #if defined(HAVE_ICONV)
