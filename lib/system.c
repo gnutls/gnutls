@@ -434,6 +434,54 @@ int add_win32_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 }
 #endif
 
+#ifdef ANDROID
+# include <dirent.h>
+
+static int load_dir_certs(const char* dirname, gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
+{
+DIR * dirp;
+struct dirent *d;
+int ret;
+int r = 0;
+
+  dirp = opendir(dirname);
+  if (dirp != NULL) 
+    {
+      do
+        {
+      	  d = readdir(dirp);
+      	  if (d != NULL && d->d_type == DT_REG) {
+      	  	ret = gnutls_x509_trust_list_add_trust_file(list, d->d_name, NULL, GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
+      	  	if (ret >= 0)
+      	  	  r += ret;
+      	  }
+      	}
+      while(d != NULL);
+      closedir(dirp);
+    }
+    
+  return r;
+}
+
+/* This works on android 4.x 
+ */
+static
+int add_android_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
+{
+  int r = 0, ret;
+
+  ret = load_dir_certs("/system/etc/security/cacerts/", list, tl_flags, tl_vflags);
+  if (ret >= 0)
+    r += ret;
+
+  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", list, tl_flags, tl_vflags);
+  if (ret >= 0)
+    r += ret;
+  
+  return r;
+}
+#endif
+
 /**
  * gnutls_x509_trust_list_add_system_trust:
  * @list: The structure of the list
@@ -476,6 +524,10 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
 
 #if defined(_WIN32)
   ret = add_win32_system_trust(list, tl_flags, tl_vflags);
+  if (ret > 0)
+    r += ret;
+#elif defined(ANDROID)
+  ret = add_android_system_trust(list, tl_flags, tl_vflags);
   if (ret > 0)
     r += ret;
 #elif !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
