@@ -29,6 +29,8 @@
 #include <sys/types.h>
 #include <c-ctype.h>
 
+#define GNUTLS_PATH_MAX 1024
+
 #ifdef _WIN32
 # include <windows.h>
 # include <wincrypt.h>
@@ -328,7 +330,7 @@ gnutls_system_global_deinit ()
  */
 int _gnutls_find_config_path(char* path, size_t max_size)
 {
-char tmp_home_dir[1024];
+char tmp_home_dir[GNUTLS_PATH_MAX];
 const char *home_dir = getenv ("HOME");
 
 #ifdef _WIN32
@@ -387,6 +389,7 @@ const char *home_dir = getenv ("HOME");
 static
 int add_win32_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
 {
+  char path[GNUTLS_PATH_MAX];
   unsigned int i;
   int r = 0;
 
@@ -443,6 +446,7 @@ DIR * dirp;
 struct dirent *d;
 int ret;
 int r = 0;
+char path[GNUTLS_PATH_MAX];
 
   dirp = opendir(dirname);
   if (dirp != NULL) 
@@ -451,7 +455,8 @@ int r = 0;
         {
       	  d = readdir(dirp);
       	  if (d != NULL && d->d_type == DT_REG) {
-      	  	ret = gnutls_x509_trust_list_add_trust_file(list, d->d_name, NULL, GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
+      	  	snprintf(path, sizeof(path), "%s/%s", dirname, d->d_name);
+      	  	ret = gnutls_x509_trust_list_add_trust_file(list, path, NULL, GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
       	  	if (ret >= 0)
       	  	  r += ret;
       	  }
