@@ -39,12 +39,16 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../extra/includes	\
 	$(LIBOPTS_CFLAGS)
 
-bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug certtool
+bin_PROGRAMS = psktool gnutls-cli-debug certtool
 if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif
+
 if ENABLE_OCSP
-bin_PROGRAMS += ocsptool
+bin_PROGRAMS += ocsptool gnutls-serv 
+if ENABLE_ANON
+bin_PROGRAMS += gnutls-cli
+endif
 endif
 
 bin_PROGRAMS += danetool
@@ -58,6 +62,34 @@ bin_PROGRAMS += p11tool
 endif
 
 noinst_LTLIBRARIES =
+
+
+if ENABLE_SRP
+srptool_SOURCES = srptool.c
+srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la ../gl/libgnu.la 
+srptool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+noinst_LTLIBRARIES += libcmd-srp.la
+libcmd_srp_la_CFLAGS =
+libcmd_srp_la_SOURCES = srptool-args.def srptool-args.c srptool-args.h
+endif
+
+psktool_SOURCES = psk.c
+psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la ../gl/libgnu.la 
+psktool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+noinst_LTLIBRARIES += libcmd-psk.la
+libcmd_psk_la_CFLAGS = 
+libcmd_psk_la_SOURCES = psk-args.def psk-args.c psk-args.h
+
+
+if ENABLE_OCSP
+
+ocsptool_SOURCES = ocsptool.c ocsptool-common.h ocsptool-common.c \
+	socket.c socket.h
+ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la 
+ocsptool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL) $(GETADDRINFO_LIB)
+noinst_LTLIBRARIES += libcmd-ocsp.la
+libcmd_ocsp_la_CFLAGS =
+libcmd_ocsp_la_SOURCES = ocsptool-args.def ocsptool-args.h ocsptool-args.c
 
 gnutls_serv_SOURCES =		\
   list.h serv.c			\
@@ -73,31 +105,7 @@ noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_CFLAGS =
 libcmd_serv_la_SOURCES = serv-args.def serv-args.c serv-args.h
 
-if ENABLE_SRP
-srptool_SOURCES = srptool.c
-srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la ../gl/libgnu.la 
-srptool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
-noinst_LTLIBRARIES += libcmd-srp.la
-libcmd_srp_la_CFLAGS =
-libcmd_srp_la_SOURCES = srptool-args.def srptool-args.c srptool-args.h
-endif
-
-if ENABLE_OCSP
-ocsptool_SOURCES = ocsptool.c ocsptool-common.h ocsptool-common.c \
-	socket.c socket.h
-ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la 
-ocsptool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL) $(GETADDRINFO_LIB)
-noinst_LTLIBRARIES += libcmd-ocsp.la
-libcmd_ocsp_la_CFLAGS =
-libcmd_ocsp_la_SOURCES = ocsptool-args.def ocsptool-args.h ocsptool-args.c
-endif
-
-psktool_SOURCES = psk.c
-psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la ../gl/libgnu.la 
-psktool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
-noinst_LTLIBRARIES += libcmd-psk.la
-libcmd_psk_la_CFLAGS = 
-libcmd_psk_la_SOURCES = psk-args.def psk-args.c psk-args.h
+if ENABLE_ANON
 
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
@@ -114,6 +122,8 @@ gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME) \
 noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS = 
 libcmd_cli_la_SOURCES = cli-args.def cli-args.c cli-args.h
+endif
+endif
 
 gnutls_cli_debug_SOURCES = cli-debug.c tests.h tests.c \
 		socket.c socket.h common.h common.c

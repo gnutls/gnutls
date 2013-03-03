@@ -87,7 +87,7 @@ check_bits (gnutls_session_t session, gnutls_x509_crt_t crt, unsigned int max_bi
 
 /* three days */
 #define MAX_OCSP_VALIDITY_SECS (3*60*60*24)
-
+#ifdef ENABLE_OCSP
 /* If the certificate is revoked status will be GNUTLS_CERT_REVOKED.
  * 
  * Returns:
@@ -198,6 +198,7 @@ cleanup:
   return ret;
 }
 
+#endif
 
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) { \
 	if (peer_certificate_list[x]) \
@@ -321,12 +322,14 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
         }
     }
 
+#ifdef ENABLE_OCSP
   ret = check_ocsp_response(session, peer_certificate_list[0], issuer, &resp, &ocsp_status);
   if (ret < 0)
     {
       CLEAR_CERTS;
       return gnutls_assert_val(ret);
     }
+#endif
 
 skip_ocsp:
   /* Verify certificate 
