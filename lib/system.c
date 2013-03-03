@@ -385,9 +385,39 @@ const char *home_dir = getenv ("HOME");
   return 0;
 }
 
-#ifdef _WIN32
+#if defined(DEFAULT_TRUST_STORE_FILE) || (defined(DEFAULT_TRUST_STORE_PKCS11) && defined(ENABLE_PKCS11))
 static
-int add_win32_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
+int
+add_system_trust(gnutls_x509_trust_list_t list,
+                 unsigned int tl_flags, unsigned int tl_vflags)
+{
+  int ret, r = 0;
+  const char* crl_file = 
+# ifdef DEFAULT_CRL_FILE
+  DEFAULT_CRL_FILE;
+# else
+  NULL;
+# endif
+
+# if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
+  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_PKCS11, crl_file, 
+                                              GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
+  if (ret > 0)
+    r += ret;
+# endif
+
+# ifdef DEFAULT_TRUST_STORE_FILE
+  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_FILE, crl_file, 
+                                              GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
+  if (ret > 0)
+    r += ret;
+# endif
+
+  return r;
+}
+#elif defined(_WIN32)
+static
+int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
 {
   char path[GNUTLS_PATH_MAX];
   unsigned int i;
@@ -435,9 +465,7 @@ int add_win32_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
   
   return r;
 }
-#endif
-
-#ifdef ANDROID
+#elif defined(ANDROID)
 # include <dirent.h>
 
 static int load_dir_certs(const char* dirname, gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
@@ -471,7 +499,7 @@ char path[GNUTLS_PATH_MAX];
 /* This works on android 4.x 
  */
 static
-int add_android_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
+int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
 {
   int r = 0, ret;
 
@@ -485,6 +513,10 @@ int add_android_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flag
   
   return r;
 }
+#else
+
+#define add_android_system_trust(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
+
 #endif
 
 /**
@@ -505,41 +537,7 @@ int
 gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
                                         unsigned int tl_flags, unsigned int tl_vflags)
 {
-  int ret, r = 0;
-  const char* crl_file = 
-# ifdef DEFAULT_CRL_FILE
-  DEFAULT_CRL_FILE;
-# else
-  NULL;
-# endif
-
-# if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
-  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_PKCS11, crl_file, 
-                                              GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
-  if (ret > 0)
-    r += ret;
-# endif
-
-# ifdef DEFAULT_TRUST_STORE_FILE
-  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_FILE, crl_file, 
-                                              GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
-  if (ret > 0)
-    r += ret;
-# endif
-
-#if defined(_WIN32)
-  ret = add_win32_system_trust(list, tl_flags, tl_vflags);
-  if (ret > 0)
-    r += ret;
-#elif defined(ANDROID)
-  ret = add_android_system_trust(list, tl_flags, tl_vflags);
-  if (ret > 0)
-    r += ret;
-#elif !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
-  r = GNUTLS_E_UNIMPLEMENTED_FEATURE;
-#endif
-
-  return r;
+  return add_system_trust(list, tl_flags, tl_vflags);
 }
 
 #if defined(HAVE_ICONV)
