@@ -506,6 +506,7 @@ ENUMS += enums/dane_cert_usage_t
 ENUMS += enums/dane_match_type_t
 ENUMS += enums/dane_query_status_t
 ENUMS += enums/dane_state_flags_t
+ENUMS += enums/dane_verify_flags_t
 ENUMS += enums/dane_verify_status_t
 ENUMS += enums/gnutls_alert_description_t
 ENUMS += enums/gnutls_alert_level_t
