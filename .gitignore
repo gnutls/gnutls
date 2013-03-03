@@ -8,6 +8,7 @@
 .libs
 ABOUT-NLS
 INSTALL
+ChangeLog
 Makefile
 Makefile.in
 TAGS
