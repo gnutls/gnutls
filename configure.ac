@@ -36,9 +36,10 @@ AC_MSG_RESULT([***
 dnl Checks for programs.
 AC_CANONICAL_TARGET
 AC_PROG_CC
+gl_EARLY
+
 AM_PROG_AS
 AC_PROG_CXX
-gl_EARLY
 
 # For includes/gnutls/gnutls.h.in.
 AC_SUBST(MAJOR_VERSION, `echo $PACKAGE_VERSION | sed 's/\(.*\)\..*\..*/\1/g'`)
