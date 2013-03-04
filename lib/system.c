@@ -465,7 +465,7 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
   
   return r;
 }
-#elif defined(ANDROID)
+#elif defined(ANDROID) || defined(__ANDROID__)
 # include <dirent.h>
 
 static int load_dir_certs(const char* dirname, gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
