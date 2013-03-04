@@ -1,6 +1,6 @@
 /* ioctl.c --- wrappers for Windows ioctl function
 
-   Copyright (C) 2008-2012 Free Software Foundation, Inc.
+   Copyright (C) 2008-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -53,8 +53,6 @@ rpl_ioctl (int fd, int request, ... /* {void *,char *} arg */)
 # include "fd-hook.h"
 /* Get _get_osfhandle.  */
 # include "msvc-nothrow.h"
-/* Get HANDLE */
-# include <windows.h>
 
 static int
 primary_ioctl (int fd, int request, void *arg)

@@ -1,6 +1,6 @@
 ## DO NOT EDIT! GENERATED AUTOMATICALLY!
 ## Process this file with automake to produce Makefile.in.
-# Copyright (C) 2002-2012 Free Software Foundation, Inc.
+# Copyright (C) 2002-2013 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ EXTRA_DIST += test-base64.c macros.h
 
 ## begin gnulib module binary-io
 
-libtests_a_SOURCES += binary-io.h
+libtests_a_SOURCES += binary-io.h binary-io.c
 
 ## end   gnulib module binary-io
 
@@ -166,15 +166,6 @@ check_PROGRAMS += test-dirent
 EXTRA_DIST += test-dirent.c
 
 ## end   gnulib module dirent-tests
-
-## begin gnulib module dup2
-
-
-EXTRA_DIST += dup2.c
-
-EXTRA_libtests_a_SOURCES += dup2.c
-
-## end   gnulib module dup2
 
 ## begin gnulib module dup2-tests
 

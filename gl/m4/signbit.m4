@@ -1,5 +1,5 @@
-# signbit.m4 serial 12
-dnl Copyright (C) 2007-2012 Free Software Foundation, Inc.
+# signbit.m4 serial 13
+dnl Copyright (C) 2007-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -170,7 +170,7 @@ double m0d = -p0d;
 /* On HP-UX 10.20, negating 0.0L does not yield -0.0L.
    So we use another constant expression instead.
    But that expression does not work on other platforms, such as when
-   cross-compiling to PowerPC on MacOS X 10.5.  */
+   cross-compiling to PowerPC on Mac OS X 10.5.  */
 long double p0l = 0.0L;
 #if defined __hpux || defined __sgi
 long double m0l = -LDBL_MIN * LDBL_MIN;

@@ -1,5 +1,5 @@
 /* ftruncate emulations for native Windows.
-   Copyright (C) 1992-2012 Free Software Foundation, Inc.
+   Copyright (C) 1992-2013 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ ftruncate (int fd, off_t length)
 
 #  if HAVE_MSVC_INVALID_PARAMETER_HANDLER
 #   include "msvc-inval.h"
-static inline int
+static int
 chsize_nothrow (int fd, long length)
 {
   int result;

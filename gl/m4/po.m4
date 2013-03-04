@@ -1,5 +1,5 @@
-# po.m4 serial 17b
-dnl Copyright (C) 1995-2012 Free Software Foundation, Inc.
+# po.m4 serial 17c
+dnl Copyright (C) 1995-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -24,7 +24,7 @@ AC_DEFUN([AM_PO_SUBDIRS],
 [
   AC_REQUIRE([AC_PROG_MAKE_SET])dnl
   AC_REQUIRE([AC_PROG_INSTALL])dnl
-  AC_REQUIRE([AM_PROG_MKDIR_P])dnl defined by automake
+  AC_REQUIRE([AC_PROG_MKDIR_P])dnl
   AC_REQUIRE([AM_NLS])dnl
 
   dnl Release version of the gettext macros. This is used to ensure that

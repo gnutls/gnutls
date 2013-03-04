@@ -1,5 +1,5 @@
-# timer_time.m4 serial 1
-dnl Copyright (C) 2011-2012 Free Software Foundation, Inc.
+# timer_time.m4 serial 2
+dnl Copyright (C) 2011-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -33,7 +33,7 @@ AC_DEFUN([gl_TIMER_TIME],
  #endif
 #endif
       ],
-      [LIB_TIMER_TIME="$LIBMULTITHREAD $LIB_TIMER_TIME"])
+      [LIB_TIMER_TIME="$LIB_TIMER_TIME $LIBMULTITHREAD"])
     AC_CHECK_FUNCS([timer_settime])
   LIBS=$gl_saved_libs
 ])

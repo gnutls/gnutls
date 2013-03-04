@@ -1,5 +1,5 @@
 /* Test of <time.h> substitute.
-   Copyright (C) 2007, 2009-2012 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 struct timespec t1;
 #if 0
 /* POSIX:2008 does not require pid_t in <time.h> unconditionally, and indeed
-   it's missing on MacOS X 10.5, FreeBSD 6.4, OpenBSD 4.9, mingw.  */
+   it's missing on Mac OS X 10.5, FreeBSD 6.4, OpenBSD 4.9, mingw.  */
 pid_t t2;
 #endif
 

@@ -1,5 +1,5 @@
 /* Get address information (partial implementation).
-   Copyright (C) 1997, 2001-2002, 2004-2012 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2001-2002, 2004-2013 Free Software Foundation, Inc.
    Contributed by Simon Josefsson <simon@josefsson.org>.
 
    This program is free software; you can redistribute it and/or modify
@@ -15,11 +15,11 @@
    You should have received a copy of the GNU General Public License
    along with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
-#include <config.h>
-
 /* Don't use __attribute__ __nonnull__ in this compilation unit.  Otherwise gcc
    optimizes away the sa == NULL test below.  */
 #define _GL_ARG_NONNULL(params)
+
+#include <config.h>
 
 #include <netdb.h>
 
@@ -109,7 +109,7 @@ use_win32_p (void)
 }
 #endif
 
-static inline bool
+static bool
 validate_family (int family)
 {
   /* FIXME: Support more families. */

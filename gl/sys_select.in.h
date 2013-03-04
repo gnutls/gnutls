@@ -1,5 +1,5 @@
 /* Substitute for <sys/select.h>.
-   Copyright (C) 2007-2012 Free Software Foundation, Inc.
+   Copyright (C) 2007-2013 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,14 +19,25 @@
 # endif
 @PRAGMA_COLUMNS@
 
-/* On OSF/1, <sys/types.h> and <sys/time.h> include <sys/select.h>.
+/* On OSF/1 and Solaris 2.6, <sys/types.h> and <sys/time.h>
+   both include <sys/select.h>.
    Simply delegate to the system's header in this case.  */
-#if @HAVE_SYS_SELECT_H@ && defined __osf__ && (defined _SYS_TYPES_H_ && !defined _GL_SYS_SELECT_H_REDIRECT_FROM_SYS_TYPES_H) && defined _OSF_SOURCE
+#if (@HAVE_SYS_SELECT_H@                                                \
+     && ((defined __osf__ && defined _SYS_TYPES_H_ && defined _OSF_SOURCE) \
+         || (defined __sun && defined _SYS_TYPES_H                      \
+             && (! (defined _XOPEN_SOURCE || defined _POSIX_C_SOURCE)   \
+                 || defined __EXTENSIONS__)))                           \
+     && !defined _GL_SYS_SELECT_H_REDIRECT_FROM_SYS_TYPES_H)
 
 # define _GL_SYS_SELECT_H_REDIRECT_FROM_SYS_TYPES_H
 # @INCLUDE_NEXT@ @NEXT_SYS_SELECT_H@
 
-#elif @HAVE_SYS_SELECT_H@ && defined __osf__ && (defined _SYS_TIME_H_ && !defined _GL_SYS_SELECT_H_REDIRECT_FROM_SYS_TIME_H) && defined _OSF_SOURCE
+#elif (@HAVE_SYS_SELECT_H@                                              \
+       && ((defined __osf__ && defined _SYS_TIME_H_ && defined _OSF_SOURCE) \
+           || (defined __sun && defined _SYS_TIME_H                     \
+               && (! (defined _XOPEN_SOURCE || defined _POSIX_C_SOURCE) \
+                   || defined __EXTENSIONS__)))                         \
+       && !defined _GL_SYS_SELECT_H_REDIRECT_FROM_SYS_TIME_H)
 
 # define _GL_SYS_SELECT_H_REDIRECT_FROM_SYS_TIME_H
 # @INCLUDE_NEXT@ @NEXT_SYS_SELECT_H@
@@ -63,7 +74,7 @@
 
 /* On OSF/1 4.0, <sys/select.h> provides only a forward declaration
    of 'struct timeval', and no definition of this type.
-   Also, MacOS X, AIX, HP-UX, IRIX, Solaris, Interix declare select()
+   Also, Mac OS X, AIX, HP-UX, IRIX, Solaris, Interix declare select()
    in <sys/time.h>.
    But avoid namespace pollution on glibc systems.  */
 # ifndef __GLIBC__
@@ -130,7 +141,7 @@
 
 /* Re-define FD_ISSET to avoid a WSA call while we are not using
    network sockets.  */
-static inline int
+static int
 rpl_fd_isset (SOCKET fd, fd_set * set)
 {
   u_int i;

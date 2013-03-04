@@ -1,5 +1,5 @@
 /* Word-wrapping and line-truncating streams.
-   Copyright (C) 1997, 2006-2012 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2006-2013 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Miles Bader <miles@gnu.ai.mit.edu>.
 
@@ -133,7 +133,7 @@ extern ssize_t argp_fmtstream_printf (argp_fmtstream_t __fs,
                                       const char *__fmt, ...)
      _GL_ATTRIBUTE_FORMAT ((printf, 2, 3));
 
-#if _LIBC || !defined __OPTIMIZE__
+#if _LIBC
 extern int __argp_fmtstream_putc (argp_fmtstream_t __fs, int __ch);
 extern int argp_fmtstream_putc (argp_fmtstream_t __fs, int __ch);
 
@@ -154,7 +154,7 @@ extern size_t argp_fmtstream_write (argp_fmtstream_t __fs,
 #define __argp_fmtstream_rmargin argp_fmtstream_rmargin
 #define __argp_fmtstream_wmargin argp_fmtstream_wmargin
 
-#if _LIBC || !defined __OPTIMIZE__
+#if _LIBC
 /* Set __FS's left margin to LMARGIN and return the old value.  */
 extern size_t argp_fmtstream_set_lmargin (argp_fmtstream_t __fs,
                                           size_t __lmargin);
@@ -184,7 +184,7 @@ extern void __argp_fmtstream_update (argp_fmtstream_t __fs);
 extern int _argp_fmtstream_ensure (argp_fmtstream_t __fs, size_t __amount);
 extern int __argp_fmtstream_ensure (argp_fmtstream_t __fs, size_t __amount);
 
-#ifdef __OPTIMIZE__
+#if !_LIBC || defined __OPTIMIZE__
 /* Inline versions of above routines.  */
 
 #if !_LIBC
@@ -197,6 +197,10 @@ extern int __argp_fmtstream_ensure (argp_fmtstream_t __fs, size_t __amount);
 #define __argp_fmtstream_point argp_fmtstream_point
 #define __argp_fmtstream_update _argp_fmtstream_update
 #define __argp_fmtstream_ensure _argp_fmtstream_ensure
+_GL_INLINE_HEADER_BEGIN
+#ifndef ARGP_FS_EI
+# define ARGP_FS_EI _GL_INLINE
+#endif
 #endif
 
 #ifndef ARGP_FS_EI
@@ -345,9 +349,10 @@ __argp_fmtstream_point (argp_fmtstream_t __fs)
 #undef __argp_fmtstream_point
 #undef __argp_fmtstream_update
 #undef __argp_fmtstream_ensure
+_GL_INLINE_HEADER_END
 #endif
 
-#endif /* __OPTIMIZE__ */
+#endif /* !_LIBC || __OPTIMIZE__ */
 
 #endif /* ARGP_FMTSTREAM_USE_LINEWRAP */
 

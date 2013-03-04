@@ -1,5 +1,5 @@
 /* Test duplicating file descriptors.
-   Copyright (C) 2009-2012 Free Software Foundation, Inc.
+   Copyright (C) 2009-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -122,6 +122,7 @@ main (void)
   errno = 0;
   ASSERT (dup2 (-1, fd) == -1);
   ASSERT (errno == EBADF);
+  close (99);
   errno = 0;
   ASSERT (dup2 (99, fd) == -1);
   ASSERT (errno == EBADF);

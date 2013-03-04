@@ -1,5 +1,5 @@
 # fcntl-o.m4 serial 4
-dnl Copyright (C) 2006, 2009-2012 Free Software Foundation, Inc.
+dnl Copyright (C) 2006, 2009-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -50,7 +50,18 @@ AC_DEFUN([gl_FCNTL_O_FLAGS],
             #if HAVE_SYMLINK
             {
               static char const sym[] = "conftest.sym";
-              if (symlink (".", sym) != 0)
+              if (symlink ("/dev/null", sym) != 0)
+                result |= 2;
+              else
+                {
+                  int fd = open (sym, O_WRONLY | O_NOFOLLOW | O_CREAT, 0);
+                  if (fd >= 0)
+                    {
+                      close (fd);
+                      result |= 4;
+                    }
+                }
+              if (unlink (sym) != 0 || symlink (".", sym) != 0)
                 result |= 2;
               else
                 {

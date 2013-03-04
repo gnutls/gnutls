@@ -1,8 +1,8 @@
-# serial 19
+# serial 20
 
 # See if we need to emulate a missing ftruncate function using chsize.
 
-# Copyright (C) 2000-2001, 2003-2007, 2009-2012 Free Software Foundation, Inc.
+# Copyright (C) 2000-2001, 2003-2007, 2009-2013 Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -36,6 +36,5 @@ AC_DEFUN([gl_FUNC_FTRUNCATE],
 # Prerequisites of lib/ftruncate.c.
 AC_DEFUN([gl_PREREQ_FTRUNCATE],
 [
-  AC_REQUIRE([AC_C_INLINE])
   AC_CHECK_FUNCS([chsize])
 ])

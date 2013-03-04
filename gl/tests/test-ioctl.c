@@ -1,5 +1,5 @@
 /* Test of ioctl() function.
-   Copyright (C) 2011-2012 Free Software Foundation, Inc.
+   Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 SIGNATURE_CHECK (ioctl, int, (int, int, ...));
 
 #include <errno.h>
+#include <unistd.h>
 
 #include "macros.h"
 
@@ -39,6 +40,7 @@ main (void)
   }
   {
     int value;
+    close (99);
     errno = 0;
     ASSERT (ioctl (99, FIONREAD, &value) == -1);
     ASSERT (errno == EBADF);

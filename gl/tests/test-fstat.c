@@ -1,5 +1,5 @@
 /* Tests of fstat() function.
-   Copyright (C) 2011-2012 Free Software Foundation, Inc.
+   Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 SIGNATURE_CHECK (fstat, int, (int, struct stat *));
 
 #include <errno.h>
+#include <unistd.h>
 
 #include "macros.h"
 
@@ -39,6 +40,7 @@ main (int argc, char *argv[])
   {
     struct stat statbuf;
 
+    close (99);
     errno = 0;
     ASSERT (fstat (99, &statbuf) == -1);
     ASSERT (errno == EBADF);

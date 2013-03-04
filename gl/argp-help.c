@@ -1,5 +1,5 @@
 /* Hierarchical argument parsing help output
-   Copyright (C) 1995-2005, 2007, 2009-2012 Free Software Foundation, Inc.
+   Copyright (C) 1995-2005, 2007, 2009-2013 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Miles Bader <miles@gnu.ai.mit.edu>.
 
@@ -29,6 +29,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <ctype.h>

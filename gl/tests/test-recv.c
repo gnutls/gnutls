@@ -1,5 +1,5 @@
 /* Test the recv() function.
-   Copyright (C) 2011-2012 Free Software Foundation, Inc.
+   Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 SIGNATURE_CHECK (recv, ssize_t, (int, void *, size_t, int));
 
 #include <errno.h>
+#include <unistd.h>
 
 #include "sockets.h"
 #include "macros.h"
@@ -40,6 +41,7 @@ main (void)
   }
   {
     char byte;
+    close (99);
     errno = 0;
     ASSERT (recv (99, &byte, 1, 0) == -1);
     ASSERT (errno == EBADF);

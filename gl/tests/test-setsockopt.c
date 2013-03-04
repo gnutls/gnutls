@@ -1,5 +1,5 @@
 /* Test setsockopt() function.
-   Copyright (C) 2011-2012 Free Software Foundation, Inc.
+   Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 SIGNATURE_CHECK (setsockopt, int, (int, int, int, const void *, socklen_t));
 
 #include <errno.h>
+#include <unistd.h>
 
 #include "sockets.h"
 #include "macros.h"
@@ -43,6 +44,7 @@ main (void)
   {
     int value = 1;
 
+    close (99);
     errno = 0;
     ASSERT (setsockopt (99, SOL_SOCKET, SO_REUSEADDR, &value, sizeof (value))
             == -1);

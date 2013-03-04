@@ -1,5 +1,5 @@
 /* Safe automatic memory allocation.
-   Copyright (C) 2003-2007, 2009-2012 Free Software Foundation, Inc.
+   Copyright (C) 2003-2007, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ extern "C" {
    and a page size can be as small as 4096 bytes.  So we cannot safely
    allocate anything larger than 4096 bytes.  Also care for the possibility
    of a few compiler-allocated temporary stack slots.
-   This must be a macro, not an inline function.  */
+   This must be a macro, not a function.  */
 # define safe_alloca(N) ((N) < 4032 ? alloca (N) : NULL)
 #else
 # define safe_alloca(N) ((void) (N), NULL)

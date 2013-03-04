@@ -1,6 +1,6 @@
 /* Provide a sys/socket header file for systems lacking it (read: MinGW)
    and for systems where it is incomplete.
-   Copyright (C) 2005-2012 Free Software Foundation, Inc.
+   Copyright (C) 2005-2013 Free Software Foundation, Inc.
    Written by Simon Josefsson.
 
    This program is free software; you can redistribute it and/or modify
@@ -62,6 +62,11 @@
 
 #ifndef _@GUARD_PREFIX@_SYS_SOCKET_H
 #define _@GUARD_PREFIX@_SYS_SOCKET_H
+
+_GL_INLINE_HEADER_BEGIN
+#ifndef _GL_SYS_SOCKET_INLINE
+# define _GL_SYS_SOCKET_INLINE _GL_INLINE
+#endif
 
 /* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */
 
@@ -201,7 +206,7 @@ struct msghdr {
 
 /* Re-define FD_ISSET to avoid a WSA call while we are not using
    network sockets.  */
-static inline int
+_GL_SYS_SOCKET_INLINE int
 rpl_fd_isset (SOCKET fd, fd_set * set)
 {
   u_int i;
@@ -676,6 +681,8 @@ _GL_WARN_ON_USE (accept4, "accept4 is unportable - "
                  "use gnulib module accept4 for portability");
 # endif
 #endif
+
+_GL_INLINE_HEADER_END
 
 #endif /* _@GUARD_PREFIX@_SYS_SOCKET_H */
 #endif /* _@GUARD_PREFIX@_SYS_SOCKET_H */

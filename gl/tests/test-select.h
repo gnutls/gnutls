@@ -1,5 +1,5 @@
 /* Test of select() substitute.
-   Copyright (C) 2008-2012 Free Software Foundation, Inc.
+   Copyright (C) 2008-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -84,6 +84,9 @@ open_server_socket (void)
 
   s = socket (AF_INET, SOCK_STREAM, 0);
 
+  x = 1;
+  setsockopt (s, SOL_SOCKET, SO_REUSEPORT, &x, sizeof (x));
+
   memset (&ia, 0, sizeof (ia));
   ia.sin_family = AF_INET;
   inet_pton (AF_INET, "127.0.0.1", &ia.sin_addr);
@@ -93,9 +96,6 @@ open_server_socket (void)
       perror ("bind");
       exit (77);
     }
-
-  x = 1;
-  setsockopt (s, SOL_SOCKET, SO_REUSEPORT, &x, sizeof (x));
 
   if (listen (s, 1) < 0)
     {
@@ -227,6 +227,29 @@ test_tty (select_fn my_select)
 #endif
 
 
+static int
+do_select_bad_nfd_nowait (int nfd, select_fn my_select)
+{
+  struct timeval tv0;
+  tv0.tv_sec = 0;
+  tv0.tv_usec = 0;
+  errno = 0;
+  return my_select (nfd, NULL, NULL, NULL, &tv0);
+}
+
+static void
+test_bad_nfd (select_fn my_select)
+{
+  if (do_select_bad_nfd_nowait (-1, my_select) != -1 || errno != EINVAL)
+    failed ("invalid errno after negative nfds");
+  /* Can't test FD_SETSIZE + 1 for EINVAL, since some systems allow
+     dynamically larger set size by redefining FD_SETSIZE anywhere up
+     to the actual maximum fd.  */
+  /* if (do_select_bad_nfd_nowait (FD_SETSIZE + 1, my_select) != -1 */
+  /*     || errno != EINVAL) */
+  /*   failed ("invalid errno after bogus nfds"); */
+}
+
 /* Test select(2) on invalid file descriptors.  */
 
 static int
@@ -243,6 +266,7 @@ do_select_bad_fd (int fd, int ev, struct timeval *timeout, select_fn my_select)
     FD_SET (fd, &wfds);
   if (ev & SEL_EXC)
     FD_SET (fd, &xfds);
+  errno = 0;
   return my_select (fd + 1, &rfds, &wfds, &xfds, timeout);
   /* In this case, when fd is invalid, on some platforms, the bit for fd
      is left alone in the fd_set, whereas on other platforms it is cleared.
@@ -265,7 +289,7 @@ test_bad_fd (select_fn my_select)
 #if !(defined __osf__ || defined WINDOWS_NATIVE)
   int fd;
 
-  /* On Linux, MacOS X, *BSD, values of fd like 99 or 399 are discarded
+  /* On Linux, Mac OS X, *BSD, values of fd like 99 or 399 are discarded
      by the kernel early and therefore do *not* lead to EBADF, as required
      by POSIX.  */
 # if defined __linux__ || (defined __APPLE__ && defined __MACH__) || defined __FreeBSD__ || defined __OpenBSD__ || defined __NetBSD__
@@ -273,6 +297,7 @@ test_bad_fd (select_fn my_select)
 # else
   fd = 99;
 # endif
+  close (fd);
 
   if (do_select_bad_fd_nowait (fd, SEL_IN, my_select) == 0 || errno != EBADF)
     failed ("invalid fd among rfds");
@@ -426,6 +451,7 @@ test_function (select_fn my_select)
   test (test_tty, "TTY", my_select);
 #endif
 
+  result += test (test_bad_nfd, my_select, "Invalid nfd test");
   result += test (test_bad_fd, my_select, "Invalid fd test");
   result += test (test_connect_first, my_select, "Unconnected socket test");
   result += test (test_socket_pair, my_select, "Connected sockets test");

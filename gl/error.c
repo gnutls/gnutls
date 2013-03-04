@@ -1,5 +1,5 @@
 /* Error handler for noninteractive utilities
-   Copyright (C) 1990-1998, 2000-2007, 2009-2012 Free Software Foundation, Inc.
+   Copyright (C) 1990-1998, 2000-2007, 2009-2013 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -121,7 +121,7 @@ extern char *program_name;
 
 #if !_LIBC
 /* Return non-zero if FD is open.  */
-static inline int
+static int
 is_open (int fd)
 {
 # if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
@@ -139,7 +139,7 @@ is_open (int fd)
 }
 #endif
 
-static inline void
+static void
 flush_stdout (void)
 {
 #if !_LIBC

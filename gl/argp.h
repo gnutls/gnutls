@@ -1,5 +1,5 @@
 /* Hierarchical argument parsing, layered over getopt.
-   Copyright (C) 1995-1999, 2003-2012 Free Software Foundation, Inc.
+   Copyright (C) 1995-1999, 2003-2013 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Miles Bader <miles@gnu.ai.mit.edu>.
 
@@ -519,7 +519,7 @@ extern void __argp_state_help (const struct argp_state *__restrict __state,
                                FILE *__restrict __stream,
                                unsigned int __flags);
 
-#if _LIBC || !defined __USE_EXTERN_INLINES
+#if _LIBC
 /* Possibly output the standard usage message for ARGP to stderr and exit.  */
 extern void argp_usage (const struct argp_state *__state);
 extern void __argp_usage (const struct argp_state *__state);
@@ -552,7 +552,7 @@ extern void __argp_failure (const struct argp_state *__restrict __state,
                             const char *__restrict __fmt, ...)
      _GL_ATTRIBUTE_FORMAT ((__printf__, 4, 5));
 
-#if _LIBC || !defined __USE_EXTERN_INLINES
+#if _LIBC
 /* Returns true if the option OPT is a valid short option.  */
 extern int _option_is_short (const struct argp_option *__opt) __THROW;
 extern int __option_is_short (const struct argp_option *__opt) __THROW;
@@ -572,13 +572,17 @@ extern void *__argp_input (const struct argp *__restrict __argp,
                            const struct argp_state *__restrict __state)
      __THROW;
 
-#ifdef __USE_EXTERN_INLINES
+#if !_LIBC || defined __USE_EXTERN_INLINES
 
 # if !_LIBC
 #  define __argp_usage argp_usage
 #  define __argp_state_help argp_state_help
 #  define __option_is_short _option_is_short
 #  define __option_is_end _option_is_end
+_GL_INLINE_HEADER_BEGIN
+#  ifndef ARGP_EI
+#   define ARGP_EI _GL_INLINE
+#  endif
 # endif
 
 # ifndef ARGP_EI
@@ -635,6 +639,7 @@ __NTH (__option_is_end (const struct argp_option *__opt))
 #  undef __argp_state_help
 #  undef __option_is_short
 #  undef __option_is_end
+_GL_INLINE_HEADER_END
 # endif
 #endif /* Use extern inlines.  */
 
