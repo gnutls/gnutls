@@ -467,8 +467,8 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
 }
 #elif defined(ANDROID) || defined(__ANDROID__)
 # include <dirent.h>
-
-static int load_dir_certs(const char* dirname, gnutls_x509_trust_list_t list, unsigned int tl_flags, unsigned int tl_vflags)
+static int load_dir_certs(const char* dirname, gnutls_x509_trust_list_t list, 
+	unsigned int tl_flags, unsigned int tl_vflags, unsigned type)
 {
 DIR * dirp;
 struct dirent *d;
@@ -484,7 +484,7 @@ char path[GNUTLS_PATH_MAX];
       	  d = readdir(dirp);
       	  if (d != NULL && d->d_type == DT_REG) {
       	  	snprintf(path, sizeof(path), "%s/%s", dirname, d->d_name);
-      	  	ret = gnutls_x509_trust_list_add_trust_file(list, path, NULL, GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
+      	  	ret = gnutls_x509_trust_list_add_trust_file(list, path, NULL, type, tl_flags, tl_vflags);
       	  	if (ret >= 0)
       	  	  r += ret;
       	  }
@@ -503,11 +503,11 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
 {
   int r = 0, ret;
 
-  ret = load_dir_certs("/system/etc/security/cacerts/", list, tl_flags, tl_vflags);
+  ret = load_dir_certs("/system/etc/security/cacerts/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_PEM);
   if (ret >= 0)
     r += ret;
 
-  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", list, tl_flags, tl_vflags);
+  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_DER);
   if (ret >= 0)
     r += ret;
   
