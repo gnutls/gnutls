@@ -1590,7 +1590,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
   return ret;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
 static int
 set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 {
@@ -1640,6 +1640,54 @@ unsigned int i;
 
   return ret;
 }
+#elif defined(ANDROID) || defined(__ANDROID__)
+# include <dirent.h>
+static int load_dir_certs(const char* dirname, gnutls_certificate_credentials_t cred)
+{
+DIR * dirp;
+struct dirent *d;
+int ret;
+int r = 0;
+char path[512];
+
+  dirp = opendir(dirname);
+  if (dirp != NULL) 
+    {
+      do
+        {
+      	  d = readdir(dirp);
+      	  if (d != NULL && d->d_type == DT_REG) {
+      	  	snprintf(path, sizeof(path), "%s/%s", dirname, d->d_name);
+                ret = gnutls_certificate_set_x509_trust_file (cred, path, GNUTLS_X509_FMT_PEM);
+      	  	if (ret >= 0)
+      	  	  r += ret;
+      	  }
+      	}
+      while(d != NULL);
+      closedir(dirp);
+    }
+    
+  return r;
+}
+
+/* This works on android 4.x 
+ */
+static int
+set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
+{
+  int r = 0, ret;
+
+  ret = load_dir_certs("/system/etc/security/cacerts/", cred);
+  if (ret >= 0)
+    r += ret;
+
+  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", cred);
+  if (ret >= 0)
+    r += ret;
+  
+  return r;
+}
+
 #elif defined(DEFAULT_TRUST_STORE_FILE)
 static int
 set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
@@ -1692,6 +1740,12 @@ set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 
   return r;
 }
+#else
+static int
+set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
 #endif
 
 /**
@@ -1712,11 +1766,7 @@ set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 int
 gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred)
 {
-#if !defined(_WIN32) && !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
-  int r = GNUTLS_E_UNIMPLEMENTED_FEATURE;
-#else
   int ret, r = 0;
-#endif
 
 #if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
   ret = read_cas_url (cred, DEFAULT_TRUST_STORE_PKCS11);
@@ -1724,11 +1774,12 @@ gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred)
     r += ret;
 #endif
 
-#ifdef DEFAULT_TRUST_STORE_FILE
   ret = set_x509_system_trust_file(cred);
   if (ret > 0)
     r += ret;
-#endif
+  
+  if (ret == GNUTLS_E_UNIMPLEMENTED_FEATURE && r == 0)
+    return ret;
 
   return r;
 }

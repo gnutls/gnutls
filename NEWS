@@ -15,6 +15,8 @@ support AES with PKCS #12.
 ** libgnutls: gnutls_pkcs11_reinit() will reinitialize all PKCS #11
 modules, and not only the ones loaded via p11-kit.
 
+** libgnutls: Load CA certificates in android systems.
+
 ** API and ABI modifications:
 No changes since last version.
 
