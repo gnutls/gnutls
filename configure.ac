@@ -25,7 +25,7 @@ AC_INIT([GnuTLS], [3.0.28], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz dist-lzip -Wall -Werror -Wno-override])
+AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz dist-lzip -Wall -Wno-override])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CONFIG_HEADERS([config.h])
 
@@ -222,7 +222,6 @@ AC_ARG_ENABLE([gcc-warnings],
 )
 
 if test "$gl_gcc_warnings" = yes; then
-  gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
   gl_WARN_ADD([-Wframe-larger-than=5120], [WSTACK_CFLAGS])
 
   nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
