@@ -24,6 +24,7 @@ AC_PREREQ(2.61)
 AC_INIT([GnuTLS], [3.1.9], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
+AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE([1.11.3 no-dist-gzip dist-xz dist-lzip -Wall -Wno-override])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -34,11 +35,11 @@ AC_MSG_RESULT([***
 ])
 
 dnl Checks for programs.
-AC_CANONICAL_TARGET
 AC_PROG_CC
-AM_PROG_AS
-AC_PROG_CXX
 gl_EARLY
+AM_PROG_AS
+dnl AM_PROG_AR
+AC_PROG_CXX
 
 # For includes/gnutls/gnutls.h.in.
 AC_SUBST(MAJOR_VERSION, `echo $PACKAGE_VERSION | sed 's/\(.*\)\..*\..*/\1/g'`)
