@@ -24,6 +24,7 @@ AC_PREREQ(2.61)
 AC_INIT([GnuTLS], [3.0.28], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
+AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE([1.11 no-dist-gzip dist-xz dist-lzip -Wall -Wno-override])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -34,7 +35,6 @@ AC_MSG_RESULT([***
 ])
 
 dnl Checks for programs.
-AC_CANONICAL_TARGET
 AC_PROG_CC
 gl_EARLY
 
