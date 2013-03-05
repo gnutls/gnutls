@@ -185,6 +185,48 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 }
 
 /**
+ * gnutls_x509_trust_list_remove_cas:
+ * @list: The structure of the list
+ * @clist: A list of CAs
+ * @clist_size: The length of the CA list
+ *
+ * This function will remove the given certificate authorities
+ * from the trusted list. 
+ *
+ * Returns: The number of removed elements is returned.
+ *
+ * Since: 3.1.10
+ **/
+int
+gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
+                               const gnutls_x509_crt_t * clist,
+                               int clist_size)
+{
+    int i, r = 0;
+    unsigned j;
+    uint32_t hash;
+
+    for (i = 0; i < clist_size; i++) 
+      {
+        hash = hash_pjw_bare(clist[i]->raw_dn.data, clist[i]->raw_dn.size);
+        hash %= list->size;
+        
+        for (j=0;j<list->node[hash].trusted_ca_size;j++) 
+          {
+	    if (_gnutls_check_if_same_cert(clist[i], list->node[hash].trusted_cas[j]) != 0)
+	      {
+                list->node[hash].trusted_cas[j] = 
+			list->node[hash].trusted_cas[list->node[hash].trusted_ca_size-1];
+		list->node[hash].trusted_ca_size--;
+		r++;
+              }
+          }
+      }
+
+    return r;
+}
+
+/**
  * gnutls_x509_trust_list_add_named_crt:
  * @list: The structure of the list
  * @cert: A certificate

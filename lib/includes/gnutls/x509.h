@@ -1040,6 +1040,9 @@ extern "C"
   int
   gnutls_x509_trust_list_add_cas (gnutls_x509_trust_list_t list, 
     const gnutls_x509_crt_t * clist, int clist_size, unsigned int flags);
+  int gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
+                               const gnutls_x509_crt_t * clist,
+                               int clist_size);
 
   int gnutls_x509_trust_list_add_named_crt (gnutls_x509_trust_list_t list, 
       gnutls_x509_crt_t cert, const void* name, size_t name_size, unsigned int flags);
@@ -1093,6 +1096,16 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
                                       gnutls_x509_crt_fmt_t type,
                                       unsigned int tl_flags,
                                       unsigned int tl_vflags);
+
+int
+gnutls_x509_trust_list_remove_trust_file(gnutls_x509_trust_list_t list,
+                                      const char* ca_file, 
+                                      gnutls_x509_crt_fmt_t type);
+
+int
+gnutls_x509_trust_list_remove_trust_mem(gnutls_x509_trust_list_t list,
+                                     const gnutls_datum_t * cas, 
+                                     gnutls_x509_crt_fmt_t type);
 
 int
 gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,

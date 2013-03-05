@@ -469,8 +469,7 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
 # include <dirent.h>
 # include <unistd.h>
 static int load_dir_certs(const char* dirname, gnutls_x509_trust_list_t list, 
-	unsigned int tl_flags, unsigned int tl_vflags, unsigned type,
-	unsigned check_revoked)
+	unsigned int tl_flags, unsigned int tl_vflags, unsigned type)
 {
 DIR * dirp;
 struct dirent *d;
@@ -486,19 +485,40 @@ char path[GNUTLS_PATH_MAX];
       	  d = readdir(dirp);
       	  if (d != NULL && d->d_type == DT_REG) 
       	    {
-      	  	
-      	  	if (check_revoked) 
-      	  	  {
-	      	    snprintf(path, sizeof(path), 
-      		                 "/data/misc/keychain/cacerts-removed/%s", d->d_name);
-	      	    if (access(path, R_OK) == 0)
-	      	      /* revoked -> do not add */
-	      	      continue;
-	          }
-
       	  	snprintf(path, sizeof(path), "%s/%s", dirname, d->d_name);
 
                 ret = gnutls_x509_trust_list_add_trust_file(list, path, NULL, type, tl_flags, tl_vflags);
+                if (ret >= 0)
+                  r += ret;
+      	    }
+      	}
+      while(d != NULL);
+      closedir(dirp);
+    }
+    
+  return r;
+}
+
+static int load_revoked_certs(gnutls_x509_trust_list_t list, 
+	unsigned int tl_flags, unsigned int tl_vflags, unsigned type)
+{
+DIR * dirp;
+struct dirent *d;
+int ret;
+int r = 0;
+char path[GNUTLS_PATH_MAX];
+
+  dirp = opendir("/data/misc/keychain/cacerts-removed/");
+  if (dirp != NULL) 
+    {
+      do
+        {
+      	  d = readdir(dirp);
+      	  if (d != NULL && d->d_type == DT_REG) 
+      	    {
+      	  	snprintf(path, sizeof(path), "/data/misc/keychain/cacerts-removed/%s", d->d_name);
+
+                ret = gnutls_x509_trust_list_remove_trust_file(list, path, type);
                 if (ret >= 0)
                   r += ret;
       	    }
@@ -517,14 +537,18 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
 {
   int r = 0, ret;
 
-  ret = load_dir_certs("/system/etc/security/cacerts/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_PEM, 1);
+  ret = load_dir_certs("/system/etc/security/cacerts/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_PEM);
   if (ret >= 0)
     r += ret;
 
-  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_DER, 0);
+  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_DER);
   if (ret >= 0)
     r += ret;
-  
+    
+  ret = load_revoked_certs(list, tl_flags, tl_vflags);
+  if (ret >= 0)
+    r -= ret;
+
   return r;
 }
 #else
@@ -699,3 +723,4 @@ const char *src = data;
   return 0;
 }
 #endif
+

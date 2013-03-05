@@ -249,11 +249,27 @@ doit (void)
   if (ret < 1)
     fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
 
+  ret = gnutls_x509_trust_list_remove_trust_mem(tl, &data, GNUTLS_X509_FMT_PEM);
+  if (ret < 1)
+    fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
+
   data.data = cert_der;
   data.size = sizeof(cert_der);
   ret = gnutls_x509_trust_list_add_trust_mem(tl, &data, NULL, GNUTLS_X509_FMT_DER, 0, 0);
   if (ret < 1)
     fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
+
+  ret = gnutls_x509_trust_list_remove_trust_mem(tl, &data, GNUTLS_X509_FMT_DER);
+  if (ret < 1)
+    fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
+
+  ret = gnutls_x509_trust_list_remove_cas(tl, &ca_crt, 1);
+  if (ret < 1)
+    fail("gnutls_x509_trust_list_add_cas");
+
+  ret = gnutls_x509_trust_list_verify_crt(tl, &server_crt, 1, 0, &status, NULL);
+  if (ret == 0 && status == 0)
+    fail("gnutls_x509_trust_list_verify_crt\n");
 
   gnutls_x509_trust_list_deinit(tl, 1);
   

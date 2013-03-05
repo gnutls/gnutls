@@ -897,6 +897,9 @@ GNUTLS_3_1_0 {
 	gnutls_x509_crt_get_dn2;
 	gnutls_x509_crl_get_issuer_dn2;
 	gnutls_x509_crq_get_dn2;
+	gnutls_x509_trust_list_remove_trust_mem;
+	gnutls_x509_trust_list_remove_trust_file;
+	gnutls_x509_trust_list_remove_cas;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
