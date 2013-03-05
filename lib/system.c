@@ -499,8 +499,7 @@ char path[GNUTLS_PATH_MAX];
   return r;
 }
 
-static int load_revoked_certs(gnutls_x509_trust_list_t list, 
-	unsigned int tl_flags, unsigned int tl_vflags, unsigned type)
+static int load_revoked_certs(gnutls_x509_trust_list_t list, unsigned type)
 {
 DIR * dirp;
 struct dirent *d;
@@ -545,7 +544,7 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
   if (ret >= 0)
     r += ret;
     
-  ret = load_revoked_certs(list, tl_flags, tl_vflags);
+  ret = load_revoked_certs(list, GNUTLS_X509_FMT_DER);
   if (ret >= 0)
     r -= ret;
 
@@ -723,4 +722,3 @@ const char *src = data;
   return 0;
 }
 #endif
-
