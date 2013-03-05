@@ -366,17 +366,11 @@ if test "x$with_default_trust_store_pkcs11" != x; then
     ["$with_default_trust_store_pkcs11"], [use the given pkcs11 uri as default trust store])
 fi
 
+dnl auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.html
 AC_ARG_WITH([default-trust-store-file],
   [AS_HELP_STRING([--with-default-trust-store-file=FILE],
-    [use the given file default trust store])])
-
-AC_ARG_WITH([default-crl-file],
-  [AS_HELP_STRING([--with-default-crl-file=FILE],
-    [use the given CRL file as default])])
-
-if test "x$with_default_trust_store_pkcs11" = x -a "x$with_default_trust_store_file" = x; then
-  # auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.html
-  for i in \
+    [use the given file default trust store])], with_default_trust_store_file="$withval",
+  [for i in \
     /etc/ssl/certs/ca-certificates.crt \
     /etc/pki/tls/cert.pem \
     /usr/local/share/certs/ca-root-nss.crt \
@@ -386,8 +380,16 @@ if test "x$with_default_trust_store_pkcs11" = x -a "x$with_default_trust_store_f
       with_default_trust_store_file="$i"
       break
     fi
-  done
+  done]
+)
+
+if test "$with_default_trust_store_file" = "no";then
+  with_default_trust_store_file=""
 fi
+
+AC_ARG_WITH([default-crl-file],
+  [AS_HELP_STRING([--with-default-crl-file=FILE],
+    [use the given CRL file as default])])
 
 if test "x$with_default_trust_store_file" != x; then
   AC_DEFINE_UNQUOTED([DEFAULT_TRUST_STORE_FILE],
@@ -616,49 +618,49 @@ AC_OUTPUT
 
 AC_MSG_NOTICE([summary of build options:
 
-  version:          ${VERSION} shared $LT_CURRENT:$LT_REVISION:$LT_AGE
-  Host type:        ${host}
-  Install prefix:   ${prefix}
-  Compiler:         ${CC}
-  CFlags:           ${CFLAGS}
-  Warning flags:    errors: ${WERROR_CFLAGS} warnings: ${WARN_CFLAGS}
-  Library types:    Shared=${enable_shared}, Static=${enable_static}
-  Valgrind:         $opt_valgrind_tests ${VALGRIND}
+  version:              ${VERSION} shared $LT_CURRENT:$LT_REVISION:$LT_AGE
+  Host type:            ${host}
+  Install prefix:       ${prefix}
+  Compiler:             ${CC}
+  CFlags:               ${CFLAGS}
+  Warning flags:        errors: ${WERROR_CFLAGS} warnings: ${WARN_CFLAGS}
+  Library types:        Shared=${enable_shared}, Static=${enable_static}
+  Valgrind:             $opt_valgrind_tests ${VALGRIND}
 ])
 
 AC_MSG_NOTICE([External hardware support:
 
-  /dev/crypto:      $enable_cryptodev
-  Hardware accel:   $hw_accel
-  PKCS#11 support:  $with_p11_kit
-  TPM support:      $with_tpm
+  /dev/crypto:          $enable_cryptodev
+  Hardware accel:       $hw_accel
+  PKCS#11 support:      $with_p11_kit
+  TPM support:          $with_tpm
 ])
 
 AC_MSG_NOTICE([Optional features:
 (note that included applications might not compile properly
 if features are disabled)
 
-  DTLS-SRTP support:$ac_enable_srtp
-  OCSP support:     $ac_enable_ocsp
-  OpenPGP support:  $ac_enable_openpgp
-  SRP support:      $ac_enable_srp
-  PSK support:      $ac_enable_psk
-  Anon auth support:$ac_enable_anon
-  Heartbeat support:$ac_enable_heartbeat
+  DTLS-SRTP support:    $ac_enable_srtp
+  OCSP support:         $ac_enable_ocsp
+  OpenPGP support:      $ac_enable_openpgp
+  SRP support:          $ac_enable_srp
+  PSK support:          $ac_enable_psk
+  Anon auth support:    $ac_enable_anon
+  Heartbeat support:    $ac_enable_heartbeat
 ])
 
 AC_MSG_NOTICE([Optional applications:
 
-  crywrap app:      $libidn
-  local libopts:    $enable_local_libopts
+  crywrap app:          $libidn
+  local libopts:        $enable_local_libopts
 ])
 
 AC_MSG_NOTICE([Optional libraries:
 
-  Guile wrappers:   $opt_guile_bindings
-  C++ library:      $use_cxx
-  DANE library:     $enable_dane
-  OpenSSL compat:   $enable_openssl
+  Guile wrappers:       $opt_guile_bindings
+  C++ library:          $use_cxx
+  DANE library:         $enable_dane
+  OpenSSL compat:       $enable_openssl
 ])
 
 AC_MSG_NOTICE([System files:
