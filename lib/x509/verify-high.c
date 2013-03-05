@@ -164,7 +164,7 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
     uint32_t hash;
 
     for (i = 0; i < clist_size; i++) {
-        ret = gnutls_x509_crt_get_raw_dn(clist[i], &dn);
+        ret = gnutls_x509_crt_get_dn2(clist[i], &dn);
         if (ret < 0) {
             gnutls_assert();
             return i;
@@ -230,7 +230,7 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
     if (name_size >= MAX_SERVER_NAME_SIZE)
         return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-    ret = gnutls_x509_crt_get_raw_issuer_dn(cert, &dn);
+    ret = gnutls_x509_crt_get_issuer_dn2(cert, &dn);
     if (ret < 0) {
         gnutls_assert();
         return ret;
@@ -298,7 +298,7 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
         return 0;
 
     for (i = 0; i < crl_size; i++) {
-        ret = gnutls_x509_crl_get_raw_issuer_dn(crl_list[i], &dn);
+        ret = gnutls_x509_crl_get_issuer_dn2(crl_list[i], &dn);
         if (ret < 0) {
             gnutls_assert();
             return i;
@@ -377,7 +377,7 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
      * self-signed E but already removed above), and we trust B, remove
      * B, C and D. */
     for (i = 1; i < clist_size; i++) {
-        ret = gnutls_x509_crt_get_raw_issuer_dn(certificate_list[i], &dn);
+        ret = gnutls_x509_crt_get_issuer_dn2(certificate_list[i], &dn);
         if (ret < 0) {
             gnutls_assert();
             return ret;
@@ -492,7 +492,7 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
     unsigned int i;
     uint32_t hash;
 
-    ret = gnutls_x509_crt_get_raw_issuer_dn(cert, &dn);
+    ret = gnutls_x509_crt_get_issuer_dn2(cert, &dn);
     if (ret < 0) {
         gnutls_assert();
         return ret;
@@ -561,7 +561,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
         return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
     ret =
-        gnutls_x509_crt_get_raw_issuer_dn(cert_list[cert_list_size - 1],
+        gnutls_x509_crt_get_issuer_dn2(cert_list[cert_list_size - 1],
                                           &dn);
     if (ret < 0) {
         gnutls_assert();
@@ -596,7 +596,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
     }
 
     for (i = 0; i < cert_list_size - 1; i++) {
-        ret = gnutls_x509_crt_get_raw_issuer_dn(cert_list[i], &dn);
+        ret = gnutls_x509_crt_get_issuer_dn2(cert_list[i], &dn);
         if (ret < 0) {
             gnutls_assert();
             return ret;
@@ -655,7 +655,7 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
     unsigned int i;
     uint32_t hash;
 
-    ret = gnutls_x509_crt_get_raw_issuer_dn(cert, &dn);
+    ret = gnutls_x509_crt_get_issuer_dn2(cert, &dn);
     if (ret < 0) {
         gnutls_assert();
         return ret;
@@ -708,7 +708,7 @@ _gnutls_trustlist_inlist (gnutls_x509_trust_list_t list,
   unsigned int i;
   uint32_t hash;
 
-  ret = gnutls_x509_crt_get_raw_dn (cert, &dn);
+  ret = gnutls_x509_crt_get_dn2 (cert, &dn);
   if (ret < 0)
     {
       gnutls_assert();
