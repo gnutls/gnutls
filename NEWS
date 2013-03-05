@@ -17,6 +17,9 @@ modules, and not only the ones loaded via p11-kit.
 
 ** libgnutls: Load CA certificates in android systems.
 
+** configure: Trust store file must be explicitly set or unset when 
+cross compiling.
+
 ** API and ABI modifications:
 No changes since last version.
 
