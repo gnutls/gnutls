@@ -291,16 +291,15 @@ if test "x$with_default_trust_store_pkcs11" != x; then
     ["$with_default_trust_store_pkcs11"], [use the given pkcs11 uri as default trust store])
 fi
 
-AC_ARG_WITH([default-trust-store-file],
-  [AS_HELP_STRING([--with-default-trust-store-file=FILE],
-    [use the given file default trust store])])
-
 AC_ARG_WITH([default-crl-file],
   [AS_HELP_STRING([--with-default-crl-file=FILE],
     [use the given CRL file as default])])
 
-if test "x$with_default_trust_store_pkcs11" = x -a "x$with_default_trust_store_file" = x; then
-  # auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.html
+dnl auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.html
+AC_ARG_WITH([default-trust-store-file],
+  [AS_HELP_STRING([--with-default-trust-store-file=FILE],
+    [use the given file default trust store])], with_default_trust_store_file="$withval",
+  [if test "$target_cpu" = "$host_cpu";then
   for i in \
     /etc/ssl/certs/ca-certificates.crt \
     /etc/pki/tls/cert.pem \
@@ -312,6 +311,11 @@ if test "x$with_default_trust_store_pkcs11" = x -a "x$with_default_trust_store_f
       break
     fi
   done
+  fi]
+)
+
+if test "$with_default_trust_store_file" = "no";then
+  with_default_trust_store_file=""
 fi
 
 if test "x$with_default_trust_store_file" != x; then
