@@ -137,7 +137,8 @@ gnutls_x509_crt_deinit (gnutls_x509_crt_t cert)
 
   if (cert->cert)
     asn1_delete_structure (&cert->cert);
-
+  gnutls_free(cert->raw_dn.data);
+  gnutls_free(cert->raw_issuer_dn.data);
   gnutls_free (cert);
 }
 
@@ -205,6 +206,8 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
          structure, so we need to replace it with a fresh
          structure. */
       asn1_delete_structure (&cert->cert);
+      _gnutls_free_datum(&cert->raw_dn);
+      _gnutls_free_datum(&cert->raw_issuer_dn);
 
       result = asn1_create_element (_gnutls_get_pkix (),
                                     "PKIX1.Certificate", &cert->cert);
@@ -224,6 +227,24 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
       goto cleanup;
     }
   
+  result = _gnutls_x509_get_raw_dn2 (cert->cert, &_data,
+                              "tbsCertificate.issuer.rdnSequence", 
+                              &cert->raw_issuer_dn);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_get_raw_dn2 (cert->cert, &_data,
+                              "tbsCertificate.subject.rdnSequence", 
+                              &cert->raw_dn);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
   cert->expanded = 1;
 
   /* Since we do not want to disable any extension
@@ -237,6 +258,8 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
 cleanup:
   if (need_free)
     _gnutls_free_datum (&_data);
+  _gnutls_free_datum (&cert->raw_dn);
+  _gnutls_free_datum (&cert->raw_issuer_dn);
   return result;
 }
 
@@ -2313,69 +2336,10 @@ gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
   return 0;
 }
 
-static int
-_gnutls_x509_crt_get_raw_dn2 (gnutls_x509_crt_t cert,
-                              const char *whom, gnutls_datum_t * start)
-{
-  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  int result, len1;
-  int start1, end1;
-  gnutls_datum_t signed_data = { NULL, 0 };
-
-  /* get the issuer of 'cert'
-   */
-  if ((result =
-       asn1_create_element (_gnutls_get_pkix (), "PKIX1.TBSCertificate",
-                            &c2)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  result =
-    _gnutls_x509_get_signed_data (cert->cert, "tbsCertificate", &signed_data);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = asn1_der_decoding (&c2, signed_data.data, signed_data.size, NULL);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&c2);
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  result =
-    asn1_der_decoding_startEnd (c2, signed_data.data, signed_data.size,
-                                whom, &start1, &end1);
-
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  len1 = end1 - start1 + 1;
-
-  _gnutls_set_datum (start, &signed_data.data[start1], len1);
-
-  result = 0;
-
-cleanup:
-  asn1_delete_structure (&c2);
-  _gnutls_free_datum (&signed_data);
-  return result;
-}
-
 /**
  * gnutls_x509_crt_get_raw_issuer_dn:
  * @cert: should contain a #gnutls_x509_crt_t structure
- * @start: will hold the starting point of the DN
+ * @dn: will hold the starting point of the DN
  *
  * This function will return a pointer to the DER encoded DN structure
  * and the length. This points to allocated data that must be free'd using gnutls_free().
@@ -2386,15 +2350,15 @@ cleanup:
  **/
 int
 gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
-                                   gnutls_datum_t * start)
+                                   gnutls_datum_t * dn)
 {
-  return _gnutls_x509_crt_get_raw_dn2 (cert, "issuer", start);
+  return _gnutls_set_datum (dn, cert->raw_issuer_dn.data, cert->raw_issuer_dn.size);
 }
 
 /**
  * gnutls_x509_crt_get_raw_dn:
  * @cert: should contain a #gnutls_x509_crt_t structure
- * @start: will hold the starting point of the DN
+ * @dn: will hold the starting point of the DN
  *
  * This function will return a pointer to the DER encoded DN structure and
  * the length. This points to allocated data that must be free'd using gnutls_free().
@@ -2404,9 +2368,9 @@ gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
  *
  **/
 int
-gnutls_x509_crt_get_raw_dn (gnutls_x509_crt_t cert, gnutls_datum_t * start)
+gnutls_x509_crt_get_raw_dn (gnutls_x509_crt_t cert, gnutls_datum_t * dn)
 {
-  return _gnutls_x509_crt_get_raw_dn2 (cert, "subject", start);
+  return _gnutls_set_datum (dn, cert->raw_dn.data, cert->raw_dn.size);
 }
 
 static int
@@ -2798,6 +2762,15 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
   return ret;
 }
 
+static int
+crl_issuer_matches (gnutls_x509_crl_t crl, gnutls_x509_crt_t cert)
+{
+  if (crl->raw_issuer_dn.size == cert->raw_issuer_dn.size &&
+    memcmp(crl->raw_issuer_dn.data, cert->raw_issuer_dn.data, cert->raw_issuer_dn.size) == 0)
+    return 1;
+  else
+    return 0;
+}
 
 /* This is exactly as gnutls_x509_crt_check_revocation() except that
  * it calls func.
@@ -2812,7 +2785,6 @@ _gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
   uint8_t cert_serial[128];
   size_t serial_size, cert_serial_size;
   int ncerts, ret, i, j;
-  gnutls_datum_t dn1, dn2;
 
   if (cert == NULL)
     {
@@ -2825,28 +2797,13 @@ _gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
 
       /* Step 1. check if issuer's DN match
        */
-      ret = gnutls_x509_crl_get_raw_issuer_dn (crl_list[j], &dn1);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      ret = gnutls_x509_crt_get_raw_issuer_dn (cert, &dn2);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      ret = _gnutls_x509_compare_raw_dn (&dn1, &dn2);
-      _gnutls_free_datum (&dn1);
-      _gnutls_free_datum (&dn2);
+      ret = crl_issuer_matches(crl_list[j], cert);
       if (ret == 0)
         {
           /* issuers do not match so don't even
            * bother checking.
            */
+          gnutls_assert();
           continue;
         }
 

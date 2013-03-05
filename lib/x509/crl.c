@@ -79,6 +79,7 @@ gnutls_x509_crl_deinit (gnutls_x509_crl_t crl)
 
   if (crl->crl)
     asn1_delete_structure (&crl->crl);
+  gnutls_free(crl->raw_issuer_dn.data);
 
   gnutls_free (crl);
 }
@@ -129,11 +130,19 @@ gnutls_x509_crl_import (gnutls_x509_crl_t crl,
       need_free = 1;
     }
 
-
   result = asn1_der_decoding (&crl->crl, _data.data, _data.size, NULL);
   if (result != ASN1_SUCCESS)
     {
       result = _gnutls_asn2err (result);
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_get_raw_dn2 (crl->crl, &_data,
+                              "tbsCertList.issuer.rdnSequence", 
+                              &crl->raw_issuer_dn);
+  if (result < 0)
+    {
       gnutls_assert ();
       goto cleanup;
     }
@@ -146,6 +155,7 @@ gnutls_x509_crl_import (gnutls_x509_crl_t crl,
 cleanup:
   if (need_free)
     _gnutls_free_datum (&_data);
+  _gnutls_free_datum (&crl->raw_issuer_dn);
   return result;
 }
 
@@ -574,68 +584,7 @@ int
 gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
 				   gnutls_datum_t * dn)
 {
-  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  int result, len1;
-  int start1, end1;
-  gnutls_datum_t crl_signed_data;
-
-  if (crl == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  /* get the issuer of 'crl'
-   */
-  if ((result =
-       asn1_create_element (_gnutls_get_pkix (), "PKIX1.TBSCertList",
-                            &c2)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  result =
-    _gnutls_x509_get_signed_data (crl->crl, "tbsCertList", &crl_signed_data);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result =
-    asn1_der_decoding (&c2, crl_signed_data.data, crl_signed_data.size, NULL);
-  if (result != ASN1_SUCCESS)
-    {
-      /* couldn't decode DER */
-      gnutls_assert ();
-      asn1_delete_structure (&c2);
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  result =
-    asn1_der_decoding_startEnd (c2, crl_signed_data.data,
-                                crl_signed_data.size, "issuer",
-                                &start1, &end1);
-
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  len1 = end1 - start1 + 1;
-
-  _gnutls_set_datum (dn, &crl_signed_data.data[start1], len1);
-
-  result = 0;
-
-cleanup:
-  asn1_delete_structure (&c2);
-  _gnutls_free_datum (&crl_signed_data);
-  return result;
+  return _gnutls_set_datum (dn, crl->raw_issuer_dn.data, crl->raw_issuer_dn.size);
 }
 
 /**

@@ -2241,12 +2241,7 @@ gnutls_ocsp_resp_verify (gnutls_ocsp_resp_t resp,
      is directly signed by something in trustlist and has proper OCSP
      extkeyusage. */
   rc = _gnutls_trustlist_inlist (trustlist, signercert);
-  if (rc < 0)
-    {
-      gnutls_assert ();
-      goto done;
-    }
-  if (rc == 1)
+  if (rc == 0)
     {
       /* not in trustlist, need to verify signature and bits */
       gnutls_x509_crt_t issuer;

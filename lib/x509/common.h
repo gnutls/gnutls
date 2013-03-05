@@ -162,7 +162,11 @@ void _asnstr_append_name (char *name, size_t name_size, const char *part1,
                           const char *part2);
 
 int
-check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
+_gnutls_x509_get_raw_dn2 (ASN1_TYPE c2, gnutls_datum_t* raw,
+                              const char *whom, gnutls_datum_t * dn);
+
+int
+_gnutls_check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
 
 time_t _gnutls_x509_generalTime2gtime (const char *ttime);
 

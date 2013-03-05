@@ -44,6 +44,7 @@ typedef struct gnutls_x509_crl_int
 {
   ASN1_TYPE crl;
   int use_extensions;
+  gnutls_datum_t raw_issuer_dn;
 } gnutls_x509_crl_int;
 
 typedef struct gnutls_x509_crt_int
@@ -51,6 +52,11 @@ typedef struct gnutls_x509_crt_int
   ASN1_TYPE cert;
   int use_extensions;
   int expanded; /* a certificate has been expanded */
+
+  /* These two cached values allow fast calls to
+   * get_raw_*_dn(). */
+  gnutls_datum_t raw_dn;
+  gnutls_datum_t raw_issuer_dn;
   
   struct pin_info_st pin;
 } gnutls_x509_crt_int;
@@ -79,9 +85,6 @@ typedef struct gnutls_x509_privkey_int
 
 int _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src);
 
-
-int _gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
-                                 const gnutls_datum_t * dn2);
 
 
 int _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src);
