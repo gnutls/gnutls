@@ -370,7 +370,8 @@ dnl auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.h
 AC_ARG_WITH([default-trust-store-file],
   [AS_HELP_STRING([--with-default-trust-store-file=FILE],
     [use the given file default trust store])], with_default_trust_store_file="$withval",
-  [for i in \
+  [if test "$target_cpu" = "$host_cpu";then
+  for i in \
     /etc/ssl/certs/ca-certificates.crt \
     /etc/pki/tls/cert.pem \
     /usr/local/share/certs/ca-root-nss.crt \
@@ -380,7 +381,8 @@ AC_ARG_WITH([default-trust-store-file],
       with_default_trust_store_file="$i"
       break
     fi
-  done]
+  done
+  fi]
 )
 
 if test "$with_default_trust_store_file" = "no";then
