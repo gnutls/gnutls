@@ -467,8 +467,10 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
 }
 #elif defined(ANDROID) || defined(__ANDROID__)
 # include <dirent.h>
+# include <unistd.h>
 static int load_dir_certs(const char* dirname, gnutls_x509_trust_list_t list, 
-	unsigned int tl_flags, unsigned int tl_vflags, unsigned type)
+	unsigned int tl_flags, unsigned int tl_vflags, unsigned type,
+	unsigned check_revoked)
 {
 DIR * dirp;
 struct dirent *d;
@@ -482,12 +484,24 @@ char path[GNUTLS_PATH_MAX];
       do
         {
       	  d = readdir(dirp);
-      	  if (d != NULL && d->d_type == DT_REG) {
+      	  if (d != NULL && d->d_type == DT_REG) 
+      	    {
+      	  	
+      	  	if (check_revoked) 
+      	  	  {
+	      	    snprintf(path, sizeof(path), 
+      		                 "/data/misc/keychain/cacerts-removed/%s", d->d_name);
+	      	    if (access(path, R_OK) == 0)
+	      	      /* revoked -> do not add */
+	      	      continue;
+	          }
+
       	  	snprintf(path, sizeof(path), "%s/%s", dirname, d->d_name);
-      	  	ret = gnutls_x509_trust_list_add_trust_file(list, path, NULL, type, tl_flags, tl_vflags);
-      	  	if (ret >= 0)
-      	  	  r += ret;
-      	  }
+
+                ret = gnutls_x509_trust_list_add_trust_file(list, path, NULL, type, tl_flags, tl_vflags);
+                if (ret >= 0)
+                  r += ret;
+      	    }
       	}
       while(d != NULL);
       closedir(dirp);
@@ -503,11 +517,11 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
 {
   int r = 0, ret;
 
-  ret = load_dir_certs("/system/etc/security/cacerts/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_PEM);
+  ret = load_dir_certs("/system/etc/security/cacerts/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_PEM, 1);
   if (ret >= 0)
     r += ret;
 
-  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_DER);
+  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_DER, 0);
   if (ret >= 0)
     r += ret;
   
