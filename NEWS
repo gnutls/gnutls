@@ -12,6 +12,8 @@ support AES with PKCS #12.
 
 ** libgnutls: Load CA certificates in android systems.
 
+** libgnutls: Optimized CA certificate loading.
+
 ** libgnutls-dane: Updated DANE verification options.
 
 ** API and ABI modifications:
