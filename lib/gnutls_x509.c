@@ -39,6 +39,7 @@
 #include <x509_b64.h>
 #include <gnutls_x509.h>
 #include "x509/common.h"
+#include "x509/verify-high.h"
 #include "x509/x509_int.h"
 #include <gnutls_str_array.h>
 #include "read-file.h"
@@ -1643,8 +1644,10 @@ unsigned int i;
 #elif defined(ANDROID) || defined(__ANDROID__)
 # include <dirent.h>
 # include <unistd.h>
+# include "read-file.h"
+
 static int load_dir_certs(const char* dirname, gnutls_certificate_credentials_t cred,
-	unsigned type, unsigned check_revoked)
+	unsigned type)
 {
 DIR * dirp;
 struct dirent *d;
@@ -1659,21 +1662,97 @@ char path[512];
         {
       	  d = readdir(dirp);
       	  if (d != NULL && d->d_type == DT_REG) {
-
-      	  	if (check_revoked) 
-      	  	  {
-	      	    snprintf(path, sizeof(path), 
-      		                 "/data/misc/keychain/cacerts-removed/%s", d->d_name);
-	      	    if (access(path, R_OK) == 0)
-	      	      /* revoked -> do not add */
-	      	      continue;
-	          }
-
       	  	snprintf(path, sizeof(path), "%s/%s", dirname, d->d_name);
                 ret = gnutls_certificate_set_x509_trust_file (cred, path, type);
       	  	if (ret >= 0)
       	  	  r += ret;
       	  }
+      	}
+      while(d != NULL);
+      closedir(dirp);
+    }
+    
+  return r;
+}
+
+static int
+gnutls_x509_trust_list_remove_trust_mem(gnutls_x509_trust_list_t list,
+                                     const gnutls_datum_t * cas, 
+                                     gnutls_x509_crt_fmt_t type)
+{
+  int ret;
+  gnutls_x509_crt_t *x509_ca_list = NULL;
+  unsigned int x509_ncas;
+  unsigned int r = 0, i;
+  
+  if (cas != NULL && cas->data != NULL)
+    {
+      ret = gnutls_x509_crt_list_import2( &x509_ca_list, &x509_ncas, cas, type, 0);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      ret = gnutls_x509_trust_list_remove_cas(list, x509_ca_list, x509_ncas);
+      
+      for (i=0;i<x509_ncas;i++)
+        gnutls_x509_crt_deinit(x509_ca_list[i]);
+      gnutls_free(x509_ca_list);
+
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      else
+        r += ret;
+    }
+
+  return r;
+}
+
+static int
+gnutls_x509_trust_list_remove_trust_file(gnutls_x509_trust_list_t list,
+                                      const char* ca_file, 
+                                      gnutls_x509_crt_fmt_t type)
+{
+  gnutls_datum_t cas = { NULL, 0 };
+  size_t size;
+  int ret;
+
+    {
+      cas.data = (void*)read_binary_file (ca_file, &size);
+      if (cas.data == NULL)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_FILE_ERROR;
+        }
+      cas.size = size;
+    }
+
+  ret = gnutls_x509_trust_list_remove_trust_mem(list, &cas, type);
+  free(cas.data);
+
+  return ret;
+}
+
+static int load_revoked_certs(gnutls_x509_trust_list_t list, unsigned type)
+{
+DIR * dirp;
+struct dirent *d;
+int ret;
+int r = 0;
+char path[512];
+
+  dirp = opendir("/data/misc/keychain/cacerts-removed/");
+  if (dirp != NULL) 
+    {
+      do
+        {
+      	  d = readdir(dirp);
+      	  if (d != NULL && d->d_type == DT_REG) 
+      	    {
+      	  	snprintf(path, sizeof(path), "/data/misc/keychain/cacerts-removed/%s", d->d_name);
+
+                ret = gnutls_x509_trust_list_remove_trust_file(list, path, type);
+                if (ret >= 0)
+                  r += ret;
+      	    }
       	}
       while(d != NULL);
       closedir(dirp);
@@ -1689,13 +1768,17 @@ set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 {
   int r = 0, ret;
 
-  ret = load_dir_certs("/system/etc/security/cacerts/", cred, GNUTLS_X509_FMT_PEM, 1);
+  ret = load_dir_certs("/system/etc/security/cacerts/", cred, GNUTLS_X509_FMT_PEM);
   if (ret >= 0)
     r += ret;
 
-  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", cred, GNUTLS_X509_FMT_DER, 0);
+  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", cred, GNUTLS_X509_FMT_DER);
   if (ret >= 0)
     r += ret;
+
+  ret = load_revoked_certs(cred->tlist, GNUTLS_X509_FMT_DER);
+  if (ret >= 0)
+    r -= ret;
   
   return r;
 }

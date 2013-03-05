@@ -188,6 +188,44 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
     return i;
 }
 
+int
+gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
+                               const gnutls_x509_crt_t * clist,
+                               int clist_size)
+{
+    int i, r = 0, ret;
+    unsigned j;
+    uint32_t hash;
+    gnutls_datum_t dn;
+
+    for (i = 0; i < clist_size; i++) 
+      {
+        ret = gnutls_x509_crt_get_raw_dn(clist[i], &dn);
+        if (ret < 0) {
+            gnutls_assert();
+            return i;
+        }
+
+        hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+        hash %= list->size;
+
+        _gnutls_free_datum(&dn);
+
+        for (j=0;j<list->node[hash].trusted_ca_size;j++) 
+          {
+	    if (check_if_same_cert(clist[i], list->node[hash].trusted_cas[j]) == 0)
+	      {
+                list->node[hash].trusted_cas[j] = 
+			list->node[hash].trusted_cas[list->node[hash].trusted_ca_size-1];
+		list->node[hash].trusted_ca_size--;
+		r++;
+              }
+          }
+      }
+
+    return r;
+}
+
 /**
  * gnutls_x509_trust_list_add_named_crt:
  * @list: The structure of the list
