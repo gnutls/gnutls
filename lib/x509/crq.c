@@ -257,6 +257,34 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * buf_size)
 }
 
 /**
+ * gnutls_x509_crq_get_dn2:
+ * @crq: should contain a #gnutls_x509_crq_t structure
+ * @dn: a pointer to a structure to hold the name
+ *
+ * This function will allocate buffer and copy the name of the Certificate 
+ * request. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on error.
+ *
+ * Since: 3.1.10
+ **/
+int
+gnutls_x509_crq_get_dn2 (gnutls_x509_crq_t crq, gnutls_datum_t * dn)
+{
+  if (crq == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_get_dn (crq->crq,
+                                "certificationRequestInfo.subject.rdnSequence", dn);
+}
+
+/**
  * gnutls_x509_crq_get_dn_by_oid:
  * @crq: should contain a gnutls_x509_crq_t structure
  * @oid: holds an Object Identifier in a null terminated string

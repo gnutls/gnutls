@@ -15,7 +15,10 @@ support AES with PKCS #12.
 ** libgnutls-dane: Updated DANE verification options.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_get_issuer_dn2: Added
+gnutls_x509_crt_get_dn2: Added
+gnutls_x509_crl_get_issuer_dn2: Added
+gnutls_x509_crq_get_dn2: Added
 
 
 * Version 3.1.9 (released 2013-02-27)

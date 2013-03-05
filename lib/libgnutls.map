@@ -893,6 +893,10 @@ GNUTLS_3_1_0 {
 	gnutls_transport_get_int2;
 	gnutls_transport_get_int;
 	gnutls_pkcs11_privkey_status;
+	gnutls_x509_crt_get_issuer_dn2;
+	gnutls_x509_crt_get_dn2;
+	gnutls_x509_crl_get_issuer_dn2;
+	gnutls_x509_crq_get_dn2;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

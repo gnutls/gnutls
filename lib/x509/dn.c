@@ -84,6 +84,44 @@ cleanup:
   return ret;
 }
 
+int
+_gnutls_x509_get_dn (ASN1_TYPE asn1_struct,
+                       const char *asn1_rdn_name, gnutls_datum_t * dn)
+{
+char * buf;
+size_t buf_size;
+int ret;
+
+  buf_size = 384;
+  buf = gnutls_malloc(buf_size);
+  if (buf == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+  	
+  ret = _gnutls_x509_parse_dn (asn1_struct,
+                                asn1_rdn_name, buf, &buf_size);
+  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+    {
+      buf = gnutls_realloc_fast(buf, buf_size);
+      if (buf == NULL)
+        return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+      
+      ret = _gnutls_x509_parse_dn (asn1_struct,
+                                   asn1_rdn_name, buf, &buf_size);
+    }
+    
+  if (ret < 0)
+    {
+      gnutls_free(buf);
+      return gnutls_assert_val(ret);
+    }
+  
+  dn->data = (void*)buf;
+  dn->size = buf_size;
+
+  return ret;
+}
+
+
 /* Parses an X509 DN in the asn1_struct, and puts the output into
  * the string buf. The output is an LDAP encoded DN.
  *

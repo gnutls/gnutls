@@ -265,6 +265,33 @@ gnutls_x509_crl_get_dn_oid (gnutls_x509_crl_t crl,
                                   oid, sizeof_oid);
 }
 
+/**
+ * gnutls_x509_crl_get_issuer_dn2:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @dn: a pointer to a structure to hold the name
+ *
+ * This function will allocate buffer and copy the name of the CRL issuer.
+ * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on error.
+ *
+ * Since: 3.1.10
+ **/
+int
+gnutls_x509_crl_get_issuer_dn2 (gnutls_x509_crl_t crl, gnutls_datum_t * dn)
+{
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_get_dn (crl->crl,
+                                "tbsCertList.issuer.rdnSequence", dn);
+}
 
 /**
  * gnutls_x509_crl_get_signature_algorithm:

@@ -274,6 +274,34 @@ gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
 }
 
 /**
+ * gnutls_x509_crt_get_issuer_dn2:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @dn: a pointer to a structure to hold the name
+ *
+ * This function will allocate buffer and copy the name of issuer of the Certificate.
+ * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on error.
+ *
+ * Since: 3.1.10
+ **/
+int
+gnutls_x509_crt_get_issuer_dn2 (gnutls_x509_crt_t cert, gnutls_datum_t * dn)
+{
+  if (cert == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_get_dn (cert->cert,
+                                "tbsCertificate.issuer.rdnSequence", dn);
+}
+
+/**
  * gnutls_x509_crt_get_issuer_dn_by_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @oid: holds an Object Identified in null terminated string
@@ -390,6 +418,34 @@ gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
   return _gnutls_x509_parse_dn (cert->cert,
                                 "tbsCertificate.subject.rdnSequence", buf,
                                 buf_size);
+}
+
+/**
+ * gnutls_x509_crt_get_dn2:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @dn: a pointer to a structure to hold the name
+ *
+ * This function will allocate buffer and copy the name of the Certificate.
+ * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on error.
+ *
+ * Since: 3.1.10
+ **/
+int
+gnutls_x509_crt_get_dn2 (gnutls_x509_crt_t cert, gnutls_datum_t * dn)
+{
+  if (cert == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_get_dn (cert->cert,
+                                "tbsCertificate.subject.rdnSequence", dn);
 }
 
 /**
