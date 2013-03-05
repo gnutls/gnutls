@@ -515,7 +515,7 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
 }
 #else
 
-#define add_android_system_trust(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
+#define add_system_trust(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
 
 #endif
 
