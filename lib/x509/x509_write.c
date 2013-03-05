@@ -1138,7 +1138,7 @@ gnutls_x509_crt_cpy_crl_dist_points (gnutls_x509_crt_t dst,
  * gnutls_x509_crt_set_subject_key_id:
  * @cert: a certificate of type #gnutls_x509_crt_t
  * @id: The key ID
- * @id_size: Holds the size of the serial field.
+ * @id_size: Holds the size of the subject key ID field.
  *
  * This function will set the X.509 certificate's subject key ID
  * extension.
@@ -1201,7 +1201,7 @@ gnutls_x509_crt_set_subject_key_id (gnutls_x509_crt_t cert,
  * gnutls_x509_crt_set_authority_key_id:
  * @cert: a certificate of type #gnutls_x509_crt_t
  * @id: The key ID
- * @id_size: Holds the size of the serial field.
+ * @id_size: Holds the size of the key ID field.
  *
  * This function will set the X.509 certificate's authority key ID extension.
  * Only the keyIdentifier field can be set with this function.
