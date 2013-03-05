@@ -1642,8 +1642,9 @@ unsigned int i;
 }
 #elif defined(ANDROID) || defined(__ANDROID__)
 # include <dirent.h>
+# include <unistd.h>
 static int load_dir_certs(const char* dirname, gnutls_certificate_credentials_t cred,
-	unsigned type)
+	unsigned type, unsigned check_revoked)
 {
 DIR * dirp;
 struct dirent *d;
@@ -1658,6 +1659,16 @@ char path[512];
         {
       	  d = readdir(dirp);
       	  if (d != NULL && d->d_type == DT_REG) {
+
+      	  	if (check_revoked) 
+      	  	  {
+	      	    snprintf(path, sizeof(path), 
+      		                 "/data/misc/keychain/cacerts-removed/%s", d->d_name);
+	      	    if (access(path, R_OK) == 0)
+	      	      /* revoked -> do not add */
+	      	      continue;
+	          }
+
       	  	snprintf(path, sizeof(path), "%s/%s", dirname, d->d_name);
                 ret = gnutls_certificate_set_x509_trust_file (cred, path, type);
       	  	if (ret >= 0)
@@ -1678,11 +1689,11 @@ set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 {
   int r = 0, ret;
 
-  ret = load_dir_certs("/system/etc/security/cacerts/", cred, GNUTLS_X509_FMT_PEM);
+  ret = load_dir_certs("/system/etc/security/cacerts/", cred, GNUTLS_X509_FMT_PEM, 1);
   if (ret >= 0)
     r += ret;
 
-  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", cred, GNUTLS_X509_FMT_DER);
+  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", cred, GNUTLS_X509_FMT_DER, 0);
   if (ret >= 0)
     r += ret;
   
@@ -2487,3 +2498,4 @@ gnutls_certificate_free_crls (gnutls_certificate_credentials_t sc)
   /* do nothing for now */
   return;
 }
+
