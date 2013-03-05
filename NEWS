@@ -16,6 +16,9 @@ support AES with PKCS #12.
 
 ** libgnutls-dane: Updated DANE verification options.
 
+** configure: Trust store file must be explicitly set or unset when 
+cross compiling.
+
 ** API and ABI modifications:
 gnutls_x509_crt_get_issuer_dn2: Added
 gnutls_x509_crt_get_dn2: Added
