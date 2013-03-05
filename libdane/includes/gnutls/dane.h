@@ -125,8 +125,8 @@ const char* dane_cert_usage_name(dane_cert_usage_t usage);
 /**
  * dane_verify_flags_t:
  * @DANE_VFLAG_FAIL_IF_NOT_CHECKED: If irrelevant to this certificate DANE entries are received fail instead of succeeding.
- * @DANE_VFLAG_CHECK_EE_USAGE: The provided certificates will be verified only against any EE field. Combine with %DANE_VFLAG_FAIL_IF_NOT_CHECKED to fail if EE entries are not present.
- * @DANE_VFLAG_CHECK_CA_USAGE: The provided certificates will be verified only against any CA field. Combine with %DANE_VFLAG_FAIL_IF_NOT_CHECKED to fail if CA entries are not present.
+ * @DANE_VFLAG_ONLY_CHECK_EE_USAGE: The provided certificates will be verified only against any EE field. Combine with %DANE_VFLAG_FAIL_IF_NOT_CHECKED to fail if EE entries are not present.
+ * @DANE_VFLAG_ONLY_CHECK_CA_USAGE: The provided certificates will be verified only against any CA field. Combine with %DANE_VFLAG_FAIL_IF_NOT_CHECKED to fail if CA entries are not present.
  *
  * Enumeration of different verification status flags.
  */
