@@ -201,7 +201,7 @@ cpydata (const uint8_t * data, int data_size, gnutls_datum_t *result)
 {
   int i, j;
 
-  result->data = gnutls_malloc (data_size);
+  result->data = gnutls_malloc (data_size+1);
   if (result->data == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
