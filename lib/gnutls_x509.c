@@ -1691,7 +1691,7 @@ gnutls_x509_trust_list_remove_trust_mem(gnutls_x509_trust_list_t list,
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      ret = gnutls_x509_trust_list_remove_cas(list, x509_ca_list, x509_ncas);
+      ret = _gnutls_x509_trust_list_remove_cas(list, x509_ca_list, x509_ncas);
       
       for (i=0;i<x509_ncas;i++)
         gnutls_x509_crt_deinit(x509_ca_list[i]);

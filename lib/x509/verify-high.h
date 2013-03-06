@@ -23,6 +23,6 @@
 int _gnutls_trustlist_inlist (gnutls_x509_trust_list_t list,
 			      gnutls_x509_crt_t cert);
 int
-gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
+_gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
                                const gnutls_x509_crt_t * clist,
                                int clist_size);
