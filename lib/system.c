@@ -540,13 +540,13 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
   if (ret >= 0)
     r += ret;
 
-  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_DER);
-  if (ret >= 0)
-    r += ret;
-    
   ret = load_revoked_certs(list, GNUTLS_X509_FMT_DER);
   if (ret >= 0)
     r -= ret;
+
+  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", list, tl_flags, tl_vflags, GNUTLS_X509_FMT_DER);
+  if (ret >= 0)
+    r += ret;
 
   return r;
 }
