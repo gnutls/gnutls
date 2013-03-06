@@ -140,6 +140,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module gettimeofday:
   # Code from module gettimeofday-tests:
   # Code from module gnumakefile:
+  # Code from module hash-pjw-bare:
   # Code from module havelib:
   # Code from module hostent:
   # Code from module ignore-value:
@@ -1196,6 +1197,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/gettime.c
   lib/gettimeofday.c
   lib/glthread/threadlib.c
+  lib/hash-pjw-bare.c
+  lib/hash-pjw-bare.h
   lib/inet_ntop.c
   lib/inet_pton.c
   lib/intprops.h
