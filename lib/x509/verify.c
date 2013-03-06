@@ -209,8 +209,7 @@ is_issuer (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
   size_t id2_size;
   int ret;
 
-  if (cert->raw_issuer_dn.size == issuer->raw_dn.size &&
-    memcmp(cert->raw_issuer_dn.data, issuer->raw_dn.data, issuer->raw_dn.size) == 0)
+  if (_gnutls_x509_compare_raw_dn(&cert->raw_issuer_dn, &issuer->raw_dn) != 0)
     ret = 1;
   else
     ret = 0;
@@ -253,8 +252,7 @@ cleanup:
 static int
 is_crl_issuer (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer)
 {
-  if (crl->raw_issuer_dn.size == issuer->raw_dn.size &&
-    memcmp(crl->raw_issuer_dn.data, issuer->raw_dn.data, issuer->raw_dn.size) == 0)
+  if (_gnutls_x509_compare_raw_dn(&crl->raw_issuer_dn, &issuer->raw_dn) != 0)
     return 1;
   else
     return 0;
@@ -267,8 +265,7 @@ is_crl_issuer (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer)
 int
 _gnutls_is_same_dn (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
 {
-  if (cert1->raw_dn.size == cert2->raw_dn.size &&
-    memcmp(cert1->raw_dn.data, cert2->raw_dn.data, cert2->raw_dn.size) == 0)
+  if (_gnutls_x509_compare_raw_dn(&cert1->raw_dn, &cert2->raw_dn) != 0)
     return 1;
   else
     return 0;

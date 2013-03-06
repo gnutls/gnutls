@@ -2765,8 +2765,7 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
 static int
 crl_issuer_matches (gnutls_x509_crl_t crl, gnutls_x509_crt_t cert)
 {
-  if (crl->raw_issuer_dn.size == cert->raw_issuer_dn.size &&
-    memcmp(crl->raw_issuer_dn.data, cert->raw_issuer_dn.data, cert->raw_issuer_dn.size) == 0)
+  if (_gnutls_x509_compare_raw_dn(&crl->raw_issuer_dn, &cert->raw_issuer_dn) != 0)
     return 1;
   else
     return 0;

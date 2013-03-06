@@ -1066,7 +1066,30 @@ gnutls_x509_rdn_get_oid (const gnutls_datum_t * idn,
 
   asn1_delete_structure (&dn);
   return result;
+}
 
+/*
+ * Compares the DER encoded part of a DN.
+ *
+ * Returns 1 if the DN's match and (0) if they don't match. Otherwise
+ * a negative error code is returned to indicate error.
+ */
+int
+_gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
+                             const gnutls_datum_t * dn2)
+{
+
+  if (dn1->size != dn2->size)
+    {
+      gnutls_assert ();
+      return 0;
+    }
+  if (memcmp (dn1->data, dn2->data, dn2->size) != 0)
+    {
+      gnutls_assert ();
+      return 0;
+    }
+  return 1;                     /* they match */
 }
 
 /**

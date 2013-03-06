@@ -85,7 +85,8 @@ typedef struct gnutls_x509_privkey_int
 
 int _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src);
 
-
+int _gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
+                                 const gnutls_datum_t * dn2);
 
 int _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src);
 int _gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
