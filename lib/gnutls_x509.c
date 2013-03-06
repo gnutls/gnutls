@@ -1772,14 +1772,14 @@ set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
   if (ret >= 0)
     r += ret;
 
-  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", cred, GNUTLS_X509_FMT_DER);
-  if (ret >= 0)
-    r += ret;
-
   ret = load_revoked_certs(cred->tlist, GNUTLS_X509_FMT_DER);
   if (ret >= 0)
     r -= ret;
   
+  ret = load_dir_certs("/data/misc/keychain/cacerts-added/", cred, GNUTLS_X509_FMT_DER);
+  if (ret >= 0)
+    r += ret;
+
   return r;
 }
 
