@@ -660,9 +660,8 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
  * This function will set the Diffie-Hellman parameters for a
  * certificate server to use. These parameters will be used in
  * Ephemeral Diffie-Hellman cipher suites.  Note that only a pointer
- * to the parameters are stored in the certificate handle, so if you
- * deallocate the parameters before the certificate is deallocated,
- * you must change the parameters stored in the certificate first.
+ * to the parameters are stored in the certificate handle, so you
+ * must not deallocate the parameters before the certificate is deallocated.
  *
  **/
 void
