@@ -24,7 +24,7 @@ AC_PREREQ(2.61)
 AC_INIT([GnuTLS], [3.1.9], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CANONICAL_TARGET
+AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([1.11.3 no-dist-gzip dist-xz dist-lzip -Wall -Wno-override])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -89,10 +89,10 @@ hw_accel=none
 
 
 if test "$use_accel" != "no"; then
-case $target_cpu in
+case $host_cpu in
   i?86 | x86_64 | amd64)
       AC_CHECK_HEADERS(cpuid.h)
-      if test "$target_cpu" = "x86_64" || test "$target_cpu" = "amd64"; then
+      if test "$host_cpu" = "x86_64" || test "$host_cpu" = "amd64"; then
         hw_accel="x86-64"
       else
         hw_accel="x86"
@@ -370,7 +370,7 @@ dnl auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.h
 AC_ARG_WITH([default-trust-store-file],
   [AS_HELP_STRING([--with-default-trust-store-file=FILE],
     [use the given file default trust store])], with_default_trust_store_file="$withval",
-  [if test "$target_cpu" = "$host_cpu";then
+  [if test "$build" = "$host";then
   for i in \
     /etc/ssl/certs/ca-certificates.crt \
     /etc/pki/tls/cert.pem \
@@ -618,16 +618,17 @@ AC_CONFIG_FILES([
 
 AC_OUTPUT
 
+dnl  Warning flags:        errors: ${WERROR_CFLAGS} warnings: ${WARN_CFLAGS}
+dnl  Valgrind:             $opt_valgrind_tests ${VALGRIND}
 AC_MSG_NOTICE([summary of build options:
 
   version:              ${VERSION} shared $LT_CURRENT:$LT_REVISION:$LT_AGE
-  Host type:            ${host}
+  Host/Target system:   ${host}
+  Build system:         ${build}
   Install prefix:       ${prefix}
   Compiler:             ${CC}
   CFlags:               ${CFLAGS}
-  Warning flags:        errors: ${WERROR_CFLAGS} warnings: ${WARN_CFLAGS}
   Library types:        Shared=${enable_shared}, Static=${enable_static}
-  Valgrind:             $opt_valgrind_tests ${VALGRIND}
 ])
 
 AC_MSG_NOTICE([External hardware support:
