@@ -215,6 +215,7 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
           {
 	    if (_gnutls_check_if_same_cert(clist[i], list->node[hash].trusted_cas[j]) != 0)
 	      {
+                gnutls_x509_crt_deinit(list->node[hash].trusted_cas[j]);
                 list->node[hash].trusted_cas[j] = 
 			list->node[hash].trusted_cas[list->node[hash].trusted_ca_size-1];
 		list->node[hash].trusted_ca_size--;
