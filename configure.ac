@@ -119,6 +119,11 @@ AC_ARG_ENABLE(doc,
     enable_doc=$enableval, enable_doc=yes)
 AM_CONDITIONAL(ENABLE_DOC, test "$enable_doc" != "no")
 
+AC_ARG_ENABLE(tests,
+  AS_HELP_STRING([--disable-tests], [don't compile or run any tests]),
+    enable_tests=$enableval, enable_tests=yes)
+AM_CONDITIONAL(ENABLE_TESTS, test "$enable_tests" != "no")
+
 GTK_DOC_CHECK(1.1)
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.18])

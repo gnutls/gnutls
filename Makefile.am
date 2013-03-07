@@ -31,7 +31,9 @@ SUBDIRS += po src
 if ENABLE_DOC
 SUBDIRS += doc
 endif
+if ENABLE_TESTS
 SUBDIRS += tests
+endif
 
 if HAVE_GUILE
 SUBDIRS += guile
