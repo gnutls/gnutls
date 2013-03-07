@@ -55,7 +55,7 @@
 
 static void cmd_parser (int argc, char **argv);
 static void dane_info(const char* host, const char* proto, unsigned int port, 
-                      unsigned int ca, unsigned int local, common_info_st * cinfo);
+                      unsigned int ca, unsigned int domain, common_info_st * cinfo);
 
 static void dane_check(const char* host, const char* proto, unsigned int port,
                        common_info_st * cinfo);
@@ -166,7 +166,7 @@ cmd_parser (int argc, char **argv)
 
   if (HAVE_OPT(TLSA_RR))
     dane_info (OPT_ARG(HOST), proto, port,
-               HAVE_OPT(CA), HAVE_OPT(LOCAL), &cinfo);
+               HAVE_OPT(CA), ENABLED_OPT(DOMAIN), &cinfo);
   else if (HAVE_OPT(CHECK))
     dane_check (OPT_ARG(CHECK), proto, port, 
                 &cinfo);
@@ -307,7 +307,7 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
 }
 
 static void dane_info(const char* host, const char* proto, unsigned int port, 
-                      unsigned int ca, unsigned int local, common_info_st * cinfo)
+                      unsigned int ca, unsigned int domain, common_info_st * cinfo)
 {
   gnutls_pubkey_t pubkey;
   gnutls_x509_crt_t crt;
@@ -390,7 +390,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
   else type = 2;
 
   /* DANE certificate classification crap */
-  if (local==0)
+  if (domain==0)
     {  
       if (ca) usage = 0;
       else usage = 1;

@@ -133,8 +133,15 @@ flag = {
 
 flag = {
     name      = local;
-    descrip   = "The provided certificate or public key is a local entity.";
-    doc      = "DANE distinguishes certificates and public keys offered via the DNSSEC to trusted and local entities. Use this flag if this is a local (and possibly unsigned) entity.";
+    aliases   = domain;
+};
+
+flag = {
+    name      = domain;
+    descrip   = "The provided certificate or public key is issued by the local domain.";
+    enabled;
+    disable   = "no";
+    doc      = "DANE distinguishes certificates and public keys offered via the DNSSEC to trusted and local entities. This flag indicates that this is a domain-issued certificate, meaning that there could be no CA involved.";
 };
 
 doc-section = {
@@ -151,26 +158,27 @@ doc-section = {
   ds-text   = <<-_EOT_
 @subheading DANE TLSA RR generation
 
-To create a DANE TLSA resource record for a CA signed certificate use the following commands.
-
+To create a DANE TLSA resource record for a certificate (or public key) 
+that was issued localy and may or may not be signed by a CA use the following command.
 @example
 $ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem
 @end example
 
-For a self signed certificate use:
+To create a DANE TLSA resource record for a CA signed certificate, which will
+be marked as such use the following command.
 @example
 $ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem \
-  --local
+  --no-domain
 @end example
 
-The latter is useful to add in your DNS entry even if your certificate is signed 
+The former is useful to add in your DNS entry even if your certificate is signed 
 by a CA. That way even users who do not trust your CA will be able to verify your
 certificate using DANE.
 
-In order to create a record for the signer of your certificate use:
+In order to create a record for the CA signer of your certificate use the following.
 @example
 $ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem \
-  --ca
+  --ca --no-domain
 @end example
 
 To read a server's DANE TLSA entry, use:
