@@ -627,7 +627,7 @@ signing_key
 # Whether this certificate will be used to encrypt data (needed
 # in TLS RSA ciphersuites). Note that it is preferred to use different
 # keys for encryption and signing.
-#encryption_key
+encryption_key
 
 # Whether this key will be used to sign other certificates.
 #cert_signing_key
