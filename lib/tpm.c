@@ -881,7 +881,7 @@ int ret;
       ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_CTK_PEM,
        		                           srk_password, key_password, flags);
       if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
-        ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_DER,
+        ret = gnutls_privkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_RAW,
                                              srk_password, key_password, flags);
 
       if (ret < 0)
@@ -1138,7 +1138,7 @@ int ret;
       ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_CTK_PEM,
        		                                srk_password, flags);
       if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
-        ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_DER,
+        ret = gnutls_pubkey_import_tpm_raw (pkey, &fdata, GNUTLS_TPMKEY_FMT_RAW,
          		                                srk_password, flags);
       if (ret < 0)
         {
