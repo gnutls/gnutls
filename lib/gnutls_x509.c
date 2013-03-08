@@ -774,6 +774,9 @@ cleanup:
   gnutls_free (ccert);
   return ret;
 }
+#else
+# define read_cert_url(x,y) gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE)
+# define read_cas_url(x,y) gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE)
 #endif
 
 /* Reads a certificate file
@@ -786,12 +789,10 @@ read_cert_file (gnutls_certificate_credentials_t res,
   size_t size;
   char *data;
 
-#ifdef ENABLE_PKCS11
   if (strncmp (certfile, "pkcs11:", 7) == 0)
     {
       return read_cert_url (res, certfile);
     }
-#endif /* ENABLE_PKCS11 */
 
   data = read_binary_file (certfile, &size);
 
@@ -821,12 +822,14 @@ read_key_file (gnutls_certificate_credentials_t res,
   size_t size;
   char *data;
 
-#ifdef ENABLE_PKCS11
   if (strncmp (keyfile, "pkcs11:", 7) == 0)
     {
+#ifdef ENABLE_PKCS11
       return read_key_url (res, keyfile);
-    }
+#else
+      return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif /* ENABLE_PKCS11 */
+    }
 
   data = read_binary_file (keyfile, &size);
 
@@ -1562,12 +1565,10 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
   gnutls_datum_t cas;
   size_t size;
 
-#ifdef ENABLE_PKCS11
   if (strncmp (cafile, "pkcs11:", 7) == 0)
     {
       return read_cas_url (cred, cafile);
     }
-#endif
 
   cas.data = (void*)read_binary_file (cafile, &size);
   if (cas.data == NULL)
