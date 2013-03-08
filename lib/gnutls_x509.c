@@ -919,9 +919,10 @@ read_key_file (gnutls_certificate_credentials_t res,
   char *data;
 
   if (gnutls_url_is_supported(keyfile))
-    {
-      return read_key_url (res, keyfile);
-    }
+    return read_key_url (res, keyfile);
+
+  if (_gnutls_url_is_known(keyfile))
+    return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
   data = read_binary_file (keyfile, &size);
 
@@ -2150,3 +2151,41 @@ void gnutls_certificate_set_pin_function (gnutls_certificate_credentials_t cred,
   cred->pin.cb = fn;
   cred->pin.data = userdata;
 }
+
+/**
+ * gnutls_url_is_supported:
+ * @url: A PKCS 11 url
+ *
+ * Check whether url is supported.  Depending on the system libraries
+ * GnuTLS may support pkcs11 or tpmkey URLs.
+ *
+ * Returns: return non-zero if the given URL is supported, and zero if
+ * it is not known.
+ *
+ * Since: 3.1.0
+ **/
+int
+gnutls_url_is_supported (const char* url)
+{
+#ifdef ENABLE_PKCS11
+  if (strstr(url, "pkcs11:") != NULL)
+    return 1;
+#endif
+#ifdef HAVE_TROUSERS
+  if (strstr(url, "tpmkey:") != NULL)
+    return 1;
+#endif
+  return 0;
+}
+
+int
+_gnutls_url_is_known (const char* url)
+{
+  if (strstr(url, "pkcs11:") != NULL)
+    return 1;
+  else if (strstr(url, "tpmkey:") != NULL)
+    return 1;
+  else
+    return 0;
+}
+

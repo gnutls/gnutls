@@ -810,32 +810,6 @@ size_t len;
 }
 
 /**
- * gnutls_url_is_supported:
- * @url: A PKCS 11 url
- *
- * Check whether url is supported.  Depending on the system libraries
- * GnuTLS may support pkcs11 or tpmkey URLs.
- *
- * Returns: return non-zero if the given URL is supported, and zero if
- * it is not known.
- *
- * Since: 3.1.0
- **/
-int
-gnutls_url_is_supported (const char* url)
-{
-#ifdef ENABLE_PKCS11
-  if (strstr(url, "pkcs11:") != NULL)
-    return 1;
-#endif
-#ifdef HAVE_TROUSERS
-  if (strstr(url, "tpmkey:") != NULL)
-    return 1;
-#endif
-  return 0;
-}
-
-/**
  * gnutls_ocsp_status_request_is_checked:
  * @session: is a gnutls session
  * @flags: should be zero
