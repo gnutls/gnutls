@@ -918,11 +918,13 @@ read_key_file (gnutls_certificate_credentials_t res,
   size_t size;
   char *data;
 
-  if (gnutls_url_is_supported(keyfile))
-    return read_key_url (res, keyfile);
-
-  if (_gnutls_url_is_known(keyfile))
-    return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+  if (_gnutls_url_is_known(keyfile)) 
+    {
+      if (gnutls_url_is_supported(keyfile))
+        return read_key_url (res, keyfile);
+      else
+        return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+  }
 
   data = read_binary_file (keyfile, &size);
 
