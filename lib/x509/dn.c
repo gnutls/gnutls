@@ -88,79 +88,22 @@ int
 _gnutls_x509_get_dn (ASN1_TYPE asn1_struct,
                        const char *asn1_rdn_name, gnutls_datum_t * dn)
 {
-char * buf;
-size_t buf_size;
-int ret;
-
-  buf_size = 384;
-  buf = gnutls_malloc(buf_size);
-  if (buf == NULL)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-  	
-  ret = _gnutls_x509_parse_dn (asn1_struct,
-                                asn1_rdn_name, buf, &buf_size);
-  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      buf = gnutls_realloc_fast(buf, buf_size);
-      if (buf == NULL)
-        return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-      
-      ret = _gnutls_x509_parse_dn (asn1_struct,
-                                   asn1_rdn_name, buf, &buf_size);
-    }
-    
-  if (ret < 0)
-    {
-      gnutls_free(buf);
-      return gnutls_assert_val(ret);
-    }
-  
-  dn->data = (void*)buf;
-  dn->size = buf_size;
-
-  return ret;
-}
-
-
-/* Parses an X509 DN in the asn1_struct, and puts the output into
- * the string buf. The output is an LDAP encoded DN.
- *
- * asn1_rdn_name must be a string in the form "tbsCertificate.issuer.rdnSequence".
- * That is to point in the rndSequence.
- */
-int
-_gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
-                       const char *asn1_rdn_name, char *buf,
-                       size_t * sizeof_buf)
-{
   gnutls_buffer_st out_str;
   int k2, k1, result;
   char tmpbuffer1[ASN1_MAX_NAME_SIZE];
   char tmpbuffer2[ASN1_MAX_NAME_SIZE];
   char tmpbuffer3[ASN1_MAX_NAME_SIZE];
-  uint8_t value[MAX_STRING_LEN], *value2 = NULL;
-  gnutls_datum_t td, escaped = {NULL, 0};
+  uint8_t value[MAX_STRING_LEN];
+  gnutls_datum_t td = {NULL, 0}, tvd = {NULL, 0}, escaped = {NULL, 0};
   const char *ldap_desc;
   char oid[MAX_OID_SIZE];
   int len;
-
-  if (sizeof_buf == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  if (*sizeof_buf > 0 && buf)
-    buf[0] = 0;
-  else
-    *sizeof_buf = 0;
 
   _gnutls_buffer_init (&out_str);
 
   k1 = 0;
   do
     {
-
       k1++;
       /* create a string like "tbsCertList.issuer.rdnSequence.?1"
        */
@@ -236,28 +179,11 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
           _gnutls_str_cat (tmpbuffer3, sizeof (tmpbuffer3), ".value");
 
           len = 0;
-          result = asn1_read_value (asn1_struct, tmpbuffer3, NULL, &len);
-          if (result != ASN1_MEM_ERROR)
+          
+          result = _gnutls_x509_read_value(asn1_struct, tmpbuffer3, &tvd);
+          if (result < 0)
             {
               gnutls_assert ();
-              result = _gnutls_asn2err (result);
-              goto cleanup;
-            }
-
-          value2 = gnutls_malloc (len);
-          if (value2 == NULL)
-            {
-              gnutls_assert ();
-              result = GNUTLS_E_MEMORY_ERROR;
-              goto cleanup;
-            }
-
-          result = asn1_read_value (asn1_struct, tmpbuffer3, value2, &len);
-
-          if (result != ASN1_SUCCESS)
-            {
-              gnutls_assert ();
-              result = _gnutls_asn2err (result);
               goto cleanup;
             }
 #define STR_APPEND(y) if ((result=_gnutls_buffer_append_str( &out_str, y)) < 0) { \
@@ -290,18 +216,17 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
           ldap_desc = gnutls_x509_dn_oid_name (oid, GNUTLS_X509_DN_OID_RETURN_OID);
 
-
           STR_APPEND (ldap_desc);
           STR_APPEND ("=");
 
           result =
-              _gnutls_x509_dn_to_string (oid, value2, len, &td);
+              _gnutls_x509_dn_to_string (oid, tvd.data, tvd.size, &td);
           if (result < 0)
             {
               gnutls_assert ();
               _gnutls_debug_log
                 ("Cannot parse OID: '%s' with value '%s'\n",
-                 oid, _gnutls_bin2hex (value2, len, tmpbuffer3, sizeof(tmpbuffer3),
+                 oid, _gnutls_bin2hex (tvd.data, tvd.size, tmpbuffer3, sizeof(tmpbuffer3),
                                        NULL));
               goto cleanup;
             }
@@ -315,39 +240,81 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
           
           DATA_APPEND (escaped.data, escaped.size);
           _gnutls_free_datum (&td);
+          _gnutls_free_datum (&tvd);
           _gnutls_free_datum (&escaped);
-          gnutls_free (value2);
-          value2 = NULL;
-
         }
       while (1);
-
     }
   while (1);
 
-  if (out_str.length >= (unsigned int) *sizeof_buf)
+  result = _gnutls_buffer_to_datum (&out_str, dn);
+  if (result < 0)
+    gnutls_assert();
+
+  goto cleanup1;
+
+cleanup:
+  _gnutls_buffer_clear (&out_str);
+cleanup1:
+  _gnutls_free_datum (&escaped);
+  _gnutls_free_datum (&td);
+  _gnutls_free_datum (&tvd);
+  return result;
+
+}
+
+
+/* Parses an X509 DN in the asn1_struct, and puts the output into
+ * the string buf. The output is an LDAP encoded DN.
+ *
+ * asn1_rdn_name must be a string in the form "tbsCertificate.issuer.rdnSequence".
+ * That is to point in the rndSequence.
+ */
+int
+_gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
+                       const char *asn1_rdn_name, char *buf,
+                       size_t * buf_size)
+{
+int ret;
+gnutls_datum_t dn;
+
+  if (buf_size == NULL)
     {
       gnutls_assert ();
-      *sizeof_buf = out_str.length + 1;
-      result = GNUTLS_E_SHORT_MEMORY_BUFFER;
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  if (*buf_size > 0 && buf)
+    buf[0] = 0;
+  else
+    *buf_size = 0;
+
+  ret = _gnutls_x509_get_dn (asn1_struct, asn1_rdn_name, 
+                             &dn);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (dn.size >= (unsigned int) *buf_size)
+    {
+      gnutls_assert ();
+      *buf_size = dn.size + 1;
+      ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
       goto cleanup;
     }
 
   if (buf)
     {
-      _gnutls_buffer_pop_data (&out_str, buf, sizeof_buf);
-      buf[*sizeof_buf] = 0;
+      memcpy(buf, dn.data, dn.size);
+      buf[dn.size] = 0;
+      *buf_size = dn.size;
     }
   else
-    *sizeof_buf = out_str.length;
+    *buf_size = dn.size + 1;
 
-  result = 0;
-
+  ret = 0;
 cleanup:
-  gnutls_free (value2);
-  _gnutls_free_datum (&escaped);
-  _gnutls_buffer_clear (&out_str);
-  return result;
+  _gnutls_free_datum (&dn);
+  return  ret;
 }
 
 /* Parses an X509 DN in the asn1_struct, and searches for the
@@ -903,25 +870,25 @@ gnutls_x509_dn_deinit (gnutls_x509_dn_t dn)
  * gnutls_x509_rdn_get:
  * @idn: should contain a DER encoded RDN sequence
  * @buf: a pointer to a structure to hold the peer's name
- * @sizeof_buf: holds the size of @buf
+ * @buf_size: holds the size of @buf
  *
  * This function will return the name of the given RDN sequence.  The
  * name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
  * RFC4514.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
- * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@buf_size is
  * updated if the provided buffer is not long enough, otherwise a
  * negative error value.
  **/
 int
 gnutls_x509_rdn_get (const gnutls_datum_t * idn,
-                     char *buf, size_t * sizeof_buf)
+                     char *buf, size_t * buf_size)
 {
   int result;
   ASN1_TYPE dn = ASN1_TYPE_EMPTY;
 
-  if (sizeof_buf == 0)
+  if (buf_size == 0)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -948,7 +915,7 @@ gnutls_x509_rdn_get (const gnutls_datum_t * idn,
       return _gnutls_asn2err (result);
     }
 
-  result = _gnutls_x509_parse_dn (dn, "rdnSequence", buf, sizeof_buf);
+  result = _gnutls_x509_parse_dn (dn, "rdnSequence", buf, buf_size);
 
   asn1_delete_structure (&dn);
   return result;
@@ -963,27 +930,27 @@ gnutls_x509_rdn_get (const gnutls_datum_t * idn,
  *   to send. Use 0 for the first one.
  * @raw_flag: If non-zero then the raw DER data are returned.
  * @buf: a pointer to a structure to hold the peer's name
- * @sizeof_buf: holds the size of @buf
+ * @buf_size: holds the size of @buf
  *
  * This function will return the name of the given Object identifier,
  * of the RDN sequence.  The name will be encoded using the rules
  * from RFC4514.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
- * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@buf_size is
  * updated if the provided buffer is not long enough, otherwise a
  * negative error value.
  **/
 int
 gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
                             int indx, unsigned int raw_flag,
-                            void *buf, size_t * sizeof_buf)
+                            void *buf, size_t * buf_size)
 {
   int result;
   ASN1_TYPE dn = ASN1_TYPE_EMPTY;
   gnutls_datum_t td;
 
-  if (sizeof_buf == 0)
+  if (buf_size == 0)
     {
       return GNUTLS_E_INVALID_REQUEST;
     }
@@ -1013,7 +980,7 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
   if (result < 0)
     return gnutls_assert_val(result);
 
-  return _gnutls_strdatum_to_buf (&td, buf, sizeof_buf);
+  return _gnutls_strdatum_to_buf (&td, buf, buf_size);
 }
 
 /**
@@ -1021,13 +988,13 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
  * @idn: should contain a DER encoded RDN sequence
  * @indx: Indicates which OID to return. Use 0 for the first one.
  * @buf: a pointer to a structure to hold the peer's name OID
- * @sizeof_buf: holds the size of @buf
+ * @buf_size: holds the size of @buf
  *
  * This function will return the specified Object identifier, of the
  * RDN sequence.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
- * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@buf_size is
  * updated if the provided buffer is not long enough, otherwise a
  * negative error value.
  *
@@ -1035,12 +1002,12 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
  **/
 int
 gnutls_x509_rdn_get_oid (const gnutls_datum_t * idn,
-                         int indx, void *buf, size_t * sizeof_buf)
+                         int indx, void *buf, size_t * buf_size)
 {
   int result;
   ASN1_TYPE dn = ASN1_TYPE_EMPTY;
 
-  if (sizeof_buf == 0)
+  if (buf_size == 0)
     {
       return GNUTLS_E_INVALID_REQUEST;
     }
@@ -1062,7 +1029,7 @@ gnutls_x509_rdn_get_oid (const gnutls_datum_t * idn,
       return _gnutls_asn2err (result);
     }
 
-  result = _gnutls_x509_get_dn_oid (dn, "rdnSequence", indx, buf, sizeof_buf);
+  result = _gnutls_x509_get_dn_oid (dn, "rdnSequence", indx, buf, buf_size);
 
   asn1_delete_structure (&dn);
   return result;
