@@ -1246,14 +1246,20 @@ int
 gnutls_pubkey_import_url (gnutls_pubkey_t key, const char *url,
                           unsigned int flags)
 {
+  if (strncmp(url, "pkcs11:", 7) == 0)
 #ifdef ENABLE_PKCS11
-  if (strstr(url, "pkcs11:") != NULL)
     return gnutls_pubkey_import_pkcs11_url(key, url, flags);
+#else
+    return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
+
+  if (strncmp(url, "tpmkey:", 7) == 0)
 #ifdef HAVE_TROUSERS
-  if (strstr(url, "tpmkey:") != NULL)
     return gnutls_pubkey_import_tpm_url(key, url, NULL, 0);
+#else
+    return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
+
   return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 }
 

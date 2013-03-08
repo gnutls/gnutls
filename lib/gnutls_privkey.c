@@ -966,14 +966,20 @@ cleanup:
 int
 gnutls_privkey_import_url (gnutls_privkey_t key, const char *url, unsigned int flags)
 {
+  if (strncmp(url, "pkcs11:", 7) == 0)
 #ifdef ENABLE_PKCS11
-  if (strstr(url, "pkcs11:") != NULL)
     return gnutls_privkey_import_pkcs11_url(key, url);
+#else
+    return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
+
+  if (strncmp(url, "tpmkey:", 7) == 0)
 #ifdef HAVE_TROUSERS
-  if (strstr(url, "tpmkey:") != NULL)
     return gnutls_privkey_import_tpm_url(key, url, NULL, NULL, 0);
+#else
+    return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
+
   return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 }
 
