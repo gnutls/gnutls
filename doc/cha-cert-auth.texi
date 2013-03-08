@@ -224,19 +224,18 @@ exist for the CRL structure @code{gnutls_x509_crl_t}.
 The ``subject'' of an X.509 certificate is not described by
 a single name, but rather with a distinguished name. This in
 X.509 terminology is a list of strings each associated an object
-identifier. To make things simple GnuTLS provides @funcref{gnutls_x509_crt_get_dn}
+identifier. To make things simple GnuTLS provides @funcref{gnutls_x509_crt_get_dn2}
 which follows the rules in @xcite{RFC4514} and returns a single
 string. Access to each string by individual object identifiers
 can be accessed using @funcref{gnutls_x509_crt_get_dn_by_oid}.
 
-@showfuncdesc{gnutls_x509_crt_get_dn}
-@showfuncdesc{gnutls_x509_crt_get_dn_by_oid}
-@showfuncdesc{gnutls_x509_crt_get_dn_oid}
+@showfuncdesc{gnutls_x509_crt_get_dn2}
+@showfuncC{gnutls_x509_crt_get_dn,gnutls_x509_crt_get_dn_by_oid,gnutls_x509_crt_get_dn_oid}
 
 Similar functions exist to access the distinguished name
 of the issuer of the certificate.
 
-@showfuncD{gnutls_x509_crt_get_issuer_dn,gnutls_x509_crt_get_issuer_dn_by_oid,gnutls_x509_crt_get_issuer_dn_oid,gnutls_x509_crt_get_issuer}
+@showfuncE{gnutls_x509_crt_get_issuer_dn,gnutls_x509_crt_get_issuer_dn2,gnutls_x509_crt_get_issuer_dn_by_oid,gnutls_x509_crt_get_issuer_dn_oid,gnutls_x509_crt_get_issuer}
 
 The more powerful @funcref{gnutls_x509_crt_get_subject} and 
 @funcref{gnutls_x509_dn_get_rdn_ava} provide efficient but low-level access

@@ -110,8 +110,7 @@ functions that return other fields of the CRL structure are also provided.
 
 @showfuncdesc{gnutls_x509_crl_get_crt_serial}
 
-@showfuncE{gnutls_x509_crl_get_version,gnutls_x509_crl_get_issuer_dn,gnutls_x509_crl_get_this_update,gnutls_x509_crl_get_next_update,gnutls_x509_crl_get_crt_count}
-
+@showfuncF{gnutls_x509_crl_get_version,gnutls_x509_crl_get_issuer_dn,gnutls_x509_crl_get_issuer_dn2,gnutls_x509_crl_get_this_update,gnutls_x509_crl_get_next_update,gnutls_x509_crl_get_crt_count}
 
 @subsubheading Generation of a CRL
 
