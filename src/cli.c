@@ -393,6 +393,25 @@ struct servent * sr;
   return sr->s_name;
 }
 
+static int service_to_port(const char* service)
+{
+unsigned int port;
+struct servent * sr;
+  
+  port = atoi(service);
+  if (port != 0) return port;
+
+  sr = getservbyname(service, udp?"udp":"tcp");
+  if (sr == NULL)
+    {
+      fprintf(stderr, "Warning: getservbyname() failed.\n");
+      exit(1);
+    }
+
+  return ntohs(sr->s_port);
+}
+
+
 static int
 cert_verify_callback (gnutls_session_t session)
 {
@@ -487,8 +506,11 @@ cert_verify_callback (gnutls_session_t session)
 #ifdef HAVE_DANE
   if (dane) /* try DANE auth */
     {
+      int port;
       unsigned int sflags = ENABLED_OPT(LOCAL_DNS)?0:DANE_F_IGNORE_LOCAL_RESOLVER;
-      rc = dane_verify_session_crt( NULL, session, hostname, udp?"udp":"tcp", atoi(service), 
+      
+      port = service_to_port(service);
+      rc = dane_verify_session_crt( NULL, session, hostname, udp?"udp":"tcp", port, 
                                     sflags, 0, &status);
       if (rc < 0)
         {
@@ -508,7 +530,7 @@ cert_verify_callback (gnutls_session_t session)
                 return -1;
             }
           
-          fprintf(stderr, "- %s\n", out.data);
+          fprintf(stderr, "- DANE: %s\n", out.data);
           gnutls_free(out.data);
         }
 
