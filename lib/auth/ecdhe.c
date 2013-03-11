@@ -25,21 +25,65 @@
  * procedure of the certificate and anoymous authentication.
  */
 
-#include "gnutls_int.h"
+#include <gnutls_int.h>
 #include "gnutls_auth.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
 #include "gnutls_num.h"
 #include "gnutls_sig.h"
+#include <gnutls_state.h>
 #include <gnutls_datum.h>
 #include <gnutls_x509.h>
-#include <gnutls_state.h>
-#include <auth/ecdh_common.h>
+#include <auth/ecdhe.h>
 #include <gnutls_ecc.h>
 #include <ext/ecc.h>
 #include <algorithms.h>
 #include <auth/psk.h>
+#include <auth/cert.h>
 #include <gnutls_pk.h>
+
+static int gen_ecdhe_server_kx (gnutls_session_t, gnutls_buffer_st*);
+static int
+proc_ecdhe_server_kx (gnutls_session_t session,
+                                  uint8_t * data, size_t _data_size);
+static int
+proc_ecdhe_client_kx (gnutls_session_t session,
+                                    uint8_t * data, size_t _data_size);
+
+#if defined(ENABLE_ECDHE)
+const mod_auth_st ecdhe_ecdsa_auth_struct = {
+  "ECDHE_ECDSA",
+  _gnutls_gen_cert_server_crt,
+  _gnutls_gen_cert_client_crt,
+  gen_ecdhe_server_kx,
+  _gnutls_gen_ecdh_common_client_kx,   /* This is the only difference */
+  _gnutls_gen_cert_client_crt_vrfy,
+  _gnutls_gen_cert_server_cert_req,
+
+  _gnutls_proc_crt,
+  _gnutls_proc_crt,
+  proc_ecdhe_server_kx,
+  proc_ecdhe_client_kx,
+  _gnutls_proc_cert_client_crt_vrfy,
+  _gnutls_proc_cert_cert_req
+};
+
+const mod_auth_st ecdhe_rsa_auth_struct = {
+  "ECDHE_RSA",
+  _gnutls_gen_cert_server_crt,
+  _gnutls_gen_cert_client_crt,
+  gen_ecdhe_server_kx,
+  _gnutls_gen_ecdh_common_client_kx,   /* This is the only difference */
+  _gnutls_gen_cert_client_crt_vrfy,
+  _gnutls_gen_cert_server_cert_req,
+
+  _gnutls_proc_crt,
+  _gnutls_proc_crt,
+  proc_ecdhe_server_kx,
+  proc_ecdhe_client_kx,
+  _gnutls_proc_cert_client_crt_vrfy,
+  _gnutls_proc_cert_cert_req
+};
 
 static int calc_ecdh_key( gnutls_session_t session, gnutls_datum_t * psk_key)
 {
@@ -88,15 +132,12 @@ cleanup:
   _gnutls_mpi_release (&session->key.ecdh_y);
   gnutls_pk_params_release( &session->key.ecdh_params);
   return ret;
-
 }
 
-
-int
-_gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
+int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
                                     uint8_t * data, size_t _data_size,
-                                    gnutls_ecc_curve_t curve,
-                                    gnutls_datum_t *psk_key)
+                                    gnutls_ecc_curve_t curve, 
+                                    gnutls_datum_t* psk_key)
 {
   ssize_t data_size = _data_size;
   int ret, i = 0;
@@ -118,8 +159,26 @@ _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
   ret = calc_ecdh_key(session, psk_key);
   if (ret < 0)
     return gnutls_assert_val(ret);
-
+    
   return 0;
+}
+
+static int
+proc_ecdhe_client_kx (gnutls_session_t session,
+                                    uint8_t * data, size_t _data_size)
+{
+  gnutls_certificate_credentials_t cred;
+
+  cred = (gnutls_certificate_credentials_t)
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
+  if (cred == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+    }
+
+  return _gnutls_proc_ecdh_common_client_kx(session, data, _data_size,
+  	_gnutls_session_ecc_curve_get(session), NULL);
 }
 
 int
@@ -163,10 +222,26 @@ _gnutls_gen_ecdh_common_client_kx_int (gnutls_session_t session,
   return data->length;
 }
 
-/* Returns the bytes parsed */
+static int
+proc_ecdhe_server_kx (gnutls_session_t session,
+                                  uint8_t * data, size_t _data_size)
+{
+int ret;
+gnutls_datum_t vparams;
+
+  ret = _gnutls_proc_ecdh_common_server_kx(session, data, _data_size);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  vparams.data = data;
+  vparams.size = ret;
+
+  return _gnutls_proc_dhe_signature(session, data+ret, _data_size-ret, &vparams);
+}
+
 int
 _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
-                                  uint8_t * data, size_t _data_size)
+                                     uint8_t * data, size_t _data_size)
 {
   int i, ret, point_size;
   gnutls_ecc_curve_t curve;
@@ -243,3 +318,37 @@ int _gnutls_ecdh_common_print_server_kx (gnutls_session_t session, gnutls_buffer
     
   return data->length;
 }
+
+static int
+gen_ecdhe_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
+{
+  int ret = 0;
+  gnutls_certificate_credentials_t cred;
+
+  cred = (gnutls_certificate_credentials_t)
+    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
+  if (cred == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+    }
+
+  if ((ret = _gnutls_auth_info_set (session, GNUTLS_CRD_CERTIFICATE,
+                                    sizeof (cert_auth_info_st), 0)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_ecdh_common_print_server_kx (session, data, _gnutls_session_ecc_curve_get(session));
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  /* Generate the signature. */
+  return _gnutls_gen_dhe_signature(session, data, data->data, data->length);
+}
+
+#endif

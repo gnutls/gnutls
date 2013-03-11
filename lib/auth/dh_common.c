@@ -38,6 +38,8 @@
 #include <algorithms.h>
 #include <auth/psk.h>
 
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
+
 /* Frees the dh_info_st structure.
  */
 void
@@ -322,3 +324,5 @@ cleanup:
 
   return ret;
 }
+
+#endif

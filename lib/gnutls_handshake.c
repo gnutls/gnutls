@@ -3177,10 +3177,12 @@ check_server_params (gnutls_session_t session,
           dh_params =
             _gnutls_get_dh_params (x509_cred->dh_params,
                                    x509_cred->params_func, session);
+#ifdef ENABLE_RSA_EXPORT
           rsa_params =
             _gnutls_certificate_get_rsa_params (x509_cred->rsa_params,
                                                 x509_cred->params_func,
                                                 session);
+#endif
         }
 
       /* Check also if the certificate supports the
@@ -3234,6 +3236,7 @@ check_server_params (gnutls_session_t session,
     return 0;                   /* no need for params */
 
 
+#ifdef ENABLE_RSA_EXPORT
   /* If the key exchange method needs RSA or DH params,
    * but they are not set then remove it.
    */
@@ -3246,6 +3249,7 @@ check_server_params (gnutls_session_t session,
           return 1;
         }
     }
+#endif
 
   if (_gnutls_kx_needs_dh_params (kx) != 0)
     {

@@ -95,13 +95,18 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
   {"ANON-ECDH", GNUTLS_KX_ANON_ECDH, &anon_ecdh_auth_struct, 0, 0},
 #endif
   {"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, 0},
+#ifdef ENABLE_RSA_EXPORT
   {"RSA-EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0,
    1 /* needs RSA params */ },
+#endif
+#ifdef ENABLE_DHE
   {"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
+  {"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
+#endif
+#ifdef ENABLE_ECDHE
   {"ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, &ecdhe_rsa_auth_struct, 0, 0},
   {"ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, &ecdhe_ecdsa_auth_struct, 0, 0},
-  {"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
-
+#endif
 #ifdef ENABLE_SRP
   {"SRP-DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0, 0},
   {"SRP-RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0, 0},
@@ -109,9 +114,13 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 #endif
 #ifdef ENABLE_PSK
   {"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0, 0},
+# ifdef ENABLE_DHE
   {"DHE-PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct,
    1 /* needs DHE params */ , 0},
+# endif
+# ifdef ENABLE_ECDHE
   {"ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, &ecdhe_psk_auth_struct, 0 , 0},
+# endif
 #endif
   {0, 0, 0, 0, 0}
 };

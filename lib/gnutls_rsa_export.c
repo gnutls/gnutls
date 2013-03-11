@@ -31,6 +31,8 @@
 #include "x509/x509_int.h"
 #include "debug.h"
 
+#ifdef ENABLE_RSA_EXPORT
+
 /* returns e and m, depends on the requested bits.
  * We only support limited key sizes.
  */
@@ -232,3 +234,5 @@ gnutls_rsa_params_export_raw (gnutls_rsa_params_t rsa,
 
   return 0;
 }
+
+#endif

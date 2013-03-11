@@ -2184,3 +2184,155 @@ _gnutls_free_rsa_info (rsa_info_st * rsa)
   _gnutls_free_datum (&rsa->modulus);
   _gnutls_free_datum (&rsa->exponent);
 }
+
+int _gnutls_gen_dhe_signature(gnutls_session_t session, gnutls_buffer_st* data,
+	uint8_t* plain, unsigned plain_size)
+{
+gnutls_pcert_st *apr_cert_list;
+gnutls_privkey_t apr_pkey;
+int apr_cert_list_length;
+gnutls_datum_t signature = { NULL, 0 }, ddata;
+gnutls_sign_algorithm_t sign_algo;
+gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+int ret;
+
+  ddata.data = plain;
+  ddata.size = plain_size;
+
+  /* find the appropriate certificate */
+  if ((ret =
+       _gnutls_get_selected_cert (session, &apr_cert_list,
+                                  &apr_cert_list_length, &apr_pkey)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  if (apr_cert_list_length > 0)
+    {
+      if ((ret =
+           _gnutls_handshake_sign_data (session, &apr_cert_list[0],
+                                        apr_pkey, &ddata, &signature,
+                                        &sign_algo)) < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
+    }
+  else
+    {
+      gnutls_assert ();
+      ret = 0; /* ANON-DH, do not put a signature - ILLEGAL! */
+      goto cleanup;
+    }
+
+  if (_gnutls_version_has_selectable_sighash (ver))
+    {
+      const sign_algorithm_st *aid;
+      uint8_t p[2];
+
+      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
+        {
+          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+          goto cleanup;
+        }
+
+      aid = _gnutls_sign_to_tls_aid (sign_algo);
+      if (aid == NULL)
+        {
+          gnutls_assert();
+          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+          goto cleanup;
+        }
+      
+      p[0] = aid->hash_algorithm;
+      p[1] = aid->sign_algorithm;
+      
+      ret = _gnutls_buffer_append_data(data, p, 2);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+    }
+
+  ret = _gnutls_buffer_append_data_prefix(data, 16, signature.data, signature.size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+    }
+
+  ret = 0;
+
+cleanup:
+  _gnutls_free_datum (&signature);
+  return ret;
+}
+
+int
+_gnutls_proc_dhe_signature (gnutls_session_t session, uint8_t * data,
+                    size_t _data_size, gnutls_datum_t* vparams)
+{
+  int sigsize;
+  gnutls_datum_t signature;
+  int ret;
+  cert_auth_info_t info = _gnutls_get_auth_info (session);
+  ssize_t data_size = _data_size;
+  gnutls_pcert_st peer_cert;
+  gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+
+  if (info == NULL || info->ncerts == 0)
+    {
+      gnutls_assert ();
+      /* we need this in order to get peer's certificate */
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  /* VERIFY SIGNATURE */
+  if (_gnutls_version_has_selectable_sighash (ver))
+    {
+      sign_algorithm_st aid;
+
+      DECR_LEN (data_size, 1);
+      aid.hash_algorithm = *data++;
+      DECR_LEN (data_size, 1);
+      aid.sign_algorithm = *data++;
+      sign_algo = _gnutls_tls_aid_to_sign (&aid);
+      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
+        {
+          _gnutls_debug_log("unknown signature %d.%d\n", aid.sign_algorithm, aid.hash_algorithm);
+          gnutls_assert ();
+          return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
+        }
+    }
+  DECR_LEN (data_size, 2);
+  sigsize = _gnutls_read_uint16 (data);
+  data += 2;
+
+  DECR_LEN (data_size, sigsize);
+  signature.data = data;
+  signature.size = sigsize;
+
+  if ((ret =
+       _gnutls_get_auth_info_pcert (&peer_cert,
+                                    session->security_parameters.cert_type,
+                                    info)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret =
+    _gnutls_handshake_verify_data (session, &peer_cert, vparams, &signature,
+                                   sign_algo);
+
+  gnutls_pcert_deinit (&peer_cert);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  return 0;
+}

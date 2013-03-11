@@ -36,7 +36,7 @@
 #include "gnutls_num.h"
 #include "gnutls_mpi.h"
 #include <gnutls_state.h>
-#include <auth/ecdh_common.h>
+#include <auth/ecdhe.h>
 #include <ext/ecc.h>
 
 static int gen_anon_ecdh_server_kx (gnutls_session_t, gnutls_buffer_st*);

@@ -71,6 +71,7 @@ int gnutls_random_art (gnutls_random_art_t type,
 
 /* ANON & DHE */
 
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 /**
  * gnutls_dh_set_prime_bits:
  * @session: is a #gnutls_session_t structure.
@@ -231,57 +232,6 @@ gnutls_dh_get_pubkey (gnutls_session_t session, gnutls_datum_t * raw_key)
 }
 
 /**
- * gnutls_rsa_export_get_pubkey:
- * @session: is a gnutls session
- * @exponent: will hold the exponent.
- * @modulus: will hold the modulus.
- *
- * This function will return the peer's public key exponent and
- * modulus used in the last RSA-EXPORT authentication.  The output
- * parameters must be freed with gnutls_free().
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
- *   an error code is returned.
- **/
-int
-gnutls_rsa_export_get_pubkey (gnutls_session_t session,
-                              gnutls_datum_t * exponent,
-                              gnutls_datum_t * modulus)
-{
-  cert_auth_info_t info;
-  int ret;
-
-  if (gnutls_auth_get_type (session) == GNUTLS_CRD_CERTIFICATE)
-    {
-      info = _gnutls_get_auth_info (session);
-      if (info == NULL)
-        return GNUTLS_E_INTERNAL_ERROR;
-
-      ret = _gnutls_set_datum (modulus, info->rsa_export.modulus.data,
-                               info->rsa_export.modulus.size);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      ret = _gnutls_set_datum (exponent, info->rsa_export.exponent.data,
-                               info->rsa_export.exponent.size);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          _gnutls_free_datum (modulus);
-          return ret;
-        }
-
-      return 0;
-    }
-
-  return GNUTLS_E_INVALID_REQUEST;
-}
-
-
-/**
  * gnutls_dh_get_secret_bits:
  * @session: is a gnutls session
  *
@@ -330,6 +280,7 @@ gnutls_dh_get_secret_bits (gnutls_session_t session)
       return GNUTLS_E_INVALID_REQUEST;
     }
 }
+
 
 static int
 mpi_buf2bits (gnutls_datum_t * mpi_buf)
@@ -410,26 +361,6 @@ gnutls_dh_get_prime_bits (gnutls_session_t session)
   return mpi_buf2bits (&dh->prime);
 }
 
-/**
- * gnutls_rsa_export_get_modulus_bits:
- * @session: is a gnutls session
- *
- * Get the export RSA parameter's modulus size.
- *
- * Returns: The bits used in the last RSA-EXPORT key exchange with the
- *   peer, or a negative error code in case of error.
- **/
-int
-gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
-{
-  cert_auth_info_t info;
-
-  info = _gnutls_get_auth_info (session);
-  if (info == NULL)
-    return GNUTLS_E_INTERNAL_ERROR;
-
-  return mpi_buf2bits (&info->rsa_export.modulus);
-}
 
 /**
  * gnutls_dh_get_peers_public_bits:
@@ -488,6 +419,27 @@ gnutls_dh_get_peers_public_bits (gnutls_session_t session)
 
   return mpi_buf2bits (&dh->public_key);
 }
+
+/**
+ * gnutls_certificate_set_dh_params:
+ * @res: is a gnutls_certificate_credentials_t structure
+ * @dh_params: is a structure that holds Diffie-Hellman parameters.
+ *
+ * This function will set the Diffie-Hellman parameters for a
+ * certificate server to use. These parameters will be used in
+ * Ephemeral Diffie-Hellman cipher suites.  Note that only a pointer
+ * to the parameters are stored in the certificate handle, so you
+ * must not deallocate the parameters before the certificate is deallocated.
+ *
+ **/
+void
+gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
+                                  gnutls_dh_params_t dh_params)
+{
+  res->dh_params = dh_params;
+}
+
+#endif /* DH */
 
 /* CERTIFICATE STUFF */
 
@@ -651,26 +603,6 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
   return 0;
 }
 
-
-/**
- * gnutls_certificate_set_dh_params:
- * @res: is a gnutls_certificate_credentials_t structure
- * @dh_params: is a structure that holds Diffie-Hellman parameters.
- *
- * This function will set the Diffie-Hellman parameters for a
- * certificate server to use. These parameters will be used in
- * Ephemeral Diffie-Hellman cipher suites.  Note that only a pointer
- * to the parameters are stored in the certificate handle, so you
- * must not deallocate the parameters before the certificate is deallocated.
- *
- **/
-void
-gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
-                                  gnutls_dh_params_t dh_params)
-{
-  res->dh_params = dh_params;
-}
-
 /**
  * gnutls_certificate_set_params_function:
  * @res: is a gnutls_certificate_credentials_t structure
@@ -686,7 +618,6 @@ gnutls_certificate_set_params_function (gnutls_certificate_credentials_t res,
 {
   res->params_func = func;
 }
-
 
 /**
  * gnutls_certificate_set_verify_flags:
@@ -725,22 +656,7 @@ gnutls_certificate_set_verify_limits (gnutls_certificate_credentials_t res,
   res->verify_bits = max_bits;
 }
 
-/**
- * gnutls_certificate_set_rsa_export_params:
- * @res: is a gnutls_certificate_credentials_t structure
- * @rsa_params: is a structure that holds temporary RSA parameters.
- *
- * This function will set the temporary RSA parameters for a
- * certificate server to use.  These parameters will be used in
- * RSA-EXPORT cipher suites.
- **/
-void
-gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
-                                          res, gnutls_rsa_params_t rsa_params)
-{
-  res->rsa_params = rsa_params;
-}
-
+#ifdef ENABLE_PSK
 /**
  * gnutls_psk_set_params_function:
  * @res: is a gnutls_psk_server_credentials_t structure
@@ -756,7 +672,9 @@ gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
 {
   res->params_func = func;
 }
+#endif
 
+#ifdef ENABLE_ANON
 /**
  * gnutls_anon_set_params_function:
  * @res: is a gnutls_anon_server_credentials_t structure
@@ -772,6 +690,7 @@ gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,
 {
   res->params_func = func;
 }
+#endif
 
 /**
  * gnutls_load_file:
@@ -828,3 +747,94 @@ gnutls_ocsp_status_request_is_checked (gnutls_session_t session, unsigned int fl
 {
   return session->internals.ocsp_check_ok;
 }
+
+#ifdef ENABLE_RSA_EXPORT
+
+/**
+ * gnutls_rsa_export_get_pubkey:
+ * @session: is a gnutls session
+ * @exponent: will hold the exponent.
+ * @modulus: will hold the modulus.
+ *
+ * This function will return the peer's public key exponent and
+ * modulus used in the last RSA-EXPORT authentication.  The output
+ * parameters must be freed with gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
+int
+gnutls_rsa_export_get_pubkey (gnutls_session_t session,
+                              gnutls_datum_t * exponent,
+                              gnutls_datum_t * modulus)
+{
+  cert_auth_info_t info;
+  int ret;
+
+  if (gnutls_auth_get_type (session) == GNUTLS_CRD_CERTIFICATE)
+    {
+      info = _gnutls_get_auth_info (session);
+      if (info == NULL)
+        return GNUTLS_E_INTERNAL_ERROR;
+
+      ret = _gnutls_set_datum (modulus, info->rsa_export.modulus.data,
+                               info->rsa_export.modulus.size);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
+
+      ret = _gnutls_set_datum (exponent, info->rsa_export.exponent.data,
+                               info->rsa_export.exponent.size);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          _gnutls_free_datum (modulus);
+          return ret;
+        }
+
+      return 0;
+    }
+
+  return GNUTLS_E_INVALID_REQUEST;
+}
+
+/**
+ * gnutls_rsa_export_get_modulus_bits:
+ * @session: is a gnutls session
+ *
+ * Get the export RSA parameter's modulus size.
+ *
+ * Returns: The bits used in the last RSA-EXPORT key exchange with the
+ *   peer, or a negative error code in case of error.
+ **/
+int
+gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
+{
+  cert_auth_info_t info;
+
+  info = _gnutls_get_auth_info (session);
+  if (info == NULL)
+    return GNUTLS_E_INTERNAL_ERROR;
+
+  return mpi_buf2bits (&info->rsa_export.modulus);
+}
+
+/**
+ * gnutls_certificate_set_rsa_export_params:
+ * @res: is a gnutls_certificate_credentials_t structure
+ * @rsa_params: is a structure that holds temporary RSA parameters.
+ *
+ * This function will set the temporary RSA parameters for a
+ * certificate server to use.  These parameters will be used in
+ * RSA-EXPORT cipher suites.
+ **/
+void
+gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
+                                          res, gnutls_rsa_params_t rsa_params)
+{
+  res->rsa_params = rsa_params;
+}
+
+#endif

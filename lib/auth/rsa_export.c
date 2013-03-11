@@ -42,6 +42,8 @@
 #include <random.h>
 #include <abstract_int.h>
 
+#ifdef ENABLE_RSA_EXPORT
+
 int _gnutls_gen_rsa_client_kx (gnutls_session_t, gnutls_buffer_st*);
 static int gen_rsa_export_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_rsa_export_server_kx (gnutls_session_t, uint8_t *, size_t);
@@ -461,3 +463,5 @@ proc_rsa_export_server_kx (gnutls_session_t session,
 
   return ret;
 }
+
+#endif
