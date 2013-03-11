@@ -355,11 +355,6 @@ gnutls_session_t initialize_session (int dtls)
       gnutls_db_set_store_function (session, wrap_db_store);
       gnutls_db_set_ptr (session, NULL);
     }
-#ifdef ENABLE_SESSION_TICKET
-  if (noticket == 0)
-    gnutls_session_ticket_enable_server (session, &session_ticket_key);
-#endif
-
 
   if (noticket == 0)
     gnutls_session_ticket_enable_server (session, &session_ticket_key);
