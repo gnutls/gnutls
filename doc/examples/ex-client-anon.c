@@ -70,7 +70,11 @@ main (void)
     }
   else
     {
-      printf ("- Handshake was completed\n");
+      char* desc;
+      
+      desc = gnutls_session_get_desc(session);
+      printf ("- Session info: %s\n", desc);
+      gnutls_free(desc);
     }
 
   gnutls_record_send (session, MSG, strlen (MSG));

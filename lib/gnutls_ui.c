@@ -836,5 +836,71 @@ gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
 {
   res->rsa_params = rsa_params;
 }
-
 #endif
+
+#define DESC_SIZE 64
+
+/**
+ * gnutls_session_get_desc:
+ * @session: is a gnutls session
+ *
+ * This function returns a string describing the current session.
+ * The string is null terminated and allocated using gnutls_malloc().
+ *
+ * Returns: a description of the protocols and algorithms in the current session.
+ *
+ * Since: 3.1.10
+ **/
+char *
+gnutls_session_get_desc (gnutls_session_t session)
+{
+    gnutls_kx_algorithm_t kx;
+    unsigned type;
+    char kx_name[32];
+    char proto_name[32];
+    const char* curve_name = NULL;
+    unsigned dh_bits = 0;
+    char* desc;
+
+    kx = session->security_parameters.kx_algorithm;
+    
+    if (kx == GNUTLS_KX_ANON_ECDH || kx == GNUTLS_KX_ECDHE_PSK ||
+        kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA) 
+      {
+        curve_name = gnutls_ecc_curve_get_name(gnutls_ecc_curve_get(session));
+      }
+    else if (kx == GNUTLS_KX_ANON_DH || kx == GNUTLS_KX_DHE_PSK ||
+        kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) 
+      {
+        dh_bits = gnutls_dh_get_prime_bits (session);
+      }
+      
+    if (curve_name != NULL)
+      snprintf(kx_name, sizeof(kx_name), "%s-%s", gnutls_kx_get_name(kx), curve_name);
+    else if (dh_bits != 0)
+      snprintf(kx_name, sizeof(kx_name), "%s-%u", gnutls_kx_get_name(kx), dh_bits);
+    else
+      snprintf(kx_name, sizeof(kx_name), "%s", gnutls_kx_get_name(kx));
+
+    type = gnutls_certificate_type_get (session);
+    if (type == GNUTLS_CRT_X509)
+      snprintf(proto_name, sizeof(proto_name), "%s-PKIX", gnutls_protocol_get_name(_gnutls_protocol_get_version(session)));
+    else
+      snprintf(proto_name, sizeof(proto_name), "%s-%s", gnutls_protocol_get_name(_gnutls_protocol_get_version(session)),
+                                                        gnutls_certificate_type_get_name(type));
+    
+    gnutls_protocol_get_name(_gnutls_protocol_get_version (session)),
+
+    desc = gnutls_malloc(DESC_SIZE);
+    if (desc == NULL)
+      return NULL;
+
+    snprintf(desc, DESC_SIZE,
+             "(%s)-(%s)-(%s)-(%s)",
+            proto_name,
+            kx_name,
+            gnutls_cipher_get_name (gnutls_cipher_get (session)),
+            gnutls_mac_get_name (gnutls_mac_get (session)));
+            
+    return desc;
+}

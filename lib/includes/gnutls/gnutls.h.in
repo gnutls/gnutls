@@ -1090,6 +1090,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                 gnutls_datum_t * data);
   void gnutls_session_get_random (gnutls_session_t session, gnutls_datum_t* client, 
                                   gnutls_datum_t* server);
+  char * gnutls_session_get_desc (gnutls_session_t session);
 
   int gnutls_session_set_premaster (gnutls_session_t session, unsigned int entity,
                            gnutls_protocol_t version, 

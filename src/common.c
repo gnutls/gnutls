@@ -457,7 +457,12 @@ print_info (gnutls_session_t session, int verbose, int print_cert)
     unsigned char session_id[33];
     size_t session_id_size = sizeof (session_id);
     gnutls_srtp_profile_t srtp_profile;
+    char *desc;
     int rc;
+
+    desc = gnutls_session_get_desc(session);
+    printf ("- Description: %s\n", desc);
+    gnutls_free(desc);
 
     /* print session ID */
     gnutls_session_get_id (session, session_id, &session_id_size);

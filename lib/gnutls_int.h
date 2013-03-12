@@ -536,7 +536,7 @@ typedef struct
   /* FIXME: The following are not saved in the session storage
    * for session resumption.
    */
-
+  
   /* Used by extensions that enable supplemental data: Which ones
    * do that? Do they belong in security parameters?
    */
