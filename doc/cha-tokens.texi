@@ -88,6 +88,13 @@ Additional functions are available that will return
 information over a public key, as well as a function that given a public
 key fingerprint would provide a memorable sketch.
 
+The key_id and random_art functions are based on an SHA1 digest of the
+the public key canonicalized as a DER-formatted, ASN.1-encoded
+subjectPublicKeyInfo object.  This is different from the ``common
+method'' described by section 4.2.1.2 of @xcite{RFC5280} in that
+GnuTLS includes the algorithmIdentifier (algorithm plus parameters) in
+addition to the raw key material itself.
+
 @showfuncD{gnutls_pubkey_get_pk_algorithm,gnutls_pubkey_get_preferred_hash_algorithm,gnutls_pubkey_get_key_id,gnutls_random_art}
 
 To export the key-specific parameters, or obtain a unique key ID the following functions are provided.

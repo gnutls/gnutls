@@ -113,6 +113,12 @@ E. Rescorla, M. Ray, S. Dispensa, and N. Oskov, "Transport Layer
 Security (TLS) Renegotiation Indication Extension", February 2010,
 available from @url{http://www.ietf.org/rfc/rfc5746}.
 
+@item @anchor{RFC5280}[RFC5280]
+D. Cooper, S. Santesson, S. Farrell, S. Boeyen, R. Housley, and
+W. Polk, "Internet X.509 Public Key Infrastructure Certificate and
+Certificate Revocation List (CRL) Profile", May 2008, available from
+@url{http://www.ietf.org/rfc/rfc5280}.
+
 @item @anchor{TLSTKT}[TLSTKT]
 Joseph Salowey, Hao Zhou, Pasi Eronen, Hannes Tschofenig, "Transport
 Layer Security (TLS) Session Resumption without Server-Side State",
