@@ -506,6 +506,7 @@ namespace gnutls
     RETWRAP (gnutls_dh_get_pubkey (s, &raw_key));
   }
 
+#ifdef ENABLE_RSA_EXPORT
   void session::get_rsa_export_pubkey (gnutls_datum_t & exponent,
 				       gnutls_datum_t & modulus) const
   {
@@ -516,6 +517,13 @@ namespace gnutls
   {
     return RETWRAP (gnutls_rsa_export_get_modulus_bits (s));
   }
+
+  void certificate_credentials::
+    set_rsa_export_params (const rsa_params & params)
+  {
+    gnutls_certificate_set_rsa_export_params (cred, params.get_params_t ());
+  }
+#endif
 
   void server_session::
     set_certificate_request (gnutls_certificate_request_t req)
@@ -616,12 +624,6 @@ namespace gnutls
   void certificate_credentials::set_dh_params (const dh_params & params)
   {
     gnutls_certificate_set_dh_params (cred, params.get_params_t ());
-  }
-
-  void certificate_credentials::
-    set_rsa_export_params (const rsa_params & params)
-  {
-    gnutls_certificate_set_rsa_export_params (cred, params.get_params_t ());
   }
 
   void certificate_credentials::set_verify_flags (unsigned int flags)
@@ -927,6 +929,7 @@ psk_server_credentials::psk_server_credentials ():credentials
 
 // RSA
 
+#ifdef ENABLE_RSA_EXPORT
   rsa_params::rsa_params ()
   {
     RETWRAP (gnutls_rsa_params_init (&params));
@@ -996,5 +999,5 @@ psk_server_credentials::psk_server_credentials ():credentials
     RETWRAP (gnutls_rsa_params_export_raw
 	     (params, &m, &e, &d, &p, &q, &u, NULL));
   }
-
+#endif
 }				// namespace gnutls

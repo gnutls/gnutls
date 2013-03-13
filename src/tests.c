@@ -185,6 +185,7 @@ static gnutls_datum_t exp = { NULL, 0 }, mod =
 {
 NULL, 0};
 
+#ifdef ENABLE_RSA_EXPORT
 test_code_t
 test_export (gnutls_session_t session)
 {
@@ -253,8 +254,8 @@ test_export_info (gnutls_session_t session)
     }
 
   return ret;
-
 }
+#endif
 
 static gnutls_datum_t pubkey = { NULL, 0 };
 static gnutls_ecc_curve_t curve = GNUTLS_ECC_CURVE_INVALID;

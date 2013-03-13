@@ -129,9 +129,11 @@ static const TLS_TEST tls_tests[] = {
    */
   {"whether the server supports session resumption",
    test_session_resume2, "yes", "no", "dunno"},
+#ifdef ENABLE_RSA_EXPORT
   {"for export-grade ciphersuite support", test_export, "yes", "no",
    "dunno"},
   {"RSA-export ciphersuite info", test_export_info, "", "N/A", "N/A"},
+#endif
 #ifdef ENABLE_ANON
   {"for anonymous authentication support", test_anonymous, "yes", "no",
    "dunno"},

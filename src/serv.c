@@ -302,6 +302,7 @@ get_params (gnutls_session_t session, gnutls_params_type_t type,
   return 0;
 }
 
+#ifdef ENABLE_RSA_EXPORT
 static int
 generate_rsa_params (void)
 {
@@ -327,6 +328,13 @@ generate_rsa_params (void)
 
   return 0;
 }
+#else
+static int
+generate_rsa_params (void) 
+{
+  return 0;
+}
+#endif
 
 LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 

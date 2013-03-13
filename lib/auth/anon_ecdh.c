@@ -27,7 +27,7 @@
 
 #include <gnutls_int.h>
 
-#ifdef ENABLE_ANON
+#if defined(ENABLE_ANON) && defined(ENABLE_ECDHE) 
 
 #include "gnutls_auth.h"
 #include "gnutls_errors.h"

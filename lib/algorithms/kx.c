@@ -90,8 +90,10 @@ struct gnutls_kx_algo_entry
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
-#ifdef ENABLE_ANON
+#if defined(ENABLE_ANON) && defined(ENABLE_DHE)
   {"ANON-DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0},
+#endif
+#if defined(ENABLE_ANON) && defined(ENABLE_ECDHE)
   {"ANON-ECDH", GNUTLS_KX_ANON_ECDH, &anon_ecdh_auth_struct, 0, 0},
 #endif
   {"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, 0},
