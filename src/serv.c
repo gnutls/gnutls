@@ -946,6 +946,7 @@ main (int argc, char **argv)
 {
   int ret, mtu, port;
   char name[256];
+  int cert_set = 0;
 
   set_program_name (argv[0]);
   cmd_parser (argc, argv);
@@ -1056,7 +1057,7 @@ main (int argc, char **argv)
         }
     }
 
-  if (HAVE_OPT (PGPCERTFILE))
+  if (pgp_certfile != NULL && pgp_keyfile != NULL)
     {
       if (HAVE_OPT (PGPSUBKEY))
         ret = gnutls_certificate_set_openpgp_key_file2
@@ -1073,38 +1074,61 @@ main (int argc, char **argv)
                    ret, pgp_certfile, pgp_keyfile);
           GERR (ret);
         }
+      else
+        cert_set = 1;
     }
 #endif
 
-  if (x509_certfile != NULL)
-    if ((ret = gnutls_certificate_set_x509_key_file
-         (cert_cred, x509_certfile, x509_keyfile, x509ctype)) < 0)
-      {
-        fprintf (stderr,
+  if (x509_certfile != NULL && x509_keyfile != NULL)
+    {
+      ret = gnutls_certificate_set_x509_key_file
+         (cert_cred, x509_certfile, x509_keyfile, x509ctype);
+      if (ret < 0)
+        {
+          fprintf (stderr,
                  "Error reading '%s' or '%s'\n", x509_certfile, x509_keyfile);
-        GERR (ret);
-        exit (1);
-      }
+          GERR (ret);
+          exit (1);
+        }
+      else
+        cert_set = 1;
+    }
 
-  if (x509_dsacertfile != NULL)
-    if ((ret = gnutls_certificate_set_x509_key_file
-         (cert_cred, x509_dsacertfile, x509_dsakeyfile, x509ctype)) < 0)
-      {
-        fprintf (stderr, "Error reading '%s' or '%s'\n",
-                 x509_dsacertfile, x509_dsakeyfile);
-        GERR (ret);
-        exit (1);
-      }
+  if (x509_dsacertfile != NULL && x509_dsakeyfile != NULL)
+    {
+      ret = gnutls_certificate_set_x509_key_file
+         (cert_cred, x509_dsacertfile, x509_dsakeyfile, x509ctype);
+      if (ret < 0)
+        {
+          fprintf (stderr,
+                 "Error reading '%s' or '%s'\n", x509_dsacertfile, x509_dsakeyfile);
+          GERR (ret);
+          exit (1);
+        }
+      else
+        cert_set = 1;
+    }
 
-  if (x509_ecccertfile != NULL)
-    if ((ret = gnutls_certificate_set_x509_key_file
-         (cert_cred, x509_ecccertfile, x509_ecckeyfile, x509ctype)) < 0)
-      {
-        fprintf (stderr, "Error reading '%s' or '%s'\n",
-                 x509_ecccertfile, x509_ecckeyfile);
-        GERR (ret);
-        exit (1);
-      }
+  if (x509_ecccertfile != NULL && x509_ecckeyfile != NULL)
+    {
+      ret = gnutls_certificate_set_x509_key_file
+         (cert_cred, x509_ecccertfile, x509_ecckeyfile, x509ctype);
+      if (ret < 0)
+        {
+          fprintf (stderr,
+                 "Error reading '%s' or '%s'\n", x509_ecccertfile, x509_ecckeyfile);
+          GERR (ret);
+          exit (1);
+        }
+      else
+        cert_set = 1;
+    }
+    
+  if (cert_set == 0) 
+    {
+      fprintf(stderr, "No private key and certificate pair was set.\n");
+      exit(1);
+    }
 
   /* OCSP status-request TLS extension */
   if (status_response_ocsp)
