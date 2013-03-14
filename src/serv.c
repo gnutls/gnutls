@@ -1126,8 +1126,7 @@ main (int argc, char **argv)
     
   if (cert_set == 0) 
     {
-      fprintf(stderr, "No private key and certificate pair was set.\n");
-      exit(1);
+      fprintf(stderr, "Warning: no private key and certificate pairs were set.\n");
     }
 
   /* OCSP status-request TLS extension */
