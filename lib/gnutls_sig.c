@@ -226,7 +226,7 @@ es_cleanup:
     }
 
    if (!_gnutls_version_has_selectable_sighash (ver))
-    return _gnutls_privkey_sign_hash (pkey, hash_concat, signature);
+    return gnutls_privkey_sign_raw_data (pkey, 0, hash_concat, signature);
   else
     return gnutls_privkey_sign_hash (pkey, hash_algo, 0, hash_concat, signature);
 }

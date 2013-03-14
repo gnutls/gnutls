@@ -284,6 +284,12 @@ int gnutls_privkey_sign_hash (gnutls_privkey_t signer,
 			      const gnutls_datum_t * hash_data,
 			      gnutls_datum_t * signature);
 
+int
+gnutls_privkey_sign_raw_data (gnutls_privkey_t key,
+			      unsigned flags,
+                              const gnutls_datum_t * data,
+                              gnutls_datum_t * signature);
+
 int gnutls_privkey_decrypt_data (gnutls_privkey_t key,
                                  unsigned int flags,
                                  const gnutls_datum_t * ciphertext,

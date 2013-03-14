@@ -417,6 +417,9 @@ cleanup:
  * #gnutls_privkey_t structure. At least one of the two callbacks
  * must be non-null.
  *
+ * Note that the signing function is supposed to "raw" sign data, i.e.,
+ * without any hashing or preprocessing.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -448,6 +451,9 @@ gnutls_privkey_import_ext (gnutls_privkey_t pkey,
  * #gnutls_privkey_t structure. At least one of the two callbacks
  * must be non-null. If a deinitialization function is provided
  * then flags is assumed to contain %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE.
+ *
+ * Note that the signing function is supposed to "raw" sign data, i.e.,
+ * without any hashing or preprocessing.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -728,7 +734,7 @@ gnutls_privkey_sign_data (gnutls_privkey_t signer,
       goto cleanup;
     }
 
-  ret = _gnutls_privkey_sign_hash (signer, &digest, signature);
+  ret = gnutls_privkey_sign_raw_data (signer, flags, &digest, signature);
   _gnutls_free_datum (&digest);
 
   if (ret < 0)
@@ -791,7 +797,7 @@ gnutls_privkey_sign_hash (gnutls_privkey_t signer,
       goto cleanup;
     }
 
-  ret = _gnutls_privkey_sign_hash (signer, &digest, signature);
+  ret = gnutls_privkey_sign_raw_data (signer, flags, &digest, signature);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -805,42 +811,48 @@ cleanup:
   return ret;
 }
 
-/*-
- * _gnutls_privkey_sign_hash:
+/**
+ * gnutls_privkey_sign_raw_data:
  * @key: Holds the key
+ * @flags: should be zero
  * @data: holds the data to be signed
  * @signature: will contain the signature allocate with gnutls_malloc()
  *
  * This function will sign the given data using a signature algorithm
- * supported by the private key.
+ * supported by the private key. Note that this is a low-level function
+ * and does not apply any preprocessing or hash on the signed data. Use
+ * it only if you know what are you doing.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.
- -*/
+ *
+ * Since: 3.1.10
+ **/
 int
-_gnutls_privkey_sign_hash (gnutls_privkey_t key,
-                           const gnutls_datum_t * hash,
-                           gnutls_datum_t * signature)
+gnutls_privkey_sign_raw_data (gnutls_privkey_t key,
+				unsigned flags,
+                                const gnutls_datum_t * data,
+                                gnutls_datum_t * signature)
 {
   switch (key->type)
     {
 #ifdef ENABLE_OPENPGP
     case GNUTLS_PRIVKEY_OPENPGP:
       return gnutls_openpgp_privkey_sign_hash (key->key.openpgp,
-                                                hash, signature);
+                                                data, signature);
 #endif
 #ifdef ENABLE_PKCS11
     case GNUTLS_PRIVKEY_PKCS11:
       return _gnutls_pkcs11_privkey_sign_hash (key->key.pkcs11,
-                                               hash, signature);
+                                               data, signature);
 #endif
     case GNUTLS_PRIVKEY_X509:
       return _gnutls_pk_sign (key->key.x509->pk_algorithm,
-                              signature, hash, &key->key.x509->params);
+                              signature, data, &key->key.x509->params);
     case GNUTLS_PRIVKEY_EXT:
       if (key->key.ext.sign_func == NULL)
         return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-      return key->key.ext.sign_func(key, key->key.ext.userdata, hash, signature);
+      return key->key.ext.sign_func(key, key->key.ext.userdata, data, signature);
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;

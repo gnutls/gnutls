@@ -54,10 +54,4 @@ int pk_hash_data (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
                   gnutls_pk_params_st * params, const gnutls_datum_t * data,
                   gnutls_datum_t * digest);
 
-int
-_gnutls_privkey_sign_hash (gnutls_privkey_t key,
-                           const gnutls_datum_t * hash,
-                           gnutls_datum_t * signature);
-
-
 #endif
