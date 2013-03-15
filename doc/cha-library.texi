@@ -36,9 +36,9 @@ implementation, and is entirely implemented within the
 @acronym{GnuTLS} library.  The ``Certificate part'' consists of the
 certificate parsing, and verification functions and it uses
 functionality from the
-libtasn1@footnote{@url{http://www.gnu.org/software/libtasn1/}} library.
-The ``Cryptographic back-end'' is provided by the nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
-library. 
+libtasn1 library.
+The ``Cryptographic back-end'' is provided by the nettle
+and gmplib libraries.
 
 @menu
 * Downloading and installing::
@@ -59,9 +59,10 @@ development release.  For example, GnuTLS 1.6.3 denote a stable
 release since 6 is even, and GnuTLS 1.7.11 denote a development
 release since 7 is odd.
 
-GnuTLS depends on Libnettle, and you will need to install it
-before installing GnuTLS.  Libnettle is available from
-@url{http://www.lysator.liu.se/~nisse/nettle/}.  
+GnuTLS depends on @code{nettle} and @code{gmplib}, and you will need to install it
+before installing GnuTLS.  The @code{nettle} library is available from
+@url{http://www.lysator.liu.se/~nisse/nettle/}, while @code{gmplib} is available
+from @url{http://www.gmplib.org/}.
 Don't forget to verify the cryptographic signature after downloading
 source code packages.
 
@@ -72,14 +73,17 @@ distribution archive.  Typically you invoke @code{./configure} and
 then @code{make check install}.  There are a number of compile-time
 parameters, as discussed below.
 
-The compression library, libz, as well as p11-kit are a optional dependencies.
-You can get libz from @url{http://www.zlib.net/} and p11-kit from @url{http://p11-glue.freedesktop.org/}.
-
-The X.509 part of GnuTLS needs ASN.1 functionality, from a library
-called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you
+Several parts of GnuTLS require ASN.1 functionality, which is provided by 
+a library called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you
 want to install it separately (e.g., to make it possibly to use
 libtasn1 in other programs), you can get it from
-@url{http://www.gnu.org/software/gnutls/download.html}.
+@url{http://www.gnu.org/software/libtasn1/}.
+
+The compression library, @code{libz}, the PKCS #11 helper library @code{p11-kit}, as well
+as the TPM library @code{trousers}, are 
+optional dependencies. You may get libz from @url{http://www.zlib.net/}, 
+p11-kit from @url{http://p11-glue.freedesktop.org/} and trousers from
+@url{http://trousers.sourceforge.net/}.
 
 A few @code{configure} options may be relevant, summarized below.
 They disable or enable particular features,
