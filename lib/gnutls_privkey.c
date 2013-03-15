@@ -820,8 +820,9 @@ cleanup:
  *
  * This function will sign the given data using a signature algorithm
  * supported by the private key. Note that this is a low-level function
- * and does not apply any preprocessing or hash on the signed data. Use
- * it only if you know what are you doing.
+ * and does not apply any preprocessing or hash on the signed data. 
+ * For example on an RSA key the input @data should be of the DigestInfo
+ * PKCS #1 1.5 format. Use it only if you know what are you doing.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.
