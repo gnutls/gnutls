@@ -96,6 +96,9 @@ options are given.
 --disable-srp-authentication
 --disable-psk-authentication
 --disable-anon-authentication
+--disable-dhe
+--disable-ecdhe
+--disable-rsa-export
 --disable-extra-pki
 --disable-openpgp-authentication
 --disable-openssl-compatibility
