@@ -85,15 +85,14 @@ A function to check for a supported by GnuTLS URL is @funcref{gnutls_url_is_supp
 @showfuncdesc{gnutls_url_is_supported}
 
 Additional functions are available that will return
-information over a public key, as well as a function that given a public
-key fingerprint would provide a memorable sketch.
+information over a public key, such as a unique key ID, as well as a function 
+that given a public key fingerprint would provide a memorable sketch.
 
-The key_id and random_art functions are based on an SHA1 digest of the
-the public key canonicalized as a DER-formatted, ASN.1-encoded
-subjectPublicKeyInfo object.  This is different from the ``common
-method'' described by section 4.2.1.2 of @xcite{RFC5280} in that
-GnuTLS includes the algorithmIdentifier (algorithm plus parameters) in
-addition to the raw key material itself.
+Note that @funcref{gnutls_pubkey_get_key_id} calculates a SHA1 digest of the 
+public key as a DER-formatted, subjectPublicKeyInfo object.  Other implementations 
+use different approaches, e.g., some use the ``common method'' described in
+section 4.2.1.2 of @xcite{RFC5280} which calculates a digest on a part of the
+subjectPublicKeyInfo object.
 
 @showfuncD{gnutls_pubkey_get_pk_algorithm,gnutls_pubkey_get_preferred_hash_algorithm,gnutls_pubkey_get_key_id,gnutls_random_art}
 
