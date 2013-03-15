@@ -214,6 +214,16 @@ gnutls_pk_params_release (gnutls_pk_params_st * p)
   p->params_nr = 0;
 }
 
+void
+gnutls_pk_params_clear (gnutls_pk_params_st * p)
+{
+  unsigned int i;
+  for (i = 0; i < p->params_nr; i++)
+    {
+      _gnutls_mpi_clear (p->params[i]);
+    }
+}
+
 int
 _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk, 
                                gnutls_pk_params_st* params,

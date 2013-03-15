@@ -33,26 +33,27 @@ extern gnutls_crypto_bigint_st _gnutls_mpi_ops;
 bigint_t _gnutls_mpi_randomize (bigint_t, unsigned int bits,
                                 gnutls_rnd_level_t level);
 
-#define _gnutls_mpi_new(x) _gnutls_mpi_ops.bigint_new(x)
-#define _gnutls_mpi_cmp(x,y) _gnutls_mpi_ops.bigint_cmp(x,y)
-#define _gnutls_mpi_cmp_ui(x,y) _gnutls_mpi_ops.bigint_cmp_ui(x,y)
-#define _gnutls_mpi_mod(x,y) _gnutls_mpi_ops.bigint_mod(x,y)
-#define _gnutls_mpi_set(x,y) _gnutls_mpi_ops.bigint_set(x,y)
-#define _gnutls_mpi_set_ui(x,y) _gnutls_mpi_ops.bigint_set_ui(x,y)
-#define _gnutls_mpi_get_nbits(x) _gnutls_mpi_ops.bigint_get_nbits(x)
+#define _gnutls_mpi_new _gnutls_mpi_ops.bigint_new
+#define _gnutls_mpi_clear _gnutls_mpi_ops.bigint_clear
+#define _gnutls_mpi_cmp _gnutls_mpi_ops.bigint_cmp
+#define _gnutls_mpi_cmp_ui _gnutls_mpi_ops.bigint_cmp_ui
+#define _gnutls_mpi_mod _gnutls_mpi_ops.bigint_mod
+#define _gnutls_mpi_set _gnutls_mpi_ops.bigint_set
+#define _gnutls_mpi_set_ui _gnutls_mpi_ops.bigint_set_ui
+#define _gnutls_mpi_get_nbits _gnutls_mpi_ops.bigint_get_nbits
 #define _gnutls_mpi_alloc_like(x) _gnutls_mpi_new(_gnutls_mpi_get_nbits(x))
-#define _gnutls_mpi_powm(x,y,z,w) _gnutls_mpi_ops.bigint_powm(x,y,z,w)
-#define _gnutls_mpi_addm(x,y,z,w) _gnutls_mpi_ops.bigint_addm(x,y,z,w)
-#define _gnutls_mpi_subm(x,y,z,w) _gnutls_mpi_ops.bigint_subm(x,y,z,w)
-#define _gnutls_mpi_mulm(x,y,z,w) _gnutls_mpi_ops.bigint_mulm(x,y,z,w)
-#define _gnutls_mpi_add(x,y,z) _gnutls_mpi_ops.bigint_add(x,y,z)
-#define _gnutls_mpi_sub(x,y,z) _gnutls_mpi_ops.bigint_sub(x,y,z)
-#define _gnutls_mpi_mul(x,y,z) _gnutls_mpi_ops.bigint_mul(x,y,z)
-#define _gnutls_mpi_div(x,y,z) _gnutls_mpi_ops.bigint_div(x,y,z)
-#define _gnutls_mpi_add_ui(x,y,z) _gnutls_mpi_ops.bigint_add_ui(x,y,z)
-#define _gnutls_mpi_sub_ui(x,y,z) _gnutls_mpi_ops.bigint_sub_ui(x,y,z)
-#define _gnutls_mpi_mul_ui(x,y,z) _gnutls_mpi_ops.bigint_mul_ui(x,y,z)
-#define _gnutls_prime_check(z) _gnutls_mpi_ops.bigint_prime_check(z)
+#define _gnutls_mpi_powm _gnutls_mpi_ops.bigint_powm
+#define _gnutls_mpi_addm _gnutls_mpi_ops.bigint_addm
+#define _gnutls_mpi_subm _gnutls_mpi_ops.bigint_subm
+#define _gnutls_mpi_mulm _gnutls_mpi_ops.bigint_mulm
+#define _gnutls_mpi_add _gnutls_mpi_ops.bigint_add
+#define _gnutls_mpi_sub _gnutls_mpi_ops.bigint_sub
+#define _gnutls_mpi_mul _gnutls_mpi_ops.bigint_mul
+#define _gnutls_mpi_div _gnutls_mpi_ops.bigint_div
+#define _gnutls_mpi_add_ui _gnutls_mpi_ops.bigint_add_ui
+#define _gnutls_mpi_sub_ui _gnutls_mpi_ops.bigint_sub_ui
+#define _gnutls_mpi_mul_ui _gnutls_mpi_ops.bigint_mul_ui
+#define _gnutls_prime_check _gnutls_mpi_ops.bigint_prime_check
 #define _gnutls_mpi_print(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_USG)
 #define _gnutls_mpi_print_lz(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_STD)
 #define _gnutls_mpi_print_pgp(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_PGP)

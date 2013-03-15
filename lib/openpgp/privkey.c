@@ -853,6 +853,7 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
   return 0;
 
 error:
+  gnutls_pk_params_clear(params);
   gnutls_pk_params_release(params);
 
   return result;
@@ -962,6 +963,7 @@ _get_sk_rsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
   ret = 0;
 
 cleanup:
+  gnutls_pk_params_clear(&params);
   gnutls_pk_params_release(&params);
   return ret;
 }
@@ -1061,6 +1063,7 @@ _get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
   ret = 0;
 
 cleanup:
+  gnutls_pk_params_clear(&params);
   gnutls_pk_params_release(&params);
   return ret;
 }
@@ -1378,6 +1381,7 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
   result =
     _gnutls_pk_sign (pk_algorithm, signature, hash, &params);
 
+  gnutls_pk_params_clear(&params);
   gnutls_pk_params_release(&params);
 
   if (result < 0)
@@ -1454,6 +1458,7 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
 
   result = _gnutls_pk_decrypt (pk_algorithm, plaintext, ciphertext, &params);
 
+  gnutls_pk_params_clear(&params);
   gnutls_pk_params_release(&params);
 
   if (result < 0)

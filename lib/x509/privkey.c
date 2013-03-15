@@ -70,6 +70,7 @@ gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key)
   if (!key)
     return;
 
+  gnutls_pk_params_clear(&key->params);
   gnutls_pk_params_release(&key->params);
   asn1_delete_structure (&key->key);
   gnutls_free (key);
@@ -224,6 +225,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
 
 error:
   asn1_delete_structure (&pkey_asn);
+  gnutls_pk_params_clear (&pkey->params);
   gnutls_pk_params_release (&pkey->params);
   return NULL;
 
@@ -331,6 +333,7 @@ _gnutls_privkey_decode_ecc_key (const gnutls_datum_t * raw_key,
 
 error:
   asn1_delete_structure (&pkey_asn);
+  gnutls_pk_params_clear (&pkey->params);
   gnutls_pk_params_release (&pkey->params);
   return NULL;
 
@@ -401,6 +404,7 @@ decode_dsa_key (const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 
 error:
   asn1_delete_structure (&dsa_asn);
+  gnutls_pk_params_clear(&pkey->params);
   gnutls_pk_params_release(&pkey->params);
   return NULL;
 
@@ -838,6 +842,7 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
   return 0;
 
 cleanup:
+  gnutls_pk_params_clear(&key->params);
   gnutls_pk_params_release(&key->params);
   return ret;
 
@@ -929,6 +934,7 @@ gnutls_x509_privkey_import_dsa_raw (gnutls_x509_privkey_t key,
   return 0;
 
 cleanup:
+  gnutls_pk_params_clear(&key->params);
   gnutls_pk_params_release(&key->params);
   return ret;
 
@@ -1001,6 +1007,7 @@ gnutls_x509_privkey_import_ecc_raw (gnutls_x509_privkey_t key,
   return 0;
 
 cleanup:
+  gnutls_pk_params_clear(&key->params);
   gnutls_pk_params_release(&key->params);
   return ret;
 
@@ -1393,6 +1400,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
         }
     }
 
+  gnutls_pk_params_clear(&pk_params);
   gnutls_pk_params_release (&pk_params);
 
   return 0;
@@ -1403,6 +1411,7 @@ error:
   _gnutls_free_datum (e);
   _gnutls_free_datum (p);
   _gnutls_free_datum (q);
+  gnutls_pk_params_clear(&pk_params);
   gnutls_pk_params_release (&pk_params);
 
   return ret;
@@ -1545,6 +1554,7 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
 
 cleanup:
   key->pk_algorithm = GNUTLS_PK_UNKNOWN;
+  gnutls_pk_params_clear(&key->params);
   gnutls_pk_params_release(&key->params);
 
   return ret;

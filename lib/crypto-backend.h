@@ -117,6 +117,7 @@
   {
     bigint_t (*bigint_new) (int nbits);
     void (*bigint_release) (bigint_t n);
+    void (*bigint_clear) (bigint_t n); /* zeros the int */
     /* 0 for equality, > 0 for m1>m2, < 0 for m1<m2 */
     int (*bigint_cmp) (const bigint_t m1, const bigint_t m2);
     /* as bigint_cmp */
@@ -194,6 +195,7 @@
 
 
   void gnutls_pk_params_release (gnutls_pk_params_st * p);
+  void gnutls_pk_params_clear (gnutls_pk_params_st * p);
   void gnutls_pk_params_init (gnutls_pk_params_st * p);
 
 
