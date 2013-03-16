@@ -167,7 +167,7 @@ pkcs11_rv_to_err (ck_rv_t rv)
 
 static int scan_slots(struct gnutls_pkcs11_provider_s * p)
 {
-int rv;
+ck_rv_t rv;
 unsigned long nslots = 0;
 
   if (p->nslots > 0)
@@ -585,7 +585,7 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
 int gnutls_pkcs11_reinit (void)
 {
   unsigned i;
-  int rv;
+  ck_rv_t rv;
 
   for (i = 0; i < active_providers; i++)
     {
