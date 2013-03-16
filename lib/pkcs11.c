@@ -498,7 +498,7 @@ initialize_automatic_p11_kit (void)
       gnutls_assert ();
       _gnutls_debug_log ("Cannot initialize registered module: %s\n",
                          p11_kit_strerror (rv));
-      return GNUTLS_E_INTERNAL_ERROR;
+      return pkcs11_rv_to_err(rv);
     }
 
   initialized_registered = 1;
