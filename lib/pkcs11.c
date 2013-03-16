@@ -167,14 +167,45 @@ pkcs11_rv_to_err (ck_rv_t rv)
     }
 }
 
-/* Fake scan */
-void
-pkcs11_rescan_slots (void)
-{
-  unsigned long slots;
 
-  pkcs11_get_slot_list (providers[active_providers - 1].module, 0,
-                          NULL, &slots);
+static int scan_slots(struct gnutls_pkcs11_provider_s * p)
+{
+int rv;
+unsigned long nslots = 0;
+
+  if (p->nslots > 0)
+    return 0;
+
+  /* cache the number of slots in this module */
+  rv = pkcs11_get_slot_list(p->module, 0, NULL, &nslots);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert ();
+      return pkcs11_rv_to_err(rv);
+    }
+
+  p->slots =
+    gnutls_malloc (sizeof (p->slots[0]) * nslots);
+  if (p->slots == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  rv = pkcs11_get_slot_list
+      (p->module, 0,
+       p->slots,
+       &nslots);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert ();
+      gnutls_free(p->slots);
+      p->slots = NULL;
+      return pkcs11_rv_to_err(rv);
+    }
+  p->nslots = nslots;
+  
+  return 0;
 }
 
 static int
@@ -204,45 +235,14 @@ pkcs11_add_module (const char *name, struct ck_function_list *module)
 
   active_providers++;
   providers[active_providers - 1].module = module;
-
-  /* cache the number of slots in this module */
-  if (pkcs11_get_slot_list
-      (providers[active_providers - 1].module, 0, NULL,
-       &providers[active_providers - 1].nslots) != CKR_OK)
-    {
-      gnutls_assert ();
-      goto fail;
-    }
-
-  providers[active_providers - 1].slots =
-    gnutls_malloc (sizeof (*providers[active_providers - 1].slots) *
-                   providers[active_providers - 1].nslots);
-  if (providers[active_providers - 1].slots == NULL)
-    {
-      gnutls_assert ();
-      goto fail;
-    }
-
-  if (pkcs11_get_slot_list
-      (providers[active_providers - 1].module, 0,
-       providers[active_providers - 1].slots,
-       &providers[active_providers - 1].nslots) != CKR_OK)
-    {
-      gnutls_assert ();
-      gnutls_free (providers[active_providers - 1].slots);
-      goto fail;
-    }
+  providers[active_providers - 1].nslots = 0;
+  providers[active_providers - 1].slots = NULL;
 
   memcpy (&providers[active_providers - 1].info, &info, sizeof(info));
 
-  _gnutls_debug_log ("p11: loaded provider '%s' with %d slots\n",
-                     name, (int) providers[active_providers - 1].nslots);
+  _gnutls_debug_log ("p11: loaded provider '%s'\n", name);
 
   return 0;
-
-fail:
-  active_providers--;
-  return GNUTLS_E_PKCS11_LOAD_ERROR;
 }
 
 
@@ -266,12 +266,10 @@ gnutls_pkcs11_add_provider (const char *name, const char *params)
   struct ck_function_list *module;
   int ret;
 
-  active_providers++;
   if (p11_kit_load_initialize_module (name, &module) != CKR_OK)
     {
       gnutls_assert ();
       _gnutls_debug_log ("p11: Cannot load provider %s\n", name);
-      active_providers--;
       return GNUTLS_E_PKCS11_LOAD_ERROR;
     }
 
@@ -593,8 +591,16 @@ int gnutls_pkcs11_reinit (void)
 
   for (i = 0; i < active_providers; i++)
     {
-      if (providers[i].module != NULL)
-        p11_kit_initialize_module(providers[i].module);
+      if (providers[i].module != NULL) 
+        {
+          rv = p11_kit_initialize_module(providers[i].module);
+          if (rv != CKR_OK)
+            _gnutls_debug_log ("Cannot initialize registered module '%s': %s\n", 
+              providers[i].info.library_description, p11_kit_strerror (rv));
+          
+          gnutls_free(providers[i].slots);
+          providers[i].nslots = 0;
+        }
     }
 
   return 0;
@@ -881,9 +887,17 @@ pkcs11_find_slot (struct ck_function_list ** module, ck_slot_id_t * slot,
                   struct p11_kit_uri *info, struct token_info *_tinfo)
 {
   unsigned int x, z;
+  int ret;
 
   for (x = 0; x < active_providers; x++)
     {
+      ret = scan_slots(&providers[x]);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          continue;
+        }
+
       for (z = 0; z < providers[x].nslots; z++)
         {
           struct token_info tinfo;
@@ -983,6 +997,13 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
 
   for (x = 0; x < active_providers; x++)
     {
+      ret = scan_slots(&providers[x]);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          continue;
+        }
+
       module = providers[x].module;
       for (z = 0; z < providers[x].nslots; z++)
         {
