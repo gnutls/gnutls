@@ -170,7 +170,7 @@ pkcs11_rv_to_err (ck_rv_t rv)
 
 static int scan_slots(struct gnutls_pkcs11_provider_s * p)
 {
-int rv;
+ck_rv_t rv;
 unsigned long nslots = 0;
 
   if (p->nslots > 0)
@@ -501,7 +501,7 @@ initialize_automatic_p11_kit (void)
       gnutls_assert ();
       _gnutls_debug_log ("Cannot initialize registered module: %s\n",
                          p11_kit_strerror (rv));
-      return GNUTLS_E_INTERNAL_ERROR;
+      return pkcs11_rv_to_err(rv);
     }
 
   initialized_registered = 1;
@@ -588,6 +588,7 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
 int gnutls_pkcs11_reinit (void)
 {
   unsigned i;
+  int rv;
 
   for (i = 0; i < active_providers; i++)
     {
