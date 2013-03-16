@@ -15,6 +15,10 @@ modules, and not only the ones loaded via p11-kit.
 
 ** libgnutls: Load CA certificates in android systems.
 
+** libgnutls: PKCS #11 slots are scanned only when needed, not
+on initialization. This speeds up gnutls initialization when smart
+cards are present.
+
 ** configure: Trust store file must be explicitly set or unset when 
 cross compiling.
 
