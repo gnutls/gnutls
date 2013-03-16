@@ -12,12 +12,16 @@ support AES with PKCS #12.
 
 ** libgnutls: Optimized CA certificate loading.
 
+** libgnutls: Private keys are overwritten on deinitialization.
+
+** libgnutls: PKCS #11 slots are scanned only when needed, not
+on initialization. This speeds up gnutls initialization when smart
+cards are present.
+
 ** libgnutls-dane: Updated DANE verification options.
 
 ** configure: Trust store file must be explicitly set or unset when 
 cross compiling.
-
-** libgnutls: Private keys are overwritten on deinitialization.
 
 ** API and ABI modifications:
 gnutls_x509_crt_get_issuer_dn2: Added
