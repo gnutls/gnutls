@@ -1018,3 +1018,32 @@ void gnutls_privkey_set_pin_function (gnutls_privkey_t key,
   key->pin.cb = fn;
   key->pin.data = userdata;
 }
+
+/**
+ * gnutls_privkey_status:
+ * @key: Holds the key
+ *
+ * Checks the status of the private key token. This function
+ * is an actual wrapper over gnutls_pkcs11_privkey_status(), and
+ * if the private key is a PKCS #11 token it will check whether
+ * it is inserted or not.
+ *
+ * Returns: this function will return non-zero if the token 
+ * holding the private key is still available (inserted), and zero otherwise.
+ * 
+ * Since: 3.1.10
+ *
+ **/
+int
+gnutls_privkey_status (gnutls_privkey_t key)
+{
+  switch (key->type)
+    {
+#ifdef ENABLE_PKCS11
+    case GNUTLS_PRIVKEY_PKCS11:
+      return gnutls_pkcs11_privkey_status (key->key.pkcs11);
+#endif
+    default:
+      return 1;
+    }
+}

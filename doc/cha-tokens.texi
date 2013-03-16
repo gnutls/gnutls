@@ -119,7 +119,7 @@ can be imported from a hardware module using URLs.
 
 @showfuncdesc{gnutls_privkey_import_url}
 
-@showfuncB{gnutls_privkey_get_pk_algorithm,gnutls_privkey_get_type}
+@showfuncC{gnutls_privkey_get_pk_algorithm,gnutls_privkey_get_type,gnutls_privkey_status}
 
 In order to support cryptographic operations using 
 an external API, the following function is provided.

@@ -210,6 +210,7 @@ void gnutls_privkey_set_pin_function (gnutls_privkey_t key,
 int gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key,
                                      unsigned int *bits);
 gnutls_privkey_type_t gnutls_privkey_get_type (gnutls_privkey_t key);
+int gnutls_privkey_status (gnutls_privkey_t key);
 
 
 #define GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE (1<<0)
