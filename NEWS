@@ -8,7 +8,7 @@ See the end for copying conditions.
 ARCFOUR (RC4) cipher to be compatible with devices that don't
 support AES with PKCS #12.
 
-** libgnutls: Load CA certificates in android systems.
+** libgnutls: Load CA certificates in android 4.x systems.
 
 ** libgnutls: Optimized CA certificate loading.
 
@@ -33,6 +33,7 @@ gnutls_x509_trust_list_remove_trust_file: Added
 gnutls_x509_trust_list_remove_cas: Added
 gnutls_session_get_desc: Added
 gnutls_privkey_sign_raw_data: Added
+gnutls_pkcs11_status: Added
 
 
 * Version 3.1.9 (released 2013-02-27)
