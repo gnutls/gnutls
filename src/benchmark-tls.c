@@ -48,11 +48,11 @@ const char* side = "";
 #define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP192R1"
 #define PRIO_RSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
-#define PRIO_AES_CBC_SHA1 "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH"
-#define PRIO_ARCFOUR_128_MD5 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+ANON-DH"
-#define PRIO_AES_GCM "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ANON-DH"
-#define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH"
-#define PRIO_SALSA20R20_128_SHA1 "NONE:+VERS-TLS1.0:+SALSA20R20-128:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH"
+#define PRIO_AES_CBC_SHA1 "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_ARCFOUR_128_MD5 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_AES_GCM "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_SALSA20R20_128_SHA1 "NONE:+VERS-TLS1.0:+SALSA20R20-128:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
 static const int rsa_bits = 1776, ec_bits = 192;
 
@@ -170,6 +170,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 {
     /* Server stuff. */
     gnutls_anon_server_credentials_t s_anoncred;
+    gnutls_certificate_credentials_t c_certcred, s_certcred;
     const gnutls_datum_t p3 = { (void*) pkcs3, strlen(pkcs3) };
     static gnutls_dh_params_t dh_params;
     gnutls_session_t server;
@@ -187,6 +188,15 @@ static void test_ciphersuite(const char *cipher_prio, int size)
     gnutls_dh_params_init(&dh_params);
     gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
     gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
+
+    gnutls_certificate_allocate_credentials(&s_certcred);
+    gnutls_certificate_set_dh_params(s_certcred, dh_params);
+
+    gnutls_certificate_set_x509_key_mem (s_certcred, &server_cert, &server_key,
+                                         GNUTLS_X509_FMT_PEM);
+    gnutls_certificate_set_x509_key_mem (s_certcred, &server_ecc_cert, &server_ecc_key,
+                                         GNUTLS_X509_FMT_PEM);
+
     gnutls_init(&server, GNUTLS_SERVER);
     ret = gnutls_priority_set_direct(server, cipher_prio, &str);
     if (ret < 0) {
@@ -194,6 +204,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
         exit(1);
     }
     gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
+    gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE, s_certcred);
     gnutls_dh_set_prime_bits(server, 1024);
     gnutls_transport_set_push_function(server, server_push);
     gnutls_transport_set_pull_function(server, server_pull);
@@ -202,6 +213,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 
     /* Init client */
     gnutls_anon_allocate_client_credentials(&c_anoncred);
+    gnutls_certificate_allocate_credentials(&c_certcred);
     gnutls_init(&client, GNUTLS_CLIENT);
 
     ret = gnutls_priority_set_direct(client, cipher_prio, &str);
@@ -210,6 +222,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
         exit(1);
     }
     gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
+    gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE, c_certcred);
     gnutls_transport_set_push_function(client, client_push);
     gnutls_transport_set_pull_function(client, client_pull);
     gnutls_transport_set_ptr(client, (gnutls_transport_ptr_t) client);
