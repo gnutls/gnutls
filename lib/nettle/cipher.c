@@ -30,6 +30,7 @@
 #include <nettle/camellia.h>
 #include <nettle/arcfour.h>
 #include <nettle/arctwo.h>
+#include <nettle/salsa20.h>
 #include <nettle/des.h>
 #include <nettle/nettle-meta.h>
 #include <nettle/cbc.h>
@@ -69,6 +70,7 @@ struct nettle_cipher_ctx
     struct des3_ctx des3;
     struct des_ctx des;
     struct gcm_aes_ctx aes_gcm;
+    struct salsa20_ctx salsa20;
   } ctx;
   void *ctx_ptr;
   uint8_t iv[MAX_BLOCK_SIZE];
@@ -116,6 +118,8 @@ static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
     case GNUTLS_CIPHER_3DES_CBC:
     case GNUTLS_CIPHER_DES_CBC:
     case GNUTLS_CIPHER_ARCFOUR_128:
+    case GNUTLS_CIPHER_SALSA20R20_128:
+    case GNUTLS_CIPHER_SALSA20R20_256:
     case GNUTLS_CIPHER_ARCFOUR_40:
     case GNUTLS_CIPHER_RC2_40_CBC:
       return 1;
@@ -194,6 +198,15 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx, int enc)
       ctx->i_encrypt = (nettle_crypt_func *) arcfour_crypt;
       ctx->i_decrypt = (nettle_crypt_func *) arcfour_crypt;
       ctx->ctx_ptr = &ctx->ctx.arcfour;
+      ctx->block_size = 1;
+      break;
+    case GNUTLS_CIPHER_SALSA20R20_128:
+    case GNUTLS_CIPHER_SALSA20R20_256:
+      ctx->encrypt = stream_encrypt;
+      ctx->decrypt = stream_encrypt;
+      ctx->i_encrypt = (nettle_crypt_func *) salsa20_crypt;
+      ctx->i_decrypt = (nettle_crypt_func *) salsa20_crypt;
+      ctx->ctx_ptr = &ctx->ctx.salsa20;
       ctx->block_size = 1;
       break;
     case GNUTLS_CIPHER_RC2_40_CBC:
@@ -278,6 +291,10 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
     case GNUTLS_CIPHER_ARCFOUR_40:
       arcfour_set_key (ctx->ctx_ptr, keysize, key);
       break;
+    case GNUTLS_CIPHER_SALSA20R20_128:
+    case GNUTLS_CIPHER_SALSA20R20_256:
+      salsa20_set_key (ctx->ctx_ptr, keysize, key);
+      break;
     case GNUTLS_CIPHER_RC2_40_CBC:
       arctwo_set_key (ctx->ctx_ptr, keysize, key);
       break;
@@ -299,19 +316,20 @@ struct nettle_cipher_ctx *ctx = _ctx;
     case GNUTLS_CIPHER_AES_128_GCM:
     case GNUTLS_CIPHER_AES_256_GCM:
       if (ivsize != GCM_DEFAULT_NONCE_SIZE)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INVALID_REQUEST;
-        }
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
       gcm_aes_set_iv(&ctx->ctx.aes_gcm, GCM_DEFAULT_NONCE_SIZE, iv);
       break;
+    case GNUTLS_CIPHER_SALSA20R20_128:
+    case GNUTLS_CIPHER_SALSA20R20_256:
+      if (ivsize != SALSA20_IV_SIZE)
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+      salsa20_set_iv(&ctx->ctx.salsa20, iv);
+      break;
     default:
       if (ivsize > ctx->block_size)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INVALID_REQUEST;
-        }
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
       memcpy (ctx->iv, iv, ivsize);
     }

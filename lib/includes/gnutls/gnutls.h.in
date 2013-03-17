@@ -111,6 +111,8 @@ extern "C"
     GNUTLS_CIPHER_AES_128_GCM = 93,
     GNUTLS_CIPHER_AES_256_GCM = 94,
     GNUTLS_CIPHER_CAMELLIA_192_CBC = 95,
+    GNUTLS_CIPHER_SALSA20R20_128 = 96,
+    GNUTLS_CIPHER_SALSA20R20_256 = 97,
 
     /* used only for PGP internals. Ignored in TLS/SSL
      */

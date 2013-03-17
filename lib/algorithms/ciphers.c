@@ -52,6 +52,8 @@ static const gnutls_cipher_entry algorithms[] = {
   {"AES-128-GCM", GNUTLS_CIPHER_AES_128_GCM, 16, 16, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 0, 1},
   {"AES-256-GCM", GNUTLS_CIPHER_AES_256_GCM, 16, 32, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 0, 1},
   {"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0, 0},
+  {"SALSA20R20-128", GNUTLS_CIPHER_SALSA20R20_128, 1, 16, CIPHER_STREAM, 8, 0, 0},
+  {"SALSA20R20-256", GNUTLS_CIPHER_SALSA20R20_256, 1, 32, CIPHER_STREAM, 8, 0, 0},
   {"CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC, 16, 32, CIPHER_BLOCK,
    16, 0, 0},
   {"CAMELLIA-192-CBC", GNUTLS_CIPHER_CAMELLIA_192_CBC, 16, 24, CIPHER_BLOCK,
@@ -112,6 +114,39 @@ gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm)
 
 }
 
+/**
+ * gnutls_cipher_get_iv_size:
+ * @algorithm: is an encryption algorithm
+ *
+ * Get block size for encryption algorithm.
+ *
+ * Returns: block size for encryption algorithm.
+ *
+ * Since: 3.1.10
+ **/
+int
+gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm)
+{
+  size_t ret = 0;
+  GNUTLS_ALG_LOOP (ret = p->iv);
+  return ret;
+}
+
+int
+_gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm)
+{
+  size_t ret = 0;
+
+  GNUTLS_ALG_LOOP (
+    if (p->auth)
+      ret = p->block; /* FIXME: happens to be the same for now */
+    else
+      ret = 0;
+  );
+  return ret;
+
+}
+
  /* returns the priority */
 int
 _gnutls_cipher_priority (gnutls_session_t session,
@@ -165,14 +200,6 @@ gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm)
 
 }
 
-int
-_gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm)
-{                               /* In bytes */
-  size_t ret = 0;
-  GNUTLS_ALG_LOOP (ret = p->iv);
-  return ret;
-
-}
 
 int
 _gnutls_cipher_get_export_flag (gnutls_cipher_algorithm_t algorithm)

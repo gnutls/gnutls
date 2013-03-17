@@ -181,7 +181,7 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  iv_size = _gnutls_cipher_get_iv_size(cipher);
+  iv_size = gnutls_cipher_get_iv_size(cipher);
   salt.size = iv_size;
   salt.data = gnutls_malloc (salt.size);
   if (!salt.data)

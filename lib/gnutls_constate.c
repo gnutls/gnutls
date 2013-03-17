@@ -298,7 +298,8 @@ _gnutls_init_record_state (record_parameters_st * params, gnutls_protocol_t ver,
 
   if (!_gnutls_version_has_explicit_iv(ver))
     {
-      iv = &state->IV;
+      if (_gnutls_cipher_is_block (params->cipher_algorithm) != CIPHER_STREAM)
+        iv = &state->IV;
     }
 
   ret = _gnutls_auth_cipher_init (&state->cipher_state,
@@ -424,7 +425,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
   if (_gnutls_compression_is_ok (comp_algo) != 0)
     return gnutls_assert_val (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
 
-  IV_size = _gnutls_cipher_get_iv_size (cipher_algo);
+  IV_size = gnutls_cipher_get_iv_size (cipher_algo);
   key_size = gnutls_cipher_get_key_size (cipher_algo);
   export_flag = _gnutls_cipher_get_export_flag (cipher_algo);
   hash_size = _gnutls_hmac_get_algo_len (mac_algo);

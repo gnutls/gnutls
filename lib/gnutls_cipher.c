@@ -323,7 +323,9 @@ compressed_to_ciphertext (gnutls_session_t session,
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
   uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
+  unsigned iv_size;
 
+  iv_size = gnutls_cipher_get_iv_size(params->cipher_algorithm);
 
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
     session, gnutls_cipher_get_name(params->cipher_algorithm), gnutls_mac_get_name(params->mac_algorithm),
@@ -349,9 +351,12 @@ compressed_to_ciphertext (gnutls_session_t session,
                                auth_cipher, blocksize);
     }
   else
-    length_to_encrypt = length =
-      calc_enc_length_stream (session, compressed->size, tag_size,
-                             auth_cipher);
+    {
+      length_to_encrypt = length =
+        calc_enc_length_stream (session, compressed->size, tag_size,
+                                auth_cipher);
+    }
+
   if (length < 0)
     {
       return gnutls_assert_val(length);
@@ -403,12 +408,17 @@ compressed_to_ciphertext (gnutls_session_t session,
            */
           length_to_encrypt -= AEAD_EXPLICIT_DATA_SIZE + tag_size;
         }
+      else if (iv_size > 0)
+        _gnutls_auth_cipher_setiv(&params->write.cipher_state, UINT64DATA(params->write.sequence_number), 8);
     }
   else
     {
       /* AEAD ciphers have an explicit IV. Shouldn't be used otherwise.
        */
-      if (auth_cipher) return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+      if (auth_cipher) 
+        return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+      else if (iv_size > 0)
+        _gnutls_auth_cipher_setiv(&params->write.cipher_state, UINT64DATA(params->write.sequence_number), 8);
     }
 
   memcpy (data_ptr, compressed->data, compressed->size);
@@ -646,9 +656,10 @@ ciphertext_to_compressed (gnutls_session_t session,
   unsigned int ver = gnutls_protocol_get_version (session);
   unsigned int tag_size = _gnutls_auth_cipher_tag_len (&params->read.cipher_state);
   unsigned int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
-
+  unsigned iv_size;
+  
+  iv_size = gnutls_cipher_get_iv_size(params->cipher_algorithm);
   blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
-
 
   /* actual decryption (inplace)
    */
@@ -678,6 +689,11 @@ ciphertext_to_compressed (gnutls_session_t session,
           ciphertext->size -= AEAD_EXPLICIT_DATA_SIZE;
           
           length_to_decrypt = ciphertext->size - tag_size;
+        }
+      else if (iv_size > 0) 
+        { /* a stream cipher with explicit IV */
+          _gnutls_auth_cipher_setiv(&params->read.cipher_state, UINT64DATA(*sequence), 8);
+          length_to_decrypt = ciphertext->size;
         }
       else
         {

@@ -602,7 +602,7 @@ int total = 0, ret, iv_size;
     return gnutls_assert_val(ret);
 
   /* requires padding */
-  iv_size = _gnutls_cipher_get_iv_size(params->cipher_algorithm);
+  iv_size = gnutls_cipher_get_iv_size(params->cipher_algorithm);
 
   if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
     {

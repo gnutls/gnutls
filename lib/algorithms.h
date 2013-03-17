@@ -89,10 +89,8 @@ _gnutls_cipher_suite_get_id (gnutls_kx_algorithm_t kx_algorithm,
 int _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_algo_is_aead (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_is_ok (gnutls_cipher_algorithm_t algorithm);
-int _gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_get_export_flag (gnutls_cipher_algorithm_t algorithm);
-/* at least for now iv_size == tag_size */
-#define _gnutls_cipher_get_tag_size _gnutls_cipher_get_iv_size
+int _gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm);
 
 /* Functions for key exchange. */
 int _gnutls_kx_needs_dh_params (gnutls_kx_algorithm_t algorithm);

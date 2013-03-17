@@ -48,7 +48,7 @@ cipher_mac_bench (int algo, int mac_algo, int size)
   gnutls_hmac_hd_t mac_ctx;
   void *_key, *_iv;
   gnutls_datum_t key, iv;
-  int blocksize = gnutls_cipher_get_block_size (algo);
+  int ivsize = gnutls_cipher_get_iv_size(algo);
   int keysize = gnutls_cipher_get_key_size (algo);
   int step = size*1024;
   struct benchmark_st st;
@@ -58,13 +58,13 @@ cipher_mac_bench (int algo, int mac_algo, int size)
     return;
   memset (_key, 0xf0, keysize);
 
-  _iv = malloc (blocksize);
+  _iv = malloc (ivsize);
   if (_iv == NULL)
     return;
-  memset (_iv, 0xf0, blocksize);
+  memset (_iv, 0xf0, ivsize);
 
   iv.data = _iv;
-  iv.size = blocksize;
+  iv.size = ivsize;
 
   key.data = _key;
   key.size = keysize;
@@ -118,7 +118,7 @@ cipher_bench (int algo, int size, int aead)
   gnutls_cipher_hd_t ctx;
   void *_key, *_iv;
   gnutls_datum_t key, iv;
-  int blocksize = gnutls_cipher_get_block_size (algo);
+  int ivsize = gnutls_cipher_get_iv_size(algo);
   int keysize = gnutls_cipher_get_key_size (algo);
   int step = size*1024;
   struct benchmark_st st;
@@ -128,14 +128,14 @@ cipher_bench (int algo, int size, int aead)
     return;
   memset (_key, 0xf0, keysize);
 
-  _iv = malloc (blocksize);
+  _iv = malloc (ivsize);
   if (_iv == NULL)
     return;
-  memset (_iv, 0xf0, blocksize);
+  memset (_iv, 0xf0, ivsize);
 
   iv.data = _iv;
   if (aead) iv.size = 12;
-  else iv.size = blocksize;
+  else iv.size = ivsize;
 
   key.data = _key;
   key.size = keysize;
@@ -212,6 +212,7 @@ void benchmark_cipher (int init, int debug_level)
       gnutls_rnd( GNUTLS_RND_NONCE, data, sizeof(data));
     }
 
+  cipher_mac_bench ( GNUTLS_CIPHER_SALSA20R20_128, GNUTLS_MAC_SHA1, 16);
   cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, 16);
   cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256, 16);
   cipher_bench ( GNUTLS_CIPHER_AES_128_GCM, 16, 1);
@@ -225,6 +226,8 @@ void benchmark_cipher (int init, int debug_level)
   cipher_bench (GNUTLS_CIPHER_AES_128_CBC, 16, 0);
 
   cipher_bench (GNUTLS_CIPHER_ARCFOUR, 16, 0);
+
+  cipher_bench ( GNUTLS_CIPHER_SALSA20R20_128, 16, 0);
 
   gnutls_global_deinit();
 }
