@@ -39,12 +39,11 @@
 
 /* XXX: try to eliminate this */
 #define MAX_CERT_SIZE 8*1024
+#define MAX_SLOTS 48
 
 struct gnutls_pkcs11_provider_s
 {
   struct ck_function_list *module;
-  unsigned long nslots;
-  ck_slot_id_t *slots;
   struct ck_info info;
   unsigned int initialized;
 };
@@ -165,43 +164,17 @@ pkcs11_rv_to_err (ck_rv_t rv)
 }
 
 
-static int scan_slots(struct gnutls_pkcs11_provider_s * p)
+static int scan_slots(struct gnutls_pkcs11_provider_s * p, ck_slot_id_t *slots,
+	 unsigned long *nslots)
 {
 ck_rv_t rv;
-unsigned long nslots = 0;
 
-  if (p->nslots > 0)
-    return 0;
-
-  /* cache the number of slots in this module */
-  rv = pkcs11_get_slot_list(p->module, 0, NULL, &nslots);
+  rv = pkcs11_get_slot_list(p->module, 1, slots, nslots);
   if (rv != CKR_OK)
     {
       gnutls_assert ();
       return pkcs11_rv_to_err(rv);
     }
-
-  p->slots =
-    gnutls_malloc (sizeof (p->slots[0]) * nslots);
-  if (p->slots == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  rv = pkcs11_get_slot_list
-      (p->module, 0,
-       p->slots,
-       &nslots);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      gnutls_free(p->slots);
-      p->slots = NULL;
-      return pkcs11_rv_to_err(rv);
-    }
-  p->nslots = nslots;
-  
   return 0;
 }
 
@@ -232,8 +205,6 @@ pkcs11_add_module (const char *name, struct ck_function_list *module)
 
   active_providers++;
   providers[active_providers - 1].module = module;
-  providers[active_providers - 1].nslots = 0;
-  providers[active_providers - 1].slots = NULL;
 
   memcpy (&providers[active_providers - 1].info, &info, sizeof(info));
 
@@ -595,9 +566,6 @@ int gnutls_pkcs11_reinit (void)
           if (rv != CKR_OK)
             _gnutls_debug_log ("Cannot initialize registered module '%s': %s\n", 
               providers[i].info.library_description, p11_kit_strerror (rv));
-          
-          gnutls_free(providers[i].slots);
-          providers[i].nslots = 0;
         }
     }
 
@@ -629,7 +597,6 @@ gnutls_pkcs11_deinit (void)
     {
       if (providers[i].initialized)
         p11_kit_finalize_module (providers[i].module);
-      gnutls_free (providers[i].slots);
     }
   active_providers = 0;
   
@@ -877,31 +844,33 @@ pkcs11_find_slot (struct ck_function_list ** module, ck_slot_id_t * slot,
 {
   unsigned int x, z;
   int ret;
+  unsigned long nslots;
+  ck_slot_id_t slots[MAX_SLOTS];
 
   for (x = 0; x < active_providers; x++)
     {
-      ret = scan_slots(&providers[x]);
+      nslots = sizeof(slots)/sizeof(slots[0]);
+      ret = scan_slots(&providers[x], slots, &nslots);
       if (ret < 0)
         {
           gnutls_assert();
           continue;
         }
 
-      for (z = 0; z < providers[x].nslots; z++)
+      for (z = 0; z < nslots; z++)
         {
           struct token_info tinfo;
 
           if (pkcs11_get_token_info
-              (providers[x].module, providers[x].slots[z],
-               &tinfo.tinfo) != CKR_OK)
+              (providers[x].module, slots[z], &tinfo.tinfo) != CKR_OK)
             {
               continue;
             }
-          tinfo.sid = providers[x].slots[z];
+          tinfo.sid = slots[z];
           tinfo.prov = &providers[x];
 
           if (pkcs11_get_slot_info
-              (providers[x].module, providers[x].slots[z],
+              (providers[x].module, slots[z],
                &tinfo.sinfo) != CKR_OK)
             {
               continue;
@@ -915,7 +884,7 @@ pkcs11_find_slot (struct ck_function_list ** module, ck_slot_id_t * slot,
 
           /* ok found */
           *module = providers[x].module;
-          *slot = providers[x].slots[z];
+          *slot = slots[z];
 
           if (_tinfo != NULL)
             memcpy (_tinfo, &tinfo, sizeof (tinfo));
@@ -991,10 +960,13 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
   ck_session_handle_t pks = 0;
   struct pkcs11_session_info sinfo;
   struct ck_function_list *module = NULL;
+  unsigned long nslots;
+  ck_slot_id_t slots[MAX_SLOTS];
 
   for (x = 0; x < active_providers; x++)
     {
-      ret = scan_slots(&providers[x]);
+      nslots = sizeof(slots)/sizeof(slots[0]);
+      ret = scan_slots(&providers[x], slots, &nslots);
       if (ret < 0)
         {
           gnutls_assert();
@@ -1002,25 +974,25 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
         }
 
       module = providers[x].module;
-      for (z = 0; z < providers[x].nslots; z++)
+      for (z = 0; z < nslots; z++)
         {
           struct token_info tinfo;
 
-          if (pkcs11_get_token_info (module, providers[x].slots[z],
+          if (pkcs11_get_token_info (module, slots[z],
                &tinfo.tinfo) != CKR_OK)
             {
               continue;
             }
-          tinfo.sid = providers[x].slots[z];
+          tinfo.sid = slots[z];
           tinfo.prov = &providers[x];
 
-          if (pkcs11_get_slot_info (module, providers[x].slots[z],
+          if (pkcs11_get_slot_info (module, slots[z],
                &tinfo.sinfo) != CKR_OK)
             {
               continue;
             }
 
-          rv = (module)->C_OpenSession (providers[x].slots[z],
+          rv = (module)->C_OpenSession (slots[z],
                                         ((flags & SESSION_WRITE)
                                           ? CKF_RW_SESSION : 0) |
                                         CKF_SERIAL_SESSION, NULL, NULL, &pks);
@@ -2610,6 +2582,11 @@ gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
   if (ret < 0)
     {
       gnutls_assert ();
+      if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+        {
+          *n_list = 0;
+          ret = 0;
+        }
       return ret;
     }
 
