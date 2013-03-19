@@ -212,7 +212,7 @@ void benchmark_cipher (int init, int debug_level)
       gnutls_rnd( GNUTLS_RND_NONCE, data, sizeof(data));
     }
 
-  cipher_mac_bench ( GNUTLS_CIPHER_SALSA20R20_256, GNUTLS_MAC_SHA1, 16);
+  cipher_mac_bench ( GNUTLS_CIPHER_SALSA20_256, GNUTLS_MAC_SHA1, 16);
   cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, 16);
   cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256, 16);
   cipher_bench ( GNUTLS_CIPHER_AES_128_GCM, 16, 1);
@@ -227,7 +227,7 @@ void benchmark_cipher (int init, int debug_level)
 
   cipher_bench (GNUTLS_CIPHER_ARCFOUR, 16, 0);
 
-  cipher_bench ( GNUTLS_CIPHER_SALSA20R20_256, 16, 0);
+  cipher_bench ( GNUTLS_CIPHER_SALSA20_256, 16, 0);
 
   gnutls_global_deinit();
 }
