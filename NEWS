@@ -18,7 +18,7 @@ support AES with PKCS #12.
 on initialization. This speeds up gnutls initialization when smart
 cards are present.
 
-** libgnutls: Added Salsa20R20 cipher (experimental)
+** libgnutls: Added Salsa20 cipher (experimental)
 
 ** libgnutls-dane: Updated DANE verification options.
 
