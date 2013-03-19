@@ -286,6 +286,9 @@ api_cipher_hd_st * h = handle;
  * effectively use the current crypto backend in use by gnutls or the
  * cryptographic accelerator in use.
  *
+ * Note that despite the name of this function, it can be used
+ * for other MAC algorithms than HMAC.
+ *
  * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
@@ -295,14 +298,30 @@ gnutls_hmac_init (gnutls_hmac_hd_t * dig,
                   gnutls_mac_algorithm_t algorithm,
                   const void *key, size_t keylen)
 {
-  *dig = gnutls_malloc (sizeof (digest_hd_st));
+  *dig = gnutls_malloc (sizeof (mac_hd_st));
   if (*dig == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  return _gnutls_hmac_init (((digest_hd_st *) * dig), algorithm, key, keylen);
+  return _gnutls_mac_init (((mac_hd_st *) * dig), algorithm, key, keylen);
+}
+
+/**
+ * gnutls_hmac_set_nonce:
+ * @handle: is a #gnutls_cipher_hd_t structure.
+ * @nonce: the data to set as nonce
+ * @nonce_len: The length of data
+ *
+ * This function will set the nonce in the MAC algorithm.
+ *
+ * Since: 3.1.10
+ **/
+void
+gnutls_hmac_set_nonce (gnutls_hmac_hd_t handle, const void *nonce, size_t nonce_len)
+{
+  _gnutls_mac_set_nonce ((mac_hd_st *) handle, nonce, nonce_len);
 }
 
 /**
@@ -321,7 +340,7 @@ gnutls_hmac_init (gnutls_hmac_hd_t * dig,
 int
 gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen)
 {
-  return _gnutls_hmac ((digest_hd_st *) handle, text, textlen);
+  return _gnutls_mac ((mac_hd_st *) handle, text, textlen);
 }
 
 /**
@@ -336,7 +355,7 @@ gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen)
 void
 gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest)
 {
-  _gnutls_hmac_output ((digest_hd_st *) handle, digest);
+  _gnutls_mac_output ((mac_hd_st *) handle, digest);
 }
 
 /**
@@ -352,7 +371,7 @@ gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest)
 void
 gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest)
 {
-  _gnutls_hmac_deinit ((digest_hd_st *) handle, digest);
+  _gnutls_mac_deinit ((mac_hd_st *) handle, digest);
   gnutls_free (handle);
 }
 
@@ -370,7 +389,7 @@ gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest)
 int
 gnutls_hmac_get_len (gnutls_mac_algorithm_t algorithm)
 {
-  return _gnutls_hmac_get_algo_len (algorithm);
+  return _gnutls_mac_get_algo_len (algorithm);
 }
 
 /**
@@ -394,7 +413,7 @@ gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm,
                   const void *key, size_t keylen,
                   const void *text, size_t textlen, void *digest)
 {
-  return _gnutls_hmac_fast (algorithm, key, keylen, text, textlen, digest);
+  return _gnutls_mac_fast (algorithm, key, keylen, text, textlen, digest);
 }
 
 /* HASH */

@@ -904,6 +904,7 @@ GNUTLS_3_1_0 {
 	gnutls_privkey_sign_raw_data;
 	gnutls_privkey_status;
 	gnutls_cipher_get_iv_size;
+	gnutls_hmac_set_nonce;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

@@ -61,6 +61,7 @@ extern "C"
   int gnutls_hmac_init (gnutls_hmac_hd_t * dig,
                         gnutls_mac_algorithm_t algorithm, const void *key,
                         size_t keylen);
+  void gnutls_hmac_set_nonce (gnutls_hmac_hd_t handle, const void *nonce, size_t nonce_len);
   int gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen);
   void gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest);
   void gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest);

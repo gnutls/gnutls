@@ -434,6 +434,8 @@ compressed_to_ciphertext (gnutls_session_t session,
       memset (data_ptr, pad - 1, pad);
     }
 
+  _gnutls_auth_cipher_set_mac_nonce(&params->write.cipher_state, UINT64DATA(params->write.sequence_number), 8);
+
   /* add the authenticate data */
   ret = _gnutls_auth_cipher_add_auth(&params->write.cipher_state, preamble, preamble_size);
   if (ret < 0)
@@ -590,6 +592,7 @@ compressed_to_ciphertext_new (gnutls_session_t session,
                    (params->write.sequence_number),
                    type, compressed->size+2+pad, ver, preamble);
 
+  _gnutls_auth_cipher_set_mac_nonce(&params->write.cipher_state, UINT64DATA(params->write.sequence_number), 8);
   /* add the authenticated data */
   ret = _gnutls_auth_cipher_add_auth(&params->write.cipher_state, preamble, preamble_size);
   if (ret < 0)
@@ -717,6 +720,7 @@ ciphertext_to_compressed (gnutls_session_t session,
         make_preamble (UINT64DATA(*sequence), type,
                        length, ver, preamble);
 
+      _gnutls_auth_cipher_set_mac_nonce(&params->read.cipher_state, UINT64DATA(*sequence), 8);
       ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
       if (ret < 0)
         return gnutls_assert_val(ret);
@@ -786,6 +790,8 @@ ciphertext_to_compressed (gnutls_session_t session,
       preamble_size =
         make_preamble (UINT64DATA(*sequence), type,
                        length, ver, preamble);
+
+      _gnutls_auth_cipher_set_mac_nonce(&params->read.cipher_state, UINT64DATA(*sequence), 8);
       ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
       if (ret < 0)
         return gnutls_assert_val(ret);
@@ -915,6 +921,7 @@ ciphertext_to_compressed_new (gnutls_session_t session,
     make_preamble (UINT64DATA(*sequence), type,
                    length, ver, preamble);
 
+  _gnutls_auth_cipher_set_mac_nonce(&params->write.cipher_state, UINT64DATA(*sequence), 8);
   ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
   if (ret < 0)
     return gnutls_assert_val(ret);

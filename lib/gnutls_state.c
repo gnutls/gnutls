@@ -798,7 +798,7 @@ _gnutls_cal_PRF_A (gnutls_mac_algorithm_t algorithm,
 {
   int ret;
 
-  ret = _gnutls_hmac_fast (algorithm, secret, secret_size, seed, seed_size, result);
+  ret = _gnutls_mac_fast (algorithm, secret, secret_size, seed, seed_size, result);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -817,7 +817,7 @@ P_hash (gnutls_mac_algorithm_t algorithm,
                 int total_bytes, uint8_t * ret)
 {
 
-  digest_hd_st td2;
+  mac_hd_st td2;
   int i, times, how, blocksize, A_size;
   uint8_t final[MAX_HASH_SIZE], Atmp[MAX_SEED_SIZE];
   int output_bytes, result;
@@ -828,7 +828,7 @@ P_hash (gnutls_mac_algorithm_t algorithm,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  blocksize = _gnutls_hmac_get_algo_len (algorithm);
+  blocksize = _gnutls_mac_get_algo_len (algorithm);
 
   output_bytes = 0;
   do
@@ -846,7 +846,7 @@ P_hash (gnutls_mac_algorithm_t algorithm,
 
   for (i = 0; i < times; i++)
     {
-      result = _gnutls_hmac_init (&td2, algorithm, secret, secret_size);
+      result = _gnutls_mac_init (&td2, algorithm, secret, secret_size);
       if (result < 0)
         {
           gnutls_assert ();
@@ -859,15 +859,15 @@ P_hash (gnutls_mac_algorithm_t algorithm,
                               A_size, Atmp)) < 0)
         {
           gnutls_assert ();
-          _gnutls_hmac_deinit (&td2, final);
+          _gnutls_mac_deinit (&td2, final);
           return result;
         }
 
       A_size = blocksize;
 
-      _gnutls_hmac (&td2, Atmp, A_size);
-      _gnutls_hmac (&td2, seed, seed_size);
-      _gnutls_hmac_deinit (&td2, final);
+      _gnutls_mac (&td2, Atmp, A_size);
+      _gnutls_mac (&td2, seed, seed_size);
+      _gnutls_mac_deinit (&td2, final);
 
       if ((1 + i) * blocksize < total_bytes)
         {

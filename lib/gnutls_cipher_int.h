@@ -141,7 +141,10 @@ inline static int _gnutls_cipher_auth (const cipher_hd_st * handle, const void *
 typedef struct
 {
   cipher_hd_st cipher;
-  digest_hd_st mac;
+  union {
+    digest_hd_st dig;
+    mac_hd_st mac;
+  } mac;
   unsigned int is_mac:1;
   unsigned int ssl_hmac:1;
   unsigned int is_null:1;
@@ -171,6 +174,16 @@ inline static void _gnutls_auth_cipher_setiv (const auth_cipher_hd_st * handle,
     const void *iv, size_t ivlen)
 {
   _gnutls_cipher_setiv(&handle->cipher, iv, ivlen);
+}
+
+inline static
+int _gnutls_auth_cipher_set_mac_nonce (auth_cipher_hd_st * handle,
+                             const void *nonce, int nonce_len)
+{
+  if (handle->is_mac && !handle->ssl_hmac)
+    return _gnutls_mac_set_nonce(&handle->mac.mac, nonce, nonce_len);
+  else
+    return 0;
 }
 
 inline static size_t _gnutls_auth_cipher_tag_len( auth_cipher_hd_st * handle)

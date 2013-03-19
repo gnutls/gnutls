@@ -56,7 +56,6 @@ digest_length (int algo)
     }
 }
 
-
 int
 _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
 {
@@ -157,7 +156,7 @@ _gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
 /* HMAC interface */
 
 int
-_gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
+_gnutls_mac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
                    int keylen, const void *text, size_t textlen, void *digest)
 {
   int ret;
@@ -168,7 +167,7 @@ _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
   cc = _gnutls_get_crypto_mac (algorithm);
   if (cc != NULL)
     {
-      if (cc->fast (algorithm, key, keylen, text, textlen, digest) < 0)
+      if (cc->fast (algorithm, NULL, 0, key, keylen, text, textlen, digest) < 0)
         {
           gnutls_assert ();
           return GNUTLS_E_HASH_FAILED;
@@ -177,7 +176,7 @@ _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
       return 0;
     }
 
-  ret = _gnutls_mac_ops.fast (algorithm, key, keylen, text, textlen, digest);
+  ret = _gnutls_mac_ops.fast (algorithm, NULL, 0, key, keylen, text, textlen, digest);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -191,7 +190,7 @@ _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
 /* Returns true(non-zero) or false(0) if the 
  * provided hash exists
  */
-int _gnutls_hmac_exists(gnutls_mac_algorithm_t algo)
+int _gnutls_mac_exists(gnutls_mac_algorithm_t algo)
 {
   const gnutls_crypto_mac_st *cc = NULL;
 
@@ -202,58 +201,59 @@ int _gnutls_hmac_exists(gnutls_mac_algorithm_t algo)
 }
 
 int
-_gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
+_gnutls_mac_init (mac_hd_st * mac, gnutls_mac_algorithm_t algorithm,
                    const void *key, int keylen)
 {
   int result;
   const gnutls_crypto_mac_st *cc = NULL;
 
-  dig->algorithm = (gnutls_digest_algorithm_t)algorithm;
-  dig->key = key;
-  dig->keysize = keylen;
+  mac->algorithm = algorithm;
+  mac->mac_len = _gnutls_mac_get_algo_len (algorithm);
 
   /* check if a digest has been registered 
    */
   cc = _gnutls_get_crypto_mac (algorithm);
   if (cc != NULL && cc->init != NULL)
     {
-      if (cc->init (algorithm, &dig->handle) < 0)
+      if (cc->init (algorithm, &mac->handle) < 0)
         {
           gnutls_assert ();
           return GNUTLS_E_HASH_FAILED;
         }
 
-      if (cc->setkey (dig->handle, key, keylen) < 0)
+      if (cc->setkey (mac->handle, key, keylen) < 0)
         {
           gnutls_assert ();
-          cc->deinit (dig->handle);
+          cc->deinit (mac->handle);
           return GNUTLS_E_HASH_FAILED;
         }
 
-      dig->hash = cc->hash;
-      dig->output = cc->output;
-      dig->deinit = cc->deinit;
-      dig->reset = cc->reset;
+      mac->hash = cc->hash;
+      mac->setnonce = cc->setnonce;
+      mac->output = cc->output;
+      mac->deinit = cc->deinit;
+      mac->reset = cc->reset;
 
       return 0;
     }
 
-  result = _gnutls_mac_ops.init (algorithm, &dig->handle);
+  result = _gnutls_mac_ops.init (algorithm, &mac->handle);
   if (result < 0)
     {
       gnutls_assert ();
       return result;
     }
 
-  dig->hash = _gnutls_mac_ops.hash;
-  dig->output = _gnutls_mac_ops.output;
-  dig->deinit = _gnutls_mac_ops.deinit;
-  dig->reset = _gnutls_mac_ops.reset;
+  mac->hash = _gnutls_mac_ops.hash;
+  mac->setnonce = _gnutls_mac_ops.setnonce;
+  mac->output = _gnutls_mac_ops.output;
+  mac->deinit = _gnutls_mac_ops.deinit;
+  mac->reset = _gnutls_mac_ops.reset;
 
-  if (_gnutls_mac_ops.setkey (dig->handle, key, keylen) < 0)
+  if (_gnutls_mac_ops.setkey (mac->handle, key, keylen) < 0)
     {
       gnutls_assert();
-      dig->deinit(dig->handle);
+      mac->deinit(mac->handle);
       return GNUTLS_E_HASH_FAILED;
     }
 
@@ -261,7 +261,7 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
 }
 
 void
-_gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
+_gnutls_mac_deinit (mac_hd_st * handle, void *digest)
 {
   if (handle->handle == NULL)
     {
@@ -269,7 +269,7 @@ _gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
     }
 
   if (digest)
-    _gnutls_hmac_output (handle, digest);
+    _gnutls_mac_output (handle, digest);
 
   handle->deinit (handle->handle);
   handle->handle = NULL;
@@ -373,7 +373,7 @@ _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
     _gnutls_hash (&td, handle->key, handle->keysize);
 
   _gnutls_hash (&td, opad, padsize);
-  block = _gnutls_hmac_get_algo_len (handle->algorithm);
+  block = _gnutls_mac_get_algo_len (handle->algorithm);
   _gnutls_hash_output (handle, ret);    /* get the previous hash */
   _gnutls_hash (&td, ret, block);
 
@@ -427,7 +427,7 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
     _gnutls_hash (&td, key, key_size);
 
   _gnutls_hash (&td, opad, padsize);
-  block = _gnutls_hmac_get_algo_len (handle->algorithm);
+  block = _gnutls_mac_get_algo_len (handle->algorithm);
 
   if (key_size > 0)
     _gnutls_hash (handle, key, key_size);

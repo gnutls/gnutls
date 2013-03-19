@@ -30,24 +30,29 @@ struct gnutls_hash_entry
   const char *name;
   const char *oid;
   gnutls_mac_algorithm_t id;
-  size_t key_size;              /* in case of mac */
+  size_t output_size;
+  size_t key_size;
   unsigned placeholder; /* if set, then not a real MAC */
   unsigned secure; /* if set the this algorithm is secure as hash */
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 0, 1},
-  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 0, 0},
-  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 0, 1},
-  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 0, 1},
-  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 0, 1},
-  {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 0, 1},
-  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 1, 1},
-  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0},     /* not used as MAC */
-  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 0, 1},
-  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0, 0},
-  {0, 0, 0, 0, 0}
+  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 20, 0, 1},
+  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 16, 0, 0},
+  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 32, 0, 1},
+  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 1},
+  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 1},
+  {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 1},
+#ifdef HAVE_UMAC
+  {"UMAC-96", NULL, GNUTLS_MAC_UMAC_96, 12, 16, 0, 1},
+  {"UMAC-128", NULL, GNUTLS_MAC_UMAC_128, 16, 16, 0, 1},
+#endif
+  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 0, 1, 1},
+  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0, 0},     /* not used as MAC */
+  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 20, 0, 1},
+  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0}
 };
 
 
@@ -121,7 +126,7 @@ gnutls_mac_get_id (const char *name)
  * gnutls_mac_get_key_size:
  * @algorithm: is an encryption algorithm
  *
- * Get size of MAC key.
+ * Get size of MAC key used in TLS. 
  *
  * Returns: length (in bytes) of the given MAC key size, or 0 if the
  *   given MAC algorithm is invalid.
@@ -133,6 +138,26 @@ gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
 
   /* avoid prefix */
   GNUTLS_HASH_ALG_LOOP (ret = p->key_size);
+
+  return ret;
+}
+
+/*-
+ * _gnutls_mac_get_algo_len:
+ * @algorithm: is an encryption algorithm
+ *
+ * Get size of MAC key.
+ *
+ * Returns: length (in bytes) of the MAC output size, or 0 if the
+ *   given MAC algorithm is invalid.
+ -*/
+size_t
+_gnutls_mac_get_algo_len (gnutls_mac_algorithm_t algorithm)
+{
+  size_t ret = 0;
+
+  /* avoid prefix */
+  GNUTLS_HASH_ALG_LOOP (ret = p->output_size);
 
   return ret;
 }
@@ -160,7 +185,7 @@ static gnutls_mac_algorithm_t supported_macs[MAX_ALGOS] = { 0 };
       int i = 0;
 
       GNUTLS_HASH_LOOP ( 
-        if (p->placeholder != 0 || _gnutls_hmac_exists(p->id))
+        if (p->placeholder != 0 || _gnutls_mac_exists(p->id))
           supported_macs[i++]=p->id;
       );
       supported_macs[i++]=0;

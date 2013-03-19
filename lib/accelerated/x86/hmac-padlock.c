@@ -292,6 +292,7 @@ wrap_padlock_hmac_deinit (void *hd)
 
 static int
 wrap_padlock_hmac_fast (gnutls_mac_algorithm_t algo,
+			const void* nonce, size_t nonce_size,
                         const void *key, size_t key_size, const void *text,
                         size_t text_size, void *digest)
 {
@@ -300,7 +301,7 @@ wrap_padlock_hmac_fast (gnutls_mac_algorithm_t algo,
           unsigned char *pad;
           unsigned char pad2[SHA1_DATA_SIZE + MAX_SHA_DIGEST_SIZE];
           unsigned char hkey[MAX_SHA_DIGEST_SIZE];
-          unsigned int digest_size = _gnutls_hmac_get_algo_len (algo);
+          unsigned int digest_size = _gnutls_mac_get_algo_len (algo);
 
           if (key_size > SHA1_DATA_SIZE)
             {
@@ -353,6 +354,7 @@ wrap_padlock_hmac_fast (gnutls_mac_algorithm_t algo,
 const gnutls_crypto_mac_st hmac_sha_padlock_struct = {
     .init = NULL,
     .setkey = NULL,
+    .setnonce = NULL,
     .hash = NULL,
     .reset = NULL,
     .output = NULL,
@@ -363,6 +365,7 @@ const gnutls_crypto_mac_st hmac_sha_padlock_struct = {
 const gnutls_crypto_mac_st hmac_sha_padlock_nano_struct = {
     .init = wrap_padlock_hmac_init,
     .setkey = wrap_padlock_hmac_setkey,
+    .setnonce = NULL,
     .hash = wrap_padlock_hmac_update,
     .reset = wrap_padlock_hmac_reset,
     .output = wrap_padlock_hmac_output,

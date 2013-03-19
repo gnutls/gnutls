@@ -51,11 +51,13 @@
   {
     int (*init) (gnutls_mac_algorithm_t, void **ctx);
     int (*setkey) (void *ctx, const void *key, size_t keysize);
+    int (*setnonce) (void *ctx, const void *nonce, size_t noncesize);
     void (*reset) (void *ctx);
     int (*hash) (void *ctx, const void *text, size_t textsize);
     int (*output) (void *src_ctx, void *digest, size_t digestsize);
     void (*deinit) (void *ctx);
-    int (*fast)(gnutls_mac_algorithm_t, const void *key, size_t keysize, const void *text, size_t textsize, void *digest);
+    int (*fast)(gnutls_mac_algorithm_t, const void* nonce, size_t nonce_size,
+    	const void *key, size_t keysize, const void *text, size_t textsize, void *digest);
 
     /* Not needed for registered on run-time. Only included
      * should define it. */

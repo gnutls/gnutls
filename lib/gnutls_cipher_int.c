@@ -157,16 +157,16 @@ int ret;
       handle->ssl_hmac = ssl_hmac;
 
       if (ssl_hmac)
-        ret = _gnutls_mac_init_ssl3(&handle->mac, mac, mac_key->data, mac_key->size);
+        ret = _gnutls_mac_init_ssl3(&handle->mac.dig, mac, mac_key->data, mac_key->size);
       else
-        ret = _gnutls_hmac_init(&handle->mac, mac, mac_key->data, mac_key->size);
+        ret = _gnutls_mac_init(&handle->mac.mac, mac, mac_key->data, mac_key->size);
       if (ret < 0)
         {
           gnutls_assert();
           goto cleanup;
         }
 
-      handle->tag_size = _gnutls_hmac_get_algo_len(mac);
+      handle->tag_size = _gnutls_mac_get_algo_len(mac);
     }
   else if (_gnutls_cipher_is_aead(&handle->cipher))
     handle->tag_size = _gnutls_cipher_tag_len(&handle->cipher);
@@ -185,9 +185,9 @@ int _gnutls_auth_cipher_add_auth (auth_cipher_hd_st * handle, const void *text,
   if (handle->is_mac)
     {
       if (handle->ssl_hmac)
-        return _gnutls_hash(&handle->mac, text, textlen);
+        return _gnutls_hash(&handle->mac.dig, text, textlen);
       else
-        return _gnutls_hmac(&handle->mac, text, textlen);
+        return _gnutls_mac(&handle->mac.mac, text, textlen);
     }
   else if (_gnutls_cipher_is_aead(&handle->cipher))
     return _gnutls_cipher_auth(&handle->cipher, text, textlen);
@@ -205,9 +205,9 @@ int ret;
   if (handle->is_mac)
     {
       if (handle->ssl_hmac)
-        ret = _gnutls_hash(&handle->mac, text, auth_size);
+        ret = _gnutls_hash(&handle->mac.dig, text, auth_size);
       else
-        ret = _gnutls_hmac(&handle->mac, text, auth_size);
+        ret = _gnutls_mac(&handle->mac.mac, text, auth_size);
       if (ret < 0)
         {
           gnutls_assert();
@@ -258,9 +258,9 @@ int ret;
       textlen -= handle->tag_size;
 
       if (handle->ssl_hmac)
-        return _gnutls_hash(&handle->mac, text, textlen);
+        return _gnutls_hash(&handle->mac.dig, text, textlen);
       else
-        return _gnutls_hmac(&handle->mac, text, textlen);
+        return _gnutls_mac(&handle->mac.mac, text, textlen);
     }
 
   return 0;
@@ -268,21 +268,22 @@ int ret;
 
 int _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void* tag, int tag_size)
 {
-int ret = 0;
+int ret;
+
   if (handle->is_mac)
     {
       if (handle->ssl_hmac)
         {
-          ret = _gnutls_mac_output_ssl3 (&handle->mac, tag);
+          ret = _gnutls_mac_output_ssl3 (&handle->mac.dig, tag);
           if (ret < 0)
             return gnutls_assert_val(ret);
 
-          _gnutls_mac_reset_ssl3 (&handle->mac);
+          _gnutls_mac_reset_ssl3 (&handle->mac.dig);
         }
       else
         {
-          _gnutls_hmac_output (&handle->mac, tag);
-          _gnutls_hmac_reset (&handle->mac);
+          _gnutls_mac_output (&handle->mac.mac, tag);
+          _gnutls_mac_reset (&handle->mac.mac);
         }
     }
   else if (_gnutls_cipher_is_aead(&handle->cipher))
@@ -298,9 +299,9 @@ void _gnutls_auth_cipher_deinit (auth_cipher_hd_st * handle)
   if (handle->is_mac)
     {
       if (handle->ssl_hmac) /* failure here doesn't matter */
-        _gnutls_mac_deinit_ssl3 (&handle->mac, NULL);
+        _gnutls_mac_deinit_ssl3 (&handle->mac.dig, NULL);
       else
-        _gnutls_hmac_deinit(&handle->mac, NULL);
+        _gnutls_mac_deinit(&handle->mac.mac, NULL);
     }
   if (handle->is_null==0)
     _gnutls_cipher_deinit(&handle->cipher);

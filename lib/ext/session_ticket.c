@@ -93,24 +93,24 @@ static int
 digest_ticket (const gnutls_datum_t * key, struct ticket *ticket,
                uint8_t * digest)
 {
-  digest_hd_st digest_hd;
+  mac_hd_st digest_hd;
   uint16_t length16;
   int ret;
 
-  ret = _gnutls_hmac_init (&digest_hd, GNUTLS_MAC_SHA256, key->data,
+  ret = _gnutls_mac_init (&digest_hd, GNUTLS_MAC_SHA256, key->data,
                            key->size);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
-  _gnutls_hmac (&digest_hd, ticket->key_name, KEY_NAME_SIZE);
-  _gnutls_hmac (&digest_hd, ticket->IV, IV_SIZE);
+  _gnutls_mac (&digest_hd, ticket->key_name, KEY_NAME_SIZE);
+  _gnutls_mac (&digest_hd, ticket->IV, IV_SIZE);
   length16 = _gnutls_conv_uint16 (ticket->encrypted_state_len);
-  _gnutls_hmac (&digest_hd, &length16, 2);
-  _gnutls_hmac (&digest_hd, ticket->encrypted_state,
+  _gnutls_mac (&digest_hd, &length16, 2);
+  _gnutls_mac (&digest_hd, ticket->encrypted_state,
                 ticket->encrypted_state_len);
-  _gnutls_hmac_deinit (&digest_hd, digest);
+  _gnutls_mac_deinit (&digest_hd, digest);
 
   return 0;
 }

@@ -48,11 +48,14 @@ const char* side = "";
 #define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP192R1"
 #define PRIO_RSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
+#define PRIO_ARCFOUR_128_SHA1 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_SALSA20R20_256_UMAC_96 "NONE:+VERS-TLS1.0:+SALSA20R20-256:+UMAC-96:+SIGN-ALL:+COMP-NULL:+RSA"
+
 #define PRIO_AES_CBC_SHA1 "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_ARCFOUR_128_MD5 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_AES_GCM "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
-#define PRIO_SALSA20R20_128_SHA1 "NONE:+VERS-TLS1.0:+SALSA20R20-128:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
+#define PRIO_SALSA20R20_256_SHA1 "NONE:+VERS-TLS1.0:+SALSA20R20-256:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
 static const int rsa_bits = 1776, ec_bits = 192;
 
@@ -435,29 +438,20 @@ void benchmark_tls(int debug_level, int ciphers)
       {
         printf("Testing throughput in cipher/MAC combinations:\n\n");
 
-        test_ciphersuite(PRIO_ARCFOUR_128_MD5, 1024);
-        test_ciphersuite(PRIO_ARCFOUR_128_MD5, 4096);
-        test_ciphersuite(PRIO_ARCFOUR_128_MD5, 8 * 1024);
+        test_ciphersuite(PRIO_SALSA20R20_256_UMAC_96, 1400);
+        test_ciphersuite(PRIO_SALSA20R20_256_SHA1, 1400);
+        test_ciphersuite(PRIO_ARCFOUR_128_SHA1, 1400);
+        test_ciphersuite(PRIO_ARCFOUR_128_MD5, 1400);
+        test_ciphersuite(PRIO_AES_GCM, 1400);
+        test_ciphersuite(PRIO_AES_CBC_SHA1, 1400);
+        test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 1400);
+
+        test_ciphersuite(PRIO_SALSA20R20_256_UMAC_96, 15 * 1024);
+        test_ciphersuite(PRIO_SALSA20R20_256_SHA1, 15*1024);
+        test_ciphersuite(PRIO_ARCFOUR_128_SHA1, 15 * 1024);
         test_ciphersuite(PRIO_ARCFOUR_128_MD5, 15 * 1024);
-
-        test_ciphersuite(PRIO_SALSA20R20_128_SHA1, 1024);
-        test_ciphersuite(PRIO_SALSA20R20_128_SHA1, 4096);
-        test_ciphersuite(PRIO_SALSA20R20_128_SHA1, 8*1024);
-        test_ciphersuite(PRIO_SALSA20R20_128_SHA1, 15*1024);
-
-        test_ciphersuite(PRIO_AES_GCM, 1024);
-        test_ciphersuite(PRIO_AES_GCM, 4096);
-        test_ciphersuite(PRIO_AES_GCM, 8 * 1024);
         test_ciphersuite(PRIO_AES_GCM, 15 * 1024);
-
-        test_ciphersuite(PRIO_AES_CBC_SHA1, 1024);
-        test_ciphersuite(PRIO_AES_CBC_SHA1, 4096);
-        test_ciphersuite(PRIO_AES_CBC_SHA1, 8 * 1024);
         test_ciphersuite(PRIO_AES_CBC_SHA1, 15 * 1024);
-
-        test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 1024);
-        test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 4096);
-        test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 8 * 1024);
         test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 15 * 1024);
       }
     else

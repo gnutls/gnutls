@@ -173,10 +173,10 @@ _gnutls_pbkdf2_sha1 (const char *P, size_t Plen,
               tmp[Slen + 3] = (i & 0x000000ff) >> 0;
 
               rc =
-                _gnutls_hmac_fast (GNUTLS_MAC_SHA1, P, Plen, tmp, tmplen, U);
+                _gnutls_mac_fast (GNUTLS_MAC_SHA1, P, Plen, tmp, tmplen, U);
             }
           else
-            rc = _gnutls_hmac_fast (GNUTLS_MAC_SHA1, P, Plen, U, hLen, U);
+            rc = _gnutls_mac_fast (GNUTLS_MAC_SHA1, P, Plen, U, hLen, U);
 
           if (rc < 0)
             {

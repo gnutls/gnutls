@@ -352,6 +352,7 @@ int ret;
 static const gnutls_crypto_mac_st mac_struct = {
   .init = NULL,
   .setkey = NULL,
+  .setnonce = NULL,
   .hash = NULL,
   .output = NULL,
   .deinit = NULL,

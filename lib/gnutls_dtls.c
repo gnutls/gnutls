@@ -626,7 +626,7 @@ int total = 0, ret, iv_size;
     total += _gnutls_cipher_get_tag_size(params->cipher_algorithm);
   else
     {
-      ret = _gnutls_hmac_get_algo_len(params->mac_algorithm);
+      ret = _gnutls_mac_get_algo_len(params->mac_algorithm);
       if (ret < 0)
         return gnutls_assert_val(ret);
       total+=ret;
@@ -856,7 +856,7 @@ uint8_t digest[C_HASH_SIZE];
   hvr[hvr_size++] = 255;
   hvr[hvr_size++] = COOKIE_SIZE;
 
-  ret = _gnutls_hmac_fast(C_HASH, key->data, key->size, client_data, client_data_size, digest);
+  ret = _gnutls_mac_fast(C_HASH, key->data, key->size, client_data, client_data_size, digest);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -931,7 +931,7 @@ uint8_t digest[C_HASH_SIZE];
       return gnutls_assert_val(GNUTLS_E_BAD_COOKIE);
     }
 
-  ret = _gnutls_hmac_fast(C_HASH, key->data, key->size, client_data, client_data_size, digest);
+  ret = _gnutls_mac_fast(C_HASH, key->data, key->size, client_data, client_data_size, digest);
   if (ret < 0)
     return gnutls_assert_val(ret);
 

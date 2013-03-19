@@ -37,6 +37,7 @@ extern int crypto_digest_prio;
 extern gnutls_crypto_digest_st _gnutls_digest_ops;
 
 typedef int (*hash_func) (void *handle, const void *text, size_t size);
+typedef int (*nonce_func) (void *handle, const void *text, size_t size);
 typedef void (*reset_func) (void *ctx);
 typedef int (*output_func) (void *src_ctx, void *digest, size_t digestsize);
 typedef void (*deinit_func) (void *handle);
@@ -44,29 +45,44 @@ typedef void (*deinit_func) (void *handle);
 typedef struct
 {
   gnutls_digest_algorithm_t algorithm;
-  const void *key;
-  int keysize;
-
   hash_func hash;
   reset_func reset;
   output_func output;
   deinit_func deinit;
 
+  const void *key; /* esoteric use by SSL3 MAC functions */
+  int keysize;
+
   void *handle;
 } digest_hd_st;
 
+typedef struct
+{
+  gnutls_mac_algorithm_t algorithm;
+  int mac_len;
+
+  hash_func hash;
+  reset_func reset;
+  nonce_func setnonce;
+  output_func output;
+  deinit_func deinit;
+
+  void *handle;
+} mac_hd_st;
+
 /* basic functions */
-int _gnutls_hmac_exists(gnutls_mac_algorithm_t algorithm);
-int _gnutls_hmac_init (digest_hd_st *, gnutls_mac_algorithm_t algorithm,
+int _gnutls_mac_exists(gnutls_mac_algorithm_t algorithm);
+int _gnutls_mac_init (mac_hd_st *, gnutls_mac_algorithm_t algorithm,
                        const void *key, int keylen);
 size_t _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm);
-#define _gnutls_hmac_get_algo_len(x) _gnutls_hash_get_algo_len((gnutls_digest_algorithm_t)x)
-int _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
+
+size_t _gnutls_mac_get_algo_len (gnutls_mac_algorithm_t algorithm);
+int _gnutls_mac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
                        int keylen, const void *text, size_t textlen,
                        void *digest);
 
 inline static int
-_gnutls_hmac (digest_hd_st * handle, const void *text, size_t textlen)
+_gnutls_mac (mac_hd_st * handle, const void *text, size_t textlen)
 {
   if (textlen > 0)
     {
@@ -76,23 +92,27 @@ _gnutls_hmac (digest_hd_st * handle, const void *text, size_t textlen)
 }
 
 inline static void
-_gnutls_hmac_output (digest_hd_st * handle, void *digest)
+_gnutls_mac_output (mac_hd_st * handle, void *digest)
 {
-  size_t maclen;
-
-  maclen = _gnutls_hmac_get_algo_len (handle->algorithm);
-
   if (digest != NULL)
     {
-      handle->output (handle->handle, digest, maclen);
+      handle->output (handle->handle, digest, handle->mac_len);
     }
 }
 
+inline static int
+_gnutls_mac_set_nonce (mac_hd_st * handle, const void *nonce, size_t n_size)
+{
+  if (handle->setnonce)
+    return handle->setnonce (handle->handle, nonce, n_size);
+  return 0;
+}
+
 void
-_gnutls_hmac_deinit (digest_hd_st * handle, void *digest);
+_gnutls_mac_deinit (mac_hd_st * handle, void *digest);
 
 inline static void
-_gnutls_hmac_reset (digest_hd_st * handle)
+_gnutls_mac_reset (mac_hd_st * handle)
 {
   if (handle->handle == NULL)
     {

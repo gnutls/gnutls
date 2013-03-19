@@ -111,8 +111,7 @@ extern "C"
     GNUTLS_CIPHER_AES_128_GCM = 93,
     GNUTLS_CIPHER_AES_256_GCM = 94,
     GNUTLS_CIPHER_CAMELLIA_192_CBC = 95,
-    GNUTLS_CIPHER_SALSA20R20_128 = 96,
-    GNUTLS_CIPHER_SALSA20R20_256 = 97,
+    GNUTLS_CIPHER_SALSA20R20_256 = 96,
 
     /* used only for PGP internals. Ignored in TLS/SSL
      */
@@ -234,7 +233,9 @@ extern "C"
     GNUTLS_MAC_SHA224 = 9,
       /* If you add anything here, make sure you align with
          gnutls_digest_algorithm_t. */
-    GNUTLS_MAC_AEAD = 200 /* indicates that MAC is on the cipher */
+    GNUTLS_MAC_AEAD = 200, /* indicates that MAC is on the cipher */
+    GNUTLS_MAC_UMAC_96 = 201,
+    GNUTLS_MAC_UMAC_128 = 202,
   } gnutls_mac_algorithm_t;
 
 /**
