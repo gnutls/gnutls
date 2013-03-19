@@ -26,6 +26,11 @@
 #include <unistd.h>
 #include "benchmark.h"
 
+#if defined(HAVE_CLOCK_GETTIME)
+# undef gettime
+# define gettime(x) clock_gettime(CLOCK_PROCESS_CPUTIME_ID, x)
+#endif
+
 #define BSECS 5
 
 int benchmark_must_finish = 0;
