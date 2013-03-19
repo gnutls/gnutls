@@ -24,7 +24,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <gnutls/gnutls.h>
+#include <gnutls/crypto.h>
 #include "utils.h"
 
 #include "../lib/gnutls_int.h"
@@ -51,29 +52,29 @@ doit (void)
     gnutls_global_set_log_level (4711);
 
   err =
-    _gnutls_hmac_fast (GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8, digest);
+    gnutls_hmac_fast (GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8, digest);
   if (err < 0)
-    fail ("_gnutls_hmac_fast(MD5) failed: %d\n", err);
+    fail ("gnutls_hmac_fast(MD5) failed: %d\n", err);
   else
     {
       if (memcmp (digest, "\x3c\xb0\x9d\x83\x28\x01\xef\xc0"
                   "\x7b\xb3\xaf\x42\x69\xe5\x93\x9a", 16) == 0)
         {
           if (debug)
-            success ("_gnutls_hmac_fast(MD5) OK\n");
+            success ("gnutls_hmac_fast(MD5) OK\n");
         }
       else
         {
           hexprint (digest, 16);
-          fail ("_gnutls_hmac_fast(MD5) failure\n");
+          fail ("gnutls_hmac_fast(MD5) failure\n");
         }
     }
 
   err =
-    _gnutls_hmac_fast (GNUTLS_MAC_SHA1, "keykeykey", 9, "abcdefgh", 8,
+    gnutls_hmac_fast (GNUTLS_MAC_SHA1, "keykeykey", 9, "abcdefgh", 8,
                        digest);
   if (err < 0)
-    fail ("_gnutls_hmac_fast(SHA1) failed: %d\n", err);
+    fail ("gnutls_hmac_fast(SHA1) failed: %d\n", err);
   else
     {
       if (memcmp (digest, "\x58\x93\x7a\x58\xfe\xea\x82\xf8"
@@ -81,12 +82,12 @@ doit (void)
                   20) == 0)
         {
           if (debug)
-            success ("_gnutls_hmac_fast(SHA1) OK\n");
+            success ("gnutls_hmac_fast(SHA1) OK\n");
         }
       else
         {
           hexprint (digest, 20);
-          fail ("_gnutls_hmac_fast(SHA1) failure\n");
+          fail ("gnutls_hmac_fast(SHA1) failure\n");
         }
     }
 

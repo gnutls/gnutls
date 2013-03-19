@@ -946,7 +946,6 @@ GNUTLS_PRIVATE {
     _gnutls_rsa_pms_set_version;
     _gnutls_record_set_default_version;
     # Internal symbols needed by tests/gc:
-    _gnutls_hmac_fast;
     _gnutls_pbkdf2_sha1;
     # Internal symbols needed by tests/mpi:
     _gnutls_mpi_ops;
