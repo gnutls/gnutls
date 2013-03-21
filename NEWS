@@ -20,6 +20,9 @@ cards are present.
 
 ** libgnutls: Added Salsa20 cipher (experimental)
 
+** libgnutls: Corrected issue in the (deprecated) external key
+signing interface, when used with TLS 1.2. Reported by Bjorn H. Christensen.
+
 ** libgnutls-dane: Updated DANE verification options.
 
 ** configure: Trust store file must be explicitly set or unset when 
