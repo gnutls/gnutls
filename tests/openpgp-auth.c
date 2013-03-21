@@ -185,7 +185,7 @@ doit ()
           gnutls_certificate_free_credentials (cred);
           gnutls_free(stored_cli_cert.data);
           gnutls_global_deinit ();
-          exit(0);
+          return; 
         }
       else
         {
