@@ -244,7 +244,7 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
               if (ret < 0)
                 return gnutls_assert_val(ret);
               
-              ret = pk_prepare_hash (gnutls_privkey_get_pk_algorithm(pkey, NULL), hash_algo, &digest);
+              ret = pk_prepare_hash (gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL), hash_algo, &digest);
               if (ret < 0)
                 {
                   gnutls_assert ();

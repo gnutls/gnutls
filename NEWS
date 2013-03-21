@@ -15,6 +15,9 @@ modules, and not only the ones loaded via p11-kit.
 
 ** libgnutls: Load CA certificates in android 4.x systems.
 
+** libgnutls: Corrected issue in the (deprecated) external key
+signing interface, when used with TLS 1.2. Reported by Bjorn H. Christensen.
+
 ** libgnutls: PKCS #11 slots are scanned only when needed, not
 on initialization. This speeds up gnutls initialization when smart
 cards are present.
