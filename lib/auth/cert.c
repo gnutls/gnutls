@@ -858,7 +858,7 @@ _gnutls_gen_openpgp_certificate (gnutls_session_t session,
   int apr_cert_list_length;
   unsigned int subkey;
   uint8_t type;
-  uint8_t fpr[20];
+  uint8_t fpr[GNUTLS_OPENPGP_V4_FINGERPRINT_SIZE];
   char buf[2*GNUTLS_OPENPGP_KEYID_SIZE+1];
   size_t fpr_size;
 
@@ -934,8 +934,8 @@ _gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session,
                                      gnutls_buffer_st * data)
 {
   int ret, packet_size;
-  uint8_t type, fpr[20];
-  uint8_t id[20];
+  uint8_t type, fpr[GNUTLS_OPENPGP_V4_FINGERPRINT_SIZE];
+  uint8_t id[GNUTLS_OPENPGP_KEYID_SIZE];
   unsigned int subkey;
   size_t fpr_size, id_size;
   gnutls_pcert_st *apr_cert_list;
