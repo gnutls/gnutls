@@ -46,13 +46,24 @@ static const char message[] = "Hello, brave GNU world!";
 static const char pub_key_file[] = "../guile/tests/openpgp-pub.asc";
 static const char priv_key_file[] = "../guile/tests/openpgp-sec.asc";
 static const char *key_id = NULL;
+static gnutls_datum_t stored_cli_cert = {NULL, 0};
 
 static void
 log_message (int level, const char *message)
 {
   fprintf (stderr, "[%5d|%2d] %s", getpid (), level, message);
 }
-
+
+static
+int key_recv_func(gnutls_session_t session, const unsigned char *keyfpr,
+	unsigned int keyfpr_length, gnutls_datum_t * key)
+{
+	key->data = gnutls_malloc(stored_cli_cert.size);
+	memcpy(key->data, stored_cli_cert.data, stored_cli_cert.size);
+	key->size = stored_cli_cert.size;
+	
+	return 0;
+}
 
 void
 doit ()
@@ -60,21 +71,20 @@ doit ()
   int err, i;
   int sockets[2];
   const char *srcdir;
-  char pub_key_path[512], priv_key_path[512];
   pid_t child;
+  char pub_key_path[512], priv_key_path[512];
 
   gnutls_global_init ();
 
   srcdir = getenv ("srcdir") ? getenv ("srcdir") : ".";
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 5; i++)
     {
-
       if (i <= 1)
         key_id = NULL;          /* try using the master key */
       else if (i == 2)
         key_id = "auto";        /* test auto */
-      else if (i == 3)
+      else if (i >= 3)
         key_id = "f30fd423c143e7ba";
 
       if (debug)
@@ -150,6 +160,9 @@ doit ()
 
           gnutls_dh_set_prime_bits (session, 1024);
 
+          if (i==4) 
+            gnutls_openpgp_send_cert(session, GNUTLS_OPENPGP_CERT_FINGERPRINT);
+
           err = gnutls_handshake (session);
           if (err != 0)
             fail ("client handshake %s (%d) \n", gnutls_strerror (err), err);
@@ -170,6 +183,9 @@ doit ()
           
           gnutls_deinit(session);
           gnutls_certificate_free_credentials (cred);
+          gnutls_free(stored_cli_cert.data);
+          gnutls_global_deinit ();
+          exit(0);
         }
       else
         {
@@ -229,9 +245,25 @@ doit ()
           gnutls_certificate_server_set_request (session,
                                                  GNUTLS_CERT_REQUIRE);
 
+          if (i==4)
+            gnutls_openpgp_set_recv_key_function(session, key_recv_func);
+
           err = gnutls_handshake (session);
           if (err != 0)
             fail ("server handshake %s (%d) \n", gnutls_strerror (err), err);
+
+          if (stored_cli_cert.data == NULL)
+            {
+              const gnutls_datum_t* d;
+              unsigned int d_size;
+              d = gnutls_certificate_get_peers(session, &d_size);
+              if (d != NULL)
+                {
+                  stored_cli_cert.data = gnutls_malloc(d[0].size);
+                  memcpy(stored_cli_cert.data, d[0].data, d[0].size);
+                  stored_cli_cert.size = d[0].size;
+                }
+            }
 
           received =
             gnutls_record_recv (session, greetings, sizeof (greetings));
@@ -268,9 +300,9 @@ doit ()
           else
             fail ("child failed: %d\n", status);
         }
-
     }
 
+  gnutls_free(stored_cli_cert.data);
   gnutls_global_deinit ();
 }
 #else
