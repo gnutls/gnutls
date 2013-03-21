@@ -681,6 +681,8 @@ error:
  * callback is only useful in server side, and will be used if the peer
  * sent a key fingerprint instead of a full key.
  *
+ * The retrieved key must be allocated using gnutls_malloc().
+ *
  **/
 void
 gnutls_openpgp_set_recv_key_function (gnutls_session_t session,

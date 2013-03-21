@@ -52,6 +52,7 @@ extern "C"
   } gnutls_openpgp_crt_fmt_t;
 
 #define GNUTLS_OPENPGP_KEYID_SIZE 8
+#define GNUTLS_OPENPGP_V4_FINGERPRINT_SIZE 20
   typedef unsigned char gnutls_openpgp_keyid_t[GNUTLS_OPENPGP_KEYID_SIZE];
 
 /* gnutls_openpgp_cert_t should be defined in gnutls.h
@@ -301,6 +302,8 @@ extern "C"
  * useful on the server, and will only be used if the peer send a key
  * fingerprint instead of a full key.  See also
  * gnutls_openpgp_set_recv_key_function().
+ *
+ * The variable @key must be allocated using gnutls_malloc().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
  *   otherwise an error code is returned.

@@ -22,6 +22,9 @@ signing interface, when used with TLS 1.2. Reported by Bjorn H. Christensen.
 on initialization. This speeds up gnutls initialization when smart
 cards are present.
 
+** libgnutls: Fixes in openpgp handshake with fingerprints. Reported by 
+Joke de Buhr.
+
 ** configure: Trust store file must be explicitly set or unset when 
 cross compiling.
 

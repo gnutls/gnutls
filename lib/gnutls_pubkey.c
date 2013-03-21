@@ -57,8 +57,13 @@ struct gnutls_pubkey_st
    */
   gnutls_pk_params_st params;
 
+#ifdef ENABLE_OPENPGP
   uint8_t openpgp_key_id[GNUTLS_OPENPGP_KEYID_SIZE];
-  int openpgp_key_id_set;
+  unsigned int openpgp_key_id_set;
+
+  uint8_t openpgp_key_fpr[20];
+  unsigned int openpgp_key_fpr_set:1;
+#endif
 
   unsigned int key_usage;       /* bits from GNUTLS_KEY_* */
 };
@@ -349,6 +354,13 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
   uint32_t kid32[2];
   uint32_t *k;
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
+  size_t len;
+
+  len = sizeof(key->openpgp_key_fpr);
+  ret = gnutls_openpgp_crt_get_fingerprint(crt, key->openpgp_key_fpr, &len);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  key->openpgp_key_fpr_set = 1;
 
   ret = gnutls_openpgp_crt_get_preferred_key_id (crt, keyid);
   if (ret == GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR)
@@ -402,15 +414,18 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
 /**
  * gnutls_pubkey_get_openpgp_key_id:
  * @key: Holds the public key
- * @flags: should be 0 for now
+ * @flags: should be 0 or %GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT
  * @output_data: will contain the key ID
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
  * @subkey: Will be non zero if the key ID corresponds to a subkey
  *
- * This function returned the OpenPGP key ID of the corresponding key.
- * The key is a unique ID the depends on the public
+ * This function returns the OpenPGP key ID of the corresponding key.
+ * The key is a unique ID that depends on the public
  * key parameters. 
+ *
+ * If the flag %GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT is specified
+ * this function returns the fingerprint of the master key.
  *
  * If the buffer provided is not long enough to hold the output, then
  * *output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
@@ -433,6 +448,24 @@ gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
+  if (flags & GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT)
+    {
+      if (*output_data_size < sizeof(key->openpgp_key_fpr))
+        {
+          *output_data_size = sizeof(key->openpgp_key_fpr);
+          return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+        }
+
+      if (key->openpgp_key_fpr_set == 0)
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+      if (output_data)
+        memcpy(output_data, key->openpgp_key_fpr, sizeof(key->openpgp_key_fpr));
+      *output_data_size = sizeof(key->openpgp_key_fpr);
+      
+      return 0;
+    }
+    
   if (*output_data_size < sizeof(key->openpgp_key_id))
     {
       *output_data_size = sizeof(key->openpgp_key_id);

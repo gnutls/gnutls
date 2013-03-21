@@ -36,6 +36,12 @@ extern "C"
 
 /* Public key operations */
 
+#define GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA 1
+/* The following flag disables call to PIN callbacks etc.
+ * Only works for TPM keys.
+ */
+#define GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT (1<<3)
+
 struct gnutls_pubkey_st;
 typedef struct gnutls_pubkey_st *gnutls_pubkey_t;
 
@@ -135,7 +141,6 @@ int gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt, gnutls_pubkey_t key);
 
 int gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq, gnutls_pubkey_t key);
 
-#define GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA 1
 int
 gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
                            const gnutls_datum_t * hash,
