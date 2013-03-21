@@ -935,7 +935,9 @@ _gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session,
 {
   int ret, packet_size;
   uint8_t type, fpr[20];
-  size_t fpr_size;
+  uint8_t id[20];
+  unsigned int subkey;
+  size_t fpr_size, id_size;
   gnutls_pcert_st *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
@@ -949,10 +951,21 @@ _gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session,
       return ret;
     }
 
+  if (apr_cert_list_length <= 0)
+    return _gnutls_gen_openpgp_certificate (session, data);
+
+  id_size = sizeof (id);
+  ret =
+    gnutls_pubkey_get_openpgp_key_id (apr_cert_list[0].pubkey, 0, id,
+                                      &id_size, &subkey);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
+
   fpr_size = sizeof (fpr);
   ret =
-    gnutls_pubkey_get_openpgp_key_id (apr_cert_list[0].pubkey, 0, fpr,
-                                      &fpr_size, NULL);
+    gnutls_pubkey_get_openpgp_key_id (apr_cert_list[0].pubkey, 
+    					GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT, 
+    					fpr, &fpr_size, NULL);
   if (ret < 0)
     return gnutls_assert_val (ret);
 
@@ -961,10 +974,7 @@ _gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session,
 
   /* Only v4 fingerprints are sent 
    */
-  if (apr_cert_list_length > 0)
-    packet_size += 20 + 1;
-  else                          /* empty certificate case */
-    return _gnutls_gen_openpgp_certificate (session, data);
+  packet_size += 20 + 1;
 
   ret = _gnutls_buffer_append_prefix (data, 24, packet_size - 3);
   if (ret < 0)
@@ -972,6 +982,10 @@ _gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session,
 
   type = PGP_KEY_FINGERPRINT_SUBKEY;
   ret = _gnutls_buffer_append_data (data, &type, 1);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
+
+  ret = _gnutls_buffer_append_data_prefix (data, 8, id, id_size);
   if (ret < 0)
     return gnutls_assert_val (ret);
 

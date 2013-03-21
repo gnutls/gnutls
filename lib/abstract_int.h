@@ -67,8 +67,13 @@ struct gnutls_pubkey_st
    */
   gnutls_pk_params_st params;
 
+#ifdef ENABLE_OPENPGP
   uint8_t openpgp_key_id[GNUTLS_OPENPGP_KEYID_SIZE];
-  int openpgp_key_id_set;
+  unsigned int openpgp_key_id_set;
+
+  uint8_t openpgp_key_fpr[GNUTLS_OPENPGP_V4_FINGERPRINT_SIZE];
+  unsigned int openpgp_key_fpr_set:1;
+#endif
 
   unsigned int key_usage;       /* bits from GNUTLS_KEY_* */
   
