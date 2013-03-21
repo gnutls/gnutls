@@ -18,6 +18,9 @@ support AES with PKCS #12.
 on initialization. This speeds up gnutls initialization when smart
 cards are present.
 
+** libgnutls: Corrected issue in the (deprecated) external key
+signing interface, when used with TLS 1.2. Reported by Bjorn H. Christensen.
+
 ** libgnutls-dane: Updated DANE verification options.
 
 ** configure: Trust store file must be explicitly set or unset when 
