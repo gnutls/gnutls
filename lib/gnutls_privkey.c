@@ -417,8 +417,7 @@ cleanup:
  * #gnutls_privkey_t structure. At least one of the two callbacks
  * must be non-null.
  *
- * Note that the signing function is supposed to "raw" sign data, i.e.,
- * without any hashing or preprocessing.
+ * See also gnutls_privkey_import_ext2().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -453,7 +452,9 @@ gnutls_privkey_import_ext (gnutls_privkey_t pkey,
  * then flags is assumed to contain %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE.
  *
  * Note that the signing function is supposed to "raw" sign data, i.e.,
- * without any hashing or preprocessing.
+ * without any hashing or preprocessing. In case of RSA the DigestInfo
+ * will be provided, and the signing function is expected to do the PKCS #1
+ * 1.5 padding and the exponentiation.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
