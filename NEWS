@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.29 (unreleased)
+* Version 3.0.29 (released 2013-03-22)
 
 ** certtool: When generating PKCS #12 files use by default the 
 ARCFOUR (RC4) cipher to be compatible with devices that don't
