@@ -151,7 +151,7 @@ fi
 AM_CONDITIONAL(ENABLE_FOOBAR, test "$ac_enable_foobar" != "no")
 @end example
 
-These lines should go in @code{lib/m4/hooks.m4}.
+These lines should go in @code{m4/hooks.m4}.
 
 @subsubheading Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
 
