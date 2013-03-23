@@ -934,7 +934,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/gnutls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -948,7 +948,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/compat.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -962,7 +962,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/dane.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -976,7 +976,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/x509.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -990,7 +990,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/ocsp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1004,7 +1004,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/abstract.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1018,7 +1018,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/pkcs12.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1032,7 +1032,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/pkcs11.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1046,7 +1046,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/dtls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1060,7 +1060,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/openpgp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1074,7 +1074,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/crypto.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1088,7 +1088,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/tpm.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation, Inc." \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
