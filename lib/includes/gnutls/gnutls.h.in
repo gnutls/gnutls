@@ -817,9 +817,6 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                            size_t indx,
                                            gnutls_sign_algorithm_t * algo);
 
-  size_t gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm);
-  size_t gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm);
-
 /* the name of the specified algorithms */
   const char *gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm);
   const char *gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm);

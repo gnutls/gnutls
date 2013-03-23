@@ -316,7 +316,7 @@ gnutls_hmac_init (gnutls_hmac_hd_t * dig,
  *
  * This function will set the nonce in the MAC algorithm.
  *
- * Since: 3.1.10
+ * Since: 3.2.0
  **/
 void
 gnutls_hmac_set_nonce (gnutls_hmac_hd_t handle, const void *nonce, size_t nonce_len)

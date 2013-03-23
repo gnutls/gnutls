@@ -32,27 +32,28 @@ struct gnutls_hash_entry
   gnutls_mac_algorithm_t id;
   size_t output_size;
   size_t key_size;
+  size_t nonce_size;
   unsigned placeholder; /* if set, then not a real MAC */
   unsigned secure; /* if set the this algorithm is secure as hash */
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 20, 0, 1},
-  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 16, 0, 0},
-  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 32, 0, 1},
-  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 1},
-  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 1},
-  {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 1},
+  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 20, 0, 0, 1},
+  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 16, 0, 0, 0},
+  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 32, 0, 0, 1},
+  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 0, 1},
+  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 0, 1},
+  {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 0, 1},
 #ifdef HAVE_UMAC
-  {"UMAC-96", NULL, GNUTLS_MAC_UMAC_96, 12, 16, 0, 1},
-  {"UMAC-128", NULL, GNUTLS_MAC_UMAC_128, 16, 16, 0, 1},
+  {"UMAC-96", NULL, GNUTLS_MAC_UMAC_96, 12, 16, 8, 0, 1},
+  {"UMAC-128", NULL, GNUTLS_MAC_UMAC_128, 16, 16, 8, 0, 1},
 #endif
-  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 0, 1, 1},
-  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0, 0},     /* not used as MAC */
-  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 20, 0, 1},
-  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0}
+  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 0, 0, 1, 1},
+  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0, 0, 0},     /* not used as MAC */
+  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 20, 0, 0, 1},
+  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0}
 };
 
 
@@ -126,7 +127,7 @@ gnutls_mac_get_id (const char *name)
  * gnutls_mac_get_key_size:
  * @algorithm: is an encryption algorithm
  *
- * Get size of MAC key used in TLS. 
+ * Returns the size of the MAC key used in TLS. 
  *
  * Returns: length (in bytes) of the given MAC key size, or 0 if the
  *   given MAC algorithm is invalid.
@@ -138,6 +139,27 @@ gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
 
   /* avoid prefix */
   GNUTLS_HASH_ALG_LOOP (ret = p->key_size);
+
+  return ret;
+}
+
+/**
+ * gnutls_mac_get_nonce_size:
+ * @algorithm: is an encryption algorithm
+ *
+ * Returns the size of the nonce used by the MAC in TLS.
+ *
+ * Returns: length (in bytes) of the given MAC nonce size, or 0.
+ *
+ * Since: 3.2.0
+ **/
+size_t
+gnutls_mac_get_nonce_size (gnutls_mac_algorithm_t algorithm)
+{
+  size_t ret = 0;
+
+  /* avoid prefix */
+  GNUTLS_HASH_ALG_LOOP (ret = p->nonce_size);
 
   return ret;
 }

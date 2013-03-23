@@ -9,6 +9,7 @@ See the end for copying conditions.
 ** API and ABI modifications:
 gnutls_cipher_get_iv_size: Added
 gnutls_hmac_set_nonce: Added
+gnutls_mac_get_nonce_size: Added
 
 
 * Version 3.1.10 (released 2013-03-22)

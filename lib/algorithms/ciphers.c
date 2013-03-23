@@ -121,7 +121,7 @@ gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm)
  *
  * Returns: block size for encryption algorithm.
  *
- * Since: 3.1.10
+ * Since: 3.2.0
  **/
 int
 gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm)
