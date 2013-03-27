@@ -620,6 +620,7 @@ struct gnutls_priority_st
   unsigned int ssl3_record_version:1;
   unsigned int server_precedence:1;
   unsigned int allow_weak_keys:1;
+  unsigned int allow_wrong_pms:1;
   /* Whether stateless compression will be used */
   unsigned int stateless_compression:1;
   unsigned int additional_verify_flags;
@@ -639,6 +640,7 @@ struct gnutls_priority_st
 
 #define ENABLE_COMPAT(x) \
               (x)->allow_large_records = 1; \
+              (x)->allow_wrong_pms = 1; \
               (x)->allow_weak_keys = 1
 
 /* DH and RSA parameters types.
