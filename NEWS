@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.30 (unreleased)
+
+** libgnutls: When in compatibility mode allow for a wrong version in the
+RSA PMS.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.29 (released 2013-03-22)
 
 ** certtool: When generating PKCS #12 files use by default the 
