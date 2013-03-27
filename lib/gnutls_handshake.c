@@ -1881,8 +1881,8 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
           return GNUTLS_E_INTERNAL_ERROR;
         }
 
-      data[pos++] = _gnutls_version_get_major (hver);
-      data[pos++] = _gnutls_version_get_minor (hver);
+      _gnutls_version_to_tls(hver, &data[pos], &data[pos+1]);
+      pos+=2;
 
       /* Set the version we advertized as maximum 
        * (RSA uses it).
@@ -2057,10 +2057,9 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
         }
       data = _mbuffer_get_udata_ptr (bufel);
 
-      data[pos++] =
-        _gnutls_version_get_major (session->security_parameters.version);
-      data[pos++] =
-        _gnutls_version_get_minor (session->security_parameters.version);
+      _gnutls_version_to_tls(session->security_parameters.version,
+      	&data[pos], &data[pos+1]);
+      pos += 2;
 
       memcpy (&data[pos],
               session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
@@ -3424,8 +3423,10 @@ gnutls_handshake_set_max_packet_length (gnutls_session_t session, size_t max)
 void
 _gnutls_set_adv_version (gnutls_session_t session, gnutls_protocol_t ver)
 {
-  set_adv_version (session, _gnutls_version_get_major (ver),
-                   _gnutls_version_get_minor (ver));
+uint8_t major, minor;
+
+  _gnutls_version_to_tls(ver, &major, &minor);
+  set_adv_version (session, major, minor);
 }
 
 gnutls_protocol_t

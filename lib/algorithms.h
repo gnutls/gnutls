@@ -38,9 +38,8 @@ int _gnutls_version_priority (gnutls_session_t session,
                               gnutls_protocol_t version);
 int _gnutls_version_is_supported (gnutls_session_t session,
                                   const gnutls_protocol_t version);
-int _gnutls_version_get_major (gnutls_protocol_t ver);
-int _gnutls_version_get_minor (gnutls_protocol_t ver);
-gnutls_protocol_t _gnutls_version_get (int major, int minor);
+void _gnutls_version_to_tls (gnutls_protocol_t ver, uint8_t* major, uint8_t* minor);
+gnutls_protocol_t _gnutls_version_get (uint8_t major, uint8_t minor);
 
 /* Functions for feature checks */
 int _gnutls_version_has_selectable_prf (gnutls_protocol_t version);

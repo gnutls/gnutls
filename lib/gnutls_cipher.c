@@ -271,12 +271,13 @@ calc_enc_length_stream (gnutls_session_t session, int data_size,
  */
 static inline int
 make_preamble (uint8_t * uint64_data, uint8_t type, unsigned int length,
-               uint8_t ver, uint8_t * preamble)
+               gnutls_protocol_t ver, uint8_t * preamble)
 {
-  uint8_t minor = _gnutls_version_get_minor (ver);
-  uint8_t major = _gnutls_version_get_major (ver);
+  uint8_t minor, major;
   uint8_t *p = preamble;
   uint16_t c_length;
+  
+  _gnutls_version_to_tls(ver, &major, &minor);
 
   c_length = _gnutls_conv_uint16 (length);
 

@@ -391,8 +391,7 @@ copy_record_version (gnutls_session_t session,
     {
       lver = gnutls_protocol_get_version (session);
 
-      version[0] = _gnutls_version_get_major (lver);
-      version[1] = _gnutls_version_get_minor (lver);
+      _gnutls_version_to_tls(lver, &version[0], &version[1]);
     }
   else
     {

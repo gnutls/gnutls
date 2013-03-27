@@ -32,10 +32,10 @@ typedef struct
 {
   const char *name;
   gnutls_protocol_t id;         /* gnutls internal version number */
-  int major;                    /* defined by the protocol */
-  int minor;                    /* defined by the protocol */
+  uint8_t major;                    /* defined by the protocol */
+  uint8_t minor;                    /* defined by the protocol */
   transport_t transport;	/* Type of transport, stream or datagram */
-  int supported;                /* 0 not supported, > 0 is supported */
+  unsigned int supported:1;     /* 0 not supported, > 0 is supported */
 } gnutls_version_entry;
 
 static const gnutls_version_entry sup_versions[] = {
@@ -185,19 +185,10 @@ static gnutls_protocol_t supported_protocols[MAX_ALGOS] = {0};
   return supported_protocols;
 }
 
-int
-_gnutls_version_get_minor (gnutls_protocol_t version)
-{
-  int ret = -1;
-
-  GNUTLS_VERSION_ALG_LOOP (ret = p->minor);
-  return ret;
-}
-
 /* Returns a version number given the major and minor numbers.
  */
 gnutls_protocol_t
-_gnutls_version_get (int major, int minor)
+_gnutls_version_get (uint8_t major, uint8_t minor)
 {
   int ret = -1;
 
@@ -206,13 +197,10 @@ _gnutls_version_get (int major, int minor)
   return ret;
 }
 
-int
-_gnutls_version_get_major (gnutls_protocol_t version)
+void
+_gnutls_version_to_tls (gnutls_protocol_t version, uint8_t* major, uint8_t *minor)
 {
-  int ret = -1;
-
-  GNUTLS_VERSION_ALG_LOOP (ret = p->major);
-  return ret;
+  GNUTLS_VERSION_ALG_LOOP (*major = p->major; *minor = p->minor);
 }
 
 /* Version Functions */

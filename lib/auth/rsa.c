@@ -289,8 +289,8 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
   if (session->internals.rsa_pms_version[0] == 0)
     {
-      session->key.key.data[0] = _gnutls_version_get_major (ver);
-      session->key.key.data[1] = _gnutls_version_get_minor (ver);
+      _gnutls_version_to_tls(ver, &session->key.key.data[0],
+        &session->key.key.data[1]);
     }
   else
     {                           /* use the version provided */
