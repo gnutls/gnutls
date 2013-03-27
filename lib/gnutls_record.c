@@ -78,6 +78,8 @@ void
 gnutls_record_disable_padding (gnutls_session_t session)
 {
   session->internals.priorities.no_padding = 1;
+  session->internals.priorities.allow_wrong_pms = 1;
+  session->internals.priorities.allow_large_records = 1;
 }
 
 /**

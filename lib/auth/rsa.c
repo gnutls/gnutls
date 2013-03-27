@@ -185,8 +185,9 @@ proc_rsa_client_kx (gnutls_session_t session, uint8_t * data,
       /* If the secret was properly formatted, then
        * check the version number.
        */
-      if (_gnutls_get_adv_version_major (session) != plaintext.data[0]
-          || _gnutls_get_adv_version_minor (session) != plaintext.data[1])
+      if (_gnutls_get_adv_version_major (session) != plaintext.data[0] ||
+          (session->internals.priorities.allow_wrong_pms == 0 && 
+           _gnutls_get_adv_version_minor (session) != plaintext.data[1]))
         {
           /* No error is returned here, if the version number check
            * fails. We proceed normally.
@@ -196,7 +197,7 @@ proc_rsa_client_kx (gnutls_session_t session, uint8_t * data,
            */
           gnutls_assert ();
           _gnutls_audit_log
-            (session, "auth_rsa: Possible PKCS #1 version check format attack\n");
+                (session, "auth_rsa: Possible PKCS #1 version check format attack\n");
         }
     }
 
