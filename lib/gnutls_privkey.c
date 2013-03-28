@@ -694,7 +694,7 @@ cleanup:
  * gnutls_privkey_sign_data:
  * @signer: Holds the key
  * @hash: should be a digest algorithm
- * @flags: should be 0 for now
+ * @flags: Zero or on of %gnutls_privkey_flags_t
  * @data: holds the data to be signed
  * @signature: will contain the signature allocate with gnutls_malloc()
  *
@@ -720,6 +720,9 @@ gnutls_privkey_sign_data (gnutls_privkey_t signer,
 {
   int ret;
   gnutls_datum_t digest;
+
+  if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   ret = pk_hash_data (signer->pk_algorithm, hash, NULL, data, &digest);
   if (ret < 0)
@@ -755,7 +758,7 @@ cleanup:
  * gnutls_privkey_sign_hash:
  * @signer: Holds the signer's key
  * @hash_algo: The hash algorithm used
- * @flags: zero for now
+ * @flags: Zero or on of %gnutls_privkey_flags_t
  * @hash_data: holds the data to be signed
  * @signature: will contain newly allocated signature
  *
@@ -781,6 +784,9 @@ gnutls_privkey_sign_hash (gnutls_privkey_t signer,
 {
   int ret;
   gnutls_datum_t digest;
+
+  if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)
+    return gnutls_privkey_sign_raw_data (signer, flags, hash_data, signature);
 
   digest.data = gnutls_malloc (hash_data->size);
   if (digest.data == NULL)
@@ -824,6 +830,9 @@ cleanup:
  * and does not apply any preprocessing or hash on the signed data. 
  * For example on an RSA key the input @data should be of the DigestInfo
  * PKCS #1 1.5 format. Use it only if you know what are you doing.
+ *
+ * Note this function is equivalent to using the %GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA
+ * flag with gnutls_privkey_sign_hash().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.

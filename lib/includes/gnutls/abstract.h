@@ -36,12 +36,23 @@ extern "C"
 
 /* Public key operations */
 
-#define GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA 1
-/* The following flag disables call to PIN callbacks etc.
- * Only works for TPM keys.
+#define GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA
+/**
+ * gnutls_pubkey_flags:
+ * @GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA: This indicates that a (raw) RSA signature is provided
+ *   as in the TLS 1.0 protocol.
+ * @GNUTLS_PUBKEY_DISABLE_CALLBACKS: The following flag disables call to PIN callbacks. Only
+ *   relevant to TPM keys.
+ * @GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT: request an OPENPGP fingerprint instead of the default.
+ *
+ * Enumeration of different certificate import flags.
  */
-#define GNUTLS_PUBKEY_DISABLE_CALLBACKS (1<<2)
-#define GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT (1<<3)
+  typedef enum gnutls_pubkey_flags
+  {
+    GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA = 1,
+    GNUTLS_PUBKEY_DISABLE_CALLBACKS = 1<<2,
+    GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT = 1<<3,
+  } gnutls_pubkey_flags_t;
 
 struct gnutls_pubkey_st;
 typedef struct gnutls_pubkey_st *gnutls_pubkey_t;
@@ -214,13 +225,25 @@ int gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key,
 gnutls_privkey_type_t gnutls_privkey_get_type (gnutls_privkey_t key);
 int gnutls_privkey_status (gnutls_privkey_t key);
 
-
-#define GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE (1<<0)
-#define GNUTLS_PRIVKEY_IMPORT_COPY (1<<1)
-/* The following flag disables call to PIN callbacks etc.
- * Only works for TPM keys.
+/**
+ * gnutls_privkey_flags:
+ * @GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA: Make an RSA signature on the hashed data as in the TLS protocol.
+ * @GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE: When importing a private key, automatically
+ *   release it when the structure it was imported is released.
+ * @GNUTLS_PRIVKEY_IMPORT_COPY: Copy required values during import.
+ * @GNUTLS_PRIVKEY_DISABLE_CALLBACKS: The following flag disables call to PIN callbacks etc.
+ *   Only relevant to TPM keys.
+ *
+ * Enumeration of different certificate import flags.
  */
-#define GNUTLS_PRIVKEY_DISABLE_CALLBACKS (1<<2)
+  typedef enum gnutls_privkey_flags
+  {
+    GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE = 1,
+    GNUTLS_PRIVKEY_IMPORT_COPY = 1<<1,
+    GNUTLS_PRIVKEY_DISABLE_CALLBACKS = 1<<2,
+    GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA = 1<<4,
+  } gnutls_privkey_flags_t;
+
 int gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey,
                                   gnutls_pkcs11_privkey_t key,
                                   unsigned int flags);

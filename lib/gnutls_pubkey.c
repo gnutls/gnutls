@@ -1534,7 +1534,7 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
 /**
  * gnutls_pubkey_verify_data:
  * @pubkey: Holds the public key
- * @flags: should be 0 for now
+ * @flags: Zero or on of %gnutls_pubkey_flags_t
  * @data: holds the signed data
  * @signature: contains the signature
  *
@@ -1563,6 +1563,9 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
+  if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
   ret = gnutls_pubkey_get_verify_algorithm (pubkey, signature, &hash);
   if (ret < 0)
     return gnutls_assert_val(ret);
@@ -1581,7 +1584,7 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
  * gnutls_pubkey_verify_data2:
  * @pubkey: Holds the public key
  * @algo: The signature algorithm used
- * @flags: should be 0 for now
+ * @flags: Zero or on of %gnutls_pubkey_flags_t
  * @data: holds the signed data
  * @signature: contains the signature
  *
@@ -1608,6 +1611,9 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
+  if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
   ret = pubkey_verify_data( pubkey->pk_algorithm, gnutls_sign_get_hash_algorithm(algo), 
                             data, signature, &pubkey->params);
   if (ret < 0)
@@ -1622,7 +1628,7 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
 /**
  * gnutls_pubkey_verify_hash:
  * @key: Holds the public key
- * @flags: should be 0 for now
+ * @flags: Zero or on of %gnutls_pubkey_flags_t
  * @hash: holds the hash digest to be verified
  * @signature: contains the signature
  *
@@ -1657,7 +1663,7 @@ int ret;
  * gnutls_pubkey_verify_hash2:
  * @key: Holds the public key
  * @algo: The signature algorithm used
- * @flags: should be 0 for now
+ * @flags: Zero or on of %gnutls_pubkey_flags_t
  * @hash: holds the hash digest to be verified
  * @signature: contains the signature
  *
@@ -1682,8 +1688,10 @@ gnutls_pubkey_verify_hash2 (gnutls_pubkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA)
-    return _gnutls_pk_verify (GNUTLS_PK_RSA, hash, signature, &key->params);
+  if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA)
+    {
+      return _gnutls_pk_verify (GNUTLS_PK_RSA, hash, signature, &key->params);
+    }
   else
     {
       return pubkey_verify_hashed_data (key->pk_algorithm, gnutls_sign_get_hash_algorithm(algo),
@@ -1870,15 +1878,13 @@ _pkcs1_rsa_verify_sig (gnutls_digest_algorithm_t hash,
 
   /* decrypted is a BER encoded data of type DigestInfo
    */
-
   ret = encode_ber_digest_info (hash, &d, &di);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
   ret = _gnutls_pk_verify (GNUTLS_PK_RSA, &di, signature, params);
+    _gnutls_free_datum (&di);
 
-  _gnutls_free_datum (&di);
-  
   return ret;
 }
 
