@@ -249,7 +249,24 @@ doit (void)
       if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
         fail ("gnutls_x509_pubkey_verify_hash2-2 (hashed data)\n");
 
+      /* test the raw interface */
+      gnutls_free(signature.data);
+      signature.data = NULL;
 
+      if (gnutls_pubkey_get_pk_algorithm(pubkey, NULL) == GNUTLS_PK_RSA)
+        {
+          ret = gnutls_privkey_sign_hash (privkey, GNUTLS_DIG_SHA1, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA,
+                                          &hash_data, &signature);
+          if (ret < 0)
+            fail ("gnutls_privkey_sign_hash: %s\n", gnutls_strerror(ret));
+
+          sign_algo = gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm(pubkey, NULL),
+                                        GNUTLS_DIG_SHA1);
+
+          ret = gnutls_pubkey_verify_hash2 (pubkey, sign_algo, GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA, &hash_data, &signature);
+          if (ret < 0)
+            fail ("gnutls_pubkey_verify_hash-3 (raw hashed data)\n");
+        }
       gnutls_free(signature.data);
       gnutls_free(signature2.data);
       gnutls_x509_privkey_deinit (key);
