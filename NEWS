@@ -7,8 +7,13 @@ See the end for copying conditions.
 ** libgnutls: When in compatibility mode allow for a wrong version in the
 RSA PMS.
 
+** libgnutls: Added GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA which allows 
+gnutls_privkey_sign_hash() to operate as with gnutls_privkey_sign_raw_data().
+This makes it consistent with verification with GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA
+flag.
+
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA: Added
 
 
 * Version 3.1.10 (released 2013-03-22)
