@@ -824,8 +824,10 @@ server_find_pk_algos_in_ciphersuites (const uint8_t *
                                               gnutls_pk_algorithm_t * algos,
                                               size_t* algos_size)
 {
-  unsigned int j;
+  unsigned int j, x;
   gnutls_kx_algorithm_t kx;
+  gnutls_pk_algorithm_t pk;
+  unsigned found;
   unsigned int max = *algos_size;
 
   if (datalen % 2 != 0)
@@ -840,10 +842,23 @@ server_find_pk_algos_in_ciphersuites (const uint8_t *
       kx = _gnutls_cipher_suite_get_kx_algo (&data[j]);
       if (_gnutls_map_kx_get_cred (kx, 1) == GNUTLS_CRD_CERTIFICATE)
         {
-          algos[(*algos_size)++] = _gnutls_map_pk_get_pk (kx);
+          pk = _gnutls_map_pk_get_pk (kx);
+          found = 0;
+          for (x=0;x<*algos_size;x++)
+            {
+              if (algos[x] == pk) 
+                {
+                  found = 1;
+                  break;
+                }
+            }
           
-          if ((*algos_size) >= max)
-            return 0;
+          if (found == 0)
+            {
+              algos[(*algos_size)++] = _gnutls_map_pk_get_pk (kx);
+              if ((*algos_size) >= max)
+                return 0;
+            }
         }
     }
 
@@ -899,7 +914,7 @@ _gnutls_server_select_suite (gnutls_session_t session, uint8_t * data,
   ret = _gnutls_supported_ciphersuites (session, cipher_suites, sizeof(cipher_suites));
   if (ret < 0)
     return gnutls_assert_val(ret);
-    
+
   cipher_suites_size = ret;
 
   /* Here we remove any ciphersuite that does not conform
@@ -3292,7 +3307,6 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
    * by that certificate and are on the same authentication
    * method (CERTIFICATE).
    */
-
   cert_cred =
     (gnutls_certificate_credentials_t) _gnutls_get_cred (session,
                                                          GNUTLS_CRD_CERTIFICATE,
