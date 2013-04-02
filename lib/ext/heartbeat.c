@@ -270,7 +270,11 @@ int ret;
                              HEARTBEAT_RESPONSE);
 
   _gnutls_buffer_reset (&session->internals.hb_remote_data);
-  return ret;
+  
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  return 0;
 }
 
 /*
