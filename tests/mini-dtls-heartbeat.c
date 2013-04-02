@@ -157,6 +157,12 @@ client (int fd, int server_init)
             }
           while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED
                  || ret == GNUTLS_E_HEARTBEAT_PING_RECEIVED);
+
+          if (ret < 0)
+            {
+                fail ("recv: %s\n", gnutls_strerror (ret));
+                terminate();
+            }
       }
     else
       {
