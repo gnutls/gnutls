@@ -94,12 +94,16 @@ heartbeat_send_data (gnutls_session_t session, const void *data,
   int ret, pos;
   uint8_t * response;
 
-  response = gnutls_malloc(1+data_size+DEFAULT_PAYLOAD_SIZE);
+  response = gnutls_malloc(1+2+data_size+DEFAULT_PAYLOAD_SIZE);
   if (response == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
   
   pos = 0;
-  response[pos++] = 1;
+  response[pos++] = type;
+  
+  _gnutls_write_uint16(data_size, &response[pos]);
+  pos += 2;
+  
   memcpy(&response[pos], data, data_size);
   pos += data_size;
 
