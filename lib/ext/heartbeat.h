@@ -37,8 +37,6 @@
 
 extern extension_entry_st ext_mod_heartbeat;
 
-typedef uint8_t heartbeat_policy_t;
-
 int _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel);
 int _gnutls_heartbeat_enabled (gnutls_session_t session, int local);
 int gnutls_heartbeat_timeout (gnutls_session_t session, int check_only);

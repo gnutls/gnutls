@@ -273,21 +273,15 @@ int ret;
   return ret;
 }
 
-/*-
- * Process HB message in buffer.
- * @bufel: the (suspected) HeartBeat message (TLV+padding)
- *
- * Returns:
- * processing result
- * GNUTLS_E_AGAIN if processed OK
- * GNUTLS_E_HEARTBEAT_PONG_FAILED on response send failure for request message
- * GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER on payload mismatch for response message
- -*/
+/*
+ * Processes a heartbeat message. 
+ */
 int
 _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
 {
-  char pr[128];
   int ret;
+  unsigned type;
+  unsigned pos;
   uint8_t *msg = _mbuffer_get_udata_ptr (bufel);
   size_t hb_len, len = _mbuffer_get_udata_size (bufel);
 
@@ -297,11 +291,16 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
   if (len < 4)
     return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-  hb_len = _gnutls_read_uint16 (msg + 1);
+  pos = 0;
+  type = msg[pos++];
+
+  hb_len = _gnutls_read_uint16 (&msg[pos]);
   if (hb_len > len - 3)
     return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+    
+  pos += 2;
   
-  switch (msg[0])
+  switch (type)
     {
     case HEARTBEAT_REQUEST:
       _gnutls_buffer_reset(&session->internals.hb_remote_data);
@@ -311,7 +310,7 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
         return gnutls_assert_val(ret);
       
       if (hb_len > 0)
-        memcpy(session->internals.hb_remote_data.data, msg+3, hb_len);
+        memcpy(session->internals.hb_remote_data.data, &msg[pos], hb_len);
       session->internals.hb_remote_data.length = hb_len;
 
       return gnutls_assert_val(GNUTLS_E_HEARTBEAT_PING_RECEIVED);
@@ -321,8 +320,8 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
       if (hb_len != session->internals.hb_local_data.length)
         return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
 
-      if (hb_len > 0 && memcmp (msg + 3, session->internals.hb_local_data.data,
-                  hb_len) != 0)
+      if (hb_len > 0 && 
+          memcmp (&msg[pos], session->internals.hb_local_data.data, hb_len) != 0)
         {
           if (IS_DTLS(session))
             return gnutls_assert_val( GNUTLS_E_AGAIN); /* ignore it */
@@ -335,8 +334,7 @@ _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
       return gnutls_assert_val(GNUTLS_E_HEARTBEAT_PONG_RECEIVED);
     default:
       _gnutls_record_log
-          ("REC[%p]: HB: received unknown type %u\n",
-           session, msg[0]);
+          ("REC[%p]: HB: received unknown type %u\n", session, type);
       return gnutls_assert_val (GNUTLS_E_UNEXPECTED_PACKET);
     }
 }
@@ -400,7 +398,7 @@ static int
 _gnutls_heartbeat_recv_params (gnutls_session_t session,
                                const uint8_t * data, size_t _data_size)
 {
-  heartbeat_policy_t pol;
+  unsigned policy;
   extension_priv_data_t epriv;
 
   if (_gnutls_ext_get_session_data
@@ -414,24 +412,16 @@ _gnutls_heartbeat_recv_params (gnutls_session_t session,
   if (_data_size == 0)
     return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 
-  _gnutls_debug_log ("HB: received parameter %u (%zu bytes)\n",
-                     (unsigned)data[0], _data_size);
+  policy = epriv.num;
 
-  pol = epriv.num;
+  if (data[0] == 1)
+    policy |= LOCAL_ALLOWED_TO_SEND;
+  else if (data[0] == 2)
+    policy |= LOCAL_NOT_ALLOWED_TO_SEND;
+  else
+    return gnutls_assert_val (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-  switch (data[0])
-    {
-    case 1:
-      pol |= LOCAL_ALLOWED_TO_SEND;
-      break;
-    case 2:
-      pol |= LOCAL_NOT_ALLOWED_TO_SEND;
-      break;
-    default:
-      return gnutls_assert_val (GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-    }
-
-  epriv.num = pol;
+  epriv.num = policy;
   _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_HEARTBEAT,
                                 epriv);
 
@@ -454,11 +444,10 @@ _gnutls_heartbeat_send_params (gnutls_session_t session,
   else /*if (epriv.num & GNUTLS_HB_PEER_NOT_ALLOWED_TO_SEND)*/
     p = 2;
 
-  _gnutls_debug_log ("HB: sending parameter %u\n", (unsigned)p);
   if (_gnutls_buffer_append_data (extdata, &p, 1) < 0)
     return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
-  return 1; /* number of bytes added for sending */
+  return 1;
 }
 
 static int
