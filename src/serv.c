@@ -1677,7 +1677,7 @@ cmd_parser (int argc, char **argv)
 
   if (HAVE_OPT (X509ECCKEYFILE))
     x509_ecckeyfile = OPT_ARG (X509ECCKEYFILE);
-  if (HAVE_OPT (X509CERTFILE))
+  if (HAVE_OPT (X509ECCCERTFILE))
     x509_ecccertfile = OPT_ARG (X509ECCCERTFILE);
 
   if (HAVE_OPT (X509CAFILE))
