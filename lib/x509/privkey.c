@@ -294,13 +294,6 @@ _gnutls_privkey_decode_ecc_key (const gnutls_datum_t * raw_key,
       goto error;
     }
     
-  ret = _gnutls_ecc_curve_fill_params(pkey->params.flags, &pkey->params);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto error;
-    }
-
   /* read the public key */
   ret = _gnutls_x509_read_value (pkey_asn, "publicKey", &out);
   if (ret < 0)
@@ -973,10 +966,6 @@ gnutls_x509_privkey_import_ecc_raw (gnutls_x509_privkey_t key,
     }
 
   key->params.flags = curve;
-
-  ret = _gnutls_ecc_curve_fill_params(curve, &key->params);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
 
   if (_gnutls_mpi_scan_nz (&key->params.params[ECC_X], x->data, x->size))
     {

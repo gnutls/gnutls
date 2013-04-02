@@ -206,7 +206,7 @@
 /* parameters should not be larger than this limit */
 #define DSA_PUBLIC_PARAMS 4
 #define RSA_PUBLIC_PARAMS 2
-#define ECC_PUBLIC_PARAMS 8
+#define ECC_PUBLIC_PARAMS 2
 
 
 #define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS       /* ok for RSA and DSA */
@@ -214,7 +214,7 @@
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5
 #define RSA_PRIVATE_PARAMS 8
-#define ECC_PRIVATE_PARAMS 9
+#define ECC_PRIVATE_PARAMS 3
 
 #if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
 #error INCREASE MAX_PRIV_PARAMS
@@ -262,15 +262,9 @@
  *  [8] is k (private key)
  */
 
-#define ECC_PRIME 0
-#define ECC_ORDER 1
-#define ECC_A 2
-#define ECC_B 3
-#define ECC_GX 4
-#define ECC_GY 5
-#define ECC_X 6
-#define ECC_Y 7
-#define ECC_K 8
+#define ECC_X 0
+#define ECC_Y 1
+#define ECC_K 2
 
 #define DSA_P 0
 #define DSA_Q 1

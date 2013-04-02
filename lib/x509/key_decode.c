@@ -221,13 +221,6 @@ _gnutls_x509_read_ecc_params (uint8_t * der, int dersize, gnutls_pk_params_st * 
       goto cleanup;
     }
 
-  ret = _gnutls_ecc_curve_fill_params(params->flags, params);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-
   ret = 0;
   
 cleanup:

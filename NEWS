@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.2.0 (unreleased)
 
+** libgnutls: Use nettle's elliptic curve implementation.
+
 ** libgnutls: Added Salsa20 cipher (experimental)
 
 ** libgnutls: Added UMAC-96 and UMAC-128 MACs (experimental)

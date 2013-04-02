@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2010-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -38,13 +39,15 @@
 #include <gnutls_pk.h>
 #include <nettle/dsa.h>
 #include <nettle/rsa.h>
-#include <random.h>
 #include <gnutls/crypto.h>
-#include "ecc.h"
+#include <nettle/bignum.h>
+#include <nettle/ecc.h>
+#include <nettle/ecdsa.h>
+#include <nettle/ecc-curve.h>
 
 #define TOMPZ(x) (*((mpz_t*)(x)))
 
-static inline int is_supported_curve(int curve);
+static inline const struct ecc_curve *get_supported_curve(int curve);
 
 static void
 rnd_func (void *_ctx, unsigned length, uint8_t * data)
@@ -91,42 +94,50 @@ _rsa_params_to_pubkey (const gnutls_pk_params_st * pk_params,
   pub->size = nettle_mpz_sizeinbase_256_u(pub->n);
 }
 
-static void 
+static int
 _ecc_params_to_privkey(const gnutls_pk_params_st * pk_params,
-                       ecc_key * priv)
+                       struct ecc_scalar * priv, const struct ecc_curve *curve)
 {
-        priv->type = PK_PRIVATE;
-        memcpy(&priv->prime, pk_params->params[ECC_PRIME], sizeof(mpz_t));
-        memcpy(&priv->order, pk_params->params[ECC_ORDER], sizeof(mpz_t));
-        memcpy(&priv->A, pk_params->params[ECC_A], sizeof(mpz_t));
-        memcpy(&priv->B, pk_params->params[ECC_B], sizeof(mpz_t));
-        memcpy(&priv->Gx, pk_params->params[ECC_GX], sizeof(mpz_t));
-        memcpy(&priv->Gy, pk_params->params[ECC_GY], sizeof(mpz_t));
-        memcpy(&priv->pubkey.x, pk_params->params[ECC_X], sizeof(mpz_t));
-        memcpy(&priv->pubkey.y, pk_params->params[ECC_Y], sizeof(mpz_t));
-        memcpy(&priv->k, pk_params->params[ECC_K], sizeof(mpz_t));
-        mpz_init_set_ui(priv->pubkey.z, 1);
+  ecc_scalar_init(priv, curve);
+  if (ecc_scalar_set(priv, pk_params->params[ECC_K]) == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  return 0;
 }
 
-static void _ecc_params_clear(ecc_key * key)
-{
-  mpz_clear(key->pubkey.z);
-}
-
-static void 
+static int
 _ecc_params_to_pubkey(const gnutls_pk_params_st * pk_params,
-                       ecc_key * pub)
+                      struct ecc_point * pub, const struct ecc_curve *curve)
 {
-        pub->type = PK_PUBLIC;
-        memcpy(&pub->prime, pk_params->params[ECC_PRIME], sizeof(mpz_t));
-        memcpy(&pub->order, pk_params->params[ECC_ORDER], sizeof(mpz_t));
-        memcpy(&pub->A, pk_params->params[ECC_A], sizeof(mpz_t));
-        memcpy(&pub->B, pk_params->params[ECC_B], sizeof(mpz_t));
-        memcpy(&pub->Gx, pk_params->params[ECC_GX], sizeof(mpz_t));
-        memcpy(&pub->Gy, pk_params->params[ECC_GY], sizeof(mpz_t));
-        memcpy(&pub->pubkey.x, pk_params->params[ECC_X], sizeof(mpz_t));
-        memcpy(&pub->pubkey.y, pk_params->params[ECC_Y], sizeof(mpz_t));
-        mpz_init_set_ui(pub->pubkey.z, 1);
+  ecc_point_init(pub, curve);
+  if (ecc_point_set(pub, pk_params->params[ECC_X], pk_params->params[ECC_Y]) == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  return 0;
+}
+
+static void
+ecc_shared_secret (struct ecc_scalar * private_key, 
+                   struct ecc_point * public_key,
+                   void *out, unsigned size)
+{
+struct ecc_point r;
+mpz_t x, y;
+
+  mpz_init(x);
+  mpz_init(y);
+  ecc_point_init(&r, public_key->ecc);
+
+  ecc_point_mul(&r, private_key, public_key);
+  
+  ecc_point_get(&r, x, y);
+  nettle_mpz_get_str_256(size, out, x);
+
+  mpz_clear(x);
+  mpz_clear(y);
+  ecc_point_clear(&r);
+  
+  return;
 }
 
 static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * out,
@@ -139,47 +150,42 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
     {
     case GNUTLS_PK_EC:
       {
-        ecc_key ecc_pub, ecc_priv;
-        int curve = priv->flags;
-        unsigned long sz;
+        struct ecc_scalar ecc_priv;
+        struct ecc_point ecc_pub;
+        const struct ecc_curve * curve;
 
         out->data = NULL;
 
-        if (is_supported_curve(curve) == 0)
+        curve = get_supported_curve(priv->flags);
+        if (curve == NULL)
           return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
-        _ecc_params_to_pubkey(pub, &ecc_pub);
-        _ecc_params_to_privkey(priv, &ecc_priv);
-        sz = ECC_BUF_SIZE;
-        
-        if (ecc_projective_check_point(&ecc_pub.pubkey, pub->params[ECC_B], pub->params[ECC_PRIME]) != 0)
+        ret = _ecc_params_to_pubkey(pub, &ecc_pub, curve);
+        if (ret < 0)
+          return gnutls_assert_val(ret);
+
+        ret = _ecc_params_to_privkey(priv, &ecc_priv, curve);
+        if (ret < 0)
           {
-            ret = gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
-            goto ecc_cleanup;
+            ecc_point_clear(&ecc_pub);
+            return gnutls_assert_val(ret);
           }
 
-        out->data = gnutls_malloc(sz);
+        out->size = gnutls_ecc_curve_get_size(priv->flags);
+        /*ecc_size(curve)*sizeof(mp_limb_t);*/
+        out->data = gnutls_malloc(out->size);
         if (out->data == NULL)
           {
             ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
             goto ecc_cleanup;
           }
 
-        ret = ecc_shared_secret(&ecc_priv, &ecc_pub, out->data, &sz);
-        if (ret != 0)
-          ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+        ecc_shared_secret(&ecc_priv, &ecc_pub, out->data, out->size);
 
 ecc_cleanup:
-        _ecc_params_clear(&ecc_pub);
-        _ecc_params_clear(&ecc_priv);
+        ecc_point_clear(&ecc_pub);
+        ecc_scalar_clear(&ecc_priv);
 
-        if (ret < 0)
-          {
-            gnutls_free(out->data);
-            return ret;
-          }
-
-        out->size = sz;
         break;
       }
     default:
@@ -328,14 +334,18 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
     {
     case GNUTLS_PK_EC: /* we do ECDSA */
       {
-        ecc_key priv;
+        struct ecc_scalar priv;
         struct dsa_signature sig;
         int curve_id = pk_params->flags;
+        const struct ecc_curve * curve;
 
-        if (is_supported_curve(curve_id) == 0)
+        curve = get_supported_curve(curve_id);
+        if (curve == NULL)
           return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
-        _ecc_params_to_privkey(pk_params, &priv);
+        ret = _ecc_params_to_privkey(pk_params, &priv, curve);
+        if (ret < 0)
+          return gnutls_assert_val(ret);
 
         dsa_signature_init (&sig);
 
@@ -347,20 +357,12 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
             hash_len = vdata->size;
           }
 
-        ret = ecc_sign_hash(vdata->data, hash_len,
-                            &sig, NULL, rnd_func, &priv, curve_id);
-        if (ret != 0)
-          {
-            gnutls_assert ();
-            ret = GNUTLS_E_PK_SIGN_FAILED;
-            goto ecdsa_fail;
-          }
+        ecdsa_sign(&priv, NULL, rnd_func, hash_len, vdata->data, &sig);
 
         ret = _gnutls_encode_ber_rs (signature, &sig.r, &sig.s);
 
-      ecdsa_fail:
         dsa_signature_clear (&sig);
-        _ecc_params_clear( &priv);
+        ecc_scalar_clear( &priv);
 
         if (ret < 0)
           {
@@ -472,22 +474,26 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
     {
     case GNUTLS_PK_EC: /* ECDSA */
       {
-        ecc_key pub;
+        struct ecc_point pub;
         struct dsa_signature sig;
-        int stat;
         int curve_id = pk_params->flags;
+        const struct ecc_curve * curve;
 
-        if (is_supported_curve(curve_id) == 0)
+        curve = get_supported_curve(curve_id);
+        if (curve == NULL)
           return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
         ret = _gnutls_decode_ber_rs (signature, &tmp[0], &tmp[1]);
         if (ret < 0)
+          return gnutls_assert_val(ret);
+
+        ret = _ecc_params_to_pubkey(pk_params, &pub, curve);
+        if (ret < 0)
           {
-            gnutls_assert ();
+            gnutls_assert();
             goto cleanup;
           }
-
-        _ecc_params_to_pubkey(pk_params, &pub);
+          
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
@@ -495,8 +501,8 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         if (hash_len > vdata->size)
           hash_len = vdata->size;
 
-        ret = ecc_verify_hash(&sig, vdata->data, hash_len, &stat, &pub, curve_id);
-        if (ret != 0 || stat != 1)
+        ret = ecdsa_verify(&pub, hash_len, vdata->data, &sig);
+        if (ret == 0)
           {
             gnutls_assert();
             ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -504,9 +510,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         else
           ret = 0;
 
-        _gnutls_mpi_release (&tmp[0]);
-        _gnutls_mpi_release (&tmp[1]);
-        _ecc_params_clear( &pub);
+        ecc_point_clear( &pub);
         break;
       }
     case GNUTLS_PK_DSA:
@@ -538,8 +542,6 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         else
           ret = 0;
 
-        _gnutls_mpi_release (&tmp[0]);
-        _gnutls_mpi_release (&tmp[1]);
         break;
       }
     case GNUTLS_PK_RSA:
@@ -563,7 +565,6 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
           ret = gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
         else ret = 0;
         
-        _gnutls_mpi_release (&tmp[0]);
         break;
       }
     default:
@@ -574,15 +575,28 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
 
 cleanup:
 
+  _gnutls_mpi_release (&tmp[0]);
+  _gnutls_mpi_release (&tmp[1]);
   return ret;
 }
 
-static inline int is_supported_curve(int curve)
+static inline const struct ecc_curve *get_supported_curve(int curve)
 {
-  if (gnutls_ecc_curve_get_name(curve) != NULL)
-    return 1;
-  else
-    return 0;
+  switch(curve) 
+    {
+      case GNUTLS_ECC_CURVE_SECP192R1:
+        return &nettle_secp_192r1;
+      case GNUTLS_ECC_CURVE_SECP224R1:
+        return &nettle_secp_224r1;
+      case GNUTLS_ECC_CURVE_SECP256R1:
+        return &nettle_secp_256r1;
+      case GNUTLS_ECC_CURVE_SECP384R1:
+        return &nettle_secp_384r1;
+      case GNUTLS_ECC_CURVE_SECP521R1:
+        return &nettle_secp_521r1;
+      default:
+        return NULL;
+    }
 }
 
 
@@ -707,55 +721,42 @@ rsa_fail:
       }
     case GNUTLS_PK_EC:
       {
-        ecc_key key;
-        ecc_set_type tls_ecc_set;
-        const gnutls_ecc_curve_entry_st *st;
+        struct ecc_scalar key;
+        struct ecc_point pub;
+        const struct ecc_curve* curve;
 
-        st = _gnutls_ecc_curve_get_params(level);
-        if (st == NULL)
+        curve = get_supported_curve(level);
+        if (curve == NULL)
           return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
         
-        tls_ecc_set.size = st->size;
-        tls_ecc_set.prime = st->prime;
-        tls_ecc_set.order = st->order;
-        tls_ecc_set.Gx = st->Gx;
-        tls_ecc_set.Gy = st->Gy;
-        tls_ecc_set.A = st->A;
-        tls_ecc_set.B = st->B;
+        ecc_scalar_init(&key, curve);
+        ecc_point_init(&pub, curve);
+        
+        ecdsa_generate_keypair(&pub, &key, NULL, rnd_func);
+        
+        params->params[ECC_X] = _gnutls_mpi_new (0);
+        params->params[ECC_Y] = _gnutls_mpi_new (0);
+        params->params[ECC_K] = _gnutls_mpi_new (0);
+        
+        if (params->params[ECC_X] == NULL || params->params[ECC_Y] == NULL ||
+            params->params[ECC_K] == NULL)
+            {
+              _gnutls_mpi_release(&params->params[ECC_X]);
+              _gnutls_mpi_release(&params->params[ECC_Y]);
+              _gnutls_mpi_release(&params->params[ECC_K]);
+              goto ecc_cleanup;
+            }
 
-        ret = ecc_make_key(NULL, rnd_func, &key, &tls_ecc_set, st->id);
-        if (ret != 0)
-          return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-
-        params->params_nr = 0;
-        for (i = 0; i < ECC_PRIVATE_PARAMS; i++)
-          {
-            params->params[i] = _gnutls_mpi_alloc_like(&key.prime);
-            if (params->params[i] == NULL)
-              {
-                ret = GNUTLS_E_MEMORY_ERROR;
-                goto ecc_fail;
-              }
-            params->params_nr++;
-          }
         params->flags = level;
+        params->params_nr = ECC_PRIVATE_PARAMS;
 
-        mpz_set(TOMPZ(params->params[ECC_PRIME]), key.prime);
-        mpz_set(TOMPZ(params->params[ECC_ORDER]), key.order);
-        mpz_set(TOMPZ(params->params[ECC_A]), key.A);
-        mpz_set(TOMPZ(params->params[ECC_B]), key.B);
-        mpz_set(TOMPZ(params->params[ECC_GX]), key.Gx);
-        mpz_set(TOMPZ(params->params[ECC_GY]), key.Gy);
-        mpz_set(TOMPZ(params->params[ECC_X]), key.pubkey.x);
-        mpz_set(TOMPZ(params->params[ECC_Y]), key.pubkey.y);
-        mpz_set(TOMPZ(params->params[ECC_K]), key.k);
-        
-ecc_fail:
-        ecc_free(&key);
-        
-        if (ret < 0)
-          goto fail;
+        ecc_point_get(&pub, TOMPZ(params->params[ECC_X]), TOMPZ(params->params[ECC_Y]));
+        ecc_scalar_get(&key, TOMPZ(params->params[ECC_K]));
 
+ecc_cleanup:        
+        ecc_point_clear(&pub);
+        ecc_scalar_clear(&key);
+        
         break;
       }
     default:
@@ -876,41 +877,53 @@ dsa_cleanup:
       break;
     case GNUTLS_PK_EC:
       {
-        int curve = params->flags;
-        ecc_key ecc_priv;
-        ecc_point *R;
-        ecc_point zero;
-
+        struct ecc_point r, pub;
+        struct ecc_scalar priv;
+        mpz_t x1, y1, x2, y2;
+	const struct ecc_curve * curve;
+                
         if (params->params_nr != ECC_PRIVATE_PARAMS)
           return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-        if (is_supported_curve(curve) == 0)
+        curve = get_supported_curve(params->flags);
+        if (curve == NULL)
           return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
 
-        _ecc_params_to_privkey(params, &ecc_priv);
-        R = ecc_new_point();
+        ret = _ecc_params_to_pubkey(params, &pub, curve);
+        if (ret < 0)
+          return gnutls_assert_val(ret);
 
+        ret = _ecc_params_to_privkey(params, &priv, curve);
+        if (ret < 0)
+          {
+            ecc_point_clear(&pub);
+            return gnutls_assert_val(ret);
+          }
+
+        ecc_point_init(&r, curve);
         /* verify that x,y lie on the curve */
-        ret = ecc_projective_check_point(&ecc_priv.pubkey, TOMPZ(params->params[ECC_B]), params->params[ECC_PRIME]);
-        if (ret != 0)
+        ret = ecc_point_set(&r, TOMPZ(params->params[ECC_X]), TOMPZ(params->params[ECC_Y]));
+        if (ret == 0)
           {
             ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
             goto ecc_cleanup;
           }
+        ecc_point_clear(&r);
 
-        memcpy(&zero.x, ecc_priv.Gx, sizeof(mpz_t));
-        memcpy(&zero.y, ecc_priv.Gy, sizeof(mpz_t));
-        memcpy(&zero.z, ecc_priv.pubkey.z, sizeof(mpz_t)); /* z = 1 */
+        ecc_point_init(&r, curve);
+        ecc_point_mul_g(&r, &priv);
+        
+        mpz_init(x1);
+        mpz_init(y1);
+        ecc_point_get(&r, x1, y1);
+        ecc_point_clear(&r);
+
+        mpz_init(x2);
+        mpz_init(y2);
+        ecc_point_get(&pub, x2, y2);
 
         /* verify that k*(Gx,Gy)=(x,y) */
-        ret = ecc_mulmod_cached(ecc_priv.k, curve, R, TOMPZ(params->params[ECC_A]), TOMPZ(params->params[ECC_PRIME]), 1);
-        if (ret != 0)
-          {
-            ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
-            goto ecc_cleanup;
-          }
-
-        if (mpz_cmp(ecc_priv.pubkey.x, R->x) != 0 || mpz_cmp(ecc_priv.pubkey.y, R->y) != 0)
+        if (mpz_cmp(x1, x2) != 0 || mpz_cmp(y1, y2) != 0)
           {
             ret = gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
             goto ecc_cleanup;
@@ -919,8 +932,8 @@ dsa_cleanup:
         ret = 0;
 
 ecc_cleanup:
-        _ecc_params_clear(&ecc_priv);
-        ecc_del_point(R);
+        ecc_scalar_clear(&priv);
+        ecc_point_clear(&pub);
       }  
       break;
     default:

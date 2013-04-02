@@ -1373,10 +1373,6 @@ gnutls_pubkey_import_ecc_raw (gnutls_pubkey_t key,
 
   key->params.flags = curve;
 
-  ret = _gnutls_ecc_curve_fill_params(curve, &key->params);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-
   if (_gnutls_mpi_scan_nz (&key->params.params[ECC_X], x->data, x->size))
     {
       gnutls_assert ();
