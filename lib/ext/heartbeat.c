@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012,2013 Free Software Foundation, Inc.
  * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
- * Author: Olga Smolenchuk, Nikos Mavrogiannopoulos
+ * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
  * The GnuTLS is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation; either version 3 of
+ * as published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but
