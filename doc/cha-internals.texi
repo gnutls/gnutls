@@ -310,7 +310,7 @@ It might be desirable to allow users of the extension to
 request use of the extension, or set extension specific data.  
 This can be implemented by adding extension specific function calls
 that can be added to @code{includes/@-gnutls/@-gnutls.h},
-as long as the LGPLv3+ applies.
+as long as the LGPLv2.1+ applies.
 The implementation of the function should lie in the @code{ext/@-foobar.c} file.
 
 To make the API available in the shared library you need to add the
