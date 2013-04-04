@@ -443,7 +443,7 @@ gnutls_sign_algorithm_get_requested (gnutls_session_t session,
  * @session: is a #gnutls_session_t structure.
  *
  * Returns the signature algorithm that is (or will be) used in this 
- * session to sign data.
+ * session by the server to sign data.
  *
  * Returns: The sign algorithm or %GNUTLS_SIGN_UNKNOWN.
  *
@@ -452,5 +452,22 @@ gnutls_sign_algorithm_get_requested (gnutls_session_t session,
 int
 gnutls_sign_algorithm_get (gnutls_session_t session)
 {
-  return session->security_parameters.sign_algo;
+  return session->security_parameters.server_sign_algo;
+}
+
+/**
+ * gnutls_sign_algorithm_get_client:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Returns the signature algorithm that is (or will be) used in this 
+ * session by the client to sign data.
+ *
+ * Returns: The sign algorithm or %GNUTLS_SIGN_UNKNOWN.
+ *
+ * Since: 3.1.11
+ **/
+int
+gnutls_sign_algorithm_get_client (gnutls_session_t session)
+{
+  return session->security_parameters.client_sign_algo;
 }

@@ -799,6 +799,9 @@ pack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_APPEND (ps, &session->security_parameters.new_record_padding, 1);
   BUFFER_APPEND_NUM (ps, session->security_parameters.ecc_curve);
 
+  BUFFER_APPEND_NUM (ps, session->security_parameters.server_sign_algo);
+  BUFFER_APPEND_NUM (ps, session->security_parameters.client_sign_algo);
+
   _gnutls_write_uint32 (ps->length - cur_size, ps->data + size_offset);
 
   return 0;
@@ -860,6 +863,10 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
 
   BUFFER_POP_NUM (ps,
                   session->internals.resumed_security_parameters.ecc_curve);
+  BUFFER_POP_NUM (ps,
+                  session->internals.resumed_security_parameters.server_sign_algo);
+  BUFFER_POP_NUM (ps,
+                  session->internals.resumed_security_parameters.client_sign_algo);
 
   if (session->internals.resumed_security_parameters.max_record_recv_size == 0 ||
       session->internals.resumed_security_parameters.max_record_send_size == 0)

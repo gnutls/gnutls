@@ -76,8 +76,8 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
       gnutls_assert ();
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
-    
-  gnutls_sign_algorithm_set(session, *sign_algo);
+
+  gnutls_sign_algorithm_set_server(session, *sign_algo);
 
   hash_algo = gnutls_sign_get_hash_algorithm (*sign_algo);
 
@@ -288,6 +288,8 @@ verify_tls_hash (gnutls_session_t session,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
+  gnutls_sign_algorithm_set_server(session, sign_algo);
+
   ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo, flags, 
                                    &vdata, signature);
 
@@ -413,6 +415,8 @@ _gnutls_handshake_verify_crt_vrfy12 (gnutls_session_t session,
   ret = _gnutls_session_sign_algo_enabled(session, sign_algo);
   if (ret < 0)
     return gnutls_assert_val(ret);
+
+  gnutls_sign_algorithm_set_client(session, sign_algo);
   
   hash_algo = gnutls_sign_get_hash_algorithm(sign_algo);
   
@@ -530,7 +534,6 @@ _gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
     }
 
   return ret;
-
 }
 
 /* the same as _gnutls_handshake_sign_crt_vrfy except that it is made for TLS 1.2
@@ -554,7 +557,7 @@ _gnutls_handshake_sign_crt_vrfy12 (gnutls_session_t session,
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
   
-  gnutls_sign_algorithm_set(session, sign_algo);
+  gnutls_sign_algorithm_set_client(session, sign_algo);
 
   hash_algo = gnutls_sign_get_hash_algorithm (sign_algo);
 

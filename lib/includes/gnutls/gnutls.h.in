@@ -812,6 +812,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
     gnutls_certificate_type_get (gnutls_session_t session);
     
   int gnutls_sign_algorithm_get (gnutls_session_t session);
+  int gnutls_sign_algorithm_get_client (gnutls_session_t session);
 
   int gnutls_sign_algorithm_get_requested (gnutls_session_t session,
                                            size_t indx,
