@@ -547,6 +547,18 @@ print_info (gnutls_session_t session, int verbose, int print_cert)
     tmp = SU (gnutls_kx_get_name (kx));
     printf ("- Key Exchange: %s\n", tmp);
 
+    if (gnutls_sign_algorithm_get(session) != GNUTLS_SIGN_UNKNOWN)
+      {
+        tmp = SU (gnutls_sign_get_name (gnutls_sign_algorithm_get (session)));
+        printf ("- Server Signature: %s\n", tmp);
+      }
+
+    if (gnutls_sign_algorithm_get_client(session) != GNUTLS_SIGN_UNKNOWN)
+      {
+        tmp = SU (gnutls_sign_get_name (gnutls_sign_algorithm_get_client (session)));
+        printf ("- Client Signature: %s\n", tmp);
+      }
+
     tmp = SU (gnutls_cipher_get_name (gnutls_cipher_get (session)));
     printf ("- Cipher: %s\n", tmp);
 
