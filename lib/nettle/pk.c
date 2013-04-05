@@ -122,19 +122,17 @@ ecc_shared_secret (struct ecc_scalar * private_key,
                    void *out, unsigned size)
 {
 struct ecc_point r;
-mpz_t x, y;
+mpz_t x;
 
   mpz_init(x);
-  mpz_init(y);
   ecc_point_init(&r, public_key->ecc);
 
   ecc_point_mul(&r, private_key, public_key);
   
-  ecc_point_get(&r, x, y);
+  ecc_point_get(&r, x, NULL);
   nettle_mpz_get_str_256(size, out, x);
 
   mpz_clear(x);
-  mpz_clear(y);
   ecc_point_clear(&r);
   
   return;
