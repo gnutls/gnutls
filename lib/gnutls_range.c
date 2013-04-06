@@ -47,6 +47,9 @@ _gnutls_range_max_lh_pad (gnutls_session_t session, ssize_t data_length,
   ssize_t max_pad;
   unsigned int fixed_pad;
   record_parameters_st *record_params;
+  ssize_t this_pad;
+  ssize_t block_size;
+  ssize_t tag_size, overflow;
 
   ret = _gnutls_epoch_get (session, EPOCH_WRITE_CURRENT, &record_params);
   if (ret < 0)
@@ -65,13 +68,12 @@ _gnutls_range_max_lh_pad (gnutls_session_t session, ssize_t data_length,
       fixed_pad = 1;
     }
 
-  ssize_t this_pad = MIN (max_pad, max_frag - data_length);
+  this_pad = MIN (max_pad, max_frag - data_length);
 
-  ssize_t block_size =
+  block_size =
       gnutls_cipher_get_block_size (record_params->cipher_algorithm);
-  ssize_t tag_size =
+  tag_size =
       _gnutls_auth_cipher_tag_len (&record_params->write.cipher_state);
-  ssize_t overflow;
   switch (_gnutls_cipher_is_block (record_params->cipher_algorithm))
     {
     case CIPHER_STREAM:
@@ -97,9 +99,6 @@ _gnutls_range_max_lh_pad (gnutls_session_t session, ssize_t data_length,
  * gnutls_record_can_use_length_hiding:
  * @session: is a #gnutls_session_t structure.
  *
- * Returns true (1) if the current session supports length-hiding
- * padding, false (0) if the current session does not. Returns
- * a negative value in case of error.
  * If the session supports length-hiding padding, you can
  * invoke gnutls_range_send_message() to send a message whose
  * length is hidden in the given range. If the session does not
@@ -107,6 +106,9 @@ _gnutls_range_max_lh_pad (gnutls_session_t session, ssize_t data_length,
  * gnutls_record_send() function, or gnutls_range_send_message()
  * making sure that the range is the same as the length of the
  * message you are trying to send.
+ *
+ * Returns: true (1) if the current session supports length-hiding
+ * padding, false (0) if the current session does not.
  **/
 int
 gnutls_record_can_use_length_hiding (gnutls_session_t session)
@@ -114,26 +116,25 @@ gnutls_record_can_use_length_hiding (gnutls_session_t session)
   int ret;
   record_parameters_st *record_params;
 
-  ret = _gnutls_epoch_get (session, EPOCH_WRITE_CURRENT, &record_params);
-  if (ret < 0)
-    {
-      return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
-    }
-
   if (session->security_parameters.new_record_padding != 0)
     return 1;
 
   if (session->security_parameters.version == GNUTLS_SSL3)
     return 0;
 
+  ret = _gnutls_epoch_get (session, EPOCH_WRITE_CURRENT, &record_params);
+  if (ret < 0)
+    {
+      return 0;
+    }
+
   switch (_gnutls_cipher_is_block (record_params->cipher_algorithm))
     {
-    case CIPHER_STREAM:
-      return 0;
     case CIPHER_BLOCK:
       return 1;
+    case CIPHER_STREAM:
     default:
-      return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
+      return 0;
     }
 }
 
@@ -239,14 +240,15 @@ gnutls_record_send_range (gnutls_session_t session, const void *data,
 
   /* sanity check on range and data size */
   if (range->low > range->high ||
-      data_size < range->low || data_size > range->high)
+      data_size < range->low || 
+      data_size > range->high)
     {
       return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
     }
 
   ret = gnutls_record_can_use_length_hiding (session);
-  if (ret < 0)
-    return ret;                 /* already gnutls_assert_val'd */
+  if (ret == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   if (ret == 0 && range->low != range->high)
     /* Cannot use LH, but a range was given */
@@ -294,7 +296,7 @@ gnutls_record_send_range (gnutls_session_t session, const void *data,
 
       if (ret < 0)
         {
-          return ret;           /* already gnutls_assert_val'd */
+          return gnutls_assert_val(ret);
         }
       if (ret != (ssize_t) next_fragment_length)
         {
