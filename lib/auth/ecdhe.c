@@ -85,7 +85,8 @@ const mod_auth_st ecdhe_rsa_auth_struct = {
   _gnutls_proc_cert_cert_req
 };
 
-static int calc_ecdh_key( gnutls_session_t session, gnutls_datum_t * psk_key)
+static int calc_ecdh_key( gnutls_session_t session, gnutls_datum_t * psk_key,
+	gnutls_ecc_curve_t curve)
 {
 gnutls_pk_params_st pub;
 int ret;
@@ -93,6 +94,7 @@ int ret;
   memset(&pub,0,sizeof(pub));
   pub.params[ECC_X] = session->key.ecdh_x;
   pub.params[ECC_Y] = session->key.ecdh_y;
+  pub.flags = curve;
 
   if (psk_key == NULL)
     ret = _gnutls_pk_derive(GNUTLS_PK_EC, &session->key.key, &session->key.ecdh_params, &pub);
@@ -149,7 +151,7 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
     return gnutls_assert_val(ret);
 
   /* generate pre-shared key */
-  ret = calc_ecdh_key(session, psk_key);
+  ret = calc_ecdh_key(session, psk_key, curve);
   if (ret < 0)
     return gnutls_assert_val(ret);
     
@@ -208,7 +210,7 @@ _gnutls_gen_ecdh_common_client_kx_int (gnutls_session_t session,
     return gnutls_assert_val(ret);
 
   /* generate pre-shared key */
-  ret = calc_ecdh_key(session, psk_key);
+  ret = calc_ecdh_key(session, psk_key, curve);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
