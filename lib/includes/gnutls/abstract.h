@@ -54,12 +54,6 @@ extern "C"
     GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT = 1<<3,
   } gnutls_pubkey_flags_t;
 
-struct gnutls_pubkey_st;
-typedef struct gnutls_pubkey_st *gnutls_pubkey_t;
-
-struct gnutls_privkey_st;
-typedef struct gnutls_privkey_st *gnutls_privkey_t;
-
 typedef int (*gnutls_privkey_sign_func) (gnutls_privkey_t key,
                                          void *userdata,
                                          const gnutls_datum_t * raw_data,
@@ -310,11 +304,6 @@ int gnutls_privkey_sign_hash (gnutls_privkey_t signer,
 			      const gnutls_datum_t * hash_data,
 			      gnutls_datum_t * signature);
 
-int
-gnutls_privkey_sign_raw_data (gnutls_privkey_t key,
-			      unsigned flags,
-                              const gnutls_datum_t * data,
-                              gnutls_datum_t * signature);
 
 int gnutls_privkey_decrypt_data (gnutls_privkey_t key,
                                  unsigned int flags,

@@ -310,6 +310,12 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                                               res,
                                               gnutls_rsa_params_t rsa_params) _GNUTLS_GCC_ATTR_DEPRECATED;
 
+  /* use gnutls_privkey_sign_hash() with the GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA flag */
+  int gnutls_privkey_sign_raw_data (gnutls_privkey_t key,
+			      unsigned flags,
+                              const gnutls_datum_t * data,
+                              gnutls_datum_t * signature) _GNUTLS_GCC_ATTR_DEPRECATED;
+
 #ifdef _ISOC99_SOURCE
 /* we provide older functions for compatibility as inline functions that
  * depend on gnutls_session_get_random. */

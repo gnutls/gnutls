@@ -1162,6 +1162,12 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
 /* x.509 types */
 
+  struct gnutls_pubkey_st;
+  typedef struct gnutls_pubkey_st *gnutls_pubkey_t;
+
+  struct gnutls_privkey_st;
+  typedef struct gnutls_privkey_st *gnutls_privkey_t;
+
   struct gnutls_x509_privkey_int;
   typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey_t;
 
