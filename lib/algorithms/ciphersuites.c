@@ -103,8 +103,6 @@ typedef struct
 #define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA1 { 0x00, 0x0A }
 
-#define GNUTLS_RSA_EXPORT_ARCFOUR_40_MD5 { 0x00, 0x03 }
-
 /* rfc3268:
  */
 #define GNUTLS_RSA_AES_128_CBC_SHA1 { 0x00, 0x2F }
@@ -633,13 +631,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_SRP_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_DTLS_VERSION_MIN),
-#endif
-#ifdef ENABLE_RSA_EXPORT
-  /* RSA-EXPORT */
-  ENTRY (GNUTLS_RSA_EXPORT_ARCFOUR_40_MD5,
-                             GNUTLS_CIPHER_ARCFOUR_40,
-                             GNUTLS_KX_RSA_EXPORT, GNUTLS_MAC_MD5,
-                             GNUTLS_SSL3, GNUTLS_VERSION_UNKNOWN),
 #endif
   {0, {0, 0}, 0, 0, 0, 0, 0, 0}
 };

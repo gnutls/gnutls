@@ -93,7 +93,6 @@ int _gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm);
 
 /* Functions for key exchange. */
 int _gnutls_kx_needs_dh_params (gnutls_kx_algorithm_t algorithm);
-int _gnutls_kx_needs_rsa_params (gnutls_kx_algorithm_t algorithm);
 mod_auth_st *_gnutls_kx_auth_struct (gnutls_kx_algorithm_t algorithm);
 int _gnutls_kx_is_ok (gnutls_kx_algorithm_t algorithm);
 

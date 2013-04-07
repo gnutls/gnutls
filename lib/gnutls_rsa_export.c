@@ -27,25 +27,13 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
-#include <gnutls_rsa_export.h>
 #include "x509/x509_int.h"
 #include "debug.h"
 
 #ifdef ENABLE_RSA_EXPORT
 
-/* returns e and m, depends on the requested bits.
- * We only support limited key sizes.
- */
-const gnutls_pk_params_st*
-_gnutls_rsa_params_to_mpi (gnutls_rsa_params_t rsa_params)
-{
-  if (rsa_params == NULL)
-    {
-      return NULL;
-    }
-
-  return &rsa_params->params;
-}
+/* The are included for binary compatibility with previous versions
+ * only */
 
 /**
  * gnutls_rsa_params_import_raw:
@@ -235,4 +223,4 @@ gnutls_rsa_params_export_raw (gnutls_rsa_params_t rsa,
   return 0;
 }
 
-#endif
+#endif /* ENABLE_RSA_EXPORT */

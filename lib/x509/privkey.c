@@ -24,7 +24,6 @@
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
-#include <gnutls_rsa_export.h>
 #include <gnutls_sig.h>
 #include <common.h>
 #include <gnutls_x509.h>

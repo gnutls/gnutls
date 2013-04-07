@@ -12,6 +12,8 @@ See the end for copying conditions.
 
 ** libgnutls: Added support for DTLS 1.2.
 
+** libgnutls: Removed support for the RSA-EXPORT ciphersuites.
+
 ** API and ABI modifications:
 gnutls_cipher_get_iv_size: Added
 gnutls_hmac_set_nonce: Added

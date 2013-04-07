@@ -320,9 +320,6 @@ static const int kx_priority_export[] = {
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
 #endif
-#ifdef ENABLE_RSA_EXPORT
-  GNUTLS_KX_RSA_EXPORT,
-#endif
   0
 };
 
@@ -344,7 +341,6 @@ static const int kx_priority_secure[] = {
   GNUTLS_KX_DHE_DSS,
 #endif
   /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
-   * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
    */
   0
 };

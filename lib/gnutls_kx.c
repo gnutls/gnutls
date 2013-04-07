@@ -34,7 +34,6 @@
 #include "gnutls_mpi.h"
 #include <gnutls_state.h>
 #include <gnutls_datum.h>
-#include <gnutls_rsa_export.h>
 #include <gnutls_mbuffers.h>
 
 /* This is a temporary function to be used before the generate_*
@@ -459,17 +458,6 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
 
   if (session->internals.auth_struct->gnutls_process_server_kx != NULL)
     {
-#ifdef ENABLE_RSA_EXPORT
-      /* EXCEPTION FOR RSA_EXPORT cipher suite 
-       */
-      if (_gnutls_session_is_export (session) != 0 &&
-          _gnutls_peers_cert_less_512 (session) != 0)
-        {
-          gnutls_assert ();
-          return 0;
-        }
-#endif
-
       /* Server key exchange packet is optional for PSK. */
       if (_gnutls_session_is_psk (session))
         optflag = 1;

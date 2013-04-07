@@ -137,7 +137,7 @@ extern "C"
  * @GNUTLS_KX_ANON_DH: Anon-DH key-exchange algorithm.
  * @GNUTLS_KX_ANON_ECDH: Anon-ECDH key-exchange algorithm.
  * @GNUTLS_KX_SRP: SRP key-exchange algorithm.
- * @GNUTLS_KX_RSA_EXPORT: RSA-EXPORT key-exchange algorithm.
+ * @GNUTLS_KX_RSA_EXPORT: RSA-EXPORT key-exchange algorithm (defunc).
  * @GNUTLS_KX_SRP_RSA: SRP-RSA key-exchange algorithm.
  * @GNUTLS_KX_SRP_DSS: SRP-DSS key-exchange algorithm.
  * @GNUTLS_KX_PSK: PSK key-exchange algorithm.
@@ -167,7 +167,7 @@ extern "C"
 
 /**
  * gnutls_params_type_t:
- * @GNUTLS_PARAMS_RSA_EXPORT: Session RSA-EXPORT parameters.
+ * @GNUTLS_PARAMS_RSA_EXPORT: Session RSA-EXPORT parameters (defunc).
  * @GNUTLS_PARAMS_DH: Session Diffie-Hellman parameters.
  * @GNUTLS_PARAMS_ECDH: Session Elliptic-Curve Diffie-Hellman parameters.
  *

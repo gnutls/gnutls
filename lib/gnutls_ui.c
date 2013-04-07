@@ -768,36 +768,7 @@ gnutls_rsa_export_get_pubkey (gnutls_session_t session,
                               gnutls_datum_t * exponent,
                               gnutls_datum_t * modulus)
 {
-  cert_auth_info_t info;
-  int ret;
-
-  if (gnutls_auth_get_type (session) == GNUTLS_CRD_CERTIFICATE)
-    {
-      info = _gnutls_get_auth_info (session);
-      if (info == NULL)
-        return GNUTLS_E_INTERNAL_ERROR;
-
-      ret = _gnutls_set_datum (modulus, info->rsa_export.modulus.data,
-                               info->rsa_export.modulus.size);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      ret = _gnutls_set_datum (exponent, info->rsa_export.exponent.data,
-                               info->rsa_export.exponent.size);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          _gnutls_free_datum (modulus);
-          return ret;
-        }
-
-      return 0;
-    }
-
-  return GNUTLS_E_INVALID_REQUEST;
+  return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
 /**
@@ -812,13 +783,7 @@ gnutls_rsa_export_get_pubkey (gnutls_session_t session,
 int
 gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
 {
-  cert_auth_info_t info;
-
-  info = _gnutls_get_auth_info (session);
-  if (info == NULL)
-    return GNUTLS_E_INTERNAL_ERROR;
-
-  return mpi_buf2bits (&info->rsa_export.modulus);
+  return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
 /**
@@ -834,7 +799,7 @@ void
 gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
                                           res, gnutls_rsa_params_t rsa_params)
 {
-  res->rsa_params = rsa_params;
+  return;
 }
 #endif
 

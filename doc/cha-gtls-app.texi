@@ -913,8 +913,7 @@ compression NULL; for certificate types X.509.
 In key exchange algorithms when in NORMAL or SECURE levels the
 perfect forward secrecy algorithms take precedence of the other
 protocols.  In all cases all the supported key exchange algorithms
-are enabled@footnote{Except for the RSA-EXPORT which is only enabled in
-EXPORT level.}.
+are enabled.
 
 Note that the SECURE levels distinguish between overall security level and
 message authenticity security level. That is because the message
@@ -957,7 +956,7 @@ priority.
 
 @item Key exchange @tab
 RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
-PSK, DHE-PSK, ECDHE-RSA, ANON-ECDH, ANON-DH, RSA-EXPORT. The
+PSK, DHE-PSK, ECDHE-RSA, ANON-ECDH, ANON-DH. The
 Catch all name is KX-ALL which will add all the algorithms from NORMAL
 priority.
 
@@ -1374,16 +1373,6 @@ changed with GnuTLS 3.0.9. Since that version the @code{privateValueLength}
 member of the structure is set, allowing the server utilizing the
 parameters to use keys of the size of the security parameter. This
 provides better performance in key exchange.
-
-The ciphersuites that involve the RSA-EXPORT key exchange require
-additional parameters. Those ciphersuites are rarely used today
-because they are by design insecure, thus if you have no requirement
-for them, the rest of this section can be skipped. The RSA-EXPORT key exchange
-requires 512-bit RSA keys to be generated. It is recommended those
-parameters to be refreshed (regenerated) in short intervals. The
-following functions can be used for these parameters.
-
-@showfuncD{gnutls_rsa_params_generate2,gnutls_certificate_set_rsa_export_params,gnutls_rsa_params_import_pkcs1,gnutls_rsa_params_export_pkcs1}
 
 To allow renewal of the parameters within an application without
 accessing the credentials, which are a shared structure,

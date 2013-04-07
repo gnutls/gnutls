@@ -659,8 +659,6 @@ typedef struct
 {
   gnutls_dh_params_t dh_params;
   int free_dh_params;
-  gnutls_rsa_params_t rsa_params;
-  int free_rsa_params;
 } internal_params_st;
 
 /* DTLS session state

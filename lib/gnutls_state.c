@@ -42,7 +42,6 @@
 #include <auth/anon.h>
 #include <auth/psk.h>
 #include <algorithms.h>
-#include <gnutls_rsa_export.h>
 #include <gnutls_extensions.h>
 #include <system.h>
 #include <random.h>
@@ -233,11 +232,6 @@ deinit_internal_params (gnutls_session_t session)
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
   if (session->internals.params.free_dh_params)
     gnutls_dh_params_deinit (session->internals.params.dh_params);
-#endif
-
-#ifdef ENABLE_RSA_EXPORT
-  if (session->internals.params.free_rsa_params)
-    gnutls_rsa_params_deinit (session->internals.params.rsa_params);
 #endif
 
   _gnutls_handshake_hash_buffers_clear (session);
@@ -590,45 +584,6 @@ _gnutls_dh_set_secret_bits (gnutls_session_t session, unsigned bits)
 
   return 0;
 }
-
-/* This function will set in the auth info structure the
- * RSA exponent and the modulus.
- */
-int
-_gnutls_rsa_export_set_pubkey (gnutls_session_t session,
-                               bigint_t exponent, bigint_t modulus)
-{
-  cert_auth_info_t info;
-  int ret;
-
-  info = _gnutls_get_auth_info (session);
-  if (info == NULL)
-    return GNUTLS_E_INTERNAL_ERROR;
-
-  if (info->rsa_export.modulus.data)
-    _gnutls_free_datum (&info->rsa_export.modulus);
-
-  if (info->rsa_export.exponent.data)
-    _gnutls_free_datum (&info->rsa_export.exponent);
-
-  ret = _gnutls_mpi_dprint_lz (modulus, &info->rsa_export.modulus);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = _gnutls_mpi_dprint_lz (exponent, &info->rsa_export.exponent);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      _gnutls_free_datum (&info->rsa_export.modulus);
-      return ret;
-    }
-
-  return 0;
-}
-
 
 /* Sets the prime and the generator in the auth info structure.
  */
