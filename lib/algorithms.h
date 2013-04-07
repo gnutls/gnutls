@@ -88,7 +88,6 @@ _gnutls_cipher_suite_get_id (gnutls_kx_algorithm_t kx_algorithm,
 int _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_algo_is_aead (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_is_ok (gnutls_cipher_algorithm_t algorithm);
-int _gnutls_cipher_get_export_flag (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm);
 
 /* Functions for key exchange. */

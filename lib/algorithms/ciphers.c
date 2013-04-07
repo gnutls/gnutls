@@ -33,7 +33,6 @@ struct gnutls_cipher_entry
   uint16_t keysize;
   unsigned block:1;
   uint16_t iv; /* the size of IV */
-  unsigned export_flag:1; /* 0 non export */
   unsigned auth:1; /* Whether it is authenc cipher */
 };
 typedef struct gnutls_cipher_entry gnutls_cipher_entry;
@@ -46,43 +45,43 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
  * Make sure to update MAX_CIPHER_BLOCK_SIZE and MAX_CIPHER_KEY_SIZE as well.
  */
 static const gnutls_cipher_entry algorithms[] = {
-  {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0, 0},
-  {"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC, 16, 24, CIPHER_BLOCK, 16, 0, 0},
-  {"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0, 0},
-  {"AES-128-GCM", GNUTLS_CIPHER_AES_128_GCM, 16, 16, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 0, 1},
-  {"AES-256-GCM", GNUTLS_CIPHER_AES_256_GCM, 16, 32, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 0, 1},
-  {"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0, 0},
-  {"SALSA20-256", GNUTLS_CIPHER_SALSA20_256, 1, 32, CIPHER_STREAM, 8, 0, 0},
+  {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0},
+  {"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC, 16, 24, CIPHER_BLOCK, 16, 0},
+  {"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0},
+  {"AES-128-GCM", GNUTLS_CIPHER_AES_128_GCM, 16, 16, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 1},
+  {"AES-256-GCM", GNUTLS_CIPHER_AES_256_GCM, 16, 32, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 1},
+  {"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0},
+  {"SALSA20-256", GNUTLS_CIPHER_SALSA20_256, 1, 32, CIPHER_STREAM, 8, 0},
   {"CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC, 16, 32, CIPHER_BLOCK,
-   16, 0, 0},
+   16, 0},
   {"CAMELLIA-192-CBC", GNUTLS_CIPHER_CAMELLIA_192_CBC, 16, 24, CIPHER_BLOCK,
-   16, 0, 0},
+   16, 0},
   {"CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16, CIPHER_BLOCK,
-   16, 0, 0},
-  {"3DES-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0, 0},
-  {"DES-CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0, 0},
-  {"ARCFOUR-40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 1, 0},
-  {"RC2-40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 1, 0},
+   16, 0},
+  {"3DES-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0},
+  {"DES-CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0},
+  {"ARCFOUR-40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 0},
+  {"RC2-40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 0},
 
 #ifdef ENABLE_OPENPGP
-  {"IDEA-PGP-CFB", GNUTLS_CIPHER_IDEA_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0, 0},
-  {"3DES-PGP-CFB", GNUTLS_CIPHER_3DES_PGP_CFB, 8, 24, CIPHER_BLOCK, 8, 0, 0},
-  {"CAST5-PGP-CFB", GNUTLS_CIPHER_CAST5_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0, 0},
+  {"IDEA-PGP-CFB", GNUTLS_CIPHER_IDEA_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0},
+  {"3DES-PGP-CFB", GNUTLS_CIPHER_3DES_PGP_CFB, 8, 24, CIPHER_BLOCK, 8, 0},
+  {"CAST5-PGP-CFB", GNUTLS_CIPHER_CAST5_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0},
   {"BLOWFISH-PGP-CFB", GNUTLS_CIPHER_BLOWFISH_PGP_CFB, 8,
-   16 /*actually unlimited */ , CIPHER_BLOCK, 8, 0, 0},
+   16 /*actually unlimited */ , CIPHER_BLOCK, 8, 0},
   {"SAFER-SK128-PGP-CFB", GNUTLS_CIPHER_SAFER_SK128_PGP_CFB, 8, 16,
-   CIPHER_BLOCK, 8, 0, 0},
+   CIPHER_BLOCK, 8, 0},
   {"AES-128-PGP-CFB", GNUTLS_CIPHER_AES128_PGP_CFB, 16, 16, CIPHER_BLOCK, 16,
-   0, 0},
+   0},
   {"AES-192-PGP-CFB", GNUTLS_CIPHER_AES192_PGP_CFB, 16, 24, CIPHER_BLOCK, 16,
-   0, 0},
+   0},
   {"AES-256-PGP-CFB", GNUTLS_CIPHER_AES256_PGP_CFB, 16, 32, CIPHER_BLOCK, 16,
-   0, 0},
+   0},
   {"TWOFISH-PGP-CFB", GNUTLS_CIPHER_TWOFISH_PGP_CFB, 16, 16, CIPHER_BLOCK, 16,
-   0, 0},
+   0},
 #endif
-  {"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0}
+  {"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0},
+  {0, 0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_CIPHER_LOOP(b) \
@@ -195,16 +194,6 @@ gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm)
 {                               /* In bytes */
   size_t ret = 0;
   GNUTLS_ALG_LOOP (ret = p->keysize);
-  return ret;
-
-}
-
-
-int
-_gnutls_cipher_get_export_flag (gnutls_cipher_algorithm_t algorithm)
-{                               /* In bytes */
-  size_t ret = 0;
-  GNUTLS_ALG_LOOP (ret = p->export_flag);
   return ret;
 
 }

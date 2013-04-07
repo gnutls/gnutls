@@ -56,7 +56,7 @@ static const int servwrite_length = sizeof (servwrite) - 1;
  */
 static int
 _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
-                  int hash_size, int IV_size, int key_size, int export_flag)
+                  int hash_size, int IV_size, int key_size)
 {
   /* FIXME: This function is too long
    */
@@ -82,8 +82,7 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
     }
       
   block_size = 2 * hash_size + 2 * key_size;
-  if (export_flag == 0)
-    block_size += 2 * IV_size;
+  block_size += 2 * IV_size;
 
   memcpy (rnd, session->security_parameters.server_random,
           GNUTLS_RANDOM_SIZE);
@@ -141,75 +140,15 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
       uint8_t *client_write_key, *server_write_key;
       int client_write_key_size, server_write_key_size;
 
-      if (export_flag == 0)
-        {
-          client_write_key = &key_block[pos];
-          client_write_key_size = key_size;
+      client_write_key = &key_block[pos];
+      client_write_key_size = key_size;
 
-          pos += key_size;
+      pos += key_size;
 
-          server_write_key = &key_block[pos];
-          server_write_key_size = key_size;
+      server_write_key = &key_block[pos];
+      server_write_key_size = key_size;
 
-          pos += key_size;
-
-        }
-      else
-        {                       /* export */
-          client_write_key = key1;
-          server_write_key = key2;
-
-          /* generate the final keys */
-
-          if (session->security_parameters.version == GNUTLS_SSL3)
-            {                   /* SSL 3 */
-              ret =
-                _gnutls_ssl3_hash_md5 (&key_block[pos],
-                                       key_size, rrnd,
-                                       2 * GNUTLS_RANDOM_SIZE,
-                                       EXPORT_FINAL_KEY_SIZE,
-                                       client_write_key);
-
-            }
-          else
-            {                   /* TLS 1.0 */
-              ret =
-                _gnutls_PRF (session, &key_block[pos], key_size,
-                             cliwrite, cliwrite_length,
-                             rrnd,
-                             2 * GNUTLS_RANDOM_SIZE,
-                             EXPORT_FINAL_KEY_SIZE, client_write_key);
-            }
-
-          if (ret < 0)
-            return gnutls_assert_val (ret);
-
-          client_write_key_size = EXPORT_FINAL_KEY_SIZE;
-          pos += key_size;
-
-          if (session->security_parameters.version == GNUTLS_SSL3)
-            {                   /* SSL 3 */
-              ret =
-                _gnutls_ssl3_hash_md5 (&key_block[pos], key_size,
-                                       rnd, 2 * GNUTLS_RANDOM_SIZE,
-                                       EXPORT_FINAL_KEY_SIZE,
-                                       server_write_key);
-            }
-          else
-            {                   /* TLS 1.0 */
-              ret =
-                _gnutls_PRF (session, &key_block[pos], key_size,
-                             servwrite, servwrite_length,
-                             rrnd, 2 * GNUTLS_RANDOM_SIZE,
-                             EXPORT_FINAL_KEY_SIZE, server_write_key);
-            }
-
-          if (ret < 0)
-            return gnutls_assert_val (ret);
-
-          server_write_key_size = EXPORT_FINAL_KEY_SIZE;
-          pos += key_size;
-        }
+      pos += key_size;
 
       if (_gnutls_set_datum
           (&client_write->key, client_write_key, client_write_key_size) < 0)
@@ -233,10 +172,9 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
 
     }
 
-
   /* IV generation in export and non export ciphers.
    */
-  if (IV_size > 0 && export_flag == 0)
+  if (IV_size > 0)
     {
       if (_gnutls_set_datum
           (&client_write->IV, &key_block[pos], IV_size) < 0)
@@ -248,42 +186,6 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
           (&server_write->IV, &key_block[pos], IV_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
-    }
-  else if (IV_size > 0 && export_flag != 0)
-    {
-      uint8_t iv_block[MAX_CIPHER_BLOCK_SIZE * 2];
-
-      if (session->security_parameters.version == GNUTLS_SSL3)
-        {                       /* SSL 3 */
-          ret = _gnutls_ssl3_hash_md5 ("", 0,
-                                       rrnd, GNUTLS_RANDOM_SIZE * 2,
-                                       IV_size, iv_block);
-
-          if (ret < 0)
-            return gnutls_assert_val (ret);
-
-
-          ret = _gnutls_ssl3_hash_md5 ("", 0, rnd,
-                                       GNUTLS_RANDOM_SIZE * 2,
-                                       IV_size, &iv_block[IV_size]);
-
-        }
-      else
-        {                       /* TLS 1.0 */
-          ret = _gnutls_PRF (session, (uint8_t*)"", 0,
-                             ivblock, ivblock_length, rrnd,
-                             2 * GNUTLS_RANDOM_SIZE, IV_size * 2, iv_block);
-        }
-
-      if (ret < 0)
-        return gnutls_assert_val (ret);
-
-      if (_gnutls_set_datum (&client_write->IV, iv_block, IV_size) < 0)
-        return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
-
-      if (_gnutls_set_datum
-          (&server_write->IV, &iv_block[IV_size], IV_size) < 0)
-        return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
     }
 
   return 0;
@@ -396,7 +298,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 {
   int hash_size;
   int IV_size;
-  int key_size, export_flag;
+  int key_size;
   gnutls_cipher_algorithm_t cipher_algo;
   gnutls_mac_algorithm_t mac_algo;
   gnutls_compression_method_t comp_algo;
@@ -427,11 +329,10 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 
   IV_size = gnutls_cipher_get_iv_size (cipher_algo);
   key_size = gnutls_cipher_get_key_size (cipher_algo);
-  export_flag = _gnutls_cipher_get_export_flag (cipher_algo);
   hash_size = gnutls_mac_get_key_size (mac_algo);
 
   ret = _gnutls_set_keys
-    (session, params, hash_size, IV_size, key_size, export_flag);
+    (session, params, hash_size, IV_size, key_size);
   if (ret < 0)
     return gnutls_assert_val (ret);
 

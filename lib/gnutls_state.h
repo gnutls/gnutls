@@ -72,7 +72,6 @@ _gnutls_dh_get_min_prime_bits (gnutls_session_t session)
 void _gnutls_handshake_internal_state_clear (gnutls_session_t);
 
 int _gnutls_session_is_resumable (gnutls_session_t session);
-int _gnutls_session_is_export (gnutls_session_t session);
 
 int _gnutls_session_is_psk (gnutls_session_t session);
 

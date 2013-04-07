@@ -1095,27 +1095,6 @@ gnutls_session_resumption_requested(gnutls_session_t session)
 }
 
 /*-
- * _gnutls_session_is_export - Used to check whether this session is of export grade
- * @session: is a #gnutls_session_t structure.
- *
- * This function will return non zero if this session is of export grade.
- -*/
-int
-_gnutls_session_is_export (gnutls_session_t session)
-{
-  gnutls_cipher_algorithm_t cipher;
-
-  cipher =
-    _gnutls_cipher_suite_get_cipher_algo (session->
-                                          security_parameters.cipher_suite);
-
-  if (_gnutls_cipher_get_export_flag (cipher) != 0)
-    return 1;
-
-  return 0;
-}
-
-/*-
  * _gnutls_session_is_psk - Used to check whether this session uses PSK kx
  * @session: is a #gnutls_session_t structure.
  *
