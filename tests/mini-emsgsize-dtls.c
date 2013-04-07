@@ -123,7 +123,7 @@ doit (void)
   gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
   gnutls_anon_set_server_dh_params (s_anoncred, dh_params);
   gnutls_init (&server, GNUTLS_SERVER|GNUTLS_DATAGRAM|GNUTLS_NONBLOCK);
-  ret = gnutls_priority_set_direct (server, "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+  ret = gnutls_priority_set_direct (server, "NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
   if (ret < 0)
     exit(1);
   gnutls_credentials_set (server, GNUTLS_CRD_ANON, s_anoncred);
@@ -136,7 +136,7 @@ doit (void)
   /* Init client */
   gnutls_anon_allocate_client_credentials (&c_anoncred);
   gnutls_init (&client, GNUTLS_CLIENT|GNUTLS_DATAGRAM|GNUTLS_NONBLOCK);
-  cret = gnutls_priority_set_direct (client, "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+  cret = gnutls_priority_set_direct (client, "NONE:+VERS-DTLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
   if (cret < 0)
     exit(1);
   gnutls_credentials_set (client, GNUTLS_CRD_ANON, c_anoncred);
@@ -147,6 +147,12 @@ doit (void)
 
   handshake = 1;
   HANDSHAKE_DTLS(client, server);
+  
+  if (gnutls_protocol_get_version(client) != GNUTLS_DTLS1_2)
+    {
+      fail("Error in negotiated version\n");
+      exit(1);
+    }
 
   handshake = 0;
   if (debug)

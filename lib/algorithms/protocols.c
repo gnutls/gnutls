@@ -45,6 +45,7 @@ static const gnutls_version_entry sup_versions[] = {
   {"TLS1.2", GNUTLS_TLS1_2, 3, 3, GNUTLS_STREAM, 1},
   {"DTLS0.9", GNUTLS_DTLS0_9, 1, 0, GNUTLS_DGRAM, 1}, /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
   {"DTLS1.0", GNUTLS_DTLS1_0, 254, 255, GNUTLS_DGRAM, 1}, /* 1.1 over datagram */
+  {"DTLS1.2", GNUTLS_DTLS1_2, 254, 253, GNUTLS_DGRAM, 1}, /* 1.2 over datagram */
   {0, 0, 0, 0, 0}
 };
 

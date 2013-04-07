@@ -282,6 +282,7 @@ static const int protocol_priority[] = {
   GNUTLS_TLS1_1,
   GNUTLS_TLS1_0,
   GNUTLS_SSL3,
+  GNUTLS_DTLS1_2,
   GNUTLS_DTLS1_0,
   0
 };

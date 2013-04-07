@@ -525,6 +525,7 @@ extern "C"
  * @GNUTLS_TLS1_1: TLS version 1.1.
  * @GNUTLS_TLS1_2: TLS version 1.2.
  * @GNUTLS_DTLS1_0: DTLS version 1.0.
+ * @GNUTLS_DTLS1_2: DTLS version 1.2.
  * @GNUTLS_DTLS0_9: DTLS version 0.9 (Cisco AnyConnect / OpenSSL 0.9.8e).
  * @GNUTLS_VERSION_MAX: Maps to the highest supported TLS version.
  * @GNUTLS_VERSION_UNKNOWN: Unknown SSL/TLS version.
@@ -538,10 +539,13 @@ extern "C"
     GNUTLS_TLS1 = GNUTLS_TLS1_0,
     GNUTLS_TLS1_1 = 3,
     GNUTLS_TLS1_2 = 4,
-    GNUTLS_DTLS1_0 = 5,
-    GNUTLS_DTLS0_9 = 6,
-    GNUTLS_VERSION_MAX = GNUTLS_DTLS0_9,
-    GNUTLS_VERSION_UNKNOWN = 0xff
+    GNUTLS_DTLS0_9 = 6, /* FIXME: at some point change it to 200 */
+    GNUTLS_DTLS1_0 = 5, /* 201 */
+    GNUTLS_DTLS1_2 = 202,
+    GNUTLS_DTLS_VERSION_MIN = GNUTLS_DTLS1_0,
+    GNUTLS_DTLS_VERSION_MAX = GNUTLS_DTLS1_2,
+    GNUTLS_TLS_VERSION_MAX = GNUTLS_TLS1_2,
+    GNUTLS_VERSION_UNKNOWN = 0xff /* change it to 0xffff */
   } gnutls_protocol_t;
 
 /**

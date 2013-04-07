@@ -17,7 +17,7 @@ include:
 
 @item Support for TLS 1.2, TLS 1.1, TLS 1.0 and SSL 3.0 protocols.
 
-@item Support for Datagram TLS 1.0.
+@item Support for Datagram TLS 1.0 and 1.2.
 
 @item Support for handling and verification of @acronym{X.509} and @acronym{OpenPGP} certificates.
 
