@@ -16,19 +16,12 @@ Current list:
    2.5.29.54: Inhibit Any-policy
    2.5.29.46: Freshest CRL
    2.5.29.30: Name Constraints
-* Improve AES assembly. AES in nettle can be improved in x86, arm and
-  x86-64.
 * Add support for RSA-PSS. This signature algorithm is seen in some
   passport CAs. Should be added in nettle and then in gnutls.
-* Move ECC code to nettle.
 - Add DTLS 1.2 support (RFC6347)
 - Add certificate image support (see RFC3709, RFC6170)
 - RFC 3280 compliant certificate path validation.
   - Reject extensions in v1 certificates.
-- Certificate chain validation improvements:
-  - Implement "correct" DN comparison (instead of memcmp).
-  - Support critical key usage KeyCertSign and cRLSign.
-  - Support path length constraints.
 - Perform signature calculation in PKCS #11 using not plain
   RSA but rather the combination of RSA-SHA256, RSA-SHA1 etc.
   That will allow the usage of tokens that do not allow plain RSA.
