@@ -121,7 +121,7 @@ developers do not have access to a particular piece of hardware or
 configuration to reproduce a scenario.  Notifying the developers about a 
 possible bug will greatly help the project.  
 
-If you believe you have found a bug, please report it to bug-gnutls@gnu.org
+If you believe you have found a bug, please report it to bugs@gnutls.org
 together with any applicable information. 
 
 Applicable information would include why the issue is a GnuTLS bug (if
