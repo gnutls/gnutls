@@ -904,6 +904,8 @@ GNUTLS_3_1_0 {
 	gnutls_privkey_sign_raw_data;
 	gnutls_privkey_status;
 	gnutls_sign_algorithm_get_client;
+	gnutls_certificate_set_x509_key_mem2;
+	gnutls_certificate_set_x509_key_file2;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

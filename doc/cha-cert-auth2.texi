@@ -328,7 +328,8 @@ import plain or encrypted keys and will auto-detect the encrypted key format.
 @showfuncdesc{gnutls_x509_privkey_import2}
 
 Any keys imported using those functions can be imported to a certificate
-credentials structure using @funcref{gnutls_certificate_set_key}.
+credentials structure using @funcref{gnutls_certificate_set_key}, or alternatively
+they can be directly imported using @funcref{gnutls_certificate_set_x509_key_file2}.
 
 @subsubheading @acronym{PKCS} #8 structures
 @cindex PKCS #8

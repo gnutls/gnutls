@@ -632,7 +632,8 @@ read_cert_mem (gnutls_certificate_credentials_t res, const void *cert,
  */
 static int
 read_key_mem (gnutls_certificate_credentials_t res,
-              const void *key, int key_size, gnutls_x509_crt_fmt_t type)
+              const void *key, int key_size, gnutls_x509_crt_fmt_t type,
+              const char* pass, unsigned int flags)
 {
   int ret;
   gnutls_datum_t tmp;
@@ -653,7 +654,7 @@ read_key_mem (gnutls_certificate_credentials_t res,
       if (res->pin.cb)
         gnutls_privkey_set_pin_function(privkey, res->pin.cb, res->pin.data);
 
-      ret = gnutls_privkey_import_x509_raw (privkey, &tmp, type, NULL, 0);
+      ret = gnutls_privkey_import_x509_raw (privkey, &tmp, type, pass, flags);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -912,7 +913,8 @@ read_cert_file (gnutls_certificate_credentials_t res,
  */
 static int
 read_key_file (gnutls_certificate_credentials_t res,
-               const char *keyfile, gnutls_x509_crt_fmt_t type)
+               const char *keyfile, gnutls_x509_crt_fmt_t type, const char* pass,
+               unsigned int flags)
 {
   int ret;
   size_t size;
@@ -934,7 +936,7 @@ read_key_file (gnutls_certificate_credentials_t res,
       return GNUTLS_E_FILE_ERROR;
     }
 
-  ret = read_key_mem (res, data, size, type);
+  ret = read_key_mem (res, data, size, type, pass, flags);
   free (data);
 
   return ret;
@@ -970,12 +972,49 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t res,
                                      const gnutls_datum_t * key,
                                      gnutls_x509_crt_fmt_t type)
 {
+  return gnutls_certificate_set_x509_key_mem2(res, cert, key, type, NULL, 0);
+}
+
+/**
+ * gnutls_certificate_set_x509_key_mem2:
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @cert: contains a certificate list (path) for the specified private key
+ * @key: is the private key, or %NULL
+ * @type: is PEM or DER
+ * @pass: is the key's password
+ * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
+ *
+ * This function sets a certificate/private key pair in the
+ * gnutls_certificate_credentials_t structure. This function may be called
+ * more than once, in case multiple keys/certificates exist for the
+ * server.
+ *
+ * Note that the keyUsage (2.5.29.15) PKIX extension in X.509 certificates
+ * is supported. This means that certificates intended for signing cannot
+ * be used for ciphersuites that require encryption.
+ *
+ * If the certificate and the private key are given in PEM encoding
+ * then the strings that hold their values must be null terminated.
+ *
+ * The @key may be %NULL if you are using a sign callback, see
+ * gnutls_sign_callback_set().
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ **/
+int
+gnutls_certificate_set_x509_key_mem2 (gnutls_certificate_credentials_t res,
+                                     const gnutls_datum_t * cert,
+                                     const gnutls_datum_t * key,
+                                     gnutls_x509_crt_fmt_t type,
+                                     const char* pass,
+                                     unsigned int flags)
+{
   int ret;
 
   /* this should be first
    */
   if ((ret = read_key_mem (res, key ? key->data : NULL,
-                           key ? key->size : 0, type)) < 0)
+                           key ? key->size : 0, type, pass, flags)) < 0)
     return ret;
 
   if ((ret = read_cert_mem (res, cert->data, cert->size, type)) < 0)
@@ -1306,11 +1345,45 @@ gnutls_certificate_set_x509_key_file (gnutls_certificate_credentials_t res,
                                       const char *keyfile,
                                       gnutls_x509_crt_fmt_t type)
 {
+  return gnutls_certificate_set_x509_key_file2(res, certfile, keyfile, type, NULL, 0);
+}
+
+/**
+ * gnutls_certificate_set_x509_key_file2:
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @certfile: is a file that containing the certificate list (path) for
+ *   the specified private key, in PKCS7 format, or a list of certificates
+ * @keyfile: is a file that contains the private key
+ * @type: is PEM or DER
+ * @pass: is the password of the key
+ * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
+ *
+ * This function sets a certificate/private key pair in the
+ * gnutls_certificate_credentials_t structure.  This function may be
+ * called more than once, in case multiple keys/certificates exist for
+ * the server.  For clients that need to send more than its own end
+ * entity certificate, e.g., also an intermediate CA cert, then the
+ * @certfile must contain the ordered certificate chain.
+ *
+ * This function can also accept URLs at @keyfile and @certfile. In that case it
+ * will import the private key and certificate indicated by the URLs. Note
+ * that the supported URLs are the ones indicated by gnutls_url_is_supported().
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ **/
+int
+gnutls_certificate_set_x509_key_file2 (gnutls_certificate_credentials_t res,
+                                      const char *certfile,
+                                      const char *keyfile,
+                                      gnutls_x509_crt_fmt_t type,
+                                      const char* pass,
+                                      unsigned int flags)
+{
   int ret;
 
   /* this should be first
    */
-  if ((ret = read_key_file (res, keyfile, type)) < 0)
+  if ((ret = read_key_file (res, keyfile, type, pass, flags)) < 0)
     return ret;
 
   if ((ret = read_cert_file (res, certfile, type)) < 0)

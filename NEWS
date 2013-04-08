@@ -18,6 +18,8 @@ This makes it consistent with verification with GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_R
 flag.
 
 ** API and ABI modifications:
+gnutls_certificate_set_x509_key_mem2: Added
+gnutls_certificate_set_x509_key_file2: Added
 gnutls_sign_algorithm_get_client: Added
 GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA: Added
 
