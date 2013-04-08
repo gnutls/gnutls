@@ -617,7 +617,7 @@ fail:
  * the native #gnutls_x509_privkey_t format, irrespective of the
  * input format. The input format is auto-detected.
  *
- * The supported formats are basic unencrypted key, PKCS #8, PKCS #12,
+ * The supported formats are basic unencrypted key, PKCS8, PKCS12,
  * and the openssl format.
  *
  * If the provided key is encrypted but no password was given, then
