@@ -357,7 +357,7 @@ session, as shown in @ref{ex:pkcs11-client}. In addition
 the following functions can be used to load PKCS #11 key and
 certificates by specifying a PKCS #11 URL instead of a filename.
 
-@showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_key_file}
+@showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_key_file2}
 @showfuncdesc{gnutls_certificate_set_x509_system_trust}
 
 @include invoke-p11tool.texi
@@ -440,7 +440,7 @@ done using @funcref{gnutls_tpm_privkey_generate}.
 @subsubheading Importing keys
 
 The TPM keys can be used directly by the abstract key types and do not require
-any special structures. Moreover functions like @funcref{gnutls_certificate_set_x509_key_file}
+any special structures. Moreover functions like @funcref{gnutls_certificate_set_x509_key_file2}
 can access TPM URLs.
 
 @showfuncB{gnutls_privkey_import_tpm_raw,gnutls_pubkey_import_tpm_raw}

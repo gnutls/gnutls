@@ -1274,10 +1274,25 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                           const char *keyfile,
                                           gnutls_x509_crt_fmt_t type);
 
+  int
+    gnutls_certificate_set_x509_key_file2 (gnutls_certificate_credentials_t
+                                          res, const char *certfile,
+                                          const char *keyfile,
+                                          gnutls_x509_crt_fmt_t type,
+                                          const char* pass,
+                                          unsigned int flags);
+
   int gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
                                            res, const gnutls_datum_t * cert,
                                            const gnutls_datum_t * key,
                                            gnutls_x509_crt_fmt_t type);
+
+  int gnutls_certificate_set_x509_key_mem2 (gnutls_certificate_credentials_t
+                                           res, const gnutls_datum_t * cert,
+                                           const gnutls_datum_t * key,
+                                           gnutls_x509_crt_fmt_t type,
+                                           const char* pass,
+                                           unsigned int flags);
 
   void gnutls_certificate_send_x509_rdn_sequence (gnutls_session_t session,
                                                   int status);

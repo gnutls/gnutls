@@ -421,11 +421,11 @@ certificate certifies the one before it. The trusted authority's
 certificate need not to be included since the peer should possess it
 already.
 
-@showfuncC{gnutls_certificate_set_x509_key_mem,gnutls_certificate_set_x509_key,gnutls_certificate_set_x509_key_file}
+@showfuncC{gnutls_certificate_set_x509_key_mem2,gnutls_certificate_set_x509_key,gnutls_certificate_set_x509_key_file2}
 
 @showfuncC{gnutls_certificate_set_openpgp_key_mem,gnutls_certificate_set_openpgp_key,gnutls_certificate_set_openpgp_key_file}
 
-Note however, that since functions like @funcref{gnutls_certificate_set_x509_key_file}
+Note however, that since functions like @funcref{gnutls_certificate_set_x509_key_file2}
 may accept URLs that specify objects stored in token, another important 
 function is @funcref{gnutls_certificate_set_pin_function}. That
 allows setting a callback function to retrieve a PIN if the input keys are

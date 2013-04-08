@@ -906,6 +906,8 @@ GNUTLS_3_1_0 {
 	gnutls_cipher_get_iv_size;
 	gnutls_hmac_set_nonce;
 	gnutls_sign_algorithm_get_client;
+	gnutls_certificate_set_x509_key_mem2;
+	gnutls_certificate_set_x509_key_file2;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
