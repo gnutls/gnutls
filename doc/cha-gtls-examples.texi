@@ -253,6 +253,7 @@ A small tool to generate OCSP requests.
 * Checking for an alert::
 * X.509 certificate parsing example::
 * Listing the ciphersuites in a priority string::
+* PKCS #12 structure generation example::
 @end menu
 
 @node Checking for an alert
@@ -280,6 +281,14 @@ This is a small program to list the enabled ciphersuites by a
 priority string.
 
 @verbatiminclude examples/print-ciphersuites.c
+
+@node PKCS #12 structure generation example
+@subsection PKCS #12 structure generation example
+
+This small program demonstrates the usage of the PKCS #12 API, by generating
+such a structure.
+
+@verbatiminclude examples/ex-pkcs12.c
 
 @node XSSL examples
 @section XSSL examples

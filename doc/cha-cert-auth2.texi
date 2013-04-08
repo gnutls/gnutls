@@ -323,9 +323,12 @@ well as a trusted CA certificate.
 Generic and higher level private key import functions are available, that
 import plain or encrypted keys and will auto-detect the encrypted key format.
 
+@showfuncdesc{gnutls_privkey_import_x509_raw}
+
 @showfuncdesc{gnutls_x509_privkey_import2}
 
-@showfuncdesc{gnutls_privkey_import_x509_raw}
+Any keys imported using those functions can be imported to a certificate
+credentials structure using @funcref{gnutls_certificate_set_key}.
 
 @subsubheading @acronym{PKCS} #8 structures
 @cindex PKCS #8
@@ -346,7 +349,9 @@ be decrypted.
 
 A @acronym{PKCS} #12 structure @xcite{PKCS12} usually contains a user's
 private keys and certificates. It is commonly used in browsers to
-export and import the user's identities.
+export and import the user's identities. A file containing such a key can 
+be directly imported to a certificate credentials structure by using 
+@funcref{gnutls_certificate_set_x509_simple_pkcs12_file}.
 
 In @acronym{GnuTLS} the @acronym{PKCS} #12 structures are handled
 using the @code{gnutls_pkcs12_t} type. This is an abstract type that
@@ -366,12 +371,10 @@ functions below.
 @showfuncC{gnutls_pkcs12_bag_get_data,gnutls_pkcs12_bag_get_key_id,gnutls_pkcs12_bag_get_friendly_name}
 
 The functions below are used to generate a PKCS #12 structure. An example
-of their usage is also shown.
+of their usage is shown at @ref{PKCS #12 structure generation example}.
 
 @showfuncC{gnutls_pkcs12_set_bag,gnutls_pkcs12_bag_encrypt,gnutls_pkcs12_generate_mac}
 @showfuncE{gnutls_pkcs12_bag_set_data,gnutls_pkcs12_bag_set_crl,gnutls_pkcs12_bag_set_crt,gnutls_pkcs12_bag_set_key_id,gnutls_pkcs12_bag_set_friendly_name}
-
-@verbatiminclude examples/ex-pkcs12.c
 
 @subsubheading OpenSSL encrypted keys
 @cindex OpenSSL encrypted keys

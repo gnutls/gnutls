@@ -920,7 +920,7 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure. 
  *
- * The supported formats are basic unencrypted key, PKCS #8, PKCS #12, 
+ * The supported formats are basic unencrypted key, PKCS8, PKCS12, 
  * and the openssl format.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a

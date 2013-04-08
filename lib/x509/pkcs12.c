@@ -1383,19 +1383,19 @@ skip:
 
 /**
  * gnutls_pkcs12_simple_parse:
- * @p12: the PKCS#12 blob.
- * @password: optional password used to decrypt PKCS#12 blob, bags and keys.
+ * @p12: the PKCS12 blob.
+ * @password: optional password used to decrypt PKCS12 blob, bags and keys.
  * @key: a structure to store the parsed private key.
  * @chain: the corresponding to key certificate chain (may be %NULL)
  * @chain_len: will be updated with the number of additional (may be %NULL)
  * @extra_certs: optional pointer to receive an array of additional
- *               certificates found in the PKCS#12 blob (may be %NULL).
+ *               certificates found in the PKCS12 blob (may be %NULL).
  * @extra_certs_len: will be updated with the number of additional
  *                   certs (may be %NULL).
  * @crl: an optional structure to store the parsed CRL (may be %NULL).
  * @flags: should be zero or one of GNUTLS_PKCS12_SP_*
  *
- * This function parses a PKCS#12 blob in @p12blob and extracts the
+ * This function parses a PKCS12 blob in @p12blob and extracts the
  * private key, the corresponding certificate chain, and any additional
  * certificates and a CRL.
  *
@@ -1403,13 +1403,13 @@ skip:
  * and both may be set to %NULL. If either is non-%NULL, then both must
  * be set.
  * 
- * Encrypted PKCS#12 bags and PKCS#8 private keys are supported.  However,
+ * Encrypted PKCS12 bags and PKCS8 private keys are supported.  However,
  * only password based security, and the same password for all
  * operations, are supported.
  *
- * A PKCS#12 file may contain many keys and/or certificates, and there
+ * A PKCS12 file may contain many keys and/or certificates, and there
  * is no way to identify which key/certificate pair you want.  You
- * should make sure the PKCS#12 file only contain one key/certificate
+ * should make sure the PKCS12 file only contain one key/certificate
  * pair and/or one CRL.
  *
  * It is believed that the limitations of this function are acceptable
