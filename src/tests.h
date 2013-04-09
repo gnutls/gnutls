@@ -25,8 +25,6 @@ typedef enum
 
 test_code_t test_server (gnutls_session_t state);
 test_code_t test_record_padding (gnutls_session_t state);
-test_code_t test_export (gnutls_session_t state);
-test_code_t test_export_info (gnutls_session_t state);
 test_code_t test_hello_extension (gnutls_session_t state);
 test_code_t test_heartbeat_extension (gnutls_session_t state);
 test_code_t test_small_records (gnutls_session_t state);
@@ -39,7 +37,6 @@ test_code_t test_md5 (gnutls_session_t state);
 test_code_t test_sha (gnutls_session_t state);
 test_code_t test_3des (gnutls_session_t state);
 test_code_t test_arcfour (gnutls_session_t state);
-test_code_t test_arcfour_40 (gnutls_session_t state);
 test_code_t test_tls1 (gnutls_session_t state);
 test_code_t test_safe_renegotiation (gnutls_session_t state);
 test_code_t test_safe_renegotiation_scsv (gnutls_session_t state);
