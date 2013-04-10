@@ -93,8 +93,10 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
  * given time frame in milliseconds. The callback should return 0 on 
  * timeout, a positive number if data can be received, and -1 on error.
  * You'll need to override this function if select() is not suitable
- * for the provided transport calls. 
- * The callback function is used in DTLS only.
+ * for the provided transport calls.
+ *
+ * As with select(), if the timeout value is zero the callback should return
+ * zero if no data are immediately available.
  *
  * @gnutls_pull_timeout_func is of the form,
  * int (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);
