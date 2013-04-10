@@ -404,6 +404,7 @@ and they will be discussed in the subsections that follow.
 * Safe renegotiation::
 * OCSP status request::
 * SRTP::
+* Application Layer Protocol Negotiation (ALPN)::
 @end menu
 
 @node Maximum fragment length negotiation
@@ -621,6 +622,20 @@ To obtain the negotiated keys use the function below.
 Other helper functions are listed below.
 
 @showfuncC{gnutls_srtp_get_selected_profile,gnutls_srtp_get_profile_name,gnutls_srtp_get_profile_id}
+
+@node Application Layer Protocol Negotiation (ALPN)
+@subsection Application Layer Protocol Negotiation (ALPN)
+@cindex ALPN
+@cindex Application Layer Protocol Negotiation
+
+The TLS protocol was extended in @code{draft-ietf-tls-applayerprotoneg-00} 
+to provide the application layer a method of
+negotiating the application protocol version. This allows for negotiation
+of the application protocol during the TLS handshake, thus reducing
+round-trips. The application protocol is described by an opaque
+string. To enable, use the following functions.
+
+@showfuncB{gnutls_alpn_set_protocols,gnutls_alpn_get_selected_protocol}
 
 @include sec-tls-app.texi
 
