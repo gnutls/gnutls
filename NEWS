@@ -12,6 +12,9 @@ See the end for copying conditions.
 
 ** libgnutls: Added support for DTLS 1.2.
 
+** libgnutls: Added support for the Application Layer Protocol Negotiation
+(ALPN) extension.
+
 ** libgnutls: Removed support for the RSA-EXPORT ciphersuites.
 
 ** API and ABI modifications:
