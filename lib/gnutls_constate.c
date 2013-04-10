@@ -47,8 +47,6 @@ static const int cliwrite_length = sizeof (cliwrite) - 1;
 static const char servwrite[] = "server write key";
 static const int servwrite_length = sizeof (servwrite) - 1;
 
-#define EXPORT_FINAL_KEY_SIZE 16
-
 /* This function is to be called after handshake, when master_secret,
  *  client_random and server_random have been initialized. 
  * This function creates the keys and stores them into pending session.
@@ -135,8 +133,6 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
 
   if (key_size > 0)
     {
-      uint8_t key1[EXPORT_FINAL_KEY_SIZE];
-      uint8_t key2[EXPORT_FINAL_KEY_SIZE];
       uint8_t *client_write_key, *server_write_key;
       int client_write_key_size, server_write_key_size;
 
