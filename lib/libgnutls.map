@@ -908,6 +908,8 @@ GNUTLS_3_1_0 {
 	gnutls_sign_algorithm_get_client;
 	gnutls_certificate_set_x509_key_mem2;
 	gnutls_certificate_set_x509_key_file2;
+	gnutls_alpn_get_selected_protocol;
+	gnutls_alpn_set_protocols;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

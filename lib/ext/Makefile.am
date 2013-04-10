@@ -42,6 +42,10 @@ libgnutls_ext_la_SOURCES = max_record.c cert_type.c \
 	status_request.h status_request.c new_record_padding.c \
 	new_record_padding.h
 
+if ENABLE_ALPN
+libgnutls_ext_la_SOURCES += alpn.c alpn.h
+endif
+
 if ENABLE_DTLS_SRTP
 libgnutls_ext_la_SOURCES += srtp.c srtp.h
 endif

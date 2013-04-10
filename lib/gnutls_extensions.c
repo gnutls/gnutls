@@ -40,6 +40,7 @@
 #include <ext/ecc.h>
 #include <ext/status_request.h>
 #include <ext/srtp.h>
+#include <ext/alpn.h>
 #include <ext/new_record_padding.h>
 #include <gnutls_num.h>
 
@@ -364,6 +365,12 @@ _gnutls_ext_init (void)
 
 #ifdef ENABLE_DTLS_SRTP
   ret = _gnutls_ext_register (&ext_mod_srtp);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
+#endif
+
+#ifdef ENABLE_ALPN
+  ret = _gnutls_ext_register (&ext_mod_alpn);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 #endif
