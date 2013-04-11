@@ -71,7 +71,7 @@ struct nettle_mac_ctx
     struct hmac_sha512_ctx sha512;
     struct hmac_sha1_ctx sha1;
 #ifdef HAVE_UMAC
-    struct umac_aes_ctx umac;
+    struct umac96_ctx umac;
 #endif
   } ctx;
   
@@ -87,7 +87,7 @@ struct nettle_mac_ctx
     struct hmac_sha512_ctx sha512;
     struct hmac_sha1_ctx sha1;
 #ifdef HAVE_UMAC
-    struct umac_aes_ctx umac;
+    struct umac96_ctx umac;
 #endif
   } init_ctx;
   void *ctx_ptr;
@@ -98,6 +98,14 @@ struct nettle_mac_ctx
   set_key_func setkey;
   set_nonce_func setnonce;
 };
+
+#ifdef HAVE_UMAC
+static void
+_wrap_umac96_set_key(void* ctx, unsigned len, const uint8_t* key)
+{
+	return umac96_set_key(ctx, key);
+}
+#endif
 
 static int _mac_ctx_init(gnutls_mac_algorithm_t algo, struct nettle_mac_ctx *ctx)
 {
@@ -148,22 +156,12 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo, struct nettle_mac_ctx *ctx
       break;
 #ifdef HAVE_UMAC
     case GNUTLS_MAC_UMAC_96:
-      ctx->update = (update_func) umac_aes_update;
-      ctx->digest = (digest_func) umac_aes_digest;
-      ctx->setkey = (set_key_func) umac_aes_set_key;
-      ctx->setnonce = (set_nonce_func) umac_aes_set_nonce;
+      ctx->update = (update_func) umac96_update;
+      ctx->digest = (digest_func) umac96_digest;
+      ctx->setkey = _wrap_umac96_set_key;
+      ctx->setnonce = (set_nonce_func) umac96_set_nonce;
       ctx->ctx_ptr = &ctx->ctx.umac;
-      umac_aes_init(ctx->ctx_ptr, 12);
       ctx->length = 12;
-      break;
-    case GNUTLS_MAC_UMAC_128:
-      ctx->update = (update_func) umac_aes_update;
-      ctx->digest = (digest_func) umac_aes_digest;
-      ctx->setkey = (set_key_func) umac_aes_set_key;
-      ctx->setnonce = (set_nonce_func) umac_aes_set_nonce;
-      ctx->ctx_ptr = &ctx->ctx.umac;
-      umac_aes_init(ctx->ctx_ptr, 16);
-      ctx->length = 16;
       break;
 #endif
     default:
@@ -208,7 +206,6 @@ static int wrap_nettle_mac_exists(gnutls_mac_algorithm_t algo)
     case GNUTLS_MAC_SHA512:
 #ifdef HAVE_UMAC
     case GNUTLS_MAC_UMAC_96:
-    case GNUTLS_MAC_UMAC_128:
 #endif
       return 1;
     default:

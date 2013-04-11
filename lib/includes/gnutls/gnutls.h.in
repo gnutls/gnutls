@@ -235,7 +235,6 @@ extern "C"
          gnutls_digest_algorithm_t. */
     GNUTLS_MAC_AEAD = 200, /* indicates that MAC is on the cipher */
     GNUTLS_MAC_UMAC_96 = 201,
-    GNUTLS_MAC_UMAC_128 = 202,
   } gnutls_mac_algorithm_t;
 
 /**
