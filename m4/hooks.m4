@@ -102,7 +102,7 @@ else
 fi
   AM_CONDITIONAL(ENABLE_NETTLE, test "$cryptolib" = "nettle")
   
-  AC_CHECK_LIB([nettle], [nettle_umac96_set_nonce], [AC_DEFINE([HAVE_UMAC], [], [UMAC detected in nettle])])
+  AC_CHECK_LIB([nettle], [nettle_umac96_set_nonce], [AC_DEFINE([HAVE_NETTLE27], [], [UMAC detected in nettle])])
 
   AC_ARG_WITH(included-libtasn1,
     AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),

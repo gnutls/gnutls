@@ -119,7 +119,7 @@ static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
     case GNUTLS_CIPHER_DES_CBC:
     case GNUTLS_CIPHER_ARCFOUR_128:
     case GNUTLS_CIPHER_SALSA20_256:
-#ifdef HAVE_UMAC
+#ifdef HAVE_NETTLE27
     case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
 #endif
     case GNUTLS_CIPHER_ARCFOUR_40:
@@ -210,7 +210,7 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx, int enc)
       ctx->ctx_ptr = &ctx->ctx.salsa20;
       ctx->block_size = 1;
       break;
-#ifdef HAVE_UMAC
+#ifdef HAVE_NETTLE27
     case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
       ctx->encrypt = stream_encrypt;
       ctx->decrypt = stream_encrypt;

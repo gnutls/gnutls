@@ -440,20 +440,24 @@ void benchmark_tls(int debug_level, int ciphers)
       {
         printf("Testing throughput in cipher/MAC combinations:\n\n");
 
+#ifdef HAVE_NETTLE27
         test_ciphersuite(PRIO_SALSA20_256_UMAC_96, 1400);
         test_ciphersuite(PRIO_SALSA20_256_SHA1, 1400);
         test_ciphersuite(PRIO_ESTREAM_SALSA20_256_UMAC_96, 1400);
         test_ciphersuite(PRIO_ESTREAM_SALSA20_256_SHA1, 1400);
+#endif
         test_ciphersuite(PRIO_ARCFOUR_128_SHA1, 1400);
         test_ciphersuite(PRIO_ARCFOUR_128_MD5, 1400);
         test_ciphersuite(PRIO_AES_GCM, 1400);
         test_ciphersuite(PRIO_AES_CBC_SHA1, 1400);
         test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 1400);
 
+#ifdef HAVE_NETTLE27
         test_ciphersuite(PRIO_SALSA20_256_UMAC_96, 15 * 1024);
         test_ciphersuite(PRIO_SALSA20_256_SHA1, 15*1024);
         test_ciphersuite(PRIO_ESTREAM_SALSA20_256_UMAC_96, 15 * 1024);
         test_ciphersuite(PRIO_ESTREAM_SALSA20_256_SHA1, 15*1024);
+#endif
         test_ciphersuite(PRIO_ARCFOUR_128_SHA1, 15 * 1024);
         test_ciphersuite(PRIO_ARCFOUR_128_MD5, 15 * 1024);
         test_ciphersuite(PRIO_AES_GCM, 15 * 1024);
