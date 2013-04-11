@@ -119,6 +119,9 @@ static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
     case GNUTLS_CIPHER_DES_CBC:
     case GNUTLS_CIPHER_ARCFOUR_128:
     case GNUTLS_CIPHER_SALSA20_256:
+#ifdef HAVE_UMAC
+    case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
+#endif
     case GNUTLS_CIPHER_ARCFOUR_40:
     case GNUTLS_CIPHER_RC2_40_CBC:
       return 1;
@@ -207,6 +210,16 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx, int enc)
       ctx->ctx_ptr = &ctx->ctx.salsa20;
       ctx->block_size = 1;
       break;
+#ifdef HAVE_UMAC
+    case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
+      ctx->encrypt = stream_encrypt;
+      ctx->decrypt = stream_encrypt;
+      ctx->i_encrypt = (nettle_crypt_func *) salsa20r12_crypt;
+      ctx->i_decrypt = (nettle_crypt_func *) salsa20r12_crypt;
+      ctx->ctx_ptr = &ctx->ctx.salsa20;
+      ctx->block_size = 1;
+      break;
+#endif
     case GNUTLS_CIPHER_RC2_40_CBC:
       ctx->encrypt = cbc_encrypt;
       ctx->decrypt = cbc_decrypt;
@@ -290,6 +303,7 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
       arcfour_set_key (ctx->ctx_ptr, keysize, key);
       break;
     case GNUTLS_CIPHER_SALSA20_256:
+    case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
       salsa20_set_key (ctx->ctx_ptr, keysize, key);
       break;
     case GNUTLS_CIPHER_RC2_40_CBC:
@@ -318,6 +332,7 @@ struct nettle_cipher_ctx *ctx = _ctx;
       gcm_aes_set_iv(&ctx->ctx.aes_gcm, GCM_DEFAULT_NONCE_SIZE, iv);
       break;
     case GNUTLS_CIPHER_SALSA20_256:
+    case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
       if (ivsize != SALSA20_IV_SIZE)
         return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
