@@ -35,7 +35,9 @@ functions are provided to set the associated data and retrieve the authenticatio
 @cindex public key algorithms
 
 Public key cryptography algorithms such as RSA, DSA and ECDSA, can be
-accessed using the abstract key API in @ref{Abstract key types}.
+accessed using the abstract key API in @ref{Abstract key types}. This
+is a high level API with the advantage of transparently handling keys
+in memory and keys present in smart cards.
 
 @node Hash and HMAC functions
 @section Hash and HMAC functions
