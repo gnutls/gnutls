@@ -19,6 +19,8 @@ No changes since last version.
 ** libgnutls: Allow ECC when in SSL 3.0 to work-around a bug in certain
 openssl versions.
 
+** libgnutls: Added priority string VERS-DTLS-ALL.
+
 ** libgnutls: When in compatibility mode allow for a wrong version in the
 RSA PMS.
 
