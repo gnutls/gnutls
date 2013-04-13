@@ -8,14 +8,15 @@ providing symmetric crypto, hash and HMAC algorithms, as well access
 to the random number generation.
 
 @menu
-* Encryption algorithms::
+* Symmetric algorithms::
+* Public key algorithms::
 * Hash and HMAC functions::
 * Random number generation::
 @end menu
 
-@node Encryption algorithms
-@section Encryption algorithms
-@cindex encryption algorithms
+@node Symmetric algorithms
+@section Symmetric algorithms
+@cindex symmetric algorithms
 @cindex symmetric cryptography
 
 The available functions to access symmetric crypto algorithms operations
@@ -28,6 +29,13 @@ In order to support authenticated encryption with associated data (AEAD) algorit
 functions are provided to set the associated data and retrieve the authentication tag.
 
 @showfuncB{gnutls_cipher_add_auth,gnutls_cipher_tag}
+
+@node Public key algorithms
+@section Public key algorithms
+@cindex public key algorithms
+
+Public key cryptography algorithms such as RSA, DSA and ECDSA, can be
+accessed using the abstract key API in @ref{Abstract key types}.
 
 @node Hash and HMAC functions
 @section Hash and HMAC functions
