@@ -30,9 +30,7 @@
 #include <nettle/md2.h>
 #include <nettle/sha.h>
 #include <nettle/hmac.h>
-#ifdef HAVE_NETTLE27
-# include <nettle/umac.h>
-#endif
+#include <nettle/umac.h>
 
 typedef void (*update_func) (void *, unsigned, const uint8_t *);
 typedef void (*digest_func) (void *, unsigned, uint8_t *);
@@ -70,9 +68,7 @@ struct nettle_mac_ctx
     struct hmac_sha384_ctx sha384;
     struct hmac_sha512_ctx sha512;
     struct hmac_sha1_ctx sha1;
-#ifdef HAVE_NETTLE27
     struct umac96_ctx umac;
-#endif
   } ctx;
   
   /* this is the context just after
@@ -86,9 +82,7 @@ struct nettle_mac_ctx
     struct hmac_sha384_ctx sha384;
     struct hmac_sha512_ctx sha512;
     struct hmac_sha1_ctx sha1;
-#ifdef HAVE_NETTLE27
     struct umac96_ctx umac;
-#endif
   } init_ctx;
   void *ctx_ptr;
   gnutls_mac_algorithm_t algo;
@@ -99,13 +93,11 @@ struct nettle_mac_ctx
   set_nonce_func set_nonce;
 };
 
-#ifdef HAVE_NETTLE27
 static void
 _wrap_umac96_set_key(void* ctx, unsigned len, const uint8_t* key)
 {
 	return umac96_set_key(ctx, key);
 }
-#endif
 
 static int _mac_ctx_init(gnutls_mac_algorithm_t algo, struct nettle_mac_ctx *ctx)
 {
@@ -154,7 +146,6 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo, struct nettle_mac_ctx *ctx
       ctx->ctx_ptr = &ctx->ctx.sha512;
       ctx->length = SHA512_DIGEST_SIZE;
       break;
-#ifdef HAVE_NETTLE27
     case GNUTLS_MAC_UMAC_96:
       ctx->update = (update_func) umac96_update;
       ctx->digest = (digest_func) umac96_digest;
@@ -163,7 +154,6 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo, struct nettle_mac_ctx *ctx
       ctx->ctx_ptr = &ctx->ctx.umac;
       ctx->length = 12;
       break;
-#endif
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -204,9 +194,7 @@ static int wrap_nettle_mac_exists(gnutls_mac_algorithm_t algo)
     case GNUTLS_MAC_SHA256:
     case GNUTLS_MAC_SHA384:
     case GNUTLS_MAC_SHA512:
-#ifdef HAVE_NETTLE27
     case GNUTLS_MAC_UMAC_96:
-#endif
       return 1;
     default:
       return 0;

@@ -89,12 +89,12 @@ dnl    fi
   AC_MSG_CHECKING([whether to use nettle])
 if test "$cryptolib" = "nettle";then
   AC_MSG_RESULT(yes)
-    AC_LIB_HAVE_LINKFLAGS([nettle], [hogweed gmp], [#include <nettle/rsa.h>],
-                          [rsa_decrypt_tr (0,0,0,0,0,0,0)])
+    AC_LIB_HAVE_LINKFLAGS([nettle], [hogweed gmp], [#include <nettle/umac.h>],
+                          [nettle_umac96_set_nonce (0,0,0)])
     if test "$ac_cv_libnettle" != yes; then
       AC_MSG_ERROR([[
   *** 
-  *** Libnettle 2.5 was not found. Note that you must compile nettle with gmp support.
+  *** Libnettle 2.7 was not found. Note that you must compile nettle with gmp support.
   ]])
     fi
 else
@@ -102,8 +102,6 @@ else
 fi
   AM_CONDITIONAL(ENABLE_NETTLE, test "$cryptolib" = "nettle")
   
-  AC_CHECK_LIB([nettle], [nettle_umac96_set_nonce], [AC_DEFINE([HAVE_NETTLE27], [], [UMAC detected in nettle])])
-
   AC_ARG_WITH(included-libtasn1,
     AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),
       included_libtasn1=$withval,

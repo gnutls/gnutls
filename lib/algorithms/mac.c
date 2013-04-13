@@ -45,9 +45,7 @@ static const gnutls_hash_entry hash_algorithms[] = {
   {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 0, 1},
   {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 0, 1},
   {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 0, 1},
-#ifdef HAVE_NETTLE27
   {"UMAC-96", NULL, GNUTLS_MAC_UMAC_96, 12, 16, 8, 0, 1},
-#endif
   {"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 0, 0, 1, 1},
   {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0, 0, 0},     /* not used as MAC */
   {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 20, 0, 0, 1},
