@@ -286,6 +286,11 @@ static const int protocol_priority[] = {
   0
 };
 
+static const int dtls_protocol_priority[] = {
+  GNUTLS_DTLS1_0,
+  0
+};
+
 static const int protocol_priority_suiteb[] = {
   GNUTLS_TLS1_2,
   0
@@ -925,6 +930,11 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
                 {
                   bulk_fn (&(*priority_cache)->protocol,
                                  protocol_priority);
+                }
+              else if (strncasecmp (&broken_list[i][1], "VERS-DTLS-ALL", 13) == 0)
+                {
+                  bulk_fn (&(*priority_cache)->protocol,
+                                 dtls_protocol_priority);
                 }
               else
                 {

@@ -970,7 +970,8 @@ COMP-NULL, COMP-DEFLATE. Catch all is COMP-ALL.
 
 @item TLS versions @tab
 VERS-SSL3.0, VERS-TLS1.0, VERS-TLS1.1,
-VERS-TLS1.2, VERS-DTLS1.0. Catch all is VERS-TLS-ALL.
+VERS-TLS1.2, VERS-DTLS1.0. 
+Catch all is VERS-TLS-ALL and VERS-DTLS-ALL.
 
 @item Signature algorithms @tab
 SIGN-RSA-SHA1, SIGN-RSA-SHA224, 
