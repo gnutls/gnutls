@@ -8,7 +8,7 @@ See the end for copying conditions.
 
 ** libgnutls: Added Salsa20 cipher (experimental)
 
-** libgnutls: Added UMAC-96 and UMAC-128 MACs (experimental)
+** libgnutls: Added UMAC-96 MAC (experimental)
 
 ** libgnutls: Added support for DTLS 1.2.
 
