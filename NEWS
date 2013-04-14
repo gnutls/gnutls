@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.1.11 (unreleased)
 
+** libgnutls: Added support for the Application Layer Protocol Negotiation
+(ALPN) extension.
+
 ** libgnutls: Added priority string VERS-DTLS-ALL.
 
 ** libgnutls: When in compatibility mode allow for a wrong version in the
@@ -23,6 +26,8 @@ flag.
 gnutls_certificate_set_x509_key_mem2: Added
 gnutls_certificate_set_x509_key_file2: Added
 gnutls_sign_algorithm_get_client: Added
+gnutls_alpn_get_selected_protocol: Added
+gnutls_alpn_set_protocols: Added
 GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA: Added
 
 
