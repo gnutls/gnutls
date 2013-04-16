@@ -345,6 +345,7 @@ wrap_padlock_hmac_fast (gnutls_mac_algorithm_t algo,
           wrap_padlock_hmac_update (&ctx, text, text_size);
 
           wrap_padlock_hmac_output (&ctx, digest, ctx.length);
+          wrap_padlock_hmac_deinit (&ctx);
       }
 
     return 0;
