@@ -361,6 +361,7 @@ int wrap_padlock_hash_fast(gnutls_digest_algorithm_t algo,
       wrap_padlock_hash_update(&ctx, text, text_size);
 
       wrap_padlock_hash_output(&ctx, digest, ctx.length);
+      wrap_padlock_hash_deinit(&ctx);
     }
   
   return 0;
