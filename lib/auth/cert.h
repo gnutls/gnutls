@@ -87,6 +87,8 @@ typedef struct gnutls_certificate_credentials_st
   gnutls_certificate_verify_function *verify_callback;
 
   struct pin_info_st pin;
+  /* temporarily hold the PIN if set_key_file2() is used with a PIN */
+  char pin_tmp[GNUTLS_PKCS11_MAX_PIN_LEN];
   
   /* OCSP */
   gnutls_status_request_ocsp_func ocsp_func;

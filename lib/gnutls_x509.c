@@ -626,6 +626,20 @@ read_cert_mem (gnutls_certificate_credentials_t res, const void *cert,
   return ret;
 }
 
+static int tmp_pin_cb(void* userdata, int attempt, const char *token_url, const char *token_label,
+	unsigned int flags, char *pin, size_t pin_max)
+{
+const char* tmp_pin = userdata;
+
+  if (attempt == 0) 
+    {
+      snprintf(pin, pin_max, "%s", tmp_pin);
+      return 0;
+    }
+  
+  return -1;
+}
+
 /* Reads a PEM encoded PKCS-1 RSA/DSA private key from memory.  Type
  * indicates the certificate format.  KEY can be NULL, to indicate
  * that GnuTLS doesn't know the private key.
@@ -653,6 +667,11 @@ read_key_mem (gnutls_certificate_credentials_t res,
       
       if (res->pin.cb)
         gnutls_privkey_set_pin_function(privkey, res->pin.cb, res->pin.data);
+      else if (pass != NULL)
+        {
+          snprintf(res->pin_tmp, sizeof(res->pin_tmp), "%s", pass);
+          gnutls_privkey_set_pin_function(privkey, tmp_pin_cb, res->pin_tmp);
+        }
 
       ret = gnutls_privkey_import_x509_raw (privkey, &tmp, type, pass, flags);
       if (ret < 0)
