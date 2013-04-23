@@ -18,7 +18,6 @@ Current list:
    2.5.29.30: Name Constraints
 * Add support for RSA-PSS. This signature algorithm is seen in some
   passport CAs. Should be added in nettle and then in gnutls.
-- Add DTLS 1.2 support (RFC6347)
 - Add certificate image support (see RFC3709, RFC6170)
 - RFC 3280 compliant certificate path validation.
   - Reject extensions in v1 certificates.
