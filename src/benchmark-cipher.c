@@ -69,8 +69,8 @@ cipher_mac_bench (int algo, int mac_algo, int size)
   key.data = _key;
   key.size = keysize;
 
-  printf ("Checking %s with %s (%dkb payload)...\n", gnutls_cipher_get_name (algo),
-      gnutls_mac_get_name(mac_algo), size);
+  printf ("%16s-%s ", gnutls_cipher_get_name (algo),
+      gnutls_mac_get_name(mac_algo));
   fflush (stdout);
 
   start_benchmark(&st);
@@ -102,12 +102,11 @@ cipher_mac_bench (int algo, int mac_algo, int size)
   gnutls_cipher_deinit (ctx);
   gnutls_hmac_deinit(mac_ctx, NULL);
 
-  stop_benchmark (&st, NULL);
+  stop_benchmark (&st, NULL, 1);
 
 leave:
   free (_key);
   free (_iv);
-
 }
 
 
@@ -140,8 +139,7 @@ cipher_bench (int algo, int size, int aead)
   key.data = _key;
   key.size = keysize;
 
-  printf ("Checking %s (%dkb payload)...\n", gnutls_cipher_get_name (algo),
-          size);
+  printf ("%16s ", gnutls_cipher_get_name (algo));
   fflush (stdout);
 
   start_benchmark(&st);
@@ -165,7 +163,7 @@ cipher_bench (int algo, int size, int aead)
 
   gnutls_cipher_deinit (ctx);
 
-  stop_benchmark(&st, NULL);
+  stop_benchmark(&st, NULL, 1);
 
 leave:
   free (_key);
@@ -185,7 +183,7 @@ mac_bench (int algo, int size)
     return;
   memset (_key, 0xf0, blocksize);
 
-  printf ("Checking %s (%dkb payload)...\n", gnutls_mac_get_name (algo), size);
+  printf ("%16s ", gnutls_mac_get_name (algo));
   fflush (stdout);
 
   start_benchmark(&st);
@@ -197,7 +195,7 @@ mac_bench (int algo, int size)
     }
   while (benchmark_must_finish == 0);
 
-  stop_benchmark(&st, NULL);
+  stop_benchmark(&st, NULL, 1);
 
   free (_key);
 }
@@ -206,28 +204,31 @@ void benchmark_cipher (int init, int debug_level)
 {
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug_level);
+  int size = 16;
+
   if (init)
     {
       gnutls_global_init ();
       gnutls_rnd( GNUTLS_RND_NONCE, data, sizeof(data));
     }
 
-  cipher_mac_bench ( GNUTLS_CIPHER_SALSA20_256, GNUTLS_MAC_SHA1, 16);
-  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, 16);
-  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256, 16);
-  cipher_bench ( GNUTLS_CIPHER_AES_128_GCM, 16, 1);
+  printf("Checking ciphers, payload size: %u\n", size*1024);
+  cipher_mac_bench ( GNUTLS_CIPHER_SALSA20_256, GNUTLS_MAC_SHA1, size);
+  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, size);
+  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256, size);
+  cipher_bench ( GNUTLS_CIPHER_AES_128_GCM, size, 1);
 
-  mac_bench (GNUTLS_MAC_SHA1, 16);
-  mac_bench (GNUTLS_MAC_SHA256, 16);
-  mac_bench (GNUTLS_MAC_SHA512, 16);
+  mac_bench (GNUTLS_MAC_SHA1, size);
+  mac_bench (GNUTLS_MAC_SHA256, size);
+  mac_bench (GNUTLS_MAC_SHA512, size);
 
-  cipher_bench (GNUTLS_CIPHER_3DES_CBC, 16, 0);
+  cipher_bench (GNUTLS_CIPHER_3DES_CBC, size, 0);
 
-  cipher_bench (GNUTLS_CIPHER_AES_128_CBC, 16, 0);
+  cipher_bench (GNUTLS_CIPHER_AES_128_CBC, size, 0);
 
-  cipher_bench (GNUTLS_CIPHER_ARCFOUR, 16, 0);
+  cipher_bench (GNUTLS_CIPHER_ARCFOUR, size, 0);
 
-  cipher_bench ( GNUTLS_CIPHER_SALSA20_256, 16, 0);
+  cipher_bench ( GNUTLS_CIPHER_SALSA20_256, size, 0);
 
   gnutls_global_deinit();
 }

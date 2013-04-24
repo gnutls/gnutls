@@ -45,7 +45,7 @@ struct benchmark_st
 extern int benchmark_must_finish;
 
 void start_benchmark(struct benchmark_st * st);
-double stop_benchmark(struct benchmark_st * st, const char* metric);
+double stop_benchmark(struct benchmark_st * st, const char* metric, int quiet);
 
 inline static unsigned int
 timespec_sub_ms (struct timespec *a, struct timespec *b)

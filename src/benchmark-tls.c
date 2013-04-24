@@ -234,10 +234,10 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 
     HANDSHAKE(client, server);
 
-    fprintf(stdout, "Testing %s with %d packet size...\n",
+    fprintf(stdout, "%38s  ",
             gnutls_cipher_suite_get_name(gnutls_kx_get(server),
                                          gnutls_cipher_get(server),
-                                         gnutls_mac_get(server)), size);
+                                         gnutls_mac_get(server)));
     fflush(stdout);
 
     gnutls_rnd(GNUTLS_RND_NONCE, buffer, sizeof(buffer));
@@ -269,8 +269,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
     }
     while (benchmark_must_finish == 0);
 
-    stop_benchmark(&st, NULL);
-    fprintf(stdout, "\n");
+    stop_benchmark(&st, NULL, 1);
 
     gnutls_bye(client, GNUTLS_SHUT_WR);
     gnutls_bye(server, GNUTLS_SHUT_WR);
@@ -415,13 +414,13 @@ static void test_ciphersuite_kx(const char *cipher_prio)
     }
     while (benchmark_must_finish == 0);
 
-    fprintf(stdout, "Benchmarked %s.\n", suite);
-    stop_benchmark(&st, "transactions");
+    fprintf(stdout, "%38s  ", suite);
+    stop_benchmark(&st, "transactions", 1);
 
     avg = calc_avg(diffs, diffs_size);
     sstddev = calc_sstdev(diffs, diffs_size, avg);
 
-    printf("  Average handshake time: %.2f ms, sample variance: %.2f\n\n", avg, sstddev);
+    printf("%32s %.2f ms, sample variance: %.2f)\n", "(avg. handshake time:", avg, sstddev);
 
     gnutls_anon_free_client_credentials(c_anoncred);
     gnutls_anon_free_server_credentials(s_anoncred);
@@ -432,37 +431,42 @@ static void test_ciphersuite_kx(const char *cipher_prio)
 
 void benchmark_tls(int debug_level, int ciphers)
 {
+  int size;
+
     gnutls_global_set_log_function(tls_log_func);
     gnutls_global_set_log_level(debug_level);
     gnutls_global_init();
 
     if (ciphers != 0)
       {
-        printf("Testing throughput in cipher/MAC combinations:\n\n");
+        size = 1400;
+        printf("Testing throughput in cipher/MAC combinations (payload: %d bytes)\n", size);
 
-        test_ciphersuite(PRIO_SALSA20_256_UMAC_96, 1400);
-        test_ciphersuite(PRIO_SALSA20_256_SHA1, 1400);
-        test_ciphersuite(PRIO_ESTREAM_SALSA20_256_UMAC_96, 1400);
-        test_ciphersuite(PRIO_ESTREAM_SALSA20_256_SHA1, 1400);
-        test_ciphersuite(PRIO_ARCFOUR_128_SHA1, 1400);
-        test_ciphersuite(PRIO_ARCFOUR_128_MD5, 1400);
-        test_ciphersuite(PRIO_AES_GCM, 1400);
-        test_ciphersuite(PRIO_AES_CBC_SHA1, 1400);
-        test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 1400);
+        test_ciphersuite(PRIO_SALSA20_256_UMAC_96, size);
+        test_ciphersuite(PRIO_SALSA20_256_SHA1, size);
+        test_ciphersuite(PRIO_ESTREAM_SALSA20_256_UMAC_96, size);
+        test_ciphersuite(PRIO_ESTREAM_SALSA20_256_SHA1, size);
+        test_ciphersuite(PRIO_ARCFOUR_128_SHA1, size);
+        test_ciphersuite(PRIO_ARCFOUR_128_MD5, size);
+        test_ciphersuite(PRIO_AES_GCM, size);
+        test_ciphersuite(PRIO_AES_CBC_SHA1, size);
+        test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, size);
 
-        test_ciphersuite(PRIO_SALSA20_256_UMAC_96, 15 * 1024);
-        test_ciphersuite(PRIO_SALSA20_256_SHA1, 15*1024);
-        test_ciphersuite(PRIO_ESTREAM_SALSA20_256_UMAC_96, 15 * 1024);
-        test_ciphersuite(PRIO_ESTREAM_SALSA20_256_SHA1, 15*1024);
-        test_ciphersuite(PRIO_ARCFOUR_128_SHA1, 15 * 1024);
-        test_ciphersuite(PRIO_ARCFOUR_128_MD5, 15 * 1024);
-        test_ciphersuite(PRIO_AES_GCM, 15 * 1024);
-        test_ciphersuite(PRIO_AES_CBC_SHA1, 15 * 1024);
-        test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 15 * 1024);
+        size = 15*1024;
+        printf("\nTesting throughput in cipher/MAC combinations (payload: %d bytes)\n", size);
+        test_ciphersuite(PRIO_SALSA20_256_UMAC_96, size);
+        test_ciphersuite(PRIO_SALSA20_256_SHA1, size);
+        test_ciphersuite(PRIO_ESTREAM_SALSA20_256_UMAC_96, size);
+        test_ciphersuite(PRIO_ESTREAM_SALSA20_256_SHA1, size);
+        test_ciphersuite(PRIO_ARCFOUR_128_SHA1, size);
+        test_ciphersuite(PRIO_ARCFOUR_128_MD5, size);
+        test_ciphersuite(PRIO_AES_GCM, size);
+        test_ciphersuite(PRIO_AES_CBC_SHA1, size);
+        test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, size);
       }
     else
       {
-        printf("\nTesting key exchanges (RSA/DH bits: %d, EC bits: %d):\n\n", rsa_bits, ec_bits);
+        printf("Testing key exchanges (RSA/DH bits: %d, EC bits: %d)\n", rsa_bits, ec_bits);
         test_ciphersuite_kx(PRIO_DH);
         test_ciphersuite_kx(PRIO_ECDH);
         test_ciphersuite_kx(PRIO_ECDHE_ECDSA);
