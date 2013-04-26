@@ -283,7 +283,6 @@ int ret;
       else
         {
           _gnutls_mac_output (&handle->mac.mac, tag);
-          _gnutls_mac_reset (&handle->mac.mac);
         }
     }
   else if (_gnutls_cipher_is_aead(&handle->cipher))

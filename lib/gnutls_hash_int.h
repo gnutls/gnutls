@@ -62,7 +62,6 @@ typedef struct
   int mac_len;
 
   hash_func hash;
-  reset_func reset;
   nonce_func setnonce;
   output_func output;
   deinit_func deinit;
@@ -110,18 +109,6 @@ _gnutls_mac_set_nonce (mac_hd_st * handle, const void *nonce, size_t n_size)
 
 void
 _gnutls_mac_deinit (mac_hd_st * handle, void *digest);
-
-inline static void
-_gnutls_mac_reset (mac_hd_st * handle)
-{
-  if (handle->handle == NULL)
-    {
-      return;
-    }
-
-  handle->reset (handle->handle);
-}
-
 
 /* Hash interface */
 int _gnutls_hash_init (digest_hd_st *, gnutls_digest_algorithm_t algorithm);

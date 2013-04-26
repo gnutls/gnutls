@@ -232,7 +232,6 @@ _gnutls_mac_init (mac_hd_st * mac, gnutls_mac_algorithm_t algorithm,
       mac->setnonce = cc->setnonce;
       mac->output = cc->output;
       mac->deinit = cc->deinit;
-      mac->reset = cc->reset;
 
       return 0;
     }
@@ -248,7 +247,6 @@ _gnutls_mac_init (mac_hd_st * mac, gnutls_mac_algorithm_t algorithm,
   mac->setnonce = _gnutls_mac_ops.setnonce;
   mac->output = _gnutls_mac_ops.output;
   mac->deinit = _gnutls_mac_ops.deinit;
-  mac->reset = _gnutls_mac_ops.reset;
 
   if (_gnutls_mac_ops.setkey (mac->handle, key, keylen) < 0)
     {

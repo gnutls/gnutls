@@ -71,19 +71,6 @@ struct nettle_mac_ctx
     struct umac96_ctx umac;
   } ctx;
   
-  /* this is the context just after
-   * the set_key. Used in reset().
-   */
-  union
-  {
-    struct hmac_md5_ctx md5;
-    struct hmac_sha224_ctx sha224;
-    struct hmac_sha256_ctx sha256;
-    struct hmac_sha384_ctx sha384;
-    struct hmac_sha512_ctx sha512;
-    struct hmac_sha1_ctx sha1;
-    struct umac96_ctx umac;
-  } init_ctx;
   void *ctx_ptr;
   gnutls_mac_algorithm_t algo;
   size_t length;
@@ -235,8 +222,6 @@ wrap_nettle_mac_set_key (void *_ctx, const void *key, size_t keylen)
 
   ctx->set_key (ctx->ctx_ptr, keylen, key);
   
-  memcpy(&ctx->init_ctx, &ctx->ctx, sizeof(ctx->ctx));
-
   return GNUTLS_E_SUCCESS;
 }
 
@@ -251,14 +236,6 @@ wrap_nettle_mac_set_nonce (void *_ctx, const void *nonce, size_t noncelen)
   ctx->set_nonce (ctx->ctx_ptr, noncelen, nonce);
 
   return GNUTLS_E_SUCCESS;
-}
-
-static void
-wrap_nettle_mac_reset (void *_ctx)
-{
-  struct nettle_mac_ctx *ctx = _ctx;
-
-  memcpy(&ctx->ctx, &ctx->init_ctx, sizeof(ctx->ctx));
 }
 
 static int
@@ -466,7 +443,6 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
   .setkey = wrap_nettle_mac_set_key,
   .setnonce = wrap_nettle_mac_set_nonce,
   .hash = wrap_nettle_mac_update,
-  .reset = wrap_nettle_mac_reset,
   .output = wrap_nettle_mac_output,
   .deinit = wrap_nettle_mac_deinit,
   .fast = wrap_nettle_mac_fast,
