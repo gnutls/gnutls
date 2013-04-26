@@ -348,7 +348,8 @@ gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen)
  * @handle: is a #gnutls_hmac_hd_t structure.
  * @digest: is the output value of the MAC
  *
- * This function will output the current MAC value.
+ * This function will output the current MAC value
+ * and reset the state of the MAC.
  *
  * Since: 2.10.0
  **/
@@ -469,7 +470,8 @@ gnutls_hash (gnutls_hash_hd_t handle, const void *text, size_t textlen)
  * @handle: is a #gnutls_hash_hd_t structure.
  * @digest: is the output value of the hash
  *
- * This function will output the current hash value.
+ * This function will output the current hash value
+ * and reset the state of the hash.
  *
  * Since: 2.10.0
  **/
