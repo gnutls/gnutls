@@ -51,7 +51,6 @@
   {
     int (*init) (gnutls_mac_algorithm_t, void **ctx);
     int (*setkey) (void *ctx, const void *key, size_t keysize);
-    void (*reset) (void *ctx);
     int (*hash) (void *ctx, const void *text, size_t textsize);
     int (*output) (void *src_ctx, void *digest, size_t digestsize);
     void (*deinit) (void *ctx);
@@ -65,7 +64,6 @@
   typedef struct
   {
     int (*init) (gnutls_digest_algorithm_t, void **ctx);
-    void (*reset) (void *ctx);
     int (*hash) (void *ctx, const void *src, size_t srcsize);
     int (*output) (void *src_ctx, void *digest, size_t digestsize);
     void (*deinit) (void *ctx);

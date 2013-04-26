@@ -77,7 +77,6 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
         }
 
       dig->hash = cc->hash;
-      dig->reset = cc->reset;
       dig->output = cc->output;
       dig->deinit = cc->deinit;
 
@@ -92,7 +91,6 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
     }
 
   dig->hash = _gnutls_digest_ops.hash;
-  dig->reset = _gnutls_digest_ops.reset;
   dig->output = _gnutls_digest_ops.output;
   dig->deinit = _gnutls_digest_ops.deinit;
 
@@ -233,7 +231,6 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
       dig->hash = cc->hash;
       dig->output = cc->output;
       dig->deinit = cc->deinit;
-      dig->reset = cc->reset;
 
       return 0;
     }
@@ -248,7 +245,6 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
   dig->hash = _gnutls_mac_ops.hash;
   dig->output = _gnutls_mac_ops.output;
   dig->deinit = _gnutls_mac_ops.deinit;
-  dig->reset = _gnutls_mac_ops.reset;
 
   if (_gnutls_mac_ops.setkey (dig->handle, key, keylen) < 0)
     {
@@ -325,25 +321,6 @@ _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
   return 0;
 }
 
-void
-_gnutls_mac_reset_ssl3 (digest_hd_st * handle)
-{
-  uint8_t ipad[48];
-  int padsize;
-
-  padsize = get_padsize (handle->algorithm);
-
-  memset (ipad, 0x36, padsize);
-
-  _gnutls_hash_reset(handle);
-
-  if (handle->keysize > 0)
-    _gnutls_hash (handle, handle->key, handle->keysize);
-  _gnutls_hash (handle, ipad, padsize);
-
-  return;
-}
-
 int 
 _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
 {
@@ -378,6 +355,13 @@ _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
   _gnutls_hash (&td, ret, block);
 
   _gnutls_hash_deinit (&td, digest);
+  
+  /* reset handle */
+  memset (opad, 0x36, padsize);
+
+  if (handle->keysize > 0)
+    _gnutls_hash (handle, handle->key, handle->keysize);
+  _gnutls_hash (handle, opad, padsize);
   
   return 0;
 }
