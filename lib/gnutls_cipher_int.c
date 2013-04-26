@@ -276,13 +276,10 @@ int ret = 0;
           ret = _gnutls_mac_output_ssl3 (&handle->mac, tag);
           if (ret < 0)
             return gnutls_assert_val(ret);
-
-          _gnutls_mac_reset_ssl3 (&handle->mac);
         }
       else
         {
           _gnutls_hmac_output (&handle->mac, tag);
-          _gnutls_hmac_reset (&handle->mac);
         }
     }
   else if (_gnutls_cipher_is_aead(&handle->cipher))

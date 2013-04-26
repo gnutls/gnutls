@@ -54,17 +54,6 @@ struct padlock_hmac_ctx
         struct hmac_sha1_ctx sha1;
     } ctx;
 
-    /* this is the context just after
-     * the set_key. Used in reset().
-     */
-    union
-    {
-        struct hmac_sha224_ctx sha224;
-        struct hmac_sha256_ctx sha256;
-        struct hmac_sha384_ctx sha384;
-        struct hmac_sha512_ctx sha512;
-        struct hmac_sha1_ctx sha1;
-    } init_ctx;
     void *ctx_ptr;
     gnutls_mac_algorithm_t algo;
     size_t length;
@@ -244,17 +233,7 @@ wrap_padlock_hmac_setkey (void *_ctx, const void *key, size_t keylen)
 
     ctx->setkey (ctx->ctx_ptr, keylen, key);
 
-    memcpy (&ctx->init_ctx, &ctx->ctx, sizeof (ctx->ctx));
-
     return GNUTLS_E_SUCCESS;
-}
-
-static void
-wrap_padlock_hmac_reset (void *_ctx)
-{
-    struct padlock_hmac_ctx *ctx = _ctx;
-
-    memcpy (&ctx->ctx, &ctx->init_ctx, sizeof (ctx->ctx));
 }
 
 static int
@@ -355,7 +334,6 @@ const gnutls_crypto_mac_st hmac_sha_padlock_struct = {
     .init = NULL,
     .setkey = NULL,
     .hash = NULL,
-    .reset = NULL,
     .output = NULL,
     .deinit = NULL,
     .fast = wrap_padlock_hmac_fast
@@ -365,7 +343,6 @@ const gnutls_crypto_mac_st hmac_sha_padlock_nano_struct = {
     .init = wrap_padlock_hmac_init,
     .setkey = wrap_padlock_hmac_setkey,
     .hash = wrap_padlock_hmac_update,
-    .reset = wrap_padlock_hmac_reset,
     .output = wrap_padlock_hmac_output,
     .deinit = wrap_padlock_hmac_deinit,
     .fast = wrap_padlock_hmac_fast,
