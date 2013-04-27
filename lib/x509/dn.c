@@ -33,57 +33,6 @@
  * Name (you need a parser just to read a name in the X.509 protoocols!!!)
  */
 
-/* Escapes a string following the rules from RFC4514.
- */
-static int
-str_escape (const gnutls_datum_t* str, gnutls_datum_t * escaped)
-{
-  unsigned int j, i;
-  uint8_t *buffer = NULL;
-  int ret;
-
-  if (str == NULL)
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-  
-  /* the string will be at most twice the original */
-  buffer = gnutls_malloc(str->size*2+2);
-  if (buffer == NULL)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-  for (i = j = 0; i < str->size; i++)
-    {
-      if (str->data[i] == 0)
-        {
-          /* this is handled earlier */
-          ret = gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
-          goto cleanup;
-        }
-
-      if (str->data[i] == ',' || str->data[i] == '+' || str->data[i] == '"'
-          || str->data[i] == '\\' || str->data[i] == '<' || str->data[i] == '>'
-          || str->data[i] == ';' || str->data[i] == 0)
-        buffer[j++] = '\\';
-      else if (i==0 && str->data[i] == '#')
-        buffer[j++] = '\\';
-      else if (i==0 && str->data[i] == ' ')
-        buffer[j++] = '\\';
-      else if (i==(str->size-1) && str->data[i] == ' ')
-        buffer[j++] = '\\';
-      
-      buffer[j++] = str->data[i];
-    }
-
-  /* null terminate the string */
-  buffer[j] = 0;
-  escaped->data = buffer;
-  escaped->size = j;
-
-  return 0;
-cleanup:
-  gnutls_free(buffer);
-  return ret;
-}
-
 int
 _gnutls_x509_get_dn (ASN1_TYPE asn1_struct,
                        const char *asn1_rdn_name, gnutls_datum_t * dn)
@@ -94,7 +43,7 @@ _gnutls_x509_get_dn (ASN1_TYPE asn1_struct,
   char tmpbuffer2[ASN1_MAX_NAME_SIZE];
   char tmpbuffer3[ASN1_MAX_NAME_SIZE];
   uint8_t value[MAX_STRING_LEN];
-  gnutls_datum_t td = {NULL, 0}, tvd = {NULL, 0}, escaped = {NULL, 0};
+  gnutls_datum_t td = {NULL, 0}, tvd = {NULL, 0};
   const char *ldap_desc;
   char oid[MAX_OID_SIZE];
   int len;
@@ -231,17 +180,9 @@ _gnutls_x509_get_dn (ASN1_TYPE asn1_struct,
               goto cleanup;
             }
 
-          result = str_escape(&td, &escaped);
-          if (result < 0)
-            {
-              gnutls_assert();
-              goto cleanup;
-            }
-          
-          DATA_APPEND (escaped.data, escaped.size);
+          DATA_APPEND (td.data, td.size);
           _gnutls_free_datum (&td);
           _gnutls_free_datum (&tvd);
-          _gnutls_free_datum (&escaped);
         }
       while (1);
     }
@@ -256,7 +197,6 @@ _gnutls_x509_get_dn (ASN1_TYPE asn1_struct,
 cleanup:
   _gnutls_buffer_clear (&out_str);
 cleanup1:
-  _gnutls_free_datum (&escaped);
   _gnutls_free_datum (&td);
   _gnutls_free_datum (&tvd);
   return result;
