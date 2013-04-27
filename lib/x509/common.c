@@ -65,6 +65,7 @@ static const struct oid_to_string _oid2str[] = {
   {"2.5.4.3", "CN", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
   {"2.5.4.7", "L", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
   {"2.5.4.8", "ST", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
+  {"2.5.4.13", "description", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
 
   {"2.5.4.5", "serialNumber", NULL, ASN1_ETYPE_PRINTABLE_STRING},
   {"2.5.4.20", "telephoneNumber", NULL, ASN1_ETYPE_PRINTABLE_STRING},
