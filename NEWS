@@ -22,6 +22,9 @@ gnutls_privkey_sign_hash() to operate as with gnutls_privkey_sign_raw_data().
 This makes it consistent with verification with GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA
 flag.
 
+** certtool: When generating certificates the default answer for marking the
+key for signing and encryption is yes.
+
 ** API and ABI modifications:
 gnutls_certificate_set_x509_key_mem2: Added
 gnutls_certificate_set_x509_key_file2: Added

@@ -48,7 +48,7 @@ pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login,
       pkcs11_list (outfile, url, PKCS11_TYPE_ALL, login,
                    GNUTLS_PKCS11_URL_LIB, info);
       ret =
-        read_yesno ("Are you sure you want to delete those objects? (y/N): ");
+        read_yesno ("Are you sure you want to delete those objects? (y/N): ", 0);
       if (ret == 0)
         {
           exit (1);

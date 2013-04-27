@@ -427,24 +427,29 @@ read_str (const char *input_str)
   return input;
 }
 
-/* Default is no
+/* Default is:
+ * def: 0 -> no
+ * def: 1 -> yes
  */
 int
-read_yesno (const char *input_str)
+read_yesno (const char *input_str, int def)
 {
   char input[128];
 
+restart:
   fputs (input_str, stderr);
   if (fgets (input, sizeof (input), stdin) == NULL)
-    return 0;
+    return def;
 
   if (IS_NEWLINE(input))
-    return 0;
+    return def;
 
   if (input[0] == 'y' || input[0] == 'Y')
     return 1;
-
-  return 0;
+  else if (input[0] == 'n' || input[0] == 'N')
+    return 0;
+  else
+    goto restart;
 }
 
 
@@ -899,7 +904,7 @@ get_ca_status (void)
   else
     {
       return
-        read_yesno ("Does the certificate belong to an authority? (y/N): ");
+        read_yesno ("Does the certificate belong to an authority? (y/N): ", 0);
     }
 }
 
@@ -914,7 +919,7 @@ get_crq_extensions_status (void)
     {
       return
         read_yesno
-        ("Do you want to honour the extensions from the request? (y/N): ");
+        ("Do you want to honour the extensions from the request? (y/N): ", 0);
     }
 }
 
@@ -976,7 +981,7 @@ get_tls_client_status (void)
     }
   else
     {
-      return read_yesno ("Is this a TLS web client certificate? (y/N): ");
+      return read_yesno ("Is this a TLS web client certificate? (y/N): ", 0);
     }
 }
 
@@ -990,7 +995,7 @@ get_tls_server_status (void)
   else
     {
       return
-        read_yesno ("Is this also a TLS web server certificate? (y/N): ");
+        read_yesno ("Is this a TLS web server certificate? (y/N): ", 0);
     }
 }
 
@@ -1382,11 +1387,11 @@ get_sign_status (int server)
     {
       if (server)
         msg =
-          "Will the certificate be used for signing (DHE and RSA-EXPORT ciphersuites)? (y/N): ";
+          "Will the certificate be used for signing (DHE and RSA-EXPORT ciphersuites)? (Y/n): ";
       else
         msg =
-          "Will the certificate be used for signing (required for TLS)? (y/N): ";
-      return read_yesno (msg);
+          "Will the certificate be used for signing (required for TLS)? (Y/n): ";
+      return read_yesno (msg, 1);
     }
 }
 
@@ -1403,11 +1408,11 @@ get_encrypt_status (int server)
     {
       if (server)
         msg =
-          "Will the certificate be used for encryption (RSA ciphersuites)? (y/N): ";
+          "Will the certificate be used for encryption (RSA ciphersuites)? (Y/n): ";
       else
         msg =
-          "Will the certificate be used for encryption (not required for TLS)? (y/N): ";
-      return read_yesno (msg);
+          "Will the certificate be used for encryption (not required for TLS)? (Y/n): ";
+      return read_yesno (msg, 1);
     }
 }
 
@@ -1422,7 +1427,7 @@ get_cert_sign_status (void)
     {
       return
         read_yesno
-        ("Will the certificate be used to sign other certificates? (y/N): ");
+        ("Will the certificate be used to sign other certificates? (y/N): ", 0);
     }
 }
 
@@ -1436,7 +1441,7 @@ get_crl_sign_status (void)
   else
     {
       return
-        read_yesno ("Will the certificate be used to sign CRLs? (y/N): ");
+        read_yesno ("Will the certificate be used to sign CRLs? (y/N): ", 0);
     }
 }
 
@@ -1450,7 +1455,7 @@ get_code_sign_status (void)
   else
     {
       return
-        read_yesno ("Will the certificate be used to sign code? (y/N): ");
+        read_yesno ("Will the certificate be used to sign code? (y/N): ", 0);
     }
 }
 
@@ -1465,7 +1470,7 @@ get_ocsp_sign_status (void)
     {
       return
         read_yesno
-        ("Will the certificate be used to sign OCSP requests? (y/N): ");
+        ("Will the certificate be used to sign OCSP requests? (y/N): ", 0);
     }
 }
 
@@ -1480,7 +1485,7 @@ get_time_stamp_status (void)
     {
       return
         read_yesno
-        ("Will the certificate be used for time stamping? (y/N): ");
+        ("Will the certificate be used for time stamping? (y/N): ", 0);
     }
 }
 
@@ -1495,7 +1500,7 @@ get_ipsec_ike_status (void)
     {
       return
         read_yesno
-        ("Will the certificate be used for IPsec IKE operations? (y/N): ");
+        ("Will the certificate be used for IPsec IKE operations? (y/N): ", 0);
     }
 }
 
