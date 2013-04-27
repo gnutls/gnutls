@@ -139,6 +139,56 @@ const char* _gnutls_ldap_string_to_oid (const char* str, unsigned str_len)
   return NULL;
 }
 
+/* Escapes a string following the rules from RFC4514.
+ */
+static int
+str_escape (const gnutls_datum_t* str, gnutls_datum_t * escaped)
+{
+  unsigned int j, i;
+  uint8_t *buffer = NULL;
+  int ret;
+
+  if (str == NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+  
+  /* the string will be at most twice the original */
+  buffer = gnutls_malloc(str->size*2+2);
+  if (buffer == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  for (i = j = 0; i < str->size; i++)
+    {
+      if (str->data[i] == 0)
+        {
+          /* this is handled earlier */
+          ret = gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+          goto cleanup;
+        }
+
+      if (str->data[i] == ',' || str->data[i] == '+' || str->data[i] == '"'
+          || str->data[i] == '\\' || str->data[i] == '<' || str->data[i] == '>'
+          || str->data[i] == ';' || str->data[i] == 0)
+        buffer[j++] = '\\';
+      else if (i==0 && str->data[i] == '#')
+        buffer[j++] = '\\';
+      else if (i==0 && str->data[i] == ' ')
+        buffer[j++] = '\\';
+      else if (i==(str->size-1) && str->data[i] == ' ')
+        buffer[j++] = '\\';
+      
+      buffer[j++] = str->data[i];
+    }
+
+  /* null terminate the string */
+  buffer[j] = 0;
+  escaped->data = buffer;
+  escaped->size = j;
+
+  return 0;
+cleanup:
+  gnutls_free(buffer);
+  return ret;
+}
 
 /**
  * gnutls_x509_dn_oid_known:
@@ -375,6 +425,7 @@ _gnutls_x509_dn_to_string (const char *oid, void *value,
 {
   const struct oid_to_string* oentry;
   int ret;
+  gnutls_datum_t tmp;
   size_t size;
 
   if (value == NULL || value_size <= 0)
@@ -405,23 +456,26 @@ _gnutls_x509_dn_to_string (const char *oid, void *value,
   
   if (oentry->asn_desc != NULL)
     { /* complex */
-      ret = decode_complex_string(oentry, value, value_size, str);
+      ret = decode_complex_string(oentry, value, value_size, &tmp);
       if (ret < 0)
         return gnutls_assert_val(ret);
     }
   else
     {
       ret = _gnutls_x509_decode_string(oentry->etype, value, value_size,
-                                       str);
+                                       &tmp);
       if (ret < 0)
-        {
-          return gnutls_assert_val(ret);
-        }
+        return gnutls_assert_val(ret);
     }
+
+  ret = str_escape(&tmp, str);
+  _gnutls_free_datum (&tmp);
+
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   return 0;
 }
-
 
 /* Converts a data string to an LDAP rfc2253 hex string
  * something like '#01020304'
