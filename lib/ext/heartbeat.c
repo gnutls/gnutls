@@ -21,6 +21,11 @@
  *
  */
 
+/* This file implements the TLS heartbeat extension.
+ * It was originally implemented during Google SoC 2012 by by Olga Smolenchuk,
+ * and later rewritten by Nikos Mavrogiannopoulos.
+ */
+
 #include <gnutls_errors.h>
 #include <gnutls_int.h>
 #include <gnutls_dtls.h>
