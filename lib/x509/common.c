@@ -33,6 +33,10 @@
 #include <common.h>
 #include <c-ctype.h>
 
+static int
+data2hex (const void * data, size_t data_size,
+          void * _out, size_t * sizeof_out);
+
 struct oid_to_string
 {
   const char *oid;
@@ -251,7 +255,7 @@ size_t size;
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
       size = out->size;
-      ret = _gnutls_x509_data2hex (input->data, input->size, out->data, &size);
+      ret = data2hex (input->data, input->size, out->data, &size);
       if (ret < 0)
         {
           gnutls_assert();
@@ -388,7 +392,7 @@ _gnutls_x509_dn_to_string (const char *oid, void *value,
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
       size = str->size;
-      ret = _gnutls_x509_data2hex (value, value_size, str->data, &size);
+      ret = data2hex (value, value_size, str->data, &size);
       if (ret < 0)
         {
           gnutls_assert();
@@ -422,13 +426,13 @@ _gnutls_x509_dn_to_string (const char *oid, void *value,
 /* Converts a data string to an LDAP rfc2253 hex string
  * something like '#01020304'
  */
-int
-_gnutls_x509_data2hex (const void * data, size_t data_size,
-                       void * _out, size_t * sizeof_out)
+static int
+data2hex (const void * data, size_t data_size,
+          void * _out, size_t * sizeof_out)
 {
   char *res;
   char escaped[MAX_STRING_LEN];
-  unsigned int size;
+  unsigned int size, res_size;
   char* out = _out;
 
   if (2 * data_size + 1 > MAX_STRING_LEN)
@@ -444,10 +448,11 @@ _gnutls_x509_data2hex (const void * data, size_t data_size,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  size = strlen (res) + 1;
+  res_size = strlen(res);
+  size = res_size + 1; /* +1 for the '#' */
   if (size + 1 > *sizeof_out)
     {
-      *sizeof_out = size;
+      *sizeof_out = size + 1;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
   *sizeof_out = size;           /* -1 for the null +1 for the '#' */
@@ -455,8 +460,8 @@ _gnutls_x509_data2hex (const void * data, size_t data_size,
   if (out)
     {
       out[0] = '#';
-      out[1] = 0;
-      _gnutls_str_cat (out, *sizeof_out, res);
+      memcpy(&out[1], res, res_size);
+      out[size] = 0;
     }
 
   return 0;
