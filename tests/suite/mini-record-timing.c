@@ -50,6 +50,7 @@ int main()
 #include <time.h>
 #include <timespec.h>
 #include <sys/time.h>
+#include <sys/resource.h>
 
 #ifdef DEBUG
 static void
