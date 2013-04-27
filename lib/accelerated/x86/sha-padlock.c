@@ -36,6 +36,7 @@
 typedef void (*update_func) (void *, unsigned, const uint8_t *);
 typedef void (*digest_func) (void *, unsigned, uint8_t *);
 typedef void (*set_key_func) (void *, unsigned, const uint8_t *);
+typedef void (*init_func) (void *);
 
 struct padlock_hash_ctx
 {
@@ -52,6 +53,7 @@ struct padlock_hash_ctx
   size_t length;
   update_func update;
   digest_func digest;
+  init_func init;
 };
 
 static int
@@ -232,6 +234,7 @@ static int _ctx_init(gnutls_digest_algorithm_t algo, struct padlock_hash_ctx *ct
       sha1_init (&ctx->ctx.sha1);
       ctx->update = (update_func) padlock_sha1_update;
       ctx->digest = (digest_func) padlock_sha1_digest;
+      ctx->init = (init_func)sha1_init;
       ctx->ctx_ptr = &ctx->ctx.sha1;
       ctx->length = SHA1_DIGEST_SIZE;
       break;
@@ -239,6 +242,7 @@ static int _ctx_init(gnutls_digest_algorithm_t algo, struct padlock_hash_ctx *ct
       sha224_init (&ctx->ctx.sha224);
       ctx->update = (update_func) padlock_sha256_update;
       ctx->digest = (digest_func) padlock_sha256_digest;
+      ctx->init = (init_func)sha224_init;
       ctx->ctx_ptr = &ctx->ctx.sha224;
       ctx->length = SHA224_DIGEST_SIZE;
       break;
@@ -246,6 +250,7 @@ static int _ctx_init(gnutls_digest_algorithm_t algo, struct padlock_hash_ctx *ct
       sha256_init (&ctx->ctx.sha256);
       ctx->update = (update_func) padlock_sha256_update;
       ctx->digest = (digest_func) padlock_sha256_digest;
+      ctx->init = (init_func)sha256_init;
       ctx->ctx_ptr = &ctx->ctx.sha256;
       ctx->length = SHA256_DIGEST_SIZE;
       break;
@@ -253,6 +258,7 @@ static int _ctx_init(gnutls_digest_algorithm_t algo, struct padlock_hash_ctx *ct
       sha384_init (&ctx->ctx.sha384);
       ctx->update = (update_func) padlock_sha512_update;
       ctx->digest = (digest_func) padlock_sha512_digest;
+      ctx->init = (init_func)sha384_init;
       ctx->ctx_ptr = &ctx->ctx.sha384;
       ctx->length = SHA384_DIGEST_SIZE;
       break;
@@ -260,6 +266,7 @@ static int _ctx_init(gnutls_digest_algorithm_t algo, struct padlock_hash_ctx *ct
       sha512_init (&ctx->ctx.sha512);
       ctx->update = (update_func) padlock_sha512_update;
       ctx->digest = (digest_func) padlock_sha512_digest;
+      ctx->init = (init_func)sha512_init;
       ctx->ctx_ptr = &ctx->ctx.sha512;
       ctx->length = SHA512_DIGEST_SIZE;
       break;
@@ -308,6 +315,8 @@ wrap_padlock_hash_output (void *src_ctx, void *digest, size_t digestsize)
     return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
   ctx->digest (ctx->ctx_ptr, digestsize, digest);
+
+  ctx->init( ctx->ctx_ptr);
 
   return 0;
 }
