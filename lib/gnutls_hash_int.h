@@ -38,7 +38,6 @@ extern gnutls_crypto_digest_st _gnutls_digest_ops;
 
 typedef int (*hash_func) (void *handle, const void *text, size_t size);
 typedef int (*nonce_func) (void *handle, const void *text, size_t size);
-typedef void (*reset_func) (void *ctx);
 typedef int (*output_func) (void *src_ctx, void *digest, size_t digestsize);
 typedef void (*deinit_func) (void *handle);
 
@@ -46,7 +45,6 @@ typedef struct
 {
   gnutls_digest_algorithm_t algorithm;
   hash_func hash;
-  reset_func reset;
   output_func output;
   deinit_func deinit;
 
@@ -138,17 +136,6 @@ _gnutls_hash_output (digest_hd_st * handle, void *digest)
     }
 }
 
-inline static void
-_gnutls_hash_reset (digest_hd_st * handle)
-{
-  if (handle->handle == NULL)
-    {
-      return;
-    }
-
-  handle->reset (handle->handle);
-}
-
 void
 _gnutls_hash_deinit (digest_hd_st * handle, void *digest);
 
@@ -168,8 +155,6 @@ int _gnutls_ssl3_generate_random (void *secret, int secret_len,
 int _gnutls_ssl3_hash_md5 (const void *first, int first_len,
                            const void *second, int second_len,
                            int ret_len, uint8_t * ret);
-
-void _gnutls_mac_reset_ssl3 (digest_hd_st * handle);
 
 int _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle, void *digest,
                                         uint8_t * key, uint32_t key_size);

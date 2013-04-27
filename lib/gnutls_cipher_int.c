@@ -277,8 +277,6 @@ int ret;
           ret = _gnutls_mac_output_ssl3 (&handle->mac.dig, tag);
           if (ret < 0)
             return gnutls_assert_val(ret);
-
-          _gnutls_mac_reset_ssl3 (&handle->mac.dig);
         }
       else
         {

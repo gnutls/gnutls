@@ -428,16 +428,6 @@ wrap_nettle_hash_output (void *src_ctx, void *digest, size_t digestsize)
   return 0;
 }
 
-static void
-wrap_nettle_hash_reset (void *src_ctx)
-{
-  struct nettle_hash_ctx *ctx;
-  ctx = src_ctx;
-
-  _ctx_init(ctx->algo, ctx->ctx_ptr);
-}
-
-
 gnutls_crypto_mac_st _gnutls_mac_ops = {
   .init = wrap_nettle_mac_init,
   .setkey = wrap_nettle_mac_set_key,
@@ -452,7 +442,6 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
 gnutls_crypto_digest_st _gnutls_digest_ops = {
   .init = wrap_nettle_hash_init,
   .hash = wrap_nettle_hash_update,
-  .reset = wrap_nettle_hash_reset,
   .output = wrap_nettle_hash_output,
   .deinit = wrap_nettle_hash_deinit,
   .fast = wrap_nettle_hash_fast,
