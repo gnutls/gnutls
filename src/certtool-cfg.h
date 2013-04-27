@@ -32,7 +32,7 @@ void read_crq_set (gnutls_x509_crq_t crq, const char *input_str,
                    const char *oid);
 int read_int (const char *input_str);
 const char *read_str (const char *input_str);
-int read_yesno (const char *input_str);
+int read_yesno (const char *input_str, int def);
 
 const char *get_pass (void);
 const char *get_confirmed_pass (bool empty_ok);
