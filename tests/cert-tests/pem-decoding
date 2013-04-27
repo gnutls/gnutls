@@ -49,6 +49,21 @@ if test "$rc" != "0"; then
   exit $rc
 fi
 
+#check whether complex-cert is decoded as expected
+$CERTTOOL --certificate-info --infile $srcdir/complex-cert.pem >tmp-pem.pem
+rc=$?
+
+if test "$rc" != "0"; then
+  exit $rc
+fi
+
+diff $srcdir/complex-cert.pem tmp-pem.pem
+rc=$?
+
+if test "$rc" != "0"; then
+  exit $rc
+fi
+
 rm -f tmp-pem.pem
 
 exit 0
