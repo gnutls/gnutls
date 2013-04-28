@@ -36,7 +36,7 @@ AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
 	../../gl/libgnu.la \
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB) \
-	$(LIB_TIMER_TIME)
+	-lrt
 
 if !WINDOWS
 
