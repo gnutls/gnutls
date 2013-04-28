@@ -28,7 +28,6 @@
 #include <gnutls_buffers.h>
 #include <gnutls_mbuffers.h>
 #include <gnutls_constate.h>
-#include <timespec.h>
 
 int _dtls_transmit(gnutls_session_t session);
 int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq);

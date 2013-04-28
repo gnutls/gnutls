@@ -93,6 +93,7 @@ endif
 if !MACOSX
 noinst_LTLIBRARIES = libecore.la
 
+mini_record_timing_LDADD = -lrt $(LDADD)
 eagain_cli_LDADD = libecore.la -lrt -lm -ldl -lpthread $(LDADD)
 nodist_eagain_cli_SOURCES = mini-eagain2.c
 

@@ -35,7 +35,6 @@
 #include <gnutls_constate.h>
 #include <gnutls_state.h>
 #include <gnutls/dtls.h>
-#include <timespec.h>
 #include <algorithms.h>
 
 void

@@ -1412,6 +1412,14 @@ EXTRA_DIST += test-init.sh
 
 ## end   gnulib module test-framework-sh-tests
 
+## begin gnulib module threadlib
+
+libtests_a_SOURCES += glthread/threadlib.c
+
+EXTRA_DIST += $(top_srcdir)/build-aux/config.rpath
+
+## end   gnulib module threadlib
+
 ## begin gnulib module time-tests
 
 TESTS += test-time

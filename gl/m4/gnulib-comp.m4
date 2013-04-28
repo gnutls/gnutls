@@ -61,7 +61,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module c-ctype-tests:
   # Code from module c-strcase:
   # Code from module c-strcase-tests:
-  # Code from module clock-time:
   # Code from module close:
   # Code from module close-tests:
   # Code from module closedir:
@@ -138,7 +137,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module getsubopt:
   # Code from module gettext:
   # Code from module gettext-h:
-  # Code from module gettime:
   # Code from module gettimeofday:
   # Code from module gettimeofday-tests:
   # Code from module gnumakefile:
@@ -338,8 +336,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module time:
   # Code from module time-tests:
   # Code from module time_r:
-  # Code from module timer-time:
-  # Code from module timespec:
   # Code from module u64:
   # Code from module u64-tests:
   # Code from module unistd:
@@ -420,7 +416,6 @@ AC_SUBST([LTALLOCA])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([bind])
   gl_BYTESWAP
-  gl_CLOCK_TIME
   gl_FUNC_CLOSE
   if test $REPLACE_CLOSE = 1; then
     AC_LIBOBJ([close])
@@ -564,7 +559,6 @@ AC_SUBST([LTALLOCA])
   AM_GNU_GETTEXT_VERSION([0.18.1])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
-  gl_GETTIME
   gl_FUNC_GETTIMEOFDAY
   if test $HAVE_GETTIMEOFDAY = 0 || test $REPLACE_GETTIMEOFDAY = 1; then
     AC_LIBOBJ([gettimeofday])
@@ -862,7 +856,6 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_SYS_UIO
   AC_PROG_MKDIR_P
   gl_SYSEXITS
-  gl_THREADLIB
   gl_HEADER_TIME_H
   gl_TIME_R
   if test $HAVE_LOCALTIME_R = 0 || test $REPLACE_LOCALTIME_R = 1; then
@@ -870,8 +863,6 @@ AC_SUBST([LTALLOCA])
     gl_PREREQ_TIME_R
   fi
   gl_TIME_MODULE_INDICATOR([time_r])
-  gl_TIMER_TIME
-  gl_TIMESPEC
   gl_UNISTD_H
   gl_LIBUNISTRING_LIBHEADER([0.9.2], [unistr.h])
   gl_MODULE_INDICATOR([unistr/u8-mbtoucr])
@@ -1074,6 +1065,7 @@ changequote([, ])dnl
   gl_SYS_IOCTL_H
   AC_PROG_MKDIR_P
   AC_CHECK_FUNCS_ONCE([shutdown])
+  gl_THREADLIB
   gl_FUNC_UNSETENV
   if test $HAVE_UNSETENV = 0 || test $REPLACE_UNSETENV = 1; then
     AC_LIBOBJ([unsetenv])
@@ -1258,9 +1250,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getpeername.c
   lib/getsubopt.c
   lib/gettext.h
-  lib/gettime.c
   lib/gettimeofday.c
-  lib/glthread/threadlib.c
   lib/hash-pjw-bare.c
   lib/hash-pjw-bare.h
   lib/iconv.c
@@ -1368,8 +1358,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/sysexits.in.h
   lib/time.in.h
   lib/time_r.c
-  lib/timespec.c
-  lib/timespec.h
   lib/u64.c
   lib/u64.h
   lib/unistd.c
@@ -1400,7 +1388,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/arpa_inet_h.m4
   m4/base64.m4
   m4/byteswap.m4
-  m4/clock_time.m4
   m4/close.m4
   m4/closedir.m4
   m4/codeset.m4
@@ -1441,7 +1428,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getpass.m4
   m4/getsubopt.m4
   m4/gettext.m4
-  m4/gettime.m4
   m4/gettimeofday.m4
   m4/glibc2.m4
   m4/glibc21.m4
@@ -1568,8 +1554,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/threadlib.m4
   m4/time_h.m4
   m4/time_r.m4
-  m4/timer_time.m4
-  m4/timespec.m4
   m4/uintmax_t.m4
   m4/ungetc.m4
   m4/unistd_h.m4
@@ -1778,6 +1762,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/getpagesize.c
   tests=lib/glthread/lock.c
   tests=lib/glthread/lock.h
+  tests=lib/glthread/threadlib.c
   tests=lib/ignore-value.h
   tests=lib/inttypes.in.h
   tests=lib/ioctl.c

@@ -48,7 +48,6 @@ int main()
 #include <errno.h>
 
 #include <time.h>
-#include <timespec.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 
@@ -338,7 +337,7 @@ restart:
     ret = gnutls_record_send (session, text, sizeof(text));
   } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
   /* measure peer's processing time */
-  gettime(&start);
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
 
 #define TLS_RECV
 #ifdef TLS_RECV
@@ -353,7 +352,7 @@ restart:
 
   if (taken < MAX_MEASUREMENTS(test->npoints) && ret > 0)
     {
-      gettime(&stop);
+      clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &stop);
       taken++;
       measurement = timespec_sub_ns(&stop, &start);
       prev_point_ptr->measurements[prev_point_ptr->midx] = measurement;

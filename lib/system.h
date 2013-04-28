@@ -24,6 +24,8 @@
 #define SYSTEM_H
 
 #include <gnutls_int.h>
+#include <time.h>
+#include <sys/time.h>
 
 #ifndef _WIN32
 # include <sys/uio.h>            /* for writev */
@@ -61,11 +63,27 @@ static inline void millisleep(unsigned int ms)
 #ifdef _WIN32
   Sleep(ms);
 #else
-struct timespec ts;
+  struct timespec ts;
+
   ts.tv_sec = 0;
   ts.tv_nsec = ms*1000*1000;
   
   nanosleep(&ts, NULL);
+#endif
+}
+
+/* emulate gnulib's gettime using gettimeofday to avoid linking to
+ * librt */
+inline static void
+gettime (struct timespec *t)
+{
+#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_REALTIME)
+  clock_gettime (CLOCK_REALTIME, t);
+#else
+struct timeval tv;
+  gettimeofday (&tv, NULL);
+  t->tv_sec = tv.tv_sec;
+  t->tv_nsec = tv.tv_usec * 1000;
 #endif
 }
 

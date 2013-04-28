@@ -28,7 +28,6 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include <time.h>
-#include "timespec.h"           /* gnulib gettime */
 #include "benchmark.h"
 
 static unsigned char data[64 * 1024];

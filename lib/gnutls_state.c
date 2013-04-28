@@ -46,7 +46,6 @@
 #include <system.h>
 #include <random.h>
 #include <gnutls/dtls.h>
-#include <timespec.h>
 
 /* These should really be static, but src/tests.c calls them.  Make
    them public functions?  */

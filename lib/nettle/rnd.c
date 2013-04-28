@@ -32,7 +32,6 @@
 #include <locks.h>
 #include <gnutls_num.h>
 #include <nettle/yarrow.h>
-#include <timespec.h>
 #ifdef HAVE_GETPID
 # include <unistd.h> /* getpid */
 #endif

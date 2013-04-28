@@ -635,3 +635,5 @@ tests/mini-xssl
 doc/examples/ex-client-xssl1
 doc/examples/ex-client-xssl2
 lib/libgnutls-xssl.la
+tests/mini-alpn
+tests/mini-record-range

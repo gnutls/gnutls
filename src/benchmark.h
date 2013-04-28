@@ -23,7 +23,20 @@
 #if defined(_WIN32)
 # include <windows.h>
 #endif
-#include "timespec.h"           /* gnulib gettime */
+
+#if defined(HAVE_CLOCK_GETTIME)
+# undef gettime
+# define gettime(x) clock_gettime(CLOCK_PROCESS_CPUTIME_ID, x)
+#else
+inline static void
+gettime (struct timespec *ts)
+{
+struct timeval tv;
+  gettimeofday (&tv, NULL);
+  ts->tv_sec = tv.tv_sec;
+  ts->tv_nsec = tv.tv_usec * 1000;
+}
+#endif
 
 typedef void (*sighandler_t)(int);
 
