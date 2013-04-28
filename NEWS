@@ -4,8 +4,6 @@ See the end for copying conditions.
 
 * Version 3.2.0 (unreleased)
 
-** libgnutls: Avoid linking to librt.
-
 ** libgnutls: Use nettle's elliptic curve implementation.
 
 ** libgnutls: Added Salsa20 cipher (experimental)
@@ -18,6 +16,9 @@ See the end for copying conditions.
 (ALPN) extension.
 
 ** libgnutls: Removed support for the RSA-EXPORT ciphersuites.
+
+** libgnutls: Avoid linking to librt (that also avoids unnecessary
+linking to pthreads if p11-kit isn't used).
 
 ** API and ABI modifications:
 gnutls_cipher_get_iv_size: Added
