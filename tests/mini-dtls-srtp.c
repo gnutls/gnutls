@@ -84,7 +84,7 @@ client (int fd, int profile)
     gnutls_datum_t cli_key, cli_salt, server_key, server_salt;
     /* Need to enable anonymous KX specifically. */
 
-    gnutls_global_init ();
+    global_init ();
 
     if (debug)
       {
@@ -208,7 +208,7 @@ server (int fd, int profile)
 
     /* this must be called once in the program
      */
-    gnutls_global_init ();
+    global_init ();
 
     if (debug)
       {

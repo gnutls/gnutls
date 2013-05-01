@@ -74,7 +74,7 @@ doit (void)
   gnutls_datum_t out;
   int ret;
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret < 0)
     fail ("init %d\n", ret);
 

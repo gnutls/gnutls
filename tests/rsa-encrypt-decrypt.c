@@ -104,7 +104,7 @@ doit (void)
   int ret;
   size_t i;
 
-  gnutls_global_init ();
+  global_init ();
 
   for (i = 0; i < sizeof (key_dat) / sizeof (key_dat[0]); i++)
     {

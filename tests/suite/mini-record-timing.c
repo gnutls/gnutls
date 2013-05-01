@@ -46,6 +46,7 @@ int main()
 #include <gnutls/gnutls.h>
 #include <signal.h>
 #include <errno.h>
+#include <utils.h>
 
 #include <time.h>
 #include <timespec.h>
@@ -273,7 +274,7 @@ client (int fd, const char* prio, unsigned int text_size, struct test_st *test)
   static unsigned long measurement;
   const char* err;
 
-  gnutls_global_init ();
+  global_init ();
   
   setpriority(PRIO_PROCESS, getpid(), -15);
   
@@ -452,7 +453,7 @@ static unsigned long measurement;
 
   /* this must be called once in the program
    */
-  gnutls_global_init ();
+  global_init ();
   memset(buffer, 0, sizeof(buffer));
 
 #ifdef DEBUG

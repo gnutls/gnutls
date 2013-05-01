@@ -94,7 +94,7 @@ doit (void)
   gnutls_x509_crt_t cert;
   gnutls_x509_dn_t xdn;
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret < 0)
     fail ("init %d\n", ret);
 

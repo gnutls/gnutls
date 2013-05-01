@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <utils.h>
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
@@ -630,7 +631,7 @@ main (int argc, char **argv)
     if (argc > 1)
         gnutls_global_set_log_level (4711);
 
-    gnutls_global_init ();
+    global_init ();
 
     if (test_aes ())
         return 1;

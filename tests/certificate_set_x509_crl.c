@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <utils.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
@@ -57,10 +58,10 @@ main (void)
   gnutls_datum_t crldatum = { (uint8_t*)crl, strlen (crl) };
   gnutls_x509_crl_t crl;
 
-  rc = gnutls_global_init ();
+  rc = global_init ();
   if (rc)
     {
-      printf ("gnutls_global_init rc %d: %s\n", rc, gnutls_strerror (rc));
+      printf ("global_init rc %d: %s\n", rc, gnutls_strerror (rc));
       return 1;
     }
 

@@ -65,7 +65,7 @@ doit (void)
   gnutls_datum_t datum;
   int rv;
 
-  gnutls_global_init ();
+  global_init ();
 
   if (gnutls_x509_crt_init (&cert) != 0)
     fail ("cert init failure\n");

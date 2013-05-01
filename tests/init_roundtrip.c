@@ -35,15 +35,15 @@ doit (void)
 {
   int res;
 
-  res = gnutls_global_init ();
+  res = global_init ();
   if (res != 0)
-    fail ("gnutls_global_init\n");
+    fail ("global_init\n");
 
   gnutls_global_deinit ();
 
-  res = gnutls_global_init ();
+  res = global_init ();
   if (res != 0)
-    fail ("gnutls_global_init2\n");
+    fail ("global_init2\n");
 
   gnutls_global_deinit ();
 

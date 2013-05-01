@@ -110,7 +110,7 @@ client (struct params_res *params)
       gnutls_global_set_log_function (tls_log_func);
       gnutls_global_set_log_level (2);
     }
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_anon_allocate_client_credentials (&anoncred);
 
@@ -368,7 +368,7 @@ server (struct params_res *params)
       gnutls_global_set_log_level (2);
     }
 
-  gnutls_global_init ();
+  global_init ();
   gnutls_anon_allocate_server_credentials (&anoncred);
 
   if (debug)

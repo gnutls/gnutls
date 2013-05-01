@@ -36,8 +36,8 @@ doit (void)
   MD5_CTX c;
   unsigned char md[MD5_DIGEST_LENGTH];
 
-  if (gnutls_global_init () != 0)
-    fail ("gnutls_global_init\n");
+  if (global_init () != 0)
+    fail ("global_init\n");
 
   if (!gnutls_check_version (GNUTLS_VERSION))
     success ("gnutls_check_version ERROR\n");

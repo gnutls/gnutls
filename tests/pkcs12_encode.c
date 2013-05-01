@@ -85,9 +85,9 @@ doit (void)
   size_t size;
   int i;
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "gnutls_global_init %d", ret);
+    error (EXIT_FAILURE, 0, "global_init %d", ret);
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)

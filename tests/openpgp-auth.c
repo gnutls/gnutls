@@ -74,7 +74,7 @@ doit ()
   pid_t child;
   char pub_key_path[512], priv_key_path[512];
 
-  gnutls_global_init ();
+  global_init ();
 
   srcdir = getenv ("srcdir") ? getenv ("srcdir") : ".";
 

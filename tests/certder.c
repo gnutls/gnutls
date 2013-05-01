@@ -293,7 +293,7 @@ doit (void)
   gnutls_datum_t der3Cert = { der3, sizeof (der3) };
   gnutls_x509_crt_t cert;
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret < 0)
     fail ("init %d\n", ret);
 

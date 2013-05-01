@@ -188,7 +188,7 @@ client (void)
   char buffer[MAX_BUF + 1];
   gnutls_certificate_credentials_t xcred;
 
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
@@ -429,7 +429,7 @@ server (void)
 {
   /* this must be called once in the program
    */
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)

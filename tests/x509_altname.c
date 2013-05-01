@@ -72,7 +72,7 @@ doit (void)
   unsigned int critical = 0;
   int alt_name_count = 0;
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret < 0)
     fail ("init %d\n", ret);
 

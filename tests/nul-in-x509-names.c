@@ -96,10 +96,10 @@ doit (void)
   gnutls_x509_crt_t crt;
   int ret;
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret < 0)
     {
-      fail ("gnutls_global_init");
+      fail ("global_init");
       exit (1);
     }
 

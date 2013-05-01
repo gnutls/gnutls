@@ -84,6 +84,7 @@
 #include <gnutls/openpgp.h>
 #include <gnutls/dtls.h>
 #include <unistd.h>
+#include <utils.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -1124,7 +1125,7 @@ int main(int argc, const char* argv[])
 	}
 
 	setlinebuf(stdout);
-	gnutls_global_init();
+	global_init();
 	cred_init();
 	gnutls_global_set_log_function(logfn);
 	gnutls_global_set_audit_log_function(auditfn);

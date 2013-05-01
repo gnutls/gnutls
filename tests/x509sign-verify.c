@@ -159,7 +159,7 @@ doit (void)
   int ret;
   size_t i;
 
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)

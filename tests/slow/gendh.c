@@ -34,9 +34,9 @@ doit (void)
   gnutls_dh_params_t dh_params = NULL;
   int rc;
 
-  rc = gnutls_global_init ();
+  rc = global_init ();
   if (rc)
-    fail ("gnutls_global_init\n");
+    fail ("global_init\n");
 
   if (gnutls_dh_params_init (&dh_params) < 0)
     fail ("Error in dh parameter initialization\n");

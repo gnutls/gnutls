@@ -187,7 +187,7 @@ client (int fd)
     /* Need to enable anonymous KX specifically. */
 
 /*    gnutls_global_set_audit_log_function (tls_audit_log_func); */
-    gnutls_global_init ();
+    global_init ();
 
     if (debug)
       {
@@ -302,7 +302,7 @@ server (int fd)
     ts.tv_sec = 0;
     ts.tv_nsec = 100*1000*1000;
 
-    gnutls_global_init ();
+    global_init ();
 
     if (debug)
       {

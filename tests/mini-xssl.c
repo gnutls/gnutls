@@ -159,7 +159,7 @@ client (int fd, unsigned int vmethod, unsigned use_cert)
   unsigned int status;
   unsigned aux_size = 0;
 
-  gnutls_global_init ();
+  global_init ();
   gnutls_global_set_time_function (mytime);
 
   if (debug)
@@ -268,7 +268,7 @@ server (int fd, unsigned vmethod)
   gnutls_cinput_st aux[2];
   unsigned aux_size = 0;
 
-  gnutls_global_init ();
+  global_init ();
 
   if (debug)
     {
