@@ -728,6 +728,7 @@ _gnutls_recv_finished (gnutls_session_t session)
   int data_size;
   int ret;
   int vrfy_size;
+  int version = gnutls_protocol_get_version (session);
 
   ret =
     _gnutls_recv_handshake (session, GNUTLS_HANDSHAKE_FINISHED, 
@@ -742,14 +743,10 @@ _gnutls_recv_finished (gnutls_session_t session)
   vrfy = buf.data;
   vrfy_size = buf.length;
 
-  if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
-    {
-      data_size = 36;
-    }
+  if (version == GNUTLS_SSL3)
+    data_size = 36;
   else
-    {
-      data_size = 12;
-    }
+    data_size = 12;
 
   if (vrfy_size != data_size)
     {
@@ -758,7 +755,7 @@ _gnutls_recv_finished (gnutls_session_t session)
       goto cleanup;
     }
 
-  if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
+  if (version == GNUTLS_SSL3)
     {
       ret =
         _gnutls_ssl3_finished (session,
