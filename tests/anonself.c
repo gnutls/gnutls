@@ -64,7 +64,7 @@ client (void)
   gnutls_anon_client_credentials_t anoncred;
   /* Need to enable anonymous KX specifically. */
 
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
@@ -249,7 +249,7 @@ server (void)
 {
   /* this must be called once in the program
    */
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)

@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utils.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/openpgp.h>
 
@@ -88,10 +89,10 @@ main (int argc, char** argv)
       gnutls_global_set_log_level (9);
     }
 
-  rc = gnutls_global_init ();
+  rc = global_init ();
   if (rc)
     {
-      printf ("gnutls_global_init rc %d: %s\n", rc, gnutls_strerror (rc));
+      printf ("global_init rc %d: %s\n", rc, gnutls_strerror (rc));
       return 1;
     }
 

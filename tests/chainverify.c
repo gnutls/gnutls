@@ -806,7 +806,7 @@ doit (void)
   exit(77);
 #endif
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret != 0)
     {
       fail ("%d: %s\n", ret, gnutls_strerror (ret));

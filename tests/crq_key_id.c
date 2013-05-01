@@ -56,9 +56,9 @@ doit (void)
 
   int ret;
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret < 0)
-    fail ("gnutls_global_init: %d\n", ret);
+    fail ("global_init: %d\n", ret);
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)

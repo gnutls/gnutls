@@ -115,7 +115,7 @@ doit (void)
   unsigned char key[32];
   char tmp[1024];
 
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)

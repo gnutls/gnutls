@@ -79,7 +79,7 @@ client (int fd, const char* protocol1, const char* protocol2)
     gnutls_anon_client_credentials_t anoncred;
     /* Need to enable anonymous KX specifically. */
 
-    gnutls_global_init ();
+    global_init ();
 
     if (debug)
       {
@@ -188,7 +188,7 @@ server (int fd, const char* protocol1, const char* protocol2)
 
     /* this must be called once in the program
      */
-    gnutls_global_init ();
+    global_init ();
 
     if (debug)
       {

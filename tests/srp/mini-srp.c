@@ -115,7 +115,7 @@ client (int fd, const char* prio)
   gnutls_certificate_credentials_t x509_cred;
   /* Need to enable anonymous KX specifically. */
 
-  gnutls_global_init ();
+  global_init ();
 
   if (debug)
     {
@@ -220,7 +220,7 @@ gnutls_session_t session;
 
   /* this must be called once in the program
    */
-  gnutls_global_init ();
+  global_init ();
 
   if (debug)
     {

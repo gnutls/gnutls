@@ -642,9 +642,9 @@ doit (void)
   gnutls_datum_t data;
   int ret;
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret < 0)
-    fail ("gnutls_global_init: %d\n", ret);
+    fail ("global_init: %d\n", ret);
 
   ret = gnutls_x509_crt_init (&x509);
   if (ret < 0)

@@ -139,7 +139,7 @@ client (int fd, const char* prio)
   gnutls_session_t session;
   /* Need to enable anonymous KX specifically. */
 
-  gnutls_global_init ();
+  global_init ();
 
   if (debug)
     {
@@ -251,7 +251,7 @@ gnutls_range_st range;
 
   /* this must be called once in the program
    */
-  gnutls_global_init ();
+  global_init ();
   memset(buffer, 0, sizeof(buffer));
 
   if (debug)

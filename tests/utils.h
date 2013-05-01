@@ -26,12 +26,18 @@
 #include <string.h>
 #include <stdarg.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/pkcs11.h>
 
 #ifndef __attribute__
 #if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
 #define __attribute__(Spec)     /* empty */
 #endif
 #endif
+
+inline static int global_init(void) {
+  gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
+  return gnutls_global_init();
+}
 
 extern int debug;
 extern int error_count;

@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utils.h>
 #include <gnutls/gnutls.h>
 
 int
@@ -35,7 +36,7 @@ main (int argc, char *argv[])
   gnutls_anon_client_credentials_t c_anoncred;
   gnutls_session_t client;
 
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_anon_allocate_client_credentials (&c_anoncred);
   gnutls_init (&client, GNUTLS_CLIENT);

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utils.h>
 #include <gnutls/gnutls.h>
 
 /* Ecore_Fd_Handler example
@@ -162,7 +163,7 @@ main (void)
   int sd, i;
 
   /* General init. */
-  gnutls_global_init ();
+  global_init ();
   ecore_init();
 //  gnutls_global_set_log_function (tls_log_func);
 //  gnutls_global_set_log_level (2);

@@ -64,7 +64,7 @@ client (void)
   gnutls_psk_client_credentials_t pskcred;
   const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
 
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
@@ -258,7 +258,7 @@ server (void)
 {
   /* this must be called once in the program
    */
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)

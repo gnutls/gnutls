@@ -45,7 +45,7 @@ doit (void)
   int rc;
   bigint_t n1, n2, n3, n4;
 
-  gnutls_global_init ();
+  global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)

@@ -50,9 +50,9 @@ doit (void)
   gnutls_x509_privkey_t pkey;
   int ret;
 
-  ret = gnutls_global_init ();
+  ret = global_init ();
   if (ret < 0)
-    fail ("gnutls_global_init failed %d\n", ret);
+    fail ("global_init failed %d\n", ret);
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)

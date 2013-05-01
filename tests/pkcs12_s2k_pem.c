@@ -34,6 +34,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utils.h>
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -265,7 +266,7 @@ main (void)
   size_t i;
   int ret;
 
-  gnutls_global_init ();
+  global_init ();
 
   for (i = 0; i < sizeof (keys) / sizeof (keys[0]); i++)
     {

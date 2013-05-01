@@ -56,7 +56,7 @@ doit (void)
   int ret;
   FILE* fp;
 
-  gnutls_global_init ();
+  global_init ();
   pid = fork();
   if (pid == 0)
     {

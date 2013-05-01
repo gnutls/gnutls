@@ -67,7 +67,7 @@ client (void)
   /* Need to enable anonymous KX specifically. */
   const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
 
-  gnutls_global_init ();
+  global_init ();
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
     gnutls_global_set_log_level (4711);
@@ -249,7 +249,7 @@ server (void)
 {
   /* this must be called once in the program
    */
-  gnutls_global_init ();
+  global_init ();
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
     gnutls_global_set_log_level (4711);
