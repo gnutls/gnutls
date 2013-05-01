@@ -46,7 +46,7 @@ int main()
 #include <gnutls/gnutls.h>
 #include <signal.h>
 #include <errno.h>
-#include <utils.h>
+#include "../utils.h"
 
 #include <time.h>
 #include <sys/time.h>
