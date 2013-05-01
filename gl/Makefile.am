@@ -565,15 +565,16 @@ EXTRA_libgnu_la_SOURCES += getsubopt.c
 
 ## begin gnulib module gettext
 
-# This is for those projects which use "gettextize --intl" to put a source-code
-# copy of libintl into their package. In such projects, every Makefile.am needs
+# If your project uses "gettextize --intl" to put a source-code
+# copy of libintl into the package, every Makefile.am needs
 # -I$(top_builddir)/intl, so that <libintl.h> can be found in this directory.
-# For the Makefile.ams in other directories it is the maintainer's
-# responsibility; for the one from gnulib we do it here.
-# This option has no effect when the user disables NLS (because then the intl
-# directory contains no libintl.h file) or when the project does not use
-# "gettextize --intl".
-AM_CPPFLAGS += -I$(top_builddir)/intl
+# Here's one way to do this:
+#AM_CPPFLAGS += -I$(top_builddir)/intl
+# This option has no effect when the user disables NLS (because then
+# the intl directory contains no libintl.h file).  This option is not
+# enabled by default because the intl directory might not exist if
+# your project does not use "gettext --intl", and some compilers
+# complain about -I options applied to nonexistent directories.
 
 EXTRA_DIST += $(top_srcdir)/build-aux/config.rpath
 

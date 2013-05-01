@@ -432,6 +432,23 @@ EXTRA_DIST += test-getdelim.c signature.h macros.h
 
 ## end   gnulib module getdelim-tests
 
+## begin gnulib module getdtablesize
+
+
+EXTRA_DIST += getdtablesize.c
+
+EXTRA_libtests_a_SOURCES += getdtablesize.c
+
+## end   gnulib module getdtablesize
+
+## begin gnulib module getdtablesize-tests
+
+TESTS += test-getdtablesize
+check_PROGRAMS += test-getdtablesize
+EXTRA_DIST += test-getdtablesize.c signature.h macros.h
+
+## end   gnulib module getdtablesize-tests
+
 ## begin gnulib module getline-tests
 
 TESTS += test-getline
