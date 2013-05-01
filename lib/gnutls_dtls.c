@@ -781,6 +781,10 @@ unsigned int diff;
  * for (i.e. #gnutls_session_t) is the one that the 
  * original incoming packet was originated from.
  *
+ * This function must be called at the first incoming packet,
+ * prior to allocating any resources and must be succeeded
+ * by gnutls_dtls_cookie_verify().
+ *
  * Returns: the number of bytes sent, or a negative error code.  
  *
  * Since: 3.0
@@ -878,10 +882,12 @@ uint8_t digest[C_HASH_SIZE];
  * @msg_size: The size of the message.
  * @prestate: The cookie of this client.
  *
- * This function will verify an incoming message for
+ * This function will verify the received message for
  * a valid cookie. If a valid cookie is returned then
  * it should be associated with the session using
  * gnutls_dtls_prestate_set();
+ *
+ * This function must be called after gnutls_dtls_cookie_send().
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.  
  *
@@ -952,6 +958,9 @@ uint8_t digest[C_HASH_SIZE];
  * This function will associate the prestate acquired by
  * the cookie authentication with the client, with the newly 
  * established session.
+ *
+ * This functions must be called after a successful gnutls_dtls_cookie_verify()
+ * and should be succeeded by the actual DTLS handshake using gnutls_handshake().
  *
  * Since: 3.0
  **/
