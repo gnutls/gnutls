@@ -430,7 +430,7 @@ gnutls_x509_crt_t crt = NULL, ca = NULL;
 	
 		if (!matches(&raw_crt[1], data, match)) {
 		        gnutls_assert();
-			*verify |= DANE_VERIFY_CA_CONSTRAINS_VIOLATED;
+			*verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
                 }
 
 	} else if (ctype == DANE_CERT_PK && crt_type == GNUTLS_CRT_X509) {
@@ -442,7 +442,7 @@ gnutls_x509_crt_t crt = NULL, ca = NULL;
 
 		if (!matches(&pubkey, data, match)) {
                         gnutls_assert();
-			*verify |= DANE_VERIFY_CA_CONSTRAINS_VIOLATED;
+			*verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
                 }
 	} else {
 		ret = gnutls_assert_val(DANE_E_UNKNOWN_DANE_DATA);
@@ -477,7 +477,7 @@ gnutls_x509_crt_t crt = NULL, ca = NULL;
 	ret = gnutls_x509_crt_check_issuer(crt, ca);
 	if (ret == 0) {
 		gnutls_assert();
-		*verify |= DANE_VERIFY_CA_CONSTRAINS_VIOLATED;
+		*verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
 	}
 
 	ret = gnutls_x509_crt_verify(crt, &ca, 1, 0, &vstatus);
@@ -486,7 +486,7 @@ gnutls_x509_crt_t crt = NULL, ca = NULL;
   	  	goto cleanup;
 	}
 	if (vstatus != 0)
-		*verify |= DANE_VERIFY_CA_CONSTRAINS_VIOLATED;
+		*verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
 
 	ret = 0;
 cleanup:
@@ -710,7 +710,7 @@ dane_verification_status_print (unsigned int status,
   else
     _gnutls_buffer_append_str (&str, _("Verification failed. "));
 
-  if (status & DANE_VERIFY_CA_CONSTRAINS_VIOLATED)
+  if (status & DANE_VERIFY_CA_CONSTRAINTS_VIOLATED)
     _gnutls_buffer_append_str (&str, _("CA constrains were violated. "));
 
   if (status & DANE_VERIFY_CERT_DIFFERS)
