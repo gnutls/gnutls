@@ -49,7 +49,7 @@ void get_dn_crq_set (gnutls_x509_crq_t crt);
 void get_uid_crt_set (gnutls_x509_crt_t crt);
 void get_pkcs9_email_crt_set (gnutls_x509_crt_t crt);
 void get_oid_crt_set (gnutls_x509_crt_t crt);
-void get_key_purpose_set (gnutls_x509_crt_t crt);
+void get_key_purpose_set (int type, void *crt);
 int get_serial (void);
 int get_days (void);
 int get_ca_status (void);

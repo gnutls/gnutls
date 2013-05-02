@@ -748,7 +748,7 @@ get_oid_crt_set (gnutls_x509_crt_t crt)
 }
 
 void
-get_key_purpose_set (gnutls_x509_crt_t crt)
+get_key_purpose_set (int type, void *crt)
 {
   int ret, i;
 
@@ -758,9 +758,12 @@ get_key_purpose_set (gnutls_x509_crt_t crt)
         return;
       for (i = 0; cfg.key_purpose_oids[i] != NULL; i++)
         {
-          ret =
-            gnutls_x509_crt_set_key_purpose_oid (crt, cfg.key_purpose_oids[i],
-                                                 0);
+          if (type == TYPE_CRT)
+            ret =
+              gnutls_x509_crt_set_key_purpose_oid (crt, cfg.key_purpose_oids[i], 0);
+          else
+            ret =
+              gnutls_x509_crq_set_key_purpose_oid (crt, cfg.key_purpose_oids[i], 0);
 
           if (ret < 0)
             {
