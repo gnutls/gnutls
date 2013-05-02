@@ -35,7 +35,9 @@
 #endif
 
 inline static int global_init(void) {
+#ifdef ENABLE_PKCS11
   gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
+#endif
   return gnutls_global_init();
 }
 
