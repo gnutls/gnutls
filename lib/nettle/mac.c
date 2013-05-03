@@ -68,7 +68,8 @@ struct nettle_mac_ctx
     struct hmac_sha384_ctx sha384;
     struct hmac_sha512_ctx sha512;
     struct hmac_sha1_ctx sha1;
-    struct umac96_ctx umac;
+    struct umac96_ctx umac96;
+    struct umac128_ctx umac128;
   } ctx;
   
   void *ctx_ptr;
@@ -84,6 +85,12 @@ static void
 _wrap_umac96_set_key(void* ctx, unsigned len, const uint8_t* key)
 {
 	return umac96_set_key(ctx, key);
+}
+
+static void
+_wrap_umac128_set_key(void* ctx, unsigned len, const uint8_t* key)
+{
+	return umac128_set_key(ctx, key);
 }
 
 static int _mac_ctx_init(gnutls_mac_algorithm_t algo, struct nettle_mac_ctx *ctx)
@@ -138,8 +145,16 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo, struct nettle_mac_ctx *ctx
       ctx->digest = (digest_func) umac96_digest;
       ctx->set_key = _wrap_umac96_set_key;
       ctx->set_nonce = (set_nonce_func) umac96_set_nonce;
-      ctx->ctx_ptr = &ctx->ctx.umac;
+      ctx->ctx_ptr = &ctx->ctx.umac96;
       ctx->length = 12;
+      break;
+    case GNUTLS_MAC_UMAC_128:
+      ctx->update = (update_func) umac128_update;
+      ctx->digest = (digest_func) umac128_digest;
+      ctx->set_key = _wrap_umac128_set_key;
+      ctx->set_nonce = (set_nonce_func) umac128_set_nonce;
+      ctx->ctx_ptr = &ctx->ctx.umac128;
+      ctx->length = 16;
       break;
     default:
       gnutls_assert ();
@@ -182,6 +197,7 @@ static int wrap_nettle_mac_exists(gnutls_mac_algorithm_t algo)
     case GNUTLS_MAC_SHA384:
     case GNUTLS_MAC_SHA512:
     case GNUTLS_MAC_UMAC_96:
+    case GNUTLS_MAC_UMAC_128:
       return 1;
     default:
       return 0;

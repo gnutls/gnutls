@@ -6,9 +6,9 @@ See the end for copying conditions.
 
 ** libgnutls: Use nettle's elliptic curve implementation.
 
-** libgnutls: Added Salsa20 cipher (experimental)
+** libgnutls: Added Salsa20 cipher
 
-** libgnutls: Added UMAC-96 MAC (experimental)
+** libgnutls: Added UMAC-96 and UMAC-128
 
 ** libgnutls: Added support for DTLS 1.2.
 
