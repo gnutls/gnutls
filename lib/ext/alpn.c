@@ -227,7 +227,7 @@ gnutls_alpn_get_selected_protocol (gnutls_session_t session,
  * @session: is a #gnutls_session_t structure.
  * @protocols: is the protocol names to add.
  * @protocols_size: the number of protocols to add.
- * @flags: one of %GNUTLS_ALPN_*
+ * @flags: zero or %GNUTLS_ALPN_*
  *
  * This function is to be used by both clients and servers, to declare
  * the supported ALPN protocols, which are used during peer negotiation.
