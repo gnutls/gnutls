@@ -675,7 +675,7 @@ init_tls_session (const char *hostname)
           p[i].data = (void*)protos[i];
           p[i].size = strlen(protos[i]);
         }
-      gnutls_alpn_set_protocols( session, p, proto_n);
+      gnutls_alpn_set_protocols( session, p, proto_n, 0);
     }
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anon_cred);
