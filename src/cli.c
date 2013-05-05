@@ -629,6 +629,7 @@ init_tls_session (const char *hostname)
 {
   const char *err;
   int ret;
+  unsigned i;
   gnutls_session_t session;
 
   if (priorities == NULL)
@@ -665,8 +666,16 @@ init_tls_session (const char *hostname)
   
   if (HAVE_OPT(ALPN))
     {
-      gnutls_datum_t p = { OPT_ARG(ALPN), strlen(OPT_ARG(ALPN)) };
-      gnutls_alpn_set_protocols( session, &p, 1);
+      unsigned proto_n = STACKCT_OPT(ALPN);
+      char** protos  = (void*)STACKLST_OPT(ALPN);
+      gnutls_datum_t p[proto_n];
+      
+      for (i=0;i<proto_n;i++)
+        {
+          p[i].data = (void*)protos[i];
+          p[i].size = strlen(protos[i]);
+        }
+      gnutls_alpn_set_protocols( session, p, proto_n);
     }
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anon_cred);

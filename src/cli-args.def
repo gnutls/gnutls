@@ -63,23 +63,10 @@ flag = {
 };
 
 flag = {
-    name      = heartbeat;
-    value     = b;
-    descrip   = "Activate heartbeat support";
-    doc      = "";
-};
-
-flag = {
     name      = rehandshake;
     value     = e;
     descrip   = "Establish a session and rehandshake";
     doc       = "Connect, establish a session and rehandshake immediately.";
-};
-
-flag = {
-    name      = noticket;
-    descrip   = "Don't accept session tickets";
-    doc      = "";
 };
 
 flag = {
@@ -105,13 +92,6 @@ flag = {
 };
 
 flag = {
-    name      = srtp_profiles;
-    arg-type  = string;
-    descrip   = "Offer SRTP profiles";
-    doc       = "";
-};
-
-flag = {
     name      = crlf;
     descrip   = "Send CR LF instead of LF";
     doc      = "";
@@ -131,22 +111,8 @@ flag = {
 };
 
 flag = {
-    name      = disable-extensions;
-    descrip   = "Disable all the TLS extensions";
-    doc      = "This option disables all TLS extensions. Deprecated option. Use the priority string.";
-};
-
-flag = {
     name      = print-cert;
     descrip   = "Print peer's certificate in PEM format";
-    doc      = "";
-};
-
-flag = {
-    name      = recordsize;
-    arg-type  = number;
-    arg-range = "0->4096";
-    descrip   = "The maximum record size to advertize";
     doc      = "";
 };
 
@@ -257,12 +223,6 @@ flag = {
     doc      = "";
 };
 
-flag = {
-    name      = alpn;
-    arg-type  = string;
-    descrip   = "Application layer protocol";
-    doc      = "This option will set and enable the Application Layer Protocol Negotiation  (ALPN) in the TLS protocol.";
-};
 
 flag = {
     name      = port;
@@ -316,11 +276,53 @@ flag = {
 };
 
 flag = {
+    name      = noticket;
+    descrip   = "Don't allow session tickets";
+    doc      = "";
+};
+
+flag = {
+    name      = srtp_profiles;
+    arg-type  = string;
+    descrip   = "Offer SRTP profiles";
+    doc       = "";
+};
+
+flag = {
+    name      = alpn;
+    arg-type  = string;
+    descrip   = "Application layer protocol";
+    max       = NOLIMIT;  /* occurrence limit (none)     */
+    stack-arg;            /* save opt args in a stack    */
+    doc      = "This option will set and enable the Application Layer Protocol Negotiation  (ALPN) in the TLS protocol.";
+};
+
+flag = {
+    name      = heartbeat;
+    value     = b;
+    descrip   = "Activate heartbeat support";
+    doc      = "";
+};
+
+flag = {
+    name      = recordsize;
+    arg-type  = number;
+    arg-range = "0->4096";
+    descrip   = "The maximum record size to advertize";
+    doc      = "";
+};
+
+flag = {
     name      = disable-sni;
     descrip   = "Do not send a Server Name Indication (SNI)";
     doc      = "";
 };
 
+flag = {
+    name      = disable-extensions;
+    descrip   = "Disable all the TLS extensions";
+    doc      = "This option disables all TLS extensions. Deprecated option. Use the priority string.";
+};
 
 
 doc-section = {

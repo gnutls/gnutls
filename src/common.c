@@ -457,6 +457,7 @@ print_info (gnutls_session_t session, int verbose, int print_cert)
     unsigned char session_id[33];
     size_t session_id_size = sizeof (session_id);
     gnutls_srtp_profile_t srtp_profile;
+    gnutls_datum_t p;
     char *desc;
     int rc;
 
@@ -575,6 +576,10 @@ print_info (gnutls_session_t session, int verbose, int print_cert)
     if (rc == 0)
       printf ("- SRTP profile: %s\n", gnutls_srtp_get_profile_name (srtp_profile));
 #endif
+
+    rc = gnutls_alpn_get_selected_protocol (session, &p);
+    if (rc == 0)
+      printf ("- Application protocol: %.*s\n", p.size, p.data);
 
     if (verbose)
       {
