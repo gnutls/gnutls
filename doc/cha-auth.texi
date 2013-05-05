@@ -82,12 +82,15 @@ connection other channels over the Internet may be used, e.g., @acronym{DNSSEC}
 
 @subsection Two peers and a trusted third party
 
-When a trusted third party is available the most suitable option is to use 
+When a trusted third party is available (or a certificate authority) 
+the most suitable option is to use 
 certificate authentication (see @ref{Certificate authentication}). 
 The client and the server obtain certificates that associate their identity
-and public keys in a reliable way and use them to on the subsequent
-communications with each other. Each party verifies the peer's certificate
-using the trusted third party's certificate.
+and public keys using a digital signature by the trusted party and use 
+them to on the subsequent communications with each other. 
+Each party verifies the peer's certificate using the trusted third party's 
+signature. The parameters of the third party's signature are present
+in its certificate which must be available to all communicating parties.
 
 While the above is the typical authentication method for servers in the
 Internet by using the commercial CAs, the users that act as clients in the
