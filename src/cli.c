@@ -662,6 +662,12 @@ init_tls_session (const char *hostname)
 
   if (HAVE_OPT(DH_BITS)) 
     gnutls_dh_set_prime_bits( session, OPT_VALUE_DH_BITS);
+  
+  if (HAVE_OPT(ALPN))
+    {
+      gnutls_datum_t p = { OPT_ARG(ALPN), strlen(OPT_ARG(ALPN)) };
+      gnutls_alpn_set_protocols( session, &p, 1);
+    }
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anon_cred);
   if (srp_cred)

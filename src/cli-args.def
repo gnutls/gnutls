@@ -258,6 +258,13 @@ flag = {
 };
 
 flag = {
+    name      = alpn;
+    arg-type  = string;
+    descrip   = "Application layer protocol";
+    doc      = "This option will set and enable the Application Layer Protocol Negotiation  (ALPN) in the TLS protocol.";
+};
+
+flag = {
     name      = port;
     value     = p;
     arg-type  = string;
