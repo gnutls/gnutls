@@ -32,6 +32,7 @@ typedef struct
   unsigned size;
   uint8_t *selected_protocol;
   unsigned selected_protocol_size;
+  unsigned flags;
 } alpn_ext_st;
 
 extern extension_entry_st ext_mod_alpn;

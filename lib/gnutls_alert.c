@@ -72,6 +72,8 @@ static const gnutls_alert_entry sup_alerts[] = {
    N_("The server name sent was not recognized")),
   ALERT_ENTRY(GNUTLS_A_UNKNOWN_PSK_IDENTITY,
    N_("The SRP/PSK username is missing or not known")),
+  ALERT_ENTRY(GNUTLS_A_NO_APPLICATION_PROTOCOL,
+   N_("No supported application protocol could be negotiated")),
   {0, NULL, NULL}
 };
 
@@ -277,6 +279,10 @@ gnutls_error_to_alert (int err, int *level)
     case GNUTLS_E_DH_PRIME_UNACCEPTABLE:
     case GNUTLS_E_NO_CERTIFICATE_FOUND:
       ret = GNUTLS_A_INSUFFICIENT_SECURITY;
+      _level = GNUTLS_AL_FATAL;
+      break;
+    case GNUTLS_E_NO_APPLICATION_PROTOCOL:
+      ret = GNUTLS_A_NO_APPLICATION_PROTOCOL;
       _level = GNUTLS_AL_FATAL;
       break;
     default:

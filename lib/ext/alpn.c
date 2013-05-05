@@ -112,6 +112,9 @@ _gnutls_alpn_recv_params (gnutls_session_t session,
       p += len1;
     }
 
+  if (priv->selected_protocol == NULL && (priv->flags & GNUTLS_ALPN_MAND))
+    return gnutls_assert_val(GNUTLS_E_NO_APPLICATION_PROTOCOL);
+
   return 0;
 }
 
@@ -224,9 +227,13 @@ gnutls_alpn_get_selected_protocol (gnutls_session_t session,
  * @session: is a #gnutls_session_t structure.
  * @protocols: is the protocol names to add.
  * @protocols_size: the number of protocols to add.
+ * @flags: one of %GNUTLS_ALPN_*
  *
  * This function is to be used by both clients and servers, to declare
  * the supported ALPN protocols, which are used during peer negotiation.
+ *
+ * If %GNUTLS_ALPN_MAND is specified the connection will be aborted
+ * if no matching ALPN protocol is found.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -235,7 +242,8 @@ gnutls_alpn_get_selected_protocol (gnutls_session_t session,
  **/
 int
 gnutls_alpn_set_protocols (gnutls_session_t session,
-                           const gnutls_datum_t * protocols, unsigned protocols_size)
+                           const gnutls_datum_t * protocols, unsigned protocols_size,
+                           unsigned int flags)
 {
   int ret;
   alpn_ext_st *priv;
@@ -272,6 +280,7 @@ gnutls_alpn_set_protocols (gnutls_session_t session,
       priv->protocol_size[i] = protocols[i].size;
       priv->size++;
     }
+  priv->flags = flags;
 
   return 0;
 }

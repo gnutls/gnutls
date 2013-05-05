@@ -355,6 +355,8 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_NO_CERTIFICATE_STATUS, 1),
   ERROR_ENTRY (N_("Error in the system's randomness device."),
                GNUTLS_E_RANDOM_DEVICE_ERROR, 1),
+  ERROR_ENTRY (N_("No common application protocol could be negotiated."),
+               GNUTLS_E_NO_APPLICATION_PROTOCOL, 1),
   {NULL, NULL, 0, 0}
 };
 
