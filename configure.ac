@@ -649,7 +649,6 @@ AC_MSG_NOTICE([Optional features:
 if features are disabled)
 
   DTLS-SRTP support:    $ac_enable_srtp
-  ALPN support:         $ac_enable_alpn
   OCSP support:         $ac_enable_ocsp
   OpenPGP support:      $ac_enable_openpgp
   SRP support:          $ac_enable_srp

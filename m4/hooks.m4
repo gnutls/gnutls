@@ -153,20 +153,6 @@ fi
   fi
   AM_CONDITIONAL(ENABLE_DTLS_SRTP, test "$ac_enable_srtp" != "no")
 
-  AC_MSG_CHECKING([whether to disable ALPN extension])
-  AC_ARG_ENABLE(dtls-alpn-support,
-    AS_HELP_STRING([--disable-dtls-alpn-support],
-                   [disable support for the Application Layer Protocol Negotiation (ALPN) extension]),
-    ac_enable_alpn=$enableval,ac_enable_alpn=yes)
-  if test x$ac_enable_alpn != xno; then
-   AC_MSG_RESULT(no)
-   AC_DEFINE([ENABLE_ALPN], 1, [enable ALPN support])
-  else
-   ac_full=0
-   AC_MSG_RESULT(yes)
-  fi
-  AM_CONDITIONAL(ENABLE_ALPN, test "$ac_enable_alpn" != "no")
-
   ac_enable_heartbeat=yes
   AC_MSG_CHECKING([whether to disable TLS heartbeat support])
   AC_ARG_ENABLE(heartbeat-support,
