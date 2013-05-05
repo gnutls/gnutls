@@ -84,7 +84,7 @@
 #include <gnutls/openpgp.h>
 #include <gnutls/dtls.h>
 #include <unistd.h>
-#include <utils.h>
+#include "../utils.h"
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
