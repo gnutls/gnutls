@@ -290,7 +290,6 @@ int ret;
 int
 _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel)
 {
-  char pr[128];
   int ret;
   uint8_t *msg = _mbuffer_get_udata_ptr (bufel);
   size_t hb_len, len = _mbuffer_get_udata_size (bufel);
