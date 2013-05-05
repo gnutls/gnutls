@@ -105,7 +105,7 @@ client (int fd, const char* protocol1, const char* protocol2)
         t[1].data = (void*)protocol2;
         t[1].size = strlen(protocol2);
         
-        ret = gnutls_alpn_set_protocols(session, t, 2);
+        ret = gnutls_alpn_set_protocols(session, t, 2, 0);
         if (ret < 0)
           {
             gnutls_perror(ret);
@@ -212,7 +212,7 @@ server (int fd, const char* protocol1, const char* protocol2)
     t[1].data = (void*)protocol2;
     t[1].size = strlen(protocol2);
     
-    ret = gnutls_alpn_set_protocols(session, t, 2);
+    ret = gnutls_alpn_set_protocols(session, t, 2, 0);
     if (ret < 0)
       {
         gnutls_perror(ret);
