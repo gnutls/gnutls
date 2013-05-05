@@ -637,11 +637,6 @@ string. To enable, use the following functions.
 
 @showfuncB{gnutls_alpn_set_protocols,gnutls_alpn_get_selected_protocol}
 
-Note that you can use these functions with protocols that are
-registered in the Application Layer Protocol Negotiation IANA registry.
-If you wish to use them for other custom protocols then prefix them
-with the 3 characters `exp' (lower-case).
-
 @include sec-tls-app.texi
 
 @node On SSL 2 and older protocols
