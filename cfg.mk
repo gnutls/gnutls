@@ -262,29 +262,43 @@ lib/accelerated/x86/coff/cpuid-x86-coff.s: devel/perlasm/cpuid-x86.pl
 	perl $< coff >> $@
 
 lib/accelerated/x86/macosx/appro-aes-gcm-x86-64-macosx.s: devel/perlasm/ghash-x86_64.pl
-	cat devel/perlasm/license.txt > $@
+	echo '/*' > $@
+	cat devel/perlasm/license.txt >> $@
+	echo '*/' >> $@
 	perl $< macosx >> $@
 
 lib/accelerated/x86/macosx/appro-aes-x86-64-macosx.s: devel/perlasm/aesni-x86_64.pl
-	cat devel/perlasm/license.txt > $@
+	echo '/*' > $@
+	cat devel/perlasm/license.txt >> $@
+	echo '*/' >> $@
 	perl $< macosx >> $@
 
 lib/accelerated/x86/macosx/appro-aes-x86-macosx.s: devel/perlasm/aesni-x86.pl
-	cat devel/perlasm/license.txt > $@
+	echo '/*' > $@
+	cat devel/perlasm/license.txt >> $@
+	echo '*/' >> $@
 	perl $< macosx >> $@
 
 lib/accelerated/x86/macosx/padlock-x86-64-macosx.s: devel/perlasm/e_padlock-x86_64.pl
-	cat devel/perlasm/license.txt > $@
+	echo '/*' > $@
+	cat devel/perlasm/license.txt >> $@
+	echo '*/' >> $@
 	perl $< macosx >> $@
 
 lib/accelerated/x86/macosx/padlock-x86-macosx.s: devel/perlasm/e_padlock-x86.pl
-	cat devel/perlasm/license.txt > $@
+	echo '/*' > $@
+	cat devel/perlasm/license.txt >> $@
+	echo '*/' >> $@
 	perl $< macosx >> $@
 
 lib/accelerated/x86/macosx/cpuid-x86-64-macosx.s: devel/perlasm/cpuid-x86_64.pl
-	cat devel/perlasm/license-gnutls.txt > $@
+	echo '/*' > $@
+	cat devel/perlasm/license.txt >> $@
+	echo '*/' >> $@
 	perl $< macosx >> $@
 
 lib/accelerated/x86/macosx/cpuid-x86-macosx.s: devel/perlasm/cpuid-x86.pl
-	cat devel/perlasm/license-gnutls.txt > $@
+	echo '/*' > $@
+	cat devel/perlasm/license.txt >> $@
+	echo '*/' >> $@
 	perl $< macosx >> $@

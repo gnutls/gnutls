@@ -1,3 +1,4 @@
+/*
 # Copyright (c) 2011-2012, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
@@ -37,6 +38,7 @@
 #
 # *** This file is auto-generated ***
 #
+*/
 .file	"devel/perlasm/aesni-x86.s"
 .text
 .globl	_aesni_encrypt

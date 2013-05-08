@@ -1,3 +1,4 @@
+/*
 # Copyright (c) 2011-2012, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
@@ -37,6 +38,7 @@
 #
 # *** This file is auto-generated ***
 #
+*/
 .text	
 .globl	_padlock_capability
 
