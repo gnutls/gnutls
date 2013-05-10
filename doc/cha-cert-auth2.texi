@@ -372,7 +372,7 @@ functions below.
 @showfuncC{gnutls_pkcs12_bag_get_data,gnutls_pkcs12_bag_get_key_id,gnutls_pkcs12_bag_get_friendly_name}
 
 The functions below are used to generate a PKCS #12 structure. An example
-of their usage is shown at @ref{PKCS #12 structure generation example}.
+of their usage is shown at @ref{PKCS12 structure generation example}.
 
 @showfuncC{gnutls_pkcs12_set_bag,gnutls_pkcs12_bag_encrypt,gnutls_pkcs12_generate_mac}
 @showfuncE{gnutls_pkcs12_bag_set_data,gnutls_pkcs12_bag_set_crl,gnutls_pkcs12_bag_set_crt,gnutls_pkcs12_bag_set_key_id,gnutls_pkcs12_bag_set_friendly_name}
