@@ -10,6 +10,10 @@ See the end for copying conditions.
 
 ** libgnutls: Added UMAC-96 and UMAC-128
 
+** libgnutls: Added ciphersuites involving Salsa20 and UMAC-96.
+As they are not standardized they are defined using private ciphersuite 
+numbers.
+
 ** libgnutls: Added support for DTLS 1.2.
 
 ** libgnutls: Added support for the Application Layer Protocol Negotiation
