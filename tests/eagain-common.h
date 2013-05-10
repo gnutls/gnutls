@@ -69,13 +69,9 @@ extern const char* side;
 #define HANDSHAKE(c, s) \
   HANDSHAKE_EXPECT(c,s,0,0)
 
-#define TRANSFER(c, s, msg, msglen, buf, buflen) \
-  do \
-    { \
-      side = "client"; \
-      ret = gnutls_record_send (c, msg, msglen); \
-    } \
-  while(ret == GNUTLS_E_AGAIN); \
+#define TRANSFER2(c, s, msg, msglen, buf, buflen, retry_send_with_null) \
+  side = "client"; \
+  ret = record_send_loop (c, msg, msglen, retry_send_with_null); \
   \
   if (ret < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
   \
@@ -97,12 +93,8 @@ extern const char* side;
         { \
           transferred += ret; \
         } \
-      do \
-        { \
-          side = "server"; \
-          ns = gnutls_record_send (server, msg, msglen); \
-        } \
-      while (ns == GNUTLS_E_AGAIN); \
+      side = "server"; \
+      ns = record_send_loop (server, msg, msglen, retry_send_with_null); \
       if (ns < 0) fail ("server send error: %s\n", gnutls_strerror (ret)); \
       do \
         { \
@@ -127,12 +119,8 @@ extern const char* side;
               fail ("client: Transmitted data do not match\n"); \
             } \
           /* echo back */ \
-          do \
-            { \
-              side = "client"; \
-              ns = gnutls_record_send (client, buf, msglen); \
-            } \
-          while (ns == GNUTLS_E_AGAIN); \
+          side = "client"; \
+          ns = record_send_loop (client, buf, msglen, retry_send_with_null); \
           if (ns < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
           transferred += ret; \
           if (debug) \
@@ -140,6 +128,10 @@ extern const char* side;
         } \
     } \
   while (transferred < 70000)
+
+#define TRANSFER(c, s, msg, msglen, buf, buflen) \
+  TRANSFER2(c, s, msg, msglen, buf, buflen, 0); \
+  TRANSFER2(c, s, msg, msglen, buf, buflen, 1)
 
 static char to_server[64*1024];
 static size_t to_server_len = 0;
@@ -292,4 +284,27 @@ inline static void reset_buffers(void)
 {
   to_server_len = 0;
   to_client_len = 0;
+}
+
+inline static int record_send_loop(gnutls_session_t session, const void * data, size_t sizeofdata, int use_null_on_retry)
+{
+int ret;
+const void * retry_data;
+size_t retry_sizeofdata;
+
+  if( use_null_on_retry ) {
+      retry_data = 0;
+      retry_sizeofdata = 0;
+  }
+  else {
+      retry_data = data;
+      retry_sizeofdata = sizeofdata;
+  }
+
+  ret = gnutls_record_send( session, data, sizeofdata );
+  while( ret == GNUTLS_E_AGAIN ) {
+    ret = gnutls_record_send( session, retry_data, retry_sizeofdata );
+  }
+
+  return ret;
 }
