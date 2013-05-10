@@ -94,7 +94,7 @@ int gnutls_random_art (gnutls_random_art_t type,
  * Note that since 3.1.7 this function is deprecated. The minimum
  * number of bits is set by the priority string level.
  * Also this function must be called after gnutls_priority_set_direct()
- * or the set value may be overriden by the selected priority options.
+ * or the set value may be overridden by the selected priority options.
  *
  *
  **/
