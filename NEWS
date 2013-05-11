@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.2.1 (unreleased)
+
+** libgnutls: Fixes in interrupted function resumption. Report
+and patch by Tim Kosse.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.0 (released 2013-05-10)
 
 ** libgnutls: Use nettle's elliptic curve implementation.
