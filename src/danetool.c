@@ -293,6 +293,10 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
               gnutls_free(clist);
             }
         }
+      else
+        {
+          fprintf(stderr, "\nCertificate was not verified. Use --load-certificate.\n");
+        }
     }
   
 
