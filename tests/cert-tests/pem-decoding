@@ -20,7 +20,7 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-set -e
+#set -e
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
@@ -31,6 +31,7 @@ rc=$?
 
 # We're done.
 if test "$rc" != "0"; then
+  echo "Funny-spacing cert decoding failed 1"
   exit $rc
 fi
 
@@ -39,6 +40,7 @@ $CERTTOOL --certificate-info --infile $srcdir/bmpstring.pem >tmp-pem.pem
 rc=$?
 
 if test "$rc" != "0"; then
+  echo "BMPString cert decoding failed 1"
   exit $rc
 fi
 
@@ -46,6 +48,7 @@ diff $srcdir/bmpstring.pem tmp-pem.pem
 rc=$?
 
 if test "$rc" != "0"; then
+  echo "BMPString cert decoding failed 2"
   exit $rc
 fi
 
@@ -54,6 +57,7 @@ $CERTTOOL --certificate-info --infile $srcdir/complex-cert.pem >tmp-pem.pem
 rc=$?
 
 if test "$rc" != "0"; then
+  echo "Complex cert decoding failed 1"
   exit $rc
 fi
 
@@ -61,6 +65,7 @@ diff $srcdir/complex-cert.pem tmp-pem.pem
 rc=$?
 
 if test "$rc" != "0"; then
+  echo "Complex cert decoding failed 2"
   exit $rc
 fi
 
