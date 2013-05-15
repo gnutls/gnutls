@@ -192,6 +192,7 @@ xssl_cred_t cred;
               gnutls_certificate_set_pin_function(cred->xcred, aux[i].i1.pin_fn,
                                                   aux[i].i2.udata);
             }
+          else ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
           if (ret < 0)
             {
@@ -239,6 +240,7 @@ xssl_cred_t cred;
                   goto fail1;
                 }
               memcpy(cred->tofu_file, aux[i].i1.file, len+1);
+              ret = 0;
             }
           else
             ret = GNUTLS_E_INVALID_REQUEST;

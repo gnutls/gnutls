@@ -1299,7 +1299,8 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
             }
 
           /* null terminate it */
-          ((char *) name)[*name_size] = 0;
+          if (name)
+            ((char *) name)[*name_size] = 0;
         }
 
     }

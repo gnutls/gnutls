@@ -183,7 +183,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
 ecc_cleanup:
         ecc_point_clear(&ecc_pub);
         ecc_scalar_clear(&ecc_priv);
-
+        if (ret < 0) goto cleanup;
         break;
       }
     default:

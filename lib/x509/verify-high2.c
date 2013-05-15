@@ -227,7 +227,7 @@ cleanup:
   for (i=0;i<pcrt_list_size;i++)
     {
       gnutls_pkcs11_obj_deinit(pcrt_list[i]);
-      gnutls_x509_crt_deinit(xcrt_list[i]);
+      if (xcrt_list) gnutls_x509_crt_deinit(xcrt_list[i]);
     }
   gnutls_free(pcrt_list);
   gnutls_free(xcrt_list);
