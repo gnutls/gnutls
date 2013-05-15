@@ -1004,15 +1004,15 @@ gnutls_x509_crl_verify (gnutls_x509_crl_t crl,
       }
   }
   
-  if (gnutls_x509_crl_get_this_update (crl) > now)
+  if (gnutls_x509_crl_get_this_update (crl) > now && verify)
     *verify |= GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE;
     
-  if (gnutls_x509_crl_get_next_update (crl) < now)
+  if (gnutls_x509_crl_get_next_update (crl) < now && verify)
     *verify |= GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED;
 
 
 cleanup:
-  if (*verify) *verify |= GNUTLS_CERT_INVALID;
+  if (verify) *verify |= GNUTLS_CERT_INVALID;
 
   _gnutls_free_datum (&crl_signed_data);
   _gnutls_free_datum (&crl_signature);

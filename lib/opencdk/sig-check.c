@@ -498,7 +498,7 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
   u32 keyid;
   int key_status, is_selfsig = 0;
   struct verify_uid *uid_list = NULL;
-  char *uid_name;
+  char *uid_name = NULL;
 
   if (!key || !r_status)
     {

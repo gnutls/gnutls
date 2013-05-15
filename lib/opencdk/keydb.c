@@ -268,8 +268,6 @@ keydb_idx_search (cdk_stream_t inp, u32 * keyid, const byte * fpr,
           *r_off = idx->offset;
           break;
         }
-      cdk_free (idx);
-      idx = NULL;
     }
   cdk_free (idx);
   return *r_off != 0xFFFFFFFF ? 0 : CDK_EOF;
@@ -818,6 +816,9 @@ keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_keydb_search_t ks,
 void
 cdk_keydb_search_release (cdk_keydb_search_t st)
 {
+  if (st == NULL)
+    return;
+
   keydb_cache_free (st->cache);
 
   if (st->idx)
@@ -2211,13 +2212,27 @@ _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid, const char *id)
     }
 
   check = 0;
-  cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_KEYID, keyid);
+  rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_KEYID, keyid);
+  if (rc)
+    {
+      cdk_kbnode_release (knode);
+      gnutls_assert ();
+      return rc;
+    }
+
   if (unode && find_by_keyid (unode, st))
     check++;
   cdk_keydb_search_release (st);
   cdk_kbnode_release (unode);
 
-  cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_EXACT, (char *) id);
+  rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_EXACT, (char *) id);
+  if (rc)
+    {
+      cdk_kbnode_release (knode);
+      gnutls_assert ();
+      return rc;
+    }
+
   if (knode && find_by_pattern (knode, st))
     check++;
   cdk_keydb_search_release (st);

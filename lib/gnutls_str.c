@@ -301,6 +301,11 @@ _gnutls_buffer_pop_data (gnutls_buffer_st * str, void *data,
   gnutls_datum_t tdata;
 
   _gnutls_buffer_pop_datum (str, &tdata, *req_size);
+  if (tdata.data == NULL)
+    {
+      *req_size = 0;
+      return;
+    }
 
   *req_size = tdata.size;
   memcpy (data, tdata.data, tdata.size);

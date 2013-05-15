@@ -403,6 +403,7 @@ int ret;
 
 cleanup:
 	free(out->data);
+	out->data = NULL;
 clean_certs:
 	if (pub)
 		gnutls_pubkey_deinit(pub);

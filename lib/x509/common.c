@@ -969,7 +969,7 @@ _gnutls_x509_decode_string (unsigned int etype,
 {
   int ret;
   const uint8_t *str;
-  unsigned int str_size;
+  unsigned int str_size, len;
   gnutls_datum_t td;
   
   ret = asn1_decode_simple_der (etype, der, der_size, &str, &str_size);
@@ -1003,7 +1003,12 @@ _gnutls_x509_decode_string (unsigned int etype,
   /* Refuse to deal with strings containing NULs. */
   if (etype != ASN1_ETYPE_OCTET_STRING)
     {
-      if (strlen ((void*)output->data) != (size_t)output->size)
+      if (output->data)
+        len = strlen ((void*)output->data);
+      else
+        len = 0;
+
+      if (len != (size_t)output->size)
         {
           _gnutls_free_datum(output);
           ret = gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
