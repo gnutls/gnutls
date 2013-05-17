@@ -577,6 +577,8 @@ gnutls_hex_decode (const gnutls_datum_t * hex_data, void *result,
  * This function will convert the given data to printable data, using
  * the hex encoding, as used in the PSK password files.
  *
+ * Note that the size of the result includes the null terminator.
+ *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
  * long enough, or 0 on success.
  **/
