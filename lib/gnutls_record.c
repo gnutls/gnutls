@@ -661,7 +661,7 @@ record_check_version (gnutls_session_t session,
         }
     }
   else if (htype != GNUTLS_HANDSHAKE_SERVER_HELLO &&
-           gnutls_protocol_get_version (session) !=
+           gnutls_protocol_get_version (session) <
            _gnutls_version_get (version[0], version[1]))
     {
       /* Reject record packets that have a different version than the
