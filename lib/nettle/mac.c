@@ -84,13 +84,17 @@ struct nettle_mac_ctx
 static void
 _wrap_umac96_set_key(void* ctx, unsigned len, const uint8_t* key)
 {
-	return umac96_set_key(ctx, key);
+	if (unlikely(len != 16))
+	  abort();
+	umac96_set_key(ctx, key);
 }
 
 static void
 _wrap_umac128_set_key(void* ctx, unsigned len, const uint8_t* key)
 {
-	return umac128_set_key(ctx, key);
+	if (unlikely(len != 16))
+	  abort();
+	umac128_set_key(ctx, key);
 }
 
 static int _mac_ctx_init(gnutls_mac_algorithm_t algo, struct nettle_mac_ctx *ctx)
@@ -237,8 +241,7 @@ wrap_nettle_mac_set_key (void *_ctx, const void *key, size_t keylen)
   struct nettle_mac_ctx *ctx = _ctx;
 
   ctx->set_key (ctx->ctx_ptr, keylen, key);
-  
-  return GNUTLS_E_SUCCESS;
+  return 0;
 }
 
 static int
