@@ -602,12 +602,11 @@ int total = 0, ret, iv_size;
 
   /* requires padding */
   iv_size = gnutls_cipher_get_iv_size(params->cipher_algorithm);
+  total += iv_size;
 
   if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
     {
-      *blocksize = iv_size;
-
-      total += iv_size; /* iv_size == block_size in DTLS */
+      *blocksize = iv_size; /* in block ciphers */
 
       /* We always pad with at least one byte; never 0. */
       if (session->security_parameters.new_record_padding == 0)
@@ -697,8 +696,11 @@ int gnutls_dtls_set_data_mtu (gnutls_session_t session, unsigned int mtu)
   mtu += overhead;
 
   /* Round it up to the next multiple of blocksize */
-  mtu += blocksize - 1;
-  mtu -= mtu % blocksize;
+  if (blocksize > 1) 
+    {
+      mtu += blocksize - 1;
+      mtu -= mtu % blocksize;
+    }
 
   /* Add the *unencrypted header size */
   mtu += RECORD_HEADER_SIZE(session);

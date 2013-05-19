@@ -10,6 +10,8 @@ and patch by Tim Kosse.
 ** libgnutls: Corrected issue when receiving client hello verify requests
 in DTLS.
 
+** libgnutls: Fixes in DTLS record overhead size calculations.
+
 ** API and ABI modifications:
 gnutls_session_set_id: Added
 
