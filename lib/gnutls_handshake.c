@@ -1580,7 +1580,9 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
                          _gnutls_bin2hex (session_id, session_id_len, buf,
                                           sizeof (buf), NULL));
 
-  if (session->internals.resumption_requested != 0 && session_id_len > 0 &&
+  if ((session->internals.resumption_requested != 0 ||
+      session->internals.premaster_set != 0) &&
+      session_id_len > 0 &&
       session->internals.resumed_security_parameters.session_id_size ==
       session_id_len
       && memcmp (session_id,
