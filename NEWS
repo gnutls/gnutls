@@ -8,7 +8,7 @@ See the end for copying conditions.
 and patch by Tim Kosse.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_session_set_id: Added
 
 
 * Version 3.2.0 (released 2013-05-10)

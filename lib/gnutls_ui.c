@@ -869,3 +869,35 @@ gnutls_session_get_desc (gnutls_session_t session)
             
     return desc;
 }
+
+/**
+ * gnutls_session_set_id:
+ * @session: is a #gnutls_session_t structure.
+ * @sid: the session identifier
+ *
+ * This function sets the session ID to be used in a client hello.
+ * This is a function intended for exceptional uses. Do not use this
+ * function unless you are implementing a custom protocol.
+ *
+ * To set session resumption parameters use gnutls_session_set_data() instead.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
+int
+gnutls_session_set_id (gnutls_session_t session, 
+                              const gnutls_datum_t * sid)
+{
+  if (session->security_parameters.entity == GNUTLS_SERVER ||
+      sid->size > TLS_MAX_SESSION_ID_SIZE)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  memset (&session->internals.resumed_security_parameters, 0,
+          sizeof (session->internals.resumed_security_parameters));
+
+  session->internals.resumed_security_parameters.session_id_size = sid->size;
+  memcpy(session->internals.resumed_security_parameters.session_id,
+  	sid->data, sid->size);
+
+  return 0;
+}

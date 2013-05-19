@@ -1122,6 +1122,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                              size_t * session_id_size);
   int gnutls_session_get_id2 (gnutls_session_t session, gnutls_datum_t *session_id);
 
+  int gnutls_session_set_id (gnutls_session_t session, 
+                              const gnutls_datum_t * sid);
+
   int gnutls_session_channel_binding (gnutls_session_t session,
                                       gnutls_channel_binding_t cbtype,
                                       gnutls_datum_t * cb);

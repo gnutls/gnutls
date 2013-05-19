@@ -221,6 +221,8 @@ gnutls_session_set_data (gnutls_session_t session,
       gnutls_assert ();
       return ret;
     }
+    
+  session->internals.resumption_requested = 1;
 
   return 0;
 }

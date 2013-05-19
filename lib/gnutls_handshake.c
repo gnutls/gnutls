@@ -1580,7 +1580,7 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
                          _gnutls_bin2hex (session_id, session_id_len, buf,
                                           sizeof (buf), NULL));
 
-  if (session_id_len > 0 &&
+  if (session->internals.resumption_requested != 0 && session_id_len > 0 &&
       session->internals.resumed_security_parameters.session_id_size ==
       session_id_len
       && memcmp (session_id,
@@ -1872,7 +1872,8 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       /* if we are resuming a session then we set the
        * version number to the previously established.
        */
-      if (session_id_len == 0)
+      if (session->internals.resumption_requested == 0 && 
+          session->internals.premaster_set == 0)
         {
           if (rehandshake)      /* already negotiated version thus version_max == negotiated version */
             hver = session->security_parameters.version;
