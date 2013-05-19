@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** libgnutls: Fixes in interrupted function resumption. Report
 and patch by Tim Kosse.
 
+** libgnutls: Corrected issue when receiving client hello verify requests
+in DTLS.
+
 ** API and ABI modifications:
 gnutls_session_set_id: Added
 
