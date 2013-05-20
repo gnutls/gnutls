@@ -647,11 +647,12 @@ inline static int
 record_check_version (gnutls_session_t session,
                       gnutls_handshake_description_t htype, uint8_t version[2])
 {
-  if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO)
+int diff = (gnutls_protocol_get_version (session) !=
+           _gnutls_version_get (version[0], version[1]));
+
+  if (!IS_DTLS(session))
     {
-      /* Reject hello packets with major version higher than 3.
-       */
-      if (!(IS_DTLS(session)) && version[0] > 3)
+      if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && version[0] != 3)
         {
           gnutls_assert ();
           _gnutls_record_log
@@ -659,20 +660,47 @@ record_check_version (gnutls_session_t session,
              htype, version[0], version[1]);
           return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
         }
-    }
-  else if (htype != GNUTLS_HANDSHAKE_SERVER_HELLO &&
-           gnutls_protocol_get_version (session) <
-           _gnutls_version_get (version[0], version[1]))
-    {
-      /* Reject record packets that have a different version than the
-       * one negotiated. Note that this version is not protected by any
-       * mac. I don't really think that this check serves any purpose.
-       */
-      gnutls_assert ();
-      _gnutls_record_log ("REC[%p]: INVALID VERSION PACKET: (%d) %d.%d\n",
+      else if (htype != GNUTLS_HANDSHAKE_SERVER_HELLO && diff != 0)
+        {
+          /* Reject record packets that have a different version than the
+           * one negotiated. Note that this version is not protected by any
+           * mac. I don't really think that this check serves any purpose.
+           */
+          gnutls_assert ();
+          _gnutls_record_log ("REC[%p]: INVALID VERSION PACKET: (%d) %d.%d\n",
                           session, htype, version[0], version[1]);
 
-      return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+          return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+        
+        }
+    }
+  else /* DTLS */
+    {
+      /* In DTLS the only information we have here is whether we
+       * expect a handshake message or not.
+       */
+      if (htype == (gnutls_handshake_description_t)-1)
+        {
+          if (diff)
+            {
+              /* Reject record packets that have a different version than the
+               * one negotiated. Note that this version is not protected by any
+               * mac. I don't really think that this check serves any purpose.
+               */
+              gnutls_assert ();
+              _gnutls_record_log ("REC[%p]: INVALID VERSION PACKET: (%d) %d.%d\n",
+                              session, htype, version[0], version[1]);
+
+              return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+            }
+        }
+      else if (version[0] > 254)
+        {
+          gnutls_assert ();
+          _gnutls_record_log("REC[%p]: INVALID DTLS VERSION PACKET: (%d) %d.%d\n", session,
+                 htype, version[0], version[1]);
+          return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+        }
     }
 
   return 0;
