@@ -853,6 +853,7 @@ main (int argc, char **argv)
   int user_term = 0, retval = 0;
   socket_st hd;
   ssize_t bytes;
+  struct sigaction new_action, old_action;
 
   set_program_name (argv[0]);
   cmd_parser (argc, argv);
@@ -961,7 +962,11 @@ after_handshake:
     }
 
 #ifndef _WIN32
-  signal (SIGALRM, &starttls_alarm);
+  new_action.sa_handler = starttls_alarm;
+  sigemptyset (&new_action.sa_mask);
+  new_action.sa_flags = 0;
+
+  sigaction (SIGALRM, &new_action, NULL);
 #endif
 
   fflush (stdout);
