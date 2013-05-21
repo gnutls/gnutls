@@ -45,7 +45,6 @@ struct gnutls_pkcs11_provider_s
 {
   struct ck_function_list *module;
   struct ck_info info;
-  unsigned int initialized;
 };
 
 struct flags_find_data_st
@@ -71,7 +70,6 @@ struct crt_find_data_st
 
 static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
-static unsigned int initialized_registered = 0;
 
 gnutls_pkcs11_token_callback_t _gnutls_token_func;
 void *_gnutls_token_data;
@@ -234,23 +232,28 @@ gnutls_pkcs11_add_provider (const char *name, const char *params)
   struct ck_function_list *module;
   int ret;
 
-  if (p11_kit_load_initialize_module (name, &module) != CKR_OK)
+  module = p11_kit_module_load (name, P11_KIT_MODULE_CRITICAL);
+  if (module == NULL)
     {
       gnutls_assert ();
       _gnutls_debug_log ("p11: Cannot load provider %s\n", name);
       return GNUTLS_E_PKCS11_LOAD_ERROR;
     }
 
-  ret = pkcs11_add_module (name, module);
-  if (ret == 0)
+  if (p11_kit_module_initialize (module) != CKR_OK)
     {
-      /* Mark this one as having been separately initialized */
-      providers[active_providers - 1].initialized = 1;
+      p11_kit_module_release (module);
+      gnutls_assert ();
+      _gnutls_debug_log ("p11: Cannot initialize provider %s\n", name);
+      return GNUTLS_E_PKCS11_LOAD_ERROR;
     }
-  else
+
+  ret = pkcs11_add_module (name, module);
+  if (ret != 0)
     {
       if (ret == GNUTLS_E_INT_RET_0) ret = 0;
-      p11_kit_finalize_module (module);
+      p11_kit_module_finalize (module);
+      p11_kit_module_release (module);
       gnutls_assert ();
     }
 
@@ -460,24 +463,20 @@ initialize_automatic_p11_kit (void)
 {
   struct ck_function_list **modules;
   char *name;
-  ck_rv_t rv;
   int i, ret;
 
-  rv = p11_kit_initialize_registered ();
-  if (rv != CKR_OK)
+  modules = p11_kit_modules_load_and_initialize (0);
+  if (modules == NULL)
     {
       gnutls_assert ();
-      _gnutls_debug_log ("Cannot initialize registered module: %s\n",
-                         p11_kit_strerror (rv));
-      return pkcs11_rv_to_err(rv);
+      _gnutls_debug_log ("Cannot initialize registered modules: %s\n",
+                         p11_kit_message ());
+      return GNUTLS_E_PKCS11_LOAD_ERROR;
     }
 
-  initialized_registered = 1;
-
-  modules = p11_kit_registered_modules ();
   for (i = 0; modules[i] != NULL; i++)
     {
-      name = p11_kit_registered_module_to_name (modules[i]);
+      name = p11_kit_module_get_name (modules[i]);
       ret = pkcs11_add_module (name, modules[i]);
       if (ret != 0 && ret != GNUTLS_E_INT_RET_0)
         {
@@ -487,6 +486,7 @@ initialize_automatic_p11_kit (void)
       free(name);
     }
 
+  /* Shallow free */
   free (modules);
   return 0;
 }
@@ -562,7 +562,7 @@ int gnutls_pkcs11_reinit (void)
     {
       if (providers[i].module != NULL) 
         {
-          rv = p11_kit_initialize_module(providers[i].module);
+          rv = p11_kit_module_initialize (providers[i].module);
           if (rv != CKR_OK)
             _gnutls_debug_log ("Cannot initialize registered module '%s': %s\n", 
               providers[i].info.library_description, p11_kit_strerror (rv));
@@ -595,14 +595,10 @@ gnutls_pkcs11_deinit (void)
 
   for (i = 0; i < active_providers; i++)
     {
-      if (providers[i].initialized)
-        p11_kit_finalize_module (providers[i].module);
+      p11_kit_module_finalize (providers[i].module);
+      p11_kit_module_release (providers[i].module);
     }
   active_providers = 0;
-  
-  if (initialized_registered != 0)
-    p11_kit_finalize_registered ();
-  initialized_registered = 0;
   
   gnutls_pkcs11_set_pin_function (NULL, NULL);
   gnutls_pkcs11_set_token_function (NULL, NULL);

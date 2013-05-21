@@ -281,11 +281,12 @@ AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
   ["$unbound_root_key_file"], [The DNSSEC root key file])
 
 dnl Check for p11-kit
+P11_KIT_MINIMUM=0.19.1
 AC_ARG_WITH(p11-kit,
 	AS_HELP_STRING([--without-p11-kit],
 		[Build without p11-kit and PKCS#11 support]))
 if test "$with_p11_kit" != "no"; then
-	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= 0.11], [with_p11_kit=yes], [with_p11_kit=no])
+	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= $P11_KIT_MINIMUM], [with_p11_kit=yes], [with_p11_kit=no])
 	if test "$with_p11_kit" != "no";then
 		AC_DEFINE([ENABLE_PKCS11], 1, [Build PKCS#11 support])
 		if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
@@ -297,7 +298,7 @@ if test "$with_p11_kit" != "no"; then
 	        with_p11_kit=no
 	        AC_MSG_WARN([[
 *** 
-*** p11-kit was not found. PKCS #11 support will be disabled.
+*** p11-kit >= $P11_KIT_MINIMUM was not found. PKCS #11 support will be disabled.
 *** You may get it from http://p11-glue.freedesktop.org/p11-kit.html
 *** ]])
 	fi
