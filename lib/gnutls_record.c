@@ -647,20 +647,25 @@ inline static int
 record_check_version (gnutls_session_t session,
                       gnutls_handshake_description_t htype, uint8_t version[2])
 {
-int diff = (gnutls_protocol_get_version (session) !=
+unsigned vers = gnutls_protocol_get_version (session);
+int diff = (vers !=
            _gnutls_version_get (version[0], version[1]));
 
   if (!IS_DTLS(session))
     {
-      if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && version[0] != 3)
+      if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO ||
+          htype == GNUTLS_HANDSHAKE_SERVER_HELLO)
         {
-          gnutls_assert ();
-          _gnutls_record_log
-            ("REC[%p]: INVALID VERSION PACKET: (%d) %d.%d\n", session,
-             htype, version[0], version[1]);
-          return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+          if (version[0] != 3)
+            {
+              gnutls_assert ();
+              _gnutls_record_log
+                ("REC[%p]: INVALID VERSION PACKET: (%d) %d.%d\n", session,
+                 htype, version[0], version[1]);
+              return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+            }
         }
-      else if (htype != GNUTLS_HANDSHAKE_SERVER_HELLO && diff != 0)
+      else if (diff != 0)
         {
           /* Reject record packets that have a different version than the
            * one negotiated. Note that this version is not protected by any
@@ -671,7 +676,6 @@ int diff = (gnutls_protocol_get_version (session) !=
                           session, htype, version[0], version[1]);
 
           return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-        
         }
     }
   else /* DTLS */
@@ -694,7 +698,14 @@ int diff = (gnutls_protocol_get_version (session) !=
               return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
             }
         }
-      else if (version[0] > 254)
+      else if (vers > GNUTLS_DTLS1_0 && version[0] > 254)
+        {
+          gnutls_assert ();
+          _gnutls_record_log("REC[%p]: INVALID DTLS VERSION PACKET: (%d) %d.%d\n", session,
+                 htype, version[0], version[1]);
+          return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+        }
+      else if (vers == GNUTLS_DTLS0_9 && version[0] > 1)
         {
           gnutls_assert ();
           _gnutls_record_log("REC[%p]: INVALID DTLS VERSION PACKET: (%d) %d.%d\n", session,
