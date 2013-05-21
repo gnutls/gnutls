@@ -956,7 +956,7 @@ after_handshake:
     }
 
 #ifndef _WIN32
-  signal (SIGALRM, &starttls_alarm);
+  signal (SIGALRM, starttls_alarm);
 #endif
 
   fflush (stdout);
