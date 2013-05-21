@@ -780,7 +780,6 @@ static int check_net_or_keyboard_input(socket_st* hd)
   fd_set rset;
   int err;
   struct timeval tv;
-  int prev_alrm = starttls_alarmed;
 
   do
     {
@@ -821,8 +820,8 @@ static int check_net_or_keyboard_input(socket_st* hd)
         return IN_KEYBOARD;
 #endif
     }
-  while(err == 0 && prev_alrm == starttls_alarmed);
-
+  while(err == 0);
+  
   return IN_NONE;
 }
 
