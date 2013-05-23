@@ -284,12 +284,15 @@ _mbuffer_alloc (size_t payload_size, size_t maximum_size)
 {
   mbuffer_st *st;
 
-  st = gnutls_calloc (1, maximum_size + sizeof (mbuffer_st));
+  st = gnutls_malloc (maximum_size + sizeof (mbuffer_st));
   if (st == NULL)
     {
       gnutls_assert ();
       return NULL;
     }
+  
+  /* set the structure to zero */
+  memset(st, 0, sizeof(*st));
 
   /* payload points after the mbuffer_st structure */
   st->msg.data = (uint8_t *) st + sizeof (mbuffer_st);
