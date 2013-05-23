@@ -561,6 +561,8 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
           return GNUTLS_E_DECRYPTION_FAILED;
         }
       pad = ciphertext.data[ciphertext.size - 1];   /* pad */
+      if (pad+1 > ciphertext.size-hash_size)
+        pad_failed = GNUTLS_E_DECRYPTION_FAILED;
 
       /* Check the pading bytes (TLS 1.x). 
        * Note that we access all 256 bytes of ciphertext for padding check
