@@ -303,6 +303,7 @@ gnutls_session_t session;
   gnutls_deinit (session);
 
   gnutls_anon_free_server_credentials (anoncred);
+  gnutls_free(cookie_key.data);
 
   gnutls_global_deinit ();
 
