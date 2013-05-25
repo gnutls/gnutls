@@ -441,7 +441,7 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
   ssize_t cipher_size;
   int retval, ret;
   int send_data_size;
-  uint8_t headers[MAX_RECORD_HEADER_SIZE];
+  uint8_t *headers;
   int header_size;
   const uint8_t *data = _data;
   record_parameters_st *record_params;
@@ -475,21 +475,6 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
         return GNUTLS_E_INVALID_SESSION;
       }
 
-  headers[0] = type;
-
-  /* Use the default record version, if it is
-   * set.
-   */
-  copy_record_version (session, htype, &headers[1]);
-
-  header_size = RECORD_HEADER_SIZE(session);
-  /* Adjust header length and add sequence for DTLS */
-  if (IS_DTLS(session))
-    memcpy(&headers[3], &record_state->sequence_number.i, 8);
-
-  _gnutls_record_log
-    ("REC[%p]: Preparing Packet %s(%d) with length: %d and target length: %d\n", session,
-     _gnutls_packet2str (type), type, (int) data_size, (int) target_length);
 
   if (data_size > MAX_USER_SEND_SIZE(session))
     {
@@ -526,10 +511,27 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
       if (bufel == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
+      headers = _mbuffer_get_uhead_ptr(bufel);
+      headers[0] = type;
+      /* Use the default record version, if it is
+       * set. */
+      copy_record_version (session, htype, &headers[1]);
+      header_size = RECORD_HEADER_SIZE(session);
+      /* Adjust header length and add sequence for DTLS */
+      if (IS_DTLS(session))
+        memcpy(&headers[3], &record_state->sequence_number.i, 8);
+
+      _gnutls_record_log
+        ("REC[%p]: Preparing Packet %s(%d) with length: %d and target length: %d\n", session,
+         _gnutls_packet2str (type), type, (int) data_size, (int) target_length);
+
+      _mbuffer_set_udata_size(bufel, cipher_size);
+      _mbuffer_set_uhead_size(bufel, header_size);
+
       ret =
-        _gnutls_encrypt (session, headers, header_size, data,
-                         send_data_size, target_length, _mbuffer_get_udata_ptr (bufel),
-                         cipher_size, type, record_params);
+        _gnutls_encrypt (session, 
+                         data, send_data_size, target_length, 
+                         bufel, type, record_params);
       if (ret <= 0)
         {
           gnutls_assert ();
@@ -539,7 +541,7 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
           return ret;   /* error */
         }
 
-      cipher_size = ret;
+      cipher_size = _mbuffer_get_udata_size(bufel);
       retval = send_data_size;
       session->internals.record_send_buffer_user_size = send_data_size;
 
@@ -552,7 +554,6 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
           return gnutls_assert_val(GNUTLS_E_RECORD_LIMIT_REACHED);
         }
 
-      _mbuffer_set_udata_size (bufel, cipher_size);
       ret = _gnutls_io_write_buffered (session, bufel, mflags);
     }
 

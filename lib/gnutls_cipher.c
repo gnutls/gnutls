@@ -38,6 +38,7 @@
 #include "gnutls_kx.h"
 #include "gnutls_record.h"
 #include "gnutls_constate.h"
+#include "gnutls_mbuffers.h"
 #include <gnutls_state.h>
 #include <random.h>
 
@@ -91,10 +92,11 @@ is_read_comp_null (record_parameters_st * record_params)
  * 
  */
 int
-_gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
-                 size_t headers_size, const uint8_t * data,
-                 size_t data_size, size_t target_size, uint8_t * ciphertext,
-                 size_t ciphertext_size, content_type_t type, 
+_gnutls_encrypt (gnutls_session_t session, 
+                 const uint8_t * data, size_t data_size, 
+                 size_t target_size, 
+                 mbuffer_st* bufel,
+                 content_type_t type, 
                  record_parameters_st * params)
 {
   gnutls_datum_t comp;
@@ -113,7 +115,7 @@ _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
        */
       free_comp = 1;
       
-      comp.size = ciphertext_size - headers_size;
+      comp.size = _mbuffer_get_udata_size(bufel);
       comp.data = gnutls_malloc(comp.size);
       if (comp.data == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -130,12 +132,12 @@ _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
     }
 
   if (session->security_parameters.new_record_padding != 0)
-    ret = compressed_to_ciphertext_new (session, &ciphertext[headers_size],
-                                        ciphertext_size - headers_size,
+    ret = compressed_to_ciphertext_new (session, _mbuffer_get_udata_ptr(bufel),
+                                        _mbuffer_get_udata_size(bufel),
                                         &comp, target_size, type, params);
   else
-    ret = compressed_to_ciphertext (session, &ciphertext[headers_size],
-                                    ciphertext_size - headers_size,
+    ret = compressed_to_ciphertext (session, _mbuffer_get_udata_ptr(bufel),
+                                    _mbuffer_get_udata_size(bufel),
                                     &comp, target_size, type, params);
 
   if (free_comp)
@@ -144,15 +146,15 @@ _gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  /* copy the headers */
-  memcpy (ciphertext, headers, headers_size);
-  
   if(IS_DTLS(session))
-    _gnutls_write_uint16 (ret, &ciphertext[11]);
+    _gnutls_write_uint16 (ret, ((uint8_t*)_mbuffer_get_uhead_ptr(bufel))+11);
   else
-    _gnutls_write_uint16 (ret, &ciphertext[3]);
+    _gnutls_write_uint16 (ret, ((uint8_t*)_mbuffer_get_uhead_ptr(bufel))+3);
+    
+  _mbuffer_set_udata_size(bufel, ret);
+  _mbuffer_set_uhead_size(bufel, 0);
 
-  return ret + headers_size;
+  return _mbuffer_get_udata_size(bufel);
 }
 
 /* Decrypts the given data.
