@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** libgnutls: When in compatibility mode allow for a wrong version in the
 RSA PMS.
 
+** libgnutls: gnutls_handshake_get_last_in() was fixed. Reported
+by Mann Ern Kang.
+
 ** API and ABI modifications:
 No changes since last version.
 
