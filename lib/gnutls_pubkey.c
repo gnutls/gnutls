@@ -1776,8 +1776,7 @@ const mac_entry_st* me;
 
   if (pubkey->pk_algorithm == GNUTLS_PK_DSA)
     {
-      me = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params);
-      hash_size = _gnutls_hash_get_algo_len(me);
+      me = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
 
       /* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
       if (!_gnutls_version_has_selectable_sighash (ver))
@@ -1798,8 +1797,7 @@ const mac_entry_st* me;
     {
       if (_gnutls_version_has_selectable_sighash (ver) && sign != GNUTLS_SIGN_UNKNOWN)
         {
-          me = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params);
-          hash_size = _gnutls_hash_get_algo_len(me);
+          me = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
 
           me = mac_to_entry(gnutls_sign_get_hash_algorithm(sign));
           sig_hash_size = _gnutls_hash_get_algo_len(me);
@@ -1907,10 +1905,8 @@ dsa_verify_hashed_data (gnutls_pk_algorithm_t pk,
   unsigned int hash_len;
 
   if (algo == NULL)
-    algo = _gnutls_dsa_q_to_hash (pk, params);
+    algo = _gnutls_dsa_q_to_hash(pk, params, &hash_len);
   
-  hash_len = _gnutls_hash_get_algo_len(algo);
-
   /* SHA1 or better allowed */
   if (!hash->data || hash->size < hash_len)
     {
@@ -1941,7 +1937,7 @@ dsa_verify_data (gnutls_pk_algorithm_t pk,
   digest_hd_st hd;
 
   if (algo == NULL)
-    algo = _gnutls_dsa_q_to_hash (pk, params);
+    algo = _gnutls_dsa_q_to_hash (pk, params, NULL);
 
   ret = _gnutls_hash_init (&hd, algo);
   if (ret < 0)
@@ -2041,7 +2037,8 @@ pubkey_verify_data (gnutls_pk_algorithm_t pk,
 }
 
 const mac_entry_st*
-_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params)
+_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params, 
+                       unsigned int* hash_len)
 {
   int bits = 0;
   int ret;
@@ -2053,26 +2050,32 @@ _gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* pa
 
   if (bits <= 160)
     {
+      if (hash_len) *hash_len = 20;
       ret = GNUTLS_DIG_SHA1;
     }
   else if (bits <= 192)
     {
+      if (hash_len) *hash_len = 24;
       ret = GNUTLS_DIG_SHA256;
     }
   else if (bits <= 224)
     {
+      if (hash_len) *hash_len = 28;
       ret = GNUTLS_DIG_SHA256;
     }
   else if (bits <= 256)
     {
+      if (hash_len) *hash_len = 32;
       ret = GNUTLS_DIG_SHA256;
     }
   else if (bits <= 384)
     {
+      if (hash_len) *hash_len = 48;
       ret = GNUTLS_DIG_SHA384;
     }
   else
     {
+      if (hash_len) *hash_len = 64;
       ret = GNUTLS_DIG_SHA512;
     }
     

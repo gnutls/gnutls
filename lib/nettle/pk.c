@@ -347,8 +347,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         dsa_signature_init (&sig);
 
-        me = _gnutls_dsa_q_to_hash (algo, pk_params);
-        hash_len = _gnutls_hash_get_algo_len(me);
+        me = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
 
         if (hash_len > vdata->size)
           {
@@ -384,8 +383,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         dsa_signature_init (&sig);
 
-        me = _gnutls_dsa_q_to_hash (algo, pk_params);
-        hash_len = _gnutls_hash_get_algo_len(me);
+        me = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
 
         if (hash_len > vdata->size)
           {
@@ -500,8 +498,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        me = _gnutls_dsa_q_to_hash (algo, pk_params);
-        hash_len = _gnutls_hash_get_algo_len(me);
+        me = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
 
         if (hash_len > vdata->size)
           hash_len = vdata->size;
@@ -534,8 +531,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        me = _gnutls_dsa_q_to_hash (algo, pk_params);
-        hash_len = _gnutls_hash_get_algo_len(me);
+        me = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
 
         if (hash_len > vdata->size)
           hash_len = vdata->size;
@@ -1100,7 +1096,7 @@ static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk,
     case GNUTLS_PK_DSA:
     case GNUTLS_PK_EC:
 
-      me = _gnutls_dsa_q_to_hash (pk, issuer_params);
+      me = _gnutls_dsa_q_to_hash (pk, issuer_params, NULL);
       if (hash_algo)
         *hash_algo = me->id;
 
