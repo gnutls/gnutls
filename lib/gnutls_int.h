@@ -341,7 +341,7 @@ typedef struct mbuffer_st
 
   /* used during fill in, to separate header from data
    * body. */
-  unsigned int user_mark;
+  unsigned int uhead_mark;
 
   /* Filled in by record layer on recv:
    * type, record_sequence
