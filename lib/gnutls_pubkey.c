@@ -1906,6 +1906,8 @@ dsa_verify_hashed_data (gnutls_pk_algorithm_t pk,
 
   if (algo == NULL)
     algo = _gnutls_dsa_q_to_hash(pk, params, &hash_len);
+  else
+    hash_len = _gnutls_hash_get_algo_len(algo);
   
   /* SHA1 or better allowed */
   if (!hash->data || hash->size < hash_len)
