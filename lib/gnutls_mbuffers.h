@@ -53,8 +53,8 @@ int _mbuffer_linearize (mbuffer_head_st * buf);
 inline static void
 _mbuffer_set_udata (mbuffer_st * bufel, void *data, size_t data_size)
 {
-  memcpy (bufel->msg.data + bufel->mark + bufel->user_mark, data, data_size);
-  bufel->msg.size = data_size + bufel->user_mark + bufel->mark;
+  memcpy (bufel->msg.data + bufel->mark + bufel->uhead_mark, data, data_size);
+  bufel->msg.size = data_size + bufel->uhead_mark + bufel->mark;
 }
 
 inline static void *
@@ -66,26 +66,26 @@ _mbuffer_get_uhead_ptr (mbuffer_st * bufel)
 inline static void *
 _mbuffer_get_udata_ptr (mbuffer_st * bufel)
 {
-  return bufel->msg.data + bufel->user_mark + bufel->mark;
+  return bufel->msg.data + bufel->uhead_mark + bufel->mark;
 }
 
 inline static void
 _mbuffer_set_udata_size (mbuffer_st * bufel, size_t size)
 {
-  bufel->msg.size = size + bufel->user_mark + bufel->mark;
+  bufel->msg.size = size + bufel->uhead_mark + bufel->mark;
 }
 
 inline static size_t
 _mbuffer_get_udata_size (mbuffer_st * bufel)
 {
-  return bufel->msg.size - bufel->user_mark - bufel->mark;
+  return bufel->msg.size - bufel->uhead_mark - bufel->mark;
 }
 
 /* discards size bytes from the begging of the buffer */
 inline static void
 _mbuffer_consume (mbuffer_head_st* buf, mbuffer_st * bufel, size_t size)
 {
-  bufel->user_mark = 0;
+  bufel->uhead_mark = 0;
   if (bufel->mark+size < bufel->msg.size)
     bufel->mark += size;
   else
@@ -97,13 +97,13 @@ _mbuffer_consume (mbuffer_head_st* buf, mbuffer_st * bufel, size_t size)
 inline static size_t
 _mbuffer_get_uhead_size (mbuffer_st * bufel)
 {
-  return bufel->user_mark;
+  return bufel->uhead_mark;
 }
 
 inline static void
 _mbuffer_set_uhead_size (mbuffer_st * bufel, size_t size)
 {
-  bufel->user_mark = size;
+  bufel->uhead_mark = size;
 }
 
 
