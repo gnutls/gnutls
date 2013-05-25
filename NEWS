@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** libgnutls: Fixes in interrupted function resumption. Report
 and patch by Tim Kosse.
 
+** libgnutls: gnutls_handshake_get_last_in() was fixed. Reported
+by Mann Ern Kang.
+
 ** API and ABI modifications:
 No changes since last version.
 
