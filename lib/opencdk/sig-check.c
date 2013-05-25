@@ -24,7 +24,8 @@
 #include <config.h>
 #endif
 #include <stdio.h>
-#include <assert.h>
+#include <gnutls_int.h>
+#include <algorithms.h>
 
 #include "opencdk.h"
 #include "main.h"
@@ -177,7 +178,9 @@ _cdk_hash_sig_data (cdk_pkt_signature_t sig, digest_hd_st * md)
       if (sig->hashed != NULL)
         {
           byte *p = _cdk_subpkt_get_array (sig->hashed, 0, &n);
-          assert (p != NULL);
+          if (p == NULL)
+            return gnutls_assert_val(CDK_Inv_Value);
+
           buf[0] = n >> 8;
           buf[1] = n >> 0;
           _gnutls_hash (md, buf, 2);
@@ -300,7 +303,7 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
   pk = knode->pkt->pkt.public_key;
   sig = snode->pkt->pkt.signature;
 
-  err = _gnutls_hash_init (&md, sig->digest_algo);
+  err = _gnutls_hash_init (&md, mac_to_entry(sig->digest_algo));
   if (err < 0)
     {
       gnutls_assert ();

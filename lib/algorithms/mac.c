@@ -25,42 +25,36 @@
 #include <gnutls_errors.h>
 #include <x509/common.h>
 
-struct gnutls_hash_entry
-{
-  const char *name;
-  const char *oid;
-  gnutls_mac_algorithm_t id;
-  size_t output_size;
-  size_t key_size;
-  size_t nonce_size;
-  unsigned placeholder; /* if set, then not a real MAC */
-  unsigned secure; /* if set the this algorithm is secure as hash */
-};
-typedef struct gnutls_hash_entry gnutls_hash_entry;
-
-static const gnutls_hash_entry hash_algorithms[] = {
-  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 20, 0, 0, 1},
-  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 16, 0, 0, 0},
-  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 32, 0, 0, 1},
-  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 0, 1},
-  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 0, 1},
-  {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 0, 1},
-  {"UMAC-96", NULL, GNUTLS_MAC_UMAC_96, 12, 16, 8, 0, 1},
-  {"UMAC-128", NULL, GNUTLS_MAC_UMAC_128, 16, 16, 8, 0, 1},
-  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 0, 0, 1, 1},
-  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0, 0, 0},     /* not used as MAC */
-  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 20, 0, 0, 1},
-  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0}
+static const mac_entry_st hash_algorithms[] = {
+  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 20, 0, 0, 1, 64},
+  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 16, 0, 0, 0, 64},
+  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 32, 0, 0, 1, 64},
+  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 0, 1, 64},
+  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 0, 1, 64},
+  {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 0, 1, 64},
+  {"UMAC-96", NULL, GNUTLS_MAC_UMAC_96, 12, 16, 8, 0, 1, 0},
+  {"UMAC-128", NULL, GNUTLS_MAC_UMAC_128, 16, 16, 8, 0, 1, 0},
+  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 0, 0, 1, 1, 0},
+  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0, 0, 0, 0},     /* not used as MAC */
+  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 20, 0, 0, 1, 64},
+  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0}
 };
 
 
 #define GNUTLS_HASH_LOOP(b) \
-        const gnutls_hash_entry *p; \
+        const mac_entry_st *p; \
                 for(p = hash_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_HASH_ALG_LOOP(a) \
                         GNUTLS_HASH_LOOP( if(p->id == algorithm) { a; break; } )
+
+const mac_entry_st* mac_to_entry(gnutls_mac_algorithm_t c)
+{
+  GNUTLS_HASH_LOOP (if (c==p->id) return p);
+
+  return NULL;
+}
 
 int
 _gnutls_mac_priority (gnutls_session_t session,
@@ -162,26 +156,6 @@ gnutls_mac_get_nonce_size (gnutls_mac_algorithm_t algorithm)
   return ret;
 }
 
-/*-
- * _gnutls_mac_get_algo_len:
- * @algorithm: is an encryption algorithm
- *
- * Get size of MAC key.
- *
- * Returns: length (in bytes) of the MAC output size, or 0 if the
- *   given MAC algorithm is invalid.
- -*/
-size_t
-_gnutls_mac_get_algo_len (gnutls_mac_algorithm_t algorithm)
-{
-  size_t ret = 0;
-
-  /* avoid prefix */
-  GNUTLS_HASH_ALG_LOOP (ret = p->output_size);
-
-  return ret;
-}
-
 /**
  * gnutls_mac_list:
  *
@@ -214,17 +188,6 @@ static gnutls_mac_algorithm_t supported_macs[MAX_ALGOS] = { 0 };
   return supported_macs;
 }
 
-const char *
-_gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t algorithm)
-{
-  const char *ret = NULL;
-
-  /* avoid prefix */
-  GNUTLS_HASH_ALG_LOOP (ret = p->oid);
-
-  return ret;
-}
-
 gnutls_digest_algorithm_t
 _gnutls_x509_oid_to_digest (const char *oid)
 {
@@ -242,25 +205,3 @@ _gnutls_x509_oid_to_digest (const char *oid)
   return ret;
 }
 
-int
-_gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm)
-{
-  ssize_t ret = -1;
-  GNUTLS_HASH_ALG_LOOP (ret = p->id);
-  if (ret >= 0)
-    ret = 0;
-  else
-    ret = 1;
-  return ret;
-}
-
-int
-_gnutls_digest_is_secure (gnutls_digest_algorithm_t algo)
-{
-  ssize_t ret = 0;
-  gnutls_mac_algorithm_t algorithm = algo;
-
-  GNUTLS_HASH_ALG_LOOP (ret = p->secure);
-  
-  return ret;
-}

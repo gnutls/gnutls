@@ -43,18 +43,16 @@ typedef void (*cipher_tag_func) (void *hd, void *tag, size_t);
 typedef struct
 {
   void *handle;
+  const cipher_entry_st* e;
   cipher_encrypt_func encrypt;
   cipher_decrypt_func decrypt;
   cipher_auth_func auth;
   cipher_tag_func tag;
   cipher_setiv_func setiv;
   cipher_deinit_func deinit;
-  
-  size_t tag_size;
-  unsigned int is_aead:1;
 } cipher_hd_st;
 
-int _gnutls_cipher_init (cipher_hd_st *, gnutls_cipher_algorithm_t cipher,
+int _gnutls_cipher_init (cipher_hd_st *, const cipher_entry_st* e,
                          const gnutls_datum_t * key,
                          const gnutls_datum_t * iv, int enc);
 
@@ -101,15 +99,8 @@ _gnutls_cipher_deinit (cipher_hd_st * handle)
 }
 
 int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher);
-inline static size_t _gnutls_cipher_tag_len( cipher_hd_st * handle)
-{
-  return handle->tag_size;
-}
 
-inline static unsigned int _gnutls_cipher_is_aead( cipher_hd_st * handle)
-{
-  return handle->is_aead;
-}
+#define _gnutls_cipher_is_aead(h) _gnutls_cipher_algo_is_aead((h)->e)
 
 /* returns the tag in AUTHENC ciphers */
 inline static void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, size_t tag_size)
@@ -152,10 +143,10 @@ typedef struct
 } auth_cipher_hd_st;
 
 int _gnutls_auth_cipher_init (auth_cipher_hd_st * handle, 
-  gnutls_cipher_algorithm_t cipher,
+  const cipher_entry_st* e,
   const gnutls_datum_t * cipher_key,
   const gnutls_datum_t * iv,
-  gnutls_mac_algorithm_t mac,
+  const mac_entry_st *me,
   const gnutls_datum_t * mac_key, int ssl_hmac, int enc);
 
 int _gnutls_auth_cipher_add_auth (auth_cipher_hd_st * handle, const void *text,
@@ -191,10 +182,7 @@ inline static size_t _gnutls_auth_cipher_tag_len( auth_cipher_hd_st * handle)
   return handle->tag_size;
 }
 
-inline static unsigned int _gnutls_auth_cipher_is_aead( auth_cipher_hd_st * handle)
-{
-  return _gnutls_cipher_is_aead(&handle->cipher);
-}
+#define _gnutls_auth_cipher_is_aead(h) _gnutls_cipher_is_aead(&(h)->cipher)
 
 void _gnutls_auth_cipher_deinit (auth_cipher_hd_st * handle);
 

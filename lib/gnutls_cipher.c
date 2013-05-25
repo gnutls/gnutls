@@ -316,9 +316,9 @@ compressed_to_ciphertext (gnutls_session_t session,
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
   int tag_size = _gnutls_auth_cipher_tag_len (&params->write.cipher_state);
-  int blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
+  int blocksize = _gnutls_cipher_get_block_size (params->cipher);
   unsigned block_algo =
-    _gnutls_cipher_is_block (params->cipher_algorithm);
+    _gnutls_cipher_is_block (params->cipher);
   uint8_t *data_ptr;
   int ver = gnutls_protocol_get_version (session);
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
@@ -326,10 +326,10 @@ compressed_to_ciphertext (gnutls_session_t session,
   uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
   unsigned iv_size;
 
-  iv_size = gnutls_cipher_get_iv_size(params->cipher_algorithm);
+  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
 
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
-    session, gnutls_cipher_get_name(params->cipher_algorithm), gnutls_mac_get_name(params->mac_algorithm),
+    session, _gnutls_cipher_get_name(params->cipher), _gnutls_mac_get_name(params->mac),
     (unsigned int)params->epoch);
 
   preamble_size =
@@ -469,9 +469,9 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
   int tag_size = _gnutls_auth_cipher_tag_len (&params->write.cipher_state);
-  int blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
+  int blocksize = _gnutls_cipher_get_block_size (params->cipher);
   unsigned block_algo =
-    _gnutls_cipher_is_block (params->cipher_algorithm);
+    _gnutls_cipher_is_block (params->cipher);
   uint8_t *data_ptr;
   int ver = gnutls_protocol_get_version (session);
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
@@ -479,10 +479,10 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
   unsigned iv_size;
 
-  iv_size = gnutls_cipher_get_iv_size(params->cipher_algorithm);
+  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
 
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
-    session, gnutls_cipher_get_name(params->cipher_algorithm), gnutls_mac_get_name(params->mac_algorithm),
+    session, _gnutls_cipher_get_name(params->cipher), _gnutls_mac_get_name(params->mac),
     (unsigned int)params->epoch);
 
   /* Call _gnutls_rnd() once. Get data used for the IV
@@ -616,7 +616,7 @@ static void dummy_wait(record_parameters_st * params, gnutls_datum_t* plaintext,
                        unsigned pad_failed, unsigned int pad, unsigned total)
 {
   /* this hack is only needed on CBC ciphers */
-  if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
+  if (_gnutls_cipher_is_block (params->cipher) == CIPHER_BLOCK)
     {
       unsigned len;
 
@@ -625,7 +625,7 @@ static void dummy_wait(record_parameters_st * params, gnutls_datum_t* plaintext,
        */
       if (pad_failed == 0 && pad > 0) 
         {
-          len = _gnutls_get_hash_block_len(params->mac_algorithm);
+          len = _gnutls_mac_block_size(params->mac);
           if (len > 0)
             {
               /* This is really specific to the current hash functions.
@@ -667,12 +667,12 @@ ciphertext_to_compressed (gnutls_session_t session,
   unsigned int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   unsigned iv_size;
   
-  iv_size = gnutls_cipher_get_iv_size(params->cipher_algorithm);
-  blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
+  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
+  blocksize = _gnutls_cipher_get_block_size (params->cipher);
 
   /* actual decryption (inplace)
    */
-  switch (_gnutls_cipher_is_block (params->cipher_algorithm))
+  switch (_gnutls_cipher_is_block (params->cipher))
     {
     case CIPHER_STREAM:
       /* The way AEAD ciphers are defined in RFC5246, it allows
@@ -848,12 +848,12 @@ ciphertext_to_compressed_new (gnutls_session_t session,
   unsigned int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   unsigned iv_size;
   
-  iv_size = gnutls_cipher_get_iv_size(params->cipher_algorithm);
-  blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
+  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
+  blocksize = _gnutls_cipher_get_block_size (params->cipher);
 
   /* actual decryption (inplace)
    */
-  switch (_gnutls_cipher_is_block (params->cipher_algorithm))
+  switch (_gnutls_cipher_is_block (params->cipher))
     {
     case CIPHER_STREAM:
       /* The way AEAD ciphers are defined in RFC5246, it allows

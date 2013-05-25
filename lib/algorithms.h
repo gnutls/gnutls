@@ -48,24 +48,86 @@ int _gnutls_version_has_extensions (gnutls_protocol_t version);
 int _gnutls_version_has_explicit_iv (gnutls_protocol_t version);
 
 /* Functions for MACs. */
-int _gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm);
+const mac_entry_st* mac_to_entry(gnutls_mac_algorithm_t c);
+
+inline static int
+_gnutls_mac_is_ok (const mac_entry_st * e)
+{
+  if (unlikely(e==NULL) || e->id == 0)
+    return 0;
+  else 
+    return 1;
+}
+
+/*-
+ * _gnutls_mac_get_algo_len:
+ * @algorithm: is an encryption algorithm
+ *
+ * Get size of MAC key.
+ *
+ * Returns: length (in bytes) of the MAC output size, or 0 if the
+ *   given MAC algorithm is invalid.
+ -*/
+inline static size_t
+_gnutls_mac_get_algo_len (const mac_entry_st * e)
+{
+  if (unlikely(e==NULL))
+    return 0;
+  else 
+    return e->output_size;
+}
+
+inline static const char*
+_gnutls_x509_mac_to_oid (const mac_entry_st * e)
+{
+  if (unlikely(e==NULL))
+    return NULL;
+  else 
+    return e->oid;
+}
+
+inline static const char*
+_gnutls_mac_get_name (const mac_entry_st * e)
+{
+  if (unlikely(e==NULL))
+    return NULL;
+  else 
+    return e->name;
+}
+
+inline static int
+_gnutls_mac_block_size (const mac_entry_st * e)
+{
+  if (unlikely(e==NULL))
+    return 0;
+  else 
+    return e->block_size;
+}
+
+inline static int
+_gnutls_mac_get_key_size (const mac_entry_st * e)
+{
+  if (unlikely(e==NULL))
+    return 0;
+  else 
+    return e->key_size;
+}
+
 gnutls_digest_algorithm_t _gnutls_x509_oid_to_digest (const char *oid);
-const char *_gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t mac);
 
 /* Functions for digests. */
-inline static const char *
-_gnutls_x509_digest_to_oid (gnutls_digest_algorithm_t algorithm)
-{
-  return _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) algorithm);
-}
+#define _gnutls_x509_digest_to_oid _gnutls_x509_mac_to_oid
+#define _gnutls_digest_get_name _gnutls_mac_get_name
+#define _gnutls_hash_get_algo_len _gnutls_mac_get_algo_len
 
-inline static const char *
-_gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm)
+inline static int
+_gnutls_digest_is_secure (const mac_entry_st * e)
 {
-  return gnutls_mac_get_name ((gnutls_mac_algorithm_t) algorithm);
+  if (unlikely(e==NULL))
+    return 0;
+  else 
+    return e->secure;
 }
-
-int _gnutls_digest_is_secure (gnutls_digest_algorithm_t algorithm);
 
 /* Functions for cipher suites. */
 int _gnutls_supported_ciphersuites (gnutls_session_t session,
@@ -73,10 +135,10 @@ int _gnutls_supported_ciphersuites (gnutls_session_t session,
                                     unsigned int max_cipher_suite_size);
 const char *_gnutls_cipher_suite_get_name (const uint8_t suite[2]);
 gnutls_mac_algorithm_t _gnutls_cipher_suite_get_prf (const uint8_t suite[2]);
-gnutls_cipher_algorithm_t _gnutls_cipher_suite_get_cipher_algo (const
+const cipher_entry_st* _gnutls_cipher_suite_get_cipher_algo (const
                                                                 uint8_t suite[2]);
 gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo (const uint8_t suite[2]);
-gnutls_mac_algorithm_t _gnutls_cipher_suite_get_mac_algo (const
+const mac_entry_st* _gnutls_cipher_suite_get_mac_algo (const
                                                           uint8_t suite[2]);
 
 int
@@ -85,10 +147,79 @@ _gnutls_cipher_suite_get_id (gnutls_kx_algorithm_t kx_algorithm,
                               gnutls_mac_algorithm_t mac_algorithm, uint8_t suite[2]);
 
 /* Functions for ciphers. */
-int _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm);
-int _gnutls_cipher_algo_is_aead (gnutls_cipher_algorithm_t algorithm);
-int _gnutls_cipher_is_ok (gnutls_cipher_algorithm_t algorithm);
-int _gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm);
+const cipher_entry_st* cipher_to_entry(gnutls_cipher_algorithm_t c);
+
+inline static int
+_gnutls_cipher_is_block (const cipher_entry_st* e)
+{ 
+  if (unlikely(e==NULL))
+    return 0;
+  return e->block;
+}
+
+inline static int
+_gnutls_cipher_get_block_size (const cipher_entry_st* e)
+{ 
+  if (unlikely(e==NULL))
+    return 0;
+  return e->blocksize;
+}
+
+inline static int
+_gnutls_cipher_get_iv_size (const cipher_entry_st* e)
+{ 
+  if (unlikely(e==NULL))
+    return 0;
+  return e->iv;
+}
+
+inline static int
+_gnutls_cipher_get_key_size (const cipher_entry_st* e)
+{ 
+  if (unlikely(e==NULL))
+    return 0;
+  return e->keysize;
+}
+
+inline static const char*
+_gnutls_cipher_get_name (const cipher_entry_st* e)
+{ 
+  if (unlikely(e==NULL))
+    return NULL;
+  return e->name;
+}
+
+inline static int
+_gnutls_cipher_algo_is_aead (const cipher_entry_st* e)
+{
+  if (unlikely(e==NULL))
+    return 0;
+  return e->aead;
+}
+
+inline static int
+_gnutls_cipher_is_ok (const cipher_entry_st* e)
+{
+  if (unlikely(e==NULL) || e->id == 0)
+    return 0;
+  else
+   return 1;
+}
+
+inline static int
+_gnutls_cipher_get_tag_size (const cipher_entry_st* e)
+{
+  size_t ret = 0;
+
+  if (unlikely(e==NULL))
+    return ret;
+
+  if (e->aead)
+    ret = e->blocksize; /* FIXME: happens to be the same for now */
+  else
+    ret = 0;
+  return ret;
+}
 
 /* Functions for key exchange. */
 int _gnutls_kx_needs_dh_params (gnutls_kx_algorithm_t algorithm);
@@ -127,7 +258,7 @@ const sign_algorithm_st* _gnutls_sign_to_tls_aid (gnutls_sign_algorithm_t sign);
 int _gnutls_mac_priority (gnutls_session_t session,
                           gnutls_mac_algorithm_t algorithm);
 int _gnutls_cipher_priority (gnutls_session_t session,
-                             gnutls_cipher_algorithm_t algorithm);
+                             gnutls_cipher_algorithm_t a);
 int _gnutls_kx_priority (gnutls_session_t session,
                          gnutls_kx_algorithm_t algorithm);
 

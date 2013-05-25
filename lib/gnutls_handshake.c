@@ -268,11 +268,11 @@ _gnutls_ssl3_finished (gnutls_session_t session, int type, uint8_t * ret, int se
   else
     len = session->internals.handshake_hash_buffer_prev_len;
 
-  rc = _gnutls_hash_init (&td_sha, GNUTLS_DIG_SHA1);
+  rc = _gnutls_hash_init (&td_sha, mac_to_entry(GNUTLS_DIG_SHA1));
   if (rc < 0)
     return gnutls_assert_val(rc);
 
-  rc = _gnutls_hash_init (&td_md5, GNUTLS_DIG_MD5);
+  rc = _gnutls_hash_init (&td_md5, mac_to_entry(GNUTLS_DIG_MD5));
   if (rc < 0)
     {
       _gnutls_hash_deinit (&td_sha, NULL);
@@ -353,7 +353,7 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret, int sending)
       if (rc < 0)
         return gnutls_assert_val(rc);
 
-      hash_len = _gnutls_hash_get_algo_len (algorithm);
+      hash_len = _gnutls_hash_get_algo_len (mac_to_entry(algorithm));
     }
 
   if (type == GNUTLS_SERVER)

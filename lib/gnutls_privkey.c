@@ -32,6 +32,7 @@
 #include <openpgp/openpgp_int.h>
 #include <openpgp/gnutls_openpgp.h>
 #include <gnutls_sig.h>
+#include <algorithms.h>
 #include <abstract_int.h>
 
 /**
@@ -711,18 +712,19 @@ gnutls_privkey_sign_data (gnutls_privkey_t signer,
 {
   int ret;
   gnutls_datum_t digest;
+  const mac_entry_st* me = mac_to_entry(hash);
 
   if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  ret = pk_hash_data (signer->pk_algorithm, hash, NULL, data, &digest);
+  ret = pk_hash_data (signer->pk_algorithm, me, NULL, data, &digest);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = pk_prepare_hash (signer->pk_algorithm, hash, &digest);
+  ret = pk_prepare_hash (signer->pk_algorithm, me, &digest);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -788,7 +790,7 @@ gnutls_privkey_sign_hash (gnutls_privkey_t signer,
   digest.size = hash_data->size;
   memcpy (digest.data, hash_data->data, digest.size);
 
-  ret = pk_prepare_hash (signer->pk_algorithm, hash_algo, &digest);
+  ret = pk_prepare_hash (signer->pk_algorithm, mac_to_entry(hash_algo), &digest);
   if (ret < 0)
     {
       gnutls_assert ();

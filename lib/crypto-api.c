@@ -25,6 +25,7 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 #include <gnutls/crypto.h>
+#include <algorithms.h>
 #include <random.h>
 #include <crypto.h>
 
@@ -66,10 +67,10 @@ int ret;
     }
 
   h = *handle;
-  ret = _gnutls_cipher_init (&h->ctx_enc, cipher, key, iv, 1);
+  ret = _gnutls_cipher_init (&h->ctx_enc, cipher_to_entry(cipher), key, iv, 1);
 
-  if (ret >= 0 && _gnutls_cipher_is_aead( &h->ctx_enc) == 0) /* AEAD ciphers are stream - so far */
-    ret = _gnutls_cipher_init (&h->ctx_dec, cipher, key, iv, 0);
+  if (ret >= 0 && _gnutls_cipher_is_aead(&h->ctx_enc) == 0) /* AEAD ciphers are stream - so far */
+    ret = _gnutls_cipher_init (&h->ctx_dec, cipher_to_entry(cipher), key, iv, 0);
 
   return ret;
 }
@@ -93,7 +94,7 @@ gnutls_cipher_tag (gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
 {
 api_cipher_hd_st * h = handle;
 
-  if (_gnutls_cipher_is_aead( &h->ctx_enc)==0)
+  if (_gnutls_cipher_is_aead(&h->ctx_enc)==0)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   _gnutls_cipher_tag( &h->ctx_enc, tag, tag_size);
@@ -121,7 +122,7 @@ gnutls_cipher_add_auth (gnutls_cipher_hd_t handle, const void *text, size_t text
 {
 api_cipher_hd_st * h = handle;
 
-  if (_gnutls_cipher_is_aead( &h->ctx_enc)==0)
+  if (_gnutls_cipher_is_aead(&h->ctx_enc)==0)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   _gnutls_cipher_auth( &h->ctx_enc, text, text_size);
@@ -147,7 +148,7 @@ api_cipher_hd_st * h = handle;
 
   _gnutls_cipher_setiv( &h->ctx_enc, iv, ivlen);
 
-  if (_gnutls_cipher_is_aead( &h->ctx_enc)==0)
+  if (_gnutls_cipher_is_aead(&h->ctx_enc)==0)
     _gnutls_cipher_setiv( &h->ctx_dec, iv, ivlen);
 }
 
@@ -191,7 +192,7 @@ gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
 {
 api_cipher_hd_st * h = handle;
 
-  if (_gnutls_cipher_is_aead( &h->ctx_enc)!=0)
+  if (_gnutls_cipher_is_aead(&h->ctx_enc)!=0)
     return _gnutls_cipher_decrypt (&h->ctx_enc, ciphertext, ciphertextlen);
   else
     return _gnutls_cipher_decrypt (&h->ctx_dec, ciphertext, ciphertextlen);
@@ -243,7 +244,7 @@ gnutls_cipher_decrypt2 (gnutls_cipher_hd_t handle, const void *ciphertext,
 {
 api_cipher_hd_st * h = handle;
 
-  if (_gnutls_cipher_is_aead( &h->ctx_enc)!=0)
+  if (_gnutls_cipher_is_aead(&h->ctx_enc)!=0)
     return _gnutls_cipher_decrypt2 (&h->ctx_enc, ciphertext,
                                   ciphertextlen, text, textlen);
   else
@@ -266,7 +267,7 @@ gnutls_cipher_deinit (gnutls_cipher_hd_t handle)
 api_cipher_hd_st * h = handle;
 
   _gnutls_cipher_deinit (&h->ctx_enc);
-  if (_gnutls_cipher_is_aead( &h->ctx_enc)==0)
+  if (_gnutls_cipher_is_aead(&h->ctx_enc)==0)
     _gnutls_cipher_deinit (&h->ctx_dec);
   gnutls_free (handle);
 }
@@ -305,7 +306,8 @@ gnutls_hmac_init (gnutls_hmac_hd_t * dig,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  return _gnutls_mac_init (((mac_hd_st *) * dig), algorithm, key, keylen);
+  return _gnutls_mac_init (((mac_hd_st *) * dig), 
+                           mac_to_entry(algorithm), key, keylen);
 }
 
 /**
@@ -390,7 +392,7 @@ gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest)
 int
 gnutls_hmac_get_len (gnutls_mac_algorithm_t algorithm)
 {
-  return _gnutls_mac_get_algo_len (algorithm);
+  return _gnutls_mac_get_algo_len (mac_to_entry(algorithm));
 }
 
 /**
@@ -443,7 +445,7 @@ gnutls_hash_init (gnutls_hash_hd_t * dig, gnutls_digest_algorithm_t algorithm)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  return _gnutls_hash_init (((digest_hd_st *) * dig), algorithm);
+  return _gnutls_hash_init (((digest_hd_st *) * dig), mac_to_entry(algorithm));
 }
 
 /**
@@ -512,7 +514,7 @@ gnutls_hash_deinit (gnutls_hash_hd_t handle, void *digest)
 int
 gnutls_hash_get_len (gnutls_digest_algorithm_t algorithm)
 {
-  return _gnutls_hash_get_algo_len (algorithm);
+  return _gnutls_hash_get_algo_len (mac_to_entry(algorithm));
 }
 
 /**

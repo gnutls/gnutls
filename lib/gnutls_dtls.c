@@ -601,10 +601,10 @@ int total = 0, ret, iv_size;
     return gnutls_assert_val(ret);
 
   /* requires padding */
-  iv_size = gnutls_cipher_get_iv_size(params->cipher_algorithm);
+  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
   total += iv_size;
 
-  if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
+  if (_gnutls_cipher_is_block (params->cipher) == CIPHER_BLOCK)
     {
       *blocksize = iv_size; /* in block ciphers */
 
@@ -620,11 +620,11 @@ int total = 0, ret, iv_size;
   if (session->security_parameters.new_record_padding != 0)
     total += 2;
   
-  if (params->mac_algorithm == GNUTLS_MAC_AEAD)
-    total += _gnutls_cipher_get_tag_size(params->cipher_algorithm);
+  if (params->mac->id == GNUTLS_MAC_AEAD)
+    total += _gnutls_cipher_get_tag_size(params->cipher);
   else
     {
-      ret = _gnutls_mac_get_algo_len(params->mac_algorithm);
+      ret = _gnutls_mac_get_algo_len(params->mac);
       if (ret < 0)
         return gnutls_assert_val(ret);
       total+=ret;

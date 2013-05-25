@@ -25,6 +25,7 @@
 #include <gnutls_errors.h>
 #include <x509_int.h>
 #include <c-ctype.h>
+#include <algorithms.h>
 
 /* Returns 0 if the password is ok, or a negative error
  * code instead.
@@ -132,7 +133,7 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
 
   for (;;)
     {
-      rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
+      rc = _gnutls_hash_init (&md, mac_to_entry(GNUTLS_MAC_SHA1));
       if (rc < 0)
         {
           gnutls_assert ();

@@ -32,6 +32,7 @@
 #include <nettle/macros.h>
 #include <aes-padlock.h>
 #include <sha-padlock.h>
+#include <algorithms.h>
 
 #ifdef HAVE_LIBNETTLE
 
@@ -280,7 +281,7 @@ wrap_padlock_hmac_fast (gnutls_mac_algorithm_t algo,
           unsigned char *pad;
           unsigned char pad2[SHA1_DATA_SIZE + MAX_SHA_DIGEST_SIZE];
           unsigned char hkey[MAX_SHA_DIGEST_SIZE];
-          unsigned int digest_size = _gnutls_mac_get_algo_len (algo);
+          unsigned int digest_size = _gnutls_mac_get_algo_len (mac_to_entry(algo));
 
           if (key_size > SHA1_DATA_SIZE)
             {

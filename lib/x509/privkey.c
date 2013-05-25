@@ -1640,7 +1640,7 @@ gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
  -*/
 static int
 _gnutls_x509_privkey_sign_hash2 (gnutls_x509_privkey_t signer,
-                                gnutls_digest_algorithm_t hash_algo,
+                                const mac_entry_st *me,
                                 unsigned int flags,
                                 const gnutls_datum_t * hash_data,
                                 gnutls_datum_t * signature)
@@ -1657,7 +1657,7 @@ _gnutls_x509_privkey_sign_hash2 (gnutls_x509_privkey_t signer,
   digest.size = hash_data->size;
   memcpy (digest.data, hash_data->data, digest.size);
 
-  ret = pk_prepare_hash (signer->pk_algorithm, hash_algo, &digest);
+  ret = pk_prepare_hash (signer->pk_algorithm, me, &digest);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1756,6 +1756,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
   int result;
   gnutls_datum_t sig = { NULL, 0 };
   gnutls_datum_t hash;
+  const mac_entry_st *me = mac_to_entry(digest);
 
   if (key == NULL)
     {
@@ -1764,7 +1765,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
     }
 
   result =
-    pk_hash_data (key->pk_algorithm, digest, &key->params, data, &hash);
+    pk_hash_data (key->pk_algorithm, me, &key->params, data, &hash);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1772,7 +1773,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
     }
 
   result =
-    _gnutls_x509_privkey_sign_hash2 (key, digest, flags, &hash, &sig);
+    _gnutls_x509_privkey_sign_hash2 (key, me, flags, &hash, &sig);
 
   _gnutls_free_datum(&hash);
 

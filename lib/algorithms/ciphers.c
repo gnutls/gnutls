@@ -25,17 +25,6 @@
 #include <gnutls_errors.h>
 #include <x509/common.h>
 
-struct gnutls_cipher_entry
-{
-  const char *name;
-  gnutls_cipher_algorithm_t id;
-  uint16_t blocksize;
-  uint16_t keysize;
-  unsigned block:1;
-  uint16_t iv; /* the size of IV */
-  unsigned auth:1; /* Whether it is authenc cipher */
-};
-typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 
 /* Note that all algorithms are in CBC or STREAM modes. 
  * Do not add any algorithms in other modes (avoid modified algorithms).
@@ -44,7 +33,7 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
  *
  * Make sure to update MAX_CIPHER_BLOCK_SIZE and MAX_CIPHER_KEY_SIZE as well.
  */
-static const gnutls_cipher_entry algorithms[] = {
+static const cipher_entry_st algorithms[] = {
   {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0},
   {"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC, 16, 24, CIPHER_BLOCK, 16, 0},
   {"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0},
@@ -86,13 +75,20 @@ static const gnutls_cipher_entry algorithms[] = {
 };
 
 #define GNUTLS_CIPHER_LOOP(b) \
-        const gnutls_cipher_entry *p; \
+        const cipher_entry_st *p; \
                 for(p = algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_ALG_LOOP(a) \
                         GNUTLS_CIPHER_LOOP( if(p->id == algorithm) { a; break; } )
 
 /* CIPHER functions */
+
+const cipher_entry_st* cipher_to_entry(gnutls_cipher_algorithm_t c)
+{
+  GNUTLS_CIPHER_LOOP (if (c==p->id) return p);
+
+  return NULL;
+}
 
 /**
  * gnutls_cipher_get_block_size:
@@ -131,20 +127,6 @@ gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm)
   return ret;
 }
 
-int
-_gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm)
-{
-  size_t ret = 0;
-
-  GNUTLS_ALG_LOOP (
-    if (p->auth)
-      ret = p->block; /* FIXME: happens to be the same for now */
-    else
-      ret = 0;
-  );
-  return ret;
-
-}
 
  /* returns the priority */
 int
@@ -158,27 +140,6 @@ _gnutls_cipher_priority (gnutls_session_t session,
         return i;
     }
   return -1;
-}
-
-
-int
-_gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm)
-{
-  size_t ret = 0;
-
-  GNUTLS_ALG_LOOP (ret = p->block);
-  return ret;
-
-}
-
-int
-_gnutls_cipher_algo_is_aead (gnutls_cipher_algorithm_t algorithm)
-{
-  size_t ret = 0;
-
-  GNUTLS_ALG_LOOP (ret = p->auth);
-  return ret;
-
 }
 
 /**
@@ -277,14 +238,3 @@ static gnutls_cipher_algorithm_t supported_ciphers[MAX_ALGOS] = {0};
   return supported_ciphers;
 }
 
-int
-_gnutls_cipher_is_ok (gnutls_cipher_algorithm_t algorithm)
-{
-  ssize_t ret = -1;
-  GNUTLS_ALG_LOOP (ret = p->id);
-  if (ret >= 0)
-    ret = 0;
-  else
-    ret = 1;
-  return ret;
-}

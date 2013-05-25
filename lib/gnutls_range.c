@@ -71,10 +71,10 @@ _gnutls_range_max_lh_pad (gnutls_session_t session, ssize_t data_length,
   this_pad = MIN (max_pad, max_frag - data_length);
 
   block_size =
-      gnutls_cipher_get_block_size (record_params->cipher_algorithm);
+      _gnutls_cipher_get_block_size (record_params->cipher);
   tag_size =
       _gnutls_auth_cipher_tag_len (&record_params->write.cipher_state);
-  switch (_gnutls_cipher_is_block (record_params->cipher_algorithm))
+  switch (_gnutls_cipher_is_block (record_params->cipher))
     {
     case CIPHER_STREAM:
       return this_pad;
@@ -128,7 +128,7 @@ gnutls_record_can_use_length_hiding (gnutls_session_t session)
       return 0;
     }
 
-  switch (_gnutls_cipher_is_block (record_params->cipher_algorithm))
+  switch (_gnutls_cipher_is_block (record_params->cipher))
     {
     case CIPHER_BLOCK:
       return 1;

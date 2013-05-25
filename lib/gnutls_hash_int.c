@@ -27,49 +27,22 @@
 #include <gnutls_int.h>
 #include <gnutls_hash_int.h>
 #include <gnutls_errors.h>
-
-static size_t
-digest_length (int algo)
-{
-  switch (algo)
-    {
-    case GNUTLS_DIG_NULL:
-    case GNUTLS_MAC_AEAD:
-      return 0;
-    case GNUTLS_DIG_MD5:
-    case GNUTLS_DIG_MD2:
-      return 16;
-    case GNUTLS_DIG_SHA1:
-    case GNUTLS_DIG_RMD160:
-      return 20;
-    case GNUTLS_DIG_SHA256:
-      return 32;
-    case GNUTLS_DIG_SHA384:
-      return 48;
-    case GNUTLS_DIG_SHA512:
-      return 64;
-    case GNUTLS_DIG_SHA224:
-      return 28;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-}
+#include <algorithms.h>
 
 int
-_gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
+_gnutls_hash_init (digest_hd_st * dig, const mac_entry_st* e)
 {
   int result;
   const gnutls_crypto_digest_st *cc = NULL;
 
-  dig->algorithm = algorithm;
+  dig->e = e;
 
   /* check if a digest has been registered 
    */
-  cc = _gnutls_get_crypto_digest (algorithm);
+  cc = _gnutls_get_crypto_digest (e->id);
   if (cc != NULL && cc->init)
     {
-      if (cc->init (algorithm, &dig->handle) < 0)
+      if (cc->init (e->id, &dig->handle) < 0)
         {
           gnutls_assert ();
           return GNUTLS_E_HASH_FAILED;
@@ -82,7 +55,7 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
       return 0;
     }
 
-  result = _gnutls_digest_ops.init (algorithm, &dig->handle);
+  result = _gnutls_digest_ops.init (e->id, &dig->handle);
   if (result < 0)
     {
       gnutls_assert ();
@@ -109,14 +82,6 @@ _gnutls_hash_deinit (digest_hd_st * handle, void *digest)
 
   handle->deinit (handle->handle);
   handle->handle = NULL;
-}
-
-/* returns the output size of the given hash/mac algorithm
- */
-size_t
-_gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm)
-{
-  return digest_length (algorithm);
 }
 
 int
@@ -199,21 +164,21 @@ int _gnutls_mac_exists(gnutls_mac_algorithm_t algo)
 }
 
 int
-_gnutls_mac_init (mac_hd_st * mac, gnutls_mac_algorithm_t algorithm,
+_gnutls_mac_init (mac_hd_st * mac, const mac_entry_st* e,
                    const void *key, int keylen)
 {
   int result;
   const gnutls_crypto_mac_st *cc = NULL;
 
-  mac->algorithm = algorithm;
-  mac->mac_len = _gnutls_mac_get_algo_len (algorithm);
+  mac->e = e;
+  mac->mac_len = _gnutls_mac_get_algo_len (e);
 
   /* check if a digest has been registered 
    */
-  cc = _gnutls_get_crypto_mac (algorithm);
+  cc = _gnutls_get_crypto_mac (e->id);
   if (cc != NULL && cc->init != NULL)
     {
-      if (cc->init (algorithm, &mac->handle) < 0)
+      if (cc->init (e->id, &mac->handle) < 0)
         {
           gnutls_assert ();
           return GNUTLS_E_HASH_FAILED;
@@ -234,7 +199,7 @@ _gnutls_mac_init (mac_hd_st * mac, gnutls_mac_algorithm_t algorithm,
       return 0;
     }
 
-  result = _gnutls_mac_ops.init (algorithm, &mac->handle);
+  result = _gnutls_mac_ops.init (e->id, &mac->handle);
   if (result < 0)
     {
       gnutls_assert ();
@@ -289,13 +254,13 @@ get_padsize (gnutls_digest_algorithm_t algorithm)
  */
 
 int
-_gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
+_gnutls_mac_init_ssl3 (digest_hd_st * ret, const mac_entry_st* e,
                        void *key, int keylen)
 {
   uint8_t ipad[48];
   int padsize, result;
 
-  padsize = get_padsize ((gnutls_digest_algorithm_t)algorithm);
+  padsize = get_padsize ((gnutls_digest_algorithm_t)e->id);
   if (padsize == 0)
     {
       gnutls_assert ();
@@ -304,7 +269,7 @@ _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
 
   memset (ipad, 0x36, padsize);
 
-  result = _gnutls_hash_init (ret, (gnutls_digest_algorithm_t)algorithm);
+  result = _gnutls_hash_init (ret, e);
   if (result < 0)
     {
       gnutls_assert ();
@@ -330,7 +295,7 @@ _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
   int padsize;
   int block, rc;
 
-  padsize = get_padsize (handle->algorithm);
+  padsize = get_padsize (handle->e->id);
   if (padsize == 0)
     {
       gnutls_assert ();
@@ -339,7 +304,7 @@ _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
 
   memset (opad, 0x5C, padsize);
 
-  rc = _gnutls_hash_init (&td, handle->algorithm);
+  rc = _gnutls_hash_init (&td, handle->e);
   if (rc < 0)
     {
       gnutls_assert ();
@@ -350,7 +315,7 @@ _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
     _gnutls_hash (&td, handle->key, handle->keysize);
 
   _gnutls_hash (&td, opad, padsize);
-  block = _gnutls_mac_get_algo_len (handle->algorithm);
+  block = _gnutls_mac_get_algo_len (handle->e);
   _gnutls_hash_output (handle, ret);    /* get the previous hash */
   _gnutls_hash (&td, ret, block);
 
@@ -389,7 +354,7 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
   int padsize;
   int block, rc;
 
-  padsize = get_padsize (handle->algorithm);
+  padsize = get_padsize (handle->e->id);
   if (padsize == 0)
     {
       gnutls_assert ();
@@ -400,7 +365,7 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
   memset (opad, 0x5C, padsize);
   memset (ipad, 0x36, padsize);
 
-  rc = _gnutls_hash_init (&td, handle->algorithm);
+  rc = _gnutls_hash_init (&td, handle->e);
   if (rc < 0)
     {
       gnutls_assert ();
@@ -411,7 +376,7 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
     _gnutls_hash (&td, key, key_size);
 
   _gnutls_hash (&td, opad, padsize);
-  block = _gnutls_mac_get_algo_len (handle->algorithm);
+  block = _gnutls_mac_get_algo_len (handle->e);
 
   if (key_size > 0)
     _gnutls_hash (handle, key, key_size);
@@ -443,7 +408,7 @@ ssl3_sha (int i, uint8_t * secret, int secret_len,
       text1[j] = 65 + i;        /* A==65 */
     }
 
-  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
+  ret = _gnutls_hash_init (&td, mac_to_entry(GNUTLS_MAC_SHA1));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -469,7 +434,7 @@ ssl3_md5 (int i, uint8_t * secret, int secret_len,
   digest_hd_st td;
   int ret;
 
-  ret = _gnutls_hash_init (&td, GNUTLS_MAC_MD5);
+  ret = _gnutls_hash_init (&td, mac_to_entry(GNUTLS_MAC_MD5));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -502,7 +467,7 @@ _gnutls_ssl3_hash_md5 (const void *first, int first_len,
   int block = MD5_DIGEST_OUTPUT;
   int rc;
 
-  rc = _gnutls_hash_init (&td, GNUTLS_MAC_MD5);
+  rc = _gnutls_hash_init (&td, mac_to_entry(GNUTLS_MAC_MD5));
   if (rc < 0)
     {
       gnutls_assert ();

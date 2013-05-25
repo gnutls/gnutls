@@ -27,18 +27,7 @@
 
 
 /* TLS Versions */
-
-typedef struct
-{
-  const char *name;
-  gnutls_protocol_t id;         /* gnutls internal version number */
-  uint8_t major;                    /* defined by the protocol */
-  uint8_t minor;                    /* defined by the protocol */
-  transport_t transport;	/* Type of transport, stream or datagram */
-  unsigned int supported:1;     /* 0 not supported, > 0 is supported */
-} gnutls_version_entry;
-
-static const gnutls_version_entry sup_versions[] = {
+static const version_entry_st sup_versions[] = {
   {"SSL3.0", GNUTLS_SSL3, 3, 0, GNUTLS_STREAM, 1},
   {"TLS1.0", GNUTLS_TLS1, 3, 1, GNUTLS_STREAM, 1},
   {"TLS1.1", GNUTLS_TLS1_1, 3, 2, GNUTLS_STREAM, 1},
@@ -50,7 +39,7 @@ static const gnutls_version_entry sup_versions[] = {
 };
 
 #define GNUTLS_VERSION_LOOP(b) \
-        const gnutls_version_entry *p; \
+        const version_entry_st *p; \
                 for(p = sup_versions; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_VERSION_ALG_LOOP(a) \

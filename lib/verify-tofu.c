@@ -159,7 +159,7 @@ char* savep = NULL;
 size_t kp_len, phash_size;
 time_t expiration;
 int ret;
-gnutls_digest_algorithm_t hash_algo;
+const mac_entry_st* hash_algo;
 uint8_t phash[MAX_HASH_SIZE];
 uint8_t hphash[MAX_HASH_SIZE*2+1];
 
@@ -193,7 +193,7 @@ uint8_t hphash[MAX_HASH_SIZE*2+1];
   if (p == NULL)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  hash_algo = (time_t)atol(p);
+  hash_algo = mac_to_entry(atol(p));
   if (_gnutls_digest_get_name(hash_algo) == NULL)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
@@ -206,7 +206,7 @@ uint8_t hphash[MAX_HASH_SIZE*2+1];
   if (p != NULL) *p = 0;
 
   /* hash and hex encode */
-  ret = _gnutls_hash_fast (hash_algo, skey->data, skey->size, phash);
+  ret = _gnutls_hash_fast (hash_algo->id, skey->data, skey->size, phash);
   if (ret < 0)
     return gnutls_assert_val(ret);
     
@@ -698,11 +698,12 @@ gnutls_store_commitment(const char* db_name,
 FILE* fd = NULL;
 int ret;
 char local_file[MAX_FILENAME];
+const mac_entry_st* me = mac_to_entry(hash_algo);
 
-  if (_gnutls_digest_is_secure(hash_algo) == 0)
+  if (_gnutls_digest_is_secure(me) == 0)
     return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
     
-  if (_gnutls_hash_get_algo_len(hash_algo) != hash->size)
+  if (_gnutls_hash_get_algo_len(me) != hash->size)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   if (db_name == NULL && tdb == NULL)
@@ -725,7 +726,7 @@ char local_file[MAX_FILENAME];
     
   _gnutls_debug_log("Configuration file: %s\n", db_name);
 
-  tdb->cstore(db_name, host, service, expiration, hash_algo, hash);
+  tdb->cstore(db_name, host, service, expiration, me->id, hash);
 
   ret = 0;
 

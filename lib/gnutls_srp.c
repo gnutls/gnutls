@@ -32,6 +32,7 @@
 #include <gnutls_mpi.h>
 #include <gnutls_num.h>
 #include <gnutls_helper.h>
+#include <algorithms.h>
 
 #include "debug.h"
 
@@ -294,10 +295,11 @@ _gnutls_calc_srp_sha (const char *username, const char *password,
   digest_hd_st td;
   uint8_t res[MAX_HASH_SIZE];
   int ret;
+  const mac_entry_st* me = mac_to_entry(GNUTLS_MAC_SHA1);
 
   *size = 20;
 
-  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
+  ret = _gnutls_hash_init (&td, me);
   if (ret < 0)
     {
       return GNUTLS_E_MEMORY_ERROR;
@@ -308,7 +310,7 @@ _gnutls_calc_srp_sha (const char *username, const char *password,
 
   _gnutls_hash_deinit (&td, res);
 
-  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
+  ret = _gnutls_hash_init (&td, me);
   if (ret < 0)
     {
       return GNUTLS_E_MEMORY_ERROR;

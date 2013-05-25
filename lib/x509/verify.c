@@ -467,7 +467,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   hash_algo = gnutls_sign_get_hash_algorithm(result);
 
   result =
-    _gnutls_x509_verify_data (hash_algo, &cert_signed_data, &cert_signature,
+    _gnutls_x509_verify_data (mac_to_entry(hash_algo), &cert_signed_data, &cert_signature,
                                    issuer);
   if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED)
     {
@@ -709,7 +709,7 @@ _gnutls_x509_verify_algorithm (gnutls_digest_algorithm_t * hash,
  * 'signature' is the signature!
  */
 int
-_gnutls_x509_verify_data (gnutls_digest_algorithm_t algo,
+_gnutls_x509_verify_data (const mac_entry_st* me,
                           const gnutls_datum_t * data,
                           const gnutls_datum_t * signature,
                           gnutls_x509_crt_t issuer)
@@ -728,8 +728,8 @@ _gnutls_x509_verify_data (gnutls_digest_algorithm_t algo,
     }
 
   ret =
-    pubkey_verify_data (gnutls_x509_crt_get_pk_algorithm (issuer, NULL), algo,
-                        data, signature, &issuer_params);
+    pubkey_verify_data (gnutls_x509_crt_get_pk_algorithm (issuer, NULL), 
+                        me, data, signature, &issuer_params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -972,7 +972,7 @@ gnutls_x509_crl_verify (gnutls_x509_crl_t crl,
   hash_algo = gnutls_sign_get_hash_algorithm(result);
 
   result =
-    _gnutls_x509_verify_data (hash_algo, &crl_signed_data, &crl_signature,
+    _gnutls_x509_verify_data (mac_to_entry(hash_algo), &crl_signed_data, &crl_signature,
                                    issuer);
   if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED)
     {

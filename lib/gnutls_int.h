@@ -450,6 +450,42 @@ typedef struct record_state_st record_state_st;
 struct record_parameters_st;
 typedef struct record_parameters_st record_parameters_st;
 
+/* cipher and mac parameters */
+typedef struct cipher_entry_st
+{
+  const char *name;
+  gnutls_cipher_algorithm_t id;
+  uint16_t blocksize;
+  uint16_t keysize;
+  unsigned block:1;
+  uint16_t iv; /* the size of IV */
+  unsigned aead:1; /* Whether it is authenc cipher */
+} cipher_entry_st;
+
+typedef struct mac_entry_st
+{
+  const char *name;
+  const char *oid;
+  gnutls_mac_algorithm_t id;
+  unsigned output_size;
+  unsigned key_size;
+  unsigned nonce_size;
+  unsigned placeholder; /* if set, then not a real MAC */
+  unsigned secure; /* if set the this algorithm is secure as hash */
+  unsigned block_size; /* internal block size for HMAC */
+} mac_entry_st;
+
+typedef struct
+{
+  const char *name;
+  gnutls_protocol_t id;         /* gnutls internal version number */
+  uint8_t major;                    /* defined by the protocol */
+  uint8_t minor;                    /* defined by the protocol */
+  transport_t transport;	/* Type of transport, stream or datagram */
+  unsigned int supported:1;     /* 0 not supported, > 0 is supported */
+} version_entry_st;
+
+
 /* STATE (cont) */
 
 #include <gnutls_hash_int.h>
@@ -555,6 +591,7 @@ struct record_state_st
   uint64 sequence_number;
 };
 
+
 /* These are used to resolve relative epochs. These values are just
    outside the 16 bit range to prevent off-by-one errors. An absolute
    epoch may be referred to by its numeric id in the range
@@ -568,9 +605,12 @@ struct record_parameters_st
   uint16_t epoch;
   int initialized;
 
-  gnutls_cipher_algorithm_t cipher_algorithm;
-  gnutls_mac_algorithm_t mac_algorithm;
+//  gnutls_cipher_algorithm_t cipher_algorithm;
+//  gnutls_mac_algorithm_t mac_algorithm;
   gnutls_compression_method_t compression_algorithm;
+
+  const cipher_entry_st* cipher;
+  const mac_entry_st* mac;
 
   /* for DTLS */
   uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];

@@ -35,6 +35,7 @@
 #include <gnutls_datum.h>
 #include <extras/randomart.h>
 #include <read-file.h>
+#include <algorithms.h>
 
 /**
  * gnutls_random_art:
@@ -584,7 +585,7 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
                     size_t * result_size)
 {
   int ret;
-  int hash_len = _gnutls_hash_get_algo_len (algo);
+  int hash_len = _gnutls_hash_get_algo_len (mac_to_entry(algo));
 
   if (hash_len < 0 || (unsigned) hash_len > *result_size || result == NULL)
     {

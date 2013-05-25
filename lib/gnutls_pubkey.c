@@ -1566,8 +1566,8 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = pubkey_verify_data( pubkey->pk_algorithm, hash, data, signature,
-    &pubkey->params);
+  ret = pubkey_verify_data( pubkey->pk_algorithm, mac_to_entry(hash), 
+    data, signature, &pubkey->params);
   if (ret < 0)
     {
       gnutls_assert();
@@ -1600,6 +1600,7 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
 			    const gnutls_datum_t * signature)
 {
   int ret;
+  const mac_entry_st* me;
 
   if (pubkey == NULL)
     {
@@ -1610,7 +1611,8 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
   if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  ret = pubkey_verify_data( pubkey->pk_algorithm, gnutls_sign_get_hash_algorithm(algo), 
+  me = mac_to_entry(gnutls_sign_get_hash_algorithm(algo));
+  ret = pubkey_verify_data( pubkey->pk_algorithm, me,
                             data, signature, &pubkey->params);
   if (ret < 0)
     {
@@ -1678,6 +1680,8 @@ gnutls_pubkey_verify_hash2 (gnutls_pubkey_t key,
                             const gnutls_datum_t * hash,
                             const gnutls_datum_t * signature)
 {
+  const mac_entry_st* me;
+
   if (key == NULL)
     {
       gnutls_assert ();
@@ -1690,7 +1694,8 @@ gnutls_pubkey_verify_hash2 (gnutls_pubkey_t key,
     }
   else
     {
-      return pubkey_verify_hashed_data (key->pk_algorithm, gnutls_sign_get_hash_algorithm(algo),
+      me = mac_to_entry(gnutls_sign_get_hash_algorithm(algo));
+      return pubkey_verify_hashed_data (key->pk_algorithm, me,
                                         hash, signature, &key->params);
     }
 }
@@ -1766,22 +1771,24 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
                                        gnutls_sign_algorithm_t sign)
 {
 unsigned int hash_size;
-unsigned int hash_algo;
 unsigned int sig_hash_size;
+const mac_entry_st* me;
 
   if (pubkey->pk_algorithm == GNUTLS_PK_DSA)
     {
-      hash_algo = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
+      me = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params);
+      hash_size = _gnutls_hash_get_algo_len(me);
 
       /* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
       if (!_gnutls_version_has_selectable_sighash (ver))
         {
-          if (hash_algo != GNUTLS_DIG_SHA1)
+          if (me->id != GNUTLS_MAC_SHA1)
             return gnutls_assert_val(GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
         }
       else if (sign != GNUTLS_SIGN_UNKNOWN)
         {
-          sig_hash_size = _gnutls_hash_get_algo_len(gnutls_sign_get_hash_algorithm(sign));
+          me = mac_to_entry(gnutls_sign_get_hash_algorithm(sign));
+          sig_hash_size = _gnutls_hash_get_algo_len(me);
           if (sig_hash_size < hash_size)
             _gnutls_audit_log(session, "The hash size used in signature (%u) is less than the expected (%u)\n", sig_hash_size, hash_size);
         }
@@ -1791,8 +1798,11 @@ unsigned int sig_hash_size;
     {
       if (_gnutls_version_has_selectable_sighash (ver) && sign != GNUTLS_SIGN_UNKNOWN)
         {
-          _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
-          sig_hash_size = _gnutls_hash_get_algo_len(gnutls_sign_get_hash_algorithm(sign));
+          me = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params);
+          hash_size = _gnutls_hash_get_algo_len(me);
+
+          me = mac_to_entry(gnutls_sign_get_hash_algorithm(sign));
+          sig_hash_size = _gnutls_hash_get_algo_len(me);
 
           if (sig_hash_size < hash_size)
             _gnutls_audit_log(session, "The hash size used in signature (%u) is less than the expected (%u)\n", sig_hash_size, hash_size);
@@ -1828,7 +1838,7 @@ _gnutls_pubkey_get_mpis (gnutls_pubkey_t key,
  * params[1] is public key
  */
 static int
-_pkcs1_rsa_verify_sig (gnutls_digest_algorithm_t hash,
+_pkcs1_rsa_verify_sig (const mac_entry_st* me,
                        const gnutls_datum_t * text,
                        const gnutls_datum_t * prehash,
                        const gnutls_datum_t * signature, 
@@ -1840,7 +1850,7 @@ _pkcs1_rsa_verify_sig (gnutls_digest_algorithm_t hash,
   gnutls_datum_t d, di;
   digest_hd_st hd;
 
-  digest_size = _gnutls_hash_get_algo_len (hash);
+  digest_size = _gnutls_hash_get_algo_len (me);
   if (prehash)
     {
       if (prehash->data == NULL || prehash->size != digest_size)
@@ -1856,7 +1866,7 @@ _pkcs1_rsa_verify_sig (gnutls_digest_algorithm_t hash,
           return GNUTLS_E_INVALID_REQUEST;
         }
 
-      ret = _gnutls_hash_init (&hd, hash);
+      ret = _gnutls_hash_init (&hd, me);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -1874,7 +1884,7 @@ _pkcs1_rsa_verify_sig (gnutls_digest_algorithm_t hash,
 
   /* decrypted is a BER encoded data of type DigestInfo
    */
-  ret = encode_ber_digest_info (hash, &d, &di);
+  ret = encode_ber_digest_info (me, &d, &di);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -1888,7 +1898,7 @@ _pkcs1_rsa_verify_sig (gnutls_digest_algorithm_t hash,
  */
 static int
 dsa_verify_hashed_data (gnutls_pk_algorithm_t pk,
-                gnutls_digest_algorithm_t algo,
+                const mac_entry_st* algo,
                 const gnutls_datum_t * hash,
                 const gnutls_datum_t * signature,
                 gnutls_pk_params_st* params)
@@ -1896,15 +1906,17 @@ dsa_verify_hashed_data (gnutls_pk_algorithm_t pk,
   gnutls_datum_t digest;
   unsigned int hash_len;
 
-  if (algo == GNUTLS_DIG_UNKNOWN)
-    algo = _gnutls_dsa_q_to_hash (pk, params, &hash_len);
-  else hash_len = _gnutls_hash_get_algo_len(algo);
+  if (algo == NULL)
+    algo = _gnutls_dsa_q_to_hash (pk, params);
+  
+  hash_len = _gnutls_hash_get_algo_len(algo);
 
   /* SHA1 or better allowed */
   if (!hash->data || hash->size < hash_len)
     {
       gnutls_assert();
-      _gnutls_debug_log("Hash size (%d) does not correspond to hash %s(%d) or better.\n", (int)hash->size, gnutls_mac_get_name(algo), hash_len);
+      _gnutls_debug_log("Hash size (%d) does not correspond to hash %s(%d) or better.\n", 
+        (int)hash->size, _gnutls_mac_get_name(algo), hash_len);
           
       if (hash->size != 20) /* SHA1 is allowed */
         return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
@@ -1918,7 +1930,7 @@ dsa_verify_hashed_data (gnutls_pk_algorithm_t pk,
 
 static int
 dsa_verify_data (gnutls_pk_algorithm_t pk,
-                 gnutls_digest_algorithm_t algo,
+                 const mac_entry_st* algo,
                  const gnutls_datum_t * data,
                  const gnutls_datum_t * signature,
                  gnutls_pk_params_st* params)
@@ -1928,8 +1940,8 @@ dsa_verify_data (gnutls_pk_algorithm_t pk,
   gnutls_datum_t digest;
   digest_hd_st hd;
 
-  if (algo == GNUTLS_DIG_UNKNOWN)
-    algo = _gnutls_dsa_q_to_hash (pk, params, NULL);
+  if (algo == NULL)
+    algo = _gnutls_dsa_q_to_hash (pk, params);
 
   ret = _gnutls_hash_init (&hd, algo);
   if (ret < 0)
@@ -1949,7 +1961,7 @@ dsa_verify_data (gnutls_pk_algorithm_t pk,
  */
 int
 pubkey_verify_hashed_data (gnutls_pk_algorithm_t pk,
-                           gnutls_digest_algorithm_t hash_algo,
+                           const mac_entry_st* hash_algo,
                            const gnutls_datum_t * hash,
                            const gnutls_datum_t * signature,
                            gnutls_pk_params_st * issuer_params)
@@ -1991,7 +2003,7 @@ pubkey_verify_hashed_data (gnutls_pk_algorithm_t pk,
  */
 int
 pubkey_verify_data (gnutls_pk_algorithm_t pk,
-                    gnutls_digest_algorithm_t hash_algo,
+                    const mac_entry_st* me,
                     const gnutls_datum_t * data,
                     const gnutls_datum_t * signature,
                     gnutls_pk_params_st * issuer_params)
@@ -2002,7 +2014,7 @@ pubkey_verify_data (gnutls_pk_algorithm_t pk,
     case GNUTLS_PK_RSA:
 
       if (_pkcs1_rsa_verify_sig
-          (hash_algo, data, NULL, signature, issuer_params) != 0)
+          (me, data, NULL, signature, issuer_params) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -2013,7 +2025,7 @@ pubkey_verify_data (gnutls_pk_algorithm_t pk,
 
     case GNUTLS_PK_EC:
     case GNUTLS_PK_DSA:
-      if (dsa_verify_data(pk, hash_algo, data, signature, issuer_params) != 0)
+      if (dsa_verify_data(pk, me, data, signature, issuer_params) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -2028,11 +2040,11 @@ pubkey_verify_data (gnutls_pk_algorithm_t pk,
     }
 }
 
-gnutls_digest_algorithm_t
-_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params, 
-                       unsigned int* hash_len)
+const mac_entry_st*
+_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params)
 {
   int bits = 0;
+  int ret;
   
   if (algo == GNUTLS_PK_DSA)
     bits = _gnutls_mpi_get_nbits (params->params[1]);
@@ -2041,34 +2053,30 @@ _gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* pa
 
   if (bits <= 160)
     {
-      if (hash_len) *hash_len = 20;
-      return GNUTLS_DIG_SHA1;
+      ret = GNUTLS_DIG_SHA1;
     }
   else if (bits <= 192)
     {
-      if (hash_len) *hash_len = 24;
-      return GNUTLS_DIG_SHA256;
+      ret = GNUTLS_DIG_SHA256;
     }
   else if (bits <= 224)
     {
-      if (hash_len) *hash_len = 28;
-      return GNUTLS_DIG_SHA256;
+      ret = GNUTLS_DIG_SHA256;
     }
   else if (bits <= 256)
     {
-      if (hash_len) *hash_len = 32;
-      return GNUTLS_DIG_SHA256;
+      ret = GNUTLS_DIG_SHA256;
     }
   else if (bits <= 384)
     {
-      if (hash_len) *hash_len = 48;
-      return GNUTLS_DIG_SHA384;
+      ret = GNUTLS_DIG_SHA384;
     }
   else
     {
-      if (hash_len) *hash_len = 64;
-      return GNUTLS_DIG_SHA512;
+      ret = GNUTLS_DIG_SHA512;
     }
+    
+  return mac_to_entry(ret);
 }
 
 /**

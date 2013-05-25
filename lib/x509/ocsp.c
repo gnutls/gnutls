@@ -590,7 +590,7 @@ gnutls_ocsp_req_add_cert_id (gnutls_ocsp_req_t req,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  oid = _gnutls_x509_digest_to_oid (digest);
+  oid = _gnutls_x509_digest_to_oid (mac_to_entry(digest));
   if (oid == NULL)
     {
       gnutls_assert ();
@@ -1294,7 +1294,7 @@ size_t t, hash_len;
       goto cleanup;
     }
   
-  hash_len = _gnutls_hash_get_algo_len(digest);
+  hash_len = _gnutls_hash_get_algo_len(mac_to_entry(digest));
   if (hash_len != rdn_hash.size)
     {
       ret = gnutls_assert_val(GNUTLS_E_OCSP_RESPONSE_ERROR);

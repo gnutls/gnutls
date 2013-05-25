@@ -2605,7 +2605,8 @@ int ret;
       goto cleanup;
     }
 
-  ret = pubkey_verify_data(gnutls_x509_crq_get_pk_algorithm (crq, NULL), algo,
+  ret = pubkey_verify_data(gnutls_x509_crq_get_pk_algorithm (crq, NULL), 
+                           mac_to_entry(algo),
                            &data, &signature, &params);
   if (ret < 0)
     {

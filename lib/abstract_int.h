@@ -93,20 +93,21 @@ _gnutls_pubkey_get_mpis (gnutls_pubkey_t key,
 
 int
 pubkey_verify_hashed_data (gnutls_pk_algorithm_t pk,
-                           gnutls_digest_algorithm_t algo,
+                           const mac_entry_st * algo,
                            const gnutls_datum_t * hash,
                            const gnutls_datum_t * signature,
                            gnutls_pk_params_st * issuer_params);
 
 int pubkey_verify_data (gnutls_pk_algorithm_t pk,
-                        gnutls_digest_algorithm_t algo,
+                           const mac_entry_st * algo,
                        const gnutls_datum_t * data,
                        const gnutls_datum_t * signature,
                        gnutls_pk_params_st * issuer_params);
 
 
 
-gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, 
-  const gnutls_pk_params_st* params, unsigned int* hash_len);
+const mac_entry_st*
+_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, 
+  const gnutls_pk_params_st* params);
 
 #endif

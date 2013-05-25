@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2009-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2009-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -50,22 +51,20 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher)
 }
 
 int
-_gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
+_gnutls_cipher_init (cipher_hd_st * handle, const cipher_entry_st* e,
                      const gnutls_datum_t * key, const gnutls_datum_t * iv, int enc)
 {
   int ret = GNUTLS_E_INTERNAL_ERROR;
   const gnutls_crypto_cipher_st *cc = NULL;
 
-  if (cipher == GNUTLS_CIPHER_NULL)
+  if (unlikely(e == NULL || e->id == GNUTLS_CIPHER_NULL))
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  handle->is_aead = _gnutls_cipher_algo_is_aead(cipher);
-  if (handle->is_aead)
-     handle->tag_size = gnutls_cipher_get_block_size(cipher);
+  handle->e = e;
 
   /* check if a cipher has been registered
    */
-  cc = _gnutls_get_crypto_cipher (cipher);
+  cc = _gnutls_get_crypto_cipher (e->id);
   if (cc != NULL)
     {
       handle->encrypt = cc->encrypt;
@@ -75,7 +74,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
       handle->tag = cc->tag;
       handle->setiv = cc->setiv;
 
-      SR (cc->init (cipher, &handle->handle, enc), cc_cleanup);
+      SR (cc->init (e->id, &handle->handle, enc), cc_cleanup);
       SR (cc->setkey( handle->handle, key->data, key->size), cc_cleanup);
       if (iv)
         {
@@ -94,7 +93,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
 
   /* otherwise use generic cipher interface
    */
-  ret = _gnutls_cipher_ops.init (cipher, &handle->handle, enc);
+  ret = _gnutls_cipher_ops.init (e->id, &handle->handle, enc);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -131,45 +130,56 @@ cc_cleanup:
 /* Auth_cipher API 
  */
 int _gnutls_auth_cipher_init (auth_cipher_hd_st * handle, 
-  gnutls_cipher_algorithm_t cipher,
+  const cipher_entry_st* e,
   const gnutls_datum_t * cipher_key,
   const gnutls_datum_t * iv,
-  gnutls_mac_algorithm_t mac,
+  const mac_entry_st* me,
   const gnutls_datum_t * mac_key,
   int ssl_hmac, int enc)
 {
 int ret;
 
+  if (unlikely(e == NULL))
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
   memset(handle, 0, sizeof(*handle));
 
-  if (cipher != GNUTLS_CIPHER_NULL)
+  if (e->id != GNUTLS_CIPHER_NULL)
     {
-      ret = _gnutls_cipher_init(&handle->cipher, cipher, cipher_key, iv, enc);
+      ret = _gnutls_cipher_init(&handle->cipher, e, cipher_key, iv, enc);
       if (ret < 0)
         return gnutls_assert_val(ret);
     }
   else
     handle->is_null = 1;
 
-  if (mac != GNUTLS_MAC_AEAD)
+  if (me->id != GNUTLS_MAC_AEAD)
     {
       handle->is_mac = 1;
       handle->ssl_hmac = ssl_hmac;
 
       if (ssl_hmac)
-        ret = _gnutls_mac_init_ssl3(&handle->mac.dig, mac, mac_key->data, mac_key->size);
+        ret = _gnutls_mac_init_ssl3(&handle->mac.dig, me, mac_key->data, mac_key->size);
       else
-        ret = _gnutls_mac_init(&handle->mac.mac, mac, mac_key->data, mac_key->size);
+        ret = _gnutls_mac_init(&handle->mac.mac, me, mac_key->data, mac_key->size);
       if (ret < 0)
         {
           gnutls_assert();
           goto cleanup;
         }
 
-      handle->tag_size = _gnutls_mac_get_algo_len(mac);
+      handle->tag_size = _gnutls_mac_get_algo_len(me);
     }
-  else if (_gnutls_cipher_is_aead(&handle->cipher))
-    handle->tag_size = _gnutls_cipher_tag_len(&handle->cipher);
+  else if (_gnutls_cipher_algo_is_aead(e))
+    {
+      handle->tag_size = _gnutls_cipher_get_tag_size(e);
+    }
+  else
+    {
+      gnutls_assert();
+      ret = GNUTLS_E_INVALID_REQUEST;
+      goto cleanup;
+    }
 
   return 0;
 cleanup:

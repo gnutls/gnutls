@@ -1784,7 +1784,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
 
   d_iv.data = (uint8_t *) enc_params->iv;
   d_iv.size = enc_params->iv_size;
-  result = _gnutls_cipher_init (&ch, enc_params->cipher, &dkey, &d_iv, 0);
+  result = _gnutls_cipher_init (&ch, cipher_to_entry(enc_params->cipher), &dkey, &d_iv, 0);
 
   gnutls_free (key);
   key = NULL;
@@ -2276,7 +2276,7 @@ encrypt_data (const gnutls_datum_t * plain,
 
   d_iv.data = (uint8_t *) enc_params->iv;
   d_iv.size = enc_params->iv_size;
-  result = _gnutls_cipher_init (&ch, enc_params->cipher, key, &d_iv, 1);
+  result = _gnutls_cipher_init (&ch, cipher_to_entry(enc_params->cipher), key, &d_iv, 1);
 
   if (result < 0)
     {

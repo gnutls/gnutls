@@ -1319,43 +1319,6 @@ cdk_stream_set_text_flag (cdk_stream_t s, const char *lf)
   return 0;
 }
 
-
-/**
- * cdk_stream_set_hash_flag:
- * @s: the stream object
- * @digest_algo: the digest algorithm to use
- * 
- * This is for read-only streams. It pushes a digest filter to
- * calculate the digest of the given stream data.
- **/
-cdk_error_t
-cdk_stream_set_hash_flag (cdk_stream_t s, int digest_algo)
-{
-  struct stream_filter_s *f;
-
-  if (!s)
-    {
-      gnutls_assert ();
-      return CDK_Inv_Value;
-    }
-  if (stream_get_mode (s))
-    {
-      gnutls_assert ();
-      return CDK_Inv_Mode;
-    }
-  f = filter_add (s, _cdk_filter_hash, fHASH);
-  if (!f)
-    {
-      gnutls_assert ();
-      return CDK_Out_Of_Core;
-    }
-  f->ctl = stream_get_mode (s);
-  f->u.mfx.digest_algo = digest_algo;
-  f->flags.rdonly = 1;
-  return 0;
-}
-
-
 /**
  * cdk_stream_enable_cache:
  * @s: the stream object

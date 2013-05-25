@@ -325,8 +325,8 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
                       const gnutls_pk_params_st * pk_params)
 {
   int ret;
-  unsigned int hash;
   unsigned int hash_len;
+  const mac_entry_st* me;
 
   switch (algo)
     {
@@ -347,11 +347,13 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         dsa_signature_init (&sig);
 
-        hash = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        me = _gnutls_dsa_q_to_hash (algo, pk_params);
+        hash_len = _gnutls_hash_get_algo_len(me);
+
         if (hash_len > vdata->size)
           {
             gnutls_assert ();
-            _gnutls_debug_log("Security level of algorithm requires hash %s(%d) or better\n", gnutls_mac_get_name(hash), hash_len);
+            _gnutls_debug_log("Security level of algorithm requires hash %s(%d) or better\n", _gnutls_mac_get_name(me), hash_len);
             hash_len = vdata->size;
           }
 
@@ -382,11 +384,13 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         dsa_signature_init (&sig);
 
-        hash = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        me = _gnutls_dsa_q_to_hash (algo, pk_params);
+        hash_len = _gnutls_hash_get_algo_len(me);
+
         if (hash_len > vdata->size)
           {
             gnutls_assert ();
-            _gnutls_debug_log("Security level of algorithm requires hash %s(%d) or better\n", gnutls_mac_get_name(hash), hash_len);
+            _gnutls_debug_log("Security level of algorithm requires hash %s(%d) or better\n", _gnutls_mac_get_name(me), hash_len);
             hash_len = vdata->size;
           }
 
@@ -466,6 +470,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
 {
   int ret;
   unsigned int hash_len;
+  const mac_entry_st* me;
   bigint_t tmp[2] = { NULL, NULL };
 
   switch (algo)
@@ -495,7 +500,9 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        me = _gnutls_dsa_q_to_hash (algo, pk_params);
+        hash_len = _gnutls_hash_get_algo_len(me);
+
         if (hash_len > vdata->size)
           hash_len = vdata->size;
 
@@ -527,7 +534,9 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        me = _gnutls_dsa_q_to_hash (algo, pk_params);
+        hash_len = _gnutls_hash_get_algo_len(me);
+
         if (hash_len > vdata->size)
           hash_len = vdata->size;
 
@@ -1081,6 +1090,7 @@ static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk,
   unsigned digest_size;
   mpz_t s;
   struct rsa_public_key pub;
+  const mac_entry_st* me;
   int ret;
 
   mpz_init(s);
@@ -1090,8 +1100,9 @@ static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk,
     case GNUTLS_PK_DSA:
     case GNUTLS_PK_EC:
 
+      me = _gnutls_dsa_q_to_hash (pk, issuer_params);
       if (hash_algo)
-        *hash_algo = _gnutls_dsa_q_to_hash (pk, issuer_params, NULL);
+        *hash_algo = me->id;
 
       ret = 0;
       break;
@@ -1126,7 +1137,7 @@ static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk,
           goto cleanup;
         }
 
-      if (digest_size != _gnutls_hash_get_algo_len (*hash_algo))
+      if (digest_size != _gnutls_hash_get_algo_len (mac_to_entry(*hash_algo)))
         {
           gnutls_assert ();
           ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;

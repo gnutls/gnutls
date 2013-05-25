@@ -937,7 +937,8 @@ gnutls_pkcs12_generate_mac (gnutls_pkcs12_t pkcs12, const char *pass)
 
   /* MAC the data
    */
-  result = _gnutls_mac_init (&td1, GNUTLS_MAC_SHA1, key, sizeof (key));
+  result = _gnutls_mac_init (&td1, mac_to_entry(GNUTLS_MAC_SHA1), 
+                             key, sizeof (key));
   if (result < 0)
     {
       gnutls_assert ();
@@ -1063,7 +1064,8 @@ gnutls_pkcs12_verify_mac (gnutls_pkcs12_t pkcs12, const char *pass)
 
   /* MAC the data
    */
-  result = _gnutls_mac_init (&td1, GNUTLS_MAC_SHA1, key, sizeof (key));
+  result = _gnutls_mac_init (&td1, mac_to_entry(GNUTLS_MAC_SHA1), 
+                             key, sizeof (key));
   if (result < 0)
     {
       gnutls_assert ();

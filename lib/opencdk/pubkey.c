@@ -80,6 +80,7 @@ cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
   int ret, algo;
   unsigned int i;
   gnutls_pk_params_st params;
+  const mac_entry_st* me;
 
   if (!pk || !sig || !md)
     {
@@ -103,15 +104,16 @@ cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
       gnutls_assert ();
       goto leave;
     }
-
-  rc = _gnutls_set_datum (&di, md, _gnutls_hash_get_algo_len (sig->digest_algo));
+  
+  me = mac_to_entry(sig->digest_algo);
+  rc = _gnutls_set_datum (&di, md, _gnutls_hash_get_algo_len(me));
   if (rc < 0)
     {
       rc = gnutls_assert_val(CDK_Out_Of_Core);
       goto leave;
     }  
 
-  rc = pk_prepare_hash (algo, sig->digest_algo, &di);
+  rc = pk_prepare_hash (algo, me, &di);
   if (rc < 0)
     {
       rc = gnutls_assert_val(CDK_General_Error);
@@ -429,6 +431,7 @@ cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte * fpr)
   int md_algo;
   int dlen = 0;
   int err;
+  const mac_entry_st* me;
 
   if (!pk || !fpr)
     return CDK_Inv_Value;
@@ -437,8 +440,11 @@ cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte * fpr)
     md_algo = GNUTLS_DIG_MD5;   /* special */
   else
     md_algo = GNUTLS_DIG_SHA1;
-  dlen = _gnutls_hash_get_algo_len (md_algo);
-  err = _gnutls_hash_init (&hd, md_algo);
+    
+  me = mac_to_entry(md_algo);
+
+  dlen = _gnutls_hash_get_algo_len (me);
+  err = _gnutls_hash_init (&hd, me);
   if (err < 0)
     {
       gnutls_assert ();

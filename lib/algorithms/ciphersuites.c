@@ -745,12 +745,12 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 
 
 /* Cipher Suite's functions */
-gnutls_cipher_algorithm_t
+const cipher_entry_st*
 _gnutls_cipher_suite_get_cipher_algo (const uint8_t suite[2])
 {
   int ret = 0;
   CIPHER_SUITE_ALG_LOOP (ret = p->block_algorithm);
-  return ret;
+  return cipher_to_entry(ret);
 }
 
 gnutls_kx_algorithm_t
@@ -773,12 +773,12 @@ _gnutls_cipher_suite_get_prf (const uint8_t suite[2])
 
 }
 
-gnutls_mac_algorithm_t
+const mac_entry_st*
 _gnutls_cipher_suite_get_mac_algo (const uint8_t suite[2])
 {                               /* In bytes */
   int ret = 0;
   CIPHER_SUITE_ALG_LOOP (ret = p->mac_algorithm);
-  return ret;
+  return mac_to_entry(ret);
 
 }
 

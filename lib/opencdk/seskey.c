@@ -28,6 +28,7 @@
 #include "opencdk.h"
 #include "main.h"
 #include "packet.h"
+#include <algorithms.h>
 
 /**
  * cdk_s2k_new:
@@ -51,7 +52,7 @@ cdk_s2k_new (cdk_s2k_t * ret_s2k, int mode, int digest_algo,
   if (mode != 0x00 && mode != 0x01 && mode != 0x03)
     return CDK_Inv_Mode;
 
-  if (_gnutls_hash_get_algo_len (digest_algo) <= 0)
+  if (_gnutls_hash_get_algo_len (mac_to_entry(digest_algo)) <= 0)
     return CDK_Inv_Algo;
 
   s2k = cdk_calloc (1, sizeof *s2k);

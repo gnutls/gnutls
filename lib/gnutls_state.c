@@ -89,7 +89,7 @@ gnutls_cipher_get (gnutls_session_t session)
   if (ret < 0)
     return gnutls_assert_val(GNUTLS_CIPHER_NULL);
 
-  return record_params->cipher_algorithm;
+  return record_params->cipher->id;
 }
 
 /**
@@ -142,7 +142,7 @@ gnutls_mac_get (gnutls_session_t session)
   if (ret < 0)
     return gnutls_assert_val(GNUTLS_MAC_NULL);
 
-  return record_params->mac_algorithm;
+  return record_params->mac->id;
 }
 
 /**
@@ -746,13 +746,13 @@ gnutls_handshake_set_private_extensions (gnutls_session_t session, int allow)
 }
 
 inline static int
-_gnutls_cal_PRF_A (gnutls_mac_algorithm_t algorithm,
+_gnutls_cal_PRF_A (const mac_entry_st* me,
                    const void *secret, int secret_size,
                    const void *seed, int seed_size, void *result)
 {
   int ret;
 
-  ret = _gnutls_mac_fast (algorithm, secret, secret_size, seed, seed_size, result);
+  ret = _gnutls_mac_fast (me->id, secret, secret_size, seed, seed_size, result);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -775,6 +775,7 @@ P_hash (gnutls_mac_algorithm_t algorithm,
   int i, times, how, blocksize, A_size;
   uint8_t final[MAX_HASH_SIZE], Atmp[MAX_SEED_SIZE];
   int output_bytes, result;
+  const mac_entry_st* me = mac_to_entry(algorithm);
 
   if (seed_size > MAX_SEED_SIZE || total_bytes <= 0)
     {
@@ -782,7 +783,7 @@ P_hash (gnutls_mac_algorithm_t algorithm,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  blocksize = _gnutls_mac_get_algo_len (algorithm);
+  blocksize = _gnutls_mac_get_algo_len (me);
 
   output_bytes = 0;
   do
@@ -800,7 +801,7 @@ P_hash (gnutls_mac_algorithm_t algorithm,
 
   for (i = 0; i < times; i++)
     {
-      result = _gnutls_mac_init (&td2, algorithm, secret, secret_size);
+      result = _gnutls_mac_init (&td2, me, secret, secret_size);
       if (result < 0)
         {
           gnutls_assert ();
@@ -809,7 +810,7 @@ P_hash (gnutls_mac_algorithm_t algorithm,
 
       /* here we calculate A(i+1) */
       if ((result =
-           _gnutls_cal_PRF_A (algorithm, secret, secret_size, Atmp,
+           _gnutls_cal_PRF_A (me, secret, secret_size, Atmp,
                               A_size, Atmp)) < 0)
         {
           gnutls_assert ();

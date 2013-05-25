@@ -247,7 +247,7 @@ _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk,
  * structure. The digest info is allocated and stored into the info structure.
  */
 int
-encode_ber_digest_info (gnutls_digest_algorithm_t hash,
+encode_ber_digest_info (const mac_entry_st* e,
                         const gnutls_datum_t * digest,
                         gnutls_datum_t * output)
 {
@@ -257,11 +257,11 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
   uint8_t *tmp_output;
   int tmp_output_size;
 
-  algo = _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) hash);
+  algo = _gnutls_x509_mac_to_oid (e);
   if (algo == NULL)
     {
       gnutls_assert ();
-      _gnutls_debug_log ("Hash algorithm: %d has no OID\n", hash);
+      _gnutls_debug_log ("Hash algorithm: %d has no OID\n", e->id);
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
