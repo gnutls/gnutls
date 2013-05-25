@@ -1357,6 +1357,8 @@ _gnutls_recv_handshake (gnutls_session_t session,
       return gnutls_assert_val_fatal(ret);
     }
 
+  session->internals.last_handshake_in = hsk.htype;
+
   ret = _gnutls_handshake_hash_add_recvd (session, hsk.htype,
                                               hsk.header, hsk.header_size,
                                               hsk.data.data, hsk.data.length);
