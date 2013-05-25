@@ -929,11 +929,7 @@ GNUTLS_PRIVATE {
     # Internal symbols needed by libgnutls-openssl:
     _gnutls_pkix1_asn;
     _gnutls_x509_parse_dn_oid;
-    _gnutls_hash_fast;
     _gnutls_asn2err;
-    _gnutls_hash_init;
-    _gnutls_hash_deinit;
-    _gnutls_hash;
     _gnutls_ext_get_session_data;
     _gnutls_ext_set_session_data;
     _gnutls_ext_register;
