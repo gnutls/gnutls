@@ -850,12 +850,12 @@ gnutls_session_get_desc (gnutls_session_t session)
 
     type = gnutls_certificate_type_get (session);
     if (type == GNUTLS_CRT_X509)
-      snprintf(proto_name, sizeof(proto_name), "%s-PKIX", gnutls_protocol_get_name(_gnutls_protocol_get_version(session)));
+      snprintf(proto_name, sizeof(proto_name), "%s-PKIX", gnutls_protocol_get_name(get_num_version(session)));
     else
-      snprintf(proto_name, sizeof(proto_name), "%s-%s", gnutls_protocol_get_name(_gnutls_protocol_get_version(session)),
+      snprintf(proto_name, sizeof(proto_name), "%s-%s", gnutls_protocol_get_name(get_num_version(session)),
                                                         gnutls_certificate_type_get_name(type));
     
-    gnutls_protocol_get_name(_gnutls_protocol_get_version (session)),
+    gnutls_protocol_get_name(get_num_version (session)),
 
     desc = gnutls_malloc(DESC_SIZE);
     if (desc == NULL)

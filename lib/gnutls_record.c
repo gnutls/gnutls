@@ -384,14 +384,15 @@ inline static void
 copy_record_version (gnutls_session_t session,
                      gnutls_handshake_description_t htype, uint8_t version[2])
 {
-  gnutls_protocol_t lver;
+  const version_entry_st* lver;
 
   if (session->internals.initial_negotiation_completed || htype != GNUTLS_HANDSHAKE_CLIENT_HELLO
       || session->internals.default_record_version[0] == 0)
     {
-      lver = gnutls_protocol_get_version (session);
+      lver = get_version (session);
 
-      _gnutls_version_to_tls(lver, &version[0], &version[1]);
+      version[0] = lver->major;
+      version[1] = lver->minor;
     }
   else
     {
@@ -647,9 +648,11 @@ inline static int
 record_check_version (gnutls_session_t session,
                       gnutls_handshake_description_t htype, uint8_t version[2])
 {
-unsigned vers = gnutls_protocol_get_version (session);
-int diff = (vers !=
-           _gnutls_version_get (version[0], version[1]));
+const version_entry_st* vers = get_version (session);
+int diff = 0;
+
+  if (vers->major != version[0] || vers->minor != version[1])
+    diff = 1;
 
   if (!IS_DTLS(session))
     {
@@ -698,14 +701,14 @@ int diff = (vers !=
               return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
             }
         }
-      else if (vers > GNUTLS_DTLS1_0 && version[0] > 254)
+      else if (vers->id > GNUTLS_DTLS1_0 && version[0] > 254)
         {
           gnutls_assert ();
           _gnutls_record_log("REC[%p]: INVALID DTLS VERSION PACKET: (%d) %d.%d\n", session,
                  htype, version[0], version[1]);
           return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
         }
-      else if (vers == GNUTLS_DTLS0_9 && version[0] > 1)
+      else if (vers->id == GNUTLS_DTLS0_9 && version[0] > 1)
         {
           gnutls_assert ();
           _gnutls_record_log("REC[%p]: INVALID DTLS VERSION PACKET: (%d) %d.%d\n", session,

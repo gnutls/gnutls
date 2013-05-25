@@ -483,6 +483,10 @@ typedef struct
   uint8_t minor;                    /* defined by the protocol */
   transport_t transport;	/* Type of transport, stream or datagram */
   unsigned int supported:1;     /* 0 not supported, > 0 is supported */
+  unsigned int explicit_iv:1;
+  unsigned int extensions:1; /* whether it supports extensions */
+  unsigned int selectable_sighash:1; /* whether signatures can be selected */
+  unsigned int selectable_prf:1; /* whether the PRF is ciphersuite-defined */
 } version_entry_st;
 
 
@@ -579,6 +583,7 @@ typedef struct
    * do that? Do they belong in security parameters?
    */
   int do_recv_supplemental, do_send_supplemental;
+  const version_entry_st* pversion;
 } security_parameters_st;
 
 struct record_state_st
@@ -605,8 +610,6 @@ struct record_parameters_st
   uint16_t epoch;
   int initialized;
 
-//  gnutls_cipher_algorithm_t cipher_algorithm;
-//  gnutls_mac_algorithm_t mac_algorithm;
   gnutls_compression_method_t compression_algorithm;
 
   const cipher_entry_st* cipher;
@@ -1028,25 +1031,21 @@ void _gnutls_free_auth_info (gnutls_session_t session);
 	session->internals.adv_version_major = major; \
 	session->internals.adv_version_minor = minor
 
-void _gnutls_set_adv_version (gnutls_session_t, gnutls_protocol_t);
-gnutls_protocol_t _gnutls_get_adv_version (gnutls_session_t);
-
 int _gnutls_is_secure_mem_null (const void *);
 
-inline static gnutls_protocol_t
-_gnutls_protocol_get_version (gnutls_session_t session)
+inline static const version_entry_st*
+get_version (gnutls_session_t session)
 {
-  return session->security_parameters.version;
+  return session->security_parameters.pversion;
 }
 
-#define gnutls_protocol_get_version _gnutls_protocol_get_version
+#define get_num_version(session) \
+	session->security_parameters.version
 
-inline static void
-_gnutls_set_current_version (gnutls_session_t session,
-                             gnutls_protocol_t version)
-{
-  session->security_parameters.version = version;
-}
+#define _gnutls_set_current_version(s, v) { \
+  s->security_parameters.version = v; \
+  s->security_parameters.pversion = version_to_entry(v); \
+  }
 
 #define timespec_sub_ms _gnutls_timespec_sub_ms
 unsigned int

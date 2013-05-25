@@ -1456,7 +1456,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, uint8_t * data,
   int i;
   gnutls_pk_algorithm_t pk_algos[MAX_CLIENT_SIGN_ALGOS];
   int pk_algos_length;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -1562,7 +1562,7 @@ _gnutls_gen_cert_client_crt_vrfy (gnutls_session_t session,
   int apr_cert_list_length;
   gnutls_datum_t signature = { NULL, 0 };
   gnutls_sign_algorithm_t sign_algo;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   /* find the appropriate certificate */
   if ((ret =
@@ -1636,7 +1636,7 @@ _gnutls_proc_cert_client_crt_vrfy (gnutls_session_t session,
   cert_auth_info_t info = _gnutls_get_auth_info (session);
   gnutls_pcert_st peer_cert;
   gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   if (info == NULL || info->ncerts == 0)
     {
@@ -1708,7 +1708,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session,
   gnutls_certificate_credentials_t cred;
   int ret;
   uint8_t tmp_data[CERTTYPE_SIZE];
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   /* Now we need to generate the RDN sequence. This is
    * already in the CERTIFICATE_CRED structure, to improve
@@ -2207,7 +2207,7 @@ gnutls_privkey_t apr_pkey;
 int apr_cert_list_length;
 gnutls_datum_t signature = { NULL, 0 }, ddata;
 gnutls_sign_algorithm_t sign_algo;
-gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+const version_entry_st*  ver = get_version (session);
 int ret;
 
   ddata.data = plain;
@@ -2294,7 +2294,7 @@ _gnutls_proc_dhe_signature (gnutls_session_t session, uint8_t * data,
   ssize_t data_size = _data_size;
   gnutls_pcert_st peer_cert;
   gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   if (info == NULL || info->ncerts == 0)
     {

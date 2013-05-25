@@ -947,7 +947,7 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
 
   unsigned int i, ret_count, j, z, k=0;
   const gnutls_cipher_suite_entry * ce;
-  unsigned int version = gnutls_protocol_get_version( session);
+  const version_entry_st* version = get_version( session);
   unsigned int is_dtls = IS_DTLS(session);
 
   for (i = 0; i < session->internals.priorities.kx.algorithms; i++)
@@ -960,9 +960,9 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
 
           if (ce == NULL) continue;
 
-          if (is_dtls == 0 && !(version >= ce->min_version))
+          if (is_dtls == 0 && !(version->id >= ce->min_version))
             continue;
-          else if (is_dtls != 0 && !(version >= ce->min_dtls_version))
+          else if (is_dtls != 0 && !(version->id >= ce->min_dtls_version))
 
           if (k+2 > max_cipher_suite_size)
             return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);

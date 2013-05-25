@@ -213,7 +213,7 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
 {
   int ret;
   size_t init_length = extdata->length;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   /* this function sends the client extension data */
   if (session->security_parameters.entity == GNUTLS_CLIENT
@@ -248,7 +248,7 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_pcert_st* cert)
 {
   unsigned i;
   int ret;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   sig_ext_st *priv;
   extension_priv_data_t epriv;
   unsigned int cert_algo;
@@ -295,7 +295,7 @@ _gnutls_session_sign_algo_enabled (gnutls_session_t session,
 {
   unsigned i;
   int ret;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   sig_ext_st *priv;
   extension_priv_data_t epriv;
 
@@ -407,7 +407,7 @@ gnutls_sign_algorithm_get_requested (gnutls_session_t session,
                                      size_t indx,
                                      gnutls_sign_algorithm_t * algo)
 {
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   sig_ext_st *priv;
   extension_priv_data_t epriv;
   int ret;

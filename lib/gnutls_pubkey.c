@@ -1767,7 +1767,7 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
  */
 int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
                                        gnutls_pubkey_t pubkey, 
-                                       gnutls_protocol_t ver, 
+                                       const version_entry_st* ver, 
                                        gnutls_sign_algorithm_t sign)
 {
 unsigned int hash_size;

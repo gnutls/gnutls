@@ -66,7 +66,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
   int ret;
   digest_hd_st td_sha;
   uint8_t concat[MAX_SIG_SIZE];
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   const mac_entry_st* hash_algo;
 
   *sign_algo =
@@ -171,7 +171,7 @@ sign_tls_hash (gnutls_session_t session, const mac_entry_st* hash_algo,
                   const gnutls_datum_t * hash_concat,
                   gnutls_datum_t * signature)
 {
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   unsigned int key_usage = 0;
 
   /* If our certificate supports signing
@@ -233,7 +233,7 @@ es_cleanup:
 
 static int
 verify_tls_hash (gnutls_session_t session,
-                 gnutls_protocol_t ver, gnutls_pcert_st* cert,
+                 const version_entry_st* ver, gnutls_pcert_st* cert,
                  const gnutls_datum_t * hash_concat,
                  gnutls_datum_t * signature, size_t sha1pos,
                  gnutls_sign_algorithm_t sign_algo,
@@ -315,7 +315,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
   digest_hd_st td_md5;
   digest_hd_st td_sha;
   uint8_t concat[MAX_SIG_SIZE];
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   gnutls_digest_algorithm_t hash_algo;
   const mac_entry_st * me;
 
@@ -411,7 +411,7 @@ _gnutls_handshake_verify_crt_vrfy12 (gnutls_session_t session,
   int ret;
   uint8_t concat[MAX_HASH_SIZE];
   gnutls_datum_t dconcat;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   gnutls_pk_algorithm_t pk = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
   const mac_entry_st *me;
 
@@ -458,7 +458,7 @@ _gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
   digest_hd_st td_md5;
   digest_hd_st td_sha;
   gnutls_datum_t dconcat;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   _gnutls_handshake_log ("HSK[%p]: verify cert vrfy: using %s\n",
                     session, gnutls_sign_algorithm_get_name (sign_algo));
@@ -488,7 +488,7 @@ _gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
   _gnutls_hash(&td_sha, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer_prev_len);
   _gnutls_hash(&td_md5, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer_prev_len);
 
-  if (ver == GNUTLS_SSL3)
+  if (ver->id == GNUTLS_SSL3)
     {
       ret = _gnutls_generate_master (session, 1);
       if (ret < 0)
@@ -606,7 +606,7 @@ _gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
   uint8_t concat[MAX_SIG_SIZE];
   digest_hd_st td_md5;
   digest_hd_st td_sha;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   gnutls_pk_algorithm_t pk = gnutls_privkey_get_pk_algorithm(pkey, NULL);
 
   if (_gnutls_version_has_selectable_sighash(ver))
@@ -623,7 +623,7 @@ _gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
 
   _gnutls_hash(&td_sha, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer.length);
 
-  if (ver == GNUTLS_SSL3)
+  if (ver->id == GNUTLS_SSL3)
     {
       ret = _gnutls_generate_master (session, 1);
       if (ret < 0)
@@ -658,7 +658,7 @@ _gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
 
       _gnutls_hash(&td_md5, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer.length);
 
-      if (ver == GNUTLS_SSL3)
+      if (ver->id == GNUTLS_SSL3)
         {
           ret = _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
                                            session->

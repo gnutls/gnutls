@@ -226,7 +226,9 @@ leave:
 
 
 inline static int
-calc_enc_length_block (gnutls_session_t session, int data_size,
+calc_enc_length_block (gnutls_session_t session, 
+                 const version_entry_st* ver,
+                 int data_size,
                  int hash_size, uint8_t * pad, 
                  unsigned auth_cipher, uint16_t blocksize)
 {
@@ -244,8 +246,7 @@ calc_enc_length_block (gnutls_session_t session, int data_size,
 
   length = data_size + hash_size + *pad;
 
-  if (_gnutls_version_has_explicit_iv
-      (session->security_parameters.version))
+  if (_gnutls_version_has_explicit_iv(ver))
     length += blocksize;    /* for the IV */
 
   return length;
@@ -271,25 +272,22 @@ calc_enc_length_stream (gnutls_session_t session, int data_size,
  */
 static inline int
 make_preamble (uint8_t * uint64_data, uint8_t type, unsigned int length,
-               gnutls_protocol_t ver, uint8_t * preamble)
+               const version_entry_st* ver, uint8_t * preamble)
 {
-  uint8_t minor, major;
   uint8_t *p = preamble;
   uint16_t c_length;
   
-  _gnutls_version_to_tls(ver, &major, &minor);
-
   c_length = _gnutls_conv_uint16 (length);
 
   memcpy (p, uint64_data, 8);
   p += 8;
   *p = type;
   p++;
-  if (ver != GNUTLS_SSL3)
+  if (ver->id != GNUTLS_SSL3)
     { /* TLS protocols */
-      *p = major;
+      *p = ver->major;
       p++;
-      *p = minor;
+      *p = ver->minor;
       p++;
     }
   memcpy (p, &c_length, 2);
@@ -320,8 +318,8 @@ compressed_to_ciphertext (gnutls_session_t session,
   unsigned block_algo =
     _gnutls_cipher_is_block (params->cipher);
   uint8_t *data_ptr;
-  int ver = gnutls_protocol_get_version (session);
-  int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
+  const version_entry_st* ver = get_version (session);
+  int explicit_iv = _gnutls_version_has_explicit_iv (ver);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
   uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
   unsigned iv_size;
@@ -348,7 +346,7 @@ compressed_to_ciphertext (gnutls_session_t session,
         return gnutls_assert_val(ret);
 
       length_to_encrypt = length =
-        calc_enc_length_block (session, compressed->size, tag_size, &pad,
+        calc_enc_length_block (session, ver, compressed->size, tag_size, &pad,
                                auth_cipher, blocksize);
     }
   else
@@ -473,8 +471,8 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   unsigned block_algo =
     _gnutls_cipher_is_block (params->cipher);
   uint8_t *data_ptr;
-  int ver = gnutls_protocol_get_version (session);
-  int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
+  const version_entry_st* ver = get_version (session);
+  int explicit_iv = _gnutls_version_has_explicit_iv (ver);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
   uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
   unsigned iv_size;
@@ -662,9 +660,9 @@ ciphertext_to_compressed (gnutls_session_t session,
   unsigned int pad_failed = 0;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   unsigned int preamble_size;
-  unsigned int ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   unsigned int tag_size = _gnutls_auth_cipher_tag_len (&params->read.cipher_state);
-  unsigned int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
+  unsigned int explicit_iv = _gnutls_version_has_explicit_iv (ver);
   unsigned iv_size;
   
   iv_size = _gnutls_cipher_get_iv_size(params->cipher);
@@ -767,7 +765,7 @@ ciphertext_to_compressed (gnutls_session_t session,
        * Note that we access all 256 bytes of ciphertext for padding check
        * because there is a timing channel in that memory access (in certain CPUs).
        */
-      if (ver != GNUTLS_SSL3)
+      if (ver->id != GNUTLS_SSL3)
         for (i = 2; i <= MIN(256, ciphertext->size); i++)
           {
             tmp_pad_failed |= (ciphertext->data[ciphertext->size - i] != pad);
@@ -843,9 +841,9 @@ ciphertext_to_compressed_new (gnutls_session_t session,
   int ret;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   unsigned int preamble_size;
-  unsigned int ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
   unsigned int tag_size = _gnutls_auth_cipher_tag_len (&params->read.cipher_state);
-  unsigned int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
+  unsigned int explicit_iv = _gnutls_version_has_explicit_iv (ver);
   unsigned iv_size;
   
   iv_size = _gnutls_cipher_get_iv_size(params->cipher);

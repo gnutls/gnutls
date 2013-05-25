@@ -188,8 +188,8 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
 }
 
 static int
-_gnutls_init_record_state (record_parameters_st * params, gnutls_protocol_t ver, int read,
-                           record_state_st * state)
+_gnutls_init_record_state (record_parameters_st * params, const version_entry_st* ver,
+                           int read, record_state_st * state)
 {
   int ret;
   gnutls_datum_t * iv = NULL;
@@ -202,7 +202,7 @@ _gnutls_init_record_state (record_parameters_st * params, gnutls_protocol_t ver,
 
   ret = _gnutls_auth_cipher_init (&state->cipher_state,
     params->cipher, &state->key, iv,
-    params->mac, &state->mac_secret, (ver==GNUTLS_SSL3)?1:0, 1-read/*1==encrypt*/);
+    params->mac, &state->mac_secret, (ver->id==GNUTLS_SSL3)?1:0, 1-read/*1==encrypt*/);
   if (ret < 0 && params->cipher->id != GNUTLS_CIPHER_NULL)
     return gnutls_assert_val (ret);
 
@@ -304,7 +304,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
   gnutls_compression_method_t comp_algo;
   record_parameters_st *params;
   int ret;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   ret = _gnutls_epoch_get (session, epoch, &params);
   if (ret < 0)
@@ -369,8 +369,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 	dst->compression_method = src->compression_method; \
 	dst->timestamp = src->timestamp; \
 	dst->max_record_recv_size = src->max_record_recv_size; \
-	dst->max_record_send_size = src->max_record_send_size; \
-	dst->version = src->version;
+	dst->max_record_send_size = src->max_record_send_size
 
 static void
 _gnutls_set_resumed_parameters (gnutls_session_t session)
@@ -380,6 +379,7 @@ _gnutls_set_resumed_parameters (gnutls_session_t session)
   security_parameters_st *dst = &session->security_parameters;
 
   CPY_COMMON;
+  _gnutls_set_current_version(session, src->version);
 }
 
 /* Sets the current connection session to conform with the

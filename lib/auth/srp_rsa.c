@@ -87,7 +87,7 @@ gen_srp_cert_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
   gnutls_sign_algorithm_t sign_algo;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   ret = _gnutls_gen_srp_server_kx (session, data);
 
@@ -180,7 +180,7 @@ proc_srp_cert_server_kx (gnutls_session_t session, uint8_t * data,
   gnutls_pcert_st peer_cert;
   uint8_t *p;
   gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   ret = _gnutls_proc_srp_server_kx (session, data, _data_size);
   if (ret < 0)

@@ -859,7 +859,7 @@ _gnutls_PRF (gnutls_session_t session,
   uint8_t s_seed[MAX_SEED_SIZE];
   uint8_t o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
   int result;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const version_entry_st* ver = get_version (session);
 
   if (total_bytes > MAX_PRF_BYTES)
     {
@@ -1311,7 +1311,6 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
   return _gnutls_session_ecc_curve_get(session);
 }
 
-#undef gnutls_protocol_get_version
 /**
  * gnutls_protocol_get_version:
  * @session: is a #gnutls_session_t structure.
@@ -1323,7 +1322,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
 gnutls_protocol_t
 gnutls_protocol_get_version (gnutls_session_t session)
 {
-  return _gnutls_protocol_get_version(session);
+  return get_num_version(session);
 }
 
 /**

@@ -25,16 +25,15 @@
 #include <gnutls_errors.h>
 #include <x509/common.h>
 
-
 /* TLS Versions */
 static const version_entry_st sup_versions[] = {
-  {"SSL3.0", GNUTLS_SSL3, 3, 0, GNUTLS_STREAM, 1},
-  {"TLS1.0", GNUTLS_TLS1, 3, 1, GNUTLS_STREAM, 1},
-  {"TLS1.1", GNUTLS_TLS1_1, 3, 2, GNUTLS_STREAM, 1},
-  {"TLS1.2", GNUTLS_TLS1_2, 3, 3, GNUTLS_STREAM, 1},
-  {"DTLS0.9", GNUTLS_DTLS0_9, 1, 0, GNUTLS_DGRAM, 1}, /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
-  {"DTLS1.0", GNUTLS_DTLS1_0, 254, 255, GNUTLS_DGRAM, 1}, /* 1.1 over datagram */
-  {"DTLS1.2", GNUTLS_DTLS1_2, 254, 253, GNUTLS_DGRAM, 1}, /* 1.2 over datagram */
+  {"SSL3.0", GNUTLS_SSL3, 3, 0, GNUTLS_STREAM, 1, 0, 0, 0, 0},
+  {"TLS1.0", GNUTLS_TLS1, 3, 1, GNUTLS_STREAM, 1, 0, 1, 0, 0},
+  {"TLS1.1", GNUTLS_TLS1_1, 3, 2, GNUTLS_STREAM, 1, 1, 1, 0, 0},
+  {"TLS1.2", GNUTLS_TLS1_2, 3, 3, GNUTLS_STREAM, 1, 1, 1, 1, 1},
+  {"DTLS0.9", GNUTLS_DTLS0_9, 1, 0, GNUTLS_DGRAM, 1, 1, 1, 0, 0}, /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
+  {"DTLS1.0", GNUTLS_DTLS1_0, 254, 255, GNUTLS_DGRAM, 1, 1, 1, 0, 0}, /* 1.1 over datagram */
+  {"DTLS1.2", GNUTLS_DTLS1_2, 254, 253, GNUTLS_DGRAM, 1, 1, 1, 1, 1}, /* 1.2 over datagram */
   {0, 0, 0, 0, 0}
 };
 
@@ -44,6 +43,12 @@ static const version_entry_st sup_versions[] = {
 
 #define GNUTLS_VERSION_ALG_LOOP(a) \
 	GNUTLS_VERSION_LOOP( if(p->id == version) { a; break; })
+
+const version_entry_st* version_to_entry(gnutls_protocol_t version)
+{
+  GNUTLS_VERSION_ALG_LOOP (return p);
+  return NULL;
+}
 
 /* Return the priority of the provided version number */
 int
@@ -187,12 +192,6 @@ _gnutls_version_get (uint8_t major, uint8_t minor)
   return ret;
 }
 
-void
-_gnutls_version_to_tls (gnutls_protocol_t version, uint8_t* major, uint8_t *minor)
-{
-  GNUTLS_VERSION_ALG_LOOP (*major = p->major; *minor = p->minor);
-}
-
 /* Version Functions */
 
 int
@@ -210,77 +209,5 @@ _gnutls_version_is_supported (gnutls_session_t session,
     return 0;                   /* disabled by the user */
   else
     return 1;
-}
-
-
-/* This function determines if the version specified has a
-   cipher-suite selected PRF hash function instead of the old
-   hardcoded MD5+SHA1. */
-int
-_gnutls_version_has_selectable_prf (gnutls_protocol_t version)
-{
-  switch (version)
-    {
-    case GNUTLS_DTLS0_9:
-    case GNUTLS_DTLS1_0:
-    case GNUTLS_TLS1_1:
-    case GNUTLS_TLS1_0:
-    case GNUTLS_SSL3:
-      return 0;
-    default:
-      return 1;
-    }
-}
-
-/* This function determines if the version specified has selectable
-   signature/hash functions for certificate authentification. */
-int
-_gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
-{
-  switch (version)
-    {
-    case GNUTLS_DTLS0_9:
-    case GNUTLS_DTLS1_0:
-    case GNUTLS_TLS1_1:
-    case GNUTLS_TLS1_0:
-    case GNUTLS_SSL3:
-      return 0;
-    default:
-      return 1;
-    }
-}
-
-/* This function determines if the version specified has support for
-   TLS extensions. */
-int
-_gnutls_version_has_extensions (gnutls_protocol_t version)
-{
-  switch (version)
-    {
-    case GNUTLS_SSL3:
-      return 0;
-    default:
-      /* Versions after TLS 1.0 are required to handle extensions.
-       * SSL 3.0 also required extensions to be ignored, but
-       * some earlier draft didn't.
-       */
-      return 1;
-    }
-}
-
-/* This function determines if the version specified has explicit IVs
-   (for CBC attack prevention). */
-int
-_gnutls_version_has_explicit_iv (gnutls_protocol_t version)
-{
-  switch (version)
-    {
-    case GNUTLS_TLS1_0:
-    case GNUTLS_SSL3:
-      return 0;
-    default:
-      /* All versions after TLS 1.1 have explicit IV */
-      return 1;
-    }
 }
 

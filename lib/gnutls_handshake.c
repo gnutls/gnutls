@@ -333,7 +333,7 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret, int sending)
   else
     len = session->internals.handshake_hash_buffer_prev_len;
 
-  if (!_gnutls_version_has_selectable_prf (gnutls_protocol_get_version(session)))
+  if (!_gnutls_version_has_selectable_prf (get_version(session)))
     {
       rc = _gnutls_hash_fast( GNUTLS_DIG_SHA1, session->internals.handshake_hash_buffer.data, len, &concat[16]);
       if (rc < 0)
@@ -654,6 +654,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
   uint8_t *data;
   int ret;
   size_t vdata_size = 0;
+  const version_entry_st* vers;
 
   if (again == 0)
     {
@@ -665,7 +666,8 @@ _gnutls_send_finished (gnutls_session_t session, int again)
         }
       data = _mbuffer_get_udata_ptr (bufel);
 
-      if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
+      vers = get_version(session);
+      if (vers->id == GNUTLS_SSL3)
         {
           ret =
             _gnutls_ssl3_finished (session,
@@ -728,7 +730,7 @@ _gnutls_recv_finished (gnutls_session_t session)
   int data_size;
   int ret;
   int vrfy_size;
-  int version = gnutls_protocol_get_version (session);
+  const version_entry_st* vers = get_version (session);
 
   ret =
     _gnutls_recv_handshake (session, GNUTLS_HANDSHAKE_FINISHED, 
@@ -743,7 +745,7 @@ _gnutls_recv_finished (gnutls_session_t session)
   vrfy = buf.data;
   vrfy_size = buf.length;
 
-  if (version == GNUTLS_SSL3)
+  if (vers->id == GNUTLS_SSL3)
     data_size = 36;
   else
     data_size = 12;
@@ -755,7 +757,7 @@ _gnutls_recv_finished (gnutls_session_t session)
       goto cleanup;
     }
 
-  if (version == GNUTLS_SSL3)
+  if (vers->id == GNUTLS_SSL3)
     {
       ret =
         _gnutls_ssl3_finished (session,
@@ -1256,8 +1258,9 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
                                   uint8_t * dataptr, uint32_t datalen)
 {
   int ret;
+  const version_entry_st* vers = get_version (session);
 
-  if ((gnutls_protocol_get_version (session) != GNUTLS_DTLS0_9 &&
+  if ((vers->id != GNUTLS_DTLS0_9 &&
        recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST) ||
       recv_type == GNUTLS_HANDSHAKE_HELLO_REQUEST)
     return 0;
@@ -1266,7 +1269,7 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 
   session->internals.handshake_hash_buffer_prev_len = session->internals.handshake_hash_buffer.length;
 
-  if (gnutls_protocol_get_version (session) != GNUTLS_DTLS0_9)
+  if (vers->id != GNUTLS_DTLS0_9)
     {
       ret = _gnutls_buffer_append_data(&session->internals.handshake_hash_buffer,
         header, header_size);
@@ -1292,6 +1295,7 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
                                  uint8_t * dataptr, uint32_t datalen)
 {
   int ret;
+  const version_entry_st* vers = get_version (session);
 
   /* We don't check for GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST because it
    * is not sent via that channel.
@@ -1300,7 +1304,7 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
     {
       CHECK_SIZE(datalen);
 
-      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9) 
+      if (vers->id == GNUTLS_DTLS0_9) 
         {
 	  /* Old DTLS doesn't include the header in the MAC */
 	  if (datalen < 12) 
@@ -1834,7 +1838,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
   uint8_t *data = NULL;
   int pos = 0, type;
   int datalen = 0, ret = 0;
-  gnutls_protocol_t hver;
+  const version_entry_st* hver;
   gnutls_buffer_st extdata;
   int rehandshake = 0;
   uint8_t session_id_len =
@@ -1878,31 +1882,31 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
           session->internals.premaster_set == 0)
         {
           if (rehandshake)      /* already negotiated version thus version_max == negotiated version */
-            hver = session->security_parameters.version;
+            hver = get_version(session);
           else                  /* new handshake. just get the max */
-            hver = _gnutls_version_max (session);
+            hver = version_to_entry(_gnutls_version_max (session));
         }
       else
         {
           /* we are resuming a session */
-          hver = session->internals.resumed_security_parameters.version;
+          hver = version_to_entry(session->internals.resumed_security_parameters.version);
         }
 
-      if (hver == GNUTLS_VERSION_UNKNOWN || hver == 0)
+      if (hver == NULL)
         {
           gnutls_assert ();
           gnutls_free (bufel);
           return GNUTLS_E_INTERNAL_ERROR;
         }
 
-      _gnutls_version_to_tls(hver, &data[pos], &data[pos+1]);
-      pos+=2;
+      data[pos++] = hver->major;
+      data[pos++] = hver->minor;
 
       /* Set the version we advertized as maximum 
        * (RSA uses it).
        */
-      _gnutls_set_adv_version (session, hver);
-      _gnutls_set_current_version (session, hver);
+      set_adv_version (session, hver->major, hver->minor);
+      _gnutls_set_current_version (session, hver->id);
 
       if (session->internals.priorities.ssl3_record_version != 0)
         {
@@ -1914,7 +1918,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
            */
           if (!IS_DTLS(session))
             _gnutls_record_set_default_version (session, 3, 0);
-          else if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+          else if (hver->id == GNUTLS_DTLS0_9)
             _gnutls_record_set_default_version (session, 1, 0);
           else
             _gnutls_record_set_default_version (session, 254, 255);
@@ -1969,7 +1973,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
        */
       if (!session->internals.initial_negotiation_completed &&
           session->security_parameters.entity == GNUTLS_CLIENT &&
-          (gnutls_protocol_get_version (session) == GNUTLS_SSL3 || 
+          (hver->id == GNUTLS_SSL3 || 
           session->internals.priorities.no_extensions != 0))
         {
           ret =
@@ -2048,6 +2052,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
   uint8_t comp;
   uint8_t session_id_len = session->security_parameters.session_id_size;
   char buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
+  const version_entry_st* vers;
 
   _gnutls_buffer_init(&extdata);
 
@@ -2071,9 +2076,9 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
         }
       data = _mbuffer_get_udata_ptr (bufel);
 
-      _gnutls_version_to_tls(session->security_parameters.version,
-      	&data[pos], &data[pos+1]);
-      pos += 2;
+      vers = get_version(session);
+      data[pos++] = vers->major;
+      data[pos++] = vers->minor;
 
       memcpy (&data[pos],
               session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
@@ -2768,6 +2773,7 @@ send_change_cipher_spec (gnutls_session_t session, int again)
   uint8_t* data;
   mbuffer_st * bufel;
   int ret;
+  const version_entry_st* vers;
   
   if (again == 0)
     {
@@ -2775,7 +2781,9 @@ send_change_cipher_spec (gnutls_session_t session, int again)
       if (bufel == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+      vers = get_version (session);
+      
+      if (vers->id == GNUTLS_DTLS0_9)
         _mbuffer_set_uhead_size(bufel, 3);
       else
         _mbuffer_set_uhead_size(bufel, 1);
@@ -2784,7 +2792,7 @@ send_change_cipher_spec (gnutls_session_t session, int again)
       data = _mbuffer_get_uhead_ptr (bufel);
       
       data[0] = 1;
-      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+      if (vers->id == GNUTLS_DTLS0_9)
         {
           _gnutls_write_uint16 (session->internals.dtls.hsk_write_seq, &data[1]);
           session->internals.dtls.hsk_write_seq++;
@@ -2874,6 +2882,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
   uint8_t ch;
   unsigned int ccs_len = 1;
   unsigned int tleft;
+  const version_entry_st* vers;
   
   ret = handshake_remaining_time(session);
   if (ret < 0)
@@ -2898,7 +2907,9 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
             return gnutls_assert_val(ret);
         }
 
-      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+      vers = get_version (session);
+      
+      if (vers->id == GNUTLS_DTLS0_9)
         ccs_len = 3;
 
       ret = _gnutls_recv_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, &ch, ccs_len, NULL, 
@@ -2910,7 +2921,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
           return (ret < 0) ? ret : GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
         }
 
-      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+      if (vers->id == GNUTLS_DTLS0_9)
         session->internals.dtls.hsk_read_seq++;
 
       /* Initialize the connection session (start encryption) - in case of server */
@@ -3408,22 +3419,6 @@ void
 gnutls_handshake_set_max_packet_length (gnutls_session_t session, size_t max)
 {
   session->internals.max_handshake_data_buffer_size = max;
-}
-
-void
-_gnutls_set_adv_version (gnutls_session_t session, gnutls_protocol_t ver)
-{
-uint8_t major, minor;
-
-  _gnutls_version_to_tls(ver, &major, &minor);
-  set_adv_version (session, major, minor);
-}
-
-gnutls_protocol_t
-_gnutls_get_adv_version (gnutls_session_t session)
-{
-  return _gnutls_version_get (_gnutls_get_adv_version_major (session),
-                              _gnutls_get_adv_version_minor (session));
 }
 
 /**

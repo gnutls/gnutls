@@ -32,20 +32,47 @@
 #define MAX_CIPHERSUITE_SIZE 512
 
 /* Functions for version handling. */
+const version_entry_st* version_to_entry(gnutls_protocol_t c);
 gnutls_protocol_t _gnutls_version_lowest (gnutls_session_t session);
 gnutls_protocol_t _gnutls_version_max (gnutls_session_t session);
 int _gnutls_version_priority (gnutls_session_t session,
                               gnutls_protocol_t version);
 int _gnutls_version_is_supported (gnutls_session_t session,
                                   const gnutls_protocol_t version);
-void _gnutls_version_to_tls (gnutls_protocol_t ver, uint8_t* major, uint8_t* minor);
 gnutls_protocol_t _gnutls_version_get (uint8_t major, uint8_t minor);
 
 /* Functions for feature checks */
-int _gnutls_version_has_selectable_prf (gnutls_protocol_t version);
-int _gnutls_version_has_selectable_sighash (gnutls_protocol_t version);
-int _gnutls_version_has_extensions (gnutls_protocol_t version);
-int _gnutls_version_has_explicit_iv (gnutls_protocol_t version);
+inline static int
+_gnutls_version_has_selectable_prf (const version_entry_st* ver)
+{
+  if (unlikely(ver==NULL))
+    return 0;
+  return ver->selectable_prf;
+}
+
+inline static int
+_gnutls_version_has_selectable_sighash (const version_entry_st* ver)
+{
+  if (unlikely(ver==NULL))
+    return 0;
+  return ver->selectable_sighash;
+}
+
+inline static
+int _gnutls_version_has_extensions (const version_entry_st* ver)
+{
+  if (unlikely(ver==NULL))
+    return 0;
+  return ver->extensions;
+}
+
+inline static
+int _gnutls_version_has_explicit_iv (const version_entry_st* ver)
+{
+  if (unlikely(ver==NULL))
+    return 0;
+  return ver->explicit_iv;
+}
 
 /* Functions for MACs. */
 const mac_entry_st* mac_to_entry(gnutls_mac_algorithm_t c);

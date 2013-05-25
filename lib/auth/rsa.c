@@ -120,7 +120,7 @@ proc_rsa_client_kx (gnutls_session_t session, uint8_t * data,
   int randomize_key = 0;
   ssize_t data_size = _data_size;
 
-  if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
+  if (get_num_version (session) == GNUTLS_SSL3)
     {
       /* SSL 3.0 
        */
@@ -225,7 +225,6 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_datum_t sdata;         /* data to send */
   gnutls_pk_params_st params;
   int ret;
-  gnutls_protocol_t ver;
 
   if (auth == NULL)
     {
@@ -253,12 +252,10 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return ret;
     }
 
-  ver = _gnutls_get_adv_version (session);
-
   if (session->internals.rsa_pms_version[0] == 0)
     {
-      _gnutls_version_to_tls(ver, &session->key.key.data[0],
-        &session->key.key.data[1]);
+      session->key.key.data[0] = _gnutls_get_adv_version_major(session);
+      session->key.key.data[1] = _gnutls_get_adv_version_minor(session);
     }
   else
     {                           /* use the version provided */
@@ -285,7 +282,7 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
     return gnutls_assert_val(ret);
 
 
-  if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
+  if (get_num_version (session) == GNUTLS_SSL3)
     {
       /* SSL 3.0 */
       _gnutls_buffer_replace_data( data, &sdata);
