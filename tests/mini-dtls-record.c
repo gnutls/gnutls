@@ -24,6 +24,8 @@
 #include <config.h>
 #endif
 
+#define REL_LAYER 
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -178,12 +180,15 @@ client (int fd)
     unsigned char seq[8];
     uint64_t useq;
     unsigned current = 0;
+#ifndef REL_LAYER
     struct timespec ts;
+
+    ts.tv_sec = 0;
+    ts.tv_nsec = 100*1000*1000;
+#endif
     
     memset(buffer, 0, sizeof(buffer));
     
-    ts.tv_sec = 0;
-    ts.tv_nsec = 100*1000*1000;
     /* Need to enable anonymous KX specifically. */
 
 /*    gnutls_global_set_audit_log_function (tls_audit_log_func); */
@@ -264,7 +269,9 @@ client (int fd)
 
             current++;
           }
+#ifndef REL_LAYER
           nanosleep(&ts, NULL);
+#endif
       }
     while ((ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED || ret > 0));
 
@@ -296,11 +303,13 @@ server (int fd)
     int ret;
     gnutls_session_t session;
     gnutls_anon_server_credentials_t anoncred;
-    struct timespec ts;
     char c;
+#ifndef REL_LAYER
+    struct timespec ts;
     
     ts.tv_sec = 0;
     ts.tv_nsec = 100*1000*1000;
+#endif
 
     global_init ();
 
@@ -362,12 +371,16 @@ server (int fd)
                 fail ("send: %s\n", gnutls_strerror (ret));
                 terminate ();
             }
+#ifndef REL_LAYER
           nanosleep(&ts, NULL);
+#endif
       }
     while (test_finished == 0);
 
     gnutls_transport_set_push_function (session, n_push);
+#ifndef REL_LAYER
     nanosleep(&ts, NULL);
+#endif
     do
       {
         ret = gnutls_bye (session, GNUTLS_SHUT_WR);
@@ -391,9 +404,10 @@ start (void)
     int fd[2];
     int ret;
 
-    ret = socketpair (AF_UNIX, SOCK_DGRAM, 0, fd);
-#if 0
+#ifdef REL_LAYER
     ret = socketpair (AF_UNIX, SOCK_STREAM, 0, fd);
+#else
+    ret = socketpair (AF_UNIX, SOCK_DGRAM, 0, fd);
 #endif
     if (ret < 0)
       {
