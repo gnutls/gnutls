@@ -310,9 +310,8 @@ compressed_to_ciphertext (gnutls_session_t session,
                           content_type_t type, 
                           record_parameters_st * params)
 {
-  uint8_t * tag_ptr = NULL;
   uint8_t pad = target_size - compressed->size;
-  int length, length_to_encrypt, ret;
+  int length, ret;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
   int tag_size = _gnutls_auth_cipher_tag_len (&params->write.cipher_state);
@@ -347,28 +346,24 @@ compressed_to_ciphertext (gnutls_session_t session,
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      length_to_encrypt = length =
+      length =
         calc_enc_length_block (session, ver, compressed->size, tag_size, &pad,
                                auth_cipher, blocksize);
     }
   else
     {
-      length_to_encrypt = length =
+      length =
         calc_enc_length_stream (session, compressed->size, tag_size,
                                 auth_cipher);
     }
 
   if (length < 0)
-    {
-      return gnutls_assert_val(length);
-    }
+    return gnutls_assert_val(length);
 
   /* copy the encrypted data to cipher_data.
    */
   if (cipher_size < length)
-    {
-      return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-    }
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
   data_ptr = cipher_data;
 
@@ -383,7 +378,6 @@ compressed_to_ciphertext (gnutls_session_t session,
 
           data_ptr += blocksize;
           cipher_data += blocksize;
-          length_to_encrypt -= blocksize;
         }
       else if (auth_cipher)
         {
@@ -405,9 +399,6 @@ compressed_to_ciphertext (gnutls_session_t session,
 
           data_ptr += AEAD_EXPLICIT_DATA_SIZE;
           cipher_data += AEAD_EXPLICIT_DATA_SIZE;
-          /* In AEAD ciphers we don't encrypt the tag 
-           */
-          length_to_encrypt -= AEAD_EXPLICIT_DATA_SIZE + tag_size;
         }
       else if (iv_size > 0)
         _gnutls_auth_cipher_setiv(&params->write.cipher_state, UINT64DATA(params->write.sequence_number), 8);
@@ -422,19 +413,6 @@ compressed_to_ciphertext (gnutls_session_t session,
         _gnutls_auth_cipher_setiv(&params->write.cipher_state, UINT64DATA(params->write.sequence_number), 8);
     }
 
-  memcpy (data_ptr, compressed->data, compressed->size);
-  data_ptr += compressed->size;
-
-  if (tag_size > 0)
-    {
-      tag_ptr = data_ptr;
-      data_ptr += tag_size;
-    }
-  if (block_algo == CIPHER_BLOCK && pad > 0)
-    {
-      memset (data_ptr, pad - 1, pad);
-    }
-
   _gnutls_auth_cipher_set_mac_nonce(&params->write.cipher_state, UINT64DATA(params->write.sequence_number), 8);
 
   /* add the authenticate data */
@@ -442,13 +420,12 @@ compressed_to_ciphertext (gnutls_session_t session,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  /* Actual encryption (inplace).
+  /* Actual encryption.
    */
   ret =
     _gnutls_auth_cipher_encrypt2_tag (&params->write.cipher_state,
-        cipher_data, length_to_encrypt, 
-        cipher_data, cipher_size,
-        tag_ptr, tag_size, compressed->size);
+        compressed->data, compressed->size, cipher_data, cipher_size,
+        pad);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -463,7 +440,6 @@ compressed_to_ciphertext_new (gnutls_session_t session,
                               content_type_t type, 
                               record_parameters_st * params)
 {
-  uint8_t * tag_ptr = NULL;
   uint16_t pad = target_size - compressed->size;
   int length, length_to_encrypt, ret;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
@@ -562,14 +538,12 @@ compressed_to_ciphertext_new (gnutls_session_t session,
  
   if (pad > 0)
     { 
-      DECR_LEN(cipher_size, pad);
       memset(data_ptr, 0, pad);
       data_ptr += pad;
       length_to_encrypt += pad;
       length += pad;
     }
 
-  DECR_LEN(cipher_size, compressed->size);
   memcpy (data_ptr, compressed->data, compressed->size);
   data_ptr += compressed->size;
   length_to_encrypt += compressed->size;
@@ -577,14 +551,10 @@ compressed_to_ciphertext_new (gnutls_session_t session,
 
   if (tag_size > 0)
     {
-      DECR_LEN(cipher_size, tag_size);
-      tag_ptr = data_ptr;
       data_ptr += tag_size;
       
       /* In AEAD ciphers we don't encrypt the tag 
        */
-      if (!auth_cipher)
-        length_to_encrypt += tag_size;
       length += tag_size;
     }
 
@@ -604,8 +574,7 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   ret =
     _gnutls_auth_cipher_encrypt2_tag (&params->write.cipher_state,
         cipher_data, length_to_encrypt, 
-        cipher_data, cipher_size,
-        tag_ptr, tag_size, compressed->size+2+pad);
+        cipher_data, cipher_size, 0);
   if (ret < 0)
     return gnutls_assert_val(ret);
 

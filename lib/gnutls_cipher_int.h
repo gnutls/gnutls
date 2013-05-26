@@ -66,7 +66,7 @@ inline static int
 _gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
                          size_t textlen, void *ciphertext, size_t ciphertextlen)
 {
-  if (handle != NULL && handle->handle != NULL)
+  if (unlikely(handle != NULL && handle->handle != NULL))
     {
       return handle->encrypt (handle->handle, text, textlen, ciphertext,
                               ciphertextlen);
@@ -79,7 +79,7 @@ inline static int
 _gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
                          size_t ciphertextlen, void *text, size_t textlen)
 {
-  if (handle != NULL && handle->handle != NULL)
+  if (unlikely(handle != NULL && handle->handle != NULL))
     {
       return handle->decrypt (handle->handle, ciphertext, ciphertextlen,
                               text, textlen);
@@ -91,7 +91,7 @@ _gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
 inline static void
 _gnutls_cipher_deinit (cipher_hd_st * handle)
 {
-  if (handle != NULL && handle->handle != NULL)
+  if (unlikely(handle != NULL && handle->handle != NULL))
     {
       handle->deinit (handle->handle);
       handle->handle = NULL;
@@ -105,7 +105,7 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher);
 /* returns the tag in AUTHENC ciphers */
 inline static void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, size_t tag_size)
 {
-  if (handle != NULL && handle->handle != NULL)
+  if (unlikely(handle != NULL && handle->handle != NULL))
     {
       handle->tag (handle->handle, tag, tag_size);
     }
@@ -116,7 +116,7 @@ inline static void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, s
 inline static int _gnutls_cipher_auth (const cipher_hd_st * handle, const void *text,
                                        size_t textlen)
 {
-  if (handle != NULL && handle->handle != NULL)
+  if (unlikely(handle != NULL && handle->handle != NULL))
     {
       return handle->auth (handle->handle, text, textlen);
     }
@@ -138,7 +138,7 @@ typedef struct
   } mac;
   unsigned int is_mac:1;
   unsigned int ssl_hmac:1;
-  unsigned int is_null:1;
+  unsigned int non_null:1;
   size_t tag_size;
 } auth_cipher_hd_st;
 
@@ -153,9 +153,8 @@ int _gnutls_auth_cipher_add_auth (auth_cipher_hd_st * handle, const void *text,
                              int textlen);
 
 int _gnutls_auth_cipher_encrypt2_tag (auth_cipher_hd_st * handle, const uint8_t *text,
-                             int textlen, void *ciphertext, int ciphertextlen,
-                             void* tag_ptr, int tag_size, 
-                             int auth_size);
+                      int textlen, void *ciphertext, int ciphertextlen, 
+                      int pad_size);
 int _gnutls_auth_cipher_decrypt2 (auth_cipher_hd_st * handle,
                              const void *ciphertext, int ciphertextlen,
                              void *text, int textlen);
