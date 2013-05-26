@@ -212,6 +212,7 @@ gl/tests/glthread/glthread
 gl/tests/inttypes.h
 gl/tests/inttypes.h 
 gl/tests/libtests.a
+gl/tests/test-getdtablesize
 gl/tests/sys/
 gl/tests/test-accept
 gl/tests/test-alignof
