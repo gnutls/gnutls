@@ -468,7 +468,6 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
 {
   int ret;
   unsigned int hash_len;
-  const mac_entry_st* me;
   bigint_t tmp[2] = { NULL, NULL };
 
   switch (algo)
@@ -498,7 +497,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        me = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
 
         if (hash_len > vdata->size)
           hash_len = vdata->size;
@@ -531,7 +530,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        me = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
 
         if (hash_len > vdata->size)
           hash_len = vdata->size;
