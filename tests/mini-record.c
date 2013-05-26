@@ -58,7 +58,7 @@ static void terminate(void);
 static void
 server_log_func (int level, const char *str)
 {
-//  fprintf (stderr, "server|<%d>| %s", level, str);
+  fprintf (stderr, "server|<%d>| %s", level, str);
 }
 
 static void
@@ -330,11 +330,10 @@ gnutls_certificate_credentials_t x509_cred;
       do {
         ret = gnutls_record_send (session, buffer, sizeof (buffer));
       } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-      usleep(400*1000);
 
       if (ret < 0)
         {
-          fail("Error sending %d byte packet\n", to_send);
+          fail("Error sending %d byte packet: %s\n", to_send, gnutls_strerror(ret));
           terminate();
         }
       to_send++;
@@ -363,7 +362,7 @@ static void start (const char* prio)
   int fd[2];
   int ret;
   
-  ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
+  ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
   if (ret < 0)
     {
       perror("socketpair");
