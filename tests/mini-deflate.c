@@ -77,7 +77,7 @@ doit (void)
   gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
   gnutls_anon_set_server_dh_params (s_anoncred, dh_params);
   gnutls_init (&server, GNUTLS_SERVER);
-  ret = gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-DEFLATE:+ANON-DH", &str);
+  ret = gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+COMP-DEFLATE:+ANON-DH", &str);
   if (ret < 0) 
     {
       fprintf(stderr, "error at: %s\n", str);
