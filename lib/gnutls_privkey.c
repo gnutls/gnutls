@@ -757,7 +757,7 @@ cleanup:
  * gnutls_privkey_sign_hash:
  * @signer: Holds the signer's key
  * @hash_algo: The hash algorithm used
- * @flags: Zero or on of %gnutls_privkey_flags_t
+ * @flags: Zero or one of %gnutls_privkey_flags_t
  * @hash_data: holds the data to be signed
  * @signature: will contain newly allocated signature
  *
@@ -768,6 +768,9 @@ cleanup:
  *
  * You may use gnutls_pubkey_get_preferred_hash_algorithm() to determine
  * the hash algorithm.
+ *
+ * Note that if %GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA flag is specified this function
+ * will ignore @hash_algo and perform a raw PKCS1 signature.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
