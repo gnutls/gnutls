@@ -280,6 +280,9 @@ int _gnutls_auth_cipher_decrypt2 (auth_cipher_hd_st * handle,
 {
 int ret;
 
+  if (unlikely(ciphertextlen > textlen))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
   if (handle->non_null != 0)
     {
       ret = _gnutls_cipher_decrypt2(&handle->cipher, ciphertext, ciphertextlen, 
@@ -287,16 +290,18 @@ int ret;
       if (ret < 0)
         return gnutls_assert_val(ret);
     }
+  else if (handle->non_null == 0 && text != ciphertext)
+    memcpy(text, ciphertext, ciphertextlen);
 
   if (handle->is_mac)
     {
       /* The MAC is not to be hashed */
-      textlen -= handle->tag_size;
+      ciphertextlen -= handle->tag_size;
 
       if (handle->ssl_hmac)
-        return _gnutls_hash(&handle->mac.dig, text, textlen);
+        return _gnutls_hash(&handle->mac.dig, text, ciphertextlen);
       else
-        return _gnutls_mac(&handle->mac.mac, text, textlen);
+        return _gnutls_mac(&handle->mac.mac, text, ciphertextlen);
     }
 
   return 0;

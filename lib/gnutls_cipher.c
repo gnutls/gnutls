@@ -623,6 +623,7 @@ ciphertext_to_compressed (gnutls_session_t session,
                           uint64* sequence)
 {
   uint8_t tag[MAX_HASH_SIZE];
+  const uint8_t* tag_ptr;
   unsigned int pad = 0, i;
   int length, length_to_decrypt;
   uint16_t blocksize;
@@ -652,10 +653,10 @@ ciphertext_to_compressed (gnutls_session_t session,
           uint8_t nonce[blocksize];
           /* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
            */
-          if (params->read.IV.data == NULL || params->read.IV.size != 4)
+          if (unlikely(params->read.IV.data == NULL || params->read.IV.size != 4))
             return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
           
-          if (ciphertext->size < tag_size+AEAD_EXPLICIT_DATA_SIZE)
+          if (unlikely(ciphertext->size < tag_size+AEAD_EXPLICIT_DATA_SIZE))
             return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
           memcpy(nonce, params->read.IV.data, AEAD_IMPLICIT_DATA_SIZE);
@@ -666,22 +667,26 @@ ciphertext_to_compressed (gnutls_session_t session,
           ciphertext->data += AEAD_EXPLICIT_DATA_SIZE;
           ciphertext->size -= AEAD_EXPLICIT_DATA_SIZE;
           
-          length_to_decrypt = ciphertext->size - tag_size;
+          length = length_to_decrypt = ciphertext->size - tag_size;
+          tag_ptr = ciphertext->data + length_to_decrypt;
         }
       else if (iv_size > 0) 
         { /* a stream cipher with explicit IV */
           _gnutls_auth_cipher_setiv(&params->read.cipher_state, UINT64DATA(*sequence), 8);
           length_to_decrypt = ciphertext->size;
+          length = ciphertext->size - tag_size;
+          tag_ptr = compressed->data + length;
         }
       else
         {
-          if (ciphertext->size < tag_size)
+          if (unlikely(ciphertext->size < tag_size))
             return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
   
           length_to_decrypt = ciphertext->size;
+          length = ciphertext->size - tag_size;
+          tag_ptr = compressed->data + length;
         }
 
-      length = ciphertext->size - tag_size;
 
       /* Pass the type, version, length and compressed through
        * MAC.
@@ -692,18 +697,23 @@ ciphertext_to_compressed (gnutls_session_t session,
 
       _gnutls_auth_cipher_set_mac_nonce(&params->read.cipher_state, UINT64DATA(*sequence), 8);
       ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
-      if (ret < 0)
+      if (unlikely(ret < 0))
         return gnutls_assert_val(ret);
 
-      if ((ret =
+      if (unlikely((unsigned)length_to_decrypt > compressed->size))
+        return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+      ret =
            _gnutls_auth_cipher_decrypt2 (&params->read.cipher_state,
              ciphertext->data, length_to_decrypt,
-             ciphertext->data, ciphertext->size)) < 0)
+             compressed->data, compressed->size);
+
+      if (unlikely(ret < 0))
         return gnutls_assert_val(ret);
 
       break;
     case CIPHER_BLOCK:
-      if (ciphertext->size < blocksize || (ciphertext->size % blocksize != 0))
+      if (unlikely(ciphertext->size < blocksize || (ciphertext->size % blocksize != 0)))
         return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
       /* ignore the IV in TLS 1.1+
@@ -717,7 +727,7 @@ ciphertext_to_compressed (gnutls_session_t session,
           ciphertext->data += blocksize;
         }
 
-      if (ciphertext->size < tag_size+1)
+      if (unlikely(ciphertext->size < tag_size+1))
         return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
       /* we don't use the auth_cipher interface here, since
@@ -725,12 +735,17 @@ ciphertext_to_compressed (gnutls_session_t session,
        * an API. (the length of plaintext is required to calculate
        * auth_data, but it is not available before decryption).
        */
-      if ((ret =
-           _gnutls_cipher_decrypt (&params->read.cipher_state.cipher,
-             ciphertext->data, ciphertext->size)) < 0)
+      if (unlikely(ciphertext->size > compressed->size))
+        return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+      ret =
+           _gnutls_cipher_decrypt2 (&params->read.cipher_state.cipher,
+             ciphertext->data, ciphertext->size,
+             compressed->data, compressed->size);
+      if (unlikely(ret < 0))
         return gnutls_assert_val(ret);
 
-      pad = ciphertext->data[ciphertext->size - 1];   /* pad */
+      pad = compressed->data[ciphertext->size - 1];   /* pad */
 
       /* Check the pading bytes (TLS 1.x). 
        * Note that we access all 256 bytes of ciphertext for padding check
@@ -739,11 +754,11 @@ ciphertext_to_compressed (gnutls_session_t session,
       if (ver->id != GNUTLS_SSL3)
         for (i = 2; i <= MIN(256, ciphertext->size); i++)
           {
-            tmp_pad_failed |= (ciphertext->data[ciphertext->size - i] != pad);
+            tmp_pad_failed |= (compressed->data[ciphertext->size - i] != pad);
             pad_failed |= ((i<= (1+pad)) & (tmp_pad_failed));
           }
 
-      if (pad_failed != 0 || (1+pad > ((int) ciphertext->size - tag_size)))
+      if (unlikely(pad_failed != 0 || (1+pad > ((int) ciphertext->size - tag_size))))
         {
           /* We do not fail here. We check below for the
            * the pad_failed. If zero means success.
@@ -753,6 +768,7 @@ ciphertext_to_compressed (gnutls_session_t session,
         }
 
       length = ciphertext->size - tag_size - pad - 1;
+      tag_ptr = &compressed->data[length];
 
       /* Pass the type, version, length and compressed through
        * MAC.
@@ -763,11 +779,11 @@ ciphertext_to_compressed (gnutls_session_t session,
 
       _gnutls_auth_cipher_set_mac_nonce(&params->read.cipher_state, UINT64DATA(*sequence), 8);
       ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
-      if (ret < 0)
+      if (unlikely(ret < 0))
         return gnutls_assert_val(ret);
 
-      ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, ciphertext->data, length);
-      if (ret < 0)
+      ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, compressed->data, length);
+      if (unlikely(ret < 0))
         return gnutls_assert_val(ret);
 
       break;
@@ -776,10 +792,10 @@ ciphertext_to_compressed (gnutls_session_t session,
     }
 
   ret = _gnutls_auth_cipher_tag(&params->read.cipher_state, tag, tag_size);
-  if (ret < 0)
+  if (unlikely(ret < 0))
     return gnutls_assert_val(ret);
 
-  if (memcmp (tag, &ciphertext->data[length], tag_size) != 0 || pad_failed != 0)
+  if (unlikely(memcmp (tag, tag_ptr, tag_size) != 0 || pad_failed != 0))
     {
       /* HMAC was not the same. */
       dummy_wait(params, compressed, pad_failed, pad, length+preamble_size);
@@ -787,25 +803,18 @@ ciphertext_to_compressed (gnutls_session_t session,
       return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
     }
 
-  /* copy the decrypted stuff to compressed_data.
-   */
-  if (compressed->size < (unsigned)length)
-    return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
-
-  memcpy (compressed->data, ciphertext->data, length);
-
   return length;
 }
 
 static int
-ciphertext_to_compressed_new (gnutls_session_t session,
-                              gnutls_datum_t *ciphertext, 
-                              gnutls_datum_t * compressed,
-                              uint8_t type, record_parameters_st * params, 
-                              uint64* sequence)
+ciphertext_to_compressed_new (gnutls_session_t restrict session,
+                              gnutls_datum_t *restrict ciphertext, 
+                              gnutls_datum_t *restrict compressed,
+                              uint8_t type, record_parameters_st *restrict params, 
+                              uint64* restrict sequence)
 {
   uint8_t tag[MAX_HASH_SIZE];
-  uint8_t *tag_ptr;
+  const uint8_t *tag_ptr;
   unsigned int pad;
   int length, length_to_decrypt;
   uint16_t blocksize;
