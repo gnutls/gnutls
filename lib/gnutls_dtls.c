@@ -685,6 +685,9 @@ int overhead;
  * renegotiation, in order to ensure that the MTU is still sufficient to
  * account for the new protocol overhead.
  *
+ * In most cases you only need to call gnutls_dtls_set_mtu() with
+ * the maximum MTU of your transport layer.
+ *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
  * Since: 3.1
