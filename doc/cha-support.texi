@@ -6,6 +6,7 @@
 * Commercial Support::
 * Bug Reports::
 * Contributing::
+* Certification::
 @end menu
 
 @node Getting help
@@ -155,3 +156,17 @@ formatted, are extracted into Texinfo manuals and GTK-DOC web pages.
 
 @end itemize
 
+@node Certification
+@section Certification
+@cindex certification
+
+Many cryptographic libraries claim certifications from national or international bodies. These certifications are tied on a specific (and often restricted) version of the library or a 
+specific product using the library, and typically in the case of software they assure that the algorithms implemented are correct. The major certifications known are:
+@itemize
+@item USA's FIPS 140-2 at Level 1 which certifies that approved algorithms are used (see @url{http://en.wikipedia.org/wiki/FIPS_140-2});
+@item Common Criteria for Information Technology Security Evaluation (CC), an international standard for verification of elaborate security claims (see @url{http://en.wikipedia.org/wiki/Common_Criteria}).
+@end itemize
+
+Obtaining such a certification is an expensive and elaborate job that has no immediate value for a continuously developed free software library (as the certification is tied to the
+particular version tested), and in the case of algorithm verification of FIPS 140-2 it doesn't make much sense as the library is freely available and anyone can verify the correctness
+of algorithm implementation. As such we are not actively pursuing this kind of certification. If you are, nevertheless, interested, see @ref{Commercial Support}.
