@@ -155,7 +155,7 @@ client (int fd, unsigned int vmethod, unsigned use_cert)
   size_t line_len;
   xssl_cred_t cred;
   xssl_t sb;
-  gnutls_cinput_st aux[2];
+  gnutls_cinput_st aux[6];
   unsigned int status;
   unsigned aux_size = 0;
 
@@ -265,7 +265,7 @@ server (int fd, unsigned vmethod)
   int ret;
   xssl_cred_t cred;
   xssl_t sb;
-  gnutls_cinput_st aux[2];
+  gnutls_cinput_st aux[6];
   unsigned aux_size = 0;
 
   global_init ();
@@ -385,19 +385,29 @@ doit (void)
   signal(SIGCHLD, ch_handler);
 
   test = "test1: no auth";
+  if (debug)
+    fprintf(stderr, "running %s", test);
   start(GNUTLS_VMETHOD_NO_AUTH, GNUTLS_VMETHOD_NO_AUTH, 0);
 
   test = "test2: server auth";
+  if (debug)
+    fprintf(stderr, "running %s", test);
   start(GNUTLS_VMETHOD_GIVEN_CAS, GNUTLS_VMETHOD_NO_AUTH, 0);
 
   test = "test3: mutual auth";
+  if (debug)
+    fprintf(stderr, "running %s", test);
   start(GNUTLS_VMETHOD_GIVEN_CAS, GNUTLS_VMETHOD_GIVEN_CAS, 1);
 
   remove(TOFU_DB_FILE);
   test = "test4: trust on first use p1";
+  if (debug)
+    fprintf(stderr, "running %s", test);
   start(GNUTLS_VMETHOD_TOFU, GNUTLS_VMETHOD_NO_AUTH, 0);
 
   test = "test5: trust on first use p2";
+  if (debug)
+    fprintf(stderr, "running %s", test);
   start(GNUTLS_VMETHOD_TOFU, GNUTLS_VMETHOD_NO_AUTH, 0);
   remove(TOFU_DB_FILE);
 
