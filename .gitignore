@@ -638,3 +638,4 @@ lib/libgnutls-xssl.la
 tests/mini-alpn
 tests/mini-record-range
 tests/mini-dtls-hello-verify
+gl/tests/test-getdtablesize
