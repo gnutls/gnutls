@@ -138,7 +138,7 @@ _gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm)
 
   GNUTLS_ALG_LOOP (
     if (p->auth)
-      ret = p->block; /* FIXME: happens to be the same for now */
+      ret = p->blocksize; /* FIXME: happens to be the same for now */
     else
       ret = 0;
   );
