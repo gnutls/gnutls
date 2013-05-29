@@ -601,11 +601,11 @@ int total = 0, ret, iv_size;
     return gnutls_assert_val(ret);
 
   /* requires padding */
-  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
-  total += iv_size;
 
   if (_gnutls_cipher_is_block (params->cipher) == CIPHER_BLOCK)
     {
+      iv_size = _gnutls_cipher_get_iv_size(params->cipher);
+      total += iv_size;
       *blocksize = iv_size; /* in block ciphers */
 
       /* We always pad with at least one byte; never 0. */
@@ -621,12 +621,18 @@ int total = 0, ret, iv_size;
     total += 2;
   
   if (params->mac->id == GNUTLS_MAC_AEAD)
-    total += _gnutls_cipher_get_tag_size(params->cipher);
+    {
+      iv_size = _gnutls_cipher_get_iv_size(params->cipher);
+      total += iv_size;
+
+      total += _gnutls_cipher_get_tag_size(params->cipher);
+    }
   else
     {
       ret = _gnutls_mac_get_algo_len(params->mac);
       if (ret < 0)
         return gnutls_assert_val(ret);
+
       total+=ret;
     }
 
