@@ -124,7 +124,7 @@ client (int fd, const char* prio, unsigned overhead)
   gnutls_session_t session;
   /* Need to enable anonymous KX specifically. */
 
-  global_init ();
+  gnutls_global_init ();
 
   if (debug)
     {
@@ -237,7 +237,7 @@ gnutls_session_t session;
 
   /* this must be called once in the program
    */
-  global_init ();
+  gnutls_global_init ();
   memset(buffer, 0, sizeof(buffer));
 
   if (debug)
