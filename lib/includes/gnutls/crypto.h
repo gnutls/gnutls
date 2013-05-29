@@ -30,7 +30,6 @@ extern "C"
 
   typedef struct api_cipher_hd_st *gnutls_cipher_hd_t;
 
-  size_t gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm);
   int gnutls_cipher_init (gnutls_cipher_hd_t * handle,
                           gnutls_cipher_algorithm_t cipher,
                           const gnutls_datum_t * key,
@@ -59,7 +58,6 @@ extern "C"
   typedef struct hash_hd_st *gnutls_hash_hd_t;
   typedef struct hmac_hd_st *gnutls_hmac_hd_t;
 
-  size_t gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm);
   size_t gnutls_mac_get_nonce_size (gnutls_mac_algorithm_t algorithm);
   int gnutls_hmac_init (gnutls_hmac_hd_t * dig,
                         gnutls_mac_algorithm_t algorithm, const void *key,

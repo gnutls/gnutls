@@ -834,6 +834,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                                 type);
   const char *gnutls_pk_get_name (gnutls_pk_algorithm_t algorithm);
   const char *gnutls_sign_get_name (gnutls_sign_algorithm_t algorithm);
+
+  size_t gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm);
+  size_t gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm);
   
   int gnutls_sign_is_secure (gnutls_sign_algorithm_t algorithm);
   gnutls_digest_algorithm_t
