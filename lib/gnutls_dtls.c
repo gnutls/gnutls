@@ -597,11 +597,9 @@ int total = 0, ret, iv_size;
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  /* requires padding */
-  iv_size = _gnutls_cipher_get_iv_size(params->cipher_algorithm);
-
   if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
     {
+      iv_size = _gnutls_cipher_get_iv_size(params->cipher_algorithm);
       *blocksize = iv_size;
 
       total += iv_size; /* iv_size == block_size in DTLS */
@@ -615,7 +613,12 @@ int total = 0, ret, iv_size;
     }
   
   if (params->mac_algorithm == GNUTLS_MAC_AEAD)
-    total += _gnutls_cipher_get_tag_size(params->cipher_algorithm);
+    {
+      iv_size = _gnutls_cipher_get_iv_size(params->cipher_algorithm);
+      total += iv_size;
+
+      total += _gnutls_cipher_get_tag_size(params->cipher_algorithm);
+    }
   else
     {
       ret = _gnutls_hmac_get_algo_len(params->mac_algorithm);
