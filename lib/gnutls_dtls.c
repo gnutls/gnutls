@@ -642,7 +642,7 @@ int total = 0, ret, iv_size;
  *
  * This function will return the actual maximum transfer unit for
  * application data. I.e. DTLS headers are subtracted from the
- * actual MTU.
+ * actual MTU which is set using gnutls_dtls_set_mtu().
  *
  * Returns: the maximum allowed transfer unit.
  *
