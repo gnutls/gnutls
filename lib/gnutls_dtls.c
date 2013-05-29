@@ -622,10 +622,10 @@ int total = 0, ret, iv_size;
   
   if (params->mac_algorithm == GNUTLS_MAC_AEAD)
     {
-      iv_size = _gnutls_cipher_get_iv_size(params->cipher_algorithm);
-      total += iv_size;
+      total += AEAD_IMPLICIT_DATA_SIZE;
 
-      total += _gnutls_cipher_get_tag_size(params->cipher_algorithm);
+      /* tag happens to be the same */
+      total += gnutls_cipher_get_block_size(params->cipher_algorithm);
     }
   else
     {
