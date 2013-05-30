@@ -65,43 +65,23 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
   AC_SUBST(DLL_VERSION)
 
-  cryptolib="nettle"
-
-dnl  AC_ARG_WITH(libgcrypt,
-dnl    AS_HELP_STRING([--with-libgcrypt], [use libgcrypt as crypto library]),
-dnl      libgcrypt=$withval,
-dnl      libgcrypt=no)
-dnl    if test "$libgcrypt" = "yes"; then
-dnl        cryptolib=libgcrypt
-dnl        AC_DEFINE([HAVE_GCRYPT], 1, [whether the gcrypt library is in use])
-dnl	AC_LIB_HAVE_LINKFLAGS([gcrypt], [gpg-error], [#include <gcrypt.h>],
-dnl                      [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
-dnl      if test "$ac_cv_libgcrypt" != yes; then
-dnl        AC_MSG_ERROR([[
-dnl***  
-dnl*** Libgcrypt v1.4.0 or later was not found. You may want to get it from
-dnl*** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
-dnl***
-dnl    ]])
-dnl      fi
-dnl    fi
-
-  AC_MSG_CHECKING([whether to use nettle])
-if test "$cryptolib" = "nettle";then
-  AC_MSG_RESULT(yes)
-    AC_LIB_HAVE_LINKFLAGS([nettle], [hogweed gmp], [#include <nettle/umac.h>],
-                          [nettle_umac96_set_nonce (0,0,0)])
-    if test "$ac_cv_libnettle" != yes; then
-      AC_MSG_ERROR([[
+  PKG_CHECK_MODULES(NETTLE, [nettle >= 2.7], [cryptolib="nettle"], [
+AC_MSG_ERROR([[
   *** 
-  *** Libnettle 2.7 was not found. Note that you must compile nettle with gmp support.
-  ]])
-    fi
-else
-  AC_MSG_RESULT(no)
-fi
+  *** Libnettle 2.7 was not found. 
+]])
+  ])
+  PKG_CHECK_MODULES(HOGWEED, [hogweed >= 2.7], [], [
+AC_MSG_ERROR([[
+  *** 
+  *** Libhogweed (nettle's companion library) was not found. Note that you must compile nettle with gmp support.
+]])
+  ])
   AM_CONDITIONAL(ENABLE_NETTLE, test "$cryptolib" = "nettle")
-  
+  AC_DEFINE([HAVE_LIBNETTLE], 1, [nettle is enabled])
+
+  GNUTLS_REQUIRES_PRIVATE="Requires.private: nettle, hogweed"
+
   AC_ARG_WITH(included-libtasn1,
     AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),
       included_libtasn1=$withval,
@@ -120,7 +100,7 @@ fi
   AM_CONDITIONAL(ENABLE_MINITASN1, test "$included_libtasn1" = "yes")
 
   if test "$included_libtasn1" = "no"; then
-    GNUTLS_REQUIRES_PRIVATE="Requires.private: libtasn1"
+    GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libtasn1"
   fi
 
   AC_MSG_CHECKING([whether C99 macros are supported])

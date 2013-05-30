@@ -256,7 +256,6 @@ fi
 AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
   ["$unbound_root_key_file"], [The DNSSEC root key file])
 
-
 dnl Check for p11-kit
 AC_ARG_WITH(p11-kit,
 	AS_HELP_STRING([--without-p11-kit],
