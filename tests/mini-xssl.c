@@ -383,6 +383,7 @@ void
 doit (void)
 {
   signal(SIGCHLD, ch_handler);
+  signal(SIGPIPE, SIG_IGN);
 
   test = "test1: no auth";
   if (debug)
