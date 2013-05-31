@@ -220,7 +220,7 @@ gnutls_pk_params_clear (gnutls_pk_params_st * p)
   unsigned int i;
   for (i = 0; i < p->params_nr; i++)
     {
-      _gnutls_mpi_clear (p->params[i]);
+      if (p->params[i] != NULL) _gnutls_mpi_clear (p->params[i]);
     }
 }
 
