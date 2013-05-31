@@ -798,6 +798,7 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
   int result;
   unsigned int i, pk_algorithm;
   cdk_packet_t pkt;
+  unsigned total;
 
   gnutls_pk_params_init(params);
 
@@ -820,17 +821,17 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
     case GNUTLS_PK_RSA:
       /* openpgp does not hold all parameters as in PKCS #1
        */
-      params->params_nr = RSA_PRIVATE_PARAMS - 2;
+      total = RSA_PRIVATE_PARAMS - 2;
       break;
     case GNUTLS_PK_DSA:
-      params->params_nr = DSA_PRIVATE_PARAMS;
+      total = DSA_PRIVATE_PARAMS;
       break;
     default:
       gnutls_assert ();
       return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
     }
 
-  for (i = 0; i < params->params_nr; i++)
+  for (i = 0; i < total; i++)
     {
       result = _gnutls_read_pgp_mpi (pkt, 1, i, &params->params[i]);
       if (result < 0)
@@ -838,6 +839,7 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
           gnutls_assert ();
           goto error;
         }
+      params->params_nr++;
     }
   
   /* fixup will generate exp1 and exp2 that are not
