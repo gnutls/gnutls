@@ -380,6 +380,7 @@ AC_ARG_WITH([default-trust-store-file],
     [use the given file default trust store])], with_default_trust_store_file="$withval",
   [if test "$build" = "$host";then
   for i in \
+    /etc/ssl/ca-bundle.pem \
     /etc/ssl/certs/ca-certificates.crt \
     /etc/pki/tls/cert.pem \
     /usr/local/share/certs/ca-root-nss.crt \
