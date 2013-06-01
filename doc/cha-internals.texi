@@ -429,8 +429,10 @@ it use option --heartbeat with example client and server supplied with
 gnutls:
 
 @example
-./doc/credentials/gnutls-http-serv --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 --heartbeat --echo
-./src/gnutls-cli --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 localhost -p 5556 --insecure --heartbeat
+./doc/credentials/gnutls-http-serv --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 \
+    --heartbeat --echo
+./src/gnutls-cli --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 localhost -p 5556 \
+    --insecure --heartbeat
 @end example
 
 After that pasting

@@ -90,3 +90,17 @@ is functionally equivalent and safer to use.
 
 @end multitable
 
+@heading Upgrading to 3.2.x from 3.1.x
+
+GnuTLS 3.2.x is source and binary compatible with GnuTLS 3.1.x releases. Few
+functions have been deprecated and are listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item @funcintref{gnutls_privkey_sign_raw_data} 
+@tab The function @funcref{gnutls_privkey_sign_hash} is equivalent
+when the flag @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA} is specified.
+
+@end multitable
+
