@@ -61,7 +61,9 @@ if test "$rc" != "0"; then
   exit $rc
 fi
 
-diff $srcdir/complex-cert.pem tmp-pem.pem
+cat $srcdir/complex-cert.pem |grep -v "Not After:" >tmp1
+cat $srcdir/tmp-pem.pem |grep -v "Not After:" >tmp2
+diff tmp1 tmp2
 rc=$?
 
 if test "$rc" != "0"; then
@@ -69,6 +71,6 @@ if test "$rc" != "0"; then
   exit $rc
 fi
 
-rm -f tmp-pem.pem
+rm -f tmp-pem.pem tmp1 tmp2
 
 exit 0
