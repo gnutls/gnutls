@@ -679,6 +679,7 @@ char* src = NULL;
       goto fail;
     }
   
+  dst[len-1] = 0;
   output->data = dst;
   output->size = ret;
   ret = 0;
