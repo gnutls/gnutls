@@ -62,7 +62,7 @@ $(P11_KIT_DIR)/.configured:
 	test -f $(P11_KIT_FILE).sig || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE).sig
 	gpg --verify $(P11_KIT_FILE).sig
 	test -d $(P11_KIT_DIR) || tar -xf $(P11_KIT_FILE)
-	cd $(P11_KIT_DIR) && ./configure $(CONFIG_FLAGS) && cd ..
+	cd $(P11_KIT_DIR) && ./configure $(CONFIG_FLAGS) --without-libtasn1 && cd ..
 	touch $@
 
 $(P11_KIT_DIR)/.installed: $(P11_KIT_DIR)/.configured
@@ -108,6 +108,7 @@ $(NETTLE_DIR)/.installed: $(NETTLE_DIR)/.configured
 
 $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	make -C $(GNUTLS_DIR) -j2
+	make -C $(GNUTLS_DIR) -C tests check
 	make -C $(GNUTLS_DIR) install -i
 	cp $(GNUTLS_DIR)/COPYING $(GNUTLS_DIR)/COPYING.LESSER $(CROSS_DIR)
 	touch $@
