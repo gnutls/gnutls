@@ -241,7 +241,9 @@ library.
 @subsection Initialization
 
 GnuTLS must be initialized before it can be used.  The library is
-initialized by calling @funcref{gnutls_global_init}.  The resources
+initialized by calling @funcref{gnutls_global_init}. That call
+typically enables CPU-specific acceleration, and performs any requires
+precalculations needed by the library. The resources
 allocated by the initialization process can be released if the
 application no longer has a need to call GnuTLS functions, this is
 done by calling @funcref{gnutls_global_deinit}.
