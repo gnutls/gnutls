@@ -23,7 +23,7 @@
 
 srcdir=${srcdir:-.}
 top_builddir=${top_builddir:-../..}
-CERTTOOL=${CERTTOOL:-${top_builddir}/src/certtool}
+CERTTOOL=${CERTTOOL:-${top_builddir}/src/certtool$EXEEXT}
 DEBUG=""
 
 if test "x$1" != "x";then
