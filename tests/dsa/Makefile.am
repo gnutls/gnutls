@@ -23,6 +23,8 @@ EXTRA_DIST = cert.dsa.1024.pem  cert.dsa.2048.pem  cert.dsa.3072.pem  dsa.1024.p
 
 dist_check_SCRIPTS = testdsa
 
+if !WINDOWS
 TESTS = testdsa
+endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
