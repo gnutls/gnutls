@@ -82,6 +82,17 @@ AC_MSG_ERROR([[
 
   GNUTLS_REQUIRES_PRIVATE="Requires.private: nettle, hogweed"
 
+  AC_ARG_VAR(GMP_CFLAGS, [C compiler flags for gmp])
+  AC_ARG_VAR(GMP_LIBS, [linker flags for gmp])
+  if test x$GMP_LIBS = x; then
+  	AC_CHECK_LIB(gmp, __gmpz_cmp, [GMP_LIBS="-lgmp"], [AC_MSG_ERROR([[
+***
+*** gmp was not found.
+]])])
+  fi
+  AC_SUBST(GMP_CFLAGS)
+  AC_SUBST(GMP_LIBS)
+
   AC_ARG_WITH(included-libtasn1,
     AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),
       included_libtasn1=$withval,
