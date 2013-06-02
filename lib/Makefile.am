@@ -140,7 +140,7 @@ thirdparty_libadd += $(LIBTASN1_LIBS)
 endif
 
 if ENABLE_NETTLE
-thirdparty_libadd += $(LTLIBNETTLE)
+thirdparty_libadd += $(LTLIBNETTLE) $(GMP_LIBS)
 libgnutls_la_LIBADD += nettle/libcrypto.la
 endif
 

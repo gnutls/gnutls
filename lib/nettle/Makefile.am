@@ -25,7 +25,10 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../includes		\
 	-I$(builddir)/../includes	\
 	-I$(builddir)/../../gl          \
-	-I$(srcdir)/..
+	-I$(srcdir)/..			\
+	$(NETTLE_CFLAGS)		\
+	$(HOGWEED_CFLAGS)		\
+	$(GMP_CFLAGS)
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../minitasn1
