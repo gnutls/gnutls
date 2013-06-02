@@ -30,17 +30,11 @@ $CERTTOOL --certificate-info --infile $srcdir/ca-no-pathlen.pem \
 $CERTTOOL --certificate-info --infile $srcdir/no-ca-or-pathlen.pem \
 	  --outfile new-no-ca-or-pathlen.pem
 
-cat $srcdir/ca-no-pathlen.pem |grep -v "Not After:" >tmp1
-cat $srcdir/new-ca-no-pathlen.pem |grep -v "Not After:" >tmp2
-diff tmp1 tmp2
+diff $srcdir/ca-no-pathlen.pem new-ca-no-pathlen.pem
 rc1=$?
-
-cat $srcdir/no-ca-or-pathlen.pem |grep -v "Not After:" >tmp1
-cat $srcdir/new-no-ca-or-pathlen.pem |grep -v "Not After:" >tmp2
-diff tmp1 tmp2
+diff $srcdir/no-ca-or-pathlen.pem new-no-ca-or-pathlen.pem
 rc2=$?
 
-rm -f tmp1 tmp2
 
 # We're done.
 if test "$rc1" != "0"; then
