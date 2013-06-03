@@ -128,8 +128,10 @@ The anonymous key exchange offers encryption without any
 indication of the peer's identity.  This kind of authentication
 is vulnerable to a man in the middle attack, but can be
 used even if there is no prior communication or shared trusted parties 
-with the peer. Moreover it is useful when complete anonymity is required. 
-Unless in one of the above cases, do not use anonymous authentication.  
+with the peer. Nevertheless it is useful when complete anonymity is required. 
+
+Unless in the above case, it is not recommended to use anonymous authentication. An alternative
+with better properties is trust on first use (see @ref{Verifying a certificate using trust on first use authentication}).
 
 The available key exchange algorithms for anonymous authentication are
 shown below, but note that few public servers support them. They typically
