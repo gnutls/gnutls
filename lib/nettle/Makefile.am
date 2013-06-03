@@ -37,5 +37,6 @@ endif
 
 noinst_LTLIBRARIES = libcrypto.la
 
+libcrypto_la_LIBADD = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS)
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h \
 	gnettle.h 
