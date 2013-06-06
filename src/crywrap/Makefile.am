@@ -15,7 +15,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-AM_CFLAGS = $(WARN_CFLAGS)
+AM_CFLAGS = $(WARN_CFLAGS) $(LIBIDN_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(srcdir)/../../gl			\
 	-I$(builddir)/../../lib/includes		\
@@ -27,4 +27,4 @@ EXTRA_DIST = README
 bin_PROGRAMS = crywrap
 
 crywrap_SOURCES = crywrap.c primes.h crywrap.h
-crywrap_LDADD = ../../lib/libgnutls.la ../../gl/libgnu.la -lidn
+crywrap_LDADD = ../../lib/libgnutls.la ../../gl/libgnu.la $(LIBIDN_LIBS)
