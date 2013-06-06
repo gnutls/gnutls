@@ -1,5 +1,5 @@
 #  GnuTLS --- Guile bindings for GnuTLS.
-#  Copyright (C) 2007-2012 Free Software Foundation, Inc.
+#  Copyright (C) 2007-2013 Free Software Foundation, Inc.
 #
 #  GnuTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -31,8 +31,9 @@ endif
 
 TESTS_ENVIRONMENT =					\
   GUILE_AUTO_COMPILE=0					\
-  GUILE_WARN_DEPRECATED=detailed			\
-  $(top_builddir)/guile/pre-inst-guile -L $(srcdir)
+  GUILE_WARN_DEPRECATED=detailed
+
+LOG_COMPILER = $(top_builddir)/guile/pre-inst-guile -L $(srcdir)
 
 
 EXTRA_DIST = $(TESTS) openpgp-pub.asc openpgp-sec.asc	\
