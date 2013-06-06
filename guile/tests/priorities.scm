@@ -32,14 +32,14 @@
   ;; Valid priority strings (from the manual).
   '("NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
     "NORMAL:-ARCFOUR-128"
-    "SECURE:-VERS-SSL3.0:+COMP-DEFLATE"
+    "SECURE128:-VERS-SSL3.0:+COMP-DEFLATE"
     "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1"))
 
 (define %invalid-priority-strings
   ;; Invalid strings: the prefix and the suffix that leads to a parse error.
   '(("" . "THIS-DOES-NOT-WORK")
     ("NORMAL:" . "FAIL-HERE")
-    ("SECURE:-VERS-SSL3.0:" . "+FAIL-HERE")
+    ("SECURE128:-VERS-SSL3.0:" . "+FAIL-HERE")
     ("NONE:+VERS-TLS-ALL:+AES-128-CBC:"
      . "+FAIL-HERE:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1")))
 
