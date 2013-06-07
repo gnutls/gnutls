@@ -26,7 +26,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([1.11.3 no-dist-gzip dist-xz dist-lzip -Wall -Wno-override])
+AM_INIT_AUTOMAKE([1.12.2 no-dist-gzip dist-xz dist-lzip -Wall -Wno-override])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CONFIG_HEADERS([config.h])
 
@@ -38,7 +38,7 @@ dnl Checks for programs.
 AC_PROG_CC
 gl_EARLY
 AM_PROG_AS
-dnl AM_PROG_AR
+AM_PROG_AR
 AC_PROG_CXX
 
 # For includes/gnutls/gnutls.h.in.
