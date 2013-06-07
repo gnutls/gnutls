@@ -25,10 +25,10 @@
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
-echo ca > template
-echo cn = "SHA 512 CA" >> template
+echo ca > template-sha2
+echo cn = "SHA 512 CA" >> template-sha2
 
-$CERTTOOL -d 2 --generate-self-signed --template template \
+$CERTTOOL -d 2 --generate-self-signed --template template-sha2 \
     --load-privkey $srcdir/key-ca.pem \
     --outfile new-ca.pem \
     --hash sha512 >out 2>&1
@@ -38,10 +38,10 @@ if [ $? != 0 ];then
 	exit 1
 fi
 
-echo ca > template
-echo cn = "SHA 384 sub-CA" >> template
+echo ca > template-sha2
+echo cn = "SHA 384 sub-CA" >> template-sha2
 
-$CERTTOOL -d 2 --generate-certificate --template template \
+$CERTTOOL -d 2 --generate-certificate --template template-sha2 \
     --load-ca-privkey $srcdir/key-ca.pem \
     --load-ca-certificate new-ca.pem \
     --load-privkey $srcdir/key-subca.pem \
@@ -53,10 +53,10 @@ if [ $? != 0 ];then
 	exit 1
 fi
 
-echo ca > template
-echo cn = "SHA 256 sub-sub-CA" >> template
+echo ca > template-sha2
+echo cn = "SHA 256 sub-sub-CA" >> template-sha2
 
-$CERTTOOL -d 2 --generate-certificate --template template \
+$CERTTOOL -d 2 --generate-certificate --template template-sha2 \
     --load-ca-privkey $srcdir/key-subca.pem \
     --load-ca-certificate new-subca.pem \
     --load-privkey $srcdir/key-subsubca.pem \
@@ -68,9 +68,9 @@ if [ $? != 0 ];then
 	exit 1
 fi
 
-echo cn = "End-user" > template
+echo cn = "End-user" > template-sha2
 
-$CERTTOOL -d 2 --generate-certificate --template template \
+$CERTTOOL -d 2 --generate-certificate --template template-sha2 \
     --load-ca-privkey $srcdir/key-subsubca.pem \
     --load-ca-certificate new-subsubca.pem \
     --load-privkey $srcdir/key-user.pem \
@@ -81,7 +81,7 @@ if [ $? != 0 ];then
 	exit 1
 fi
 
-num=`cat new-user.pem new-subsubca.pem new-subca.pem new-ca.pem | $CERTTOOL --verify-chain | tee verify | grep -c Verified`
+num=`cat new-user.pem new-subsubca.pem new-subca.pem new-ca.pem | $CERTTOOL --verify-chain | tee verify-sha2 | grep -c Verified`
 #cat verify
 
 if test "$num" != "4"; then
@@ -89,6 +89,6 @@ if test "$num" != "4"; then
     exit 1
 fi
 
-rm -f verify new-user.pem new-subsubca.pem new-subca.pem new-ca.pem template
+rm -f verify-sha2 new-user.pem new-subsubca.pem new-subca.pem new-ca.pem template-sha2
 
 exit 0
