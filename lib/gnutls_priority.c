@@ -816,7 +816,7 @@ bulk_rmadd_func *func;
  *
  * "NORMAL:-ARCFOUR-128" means normal ciphers except for ARCFOUR-128.
  *
- * "SECURE:-VERS-SSL3.0:+COMP-DEFLATE" means that only secure ciphers are
+ * "SECURE128:-VERS-SSL3.0:+COMP-DEFLATE" means that only secure ciphers are
  * enabled, SSL3.0 is disabled, and libz compression enabled.
  *
  * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", 
