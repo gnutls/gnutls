@@ -2,6 +2,8 @@
 *.gcno
 *.gcov
 *.lo
+*.log
+*.trs
 *.o
 *~
 .deps
