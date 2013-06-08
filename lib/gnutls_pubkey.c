@@ -1530,7 +1530,7 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
 /**
  * gnutls_pubkey_verify_data:
  * @pubkey: Holds the public key
- * @flags: Zero or on of %gnutls_pubkey_flags_t
+ * @flags: Zero or one of %gnutls_pubkey_flags_t
  * @data: holds the signed data
  * @signature: contains the signature
  *
@@ -1580,7 +1580,7 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
  * gnutls_pubkey_verify_data2:
  * @pubkey: Holds the public key
  * @algo: The signature algorithm used
- * @flags: Zero or on of %gnutls_pubkey_flags_t
+ * @flags: Zero or one of %gnutls_pubkey_flags_t
  * @data: holds the signed data
  * @signature: contains the signature
  *
@@ -1626,7 +1626,7 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
 /**
  * gnutls_pubkey_verify_hash:
  * @key: Holds the public key
- * @flags: Zero or on of %gnutls_pubkey_flags_t
+ * @flags: Zero or one of %gnutls_pubkey_flags_t
  * @hash: holds the hash digest to be verified
  * @signature: contains the signature
  *
@@ -1661,7 +1661,7 @@ int ret;
  * gnutls_pubkey_verify_hash2:
  * @key: Holds the public key
  * @algo: The signature algorithm used
- * @flags: Zero or on of %gnutls_pubkey_flags_t
+ * @flags: Zero or one of %gnutls_pubkey_flags_t
  * @hash: holds the hash digest to be verified
  * @signature: contains the signature
  *

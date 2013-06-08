@@ -686,7 +686,7 @@ cleanup:
  * gnutls_privkey_sign_data:
  * @signer: Holds the key
  * @hash: should be a digest algorithm
- * @flags: Zero or on of %gnutls_privkey_flags_t
+ * @flags: Zero or one of %gnutls_privkey_flags_t
  * @data: holds the data to be signed
  * @signature: will contain the signature allocate with gnutls_malloc()
  *
