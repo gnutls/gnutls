@@ -552,6 +552,8 @@ unsigned int last_idx;
  * If the retransmission timeout is zero then the handshake will operate
  * in a non-blocking way, i.e., return %GNUTLS_E_AGAIN.
  *
+ * To disable retransmissions set a @retrans_timeout larger than the @total_timeout.
+ *
  * Since: 3.0
  **/
 void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_timeout,

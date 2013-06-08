@@ -381,14 +381,11 @@ unsigned int diff;
  * @retrans_timeout: The time at which a retransmission will occur in milliseconds
  * @total_timeout: The time at which the connection will be aborted, in milliseconds.
  *
- * This function will set the timeouts required for the DTLS handshake
+ * This function will override the timeouts for the DTLS heartbeat
  * protocol. The retransmission timeout is the time after which a
- * message from the peer is not received, the previous messages will
+ * message from the peer is not received, the previous request will
  * be retransmitted. The total timeout is the time after which the
  * handshake will be aborted with %GNUTLS_E_TIMEDOUT.
- *
- * The DTLS protocol recommends the values of 1 sec and 60 seconds
- * respectively.
  *
  * If the retransmission timeout is zero then the handshake will operate
  * in a non-blocking way, i.e., return %GNUTLS_E_AGAIN.
