@@ -89,6 +89,9 @@ gen_srp_cert_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_sign_algorithm_t sign_algo;
   const version_entry_st* ver = get_version (session);
 
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
   ret = _gnutls_gen_srp_server_kx (session, data);
 
   if (ret < 0)
@@ -181,6 +184,9 @@ proc_srp_cert_server_kx (gnutls_session_t session, uint8_t * data,
   uint8_t *p;
   gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
   const version_entry_st* ver = get_version (session);
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   ret = _gnutls_proc_srp_server_kx (session, data, _data_size);
   if (ret < 0)

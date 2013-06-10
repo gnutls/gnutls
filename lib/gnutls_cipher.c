@@ -325,6 +325,9 @@ compressed_to_ciphertext (gnutls_session_t session,
   uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
   unsigned iv_size;
 
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
   iv_size = _gnutls_cipher_get_iv_size(params->cipher);
 
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
@@ -454,6 +457,9 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
   uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
   unsigned iv_size;
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   iv_size = _gnutls_cipher_get_iv_size(params->cipher);
 
@@ -636,7 +642,10 @@ ciphertext_to_compressed (gnutls_session_t session,
   unsigned int tag_size = _gnutls_auth_cipher_tag_len (&params->read.cipher_state);
   unsigned int explicit_iv = _gnutls_version_has_explicit_iv (ver);
   unsigned iv_size;
-  
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
   iv_size = _gnutls_cipher_get_iv_size(params->cipher);
   blocksize = _gnutls_cipher_get_block_size (params->cipher);
 
@@ -825,7 +834,10 @@ ciphertext_to_compressed_new (gnutls_session_t restrict session,
   unsigned int tag_size = _gnutls_auth_cipher_tag_len (&params->read.cipher_state);
   unsigned int explicit_iv = _gnutls_version_has_explicit_iv (ver);
   unsigned iv_size;
-  
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
   iv_size = _gnutls_cipher_get_iv_size(params->cipher);
   blocksize = _gnutls_cipher_get_block_size (params->cipher);
 

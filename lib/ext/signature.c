@@ -214,6 +214,9 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
   int ret;
   size_t init_length = extdata->length;
   const version_entry_st* ver = get_version (session);
+  
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   /* this function sends the client extension data */
   if (session->security_parameters.entity == GNUTLS_CLIENT
@@ -252,7 +255,10 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_pcert_st* cert)
   sig_ext_st *priv;
   extension_priv_data_t epriv;
   unsigned int cert_algo;
-  
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
   cert_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
 
   ret =
@@ -298,6 +304,9 @@ _gnutls_session_sign_algo_enabled (gnutls_session_t session,
   const version_entry_st* ver = get_version (session);
   sig_ext_st *priv;
   extension_priv_data_t epriv;
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   ret =
     _gnutls_ext_get_session_data (session,
@@ -411,6 +420,9 @@ gnutls_sign_algorithm_get_requested (gnutls_session_t session,
   sig_ext_st *priv;
   extension_priv_data_t epriv;
   int ret;
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   ret =
     _gnutls_ext_get_session_data (session,

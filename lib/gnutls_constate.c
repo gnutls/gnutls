@@ -305,6 +305,9 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
   record_parameters_st *params;
   int ret;
   const version_entry_st* ver = get_version (session);
+  
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   ret = _gnutls_epoch_get (session, epoch, &params);
   if (ret < 0)

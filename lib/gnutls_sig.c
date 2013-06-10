@@ -463,6 +463,8 @@ _gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
   _gnutls_handshake_log ("HSK[%p]: verify cert vrfy: using %s\n",
                     session, gnutls_sign_algorithm_get_name (sign_algo));
 
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   if (_gnutls_version_has_selectable_sighash(ver))
     return _gnutls_handshake_verify_crt_vrfy12 (session, cert, signature,
@@ -608,6 +610,9 @@ _gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
   digest_hd_st td_sha;
   const version_entry_st* ver = get_version (session);
   gnutls_pk_algorithm_t pk = gnutls_privkey_get_pk_algorithm(pkey, NULL);
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   if (_gnutls_version_has_selectable_sighash(ver))
     return _gnutls_handshake_sign_crt_vrfy12 (session, cert, pkey,

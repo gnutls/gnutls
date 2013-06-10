@@ -1458,6 +1458,9 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, uint8_t * data,
   int pk_algos_length;
   const version_entry_st* ver = get_version (session);
 
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
   if (cred == NULL)
@@ -1564,6 +1567,9 @@ _gnutls_gen_cert_client_crt_vrfy (gnutls_session_t session,
   gnutls_sign_algorithm_t sign_algo;
   const version_entry_st* ver = get_version (session);
 
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
   /* find the appropriate certificate */
   if ((ret =
        _gnutls_get_selected_cert (session, &apr_cert_list,
@@ -1638,7 +1644,7 @@ _gnutls_proc_cert_client_crt_vrfy (gnutls_session_t session,
   gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
   const version_entry_st* ver = get_version (session);
 
-  if (info == NULL || info->ncerts == 0)
+  if (unlikely(info == NULL || info->ncerts == 0 || ver == NULL))
     {
       gnutls_assert ();
       /* we need this in order to get peer's certificate */
@@ -1709,6 +1715,9 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session,
   int ret;
   uint8_t tmp_data[CERTTYPE_SIZE];
   const version_entry_st* ver = get_version (session);
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   /* Now we need to generate the RDN sequence. This is
    * already in the CERTIFICATE_CRED structure, to improve
@@ -2207,8 +2216,11 @@ gnutls_privkey_t apr_pkey;
 int apr_cert_list_length;
 gnutls_datum_t signature = { NULL, 0 }, ddata;
 gnutls_sign_algorithm_t sign_algo;
-const version_entry_st*  ver = get_version (session);
+const version_entry_st* ver = get_version (session);
 int ret;
+
+  if (unlikely(ver == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   ddata.data = plain;
   ddata.size = plain_size;
@@ -2296,7 +2308,7 @@ _gnutls_proc_dhe_signature (gnutls_session_t session, uint8_t * data,
   gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
   const version_entry_st* ver = get_version (session);
 
-  if (info == NULL || info->ncerts == 0)
+  if (unlikely(info == NULL || info->ncerts == 0 || ver == NULL))
     {
       gnutls_assert ();
       /* we need this in order to get peer's certificate */

@@ -667,6 +667,9 @@ _gnutls_send_finished (gnutls_session_t session, int again)
       data = _mbuffer_get_udata_ptr (bufel);
 
       vers = get_version(session);
+      if (unlikely(vers == NULL))
+        return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
       if (vers->id == GNUTLS_SSL3)
         {
           ret =
@@ -731,6 +734,9 @@ _gnutls_recv_finished (gnutls_session_t session)
   int ret;
   int vrfy_size;
   const version_entry_st* vers = get_version (session);
+
+  if (unlikely(vers == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   ret =
     _gnutls_recv_handshake (session, GNUTLS_HANDSHAKE_FINISHED, 
@@ -1260,6 +1266,9 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
   int ret;
   const version_entry_st* vers = get_version (session);
 
+  if (unlikely(vers == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
   if ((vers->id != GNUTLS_DTLS0_9 &&
        recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST) ||
       recv_type == GNUTLS_HANDSHAKE_HELLO_REQUEST)
@@ -1296,6 +1305,9 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
 {
   int ret;
   const version_entry_st* vers = get_version (session);
+
+  if (unlikely(vers == NULL))
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   /* We don't check for GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST because it
    * is not sent via that channel.
@@ -2079,6 +2091,9 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
       data = _mbuffer_get_udata_ptr (bufel);
 
       vers = get_version(session);
+      if (unlikely(vers == NULL))
+        return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
       data[pos++] = vers->major;
       data[pos++] = vers->minor;
 
@@ -2784,7 +2799,9 @@ send_change_cipher_spec (gnutls_session_t session, int again)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
       vers = get_version (session);
-      
+      if (unlikely(vers == NULL))
+        return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
       if (vers->id == GNUTLS_DTLS0_9)
         _mbuffer_set_uhead_size(bufel, 3);
       else
@@ -2910,7 +2927,9 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
         }
 
       vers = get_version (session);
-      
+      if (unlikely(vers == NULL))
+        return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
       if (vers->id == GNUTLS_DTLS0_9)
         ccs_len = 3;
 
