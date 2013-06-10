@@ -911,6 +911,7 @@ GNUTLS_3_1_0 {
 	gnutls_alpn_get_selected_protocol;
 	gnutls_alpn_set_protocols;
 	gnutls_session_set_id;
+	gnutls_certificate_set_trust_list;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

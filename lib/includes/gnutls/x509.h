@@ -1110,6 +1110,10 @@ gnutls_x509_trust_list_remove_trust_mem(gnutls_x509_trust_list_t list,
 int
 gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
                                         unsigned int tl_flags, unsigned int tl_vflags);
+
+void gnutls_certificate_set_trust_list (gnutls_certificate_credentials_t res,
+                                gnutls_x509_trust_list_t tlist, unsigned flags);
+
 #ifdef __cplusplus
 }
 #endif

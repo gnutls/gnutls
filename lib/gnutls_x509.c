@@ -42,6 +42,7 @@
 #include "x509/common.h"
 #include "x509/x509_int.h"
 #include <gnutls_str_array.h>
+#include <gnutls/x509.h>
 #include "read-file.h"
 #ifdef _WIN32
 # include <wincrypt.h>
@@ -1270,10 +1271,11 @@ cleanup:
  * called more than once, in case multiple keys/certificates exist for
  * the server.  For clients that wants to send more than its own end
  * entity certificate (e.g., also an intermediate CA cert) then put
- * the certificate chain in @pcert_list. The @pcert_list and @key will
- * become part of the credentials structure and must not
- * be deallocated. They will be automatically deallocated when @res
- * is deinitialized.
+ * the certificate chain in @pcert_list. 
+ *
+ * Note that the @pcert_list and @key will become part of the credentials 
+ * structure and must not be deallocated. They will be automatically deallocated 
+ * when the @res structure is deinitialized.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
@@ -1336,6 +1338,33 @@ cleanup:
   _gnutls_str_array_clear(&str_names);
   return ret;
 }
+
+/**
+ * gnutls_certificate_set_trust_list:
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @tlist: is a #gnutls_x509_trust_list_t structure
+ * @flags: must be zero
+ *
+ * This function sets a trust list in the gnutls_certificate_credentials_t structure. 
+ *
+ * Note that the @tlist will become part of the credentials 
+ * structure and must not be deallocated. It will be automatically deallocated 
+ * when the @res structure is deinitialized.
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ *
+ * Since: 3.2.2
+ **/
+void
+gnutls_certificate_set_trust_list (gnutls_certificate_credentials_t res,
+                                   gnutls_x509_trust_list_t tlist,
+                                   unsigned flags)
+{
+  gnutls_x509_trust_list_deinit(res->tlist, 1);
+
+  res->tlist = tlist;
+}
+
 
 /**
  * gnutls_certificate_set_x509_key_file:

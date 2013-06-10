@@ -8,7 +8,7 @@ See the end for copying conditions.
 subsystems.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_certificate_set_trust_list: Added
 
 
 * Version 3.2.1 (released 2013-06-01)
