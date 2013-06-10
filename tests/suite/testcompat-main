@@ -22,7 +22,7 @@
 
 srcdir="${srcdir:-.}"
 CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
-PORT="${PORT:-5558}"
+PORT="${PORT:-5568}"
 unset RETCODE
 
 if test "${WINDIR}" != "";then
