@@ -854,7 +854,7 @@ main (int argc, char **argv)
   socket_st hd;
   ssize_t bytes;
 #ifndef _WIN32
-  struct sigaction new_action, old_action;
+  struct sigaction new_action;
 #endif
 
   set_program_name (argv[0]);
