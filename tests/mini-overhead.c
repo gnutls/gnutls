@@ -345,7 +345,7 @@ doit (void)
 {
   signal(SIGCHLD, ch_handler);
 
-  /* 13 + 20(sha1) + 16(iv) + 1(min pad) + rounding(15) */
+  /* 13 + 20(sha1) + 16(iv) + 16(max pad) */
   start("NONE:+VERS-DTLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA", 65);
   /* 13 + 16(tag) + 4(iv) */
   start("NONE:+VERS-DTLS1.0:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA", 33);
