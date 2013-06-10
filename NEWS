@@ -13,6 +13,8 @@ subsystems.
 gnutls_certificate_set_trust_list: Added
 gnutls_cipher_get_tag_size: Added
 gnutls_record_disable_replay_protection: Added
+gnutls_record_overhead_size: Added
+gnutls_record_overhead_size2: Added
 
 
 * Version 3.2.1 (released 2013-06-01)

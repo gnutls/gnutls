@@ -581,6 +581,98 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
   session->internals.dtls.mtu  = mtu;
 }
 
+static int record_overhead(const cipher_entry_st* cipher, const mac_entry_st* mac, 
+        gnutls_compression_method_t comp,
+	unsigned new_padding)
+{
+int total = 0;
+int t, ret;
+
+  if (_gnutls_cipher_is_block (cipher) == CIPHER_BLOCK)
+    {
+      t = _gnutls_cipher_get_iv_size(cipher);
+      total += t;
+
+      /* padding */
+      t = _gnutls_cipher_get_block_size(cipher);
+      if (new_padding == 0)
+        total += t;
+    }
+
+  if (mac->id == GNUTLS_MAC_AEAD)
+    {
+      t = _gnutls_cipher_get_iv_size(cipher);
+      total += t;
+
+      total += _gnutls_cipher_get_tag_size(cipher);
+    }
+  else
+    {
+      ret = _gnutls_mac_get_algo_len(mac);
+      if (unlikely(ret < 0))
+        return 0;
+
+      total+=ret;
+    }
+
+  if (new_padding != 0)
+    total += 2;
+
+  if (comp != GNUTLS_COMP_NULL)
+    total += EXTRA_COMP_SIZE;
+
+  return total;
+}  
+
+/**
+ * gnutls_record_overhead_size2:
+ * @version: is a #gnutls_protocol_t value
+ * @cipher: is a #gnutls_cipher_algorithm_t value
+ * @mac: is a #gnutls_mac_algorithm_t value
+ * @comp: is a #gnutls_compression_method_t value
+ * @flags: must be zero
+ *
+ * This function will return the set size in bytes of the overhead
+ * due to TLS (or DTLS) per record.
+ *
+ * Note that this function may not provide inacurate values because
+ * of the many options that may be negotiated in TLS/DTLS. An more accurate
+ * value can be obtained using gnutls_record_overhead_size() after
+ * a completed handshake.
+ *
+ * Since: 3.2.2
+ **/
+size_t gnutls_record_overhead_size2 (gnutls_protocol_t version, gnutls_cipher_algorithm_t cipher,
+			             gnutls_mac_algorithm_t mac, gnutls_compression_method_t comp, 
+			             unsigned int flags)
+{
+const cipher_entry_st *c;
+const mac_entry_st *m;
+const version_entry_st* v;
+size_t total = 0;
+
+	c = cipher_to_entry(cipher);
+	if (c == NULL)
+		return 0;
+
+	m = mac_to_entry(mac);
+	if (m == NULL)
+		return 0;
+	
+	v = version_to_entry(version);
+	if (v == NULL)
+		return 0;
+	
+	if (v->transport == GNUTLS_STREAM)
+		total = TLS_RECORD_HEADER_SIZE;
+	else
+		total = DTLS_RECORD_HEADER_SIZE;
+	
+	total += record_overhead(c, m, comp, 0);
+	
+	return total;
+}
+
 /* returns overhead imposed by the record layer (encryption/compression)
  * etc. It does not include the record layer headers, since the caller
  * needs to cope with rounding to multiples of blocksize, and the header
@@ -590,10 +682,10 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
  *
  * It may return a negative error code on error.
  */
-static int record_overhead_rt(gnutls_session_t session, unsigned int *blocksize)
+static int record_overhead_rt(gnutls_session_t session)
 {
 record_parameters_st *params;
-int total = 0, ret, iv_size;
+int ret;
 
   if (session->internals.initial_negotiation_completed == 0)
     return GNUTLS_E_INVALID_REQUEST;
@@ -603,46 +695,35 @@ int total = 0, ret, iv_size;
     return gnutls_assert_val(ret);
 
   /* requires padding */
-
-  if (_gnutls_cipher_is_block (params->cipher) == CIPHER_BLOCK)
-    {
-      iv_size = _gnutls_cipher_get_iv_size(params->cipher);
-      total += iv_size;
-      *blocksize = iv_size; /* in block ciphers */
-
-      /* We always pad with at least one byte; never 0. */
-      if (session->security_parameters.new_record_padding == 0)
-        total++;
-    }
-  else
-    {
-      *blocksize = 1;
-    }
-
-  if (session->security_parameters.new_record_padding != 0)
-    total += 2;
-  
-  if (params->mac->id == GNUTLS_MAC_AEAD)
-    {
-      iv_size = _gnutls_cipher_get_iv_size(params->cipher);
-      total += iv_size;
-
-      total += _gnutls_cipher_get_tag_size(params->cipher);
-    }
-  else
-    {
-      ret = _gnutls_mac_get_algo_len(params->mac);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-
-      total+=ret;
-    }
-
-  if (params->compression_algorithm != GNUTLS_COMP_NULL)
-    total += EXTRA_COMP_SIZE;
-
-  return total;
+  return record_overhead(params->cipher, params->mac, params->compression_algorithm, 
+  	session->security_parameters.new_record_padding);
 }
+
+/**
+ * gnutls_record_overhead_size:
+ * @session: is #gnutls_session_t
+ *
+ * This function will return the set size in bytes of the overhead
+ * due to TLS (or DTLS) per record.
+ *
+ * Since: 3.2.2
+ **/
+size_t gnutls_record_overhead_size (gnutls_session_t session)
+{
+const version_entry_st* v = get_version(session);
+size_t total;
+
+	if (v->transport == GNUTLS_STREAM)
+		total = TLS_RECORD_HEADER_SIZE;
+	else
+		total = DTLS_RECORD_HEADER_SIZE;
+	
+	total += record_overhead_rt(session);
+
+	return total;
+}
+
+
 
 /**
  * gnutls_dtls_get_data_mtu:
@@ -659,17 +740,13 @@ int total = 0, ret, iv_size;
 unsigned int gnutls_dtls_get_data_mtu (gnutls_session_t session)
 {
 int mtu = session->internals.dtls.mtu;
-unsigned int blocksize = 1;
 int overhead;
  
   mtu -= RECORD_HEADER_SIZE(session);
 
-  overhead = record_overhead_rt(session, &blocksize);
+  overhead = record_overhead_rt(session);
   if (overhead < 0)
     return mtu;
-
-  if (blocksize)
-    mtu -= mtu % blocksize;
 
   return mtu - overhead;
 }
@@ -696,8 +773,7 @@ int overhead;
  **/
 int gnutls_dtls_set_data_mtu (gnutls_session_t session, unsigned int mtu)
 {
-  unsigned int blocksize;
-  int overhead = record_overhead_rt(session, &blocksize);
+  int overhead = record_overhead_rt(session);
 
   /* You can't call this until the session is actually running */
   if (overhead < 0)
@@ -705,13 +781,6 @@ int gnutls_dtls_set_data_mtu (gnutls_session_t session, unsigned int mtu)
 
   /* Add the overhead inside the encrypted part */
   mtu += overhead;
-
-  /* Round it up to the next multiple of blocksize */
-  if (blocksize > 1) 
-    {
-      mtu += blocksize - 1;
-      mtu -= mtu % blocksize;
-    }
 
   /* Add the *unencrypted header size */
   mtu += RECORD_HEADER_SIZE(session);
