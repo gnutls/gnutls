@@ -1250,6 +1250,9 @@ gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
  *
  * Normally only servers that require maximum compatibility with
  * everything out there, need to call this function.
+ *
+ * Note that this function must be called after any call to gnutls_priority
+ * functions.
  **/
 void
 gnutls_session_enable_compatibility_mode (gnutls_session_t session)
