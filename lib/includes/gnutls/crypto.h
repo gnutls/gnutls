@@ -53,7 +53,7 @@ extern "C"
   void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
   int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
   int gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm);
-
+  int gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm);
 
   typedef struct hash_hd_st *gnutls_hash_hd_t;
   typedef struct hmac_hd_st *gnutls_hmac_hd_t;

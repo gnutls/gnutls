@@ -94,9 +94,7 @@ const cipher_entry_st* cipher_to_entry(gnutls_cipher_algorithm_t c)
  * gnutls_cipher_get_block_size:
  * @algorithm: is an encryption algorithm
  *
- * Get block size for encryption algorithm.
- *
- * Returns: block size for encryption algorithm.
+ * Returns: the block size of the encryption algorithm.
  *
  * Since: 2.10.0
  **/
@@ -107,6 +105,20 @@ gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm)
   GNUTLS_ALG_LOOP (ret = p->blocksize);
   return ret;
 
+}
+
+/**
+ * gnutls_cipher_get_tag_size:
+ * @algorithm: is an encryption algorithm
+ *
+ * Returns: the tag size of the authenticated encryption algorithm.
+ *
+ * Since: 3.2.2
+ **/
+int
+gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm)
+{
+  return _gnutls_cipher_get_tag_size(cipher_to_entry(algorithm));
 }
 
 /**

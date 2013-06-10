@@ -9,6 +9,7 @@ subsystems.
 
 ** API and ABI modifications:
 gnutls_certificate_set_trust_list: Added
+gnutls_cipher_get_tag_size: Added
 
 
 * Version 3.2.1 (released 2013-06-01)
