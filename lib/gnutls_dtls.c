@@ -1082,18 +1082,3 @@ unsigned int gnutls_record_get_discarded (gnutls_session_t session)
 {
   return session->internals.dtls.packets_dropped;
 }
-
-/**
- * gnutls_record_disable_replay_protection:
- * @session: is a #gnutls_session_t structure.
- *
- * This function will disable any replay protection in DTLS mode.
- * That must only used when replay protection is achieved using
- * other means.
- *
- **/
-void
-gnutls_record_disable_replay_protection (gnutls_session_t session)
-{
-  session->internals.no_replay_protection = 1;
-}

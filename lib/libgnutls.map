@@ -913,7 +913,6 @@ GNUTLS_3_1_0 {
 	gnutls_session_set_id;
 	gnutls_certificate_set_trust_list;
 	gnutls_cipher_get_tag_size;
-	gnutls_record_disable_replay_protection;
 	gnutls_record_overhead_size;
 	gnutls_record_overhead_size2;
 } GNUTLS_3_0_0;

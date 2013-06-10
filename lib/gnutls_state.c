@@ -292,6 +292,10 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
  * also available. The latter flag will enable a non-blocking
  * operation of the DTLS timers. 
  *
+ * The flag %GNUTLS_NO_REPLAY_PROTECTION will disable any 
+ * replay protection in DTLS mode. That must only used when 
+ * replay protection is achieved using other means.
+ *
  * Note that since version 3.1.2 this function enables some common
  * TLS extensions such as session tickets and OCSP certificate status
  * request in client side by default. To prevent that use the %GNUTLS_NO_EXTENSIONS
@@ -401,6 +405,9 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
       gnutls_session_ticket_enable_client(*session);
       gnutls_ocsp_status_request_enable_client(*session, NULL, 0, NULL);
     }
+
+  if (flags & GNUTLS_NO_REPLAY_PROTECTION)
+    (*session)->internals.no_replay_protection = 1;
 
   return 0;
 }

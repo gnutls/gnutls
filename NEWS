@@ -10,9 +10,9 @@ subsystems.
 ** libgnutls: DTLS replay protection can now be disabled.
 
 ** API and ABI modifications:
+GNUTLS_NO_REPLAY_PROTECTION: Added
 gnutls_certificate_set_trust_list: Added
 gnutls_cipher_get_tag_size: Added
-gnutls_record_disable_replay_protection: Added
 gnutls_record_overhead_size: Added
 gnutls_record_overhead_size2: Added
 
