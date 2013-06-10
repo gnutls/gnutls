@@ -81,6 +81,8 @@ unsigned int gnutls_dtls_get_timeout (gnutls_session_t session);
 				 gnutls_dtls_prestate_st* prestate);
 
   unsigned int gnutls_record_get_discarded (gnutls_session_t session);
+  
+  void gnutls_record_disable_replay_protection (gnutls_session_t session);
 #ifdef __cplusplus
 }
 #endif

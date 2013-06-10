@@ -997,6 +997,7 @@ typedef struct
   recv_state_t recv_state; /* state of the receive function */
   
   unsigned int sc_random_set:1;
+  unsigned int no_replay_protection:1; /* DTLS replay protection */
   
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */

@@ -7,9 +7,12 @@ See the end for copying conditions.
 ** libgnutls: Several optimizations in the related to packet processing
 subsystems.
 
+** libgnutls: DTLS replay protection can now be disabled.
+
 ** API and ABI modifications:
 gnutls_certificate_set_trust_list: Added
 gnutls_cipher_get_tag_size: Added
+gnutls_record_disable_replay_protection: Added
 
 
 * Version 3.2.1 (released 2013-06-01)

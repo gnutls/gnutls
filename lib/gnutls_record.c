@@ -1224,7 +1224,7 @@ begin:
    * is processed and authenticated to avoid someone
    * messing with our windows.
    */
-  if (IS_DTLS(session)) 
+  if (IS_DTLS(session) && session->internals.no_replay_protection == 0)
     {
       ret = _dtls_record_check(record_params, packet_sequence);
       if (ret < 0)
