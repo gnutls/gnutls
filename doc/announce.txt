@@ -1,4 +1,5 @@
 To: help-gnutls@gnu.org, gnutls-devel@gnu.org, info-gnu@gnu.org
+Bcc: coordinator@translationproject.org
 Subject: GnuTLS 3.0.0 released
 <#part sign=pgpmime>
 We are proud to announce a new stable GnuTLS release: Version 3.0.0.
