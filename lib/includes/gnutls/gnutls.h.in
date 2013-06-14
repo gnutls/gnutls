@@ -434,6 +434,11 @@ extern "C"
     GNUTLS_HANDSHAKE_CLIENT_HELLO_V2 = 1024,
   } gnutls_handshake_description_t;
 
+#define GNUTLS_HANDSHAKE_ANY ((unsigned int)-1)
+
+const char *
+gnutls_handshake_description_get_name (gnutls_handshake_description_t type);
+
 /**
  * gnutls_certificate_status_t:
  * @GNUTLS_CERT_INVALID: The certificate is not signed by one of the
@@ -1166,6 +1171,24 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   int gnutls_db_check_entry (gnutls_session_t session,
                              gnutls_datum_t session_entry);
   time_t gnutls_db_check_entry_time (gnutls_datum_t *entry);
+
+  /**
+   * gnutls_handshake_hook_func:
+   * @session: the current session
+   * @htype: the type of the handshake message (%gnutls_handshake_description_t)
+   * @post: non zero if this is an post-process/generation call and zero otherwise
+   * @incoming: non zero if this is an incoming message and zero if this is an outgoing message
+   *
+   * Function prototype for handshake hooks. It is set using
+   * gnutls_handshake_set_hook_function().
+   *
+   * Returns: Non zero on error.
+   */
+
+  typedef int (*gnutls_handshake_hook_func) (gnutls_session_t, unsigned int htype, unsigned int post, unsigned int incoming);
+  void gnutls_handshake_set_hook_function (gnutls_session_t session,
+				           unsigned int htype,
+				           gnutls_handshake_hook_func func);
 
   typedef int (*gnutls_handshake_post_client_hello_func) (gnutls_session_t);
   void

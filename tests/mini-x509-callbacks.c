@@ -52,6 +52,35 @@ static int post_client_hello_callback (gnutls_session_t session)
   return 0;
 }
 
+unsigned int msg_order[] = {
+	GNUTLS_HANDSHAKE_CLIENT_HELLO,
+	GNUTLS_HANDSHAKE_SERVER_HELLO,
+	GNUTLS_HANDSHAKE_CERTIFICATE_PKT,
+	GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE,
+	GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST,
+	GNUTLS_HANDSHAKE_SERVER_HELLO_DONE,
+	GNUTLS_HANDSHAKE_CERTIFICATE_PKT,
+	GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE,
+	GNUTLS_HANDSHAKE_FINISHED,
+	GNUTLS_HANDSHAKE_FINISHED,
+};
+
+static int handshake_callback (gnutls_session_t session, unsigned int htype, unsigned int post, unsigned int incoming)
+{
+static unsigned idx = 0;
+
+  if (post > 0)
+    {
+      if (msg_order[idx] != htype)
+        {
+          fail("%s: %s, expected %s\n", incoming!=0?"Received":"Sent", gnutls_handshake_description_get_name(htype), gnutls_handshake_description_get_name(msg_order[idx]));
+          exit(1);
+        }
+      idx++;
+    }
+  return 0;
+}
+
 static int
 server_callback (gnutls_session_t session)
 {
@@ -137,6 +166,7 @@ void doit(void)
   gnutls_certificate_set_verify_function (serverx509cred, server_callback);
   gnutls_certificate_server_set_request (server, GNUTLS_CERT_REQUEST);
   gnutls_handshake_set_post_client_hello_function (server, post_client_hello_callback);
+  gnutls_handshake_set_hook_function (server, GNUTLS_HANDSHAKE_ANY, handshake_callback);
 
   /* Init client */
   gnutls_certificate_allocate_credentials (&clientx509cred);

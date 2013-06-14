@@ -15,6 +15,8 @@ gnutls_certificate_set_trust_list: Added
 gnutls_cipher_get_tag_size: Added
 gnutls_record_overhead_size: Added
 gnutls_record_overhead_size2: Added
+gnutls_handshake_set_hook_function: Added
+gnutls_handshake_description_get_name: Added
 
 
 * Version 3.2.1 (released 2013-06-01)

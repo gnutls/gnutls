@@ -486,7 +486,7 @@ gnutls_deinit (gnutls_session_t session)
   _gnutls_mpi_release (&session->key.rsa[1]);
 
   _gnutls_mpi_release (&session->key.dh_secret);
-
+  
   gnutls_free (session);
 }
 
@@ -1247,6 +1247,7 @@ gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
   session->internals.user_hello_func = func;
 }
 
+
 /**
  * gnutls_session_enable_compatibility_mode:
  * @session: is a #gnutls_session_t structure.
@@ -1405,5 +1406,36 @@ gnutls_handshake_set_random (gnutls_session_t session, const gnutls_datum_t* ran
     memcpy(session->internals.resumed_security_parameters.server_random, random->data, random->size);
 
   return 0;
+}
+
+/**
+ * gnutls_handshake_set_hook_function:
+ * @session: is a #gnutls_session_t structure.
+ * @htype: the %gnutls_handshake_description_t of the message to hook at.
+ * @func: is the function to be called
+ *
+ * This function will set a callback to be called after or before the specified
+ * handshake message has been received or generated. This is a
+ * generalization of gnutls_handshake_set_post_client_hello_function().
+ *
+ * This callback must return 0 on success or a gnutls error code to
+ * terminate the handshake.
+ *
+ * Note to hook at all handshake messages use an @htype of %GNUTLS_HANDSHAKE_ANY.
+ *
+ * Warning: You should not use this function to terminate the
+ * handshake based on client input unless you know what you are
+ * doing. Before the handshake is finished there is no way to know if
+ * there is a man-in-the-middle attack being performed.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
+void
+gnutls_handshake_set_hook_function (gnutls_session_t session,
+                                    unsigned int htype,
+				    gnutls_handshake_hook_func func)
+{
+  session->internals.h_hook = func;
+  session->internals.h_type = htype;
 }
 

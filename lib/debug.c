@@ -73,11 +73,19 @@ _gnutls_packet2str (content_type_t packet)
     }
 }
 
+/**
+ * gnutls_handshake_description_get_name:
+ * @type: is a handshake message description
+ *
+ * Convert a #gnutls_handshake_description_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified handshake
+ *   message or %NULL.
+ **/
 const char *
-_gnutls_handshake2str (gnutls_handshake_description_t handshake)
+gnutls_handshake_description_get_name (gnutls_handshake_description_t type)
 {
-
-  switch (handshake)
+  switch (type)
     {
     case GNUTLS_HANDSHAKE_HELLO_REQUEST:
       return "HELLO REQUEST";
@@ -129,6 +137,5 @@ _gnutls_handshake2str (gnutls_handshake_description_t handshake)
       break;
     default:
       return "Unknown Handshake packet";
-
     }
 }

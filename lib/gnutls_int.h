@@ -750,7 +750,6 @@ typedef struct
   unsigned int packets_dropped;
 } dtls_st;
 
-
 typedef union
 {
   void *ptr;
@@ -868,6 +867,9 @@ typedef struct
   /* post client hello callback (server side only)
    */
   gnutls_handshake_post_client_hello_func user_hello_func;
+  /* handshake hook function */
+  gnutls_handshake_hook_func h_hook;
+  unsigned int h_type; /* the hooked type */
 
   /* holds the selected certificate and key.
    * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()

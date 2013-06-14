@@ -1141,8 +1141,20 @@ _gnutls_send_empty_handshake (gnutls_session_t session,
   return _gnutls_send_handshake (session, bufel, type);
 }
 
+inline
+static int call_hook_func(gnutls_session_t session, gnutls_handshake_description_t type,
+                          unsigned post, unsigned incoming)
+{
+  if (session->internals.h_hook == NULL)
+    return 0;
+  else 
+    {
+      if (session->internals.h_type == type || session->internals.h_type == GNUTLS_HANDSHAKE_ANY)
+        return session->internals.h_hook(session, type, post, incoming);
 
-
+      return 0;
+    }
+}
 
 /* This function sends a handshake message of type 'type' containing the
  * data specified here. If the previous _gnutls_send_handshake() returned
@@ -1210,6 +1222,14 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
         return ret;
       }
 
+  ret = call_hook_func(session, type, 0, 0);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _mbuffer_xfree(&bufel);
+      return ret;
+    }
+
   session->internals.last_handshake_out = type;
 
   ret = _gnutls_handshake_io_cache_int (session, type, bufel);
@@ -1242,6 +1262,13 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
       /* send cached messages */
       ret = _gnutls_handshake_io_write_flush (session);
       break;
+    }
+
+  ret = call_hook_func(session, type, 1, 0);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
   return ret;
@@ -1342,7 +1369,6 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
   return 0;
 }
 
-
 /* This function will receive handshake messages of the given types,
  * and will pass the message to the right place in order to be processed.
  * E.g. for the SERVER_HELLO message (if it is expected), it will be
@@ -1371,6 +1397,13 @@ _gnutls_recv_handshake (gnutls_session_t session,
 
   session->internals.last_handshake_in = hsk.htype;
 
+  ret = call_hook_func(session, hsk.htype, 0, 1);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
   ret = _gnutls_handshake_hash_add_recvd (session, hsk.htype,
                                               hsk.header, hsk.header_size,
                                               hsk.data.data, hsk.data.length);
@@ -1396,8 +1429,6 @@ _gnutls_recv_handshake (gnutls_session_t session,
           goto cleanup;
         }
 
-      goto cleanup; /* caller doesn't need dataptr */
-
       break;
     case GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST:
       ret = _gnutls_recv_hello_verify_request (session, hsk.data.data, hsk.data.length);
@@ -1411,8 +1442,6 @@ _gnutls_recv_handshake (gnutls_session_t session,
            and ClientHello needs to be sent again. */
         ret = 1;
 	
-      goto cleanup; /* caller doesn't need dataptr */
-
       break;
     case GNUTLS_HANDSHAKE_SERVER_HELLO_DONE:
       if (hsk.data.length == 0)
@@ -1441,6 +1470,13 @@ _gnutls_recv_handshake (gnutls_session_t session,
        * unexpected messages should be catched after _gnutls_handshake_io_recv_int()
        */
       ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
+      goto cleanup;
+    }
+
+  ret = call_hook_func(session, hsk.htype, 1, 1);
+  if (ret < 0)
+    {
+      gnutls_assert ();
       goto cleanup;
     }
 
