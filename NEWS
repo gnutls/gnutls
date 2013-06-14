@@ -9,6 +9,9 @@ subsystems.
 
 ** libgnutls: DTLS replay protection can now be disabled.
 
+** libgnutls: Added ability to set hooks prior to sending or receiving
+any handshake message with gnutls_handshake_set_hook_function().
+
 ** API and ABI modifications:
 GNUTLS_NO_REPLAY_PROTECTION: Added
 gnutls_certificate_set_trust_list: Added
