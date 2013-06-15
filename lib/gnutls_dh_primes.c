@@ -188,7 +188,7 @@ gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
 {
   int ret;
   gnutls_group_st group;
-
+  
   ret = _gnutls_mpi_generate_group (&group, bits);
   if (ret < 0)
     {
@@ -302,6 +302,12 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
       return result;
     }
 
+  if (_gnutls_mpi_cmp_ui(params->params[0], 0) == 0)
+    {
+      asn1_delete_structure (&c2);
+      return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+    }
+
   /* read the generator
    */
   result = _gnutls_x509_read_int (c2, "base", &params->params[1]);
@@ -311,6 +317,13 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
       _gnutls_mpi_release (&params->params[0]);
       gnutls_assert ();
       return result;
+    }
+
+  if (_gnutls_mpi_cmp_ui(params->params[1], 0) == 0)
+    {
+      asn1_delete_structure (&c2);
+      _gnutls_mpi_release (&params->params[0]);
+      return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
     }
 
   asn1_delete_structure (&c2);
