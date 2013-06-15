@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the libgnutls package.
 # Jens Seidel <jensseidel@users.sf.net>, 2006.
 # Michael Piefel <piefel@informatik.hu-berlin.de>, 2006.
-# Mario Blättermann <mario.blaettermann@gmail.com>, 2012.
+# Mario Blättermann <mario.blaettermann@gmail.com>, 2012, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: libgnutls 3.0.12\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
 "POT-Creation-Date: 2012-01-20 14:09+0100\n"
-"PO-Revision-Date: 2012-04-11 20:14+0100\n"
+"PO-Revision-Date: 2013-05-30 15:49+0100\n"
 "Last-Translator: Mario Blättermann <mario.blaettermann@gmail.com>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
 "Language: de\n"
@@ -18,8 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Language: German\n"
-"X-Poedit-Country: GERMANY\n"
+"X-Generator: Poedit 1.5.4\n"
 
 #: lib/gnutls_alert.c:45
 msgid "Close notify"
@@ -183,7 +182,7 @@ msgstr "Ein TLS-Paket mit unerwarteter Länge wurde empfangen."
 
 #: lib/gnutls_errors.c:76
 msgid "The TLS connection was non-properly terminated."
-msgstr "Die TLS-Verbindung wurde nicht sauber beeendet."
+msgstr "Die TLS-Verbindung wurde nicht sauber beendet."
 
 #: lib/gnutls_errors.c:79
 msgid "The specified session has been invalidated for some reason."
