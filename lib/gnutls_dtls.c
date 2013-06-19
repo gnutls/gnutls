@@ -573,7 +573,7 @@ void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_ti
  **/
 void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
 {
-  session->internals.dtls.mtu  = mtu;
+  session->internals.dtls.mtu  = MIN(mtu, DEFAULT_MAX_RECORD_SIZE);
 }
 
 /* returns overhead imposed by the record layer (encryption/compression)
