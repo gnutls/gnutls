@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.31 (unreleased)
+
+** libgnutls: Ensure that gnutls_dtls_set_mtu() cannot exceed the
+maximum allowed DTLS size.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.30 (released 2013-06-01)
 
 ** libgnutls: Allow ECC when in SSL 3.0 to work-around a bug in certain
