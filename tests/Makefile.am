@@ -67,7 +67,7 @@ ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid	\
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
 	 mini-rehandshake rng-fork mini-eagain-dtls resume-dtls \
 	 x509cert x509cert-tl infoaccess mini-dtls-hello-verify \
-	 mini-tdb mini-dtls-rehandshake mini-alpn \
+	 mini-tdb mini-dtls-rehandshake mini-alpn mini-dtls-large \
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl		\
