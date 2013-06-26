@@ -31,6 +31,11 @@ Tim Dierks and Christopher Allen, "The TLS Protocol Version 1.0",
 January 1999, Available from
 @url{http://www.ietf.org/rfc/rfc2246.txt}.
 
+@item @anchor{RFC4418}[RFC4418]
+Ted Krovetz, "UMAC: Message Authentication Code using Universal Hashing",
+March 2006, Available from
+@url{http://www.ietf.org/rfc/rfc4418.txt}.
+
 @item @anchor{RFC4680}[RFC4680]
 S. Santesson, "TLS Handshake Message for Supplemental Data",
 September 2006, Available from

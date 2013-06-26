@@ -124,10 +124,6 @@ encryption (EDE). Has 64 bits block size and is used in CBC mode.
 ARCFOUR_128 is a compatible algorithm with RSA's RC4 algorithm, which is considered to be a trade
 secret. It is a fast cipher but considered weak today.
 
-@item ARCFOUR_@-40 @tab
-This is the ARCFOUR cipher fed with a 40 bit key,
-which is considered weak.
-
 @item AES_@-CBC @tab
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
 DES algorithm.  Has 128 bits block size and is used in CBC mode.
@@ -141,6 +137,15 @@ be extremely fast on CPUs that support hardware acceleration.
 This is an 128-bit block cipher developed by Mitsubishi and NTT. It
 is one of the approved ciphers of the European NESSIE and Japanese
 CRYPTREC projects.
+
+@item SALSA20_@-256 @tab
+SALSA20_256 is a fast stream cipher. This is currently a GnuTLS
+extension.
+
+@item ESTREAM_@-SALSA20_@-256 @tab
+ESTREAM_@-SALSA20_@-256 is a faster variant of SALSA20, and is one of the 
+selected ciphers of the ESTREAM competition. This is currently a GnuTLS
+extension.
 
 @end multitable
 @caption{Supported ciphers.}
@@ -160,6 +165,10 @@ designed by NSA. Outputs 160 bits of data.
 
 @item MAC_@-SHA256 @tab
 An HMAC based on SHA256. Outputs 256 bits of data.
+
+@item MAC_@-UMAC @tab
+This is a very fast MAC algorithm based on universal hashing, described in
+@xcite{RFC4418}. This is currently a GnuTLS extension.
 
 @item MAC_@-AEAD @tab
 This indicates that an authenticated encryption algorithm, such as
