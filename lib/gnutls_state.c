@@ -1414,7 +1414,7 @@ gnutls_handshake_set_random (gnutls_session_t session, const gnutls_datum_t* ran
  * @htype: the %gnutls_handshake_description_t of the message to hook at.
  * @func: is the function to be called
  *
- * This function will set a callback to be called after or before the specified
+ * This function will set a callback to be called after the specified
  * handshake message has been received or generated. This is a
  * generalization of gnutls_handshake_set_post_client_hello_function().
  *
