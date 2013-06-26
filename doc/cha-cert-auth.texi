@@ -20,12 +20,6 @@ shown in @ref{tab:key-exchange}.
 The RSA algorithm is used to encrypt a key and send it to the peer.
 The certificate must allow the key to be used for encryption.
 
-@item RSA_@-EXPORT @tab
-The RSA algorithm is used to encrypt a key and send it to the peer.
-In the EXPORT algorithm, the server signs temporary RSA parameters of
-512 bits --- which are considered weak --- and sends them to the
-client.
-
 @item DHE_@-RSA @tab
 The RSA algorithm is used to sign ephemeral Diffie-Hellman parameters
 which are sent to the peer. The key in the certificate must allow the
