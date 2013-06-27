@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2012 Free Software Foundation, Inc.
+   Copyright (C) 2007-2013 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -77,6 +77,19 @@ const char scm_gnutls_array_error_message[] =
   scm_to_bool (SCM_CAR (SCM_GNUTLS_SESSION_DATA (c_session)))
 #define SCM_GNUTLS_SESSION_RECORD_PORT(c_session)	\
   SCM_CDR (SCM_GNUTLS_SESSION_DATA (c_session))
+
+
+/* Weak-key hash table.  */
+static SCM weak_refs;
+
+/* Register a weak reference from FROM to TO, such that the lifetime of TO is
+   greater than or equal to that of FROM.  */
+static void
+register_weak_reference (SCM from, SCM to)
+{
+  scm_hashq_set_x (weak_refs, from, to);
+}
+
 
 
 
@@ -675,6 +688,8 @@ SCM_DEFINE (scm_gnutls_set_session_credentials_x, "set-session-credentials!",
 
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
+  else
+    register_weak_reference (session, cred);
 
   return SCM_UNSPECIFIED;
 }
@@ -1291,6 +1306,7 @@ SCM_DEFINE (scm_gnutls_set_anonymous_server_dh_parameters_x,
   c_dh_params = scm_to_gnutls_dh_parameters (dh_params, 2, FUNC_NAME);
 
   gnutls_anon_set_server_dh_params (c_cred, c_dh_params);
+  register_weak_reference (cred, dh_params);
 
   return SCM_UNSPECIFIED;
 }
@@ -1514,6 +1530,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_dh_params_x,
   c_dh_params = scm_to_gnutls_dh_parameters (dh_params, 2, FUNC_NAME);
 
   gnutls_certificate_set_dh_params (c_cred, c_dh_params);
+  register_weak_reference (cred, dh_params);
 
   return SCM_UNSPECIFIED;
 }
@@ -1535,6 +1552,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_rsa_export_params_x,
   c_rsa_params = scm_to_gnutls_rsa_parameters (rsa_params, 2, FUNC_NAME);
 
   gnutls_certificate_set_rsa_export_params (c_cred, c_rsa_params);
+  register_weak_reference (cred, rsa_params);
 
   return SCM_UNSPECIFIED;
 }
@@ -1735,6 +1753,11 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_keys_x,
                                          c_key);
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
+  else
+    {
+      register_weak_reference (cred, privkey);
+      register_weak_reference (cred, scm_list_copy (certs));
+    }
 
   return SCM_UNSPECIFIED;
 }
@@ -3353,4 +3376,7 @@ scm_init_gnutls (void)
   scm_init_gnutls_error ();
 
   scm_init_gnutls_session_record_port_type ();
+
+  weak_refs = scm_make_weak_key_hash_table (scm_from_int (42));
+  weak_refs = scm_permanent_object (weak_refs);
 }
