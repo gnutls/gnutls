@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2013 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -61,7 +61,7 @@
               ;; client-side (child process)
               (set-session-priorities! client priorities)
 
-              (set-session-transport-fd! client (fileno (car socket-pair)))
+              (set-session-transport-fd! client (port->fdes (car socket-pair)))
               (set-session-credentials! client (make-anonymous-client-credentials))
               (set-session-dh-prime-bits! client 1024)
 
@@ -75,7 +75,7 @@
               ;; server-side
               (set-session-priorities! server priorities)
 
-              (set-session-transport-fd! server (fileno (cdr socket-pair)))
+              (set-session-transport-fd! server (port->fdes (cdr socket-pair)))
               (let ((cred (make-anonymous-server-credentials))
                     (dh-params (import-dh-params "dh-parameters.pem")))
                 ;; Note: DH parameter generation can take some time.

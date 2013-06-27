@@ -1,5 +1,5 @@
 ;;; GnuTLS-extra --- Guile bindings for GnuTLS-EXTRA.
-;;; Copyright (C) 2007-2012 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2013 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS-extra is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@
                 (set-session-credentials! client cred)
                 (set-session-dh-prime-bits! client 1024)
 
-                (set-session-transport-fd! client (fileno (car socket-pair)))
+                (set-session-transport-fd! client (port->fdes (car socket-pair)))
 
                 (handshake client)
                 (write %message (session-record-port client))
@@ -94,7 +94,7 @@
                 (set-server-session-certificate-request! server
                          certificate-request/require)
 
-                (set-session-transport-fd! server (fileno (cdr socket-pair)))
+                (set-session-transport-fd! server (port->fdes (cdr socket-pair)))
                 (let ((cred (make-certificate-credentials)))
                   (set-certificate-credentials-dh-parameters! cred dh)
                   (set-certificate-credentials-rsa-export-parameters! cred rsa)
