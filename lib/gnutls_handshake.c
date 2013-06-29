@@ -3252,6 +3252,20 @@ _gnutls_recv_hello_request (gnutls_session_t session, void *data,
     }
 }
 
+/* returns e and m, depends on the requested bits.
+ * We only support limited key sizes.
+ */
+static const gnutls_pk_params_st*
+_gnutls_rsa_params_to_mpi (gnutls_rsa_params_t rsa_params)
+{
+  if (rsa_params == NULL)
+    {
+      return NULL;
+    }
+
+  return &rsa_params->params;
+}
+
 /* Returns 1 if the given KX has not the corresponding parameters
  * (DH or RSA) set up. Otherwise returns 0.
  */
@@ -3262,6 +3276,7 @@ check_server_params (gnutls_session_t session,
 {
   int cred_type;
   gnutls_dh_params_t dh_params = NULL;
+  gnutls_rsa_params_t rsa_params = NULL;
   int j;
 
   cred_type = _gnutls_map_kx_get_cred (kx, 1);
@@ -3280,6 +3295,10 @@ check_server_params (gnutls_session_t session,
           dh_params =
             _gnutls_get_dh_params (x509_cred->dh_params,
                                    x509_cred->params_func, session);
+          rsa_params =
+            _gnutls_certificate_get_rsa_params (x509_cred->rsa_params,
+                                                x509_cred->params_func,
+                                                session);
         }
 
       /* Check also if the certificate supports the
@@ -3331,6 +3350,19 @@ check_server_params (gnutls_session_t session,
     }
   else
     return 0;                   /* no need for params */
+
+  /* If the key exchange method needs RSA or DH params,
+   * but they are not set then remove it.
+   */
+  if (_gnutls_kx_needs_rsa_params (kx) != 0)
+    {
+      /* needs rsa params. */
+      if (_gnutls_rsa_params_to_mpi (rsa_params) == NULL)
+        {
+          gnutls_assert ();
+          return 1;
+        }
+    }
 
   if (_gnutls_kx_needs_dh_params (kx) != 0)
     {

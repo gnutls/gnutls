@@ -67,6 +67,10 @@ typedef struct psk_auth_info_st psk_auth_info_st;
 
 int
 _gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum_t* key, gnutls_datum_t * psk2);
+int _gnutls_gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data);
+int _gnutls_gen_psk_client_kx (gnutls_session_t, gnutls_buffer_st*);
+int _gnutls_proc_psk_server_kx (gnutls_session_t session, uint8_t * data,
+                                size_t _data_size);
 
 int _gnutls_find_psk_key( gnutls_session_t session, gnutls_psk_client_credentials_t cred, 
   gnutls_datum_t * username, gnutls_datum_t* key, int* free);

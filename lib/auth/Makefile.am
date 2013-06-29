@@ -35,7 +35,7 @@ endif
 noinst_LTLIBRARIES = libgnutls_auth.la
 
 libgnutls_auth_la_SOURCES = anon.c cert.c dh_common.c dhe.c \
-	dhe_psk.c psk.c psk_passwd.c rsa.c srp.c \
+	rsa_psk.c dhe_psk.c psk.c psk_passwd.c rsa.c srp.c \
 	srp_passwd.c srp_rsa.c srp_sb64.c anon.h cert.h dh_common.h \
 	psk.h psk_passwd.h srp.h srp_passwd.h anon_ecdh.c \
 	ecdhe.c ecdhe.h

@@ -34,13 +34,9 @@
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
 
-int _gnutls_gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data);
-int _gnutls_gen_psk_client_kx (gnutls_session_t, gnutls_buffer_st*);
 
 int _gnutls_proc_psk_client_kx (gnutls_session_t, uint8_t *, size_t);
 
-int _gnutls_proc_psk_server_kx (gnutls_session_t session, uint8_t * data,
-                                size_t _data_size);
 
 const mod_auth_st psk_auth_struct = {
   "PSK",
