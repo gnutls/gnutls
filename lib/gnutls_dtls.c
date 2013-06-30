@@ -625,7 +625,7 @@ int t, ret;
 }  
 
 /**
- * gnutls_record_overhead_size2:
+ * gnutls_est_record_overhead_size:
  * @version: is a #gnutls_protocol_t value
  * @cipher: is a #gnutls_cipher_algorithm_t value
  * @mac: is a #gnutls_mac_algorithm_t value
@@ -642,7 +642,7 @@ int t, ret;
  *
  * Since: 3.2.2
  **/
-size_t gnutls_record_overhead_size2 (gnutls_protocol_t version, gnutls_cipher_algorithm_t cipher,
+size_t gnutls_est_record_overhead_size (gnutls_protocol_t version, gnutls_cipher_algorithm_t cipher,
 			             gnutls_mac_algorithm_t mac, gnutls_compression_method_t comp, 
 			             unsigned int flags)
 {

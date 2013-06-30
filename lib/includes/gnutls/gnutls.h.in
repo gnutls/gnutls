@@ -938,7 +938,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   size_t gnutls_record_overhead_size (gnutls_session_t session);
 
-  size_t gnutls_record_overhead_size2 (gnutls_protocol_t version, 
+  size_t gnutls_est_record_overhead_size (gnutls_protocol_t version, 
                                       gnutls_cipher_algorithm_t cipher,
                                       gnutls_mac_algorithm_t mac, 
                                       gnutls_compression_method_t comp, 
