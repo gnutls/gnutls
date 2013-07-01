@@ -182,6 +182,9 @@ api_cipher_hd_st * h = handle;
  * This function will decrypt the given data using the algorithm
  * specified by the context.
  *
+ * Note that in AEAD ciphers, this will not check the tag. You will
+ * need to compare the tag sent with the value returned from gnutls_cipher_tag().
+ *
  * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
@@ -233,6 +236,9 @@ api_cipher_hd_st * h = handle;
  *
  * This function will decrypt the given data using the algorithm
  * specified by the context.
+ *
+ * Note that in AEAD ciphers, this will not check the tag. You will
+ * need to compare the tag sent with the value returned from gnutls_cipher_tag().
  *
  * Returns: Zero or a negative error code on error.
  *
