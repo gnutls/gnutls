@@ -558,21 +558,17 @@ typedef void (rmadd_func) (priority_st * priority_list, unsigned int alg);
 static void
 prio_remove (priority_st * priority_list, unsigned int algo)
 {
-  int i = 0;
-  int pos = -1;                 /* the position of the cipher to remove */
+  unsigned int i;
 
-  while (priority_list->priority[i] != 0)
+  for (i=0;i<priority_list->algorithms;i++)
     {
-      if (priority_list->priority[i] == algo)
-        pos = i;
-      i++;
-    }
-
-  if (pos >= 0)
-    {
-      priority_list->priority[pos] = priority_list->priority[i - 1];
-      priority_list->priority[i - 1] = 0;
-      priority_list->algorithms--;
+      if (priority_list->priority[i] == algo) 
+        {
+          priority_list->algorithms--;
+          if (priority_list->algorithms-i) > 0)
+            memmove(&priority_list->priority[i], &priority_list->priority[i+1], (priority_list->algorithms-i)*sizeof(priority_list->priority[0]));
+          break;
+        }
     }
 
   return;
