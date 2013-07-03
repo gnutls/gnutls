@@ -635,10 +635,10 @@ int t, ret;
  * This function will return the set size in bytes of the overhead
  * due to TLS (or DTLS) per record.
  *
- * Note that this function may not provide inacurate values because
- * of the many options that may be negotiated in TLS/DTLS. An more accurate
- * value can be obtained using gnutls_record_overhead_size() after
- * a completed handshake.
+ * Note that this function may provide inacurate values when TLS
+ * extensions that modify the record format are negotiated. In these
+ * cases a more accurate value can be obtained using gnutls_record_overhead_size() 
+ * after a completed handshake.
  *
  * Since: 3.2.2
  **/
