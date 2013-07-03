@@ -65,19 +65,17 @@ unsigned int msg_order[] = {
 	GNUTLS_HANDSHAKE_FINISHED,
 };
 
-static int handshake_callback (gnutls_session_t session, unsigned int htype, unsigned int post, unsigned int incoming)
+static int handshake_callback (gnutls_session_t session, unsigned int htype, unsigned int incoming)
 {
 static unsigned idx = 0;
 
-  if (post > 0)
-    {
       if (msg_order[idx] != htype)
         {
           fail("%s: %s, expected %s\n", incoming!=0?"Received":"Sent", gnutls_handshake_description_get_name(htype), gnutls_handshake_description_get_name(msg_order[idx]));
           exit(1);
         }
       idx++;
-    }
+
   return 0;
 }
 
