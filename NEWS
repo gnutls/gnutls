@@ -20,6 +20,9 @@ gnutls_record_overhead_size: Added
 gnutls_est_record_overhead_size: Added
 gnutls_handshake_set_hook_function: Added
 gnutls_handshake_description_get_name: Added
+gnutls_digest_list: Added
+gnutls_digest_get_id: Added
+gnutls_digest_get_name: Added
 
 
 * Version 3.2.1 (released 2013-06-01)

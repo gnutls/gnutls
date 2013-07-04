@@ -465,7 +465,7 @@ typedef struct cipher_entry_st
 typedef struct mac_entry_st
 {
   const char *name;
-  const char *oid;
+  const char *oid; /* OID of the hash - if it is a hash */
   gnutls_mac_algorithm_t id;
   unsigned output_size;
   unsigned key_size;

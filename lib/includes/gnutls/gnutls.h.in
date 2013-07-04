@@ -834,6 +834,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 /* the name of the specified algorithms */
   const char *gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm);
   const char *gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm);
+  const char *gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm);
   const char *gnutls_compression_get_name (gnutls_compression_method_t
                                            algorithm);
   const char *gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm);
@@ -857,6 +858,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 #define gnutls_sign_algorithm_get_name gnutls_sign_get_name
 
   gnutls_mac_algorithm_t gnutls_mac_get_id (const char *name);
+  gnutls_digest_algorithm_t gnutls_digest_get_id (const char *name);
   gnutls_compression_method_t gnutls_compression_get_id (const char *name);
   gnutls_cipher_algorithm_t gnutls_cipher_get_id (const char *name);
   gnutls_kx_algorithm_t gnutls_kx_get_id (const char *name);
@@ -869,6 +871,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   const gnutls_ecc_curve_t * gnutls_ecc_curve_list (void);
   const gnutls_cipher_algorithm_t *gnutls_cipher_list (void);
   const gnutls_mac_algorithm_t *gnutls_mac_list (void);
+  const gnutls_digest_algorithm_t *gnutls_digest_list (void);
   const gnutls_compression_method_t *gnutls_compression_list (void);
   const gnutls_protocol_t *gnutls_protocol_list (void);
   const gnutls_certificate_type_t *gnutls_certificate_type_list (void);

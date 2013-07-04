@@ -90,6 +90,57 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 }
 
 /**
+ * gnutls_digest_get_name:
+ * @algorithm: is a digest algorithm
+ *
+ * Convert a #gnutls_digest_algorithm_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified digest
+ *   algorithm, or %NULL.
+ **/
+const char *
+gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm)
+{
+  const char *ret = NULL;
+
+  GNUTLS_HASH_LOOP (
+    if (algorithm == (unsigned)p->id && p->oid != NULL)
+      {
+        ret = p->name;
+        break;
+      }
+  );
+
+  return ret;
+}
+
+/**
+ * gnutls_digest_get_id:
+ * @name: is a digest algorithm name
+ *
+ * Convert a string to a #gnutls_digest_algorithm_t value.  The names are
+ * compared in a case insensitive way.
+ *
+ * Returns: a #gnutls_digest_algorithm_t id of the specified MAC
+ *   algorithm string, or %GNUTLS_DIG_UNKNOWN on failures.
+ **/
+gnutls_digest_algorithm_t
+gnutls_digest_get_id (const char *name)
+{
+  gnutls_digest_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
+
+  GNUTLS_HASH_LOOP (
+    if (p->oid != NULL && strcasecmp (p->name, name) == 0) 
+      {
+        ret = p->id;
+        break;
+      }
+  );
+
+  return ret;
+}
+
+/**
  * gnutls_mac_get_id:
  * @name: is a MAC algorithm name
  *
@@ -186,6 +237,38 @@ static gnutls_mac_algorithm_t supported_macs[MAX_ALGOS] = { 0 };
     }
 
   return supported_macs;
+}
+
+/**
+ * gnutls_digest_list:
+ *
+ * Get a list of hash algorithms for use as MACs.  Note that not
+ * necessarily all MACs are supported in TLS cipher suites.  For
+ * example, MD2 is not supported as a cipher suite, but is supported
+ * for other purposes (e.g., X.509 signature verification or similar).
+ *
+ * This function is not thread safe.
+ *
+ * Returns: Return a (0)-terminated list of #gnutls_digest_algorithm_t
+ *   integers indicating the available MACs.
+ **/
+const gnutls_digest_algorithm_t *
+gnutls_digest_list (void)
+{
+static gnutls_digest_algorithm_t supported_digests[MAX_ALGOS] = { 0 };
+
+  if (supported_digests[0] == 0)
+    {
+      int i = 0;
+
+      GNUTLS_HASH_LOOP ( 
+        if (p->oid != NULL && (p->placeholder != 0 || _gnutls_mac_exists(p->id)))
+          supported_digests[i++]=p->id;
+      );
+      supported_digests[i++]=0;
+    }
+
+  return supported_digests;
 }
 
 gnutls_digest_algorithm_t
