@@ -2205,7 +2205,7 @@ find_objs (struct pkcs11_session_info* sinfo,
   struct ck_attribute *attr;
   ck_object_class_t class = (ck_object_class_t)-1;
   ck_certificate_type_t type = (ck_certificate_type_t)-1;
-  unsigned int trusted;
+  unsigned char trusted;
   unsigned long category;
   ck_rv_t rv;
   ck_object_handle_t obj;
