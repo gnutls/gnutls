@@ -917,6 +917,9 @@ GNUTLS_3_1_0 {
 	gnutls_record_overhead_size2;
 	gnutls_handshake_set_hook_function;
 	gnutls_handshake_description_get_name;
+	gnutls_digest_list;
+	gnutls_digest_get_id;
+	gnutls_digest_get_name;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
