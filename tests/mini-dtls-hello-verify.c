@@ -50,7 +50,7 @@ int main()
 
 static void terminate(void);
 
-/* This program tests the rehandshake in DTLS
+/* This program tests the client hello verify in DTLS
  */
 
 static void
@@ -101,6 +101,7 @@ client (int fd)
    */
   gnutls_init (&session, GNUTLS_CLIENT|GNUTLS_DATAGRAM);
   gnutls_dtls_set_mtu( session, 1500);
+  gnutls_handshake_set_timeout(session, 20*1000);
 
   /* Use default priorities */
   gnutls_priority_set_direct (session, "NONE:+VERS-DTLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL", NULL);
@@ -212,6 +213,7 @@ gnutls_session_t session;
   gnutls_anon_allocate_server_credentials (&anoncred);
 
   gnutls_init (&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
+  gnutls_handshake_set_timeout(session, 20*1000);
   gnutls_dtls_set_mtu( session, 1500);
 
   /* avoid calling all the priority functions, since the defaults
@@ -239,7 +241,13 @@ gnutls_session_t session;
         {
           if (debug) success("Sending hello verify request\n");
 
-          gnutls_dtls_cookie_send(&cookie_key, CLI_ADDR, CLI_ADDR_LEN, &prestate, (gnutls_transport_ptr_t)fd, push);
+          ret = gnutls_dtls_cookie_send(&cookie_key, CLI_ADDR, CLI_ADDR_LEN, &prestate, (gnutls_transport_ptr_t)fd, push);
+          if (ret < 0)
+            {
+              fail("Cannot send data\n");
+              terminate();
+            }
+
           /* discard peeked data*/
           recv(fd, buffer, sizeof(buffer), 0);
           csend++;
@@ -311,12 +319,12 @@ gnutls_session_t session;
     success ("server: finished\n");
 }
 
-static void start (void)
+void doit (void)
 {
   int fd[2];
   int ret;
   
-  ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
+  ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
   if (ret < 0)
     {
       perror("socketpair");
@@ -347,12 +355,6 @@ static void start (void)
       client (fd[1]);
       exit(0);
     }
-}
-
-void
-doit (void)
-{
-  start();
 }
 
 #endif /* _WIN32 */
