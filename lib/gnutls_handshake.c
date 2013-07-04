@@ -1423,9 +1423,12 @@ _gnutls_recv_handshake (gnutls_session_t session,
           goto cleanup;
         }
       else
-        /* Signal our caller we have received a verification cookie
-           and ClientHello needs to be sent again. */
-        ret = 1;
+        {
+          /* Signal our caller we have received a verification cookie
+             and ClientHello needs to be sent again. */
+          ret = 1;
+          goto cleanup;
+        }
 	
       break;
     case GNUTLS_HANDSHAKE_SERVER_HELLO_DONE:
