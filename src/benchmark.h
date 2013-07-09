@@ -24,7 +24,7 @@
 # include <windows.h>
 #endif
 
-#if defined(HAVE_CLOCK_GETTIME)
+#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_PROCESS_CPUTIME_ID)
 # undef gettime
 # define gettime(x) clock_gettime(CLOCK_PROCESS_CPUTIME_ID, x)
 #else
