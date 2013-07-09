@@ -2058,7 +2058,9 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
     {
       datalen = 2 + session_id_len + 1 + GNUTLS_RANDOM_SIZE + 3;
       ret =
-        _gnutls_gen_extensions (session, &extdata, GNUTLS_EXT_ANY);
+        _gnutls_gen_extensions (session, &extdata, 
+                                (session->internals.resumed==RESUME_TRUE)?
+                                GNUTLS_EXT_MANDATORY:GNUTLS_EXT_ANY);
       if (ret < 0)
         {
           gnutls_assert ();
