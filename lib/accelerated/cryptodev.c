@@ -49,7 +49,6 @@ struct cryptodev_ctx
   struct session_op sess;
   struct crypt_op cryp;
   uint8_t iv[EALG_MAX_BLOCK_LEN];
-  int reset;
 
   int cfd;
 };
@@ -356,7 +355,6 @@ static const gnutls_crypto_mac_st mac_struct = {
   .hash = NULL,
   .output = NULL,
   .deinit = NULL,
-  .reset = NULL,
   .fast = cryptodev_mac_fast
 };
 
@@ -407,7 +405,6 @@ static const gnutls_crypto_digest_st digest_struct = {
   .hash = NULL,
   .output = NULL,
   .deinit = NULL,
-  .reset = NULL,
   .fast = cryptodev_digest_fast
 };
 
