@@ -211,10 +211,7 @@ gnutls_mac_get_nonce_size (gnutls_mac_algorithm_t algorithm)
  * gnutls_mac_list:
  *
  * Get a list of hash algorithms for use as MACs.  Note that not
- * necessarily all MACs are supported in TLS cipher suites.  For
- * example, MD2 is not supported as a cipher suite, but is supported
- * for other purposes (e.g., X.509 signature verification or similar).
- *
+ * necessarily all MACs are supported in TLS cipher suites.  
  * This function is not thread safe.
  *
  * Returns: Return a (0)-terminated list of #gnutls_mac_algorithm_t
@@ -242,15 +239,12 @@ static gnutls_mac_algorithm_t supported_macs[MAX_ALGOS] = { 0 };
 /**
  * gnutls_digest_list:
  *
- * Get a list of hash algorithms for use as MACs.  Note that not
- * necessarily all MACs are supported in TLS cipher suites.  For
- * example, MD2 is not supported as a cipher suite, but is supported
- * for other purposes (e.g., X.509 signature verification or similar).
+ * Get a list of hash (digest) algorithms supported by GnuTLS.
  *
  * This function is not thread safe.
  *
  * Returns: Return a (0)-terminated list of #gnutls_digest_algorithm_t
- *   integers indicating the available MACs.
+ *   integers indicating the available digests.
  **/
 const gnutls_digest_algorithm_t *
 gnutls_digest_list (void)
