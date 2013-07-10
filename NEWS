@@ -7,7 +7,8 @@ See the end for copying conditions.
 ** libgnutls: Several optimizations in the related to packet processing
 subsystems.
 
-** libgnutls: DTLS replay protection can now be disabled.
+** libgnutls: DTLS replay detection can now be disabled (to be used
+in certain transport layers like SCTP).
 
 ** libgnutls: Fixes in SRTP extension generation when MKI is being
 used.
