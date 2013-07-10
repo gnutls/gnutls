@@ -1371,7 +1371,7 @@ _gnutls_recv_handshake (gnutls_session_t session,
                         gnutls_handshake_description_t type,
                         unsigned int optional, gnutls_buffer_st* buf)
 {
-  int ret;
+  int ret, ret2;
   handshake_buffer_st hsk;
 
   ret =
@@ -1427,7 +1427,6 @@ _gnutls_recv_handshake (gnutls_session_t session,
           /* Signal our caller we have received a verification cookie
              and ClientHello needs to be sent again. */
           ret = 1;
-          goto cleanup;
         }
 	
       break;
@@ -1461,9 +1460,10 @@ _gnutls_recv_handshake (gnutls_session_t session,
       goto cleanup;
     }
 
-  ret = call_hook_func(session, hsk.htype, 1);
-  if (ret < 0)
+  ret2 = call_hook_func(session, hsk.htype, 1);
+  if (ret2 < 0)
     {
+      ret = ret2;
       gnutls_assert ();
       goto cleanup;
     }
