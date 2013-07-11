@@ -1143,17 +1143,15 @@ _gnutls_send_empty_handshake (gnutls_session_t session,
 
 inline
 static int call_hook_func(gnutls_session_t session, gnutls_handshake_description_t type,
-                          unsigned post, unsigned incoming)
+                          int post, unsigned incoming)
 {
-  if (session->internals.h_hook == NULL)
-    return 0;
-  else 
+  if (session->internals.h_hook != NULL)
     {
-      if (session->internals.h_type == type || session->internals.h_type == GNUTLS_HANDSHAKE_ANY)
+      if ((session->internals.h_type == type || session->internals.h_type == GNUTLS_HANDSHAKE_ANY) && 
+      	(session->internals.h_post == post || session->internals.h_post == GNUTLS_HOOK_BOTH))
         return session->internals.h_hook(session, type, post, incoming);
-
-      return 0;
     }
+  return 0;
 }
 
 /* This function sends a handshake message of type 'type' containing the
@@ -1222,7 +1220,7 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
         return ret;
       }
 
-  ret = call_hook_func(session, type, 0, 0);
+  ret = call_hook_func(session, type, GNUTLS_HOOK_PRE, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1264,7 +1262,7 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
       break;
     }
 
-  ret = call_hook_func(session, type, 1, 0);
+  ret = call_hook_func(session, type, GNUTLS_HOOK_POST, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1397,7 +1395,7 @@ _gnutls_recv_handshake (gnutls_session_t session,
 
   session->internals.last_handshake_in = hsk.htype;
 
-  ret = call_hook_func(session, hsk.htype, 0, 1);
+  ret = call_hook_func(session, hsk.htype, GNUTLS_HOOK_PRE, 1);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1475,7 +1473,7 @@ _gnutls_recv_handshake (gnutls_session_t session,
       goto cleanup;
     }
 
-  ret2 = call_hook_func(session, hsk.htype, 1, 1);
+  ret2 = call_hook_func(session, hsk.htype, GNUTLS_HOOK_POST, 1);
   if (ret2 < 0)
     {
       ret = ret2;

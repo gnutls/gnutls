@@ -1410,13 +1410,18 @@ gnutls_handshake_set_random (gnutls_session_t session, const gnutls_datum_t* ran
 
 /**
  * gnutls_handshake_set_hook_function:
- * @session: is a #gnutls_session_t structure.
- * @htype: the %gnutls_handshake_description_t of the message to hook at.
+ * @session: is a #gnutls_session_t structure
+ * @htype: the %gnutls_handshake_description_t of the message to hook at
+ * @post: %GNUTLS_HOOK_* depending on when the hook function should be called
  * @func: is the function to be called
  *
  * This function will set a callback to be called after or before the specified
  * handshake message has been received or generated. This is a
  * generalization of gnutls_handshake_set_post_client_hello_function().
+ *
+ * To call the hook function prior to the message being sent/generation use 
+ * %GNUTLS_HOOK_PRE as @post parameter, %GNUTLS_HOOK_POST to call
+ * after, and %GNUTLS_HOOK_BOTH for both cases.
  *
  * This callback must return 0 on success or a gnutls error code to
  * terminate the handshake.
@@ -1433,9 +1438,11 @@ gnutls_handshake_set_random (gnutls_session_t session, const gnutls_datum_t* ran
 void
 gnutls_handshake_set_hook_function (gnutls_session_t session,
                                     unsigned int htype,
+                                    int post,
 				    gnutls_handshake_hook_func func)
 {
   session->internals.h_hook = func;
   session->internals.h_type = htype;
+  session->internals.h_post = post;
 }
 

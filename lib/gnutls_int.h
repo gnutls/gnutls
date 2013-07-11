@@ -870,6 +870,7 @@ typedef struct
   /* handshake hook function */
   gnutls_handshake_hook_func h_hook;
   unsigned int h_type; /* the hooked type */
+  int h_post; /* whether post-generation/receive */
 
   /* holds the selected certificate and key.
    * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()

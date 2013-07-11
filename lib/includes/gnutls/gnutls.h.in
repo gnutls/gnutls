@@ -1187,10 +1187,14 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
    *
    * Returns: Non zero on error.
    */
+#define GNUTLS_HOOK_POST (1)
+#define GNUTLS_HOOK_PRE (0)
+#define GNUTLS_HOOK_BOTH (-1)
 
-  typedef int (*gnutls_handshake_hook_func) (gnutls_session_t, unsigned int htype, unsigned int post, unsigned int incoming);
+  typedef int (*gnutls_handshake_hook_func) (gnutls_session_t, unsigned int htype, unsigned post, unsigned int incoming);
   void gnutls_handshake_set_hook_function (gnutls_session_t session,
 				           unsigned int htype,
+				           int post,
 				           gnutls_handshake_hook_func func);
 
   typedef int (*gnutls_handshake_post_client_hello_func) (gnutls_session_t);

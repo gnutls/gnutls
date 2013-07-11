@@ -65,7 +65,7 @@ unsigned int msg_order[] = {
 	GNUTLS_HANDSHAKE_FINISHED,
 };
 
-static int handshake_callback (gnutls_session_t session, unsigned int htype, unsigned int incoming)
+static int handshake_callback (gnutls_session_t session, unsigned int htype, unsigned post, unsigned int incoming)
 {
 static unsigned idx = 0;
 
@@ -164,7 +164,7 @@ void doit(void)
   gnutls_certificate_set_verify_function (serverx509cred, server_callback);
   gnutls_certificate_server_set_request (server, GNUTLS_CERT_REQUEST);
   gnutls_handshake_set_post_client_hello_function (server, post_client_hello_callback);
-  gnutls_handshake_set_hook_function (server, GNUTLS_HANDSHAKE_ANY, handshake_callback);
+  gnutls_handshake_set_hook_function (server, GNUTLS_HANDSHAKE_ANY, GNUTLS_HOOK_POST, handshake_callback);
 
   /* Init client */
   gnutls_certificate_allocate_credentials (&clientx509cred);

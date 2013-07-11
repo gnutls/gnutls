@@ -13,7 +13,7 @@ in certain transport layers like SCTP).
 ** libgnutls: Fixes in SRTP extension generation when MKI is being
 used.
 
-** libgnutls: Added ability to set hooks after sending or receiving
+** libgnutls: Added ability to set hooks before or after sending or receiving
 any handshake message with gnutls_handshake_set_hook_function().
 
 ** API and ABI modifications:
