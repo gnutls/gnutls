@@ -1143,14 +1143,14 @@ _gnutls_send_empty_handshake (gnutls_session_t session,
 
 inline
 static int call_hook_func(gnutls_session_t session, gnutls_handshake_description_t type,
-                          unsigned incoming)
+                          unsigned post, unsigned incoming)
 {
   if (session->internals.h_hook == NULL)
     return 0;
   else 
     {
       if (session->internals.h_type == type || session->internals.h_type == GNUTLS_HANDSHAKE_ANY)
-        return session->internals.h_hook(session, type, incoming);
+        return session->internals.h_hook(session, type, post, incoming);
 
       return 0;
     }
@@ -1222,14 +1222,15 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
         return ret;
       }
 
-  session->internals.last_handshake_out = type;
-
-  ret = call_hook_func(session, type, 0);
+  ret = call_hook_func(session, type, 0, 0);
   if (ret < 0)
     {
       gnutls_assert ();
+      _mbuffer_xfree(&bufel);
       return ret;
     }
+
+  session->internals.last_handshake_out = type;
 
   ret = _gnutls_handshake_io_cache_int (session, type, bufel);
   if (ret < 0)
@@ -1261,6 +1262,13 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
       /* send cached messages */
       ret = _gnutls_handshake_io_write_flush (session);
       break;
+    }
+
+  ret = call_hook_func(session, type, 1, 0);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
   return ret;
@@ -1389,6 +1397,13 @@ _gnutls_recv_handshake (gnutls_session_t session,
 
   session->internals.last_handshake_in = hsk.htype;
 
+  ret = call_hook_func(session, hsk.htype, 0, 1);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
   ret = _gnutls_handshake_hash_add_recvd (session, hsk.htype,
                                               hsk.header, hsk.header_size,
                                               hsk.data.data, hsk.data.length);
@@ -1460,7 +1475,7 @@ _gnutls_recv_handshake (gnutls_session_t session,
       goto cleanup;
     }
 
-  ret2 = call_hook_func(session, hsk.htype, 1);
+  ret2 = call_hook_func(session, hsk.htype, 1, 1);
   if (ret2 < 0)
     {
       ret = ret2;
