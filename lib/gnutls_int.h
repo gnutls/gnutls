@@ -824,7 +824,7 @@ typedef struct
                                          * function.
                                          */
 
-  int expire_time;              /* after expire_time seconds this session will expire */
+  unsigned expire_time;              /* after expire_time seconds this session will expire */
   struct mod_auth_st_int *auth_struct;  /* used in handshake packets and KX algorithms */
 
   /* this is the highest version available
@@ -839,7 +839,7 @@ typedef struct
    * will be sent to the client. - only if the ciphersuite
    * supports it.
    */
-  int send_cert_req;
+  unsigned send_cert_req:1;
 
   size_t max_handshake_data_buffer_size;
 
@@ -870,16 +870,16 @@ typedef struct
   /* handshake hook function */
   gnutls_handshake_hook_func h_hook;
   unsigned int h_type; /* the hooked type */
-  int h_post; /* whether post-generation/receive */
+  sint16_t h_post; /* whether post-generation/receive */
 
   /* holds the selected certificate and key.
    * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
    * to change them.
    */
   gnutls_pcert_st *selected_cert_list;
-  int selected_cert_list_length;
+  sint16_t selected_cert_list_length;
   struct gnutls_privkey_st *selected_key;
-  int selected_need_free:1;
+  unsigned selected_need_free:1;
 
   /* holds the extensions we sent to the peer
    * (in case of a client)
@@ -890,7 +890,7 @@ typedef struct
   /* is 0 if we are to send the whole PGP key, or non zero
    * if the fingerprint is to be sent.
    */
-  int pgp_fingerprint;
+  unsigned pgp_fingerprint:1;
 
   /* This holds the default version that our first
    * record packet will have. */
@@ -898,7 +898,7 @@ typedef struct
 
   void *user_ptr;
 
-  int enable_private;           /* non zero to
+  unsigned enable_private:1;           /* non zero to
                                  * enable cipher suites
                                  * which have 0xFF status.
                                  */
@@ -906,7 +906,7 @@ typedef struct
   /* Holds 0 if the last called function was interrupted while
    * receiving, and non zero otherwise.
    */
-  int direction;
+  unsigned direction:1;
 
   /* This callback will be used (if set) to receive an
    * openpgp key. (if the peer sends a fingerprint)
@@ -916,7 +916,7 @@ typedef struct
   /* If non zero the server will not advertise the CA's he
    * trusts (do not send an RDN sequence).
    */
-  int ignore_rdn_sequence;
+  unsigned ignore_rdn_sequence:1;
 
   /* This is used to set an arbitary version in the RSA
    * PMS secret. Can be used by clients to test whether the
@@ -958,14 +958,14 @@ typedef struct
   {
     uint16_t type;
     extension_priv_data_t priv;
-    int set:1;
+    unsigned set:1;
   } extension_int_data[MAX_EXT_TYPES];
 
   struct
   {
     uint16_t type;
     extension_priv_data_t priv;
-    int set:1;
+    unsigned set:1;
   } resumed_extension_int_data[MAX_EXT_TYPES];
   /* The type of transport protocol; stream or datagram */
   transport_t transport;
@@ -992,7 +992,7 @@ typedef struct
   unsigned int hb_retrans_timeout_ms; /* the default timeout, in milliseconds*/
   unsigned int hb_total_timeout_ms; /* the total timeout, in milliseconds*/
   
-  unsigned int ocsp_check_ok; /* will be zero if the OCSP response TLS extension
+  unsigned int ocsp_check_ok:1; /* will be zero if the OCSP response TLS extension
                                * check failed (OCSP was old/unrelated or so). */
 
   heartbeat_state_t hb_state; /* for ping */
