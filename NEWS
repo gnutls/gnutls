@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.13 (unreleased)
+* Version 3.1.13 (released 2013-07-12)
 
 ** libgnutls: Ensure that gnutls_dtls_set_mtu() cannot exceed the
 maximum allowed DTLS size.
