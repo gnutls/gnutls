@@ -10,6 +10,9 @@ maximum allowed DTLS size.
 ** libgnutls: Fixes in SRTP extension generation when MKI is being
 used.
 
+** libgnutls: Fixes in discovery of trusted objects (CA certificates)
+PKCS #11 in tokens. Patch by Stef Walter.
+
 ** API and ABI modifications:
 No changes since last version.
 
