@@ -73,10 +73,11 @@ gnutls_global_set_log_function (gnutls_log_func log_func)
  * gnutls_global_set_audit_log_function:
  * @log_func: it is the audit log function
  *
- * This is the function where you set the logging function gnutls is
- * going to use.  This is different from gnutls_global_set_log_function()
- * because it will report the session of the event if any. Note that
- * that session might be null if there is no corresponding TLS session.
+ * This is the function to set the audit logging function. This
+ * is a function to report important issues, such as possible
+ * attacks in the protocol. This is different from gnutls_global_set_log_function()
+ * because it will report also session-specific events. The session
+ * parameter will be null if there is no corresponding TLS session.
  *
  * @gnutls_audit_log_func is of the form,
  * void (*gnutls_audit_log_func)( gnutls_session_t, const char*);
