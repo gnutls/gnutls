@@ -865,6 +865,20 @@ print_list (const char *priorities, int verbose)
     }
 
     {
+        const gnutls_digest_algorithm_t *p = gnutls_digest_list ();
+
+        printf ("Digests: ");
+        for (; *p; p++)
+          {
+              printf ("%s", gnutls_digest_get_name (*p));
+              if (*(p + 1))
+                  printf (", ");
+              else
+                  printf ("\n");
+          }
+    }
+
+    {
         const gnutls_kx_algorithm_t *p = gnutls_kx_list ();
 
         printf ("Key exchange algorithms: ");
