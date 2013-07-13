@@ -1163,7 +1163,7 @@ int
 _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
                         gnutls_handshake_description_t type)
 {
-  int ret;
+  int ret, ret2;
   uint8_t *data;
   uint32_t datasize, i_datasize;
   int pos = 0;
@@ -1262,11 +1262,11 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
       break;
     }
 
-  ret = call_hook_func(session, type, GNUTLS_HOOK_POST, 0);
-  if (ret < 0)
+  ret2 = call_hook_func(session, type, GNUTLS_HOOK_POST, 0);
+  if (ret2 < 0)
     {
       gnutls_assert ();
-      return ret;
+      return ret2;
     }
 
   return ret;
