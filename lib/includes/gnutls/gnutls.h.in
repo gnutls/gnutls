@@ -1179,7 +1179,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
    * gnutls_handshake_hook_func:
    * @session: the current session
    * @htype: the type of the handshake message (%gnutls_handshake_description_t)
-   * @post: non zero if this is an post-process/generation call and zero otherwise
+   * @post: non zero if this is a post-process/generation call and zero otherwise
    * @incoming: non zero if this is an incoming message and zero if this is an outgoing message
    *
    * Function prototype for handshake hooks. It is set using
