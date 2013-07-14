@@ -1,4 +1,4 @@
-GNUTLS_VERSION:=3.2.1
+GNUTLS_VERSION:=3.2.2
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -99,7 +99,7 @@ $(NETTLE_DIR)/.configured: $(GMP_DIR)/.installed
 
 #nettle messes up installation
 $(NETTLE_DIR)/.installed: $(NETTLE_DIR)/.configured
-	make -C $(NETTLE_DIR) -j2
+	make -C $(NETTLE_DIR) -j2 -i
 	make -C $(NETTLE_DIR) install -i
 	rm -f $(LIB_DIR)/libnettle.a $(LIB_DIR)/libhogweed.a $(BIN_DIR)/nettle-hash.exe $(BIN_DIR)/nettle-lfib-stream.exe $(BIN_DIR)/pkcs1-conv.exe $(BIN_DIR)/sexp-conv.exe
 	cp $(NETTLE_DIR)/libnettle.dll.a $(NETTLE_DIR)/libhogweed.dll.a $(LIB_DIR)/
@@ -114,8 +114,8 @@ $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	touch $@
 
 $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
-	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.1/$(GNUTLS_FILE)
-	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.1/$(GNUTLS_FILE).sig
+	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/$(GNUTLS_FILE)
+	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/$(GNUTLS_FILE).sig
 	gpg --verify $(GNUTLS_FILE).sig
 	test -d $(GNUTLS_DIR) || tar -xf $(GNUTLS_FILE)
 	cd $(GNUTLS_DIR) && \
