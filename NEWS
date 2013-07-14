@@ -1,8 +1,9 @@
 GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
+Copyright (C) 2013 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.2.2 (unreleased)
+* Version 3.2.2 (released 2013-07-14)
 
 ** libgnutls: Several optimizations in the related to packet processing
 subsystems.
