@@ -989,6 +989,7 @@ changequote([, ])dnl
   gl_LOCALENAME
   AC_CHECK_FUNCS_ONCE([newlocale])
   gl_LOCK
+  gl_MODULE_INDICATOR([lock])
   gl_FUNC_LSTAT
   if test $REPLACE_LSTAT = 1; then
     AC_LIBOBJ([lstat])
