@@ -119,7 +119,7 @@ gnutls_record_can_use_length_hiding (gnutls_session_t session)
   if (session->security_parameters.new_record_padding != 0)
     return 1;
 
-  if (session->security_parameters.version == GNUTLS_SSL3)
+  if (get_num_version(session) == GNUTLS_SSL3)
     return 0;
 
   ret = _gnutls_epoch_get (session, EPOCH_WRITE_CURRENT, &record_params);

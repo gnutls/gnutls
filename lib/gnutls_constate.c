@@ -92,7 +92,7 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
   memcpy (&rrnd[GNUTLS_RANDOM_SIZE],
           session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
 
-  if (session->security_parameters.version == GNUTLS_SSL3)
+  if (get_num_version(session) == GNUTLS_SSL3)
     {                           /* SSL 3 */
       ret =
         _gnutls_ssl3_generate_random
@@ -382,7 +382,7 @@ _gnutls_set_resumed_parameters (gnutls_session_t session)
   security_parameters_st *dst = &session->security_parameters;
 
   CPY_COMMON;
-  _gnutls_set_current_version(session, src->version);
+  dst->pversion = src->pversion;
 }
 
 /* Sets the current connection session to conform with the

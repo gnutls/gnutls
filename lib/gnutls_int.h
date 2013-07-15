@@ -569,7 +569,6 @@ typedef struct
   /* holds the negotiated certificate type */
   gnutls_certificate_type_t cert_type;
   gnutls_ecc_curve_t ecc_curve; /* holds the first supported ECC curve requested by client */
-  gnutls_protocol_t version;    /* moved here */
 
   /* Holds the signature algorithm used in this session - If any */
   gnutls_sign_algorithm_t server_sign_algo;
@@ -1043,11 +1042,16 @@ get_version (gnutls_session_t session)
   return session->security_parameters.pversion;
 }
 
-#define get_num_version(session) \
-	session->security_parameters.version
+inline static unsigned
+get_num_version (gnutls_session_t session)
+{
+  if (likely(session->security_parameters.pversion != NULL))
+    return session->security_parameters.pversion->id;
+  else
+    return GNUTLS_VERSION_UNKNOWN;
+}
 
 #define _gnutls_set_current_version(s, v) { \
-  s->security_parameters.version = v; \
   s->security_parameters.pversion = version_to_entry(v); \
   }
 

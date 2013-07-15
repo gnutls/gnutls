@@ -152,9 +152,10 @@ resume_copy_required_values (gnutls_session_t session)
   session->security_parameters.entity =
     session->internals.resumed_security_parameters.entity;
 
-  _gnutls_set_current_version (session,
-                               session->internals.resumed_security_parameters.
-                               version);
+  if (session->internals.resumed_security_parameters.pversion != NULL)
+    _gnutls_set_current_version (session,
+                                 session->internals.resumed_security_parameters.
+                                 pversion->id);
 
   session->security_parameters.cert_type =
     session->internals.resumed_security_parameters.cert_type;
@@ -1940,7 +1941,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       else
         {
           /* we are resuming a session */
-          hver = version_to_entry(session->internals.resumed_security_parameters.version);
+          hver = session->internals.resumed_security_parameters.pversion;
         }
 
       if (hver == NULL)

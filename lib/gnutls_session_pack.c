@@ -772,7 +772,7 @@ pack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
                  session->security_parameters.cipher_suite, 2);
   BUFFER_APPEND_NUM (ps, session->security_parameters.compression_method);
   BUFFER_APPEND_NUM (ps, session->security_parameters.cert_type);
-  BUFFER_APPEND_NUM (ps, session->security_parameters.version);
+  BUFFER_APPEND_NUM (ps, session->security_parameters.pversion->id);
 
   BUFFER_APPEND (ps, session->security_parameters.master_secret,
                  GNUTLS_MASTER_SIZE);
@@ -803,6 +803,7 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
 {
   size_t pack_size;
   int ret;
+  unsigned version;
   time_t timestamp;
   
   BUFFER_POP_NUM (ps, pack_size);
@@ -825,7 +826,10 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
               resumed_security_parameters.cipher_suite, 2);
   BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.compression_method);
   BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.cert_type);
-  BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.version);
+  BUFFER_POP_NUM (ps, version);
+  session->internals.resumed_security_parameters.pversion = version_to_entry(version);
+  if (session->internals.resumed_security_parameters.pversion == NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   BUFFER_POP (ps,
               session->internals.resumed_security_parameters.master_secret,
@@ -923,7 +927,10 @@ gnutls_session_set_premaster (gnutls_session_t session, unsigned int entity,
 
   session->internals.resumed_security_parameters.compression_method = comp;
   session->internals.resumed_security_parameters.cert_type = DEFAULT_CERT_TYPE;
-  session->internals.resumed_security_parameters.version = version;
+  session->internals.resumed_security_parameters.pversion = version_to_entry(version);
+  
+  if (session->internals.resumed_security_parameters.pversion == NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   if (master->size != GNUTLS_MASTER_SIZE)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
