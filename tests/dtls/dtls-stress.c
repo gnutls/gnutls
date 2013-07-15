@@ -729,7 +729,7 @@ static int run_test(void)
 	int pid1, pid2;
 	int status2;
 
-	if (socketpair(AF_LOCAL, SOCK_DGRAM, 0, fds) < 0) {
+	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, fds) < 0) {
 		rperror("socketpair");
 		exit(2);
 	}

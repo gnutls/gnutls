@@ -253,7 +253,7 @@ static void start (int server_packet, int client_packet)
     fprintf(stderr, "\nWill discard %s packet %d\n", 
       (client_packet!=-1)?"client":"server", (client_packet!=-1)?client_packet:server_packet);
   
-  ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
+  ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
   if (ret < 0)
     {
       perror("socketpair");
