@@ -296,7 +296,7 @@ global_start (void)
   /* Socket operations
    */
   listen_sd = socket (AF_INET, SOCK_STREAM, 0);
-  if (err == -1)
+  if (listen_sd == -1)
     {
       perror ("socket");
       fail ("server: socket failed\n");
