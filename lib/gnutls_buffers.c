@@ -355,6 +355,9 @@ finish:
   _gnutls_read_log ("READ: read %d bytes from %p\n",
                         (int) (size - left), fd);
 
+  if (size - left == 0)
+    _mbuffer_xfree(bufel);
+
   return (size - left);
   
 cleanup:
