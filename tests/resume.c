@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Adam Sampson <ats@offog.org>
  *
  * Author: Simon Josefsson
  *
@@ -33,13 +34,9 @@
 #include <sys/socket.h>
 #if !defined(_WIN32)
 #include <sys/wait.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-
-#include "tcp.c"
 
 #include "utils.h"
 
@@ -73,6 +70,7 @@ struct params_res resume_tests[] = {
 /* A very basic TLS client, with anonymous authentication.
  */
 
+#define SESSIONS 2
 #define MAX_BUF 5*1024
 #define MSG "Hello TLS"
 
@@ -83,9 +81,9 @@ tls_log_func (int level, const char *str)
 }
 
 static void
-client (struct params_res *params)
+client (int sds[], struct params_res *params)
 {
-  int ret, sd, ii;
+  int ret, ii;
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   gnutls_anon_client_credentials_t anoncred;
@@ -105,11 +103,9 @@ client (struct params_res *params)
 
   gnutls_anon_allocate_client_credentials (&anoncred);
 
-  for (t = 0; t < 2; t++)
-    {                           /* connect 2 times to the server */
-      /* connect to the peer
-       */
-      sd = tcp_connect ();
+  for (t = 0; t < SESSIONS; t++)
+    {
+      int sd = sds[t];
 
       /* Initialize TLS session
        */
@@ -214,8 +210,7 @@ client (struct params_res *params)
 
       gnutls_bye (session, GNUTLS_SHUT_RDWR);
 
-
-      tcp_close (sd);
+      close (sd);
 
       gnutls_deinit (session);
     }
@@ -227,8 +222,6 @@ end:
 /* This is a sample TLS 1.0 echo server, for anonymous authentication only.
  */
 
-#define SA struct sockaddr
-#define PORT 5556               /* listen to 5556 port */
 #define DH_BITS 1024
 
 /* These are global */
@@ -280,56 +273,11 @@ generate_dh_params (void)
   return gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
 }
 
-int err, listen_sd, i;
-int sd, ret;
-struct sockaddr_in sa_serv;
-struct sockaddr_in sa_cli;
-socklen_t client_len;
+int err, ret;
 char topbuf[512];
 gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
-
-static void
-global_start (void)
-{
-  /* Socket operations
-   */
-  listen_sd = socket (AF_INET, SOCK_STREAM, 0);
-  if (listen_sd == -1)
-    {
-      perror ("socket");
-      fail ("server: socket failed\n");
-      return;
-    }
-
-  memset (&sa_serv, '\0', sizeof (sa_serv));
-  sa_serv.sin_family = AF_INET;
-  sa_serv.sin_addr.s_addr = INADDR_ANY;
-  sa_serv.sin_port = htons (PORT);      /* Server Port number */
-
-  setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
-              sizeof (int));
-
-  err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
-  if (err == -1)
-    {
-      perror ("bind");
-      fail ("server: bind failed\n");
-      return;
-    }
-
-  err = listen (listen_sd, 1024);
-  if (err == -1)
-    {
-      perror ("listen");
-      fail ("server: listen failed\n");
-      return;
-    }
-
-  if (debug)
-    success ("server: ready. Listening to port '%d'.\n", PORT);
-}
 
 static void
 global_stop (void)
@@ -342,12 +290,10 @@ global_stop (void)
   gnutls_dh_params_deinit (dh_params);
 
   gnutls_global_deinit ();
-
-  shutdown (listen_sd, SHUT_RDWR);
 }
 
 static void
-server (struct params_res *params)
+server (int sds[], struct params_res *params)
 {
   size_t t;
 
@@ -377,18 +323,11 @@ server (struct params_res *params)
   if (params->enable_session_ticket_server)
     gnutls_session_ticket_key_generate (&session_ticket_key);
 
-  for (t = 0; t < 2; t++)
+  for (t = 0; t < SESSIONS; t++)
     {
-      client_len = sizeof (sa_cli);
+      int sd = sds[t];
 
       session = initialize_tls_session (params);
-
-      sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
-
-      if (debug)
-        success ("server: connection from %s, port %d\n",
-                 inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
-                            sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
       gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
       ret = gnutls_handshake (session);
@@ -406,7 +345,6 @@ server (struct params_res *params)
       /* see the Getting peer's information example */
       /* print_info(session); */
 
-      i = 0;
       for (;;)
         {
           memset (buffer, 0, MAX_BUF + 1);
@@ -439,8 +377,6 @@ server (struct params_res *params)
       gnutls_deinit (session);
     }
 
-  close (listen_sd);
-
   if (params->enable_db)
     {
       wrap_db_deinit ();
@@ -460,11 +396,26 @@ doit (void)
 
   for (i = 0; resume_tests[i].desc; i++)
     {
+      int client_sds[SESSIONS], server_sds[SESSIONS];
+      int j;
+
       printf ("%s\n", resume_tests[i].desc);
 
-      global_start ();
-      if (error_count)
-        return;
+      for (j = 0; j < SESSIONS; j++)
+        {
+          int sockets[2];
+
+          err = socketpair (AF_UNIX, SOCK_STREAM, 0, sockets);
+          if (err == -1)
+            {
+              perror ("socketpair");
+              fail ("socketpair failed\n");
+              return;
+            }
+
+          server_sds[j] = sockets[0];
+          client_sds[j] = sockets[1];
+        }
 
       child = fork ();
       if (child < 0)
@@ -478,7 +429,7 @@ doit (void)
         {
           int status;
           /* parent */
-          server (&resume_tests[i]);
+          server (server_sds, &resume_tests[i]);
           wait (&status);
           if (WEXITSTATUS(status) > 0)
             error_count++;
@@ -486,7 +437,7 @@ doit (void)
         }
       else
         {
-          client (&resume_tests[i]);
+          client (client_sds, &resume_tests[i]);
           gnutls_global_deinit ();
           if (error_count)
             exit(1);

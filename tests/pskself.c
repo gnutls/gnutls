@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Adam Sampson <ats@offog.org>
  *
  * Author: Simon Josefsson
  *
@@ -33,13 +34,9 @@
 #include <sys/socket.h>
 #if !defined(_WIN32)
 #include <sys/wait.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-
-#include "tcp.c"
 
 #include "utils.h"
 
@@ -58,9 +55,9 @@ tls_log_func (int level, const char *str)
 #define MSG "Hello TLS"
 
 static void
-client (void)
+client (int sd)
 {
-  int ret, sd, ii;
+  int ret, ii;
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   gnutls_psk_client_credentials_t pskcred;
@@ -88,10 +85,6 @@ client (void)
   /* put the anonymous credentials to the current session
    */
   gnutls_credentials_set (session, GNUTLS_CRD_PSK, pskcred);
-
-  /* connect to the peer
-   */
-  sd = tcp_connect ();
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
 
@@ -140,7 +133,7 @@ client (void)
 
 end:
 
-  tcp_close (sd);
+  close (sd);
 
   gnutls_deinit (session);
 
@@ -152,9 +145,7 @@ end:
 /* This is a sample TLS 1.0 echo server, for PSK authentication.
  */
 
-#define SA struct sockaddr
 #define MAX_BUF 1024
-#define PORT 5556               /* listen to 5556 port */
 
 /* These are global */
 gnutls_psk_server_credentials_t server_pskcred;
@@ -190,62 +181,14 @@ pskfunc (gnutls_session_t session, const char *username, gnutls_datum_t * key)
   return 0;
 }
 
-int err, listen_sd, i;
-int sd, ret;
-struct sockaddr_in sa_serv;
-struct sockaddr_in sa_cli;
-socklen_t client_len;
+int err, ret;
 char topbuf[512];
 gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
 static void
-server_start (void)
-{
-  if (debug)
-    success ("Launched...\n");
-
-  /* Socket operations
-   */
-  listen_sd = socket (AF_INET, SOCK_STREAM, 0);
-  if (listen_sd == -1)
-    {
-      perror ("socket");
-      fail ("server: socket failed\n");
-      return;
-    }
-
-  memset (&sa_serv, '\0', sizeof (sa_serv));
-  sa_serv.sin_family = AF_INET;
-  sa_serv.sin_addr.s_addr = INADDR_ANY;
-  sa_serv.sin_port = htons (PORT);      /* Server Port number */
-
-  setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
-              sizeof (int));
-
-  err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
-  if (err == -1)
-    {
-      perror ("bind");
-      fail ("server: bind failed\n");
-      return;
-    }
-
-  err = listen (listen_sd, 1024);
-  if (err == -1)
-    {
-      perror ("listen");
-      fail ("server: listen failed\n");
-      return;
-    }
-
-  if (debug)
-    success ("server: ready. Listening to port '%d'.\n", PORT);
-}
-
-static void
-server (void)
+server (int sd)
 {
   /* this must be called once in the program
    */
@@ -259,16 +202,7 @@ server (void)
   gnutls_psk_allocate_server_credentials (&server_pskcred);
   gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
 
-  client_len = sizeof (sa_cli);
-
   session = initialize_tls_session ();
-
-  sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
-
-  if (debug)
-    success ("server: connection from %s, port %d\n",
-             inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
-                        sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
   ret = gnutls_handshake (session);
@@ -285,7 +219,6 @@ server (void)
   /* see the Getting peer's information example */
   /* print_info(session); */
 
-  i = 0;
   for (;;)
     {
       memset (buffer, 0, MAX_BUF + 1);
@@ -316,8 +249,6 @@ server (void)
   close (sd);
   gnutls_deinit (session);
 
-  close (listen_sd);
-
   gnutls_psk_free_server_credentials (server_pskcred);
 
   gnutls_global_deinit ();
@@ -330,10 +261,15 @@ void
 doit (void)
 {
   pid_t child;
+  int sockets[2];
 
-  server_start ();
-  if (error_count)
-    return;
+  err = socketpair (AF_UNIX, SOCK_STREAM, 0, sockets);
+  if (err == -1)
+    {
+      perror ("socketpair");
+      fail ("socketpair failed\n");
+      return;
+    }
 
   child = fork ();
   if (child < 0)
@@ -347,9 +283,9 @@ doit (void)
     {
       int status;
       /* parent */
-      server ();
+      server (sockets[0]);
       wait (&status);
     }
   else
-    client ();
+    client (sockets[1]);
 }

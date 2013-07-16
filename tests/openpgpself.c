@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Adam Sampson <ats@offog.org>
  *
  * Author: Simon Josefsson
  *
@@ -32,9 +33,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #if !defined(_WIN32)
-#include <netinet/in.h>
 #include <sys/wait.h>
-#include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
@@ -44,7 +43,6 @@
 
 #include "ex-session-info.c"
 #include "ex-x509-info.c"
-#include "tcp.c"
 
 pid_t child;
 
@@ -57,6 +55,7 @@ tls_log_func (int level, const char *str)
 /* A very basic TLS client, with anonymous authentication.
  */
 
+#define SESSIONS 2
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
@@ -132,9 +131,9 @@ const gnutls_datum_t key = { key_txt, sizeof (key_txt) };
 
 
 static void
-client (void)
+client (int sds[])
 {
-  int ret, sd, ii, j;
+  int ret, ii, j;
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   gnutls_certificate_credentials_t xcred;
@@ -160,9 +159,9 @@ client (void)
       return;
     }
 
-  for (j = 0; j < 2; j++)
+  for (j = 0; j < SESSIONS; j++)
     {
-
+      int sd = sds[j];
 
       /* Initialize TLS session
        */
@@ -174,12 +173,6 @@ client (void)
       /* put the x509 credentials to the current session
        */
       gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
-
-      /* connect to the peer
-       */
-      if (debug)
-        success ("Connecting...\n");
-      sd = tcp_connect ();
 
       gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
 
@@ -234,8 +227,7 @@ client (void)
 
       gnutls_bye (session, GNUTLS_SHUT_RDWR);
 
-
-      tcp_close (sd);
+      close (sd);
 
       gnutls_deinit (session);
 
@@ -251,9 +243,7 @@ end:
 /* This is a sample TLS 1.0 echo server, using X.509 authentication.
  */
 
-#define SA struct sockaddr
 #define MAX_BUF 1024
-#define PORT 5556               /* listen to 5556 port */
 #define DH_BITS 1024
 
 /* These are global */
@@ -297,11 +287,7 @@ generate_dh_params (void)
   return gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
 }
 
-int err, listen_sd, i;
-int sd, ret;
-struct sockaddr_in sa_serv;
-struct sockaddr_in sa_cli;
-socklen_t client_len;
+int err, ret;
 char topbuf[512];
 gnutls_session_t session;
 char buffer[MAX_BUF + 1];
@@ -488,48 +474,7 @@ const gnutls_datum_t key2048 = { key2048_txt, sizeof (key2048_txt) };
 
 
 static void
-server_start (void)
-{
-  /* Socket operations
-   */
-  listen_sd = socket (AF_INET, SOCK_STREAM, 0);
-  if (listen_sd == -1)
-    {
-      perror ("socket");
-      fail ("server: socket failed\n");
-      return;
-    }
-
-  memset (&sa_serv, '\0', sizeof (sa_serv));
-  sa_serv.sin_family = AF_INET;
-  sa_serv.sin_addr.s_addr = INADDR_ANY;
-  sa_serv.sin_port = htons (PORT);      /* Server Port number */
-
-  setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
-              sizeof (int));
-
-  err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
-  if (err == -1)
-    {
-      perror ("bind");
-      fail ("server: bind failed\n");
-      return;
-    }
-
-  err = listen (listen_sd, 1024);
-  if (err == -1)
-    {
-      perror ("listen");
-      fail ("server: listen failed\n");
-      return;
-    }
-
-  if (debug)
-    success ("server: ready. Listening to port '%d'.\n", PORT);
-}
-
-static void
-server (void)
+server (int sds[])
 {
   int j;
   /* this must be called once in the program
@@ -545,25 +490,25 @@ server (void)
 
   generate_dh_params ();
 
-  client_len = sizeof (sa_cli);
-
-  for (j = 0; j < 2; j++)
+  for (j = 0; j < SESSIONS; j++)
     {
-     if (j==0)
-       {
-         gnutls_certificate_allocate_credentials (&pgp_cred);
-         ret = gnutls_certificate_set_openpgp_key_mem2 (pgp_cred, &server_crt,
-                                                 &server_key, "auto",
-                                                 GNUTLS_OPENPGP_FMT_BASE64);
-      }
-     else
-       {
-         gnutls_certificate_free_credentials (pgp_cred);
-         gnutls_certificate_allocate_credentials (&pgp_cred);
-         ret =
-           gnutls_certificate_set_openpgp_key_mem2 (pgp_cred, &cert2048, &key2048,
-             "auto", GNUTLS_OPENPGP_FMT_BASE64);
-       }
+      int sd = sds[j];
+
+      if (j == 0)
+        {
+          gnutls_certificate_allocate_credentials (&pgp_cred);
+          ret = gnutls_certificate_set_openpgp_key_mem2 (pgp_cred, &server_crt,
+                                                         &server_key, "auto",
+                                                         GNUTLS_OPENPGP_FMT_BASE64);
+        }
+      else
+        {
+          gnutls_certificate_free_credentials (pgp_cred);
+          gnutls_certificate_allocate_credentials (&pgp_cred);
+          ret =
+            gnutls_certificate_set_openpgp_key_mem2 (pgp_cred, &cert2048, &key2048,
+              "auto", GNUTLS_OPENPGP_FMT_BASE64);
+        }
 
       if (ret < 0)
         {
@@ -574,13 +519,6 @@ server (void)
       gnutls_certificate_set_dh_params (pgp_cred, dh_params);
 
       session = initialize_tls_session ();
-
-      sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
-
-      if (debug)
-        success ("server: connection from %s, port %d\n",
-                 inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
-                            sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
       gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
       ret = gnutls_handshake (session);
@@ -604,7 +542,6 @@ server (void)
       if (debug)
         print_info (session);
 
-      i = 0;
       for (;;)
         {
           memset (buffer, 0, MAX_BUF + 1);
@@ -637,8 +574,6 @@ server (void)
     }
 
 end:
-  close (listen_sd);
-
   gnutls_certificate_free_credentials (pgp_cred);
 
   gnutls_dh_params_deinit (dh_params);
@@ -649,13 +584,27 @@ end:
     success ("server: finished\n");
 }
 
-
 void
 doit (void)
 {
-  server_start ();
-  if (error_count)
-    return;
+  int client_sds[SESSIONS], server_sds[SESSIONS];
+  int i;
+
+  for (i = 0; i < SESSIONS; i++)
+    {
+      int sockets[2];
+
+      err = socketpair (AF_UNIX, SOCK_STREAM, 0, sockets);
+      if (err == -1)
+        {
+          perror ("socketpair");
+          fail ("socketpair failed\n");
+          return;
+        }
+
+      server_sds[i] = sockets[0];
+      client_sds[i] = sockets[1];
+    }
 
   child = fork ();
   if (child < 0)
@@ -669,9 +618,9 @@ doit (void)
     {
       int status;
       /* parent */
-      server ();
+      server (server_sds);
       wait (&status);
     }
   else
-    client ();
+    client (client_sds);
 }
