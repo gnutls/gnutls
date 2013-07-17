@@ -29,6 +29,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(_WIN32)
+
+/* socketpair isn't supported on Win32. */
+int
+main (int argc, char** argv)
+{
+    exit (77);
+}
+
+#else
+
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -624,3 +636,5 @@ doit (void)
   else
     client (client_sds);
 }
+
+#endif /* _WIN32 */

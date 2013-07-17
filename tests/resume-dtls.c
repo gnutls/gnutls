@@ -29,6 +29,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(_WIN32)
+
+int
+main (int argc, char** argv)
+{
+    exit (77);
+}
+
+#else
+
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -37,15 +48,6 @@
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-
-#if defined(_WIN32)
-
-int main()
-{
-  exit(77);
-}
-
-#else
 
 #include "utils.h"
 
@@ -626,4 +628,4 @@ wrap_db_delete (void *dbf, gnutls_datum_t key)
 
 }
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
