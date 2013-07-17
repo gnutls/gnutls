@@ -565,6 +565,7 @@ prio_remove (priority_st * priority_list, unsigned int algo)
           priority_list->algorithms--;
           if ((priority_list->algorithms-i) > 0)
             memmove(&priority_list->priority[i], &priority_list->priority[i+1], (priority_list->algorithms-i)*sizeof(priority_list->priority[0]));
+          priority_list->priority[priority_list->algorithms] = 0;
           break;
         }
     }
@@ -575,19 +576,19 @@ prio_remove (priority_st * priority_list, unsigned int algo)
 static void
 prio_add (priority_st * priority_list, unsigned int algo)
 {
-  register int i = 0;
-  while (priority_list->priority[i] != 0)
+  unsigned int i, l = priority_list->algorithms;
+
+  if (l >= MAX_ALGOS)
+    return;                     /* can't add it anyway */
+
+  for (i = 0; i < l; ++i)
     {
       if (algo == priority_list->priority[i])
         return;                 /* if it exists */
-      i++;
     }
 
-  if (i < MAX_ALGOS)
-    {
-      priority_list->priority[i] = algo;
-      priority_list->algorithms++;
-    }
+  priority_list->priority[l] = algo;
+  priority_list->algorithms++;
 
   return;
 }
