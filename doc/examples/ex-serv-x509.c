@@ -20,7 +20,16 @@
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define CRLFILE "crl.pem"
 
-/* This is a sample TLS 1.0 echo server, using X.509 authentication.
+/* The OCSP status file contains up to date information about revocation
+ * of the server's certificate. That can be periodically be updated
+ * using:
+ * $ ocsptool --ask --load-cert your_cert.pem --load-issuer your_issuer.pem
+ *            --load-signer your_issuer.pem --outfile ocsp-status.der
+ */
+#define OCSP_STATUS_FILE "ocsp-status.der"
+
+/* This is a sample TLS 1.0 echo server, using X.509 authentication and
+ * OCSP stapling support.
  */
 
 #define MAX_BUF 1024
@@ -79,6 +88,9 @@ main (void)
       printf("No certificate or key were found\n");
       exit(1);
     }
+
+  /* loads an OCSP status request if available */
+  gnutls_certificate_set_ocsp_status_request_file(x509_cred, OCSP_STATUS_FILE, 0);
 
   generate_dh_params ();
 
