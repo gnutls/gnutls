@@ -1381,6 +1381,10 @@ gnutls_certificate_set_trust_list (gnutls_certificate_credentials_t res,
  * entity certificate, e.g., also an intermediate CA cert, then the
  * @certfile must contain the ordered certificate chain.
  *
+ * Note that the names in the certificate provided will be considered
+ * when selecting the appropriate certificate to use (in case of multiple
+ * certificate/key pairs).
+ *
  * This function can also accept URLs at @keyfile and @certfile. In that case it
  * will import the private key and certificate indicated by the URLs. Note
  * that the supported URLs are the ones indicated by gnutls_url_is_supported().
@@ -1412,6 +1416,10 @@ gnutls_certificate_set_x509_key_file (gnutls_certificate_credentials_t res,
  * the server.  For clients that need to send more than its own end
  * entity certificate, e.g., also an intermediate CA cert, then the
  * @certfile must contain the ordered certificate chain.
+ *
+ * Note that the names in the certificate provided will be considered
+ * when selecting the appropriate certificate to use (in case of multiple
+ * certificate/key pairs).
  *
  * This function can also accept URLs at @keyfile and @certfile. In that case it
  * will import the private key and certificate indicated by the URLs. Note
