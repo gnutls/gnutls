@@ -42,6 +42,7 @@
 #include <gnutls_x509.h>
 #include <random.h>
 #include <gnutls_mpi.h>
+#include <auth_rsa.h>
 
 int _gnutls_gen_rsa_client_kx (gnutls_session_t, opaque **);
 int _gnutls_proc_rsa_client_kx (gnutls_session_t, opaque *, size_t);
@@ -65,7 +66,7 @@ const mod_auth_st rsa_auth_struct = {
 
 /* This function reads the RSA parameters from peer's certificate;
  */
-static int
+int
 _gnutls_get_public_rsa_params (gnutls_session_t session,
 			       bigint_t params[MAX_PUBLIC_PARAMS_SIZE],
 			       int *params_len)
@@ -146,7 +147,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 
 /* This function reads the RSA parameters from the private key
  */
-static int
+int
 _gnutls_get_private_rsa_params (gnutls_session_t session,
 				bigint_t ** params, int *params_size)
 {

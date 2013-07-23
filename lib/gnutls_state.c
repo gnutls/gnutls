@@ -1240,7 +1240,8 @@ _gnutls_session_is_psk (gnutls_session_t session)
   kx =
     _gnutls_cipher_suite_get_kx_algo (&session->
 				      security_parameters.current_cipher_suite);
-  if (kx == GNUTLS_KX_PSK || kx == GNUTLS_KX_DHE_PSK)
+  if (kx == GNUTLS_KX_PSK || kx == GNUTLS_KX_DHE_PSK 
+      || kx == GNUTLS_KX_RSA_PSK)
     return 1;
 
   return 0;

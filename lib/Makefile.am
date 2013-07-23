@@ -60,7 +60,7 @@ SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
 	auth_srp_sb64.c auth_srp_rsa.c
 
 PSK_COBJECTS = auth_psk.c auth_psk_passwd.c gnutls_psk.c	\
-	auth_dhe_psk.c gnutls_psk_netconf.c
+	auth_dhe_psk.c gnutls_psk_netconf.c auth_rsa_psk.c
 
 OPRFI_COBJECTS = ext_oprfi.c
 
@@ -103,7 +103,7 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	gnutls_supplemental.h ext_oprfi.h crypto.h random.h		\
 	ext_session_ticket.h ext_signature.h gnutls_cryptodev.h		\
-	ext_safe_renegotiation.h
+	ext_safe_renegotiation.h auth_rsa.h
 
 # Separate so we can create the documentation
 

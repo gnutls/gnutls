@@ -51,6 +51,7 @@ static const gnutls_cred_map cred_mappings[] = {
   {GNUTLS_KX_DHE_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_PSK, GNUTLS_CRD_PSK, GNUTLS_CRD_PSK},
   {GNUTLS_KX_DHE_PSK, GNUTLS_CRD_PSK, GNUTLS_CRD_PSK},
+  {GNUTLS_KX_RSA_PSK, GNUTLS_CRD_PSK, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_SRP, GNUTLS_CRD_SRP, GNUTLS_CRD_SRP},
   {GNUTLS_KX_SRP_RSA, GNUTLS_CRD_SRP, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_SRP_DSS, GNUTLS_CRD_SRP, GNUTLS_CRD_CERTIFICATE},
@@ -90,6 +91,7 @@ static const gnutls_pk_map pk_mappings[] = {
   {GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
   {GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
   {GNUTLS_KX_SRP_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
+  {GNUTLS_KX_RSA_PSK, GNUTLS_PK_RSA, CIPHER_ENCRYPT},
   {0, 0, 0}
 };
 
@@ -271,6 +273,7 @@ extern mod_auth_st anon_auth_struct;
 extern mod_auth_st srp_auth_struct;
 extern mod_auth_st psk_auth_struct;
 extern mod_auth_st dhe_psk_auth_struct;
+extern mod_auth_st rsa_psk_auth_struct;
 extern mod_auth_st srp_rsa_auth_struct;
 extern mod_auth_st srp_dss_auth_struct;
 
@@ -303,6 +306,7 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
   {"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0, 0},
   {"DHE-PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct,
    1 /* needs DHE params */ , 0},
+  {"RSA-PSK", GNUTLS_KX_RSA_PSK, &rsa_psk_auth_struct, 0, 0},
 #endif
   {0, 0, 0, 0, 0}
 };
@@ -324,6 +328,7 @@ static const gnutls_kx_algorithm_t supported_kxs[] = {
 #ifdef ENABLE_PSK
   GNUTLS_KX_PSK,
   GNUTLS_KX_DHE_PSK,
+  GNUTLS_KX_RSA_PSK,
 #endif
   0
 };
@@ -392,6 +397,10 @@ typedef struct
 #define GNUTLS_DHE_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x90 }
 #define GNUTLS_DHE_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x91 }
 
+#define GNUTLS_RSA_PSK_SHA_ARCFOUR_SHA1 { 0x00, 0x92 }
+#define GNUTLS_RSA_PSK_SHA_3DES_EDE_CBC_SHA1 { 0x00, 0x93 }
+#define GNUTLS_RSA_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x94 }
+#define GNUTLS_RSA_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x95 }
 
 /* SRP (rfc5054)
  */
@@ -553,6 +562,24 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 			     GNUTLS_MAC_SHA1, GNUTLS_TLS1,
 			     GNUTLS_VERSION_MAX),
 
+	/* RSA-PSK */
+	GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_PSK_SHA_ARCFOUR_SHA1,
+	             GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_RSA_PSK,
+				 GNUTLS_MAC_SHA1, GNUTLS_TLS1,
+			     GNUTLS_VERSION_MAX),	                           
+	GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_PSK_SHA_3DES_EDE_CBC_SHA1,
+	             GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_RSA_PSK,
+				 GNUTLS_MAC_SHA1, GNUTLS_TLS1,
+			     GNUTLS_VERSION_MAX),	                           
+	GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_PSK_SHA_AES_128_CBC_SHA1,
+	             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_RSA_PSK,
+				 GNUTLS_MAC_SHA1, GNUTLS_TLS1,
+			     GNUTLS_VERSION_MAX),	                           
+	GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_PSK_SHA_AES_256_CBC_SHA1,
+	             GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_RSA_PSK,
+				 GNUTLS_MAC_SHA1, GNUTLS_TLS1,
+			     GNUTLS_VERSION_MAX),	                           
+	
   /* SRP */
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_SRP_SHA_3DES_EDE_CBC_SHA1,
 			     GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_SRP,
