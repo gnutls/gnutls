@@ -898,7 +898,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           if (broken_list[i][0] == '+')
             {
               fn = prio_add;
-              bulk_fn = _set_priority;
+              bulk_fn = _add_priority;
             }
           else
             {
