@@ -70,7 +70,7 @@ ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-tdb mini-dtls-rehandshake mini-alpn mini-dtls-large \
 	 mini-termination mini-x509-cas mini-x509-2 pkcs12_simple \
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead \
-	 mini-dtls-heartbeat mini-x509-callbacks key-openssl		\
+	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities	\
 	 mini-dtls-srtp mini-xssl rsa-encrypt-decrypt mini-loss-time \
 	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range
 

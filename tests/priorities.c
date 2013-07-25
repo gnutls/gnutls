@@ -1,0 +1,101 @@
+/*
+ * Copyright (C) 2012 Free Software Foundation, Inc.
+ *
+ * Author: Nikos Mavrogiannopoulos
+ *
+ * This file is part of GnuTLS.
+ *
+ * GnuTLS is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GnuTLS is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GnuTLS; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ */
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <gnutls/gnutls.h>
+
+#include "utils.h"
+
+static void
+try_prio (const char* prio, unsigned expected)
+{
+int ret;
+gnutls_priority_t p;
+const char* err;
+unsigned i, si, count = 0;
+
+  /* this must be called once in the program
+   */
+  global_init ();
+  
+  ret = gnutls_priority_init(&p, prio, &err);
+  if (ret < 0)
+    {
+      fprintf(stderr, "error: %s: %s\n", gnutls_strerror(ret), err);
+      exit(1);
+    }
+  
+  for (i=0;;i++)
+    {
+      ret = gnutls_priority_get_cipher_suite_index(p, i, &si);
+      if (ret == GNUTLS_E_UNKNOWN_CIPHER_SUITE)
+      	continue;
+      else if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+      	break;
+      else if (ret == 0)
+        {
+          count++;
+          /* fprintf(stderr, "%s\n", gnutls_cipher_suite_info(si, NULL, NULL, NULL, NULL, NULL)); */
+        }
+
+    }
+  
+  gnutls_priority_deinit(p);
+  
+  /* fprintf(stderr, "count: %d\n", count); */
+
+  if (debug)
+    success ("finished: %s\n", prio);
+  
+  if (count != expected) 
+    {
+      fail("expected %d ciphersuites, found %d\n", expected, count);
+      exit(1);
+    }
+}
+
+void
+doit (void)
+{
+const int normal = 40;
+const int null = 5;
+const int sec128 = 32;
+
+  try_prio("NORMAL", normal);
+  try_prio("NORMAL:-MAC-ALL:+MD5:+MAC-ALL", normal);
+  try_prio("NORMAL:+CIPHER-ALL", normal); /* all (except null) */
+  try_prio("NORMAL:-CIPHER-ALL:+NULL", null); /* null */
+  try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal+null); /* should be null + all */
+  try_prio("PERFORMANCE", normal);
+  try_prio("SECURE256", 6);
+  try_prio("SECURE128", sec128);
+  try_prio("SECURE128:+SECURE256", sec128); /* should be the same as SECURE128 */
+  try_prio("SECURE128:+SECURE256:+NORMAL", normal); /* should be the same as NORMAL */
+  try_prio("SUITEB192", 1);
+}
+
