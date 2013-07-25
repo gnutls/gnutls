@@ -1097,6 +1097,10 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   int gnutls_priority_compression_list (gnutls_priority_t pcache, const unsigned int** list);
   int gnutls_priority_ecc_curve_list (gnutls_priority_t pcache, const unsigned int** list);
 
+  int gnutls_priority_kx_list (gnutls_priority_t pcache, const unsigned int** list);
+  int gnutls_priority_cipher_list (gnutls_priority_t pcache, const unsigned int** list);
+  int gnutls_priority_mac_list (gnutls_priority_t pcache, const unsigned int** list);
+
   /* for compatibility
    */
   int gnutls_set_default_priority (gnutls_session_t session);

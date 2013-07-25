@@ -920,6 +920,9 @@ GNUTLS_3_1_0 {
 	gnutls_digest_list;
 	gnutls_digest_get_id;
 	gnutls_digest_get_name;
+	gnutls_priority_mac_list;
+	gnutls_priority_cipher_list;
+	gnutls_priority_kx_list;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

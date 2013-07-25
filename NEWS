@@ -8,7 +8,9 @@ See the end for copying conditions.
 ** libgnutls: Fixes in parsing of priority strings. Patch by Stefan Buehler.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_priority_kx_list: Added
+gnutls_priority_mac_list: Added
+gnutls_priority_cipher_list: Added
 
 
 * Version 3.2.2 (released 2013-07-14)
