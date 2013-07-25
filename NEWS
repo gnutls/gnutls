@@ -3,6 +3,14 @@ Copyright (C) 2000-2012 Free Software Foundation, Inc.
 Copyright (C) 2013 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.3 (unreleased)
+
+** libgnutls: Fixes in parsing of priority strings. Patch by Stefan Buehler.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.2 (released 2013-07-14)
 
 ** libgnutls: Several optimizations in the related to packet processing
