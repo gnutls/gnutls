@@ -711,7 +711,10 @@ to decide which direction to check prior to restoring a function call.
 
 Moreover, to prevent blocking from DTLS' retransmission timers to block a
 handshake, the @funcref{gnutls_init} function should be called with the
-@code{GNUTLS_NONBLOCK} flag set (see @ref{Session initialization}).
+@code{GNUTLS_NONBLOCK} flag set (see @ref{Session initialization}). In that
+case, in order to be able to use the DTLS handshake timers, the function
+@funcref{gnutls_dtls_get_timeout} should be used to estimate when to call
+@funcref{gnutls_handshake} if no packets have been received.
 
 
 @node DTLS sessions
