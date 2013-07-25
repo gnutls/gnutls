@@ -720,9 +720,9 @@ case, in order to be able to use the DTLS handshake timers, the function
 @node DTLS sessions
 @subsection DTLS sessions
 
-Because datagram TLS can operate over connections where the peer
-of a server cannot be reliably verified, functionality is available to prevent
-denial of service attacks. @acronym{GnuTLS} requires a server
+Because datagram TLS can operate over connections where the client
+cannot be reliably verified, functionality in the form of cookies, is available to prevent
+denial of service attacks to servers. @acronym{GnuTLS} requires a server
 to generate a secret key that is used to sign a cookie@footnote{A key of 128 bits or 16 bytes should be sufficient for this purpose.}. 
 That cookie is sent to the client using @funcref{gnutls_dtls_cookie_send}, and 
 the client must reply using the correct cookie. The server side
