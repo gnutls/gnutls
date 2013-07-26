@@ -41,8 +41,10 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "%s|<%d>| %s", side, level, str);
 }
 
+/* This test attempts to transfer various sizes using AES-128-CBC.
+ */
+
 #define MAX_BUF 1024
-#define MSG "Hello TLS"
 
 void
 doit (void)
@@ -56,11 +58,12 @@ doit (void)
   /* Client stuff. */
   gnutls_anon_client_credentials_t c_anoncred;
   gnutls_session_t client;
-  int cret = GNUTLS_E_AGAIN;
+  int cret = GNUTLS_E_AGAIN, i;
   /* Need to enable anonymous KX specifically. */
+  char b1[MAX_BUF + 1];
   char buffer[MAX_BUF + 1];
   ssize_t ns;
-  int ret, transferred = 0, msglen;
+  int ret, transferred = 0;
 
   /* General init. */
   global_init ();
@@ -74,7 +77,7 @@ doit (void)
   gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
   gnutls_anon_set_server_dh_params (s_anoncred, dh_params);
   gnutls_init (&server, GNUTLS_SERVER);
-  gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+  gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
   gnutls_credentials_set (server, GNUTLS_CRD_ANON, s_anoncred);
   gnutls_dh_set_prime_bits (server, 1024);
   gnutls_transport_set_push_function (server, server_push);
@@ -90,13 +93,16 @@ doit (void)
   gnutls_transport_set_pull_function (client, client_pull);
   gnutls_transport_set_ptr (client, (gnutls_transport_ptr_t)client);
 
+  memset(b1, 0, sizeof(b1));
   HANDSHAKE(client, server);
 
   if (debug)
     success ("Handshake established\n");
 
-  msglen = strlen(MSG);
-  TRANSFER(client, server, MSG, msglen, buffer, MAX_BUF);
+  for (i=1;i<128;i++)
+    {
+      TRANSFER(client, server, b1, i, buffer, MAX_BUF);
+    }
   if (debug)
     fputs ("\n", stdout);
 
