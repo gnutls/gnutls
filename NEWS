@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** libgnutls: Fixes in parsing of priority strings. Patch by Stefan Buehler.
 
+** libgnutls: %COMPAT will allow large packets from TLS-incompliant servers
+(this behavior was the default and was accidentally undone in 3.2.2)
+
 ** API and ABI modifications:
 gnutls_priority_kx_list: Added
 gnutls_priority_mac_list: Added
