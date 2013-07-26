@@ -180,7 +180,7 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
   ssize_t i, ret;
   uint8_t *ptr;
   struct timespec t1, t2;
-  size_t max_size = _gnutls_get_max_decrypted_data(session);
+  size_t max_size = get_max_decrypted_data(session);
   size_t recv_size = MAX_RECV_SIZE(session);
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
   unsigned int diff;
@@ -260,7 +260,7 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
 {
   size_t left;
   ssize_t i = 0;
-  size_t max_size = _gnutls_get_max_decrypted_data(session);
+  size_t max_size = get_max_decrypted_data(session);
   uint8_t *ptr;
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
   int ret;

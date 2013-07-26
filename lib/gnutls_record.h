@@ -45,6 +45,19 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 ssize_t _gnutls_recv_int (gnutls_session_t session, content_type_t type,
                           gnutls_handshake_description_t, uint8_t * data,
                           size_t sizeofdata, void* seq, unsigned int ms);
-int _gnutls_get_max_decrypted_data(gnutls_session_t session);
+
+inline
+static int get_max_decrypted_data(gnutls_session_t session)
+{
+int ret;
+
+  if (gnutls_compression_get (session) != GNUTLS_COMP_NULL ||
+      session->internals.priorities.allow_large_records != 0)
+    ret = MAX_RECORD_RECV_SIZE(session) + EXTRA_COMP_SIZE;
+  else
+    ret = MAX_RECORD_RECV_SIZE(session);
+
+  return ret;
+}
 
 #endif

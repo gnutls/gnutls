@@ -933,18 +933,6 @@ cleanup:
 
 }
 
-int _gnutls_get_max_decrypted_data(gnutls_session_t session)
-{
-int ret;
-
-  if (gnutls_compression_get (session) != GNUTLS_COMP_NULL ||
-      session->internals.priorities.allow_large_records != 0)
-    ret = MAX_RECORD_RECV_SIZE(session) + EXTRA_COMP_SIZE;
-  else
-    ret = MAX_RECORD_RECV_SIZE(session);
-
-  return ret;
-}
 
 /* Checks the record headers and returns the length, version and
  * content type.
@@ -1193,7 +1181,7 @@ begin:
   /* We allocate the maximum possible to allow few compressed bytes to expand to a
    * full record.
    */
-  t.size = _gnutls_get_max_decrypted_data(session);
+  t.size = get_max_decrypted_data(session);
   decrypted = _mbuffer_alloc(t.size, t.size);
   if (decrypted == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
