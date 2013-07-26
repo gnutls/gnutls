@@ -710,7 +710,11 @@ ciphertext_to_compressed (gnutls_session_t session,
         return gnutls_assert_val(ret);
 
       if (unlikely((unsigned)length_to_decrypt > compressed->size))
-        return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+        {
+          _gnutls_audit_log(session, "Received %u bytes, while expecting less than %u\n",
+                    (unsigned int)length_to_decrypt, (unsigned int)compressed->size);
+          return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+        }
 
       ret =
            _gnutls_auth_cipher_decrypt2 (&params->read.cipher_state,

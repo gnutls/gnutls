@@ -1193,8 +1193,8 @@ begin:
   /* We allocate the maximum possible to allow few compressed bytes to expand to a
    * full record.
    */
-  decrypted = _mbuffer_alloc(MAX_RECORD_RECV_SIZE(session), 
-                             MAX_RECORD_RECV_SIZE(session));
+  t.size = _gnutls_get_max_decrypted_data(session);
+  decrypted = _mbuffer_alloc(t.size, t.size);
   if (decrypted == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
