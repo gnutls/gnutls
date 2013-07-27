@@ -57,6 +57,8 @@ int ret;
   else
     ret = MAX_RECORD_RECV_SIZE(session);
 
+  ret += MAX_PAD_SIZE + MAX_HASH_SIZE + MAX_CIPHER_BLOCK_SIZE;
+
   return ret;
 }
 
