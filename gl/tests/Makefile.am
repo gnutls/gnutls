@@ -142,15 +142,6 @@ EXTRA_DIST += test-c-ctype.c macros.h
 
 ## end   gnulib module c-ctype-tests
 
-## begin gnulib module c-strcase-tests
-
-TESTS += test-c-strcase.sh
-TESTS_ENVIRONMENT += LOCALE_FR='@LOCALE_FR@' LOCALE_TR_UTF8='@LOCALE_TR_UTF8@'
-check_PROGRAMS += test-c-strcasecmp test-c-strncasecmp
-EXTRA_DIST += test-c-strcase.sh test-c-strcasecmp.c test-c-strncasecmp.c macros.h
-
-## end   gnulib module c-strcase-tests
-
 ## begin gnulib module close-tests
 
 TESTS += test-close
@@ -494,14 +485,6 @@ EXTRA_DIST += signature.h test-gettimeofday.c
 
 ## end   gnulib module gettimeofday-tests
 
-## begin gnulib module iconv-h-tests
-
-TESTS += test-iconv-h
-check_PROGRAMS += test-iconv-h
-EXTRA_DIST += test-iconv-h.c
-
-## end   gnulib module iconv-h-tests
-
 ## begin gnulib module iconv-tests
 
 TESTS += test-iconv
@@ -511,16 +494,6 @@ test_iconv_LDADD = $(LDADD) @LIBICONV@
 EXTRA_DIST += test-iconv.c signature.h macros.h
 
 ## end   gnulib module iconv-tests
-
-## begin gnulib module iconv_open-utf-tests
-
-TESTS += test-iconv-utf
-check_PROGRAMS += test-iconv-utf
-test_iconv_utf_LDADD = $(LDADD) @LIBICONV@
-
-EXTRA_DIST += test-iconv-utf.c macros.h
-
-## end   gnulib module iconv_open-utf-tests
 
 ## begin gnulib module ignore-value
 
@@ -667,67 +640,6 @@ test_listen_LDADD = $(LDADD) @LIBSOCKET@
 EXTRA_DIST += test-listen.c signature.h macros.h
 
 ## end   gnulib module listen-tests
-
-## begin gnulib module locale
-
-BUILT_SOURCES += locale.h
-
-# We need the following in order to create <locale.h> when the system
-# doesn't have one that provides all definitions.
-locale.h: locale.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
-	  sed -e 's|@''GUARD_PREFIX''@|GL|g' \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
-	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
-	      -e 's|@''NEXT_LOCALE_H''@|$(NEXT_LOCALE_H)|g' \
-	      -e 's/@''GNULIB_LOCALECONV''@/$(GNULIB_LOCALECONV)/g' \
-	      -e 's/@''GNULIB_SETLOCALE''@/$(GNULIB_SETLOCALE)/g' \
-	      -e 's/@''GNULIB_DUPLOCALE''@/$(GNULIB_DUPLOCALE)/g' \
-	      -e 's|@''HAVE_DUPLOCALE''@|$(HAVE_DUPLOCALE)|g' \
-	      -e 's|@''HAVE_XLOCALE_H''@|$(HAVE_XLOCALE_H)|g' \
-	      -e 's|@''REPLACE_LOCALECONV''@|$(REPLACE_LOCALECONV)|g' \
-	      -e 's|@''REPLACE_SETLOCALE''@|$(REPLACE_SETLOCALE)|g' \
-	      -e 's|@''REPLACE_DUPLOCALE''@|$(REPLACE_DUPLOCALE)|g' \
-	      -e 's|@''REPLACE_STRUCT_LCONV''@|$(REPLACE_STRUCT_LCONV)|g' \
-	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
-	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
-	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
-	      < $(srcdir)/locale.in.h; \
-	} > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += locale.h locale.h-t
-
-EXTRA_DIST += locale.in.h
-
-## end   gnulib module locale
-
-## begin gnulib module locale-tests
-
-TESTS += test-locale
-check_PROGRAMS += test-locale
-EXTRA_DIST += test-locale.c
-
-## end   gnulib module locale-tests
-
-## begin gnulib module localename
-
-libtests_a_SOURCES += localename.c
-
-EXTRA_DIST += localename.h
-
-## end   gnulib module localename
-
-## begin gnulib module localename-tests
-
-TESTS += test-localename
-check_PROGRAMS += test-localename
-test_localename_LDADD = $(LDADD) @INTL_MACOSX_LIBS@ $(LIBTHREAD)
-
-EXTRA_DIST += test-localename.c macros.h
-
-## end   gnulib module localename-tests
 
 ## begin gnulib module lock
 
@@ -988,28 +900,6 @@ EXTRA_DIST += test-setenv.c signature.h macros.h
 
 ## end   gnulib module setenv-tests
 
-## begin gnulib module setlocale
-
-
-EXTRA_DIST += setlocale.c
-
-EXTRA_libtests_a_SOURCES += setlocale.c
-
-## end   gnulib module setlocale
-
-## begin gnulib module setlocale-tests
-
-TESTS += test-setlocale1.sh test-setlocale2.sh
-TESTS_ENVIRONMENT += \
-  LOCALE_FR='@LOCALE_FR@' \
-  LOCALE_FR_UTF8='@LOCALE_FR_UTF8@' \
-  LOCALE_JA='@LOCALE_JA@' \
-  LOCALE_ZH_CN='@LOCALE_ZH_CN@'
-check_PROGRAMS += test-setlocale1 test-setlocale2
-EXTRA_DIST += test-setlocale1.sh test-setlocale1.c test-setlocale2.sh test-setlocale2.c signature.h macros.h
-
-## end   gnulib module setlocale-tests
-
 ## begin gnulib module setsockopt-tests
 
 TESTS += test-setsockopt
@@ -1113,31 +1003,6 @@ CXXDEFS_H=c++defs.h
 EXTRA_DIST += $(top_srcdir)/build-aux/snippet/c++defs.h
 
 ## end   gnulib module snippet/c++defs
-
-## begin gnulib module snippet/unused-parameter
-
-# The BUILT_SOURCES created by this Makefile snippet are not used via #include
-# statements but through direct file reference. Therefore this snippet must be
-# present in all Makefile.am that need it. This is ensured by the applicability
-# 'all' defined above.
-
-BUILT_SOURCES += unused-parameter.h
-# The unused-parameter.h that gets inserted into generated .h files is the same
-# as build-aux/snippet/unused-parameter.h, except that it has the copyright
-# header cut off.
-unused-parameter.h: $(top_srcdir)/build-aux/snippet/unused-parameter.h
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	sed -n -e '/GL_UNUSED_PARAMETER/,$$p' \
-	  < $(top_srcdir)/build-aux/snippet/unused-parameter.h \
-	  > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += unused-parameter.h unused-parameter.h-t
-
-UNUSED_PARAMETER_H=unused-parameter.h
-
-EXTRA_DIST += $(top_srcdir)/build-aux/snippet/unused-parameter.h
-
-## end   gnulib module snippet/unused-parameter
 
 ## begin gnulib module snippet/warn-on-use
 
@@ -1460,26 +1325,6 @@ check_PROGRAMS += test-unistd
 EXTRA_DIST += test-unistd.c
 
 ## end   gnulib module unistd-tests
-
-## begin gnulib module unistr/u8-mbtoucr-tests
-
-TESTS += test-u8-mbtoucr
-check_PROGRAMS += test-u8-mbtoucr
-test_u8_mbtoucr_SOURCES = unistr/test-u8-mbtoucr.c
-test_u8_mbtoucr_LDADD = $(LDADD) $(LIBUNISTRING)
-EXTRA_DIST += unistr/test-u8-mbtoucr.c macros.h
-
-## end   gnulib module unistr/u8-mbtoucr-tests
-
-## begin gnulib module unistr/u8-uctomb-tests
-
-TESTS += test-u8-uctomb
-check_PROGRAMS += test-u8-uctomb
-test_u8_uctomb_SOURCES = unistr/test-u8-uctomb.c
-test_u8_uctomb_LDADD = $(LDADD) $(LIBUNISTRING)
-EXTRA_DIST += unistr/test-u8-uctomb.c macros.h
-
-## end   gnulib module unistr/u8-uctomb-tests
 
 ## begin gnulib module unsetenv
 

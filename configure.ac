@@ -206,7 +206,7 @@ AC_PROG_LIBTOOL
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork getrusage getpwuid_r nanosleep daemon getpid clock_gettime pthread_mutex_lock],,)
+AC_CHECK_FUNCS([fork getrusage getpwuid_r nanosleep daemon getpid clock_gettime pthread_mutex_lock iconv],,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 if test "$ac_cv_func_pthread_mutex_lock" != "yes";then
@@ -215,6 +215,10 @@ fi
 
 if test "$ac_cv_func_nanosleep" != "yes";then
   AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [nanosleep (0, 0);])
+fi
+
+if test "$ac_cv_func_iconv" != "yes";then
+  AC_LIB_HAVE_LINKFLAGS(iconv,, [#include <iconv.h>], [iconv (0, 0, 0, 0, 0);])
 fi
 
 AC_MSG_CHECKING([whether to build libdane])
