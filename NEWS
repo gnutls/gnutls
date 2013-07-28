@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: Solve issue with received TLS packets that exceed 2^14. 
 (this fixes a bug that was accidentally introduced in 3.2.2)
 
+** libgnutls: Removed gnulib modules under LGPLv3 that could possibly be
+used by the library.
+
 ** API and ABI modifications:
 gnutls_priority_kx_list: Added
 gnutls_priority_mac_list: Added
