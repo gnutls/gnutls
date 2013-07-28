@@ -35,6 +35,9 @@
 #include <gnutls_extensions.h>
 #include <gnutls_buffers.h>
 
+static int
+_gnutls_set_kx (gnutls_session_t session, gnutls_kx_algorithm_t algo);
+
 static const char keyexp[] = "key expansion";
 static const int keyexp_length = sizeof (keyexp) - 1;
 
@@ -346,10 +349,12 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
   ret = _gnutls_init_record_state (params, ver, 1, &params->read);
   if (ret < 0)
     return gnutls_assert_val (ret);
+  params->read.new_record_padding = session->security_parameters.new_record_padding;
 
   ret = _gnutls_init_record_state (params, ver, 0, &params->write);
   if (ret < 0)
     return gnutls_assert_val (ret);
+  params->write.new_record_padding = session->security_parameters.new_record_padding;
 
   params->record_sw_size = 0;
 
@@ -500,7 +505,7 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
 
 /* Sets the specified kx algorithm into pending session
  */
-int
+static int
 _gnutls_set_kx (gnutls_session_t session, gnutls_kx_algorithm_t algo)
 {
 

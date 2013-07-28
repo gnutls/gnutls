@@ -593,6 +593,7 @@ struct record_state_st
   auth_cipher_hd_st cipher_state;
   comp_hd_st compression_state;
   uint64 sequence_number;
+  uint8_t new_record_padding;
 };
 
 

@@ -408,16 +408,16 @@ _gnutls_ext_register (extension_entry_st * mod)
 }
 
 int
-_gnutls_ext_after_handshake (gnutls_session_t session)
+_gnutls_ext_before_epoch_change (gnutls_session_t session)
 {
   unsigned int i;
   int ret;
 
   for (i = 0; i < extfunc_size; i++)
     {
-      if (extfunc[i].handshake_func != NULL)
+      if (extfunc[i].epoch_func != NULL)
         {
-          ret = extfunc[i].handshake_func (session);
+          ret = extfunc[i].epoch_func (session);
           if (ret < 0)
             return gnutls_assert_val(ret);
         }

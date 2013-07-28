@@ -2556,10 +2556,6 @@ gnutls_handshake (gnutls_session_t session)
 
   session->security_parameters.epoch_next++;
 
-  ret = _gnutls_ext_after_handshake(session);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-
   return 0;
 }
 
@@ -2896,6 +2892,10 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
        */
       if (init == TRUE)
         {
+          ret = _gnutls_ext_before_epoch_change(session);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+
           ret = _gnutls_connection_state_init (session);
           if (ret < 0)
             {
@@ -2988,6 +2988,10 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
       /* Initialize the connection session (start encryption) - in case of server */
       if (init == TRUE)
         {
+          ret = _gnutls_ext_before_epoch_change(session);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+
           ret = _gnutls_connection_state_init (session);
           if (ret < 0)
             {

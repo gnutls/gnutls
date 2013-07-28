@@ -45,7 +45,7 @@ typedef int (*gnutls_ext_pack_func) (extension_priv_data_t data,
                                      gnutls_buffer_st * packed_data);
 typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_st * packed_data,
                                        extension_priv_data_t * data);
-typedef int (*gnutls_ext_handshake_func) (gnutls_session_t session);
+typedef int (*gnutls_ext_epoch_func) (gnutls_session_t session);
 
 void _gnutls_ext_free_session_data (gnutls_session_t session);
 
@@ -61,7 +61,7 @@ int _gnutls_ext_get_resumed_session_data (gnutls_session_t session,
                                           extension_priv_data_t * data);
 
 void _gnutls_ext_restore_resumed_session (gnutls_session_t session);
-int _gnutls_ext_after_handshake (gnutls_session_t session);
+int _gnutls_ext_before_epoch_change (gnutls_session_t session);
 
 /* for session packing */
 int _gnutls_ext_pack (gnutls_session_t session, gnutls_buffer_st * packed);
@@ -91,7 +91,7 @@ typedef struct
                                                  */
   gnutls_ext_pack_func pack_func;       /* packs internal data to machine independent format */
   gnutls_ext_unpack_func unpack_func;   /* unpacks internal data */
-  gnutls_ext_handshake_func handshake_func; /* called after the handshake is finished */
+  gnutls_ext_epoch_func epoch_func; /* called after the handshake is finished */
 } extension_entry_st;
 
 int _gnutls_ext_register (extension_entry_st *);

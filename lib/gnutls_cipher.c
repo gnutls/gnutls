@@ -131,7 +131,7 @@ _gnutls_encrypt (gnutls_session_t session,
       comp.size = ret;
     }
 
-  if (session->security_parameters.new_record_padding != 0)
+  if (params->write.new_record_padding != 0)
     ret = compressed_to_ciphertext_new (session, _mbuffer_get_udata_ptr(bufel),
                                         _mbuffer_get_udata_size(bufel),
                                         &comp, target_size, type, params);
@@ -176,7 +176,7 @@ _gnutls_decrypt (gnutls_session_t session,
 
   if (is_read_comp_null (params) == 0)
     {
-      if (session->security_parameters.new_record_padding != 0)
+      if (params->read.new_record_padding != 0)
         ret =
           ciphertext_to_compressed_new (session, ciphertext, output, 
                                         type, params, sequence);
@@ -198,7 +198,7 @@ _gnutls_decrypt (gnutls_session_t session,
       if (tmp.data == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-      if (session->security_parameters.new_record_padding != 0)
+      if (params->read.new_record_padding != 0)
         ret =
           ciphertext_to_compressed_new (session, ciphertext, &tmp,
                                         type, params, sequence);

@@ -34,7 +34,7 @@ static int new_record_padding_recv_params (gnutls_session_t session,
                                            size_t data_size);
 static int new_record_padding_send_params (gnutls_session_t session,
   gnutls_buffer_st* extdata);
-static int new_record_padding_after_handshake(gnutls_session_t session);
+static int new_record_padding_before_epoch_change(gnutls_session_t session);
 
 extension_entry_st ext_mod_new_record_padding = {
   .name = "NEW_RECORD_PADDING",
@@ -46,7 +46,7 @@ extension_entry_st ext_mod_new_record_padding = {
   .pack_func = NULL,
   .unpack_func = NULL,
   .deinit_func = NULL,
-  .handshake_func = new_record_padding_after_handshake
+  .epoch_func = new_record_padding_before_epoch_change
 };
 
 static int
@@ -83,7 +83,7 @@ new_record_padding_recv_params (gnutls_session_t session,
   return 0;
 }
 
-static int new_record_padding_after_handshake(gnutls_session_t session)
+static int new_record_padding_before_epoch_change(gnutls_session_t session)
 {
   extension_priv_data_t epriv;
   int ret;

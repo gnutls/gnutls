@@ -35,8 +35,6 @@ int _gnutls_connection_state_init (gnutls_session_t session);
 int _gnutls_read_connection_state_init (gnutls_session_t session);
 int _gnutls_write_connection_state_init (gnutls_session_t session);
 
-int _gnutls_set_kx (gnutls_session_t session, gnutls_kx_algorithm_t algo);
-
 int _gnutls_epoch_get (gnutls_session_t session, unsigned int epoch_rel,
                        record_parameters_st ** params_out);
 int _gnutls_epoch_alloc (gnutls_session_t session, uint16_t epoch,
