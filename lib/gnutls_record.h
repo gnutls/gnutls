@@ -51,13 +51,11 @@ static int get_max_decrypted_data(gnutls_session_t session)
 {
 int ret;
 
-  if (gnutls_compression_get (session) != GNUTLS_COMP_NULL ||
-      session->internals.priorities.allow_large_records != 0)
-    ret = MAX_RECORD_RECV_SIZE(session) + EXTRA_COMP_SIZE;
-  else
-    ret = MAX_RECORD_RECV_SIZE(session);
+  ret = MAX_RECORD_RECV_SIZE(session) + MAX_RECORD_OVERHEAD(session);
 
-  ret += MAX_PAD_SIZE + MAX_HASH_SIZE + MAX_CIPHER_BLOCK_SIZE;
+  if (session->internals.priorities.allow_large_records != 0 &&
+      gnutls_compression_get(session)==GNUTLS_COMP_NULL)
+    ret += EXTRA_COMP_SIZE;
 
   return ret;
 }

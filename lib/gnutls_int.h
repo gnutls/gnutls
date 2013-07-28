@@ -183,12 +183,12 @@ typedef enum record_flush_t
 #define MAX_RECORD_HEADER_SIZE DTLS_RECORD_HEADER_SIZE
 
 #define MAX_USER_SEND_SIZE(session) (IS_DTLS(session)?((size_t)gnutls_dtls_get_data_mtu(session)):(size_t)session->security_parameters.max_record_send_size)
-#define MAX_RECORD_SEND_SIZE(session) (IS_DTLS(session)?((size_t)gnutls_dtls_get_mtu(session)):(size_t)session->security_parameters.max_record_send_size+MAX_RECORD_OVERHEAD)
+#define MAX_RECORD_SEND_SIZE(session) (IS_DTLS(session)?((size_t)gnutls_dtls_get_mtu(session)):(size_t)session->security_parameters.max_record_send_size+MAX_RECORD_OVERHEAD(session))
 #define MAX_RECORD_RECV_SIZE(session) ((size_t)session->security_parameters.max_record_recv_size)
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
-#define MAX_RECORD_OVERHEAD (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+EXTRA_COMP_SIZE+MAX_HASH_SIZE/*MAC*/)
-#define MAX_RECV_SIZE(session) (MAX_RECORD_OVERHEAD+MAX_RECORD_RECV_SIZE(session)+RECORD_HEADER_SIZE(session))
+#define MAX_RECORD_OVERHEAD(session) (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+(gnutls_compression_get(session)!=GNUTLS_COMP_NULL)?EXTRA_COMP_SIZE:0+MAX_HASH_SIZE/*MAC*/)
+#define MAX_RECV_SIZE(session) (MAX_RECORD_OVERHEAD(session)+MAX_RECORD_RECV_SIZE(session)+RECORD_HEADER_SIZE(session))
 
 #define TLS_HANDSHAKE_HEADER_SIZE 4
 #define DTLS_HANDSHAKE_HEADER_SIZE (TLS_HANDSHAKE_HEADER_SIZE+8)
