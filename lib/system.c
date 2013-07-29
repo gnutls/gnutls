@@ -577,7 +577,7 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
   return add_system_trust(list, tl_flags, tl_vflags);
 }
 
-#if defined(HAVE_ICONV)
+#if defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
 
 # include <iconv.h>
 

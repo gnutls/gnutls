@@ -219,6 +219,11 @@ fi
 
 if test "$ac_cv_func_iconv" != "yes";then
   AC_LIB_HAVE_LINKFLAGS(iconv,, [#include <iconv.h>], [iconv (0, 0, 0, 0, 0);])
+  if test "$HAVE_LIBICONV" = "yes";then
+    ac_have_unicode=yes
+  fi
+else
+  ac_have_unicode=yes
 fi
 
 AC_MSG_CHECKING([whether to build libdane])
@@ -671,6 +676,7 @@ if features are disabled)
   Anon auth support:    $ac_enable_anon
   Heartbeat support:    $ac_enable_heartbeat
   RSA-EXPORT compat:    $ac_enable_rsa_export
+  Unicode support:      $ac_have_unicode
 ])
 
 AC_MSG_NOTICE([Optional applications:
