@@ -217,6 +217,7 @@ if test "$ac_cv_func_nanosleep" != "yes";then
   AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [nanosleep (0, 0);])
 fi
 
+ac_have_unicode=no
 if test "$ac_cv_func_iconv" != "yes";then
   AC_LIB_HAVE_LINKFLAGS(iconv,, [#include <iconv.h>], [iconv (0, 0, 0, 0, 0);])
   if test "$HAVE_LIBICONV" = "yes";then
@@ -224,6 +225,12 @@ if test "$ac_cv_func_iconv" != "yes";then
   fi
 else
   ac_have_unicode=yes
+fi
+
+if test "$ac_have_unicode" != "yes";then
+  if test "$have_win" = "yes";then
+    ac_have_unicode=yes
+  fi
 fi
 
 AC_MSG_CHECKING([whether to build libdane])
