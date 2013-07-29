@@ -501,7 +501,7 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
     }
   else
     {
-      if (unlikely(send_data_size == 0))
+      if (unlikely((send_data_size == 0 && target_length == 0)))
         return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
       /* now proceed to packet encryption
