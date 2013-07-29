@@ -52,7 +52,7 @@ static char buffer[MAX_BUF + 1];
 static void try_send(gnutls_session_t client, gnutls_session_t server, 
                 void* b1, ssize_t b1_size, void* b2, ssize_t b2_size, gnutls_range_st* range)
 {
-int ret;
+int ret, recvd;
 
   /* Try sending various other sizes */
   ret = gnutls_record_send_range(client, b1, b1_size, range);
@@ -68,18 +68,25 @@ int ret;
       exit(1);
     }
   
-  ret = gnutls_record_recv(server, b2, b2_size);
-  if (ret < 0)
+  recvd = 0;
+  do
     {
-      fprintf(stderr, "Error receiving %d bytes: %s\n", (int)b2_size, gnutls_strerror(ret));
-      exit(1);
+      ret = gnutls_record_recv(server, b2, b2_size);
+      if (ret < 0)
+        {
+          fprintf(stderr, "Error receiving %d bytes: %s\n", (int)b2_size, gnutls_strerror(ret));
+          exit(1);
+        }
+      recvd += ret;
     }
+  while (recvd < b1_size);
 
-  if (ret != b1_size)
+  if (recvd != b1_size)
     {
-      fprintf(stderr, "Couldn't receive %d bytes, received %d\n", (int)b1_size, ret);
+      fprintf(stderr, "Couldn't receive %d bytes, received %d\n", (int)b1_size, recvd);
       exit(1);
     }
+    
 }
 
 void
@@ -141,7 +148,7 @@ doit (void)
   try_send(client, server, b1, MAX_SEND, buffer, MAX_BUF, &range);
   try_send(client, server, b1, 1024, buffer, MAX_BUF, &range);
   try_send(client, server, b1, 4096, buffer, MAX_BUF, &range);
-  try_send(client, server, b1, 128, buffer, MAX_BUF, &range);
+  /*try_send(client, server, b1, 128, buffer, MAX_BUF, &range)*/;
 
 
   if (debug)
