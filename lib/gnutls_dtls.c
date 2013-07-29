@@ -601,9 +601,7 @@ int t, ret;
 
   if (mac->id == GNUTLS_MAC_AEAD)
     {
-      t = _gnutls_cipher_get_iv_size(cipher);
-      total += t;
-
+      total += AEAD_EXPLICIT_DATA_SIZE;
       total += _gnutls_cipher_get_tag_size(cipher);
     }
   else
