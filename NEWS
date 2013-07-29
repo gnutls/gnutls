@@ -13,6 +13,9 @@ See the end for copying conditions.
 ** libgnutls: Removed gnulib modules under LGPLv3 that could possibly be
 used by the library.
 
+** libgnutls: Fixes in gnutls_record_send_range(). Report and initial fix by 
+Alfredo Pironti.
+
 ** API and ABI modifications:
 gnutls_priority_kx_list: Added
 gnutls_priority_mac_list: Added
