@@ -309,6 +309,18 @@ static const int kx_priority_performance[] = {
   0
 };
 
+static const int kx_priority_pfs[] = {
+#ifdef ENABLE_ECDHE
+  GNUTLS_KX_ECDHE_ECDSA,
+  GNUTLS_KX_ECDHE_RSA,
+#endif
+#ifdef ENABLE_DHE
+  GNUTLS_KX_DHE_RSA,
+  GNUTLS_KX_DHE_DSS,
+#endif
+  0
+};
+
 static const int kx_priority_suiteb[] = {
   GNUTLS_KX_ECDHE_ECDSA,
   0
@@ -641,6 +653,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
 
 #define LEVEL_NONE "NONE"
 #define LEVEL_NORMAL "NORMAL"
+#define LEVEL_PFS "PFS"
 #define LEVEL_PERFORMANCE "PERFORMANCE"
 #define LEVEL_SECURE128 "SECURE128"
 #define LEVEL_SECURE192 "SECURE192"
@@ -675,6 +688,19 @@ bulk_rmadd_func *func;
     {
       func (&priority_cache->cipher, cipher_priority_normal);
       func (&priority_cache->kx, kx_priority_secure);
+      func (&priority_cache->mac, mac_priority_normal);
+      func (&priority_cache->sign_algo,
+                     sign_priority_default);
+      func (&priority_cache->supported_ecc, supported_ecc_normal);
+
+      if (priority_cache->level == 0)
+        priority_cache->level = GNUTLS_SEC_PARAM_VERY_WEAK;
+      return 1;
+    }
+  else if (strcasecmp (level, LEVEL_PFS) == 0)
+    {
+      func (&priority_cache->cipher, cipher_priority_normal);
+      func (&priority_cache->kx, kx_priority_pfs);
       func (&priority_cache->mac, mac_priority_normal);
       func (&priority_cache->sign_algo,
                      sign_priority_default);
@@ -783,6 +809,10 @@ bulk_rmadd_func *func;
  * "NORMAL" means all "secure" ciphersuites. The 256-bit ciphers are
  * included as a fallback only.  The ciphers are sorted by security
  * margin.
+ *
+ * "PFS" means all "secure" ciphersuites that support perfect forward secrecy. 
+ * The 256-bit ciphers are included as a fallback only.  
+ * The ciphers are sorted by security margin.
  *
  * "SECURE128" means all "secure" ciphersuites of security level 128-bit
  * or more.
