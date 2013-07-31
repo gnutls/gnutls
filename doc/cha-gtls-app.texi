@@ -878,6 +878,13 @@ Means all the known to be secure ciphersuites. The ciphers are sorted by securit
 margin, although the 256-bit ciphers are included as a fallback only.
 The message authenticity security level is of 64 bits or more.
 
+@item PFS @tab
+Means all the known to be secure ciphersuites that support perfect forward
+secrecy. The ciphers are sorted by security
+margin, although the 256-bit ciphers are included as a fallback only.
+The message authenticity security level is of 64 bits or more. This
+option is available since 3.2.4 or later.
+
 @item SECURE128 @tab
 Means all known to be secure ciphersuites that offer a 
 security level 128-bit or more and a message authenticity
