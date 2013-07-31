@@ -328,19 +328,6 @@ static const int kx_priority_suiteb[] = {
   0
 };
 
-static const int kx_priority_export[] = {
-  GNUTLS_KX_RSA,
-#ifdef ENABLE_ECDHE
-  GNUTLS_KX_ECDHE_ECDSA,
-  GNUTLS_KX_ECDHE_RSA,
-#endif
-#ifdef ENABLE_DHE
-  GNUTLS_KX_DHE_RSA,
-  GNUTLS_KX_DHE_DSS,
-#endif
-  0
-};
-
 static const int kx_priority_secure[] = {
   /* The ciphersuites that offer forward secrecy take
    * precedence
@@ -445,19 +432,6 @@ static const int cipher_priority_secure192[] = {
   GNUTLS_CIPHER_AES_256_CBC,
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
   GNUTLS_CIPHER_AES_256_GCM,
-  0
-};
-
-/* The same as cipher_priority_security_normal + arcfour-40. */
-static const int cipher_priority_export[] = {
-  GNUTLS_CIPHER_AES_128_CBC,
-  GNUTLS_CIPHER_AES_256_CBC,
-  GNUTLS_CIPHER_CAMELLIA_128_CBC,
-  GNUTLS_CIPHER_CAMELLIA_256_CBC,
-  GNUTLS_CIPHER_AES_128_GCM,
-  GNUTLS_CIPHER_3DES_CBC,
-  GNUTLS_CIPHER_ARCFOUR_128,
-  GNUTLS_CIPHER_ARCFOUR_40,
   0
 };
 
@@ -772,8 +746,8 @@ bulk_rmadd_func *func;
     }
   else if (strcasecmp (level, LEVEL_EXPORT) == 0)
     {
-      func (&priority_cache->cipher, cipher_priority_export);
-      func (&priority_cache->kx, kx_priority_export);
+      func (&priority_cache->cipher, cipher_priority_performance);
+      func (&priority_cache->kx, kx_priority_performance);
       func (&priority_cache->mac, mac_priority_secure128);
       func (&priority_cache->sign_algo,
                      sign_priority_default);
