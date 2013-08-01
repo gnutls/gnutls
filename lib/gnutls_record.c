@@ -422,6 +422,14 @@ sequence_increment (gnutls_session_t session,
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current session.    
  *
+ * @type: The content type to send
+ * @htype: If this is a handshake message then the handshake type
+ * @epoch_rel: %EPOCH_READ_* or %EPOCH_WRITE_*
+ * @data: the data to be sent
+ * @data_size: the size of the @data
+ * @target_length: @data_size + minimum required padding
+ * @mflags: zero or %MBUFFER_FLUSH
+ *
  * Oct 30 2001: Removed capability to send data more than MAX_RECORD_SIZE.
  * This makes the function much easier to read, and more error resistant
  * (there were cases were the old function could mess everything up).
