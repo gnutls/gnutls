@@ -239,14 +239,14 @@ _gnutls_epoch_set_cipher_suite (gnutls_session_t session,
   cipher_algo = _gnutls_cipher_suite_get_cipher_algo (suite);
   mac_algo = _gnutls_cipher_suite_get_mac_algo (suite);
 
+  if (_gnutls_cipher_is_ok (cipher_algo) == 0
+      || _gnutls_mac_is_ok (mac_algo) == 0)
+    return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
+
   if (_gnutls_cipher_priority (session, cipher_algo->id) < 0)
     return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
 
   if (_gnutls_mac_priority (session, mac_algo->id) < 0)
-    return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
-
-  if (_gnutls_cipher_is_ok (cipher_algo) == 0
-      || _gnutls_mac_is_ok (mac_algo) == 0)
     return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
 
   params->cipher = cipher_algo;
@@ -324,14 +324,14 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 
   comp_algo = params->compression_algorithm;
 
+  if (_gnutls_cipher_is_ok (params->cipher) == 0
+      || _gnutls_mac_is_ok (params->mac) == 0)
+    return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
+
   if (_gnutls_cipher_priority (session, params->cipher->id) < 0)
     return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
 
   if (_gnutls_mac_priority (session, params->mac->id) < 0)
-    return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
-
-  if (_gnutls_cipher_is_ok (params->cipher) == 0
-      || _gnutls_mac_is_ok (params->mac) == 0)
     return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
 
   if (_gnutls_compression_is_ok (comp_algo) != 0)
