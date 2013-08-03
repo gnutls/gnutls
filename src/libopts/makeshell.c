@@ -345,7 +345,7 @@ text_to_var(tOptions * opts, teTextTo which, tOptDesc * od)
 static void
 emit_usage(tOptions * opts)
 {
-    char tm_nm_buf[AO_NAME_SIZE];
+    char tm_nm_buf[AO_NAME_SIZE] = "";
 
     /*
      *  First, switch stdout to the output file name.
@@ -359,11 +359,13 @@ emit_usage(tOptions * opts)
     {
         char const * out_nm;
 
+#ifdef HAVE_LOCALTIME
         {
             time_t    c_tim = time(NULL);
             struct tm * ptm = localtime(&c_tim);
             strftime(tm_nm_buf, AO_NAME_SIZE, TIME_FMT, ptm );
         }
+#endif
 
         if (HAVE_GENSHELL_OPT(SCRIPT))
              out_nm = GENSHELL_OPT_ARG(SCRIPT);
