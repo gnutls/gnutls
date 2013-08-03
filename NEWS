@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.14 (unreleased)
+
+** libgnutls: Fixes in gnutls_record_send_range(). Report and initial fix by 
+Alfredo Pironti.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.13 (released 2013-07-12)
 
 ** libgnutls: Ensure that gnutls_dtls_set_mtu() cannot exceed the
