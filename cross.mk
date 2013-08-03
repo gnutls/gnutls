@@ -1,4 +1,4 @@
-GNUTLS_VERSION:=3.2.2
+GNUTLS_VERSION:=3.2.3
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -85,6 +85,7 @@ $(GMP_DIR)/.configured:
 $(GMP_DIR)/.installed: $(GMP_DIR)/.configured
 	make -C $(GMP_DIR) -j2
 	make -C $(GMP_DIR) install -i
+	-mkdir -p $(HEADERS_DIR)
 	mv $(LIB_DIR)/include/* $(HEADERS_DIR)/
 	rmdir $(LIB_DIR)/include/
 	touch $@
