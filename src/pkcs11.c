@@ -77,7 +77,7 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
   gnutls_pkcs11_obj_t *crt_list;
   gnutls_x509_crt_t xcrt;
   unsigned int crt_list_size = 0, i;
-  int ret;
+  int ret, otype;
   char *output;
   int attrs;
   unsigned int obj_flags = 0;
@@ -171,9 +171,9 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
 
       fprintf (outfile, "Object %d:\n\tURL: %s\n", i, output);
 
+      otype = gnutls_pkcs11_obj_get_type(crt_list[i]);
       fprintf (outfile, "\tType: %s\n",
-               gnutls_pkcs11_type_get_name (gnutls_pkcs11_obj_get_type
-                                            (crt_list[i])));
+               gnutls_pkcs11_type_get_name (otype));
 
       size = sizeof (buf);
       ret =
@@ -199,10 +199,11 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
         }
       fprintf (outfile, "\tID: %s\n\n", buf);
 
-
-
       if (attrs == GNUTLS_PKCS11_OBJ_ATTR_ALL
           || attrs == GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY)
+        continue;
+
+      if (otype != GNUTLS_PKCS11_OBJ_X509_CRT)
         continue;
 
       ret = gnutls_x509_crt_init (&xcrt);
