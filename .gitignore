@@ -643,3 +643,6 @@ tests/mini-record-range
 tests/mini-dtls-hello-verify
 tests/mini-overhead
 tests/mini-dtls-large
+tests/record-sizes
+tests/priorities
+tests/record-sizes-range
