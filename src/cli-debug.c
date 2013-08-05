@@ -176,7 +176,6 @@ main (int argc, char **argv)
   char portname[6];
   struct addrinfo hints, *res, *ptr;
 
-  set_program_name (argv[0]);
   cmd_parser(argc, argv);
 
 #ifndef _WIN32

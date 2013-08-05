@@ -7,6 +7,8 @@ See the end for copying conditions.
 
 ** libgnutls: Added the PFS priority string option.
 
+** libgnutls: Gnulib included files are strictly LGPLv2.
+
 ** API and ABI modifications:
 No changes since last version.
 

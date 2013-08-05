@@ -206,7 +206,7 @@ AC_PROG_LIBTOOL
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork getrusage getpwuid_r nanosleep daemon getpid clock_gettime pthread_mutex_lock iconv localtime],,)
+AC_CHECK_FUNCS([fork getrusage getpwuid_r nanosleep daemon getpid clock_gettime pthread_mutex_lock iconv localtime vasprintf],,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 if test "$ac_cv_func_pthread_mutex_lock" != "yes";then
@@ -568,9 +568,10 @@ AC_ARG_ENABLE(crywrap,
 
  if test "x$enable_crywrap" != "xno" ; then
 	PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [libidn=yes], [libidn=no])
+	AC_CHECK_FUNCS([argp_usage],[ac_argp=yes],[ac_argp=no])
  fi
 
- if test "x$libidn" != "xno" && test "$ac_cv_func_daemon" != "no";then
+ if test "x$libidn" != "xno" && test "$ac_cv_func_daemon" != "no" && test "$ac_argp" != "no";then
   crywrap=yes
  fi
 

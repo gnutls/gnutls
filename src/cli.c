@@ -855,7 +855,6 @@ main (int argc, char **argv)
   struct sigaction new_action;
 #endif
 
-  set_program_name (argv[0]);
   cmd_parser (argc, argv);
 
   gnutls_global_set_log_function (tls_log_func);

@@ -424,8 +424,6 @@ int main (int argc, char **argv)
    struct passwd *pwd;
 #endif
 
-  set_program_name (argv[0]);
-
   if ((ret = gnutls_global_init ()) < 0)
     {
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));

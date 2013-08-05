@@ -26,6 +26,7 @@
 #ifdef STDC_HEADERS
 #include <stdarg.h>
 #endif
+#include "vasprintf.h"
 
 /* I18n of error codes. */
 #include "gettext.h"

@@ -17,14 +17,15 @@
 
 AM_CFLAGS = $(WARN_CFLAGS) $(LIBIDN_CFLAGS)
 AM_CPPFLAGS = \
-	-I$(srcdir)/../../gl			\
 	-I$(builddir)/../../lib/includes		\
 	-I$(srcdir)/../../lib/includes \
 	-DSYSCONFDIR=\"${sysconfdir}\" \
 	-DCRYWRAP_PATCHLEVEL=\"${CRYWRAP_PATCHLEVEL}\"
 
+#	-I$(srcdir)/../../gl			
+
 EXTRA_DIST = README
 bin_PROGRAMS = crywrap
 
 crywrap_SOURCES = crywrap.c primes.h crywrap.h
-crywrap_LDADD = ../../lib/libgnutls.la ../../gl/libgnu.la $(LIBIDN_LIBS)
+crywrap_LDADD = ../../lib/libgnutls.la $(LIBIDN_LIBS) #../../gl/libgnu.la 

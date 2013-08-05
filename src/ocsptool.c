@@ -380,8 +380,6 @@ main (int argc, char **argv)
 {
   int ret;
 
-  set_program_name (argv[0]);
-
   if ((ret = gnutls_global_init ()) < 0)
     error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
 

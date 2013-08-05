@@ -25,9 +25,7 @@
 
 #include <config.h>
 
-#ifdef HAVE_ARGP_H
 #include <argp.h>
-#endif
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -50,11 +48,6 @@
 #include <syslog.h>
 #include <stdarg.h>
 #include <unistd.h>
-
-/* Gnulib portability files. */
-#include "progname.h"
-#include "argp.h"
-#include <read-file.h>
 
 #include "crywrap.h"
 #include "primes.h"
@@ -201,13 +194,10 @@ static gnutls_datum_t
 load_file (const char *file)
 {
   gnutls_datum_t loaded_file = { NULL, 0 };
-  size_t length;
 
-  loaded_file.data = (void*)read_binary_file (file, &length);
-  if (loaded_file.data)
-    loaded_file.size = (unsigned int) length;
+  gnutls_load_file(file, &loaded_file);
 
-  return loaded_file;
+  return loaded_file;  
 }
 
 /** Generic signal handler.
@@ -1010,7 +1000,6 @@ main (int argc, char **argv, char **envp)
   stringprep_locale_charset ();
 
   config = _crywrap_config_parse (argc, argv);
-  set_program_name(__CRYWRAP__);
 
   _crywrap_tls_init ();
 

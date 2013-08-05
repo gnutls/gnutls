@@ -25,6 +25,7 @@
 #include <gnutls_num.h>
 #include <gnutls/xssl.h>
 #include <auth/cert.h>
+#include "vasprintf.h"
 
 #include <xssl.h>
 

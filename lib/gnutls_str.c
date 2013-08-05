@@ -26,6 +26,7 @@
 #include <gnutls_str.h>
 #include <stdarg.h>
 #include <c-ctype.h>
+#include "vasprintf.h"
 
 /* These function are like strcat, strcpy. They only
  * do bound checking (they shouldn't cause buffer overruns),

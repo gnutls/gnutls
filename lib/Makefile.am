@@ -72,7 +72,7 @@ COBJECTS = gnutls_range.c gnutls_record.c \
 	gnutls_global.c gnutls_constate.c gnutls_anon_cred.c		\
 	$(srcdir)/pkix_asn1_tab.c				\
 	$(srcdir)/gnutls_asn1_tab.c				\
-	gnutls_mem.c gnutls_ui.c 				\
+	gnutls_mem.c gnutls_ui.c vasprintf.c vasprintf.h		\
 	gnutls_sig.c gnutls_ecc.c gnutls_dh_primes.c gnutls_alert.c	\
 	system.c gnutls_str.c gnutls_state.c gnutls_x509.c		\
 	gnutls_rsa_export.c gnutls_helper.c gnutls_supplemental.c	\

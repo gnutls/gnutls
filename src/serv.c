@@ -946,7 +946,6 @@ main (int argc, char **argv)
   char name[256];
   int cert_set = 0;
 
-  set_program_name (argv[0]);
   cmd_parser (argc, argv);
 
 #ifndef _WIN32
