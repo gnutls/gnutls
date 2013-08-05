@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: libgnutls-3.2.1\n"
+"Project-Id-Version: libgnutls-3.2.3\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2013-05-29 19:03+0200\n"
-"PO-Revision-Date: 2013-06-15 08:03+0700\n"
+"POT-Creation-Date: 2013-07-28 23:51+0200\n"
+"PO-Revision-Date: 2013-08-04 08:05+0700\n"
 "Last-Translator: Trần Ngọc Quân <vnwildman@gmail.com>\n"
 "Language-Team: Vietnamese <translation-team-vi@lists.sourceforge.net>\n"
 "Language: vi\n"
@@ -42,11 +42,11 @@ msgstr "Tràn bản ghi"
 
 #: lib/gnutls_alert.c:49
 msgid "Decompression failed"
-msgstr "Lỗi giải nén"
+msgstr "Gặp lỗi khi giải nén"
 
 #: lib/gnutls_alert.c:50
 msgid "Handshake failed"
-msgstr "Lỗi thiết lập quan hệ"
+msgstr "Gặp lỗi khi thiết lập quan hệ"
 
 #: lib/gnutls_alert.c:51
 msgid "Certificate is bad"
@@ -58,7 +58,7 @@ msgstr "Chứng nhận không được hỗ trợ"
 
 #: lib/gnutls_alert.c:53
 msgid "Certificate was revoked"
-msgstr "Chứng nhận bị thu hồi"
+msgstr "Chứng nhận đã bị thu hồi"
 
 #: lib/gnutls_alert.c:54
 msgid "Certificate is expired"
@@ -90,7 +90,7 @@ msgstr "Lỗi giải mật mã"
 
 #: lib/gnutls_alert.c:61
 msgid "Export restriction"
-msgstr "Giới hạn xuất khẩu"
+msgstr "Hạn chế xuất ra"
 
 #: lib/gnutls_alert.c:62
 msgid "Error in protocol version"
@@ -106,7 +106,7 @@ msgstr "Người dùng đã hủy bỏ"
 
 #: lib/gnutls_alert.c:65
 msgid "No certificate (SSL 3.0)"
-msgstr "Không chứng nhận (SSL 3.0)"
+msgstr "Không có chứng nhận (SSL 3.0)"
 
 #: lib/gnutls_alert.c:66
 msgid "Internal error"
@@ -146,7 +146,7 @@ msgstr "Không thể thỏa thuận một bộ ứng dụng mật mã được h
 
 #: lib/gnutls_errors.c:54
 msgid "No or insufficient priorities were set."
-msgstr "Không hay thiếu quyền ưu tiên được đặt."
+msgstr "Không có hay thiếu quyền ưu tiên được đặt."
 
 #: lib/gnutls_errors.c:56
 msgid "The cipher type is unsupported."
@@ -166,7 +166,7 @@ msgstr "Gặp phải một thuật toán khoá công không rõ."
 
 #: lib/gnutls_errors.c:65
 msgid "An algorithm that is not enabled was negotiated."
-msgstr "Đã thỏa thuận một thuật toán chưa được hiệu lực."
+msgstr "Đã thỏa thuận một thuật toán chưa được bật."
 
 #: lib/gnutls_errors.c:67
 msgid "A record packet with illegal version was received."
@@ -222,11 +222,11 @@ msgstr "Khoá DSA đưa ra thì không tương thích với giao thức TLS đã
 
 #: lib/gnutls_errors.c:96
 msgid "A heartbeat pong message was received."
-msgstr "Đã nhận được tiếng vọng `pong'."
+msgstr "Đã nhận được tiếng vọng “pong”."
 
 #: lib/gnutls_errors.c:98
 msgid "A heartbeat ping message was received."
-msgstr "Đã nhận được tiếng vọng `ping'."
+msgstr "Đã nhận được tiếng vọng “ping”."
 
 #: lib/gnutls_errors.c:100
 msgid "There is already a crypto algorithm with lower priority."
@@ -426,7 +426,7 @@ msgstr "Bộ phân tích ASN1: không tìm thấy phần tử."
 
 #: lib/gnutls_errors.c:193
 msgid "ASN1 parser: Identifier was not found"
-msgstr "Bộ phân tích ASN1: không tìm thấy đồ nhận diện."
+msgstr "Bộ phân tích ASN1: không tìm thấy định danh."
 
 #: lib/gnutls_errors.c:195
 msgid "ASN1 parser: Error in DER parsing."
@@ -434,35 +434,35 @@ msgstr "Bộ phân tích ASN1: gặp lỗi khi phân tích ngữ cảnh DER."
 
 #: lib/gnutls_errors.c:197
 msgid "ASN1 parser: Value was not found."
-msgstr "Bộ phân tích ASN1: không tìm thấy giá trị."
+msgstr "Bộ phân tích ASN1: Không tìm thấy giá trị."
 
 #: lib/gnutls_errors.c:199
 msgid "ASN1 parser: Generic parsing error."
-msgstr "Bộ phân tích ASN1: lỗi phân tích ngữ cảnh chung."
+msgstr "Bộ phân tích ASN1: Lỗi phân tích ngữ cảnh chung."
 
 #: lib/gnutls_errors.c:201
 msgid "ASN1 parser: Value is not valid."
-msgstr "Bộ phân tích ASN1: giá trị không hợp lệ."
+msgstr "Bộ phân tích ASN1: Giá trị không hợp lệ."
 
 #: lib/gnutls_errors.c:203
 msgid "ASN1 parser: Error in TAG."
-msgstr "Bộ phân tích ASN1: gặp lỗi trong TAG (thẻ)."
+msgstr "Bộ phân tích ASN1: Gặp lỗi trong TAG (thẻ)."
 
 #: lib/gnutls_errors.c:204
 msgid "ASN1 parser: error in implicit tag"
-msgstr "Bộ phân tích ASN1: gặp lỗi trong thẻ dứt khoát."
+msgstr "Bộ phân tích ASN1: Gặp lỗi trong thẻ dứt ẩn."
 
 #: lib/gnutls_errors.c:206
 msgid "ASN1 parser: Error in type 'ANY'."
-msgstr "Bộ phân tích ASN1: ỗi trong kiểu `ANY' (bất kỳ)."
+msgstr "Bộ phân tích ASN1: Lỗi trong kiểu “ANY” (bất kỳ)."
 
 #: lib/gnutls_errors.c:208
 msgid "ASN1 parser: Syntax error."
-msgstr "Bộ phân tích ASN1: lỗi cú pháp."
+msgstr "Bộ phân tích ASN1: Lỗi cú pháp."
 
 #: lib/gnutls_errors.c:210
 msgid "ASN1 parser: Overflow in DER parsing."
-msgstr "Bộ phân tích ASN1: tràn sự phân tích ngữ cảnh DER."
+msgstr "Bộ phân tích ASN1: Tràn trong phân tích DER."
 
 #: lib/gnutls_errors.c:213
 msgid "Too many empty record packets have been received."
@@ -746,7 +746,7 @@ msgstr "(không rõ mã lỗi)"
 
 #: lib/openpgp/output.c:41
 msgid "\t\tKey Usage:\n"
-msgstr "\t\tSử dụng Khoá:\n"
+msgstr "\t\tCách dùng Khoá:\n"
 
 #: lib/openpgp/output.c:50
 #, c-format
@@ -779,7 +779,7 @@ msgstr "\tMã số (thập lục): "
 
 #: lib/openpgp/output.c:109
 msgid "\tFingerprint (hex): "
-msgstr "\tDấu tay (thập lục):"
+msgstr "\tDấu vân tay (thập lục):"
 
 #: lib/openpgp/output.c:126
 msgid "\tFingerprint's random art:\n"
@@ -795,12 +795,12 @@ msgstr "\tThu hồi: Sai\n"
 
 #: lib/openpgp/output.c:154
 msgid "\tTime stamps:\n"
-msgstr "\tDấu vết thời gian.\n"
+msgstr "\tDấu vết thời gian:\n"
 
 #: lib/openpgp/output.c:171
 #, c-format
 msgid "\t\tCreation: %s\n"
-msgstr "\t\tTạo : %s\n"
+msgstr "\t\tTạo: %s\n"
 
 #: lib/openpgp/output.c:185
 msgid "\t\tExpiration: Never\n"
@@ -833,7 +833,7 @@ msgstr "\t\tGiá trị tuyệt đối (%d bit):\n"
 
 #: lib/openpgp/output.c:242
 msgid "\t\tExponent:\n"
-msgstr "\t\tMũ :\n"
+msgstr "\t\tMũ:\n"
 
 #: lib/openpgp/output.c:267 lib/x509/output.c:1337
 #, c-format
@@ -890,7 +890,7 @@ msgstr "tên bị thu hồi[%d]: %s, "
 
 #: lib/openpgp/output.c:422
 msgid "fingerprint: "
-msgstr "dấu tay: "
+msgstr "dấu vân tay: "
 
 #: lib/openpgp/output.c:442
 #, c-format
@@ -978,7 +978,7 @@ msgstr "Thông tin OCSP Đáp ứng:\n"
 
 #: lib/x509/output.c:92 lib/x509/output.c:808
 msgid "warning: altname contains an embedded NUL, replacing with '!'\n"
-msgstr "cảnh báo: tên thay thế (altname) chứa một NUL nhúng, thay thế bằng một dấu chấm than « ! »\n"
+msgstr "cảnh báo: tên thay thế (altname) chứa một NUL nhúng, thay thế bằng một dấu chấm than “!”\n"
 
 #: lib/x509/output.c:148
 #, c-format
@@ -1068,7 +1068,7 @@ msgstr "\t\t\tKhông sau: %s\n"
 
 #: lib/x509/output.c:539
 msgid "warning: distributionPoint contains an embedded NUL, replacing with '!'\n"
-msgstr "cảnh báo : distributionPoint (điểm phân phối) chứa một NUL nhúng thì thay thế bằng một dấu chấm than `!'\n"
+msgstr "cảnh báo : distributionPoint (điểm phân phối) chứa một NUL nhúng thì thay thế bằng một dấu chấm than “!”\n"
 
 #: lib/x509/output.c:632
 #, c-format
@@ -1166,7 +1166,7 @@ msgstr "%s\t\tRàng buộc Cơ bản (%s):\n"
 #: lib/x509/output.c:1158 lib/x509/output.c:2008 lib/x509/output.c:2031
 #: lib/x509/output.c:2044
 msgid "critical"
-msgstr "tới hạn"
+msgstr "hết hạn"
 
 #: lib/x509/output.c:956 lib/x509/output.c:971 lib/x509/output.c:1000
 #: lib/x509/output.c:1029 lib/x509/output.c:1045 lib/x509/output.c:1062
@@ -1175,17 +1175,17 @@ msgstr "tới hạn"
 #: lib/x509/output.c:1158 lib/x509/output.c:2008 lib/x509/output.c:2031
 #: lib/x509/output.c:2044
 msgid "not critical"
-msgstr "không tới hạn"
+msgstr "chưa hết hạn"
 
 #: lib/x509/output.c:970
 #, c-format
 msgid "%s\t\tSubject Key Identifier (%s):\n"
-msgstr "%s\tĐịnh danh Khoá Chủ thể (%s):\n"
+msgstr "%s\tĐịnh danh Chủ thể Khoá (%s):\n"
 
 #: lib/x509/output.c:1028
 #, c-format
 msgid "%s\t\tAuthority Key Identifier (%s):\n"
-msgstr "%s\t\tĐồ nhận diện Khoá Nhà cầm quyền (%s):\n"
+msgstr "%s\t\tĐịnh danh Nhà cầm quyền Khóa (%s):\n"
 
 #: lib/x509/output.c:1044
 #, c-format
@@ -1270,7 +1270,7 @@ msgstr "\t\tMũ (%d bit):\n"
 #: lib/x509/output.c:1286
 #, c-format
 msgid "\t\tCurve:\t%s\n"
-msgstr "\t\tCurve:\t%s\n"
+msgstr "\t\tĐặc tuyến:\t%s\n"
 
 #: lib/x509/output.c:1290
 msgid "\t\tX: "
@@ -1286,12 +1286,12 @@ msgstr "\t\tX:\n"
 
 #: lib/x509/output.c:1301
 msgid "\t\tY:\n"
-msgstr "\t\tC:\n"
+msgstr "\t\tY:\n"
 
 #: lib/x509/output.c:1322
 #, c-format
 msgid "\t\tPublic key (bits %d): "
-msgstr "\t\tKhoá công (%d bit):"
+msgstr "\t\tKhoá công (%d bít):"
 
 #: lib/x509/output.c:1325
 msgid "\t\tP: "
@@ -1320,17 +1320,17 @@ msgstr "\tNơi cấp: %s\n"
 
 #: lib/x509/output.c:1445
 msgid "\tValidity:\n"
-msgstr "\tHợp lệ:\n"
+msgstr "\tCó hiệu lực:\n"
 
 #: lib/x509/output.c:1458
 #, c-format
 msgid "\t\tNot Before: %s\n"
-msgstr "\t\tKhông phải trước: %s\n"
+msgstr "\t\tKhông trước: %s\n"
 
 #: lib/x509/output.c:1472
 #, c-format
 msgid "\t\tNot After: %s\n"
-msgstr "\t\tKhông phải sau : %s\n"
+msgstr "\t\tKhông sau: %s\n"
 
 #: lib/x509/output.c:1497 lib/x509/output.c:2274
 #, c-format
@@ -1350,7 +1350,7 @@ msgid ""
 "\tSHA-1 fingerprint:\n"
 "\t\t"
 msgstr ""
-"\tDấu tay SHA1:\n"
+"\tDấu vân tay SHA1:\n"
 "\t\t"
 
 #: lib/x509/output.c:1611 lib/x509/output.c:2450
@@ -1413,12 +1413,12 @@ msgstr "\t\tSố CRL (%s): "
 #: lib/x509/output.c:2030
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
-msgstr "\t\tĐồ nhận diện Khoá Nhà cầm quyền (%s):\n"
+msgstr "\t\tĐịnh danh Nhà cầm quyền Khoá (%s):\n"
 
 #: lib/x509/output.c:2043
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
-msgstr "\t\tPhần mở rộng không được nhận ra %s (%s):\n"
+msgstr "\t\tKhông hiểu phần mở rộng %s (%s):\n"
 
 #: lib/x509/output.c:2093
 #, c-format
@@ -1436,7 +1436,7 @@ msgstr "\t\tSố sê-ri (thập lục phân): "
 #: lib/x509/output.c:2123
 #, c-format
 msgid "\t\tRevoked at: %s\n"
-msgstr "\t\tĐược thu hồi vào : %s\n"
+msgstr "\t\tĐược thu hồi vào: %s\n"
 
 #: lib/x509/output.c:2207
 msgid "X.509 Certificate Revocation List Information:\n"
