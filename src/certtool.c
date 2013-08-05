@@ -42,8 +42,6 @@
 
 /* Gnulib portability files. */
 #include <read-file.h>
-#include <progname.h>
-#include <version-etc.h>
 
 #include <certtool-cfg.h>
 #include <common.h>

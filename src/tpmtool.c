@@ -43,8 +43,6 @@
 
 /* Gnulib portability files. */
 #include <read-file.h>
-#include <progname.h>
-#include <version-etc.h>
 
 #include "certtool-common.h"
 #include "tpmtool-args.h"

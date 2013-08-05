@@ -46,8 +46,6 @@
 
 /* Gnulib portability files. */
 #include <read-file.h>
-#include <progname.h>
-#include <version-etc.h>
 
 #include <common.h>
 #include "danetool-args.h"

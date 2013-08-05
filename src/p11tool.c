@@ -43,8 +43,6 @@
 
 /* Gnulib portability files. */
 #include <read-file.h>
-#include <progname.h>
-#include <version-etc.h>
 
 #include "p11tool-args.h"
 #include "p11tool.h"

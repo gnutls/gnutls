@@ -39,8 +39,6 @@
 /* Gnulib portability files. */
 #include <getpass.h>
 #include <minmax.h>
-#include <progname.h>
-#include <version-etc.h>
 
 #include <srptool-args.h>
 

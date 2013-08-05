@@ -32,8 +32,6 @@
 
 /* Gnulib portability files. */
 #include <error.h>
-#include <progname.h>
-#include <version-etc.h>
 #include <read-file.h>
 #include <socket.h>
 

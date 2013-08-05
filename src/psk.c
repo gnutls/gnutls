@@ -21,8 +21,6 @@
 #include <config.h>
 
 /* Gnulib portability files. */
-#include <version-etc.h>
-#include <progname.h>
 
 #ifndef ENABLE_PSK
 

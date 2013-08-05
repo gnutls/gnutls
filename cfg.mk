@@ -80,7 +80,7 @@ bootstrap: autoreconf
 # The only non-lgpl modules used are: gettime progname timespec. Those
 # are not used (and must not be used) in the library)
 glimport:
-	gnulib-tool --add-import
+	gnulib-tool --add-import --lgpl=2
 
 # Code Coverage
 

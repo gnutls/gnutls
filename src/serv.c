@@ -44,8 +44,6 @@
 #include <socket.h>
 
 /* Gnulib portability files. */
-#include "progname.h"
-#include "version-etc.h"
 #include "read-file.h"
 #include "minmax.h"
 #include "sockets.h"

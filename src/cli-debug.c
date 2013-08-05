@@ -38,8 +38,6 @@
 #include <socket.h>
 
 /* Gnulib portability files. */
-#include <progname.h>
-#include <version-etc.h>
 #include "sockets.h"
 
 static void cmd_parser (int argc, char **argv);
