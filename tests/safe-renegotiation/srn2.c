@@ -112,7 +112,7 @@ void doit(void)
   gnutls_priority_set_direct (server, "NORMAL", NULL);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);
-  gnutls_transport_set_ptr (server, (gnutls_transport_ptr_t)server);
+  gnutls_transport_set_ptr (server, server);
 
   /* Init client */
   gnutls_certificate_allocate_credentials (&clientx509cred);
@@ -121,7 +121,7 @@ void doit(void)
   gnutls_priority_set_direct (client, "NORMAL", NULL);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
-  gnutls_transport_set_ptr (client, (gnutls_transport_ptr_t)client);
+  gnutls_transport_set_ptr (client, client);
 
   /* Check that initially no session use the extension. */
   if (gnutls_safe_renegotiation_status (server)

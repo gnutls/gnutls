@@ -98,7 +98,7 @@ client (int sd)
    */
   gnutls_credentials_set (session, GNUTLS_CRD_PSK, pskcred);
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
+  gnutls_transport_set_int (session, sd);
 
   /* Perform the TLS handshake
    */
@@ -216,7 +216,7 @@ server (int sd)
 
   session = initialize_tls_session ();
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
+  gnutls_transport_set_int (session, sd);
   ret = gnutls_handshake (session);
   if (ret < 0)
     {

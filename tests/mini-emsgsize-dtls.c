@@ -131,7 +131,7 @@ doit (void)
   gnutls_transport_set_push_function (server, server_push_300);
   gnutls_transport_set_pull_function (server, server_pull);
   gnutls_transport_set_pull_timeout_function (server, server_pull_timeout_func);
-  gnutls_transport_set_ptr (server, (gnutls_transport_ptr_t)server);
+  gnutls_transport_set_ptr (server, server);
 
   /* Init client */
   gnutls_anon_allocate_client_credentials (&c_anoncred);
@@ -143,7 +143,7 @@ doit (void)
   gnutls_transport_set_push_function (client, client_push_300);
   gnutls_transport_set_pull_function (client, client_pull);
   gnutls_transport_set_pull_timeout_function (client, client_pull_timeout_func);
-  gnutls_transport_set_ptr (client, (gnutls_transport_ptr_t)client);
+  gnutls_transport_set_ptr (client, client);
 
   handshake = 1;
   HANDSHAKE_DTLS(client, server);

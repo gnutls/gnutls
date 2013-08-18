@@ -110,7 +110,7 @@ client (int fd)
    */
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
   gnutls_transport_set_push_function (session, push);
 
   /* Perform the TLS handshake
@@ -223,7 +223,7 @@ gnutls_session_t session;
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
   gnutls_transport_set_push_function (session, push);
 
   for (;;)
@@ -241,7 +241,7 @@ gnutls_session_t session;
         {
           if (debug) success("Sending hello verify request\n");
 
-          ret = gnutls_dtls_cookie_send(&cookie_key, CLI_ADDR, CLI_ADDR_LEN, &prestate, (gnutls_transport_ptr_t)fd, push);
+          ret = gnutls_dtls_cookie_send(&cookie_key, CLI_ADDR, CLI_ADDR_LEN, &prestate, (gnutls_transport_ptr_t)(long)fd, push);
           if (ret < 0)
             {
               fail("Cannot send data\n");

@@ -152,7 +152,7 @@ client (int fd, int packet)
   counter = 0;
   packet_to_lose = packet;
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
   gnutls_transport_set_push_function (session, push);
 
   /* Perform the TLS handshake
@@ -226,7 +226,7 @@ int ret;
   counter = 0;
   packet_to_lose = packet;
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
   gnutls_transport_set_push_function (session, push);
 
   do 

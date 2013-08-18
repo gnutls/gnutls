@@ -188,7 +188,7 @@ main (void)
       sd = tcp_connect ();
 
       /* associate gnutls with socket */
-      gnutls_transport_set_ptr (client, (gnutls_transport_ptr_t) sd);
+      gnutls_transport_set_int (client, sd);
       /* add a callback for data being available for send/receive on socket */
       if (!ecore_main_fd_handler_add(sd, ECORE_FD_READ | ECORE_FD_WRITE, (Ecore_Fd_Cb)_process_data, client, NULL, NULL))
         {

@@ -191,7 +191,7 @@ client (int fd, const char* prio)
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
   gnutls_transport_set_push_function (session, push);
 
   /* Perform the TLS handshake
@@ -301,7 +301,7 @@ gnutls_certificate_credentials_t x509_cred;
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
   gnutls_transport_set_push_function (session, push_crippled);
 
   do 

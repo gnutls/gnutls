@@ -201,7 +201,7 @@ client (int fd, unsigned int vmethod, unsigned use_cert)
 
   /* Initialize TLS session
    */
-  ret = xssl_client_init(&sb, "localhost", NULL, (gnutls_transport_ptr_t)fd,
+  ret = xssl_client_init(&sb, "localhost", NULL, (gnutls_transport_ptr_t)(long)fd,
                                 NULL, cred, &status, 0);
   if (ret < 0)
     {
@@ -299,7 +299,7 @@ server (int fd, unsigned vmethod)
 
   /* Initialize TLS session
    */
-  ret = xssl_server_init(&sb, (gnutls_transport_ptr_t)fd,
+  ret = xssl_server_init(&sb, (gnutls_transport_ptr_t)(long)fd,
                                 NULL, cred, NULL, 0);
   if (ret < 0)
     err_quit(ret);

@@ -111,7 +111,7 @@ client (int fd, int server_init)
    */
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
   gnutls_transport_set_push_function (session, push);
 
   /* Perform the TLS handshake
@@ -253,7 +253,7 @@ char buffer[MAX_BUF + 1];
 
   session = initialize_tls_session ();
 
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
   gnutls_transport_set_push_function (session, push);
 
   do 

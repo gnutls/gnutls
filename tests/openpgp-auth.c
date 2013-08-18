@@ -137,9 +137,7 @@ doit ()
             gnutls_priority_set_direct (session,
                                       "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+CTYPE-OPENPGP",
                                       NULL);
-          gnutls_transport_set_ptr (session,
-                                    (gnutls_transport_ptr_t) (intptr_t)
-                                    sockets[0]);
+          gnutls_transport_set_int (session, sockets[0]);
 
           err = gnutls_certificate_allocate_credentials (&cred);
           if (err != 0)
@@ -209,9 +207,7 @@ doit ()
           gnutls_priority_set_direct (session,
                                       "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+RSA:+CTYPE-OPENPGP",
                                       NULL);
-          gnutls_transport_set_ptr (session,
-                                    (gnutls_transport_ptr_t) (intptr_t)
-                                    sockets[1]);
+          gnutls_transport_set_int (session, sockets[1]);
 
           err = gnutls_certificate_allocate_credentials (&cred);
           if (err != 0)

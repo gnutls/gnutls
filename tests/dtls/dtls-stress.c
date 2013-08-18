@@ -396,7 +396,7 @@ static void filter_run_next(gnutls_transport_ptr_t fd,
 	if (fn) {
 		fn(fd, buffer, len);
 	} else {
-		send((intptr_t) fd, buffer, len, 0);
+		send((int)(intptr_t) fd, buffer, len, 0);
 	}
 	filter_current_idx--;
 }
@@ -613,7 +613,7 @@ static void session_init(int sock, int server)
 	gnutls_init(&session, GNUTLS_DATAGRAM | (server ? GNUTLS_SERVER : GNUTLS_CLIENT)
 			| GNUTLS_NONBLOCK * nonblock);
 	gnutls_priority_set_direct(session, "+CTYPE-OPENPGP:+CIPHER-ALL:+MAC-ALL:+ECDHE-RSA:+ANON-ECDH", 0);
-	gnutls_transport_set_ptr(session, (gnutls_transport_ptr_t) (intptr_t) sock);
+	gnutls_transport_set_int(session, sock);
 
 	if (full) {
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred);

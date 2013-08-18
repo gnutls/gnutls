@@ -88,7 +88,7 @@ doit (void)
   gnutls_dh_set_prime_bits (server, 1024);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);
-  gnutls_transport_set_ptr (server, (gnutls_transport_ptr_t)server);
+  gnutls_transport_set_ptr (server, server);
 
   /* Init client */
   gnutls_anon_allocate_client_credentials (&c_anoncred);
@@ -102,7 +102,7 @@ doit (void)
   gnutls_credentials_set (client, GNUTLS_CRD_ANON, c_anoncred);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
-  gnutls_transport_set_ptr (client, (gnutls_transport_ptr_t)client);
+  gnutls_transport_set_ptr (client, client);
 
   HANDSHAKE(client, server);
 

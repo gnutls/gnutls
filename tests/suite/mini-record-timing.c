@@ -305,7 +305,7 @@ restart:
   /* put the anonymous credentials to the current session
    */
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
 
   /* Perform the TLS handshake
    */
@@ -483,7 +483,7 @@ restart:
   }
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-  gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_int (session, fd);
 
   do 
     {
