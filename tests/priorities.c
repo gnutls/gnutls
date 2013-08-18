@@ -94,7 +94,7 @@ for (i=0;i<ret;i++)
 void
 doit (void)
 {
-const int normal = 40;
+const int normal = 42;
 const int null = 5;
 const int sec128 = 32;
 
