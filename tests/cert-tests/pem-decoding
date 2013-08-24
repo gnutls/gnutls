@@ -62,7 +62,7 @@ if test "$rc" != "0"; then
 fi
 
 cat $srcdir/complex-cert.pem |grep -v "Not After:" >tmp1
-cat $srcdir/tmp-pem.pem |grep -v "Not After:" >tmp2
+cat tmp-pem.pem |grep -v "Not After:" >tmp2
 diff --strip-trailing-cr tmp1 tmp2
 rc=$?
 
