@@ -89,6 +89,6 @@ if test "$num" != "4"; then
     exit 1
 fi
 
-rm -f verify-sha2 new-user.pem new-subsubca.pem new-subca.pem new-ca.pem template-sha2
+rm -f verify-sha2 new-user.pem new-subsubca.pem new-subca.pem new-ca.pem template-sha2 out
 
 exit 0
