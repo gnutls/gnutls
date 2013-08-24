@@ -350,22 +350,10 @@ static const int kx_priority_secure[] = {
   0
 };
 
-static const int cipher_priority_performance_sw[] = {
-  GNUTLS_CIPHER_ARCFOUR_128,
-  GNUTLS_CIPHER_AES_128_CBC,
-  GNUTLS_CIPHER_CAMELLIA_128_CBC,
-  GNUTLS_CIPHER_AES_256_CBC,
-  GNUTLS_CIPHER_CAMELLIA_256_CBC,
-  GNUTLS_CIPHER_3DES_CBC,
-  GNUTLS_CIPHER_AES_128_GCM,
-  GNUTLS_CIPHER_AES_256_GCM,
-  0
-};
-
 /* If GCM and AES acceleration is available then prefer
  * them over anything else.
  */
-static const int cipher_priority_performance_hw_aes[] = {
+static const int cipher_priority_performance[] = {
   GNUTLS_CIPHER_AES_128_GCM,
   GNUTLS_CIPHER_AES_128_CBC,
   GNUTLS_CIPHER_AES_256_GCM,
@@ -377,19 +365,7 @@ static const int cipher_priority_performance_hw_aes[] = {
   0
 };
 
-static const int cipher_priority_normal_sw[] = {
-  GNUTLS_CIPHER_AES_128_CBC,
-  GNUTLS_CIPHER_CAMELLIA_128_CBC,
-  GNUTLS_CIPHER_AES_128_GCM,
-  GNUTLS_CIPHER_AES_256_CBC,
-  GNUTLS_CIPHER_CAMELLIA_256_CBC,
-  GNUTLS_CIPHER_AES_256_GCM,
-  GNUTLS_CIPHER_3DES_CBC,
-  GNUTLS_CIPHER_ARCFOUR_128,
-  0
-};
-
-static const int cipher_priority_normal_hw_aes[] = {
+static const int cipher_priority_normal[] = {
   GNUTLS_CIPHER_AES_128_GCM,
   GNUTLS_CIPHER_AES_128_CBC,
   GNUTLS_CIPHER_AES_256_GCM,
@@ -400,10 +376,6 @@ static const int cipher_priority_normal_hw_aes[] = {
   GNUTLS_CIPHER_ARCFOUR_128,
   0
 };
-
-static const int *cipher_priority_performance = cipher_priority_performance_sw;
-static const int *cipher_priority_normal = cipher_priority_normal_sw;
-
 
 static const int cipher_priority_suiteb128[] = {
   GNUTLS_CIPHER_AES_128_GCM,
@@ -1259,15 +1231,6 @@ int
 gnutls_set_default_export_priority (gnutls_session_t session)
 {
   return gnutls_priority_set_direct (session, "EXPORT", NULL);
-}
-
-/* Increases the priority of AES-GCM as it is much faster
- * than anything else if hardware support is there.
- */
-void _gnutls_priority_prefer_aes_gcm(void)
-{
-  cipher_priority_performance = cipher_priority_performance_hw_aes;
-  cipher_priority_normal = cipher_priority_normal_hw_aes;
 }
 
 /**

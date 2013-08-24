@@ -215,9 +215,6 @@ register_x86_crypto (void)
             {
               gnutls_assert ();
             }
-          
-          if (ret >= 0)
-            _gnutls_priority_prefer_aes_gcm();
         }
 #endif
     }
