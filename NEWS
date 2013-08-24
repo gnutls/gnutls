@@ -5,12 +5,15 @@ See the end for copying conditions.
 
 * Version 3.2.4 (unreleased)
 
+** libgnutls: Added ciphersuites that use ARCFOUR with ECDHE. Patch
+by Stefan Buehler.
+
 ** libgnutls: Added the PFS priority string option.
 
 ** libgnutls: Gnulib included files are strictly LGPLv2.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_record_set_timeout: Exported
 
 
 * Version 3.2.3 (released 2013-07-30)
