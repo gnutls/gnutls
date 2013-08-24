@@ -1490,14 +1490,7 @@ another priority string is:
 NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
 @end verbatim
 This priority string will in addition to above, only enable SSL 3.0 and 
-TLS 1.0 as protocols. Note however that
-there are known attacks against those protocol versions, especially over
-the CBC-mode ciphersuites. To mitigate them another priority string
-that only allows the stream cipher ARCFOUR is below.
-@verbatim
-NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:-CIPHER-ALL:+ARCFOUR-128:%COMPAT
-@end verbatim
-
+TLS 1.0 as protocols. 
 
 
 @node Compatibility with the OpenSSL library
