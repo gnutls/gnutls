@@ -923,6 +923,7 @@ GNUTLS_3_1_0 {
 	gnutls_priority_mac_list;
 	gnutls_priority_cipher_list;
 	gnutls_priority_kx_list;
+	gnutls_record_set_timeout;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
