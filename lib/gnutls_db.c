@@ -199,21 +199,9 @@ store_session (gnutls_session_t session,
 {
   int ret = 0;
 
-  if (session->internals.resumable == RESUME_FALSE)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_SESSION;
-    }
-
   if (db_func_is_ok (session) != 0)
     {
       return GNUTLS_E_DB_ERROR;
-    }
-
-  if (session_id.data == NULL || session_id.size == 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_SESSION;
     }
 
   if (session_data.data == NULL || session_data.size == 0)
