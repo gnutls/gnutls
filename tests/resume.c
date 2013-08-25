@@ -72,17 +72,18 @@ struct params_res
 pid_t child;
 
 struct params_res resume_tests[] = {
-  {"try to resume from db", 50, 0, 0, 1},
+  {"try to resume from db", 1, 0, 0, 1},
   {"try to resume from session ticket", 0, 1, 1, 1},
   {"try to resume from session ticket (server only)", 0, 1, 0, 0},
   {"try to resume from session ticket (client only)", 0, 0, 1, 0},
+  {"try to resume from db and ticket", 1, 1, 1, 1},
   {NULL, -1}
 };
 
 /* A very basic TLS client, with anonymous authentication.
  */
 
-#define SESSIONS 2
+#define SESSIONS 3
 #define MAX_BUF 5*1024
 #define MSG "Hello TLS"
 
@@ -138,7 +139,6 @@ client (int sds[], struct params_res *params)
           /* if this is not the first time we connect */
           gnutls_session_set_data (session, session_data.data,
                                    session_data.size);
-          gnutls_free (session_data.data);
         }
 
       gnutls_transport_set_int (session, sd);
@@ -226,6 +226,7 @@ client (int sds[], struct params_res *params)
 
       gnutls_deinit (session);
     }
+  gnutls_free (session_data.data);
 
 end:
   gnutls_anon_free_client_credentials (anoncred);
