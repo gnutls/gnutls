@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.2.4 (unreleased)
 
+** libgnutls: Fixes when session tickets and session DB are used.
+Report and initial patch by Stefan Buehler.
+
 ** libgnutls: Added ciphersuites that use ARCFOUR with ECDHE. Patch
 by Stefan Buehler.
 
