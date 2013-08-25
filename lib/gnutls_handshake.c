@@ -3098,17 +3098,17 @@ _gnutls_handshake_server (gnutls_session_t session)
         {
           ret = _gnutls_send_handshake_final (session, FALSE);
           IMED_RET ("send handshake final", ret, 1);
+
+          if (session->security_parameters.entity == GNUTLS_SERVER && session->internals.ticket_sent == 0)
+            {
+              /* if no ticket, save session data */
+              _gnutls_server_register_current_session (session);
+            }
         }
       else
         {
           ret = _gnutls_recv_handshake_final (session, FALSE);
           IMED_RET ("recv handshake final 2", ret, 1);
-        }
-
-      if (session->security_parameters.entity == GNUTLS_SERVER && session->internals.ticket_sent == 0)
-        {
-          /* if no ticket, save session data */
-          _gnutls_server_register_current_session (session);
         }
 
       STATE = STATE0;
