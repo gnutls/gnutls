@@ -1199,10 +1199,8 @@ main (int argc, char **argv)
 /*      gnutls_anon_set_server_dh_params(dh_cred, dh_params); */
 #endif
 
-#ifdef ENABLE_SESSION_TICKET
   if (noticket == 0)
     gnutls_session_ticket_key_generate (&session_ticket_key);
-#endif
 
   if (HAVE_OPT (MTU))
     mtu = OPT_VALUE_MTU;
@@ -1610,10 +1608,8 @@ tcp_server (const char *name, int port)
   gnutls_anon_free_server_credentials (dh_cred);
 #endif
 
-#ifdef ENABLE_SESSION_TICKET
   if (noticket == 0)
     gnutls_free (session_ticket_key.data);
-#endif
 
   if (nodb == 0)
     wrap_db_deinit ();
