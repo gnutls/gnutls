@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: libgnutls-3.2.3\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
 "POT-Creation-Date: 2013-07-28 23:51+0200\n"
-"PO-Revision-Date: 2013-08-04 08:05+0700\n"
+"PO-Revision-Date: 2013-08-06 07:13+0700\n"
 "Last-Translator: Trần Ngọc Quân <vnwildman@gmail.com>\n"
 "Language-Team: Vietnamese <translation-team-vi@lists.sourceforge.net>\n"
 "Language: vi\n"
@@ -378,7 +378,7 @@ msgstr "Gói đã truyền là quá lớn (EMSGSIZE)."
 
 #: lib/gnutls_errors.c:172
 msgid "Function was interrupted."
-msgstr "Hàm đã bị gián đoạn."
+msgstr "Hàm đã bị ngắt."
 
 #: lib/gnutls_errors.c:173
 msgid "Rehandshake was requested by the peer."
@@ -422,11 +422,11 @@ msgstr "Gặp lỗi khi đọc tập tin."
 
 #: lib/gnutls_errors.c:191
 msgid "ASN1 parser: Element was not found."
-msgstr "Bộ phân tích ASN1: không tìm thấy phần tử."
+msgstr "Bộ phân tích ASN1: Không tìm thấy phần tử."
 
 #: lib/gnutls_errors.c:193
 msgid "ASN1 parser: Identifier was not found"
-msgstr "Bộ phân tích ASN1: không tìm thấy định danh."
+msgstr "Bộ phân tích ASN1: Không tìm thấy định danh."
 
 #: lib/gnutls_errors.c:195
 msgid "ASN1 parser: Error in DER parsing."
@@ -1260,7 +1260,7 @@ msgstr "\t\tGiá trị tuyệt đối (%d bit):"
 #: lib/x509/output.c:1257
 #, c-format
 msgid "\t\tExponent (bits %d): "
-msgstr "\t\tMũ (%d bit):"
+msgstr "\t\tMũ (%d bit): "
 
 #: lib/x509/output.c:1265
 #, c-format
@@ -1291,7 +1291,7 @@ msgstr "\t\tY:\n"
 #: lib/x509/output.c:1322
 #, c-format
 msgid "\t\tPublic key (bits %d): "
-msgstr "\t\tKhoá công (%d bít):"
+msgstr "\t\tKhoá công (%d bít): "
 
 #: lib/x509/output.c:1325
 msgid "\t\tP: "
@@ -1307,7 +1307,7 @@ msgstr "\t\tG: "
 
 #: lib/x509/output.c:1375 lib/x509/output.c:2234
 msgid "Subject "
-msgstr "Chủ thể"
+msgstr "Chủ thể "
 
 #: lib/x509/output.c:1406
 msgid "\tSerial Number (hex): "
@@ -1466,7 +1466,7 @@ msgstr "Cách dùng Khoá Công:\n"
 
 #: lib/x509/output.c:2531
 msgid "Public Key ID: "
-msgstr "Mã số ID Khoá Công:"
+msgstr "Mã số ID Khoá Công: "
 
 #: lib/x509/output.c:2565
 msgid "Public Key Information:\n"
