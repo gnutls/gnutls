@@ -417,7 +417,7 @@ AC_ARG_ENABLE(guile,
 opt_guile_bindings=$enableval)
 AC_MSG_RESULT($opt_guile_bindings)
 
-AC_ARG_WITH([--with-guile-site-dir],
+AC_ARG_WITH([guile-site-dir],
   [AS_HELP_STRING([--with-guile-site-dir],
      [use the given directory as the Guile site (use with care)])])
 
