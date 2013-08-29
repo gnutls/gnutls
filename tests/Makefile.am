@@ -72,7 +72,8 @@ ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-emsgsize-dtls chainverify-unsorted mini-overhead \
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities	\
 	 mini-dtls-srtp mini-xssl rsa-encrypt-decrypt mini-loss-time \
-	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range
+	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range \
+	 mini-cert-status
 
 if ENABLE_OCSP
 ctests += ocsp
