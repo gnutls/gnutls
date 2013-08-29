@@ -837,9 +837,10 @@ typedef struct
 
   /* if this is non zero a certificate request message
    * will be sent to the client. - only if the ciphersuite
-   * supports it.
+   * supports it. In server side it contains GNUTLS_CERT_REQUIRE
+   * or similar.
    */
-  unsigned send_cert_req:1;
+  unsigned send_cert_req;
 
   size_t max_handshake_data_buffer_size;
 
