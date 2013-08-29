@@ -15,6 +15,9 @@ by Stefan Buehler.
 
 ** libgnutls: Gnulib included files are strictly LGPLv2.
 
+** libgnutls: Corrected gnutls_certificate_server_set_request().
+Reported by Petr Pisar.
+
 ** API and ABI modifications:
 gnutls_record_set_timeout: Exported
 
