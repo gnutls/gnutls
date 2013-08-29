@@ -49,8 +49,6 @@ int main()
 
 #include "utils.h"
 
-static void terminate(void);
-
 /* This program tests the robustness of record
  * decoding.
  */
@@ -192,12 +190,6 @@ client (int fd)
 /* These are global */
 pid_t child;
 
-static void terminate(void)
-{
-  kill(child, SIGTERM);
-  exit(1);
-}
-
 static void
 server (int fd, unsigned status, int expected)
 {
@@ -315,11 +307,6 @@ int status = 0;
     {
       if (WIFSIGNALED(status))
         fail("Child died with sigsegv\n");
-#if 0
-      else
-        fail("Child died with status %d\n", WEXITSTATUS(status));
-      terminate();
-#endif
     }
   return;
 }
