@@ -36,8 +36,4 @@ int
 _gnutls_get_public_rsa_params (gnutls_session_t session,
                                gnutls_pk_params_st * params);
 
-int
-_gnutls_get_private_rsa_params (gnutls_session_t session,
-                                gnutls_pk_params_st** params);
-
 #endif

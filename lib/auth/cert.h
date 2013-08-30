@@ -42,7 +42,6 @@ typedef struct {
 typedef struct gnutls_certificate_credentials_st
 {
   gnutls_dh_params_t dh_params;
-  gnutls_rsa_params_t rsa_params;
   /* this callback is used to retrieve the DH or RSA
    * parameters.
    */
@@ -147,12 +146,6 @@ void _gnutls_selected_certs_set (gnutls_session_t session,
                                  gnutls_pcert_st * certs, int ncerts,
                                  gnutls_privkey_t key, int need_free);
  
-gnutls_rsa_params_t _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t
-                                                        rsa_params,
-                                                        gnutls_params_function
-                                                        * func,
-                                                        gnutls_session_t);
-
 int _gnutls_get_auth_info_pcert (gnutls_pcert_st* gcert,
                                  gnutls_certificate_type_t type,
                                  cert_auth_info_t info);

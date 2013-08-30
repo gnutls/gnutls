@@ -54,7 +54,7 @@ static int _gnutls_proc_rsa_psk_client_kx (gnutls_session_t, uint8_t *, size_t);
 
 const mod_auth_st rsa_psk_auth_struct = {
   "RSA PSK",
-  NULL,/*_gnutls_gen_cert_server_certificate,*/
+  _gnutls_gen_cert_server_crt,
   NULL,                        /* generate_client_certificate */
   _gnutls_gen_psk_server_kx,
   _gnutls_gen_rsa_psk_client_kx,
@@ -68,62 +68,9 @@ const mod_auth_st rsa_psk_auth_struct = {
   NULL                         /* process_server_certificate_reuqest */
 };
 
-/* This function reads the RSA parameters from the private key
- */
-int
-_gnutls_get_private_rsa_params (gnutls_session_t session,
-                                gnutls_pk_params_st** params)
-{
-  int ret;
-  gnutls_certificate_credentials_t cred;
-  gnutls_rsa_params_t rsa_params;
-
-  cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
-  if (cred == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
-
-  if (session->internals.selected_cert_list == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
-
-  ret = _gnutls_pubkey_is_over_rsa_512(session->internals.selected_cert_list[0].pubkey);
-
-  if (_gnutls_cipher_suite_get_kx_algo
-      (session->security_parameters.cipher_suite)
-      != GNUTLS_KX_RSA_EXPORT || ret < 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  rsa_params =
-    _gnutls_certificate_get_rsa_params (cred->rsa_params,
-                                        cred->params_func, session);
-  /* EXPORT case: */
-  if (rsa_params == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
-    }
-
-  /* In the export case, we do use temporary RSA params
-   * of 512 bits size. The params in the certificate are
-   * used to sign this temporary stuff.
-   */
-  *params = &rsa_params->params;
-
-  return 0;
-}
-
 /* Set the PSK premaster secret.
  */
-int
+static int
 set_rsa_psk_session_key (gnutls_session_t session,
 			     gnutls_datum_t * rsa_secret)
 {
@@ -215,6 +162,7 @@ _gnutls_gen_rsa_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
   cert_auth_info_t auth = session->key.auth_info;
   gnutls_datum_t sdata;		/* data to send */
   gnutls_pk_params_st params;
+  gnutls_psk_client_credentials_t cred;
   int ret;
 
 	if (auth == NULL)
@@ -277,10 +225,6 @@ _gnutls_gen_rsa_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
   gnutls_pk_params_release(&params);
 
-
-/* retrieve PSK credentials */
-  gnutls_psk_client_credentials_t cred;
-
   cred = (gnutls_psk_client_credentials_t)
     _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
 
@@ -290,9 +234,9 @@ _gnutls_gen_rsa_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-	/* TODO: Bei dhe_psk wird keine PSK aufgerufen, wenn die Parameter
-	 leer sind. Die Funktion wird an dieser Stelle dann abgebrochen.
-	 Können diese womöglich an anderer Stelle übergeben werden? */
+  /* TODO: Bei dhe_psk wird keine PSK aufgerufen, wenn die Parameter
+     leer sind. Die Funktion wird an dieser Stelle dann abgebrochen.
+     Können diese womöglich an anderer Stelle übergeben werden? */
   if (cred->username.data == NULL && cred->key.data == NULL &&
       cred->get_function != NULL)
     {
@@ -329,24 +273,21 @@ _gnutls_gen_rsa_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-	/* Here we set the PSK key */
-	ret = set_rsa_psk_session_key (session, &premaster_secret);
-
+  /* Here we set the PSK key */
+  ret = set_rsa_psk_session_key (session, &premaster_secret);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-
-/* Create message for client key exchange
- *
- * struct {
- *   uint8_t psk_identity<0..2^16-1>;
- *   EncryptedPreMasterSecret;
- * }
- */
-  _gnutls_buffer_init (data);
+  /* Create message for client key exchange
+   *
+   * struct {
+   *   uint8_t psk_identity<0..2^16-1>;
+   *   EncryptedPreMasterSecret;
+   * }
+   */
 
   /* Write psk_identity and EncryptedPreMasterSecret into data stream
   */
@@ -357,6 +298,7 @@ _gnutls_gen_rsa_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
       _gnutls_free_datum (&sdata);
       return GNUTLS_E_MEMORY_ERROR;
     }
+
   ret = _gnutls_buffer_append_data_prefix (data, 16, sdata.data,
                                                    sdata.size);
   if (ret < 0)
@@ -383,10 +325,10 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
   gnutls_datum_t plaintext;
   gnutls_datum_t ciphertext;
   int ret, dsize;
-  gnutls_pk_params_st *params;
   int randomize_key = 0;
   ssize_t data_size = _data_size;
   gnutls_psk_server_credentials_t cred;
+  gnutls_datum_t premaster_secret;
 
   cred = (gnutls_psk_server_credentials_t)
     _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
@@ -444,16 +386,8 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
 	}
   ciphertext.size = dsize;
 
-
-  ret = _gnutls_get_private_rsa_params (session, &params);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = _gnutls_pk_decrypt (GNUTLS_PK_RSA, &ciphertext, &plaintext, params);	/* btype==2 */
-
+  ret = gnutls_privkey_decrypt_data (session->internals.selected_key, 0,
+                                     &ciphertext, &plaintext);
   if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE)
     {
       /* In case decryption fails then don't inform
@@ -461,7 +395,7 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
        * attack against pkcs-1 formating).
        */
       gnutls_assert ();
-      _gnutls_debug_log ("auth_rsa: Possible PKCS #1 format attack\n");
+      _gnutls_debug_log ("auth_rsa_psk: Possible PKCS #1 format attack\n");
       randomize_key = 1;
     }
   else
@@ -469,8 +403,9 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
       /* If the secret was properly formatted, then
        * check the version number.
        */
-      if (_gnutls_get_adv_version_major (session) != plaintext.data[0]
-	  || _gnutls_get_adv_version_minor (session) != plaintext.data[1])
+      if (_gnutls_get_adv_version_major (session) != plaintext.data[0] ||
+          (session->internals.priorities.allow_wrong_pms == 0 &&
+	   _gnutls_get_adv_version_minor (session) != plaintext.data[1]))
 	{
 	  /* No error is returned here, if the version number check
 	   * fails. We proceed normally.
@@ -484,8 +419,6 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
 	}
     }
 
-
-  gnutls_datum_t premaster_secret;
 
   if (randomize_key != 0)
     {
@@ -506,14 +439,12 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
 	  gnutls_assert ();
 	  return ret;
 	}
-
     }
   else
     {
       premaster_secret.data = plaintext.data;
       premaster_secret.size = plaintext.size;
     }
-
 
   /* This is here to avoid the version check attack
    * discussed above.
@@ -523,13 +454,14 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
   premaster_secret.data[1] = _gnutls_get_adv_version_minor (session);
 
   ret = set_rsa_psk_session_key (session, &premaster_secret);
+  _gnutls_free_datum (&premaster_secret);
+
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  _gnutls_free_datum (&premaster_secret);
   return 0;
 }
 
