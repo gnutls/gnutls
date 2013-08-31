@@ -5,8 +5,8 @@
  * Copyright (C) 2011
  * Bardenheuer GmbH, Munich and Bundesdruckerei GmbH, Berlin
  *
- * Copyright (C) 2013
- * Frank Morgner
+ * Copyright (C) 2013 Frank Morgner
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
