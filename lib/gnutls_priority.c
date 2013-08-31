@@ -746,6 +746,9 @@ bulk_rmadd_func *func;
  * Some keywords are defined to provide quick access
  * to common preferences.
  *
+ * Unless there is a special need, using "NORMAL" or "NORMAL:%COMPAT" for compatibility 
+ * is recommended.
+ *
  * "PERFORMANCE" means all the "secure" ciphersuites are enabled,
  * limited to 128 bit ciphers and sorted by terms of speed
  * performance.
