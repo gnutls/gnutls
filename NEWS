@@ -3,7 +3,7 @@ Copyright (C) 2000-2012 Free Software Foundation, Inc.
 Copyright (C) 2013 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.2.4 (unreleased)
+* Version 3.2.4 (released 2013-08-31)
 
 ** libgnutls: Fixes when session tickets and session DB are used.
 Report and initial patch by Stefan Buehler.
