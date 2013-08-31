@@ -40,7 +40,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Interfaces added:                             AGE++
   # Interfaces removed:                           AGE=0
   AC_SUBST(LT_CURRENT, 39)
-  AC_SUBST(LT_REVISION, 6)
+  AC_SUBST(LT_REVISION, 7)
   AC_SUBST(LT_AGE, 11)
 
   AC_SUBST(LT_SSL_CURRENT, 27)
