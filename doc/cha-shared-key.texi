@@ -110,6 +110,10 @@ exchange.  This method offers perfect forward secrecy.
 Authentication using the @acronym{PSK} protocol and Elliptic curve Diffie-Hellman key
 exchange.  This method offers perfect forward secrecy.
 
+@item RSA-PSK:
+Authentication using the @acronym{PSK} protocol for the client and an RSA certificate
+for the server.
+
 @end table
 
 
