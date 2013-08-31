@@ -310,7 +310,7 @@ compressed_to_ciphertext (gnutls_session_t session,
                           content_type_t type, 
                           record_parameters_st * params)
 {
-  uint8_t pad = target_size - compressed->size;
+  uint8_t pad;
   int length, ret;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
@@ -349,12 +349,15 @@ compressed_to_ciphertext (gnutls_session_t session,
       if (ret < 0)
         return gnutls_assert_val(ret);
 
+      pad = target_size - compressed->size;
+
       length =
         calc_enc_length_block (session, ver, compressed->size, tag_size, &pad,
                                auth_cipher, blocksize);
     }
   else
     {
+      pad = 0;
       length =
         calc_enc_length_stream (session, compressed->size, tag_size,
                                 auth_cipher);
