@@ -233,9 +233,6 @@ deinit_internal_params (gnutls_session_t session)
     gnutls_dh_params_deinit (session->internals.params.dh_params);
 #endif
 
-  if (session->internals.params.free_rsa_params)
-    gnutls_rsa_params_deinit (session->internals.params.rsa_params);
-
   _gnutls_handshake_hash_buffers_clear (session);
 
   memset (&session->internals.params, 0, sizeof (session->internals.params));

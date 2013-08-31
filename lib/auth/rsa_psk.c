@@ -74,46 +74,12 @@ const mod_auth_st rsa_psk_auth_struct = {
  */
 static int
 set_rsa_psk_session_key (gnutls_session_t session,
-                         gnutls_datum_t * rsa_secret)
+                         gnutls_datum_t *ppsk, gnutls_datum_t * rsa_secret)
 {
-  gnutls_datum_t pwd_psk = { NULL, 0 };
-  gnutls_datum_t *ppsk;
   unsigned char *p;
   size_t rsa_secret_size;
   int ret;
 
-  if (session->security_parameters.entity == GNUTLS_CLIENT)
-    {
-      gnutls_psk_client_credentials_t cred;
-
-      cred = (gnutls_psk_client_credentials_t)
-        _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
-
-      if (cred == NULL)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-        }
-
-      ppsk = &cred->key;
-
-    }
-  else
-    {                           /* SERVER side */
-      psk_auth_info_t info;
-
-      info = _gnutls_get_auth_info (session);
-
-      /* find the key of this username
-       */
-      ret = _gnutls_psk_pwd_find_entry (session, info->username, &pwd_psk);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-      ppsk = &pwd_psk;
-    }
 
   rsa_secret_size = rsa_secret->size;
 
@@ -144,7 +110,6 @@ set_rsa_psk_session_key (gnutls_session_t session,
   ret = 0;
 
 error:
-  _gnutls_free_datum (&pwd_psk);
   return ret;
 }
 
@@ -166,7 +131,8 @@ _gnutls_gen_rsa_psk_client_kx (gnutls_session_t session,
   gnutls_datum_t sdata;         /* data to send */
   gnutls_pk_params_st params;
   gnutls_psk_client_credentials_t cred;
-  int ret;
+  gnutls_datum_t username, key;
+  int ret, free;
 
   if (auth == NULL)
     {
@@ -236,51 +202,16 @@ _gnutls_gen_rsa_psk_client_kx (gnutls_session_t session,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  /* TODO: Bei dhe_psk wird keine PSK aufgerufen, wenn die Parameter
-     leer sind. Die Funktion wird an dieser Stelle dann abgebrochen.
-     Können diese womöglich an anderer Stelle übergeben werden? */
-  if (cred->username.data == NULL && cred->key.data == NULL &&
-      cred->get_function != NULL)
-    {
-      char *username;
-      gnutls_datum_t key;
-
-      ret = cred->get_function (session, &username, &key);
-      if (ret)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      ret = _gnutls_set_datum (&cred->username, username, strlen (username));
-      gnutls_free (username);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          _gnutls_free_datum (&key);
-          return ret;
-        }
-
-      ret = _gnutls_set_datum (&cred->key, key.data, key.size);
-      _gnutls_free_datum (&key);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-    }
-  else if (cred->username.data == NULL || cred->key.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
+  ret = _gnutls_find_psk_key( session, cred, &username, &key, &free);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   /* Here we set the PSK key */
-  ret = set_rsa_psk_session_key (session, &premaster_secret);
+  ret = set_rsa_psk_session_key (session, &key, &premaster_secret);
   if (ret < 0)
     {
       gnutls_assert ();
-      return ret;
+      goto cleanup;
     }
 
   /* Create message for client key exchange
@@ -297,19 +228,27 @@ _gnutls_gen_rsa_psk_client_kx (gnutls_session_t session,
                                            cred->username.size);
   if (ret < 0)
     {
-      _gnutls_free_datum (&sdata);
-      return GNUTLS_E_MEMORY_ERROR;
+      gnutls_assert();
+      goto cleanup;
     }
 
   ret = _gnutls_buffer_append_data_prefix (data, 16, sdata.data, sdata.size);
   if (ret < 0)
     {
-      _gnutls_free_datum (&sdata);
-      return GNUTLS_E_MEMORY_ERROR;
+      gnutls_assert();
+      goto cleanup;
     }
 
+  ret = 0;
+
+cleanup:
   _gnutls_free_datum (&sdata);
   _gnutls_free_datum (&premaster_secret);
+  if (free)
+    {
+      gnutls_free(key.data);
+      gnutls_free(username.data);
+    }
 
   return data->length;
 }
@@ -325,11 +264,12 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
   psk_auth_info_t info;
   gnutls_datum_t plaintext;
   gnutls_datum_t ciphertext;
+  gnutls_datum_t pwd_psk = {NULL, 0};
   int ret, dsize;
   int randomize_key = 0;
   ssize_t data_size = _data_size;
   gnutls_psk_server_credentials_t cred;
-  gnutls_datum_t premaster_secret;
+  gnutls_datum_t premaster_secret = {NULL, 0};
 
   cred = (gnutls_psk_server_credentials_t)
     _gnutls_get_cred (session, GNUTLS_CRD_PSK, NULL);
@@ -372,7 +312,6 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
 
   /* Adjust data so it points to EncryptedPreMasterSecret */
   data += username.size + 2;
-
 
   /*** 2. Decrypt and extract EncryptedPreMasterSecret ***/
 
@@ -438,7 +377,7 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
       if (ret < 0)
         {
           gnutls_assert ();
-          return ret;
+          goto cleanup;
         }
     }
   else
@@ -454,16 +393,28 @@ _gnutls_proc_rsa_psk_client_kx (gnutls_session_t session, uint8_t * data,
   premaster_secret.data[0] = _gnutls_get_adv_version_major (session);
   premaster_secret.data[1] = _gnutls_get_adv_version_minor (session);
 
-  ret = set_rsa_psk_session_key (session, &premaster_secret);
-  _gnutls_free_datum (&premaster_secret);
+  /* find the key of this username
+   */
+  ret = _gnutls_psk_pwd_find_entry (session, info->username, &pwd_psk);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
+  ret = set_rsa_psk_session_key (session, &pwd_psk, &premaster_secret);
   if (ret < 0)
     {
       gnutls_assert ();
-      return ret;
+      goto cleanup;
     }
 
-  return 0;
+  ret = 0;
+cleanup:
+  _gnutls_free_datum (&pwd_psk);
+  _gnutls_free_datum (&premaster_secret);
+
+  return ret;
 }
 
 #endif /* ENABLE_PSK */
