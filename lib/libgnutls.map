@@ -906,6 +906,7 @@ GNUTLS_3_1_0 {
 	gnutls_sign_algorithm_get_client;
 	gnutls_certificate_set_x509_key_mem2;
 	gnutls_certificate_set_x509_key_file2;
+	gnutls_record_set_timeout;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
