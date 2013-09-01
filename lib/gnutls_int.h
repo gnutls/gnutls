@@ -1068,14 +1068,17 @@ size_t max;
 
   if (IS_DTLS(session))
     max = gnutls_dtls_get_data_mtu(session);
-  else 
-    max = session->security_parameters.max_record_send_size;
+  else
+    {
+      max = session->security_parameters.max_record_send_size;
+      /* DTLS data MTU accounts for those */
 
-  if (record_params->write.new_record_padding != 0)
-    max -= 2;
+      if (record_params->write.new_record_padding != 0)
+        max -= 2;
 
-  if (_gnutls_cipher_is_block (record_params->cipher))
-    max -= _gnutls_cipher_get_block_size(record_params->cipher);
+      if (_gnutls_cipher_is_block (record_params->cipher))
+        max -= _gnutls_cipher_get_block_size(record_params->cipher);
+    }
 
   return max;
 }
