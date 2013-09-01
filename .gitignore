@@ -646,3 +646,6 @@ tests/mini-dtls-large
 tests/record-sizes
 tests/priorities
 tests/record-sizes-range
+tests/mini-rsa-psk
+tests/mini-record-2
+tests/mini-cert-status
