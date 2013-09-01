@@ -47,8 +47,8 @@ void *_gnutls_file_mutex;
 ASN1_TYPE _gnutls_pkix1_asn;
 ASN1_TYPE _gnutls_gnutls_asn;
 
-gnutls_log_func _gnutls_log_func;
-gnutls_audit_log_func _gnutls_audit_log_func;
+gnutls_log_func _gnutls_log_func = NULL;
+gnutls_audit_log_func _gnutls_audit_log_func = NULL;
 int _gnutls_log_level = 0;      /* default log level */
 
 /**
