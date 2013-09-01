@@ -112,7 +112,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 /* A very basic TLS client, with anonymous authentication.
  */
 
-#define MAX_BUF 16*1024
+#define MAX_BUF 24*1024
 
 static void
 client (int fd, const char* prio)
@@ -125,6 +125,7 @@ client (int fd, const char* prio)
   /* Need to enable anonymous KX specifically. */
 
   global_init ();
+  memset(buffer, 2, sizeof(buffer));
 
   if (debug)
     {
@@ -219,7 +220,7 @@ static void terminate(void)
 }
 
 static void
-server (int fd, const char* prio)
+server (int fd, const char* prio, int ign)
 {
 int ret;
 unsigned i;
@@ -290,6 +291,23 @@ gnutls_certificate_credentials_t x509_cred;
         }
     }
 
+    /* Try sending a bit more */
+    i = 21056;
+    do {
+      ret = gnutls_record_send (session, buffer, i);
+    } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+    if (ret < 0)
+      {
+        fail("server (%s): Error sending %d byte packet: %s\n", prio, i, gnutls_strerror(ret));
+        terminate();
+      } 
+    else if (ign == 0 && ret != 16384)
+      {
+        fail("server (%s): Error sending %d byte packet; sent %d bytes instead of 16384\n", prio, i, ret);
+        terminate();
+      }
+    
   /* do not wait for the peer to close the connection.
    */
   gnutls_bye (session, GNUTLS_SHUT_WR);
@@ -306,7 +324,7 @@ gnutls_certificate_credentials_t x509_cred;
     success ("server: finished\n");
 }
 
-static void start (const char* prio)
+static void start (const char* prio, int ign)
 {
   int fd[2];
   int ret;
@@ -330,7 +348,7 @@ static void start (const char* prio)
     {
       /* parent */
       close(fd[1]);
-      server (fd[0], prio);
+      server (fd[0], prio, ign);
       kill(child, SIGTERM);
     }
   else 
@@ -349,6 +367,7 @@ static void start (const char* prio)
 #define ARCFOUR_MD5 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:+RSA"
 
 #define NEW_AES_CBC "NONE:+VERS-TLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:%NEW_PADDING"
+#define NEW_ARCFOUR_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:%NEW_PADDING"
 #define NEW_AES_CBC_SHA256 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:%NEW_PADDING"
 #define NEW_AES_GCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:%NEW_PADDING"
 
@@ -373,16 +392,17 @@ doit (void)
 {
   signal(SIGCHLD, ch_handler);
 
-  start(NEW_AES_CBC);
-  start(NEW_AES_CBC_SHA256);
-  start(NEW_AES_GCM);
+  start(NEW_ARCFOUR_SHA1, 1);
+  start(NEW_AES_CBC, 1);
+  start(NEW_AES_CBC_SHA256, 1);
+  start(NEW_AES_GCM, 1);
 
-  start(AES_CBC);
-  start(AES_CBC_SHA256);
-  start(AES_GCM);
+  start(AES_CBC, 1);
+  start(AES_CBC_SHA256, 1);
+  start(AES_GCM, 0);
 
-  start(ARCFOUR_SHA1);
-  start(ARCFOUR_MD5);
+  start(ARCFOUR_SHA1, 0);
+  start(ARCFOUR_MD5, 0);
 }
 
 #endif /* _WIN32 */
