@@ -427,7 +427,7 @@ sequence_increment (gnutls_session_t session,
  * @epoch_rel: %EPOCH_READ_* or %EPOCH_WRITE_*
  * @data: the data to be sent
  * @data_size: the size of the @data
- * @target_length: @data_size + minimum required padding
+ * @min_pad: the minimum required padding
  * @mflags: zero or %MBUFFER_FLUSH
  *
  * Oct 30 2001: Removed capability to send data more than MAX_RECORD_SIZE.
@@ -443,7 +443,7 @@ ssize_t
 _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
 		gnutls_handshake_description_t htype,
 		unsigned int epoch_rel, const void *_data,
-		size_t data_size, size_t target_length, unsigned int mflags)
+		size_t data_size, size_t min_pad, unsigned int mflags)
 {
   mbuffer_st *bufel;
   ssize_t cipher_size;
@@ -453,6 +453,7 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
   int header_size;
   const uint8_t *data = _data;
   record_parameters_st *record_params;
+  size_t max_send_size;
   record_state_st *record_state;
 
   ret = _gnutls_epoch_get (session, epoch_rel, &record_params);
@@ -483,13 +484,14 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
         return GNUTLS_E_INVALID_SESSION;
       }
 
+  max_send_size = max_user_send_size(session, record_params);
 
-  if (data_size > MAX_USER_SEND_SIZE(session))
+  if (data_size > max_send_size)
     {
       if (IS_DTLS(session))
         return gnutls_assert_val(GNUTLS_E_LARGE_PACKET);
 
-      send_data_size = MAX_USER_SEND_SIZE(session);
+      send_data_size = max_send_size;
     }
   else
     send_data_size = data_size;
@@ -509,7 +511,7 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
     }
   else
     {
-      if (unlikely((send_data_size == 0 && target_length == 0)))
+      if (unlikely((send_data_size == 0 && min_pad == 0)))
         return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
       /* now proceed to packet encryption
@@ -530,15 +532,15 @@ _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
         memcpy(&headers[3], &record_state->sequence_number.i, 8);
 
       _gnutls_record_log
-        ("REC[%p]: Preparing Packet %s(%d) with length: %d and target length: %d\n", session,
-         _gnutls_packet2str (type), type, (int) data_size, (int) target_length);
+        ("REC[%p]: Preparing Packet %s(%d) with length: %d and min pad: %d\n", session,
+         _gnutls_packet2str (type), type, (int) data_size, (int) min_pad);
 
       _mbuffer_set_udata_size(bufel, cipher_size);
       _mbuffer_set_uhead_size(bufel, header_size);
 
       ret =
         _gnutls_encrypt (session, 
-                         data, send_data_size, target_length, 
+                         data, send_data_size, min_pad,
                          bufel, type, record_params);
       if (ret <= 0)
         {

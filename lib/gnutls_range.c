@@ -59,7 +59,7 @@ _gnutls_range_max_lh_pad (gnutls_session_t session, ssize_t data_length,
 
   if (session->security_parameters.new_record_padding != 0)
     {
-      max_pad = MAX_USER_SEND_SIZE (session);
+      max_pad = max_user_send_size (session, record_params);
       fixed_pad = 2;
     }
   else
@@ -163,9 +163,16 @@ gnutls_range_split (gnutls_session_t session,
                     gnutls_range_st * remainder)
 {
   int ret;
-  ssize_t max_frag = MAX_USER_SEND_SIZE (session);
+  ssize_t max_frag;
   ssize_t orig_low = (ssize_t) orig->low;
   ssize_t orig_high = (ssize_t) orig->high;
+  record_parameters_st *record_params;
+
+  ret = _gnutls_epoch_get (session, EPOCH_WRITE_CURRENT, &record_params);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  max_frag = max_user_send_size (session, record_params);
 
   if (orig_high == orig_low)
     {
@@ -283,7 +290,7 @@ gnutls_record_send_range (gnutls_session_t session, const void *data,
                                    EPOCH_WRITE_CURRENT,
                                    &(((char *) data)[sent]),
                                    next_fragment_length, 
-                                   cur_range.high,
+                                   cur_range.high-next_fragment_length,
                                    MBUFFER_FLUSH);
 
       while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED)

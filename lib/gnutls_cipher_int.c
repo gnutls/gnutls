@@ -328,6 +328,8 @@ int ret;
     {
       _gnutls_cipher_tag(&handle->cipher, tag, tag_size);
     }
+  else
+    memset(tag, 0, tag_size);
     
   return 0;
 }

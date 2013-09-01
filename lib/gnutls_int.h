@@ -182,7 +182,6 @@ typedef enum record_flush_t
 #define RECORD_HEADER_SIZE(session) (IS_DTLS(session) ? DTLS_RECORD_HEADER_SIZE : TLS_RECORD_HEADER_SIZE)
 #define MAX_RECORD_HEADER_SIZE DTLS_RECORD_HEADER_SIZE
 
-#define MAX_USER_SEND_SIZE(session) (IS_DTLS(session)?((size_t)gnutls_dtls_get_data_mtu(session)):(size_t)session->security_parameters.max_record_send_size)
 #define MAX_RECORD_SEND_SIZE(session) (IS_DTLS(session)?((size_t)gnutls_dtls_get_mtu(session)):(size_t)session->security_parameters.max_record_send_size+MAX_RECORD_OVERHEAD(session))
 #define MAX_RECORD_RECV_SIZE(session) ((size_t)session->security_parameters.max_record_recv_size)
 #define MAX_PAD_SIZE 255
@@ -1061,5 +1060,24 @@ get_num_version (gnutls_session_t session)
 unsigned int
 /* returns a-b in ms */
 timespec_sub_ms (struct timespec *a, struct timespec *b);
+
+#include <algorithms.h>
+inline static size_t max_user_send_size(gnutls_session_t session, record_parameters_st *record_params)
+{
+size_t max;
+
+  if (IS_DTLS(session))
+    max = gnutls_dtls_get_data_mtu(session);
+  else 
+    max = session->security_parameters.max_record_send_size;
+
+  if (record_params->write.new_record_padding != 0)
+    max -= 2;
+
+  if (_gnutls_cipher_is_block (record_params->cipher))
+    max -= _gnutls_cipher_get_block_size(record_params->cipher);
+
+  return max;
+}
 
 #endif /* GNUTLS_INT_H */

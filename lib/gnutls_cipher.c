@@ -45,7 +45,7 @@
 static int compressed_to_ciphertext (gnutls_session_t session,
                                    uint8_t * cipher_data, int cipher_size,
                                    gnutls_datum_t *compressed,
-                                   size_t target_size,
+                                   size_t min_pad,
                                    content_type_t _type, 
                                    record_parameters_st * params);
 static int ciphertext_to_compressed (gnutls_session_t session,
@@ -64,7 +64,7 @@ static int
 compressed_to_ciphertext_new (gnutls_session_t session,
                                uint8_t * cipher_data, int cipher_size,
                                gnutls_datum_t *compressed,
-                               size_t target_size,
+                               size_t min_pad,
                                content_type_t type, 
                                record_parameters_st * params);
 
@@ -94,7 +94,7 @@ is_read_comp_null (record_parameters_st * record_params)
 int
 _gnutls_encrypt (gnutls_session_t session, 
                  const uint8_t * data, size_t data_size, 
-                 size_t target_size, 
+                 size_t min_pad, 
                  mbuffer_st* bufel,
                  content_type_t type, 
                  record_parameters_st * params)
@@ -134,11 +134,11 @@ _gnutls_encrypt (gnutls_session_t session,
   if (params->write.new_record_padding != 0)
     ret = compressed_to_ciphertext_new (session, _mbuffer_get_udata_ptr(bufel),
                                         _mbuffer_get_udata_size(bufel),
-                                        &comp, target_size, type, params);
+                                        &comp, min_pad, type, params);
   else
     ret = compressed_to_ciphertext (session, _mbuffer_get_udata_ptr(bufel),
                                     _mbuffer_get_udata_size(bufel),
-                                    &comp, target_size, type, params);
+                                    &comp, min_pad, type, params);
 
   if (free_comp)
     gnutls_free(comp.data);
@@ -306,7 +306,7 @@ static int
 compressed_to_ciphertext (gnutls_session_t session,
                           uint8_t * cipher_data, int cipher_size,
                           gnutls_datum_t *compressed,
-                          size_t target_size,
+                          size_t min_pad,
                           content_type_t type, 
                           record_parameters_st * params)
 {
@@ -349,7 +349,7 @@ compressed_to_ciphertext (gnutls_session_t session,
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      pad = target_size - compressed->size;
+      pad = min_pad;
 
       length =
         calc_enc_length_block (session, ver, compressed->size, tag_size, &pad,
@@ -442,11 +442,11 @@ static int
 compressed_to_ciphertext_new (gnutls_session_t session,
                               uint8_t * cipher_data, int cipher_size,
                               gnutls_datum_t *compressed,
-                              size_t target_size,
+                              size_t min_pad,
                               content_type_t type, 
                               record_parameters_st * params)
 {
-  uint16_t pad = target_size - compressed->size;
+  uint16_t pad = min_pad;
   int length, length_to_encrypt, ret;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
@@ -459,7 +459,7 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   int explicit_iv = _gnutls_version_has_explicit_iv (ver);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
   uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
-  unsigned iv_size;
+  unsigned iv_size, final_cipher_size;
 
   if (unlikely(ver == NULL))
     return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -544,14 +544,35 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   data_ptr += 2;
   length_to_encrypt += 2;
   length += 2;
- 
+  final_cipher_size = cipher_size;
+
   if (pad > 0)
     { 
+      unsigned t;
+
+      t = cipher_size - compressed->size;
+      if (pad > t)
+        {
+          if (block_algo == CIPHER_BLOCK)
+            {
+              if (pad <= blocksize)
+                return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+              pad -= blocksize*((pad-t)/blocksize);
+            }
+          else
+            pad = t;
+        }
+
+      DECR_LEN(cipher_size, pad);
+
       memset(data_ptr, 0, pad);
       data_ptr += pad;
       length_to_encrypt += pad;
       length += pad;
     }
+
+  DECR_LEN(cipher_size, compressed->size);
 
   memcpy (data_ptr, compressed->data, compressed->size);
   data_ptr += compressed->size;
@@ -560,6 +581,8 @@ compressed_to_ciphertext_new (gnutls_session_t session,
 
   if (tag_size > 0)
     {
+      DECR_LEN(cipher_size, tag_size);
+
       data_ptr += tag_size;
       
       /* In AEAD ciphers we don't encrypt the tag 
@@ -583,7 +606,7 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   ret =
     _gnutls_auth_cipher_encrypt2_tag (&params->write.cipher_state,
         cipher_data, length_to_encrypt, 
-        cipher_data, cipher_size, 0);
+        cipher_data, final_cipher_size, 0);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -907,6 +930,9 @@ ciphertext_to_compressed_new (gnutls_session_t restrict session,
         return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
       
       length_to_decrypt = ciphertext->size;
+      if (length_to_decrypt < blocksize)
+        return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
       break;
 
     default:
