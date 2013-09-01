@@ -51,7 +51,8 @@ done
 
 HOSTS="torproject.org jhcloos.com good.dane.verisignlabs.com \
 www.kumari.net"
-HOSTS="$HOSTS nohats.ca dane.nox.su"
+HOSTS="$HOSTS nohats.ca"
+# dane.nox.su
 for i in $HOSTS;do
 rm -f tmp
 $CLI $i -p 443 --print-cert --insecure >tmp 2>&1 </dev/null
