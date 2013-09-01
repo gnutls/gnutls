@@ -41,7 +41,7 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "%s|<%d>| %s", side, level, str);
 }
 
-/* This test attempts to transfer various sizes using AES-128-CBC.
+/* This test attempts to transfer various sizes using ARCFOUR-128.
  */
 
 #define MAX_BUF 16384
@@ -77,7 +77,7 @@ doit (void)
   gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
   gnutls_anon_set_server_dh_params (s_anoncred, dh_params);
   gnutls_init (&server, GNUTLS_SERVER);
-  gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH", NULL);
+  gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+ARCFOUR-128:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH", NULL);
   gnutls_credentials_set (server, GNUTLS_CRD_ANON, s_anoncred);
   gnutls_dh_set_prime_bits (server, 1024);
   gnutls_transport_set_push_function (server, server_push);
