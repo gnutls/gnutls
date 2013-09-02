@@ -38,7 +38,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <error.h>
 #include "certtool-common.h"
 #include "certtool-cfg.h"
 
@@ -64,14 +63,20 @@ load_privkey_list (int mand, size_t * privkey_size, common_info_st * info)
   if (info->privkey == NULL)
     {
       if (mand)
-        error (EXIT_FAILURE, 0, "missing --load-privkey");
+        {
+          fprintf( stderr, "missing --load-privkey");
+          exit(1);
+        }
       else
         return NULL;
     }
 
   ret = gnutls_load_file(info->privkey, &file_data);
   if (ret < 0)
-    error (EXIT_FAILURE, errno, "%s", info->privkey);
+    {
+      fprintf (stderr, "%s", info->privkey);
+      exit(1);
+    }
 
   ptr = (void*)file_data.data;
   ptr_size = file_data.size;
@@ -80,7 +85,10 @@ load_privkey_list (int mand, size_t * privkey_size, common_info_st * info)
     {
       ret = gnutls_x509_privkey_init (&key[i]);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+        {
+          fprintf( stderr, "privkey_init: %s", gnutls_strerror (ret));
+          exit(1);
+        }
 
       dat.data = (void*)ptr;
       dat.size = ptr_size;
@@ -95,7 +103,10 @@ load_privkey_list (int mand, size_t * privkey_size, common_info_st * info)
       if (ret < 0 && *privkey_size > 0)
         break;
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "privkey_import: %s", gnutls_strerror (ret));
+        {
+          fprintf( stderr, "privkey_import: %s", gnutls_strerror (ret));
+          exit(1);
+        }
 
       (*privkey_size)++;
 

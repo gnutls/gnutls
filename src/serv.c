@@ -1216,6 +1216,8 @@ main (int argc, char **argv)
     udp_server (name, port, mtu);
   else
     tcp_server (name, port);
+  
+  return 0;
 }
 
 static void

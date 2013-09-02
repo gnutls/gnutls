@@ -31,7 +31,6 @@
 #include <gnutls/crypto.h>
 
 /* Gnulib portability files. */
-#include <error.h>
 #include <read-file.h>
 #include <socket.h>
 
@@ -83,12 +82,18 @@ _generate_request (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 
   ret = gnutls_ocsp_req_init (&req);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "ocsp_req_init: %s", gnutls_strerror (ret));
+    {
+      fprintf( stderr, "ocsp_req_init: %s", gnutls_strerror (ret));
+      exit(1);
+    }
 
   ret = gnutls_ocsp_req_add_cert (req, GNUTLS_DIG_SHA1,
   				      issuer, cert);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "ocsp_req_add_cert: %s", gnutls_strerror (ret));
+    {
+      fprintf( stderr, "ocsp_req_add_cert: %s", gnutls_strerror (ret));
+      exit(1);
+    }
     
   if (nonce)
     {
@@ -97,17 +102,26 @@ _generate_request (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 
       ret = gnutls_rnd (GNUTLS_RND_RANDOM, nonce.data, nonce.size);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "gnutls_rnd: %s", gnutls_strerror (ret));
+	{
+	  fprintf( stderr, "gnutls_rnd: %s", gnutls_strerror (ret));
+          exit(1);
+        }
 
       ret = gnutls_ocsp_req_set_nonce (req, 0, &nonce);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "ocsp_req_set_nonce: %s",
+	{
+	  fprintf( stderr, "ocsp_req_set_nonce: %s",
 	       gnutls_strerror (ret));
+          exit(1);
+        }
     }
 
   ret = gnutls_ocsp_req_export (req, rdata);
   if (ret != 0)
-    error (EXIT_FAILURE, 0, "ocsp_req_export: %s", gnutls_strerror (ret));
+    {
+      fprintf( stderr, "ocsp_req_export: %s", gnutls_strerror (ret));
+      exit(1);
+    }
 
   gnutls_ocsp_req_deinit (req);
   return;
@@ -321,11 +335,17 @@ check_ocsp_response (gnutls_x509_crt_t cert,
 
   ret = gnutls_ocsp_resp_init (&resp);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "ocsp_resp_init: %s", gnutls_strerror (ret));
+    {
+      fprintf(stderr,  "ocsp_resp_init: %s", gnutls_strerror (ret));
+      exit(1);
+    }
 
   ret = gnutls_ocsp_resp_import (resp, data);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "importing response: %s", gnutls_strerror (ret));
+    {
+      fprintf(stderr,  "importing response: %s", gnutls_strerror (ret));
+      exit(1);
+    }
   
   ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
   if (ret < 0)
@@ -337,8 +357,11 @@ check_ocsp_response (gnutls_x509_crt_t cert,
 
   ret = gnutls_ocsp_resp_verify_direct( resp, issuer, &status, 0);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "gnutls_ocsp_resp_verify_direct: %s",
-      gnutls_strerror (ret));
+    {  
+      fprintf(stderr,  "gnutls_ocsp_resp_verify_direct: %s",
+        gnutls_strerror (ret));
+      exit(1);
+    }
 
   if (status != 0)
     {
@@ -357,7 +380,10 @@ check_ocsp_response (gnutls_x509_crt_t cert,
   ret = gnutls_ocsp_resp_get_single(resp, 0, NULL, NULL, NULL, NULL,
         &cert_status, &vtime, &ntime, &rtime, NULL);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "reading response: %s", gnutls_strerror (ret));
+    {
+      fprintf(stderr,  "reading response: %s", gnutls_strerror (ret));
+      exit(1);
+    }
   
   if (cert_status == GNUTLS_OCSP_CERT_REVOKED)
     {

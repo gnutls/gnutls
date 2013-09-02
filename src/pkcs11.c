@@ -75,7 +75,6 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
              unsigned int detailed, common_info_st * info)
 {
   gnutls_pkcs11_obj_t *crt_list;
-  gnutls_x509_crt_t xcrt;
   unsigned int crt_list_size = 0, i;
   int ret, otype;
   char *output;
