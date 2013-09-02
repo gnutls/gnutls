@@ -19,9 +19,6 @@
 
 #include <stdint.h>
 
-#ifndef _GL_INLINE_HEADER_BEGIN
- #error "Please include config.h first."
-#endif
 _GL_INLINE_HEADER_BEGIN
 #ifndef _GL_U64_INLINE
 # define _GL_U64_INLINE _GL_INLINE

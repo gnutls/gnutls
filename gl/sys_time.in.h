@@ -24,12 +24,11 @@
 #endif
 @PRAGMA_COLUMNS@
 
-/* On Cygwin and on many BSDish systems, <sys/time.h> includes itself
-   recursively via <sys/select.h>.
+/* On Cygwin, <sys/time.h> includes itself recursively via <sys/select.h>.
    Simply delegate to the system's header in this case; it is a no-op.
    Without this extra ifdef, the C++ gettimeofday declaration below
    would be a forward declaration in gnulib's nested <sys/time.h>.  */
-#if defined _CYGWIN_SYS_TIME_H || defined _SYS_TIME_H || defined _SYS_TIME_H_
+#ifdef _CYGWIN_SYS_TIME_H
 # @INCLUDE_NEXT@ @NEXT_SYS_TIME_H@
 #else
 

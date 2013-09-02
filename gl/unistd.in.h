@@ -116,9 +116,6 @@
 # include <getopt.h>
 #endif
 
-#ifndef _GL_INLINE_HEADER_BEGIN
- #error "Please include config.h first."
-#endif
 _GL_INLINE_HEADER_BEGIN
 #ifndef _GL_UNISTD_INLINE
 # define _GL_UNISTD_INLINE _GL_INLINE
