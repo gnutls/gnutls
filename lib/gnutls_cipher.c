@@ -373,7 +373,7 @@ compressed_to_ciphertext (gnutls_session_t session,
 
   data_ptr = cipher_data;
 
-  if (explicit_iv)
+  if (explicit_iv) /* TLS 1.1 or later */
     {
       if (block_algo == CIPHER_BLOCK)
         {
