@@ -51,8 +51,8 @@ int main()
 
 static void terminate(void);
 
-/* This program tests the robustness of record
- * decoding.
+/* This program tests the ability to transfer various data size
+ * by the record layer, under different ciphersuites.
  */
 
 static void
@@ -366,6 +366,8 @@ static void start (const char* prio, int ign)
 #define ARCFOUR_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL"
 #define ARCFOUR_MD5 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:+RSA"
 
+#define NULL_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+NULL:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+RSA:+CURVE-ALL"
+
 #define NEW_AES_CBC "NONE:+VERS-TLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:%NEW_PADDING"
 #define NEW_ARCFOUR_SHA1 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:%NEW_PADDING"
 #define NEW_AES_CBC_SHA256 "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-ALL:%NEW_PADDING"
@@ -391,6 +393,8 @@ void
 doit (void)
 {
   signal(SIGCHLD, ch_handler);
+
+  start(NULL_SHA1, 0);
 
   start(NEW_ARCFOUR_SHA1, 1);
   start(NEW_AES_CBC, 1);
