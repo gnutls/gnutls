@@ -228,10 +228,6 @@ unsigned l;
       if (unlikely(textlen+pad_size+handle->tag_size) > ciphertextlen)
         return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-      ret = _gnutls_auth_cipher_tag(handle, ciphertext+textlen, handle->tag_size);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-
       if (handle->non_null != 0)
         {
           l = (textlen/blocksize)*blocksize;
@@ -247,16 +243,31 @@ unsigned l;
           if (ciphertext != text && textlen > 0)
             memcpy(ciphertext, text, textlen);
 
+          ret = _gnutls_auth_cipher_tag(handle, ciphertext+textlen, handle->tag_size);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+          textlen += handle->tag_size;
+
           /* TLS 1.0 style padding */
           if (pad_size > 0)
-            memset (ciphertext+textlen+handle->tag_size, pad_size - 1, pad_size);
+            {
+              memset (ciphertext+textlen, pad_size - 1, pad_size);
+              textlen += pad_size;
+            }
 
-          ret = _gnutls_cipher_encrypt2(&handle->cipher, ciphertext, textlen+handle->tag_size+pad_size, ciphertext, ciphertextlen);
+          ret = _gnutls_cipher_encrypt2(&handle->cipher, ciphertext, textlen, ciphertext, ciphertextlen);
           if (ret < 0)
             return gnutls_assert_val(ret);
         }
-      else if (text != ciphertext)
-        memcpy(ciphertext, text, textlen);
+      else /* null cipher */
+        {
+          if (text != ciphertext)
+            memcpy(ciphertext, text, textlen);
+
+          ret = _gnutls_auth_cipher_tag(handle, ciphertext+textlen, handle->tag_size);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+        }
     }
   else if (_gnutls_cipher_is_aead(&handle->cipher))
     {
