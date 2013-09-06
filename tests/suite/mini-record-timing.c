@@ -802,6 +802,7 @@ char prio[512];
          test->file, test->name);
   system(prio);
 #endif
+  return 0;
 }
 
 #endif /* _WIN32 */
