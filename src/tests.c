@@ -62,14 +62,13 @@ do_handshake (gnutls_session_t session)
     {
       ret = gnutls_handshake (session);
     }
-  while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+  while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
   handshake_output = ret;
 
   if (ret < 0 && verbose > 1)
     {
-      if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
-          || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
+      if (ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
         {
           alert = gnutls_alert_get (session);
           printf ("\n");
