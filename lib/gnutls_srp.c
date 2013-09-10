@@ -574,8 +574,8 @@ gnutls_srp_set_server_credentials_file (gnutls_srp_server_credentials_t res,
  * SRP credentials.  The callback's function form is:
  *
  * int (*callback)(gnutls_session_t, const char* username,
- *  gnutls_datum_t* salt, gnutls_datum_t *verifier, gnutls_datum_t* g,
- *  gnutls_datum_t* n);
+ *  gnutls_datum_t* salt, gnutls_datum_t *verifier, gnutls_datum_t* generator,
+ *  gnutls_datum_t* prime);
  *
  * @username contains the actual username.
  * The @salt, @verifier, @generator and @prime must be filled
