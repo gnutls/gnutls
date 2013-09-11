@@ -834,6 +834,12 @@ ciphertext_to_compressed (gnutls_session_t session,
   if (unlikely(ret < 0))
     return gnutls_assert_val(ret);
 
+  /* Here there could be a timing leakage in CBC ciphersuites that
+   * could be exploited if the cost of a successful memcmp is high. 
+   * A constant time memcmp would help there, but it is not easy to maintain
+   * against compiler optimizations. Currently we rely on the fact that
+   * a memcmp comparison is negligible over the crypto operations.
+   */
   if (unlikely(memcmp (tag, tag_ptr, tag_size) != 0 || pad_failed != 0))
     {
       /* HMAC was not the same. */
