@@ -80,19 +80,24 @@ endif HAVE_GCC
 
 
 enums.h: $(srcdir)/make-enum-header.scm
-	$(GUILE_FOR_BUILD) $^ > $@
+	$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
+	mv "$@.tmp" "$@"
 
 enum-map.i.c: $(srcdir)/make-enum-map.scm
-	$(GUILE_FOR_BUILD) $^ > $@
+	$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
+	mv "$@.tmp" "$@"
 
 smobs.h: $(srcdir)/make-smob-header.scm
-	$(GUILE_FOR_BUILD) $^ > $@
+	$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
+	mv "$@.tmp" "$@"
 
 smob-types.i.c: $(srcdir)/make-smob-types.scm
-	$(GUILE_FOR_BUILD) $^ > $@
+	$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
+	mv "$@.tmp" "$@"
 
 priorities.i.c: $(srcdir)/make-session-priorities.scm
-	$(GUILE_FOR_BUILD) $^ > $@
+	$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
+	mv "$@.tmp" "$@"
 
 
 # C file snarfing.
