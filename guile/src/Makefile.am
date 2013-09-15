@@ -1,5 +1,5 @@
 #  GnuTLS --- Guile bindings for GnuTLS.
-#  Copyright (C) 2007-2012 Free Software Foundation, Inc.
+#  Copyright (C) 2007-2013 Free Software Foundation, Inc.
 #
 #  GnuTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -102,7 +102,10 @@ priorities.i.c: $(srcdir)/make-session-priorities.scm
 snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	       $(CFLAGS) $(AM_CFLAGS) $(GUILE_CFLAGS)
 
-.c.x: $(GENERATED_BINDINGS)
+# Note: we cannot use the portable ".c.x" form, since that leads
+# prerequisites to be ignored:
+# <http://lists.gnutls.org/pipermail/gnutls-devel/2013-September/006453.html>.
+%.x: %.c $(GENERATED_BINDINGS)
 	$(guile_snarf) -o $@ $< $(snarfcppopts)
 
 # Target used by doc/Makefile, to create all built sources necessary
