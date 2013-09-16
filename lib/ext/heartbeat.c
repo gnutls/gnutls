@@ -40,8 +40,12 @@
   * @session: is a #gnutls_session_t structure.
   * @type: one of the GNUTLS_HB_* flags
   *
-  * This function will allow heartbeat messages to be
-  * received.
+  * If this function is called with the %GNUTLS_HB_PEER_ALLOWED_TO_SEND
+  * GnuTLS will allow heartbeat messages to be received. Moreover it also
+  * request the peer to accept heartbeat messages.
+  *
+  * The function gnutls_heartbeat_allowed() can be used to test Whether
+  * locally generated heartbeat messages can be accepted by the peer.
   *
   * Since: 3.1.2
   **/
