@@ -369,18 +369,21 @@ certificates by specifying a PKCS #11 URL instead of a filename.
 
 In this section we present the Trusted Platform Module (TPM) support 
 in @acronym{GnuTLS}. Note that this functionality is disabled by default
-because the @code{trousers} libraries GnuTLS depends on for that functionality
-are under the Common Public License which is not compatible with the GPL license.
+because the @code{trousers} libraries GnuTLS depends on
+are under the Common Public License which is not compatible with the GPL 
+license. By disabling this feature by default we ensure that the GnuTLS library can
+be linked by both GPL and non-GPL programs, but you can enable this option
+during the library configuration.
 
 There was a big hype when the TPM chip was introduced into 
 computers. Briefly it is a co-processor in your PC that allows it to perform 
 calculations independently of the main processor. This has good and bad 
-side-effects. In this section we focus on the good ones, which are the fact that 
-you can use it to perform cryptographic operations the similarly to a
-@acronym{PKCS} #11 smart card. 
-It allows for storing and using RSA keys but with slight differences
-from a @acronym{PKCS} #11 module that require different handling. 
-The basic operations supported, and used by GnuTLS, are key generation and signing. 
+side-effects. In this section we focus on the good ones; these are the fact that 
+you can use the TPM chip to perform cryptographic operations on keys stored in it, without 
+accessing them. That is very similar to the operation of a @acronym{PKCS} #11 smart card. 
+The chip allows for storage and usage of RSA keys, but has quite some 
+operational differences from @acronym{PKCS} #11 module, and thus require different handling. 
+The basic TPM operations supported and used by GnuTLS, are key generation and signing. 
 
 In GnuTLS the TPM functionality is available in @code{gnutls/tpm.h}.
 
@@ -397,7 +400,7 @@ In GnuTLS the TPM functionality is available in @code{gnutls/tpm.h}.
 The RSA keys in the TPM module may either be stored in a flash memory
 within TPM or stored in a file in disk. In the former case the key can
 provide operations as with @acronym{PKCS} #11 and is identified by
-a URL. The URL is described in @xcite{TPMURI} and are of the following form.
+a URL. The URL is described in @xcite{TPMURI} and is of the following form.
 @verbatim
 tpmkey:uuid=42309df8-d101-11e1-a89a-97bb33c23ad1;storage=user
 @end verbatim
