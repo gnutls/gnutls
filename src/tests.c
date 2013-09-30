@@ -39,7 +39,7 @@ extern gnutls_srp_client_credentials_t srp_cred;
 extern gnutls_anon_client_credentials_t anon_cred;
 extern gnutls_certificate_credentials_t xcred;
 
-extern int verbose;
+extern unsigned int verbose;
 
 int tls1_ok = 0;
 int ssl3_ok = 0;
