@@ -27,6 +27,7 @@
  * Carolin Latze <latze@angry-red-pla.net> and Tobias Soder
  */
 
+#include <config.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 #include <gnutls/tpm.h>
