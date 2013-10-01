@@ -3,6 +3,8 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* Deprecate GNUTLS_E_CERTIFICATE_LIST_UNSORTED, and automatically sort
+  input chains in gnutls_certificate_set_x509_key_*.
 * Priority strings should also set the minimum acceptable DH key size and
   certificate size.
 * Add an authenticated-encryption API.
