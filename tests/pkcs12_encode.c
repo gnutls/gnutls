@@ -30,7 +30,6 @@
 
 #include "utils.h"
 
-#include <error.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -87,7 +86,10 @@ doit (void)
 
   ret = global_init ();
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "global_init %d", ret);
+    {
+      fprintf(stderr, "global_init %d", ret);
+      exit(1);
+    }
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
@@ -96,66 +98,102 @@ doit (void)
   /* Read certs. */
   ret = gnutls_x509_crt_init (&client);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "crt_init: %d", ret);
+    {
+      fprintf(stderr, "crt_init: %d", ret);
+      exit(1);
+    }
 
   ret = gnutls_x509_crt_import (client, &client_dat, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "crt_import: %d", ret);
+    {
+      fprintf(stderr, "crt_import: %d", ret);
+      exit(1);
+    }
 
   ret = gnutls_x509_crt_init (&ca);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "ca_init: %d", ret);
+    {
+      fprintf(stderr, "ca_init: %d", ret);
+      exit(1);
+    }
 
   ret = gnutls_x509_crt_import (ca, &ca_dat, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "ca_import: %d", ret);
+    {
+      fprintf(stderr, "ca_import: %d", ret);
+      exit(1);
+    }
 
   /* Create PKCS#12 structure. */
   ret = gnutls_pkcs12_init (&pkcs12);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "pkcs12_init: %d", ret);
+    {
+      fprintf(stderr, "pkcs12_init: %d", ret);
+      exit(1);
+    }
 
   /* Generate and add PKCS#12 cert bags. */
   for (i = 0; i < 2; i++)
     {
       ret = gnutls_pkcs12_bag_init (&bag);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "bag_init: %d", ret);
+        {
+          fprintf(stderr, "bag_init: %d", ret);
+          exit(1);
+        }
 
       ret = gnutls_pkcs12_bag_set_crt (bag, i == 0 ? client : ca);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "set_crt: %d", ret);
+        {
+          fprintf(stderr, "set_crt: %d", ret);
+          exit(1);
+        }
 
       indx = ret;
 
       ret = gnutls_pkcs12_bag_set_friendly_name (bag, indx,
                                                  i == 0 ? "client" : "ca");
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "set_friendly_name: %d", ret);
+        {
+          fprintf(stderr, "set_friendly_name: %d", ret);
+          exit(1);
+        }
 
       size = sizeof (key_id_buf);
       ret = gnutls_x509_crt_get_key_id (i == 0 ? client : ca, 0,
                                         key_id_buf, &size);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "get_key_id: %d", ret);
+        {
+          fprintf(stderr, "get_key_id: %d", ret);
+          exit(1);
+        }
 
       key_id.data = key_id_buf;
       key_id.size = size;
 
       ret = gnutls_pkcs12_bag_set_key_id (bag, indx, &key_id);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "bag_set_key_id: %d", ret);
+        {
+          fprintf(stderr, "bag_set_key_id: %d", ret);
+          exit(1);
+        }
 
       ret = gnutls_pkcs12_bag_encrypt (bag, "pass",
                                        i == 0 ? GNUTLS_PKCS8_USE_PKCS12_3DES
                                        : GNUTLS_PKCS_USE_PKCS12_RC2_40);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "bag_encrypt: %d: %s", ret,
+        {
+          fprintf(stderr, "bag_encrypt: %d: %s", ret,
                i == 0 ? "3DES" : "RC2-40");
+          exit(1);
+        }
 
       ret = gnutls_pkcs12_set_bag (pkcs12, bag);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "set_bag: %d", ret);
+        {
+          fprintf(stderr, "set_bag: %d", ret);
+          exit(1);
+        }
 
       gnutls_pkcs12_bag_deinit (bag);
     }
@@ -163,12 +201,18 @@ doit (void)
   /* MAC the structure, export and print. */
   ret = gnutls_pkcs12_generate_mac (pkcs12, "pass");
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "generate_mac: %d", ret);
+    {
+      fprintf(stderr, "generate_mac: %d", ret);
+      exit(1);
+    }
 
   size = sizeof (outbuf);
   ret = gnutls_pkcs12_export (pkcs12, GNUTLS_X509_FMT_PEM, outbuf, &size);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "pkcs12_export: %d", ret);
+    {
+      fprintf(stderr, "pkcs12_export: %d", ret);
+      exit(1);
+    }
 
   if (debug)
     fwrite (outbuf, size, 1, stdout);
