@@ -324,6 +324,19 @@ flag = {
     doc      = "This option disables all TLS extensions. Deprecated option. Use the priority string.";
 };
 
+flag = {
+    name      = inline-commands;
+    descrip   = "Inline commands of the form ^<cmd>^";
+    doc       = "Enable inline commands of the form ^<cmd>^. The inline commands are expected to be in a line by themselves";
+};
+
+flag = {
+    name      = inline-commands-prefix;
+    arg-type  = string;
+    descrip   = "Change the default (^) used as a delimiter for inline commands.
+\t\t\t\tThe value is a single US-ASCII character (octets 0 - 127).";
+    doc       = "Change the default (^) delimiter used for inline commands. The delimiter is expected to be a single US-ASCII character (octets 0 - 127). This option is only relevant if inline commands are enabled via the inline-commands option";
+};
 
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else

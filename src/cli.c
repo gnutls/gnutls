@@ -52,6 +52,7 @@
 
 #include "sockets.h"
 #include "benchmark.h"
+#include "inline_cmds.h"
 
 #ifdef HAVE_DANE
 #include <gnutls/dane.h>
@@ -66,7 +67,7 @@
 #define MAX_BUF 4096
 
 /* global stuff here */
-int resume, starttls, insecure, ranges, rehandshake, udp, mtu;
+int resume, starttls, insecure, ranges, rehandshake, udp, mtu, inline_commands;
 const char *hostname = NULL;
 const char *service = NULL;
 int record_max_size;
@@ -89,6 +90,7 @@ static int disable_extensions;
 static int disable_sni;
 static unsigned int init_flags = GNUTLS_CLIENT;
 static const char * priorities = NULL;
+static const char * inline_commands_prefix;
 
 const char *psk_username = NULL;
 gnutls_datum_t psk_key = { NULL, 0 };
@@ -838,19 +840,242 @@ static int check_net_or_keyboard_input(socket_st* hd)
   return IN_NONE;
 }
 
+static int try_rehandshake(socket_st *hd)
+{
+  int ret;
+
+  ret = do_handshake (hd); 
+  if (ret < 0)
+    {
+      fprintf (stderr, "*** ReHandshake has failed\n");
+      gnutls_perror (ret);
+      return ret;
+    }
+  else
+    {
+      printf ("- ReHandshake was completed\n");
+      return 0;
+    }
+}
+
+static int try_resume (socket_st *hd)
+{
+  int ret;
+
+  char *session_data;
+  size_t session_data_size = 0;
+
+  gnutls_session_get_data (hd->session, NULL, &session_data_size);
+  session_data = (char *) malloc (session_data_size);
+  if (session_data == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
+
+  gnutls_session_get_data (hd->session, session_data,
+			   &session_data_size);
+
+  printf ("- Disconnecting\n");
+  socket_bye (hd);
+  
+  printf ("\n\n- Connecting again- trying to resume previous session\n");
+  socket_open (hd, hostname, service, udp);
+
+  hd->session = init_tls_session (hostname);
+  gnutls_session_set_data (hd->session, session_data, session_data_size);
+  free (session_data);
+
+  ret = do_handshake (hd);
+  if (ret < 0)
+    {
+      fprintf (stderr, "*** Resume handshake has failed\n");
+      gnutls_perror (ret);
+      return ret;
+    }
+
+  printf ("- Resume Handshake was completed\n");
+  if (gnutls_session_is_resumed (hd->session) != 0)
+    printf ("*** This is a resumed session\n");
+  
+  return 0;
+}
+
+static 
+bool parse_for_inline_commands_in_buffer (char *buffer, size_t bytes, 
+                                          inline_cmds_st *inline_cmds)
+{
+  int  local_bytes, match_bytes, prev_bytes_copied, ii, jj;
+  char *local_buffer_ptr, *ptr;
+  char inline_command_string[MAX_INLINE_COMMAND_BYTES];
+
+  inline_cmds->bytes_to_flush = 0;
+  inline_cmds->cmd_found = INLINE_COMMAND_NONE;
+                                                 
+  if (inline_cmds->bytes_copied)
+    {
+      local_buffer_ptr = 
+        &inline_cmds->inline_cmd_buffer[inline_cmds->bytes_copied];
+      
+      local_bytes = 
+        ((inline_cmds->bytes_copied + bytes) <= MAX_INLINE_COMMAND_BYTES) ? 
+         bytes : (MAX_INLINE_COMMAND_BYTES - inline_cmds->bytes_copied);
+
+      memcpy (local_buffer_ptr, buffer, local_bytes);      
+      prev_bytes_copied = inline_cmds->bytes_copied;
+      inline_cmds->new_buffer_ptr  = buffer + local_bytes; 
+      inline_cmds->bytes_copied += local_bytes;
+      local_buffer_ptr = inline_cmds->inline_cmd_buffer;
+      local_bytes = inline_cmds->bytes_copied;           
+    }
+  else
+    {
+      prev_bytes_copied = 0;
+      local_buffer_ptr = buffer;
+      local_bytes = bytes;
+      inline_cmds->new_buffer_ptr = buffer + bytes; 
+    }
+  
+  inline_cmds->current_ptr = local_buffer_ptr;
+
+  if (local_buffer_ptr[0] == inline_commands_prefix[0] && inline_cmds->lf_found)
+    {
+      for (jj = 0; jj < NUM_INLINE_COMMANDS; jj ++)
+        {
+          if (inline_commands_prefix[0] != '^') /* refer inline_cmds.h for usage of ^ */
+            {
+              strcpy (inline_command_string, inline_commands_def[jj].string);
+              inline_command_string[strlen(inline_commands_def[jj].string)] = '\0';
+              inline_command_string[0] = inline_commands_prefix[0];
+              /* Inline commands are delimited by the inline_commands_prefix[0] (default is ^).
+                 The inline_commands_def[].string includes a trailing LF */
+              inline_command_string[strlen(inline_commands_def[jj].string) - 2] = inline_commands_prefix[0];
+              ptr = inline_command_string;
+            }
+          else
+            ptr = inline_commands_def[jj].string;
+
+          match_bytes = (local_bytes <= strlen (ptr)) ? local_bytes : strlen (ptr);
+          if (strncmp (ptr, local_buffer_ptr, match_bytes) == 0)
+            {
+              if (match_bytes == strlen (ptr))
+                {
+                  inline_cmds->new_buffer_ptr = buffer + match_bytes - prev_bytes_copied;
+                  inline_cmds->cmd_found = inline_commands_def[jj].command;		      
+                  inline_cmds->bytes_copied = 0; /* reset it */
+                }
+              else
+                {
+                  /* partial command */		      
+                  memcpy (&inline_cmds->inline_cmd_buffer[inline_cmds->bytes_copied], 
+                          buffer, bytes);
+                  inline_cmds->bytes_copied += bytes;
+                }
+              return true; 
+           }
+          /* else - if not a match, do nothing here */	
+        } /* for */
+    }
+
+  for (ii = prev_bytes_copied; ii < local_bytes; ii ++)
+    {
+      if (ii && local_buffer_ptr[ii] == inline_commands_prefix[0] && inline_cmds->lf_found)
+        {
+          /* possible inline command. First, let's flush bytes up to ^ */
+          inline_cmds->new_buffer_ptr  = buffer + ii - prev_bytes_copied;
+          inline_cmds->bytes_to_flush = ii; 
+          inline_cmds->lf_found = true;
+
+          /* bytes to flush starts at inline_cmds->current_ptr */
+          return true;
+        }
+      else if (local_buffer_ptr[ii] == '\n')
+        {
+          inline_cmds->lf_found = true;
+        }
+      else
+        {
+          inline_cmds->lf_found = false;
+        }
+    }  /* for */
+
+  inline_cmds->bytes_copied = 0; /* reset it */  
+  return false; /* not an inline command */
+}
+
+static
+int run_inline_command (inline_cmds_st *cmd,  socket_st * hd)
+{
+  switch (cmd->cmd_found)
+    {
+    case INLINE_COMMAND_RESUME:
+      return try_resume (hd);
+    case INLINE_COMMAND_RENEGOTIATE:
+      return try_rehandshake (hd);
+    default:
+      return -1;
+    }
+}
+
+static
+int do_inline_command_processing (char *buffer_ptr, size_t curr_bytes, socket_st * hd, inline_cmds_st *inline_cmds)
+{
+  int skip_bytes, bytes;
+  bool inline_cmd_start_found;
+
+  bytes = curr_bytes;
+
+continue_inline_processing:	    
+  /* parse_for_inline_commands_in_buffer hunts for start of an inline command
+   * sequence. The function maintains state information in inline_cmds. 
+   */
+  inline_cmd_start_found = parse_for_inline_commands_in_buffer (buffer_ptr, 
+                                                                bytes, inline_cmds); 
+  if (!inline_cmd_start_found)
+    return bytes;
+
+  /* inline_cmd_start_found is set */
+
+  if (inline_cmds->bytes_to_flush)
+    {
+      /* start of an inline command sequence found, but is not
+       * at the beginning of buffer. So, we flush all preceding bytes.
+       */
+      return inline_cmds->bytes_to_flush;
+    }
+  else if (inline_cmds->cmd_found == INLINE_COMMAND_NONE)
+    {
+      /* partial command found */
+      return 0;
+    }
+  else
+    {
+      /* complete inline command found and is at the start */
+      if (run_inline_command (inline_cmds, hd))
+        return -1;
+
+      inline_cmds->cmd_found = INLINE_COMMAND_NONE;      
+      skip_bytes = inline_cmds->new_buffer_ptr - buffer_ptr;
+
+      if (skip_bytes >= bytes)
+        return 0;
+      else
+        {
+          buffer_ptr = inline_cmds->new_buffer_ptr;	      
+          bytes -= skip_bytes;
+          goto continue_inline_processing;
+        }
+    }
+}
+
 int
 main (int argc, char **argv)
 {
   int ret;
-  int ii, i, inp;
+  int ii, inp;
   char buffer[MAX_BUF + 1];
-  char *session_data = NULL;
-  char *session_id = NULL;
-  size_t session_data_size;
-  size_t session_id_size = 0;
   int user_term = 0, retval = 0;
   socket_st hd;
-  ssize_t bytes;
+  ssize_t bytes, keyboard_bytes;
+  char *keyboard_buffer_ptr;
+  inline_cmds_st inline_cmds;
 #ifndef _WIN32
   struct sigaction new_action;
 #endif
@@ -882,60 +1107,21 @@ main (int argc, char **argv)
   if (starttls)
     goto after_handshake;
 
-  for (i = 0; i < 2; i++)
+  ret = do_handshake (&hd);
+  
+  if (ret < 0)
     {
-
-
-      if (i == 1)
-        {
-          hd.session = init_tls_session (hostname);
-          gnutls_session_set_data (hd.session, session_data,
-                                   session_data_size);
-          free (session_data);
-        }
-
-      ret = do_handshake (&hd);
-
-      if (ret < 0)
-        {
-          fprintf (stderr, "*** Handshake has failed\n");
-          gnutls_perror (ret);
-          gnutls_deinit (hd.session);
-          return 1;
-        }
-      else
-        {
-          printf ("- Handshake was completed\n");
-          if (gnutls_session_is_resumed (hd.session) != 0)
-            printf ("*** This is a resumed session\n");
-        }
-
-      if (resume != 0 && i == 0)
-        {
-
-          gnutls_session_get_data (hd.session, NULL, &session_data_size);
-          session_data = malloc (session_data_size);
-
-          gnutls_session_get_data (hd.session, session_data,
-                                   &session_data_size);
-
-          gnutls_session_get_id (hd.session, NULL, &session_id_size);
-
-          session_id = malloc (session_id_size);
-          gnutls_session_get_id (hd.session, session_id, &session_id_size);
-
-          printf ("- Disconnecting\n");
-          socket_bye (&hd);
-
-          printf
-            ("\n\n- Connecting again- trying to resume previous session\n");
-          socket_open (&hd, hostname, service, udp);
-        }
-      else
-        {
-          break;
-        }
+      fprintf (stderr, "*** Handshake has failed\n");
+      gnutls_perror (ret);
+      gnutls_deinit (hd.session);
+      return 1;
     }
+  else
+      printf ("- Handshake was completed\n");  
+  
+  if (resume != 0) 
+    if (try_resume (&hd))
+        return 1;
 
 after_handshake:
 
@@ -944,21 +1130,8 @@ after_handshake:
   printf ("\n- Simple Client Mode:\n\n");
 
   if (rehandshake)
-    {
-      ret = do_handshake (&hd);
-
-      if (ret < 0)
-        {
-          fprintf (stderr, "*** ReHandshake has failed\n");
-          gnutls_perror (ret);
-          gnutls_deinit (hd.session);
-          return 1;
-        }
-      else
-        {
-          printf ("- ReHandshake was completed\n");
-        }
-    }
+    if (try_rehandshake (&hd))
+      return 1;
 
 #ifndef _WIN32
   new_action.sa_handler = starttls_alarm;
@@ -977,6 +1150,12 @@ after_handshake:
 #endif
   setbuf (stdout, NULL);
   setbuf (stderr, NULL);
+
+  if (inline_commands)
+    {
+      memset (&inline_cmds, 0, sizeof (inline_cmds_st));
+      inline_cmds.lf_found = true; /* initially, at start of line */
+    }
 
   for (;;)
     {
@@ -1069,16 +1248,42 @@ after_handshake:
                 }
             }
 
+          keyboard_bytes = bytes;
+          keyboard_buffer_ptr = buffer;
+
+inline_command_processing:
+
+          if (inline_commands)
+            {
+              keyboard_bytes = do_inline_command_processing (
+                                 keyboard_buffer_ptr, keyboard_bytes, 
+                                 &hd, &inline_cmds);
+              if (keyboard_bytes == 0)
+                continue;
+              else if (keyboard_bytes < 0)
+                { /* error processing an inline command */
+                  retval = 1;
+                  break;
+                }
+              else
+                {
+                  /* current_ptr could point to either an inline_cmd_buffer
+                   * or may point to start or an offset into buffer.
+                   */
+                  keyboard_buffer_ptr = inline_cmds.current_ptr;
+                }
+            }
+
           if (ranges && gnutls_record_can_use_length_hiding(hd.session)) 
             {
 	      gnutls_range_st range;
 	      range.low = 0;
 	      range.high = MAX_BUF;
-              ret = socket_send_range (&hd, buffer, bytes, &range);
+              ret = socket_send_range (&hd, keyboard_buffer_ptr, keyboard_bytes, &range);
             }
           else 
             {
-        	  ret = socket_send(&hd, buffer, bytes);
+              ret = socket_send(&hd, keyboard_buffer_ptr, keyboard_bytes);
             }
 
           if (ret > 0)
@@ -1089,6 +1294,13 @@ after_handshake:
           else
             handle_error (&hd, ret);
 
+          if (inline_commands &&
+              inline_cmds.new_buffer_ptr < (buffer + bytes))
+            {
+              keyboard_buffer_ptr = inline_cmds.new_buffer_ptr;
+              keyboard_bytes = (buffer + bytes) - keyboard_buffer_ptr;
+              goto inline_command_processing;
+            }
         }
     }
 
@@ -1174,6 +1386,24 @@ const char* rest = NULL;
   if (disable_extensions)
     init_flags |= GNUTLS_NO_EXTENSIONS;
   
+  inline_commands = HAVE_OPT(INLINE_COMMANDS);
+  if (HAVE_OPT(INLINE_COMMANDS_PREFIX))
+    {
+      if (strlen(OPT_ARG(INLINE_COMMANDS_PREFIX)) > 1)
+        {
+          fprintf(stderr, "inline-commands-prefix value is a single US-ASCII character (octets 0 - 127)\n");
+          exit(1);
+        }    
+      inline_commands_prefix = (unsigned char *) OPT_ARG(INLINE_COMMANDS_PREFIX);
+      if (inline_commands_prefix[0] > 127)
+        {
+          fprintf(stderr, "inline-commands-prefix value is a single US-ASCII character (octets 0 - 127)\n");
+          exit(1);
+        }
+    }
+  else
+    inline_commands_prefix = (const unsigned char *) "^";
+
   starttls = HAVE_OPT(STARTTLS);
   resume = HAVE_OPT(RESUME);
   rehandshake = HAVE_OPT(REHANDSHAKE);
