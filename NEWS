@@ -9,6 +9,9 @@ See the end for copying conditions.
 
 ** libgnutls: Allow the generation of DH groups of less than 700 bits.
 
+** gnutls-cli: Added support for inline commands, using the
+--inline-commands-prefix and --inline-commands options. Patch by Raj Raman.	
+
 ** API and ABI modifications:
 No changes since last version.
 
