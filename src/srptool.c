@@ -572,9 +572,8 @@ crypt_int (const char *username, const char *passwd, int salt_size,
   do
     {                           /* find the specified uindex in file */
       p = fgets (line, sizeof (line) - 1, fd);
-      iindex = atoi (p);
     }
-  while (p != NULL && iindex != uindex);
+  while (p != NULL && (iindex = atoi (p)) != uindex);
 
   if (p == NULL)
     {
