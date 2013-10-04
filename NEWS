@@ -2,6 +2,14 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.33 (unreleased)
+
+** srptool: Fixed index command line option. Patch by Attila Molnar.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.32 (released 2013-08-31)
 
 ** libgnutls: Fixes when session tickets and session DB are used.
