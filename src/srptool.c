@@ -496,7 +496,7 @@ int main (int argc, char **argv)
 
 
   return crypt_int (username, passwd, salt_size,
-                    fpasswd_conf, fpasswd, VALUE_OPT_INDEX);
+                    fpasswd_conf, fpasswd, OPT_VALUE_INDEX);
 
 }
 
