@@ -301,7 +301,7 @@ GNUTLS_SEC_PARAM_VERY_WEAK: Added
 * Version 3.1.6 (released 2013-01-02)
 
 ** libgnutls: Fixed record padding parsing issue. Reported by Kenny
-Patterson and Nadhem Alfardan.
+Paterson and Nadhem Alfardan.
 
 ** libgnutls: Several updates in the ASN.1 string handling subsystem.
 
