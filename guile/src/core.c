@@ -2086,7 +2086,7 @@ SCM_DEFINE (scm_gnutls_srp_base64_decode, "srp-base64-decode",
   /* We assume that the decoded string is smaller than the encoded
      string.  */
   c_result_len = c_str_len;
-  c_result = alloca (c_result_len);
+  c_result = alloca (c_result_len + 1);
 
   c_str_d.data = (unsigned char *) c_str;
   c_str_d.size = c_str_len;
