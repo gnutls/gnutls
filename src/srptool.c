@@ -602,13 +602,13 @@ crypt_int (const char *username, const char *passwd, int salt_size,
       FILE *fd2;
       int put;
 
-      if (strlen (tpasswd) > sizeof (tmpname) + 5)
+      if (strlen (tpasswd) + 5 > sizeof (tmpname))
         {
           fprintf (stderr, "file '%s' is tooooo long\n", tpasswd);
           return -1;
         }
-      strcpy (tmpname, tpasswd);
-      strcat (tmpname, ".tmp");
+
+      snprintf(tmpname, sizeof(tmpname), "%s.tmp", tpasswd);
 
       if (stat (tmpname, &st) != -1)
         {

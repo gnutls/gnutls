@@ -204,13 +204,13 @@ write_key (const char *username, const char *key, int key_size,
   FILE *fd2;
   int put;
 
-  if (strlen (passwd_file) > sizeof (tmpname) + 5)
+  if (strlen (passwd_file) + 5 > sizeof (tmpname))
     {
       fprintf (stderr, "file '%s' is tooooo long\n", passwd_file);
       return -1;
     }
-  strcpy (tmpname, passwd_file);
-  strcat (tmpname, ".tmp");
+
+  snprintf (tmpname, sizeof(tmpname), "%s.tmp", passwd_file);
 
   if (stat (tmpname, &st) != -1)
     {

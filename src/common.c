@@ -1045,12 +1045,19 @@ pin_callback (void *user, int attempt, const char *token_url,
       exit (1);
     }
 
-  len = MIN (pin_max, strlen (password));
+  len = 1 + MIN (pin_max, strlen (password));
   memcpy (pin, password, len);
   pin[len] = 0;
 
   /* cache */
-  strcpy (cached_pin, pin);
+  if (len < sizeof(cached_pin))
+    {
+      memcpy (cached_pin, pin, len);
+      cached_pin[len] = 0;
+    }
+  else
+    cached_pin[0] = 0;
+
   free (cached_url);
   if (token_url)
     cached_url = strdup (token_url);
