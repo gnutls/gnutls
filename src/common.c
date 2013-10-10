@@ -1045,7 +1045,7 @@ pin_callback (void *user, int attempt, const char *token_url,
       exit (1);
     }
 
-  len = 1 + MIN (pin_max, strlen (password));
+  len = MIN (pin_max-1, strlen (password));
   memcpy (pin, password, len);
   pin[len] = 0;
 
