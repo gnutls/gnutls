@@ -1352,7 +1352,7 @@ msgstr ""
 
 #: lib/x509/output.c:1611 lib/x509/output.c:2450
 msgid ""
-"\tPublic Key Id:\n"
+"\tPublic Key ID:\n"
 "\t\t"
 msgstr ""
 "\tJulkisen avaimen tunniste:\n"

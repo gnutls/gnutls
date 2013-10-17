@@ -857,7 +857,7 @@ msgstr ""
 
 #: x509/output.c:1156 x509/output.c:1924
 msgid ""
-"\tPublic Key Id:\n"
+"\tPublic Key ID:\n"
 "\t\t"
 msgstr ""
 "\t公钥 Id：\n"

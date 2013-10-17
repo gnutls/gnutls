@@ -1608,7 +1608,7 @@ print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
       return;
     }
 
-  adds (str, _("\tPublic Key Id:\n\t\t"));
+  adds (str, _("\tPublic Key ID:\n\t\t"));
   _gnutls_buffer_hexprint (str, buffer, size);
   adds (str, "\n");
 
@@ -2447,7 +2447,7 @@ print_crq_other (gnutls_buffer_st * str, gnutls_x509_crq_t crq)
       return;
     }
 
-  adds (str, _("\tPublic Key Id:\n\t\t"));
+  adds (str, _("\tPublic Key ID:\n\t\t"));
   _gnutls_buffer_hexprint (str, buffer, size);
   adds (str, "\n");
 
