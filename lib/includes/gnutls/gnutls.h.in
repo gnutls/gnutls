@@ -1297,6 +1297,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   int
     gnutls_certificate_get_issuer (gnutls_certificate_credentials_t sc,
     gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags);
+    
+  int gnutls_certificate_get_crt_raw (gnutls_certificate_credentials_t sc, unsigned idx1,
+    unsigned idx2, gnutls_datum_t * cert);
 
   void gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc);
   void gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc);

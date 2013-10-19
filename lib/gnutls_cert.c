@@ -120,6 +120,42 @@ gnutls_certificate_get_issuer (gnutls_certificate_credentials_t sc,
 }
 
 /**
+ * gnutls_certificate_get_crt_raw:
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @idx1: the index of the certificate if multiple are present
+ * @idx2: the index in the certificate list. Zero gives the server's certificate.
+ * @cert: Will hold the DER encoded certificate.
+ *
+ * This function will return the DER encoded certificate of the
+ * server or any other certificate on its certificate chain (based on @idx2).
+ * The returned data should be treated as constant and only accessible during the lifetime
+ * of @sc.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. In case the indexes are out of bounds %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ *   is returned.
+ *
+ * Since: 3.2.5
+ **/
+int
+gnutls_certificate_get_crt_raw (gnutls_certificate_credentials_t sc, 
+  unsigned idx1,
+  unsigned idx2,
+  gnutls_datum_t * cert)
+{
+  if (idx1 >= sc->ncerts)
+    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+  if (idx2 >= sc->certs[idx1].cert_list_length)
+    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+  cert->data = sc->certs[idx1].cert_list[idx2].cert.data;
+  cert->size = sc->certs[idx1].cert_list[idx2].cert.size;
+
+  return 0;
+}
+
+/**
  * gnutls_certificate_free_ca_names:
  * @sc: is a #gnutls_certificate_credentials_t structure.
  *

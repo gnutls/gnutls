@@ -15,7 +15,7 @@ See the end for copying conditions.
 --inline-commands-prefix and --inline-commands options. Patch by Raj Raman.	
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_certificate_get_crt_raw: Added
 
 
 * Version 3.2.4 (released 2013-08-31)
