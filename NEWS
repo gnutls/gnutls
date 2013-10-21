@@ -6,6 +6,9 @@ See the end for copying conditions.
 
 ** srptool: Fixed index command line option. Patch by Attila Molnar.
 
+** certtool: pathlen constraint is now read correctly. Reported by
+Christoph Seitz.
+
 ** API and ABI modifications:
 No changes since last version.
 
