@@ -581,6 +581,93 @@ cleanup:
  * @chain: A certificate chain
  * @chain_size: The size of the chain
  * @chain_type: The type of the certificate chain
+ * @r DANE data to check against
+ * @sflags: Flags for the the initialization of @s (if NULL)
+ * @vflags: Verification flags; an OR'ed list of %dane_verify_flags_t.
+ * @verify: An OR'ed list of %dane_verify_status_t.
+ *
+ * This function will verify the given certificate chain against the
+ * CA constrains and/or the certificate available via DANE.
+ * If no information via DANE can be obtained the flag %DANE_VERIFY_NO_DANE_INFO
+ * is set. If a DNSSEC signature is not available for the DANE
+ * record then the verify flag %DANE_VERIFY_NO_DNSSEC_DATA is set.
+ *
+ * Note that the CA constraint only applies for the directly certifying CA
+ * and does not account for long CA chains.
+ *
+ * Due to the many possible options of DANE, there is no single threat
+ * model countered. When notifying the user about DANE verification results
+ * it may be better to mention: DANE verification did not reject the certificate,
+ * rather than mentioning a successful DANE verication.
+ *
+ * If the @q parameter is provided it will be used for caching entries.
+ *
+ * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ **/
+int dane_verify_crt_raw (dane_state_t s,
+	const gnutls_datum_t *chain, unsigned chain_size,
+	gnutls_certificate_type_t chain_type,
+        dane_query_t r,
+	unsigned int sflags, unsigned int vflags,
+	unsigned int *verify)
+{
+dane_state_t _s = NULL;
+int ret;
+unsigned checked = 0;
+unsigned int usage, type, match, idx;
+gnutls_datum_t data;
+
+	if (chain_type != GNUTLS_CRT_X509)
+		return gnutls_assert_val(DANE_E_INVALID_REQUEST);
+
+	*verify = 0;
+	idx = 0;
+	do {
+		ret = dane_query_data(r, idx++, &usage, &type, &match, &data);
+		if (ret == DANE_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		if (!(vflags & DANE_VFLAG_ONLY_CHECK_EE_USAGE) && (usage == DANE_CERT_USAGE_LOCAL_CA || usage == DANE_CERT_USAGE_CA)) {
+			ret = verify_ca(chain, chain_size, chain_type, type, match, &data, verify);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+                        }
+                        checked = 1;
+		} else if (!(vflags & DANE_VFLAG_ONLY_CHECK_CA_USAGE) && (usage == DANE_CERT_USAGE_LOCAL_EE || usage == DANE_CERT_USAGE_EE)) {
+			ret = verify_ee(&chain[0], chain_type, type, match, &data, verify);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+                        }
+                        checked = 1;
+		}
+	} while(1);
+
+	if ((vflags & DANE_VFLAG_FAIL_IF_NOT_CHECKED) && checked == 0)
+		ret = gnutls_assert_val(DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
+	else
+		ret = 0;
+
+cleanup:
+	if (s == NULL) dane_state_deinit(_s);
+	return ret;
+}
+
+
+/**
+ * dane_verify_crt:
+ * @s: A DANE state structure (may be NULL)
+ * @chain: A certificate chain
+ * @chain_size: The size of the chain
+ * @chain_type: The type of the certificate chain
  * @hostname: The hostname associated with the chain
  * @proto: The protocol of the service connecting (e.g. tcp)
  * @port: The port of the service connecting (e.g. 443)
@@ -618,15 +705,8 @@ int dane_verify_crt (dane_state_t s,
 dane_state_t _s = NULL;
 dane_query_t r = NULL;
 int ret;
-unsigned checked = 0;
-unsigned int usage, type, match, idx;
-gnutls_datum_t data;
-
-	if (chain_type != GNUTLS_CRT_X509)
-		return gnutls_assert_val(DANE_E_INVALID_REQUEST);
 
 	*verify = 0;
-
 	if (s == NULL) {
 		ret = dane_state_init(&_s, sflags);
 		if (ret < 0) {
@@ -641,40 +721,8 @@ gnutls_datum_t data;
 	        gnutls_assert();
 		goto cleanup;
 	}
-
-	idx = 0;
-	do {
-		ret = dane_query_data(r, idx++, &usage, &type, &match, &data);
-		if (ret == DANE_E_REQUESTED_DATA_NOT_AVAILABLE)
-			break;
-
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		if (!(vflags & DANE_VFLAG_ONLY_CHECK_EE_USAGE) && (usage == DANE_CERT_USAGE_LOCAL_CA || usage == DANE_CERT_USAGE_CA)) {
-			ret = verify_ca(chain, chain_size, chain_type, type, match, &data, verify);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-                        }
-                        checked = 1;
-		} else if (!(vflags & DANE_VFLAG_ONLY_CHECK_CA_USAGE) && (usage == DANE_CERT_USAGE_LOCAL_EE || usage == DANE_CERT_USAGE_EE)) {
-			ret = verify_ee(&chain[0], chain_type, type, match, &data, verify);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-                        }
-                        checked = 1;
-		}
-	} while(1);
-
-	if ((vflags & DANE_VFLAG_FAIL_IF_NOT_CHECKED) && checked == 0)
-		ret = gnutls_assert_val(DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
-	else
-		ret = 0;
-
+        ret = dane_verify_crt_raw (s, chain, chain_size, chain_type,
+                                   r, sflags, vflags, verify);
 cleanup:
 	if (s == NULL) dane_state_deinit(_s);
 	if (r != NULL) dane_query_deinit(r);
