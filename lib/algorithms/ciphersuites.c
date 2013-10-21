@@ -81,6 +81,14 @@ typedef struct
 #define GNUTLS_ECDHE_ECDSA_CAMELLIA_256_CBC_SHA384 { 0xC0,0x73 }
 #define GNUTLS_ECDHE_RSA_CAMELLIA_128_CBC_SHA256   { 0xC0,0x76 }
 #define GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384   { 0xC0,0x77 }
+#define GNUTLS_PSK_WITH_CAMELLIA_128_CBC_SHA256     { 0xC0,0x94 }
+#define GNUTLS_PSK_WITH_CAMELLIA_256_CBC_SHA384     { 0xC0,0x95 }
+#define GNUTLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256 { 0xC0,0x96 }
+#define GNUTLS_DHE_PSK_WITH_CAMELLIA_256_CBC_SHA384 { 0xC0,0x97 }
+#define GNUTLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256 { 0xC0,0x98 }
+#define GNUTLS_RSA_PSK_WITH_CAMELLIA_256_CBC_SHA384 { 0xC0,0x99 }
+#define GNUTLS_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256 { 0xC0,0x9A }
+#define GNUTLS_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384 { 0xC0,0x9B }
 
 #define GNUTLS_DH_ANON_AES_128_CBC_SHA256 { 0x00, 0x6C }
 #define GNUTLS_DH_ANON_AES_256_CBC_SHA256 { 0x00, 0x6D }
@@ -641,6 +649,14 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_NULL, GNUTLS_KX_ECDHE_PSK,
                              GNUTLS_MAC_SHA384, GNUTLS_TLS1_2,
                              GNUTLS_DTLS1_2, GNUTLS_MAC_SHA384),
+  ENTRY (GNUTLS_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
+                             GNUTLS_DTLS1_2),
+  ENTRY_PRF (GNUTLS_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384,
+                             GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_MAC_SHA384, GNUTLS_TLS1_2,
+                             GNUTLS_DTLS1_2, GNUTLS_MAC_SHA384),
 
   ENTRY (GNUTLS_ECDHE_PSK_WITH_SALSA20_256_SHA1,
   		GNUTLS_CIPHER_SALSA20_256, GNUTLS_KX_ECDHE_PSK,
@@ -689,6 +705,14 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_NULL, GNUTLS_KX_PSK,
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
                              GNUTLS_DTLS1_2),
+  ENTRY (GNUTLS_PSK_WITH_CAMELLIA_128_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_PSK,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY_PRF (GNUTLS_PSK_WITH_CAMELLIA_256_CBC_SHA384,
+                             GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_PSK,
+                             GNUTLS_MAC_SHA384, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
 
   ENTRY (GNUTLS_PSK_WITH_SALSA20_256_SHA1,
   		GNUTLS_CIPHER_SALSA20_256, GNUTLS_KX_PSK,
@@ -757,6 +781,15 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
         GNUTLS_CIPHER_NULL, GNUTLS_KX_RSA_PSK,
         GNUTLS_MAC_SHA384, GNUTLS_SSL3,
         GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
+  ENTRY (GNUTLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256,
+        GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_RSA_PSK,
+        GNUTLS_MAC_SHA256, GNUTLS_SSL3,
+        GNUTLS_DTLS_VERSION_MIN),
+  ENTRY_PRF (GNUTLS_RSA_PSK_WITH_CAMELLIA_256_CBC_SHA384,
+        GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_RSA_PSK,
+        GNUTLS_MAC_SHA384, GNUTLS_SSL3,
+        GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
+
 
   /* DHE-PSK */
   ENTRY (GNUTLS_DHE_PSK_SHA_ARCFOUR_SHA1,
@@ -795,7 +828,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                                 GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_DHE_PSK,
                                 GNUTLS_MAC_SHA384, GNUTLS_SSL3,
                                 GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
-
   ENTRY_PRF(GNUTLS_PSK_WITH_AES_256_GCM_SHA384,
                                 GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_PSK,
                                 GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
@@ -804,6 +836,14 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                                 GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_DHE_PSK,
                                 GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                                 GNUTLS_DTLS1_2, GNUTLS_DIG_SHA384),
+  ENTRY (GNUTLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_DHE_PSK,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY_PRF (GNUTLS_DHE_PSK_WITH_CAMELLIA_256_CBC_SHA384,
+                             GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_DHE_PSK,
+                             GNUTLS_MAC_SHA384, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
 #endif
 #ifdef ENABLE_ANON
   /* DH_ANON */
