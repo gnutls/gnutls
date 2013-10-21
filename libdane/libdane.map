@@ -18,6 +18,8 @@ DANE_0_0
 	dane_cert_usage_name;
 	dane_verification_status_print;
 	dane_state_set_dlv_file;
+	dane_verify_crt_raw;
+	dane_raw_tlsa;
   local:
     *;
 };
