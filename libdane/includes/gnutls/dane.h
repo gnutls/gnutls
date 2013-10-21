@@ -161,6 +161,13 @@ int
 dane_verification_status_print (unsigned int status,
                        gnutls_datum_t * out, unsigned int flags);
 
+int dane_verify_crt_raw (dane_state_t s,
+	const gnutls_datum_t *chain, unsigned chain_size,
+	gnutls_certificate_type_t chain_type,
+        dane_query_t r,
+	unsigned int sflags, unsigned int vflags,
+        unsigned int *verify);
+
 int dane_verify_crt (dane_state_t s,
 	const gnutls_datum_t *chain, unsigned chain_size,
 	gnutls_certificate_type_t chain_type,
