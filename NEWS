@@ -7,7 +7,7 @@ See the end for copying conditions.
 ** srptool: Fixed index command line option. Patch by Attila Molnar.
 
 ** API and ABI modifications:
-No changes since last version.
+dane_raw_tlsa: Added
 
 
 * Version 3.1.14 (released 2013-08-31)
