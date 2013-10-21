@@ -255,6 +255,7 @@ template_parse (const char *template)
   READ_NUMERIC("expiration_days", cfg.expiration_days);
   READ_NUMERIC("crl_next_update", cfg.crl_next_update);
   READ_NUMERIC("crl_number", cfg.crl_number);
+  READ_NUMERIC("path_len", cfg.path_len);
   
   val = optionGetValue(pov, "proxy_policy_language");
   if (val != NULL && val->valType == OPARG_TYPE_STRING)
@@ -265,7 +266,6 @@ template_parse (const char *template)
   
   READ_BOOLEAN("ca", cfg.ca);
   READ_BOOLEAN("honor_crq_extensions", cfg.crq_extensions);
-  READ_BOOLEAN("path_len", cfg.path_len);
   READ_BOOLEAN("tls_www_client", cfg.tls_www_client);
   READ_BOOLEAN("tls_www_server", cfg.tls_www_server);
   READ_BOOLEAN("signing_key", cfg.signing_key);
