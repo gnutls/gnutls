@@ -163,6 +163,11 @@ typedef struct
 #define GNUTLS_DHE_RSA_AES_128_GCM_SHA256 {0x00,0x9E}
 #define GNUTLS_DHE_DSS_AES_128_GCM_SHA256 {0x00,0xA2}
 #define GNUTLS_DH_ANON_AES_128_GCM_SHA256 {0x00,0xA6}
+#define GNUTLS_RSA_AES_256_GCM_SHA384 { 0x00, 0x9D }
+#define GNUTLS_DHE_RSA_AES_256_GCM_SHA384 {0x00,0x9F}
+#define GNUTLS_DHE_DSS_AES_256_GCM_SHA384 {0x00,0xA3}
+#define GNUTLS_DH_ANON_AES_256_GCM_SHA384 {0x00,0xA7}
+
 
 /* RFC 5487 */
 /* GCM-PSK */
@@ -307,6 +312,11 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_RSA,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                              GNUTLS_DTLS1_2),
+  ENTRY_PRF(GNUTLS_RSA_AES_256_GCM_SHA384,
+                             GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_RSA,
+                             GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_DTLS1_2, GNUTLS_DIG_SHA384),
+
 /* Salsa20 */
   ENTRY (GNUTLS_RSA_WITH_SALSA20_256_SHA1,
   		GNUTLS_CIPHER_SALSA20_256, GNUTLS_KX_RSA,
@@ -362,6 +372,11 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_DHE_DSS,
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
                              GNUTLS_DTLS1_2),
+  ENTRY_PRF(GNUTLS_DHE_DSS_AES_256_GCM_SHA384,
+                                GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_DHE_DSS,
+                                GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                                GNUTLS_DTLS1_2, GNUTLS_DIG_SHA384),
+
   /* DHE_RSA */
   ENTRY (GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA1,
                              GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_DHE_RSA,
@@ -401,6 +416,10 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_DHE_DSS,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                              GNUTLS_DTLS1_2),
+  ENTRY_PRF(GNUTLS_DHE_RSA_AES_256_GCM_SHA384,
+                             GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_DHE_RSA,
+                             GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_DTLS1_2, GNUTLS_DIG_SHA384),
 #endif /* DHE */
 #ifdef ENABLE_ECDHE
 /* ECC-RSA */
@@ -709,6 +728,11 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                              GNUTLS_DTLS1_2),
+  ENTRY_PRF(GNUTLS_DH_ANON_AES_256_GCM_SHA384,
+                                GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_ANON_DH,
+                                GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                                GNUTLS_DTLS1_2, GNUTLS_DIG_SHA384),
+
 /* ECC-ANON */
   ENTRY (GNUTLS_ECDH_ANON_NULL_SHA1,
                              GNUTLS_CIPHER_NULL, GNUTLS_KX_ANON_ECDH,
