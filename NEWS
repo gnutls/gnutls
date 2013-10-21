@@ -14,6 +14,9 @@ See the end for copying conditions.
 ** gnutls-cli: Added support for inline commands, using the
 --inline-commands-prefix and --inline-commands options. Patch by Raj Raman.	
 
+** certtool: pathlen constraint is now read correctly. Reported by
+Christoph Seitz.
+
 ** API and ABI modifications:
 gnutls_certificate_get_crt_raw: Added
 dane_verify_crt_raw: Added
