@@ -51,7 +51,7 @@ typedef enum dane_cert_usage_t
  *
  * Enumeration of different certificate types.
  */
-typedef enum dane_cert_type_t 
+typedef enum dane_cert_type_t
 {
   DANE_CERT_X509 = 0,
   DANE_CERT_PK = 1
@@ -65,7 +65,7 @@ typedef enum dane_cert_type_t
  *
  * Enumeration of different content matching types.
  */
-typedef enum dane_match_type_t 
+typedef enum dane_match_type_t
 {
   DANE_MATCH_EXACT = 0,
   DANE_MATCH_SHA2_256 = 1,
@@ -81,7 +81,7 @@ typedef enum dane_match_type_t
  *
  * Enumeration of different certificate types.
  */
-typedef enum dane_query_status_t 
+typedef enum dane_query_status_t
 {
   DANE_QUERY_UNKNOWN = 0,
   DANE_QUERY_DNSSEC_VERIFIED,
@@ -99,7 +99,7 @@ typedef struct dane_query_st *dane_query_t;
  *
  * Enumeration of different verification flags.
  */
-typedef enum dane_state_flags_t 
+typedef enum dane_state_flags_t
 {
   DANE_F_IGNORE_LOCAL_RESOLVER = 1,
   DANE_F_INSECURE=2,
@@ -108,6 +108,9 @@ typedef enum dane_state_flags_t
 int dane_state_init (dane_state_t* s, unsigned int flags);
 int dane_state_set_dlv_file(dane_state_t s, const char* file);
 void dane_state_deinit (dane_state_t s);
+
+
+int dane_raw_tlsa(dane_state_t s, dane_query_t *r, char *const*dane_data, const int *dane_data_len, int secure, int bogus);
 
 int dane_query_tlsa(dane_state_t s, dane_query_t *r, const char* host, const char* proto, unsigned int port);
 
@@ -130,7 +133,7 @@ const char* dane_cert_usage_name(dane_cert_usage_t usage);
  *
  * Enumeration of different verification status flags.
  */
-typedef enum dane_verify_flags_t 
+typedef enum dane_verify_flags_t
 {
   DANE_VFLAG_FAIL_IF_NOT_CHECKED = 1,
   DANE_VFLAG_ONLY_CHECK_EE_USAGE = 1<<1,
@@ -145,7 +148,7 @@ typedef enum dane_verify_flags_t
  *
  * Enumeration of different verification status flags.
  */
-typedef enum dane_verify_status_t 
+typedef enum dane_verify_status_t
 {
   DANE_VERIFY_CA_CONSTRAINTS_VIOLATED = 1,
   DANE_VERIFY_CERT_DIFFERS = 1<<1,
