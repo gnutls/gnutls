@@ -7,6 +7,7 @@ See the end for copying conditions.
 ** srptool: Fixed index command line option. Patch by Attila Molnar.
 
 ** API and ABI modifications:
+dane_verify_crt_raw: Added
 dane_raw_tlsa: Added
 
 
