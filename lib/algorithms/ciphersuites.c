@@ -66,6 +66,17 @@ typedef struct
 #define GNUTLS_DH_ANON_CAMELLIA_128_CBC_SHA1 { 0x00,0x46 }
 #define GNUTLS_DH_ANON_CAMELLIA_256_CBC_SHA1 { 0x00,0x89 }
 
+/* rfc5932 */
+#define GNUTLS_RSA_CAMELLIA_128_CBC_SHA256     { 0x00,0xBA }
+#define GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA256 { 0x00,0xBD }
+#define GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA256 { 0x00,0xBE }
+#define GNUTLS_DH_ANON_CAMELLIA_128_CBC_SHA256 { 0x00,0xBF }
+#define GNUTLS_RSA_CAMELLIA_256_CBC_SHA256     { 0x00,0xC0 }
+#define GNUTLS_DHE_DSS_CAMELLIA_256_CBC_SHA256 { 0x00,0xC3 }
+#define GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA256 { 0x00,0xC4 }
+#define GNUTLS_DH_ANON_CAMELLIA_256_CBC_SHA256 { 0x00,0xC5 }
+
+
 #define GNUTLS_DH_ANON_AES_128_CBC_SHA256 { 0x00, 0x6C }
 #define GNUTLS_DH_ANON_AES_256_CBC_SHA256 { 0x00, 0x6D }
 
@@ -304,6 +315,15 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_DTLS_VERSION_MIN),
+
+  ENTRY (GNUTLS_RSA_CAMELLIA_128_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_RSA,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY (GNUTLS_RSA_CAMELLIA_256_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_RSA,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN),
   ENTRY (GNUTLS_RSA_CAMELLIA_128_CBC_SHA1,
                              GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
@@ -367,6 +387,17 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_DHE_DSS,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_DTLS_VERSION_MIN),
+  ENTRY (GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_128_CBC,
+                             GNUTLS_KX_DHE_DSS,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY (GNUTLS_DHE_DSS_CAMELLIA_256_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_256_CBC,
+                             GNUTLS_KX_DHE_DSS,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN),
+
   ENTRY (GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA1,
                              GNUTLS_CIPHER_CAMELLIA_128_CBC,
                              GNUTLS_KX_DHE_DSS,
@@ -402,6 +433,16 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
   ENTRY (GNUTLS_DHE_RSA_AES_256_CBC_SHA1,
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_DHE_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY (GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_128_CBC,
+                             GNUTLS_KX_DHE_RSA,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY (GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_256_CBC,
+                             GNUTLS_KX_DHE_RSA,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
                              GNUTLS_DTLS_VERSION_MIN),
   ENTRY (GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA1,
                              GNUTLS_CIPHER_CAMELLIA_128_CBC,
@@ -758,6 +799,16 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
   ENTRY (GNUTLS_DH_ANON_AES_256_CBC_SHA1,
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY (GNUTLS_DH_ANON_CAMELLIA_128_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_128_CBC,
+                             GNUTLS_KX_ANON_DH,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY (GNUTLS_DH_ANON_CAMELLIA_256_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_256_CBC,
+                             GNUTLS_KX_ANON_DH,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
                              GNUTLS_DTLS_VERSION_MIN),
   ENTRY (GNUTLS_DH_ANON_CAMELLIA_128_CBC_SHA1,
                              GNUTLS_CIPHER_CAMELLIA_128_CBC,
