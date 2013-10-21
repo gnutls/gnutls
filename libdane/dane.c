@@ -180,14 +180,14 @@ int dane_state_init(dane_state_t* s, unsigned int flags)
 
 	(*s)->ctx = ctx;
 	(*s)->flags = flags;
-	
+
 	return DANE_E_SUCCESS;
 cleanup:
 
 	if (ctx)
 		ub_ctx_delete(ctx);
 	free(*s);
-	
+
 	return ret;
 }
 
@@ -209,18 +209,18 @@ void dane_state_deinit(dane_state_t s)
  * @s: The structure to be deinitialized
  * @file: The file holding the DLV keys.
  *
- * This function will set a file with trusted keys 
+ * This function will set a file with trusted keys
  * for DLV  (DNSSEC  Lookaside  Validation).
  *
  **/
 int dane_state_set_dlv_file(dane_state_t s, const char* file)
 {
 int ret;
-  
+
   ret = ub_ctx_set_option(s->ctx, (char*)"dlv-anchor-file:", (void*)file);
   if (ret != 0)
     return gnutls_assert_val(DANE_E_FILE_ERROR);
-  
+
   return 0;
 }
 
@@ -233,9 +233,81 @@ int ret;
  **/
 void dane_query_deinit(dane_query_t q)
 {
-	ub_resolve_free(q->result);
+        if (q->result) ub_resolve_free(q->result);
 	free(q);
 }
+
+
+/**
+ * dane_raw_tlsa:
+ * @s: The DANE state structure
+ * @r: A structure to place the result
+ * @dane_data: array of DNS rdata items, terminated with a NULL pointer;
+ *             caller must guarantee that the referenced data remains
+ *             valid until dane_query_deinit() is called.
+ * @dane_data_len: the length n bytes of the dane_data items
+ * @param secure true if the result is validated securely, false if
+ *               validation failed or the domain queried has no security info
+ * @param bogus if the result was not secure (secure = 0) due to a security failure,
+ *              and the result is due to a security failure, bogus is true.
+ *
+ *
+ * This function will fill in the TLSA (DANE) structure from
+ * the given raw DNS record data.
+ *
+ * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int dane_raw_tlsa(dane_state_t s, dane_query_t *r, char *const*dane_data, const int *dane_data_len, int secure, int bogus)
+{
+	int ret;
+	unsigned int i;
+
+	*r = calloc(1, sizeof(struct dane_query_st));
+	if (*r == NULL)
+		return gnutls_assert_val(DANE_E_MEMORY_ERROR);
+	i = 0;
+	do {
+
+		if (dane_data_len[i] > 3)
+			ret = DANE_E_SUCCESS;
+		else {
+			return gnutls_assert_val(DANE_E_RECEIVED_CORRUPT_DATA);
+		}
+
+		(*r)->usage[i] = dane_data[i][0];
+		(*r)->type[i] = dane_data[i][1];
+		(*r)->match[i] = dane_data[i][2];
+		(*r)->data[i].data = (void*)&dane_data[i][3];
+		(*r)->data[i].size = dane_data_len[i] - 3;
+		i++;
+                if (i > MAX_DATA_ENTRIES)
+                  break;
+	} while(dane_data[i] != NULL);
+
+	(*r)->data_entries = i;
+
+	if (!(s->flags & DANE_F_INSECURE) && !secure) {
+		if (bogus)
+			ret = gnutls_assert_val(DANE_E_INVALID_DNSSEC_SIG);
+		else
+			ret = gnutls_assert_val(DANE_E_NO_DNSSEC_SIG);
+	}
+
+	/* show security status */
+	if (secure) {
+		(*r)->status = DANE_QUERY_DNSSEC_VERIFIED;
+	} else if (bogus) {
+	        gnutls_assert();
+		(*r)->status = DANE_QUERY_BOGUS;
+	} else {
+	        gnutls_assert();
+	        (*r)->status = DANE_QUERY_NO_DNSSEC;
+        }
+
+	return ret;
+}
+
 
 /**
  * dane_query_tlsa:
@@ -255,66 +327,33 @@ int dane_query_tlsa(dane_state_t s, dane_query_t *r, const char* host, const cha
 {
 	char ns[1024];
 	int ret;
-	unsigned int i;
-
-	*r = calloc(1, sizeof(struct dane_query_st));
-	if (*r == NULL)
-		return gnutls_assert_val(DANE_E_MEMORY_ERROR);
+        struct ub_result *result;
 
 	snprintf(ns, sizeof(ns), "_%u._%s.%s", port, proto, host);
 
 	/* query for webserver */
-	ret = ub_resolve(s->ctx, ns, 52, 1, &(*r)->result);
+	ret = ub_resolve(s->ctx, ns, 52, 1, &result);
 	if(ret != 0) {
 		return gnutls_assert_val(DANE_E_RESOLVING_ERROR);
 	}
 
 /* show first result */
-	if(!(*r)->result->havedata) {
+	if(!result->havedata) {
+                ub_resolve_free (result);
 		return gnutls_assert_val(DANE_E_NO_DANE_DATA);
 	}
 
-	i = 0;
-	do {
-
-		if ((*r)->result->len[i] > 3)
-			ret = DANE_E_SUCCESS;
-		else {
-			return gnutls_assert_val(DANE_E_RECEIVED_CORRUPT_DATA);
-		}
-	
-		(*r)->usage[i] = (*r)->result->data[i][0];
-		(*r)->type[i] = (*r)->result->data[i][1];
-		(*r)->match[i] = (*r)->result->data[i][2];
-		(*r)->data[i].data = (void*)&(*r)->result->data[i][3];
-		(*r)->data[i].size = (*r)->result->len[i] - 3;
-		i++;
-	} while((*r)->result->data[i] != NULL);
-	
-	(*r)->data_entries = i;
-
-	if (!(s->flags & DANE_F_INSECURE) && !(*r)->result->secure) {
-		if ((*r)->result->bogus)
-			ret = gnutls_assert_val(DANE_E_INVALID_DNSSEC_SIG);
-		else
-			ret = gnutls_assert_val(DANE_E_NO_DNSSEC_SIG);
-	}
-
-	/* show security status */
-	if ((*r)->result->secure) {
-		(*r)->status = DANE_QUERY_DNSSEC_VERIFIED;
-	} else if ((*r)->result->bogus) {
-	        gnutls_assert();
-		(*r)->status = DANE_QUERY_BOGUS;
-	} else {
-	        gnutls_assert();
-	        (*r)->status = DANE_QUERY_NO_DNSSEC;
+        ret = dane_raw_tlsa (s, r, result->data, result->len, result->secure, result->bogus);
+        if (*r == NULL) {
+                ub_resolve_free (result);
+		return ret;
         }
-
+        (*r)->result = result;
 	return ret;
 }
 
-static unsigned int matches(const gnutls_datum_t *raw1, const gnutls_datum_t *raw2, 
+
+static unsigned int matches(const gnutls_datum_t *raw1, const gnutls_datum_t *raw2,
 							dane_match_type_t match)
 {
 uint8_t digest[64];
@@ -326,35 +365,35 @@ int ret;
 
 		if (memcmp(raw1->data, raw2->data, raw1->size) != 0)
 			return gnutls_assert_val(0);
-		
+
 		return 1;
 	} else if (match == DANE_MATCH_SHA2_256) {
 
 		if (raw2->size != 32)
 			return gnutls_assert_val(0);
-		
+
 		ret = gnutls_hash_fast(GNUTLS_DIG_SHA256, raw1->data, raw1->size, digest);
 		if (ret < 0)
 			return gnutls_assert_val(0);
 
 		if (memcmp(digest, raw2->data, 32) != 0)
 			return gnutls_assert_val(0);
-		
+
 		return 1;
 	} else if (match == DANE_MATCH_SHA2_512) {
 		if (raw2->size != 64)
 			return gnutls_assert_val(0);
-		
+
 		ret = gnutls_hash_fast(GNUTLS_DIG_SHA512, raw1->data, raw1->size, digest);
 		if (ret < 0)
 			return gnutls_assert_val(0);
-		
+
 		if (memcmp(digest, raw2->data, 64) != 0)
 			return gnutls_assert_val(0);
-		
+
 		return 1;
 	}
-	
+
 	return gnutls_assert_val(0);
 }
 
@@ -376,7 +415,7 @@ int ret;
 		ret = DANE_E_PUBKEY_ERROR;
 		goto cleanup;
 	}
-		
+
 	ret = gnutls_x509_crt_import(crt, raw_crt, GNUTLS_X509_FMT_DER);
 	if (ret < 0) {
 	        gnutls_assert();
@@ -397,7 +436,7 @@ int ret;
 		ret = DANE_E_PUBKEY_ERROR;
 		goto cleanup;
 	}
-	
+
 	ret = 0;
 	goto clean_certs;
 
@@ -428,7 +467,7 @@ gnutls_x509_crt_t crt = NULL, ca = NULL;
 		return gnutls_assert_val(DANE_E_INVALID_REQUEST);
 
 	if (ctype == DANE_CERT_X509 && crt_type == GNUTLS_CRT_X509) {
-	
+
 		if (!matches(&raw_crt[1], data, match)) {
 		        gnutls_assert();
 			*verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
@@ -449,7 +488,7 @@ gnutls_x509_crt_t crt = NULL, ca = NULL;
 		ret = gnutls_assert_val(DANE_E_UNKNOWN_DANE_DATA);
 		goto cleanup;
 	}
-	
+
 	/* check if the certificate chain is actually a chain */
 	ret = gnutls_x509_crt_init(&crt);
   	if (ret < 0) {
@@ -474,7 +513,7 @@ gnutls_x509_crt_t crt = NULL, ca = NULL;
   	  	ret = gnutls_assert_val(DANE_E_CERT_ERROR);
   	  	goto cleanup;
 	}
-	    
+
 	ret = gnutls_x509_crt_check_issuer(crt, ca);
 	if (ret == 0) {
 		gnutls_assert();
@@ -550,19 +589,19 @@ cleanup:
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
  * This function will verify the given certificate chain against the
- * CA constrains and/or the certificate available via DANE. 
+ * CA constrains and/or the certificate available via DANE.
  * If no information via DANE can be obtained the flag %DANE_VERIFY_NO_DANE_INFO
- * is set. If a DNSSEC signature is not available for the DANE 
+ * is set. If a DNSSEC signature is not available for the DANE
  * record then the verify flag %DANE_VERIFY_NO_DNSSEC_DATA is set.
  *
  * Note that the CA constraint only applies for the directly certifying CA
  * and does not account for long CA chains.
- * 
+ *
  * Due to the many possible options of DANE, there is no single threat
  * model countered. When notifying the user about DANE verification results
  * it may be better to mention: DANE verification did not reject the certificate,
  * rather than mentioning a successful DANE verication.
- * 
+ *
  * If the @q parameter is provided it will be used for caching entries.
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
@@ -582,12 +621,12 @@ int ret;
 unsigned checked = 0;
 unsigned int usage, type, match, idx;
 gnutls_datum_t data;
-	
+
 	if (chain_type != GNUTLS_CRT_X509)
 		return gnutls_assert_val(DANE_E_INVALID_REQUEST);
-	
+
 	*verify = 0;
-	
+
 	if (s == NULL) {
 		ret = dane_state_init(&_s, sflags);
 		if (ret < 0) {
@@ -596,7 +635,7 @@ gnutls_datum_t data;
 		}
 	} else
 		_s = s;
-	
+
 	ret = dane_query_tlsa(_s, &r, hostname, proto, port);
 	if (ret < 0) {
 	        gnutls_assert();
@@ -613,7 +652,7 @@ gnutls_datum_t data;
 			gnutls_assert();
 			goto cleanup;
 		}
-		
+
 		if (!(vflags & DANE_VFLAG_ONLY_CHECK_EE_USAGE) && (usage == DANE_CERT_USAGE_LOCAL_CA || usage == DANE_CERT_USAGE_CA)) {
 			ret = verify_ca(chain, chain_size, chain_type, type, match, &data, verify);
 			if (ret < 0) {
@@ -654,7 +693,7 @@ cleanup:
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
  * This function will verify session's certificate chain against the
- * CA constrains and/or the certificate available via DANE. 
+ * CA constrains and/or the certificate available via DANE.
  * See dane_verify_crt() for more information.
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
@@ -676,9 +715,9 @@ unsigned int type;
 	if (cert_list_size == 0) {
 		return gnutls_assert_val(DANE_E_NO_CERT);
 	}
-	
+
 	type = gnutls_certificate_type_get(session);
-	
+
 	return dane_verify_crt(s, cert_list, cert_list_size, type, hostname, proto, port, sflags, vflags, verify);
 }
 
@@ -722,6 +761,6 @@ dane_verification_status_print (unsigned int status,
 
   ret = _gnutls_buffer_to_datum( &str, out);
   if (out->size > 0) out->size--;
-      
+
   return ret;
 }
