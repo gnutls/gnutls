@@ -76,6 +76,11 @@ typedef struct
 #define GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA256 { 0x00,0xC4 }
 #define GNUTLS_DH_ANON_CAMELLIA_256_CBC_SHA256 { 0x00,0xC5 }
 
+/* rfc6367 */
+#define GNUTLS_ECDHE_ECDSA_CAMELLIA_128_CBC_SHA256 { 0xC0,0x72 }
+#define GNUTLS_ECDHE_ECDSA_CAMELLIA_256_CBC_SHA384 { 0xC0,0x73 }
+#define GNUTLS_ECDHE_RSA_CAMELLIA_128_CBC_SHA256   { 0xC0,0x76 }
+#define GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384   { 0xC0,0x77 }
 
 #define GNUTLS_DH_ANON_AES_128_CBC_SHA256 { 0x00, 0x6C }
 #define GNUTLS_DH_ANON_AES_256_CBC_SHA256 { 0x00, 0x6D }
@@ -497,6 +502,15 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_ECDHE_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_VERSION_UNKNOWN),
+  ENTRY (GNUTLS_ECDHE_RSA_CAMELLIA_128_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_ECDHE_RSA,
+                             GNUTLS_MAC_SHA256, GNUTLS_SSL3,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY_PRF (GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384,
+                             GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_ECDHE_RSA,
+                             GNUTLS_MAC_SHA256, GNUTLS_SSL3,
+                             GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
+
   /* ECDHE-ECDSA */
   ENTRY (GNUTLS_ECDHE_ECDSA_NULL_SHA1,
                              GNUTLS_CIPHER_NULL, GNUTLS_KX_ECDHE_ECDSA,
@@ -518,6 +532,15 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_ECDHE_ECDSA,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_VERSION_UNKNOWN),
+  ENTRY (GNUTLS_ECDHE_ECDSA_CAMELLIA_128_CBC_SHA256,
+                             GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_ECDHE_ECDSA,
+                             GNUTLS_MAC_SHA256, GNUTLS_SSL3,
+                             GNUTLS_DTLS_VERSION_MIN),
+  ENTRY_PRF (GNUTLS_ECDHE_ECDSA_CAMELLIA_256_CBC_SHA384,
+                             GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_ECDHE_ECDSA,
+                             GNUTLS_MAC_SHA256, GNUTLS_SSL3,
+                             GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
+
   /* More ECC */
 
   ENTRY (GNUTLS_ECDHE_ECDSA_AES_128_CBC_SHA256,
