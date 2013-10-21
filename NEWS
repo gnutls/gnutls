@@ -16,6 +16,7 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 gnutls_certificate_get_crt_raw: Added
+dane_verify_crt_raw: Added
 dane_raw_tlsa: Added
 
 

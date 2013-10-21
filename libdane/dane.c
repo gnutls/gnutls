@@ -576,12 +576,12 @@ cleanup:
 }
 
 /**
- * dane_verify_crt:
+ * dane_verify_crt_raw:
  * @s: A DANE state structure (may be NULL)
  * @chain: A certificate chain
  * @chain_size: The size of the chain
  * @chain_type: The type of the certificate chain
- * @r DANE data to check against
+ * @r: DANE data to check against
  * @sflags: Flags for the the initialization of @s (if NULL)
  * @vflags: Verification flags; an OR'ed list of %dane_verify_flags_t.
  * @verify: An OR'ed list of %dane_verify_status_t.
