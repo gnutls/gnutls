@@ -16,6 +16,7 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 gnutls_certificate_get_crt_raw: Added
+dane_raw_tlsa: Added
 
 
 * Version 3.2.4 (released 2013-08-31)
