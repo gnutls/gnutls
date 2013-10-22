@@ -22,15 +22,15 @@
 
 #include <nettle/camellia.h>
 
-struct gcm_camellia_ctx GCM_CTX(struct camellia_ctx);
+struct _gcm_camellia_ctx GCM_CTX(struct camellia_ctx);
 
-void _gcm_camellia_set_key(struct gcm_camellia_ctx *ctx, unsigned length, const uint8_t *key);
-void _gcm_camellia_set_iv(struct gcm_camellia_ctx *ctx,
+void _gcm_camellia_set_key(struct _gcm_camellia_ctx *ctx, unsigned length, const uint8_t *key);
+void _gcm_camellia_set_iv(struct _gcm_camellia_ctx *ctx,
 	       unsigned length, const uint8_t *iv);
-void _gcm_camellia_update(struct gcm_camellia_ctx *ctx, unsigned length, const uint8_t *data);
-void _gcm_camellia_encrypt(struct gcm_camellia_ctx *ctx,
+void _gcm_camellia_update(struct _gcm_camellia_ctx *ctx, unsigned length, const uint8_t *data);
+void _gcm_camellia_encrypt(struct _gcm_camellia_ctx *ctx,
 		unsigned length, uint8_t *dst, const uint8_t *src);
-void _gcm_camellia_decrypt(struct gcm_camellia_ctx *ctx,
+void _gcm_camellia_decrypt(struct _gcm_camellia_ctx *ctx,
 		unsigned length, uint8_t *dst, const uint8_t *src);
-void _gcm_camellia_digest(struct gcm_camellia_ctx *ctx,
+void _gcm_camellia_digest(struct _gcm_camellia_ctx *ctx,
 	       unsigned length, uint8_t *digest);

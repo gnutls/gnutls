@@ -20,7 +20,7 @@
  *
  */
 
-/* gcm_aes.c
+/* gcm_camellia.c
  *
  * Galois counter mode using Camellia as the underlying cipher.
  */
@@ -34,40 +34,40 @@
 #include <gcm-camellia.h>
 
 void
-_gcm_camellia_set_key(struct gcm_camellia_ctx *ctx, unsigned length, const uint8_t *key)
+_gcm_camellia_set_key(struct _gcm_camellia_ctx *ctx, unsigned length, const uint8_t *key)
 {
   GCM_SET_KEY(ctx, camellia_set_encrypt_key, camellia_crypt, length, key);
 }
 
 void
-_gcm_camellia_set_iv(struct gcm_camellia_ctx *ctx,
+_gcm_camellia_set_iv(struct _gcm_camellia_ctx *ctx,
 	       unsigned length, const uint8_t *iv)
 {
   GCM_SET_IV(ctx, length, iv);
 }
 
 void
-_gcm_camellia_update(struct gcm_camellia_ctx *ctx, unsigned length, const uint8_t *data)
+_gcm_camellia_update(struct _gcm_camellia_ctx *ctx, unsigned length, const uint8_t *data)
 {
   GCM_UPDATE(ctx, length, data);
 }
 
 void
-_gcm_camellia_encrypt(struct gcm_camellia_ctx *ctx,
+_gcm_camellia_encrypt(struct _gcm_camellia_ctx *ctx,
 		unsigned length, uint8_t *dst, const uint8_t *src)
 {
   GCM_ENCRYPT(ctx, camellia_crypt, length, dst, src);
 }
 
 void
-_gcm_camellia_decrypt(struct gcm_camellia_ctx *ctx,
+_gcm_camellia_decrypt(struct _gcm_camellia_ctx *ctx,
 		unsigned length, uint8_t *dst, const uint8_t *src)
 {
   GCM_DECRYPT(ctx, camellia_crypt, length, dst, src);
 }
 
 void
-_gcm_camellia_digest(struct gcm_camellia_ctx *ctx,
+_gcm_camellia_digest(struct _gcm_camellia_ctx *ctx,
 	       unsigned length, uint8_t *digest)
 {
   GCM_DIGEST(ctx, camellia_crypt, length, digest);

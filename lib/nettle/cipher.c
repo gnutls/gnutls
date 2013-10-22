@@ -71,7 +71,7 @@ struct nettle_cipher_ctx
     struct des3_ctx des3;
     struct des_ctx des;
     struct gcm_aes_ctx aes_gcm;
-    struct gcm_camellia_ctx camellia_gcm;
+    struct _gcm_camellia_ctx camellia_gcm;
     struct salsa20_ctx salsa20;
   } ctx;
   void *ctx_ptr;
