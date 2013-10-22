@@ -35,6 +35,7 @@
 #include <nettle/nettle-meta.h>
 #include <nettle/cbc.h>
 #include <nettle/gcm.h>
+#include <gcm-camellia.h>
 
 /* Functions that refer to the nettle library.
  */
@@ -70,6 +71,7 @@ struct nettle_cipher_ctx
     struct des3_ctx des3;
     struct des_ctx des;
     struct gcm_aes_ctx aes_gcm;
+    struct gcm_camellia_ctx camellia_gcm;
     struct salsa20_ctx salsa20;
   } ctx;
   void *ctx_ptr;
@@ -87,7 +89,7 @@ struct nettle_cipher_ctx
 
 #define GCM_DEFAULT_NONCE_SIZE 12
 
-static void _gcm_encrypt(void *_ctx, nettle_crypt_func f,  
+static void _aes_gcm_encrypt(void *_ctx, nettle_crypt_func f,  
             unsigned block_size, uint8_t *iv,
             unsigned length, uint8_t *dst,
             const uint8_t *src)
@@ -95,12 +97,28 @@ static void _gcm_encrypt(void *_ctx, nettle_crypt_func f,
   gcm_aes_encrypt(_ctx, length, dst, src);
 }
 
-static void _gcm_decrypt(void *_ctx, nettle_crypt_func f,  
+static void _aes_gcm_decrypt(void *_ctx, nettle_crypt_func f,  
             unsigned block_size, uint8_t *iv,
             unsigned length, uint8_t *dst,
             const uint8_t *src)
 {
   gcm_aes_decrypt(_ctx, length, dst, src);
+}
+
+static void _camellia_gcm_encrypt(void *_ctx, nettle_crypt_func f,  
+            unsigned block_size, uint8_t *iv,
+            unsigned length, uint8_t *dst,
+            const uint8_t *src)
+{
+  _gcm_camellia_encrypt(_ctx, length, dst, src);
+}
+
+static void _camellia_gcm_decrypt(void *_ctx, nettle_crypt_func f,  
+            unsigned block_size, uint8_t *iv,
+            unsigned length, uint8_t *dst,
+            const uint8_t *src)
+{
+  _gcm_camellia_decrypt(_ctx, length, dst, src);
 }
 
 static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
@@ -109,6 +127,8 @@ static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
     {
     case GNUTLS_CIPHER_AES_128_GCM:
     case GNUTLS_CIPHER_AES_256_GCM:
+    case GNUTLS_CIPHER_CAMELLIA_128_GCM:
+    case GNUTLS_CIPHER_CAMELLIA_256_GCM:
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
     case GNUTLS_CIPHER_CAMELLIA_192_CBC:
     case GNUTLS_CIPHER_CAMELLIA_256_CBC:
@@ -147,13 +167,23 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx, int enc)
     {
     case GNUTLS_CIPHER_AES_128_GCM:
     case GNUTLS_CIPHER_AES_256_GCM:
-      ctx->encrypt = _gcm_encrypt;
-      ctx->decrypt = _gcm_decrypt;
+      ctx->encrypt = _aes_gcm_encrypt;
+      ctx->decrypt = _aes_gcm_decrypt;
       ctx->i_encrypt = (nettle_crypt_func*) aes_encrypt;
       ctx->auth = (auth_func)gcm_aes_update;
       ctx->tag = (tag_func)gcm_aes_digest;
       ctx->ctx_ptr = &ctx->ctx.aes_gcm;
       ctx->block_size = AES_BLOCK_SIZE;
+      break;
+    case GNUTLS_CIPHER_CAMELLIA_128_GCM:
+    case GNUTLS_CIPHER_CAMELLIA_256_GCM:
+      ctx->encrypt = _camellia_gcm_encrypt;
+      ctx->decrypt = _camellia_gcm_decrypt;
+      ctx->i_encrypt = (nettle_crypt_func*) camellia_crypt;
+      ctx->auth = (auth_func)_gcm_camellia_update;
+      ctx->tag = (tag_func)_gcm_camellia_digest;
+      ctx->ctx_ptr = &ctx->ctx.camellia_gcm;
+      ctx->block_size = CAMELLIA_BLOCK_SIZE;
       break;
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
     case GNUTLS_CIPHER_CAMELLIA_192_CBC:
@@ -247,6 +277,10 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
     case GNUTLS_CIPHER_AES_256_GCM:
       gcm_aes_set_key(&ctx->ctx.aes_gcm, keysize, key);
       break;
+    case GNUTLS_CIPHER_CAMELLIA_128_GCM:
+    case GNUTLS_CIPHER_CAMELLIA_256_GCM:
+      _gcm_camellia_set_key(&ctx->ctx.camellia_gcm, keysize, key);
+      break;
     case GNUTLS_CIPHER_AES_128_CBC:
     case GNUTLS_CIPHER_AES_192_CBC:
     case GNUTLS_CIPHER_AES_256_CBC:
@@ -326,6 +360,13 @@ struct nettle_cipher_ctx *ctx = _ctx;
         return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
       gcm_aes_set_iv(&ctx->ctx.aes_gcm, GCM_DEFAULT_NONCE_SIZE, iv);
+      break;
+    case GNUTLS_CIPHER_CAMELLIA_128_GCM:
+    case GNUTLS_CIPHER_CAMELLIA_256_GCM:
+      if (ivsize != GCM_DEFAULT_NONCE_SIZE)
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+      _gcm_camellia_set_iv(&ctx->ctx.camellia_gcm, GCM_DEFAULT_NONCE_SIZE, iv);
       break;
     case GNUTLS_CIPHER_SALSA20_256:
     case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
