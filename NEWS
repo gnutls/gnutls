@@ -17,6 +17,9 @@ See the end for copying conditions.
 ** certtool: pathlen constraint is now read correctly. Reported by
 Christoph Seitz.
 
+** Added several combinations of ciphersuites with SHA256 and SHA384 as MAC,
+as well as Camellia with GCM.
+
 ** API and ABI modifications:
 gnutls_certificate_get_crt_raw: Added
 dane_verify_crt_raw: Added
