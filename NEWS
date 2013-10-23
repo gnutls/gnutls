@@ -9,6 +9,14 @@ See the end for copying conditions.
 ** certtool: pathlen constraint is now read correctly. Reported by
 Christoph Seitz.
 
+** libdane: Added interfaces to allow initialization of dane_query_t from
+external DNS resolutions, and to allow direct verification of a certificate
+chain against a dane_query_t. Contributed by Christian Grothoff.
+
+** libdane: Fixed a buffer overflow in dane_query_tlsa(). This could be
+triggered by a DNS server supplying more than 4 DANE records. Report and fix
+by Christian Grothoff.
+
 ** API and ABI modifications:
 dane_verify_crt_raw: Added
 dane_raw_tlsa: Added

@@ -246,9 +246,9 @@ void dane_query_deinit(dane_query_t q)
  *             caller must guarantee that the referenced data remains
  *             valid until dane_query_deinit() is called.
  * @dane_data_len: the length n bytes of the dane_data items
- * @param secure true if the result is validated securely, false if
+ * @secure: true if the result is validated securely, false if
  *               validation failed or the domain queried has no security info
- * @param bogus if the result was not secure (secure = 0) due to a security failure,
+ * @bogus: if the result was not secure (secure = 0) due to a security failure,
  *              and the result is due to a security failure, bogus is true.
  *
  *
