@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.15 (unreleased)
+* Version 3.1.15 (released 2013-10-23)
 
 ** srptool: Fixed index command line option. Patch by Attila Molnar.
 
