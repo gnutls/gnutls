@@ -222,6 +222,8 @@ extern "C"
  * @GNUTLS_MAC_SHA512: HMAC-SHA-512 algorithm.
  * @GNUTLS_MAC_SHA224: HMAC-SHA-224 algorithm.
  * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
+ * @GNUTLS_MAC_UMAC_96: The UMAC-96 MAC algorithm.
+ * @GNUTLS_MAC_UMAC_128: The UMAC-128 MAC algorithm.
  *
  * Enumeration of different Message Authentication Code (MAC)
  * algorithms.
