@@ -172,10 +172,13 @@ int dane_state_init(dane_state_t* s, unsigned int flags)
 	}
 
 	/* read public keys for DNSSEC verification */
-	if( (ret=ub_ctx_add_ta_file(ctx, (char*)UNBOUND_ROOT_KEY_FILE)) != 0) {
-	        gnutls_assert();
-		ret = DANE_E_INITIALIZATION_ERROR;
-		goto cleanup;
+        if (!(flags & DANE_F_IGNORE_DNSSEC))
+        {
+                if( (ret=ub_ctx_add_ta_file(ctx, (char*)UNBOUND_ROOT_KEY_FILE)) != 0) {
+	                gnutls_assert();
+		        ret = DANE_E_INITIALIZATION_ERROR;
+		        goto cleanup;
+                }
 	}
 
 	(*s)->ctx = ctx;

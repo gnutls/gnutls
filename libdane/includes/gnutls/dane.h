@@ -96,6 +96,7 @@ typedef struct dane_query_st *dane_query_t;
  * dane_state_flags_t:
  * @DANE_F_IGNORE_LOCAL_RESOLVER: Many systems are not DNSSEC-ready. In that case the local resolver is ignored, and a direct recursive resolve occurs.
  * @DANE_F_INSECURE: Ignore any DNSSEC signature verification errors.
+ * @DANE_F_IGNORE_DNSSEC: Do not try to initialize DNSSEC as we will not use it (will then not try to load the DNSSEC root certificate).  Useful if the TLSA data does not come from DNS.
  *
  * Enumeration of different verification flags.
  */
@@ -103,6 +104,7 @@ typedef enum dane_state_flags_t
 {
   DANE_F_IGNORE_LOCAL_RESOLVER = 1,
   DANE_F_INSECURE=2,
+  DANE_F_IGNORE_DNSSEC=4
 } dane_state_flags_t;
 
 int dane_state_init (dane_state_t* s, unsigned int flags);
