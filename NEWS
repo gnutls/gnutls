@@ -3,11 +3,22 @@ Copyright (C) 2000-2012 Free Software Foundation, Inc.
 Copyright (C) 2013 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.2.5 (unreleased)
+* Version 3.2.5 (released 2013-10-23)
 
 ** libgnutls: Documentation and build-time fixes.
 
 ** libgnutls: Allow the generation of DH groups of less than 700 bits.
+
+** libgnutls: Added several combinations of ciphersuites with SHA256 and SHA384 as MAC,
+as well as Camellia with GCM.
+
+** libdane: Added interfaces to allow initialization of dane_query_t from
+external DNS resolutions, and to allow direct verification of a certificate
+chain against a dane_query_t. Contributed by Christian Grothoff.
+
+** libdane: Fixed a buffer overflow in dane_query_tlsa(). This could be
+triggered by a DNS server supplying more than 4 DANE records. Report and fix
+by Christian Grothoff.
 
 ** srptool: Fixed index command line option. Patch by Attila Molnar.
 
@@ -16,9 +27,6 @@ See the end for copying conditions.
 
 ** certtool: pathlen constraint is now read correctly. Reported by
 Christoph Seitz.
-
-** Added several combinations of ciphersuites with SHA256 and SHA384 as MAC,
-as well as Camellia with GCM.
 
 ** API and ABI modifications:
 gnutls_certificate_get_crt_raw: Added

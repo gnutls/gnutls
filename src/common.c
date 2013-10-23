@@ -991,7 +991,8 @@ pin_callback (void *user, int attempt, const char *token_url,
 {
   const char *password;
   const char * desc;
-  int len, cache = MAX_CACHE_TRIES;
+  int cache = MAX_CACHE_TRIES;
+  unsigned len;
 /* allow caching of PIN */
   static char *cached_url = NULL;
   static char cached_pin[32] = "";

@@ -117,6 +117,7 @@ APIMANS += gnutls_certificate_free_cas.3
 APIMANS += gnutls_certificate_free_credentials.3
 APIMANS += gnutls_certificate_free_crls.3
 APIMANS += gnutls_certificate_free_keys.3
+APIMANS += gnutls_certificate_get_crt_raw.3
 APIMANS += gnutls_certificate_get_issuer.3
 APIMANS += gnutls_certificate_get_ours.3
 APIMANS += gnutls_certificate_get_peers.3

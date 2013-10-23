@@ -110,7 +110,7 @@ if ENABLE_ANON
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
 gnutls_cli_SOURCES = cli.c common.h common.c \
-	socket.c socket.h ocsptool-common.c \
+	socket.c socket.h ocsptool-common.c inline_cmds.h \
 	$(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la
 if ENABLE_DANE

@@ -345,6 +345,7 @@ multitable:
 		$line =~ s/\>/\$>\$/g;
 		$line =~ s/\_/\\_/g;
 		$line =~ s/\~/\\~/g;
+		$line =~ s/\^/\\\\textasciicircum/g;
 		$line =~ s/\%(?!c)/\\%/g;
 		$line =~ s/\#/\\\#/g;
 		$line =~ s/\@-/\\-/g;
