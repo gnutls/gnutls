@@ -94,9 +94,9 @@ for (i=0;i<ret;i++)
 void
 doit (void)
 {
-const int normal = 42;
+const int normal = 55;
 const int null = 5;
-const int sec128 = 32;
+const int sec128 = 45;
 
   try_prio("NORMAL", normal, 8);
   try_prio("NORMAL:-MAC-ALL:+MD5:+MAC-ALL", normal, 8);
@@ -105,7 +105,7 @@ const int sec128 = 32;
   try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal+null, 9); /* should be null + all */
   try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 10, 1); /* should be null + all */
   try_prio("PERFORMANCE", normal, 8);
-  try_prio("SECURE256", 6, 3);
+  try_prio("SECURE256", 14, 3);
   try_prio("SECURE128", sec128, 6);
   try_prio("SECURE128:+SECURE256", sec128, 6); /* should be the same as SECURE128 */
   try_prio("SECURE128:+SECURE256:+NORMAL", normal, 8); /* should be the same as NORMAL */
