@@ -832,3 +832,64 @@ finish:
 
 }
 
+/**
+ * gnutls_pkcs11_token_get_random:
+ * @token_url: A PKCS #11 URL specifying a token
+ * @len:       The number of bytes of randomness to request
+ * @rnddata:   A pointer to the memory area to be filled with random data
+ *
+ * This function will get random data from the given token.
+ * It will store rnddata and fill the memory pointed to by rnddata with
+ * len random bytes from the token.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_pkcs11_token_get_random (const char *token_url,
+                                void *rnddata,
+                                size_t len)
+{
+  int ret;
+  struct p11_kit_uri *info = NULL;
+  ck_rv_t rv;
+  unsigned int ses_flags;
+  struct pkcs11_session_info sinfo;
+
+  memset(&sinfo, 0, sizeof(sinfo));
+
+  ret = pkcs11_url_to_info (token_url, &info);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ses_flags = 0; // randomness can be read without login in user session
+
+  ret = pkcs11_open_session (&sinfo, NULL, info, ses_flags);
+  p11_kit_uri_free (info);
+
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  rv = pkcs11_get_random(sinfo.module, sinfo.pks, rnddata, len);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert();
+      _gnutls_debug_log ("pkcs11: %s\n", pkcs11_strerror (rv));
+      ret = pkcs11_rv_to_err (rv);
+      goto finish;
+    }
+
+  ret = 0;
+
+finish:
+  pkcs11_close_session (&sinfo);
+  return ret;
+
+}
+

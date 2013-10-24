@@ -3127,6 +3127,15 @@ pkcs11_set_pin (struct ck_function_list *module,
 	return (module)->C_SetPIN (sess, (uint8_t*)old_pin, old_len, (uint8_t*)new_pin, new_len);
 }
 
+ck_rv_t
+pkcs11_get_random (struct ck_function_list *module,
+                   ck_session_handle_t sess,
+                   void * data,
+                   size_t len)
+{
+	return (module)->C_GenerateRandom (sess, data, len);
+}
+
 const char *
 pkcs11_strerror (ck_rv_t rv)
 {

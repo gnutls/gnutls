@@ -278,6 +278,13 @@ pkcs11_set_pin (struct ck_function_list *module,
                 const char *new_pin,
                 unsigned long new_len);
 
+ck_rv_t
+pkcs11_get_random (struct ck_function_list *module,
+                   ck_session_handle_t sess,
+                   void *data,
+                   size_t len);
+                   
+
 const char *
 pkcs11_strerror (ck_rv_t rv);
 

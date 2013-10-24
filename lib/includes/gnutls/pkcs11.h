@@ -318,6 +318,11 @@ gnutls_pkcs11_privkey_generate2 (const char* url, gnutls_pk_algorithm_t pk,
                                 gnutls_datum_t * pubkey,
                                 unsigned int flags);
 
+int
+gnutls_pkcs11_token_get_random (const char* token_url,
+                                void* data,
+                                size_t len);
+
 #ifdef __cplusplus
 }
 #endif
