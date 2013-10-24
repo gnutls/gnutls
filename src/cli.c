@@ -34,6 +34,7 @@
 #include <sys/select.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <fcntl.h>
 #include <netdb.h>
 #include <ctype.h>
