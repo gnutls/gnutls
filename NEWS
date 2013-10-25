@@ -3,6 +3,16 @@ Copyright (C) 2000-2012 Free Software Foundation, Inc.
 Copyright (C) 2013 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.6 (unreleased)
+
+** libgnutls: Camellia in GCM mode has been added in default priorities.
+
+** libgnutls: Added ciphersuite GNUTLS_ECDHE_RSA_AES_256_CBC_SHA384.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.5 (released 2013-10-23)
 
 ** libgnutls: Documentation and build-time fixes.
