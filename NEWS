@@ -10,7 +10,7 @@ See the end for copying conditions.
 ** libgnutls: Added ciphersuite GNUTLS_ECDHE_RSA_AES_256_CBC_SHA384.
 
 ** libgnutls: Fixed ciphersuites GNUTLS_ECDHE_ECDSA_CAMELLIA_256_CBC_SHA384,
-and GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384.
+and GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384. Reported by Stefan Buehler.
 
 ** libgnutls: Minimum acceptable DH group parameters were increased to 767
 bits from 727.
