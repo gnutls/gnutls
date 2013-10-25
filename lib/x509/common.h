@@ -62,6 +62,7 @@
 #define SIG_RSA_RMD160_OID "1.3.36.3.3.1.2"
 #define SIG_GOST_R3410_94_OID "1.2.643.2.2.4"
 #define SIG_GOST_R3410_2001_OID "1.2.643.2.2.3"
+#define ISO_SIG_RSA_SHA1_OID "1.3.14.3.2.29"
 
 #define ASN1_NULL "\x05\x00"
 #define ASN1_NULL_SIZE 2
