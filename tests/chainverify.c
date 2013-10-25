@@ -26,7 +26,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <error.h>
 #include <string.h>
 
 #include <gnutls/gnutls.h>
@@ -810,7 +809,7 @@ doit (void)
   if (ret != 0)
     {
       fail ("%d: %s\n", ret, gnutls_strerror (ret));
-      exit (EXIT_FAILURE);
+      exit (1);
     }
 
   gnutls_global_set_time_function (mytime);
@@ -836,8 +835,11 @@ doit (void)
 
           ret = gnutls_x509_crt_init (&certs[j]);
           if (ret < 0)
-            error (EXIT_FAILURE, 0, "gnutls_x509_crt_init[%d,%d]: %s",
-                   (int) i, (int) j, gnutls_strerror (ret));
+	    {
+	      fprintf (stderr, "gnutls_x509_crt_init[%d,%d]: %s",
+		       (int) i, (int) j, gnutls_strerror (ret));
+	      exit (1);
+	    }
 
           tmp.data = (unsigned char *) chains[i].chain[j];
           tmp.size = strlen (chains[i].chain[j]);
@@ -846,8 +848,11 @@ doit (void)
           if (debug > 2)
             printf ("done\n");
           if (ret < 0)
-            error (EXIT_FAILURE, 0, "gnutls_x509_crt_import[%d,%d]: %s",
-                   (int) i, (int) j, gnutls_strerror (ret));
+	    {
+	      fprintf (stderr, "gnutls_x509_crt_import[%d,%d]: %s",
+		       (int) i, (int) j, gnutls_strerror (ret));
+	      exit (1);
+	    }
 
           gnutls_x509_crt_print (certs[j], GNUTLS_CRT_PRINT_ONELINE, &tmp);
           if (debug)
@@ -860,16 +865,22 @@ doit (void)
 
       ret = gnutls_x509_crt_init (&ca);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "gnutls_x509_crt_init: %s",
-               gnutls_strerror (ret));
+      {
+	fprintf (stderr, "gnutls_x509_crt_init: %s",
+		 gnutls_strerror (ret));
+	exit (1);
+      }
 
       tmp.data = (unsigned char *) *chains[i].ca;
       tmp.size = strlen (*chains[i].ca);
 
       ret = gnutls_x509_crt_import (ca, &tmp, GNUTLS_X509_FMT_PEM);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "gnutls_x509_crt_import: %s",
-               gnutls_strerror (ret));
+	{
+	  fprintf (stderr, "gnutls_x509_crt_import: %s",
+		   gnutls_strerror (ret));
+	  exit (1);
+	}
 
       if (debug > 2)
         printf ("done\n");
@@ -887,8 +898,11 @@ doit (void)
                                          chains[i].verify_flags,
                                          &verify_status);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify[%d,%d]: %s",
-               (int) i, (int) j, gnutls_strerror (ret));
+	{
+	  fprintf (stderr, "gnutls_x509_crt_list_verify[%d,%d]: %s",
+		   (int) i, (int) j, gnutls_strerror (ret));
+	  exit (1);
+	}
 
       if (verify_status != chains[i].expected_verify_result)
         {
