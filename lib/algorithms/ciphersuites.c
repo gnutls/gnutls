@@ -57,7 +57,7 @@ typedef struct
  */
 
 #define GNUTLS_DH_ANON_3DES_EDE_CBC_SHA1 { 0x00, 0x1B }
-#define GNUTLS_DH_ANON_ARCFOUR_MD5 { 0x00, 0x18 }
+#define GNUTLS_DH_ANON_ARCFOUR_128_MD5 { 0x00, 0x18 }
 
  /* rfc3268: */
 #define GNUTLS_DH_ANON_AES_128_CBC_SHA1 { 0x00, 0x34 }
@@ -73,16 +73,15 @@ typedef struct
 /* PSK (not in TLS 1.0)
  * draft-ietf-tls-psk:
  */
-#define GNUTLS_PSK_SHA_ARCFOUR_SHA1 { 0x00, 0x8A }
+#define GNUTLS_PSK_SHA_ARCFOUR_128_SHA1 { 0x00, 0x8A }
 #define GNUTLS_PSK_SHA_3DES_EDE_CBC_SHA1 { 0x00, 0x8B }
 #define GNUTLS_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x8C }
 #define GNUTLS_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x8D }
 
-#define GNUTLS_DHE_PSK_SHA_ARCFOUR_SHA1 { 0x00, 0x8E }
+#define GNUTLS_DHE_PSK_SHA_ARCFOUR_128_SHA1 { 0x00, 0x8E }
 #define GNUTLS_DHE_PSK_SHA_3DES_EDE_CBC_SHA1 { 0x00, 0x8F }
 #define GNUTLS_DHE_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x90 }
 #define GNUTLS_DHE_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x91 }
-
 
 /* SRP (rfc5054)
  */
@@ -100,8 +99,8 @@ typedef struct
 
 /* RSA
  */
-#define GNUTLS_RSA_ARCFOUR_SHA1 { 0x00, 0x05 }
-#define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
+#define GNUTLS_RSA_ARCFOUR_128_SHA1 { 0x00, 0x05 }
+#define GNUTLS_RSA_ARCFOUR_128_MD5 { 0x00, 0x04 }
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA1 { 0x00, 0x0A }
 
 #define GNUTLS_RSA_EXPORT_ARCFOUR_40_MD5 { 0x00, 0x03 }
@@ -126,7 +125,7 @@ typedef struct
 
 /* draft-ietf-tls-56-bit-ciphersuites-01:
  */
-#define GNUTLS_DHE_DSS_ARCFOUR_SHA1 { 0x00, 0x66 }
+#define GNUTLS_DHE_DSS_ARCFOUR_128_SHA1 { 0x00, 0x66 }
 
 
 /* rfc3268:
@@ -236,11 +235,11 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_VERSION_MAX, 1),
 
   /* RSA */
-  ENTRY (GNUTLS_RSA_ARCFOUR_SHA1,
+  ENTRY (GNUTLS_RSA_ARCFOUR_128_SHA1,
                              GNUTLS_CIPHER_ARCFOUR_128,
                              GNUTLS_KX_RSA, GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_VERSION_MAX, 0),
-  ENTRY (GNUTLS_RSA_ARCFOUR_MD5,
+  ENTRY (GNUTLS_RSA_ARCFOUR_128_MD5,
                              GNUTLS_CIPHER_ARCFOUR_128,
                              GNUTLS_KX_RSA, GNUTLS_MAC_MD5, GNUTLS_SSL3,
                              GNUTLS_VERSION_MAX, 0),
@@ -280,7 +279,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 
   /* DHE_DSS */
 #ifdef ENABLE_DHE
-  ENTRY (GNUTLS_DHE_DSS_ARCFOUR_SHA1,
+  ENTRY (GNUTLS_DHE_DSS_ARCFOUR_128_SHA1,
                              GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_KX_DHE_DSS,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 0),
@@ -452,7 +451,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_VERSION_MAX, 1, GNUTLS_MAC_SHA384),
 
   /* PSK */
-  ENTRY (GNUTLS_PSK_SHA_ARCFOUR_SHA1,
+  ENTRY (GNUTLS_PSK_SHA_ARCFOUR_128_SHA1,
                              GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 0),
@@ -482,7 +481,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_VERSION_MAX, 1),
 
   /* DHE-PSK */
-  ENTRY (GNUTLS_DHE_PSK_SHA_ARCFOUR_SHA1,
+  ENTRY (GNUTLS_DHE_PSK_SHA_ARCFOUR_128_SHA1,
                              GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_DHE_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 0),
@@ -522,7 +521,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 #endif
 #ifdef ENABLE_ANON
   /* DH_ANON */
-  ENTRY (GNUTLS_DH_ANON_ARCFOUR_MD5,
+  ENTRY (GNUTLS_DH_ANON_ARCFOUR_128_MD5,
                              GNUTLS_CIPHER_ARCFOUR_128,
                              GNUTLS_KX_ANON_DH, GNUTLS_MAC_MD5,
                              GNUTLS_SSL3, GNUTLS_VERSION_MAX, 0),
