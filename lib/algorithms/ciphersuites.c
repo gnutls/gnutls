@@ -565,7 +565,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_DTLS_VERSION_MIN),
   ENTRY_PRF (GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384,
                              GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_ECDHE_RSA,
-                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_MAC_SHA384, GNUTLS_TLS1,
                              GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
 
   /* ECDHE-ECDSA */
@@ -595,7 +595,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_DTLS_VERSION_MIN),
   ENTRY_PRF (GNUTLS_ECDHE_ECDSA_CAMELLIA_256_CBC_SHA384,
                              GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_ECDHE_ECDSA,
-                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_MAC_SHA384, GNUTLS_TLS1,
                              GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
 
   /* More ECC */
