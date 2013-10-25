@@ -130,7 +130,6 @@ typedef struct
 #define GNUTLS_RSA_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x94 }
 #define GNUTLS_RSA_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x95 }
 
-
 /* SRP (rfc5054)
  */
 #define GNUTLS_SRP_SHA_3DES_EDE_CBC_SHA1 { 0xC0, 0x1A }
@@ -260,9 +259,11 @@ typedef struct
 #define GNUTLS_ECDHE_ECDSA_AES_256_CBC_SHA1    { 0xC0, 0x0A }
 #define GNUTLS_ECDHE_ECDSA_ARCFOUR_128_SHA1 { 0xC0, 0x07 }
 
+/* RFC5289 */
 /* ECC with SHA2 */
 #define GNUTLS_ECDHE_ECDSA_AES_128_CBC_SHA256     {0xC0,0x23}
 #define GNUTLS_ECDHE_RSA_AES_128_CBC_SHA256       {0xC0,0x27}
+#define GNUTLS_ECDHE_RSA_AES_256_CBC_SHA384       { 0xC0,0x28 }
 
 /* ECC with AES-GCM */
 #define GNUTLS_ECDHE_ECDSA_AES_128_GCM_SHA256   {0xC0,0x2B}
@@ -295,7 +296,6 @@ typedef struct
 #define GNUTLS_PSK_SALSA20_256_SHA1              {0xE4, 0x17}
 #define GNUTLS_ECDHE_PSK_ESTREAM_SALSA20_256_SHA1 {0xE4, 0x18}
 #define GNUTLS_ECDHE_PSK_SALSA20_256_SHA1        {0xE4, 0x19}
-
 
 #define GNUTLS_RSA_ESTREAM_SALSA20_256_UMAC96      {0xE4, 0x30}
 #define GNUTLS_RSA_SALSA20_256_UMAC96              {0xE4, 0x31}
@@ -551,6 +551,10 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ECDHE_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_DTLS_VERSION_MIN),
+  ENTRY_PRF (GNUTLS_ECDHE_RSA_AES_256_CBC_SHA384,
+                             GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ECDHE_RSA,
+                             GNUTLS_MAC_SHA384, GNUTLS_TLS1,
+                             GNUTLS_DTLS_VERSION_MIN, GNUTLS_DIG_SHA384),
   ENTRY (GNUTLS_ECDHE_RSA_ARCFOUR_128_SHA1,
                              GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_ECDHE_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
