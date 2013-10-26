@@ -35,8 +35,7 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
 	../../gl/libgnu.la \
-	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB) \
-	-lrt
+	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB) $(LIBRT)
 
 if !WINDOWS
 
