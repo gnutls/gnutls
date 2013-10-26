@@ -84,6 +84,13 @@ flag = {
 };
 
 flag = {
+    name      = generate-random;
+    descrip   = "Generate random data";
+    arg-type  = number;
+    doc = "Asks the token to generate a number of bytes of random bytes.";
+};
+
+flag = {
     name      = generate-rsa;
     descrip   = "Generate an RSA private-public key pair";
     doc = "Generates an RSA private-public key pair on the specified token.";

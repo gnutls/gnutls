@@ -812,3 +812,33 @@ pkcs11_mechanism_list (FILE * outfile, const char *url, unsigned int login,
 
   return;
 }
+
+void
+pkcs11_get_random (FILE * outfile, const char *url, unsigned bytes, common_info_st * info)
+{
+  int ret;
+  uint8_t* output;
+
+  pkcs11_common ();
+
+  if (url == NULL)
+    url = "pkcs11:";
+
+  output = malloc(bytes);
+  if (output == NULL)
+    {
+      fprintf(stderr, "Memory error\n");
+      exit(1);
+    }
+
+  ret = gnutls_pkcs11_token_get_random (url, output, bytes);
+  if (ret < 0)
+    {
+      fprintf(stderr, "gnutls_pkcs11_token_get_random: %s\n", gnutls_strerror(ret));
+      exit(1);
+    }
+
+  fwrite(output, 1, bytes, outfile);
+
+  return;
+}

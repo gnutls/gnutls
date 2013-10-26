@@ -195,6 +195,8 @@ cmd_parser (int argc, char **argv)
   else if (HAVE_OPT(LIST_MECHANISMS))
     pkcs11_mechanism_list (outfile, url, login,
                              &cinfo);
+  else if (HAVE_OPT(GENERATE_RANDOM))
+    pkcs11_get_random (outfile, url, OPT_VALUE_GENERATE_RANDOM, &cinfo);
   else if (HAVE_OPT(LIST_ALL))
     {
       pkcs11_type = PKCS11_TYPE_ALL;
