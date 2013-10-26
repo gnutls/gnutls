@@ -45,4 +45,7 @@ TESTS = mini-srp
 
 endif
 
-TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
+	LC_ALL="C"						\
+	top_builddir="$(top_builddir)"				\
+	srcdir="$(srcdir)"

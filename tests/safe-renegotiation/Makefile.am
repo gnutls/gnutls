@@ -31,8 +31,9 @@ ctests = srn0 srn1 srn2 srn3 srn4 srn5
 check_PROGRAMS = $(ctests)
 TESTS = $(ctests)
 
-if WANT_TEST_SUITE
-TESTS_ENVIRONMENT = $(VALGRIND)
-endif
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
+	LC_ALL="C"						\
+	top_builddir="$(top_builddir)"				\
+	srcdir="$(srcdir)"
 
 EXTRA_DIST = README suppressions.valgrind

@@ -32,3 +32,8 @@ check_PROGRAMS = $(ctests)
 TESTS = $(ctests)
 
 EXTRA_DIST = README
+
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
+	LC_ALL="C"						\
+	top_builddir="$(top_builddir)"				\
+	srcdir="$(srcdir)"

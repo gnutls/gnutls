@@ -86,6 +86,11 @@ nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom
 
 TESTS = eagain testsrn testcompat chain invalid-cert
 
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
+	LC_ALL="C"						\
+	top_builddir="$(top_builddir)"				\
+	srcdir="$(srcdir)"
+
 if ENABLE_DANE
 TESTS += testdane
 endif

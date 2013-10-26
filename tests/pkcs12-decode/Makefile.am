@@ -26,4 +26,7 @@ dist_check_SCRIPTS = pkcs12
 
 TESTS = pkcs12
 
-TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
+	LC_ALL="C"						\
+	top_builddir="$(top_builddir)"				\
+	srcdir="$(srcdir)"

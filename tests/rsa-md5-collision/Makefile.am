@@ -28,4 +28,7 @@ dist_check_SCRIPTS = rsa-md5-collision
 
 TESTS = rsa-md5-collision
 
-TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
+	LC_ALL="C"						\
+	top_builddir="$(top_builddir)"				\
+	srcdir="$(srcdir)"
