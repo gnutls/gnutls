@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 3.2.6 (unreleased)
 
+** libgnutls: Support for TPM via trousers is now enabled by default.
+
 ** libgnutls: Camellia in GCM mode has been added in default priorities.
 
 ** libgnutls: Added ciphersuite GNUTLS_ECDHE_RSA_AES_256_CBC_SHA384.
