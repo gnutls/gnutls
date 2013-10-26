@@ -106,7 +106,7 @@ client (int fd, int wait)
       ret = gnutls_handshake (session);
     }
   while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-  
+
   gnutls_deinit(session);
   gnutls_anon_free_client_credentials(anoncred);
   gnutls_global_deinit();
@@ -123,6 +123,8 @@ client (int fd, int wait)
     }
   else
     {
+      gnutls_bye(session, GNUTLS_SHUT_WR);
+
       if (wait != 0) 
         {
           fail ("client: handshake was completed unexpectedly\n");
@@ -170,11 +172,17 @@ gnutls_anon_server_credentials_t anoncred;
   gnutls_transport_set_int (session, fd);
 
   if (wait) sleep(25);
-  else do 
+  else 
     {
-      ret = gnutls_handshake (session);
+      do 
+        {
+          ret = gnutls_handshake (session);
+        }
+      while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+  
+      if (ret == 0)
+        gnutls_bye(session, GNUTLS_SHUT_RDWR);
     }
-  while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
   gnutls_deinit (session);
   gnutls_anon_free_server_credentials(anoncred);
