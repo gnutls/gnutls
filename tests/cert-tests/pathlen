@@ -24,15 +24,16 @@ set -e
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+DIFF=${DIFF:-diff}
 
 $CERTTOOL --certificate-info --infile $srcdir/ca-no-pathlen.pem \
 	  --outfile new-ca-no-pathlen.pem
 $CERTTOOL --certificate-info --infile $srcdir/no-ca-or-pathlen.pem \
 	  --outfile new-no-ca-or-pathlen.pem
 
-diff $srcdir/ca-no-pathlen.pem new-ca-no-pathlen.pem
+$DIFF $srcdir/ca-no-pathlen.pem new-ca-no-pathlen.pem
 rc1=$?
-diff $srcdir/no-ca-or-pathlen.pem new-no-ca-or-pathlen.pem
+$DIFF $srcdir/no-ca-or-pathlen.pem new-no-ca-or-pathlen.pem
 rc2=$?
 
 

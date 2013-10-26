@@ -24,11 +24,12 @@ set -e
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+DIFF=${DIFF:-diff}
 
 $CERTTOOL --certificate-info --infile $srcdir/aki-cert.pem \
 	  --outfile tmp-aki.pem
 
-diff $srcdir/aki-cert.pem tmp-aki.pem
+$DIFF $srcdir/aki-cert.pem tmp-aki.pem
 rc=$?
 
 # We're done.
