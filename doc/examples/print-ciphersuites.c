@@ -51,4 +51,5 @@ int main(int argc, char** argv)
 {
   if (argc > 1)
     print_cipher_suite_list (argv[1]);
+  return 0;
 }

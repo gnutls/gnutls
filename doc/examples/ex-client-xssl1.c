@@ -80,6 +80,6 @@ int main (void)
   xssl_cred_deinit (cred);
 
   gnutls_global_deinit ();
+  
+  return 0;
 }
-
-
