@@ -4,10 +4,12 @@ See the end for copying conditions.
 
 * Version 3.1.17 (unreleased)
 
-** certtool: When exporting an encrypted PEM private key do not output the key
-parameters.
+** libgnutls: Support for TPM via trousers is now enabled by default.
 
 ** libgnutls: Added support for ISO OID for RSA-SHA1 signatures.
+
+** certtool: When exporting an encrypted PEM private key do not output the key
+parameters.
 
 ** API and ABI modifications:
 No changes since last version.

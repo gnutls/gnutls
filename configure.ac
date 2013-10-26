@@ -279,9 +279,9 @@ fi
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
 AC_ARG_WITH(tpm,
-	AS_HELP_STRING([--with-tpm],
-		[Build with TPM (trousers) support. Note that trousers is under the Common Public License and incompatible with GPL programs.]),
-		[with_tpm=$withval], [with_tpm=no])
+	AS_HELP_STRING([--without-tpm],
+		[Disable TPM (trousers) support.]),
+		[with_tpm=$withval], [with_tpm=yes])
 if test "$with_tpm" != "no"; then
     LIBS="$oldlibs -ltspi"
     AC_MSG_CHECKING([for tss library])
