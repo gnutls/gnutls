@@ -903,9 +903,10 @@ static
 bool parse_for_inline_commands_in_buffer (char *buffer, size_t bytes, 
                                           inline_cmds_st *inline_cmds)
 {
-  int  local_bytes, match_bytes, prev_bytes_copied, ii, jj;
+  ssize_t local_bytes, match_bytes, prev_bytes_copied, ii, jj;
   char *local_buffer_ptr, *ptr;
   char inline_command_string[MAX_INLINE_COMMAND_BYTES];
+  ssize_t l;
 
   inline_cmds->bytes_to_flush = 0;
   inline_cmds->cmd_found = INLINE_COMMAND_NONE;
@@ -917,7 +918,7 @@ bool parse_for_inline_commands_in_buffer (char *buffer, size_t bytes,
       
       local_bytes = 
         ((inline_cmds->bytes_copied + bytes) <= MAX_INLINE_COMMAND_BYTES) ? 
-         bytes : (MAX_INLINE_COMMAND_BYTES - inline_cmds->bytes_copied);
+         (ssize_t)bytes : (MAX_INLINE_COMMAND_BYTES - inline_cmds->bytes_copied);
 
       memcpy (local_buffer_ptr, buffer, local_bytes);      
       prev_bytes_copied = inline_cmds->bytes_copied;
@@ -953,10 +954,11 @@ bool parse_for_inline_commands_in_buffer (char *buffer, size_t bytes,
           else
             ptr = inline_commands_def[jj].string;
 
-          match_bytes = (local_bytes <= strlen (ptr)) ? local_bytes : strlen (ptr);
+          l = strlen(ptr);
+          match_bytes = (local_bytes <= l) ? local_bytes : l;
           if (strncmp (ptr, local_buffer_ptr, match_bytes) == 0)
             {
-              if (match_bytes == strlen (ptr))
+              if (match_bytes == (ssize_t)strlen (ptr))
                 {
                   inline_cmds->new_buffer_ptr = buffer + match_bytes - prev_bytes_copied;
                   inline_cmds->cmd_found = inline_commands_def[jj].command;		      
@@ -1395,15 +1397,15 @@ const char* rest = NULL;
           fprintf(stderr, "inline-commands-prefix value is a single US-ASCII character (octets 0 - 127)\n");
           exit(1);
         }    
-      inline_commands_prefix = (unsigned char *) OPT_ARG(INLINE_COMMANDS_PREFIX);
-      if (inline_commands_prefix[0] > 127)
+      inline_commands_prefix = (char *) OPT_ARG(INLINE_COMMANDS_PREFIX);
+      if (!isascii(inline_commands_prefix[0]))
         {
           fprintf(stderr, "inline-commands-prefix value is a single US-ASCII character (octets 0 - 127)\n");
           exit(1);
         }
     }
   else
-    inline_commands_prefix = (const unsigned char *) "^";
+    inline_commands_prefix = "^";
 
   starttls = HAVE_OPT(STARTTLS);
   resume = HAVE_OPT(RESUME);
