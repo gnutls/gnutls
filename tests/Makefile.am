@@ -106,6 +106,7 @@ dist_check_SCRIPTS = rfc2253-escape-test
 TESTS = $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT =						\
+	LC_ALL="C"						\
 	CAFILE=$(srcdir)/cert-tests/ca-certs.pem		\
 	PKCS12_MANY_CERTS_FILE=$(srcdir)/pkcs12-decode/pkcs12_5certs.p12	\
 	PKCS12FILE=$(srcdir)/pkcs12-decode/client.p12		\
