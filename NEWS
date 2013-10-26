@@ -10,13 +10,21 @@ See the end for copying conditions.
 ** libgnutls: Added ciphersuite GNUTLS_ECDHE_RSA_AES_256_CBC_SHA384.
 
 ** libgnutls: Fixed ciphersuites GNUTLS_ECDHE_ECDSA_CAMELLIA_256_CBC_SHA384,
-and GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384. Reported by Stefan Buehler.
+GNUTLS_ECDHE_RSA_CAMELLIA_256_CBC_SHA384 and GNUTLS_PSK_CAMELLIA_128_GCM_SHA256. 
+Reported by Stefan Buehler.
+
+** libgnutls: Added support for ISO OID for RSA-SHA1 signatures.
 
 ** libgnutls: Minimum acceptable DH group parameters were increased to 767
 bits from 727.
 
+** libgnutls: Added function to obtain random data from PKCS #11 tokens.
+Contributed by Wolfgang Meyer zu Bergsten.
+
+** p11tool: Added option generate-random.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_token_get_random: Added
 
 
 * Version 3.2.5 (released 2013-10-23)
