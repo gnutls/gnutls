@@ -1,0 +1,2726 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="tls-parameters.xsl"?>
+<?oxygen RNGSchema="tls-parameters.rng" type="xml"?>
+<registry xmlns="http://www.iana.org/assignments" id="tls-parameters">
+  <title>Transport Layer Security (TLS) Parameters</title>
+  <category>Transport Layer Security (TLS)</category>
+  <created>2005-08-23</created>
+  <updated>2013-10-03</updated>
+  <registry id="tls-parameters-2">
+    <title>TLS ClientCertificateType Identifiers Registry</title>
+    <xref type="rfc" data="rfc5246"/>
+    <expert>Eric Rescorla</expert>
+    <range>
+      <value>0-63</value>
+      <registration_rule>Standards Action</registration_rule>
+    </range>
+    <range>
+      <value>64-223</value>
+      <registration_rule>Specification Required</registration_rule>
+    </range>
+    <range>
+      <value>224-255</value>
+      <registration_rule>Reserved for Private Use</registration_rule>
+    </range>
+    <record>
+      <value>0</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>1</value>
+      <description>rsa_sign</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>dss_sign</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>3</value>
+      <description>rsa_fixed_dh</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>4</value>
+      <description>dss_fixed_dh</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>5</value>
+      <description>rsa_ephemeral_dh_RESERVED</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>6</value>
+      <description>dss_ephemeral_dh_RESERVED</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>7-19</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>20</value>
+      <description>fortezza_dms_RESERVED</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>21-63</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>64</value>
+      <description>ecdsa_sign</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>65</value>
+      <description>rsa_fixed_ecdh</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>66</value>
+      <description>ecdsa_fixed_ecdh</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>67-223</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>224-255</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc5246"/>
+    </record>
+  </registry>
+  <registry id="tls-parameters-4">
+    <title>TLS Cipher Suite Registry</title>
+    <xref type="rfc" data="rfc5246"/>
+    <expert>Eric Rescorla</expert>
+    <range>
+      <value>0-191</value>
+      <registration_rule>Standards Action</registration_rule>
+      <note>Refers to value of first byte</note>
+    </range>
+    <range>
+      <value>192-254</value>
+      <registration_rule>Specification Required</registration_rule>
+      <note>Refers to value of first byte</note>
+    </range>
+    <range>
+      <value>255</value>
+      <registration_rule>Reserved for Private Use</registration_rule>
+      <note>Refers to value of first byte</note>
+    </range>
+    <record>
+      <value>0x00,0x00</value>
+      <description>TLS_NULL_WITH_NULL_NULL</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x01</value>
+      <description>TLS_RSA_WITH_NULL_MD5</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x02</value>
+      <description>TLS_RSA_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x03</value>
+      <description>TLS_RSA_EXPORT_WITH_RC4_40_MD5</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4346"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x04</value>
+      <description>TLS_RSA_WITH_RC4_128_MD5</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc5246"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x05</value>
+      <description>TLS_RSA_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc5246"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x06</value>
+      <description>TLS_RSA_EXPORT_WITH_RC2_CBC_40_MD5</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4346"/>
+    </record>
+    <record>
+      <value>0x00,0x07</value>
+      <description>TLS_RSA_WITH_IDEA_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5469"/>
+    </record>
+    <record>
+      <value>0x00,0x08</value>
+      <description>TLS_RSA_EXPORT_WITH_DES40_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4346"/>
+    </record>
+    <record>
+      <value>0x00,0x09</value>
+      <description>TLS_RSA_WITH_DES_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5469"/>
+    </record>
+    <record>
+      <value>0x00,0x0A</value>
+      <description>TLS_RSA_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x0B</value>
+      <description>TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4346"/>
+    </record>
+    <record>
+      <value>0x00,0x0C</value>
+      <description>TLS_DH_DSS_WITH_DES_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5469"/>
+    </record>
+    <record>
+      <value>0x00,0x0D</value>
+      <description>TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x0E</value>
+      <description>TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4346"/>
+    </record>
+    <record>
+      <value>0x00,0x0F</value>
+      <description>TLS_DH_RSA_WITH_DES_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5469"/>
+    </record>
+    <record>
+      <value>0x00,0x10</value>
+      <description>TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x11</value>
+      <description>TLS_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4346"/>
+    </record>
+    <record>
+      <value>0x00,0x12</value>
+      <description>TLS_DHE_DSS_WITH_DES_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5469"/>
+    </record>
+    <record>
+      <value>0x00,0x13</value>
+      <description>TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x14</value>
+      <description>TLS_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4346"/>
+    </record>
+    <record>
+      <value>0x00,0x15</value>
+      <description>TLS_DHE_RSA_WITH_DES_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5469"/>
+    </record>
+    <record>
+      <value>0x00,0x16</value>
+      <description>TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x17</value>
+      <description>TLS_DH_anon_EXPORT_WITH_RC4_40_MD5</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4346"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x18</value>
+      <description>TLS_DH_anon_WITH_RC4_128_MD5</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc5246"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x19</value>
+      <description>TLS_DH_anon_EXPORT_WITH_DES40_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4346"/>
+    </record>
+    <record>
+      <value>0x00,0x1A</value>
+      <description>TLS_DH_anon_WITH_DES_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5469"/>
+    </record>
+    <record>
+      <value>0x00,0x1B</value>
+      <description>TLS_DH_anon_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x1C-1D</value>
+      <description>Reserved to avoid conflicts with SSLv3</description>
+      <xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x1E</value>
+      <description>TLS_KRB5_WITH_DES_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x1F</value>
+      <description>TLS_KRB5_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x20</value>
+      <description>TLS_KRB5_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc2712"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x21</value>
+      <description>TLS_KRB5_WITH_IDEA_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x22</value>
+      <description>TLS_KRB5_WITH_DES_CBC_MD5</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x23</value>
+      <description>TLS_KRB5_WITH_3DES_EDE_CBC_MD5</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x24</value>
+      <description>TLS_KRB5_WITH_RC4_128_MD5</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc2712"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x25</value>
+      <description>TLS_KRB5_WITH_IDEA_CBC_MD5</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x26</value>
+      <description>TLS_KRB5_EXPORT_WITH_DES_CBC_40_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x27</value>
+      <description>TLS_KRB5_EXPORT_WITH_RC2_CBC_40_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x28</value>
+      <description>TLS_KRB5_EXPORT_WITH_RC4_40_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc2712"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x29</value>
+      <description>TLS_KRB5_EXPORT_WITH_DES_CBC_40_MD5</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x2A</value>
+      <description>TLS_KRB5_EXPORT_WITH_RC2_CBC_40_MD5</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc2712"/>
+    </record>
+    <record>
+      <value>0x00,0x2B</value>
+      <description>TLS_KRB5_EXPORT_WITH_RC4_40_MD5</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc2712"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x2C</value>
+      <description>TLS_PSK_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4785"/>
+    </record>
+    <record>
+      <value>0x00,0x2D</value>
+      <description>TLS_DHE_PSK_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4785"/>
+    </record>
+    <record>
+      <value>0x00,0x2E</value>
+      <description>TLS_RSA_PSK_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4785"/>
+    </record>
+    <record>
+      <value>0x00,0x2F</value>
+      <description>TLS_RSA_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x30</value>
+      <description>TLS_DH_DSS_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x31</value>
+      <description>TLS_DH_RSA_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x32</value>
+      <description>TLS_DHE_DSS_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x33</value>
+      <description>TLS_DHE_RSA_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x34</value>
+      <description>TLS_DH_anon_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x35</value>
+      <description>TLS_RSA_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x36</value>
+      <description>TLS_DH_DSS_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x37</value>
+      <description>TLS_DH_RSA_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x38</value>
+      <description>TLS_DHE_DSS_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x39</value>
+      <description>TLS_DHE_RSA_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x3A</value>
+      <description>TLS_DH_anon_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x3B</value>
+      <description>TLS_RSA_WITH_NULL_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x3C</value>
+      <description>TLS_RSA_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x3D</value>
+      <description>TLS_RSA_WITH_AES_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x3E</value>
+      <description>TLS_DH_DSS_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x3F</value>
+      <description>TLS_DH_RSA_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x40</value>
+      <description>TLS_DHE_DSS_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x41</value>
+      <description>TLS_RSA_WITH_CAMELLIA_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x42</value>
+      <description>TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x43</value>
+      <description>TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x44</value>
+      <description>TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x45</value>
+      <description>TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x46</value>
+      <description>TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record date="2008-04-04">
+      <value>0x00,0x47-4F</value>
+      <description>Reserved to avoid conflicts with         
+deployed implementations</description>
+      <xref type="person" data="Pasi_Eronen"/>
+    </record>
+    <record>
+      <value>0x00,0x50-58</value>
+      <description>Reserved to avoid conflicts</description>
+      <xref type="text">Pasi Eronen, &lt;pasi.eronen&amp;nokia.com&gt;, 2008-04-04.  2008-04-04</xref>
+    </record>
+    <record date="2008-04-04">
+      <value>0x00,0x59-5C</value>
+      <description>Reserved to avoid conflicts with         
+deployed implementations</description>
+      <xref type="person" data="Pasi_Eronen"/>
+    </record>
+    <record>
+      <value>0x00,0x5D-5F</value>
+      <description>Unassigned</description>
+    </record>
+    <record date="2008-04-04">
+      <value>0x00,0x60-66</value>
+      <description>Reserved to avoid conflicts with
+widely deployed implementations</description>
+      <xref type="person" data="Pasi_Eronen"/>
+    </record>
+    <record>
+      <value>0x00,0x67</value>
+      <description>TLS_DHE_RSA_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x68</value>
+      <description>TLS_DH_DSS_WITH_AES_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x69</value>
+      <description>TLS_DH_RSA_WITH_AES_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x6A</value>
+      <description>TLS_DHE_DSS_WITH_AES_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x6B</value>
+      <description>TLS_DHE_RSA_WITH_AES_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x6C</value>
+      <description>TLS_DH_anon_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x6D</value>
+      <description>TLS_DH_anon_WITH_AES_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>0x00,0x6E-83</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>0x00,0x84</value>
+      <description>TLS_RSA_WITH_CAMELLIA_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x85</value>
+      <description>TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x86</value>
+      <description>TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x87</value>
+      <description>TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x88</value>
+      <description>TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x89</value>
+      <description>TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0x8A</value>
+      <description>TLS_PSK_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4279"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x8B</value>
+      <description>TLS_PSK_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>0x00,0x8C</value>
+      <description>TLS_PSK_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>0x00,0x8D</value>
+      <description>TLS_PSK_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>0x00,0x8E</value>
+      <description>TLS_DHE_PSK_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4279"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x8F</value>
+      <description>TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>0x00,0x90</value>
+      <description>TLS_DHE_PSK_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>0x00,0x91</value>
+      <description>TLS_DHE_PSK_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>0x00,0x92</value>
+      <description>TLS_RSA_PSK_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4279"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0x00,0x93</value>
+      <description>TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>0x00,0x94</value>
+      <description>TLS_RSA_PSK_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>0x00,0x95</value>
+      <description>TLS_RSA_PSK_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>0x00,0x96</value>
+      <description>TLS_RSA_WITH_SEED_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4162"/>
+    </record>
+    <record>
+      <value>0x00,0x97</value>
+      <description>TLS_DH_DSS_WITH_SEED_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4162"/>
+    </record>
+    <record>
+      <value>0x00,0x98</value>
+      <description>TLS_DH_RSA_WITH_SEED_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4162"/>
+    </record>
+    <record>
+      <value>0x00,0x99</value>
+      <description>TLS_DHE_DSS_WITH_SEED_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4162"/>
+    </record>
+    <record>
+      <value>0x00,0x9A</value>
+      <description>TLS_DHE_RSA_WITH_SEED_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4162"/>
+    </record>
+    <record>
+      <value>0x00,0x9B</value>
+      <description>TLS_DH_anon_WITH_SEED_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4162"/>
+    </record>
+    <record>
+      <value>0x00,0x9C</value>
+      <description>TLS_RSA_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0x9D</value>
+      <description>TLS_RSA_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0x9E</value>
+      <description>TLS_DHE_RSA_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0x9F</value>
+      <description>TLS_DHE_RSA_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0xA0</value>
+      <description>TLS_DH_RSA_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0xA1</value>
+      <description>TLS_DH_RSA_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0xA2</value>
+      <description>TLS_DHE_DSS_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0xA3</value>
+      <description>TLS_DHE_DSS_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0xA4</value>
+      <description>TLS_DH_DSS_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0xA5</value>
+      <description>TLS_DH_DSS_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0xA6</value>
+      <description>TLS_DH_anon_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0xA7</value>
+      <description>TLS_DH_anon_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5288"/>
+    </record>
+    <record>
+      <value>0x00,0xA8</value>
+      <description>TLS_PSK_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xA9</value>
+      <description>TLS_PSK_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xAA</value>
+      <description>TLS_DHE_PSK_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xAB</value>
+      <description>TLS_DHE_PSK_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xAC</value>
+      <description>TLS_RSA_PSK_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xAD</value>
+      <description>TLS_RSA_PSK_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xAE</value>
+      <description>TLS_PSK_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xAF</value>
+      <description>TLS_PSK_WITH_AES_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB0</value>
+      <description>TLS_PSK_WITH_NULL_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB1</value>
+      <description>TLS_PSK_WITH_NULL_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB2</value>
+      <description>TLS_DHE_PSK_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB3</value>
+      <description>TLS_DHE_PSK_WITH_AES_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB4</value>
+      <description>TLS_DHE_PSK_WITH_NULL_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB5</value>
+      <description>TLS_DHE_PSK_WITH_NULL_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB6</value>
+      <description>TLS_RSA_PSK_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB7</value>
+      <description>TLS_RSA_PSK_WITH_AES_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB8</value>
+      <description>TLS_RSA_PSK_WITH_NULL_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xB9</value>
+      <description>TLS_RSA_PSK_WITH_NULL_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5487"/>
+    </record>
+    <record>
+      <value>0x00,0xBA</value>
+      <description>TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xBB</value>
+      <description>TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xBC</value>
+      <description>TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xBD</value>
+      <description>TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xBE</value>
+      <description>TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xBF</value>
+      <description>TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xC0</value>
+      <description>TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xC1</value>
+      <description>TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xC2</value>
+      <description>TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xC3</value>
+      <description>TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xC4</value>
+      <description>TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xC5</value>
+      <description>TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5932"/>
+    </record>
+    <record>
+      <value>0x00,0xC6-FE</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>0x00,0xFF</value>
+      <description>TLS_EMPTY_RENEGOTIATION_INFO_SCSV</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5746"/>
+    </record>  
+    <record>
+      <value>0x01-BF,*</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>0xC0,0x01</value>
+      <description>TLS_ECDH_ECDSA_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x02</value>
+      <description>TLS_ECDH_ECDSA_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4492"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0xC0,0x03</value>
+      <description>TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x04</value>
+      <description>TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x05</value>
+      <description>TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x06</value>
+      <description>TLS_ECDHE_ECDSA_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x07</value>
+      <description>TLS_ECDHE_ECDSA_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4492"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0xC0,0x08</value>
+      <description>TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x09</value>
+      <description>TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x0A</value>
+      <description>TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x0B</value>
+      <description>TLS_ECDH_RSA_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x0C</value>
+      <description>TLS_ECDH_RSA_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4492"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0xC0,0x0D</value>
+      <description>TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x0E</value>
+      <description>TLS_ECDH_RSA_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x0F</value>
+      <description>TLS_ECDH_RSA_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x10</value>
+      <description>TLS_ECDHE_RSA_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x11</value>
+      <description>TLS_ECDHE_RSA_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4492"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0xC0,0x12</value>
+      <description>TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x13</value>
+      <description>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x14</value>
+      <description>TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x15</value>
+      <description>TLS_ECDH_anon_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x16</value>
+      <description>TLS_ECDH_anon_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc4492"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0xC0,0x17</value>
+      <description>TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x18</value>
+      <description>TLS_ECDH_anon_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x19</value>
+      <description>TLS_ECDH_anon_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>0xC0,0x1A</value>
+      <description>TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5054"/>
+    </record>
+    <record>
+      <value>0xC0,0x1B</value>
+      <description>TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5054"/>
+    </record>
+    <record>
+      <value>0xC0,0x1C</value>
+      <description>TLS_SRP_SHA_DSS_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5054"/>
+    </record>
+    <record>
+      <value>0xC0,0x1D</value>
+      <description>TLS_SRP_SHA_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5054"/>
+    </record>
+    <record>
+      <value>0xC0,0x1E</value>
+      <description>TLS_SRP_SHA_RSA_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5054"/>
+    </record>
+    <record>
+      <value>0xC0,0x1F</value>
+      <description>TLS_SRP_SHA_DSS_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5054"/>
+    </record>
+    <record>
+      <value>0xC0,0x20</value>
+      <description>TLS_SRP_SHA_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5054"/>
+    </record>
+    <record>
+      <value>0xC0,0x21</value>
+      <description>TLS_SRP_SHA_RSA_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5054"/>
+    </record>
+    <record>
+      <value>0xC0,0x22</value>
+      <description>TLS_SRP_SHA_DSS_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5054"/>
+    </record>
+    <record>
+      <value>0xC0,0x23</value>
+      <description>TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x24</value>
+      <description>TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x25</value>
+      <description>TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x26</value>
+      <description>TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x27</value>
+      <description>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x28</value>
+      <description>TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x29</value>
+      <description>TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x2A</value>
+      <description>TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x2B</value>
+      <description>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x2C</value>
+      <description>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x2D</value>
+      <description>TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x2E</value>
+      <description>TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x2F</value>
+      <description>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x30</value>
+      <description>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x31</value>
+      <description>TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x32</value>
+      <description>TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5289"/>
+    </record>
+    <record>
+      <value>0xC0,0x33</value>
+      <description>TLS_ECDHE_PSK_WITH_RC4_128_SHA</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc5489"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>0xC0,0x34</value>
+      <description>TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5489"/>
+    </record>
+    <record>
+      <value>0xC0,0x35</value>
+      <description>TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5489"/>
+    </record>
+    <record>
+      <value>0xC0,0x36</value>
+      <description>TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5489"/>
+    </record>
+    <record>
+      <value>0xC0,0x37</value>
+      <description>TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5489"/>
+    </record>
+    <record>
+      <value>0xC0,0x38</value>
+      <description>TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5489"/>
+    </record>
+    <record>
+      <value>0xC0,0x39</value>
+      <description>TLS_ECDHE_PSK_WITH_NULL_SHA</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5489"/>
+    </record>
+    <record>
+      <value>0xC0,0x3A</value>
+      <description>TLS_ECDHE_PSK_WITH_NULL_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5489"/>
+    </record>
+    <record>
+      <value>0xC0,0x3B</value>
+      <description>TLS_ECDHE_PSK_WITH_NULL_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5489"/>
+    </record>
+    <record>
+      <value>0xC0,0x3C</value>
+      <description>TLS_RSA_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x3D</value>
+      <description>TLS_RSA_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x3E</value>
+      <description>TLS_DH_DSS_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x3F</value>
+      <description>TLS_DH_DSS_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x40</value>
+      <description>TLS_DH_RSA_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x41</value>
+      <description>TLS_DH_RSA_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x42</value>
+      <description>TLS_DHE_DSS_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x43</value>
+      <description>TLS_DHE_DSS_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x44</value>
+      <description>TLS_DHE_RSA_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x45</value>
+      <description>TLS_DHE_RSA_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x46</value>
+      <description>TLS_DH_anon_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x47</value>
+      <description>TLS_DH_anon_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x48</value>
+      <description>TLS_ECDHE_ECDSA_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x49</value>
+      <description>TLS_ECDHE_ECDSA_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x4A</value>
+      <description>TLS_ECDH_ECDSA_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x4B</value>
+      <description>TLS_ECDH_ECDSA_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x4C</value>
+      <description>TLS_ECDHE_RSA_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x4D</value>
+      <description>TLS_ECDHE_RSA_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x4E</value>
+      <description>TLS_ECDH_RSA_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x4F</value>
+      <description>TLS_ECDH_RSA_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x50</value>
+      <description>TLS_RSA_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x51</value>
+      <description>TLS_RSA_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x52</value>
+      <description>TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x53</value>
+      <description>TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x54</value>
+      <description>TLS_DH_RSA_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x55</value>
+      <description>TLS_DH_RSA_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x56</value>
+      <description>TLS_DHE_DSS_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x57</value>
+      <description>TLS_DHE_DSS_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x58</value>
+      <description>TLS_DH_DSS_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x59</value>
+      <description>TLS_DH_DSS_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x5A</value>
+      <description>TLS_DH_anon_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x5B</value>
+      <description>TLS_DH_anon_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x5C</value>
+      <description>TLS_ECDHE_ECDSA_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x5D</value>
+      <description>TLS_ECDHE_ECDSA_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x5E</value>
+      <description>TLS_ECDH_ECDSA_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x5F</value>
+      <description>TLS_ECDH_ECDSA_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x60</value>
+      <description>TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x61</value>
+      <description>TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x62</value>
+      <description>TLS_ECDH_RSA_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x63</value>
+      <description>TLS_ECDH_RSA_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x64</value>
+      <description>TLS_PSK_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x65</value>
+      <description>TLS_PSK_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x66</value>
+      <description>TLS_DHE_PSK_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x67</value>
+      <description>TLS_DHE_PSK_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x68</value>
+      <description>TLS_RSA_PSK_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x69</value>
+      <description>TLS_RSA_PSK_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x6A</value>
+      <description>TLS_PSK_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x6B</value>
+      <description>TLS_PSK_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x6C</value>
+      <description>TLS_DHE_PSK_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x6D</value>
+      <description>TLS_DHE_PSK_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x6E</value>
+      <description>TLS_RSA_PSK_WITH_ARIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x6F</value>
+      <description>TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x70</value>
+      <description>TLS_ECDHE_PSK_WITH_ARIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x71</value>
+      <description>TLS_ECDHE_PSK_WITH_ARIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6209"/>
+    </record>
+    <record>
+      <value>0xC0,0x72</value>
+      <description>TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x73</value>
+      <description>TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x74</value>
+      <description>TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x75</value>
+      <description>TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x76</value>
+      <description>TLS_ECDHE_RSA_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x77</value>
+      <description>TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x78</value>
+      <description>TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x79</value>
+      <description>TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x7A</value>
+      <description>TLS_RSA_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x7B</value>
+      <description>TLS_RSA_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x7C</value>
+      <description>TLS_DHE_RSA_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x7D</value>
+      <description>TLS_DHE_RSA_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x7E</value>
+      <description>TLS_DH_RSA_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x7F</value>
+      <description>TLS_DH_RSA_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x80</value>
+      <description>TLS_DHE_DSS_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x81</value>
+      <description>TLS_DHE_DSS_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x82</value>
+      <description>TLS_DH_DSS_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x83</value>
+      <description>TLS_DH_DSS_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x84</value>
+      <description>TLS_DH_anon_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x85</value>
+      <description>TLS_DH_anon_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x86</value>
+      <description>TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x87</value>
+      <description>TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x88</value>
+      <description>TLS_ECDH_ECDSA_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x89</value>
+      <description>TLS_ECDH_ECDSA_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x8A</value>
+      <description>TLS_ECDHE_RSA_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x8B</value>
+      <description>TLS_ECDHE_RSA_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x8C</value>
+      <description>TLS_ECDH_RSA_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x8D</value>
+      <description>TLS_ECDH_RSA_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x8E</value>
+      <description>TLS_PSK_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x8F</value>
+      <description>TLS_PSK_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x90</value>
+      <description>TLS_DHE_PSK_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x91</value>
+      <description>TLS_DHE_PSK_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x92</value>
+      <description>TLS_RSA_PSK_WITH_CAMELLIA_128_GCM_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x93</value>
+      <description>TLS_RSA_PSK_WITH_CAMELLIA_256_GCM_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x94</value>
+      <description>TLS_PSK_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x95</value>
+      <description>TLS_PSK_WITH_CAMELLIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x96</value>
+      <description>TLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x97</value>
+      <description>TLS_DHE_PSK_WITH_CAMELLIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x98</value>
+      <description>TLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x99</value>
+      <description>TLS_RSA_PSK_WITH_CAMELLIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x9A</value>
+      <description>TLS_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x9B</value>
+      <description>TLS_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6367"/>
+    </record>
+    <record>
+      <value>0xC0,0x9C</value>
+      <description>TLS_RSA_WITH_AES_128_CCM</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0x9D</value>
+      <description>TLS_RSA_WITH_AES_256_CCM</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0x9E</value>
+      <description>TLS_DHE_RSA_WITH_AES_128_CCM</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0x9F</value>
+      <description>TLS_DHE_RSA_WITH_AES_256_CCM</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    
+    <record>
+      <value>0xC0,0xA0</value>
+      <description>TLS_RSA_WITH_AES_128_CCM_8</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xA1</value>
+      <description>TLS_RSA_WITH_AES_256_CCM_8</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xA2</value>
+      <description>TLS_DHE_RSA_WITH_AES_128_CCM_8</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xA3</value>
+      <description>TLS_DHE_RSA_WITH_AES_256_CCM_8</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xA4</value>
+      <description>TLS_PSK_WITH_AES_128_CCM</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xA5</value>
+      <description>TLS_PSK_WITH_AES_256_CCM</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xA6</value>
+      <description>TLS_DHE_PSK_WITH_AES_128_CCM</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xA7</value>
+      <description>TLS_DHE_PSK_WITH_AES_256_CCM</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xA8</value>
+      <description>TLS_PSK_WITH_AES_128_CCM_8</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xA9</value>
+      <description>TLS_PSK_WITH_AES_256_CCM_8</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xAA</value>
+      <description>TLS_PSK_DHE_WITH_AES_128_CCM_8</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xAB</value>
+      <description>TLS_PSK_DHE_WITH_AES_256_CCM_8</description>
+      <dtls>Y</dtls>
+      <xref type="rfc" data="rfc6655"/>
+    </record>
+    <record>
+      <value>0xC0,0xAC-FF</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>0xC1-FD,*</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>0xFE,0x00-FD</value>
+      <description>Unassigned</description>
+    </record>
+    <record date="2008-04-04">
+      <value>0xFE,0xFE-FF</value>
+      <description>Reserved to avoid conflicts with
+widely deployed implementations</description>
+      <xref type="person" data="Pasi_Eronen"/>
+    </record>
+    <record>
+      <value>0xFF,0x00-FF</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc5246"/>
+    </record>
+  </registry>
+  <registry id="tls-parameters-5">
+    <title>TLS ContentType Registry</title>
+    <xref type="rfc" data="rfc5246"/>
+    <registration_rule>Standards Action</registration_rule>
+    <record>
+      <value>0-19</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>20</value>
+      <description>change_cipher_spec</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>21</value>
+      <description>alert</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>22</value>
+      <description>handshake</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>23</value>
+      <description>application_data</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>24</value>
+      <description>heartbeat</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6520"/>
+    </record>
+    <record>
+      <value>25-255</value>
+      <description>Unassigned</description>
+    </record>
+  </registry>
+  <registry id="tls-parameters-6">
+    <title>TLS Alert Registry</title>
+    <xref type="rfc" data="rfc5246"/>
+    <registration_rule>Standards Action</registration_rule>
+    <record>
+      <value>0</value>
+      <description>close_notify</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>1-9</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>10</value>
+      <description>unexpected_message</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>11-19</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>20</value>
+      <description>bad_record_mac</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>21</value>
+      <description>decryption_failed</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>22</value>
+      <description>record_overflow</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>23-29</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>30</value>
+      <description>decompression_failure</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>31-39</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>40</value>
+      <description>handshake_failure</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>41</value>
+      <description>no_certificate_RESERVED</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>42</value>
+      <description>bad_certificate</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>43</value>
+      <description>unsupported_certificate</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>44</value>
+      <description>certificate_revoked</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>45</value>
+      <description>certificate_expired</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>46</value>
+      <description>certificate_unknown</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>47</value>
+      <description>illegal_parameter</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>48</value>
+      <description>unknown_ca</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>49</value>
+      <description>access_denied</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>50</value>
+      <description>decode_error</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>51</value>
+      <description>decrypt_error</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>52-59</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>60</value>
+      <description>export_restriction_RESERVED</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>61-69</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>70</value>
+      <description>protocol_version</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>71</value>
+      <description>insufficient_security</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>72-79</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>80</value>
+      <description>internal_error</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>81-89</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>90</value>
+      <description>user_canceled</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>91-99</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>100</value>
+      <description>no_renegotiation</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>101-109</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>110</value>
+      <description>unsupported_extension</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>111</value>
+      <description>certificate_unobtainable</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6066"/>
+    </record>
+    <record>
+      <value>112</value>
+      <description>unrecognized_name</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6066"/>
+    </record>
+    <record>
+      <value>113</value>
+      <description>bad_certificate_status_response</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6066"/>
+    </record>
+    <record>
+      <value>114</value>
+      <description>bad_certificate_hash_value</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6066"/>
+    </record>
+    <record>
+      <value>115</value>
+      <description>unknown_psk_identity</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4279"/>
+    </record>
+    <record>
+      <value>116-255</value>
+      <description>Unassigned</description>
+    </record>
+  </registry>
+  <registry id="tls-parameters-7">
+    <title>TLS HandshakeType Registry</title>
+    <xref type="rfc" data="rfc5246"/>
+    <registration_rule>Standards Action</registration_rule>
+    <record>
+      <value>0</value>
+      <description>hello_request</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>1</value>
+      <description>client_hello</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>server_hello</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>3</value>
+      <description>hello_verify_request</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <value>4</value>
+      <description>NewSessionTicket</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4507"/>
+    </record>
+    <record>
+      <value>5-10</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>11</value>
+      <description>certificate</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>12</value>
+      <description>server_key_exchange</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>13</value>
+      <description>certificate_request</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>14</value>
+      <description>server_hello_done</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>15</value>
+      <description>certificate_verify</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>16</value>
+      <description>client_key_exchange</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>17-19</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>20</value>
+      <description>finished</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>21</value>
+      <description>certificate_url</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6066"/>
+    </record>
+    <record>
+      <value>22</value>
+      <description>certificate_status</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6066"/>
+    </record>
+    <record>
+      <value>23</value>
+      <description>supplemental_data</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4680"/>
+    </record>
+    <record>
+      <value>24-255</value>
+      <description>Unassigned</description>
+    </record>
+  </registry>
+  <registry id="tls-parameters-8">
+    <title>EC Named Curve Registry</title>
+    <xref type="rfc" data="rfc4492"/>
+    <registration_rule>IETF Consensus</registration_rule>
+    <record>
+      <value>0</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>1</value>
+      <description>sect163k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>sect163r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>3</value>
+      <description>sect163r2</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>4</value>
+      <description>sect193r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>5</value>
+      <description>sect193r2</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>6</value>
+      <description>sect233k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>7</value>
+      <description>sect233r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>8</value>
+      <description>sect239k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>9</value>
+      <description>sect283k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>10</value>
+      <description>sect283r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>11</value>
+      <description>sect409k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>12</value>
+      <description>sect409r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>13</value>
+      <description>sect571k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>14</value>
+      <description>sect571r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>15</value>
+      <description>secp160k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>16</value>
+      <description>secp160r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>17</value>
+      <description>secp160r2</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>18</value>
+      <description>secp192k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>19</value>
+      <description>secp192r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>20</value>
+      <description>secp224k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>21</value>
+      <description>secp224r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>22</value>
+      <description>secp256k1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>23</value>
+      <description>secp256r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>24</value>
+      <description>secp384r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>25</value>
+      <description>secp521r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>    
+    <record date="2013-08-19">
+      <value>26</value>
+      <description>brainpoolP256r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc7027"/>
+    </record>
+    <record date="2013-08-19">
+      <value>27</value>
+      <description>brainpoolP384r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc7027"/>
+    </record>
+    <record date="2013-08-19">
+      <value>28</value>
+      <description>brainpoolP512r1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc7027"/>
+    </record>
+    <record>
+      <value>29-65023</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>65024-65279</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>65280</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>65281</value>
+      <description>arbitrary_explicit_prime_curves</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>65282</value>
+      <description>arbitrary_explicit_char2_curves</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>65283-65535</value>
+      <description>Unassigned</description>
+    </record>
+  </registry>
+  <registry id="tls-parameters-9">
+    <title>EC Point Format Registry</title>
+    <xref type="rfc" data="rfc4492"/>
+    <registration_rule>IETF Consensus</registration_rule>
+    <record>
+      <value>0</value>
+      <description>uncompressed</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>1</value>
+      <description>ansiX962_compressed_prime</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>ansiX962_compressed_char2</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>3-247</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>248-255</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc4492"/>
+    </record>
+  </registry>
+  <registry id="tls-parameters-10">
+    <title>EC Curve Type Registry</title>
+    <xref type="rfc" data="rfc4492"/>
+    <registration_rule>IETF Consensus</registration_rule>
+    <record>
+      <value>0</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>1</value>
+      <description>explicit_prime</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>explicit_char2</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>3</value>
+      <description>named_curve</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4492"/>
+    </record>
+    <record>
+      <value>4-247</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>248-255</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc4492"/>
+    </record>
+  </registry>
+  <registry id="tls-parameters-12">
+    <title>TLS Supplemental Data Formats (SupplementalDataType)</title>
+    <xref type="rfc" data="rfc4680"/>
+    <range>
+      <value>0-16385</value>
+      <registration_rule>Standards Action</registration_rule>
+    </range>
+    <range>
+      <value>16386-65279</value>
+      <registration_rule>IETF Consensus</registration_rule>
+    </range>
+    <range>
+      <value>65280-65535</value>
+      <registration_rule>Reserved for Private Use</registration_rule>
+    </range>
+    <record>
+      <value>0</value>
+      <description>user_mapping_data</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4681"/>
+    </record>
+    <record>
+      <value>1-16385</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>16386</value>
+      <description>authz_data</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5878"/>
+    </record>
+    <record>
+      <value>16387-65279</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>65280-65535</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc4680"/>
+    </record>
+  </registry>
+  <registry id="tls-parameters-14">
+    <title>TLS UserMappingType Values</title>
+    <xref type="rfc" data="rfc4681"/>
+    <expert>Eric Rescorla</expert>
+    <range>
+      <value>0-63</value>
+      <registration_rule>Standards Action</registration_rule>
+    </range>
+    <range>
+      <value>64-223</value>
+      <registration_rule>Specification Required</registration_rule>
+    </range>
+    <range>
+      <value>224-255</value>
+      <registration_rule>Reserved for Private Use</registration_rule>
+    </range>
+    <record>
+      <value>0-63</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>64</value>
+      <description>upn_domain_hint</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc4681"/>
+    </record>
+    <record>
+      <value>65-223</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>224-255</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc4681"/>
+    </record>
+  </registry>
+  <registry id="tls-parameters-16">
+    <title>TLS SignatureAlgorithm Registry</title>
+    <xref type="rfc" data="rfc5246"/>
+    <expert>Eric Rescorla</expert>
+    <range>
+      <value>0-63</value>
+      <registration_rule>Standards Action</registration_rule>
+    </range>
+    <range>
+      <value>64-223</value>
+      <registration_rule>Specification Required</registration_rule>
+    </range>
+    <range>
+      <value>224-255</value>
+      <registration_rule>Reserved for Private Use</registration_rule>
+    </range>
+    <record>
+      <value>0</value>
+      <description>anonymous</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>1</value>
+      <description>rsa</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>dsa</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>3</value>
+      <description>ecdsa</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>4-223</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>224-255</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc5246"/>
+    </record>
+  </registry>
+  
+  <registry id="tls-parameters-18">
+    <title>TLS HashAlgorithm Registry</title>
+    <xref type="rfc" data="rfc5246"/>
+    <expert>Eric Rescorla</expert>
+    <range>
+      <value>0-63</value>
+      <registration_rule>Standards Action</registration_rule>
+    </range>
+    <range>
+      <value>64-223</value>
+      <registration_rule>Specification Required</registration_rule>
+    </range>
+    <range>
+      <value>224-255</value>
+      <registration_rule>Reserved for Private Use</registration_rule>
+    </range>
+    <record>
+      <value>0</value>
+      <description>none</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>1</value>
+      <description>md5</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>sha1</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>3</value>
+      <description>sha224</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>4</value>
+      <description>sha256</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>5</value>
+      <description>sha384</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>6</value>
+      <description>sha512</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+    </record>
+    <record>
+      <value>7-223</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>224-255</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc5246"/>
+    </record>
+  </registry>
+  
+  <registry id="exporter-labels">
+    <title>TLS Exporter Label Registry</title>
+    <xref type="rfc" data="rfc5705"/>
+    <registration_rule>Specification Required</registration_rule>
+    <expert>Eric Rescorla</expert>
+    <note>(1) These entries are reserved and MUST NOT be used for the purpose described in <xref type="rfc" data="rfc5705"/>, 
+in order to avoid confusion with similar, but distinct use in <xref type="rfc" data="rfc5246"/>.
+    </note>
+    <record>
+      <description>client finished</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+      <note>(1)</note>
+    </record>
+    <record>
+      <description>server finished</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+      <note>(1)</note>
+    </record>
+    <record>
+      <description>master secret</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+      <note>(1)</note>
+    </record>
+    <record>
+      <description>key expansion</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5246"/>
+      <note>(1)</note>
+    </record>
+    <record>
+      <description>client EAP encryption</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc5216"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <description>ttls keying material</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc5281"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <description>ttls challenge</description>
+      <dtls>N</dtls><xref type="rfc" data="rfc5281"/><xref type="rfc" data="rfc6347"/>
+    </record>
+    <record>
+      <description>EXTRACTOR-dtls_srtp</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5764"/>
+    </record>
+    <record>
+      <description>EXPORTER_DTLS_OVER_SCTP</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6083"/>
+    </record>
+    <record>
+      <description>EXPORTER-ETSI-TC-M2M-Bootstrap</description>
+      <dtls>Y</dtls><xref type="text">TS 102 921 v2.0.3</xref><xref type="person" data="Miguel_Angel_Reina_Ortega"/>
+    </record>
+    <record>
+      <description>EXPORTER-ETSI-TC-M2M-Connection</description>
+      <dtls>Y</dtls><xref type="text">TS 102 921 v2.0.3</xref><xref type="person" data="Miguel_Angel_Reina_Ortega"/>
+    </record>    
+    <record date="2013-01-30">
+      <description>TLS_MK_Extr</description>
+      <dtls>Y</dtls>
+      <xref type="uri" data="http://www.3gpp.org/ftp/Specs/html-info/33222.htm ">TR 33.222</xref>
+      <xref type="person" data="Silke_Holtmanns"/>
+    </record>    
+    <record>
+      <description>EXPORTER_GBA_Digest</description>
+      <dtls>Y</dtls>
+      <xref type="uri" data="http://www.3gpp.org/ftp/Specs/html-info/33220.htm">TS 33.220 Annex M.6</xref>
+      <xref type="person" data="Silke_Holtmanns"/>
+    </record>  
+    </registry>
+  
+  <registry id="authorization-data">
+    <title>TLS Authorization Data Formats</title>
+    <xref type="rfc" data="rfc5878"/>
+    <range>
+      <value>0-63</value>
+      <registration_rule>IETF Review</registration_rule>
+    </range>
+    <range>
+      <value>64-223</value>
+      <registration_rule>Specification Required</registration_rule>
+    </range>
+    <record>
+      <value>0</value>
+      <description>x509_attr_cert</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5878"/>
+    </record>
+    <record>
+      <value>1</value>
+      <description>saml_assertion</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5878"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>x509_attr_cert_url</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5878"/>
+    </record>
+    <record>
+      <value>3</value>
+      <description>saml_assertion_url</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc5878"/>
+    </record>
+    <record>
+      <value>4-63</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>64</value>
+      <description>keynote_assertion_list</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6042"/>
+    </record>
+    <record>
+      <value>65</value>
+      <description>keynote_assertion_list_url</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6042"/>
+    </record>
+    <record>
+      <value>66-223</value>
+      <description>Unassigned</description>
+    </record> 
+    <record>
+      <value>224-255</value>
+      <description>Reserved for Private Use</description>
+      <xref type="rfc" data="rfc5878"/>
+    </record>
+  </registry>
+  
+  <registry id="heartbeat-message-types">
+    <title>Heartbeat Message Types</title>
+    <xref type="rfc" data="rfc6520"/>
+    <registration_rule>Expert Review</registration_rule>
+    <expert>Eric Rescorla</expert>
+    <record>
+      <value>0</value>
+      <description>Reserved</description>
+      <xref type="rfc" data="rfc6520"/>
+    </record>
+    <record>
+      <value>1</value>
+      <description>heartbeat_request</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6520"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>heartbeat_response</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6520"/>
+    </record>
+    <record>
+      <value>3-254</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>255</value>
+      <description>Reserved</description>
+      <xref type="rfc" data="rfc6520"/>
+    </record>
+  </registry>
+  
+  <registry id="heartbeat-modes">
+    <title>Heartbeat Modes</title>
+    <xref type="rfc" data="rfc6520"/>
+    <registration_rule>Expert Review</registration_rule>
+    <expert>Eric Rescorla</expert>
+    <record>
+      <value>0</value>
+      <description>Reserved</description>
+      <xref type="rfc" data="rfc6520"/>
+    </record>
+    <record>
+      <value>1</value>
+      <description>peer_allowed_to_send</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6520"/>
+    </record>
+    <record>
+      <value>2</value>
+      <description>peer_not_allowed_to_send</description>
+      <dtls>Y</dtls><xref type="rfc" data="rfc6520"/>
+    </record>
+    <record>
+      <value>3-254</value>
+      <description>Unassigned</description>
+    </record>
+    <record>
+      <value>255</value>
+      <description>Reserved</description>
+      <xref type="rfc" data="rfc6520"/>
+    </record>
+  </registry>
+  
+  <people>
+    <person id="Miguel_Angel_Reina_Ortega">
+      <name>Miguel Angel Reina Ortega</name>
+      <uri>mailto:MiguelAngel.ReinaOrtega&amp;etsi.org</uri>
+      <updated>2012-12-06</updated>
+    </person>
+    <person id="Pasi_Eronen">
+      <name>Pasi Eronen</name>
+      <uri>mailto:pasi.eronen&amp;nokia.com</uri>
+      <updated>2008-04-04</updated>
+    </person>    
+    <person id="Silke_Holtmanns">
+      <name>Silke Holtmanns</name>
+      <uri>mailto:Silke.Holtmanns&amp;nokia.com</uri>
+      <updated>2013-01-30</updated>
+    </person>
+  </people>
+</registry>

@@ -84,7 +84,7 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom
 
-TESTS = eagain testsrn testcompat chain invalid-cert
+TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn testcompat chain invalid-cert
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\

@@ -1,0 +1,5 @@
+This test checks whether the included in GnuTLS ciphersuites match the IANA
+assigned IDs and whether the combination of Cipher/MAC and key exchange are
+correct.
+
+The test was created by Stefan Buehler.

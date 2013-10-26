@@ -649,3 +649,4 @@ tests/record-sizes-range
 tests/mini-rsa-psk
 tests/mini-record-2
 tests/mini-cert-status
+tests/suite/ciphersuite/gnutls-ciphers.js
