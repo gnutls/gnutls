@@ -119,7 +119,7 @@ client (int fd, int wait)
           exit(1);
         }
       if (debug) success("client: expected timeout occured\n");
-      exit(0);
+      return;
     }
   else
     {
@@ -131,7 +131,7 @@ client (int fd, int wait)
         }
     }
 
-  exit(0);
+  return;
 }
 
 static void
