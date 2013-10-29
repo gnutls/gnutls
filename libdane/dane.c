@@ -39,34 +39,35 @@
 #define MAX_DATA_ENTRIES 4
 
 #ifdef DEBUG
-# define gnutls_assert() fprintf(stderr, "ASSERT: %s: %d\n", __FILE__, __LINE__);
-# define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
-static int gnutls_assert_val_int (int val, const char *file, int line)
+#define gnutls_assert() fprintf(stderr, "ASSERT: %s: %d\n", __FILE__, __LINE__);
+#define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
+static int
+gnutls_assert_val_int (int val, const char *file, int line)
 {
-  fprintf(stderr, "ASSERT: %s: %d\n", file, line);
+  fprintf (stderr, "ASSERT: %s: %d\n", file, line);
   return val;
 }
 #else
-# define gnutls_assert()
-# define gnutls_assert_val(x) (x)
+#define gnutls_assert()
+#define gnutls_assert_val(x) (x)
 #endif
 
 struct dane_state_st
 {
-	struct ub_ctx* ctx;
-	unsigned int flags;
+  struct ub_ctx *ctx;
+  unsigned int flags;
 };
 
 struct dane_query_st
 {
-        struct ub_result* result;
-	unsigned int data_entries;
-	dane_cert_usage_t usage[MAX_DATA_ENTRIES];
-	dane_cert_type_t  type[MAX_DATA_ENTRIES];
-	dane_match_type_t match[MAX_DATA_ENTRIES];
-	gnutls_datum_t data[MAX_DATA_ENTRIES];
-	unsigned int flags;
-	dane_query_status_t status;
+  struct ub_result *result;
+  unsigned int data_entries;
+  dane_cert_usage_t usage[MAX_DATA_ENTRIES];
+  dane_cert_type_t type[MAX_DATA_ENTRIES];
+  dane_match_type_t match[MAX_DATA_ENTRIES];
+  gnutls_datum_t data[MAX_DATA_ENTRIES];
+  unsigned int flags;
+  dane_query_status_t status;
 };
 
 /**
@@ -78,9 +79,10 @@ struct dane_query_st
  *
  * Returns: The status type.
  **/
-dane_query_status_t dane_query_status(dane_query_t q)
+dane_query_status_t
+dane_query_status (dane_query_t q)
 {
-	return q->status;
+  return q->status;
 }
 
 /**
@@ -91,9 +93,10 @@ dane_query_status_t dane_query_status(dane_query_t q)
  *
  * Returns: The number of entries.
  **/
-unsigned int dane_query_entries(dane_query_t q)
+unsigned int
+dane_query_entries (dane_query_t q)
 {
-	return q->data_entries;
+  return q->data_entries;
 }
 
 /**
@@ -111,25 +114,27 @@ unsigned int dane_query_entries(dane_query_t q)
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int dane_query_data(dane_query_t q, unsigned int idx,
-			unsigned int *usage, unsigned int *type,
-			unsigned int *match, gnutls_datum_t * data)
+int
+dane_query_data (dane_query_t q, unsigned int idx,
+                 unsigned int *usage, unsigned int *type,
+                 unsigned int *match, gnutls_datum_t * data)
 {
-	if (idx >= q->data_entries)
-		return gnutls_assert_val(DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
+  if (idx >= q->data_entries)
+    return gnutls_assert_val (DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	if (usage)
-		*usage = q->usage[idx];
-	if (type)
-		*type = q->type[idx];
-	if (match)
-		*match = q->match[idx];
-	if (data) {
-		data->data = q->data[idx].data;
-		data->size = q->data[idx].size;
-	}
+  if (usage)
+    *usage = q->usage[idx];
+  if (type)
+    *type = q->type[idx];
+  if (match)
+    *match = q->match[idx];
+  if (data)
+    {
+      data->data = q->data[idx].data;
+      data->size = q->data[idx].size;
+    }
 
-	return DANE_E_SUCCESS;
+  return DANE_E_SUCCESS;
 }
 
 /**
@@ -142,55 +147,61 @@ int dane_query_data(dane_query_t q, unsigned int idx,
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int dane_state_init(dane_state_t* s, unsigned int flags)
+int
+dane_state_init (dane_state_t * s, unsigned int flags)
 {
-	struct ub_ctx* ctx;
-	int ret;
+  struct ub_ctx *ctx;
+  int ret;
 
-	*s = calloc(1, sizeof(struct dane_state_st));
-	if (*s == NULL)
-		return gnutls_assert_val(DANE_E_MEMORY_ERROR);
+  *s = calloc (1, sizeof (struct dane_state_st));
+  if (*s == NULL)
+    return gnutls_assert_val (DANE_E_MEMORY_ERROR);
 
-	ctx = ub_ctx_create();
-	if(!ctx) {
-                gnutls_assert();
-		ret = DANE_E_INITIALIZATION_ERROR;
-		goto cleanup;
-	}
-	ub_ctx_debugout(ctx, stderr);
+  ctx = ub_ctx_create ();
+  if (!ctx)
+    {
+      gnutls_assert ();
+      ret = DANE_E_INITIALIZATION_ERROR;
+      goto cleanup;
+    }
+  ub_ctx_debugout (ctx, stderr);
 
-	if (!(flags & DANE_F_IGNORE_LOCAL_RESOLVER)) {
-		if( (ret=ub_ctx_resolvconf(ctx, NULL)) != 0) {
-		        gnutls_assert();
-			ret = DANE_E_INITIALIZATION_ERROR;
-			goto cleanup;
-		}
+  if (!(flags & DANE_F_IGNORE_LOCAL_RESOLVER))
+    {
+      if ((ret = ub_ctx_resolvconf (ctx, NULL)) != 0)
+        {
+          gnutls_assert ();
+          ret = DANE_E_INITIALIZATION_ERROR;
+          goto cleanup;
+        }
 
-		if( (ret=ub_ctx_hosts(ctx, NULL)) != 0) {
-		        gnutls_assert();
-			ret = DANE_E_INITIALIZATION_ERROR;
-			goto cleanup;
-		}
-	}
+      if ((ret = ub_ctx_hosts (ctx, NULL)) != 0)
+        {
+          gnutls_assert ();
+          ret = DANE_E_INITIALIZATION_ERROR;
+          goto cleanup;
+        }
+    }
 
-	/* read public keys for DNSSEC verification */
-	if( (ret=ub_ctx_add_ta_file(ctx, (char*)UNBOUND_ROOT_KEY_FILE)) != 0) {
-	        gnutls_assert();
-		ret = DANE_E_INITIALIZATION_ERROR;
-		goto cleanup;
-	}
+  /* read public keys for DNSSEC verification */
+  if ((ret = ub_ctx_add_ta_file (ctx, (char *) UNBOUND_ROOT_KEY_FILE)) != 0)
+    {
+      gnutls_assert ();
+      ret = DANE_E_INITIALIZATION_ERROR;
+      goto cleanup;
+    }
 
-	(*s)->ctx = ctx;
-	(*s)->flags = flags;
+  (*s)->ctx = ctx;
+  (*s)->flags = flags;
 
-	return DANE_E_SUCCESS;
+  return DANE_E_SUCCESS;
 cleanup:
 
-	if (ctx)
-		ub_ctx_delete(ctx);
-	free(*s);
+  if (ctx)
+    ub_ctx_delete (ctx);
+  free (*s);
 
-	return ret;
+  return ret;
 }
 
 /**
@@ -200,10 +211,11 @@ cleanup:
  * This function will deinitialize a DANE query structure.
  *
  **/
-void dane_state_deinit(dane_state_t s)
+void
+dane_state_deinit (dane_state_t s)
 {
-	ub_ctx_delete(s->ctx);
-	free(s);
+  ub_ctx_delete (s->ctx);
+  free (s);
 }
 
 /**
@@ -215,13 +227,15 @@ void dane_state_deinit(dane_state_t s)
  * for DLV  (DNSSEC  Lookaside  Validation).
  *
  **/
-int dane_state_set_dlv_file(dane_state_t s, const char* file)
+int
+dane_state_set_dlv_file (dane_state_t s, const char *file)
 {
-int ret;
+  int ret;
 
-  ret = ub_ctx_set_option(s->ctx, (char*)"dlv-anchor-file:", (void*)file);
+  ret =
+    ub_ctx_set_option (s->ctx, (char *) "dlv-anchor-file:", (void *) file);
   if (ret != 0)
-    return gnutls_assert_val(DANE_E_FILE_ERROR);
+    return gnutls_assert_val (DANE_E_FILE_ERROR);
 
   return 0;
 }
@@ -233,10 +247,12 @@ int ret;
  * This function will deinitialize a DANE query result structure.
  *
  **/
-void dane_query_deinit(dane_query_t q)
+void
+dane_query_deinit (dane_query_t q)
 {
-        if (q->result) ub_resolve_free(q->result);
-	free(q);
+  if (q->result)
+    ub_resolve_free (q->result);
+  free (q);
 }
 
 
@@ -259,52 +275,60 @@ void dane_query_deinit(dane_query_t q)
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int dane_raw_tlsa(dane_state_t s, dane_query_t *r, char *const*dane_data, const int *dane_data_len, int secure, int bogus)
+int
+dane_raw_tlsa (dane_state_t s, dane_query_t * r, char *const *dane_data,
+               const int *dane_data_len, int secure, int bogus)
 {
-	int ret = DANE_E_SUCCESS;
-	unsigned int i;
+  int ret = DANE_E_SUCCESS;
+  unsigned int i;
 
-	*r = calloc(1, sizeof(struct dane_query_st));
-	if (*r == NULL)
-		return gnutls_assert_val(DANE_E_MEMORY_ERROR);
+  *r = calloc (1, sizeof (struct dane_query_st));
+  if (*r == NULL)
+    return gnutls_assert_val (DANE_E_MEMORY_ERROR);
 
-	(*r)->data_entries = 0;
+  (*r)->data_entries = 0;
 
-	for (i=0;i<MAX_DATA_ENTRIES;i++)
-	  {
-	  	if (dane_data[i] == NULL)
-	  		break;
+  for (i = 0; i < MAX_DATA_ENTRIES; i++)
+    {
+      if (dane_data[i] == NULL)
+        break;
 
-		if (dane_data_len[i] <= 3)
-			return gnutls_assert_val(DANE_E_RECEIVED_CORRUPT_DATA);  
+      if (dane_data_len[i] <= 3)
+        return gnutls_assert_val (DANE_E_RECEIVED_CORRUPT_DATA);
 
-		(*r)->usage[i] = dane_data[i][0];
-		(*r)->type[i] = dane_data[i][1];
-		(*r)->match[i] = dane_data[i][2];
-		(*r)->data[i].data = (void*)&dane_data[i][3];
-		(*r)->data[i].size = dane_data_len[i] - 3;
-		(*r)->data_entries++;
-	  }
+      (*r)->usage[i] = dane_data[i][0];
+      (*r)->type[i] = dane_data[i][1];
+      (*r)->match[i] = dane_data[i][2];
+      (*r)->data[i].data = (void *) &dane_data[i][3];
+      (*r)->data[i].size = dane_data_len[i] - 3;
+      (*r)->data_entries++;
+    }
 
-	if (!(s->flags & DANE_F_INSECURE) && !secure) {
-		if (bogus)
-			ret = gnutls_assert_val(DANE_E_INVALID_DNSSEC_SIG);
-		else
-			ret = gnutls_assert_val(DANE_E_NO_DNSSEC_SIG);
-	}
+  if (!(s->flags & DANE_F_INSECURE) && !secure)
+    {
+      if (bogus)
+        ret = gnutls_assert_val (DANE_E_INVALID_DNSSEC_SIG);
+      else
+        ret = gnutls_assert_val (DANE_E_NO_DNSSEC_SIG);
+    }
 
-	/* show security status */
-	if (secure) {
-		(*r)->status = DANE_QUERY_DNSSEC_VERIFIED;
-	} else if (bogus) {
-	        gnutls_assert();
-		(*r)->status = DANE_QUERY_BOGUS;
-	} else {
-	        gnutls_assert();
-	        (*r)->status = DANE_QUERY_NO_DNSSEC;
-        }
+  /* show security status */
+  if (secure)
+    {
+      (*r)->status = DANE_QUERY_DNSSEC_VERIFIED;
+    }
+  else if (bogus)
+    {
+      gnutls_assert ();
+      (*r)->status = DANE_QUERY_BOGUS;
+    }
+  else
+    {
+      gnutls_assert ();
+      (*r)->status = DANE_QUERY_NO_DNSSEC;
+    }
 
-	return ret;
+  return ret;
 }
 
 
@@ -322,256 +346,300 @@ int dane_raw_tlsa(dane_state_t s, dane_query_t *r, char *const*dane_data, const 
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int dane_query_tlsa(dane_state_t s, dane_query_t *r, const char* host, const char* proto, unsigned int port)
+int
+dane_query_tlsa (dane_state_t s, dane_query_t * r, const char *host,
+                 const char *proto, unsigned int port)
 {
-	char ns[1024];
-	int ret;
-        struct ub_result *result;
+  char ns[1024];
+  int ret;
+  struct ub_result *result;
 
-	snprintf(ns, sizeof(ns), "_%u._%s.%s", port, proto, host);
+  snprintf (ns, sizeof (ns), "_%u._%s.%s", port, proto, host);
 
-	/* query for webserver */
-	ret = ub_resolve(s->ctx, ns, 52, 1, &result);
-	if(ret != 0) {
-		return gnutls_assert_val(DANE_E_RESOLVING_ERROR);
-	}
+  /* query for webserver */
+  ret = ub_resolve (s->ctx, ns, 52, 1, &result);
+  if (ret != 0)
+    {
+      return gnutls_assert_val (DANE_E_RESOLVING_ERROR);
+    }
 
 /* show first result */
-	if(!result->havedata) {
-                ub_resolve_free (result);
-		return gnutls_assert_val(DANE_E_NO_DANE_DATA);
-	}
+  if (!result->havedata)
+    {
+      ub_resolve_free (result);
+      return gnutls_assert_val (DANE_E_NO_DANE_DATA);
+    }
 
-        ret = dane_raw_tlsa (s, r, result->data, result->len, result->secure, result->bogus);
-        if (*r == NULL) {
-                ub_resolve_free (result);
-		return ret;
-        }
-        (*r)->result = result;
-	return ret;
+  ret =
+    dane_raw_tlsa (s, r, result->data, result->len, result->secure,
+                   result->bogus);
+  if (*r == NULL)
+    {
+      ub_resolve_free (result);
+      return ret;
+    }
+  (*r)->result = result;
+  return ret;
 }
 
 
-static unsigned int matches(const gnutls_datum_t *raw1, const gnutls_datum_t *raw2,
-							dane_match_type_t match)
+static unsigned int
+matches (const gnutls_datum_t * raw1, const gnutls_datum_t * raw2,
+         dane_match_type_t match)
 {
-uint8_t digest[64];
-int ret;
+  uint8_t digest[64];
+  int ret;
 
-	if (match == DANE_MATCH_EXACT) {
-		if (raw1->size != raw2->size)
-			return gnutls_assert_val(0);
+  if (match == DANE_MATCH_EXACT)
+    {
+      if (raw1->size != raw2->size)
+        return gnutls_assert_val (0);
 
-		if (memcmp(raw1->data, raw2->data, raw1->size) != 0)
-			return gnutls_assert_val(0);
+      if (memcmp (raw1->data, raw2->data, raw1->size) != 0)
+        return gnutls_assert_val (0);
 
-		return 1;
-	} else if (match == DANE_MATCH_SHA2_256) {
+      return 1;
+    }
+  else if (match == DANE_MATCH_SHA2_256)
+    {
 
-		if (raw2->size != 32)
-			return gnutls_assert_val(0);
+      if (raw2->size != 32)
+        return gnutls_assert_val (0);
 
-		ret = gnutls_hash_fast(GNUTLS_DIG_SHA256, raw1->data, raw1->size, digest);
-		if (ret < 0)
-			return gnutls_assert_val(0);
+      ret =
+        gnutls_hash_fast (GNUTLS_DIG_SHA256, raw1->data, raw1->size, digest);
+      if (ret < 0)
+        return gnutls_assert_val (0);
 
-		if (memcmp(digest, raw2->data, 32) != 0)
-			return gnutls_assert_val(0);
+      if (memcmp (digest, raw2->data, 32) != 0)
+        return gnutls_assert_val (0);
 
-		return 1;
-	} else if (match == DANE_MATCH_SHA2_512) {
-		if (raw2->size != 64)
-			return gnutls_assert_val(0);
+      return 1;
+    }
+  else if (match == DANE_MATCH_SHA2_512)
+    {
+      if (raw2->size != 64)
+        return gnutls_assert_val (0);
 
-		ret = gnutls_hash_fast(GNUTLS_DIG_SHA512, raw1->data, raw1->size, digest);
-		if (ret < 0)
-			return gnutls_assert_val(0);
+      ret =
+        gnutls_hash_fast (GNUTLS_DIG_SHA512, raw1->data, raw1->size, digest);
+      if (ret < 0)
+        return gnutls_assert_val (0);
 
-		if (memcmp(digest, raw2->data, 64) != 0)
-			return gnutls_assert_val(0);
+      if (memcmp (digest, raw2->data, 64) != 0)
+        return gnutls_assert_val (0);
 
-		return 1;
-	}
+      return 1;
+    }
 
-	return gnutls_assert_val(0);
+  return gnutls_assert_val (0);
 }
 
-static int crt_to_pubkey(const gnutls_datum_t *raw_crt, gnutls_datum_t * out)
+static int
+crt_to_pubkey (const gnutls_datum_t * raw_crt, gnutls_datum_t * out)
 {
-gnutls_pubkey_t pub = NULL;
-gnutls_x509_crt_t crt = NULL;
-int ret;
+  gnutls_pubkey_t pub = NULL;
+  gnutls_x509_crt_t crt = NULL;
+  int ret;
 
-	out->data = NULL;
+  out->data = NULL;
 
-	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0)
-		return gnutls_assert_val(DANE_E_PUBKEY_ERROR);
+  ret = gnutls_x509_crt_init (&crt);
+  if (ret < 0)
+    return gnutls_assert_val (DANE_E_PUBKEY_ERROR);
 
-	ret = gnutls_pubkey_init( &pub);
-	if (ret < 0) {
-	        gnutls_assert();
-		ret = DANE_E_PUBKEY_ERROR;
-		goto cleanup;
-	}
+  ret = gnutls_pubkey_init (&pub);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      ret = DANE_E_PUBKEY_ERROR;
+      goto cleanup;
+    }
 
-	ret = gnutls_x509_crt_import(crt, raw_crt, GNUTLS_X509_FMT_DER);
-	if (ret < 0) {
-	        gnutls_assert();
-		ret = DANE_E_PUBKEY_ERROR;
-		goto cleanup;
-	}
+  ret = gnutls_x509_crt_import (crt, raw_crt, GNUTLS_X509_FMT_DER);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      ret = DANE_E_PUBKEY_ERROR;
+      goto cleanup;
+    }
 
-	ret = gnutls_pubkey_import_x509(pub, crt, 0);
-	if (ret < 0) {
-	        gnutls_assert();
-		ret = DANE_E_PUBKEY_ERROR;
-		goto cleanup;
-	}
+  ret = gnutls_pubkey_import_x509 (pub, crt, 0);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      ret = DANE_E_PUBKEY_ERROR;
+      goto cleanup;
+    }
 
-	ret = gnutls_pubkey_export2(pub, GNUTLS_X509_FMT_DER, out);
-	if (ret < 0) {
-	        gnutls_assert();
-		ret = DANE_E_PUBKEY_ERROR;
-		goto cleanup;
-	}
+  ret = gnutls_pubkey_export2 (pub, GNUTLS_X509_FMT_DER, out);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      ret = DANE_E_PUBKEY_ERROR;
+      goto cleanup;
+    }
 
-	ret = 0;
-	goto clean_certs;
+  ret = 0;
+  goto clean_certs;
 
 cleanup:
-	free(out->data);
-	out->data = NULL;
+  free (out->data);
+  out->data = NULL;
 clean_certs:
-	if (pub)
-		gnutls_pubkey_deinit(pub);
-	if (crt)
-		gnutls_x509_crt_deinit(crt);
+  if (pub)
+    gnutls_pubkey_deinit (pub);
+  if (crt)
+    gnutls_x509_crt_deinit (crt);
 
-	return ret;
+  return ret;
 }
 
-static int verify_ca(const gnutls_datum_t *raw_crt, unsigned raw_crt_size,
-					 gnutls_certificate_type_t crt_type,
-					 dane_cert_type_t ctype,
-					 dane_match_type_t match, gnutls_datum_t * data,
-					 unsigned int *verify)
+static int
+verify_ca (const gnutls_datum_t * raw_crt, unsigned raw_crt_size,
+           gnutls_certificate_type_t crt_type,
+           dane_cert_type_t ctype,
+           dane_match_type_t match, gnutls_datum_t * data,
+           unsigned int *verify)
 {
-gnutls_datum_t pubkey = {NULL, 0};
-int ret;
-unsigned int vstatus;
-gnutls_x509_crt_t crt = NULL, ca = NULL;
+  gnutls_datum_t pubkey = { NULL, 0 };
+  int ret;
+  unsigned int vstatus;
+  gnutls_x509_crt_t crt = NULL, ca = NULL;
 
-	if (raw_crt_size < 2)
-		return gnutls_assert_val(DANE_E_INVALID_REQUEST);
+  if (raw_crt_size < 2)
+    return gnutls_assert_val (DANE_E_INVALID_REQUEST);
 
-	if (ctype == DANE_CERT_X509 && crt_type == GNUTLS_CRT_X509) {
+  if (ctype == DANE_CERT_X509 && crt_type == GNUTLS_CRT_X509)
+    {
 
-		if (!matches(&raw_crt[1], data, match)) {
-		        gnutls_assert();
-			*verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
-                }
+      if (!matches (&raw_crt[1], data, match))
+        {
+          gnutls_assert ();
+          *verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
+        }
 
-	} else if (ctype == DANE_CERT_PK && crt_type == GNUTLS_CRT_X509) {
-		ret = crt_to_pubkey(&raw_crt[1], &pubkey);
-		if (ret < 0) {
-        	        gnutls_assert();
-			goto cleanup;
-                }
+    }
+  else if (ctype == DANE_CERT_PK && crt_type == GNUTLS_CRT_X509)
+    {
+      ret = crt_to_pubkey (&raw_crt[1], &pubkey);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
 
-		if (!matches(&pubkey, data, match)) {
-                        gnutls_assert();
-			*verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
-                }
-	} else {
-		ret = gnutls_assert_val(DANE_E_UNKNOWN_DANE_DATA);
-		goto cleanup;
-	}
+      if (!matches (&pubkey, data, match))
+        {
+          gnutls_assert ();
+          *verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
+        }
+    }
+  else
+    {
+      ret = gnutls_assert_val (DANE_E_UNKNOWN_DANE_DATA);
+      goto cleanup;
+    }
 
-	/* check if the certificate chain is actually a chain */
-	ret = gnutls_x509_crt_init(&crt);
-  	if (ret < 0) {
-  	  	ret = gnutls_assert_val(DANE_E_CERT_ERROR);
-  	  	goto cleanup;
-	}
+  /* check if the certificate chain is actually a chain */
+  ret = gnutls_x509_crt_init (&crt);
+  if (ret < 0)
+    {
+      ret = gnutls_assert_val (DANE_E_CERT_ERROR);
+      goto cleanup;
+    }
 
-	ret = gnutls_x509_crt_init(&ca);
-  	if (ret < 0) {
-  	  	ret = gnutls_assert_val(DANE_E_CERT_ERROR);
-  	  	goto cleanup;
-	}
+  ret = gnutls_x509_crt_init (&ca);
+  if (ret < 0)
+    {
+      ret = gnutls_assert_val (DANE_E_CERT_ERROR);
+      goto cleanup;
+    }
 
-	ret = gnutls_x509_crt_import(crt, &raw_crt[0], GNUTLS_X509_FMT_DER);
-  	if (ret < 0) {
-  	  	ret = gnutls_assert_val(DANE_E_CERT_ERROR);
-  	  	goto cleanup;
-	}
+  ret = gnutls_x509_crt_import (crt, &raw_crt[0], GNUTLS_X509_FMT_DER);
+  if (ret < 0)
+    {
+      ret = gnutls_assert_val (DANE_E_CERT_ERROR);
+      goto cleanup;
+    }
 
-	ret = gnutls_x509_crt_import(ca, &raw_crt[1], GNUTLS_X509_FMT_DER);
-  	if (ret < 0) {
-  	  	ret = gnutls_assert_val(DANE_E_CERT_ERROR);
-  	  	goto cleanup;
-	}
+  ret = gnutls_x509_crt_import (ca, &raw_crt[1], GNUTLS_X509_FMT_DER);
+  if (ret < 0)
+    {
+      ret = gnutls_assert_val (DANE_E_CERT_ERROR);
+      goto cleanup;
+    }
 
-	ret = gnutls_x509_crt_check_issuer(crt, ca);
-	if (ret == 0) {
-		gnutls_assert();
-		*verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
-	}
+  ret = gnutls_x509_crt_check_issuer (crt, ca);
+  if (ret == 0)
+    {
+      gnutls_assert ();
+      *verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
+    }
 
-	ret = gnutls_x509_crt_verify(crt, &ca, 1, 0, &vstatus);
-	if (ret < 0) {
-  	  	ret = gnutls_assert_val(DANE_E_CERT_ERROR);
-  	  	goto cleanup;
-	}
-	if (vstatus != 0)
-		*verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
+  ret = gnutls_x509_crt_verify (crt, &ca, 1, 0, &vstatus);
+  if (ret < 0)
+    {
+      ret = gnutls_assert_val (DANE_E_CERT_ERROR);
+      goto cleanup;
+    }
+  if (vstatus != 0)
+    *verify |= DANE_VERIFY_CA_CONSTRAINTS_VIOLATED;
 
-	ret = 0;
+  ret = 0;
 cleanup:
-	free(pubkey.data);
-	if (crt != NULL)
-	  gnutls_x509_crt_deinit(crt);
-	if (ca != NULL)
-	  gnutls_x509_crt_deinit(ca);
-	return ret;
+  free (pubkey.data);
+  if (crt != NULL)
+    gnutls_x509_crt_deinit (crt);
+  if (ca != NULL)
+    gnutls_x509_crt_deinit (ca);
+  return ret;
 }
 
-static int verify_ee(const gnutls_datum_t *raw_crt, gnutls_certificate_type_t crt_type,
-		 dane_cert_type_t ctype, dane_match_type_t match, gnutls_datum_t * data,
-		 unsigned int *verify)
+static int
+verify_ee (const gnutls_datum_t * raw_crt, gnutls_certificate_type_t crt_type,
+           dane_cert_type_t ctype, dane_match_type_t match,
+           gnutls_datum_t * data, unsigned int *verify)
 {
-gnutls_datum_t pubkey = {NULL, 0};
-int ret;
+  gnutls_datum_t pubkey = { NULL, 0 };
+  int ret;
 
-	if (ctype == DANE_CERT_X509 && crt_type == GNUTLS_CRT_X509) {
+  if (ctype == DANE_CERT_X509 && crt_type == GNUTLS_CRT_X509)
+    {
 
-		if (!matches(raw_crt, data, match)) {
-		        gnutls_assert();
-			*verify |= DANE_VERIFY_CERT_DIFFERS;
-                }
+      if (!matches (raw_crt, data, match))
+        {
+          gnutls_assert ();
+          *verify |= DANE_VERIFY_CERT_DIFFERS;
+        }
 
-	} else if (ctype == DANE_CERT_PK && crt_type == GNUTLS_CRT_X509) {
+    }
+  else if (ctype == DANE_CERT_PK && crt_type == GNUTLS_CRT_X509)
+    {
 
-		ret = crt_to_pubkey(raw_crt, &pubkey);
-		if (ret < 0) {
-        	        gnutls_assert();
-			goto cleanup;
-                }
+      ret = crt_to_pubkey (raw_crt, &pubkey);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
 
-		if (!matches(&pubkey, data, match)) {
-		        gnutls_assert();
-			*verify |= DANE_VERIFY_CERT_DIFFERS;
-                }
-	} else {
-		ret = gnutls_assert_val(DANE_E_UNKNOWN_DANE_DATA);
-		goto cleanup;
-	}
+      if (!matches (&pubkey, data, match))
+        {
+          gnutls_assert ();
+          *verify |= DANE_VERIFY_CERT_DIFFERS;
+        }
+    }
+  else
+    {
+      ret = gnutls_assert_val (DANE_E_UNKNOWN_DANE_DATA);
+      goto cleanup;
+    }
 
-	ret = 0;
+  ret = 0;
 cleanup:
-	free(pubkey.data);
-	return ret;
+  free (pubkey.data);
+  return ret;
 }
 
 /**
@@ -605,57 +673,72 @@ cleanup:
  *   negative error value.
  *
  **/
-int dane_verify_crt_raw (dane_state_t s,
-	const gnutls_datum_t *chain, unsigned chain_size,
-	gnutls_certificate_type_t chain_type,
-        dane_query_t r,
-	unsigned int sflags, unsigned int vflags,
-	unsigned int *verify)
+int
+dane_verify_crt_raw (dane_state_t s,
+                     const gnutls_datum_t * chain, unsigned chain_size,
+                     gnutls_certificate_type_t chain_type,
+                     dane_query_t r,
+                     unsigned int sflags, unsigned int vflags,
+                     unsigned int *verify)
 {
-int ret;
-unsigned checked = 0;
-unsigned int usage, type, match, idx;
-gnutls_datum_t data;
+  int ret;
+  unsigned checked = 0;
+  unsigned int usage, type, match, idx;
+  gnutls_datum_t data;
 
-	if (chain_type != GNUTLS_CRT_X509)
-		return gnutls_assert_val(DANE_E_INVALID_REQUEST);
+  if (chain_type != GNUTLS_CRT_X509)
+    return gnutls_assert_val (DANE_E_INVALID_REQUEST);
 
-	*verify = 0;
-	idx = 0;
-	do {
-		ret = dane_query_data(r, idx++, &usage, &type, &match, &data);
-		if (ret == DANE_E_REQUESTED_DATA_NOT_AVAILABLE)
-			break;
+  *verify = 0;
+  idx = 0;
+  do
+    {
+      ret = dane_query_data (r, idx++, &usage, &type, &match, &data);
+      if (ret == DANE_E_REQUESTED_DATA_NOT_AVAILABLE)
+        break;
 
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
 
-		if (!(vflags & DANE_VFLAG_ONLY_CHECK_EE_USAGE) && (usage == DANE_CERT_USAGE_LOCAL_CA || usage == DANE_CERT_USAGE_CA)) {
-			ret = verify_ca(chain, chain_size, chain_type, type, match, &data, verify);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-                        }
-                        checked = 1;
-		} else if (!(vflags & DANE_VFLAG_ONLY_CHECK_CA_USAGE) && (usage == DANE_CERT_USAGE_LOCAL_EE || usage == DANE_CERT_USAGE_EE)) {
-			ret = verify_ee(&chain[0], chain_type, type, match, &data, verify);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-                        }
-                        checked = 1;
-		}
-	} while(1);
+      if (!(vflags & DANE_VFLAG_ONLY_CHECK_EE_USAGE)
+          && (usage == DANE_CERT_USAGE_LOCAL_CA
+              || usage == DANE_CERT_USAGE_CA))
+        {
+          ret =
+            verify_ca (chain, chain_size, chain_type, type, match, &data,
+                       verify);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              goto cleanup;
+            }
+          checked = 1;
+        }
+      else if (!(vflags & DANE_VFLAG_ONLY_CHECK_CA_USAGE)
+               && (usage == DANE_CERT_USAGE_LOCAL_EE
+                   || usage == DANE_CERT_USAGE_EE))
+        {
+          ret = verify_ee (&chain[0], chain_type, type, match, &data, verify);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              goto cleanup;
+            }
+          checked = 1;
+        }
+    }
+  while (1);
 
-	if ((vflags & DANE_VFLAG_FAIL_IF_NOT_CHECKED) && checked == 0)
-		ret = gnutls_assert_val(DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
-	else
-		ret = 0;
+  if ((vflags & DANE_VFLAG_FAIL_IF_NOT_CHECKED) && checked == 0)
+    ret = gnutls_assert_val (DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
+  else
+    ret = 0;
 
 cleanup:
-	return ret;
+  return ret;
 }
 
 
@@ -692,38 +775,45 @@ cleanup:
  *   negative error value.
  *
  **/
-int dane_verify_crt (dane_state_t s,
-	const gnutls_datum_t *chain, unsigned chain_size,
-	gnutls_certificate_type_t chain_type,
-	const char * hostname, const char* proto, unsigned int port,
-	unsigned int sflags, unsigned int vflags,
-	unsigned int *verify)
+int
+dane_verify_crt (dane_state_t s,
+                 const gnutls_datum_t * chain, unsigned chain_size,
+                 gnutls_certificate_type_t chain_type,
+                 const char *hostname, const char *proto, unsigned int port,
+                 unsigned int sflags, unsigned int vflags,
+                 unsigned int *verify)
 {
-dane_state_t _s = NULL;
-dane_query_t r = NULL;
-int ret;
+  dane_state_t _s = NULL;
+  dane_query_t r = NULL;
+  int ret;
 
-	*verify = 0;
-	if (s == NULL) {
-		ret = dane_state_init(&_s, sflags);
-		if (ret < 0) {
-		        gnutls_assert();
-			return ret;
-		}
-	} else
-		_s = s;
+  *verify = 0;
+  if (s == NULL)
+    {
+      ret = dane_state_init (&_s, sflags);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
+    }
+  else
+    _s = s;
 
-	ret = dane_query_tlsa(_s, &r, hostname, proto, port);
-	if (ret < 0) {
-	        gnutls_assert();
-		goto cleanup;
-	}
-        ret = dane_verify_crt_raw (s, chain, chain_size, chain_type,
-                                   r, sflags, vflags, verify);
+  ret = dane_query_tlsa (_s, &r, hostname, proto, port);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+  ret = dane_verify_crt_raw (s, chain, chain_size, chain_type,
+                             r, sflags, vflags, verify);
 cleanup:
-	if (s == NULL) dane_state_deinit(_s);
-	if (r != NULL) dane_query_deinit(r);
-	return ret;
+  if (s == NULL)
+    dane_state_deinit (_s);
+  if (r != NULL)
+    dane_query_deinit (r);
+  return ret;
 }
 
 /**
@@ -745,25 +835,27 @@ cleanup:
  *   negative error value.
  *
  **/
-int dane_verify_session_crt (
-        dane_state_t s,
-	gnutls_session_t session,
-	const char * hostname, const char* proto, unsigned int port,
-	unsigned int sflags, unsigned int vflags,
-	unsigned int *verify)
+int
+dane_verify_session_crt (dane_state_t s,
+                         gnutls_session_t session,
+                         const char *hostname, const char *proto,
+                         unsigned int port, unsigned int sflags,
+                         unsigned int vflags, unsigned int *verify)
 {
-const gnutls_datum_t *cert_list;
-unsigned int cert_list_size = 0;
-unsigned int type;
+  const gnutls_datum_t *cert_list;
+  unsigned int cert_list_size = 0;
+  unsigned int type;
 
-	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
-	if (cert_list_size == 0) {
-		return gnutls_assert_val(DANE_E_NO_CERT);
-	}
+  cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
+  if (cert_list_size == 0)
+    {
+      return gnutls_assert_val (DANE_E_NO_CERT);
+    }
 
-	type = gnutls_certificate_type_get(session);
+  type = gnutls_certificate_type_get (session);
 
-	return dane_verify_crt(s, cert_list, cert_list_size, type, hostname, proto, port, sflags, vflags, verify);
+  return dane_verify_crt (s, cert_list, cert_list_size, type, hostname, proto,
+                          port, sflags, vflags, verify);
 }
 
 /**
@@ -783,7 +875,7 @@ unsigned int type;
  **/
 int
 dane_verification_status_print (unsigned int status,
-                       gnutls_datum_t * out, unsigned int flags)
+                                gnutls_datum_t * out, unsigned int flags)
 {
   gnutls_buffer_st str;
   int ret;
@@ -804,8 +896,9 @@ dane_verification_status_print (unsigned int status,
   if (status & DANE_VERIFY_NO_DANE_INFO)
     _gnutls_buffer_append_str (&str, _("There were no DANE information. "));
 
-  ret = _gnutls_buffer_to_datum( &str, out);
-  if (out->size > 0) out->size--;
+  ret = _gnutls_buffer_to_datum (&str, out);
+  if (out->size > 0)
+    out->size--;
 
   return ret;
 }
