@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2012 KU Leuven
+ * Copyright (C) 2013 Christian Grothoff
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -254,7 +256,6 @@ void dane_query_deinit(dane_query_t q)
  * @bogus: if the result was not secure (secure = 0) due to a security failure,
  *              and the result is due to a security failure, bogus is true.
  *
- *
  * This function will fill in the TLSA (DANE) structure from
  * the given raw DNS record data.
  *
@@ -263,32 +264,30 @@ void dane_query_deinit(dane_query_t q)
  **/
 int dane_raw_tlsa(dane_state_t s, dane_query_t *r, char *const*dane_data, const int *dane_data_len, int secure, int bogus)
 {
-	int ret;
+	int ret = DANE_E_SUCCESS;
 	unsigned int i;
 
 	*r = calloc(1, sizeof(struct dane_query_st));
 	if (*r == NULL)
 		return gnutls_assert_val(DANE_E_MEMORY_ERROR);
-	i = 0;
-	do {
 
-		if (dane_data_len[i] > 3)
-			ret = DANE_E_SUCCESS;
-		else {
-			return gnutls_assert_val(DANE_E_RECEIVED_CORRUPT_DATA);
-		}
+	(*r)->data_entries = 0;
+
+	for (i=0;i<MAX_DATA_ENTRIES;i++)
+	  {
+	  	if (dane_data[i] == NULL)
+	  		break;
+
+		if (dane_data_len[i] <= 3)
+			return gnutls_assert_val(DANE_E_RECEIVED_CORRUPT_DATA);  
 
 		(*r)->usage[i] = dane_data[i][0];
 		(*r)->type[i] = dane_data[i][1];
 		(*r)->match[i] = dane_data[i][2];
 		(*r)->data[i].data = (void*)&dane_data[i][3];
 		(*r)->data[i].size = dane_data_len[i] - 3;
-		i++;
-                if (i > MAX_DATA_ENTRIES)
-                  break;
-	} while(dane_data[i] != NULL);
-
-	(*r)->data_entries = i;
+		(*r)->data_entries++;
+	  }
 
 	if (!(s->flags & DANE_F_INSECURE) && !secure) {
 		if (bogus)
