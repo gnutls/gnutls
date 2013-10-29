@@ -612,7 +612,6 @@ int dane_verify_crt_raw (dane_state_t s,
 	unsigned int sflags, unsigned int vflags,
 	unsigned int *verify)
 {
-dane_state_t _s = NULL;
 int ret;
 unsigned checked = 0;
 unsigned int usage, type, match, idx;
@@ -656,7 +655,6 @@ gnutls_datum_t data;
 		ret = 0;
 
 cleanup:
-	if (s == NULL) dane_state_deinit(_s);
 	return ret;
 }
 
