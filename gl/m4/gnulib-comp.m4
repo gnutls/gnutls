@@ -688,7 +688,7 @@ changequote([, ])dnl
   fi
   gl_UNISTD_MODULE_INDICATOR([getcwd])
   gl_FUNC_GETDTABLESIZE
-  if test $HAVE_GETDTABLESIZE = 0; then
+  if test $HAVE_GETDTABLESIZE = 0 || test $REPLACE_GETDTABLESIZE = 1; then
     AC_LIBOBJ([getdtablesize])
     gl_PREREQ_GETDTABLESIZE
   fi
