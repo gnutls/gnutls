@@ -993,7 +993,7 @@ gnutls_prf_raw (gnutls_session_t session,
  * @outsize: size of pre-allocated output buffer to hold the output.
  * @out: pre-allocated buffer to hold the generated data.
  *
- * Apply the TLS Pseudo-Random-Function (PRF) on the master secret
+ * Applies the TLS Pseudo-Random-Function (PRF) on the master secret
  * and the provided data, seeded with the client and server random fields,
  * as specified in RFC5705.
  *

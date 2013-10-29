@@ -1237,7 +1237,7 @@ and SRP authentication.
 * Session resumption::
 * Certificate verification::
 * Parameter generation::
-* Keying Material Exporters::
+* Deriving keys for other applications/protocols::
 * Channel Bindings::
 * Interoperability::
 * Compatibility with the OpenSSL library::
@@ -1404,32 +1404,42 @@ an alternative interface is available using a callback function.
 @showfuncdesc{gnutls_certificate_set_params_function}
 
 
-@node Keying Material Exporters
-@subsection Keying material exporters
+@node Deriving keys for other applications/protocols
+@subsection Deriving keys for other applications/protocols
 @cindex keying material exporters
 @cindex exporting keying material
+@cindex deriving keys
+@cindex key extraction
 
-The TLS PRF can be used by other protocols to derive keys based on
-the TLS master secret.  The API to use is @funcref{gnutls_prf}.  The 
-function needs to be provided with the label in the parameter 
-@code{label}, and the extra data to mix in the
-@code{extra} parameter.  Depending on whether you want to mix in the
-client or server random data first, you can set the
-@code{server_random_first} parameter.
+In several cases, after a TLS connection is established, it is desirable
+to derive keys to be used in another application or protocol (e.g., in an
+other TLS session using pre-shared keys). The following describe GnuTLS'
+implementation of RFC5705 to extract keys based on a session's master secret.
+
+The API to use is @funcref{gnutls_prf}.  The 
+function needs to be provided with a label,
+and additional context data to mix in the @code{extra} parameter. 
+Moreover, the API allows to switch the mix of the
+client and server random nonces, using the @code{server_random_first} parameter.
+In typical uses you don't need it, so a zero value should be provided in @code{server_random_first}.
 
 For example, after establishing a TLS session using
-@funcref{gnutls_handshake}, you can invoke the TLS PRF with this call:
+@funcref{gnutls_handshake}, you can obtain 32-bytes to be used as key, using this call:
 
 @example
-#define MYLABEL "EXPORTER-FOO"
-#define MYCONTEXT "some context data"
+#define MYLABEL "EXPORTER-My-protocol-name"
+#define MYCONTEXT "my-protocol's-1st-session"
+
 char out[32];
-rc = gnutls_prf (session, strlen (MYLABEL), MYLABEL, 0,
-                 strlen (MYCONTEXT), MYCONTEXT, 32, out);
+rc = gnutls_prf (session, sizeof(MYLABEL)-1, MYLABEL, 0,
+                 sizeof(MYCONTEXT)-1, MYCONTEXT, 32, out);
 @end example
 
-If you don't want to mix in the client/server random, there is a 
-low-level TLS PRF interface called @funcref{gnutls_prf_raw}.
+The output key depends on TLS' master secret, and is the same on both client
+and server.
+
+If you don't want to use the RFC5705 interface and not mix in the client and server random
+nonces, there is a low-level TLS PRF interface called @funcref{gnutls_prf_raw}.
 
 @node Channel Bindings
 @subsection Channel bindings
