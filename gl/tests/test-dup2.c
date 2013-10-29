@@ -26,6 +26,10 @@ SIGNATURE_CHECK (dup2, int, (int, int));
 #include <errno.h>
 #include <fcntl.h>
 
+#if HAVE_SYS_RESOURCE_H
+# include <sys/resource.h>
+#endif
+
 #include "binary-io.h"
 
 #if GNULIB_TEST_CLOEXEC
@@ -103,6 +107,7 @@ main (void)
 {
   const char *file = "test-dup2.tmp";
   char buffer[1];
+  int bad_fd = getdtablesize ();
   int fd = open (file, O_CREAT | O_TRUNC | O_RDWR, 0600);
 
   /* Assume std descriptors were provided by invoker.  */
@@ -145,8 +150,17 @@ main (void)
   errno = 0;
   ASSERT (dup2 (fd, -2) == -1);
   ASSERT (errno == EBADF);
+  if (bad_fd > 256)
+    {
+      ASSERT (dup2 (fd, 255) == 255);
+      ASSERT (dup2 (fd, 256) == 256);
+      ASSERT (close (255) == 0);
+      ASSERT (close (256) == 0);
+    }
+  ASSERT (dup2 (fd, bad_fd - 1) == bad_fd - 1);
+  ASSERT (close (bad_fd - 1) == 0);
   errno = 0;
-  ASSERT (dup2 (fd, 10000000) == -1);
+  ASSERT (dup2 (fd, bad_fd) == -1);
   ASSERT (errno == EBADF);
 
   /* Using dup2 can skip fds.  */

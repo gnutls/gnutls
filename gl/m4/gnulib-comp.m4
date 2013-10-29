@@ -126,6 +126,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module getcwd-lgpl-tests:
   # Code from module getdelim:
   # Code from module getdelim-tests:
+  # Code from module getdtablesize:
+  # Code from module getdtablesize-tests:
   # Code from module getline:
   # Code from module getline-tests:
   # Code from module getopt-gnu:
@@ -967,6 +969,12 @@ changequote([, ])dnl
     AC_LIBOBJ([getcwd-lgpl])
   fi
   gl_UNISTD_MODULE_INDICATOR([getcwd])
+  gl_FUNC_GETDTABLESIZE
+  if test $HAVE_GETDTABLESIZE = 0 || test $REPLACE_GETDTABLESIZE = 1; then
+    AC_LIBOBJ([getdtablesize])
+    gl_PREREQ_GETDTABLESIZE
+  fi
+  gl_UNISTD_MODULE_INDICATOR([getdtablesize])
   gl_FUNC_GETPAGESIZE
   if test $REPLACE_GETPAGESIZE = 1; then
     AC_LIBOBJ([getpagesize])
@@ -990,6 +998,7 @@ changequote([, ])dnl
   gl_LOCALENAME
   AC_CHECK_FUNCS_ONCE([newlocale])
   gl_LOCK
+  gl_MODULE_INDICATOR([lock])
   gl_FUNC_LSTAT
   if test $REPLACE_LSTAT = 1; then
     AC_LIBOBJ([lstat])
@@ -1435,6 +1444,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getaddrinfo.m4
   m4/getcwd.m4
   m4/getdelim.m4
+  m4/getdtablesize.m4
   m4/getline.m4
   m4/getopt.m4
   m4/getpagesize.m4
@@ -1654,6 +1664,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getaddrinfo.c
   tests/test-getcwd-lgpl.c
   tests/test-getdelim.c
+  tests/test-getdtablesize.c
   tests/test-getline.c
   tests/test-getopt.c
   tests/test-getopt.h
@@ -1775,6 +1786,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/fdopen.c
   tests=lib/ftruncate.c
   tests=lib/getcwd-lgpl.c
+  tests=lib/getdtablesize.c
   tests=lib/getpagesize.c
   tests=lib/glthread/lock.c
   tests=lib/glthread/lock.h

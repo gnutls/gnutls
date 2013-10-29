@@ -809,7 +809,7 @@ sc_prohibit_always_true_header_tests:
 	  $(_sc_search_regexp)
 
 sc_prohibit_defined_have_decl_tests:
-	@prohibit='#[	 ]*if(n?def|.*\<defined)\>[	 (]+HAVE_DECL_'	\
+	@prohibit='(#[	 ]*ifn?def|\<defined)\>[	 (]+HAVE_DECL_'	\
 	halt='HAVE_DECL macros are always defined'			\
 	  $(_sc_search_regexp)
 
@@ -1283,7 +1283,8 @@ vc-diff-check:
 rel-files = $(DIST_ARCHIVES)
 
 gnulib_dir ?= $(srcdir)/gnulib
-gnulib-version = $$(cd $(gnulib_dir) && git describe)
+gnulib-version = $$(cd $(gnulib_dir)				\
+                    && { git describe || git rev-parse --short=10 HEAD; } )
 bootstrap-tools ?= autoconf,automake,gnulib
 
 # If it's not already specified, derive the GPG key ID from
@@ -1424,6 +1425,7 @@ alpha beta stable: $(local-check) writable-files $(submodule-checks)
 	$(AM_V_at)$(MAKE) -s emit_upload_commands RELEASE_TYPE=$@
 
 release:
+	$(AM_V_GEN)$(MAKE) _version
 	$(AM_V_GEN)$(MAKE) $(release-type)
 
 # Override this in cfg.mk if you follow different procedures.

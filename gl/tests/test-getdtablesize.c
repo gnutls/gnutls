@@ -1,5 +1,5 @@
-/* Test of <sys/time.h> substitute.
-   Copyright (C) 2007, 2009-2013 Free Software Foundation, Inc.
+/* Test of getdtablesize() function.
+   Copyright (C) 2008-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,21 +14,23 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
+/* Written by Bruno Haible <bruno@clisp.org>, 2008.  */
 
 #include <config.h>
 
-#include <sys/time.h>
+#include <unistd.h>
 
-/* Check that the 'struct timeval' type is defined.  */
-struct timeval a;
+#include "signature.h"
+SIGNATURE_CHECK (getdtablesize, int, (void));
 
-/* Check that a.tv_sec is wide enough to hold a time_t, ignoring
-   signedness issues.  */
-typedef int verify_tv_sec_type[sizeof (time_t) <= sizeof (a.tv_sec) ? 1 : -1];
+#include "macros.h"
 
 int
-main (void)
+main (int argc, char *argv[])
 {
+  ASSERT (getdtablesize () >= 3);
+  ASSERT (dup2 (0, getdtablesize() - 1) == getdtablesize () - 1);
+  ASSERT (dup2 (0, getdtablesize()) == -1);
+
   return 0;
 }
