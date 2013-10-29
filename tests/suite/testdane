@@ -29,10 +29,12 @@ fi
 
 . $srcdir/../scripts/common.sh
 
+echo "*** Testing bad hosts"
 # Not ok
 HOSTS="bad-hash.dane.verisignlabs.com dane-broken.rd.nic.fr bad-params.dane.verisignlabs.com"
 HOSTS="$HOSTS bad-sig.dane.verisignlabs.com"
 for i in $HOSTS;do
+echo -n "$i: "
 rm -f tmp
 $CLI $i -p 443 --print-cert --insecure >tmp 2>&1 </dev/null
 if [ $? != 0 ];then
@@ -45,15 +47,19 @@ if [ $? = 0 ];then
 	echo "Checking $i should have failed"
 	exit 1
 fi
+echo "ok"
 done
 
 # Fine hosts
 
+echo ""
+echo "*** Testing good hosts"
 HOSTS="torproject.org jhcloos.com good.dane.verisignlabs.com \
 www.kumari.net"
 HOSTS="$HOSTS nohats.ca"
 # dane.nox.su
 for i in $HOSTS;do
+echo -n "$i: "
 rm -f tmp
 $CLI $i -p 443 --print-cert --insecure >tmp 2>&1 </dev/null
 if [ $? != 0 ];then
@@ -66,6 +72,7 @@ if [ $? != 0 ];then
 	echo "Error checking $i"
 	exit 1
 fi
+echo "ok"
 done
 
 
