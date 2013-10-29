@@ -216,7 +216,7 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
   ret = dane_state_init(&s, flags);
   if (ret < 0)
     {
-      fprintf (stderr, "dane_state_init: %s", dane_strerror (ret));
+      fprintf (stderr, "dane_state_init: %s\n", dane_strerror (ret));
       exit(1);
     }
 
@@ -225,7 +225,7 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
       ret = dane_state_set_dlv_file(s, OPT_ARG(DLV));
       if (ret < 0)
         {
-          fprintf (stderr, "dane_state_set_dlv_file: %s", dane_strerror (ret));
+          fprintf (stderr, "dane_state_set_dlv_file: %s\n", dane_strerror (ret));
           exit(1);
         }
     }
@@ -233,7 +233,7 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
   ret = dane_query_tlsa(s, &q, host, proto, port);
   if (ret < 0)
     {
-      fprintf (stderr, "dane_query_tlsa: %s", dane_strerror (ret));
+      fprintf (stderr, "dane_query_tlsa: %s\n", dane_strerror (ret));
       exit(1);
     }
   
@@ -243,7 +243,7 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
       ret = dane_query_data(q, i, &usage, &type, &match, &data);
       if (ret < 0)
         {
-          fprintf (stderr, "dane_query_data: %s", dane_strerror (ret));
+          fprintf (stderr, "dane_query_data: %s\n", dane_strerror (ret));
           exit(1);
         }
       
@@ -252,7 +252,7 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
       ret = gnutls_hex_encode(&data, (void*)buffer, &size);
       if (ret < 0)
         {
-          fprintf (stderr, "gnutls_hex_encode: %s", dane_strerror (ret));
+          fprintf (stderr, "gnutls_hex_encode: %s\n", dane_strerror (ret));
           exit(1);
         }
 
@@ -273,14 +273,14 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
           ret = gnutls_load_file(cinfo->cert, &file);
           if (ret < 0)
             {
-              fprintf (stderr, "gnutls_load_file: %s", gnutls_strerror (ret));
+              fprintf (stderr, "gnutls_load_file: %s\n", gnutls_strerror (ret));
               exit(1);
             }
         
           ret = gnutls_x509_crt_list_import2( &clist, &clist_size, &file, cinfo->incert_format, 0);
           if (ret < 0)
             {
-              fprintf (stderr, "gnutls_x509_crt_list_import2: %s", gnutls_strerror (ret));
+              fprintf (stderr, "gnutls_x509_crt_list_import2: %s\n", gnutls_strerror (ret));
               exit(1);
             }
 
@@ -295,7 +295,7 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
                   ret = gnutls_x509_crt_export2( clist[i], GNUTLS_X509_FMT_DER, &certs[i]);
                   if (ret < 0)
                     {
-                      fprintf (stderr, "gnutls_x509_crt_export2: %s", gnutls_strerror (ret));
+                      fprintf (stderr, "gnutls_x509_crt_export2: %s\n", gnutls_strerror (ret));
                       exit(1);
                     }
                 }
@@ -304,14 +304,14 @@ unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
                                      host, proto, port, 0, vflags, &status);
               if (ret < 0)
                 {
-                  fprintf (stderr, "dane_verify_crt: %s", dane_strerror (ret));
+                  fprintf (stderr, "dane_verify_crt: %s\n", dane_strerror (ret));
                   exit(1);
                 }
                 
               ret = dane_verification_status_print(status, &out, 0);
               if (ret < 0)
                 {
-                  fprintf( stderr, "dane_verification_status_print: %s", dane_strerror (ret));
+                  fprintf( stderr, "dane_verification_status_print: %s\n", dane_strerror (ret));
                   exit(1);
                 }
               
@@ -370,7 +370,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
       ret = gnutls_x509_crt_export (crt, GNUTLS_X509_FMT_DER, buffer, &size);
       if (ret < 0)
         {
-          fprintf( stderr, "export error: %s", gnutls_strerror (ret));
+          fprintf( stderr, "export error: %s\n", gnutls_strerror (ret));
           exit(1);
         }
 
@@ -383,7 +383,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
       ret = gnutls_pubkey_init (&pubkey);
       if (ret < 0)
         {
-          fprintf (stderr, "pubkey_init: %s", gnutls_strerror (ret));
+          fprintf (stderr, "pubkey_init: %s\n", gnutls_strerror (ret));
           exit(1);
         }
 
@@ -393,7 +393,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
           ret = gnutls_pubkey_import_x509 (pubkey, crt, 0);
           if (ret < 0)
             {
-              fprintf (stderr, "pubkey_import_x509: %s",
+              fprintf (stderr, "pubkey_import_x509: %s\n",
                      gnutls_strerror (ret));
               exit(1);
             }
@@ -402,7 +402,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
           ret = gnutls_pubkey_export (pubkey, GNUTLS_X509_FMT_DER, buffer, &size);
           if (ret < 0)
             {
-              fprintf( stderr, "pubkey_export: %s",
+              fprintf( stderr, "pubkey_export: %s\n",
                      gnutls_strerror (ret));
               exit(1);
             }
@@ -417,7 +417,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
           ret = gnutls_pubkey_export (pubkey, GNUTLS_X509_FMT_DER, buffer, &size);
           if (ret < 0)
             {
-              fprintf (stderr, "export error: %s", gnutls_strerror (ret));
+              fprintf (stderr, "export error: %s\n", gnutls_strerror (ret));
               exit(1);
             }
         }
@@ -434,7 +434,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
   ret = gnutls_hash_fast(default_dig, buffer, size, digest);
   if (ret < 0)
     {
-      fprintf( stderr, "hash error: %s", gnutls_strerror (ret));
+      fprintf( stderr, "hash error: %s\n", gnutls_strerror (ret));
       exit(1);
     }
 
@@ -461,7 +461,7 @@ static void dane_info(const char* host, const char* proto, unsigned int port,
   ret = gnutls_hex_encode(&t, (void*)buffer, &size);
   if (ret < 0)
     {
-      fprintf (stderr, "hex encode error: %s", gnutls_strerror (ret));
+      fprintf (stderr, "hex encode error: %s\n", gnutls_strerror (ret));
       exit(1);
     }
 
