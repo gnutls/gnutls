@@ -192,7 +192,7 @@ register_crypto (int cfd)
       if (gnutls_cipher_map[i] == 0)
         continue;
 
-      /* test if a cipher is support it and if yes register it */
+      /* test if a cipher is supported and if yes register it */
       sess.cipher = gnutls_cipher_map[i];
       sess.keylen = gnutls_cipher_get_key_size (i);
       sess.key = fake_key;
