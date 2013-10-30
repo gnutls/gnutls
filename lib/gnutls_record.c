@@ -1226,7 +1226,7 @@ begin:
       ret = _dtls_record_check(record_params, packet_sequence);
       if (ret < 0)
         {
-          _gnutls_audit_log(session, "Discarded duplicate message[%u.%u]: %s\n",
+          _gnutls_debug_log("Discarded duplicate message[%u.%u]: %s\n",
             (unsigned int)record.sequence.i[0]*256 +(unsigned int)record.sequence.i[1],
             (unsigned int) _gnutls_uint64touint32 (packet_sequence), _gnutls_packet2str (record.type));
           goto sanity_check_error;
