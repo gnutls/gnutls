@@ -48,9 +48,9 @@ alert protocol is above the record protocol.
 The handshake protocol is responsible for the security parameters'
 negotiation, the initial key exchange and authentication.  
 @xref{The Handshake Protocol}, for more information about the handshake
-protocol.  The protocol layering in TLS is shown in @ref{fig:tls-layers}.
+protocol.  The protocol layering in TLS is shown in @ref{fig-tls-layers}.
 
-@float Figure,fig:tls-layers
+@float Figure,fig-tls-layers
 @image{gnutls-layers,12cm}
 @caption{The TLS protocol layers.}
 @end float
@@ -384,7 +384,7 @@ established keys, meaning the server needs to store the state of established
 connections (unless session tickets are used -- @ref{Session tickets}).
 
 Session resumption is an integral part of @acronym{GnuTLS}, and 
-@ref{Session resumption}, @ref{ex:resume-client} illustrate typical 
+@ref{Session resumption}, @ref{ex-resume-client} illustrate typical 
 uses of it.
 
 @node TLS Extensions

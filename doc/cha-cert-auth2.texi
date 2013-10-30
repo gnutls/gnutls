@@ -49,7 +49,7 @@ The following example is about generating a certificate request, and a
 private key. A certificate request can be later be processed by a CA
 which should return a signed certificate.
 
-@anchor{ex:crq}
+@anchor{ex-crq}
 @verbatiminclude examples/ex-crq.c
 
 @node PKIX certificate revocation lists

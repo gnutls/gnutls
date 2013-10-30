@@ -17,12 +17,12 @@ happens inside the black box.
 
 @node The TLS Protocol
 @section The TLS Protocol
-The main use case for the TLS protocol is shown in @ref{fig:client-server}.
+The main use case for the TLS protocol is shown in @ref{fig-client-server}.
 A user of a library implementing the protocol expects no less than this functionality,
 i.e., to be able to set parameters such as the accepted security level, perform a
 negotiation with the peer and be able to exchange data.
 
-@float Figure,fig:client-server
+@float Figure,fig-client-server
 @image{gnutls-client-server-use-case,9cm}
 @caption{TLS protocol use case.}
 @end float
@@ -31,9 +31,9 @@ negotiation with the peer and be able to exchange data.
 @section TLS Handshake Protocol
 The @acronym{GnuTLS} handshake protocol is implemented as a state
 machine that waits for input or returns immediately when the non-blocking
-transport layer functions are used. The main idea is shown in @ref{fig:gnutls-handshake}.
+transport layer functions are used. The main idea is shown in @ref{fig-gnutls-handshake}.
 
-@float Figure,fig:gnutls-handshake
+@float Figure,fig-gnutls-handshake
 @image{gnutls-handshake-state,9cm}
 @caption{GnuTLS handshake state machine.}
 @end float
@@ -43,9 +43,9 @@ implementations of the internal handlers are available and
 @funcref{gnutls_handshake} only multiplexes the input to the appropriate 
 handler. For example a @acronym{PSK} ciphersuite has a different 
 implementation of the @code{process_client_key_exchange} than a
-certificate ciphersuite. We illustrate the idea in @ref{fig:gnutls-handshake-sequence}.
+certificate ciphersuite. We illustrate the idea in @ref{fig-gnutls-handshake-sequence}.
 
-@float Figure,fig:gnutls-handshake-sequence
+@float Figure,fig-gnutls-handshake-sequence
 @image{gnutls-handshake-sequence,12cm}
 @caption{GnuTLS handshake process sequence.}
 @end float
@@ -457,9 +457,9 @@ those is a challenging task for every cryptographic  application or
 library. Unfortunately the cryptographic library that GnuTLS is based 
 on takes no advantage of these capabilities. For this reason GnuTLS handles 
 this internally by following a layered approach to accessing
-cryptographic operations as in @ref{fig:crypto-layers}.
+cryptographic operations as in @ref{fig-crypto-layers}.
 
-@float Figure,fig:crypto-layers
+@float Figure,fig-crypto-layers
 @image{gnutls-crypto-layers,12cm}
 @caption{GnuTLS cryptographic back-end design.}
 @end float

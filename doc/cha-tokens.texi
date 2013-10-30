@@ -179,12 +179,12 @@ and signing without exposing the key. In GnuTLS the PKCS #11 functionality is
 available in @code{gnutls/pkcs11.h}.
 
 Moreover @acronym{PKCS} #11 can be (ab)used to allow all applications in the same operating system to access
-shared cryptographic keys and certificates in a uniform way, as in @ref{fig:pkcs11-vision}.
+shared cryptographic keys and certificates in a uniform way, as in @ref{fig-pkcs11-vision}.
 That way applications could load their trusted certificate list, as well as user
 certificates from a common PKCS #11 module. Such a provider exists in the @acronym{Gnome} 
 system, being the @acronym{Gnome Keyring}.
 
-@float Figure,fig:pkcs11-vision
+@float Figure,fig-pkcs11-vision
 @image{pkcs11-vision,9cm}
 @caption{PKCS #11 module usage.}
 @end float
@@ -353,7 +353,7 @@ entered before accessing the object (for operations or otherwise).
 @subsection Using a @acronym{PKCS} #11 token with TLS
 
 It is possible to use a @acronym{PKCS} #11 token to a TLS
-session, as shown in @ref{ex:pkcs11-client}. In addition
+session, as shown in @ref{ex-pkcs11-client}. In addition
 the following functions can be used to load PKCS #11 key and
 certificates by specifying a PKCS #11 URL instead of a filename.
 

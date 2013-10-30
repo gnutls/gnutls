@@ -68,14 +68,14 @@ entities.  Usually more than one certification authorities exist, and
 certification authorities may certify other authorities to issue
 certificates as well, following a hierarchical model.
 
-@float Figure,fig:x509
+@float Figure,fig-x509
 @image{gnutls-x509,7cm}
 @caption{An example of the X.509 hierarchical trust model.}
 @end float
 
 One needs to trust one or more CAs for his secure communications. In
 that case only the certificates issued by the trusted authorities are
-acceptable.  The framework is illustrated on @ref{fig:x509}.
+acceptable.  The framework is illustrated on @ref{fig-x509}.
 
 @menu
 * X.509 certificate structure::
@@ -192,7 +192,7 @@ private keys with the @code{gnutls_x509_privkey_t} type.  All the
 available functions for @acronym{X.509} certificate handling have
 their prototypes in @file{gnutls/x509.h}. An example program to
 demonstrate the @acronym{X.509} parsing capabilities can be found in
-@ref{ex:x509-info}.
+@ref{ex-x509-info}.
 
 @node Importing an X.509 certificate
 @subsubsection Importing an X.509 certificate
@@ -280,7 +280,7 @@ is always set on a verification error and more detailed flags will also be set w
 
 @showenumdesc{gnutls_certificate_status_t,The @code{gnutls_@-certificate_@-status_t} enumeration.}
 
-An example of certificate verification is shown in @ref{ex:verify2}.
+An example of certificate verification is shown in @ref{ex-verify2}.
 It is also possible to have a set of certificates that
 are trusted for a particular server but not to authorize other certificates.
 This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_named_crt} and @funcref{gnutls_x509_trust_list_verify_named_crt}.
@@ -321,10 +321,10 @@ CA. @acronym{OpenPGP} allows anyone to sign anyone else's public
 key. When Alice signs Bob's key, she is introducing Bob's key to
 anyone who trusts Alice. If someone trusts Alice to introduce keys,
 then Alice is a trusted introducer in the mind of that observer.
-For example in @ref{fig:openpgp}, David trusts Alice to be an introducer and Alice
+For example in @ref{fig-openpgp}, David trusts Alice to be an introducer and Alice
 signed Bob's key thus Dave trusts Bob's key to be the real one.
 
-@float Figure,fig:openpgp
+@float Figure,fig-openpgp
 @image{gnutls-pgp,8cm}
 @caption{An example of the OpenPGP trust model.}
 @end float

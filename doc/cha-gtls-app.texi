@@ -37,7 +37,7 @@ and the manpages is recommended.
 @subsection General idea
 
 A brief description of how @acronym{GnuTLS} sessions operate is shown
-at @ref{fig:gnutls-design}. This section will become more clear when it
+at @ref{fig-gnutls-design}. This section will become more clear when it
 is completely read.
 As shown in the figure, there is a read-only global state that is
 initialized once by the global initialization function.  This global
@@ -49,7 +49,7 @@ for the deinitialization function which frees all allocated memory
 and must be called after the program has permanently
 finished using @acronym{GnuTLS}.
 
-@float Figure,fig:gnutls-design
+@float Figure,fig-gnutls-design
 @image{gnutls-internals,12cm}
 @caption{High level design of GnuTLS.}
 @end float
