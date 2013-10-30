@@ -24,6 +24,11 @@ bits from 727.
 ** libgnutls: Added function to obtain random data from PKCS #11 tokens.
 Contributed by Wolfgang Meyer zu Bergsten.
 
+** gnulib: updated.
+
+** libdane: Fixed a one-off bug in dane_query_tlsa() introduced by the
+previous fix. Reported by Tomas Mraz.
+
 ** p11tool: Added option generate-random.
 
 ** API and ABI modifications:
