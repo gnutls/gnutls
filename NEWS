@@ -6,6 +6,9 @@ See the end for copying conditions.
 
 ** gnulib: updated.
 
+** libdane: Fixed a one-off bug in dane_query_tlsa() introduced by the
+previous fix. Reported by Tomas Mraz.
+
 ** API and ABI modifications:
 No changes since last version.
 
