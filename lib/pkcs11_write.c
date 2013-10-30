@@ -853,7 +853,6 @@ gnutls_pkcs11_token_get_random (const char *token_url,
   int ret;
   struct p11_kit_uri *info = NULL;
   ck_rv_t rv;
-  unsigned int ses_flags;
   struct pkcs11_session_info sinfo;
 
   memset(&sinfo, 0, sizeof(sinfo));
@@ -865,9 +864,7 @@ gnutls_pkcs11_token_get_random (const char *token_url,
       return ret;
     }
 
-  ses_flags = 0; // randomness can be read without login in user session
-
-  ret = pkcs11_open_session (&sinfo, NULL, info, ses_flags);
+  ret = pkcs11_open_session (&sinfo, NULL, info, 0);
   p11_kit_uri_free (info);
 
   if (ret < 0)
