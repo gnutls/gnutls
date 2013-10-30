@@ -444,6 +444,7 @@ APIMANS += gnutls_pkcs11_set_token_function.3
 APIMANS += gnutls_pkcs11_token_get_flags.3
 APIMANS += gnutls_pkcs11_token_get_info.3
 APIMANS += gnutls_pkcs11_token_get_mechanism.3
+APIMANS += gnutls_pkcs11_token_get_random.3
 APIMANS += gnutls_pkcs11_token_get_url.3
 APIMANS += gnutls_pkcs11_token_init.3
 APIMANS += gnutls_pkcs11_token_set_pin.3
