@@ -31,6 +31,7 @@
 #include "certtool-common.h"
 #include <unistd.h>
 #include <string.h>
+#include <stdint.h>
 #include <common.h>
 
 void
