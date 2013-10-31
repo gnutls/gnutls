@@ -514,8 +514,8 @@ certtool. Initially create a file named 'cert.cfg' that contains the information
 about the certificate. The template can be used as below:
 
 @example
-$ certtool --generate-certificate cert.pem --load-privkey key.pem  \
-   --template cert.cfg \
+$ certtool --generate-certificate --load-privkey key.pem  \
+   --template cert.cfg --outfile cert.pem \
    --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
 @end example
 
