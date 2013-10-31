@@ -45,7 +45,9 @@ if test "$rc" != "0"; then
   exit $rc
 fi
 
-$DIFF $srcdir/bmpstring.pem tmp-pem.pem
+#Note that --strip-trailing-cr is used for the test
+#to run on windows platform.
+$DIFF $srcdir/bmpstring.pem tmp-pem.pem || $DIFF --strip-trailing-cr $srcdir/bmpstring.pem tmp-pem.pem
 rc=$?
 
 if test "$rc" != "0"; then
@@ -64,7 +66,7 @@ fi
 
 cat $srcdir/complex-cert.pem |grep -v "Not After:" >tmp1
 cat tmp-pem.pem |grep -v "Not After:" >tmp2
-$DIFF tmp1 tmp2
+$DIFF tmp1 tmp2 || $DIFF --strip-trailing-cr tmp1 tmp2
 rc=$?
 
 if test "$rc" != "0"; then
