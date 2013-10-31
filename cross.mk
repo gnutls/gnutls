@@ -1,4 +1,4 @@
-GNUTLS_VERSION:=3.2.5
+GNUTLS_VERSION:=3.2.6
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -108,8 +108,8 @@ $(NETTLE_DIR)/.installed: $(NETTLE_DIR)/.configured
 	touch $@
 
 $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
-	make -C $(GNUTLS_DIR) -j2
-	make -C $(GNUTLS_DIR) -C tests check
+	make -C $(GNUTLS_DIR) -j4
+	make -C $(GNUTLS_DIR) -j4 -C tests check
 	make -C $(GNUTLS_DIR) install -i
 	cp $(GNUTLS_DIR)/COPYING $(GNUTLS_DIR)/COPYING.LESSER $(CROSS_DIR)
 	touch $@
