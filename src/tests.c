@@ -265,6 +265,7 @@ test_dhe_group (gnutls_session_t session)
   sprintf (prio_str, INIT_STR
            ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
            ":+DHE-RSA:+DHE-DSS:%s", protocol_str, rest);
+  _gnutls_priority_set_direct (session, prio_str);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 
