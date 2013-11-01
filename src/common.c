@@ -577,9 +577,11 @@ print_info (gnutls_session_t session, int verbose, int print_cert)
       printf ("- SRTP profile: %s\n", gnutls_srtp_get_profile_name (srtp_profile));
 #endif
 
+#ifdef ENABLE_ALPN
     rc = gnutls_alpn_get_selected_protocol (session, &p);
     if (rc == 0)
       printf ("- Application protocol: %.*s\n", p.size, p.data);
+#endif
 
     if (verbose)
       {
