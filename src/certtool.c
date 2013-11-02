@@ -184,11 +184,14 @@ print_private_key (common_info_st* cinfo, gnutls_x509_privkey_t key)
   if (!key)
     return;
 
-  if (outcert_format == GNUTLS_X509_FMT_PEM)
-    privkey_info_int(cinfo, key);
 
   if (!cinfo->pkcs8)
     {
+      /* Only print private key parameters when an unencrypted
+       * format is used */
+      if (outcert_format == GNUTLS_X509_FMT_PEM)
+        privkey_info_int(cinfo, key);
+
       size = buffer_size;
       ret = gnutls_x509_privkey_export (key, outcert_format,
                                         buffer, &size);
