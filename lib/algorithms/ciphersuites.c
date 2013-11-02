@@ -73,15 +73,15 @@ typedef struct
 /* PSK (not in TLS 1.0)
  * draft-ietf-tls-psk:
  */
-#define GNUTLS_PSK_SHA_ARCFOUR_128_SHA1 { 0x00, 0x8A }
-#define GNUTLS_PSK_SHA_3DES_EDE_CBC_SHA1 { 0x00, 0x8B }
-#define GNUTLS_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x8C }
-#define GNUTLS_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x8D }
+#define GNUTLS_PSK_ARCFOUR_128_SHA1 { 0x00, 0x8A }
+#define GNUTLS_PSK_3DES_EDE_CBC_SHA1 { 0x00, 0x8B }
+#define GNUTLS_PSK_AES_128_CBC_SHA1 { 0x00, 0x8C }
+#define GNUTLS_PSK_AES_256_CBC_SHA1 { 0x00, 0x8D }
 
-#define GNUTLS_DHE_PSK_SHA_ARCFOUR_128_SHA1 { 0x00, 0x8E }
-#define GNUTLS_DHE_PSK_SHA_3DES_EDE_CBC_SHA1 { 0x00, 0x8F }
-#define GNUTLS_DHE_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x90 }
-#define GNUTLS_DHE_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x91 }
+#define GNUTLS_DHE_PSK_ARCFOUR_128_SHA1 { 0x00, 0x8E }
+#define GNUTLS_DHE_PSK_3DES_EDE_CBC_SHA1 { 0x00, 0x8F }
+#define GNUTLS_DHE_PSK_AES_128_CBC_SHA1 { 0x00, 0x90 }
+#define GNUTLS_DHE_PSK_AES_256_CBC_SHA1 { 0x00, 0x91 }
 
 /* SRP (rfc5054)
  */
@@ -451,19 +451,19 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_VERSION_MAX, 1, GNUTLS_MAC_SHA384),
 
   /* PSK */
-  ENTRY (GNUTLS_PSK_SHA_ARCFOUR_128_SHA1,
+  ENTRY (GNUTLS_PSK_ARCFOUR_128_SHA1,
                              GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 0),
-  ENTRY (GNUTLS_PSK_SHA_3DES_EDE_CBC_SHA1,
+  ENTRY (GNUTLS_PSK_3DES_EDE_CBC_SHA1,
                              GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
-  ENTRY (GNUTLS_PSK_SHA_AES_128_CBC_SHA1,
+  ENTRY (GNUTLS_PSK_AES_128_CBC_SHA1,
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
-  ENTRY (GNUTLS_PSK_SHA_AES_256_CBC_SHA1,
+  ENTRY (GNUTLS_PSK_AES_256_CBC_SHA1,
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
@@ -481,19 +481,19 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_VERSION_MAX, 1),
 
   /* DHE-PSK */
-  ENTRY (GNUTLS_DHE_PSK_SHA_ARCFOUR_128_SHA1,
+  ENTRY (GNUTLS_DHE_PSK_ARCFOUR_128_SHA1,
                              GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_DHE_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 0),
-  ENTRY (GNUTLS_DHE_PSK_SHA_3DES_EDE_CBC_SHA1,
+  ENTRY (GNUTLS_DHE_PSK_3DES_EDE_CBC_SHA1,
                              GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_DHE_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
-  ENTRY (GNUTLS_DHE_PSK_SHA_AES_128_CBC_SHA1,
+  ENTRY (GNUTLS_DHE_PSK_AES_128_CBC_SHA1,
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_DHE_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
-  ENTRY (GNUTLS_DHE_PSK_SHA_AES_256_CBC_SHA1,
+  ENTRY (GNUTLS_DHE_PSK_AES_256_CBC_SHA1,
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_DHE_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
