@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.17 (unreleased)
+
+** certtool: When exporting an encrypted PEM private key do not output the key
+parameters.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.16 (released 2013-10-31)
 
 ** gnulib: updated.
