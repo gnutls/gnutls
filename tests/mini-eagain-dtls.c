@@ -80,7 +80,6 @@ doit (void)
   if (ret < 0)
     exit(1);
   gnutls_credentials_set (server, GNUTLS_CRD_ANON, s_anoncred);
-  gnutls_dh_set_prime_bits (server, 1024);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);
   gnutls_transport_set_pull_timeout_function (server, server_pull_timeout_func);

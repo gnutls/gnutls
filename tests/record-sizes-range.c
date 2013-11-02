@@ -119,7 +119,6 @@ doit (void)
   gnutls_init (&server, GNUTLS_SERVER);
   gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+AES-128-CBC:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH", NULL);
   gnutls_credentials_set (server, GNUTLS_CRD_ANON, s_anoncred);
-  gnutls_dh_set_prime_bits (server, 1024);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);
   gnutls_transport_set_ptr (server, server);
