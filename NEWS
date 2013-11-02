@@ -9,6 +9,9 @@ See the end for copying conditions.
 ** certtool: pathlen constraint is now read correctly. Reported by
 Christoph Seitz.
 
+** certtool: When exporting an encrypted PEM private key do not output the key
+parameters.
+
 ** API and ABI modifications:
 No changes since last version.
 
