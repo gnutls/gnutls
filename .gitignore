@@ -2,6 +2,8 @@
 *.gcno
 *.gcov
 *.lo
+*.log
+*.trs
 *.o
 *~
 .deps
@@ -212,6 +214,7 @@ gl/tests/glthread/glthread
 gl/tests/inttypes.h
 gl/tests/inttypes.h 
 gl/tests/libtests.a
+gl/tests/test-getdtablesize
 gl/tests/sys/
 gl/tests/test-accept
 gl/tests/test-alignof
@@ -635,3 +638,15 @@ tests/mini-xssl
 doc/examples/ex-client-xssl1
 doc/examples/ex-client-xssl2
 lib/libgnutls-xssl.la
+tests/mini-alpn
+tests/mini-record-range
+tests/mini-dtls-hello-verify
+tests/mini-overhead
+tests/mini-dtls-large
+tests/record-sizes
+tests/priorities
+tests/record-sizes-range
+tests/mini-rsa-psk
+tests/mini-record-2
+tests/mini-cert-status
+tests/suite/ciphersuite/gnutls-ciphers.js
