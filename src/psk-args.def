@@ -30,7 +30,7 @@ flag = {
     name      = passwd;
     value     = p;
     arg-type  = string;
-    descrip   = "specify a password file.";
+    descrip   = "specify a password file";
     doc       = "";
 };
 

@@ -24,7 +24,7 @@ flag = {
     value     = d;
     arg-type  = number;
     arg-range = "0 -> 9999";
-    descrip   = "Enable debugging.";
+    descrip   = "Enable debugging";
     doc       = "Specifies the debug level.";
 };
 

@@ -64,33 +64,33 @@ flag = {
 flag = {
     name      = verify-chain;
     value     = e;
-    descrip   = "Verify a PEM encoded certificate chain.";
+    descrip   = "Verify a PEM encoded certificate chain";
     doc = "The last certificate in the chain must be a self signed one.";
 };
 
 flag = {
     name      = verify;
-    descrip   = "Verify a PEM encoded certificate chain using a trusted list.";
+    descrip   = "Verify a PEM encoded certificate chain using a trusted list";
     doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
     flags-must = load-ca-certificate;
 };
 
 flag = {
     name      = verify-crl;
-    descrip   = "Verify a CRL using a trusted list.";
+    descrip   = "Verify a CRL using a trusted list";
     doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
     flags-must = load-ca-certificate;
 };
 
 flag = {
     name      = generate-dh-params;
-    descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters.";
+    descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters";
     doc = "";
 };
 
 flag = {
     name      = get-dh-params;
-    descrip   = "Get the included PKCS #3 encoded Diffie-Hellman parameters.";
+    descrip   = "Get the included PKCS #3 encoded Diffie-Hellman parameters";
     doc = "Returns stored DH parameters in GnuTLS. Those parameters are used in the SRP protocol. The parameters returned by fresh generation
 are more efficient since GnuTLS 3.0.9.";
 };
@@ -303,13 +303,13 @@ flag = {
 flag = {
     name      = hash;
     arg-type  = string;
-    descrip   = "Hash algorithm to use for signing.";
+    descrip   = "Hash algorithm to use for signing";
     doc = "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512.";
 };
 
 flag = {
     name      = inder;
-    descrip   = "Use DER format for input certificates and private keys.";
+    descrip   = "Use DER format for input certificates and private keys";
     disabled;
     disable   = "no";
     doc       = "The input files will be assumed to be in DER or RAW format. 
@@ -346,7 +346,7 @@ flag = {
     name      = sec-param;
     arg-type  = string;
     arg-name  = "Security parameter";
-    descrip   = "Specify the security level [low, legacy, normal, high, ultra].";
+    descrip   = "Specify the security level [low, legacy, normal, high, ultra]";
     doc      = "This is alternative to the bits option.";
 };
 

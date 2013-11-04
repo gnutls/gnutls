@@ -35,38 +35,38 @@ flag = {
 flag = {
     name      = hash;
     arg-type  = string;
-    descrip   = "Hash algorithm to use for signing.";
+    descrip   = "Hash algorithm to use for signing";
     doc = "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512.";
 };
 
 flag = {
     name      = check;
     arg-type  = string;
-    descrip   = "Check a host's DANE TLSA entry.";
+    descrip   = "Check a host's DANE TLSA entry";
     doc = "Obtains the DANE TLSA entry from the given hostname and prints information. Note that the actual certificate of the host has to be provided using --load-certificate.";
 };
 
 flag = {
     name      = check-ee;
-    descrip   = "Check only the end-entity's certificate.";
+    descrip   = "Check only the end-entity's certificate";
     doc = "Checks the end-entity's certificate only. Trust anchors or CAs are not considered.";
 };
 
 flag = {
     name      = check-ca;
-    descrip   = "Check only the CA's certificate.";
+    descrip   = "Check only the CA's certificate";
     doc = "Checks the trust anchor's and CA's certificate only. End-entities are not considered.";
 };
 
 flag = {
     name      = insecure;
-    descrip   = "Do not verify any DNSSEC signature.";
+    descrip   = "Do not verify any DNSSEC signature";
     doc = "Ignores any DNSSEC signature verification results.";
 };
 
 flag = {
     name      = local-dns;
-    descrip   = "Use the local DNS server for DNSSEC resolving.";
+    descrip   = "Use the local DNS server for DNSSEC resolving";
     disabled;
     disable   = "no";
     doc       = "This option will use the local DNS server for DNSSEC.
@@ -75,7 +75,7 @@ This is disabled by default due to many servers not allowing DNSSEC.";
 
 flag = {
     name      = inder;
-    descrip   = "Use DER format for input certificates and private keys.";
+    descrip   = "Use DER format for input certificates and private keys";
     disabled;
     disable   = "no";
     doc       = "The input files will be assumed to be in DER or RAW format. 
@@ -114,20 +114,20 @@ flag = {
 flag = {
     name      = port;
     arg-type  = number;
-    descrip   = "Specify the port number for the DANE data.";
+    descrip   = "Specify the port number for the DANE data";
     default-value = 443;
     doc      = "";
 };
 
 flag = {
     name      = ca;
-    descrip   = "Whether the provided certificate or public key is a Certificate Authority.";
+    descrip   = "Whether the provided certificate or public key is a Certificate Authority";
     doc      = "Marks the DANE RR as a CA certificate if specified.";
 };
 
 flag = {
     name      = x509;
-    descrip   = "Use the hash of the X.509 certificate, rather than the public key.";
+    descrip   = "Use the hash of the X.509 certificate, rather than the public key";
     doc      = "This option forces the generated record to contain the hash of the full X.509 certificate. By default only the hash of the public key is used.";
 };
 
@@ -138,7 +138,7 @@ flag = {
 
 flag = {
     name      = domain;
-    descrip   = "The provided certificate or public key is issued by the local domain.";
+    descrip   = "The provided certificate or public key is issued by the local domain";
     enabled;
     disable   = "no";
     doc      = "DANE distinguishes certificates and public keys offered via the DNSSEC to trusted and local entities. This flag indicates that this is a domain-issued certificate, meaning that there could be no CA involved.";

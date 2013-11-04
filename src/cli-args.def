@@ -32,7 +32,7 @@ available via DNSSEC.";
 
 flag = {
     name      = local-dns;
-    descrip   = "Use the local DNS server for DNSSEC resolving.";
+    descrip   = "Use the local DNS server for DNSSEC resolving";
     disabled;
     disable   = "no";
     doc       = "This option will use the local DNS server for DNSSEC.
@@ -72,7 +72,7 @@ flag = {
 flag = {
     name      = starttls;
     value     = s;
-    descrip   = "Connect, establish a plain session and start TLS.";
+    descrip   = "Connect, establish a plain session and start TLS";
     doc       = "The TLS session will be initiated when EOF or a SIGALRM is received.";
 };
 
