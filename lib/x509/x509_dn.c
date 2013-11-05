@@ -90,7 +90,7 @@ const unsigned char* p = (void*)*ptr;
   /* skip any space */
   while (c_isspace(*p))
     p++;
-      
+
   /* Read the name */
   name->data = (void*)p;
   while (*p != '=' && *p != 0 && !c_isspace(*p))
@@ -117,8 +117,6 @@ const unsigned char* p = (void*)*ptr;
   
   if (val->size == 0 || name->size == 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-
-fprintf(stderr, "name[%d]: %s\nval[%d]: %s\n",name->size, name->data, val->size, val->data);
 
   *ptr = (void*)p;
 
