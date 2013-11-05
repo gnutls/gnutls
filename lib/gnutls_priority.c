@@ -910,11 +910,11 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       _set_priority (&(*priority_cache)->cert_type, cert_type_priority_default);
       _set_priority (&(*priority_cache)->sign_algo, sign_priority_default);
       _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
-      (*priority_cache)->level = GNUTLS_SEC_PARAM_VERY_WEAK;
       i = 0;
     }
   else
     {
+      (*priority_cache)->level = GNUTLS_SEC_PARAM_VERY_WEAK;
       i = 1;
     }
 
