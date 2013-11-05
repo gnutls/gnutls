@@ -662,7 +662,7 @@ get_cn_crt_set (gnutls_x509_crt_t crt)
                                        0, cfg.cn, strlen (cfg.cn));
       if (ret < 0)
         {
-          fprintf (stderr, "set_dn: %s\n", gnutls_strerror (ret));
+          fprintf (stderr, "set_dn_by_oid: %s\n", gnutls_strerror (ret));
           exit (1);
         }
     }
