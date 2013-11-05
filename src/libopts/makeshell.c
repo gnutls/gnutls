@@ -30,13 +30,6 @@
  *  13aa749a5b0a454917a944ed8fffc530b784f5ead522b1aacaf4ec8aa55a6239  COPYING.mbsd
  */
 
-tOptions * optionParseShellOptions = NULL;
-
-static char const * shell_prog = NULL;
-static char * script_leader    = NULL;
-static char * script_trailer   = NULL;
-static char * script_text      = NULL;
-
 /* = = = START-STATIC-FORWARD = = = */
 static void
 emit_var_text(char const * prog, char const * var, int fdin);
@@ -76,6 +69,21 @@ open_out(char const * fname, char const * pname);
 /* = = = END-STATIC-FORWARD = = = */
 
 LOCAL void
+option_exits(int exit_code)
+{
+    if (print_exit)
+        printf("\nexit %d\n", exit_code);
+    exit(exit_code);
+}
+
+LOCAL void
+ao_bug(char const * msg)
+{
+    fprintf(stderr, zao_bug_msg, msg);
+    option_exits(EX_SOFTWARE);
+}
+
+LOCAL void
 fserr_warn(char const * prog, char const * op, char const * fname)
 {
     fprintf(stderr, zfserr_fmt, prog, errno, strerror(errno),
@@ -86,7 +94,7 @@ LOCAL void
 fserr_exit(char const * prog, char const * op, char const * fname)
 {
     fserr_warn(prog, op, fname);
-    exit(EXIT_FAILURE);
+    option_exits(EXIT_FAILURE);
 }
 
 /*=export_func  optionParseShell
@@ -325,7 +333,7 @@ text_to_var(tOptions * opts, teTextTo which, tOptDesc * od)
             /* NOTREACHED */
 
         default:
-            exit(EXIT_FAILURE);
+            option_exits(EXIT_FAILURE);
             /* NOTREACHED */
         }
         /* NOTREACHED */
@@ -345,7 +353,7 @@ text_to_var(tOptions * opts, teTextTo which, tOptDesc * od)
 static void
 emit_usage(tOptions * opts)
 {
-    char tm_nm_buf[AO_NAME_SIZE] = "";
+    char tm_nm_buf[AO_NAME_SIZE];
 
     /*
      *  First, switch stdout to the output file name.
@@ -359,13 +367,11 @@ emit_usage(tOptions * opts)
     {
         char const * out_nm;
 
-#ifdef HAVE_LOCALTIME
         {
             time_t    c_tim = time(NULL);
             struct tm * ptm = localtime(&c_tim);
             strftime(tm_nm_buf, AO_NAME_SIZE, TIME_FMT, ptm );
         }
-#endif
 
         if (HAVE_GENSHELL_OPT(SCRIPT))
              out_nm = GENSHELL_OPT_ARG(SCRIPT);
@@ -864,7 +870,7 @@ genshelloptUsage(tOptions * opts, int exit_cd)
     fflush(stderr);
     fflush(stdout);
     if (ferror(stdout) || ferror(stderr))
-        exit(EXIT_FAILURE);
+        option_exits(EXIT_FAILURE);
 
     option_usage_fp = stdout;
 
@@ -931,7 +937,7 @@ genshelloptUsage(tOptions * opts, int exit_cd)
     if (ferror(stdout))
         fserr_exit(opts->pzProgName, zwriting, zstdout_name);
 
-    exit(EXIT_SUCCESS);
+    option_exits(EXIT_SUCCESS);
 #endif
 }
 
