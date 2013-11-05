@@ -132,7 +132,7 @@ gnutls_datum_t name, val;
 
   if (crt == NULL || dn == NULL)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-    
+
   /* For each element */
   while (*p != 0 && *p != '\n')
     {
@@ -156,7 +156,8 @@ gnutls_datum_t name, val;
 
       if (*p != ',' && *p != 0 && *p != '\n')
         return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-      p++;
+      if (*p == ',')
+      	p++;
     }
     
   return 0;
