@@ -710,7 +710,6 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
     }
   else
     {
-      (*priority_cache)->level = GNUTLS_SEC_PARAM_VERY_WEAK;
       i = 1;
     }
 
