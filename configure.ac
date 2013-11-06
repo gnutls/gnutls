@@ -347,7 +347,7 @@ AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 LIBOPTS_CHECK([src/libopts])
 if [ test "$NEED_LIBOPTS_DIR" != "true" ];then
 	dnl delete libopts-generated files
-	rm -f src/*-args.c src/*-args.h
+	rm -f ${srcdir}/src/*-args.c ${srcdir}/src/*-args.h
 fi
 
 AC_CHECK_TYPE(ssize_t,
