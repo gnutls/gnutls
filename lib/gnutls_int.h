@@ -457,7 +457,8 @@ typedef struct cipher_entry_st
   uint16_t blocksize;
   uint16_t keysize;
   unsigned block:1;
-  uint16_t iv; /* the size of IV */
+  uint16_t iv; /* the size of implicit IV - TLS related */
+  uint16_t cipher_iv; /* the size of IV needed by the cipher */
   unsigned aead:1; /* Whether it is authenc cipher */
 } cipher_entry_st;
 

@@ -328,7 +328,7 @@ compressed_to_ciphertext (gnutls_session_t session,
   if (unlikely(ver == NULL))
     return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
+  iv_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
 
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
     session, _gnutls_cipher_get_name(params->cipher), _gnutls_mac_get_name(params->mac),
@@ -464,7 +464,7 @@ compressed_to_ciphertext_new (gnutls_session_t session,
   if (unlikely(ver == NULL))
     return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
+  iv_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
 
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
     session, _gnutls_cipher_get_name(params->cipher), _gnutls_mac_get_name(params->mac),
@@ -672,7 +672,7 @@ ciphertext_to_compressed (gnutls_session_t session,
   if (unlikely(ver == NULL))
     return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
+  iv_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
   blocksize = _gnutls_cipher_get_block_size (params->cipher);
 
   /* actual decryption (inplace)
@@ -874,7 +874,7 @@ ciphertext_to_compressed_new (gnutls_session_t restrict session,
   if (unlikely(ver == NULL))
     return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  iv_size = _gnutls_cipher_get_iv_size(params->cipher);
+  iv_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
   blocksize = _gnutls_cipher_get_block_size (params->cipher);
 
   /* actual decryption (inplace)

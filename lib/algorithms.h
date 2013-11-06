@@ -193,7 +193,7 @@ _gnutls_cipher_get_block_size (const cipher_entry_st* e)
 }
 
 inline static int
-_gnutls_cipher_get_iv_size (const cipher_entry_st* e)
+_gnutls_cipher_get_implicit_iv_size (const cipher_entry_st* e)
 { 
   if (unlikely(e==NULL))
     return 0;
