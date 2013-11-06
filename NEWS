@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.2.7 (unreleased)
 
+** libgnutls: gnutls_cipher_get_iv_size() now returns the correct IV size in
+GCM ciphers.
+
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
 
