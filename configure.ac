@@ -705,7 +705,7 @@ if features are disabled)
 AC_MSG_NOTICE([Optional applications:
 
   crywrap app:          $libidn
-  local libopts:        $enable_local_libopts
+  libopts flags:        ${LIBOPTS_LDADD}
 ])
 
 AC_MSG_NOTICE([Optional libraries:
