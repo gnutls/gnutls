@@ -363,16 +363,19 @@ static const gnutls_error_entry error_algorithms[] = {
  * @error: is a GnuTLS error code, a negative error code
  *
  * If a GnuTLS function returns a negative error code you may feed that
- * value to this function to see if the error condition is fatal. 
+ * value to this function to see if the error condition is fatal to
+ * a TLS session (i.e., must be terminated). 
+ *
  * Note that you may also want to check the error code manually, since some
  * non-fatal errors to the protocol (such as a warning alert or
  * a rehandshake request) may be fatal for your program.
  *
  * This function is only useful if you are dealing with errors from
- * the record layer or the handshake layer.
+ * functions that relate to a TLS session (e.g., record layer or handshake 
+ * layer handling functions).
  *
- * Returns: 1 if the error code is fatal, for positive @error values,
- *   0 is returned.  For unknown @error values, -1 is returned.
+ * Returns: zero on non fatal errors or positive @error values. Non-zero
+ *    on fatal error codes.
  **/
 int
 gnutls_error_is_fatal (int error)
