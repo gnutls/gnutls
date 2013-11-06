@@ -593,7 +593,7 @@ AC_ARG_ENABLE(crywrap,
 fi
 
 AM_CONDITIONAL(ENABLE_CRYWRAP, test "x$crywrap" != "xno")
-rm -f suppressions.valgrind
+
 dnl end of crywrap requirements
 
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
