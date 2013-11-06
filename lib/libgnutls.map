@@ -927,6 +927,9 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs11_obj_export3;
 	gnutls_pkcs11_get_raw_issuer;
 	gnutls_est_record_overhead_size;
+	gnutls_cipher_self_test;
+	gnutls_mac_self_test;
+	gnutls_digest_self_test;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

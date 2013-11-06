@@ -2089,6 +2089,12 @@ void gnutls_certificate_set_pin_function(gnutls_certificate_credentials_t,
 					 gnutls_pin_callback_t fn,
 					 void *userdata);
 
+ /* Self checking functions */
+ int gnutls_cipher_self_test(gnutls_cipher_algorithm_t cipher);
+ int gnutls_mac_self_test(gnutls_mac_algorithm_t mac);
+ int gnutls_digest_self_test(gnutls_digest_algorithm_t digest);
+
+
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.
    */
@@ -2278,6 +2284,9 @@ void gnutls_certificate_set_pin_function(gnutls_certificate_credentials_t,
 #define GNUTLS_E_RANDOM_DEVICE_ERROR -342
 #define GNUTLS_E_AUTH_ERROR -343
 #define GNUTLS_E_NO_APPLICATION_PROTOCOL -344
+
+#define GNUTLS_E_SELF_TEST_ERROR -400
+#define GNUTLS_E_NO_SELF_TEST -401
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
