@@ -26,22 +26,61 @@ int main(int argc, char **argv)
 
 	global_init();
 
-    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_128_CBC))
+    /* ciphers */
+    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_128_CBC) < 0)
         return 1;
 
-    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_192_CBC))
+    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_192_CBC) < 0)
         return 1;
 
-    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_256_CBC))
+    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_256_CBC) < 0)
         return 1;
 
-    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_128_GCM))
+    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_128_GCM) < 0)
         return 1;
 
-    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_256_GCM))
+    if (gnutls_cipher_self_test(GNUTLS_CIPHER_AES_256_GCM) < 0)
         return 1;
 
-    if (gnutls_cipher_self_test(GNUTLS_CIPHER_3DES_CBC))
+    if (gnutls_cipher_self_test(GNUTLS_CIPHER_3DES_CBC) < 0)
+        return 1;
+
+    /* message digests */        
+    if (gnutls_digest_self_test(GNUTLS_DIG_MD5) < 0)
+        return 1;
+
+    if (gnutls_digest_self_test(GNUTLS_DIG_SHA1) < 0)
+        return 1;
+
+    if (gnutls_digest_self_test(GNUTLS_DIG_SHA224) < 0)
+        return 1;
+
+    if (gnutls_digest_self_test(GNUTLS_DIG_SHA256) < 0)
+        return 1;
+
+    if (gnutls_digest_self_test(GNUTLS_DIG_SHA384) < 0)
+        return 1;
+
+    if (gnutls_digest_self_test(GNUTLS_DIG_SHA512) < 0)
+        return 1;
+
+    /* MAC */
+    if (gnutls_mac_self_test(GNUTLS_MAC_MD5) < 0)
+        return 1;
+
+    if (gnutls_mac_self_test(GNUTLS_MAC_SHA1) < 0)
+        return 1;
+
+    if (gnutls_mac_self_test(GNUTLS_MAC_SHA224) < 0)
+        return 1;
+
+    if (gnutls_mac_self_test(GNUTLS_MAC_SHA256) < 0)
+        return 1;
+
+    if (gnutls_mac_self_test(GNUTLS_MAC_SHA384) < 0)
+        return 1;
+
+    if (gnutls_mac_self_test(GNUTLS_MAC_SHA512) < 0)
         return 1;
 
 	gnutls_global_deinit();
