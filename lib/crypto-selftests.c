@@ -33,6 +33,9 @@
 	.tag = (uint8_t*)val, \
 	.tag_size = (sizeof(val)-1)
 
+#define V(x) (x), (sizeof(x)/sizeof(x[0]))
+
+
 /* This does check the AES and SHA implementation against test vectors.
  * This should not run under valgrind in order to use the native
  * cpu instructions (AES-NI or padlock).
@@ -585,45 +588,49 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 	return 0;
 }
 
-#define V(x) (x), (sizeof(x)/sizeof(x[0]))
+#define CASE(x, func, vectors) case x: \
+			ret = func(x, V(vectors)); \
+			if (all == 0 || ret < 0) \
+				return ret
 
 /**
  * gnutls_cipher_self_test:
+ * @all: if non-zero then tests to all ciphers are performed.
  * @cipher: the encryption algorithm to use
  *
- * This function will run self tests on the provided cipher.
+ * This function will run self tests on the provided cipher or all
+ * available ciphers if @all is non-zero.
  *
  * Returns: Zero or a negative error code on error.
  *
  * Since: 3.3.0
  **/
-int gnutls_cipher_self_test(gnutls_cipher_algorithm_t cipher)
+int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher)
 {
+int ret;
+
+	if (all != 0)
+		cipher = GNUTLS_CIPHER_UNKNOWN;
+
 	switch (cipher) {
-		case GNUTLS_CIPHER_AES_128_CBC:
-			return test_cipher(cipher, V(aes128_cbc_vectors));
-
-		case GNUTLS_CIPHER_AES_192_CBC:
-			return test_cipher(cipher, V(aes192_cbc_vectors));
-
-		case GNUTLS_CIPHER_AES_256_CBC:
-			return test_cipher(cipher, V(aes256_cbc_vectors));
-
-		case GNUTLS_CIPHER_AES_128_GCM:
-			return test_cipher_aead(cipher, V(aes128_gcm_vectors));
-
-		case GNUTLS_CIPHER_AES_256_GCM:
-			return test_cipher_aead(cipher, V(aes256_gcm_vectors));
-
-		case GNUTLS_CIPHER_3DES_CBC:
-			return test_cipher(cipher, V(tdes_cbc_vectors));
+		case GNUTLS_CIPHER_UNKNOWN:
+		CASE(GNUTLS_CIPHER_AES_128_CBC, test_cipher, aes128_cbc_vectors);
+		CASE(GNUTLS_CIPHER_AES_192_CBC, test_cipher, aes192_cbc_vectors);
+		CASE(GNUTLS_CIPHER_AES_256_CBC, test_cipher, aes256_cbc_vectors);
+		CASE(GNUTLS_CIPHER_3DES_CBC, test_cipher, tdes_cbc_vectors);
+		CASE(GNUTLS_CIPHER_AES_128_GCM, test_cipher_aead, aes128_gcm_vectors);
+		CASE(GNUTLS_CIPHER_AES_256_GCM, test_cipher_aead, aes256_gcm_vectors);
+			break;
 		default:
 			return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
 	}
+
+	return 0;
 }
 
 /**
  * gnutls_mac_self_test:
+ * @all: if non-zero then tests to all ciphers are performed.
  * @mac: the message authentication algorithm to use
  *
  * This function will run self tests on the provided mac.
@@ -632,28 +639,33 @@ int gnutls_cipher_self_test(gnutls_cipher_algorithm_t cipher)
  *
  * Since: 3.3.0
  **/
-int gnutls_mac_self_test(gnutls_mac_algorithm_t mac)
+int gnutls_mac_self_test(unsigned all, gnutls_mac_algorithm_t mac)
 {
+int ret;
+
+	if (all != 0)
+		mac = GNUTLS_MAC_UNKNOWN;
+
 	switch (mac) {
-		case GNUTLS_MAC_MD5:
-			return test_mac(mac, V(hmac_md5_vectors));
-		case GNUTLS_MAC_SHA1:
-			return test_mac(mac, V(hmac_sha1_vectors));
-		case GNUTLS_MAC_SHA224:
-			return test_mac(mac, V(hmac_sha224_vectors));
-		case GNUTLS_MAC_SHA256:
-			return test_mac(mac, V(hmac_sha256_vectors));
-		case GNUTLS_MAC_SHA384:
-			return test_mac(mac, V(hmac_sha384_vectors));
-		case GNUTLS_MAC_SHA512:
-			return test_mac(mac, V(hmac_sha512_vectors));
+		case GNUTLS_MAC_UNKNOWN:
+		CASE(GNUTLS_MAC_MD5, test_mac, hmac_md5_vectors);
+		CASE(GNUTLS_MAC_SHA1, test_mac, hmac_sha1_vectors);
+		CASE(GNUTLS_MAC_SHA224, test_mac, hmac_sha224_vectors);
+		CASE(GNUTLS_MAC_SHA256, test_mac, hmac_sha256_vectors);
+		CASE(GNUTLS_MAC_SHA384, test_mac, hmac_sha384_vectors);
+		CASE(GNUTLS_MAC_SHA512, test_mac, hmac_sha512_vectors);
+
+			break;
 		default:
 			return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
 	}
+	
+	return 0;
 }
 
 /**
  * gnutls_digest_self_test:
+ * @all: if non-zero then tests to all ciphers are performed.
  * @digest: the digest algorithm to use
  *
  * This function will run self tests on the provided digest.
@@ -662,22 +674,26 @@ int gnutls_mac_self_test(gnutls_mac_algorithm_t mac)
  *
  * Since: 3.3.0
  **/
-int gnutls_digest_self_test(gnutls_digest_algorithm_t digest)
+int gnutls_digest_self_test(unsigned all, gnutls_digest_algorithm_t digest)
 {
+int ret;
+
+	if (all != 0)
+		digest = GNUTLS_DIG_UNKNOWN;
+
 	switch (digest) {
-		case GNUTLS_DIG_MD5:
-			return test_digest(digest, V(md5_vectors));
-		case GNUTLS_DIG_SHA1:
-			return test_digest(digest, V(sha1_vectors));
-		case GNUTLS_DIG_SHA224:
-			return test_digest(digest, V(sha224_vectors));
-		case GNUTLS_DIG_SHA256:
-			return test_digest(digest, V(sha256_vectors));
-		case GNUTLS_DIG_SHA384:
-			return test_digest(digest, V(sha384_vectors));
-		case GNUTLS_DIG_SHA512:
-			return test_digest(digest, V(sha512_vectors));
+		case GNUTLS_DIG_UNKNOWN:
+		CASE(GNUTLS_DIG_MD5, test_digest, md5_vectors);
+		CASE(GNUTLS_DIG_SHA1, test_digest, sha1_vectors);
+		CASE(GNUTLS_DIG_SHA224, test_digest, sha224_vectors);
+		CASE(GNUTLS_DIG_SHA256, test_digest, sha256_vectors);
+		CASE(GNUTLS_DIG_SHA384, test_digest, sha384_vectors);
+		CASE(GNUTLS_DIG_SHA512, test_digest, sha512_vectors);
+			
+			break;
 		default:
 			return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
 	}
+
+	return 0;
 }
