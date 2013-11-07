@@ -897,7 +897,7 @@ void dh_info (FILE* infile, FILE* outfile, common_info_st * ci)
   params.size = size;
 
   ret =
-    gnutls_dh_params_import_pkcs3 (dh_params, &params, GNUTLS_X509_FMT_PEM);
+    gnutls_dh_params_import_pkcs3 (dh_params, &params, ci->incert_format);
   if (ret < 0)
     {
       fprintf (stderr, "Error parsing dh params: %s\n", gnutls_strerror (ret));

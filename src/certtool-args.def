@@ -309,7 +309,7 @@ flag = {
 
 flag = {
     name      = inder;
-    descrip   = "Use DER format for input certificates and private keys";
+    descrip   = "Use DER format for input certificates, private keys, and DH parameters ";
     disabled;
     disable   = "no";
     doc       = "The input files will be assumed to be in DER or RAW format. 
