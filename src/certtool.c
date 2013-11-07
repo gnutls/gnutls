@@ -1147,6 +1147,7 @@ cmd_parser (int argc, char **argv)
 
   cinfo.pkcs8 = HAVE_OPT(PKCS8);
   cinfo.incert_format = incert_format;
+  cinfo.outcert_format = outcert_format;
 
   if (HAVE_OPT(LOAD_CERTIFICATE))
     cinfo.cert = OPT_ARG(LOAD_CERTIFICATE);

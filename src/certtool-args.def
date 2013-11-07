@@ -324,7 +324,7 @@ flag = {
 
 flag = {
     name      = outder;
-    descrip   = "Use DER format for output certificates and private keys";
+    descrip   = "Use DER format for output certificates, private keys, and DH parameters";
     disabled;
     disable   = "no";
     doc       = "The output will be in DER or RAW format.";

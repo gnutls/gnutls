@@ -912,18 +912,26 @@ void dh_info (FILE* infile, FILE* outfile, common_info_st * ci)
       exit (1);
     }
     
-  print_dh_info (outfile, &p, &g, q_bits, ci->cprint);
+  if (ci->outcert_format == GNUTLS_X509_FMT_PEM)
+    print_dh_info (outfile, &p, &g, q_bits, ci->cprint);
 
   if (!ci->cprint)
     {                             /* generate a PKCS#3 structure */
     size_t len = buffer_size;
 
-    ret = gnutls_dh_params_export_pkcs3 (dh_params, GNUTLS_X509_FMT_PEM,
+    ret = gnutls_dh_params_export_pkcs3 (dh_params, ci->outcert_format,
                                          buffer, &len);
 
     if (ret == 0)
       {
-        fprintf (outfile, "\n%s", buffer);
+        if (ci->outcert_format == GNUTLS_X509_FMT_PEM)
+          {
+            fprintf (outfile, "\n%s", buffer);
+          }
+        else
+          {
+            fwrite (buffer, 1, len, outfile);
+          }
       }
     else
       {

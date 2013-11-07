@@ -39,6 +39,7 @@ typedef struct common_info
   const char *pubkey;
   int pkcs8;
   int incert_format;
+  int outcert_format;
   const char *cert;
 
   const char *request;
