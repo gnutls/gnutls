@@ -79,7 +79,7 @@ COBJECTS = gnutls_range.c gnutls_record.c \
 	random.c crypto-api.c gnutls_privkey.c gnutls_pcert.c		\
 	gnutls_pubkey.c locks.c gnutls_dtls.c system_override.c	\
 	crypto-backend.c verify-tofu.c pin.c tpm.c \
-	crypto-selftests.c
+	crypto-selftests.c crypto-selftests-pk.c
 
 if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \

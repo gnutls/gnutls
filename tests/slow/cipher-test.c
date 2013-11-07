@@ -38,6 +38,10 @@ int main(int argc, char **argv)
     if (gnutls_mac_self_test(1, 0) < 0)
         return 1;
 
-	gnutls_global_deinit();
-	return 0;
+    /* PK */
+    if (gnutls_pk_self_test(1, 0) < 0)
+        return 1;
+
+    gnutls_global_deinit ();
+    return 0;
 }

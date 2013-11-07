@@ -2093,6 +2093,7 @@ void gnutls_certificate_set_pin_function(gnutls_certificate_credentials_t,
 int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher);
 int gnutls_mac_self_test(unsigned all, gnutls_mac_algorithm_t mac);
 int gnutls_digest_self_test(unsigned all, gnutls_digest_algorithm_t digest);
+int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk);
 
 
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
