@@ -1,3 +1,4 @@
+#include <config.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,6 +18,10 @@ tls_log_func (int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
+#ifndef ENABLE_SELF_CHECKS
+# include "../../lib/crypto-selftests.c"
+# include "../../lib/crypto-selftests-pk.c"
+#endif
 
 int main(int argc, char **argv)
 {

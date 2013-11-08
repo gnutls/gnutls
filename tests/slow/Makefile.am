@@ -24,7 +24,13 @@ AM_CPPFLAGS = -I$(top_srcdir)/lib/includes		\
 
 AM_LDFLAGS = -no-install
 LDADD = ../libutils.la \
-	../../lib/libgnutls.la $(LTLIBGCRYPT) $(LIBSOCKET)
+	$(top_builddir)/lib/libgnutls.la $(LTLIBGCRYPT) $(LIBSOCKET)
+
+if !ENABLE_SELF_CHECKS
+cipher_test_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_builddir)/lib/ -I$(top_builddir)/gl/
+else
+cipher_test_CPPFLAGS = $(AM_CPPFLAGS)
+endif
 
 ctests = gendh keygen cipher-test
 
