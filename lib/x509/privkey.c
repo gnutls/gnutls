@@ -1500,6 +1500,10 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
  * This function will generate a random private key. Note that this
  * function must be called on an empty private key.
  *
+ * Note that when generating an elliptic curve key, the curve
+ * can be substituted in the place of the bits parameter using the
+ * GNUTLS_CURVE_TO_BITS() macro.
+ *
  * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -1521,7 +1525,12 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
   gnutls_pk_params_init(&key->params);
   
   if (algo == GNUTLS_PK_EC)
-    bits = _gnutls_ecc_bits_to_curve(bits);
+    {
+      if (GNUTLS_BITS_ARE_CURVE(bits))
+        bits = GNUTLS_BITS_TO_CURVE(bits);
+      else
+        bits = _gnutls_ecc_bits_to_curve(bits);
+    }
 
   ret = _gnutls_pk_generate (algo, bits, &key->params);
   if (ret < 0)
