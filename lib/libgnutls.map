@@ -931,6 +931,7 @@ GNUTLS_3_1_0 {
 	gnutls_pk_self_test;
 	gnutls_mac_self_test;
 	gnutls_digest_self_test;
+	gnutls_privkey_generate;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
