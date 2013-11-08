@@ -760,7 +760,7 @@ gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t obj)
 /**
  * gnutls_pkcs11_obj_export:
  * @obj: Holds the object
- * @output_data: will contain a certificate PEM or DER encoded
+ * @output_data: will contain the object data
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
  *
@@ -771,9 +771,6 @@ gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t obj)
  * If the buffer provided is not long enough to hold the output, then
  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
  * be returned.
- *
- * If the structure is PEM encoded, it will have a header
- * of "BEGIN CERTIFICATE".
  *
  * Returns: In case of failure a negative error code will be
  *   returned, and %GNUTLS_E_SUCCESS (0) on success.
@@ -805,16 +802,13 @@ gnutls_pkcs11_obj_export (gnutls_pkcs11_obj_t obj,
 /**
  * gnutls_pkcs11_obj_export2:
  * @obj: Holds the object
- * @out: will contain a certificate PEM or DER encoded
+ * @out: will contain the object data
  *
  * This function will export the PKCS11 object data.  It is normal for
  * data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
  * will be returned.
  *
  * The output buffer is allocated using gnutls_malloc().
- *
- * If the structure is PEM encoded, it will have a header
- * of "BEGIN CERTIFICATE".
  *
  * Returns: In case of failure a negative error code will be
  *   returned, and %GNUTLS_E_SUCCESS (0) on success.
@@ -1052,7 +1046,7 @@ finish:
   return ret;
 }
 
-/* imports a raw certificate from a token to a pkcs11_obj_t structure.
+/* imports an object from a token to a pkcs11_obj_t structure.
  */
 static int
 pkcs11_obj_import (ck_object_class_t class, gnutls_pkcs11_obj_t obj,
