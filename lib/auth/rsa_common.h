@@ -28,12 +28,12 @@
  */
 
 #ifndef AUTH_RSA_COMMON
-# define AUTH_RSA_COMMON
+#define AUTH_RSA_COMMON
 
 #include <abstract_int.h>
 
 int
-_gnutls_get_public_rsa_params (gnutls_session_t session,
-                               gnutls_pk_params_st * params);
+_gnutls_get_public_rsa_params(gnutls_session_t session,
+			      gnutls_pk_params_st * params);
 
 #endif

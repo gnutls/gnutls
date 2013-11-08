@@ -43,7 +43,7 @@ typedef struct _Eina_Benchmark Eina_Benchmark;
  * @typedef Eina_Benchmark_Specimens
  * Type for a test function to be called when running a benchmark.
  */
-typedef void (*Eina_Benchmark_Specimens)(int request);
+typedef void (*Eina_Benchmark_Specimens) (int request);
 
 /**
  * @def EINA_BENCHMARK
@@ -55,16 +55,14 @@ typedef void (*Eina_Benchmark_Specimens)(int request);
  */
 #define EINA_BENCHMARK(function) ((Eina_Benchmark_Specimens)function)
 
-EAPI Eina_Benchmark * eina_benchmark_new(const char *name,
-                                         const char *run);
-EAPI void             eina_benchmark_free(Eina_Benchmark *bench);
-EAPI Eina_Bool        eina_benchmark_register(Eina_Benchmark *bench,
-                                              const char *name,
-                                              Eina_Benchmark_Specimens bench_cb,
-                                              int count_start,
-                                              int count_end,
-                                              int count_set);
-EAPI Eina_Array *     eina_benchmark_run(Eina_Benchmark *bench);
+EAPI Eina_Benchmark *eina_benchmark_new(const char *name, const char *run);
+EAPI void eina_benchmark_free(Eina_Benchmark * bench);
+EAPI Eina_Bool eina_benchmark_register(Eina_Benchmark * bench,
+				       const char *name,
+				       Eina_Benchmark_Specimens bench_cb,
+				       int count_start,
+				       int count_end, int count_set);
+EAPI Eina_Array *eina_benchmark_run(Eina_Benchmark * bench);
 
 /**
  * @}
@@ -74,4 +72,4 @@ EAPI Eina_Array *     eina_benchmark_run(Eina_Benchmark *bench);
  * @}
  */
 
-#endif /* EINA_BENCHMARK_H_ */
+#endif				/* EINA_BENCHMARK_H_ */

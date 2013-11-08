@@ -29,30 +29,25 @@
 
 void *gnutls_rnd_ctx;
 
-int
-_gnutls_rnd_init (void)
+int _gnutls_rnd_init(void)
 {
-  if (_gnutls_rnd_ops.init != NULL)
-    {
-      if (_gnutls_rnd_ops.init (&gnutls_rnd_ctx) < 0)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_RANDOM_FAILED;
-        }
-    }
+	if (_gnutls_rnd_ops.init != NULL) {
+		if (_gnutls_rnd_ops.init(&gnutls_rnd_ctx) < 0) {
+			gnutls_assert();
+			return GNUTLS_E_RANDOM_FAILED;
+		}
+	}
 
-  return 0;
+	return 0;
 }
 
-void
-_gnutls_rnd_deinit (void)
+void _gnutls_rnd_deinit(void)
 {
-  if (_gnutls_rnd_ops.deinit != NULL)
-    {
-      _gnutls_rnd_ops.deinit (gnutls_rnd_ctx);
-    }
+	if (_gnutls_rnd_ops.deinit != NULL) {
+		_gnutls_rnd_ops.deinit(gnutls_rnd_ctx);
+	}
 
-  return;
+	return;
 }
 
 /**
@@ -68,10 +63,9 @@ _gnutls_rnd_deinit (void)
  *
  * Since: 2.12.0
  **/
-int
-gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len)
+int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
-  return _gnutls_rnd(level, data, len);
+	return _gnutls_rnd(level, data, len);
 }
 
 /**
@@ -85,8 +79,7 @@ gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len)
  *
  * Since: 3.1.7
  **/
-void
-gnutls_rnd_refresh ()
+void gnutls_rnd_refresh()
 {
-  _gnutls_rnd_refresh();
+	_gnutls_rnd_refresh();
 }

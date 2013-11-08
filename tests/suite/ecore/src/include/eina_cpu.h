@@ -21,19 +21,18 @@
 
 #include "eina_types.h"
 
-typedef enum _Eina_Cpu_Features
-{
-   EINA_CPU_MMX = 0x00000001,
-   EINA_CPU_SSE = 0x00000002,
-   EINA_CPU_SSE2 = 0x00000004,
-   EINA_CPU_SSE3 = 0x00000008,
-   /* TODO 3DNow! */
-   EINA_CPU_ALTIVEC = 0x00000010,
-   EINA_CPU_VIS = 0x00000020,
-   EINA_CPU_NEON = 0x00000040,
+typedef enum _Eina_Cpu_Features {
+	EINA_CPU_MMX = 0x00000001,
+	EINA_CPU_SSE = 0x00000002,
+	EINA_CPU_SSE2 = 0x00000004,
+	EINA_CPU_SSE3 = 0x00000008,
+	/* TODO 3DNow! */
+	EINA_CPU_ALTIVEC = 0x00000010,
+	EINA_CPU_VIS = 0x00000020,
+	EINA_CPU_NEON = 0x00000040,
 } Eina_Cpu_Features;
 
 EAPI Eina_Cpu_Features eina_cpu_features_get(void);
-EAPI int               eina_cpu_count(void);
+EAPI int eina_cpu_count(void);
 
-#endif /* EINA_CPU_H_ */
+#endif				/* EINA_CPU_H_ */

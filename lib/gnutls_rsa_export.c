@@ -52,15 +52,16 @@
  * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
  **/
 int
-gnutls_rsa_params_import_raw (gnutls_rsa_params_t rsa_params,
-                              const gnutls_datum_t * m,
-                              const gnutls_datum_t * e,
-                              const gnutls_datum_t * d,
-                              const gnutls_datum_t * p,
-                              const gnutls_datum_t * q,
-                              const gnutls_datum_t * u)
+gnutls_rsa_params_import_raw(gnutls_rsa_params_t rsa_params,
+			     const gnutls_datum_t * m,
+			     const gnutls_datum_t * e,
+			     const gnutls_datum_t * d,
+			     const gnutls_datum_t * p,
+			     const gnutls_datum_t * q,
+			     const gnutls_datum_t * u)
 {
-  return gnutls_x509_privkey_import_rsa_raw (rsa_params, m, e, d, p, q, u);
+	return gnutls_x509_privkey_import_rsa_raw(rsa_params, m, e, d, p,
+						  q, u);
 }
 
 /**
@@ -71,19 +72,17 @@ gnutls_rsa_params_import_raw (gnutls_rsa_params_t rsa_params,
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
  **/
-int
-gnutls_rsa_params_init (gnutls_rsa_params_t * rsa_params)
+int gnutls_rsa_params_init(gnutls_rsa_params_t * rsa_params)
 {
-  int ret;
+	int ret;
 
-  ret = gnutls_x509_privkey_init (rsa_params);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = gnutls_x509_privkey_init(rsa_params);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -92,10 +91,9 @@ gnutls_rsa_params_init (gnutls_rsa_params_t * rsa_params)
  *
  * This function will deinitialize the RSA parameters structure.
  **/
-void
-gnutls_rsa_params_deinit (gnutls_rsa_params_t rsa_params)
+void gnutls_rsa_params_deinit(gnutls_rsa_params_t rsa_params)
 {
-  gnutls_x509_privkey_deinit (rsa_params);
+	gnutls_x509_privkey_deinit(rsa_params);
 }
 
 /**
@@ -108,10 +106,9 @@ gnutls_rsa_params_deinit (gnutls_rsa_params_t rsa_params)
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
  **/
-int
-gnutls_rsa_params_cpy (gnutls_rsa_params_t dst, gnutls_rsa_params_t src)
+int gnutls_rsa_params_cpy(gnutls_rsa_params_t dst, gnutls_rsa_params_t src)
 {
-  return gnutls_x509_privkey_cpy (dst, src);
+	return gnutls_x509_privkey_cpy(dst, src);
 }
 
 /**
@@ -131,9 +128,10 @@ gnutls_rsa_params_cpy (gnutls_rsa_params_t dst, gnutls_rsa_params_t src)
  * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
  **/
 int
-gnutls_rsa_params_generate2 (gnutls_rsa_params_t params, unsigned int bits)
+gnutls_rsa_params_generate2(gnutls_rsa_params_t params, unsigned int bits)
 {
-  return gnutls_x509_privkey_generate (params, GNUTLS_PK_RSA, bits, 0);
+	return gnutls_x509_privkey_generate(params, GNUTLS_PK_RSA, bits,
+					    0);
 }
 
 /**
@@ -151,11 +149,11 @@ gnutls_rsa_params_generate2 (gnutls_rsa_params_t params, unsigned int bits)
  * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
  **/
 int
-gnutls_rsa_params_import_pkcs1 (gnutls_rsa_params_t params,
-                                const gnutls_datum_t * pkcs1_params,
-                                gnutls_x509_crt_fmt_t format)
+gnutls_rsa_params_import_pkcs1(gnutls_rsa_params_t params,
+			       const gnutls_datum_t * pkcs1_params,
+			       gnutls_x509_crt_fmt_t format)
 {
-  return gnutls_x509_privkey_import (params, pkcs1_params, format);
+	return gnutls_x509_privkey_import(params, pkcs1_params, format);
 }
 
 /**
@@ -175,13 +173,13 @@ gnutls_rsa_params_import_pkcs1 (gnutls_rsa_params_t params,
  * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
  **/
 int
-gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
-                                gnutls_x509_crt_fmt_t format,
-                                unsigned char *params_data,
-                                size_t * params_data_size)
+gnutls_rsa_params_export_pkcs1(gnutls_rsa_params_t params,
+			       gnutls_x509_crt_fmt_t format,
+			       unsigned char *params_data,
+			       size_t * params_data_size)
 {
-  return gnutls_x509_privkey_export (params, format,
-                                     params_data, params_data_size);
+	return gnutls_x509_privkey_export(params, format,
+					  params_data, params_data_size);
 }
 
 /**
@@ -202,25 +200,24 @@ gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
  * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
  **/
 int
-gnutls_rsa_params_export_raw (gnutls_rsa_params_t rsa,
-                              gnutls_datum_t * m, gnutls_datum_t * e,
-                              gnutls_datum_t * d, gnutls_datum_t * p,
-                              gnutls_datum_t * q, gnutls_datum_t * u,
-                              unsigned int *bits)
+gnutls_rsa_params_export_raw(gnutls_rsa_params_t rsa,
+			     gnutls_datum_t * m, gnutls_datum_t * e,
+			     gnutls_datum_t * d, gnutls_datum_t * p,
+			     gnutls_datum_t * q, gnutls_datum_t * u,
+			     unsigned int *bits)
 {
-  int ret;
+	int ret;
 
-  ret = gnutls_x509_privkey_export_rsa_raw (rsa, m, e, d, p, q, u);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = gnutls_x509_privkey_export_rsa_raw(rsa, m, e, d, p, q, u);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  if (bits)
-    *bits = _gnutls_mpi_get_nbits (rsa->params.params[3]);
+	if (bits)
+		*bits = _gnutls_mpi_get_nbits(rsa->params.params[3]);
 
-  return 0;
+	return 0;
 }
 
-#endif /* ENABLE_RSA_EXPORT */
+#endif				/* ENABLE_RSA_EXPORT */

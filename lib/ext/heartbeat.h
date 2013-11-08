@@ -38,6 +38,6 @@
 
 extern extension_entry_st ext_mod_heartbeat;
 
-int _gnutls_heartbeat_handle (gnutls_session_t session, mbuffer_st * bufel);
-int _gnutls_heartbeat_enabled (gnutls_session_t session, int local);
+int _gnutls_heartbeat_handle(gnutls_session_t session, mbuffer_st * bufel);
+int _gnutls_heartbeat_enabled(gnutls_session_t session, int local);
 #endif

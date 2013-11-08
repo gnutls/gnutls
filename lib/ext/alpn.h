@@ -25,14 +25,13 @@
 #define MAX_ALPN_PROTOCOLS 8
 #define MAX_ALPN_PROTOCOL_NAME 32
 
-typedef struct
-{
-  uint8_t protocols[MAX_ALPN_PROTOCOLS][MAX_ALPN_PROTOCOL_NAME];
-  unsigned protocol_size[MAX_ALPN_PROTOCOLS];
-  unsigned size;
-  uint8_t *selected_protocol;
-  unsigned selected_protocol_size;
-  unsigned flags;
+typedef struct {
+	uint8_t protocols[MAX_ALPN_PROTOCOLS][MAX_ALPN_PROTOCOL_NAME];
+	unsigned protocol_size[MAX_ALPN_PROTOCOLS];
+	unsigned size;
+	uint8_t *selected_protocol;
+	unsigned selected_protocol_size;
+	unsigned flags;
 } alpn_ext_st;
 
 extern extension_entry_st ext_mod_alpn;

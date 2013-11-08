@@ -26,7 +26,7 @@
 #include <xssl.h>
 
 #ifndef SSIZE_MAX
-# define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
+#define SSIZE_MAX ((ssize_t) (SIZE_MAX / 2))
 #endif
 
 /**
@@ -49,79 +49,77 @@
  * Since: 3.1.7
  **/
 ssize_t
-xssl_getdelim (xssl_t sbuf, char **lineptr, size_t *n, int delimiter)
+xssl_getdelim(xssl_t sbuf, char **lineptr, size_t * n, int delimiter)
 {
-  ssize_t result;
-  size_t cur_len = 0;
+	ssize_t result;
+	size_t cur_len = 0;
 
-  if (lineptr == NULL || n == NULL || sbuf == NULL)
-    {
-      return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-    }
+	if (lineptr == NULL || n == NULL || sbuf == NULL) {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
-  if (*lineptr == NULL || *n == 0)
-    {
-      char *new_lineptr;
-      *n = 120;
-      new_lineptr = (char *) gnutls_realloc_fast (*lineptr, *n);
-      if (new_lineptr == NULL)
-        {
-          result = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-          goto fail;
-        }
-      *lineptr = new_lineptr;
-    }
+	if (*lineptr == NULL || *n == 0) {
+		char *new_lineptr;
+		*n = 120;
+		new_lineptr = (char *) gnutls_realloc_fast(*lineptr, *n);
+		if (new_lineptr == NULL) {
+			result = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto fail;
+		}
+		*lineptr = new_lineptr;
+	}
 
-  for (;;)
-    {
-      char c;
-      
-      result = xssl_read(sbuf, &c, 1);
-      if (result < 0)
-        {
-          gnutls_assert();
-          break;
-        }
+	for (;;) {
+		char c;
 
-      /* Make enough space for len+1 (for final NUL) bytes.  */
-      if (cur_len + 1 >= *n)
-        {
-          size_t needed_max =
-            SSIZE_MAX < SIZE_MAX ? (size_t) SSIZE_MAX + 1 : SIZE_MAX;
-          size_t needed = 2 * *n + 1;   /* Be generous. */
-          char *new_lineptr;
+		result = xssl_read(sbuf, &c, 1);
+		if (result < 0) {
+			gnutls_assert();
+			break;
+		}
 
-          if (needed_max < needed)
-            needed = needed_max;
-          if (cur_len + 1 >= needed)
-            {
-              result = gnutls_assert_val(GNUTLS_E_LARGE_PACKET);
-              goto fail;
-            }
+		/* Make enough space for len+1 (for final NUL) bytes.  */
+		if (cur_len + 1 >= *n) {
+			size_t needed_max =
+			    SSIZE_MAX <
+			    SIZE_MAX ? (size_t) SSIZE_MAX + 1 : SIZE_MAX;
+			size_t needed = 2 * *n + 1;	/* Be generous. */
+			char *new_lineptr;
 
-          new_lineptr = (char *) gnutls_realloc_fast (*lineptr, needed);
-          if (new_lineptr == NULL)
-            {
-              result = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-              goto fail;
-            }
+			if (needed_max < needed)
+				needed = needed_max;
+			if (cur_len + 1 >= needed) {
+				result =
+				    gnutls_assert_val
+				    (GNUTLS_E_LARGE_PACKET);
+				goto fail;
+			}
 
-          *lineptr = new_lineptr;
-          *n = needed;
-        }
+			new_lineptr =
+			    (char *) gnutls_realloc_fast(*lineptr, needed);
+			if (new_lineptr == NULL) {
+				result =
+				    gnutls_assert_val
+				    (GNUTLS_E_MEMORY_ERROR);
+				goto fail;
+			}
 
-      (*lineptr)[cur_len] = c;
-      cur_len++;
+			*lineptr = new_lineptr;
+			*n = needed;
+		}
 
-      if (c == delimiter)
-        break;
-    }
-  (*lineptr)[cur_len] = '\0';
+		(*lineptr)[cur_len] = c;
+		cur_len++;
 
-  if (cur_len != 0)
-    result = cur_len;
+		if (c == delimiter)
+			break;
+	}
+	(*lineptr)[cur_len] = '\0';
 
-fail:
+	if (cur_len != 0)
+		result = cur_len;
 
-  return result;
+      fail:
+
+	return result;
 }

@@ -44,109 +44,105 @@
  * Since: 2.12.0
  **/
 int
-gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
-                               const char *label,
-                               unsigned int key_usage, unsigned int flags
-                               /* GNUTLS_PKCS11_OBJ_FLAG_* */ )
+gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
+			      const char *label,
+			      unsigned int key_usage, unsigned int flags
+			      /* GNUTLS_PKCS11_OBJ_FLAG_* */ )
 {
-  int ret;
-  struct p11_kit_uri *info = NULL;
-  ck_rv_t rv;
-  struct ck_attribute a[12];
-  ck_object_class_t class = CKO_SECRET_KEY;
-  ck_object_handle_t obj;
-  ck_key_type_t keytype = CKK_GENERIC_SECRET;
-  ck_bool_t tval = 1;
-  int a_val;
-  uint8_t id[16];
-  struct pkcs11_session_info sinfo;
-  
-  memset(&sinfo, 0, sizeof(sinfo));
+	int ret;
+	struct p11_kit_uri *info = NULL;
+	ck_rv_t rv;
+	struct ck_attribute a[12];
+	ck_object_class_t class = CKO_SECRET_KEY;
+	ck_object_handle_t obj;
+	ck_key_type_t keytype = CKK_GENERIC_SECRET;
+	ck_bool_t tval = 1;
+	int a_val;
+	uint8_t id[16];
+	struct pkcs11_session_info sinfo;
 
-  ret = pkcs11_url_to_info (token_url, &info);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	memset(&sinfo, 0, sizeof(sinfo));
 
-  /* generate a unique ID */
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, id, sizeof (id));
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = pkcs11_url_to_info(token_url, &info);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  ret =
-    pkcs11_open_session (&sinfo, NULL, info,
-                         SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
-  p11_kit_uri_free (info);
+	/* generate a unique ID */
+	ret = _gnutls_rnd(GNUTLS_RND_NONCE, id, sizeof(id));
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret =
+	    pkcs11_open_session(&sinfo, NULL, info,
+				SESSION_WRITE |
+				pkcs11_obj_flags_to_int(flags));
+	p11_kit_uri_free(info);
 
-  /* FIXME: copy key usage flags */
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  a[0].type = CKA_CLASS;
-  a[0].value = &class;
-  a[0].value_len = sizeof (class);
-  a[1].type = CKA_VALUE;
-  a[1].value = key->data;
-  a[1].value_len = key->size;
-  a[2].type = CKA_TOKEN;
-  a[2].value = &tval;
-  a[2].value_len = sizeof (tval);
-  a[3].type = CKA_PRIVATE;
-  a[3].value = &tval;
-  a[3].value_len = sizeof (tval);
-  a[4].type = CKA_KEY_TYPE;
-  a[4].value = &keytype;
-  a[4].value_len = sizeof (keytype);
-  a[5].type = CKA_ID;
-  a[5].value = id;
-  a[5].value_len = sizeof (id);
+	/* FIXME: copy key usage flags */
 
-  a_val = 6;
+	a[0].type = CKA_CLASS;
+	a[0].value = &class;
+	a[0].value_len = sizeof(class);
+	a[1].type = CKA_VALUE;
+	a[1].value = key->data;
+	a[1].value_len = key->size;
+	a[2].type = CKA_TOKEN;
+	a[2].value = &tval;
+	a[2].value_len = sizeof(tval);
+	a[3].type = CKA_PRIVATE;
+	a[3].value = &tval;
+	a[3].value_len = sizeof(tval);
+	a[4].type = CKA_KEY_TYPE;
+	a[4].value = &keytype;
+	a[4].value_len = sizeof(keytype);
+	a[5].type = CKA_ID;
+	a[5].value = id;
+	a[5].value_len = sizeof(id);
 
-  if (label)
-    {
-      a[a_val].type = CKA_LABEL;
-      a[a_val].value = (void *) label;
-      a[a_val].value_len = strlen (label);
-      a_val++;
-    }
+	a_val = 6;
 
-  if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
-    tval = 1;
-  else
-    tval = 0;
+	if (label) {
+		a[a_val].type = CKA_LABEL;
+		a[a_val].value = (void *) label;
+		a[a_val].value_len = strlen(label);
+		a_val++;
+	}
 
-  a[a_val].type = CKA_SENSITIVE;
-  a[a_val].value = &tval;
-  a[a_val].value_len = sizeof (tval);
-  a_val++;
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
+		tval = 1;
+	else
+		tval = 0;
 
-  rv = pkcs11_create_object (sinfo.module, sinfo.pks, a, a_val, &obj);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("pkcs11: %s\n", pkcs11_strerror (rv));
-      ret = pkcs11_rv_to_err (rv);
-      goto cleanup;
-    }
+	a[a_val].type = CKA_SENSITIVE;
+	a[a_val].value = &tval;
+	a[a_val].value_len = sizeof(tval);
+	a_val++;
 
-  /* generated! 
-   */
+	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &obj);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		_gnutls_debug_log("pkcs11: %s\n", pkcs11_strerror(rv));
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
 
-  ret = 0;
+	/* generated! 
+	 */
 
-cleanup:
-  pkcs11_close_session (&sinfo);
+	ret = 0;
 
-  return ret;
+      cleanup:
+	pkcs11_close_session(&sinfo);
+
+	return ret;
 
 }

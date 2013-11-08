@@ -61,7 +61,7 @@
  */
 typedef struct _Eina_Module Eina_Module;
 
-typedef Eina_Bool (*Eina_Module_Cb)(Eina_Module *m, void *data);
+typedef Eina_Bool(*Eina_Module_Cb) (Eina_Module * m, void *data);
 
 /**
  * @typedef Eina_Module_Init
@@ -71,7 +71,7 @@ typedef Eina_Bool (*Eina_Module_Cb)(Eina_Module *m, void *data);
  * means the module was successfully initialized.
  * @see Eina_Module_Shutdown
  */
-typedef Eina_Bool (*Eina_Module_Init)(void);
+typedef Eina_Bool(*Eina_Module_Init) (void);
 
 /**
  * @typedef Eina_Module_Shutdown
@@ -79,7 +79,7 @@ typedef Eina_Bool (*Eina_Module_Init)(void);
  * __eina_module_shutdown, it will be called before calling dlclose()
  * @see Eina_Module_Init
  */
-typedef void (*Eina_Module_Shutdown)(void);
+typedef void (*Eina_Module_Shutdown) (void);
 
 /**
  * @def EINA_MODULE_INIT
@@ -108,43 +108,44 @@ extern EAPI Eina_Error EINA_ERROR_WRONG_MODULE;
  */
 extern EAPI Eina_Error EINA_ERROR_MODULE_INIT_FAILED;
 
-EAPI Eina_Module *
-eina_module_new(const char *file) EINA_MALLOC EINA_WARN_UNUSED_RESULT EINA_ARG_NONNULL(1);
-EAPI Eina_Bool
-eina_module_free(Eina_Module *m) EINA_ARG_NONNULL(1);
-EAPI Eina_Bool
-eina_module_load(Eina_Module *module) EINA_ARG_NONNULL(1);
-EAPI Eina_Bool
-eina_module_unload(Eina_Module *m) EINA_ARG_NONNULL(1);
-EAPI void *
-eina_module_symbol_get(const Eina_Module *module, const char *symbol) EINA_PURE EINA_ARG_NONNULL(1, 2) EINA_WARN_UNUSED_RESULT;
-EAPI const char *
-eina_module_file_get(const Eina_Module *m) EINA_PURE EINA_WARN_UNUSED_RESULT EINA_ARG_NONNULL(1);
+EAPI Eina_Module *eina_module_new(const char *file)
+EINA_MALLOC EINA_WARN_UNUSED_RESULT EINA_ARG_NONNULL(1);
+EAPI Eina_Bool eina_module_free(Eina_Module * m) EINA_ARG_NONNULL(1);
+EAPI Eina_Bool eina_module_load(Eina_Module * module) EINA_ARG_NONNULL(1);
+EAPI Eina_Bool eina_module_unload(Eina_Module * m) EINA_ARG_NONNULL(1);
+EAPI void *eina_module_symbol_get(const Eina_Module * module,
+				  const char *symbol)
+EINA_PURE EINA_ARG_NONNULL(1, 2) EINA_WARN_UNUSED_RESULT;
+EAPI const char *eina_module_file_get(const Eina_Module * m)
+EINA_PURE EINA_WARN_UNUSED_RESULT EINA_ARG_NONNULL(1);
 
-EAPI char *
-eina_module_symbol_path_get(const void *symbol, const char *sub_dir) EINA_PURE EINA_MALLOC EINA_ARG_NONNULL(1, 2);
-EAPI char *
-eina_module_environment_path_get(const char *env, const char *sub_dir) EINA_PURE EINA_MALLOC EINA_ARG_NONNULL(1, 2);
+EAPI char *eina_module_symbol_path_get(const void *symbol,
+				       const char *sub_dir)
+EINA_PURE EINA_MALLOC EINA_ARG_NONNULL(1, 2);
+EAPI char *eina_module_environment_path_get(const char *env,
+					    const char *sub_dir)
+EINA_PURE EINA_MALLOC EINA_ARG_NONNULL(1, 2);
 
-EAPI Eina_Array *
-eina_module_arch_list_get(Eina_Array *array, const char *path, const char *arch);
-EAPI Eina_Array *
-eina_module_list_get(Eina_Array *array, const char *path, Eina_Bool recursive, Eina_Module_Cb cb, void *data) EINA_MALLOC EINA_WARN_UNUSED_RESULT;
-EAPI void
-eina_module_list_load(Eina_Array *list) EINA_ARG_NONNULL(1);
-EAPI void
-eina_module_list_unload(Eina_Array *list) EINA_ARG_NONNULL(1);
-EAPI void
-eina_module_list_free(Eina_Array *list) EINA_ARG_NONNULL(1);
-EAPI Eina_Module *
-eina_module_find(const Eina_Array *array, const char *module) EINA_ARG_NONNULL(1, 2);
-
-/**
- * @}
- */
+EAPI Eina_Array *eina_module_arch_list_get(Eina_Array * array,
+					   const char *path,
+					   const char *arch);
+EAPI Eina_Array *eina_module_list_get(Eina_Array * array, const char *path,
+				      Eina_Bool recursive,
+				      Eina_Module_Cb cb, void *data)
+EINA_MALLOC EINA_WARN_UNUSED_RESULT;
+EAPI void eina_module_list_load(Eina_Array * list) EINA_ARG_NONNULL(1);
+EAPI void eina_module_list_unload(Eina_Array * list) EINA_ARG_NONNULL(1);
+EAPI void eina_module_list_free(Eina_Array * list) EINA_ARG_NONNULL(1);
+EAPI Eina_Module *eina_module_find(const Eina_Array * array,
+				   const char *module) EINA_ARG_NONNULL(1,
+									2);
 
 /**
  * @}
  */
 
-#endif /*EINA_MODULE_H_*/
+/**
+ * @}
+ */
+
+#endif				/*EINA_MODULE_H_ */

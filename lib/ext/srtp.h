@@ -26,14 +26,13 @@
 
 #define MAX_SRTP_PROFILES 4
 
-typedef struct
-{
-  gnutls_srtp_profile_t profiles[MAX_SRTP_PROFILES];
-  unsigned profiles_size;
-  gnutls_srtp_profile_t selected_profile;
-  uint8_t mki[256];
-  unsigned mki_size;
-  unsigned int mki_received;
+typedef struct {
+	gnutls_srtp_profile_t profiles[MAX_SRTP_PROFILES];
+	unsigned profiles_size;
+	gnutls_srtp_profile_t selected_profile;
+	uint8_t mki[256];
+	unsigned mki_size;
+	unsigned int mki_received;
 } srtp_ext_st;
 
 extern extension_entry_st ext_mod_srtp;

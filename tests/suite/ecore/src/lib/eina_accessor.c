@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -64,10 +64,10 @@ static const char EINA_MAGIC_ACCESSOR_STR[] = "Eina Accessor";
  *
  * @see eina_init()
  */
-Eina_Bool
-eina_accessor_init(void)
+Eina_Bool eina_accessor_init(void)
 {
-   return eina_magic_string_set(EINA_MAGIC_ACCESSOR, EINA_MAGIC_ACCESSOR_STR);
+	return eina_magic_string_set(EINA_MAGIC_ACCESSOR,
+				     EINA_MAGIC_ACCESSOR_STR);
 }
 
 /**
@@ -81,10 +81,9 @@ eina_accessor_init(void)
  *
  * @see eina_shutdown()
  */
-Eina_Bool
-eina_accessor_shutdown(void)
+Eina_Bool eina_accessor_shutdown(void)
 {
-   return EINA_TRUE;
+	return EINA_TRUE;
 }
 
 /*============================================================================*
@@ -118,13 +117,12 @@ eina_accessor_shutdown(void)
  *
  * This function frees @p accessor if it is not @c NULL;
  */
-EAPI void
-eina_accessor_free(Eina_Accessor *accessor)
+EAPI void eina_accessor_free(Eina_Accessor * accessor)
 {
-   EINA_MAGIC_CHECK_ACCESSOR(accessor);
-   EINA_SAFETY_ON_NULL_RETURN(accessor);
-   EINA_SAFETY_ON_NULL_RETURN(accessor->free);
-   accessor->free(accessor);
+	EINA_MAGIC_CHECK_ACCESSOR(accessor);
+	EINA_SAFETY_ON_NULL_RETURN(accessor);
+	EINA_SAFETY_ON_NULL_RETURN(accessor->free);
+	accessor->free(accessor);
 }
 
 /**
@@ -136,13 +134,12 @@ eina_accessor_free(Eina_Accessor *accessor)
  * This function returns the container which created @p accessor. If
  * @p accessor is @c NULL, this function returns @c NULL.
  */
-EAPI void *
-eina_accessor_container_get(Eina_Accessor *accessor)
+EAPI void *eina_accessor_container_get(Eina_Accessor * accessor)
 {
-   EINA_MAGIC_CHECK_ACCESSOR(accessor);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(accessor,                NULL);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(accessor->get_container, NULL);
-   return accessor->get_container(accessor);
+	EINA_MAGIC_CHECK_ACCESSOR(accessor);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(accessor, NULL);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(accessor->get_container, NULL);
+	return accessor->get_container(accessor);
 }
 
 /**
@@ -159,15 +156,14 @@ eina_accessor_container_get(Eina_Accessor *accessor)
  * #EINA_FALSE is returned, otherwise EINA_TRUE is returned.
  */
 EAPI Eina_Bool
-eina_accessor_data_get(Eina_Accessor *accessor,
-                       unsigned int position,
-                       void **data)
+eina_accessor_data_get(Eina_Accessor * accessor,
+		       unsigned int position, void **data)
 {
-   EINA_MAGIC_CHECK_ACCESSOR(accessor);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(accessor,         EINA_FALSE);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(accessor->get_at, EINA_FALSE);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(data,             EINA_FALSE);
-   return accessor->get_at(accessor, position, data);
+	EINA_MAGIC_CHECK_ACCESSOR(accessor);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(accessor, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(accessor->get_at, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_FALSE);
+	return accessor->get_at(accessor, position, data);
 }
 
 /**
@@ -187,34 +183,33 @@ eina_accessor_data_get(Eina_Accessor *accessor,
  * immediately.
  */
 EAPI void
-eina_accessor_over(Eina_Accessor *accessor,
-                   Eina_Each_Cb cb,
-                   unsigned int start,
-                   unsigned int end,
-                   const void *fdata)
+eina_accessor_over(Eina_Accessor * accessor,
+		   Eina_Each_Cb cb,
+		   unsigned int start, unsigned int end, const void *fdata)
 {
-   const void *container;
-   void *data;
-   unsigned int i;
+	const void *container;
+	void *data;
+	unsigned int i;
 
-   EINA_MAGIC_CHECK_ACCESSOR(accessor);
-   EINA_SAFETY_ON_NULL_RETURN(accessor);
-   EINA_SAFETY_ON_NULL_RETURN(accessor->get_container);
-   EINA_SAFETY_ON_NULL_RETURN(accessor->get_at);
-   EINA_SAFETY_ON_NULL_RETURN(cb);
-   EINA_SAFETY_ON_FALSE_RETURN(start < end);
+	EINA_MAGIC_CHECK_ACCESSOR(accessor);
+	EINA_SAFETY_ON_NULL_RETURN(accessor);
+	EINA_SAFETY_ON_NULL_RETURN(accessor->get_container);
+	EINA_SAFETY_ON_NULL_RETURN(accessor->get_at);
+	EINA_SAFETY_ON_NULL_RETURN(cb);
+	EINA_SAFETY_ON_FALSE_RETURN(start < end);
 
-   if (!eina_accessor_lock(accessor))
-      return ;
+	if (!eina_accessor_lock(accessor))
+		return;
 
-   container = accessor->get_container(accessor);
-   for (i = start; i < end && accessor->get_at(accessor, i, &data) == EINA_TRUE;
-        ++i)
-      if (cb(container, data, (void *)fdata) != EINA_TRUE)
-	 goto on_exit;
+	container = accessor->get_container(accessor);
+	for (i = start;
+	     i < end && accessor->get_at(accessor, i, &data) == EINA_TRUE;
+	     ++i)
+		if (cb(container, data, (void *) fdata) != EINA_TRUE)
+			goto on_exit;
 
- on_exit:
-   (void) eina_accessor_unlock(accessor);
+      on_exit:
+	(void) eina_accessor_unlock(accessor);
 }
 
 /**
@@ -228,15 +223,14 @@ eina_accessor_over(Eina_Accessor *accessor,
  * returned, otherwise #EINA_TRUE is returned. If the container
  * is not lockable, it will return EINA_TRUE.
  */
-EAPI Eina_Bool
-eina_accessor_lock(Eina_Accessor *accessor)
+EAPI Eina_Bool eina_accessor_lock(Eina_Accessor * accessor)
 {
-   EINA_MAGIC_CHECK_ACCESSOR(accessor);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(accessor, EINA_FALSE);
+	EINA_MAGIC_CHECK_ACCESSOR(accessor);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(accessor, EINA_FALSE);
 
-   if (accessor->lock)
-      return accessor->lock(accessor);
-   return EINA_TRUE;
+	if (accessor->lock)
+		return accessor->lock(accessor);
+	return EINA_TRUE;
 }
 
 /**
@@ -251,15 +245,14 @@ eina_accessor_lock(Eina_Accessor *accessor)
  * is returned. If the container is not lockable, it will return
  * EINA_TRUE.
  */
-EAPI Eina_Bool
-eina_accessor_unlock(Eina_Accessor *accessor)
+EAPI Eina_Bool eina_accessor_unlock(Eina_Accessor * accessor)
 {
-   EINA_MAGIC_CHECK_ACCESSOR(accessor);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(accessor, EINA_FALSE);
+	EINA_MAGIC_CHECK_ACCESSOR(accessor);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(accessor, EINA_FALSE);
 
-   if (accessor->unlock)
-      return accessor->unlock(accessor);
-   return EINA_TRUE;
+	if (accessor->unlock)
+		return accessor->unlock(accessor);
+	return EINA_TRUE;
 }
 
 /**

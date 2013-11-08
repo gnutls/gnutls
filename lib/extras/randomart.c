@@ -61,107 +61,106 @@
 #define	FLDBASE		8
 #define	FLDSIZE_Y	(FLDBASE + 1)
 #define	FLDSIZE_X	(FLDBASE * 2 + 1)
-char *
-_gnutls_key_fingerprint_randomart (uint8_t * dgst_raw, u_int dgst_raw_len,
-                                   const char *key_type, unsigned int key_size,
-                                   const char* prefix)
+char *_gnutls_key_fingerprint_randomart(uint8_t * dgst_raw,
+					u_int dgst_raw_len,
+					const char *key_type,
+					unsigned int key_size,
+					const char *prefix)
 {
-  /*
-   * Chars to be used after each other every time the worm
-   * intersects with itself.  Matter of taste.
-   */
-  const char augmentation_string[] = " .o+=*BOX@%&#/^SE";
-  char *retval, *p;
-  uint8_t field[FLDSIZE_X][FLDSIZE_Y];
-  unsigned int i, b;
-  int x, y;
-  const size_t len = sizeof(augmentation_string) - 2;
-  unsigned int prefix_len = 0;
-  
-  if (prefix)
-    prefix_len = strlen(prefix);
+	/*
+	 * Chars to be used after each other every time the worm
+	 * intersects with itself.  Matter of taste.
+	 */
+	const char augmentation_string[] = " .o+=*BOX@%&#/^SE";
+	char *retval, *p;
+	uint8_t field[FLDSIZE_X][FLDSIZE_Y];
+	unsigned int i, b;
+	int x, y;
+	const size_t len = sizeof(augmentation_string) - 2;
+	unsigned int prefix_len = 0;
 
-  retval = gnutls_calloc (1, (FLDSIZE_X + 3 + prefix_len) * (FLDSIZE_Y + 2));
-  if (retval == NULL)
-    {
-      gnutls_assert();
-      return NULL;
-    }
+	if (prefix)
+		prefix_len = strlen(prefix);
 
-  /* initialize field */
-  memset (field, 0, FLDSIZE_X * FLDSIZE_Y * sizeof (char));
-  x = FLDSIZE_X / 2;
-  y = FLDSIZE_Y / 2;
+	retval =
+	    gnutls_calloc(1,
+			  (FLDSIZE_X + 3 + prefix_len) * (FLDSIZE_Y + 2));
+	if (retval == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
 
-  /* process raw key */
-  for (i = 0; i < dgst_raw_len; i++)
-    {
-      int input;
-      /* each byte conveys four 2-bit move commands */
-      input = dgst_raw[i];
-      for (b = 0; b < 4; b++)
-        {
-          /* evaluate 2 bit, rest is shifted later */
-          x += (input & 0x1) ? 1 : -1;
-          y += (input & 0x2) ? 1 : -1;
+	/* initialize field */
+	memset(field, 0, FLDSIZE_X * FLDSIZE_Y * sizeof(char));
+	x = FLDSIZE_X / 2;
+	y = FLDSIZE_Y / 2;
 
-          /* assure we are still in bounds */
-          x = MAX (x, 0);
-          y = MAX (y, 0);
-          x = MIN (x, FLDSIZE_X - 1);
-          y = MIN (y, FLDSIZE_Y - 1);
+	/* process raw key */
+	for (i = 0; i < dgst_raw_len; i++) {
+		int input;
+		/* each byte conveys four 2-bit move commands */
+		input = dgst_raw[i];
+		for (b = 0; b < 4; b++) {
+			/* evaluate 2 bit, rest is shifted later */
+			x += (input & 0x1) ? 1 : -1;
+			y += (input & 0x2) ? 1 : -1;
 
-          /* augment the field */
-          if (field[x][y] < len - 2)
-            field[x][y]++;
-          input = input >> 2;
-        }
-    }
+			/* assure we are still in bounds */
+			x = MAX(x, 0);
+			y = MAX(y, 0);
+			x = MIN(x, FLDSIZE_X - 1);
+			y = MIN(y, FLDSIZE_Y - 1);
 
-  /* mark starting point and end point */
-  field[FLDSIZE_X / 2][FLDSIZE_Y / 2] = len - 1;
-  field[x][y] = len;
+			/* augment the field */
+			if (field[x][y] < len - 2)
+				field[x][y]++;
+			input = input >> 2;
+		}
+	}
 
-  /* fill in retval */
-  if (prefix_len)
-    snprintf (retval, FLDSIZE_X + prefix_len, "%s+--[%4s %4u]", prefix, key_type, key_size);
-  else
-    snprintf (retval, FLDSIZE_X, "+--[%4s %4u]", key_type, key_size);
-  p = strchr (retval, '\0');
+	/* mark starting point and end point */
+	field[FLDSIZE_X / 2][FLDSIZE_Y / 2] = len - 1;
+	field[x][y] = len;
 
-  /* output upper border */
-  for (i = p - retval - 1; i < FLDSIZE_X + prefix_len; i++)
-    *p++ = '-';
-  *p++ = '+';
-  *p++ = '\n';
-  
-  if (prefix_len)
-    {
-      memcpy(p, prefix, prefix_len);
-      p += prefix_len;
-    }
+	/* fill in retval */
+	if (prefix_len)
+		snprintf(retval, FLDSIZE_X + prefix_len, "%s+--[%4s %4u]",
+			 prefix, key_type, key_size);
+	else
+		snprintf(retval, FLDSIZE_X, "+--[%4s %4u]", key_type,
+			 key_size);
+	p = strchr(retval, '\0');
 
-  /* output content */
-  for (y = 0; y < FLDSIZE_Y; y++)
-    {
-      *p++ = '|';
-      for (x = 0; x < FLDSIZE_X; x++)
-        *p++ = augmentation_string[MIN (field[x][y], len)];
-      *p++ = '|';
-      *p++ = '\n';
+	/* output upper border */
+	for (i = p - retval - 1; i < FLDSIZE_X + prefix_len; i++)
+		*p++ = '-';
+	*p++ = '+';
+	*p++ = '\n';
 
-      if (prefix_len)
-        {
-          memcpy(p, prefix, prefix_len);
-          p += prefix_len;
-        }
-    }
+	if (prefix_len) {
+		memcpy(p, prefix, prefix_len);
+		p += prefix_len;
+	}
 
-  /* output lower border */
-  *p++ = '+';
-  for (i = 0; i < FLDSIZE_X; i++)
-    *p++ = '-';
-  *p++ = '+';
+	/* output content */
+	for (y = 0; y < FLDSIZE_Y; y++) {
+		*p++ = '|';
+		for (x = 0; x < FLDSIZE_X; x++)
+			*p++ = augmentation_string[MIN(field[x][y], len)];
+		*p++ = '|';
+		*p++ = '\n';
 
-  return retval;
+		if (prefix_len) {
+			memcpy(p, prefix, prefix_len);
+			p += prefix_len;
+		}
+	}
+
+	/* output lower border */
+	*p++ = '+';
+	for (i = 0; i < FLDSIZE_X; i++)
+		*p++ = '-';
+	*p++ = '+';
+
+	return retval;
 }

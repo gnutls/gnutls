@@ -23,26 +23,25 @@
 
 #include <gnutls/ocsp.h>
 
-enum
-  {
-    ACTION_NONE,
-    ACTION_REQ_INFO,
-    ACTION_RESP_INFO,
-    ACTION_VERIFY_RESP,
-    ACTION_GEN_REQ
-  };
+enum {
+	ACTION_NONE,
+	ACTION_REQ_INFO,
+	ACTION_RESP_INFO,
+	ACTION_VERIFY_RESP,
+	ACTION_GEN_REQ
+};
 
-extern void ocsptool_version (void);
+extern void ocsptool_version(void);
 void
-_generate_request (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-                   gnutls_datum_t * rdata, int nonce);
-int send_ocsp_request(const char* server,
-                       gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-                       gnutls_datum_t * resp_data, int nonce);
-void
-print_ocsp_verify_res (unsigned int output);
+_generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+		  gnutls_datum_t * rdata, int nonce);
+int send_ocsp_request(const char *server,
+		      gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+		      gnutls_datum_t * resp_data, int nonce);
+void print_ocsp_verify_res(unsigned int output);
 
 int
-check_ocsp_response (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer, gnutls_datum_t *data);
+check_ocsp_response(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+		    gnutls_datum_t * data);
 
 #endif

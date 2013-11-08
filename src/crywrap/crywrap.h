@@ -57,35 +57,37 @@
  * Most of the CryWrap configuration - those options that are settable
  * via the command-line are stored in a variable of this type.
  */
-typedef struct
-{
+typedef struct {
   /** Properties of the listening socket.
    */
-  struct
-  {
-    in_port_t port;
-    struct sockaddr_storage *addr;
-  } listen;
+	struct {
+		in_port_t port;
+		struct sockaddr_storage *addr;
+	} listen;
 
   /** Properties of the destination socket.
    */
-  struct
-  {
-    in_port_t port;
-    char *host;
-    struct sockaddr_storage *addr;
-  } dest;
+	struct {
+		in_port_t port;
+		char *host;
+		struct sockaddr_storage *addr;
+	} dest;
 
-  gnutls_priority_t priority; /**< GnuTLS priority string. */
-  const char *pidfile; /**< File to store our PID in. */
-  uid_t uid; /**< User ID to run as. */
-  int inetd; /**< InetD-mode toggle. */
-  int anon; /**< Anon-DH toggle. */
-  int verify; /**< Client certificate verify level. */
-  int debug;
+	gnutls_priority_t priority;
+			      /**< GnuTLS priority string. */
+	const char *pidfile;
+		       /**< File to store our PID in. */
+	uid_t uid;
+	     /**< User ID to run as. */
+	int inetd;
+	     /**< InetD-mode toggle. */
+	int anon;
+	    /**< Anon-DH toggle. */
+	int verify;
+	      /**< Client certificate verify level. */
+	int debug;
 } crywrap_config_t;
 
-/** @} *//* End of the Options group */
+	 /** @} *//* End of the Options group */
 
-#endif /* !_CRYWRAP_H */
-
+#endif				/* !_CRYWRAP_H */

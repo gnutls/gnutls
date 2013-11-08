@@ -51,14 +51,13 @@
  *
  * Cost: O(1)
  */
-void
-_mbuffer_head_init (mbuffer_head_st * buf)
+void _mbuffer_head_init(mbuffer_head_st * buf)
 {
-  buf->head = NULL;
-  buf->tail = NULL;
+	buf->head = NULL;
+	buf->tail = NULL;
 
-  buf->length = 0;
-  buf->byte_length = 0;
+	buf->length = 0;
+	buf->byte_length = 0;
 }
 
 /* Deallocate all buffer segments and reset the buffer head.
@@ -66,38 +65,35 @@ _mbuffer_head_init (mbuffer_head_st * buf)
  * Cost: O(n)
  * n: Number of segments currently in the buffer.
  */
-void
-_mbuffer_head_clear (mbuffer_head_st * buf)
+void _mbuffer_head_clear(mbuffer_head_st * buf)
 {
-  mbuffer_st *bufel, *next;
+	mbuffer_st *bufel, *next;
 
-  for (bufel = buf->head; bufel != NULL; bufel = next)
-    {
-      next = bufel->next;
-      gnutls_free (bufel);
-    }
+	for (bufel = buf->head; bufel != NULL; bufel = next) {
+		next = bufel->next;
+		gnutls_free(bufel);
+	}
 
-  _mbuffer_head_init (buf);
+	_mbuffer_head_init(buf);
 }
 
 /* Append a segment to the end of this buffer.
  *
  * Cost: O(1)
  */
-void
-_mbuffer_enqueue (mbuffer_head_st * buf, mbuffer_st * bufel)
+void _mbuffer_enqueue(mbuffer_head_st * buf, mbuffer_st * bufel)
 {
-  bufel->next = NULL;
-  bufel->prev = buf->tail;
+	bufel->next = NULL;
+	bufel->prev = buf->tail;
 
-  buf->length++;
-  buf->byte_length += bufel->msg.size - bufel->mark;
+	buf->length++;
+	buf->byte_length += bufel->msg.size - bufel->mark;
 
-  if (buf->tail != NULL)
-    buf->tail->next = bufel;
-  else
-    buf->head = bufel;
-  buf->tail = bufel;
+	if (buf->tail != NULL)
+		buf->tail->next = bufel;
+	else
+		buf->head = bufel;
+	buf->tail = bufel;
 }
 
 /* Remove a segment from the buffer.
@@ -106,29 +102,28 @@ _mbuffer_enqueue (mbuffer_head_st * buf, mbuffer_st * bufel)
  *
  * Returns the buffer following it.
  */
-mbuffer_st *
-_mbuffer_dequeue (mbuffer_head_st * buf, mbuffer_st * bufel)
+mbuffer_st *_mbuffer_dequeue(mbuffer_head_st * buf, mbuffer_st * bufel)
 {
-mbuffer_st* ret = bufel->next;
+	mbuffer_st *ret = bufel->next;
 
-  if (buf->tail == bufel) /* if last */
-    buf->tail = bufel->prev;
-  
-  if (buf->head == bufel) /* if first */
-    buf->head = bufel->next;
+	if (buf->tail == bufel)	/* if last */
+		buf->tail = bufel->prev;
 
-  if (bufel->prev)
-    bufel->prev->next = bufel->next;
+	if (buf->head == bufel)	/* if first */
+		buf->head = bufel->next;
 
-  if (bufel->next)
-    bufel->next->prev = NULL;
+	if (bufel->prev)
+		bufel->prev->next = bufel->next;
 
-  buf->length--;
-  buf->byte_length -= bufel->msg.size - bufel->mark;
-  
-  bufel->next = bufel->prev = NULL;
-  
-  return ret;
+	if (bufel->next)
+		bufel->next->prev = NULL;
+
+	buf->length--;
+	buf->byte_length -= bufel->msg.size - bufel->mark;
+
+	bufel->next = bufel->prev = NULL;
+
+	return ret;
 }
 
 /* Get a reference to the first segment of the buffer and
@@ -138,17 +133,16 @@ mbuffer_st* ret = bufel->next;
  *
  * Cost: O(1)
  */
-mbuffer_st *
-_mbuffer_head_pop_first (mbuffer_head_st * buf)
+mbuffer_st *_mbuffer_head_pop_first(mbuffer_head_st * buf)
 {
-  mbuffer_st *bufel = buf->head;
+	mbuffer_st *bufel = buf->head;
 
-  if (buf->head == NULL)
-    return NULL;
+	if (buf->head == NULL)
+		return NULL;
 
-  _mbuffer_dequeue(buf, bufel);
-    
-  return bufel;
+	_mbuffer_dequeue(buf, bufel);
+
+	return bufel;
 }
 
 /* Get a reference to the first segment of the buffer and its data.
@@ -157,25 +151,21 @@ _mbuffer_head_pop_first (mbuffer_head_st * buf)
  *
  * Cost: O(1)
  */
-mbuffer_st *
-_mbuffer_head_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg)
+mbuffer_st *_mbuffer_head_get_first(mbuffer_head_st * buf,
+				    gnutls_datum_t * msg)
 {
-  mbuffer_st *bufel = buf->head;
+	mbuffer_st *bufel = buf->head;
 
-  if (msg)
-    {
-      if (bufel)
-        {
-          msg->data = bufel->msg.data + bufel->mark;
-          msg->size = bufel->msg.size - bufel->mark;
-      }
-    else
-      {
-        msg->data = NULL;
-        msg->size = 0;
-      }
-    }
-  return bufel;
+	if (msg) {
+		if (bufel) {
+			msg->data = bufel->msg.data + bufel->mark;
+			msg->size = bufel->msg.size - bufel->mark;
+		} else {
+			msg->data = NULL;
+			msg->size = 0;
+		}
+	}
+	return bufel;
 }
 
 /* Get a reference to the next segment of the buffer and its data.
@@ -184,25 +174,20 @@ _mbuffer_head_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg)
  *
  * Cost: O(1)
  */
-mbuffer_st *
-_mbuffer_head_get_next (mbuffer_st * cur, gnutls_datum_t * msg)
+mbuffer_st *_mbuffer_head_get_next(mbuffer_st * cur, gnutls_datum_t * msg)
 {
-  mbuffer_st *bufel = cur->next;
+	mbuffer_st *bufel = cur->next;
 
-  if (msg)
-    {
-      if (bufel)
-        {
-          msg->data = bufel->msg.data + bufel->mark;
-          msg->size = bufel->msg.size - bufel->mark;
-        }
-      else
-        {
-          msg->data = NULL;
-          msg->size = 0;
-        }
-    }
-  return bufel;
+	if (msg) {
+		if (bufel) {
+			msg->data = bufel->msg.data + bufel->mark;
+			msg->size = bufel->msg.size - bufel->mark;
+		} else {
+			msg->data = NULL;
+			msg->size = 0;
+		}
+	}
+	return bufel;
 }
 
 /* Remove the first segment from the buffer.
@@ -212,16 +197,15 @@ _mbuffer_head_get_next (mbuffer_st * cur, gnutls_datum_t * msg)
  *
  * Cost: O(1)
  */
-static inline void
-remove_front (mbuffer_head_st * buf)
+static inline void remove_front(mbuffer_head_st * buf)
 {
-  mbuffer_st *bufel = buf->head;
+	mbuffer_st *bufel = buf->head;
 
-  if (!bufel)
-    return;
+	if (!bufel)
+		return;
 
-  _mbuffer_dequeue(buf, bufel);
-  gnutls_free (bufel);
+	_mbuffer_dequeue(buf, bufel);
+	gnutls_free(bufel);
 }
 
 /* Remove a specified number of bytes from the start of the buffer.
@@ -234,37 +218,31 @@ remove_front (mbuffer_head_st * buf)
  * Cost: O(n)
  * n: Number of segments needed to remove the specified amount of data.
  */
-int
-_mbuffer_head_remove_bytes (mbuffer_head_st * buf, size_t bytes)
+int _mbuffer_head_remove_bytes(mbuffer_head_st * buf, size_t bytes)
 {
-  size_t left = bytes;
-  mbuffer_st *bufel, *next;
-  int ret = 0;
+	size_t left = bytes;
+	mbuffer_st *bufel, *next;
+	int ret = 0;
 
-  if (bytes > buf->byte_length)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	if (bytes > buf->byte_length) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  for (bufel = buf->head; bufel != NULL && left > 0; bufel = next)
-    {
-      next = bufel->next;
+	for (bufel = buf->head; bufel != NULL && left > 0; bufel = next) {
+		next = bufel->next;
 
-      if (left >= (bufel->msg.size - bufel->mark))
-        {
-          left -= (bufel->msg.size - bufel->mark);
-          remove_front (buf);
-          ret = 1;
-        }
-      else
-        {
-          bufel->mark += left;
-          buf->byte_length -= left;
-          left = 0;
-        }
-    }
-  return ret;
+		if (left >= (bufel->msg.size - bufel->mark)) {
+			left -= (bufel->msg.size - bufel->mark);
+			remove_front(buf);
+			ret = 1;
+		} else {
+			bufel->mark += left;
+			buf->byte_length -= left;
+			left = 0;
+		}
+	}
+	return ret;
 }
 
 /* Allocate a buffer segment. The segment is not initially "owned" by
@@ -279,27 +257,25 @@ _mbuffer_head_remove_bytes (mbuffer_head_st * buf, size_t bytes)
  *
  * Cost: O(1)
  */
-mbuffer_st *
-_mbuffer_alloc (size_t payload_size, size_t maximum_size)
+mbuffer_st *_mbuffer_alloc(size_t payload_size, size_t maximum_size)
 {
-  mbuffer_st *st;
+	mbuffer_st *st;
 
-  st = gnutls_malloc (maximum_size + sizeof (mbuffer_st));
-  if (st == NULL)
-    {
-      gnutls_assert ();
-      return NULL;
-    }
-  
-  /* set the structure to zero */
-  memset(st, 0, sizeof(*st));
+	st = gnutls_malloc(maximum_size + sizeof(mbuffer_st));
+	if (st == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
 
-  /* payload points after the mbuffer_st structure */
-  st->msg.data = (uint8_t *) st + sizeof (mbuffer_st);
-  st->msg.size = payload_size;
-  st->maximum_size = maximum_size;
+	/* set the structure to zero */
+	memset(st, 0, sizeof(*st));
 
-  return st;
+	/* payload points after the mbuffer_st structure */
+	st->msg.data = (uint8_t *) st + sizeof(mbuffer_st);
+	st->msg.size = payload_size;
+	st->maximum_size = maximum_size;
+
+	return st;
 }
 
 /* Copy data into a segment. The segment must not be part of a buffer
@@ -313,20 +289,19 @@ _mbuffer_alloc (size_t payload_size, size_t maximum_size)
  * n: number of bytes to copy
  */
 int
-_mbuffer_append_data (mbuffer_st * bufel, void *newdata, size_t newdata_size)
+_mbuffer_append_data(mbuffer_st * bufel, void *newdata,
+		     size_t newdata_size)
 {
-  if (bufel->msg.size + newdata_size <= bufel->maximum_size)
-    {
-      memcpy (&bufel->msg.data[bufel->msg.size], newdata, newdata_size);
-      bufel->msg.size += newdata_size;
-    }
-  else
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	if (bufel->msg.size + newdata_size <= bufel->maximum_size) {
+		memcpy(&bufel->msg.data[bufel->msg.size], newdata,
+		       newdata_size);
+		bufel->msg.size += newdata_size;
+	} else {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  return 0;
+	return 0;
 }
 
 /* Takes a buffer in multiple chunks and puts all the data in a single
@@ -337,33 +312,30 @@ _mbuffer_append_data (mbuffer_st * bufel, void *newdata, size_t newdata_size)
  * Cost: O(n)
  * n: number of segments initially in the buffer
  */
-int
-_mbuffer_linearize (mbuffer_head_st * buf)
+int _mbuffer_linearize(mbuffer_head_st * buf)
 {
-  mbuffer_st *bufel, *cur;
-  gnutls_datum_t msg;
-  size_t pos = 0;
+	mbuffer_st *bufel, *cur;
+	gnutls_datum_t msg;
+	size_t pos = 0;
 
-  if (buf->length <= 1)
-    /* Nothing to do */
-    return 0;
+	if (buf->length <= 1)
+		/* Nothing to do */
+		return 0;
 
-  bufel = _mbuffer_alloc (buf->byte_length, buf->byte_length);
-  if (!bufel)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+	bufel = _mbuffer_alloc(buf->byte_length, buf->byte_length);
+	if (!bufel) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-  for (cur = _mbuffer_head_get_first (buf, &msg);
-       msg.data != NULL; cur = _mbuffer_head_get_next (cur, &msg))
-    {
-      memcpy (&bufel->msg.data[pos], msg.data, msg.size);
-      pos += msg.size;
-    }
+	for (cur = _mbuffer_head_get_first(buf, &msg);
+	     msg.data != NULL; cur = _mbuffer_head_get_next(cur, &msg)) {
+		memcpy(&bufel->msg.data[pos], msg.data, msg.size);
+		pos += msg.size;
+	}
 
-  _mbuffer_head_clear (buf);
-  _mbuffer_enqueue (buf, bufel);
+	_mbuffer_head_clear(buf);
+	_mbuffer_enqueue(buf, bufel);
 
-  return 0;
+	return 0;
 }

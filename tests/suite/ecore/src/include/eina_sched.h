@@ -23,4 +23,4 @@
 
 EAPI void eina_sched_prio_drop(void);
 
-#endif /* EINA_SCHED_H_ */
+#endif				/* EINA_SCHED_H_ */

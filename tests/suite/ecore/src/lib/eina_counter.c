@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <stdio.h>
@@ -25,12 +25,12 @@
 #include <string.h>
 #include <stdarg.h>
 #ifndef _WIN32
-# include <time.h>
+#include <time.h>
 #else
-# define WIN32_LEAN_AND_MEAN
-# include <windows.h>
-# undef WIN32_LEAN_AND_MEAN
-#endif /* _WIN2 */
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
+#endif				/* _WIN2 */
 
 #include "eina_config.h"
 #include "eina_private.h"
@@ -57,90 +57,84 @@ typedef LARGE_INTEGER Eina_Nano_Time;
 
 typedef struct _Eina_Clock Eina_Clock;
 
-struct _Eina_Counter
-{
-   EINA_INLIST;
+struct _Eina_Counter {
+	EINA_INLIST;
 
-   Eina_Inlist *clocks;
-   const char *name;
+	Eina_Inlist *clocks;
+	const char *name;
 };
 
-struct _Eina_Clock
-{
-   EINA_INLIST;
+struct _Eina_Clock {
+	EINA_INLIST;
 
-   Eina_Nano_Time start;
-   Eina_Nano_Time end;
-   int specimen;
+	Eina_Nano_Time start;
+	Eina_Nano_Time end;
+	int specimen;
 
-   Eina_Bool valid;
+	Eina_Bool valid;
 };
 
 #ifndef _WIN32
-static inline int
-_eina_counter_time_get(Eina_Nano_Time *tp)
+static inline int _eina_counter_time_get(Eina_Nano_Time * tp)
 {
-# if defined(CLOCK_PROCESS_CPUTIME_ID)
-   return clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tp);
-# elif defined(CLOCK_PROF)
-   return clock_gettime(CLOCK_PROF, tp);
-# elif defined(CLOCK_REALTIME)
-   return clock_gettime(CLOCK_REALTIME, tp);
-# else
-   return gettimeofday(tp, NULL);
-# endif
+#if defined(CLOCK_PROCESS_CPUTIME_ID)
+	return clock_gettime(CLOCK_PROCESS_CPUTIME_ID, tp);
+#elif defined(CLOCK_PROF)
+	return clock_gettime(CLOCK_PROF, tp);
+#elif defined(CLOCK_REALTIME)
+	return clock_gettime(CLOCK_REALTIME, tp);
+#else
+	return gettimeofday(tp, NULL);
+#endif
 }
 #else
 static const char EINA_ERROR_COUNTER_WINDOWS_STR[] =
-   "Change your OS, you moron !";
+    "Change your OS, you moron !";
 static int EINA_ERROR_COUNTER_WINDOWS = 0;
 static LARGE_INTEGER _eina_counter_frequency;
 
-static inline int
-_eina_counter_time_get(Eina_Nano_Time *tp)
+static inline int _eina_counter_time_get(Eina_Nano_Time * tp)
 {
-   return QueryPerformanceCounter(tp);
+	return QueryPerformanceCounter(tp);
 }
-#endif /* _WIN2 */
+#endif				/* _WIN2 */
 
-static char *
-_eina_counter_asiprintf(char *base, int *position, const char *format, ...)
+static char *_eina_counter_asiprintf(char *base, int *position,
+				     const char *format, ...)
 {
-   char *tmp, *result;
-   int size = 32;
-   int n;
-   va_list ap;
+	char *tmp, *result;
+	int size = 32;
+	int n;
+	va_list ap;
 
-   tmp = realloc(base, sizeof (char) * (*position + size));
-   if (!tmp)
-      return base;
+	tmp = realloc(base, sizeof(char) * (*position + size));
+	if (!tmp)
+		return base;
 
-   result = tmp;
+	result = tmp;
 
-   while (1)
-     {
-        va_start(ap, format);
-        n = vsnprintf(result + *position, size, format, ap);
-        va_end(ap);
+	while (1) {
+		va_start(ap, format);
+		n = vsnprintf(result + *position, size, format, ap);
+		va_end(ap);
 
-        if (n > -1 && n < size)
-          {
-             /* If we always have glibc > 2.2, we could just return *position += n. */
-             *position += strlen(result + *position);
-             return result;
-          }
+		if (n > -1 && n < size) {
+			/* If we always have glibc > 2.2, we could just return *position += n. */
+			*position += strlen(result + *position);
+			return result;
+		}
 
-        if (n > -1)
-           size = n + 1;
-        else
-           size <<= 1;
+		if (n > -1)
+			size = n + 1;
+		else
+			size <<= 1;
 
-        tmp = realloc(result, sizeof (char) * (*position + size));
-        if (!tmp)
-           return result;
+		tmp = realloc(result, sizeof(char) * (*position + size));
+		if (!tmp)
+			return result;
 
-        result = tmp;
-     }
+		result = tmp;
+	}
 }
 
 /**
@@ -168,20 +162,17 @@ _eina_counter_asiprintf(char *base, int *position, const char *format, ...)
  *
  * @see eina_init()
  */
-Eina_Bool
-eina_counter_init(void)
+Eina_Bool eina_counter_init(void)
 {
 #ifdef _WIN32
-   EINA_ERROR_COUNTER_WINDOWS = eina_error_msg_static_register(
-         EINA_ERROR_COUNTER_WINDOWS_STR);
-   if (!QueryPerformanceFrequency(&_eina_counter_frequency))
-     {
-        eina_error_set(EINA_ERROR_COUNTER_WINDOWS);
-        return EINA_FALSE;
-     }
-
-#endif /* _WIN2 */
-   return EINA_TRUE;
+	EINA_ERROR_COUNTER_WINDOWS =
+	    eina_error_msg_static_register(EINA_ERROR_COUNTER_WINDOWS_STR);
+	if (!QueryPerformanceFrequency(&_eina_counter_frequency)) {
+		eina_error_set(EINA_ERROR_COUNTER_WINDOWS);
+		return EINA_FALSE;
+	}
+#endif				/* _WIN2 */
+	return EINA_TRUE;
 }
 
 /**
@@ -195,10 +186,9 @@ eina_counter_init(void)
  *
  * @see eina_shutdown()
  */
-Eina_Bool
-eina_counter_shutdown(void)
+Eina_Bool eina_counter_shutdown(void)
 {
-   return EINA_TRUE;
+	return EINA_TRUE;
 }
 
 /*============================================================================*
@@ -301,28 +291,26 @@ eina_counter_shutdown(void)
  * Whe the new counter is not needed anymore, use eina_counter_free() to
  * free the allocated memory.
  */
-EAPI Eina_Counter *
-eina_counter_new(const char *name)
+EAPI Eina_Counter *eina_counter_new(const char *name)
 {
-   Eina_Counter *counter;
-   size_t length;
+	Eina_Counter *counter;
+	size_t length;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(name, NULL);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(name, NULL);
 
-   length = strlen(name) + 1;
+	length = strlen(name) + 1;
 
-        eina_error_set(0);
-   counter = calloc(1, sizeof (Eina_Counter) + length);
-   if (!counter)
-     {
-        eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
-        return NULL;
-     }
+	eina_error_set(0);
+	counter = calloc(1, sizeof(Eina_Counter) + length);
+	if (!counter) {
+		eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
+		return NULL;
+	}
 
-   counter->name = (char *)(counter + 1);
-   memcpy((char *)counter->name, name, length);
+	counter->name = (char *) (counter + 1);
+	memcpy((char *) counter->name, name, length);
 
-   return counter;
+	return counter;
 }
 
 /**
@@ -335,20 +323,19 @@ eina_counter_new(const char *name)
  * @p counter. If @p counter is @c NULL, the function returns
  * immediately.
  */
-EAPI void
-eina_counter_free(Eina_Counter *counter)
+EAPI void eina_counter_free(Eina_Counter * counter)
 {
-   EINA_SAFETY_ON_NULL_RETURN(counter);
+	EINA_SAFETY_ON_NULL_RETURN(counter);
 
-   while (counter->clocks)
-     {
-        Eina_Clock *clk = (Eina_Clock *)counter->clocks;
+	while (counter->clocks) {
+		Eina_Clock *clk = (Eina_Clock *) counter->clocks;
 
-        counter->clocks = eina_inlist_remove(counter->clocks, counter->clocks);
-        free(clk);
-     }
+		counter->clocks =
+		    eina_inlist_remove(counter->clocks, counter->clocks);
+		free(clk);
+	}
 
-        free(counter);
+	free(counter);
 }
 
 /**
@@ -367,28 +354,27 @@ eina_counter_free(Eina_Counter *counter)
  * To stop the timing, eina_counter_stop() must be called with the
  * same counter.
  */
-EAPI void
-eina_counter_start(Eina_Counter *counter)
+EAPI void eina_counter_start(Eina_Counter * counter)
 {
-   Eina_Clock *clk;
-   Eina_Nano_Time tp;
+	Eina_Clock *clk;
+	Eina_Nano_Time tp;
 
-   EINA_SAFETY_ON_NULL_RETURN(counter);
-   if (_eina_counter_time_get(&tp) != 0)
-      return;
+	EINA_SAFETY_ON_NULL_RETURN(counter);
+	if (_eina_counter_time_get(&tp) != 0)
+		return;
 
-        eina_error_set(0);
-   clk = calloc(1, sizeof (Eina_Clock));
-   if (!clk)
-     {
-        eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
-        return;
-     }
+	eina_error_set(0);
+	clk = calloc(1, sizeof(Eina_Clock));
+	if (!clk) {
+		eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
+		return;
+	}
 
-   counter->clocks = eina_inlist_prepend(counter->clocks, EINA_INLIST_GET(clk));
+	counter->clocks =
+	    eina_inlist_prepend(counter->clocks, EINA_INLIST_GET(clk));
 
-   clk->valid = EINA_FALSE;
-   clk->start = tp;
+	clk->valid = EINA_FALSE;
+	clk->start = tp;
 }
 
 /**
@@ -403,24 +389,23 @@ eina_counter_start(Eina_Counter *counter)
  * test. If @p counter or its associated clock are  @c NULL, or if the
  * time can't be retrieved the function exits.
  */
-EAPI void
-eina_counter_stop(Eina_Counter *counter, int specimen)
+EAPI void eina_counter_stop(Eina_Counter * counter, int specimen)
 {
-   Eina_Clock *clk;
-   Eina_Nano_Time tp;
+	Eina_Clock *clk;
+	Eina_Nano_Time tp;
 
-   EINA_SAFETY_ON_NULL_RETURN(counter);
-   if (_eina_counter_time_get(&tp) != 0)
-      return;
+	EINA_SAFETY_ON_NULL_RETURN(counter);
+	if (_eina_counter_time_get(&tp) != 0)
+		return;
 
-   clk = (Eina_Clock *)counter->clocks;
+	clk = (Eina_Clock *) counter->clocks;
 
-   if (!clk || clk->valid == EINA_TRUE)
-      return;
+	if (!clk || clk->valid == EINA_TRUE)
+		return;
 
-   clk->end = tp;
-   clk->specimen = specimen;
-   clk->valid = EINA_TRUE;
+	clk->end = tp;
+	clk->specimen = specimen;
+	clk->valid = EINA_TRUE;
 }
 
 /**
@@ -441,63 +426,64 @@ eina_counter_stop(Eina_Counter *counter, int specimen)
  *
  * The unit of time is the nanosecond.
  */
-EAPI char *
-eina_counter_dump(Eina_Counter *counter)
+EAPI char *eina_counter_dump(Eina_Counter * counter)
 {
-   Eina_Clock *clk;
-   char *result = NULL;
-   int position = 0;
+	Eina_Clock *clk;
+	char *result = NULL;
+	int position = 0;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(counter, NULL);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(counter, NULL);
 
-   result = _eina_counter_asiprintf(
-         result,
-         &position,
-         "# specimen\texperiment time\tstarting time\tending time\n");
-   if (!result)
-      return NULL;
+	result = _eina_counter_asiprintf(result,
+					 &position,
+					 "# specimen\texperiment time\tstarting time\tending time\n");
+	if (!result)
+		return NULL;
 
-   EINA_INLIST_REVERSE_FOREACH(counter->clocks, clk)
-   {
-      long int start;
-      long int end;
-      long int diff;
+	EINA_INLIST_REVERSE_FOREACH(counter->clocks, clk) {
+		long int start;
+		long int end;
+		long int diff;
 
-      if (clk->valid == EINA_FALSE)
-         continue;
+		if (clk->valid == EINA_FALSE)
+			continue;
 
 #ifndef _WIN32
-      start = clk->start.tv_sec * 1000000000 + clk->start.tv_nsec;
-      end = clk->end.tv_sec * 1000000000 + clk->end.tv_nsec;
-      diff =
-         (clk->end.tv_sec -
-          clk->start.tv_sec) * 1000000000 + clk->end.tv_nsec -
-         clk->start.tv_nsec;
+		start =
+		    clk->start.tv_sec * 1000000000 + clk->start.tv_nsec;
+		end = clk->end.tv_sec * 1000000000 + clk->end.tv_nsec;
+		diff =
+		    (clk->end.tv_sec -
+		     clk->start.tv_sec) * 1000000000 + clk->end.tv_nsec -
+		    clk->start.tv_nsec;
 #else
-      start =
-         (long int)(((long long int)clk->start.QuadPart *
-                     1000000000ll) /
-                    (long long int)_eina_counter_frequency.QuadPart);
-      end =
-         (long int)(((long long int)clk->end.QuadPart *
-                     1000000000LL) /
-                    (long long int)_eina_counter_frequency.QuadPart);
-      diff =
-         (long int)(((long long int)(clk->end.QuadPart -
-                                     clk->start.QuadPart) *
-                     1000000000LL) /
-                    (long long int)_eina_counter_frequency.QuadPart);
-#endif /* _WIN2 */
+		start =
+		    (long int) (((long long int) clk->start.QuadPart *
+				 1000000000ll) /
+				(long long int) _eina_counter_frequency.
+				QuadPart);
+		end =
+		    (long
+		     int) (((long long int) clk->end.QuadPart *
+			    1000000000LL) /
+			   (long long int) _eina_counter_frequency.
+			   QuadPart);
+		diff =
+		    (long
+		     int) (((long long int) (clk->end.QuadPart -
+					     clk->start.QuadPart) *
+			    1000000000LL) /
+			   (long long int) _eina_counter_frequency.
+			   QuadPart);
+#endif				/* _WIN2 */
 
-      result = _eina_counter_asiprintf(result, &position,
-                                       "%i\t%li\t%li\t%li\n",
-                                       clk->specimen,
-                                       diff,
-                                       start,
-                                       end);
-   }
+		result = _eina_counter_asiprintf(result, &position,
+						 "%i\t%li\t%li\t%li\n",
+						 clk->specimen,
+						 diff, start, end);
+	}
 
-   return result;
+	return result;
 }
 
 /**

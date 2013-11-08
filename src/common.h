@@ -27,7 +27,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #ifndef _WIN32
-# include <netinet/in.h>
+#include <netinet/in.h>
 #endif
 
 #include <signal.h>
@@ -39,7 +39,7 @@
 
 #ifndef __attribute__
 #if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#define __attribute__(Spec)     /* empty */
+#define __attribute__(Spec)	/* empty */
 #endif
 #endif
 
@@ -49,20 +49,20 @@
 
 extern const char str_unknown[];
 
-int print_info (gnutls_session_t state, int verbose, int print_cert);
-void print_cert_info (gnutls_session_t, int flag, int print_cert);
-void print_cert_info_compact (gnutls_session_t session);
+int print_info(gnutls_session_t state, int verbose, int print_cert);
+void print_cert_info(gnutls_session_t, int flag, int print_cert);
+void print_cert_info_compact(gnutls_session_t session);
 
-void print_list (const char* priorities, int verbose);
-int cert_verify (gnutls_session_t session, const char* hostname);
+void print_list(const char *priorities, int verbose);
+int cert_verify(gnutls_session_t session, const char *hostname);
 
-const char *raw_to_string (const unsigned char *raw, size_t raw_size);
-void pkcs11_common (void);
-int check_command(gnutls_session_t session, const char* str);
+const char *raw_to_string(const unsigned char *raw, size_t raw_size);
+void pkcs11_common(void);
+int check_command(gnutls_session_t session, const char *str);
 
 int
-pin_callback (void *user, int attempt, const char *token_url,
-              const char *token_label, unsigned int flags, char *pin,
-              size_t pin_max);
+pin_callback(void *user, int attempt, const char *token_url,
+	     const char *token_label, unsigned int flags, char *pin,
+	     size_t pin_max);
 
-void pkcs11_common (void);
+void pkcs11_common(void);

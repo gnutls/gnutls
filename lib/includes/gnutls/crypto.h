@@ -24,61 +24,71 @@
 #define GNUTLS_CRYPTO_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-  typedef struct api_cipher_hd_st *gnutls_cipher_hd_t;
+	typedef struct api_cipher_hd_st *gnutls_cipher_hd_t;
 
-  int gnutls_cipher_init (gnutls_cipher_hd_t * handle,
-                          gnutls_cipher_algorithm_t cipher,
-                          const gnutls_datum_t * key,
-                          const gnutls_datum_t * iv);
-  int gnutls_cipher_encrypt (const gnutls_cipher_hd_t handle,
-                             void *text, size_t textlen);
-  int gnutls_cipher_decrypt (const gnutls_cipher_hd_t handle,
-                             void *ciphertext, size_t ciphertextlen);
-  int gnutls_cipher_decrypt2 (gnutls_cipher_hd_t handle,
-                              const void *ciphertext, size_t ciphertextlen,
-                              void *text, size_t textlen);
-  int gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, const void *text,
-                              size_t textlen, void *ciphertext,
-                              size_t ciphertextlen);
+	int gnutls_cipher_init(gnutls_cipher_hd_t * handle,
+			       gnutls_cipher_algorithm_t cipher,
+			       const gnutls_datum_t * key,
+			       const gnutls_datum_t * iv);
+	int gnutls_cipher_encrypt(const gnutls_cipher_hd_t handle,
+				  void *text, size_t textlen);
+	int gnutls_cipher_decrypt(const gnutls_cipher_hd_t handle,
+				  void *ciphertext, size_t ciphertextlen);
+	int gnutls_cipher_decrypt2(gnutls_cipher_hd_t handle,
+				   const void *ciphertext,
+				   size_t ciphertextlen, void *text,
+				   size_t textlen);
+	int gnutls_cipher_encrypt2(gnutls_cipher_hd_t handle,
+				   const void *text, size_t textlen,
+				   void *ciphertext, size_t ciphertextlen);
 
-  void gnutls_cipher_set_iv (gnutls_cipher_hd_t handle, void *iv, size_t ivlen);
+	void gnutls_cipher_set_iv(gnutls_cipher_hd_t handle, void *iv,
+				  size_t ivlen);
 
-  int gnutls_cipher_tag( gnutls_cipher_hd_t handle, void* tag, size_t tag_size);
-  int gnutls_cipher_add_auth( gnutls_cipher_hd_t handle, const void* text, size_t text_size);
+	int gnutls_cipher_tag(gnutls_cipher_hd_t handle, void *tag,
+			      size_t tag_size);
+	int gnutls_cipher_add_auth(gnutls_cipher_hd_t handle,
+				   const void *text, size_t text_size);
 
-  void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
-  int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
-  int gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm);
-  int gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm);
+	void gnutls_cipher_deinit(gnutls_cipher_hd_t handle);
+	int gnutls_cipher_get_block_size(gnutls_cipher_algorithm_t
+					 algorithm);
+	int gnutls_cipher_get_iv_size(gnutls_cipher_algorithm_t algorithm);
+	int gnutls_cipher_get_tag_size(gnutls_cipher_algorithm_t
+				       algorithm);
 
-  typedef struct hash_hd_st *gnutls_hash_hd_t;
-  typedef struct hmac_hd_st *gnutls_hmac_hd_t;
+	typedef struct hash_hd_st *gnutls_hash_hd_t;
+	typedef struct hmac_hd_st *gnutls_hmac_hd_t;
 
-  size_t gnutls_mac_get_nonce_size (gnutls_mac_algorithm_t algorithm);
-  int gnutls_hmac_init (gnutls_hmac_hd_t * dig,
-                        gnutls_mac_algorithm_t algorithm, const void *key,
-                        size_t keylen);
-  void gnutls_hmac_set_nonce (gnutls_hmac_hd_t handle, const void *nonce, size_t nonce_len);
-  int gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen);
-  void gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest);
-  void gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest);
-  int gnutls_hmac_get_len (gnutls_mac_algorithm_t algorithm);
-  int gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
-                        size_t keylen, const void *text, size_t textlen,
-                        void *digest);
+	size_t gnutls_mac_get_nonce_size(gnutls_mac_algorithm_t algorithm);
+	int gnutls_hmac_init(gnutls_hmac_hd_t * dig,
+			     gnutls_mac_algorithm_t algorithm,
+			     const void *key, size_t keylen);
+	void gnutls_hmac_set_nonce(gnutls_hmac_hd_t handle,
+				   const void *nonce, size_t nonce_len);
+	int gnutls_hmac(gnutls_hmac_hd_t handle, const void *text,
+			size_t textlen);
+	void gnutls_hmac_output(gnutls_hmac_hd_t handle, void *digest);
+	void gnutls_hmac_deinit(gnutls_hmac_hd_t handle, void *digest);
+	int gnutls_hmac_get_len(gnutls_mac_algorithm_t algorithm);
+	int gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
+			     const void *key, size_t keylen,
+			     const void *text, size_t textlen,
+			     void *digest);
 
-  int gnutls_hash_init (gnutls_hash_hd_t * dig,
-                        gnutls_digest_algorithm_t algorithm);
-  int gnutls_hash (gnutls_hash_hd_t handle, const void *text, size_t textlen);
-  void gnutls_hash_output (gnutls_hash_hd_t handle, void *digest);
-  void gnutls_hash_deinit (gnutls_hash_hd_t handle, void *digest);
-  int gnutls_hash_get_len (gnutls_digest_algorithm_t algorithm);
-  int gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
-                        const void *text, size_t textlen, void *digest);
+	int gnutls_hash_init(gnutls_hash_hd_t * dig,
+			     gnutls_digest_algorithm_t algorithm);
+	int gnutls_hash(gnutls_hash_hd_t handle, const void *text,
+			size_t textlen);
+	void gnutls_hash_output(gnutls_hash_hd_t handle, void *digest);
+	void gnutls_hash_deinit(gnutls_hash_hd_t handle, void *digest);
+	int gnutls_hash_get_len(gnutls_digest_algorithm_t algorithm);
+	int gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
+			     const void *text, size_t textlen,
+			     void *digest);
 
 /* register ciphers */
 
@@ -93,19 +103,17 @@ extern "C"
  *
  * Enumeration of random quality levels.
  */
-  typedef enum gnutls_rnd_level
-  {
-    GNUTLS_RND_NONCE = 0,
-    GNUTLS_RND_RANDOM = 1,
-    GNUTLS_RND_KEY = 2
-  } gnutls_rnd_level_t;
+	typedef enum gnutls_rnd_level {
+		GNUTLS_RND_NONCE = 0,
+		GNUTLS_RND_RANDOM = 1,
+		GNUTLS_RND_KEY = 2
+	} gnutls_rnd_level_t;
 
-  int gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len);
+	int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len);
 
-  void gnutls_rnd_refresh (void);
+	void gnutls_rnd_refresh(void);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

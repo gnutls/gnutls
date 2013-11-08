@@ -21,7 +21,7 @@
  */
 
 
-#include <gnutls/gnutls.h> /* for gnutls_datum_t */
+#include <gnutls/gnutls.h>	/* for gnutls_datum_t */
 
 /**
  * dane_cert_usage_t:
@@ -36,12 +36,11 @@
  *
  * Enumeration of different certificate usage types.
  */
-typedef enum dane_cert_usage_t
-{
-  DANE_CERT_USAGE_CA = 0,
-  DANE_CERT_USAGE_EE = 1,
-  DANE_CERT_USAGE_LOCAL_CA = 2,
-  DANE_CERT_USAGE_LOCAL_EE = 3
+typedef enum dane_cert_usage_t {
+	DANE_CERT_USAGE_CA = 0,
+	DANE_CERT_USAGE_EE = 1,
+	DANE_CERT_USAGE_LOCAL_CA = 2,
+	DANE_CERT_USAGE_LOCAL_EE = 3
 } dane_cert_usage_t;
 
 /**
@@ -51,10 +50,9 @@ typedef enum dane_cert_usage_t
  *
  * Enumeration of different certificate types.
  */
-typedef enum dane_cert_type_t
-{
-  DANE_CERT_X509 = 0,
-  DANE_CERT_PK = 1
+typedef enum dane_cert_type_t {
+	DANE_CERT_X509 = 0,
+	DANE_CERT_PK = 1
 } dane_cert_type_t;
 
 /**
@@ -65,11 +63,10 @@ typedef enum dane_cert_type_t
  *
  * Enumeration of different content matching types.
  */
-typedef enum dane_match_type_t
-{
-  DANE_MATCH_EXACT = 0,
-  DANE_MATCH_SHA2_256 = 1,
-  DANE_MATCH_SHA2_512 = 2
+typedef enum dane_match_type_t {
+	DANE_MATCH_EXACT = 0,
+	DANE_MATCH_SHA2_256 = 1,
+	DANE_MATCH_SHA2_512 = 2
 } dane_match_type_t;
 
 /**
@@ -81,12 +78,11 @@ typedef enum dane_match_type_t
  *
  * Enumeration of different certificate types.
  */
-typedef enum dane_query_status_t
-{
-  DANE_QUERY_UNKNOWN = 0,
-  DANE_QUERY_DNSSEC_VERIFIED,
-  DANE_QUERY_BOGUS,
-  DANE_QUERY_NO_DNSSEC
+typedef enum dane_query_status_t {
+	DANE_QUERY_UNKNOWN = 0,
+	DANE_QUERY_DNSSEC_VERIFIED,
+	DANE_QUERY_BOGUS,
+	DANE_QUERY_NO_DNSSEC
 } dane_query_status_t;
 
 typedef struct dane_state_st *dane_state_t;
@@ -100,32 +96,33 @@ typedef struct dane_query_st *dane_query_t;
  *
  * Enumeration of different verification flags.
  */
-typedef enum dane_state_flags_t
-{
-  DANE_F_IGNORE_LOCAL_RESOLVER = 1,
-  DANE_F_INSECURE=2,
-  DANE_F_IGNORE_DNSSEC=4
+typedef enum dane_state_flags_t {
+	DANE_F_IGNORE_LOCAL_RESOLVER = 1,
+	DANE_F_INSECURE = 2,
+	DANE_F_IGNORE_DNSSEC = 4
 } dane_state_flags_t;
 
-int dane_state_init (dane_state_t* s, unsigned int flags);
-int dane_state_set_dlv_file(dane_state_t s, const char* file);
-void dane_state_deinit (dane_state_t s);
+int dane_state_init(dane_state_t * s, unsigned int flags);
+int dane_state_set_dlv_file(dane_state_t s, const char *file);
+void dane_state_deinit(dane_state_t s);
 
 
-int dane_raw_tlsa(dane_state_t s, dane_query_t *r, char *const*dane_data, const int *dane_data_len, int secure, int bogus);
+int dane_raw_tlsa(dane_state_t s, dane_query_t * r, char *const *dane_data,
+		  const int *dane_data_len, int secure, int bogus);
 
-int dane_query_tlsa(dane_state_t s, dane_query_t *r, const char* host, const char* proto, unsigned int port);
+int dane_query_tlsa(dane_state_t s, dane_query_t * r, const char *host,
+		    const char *proto, unsigned int port);
 
 dane_query_status_t dane_query_status(dane_query_t q);
 unsigned int dane_query_entries(dane_query_t q);
 int dane_query_data(dane_query_t q, unsigned int idx,
-			unsigned int *usage, unsigned int *type,
-			unsigned int *match, gnutls_datum_t * data);
+		    unsigned int *usage, unsigned int *type,
+		    unsigned int *match, gnutls_datum_t * data);
 void dane_query_deinit(dane_query_t q);
 
-const char* dane_cert_type_name(dane_cert_type_t type);
-const char* dane_match_type_name(dane_match_type_t type);
-const char* dane_cert_usage_name(dane_cert_usage_t usage);
+const char *dane_cert_type_name(dane_cert_type_t type);
+const char *dane_match_type_name(dane_match_type_t type);
+const char *dane_cert_usage_name(dane_cert_usage_t usage);
 
 /**
  * dane_verify_flags_t:
@@ -135,11 +132,10 @@ const char* dane_cert_usage_name(dane_cert_usage_t usage);
  *
  * Enumeration of different verification status flags.
  */
-typedef enum dane_verify_flags_t
-{
-  DANE_VFLAG_FAIL_IF_NOT_CHECKED = 1,
-  DANE_VFLAG_ONLY_CHECK_EE_USAGE = 1<<1,
-  DANE_VFLAG_ONLY_CHECK_CA_USAGE = 1<<2,
+typedef enum dane_verify_flags_t {
+	DANE_VFLAG_FAIL_IF_NOT_CHECKED = 1,
+	DANE_VFLAG_ONLY_CHECK_EE_USAGE = 1 << 1,
+	DANE_VFLAG_ONLY_CHECK_CA_USAGE = 1 << 2,
 } dane_verify_flags_t;
 
 /**
@@ -150,41 +146,39 @@ typedef enum dane_verify_flags_t
  *
  * Enumeration of different verification status flags.
  */
-typedef enum dane_verify_status_t
-{
-  DANE_VERIFY_CA_CONSTRAINTS_VIOLATED = 1,
-  DANE_VERIFY_CERT_DIFFERS = 1<<1,
-  DANE_VERIFY_NO_DANE_INFO = 1<<2,
+typedef enum dane_verify_status_t {
+	DANE_VERIFY_CA_CONSTRAINTS_VIOLATED = 1,
+	DANE_VERIFY_CERT_DIFFERS = 1 << 1,
+	DANE_VERIFY_NO_DANE_INFO = 1 << 2,
 } dane_verify_status_t;
 
 #define DANE_VERIFY_CA_CONSTRAINS_VIOLATED DANE_VERIFY_CA_CONSTRAINTS_VIOLATED
 
 int
-dane_verification_status_print (unsigned int status,
-                       gnutls_datum_t * out, unsigned int flags);
+dane_verification_status_print(unsigned int status,
+			       gnutls_datum_t * out, unsigned int flags);
 
-int dane_verify_crt_raw (dane_state_t s,
-	const gnutls_datum_t *chain, unsigned chain_size,
-	gnutls_certificate_type_t chain_type,
-        dane_query_t r,
-	unsigned int sflags, unsigned int vflags,
-        unsigned int *verify);
+int dane_verify_crt_raw(dane_state_t s,
+			const gnutls_datum_t * chain, unsigned chain_size,
+			gnutls_certificate_type_t chain_type,
+			dane_query_t r,
+			unsigned int sflags, unsigned int vflags,
+			unsigned int *verify);
 
-int dane_verify_crt (dane_state_t s,
-	const gnutls_datum_t *chain, unsigned chain_size,
-	gnutls_certificate_type_t chain_type,
-	const char * hostname, const char* proto, unsigned int port,
-	unsigned int sflags, unsigned int vflags,
-	unsigned int *verify);
+int dane_verify_crt(dane_state_t s,
+		    const gnutls_datum_t * chain, unsigned chain_size,
+		    gnutls_certificate_type_t chain_type,
+		    const char *hostname, const char *proto,
+		    unsigned int port, unsigned int sflags,
+		    unsigned int vflags, unsigned int *verify);
 
-int dane_verify_session_crt (
-        dane_state_t s,
-	gnutls_session_t session,
-	const char * hostname, const char* proto, unsigned int port,
-	unsigned int sflags, unsigned int vflags,
-	unsigned int *verify);
+int dane_verify_session_crt(dane_state_t s,
+			    gnutls_session_t session,
+			    const char *hostname, const char *proto,
+			    unsigned int port, unsigned int sflags,
+			    unsigned int vflags, unsigned int *verify);
 
-const char * dane_strerror (int error);
+const char *dane_strerror(int error);
 
 #define DANE_E_SUCCESS 0
 #define DANE_E_INITIALIZATION_ERROR -1
@@ -201,4 +195,3 @@ const char * dane_strerror (int error);
 #define DANE_E_FILE_ERROR -12
 #define DANE_E_CERT_ERROR -13
 #define DANE_E_UNKNOWN_DANE_DATA -14
-

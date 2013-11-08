@@ -27,199 +27,198 @@
 #include <gnutls/openpgp.h>
 #include "common.h"
 
-static void main_texinfo (void);
+static void main_texinfo(void);
 static void main_latex(void);
 
 char buffer[1024];
 
-int
-main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  if (argc > 1)
-    main_latex();
-  else
-    main_texinfo();
-    
-  return 0;
+	if (argc > 1)
+		main_latex();
+	else
+		main_texinfo();
+
+	return 0;
 }
 
-static void main_texinfo (void)
+static void main_texinfo(void)
 {
-  {
-    size_t i;
-    const char *name;
-    char id[2];
-    gnutls_kx_algorithm_t kx;
-    gnutls_cipher_algorithm_t cipher;
-    gnutls_mac_algorithm_t mac;
-    gnutls_protocol_t version;
+	{
+		size_t i;
+		const char *name;
+		char id[2];
+		gnutls_kx_algorithm_t kx;
+		gnutls_cipher_algorithm_t cipher;
+		gnutls_mac_algorithm_t mac;
+		gnutls_protocol_t version;
 
-    printf ("@heading Ciphersuites\n");
-    printf ("@multitable @columnfractions .60 .20 .20\n");
-    printf("@headitem Ciphersuite name @tab TLS ID @tab Since\n");
-    for (i = 0; (name = gnutls_cipher_suite_info
-                 (i, id, &kx, &cipher, &mac, &version)); i++)
-      {
-        printf ("@item %s\n@tab 0x%02X 0x%02X\n@tab %s\n",
-                escape_texi_string(name, buffer, sizeof(buffer)),
-                (unsigned char) id[0], (unsigned char) id[1],
-                gnutls_protocol_get_name (version));
-      }
-    printf ("@end multitable\n");
+		printf("@heading Ciphersuites\n");
+		printf("@multitable @columnfractions .60 .20 .20\n");
+		printf
+		    ("@headitem Ciphersuite name @tab TLS ID @tab Since\n");
+		for (i = 0;
+		     (name =
+		      gnutls_cipher_suite_info(i, id, &kx, &cipher, &mac,
+					       &version)); i++) {
+			printf("@item %s\n@tab 0x%02X 0x%02X\n@tab %s\n",
+			       escape_texi_string(name, buffer,
+						  sizeof(buffer)),
+			       (unsigned char) id[0],
+			       (unsigned char) id[1],
+			       gnutls_protocol_get_name(version));
+		}
+		printf("@end multitable\n");
 
-  }
+	}
 
-  {
-    const gnutls_certificate_type_t *p = gnutls_certificate_type_list ();
+	{
+		const gnutls_certificate_type_t *p =
+		    gnutls_certificate_type_list();
 
-    printf ("\n\n@heading Certificate types\n");
-    printf ("@table @code\n");
-    for (; *p; p++)
-      {
-        printf ("@item %s\n", gnutls_certificate_type_get_name (*p));
-      }
-    printf ("@end table\n");
-  }
+		printf("\n\n@heading Certificate types\n");
+		printf("@table @code\n");
+		for (; *p; p++) {
+			printf("@item %s\n",
+			       gnutls_certificate_type_get_name(*p));
+		}
+		printf("@end table\n");
+	}
 
-  {
-    const gnutls_protocol_t *p = gnutls_protocol_list ();
+	{
+		const gnutls_protocol_t *p = gnutls_protocol_list();
 
-    printf ("\n@heading Protocols\n@table @code\n");
-    for (; *p; p++)
-      {
-        printf ("@item %s\n", gnutls_protocol_get_name (*p));
-      }
-    printf ("@end table\n");
-  }
+		printf("\n@heading Protocols\n@table @code\n");
+		for (; *p; p++) {
+			printf("@item %s\n", gnutls_protocol_get_name(*p));
+		}
+		printf("@end table\n");
+	}
 
-  {
-    const gnutls_cipher_algorithm_t *p = gnutls_cipher_list ();
+	{
+		const gnutls_cipher_algorithm_t *p = gnutls_cipher_list();
 
-    printf ("\n@heading Ciphers\n@table @code\n");
-    for (; *p; p++)
-      {
-        printf ("@item %s\n", gnutls_cipher_get_name (*p));
-      }
-    printf ("@end table\n");
-  }
+		printf("\n@heading Ciphers\n@table @code\n");
+		for (; *p; p++) {
+			printf("@item %s\n", gnutls_cipher_get_name(*p));
+		}
+		printf("@end table\n");
+	}
 
-  {
-    const gnutls_mac_algorithm_t *p = gnutls_mac_list ();
+	{
+		const gnutls_mac_algorithm_t *p = gnutls_mac_list();
 
-    printf ("\n@heading MAC algorithms\n@table @code\n");
-    for (; *p; p++)
-      {
-        printf ("@item %s\n", gnutls_mac_get_name (*p));
-      }
-    printf ("@end table\n");
-  }
+		printf("\n@heading MAC algorithms\n@table @code\n");
+		for (; *p; p++) {
+			printf("@item %s\n", gnutls_mac_get_name(*p));
+		}
+		printf("@end table\n");
+	}
 
-  {
-    const gnutls_kx_algorithm_t *p = gnutls_kx_list ();
+	{
+		const gnutls_kx_algorithm_t *p = gnutls_kx_list();
 
-    printf ("\n@heading Key exchange methods\n@table @code\n");
-    for (; *p; p++)
-      {
-        printf ("@item %s\n", gnutls_kx_get_name (*p));
-      }
-    printf ("@end table\n");
-  }
+		printf("\n@heading Key exchange methods\n@table @code\n");
+		for (; *p; p++) {
+			printf("@item %s\n", gnutls_kx_get_name(*p));
+		}
+		printf("@end table\n");
+	}
 
-  {
-    const gnutls_pk_algorithm_t *p = gnutls_pk_list ();
+	{
+		const gnutls_pk_algorithm_t *p = gnutls_pk_list();
 
-    printf ("\n@heading Public key algorithms\n@table @code\n");
-    for (; *p; p++)
-      {
-        printf ("@item %s\n", gnutls_pk_get_name (*p));
-      }
-    printf ("@end table\n");
-  }
+		printf("\n@heading Public key algorithms\n@table @code\n");
+		for (; *p; p++) {
+			printf("@item %s\n", gnutls_pk_get_name(*p));
+		}
+		printf("@end table\n");
+	}
 
-  {
-    const gnutls_sign_algorithm_t *p = gnutls_sign_list ();
+	{
+		const gnutls_sign_algorithm_t *p = gnutls_sign_list();
 
-    printf ("\n@heading Public key signature algorithms\n@table @code\n");
-    for (; *p; p++)
-      {
-        printf ("@item %s\n", gnutls_sign_get_name (*p));
-      }
-    printf ("@end table\n");
-  }
+		printf
+		    ("\n@heading Public key signature algorithms\n@table @code\n");
+		for (; *p; p++) {
+			printf("@item %s\n", gnutls_sign_get_name(*p));
+		}
+		printf("@end table\n");
+	}
 
-  {
-    const gnutls_ecc_curve_t *p = gnutls_ecc_curve_list ();
+	{
+		const gnutls_ecc_curve_t *p = gnutls_ecc_curve_list();
 
-    printf ("\n@heading Elliptic curves\n@table @code\n");
-    for (; *p; p++)
-      {
-        printf ("@item %s\n", gnutls_ecc_curve_get_name (*p));
-      }
-    printf ("@end table\n");
-  }
+		printf("\n@heading Elliptic curves\n@table @code\n");
+		for (; *p; p++) {
+			printf("@item %s\n",
+			       gnutls_ecc_curve_get_name(*p));
+		}
+		printf("@end table\n");
+	}
 
 
-  {
-    const gnutls_compression_method_t *p = gnutls_compression_list ();
+	{
+		const gnutls_compression_method_t *p =
+		    gnutls_compression_list();
 
-    printf ("\n@heading Compression methods\n@table @code\n");
-    for (; *p; p++)
-      {
-        printf ("@item %s\n", gnutls_compression_get_name (*p));
-      }
-    printf ("@end table\n");
-  }
+		printf("\n@heading Compression methods\n@table @code\n");
+		for (; *p; p++) {
+			printf("@item %s\n",
+			       gnutls_compression_get_name(*p));
+		}
+		printf("@end table\n");
+	}
 }
 
 static const char headers[] = "\\tablefirsthead{%\n"
-	"\\hline\n"
-	"Ciphersuite name & TLS ID & Since\\\\\n"
-	"\\hline}\n"
+    "\\hline\n" "Ciphersuite name & TLS ID & Since\\\\\n" "\\hline}\n"
 #if 0
-	"\\tablehead{%\n"
-	"\\hline\n"
-	"\\multicolumn{3}{|l|}{\\small\\sl continued from previous page}\\\\\n"
-	"\\hline}\n"
-	"\\tabletail{%\n"
-	"\\hline\n"
-	"\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
-	"\\hline}\n"
+    "\\tablehead{%\n"
+    "\\hline\n"
+    "\\multicolumn{3}{|l|}{\\small\\sl continued from previous page}\\\\\n"
+    "\\hline}\n"
+    "\\tabletail{%\n"
+    "\\hline\n"
+    "\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
+    "\\hline}\n"
 #endif
-	"\\tablelasttail{\\hline}\n"
-	"\\bottomcaption{The ciphersuites table}\n\n";
+    "\\tablelasttail{\\hline}\n"
+    "\\bottomcaption{The ciphersuites table}\n\n";
 
 static void main_latex(void)
 {
-int i, j;
-const char* desc;
-const char* _name;
+	int i, j;
+	const char *desc;
+	const char *_name;
 
-puts( headers);
+	puts(headers);
 
-printf("\\begin{supertabular}{|p{.64\\linewidth}|p{.12\\linewidth}|p{.09\\linewidth}|}\n");
+	printf
+	    ("\\begin{supertabular}{|p{.64\\linewidth}|p{.12\\linewidth}|p{.09\\linewidth}|}\n");
 
-  {
-    size_t i;
-    const char *name;
-    char id[2];
-    gnutls_kx_algorithm_t kx;
-    gnutls_cipher_algorithm_t cipher;
-    gnutls_mac_algorithm_t mac;
-    gnutls_protocol_t version;
+	{
+		size_t i;
+		const char *name;
+		char id[2];
+		gnutls_kx_algorithm_t kx;
+		gnutls_cipher_algorithm_t cipher;
+		gnutls_mac_algorithm_t mac;
+		gnutls_protocol_t version;
 
-    for (i = 0; (name = gnutls_cipher_suite_info
-                 (i, id, &kx, &cipher, &mac, &version)); i++)
-      {
-        printf ("{\\small{%s}} & \\code{0x%02X 0x%02X} & %s",
-                escape_string(name, buffer, sizeof(buffer)),
-                (unsigned char) id[0], (unsigned char) id[1],
-                gnutls_protocol_get_name (version));
-        printf( "\\\\\n");
-      }
-    printf("\\end{supertabular}\n\n");
+		for (i = 0; (name = gnutls_cipher_suite_info
+			     (i, id, &kx, &cipher, &mac, &version)); i++) {
+			printf
+			    ("{\\small{%s}} & \\code{0x%02X 0x%02X} & %s",
+			     escape_string(name, buffer, sizeof(buffer)),
+			     (unsigned char) id[0], (unsigned char) id[1],
+			     gnutls_protocol_get_name(version));
+			printf("\\\\\n");
+		}
+		printf("\\end{supertabular}\n\n");
 
-  }
+	}
 
-return;
+	return;
 
 }

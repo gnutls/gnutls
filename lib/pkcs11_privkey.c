@@ -29,16 +29,15 @@
 #include <gnutls_pk.h>
 #include <p11-kit/uri.h>
 
-struct gnutls_pkcs11_privkey_st
-{
-  gnutls_pk_algorithm_t pk_algorithm;
-  unsigned int flags;
-  struct p11_kit_uri *info;
-  
-  struct pkcs11_session_info sinfo;
-  ck_object_handle_t obj; /* the key in the session */
+struct gnutls_pkcs11_privkey_st {
+	gnutls_pk_algorithm_t pk_algorithm;
+	unsigned int flags;
+	struct p11_kit_uri *info;
 
-  struct pin_info_st pin;
+	struct pkcs11_session_info sinfo;
+	ck_object_handle_t obj;	/* the key in the session */
+
+	struct pin_info_st pin;
 };
 
 /**
@@ -50,25 +49,22 @@ struct gnutls_pkcs11_privkey_st
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int
-gnutls_pkcs11_privkey_init (gnutls_pkcs11_privkey_t * key)
+int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 {
-  *key = gnutls_calloc (1, sizeof (struct gnutls_pkcs11_privkey_st));
-  if (*key == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+	*key = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_privkey_st));
+	if (*key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-  (*key)->info = p11_kit_uri_new ();
-  if ((*key)->info == NULL)
-    {
-      free (*key);
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+	(*key)->info = p11_kit_uri_new();
+	if ((*key)->info == NULL) {
+		free(*key);
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -77,13 +73,12 @@ gnutls_pkcs11_privkey_init (gnutls_pkcs11_privkey_t * key)
  *
  * This function will deinitialize a private key structure.
  **/
-void
-gnutls_pkcs11_privkey_deinit (gnutls_pkcs11_privkey_t key)
+void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
 {
-  p11_kit_uri_free (key->info);
-  if (key->sinfo.init != 0)
-    pkcs11_close_session (&key->sinfo);
-  gnutls_free (key);
+	p11_kit_uri_free(key->info);
+	if (key->sinfo.init != 0)
+		pkcs11_close_session(&key->sinfo);
+	gnutls_free(key);
 }
 
 /**
@@ -98,12 +93,12 @@ gnutls_pkcs11_privkey_deinit (gnutls_pkcs11_privkey_t key)
  *   success, or a negative error code on error.
  **/
 int
-gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key,
-                                        unsigned int *bits)
+gnutls_pkcs11_privkey_get_pk_algorithm(gnutls_pkcs11_privkey_t key,
+				       unsigned int *bits)
 {
-  if (bits)
-    *bits = 0;                  /* FIXME */
-  return key->pk_algorithm;
+	if (bits)
+		*bits = 0;	/* FIXME */
+	return key->pk_algorithm;
 }
 
 /**
@@ -121,56 +116,57 @@ gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key,
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  **/
 int
-gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
-                                gnutls_pkcs11_obj_info_t itype,
-                                void *output, size_t * output_size)
+gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t pkey,
+			       gnutls_pkcs11_obj_info_t itype,
+			       void *output, size_t * output_size)
 {
-  return pkcs11_get_info (pkey->info, itype, output, output_size);
+	return pkcs11_get_info(pkey->info, itype, output, output_size);
 }
 
 static int
-find_object (struct pkcs11_session_info* sinfo,
-                    struct pin_info_st * pin_info,
-                    ck_object_handle_t * _obj,
-                    struct p11_kit_uri *info, unsigned int flags)
+find_object(struct pkcs11_session_info *sinfo,
+	    struct pin_info_st *pin_info,
+	    ck_object_handle_t * _obj,
+	    struct p11_kit_uri *info, unsigned int flags)
 {
-  int ret;
-  ck_object_handle_t obj;
-  struct ck_attribute *attrs;
-  unsigned long attr_count;
-  unsigned long count;
-  ck_rv_t rv;
+	int ret;
+	ck_object_handle_t obj;
+	struct ck_attribute *attrs;
+	unsigned long attr_count;
+	unsigned long count;
+	ck_rv_t rv;
 
-  ret = pkcs11_open_session (sinfo, pin_info, info, flags & SESSION_LOGIN);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret =
+	    pkcs11_open_session(sinfo, pin_info, info,
+				flags & SESSION_LOGIN);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  attrs = p11_kit_uri_get_attributes (info, &attr_count);
-  rv = pkcs11_find_objects_init (sinfo->module, sinfo->pks, attrs, attr_count);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("pk11: FindObjectsInit failed.\n");
-      ret = pkcs11_rv_to_err (rv);
-      goto fail;
-    }
+	attrs = p11_kit_uri_get_attributes(info, &attr_count);
+	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, attrs,
+				      attr_count);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		_gnutls_debug_log("pk11: FindObjectsInit failed.\n");
+		ret = pkcs11_rv_to_err(rv);
+		goto fail;
+	}
 
-  if (pkcs11_find_objects (sinfo->module, sinfo->pks, &obj, 1, &count) == CKR_OK && count == 1)
-    {
-      *_obj = obj;
-      pkcs11_find_objects_final (sinfo);
-      return 0;
-    }
+	if (pkcs11_find_objects(sinfo->module, sinfo->pks, &obj, 1, &count)
+	    == CKR_OK && count == 1) {
+		*_obj = obj;
+		pkcs11_find_objects_final(sinfo);
+		return 0;
+	}
 
-  ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-  pkcs11_find_objects_final (sinfo);
-fail:
-  pkcs11_close_session (sinfo);
+	ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	pkcs11_find_objects_final(sinfo);
+      fail:
+	pkcs11_close_session(sinfo);
 
-  return ret;
+	return ret;
 }
 
 #define FIND_OBJECT(sinfo, pin_info, obj, key) \
@@ -206,109 +202,101 @@ fail:
  *   negative error value.
  -*/
 int
-_gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
-                                  const gnutls_datum_t * hash,
-                                  gnutls_datum_t * signature)
+_gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
+				 const gnutls_datum_t * hash,
+				 gnutls_datum_t * signature)
 {
-  ck_rv_t rv;
-  int ret;
-  struct ck_mechanism mech;
-  gnutls_datum_t tmp = {NULL, 0};
-  unsigned long siglen;
-  struct pkcs11_session_info _sinfo;
-  struct pkcs11_session_info *sinfo;
-  ck_object_handle_t obj;
+	ck_rv_t rv;
+	int ret;
+	struct ck_mechanism mech;
+	gnutls_datum_t tmp = { NULL, 0 };
+	unsigned long siglen;
+	struct pkcs11_session_info _sinfo;
+	struct pkcs11_session_info *sinfo;
+	ck_object_handle_t obj;
 
-  if (key->sinfo.init != 0)
-    {
-      sinfo = &key->sinfo;
-      obj = key->obj;
-    }
-  else
-    {
-      sinfo = &_sinfo;
-      memset(sinfo, 0, sizeof(*sinfo));
-      FIND_OBJECT (sinfo, &key->pin, obj, key);
-    }
+	if (key->sinfo.init != 0) {
+		sinfo = &key->sinfo;
+		obj = key->obj;
+	} else {
+		sinfo = &_sinfo;
+		memset(sinfo, 0, sizeof(*sinfo));
+		FIND_OBJECT(sinfo, &key->pin, obj, key);
+	}
 
-  mech.mechanism = pk_to_mech(key->pk_algorithm);
-  mech.parameter = NULL;
-  mech.parameter_len = 0;
+	mech.mechanism = pk_to_mech(key->pk_algorithm);
+	mech.parameter = NULL;
+	mech.parameter_len = 0;
 
-  /* Initialize signing operation; using the private key discovered
-   * earlier. */
-  rv = pkcs11_sign_init (sinfo->module, sinfo->pks, &mech, obj);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      ret = pkcs11_rv_to_err (rv);
-      goto cleanup;
-    }
+	/* Initialize signing operation; using the private key discovered
+	 * earlier. */
+	rv = pkcs11_sign_init(sinfo->module, sinfo->pks, &mech, obj);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
 
-  /* Work out how long the signature must be: */
-  rv = pkcs11_sign (sinfo->module, sinfo->pks, hash->data, hash->size, NULL, &siglen);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      ret = pkcs11_rv_to_err (rv);
-      goto cleanup;
-    }
+	/* Work out how long the signature must be: */
+	rv = pkcs11_sign(sinfo->module, sinfo->pks, hash->data, hash->size,
+			 NULL, &siglen);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
 
-  tmp.data = gnutls_malloc (siglen);
-  tmp.size = siglen;
+	tmp.data = gnutls_malloc(siglen);
+	tmp.size = siglen;
 
-  rv = pkcs11_sign (sinfo->module, sinfo->pks, hash->data, hash->size, tmp.data, &siglen);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      ret = pkcs11_rv_to_err (rv);
-      goto cleanup;
-    }
+	rv = pkcs11_sign(sinfo->module, sinfo->pks, hash->data, hash->size,
+			 tmp.data, &siglen);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
 
-  
-  if (key->pk_algorithm == GNUTLS_PK_EC || key->pk_algorithm == GNUTLS_PK_DSA)
-    {
-      unsigned int hlen = siglen / 2;
-      gnutls_datum_t r, s;
 
-      if (siglen % 2 != 0)
-        {
-          gnutls_assert();
-          ret = GNUTLS_E_PK_SIGN_FAILED;
-          goto cleanup;
-        }
+	if (key->pk_algorithm == GNUTLS_PK_EC
+	    || key->pk_algorithm == GNUTLS_PK_DSA) {
+		unsigned int hlen = siglen / 2;
+		gnutls_datum_t r, s;
 
-      r.data = tmp.data;
-      r.size = hlen;
+		if (siglen % 2 != 0) {
+			gnutls_assert();
+			ret = GNUTLS_E_PK_SIGN_FAILED;
+			goto cleanup;
+		}
 
-      s.data = &tmp.data[hlen];
-      s.size = hlen;
-      
-      ret = _gnutls_encode_ber_rs_raw (signature, &r, &s);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
+		r.data = tmp.data;
+		r.size = hlen;
 
-      gnutls_free(tmp.data);
-      tmp.data = NULL;
-    }
-  else
-    {
-      signature->size = siglen;
-      signature->data = tmp.data;
-    }
+		s.data = &tmp.data[hlen];
+		s.size = hlen;
 
-  ret = 0;
+		ret = _gnutls_encode_ber_rs_raw(signature, &r, &s);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
-cleanup:
-  if (sinfo != &key->sinfo)
-    pkcs11_close_session (sinfo);
-  if (ret < 0)
-    gnutls_free(tmp.data);
+		gnutls_free(tmp.data);
+		tmp.data = NULL;
+	} else {
+		signature->size = siglen;
+		signature->data = tmp.data;
+	}
 
-  return ret;
+	ret = 0;
+
+      cleanup:
+	if (sinfo != &key->sinfo)
+		pkcs11_close_session(sinfo);
+	if (ret < 0)
+		gnutls_free(tmp.data);
+
+	return ret;
 }
 
 /**
@@ -323,41 +311,36 @@ cleanup:
  * Since: 3.1.9
  *
  **/
-int
-gnutls_pkcs11_privkey_status (gnutls_pkcs11_privkey_t key)
+int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
 {
-  ck_rv_t rv;
-  int ret;
-  struct pkcs11_session_info _sinfo;
-  struct pkcs11_session_info *sinfo;
-  ck_object_handle_t obj;
-  struct ck_session_info session_info;
+	ck_rv_t rv;
+	int ret;
+	struct pkcs11_session_info _sinfo;
+	struct pkcs11_session_info *sinfo;
+	ck_object_handle_t obj;
+	struct ck_session_info session_info;
 
-  if (key->sinfo.init != 0)
-    {
-      sinfo = &key->sinfo;
-      obj = key->obj;
-    }
-  else
-    {
-      sinfo = &_sinfo;
-      memset(sinfo, 0, sizeof(*sinfo));
-      FIND_OBJECT (sinfo, &key->pin, obj, key);
-    }
-  
-  rv = (sinfo->module)->C_GetSessionInfo (sinfo->pks, &session_info);
-  if (rv != CKR_OK)
-    {
-      ret = 0;
-      goto cleanup;
-    }
-  ret = 1;
+	if (key->sinfo.init != 0) {
+		sinfo = &key->sinfo;
+		obj = key->obj;
+	} else {
+		sinfo = &_sinfo;
+		memset(sinfo, 0, sizeof(*sinfo));
+		FIND_OBJECT(sinfo, &key->pin, obj, key);
+	}
 
-cleanup:
-  if (sinfo != &key->sinfo)
-    pkcs11_close_session (sinfo);
+	rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks, &session_info);
+	if (rv != CKR_OK) {
+		ret = 0;
+		goto cleanup;
+	}
+	ret = 1;
 
-  return ret;
+      cleanup:
+	if (sinfo != &key->sinfo)
+		pkcs11_close_session(sinfo);
+
+	return ret;
 }
 
 /**
@@ -375,82 +358,77 @@ cleanup:
  *   negative error value.
  **/
 int
-gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
-                                  const char *url, unsigned int flags)
+gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
+				 const char *url, unsigned int flags)
 {
-  int ret;
-  struct ck_attribute *attr;
-  ck_object_handle_t obj;
-  struct ck_attribute a[4];
-  ck_key_type_t key_type;
-  struct pkcs11_session_info sinfo;
-  
-  memset(&sinfo, 0, sizeof(sinfo));
+	int ret;
+	struct ck_attribute *attr;
+	ck_object_handle_t obj;
+	struct ck_attribute a[4];
+	ck_key_type_t key_type;
+	struct pkcs11_session_info sinfo;
 
-  ret = pkcs11_url_to_info (url, &pkey->info);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	memset(&sinfo, 0, sizeof(sinfo));
 
-  pkey->flags = flags;
+	ret = pkcs11_url_to_info(url, &pkey->info);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  attr = p11_kit_uri_get_attribute (pkey->info, CKA_CLASS);
-  if (!attr || attr->value_len != sizeof (ck_object_class_t) ||
-      *(ck_object_class_t*)attr->value != CKO_PRIVATE_KEY)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	pkey->flags = flags;
 
-  attr = p11_kit_uri_get_attribute (pkey->info, CKA_ID);
-  if (!attr || !attr->value_len)
-    {
-      attr = p11_kit_uri_get_attribute (pkey->info, CKA_LABEL);
-      if (!attr || !attr->value_len)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-        }
-    }
+	attr = p11_kit_uri_get_attribute(pkey->info, CKA_CLASS);
+	if (!attr || attr->value_len != sizeof(ck_object_class_t) ||
+	    *(ck_object_class_t *) attr->value != CKO_PRIVATE_KEY) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  FIND_OBJECT (&sinfo, &pkey->pin, obj, pkey);
+	attr = p11_kit_uri_get_attribute(pkey->info, CKA_ID);
+	if (!attr || !attr->value_len) {
+		attr = p11_kit_uri_get_attribute(pkey->info, CKA_LABEL);
+		if (!attr || !attr->value_len) {
+			gnutls_assert();
+			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		}
+	}
 
-  a[0].type = CKA_KEY_TYPE;
-  a[0].value = &key_type;
-  a[0].value_len = sizeof (key_type);
+	FIND_OBJECT(&sinfo, &pkey->pin, obj, pkey);
 
-  if (pkcs11_get_attribute_value (sinfo.module, sinfo.pks, obj, a, 1) == CKR_OK)
-    {
-      pkey->pk_algorithm = mech_to_pk(key_type);
-      if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN)
-        {
-          _gnutls_debug_log("Cannot determine PKCS #11 key algorithm\n");
-          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
-          goto cleanup;
-        }
-    }
+	a[0].type = CKA_KEY_TYPE;
+	a[0].value = &key_type;
+	a[0].value_len = sizeof(key_type);
 
-  ret = 0;
-  
-  if (pkey->sinfo.init)
-    pkcs11_close_session (&pkey->sinfo);
+	if (pkcs11_get_attribute_value(sinfo.module, sinfo.pks, obj, a, 1)
+	    == CKR_OK) {
+		pkey->pk_algorithm = mech_to_pk(key_type);
+		if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN) {
+			_gnutls_debug_log
+			    ("Cannot determine PKCS #11 key algorithm\n");
+			ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+			goto cleanup;
+		}
+	}
 
-  if (sinfo.tinfo.max_session_count != 1)
-    {
-      /* We do not keep the session open in tokens that can 
-       * only support a single session.
-       */
-      memcpy(&pkey->sinfo, &sinfo, sizeof(pkey->sinfo));
-      pkey->obj = obj;
-      return ret;
-    }
+	ret = 0;
 
-cleanup:
-  pkcs11_close_session (&sinfo);
+	if (pkey->sinfo.init)
+		pkcs11_close_session(&pkey->sinfo);
 
-  return ret;
+	if (sinfo.tinfo.max_session_count != 1) {
+		/* We do not keep the session open in tokens that can 
+		 * only support a single session.
+		 */
+		memcpy(&pkey->sinfo, &sinfo, sizeof(pkey->sinfo));
+		pkey->obj = obj;
+		return ret;
+	}
+
+      cleanup:
+	pkcs11_close_session(&sinfo);
+
+	return ret;
 }
 
 /*-
@@ -467,80 +445,74 @@ cleanup:
  *   negative error value.
  -*/
 int
-_gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
-                                    unsigned int flags,
-                                    const gnutls_datum_t * ciphertext,
-                                    gnutls_datum_t * plaintext)
+_gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
+				    unsigned int flags,
+				    const gnutls_datum_t * ciphertext,
+				    gnutls_datum_t * plaintext)
 {
-  ck_rv_t rv;
-  int ret;
-  struct ck_mechanism mech;
-  unsigned long siglen;
-  ck_object_handle_t obj;
-  struct pkcs11_session_info _sinfo;
-  struct pkcs11_session_info *sinfo;
+	ck_rv_t rv;
+	int ret;
+	struct ck_mechanism mech;
+	unsigned long siglen;
+	ck_object_handle_t obj;
+	struct pkcs11_session_info _sinfo;
+	struct pkcs11_session_info *sinfo;
 
-  if (key->sinfo.init != 0)
-    {
-      sinfo = &key->sinfo;
-      obj = key->obj;
-    }
-  else
-    {
-      sinfo = &_sinfo;
-      memset(sinfo, 0, sizeof(*sinfo));
-      FIND_OBJECT (sinfo, &key->pin, obj, key);
-    }
+	if (key->sinfo.init != 0) {
+		sinfo = &key->sinfo;
+		obj = key->obj;
+	} else {
+		sinfo = &_sinfo;
+		memset(sinfo, 0, sizeof(*sinfo));
+		FIND_OBJECT(sinfo, &key->pin, obj, key);
+	}
 
-  if (key->pk_algorithm != GNUTLS_PK_RSA)
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (key->pk_algorithm != GNUTLS_PK_RSA)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  mech.mechanism = CKM_RSA_PKCS;
-  mech.parameter = NULL;
-  mech.parameter_len = 0;
+	mech.mechanism = CKM_RSA_PKCS;
+	mech.parameter = NULL;
+	mech.parameter_len = 0;
 
-  /* Initialize signing operation; using the private key discovered
-   * earlier. */
-  rv = pkcs11_decrypt_init (sinfo->module, sinfo->pks, &mech, obj);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      ret = pkcs11_rv_to_err (rv);
-      goto cleanup;
-    }
+	/* Initialize signing operation; using the private key discovered
+	 * earlier. */
+	rv = pkcs11_decrypt_init(sinfo->module, sinfo->pks, &mech, obj);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
 
-  /* Work out how long the plaintext must be: */
-  rv = pkcs11_decrypt (sinfo->module, sinfo->pks, ciphertext->data, ciphertext->size,
-                         NULL, &siglen);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      ret = pkcs11_rv_to_err (rv);
-      goto cleanup;
-    }
+	/* Work out how long the plaintext must be: */
+	rv = pkcs11_decrypt(sinfo->module, sinfo->pks, ciphertext->data,
+			    ciphertext->size, NULL, &siglen);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
 
-  plaintext->data = gnutls_malloc (siglen);
-  plaintext->size = siglen;
+	plaintext->data = gnutls_malloc(siglen);
+	plaintext->size = siglen;
 
-  rv = pkcs11_decrypt (sinfo->module, sinfo->pks, ciphertext->data, ciphertext->size,
-                         plaintext->data, &siglen);
-  if (rv != CKR_OK)
-    {
-      gnutls_free (plaintext->data);
-      gnutls_assert ();
-      ret = pkcs11_rv_to_err (rv);
-      goto cleanup;
-    }
+	rv = pkcs11_decrypt(sinfo->module, sinfo->pks, ciphertext->data,
+			    ciphertext->size, plaintext->data, &siglen);
+	if (rv != CKR_OK) {
+		gnutls_free(plaintext->data);
+		gnutls_assert();
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
 
-  plaintext->size = siglen;
+	plaintext->size = siglen;
 
-  ret = 0;
+	ret = 0;
 
-cleanup:
-  if (key->sinfo.init == 0)
-    pkcs11_close_session (sinfo);
+      cleanup:
+	if (key->sinfo.init == 0)
+		pkcs11_close_session(sinfo);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -555,20 +527,19 @@ cleanup:
  *   negative error value.
  **/
 int
-gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
-                                  gnutls_pkcs11_url_type_t detailed,
-                                  char **url)
+gnutls_pkcs11_privkey_export_url(gnutls_pkcs11_privkey_t key,
+				 gnutls_pkcs11_url_type_t detailed,
+				 char **url)
 {
-  int ret;
+	int ret;
 
-  ret = pkcs11_info_to_url (key->info, detailed, url);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = pkcs11_info_to_url(key->info, detailed, url);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  return 0;
+	return 0;
 }
 
 
@@ -590,11 +561,12 @@ gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
  * Since: 3.0
  **/
 int
-gnutls_pkcs11_privkey_generate (const char* url, gnutls_pk_algorithm_t pk, 
-                                unsigned int bits, const char* label, 
-                                unsigned int flags)
+gnutls_pkcs11_privkey_generate(const char *url, gnutls_pk_algorithm_t pk,
+			       unsigned int bits, const char *label,
+			       unsigned int flags)
 {
-  return gnutls_pkcs11_privkey_generate2( url, pk, bits, label, 0, NULL, flags);
+	return gnutls_pkcs11_privkey_generate2(url, pk, bits, label, 0,
+					       NULL, flags);
 }
 
 /**
@@ -619,229 +591,216 @@ gnutls_pkcs11_privkey_generate (const char* url, gnutls_pk_algorithm_t pk,
  * Since: 3.1.5
  **/
 int
-gnutls_pkcs11_privkey_generate2 (const char* url, gnutls_pk_algorithm_t pk, 
-                                unsigned int bits, const char* label, 
-                                gnutls_x509_crt_fmt_t fmt, 
-                                gnutls_datum_t * pubkey,
-                                unsigned int flags)
+gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
+				unsigned int bits, const char *label,
+				gnutls_x509_crt_fmt_t fmt,
+				gnutls_datum_t * pubkey,
+				unsigned int flags)
 {
-  int ret;
-  const ck_bool_t tval = 1;
-  const ck_bool_t fval = 0;
-  struct pkcs11_session_info sinfo;
-  struct p11_kit_uri *info = NULL;
-  ck_rv_t rv;
-  struct ck_attribute a[10], p[10];
-  ck_object_handle_t pub, priv;
-  unsigned long _bits = bits;
-  int a_val, p_val;
-  struct ck_mechanism mech;
-  gnutls_pubkey_t pkey = NULL;
-  gnutls_pkcs11_obj_t obj = NULL;
+	int ret;
+	const ck_bool_t tval = 1;
+	const ck_bool_t fval = 0;
+	struct pkcs11_session_info sinfo;
+	struct p11_kit_uri *info = NULL;
+	ck_rv_t rv;
+	struct ck_attribute a[10], p[10];
+	ck_object_handle_t pub, priv;
+	unsigned long _bits = bits;
+	int a_val, p_val;
+	struct ck_mechanism mech;
+	gnutls_pubkey_t pkey = NULL;
+	gnutls_pkcs11_obj_t obj = NULL;
 
-  memset(&sinfo, 0, sizeof(sinfo));
+	memset(&sinfo, 0, sizeof(sinfo));
 
-  ret = pkcs11_url_to_info (url, &info);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = pkcs11_url_to_info(url, &info);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  ret =
-    pkcs11_open_session (&sinfo, NULL, info,
-                         SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
-  p11_kit_uri_free (info);
+	ret =
+	    pkcs11_open_session(&sinfo, NULL, info,
+				SESSION_WRITE |
+				pkcs11_obj_flags_to_int(flags));
+	p11_kit_uri_free(info);
 
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-  /* a holds the public key template
-   * and p the private key */
-  a_val = p_val = 0;
-  mech.parameter = NULL;
-  mech.parameter_len = 0;
-  mech.mechanism = pk_to_genmech(pk);
+	/* a holds the public key template
+	 * and p the private key */
+	a_val = p_val = 0;
+	mech.parameter = NULL;
+	mech.parameter_len = 0;
+	mech.mechanism = pk_to_genmech(pk);
 
-  switch(pk)
-    {
-      case GNUTLS_PK_RSA:
-        p[p_val].type = CKA_DECRYPT;
-        p[p_val].value = (void*)&tval;
-        p[p_val].value_len = sizeof (tval);
-        p_val++;
+	switch (pk) {
+	case GNUTLS_PK_RSA:
+		p[p_val].type = CKA_DECRYPT;
+		p[p_val].value = (void *) &tval;
+		p[p_val].value_len = sizeof(tval);
+		p_val++;
 
-        p[p_val].type = CKA_SIGN;
-        p[p_val].value = (void*)&tval;
-        p[p_val].value_len = sizeof (tval);
-        p_val++;
+		p[p_val].type = CKA_SIGN;
+		p[p_val].value = (void *) &tval;
+		p[p_val].value_len = sizeof(tval);
+		p_val++;
 
-        a[a_val].type = CKA_ENCRYPT;
-        a[a_val].value = (void*)&tval;
-        a[a_val].value_len = sizeof (tval);
-        a_val++;
+		a[a_val].type = CKA_ENCRYPT;
+		a[a_val].value = (void *) &tval;
+		a[a_val].value_len = sizeof(tval);
+		a_val++;
 
-        a[a_val].type = CKA_VERIFY;
-        a[a_val].value = (void*)&tval;
-        a[a_val].value_len = sizeof (tval);
-        a_val++;
+		a[a_val].type = CKA_VERIFY;
+		a[a_val].value = (void *) &tval;
+		a[a_val].value_len = sizeof(tval);
+		a_val++;
 
-        a[a_val].type = CKA_MODULUS_BITS;
-        a[a_val].value = &_bits;
-        a[a_val].value_len = sizeof (_bits);
-        a_val++;
-        break;
-      case GNUTLS_PK_DSA:
-        p[p_val].type = CKA_SIGN;
-        p[p_val].value = (void*)&tval;
-        p[p_val].value_len = sizeof (tval);
-        p_val++;
+		a[a_val].type = CKA_MODULUS_BITS;
+		a[a_val].value = &_bits;
+		a[a_val].value_len = sizeof(_bits);
+		a_val++;
+		break;
+	case GNUTLS_PK_DSA:
+		p[p_val].type = CKA_SIGN;
+		p[p_val].value = (void *) &tval;
+		p[p_val].value_len = sizeof(tval);
+		p_val++;
 
-        a[a_val].type = CKA_VERIFY;
-        a[a_val].value = (void*)&tval;
-        a[a_val].value_len = sizeof (tval);
-        a_val++;
+		a[a_val].type = CKA_VERIFY;
+		a[a_val].value = (void *) &tval;
+		a[a_val].value_len = sizeof(tval);
+		a_val++;
 
-        a[a_val].type = CKA_MODULUS_BITS;
-        a[a_val].value = &_bits;
-        a[a_val].value_len = sizeof (_bits);
-        a_val++;
-        break;
-      case GNUTLS_PK_EC:
-        p[p_val].type = CKA_SIGN;
-        p[p_val].value = (void*)&tval;
-        p[p_val].value_len = sizeof (tval);
-        p_val++;
+		a[a_val].type = CKA_MODULUS_BITS;
+		a[a_val].value = &_bits;
+		a[a_val].value_len = sizeof(_bits);
+		a_val++;
+		break;
+	case GNUTLS_PK_EC:
+		p[p_val].type = CKA_SIGN;
+		p[p_val].value = (void *) &tval;
+		p[p_val].value_len = sizeof(tval);
+		p_val++;
 
-        a[a_val].type = CKA_VERIFY;
-        a[a_val].value = (void*)&tval;
-        a[a_val].value_len = sizeof (tval);
-        a_val++;
+		a[a_val].type = CKA_VERIFY;
+		a[a_val].value = (void *) &tval;
+		a[a_val].value_len = sizeof(tval);
+		a_val++;
 
-        a[a_val].type = CKA_MODULUS_BITS;
-        a[a_val].value = &_bits;
-        a[a_val].value_len = sizeof (_bits);
-        a_val++;
-        break;
-      default:
-        ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-        goto cleanup;
-    }
+		a[a_val].type = CKA_MODULUS_BITS;
+		a[a_val].value = &_bits;
+		a[a_val].value_len = sizeof(_bits);
+		a_val++;
+		break;
+	default:
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
 
-  /* a private key is set always as private unless
-   * requested otherwise
-   */
-  if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE)
-    {
-      p[p_val].type = CKA_PRIVATE;
-      p[p_val].value = (void*)&fval;
-      p[p_val].value_len = sizeof(fval);
-      p_val++;
-    }
-  else
-    {
-      p[p_val].type = CKA_PRIVATE;
-      p[p_val].value = (void*)&tval;
-      p[p_val].value_len = sizeof (tval);
-      p_val++;
-    }
+	/* a private key is set always as private unless
+	 * requested otherwise
+	 */
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE) {
+		p[p_val].type = CKA_PRIVATE;
+		p[p_val].value = (void *) &fval;
+		p[p_val].value_len = sizeof(fval);
+		p_val++;
+	} else {
+		p[p_val].type = CKA_PRIVATE;
+		p[p_val].value = (void *) &tval;
+		p[p_val].value_len = sizeof(tval);
+		p_val++;
+	}
 
-  p[p_val].type = CKA_TOKEN;
-  p[p_val].value = (void *)&tval;
-  p[p_val].value_len = sizeof (tval);
-  p_val++;
+	p[p_val].type = CKA_TOKEN;
+	p[p_val].value = (void *) &tval;
+	p[p_val].value_len = sizeof(tval);
+	p_val++;
 
-  if (label)
-    {
-      p[p_val].type = CKA_LABEL;
-      p[p_val].value = (void*)label;
-      p[p_val].value_len = strlen (label);
-      p_val++;
+	if (label) {
+		p[p_val].type = CKA_LABEL;
+		p[p_val].value = (void *) label;
+		p[p_val].value_len = strlen(label);
+		p_val++;
 
-      a[a_val].type = CKA_LABEL;
-      a[a_val].value = (void*)label;
-      a[a_val].value_len = strlen (label);
-      a_val++;
-    }
+		a[a_val].type = CKA_LABEL;
+		a[a_val].value = (void *) label;
+		a[a_val].value_len = strlen(label);
+		a_val++;
+	}
 
-  if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
-    {
-      p[p_val].type = CKA_SENSITIVE;
-      p[p_val].value = (void*)&tval;
-      p[p_val].value_len = sizeof (tval);
-      p_val++;
-    }
-  else
-    {
-      p[p_val].type = CKA_SENSITIVE;
-      p[p_val].value = (void*)&fval;
-      p[p_val].value_len = sizeof (fval);
-      p_val++;
-    }
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE) {
+		p[p_val].type = CKA_SENSITIVE;
+		p[p_val].value = (void *) &tval;
+		p[p_val].value_len = sizeof(tval);
+		p_val++;
+	} else {
+		p[p_val].type = CKA_SENSITIVE;
+		p[p_val].value = (void *) &fval;
+		p[p_val].value_len = sizeof(fval);
+		p_val++;
+	}
 
-  rv = pkcs11_generate_key_pair( sinfo.module, sinfo.pks, &mech, a, a_val, p, p_val, &pub, &priv);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("pkcs11: %s\n", pkcs11_strerror (rv));
-      ret = pkcs11_rv_to_err (rv);
-      goto cleanup;
-    }
-  
-  /* extract the public key */
-  if (pubkey)
-    {
-      ret = gnutls_pubkey_init(&pkey);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+	rv = pkcs11_generate_key_pair(sinfo.module, sinfo.pks, &mech, a,
+				      a_val, p, p_val, &pub, &priv);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		_gnutls_debug_log("pkcs11: %s\n", pkcs11_strerror(rv));
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
 
-      ret = gnutls_pkcs11_obj_init(&obj);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+	/* extract the public key */
+	if (pubkey) {
+		ret = gnutls_pubkey_init(&pkey);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
-      obj->pk_algorithm = pk;
-      obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
-      ret = pkcs11_read_pubkey(sinfo.module, sinfo.pks, pub, mech.mechanism, obj->pubkey);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
-      
-      ret = gnutls_pubkey_import_pkcs11 (pkey, obj, 0);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+		ret = gnutls_pkcs11_obj_init(&obj);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
-      ret = gnutls_pubkey_export2 (pkey, fmt, pubkey);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
-    }
-    
+		obj->pk_algorithm = pk;
+		obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
+		ret =
+		    pkcs11_read_pubkey(sinfo.module, sinfo.pks, pub,
+				       mech.mechanism, obj->pubkey);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
-cleanup:
-  if (obj != NULL)
-    gnutls_pkcs11_obj_deinit(obj);
-  if (pkey != NULL)
-    gnutls_pubkey_deinit(pkey);
-  if (sinfo.pks != 0)
-    pkcs11_close_session (&sinfo);
+		ret = gnutls_pubkey_import_pkcs11(pkey, obj, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
-  return ret;
+		ret = gnutls_pubkey_export2(pkey, fmt, pubkey);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+
+      cleanup:
+	if (obj != NULL)
+		gnutls_pkcs11_obj_deinit(obj);
+	if (pkey != NULL)
+		gnutls_pubkey_deinit(pkey);
+	if (sinfo.pks != 0)
+		pkcs11_close_session(&sinfo);
+
+	return ret;
 }
 
 /**
@@ -858,10 +817,10 @@ cleanup:
  *
  **/
 void
-gnutls_pkcs11_privkey_set_pin_function (gnutls_pkcs11_privkey_t key,
-					gnutls_pin_callback_t fn,
-					void *userdata)
+gnutls_pkcs11_privkey_set_pin_function(gnutls_pkcs11_privkey_t key,
+				       gnutls_pin_callback_t fn,
+				       void *userdata)
 {
-  key->pin.cb = fn;
-  key->pin.data = userdata;
+	key->pin.cb = fn;
+	key->pin.data = userdata;
 }

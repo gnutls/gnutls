@@ -37,11 +37,10 @@ void *_gnutls_pin_data;
  * Since: 2.12.0
  **/
 void
-gnutls_pkcs11_set_pin_function (gnutls_pin_callback_t fn,
-                                void *userdata)
+gnutls_pkcs11_set_pin_function(gnutls_pin_callback_t fn, void *userdata)
 {
-  _gnutls_pin_func = fn;
-  _gnutls_pin_data = userdata;
+	_gnutls_pin_func = fn;
+	_gnutls_pin_data = userdata;
 }
 
 /**
@@ -55,13 +54,11 @@ gnutls_pkcs11_set_pin_function (gnutls_pin_callback_t fn,
  * 
  * Since: 3.1.0
  **/
-gnutls_pin_callback_t
-gnutls_pkcs11_get_pin_function (void **userdata)
+gnutls_pin_callback_t gnutls_pkcs11_get_pin_function(void **userdata)
 {
-  if (_gnutls_pin_func != NULL)
-    {
-      *userdata = _gnutls_pin_data;
-      return _gnutls_pin_func;
-    }
-  return NULL;
+	if (_gnutls_pin_func != NULL) {
+		*userdata = _gnutls_pin_data;
+		return _gnutls_pin_func;
+	}
+	return NULL;
 }

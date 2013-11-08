@@ -34,10 +34,9 @@
 #if defined(_WIN32)
 
 /* socketpair isn't supported on Win32. */
-int
-main (int argc, char** argv)
+int main(int argc, char **argv)
 {
-    exit (77);
+	exit(77);
 }
 
 #else
@@ -56,108 +55,101 @@ main (int argc, char** argv)
 /* A very basic TLS client, with PSK authentication.
  */
 
-const char* side = "";
+const char *side = "";
 
-static void
-tls_log_func (int level, const char *str)
+static void tls_log_func(int level, const char *str)
 {
-  fprintf (stderr, "%s|<%d>| %s", side, level, str);
+	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-static void
-client (int sd)
+static void client(int sd)
 {
-  int ret, ii;
-  gnutls_session_t session;
-  gnutls_certificate_credentials_t clientx509cred;
-  char buffer[MAX_BUF + 1];
-  gnutls_psk_client_credentials_t pskcred;
-  /* Need to enable anonymous KX specifically. */
-  const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
+	int ret, ii;
+	gnutls_session_t session;
+	gnutls_certificate_credentials_t clientx509cred;
+	char buffer[MAX_BUF + 1];
+	gnutls_psk_client_credentials_t pskcred;
+	/* Need to enable anonymous KX specifically. */
+	const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
 
-  global_init ();
-  gnutls_global_set_log_function (tls_log_func);
-  if (debug)
-    gnutls_global_set_log_level (4711);
-    
-  side = "client";
+	global_init();
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
 
-  gnutls_certificate_allocate_credentials (&clientx509cred);
+	side = "client";
 
-  gnutls_psk_allocate_client_credentials (&pskcred);
-  gnutls_psk_set_client_credentials (pskcred, "test", &key,
-                                     GNUTLS_PSK_KEY_HEX);
+	gnutls_certificate_allocate_credentials(&clientx509cred);
 
-  /* Initialize TLS session
-   */
-  gnutls_init (&session, GNUTLS_CLIENT);
+	gnutls_psk_allocate_client_credentials(&pskcred);
+	gnutls_psk_set_client_credentials(pskcred, "test", &key,
+					  GNUTLS_PSK_KEY_HEX);
 
-  /* Use default priorities */
-  gnutls_priority_set_direct (session, "NORMAL:-KX-ALL:+RSA-PSK", NULL);
+	/* Initialize TLS session
+	 */
+	gnutls_init(&session, GNUTLS_CLIENT);
 
-  /* put the anonymous credentials to the current session
-   */
-  gnutls_credentials_set (session, GNUTLS_CRD_PSK, pskcred);
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, clientx509cred);
+	/* Use default priorities */
+	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+RSA-PSK",
+				   NULL);
 
-  gnutls_transport_set_int (session, sd);
+	/* put the anonymous credentials to the current session
+	 */
+	gnutls_credentials_set(session, GNUTLS_CRD_PSK, pskcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+			       clientx509cred);
 
-  /* Perform the TLS handshake
-   */
-  ret = gnutls_handshake (session);
+	gnutls_transport_set_int(session, sd);
 
-  if (ret < 0)
-    {
-      fail ("client: Handshake failed\n");
-      gnutls_perror (ret);
-      goto end;
-    }
-  else
-    {
-      if (debug)
-        success ("client: Handshake was completed\n");
-    }
+	/* Perform the TLS handshake
+	 */
+	ret = gnutls_handshake(session);
 
-  gnutls_record_send (session, MSG, strlen (MSG));
+	if (ret < 0) {
+		fail("client: Handshake failed\n");
+		gnutls_perror(ret);
+		goto end;
+	} else {
+		if (debug)
+			success("client: Handshake was completed\n");
+	}
 
-  ret = gnutls_record_recv (session, buffer, MAX_BUF);
-  if (ret == 0)
-    {
-      if (debug)
-        success ("client: Peer has closed the TLS connection\n");
-      goto end;
-    }
-  else if (ret < 0)
-    {
-      fail ("client: Error: %s\n", gnutls_strerror (ret));
-      goto end;
-    }
+	gnutls_record_send(session, MSG, strlen(MSG));
 
-  if (debug)
-    {
-      printf ("- Received %d bytes: ", ret);
-      for (ii = 0; ii < ret; ii++)
-        {
-          fputc (buffer[ii], stdout);
-        }
-      fputs ("\n", stdout);
-    }
+	ret = gnutls_record_recv(session, buffer, MAX_BUF);
+	if (ret == 0) {
+		if (debug)
+			success
+			    ("client: Peer has closed the TLS connection\n");
+		goto end;
+	} else if (ret < 0) {
+		fail("client: Error: %s\n", gnutls_strerror(ret));
+		goto end;
+	}
 
-  gnutls_bye (session, GNUTLS_SHUT_RDWR);
+	if (debug) {
+		printf("- Received %d bytes: ", ret);
+		for (ii = 0; ii < ret; ii++) {
+			fputc(buffer[ii], stdout);
+		}
+		fputs("\n", stdout);
+	}
 
-end:
+	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-  close (sd);
+      end:
 
-  gnutls_deinit (session);
+	close(sd);
 
-  gnutls_psk_free_client_credentials (pskcred);
-  gnutls_certificate_free_credentials (clientx509cred);
+	gnutls_deinit(session);
 
-  gnutls_global_deinit ();
+	gnutls_psk_free_client_credentials(pskcred);
+	gnutls_certificate_free_credentials(clientx509cred);
+
+	gnutls_global_deinit();
 }
 
 /* This is a sample TLS 1.0 echo server, for PSK authentication.
@@ -166,78 +158,79 @@ end:
 #define MAX_BUF 1024
 
 static unsigned char server_cert_pem[] =
-  "-----BEGIN CERTIFICATE-----\n"
-  "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
-  "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
-  "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
-  "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
-  "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
-  "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
-  "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
-  "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
-  "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
-  "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
-  "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
-  "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-  "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
+    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
+    "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
+    "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
+    "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
+    "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
+    "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
+    "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
+    "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
+    "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
+    "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
+    "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
+    "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
-  sizeof (server_cert_pem)
+	sizeof(server_cert_pem)
 };
 
 static unsigned char server_key_pem[] =
-  "-----BEGIN RSA PRIVATE KEY-----\n"
-  "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
-  "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
-  "fnOcMRP/PciupWBu2baMWppvtr6far2n8KAzJ/W3HZLllpxzUtaf1siOsQIDAQAB\n"
-  "AoGAYAFyKkAYC/PYF8e7+X+tsVCHXppp8AoP8TEZuUqOZz/AArVlle/ROrypg5kl\n"
-  "8YunrvUdzH9R/KZ7saNZlAPLjZyFG9beL/am6Ai7q7Ma5HMqjGU8kTEGwD7K+lbG\n"
-  "iomokKMOl+kkbY/2sI5Czmbm+/PqLXOjtVc5RAsdbgvtmvkCQQDdV5QuU8jap8Hs\n"
-  "Eodv/tLJ2z4+SKCV2k/7FXSKWe0vlrq0cl2qZfoTUYRnKRBcWxc9o92DxK44wgPi\n"
-  "oMQS+O7fAkEA+YG+K9e60sj1K4NYbMPAbYILbZxORDecvP8lcphvwkOVUqbmxOGh\n"
-  "XRmTZUuhBrJhJKKf6u7gf3KWlPl6ShKEbwJASC118cF6nurTjuLf7YKARDjNTEws\n"
-  "qZEeQbdWYINAmCMj0RH2P0mvybrsXSOD5UoDAyO7aWuqkHGcCLv6FGG+qwJAOVqq\n"
-  "tXdUucl6GjOKKw5geIvRRrQMhb/m5scb+5iw8A4LEEHPgGiBaF5NtJZLALgWfo5n\n"
-  "hmC8+G8F0F78znQtPwJBANexu+Tg5KfOnzSILJMo3oXiXhf5PqXIDmbN0BKyCKAQ\n"
-  "LfkcEcUbVfmDaHpvzwY9VEaoMOKVLitETXdNSxVpvWM=\n"
-  "-----END RSA PRIVATE KEY-----\n";
+    "-----BEGIN RSA PRIVATE KEY-----\n"
+    "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
+    "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
+    "fnOcMRP/PciupWBu2baMWppvtr6far2n8KAzJ/W3HZLllpxzUtaf1siOsQIDAQAB\n"
+    "AoGAYAFyKkAYC/PYF8e7+X+tsVCHXppp8AoP8TEZuUqOZz/AArVlle/ROrypg5kl\n"
+    "8YunrvUdzH9R/KZ7saNZlAPLjZyFG9beL/am6Ai7q7Ma5HMqjGU8kTEGwD7K+lbG\n"
+    "iomokKMOl+kkbY/2sI5Czmbm+/PqLXOjtVc5RAsdbgvtmvkCQQDdV5QuU8jap8Hs\n"
+    "Eodv/tLJ2z4+SKCV2k/7FXSKWe0vlrq0cl2qZfoTUYRnKRBcWxc9o92DxK44wgPi\n"
+    "oMQS+O7fAkEA+YG+K9e60sj1K4NYbMPAbYILbZxORDecvP8lcphvwkOVUqbmxOGh\n"
+    "XRmTZUuhBrJhJKKf6u7gf3KWlPl6ShKEbwJASC118cF6nurTjuLf7YKARDjNTEws\n"
+    "qZEeQbdWYINAmCMj0RH2P0mvybrsXSOD5UoDAyO7aWuqkHGcCLv6FGG+qwJAOVqq\n"
+    "tXdUucl6GjOKKw5geIvRRrQMhb/m5scb+5iw8A4LEEHPgGiBaF5NtJZLALgWfo5n\n"
+    "hmC8+G8F0F78znQtPwJBANexu+Tg5KfOnzSILJMo3oXiXhf5PqXIDmbN0BKyCKAQ\n"
+    "LfkcEcUbVfmDaHpvzwY9VEaoMOKVLitETXdNSxVpvWM=\n"
+    "-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t server_key = { server_key_pem,
-  sizeof (server_key_pem)
+	sizeof(server_key_pem)
 };
 
 /* These are global */
 gnutls_psk_server_credentials_t server_pskcred;
 
-static gnutls_session_t
-initialize_tls_session (void)
+static gnutls_session_t initialize_tls_session(void)
 {
-  gnutls_session_t session;
+	gnutls_session_t session;
 
-  gnutls_init (&session, GNUTLS_SERVER);
+	gnutls_init(&session, GNUTLS_SERVER);
 
-  /* avoid calling all the priority functions, since the defaults
-   * are adequate.
-   */
-  gnutls_priority_set_direct (session, "NORMAL:-KX-ALL:+RSA-PSK", NULL);
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+RSA-PSK",
+				   NULL);
 
-  gnutls_credentials_set (session, GNUTLS_CRD_PSK, server_pskcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 
-  return session;
+	return session;
 }
 
 static int
-pskfunc (gnutls_session_t session, const char *username, gnutls_datum_t * key)
+pskfunc(gnutls_session_t session, const char *username,
+	gnutls_datum_t * key)
 {
-  if (debug)
-    printf ("psk: username %s\n", username);
-  key->data = gnutls_malloc (4);
-  key->data[0] = 0xDE;
-  key->data[1] = 0xAD;
-  key->data[2] = 0xBE;
-  key->data[3] = 0xEF;
-  key->size = 4;
-  return 0;
+	if (debug)
+		printf("psk: username %s\n", username);
+	key->data = gnutls_malloc(4);
+	key->data[0] = 0xDE;
+	key->data[1] = 0xAD;
+	key->data[2] = 0xBE;
+	key->data[3] = 0xEF;
+	key->size = 4;
+	return 0;
 }
 
 int err, ret;
@@ -246,116 +239,108 @@ gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
-static void
-server (int sd)
+static void server(int sd)
 {
-  gnutls_certificate_credentials_t serverx509cred;
+	gnutls_certificate_credentials_t serverx509cred;
 
-  /* this must be called once in the program
-   */
-  global_init ();
-  gnutls_global_set_log_function (tls_log_func);
-  if (debug)
-    gnutls_global_set_log_level (4711);
-    
-  side = "server";
+	/* this must be called once in the program
+	 */
+	global_init();
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
 
-  gnutls_psk_allocate_server_credentials (&server_pskcred);
-  gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
-  gnutls_certificate_allocate_credentials (&serverx509cred);
-  gnutls_certificate_set_x509_key_mem (serverx509cred,
-                                       &server_cert, &server_key,
-                                       GNUTLS_X509_FMT_PEM);
+	side = "server";
 
-  session = initialize_tls_session ();
+	gnutls_psk_allocate_server_credentials(&server_pskcred);
+	gnutls_psk_set_server_credentials_function(server_pskcred,
+						   pskfunc);
+	gnutls_certificate_allocate_credentials(&serverx509cred);
+	gnutls_certificate_set_x509_key_mem(serverx509cred,
+					    &server_cert, &server_key,
+					    GNUTLS_X509_FMT_PEM);
 
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, serverx509cred);
+	session = initialize_tls_session();
 
-  gnutls_transport_set_int (session, sd);
-  ret = gnutls_handshake (session);
-  if (ret < 0)
-    {
-      close (sd);
-      gnutls_deinit (session);
-      fail ("server: Handshake has failed (%s)\n\n", gnutls_strerror (ret));
-      return;
-    }
-  if (debug)
-    success ("server: Handshake was completed\n");
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+			       serverx509cred);
 
-  /* see the Getting peer's information example */
-  /* print_info(session); */
+	gnutls_transport_set_int(session, sd);
+	ret = gnutls_handshake(session);
+	if (ret < 0) {
+		close(sd);
+		gnutls_deinit(session);
+		fail("server: Handshake has failed (%s)\n\n",
+		     gnutls_strerror(ret));
+		return;
+	}
+	if (debug)
+		success("server: Handshake was completed\n");
 
-  for (;;)
-    {
-      memset (buffer, 0, MAX_BUF + 1);
-      ret = gnutls_record_recv (session, buffer, MAX_BUF);
+	/* see the Getting peer's information example */
+	/* print_info(session); */
 
-      if (ret == 0)
-        {
-          if (debug)
-            success ("server: Peer has closed the GnuTLS connection\n");
-          break;
-        }
-      else if (ret < 0)
-        {
-          fail ("server: Received corrupted data(%d). Closing...\n", ret);
-          break;
-        }
-      else if (ret > 0)
-        {
-          /* echo data back to the client
-           */
-          gnutls_record_send (session, buffer, strlen (buffer));
-        }
-    }
-  /* do not wait for the peer to close the connection.
-   */
-  gnutls_bye (session, GNUTLS_SHUT_WR);
+	for (;;) {
+		memset(buffer, 0, MAX_BUF + 1);
+		ret = gnutls_record_recv(session, buffer, MAX_BUF);
 
-  close (sd);
-  gnutls_deinit (session);
+		if (ret == 0) {
+			if (debug)
+				success
+				    ("server: Peer has closed the GnuTLS connection\n");
+			break;
+		} else if (ret < 0) {
+			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			break;
+		} else if (ret > 0) {
+			/* echo data back to the client
+			 */
+			gnutls_record_send(session, buffer,
+					   strlen(buffer));
+		}
+	}
+	/* do not wait for the peer to close the connection.
+	 */
+	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-  gnutls_psk_free_server_credentials (server_pskcred);
-  gnutls_certificate_free_credentials (serverx509cred);
+	close(sd);
+	gnutls_deinit(session);
 
-  gnutls_global_deinit ();
+	gnutls_psk_free_server_credentials(server_pskcred);
+	gnutls_certificate_free_credentials(serverx509cred);
 
-  if (debug)
-    success ("server: finished\n");
+	gnutls_global_deinit();
+
+	if (debug)
+		success("server: finished\n");
 }
 
-void
-doit (void)
+void doit(void)
 {
-  pid_t child;
-  int sockets[2];
+	pid_t child;
+	int sockets[2];
 
-  err = socketpair (AF_UNIX, SOCK_STREAM, 0, sockets);
-  if (err == -1)
-    {
-      perror ("socketpair");
-      fail ("socketpair failed\n");
-      return;
-    }
+	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
+	if (err == -1) {
+		perror("socketpair");
+		fail("socketpair failed\n");
+		return;
+	}
 
-  child = fork ();
-  if (child < 0)
-    {
-      perror ("fork");
-      fail ("fork");
-      return;
-    }
+	child = fork();
+	if (child < 0) {
+		perror("fork");
+		fail("fork");
+		return;
+	}
 
-  if (child)
-    {
-      int status;
-      /* parent */
-      server (sockets[0]);
-      wait (&status);
-    }
-  else
-    client (sockets[1]);
+	if (child) {
+		int status;
+		/* parent */
+		server(sockets[0]);
+		wait(&status);
+	} else
+		client(sockets[1]);
 }
 
-#endif /* _WIN32 */
+#endif				/* _WIN32 */

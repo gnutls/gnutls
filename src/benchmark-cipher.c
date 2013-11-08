@@ -33,201 +33,193 @@
 static unsigned char data[64 * 1024];
 
 
-static void
-tls_log_func (int level, const char *str)
+static void tls_log_func(int level, const char *str)
 {
-  fprintf (stderr, "|<%d>| %s", level, str);
+	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static void
-cipher_mac_bench (int algo, int mac_algo, int size)
+static void cipher_mac_bench(int algo, int mac_algo, int size)
 {
-  int ret;
-  gnutls_cipher_hd_t ctx;
-  gnutls_hmac_hd_t mac_ctx;
-  void *_key, *_iv;
-  gnutls_datum_t key, iv;
-  int ivsize = gnutls_cipher_get_iv_size(algo);
-  int keysize = gnutls_cipher_get_key_size (algo);
-  int step = size*1024;
-  struct benchmark_st st;
+	int ret;
+	gnutls_cipher_hd_t ctx;
+	gnutls_hmac_hd_t mac_ctx;
+	void *_key, *_iv;
+	gnutls_datum_t key, iv;
+	int ivsize = gnutls_cipher_get_iv_size(algo);
+	int keysize = gnutls_cipher_get_key_size(algo);
+	int step = size * 1024;
+	struct benchmark_st st;
 
-  _key = malloc (keysize);
-  if (_key == NULL)
-    return;
-  memset (_key, 0xf0, keysize);
+	_key = malloc(keysize);
+	if (_key == NULL)
+		return;
+	memset(_key, 0xf0, keysize);
 
-  _iv = malloc (ivsize);
-  if (_iv == NULL)
-    return;
-  memset (_iv, 0xf0, ivsize);
+	_iv = malloc(ivsize);
+	if (_iv == NULL)
+		return;
+	memset(_iv, 0xf0, ivsize);
 
-  iv.data = _iv;
-  iv.size = ivsize;
+	iv.data = _iv;
+	iv.size = ivsize;
 
-  key.data = _key;
-  key.size = keysize;
+	key.data = _key;
+	key.size = keysize;
 
-  printf ("%16s-%s ", gnutls_cipher_get_name (algo),
-      gnutls_mac_get_name(mac_algo));
-  fflush (stdout);
+	printf("%16s-%s ", gnutls_cipher_get_name(algo),
+	       gnutls_mac_get_name(mac_algo));
+	fflush(stdout);
 
-  start_benchmark(&st);
+	start_benchmark(&st);
 
-  ret = gnutls_hmac_init(&mac_ctx, mac_algo, key.data, key.size);
-  if (ret < 0)
-    {
-      fprintf (stderr, "error: %s\n", gnutls_strerror (ret));
-      goto leave;
-    }
+	ret = gnutls_hmac_init(&mac_ctx, mac_algo, key.data, key.size);
+	if (ret < 0) {
+		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
+		goto leave;
+	}
 
-  ret = gnutls_cipher_init (&ctx, algo, &key, &iv);
-  if (ret < 0)
-    {
-      fprintf (stderr, "error: %s\n", gnutls_strerror (ret));
-      goto leave;
-    }
+	ret = gnutls_cipher_init(&ctx, algo, &key, &iv);
+	if (ret < 0) {
+		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
+		goto leave;
+	}
 
-  gnutls_hmac(mac_ctx, data, 1024);
+	gnutls_hmac(mac_ctx, data, 1024);
 
-  do
-    {
-      gnutls_hmac(mac_ctx, data, step);
-      gnutls_cipher_encrypt2 (ctx, data, step, data, step+64);
-      st.size += step;
-    }
-  while (benchmark_must_finish == 0);
+	do {
+		gnutls_hmac(mac_ctx, data, step);
+		gnutls_cipher_encrypt2(ctx, data, step, data, step + 64);
+		st.size += step;
+	}
+	while (benchmark_must_finish == 0);
 
-  gnutls_cipher_deinit (ctx);
-  gnutls_hmac_deinit(mac_ctx, NULL);
+	gnutls_cipher_deinit(ctx);
+	gnutls_hmac_deinit(mac_ctx, NULL);
 
-  stop_benchmark (&st, NULL, 1);
+	stop_benchmark(&st, NULL, 1);
 
-leave:
-  free (_key);
-  free (_iv);
+      leave:
+	free(_key);
+	free(_iv);
 }
 
 
-static void
-cipher_bench (int algo, int size, int aead)
+static void cipher_bench(int algo, int size, int aead)
 {
-  int ret;
-  gnutls_cipher_hd_t ctx;
-  void *_key, *_iv;
-  gnutls_datum_t key, iv;
-  int ivsize = gnutls_cipher_get_iv_size(algo);
-  int keysize = gnutls_cipher_get_key_size (algo);
-  int step = size*1024;
-  struct benchmark_st st;
+	int ret;
+	gnutls_cipher_hd_t ctx;
+	void *_key, *_iv;
+	gnutls_datum_t key, iv;
+	int ivsize = gnutls_cipher_get_iv_size(algo);
+	int keysize = gnutls_cipher_get_key_size(algo);
+	int step = size * 1024;
+	struct benchmark_st st;
 
-  _key = malloc (keysize);
-  if (_key == NULL)
-    return;
-  memset (_key, 0xf0, keysize);
+	_key = malloc(keysize);
+	if (_key == NULL)
+		return;
+	memset(_key, 0xf0, keysize);
 
-  _iv = malloc (ivsize);
-  if (_iv == NULL)
-    return;
-  memset (_iv, 0xf0, ivsize);
+	_iv = malloc(ivsize);
+	if (_iv == NULL)
+		return;
+	memset(_iv, 0xf0, ivsize);
 
-  iv.data = _iv;
-  if (aead) iv.size = 12;
-  else iv.size = ivsize;
+	iv.data = _iv;
+	if (aead)
+		iv.size = 12;
+	else
+		iv.size = ivsize;
 
-  key.data = _key;
-  key.size = keysize;
+	key.data = _key;
+	key.size = keysize;
 
-  printf ("%16s ", gnutls_cipher_get_name (algo));
-  fflush (stdout);
+	printf("%16s ", gnutls_cipher_get_name(algo));
+	fflush(stdout);
 
-  start_benchmark(&st);
+	start_benchmark(&st);
 
-  ret = gnutls_cipher_init (&ctx, algo, &key, &iv);
-  if (ret < 0)
-    {
-      fprintf (stderr, "error: %s\n", gnutls_strerror (ret));
-      goto leave;
-    }
+	ret = gnutls_cipher_init(&ctx, algo, &key, &iv);
+	if (ret < 0) {
+		fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
+		goto leave;
+	}
 
-  if (aead)
-    gnutls_cipher_add_auth (ctx, data, 1024);
+	if (aead)
+		gnutls_cipher_add_auth(ctx, data, 1024);
 
-  do
-    {
-      gnutls_cipher_encrypt2 (ctx, data, step, data, step+64);
-      st.size += step;
-    }
-  while (benchmark_must_finish == 0);
+	do {
+		gnutls_cipher_encrypt2(ctx, data, step, data, step + 64);
+		st.size += step;
+	}
+	while (benchmark_must_finish == 0);
 
-  gnutls_cipher_deinit (ctx);
+	gnutls_cipher_deinit(ctx);
 
-  stop_benchmark(&st, NULL, 1);
+	stop_benchmark(&st, NULL, 1);
 
-leave:
-  free (_key);
-  free (_iv);
+      leave:
+	free(_key);
+	free(_iv);
 }
 
-static void
-mac_bench (int algo, int size)
+static void mac_bench(int algo, int size)
 {
-  void *_key;
-  int blocksize = gnutls_hmac_get_len (algo);
-  int step = size*1024;
-  struct benchmark_st st;
-  
-  _key = malloc (blocksize);
-  if (_key == NULL)
-    return;
-  memset (_key, 0xf0, blocksize);
+	void *_key;
+	int blocksize = gnutls_hmac_get_len(algo);
+	int step = size * 1024;
+	struct benchmark_st st;
 
-  printf ("%16s ", gnutls_mac_get_name (algo));
-  fflush (stdout);
+	_key = malloc(blocksize);
+	if (_key == NULL)
+		return;
+	memset(_key, 0xf0, blocksize);
 
-  start_benchmark(&st);
+	printf("%16s ", gnutls_mac_get_name(algo));
+	fflush(stdout);
 
-  do
-    {
-      gnutls_hmac_fast (algo, _key, blocksize, data, step, _key);
-      st.size += step;
-    }
-  while (benchmark_must_finish == 0);
+	start_benchmark(&st);
 
-  stop_benchmark(&st, NULL, 1);
+	do {
+		gnutls_hmac_fast(algo, _key, blocksize, data, step, _key);
+		st.size += step;
+	}
+	while (benchmark_must_finish == 0);
 
-  free (_key);
+	stop_benchmark(&st, NULL, 1);
+
+	free(_key);
 }
 
-void benchmark_cipher (int init, int debug_level)
+void benchmark_cipher(int init, int debug_level)
 {
-  gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (debug_level);
-  int size = 16;
+	gnutls_global_set_log_function(tls_log_func);
+	gnutls_global_set_log_level(debug_level);
+	int size = 16;
 
-  if (init)
-    {
-      gnutls_global_init ();
-      gnutls_rnd( GNUTLS_RND_NONCE, data, sizeof(data));
-    }
+	if (init) {
+		gnutls_global_init();
+		gnutls_rnd(GNUTLS_RND_NONCE, data, sizeof(data));
+	}
 
-  printf("Checking ciphers, payload size: %u\n", size*1024);
-  cipher_mac_bench ( GNUTLS_CIPHER_SALSA20_256, GNUTLS_MAC_SHA1, size);
-  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, size);
-  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256, size);
-  cipher_bench ( GNUTLS_CIPHER_AES_128_GCM, size, 1);
+	printf("Checking ciphers, payload size: %u\n", size * 1024);
+	cipher_mac_bench(GNUTLS_CIPHER_SALSA20_256, GNUTLS_MAC_SHA1, size);
+	cipher_mac_bench(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, size);
+	cipher_mac_bench(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256,
+			 size);
+	cipher_bench(GNUTLS_CIPHER_AES_128_GCM, size, 1);
 
-  mac_bench (GNUTLS_MAC_SHA1, size);
-  mac_bench (GNUTLS_MAC_SHA256, size);
-  mac_bench (GNUTLS_MAC_SHA512, size);
+	mac_bench(GNUTLS_MAC_SHA1, size);
+	mac_bench(GNUTLS_MAC_SHA256, size);
+	mac_bench(GNUTLS_MAC_SHA512, size);
 
-  cipher_bench (GNUTLS_CIPHER_3DES_CBC, size, 0);
+	cipher_bench(GNUTLS_CIPHER_3DES_CBC, size, 0);
 
-  cipher_bench (GNUTLS_CIPHER_AES_128_CBC, size, 0);
+	cipher_bench(GNUTLS_CIPHER_AES_128_CBC, size, 0);
 
-  cipher_bench (GNUTLS_CIPHER_ARCFOUR, size, 0);
+	cipher_bench(GNUTLS_CIPHER_ARCFOUR, size, 0);
 
-  cipher_bench ( GNUTLS_CIPHER_SALSA20_256, size, 0);
+	cipher_bench(GNUTLS_CIPHER_SALSA20_256, size, 0);
 
-  gnutls_global_deinit();
+	gnutls_global_deinit();
 }

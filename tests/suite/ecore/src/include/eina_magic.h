@@ -41,11 +41,14 @@ typedef unsigned int Eina_Magic;
  * @typedef Eina_Magic
  * An abstract type for a magic number.
  */
-EAPI const char *eina_magic_string_get(Eina_Magic magic) EINA_PURE EINA_WARN_UNUSED_RESULT;
-EAPI Eina_Bool   eina_magic_string_set(Eina_Magic magic,
-                                       const char *magic_name) EINA_ARG_NONNULL(2);
-EAPI Eina_Bool   eina_magic_string_static_set(Eina_Magic magic,
-                                              const char *magic_name) EINA_ARG_NONNULL(2);
+EAPI const char *eina_magic_string_get(Eina_Magic magic)
+EINA_PURE EINA_WARN_UNUSED_RESULT;
+EAPI Eina_Bool eina_magic_string_set(Eina_Magic magic,
+				     const char *magic_name)
+EINA_ARG_NONNULL(2);
+EAPI Eina_Bool eina_magic_string_static_set(Eina_Magic magic,
+					    const char *magic_name)
+EINA_ARG_NONNULL(2);
 
 /**
  * @def EINA_MAGIC_NONE
@@ -120,8 +123,8 @@ EAPI Eina_Bool   eina_magic_string_static_set(Eina_Magic magic,
 		  __LINE__);
 
 EAPI void eina_magic_fail(void *d, Eina_Magic m, Eina_Magic req_m,
-                          const char *file, const char *fnc,
-                          int line) EINA_ARG_NONNULL(4, 5);
+			  const char *file, const char *fnc,
+			  int line) EINA_ARG_NONNULL(4, 5);
 
 #else
 
@@ -150,4 +153,4 @@ EAPI void eina_magic_fail(void *d, Eina_Magic m, Eina_Magic req_m,
  * @}
  */
 
-#endif /* EINA_MAGIC_H_ */
+#endif				/* EINA_MAGIC_H_ */

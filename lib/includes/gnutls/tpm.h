@@ -27,12 +27,11 @@
 #include <gnutls/x509.h>
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-struct tpm_key_list_st;
-typedef struct tpm_key_list_st *gnutls_tpm_key_list_t;
+	struct tpm_key_list_st;
+	typedef struct tpm_key_list_st *gnutls_tpm_key_list_t;
 
 #define GNUTLS_TPM_KEY_SIGNING (1<<1)
 #define GNUTLS_TPM_REGISTER_KEY (1<<2)
@@ -46,31 +45,33 @@ typedef struct tpm_key_list_st *gnutls_tpm_key_list_t;
  *
  * Enumeration of different certificate encoding formats.
  */
-  typedef enum
-  {
-    GNUTLS_TPMKEY_FMT_RAW = 0,
-    GNUTLS_TPMKEY_FMT_DER = GNUTLS_TPMKEY_FMT_RAW,
-    GNUTLS_TPMKEY_FMT_CTK_PEM = 1
-  } gnutls_tpmkey_fmt_t;
+	typedef enum {
+		GNUTLS_TPMKEY_FMT_RAW = 0,
+		GNUTLS_TPMKEY_FMT_DER = GNUTLS_TPMKEY_FMT_RAW,
+		GNUTLS_TPMKEY_FMT_CTK_PEM = 1
+	} gnutls_tpmkey_fmt_t;
 
-int
-gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t pk, unsigned int bits, 
-                             const char* srk_password,
-                             const char* key_password,
-                             gnutls_tpmkey_fmt_t format,
-                             gnutls_x509_crt_fmt_t pub_format,
-                             gnutls_datum_t* privkey, 
-                             gnutls_datum_t* pubkey,
-                             unsigned int flags);
+	int
+	 gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk,
+				     unsigned int bits,
+				     const char *srk_password,
+				     const char *key_password,
+				     gnutls_tpmkey_fmt_t format,
+				     gnutls_x509_crt_fmt_t pub_format,
+				     gnutls_datum_t * privkey,
+				     gnutls_datum_t * pubkey,
+				     unsigned int flags);
 
-void gnutls_tpm_key_list_deinit (gnutls_tpm_key_list_t list);
-int gnutls_tpm_key_list_get_url (gnutls_tpm_key_list_t list, unsigned int idx, char** url, unsigned int flags);
-int gnutls_tpm_get_registered (gnutls_tpm_key_list_t *list);
-int gnutls_tpm_privkey_delete (const char* url, const char* srk_password);
+	void gnutls_tpm_key_list_deinit(gnutls_tpm_key_list_t list);
+	int gnutls_tpm_key_list_get_url(gnutls_tpm_key_list_t list,
+					unsigned int idx, char **url,
+					unsigned int flags);
+	int gnutls_tpm_get_registered(gnutls_tpm_key_list_t * list);
+	int gnutls_tpm_privkey_delete(const char *url,
+				      const char *srk_password);
 
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include "eina_private.h"
@@ -44,10 +44,9 @@
  *
  * @see eina_shutdown()
  */
-Eina_Bool
-eina_safety_checks_shutdown(void)
+Eina_Bool eina_safety_checks_shutdown(void)
 {
-   return EINA_TRUE;
+	return EINA_TRUE;
 }
 
 /*============================================================================*
@@ -101,12 +100,11 @@ static const char EINA_ERROR_SAFETY_FAILED_STR[] = "Safety check failed.";
  *
  * @see eina_init()
  */
-Eina_Bool
-eina_safety_checks_init(void)
+Eina_Bool eina_safety_checks_init(void)
 {
-   EINA_ERROR_SAFETY_FAILED = eina_error_msg_static_register(
-         EINA_ERROR_SAFETY_FAILED_STR);
-   return EINA_TRUE;
+	EINA_ERROR_SAFETY_FAILED =
+	    eina_error_msg_static_register(EINA_ERROR_SAFETY_FAILED_STR);
+	return EINA_TRUE;
 }
 
 /**

@@ -25,28 +25,28 @@
 
 #include "certtool-common.h"
 
-void pkcs11_list (FILE * outfile, const char *url, int type,
-                  unsigned int login, unsigned int detailed,
-                  common_info_st *);
-void pkcs11_mechanism_list (FILE * outfile, const char *url,
-                            unsigned int login, common_info_st *);
-void pkcs11_get_random (FILE * outfile, const char *url,
-                            unsigned bytes, common_info_st *);
-void pkcs11_export (FILE * outfile, const char *pkcs11_url,
-                    unsigned int login, common_info_st *);
-void pkcs11_token_list (FILE * outfile, unsigned int detailed,
-                        common_info_st *);
-void pkcs11_write (FILE * outfile, const char *pkcs11_url, const char *label,
-                   int trusted, int private, unsigned int login, common_info_st *);
-void pkcs11_delete (FILE * outfile, const char *pkcs11_url, int batch,
-                    unsigned int login, common_info_st *);
-void pkcs11_init (FILE * outfile, const char *pkcs11_url, const char *label,
-                  common_info_st *);
-void
-pkcs11_generate (FILE * outfile, const char *url, gnutls_pk_algorithm_t type,
-              unsigned int bits,
-              const char *label, int private, int detailed,
-              unsigned int login, common_info_st * info);
+void pkcs11_list(FILE * outfile, const char *url, int type,
+		 unsigned int login, unsigned int detailed,
+		 common_info_st *);
+void pkcs11_mechanism_list(FILE * outfile, const char *url,
+			   unsigned int login, common_info_st *);
+void pkcs11_get_random(FILE * outfile, const char *url,
+		       unsigned bytes, common_info_st *);
+void pkcs11_export(FILE * outfile, const char *pkcs11_url,
+		   unsigned int login, common_info_st *);
+void pkcs11_token_list(FILE * outfile, unsigned int detailed,
+		       common_info_st *);
+void pkcs11_write(FILE * outfile, const char *pkcs11_url,
+		  const char *label, int trusted, int private,
+		  unsigned int login, common_info_st *);
+void pkcs11_delete(FILE * outfile, const char *pkcs11_url, int batch,
+		   unsigned int login, common_info_st *);
+void pkcs11_init(FILE * outfile, const char *pkcs11_url, const char *label,
+		 common_info_st *);
+void pkcs11_generate(FILE * outfile, const char *url,
+		     gnutls_pk_algorithm_t type, unsigned int bits,
+		     const char *label, int private, int detailed,
+		     unsigned int login, common_info_st * info);
 
 #define PKCS11_TYPE_CRT_ALL 1
 #define PKCS11_TYPE_TRUSTED 2

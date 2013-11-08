@@ -1,5 +1,5 @@
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #define _GNU_SOURCE
@@ -9,7 +9,7 @@
 #include <string.h>
 
 #ifdef _WIN32
-# include <Evil.h>
+#include <Evil.h>
 #endif
 
 #include "eina_private.h"
@@ -51,10 +51,9 @@
  *
  * @see eina_init()
  */
-Eina_Bool
-eina_strbuf_common_init(void)
+Eina_Bool eina_strbuf_common_init(void)
 {
-   return EINA_TRUE;
+	return EINA_TRUE;
 }
 
 /**
@@ -68,10 +67,9 @@ eina_strbuf_common_init(void)
  *
  * @see eina_shutdown()
  */
-Eina_Bool
-eina_strbuf_common_shutdown(void)
+Eina_Bool eina_strbuf_common_shutdown(void)
 {
-   return EINA_TRUE;
+	return EINA_TRUE;
 }
 
 /**
@@ -82,22 +80,20 @@ eina_strbuf_common_shutdown(void)
  *
  * @return #EINA_TRUE on success, #EINA_FALSE on failure.
  */
-static Eina_Bool
-_eina_strbuf_common_init(size_t csize, Eina_Strbuf *buf)
+static Eina_Bool _eina_strbuf_common_init(size_t csize, Eina_Strbuf * buf)
 {
-   buf->len = 0;
-   buf->size = EINA_STRBUF_INIT_SIZE;
-   buf->step = EINA_STRBUF_INIT_STEP;
+	buf->len = 0;
+	buf->size = EINA_STRBUF_INIT_SIZE;
+	buf->step = EINA_STRBUF_INIT_STEP;
 
-        eina_error_set(0);
-   buf->buf = calloc(csize, buf->size);
-   if (EINA_UNLIKELY(!buf->buf))
-     {
-        eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
-        return EINA_FALSE;
-     }
+	eina_error_set(0);
+	buf->buf = calloc(csize, buf->size);
+	if (EINA_UNLIKELY(!buf->buf)) {
+		eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
+		return EINA_FALSE;
+	}
 
-   return EINA_TRUE;
+	return EINA_TRUE;
 }
 
 /**
@@ -110,48 +106,46 @@ _eina_strbuf_common_init(size_t csize, Eina_Strbuf *buf)
  * @return #EINA_TRUE on success, #EINA_FALSE on failure.
  */
 static inline Eina_Bool
-_eina_strbuf_common_resize(size_t csize, Eina_Strbuf *buf, size_t size)
+_eina_strbuf_common_resize(size_t csize, Eina_Strbuf * buf, size_t size)
 {
-   size_t new_size, new_step, delta;
-   void *buffer;
+	size_t new_size, new_step, delta;
+	void *buffer;
 
-   size += 1; // Add extra space for '\0'
+	size += 1;		// Add extra space for '\0'
 
-   if (size == buf->size)
-      /* nothing to do */
-      return EINA_TRUE;
-   else if (size > buf->size)
-      delta = size - buf->size;
-   else
-      delta = buf->size - size;
+	if (size == buf->size)
+		/* nothing to do */
+		return EINA_TRUE;
+	else if (size > buf->size)
+		delta = size - buf->size;
+	else
+		delta = buf->size - size;
 
-   /* check if should keep the same step (just used while growing) */
-   if ((delta <= buf->step) && (size > buf->size))
-      new_step = buf->step;
-   else
-     {
-        new_step = (((delta / EINA_STRBUF_INIT_STEP) + 1)
-                    * EINA_STRBUF_INIT_STEP);
+	/* check if should keep the same step (just used while growing) */
+	if ((delta <= buf->step) && (size > buf->size))
+		new_step = buf->step;
+	else {
+		new_step = (((delta / EINA_STRBUF_INIT_STEP) + 1)
+			    * EINA_STRBUF_INIT_STEP);
 
-        if (new_step > EINA_STRBUF_MAX_STEP)
-           new_step = EINA_STRBUF_MAX_STEP;
-     }
+		if (new_step > EINA_STRBUF_MAX_STEP)
+			new_step = EINA_STRBUF_MAX_STEP;
+	}
 
-   new_size = (((size / new_step) + 1) * new_step);
+	new_size = (((size / new_step) + 1) * new_step);
 
-   /* reallocate the buffer to the new size */
-   buffer = realloc(buf->buf, new_size * csize);
-   if (EINA_UNLIKELY(!buffer))
-     {
-        eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
-        return EINA_FALSE;
-     }
+	/* reallocate the buffer to the new size */
+	buffer = realloc(buf->buf, new_size * csize);
+	if (EINA_UNLIKELY(!buffer)) {
+		eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
+		return EINA_FALSE;
+	}
 
-   buf->buf = buffer;
-   buf->size = new_size;
-   buf->step = new_step;
-        eina_error_set(0);
-   return EINA_TRUE;
+	buf->buf = buffer;
+	buf->size = new_size;
+	buf->step = new_step;
+	eina_error_set(0);
+	return EINA_TRUE;
 }
 
 /**
@@ -165,12 +159,12 @@ _eina_strbuf_common_resize(size_t csize, Eina_Strbuf *buf, size_t size)
  * @return #EINA_TRUE on success, #EINA_FALSE on failure.
  */
 Eina_Bool
-_eina_strbuf_common_grow(size_t csize, Eina_Strbuf *buf, size_t size)
+_eina_strbuf_common_grow(size_t csize, Eina_Strbuf * buf, size_t size)
 {
-   if ((size + 1) < buf->size)
-      return EINA_TRUE;
+	if ((size + 1) < buf->size)
+		return EINA_TRUE;
 
-   return _eina_strbuf_common_resize(csize, buf, size);
+	return _eina_strbuf_common_resize(csize, buf, size);
 }
 
 /**
@@ -188,24 +182,23 @@ _eina_strbuf_common_grow(size_t csize, Eina_Strbuf *buf, size_t size)
  */
 static inline Eina_Bool
 _eina_strbuf_common_insert_length(size_t csize,
-                                  Eina_Strbuf *buf,
-                                  const void *str,
-                                  size_t len,
-                                  size_t pos)
+				  Eina_Strbuf * buf,
+				  const void *str, size_t len, size_t pos)
 {
-   if (EINA_UNLIKELY(!_eina_strbuf_common_grow(csize, buf, buf->len + len)))
-      return EINA_FALSE;
+	if (EINA_UNLIKELY
+	    (!_eina_strbuf_common_grow(csize, buf, buf->len + len)))
+		return EINA_FALSE;
 
-   /* move the existing text */
-   memmove(buf->buf + ((len + pos) * csize), buf->buf + (pos * csize),
-           (buf->len - pos) * csize);
+	/* move the existing text */
+	memmove(buf->buf + ((len + pos) * csize), buf->buf + (pos * csize),
+		(buf->len - pos) * csize);
 
-   /* and now insert the given string */
-   memcpy(buf->buf + (pos * csize), str, len * csize);
+	/* and now insert the given string */
+	memcpy(buf->buf + (pos * csize), str, len * csize);
 
-   buf->len += len;
-   memset(buf->buf + (buf->len * csize), 0, csize);
-   return EINA_TRUE;
+	buf->len += len;
+	memset(buf->buf + (buf->len * csize), 0, csize);
+	return EINA_TRUE;
 }
 
 /*============================================================================*
@@ -225,26 +218,23 @@ _eina_strbuf_common_insert_length(size_t csize,
  * @see eina_strbuf_common_append()
  * @see eina_strbuf_common_string_get()
  */
-Eina_Strbuf *
-eina_strbuf_common_new(size_t csize)
+Eina_Strbuf *eina_strbuf_common_new(size_t csize)
 {
-   Eina_Strbuf *buf;
+	Eina_Strbuf *buf;
 
-        eina_error_set(0);
-   buf = malloc(sizeof(Eina_Strbuf));
-   if (EINA_UNLIKELY(!buf))
-     {
-        eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
-        return NULL;
-     }
+	eina_error_set(0);
+	buf = malloc(sizeof(Eina_Strbuf));
+	if (EINA_UNLIKELY(!buf)) {
+		eina_error_set(EINA_ERROR_OUT_OF_MEMORY);
+		return NULL;
+	}
 
-   if (EINA_UNLIKELY(!_eina_strbuf_common_init(csize, buf)))
-     {
-        eina_strbuf_common_free(buf);
-        return NULL;
-     }
+	if (EINA_UNLIKELY(!_eina_strbuf_common_init(csize, buf))) {
+		eina_strbuf_common_free(buf);
+		return NULL;
+	}
 
-   return buf;
+	return buf;
 }
 
 /**
@@ -255,11 +245,10 @@ eina_strbuf_common_new(size_t csize)
  * This function frees the memory of @p buf. @p buf must have been
  * created by eina_strbuf_common_new().
  */
-void
-eina_strbuf_common_free(Eina_Strbuf *buf)
+void eina_strbuf_common_free(Eina_Strbuf * buf)
 {
-   free(buf->buf);
-   free(buf);
+	free(buf->buf);
+	free(buf);
 }
 
 /**
@@ -270,13 +259,12 @@ eina_strbuf_common_free(Eina_Strbuf *buf)
  * This function reset @p buf: the buffer len is set to 0, and the
  * string is set to '\\0'. No memory is free'd.
  */
-void
-eina_strbuf_common_reset(size_t csize, Eina_Strbuf *buf)
+void eina_strbuf_common_reset(size_t csize, Eina_Strbuf * buf)
 {
-   buf->len = 0;
-   buf->step = EINA_STRBUF_INIT_STEP;
+	buf->len = 0;
+	buf->step = EINA_STRBUF_INIT_STEP;
 
-   memset(buf->buf, 0, csize);
+	memset(buf->buf, 0, csize);
 }
 
 /**
@@ -297,19 +285,18 @@ eina_strbuf_common_reset(size_t csize, Eina_Strbuf *buf)
  */
 Eina_Bool
 eina_strbuf_common_append(size_t csize,
-                          Eina_Strbuf *buf,
-                          const void *str,
-                          size_t len)
+			  Eina_Strbuf * buf, const void *str, size_t len)
 {
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
 
-   if (EINA_UNLIKELY(!_eina_strbuf_common_grow(csize, buf, buf->len + len)))
-      return EINA_FALSE;
+	if (EINA_UNLIKELY
+	    (!_eina_strbuf_common_grow(csize, buf, buf->len + len)))
+		return EINA_FALSE;
 
-   memcpy(buf->buf + (buf->len * csize), str, (len + 1) * csize);
-   buf->len += len;
-   return EINA_TRUE;
+	memcpy(buf->buf + (buf->len * csize), str, (len + 1) * csize);
+	buf->len += len;
+	return EINA_TRUE;
 }
 
 /**
@@ -335,23 +322,22 @@ eina_strbuf_common_append(size_t csize,
  */
 Eina_Bool
 eina_strbuf_common_append_n(size_t csize,
-                            Eina_Strbuf *buf,
-                            const void *str,
-                            size_t len,
-                            size_t maxlen)
+			    Eina_Strbuf * buf,
+			    const void *str, size_t len, size_t maxlen)
 {
-   EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
 
-   if (len > maxlen)
-      len = maxlen;
+	if (len > maxlen)
+		len = maxlen;
 
-   if (EINA_UNLIKELY(!_eina_strbuf_common_grow(csize, buf, buf->len + len)))
-      return EINA_FALSE;
+	if (EINA_UNLIKELY
+	    (!_eina_strbuf_common_grow(csize, buf, buf->len + len)))
+		return EINA_FALSE;
 
-   memcpy(buf->buf + (buf->len * csize), str, len * csize);
-   buf->len += len;
-   memset(buf->buf + (buf->len * csize), 0, csize);
-   return EINA_TRUE;
+	memcpy(buf->buf + (buf->len * csize), str, len * csize);
+	buf->len += len;
+	memset(buf->buf + (buf->len * csize), 0, csize);
+	return EINA_TRUE;
 }
 
 /**
@@ -375,19 +361,19 @@ eina_strbuf_common_append_n(size_t csize,
  */
 Eina_Bool
 eina_strbuf_common_append_length(size_t csize,
-                                 Eina_Strbuf *buf,
-                                 const void *str,
-                                 size_t length)
+				 Eina_Strbuf * buf,
+				 const void *str, size_t length)
 {
-   EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
 
-   if (EINA_UNLIKELY(!_eina_strbuf_common_grow(csize, buf, buf->len + length)))
-      return EINA_FALSE;
+	if (EINA_UNLIKELY
+	    (!_eina_strbuf_common_grow(csize, buf, buf->len + length)))
+		return EINA_FALSE;
 
-   memcpy(buf->buf + (buf->len * csize), str, length * csize);
-   buf->len += length;
-   memset(buf->buf + (buf->len * csize), 0, csize);
-   return EINA_TRUE;
+	memcpy(buf->buf + (buf->len * csize), str, length * csize);
+	buf->len += length;
+	memset(buf->buf + (buf->len * csize), 0, csize);
+	return EINA_TRUE;
 }
 
 /**
@@ -406,17 +392,16 @@ eina_strbuf_common_append_length(size_t csize,
  */
 Eina_Bool
 eina_strbuf_common_insert(size_t csize,
-                          Eina_Strbuf *buf,
-                          const void *str,
-                          size_t len,
-                          size_t pos)
+			  Eina_Strbuf * buf,
+			  const void *str, size_t len, size_t pos)
 {
-   EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
 
-   if (pos >= buf->len)
-      return eina_strbuf_common_append(csize, buf, str, len);
+	if (pos >= buf->len)
+		return eina_strbuf_common_append(csize, buf, str, len);
 
-   return _eina_strbuf_common_insert_length(csize, buf, str, len, pos);
+	return _eina_strbuf_common_insert_length(csize, buf, str, len,
+						 pos);
 }
 
 /**
@@ -439,21 +424,21 @@ eina_strbuf_common_insert(size_t csize,
  */
 Eina_Bool
 eina_strbuf_common_insert_n(size_t csize,
-                            Eina_Strbuf *buf,
-                            const void *str,
-                            size_t len,
-                            size_t maxlen,
-                            size_t pos)
+			    Eina_Strbuf * buf,
+			    const void *str,
+			    size_t len, size_t maxlen, size_t pos)
 {
-   EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
 
-   if (pos >= buf->len)
-      return eina_strbuf_common_append_n(csize, buf, str, len, maxlen);
+	if (pos >= buf->len)
+		return eina_strbuf_common_append_n(csize, buf, str, len,
+						   maxlen);
 
-   if (len > maxlen)
-      len = maxlen;
+	if (len > maxlen)
+		len = maxlen;
 
-   return _eina_strbuf_common_insert_length(csize, buf, str, len, pos);
+	return _eina_strbuf_common_insert_length(csize, buf, str, len,
+						 pos);
 }
 
 /**
@@ -478,17 +463,18 @@ eina_strbuf_common_insert_n(size_t csize,
  */
 Eina_Bool
 eina_strbuf_common_insert_length(size_t csize,
-                                 Eina_Strbuf *buf,
-                                 const void *str,
-                                 size_t length,
-                                 size_t pos)
+				 Eina_Strbuf * buf,
+				 const void *str,
+				 size_t length, size_t pos)
 {
-   EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
 
-   if (pos >= buf->len)
-      return eina_strbuf_common_append_length(csize, buf, str, length);
+	if (pos >= buf->len)
+		return eina_strbuf_common_append_length(csize, buf, str,
+							length);
 
-   return _eina_strbuf_common_insert_length(csize, buf, str, length, pos);
+	return _eina_strbuf_common_insert_length(csize, buf, str, length,
+						 pos);
 }
 
 /**
@@ -503,15 +489,17 @@ eina_strbuf_common_insert_length(size_t csize,
  * #EINA_FALSE is returned, otherwise #EINA_TRUE is returned.
  */
 Eina_Bool
-eina_strbuf_common_append_char(size_t csize, Eina_Strbuf *buf, const void *c)
+eina_strbuf_common_append_char(size_t csize, Eina_Strbuf * buf,
+			       const void *c)
 {
 
-   if (EINA_UNLIKELY(!_eina_strbuf_common_grow(csize, buf, buf->len + 1)))
-      return EINA_FALSE;
+	if (EINA_UNLIKELY
+	    (!_eina_strbuf_common_grow(csize, buf, buf->len + 1)))
+		return EINA_FALSE;
 
-   memcpy(buf->buf + ((buf->len)++ *csize), c, csize);
-   memset(buf->buf + (buf->len * csize), 0, csize);
-   return EINA_TRUE;
+	memcpy(buf->buf + ((buf->len)++ * csize), c, csize);
+	memset(buf->buf + (buf->len * csize), 0, csize);
+	return EINA_TRUE;
 }
 
 /**
@@ -529,15 +517,14 @@ eina_strbuf_common_append_char(size_t csize, Eina_Strbuf *buf, const void *c)
  */
 Eina_Bool
 eina_strbuf_common_insert_char(size_t csize,
-                               Eina_Strbuf *buf,
-                               const void *c,
-                               size_t pos)
+			       Eina_Strbuf * buf,
+			       const void *c, size_t pos)
 {
 
-   if (pos >= buf->len)
-      return eina_strbuf_common_append_char(csize, buf, c);
+	if (pos >= buf->len)
+		return eina_strbuf_common_append_char(csize, buf, c);
 
-   return _eina_strbuf_common_insert_length(csize, buf, c, 1, pos);
+	return _eina_strbuf_common_insert_length(csize, buf, c, 1, pos);
 }
 
 /**
@@ -556,31 +543,27 @@ eina_strbuf_common_insert_char(size_t csize,
  */
 Eina_Bool
 eina_strbuf_common_remove(size_t csize,
-                          Eina_Strbuf *buf,
-                          size_t start,
-                          size_t end)
+			  Eina_Strbuf * buf, size_t start, size_t end)
 {
-   size_t remove_len, tail_len;
+	size_t remove_len, tail_len;
 
-   if (end >= buf->len)
-      end = buf->len;
+	if (end >= buf->len)
+		end = buf->len;
 
-   if (end <= start)
-      return EINA_TRUE;
+	if (end <= start)
+		return EINA_TRUE;
 
-   remove_len = end - start;
-   if (remove_len == buf->len)
-     {
-        free(buf->buf);
-        return _eina_strbuf_common_init(csize, buf);
-     }
+	remove_len = end - start;
+	if (remove_len == buf->len) {
+		free(buf->buf);
+		return _eina_strbuf_common_init(csize, buf);
+	}
 
-   tail_len = buf->len - end + 1; /* includes '\0' */
-   memmove(buf->buf + (start * csize),
-           buf->buf + (end * csize),
-           tail_len * csize);
-   buf->len -= remove_len;
-   return _eina_strbuf_common_resize(csize, buf, buf->len);
+	tail_len = buf->len - end + 1;	/* includes '\0' */
+	memmove(buf->buf + (start * csize),
+		buf->buf + (end * csize), tail_len * csize);
+	buf->len -= remove_len;
+	return _eina_strbuf_common_resize(csize, buf, buf->len);
 }
 
 /**
@@ -596,10 +579,9 @@ eina_strbuf_common_remove(size_t csize,
  *
  * @see eina_strbuf_common_string_steal()
  */
-const void *
-eina_strbuf_common_string_get(const Eina_Strbuf *buf)
+const void *eina_strbuf_common_string_get(const Eina_Strbuf * buf)
 {
-   return buf->buf;
+	return buf->buf;
 }
 
 /**
@@ -615,15 +597,14 @@ eina_strbuf_common_string_get(const Eina_Strbuf *buf)
  *
  * @see eina_strbuf_common_string_get()
  */
-void *
-eina_strbuf_common_string_steal(size_t csize, Eina_Strbuf *buf)
+void *eina_strbuf_common_string_steal(size_t csize, Eina_Strbuf * buf)
 {
-   void *ret;
+	void *ret;
 
-   ret = buf->buf;
-   // TODO: Check return value and do something clever
-   _eina_strbuf_common_init(csize, buf);
-   return ret;
+	ret = buf->buf;
+	// TODO: Check return value and do something clever
+	_eina_strbuf_common_init(csize, buf);
+	return ret;
 }
 
 /**
@@ -634,11 +615,10 @@ eina_strbuf_common_string_steal(size_t csize, Eina_Strbuf *buf)
  * This function frees the string contained in @p buf without freeing
  * @p buf.
  */
-void
-eina_strbuf_common_string_free(size_t csize, Eina_Strbuf *buf)
+void eina_strbuf_common_string_free(size_t csize, Eina_Strbuf * buf)
 {
-   free(buf->buf);
-   _eina_strbuf_common_init(csize, buf);
+	free(buf->buf);
+	_eina_strbuf_common_init(csize, buf);
 }
 
 /**
@@ -649,10 +629,9 @@ eina_strbuf_common_string_free(size_t csize, Eina_Strbuf *buf)
  *
  * This function returns the length of @p buf.
  */
-size_t
-eina_strbuf_common_length_get(const Eina_Strbuf *buf)
+size_t eina_strbuf_common_length_get(const Eina_Strbuf * buf)
 {
-   return buf->len;
+	return buf->len;
 }
 
 /**
@@ -674,15 +653,15 @@ eina_strbuf_common_length_get(const Eina_Strbuf *buf)
 /*FIXME: Implementing them here is a hack! */
 
 #ifdef _STRBUF_CSIZE
-# undef _STRBUF_CSIZE
+#undef _STRBUF_CSIZE
 #endif
 
 #ifdef _STRBUF_MAGIC
-# undef _STRBUF_MAGIC
+#undef _STRBUF_MAGIC
 #endif
 
 #ifdef _STRBUF_MAGIC_STR
-# undef _STRBUF_MAGIC_STR
+#undef _STRBUF_MAGIC_STR
 #endif
 
 #define _STRBUF_CSIZE 1
@@ -709,56 +688,52 @@ static const char __STRBUF_STR_MAGIC_STR[] = "Eina Strbuf";
  * @p with. It returns #EINA_FALSE on failure, #EINA_TRUE otherwise.
  */
 EAPI Eina_Bool
-eina_strbuf_replace(Eina_Strbuf *buf,
-                    const char *str,
-                    const char *with,
-                    unsigned int n)
+eina_strbuf_replace(Eina_Strbuf * buf,
+		    const char *str, const char *with, unsigned int n)
 {
-   size_t len1, len2;
-   char *spos;
-   size_t pos;
+	size_t len1, len2;
+	char *spos;
+	size_t pos;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL( str, EINA_FALSE);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(with, EINA_FALSE);
-   EINA_MAGIC_CHECK_STRBUF(buf, 0);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(str, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(with, EINA_FALSE);
+	EINA_MAGIC_CHECK_STRBUF(buf, 0);
 
-   if (n == 0)
-      return EINA_FALSE;
+	if (n == 0)
+		return EINA_FALSE;
 
-   spos = buf->buf;
-   while (n--)
-     {
-        spos = strstr(spos, str);
-        if (!spos || *spos == '\0')
-           return EINA_FALSE;
+	spos = buf->buf;
+	while (n--) {
+		spos = strstr(spos, str);
+		if (!spos || *spos == '\0')
+			return EINA_FALSE;
 
-        if (n)
-           spos++;
-     }
+		if (n)
+			spos++;
+	}
 
-   pos = spos - (const char *)buf->buf;
-   len1 = strlen(str);
-   len2 = strlen(with);
-   if (len1 != len2)
-     {
-        /* resize the buffer if necessary */
-        if (EINA_UNLIKELY(!_eina_strbuf_common_grow(_STRBUF_CSIZE, buf,
-                                                    buf->len - len1 + len2)))
-          {
-             return EINA_FALSE; /* move the existing text */
+	pos = spos - (const char *) buf->buf;
+	len1 = strlen(str);
+	len2 = strlen(with);
+	if (len1 != len2) {
+		/* resize the buffer if necessary */
+		if (EINA_UNLIKELY
+		    (!_eina_strbuf_common_grow
+		     (_STRBUF_CSIZE, buf, buf->len - len1 + len2))) {
+			return EINA_FALSE;	/* move the existing text */
 
-          }
+		}
 
-        memmove(buf->buf + pos + len2, buf->buf + pos + len1,
-                buf->len - pos - len1);
-     }
+		memmove(buf->buf + pos + len2, buf->buf + pos + len1,
+			buf->len - pos - len1);
+	}
 
-   /* and now insert the given string */
-   memcpy(buf->buf + pos, with, len2);
-   buf->len += len2 - len1;
-   memset((char *)buf->buf + buf->len, 0, 1);
+	/* and now insert the given string */
+	memcpy(buf->buf + pos, with, len2);
+	buf->len += len2 - len1;
+	memset((char *) buf->buf + buf->len, 0, 1);
 
-   return EINA_TRUE;
+	return EINA_TRUE;
 }
 
 /**
@@ -774,87 +749,84 @@ eina_strbuf_replace(Eina_Strbuf *buf,
  * has been replaced. On failure, it returns 0.
  */
 EAPI int
-eina_strbuf_replace_all(Eina_Strbuf *buf, const char *str, const char *with)
+eina_strbuf_replace_all(Eina_Strbuf * buf, const char *str,
+			const char *with)
 {
-   size_t len1, len2, len;
-   char *tmp_buf = NULL;
-   char *spos;
-   size_t pos, start;
-   size_t pos_tmp, start_tmp;
-   int n = 0;
+	size_t len1, len2, len;
+	char *tmp_buf = NULL;
+	char *spos;
+	size_t pos, start;
+	size_t pos_tmp, start_tmp;
+	int n = 0;
 
-   EINA_SAFETY_ON_NULL_RETURN_VAL( str, 0);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(with, 0);
-   EINA_MAGIC_CHECK_STRBUF(buf, 0);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(str, 0);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(with, 0);
+	EINA_MAGIC_CHECK_STRBUF(buf, 0);
 
-   spos = strstr(buf->buf, str);
-   if (!spos || *spos == '\0')
-      return 0;
+	spos = strstr(buf->buf, str);
+	if (!spos || *spos == '\0')
+		return 0;
 
-   len1 = strlen(str);
-   len2 = strlen(with);
+	len1 = strlen(str);
+	len2 = strlen(with);
 
-   /* if the size of the two string is equal, it is fairly easy to replace them
-    * we don't need to resize the buffer or doing other calculations */
-   if (len1 == len2)
-     {
-        while (spos)
-          {
-             memcpy(spos, with, len2);
-             spos = strstr(spos + len2, str);
-             n++;
-          }
-        return n;
-     }
+	/* if the size of the two string is equal, it is fairly easy to replace them
+	 * we don't need to resize the buffer or doing other calculations */
+	if (len1 == len2) {
+		while (spos) {
+			memcpy(spos, with, len2);
+			spos = strstr(spos + len2, str);
+			n++;
+		}
+		return n;
+	}
 
-   pos = pos_tmp = spos - (const char *)buf->buf;
-   tmp_buf = buf->buf;
-   buf->buf = malloc(buf->size);
-   if (EINA_UNLIKELY(!buf->buf))
-     {
-        buf->buf = tmp_buf;
-        return 0;
-     }
+	pos = pos_tmp = spos - (const char *) buf->buf;
+	tmp_buf = buf->buf;
+	buf->buf = malloc(buf->size);
+	if (EINA_UNLIKELY(!buf->buf)) {
+		buf->buf = tmp_buf;
+		return 0;
+	}
 
-   start = start_tmp = 0;
-   len = buf->len;
+	start = start_tmp = 0;
+	len = buf->len;
 
-   while (spos)
-     {
-        n++;
-        len = (len + len2) - len1;
-        /* resize the buffer if necessary */
-        if (EINA_UNLIKELY(!_eina_strbuf_common_grow(_STRBUF_CSIZE, buf, len)))
-          {
-             /* we have to stop replacing here, because we haven't enough
-              * memory to go on */
-             len = (len + len1) - len2;
-             break;
-          }
+	while (spos) {
+		n++;
+		len = (len + len2) - len1;
+		/* resize the buffer if necessary */
+		if (EINA_UNLIKELY
+		    (!_eina_strbuf_common_grow(_STRBUF_CSIZE, buf, len))) {
+			/* we have to stop replacing here, because we haven't enough
+			 * memory to go on */
+			len = (len + len1) - len2;
+			break;
+		}
 
-        /* copy the untouched text */
-             memcpy(buf->buf + start, tmp_buf + start_tmp, pos - start);
-        /* copy the new string */
-             memcpy(buf->buf + pos,   with,                len2);
+		/* copy the untouched text */
+		memcpy(buf->buf + start, tmp_buf + start_tmp, pos - start);
+		/* copy the new string */
+		memcpy(buf->buf + pos, with, len2);
 
-        /* calculate the next positions */
-        start_tmp = pos_tmp + len1;
-        start = pos + len2;
-        spos = strstr(tmp_buf + start_tmp, str);
-        /* this calculations don't make sense if spos == NULL, but the
-         * calculated values won't be used, because the loop will stop
-         * then */
-        pos_tmp = spos - tmp_buf;
-        pos = start + pos_tmp - start_tmp;
-     }
-   /* and now copy the rest of the text */
-             memcpy(buf->buf + start, tmp_buf + start_tmp, len - start);
-   buf->len = len;
-             memset((char *)buf->buf + buf->len, 0, 1);
+		/* calculate the next positions */
+		start_tmp = pos_tmp + len1;
+		start = pos + len2;
+		spos = strstr(tmp_buf + start_tmp, str);
+		/* this calculations don't make sense if spos == NULL, but the
+		 * calculated values won't be used, because the loop will stop
+		 * then */
+		pos_tmp = spos - tmp_buf;
+		pos = start + pos_tmp - start_tmp;
+	}
+	/* and now copy the rest of the text */
+	memcpy(buf->buf + start, tmp_buf + start_tmp, len - start);
+	buf->len = len;
+	memset((char *) buf->buf + buf->len, 0, 1);
 
-   free(tmp_buf);
+	free(tmp_buf);
 
-   return n;
+	return n;
 }
 
 /**

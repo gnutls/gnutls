@@ -40,10 +40,10 @@
 #include <abstract_int.h>
 
 static int
-sign_tls_hash (gnutls_session_t session, const mac_entry_st* hash_algo,
-                  gnutls_pcert_st* cert, gnutls_privkey_t pkey,
-                  const gnutls_datum_t * hash_concat,
-                  gnutls_datum_t * signature);
+sign_tls_hash(gnutls_session_t session, const mac_entry_st * hash_algo,
+	      gnutls_pcert_st * cert, gnutls_privkey_t pkey,
+	      const gnutls_datum_t * hash_concat,
+	      gnutls_datum_t * signature);
 
 
 /* While this is currently equal to the length of RSA/SHA512
@@ -57,107 +57,108 @@ sign_tls_hash (gnutls_session_t session, const mac_entry_st* hash_algo,
  * Used in DHE_* ciphersuites.
  */
 int
-_gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
-                             gnutls_privkey_t pkey, gnutls_datum_t * params,
-                             gnutls_datum_t * signature,
-                             gnutls_sign_algorithm_t * sign_algo)
+_gnutls_handshake_sign_data(gnutls_session_t session,
+			    gnutls_pcert_st * cert, gnutls_privkey_t pkey,
+			    gnutls_datum_t * params,
+			    gnutls_datum_t * signature,
+			    gnutls_sign_algorithm_t * sign_algo)
 {
-  gnutls_datum_t dconcat;
-  int ret;
-  digest_hd_st td_sha;
-  uint8_t concat[MAX_SIG_SIZE];
-  const version_entry_st* ver = get_version (session);
-  const mac_entry_st* hash_algo;
+	gnutls_datum_t dconcat;
+	int ret;
+	digest_hd_st td_sha;
+	uint8_t concat[MAX_SIG_SIZE];
+	const version_entry_st *ver = get_version(session);
+	const mac_entry_st *hash_algo;
 
-  *sign_algo =
-    _gnutls_session_get_sign_algo (session, cert);
-  if (*sign_algo == GNUTLS_SIGN_UNKNOWN)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
-    }
+	*sign_algo = _gnutls_session_get_sign_algo(session, cert);
+	if (*sign_algo == GNUTLS_SIGN_UNKNOWN) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+	}
 
-  gnutls_sign_algorithm_set_server(session, *sign_algo);
+	gnutls_sign_algorithm_set_server(session, *sign_algo);
 
-  hash_algo = mac_to_entry(gnutls_sign_get_hash_algorithm (*sign_algo));
+	hash_algo =
+	    mac_to_entry(gnutls_sign_get_hash_algorithm(*sign_algo));
 
-  _gnutls_handshake_log ("HSK[%p]: signing handshake data: using %s\n",
-                    session, gnutls_sign_algorithm_get_name (*sign_algo));
+	_gnutls_handshake_log
+	    ("HSK[%p]: signing handshake data: using %s\n", session,
+	     gnutls_sign_algorithm_get_name(*sign_algo));
 
-  ret = _gnutls_hash_init (&td_sha, hash_algo);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = _gnutls_hash_init(&td_sha, hash_algo);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  _gnutls_hash (&td_sha, session->security_parameters.client_random,
-                GNUTLS_RANDOM_SIZE);
-  _gnutls_hash (&td_sha, session->security_parameters.server_random,
-                GNUTLS_RANDOM_SIZE);
-  _gnutls_hash (&td_sha, params->data, params->size);
+	_gnutls_hash(&td_sha, session->security_parameters.client_random,
+		     GNUTLS_RANDOM_SIZE);
+	_gnutls_hash(&td_sha, session->security_parameters.server_random,
+		     GNUTLS_RANDOM_SIZE);
+	_gnutls_hash(&td_sha, params->data, params->size);
 
-  switch (gnutls_privkey_get_pk_algorithm(pkey, NULL))
-    {
-    case GNUTLS_PK_RSA:
-      if (!_gnutls_version_has_selectable_sighash (ver))
-        {
-          digest_hd_st td_md5;
+	switch (gnutls_privkey_get_pk_algorithm(pkey, NULL)) {
+	case GNUTLS_PK_RSA:
+		if (!_gnutls_version_has_selectable_sighash(ver)) {
+			digest_hd_st td_md5;
 
-          ret = _gnutls_hash_init (&td_md5, mac_to_entry(GNUTLS_MAC_MD5));
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
+			ret =
+			    _gnutls_hash_init(&td_md5,
+					      mac_to_entry
+					      (GNUTLS_MAC_MD5));
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
 
-          _gnutls_hash (&td_md5, session->security_parameters.client_random,
-                        GNUTLS_RANDOM_SIZE);
-          _gnutls_hash (&td_md5, session->security_parameters.server_random,
-                        GNUTLS_RANDOM_SIZE);
-          _gnutls_hash (&td_md5, params->data, params->size);
+			_gnutls_hash(&td_md5,
+				     session->security_parameters.
+				     client_random, GNUTLS_RANDOM_SIZE);
+			_gnutls_hash(&td_md5,
+				     session->security_parameters.
+				     server_random, GNUTLS_RANDOM_SIZE);
+			_gnutls_hash(&td_md5, params->data, params->size);
 
-          _gnutls_hash_deinit (&td_md5, concat);
-          _gnutls_hash_deinit (&td_sha, &concat[16]);
+			_gnutls_hash_deinit(&td_md5, concat);
+			_gnutls_hash_deinit(&td_sha, &concat[16]);
 
-          dconcat.data = concat;
-          dconcat.size = 36;
-        }
-      else
-        { /* TLS 1.2 way */
+			dconcat.data = concat;
+			dconcat.size = 36;
+		} else {	/* TLS 1.2 way */
 
-          _gnutls_hash_deinit (&td_sha, concat);
+			_gnutls_hash_deinit(&td_sha, concat);
 
-          dconcat.data = concat;
-          dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
-        }
-      break;
-    case GNUTLS_PK_DSA:
-    case GNUTLS_PK_EC:
-      _gnutls_hash_deinit (&td_sha, concat);
+			dconcat.data = concat;
+			dconcat.size =
+			    _gnutls_hash_get_algo_len(hash_algo);
+		}
+		break;
+	case GNUTLS_PK_DSA:
+	case GNUTLS_PK_EC:
+		_gnutls_hash_deinit(&td_sha, concat);
 
-      if (!IS_SHA(hash_algo->id))
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INTERNAL_ERROR;
-        }
-      dconcat.data = concat;
-      dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
-      break;
+		if (!IS_SHA(hash_algo->id)) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+		dconcat.data = concat;
+		dconcat.size = _gnutls_hash_get_algo_len(hash_algo);
+		break;
 
-    default:
-      gnutls_assert ();
-      _gnutls_hash_deinit (&td_sha, NULL);
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+	default:
+		gnutls_assert();
+		_gnutls_hash_deinit(&td_sha, NULL);
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
 
-  ret = sign_tls_hash (session, hash_algo, cert, pkey, &dconcat, signature);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-    }
+	ret =
+	    sign_tls_hash(session, hash_algo, cert, pkey, &dconcat,
+			  signature);
+	if (ret < 0) {
+		gnutls_assert();
+	}
 
-  return ret;
+	return ret;
 
 }
 
@@ -166,138 +167,148 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
  * it supports signing.
  */
 static int
-sign_tls_hash (gnutls_session_t session, const mac_entry_st* hash_algo,
-                  gnutls_pcert_st* cert, gnutls_privkey_t pkey,
-                  const gnutls_datum_t * hash_concat,
-                  gnutls_datum_t * signature)
+sign_tls_hash(gnutls_session_t session, const mac_entry_st * hash_algo,
+	      gnutls_pcert_st * cert, gnutls_privkey_t pkey,
+	      const gnutls_datum_t * hash_concat,
+	      gnutls_datum_t * signature)
 {
-  const version_entry_st* ver = get_version (session);
-  unsigned int key_usage = 0;
+	const version_entry_st *ver = get_version(session);
+	unsigned int key_usage = 0;
 
-  /* If our certificate supports signing
-   */
-  if (cert != NULL)
-    {
-      gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
-      
-      if (key_usage != 0)
-        if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
-          {
-            gnutls_assert ();
-            _gnutls_audit_log(session, "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
-          }
+	/* If our certificate supports signing
+	 */
+	if (cert != NULL) {
+		gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-      /* External signing. Deprecated. To be removed. */
-      if (!pkey)
-        {
-          int ret;
+		if (key_usage != 0)
+			if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
+				gnutls_assert();
+				_gnutls_audit_log(session,
+						  "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
+			}
 
-          if (!session->internals.sign_func)
-            return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+		/* External signing. Deprecated. To be removed. */
+		if (!pkey) {
+			int ret;
 
-          if (!_gnutls_version_has_selectable_sighash (ver))
-            return (*session->internals.sign_func)
-              (session, session->internals.sign_func_userdata,
-               cert->type, &cert->cert, hash_concat, signature);
-          else
-            {
-              gnutls_datum_t digest;
+			if (!session->internals.sign_func)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
-              ret = _gnutls_set_datum(&digest, hash_concat->data, hash_concat->size);
-              if (ret < 0)
-                return gnutls_assert_val(ret);
-              
-              ret = pk_prepare_hash (gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL), hash_algo, &digest);
-              if (ret < 0)
-                {
-                  gnutls_assert ();
-                  goto es_cleanup;
-                }
+			if (!_gnutls_version_has_selectable_sighash(ver))
+				return (*session->internals.sign_func)
+				    (session,
+				     session->internals.sign_func_userdata,
+				     cert->type, &cert->cert, hash_concat,
+				     signature);
+			else {
+				gnutls_datum_t digest;
 
-              ret = (*session->internals.sign_func)
-                (session, session->internals.sign_func_userdata,
-                 cert->type, &cert->cert, &digest, signature);
-es_cleanup:
-              gnutls_free(digest.data);
-              
-              return ret;
-            }
-        }
-    }
+				ret =
+				    _gnutls_set_datum(&digest,
+						      hash_concat->data,
+						      hash_concat->size);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
 
-   if (!_gnutls_version_has_selectable_sighash (ver))
-    return gnutls_privkey_sign_raw_data (pkey, 0, hash_concat, signature);
-  else
-    return gnutls_privkey_sign_hash (pkey, hash_algo->id, 0, hash_concat, signature);
+				ret =
+				    pk_prepare_hash
+				    (gnutls_pubkey_get_pk_algorithm
+				     (cert->pubkey, NULL), hash_algo,
+				     &digest);
+				if (ret < 0) {
+					gnutls_assert();
+					goto es_cleanup;
+				}
+
+				ret = (*session->internals.sign_func)
+				    (session,
+				     session->internals.sign_func_userdata,
+				     cert->type, &cert->cert, &digest,
+				     signature);
+			      es_cleanup:
+				gnutls_free(digest.data);
+
+				return ret;
+			}
+		}
+	}
+
+	if (!_gnutls_version_has_selectable_sighash(ver))
+		return gnutls_privkey_sign_raw_data(pkey, 0, hash_concat,
+						    signature);
+	else
+		return gnutls_privkey_sign_hash(pkey, hash_algo->id, 0,
+						hash_concat, signature);
 }
 
 static int
-verify_tls_hash (gnutls_session_t session,
-                 const version_entry_st* ver, gnutls_pcert_st* cert,
-                 const gnutls_datum_t * hash_concat,
-                 gnutls_datum_t * signature, size_t sha1pos,
-                 gnutls_sign_algorithm_t sign_algo,
-                 gnutls_pk_algorithm_t pk_algo)
+verify_tls_hash(gnutls_session_t session,
+		const version_entry_st * ver, gnutls_pcert_st * cert,
+		const gnutls_datum_t * hash_concat,
+		gnutls_datum_t * signature, size_t sha1pos,
+		gnutls_sign_algorithm_t sign_algo,
+		gnutls_pk_algorithm_t pk_algo)
 {
-  int ret;
-  gnutls_datum_t vdata;
-  unsigned int key_usage = 0, flags;
+	int ret;
+	gnutls_datum_t vdata;
+	unsigned int key_usage = 0, flags;
 
-  if (cert == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
+	if (cert == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_CERTIFICATE_ERROR;
+	}
 
-  gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
+	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-  /* If the certificate supports signing continue.
-   */
-  if (key_usage != 0)
-    if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
-      {
-        gnutls_assert ();
-        _gnutls_audit_log(session, "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
-      }
+	/* If the certificate supports signing continue.
+	 */
+	if (key_usage != 0)
+		if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
+			gnutls_assert();
+			_gnutls_audit_log(session,
+					  "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
+		}
 
-  if (pk_algo == GNUTLS_PK_UNKNOWN)
-    pk_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
-  switch (pk_algo)
-    {
-    case GNUTLS_PK_RSA:
+	if (pk_algo == GNUTLS_PK_UNKNOWN)
+		pk_algo =
+		    gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
+	switch (pk_algo) {
+	case GNUTLS_PK_RSA:
 
-      vdata.data = hash_concat->data;
-      vdata.size = hash_concat->size;
+		vdata.data = hash_concat->data;
+		vdata.size = hash_concat->size;
 
-      /* verify signature */
-      if (!_gnutls_version_has_selectable_sighash (ver))
-        flags = GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA;
-      else
-        flags = 0;
-      break;
-    case GNUTLS_PK_DSA:
-    case GNUTLS_PK_EC:
-      vdata.data = &hash_concat->data[sha1pos];
-      vdata.size = hash_concat->size - sha1pos;
+		/* verify signature */
+		if (!_gnutls_version_has_selectable_sighash(ver))
+			flags = GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA;
+		else
+			flags = 0;
+		break;
+	case GNUTLS_PK_DSA:
+	case GNUTLS_PK_EC:
+		vdata.data = &hash_concat->data[sha1pos];
+		vdata.size = hash_concat->size - sha1pos;
 
-      flags = 0;
+		flags = 0;
 
-      break;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+		break;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
 
-  gnutls_sign_algorithm_set_server(session, sign_algo);
+	gnutls_sign_algorithm_set_server(session, sign_algo);
 
-  ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo, flags, 
-                                   &vdata, signature);
+	ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo, flags,
+					 &vdata, signature);
 
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 
-  return 0;
+	return 0;
 }
 
 
@@ -305,95 +316,95 @@ verify_tls_hash (gnutls_session_t session,
  * Used in DHE_* ciphersuites.
  */
 int
-_gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
-                               const gnutls_datum_t * params,
-                               gnutls_datum_t * signature,
-                               gnutls_sign_algorithm_t sign_algo)
+_gnutls_handshake_verify_data(gnutls_session_t session,
+			      gnutls_pcert_st * cert,
+			      const gnutls_datum_t * params,
+			      gnutls_datum_t * signature,
+			      gnutls_sign_algorithm_t sign_algo)
 {
-  gnutls_datum_t dconcat;
-  int ret;
-  digest_hd_st td_md5;
-  digest_hd_st td_sha;
-  uint8_t concat[MAX_SIG_SIZE];
-  const version_entry_st* ver = get_version (session);
-  gnutls_digest_algorithm_t hash_algo;
-  const mac_entry_st * me;
+	gnutls_datum_t dconcat;
+	int ret;
+	digest_hd_st td_md5;
+	digest_hd_st td_sha;
+	uint8_t concat[MAX_SIG_SIZE];
+	const version_entry_st *ver = get_version(session);
+	gnutls_digest_algorithm_t hash_algo;
+	const mac_entry_st *me;
 
-  if (_gnutls_version_has_selectable_sighash (ver))
-    {
-      _gnutls_handshake_log ("HSK[%p]: verify handshake data: using %s\n",
-                    session, gnutls_sign_algorithm_get_name (sign_algo));
+	if (_gnutls_version_has_selectable_sighash(ver)) {
+		_gnutls_handshake_log
+		    ("HSK[%p]: verify handshake data: using %s\n", session,
+		     gnutls_sign_algorithm_get_name(sign_algo));
 
-      ret = _gnutls_pubkey_compatible_with_sig(session, cert->pubkey, ver, sign_algo);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
+		ret =
+		    _gnutls_pubkey_compatible_with_sig(session,
+						       cert->pubkey, ver,
+						       sign_algo);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-      ret = _gnutls_session_sign_algo_enabled (session, sign_algo);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
+		ret =
+		    _gnutls_session_sign_algo_enabled(session, sign_algo);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-      hash_algo = gnutls_sign_get_hash_algorithm (sign_algo);
-      me = mac_to_entry(hash_algo);
-    }
-  else
-    {
-      me = mac_to_entry(GNUTLS_DIG_MD5);
-      ret = _gnutls_hash_init (&td_md5, me);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
+		hash_algo = gnutls_sign_get_hash_algorithm(sign_algo);
+		me = mac_to_entry(hash_algo);
+	} else {
+		me = mac_to_entry(GNUTLS_DIG_MD5);
+		ret = _gnutls_hash_init(&td_md5, me);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 
-      _gnutls_hash (&td_md5, session->security_parameters.client_random,
-                    GNUTLS_RANDOM_SIZE);
-      _gnutls_hash (&td_md5, session->security_parameters.server_random,
-                    GNUTLS_RANDOM_SIZE);
-      _gnutls_hash (&td_md5, params->data, params->size);
+		_gnutls_hash(&td_md5,
+			     session->security_parameters.client_random,
+			     GNUTLS_RANDOM_SIZE);
+		_gnutls_hash(&td_md5,
+			     session->security_parameters.server_random,
+			     GNUTLS_RANDOM_SIZE);
+		_gnutls_hash(&td_md5, params->data, params->size);
 
-      me = mac_to_entry(GNUTLS_DIG_SHA1);
-    }
+		me = mac_to_entry(GNUTLS_DIG_SHA1);
+	}
 
-  ret = _gnutls_hash_init (&td_sha, me);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      if (!_gnutls_version_has_selectable_sighash (ver))
-        _gnutls_hash_deinit (&td_md5, NULL);
-      return ret;
-    }
+	ret = _gnutls_hash_init(&td_sha, me);
+	if (ret < 0) {
+		gnutls_assert();
+		if (!_gnutls_version_has_selectable_sighash(ver))
+			_gnutls_hash_deinit(&td_md5, NULL);
+		return ret;
+	}
 
-  _gnutls_hash (&td_sha, session->security_parameters.client_random,
-                GNUTLS_RANDOM_SIZE);
-  _gnutls_hash (&td_sha, session->security_parameters.server_random,
-                GNUTLS_RANDOM_SIZE);
-  _gnutls_hash (&td_sha, params->data, params->size);
+	_gnutls_hash(&td_sha, session->security_parameters.client_random,
+		     GNUTLS_RANDOM_SIZE);
+	_gnutls_hash(&td_sha, session->security_parameters.server_random,
+		     GNUTLS_RANDOM_SIZE);
+	_gnutls_hash(&td_sha, params->data, params->size);
 
-  if (!_gnutls_version_has_selectable_sighash (ver))
-    {
-      _gnutls_hash_deinit (&td_md5, concat);
-      _gnutls_hash_deinit (&td_sha, &concat[16]);
-      dconcat.data = concat;
-      dconcat.size = 36;
-    }
-  else
-    {
-      _gnutls_hash_deinit (&td_sha, concat);
+	if (!_gnutls_version_has_selectable_sighash(ver)) {
+		_gnutls_hash_deinit(&td_md5, concat);
+		_gnutls_hash_deinit(&td_sha, &concat[16]);
+		dconcat.data = concat;
+		dconcat.size = 36;
+	} else {
+		_gnutls_hash_deinit(&td_sha, concat);
 
-      dconcat.data = concat;
-      dconcat.size = _gnutls_hash_get_algo_len (me);
-    }
+		dconcat.data = concat;
+		dconcat.size = _gnutls_hash_get_algo_len(me);
+	}
 
-  ret = verify_tls_hash (session, ver, cert, &dconcat, signature,
-                            dconcat.size - _gnutls_hash_get_algo_len (me),
-                            sign_algo, gnutls_sign_get_pk_algorithm (sign_algo));
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = verify_tls_hash(session, ver, cert, &dconcat, signature,
+			      dconcat.size - _gnutls_hash_get_algo_len(me),
+			      sign_algo,
+			      gnutls_sign_get_pk_algorithm(sign_algo));
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  return ret;
+	return ret;
 
 }
 
@@ -403,44 +414,48 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
 /* this is _gnutls_handshake_verify_crt_vrfy for TLS 1.2
  */
 static int
-_gnutls_handshake_verify_crt_vrfy12 (gnutls_session_t session,
-                                      gnutls_pcert_st*  cert,
-                                      gnutls_datum_t * signature,
-                                      gnutls_sign_algorithm_t sign_algo)
+_gnutls_handshake_verify_crt_vrfy12(gnutls_session_t session,
+				    gnutls_pcert_st * cert,
+				    gnutls_datum_t * signature,
+				    gnutls_sign_algorithm_t sign_algo)
 {
-  int ret;
-  uint8_t concat[MAX_HASH_SIZE];
-  gnutls_datum_t dconcat;
-  const version_entry_st* ver = get_version (session);
-  gnutls_pk_algorithm_t pk = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
-  const mac_entry_st *me;
+	int ret;
+	uint8_t concat[MAX_HASH_SIZE];
+	gnutls_datum_t dconcat;
+	const version_entry_st *ver = get_version(session);
+	gnutls_pk_algorithm_t pk =
+	    gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
+	const mac_entry_st *me;
 
-  ret = _gnutls_session_sign_algo_enabled(session, sign_algo);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	ret = _gnutls_session_sign_algo_enabled(session, sign_algo);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  gnutls_sign_algorithm_set_client(session, sign_algo);
-  
-  me = mac_to_entry(gnutls_sign_get_hash_algorithm(sign_algo));
-  
-  ret = _gnutls_hash_fast(me->id, session->internals.handshake_hash_buffer.data, 
-                          session->internals.handshake_hash_buffer_prev_len,
-                          concat);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	gnutls_sign_algorithm_set_client(session, sign_algo);
 
-  dconcat.data = concat;
-  dconcat.size = _gnutls_hash_get_algo_len (me);
+	me = mac_to_entry(gnutls_sign_get_hash_algorithm(sign_algo));
 
-  ret =
-    verify_tls_hash (session, ver, cert, &dconcat, signature, 0, sign_algo, pk);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret =
+	    _gnutls_hash_fast(me->id,
+			      session->internals.handshake_hash_buffer.
+			      data,
+			      session->internals.
+			      handshake_hash_buffer_prev_len, concat);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  return ret;
+	dconcat.data = concat;
+	dconcat.size = _gnutls_hash_get_algo_len(me);
+
+	ret =
+	    verify_tls_hash(session, ver, cert, &dconcat, signature, 0,
+			    sign_algo, pk);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return ret;
 
 }
 
@@ -448,145 +463,143 @@ _gnutls_handshake_verify_crt_vrfy12 (gnutls_session_t session,
  * verify message). 
  */
 int
-_gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
-                                    gnutls_pcert_st *cert,
-                                    gnutls_datum_t * signature,
-                                    gnutls_sign_algorithm_t sign_algo)
+_gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
+				  gnutls_pcert_st * cert,
+				  gnutls_datum_t * signature,
+				  gnutls_sign_algorithm_t sign_algo)
 {
-  int ret;
-  uint8_t concat[MAX_SIG_SIZE];
-  digest_hd_st td_md5;
-  digest_hd_st td_sha;
-  gnutls_datum_t dconcat;
-  const version_entry_st* ver = get_version (session);
+	int ret;
+	uint8_t concat[MAX_SIG_SIZE];
+	digest_hd_st td_md5;
+	digest_hd_st td_sha;
+	gnutls_datum_t dconcat;
+	const version_entry_st *ver = get_version(session);
 
-  _gnutls_handshake_log ("HSK[%p]: verify cert vrfy: using %s\n",
-                    session, gnutls_sign_algorithm_get_name (sign_algo));
+	_gnutls_handshake_log("HSK[%p]: verify cert vrfy: using %s\n",
+			      session,
+			      gnutls_sign_algorithm_get_name(sign_algo));
 
-  if (unlikely(ver == NULL))
-    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	if (unlikely(ver == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  if (_gnutls_version_has_selectable_sighash(ver))
-    return _gnutls_handshake_verify_crt_vrfy12 (session, cert, signature,
-                                                sign_algo);
+	if (_gnutls_version_has_selectable_sighash(ver))
+		return _gnutls_handshake_verify_crt_vrfy12(session, cert,
+							   signature,
+							   sign_algo);
 
-  ret =
-    _gnutls_hash_init (&td_md5, mac_to_entry(GNUTLS_DIG_MD5));
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = _gnutls_hash_init(&td_md5, mac_to_entry(GNUTLS_DIG_MD5));
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  ret =
-    _gnutls_hash_init (&td_sha, mac_to_entry(GNUTLS_DIG_SHA1));
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      _gnutls_hash_deinit (&td_md5, NULL);
-      return GNUTLS_E_HASH_FAILED;
-    }
+	ret = _gnutls_hash_init(&td_sha, mac_to_entry(GNUTLS_DIG_SHA1));
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_hash_deinit(&td_md5, NULL);
+		return GNUTLS_E_HASH_FAILED;
+	}
 
-  _gnutls_hash(&td_sha, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer_prev_len);
-  _gnutls_hash(&td_md5, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer_prev_len);
+	_gnutls_hash(&td_sha,
+		     session->internals.handshake_hash_buffer.data,
+		     session->internals.handshake_hash_buffer_prev_len);
+	_gnutls_hash(&td_md5,
+		     session->internals.handshake_hash_buffer.data,
+		     session->internals.handshake_hash_buffer_prev_len);
 
-  if (ver->id == GNUTLS_SSL3)
-    {
-      ret = _gnutls_generate_master (session, 1);
-      if (ret < 0)
-        {
-          _gnutls_hash_deinit (&td_md5, NULL);
-          _gnutls_hash_deinit (&td_sha, NULL);
-          return gnutls_assert_val(ret);
-        }
+	if (ver->id == GNUTLS_SSL3) {
+		ret = _gnutls_generate_master(session, 1);
+		if (ret < 0) {
+			_gnutls_hash_deinit(&td_md5, NULL);
+			_gnutls_hash_deinit(&td_sha, NULL);
+			return gnutls_assert_val(ret);
+		}
 
-      ret = _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
-                                         session->
-                                         security_parameters.master_secret,
-                                         GNUTLS_MASTER_SIZE);
-      if (ret < 0)
-        {
-          _gnutls_hash_deinit (&td_sha, NULL);
-          return gnutls_assert_val(ret);
-        }
+		ret = _gnutls_mac_deinit_ssl3_handshake(&td_md5, concat,
+							session->security_parameters.
+							master_secret,
+							GNUTLS_MASTER_SIZE);
+		if (ret < 0) {
+			_gnutls_hash_deinit(&td_sha, NULL);
+			return gnutls_assert_val(ret);
+		}
 
-      ret = _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
-                                         session->
-                                         security_parameters.master_secret,
-                                         GNUTLS_MASTER_SIZE);
-      if (ret < 0)
-        {
-          return gnutls_assert_val(ret);
-        }
-    }
-  else
-    {
-      _gnutls_hash_deinit (&td_md5, concat);
-      _gnutls_hash_deinit (&td_sha, &concat[16]);
-    }
+		ret =
+		    _gnutls_mac_deinit_ssl3_handshake(&td_sha, &concat[16],
+						      session->security_parameters.
+						      master_secret,
+						      GNUTLS_MASTER_SIZE);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+	} else {
+		_gnutls_hash_deinit(&td_md5, concat);
+		_gnutls_hash_deinit(&td_sha, &concat[16]);
+	}
 
-  dconcat.data = concat;
-  dconcat.size = 20 + 16;       /* md5+ sha */
+	dconcat.data = concat;
+	dconcat.size = 20 + 16;	/* md5+ sha */
 
-  ret =
-    verify_tls_hash (session, ver, cert, &dconcat, signature, 16,
-                     GNUTLS_SIGN_UNKNOWN,
-                     gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL));
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret =
+	    verify_tls_hash(session, ver, cert, &dconcat, signature, 16,
+			    GNUTLS_SIGN_UNKNOWN,
+			    gnutls_pubkey_get_pk_algorithm(cert->pubkey,
+							   NULL));
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  return ret;
+	return ret;
 }
 
 /* the same as _gnutls_handshake_sign_crt_vrfy except that it is made for TLS 1.2
  */
 static int
-_gnutls_handshake_sign_crt_vrfy12 (gnutls_session_t session,
-                                    gnutls_pcert_st* cert, gnutls_privkey_t pkey,
-                                    gnutls_datum_t * signature)
+_gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
+				  gnutls_pcert_st * cert,
+				  gnutls_privkey_t pkey,
+				  gnutls_datum_t * signature)
 {
-  gnutls_datum_t dconcat;
-  int ret;
-  uint8_t concat[MAX_SIG_SIZE];
-  gnutls_sign_algorithm_t sign_algo;
-  const mac_entry_st* me;
+	gnutls_datum_t dconcat;
+	int ret;
+	uint8_t concat[MAX_SIG_SIZE];
+	gnutls_sign_algorithm_t sign_algo;
+	const mac_entry_st *me;
 
-  sign_algo =
-    _gnutls_session_get_sign_algo (session, cert);
-  if (sign_algo == GNUTLS_SIGN_UNKNOWN)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
-    }
-  
-  gnutls_sign_algorithm_set_client(session, sign_algo);
+	sign_algo = _gnutls_session_get_sign_algo(session, cert);
+	if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+	}
 
-  me = mac_to_entry(gnutls_sign_get_hash_algorithm (sign_algo));
+	gnutls_sign_algorithm_set_client(session, sign_algo);
 
-  _gnutls_debug_log ("sign handshake cert vrfy: picked %s with %s\n",
-                    gnutls_sign_algorithm_get_name (sign_algo),
-                    _gnutls_mac_get_name (me));
+	me = mac_to_entry(gnutls_sign_get_hash_algorithm(sign_algo));
 
-  ret = _gnutls_hash_fast (me->id, session->internals.handshake_hash_buffer.data, 
-                           session->internals.handshake_hash_buffer.length,
-                           concat);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	_gnutls_debug_log("sign handshake cert vrfy: picked %s with %s\n",
+			  gnutls_sign_algorithm_get_name(sign_algo),
+			  _gnutls_mac_get_name(me));
 
-  dconcat.data = concat;
-  dconcat.size = _gnutls_hash_get_algo_len (me);
+	ret =
+	    _gnutls_hash_fast(me->id,
+			      session->internals.handshake_hash_buffer.
+			      data,
+			      session->internals.handshake_hash_buffer.
+			      length, concat);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  ret = sign_tls_hash (session, me, cert, pkey, &dconcat, signature);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	dconcat.data = concat;
+	dconcat.size = _gnutls_hash_get_algo_len(me);
 
-  return sign_algo;
+	ret = sign_tls_hash(session, me, cert, pkey, &dconcat, signature);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return sign_algo;
 }
 
 
@@ -599,131 +612,136 @@ _gnutls_handshake_sign_crt_vrfy12 (gnutls_session_t session,
  * For TLS1.2 returns the signature algorithm used on success, or a negative error code;
  */
 int
-_gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
-                                  gnutls_pcert_st* cert, gnutls_privkey_t pkey,
-                                  gnutls_datum_t * signature)
+_gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
+				gnutls_pcert_st * cert,
+				gnutls_privkey_t pkey,
+				gnutls_datum_t * signature)
 {
-  gnutls_datum_t dconcat;
-  int ret;
-  uint8_t concat[MAX_SIG_SIZE];
-  digest_hd_st td_md5;
-  digest_hd_st td_sha;
-  const version_entry_st* ver = get_version (session);
-  gnutls_pk_algorithm_t pk = gnutls_privkey_get_pk_algorithm(pkey, NULL);
+	gnutls_datum_t dconcat;
+	int ret;
+	uint8_t concat[MAX_SIG_SIZE];
+	digest_hd_st td_md5;
+	digest_hd_st td_sha;
+	const version_entry_st *ver = get_version(session);
+	gnutls_pk_algorithm_t pk =
+	    gnutls_privkey_get_pk_algorithm(pkey, NULL);
 
-  if (unlikely(ver == NULL))
-    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	if (unlikely(ver == NULL))
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  if (_gnutls_version_has_selectable_sighash(ver))
-    return _gnutls_handshake_sign_crt_vrfy12 (session, cert, pkey,
-                                              signature);
+	if (_gnutls_version_has_selectable_sighash(ver))
+		return _gnutls_handshake_sign_crt_vrfy12(session, cert,
+							 pkey, signature);
 
-  ret =
-    _gnutls_hash_init (&td_sha, mac_to_entry(GNUTLS_DIG_SHA1));
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = _gnutls_hash_init(&td_sha, mac_to_entry(GNUTLS_DIG_SHA1));
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  _gnutls_hash(&td_sha, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer.length);
+	_gnutls_hash(&td_sha,
+		     session->internals.handshake_hash_buffer.data,
+		     session->internals.handshake_hash_buffer.length);
 
-  if (ver->id == GNUTLS_SSL3)
-    {
-      ret = _gnutls_generate_master (session, 1);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          _gnutls_hash_deinit (&td_sha, NULL);
-          return ret;
-        }
+	if (ver->id == GNUTLS_SSL3) {
+		ret = _gnutls_generate_master(session, 1);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_hash_deinit(&td_sha, NULL);
+			return ret;
+		}
 
-      ret = _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
-                                         session->
-                                         security_parameters.master_secret,
-                                         GNUTLS_MASTER_SIZE);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-    }
-  else
-    _gnutls_hash_deinit (&td_sha, &concat[16]);
+		ret =
+		    _gnutls_mac_deinit_ssl3_handshake(&td_sha, &concat[16],
+						      session->security_parameters.
+						      master_secret,
+						      GNUTLS_MASTER_SIZE);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	} else
+		_gnutls_hash_deinit(&td_sha, &concat[16]);
 
-  /* ensure 1024 bit DSA keys are used */
-  ret = _gnutls_pubkey_compatible_with_sig(session, cert->pubkey, ver, GNUTLS_SIGN_UNKNOWN);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	/* ensure 1024 bit DSA keys are used */
+	ret =
+	    _gnutls_pubkey_compatible_with_sig(session, cert->pubkey, ver,
+					       GNUTLS_SIGN_UNKNOWN);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  switch (pk)
-    {
-    case GNUTLS_PK_RSA:
-      ret =
-        _gnutls_hash_init (&td_md5, mac_to_entry(GNUTLS_DIG_MD5));
-      if (ret < 0)
-        return gnutls_assert_val(ret);
+	switch (pk) {
+	case GNUTLS_PK_RSA:
+		ret =
+		    _gnutls_hash_init(&td_md5,
+				      mac_to_entry(GNUTLS_DIG_MD5));
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-      _gnutls_hash(&td_md5, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer.length);
+		_gnutls_hash(&td_md5,
+			     session->internals.handshake_hash_buffer.data,
+			     session->internals.handshake_hash_buffer.
+			     length);
 
-      if (ver->id == GNUTLS_SSL3)
-        {
-          ret = _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
-                                           session->
-                                           security_parameters.master_secret,
-                                           GNUTLS_MASTER_SIZE);
-          if (ret < 0)
-            return gnutls_assert_val(ret);
-        }
-      else
-        _gnutls_hash_deinit (&td_md5, concat);
+		if (ver->id == GNUTLS_SSL3) {
+			ret =
+			    _gnutls_mac_deinit_ssl3_handshake(&td_md5,
+							      concat,
+							      session->security_parameters.
+							      master_secret,
+							      GNUTLS_MASTER_SIZE);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		} else
+			_gnutls_hash_deinit(&td_md5, concat);
 
-      dconcat.data = concat;
-      dconcat.size = 36;
-      break;
-    case GNUTLS_PK_DSA:
-    case GNUTLS_PK_EC:
+		dconcat.data = concat;
+		dconcat.size = 36;
+		break;
+	case GNUTLS_PK_DSA:
+	case GNUTLS_PK_EC:
 
-      dconcat.data = &concat[16];
-      dconcat.size = 20;
-      break;
+		dconcat.data = &concat[16];
+		dconcat.size = 20;
+		break;
 
-    default:
-      return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-    }
-  ret = sign_tls_hash (session, NULL, cert, pkey, &dconcat, signature);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-    }
+	default:
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+	ret =
+	    sign_tls_hash(session, NULL, cert, pkey, &dconcat, signature);
+	if (ret < 0) {
+		gnutls_assert();
+	}
 
-  return ret;
+	return ret;
 }
 
 int
-pk_hash_data (gnutls_pk_algorithm_t pk, const mac_entry_st* hash,
-              gnutls_pk_params_st* params,
-              const gnutls_datum_t * data, gnutls_datum_t * digest)
+pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
+	     gnutls_pk_params_st * params,
+	     const gnutls_datum_t * data, gnutls_datum_t * digest)
 {
-  int ret;
+	int ret;
 
-  digest->size = _gnutls_hash_get_algo_len (hash);
-  digest->data = gnutls_malloc (digest->size);
-  if (digest->data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+	digest->size = _gnutls_hash_get_algo_len(hash);
+	digest->data = gnutls_malloc(digest->size);
+	if (digest->data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-  ret = _gnutls_hash_fast (hash->id, data->data, data->size, digest->data);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
+	ret =
+	    _gnutls_hash_fast(hash->id, data->data, data->size,
+			      digest->data);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-  return 0;
+	return 0;
 
-cleanup:
-  gnutls_free (digest->data);
-  return ret;
+      cleanup:
+	gnutls_free(digest->data);
+	return ret;
 }
 
 
@@ -733,35 +751,34 @@ cleanup:
  * and will be freed if replacement is required.
  */
 int
-pk_prepare_hash (gnutls_pk_algorithm_t pk,
-                 const mac_entry_st* hash, gnutls_datum_t * digest)
+pk_prepare_hash(gnutls_pk_algorithm_t pk,
+		const mac_entry_st * hash, gnutls_datum_t * digest)
 {
-  int ret;
-  gnutls_datum_t old_digest = { digest->data, digest->size };
+	int ret;
+	gnutls_datum_t old_digest = { digest->data, digest->size };
 
-  switch (pk)
-    {
-    case GNUTLS_PK_RSA:
-      if (unlikely(hash == NULL))
-        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-      /* Encode the digest as a DigestInfo
-       */
-      if ((ret = encode_ber_digest_info (hash, &old_digest, digest)) != 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
+	switch (pk) {
+	case GNUTLS_PK_RSA:
+		if (unlikely(hash == NULL))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		/* Encode the digest as a DigestInfo
+		 */
+		if ((ret =
+		     encode_ber_digest_info(hash, &old_digest,
+					    digest)) != 0) {
+			gnutls_assert();
+			return ret;
+		}
 
-      _gnutls_free_datum (&old_digest);
-      break;
-    case GNUTLS_PK_DSA:
-    case GNUTLS_PK_EC:
-      break;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-    }
+		_gnutls_free_datum(&old_digest);
+		break;
+	case GNUTLS_PK_DSA:
+	case GNUTLS_PK_EC:
+		break;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
 
-  return 0;
+	return 0;
 }
-

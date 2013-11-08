@@ -54,20 +54,19 @@ EAPI extern Eina_Error EINA_ERROR_CONVERT_0X_NOT_FOUND;
  */
 EAPI extern Eina_Error EINA_ERROR_CONVERT_OUTRUN_STRING_LENGTH;
 
-EAPI int       eina_convert_itoa(int n, char *s)  EINA_ARG_NONNULL(2);
-EAPI int       eina_convert_xtoa(unsigned int n, char *s) EINA_ARG_NONNULL(2);
+EAPI int eina_convert_itoa(int n, char *s) EINA_ARG_NONNULL(2);
+EAPI int eina_convert_xtoa(unsigned int n, char *s) EINA_ARG_NONNULL(2);
 
-EAPI int       eina_convert_dtoa(double d, char *des) EINA_ARG_NONNULL(2);
+EAPI int eina_convert_dtoa(double d, char *des) EINA_ARG_NONNULL(2);
 EAPI Eina_Bool eina_convert_atod(const char *src,
-                                 int length,
-                                 long long *m,
-                                 long *e) EINA_ARG_NONNULL(1,3,4);
+				 int length,
+				 long long *m,
+				 long *e) EINA_ARG_NONNULL(1, 3, 4);
 
-EAPI int       eina_convert_fptoa(Eina_F32p32 fp,
-                                  char *des) EINA_ARG_NONNULL(2);
+EAPI int eina_convert_fptoa(Eina_F32p32 fp, char *des) EINA_ARG_NONNULL(2);
 EAPI Eina_Bool eina_convert_atofp(const char *src,
-                                  int length,
-                                  Eina_F32p32 *fp) EINA_ARG_NONNULL(1,3);
+				  int length,
+				  Eina_F32p32 * fp) EINA_ARG_NONNULL(1, 3);
 
 /**
  * @}
@@ -77,4 +76,4 @@ EAPI Eina_Bool eina_convert_atofp(const char *src,
  * @}
  */
 
-#endif /* EINA_CONVERT_H_ */
+#endif				/* EINA_CONVERT_H_ */

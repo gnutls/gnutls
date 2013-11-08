@@ -33,58 +33,53 @@ gnutls_realloc_function gnutls_realloc = realloc;
 void *(*gnutls_calloc) (size_t, size_t) = calloc;
 char *(*gnutls_strdup) (const char *) = _gnutls_strdup;
 
-void *
-_gnutls_calloc (size_t nmemb, size_t size)
+void *_gnutls_calloc(size_t nmemb, size_t size)
 {
-  void *ret;
-  size_t n = xtimes (nmemb, size);
-  ret = (size_in_bounds_p (n) ? gnutls_malloc (n) : NULL);
-  if (ret != NULL)
-    memset (ret, 0, size);
-  return ret;
+	void *ret;
+	size_t n = xtimes(nmemb, size);
+	ret = (size_in_bounds_p(n) ? gnutls_malloc(n) : NULL);
+	if (ret != NULL)
+		memset(ret, 0, size);
+	return ret;
 }
 
-svoid *
-gnutls_secure_calloc (size_t nmemb, size_t size)
+svoid *gnutls_secure_calloc(size_t nmemb, size_t size)
 {
-  svoid *ret;
-  size_t n = xtimes (nmemb, size);
-  ret = (size_in_bounds_p (n) ? gnutls_secure_malloc (n) : NULL);
-  if (ret != NULL)
-    memset (ret, 0, size);
-  return ret;
+	svoid *ret;
+	size_t n = xtimes(nmemb, size);
+	ret = (size_in_bounds_p(n) ? gnutls_secure_malloc(n) : NULL);
+	if (ret != NULL)
+		memset(ret, 0, size);
+	return ret;
 }
 
 /* This realloc will free ptr in case realloc
  * fails.
  */
-void *
-gnutls_realloc_fast (void *ptr, size_t size)
+void *gnutls_realloc_fast(void *ptr, size_t size)
 {
-  void *ret;
+	void *ret;
 
-  if (size == 0)
-    return ptr;
+	if (size == 0)
+		return ptr;
 
-  ret = gnutls_realloc (ptr, size);
-  if (ret == NULL)
-    {
-      gnutls_free (ptr);
-    }
+	ret = gnutls_realloc(ptr, size);
+	if (ret == NULL) {
+		gnutls_free(ptr);
+	}
 
-  return ret;
+	return ret;
 }
 
-char *
-_gnutls_strdup (const char *str)
+char *_gnutls_strdup(const char *str)
 {
-  size_t siz = strlen (str) + 1;
-  char *ret;
+	size_t siz = strlen(str) + 1;
+	char *ret;
 
-  ret = gnutls_malloc (siz);
-  if (ret != NULL)
-    memcpy (ret, str, siz);
-  return ret;
+	ret = gnutls_malloc(siz);
+	if (ret != NULL)
+		memcpy(ret, str, siz);
+	return ret;
 }
 
 
@@ -103,8 +98,7 @@ _gnutls_strdup (const char *str)
  * The allocation function used is the one set by
  * gnutls_global_set_mem_functions().
  **/
-void *
-gnutls_malloc (size_t s)
+void *gnutls_malloc(size_t s)
 {
 }
 
@@ -118,8 +112,7 @@ gnutls_malloc (size_t s)
  * gnutls_global_set_mem_functions().
  *
  **/
-void
-gnutls_free (void *ptr)
+void gnutls_free(void *ptr)
 {
 }
 

@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <stdlib.h>
@@ -65,10 +65,10 @@ static const char EINA_MAGIC_ITERATOR_STR[] = "Eina Iterator";
  *
  * @see eina_init()
  */
-Eina_Bool
-eina_iterator_init(void)
+Eina_Bool eina_iterator_init(void)
 {
-   return eina_magic_string_set(EINA_MAGIC_ITERATOR, EINA_MAGIC_ITERATOR_STR);
+	return eina_magic_string_set(EINA_MAGIC_ITERATOR,
+				     EINA_MAGIC_ITERATOR_STR);
 }
 
 /**
@@ -82,10 +82,9 @@ eina_iterator_init(void)
  *
  * @see eina_shutdown()
  */
-Eina_Bool
-eina_iterator_shutdown(void)
+Eina_Bool eina_iterator_shutdown(void)
 {
-   return EINA_TRUE;
+	return EINA_TRUE;
 }
 
 /*============================================================================*
@@ -119,13 +118,12 @@ eina_iterator_shutdown(void)
  *
  * This function frees @p iterator if it is not @c NULL;
  */
-EAPI void
-eina_iterator_free(Eina_Iterator *iterator)
+EAPI void eina_iterator_free(Eina_Iterator * iterator)
 {
-   EINA_MAGIC_CHECK_ITERATOR(iterator);
-   EINA_SAFETY_ON_NULL_RETURN(iterator);
-   EINA_SAFETY_ON_NULL_RETURN(iterator->free);
-   iterator->free(iterator);
+	EINA_MAGIC_CHECK_ITERATOR(iterator);
+	EINA_SAFETY_ON_NULL_RETURN(iterator);
+	EINA_SAFETY_ON_NULL_RETURN(iterator->free);
+	iterator->free(iterator);
 }
 
 /**
@@ -137,13 +135,12 @@ eina_iterator_free(Eina_Iterator *iterator)
  * This function returns the container which created @p iterator. If
  * @p iterator is @c NULL, this function returns @c NULL.
  */
-EAPI void *
-eina_iterator_container_get(Eina_Iterator *iterator)
+EAPI void *eina_iterator_container_get(Eina_Iterator * iterator)
 {
-   EINA_MAGIC_CHECK_ITERATOR(iterator);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(iterator,                NULL);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(iterator->get_container, NULL);
-   return iterator->get_container(iterator);
+	EINA_MAGIC_CHECK_ITERATOR(iterator);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(iterator, NULL);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(iterator->get_container, NULL);
+	return iterator->get_container(iterator);
 }
 
 /**
@@ -158,17 +155,16 @@ eina_iterator_container_get(Eina_Iterator *iterator)
  * iterator is @c NULL or if a problem occurred, #EINA_FALSE is
  * returned, otherwise #EINA_TRUE is returned.
  */
-EAPI Eina_Bool
-eina_iterator_next(Eina_Iterator *iterator, void **data)
+EAPI Eina_Bool eina_iterator_next(Eina_Iterator * iterator, void **data)
 {
-   if (!iterator)
-      return EINA_FALSE;
+	if (!iterator)
+		return EINA_FALSE;
 
-   EINA_MAGIC_CHECK_ITERATOR(iterator);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(iterator,       EINA_FALSE);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(iterator->next, EINA_FALSE);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(data,           EINA_FALSE);
-   return iterator->next(iterator, data);
+	EINA_MAGIC_CHECK_ITERATOR(iterator);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(iterator, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(iterator->next, EINA_FALSE);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(data, EINA_FALSE);
+	return iterator->next(iterator, data);
 }
 
 /**
@@ -185,29 +181,29 @@ eina_iterator_next(Eina_Iterator *iterator, void **data)
  * EINA_FALSE, the iteration stops at that point.
  */
 EAPI void
-eina_iterator_foreach(Eina_Iterator *iterator,
-                      Eina_Each_Cb cb,
-                      const void *fdata)
+eina_iterator_foreach(Eina_Iterator * iterator,
+		      Eina_Each_Cb cb, const void *fdata)
 {
-   const void *container;
-   void *data;
+	const void *container;
+	void *data;
 
-   EINA_MAGIC_CHECK_ITERATOR(iterator);
-   EINA_SAFETY_ON_NULL_RETURN(iterator);
-   EINA_SAFETY_ON_NULL_RETURN(iterator->get_container);
-   EINA_SAFETY_ON_NULL_RETURN(iterator->next);
-   EINA_SAFETY_ON_NULL_RETURN(cb);
+	EINA_MAGIC_CHECK_ITERATOR(iterator);
+	EINA_SAFETY_ON_NULL_RETURN(iterator);
+	EINA_SAFETY_ON_NULL_RETURN(iterator->get_container);
+	EINA_SAFETY_ON_NULL_RETURN(iterator->next);
+	EINA_SAFETY_ON_NULL_RETURN(cb);
 
-   if (!eina_iterator_lock(iterator)) return ;
+	if (!eina_iterator_lock(iterator))
+		return;
 
-   container = iterator->get_container(iterator);
-   while (iterator->next(iterator, &data) == EINA_TRUE) {
-        if (cb(container, data, (void *)fdata) != EINA_TRUE)
-	   goto on_exit;
-     }
+	container = iterator->get_container(iterator);
+	while (iterator->next(iterator, &data) == EINA_TRUE) {
+		if (cb(container, data, (void *) fdata) != EINA_TRUE)
+			goto on_exit;
+	}
 
- on_exit:
-   (void) eina_iterator_unlock(iterator);
+      on_exit:
+	(void) eina_iterator_unlock(iterator);
 }
 
 /**
@@ -221,15 +217,14 @@ eina_iterator_foreach(Eina_Iterator *iterator,
  * returned, otherwise #EINA_TRUE is returned. If the container
  * is not lockable, it will return EINA_TRUE.
  */
-EAPI Eina_Bool
-eina_iterator_lock(Eina_Iterator *iterator)
+EAPI Eina_Bool eina_iterator_lock(Eina_Iterator * iterator)
 {
-   EINA_MAGIC_CHECK_ITERATOR(iterator);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(iterator, EINA_FALSE);
+	EINA_MAGIC_CHECK_ITERATOR(iterator);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(iterator, EINA_FALSE);
 
-   if (iterator->lock)
-      return iterator->lock(iterator);
-   return EINA_TRUE;
+	if (iterator->lock)
+		return iterator->lock(iterator);
+	return EINA_TRUE;
 }
 
 /**
@@ -244,15 +239,14 @@ eina_iterator_lock(Eina_Iterator *iterator)
  * is returned. If the container is not lockable, it will return
  * EINA_TRUE.
  */
-EAPI Eina_Bool
-eina_iterator_unlock(Eina_Iterator *iterator)
+EAPI Eina_Bool eina_iterator_unlock(Eina_Iterator * iterator)
 {
-   EINA_MAGIC_CHECK_ITERATOR(iterator);
-   EINA_SAFETY_ON_NULL_RETURN_VAL(iterator, EINA_FALSE);
+	EINA_MAGIC_CHECK_ITERATOR(iterator);
+	EINA_SAFETY_ON_NULL_RETURN_VAL(iterator, EINA_FALSE);
 
-   if (iterator->unlock)
-      return iterator->unlock(iterator);
-   return EINA_TRUE;
+	if (iterator->unlock)
+		return iterator->unlock(iterator);
+	return EINA_TRUE;
 }
 
 /**

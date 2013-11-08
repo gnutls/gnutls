@@ -30,15 +30,16 @@
 
 #ifndef __attribute__
 #if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#define __attribute__(Spec)     /* empty */
+#define __attribute__(Spec)	/* empty */
 #endif
 #endif
 
-inline static int global_init(void) {
+inline static int global_init(void)
+{
 #ifdef ENABLE_PKCS11
-  gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
+	gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
 #endif
-  return gnutls_global_init();
+	return gnutls_global_init();
 }
 
 extern int debug;
@@ -47,16 +48,16 @@ extern int break_on_error;
 
 extern const char *pkcs3;
 
-extern void fail (const char *format, ...)
-  __attribute__ ((format (printf, 1, 2)));
-extern void success (const char *format, ...)
-  __attribute__ ((format (printf, 1, 2)));
+extern void fail(const char *format, ...)
+    __attribute__ ((format(printf, 1, 2)));
+extern void success(const char *format, ...)
+    __attribute__ ((format(printf, 1, 2)));
 
-extern void escapeprint (const char *str, size_t len);
-extern void hexprint (const void *str, size_t len);
-extern void binprint (const void *str, size_t len);
+extern void escapeprint(const char *str, size_t len);
+extern void hexprint(const void *str, size_t len);
+extern void binprint(const void *str, size_t len);
 
 /* This must be implemented elsewhere. */
-extern void doit (void);
+extern void doit(void);
 
-#endif /* UTILS_H */
+#endif				/* UTILS_H */

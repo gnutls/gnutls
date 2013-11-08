@@ -65,14 +65,15 @@
  * @{
  */
 
-EAPI Eina_Bool    eina_binshare_init(void);
-EAPI Eina_Bool    eina_binshare_shutdown(void);
-EAPI const void * eina_binshare_add_length(const void *obj,
-                                          unsigned int olen) EINA_PURE EINA_WARN_UNUSED_RESULT;
-EAPI const void * eina_binshare_ref(const void *obj);
-EAPI void         eina_binshare_del(const void *obj);
-EAPI int          eina_binshare_length(const void *obj) EINA_WARN_UNUSED_RESULT;
-EAPI void         eina_binshare_dump(void);
+EAPI Eina_Bool eina_binshare_init(void);
+EAPI Eina_Bool eina_binshare_shutdown(void);
+EAPI const void *eina_binshare_add_length(const void *obj,
+					  unsigned int olen)
+EINA_PURE EINA_WARN_UNUSED_RESULT;
+EAPI const void *eina_binshare_ref(const void *obj);
+EAPI void eina_binshare_del(const void *obj);
+EAPI int eina_binshare_length(const void *obj) EINA_WARN_UNUSED_RESULT;
+EAPI void eina_binshare_dump(void);
 
 /**
  * @brief Retrieve an instance of a blob for use in a program.
@@ -102,4 +103,4 @@ EAPI void         eina_binshare_dump(void);
  * @}
  */
 
-#endif /* EINA_STRINGSHARE_H_ */
+#endif				/* EINA_STRINGSHARE_H_ */

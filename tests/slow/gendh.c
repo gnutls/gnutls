@@ -28,25 +28,25 @@
 
 #include "utils.h"
 
-void
-doit (void)
+void doit(void)
 {
-  gnutls_dh_params_t dh_params = NULL;
-  int rc;
+	gnutls_dh_params_t dh_params = NULL;
+	int rc;
 
-  rc = global_init ();
-  if (rc)
-    fail ("global_init\n");
+	rc = global_init();
+	if (rc)
+		fail("global_init\n");
 
-  if (gnutls_dh_params_init (&dh_params) < 0)
-    fail ("Error in dh parameter initialization\n");
+	if (gnutls_dh_params_init(&dh_params) < 0)
+		fail("Error in dh parameter initialization\n");
 
-  if (gnutls_dh_params_generate2 (dh_params, 1024) < 0)
-    fail ("Error in prime generation\n");
-    
-  gnutls_dh_params_deinit(dh_params);
-  
-  gnutls_global_deinit();
+	if (gnutls_dh_params_generate2(dh_params, 1024) < 0)
+		fail("Error in prime generation\n");
 
-  if (debug) success ("generated DH params OK\n");
+	gnutls_dh_params_deinit(dh_params);
+
+	gnutls_global_deinit();
+
+	if (debug)
+		success("generated DH params OK\n");
 }

@@ -49,12 +49,15 @@
  * @typedef Eina_Version
  * The version of Eina.
  */
-typedef struct _Eina_Version
-{
-   int major;    /**< Major component of the version */
-   int minor;    /**< Minor component of the version */
-   int micro;    /**< Micro component of the version */
-   int revision; /**< Revision component of the version */
+typedef struct _Eina_Version {
+	int major;
+		 /**< Major component of the version */
+	int minor;
+		 /**< Minor component of the version */
+	int micro;
+		 /**< Micro component of the version */
+	int revision;
+		 /**< Revision component of the version */
 } Eina_Version;
 
 EAPI extern Eina_Version *eina_version;
@@ -72,4 +75,4 @@ EAPI int eina_threads_shutdown(void);
  * @}
  */
 
-#endif /* EINA_MAIN_H_ */
+#endif				/* EINA_MAIN_H_ */

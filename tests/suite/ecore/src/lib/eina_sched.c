@@ -17,17 +17,17 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #ifdef EFL_HAVE_POSIX_THREADS
-# include <pthread.h>
-# ifdef __linux__
-#  include <sched.h>
-#  include <sys/time.h>
-#  include <sys/resource.h>
-#  include <errno.h>
-# endif
+#include <pthread.h>
+#ifdef __linux__
+#include <sched.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <errno.h>
+#endif
 #endif
 
 #include "eina_sched.h"
@@ -48,48 +48,43 @@
  * only one that is implemented as of now. In this case the nice level is
  * incremented on this thread by @c NICENESS.
  */
-EAPI void
-eina_sched_prio_drop(void)
+EAPI void eina_sched_prio_drop(void)
 {
 #ifdef EFL_HAVE_POSIX_THREADS
-   struct sched_param param;
-   int pol, prio, ret;
-   pthread_t pthread_id;
+	struct sched_param param;
+	int pol, prio, ret;
+	pthread_t pthread_id;
 
-   pthread_id = pthread_self();
-   ret = pthread_getschedparam(pthread_id, &pol, &param);
-   if (ret)
-     {
-        EINA_LOG_ERR("Unable to query sched parameters");
-        return;
-     }
+	pthread_id = pthread_self();
+	ret = pthread_getschedparam(pthread_id, &pol, &param);
+	if (ret) {
+		EINA_LOG_ERR("Unable to query sched parameters");
+		return;
+	}
 
-   if (EINA_UNLIKELY(pol == SCHED_RR || pol == SCHED_FIFO))
-     {
-        prio = sched_get_priority_max(pol);
-        param.sched_priority += RTNICENESS;
-        if (prio > 0 && param.sched_priority > prio)
-           param.sched_priority = prio;
+	if (EINA_UNLIKELY(pol == SCHED_RR || pol == SCHED_FIFO)) {
+		prio = sched_get_priority_max(pol);
+		param.sched_priority += RTNICENESS;
+		if (prio > 0 && param.sched_priority > prio)
+			param.sched_priority = prio;
 
-        pthread_setschedparam(pthread_id, pol, &param);
-     }
+		pthread_setschedparam(pthread_id, pol, &param);
+	}
 #ifdef __linux__
-   else
-     {
-        errno = 0;
-        prio = getpriority(PRIO_PROCESS, 0);
-        if (errno == 0)
-          {
-             prio += NICENESS;
-             if (prio > 19)
-                prio = 19;
+	else {
+		errno = 0;
+		prio = getpriority(PRIO_PROCESS, 0);
+		if (errno == 0) {
+			prio += NICENESS;
+			if (prio > 19)
+				prio = 19;
 
-             setpriority(PRIO_PROCESS, 0, prio);
-          }
-     }
+			setpriority(PRIO_PROCESS, 0, prio);
+		}
+	}
 #endif
 #else
-   EINA_LOG_ERR("Eina does not have support for threads enabled"
-                "or it doesn't support setting scheduler priorities");
+	EINA_LOG_ERR("Eina does not have support for threads enabled"
+		     "or it doesn't support setting scheduler priorities");
 #endif
 }

@@ -41,4 +41,4 @@ EAPI int eina_hamster_count(void);
  * @}
  */
 
-#endif /* EINA_HAMSTER_H_ */
+#endif				/* EINA_HAMSTER_H_ */

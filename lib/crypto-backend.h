@@ -21,77 +21,74 @@
  */
 
 #ifndef GNUTLS_CRYPTO_BACKEND_H
-# define GNUTLS_CRYPTO_BACKEND_H
+#define GNUTLS_CRYPTO_BACKEND_H
 
-# include <gnutls/crypto.h>
+#include <gnutls/crypto.h>
 
-# define gnutls_crypto_single_cipher_st gnutls_crypto_cipher_st
-# define gnutls_crypto_single_mac_st gnutls_crypto_mac_st
-# define gnutls_crypto_single_digest_st gnutls_crypto_digest_st
+#define gnutls_crypto_single_cipher_st gnutls_crypto_cipher_st
+#define gnutls_crypto_single_mac_st gnutls_crypto_mac_st
+#define gnutls_crypto_single_digest_st gnutls_crypto_digest_st
 
-  typedef struct
-  {
-    int (*init) (gnutls_cipher_algorithm_t, void **ctx, int enc);
-    int (*setkey) (void *ctx, const void *key, size_t keysize);
-    int (*setiv) (void *ctx, const void *iv, size_t ivsize);
-    int (*encrypt) (void *ctx, const void *plain, size_t plainsize,
-                    void *encr, size_t encrsize);
-    int (*decrypt) (void *ctx, const void *encr, size_t encrsize,
-                    void *plain, size_t plainsize);
-    int (*auth) (void *ctx, const void *data, size_t datasize);
-    void (*tag) (void *ctx, void *tag, size_t tagsize);
-    void (*deinit) (void *ctx);
-    
-    /* Not needed for registered on run-time. Only included
-     * should define it. */
-    int (*exists) (gnutls_cipher_algorithm_t); /* true/false */
-  } gnutls_crypto_cipher_st;
+typedef struct {
+	int (*init) (gnutls_cipher_algorithm_t, void **ctx, int enc);
+	int (*setkey) (void *ctx, const void *key, size_t keysize);
+	int (*setiv) (void *ctx, const void *iv, size_t ivsize);
+	int (*encrypt) (void *ctx, const void *plain, size_t plainsize,
+			void *encr, size_t encrsize);
+	int (*decrypt) (void *ctx, const void *encr, size_t encrsize,
+			void *plain, size_t plainsize);
+	int (*auth) (void *ctx, const void *data, size_t datasize);
+	void (*tag) (void *ctx, void *tag, size_t tagsize);
+	void (*deinit) (void *ctx);
 
-  typedef struct
-  {
-    int (*init) (gnutls_mac_algorithm_t, void **ctx);
-    int (*setkey) (void *ctx, const void *key, size_t keysize);
-    int (*setnonce) (void *ctx, const void *nonce, size_t noncesize);
-    int (*hash) (void *ctx, const void *text, size_t textsize);
-    int (*output) (void *src_ctx, void *digest, size_t digestsize);
-    void (*deinit) (void *ctx);
-    int (*fast)(gnutls_mac_algorithm_t, const void* nonce, size_t nonce_size,
-    	const void *key, size_t keysize, const void *text, size_t textsize, void *digest);
+	/* Not needed for registered on run-time. Only included
+	 * should define it. */
+	int (*exists) (gnutls_cipher_algorithm_t);	/* true/false */
+} gnutls_crypto_cipher_st;
 
-    /* Not needed for registered on run-time. Only included
-     * should define it. */
-    int (*exists) (gnutls_mac_algorithm_t);
-  } gnutls_crypto_mac_st;
+typedef struct {
+	int (*init) (gnutls_mac_algorithm_t, void **ctx);
+	int (*setkey) (void *ctx, const void *key, size_t keysize);
+	int (*setnonce) (void *ctx, const void *nonce, size_t noncesize);
+	int (*hash) (void *ctx, const void *text, size_t textsize);
+	int (*output) (void *src_ctx, void *digest, size_t digestsize);
+	void (*deinit) (void *ctx);
+	int (*fast) (gnutls_mac_algorithm_t, const void *nonce,
+		     size_t nonce_size, const void *key, size_t keysize,
+		     const void *text, size_t textsize, void *digest);
 
-  typedef struct
-  {
-    int (*init) (gnutls_digest_algorithm_t, void **ctx);
-    int (*hash) (void *ctx, const void *src, size_t srcsize);
-    int (*output) (void *src_ctx, void *digest, size_t digestsize);
-    void (*deinit) (void *ctx);
-    int (*fast)(gnutls_digest_algorithm_t, const void *src, size_t srcsize, void *digest);
+	/* Not needed for registered on run-time. Only included
+	 * should define it. */
+	int (*exists) (gnutls_mac_algorithm_t);
+} gnutls_crypto_mac_st;
 
-    /* Not needed for registered on run-time. Only included
-     * should define it. */
-    int (*exists) (gnutls_digest_algorithm_t);
-  } gnutls_crypto_digest_st;
+typedef struct {
+	int (*init) (gnutls_digest_algorithm_t, void **ctx);
+	int (*hash) (void *ctx, const void *src, size_t srcsize);
+	int (*output) (void *src_ctx, void *digest, size_t digestsize);
+	void (*deinit) (void *ctx);
+	int (*fast) (gnutls_digest_algorithm_t, const void *src,
+		     size_t srcsize, void *digest);
 
-  typedef struct gnutls_crypto_rnd
-  {
-    int (*init) (void **ctx);
-    int (*rnd) (void *ctx, int level, void *data, size_t datasize);
-    void (*rnd_refresh) (void *ctx);
-    void (*deinit) (void *ctx);
-  } gnutls_crypto_rnd_st;
+	/* Not needed for registered on run-time. Only included
+	 * should define it. */
+	int (*exists) (gnutls_digest_algorithm_t);
+} gnutls_crypto_digest_st;
 
-  typedef void *bigint_t;
+typedef struct gnutls_crypto_rnd {
+	int (*init) (void **ctx);
+	int (*rnd) (void *ctx, int level, void *data, size_t datasize);
+	void (*rnd_refresh) (void *ctx);
+	void (*deinit) (void *ctx);
+} gnutls_crypto_rnd_st;
 
-  typedef struct
-  {
-    bigint_t g;                 /* group generator */
-    bigint_t p;                 /* prime */
-    int q_bits;                 /* the number of bits of q */
-  } gnutls_group_st;
+typedef void *bigint_t;
+
+typedef struct {
+	bigint_t g;		/* group generator */
+	bigint_t p;		/* prime */
+	int q_bits;		/* the number of bits of q */
+} gnutls_group_st;
 
 /**
  * gnutls_bigint_format_t:
@@ -102,85 +99,88 @@
  *
  * Enumeration of different bignum integer encoding formats.
  */
-  typedef enum
-  {
-    /* raw unsigned integer format */
-    GNUTLS_MPI_FORMAT_USG = 0,
-    /* raw signed integer format - always a leading zero when positive */
-    GNUTLS_MPI_FORMAT_STD = 1,
-    /* the pgp integer format */
-    GNUTLS_MPI_FORMAT_PGP = 2
-  } gnutls_bigint_format_t;
+typedef enum {
+	/* raw unsigned integer format */
+	GNUTLS_MPI_FORMAT_USG = 0,
+	/* raw signed integer format - always a leading zero when positive */
+	GNUTLS_MPI_FORMAT_STD = 1,
+	/* the pgp integer format */
+	GNUTLS_MPI_FORMAT_PGP = 2
+} gnutls_bigint_format_t;
 
 /* Multi precision integer arithmetic */
-  typedef struct gnutls_crypto_bigint
-  {
-    bigint_t (*bigint_new) (int nbits);
-    void (*bigint_release) (bigint_t n);
-    void (*bigint_clear) (bigint_t n); /* zeros the int */
-    /* 0 for equality, > 0 for m1>m2, < 0 for m1<m2 */
-    int (*bigint_cmp) (const bigint_t m1, const bigint_t m2);
-    /* as bigint_cmp */
-    int (*bigint_cmp_ui) (const bigint_t m1, unsigned long m2);
-    /* ret = a % b */
-      bigint_t (*bigint_mod) (const bigint_t a, const bigint_t b);
-    /* a = b -> ret == a */
-      bigint_t (*bigint_set) (bigint_t a, const bigint_t b);
-    /* a = b -> ret == a */
-      bigint_t (*bigint_set_ui) (bigint_t a, unsigned long b);
-    unsigned int (*bigint_get_nbits) (const bigint_t a);
-    /* w = b ^ e mod m */
-      bigint_t (*bigint_powm) (bigint_t w, const bigint_t b,
-                               const bigint_t e, const bigint_t m);
-    /* w = a + b mod m */
-      bigint_t (*bigint_addm) (bigint_t w, const bigint_t a,
-                               const bigint_t b, const bigint_t m);
-    /* w = a - b mod m */
-      bigint_t (*bigint_subm) (bigint_t w, const bigint_t a, const bigint_t b,
-                               const bigint_t m);
-    /* w = a * b mod m */
-      bigint_t (*bigint_mulm) (bigint_t w, const bigint_t a, const bigint_t b,
-                               const bigint_t m);
-    /* w = a + b */ bigint_t (*bigint_add) (bigint_t w, const bigint_t a,
-                                            const bigint_t b);
-    /* w = a - b */ bigint_t (*bigint_sub) (bigint_t w, const bigint_t a,
-                                            const bigint_t b);
-    /* w = a * b */
-      bigint_t (*bigint_mul) (bigint_t w, const bigint_t a, const bigint_t b);
-    /* w = a + b */
-      bigint_t (*bigint_add_ui) (bigint_t w, const bigint_t a,
-                                 unsigned long b);
-    /* w = a - b */
-      bigint_t (*bigint_sub_ui) (bigint_t w, const bigint_t a,
-                                 unsigned long b);
-    /* w = a * b */
-      bigint_t (*bigint_mul_ui) (bigint_t w, const bigint_t a,
-                                 unsigned long b);
-    /* q = a / b */
-      bigint_t (*bigint_div) (bigint_t q, const bigint_t a, const bigint_t b);
-    /* 0 if prime */
-    int (*bigint_prime_check) (const bigint_t pp);
-    int (*bigint_generate_group) (gnutls_group_st * gg, unsigned int bits);
+typedef struct gnutls_crypto_bigint {
+	bigint_t(*bigint_new) (int nbits);
+	void (*bigint_release) (bigint_t n);
+	void (*bigint_clear) (bigint_t n);	/* zeros the int */
+	/* 0 for equality, > 0 for m1>m2, < 0 for m1<m2 */
+	int (*bigint_cmp) (const bigint_t m1, const bigint_t m2);
+	/* as bigint_cmp */
+	int (*bigint_cmp_ui) (const bigint_t m1, unsigned long m2);
+	/* ret = a % b */
+	 bigint_t(*bigint_mod) (const bigint_t a, const bigint_t b);
+	/* a = b -> ret == a */
+	 bigint_t(*bigint_set) (bigint_t a, const bigint_t b);
+	/* a = b -> ret == a */
+	 bigint_t(*bigint_set_ui) (bigint_t a, unsigned long b);
+	unsigned int (*bigint_get_nbits) (const bigint_t a);
+	/* w = b ^ e mod m */
+	 bigint_t(*bigint_powm) (bigint_t w, const bigint_t b,
+				 const bigint_t e, const bigint_t m);
+	/* w = a + b mod m */
+	 bigint_t(*bigint_addm) (bigint_t w, const bigint_t a,
+				 const bigint_t b, const bigint_t m);
+	/* w = a - b mod m */
+	 bigint_t(*bigint_subm) (bigint_t w, const bigint_t a,
+				 const bigint_t b, const bigint_t m);
+	/* w = a * b mod m */
+	 bigint_t(*bigint_mulm) (bigint_t w, const bigint_t a,
+				 const bigint_t b, const bigint_t m);
+	/* w = a + b */ bigint_t(*bigint_add) (bigint_t w,
+					       const bigint_t a,
+					       const bigint_t b);
+	/* w = a - b */ bigint_t(*bigint_sub) (bigint_t w,
+					       const bigint_t a,
+					       const bigint_t b);
+	/* w = a * b */
+	 bigint_t(*bigint_mul) (bigint_t w, const bigint_t a,
+				const bigint_t b);
+	/* w = a + b */
+	 bigint_t(*bigint_add_ui) (bigint_t w, const bigint_t a,
+				   unsigned long b);
+	/* w = a - b */
+	 bigint_t(*bigint_sub_ui) (bigint_t w, const bigint_t a,
+				   unsigned long b);
+	/* w = a * b */
+	 bigint_t(*bigint_mul_ui) (bigint_t w, const bigint_t a,
+				   unsigned long b);
+	/* q = a / b */
+	 bigint_t(*bigint_div) (bigint_t q, const bigint_t a,
+				const bigint_t b);
+	/* 0 if prime */
+	int (*bigint_prime_check) (const bigint_t pp);
+	int (*bigint_generate_group) (gnutls_group_st * gg,
+				      unsigned int bits);
 
-    /* reads a bigint from a buffer */
-    /* stores a bigint into the buffer.  returns
-     * GNUTLS_E_SHORT_MEMORY_BUFFER if buf_size is not sufficient to
-     * store this integer, and updates the buf_size;
-     */
-      bigint_t (*bigint_scan) (const void *buf, size_t buf_size,
-                               gnutls_bigint_format_t format);
-    int (*bigint_print) (const bigint_t a, void *buf, size_t * buf_size,
-                         gnutls_bigint_format_t format);
-  } gnutls_crypto_bigint_st;
+	/* reads a bigint from a buffer */
+	/* stores a bigint into the buffer.  returns
+	 * GNUTLS_E_SHORT_MEMORY_BUFFER if buf_size is not sufficient to
+	 * store this integer, and updates the buf_size;
+	 */
+	 bigint_t(*bigint_scan) (const void *buf, size_t buf_size,
+				 gnutls_bigint_format_t format);
+	int (*bigint_print) (const bigint_t a, void *buf,
+			     size_t * buf_size,
+			     gnutls_bigint_format_t format);
+} gnutls_crypto_bigint_st;
 
 #define GNUTLS_MAX_PK_PARAMS 16
 
-  typedef struct
-  {
-    bigint_t params[GNUTLS_MAX_PK_PARAMS];
-    unsigned int params_nr;     /* the number of parameters */
-    unsigned int flags;
-  } gnutls_pk_params_st;
+typedef struct {
+	bigint_t params[GNUTLS_MAX_PK_PARAMS];
+	unsigned int params_nr;	/* the number of parameters */
+	unsigned int flags;
+} gnutls_pk_params_st;
 
 /**
  * gnutls_pk_flag_t:
@@ -188,18 +188,17 @@
  *
  * Enumeration of public-key flag.
  */
-  typedef enum
-  {
-    GNUTLS_PK_FLAG_NONE = 0
-  } gnutls_pk_flag_t;
+typedef enum {
+	GNUTLS_PK_FLAG_NONE = 0
+} gnutls_pk_flag_t;
 
 
-  void gnutls_pk_params_release (gnutls_pk_params_st * p);
-  void gnutls_pk_params_clear (gnutls_pk_params_st * p);
-  void gnutls_pk_params_init (gnutls_pk_params_st * p);
+void gnutls_pk_params_release(gnutls_pk_params_st * p);
+void gnutls_pk_params_clear(gnutls_pk_params_st * p);
+void gnutls_pk_params_init(gnutls_pk_params_st * p);
 
 
-#define MAX_PUBLIC_PARAMS_SIZE 4        /* ok for RSA and DSA */
+#define MAX_PUBLIC_PARAMS_SIZE 4	/* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
 #define DSA_PUBLIC_PARAMS 4
@@ -207,7 +206,7 @@
 #define ECC_PUBLIC_PARAMS 2
 
 
-#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS       /* ok for RSA and DSA */
+#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS	/* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5
@@ -286,83 +285,81 @@
  *
  * Enumeration of different directions.
  */
-  typedef enum
-  {
-    GNUTLS_IMPORT = 0,
-    GNUTLS_EXPORT = 1
-  } gnutls_direction_t;
+typedef enum {
+	GNUTLS_IMPORT = 0,
+	GNUTLS_EXPORT = 1
+} gnutls_direction_t;
 
 /* Public key algorithms */
-  typedef struct gnutls_crypto_pk
-  {
-    /* The params structure should contain the private or public key
-     * parameters, depending on the operation */
-    int (*encrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * ciphertext,
-                    const gnutls_datum_t * plaintext,
-                    const gnutls_pk_params_st * pub);
-    int (*decrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * plaintext,
-                    const gnutls_datum_t * ciphertext,
-                    const gnutls_pk_params_st * priv);
+typedef struct gnutls_crypto_pk {
+	/* The params structure should contain the private or public key
+	 * parameters, depending on the operation */
+	int (*encrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * ciphertext,
+			const gnutls_datum_t * plaintext,
+			const gnutls_pk_params_st * pub);
+	int (*decrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * plaintext,
+			const gnutls_datum_t * ciphertext,
+			const gnutls_pk_params_st * priv);
 
-    int (*sign) (gnutls_pk_algorithm_t, gnutls_datum_t * signature,
-                 const gnutls_datum_t * data,
-                 const gnutls_pk_params_st * priv);
-    int (*verify) (gnutls_pk_algorithm_t, const gnutls_datum_t * data,
-                   const gnutls_datum_t * sig,
-                   const gnutls_pk_params_st * pub);
-    /* given a signature and the public parameters,
-     * suggest a hash algorithm */
-    int (*hash_algorithm) (gnutls_pk_algorithm_t, 
-                   const gnutls_datum_t * sig,
-                   gnutls_pk_params_st * issuer_params,
-                   gnutls_digest_algorithm_t*);
-    /* sanity checks the public key parameters */
-    int (*verify_params) (gnutls_pk_algorithm_t, 
-                          const gnutls_pk_params_st * pub);
-    int (*generate) (gnutls_pk_algorithm_t, unsigned int nbits,
-                     gnutls_pk_params_st *);
-    /* this function should convert params to ones suitable
-     * for the above functions
-     */
-    int (*pk_fixup_private_params) (gnutls_pk_algorithm_t, gnutls_direction_t,
-                                    gnutls_pk_params_st *);
-    int (*derive) (gnutls_pk_algorithm_t, gnutls_datum_t * out,
-                   const gnutls_pk_params_st * priv,
-                   const gnutls_pk_params_st * pub);
+	int (*sign) (gnutls_pk_algorithm_t, gnutls_datum_t * signature,
+		     const gnutls_datum_t * data,
+		     const gnutls_pk_params_st * priv);
+	int (*verify) (gnutls_pk_algorithm_t, const gnutls_datum_t * data,
+		       const gnutls_datum_t * sig,
+		       const gnutls_pk_params_st * pub);
+	/* given a signature and the public parameters,
+	 * suggest a hash algorithm */
+	int (*hash_algorithm) (gnutls_pk_algorithm_t,
+			       const gnutls_datum_t * sig,
+			       gnutls_pk_params_st * issuer_params,
+			       gnutls_digest_algorithm_t *);
+	/* sanity checks the public key parameters */
+	int (*verify_params) (gnutls_pk_algorithm_t,
+			      const gnutls_pk_params_st * pub);
+	int (*generate) (gnutls_pk_algorithm_t, unsigned int nbits,
+			 gnutls_pk_params_st *);
+	/* this function should convert params to ones suitable
+	 * for the above functions
+	 */
+	int (*pk_fixup_private_params) (gnutls_pk_algorithm_t,
+					gnutls_direction_t,
+					gnutls_pk_params_st *);
+	int (*derive) (gnutls_pk_algorithm_t, gnutls_datum_t * out,
+		       const gnutls_pk_params_st * priv,
+		       const gnutls_pk_params_st * pub);
 
 
-  } gnutls_crypto_pk_st;
+} gnutls_crypto_pk_st;
 
 /* priority: infinity for backend algorithms, 90 for kernel
    algorithms, lowest wins
  */
-  int gnutls_crypto_single_cipher_register (gnutls_cipher_algorithm_t
-                                             algorithm, int priority,
-                                             const
-                                             gnutls_crypto_single_cipher_st *
-                                             s);
-  int gnutls_crypto_single_mac_register (gnutls_mac_algorithm_t algorithm,
-                                          int priority,
-                                          const gnutls_crypto_single_mac_st *
-                                          s);
-  int gnutls_crypto_single_digest_register (gnutls_digest_algorithm_t
-                                             algorithm, int priority,
-                                             const
-                                             gnutls_crypto_single_digest_st *
-                                             s);
+int gnutls_crypto_single_cipher_register(gnutls_cipher_algorithm_t
+					 algorithm, int priority,
+					 const
+					 gnutls_crypto_single_cipher_st *
+					 s);
+int gnutls_crypto_single_mac_register(gnutls_mac_algorithm_t algorithm,
+				      int priority,
+				      const gnutls_crypto_single_mac_st *
+				      s);
+int gnutls_crypto_single_digest_register(gnutls_digest_algorithm_t
+					 algorithm, int priority,
+					 const
+					 gnutls_crypto_single_digest_st *
+					 s);
 
-  int gnutls_crypto_cipher_register (int priority,
-                                      const gnutls_crypto_cipher_st * s);
-  int gnutls_crypto_mac_register (int priority, 
-                                   const gnutls_crypto_mac_st * s);
-  int gnutls_crypto_digest_register (int priority, 
-                                      const gnutls_crypto_digest_st * s);
+int gnutls_crypto_cipher_register(int priority,
+				  const gnutls_crypto_cipher_st * s);
+int gnutls_crypto_mac_register(int priority,
+			       const gnutls_crypto_mac_st * s);
+int gnutls_crypto_digest_register(int priority,
+				  const gnutls_crypto_digest_st * s);
 
-  int gnutls_crypto_rnd_register (int priority,
-                                   const gnutls_crypto_rnd_st * s);
-  int gnutls_crypto_pk_register (int priority,
-                                  const gnutls_crypto_pk_st * s);
-  int gnutls_crypto_bigint_register (int priority,
-                                      const gnutls_crypto_bigint_st * s);
+int gnutls_crypto_rnd_register(int priority,
+			       const gnutls_crypto_rnd_st * s);
+int gnutls_crypto_pk_register(int priority, const gnutls_crypto_pk_st * s);
+int gnutls_crypto_bigint_register(int priority,
+				  const gnutls_crypto_bigint_st * s);
 
 #endif

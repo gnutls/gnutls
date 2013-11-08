@@ -27,7 +27,7 @@
 #include <random.h>
 #include <gnutls/pkcs11.h>
 
-#include <gnutls_extensions.h>  /* for _gnutls_ext_init */
+#include <gnutls_extensions.h>	/* for _gnutls_ext_init */
 #include <locks.h>
 #include <system.h>
 #include <accelerated/cryptodev.h>
@@ -49,7 +49,7 @@ ASN1_TYPE _gnutls_gnutls_asn;
 
 gnutls_log_func _gnutls_log_func = NULL;
 gnutls_audit_log_func _gnutls_audit_log_func = NULL;
-int _gnutls_log_level = 0;      /* default log level */
+int _gnutls_log_level = 0;	/* default log level */
 
 /**
  * gnutls_global_set_log_function:
@@ -63,10 +63,9 @@ int _gnutls_log_level = 0;      /* default log level */
  * @gnutls_log_func is of the form,
  * void (*gnutls_log_func)( int level, const char*);
  **/
-void
-gnutls_global_set_log_function (gnutls_log_func log_func)
+void gnutls_global_set_log_function(gnutls_log_func log_func)
 {
-  _gnutls_log_func = log_func;
+	_gnutls_log_func = log_func;
 }
 
 /**
@@ -84,10 +83,9 @@ gnutls_global_set_log_function (gnutls_log_func log_func)
  *
  * Since: 3.0
  **/
-void
-gnutls_global_set_audit_log_function (gnutls_audit_log_func log_func)
+void gnutls_global_set_audit_log_function(gnutls_audit_log_func log_func)
 {
-  _gnutls_audit_log_func = log_func;
+	_gnutls_audit_log_func = log_func;
 }
 
 /**
@@ -100,10 +98,9 @@ gnutls_global_set_audit_log_function (gnutls_audit_log_func log_func)
  *
  * Since: 2.12.0
  **/
-void
-gnutls_global_set_time_function (gnutls_time_func time_func)
+void gnutls_global_set_time_function(gnutls_time_func time_func)
 {
-  gnutls_time = time_func;
+	gnutls_time = time_func;
 }
 
 /**
@@ -117,10 +114,9 @@ gnutls_global_set_time_function (gnutls_time_func time_func)
  *
  * Use a log level over 10 to enable all debugging options.
  **/
-void
-gnutls_global_set_log_level (int level)
+void gnutls_global_set_log_level(int level)
 {
-  _gnutls_log_level = level;
+	_gnutls_log_level = level;
 }
 
 /**
@@ -141,29 +137,26 @@ gnutls_global_set_log_level (int level)
  * This function is not thread safe.
  **/
 void
-gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
-                                 gnutls_alloc_function secure_alloc_func,
-                                 gnutls_is_secure_function is_secure_func,
-                                 gnutls_realloc_function realloc_func,
-                                 gnutls_free_function free_func)
+gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
+				gnutls_alloc_function secure_alloc_func,
+				gnutls_is_secure_function is_secure_func,
+				gnutls_realloc_function realloc_func,
+				gnutls_free_function free_func)
 {
-  gnutls_secure_malloc = secure_alloc_func;
-  gnutls_malloc = alloc_func;
-  gnutls_realloc = realloc_func;
-  gnutls_free = free_func;
+	gnutls_secure_malloc = secure_alloc_func;
+	gnutls_malloc = alloc_func;
+	gnutls_realloc = realloc_func;
+	gnutls_free = free_func;
 
-  /* if using the libc's default malloc
-   * use libc's calloc as well.
-   */
-  if (gnutls_malloc == malloc)
-    {
-      gnutls_calloc = calloc;
-    }
-  else
-    {                           /* use the included ones */
-      gnutls_calloc = _gnutls_calloc;
-    }
-  gnutls_strdup = _gnutls_strdup;
+	/* if using the libc's default malloc
+	 * use libc's calloc as well.
+	 */
+	if (gnutls_malloc == malloc) {
+		gnutls_calloc = calloc;
+	} else {		/* use the included ones */
+		gnutls_calloc = _gnutls_calloc;
+	}
+	gnutls_strdup = _gnutls_strdup;
 
 }
 
@@ -196,94 +189,85 @@ static int _gnutls_init = 0;
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
-int
-gnutls_global_init (void)
+int gnutls_global_init(void)
 {
-  int result = 0;
-  int res;
+	int result = 0;
+	int res;
 
-  if (_gnutls_init++)
-    goto out;
+	if (_gnutls_init++)
+		goto out;
 
-  if (gl_sockets_startup (SOCKETS_1_1))
-    return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+	if (gl_sockets_startup(SOCKETS_1_1))
+		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 
-  bindtextdomain (PACKAGE, LOCALEDIR);
+	bindtextdomain(PACKAGE, LOCALEDIR);
 
-  res = gnutls_crypto_init ();
-  if (res != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CRYPTO_INIT_FAILED;
-    }
+	res = gnutls_crypto_init();
+	if (res != 0) {
+		gnutls_assert();
+		return GNUTLS_E_CRYPTO_INIT_FAILED;
+	}
 
-  _gnutls_register_accel_crypto();
+	_gnutls_register_accel_crypto();
 
-  /* initialize ASN.1 parser
-   * This should not deal with files in the final
-   * version.
-   */
-  if (asn1_check_version (GNUTLS_MIN_LIBTASN1_VERSION) == NULL)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Checking for libtasn1 failed: %s < %s\n",
-                         asn1_check_version (NULL),
-                         GNUTLS_MIN_LIBTASN1_VERSION);
-      return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
-    }
+	/* initialize ASN.1 parser
+	 * This should not deal with files in the final
+	 * version.
+	 */
+	if (asn1_check_version(GNUTLS_MIN_LIBTASN1_VERSION) == NULL) {
+		gnutls_assert();
+		_gnutls_debug_log
+		    ("Checking for libtasn1 failed: %s < %s\n",
+		     asn1_check_version(NULL),
+		     GNUTLS_MIN_LIBTASN1_VERSION);
+		return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
+	}
 
-  res = asn1_array2tree (pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
-  if (res != ASN1_SUCCESS)
-    {
-      result = _gnutls_asn2err (res);
-      goto out;
-    }
+	res = asn1_array2tree(pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
+	if (res != ASN1_SUCCESS) {
+		result = _gnutls_asn2err(res);
+		goto out;
+	}
 
-  res = asn1_array2tree (gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
-  if (res != ASN1_SUCCESS)
-    {
-      result = _gnutls_asn2err (res);
-      goto out;
-    }
+	res = asn1_array2tree(gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
+	if (res != ASN1_SUCCESS) {
+		result = _gnutls_asn2err(res);
+		goto out;
+	}
 
-  /* Initialize the random generator */
-  result = _gnutls_rnd_init ();
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto out;
-    }
+	/* Initialize the random generator */
+	result = _gnutls_rnd_init();
+	if (result < 0) {
+		gnutls_assert();
+		goto out;
+	}
 
-  /* Initialize the default TLS extensions */
-  result = _gnutls_ext_init ();
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto out;
-    }
+	/* Initialize the default TLS extensions */
+	result = _gnutls_ext_init();
+	if (result < 0) {
+		gnutls_assert();
+		goto out;
+	}
 
-  result = gnutls_mutex_init(&_gnutls_file_mutex);
-  if (result < 0)
-    {
-      gnutls_assert();
-      goto out;
-    }
+	result = gnutls_mutex_init(&_gnutls_file_mutex);
+	if (result < 0) {
+		gnutls_assert();
+		goto out;
+	}
 
-  result = gnutls_system_global_init ();
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto out;
-    }
-
+	result = gnutls_system_global_init();
+	if (result < 0) {
+		gnutls_assert();
+		goto out;
+	}
 #ifdef ENABLE_PKCS11
-  gnutls_pkcs11_init (GNUTLS_PKCS11_FLAG_AUTO, NULL);
+	gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
 #endif
 
-  _gnutls_cryptodev_init ();
+	_gnutls_cryptodev_init();
 
-out:
-  return result;
+      out:
+	return result;
 }
 
 /**
@@ -295,26 +279,24 @@ out:
  * Note!  This function is not thread safe.  See the discussion for
  * gnutls_global_init() for more information.
  **/
-void
-gnutls_global_deinit (void)
+void gnutls_global_deinit(void)
 {
-  if (_gnutls_init == 1)
-    {
-      gl_sockets_cleanup ();
-      gnutls_crypto_deinit();
-      _gnutls_rnd_deinit ();
-      _gnutls_ext_deinit ();
-      asn1_delete_structure (&_gnutls_gnutls_asn);
-      asn1_delete_structure (&_gnutls_pkix1_asn);
-      _gnutls_crypto_deregister ();
-      _gnutls_cryptodev_deinit ();
-      gnutls_system_global_deinit ();
+	if (_gnutls_init == 1) {
+		gl_sockets_cleanup();
+		gnutls_crypto_deinit();
+		_gnutls_rnd_deinit();
+		_gnutls_ext_deinit();
+		asn1_delete_structure(&_gnutls_gnutls_asn);
+		asn1_delete_structure(&_gnutls_pkix1_asn);
+		_gnutls_crypto_deregister();
+		_gnutls_cryptodev_deinit();
+		gnutls_system_global_deinit();
 #ifdef ENABLE_PKCS11
-      gnutls_pkcs11_deinit ();
+		gnutls_pkcs11_deinit();
 #endif
-      gnutls_mutex_deinit(&_gnutls_file_mutex);
-    }
-  _gnutls_init--;
+		gnutls_mutex_deinit(&_gnutls_file_mutex);
+	}
+	_gnutls_init--;
 }
 
 /* These functions should be elsewere. Kept here for
@@ -336,11 +318,10 @@ gnutls_global_deinit (void)
  *   condition is not met.  If %NULL is passed to this function no
  *   check is done and only the version string is returned.
   **/
-const char *
-gnutls_check_version (const char *req_version)
+const char *gnutls_check_version(const char *req_version)
 {
-  if (!req_version || strverscmp (req_version, VERSION) <= 0)
-    return VERSION;
+	if (!req_version || strverscmp(req_version, VERSION) <= 0)
+		return VERSION;
 
-  return NULL;
+	return NULL;
 }

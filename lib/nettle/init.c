@@ -28,16 +28,14 @@
 /* Functions that refer to the initialization of the nettle library.
  */
 
-int
-gnutls_crypto_init (void)
+int gnutls_crypto_init(void)
 {
-  return 0;
+	return 0;
 }
 
 /* Functions that refer to the deinitialization of the nettle library.
  */
 
-void
-gnutls_crypto_deinit (void)
+void gnutls_crypto_deinit(void)
 {
 }

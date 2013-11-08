@@ -30,27 +30,26 @@
 #include <utils.h>
 #include <gnutls/gnutls.h>
 
-int
-main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  gnutls_anon_client_credentials_t c_anoncred;
-  gnutls_session_t client;
+	gnutls_anon_client_credentials_t c_anoncred;
+	gnutls_session_t client;
 
-  global_init ();
+	global_init();
 
-  gnutls_anon_allocate_client_credentials (&c_anoncred);
-  gnutls_init (&client, GNUTLS_CLIENT);
-  gnutls_set_default_priority (client);
+	gnutls_anon_allocate_client_credentials(&c_anoncred);
+	gnutls_init(&client, GNUTLS_CLIENT);
+	gnutls_set_default_priority(client);
 
-  /* Test setting the same credential type twice.  Earlier GnuTLS had
-     a bug that crashed when this happened. */
-  gnutls_credentials_set (client, GNUTLS_CRD_ANON, c_anoncred);
-  gnutls_credentials_set (client, GNUTLS_CRD_ANON, c_anoncred);
+	/* Test setting the same credential type twice.  Earlier GnuTLS had
+	   a bug that crashed when this happened. */
+	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
+	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
 
-  gnutls_deinit (client);
-  gnutls_anon_free_client_credentials (c_anoncred);
+	gnutls_deinit(client);
+	gnutls_anon_free_client_credentials(c_anoncred);
 
-  gnutls_global_deinit ();
+	gnutls_global_deinit();
 
-  return 0;
+	return 0;
 }

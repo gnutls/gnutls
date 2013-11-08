@@ -35,72 +35,61 @@
 
 #define MAX_TRIES 2
 
-static int sec_param[MAX_TRIES] = {GNUTLS_SEC_PARAM_LOW, GNUTLS_SEC_PARAM_NORMAL};
+static int sec_param[MAX_TRIES] =
+    { GNUTLS_SEC_PARAM_LOW, GNUTLS_SEC_PARAM_NORMAL };
 
-static void
-tls_log_func (int level, const char *str)
+static void tls_log_func(int level, const char *str)
 {
-    fprintf (stderr, "%s |<%d>| %s", "crq_key_id", level, str);
+	fprintf(stderr, "%s |<%d>| %s", "crq_key_id", level, str);
 }
 
-void
-doit (void)
+void doit(void)
 {
-    gnutls_x509_privkey_t pkey;
-    int ret, algorithm, i;
+	gnutls_x509_privkey_t pkey;
+	int ret, algorithm, i;
 
-    ret = global_init ();
-    if (ret < 0)
-        fail ("global_init: %d\n", ret);
+	ret = global_init();
+	if (ret < 0)
+		fail("global_init: %d\n", ret);
 
-    gnutls_global_set_log_function (tls_log_func);
-    if (debug)
-        gnutls_global_set_log_level (4711);
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
 
-    for (i = 0; i < MAX_TRIES; i++)
-      {
-          for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_EC;
-               algorithm++)
-            {
-                if (algorithm == GNUTLS_PK_DH)
-                    continue;
+	for (i = 0; i < MAX_TRIES; i++) {
+		for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_EC;
+		     algorithm++) {
+			if (algorithm == GNUTLS_PK_DH)
+				continue;
 
-                ret = gnutls_x509_privkey_init (&pkey);
-                if (ret < 0)
-                  {
-                      fail ("gnutls_x509_privkey_init: %d\n", ret);
-                  }
+			ret = gnutls_x509_privkey_init(&pkey);
+			if (ret < 0) {
+				fail("gnutls_x509_privkey_init: %d\n",
+				     ret);
+			}
 
-                ret =
-                    gnutls_x509_privkey_generate (pkey, algorithm,
-                                                  gnutls_sec_param_to_pk_bits
-                                                  (algorithm,
-                                                   sec_param[i]),
-                                                  0);
-                if (ret < 0)
-                  {
-                      fail ("gnutls_x509_privkey_generate (%s): %s (%d)\n",
-                            gnutls_pk_algorithm_get_name (algorithm),
-                            gnutls_strerror (ret), ret);
-                  }
-                else if (debug)
-                  {
-                      success ("Key[%s] generation ok: %d\n",
-                               gnutls_pk_algorithm_get_name (algorithm),
-                               ret);
-                  }
+			ret =
+			    gnutls_x509_privkey_generate(pkey, algorithm,
+							 gnutls_sec_param_to_pk_bits
+							 (algorithm,
+							  sec_param[i]),
+							 0);
+			if (ret < 0) {
+				fail("gnutls_x509_privkey_generate (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
+			} else if (debug) {
+				success("Key[%s] generation ok: %d\n",
+					gnutls_pk_algorithm_get_name
+					(algorithm), ret);
+			}
 
-                ret = gnutls_x509_privkey_verify_params (pkey);
-                if (ret < 0)
-                  {
-                      fail ("gnutls_x509_privkey_generate (%s): %s (%d)\n",
-                            gnutls_pk_algorithm_get_name (algorithm),
-                            gnutls_strerror (ret), ret);
-                  }
+			ret = gnutls_x509_privkey_verify_params(pkey);
+			if (ret < 0) {
+				fail("gnutls_x509_privkey_generate (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
+			}
 
-                gnutls_x509_privkey_deinit (pkey);
-            }
-      }
+			gnutls_x509_privkey_deinit(pkey);
+		}
+	}
 
-    gnutls_global_deinit ();
+	gnutls_global_deinit();
 }

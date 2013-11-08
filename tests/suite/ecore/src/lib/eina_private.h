@@ -22,9 +22,9 @@
 #include <stdarg.h>
 
 #if HAVE___ATTRIBUTE__
-# define __UNUSED__ __attribute__((unused))
+#define __UNUSED__ __attribute__((unused))
 #else
-# define __UNUSED__
+#define __UNUSED__
 #endif
 
 #include "eina_magic.h"
@@ -32,19 +32,19 @@
 #include "eina_accessor.h"
 
 #ifndef MIN
-# define MIN(x, y) (((x) > (y)) ? (y) : (x))
+#define MIN(x, y) (((x) > (y)) ? (y) : (x))
 #endif
 
 #ifndef MAX
-# define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #endif
 
 #ifndef ABS
-# define ABS(x) ((x) < 0 ? -(x) : (x))
+#define ABS(x) ((x) < 0 ? -(x) : (x))
 #endif
 
 #ifndef CLAMP
-# define CLAMP(x, min, \
+#define CLAMP(x, min, \
                max) (((x) > (max)) ? (max) : (((x) < (min)) ? (min) : (x)))
 #endif
 
@@ -131,5 +131,4 @@ void eina_log_threads_init(void);
 void eina_log_threads_shutdown(void);
 #endif
 
-#endif /* EINA_PRIVATE_H_ */
-
+#endif				/* EINA_PRIVATE_H_ */

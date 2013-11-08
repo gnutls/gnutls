@@ -56,32 +56,32 @@
 
 typedef struct _Eina_Share Eina_Share;
 
-struct dumpinfo
-{
-   int used, saved, dups, unique;
+struct dumpinfo {
+	int used, saved, dups, unique;
 };
 
-Eina_Bool   eina_share_common_init(Eina_Share **share,
-                                   Eina_Magic node_magic,
-                                   const char *node_magic_STR);
-Eina_Bool   eina_share_common_shutdown(Eina_Share **share);
-const char *eina_share_common_add_length(Eina_Share *share,
-                                         const char *str,
-                                         unsigned int slen,
-                                         unsigned int null_size)
-EINA_WARN_UNUSED_RESULT;
-const char *eina_share_common_ref(Eina_Share *share, const char *str);
-void        eina_share_common_del(Eina_Share *share, const char *str);
-int         eina_share_common_length(Eina_Share *share,
-                                     const char *str) EINA_CONST
-EINA_WARN_UNUSED_RESULT;
-void        eina_share_common_dump(Eina_Share *share, void (*additional_dump)(
-                                      struct dumpinfo *), int used);
+Eina_Bool eina_share_common_init(Eina_Share ** share,
+				 Eina_Magic node_magic,
+				 const char *node_magic_STR);
+Eina_Bool eina_share_common_shutdown(Eina_Share ** share);
+const char *eina_share_common_add_length(Eina_Share * share,
+					 const char *str,
+					 unsigned int slen,
+					 unsigned int null_size)
+    EINA_WARN_UNUSED_RESULT;
+const char *eina_share_common_ref(Eina_Share * share, const char *str);
+void eina_share_common_del(Eina_Share * share, const char *str);
+int eina_share_common_length(Eina_Share * share,
+			     const char *str) EINA_CONST
+    EINA_WARN_UNUSED_RESULT;
+void eina_share_common_dump(Eina_Share * share,
+			    void (*additional_dump) (struct dumpinfo *),
+			    int used);
 
 
 /* Population functions */
-void        eina_share_common_population_add(Eina_Share *share, int slen);
-void        eina_share_common_population_del(Eina_Share *share, int slen);
+void eina_share_common_population_add(Eina_Share * share, int slen);
+void eina_share_common_population_del(Eina_Share * share, int slen);
 
 /* Share logging */
 #ifdef CRITICAL
@@ -100,4 +100,4 @@ void        eina_share_common_population_del(Eina_Share *share, int slen);
 #define DBG(...) EINA_LOG_DOM_DBG(_eina_share_common_log_dom, __VA_ARGS__)
 extern int _eina_share_common_log_dom;
 
-#endif /* EINA_STRINGSHARE_H_ */
+#endif				/* EINA_STRINGSHARE_H_ */

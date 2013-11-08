@@ -31,112 +31,121 @@
 #include <gnutls/x509.h>
 #include "utils.h"
 
-static void
-tls_log_func (int level, const char *str)
+static void tls_log_func(int level, const char *str)
 {
-  fprintf (stderr, "<%d>| %s", level, str);
+	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-void
-doit (void)
+void doit(void)
 {
-  const char *filename, *password = "1234";
-  gnutls_pkcs12_t pkcs12;
-  unsigned char* file_data;
-  size_t file_size;
-  gnutls_datum_t data;
-  gnutls_x509_crt_t * chain, * extras;
-  unsigned int chain_size, extras_size, i;
-  gnutls_x509_privkey_t pkey;
-  int ret;
+	const char *filename, *password = "1234";
+	gnutls_pkcs12_t pkcs12;
+	unsigned char *file_data;
+	size_t file_size;
+	gnutls_datum_t data;
+	gnutls_x509_crt_t *chain, *extras;
+	unsigned int chain_size, extras_size, i;
+	gnutls_x509_privkey_t pkey;
+	int ret;
 
-  ret = global_init ();
-  if (ret < 0)
-    fail ("global_init failed %d\n", ret);
+	ret = global_init();
+	if (ret < 0)
+		fail("global_init failed %d\n", ret);
 
-  gnutls_global_set_log_function (tls_log_func);
-  if (debug)
-    gnutls_global_set_log_level (2);
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(2);
 
-  ret = gnutls_pkcs12_init(&pkcs12);
-  if (ret < 0)
-    fail ("initialization failed: %s\n", gnutls_strerror(ret));
+	ret = gnutls_pkcs12_init(&pkcs12);
+	if (ret < 0)
+		fail("initialization failed: %s\n", gnutls_strerror(ret));
 
-  filename = getenv ("PKCS12_MANY_CERTS_FILE");
+	filename = getenv("PKCS12_MANY_CERTS_FILE");
 
-  if (!filename)
-    filename = "pkcs12-decode/pkcs12_5certs.p12";
+	if (!filename)
+		filename = "pkcs12-decode/pkcs12_5certs.p12";
 
-  if (debug)
-    success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
-             filename, password);
-             
-  file_data = (void*)read_binary_file( filename, &file_size);
-  if (file_data == NULL)
-    fail("cannot open file");
+	if (debug)
+		success
+		    ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
+		     filename, password);
 
-  data.data = file_data;
-  data.size = file_size;
-  ret = gnutls_pkcs12_import(pkcs12, &data, GNUTLS_X509_FMT_DER, 0);
-  if (ret < 0)
-    fail ("pkcs12_import failed %d: %s\n", ret, gnutls_strerror (ret));
+	file_data = (void *) read_binary_file(filename, &file_size);
+	if (file_data == NULL)
+		fail("cannot open file");
 
-  if (debug)
-    success ("Read file OK\n");
+	data.data = file_data;
+	data.size = file_size;
+	ret = gnutls_pkcs12_import(pkcs12, &data, GNUTLS_X509_FMT_DER, 0);
+	if (ret < 0)
+		fail("pkcs12_import failed %d: %s\n", ret,
+		     gnutls_strerror(ret));
 
-  ret = gnutls_pkcs12_simple_parse (pkcs12, password, &pkey, &chain, &chain_size,
-                                    &extras, &extras_size, NULL, 0);
-  if (ret < 0)
-    fail ("pkcs12_simple_parse failed %d: %s\n", ret, gnutls_strerror (ret));
+	if (debug)
+		success("Read file OK\n");
 
-  if (chain_size != 1)
-    fail("chain size (%u) should have been 1\n", chain_size);
+	ret =
+	    gnutls_pkcs12_simple_parse(pkcs12, password, &pkey, &chain,
+				       &chain_size, &extras, &extras_size,
+				       NULL, 0);
+	if (ret < 0)
+		fail("pkcs12_simple_parse failed %d: %s\n", ret,
+		     gnutls_strerror(ret));
 
-  if (extras_size != 4)
-    fail("extras size (%u) should have been 4\n", extras_size);
-  
-  if (debug)
-    {
-      char dn[512];
-      size_t dn_size;
-    
-      dn_size = sizeof(dn);
-      ret = gnutls_x509_crt_get_dn(chain[0], dn, &dn_size);
-      if (ret < 0)
-        fail ("crt_get_dn failed %d: %s\n", ret, gnutls_strerror (ret));
+	if (chain_size != 1)
+		fail("chain size (%u) should have been 1\n", chain_size);
 
-      success("dn: %s\n", dn);
+	if (extras_size != 4)
+		fail("extras size (%u) should have been 4\n", extras_size);
 
-      dn_size = sizeof(dn);
-      ret = gnutls_x509_crt_get_issuer_dn(chain[0], dn, &dn_size);
-      if (ret < 0)
-        fail ("crt_get_dn failed %d: %s\n", ret, gnutls_strerror (ret));
+	if (debug) {
+		char dn[512];
+		size_t dn_size;
 
-      success("issuer dn: %s\n", dn);
-    }
-  
-  gnutls_pkcs12_deinit(pkcs12);
-  gnutls_x509_privkey_deinit(pkey);
+		dn_size = sizeof(dn);
+		ret = gnutls_x509_crt_get_dn(chain[0], dn, &dn_size);
+		if (ret < 0)
+			fail("crt_get_dn failed %d: %s\n", ret,
+			     gnutls_strerror(ret));
 
-  for (i=0;i<chain_size;i++)
-    gnutls_x509_crt_deinit(chain[i]);
-  gnutls_free(chain);
+		success("dn: %s\n", dn);
 
-  for (i=0;i<extras_size;i++)
-    gnutls_x509_crt_deinit(extras[i]);
-  gnutls_free(extras);
-  
-  /* Try gnutls_x509_privkey_import2() */
-  ret = gnutls_x509_privkey_init(&pkey);
-  if (ret < 0)
-    fail ("gnutls_x509_privkey_init failed %d: %s\n", ret, gnutls_strerror (ret));
+		dn_size = sizeof(dn);
+		ret =
+		    gnutls_x509_crt_get_issuer_dn(chain[0], dn, &dn_size);
+		if (ret < 0)
+			fail("crt_get_dn failed %d: %s\n", ret,
+			     gnutls_strerror(ret));
 
-  ret = gnutls_x509_privkey_import2(pkey, &data, GNUTLS_X509_FMT_DER, password, 0);
-  if (ret < 0)
-    fail ("gnutls_x509_privkey_import2 failed %d: %s\n", ret, gnutls_strerror (ret));
-  gnutls_x509_privkey_deinit(pkey);
+		success("issuer dn: %s\n", dn);
+	}
 
-  free(file_data);
+	gnutls_pkcs12_deinit(pkcs12);
+	gnutls_x509_privkey_deinit(pkey);
 
-  gnutls_global_deinit ();
+	for (i = 0; i < chain_size; i++)
+		gnutls_x509_crt_deinit(chain[i]);
+	gnutls_free(chain);
+
+	for (i = 0; i < extras_size; i++)
+		gnutls_x509_crt_deinit(extras[i]);
+	gnutls_free(extras);
+
+	/* Try gnutls_x509_privkey_import2() */
+	ret = gnutls_x509_privkey_init(&pkey);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_init failed %d: %s\n", ret,
+		     gnutls_strerror(ret));
+
+	ret =
+	    gnutls_x509_privkey_import2(pkey, &data, GNUTLS_X509_FMT_DER,
+					password, 0);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_import2 failed %d: %s\n", ret,
+		     gnutls_strerror(ret));
+	gnutls_x509_privkey_deinit(pkey);
+
+	free(file_data);
+
+	gnutls_global_deinit();
 }

@@ -193,7 +193,7 @@ EAPI extern Eina_Error EINA_ERROR_SAFETY_FAILED;
 #endif
 
 
-#else /* no safety checks */
+#else				/* no safety checks */
 
 #define EINA_SAFETY_ON_NULL_RETURN(exp)		\
   do { (void)(!(exp)); } while (0)
@@ -222,8 +222,8 @@ EAPI extern Eina_Error EINA_ERROR_SAFETY_FAILED;
 #define EINA_SAFETY_ON_FALSE_GOTO(exp, label)		\
   do { if (0 && !(exp)) { goto label; } } while (0)
 
-#endif /* safety checks macros */
-#endif /* EINA_SAFETY_CHECKS_H_ */
+#endif				/* safety checks macros */
+#endif				/* EINA_SAFETY_CHECKS_H_ */
 
 /**
  * @}

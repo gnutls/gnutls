@@ -27,10 +27,9 @@
 
 #if defined(_WIN32) || !defined(ENABLE_ALPN)
 
-int
-main (int argc, char** argv)
+int main(int argc, char **argv)
 {
-    exit (77);
+	exit(77);
 }
 
 #else
@@ -47,21 +46,19 @@ main (int argc, char** argv)
 
 #include "utils.h"
 
-static void terminate (void);
+static void terminate(void);
 
 /* This program tests the rehandshake in DTLS
  */
 
-static void
-server_log_func (int level, const char *str)
+static void server_log_func(int level, const char *str)
 {
-    fprintf (stderr, "server|<%d>| %s", level, str);
+	fprintf(stderr, "server|<%d>| %s", level, str);
 }
 
-static void
-client_log_func (int level, const char *str)
+static void client_log_func(int level, const char *str)
 {
-    fprintf (stderr, "client|<%d>| %s", level, str);
+	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
 /* These are global */
@@ -70,253 +67,229 @@ static pid_t child;
 /* A very basic DTLS client, with anonymous authentication, that negotiates SRTP
  */
 
-static void
-client (int fd, const char* protocol1, const char* protocol2)
+static void client(int fd, const char *protocol1, const char *protocol2)
 {
-    gnutls_session_t session;
-    int ret;
-    gnutls_datum_t proto;
-    gnutls_anon_client_credentials_t anoncred;
-    /* Need to enable anonymous KX specifically. */
+	gnutls_session_t session;
+	int ret;
+	gnutls_datum_t proto;
+	gnutls_anon_client_credentials_t anoncred;
+	/* Need to enable anonymous KX specifically. */
 
-    global_init ();
+	global_init();
 
-    if (debug)
-      {
-          gnutls_global_set_log_function (client_log_func);
-          gnutls_global_set_log_level (4711);
-      }
+	if (debug) {
+		gnutls_global_set_log_function(client_log_func);
+		gnutls_global_set_log_level(4711);
+	}
 
-    gnutls_anon_allocate_client_credentials (&anoncred);
+	gnutls_anon_allocate_client_credentials(&anoncred);
 
-    /* Initialize TLS session
-     */
-    gnutls_init (&session, GNUTLS_CLIENT);
+	/* Initialize TLS session
+	 */
+	gnutls_init(&session, GNUTLS_CLIENT);
 
-    /* Use default priorities */
-    gnutls_priority_set_direct (session,
-                                "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-                                NULL);
-    if (protocol1)
-      {
-        gnutls_datum_t t[2];
-        t[0].data = (void*)protocol1;
-        t[0].size = strlen(protocol1);
-        t[1].data = (void*)protocol2;
-        t[1].size = strlen(protocol2);
-        
-        ret = gnutls_alpn_set_protocols(session, t, 2, 0);
-        if (ret < 0)
-          {
-            gnutls_perror(ret);
-            exit(1);
-          }
-      }
+	/* Use default priorities */
+	gnutls_priority_set_direct(session,
+				   "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+				   NULL);
+	if (protocol1) {
+		gnutls_datum_t t[2];
+		t[0].data = (void *) protocol1;
+		t[0].size = strlen(protocol1);
+		t[1].data = (void *) protocol2;
+		t[1].size = strlen(protocol2);
 
-    /* put the anonymous credentials to the current session
-     */
-    gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
+		ret = gnutls_alpn_set_protocols(session, t, 2, 0);
+		if (ret < 0) {
+			gnutls_perror(ret);
+			exit(1);
+		}
+	}
 
-    gnutls_transport_set_int (session, fd);
+	/* put the anonymous credentials to the current session
+	 */
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
-    /* Perform the TLS handshake
-     */
-    do
-      {
-          ret = gnutls_handshake (session);
-      }
-    while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
+	gnutls_transport_set_int(session, fd);
 
-    if (ret < 0)
-      {
-          fail ("client: Handshake failed\n");
-          gnutls_perror (ret);
-          exit (1);
-      }
-    else
-      {
-          if (debug)
-              success ("client: Handshake was completed\n");
-      }
+	/* Perform the TLS handshake
+	 */
+	do {
+		ret = gnutls_handshake(session);
+	}
+	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
-    if (debug)
-        success ("client: TLS version is: %s\n",
-                 gnutls_protocol_get_name (gnutls_protocol_get_version
-                                           (session)));
-    
-    ret = gnutls_alpn_get_selected_protocol(session, &proto);
-    if (ret < 0)
-      {
-        gnutls_perror(ret);
-        exit(1);
-      }
+	if (ret < 0) {
+		fail("client: Handshake failed\n");
+		gnutls_perror(ret);
+		exit(1);
+	} else {
+		if (debug)
+			success("client: Handshake was completed\n");
+	}
 
-    if (debug)
-      {
-        fprintf(stderr, "selected protocol: %.*s\n", (int)proto.size, proto.data);
-      }
+	if (debug)
+		success("client: TLS version is: %s\n",
+			gnutls_protocol_get_name
+			(gnutls_protocol_get_version(session)));
+
+	ret = gnutls_alpn_get_selected_protocol(session, &proto);
+	if (ret < 0) {
+		gnutls_perror(ret);
+		exit(1);
+	}
+
+	if (debug) {
+		fprintf(stderr, "selected protocol: %.*s\n",
+			(int) proto.size, proto.data);
+	}
 
 
-    gnutls_bye (session, GNUTLS_SHUT_WR);
+	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-    close (fd);
+	close(fd);
 
-    gnutls_deinit (session);
+	gnutls_deinit(session);
 
-    gnutls_anon_free_client_credentials (anoncred);
+	gnutls_anon_free_client_credentials(anoncred);
 
-    gnutls_global_deinit ();
+	gnutls_global_deinit();
 }
 
-static void
-terminate (void)
+static void terminate(void)
 {
-    int status;
+	int status;
 
-    kill (child, SIGTERM);
-    wait (&status);
-    exit (1);
+	kill(child, SIGTERM);
+	wait(&status);
+	exit(1);
 }
 
-static void
-server (int fd, const char* protocol1, const char* protocol2)
+static void server(int fd, const char *protocol1, const char *protocol2)
 {
-    int ret;
-    gnutls_session_t session;
-    gnutls_anon_server_credentials_t anoncred;
-    gnutls_datum_t t[2];
+	int ret;
+	gnutls_session_t session;
+	gnutls_anon_server_credentials_t anoncred;
+	gnutls_datum_t t[2];
 
-    /* this must be called once in the program
-     */
-    global_init ();
+	/* this must be called once in the program
+	 */
+	global_init();
 
-    if (debug)
-      {
-          gnutls_global_set_log_function (server_log_func);
-          gnutls_global_set_log_level (4711);
-      }
+	if (debug) {
+		gnutls_global_set_log_function(server_log_func);
+		gnutls_global_set_log_level(4711);
+	}
 
-    gnutls_anon_allocate_server_credentials (&anoncred);
+	gnutls_anon_allocate_server_credentials(&anoncred);
 
-    gnutls_init (&session, GNUTLS_SERVER);
+	gnutls_init(&session, GNUTLS_SERVER);
 
-    /* avoid calling all the priority functions, since the defaults
-     * are adequate.
-     */
-    gnutls_priority_set_direct (session,
-                                "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-                                NULL);
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(session,
+				   "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+				   NULL);
 
-    t[0].data = (void*)protocol1;
-    t[0].size = strlen(protocol1);
-    t[1].data = (void*)protocol2;
-    t[1].size = strlen(protocol2);
-    
-    ret = gnutls_alpn_set_protocols(session, t, 2, 0);
-    if (ret < 0)
-      {
-        gnutls_perror(ret);
-        exit(1);
-      }
+	t[0].data = (void *) protocol1;
+	t[0].size = strlen(protocol1);
+	t[1].data = (void *) protocol2;
+	t[1].size = strlen(protocol2);
 
-    gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
+	ret = gnutls_alpn_set_protocols(session, t, 2, 0);
+	if (ret < 0) {
+		gnutls_perror(ret);
+		exit(1);
+	}
 
-    gnutls_transport_set_int (session, fd);
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
-    do
-      {
-          ret = gnutls_handshake (session);
-      }
-    while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
-    if (ret < 0)
-      {
-          close (fd);
-          gnutls_deinit (session);
-          fail ("server: Handshake has failed (%s)\n\n",
-                gnutls_strerror (ret));
-          terminate ();
-      }
-    if (debug)
-        success ("server: Handshake was completed\n");
+	gnutls_transport_set_int(session, fd);
 
-    if (debug)
-        success ("server: TLS version is: %s\n",
-                 gnutls_protocol_get_name (gnutls_protocol_get_version
-                                           (session)));
+	do {
+		ret = gnutls_handshake(session);
+	}
+	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	if (ret < 0) {
+		close(fd);
+		gnutls_deinit(session);
+		fail("server: Handshake has failed (%s)\n\n",
+		     gnutls_strerror(ret));
+		terminate();
+	}
+	if (debug)
+		success("server: Handshake was completed\n");
 
-    ret = gnutls_alpn_get_selected_protocol(session, &t[0]);
-    if (ret < 0)
-      {
-        gnutls_perror(ret);
-        exit(1);
-      }
-    
+	if (debug)
+		success("server: TLS version is: %s\n",
+			gnutls_protocol_get_name
+			(gnutls_protocol_get_version(session)));
+
+	ret = gnutls_alpn_get_selected_protocol(session, &t[0]);
+	if (ret < 0) {
+		gnutls_perror(ret);
+		exit(1);
+	}
 #if 0
-    if (debug)
-      {
-        success ("Protocol: %.*s\n", (int)t[0].size, t[0].data);
-      }
+	if (debug) {
+		success("Protocol: %.*s\n", (int) t[0].size, t[0].data);
+	}
 #endif
 
-    /* do not wait for the peer to close the connection.
-     */
-    gnutls_bye (session, GNUTLS_SHUT_WR);
+	/* do not wait for the peer to close the connection.
+	 */
+	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-    close (fd);
-    gnutls_deinit (session);
+	close(fd);
+	gnutls_deinit(session);
 
-    gnutls_anon_free_server_credentials (anoncred);
+	gnutls_anon_free_server_credentials(anoncred);
 
-    gnutls_global_deinit ();
+	gnutls_global_deinit();
 
-    if (debug)
-        success ("server: finished\n");
+	if (debug)
+		success("server: finished\n");
 }
 
-static void
-start (const char* p1, const char* p2)
+static void start(const char *p1, const char *p2)
 {
-    int fd[2];
-    int ret;
+	int fd[2];
+	int ret;
 
-    ret = socketpair (AF_UNIX, SOCK_STREAM, 0, fd);
-    if (ret < 0)
-      {
-          perror ("socketpair");
-          exit (1);
-      }
+	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
+	if (ret < 0) {
+		perror("socketpair");
+		exit(1);
+	}
 
-    child = fork ();
-    if (child < 0)
-      {
-          perror ("fork");
-          fail ("fork");
-          exit (1);
-      }
+	child = fork();
+	if (child < 0) {
+		perror("fork");
+		fail("fork");
+		exit(1);
+	}
 
-    if (child)
-      {
-          int status;
-          /* parent */
+	if (child) {
+		int status;
+		/* parent */
 
-          server (fd[0], p1, p2);
-          wait (&status);
-          if (WEXITSTATUS (status) != 0)
-              fail ("Child died with status %d\n", WEXITSTATUS (status));
-      }
-    else
-      {
-          close (fd[0]);
-          client (fd[1], p2, p1);
-          exit (0);
-      }
+		server(fd[0], p1, p2);
+		wait(&status);
+		if (WEXITSTATUS(status) != 0)
+			fail("Child died with status %d\n",
+			     WEXITSTATUS(status));
+	} else {
+		close(fd[0]);
+		client(fd[1], p2, p1);
+		exit(0);
+	}
 }
 
-void
-doit (void)
+void doit(void)
 {
-    start ("spdy/2", "spdy/3");
-    start ("spdy/3", "spdy/2");
+	start("spdy/2", "spdy/3");
+	start("spdy/3", "spdy/2");
 }
 
-#endif /* _WIN32 */
+#endif				/* _WIN32 */

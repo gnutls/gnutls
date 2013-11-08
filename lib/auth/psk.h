@@ -26,38 +26,35 @@
 #include <gnutls_auth.h>
 #include <auth/dh_common.h>
 
-typedef struct gnutls_psk_client_credentials_st
-{
-  gnutls_datum_t username;
-  gnutls_datum_t key;
-  gnutls_psk_client_credentials_function *get_function;
+typedef struct gnutls_psk_client_credentials_st {
+	gnutls_datum_t username;
+	gnutls_datum_t key;
+	gnutls_psk_client_credentials_function *get_function;
 } psk_client_credentials_st;
 
-typedef struct gnutls_psk_server_credentials_st
-{
-  char *password_file;
-  /* callback function, instead of reading the
-   * password files.
-   */
-  gnutls_psk_server_credentials_function *pwd_callback;
+typedef struct gnutls_psk_server_credentials_st {
+	char *password_file;
+	/* callback function, instead of reading the
+	 * password files.
+	 */
+	gnutls_psk_server_credentials_function *pwd_callback;
 
-  /* For DHE_PSK */
-  gnutls_dh_params_t dh_params;
-  /* this callback is used to retrieve the DH or RSA
-   * parameters.
-   */
-  gnutls_params_function *params_func;
+	/* For DHE_PSK */
+	gnutls_dh_params_t dh_params;
+	/* this callback is used to retrieve the DH or RSA
+	 * parameters.
+	 */
+	gnutls_params_function *params_func;
 
-  /* Identity hint. */
-  char *hint;
+	/* Identity hint. */
+	char *hint;
 } psk_server_cred_st;
 
 /* these structures should not use allocated data */
-typedef struct psk_auth_info_st
-{
-  char username[MAX_USERNAME_SIZE + 1];
-  dh_info_st dh;
-  char hint[MAX_USERNAME_SIZE + 1];
+typedef struct psk_auth_info_st {
+	char username[MAX_USERNAME_SIZE + 1];
+	dh_info_st dh;
+	char hint[MAX_USERNAME_SIZE + 1];
 } *psk_auth_info_t;
 
 
@@ -66,17 +63,21 @@ typedef struct psk_auth_info_st
 typedef struct psk_auth_info_st psk_auth_info_st;
 
 int
-_gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum_t* key, gnutls_datum_t * psk2);
-int _gnutls_gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data);
-int _gnutls_gen_psk_client_kx (gnutls_session_t, gnutls_buffer_st*);
-int _gnutls_proc_psk_server_kx (gnutls_session_t session, uint8_t * data,
-                                size_t _data_size);
+_gnutls_set_psk_session_key(gnutls_session_t session, gnutls_datum_t * key,
+			    gnutls_datum_t * psk2);
+int _gnutls_gen_psk_server_kx(gnutls_session_t session,
+			      gnutls_buffer_st * data);
+int _gnutls_gen_psk_client_kx(gnutls_session_t, gnutls_buffer_st *);
+int _gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t * data,
+			       size_t _data_size);
 
-int _gnutls_find_psk_key( gnutls_session_t session, gnutls_psk_client_credentials_t cred, 
-  gnutls_datum_t * username, gnutls_datum_t* key, int* free);
+int _gnutls_find_psk_key(gnutls_session_t session,
+			 gnutls_psk_client_credentials_t cred,
+			 gnutls_datum_t * username, gnutls_datum_t * key,
+			 int *free);
 
 #else
 #define _gnutls_set_psk_session_key(x,y,z) GNUTLS_E_UNIMPLEMENTED_FEATURE
-#endif /* ENABLE_PSK */
+#endif				/* ENABLE_PSK */
 
 #endif

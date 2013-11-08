@@ -27,46 +27,46 @@
 /***************************************/
 /*  Functions used by ASN.1 parser     */
 /***************************************/
-asn1_node _asn1_add_static_node (unsigned int type);
+asn1_node _asn1_add_static_node(unsigned int type);
 
 asn1_node
-_asn1_set_value (asn1_node node, const void *value, unsigned int len);
+_asn1_set_value(asn1_node node, const void *value, unsigned int len);
 
-asn1_node _asn1_set_value_m (asn1_node node, void *value, unsigned int len);
-
-asn1_node
-_asn1_set_value_lv (asn1_node node, const void *value, unsigned int len);
+asn1_node _asn1_set_value_m(asn1_node node, void *value, unsigned int len);
 
 asn1_node
-_asn1_append_value (asn1_node node, const void *value, unsigned int len);
+_asn1_set_value_lv(asn1_node node, const void *value, unsigned int len);
 
-asn1_node _asn1_set_name (asn1_node node, const char *name);
+asn1_node
+_asn1_append_value(asn1_node node, const void *value, unsigned int len);
 
-asn1_node _asn1_cpy_name (asn1_node dst, asn1_node src);
+asn1_node _asn1_set_name(asn1_node node, const char *name);
 
-asn1_node _asn1_set_right (asn1_node node, asn1_node right);
+asn1_node _asn1_cpy_name(asn1_node dst, asn1_node src);
 
-asn1_node _asn1_get_last_right (asn1_node node);
+asn1_node _asn1_set_right(asn1_node node, asn1_node right);
 
-void _asn1_remove_node (asn1_node node);
+asn1_node _asn1_get_last_right(asn1_node node);
 
-void _asn1_delete_list (void);
+void _asn1_remove_node(asn1_node node);
 
-void _asn1_delete_list_and_nodes (void);
+void _asn1_delete_list(void);
 
-char *_asn1_ltostr (long v, char *str);
+void _asn1_delete_list_and_nodes(void);
 
-asn1_node _asn1_find_up (asn1_node node);
+char *_asn1_ltostr(long v, char *str);
 
-int _asn1_change_integer_value (asn1_node node);
+asn1_node _asn1_find_up(asn1_node node);
 
-int _asn1_expand_object_id (asn1_node node);
+int _asn1_change_integer_value(asn1_node node);
 
-int _asn1_type_set_config (asn1_node node);
+int _asn1_expand_object_id(asn1_node node);
 
-int _asn1_check_identifier (asn1_node node);
+int _asn1_type_set_config(asn1_node node);
 
-int _asn1_set_default_tag (asn1_node node);
+int _asn1_check_identifier(asn1_node node);
+
+int _asn1_set_default_tag(asn1_node node);
 
 /******************************************************************/
 /* Function : _asn1_get_right                                     */
@@ -76,12 +76,11 @@ int _asn1_set_default_tag (asn1_node node);
 /*   node: NODE_ASN element pointer.                              */
 /* Return: field RIGHT of NODE.                                   */
 /******************************************************************/
-inline static asn1_node
-_asn1_get_right (asn1_node node)
+inline static asn1_node _asn1_get_right(asn1_node node)
 {
-  if (node == NULL)
-    return NULL;
-  return node->right;
+	if (node == NULL)
+		return NULL;
+	return node->right;
 }
 
 /******************************************************************/
@@ -93,15 +92,14 @@ _asn1_get_right (asn1_node node)
 /*          by NODE.                                              */
 /* Return: pointer to *NODE.                                      */
 /******************************************************************/
-inline static asn1_node
-_asn1_set_down (asn1_node node, asn1_node down)
+inline static asn1_node _asn1_set_down(asn1_node node, asn1_node down)
 {
-  if (node == NULL)
-    return node;
-  node->down = down;
-  if (down)
-    down->left = node;
-  return node;
+	if (node == NULL)
+		return node;
+	node->down = down;
+	if (down)
+		down->left = node;
+	return node;
 }
 
 /******************************************************************/
@@ -112,12 +110,11 @@ _asn1_set_down (asn1_node node, asn1_node down)
 /*   node: NODE_ASN element pointer.                              */
 /* Return: field DOWN of NODE.                                    */
 /******************************************************************/
-inline static asn1_node
-_asn1_get_down (asn1_node node)
+inline static asn1_node _asn1_get_down(asn1_node node)
 {
-  if (node == NULL)
-    return NULL;
-  return node->down;
+	if (node == NULL)
+		return NULL;
+	return node->down;
 }
 
 /******************************************************************/
@@ -127,12 +124,11 @@ _asn1_get_down (asn1_node node)
 /*   node: NODE_ASN element pointer.                              */
 /* Return: a null terminated string.                              */
 /******************************************************************/
-inline static char *
-_asn1_get_name (asn1_node node)
+inline static char *_asn1_get_name(asn1_node node)
 {
-  if (node == NULL)
-    return NULL;
-  return node->name;
+	if (node == NULL)
+		return NULL;
+	return node->name;
 }
 
 /******************************************************************/
@@ -146,13 +142,12 @@ _asn1_get_name (asn1_node node)
 /*          value of field TYPE.                                  */
 /* Return: NODE pointer.                                          */
 /******************************************************************/
-inline static asn1_node
-_asn1_mod_type (asn1_node node, unsigned int value)
+inline static asn1_node _asn1_mod_type(asn1_node node, unsigned int value)
 {
-  if (node == NULL)
-    return node;
-  node->type |= value;
-  return node;
+	if (node == NULL)
+		return node;
+	node->type |= value;
+	return node;
 }
 
 #endif

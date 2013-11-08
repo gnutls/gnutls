@@ -114,7 +114,7 @@
 #include <dirent.h>
 
 #ifdef _WIN32
-# include <Evil.h>
+#include <Evil.h>
 #endif
 
 #ifdef __cplusplus
@@ -161,5 +161,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* EINA_H */
+#endif				/* EINA_H */

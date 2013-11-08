@@ -29,83 +29,87 @@
 
 #include "utils.h"
 
-static void
-tls_log_func (int level, const char *str)
+static void tls_log_func(int level, const char *str)
 {
-  fprintf (stderr, "<%d>| %s", level, str);
+	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-void
-doit (void)
+void doit(void)
 {
-  gnutls_certificate_credentials_t x509cred;
-  const char *file, *password;
-  int ret;
+	gnutls_certificate_credentials_t x509cred;
+	const char *file, *password;
+	int ret;
 
-  ret = global_init ();
-  if (ret < 0)
-    fail ("global_init failed %d\n", ret);
+	ret = global_init();
+	if (ret < 0)
+		fail("global_init failed %d\n", ret);
 
-  gnutls_global_set_log_function (tls_log_func);
-  if (debug)
-    gnutls_global_set_log_level (4711);
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
 
-  ret = gnutls_certificate_allocate_credentials (&x509cred);
-  if (ret < 0)
-    fail ("gnutls_certificate_allocate_credentials failed %d\n", ret);
+	ret = gnutls_certificate_allocate_credentials(&x509cred);
+	if (ret < 0)
+		fail("gnutls_certificate_allocate_credentials failed %d\n",
+		     ret);
 
-  file = getenv ("PKCS12FILE");
-  password = getenv ("PKCS12PASSWORD");
+	file = getenv("PKCS12FILE");
+	password = getenv("PKCS12PASSWORD");
 
-  if (!file)
-    file = "pkcs12-decode/client.p12";
-  if (!password)
-    password = "foobar";
+	if (!file)
+		file = "pkcs12-decode/client.p12";
+	if (!password)
+		password = "foobar";
 
-  if (debug)
-    success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
-             file, password);
-  ret = gnutls_certificate_set_x509_simple_pkcs12_file (x509cred,
-                                                        file,
-                                                        GNUTLS_X509_FMT_DER,
-                                                        password);
-  if (ret < 0)
-    fail ("x509_pkcs12 failed %d: %s\n", ret, gnutls_strerror (ret));
+	if (debug)
+		success
+		    ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
+		     file, password);
+	ret =
+	    gnutls_certificate_set_x509_simple_pkcs12_file(x509cred, file,
+							   GNUTLS_X509_FMT_DER,
+							   password);
+	if (ret < 0)
+		fail("x509_pkcs12 failed %d: %s\n", ret,
+		     gnutls_strerror(ret));
 
-  if (debug)
-    success ("Read file OK\n");
+	if (debug)
+		success("Read file OK\n");
 
-  gnutls_certificate_free_credentials (x509cred);
+	gnutls_certificate_free_credentials(x509cred);
 
-  /* try now if we can read correctly from a pkcs12 file that
-   * contains two certificates (one unrelated with key)
-   */
-  ret = gnutls_certificate_allocate_credentials (&x509cred);
-  if (ret < 0)
-    fail ("gnutls_certificate_allocate_credentials failed %d\n", ret);
+	/* try now if we can read correctly from a pkcs12 file that
+	 * contains two certificates (one unrelated with key)
+	 */
+	ret = gnutls_certificate_allocate_credentials(&x509cred);
+	if (ret < 0)
+		fail("gnutls_certificate_allocate_credentials failed %d\n",
+		     ret);
 
-  file = getenv ("PKCS12FILE_2");
-  password = getenv ("PKCS12PASSWORD_2");
+	file = getenv("PKCS12FILE_2");
+	password = getenv("PKCS12PASSWORD_2");
 
-  if (!file)
-    file = "pkcs12-decode/pkcs12_2certs.p12";
-  if (!password)
-    password = "";
+	if (!file)
+		file = "pkcs12-decode/pkcs12_2certs.p12";
+	if (!password)
+		password = "";
 
-  if (debug)
-    success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
-             file, password);
-  ret = gnutls_certificate_set_x509_simple_pkcs12_file (x509cred,
-                                                        file,
-                                                        GNUTLS_X509_FMT_DER,
-                                                        password);
-  if (ret < 0)
-    fail ("x509_pkcs12 failed %d: %s\n", ret, gnutls_strerror (ret));
+	if (debug)
+		success
+		    ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
+		     file, password);
+	ret =
+	    gnutls_certificate_set_x509_simple_pkcs12_file(x509cred, file,
+							   GNUTLS_X509_FMT_DER,
+							   password);
+	if (ret < 0)
+		fail("x509_pkcs12 failed %d: %s\n", ret,
+		     gnutls_strerror(ret));
 
-  if (debug)
-    success ("Read file OK\n");
+	if (debug)
+		success("Read file OK\n");
 
-  gnutls_certificate_free_credentials (x509cred);
+	gnutls_certificate_free_credentials(x509cred);
 
-  gnutls_global_deinit ();
+	gnutls_global_deinit();
 }

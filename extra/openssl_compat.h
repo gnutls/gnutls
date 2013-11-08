@@ -28,9 +28,9 @@
 /* Extra definitions */
 #include <gnutls/openssl.h>
 
-int gnutls_x509_extract_certificate_dn (const gnutls_datum_t *,
-                                        gnutls_x509_dn *);
-int gnutls_x509_extract_certificate_issuer_dn (const gnutls_datum_t *,
-                                               gnutls_x509_dn *);
+int gnutls_x509_extract_certificate_dn(const gnutls_datum_t *,
+				       gnutls_x509_dn *);
+int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum_t *,
+					      gnutls_x509_dn *);
 
 #endif

@@ -30,51 +30,61 @@
 #define _(String) dgettext (PACKAGE, String)
 #define N_(String) gettext_noop (String)
 
-typedef struct
-{
-  gnutls_alert_description_t alert;
-  const char *name;
-  const char *desc;
+typedef struct {
+	gnutls_alert_description_t alert;
+	const char *name;
+	const char *desc;
 } gnutls_alert_entry;
 
 #define ALERT_ENTRY(x,y) \
   {x, #x, y}
 
 static const gnutls_alert_entry sup_alerts[] = {
-  ALERT_ENTRY(GNUTLS_A_CLOSE_NOTIFY, N_("Close notify")),
-  ALERT_ENTRY(GNUTLS_A_UNEXPECTED_MESSAGE, N_("Unexpected message")),
-  ALERT_ENTRY(GNUTLS_A_BAD_RECORD_MAC, N_("Bad record MAC")),
-  ALERT_ENTRY(GNUTLS_A_DECRYPTION_FAILED, N_("Decryption failed")),
-  ALERT_ENTRY(GNUTLS_A_RECORD_OVERFLOW, N_("Record overflow")),
-  ALERT_ENTRY(GNUTLS_A_DECOMPRESSION_FAILURE, N_("Decompression failed")),
-  ALERT_ENTRY(GNUTLS_A_HANDSHAKE_FAILURE, N_("Handshake failed")),
-  ALERT_ENTRY(GNUTLS_A_BAD_CERTIFICATE, N_("Certificate is bad")),
-  ALERT_ENTRY(GNUTLS_A_UNSUPPORTED_CERTIFICATE, N_("Certificate is not supported")),
-  ALERT_ENTRY(GNUTLS_A_CERTIFICATE_REVOKED, N_("Certificate was revoked")),
-  ALERT_ENTRY(GNUTLS_A_CERTIFICATE_EXPIRED, N_("Certificate is expired")),
-  ALERT_ENTRY(GNUTLS_A_CERTIFICATE_UNKNOWN, N_("Unknown certificate")),
-  ALERT_ENTRY(GNUTLS_A_ILLEGAL_PARAMETER, N_("Illegal parameter")),
-  ALERT_ENTRY(GNUTLS_A_UNKNOWN_CA, N_("CA is unknown")),
-  ALERT_ENTRY(GNUTLS_A_ACCESS_DENIED, N_("Access was denied")),
-  ALERT_ENTRY(GNUTLS_A_DECODE_ERROR, N_("Decode error")),
-  ALERT_ENTRY(GNUTLS_A_DECRYPT_ERROR, N_("Decrypt error")),
-  ALERT_ENTRY(GNUTLS_A_EXPORT_RESTRICTION, N_("Export restriction")),
-  ALERT_ENTRY(GNUTLS_A_PROTOCOL_VERSION, N_("Error in protocol version")),
-  ALERT_ENTRY(GNUTLS_A_INSUFFICIENT_SECURITY, N_("Insufficient security")),
-  ALERT_ENTRY(GNUTLS_A_USER_CANCELED, N_("User canceled")),
-  ALERT_ENTRY(GNUTLS_A_SSL3_NO_CERTIFICATE, N_("No certificate (SSL 3.0)")),
-  ALERT_ENTRY(GNUTLS_A_INTERNAL_ERROR, N_("Internal error")),
-  ALERT_ENTRY(GNUTLS_A_NO_RENEGOTIATION, N_("No renegotiation is allowed")),
-  ALERT_ENTRY(GNUTLS_A_CERTIFICATE_UNOBTAINABLE,
-   N_("Could not retrieve the specified certificate")),
-  ALERT_ENTRY(GNUTLS_A_UNSUPPORTED_EXTENSION, N_("An unsupported extension was sent")),
-  ALERT_ENTRY(GNUTLS_A_UNRECOGNIZED_NAME,
-   N_("The server name sent was not recognized")),
-  ALERT_ENTRY(GNUTLS_A_UNKNOWN_PSK_IDENTITY,
-   N_("The SRP/PSK username is missing or not known")),
-  ALERT_ENTRY(GNUTLS_A_NO_APPLICATION_PROTOCOL,
-   N_("No supported application protocol could be negotiated")),
-  {0, NULL, NULL}
+	ALERT_ENTRY(GNUTLS_A_CLOSE_NOTIFY, N_("Close notify")),
+	ALERT_ENTRY(GNUTLS_A_UNEXPECTED_MESSAGE, N_("Unexpected message")),
+	ALERT_ENTRY(GNUTLS_A_BAD_RECORD_MAC, N_("Bad record MAC")),
+	ALERT_ENTRY(GNUTLS_A_DECRYPTION_FAILED, N_("Decryption failed")),
+	ALERT_ENTRY(GNUTLS_A_RECORD_OVERFLOW, N_("Record overflow")),
+	ALERT_ENTRY(GNUTLS_A_DECOMPRESSION_FAILURE,
+		    N_("Decompression failed")),
+	ALERT_ENTRY(GNUTLS_A_HANDSHAKE_FAILURE, N_("Handshake failed")),
+	ALERT_ENTRY(GNUTLS_A_BAD_CERTIFICATE, N_("Certificate is bad")),
+	ALERT_ENTRY(GNUTLS_A_UNSUPPORTED_CERTIFICATE,
+		    N_("Certificate is not supported")),
+	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_REVOKED,
+		    N_("Certificate was revoked")),
+	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_EXPIRED,
+		    N_("Certificate is expired")),
+	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_UNKNOWN,
+		    N_("Unknown certificate")),
+	ALERT_ENTRY(GNUTLS_A_ILLEGAL_PARAMETER, N_("Illegal parameter")),
+	ALERT_ENTRY(GNUTLS_A_UNKNOWN_CA, N_("CA is unknown")),
+	ALERT_ENTRY(GNUTLS_A_ACCESS_DENIED, N_("Access was denied")),
+	ALERT_ENTRY(GNUTLS_A_DECODE_ERROR, N_("Decode error")),
+	ALERT_ENTRY(GNUTLS_A_DECRYPT_ERROR, N_("Decrypt error")),
+	ALERT_ENTRY(GNUTLS_A_EXPORT_RESTRICTION, N_("Export restriction")),
+	ALERT_ENTRY(GNUTLS_A_PROTOCOL_VERSION,
+		    N_("Error in protocol version")),
+	ALERT_ENTRY(GNUTLS_A_INSUFFICIENT_SECURITY,
+		    N_("Insufficient security")),
+	ALERT_ENTRY(GNUTLS_A_USER_CANCELED, N_("User canceled")),
+	ALERT_ENTRY(GNUTLS_A_SSL3_NO_CERTIFICATE,
+		    N_("No certificate (SSL 3.0)")),
+	ALERT_ENTRY(GNUTLS_A_INTERNAL_ERROR, N_("Internal error")),
+	ALERT_ENTRY(GNUTLS_A_NO_RENEGOTIATION,
+		    N_("No renegotiation is allowed")),
+	ALERT_ENTRY(GNUTLS_A_CERTIFICATE_UNOBTAINABLE,
+		    N_("Could not retrieve the specified certificate")),
+	ALERT_ENTRY(GNUTLS_A_UNSUPPORTED_EXTENSION,
+		    N_("An unsupported extension was sent")),
+	ALERT_ENTRY(GNUTLS_A_UNRECOGNIZED_NAME,
+		    N_("The server name sent was not recognized")),
+	ALERT_ENTRY(GNUTLS_A_UNKNOWN_PSK_IDENTITY,
+		    N_("The SRP/PSK username is missing or not known")),
+	ALERT_ENTRY(GNUTLS_A_NO_APPLICATION_PROTOCOL,
+		    N_
+		    ("No supported application protocol could be negotiated")),
+	{0, NULL, NULL}
 };
 
 /**
@@ -86,16 +96,15 @@ static const gnutls_alert_entry sup_alerts[] = {
  *
  * Returns: string corresponding to #gnutls_alert_description_t value.
  **/
-const char *
-gnutls_alert_get_name (gnutls_alert_description_t alert)
+const char *gnutls_alert_get_name(gnutls_alert_description_t alert)
 {
-  const gnutls_alert_entry *p;
+	const gnutls_alert_entry *p;
 
-  for (p = sup_alerts; p->desc != NULL; p++)
-    if (p->alert == alert)
-      return _(p->desc);
+	for (p = sup_alerts; p->desc != NULL; p++)
+		if (p->alert == alert)
+			return _(p->desc);
 
-  return NULL;
+	return NULL;
 }
 
 /**
@@ -108,16 +117,15 @@ gnutls_alert_get_name (gnutls_alert_description_t alert)
  *
  * Since: 3.0
  **/
-const char *
-gnutls_alert_get_strname (gnutls_alert_description_t alert)
+const char *gnutls_alert_get_strname(gnutls_alert_description_t alert)
 {
-  const gnutls_alert_entry *p;
+	const gnutls_alert_entry *p;
 
-  for (p = sup_alerts; p->name != NULL; p++)
-    if (p->alert == alert)
-      return p->name;
+	for (p = sup_alerts; p->name != NULL; p++)
+		if (p->alert == alert)
+			return p->name;
 
-  return NULL;
+	return NULL;
 }
 
 /**
@@ -139,28 +147,29 @@ gnutls_alert_get_strname (gnutls_alert_description_t alert)
  *   an error code is returned.
  **/
 int
-gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
-                   gnutls_alert_description_t desc)
+gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
+		  gnutls_alert_description_t desc)
 {
-  uint8_t data[2];
-  int ret;
-  const char *name;
+	uint8_t data[2];
+	int ret;
+	const char *name;
 
-  data[0] = (uint8_t) level;
-  data[1] = (uint8_t) desc;
+	data[0] = (uint8_t) level;
+	data[1] = (uint8_t) desc;
 
-  name = gnutls_alert_get_name ((int) data[1]);
-  if (name == NULL)
-    name = "(unknown)";
-  _gnutls_record_log ("REC: Sending Alert[%d|%d] - %s\n", data[0],
-                      data[1], name);
+	name = gnutls_alert_get_name((int) data[1]);
+	if (name == NULL)
+		name = "(unknown)";
+	_gnutls_record_log("REC: Sending Alert[%d|%d] - %s\n", data[0],
+			   data[1], name);
 
-  if ((ret =
-       _gnutls_send_int (session, GNUTLS_ALERT, -1, EPOCH_WRITE_CURRENT, data,
-                         2, MBUFFER_FLUSH)) >= 0)
-    return 0;
-  else
-    return ret;
+	if ((ret =
+	     _gnutls_send_int(session, GNUTLS_ALERT, -1,
+			      EPOCH_WRITE_CURRENT, data, 2,
+			      MBUFFER_FLUSH)) >= 0)
+		return 0;
+	else
+		return ret;
 }
 
 /**
@@ -179,122 +188,120 @@ gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
  *
  * Returns: the alert code to use for a particular error code.
  **/
-int
-gnutls_error_to_alert (int err, int *level)
+int gnutls_error_to_alert(int err, int *level)
 {
-  int ret, _level = -1;
+	int ret, _level = -1;
 
-  switch (err)
-    {                           /* send appropriate alert */
-    case GNUTLS_E_DECRYPTION_FAILED:
-      /* GNUTLS_A_DECRYPTION_FAILED is not sent, because
-       * it is not defined in SSL3. Note that we must
-       * not distinguish Decryption failures from mac
-       * check failures, due to the possibility of some
-       * attacks.
-       */
-      ret = GNUTLS_A_BAD_RECORD_MAC;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_DECOMPRESSION_FAILED:
-      ret = GNUTLS_A_DECOMPRESSION_FAILURE;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER:
-    case GNUTLS_E_ILLEGAL_SRP_USERNAME:
-      ret = GNUTLS_A_ILLEGAL_PARAMETER;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_UNKNOWN_SRP_USERNAME:
-      ret = GNUTLS_A_UNKNOWN_PSK_IDENTITY;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_ASN1_ELEMENT_NOT_FOUND:
-    case GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND:
-    case GNUTLS_E_ASN1_DER_ERROR:
-    case GNUTLS_E_ASN1_VALUE_NOT_FOUND:
-    case GNUTLS_E_ASN1_GENERIC_ERROR:
-    case GNUTLS_E_ASN1_VALUE_NOT_VALID:
-    case GNUTLS_E_ASN1_TAG_ERROR:
-    case GNUTLS_E_ASN1_TAG_IMPLICIT:
-    case GNUTLS_E_ASN1_TYPE_ANY_ERROR:
-    case GNUTLS_E_ASN1_SYNTAX_ERROR:
-    case GNUTLS_E_ASN1_DER_OVERFLOW:
-    case GNUTLS_E_CERTIFICATE_ERROR:
-      ret = GNUTLS_A_BAD_CERTIFICATE;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
-    case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
-    case GNUTLS_E_INSUFFICIENT_CREDENTIALS:
-    case GNUTLS_E_NO_CIPHER_SUITES:
-    case GNUTLS_E_NO_COMPRESSION_ALGORITHMS:
-    case GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM:
-    case GNUTLS_E_SAFE_RENEGOTIATION_FAILED:
-    case GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL:
-      ret = GNUTLS_A_HANDSHAKE_FAILURE;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION:
-      ret = GNUTLS_A_UNSUPPORTED_EXTENSION;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_USER_ERROR:
-      ret = GNUTLS_A_USER_CANCELED;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_UNEXPECTED_PACKET:
-    case GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET:
-    case GNUTLS_E_PREMATURE_TERMINATION:
-      ret = GNUTLS_A_UNEXPECTED_MESSAGE;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_REHANDSHAKE:
-    case GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED:
-      ret = GNUTLS_A_NO_RENEGOTIATION;
-      _level = GNUTLS_AL_WARNING;
-      break;
-    case GNUTLS_E_UNSUPPORTED_VERSION_PACKET:
-      ret = GNUTLS_A_PROTOCOL_VERSION;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE:
-      ret = GNUTLS_A_UNSUPPORTED_CERTIFICATE;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
-      ret = GNUTLS_A_RECORD_OVERFLOW;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_INTERNAL_ERROR:
-    case GNUTLS_E_NO_TEMPORARY_DH_PARAMS:
-    case GNUTLS_E_NO_TEMPORARY_RSA_PARAMS:
-      ret = GNUTLS_A_INTERNAL_ERROR;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_OPENPGP_GETKEY_FAILED:
-      ret = GNUTLS_A_CERTIFICATE_UNOBTAINABLE;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_DH_PRIME_UNACCEPTABLE:
-    case GNUTLS_E_NO_CERTIFICATE_FOUND:
-      ret = GNUTLS_A_INSUFFICIENT_SECURITY;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    case GNUTLS_E_NO_APPLICATION_PROTOCOL:
-      ret = GNUTLS_A_NO_APPLICATION_PROTOCOL;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    default:
-      ret = GNUTLS_A_INTERNAL_ERROR;
-      _level = GNUTLS_AL_FATAL;
-      break;
-    }
+	switch (err) {		/* send appropriate alert */
+	case GNUTLS_E_DECRYPTION_FAILED:
+		/* GNUTLS_A_DECRYPTION_FAILED is not sent, because
+		 * it is not defined in SSL3. Note that we must
+		 * not distinguish Decryption failures from mac
+		 * check failures, due to the possibility of some
+		 * attacks.
+		 */
+		ret = GNUTLS_A_BAD_RECORD_MAC;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_DECOMPRESSION_FAILED:
+		ret = GNUTLS_A_DECOMPRESSION_FAILURE;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER:
+	case GNUTLS_E_ILLEGAL_SRP_USERNAME:
+		ret = GNUTLS_A_ILLEGAL_PARAMETER;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_UNKNOWN_SRP_USERNAME:
+		ret = GNUTLS_A_UNKNOWN_PSK_IDENTITY;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_ASN1_ELEMENT_NOT_FOUND:
+	case GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND:
+	case GNUTLS_E_ASN1_DER_ERROR:
+	case GNUTLS_E_ASN1_VALUE_NOT_FOUND:
+	case GNUTLS_E_ASN1_GENERIC_ERROR:
+	case GNUTLS_E_ASN1_VALUE_NOT_VALID:
+	case GNUTLS_E_ASN1_TAG_ERROR:
+	case GNUTLS_E_ASN1_TAG_IMPLICIT:
+	case GNUTLS_E_ASN1_TYPE_ANY_ERROR:
+	case GNUTLS_E_ASN1_SYNTAX_ERROR:
+	case GNUTLS_E_ASN1_DER_OVERFLOW:
+	case GNUTLS_E_CERTIFICATE_ERROR:
+		ret = GNUTLS_A_BAD_CERTIFICATE;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
+	case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
+	case GNUTLS_E_INSUFFICIENT_CREDENTIALS:
+	case GNUTLS_E_NO_CIPHER_SUITES:
+	case GNUTLS_E_NO_COMPRESSION_ALGORITHMS:
+	case GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM:
+	case GNUTLS_E_SAFE_RENEGOTIATION_FAILED:
+	case GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL:
+		ret = GNUTLS_A_HANDSHAKE_FAILURE;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION:
+		ret = GNUTLS_A_UNSUPPORTED_EXTENSION;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_USER_ERROR:
+		ret = GNUTLS_A_USER_CANCELED;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_UNEXPECTED_PACKET:
+	case GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET:
+	case GNUTLS_E_PREMATURE_TERMINATION:
+		ret = GNUTLS_A_UNEXPECTED_MESSAGE;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_REHANDSHAKE:
+	case GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED:
+		ret = GNUTLS_A_NO_RENEGOTIATION;
+		_level = GNUTLS_AL_WARNING;
+		break;
+	case GNUTLS_E_UNSUPPORTED_VERSION_PACKET:
+		ret = GNUTLS_A_PROTOCOL_VERSION;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE:
+		ret = GNUTLS_A_UNSUPPORTED_CERTIFICATE;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
+		ret = GNUTLS_A_RECORD_OVERFLOW;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_INTERNAL_ERROR:
+	case GNUTLS_E_NO_TEMPORARY_DH_PARAMS:
+	case GNUTLS_E_NO_TEMPORARY_RSA_PARAMS:
+		ret = GNUTLS_A_INTERNAL_ERROR;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_OPENPGP_GETKEY_FAILED:
+		ret = GNUTLS_A_CERTIFICATE_UNOBTAINABLE;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_DH_PRIME_UNACCEPTABLE:
+	case GNUTLS_E_NO_CERTIFICATE_FOUND:
+		ret = GNUTLS_A_INSUFFICIENT_SECURITY;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	case GNUTLS_E_NO_APPLICATION_PROTOCOL:
+		ret = GNUTLS_A_NO_APPLICATION_PROTOCOL;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	default:
+		ret = GNUTLS_A_INTERNAL_ERROR;
+		_level = GNUTLS_AL_FATAL;
+		break;
+	}
 
-  if (level != NULL)
-    *level = _level;
+	if (level != NULL)
+		*level = _level;
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -315,19 +322,17 @@ gnutls_error_to_alert (int err, int *level)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  */
-int
-gnutls_alert_send_appropriate (gnutls_session_t session, int err)
+int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 {
-  int alert;
-  int level;
+	int alert;
+	int level;
 
-  alert = gnutls_error_to_alert (err, &level);
-  if (alert < 0)
-    {
-      return alert;
-    }
+	alert = gnutls_error_to_alert(err, &level);
+	if (alert < 0) {
+		return alert;
+	}
 
-  return gnutls_alert_send (session, level, alert);
+	return gnutls_alert_send(session, level, alert);
 }
 
 /**
@@ -343,8 +348,7 @@ gnutls_alert_send_appropriate (gnutls_session_t session, int err)
  * Returns: the last alert received, a
  *   #gnutls_alert_description_t value.
  **/
-gnutls_alert_description_t
-gnutls_alert_get (gnutls_session_t session)
+gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session)
 {
-  return session->internals.last_alert;
+	return session->internals.last_alert;
 }

@@ -24,7 +24,7 @@
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_global.h>
-#include <gnutls_num.h>         /* MAX */
+#include <gnutls_num.h>		/* MAX */
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
@@ -36,35 +36,38 @@
 #include <locks.h>
 
 struct gnutls_tdb_int {
-  gnutls_tdb_store_func store;
-  gnutls_tdb_store_commitment_func cstore;
-  gnutls_tdb_verify_func verify;
+	gnutls_tdb_store_func store;
+	gnutls_tdb_store_commitment_func cstore;
+	gnutls_tdb_verify_func verify;
 };
 
-static int raw_pubkey_to_base64(const gnutls_datum_t* raw, gnutls_datum_t * b64);
-static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
-static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
-static int verify_pubkey(const char* file, 
-                              const char* host, const char* service, 
-                              const gnutls_datum_t* skey);
+static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
+				gnutls_datum_t * b64);
+static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert,
+				  gnutls_datum_t * rpubkey);
+static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert,
+				 gnutls_datum_t * rpubkey);
+static int verify_pubkey(const char *file, const char *host,
+			 const char *service, const gnutls_datum_t * skey);
 
-static 
-int store_commitment(const char* db_name, const char* host,
-                 const char* service, time_t expiration, 
-                 gnutls_digest_algorithm_t hash_algo,
-                 const gnutls_datum_t* hash);
-static 
-int store_pubkey(const char* db_name, const char* host,
-                 const char* service, time_t expiration, const gnutls_datum_t* pubkey);
+static
+int store_commitment(const char *db_name, const char *host,
+		     const char *service, time_t expiration,
+		     gnutls_digest_algorithm_t hash_algo,
+		     const gnutls_datum_t * hash);
+static
+int store_pubkey(const char *db_name, const char *host,
+		 const char *service, time_t expiration,
+		 const gnutls_datum_t * pubkey);
 
-static int find_config_file(char* file, size_t max_size);
+static int find_config_file(char *file, size_t max_size);
 
 extern void *_gnutls_file_mutex;
 
 struct gnutls_tdb_int default_tdb = {
-  store_pubkey,
-  store_commitment,
-  verify_pubkey
+	store_pubkey,
+	store_commitment,
+	verify_pubkey
 };
 
 
@@ -103,477 +106,489 @@ struct gnutls_tdb_int default_tdb = {
  * Since: 3.0
  **/
 int
-gnutls_verify_stored_pubkey(const char* db_name,
-                            gnutls_tdb_t tdb,
-                            const char* host,
-                            const char* service,
-                            gnutls_certificate_type_t cert_type,
-                            const gnutls_datum_t * cert, unsigned int flags)
+gnutls_verify_stored_pubkey(const char *db_name,
+			    gnutls_tdb_t tdb,
+			    const char *host,
+			    const char *service,
+			    gnutls_certificate_type_t cert_type,
+			    const gnutls_datum_t * cert,
+			    unsigned int flags)
 {
-gnutls_datum_t pubkey = { NULL, 0 };
-int ret;
-char local_file[MAX_FILENAME];
+	gnutls_datum_t pubkey = { NULL, 0 };
+	int ret;
+	char local_file[MAX_FILENAME];
 
-  if (cert_type != GNUTLS_CRT_X509 && cert_type != GNUTLS_CRT_OPENPGP)
-    return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
+	if (cert_type != GNUTLS_CRT_X509
+	    && cert_type != GNUTLS_CRT_OPENPGP)
+		return
+		    gnutls_assert_val
+		    (GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 
-  if (db_name == NULL && tdb == NULL)
-    {
-      ret = find_config_file(local_file, sizeof(local_file));
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-      db_name = local_file;
-    }
+	if (db_name == NULL && tdb == NULL) {
+		ret = find_config_file(local_file, sizeof(local_file));
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+		db_name = local_file;
+	}
 
-  if (tdb == NULL)
-    tdb = &default_tdb;
+	if (tdb == NULL)
+		tdb = &default_tdb;
 
-  if (cert_type == GNUTLS_CRT_X509)
-    ret = x509_crt_to_raw_pubkey(cert, &pubkey);
-  else
-    ret = pgp_crt_to_raw_pubkey(cert, &pubkey);
+	if (cert_type == GNUTLS_CRT_X509)
+		ret = x509_crt_to_raw_pubkey(cert, &pubkey);
+	else
+		ret = pgp_crt_to_raw_pubkey(cert, &pubkey);
 
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-  
-  ret = tdb->verify(db_name, host, service, &pubkey);
-  if (ret < 0 && ret != GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
-    ret = gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-cleanup:
-  gnutls_free(pubkey.data);
-  return ret;
+	ret = tdb->verify(db_name, host, service, &pubkey);
+	if (ret < 0 && ret != GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
+		ret = gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
+
+      cleanup:
+	gnutls_free(pubkey.data);
+	return ret;
 }
 
-static int parse_commitment_line(char* line, 
-                      const char* host, size_t host_len,
-                      const char* service, size_t service_len,
-                      time_t now,
-                      const gnutls_datum_t *skey)
+static int parse_commitment_line(char *line,
+				 const char *host, size_t host_len,
+				 const char *service, size_t service_len,
+				 time_t now, const gnutls_datum_t * skey)
 {
-char* p, *kp;
-char* savep = NULL;
-size_t kp_len, phash_size;
-time_t expiration;
-int ret;
-const mac_entry_st* hash_algo;
-uint8_t phash[MAX_HASH_SIZE];
-uint8_t hphash[MAX_HASH_SIZE*2+1];
+	char *p, *kp;
+	char *savep = NULL;
+	size_t kp_len, phash_size;
+	time_t expiration;
+	int ret;
+	const mac_entry_st *hash_algo;
+	uint8_t phash[MAX_HASH_SIZE];
+	uint8_t hphash[MAX_HASH_SIZE * 2 + 1];
 
-  /* read host */
-  p = strtok_r(line, "|", &savep);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-    
-  if (p[0] != '*' && strcmp(p, host) != 0)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	/* read host */
+	p = strtok_r(line, "|", &savep);
+	if (p == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  /* read service */
-  p = strtok_r(NULL, "|", &savep);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-    
-  if (p[0] != '*' && strcmp(p, service) != 0)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	if (p[0] != '*' && strcmp(p, host) != 0)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  /* read expiration */
-  p = strtok_r(NULL, "|", &savep);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-    
-  expiration = (time_t)atol(p);
-  if (expiration > 0 && now > expiration)
-    return gnutls_assert_val(GNUTLS_E_EXPIRED);
+	/* read service */
+	p = strtok_r(NULL, "|", &savep);
+	if (p == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  /* read hash algorithm */
-  p = strtok_r(NULL, "|", &savep);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	if (p[0] != '*' && strcmp(p, service) != 0)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  hash_algo = mac_to_entry(atol(p));
-  if (_gnutls_digest_get_name(hash_algo) == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	/* read expiration */
+	p = strtok_r(NULL, "|", &savep);
+	if (p == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  /* read hash */
-  kp = strtok_r(NULL, "|", &savep);
-  if (kp == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-  
-  p = strpbrk(kp, "\n \r\t|");
-  if (p != NULL) *p = 0;
+	expiration = (time_t) atol(p);
+	if (expiration > 0 && now > expiration)
+		return gnutls_assert_val(GNUTLS_E_EXPIRED);
 
-  /* hash and hex encode */
-  ret = _gnutls_hash_fast (hash_algo->id, skey->data, skey->size, phash);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-    
-  phash_size = _gnutls_hash_get_algo_len(hash_algo);
+	/* read hash algorithm */
+	p = strtok_r(NULL, "|", &savep);
+	if (p == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  p = _gnutls_bin2hex (phash, phash_size,(void*) hphash,
-                         sizeof(hphash), NULL);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	hash_algo = mac_to_entry(atol(p));
+	if (_gnutls_digest_get_name(hash_algo) == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  kp_len = strlen(kp);
-  if (kp_len != phash_size*2)
-    return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
+	/* read hash */
+	kp = strtok_r(NULL, "|", &savep);
+	if (kp == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  if (memcmp(kp, hphash, kp_len) != 0)
-    return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
+	p = strpbrk(kp, "\n \r\t|");
+	if (p != NULL)
+		*p = 0;
 
-  /* key found and matches */
-  return 0;
+	/* hash and hex encode */
+	ret =
+	    _gnutls_hash_fast(hash_algo->id, skey->data, skey->size,
+			      phash);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	phash_size = _gnutls_hash_get_algo_len(hash_algo);
+
+	p = _gnutls_bin2hex(phash, phash_size, (void *) hphash,
+			    sizeof(hphash), NULL);
+	if (p == NULL)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	kp_len = strlen(kp);
+	if (kp_len != phash_size * 2)
+		return
+		    gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
+
+	if (memcmp(kp, hphash, kp_len) != 0)
+		return
+		    gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
+
+	/* key found and matches */
+	return 0;
 }
 
 
-static int parse_line(char* line, 
-                      const char* host, size_t host_len,
-                      const char* service, size_t service_len,
-                      time_t now,
-                      const gnutls_datum_t *rawkey,
-                      const gnutls_datum_t *b64key)
+static int parse_line(char *line,
+		      const char *host, size_t host_len,
+		      const char *service, size_t service_len,
+		      time_t now,
+		      const gnutls_datum_t * rawkey,
+		      const gnutls_datum_t * b64key)
 {
-char* p, *kp;
-char* savep = NULL;
-size_t kp_len;
-time_t expiration;
+	char *p, *kp;
+	char *savep = NULL;
+	size_t kp_len;
+	time_t expiration;
 
-  /* read version */
-  p = strtok_r(line, "|", &savep);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	/* read version */
+	p = strtok_r(line, "|", &savep);
+	if (p == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  if (strncmp(p, "c0", 2) == 0)
-    return parse_commitment_line(p+3, host, host_len, service, service_len, now, rawkey);
+	if (strncmp(p, "c0", 2) == 0)
+		return parse_commitment_line(p + 3, host, host_len,
+					     service, service_len, now,
+					     rawkey);
 
-  if (strncmp(p, "g0", 2) != 0)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	if (strncmp(p, "g0", 2) != 0)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  /* read host */
-  p = strtok_r(NULL, "|", &savep);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	/* read host */
+	p = strtok_r(NULL, "|", &savep);
+	if (p == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  if (p[0] != '*' && strcmp(p, host) != 0)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	if (p[0] != '*' && strcmp(p, host) != 0)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  /* read service */
-  p = strtok_r(NULL, "|", &savep);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-    
-  if (p[0] != '*' && strcmp(p, service) != 0)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	/* read service */
+	p = strtok_r(NULL, "|", &savep);
+	if (p == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  /* read expiration */
-  p = strtok_r(NULL, "|", &savep);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-    
-  expiration = (time_t)atol(p);
-  if (expiration > 0 && now > expiration)
-    return gnutls_assert_val(GNUTLS_E_EXPIRED);
+	if (p[0] != '*' && strcmp(p, service) != 0)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  /* read key */
-  kp = strtok_r(NULL, "|", &savep);
-  if (kp == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-  
-  p = strpbrk(kp, "\n \r\t|");
-  if (p != NULL) *p = 0;
+	/* read expiration */
+	p = strtok_r(NULL, "|", &savep);
+	if (p == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  kp_len = strlen(kp);
-  if (kp_len != b64key->size)
-    return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
-    
-  if (memcmp(kp, b64key->data, b64key->size) != 0)
-    return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
-  
-  /* key found and matches */
-  return 0;
+	expiration = (time_t) atol(p);
+	if (expiration > 0 && now > expiration)
+		return gnutls_assert_val(GNUTLS_E_EXPIRED);
+
+	/* read key */
+	kp = strtok_r(NULL, "|", &savep);
+	if (kp == NULL)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+	p = strpbrk(kp, "\n \r\t|");
+	if (p != NULL)
+		*p = 0;
+
+	kp_len = strlen(kp);
+	if (kp_len != b64key->size)
+		return
+		    gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
+
+	if (memcmp(kp, b64key->data, b64key->size) != 0)
+		return
+		    gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
+
+	/* key found and matches */
+	return 0;
 }
 
 /* Returns the base64 key if found 
  */
-static int verify_pubkey(const char* file, 
-                             const char* host, const char* service, 
-                             const gnutls_datum_t* pubkey)
+static int verify_pubkey(const char *file,
+			 const char *host, const char *service,
+			 const gnutls_datum_t * pubkey)
 {
-FILE* fd;
-char* line = NULL;
-size_t line_size = 0;
-int ret, l2, mismatch = 0;
-size_t host_len = 0, service_len = 0;
-time_t now = gnutls_time(0);
-gnutls_datum_t b64key = { NULL, 0 };
+	FILE *fd;
+	char *line = NULL;
+	size_t line_size = 0;
+	int ret, l2, mismatch = 0;
+	size_t host_len = 0, service_len = 0;
+	time_t now = gnutls_time(0);
+	gnutls_datum_t b64key = { NULL, 0 };
 
-  ret = raw_pubkey_to_base64(pubkey, &b64key);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	ret = raw_pubkey_to_base64(pubkey, &b64key);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  if (host != NULL) host_len = strlen(host);
-  if (service != NULL) service_len = strlen(service);
+	if (host != NULL)
+		host_len = strlen(host);
+	if (service != NULL)
+		service_len = strlen(service);
 
-  fd = fopen(file, "rb");
-  if (fd == NULL)
-    {
-      ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
-      goto cleanup;
-    }
-  
-  do 
-    {
-      l2 = getline(&line, &line_size, fd);
-      if (l2 > 0)
-        {
-          ret = parse_line(line, host, host_len, service, service_len, now, pubkey, &b64key);
-          if (ret == 0) /* found */
-            {
-              goto cleanup;
-            }
-          else if (ret == GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
-            mismatch = 1;
-        }
-    }
-  while(l2 >= 0);
+	fd = fopen(file, "rb");
+	if (fd == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+		goto cleanup;
+	}
 
-  if (mismatch)
-    ret = GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
-  else
-    ret = GNUTLS_E_NO_CERTIFICATE_FOUND;
-  
-cleanup:
-  free(line);
-  if (fd != NULL)
-    fclose(fd);
-  gnutls_free(b64key.data);
-  
-  return ret;
+	do {
+		l2 = getline(&line, &line_size, fd);
+		if (l2 > 0) {
+			ret =
+			    parse_line(line, host, host_len, service,
+				       service_len, now, pubkey, &b64key);
+			if (ret == 0) {	/* found */
+				goto cleanup;
+			} else if (ret ==
+				   GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
+				mismatch = 1;
+		}
+	}
+	while (l2 >= 0);
+
+	if (mismatch)
+		ret = GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
+	else
+		ret = GNUTLS_E_NO_CERTIFICATE_FOUND;
+
+      cleanup:
+	free(line);
+	if (fd != NULL)
+		fclose(fd);
+	gnutls_free(b64key.data);
+
+	return ret;
 }
 
-static int raw_pubkey_to_base64(const gnutls_datum_t* raw, gnutls_datum_t * b64)
+static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
+				gnutls_datum_t * b64)
 {
-  int ret;
-  char* out;
-  
-  ret = base64_encode_alloc((void*)raw->data, raw->size, &out);
-  if (ret == 0)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-  
-  b64->data = (void*)out;
-  b64->size = ret;
+	int ret;
+	char *out;
 
-  return 0;
+	ret = base64_encode_alloc((void *) raw->data, raw->size, &out);
+	if (ret == 0)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	b64->data = (void *) out;
+	b64->size = ret;
+
+	return 0;
 }
 
-static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey)
+static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert,
+				  gnutls_datum_t * rpubkey)
 {
-gnutls_x509_crt_t crt = NULL;
-gnutls_pubkey_t pubkey = NULL;
-size_t size;
-int ret;
+	gnutls_x509_crt_t crt = NULL;
+	gnutls_pubkey_t pubkey = NULL;
+	size_t size;
+	int ret;
 
-  ret = gnutls_x509_crt_init(&crt);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	ret = gnutls_x509_crt_init(&crt);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  ret = gnutls_pubkey_init(&pubkey);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-  
-  ret = gnutls_x509_crt_import(crt, cert, GNUTLS_X509_FMT_DER);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-  ret = gnutls_pubkey_import_x509 (pubkey, crt, 0);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-  
-  size = 0;
-  ret = gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER, NULL, &size);
-  if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
+	ret = gnutls_x509_crt_import(crt, cert, GNUTLS_X509_FMT_DER);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-  rpubkey->data = gnutls_malloc(size);
-  if (rpubkey->data == NULL)
-  if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      ret = GNUTLS_E_MEMORY_ERROR;
-      gnutls_assert();
-      goto cleanup;
-    }
-  
-  ret = gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER, rpubkey->data, &size);
-  if (ret < 0)
-    {
-      gnutls_free(rpubkey->data);
-      gnutls_assert();
-      goto cleanup;
-    }
+	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-  rpubkey->size = size;
-  ret = 0;
+	size = 0;
+	ret =
+	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER, NULL, &size);
+	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-cleanup:
-  gnutls_x509_crt_deinit(crt);
-  gnutls_pubkey_deinit(pubkey);
+	rpubkey->data = gnutls_malloc(size);
+	if (rpubkey->data == NULL)
+		if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			ret = GNUTLS_E_MEMORY_ERROR;
+			gnutls_assert();
+			goto cleanup;
+		}
 
-  return ret;
+	ret =
+	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER,
+				 rpubkey->data, &size);
+	if (ret < 0) {
+		gnutls_free(rpubkey->data);
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	rpubkey->size = size;
+	ret = 0;
+
+      cleanup:
+	gnutls_x509_crt_deinit(crt);
+	gnutls_pubkey_deinit(pubkey);
+
+	return ret;
 }
 
-static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey)
+static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert,
+				 gnutls_datum_t * rpubkey)
 {
 #ifdef ENABLE_OPENPGP
-gnutls_openpgp_crt_t crt = NULL;
-gnutls_pubkey_t pubkey = NULL;
-size_t size;
-int ret;
+	gnutls_openpgp_crt_t crt = NULL;
+	gnutls_pubkey_t pubkey = NULL;
+	size_t size;
+	int ret;
 
-  ret = gnutls_openpgp_crt_init(&crt);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	ret = gnutls_openpgp_crt_init(&crt);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  ret = gnutls_pubkey_init(&pubkey);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-  
-  ret = gnutls_openpgp_crt_import(crt, cert, GNUTLS_OPENPGP_FMT_RAW);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-  ret = gnutls_pubkey_import_openpgp (pubkey, crt, 0);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-  
-  size = 0;
-  ret = gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER, NULL, &size);
-  if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
+	ret = gnutls_openpgp_crt_import(crt, cert, GNUTLS_OPENPGP_FMT_RAW);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-  rpubkey->data = gnutls_malloc(size);
-  if (rpubkey->data == NULL)
-  if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      ret = GNUTLS_E_MEMORY_ERROR;
-      gnutls_assert();
-      goto cleanup;
-    }
-  
-  ret = gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER, rpubkey->data, &size);
-  if (ret < 0)
-    {
-      gnutls_free(rpubkey->data);
-      gnutls_assert();
-      goto cleanup;
-    }
+	ret = gnutls_pubkey_import_openpgp(pubkey, crt, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-  rpubkey->size = size;
-  ret = 0;
+	size = 0;
+	ret =
+	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER, NULL, &size);
+	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-cleanup:
-  gnutls_openpgp_crt_deinit(crt);
-  gnutls_pubkey_deinit(pubkey);
+	rpubkey->data = gnutls_malloc(size);
+	if (rpubkey->data == NULL)
+		if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			ret = GNUTLS_E_MEMORY_ERROR;
+			gnutls_assert();
+			goto cleanup;
+		}
 
-  return ret;
+	ret =
+	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER,
+				 rpubkey->data, &size);
+	if (ret < 0) {
+		gnutls_free(rpubkey->data);
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	rpubkey->size = size;
+	ret = 0;
+
+      cleanup:
+	gnutls_openpgp_crt_deinit(crt);
+	gnutls_pubkey_deinit(pubkey);
+
+	return ret;
 #else
-  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 #endif
 }
 
-static 
-int store_pubkey(const char* db_name, const char* host,
-                 const char* service, time_t expiration, 
-                 const gnutls_datum_t* pubkey)
+static
+int store_pubkey(const char *db_name, const char *host,
+		 const char *service, time_t expiration,
+		 const gnutls_datum_t * pubkey)
 {
-FILE* fd = NULL;
-gnutls_datum_t b64key = { NULL, 0 };
-int ret;
+	FILE *fd = NULL;
+	gnutls_datum_t b64key = { NULL, 0 };
+	int ret;
 
-  ret = gnutls_mutex_lock(&_gnutls_file_mutex);
-  if (ret != 0)
-    return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+	ret = gnutls_mutex_lock(&_gnutls_file_mutex);
+	if (ret != 0)
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
-  ret = raw_pubkey_to_base64(pubkey, &b64key);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
+	ret = raw_pubkey_to_base64(pubkey, &b64key);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-  fd = fopen(db_name, "ab+");
-  if (fd == NULL)
-    {
-      ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
-      goto cleanup;
-    }
+	fd = fopen(db_name, "ab+");
+	if (fd == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+		goto cleanup;
+	}
 
-  if (service == NULL) service = "*";
-  if (host == NULL) host = "*";
+	if (service == NULL)
+		service = "*";
+	if (host == NULL)
+		host = "*";
 
-  fprintf(fd, "|g0|%s|%s|%lu|%.*s\n", host, service, (unsigned long)expiration, 
-    b64key.size, b64key.data);
+	fprintf(fd, "|g0|%s|%s|%lu|%.*s\n", host, service,
+		(unsigned long) expiration, b64key.size, b64key.data);
 
-  ret = 0;
+	ret = 0;
 
-cleanup:
-  if (fd != NULL)
-    fclose(fd);
+      cleanup:
+	if (fd != NULL)
+		fclose(fd);
 
-  gnutls_mutex_unlock(&_gnutls_file_mutex);
-  gnutls_free(b64key.data);
-  
-  return ret;
+	gnutls_mutex_unlock(&_gnutls_file_mutex);
+	gnutls_free(b64key.data);
+
+	return ret;
 }
 
-static 
-int store_commitment(const char* db_name, const char* host,
-                 const char* service, time_t expiration, 
-                 gnutls_digest_algorithm_t hash_algo,
-                 const gnutls_datum_t* hash)
+static
+int store_commitment(const char *db_name, const char *host,
+		     const char *service, time_t expiration,
+		     gnutls_digest_algorithm_t hash_algo,
+		     const gnutls_datum_t * hash)
 {
-FILE* fd;
-char buffer[MAX_HASH_SIZE*2+1];
+	FILE *fd;
+	char buffer[MAX_HASH_SIZE * 2 + 1];
 
-  fd = fopen(db_name, "ab+");
-  if (fd == NULL)
-    return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+	fd = fopen(db_name, "ab+");
+	if (fd == NULL)
+		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 
-  if (service == NULL) service = "*";
-  if (host == NULL) host = "*";
+	if (service == NULL)
+		service = "*";
+	if (host == NULL)
+		host = "*";
 
-  fprintf(fd, "|c0|%s|%s|%lu|%u|%s\n", host, service, (unsigned long)expiration, 
-          (unsigned)hash_algo, _gnutls_bin2hex(hash->data, hash->size, buffer, sizeof(buffer), NULL));
-  
-  fclose(fd);
-  
-  return 0;
+	fprintf(fd, "|c0|%s|%s|%lu|%u|%s\n", host, service,
+		(unsigned long) expiration, (unsigned) hash_algo,
+		_gnutls_bin2hex(hash->data, hash->size, buffer,
+				sizeof(buffer), NULL));
+
+	fclose(fd);
+
+	return 0;
 }
 
 /**
@@ -601,62 +616,65 @@ char buffer[MAX_HASH_SIZE*2+1];
  * Since: 3.0
  **/
 int
-gnutls_store_pubkey(const char* db_name,
-                    gnutls_tdb_t tdb,
-                    const char* host,
-                    const char* service,
-                    gnutls_certificate_type_t cert_type,
-                    const gnutls_datum_t * cert,
-                    time_t expiration,
-                    unsigned int flags)
+gnutls_store_pubkey(const char *db_name,
+		    gnutls_tdb_t tdb,
+		    const char *host,
+		    const char *service,
+		    gnutls_certificate_type_t cert_type,
+		    const gnutls_datum_t * cert,
+		    time_t expiration, unsigned int flags)
 {
-FILE* fd = NULL;
-gnutls_datum_t pubkey = { NULL, 0 };
-int ret;
-char local_file[MAX_FILENAME];
+	FILE *fd = NULL;
+	gnutls_datum_t pubkey = { NULL, 0 };
+	int ret;
+	char local_file[MAX_FILENAME];
 
-  if (cert_type != GNUTLS_CRT_X509 && cert_type != GNUTLS_CRT_OPENPGP)
-    return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
-  
-  if (db_name == NULL && tdb == NULL)
-    {
-      ret = _gnutls_find_config_path(local_file, sizeof(local_file));
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-      
-      _gnutls_debug_log("Configuration path: %s\n", local_file);
-      mkdir(local_file, 0700);
-      
-      ret = find_config_file(local_file, sizeof(local_file));
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-      db_name = local_file;
-    }
+	if (cert_type != GNUTLS_CRT_X509
+	    && cert_type != GNUTLS_CRT_OPENPGP)
+		return
+		    gnutls_assert_val
+		    (GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 
-  if (tdb == NULL)
-    tdb = &default_tdb;
-    
-  if (cert_type == GNUTLS_CRT_X509)
-    ret = x509_crt_to_raw_pubkey(cert, &pubkey);
-  else
-    ret = pgp_crt_to_raw_pubkey(cert, &pubkey);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
+	if (db_name == NULL && tdb == NULL) {
+		ret =
+		    _gnutls_find_config_path(local_file,
+					     sizeof(local_file));
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-  _gnutls_debug_log("Configuration file: %s\n", db_name);
+		_gnutls_debug_log("Configuration path: %s\n", local_file);
+		mkdir(local_file, 0700);
 
-  tdb->store(db_name, host, service, expiration, &pubkey);
+		ret = find_config_file(local_file, sizeof(local_file));
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+		db_name = local_file;
+	}
 
-  ret = 0;
+	if (tdb == NULL)
+		tdb = &default_tdb;
 
-cleanup:
-  gnutls_free(pubkey.data);
-  if (fd != NULL) fclose(fd);
-  
-  return ret;
+	if (cert_type == GNUTLS_CRT_X509)
+		ret = x509_crt_to_raw_pubkey(cert, &pubkey);
+	else
+		ret = pgp_crt_to_raw_pubkey(cert, &pubkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	_gnutls_debug_log("Configuration file: %s\n", db_name);
+
+	tdb->store(db_name, host, service, expiration, &pubkey);
+
+	ret = 0;
+
+      cleanup:
+	gnutls_free(pubkey.data);
+	if (fd != NULL)
+		fclose(fd);
+
+	return ret;
 }
 
 /**
@@ -686,72 +704,73 @@ cleanup:
  * Since: 3.0
  **/
 int
-gnutls_store_commitment(const char* db_name,
-                    gnutls_tdb_t tdb,
-                    const char* host,
-                    const char* service,
-                    gnutls_digest_algorithm_t hash_algo,
-                    const gnutls_datum_t* hash,
-                    time_t expiration,
-                    unsigned int flags)
+gnutls_store_commitment(const char *db_name,
+			gnutls_tdb_t tdb,
+			const char *host,
+			const char *service,
+			gnutls_digest_algorithm_t hash_algo,
+			const gnutls_datum_t * hash,
+			time_t expiration, unsigned int flags)
 {
-FILE* fd = NULL;
-int ret;
-char local_file[MAX_FILENAME];
-const mac_entry_st* me = mac_to_entry(hash_algo);
+	FILE *fd = NULL;
+	int ret;
+	char local_file[MAX_FILENAME];
+	const mac_entry_st *me = mac_to_entry(hash_algo);
 
-  if (_gnutls_digest_is_secure(me) == 0)
-    return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
-    
-  if (_gnutls_hash_get_algo_len(me) != hash->size)
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (_gnutls_digest_is_secure(me) == 0)
+		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
-  if (db_name == NULL && tdb == NULL)
-    {
-      ret = _gnutls_find_config_path(local_file, sizeof(local_file));
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-      
-      _gnutls_debug_log("Configuration path: %s\n", local_file);
-      mkdir(local_file, 0700);
-      
-      ret = find_config_file(local_file, sizeof(local_file));
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-      db_name = local_file;
-    }
+	if (_gnutls_hash_get_algo_len(me) != hash->size)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  if (tdb == NULL)
-    tdb = &default_tdb;
-    
-  _gnutls_debug_log("Configuration file: %s\n", db_name);
+	if (db_name == NULL && tdb == NULL) {
+		ret =
+		    _gnutls_find_config_path(local_file,
+					     sizeof(local_file));
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-  tdb->cstore(db_name, host, service, expiration, me->id, hash);
+		_gnutls_debug_log("Configuration path: %s\n", local_file);
+		mkdir(local_file, 0700);
 
-  ret = 0;
+		ret = find_config_file(local_file, sizeof(local_file));
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+		db_name = local_file;
+	}
 
-  if (fd != NULL) fclose(fd);
-  
-  return ret;
+	if (tdb == NULL)
+		tdb = &default_tdb;
+
+	_gnutls_debug_log("Configuration file: %s\n", db_name);
+
+	tdb->cstore(db_name, host, service, expiration, me->id, hash);
+
+	ret = 0;
+
+	if (fd != NULL)
+		fclose(fd);
+
+	return ret;
 }
 
 #define CONFIG_FILE "known_hosts"
 
-static int find_config_file(char* file, size_t max_size)
+static int find_config_file(char *file, size_t max_size)
 {
-char path[MAX_FILENAME];
-int ret;
+	char path[MAX_FILENAME];
+	int ret;
 
-  ret = _gnutls_find_config_path(path, sizeof(path));
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	ret = _gnutls_find_config_path(path, sizeof(path));
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  if (path[0] == 0)
-    snprintf(file, max_size, "%s", CONFIG_FILE);
-  else
-    snprintf(file, max_size, "%s/%s", path, CONFIG_FILE);
-      
-  return 0;
+	if (path[0] == 0)
+		snprintf(file, max_size, "%s", CONFIG_FILE);
+	else
+		snprintf(file, max_size, "%s/%s", path, CONFIG_FILE);
+
+	return 0;
 }
 
 /**
@@ -763,14 +782,14 @@ int ret;
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_tdb_init(gnutls_tdb_t* tdb)
+int gnutls_tdb_init(gnutls_tdb_t * tdb)
 {
-  *tdb = gnutls_calloc (1, sizeof (struct gnutls_tdb_int));
+	*tdb = gnutls_calloc(1, sizeof(struct gnutls_tdb_int));
 
-  if (!*tdb)
-    return GNUTLS_E_MEMORY_ERROR;
-    
-  return 0;
+	if (!*tdb)
+		return GNUTLS_E_MEMORY_ERROR;
+
+	return 0;
 }
 
 /**
@@ -786,9 +805,10 @@ int gnutls_tdb_init(gnutls_tdb_t* tdb)
  *                       const gnutls_datum_t* pubkey);
  *
  **/
-void gnutls_tdb_set_store_func(gnutls_tdb_t tdb, gnutls_tdb_store_func store)
+void gnutls_tdb_set_store_func(gnutls_tdb_t tdb,
+			       gnutls_tdb_store_func store)
 {
-  tdb->store = store;
+	tdb->store = store;
 }
 
 /**
@@ -805,9 +825,10 @@ void gnutls_tdb_set_store_func(gnutls_tdb_t tdb, gnutls_tdb_store_func store)
  *
  **/
 void gnutls_tdb_set_store_commitment_func(gnutls_tdb_t tdb,
-                                     gnutls_tdb_store_commitment_func cstore)
+					  gnutls_tdb_store_commitment_func
+					  cstore)
 {
-  tdb->cstore = cstore;
+	tdb->cstore = cstore;
 }
 
 /**
@@ -822,9 +843,10 @@ void gnutls_tdb_set_store_commitment_func(gnutls_tdb_t tdb,
  *                      const char* service, const gnutls_datum_t* pubkey);
  *
  **/
-void gnutls_tdb_set_verify_func(gnutls_tdb_t tdb, gnutls_tdb_verify_func verify)
+void gnutls_tdb_set_verify_func(gnutls_tdb_t tdb,
+				gnutls_tdb_verify_func verify)
 {
-  tdb->verify = verify;
+	tdb->verify = verify;
 }
 
 /**
@@ -835,7 +857,5 @@ void gnutls_tdb_set_verify_func(gnutls_tdb_t tdb, gnutls_tdb_verify_func verify)
  **/
 void gnutls_tdb_deinit(gnutls_tdb_t tdb)
 {
-  gnutls_free(tdb);
+	gnutls_free(tdb);
 }
-
-

@@ -229,70 +229,58 @@
   "UWl07o3w\n" \
   "-----END ENCRYPTED PRIVATE KEY-----\n"
 
-static struct
-{
-  const char *name;
-  const char *password;
-  const char *pkcs12key;
-  int expected_result;
-} keys[] =
-{
-  {
-  "x_9607", "123456", X_9607, 0},
-  {
-  "x_9671", "123456", X_9671, 0},
-  {
-  "x_9925", "123456", X_9925, 0},
-  {
-  "x_9926", "123456", X_9926, 0},
-  {
-  "x_9927", "123456", X_9927, 0},
-  {
-  "x_9928", "123456", X_9928, 0},
-  {
-  "x_9929", "123456", X_9929, 0},
-  {
-  "x_9930", "123456", X_9930, 0},
-  {
-  "x_9931", "123456", X_9931, 0},
-  {
-  "x_9932", "123456", X_9932, 0}
+static struct {
+	const char *name;
+	const char *password;
+	const char *pkcs12key;
+	int expected_result;
+} keys[] = {
+	{
+	"x_9607", "123456", X_9607, 0}, {
+	"x_9671", "123456", X_9671, 0}, {
+	"x_9925", "123456", X_9925, 0}, {
+	"x_9926", "123456", X_9926, 0}, {
+	"x_9927", "123456", X_9927, 0}, {
+	"x_9928", "123456", X_9928, 0}, {
+	"x_9929", "123456", X_9929, 0}, {
+	"x_9930", "123456", X_9930, 0}, {
+	"x_9931", "123456", X_9931, 0}, {
+	"x_9932", "123456", X_9932, 0}
 };
 
-int
-main (void)
+int main(void)
 {
-  gnutls_x509_privkey_t key;
-  size_t i;
-  int ret;
+	gnutls_x509_privkey_t key;
+	size_t i;
+	int ret;
 
-  global_init ();
+	global_init();
 
-  for (i = 0; i < sizeof (keys) / sizeof (keys[0]); i++)
-    {
-      gnutls_datum_t tmp;
+	for (i = 0; i < sizeof(keys) / sizeof(keys[0]); i++) {
+		gnutls_datum_t tmp;
 
-      ret = gnutls_x509_privkey_init (&key);
-      if (ret < 0)
-        return 1;
+		ret = gnutls_x509_privkey_init(&key);
+		if (ret < 0)
+			return 1;
 
-      tmp.data = (unsigned char *) keys[i].pkcs12key;
-      tmp.size = strlen ((char*)tmp.data);
+		tmp.data = (unsigned char *) keys[i].pkcs12key;
+		tmp.size = strlen((char *) tmp.data);
 
-      ret = gnutls_x509_privkey_import_pkcs8 (key, &tmp,
-                                              GNUTLS_X509_FMT_PEM,
-                                              keys[i].password, 0);
-      gnutls_x509_privkey_deinit (key);
+		ret = gnutls_x509_privkey_import_pkcs8(key, &tmp,
+						       GNUTLS_X509_FMT_PEM,
+						       keys[i].password,
+						       0);
+		gnutls_x509_privkey_deinit(key);
 
-      if (ret != keys[i].expected_result)
-        {
-          printf ("fail[%d]: %d: %s\n", (int) i, ret, gnutls_strerror (ret));
-          return 1;
-        }
+		if (ret != keys[i].expected_result) {
+			printf("fail[%d]: %d: %s\n", (int) i, ret,
+			       gnutls_strerror(ret));
+			return 1;
+		}
 
-    }
+	}
 
-  gnutls_global_deinit ();
+	gnutls_global_deinit();
 
-  return 0;
+	return 0;
 }

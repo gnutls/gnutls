@@ -52,12 +52,11 @@ static const char EINA_MAGIC_BINSHARE_NODE_STR[] = "Eina Binshare Node";
  *
  * @see eina_init()
  */
-EAPI Eina_Bool
-eina_binshare_init(void)
+EAPI Eina_Bool eina_binshare_init(void)
 {
-   return eina_share_common_init(&binshare_share,
-                                 EINA_MAGIC_BINSHARE_NODE,
-                                 EINA_MAGIC_BINSHARE_NODE_STR);
+	return eina_share_common_init(&binshare_share,
+				      EINA_MAGIC_BINSHARE_NODE,
+				      EINA_MAGIC_BINSHARE_NODE_STR);
 }
 
 /**
@@ -71,12 +70,11 @@ eina_binshare_init(void)
  *
  * @see eina_shutdown()
  */
-EAPI Eina_Bool
-eina_binshare_shutdown(void)
+EAPI Eina_Bool eina_binshare_shutdown(void)
 {
-   Eina_Bool ret;
-   ret = eina_share_common_shutdown(&binshare_share);
-   return ret;
+	Eina_Bool ret;
+	ret = eina_share_common_shutdown(&binshare_share);
+	return ret;
 }
 
 /*============================================================================*
@@ -109,13 +107,12 @@ eina_binshare_shutdown(void)
  * Note that if the given pointer is not shared or NULL, bad things
  * will happen, likely a segmentation fault.
  */
-EAPI void
-eina_binshare_del(const void *obj)
+EAPI void eina_binshare_del(const void *obj)
 {
-   if (!obj)
-      return;
+	if (!obj)
+		return;
 
-   eina_share_common_del(binshare_share, obj);
+	eina_share_common_del(binshare_share, obj);
 }
 
 /**
@@ -138,13 +135,11 @@ eina_binshare_del(const void *obj)
  *
  * @see eina_binshare_add()
  */
-EAPI const void *
-eina_binshare_add_length(const void *obj, unsigned int olen)
+EAPI const void *eina_binshare_add_length(const void *obj,
+					  unsigned int olen)
 {
-   return eina_share_common_add_length(binshare_share,
-                                                     obj,
-                                                     (olen) * sizeof(char),
-                                                     0);
+	return eina_share_common_add_length(binshare_share,
+					    obj, (olen) * sizeof(char), 0);
 }
 
 /**
@@ -161,10 +156,9 @@ eina_binshare_add_length(const void *obj, unsigned int olen)
  *
  * There is no unref since this is the work of eina_binshare_del().
  */
-EAPI const void *
-eina_binshare_ref(const void *obj)
+EAPI const void *eina_binshare_ref(const void *obj)
 {
-   return eina_share_common_ref(binshare_share, obj);
+	return eina_share_common_ref(binshare_share, obj);
 }
 
 /**
@@ -178,10 +172,9 @@ eina_binshare_ref(const void *obj)
  * things will happen, likely a segmentation fault. If in doubt, try
  * strlen().
  */
-EAPI int
-eina_binshare_length(const void *obj)
+EAPI int eina_binshare_length(const void *obj)
 {
-   return eina_share_common_length(binshare_share, obj);
+	return eina_share_common_length(binshare_share, obj);
 }
 
 /**
@@ -190,13 +183,11 @@ eina_binshare_length(const void *obj)
  * This function dumps all objects in the share_common to stdout with a
  * DDD: prefix per line and a memory usage summary.
  */
-EAPI void
-eina_binshare_dump(void)
+EAPI void eina_binshare_dump(void)
 {
-   eina_share_common_dump(binshare_share, NULL, 0);
+	eina_share_common_dump(binshare_share, NULL, 0);
 }
 
 /**
  * @}
  */
-

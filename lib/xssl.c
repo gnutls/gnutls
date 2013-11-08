@@ -39,94 +39,93 @@
  *
  * Since: 3.1.7
  **/
-void xssl_cred_deinit (xssl_cred_t cred)
+void xssl_cred_deinit(xssl_cred_t cred)
 {
-  if (cred->xcred)
-    gnutls_certificate_free_credentials(cred->xcred);
-  gnutls_free(cred);
+	if (cred->xcred)
+		gnutls_certificate_free_credentials(cred->xcred);
+	gnutls_free(cred);
 }
 
 
-static int
-_verify_certificate_callback (gnutls_session_t session)
+static int _verify_certificate_callback(gnutls_session_t session)
 {
-  unsigned int status;
-  xssl_t sb;
-  int ret, type;
-  const char *hostname = NULL;
-  const char *service = NULL;
-  const char *tofu_file = NULL;
+	unsigned int status;
+	xssl_t sb;
+	int ret, type;
+	const char *hostname = NULL;
+	const char *service = NULL;
+	const char *tofu_file = NULL;
 
-  sb = gnutls_session_get_ptr(session);
-  if (sb == NULL)
-    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	sb = gnutls_session_get_ptr(session);
+	if (sb == NULL)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  if (sb->cred == NULL)
-    return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+	if (sb->cred == NULL)
+		return
+		    gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
-  if (sb->server_name[0] != 0)
-    hostname = sb->server_name;
+	if (sb->server_name[0] != 0)
+		hostname = sb->server_name;
 
-  if (sb->service_name[0] != 0)
-    service = sb->service_name;
+	if (sb->service_name[0] != 0)
+		service = sb->service_name;
 
-  if (sb->cred->tofu_file[0] != 0)
-    tofu_file = sb->cred->tofu_file;
+	if (sb->cred->tofu_file[0] != 0)
+		tofu_file = sb->cred->tofu_file;
 
-  /* This verification function uses the trusted CAs in the credentials
-   * structure. So you must have installed one or more CA certificates.
-   */
-  sb->vstatus = 0;
-  if (sb->cred->vflags & GNUTLS_VMETHOD_SYSTEM_CAS || sb->cred->vflags & GNUTLS_VMETHOD_GIVEN_CAS)
-    {
-      ret = gnutls_certificate_verify_peers3 (session, hostname, &status);
-      if (ret < 0)
-        return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
-      
-      sb->vstatus = status;
+	/* This verification function uses the trusted CAs in the credentials
+	 * structure. So you must have installed one or more CA certificates.
+	 */
+	sb->vstatus = 0;
+	if (sb->cred->vflags & GNUTLS_VMETHOD_SYSTEM_CAS
+	    || sb->cred->vflags & GNUTLS_VMETHOD_GIVEN_CAS) {
+		ret =
+		    gnutls_certificate_verify_peers3(session, hostname,
+						     &status);
+		if (ret < 0)
+			return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
 
-      if (status != 0) /* Certificate is not trusted */
-        return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
-    }
+		sb->vstatus = status;
 
-  if (hostname && sb->cred->vflags & GNUTLS_VMETHOD_TOFU)
-    {
-      const gnutls_datum_t *cert_list;
-      unsigned int cert_list_size;
+		if (status != 0)	/* Certificate is not trusted */
+			return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
+	}
 
-      type = gnutls_certificate_type_get (session);
+	if (hostname && sb->cred->vflags & GNUTLS_VMETHOD_TOFU) {
+		const gnutls_datum_t *cert_list;
+		unsigned int cert_list_size;
 
-      /* Do SSH verification */
-      cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
-      if (cert_list == NULL)
-        { 
-          sb->vstatus |= GNUTLS_CERT_INVALID;
-          return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
-        }
+		type = gnutls_certificate_type_get(session);
 
-      /* service may be obtained alternatively using getservbyport() */
-      ret = gnutls_verify_stored_pubkey(tofu_file, NULL, hostname, service, 
-                                    type, &cert_list[0], 0);
-      if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
-        {
-          /* host was not seen before. Store the key */
-          gnutls_store_pubkey(tofu_file, NULL, hostname, service, 
-                              type, &cert_list[0], 0, 0);
-        }
-      else if (ret == GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
-        {
-          sb->vstatus |= GNUTLS_CERT_MISMATCH;
-          return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
-        }
-      else if (ret < 0)
-        {
-          sb->vstatus |= GNUTLS_CERT_INVALID;
-          return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
-        }
-    }
-  
-  /* notify gnutls to continue handshake normally */
-  return 0;
+		/* Do SSH verification */
+		cert_list =
+		    gnutls_certificate_get_peers(session, &cert_list_size);
+		if (cert_list == NULL) {
+			sb->vstatus |= GNUTLS_CERT_INVALID;
+			return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
+		}
+
+		/* service may be obtained alternatively using getservbyport() */
+		ret =
+		    gnutls_verify_stored_pubkey(tofu_file, NULL, hostname,
+						service, type,
+						&cert_list[0], 0);
+		if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND) {
+			/* host was not seen before. Store the key */
+			gnutls_store_pubkey(tofu_file, NULL, hostname,
+					    service, type, &cert_list[0],
+					    0, 0);
+		} else if (ret == GNUTLS_E_CERTIFICATE_KEY_MISMATCH) {
+			sb->vstatus |= GNUTLS_CERT_MISMATCH;
+			return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
+		} else if (ret < 0) {
+			sb->vstatus |= GNUTLS_CERT_INVALID;
+			return gnutls_assert_val(GNUTLS_E_AUTH_ERROR);
+		}
+	}
+
+	/* notify gnutls to continue handshake normally */
+	return 0;
 }
 
 /**
@@ -147,122 +146,141 @@ _verify_certificate_callback (gnutls_session_t session)
  *
  * Since: 3.1.7
  **/
-int xssl_cred_init (xssl_cred_t *c, unsigned vflags, 
-                             gnutls_cinput_st* aux,
-                             unsigned aux_size)
+int xssl_cred_init(xssl_cred_t * c, unsigned vflags,
+		   gnutls_cinput_st * aux, unsigned aux_size)
 {
-int ret;
-unsigned len, i;
-xssl_cred_t cred;
+	int ret;
+	unsigned len, i;
+	xssl_cred_t cred;
 
-  *c = gnutls_calloc(1, sizeof(*cred));
-  if (*c == NULL)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	*c = gnutls_calloc(1, sizeof(*cred));
+	if (*c == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-  cred = *c;
-  cred->vflags = vflags;
+	cred = *c;
+	cred->vflags = vflags;
 
-  if (cred->xcred == NULL)
-    {
-      ret = gnutls_certificate_allocate_credentials(&cred->xcred);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-    }
-  
-  if (vflags & GNUTLS_VMETHOD_SYSTEM_CAS)
-    {
-      ret = gnutls_certificate_set_x509_system_trust(cred->xcred);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto fail1;
-        }
-    }
+	if (cred->xcred == NULL) {
+		ret =
+		    gnutls_certificate_allocate_credentials(&cred->xcred);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
 
-  for (i=0;i<aux_size;i++)
-    {
-      if (aux[i].contents == GNUTLS_CINPUT_KEYPAIR)
-        {
-          if (aux[i].type == GNUTLS_CINPUT_TYPE_FILE)
-            ret = gnutls_certificate_set_x509_key_file(cred->xcred, aux[i].i1.file, aux[i].i2.file, aux[i].fmt);
-          else if (aux[i].type == GNUTLS_CINPUT_TYPE_MEM)
-            ret = gnutls_certificate_set_x509_key_mem(cred->xcred, &aux[i].i1.mem, &aux[i].i2.mem, aux[i].fmt);
-          else if (aux[i].type == GNUTLS_CINPUT_TYPE_PIN_FUNC)
-            {
-              ret = 0;
-              gnutls_certificate_set_pin_function(cred->xcred, aux[i].i1.pin_fn,
-                                                  aux[i].i2.udata);
-            }
-          else ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (vflags & GNUTLS_VMETHOD_SYSTEM_CAS) {
+		ret =
+		    gnutls_certificate_set_x509_system_trust(cred->xcred);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail1;
+		}
+	}
 
-          if (ret < 0)
-            {
-              gnutls_assert();
-              goto fail1;
-            }
-        }
-        
-      if (aux[i].contents == GNUTLS_CINPUT_CAS && (vflags & GNUTLS_VMETHOD_GIVEN_CAS))
-        {
-          if (aux[i].type == GNUTLS_CINPUT_TYPE_FILE)
-            ret = gnutls_certificate_set_x509_trust_file(cred->xcred, aux[i].i1.file, aux[i].fmt);
-          else       
-            ret = gnutls_certificate_set_x509_trust_mem(cred->xcred, &aux[i].i1.mem, aux[i].fmt);
+	for (i = 0; i < aux_size; i++) {
+		if (aux[i].contents == GNUTLS_CINPUT_KEYPAIR) {
+			if (aux[i].type == GNUTLS_CINPUT_TYPE_FILE)
+				ret =
+				    gnutls_certificate_set_x509_key_file
+				    (cred->xcred, aux[i].i1.file,
+				     aux[i].i2.file, aux[i].fmt);
+			else if (aux[i].type == GNUTLS_CINPUT_TYPE_MEM)
+				ret =
+				    gnutls_certificate_set_x509_key_mem
+				    (cred->xcred, &aux[i].i1.mem,
+				     &aux[i].i2.mem, aux[i].fmt);
+			else if (aux[i].type ==
+				 GNUTLS_CINPUT_TYPE_PIN_FUNC) {
+				ret = 0;
+				gnutls_certificate_set_pin_function(cred->
+								    xcred,
+								    aux[i].
+								    i1.
+								    pin_fn,
+								    aux[i].
+								    i2.
+								    udata);
+			} else
+				ret =
+				    gnutls_assert_val
+				    (GNUTLS_E_INVALID_REQUEST);
 
-          if (ret < 0)
-            {
-              gnutls_assert();
-              goto fail1;
-            }
-        } 
+			if (ret < 0) {
+				gnutls_assert();
+				goto fail1;
+			}
+		}
 
-      if (aux[i].contents == GNUTLS_CINPUT_CRLS && (vflags & GNUTLS_VMETHOD_GIVEN_CAS))
-        {
-          if (aux[i].type == GNUTLS_CINPUT_TYPE_FILE)
-            ret = gnutls_certificate_set_x509_crl_file(cred->xcred, aux[i].i1.file, aux[i].fmt);
-          else       
-            ret = gnutls_certificate_set_x509_crl_mem(cred->xcred, &aux[i].i1.mem, aux[i].fmt);
+		if (aux[i].contents == GNUTLS_CINPUT_CAS
+		    && (vflags & GNUTLS_VMETHOD_GIVEN_CAS)) {
+			if (aux[i].type == GNUTLS_CINPUT_TYPE_FILE)
+				ret =
+				    gnutls_certificate_set_x509_trust_file
+				    (cred->xcred, aux[i].i1.file,
+				     aux[i].fmt);
+			else
+				ret =
+				    gnutls_certificate_set_x509_trust_mem
+				    (cred->xcred, &aux[i].i1.mem,
+				     aux[i].fmt);
 
-          if (ret < 0)
-            {
-              gnutls_assert();
-              goto fail1;
-            }
-        }
+			if (ret < 0) {
+				gnutls_assert();
+				goto fail1;
+			}
+		}
 
-      if (aux[i].contents == GNUTLS_CINPUT_TOFU_DB && (vflags & GNUTLS_VMETHOD_TOFU))
-        {
-          if (aux[i].type == GNUTLS_CINPUT_TYPE_FILE)
-            {
-              len = strlen(aux[i].i1.file);
-              if (len >= sizeof(cred->tofu_file))
-                {
-                  ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-                  goto fail1;
-                }
-              memcpy(cred->tofu_file, aux[i].i1.file, len+1);
-              ret = 0;
-            }
-          else
-            ret = GNUTLS_E_INVALID_REQUEST;
+		if (aux[i].contents == GNUTLS_CINPUT_CRLS
+		    && (vflags & GNUTLS_VMETHOD_GIVEN_CAS)) {
+			if (aux[i].type == GNUTLS_CINPUT_TYPE_FILE)
+				ret =
+				    gnutls_certificate_set_x509_crl_file
+				    (cred->xcred, aux[i].i1.file,
+				     aux[i].fmt);
+			else
+				ret =
+				    gnutls_certificate_set_x509_crl_mem
+				    (cred->xcred, &aux[i].i1.mem,
+				     aux[i].fmt);
 
-          if (ret < 0)
-            {
-              gnutls_assert();
-              goto fail1;
-            }
-        }
-    }
-  
-  gnutls_certificate_set_verify_function (cred->xcred, _verify_certificate_callback);
+			if (ret < 0) {
+				gnutls_assert();
+				goto fail1;
+			}
+		}
 
-  return 0;
-fail1:
-  gnutls_certificate_free_credentials(cred->xcred);
-  cred->xcred = NULL;
-  gnutls_free(*c);
+		if (aux[i].contents == GNUTLS_CINPUT_TOFU_DB
+		    && (vflags & GNUTLS_VMETHOD_TOFU)) {
+			if (aux[i].type == GNUTLS_CINPUT_TYPE_FILE) {
+				len = strlen(aux[i].i1.file);
+				if (len >= sizeof(cred->tofu_file)) {
+					ret =
+					    gnutls_assert_val
+					    (GNUTLS_E_INVALID_REQUEST);
+					goto fail1;
+				}
+				memcpy(cred->tofu_file, aux[i].i1.file,
+				       len + 1);
+				ret = 0;
+			} else
+				ret = GNUTLS_E_INVALID_REQUEST;
 
-  return ret;
+			if (ret < 0) {
+				gnutls_assert();
+				goto fail1;
+			}
+		}
+	}
+
+	gnutls_certificate_set_verify_function(cred->xcred,
+					       _verify_certificate_callback);
+
+	return 0;
+      fail1:
+	gnutls_certificate_free_credentials(cred->xcred);
+	cred->xcred = NULL;
+	gnutls_free(*c);
+
+	return ret;
 }
 
 /**
@@ -280,22 +298,21 @@ fail1:
  *
  * Since: 3.1.7
  **/
-int xssl_sinit (xssl_t * isb, gnutls_session_t session,
-                       unsigned int flags)
+int xssl_sinit(xssl_t * isb, gnutls_session_t session, unsigned int flags)
 {
-struct xssl_st* sb;
+	struct xssl_st *sb;
 
-  sb = gnutls_calloc(1, sizeof(*sb));
-  if (sb == NULL)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	sb = gnutls_calloc(1, sizeof(*sb));
+	if (sb == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-  _gnutls_buffer_init(&sb->buf);
-  sb->session = session;
-  sb->flags = flags;
-  
-  *isb = sb;
-  
-  return 0;
+	_gnutls_buffer_init(&sb->buf);
+	sb->session = session;
+	sb->flags = flags;
+
+	*isb = sb;
+
+	return 0;
 }
 
 /**
@@ -320,115 +337,113 @@ struct xssl_st* sb;
  *
  * Since: 3.1.7
  **/
-int xssl_client_init (xssl_t * isb, const char* hostname, 
-                             const char* service,
-                             gnutls_transport_ptr fd, 
-                             const char* priority, xssl_cred_t cred,
-                             unsigned int *status,
-                             unsigned int flags)
+int xssl_client_init(xssl_t * isb, const char *hostname,
+		     const char *service,
+		     gnutls_transport_ptr fd,
+		     const char *priority, xssl_cred_t cred,
+		     unsigned int *status, unsigned int flags)
 {
-struct xssl_st* sb;
-gnutls_session_t session;
-int ret;
-unsigned len;
+	struct xssl_st *sb;
+	gnutls_session_t session;
+	int ret;
+	unsigned len;
 
-  ret = gnutls_init(&session, GNUTLS_CLIENT);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	ret = gnutls_init(&session, GNUTLS_CLIENT);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  sb = gnutls_calloc(1, sizeof(*sb));
-  if (sb == NULL)
-    {
-      gnutls_deinit(session);
-      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-      goto fail1;
-    }
-  _gnutls_buffer_init(&sb->buf);
-  sb->session = session;
-  sb->flags = flags;
-  sb->cred = cred;
-  
-  /* set session/handshake info 
-   */
-  gnutls_handshake_set_timeout(session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
-  
-  if (priority == NULL) priority = "NORMAL:%COMPAT";
-  ret = gnutls_priority_set_direct(session, priority, NULL);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto fail1;
-    }
-  
-  if (cred->xcred)
-    {
-      ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred->xcred);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto fail1;
-        }
-    }
+	sb = gnutls_calloc(1, sizeof(*sb));
+	if (sb == NULL) {
+		gnutls_deinit(session);
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto fail1;
+	}
+	_gnutls_buffer_init(&sb->buf);
+	sb->session = session;
+	sb->flags = flags;
+	sb->cred = cred;
 
-  if (hostname)
-    {
-      len = strlen(hostname);
-      
-      if (len >= sizeof(sb->server_name))
-        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-      memcpy(sb->server_name, hostname, len+1);
+	/* set session/handshake info 
+	 */
+	gnutls_handshake_set_timeout(session,
+				     GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
-      ret = gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname, len);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto fail1;
-        }
-    }
+	if (priority == NULL)
+		priority = "NORMAL:%COMPAT";
+	ret = gnutls_priority_set_direct(session, priority, NULL);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail1;
+	}
 
-  if (service)
-    {
-      len = strlen(service);
-      
-      if (len >= sizeof(sb->service_name))
-        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-      memcpy(sb->service_name, service, len+1);
-    }
+	if (cred->xcred) {
+		ret =
+		    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+					   cred->xcred);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail1;
+		}
+	}
 
-  gnutls_transport_set_ptr (session, fd);
-  gnutls_session_set_ptr( session, sb);
+	if (hostname) {
+		len = strlen(hostname);
 
-  do
-    {
-      ret = gnutls_handshake(session);
-    }
-  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
-  if (status) *status = sb->vstatus;
+		if (len >= sizeof(sb->server_name))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		memcpy(sb->server_name, hostname, len + 1);
 
-  if (ret < 0)
-    {
-      int ret2;
-      do
-        {
-          ret2 = gnutls_alert_send_appropriate(sb->session, ret);
-        }
-      while (ret2 < 0 && gnutls_error_is_fatal(ret2) == 0);
+		ret =
+		    gnutls_server_name_set(session, GNUTLS_NAME_DNS,
+					   hostname, len);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail1;
+		}
+	}
 
-      return gnutls_assert_val(ret);
+	if (service) {
+		len = strlen(service);
 
-      gnutls_assert();
-      goto fail1;
-    }
-  
-  *isb = sb;
-  
-  return 0;
+		if (len >= sizeof(sb->service_name))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		memcpy(sb->service_name, service, len + 1);
+	}
 
-fail1:
-  if (sb)
-    xssl_deinit(sb);
-  
-  return ret;
+	gnutls_transport_set_ptr(session, fd);
+	gnutls_session_set_ptr(session, sb);
+
+	do {
+		ret = gnutls_handshake(session);
+	}
+	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	if (status)
+		*status = sb->vstatus;
+
+	if (ret < 0) {
+		int ret2;
+		do {
+			ret2 =
+			    gnutls_alert_send_appropriate(sb->session,
+							  ret);
+		}
+		while (ret2 < 0 && gnutls_error_is_fatal(ret2) == 0);
+
+		return gnutls_assert_val(ret);
+
+		gnutls_assert();
+		goto fail1;
+	}
+
+	*isb = sb;
+
+	return 0;
+
+      fail1:
+	if (sb)
+		xssl_deinit(sb);
+
+	return ret;
 }
 
 /**
@@ -449,98 +464,100 @@ fail1:
  *
  * Since: 3.1.7
  **/
-int xssl_server_init (xssl_t * isb,
-                             gnutls_transport_ptr fd, 
-                             const char* priority, xssl_cred_t cred,
-                             unsigned int *status,
-                             unsigned int flags)
+int xssl_server_init(xssl_t * isb,
+		     gnutls_transport_ptr fd,
+		     const char *priority, xssl_cred_t cred,
+		     unsigned int *status, unsigned int flags)
 {
-struct xssl_st* sb;
-gnutls_session_t session;
-int ret;
+	struct xssl_st *sb;
+	gnutls_session_t session;
+	int ret;
 
-  ret = gnutls_init(&session, GNUTLS_SERVER);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	ret = gnutls_init(&session, GNUTLS_SERVER);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  sb = gnutls_calloc(1, sizeof(*sb));
-  if (sb == NULL)
-    {
-      gnutls_deinit(session);
-      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-      goto fail1;
-    }
-  _gnutls_buffer_init(&sb->buf);
-  sb->session = session;
-  sb->flags = flags;
-  sb->cred = cred;
-  
-  /* set session/handshake info 
-   */
-  gnutls_handshake_set_timeout(session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
-  
-  if (priority == NULL) priority = "NORMAL:%COMPAT";
-  ret = gnutls_priority_set_direct(session, priority, NULL);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto fail1;
-    }
-  
-  if (cred->xcred)
-    {
-      if (cred->xcred->ncerts == 0 && cred->xcred->get_cert_callback2 == NULL)
-        {
-          ret = gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
-          goto fail1;
-        }
-      
-      ret = gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred->xcred);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto fail1;
-        }
-      
-    }
+	sb = gnutls_calloc(1, sizeof(*sb));
+	if (sb == NULL) {
+		gnutls_deinit(session);
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto fail1;
+	}
+	_gnutls_buffer_init(&sb->buf);
+	sb->session = session;
+	sb->flags = flags;
+	sb->cred = cred;
 
-  if (cred->vflags & GNUTLS_VMETHOD_GIVEN_CAS)
-    gnutls_certificate_server_set_request( session, GNUTLS_CERT_REQUIRE);
+	/* set session/handshake info 
+	 */
+	gnutls_handshake_set_timeout(session,
+				     GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
-  gnutls_transport_set_ptr( session, fd);
-  gnutls_session_set_ptr( session, sb);
+	if (priority == NULL)
+		priority = "NORMAL:%COMPAT";
+	ret = gnutls_priority_set_direct(session, priority, NULL);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail1;
+	}
 
-  do
-    {
-      ret = gnutls_handshake(session);
-    }
-  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
-  if (status) *status = sb->vstatus;
+	if (cred->xcred) {
+		if (cred->xcred->ncerts == 0
+		    && cred->xcred->get_cert_callback2 == NULL) {
+			ret =
+			    gnutls_assert_val
+			    (GNUTLS_E_INSUFFICIENT_CREDENTIALS);
+			goto fail1;
+		}
 
-  if (ret < 0)
-    {
-      int ret2;
-      do
-        {
-          ret2 = gnutls_alert_send_appropriate(sb->session, ret);
-        }
-      while (ret2 < 0 && gnutls_error_is_fatal(ret2) == 0);
+		ret =
+		    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
+					   cred->xcred);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail1;
+		}
 
-      return gnutls_assert_val(ret);
+	}
 
-      gnutls_assert();
-      goto fail1;
-    }
-  
-  *isb = sb;
-  
-  return 0;
+	if (cred->vflags & GNUTLS_VMETHOD_GIVEN_CAS)
+		gnutls_certificate_server_set_request(session,
+						      GNUTLS_CERT_REQUIRE);
 
-fail1:
-  if (sb)
-    xssl_deinit(sb);
-  
-  return ret;
+	gnutls_transport_set_ptr(session, fd);
+	gnutls_session_set_ptr(session, sb);
+
+	do {
+		ret = gnutls_handshake(session);
+	}
+	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	if (status)
+		*status = sb->vstatus;
+
+	if (ret < 0) {
+		int ret2;
+		do {
+			ret2 =
+			    gnutls_alert_send_appropriate(sb->session,
+							  ret);
+		}
+		while (ret2 < 0 && gnutls_error_is_fatal(ret2) == 0);
+
+		return gnutls_assert_val(ret);
+
+		gnutls_assert();
+		goto fail1;
+	}
+
+	*isb = sb;
+
+	return 0;
+
+      fail1:
+	if (sb)
+		xssl_deinit(sb);
+
+	return ret;
 }
 
 /**
@@ -555,13 +572,12 @@ fail1:
  **/
 void xssl_deinit(xssl_t sb)
 {
-  if (sb->session)
-    {
-      gnutls_bye(sb->session, GNUTLS_SHUT_WR);
-      gnutls_deinit(sb->session);
-    }
-  _gnutls_buffer_clear(&sb->buf);
-  gnutls_free(sb);
+	if (sb->session) {
+		gnutls_bye(sb->session, GNUTLS_SHUT_WR);
+		gnutls_deinit(sb->session);
+	}
+	_gnutls_buffer_clear(&sb->buf);
+	gnutls_free(sb);
 }
 
 /**
@@ -582,31 +598,30 @@ void xssl_deinit(xssl_t sb)
  *
  * Since: 3.1.7
  **/
-ssize_t xssl_write (xssl_t sb, const void *data,
-                           size_t data_size)
+ssize_t xssl_write(xssl_t sb, const void *data, size_t data_size)
 {
-int ret;
-  
-  ret = _gnutls_buffer_append_data(&sb->buf, data, data_size);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-  
-  while ((sb->flags & GNUTLS_SBUF_WRITE_FLUSHES) && 
-       sb->buf.length >= MAX_RECORD_SEND_SIZE(sb->session))
-    {
-      do
-        {
-          ret = gnutls_record_send(sb->session, sb->buf.data, sb->buf.length);
-        }
-      while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
+	int ret;
 
-      sb->buf.data += ret;
-      sb->buf.length -= ret;
-    }
-  
-  return data_size;
+	ret = _gnutls_buffer_append_data(&sb->buf, data, data_size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	while ((sb->flags & GNUTLS_SBUF_WRITE_FLUSHES) &&
+	       sb->buf.length >= MAX_RECORD_SEND_SIZE(sb->session)) {
+		do {
+			ret =
+			    gnutls_record_send(sb->session, sb->buf.data,
+					       sb->buf.length);
+		}
+		while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		sb->buf.data += ret;
+		sb->buf.length -= ret;
+	}
+
+	return data_size;
 }
 
 /**
@@ -624,25 +639,25 @@ int ret;
  *
  * Since: 3.1.7
  **/
-ssize_t xssl_printf (xssl_t sb, const char *fmt, ...)
+ssize_t xssl_printf(xssl_t sb, const char *fmt, ...)
 {
-int ret;
-va_list args;
-int len;
-char* str;
+	int ret;
+	va_list args;
+	int len;
+	char *str;
 
-  va_start(args, fmt);
-  len = vasprintf(&str, fmt, args);
-  va_end(args);
-  
-  if (len < 0 || !str)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-  
-  ret = xssl_write (sb, str, len);
-  
-  gnutls_free(str);
+	va_start(args, fmt);
+	len = vasprintf(&str, fmt, args);
+	va_end(args);
 
-  return ret;
+	if (len < 0 || !str)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	ret = xssl_write(sb, str, len);
+
+	gnutls_free(str);
+
+	return ret;
 }
 
 /**
@@ -657,27 +672,27 @@ char* str;
  *
  * Since: 3.1.7
  **/
-ssize_t xssl_flush (xssl_t sb)
+ssize_t xssl_flush(xssl_t sb)
 {
-int ret;
-ssize_t total = 0;
+	int ret;
+	ssize_t total = 0;
 
-  while(sb->buf.length > 0)
-    {
-      do
-        {
-          ret = gnutls_record_send(sb->session, sb->buf.data, sb->buf.length);
-        }
-      while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
+	while (sb->buf.length > 0) {
+		do {
+			ret =
+			    gnutls_record_send(sb->session, sb->buf.data,
+					       sb->buf.length);
+		}
+		while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-      sb->buf.data += ret;
-      sb->buf.length -= ret;
-      total += ret;
-    }
+		sb->buf.data += ret;
+		sb->buf.length -= ret;
+		total += ret;
+	}
 
-  return total;
+	return total;
 }
 
 /**
@@ -694,20 +709,19 @@ ssize_t total = 0;
  *
  * Since: 3.1.7
  **/
-ssize_t xssl_read(xssl_t sb, void* data, size_t data_size)
+ssize_t xssl_read(xssl_t sb, void *data, size_t data_size)
 {
-int ret;
+	int ret;
 
-  do
-    {
-      ret = gnutls_record_recv(sb->session, data, data_size);
-    }
-  while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	do {
+		ret = gnutls_record_recv(sb->session, data, data_size);
+	}
+	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -720,5 +734,5 @@ int ret;
  **/
 gnutls_session_t xssl_get_session(xssl_t sb)
 {
-  return sb->session;
+	return sb->session;
 }

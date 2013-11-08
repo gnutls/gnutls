@@ -25,30 +25,29 @@
 #include <gnutls_errors.h>
 #include <x509/common.h>
 
-typedef struct
-{
-  const char *name;
-  gnutls_sec_param_t sec_param;
-  unsigned int bits;                     /* security level */
-  unsigned int pk_bits;                  /* DH, RSA, SRP */
-  unsigned int dsa_bits;                 /* bits for DSA. Handled differently since
-                                 * choice of key size in DSA is political.
-                                 */
-  unsigned int subgroup_bits;            /* subgroup bits */
-  unsigned int ecc_bits;                 /* bits for ECC keys */
+typedef struct {
+	const char *name;
+	gnutls_sec_param_t sec_param;
+	unsigned int bits;	/* security level */
+	unsigned int pk_bits;	/* DH, RSA, SRP */
+	unsigned int dsa_bits;	/* bits for DSA. Handled differently since
+				 * choice of key size in DSA is political.
+				 */
+	unsigned int subgroup_bits;	/* subgroup bits */
+	unsigned int ecc_bits;	/* bits for ECC keys */
 } gnutls_sec_params_entry;
 
 static const gnutls_sec_params_entry sec_params[] = {
-  {"Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0},
-  {"Export", GNUTLS_SEC_PARAM_EXPORT, 42, 512, 0, 150, 0},
-  {"Very weak", GNUTLS_SEC_PARAM_VERY_WEAK, 64, 767, 0, 160, 0},
-  {"Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1024, 160, 160},
-  {"Low", GNUTLS_SEC_PARAM_LOW, 80, 1248, 2048, 160, 160}, 
-  {"Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192},
-  {"Normal", GNUTLS_SEC_PARAM_NORMAL, 112, 2432, 3072, 224, 224},
-  {"High", GNUTLS_SEC_PARAM_HIGH, 128, 3248, 3072, 256, 256},
-  {"Ultra", GNUTLS_SEC_PARAM_ULTRA, 256, 15424, 3072, 512, 512},
-  {NULL, 0, 0, 0, 0, 0}
+	{"Insecure", GNUTLS_SEC_PARAM_INSECURE, 0, 0, 0, 0, 0},
+	{"Export", GNUTLS_SEC_PARAM_EXPORT, 42, 512, 0, 150, 0},
+	{"Very weak", GNUTLS_SEC_PARAM_VERY_WEAK, 64, 767, 0, 160, 0},
+	{"Weak", GNUTLS_SEC_PARAM_WEAK, 72, 1008, 1024, 160, 160},
+	{"Low", GNUTLS_SEC_PARAM_LOW, 80, 1248, 2048, 160, 160},
+	{"Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192},
+	{"Normal", GNUTLS_SEC_PARAM_NORMAL, 112, 2432, 3072, 224, 224},
+	{"High", GNUTLS_SEC_PARAM_HIGH, 128, 3248, 3072, 256, 256},
+	{"Ultra", GNUTLS_SEC_PARAM_ULTRA, 256, 15424, 3072, 512, 512},
+	{NULL, 0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_SEC_PARAM_LOOP(b) \
@@ -71,41 +70,40 @@ static const gnutls_sec_params_entry sec_params[] = {
  * Since: 2.12.0
  **/
 unsigned int
-gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
-                             gnutls_sec_param_t param)
+gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
+			    gnutls_sec_param_t param)
 {
-  unsigned int ret = 0;
+	unsigned int ret = 0;
 
-  /* handle DSA differently */
-  GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
-                             {
-                               if (algo == GNUTLS_PK_DSA)
-                                 ret = p->dsa_bits;
-                               else if (algo == GNUTLS_PK_EC)
-                                 ret = p->ecc_bits;
-                               else
-                                 ret = p->pk_bits;
-                               break;
-                             }
-      );
-      return ret;
+	/* handle DSA differently */
+	GNUTLS_SEC_PARAM_LOOP(
+	if (p->sec_param == param) {
+		if (algo == GNUTLS_PK_DSA)
+			ret = p->dsa_bits;
+		else if (algo == GNUTLS_PK_EC)
+			ret = p->ecc_bits;
+		else
+			ret = p->pk_bits; break;
+	}
+	);
+	return ret;
 }
 
 /* Returns the corresponding size for subgroup bits (q),
  * given the group bits (p).
  */
-unsigned int
-_gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
+unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits)
 {
-  unsigned int ret = 0;
+	unsigned int ret = 0;
 
-  GNUTLS_SEC_PARAM_LOOP (if (p->pk_bits >= pk_bits)
-                         {
-                           ret = p->subgroup_bits; break;
-                         }
-  );
+	GNUTLS_SEC_PARAM_LOOP(
+		if (p->pk_bits >= pk_bits) {
+			ret = p->subgroup_bits; 
+			break;
+		}
+	);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -119,18 +117,18 @@ _gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
  *
  * Since: 2.12.0
  **/
-const char *
-gnutls_sec_param_get_name (gnutls_sec_param_t param)
+const char *gnutls_sec_param_get_name(gnutls_sec_param_t param)
 {
-  const char *ret = "Unknown";
+	const char *ret = "Unknown";
 
-  GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
-                         {
-                           ret = p->name; break;
-                         }
-  );
+	GNUTLS_SEC_PARAM_LOOP(
+		if (p->sec_param == param) {
+			ret = p->name; 
+			break;
+		}
+	);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -147,29 +145,28 @@ gnutls_sec_param_get_name (gnutls_sec_param_t param)
  * Since: 2.12.0
  **/
 gnutls_sec_param_t
-gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo, unsigned int bits)
+gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo, unsigned int bits)
 {
-  gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_INSECURE;
+	gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_INSECURE;
 
-  if (bits == 0)
-    return GNUTLS_SEC_PARAM_UNKNOWN;
+	if (bits == 0)
+		return GNUTLS_SEC_PARAM_UNKNOWN;
 
-  if (algo == GNUTLS_PK_EC)
-    {
-      GNUTLS_SEC_PARAM_LOOP (if (p->ecc_bits > bits)
-                         {
-                           break;
-                         }
-                         ret = p->sec_param;);
-    }
-  else
-    {
-      GNUTLS_SEC_PARAM_LOOP (if (p->pk_bits > bits)
-                         {
-                           break;
-                         }
-                         ret = p->sec_param;);
-    }
+	if (algo == GNUTLS_PK_EC) {
+		GNUTLS_SEC_PARAM_LOOP(
+			if (p->ecc_bits > bits) {
+				break;
+			}
+			ret = p->sec_param;
+		);
+	} else {
+		GNUTLS_SEC_PARAM_LOOP(
+			if (p->pk_bits > bits) {
+			      break;
+			}
+			ret = p->sec_param;
+		);
+	}
 
-  return ret;
+	return ret;
 }

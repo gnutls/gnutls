@@ -20,14 +20,13 @@
  *
  */
 
-int _gnutls_encrypt (gnutls_session_t session, 
-                     const uint8_t * data,
-                     size_t data_size, size_t min_pad,
-                     mbuffer_st* bufel,
-                     content_type_t type,
-                     record_parameters_st * params);
+int _gnutls_encrypt(gnutls_session_t session,
+		    const uint8_t * data,
+		    size_t data_size, size_t min_pad,
+		    mbuffer_st * bufel,
+		    content_type_t type, record_parameters_st * params);
 
-int _gnutls_decrypt (gnutls_session_t session,
-                     gnutls_datum_t *ciphertext, gnutls_datum_t *output,
-                     content_type_t type, record_parameters_st * params,
-                     uint64* sequence);
+int _gnutls_decrypt(gnutls_session_t session,
+		    gnutls_datum_t * ciphertext, gnutls_datum_t * output,
+		    content_type_t type, record_parameters_st * params,
+		    uint64 * sequence);

@@ -30,23 +30,22 @@
 
 /* See <http://bugs.gentoo.org/272388>. */
 
-void
-doit (void)
+void doit(void)
 {
-  int res;
+	int res;
 
-  res = global_init ();
-  if (res != 0)
-    fail ("global_init\n");
+	res = global_init();
+	if (res != 0)
+		fail("global_init\n");
 
-  gnutls_global_deinit ();
+	gnutls_global_deinit();
 
-  res = global_init ();
-  if (res != 0)
-    fail ("global_init2\n");
+	res = global_init();
+	if (res != 0)
+		fail("global_init2\n");
 
-  gnutls_global_deinit ();
+	gnutls_global_deinit();
 
-  if (debug)
-    success ("init-deinit round-trip success\n");
+	if (debug)
+		success("init-deinit round-trip success\n");
 }

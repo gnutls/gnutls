@@ -33,10 +33,9 @@
 /** Initial DH primes, 1024 bits.
  */
 static char _crywrap_prime_dh_1024[] = "-----BEGIN DH PARAMETERS-----\n"
-"MIGHAoGBAO6vCrmts43WnDP4CvqPxehgcmGHdf88C56iMUycJWV21nTfdJbqgdM4\n"
-"O0gT1pLG4ODV2OJQuYvkjklcHWCJ2tFdx9e0YVTWts6O9K1psV1JglWbKXvPGIXF\n"
-"KfVmZg5X7GjtvDwFcmzAL9TL9Jduqpr9UTj+g3ZDW5/GHS/A6wbjAgEC\n"
-"-----END DH PARAMETERS-----\n";
+    "MIGHAoGBAO6vCrmts43WnDP4CvqPxehgcmGHdf88C56iMUycJWV21nTfdJbqgdM4\n"
+    "O0gT1pLG4ODV2OJQuYvkjklcHWCJ2tFdx9e0YVTWts6O9K1psV1JglWbKXvPGIXF\n"
+    "KfVmZg5X7GjtvDwFcmzAL9TL9Jduqpr9UTj+g3ZDW5/GHS/A6wbjAgEC\n"
+    "-----END DH PARAMETERS-----\n";
 
 #endif
-

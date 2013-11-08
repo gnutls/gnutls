@@ -5,30 +5,30 @@
 #include <Eina.h>
 
 #ifdef EAPI
-# undef EAPI
+#undef EAPI
 #endif
 
 #ifdef _WIN32
-# ifdef EFL_ECORE_BUILD
-#  ifdef DLL_EXPORT
-#   define EAPI __declspec(dllexport)
-#  else
-#   define EAPI
-#  endif /* ! DLL_EXPORT */
-# else
-#  define EAPI __declspec(dllimport)
-# endif /* ! EFL_ECORE_BUILD */
+#ifdef EFL_ECORE_BUILD
+#ifdef DLL_EXPORT
+#define EAPI __declspec(dllexport)
 #else
-# ifdef __GNUC__
-#  if __GNUC__ >= 4
-#   define EAPI __attribute__ ((visibility("default")))
-#  else
-#   define EAPI
-#  endif
-# else
-#  define EAPI
-# endif
-#endif /* ! _WIN32 */
+#define EAPI
+#endif				/* ! DLL_EXPORT */
+#else
+#define EAPI __declspec(dllimport)
+#endif				/* ! EFL_ECORE_BUILD */
+#else
+#ifdef __GNUC__
+#if __GNUC__ >= 4
+#define EAPI __attribute__ ((visibility("default")))
+#else
+#define EAPI
+#endif
+#else
+#define EAPI
+#endif
+#endif				/* ! _WIN32 */
 
 /**
  * @file Ecore_Getopt.h
@@ -53,117 +53,126 @@
 extern "C" {
 #endif
 
-  typedef enum {
-    ECORE_GETOPT_ACTION_STORE,
-    ECORE_GETOPT_ACTION_STORE_CONST,
-    ECORE_GETOPT_ACTION_STORE_TRUE,
-    ECORE_GETOPT_ACTION_STORE_FALSE,
-    ECORE_GETOPT_ACTION_CHOICE,
-    ECORE_GETOPT_ACTION_APPEND,
-    ECORE_GETOPT_ACTION_COUNT,
-    ECORE_GETOPT_ACTION_CALLBACK,
-    ECORE_GETOPT_ACTION_HELP,
-    ECORE_GETOPT_ACTION_VERSION,
-    ECORE_GETOPT_ACTION_COPYRIGHT,
-    ECORE_GETOPT_ACTION_LICENSE
-  } Ecore_Getopt_Action;
+	typedef enum {
+		ECORE_GETOPT_ACTION_STORE,
+		ECORE_GETOPT_ACTION_STORE_CONST,
+		ECORE_GETOPT_ACTION_STORE_TRUE,
+		ECORE_GETOPT_ACTION_STORE_FALSE,
+		ECORE_GETOPT_ACTION_CHOICE,
+		ECORE_GETOPT_ACTION_APPEND,
+		ECORE_GETOPT_ACTION_COUNT,
+		ECORE_GETOPT_ACTION_CALLBACK,
+		ECORE_GETOPT_ACTION_HELP,
+		ECORE_GETOPT_ACTION_VERSION,
+		ECORE_GETOPT_ACTION_COPYRIGHT,
+		ECORE_GETOPT_ACTION_LICENSE
+	} Ecore_Getopt_Action;
 
-  typedef enum {
-    ECORE_GETOPT_TYPE_STR,
-    ECORE_GETOPT_TYPE_BOOL,
-    ECORE_GETOPT_TYPE_SHORT,
-    ECORE_GETOPT_TYPE_INT,
-    ECORE_GETOPT_TYPE_LONG,
-    ECORE_GETOPT_TYPE_USHORT,
-    ECORE_GETOPT_TYPE_UINT,
-    ECORE_GETOPT_TYPE_ULONG,
-    ECORE_GETOPT_TYPE_DOUBLE
-  } Ecore_Getopt_Type;
+	typedef enum {
+		ECORE_GETOPT_TYPE_STR,
+		ECORE_GETOPT_TYPE_BOOL,
+		ECORE_GETOPT_TYPE_SHORT,
+		ECORE_GETOPT_TYPE_INT,
+		ECORE_GETOPT_TYPE_LONG,
+		ECORE_GETOPT_TYPE_USHORT,
+		ECORE_GETOPT_TYPE_UINT,
+		ECORE_GETOPT_TYPE_ULONG,
+		ECORE_GETOPT_TYPE_DOUBLE
+	} Ecore_Getopt_Type;
 
-  typedef enum {
-    ECORE_GETOPT_DESC_ARG_REQUIREMENT_NO = 0,
-    ECORE_GETOPT_DESC_ARG_REQUIREMENT_YES = 1,
-    ECORE_GETOPT_DESC_ARG_REQUIREMENT_OPTIONAL = 3
-  } Ecore_Getopt_Desc_Arg_Requirement;
+	typedef enum {
+		ECORE_GETOPT_DESC_ARG_REQUIREMENT_NO = 0,
+		ECORE_GETOPT_DESC_ARG_REQUIREMENT_YES = 1,
+		ECORE_GETOPT_DESC_ARG_REQUIREMENT_OPTIONAL = 3
+	} Ecore_Getopt_Desc_Arg_Requirement;
 
-  typedef union _Ecore_Getopt_Value             Ecore_Getopt_Value;
+	typedef union _Ecore_Getopt_Value Ecore_Getopt_Value;
 
-  typedef struct _Ecore_Getopt_Desc_Store       Ecore_Getopt_Desc_Store;
-  typedef struct _Ecore_Getopt_Desc_Callback    Ecore_Getopt_Desc_Callback;
-  typedef struct _Ecore_Getopt_Desc             Ecore_Getopt_Desc;
-  typedef struct _Ecore_Getopt                  Ecore_Getopt;
+	typedef struct _Ecore_Getopt_Desc_Store Ecore_Getopt_Desc_Store;
+	typedef struct _Ecore_Getopt_Desc_Callback
+	    Ecore_Getopt_Desc_Callback;
+	typedef struct _Ecore_Getopt_Desc Ecore_Getopt_Desc;
+	typedef struct _Ecore_Getopt Ecore_Getopt;
 
-  union _Ecore_Getopt_Value
-  {
-     char **strp;
-     unsigned char *boolp;
-     short *shortp;
-     int *intp;
-     long *longp;
-     unsigned short *ushortp;
-     unsigned int *uintp;
-     unsigned long *ulongp;
-     double *doublep;
-     Eina_List **listp;
-     void **ptrp;
-  };
+	union _Ecore_Getopt_Value {
+		char **strp;
+		unsigned char *boolp;
+		short *shortp;
+		int *intp;
+		long *longp;
+		unsigned short *ushortp;
+		unsigned int *uintp;
+		unsigned long *ulongp;
+		double *doublep;
+		Eina_List **listp;
+		void **ptrp;
+	};
 
-  struct _Ecore_Getopt_Desc_Store
-  {
-     Ecore_Getopt_Type type;           /**< type of data being handled */
-     Ecore_Getopt_Desc_Arg_Requirement arg_req;
-     union
-     {
-        const char *strv;
-        unsigned char boolv;
-        short shortv;
-        int intv;
-        long longv;
-        unsigned short ushortv;
-        unsigned int uintv;
-        unsigned long ulongv;
-        double doublev;
-     } def;
-  };
+	struct _Ecore_Getopt_Desc_Store {
+		Ecore_Getopt_Type type;/**< type of data being handled */
+		Ecore_Getopt_Desc_Arg_Requirement arg_req;
+		union {
+			const char *strv;
+			unsigned char boolv;
+			short shortv;
+			int intv;
+			long longv;
+			unsigned short ushortv;
+			unsigned int uintv;
+			unsigned long ulongv;
+			double doublev;
+		} def;
+	};
 
-  struct _Ecore_Getopt_Desc_Callback
-  {
-     unsigned char (*func)(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage);
-     const void *data;
-     Ecore_Getopt_Desc_Arg_Requirement arg_req;
-     const char *def;
-  };
+	struct _Ecore_Getopt_Desc_Callback {
+		unsigned char (*func) (const Ecore_Getopt * parser,
+				       const Ecore_Getopt_Desc * desc,
+				       const char *str, void *data,
+				       Ecore_Getopt_Value * storage);
+		const void *data;
+		Ecore_Getopt_Desc_Arg_Requirement arg_req;
+		const char *def;
+	};
 
-  struct _Ecore_Getopt_Desc
-  {
-     char shortname;       /**< used with a single dash */
-     const char *longname; /**< used with double dashes */
-     const char *help;     /**< used by --help/ecore_getopt_help() */
-     const char *metavar;  /**< used by ecore_getopt_help() with nargs > 0 */
+	struct _Ecore_Getopt_Desc {
+		char shortname;
+			   /**< used with a single dash */
+		const char *longname;
+			   /**< used with double dashes */
+		const char *help;
+			   /**< used by --help/ecore_getopt_help() */
+		const char *metavar;
+			   /**< used by ecore_getopt_help() with nargs > 0 */
 
-     Ecore_Getopt_Action action; /**< define how to handle it */
-     union
-     {
-        const Ecore_Getopt_Desc_Store store;
-        const void *store_const;
-        const char *const *choices; /* NULL terminated. */
-        const Ecore_Getopt_Type append_type;
-        const Ecore_Getopt_Desc_Callback callback;
-        const void *dummy;
-     } action_param;
-  };
+		Ecore_Getopt_Action action;
+				 /**< define how to handle it */
+		union {
+			const Ecore_Getopt_Desc_Store store;
+			const void *store_const;
+			const char *const *choices;	/* NULL terminated. */
+			const Ecore_Getopt_Type append_type;
+			const Ecore_Getopt_Desc_Callback callback;
+			const void *dummy;
+		} action_param;
+	};
 
-  struct _Ecore_Getopt
-  {
-     const char *prog; /**< to be used when ecore_app_args_get() fails */
-     const char *usage; /**< usage example, %prog is replaced */
-     const char *version; /**< if exists, --version will work */
-     const char *copyright; /**< if exists, --copyright will work */
-     const char *license; /**< if exists, --license will work */
-     const char *description; /**< long description, possible multiline */
-     unsigned char strict : 1; /**< fail on errors */
-     const Ecore_Getopt_Desc descs[]; /* NULL terminated. */
-  };
+	struct _Ecore_Getopt {
+		const char *prog;
+		       /**< to be used when ecore_app_args_get() fails */
+		const char *usage;
+			/**< usage example, %prog is replaced */
+		const char *version;
+			  /**< if exists, --version will work */
+		const char *copyright;
+			    /**< if exists, --copyright will work */
+		const char *license;
+			  /**< if exists, --license will work */
+		const char *description;
+			      /**< long description, possible multiline */
+		unsigned char strict:1;
+			       /**< fail on errors */
+		const Ecore_Getopt_Desc descs[];	/* NULL terminated. */
+	};
 
 #define ECORE_GETOPT_STORE_FULL(shortname, longname, help, metavar, type, arg_requirement, default_value) \
   {shortname, longname, help, metavar, ECORE_GETOPT_ACTION_STORE,        \
@@ -385,19 +394,43 @@ extern "C" {
 #define ECORE_GETOPT_VALUE_LIST(val)     {.listp = &(val)}
 #define ECORE_GETOPT_VALUE_NONE          {.ptrp = NULL}
 
-  EAPI void ecore_getopt_help(FILE *fp, const Ecore_Getopt *info);
+	EAPI void ecore_getopt_help(FILE * fp, const Ecore_Getopt * info);
 
-  EAPI unsigned char ecore_getopt_parser_has_duplicates(const Ecore_Getopt *parser);
-  EAPI int ecore_getopt_parse(const Ecore_Getopt *parser, Ecore_Getopt_Value *values, int argc, char **argv);
+	EAPI unsigned char ecore_getopt_parser_has_duplicates(const
+							      Ecore_Getopt
+							      * parser);
+	EAPI int ecore_getopt_parse(const Ecore_Getopt * parser,
+				    Ecore_Getopt_Value * values, int argc,
+				    char **argv);
 
-  EAPI Eina_List *ecore_getopt_list_free(Eina_List *list);
+	EAPI Eina_List *ecore_getopt_list_free(Eina_List * list);
 
-  /* helper functions to be used with ECORE_GETOPT_CALLBACK_*() */
-  EAPI unsigned char ecore_getopt_callback_geometry_parse(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage);
-  EAPI unsigned char ecore_getopt_callback_size_parse(const Ecore_Getopt *parser, const Ecore_Getopt_Desc *desc, const char *str, void *data, Ecore_Getopt_Value *storage);
+	/* helper functions to be used with ECORE_GETOPT_CALLBACK_*() */
+	EAPI unsigned char ecore_getopt_callback_geometry_parse(const
+								Ecore_Getopt
+								* parser,
+								const
+								Ecore_Getopt_Desc
+								* desc,
+								const char
+								*str,
+								void *data,
+								Ecore_Getopt_Value
+								* storage);
+	EAPI unsigned char ecore_getopt_callback_size_parse(const
+							    Ecore_Getopt *
+							    parser,
+							    const
+							    Ecore_Getopt_Desc
+							    * desc,
+							    const char
+							    *str,
+							    void *data,
+							    Ecore_Getopt_Value
+							    * storage);
 
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _ECORE_GETOPT_H */
+#endif				/* _ECORE_GETOPT_H */

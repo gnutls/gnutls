@@ -25,29 +25,30 @@
 
 #include <gnutls_errors.h>
 
-int _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
-                            gnutls_handshake_description_t type);
-int _gnutls_recv_hello_request (gnutls_session_t session, void *data,
-                                uint32_t data_size);
-int _gnutls_send_hello (gnutls_session_t session, int again);
-int _gnutls_recv_hello (gnutls_session_t session, uint8_t * data, int datalen);
-int _gnutls_recv_handshake (gnutls_session_t session, 
-                        gnutls_handshake_description_t type,
-                        unsigned int optional, gnutls_buffer_st* buf);
-int _gnutls_generate_session_id (uint8_t * session_id, uint8_t * len);
-int _gnutls_set_server_random (gnutls_session_t session, uint8_t * rnd);
-int _gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd);
+int _gnutls_send_handshake(gnutls_session_t session, mbuffer_st * bufel,
+			   gnutls_handshake_description_t type);
+int _gnutls_recv_hello_request(gnutls_session_t session, void *data,
+			       uint32_t data_size);
+int _gnutls_send_hello(gnutls_session_t session, int again);
+int _gnutls_recv_hello(gnutls_session_t session, uint8_t * data,
+		       int datalen);
+int _gnutls_recv_handshake(gnutls_session_t session,
+			   gnutls_handshake_description_t type,
+			   unsigned int optional, gnutls_buffer_st * buf);
+int _gnutls_generate_session_id(uint8_t * session_id, uint8_t * len);
+int _gnutls_set_server_random(gnutls_session_t session, uint8_t * rnd);
+int _gnutls_set_client_random(gnutls_session_t session, uint8_t * rnd);
 
-int _gnutls_find_pk_algos_in_ciphersuites (uint8_t * data, int datalen);
-int _gnutls_server_select_suite (gnutls_session_t session, uint8_t * data,
-                                 unsigned int datalen);
+int _gnutls_find_pk_algos_in_ciphersuites(uint8_t * data, int datalen);
+int _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
+				unsigned int datalen);
 
-int _gnutls_negotiate_version (gnutls_session_t session,
-                               gnutls_protocol_t adv_version);
-int _gnutls_user_hello_func (gnutls_session_t session,
-                             gnutls_protocol_t adv_version);
+int _gnutls_negotiate_version(gnutls_session_t session,
+			      gnutls_protocol_t adv_version);
+int _gnutls_user_hello_func(gnutls_session_t session,
+			    gnutls_protocol_t adv_version);
 
-void _gnutls_handshake_hash_buffers_clear (gnutls_session_t session);
+void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session);
 
 #define STATE session->internals.handshake_state
 #define FINAL_STATE session->internals.handshake_final_state
@@ -60,15 +61,15 @@ void _gnutls_handshake_hash_buffers_clear (gnutls_session_t session);
 
 inline static int handshake_remaining_time(gnutls_session_t session)
 {
-  if (session->internals.handshake_endtime)
-    {
-      time_t now = gnutls_time(0);
-      if (now < session->internals.handshake_endtime)
-        return (session->internals.handshake_endtime - now) * 1000;
-      else 
-        return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
-    }
-  return 0;
+	if (session->internals.handshake_endtime) {
+		time_t now = gnutls_time(0);
+		if (now < session->internals.handshake_endtime)
+			return (session->internals.handshake_endtime -
+				now) * 1000;
+		else
+			return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+	}
+	return 0;
 }
 
 #endif

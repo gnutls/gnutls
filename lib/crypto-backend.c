@@ -35,12 +35,11 @@ int crypto_mac_prio = INT_MAX;
 int crypto_digest_prio = INT_MAX;
 int crypto_cipher_prio = INT_MAX;
 
-typedef struct algo_list
-{
-  int algorithm;
-  int priority;
-  const void *alg_data;
-  struct algo_list *next;
+typedef struct algo_list {
+	int algorithm;
+	int priority;
+	const void *alg_data;
+	struct algo_list *next;
 } algo_list;
 
 #define cipher_list algo_list
@@ -48,104 +47,92 @@ typedef struct algo_list
 #define digest_list algo_list
 
 static int
-_algo_register (algo_list * al, int algorithm, int priority, const void *s)
+_algo_register(algo_list * al, int algorithm, int priority, const void *s)
 {
-  algo_list *cl;
-  algo_list *last_cl = al;
-  
-  if (al == NULL)
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	algo_list *cl;
+	algo_list *last_cl = al;
 
-  /* look if there is any cipher with lowest priority. In that case do not add.
-   */
-  cl = al;
-  while (cl && cl->alg_data)
-    {
-      if (cl->algorithm == algorithm)
-        {
-          if (cl->priority < priority)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
-            }
-          else
-            {
-              /* the current has higher priority -> overwrite */
-              cl->algorithm = algorithm;
-              cl->priority = priority;
-              cl->alg_data = s;
-              return 0;
-            }
-        }
-      cl = cl->next;
-      if (cl)
-        last_cl = cl;
-    }
+	if (al == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  cl = gnutls_calloc (1, sizeof (cipher_list));
+	/* look if there is any cipher with lowest priority. In that case do not add.
+	 */
+	cl = al;
+	while (cl && cl->alg_data) {
+		if (cl->algorithm == algorithm) {
+			if (cl->priority < priority) {
+				gnutls_assert();
+				return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+			} else {
+				/* the current has higher priority -> overwrite */
+				cl->algorithm = algorithm;
+				cl->priority = priority;
+				cl->alg_data = s;
+				return 0;
+			}
+		}
+		cl = cl->next;
+		if (cl)
+			last_cl = cl;
+	}
 
-  if (cl == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+	cl = gnutls_calloc(1, sizeof(cipher_list));
 
-  last_cl->algorithm = algorithm;
-  last_cl->priority = priority;
-  last_cl->alg_data = s;
-  last_cl->next = cl;
+	if (cl == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-  return 0;
+	last_cl->algorithm = algorithm;
+	last_cl->priority = priority;
+	last_cl->alg_data = s;
+	last_cl->next = cl;
+
+	return 0;
 
 }
 
-static const void *
-_get_algo (algo_list * al, int algo)
+static const void *_get_algo(algo_list * al, int algo)
 {
-  cipher_list *cl;
+	cipher_list *cl;
 
-  /* look if there is any cipher with lowest priority. In that case do not add.
-   */
-  cl = al;
-  while (cl && cl->alg_data)
-    {
-      if (cl->algorithm == algo)
-        {
-          return cl->alg_data;
-        }
-      cl = cl->next;
-    }
+	/* look if there is any cipher with lowest priority. In that case do not add.
+	 */
+	cl = al;
+	while (cl && cl->alg_data) {
+		if (cl->algorithm == algo) {
+			return cl->alg_data;
+		}
+		cl = cl->next;
+	}
 
-  return NULL;
+	return NULL;
 }
 
 static cipher_list glob_cl = { GNUTLS_CIPHER_NULL, 0, NULL, NULL };
 static mac_list glob_ml = { GNUTLS_MAC_NULL, 0, NULL, NULL };
 static digest_list glob_dl = { GNUTLS_MAC_NULL, 0, NULL, NULL };
 
-static void
-_deregister (algo_list * cl)
+static void _deregister(algo_list * cl)
 {
-  algo_list *next;
+	algo_list *next;
 
-  next = cl->next;
-  cl->next = NULL;
-  cl = next;
+	next = cl->next;
+	cl->next = NULL;
+	cl = next;
 
-  while (cl)
-    {
-      next = cl->next;
-      gnutls_free (cl);
-      cl = next;
-    }
+	while (cl) {
+		next = cl->next;
+		gnutls_free(cl);
+		cl = next;
+	}
 }
 
-void
-_gnutls_crypto_deregister (void)
+void _gnutls_crypto_deregister(void)
 {
-  _deregister (&glob_cl);
-  _deregister (&glob_ml);
-  _deregister (&glob_dl);
+	_deregister(&glob_cl);
+	_deregister(&glob_ml);
+	_deregister(&glob_dl);
 }
 
 /*-
@@ -170,17 +157,17 @@ _gnutls_crypto_deregister (void)
  * Since: 2.6.0
  -*/
 int
-gnutls_crypto_single_cipher_register (gnutls_cipher_algorithm_t algorithm,
-                                       int priority,
-                                       const gnutls_crypto_cipher_st * s)
+gnutls_crypto_single_cipher_register(gnutls_cipher_algorithm_t algorithm,
+				     int priority,
+				     const gnutls_crypto_cipher_st * s)
 {
-  return _algo_register (&glob_cl, algorithm, priority, s);
+	return _algo_register(&glob_cl, algorithm, priority, s);
 }
 
-const gnutls_crypto_cipher_st *
-_gnutls_get_crypto_cipher (gnutls_cipher_algorithm_t algo)
+const gnutls_crypto_cipher_st
+    *_gnutls_get_crypto_cipher(gnutls_cipher_algorithm_t algo)
 {
-  return _get_algo (&glob_cl, algo);
+	return _get_algo(&glob_cl, algo);
 }
 
 /*-
@@ -204,17 +191,15 @@ _gnutls_get_crypto_cipher (gnutls_cipher_algorithm_t algo)
  * Since: 2.6.0
  -*/
 int
-gnutls_crypto_rnd_register (int priority,
-                             const gnutls_crypto_rnd_st * s)
+gnutls_crypto_rnd_register(int priority, const gnutls_crypto_rnd_st * s)
 {
-  if (crypto_rnd_prio > priority)
-    {
-      memcpy (&_gnutls_rnd_ops, s, sizeof (*s));
-      crypto_rnd_prio = priority;
-      return 0;
-    }
+	if (crypto_rnd_prio > priority) {
+		memcpy(&_gnutls_rnd_ops, s, sizeof(*s));
+		crypto_rnd_prio = priority;
+		return 0;
+	}
 
-  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+	return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /*-
@@ -239,17 +224,17 @@ gnutls_crypto_rnd_register (int priority,
  * Since: 2.6.0
  -*/
 int
-gnutls_crypto_single_mac_register (gnutls_mac_algorithm_t algorithm,
-                                    int priority, 
-                                    const gnutls_crypto_mac_st * s)
+gnutls_crypto_single_mac_register(gnutls_mac_algorithm_t algorithm,
+				  int priority,
+				  const gnutls_crypto_mac_st * s)
 {
-  return _algo_register (&glob_ml, algorithm, priority, s);
+	return _algo_register(&glob_ml, algorithm, priority, s);
 }
 
-const gnutls_crypto_mac_st *
-_gnutls_get_crypto_mac (gnutls_mac_algorithm_t algo)
+const gnutls_crypto_mac_st *_gnutls_get_crypto_mac(gnutls_mac_algorithm_t
+						   algo)
 {
-  return _get_algo (&glob_ml, algo);
+	return _get_algo(&glob_ml, algo);
 }
 
 /*-
@@ -274,17 +259,17 @@ _gnutls_get_crypto_mac (gnutls_mac_algorithm_t algo)
  * Since: 2.6.0
  -*/
 int
-gnutls_crypto_single_digest_register (gnutls_digest_algorithm_t algorithm,
-                                       int priority,
-                                       const gnutls_crypto_digest_st * s)
+gnutls_crypto_single_digest_register(gnutls_digest_algorithm_t algorithm,
+				     int priority,
+				     const gnutls_crypto_digest_st * s)
 {
-  return _algo_register (&glob_dl, algorithm, priority, s);
+	return _algo_register(&glob_dl, algorithm, priority, s);
 }
 
-const gnutls_crypto_digest_st *
-_gnutls_get_crypto_digest (gnutls_digest_algorithm_t algo)
+const gnutls_crypto_digest_st
+    *_gnutls_get_crypto_digest(gnutls_digest_algorithm_t algo)
 {
-  return _get_algo (&glob_dl, algo);
+	return _get_algo(&glob_dl, algo);
 }
 
 /*-
@@ -311,17 +296,16 @@ _gnutls_get_crypto_digest (gnutls_digest_algorithm_t algo)
  * Since: 2.6.0
  -*/
 int
-gnutls_crypto_bigint_register (int priority,
-                                const gnutls_crypto_bigint_st * s)
+gnutls_crypto_bigint_register(int priority,
+			      const gnutls_crypto_bigint_st * s)
 {
-  if (crypto_bigint_prio > priority)
-    {
-      memcpy (&_gnutls_mpi_ops, s, sizeof (*s));
-      crypto_bigint_prio = priority;
-      return 0;
-    }
+	if (crypto_bigint_prio > priority) {
+		memcpy(&_gnutls_mpi_ops, s, sizeof(*s));
+		crypto_bigint_prio = priority;
+		return 0;
+	}
 
-  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+	return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /*-
@@ -347,18 +331,15 @@ gnutls_crypto_bigint_register (int priority,
  *
  * Since: 2.6.0
  -*/
-int
-gnutls_crypto_pk_register (int priority,
-                            const gnutls_crypto_pk_st * s)
+int gnutls_crypto_pk_register(int priority, const gnutls_crypto_pk_st * s)
 {
-  if (crypto_pk_prio > priority)
-    {
-      memcpy (&_gnutls_pk_ops, s, sizeof (*s));
-      crypto_pk_prio = priority;
-      return 0;
-    }
+	if (crypto_pk_prio > priority) {
+		memcpy(&_gnutls_pk_ops, s, sizeof(*s));
+		crypto_pk_prio = priority;
+		return 0;
+	}
 
-  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+	return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /*-
@@ -382,17 +363,16 @@ gnutls_crypto_pk_register (int priority,
  * Since: 2.6.0
  -*/
 int
-gnutls_crypto_cipher_register (int priority,
-                               const gnutls_crypto_cipher_st * s)
+gnutls_crypto_cipher_register(int priority,
+			      const gnutls_crypto_cipher_st * s)
 {
-  if (crypto_cipher_prio > priority)
-    {
-      memcpy (&_gnutls_cipher_ops, s, sizeof (*s));
-      crypto_cipher_prio = priority;
-      return 0;
-    }
+	if (crypto_cipher_prio > priority) {
+		memcpy(&_gnutls_cipher_ops, s, sizeof(*s));
+		crypto_cipher_prio = priority;
+		return 0;
+	}
 
-  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+	return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /*-
@@ -416,17 +396,15 @@ gnutls_crypto_cipher_register (int priority,
  * Since: 2.6.0
  -*/
 int
-gnutls_crypto_mac_register (int priority,
-                             const gnutls_crypto_mac_st * s)
+gnutls_crypto_mac_register(int priority, const gnutls_crypto_mac_st * s)
 {
-  if (crypto_mac_prio > priority)
-    {
-      memcpy (&_gnutls_mac_ops, s, sizeof (*s));
-      crypto_mac_prio = priority;
-      return 0;
-    }
+	if (crypto_mac_prio > priority) {
+		memcpy(&_gnutls_mac_ops, s, sizeof(*s));
+		crypto_mac_prio = priority;
+		return 0;
+	}
 
-  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+	return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /*-
@@ -450,15 +428,14 @@ gnutls_crypto_mac_register (int priority,
  * Since: 2.6.0
  -*/
 int
-gnutls_crypto_digest_register (int priority,
-                                const gnutls_crypto_digest_st * s)
+gnutls_crypto_digest_register(int priority,
+			      const gnutls_crypto_digest_st * s)
 {
-  if (crypto_digest_prio > priority)
-    {
-      memcpy (&_gnutls_digest_ops, s, sizeof (*s));
-      crypto_digest_prio = priority;
-      return 0;
-    }
+	if (crypto_digest_prio > priority) {
+		memcpy(&_gnutls_digest_ops, s, sizeof(*s));
+		crypto_digest_prio = priority;
+		return 0;
+	}
 
-  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+	return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }

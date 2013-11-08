@@ -132,17 +132,15 @@ int main (int argc, char **argv)
    the consecutive list-item, or the pre-consecutive list-item.
    this obviates the need for a hash table for 99% of
    cercumstances the time */
-struct list
-{
-  long length;
-  long item_size;
-  struct list_item
-  {
-    struct list_item *next;
-    struct list_item *prev;
-    char data[1];
-  } *head, *tail, *search;
-  void (*free_func) (struct list_item *);
+struct list {
+	long length;
+	long item_size;
+	struct list_item {
+		struct list_item *next;
+		struct list_item *prev;
+		char data[1];
+	} *head, *tail, *search;
+	void (*free_func) (struct list_item *);
 };
 
 /* declare a list of type `x', also called `x' having members `typelist' */
@@ -446,4 +444,4 @@ struct list
 	free (__t);									\
     }											\
 
-#endif /* _LIST_H */
+#endif				/* _LIST_H */

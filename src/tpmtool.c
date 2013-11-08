@@ -46,11 +46,12 @@
 #include "certtool-common.h"
 #include "tpmtool-args.h"
 
-static void cmd_parser (int argc, char **argv);
-static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, unsigned int flags);
-static void tpm_pubkey(const char* url, FILE* outfile);
-static void tpm_delete(const char* url, FILE* outfile);
-static void tpm_list(FILE* outfile);
+static void cmd_parser(int argc, char **argv);
+static void tpm_generate(FILE * outfile, unsigned int key_type,
+			 unsigned int bits, unsigned int flags);
+static void tpm_pubkey(const char *url, FILE * outfile);
+static void tpm_delete(const char *url, FILE * outfile);
+static void tpm_list(FILE * outfile);
 
 static gnutls_x509_crt_fmt_t incert_format, outcert_format;
 static gnutls_tpmkey_fmt_t inkey_format, outkey_format;
@@ -59,252 +60,226 @@ static FILE *outfile;
 static FILE *infile;
 int batch = 0;
 
-static void
-tls_log_func (int level, const char *str)
+static void tls_log_func(int level, const char *str)
 {
-  fprintf (stderr, "|<%d>| %s", level, str);
+	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
 
-int
-main (int argc, char **argv)
+int main(int argc, char **argv)
 {
-  cmd_parser (argc, argv);
+	cmd_parser(argc, argv);
 
-  return 0;
+	return 0;
 }
 
-static void
-cmd_parser (int argc, char **argv)
+static void cmd_parser(int argc, char **argv)
 {
-  int ret, debug = 0;
-  unsigned int optct;
-  unsigned int key_type = GNUTLS_PK_UNKNOWN;
-  unsigned int bits = 0;
-  unsigned int genflags = 0;
-  /* Note that the default sec-param is legacy because several TPMs
-   * cannot handle larger keys.
-   */
-  const char* sec_param = "legacy";
-  
-  optct = optionProcess( &tpmtoolOptions, argc, argv);
-  argc += optct;
-  argv += optct;
- 
-  if (HAVE_OPT(DEBUG))
-    debug = OPT_VALUE_DEBUG;
+	int ret, debug = 0;
+	unsigned int optct;
+	unsigned int key_type = GNUTLS_PK_UNKNOWN;
+	unsigned int bits = 0;
+	unsigned int genflags = 0;
+	/* Note that the default sec-param is legacy because several TPMs
+	 * cannot handle larger keys.
+	 */
+	const char *sec_param = "legacy";
 
-  if (HAVE_OPT(INDER))
-    {
-      incert_format = GNUTLS_X509_FMT_DER;
-      inkey_format = GNUTLS_TPMKEY_FMT_DER;
-    }
-  else
-    {
-      incert_format = GNUTLS_X509_FMT_PEM;
-      inkey_format = GNUTLS_TPMKEY_FMT_CTK_PEM;
-    }
+	optct = optionProcess(&tpmtoolOptions, argc, argv);
+	argc += optct;
+	argv += optct;
 
-  if (HAVE_OPT(OUTDER))
-    {
-      outcert_format = GNUTLS_X509_FMT_DER;
-      outkey_format = GNUTLS_TPMKEY_FMT_DER;
-    }
-  else
-    {
-      outcert_format = GNUTLS_X509_FMT_PEM;
-      outkey_format = GNUTLS_TPMKEY_FMT_CTK_PEM;
-    }
+	if (HAVE_OPT(DEBUG))
+		debug = OPT_VALUE_DEBUG;
 
-  if (HAVE_OPT(REGISTER))
-    genflags |= GNUTLS_TPM_REGISTER_KEY;
-  if (!HAVE_OPT(LEGACY))
-    genflags |= GNUTLS_TPM_KEY_SIGNING;
-  if (HAVE_OPT(USER))
-    genflags |= GNUTLS_TPM_KEY_USER;
+	if (HAVE_OPT(INDER)) {
+		incert_format = GNUTLS_X509_FMT_DER;
+		inkey_format = GNUTLS_TPMKEY_FMT_DER;
+	} else {
+		incert_format = GNUTLS_X509_FMT_PEM;
+		inkey_format = GNUTLS_TPMKEY_FMT_CTK_PEM;
+	}
 
-  gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (debug);
-  if (debug > 1)
-    printf ("Setting log level to %d\n", debug);
+	if (HAVE_OPT(OUTDER)) {
+		outcert_format = GNUTLS_X509_FMT_DER;
+		outkey_format = GNUTLS_TPMKEY_FMT_DER;
+	} else {
+		outcert_format = GNUTLS_X509_FMT_PEM;
+		outkey_format = GNUTLS_TPMKEY_FMT_CTK_PEM;
+	}
 
-  if ((ret = gnutls_global_init ()) < 0)
-    {
-      fprintf (stderr, "global_init: %s", gnutls_strerror (ret));
-      exit(1);
-    }
+	if (HAVE_OPT(REGISTER))
+		genflags |= GNUTLS_TPM_REGISTER_KEY;
+	if (!HAVE_OPT(LEGACY))
+		genflags |= GNUTLS_TPM_KEY_SIGNING;
+	if (HAVE_OPT(USER))
+		genflags |= GNUTLS_TPM_KEY_USER;
 
-  if (HAVE_OPT(OUTFILE))
-    {
-      outfile = safe_open_rw (OPT_ARG(OUTFILE), 0);
-      if (outfile == NULL)
-        {
-          fprintf (stderr, "%s", OPT_ARG(OUTFILE));
-          exit(1);
-        }
-    }
-  else
-    outfile = stdout;
+	gnutls_global_set_log_function(tls_log_func);
+	gnutls_global_set_log_level(debug);
+	if (debug > 1)
+		printf("Setting log level to %d\n", debug);
 
-  if (HAVE_OPT(INFILE))
-    {
-      infile = fopen (OPT_ARG(INFILE), "rb");
-      if (infile == NULL)
-        {
-          fprintf (stderr, "%s", OPT_ARG(INFILE));
-          exit(1);
-        }
-    }
-  else
-    infile = stdin;
+	if ((ret = gnutls_global_init()) < 0) {
+		fprintf(stderr, "global_init: %s", gnutls_strerror(ret));
+		exit(1);
+	}
 
-  if (HAVE_OPT(SEC_PARAM))
-    sec_param = OPT_ARG(SEC_PARAM);
-  if (HAVE_OPT(BITS))
-    bits = OPT_VALUE_BITS;
-  
+	if (HAVE_OPT(OUTFILE)) {
+		outfile = safe_open_rw(OPT_ARG(OUTFILE), 0);
+		if (outfile == NULL) {
+			fprintf(stderr, "%s", OPT_ARG(OUTFILE));
+			exit(1);
+		}
+	} else
+		outfile = stdout;
 
-  if (HAVE_OPT(GENERATE_RSA))
-    {
-      key_type = GNUTLS_PK_RSA;
-      bits = get_bits (key_type, bits, sec_param, 0);
-      tpm_generate (outfile, key_type, bits, genflags);
-    }
-  else if (HAVE_OPT(PUBKEY))
-    {
-      tpm_pubkey (OPT_ARG(PUBKEY), outfile);
-    }
-  else if (HAVE_OPT(DELETE))
-    {
-      tpm_delete (OPT_ARG(DELETE), outfile);
-    }
-  else if (HAVE_OPT(LIST))
-    {
-      tpm_list (outfile);
-    }
-  else 
-    {
-      USAGE(1);
-    }
-    
-  fclose (outfile);
+	if (HAVE_OPT(INFILE)) {
+		infile = fopen(OPT_ARG(INFILE), "rb");
+		if (infile == NULL) {
+			fprintf(stderr, "%s", OPT_ARG(INFILE));
+			exit(1);
+		}
+	} else
+		infile = stdin;
 
-  gnutls_global_deinit ();
+	if (HAVE_OPT(SEC_PARAM))
+		sec_param = OPT_ARG(SEC_PARAM);
+	if (HAVE_OPT(BITS))
+		bits = OPT_VALUE_BITS;
+
+
+	if (HAVE_OPT(GENERATE_RSA)) {
+		key_type = GNUTLS_PK_RSA;
+		bits = get_bits(key_type, bits, sec_param, 0);
+		tpm_generate(outfile, key_type, bits, genflags);
+	} else if (HAVE_OPT(PUBKEY)) {
+		tpm_pubkey(OPT_ARG(PUBKEY), outfile);
+	} else if (HAVE_OPT(DELETE)) {
+		tpm_delete(OPT_ARG(DELETE), outfile);
+	} else if (HAVE_OPT(LIST)) {
+		tpm_list(outfile);
+	} else {
+		USAGE(1);
+	}
+
+	fclose(outfile);
+
+	gnutls_global_deinit();
 }
 
-static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits, unsigned int flags)
+static void tpm_generate(FILE * outfile, unsigned int key_type,
+			 unsigned int bits, unsigned int flags)
 {
-  int ret;
-  char* srk_pass, *key_pass = NULL;
-  gnutls_datum_t privkey, pubkey;
-  
-  srk_pass = getpass ("Enter SRK password: ");
-  if (srk_pass != NULL)
-    srk_pass = strdup(srk_pass);
+	int ret;
+	char *srk_pass, *key_pass = NULL;
+	gnutls_datum_t privkey, pubkey;
 
-  if (!(flags & GNUTLS_TPM_REGISTER_KEY))
-    {
-      key_pass = getpass ("Enter key password: ");
-      if (key_pass != NULL)
-        key_pass = strdup(srk_pass);
-    }
-  
-  ret = gnutls_tpm_privkey_generate(key_type, bits, srk_pass, key_pass,
-                                    outkey_format, outcert_format, 
-                                    &privkey, &pubkey,
-                                    flags);
+	srk_pass = getpass("Enter SRK password: ");
+	if (srk_pass != NULL)
+		srk_pass = strdup(srk_pass);
 
-  free(key_pass);
-  free(srk_pass);
+	if (!(flags & GNUTLS_TPM_REGISTER_KEY)) {
+		key_pass = getpass("Enter key password: ");
+		if (key_pass != NULL)
+			key_pass = strdup(srk_pass);
+	}
 
-  if (ret < 0)
-    {
-      fprintf (stderr, "gnutls_tpm_privkey_generate: %s", gnutls_strerror (ret));
-      exit(1);
-    }
+	ret =
+	    gnutls_tpm_privkey_generate(key_type, bits, srk_pass, key_pass,
+					outkey_format, outcert_format,
+					&privkey, &pubkey, flags);
+
+	free(key_pass);
+	free(srk_pass);
+
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_tpm_privkey_generate: %s",
+			gnutls_strerror(ret));
+		exit(1);
+	}
 
 /*  fwrite (pubkey.data, 1, pubkey.size, outfile);
   fputs ("\n", outfile);*/
-  fwrite (privkey.data, 1, privkey.size, outfile);
-  fputs ("\n", outfile);
-  
-  gnutls_free(privkey.data);
-  gnutls_free(pubkey.data);
+	fwrite(privkey.data, 1, privkey.size, outfile);
+	fputs("\n", outfile);
+
+	gnutls_free(privkey.data);
+	gnutls_free(pubkey.data);
 }
 
-static void tpm_delete(const char* url, FILE* outfile)
+static void tpm_delete(const char *url, FILE * outfile)
 {
-  int ret;
-  char* srk_pass;
-  
-  srk_pass = getpass ("Enter SRK password: ");
-  
-  ret = gnutls_tpm_privkey_delete(url, srk_pass);
-  if (ret < 0)
-    {
-      fprintf (stderr, "gnutls_tpm_privkey_delete: %s", gnutls_strerror (ret));
-      exit(1);
-    }
+	int ret;
+	char *srk_pass;
 
-  fprintf (outfile, "Key %s deleted\n", url);
+	srk_pass = getpass("Enter SRK password: ");
+
+	ret = gnutls_tpm_privkey_delete(url, srk_pass);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_tpm_privkey_delete: %s",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(outfile, "Key %s deleted\n", url);
 }
 
-static void tpm_list(FILE* outfile)
+static void tpm_list(FILE * outfile)
 {
-  int ret;
-  gnutls_tpm_key_list_t list;
-  unsigned int i;
-  char* url;
-  
-  ret = gnutls_tpm_get_registered (&list);
-  if (ret < 0)
-    {
-      fprintf (stderr, "gnutls_tpm_get_registered: %s", gnutls_strerror (ret));
-      exit(1);
-    }
-    
-  fprintf(outfile, "Available keys:\n");
-  for (i=0;;i++)
-    {
-      ret = gnutls_tpm_key_list_get_url(list, i, &url, 0);
-      if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-        break;
-      else if (ret < 0)
-        {
-          fprintf (stderr, "gnutls_tpm_key_list_get_url: %s", gnutls_strerror (ret));
-          exit(1);
-        }
-  
-      fprintf(outfile, "\t%u: %s\n", i, url);
-      gnutls_free(url);
-    }
+	int ret;
+	gnutls_tpm_key_list_t list;
+	unsigned int i;
+	char *url;
 
-  fputs ("\n", outfile);
+	ret = gnutls_tpm_get_registered(&list);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_tpm_get_registered: %s",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(outfile, "Available keys:\n");
+	for (i = 0;; i++) {
+		ret = gnutls_tpm_key_list_get_url(list, i, &url, 0);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+		else if (ret < 0) {
+			fprintf(stderr, "gnutls_tpm_key_list_get_url: %s",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\t%u: %s\n", i, url);
+		gnutls_free(url);
+	}
+
+	fputs("\n", outfile);
 }
 
-static void tpm_pubkey(const char* url, FILE* outfile)
+static void tpm_pubkey(const char *url, FILE * outfile)
 {
-  int ret;
-  char* srk_pass;
-  gnutls_pubkey_t pubkey;
-  
-  srk_pass = getpass ("Enter SRK password: ");
-  if (srk_pass != NULL)
-    srk_pass = strdup(srk_pass);
+	int ret;
+	char *srk_pass;
+	gnutls_pubkey_t pubkey;
 
-  gnutls_pubkey_init(&pubkey);
+	srk_pass = getpass("Enter SRK password: ");
+	if (srk_pass != NULL)
+		srk_pass = strdup(srk_pass);
 
-  ret = gnutls_pubkey_import_tpm_url(pubkey, url, srk_pass, 0);
+	gnutls_pubkey_init(&pubkey);
 
-  free(srk_pass);
+	ret = gnutls_pubkey_import_tpm_url(pubkey, url, srk_pass, 0);
 
-  if (ret < 0)
-    {
-      fprintf (stderr, "gnutls_pubkey_import_tpm_url: %s", gnutls_strerror (ret));
-      exit(1);
-    }
+	free(srk_pass);
 
-  _pubkey_info(outfile, GNUTLS_CRT_PRINT_FULL, pubkey);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_pubkey_import_tpm_url: %s",
+			gnutls_strerror(ret));
+		exit(1);
+	}
 
-  gnutls_pubkey_deinit(pubkey);
+	_pubkey_info(outfile, GNUTLS_CRT_PRINT_FULL, pubkey);
+
+	gnutls_pubkey_deinit(pubkey);
 }

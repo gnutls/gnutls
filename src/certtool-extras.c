@@ -46,89 +46,91 @@
 
 /* Loads a x509 private key list
  */
-gnutls_x509_privkey_t *
-load_privkey_list (int mand, size_t * privkey_size, common_info_st * info)
+gnutls_x509_privkey_t *load_privkey_list(int mand, size_t * privkey_size,
+					 common_info_st * info)
 {
-  static gnutls_x509_privkey_t key[MAX_KEYS];
-  char *ptr;
-  int ret, i;
-  gnutls_datum_t dat, file_data;
-  int ptr_size;
-  unsigned int flags = 0;
-  const char* pass;
+	static gnutls_x509_privkey_t key[MAX_KEYS];
+	char *ptr;
+	int ret, i;
+	gnutls_datum_t dat, file_data;
+	int ptr_size;
+	unsigned int flags = 0;
+	const char *pass;
 
-  *privkey_size = 0;
-  fprintf (stderr, "Loading private key list...\n");
+	*privkey_size = 0;
+	fprintf(stderr, "Loading private key list...\n");
 
-  if (info->privkey == NULL)
-    {
-      if (mand)
-        {
-          fprintf( stderr, "missing --load-privkey");
-          exit(1);
-        }
-      else
-        return NULL;
-    }
+	if (info->privkey == NULL) {
+		if (mand) {
+			fprintf(stderr, "missing --load-privkey");
+			exit(1);
+		} else
+			return NULL;
+	}
 
-  ret = gnutls_load_file(info->privkey, &file_data);
-  if (ret < 0)
-    {
-      fprintf (stderr, "%s", info->privkey);
-      exit(1);
-    }
+	ret = gnutls_load_file(info->privkey, &file_data);
+	if (ret < 0) {
+		fprintf(stderr, "%s", info->privkey);
+		exit(1);
+	}
 
-  ptr = (void*)file_data.data;
-  ptr_size = file_data.size;
+	ptr = (void *) file_data.data;
+	ptr_size = file_data.size;
 
-  for (i = 0; i < MAX_KEYS; i++)
-    {
-      ret = gnutls_x509_privkey_init (&key[i]);
-      if (ret < 0)
-        {
-          fprintf( stderr, "privkey_init: %s", gnutls_strerror (ret));
-          exit(1);
-        }
+	for (i = 0; i < MAX_KEYS; i++) {
+		ret = gnutls_x509_privkey_init(&key[i]);
+		if (ret < 0) {
+			fprintf(stderr, "privkey_init: %s",
+				gnutls_strerror(ret));
+			exit(1);
+		}
 
-      dat.data = (void*)ptr;
-      dat.size = ptr_size;
+		dat.data = (void *) ptr;
+		dat.size = ptr_size;
 
-      ret = gnutls_x509_privkey_import2 (key[i], &dat, info->incert_format, NULL, 0);
-      if (ret == GNUTLS_E_DECRYPTION_FAILED)
-        {
-          pass = get_password (info, &flags, 0);
-          ret = gnutls_x509_privkey_import2 (key[i], &dat, info->incert_format, pass, flags);
-        }
+		ret =
+		    gnutls_x509_privkey_import2(key[i], &dat,
+						info->incert_format, NULL,
+						0);
+		if (ret == GNUTLS_E_DECRYPTION_FAILED) {
+			pass = get_password(info, &flags, 0);
+			ret =
+			    gnutls_x509_privkey_import2(key[i], &dat,
+							info->
+							incert_format,
+							pass, flags);
+		}
 
-      if (ret < 0 && *privkey_size > 0)
-        break;
-      if (ret < 0)
-        {
-          fprintf( stderr, "privkey_import: %s", gnutls_strerror (ret));
-          exit(1);
-        }
+		if (ret < 0 && *privkey_size > 0)
+			break;
+		if (ret < 0) {
+			fprintf(stderr, "privkey_import: %s",
+				gnutls_strerror(ret));
+			exit(1);
+		}
 
-      (*privkey_size)++;
+		(*privkey_size)++;
 
-      if (info->incert_format != GNUTLS_X509_FMT_PEM)
-      	break;
+		if (info->incert_format != GNUTLS_X509_FMT_PEM)
+			break;
 
-      ptr = strstr (ptr, "---END");
-      if (ptr == NULL)
-        break;
-      ptr++;
+		ptr = strstr(ptr, "---END");
+		if (ptr == NULL)
+			break;
+		ptr++;
 
-      ptr_size = file_data.size;
-      ptr_size -=
-        (unsigned int) ((unsigned char *) ptr - (unsigned char *) buffer);
+		ptr_size = file_data.size;
+		ptr_size -=
+		    (unsigned int) ((unsigned char *) ptr -
+				    (unsigned char *) buffer);
 
-      if (ptr_size < 0)
-        break;
+		if (ptr_size < 0)
+			break;
 
-    }
-  
-  gnutls_free(file_data.data);
-  fprintf (stderr, "Loaded %d private keys.\n", (int) *privkey_size);
+	}
 
-  return key;
+	gnutls_free(file_data.data);
+	fprintf(stderr, "Loaded %d private keys.\n", (int) *privkey_size);
+
+	return key;
 }

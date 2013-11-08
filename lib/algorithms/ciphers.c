@@ -34,46 +34,67 @@
  * Make sure to update MAX_CIPHER_BLOCK_SIZE and MAX_CIPHER_KEY_SIZE as well.
  */
 static const cipher_entry_st algorithms[] = {
-  {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 16, 0},
-  {"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC, 16, 24, CIPHER_BLOCK, 16, 16, 0},
-  {"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 16, 0},
-  {"AES-128-GCM", GNUTLS_CIPHER_AES_128_GCM, 16, 16, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 12, 1},
-  {"AES-256-GCM", GNUTLS_CIPHER_AES_256_GCM, 16, 32, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 12, 1},
-  {"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0, 0},
-  {"ESTREAM-SALSA20-256", GNUTLS_CIPHER_ESTREAM_SALSA20_256, 64, 32, CIPHER_STREAM, 8, 8, 0},
-  {"SALSA20-256", GNUTLS_CIPHER_SALSA20_256, 64, 32, CIPHER_STREAM, 8, 8, 0},
-  {"CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC, 16, 32, CIPHER_BLOCK,
-   16, 16, 0},
-  {"CAMELLIA-192-CBC", GNUTLS_CIPHER_CAMELLIA_192_CBC, 16, 24, CIPHER_BLOCK,
-   16, 16, 0},
-  {"CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16, CIPHER_BLOCK,
-   16, 16, 0},
-  {"CAMELLIA-128-GCM", GNUTLS_CIPHER_CAMELLIA_128_GCM, 16, 16, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 12, 1},
-  {"CAMELLIA-256-GCM", GNUTLS_CIPHER_CAMELLIA_256_GCM, 16, 32, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 12, 1},
-  {"3DES-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 8, 0},
-  {"DES-CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 8, 0},
-  {"ARCFOUR-40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 0, 0},
-  {"RC2-40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 8, 0},
+	{"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK,
+	 16, 16, 0},
+	{"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC, 16, 24, CIPHER_BLOCK,
+	 16, 16, 0},
+	{"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK,
+	 16, 16, 0},
+	{"AES-128-GCM", GNUTLS_CIPHER_AES_128_GCM, 16, 16, CIPHER_STREAM,
+	 AEAD_IMPLICIT_DATA_SIZE, 12, 1},
+	{"AES-256-GCM", GNUTLS_CIPHER_AES_256_GCM, 16, 32, CIPHER_STREAM,
+	 AEAD_IMPLICIT_DATA_SIZE, 12, 1},
+	{"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0,
+	 0, 0},
+	{"ESTREAM-SALSA20-256", GNUTLS_CIPHER_ESTREAM_SALSA20_256, 64, 32,
+	 CIPHER_STREAM, 8, 8, 0},
+	{"SALSA20-256", GNUTLS_CIPHER_SALSA20_256, 64, 32, CIPHER_STREAM,
+	 8, 8, 0},
+	{"CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC, 16, 32,
+	 CIPHER_BLOCK,
+	 16, 16, 0},
+	{"CAMELLIA-192-CBC", GNUTLS_CIPHER_CAMELLIA_192_CBC, 16, 24,
+	 CIPHER_BLOCK,
+	 16, 16, 0},
+	{"CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16,
+	 CIPHER_BLOCK,
+	 16, 16, 0},
+	{"CAMELLIA-128-GCM", GNUTLS_CIPHER_CAMELLIA_128_GCM, 16, 16,
+	 CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 12, 1},
+	{"CAMELLIA-256-GCM", GNUTLS_CIPHER_CAMELLIA_256_GCM, 16, 32,
+	 CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 12, 1},
+	{"3DES-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 8, 0},
+	{"DES-CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 8, 0},
+	{"ARCFOUR-40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 0,
+	 0},
+	{"RC2-40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 8, 0},
 
 #ifdef ENABLE_OPENPGP
-  {"IDEA-PGP-CFB", GNUTLS_CIPHER_IDEA_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 8, 0},
-  {"3DES-PGP-CFB", GNUTLS_CIPHER_3DES_PGP_CFB, 8, 24, CIPHER_BLOCK, 8, 8, 0},
-  {"CAST5-PGP-CFB", GNUTLS_CIPHER_CAST5_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 8, 0},
-  {"BLOWFISH-PGP-CFB", GNUTLS_CIPHER_BLOWFISH_PGP_CFB, 8,
-   16 /*actually unlimited */ , CIPHER_BLOCK, 8, 8, 0},
-  {"SAFER-SK128-PGP-CFB", GNUTLS_CIPHER_SAFER_SK128_PGP_CFB, 8, 16,
-   CIPHER_BLOCK, 8, 8, 0},
-  {"AES-128-PGP-CFB", GNUTLS_CIPHER_AES128_PGP_CFB, 16, 16, CIPHER_BLOCK, 16,
-   16, 0},
-  {"AES-192-PGP-CFB", GNUTLS_CIPHER_AES192_PGP_CFB, 16, 24, CIPHER_BLOCK, 16,
-   16, 0},
-  {"AES-256-PGP-CFB", GNUTLS_CIPHER_AES256_PGP_CFB, 16, 32, CIPHER_BLOCK, 16,
-   16, 0},
-  {"TWOFISH-PGP-CFB", GNUTLS_CIPHER_TWOFISH_PGP_CFB, 16, 16, CIPHER_BLOCK, 16,
-   16, 0},
+	{"IDEA-PGP-CFB", GNUTLS_CIPHER_IDEA_PGP_CFB, 8, 16, CIPHER_BLOCK,
+	 8, 8, 0},
+	{"3DES-PGP-CFB", GNUTLS_CIPHER_3DES_PGP_CFB, 8, 24, CIPHER_BLOCK,
+	 8, 8, 0},
+	{"CAST5-PGP-CFB", GNUTLS_CIPHER_CAST5_PGP_CFB, 8, 16, CIPHER_BLOCK,
+	 8, 8, 0},
+	{"BLOWFISH-PGP-CFB", GNUTLS_CIPHER_BLOWFISH_PGP_CFB, 8,
+	 16 /*actually unlimited */ , CIPHER_BLOCK, 8, 8, 0},
+	{"SAFER-SK128-PGP-CFB", GNUTLS_CIPHER_SAFER_SK128_PGP_CFB, 8, 16,
+	 CIPHER_BLOCK, 8, 8, 0},
+	{"AES-128-PGP-CFB", GNUTLS_CIPHER_AES128_PGP_CFB, 16, 16,
+	 CIPHER_BLOCK, 16,
+	 16, 0},
+	{"AES-192-PGP-CFB", GNUTLS_CIPHER_AES192_PGP_CFB, 16, 24,
+	 CIPHER_BLOCK, 16,
+	 16, 0},
+	{"AES-256-PGP-CFB", GNUTLS_CIPHER_AES256_PGP_CFB, 16, 32,
+	 CIPHER_BLOCK, 16,
+	 16, 0},
+	{"TWOFISH-PGP-CFB", GNUTLS_CIPHER_TWOFISH_PGP_CFB, 16, 16,
+	 CIPHER_BLOCK, 16,
+	 16, 0},
 #endif
-  {"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0}
+	{"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_CIPHER_LOOP(b) \
@@ -85,11 +106,11 @@ static const cipher_entry_st algorithms[] = {
 
 /* CIPHER functions */
 
-const cipher_entry_st* cipher_to_entry(gnutls_cipher_algorithm_t c)
+const cipher_entry_st *cipher_to_entry(gnutls_cipher_algorithm_t c)
 {
-  GNUTLS_CIPHER_LOOP (if (c==p->id) return p);
+	GNUTLS_CIPHER_LOOP(if (c == p->id) return p);
 
-  return NULL;
+	return NULL;
 }
 
 /**
@@ -100,12 +121,11 @@ const cipher_entry_st* cipher_to_entry(gnutls_cipher_algorithm_t c)
  *
  * Since: 2.10.0
  **/
-int
-gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm)
+int gnutls_cipher_get_block_size(gnutls_cipher_algorithm_t algorithm)
 {
-  size_t ret = 0;
-  GNUTLS_ALG_LOOP (ret = p->blocksize);
-  return ret;
+	size_t ret = 0;
+	GNUTLS_ALG_LOOP(ret = p->blocksize);
+	return ret;
 
 }
 
@@ -117,10 +137,9 @@ gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm)
  *
  * Since: 3.2.2
  **/
-int
-gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm)
+int gnutls_cipher_get_tag_size(gnutls_cipher_algorithm_t algorithm)
 {
-  return _gnutls_cipher_get_tag_size(cipher_to_entry(algorithm));
+	return _gnutls_cipher_get_tag_size(cipher_to_entry(algorithm));
 }
 
 /**
@@ -133,27 +152,27 @@ gnutls_cipher_get_tag_size (gnutls_cipher_algorithm_t algorithm)
  *
  * Since: 3.2.0
  **/
-int
-gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm)
+int gnutls_cipher_get_iv_size(gnutls_cipher_algorithm_t algorithm)
 {
-  size_t ret = 0;
-  GNUTLS_ALG_LOOP (ret = p->cipher_iv);
-  return ret;
+	size_t ret = 0;
+	GNUTLS_ALG_LOOP(ret = p->cipher_iv);
+	return ret;
 }
 
 
  /* returns the priority */
 int
-_gnutls_cipher_priority (gnutls_session_t session,
-                         gnutls_cipher_algorithm_t algorithm)
+_gnutls_cipher_priority(gnutls_session_t session,
+			gnutls_cipher_algorithm_t algorithm)
 {
-  unsigned int i;
-  for (i = 0; i < session->internals.priorities.cipher.algorithms; i++)
-    {
-      if (session->internals.priorities.cipher.priority[i] == algorithm)
-        return i;
-    }
-  return -1;
+	unsigned int i;
+	for (i = 0; i < session->internals.priorities.cipher.algorithms;
+	     i++) {
+		if (session->internals.priorities.cipher.priority[i] ==
+		    algorithm)
+			return i;
+	}
+	return -1;
 }
 
 /**
@@ -165,12 +184,11 @@ _gnutls_cipher_priority (gnutls_session_t session,
  * Returns: length (in bytes) of the given cipher's key size, or 0 if
  *   the given cipher is invalid.
  **/
-size_t
-gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm)
-{                               /* In bytes */
-  size_t ret = 0;
-  GNUTLS_ALG_LOOP (ret = p->keysize);
-  return ret;
+size_t gnutls_cipher_get_key_size(gnutls_cipher_algorithm_t algorithm)
+{				/* In bytes */
+	size_t ret = 0;
+	GNUTLS_ALG_LOOP(ret = p->keysize);
+	return ret;
 
 }
 
@@ -183,15 +201,14 @@ gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm)
  * Returns: a pointer to a string that contains the name of the
  *   specified cipher, or %NULL.
  **/
-const char *
-gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
+const char *gnutls_cipher_get_name(gnutls_cipher_algorithm_t algorithm)
 {
-  const char *ret = NULL;
+	const char *ret = NULL;
 
-  /* avoid prefix */
-  GNUTLS_ALG_LOOP (ret = p->name);
+	/* avoid prefix */
+	GNUTLS_ALG_LOOP(ret = p->name);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -203,20 +220,18 @@ gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
  * Returns: return a #gnutls_cipher_algorithm_t value corresponding to
  *   the specified cipher, or %GNUTLS_CIPHER_UNKNOWN on error.
  **/
-gnutls_cipher_algorithm_t
-gnutls_cipher_get_id (const char *name)
+gnutls_cipher_algorithm_t gnutls_cipher_get_id(const char *name)
 {
-  gnutls_cipher_algorithm_t ret = GNUTLS_CIPHER_UNKNOWN;
+	gnutls_cipher_algorithm_t ret = GNUTLS_CIPHER_UNKNOWN;
 
-  GNUTLS_CIPHER_LOOP (
-    if (strcasecmp (p->name, name) == 0) 
-      {
-        ret = p->id;
-        break;
-      }
-  );
+	GNUTLS_CIPHER_LOOP(
+		if (strcasecmp(p->name, name) == 0) {
+			ret = p->id; 
+			break;
+		}
+	);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -233,22 +248,20 @@ gnutls_cipher_get_id (const char *name)
  *   integers indicating the available ciphers.
  *
  **/
-const gnutls_cipher_algorithm_t *
-gnutls_cipher_list (void)
+const gnutls_cipher_algorithm_t *gnutls_cipher_list(void)
 {
-static gnutls_cipher_algorithm_t supported_ciphers[MAX_ALGOS] = {0};
+	static gnutls_cipher_algorithm_t supported_ciphers[MAX_ALGOS] =
+	    { 0 };
 
-  if (supported_ciphers[0] == 0)
-    {
-      int i = 0;
+	if (supported_ciphers[0] == 0) {
+		int i = 0;
 
-      GNUTLS_CIPHER_LOOP (
-        if (_gnutls_cipher_exists(p->id))
-          supported_ciphers[i++]=p->id;
-      );
-      supported_ciphers[i++]=0;
-    }
+		GNUTLS_CIPHER_LOOP(
+			if (_gnutls_cipher_exists(p->id))
+				supported_ciphers[i++] = p->id;
+		);
+		supported_ciphers[i++] = 0;
+	}
 
-  return supported_ciphers;
+	return supported_ciphers;
 }
-

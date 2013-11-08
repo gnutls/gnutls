@@ -32,46 +32,40 @@
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
 
-typedef struct cert_type_entry
-{
-  const char* name;
-  dane_cert_type_t type;
+typedef struct cert_type_entry {
+	const char *name;
+	dane_cert_type_t type;
 } cert_type_entry;
 
-static const cert_type_entry dane_cert_types[] = 
-{
-  {"X.509", DANE_CERT_X509},
-  {"SubjectPublicKeyInfo", DANE_CERT_PK},
-  {NULL, 0}
+static const cert_type_entry dane_cert_types[] = {
+	{"X.509", DANE_CERT_X509},
+	{"SubjectPublicKeyInfo", DANE_CERT_PK},
+	{NULL, 0}
 };
 
-typedef struct match_type_entry
-{
-  const char* name;
-  dane_match_type_t type;
+typedef struct match_type_entry {
+	const char *name;
+	dane_match_type_t type;
 } match_type_entry;
 
-static const match_type_entry dane_match_types[] = 
-{
-  {"Exact match", DANE_MATCH_EXACT},
-  {"SHA2-256 hash", DANE_MATCH_SHA2_256},
-  {"SHA2-512 hash", DANE_MATCH_SHA2_512},
-  {NULL, 0}
+static const match_type_entry dane_match_types[] = {
+	{"Exact match", DANE_MATCH_EXACT},
+	{"SHA2-256 hash", DANE_MATCH_SHA2_256},
+	{"SHA2-512 hash", DANE_MATCH_SHA2_512},
+	{NULL, 0}
 };
 
-typedef struct cert_usage_entry
-{
-  const char* name;
-  dane_cert_usage_t usage;
+typedef struct cert_usage_entry {
+	const char *name;
+	dane_cert_usage_t usage;
 } cert_usage_entry;
 
-static const cert_usage_entry dane_cert_usages[] = 
-{
-  {"CA", DANE_CERT_USAGE_CA},
-  {"End-entity", DANE_CERT_USAGE_EE},
-  {"Local CA", DANE_CERT_USAGE_LOCAL_CA},
-  {"Local end-entity", DANE_CERT_USAGE_LOCAL_EE},
-  {NULL, 0}
+static const cert_usage_entry dane_cert_usages[] = {
+	{"CA", DANE_CERT_USAGE_CA},
+	{"End-entity", DANE_CERT_USAGE_EE},
+	{"Local CA", DANE_CERT_USAGE_LOCAL_CA},
+	{"Local end-entity", DANE_CERT_USAGE_LOCAL_EE},
+	{NULL, 0}
 };
 
 
@@ -85,18 +79,17 @@ static const cert_usage_entry dane_cert_usages[] =
  * Returns: a string that contains the name of the specified
  *   type, or %NULL.
  **/
-const char* dane_cert_type_name(dane_cert_type_t type)
+const char *dane_cert_type_name(dane_cert_type_t type)
 {
-const cert_type_entry* e = dane_cert_types; 
+	const cert_type_entry *e = dane_cert_types;
 
-  while(e->name != NULL)
-    {
-      if (e->type == type)
-        return e->name;
-      e++;
-    }
-  
-  return NULL;
+	while (e->name != NULL) {
+		if (e->type == type)
+			return e->name;
+		e++;
+	}
+
+	return NULL;
 }
 
 /**
@@ -108,18 +101,17 @@ const cert_type_entry* e = dane_cert_types;
  * Returns: a string that contains the name of the specified
  *   type, or %NULL.
  **/
-const char* dane_match_type_name(dane_match_type_t type)
+const char *dane_match_type_name(dane_match_type_t type)
 {
-const match_type_entry* e = dane_match_types; 
+	const match_type_entry *e = dane_match_types;
 
-  while(e->name != NULL)
-    {
-      if (e->type == type)
-        return e->name;
-      e++;
-    }
-  
-  return NULL;
+	while (e->name != NULL) {
+		if (e->type == type)
+			return e->name;
+		e++;
+	}
+
+	return NULL;
 }
 
 /**
@@ -131,17 +123,16 @@ const match_type_entry* e = dane_match_types;
  * Returns: a string that contains the name of the specified
  *   type, or %NULL.
  **/
-const char* dane_cert_usage_name(dane_cert_usage_t usage)
+const char *dane_cert_usage_name(dane_cert_usage_t usage)
 {
-const cert_usage_entry* e = dane_cert_usages; 
+	const cert_usage_entry *e = dane_cert_usages;
 
-  while(e->name != NULL)
-    {
-      if (e->usage == usage)
-        return e->name;
-      e++;
-    }
-  
-  return NULL;
+	while (e->name != NULL) {
+		if (e->usage == usage)
+			return e->name;
+		e++;
+	}
+
+	return NULL;
 
 }

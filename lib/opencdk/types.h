@@ -46,4 +46,4 @@ typedef unsigned int u32;
 #define DIMof(type, member)   DIM(((type *)0)->member)
 #endif
 
-#endif /* CDK_TYPES_H */
+#endif				/* CDK_TYPES_H */

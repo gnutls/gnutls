@@ -34,17 +34,17 @@
  * Returns: a string that contains the name of the specified
  *   certificate type, or %NULL in case of unknown types.
  **/
-const char *
-gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
+const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t
+					     type)
 {
-  const char *ret = NULL;
+	const char *ret = NULL;
 
-  if (type == GNUTLS_CRT_X509)
-    ret = "X.509";
-  if (type == GNUTLS_CRT_OPENPGP)
-    ret = "OPENPGP";
+	if (type == GNUTLS_CRT_X509)
+		ret = "X.509";
+	if (type == GNUTLS_CRT_OPENPGP)
+		ret = "OPENPGP";
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -56,23 +56,23 @@ gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
  * Returns: a #gnutls_certificate_type_t for the specified in a
  *   string certificate type, or %GNUTLS_CRT_UNKNOWN on error.
  **/
-gnutls_certificate_type_t
-gnutls_certificate_type_get_id (const char *name)
+gnutls_certificate_type_t gnutls_certificate_type_get_id(const char *name)
 {
-  gnutls_certificate_type_t ret = GNUTLS_CRT_UNKNOWN;
+	gnutls_certificate_type_t ret = GNUTLS_CRT_UNKNOWN;
 
-  if (strcasecmp (name, "X.509") == 0 || strcasecmp (name, "X509") == 0)
-    return GNUTLS_CRT_X509;
-  if (strcasecmp (name, "OPENPGP") == 0)
-    return GNUTLS_CRT_OPENPGP;
+	if (strcasecmp(name, "X.509") == 0
+	    || strcasecmp(name, "X509") == 0)
+		return GNUTLS_CRT_X509;
+	if (strcasecmp(name, "OPENPGP") == 0)
+		return GNUTLS_CRT_OPENPGP;
 
-  return ret;
+	return ret;
 }
 
 static const gnutls_certificate_type_t supported_certificate_types[] = {
-  GNUTLS_CRT_X509,
-  GNUTLS_CRT_OPENPGP,
-  0
+	GNUTLS_CRT_X509,
+	GNUTLS_CRT_OPENPGP,
+	0
 };
 
 /**
@@ -83,12 +83,7 @@ static const gnutls_certificate_type_t supported_certificate_types[] = {
  * Returns: a (0)-terminated list of #gnutls_certificate_type_t
  *   integers indicating the available certificate types.
  **/
-const gnutls_certificate_type_t *
-gnutls_certificate_type_list (void)
+const gnutls_certificate_type_t *gnutls_certificate_type_list(void)
 {
-  return supported_certificate_types;
+	return supported_certificate_types;
 }
-
-
-
-

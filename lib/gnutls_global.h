@@ -26,7 +26,7 @@
 #include <libtasn1.h>
 #include <gnutls/gnutls.h>
 
-int gnutls_is_secure_memory (const void *mem);
+int gnutls_is_secure_memory(const void *mem);
 
 extern ASN1_TYPE _gnutls_pkix1_asn;
 extern ASN1_TYPE _gnutls_gnutls_asn;
@@ -41,7 +41,7 @@ extern ASN1_TYPE _gnutls_gnutls_asn;
 extern gnutls_log_func _gnutls_log_func;
 extern gnutls_audit_log_func _gnutls_audit_log_func;
 extern int _gnutls_log_level;
-extern int gnutls_crypto_init (void);
-extern void gnutls_crypto_deinit (void);
+extern int gnutls_crypto_init(void);
+extern void gnutls_crypto_deinit(void);
 
 #endif

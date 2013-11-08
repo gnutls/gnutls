@@ -25,33 +25,33 @@
 
 #include <gnutls/abstract.h>
 
-int _gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
-                                      gnutls_pcert_st* cert,
-                                      gnutls_privkey_t pkey,
-                                      gnutls_datum_t * signature);
+int _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
+				    gnutls_pcert_st * cert,
+				    gnutls_privkey_t pkey,
+				    gnutls_datum_t * signature);
 
-int _gnutls_handshake_sign_data (gnutls_session_t session,
-                                 gnutls_pcert_st* cert,
-                                 gnutls_privkey_t pkey,
-                                 gnutls_datum_t * params,
-                                 gnutls_datum_t * signature,
-                                 gnutls_sign_algorithm_t * algo);
+int _gnutls_handshake_sign_data(gnutls_session_t session,
+				gnutls_pcert_st * cert,
+				gnutls_privkey_t pkey,
+				gnutls_datum_t * params,
+				gnutls_datum_t * signature,
+				gnutls_sign_algorithm_t * algo);
 
-int _gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
-                                        gnutls_pcert_st* cert,
-                                        gnutls_datum_t * signature,
-                                        gnutls_sign_algorithm_t);
+int _gnutls_handshake_verify_crt_vrfy(gnutls_session_t session,
+				      gnutls_pcert_st * cert,
+				      gnutls_datum_t * signature,
+				      gnutls_sign_algorithm_t);
 
-int _gnutls_handshake_verify_data (gnutls_session_t session,
-                                   gnutls_pcert_st* cert,
-                                   const gnutls_datum_t * params,
-                                   gnutls_datum_t * signature,
-                                   gnutls_sign_algorithm_t algo);
+int _gnutls_handshake_verify_data(gnutls_session_t session,
+				  gnutls_pcert_st * cert,
+				  const gnutls_datum_t * params,
+				  gnutls_datum_t * signature,
+				  gnutls_sign_algorithm_t algo);
 
-int pk_prepare_hash (gnutls_pk_algorithm_t pk, const mac_entry_st* hash,
-                     gnutls_datum_t * output);
-int pk_hash_data (gnutls_pk_algorithm_t pk, const mac_entry_st* hash,
-                  gnutls_pk_params_st * params, const gnutls_datum_t * data,
-                  gnutls_datum_t * digest);
+int pk_prepare_hash(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
+		    gnutls_datum_t * output);
+int pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
+		 gnutls_pk_params_st * params, const gnutls_datum_t * data,
+		 gnutls_datum_t * digest);
 
 #endif

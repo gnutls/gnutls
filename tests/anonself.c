@@ -33,10 +33,9 @@
 #if defined(_WIN32)
 
 /* socketpair isn't supported on Win32. */
-int
-main (int argc, char** argv)
+int main(int argc, char **argv)
 {
-    exit (77);
+	exit(77);
 }
 
 #else
@@ -53,10 +52,9 @@ main (int argc, char** argv)
 
 #include "utils.h"
 
-static void
-tls_log_func (int level, const char *str)
+static void tls_log_func(int level, const char *str)
 {
-  fprintf (stderr, "|<%d>| %s", level, str);
+	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
 /* A very basic TLS client, with anonymous authentication.
@@ -65,93 +63,87 @@ tls_log_func (int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-static void
-client (int sd)
+static void client(int sd)
 {
-  int ret, ii;
-  gnutls_session_t session;
-  char buffer[MAX_BUF + 1];
-  gnutls_anon_client_credentials_t anoncred;
-  /* Need to enable anonymous KX specifically. */
+	int ret, ii;
+	gnutls_session_t session;
+	char buffer[MAX_BUF + 1];
+	gnutls_anon_client_credentials_t anoncred;
+	/* Need to enable anonymous KX specifically. */
 
-  global_init ();
+	global_init();
 
-  gnutls_global_set_log_function (tls_log_func);
-  if (debug)
-    gnutls_global_set_log_level (4711);
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
 
-  gnutls_anon_allocate_client_credentials (&anoncred);
+	gnutls_anon_allocate_client_credentials(&anoncred);
 
-  /* Initialize TLS session
-   */
-  gnutls_init (&session, GNUTLS_CLIENT);
+	/* Initialize TLS session
+	 */
+	gnutls_init(&session, GNUTLS_CLIENT);
 
-  /* Use default priorities */
-  gnutls_priority_set_direct (session, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+	/* Use default priorities */
+	gnutls_priority_set_direct(session,
+				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				   NULL);
 
-  /* put the anonymous credentials to the current session
-   */
-  gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
+	/* put the anonymous credentials to the current session
+	 */
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
-  gnutls_transport_set_int (session, sd);
+	gnutls_transport_set_int(session, sd);
 
-  /* Perform the TLS handshake
-   */
-  ret = gnutls_handshake (session);
+	/* Perform the TLS handshake
+	 */
+	ret = gnutls_handshake(session);
 
-  if (ret < 0)
-    {
-      fail ("client: Handshake failed\n");
-      gnutls_perror (ret);
-      goto end;
-    }
-  else
-    {
-      if (debug)
-        success ("client: Handshake was completed\n");
-    }
+	if (ret < 0) {
+		fail("client: Handshake failed\n");
+		gnutls_perror(ret);
+		goto end;
+	} else {
+		if (debug)
+			success("client: Handshake was completed\n");
+	}
 
-  if (debug)
-    success ("client: TLS version is: %s\n",
-             gnutls_protocol_get_name (gnutls_protocol_get_version
-                                       (session)));
+	if (debug)
+		success("client: TLS version is: %s\n",
+			gnutls_protocol_get_name
+			(gnutls_protocol_get_version(session)));
 
-  gnutls_record_send (session, MSG, strlen (MSG));
+	gnutls_record_send(session, MSG, strlen(MSG));
 
-  ret = gnutls_record_recv (session, buffer, MAX_BUF);
-  if (ret == 0)
-    {
-      if (debug)
-        success ("client: Peer has closed the TLS connection\n");
-      goto end;
-    }
-  else if (ret < 0)
-    {
-      fail ("client: Error: %s\n", gnutls_strerror (ret));
-      goto end;
-    }
+	ret = gnutls_record_recv(session, buffer, MAX_BUF);
+	if (ret == 0) {
+		if (debug)
+			success
+			    ("client: Peer has closed the TLS connection\n");
+		goto end;
+	} else if (ret < 0) {
+		fail("client: Error: %s\n", gnutls_strerror(ret));
+		goto end;
+	}
 
-  if (debug)
-    {
-      printf ("- Received %d bytes: ", ret);
-      for (ii = 0; ii < ret; ii++)
-        {
-          fputc (buffer[ii], stdout);
-        }
-      fputs ("\n", stdout);
-    }
+	if (debug) {
+		printf("- Received %d bytes: ", ret);
+		for (ii = 0; ii < ret; ii++) {
+			fputc(buffer[ii], stdout);
+		}
+		fputs("\n", stdout);
+	}
 
-  gnutls_bye (session, GNUTLS_SHUT_RDWR);
+	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
-end:
+      end:
 
-  close (sd);
+	close(sd);
 
-  gnutls_deinit (session);
+	gnutls_deinit(session);
 
-  gnutls_anon_free_client_credentials (anoncred);
+	gnutls_anon_free_client_credentials(anoncred);
 
-  gnutls_global_deinit ();
+	gnutls_global_deinit();
 }
 
 /* This is a sample TLS 1.0 echo server, for anonymous authentication only.
@@ -163,38 +155,39 @@ end:
 /* These are global */
 gnutls_anon_server_credentials_t anoncred;
 
-static gnutls_session_t
-initialize_tls_session (void)
+static gnutls_session_t initialize_tls_session(void)
 {
-  gnutls_session_t session;
+	gnutls_session_t session;
 
-  gnutls_init (&session, GNUTLS_SERVER);
+	gnutls_init(&session, GNUTLS_SERVER);
 
-  /* avoid calling all the priority functions, since the defaults
-   * are adequate.
-   */
-  gnutls_priority_set_direct (session, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(session,
+				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				   NULL);
 
-  gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
-  gnutls_dh_set_prime_bits (session, DH_BITS);
+	gnutls_dh_set_prime_bits(session, DH_BITS);
 
-  return session;
+	return session;
 }
 
 static gnutls_dh_params_t dh_params;
 
-static int
-generate_dh_params (void)
+static int generate_dh_params(void)
 {
-  const gnutls_datum_t p3 = { (void *) pkcs3, strlen (pkcs3) };
-  /* Generate Diffie-Hellman parameters - for use with DHE
-   * kx algorithms. These should be discarded and regenerated
-   * once a day, once a week or once a month. Depending on the
-   * security requirements.
-   */
-  gnutls_dh_params_init (&dh_params);
-  return gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
+	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
+	/* Generate Diffie-Hellman parameters - for use with DHE
+	 * kx algorithms. These should be discarded and regenerated
+	 * once a day, once a week or once a month. Depending on the
+	 * security requirements.
+	 */
+	gnutls_dh_params_init(&dh_params);
+	return gnutls_dh_params_import_pkcs3(dh_params, &p3,
+					     GNUTLS_X509_FMT_PEM);
 }
 
 int err, ret;
@@ -203,119 +196,109 @@ gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
-static void
-server (int sd)
+static void server(int sd)
 {
-  /* this must be called once in the program
-   */
-  global_init ();
+	/* this must be called once in the program
+	 */
+	global_init();
 
-  gnutls_global_set_log_function (tls_log_func);
-  if (debug)
-    gnutls_global_set_log_level (4711);
+	gnutls_global_set_log_function(tls_log_func);
+	if (debug)
+		gnutls_global_set_log_level(4711);
 
-  gnutls_anon_allocate_server_credentials (&anoncred);
+	gnutls_anon_allocate_server_credentials(&anoncred);
 
-  if (debug)
-    success ("Launched, generating DH parameters...\n");
+	if (debug)
+		success("Launched, generating DH parameters...\n");
 
-  generate_dh_params ();
+	generate_dh_params();
 
-  gnutls_anon_set_server_dh_params (anoncred, dh_params);
+	gnutls_anon_set_server_dh_params(anoncred, dh_params);
 
-  session = initialize_tls_session ();
+	session = initialize_tls_session();
 
-  gnutls_transport_set_int (session, sd);
-  ret = gnutls_handshake (session);
-  if (ret < 0)
-    {
-      close (sd);
-      gnutls_deinit (session);
-      fail ("server: Handshake has failed (%s)\n\n", gnutls_strerror (ret));
-      return;
-    }
-  if (debug)
-    success ("server: Handshake was completed\n");
+	gnutls_transport_set_int(session, sd);
+	ret = gnutls_handshake(session);
+	if (ret < 0) {
+		close(sd);
+		gnutls_deinit(session);
+		fail("server: Handshake has failed (%s)\n\n",
+		     gnutls_strerror(ret));
+		return;
+	}
+	if (debug)
+		success("server: Handshake was completed\n");
 
-  if (debug)
-    success ("server: TLS version is: %s\n",
-             gnutls_protocol_get_name (gnutls_protocol_get_version
-                                       (session)));
+	if (debug)
+		success("server: TLS version is: %s\n",
+			gnutls_protocol_get_name
+			(gnutls_protocol_get_version(session)));
 
-  /* see the Getting peer's information example */
-  /* print_info(session); */
+	/* see the Getting peer's information example */
+	/* print_info(session); */
 
-  for (;;)
-    {
-      memset (buffer, 0, MAX_BUF + 1);
-      ret = gnutls_record_recv (session, buffer, MAX_BUF);
+	for (;;) {
+		memset(buffer, 0, MAX_BUF + 1);
+		ret = gnutls_record_recv(session, buffer, MAX_BUF);
 
-      if (ret == 0)
-        {
-          if (debug)
-            success ("server: Peer has closed the GnuTLS connection\n");
-          break;
-        }
-      else if (ret < 0)
-        {
-          fail ("server: Received corrupted data(%d). Closing...\n", ret);
-          break;
-        }
-      else if (ret > 0)
-        {
-          /* echo data back to the client
-           */
-          gnutls_record_send (session, buffer, strlen (buffer));
-        }
-    }
-  /* do not wait for the peer to close the connection.
-   */
-  gnutls_bye (session, GNUTLS_SHUT_WR);
+		if (ret == 0) {
+			if (debug)
+				success
+				    ("server: Peer has closed the GnuTLS connection\n");
+			break;
+		} else if (ret < 0) {
+			fail("server: Received corrupted data(%d). Closing...\n", ret);
+			break;
+		} else if (ret > 0) {
+			/* echo data back to the client
+			 */
+			gnutls_record_send(session, buffer,
+					   strlen(buffer));
+		}
+	}
+	/* do not wait for the peer to close the connection.
+	 */
+	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-  close (sd);
-  gnutls_deinit (session);
+	close(sd);
+	gnutls_deinit(session);
 
-  gnutls_anon_free_server_credentials (anoncred);
+	gnutls_anon_free_server_credentials(anoncred);
 
-  gnutls_dh_params_deinit (dh_params);
+	gnutls_dh_params_deinit(dh_params);
 
-  gnutls_global_deinit ();
+	gnutls_global_deinit();
 
-  if (debug)
-    success ("server: finished\n");
+	if (debug)
+		success("server: finished\n");
 }
 
-void
-doit (void)
+void doit(void)
 {
-  pid_t child;
-  int sockets[2];
+	pid_t child;
+	int sockets[2];
 
-  err = socketpair (AF_UNIX, SOCK_STREAM, 0, sockets);
-  if (err == -1)
-    {
-      perror ("socketpair");
-      fail ("socketpair failed\n");
-      return;
-    }
+	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
+	if (err == -1) {
+		perror("socketpair");
+		fail("socketpair failed\n");
+		return;
+	}
 
-  child = fork ();
-  if (child < 0)
-    {
-      perror ("fork");
-      fail ("fork");
-      return;
-    }
+	child = fork();
+	if (child < 0) {
+		perror("fork");
+		fail("fork");
+		return;
+	}
 
-  if (child)
-    {
-      int status;
-      /* parent */
-      server (sockets[0]);
-      wait (&status);
-    }
-  else
-    client (sockets[1]);
+	if (child) {
+		int status;
+		/* parent */
+		server(sockets[0]);
+		wait(&status);
+	} else
+		client(sockets[1]);
 }
 
-#endif /* _WIN32 */
+#endif				/* _WIN32 */

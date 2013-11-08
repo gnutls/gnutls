@@ -15,71 +15,68 @@
  * is explicit.
  */
 
-extern int tcp_connect (void);
-extern void tcp_close (int sd);
+extern int tcp_connect(void);
+extern void tcp_close(int sd);
 
-int main (void)
+int main(void)
 {
-  int ret;
-  char *line = NULL;
-  size_t line_len;
-  xssl_cred_t cred;
-  xssl_t sb;
-  unsigned int status;
-  int fd;
+        int ret;
+        char *line = NULL;
+        size_t line_len;
+        xssl_cred_t cred;
+        xssl_t sb;
+        unsigned int status;
+        int fd;
 
-  gnutls_global_init ();
-  
-  fd = tcp_connect ();
+        gnutls_global_init();
 
-  ret = xssl_cred_init(&cred, GNUTLS_VMETHOD_SYSTEM_CAS, NULL, 0);
-  if (ret < 0)
-    exit(1);
+        fd = tcp_connect();
 
-  /* Initialize TLS session
-   */
-  ret = xssl_client_init(&sb, "www.example.com", NULL, 
-                         (gnutls_transport_ptr_t)fd,
-			 NULL, cred, &status, 0);
-  if (ret < 0)
-    {
-      if (ret == GNUTLS_E_AUTH_ERROR)
-        {
-          gnutls_datum_t txt;
-          
-          gnutls_certificate_verification_status_print(status, GNUTLS_CRT_X509,
-            &txt, 0);
-          
-          fprintf(stderr, "Verification error (%x): %s\n", status, txt.data);
-          gnutls_free(txt.data);
+        ret = xssl_cred_init(&cred, GNUTLS_VMETHOD_SYSTEM_CAS, NULL, 0);
+        if (ret < 0)
+                exit(1);
+
+        /* Initialize TLS session
+         */
+        ret = xssl_client_init(&sb, "www.example.com", NULL,
+                               (gnutls_transport_ptr_t) fd,
+                               NULL, cred, &status, 0);
+        if (ret < 0) {
+                if (ret == GNUTLS_E_AUTH_ERROR) {
+                        gnutls_datum_t txt;
+
+                        gnutls_certificate_verification_status_print
+                            (status, GNUTLS_CRT_X509, &txt, 0);
+
+                        fprintf(stderr, "Verification error (%x): %s\n",
+                                status, txt.data);
+                        gnutls_free(txt.data);
+                }
+                exit(1);
         }
-      exit(1);
-    }
-
 #define REQ "GET / HTTP/1.0\r\n"
-  ret = xssl_write(sb, REQ, sizeof(REQ)-1);
-  if (ret < 0)
-    exit(1);
+        ret = xssl_write(sb, REQ, sizeof(REQ) - 1);
+        if (ret < 0)
+                exit(1);
 
-  do
-    {
-      ret = xssl_getline(sb, &line, &line_len);
-      if (ret < 0)
-        exit(1);
-      
-      fprintf(stderr, "received: %s\n", line);
-    }
-  while (ret >= 0);
+        do {
+                ret = xssl_getline(sb, &line, &line_len);
+                if (ret < 0)
+                        exit(1);
 
-  gnutls_free(line);
+                fprintf(stderr, "received: %s\n", line);
+        }
+        while (ret >= 0);
 
-  xssl_deinit(sb);
+        gnutls_free(line);
 
-  tcp_close (fd);
+        xssl_deinit(sb);
 
-  xssl_cred_deinit (cred);
+        tcp_close(fd);
 
-  gnutls_global_deinit ();
-  
-  return 0;
+        xssl_cred_deinit(cred);
+
+        gnutls_global_deinit();
+
+        return 0;
 }

@@ -44,41 +44,40 @@ typedef int ssize_t;
 #include <unistd.h>
 #include <sys/stat.h>
 #if HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
+#include <sys/socket.h>
 #elif HAVE_WS2TCPIP_H
-# include <ws2tcpip.h>
+#include <ws2tcpip.h>
 #endif
 #include <time.h>
-#include <u64.h> /* gnulib for uint64_t */
+#include <u64.h>		/* gnulib for uint64_t */
 
 #ifdef HAVE_LIBNETTLE
-# include <nettle/memxor.h>
+#include <nettle/memxor.h>
 #else
-# include <gl/memxor.h>
-# define memxor gl_memxor
+#include <gl/memxor.h>
+#define memxor gl_memxor
 #endif
 
 #ifdef __GNUC__
-# ifndef _GNUTLS_GCC_VERSION
-#  define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-# endif
-# if _GNUTLS_GCC_VERSION >= 30100
-#  define likely(x)      __builtin_expect((x), 1)
-#  define unlikely(x)    __builtin_expect((x), 0)
-# endif
+#ifndef _GNUTLS_GCC_VERSION
+#define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif
+#if _GNUTLS_GCC_VERSION >= 30100
+#define likely(x)      __builtin_expect((x), 1)
+#define unlikely(x)    __builtin_expect((x), 0)
+#endif
 #endif
 
 #ifndef likely
-# define likely
-# define unlikely
+#define likely
+#define unlikely
 #endif
 
 /* some systems had problems with long long int, thus,
  * it is not used.
  */
-typedef struct
-{
-  unsigned char i[8];
+typedef struct {
+	unsigned char i[8];
 } uint64;
 
 #include <gnutls/gnutls.h>
@@ -148,29 +147,26 @@ typedef struct
    * application level extensions before the "client_hello" callback
    * is called.
    */
-  typedef enum
-  {
-    GNUTLS_EXT_ANY = 0,
-    GNUTLS_EXT_APPLICATION = 1,
-    GNUTLS_EXT_TLS = 2,
-    GNUTLS_EXT_MANDATORY = 3,
-    GNUTLS_EXT_NONE = 4
-  } gnutls_ext_parse_type_t;
+typedef enum {
+	GNUTLS_EXT_ANY = 0,
+	GNUTLS_EXT_APPLICATION = 1,
+	GNUTLS_EXT_TLS = 2,
+	GNUTLS_EXT_MANDATORY = 3,
+	GNUTLS_EXT_NONE = 4
+} gnutls_ext_parse_type_t;
 
 
 /* expire time for resuming sessions */
 #define DEFAULT_EXPIRE_TIME 3600
 
-typedef enum transport_t
-{
-  GNUTLS_STREAM,
-  GNUTLS_DGRAM
+typedef enum transport_t {
+	GNUTLS_STREAM,
+	GNUTLS_DGRAM
 } transport_t;
 
-typedef enum record_flush_t
-{
-  RECORD_FLUSH = 0,
-  RECORD_CORKED,
+typedef enum record_flush_t {
+	RECORD_FLUSH = 0,
+	RECORD_CORKED,
 } record_flush_t;
 
 /* the maximum size of encrypted packets */
@@ -222,34 +218,30 @@ typedef enum record_flush_t
 #define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
 #define GNUTLS_INT_TO_POINTER(_) ((void*) GNUTLS_POINTER_TO_INT_CAST (_))
 
-typedef struct
-{
-  uint8_t pint[3];
+typedef struct {
+	uint8_t pint[3];
 } uint24;
 
 #include <gnutls_mpi.h>
 
-typedef enum handshake_state_t
-{ STATE0 = 0, STATE1, STATE2,
-  STATE3, STATE4, STATE5, STATE6, STATE7, STATE8, 
-  STATE9, STATE10, STATE11, STATE12, STATE13, STATE14,
-  STATE15, STATE16, STATE17,
-  STATE20 = 20, STATE21, STATE22,
-  STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
-  STATE60 = 60, STATE61, STATE62, STATE70, STATE71
+typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
+	STATE3, STATE4, STATE5, STATE6, STATE7, STATE8,
+	STATE9, STATE10, STATE11, STATE12, STATE13, STATE14,
+	STATE15, STATE16, STATE17,
+	STATE20 = 20, STATE21, STATE22,
+	STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
+	STATE60 = 60, STATE61, STATE62, STATE70, STATE71
 } handshake_state_t;
 
-typedef enum heartbeat_state_t
-{  
-  SHB_SEND1 = 0, 
-  SHB_SEND2, 
-  SHB_RECV, 
+typedef enum heartbeat_state_t {
+	SHB_SEND1 = 0,
+	SHB_SEND2,
+	SHB_RECV,
 } heartbeat_state_t;
 
-typedef enum recv_state_t
-{  
-  RECV_STATE_0 = 0, 
-  RECV_STATE_DTLS_RETRANSMIT,
+typedef enum recv_state_t {
+	RECV_STATE_0 = 0,
+	RECV_STATE_DTLS_RETRANSMIT,
 } recv_state_t;
 
 #include <gnutls_str.h>
@@ -259,36 +251,33 @@ typedef enum recv_state_t
  */
 #define MAX_ALGOS GNUTLS_MAX_ALGORITHM_NUM
 
-typedef enum extensions_t
-{
-  GNUTLS_EXTENSION_SERVER_NAME = 0,
-  GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1,
-  GNUTLS_EXTENSION_STATUS_REQUEST = 5,
-  GNUTLS_EXTENSION_CERT_TYPE = 9,
-  GNUTLS_EXTENSION_SUPPORTED_ECC = 10,
-  GNUTLS_EXTENSION_SUPPORTED_ECC_PF = 11,
-  GNUTLS_EXTENSION_SRP = 12,
-  GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
-  GNUTLS_EXTENSION_SRTP = 14,
-  GNUTLS_EXTENSION_HEARTBEAT = 15,
-  GNUTLS_EXTENSION_ALPN = 16,
-  GNUTLS_EXTENSION_SESSION_TICKET = 35,
-  GNUTLS_EXTENSION_NEW_RECORD_PADDING = 48015,  /* aka: 0xbeaf */
-  GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281   /* aka: 0xff01 */
+typedef enum extensions_t {
+	GNUTLS_EXTENSION_SERVER_NAME = 0,
+	GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1,
+	GNUTLS_EXTENSION_STATUS_REQUEST = 5,
+	GNUTLS_EXTENSION_CERT_TYPE = 9,
+	GNUTLS_EXTENSION_SUPPORTED_ECC = 10,
+	GNUTLS_EXTENSION_SUPPORTED_ECC_PF = 11,
+	GNUTLS_EXTENSION_SRP = 12,
+	GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
+	GNUTLS_EXTENSION_SRTP = 14,
+	GNUTLS_EXTENSION_HEARTBEAT = 15,
+	GNUTLS_EXTENSION_ALPN = 16,
+	GNUTLS_EXTENSION_SESSION_TICKET = 35,
+	GNUTLS_EXTENSION_NEW_RECORD_PADDING = 48015,	/* aka: 0xbeaf */
+	GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
 } extensions_t;
 
-typedef enum
-{ CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
+typedef enum { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
 
 #define RESUME_TRUE 1
 #define RESUME_FALSE 0
 
 /* Record Protocol */
-typedef enum content_type_t
-{
-  GNUTLS_CHANGE_CIPHER_SPEC = 20, GNUTLS_ALERT,
-  GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA,
-  GNUTLS_HEARTBEAT
+typedef enum content_type_t {
+	GNUTLS_CHANGE_CIPHER_SPEC = 20, GNUTLS_ALERT,
+	GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA,
+	GNUTLS_HEARTBEAT
 } content_type_t;
 
 
@@ -301,146 +290,140 @@ typedef enum content_type_t
  * messages that can arrive in a single flight
  */
 #define MAX_HANDSHAKE_MSGS 6
-typedef struct
-{
-  /* Handshake layer type and sequence of message */
-  gnutls_handshake_description_t htype;
-  uint32_t length;
+typedef struct {
+	/* Handshake layer type and sequence of message */
+	gnutls_handshake_description_t htype;
+	uint32_t length;
 
-  /* valid in DTLS */
-  uint16_t sequence;
+	/* valid in DTLS */
+	uint16_t sequence;
 
-  /* indicate whether that message is complete.
-   * complete means start_offset == 0 and end_offset == length
-   */
-  uint32_t start_offset;
-  uint32_t end_offset;
-  
-  uint8_t header[MAX_HANDSHAKE_HEADER_SIZE];
-  int header_size;
+	/* indicate whether that message is complete.
+	 * complete means start_offset == 0 and end_offset == length
+	 */
+	uint32_t start_offset;
+	uint32_t end_offset;
 
-  gnutls_buffer_st data;
+	uint8_t header[MAX_HANDSHAKE_HEADER_SIZE];
+	int header_size;
+
+	gnutls_buffer_st data;
 } handshake_buffer_st;
 
-typedef struct mbuffer_st
-{
-  /* when used in mbuffer_head_st */
-  struct mbuffer_st *next;
-  struct mbuffer_st *prev;
+typedef struct mbuffer_st {
+	/* when used in mbuffer_head_st */
+	struct mbuffer_st *next;
+	struct mbuffer_st *prev;
 
-  /* msg->size - mark = number of bytes left to process in this
-     message. Mark should only be non-zero when this buffer is the
-     head of the queue. */
-  size_t mark;
+	/* msg->size - mark = number of bytes left to process in this
+	   message. Mark should only be non-zero when this buffer is the
+	   head of the queue. */
+	size_t mark;
 
 
-  /* the data */
-  gnutls_datum_t msg;
-  size_t maximum_size;
+	/* the data */
+	gnutls_datum_t msg;
+	size_t maximum_size;
 
-  /* used during fill in, to separate header from data
-   * body. */
-  unsigned int uhead_mark;
+	/* used during fill in, to separate header from data
+	 * body. */
+	unsigned int uhead_mark;
 
-  /* Filled in by record layer on recv:
-   * type, record_sequence
-   */
+	/* Filled in by record layer on recv:
+	 * type, record_sequence
+	 */
 
-  /* record layer content type */
-  content_type_t type;
+	/* record layer content type */
+	content_type_t type;
 
-  /* record layer sequence */
-  uint64 record_sequence;
+	/* record layer sequence */
+	uint64 record_sequence;
 
-  /* Filled in by handshake layer on send:
-   * type, epoch, htype, handshake_sequence
-   */
+	/* Filled in by handshake layer on send:
+	 * type, epoch, htype, handshake_sequence
+	 */
 
-  /* Record layer epoch of message */
-  uint16_t epoch;
+	/* Record layer epoch of message */
+	uint16_t epoch;
 
-  /* Handshake layer type and sequence of message */
-  gnutls_handshake_description_t htype;
-  uint16_t handshake_sequence;
+	/* Handshake layer type and sequence of message */
+	gnutls_handshake_description_t htype;
+	uint16_t handshake_sequence;
 } mbuffer_st;
 
-typedef struct mbuffer_head_st
-{
-  mbuffer_st *head;
-  mbuffer_st *tail;
+typedef struct mbuffer_head_st {
+	mbuffer_st *head;
+	mbuffer_st *tail;
 
-  unsigned int length;
-  size_t byte_length;
+	unsigned int length;
+	size_t byte_length;
 } mbuffer_head_st;
 
 /* Store & Retrieve functions defines: 
  */
 
-typedef struct auth_cred_st
-{
-  gnutls_credentials_type_t algorithm;
+typedef struct auth_cred_st {
+	gnutls_credentials_type_t algorithm;
 
-  /* the type of credentials depends on algorithm 
-   */
-  void *credentials;
-  struct auth_cred_st *next;
+	/* the type of credentials depends on algorithm 
+	 */
+	void *credentials;
+	struct auth_cred_st *next;
 } auth_cred_st;
 
-struct gnutls_key_st
-{
-  /* For ECDH KX */
-  gnutls_pk_params_st ecdh_params;
-  bigint_t ecdh_x;
-  bigint_t ecdh_y;
+struct gnutls_key_st {
+	/* For ECDH KX */
+	gnutls_pk_params_st ecdh_params;
+	bigint_t ecdh_x;
+	bigint_t ecdh_y;
 
-  /* For DH KX */
-  gnutls_datum_t key;
-  bigint_t KEY;
-  bigint_t client_Y;
-  bigint_t client_g;
-  bigint_t client_p;
-  bigint_t dh_secret;
-  /* for SRP */
-  bigint_t A;
-  bigint_t B;
-  bigint_t u;
-  bigint_t b;
-  bigint_t a;
-  bigint_t x;
-  /* RSA: e, m
-   */
-  bigint_t rsa[2];
+	/* For DH KX */
+	gnutls_datum_t key;
+	bigint_t KEY;
+	bigint_t client_Y;
+	bigint_t client_g;
+	bigint_t client_p;
+	bigint_t dh_secret;
+	/* for SRP */
+	bigint_t A;
+	bigint_t B;
+	bigint_t u;
+	bigint_t b;
+	bigint_t a;
+	bigint_t x;
+	/* RSA: e, m
+	 */
+	bigint_t rsa[2];
 
-  /* this is used to hold the peers authentication data 
-   */
-  /* auth_info_t structures SHOULD NOT contain malloced 
-   * elements. Check gnutls_session_pack.c, and gnutls_auth.c.
-   * Remember that this should be calloced!
-   */
-  void *auth_info;
-  gnutls_credentials_type_t auth_info_type;
-  int auth_info_size;           /* needed in order to store to db for restoring 
-                                 */
-  uint8_t crypt_algo;
+	/* this is used to hold the peers authentication data 
+	 */
+	/* auth_info_t structures SHOULD NOT contain malloced 
+	 * elements. Check gnutls_session_pack.c, and gnutls_auth.c.
+	 * Remember that this should be calloced!
+	 */
+	void *auth_info;
+	gnutls_credentials_type_t auth_info_type;
+	int auth_info_size;	/* needed in order to store to db for restoring 
+				 */
+	uint8_t crypt_algo;
 
-  auth_cred_st *cred;           /* used to specify keys/certificates etc */
+	auth_cred_st *cred;	/* used to specify keys/certificates etc */
 
-  int crt_requested;
-  /* some ciphersuites use this
-   * to provide client authentication.
-   * 1 if client auth was requested
-   * by the peer, 0 otherwise
-   *** In case of a server this
-   * holds 1 if we should wait
-   * for a client certificate verify
-   */
+	int crt_requested;
+	/* some ciphersuites use this
+	 * to provide client authentication.
+	 * 1 if client auth was requested
+	 * by the peer, 0 otherwise
+	 *** In case of a server this
+	 * holds 1 if we should wait
+	 * for a client certificate verify
+	 */
 };
 typedef struct gnutls_key_st gnutls_key_st;
 
-struct pin_info_st
-{
-  gnutls_pin_callback_t cb;
-  void* data;
+struct pin_info_st {
+	gnutls_pin_callback_t cb;
+	void *data;
 };
 
 struct record_state_st;
@@ -450,43 +433,40 @@ struct record_parameters_st;
 typedef struct record_parameters_st record_parameters_st;
 
 /* cipher and mac parameters */
-typedef struct cipher_entry_st
-{
-  const char *name;
-  gnutls_cipher_algorithm_t id;
-  uint16_t blocksize;
-  uint16_t keysize;
-  unsigned block:1;
-  uint16_t iv; /* the size of implicit IV - TLS related */
-  uint16_t cipher_iv; /* the size of IV needed by the cipher */
-  unsigned aead:1; /* Whether it is authenc cipher */
+typedef struct cipher_entry_st {
+	const char *name;
+	gnutls_cipher_algorithm_t id;
+	uint16_t blocksize;
+	uint16_t keysize;
+	unsigned block:1;
+	uint16_t iv;		/* the size of implicit IV - TLS related */
+	uint16_t cipher_iv;	/* the size of IV needed by the cipher */
+	unsigned aead:1;	/* Whether it is authenc cipher */
 } cipher_entry_st;
 
-typedef struct mac_entry_st
-{
-  const char *name;
-  const char *oid; /* OID of the hash - if it is a hash */
-  gnutls_mac_algorithm_t id;
-  unsigned output_size;
-  unsigned key_size;
-  unsigned nonce_size;
-  unsigned placeholder; /* if set, then not a real MAC */
-  unsigned secure; /* if set the this algorithm is secure as hash */
-  unsigned block_size; /* internal block size for HMAC */
+typedef struct mac_entry_st {
+	const char *name;
+	const char *oid;	/* OID of the hash - if it is a hash */
+	gnutls_mac_algorithm_t id;
+	unsigned output_size;
+	unsigned key_size;
+	unsigned nonce_size;
+	unsigned placeholder;	/* if set, then not a real MAC */
+	unsigned secure;	/* if set the this algorithm is secure as hash */
+	unsigned block_size;	/* internal block size for HMAC */
 } mac_entry_st;
 
-typedef struct
-{
-  const char *name;
-  gnutls_protocol_t id;         /* gnutls internal version number */
-  uint8_t major;                    /* defined by the protocol */
-  uint8_t minor;                    /* defined by the protocol */
-  transport_t transport;	/* Type of transport, stream or datagram */
-  unsigned int supported:1;     /* 0 not supported, > 0 is supported */
-  unsigned int explicit_iv:1;
-  unsigned int extensions:1; /* whether it supports extensions */
-  unsigned int selectable_sighash:1; /* whether signatures can be selected */
-  unsigned int selectable_prf:1; /* whether the PRF is ciphersuite-defined */
+typedef struct {
+	const char *name;
+	gnutls_protocol_t id;	/* gnutls internal version number */
+	uint8_t major;		/* defined by the protocol */
+	uint8_t minor;		/* defined by the protocol */
+	transport_t transport;	/* Type of transport, stream or datagram */
+	unsigned int supported:1;	/* 0 not supported, > 0 is supported */
+	unsigned int explicit_iv:1;
+	unsigned int extensions:1;	/* whether it supports extensions */
+	unsigned int selectable_sighash:1;	/* whether signatures can be selected */
+	unsigned int selectable_prf:1;	/* whether the PRF is ciphersuite-defined */
 } version_entry_st;
 
 
@@ -496,10 +476,9 @@ typedef struct
 #include <gnutls_cipher_int.h>
 #include <gnutls_compress.h>
 
-typedef struct
-{
-  uint8_t hash_algorithm;
-  uint8_t sign_algorithm;       /* pk algorithm actually */
+typedef struct {
+	uint8_t hash_algorithm;
+	uint8_t sign_algorithm;	/* pk algorithm actually */
 } sign_algorithm_st;
 
 /* This structure holds parameters got from TLS extension
@@ -510,7 +489,7 @@ typedef struct
 #define MAX_SIGNATURE_ALGORITHMS 16
 #define MAX_SIGN_ALGO_SIZE (2 + MAX_SIGNATURE_ALGORITHMS * 2)
 
-#define MAX_VERIFY_DATA_SIZE 36 /* in SSL 3.0, 12 in TLS 1.0 */
+#define MAX_VERIFY_DATA_SIZE 36	/* in SSL 3.0, 12 in TLS 1.0 */
 
 /* auth_info_t structures now MAY contain malloced 
  * elements.
@@ -530,70 +509,68 @@ typedef struct
  * handshake has finished. The only value you may depend on while
  * the handshake is in progress is the cipher suite value.
  */
-typedef struct
-{
-  unsigned int entity; /* GNUTLS_SERVER or GNUTLS_CLIENT */
-  gnutls_kx_algorithm_t kx_algorithm;
+typedef struct {
+	unsigned int entity;	/* GNUTLS_SERVER or GNUTLS_CLIENT */
+	gnutls_kx_algorithm_t kx_algorithm;
 
-  /* The epoch used to read and write */
-  uint16_t epoch_read;
-  uint16_t epoch_write;
+	/* The epoch used to read and write */
+	uint16_t epoch_read;
+	uint16_t epoch_write;
 
-  /* The epoch that the next handshake will initialize. */
-  uint16_t epoch_next;
+	/* The epoch that the next handshake will initialize. */
+	uint16_t epoch_next;
 
-  /* The epoch at index 0 of record_parameters. */
-  uint16_t epoch_min;
+	/* The epoch at index 0 of record_parameters. */
+	uint16_t epoch_min;
 
-  /* this is the ciphersuite we are going to use 
-   * moved here from internals in order to be restored
-   * on resume;
-   */
-  uint8_t cipher_suite[2];
-  gnutls_compression_method_t compression_method;
-  uint8_t master_secret[GNUTLS_MASTER_SIZE];
-  uint8_t client_random[GNUTLS_RANDOM_SIZE];
-  uint8_t server_random[GNUTLS_RANDOM_SIZE];
-  uint8_t session_id[TLS_MAX_SESSION_ID_SIZE];
-  uint8_t session_id_size;
-  time_t timestamp;
-  
-  /* if non-zero the new record padding is used */
-  uint8_t new_record_padding;
+	/* this is the ciphersuite we are going to use 
+	 * moved here from internals in order to be restored
+	 * on resume;
+	 */
+	uint8_t cipher_suite[2];
+	gnutls_compression_method_t compression_method;
+	uint8_t master_secret[GNUTLS_MASTER_SIZE];
+	uint8_t client_random[GNUTLS_RANDOM_SIZE];
+	uint8_t server_random[GNUTLS_RANDOM_SIZE];
+	uint8_t session_id[TLS_MAX_SESSION_ID_SIZE];
+	uint8_t session_id_size;
+	time_t timestamp;
 
-  /* The send size is the one requested by the programmer.
-   * The recv size is the one negotiated with the peer.
-   */
-  uint16_t max_record_send_size;
-  uint16_t max_record_recv_size;
-  /* holds the negotiated certificate type */
-  gnutls_certificate_type_t cert_type;
-  gnutls_ecc_curve_t ecc_curve; /* holds the first supported ECC curve requested by client */
+	/* if non-zero the new record padding is used */
+	uint8_t new_record_padding;
 
-  /* Holds the signature algorithm used in this session - If any */
-  gnutls_sign_algorithm_t server_sign_algo;
-  gnutls_sign_algorithm_t client_sign_algo;
+	/* The send size is the one requested by the programmer.
+	 * The recv size is the one negotiated with the peer.
+	 */
+	uint16_t max_record_send_size;
+	uint16_t max_record_recv_size;
+	/* holds the negotiated certificate type */
+	gnutls_certificate_type_t cert_type;
+	gnutls_ecc_curve_t ecc_curve;	/* holds the first supported ECC curve requested by client */
 
-  /* FIXME: The following are not saved in the session storage
-   * for session resumption.
-   */
-  
-  /* Used by extensions that enable supplemental data: Which ones
-   * do that? Do they belong in security parameters?
-   */
-  int do_recv_supplemental, do_send_supplemental;
-  const version_entry_st* pversion;
+	/* Holds the signature algorithm used in this session - If any */
+	gnutls_sign_algorithm_t server_sign_algo;
+	gnutls_sign_algorithm_t client_sign_algo;
+
+	/* FIXME: The following are not saved in the session storage
+	 * for session resumption.
+	 */
+
+	/* Used by extensions that enable supplemental data: Which ones
+	 * do that? Do they belong in security parameters?
+	 */
+	int do_recv_supplemental, do_send_supplemental;
+	const version_entry_st *pversion;
 } security_parameters_st;
 
-struct record_state_st
-{
-  gnutls_datum_t mac_secret;
-  gnutls_datum_t IV;
-  gnutls_datum_t key;
-  auth_cipher_hd_st cipher_state;
-  comp_hd_st compression_state;
-  uint64 sequence_number;
-  uint8_t new_record_padding;
+struct record_state_st {
+	gnutls_datum_t mac_secret;
+	gnutls_datum_t IV;
+	gnutls_datum_t key;
+	auth_cipher_hd_st cipher_state;
+	comp_hd_st compression_state;
+	uint64 sequence_number;
+	uint8_t new_record_padding;
 };
 
 
@@ -605,77 +582,73 @@ struct record_state_st
 #define EPOCH_WRITE_CURRENT 70001
 #define EPOCH_NEXT          70002
 
-struct record_parameters_st
-{
-  uint16_t epoch;
-  int initialized;
+struct record_parameters_st {
+	uint16_t epoch;
+	int initialized;
 
-  gnutls_compression_method_t compression_algorithm;
+	gnutls_compression_method_t compression_algorithm;
 
-  const cipher_entry_st* cipher;
-  const mac_entry_st* mac;
+	const cipher_entry_st *cipher;
+	const mac_entry_st *mac;
 
-  /* for DTLS */
-  uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];
-  unsigned int record_sw_head_idx;
-  unsigned int record_sw_size;
+	/* for DTLS */
+	uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];
+	unsigned int record_sw_head_idx;
+	unsigned int record_sw_size;
 
-  record_state_st read;
-  record_state_st write;
-  
-  /* Whether this state is in use, i.e., if there is
-     a pending handshake message waiting to be encrypted
-     under this epoch's parameters.
-   */
-  int usage_cnt;
+	record_state_st read;
+	record_state_st write;
+
+	/* Whether this state is in use, i.e., if there is
+	   a pending handshake message waiting to be encrypted
+	   under this epoch's parameters.
+	 */
+	int usage_cnt;
 };
 
-typedef struct
-{
-  unsigned int priority[MAX_ALGOS];
-  unsigned int algorithms;
+typedef struct {
+	unsigned int priority[MAX_ALGOS];
+	unsigned int algorithms;
 } priority_st;
 
-typedef enum
-{
-  SR_DISABLED,
-  SR_UNSAFE,
-  SR_PARTIAL,
-  SR_SAFE
+typedef enum {
+	SR_DISABLED,
+	SR_UNSAFE,
+	SR_PARTIAL,
+	SR_SAFE
 } safe_renegotiation_t;
 
 /* For the external api */
-struct gnutls_priority_st
-{
-  priority_st cipher;
-  priority_st mac;
-  priority_st kx;
-  priority_st compression;
-  priority_st protocol;
-  priority_st cert_type;
-  priority_st sign_algo;
-  priority_st supported_ecc;
+struct gnutls_priority_st {
+	priority_st cipher;
+	priority_st mac;
+	priority_st kx;
+	priority_st compression;
+	priority_st protocol;
+	priority_st cert_type;
+	priority_st sign_algo;
+	priority_st supported_ecc;
 
-  /* to disable record padding */
-  unsigned int no_extensions:1;
-  unsigned int allow_large_records:1;
-  unsigned int new_record_padding:1;
-  unsigned int max_empty_records;
-  safe_renegotiation_t sr;
-  unsigned int ssl3_record_version:1;
-  unsigned int server_precedence:1;
-  unsigned int allow_weak_keys:1;
-  unsigned int allow_wrong_pms:1;
-  /* Whether stateless compression will be used */
-  unsigned int stateless_compression:1;
-  unsigned int additional_verify_flags;
+	/* to disable record padding */
+	unsigned int no_extensions:1;
+	unsigned int allow_large_records:1;
+	unsigned int new_record_padding:1;
+	unsigned int max_empty_records;
+	safe_renegotiation_t sr;
+	unsigned int ssl3_record_version:1;
+	unsigned int server_precedence:1;
+	unsigned int allow_weak_keys:1;
+	unsigned int allow_wrong_pms:1;
+	/* Whether stateless compression will be used */
+	unsigned int stateless_compression:1;
+	unsigned int additional_verify_flags;
 
-  /* The session's expected security level.
-   * Will be used to determine the minimum DH bits,
-   * (or the acceptable certificate security level).
-   */
-  gnutls_sec_param_t level;
-  unsigned int dh_prime_bits; /* old (deprecated) variable */
+	/* The session's expected security level.
+	 * Will be used to determine the minimum DH bits,
+	 * (or the acceptable certificate security level).
+	 */
+	gnutls_sec_param_t level;
+	unsigned int dh_prime_bits;	/* old (deprecated) variable */
 };
 
 /* Allow around 50KB of length-hiding padding
@@ -690,338 +663,330 @@ struct gnutls_priority_st
 
 /* DH and RSA parameters types.
  */
-typedef struct gnutls_dh_params_int
-{
-  /* [0] is the prime, [1] is the generator.
-   */
-  bigint_t params[2];
-  int q_bits; /* length of q in bits. If zero then length is unknown.
-              */
+typedef struct gnutls_dh_params_int {
+	/* [0] is the prime, [1] is the generator.
+	 */
+	bigint_t params[2];
+	int q_bits;		/* length of q in bits. If zero then length is unknown.
+				 */
 } dh_params_st;
 
-typedef struct
-{
-  gnutls_dh_params_t dh_params;
-  int free_dh_params;
+typedef struct {
+	gnutls_dh_params_t dh_params;
+	int free_dh_params;
 } internal_params_st;
 
 /* DTLS session state
  */
-typedef struct
-{
-  /* HelloVerifyRequest DOS prevention cookie */
-  uint8_t  cookie[DTLS_MAX_COOKIE_SIZE];
-  uint8_t cookie_len;
+typedef struct {
+	/* HelloVerifyRequest DOS prevention cookie */
+	uint8_t cookie[DTLS_MAX_COOKIE_SIZE];
+	uint8_t cookie_len;
 
-  /* For DTLS handshake fragmentation and reassembly. */
-  uint16_t hsk_write_seq;
-  /* the sequence number of the expected packet */
-  unsigned int hsk_read_seq;
-  uint16_t mtu;
+	/* For DTLS handshake fragmentation and reassembly. */
+	uint16_t hsk_write_seq;
+	/* the sequence number of the expected packet */
+	unsigned int hsk_read_seq;
+	uint16_t mtu;
 
-  /* a flight transmission is in process */
-  unsigned int flight_init:1;
-  /* whether this is the last flight in the protocol  */
-  unsigned int last_flight:1;
-  
-  /* the retransmission timeout in milliseconds */
-  unsigned int retrans_timeout_ms;
-  /* the connection timeout in milliseconds */
-  unsigned int total_timeout_ms;
+	/* a flight transmission is in process */
+	unsigned int flight_init:1;
+	/* whether this is the last flight in the protocol  */
+	unsigned int last_flight:1;
 
-  unsigned int hsk_hello_verify_requests;
-  
-  /* non blocking stuff variables */
-  unsigned int blocking:1;
-  /* starting time of current handshake */
-  struct timespec handshake_start_time;
+	/* the retransmission timeout in milliseconds */
+	unsigned int retrans_timeout_ms;
+	/* the connection timeout in milliseconds */
+	unsigned int total_timeout_ms;
 
-  /* The actual retrans_timeout for the next message (e.g. doubled or so) 
-   */
-  unsigned int actual_retrans_timeout_ms;
+	unsigned int hsk_hello_verify_requests;
 
-  /* timers to handle async handshake after gnutls_handshake()
-   * has terminated. Required to handle retransmissions.
-   */
-  time_t async_term;
+	/* non blocking stuff variables */
+	unsigned int blocking:1;
+	/* starting time of current handshake */
+	struct timespec handshake_start_time;
 
-  /* last retransmission triggered by record layer */
-  struct timespec last_retransmit;
-  unsigned int packets_dropped;
+	/* The actual retrans_timeout for the next message (e.g. doubled or so) 
+	 */
+	unsigned int actual_retrans_timeout_ms;
+
+	/* timers to handle async handshake after gnutls_handshake()
+	 * has terminated. Required to handle retransmissions.
+	 */
+	time_t async_term;
+
+	/* last retransmission triggered by record layer */
+	struct timespec last_retransmit;
+	unsigned int packets_dropped;
 } dtls_st;
 
-typedef union
-{
-  void *ptr;
-  uint32_t num;
+typedef union {
+	void *ptr;
+	uint32_t num;
 } extension_priv_data_t;
 
-typedef struct
-{
-  /* holds all the parsed data received by the record layer */
-  mbuffer_head_st record_buffer; 
+typedef struct {
+	/* holds all the parsed data received by the record layer */
+	mbuffer_head_st record_buffer;
 
-  int handshake_hash_buffer_prev_len;           /* keeps the length of handshake_hash_buffer, excluding
-                                                 * the last received message */
-  gnutls_buffer_st handshake_hash_buffer;       /* used to keep the last received handshake 
-                                                 * message */
-  unsigned int resumable:1;              /* TRUE or FALSE - if we can resume that session */
-  unsigned int ticket_sent:1;            /* whether a session ticket was sent */
-  handshake_state_t handshake_final_state;
-  handshake_state_t handshake_state;    /* holds
-                                         * a number which indicates where
-                                         * the handshake procedure has been
-                                         * interrupted. If it is 0 then
-                                         * no interruption has happened.
-                                         */
+	int handshake_hash_buffer_prev_len;	/* keeps the length of handshake_hash_buffer, excluding
+						 * the last received message */
+	gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake 
+						 * message */
+	unsigned int resumable:1;	/* TRUE or FALSE - if we can resume that session */
+	unsigned int ticket_sent:1;	/* whether a session ticket was sent */
+	handshake_state_t handshake_final_state;
+	handshake_state_t handshake_state;	/* holds
+						 * a number which indicates where
+						 * the handshake procedure has been
+						 * interrupted. If it is 0 then
+						 * no interruption has happened.
+						 */
 
-  int invalid_connection:1;     /* true or FALSE - if this session is valid */
+	int invalid_connection:1;	/* true or FALSE - if this session is valid */
 
-  int may_not_read:1;           /* if it's 0 then we can read/write, otherwise it's forbiden to read/write
-                                 */
-  int may_not_write:1;
-  int read_eof:1;               /* non-zero if we have received a closure alert. */
+	int may_not_read:1;	/* if it's 0 then we can read/write, otherwise it's forbiden to read/write
+				 */
+	int may_not_write:1;
+	int read_eof:1;		/* non-zero if we have received a closure alert. */
 
-  int last_alert;               /* last alert received */
+	int last_alert;		/* last alert received */
 
-  /* The last handshake messages sent or received.
-   */
-  int last_handshake_in;
-  int last_handshake_out;
+	/* The last handshake messages sent or received.
+	 */
+	int last_handshake_in;
+	int last_handshake_out;
 
-  /* priorities */
-  struct gnutls_priority_st priorities;
+	/* priorities */
+	struct gnutls_priority_st priorities;
 
-  /* resumed session */
-  unsigned int resumed:1;  /* RESUME_TRUE or FALSE - if we are resuming a session */
-  unsigned int resumption_requested:1; /* non-zero if resumption was requested by client */
-  security_parameters_st resumed_security_parameters;
+	/* resumed session */
+	unsigned int resumed:1;	/* RESUME_TRUE or FALSE - if we are resuming a session */
+	unsigned int resumption_requested:1;	/* non-zero if resumption was requested by client */
+	security_parameters_st resumed_security_parameters;
 
-  /* These buffers are used in the handshake
-   * protocol only. freed using _gnutls_handshake_io_buffer_clear();
-   */
-  mbuffer_head_st handshake_send_buffer;
-  handshake_buffer_st handshake_recv_buffer[MAX_HANDSHAKE_MSGS];
-  int handshake_recv_buffer_size;
+	/* These buffers are used in the handshake
+	 * protocol only. freed using _gnutls_handshake_io_buffer_clear();
+	 */
+	mbuffer_head_st handshake_send_buffer;
+	handshake_buffer_st handshake_recv_buffer[MAX_HANDSHAKE_MSGS];
+	int handshake_recv_buffer_size;
 
-  /* this buffer holds a record packet -mostly used for
-   * non blocking IO.
-   */
-  mbuffer_head_st record_recv_buffer;   /* buffer holding the unparsed record that is currently 
-                                         * being received */
-  mbuffer_head_st record_send_buffer;   /* holds cached data
-                                         * for the gnutls_io_write_buffered()
-                                         * function.
-                                         */
-  size_t record_send_buffer_user_size;  /* holds the
-                                         * size of the user specified data to
-                                         * send.
-                                         */
+	/* this buffer holds a record packet -mostly used for
+	 * non blocking IO.
+	 */
+	mbuffer_head_st record_recv_buffer;	/* buffer holding the unparsed record that is currently 
+						 * being received */
+	mbuffer_head_st record_send_buffer;	/* holds cached data
+						 * for the gnutls_io_write_buffered()
+						 * function.
+						 */
+	size_t record_send_buffer_user_size;	/* holds the
+						 * size of the user specified data to
+						 * send.
+						 */
 
-  record_flush_t record_flush_mode; /* GNUTLS_FLUSH or GNUTLS_CORKED */
-  gnutls_buffer_st record_presend_buffer;/* holds cached data
-                                         * for the gnutls_record_send()
-                                         * function.
-                                         */
+	record_flush_t record_flush_mode;	/* GNUTLS_FLUSH or GNUTLS_CORKED */
+	gnutls_buffer_st record_presend_buffer;	/* holds cached data
+						 * for the gnutls_record_send()
+						 * function.
+						 */
 
-  unsigned expire_time;              /* after expire_time seconds this session will expire */
-  struct mod_auth_st_int *auth_struct;  /* used in handshake packets and KX algorithms */
+	unsigned expire_time;	/* after expire_time seconds this session will expire */
+	struct mod_auth_st_int *auth_struct;	/* used in handshake packets and KX algorithms */
 
-  /* this is the highest version available
-   * to the peer. (advertized version).
-   * This is obtained by the Handshake Client Hello 
-   * message. (some implementations read the Record version)
-   */
-  uint8_t adv_version_major;
-  uint8_t adv_version_minor;
+	/* this is the highest version available
+	 * to the peer. (advertized version).
+	 * This is obtained by the Handshake Client Hello 
+	 * message. (some implementations read the Record version)
+	 */
+	uint8_t adv_version_major;
+	uint8_t adv_version_minor;
 
-  /* if this is non zero a certificate request message
-   * will be sent to the client. - only if the ciphersuite
-   * supports it. In server side it contains GNUTLS_CERT_REQUIRE
-   * or similar.
-   */
-  unsigned send_cert_req;
+	/* if this is non zero a certificate request message
+	 * will be sent to the client. - only if the ciphersuite
+	 * supports it. In server side it contains GNUTLS_CERT_REQUIRE
+	 * or similar.
+	 */
+	unsigned send_cert_req;
 
-  size_t max_handshake_data_buffer_size;
+	size_t max_handshake_data_buffer_size;
 
-  /* PUSH & PULL functions.
-   */
-  gnutls_pull_timeout_func pull_timeout_func;
-  gnutls_pull_func pull_func;
-  gnutls_push_func push_func;
-  gnutls_vec_push_func vec_push_func;
-  gnutls_errno_func errno_func;
-  /* Holds the first argument of PUSH and PULL
-   * functions;
-   */
-  gnutls_transport_ptr_t transport_recv_ptr;
-  gnutls_transport_ptr_t transport_send_ptr;
+	/* PUSH & PULL functions.
+	 */
+	gnutls_pull_timeout_func pull_timeout_func;
+	gnutls_pull_func pull_func;
+	gnutls_push_func push_func;
+	gnutls_vec_push_func vec_push_func;
+	gnutls_errno_func errno_func;
+	/* Holds the first argument of PUSH and PULL
+	 * functions;
+	 */
+	gnutls_transport_ptr_t transport_recv_ptr;
+	gnutls_transport_ptr_t transport_send_ptr;
 
-  /* STORE & RETRIEVE functions. Only used if other
-   * backend than gdbm is used.
-   */
-  gnutls_db_store_func db_store_func;
-  gnutls_db_retr_func db_retrieve_func;
-  gnutls_db_remove_func db_remove_func;
-  void *db_ptr;
+	/* STORE & RETRIEVE functions. Only used if other
+	 * backend than gdbm is used.
+	 */
+	gnutls_db_store_func db_store_func;
+	gnutls_db_retr_func db_retrieve_func;
+	gnutls_db_remove_func db_remove_func;
+	void *db_ptr;
 
-  /* post client hello callback (server side only)
-   */
-  gnutls_handshake_post_client_hello_func user_hello_func;
-  /* handshake hook function */
-  gnutls_handshake_hook_func h_hook;
-  unsigned int h_type; /* the hooked type */
-  int16_t h_post; /* whether post-generation/receive */
+	/* post client hello callback (server side only)
+	 */
+	gnutls_handshake_post_client_hello_func user_hello_func;
+	/* handshake hook function */
+	gnutls_handshake_hook_func h_hook;
+	unsigned int h_type;	/* the hooked type */
+	int16_t h_post;		/* whether post-generation/receive */
 
-  /* holds the selected certificate and key.
-   * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
-   * to change them.
-   */
-  gnutls_pcert_st *selected_cert_list;
-  int16_t selected_cert_list_length;
-  struct gnutls_privkey_st *selected_key;
-  unsigned selected_need_free:1;
+	/* holds the selected certificate and key.
+	 * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
+	 * to change them.
+	 */
+	gnutls_pcert_st *selected_cert_list;
+	int16_t selected_cert_list_length;
+	struct gnutls_privkey_st *selected_key;
+	unsigned selected_need_free:1;
 
-  /* holds the extensions we sent to the peer
-   * (in case of a client)
-   */
-  uint16_t extensions_sent[MAX_EXT_TYPES];
-  uint16_t extensions_sent_size;
+	/* holds the extensions we sent to the peer
+	 * (in case of a client)
+	 */
+	uint16_t extensions_sent[MAX_EXT_TYPES];
+	uint16_t extensions_sent_size;
 
-  /* is 0 if we are to send the whole PGP key, or non zero
-   * if the fingerprint is to be sent.
-   */
-  unsigned pgp_fingerprint:1;
+	/* is 0 if we are to send the whole PGP key, or non zero
+	 * if the fingerprint is to be sent.
+	 */
+	unsigned pgp_fingerprint:1;
 
-  /* This holds the default version that our first
-   * record packet will have. */
-  uint8_t default_record_version[2];
+	/* This holds the default version that our first
+	 * record packet will have. */
+	uint8_t default_record_version[2];
 
-  void *user_ptr;
+	void *user_ptr;
 
-  unsigned enable_private:1;           /* non zero to
-                                 * enable cipher suites
-                                 * which have 0xFF status.
-                                 */
+	unsigned enable_private:1;	/* non zero to
+					 * enable cipher suites
+					 * which have 0xFF status.
+					 */
 
-  /* Holds 0 if the last called function was interrupted while
-   * receiving, and non zero otherwise.
-   */
-  unsigned direction:1;
+	/* Holds 0 if the last called function was interrupted while
+	 * receiving, and non zero otherwise.
+	 */
+	unsigned direction:1;
 
-  /* This callback will be used (if set) to receive an
-   * openpgp key. (if the peer sends a fingerprint)
-   */
-  gnutls_openpgp_recv_key_func openpgp_recv_key_func;
+	/* This callback will be used (if set) to receive an
+	 * openpgp key. (if the peer sends a fingerprint)
+	 */
+	gnutls_openpgp_recv_key_func openpgp_recv_key_func;
 
-  /* If non zero the server will not advertise the CA's he
-   * trusts (do not send an RDN sequence).
-   */
-  unsigned ignore_rdn_sequence:1;
+	/* If non zero the server will not advertise the CA's he
+	 * trusts (do not send an RDN sequence).
+	 */
+	unsigned ignore_rdn_sequence:1;
 
-  /* This is used to set an arbitary version in the RSA
-   * PMS secret. Can be used by clients to test whether the
-   * server checks that version. (** only used in gnutls-cli-debug)
-   */
-  uint8_t rsa_pms_version[2];
+	/* This is used to set an arbitary version in the RSA
+	 * PMS secret. Can be used by clients to test whether the
+	 * server checks that version. (** only used in gnutls-cli-debug)
+	 */
+	uint8_t rsa_pms_version[2];
 
-  /* Here we cache the DH or RSA parameters got from the
-   * credentials structure, or from a callback. That is to
-   * minimize external calls.
-   */
-  internal_params_st params;
+	/* Here we cache the DH or RSA parameters got from the
+	 * credentials structure, or from a callback. That is to
+	 * minimize external calls.
+	 */
+	internal_params_st params;
 
-  /* To avoid using global variables, and especially on Windows where
-   * the application may use a different errno variable than GnuTLS,
-   * it is possible to use gnutls_transport_set_errno to set a
-   * session-specific errno variable in the user-replaceable push/pull
-   * functions.  This value is used by the send/recv functions.  (The
-   * strange name of this variable is because 'errno' is typically
-   * #define'd.)
-   */
-  int errnum;
+	/* To avoid using global variables, and especially on Windows where
+	 * the application may use a different errno variable than GnuTLS,
+	 * it is possible to use gnutls_transport_set_errno to set a
+	 * session-specific errno variable in the user-replaceable push/pull
+	 * functions.  This value is used by the send/recv functions.  (The
+	 * strange name of this variable is because 'errno' is typically
+	 * #define'd.)
+	 */
+	int errnum;
 
-  /* Function used to perform public-key signing operation during
-     handshake.  Used by gnutls_sig.c:_gnutls_tls_sign(), see also
-     gnutls_sign_callback_set(). */
-  gnutls_sign_func sign_func;
-  void *sign_func_userdata;
+	/* Function used to perform public-key signing operation during
+	   handshake.  Used by gnutls_sig.c:_gnutls_tls_sign(), see also
+	   gnutls_sign_callback_set(). */
+	gnutls_sign_func sign_func;
+	void *sign_func_userdata;
 
-  /* minimum bits to allow for SRP
-   * use gnutls_srp_set_prime_bits() to adjust it.
-   */
-  uint16_t srp_prime_bits;
+	/* minimum bits to allow for SRP
+	 * use gnutls_srp_set_prime_bits() to adjust it.
+	 */
+	uint16_t srp_prime_bits;
 
-  /* A handshake process has been completed */
-  unsigned int initial_negotiation_completed:1;
+	/* A handshake process has been completed */
+	unsigned int initial_negotiation_completed:1;
 
-  struct
-  {
-    uint16_t type;
-    extension_priv_data_t priv;
-    unsigned set:1;
-  } extension_int_data[MAX_EXT_TYPES];
+	struct {
+		uint16_t type;
+		extension_priv_data_t priv;
+		unsigned set:1;
+	} extension_int_data[MAX_EXT_TYPES];
 
-  struct
-  {
-    uint16_t type;
-    extension_priv_data_t priv;
-    unsigned set:1;
-  } resumed_extension_int_data[MAX_EXT_TYPES];
-  /* The type of transport protocol; stream or datagram */
-  transport_t transport;
+	struct {
+		uint16_t type;
+		extension_priv_data_t priv;
+		unsigned set:1;
+	} resumed_extension_int_data[MAX_EXT_TYPES];
+	/* The type of transport protocol; stream or datagram */
+	transport_t transport;
 
-  /* DTLS session state */
-  dtls_st dtls;
-  
-  /* if set it means that the master key was set using
-   * gnutls_session_set_master() rather than being negotiated. */
-  unsigned int premaster_set:1;
-  
-  unsigned int cb_tls_unique_len;
-  unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
-  
-  time_t handshake_endtime; /* end time in seconds */
-  unsigned int handshake_timeout_ms; /* timeout in milliseconds */
-  unsigned int record_timeout_ms; /* timeout in milliseconds */
+	/* DTLS session state */
+	dtls_st dtls;
 
-  gnutls_buffer_st hb_local_data;
-  gnutls_buffer_st hb_remote_data;
-  struct timespec hb_ping_start; /* timestamp: when first HeartBeat ping was sent*/
-  struct timespec hb_ping_sent; /* timestamp: when last HeartBeat ping was sent*/
-  unsigned int hb_actual_retrans_timeout_ms; /* current timeout, in milliseconds*/
-  unsigned int hb_retrans_timeout_ms; /* the default timeout, in milliseconds*/
-  unsigned int hb_total_timeout_ms; /* the total timeout, in milliseconds*/
-  
-  unsigned int ocsp_check_ok:1; /* will be zero if the OCSP response TLS extension
-                               * check failed (OCSP was old/unrelated or so). */
+	/* if set it means that the master key was set using
+	 * gnutls_session_set_master() rather than being negotiated. */
+	unsigned int premaster_set:1;
 
-  heartbeat_state_t hb_state; /* for ping */
-  
-  recv_state_t recv_state; /* state of the receive function */
-  
-  unsigned int sc_random_set:1;
-  unsigned int no_replay_protection:1; /* DTLS replay protection */
-  
-  /* If you add anything here, check _gnutls_handshake_internal_state_clear().
-   */
+	unsigned int cb_tls_unique_len;
+	unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
+
+	time_t handshake_endtime;	/* end time in seconds */
+	unsigned int handshake_timeout_ms;	/* timeout in milliseconds */
+	unsigned int record_timeout_ms;	/* timeout in milliseconds */
+
+	gnutls_buffer_st hb_local_data;
+	gnutls_buffer_st hb_remote_data;
+	struct timespec hb_ping_start;	/* timestamp: when first HeartBeat ping was sent */
+	struct timespec hb_ping_sent;	/* timestamp: when last HeartBeat ping was sent */
+	unsigned int hb_actual_retrans_timeout_ms;	/* current timeout, in milliseconds */
+	unsigned int hb_retrans_timeout_ms;	/* the default timeout, in milliseconds */
+	unsigned int hb_total_timeout_ms;	/* the total timeout, in milliseconds */
+
+	unsigned int ocsp_check_ok:1;	/* will be zero if the OCSP response TLS extension
+					 * check failed (OCSP was old/unrelated or so). */
+
+	heartbeat_state_t hb_state;	/* for ping */
+
+	recv_state_t recv_state;	/* state of the receive function */
+
+	unsigned int sc_random_set:1;
+	unsigned int no_replay_protection:1;	/* DTLS replay protection */
+
+	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
+	 */
 } internals_st;
 
 /* Maximum number of epochs we keep around. */
 #define MAX_EPOCH_INDEX 16
 
-struct gnutls_session_int
-{
-  security_parameters_st security_parameters;
-  record_parameters_st *record_parameters[MAX_EPOCH_INDEX];
-  internals_st internals;
-  gnutls_key_st key;
+struct gnutls_session_int {
+	security_parameters_st security_parameters;
+	record_parameters_st *record_parameters[MAX_EPOCH_INDEX];
+	internals_st internals;
+	gnutls_key_st key;
 };
 
 
 /* functions 
  */
-void _gnutls_free_auth_info (gnutls_session_t session);
+void _gnutls_free_auth_info(gnutls_session_t session);
 
 /* These two macros return the advertised TLS version of
  * the peer.
@@ -1036,21 +1001,19 @@ void _gnutls_free_auth_info (gnutls_session_t session);
 	session->internals.adv_version_major = major; \
 	session->internals.adv_version_minor = minor
 
-int _gnutls_is_secure_mem_null (const void *);
+int _gnutls_is_secure_mem_null(const void *);
 
-inline static const version_entry_st*
-get_version (gnutls_session_t session)
+inline static const version_entry_st *get_version(gnutls_session_t session)
 {
-  return session->security_parameters.pversion;
+	return session->security_parameters.pversion;
 }
 
-inline static unsigned
-get_num_version (gnutls_session_t session)
+inline static unsigned get_num_version(gnutls_session_t session)
 {
-  if (likely(session->security_parameters.pversion != NULL))
-    return session->security_parameters.pversion->id;
-  else
-    return GNUTLS_VERSION_UNKNOWN;
+	if (likely(session->security_parameters.pversion != NULL))
+		return session->security_parameters.pversion->id;
+	else
+		return GNUTLS_VERSION_UNKNOWN;
 }
 
 #define _gnutls_set_current_version(s, v) { \
@@ -1060,28 +1023,31 @@ get_num_version (gnutls_session_t session)
 #define timespec_sub_ms _gnutls_timespec_sub_ms
 unsigned int
 /* returns a-b in ms */
-timespec_sub_ms (struct timespec *a, struct timespec *b);
+ timespec_sub_ms(struct timespec *a, struct timespec *b);
 
 #include <algorithms.h>
-inline static size_t max_user_send_size(gnutls_session_t session, record_parameters_st *record_params)
+inline static size_t max_user_send_size(gnutls_session_t session,
+					record_parameters_st *
+					record_params)
 {
-size_t max;
+	size_t max;
 
-  if (IS_DTLS(session))
-    max = gnutls_dtls_get_data_mtu(session);
-  else
-    {
-      max = session->security_parameters.max_record_send_size;
-      /* DTLS data MTU accounts for those */
+	if (IS_DTLS(session))
+		max = gnutls_dtls_get_data_mtu(session);
+	else {
+		max = session->security_parameters.max_record_send_size;
+		/* DTLS data MTU accounts for those */
 
-      if (record_params->write.new_record_padding != 0)
-        max -= 2;
+		if (record_params->write.new_record_padding != 0)
+			max -= 2;
 
-      if (_gnutls_cipher_is_block (record_params->cipher))
-        max -= _gnutls_cipher_get_block_size(record_params->cipher);
-    }
+		if (_gnutls_cipher_is_block(record_params->cipher))
+			max -=
+			    _gnutls_cipher_get_block_size(record_params->
+							  cipher);
+	}
 
-  return max;
+	return max;
 }
 
-#endif /* GNUTLS_INT_H */
+#endif				/* GNUTLS_INT_H */

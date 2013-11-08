@@ -24,17 +24,16 @@
 #include <config.h>
 #endif
 
-#define REL_LAYER 
+#define REL_LAYER
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #if defined(_WIN32)
 
-int
-main ()
+int main()
 {
-    exit (77);
+	exit(77);
 }
 
 #else
@@ -53,7 +52,7 @@ main ()
 #include "utils.h"
 
 static int test_finished = 0;
-static void terminate (void);
+static void terminate(void);
 
 /* This program tests the rehandshake in DTLS
  */
@@ -66,16 +65,14 @@ tls_audit_log_func (gnutls_session_t session, const char *str)
 }
 */
 
-static void
-server_log_func (int level, const char *str)
+static void server_log_func(int level, const char *str)
 {
-    fprintf (stderr, "server|<%d>| %s", level, str);
+	fprintf(stderr, "server|<%d>| %s", level, str);
 }
 
-static void
-client_log_func (int level, const char *str)
+static void client_log_func(int level, const char *str)
 {
-    fprintf (stderr, "client|<%d>| %s", level, str);
+	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
 /* These are global */
@@ -88,363 +85,351 @@ static pid_t child;
 
 #define MAX_SEQ 128
 
-static int msg_seq[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 16, 5, 32, 11, 11, 11, 11, 12, 10, 13, 14, 
-  15, 16, 17, 19, 20, 18, 22, 24, 23, 25, 26, 27, 29, 28, 29, 29, 30, 31, 32, 33, 34, 35, 37, 36, 38, 39, 
-  42, 37, 40, 41, 41, -1};
+static int msg_seq[] =
+    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 16, 5, 32, 11, 11, 11, 11, 12,
+10, 13, 14,
+	15, 16, 17, 19, 20, 18, 22, 24, 23, 25, 26, 27, 29, 28, 29, 29, 30,
+	    31, 32, 33, 34, 35, 37, 36, 38, 39,
+	42, 37, 40, 41, 41, -1
+};
+
 static unsigned int current = 0;
 static unsigned int pos = 0;
 
-unsigned char* stored_messages[MAX_SEQ];
+unsigned char *stored_messages[MAX_SEQ];
 unsigned int stored_sizes[MAX_SEQ];
 
 static ssize_t
-odd_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
+odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-ssize_t ret;
-unsigned i;
+	ssize_t ret;
+	unsigned i;
 
-  if (msg_seq[current] == -1 || test_finished != 0)
-    {
-      test_finished = 1;
-      return len;
-    }
-  
-  stored_messages[current] = malloc(len);
-  memcpy(stored_messages[current], data, len);
-  stored_sizes[current] = len;
-  
-  if (pos != current)
-    {
-      for (i=pos;i<=current;i++)
-        {
-          if (stored_messages[msg_seq[i]] != NULL)
-            {
-              do
-                {
-                  ret = send((long int)tr, stored_messages[msg_seq[i]], stored_sizes[msg_seq[i]], 0);
-                }
-              while(ret == -1 && errno == EAGAIN);
-              pos++;
-            }
-          else
-            break;
-        }
-    }
-  else if (msg_seq[current] == (int)current)
-    {
-      do
-        {
-          ret = send((long int)tr, data, len, 0);
-        }
-      while(ret == -1 && errno == EAGAIN);
+	if (msg_seq[current] == -1 || test_finished != 0) {
+		test_finished = 1;
+		return len;
+	}
 
-      current++;
-      pos++;
-    
-      return ret;
-    }
-  else if (stored_messages[msg_seq[current]] != NULL)
-    {
-      do
-        {
-          ret = send((long int)tr, stored_messages[msg_seq[current]], stored_sizes[msg_seq[current]], 0);
-        }
-      while(ret == -1 && errno == EAGAIN);
-      current++;
-      pos++;
-      return ret;
-    }
+	stored_messages[current] = malloc(len);
+	memcpy(stored_messages[current], data, len);
+	stored_sizes[current] = len;
 
-  current++;
+	if (pos != current) {
+		for (i = pos; i <= current; i++) {
+			if (stored_messages[msg_seq[i]] != NULL) {
+				do {
+					ret =
+					    send((long int) tr,
+						 stored_messages[msg_seq
+								 [i]],
+						 stored_sizes[msg_seq[i]],
+						 0);
+				}
+				while (ret == -1 && errno == EAGAIN);
+				pos++;
+			} else
+				break;
+		}
+	} else if (msg_seq[current] == (int) current) {
+		do {
+			ret = send((long int) tr, data, len, 0);
+		}
+		while (ret == -1 && errno == EAGAIN);
 
-  return len;
+		current++;
+		pos++;
+
+		return ret;
+	} else if (stored_messages[msg_seq[current]] != NULL) {
+		do {
+			ret =
+			    send((long int) tr,
+				 stored_messages[msg_seq[current]],
+				 stored_sizes[msg_seq[current]], 0);
+		}
+		while (ret == -1 && errno == EAGAIN);
+		current++;
+		pos++;
+		return ret;
+	}
+
+	current++;
+
+	return len;
 }
 
 static ssize_t
-n_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
+n_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-  return send((unsigned long)tr, data, len, 0);
+	return send((unsigned long) tr, data, len, 0);
 }
 
 /* The first five messages are handshake. Thus corresponds to msg_seq+5 */
-static int recv_msg_seq[] = { 1, 2, 3, 4, 5, 6, 12, 28, 7, 8, 9, 10, 11, 13, 15, 16, 14, 18, 20, 19, 21, 22, 
- 23, 25, 24, 26, 27, 29, 30, 31, 33, 32, 34, 35, 38, 36, 37, -1};
+static int recv_msg_seq[] =
+    { 1, 2, 3, 4, 5, 6, 12, 28, 7, 8, 9, 10, 11, 13, 15, 16, 14, 18, 20,
+19, 21, 22,
+	23, 25, 24, 26, 27, 29, 30, 31, 33, 32, 34, 35, 38, 36, 37, -1
+};
 
-static void
-client (int fd)
+static void client(int fd)
 {
-    gnutls_session_t session;
-    int ret;
-    char buffer[MAX_BUF + 1];
-    gnutls_anon_client_credentials_t anoncred;
-    unsigned char seq[8];
-    uint64_t useq;
-    unsigned current = 0;
+	gnutls_session_t session;
+	int ret;
+	char buffer[MAX_BUF + 1];
+	gnutls_anon_client_credentials_t anoncred;
+	unsigned char seq[8];
+	uint64_t useq;
+	unsigned current = 0;
 #ifndef REL_LAYER
-    struct timespec ts;
+	struct timespec ts;
 
-    ts.tv_sec = 0;
-    ts.tv_nsec = 100*1000*1000;
+	ts.tv_sec = 0;
+	ts.tv_nsec = 100 * 1000 * 1000;
 #endif
-    
-    memset(buffer, 0, sizeof(buffer));
-    
-    /* Need to enable anonymous KX specifically. */
+
+	memset(buffer, 0, sizeof(buffer));
+
+	/* Need to enable anonymous KX specifically. */
 
 /*    gnutls_global_set_audit_log_function (tls_audit_log_func); */
-    global_init ();
+	global_init();
 
-    if (debug)
-      {
-          gnutls_global_set_log_function (client_log_func);
-          gnutls_global_set_log_level (99);
-      }
+	if (debug) {
+		gnutls_global_set_log_function(client_log_func);
+		gnutls_global_set_log_level(99);
+	}
 
-    gnutls_anon_allocate_client_credentials (&anoncred);
+	gnutls_anon_allocate_client_credentials(&anoncred);
 
-    /* Initialize TLS session
-     */
-    gnutls_init (&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
-    gnutls_heartbeat_enable (session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
-    gnutls_dtls_set_mtu (session, 1500);
+	/* Initialize TLS session
+	 */
+	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
+	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
+	gnutls_dtls_set_mtu(session, 1500);
 
-    /* Use default priorities */
-    gnutls_priority_set_direct (session,
-                                "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-                                NULL);
+	/* Use default priorities */
+	gnutls_priority_set_direct(session,
+				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+				   NULL);
 
-    /* put the anonymous credentials to the current session
-     */
-    gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
+	/* put the anonymous credentials to the current session
+	 */
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
-    gnutls_transport_set_int (session, fd);
+	gnutls_transport_set_int(session, fd);
 
-    /* Perform the TLS handshake
-     */
-    do
-      {
-          ret = gnutls_handshake (session);
-      }
-    while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
+	/* Perform the TLS handshake
+	 */
+	do {
+		ret = gnutls_handshake(session);
+	}
+	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
-    if (ret < 0)
-      {
-          fail ("client: Handshake failed\n");
-          gnutls_perror (ret);
-          exit (1);
-      }
-    else
-      {
-          if (debug)
-              success ("client: Handshake was completed\n");
-      }
+	if (ret < 0) {
+		fail("client: Handshake failed\n");
+		gnutls_perror(ret);
+		exit(1);
+	} else {
+		if (debug)
+			success("client: Handshake was completed\n");
+	}
 
-    gnutls_record_send( session, buffer, 1);
+	gnutls_record_send(session, buffer, 1);
 
-    if (debug)
-        success ("client: DTLS version is: %s\n",
-                 gnutls_protocol_get_name (gnutls_protocol_get_version
-                                           (session)));
-    do
-      {
-        ret = gnutls_record_recv_seq (session, buffer, sizeof (buffer), seq);
+	if (debug)
+		success("client: DTLS version is: %s\n",
+			gnutls_protocol_get_name
+			(gnutls_protocol_get_version(session)));
+	do {
+		ret =
+		    gnutls_record_recv_seq(session, buffer, sizeof(buffer),
+					   seq);
 
-        if (ret > 0)
-          {
-            useq = seq[3] | (seq[2] << 8) | (seq[1] << 16) | (seq[0] << 24);
-            useq <<= 32;
-            useq |= seq[7] | (seq[6] << 8) | (seq[5] << 16) | (seq[4] << 24);
-        
-            if (recv_msg_seq[current] == -1)
-              {
-                fail("received message sequence differs\n");
-                terminate();
-              }
-        
-            if ((uint32_t)recv_msg_seq[current] != (uint32_t)useq)
-              {
-                fail("received message sequence differs\n");
-                terminate();
-              }
+		if (ret > 0) {
+			useq =
+			    seq[3] | (seq[2] << 8) | (seq[1] << 16) |
+			    (seq[0] << 24);
+			useq <<= 32;
+			useq |=
+			    seq[7] | (seq[6] << 8) | (seq[5] << 16) |
+			    (seq[4] << 24);
 
-            current++;
-          }
+			if (recv_msg_seq[current] == -1) {
+				fail("received message sequence differs\n");
+				terminate();
+			}
+
+			if ((uint32_t) recv_msg_seq[current] !=
+			    (uint32_t) useq) {
+				fail("received message sequence differs\n");
+				terminate();
+			}
+
+			current++;
+		}
 #ifndef REL_LAYER
-          nanosleep(&ts, NULL);
+		nanosleep(&ts, NULL);
 #endif
-      }
-    while ((ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED || ret > 0));
+	}
+	while ((ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED
+		|| ret > 0));
 
-    gnutls_bye (session, GNUTLS_SHUT_WR);
+	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-    close (fd);
+	close(fd);
 
-    gnutls_deinit (session);
+	gnutls_deinit(session);
 
-    gnutls_anon_free_client_credentials (anoncred);
+	gnutls_anon_free_client_credentials(anoncred);
 
-    gnutls_global_deinit ();
+	gnutls_global_deinit();
 }
 
 
-static void
-terminate (void)
+static void terminate(void)
 {
-    int status;
+	int status;
 
-    kill (child, SIGTERM);
-    wait (&status);
-    exit (1);
+	kill(child, SIGTERM);
+	wait(&status);
+	exit(1);
 }
 
-static void
-server (int fd)
+static void server(int fd)
 {
-    int ret;
-    gnutls_session_t session;
-    gnutls_anon_server_credentials_t anoncred;
-    char c;
+	int ret;
+	gnutls_session_t session;
+	gnutls_anon_server_credentials_t anoncred;
+	char c;
 #ifndef REL_LAYER
-    struct timespec ts;
-    
-    ts.tv_sec = 0;
-    ts.tv_nsec = 100*1000*1000;
+	struct timespec ts;
+
+	ts.tv_sec = 0;
+	ts.tv_nsec = 100 * 1000 * 1000;
 #endif
 
-    global_init ();
+	global_init();
 
-    if (debug)
-      {
-          gnutls_global_set_log_function (server_log_func);
-          gnutls_global_set_log_level (4711);
-      }
+	if (debug) {
+		gnutls_global_set_log_function(server_log_func);
+		gnutls_global_set_log_level(4711);
+	}
 
-    gnutls_anon_allocate_server_credentials (&anoncred);
+	gnutls_anon_allocate_server_credentials(&anoncred);
 
-    gnutls_init (&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-    gnutls_transport_set_push_function (session, odd_push);
-    gnutls_heartbeat_enable (session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
-    gnutls_dtls_set_mtu (session, 1500);
+	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
+	gnutls_transport_set_push_function(session, odd_push);
+	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
+	gnutls_dtls_set_mtu(session, 1500);
 
-    /* avoid calling all the priority functions, since the defaults
-     * are adequate.
-     */
-    gnutls_priority_set_direct (session,
-                                "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-                                NULL);
-    gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(session,
+				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+				   NULL);
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
-    gnutls_transport_set_int (session, fd);
+	gnutls_transport_set_int(session, fd);
 
-    do
-      {
-          ret = gnutls_handshake (session);
-      }
-    while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
-    if (ret < 0)
-      {
-          close (fd);
-          gnutls_deinit (session);
-          fail ("server: Handshake has failed (%s)\n\n",
-                gnutls_strerror (ret));
-          terminate ();
-      }
-    if (debug)
-        success ("server: Handshake was completed\n");
+	do {
+		ret = gnutls_handshake(session);
+	}
+	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	if (ret < 0) {
+		close(fd);
+		gnutls_deinit(session);
+		fail("server: Handshake has failed (%s)\n\n",
+		     gnutls_strerror(ret));
+		terminate();
+	}
+	if (debug)
+		success("server: Handshake was completed\n");
 
-    if (debug)
-        success ("server: TLS version is: %s\n",
-                 gnutls_protocol_get_name (gnutls_protocol_get_version
-                                           (session)));
+	if (debug)
+		success("server: TLS version is: %s\n",
+			gnutls_protocol_get_name
+			(gnutls_protocol_get_version(session)));
 
-    gnutls_record_recv(session, &c, 1);
-    do
-      {
-          do
-            {
-                ret = gnutls_record_send( session, &c, 1);
-            }
-          while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	gnutls_record_recv(session, &c, 1);
+	do {
+		do {
+			ret = gnutls_record_send(session, &c, 1);
+		}
+		while (ret == GNUTLS_E_AGAIN
+		       || ret == GNUTLS_E_INTERRUPTED);
 
-          if (ret < 0)
-            {
-                fail ("send: %s\n", gnutls_strerror (ret));
-                terminate ();
-            }
+		if (ret < 0) {
+			fail("send: %s\n", gnutls_strerror(ret));
+			terminate();
+		}
 #ifndef REL_LAYER
-          nanosleep(&ts, NULL);
+		nanosleep(&ts, NULL);
 #endif
-      }
-    while (test_finished == 0);
+	}
+	while (test_finished == 0);
 
-    gnutls_transport_set_push_function (session, n_push);
+	gnutls_transport_set_push_function(session, n_push);
 #ifndef REL_LAYER
-    nanosleep(&ts, NULL);
+	nanosleep(&ts, NULL);
 #endif
-    do
-      {
-        ret = gnutls_bye (session, GNUTLS_SHUT_WR);
-      }
-    while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	do {
+		ret = gnutls_bye(session, GNUTLS_SHUT_WR);
+	}
+	while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
-    close (fd);
-    gnutls_deinit (session);
+	close(fd);
+	gnutls_deinit(session);
 
-    gnutls_anon_free_server_credentials (anoncred);
+	gnutls_anon_free_server_credentials(anoncred);
 
-    gnutls_global_deinit ();
+	gnutls_global_deinit();
 
-    if (debug)
-        success ("server: finished\n");
+	if (debug)
+		success("server: finished\n");
 }
 
-static void
-start (void)
+static void start(void)
 {
-    int fd[2];
-    int ret;
+	int fd[2];
+	int ret;
 
 #ifdef REL_LAYER
-    ret = socketpair (AF_UNIX, SOCK_STREAM, 0, fd);
+	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 #else
-    ret = socketpair (AF_UNIX, SOCK_DGRAM, 0, fd);
+	ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
 #endif
-    if (ret < 0)
-      {
-          perror ("socketpair");
-          exit (1);
-      }
+	if (ret < 0) {
+		perror("socketpair");
+		exit(1);
+	}
 
-    child = fork ();
-    if (child < 0)
-      {
-          perror ("fork");
-          fail ("fork");
-          exit (1);
-      }
+	child = fork();
+	if (child < 0) {
+		perror("fork");
+		fail("fork");
+		exit(1);
+	}
 
-    if (child)
-      {
-          int status;
-          /* parent */
+	if (child) {
+		int status;
+		/* parent */
 
-          server (fd[0]);
-          wait (&status);
-          if (WEXITSTATUS (status) != 0)
-              fail ("Child died with status %d\n", WEXITSTATUS (status));
-      }
-    else
-      {
-          close (fd[0]);
-          client (fd[1]);
-          exit (0);
-      }
+		server(fd[0]);
+		wait(&status);
+		if (WEXITSTATUS(status) != 0)
+			fail("Child died with status %d\n",
+			     WEXITSTATUS(status));
+	} else {
+		close(fd[0]);
+		client(fd[1]);
+		exit(0);
+	}
 }
 
-void
-doit (void)
+void doit(void)
 {
-    start ();
+	start();
 }
 
-#endif /* _WIN32 */
+#endif				/* _WIN32 */

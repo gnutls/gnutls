@@ -29,7 +29,7 @@
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_global.h>
-#include <gnutls_num.h>         /* MAX */
+#include <gnutls_num.h>		/* MAX */
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
@@ -42,36 +42,34 @@
  * of the TBS and sign it on the fly.
  */
 int
-_gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
-                      gnutls_datum_t * tbs)
+_gnutls_x509_get_tbs(ASN1_TYPE cert, const char *tbs_name,
+		     gnutls_datum_t * tbs)
 {
-  int result;
-  uint8_t *buf;
-  int buf_size;
+	int result;
+	uint8_t *buf;
+	int buf_size;
 
-  buf_size = 0;
-  asn1_der_coding (cert, tbs_name, NULL, &buf_size, NULL);
+	buf_size = 0;
+	asn1_der_coding(cert, tbs_name, NULL, &buf_size, NULL);
 
-  buf = gnutls_malloc (buf_size);
-  if (buf == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+	buf = gnutls_malloc(buf_size);
+	if (buf == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-  result = asn1_der_coding (cert, tbs_name, buf, &buf_size, NULL);
+	result = asn1_der_coding(cert, tbs_name, buf, &buf_size, NULL);
 
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      gnutls_free (buf);
-      return _gnutls_asn2err (result);
-    }
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		gnutls_free(buf);
+		return _gnutls_asn2err(result);
+	}
 
-  tbs->data = buf;
-  tbs->size = buf_size;
+	tbs->data = buf;
+	tbs->size = buf_size;
 
-  return 0;
+	return 0;
 }
 
 /*-
@@ -87,86 +85,84 @@ _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
  *   negative error value.
  -*/
 int
-_gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
-                        gnutls_digest_algorithm_t dig,
-                        gnutls_x509_crt_t issuer, gnutls_privkey_t issuer_key)
+_gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
+		       gnutls_digest_algorithm_t dig,
+		       gnutls_x509_crt_t issuer,
+		       gnutls_privkey_t issuer_key)
 {
-  int result;
-  gnutls_datum_t signature;
-  gnutls_datum_t tbs;
-  char name[128];
+	int result;
+	gnutls_datum_t signature;
+	gnutls_datum_t tbs;
+	char name[128];
 
-  /* Step 1. Copy the issuer's name into the certificate.
-   */
-  _gnutls_str_cpy (name, sizeof (name), src_name);
-  _gnutls_str_cat (name, sizeof (name), ".issuer");
+	/* Step 1. Copy the issuer's name into the certificate.
+	 */
+	_gnutls_str_cpy(name, sizeof(name), src_name);
+	_gnutls_str_cat(name, sizeof(name), ".issuer");
 
-  result = asn1_copy_node (src, name, issuer->cert, "tbsCertificate.subject");
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
+	result =
+	    asn1_copy_node(src, name, issuer->cert,
+			   "tbsCertificate.subject");
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
 
-  /* Step 1.5. Write the signature stuff in the tbsCertificate.
-   */
-  _gnutls_str_cpy (name, sizeof (name), src_name);
-  _gnutls_str_cat (name, sizeof (name), ".signature");
+	/* Step 1.5. Write the signature stuff in the tbsCertificate.
+	 */
+	_gnutls_str_cpy(name, sizeof(name), src_name);
+	_gnutls_str_cat(name, sizeof(name), ".signature");
 
-  result = _gnutls_x509_write_sig_params (src, name,
-                                          gnutls_privkey_get_pk_algorithm
-                                          (issuer_key, NULL), dig);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
+	result = _gnutls_x509_write_sig_params(src, name,
+					       gnutls_privkey_get_pk_algorithm
+					       (issuer_key, NULL), dig);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
 
-  /* Step 2. Sign the certificate.
-   */
-  result = _gnutls_x509_get_tbs (src, src_name, &tbs);
+	/* Step 2. Sign the certificate.
+	 */
+	result = _gnutls_x509_get_tbs(src, src_name, &tbs);
 
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
 
-  result = gnutls_privkey_sign_data (issuer_key, dig, 0, &tbs, &signature);
-  gnutls_free (tbs.data);
+	result =
+	    gnutls_privkey_sign_data(issuer_key, dig, 0, &tbs, &signature);
+	gnutls_free(tbs.data);
 
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
 
-  /* write the signature (bits)
-   */
-  result =
-    asn1_write_value (src, "signature", signature.data, signature.size * 8);
+	/* write the signature (bits)
+	 */
+	result =
+	    asn1_write_value(src, "signature", signature.data,
+			     signature.size * 8);
 
-  _gnutls_free_datum (&signature);
+	_gnutls_free_datum(&signature);
 
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
 
-  /* Step 3. Move up and write the AlgorithmIdentifier, which is also
-   * the same. 
-   */
+	/* Step 3. Move up and write the AlgorithmIdentifier, which is also
+	 * the same. 
+	 */
 
-  result = _gnutls_x509_write_sig_params (src, "signatureAlgorithm",
-                                          gnutls_privkey_get_pk_algorithm
-                                          (issuer_key, NULL), dig);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
+	result = _gnutls_x509_write_sig_params(src, "signatureAlgorithm",
+					       gnutls_privkey_get_pk_algorithm
+					       (issuer_key, NULL), dig);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
 
-  return 0;
+	return 0;
 }
-

@@ -32,10 +32,9 @@
 
 extern extension_entry_st ext_mod_srp;
 
-typedef struct
-{
-  char *username;
-  char *password;
+typedef struct {
+	char *username;
+	char *password;
 } srp_ext_st;
 
 #endif

@@ -50,65 +50,59 @@
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
-gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
-                                gnutls_openpgp_keyring_t keyring,
-                                unsigned int flags, unsigned int *verify)
+gnutls_openpgp_crt_verify_ring(gnutls_openpgp_crt_t key,
+			       gnutls_openpgp_keyring_t keyring,
+			       unsigned int flags, unsigned int *verify)
 {
-  uint8_t id[GNUTLS_OPENPGP_KEYID_SIZE];
-  cdk_error_t rc;
-  int status;
+	uint8_t id[GNUTLS_OPENPGP_KEYID_SIZE];
+	cdk_error_t rc;
+	int status;
 
-  if (!key || !keyring)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_NO_CERTIFICATE_FOUND;
-    }
+	if (!key || !keyring) {
+		gnutls_assert();
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
+	}
 
-  *verify = 0;
+	*verify = 0;
 
-  rc = cdk_pk_check_sigs (key->knode, keyring->db, &status);
-  if (rc == CDK_Error_No_Key)
-    {
-      rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
-      gnutls_assert ();
-      return rc;
-    }
-  else if (rc != CDK_Success)
-    {
-      _gnutls_debug_log ("cdk_pk_check_sigs: error %d\n", rc);
-      rc = _gnutls_map_cdk_rc (rc);
-      gnutls_assert ();
-      return rc;
-    }
-  _gnutls_debug_log ("status: %x\n", status);
+	rc = cdk_pk_check_sigs(key->knode, keyring->db, &status);
+	if (rc == CDK_Error_No_Key) {
+		rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+		gnutls_assert();
+		return rc;
+	} else if (rc != CDK_Success) {
+		_gnutls_debug_log("cdk_pk_check_sigs: error %d\n", rc);
+		rc = _gnutls_map_cdk_rc(rc);
+		gnutls_assert();
+		return rc;
+	}
+	_gnutls_debug_log("status: %x\n", status);
 
-  if (status & CDK_KEY_INVALID)
-    *verify |= GNUTLS_CERT_SIGNATURE_FAILURE;
-  if (status & CDK_KEY_REVOKED)
-    *verify |= GNUTLS_CERT_REVOKED;
-  if (status & CDK_KEY_NOSIGNER)
-    *verify |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+	if (status & CDK_KEY_INVALID)
+		*verify |= GNUTLS_CERT_SIGNATURE_FAILURE;
+	if (status & CDK_KEY_REVOKED)
+		*verify |= GNUTLS_CERT_REVOKED;
+	if (status & CDK_KEY_NOSIGNER)
+		*verify |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 
-  /* Check if the key is included in the ring. */
-  if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
-    {
-      rc = gnutls_openpgp_crt_get_key_id (key, id);
-      if (rc < 0)
-        {
-          gnutls_assert ();
-          return rc;
-        }
+	/* Check if the key is included in the ring. */
+	if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME)) {
+		rc = gnutls_openpgp_crt_get_key_id(key, id);
+		if (rc < 0) {
+			gnutls_assert();
+			return rc;
+		}
 
-      rc = gnutls_openpgp_keyring_check_id (keyring, id, 0);
-      /* If it exists in the keyring don't treat it as unknown. */
-      if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
-        *verify &= ~GNUTLS_CERT_SIGNER_NOT_FOUND;
-    }
+		rc = gnutls_openpgp_keyring_check_id(keyring, id, 0);
+		/* If it exists in the keyring don't treat it as unknown. */
+		if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
+			*verify &= ~GNUTLS_CERT_SIGNER_NOT_FOUND;
+	}
 
-  if (*verify != 0)
-    *verify |= GNUTLS_CERT_INVALID;
+	if (*verify != 0)
+		*verify |= GNUTLS_CERT_INVALID;
 
-  return 0;
+	return 0;
 }
 
 
@@ -125,19 +119,20 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
-gnutls_openpgp_crt_verify_self (gnutls_openpgp_crt_t key,
-                                unsigned int flags, unsigned int *verify)
+gnutls_openpgp_crt_verify_self(gnutls_openpgp_crt_t key,
+			       unsigned int flags, unsigned int *verify)
 {
-  int status;
-  cdk_error_t rc;
+	int status;
+	cdk_error_t rc;
 
-  *verify = 0;
+	*verify = 0;
 
-  rc = cdk_pk_check_self_sig (key->knode, &status);
-  if (rc || status != CDK_KEY_VALID)
-    *verify |= GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE;
-  else
-    *verify = 0;
+	rc = cdk_pk_check_self_sig(key->knode, &status);
+	if (rc || status != CDK_KEY_VALID)
+		*verify |=
+		    GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE;
+	else
+		*verify = 0;
 
-  return 0;
+	return 0;
 }

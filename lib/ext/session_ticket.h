@@ -27,7 +27,7 @@
 
 extern extension_entry_st ext_mod_session_ticket;
 
-int _gnutls_send_new_session_ticket (gnutls_session_t session, int again);
-int _gnutls_recv_new_session_ticket (gnutls_session_t session);
+int _gnutls_send_new_session_ticket(gnutls_session_t session, int again);
+int _gnutls_recv_new_session_ticket(gnutls_session_t session);
 
 #endif

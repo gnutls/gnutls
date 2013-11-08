@@ -25,13 +25,13 @@
 #define MBUFFER_FLUSH 1
 
 int
-_gnutls_record_buffer_put (gnutls_session_t session,
-  content_type_t type, uint64* seq, mbuffer_st* bufel);
+_gnutls_record_buffer_put(gnutls_session_t session,
+			  content_type_t type, uint64 * seq,
+			  mbuffer_st * bufel);
 
-inline static int
-_gnutls_record_buffer_get_size (gnutls_session_t session)
+inline static int _gnutls_record_buffer_get_size(gnutls_session_t session)
 {
-  return session->internals.record_buffer.byte_length;
+	return session->internals.record_buffer.byte_length;
 }
 
 /*-
@@ -44,72 +44,76 @@ _gnutls_record_buffer_get_size (gnutls_session_t session)
  *
  * Returns: Returns the size of the data or zero.
  -*/
-inline static size_t
-record_check_unprocessed (gnutls_session_t session)
+inline static size_t record_check_unprocessed(gnutls_session_t session)
 {
-  return session->internals.record_recv_buffer.byte_length;
+	return session->internals.record_recv_buffer.byte_length;
 }
 
-int _gnutls_record_buffer_get (content_type_t type,
-                               gnutls_session_t session, uint8_t * data,
-                               size_t length, uint8_t seq[8]);
-ssize_t _gnutls_io_read_buffered (gnutls_session_t, size_t n, content_type_t, unsigned int *ms);
-int _gnutls_io_clear_peeked_data (gnutls_session_t session);
+int _gnutls_record_buffer_get(content_type_t type,
+			      gnutls_session_t session, uint8_t * data,
+			      size_t length, uint8_t seq[8]);
+ssize_t _gnutls_io_read_buffered(gnutls_session_t, size_t n,
+				 content_type_t, unsigned int *ms);
+int _gnutls_io_clear_peeked_data(gnutls_session_t session);
 
-ssize_t _gnutls_io_write_buffered (gnutls_session_t session,
-                                   mbuffer_st * bufel, unsigned int mflag);
+ssize_t _gnutls_io_write_buffered(gnutls_session_t session,
+				  mbuffer_st * bufel, unsigned int mflag);
 
-int _gnutls_handshake_io_cache_int (gnutls_session_t,
-                                     gnutls_handshake_description_t,
-                                     mbuffer_st * bufel);
+int _gnutls_handshake_io_cache_int(gnutls_session_t,
+				   gnutls_handshake_description_t,
+				   mbuffer_st * bufel);
 
 ssize_t
-_gnutls_handshake_io_recv_int (gnutls_session_t session,
-                               gnutls_handshake_description_t htype,
-                               handshake_buffer_st * hsk, unsigned int optional);
+_gnutls_handshake_io_recv_int(gnutls_session_t session,
+			      gnutls_handshake_description_t htype,
+			      handshake_buffer_st * hsk,
+			      unsigned int optional);
 
-ssize_t _gnutls_io_write_flush (gnutls_session_t session);
-int
-_gnutls_io_check_recv (gnutls_session_t session, unsigned int ms);
-ssize_t _gnutls_handshake_io_write_flush (gnutls_session_t session);
+ssize_t _gnutls_io_write_flush(gnutls_session_t session);
+int _gnutls_io_check_recv(gnutls_session_t session, unsigned int ms);
+ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session);
 
-inline static void _gnutls_handshake_buffer_clear(handshake_buffer_st* hsk)
+inline static void _gnutls_handshake_buffer_clear(handshake_buffer_st *
+						  hsk)
 {
-  _gnutls_buffer_clear(&hsk->data);
-  hsk->htype = -1;
+	_gnutls_buffer_clear(&hsk->data);
+	hsk->htype = -1;
 }
 
-inline static void _gnutls_handshake_buffer_init(handshake_buffer_st* hsk)
+inline static void _gnutls_handshake_buffer_init(handshake_buffer_st * hsk)
 {
-  memset(hsk, 0, sizeof(*hsk));
-  _gnutls_buffer_init(&hsk->data);
-  hsk->htype = -1;
+	memset(hsk, 0, sizeof(*hsk));
+	_gnutls_buffer_init(&hsk->data);
+	hsk->htype = -1;
 }
 
-inline static void _gnutls_handshake_recv_buffer_clear(gnutls_session_t session)
+inline static void _gnutls_handshake_recv_buffer_clear(gnutls_session_t
+						       session)
 {
-int i;
-  for (i=0;i<session->internals.handshake_recv_buffer_size;i++)
-    _gnutls_handshake_buffer_clear(&session->internals.handshake_recv_buffer[i]);
-  session->internals.handshake_recv_buffer_size = 0;
+	int i;
+	for (i = 0; i < session->internals.handshake_recv_buffer_size; i++)
+		_gnutls_handshake_buffer_clear(&session->internals.
+					       handshake_recv_buffer[i]);
+	session->internals.handshake_recv_buffer_size = 0;
 }
 
-inline static void _gnutls_handshake_recv_buffer_init(gnutls_session_t session)
+inline static void _gnutls_handshake_recv_buffer_init(gnutls_session_t
+						      session)
 {
-int i;
-  for (i=0;i<MAX_HANDSHAKE_MSGS;i++)
-    {
-      _gnutls_handshake_buffer_init(&session->internals.handshake_recv_buffer[i]);
-    }
-  session->internals.handshake_recv_buffer_size = 0;
+	int i;
+	for (i = 0; i < MAX_HANDSHAKE_MSGS; i++) {
+		_gnutls_handshake_buffer_init(&session->internals.
+					      handshake_recv_buffer[i]);
+	}
+	session->internals.handshake_recv_buffer_size = 0;
 }
 
-int
-_gnutls_parse_record_buffered_msgs (gnutls_session_t session);
+int _gnutls_parse_record_buffered_msgs(gnutls_session_t session);
 
 ssize_t
-_gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
-                         gnutls_handshake_description_t htype, unsigned int ms);
+_gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
+			gnutls_handshake_description_t htype,
+			unsigned int ms);
 
 #define _gnutls_handshake_io_buffer_clear( session) \
         _mbuffer_head_clear( &session->internals.handshake_send_buffer); \

@@ -31,136 +31,135 @@
 #include <x509_b64.h>
 #include <c-ctype.h>
 
-typedef int (*set_dn_func) (void*, const char *oid, unsigned int raw_flag, const void *name, unsigned int name_size);
-                                                                                                                                                       
+typedef int (*set_dn_func) (void *, const char *oid, unsigned int raw_flag,
+			    const void *name, unsigned int name_size);
+
 static
-int dn_attr_crt_set( set_dn_func f, void* crt, const gnutls_datum_t * name,
-                     const gnutls_datum_t * val)
+int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
+		    const gnutls_datum_t * val)
 {
-  char _oid[MAX_OID_SIZE];
-  const char *oid;
-  int ret;
-  
-  if (name->size == 0 || val->size == 0)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-    
-  if (c_isdigit(name->data[0]) != 0)
-    {
-      if (name->size >= sizeof(_oid))
-        return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-        
-      memcpy(_oid, name->data, name->size);
-      _oid[name->size] = 0;
-      
-      oid = _oid;
+	char _oid[MAX_OID_SIZE];
+	const char *oid;
+	int ret;
 
-      if (gnutls_x509_dn_oid_known(oid) == 0)
-        {
-          _gnutls_debug_log("Unknown OID: '%s'\n", oid);
-          return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-        }
-    }
-  else
-    {
-      oid = _gnutls_ldap_string_to_oid((char*)name->data, name->size);
-    }
+	if (name->size == 0 || val->size == 0)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  if (oid == NULL)
-    {
-      _gnutls_debug_log("Unknown DN attribute: '%.*s'\n", (int)name->size, name->data);
-      return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-    }
-    
-  if (val->data[0] == '#')
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-  
-  ret = f(crt, oid, 0, val->data, val->size);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-    
-  return 0;
+	if (c_isdigit(name->data[0]) != 0) {
+		if (name->size >= sizeof(_oid))
+			return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+		memcpy(_oid, name->data, name->size);
+		_oid[name->size] = 0;
+
+		oid = _oid;
+
+		if (gnutls_x509_dn_oid_known(oid) == 0) {
+			_gnutls_debug_log("Unknown OID: '%s'\n", oid);
+			return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		}
+	} else {
+		oid =
+		    _gnutls_ldap_string_to_oid((char *) name->data,
+					       name->size);
+	}
+
+	if (oid == NULL) {
+		_gnutls_debug_log("Unknown DN attribute: '%.*s'\n",
+				  (int) name->size, name->data);
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	}
+
+	if (val->data[0] == '#')
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+	ret = f(crt, oid, 0, val->data, val->size);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return 0;
 }
 
-static int read_attr_and_val(const char** ptr,
-                              gnutls_datum_t * name,
-                              gnutls_datum_t * val)
+static int read_attr_and_val(const char **ptr,
+			     gnutls_datum_t * name, gnutls_datum_t * val)
 {
-const unsigned char* p = (void*)*ptr;
-  
-  /* skip any space */
-  while (c_isspace(*p))
-    p++;
+	const unsigned char *p = (void *) *ptr;
 
-  /* Read the name */
-  name->data = (void*)p;
-  while (*p != '=' && *p != 0 && !c_isspace(*p))
-    p++;
-    
-  name->size = p - name->data;
+	/* skip any space */
+	while (c_isspace(*p))
+		p++;
 
-  /* skip any space */
-  while (c_isspace(*p))
-    p++;
+	/* Read the name */
+	name->data = (void *) p;
+	while (*p != '=' && *p != 0 && !c_isspace(*p))
+		p++;
 
-  if (*p != '=')
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-  p++;
+	name->size = p - name->data;
 
-  while (c_isspace(*p))
-    p++;
+	/* skip any space */
+	while (c_isspace(*p))
+		p++;
 
-  /* Read value */
-  val->data = (void*)p;
-  while (*p != 0 && !c_isspace(*p) && (*p != ',' || (*p == ',' && *(p-1) == '\\')) && *p != '\n')
-    p++;
-  val->size = p - (val->data);
-  
-  if (val->size == 0 || name->size == 0)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	if (*p != '=')
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+	p++;
 
-  *ptr = (void*)p;
+	while (c_isspace(*p))
+		p++;
 
-  return 0;
+	/* Read value */
+	val->data = (void *) p;
+	while (*p != 0 && !c_isspace(*p)
+	       && (*p != ',' || (*p == ',' && *(p - 1) == '\\'))
+	       && *p != '\n')
+		p++;
+	val->size = p - (val->data);
+
+	if (val->size == 0 || name->size == 0)
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+	*ptr = (void *) p;
+
+	return 0;
 }
 
 static int
-crt_set_dn (set_dn_func f, void* crt, const char *dn, const char** err)
+crt_set_dn(set_dn_func f, void *crt, const char *dn, const char **err)
 {
-const char *p = dn;
-int ret;
-gnutls_datum_t name, val;
+	const char *p = dn;
+	int ret;
+	gnutls_datum_t name, val;
 
-  if (crt == NULL || dn == NULL)
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (crt == NULL || dn == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  /* For each element */
-  while (*p != 0 && *p != '\n')
-    {
-      if (err)
-        *err = p;
+	/* For each element */
+	while (*p != 0 && *p != '\n') {
+		if (err)
+			*err = p;
 
-      ret = read_attr_and_val(&p, &name, &val);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
+		ret = read_attr_and_val(&p, &name, &val);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-      /* skip spaces and look for comma */
-      while (c_isspace(*p))
-        p++;
+		/* skip spaces and look for comma */
+		while (c_isspace(*p))
+			p++;
 
-      ret = dn_attr_crt_set(f, crt, &name, &val);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
+		ret = dn_attr_crt_set(f, crt, &name, &val);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-      if (err)
-        *err = p;
+		if (err)
+			*err = p;
 
-      if (*p != ',' && *p != 0 && *p != '\n')
-        return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-      if (*p == ',')
-      	p++;
-    }
-    
-  return 0;
+		if (*p != ',' && *p != 0 && *p != '\n')
+			return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		if (*p == ',')
+			p++;
+	}
+
+	return 0;
 }
 
 
@@ -177,9 +176,11 @@ gnutls_datum_t name, val;
  *   negative error value.
  **/
 int
-gnutls_x509_crt_set_dn (gnutls_x509_crt_t crt, const char *dn, const char** err)
+gnutls_x509_crt_set_dn(gnutls_x509_crt_t crt, const char *dn,
+		       const char **err)
 {
-  return crt_set_dn( (set_dn_func)gnutls_x509_crt_set_dn_by_oid, crt, dn, err);
+	return crt_set_dn((set_dn_func) gnutls_x509_crt_set_dn_by_oid, crt,
+			  dn, err);
 }
 
 /**
@@ -195,9 +196,12 @@ gnutls_x509_crt_set_dn (gnutls_x509_crt_t crt, const char *dn, const char** err)
  *   negative error value.
  **/
 int
-gnutls_x509_crt_set_issuer_dn (gnutls_x509_crt_t crt, const char *dn, const char** err)
+gnutls_x509_crt_set_issuer_dn(gnutls_x509_crt_t crt, const char *dn,
+			      const char **err)
 {
-  return crt_set_dn( (set_dn_func)gnutls_x509_crt_set_issuer_dn_by_oid, crt, dn, err);
+	return crt_set_dn((set_dn_func)
+			  gnutls_x509_crt_set_issuer_dn_by_oid, crt, dn,
+			  err);
 }
 
 /**
@@ -213,7 +217,9 @@ gnutls_x509_crt_set_issuer_dn (gnutls_x509_crt_t crt, const char *dn, const char
  *   negative error value.
  **/
 int
-gnutls_x509_crq_set_dn (gnutls_x509_crq_t crq, const char *dn, const char** err)
+gnutls_x509_crq_set_dn(gnutls_x509_crq_t crq, const char *dn,
+		       const char **err)
 {
-  return crt_set_dn( (set_dn_func)gnutls_x509_crq_set_dn_by_oid, crq, dn, err);
+	return crt_set_dn((set_dn_func) gnutls_x509_crq_set_dn_by_oid, crq,
+			  dn, err);
 }

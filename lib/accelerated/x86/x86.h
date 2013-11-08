@@ -24,13 +24,13 @@
 
 #if defined(ASM_X86)
 
-void gnutls_cpuid(unsigned int func, unsigned int *ax, unsigned int *bx, unsigned int *cx, unsigned int* dx);
+void gnutls_cpuid(unsigned int func, unsigned int *ax, unsigned int *bx,
+		  unsigned int *cx, unsigned int *dx);
 
-# ifdef ASM_X86_32
+#ifdef ASM_X86_32
 unsigned int gnutls_have_cpuid(void);
-# else
-#  define gnutls_have_cpuid() 1
-# endif /* ASM_X86_32 */
+#else
+#define gnutls_have_cpuid() 1
+#endif				/* ASM_X86_32 */
 
 #endif
-

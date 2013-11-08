@@ -34,24 +34,24 @@
 /* Maps record size to numbers according to the
  * extensions draft.
  */
-inline static int _gnutls_num2cert_type (int num);
-inline static int _gnutls_cert_type2num (int record_size);
-static int _gnutls_cert_type_recv_params (gnutls_session_t session,
-                                          const uint8_t * data,
-                                          size_t data_size);
-static int _gnutls_cert_type_send_params (gnutls_session_t session,
-                                          gnutls_buffer_st * extdata);
+inline static int _gnutls_num2cert_type(int num);
+inline static int _gnutls_cert_type2num(int record_size);
+static int _gnutls_cert_type_recv_params(gnutls_session_t session,
+					 const uint8_t * data,
+					 size_t data_size);
+static int _gnutls_cert_type_send_params(gnutls_session_t session,
+					 gnutls_buffer_st * extdata);
 
 extension_entry_st ext_mod_cert_type = {
-  .name = "CERT TYPE",
-  .type = GNUTLS_EXTENSION_CERT_TYPE,
-  .parse_type = GNUTLS_EXT_TLS,
+	.name = "CERT TYPE",
+	.type = GNUTLS_EXTENSION_CERT_TYPE,
+	.parse_type = GNUTLS_EXT_TLS,
 
-  .recv_func = _gnutls_cert_type_recv_params,
-  .send_func = _gnutls_cert_type_send_params,
-  .pack_func = NULL,
-  .unpack_func = NULL,
-  .deinit_func = NULL
+	.recv_func = _gnutls_cert_type_recv_params,
+	.send_func = _gnutls_cert_type_send_params,
+	.pack_func = NULL,
+	.unpack_func = NULL,
+	.deinit_func = NULL
 };
 
 /* 
@@ -64,197 +64,186 @@ extension_entry_st ext_mod_cert_type = {
  */
 
 static int
-_gnutls_cert_type_recv_params (gnutls_session_t session,
-                               const uint8_t * data, size_t _data_size)
+_gnutls_cert_type_recv_params(gnutls_session_t session,
+			      const uint8_t * data, size_t _data_size)
 {
-  int new_type = -1, ret, i;
-  ssize_t data_size = _data_size;
+	int new_type = -1, ret, i;
+	ssize_t data_size = _data_size;
 
-  if (session->security_parameters.entity == GNUTLS_CLIENT)
-    {
-      if (data_size > 0)
-        {
-          if (data_size != 1)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-            }
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		if (data_size > 0) {
+			if (data_size != 1) {
+				gnutls_assert();
+				return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+			}
 
-          new_type = _gnutls_num2cert_type (data[0]);
+			new_type = _gnutls_num2cert_type(data[0]);
 
-          if (new_type < 0)
-            {
-              gnutls_assert ();
-              return new_type;
-            }
+			if (new_type < 0) {
+				gnutls_assert();
+				return new_type;
+			}
 
-          /* Check if we support this cert_type */
-          if ((ret =
-               _gnutls_session_cert_type_supported (session, new_type)) < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
+			/* Check if we support this cert_type */
+			if ((ret =
+			     _gnutls_session_cert_type_supported(session,
+								 new_type))
+			    < 0) {
+				gnutls_assert();
+				return ret;
+			}
 
-          _gnutls_session_cert_type_set (session, new_type);
-        }
-    }
-  else
-    {                           /* SERVER SIDE - we must check if the sent cert type is the right one 
-                                 */
-      if (data_size > 1)
-        {
-          uint8_t len;
+			_gnutls_session_cert_type_set(session, new_type);
+		}
+	} else {		/* SERVER SIDE - we must check if the sent cert type is the right one 
+				 */
+		if (data_size > 1) {
+			uint8_t len;
 
-          DECR_LEN (data_size, 1);
-          len = data[0];
-          DECR_LEN (data_size, len);
+			DECR_LEN(data_size, 1);
+			len = data[0];
+			DECR_LEN(data_size, len);
 
-          for (i = 0; i < len; i++)
-            {
-              new_type = _gnutls_num2cert_type (data[i + 1]);
+			for (i = 0; i < len; i++) {
+				new_type =
+				    _gnutls_num2cert_type(data[i + 1]);
 
-              if (new_type < 0)
-                continue;
+				if (new_type < 0)
+					continue;
 
-              /* Check if we support this cert_type */
-              if ((ret =
-                   _gnutls_session_cert_type_supported (session,
-                                                        new_type)) < 0)
-                {
-                  gnutls_assert ();
-                  continue;
-                }
-              else
-                break;
-              /* new_type is ok */
-            }
+				/* Check if we support this cert_type */
+				if ((ret =
+				     _gnutls_session_cert_type_supported
+				     (session, new_type)) < 0) {
+					gnutls_assert();
+					continue;
+				} else
+					break;
+				/* new_type is ok */
+			}
 
-          if (new_type < 0)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-            }
+			if (new_type < 0) {
+				gnutls_assert();
+				return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			}
 
-          if ((ret =
-               _gnutls_session_cert_type_supported (session, new_type)) < 0)
-            {
-              gnutls_assert ();
-              /* The peer has requested unsupported certificate
-               * types. Instead of failing, procceed normally.
-               * (the ciphersuite selection would fail, or a
-               * non certificate ciphersuite will be selected).
-               */
-              return 0;
-            }
+			if ((ret =
+			     _gnutls_session_cert_type_supported(session,
+								 new_type))
+			    < 0) {
+				gnutls_assert();
+				/* The peer has requested unsupported certificate
+				 * types. Instead of failing, procceed normally.
+				 * (the ciphersuite selection would fail, or a
+				 * non certificate ciphersuite will be selected).
+				 */
+				return 0;
+			}
 
-          _gnutls_session_cert_type_set (session, new_type);
-        }
-    }
+			_gnutls_session_cert_type_set(session, new_type);
+		}
+	}
 
-  return 0;
+	return 0;
 }
 
 /* returns data_size or a negative number on failure
  */
 static int
-_gnutls_cert_type_send_params (gnutls_session_t session, gnutls_buffer_st* extdata)
+_gnutls_cert_type_send_params(gnutls_session_t session,
+			      gnutls_buffer_st * extdata)
 {
-  unsigned len, i;
-  int ret;
-  uint8_t p;
-  
-  /* this function sends the client extension data (dnsname) */
-  if (session->security_parameters.entity == GNUTLS_CLIENT)
-    {
+	unsigned len, i;
+	int ret;
+	uint8_t p;
 
-      if (session->internals.priorities.cert_type.algorithms > 0)
-        {
+	/* this function sends the client extension data (dnsname) */
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
-          len = session->internals.priorities.cert_type.algorithms;
+		if (session->internals.priorities.cert_type.algorithms > 0) {
 
-          if (len == 1 &&
-              session->internals.priorities.cert_type.priority[0] ==
-              GNUTLS_CRT_X509)
-            {
-              /* We don't use this extension if X.509 certificates
-               * are used.
-               */
-              return 0;
-            }
+			len =
+			    session->internals.priorities.cert_type.
+			    algorithms;
 
-          /* this is a vector!
-           */
-          p = (uint8_t) len;
-          ret = _gnutls_buffer_append_data(extdata, &p, 1);
-          if (ret < 0)
-            return gnutls_assert_val(ret);
+			if (len == 1 &&
+			    session->internals.priorities.cert_type.
+			    priority[0] == GNUTLS_CRT_X509) {
+				/* We don't use this extension if X.509 certificates
+				 * are used.
+				 */
+				return 0;
+			}
 
-          for (i = 0; i < len; i++)
-            {
-              p =
-                _gnutls_cert_type2num (session->internals.priorities.
-                                       cert_type.priority[i]);
-              ret = _gnutls_buffer_append_data(extdata, &p, 1);
-              if (ret < 0)
-                return gnutls_assert_val(ret);
-            }
-          return len + 1;
-        }
+			/* this is a vector!
+			 */
+			p = (uint8_t) len;
+			ret = _gnutls_buffer_append_data(extdata, &p, 1);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
-    }
-  else
-    {                           /* server side */
-      if (session->security_parameters.cert_type != DEFAULT_CERT_TYPE)
-        {
-          len = 1;
+			for (i = 0; i < len; i++) {
+				p = _gnutls_cert_type2num(session->
+							  internals.
+							  priorities.cert_type.
+							  priority[i]);
+				ret =
+				    _gnutls_buffer_append_data(extdata, &p,
+							       1);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+			}
+			return len + 1;
+		}
 
-          p =
-            _gnutls_cert_type2num (session->security_parameters.cert_type);
-          ret = _gnutls_buffer_append_data(extdata, &p, 1);
-          if (ret < 0)
-            return gnutls_assert_val(ret);
+	} else {		/* server side */
+		if (session->security_parameters.cert_type !=
+		    DEFAULT_CERT_TYPE) {
+			len = 1;
 
-          return len;
-        }
+			p = _gnutls_cert_type2num(session->
+						  security_parameters.
+						  cert_type);
+			ret = _gnutls_buffer_append_data(extdata, &p, 1);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			return len;
+		}
 
 
-    }
+	}
 
-  return 0;
+	return 0;
 }
 
 /* Maps numbers to record sizes according to the
  * extensions draft.
  */
-inline static int
-_gnutls_num2cert_type (int num)
+inline static int _gnutls_num2cert_type(int num)
 {
-  switch (num)
-    {
-    case 0:
-      return GNUTLS_CRT_X509;
-    case 1:
-      return GNUTLS_CRT_OPENPGP;
-    default:
-      return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-    }
+	switch (num) {
+	case 0:
+		return GNUTLS_CRT_X509;
+	case 1:
+		return GNUTLS_CRT_OPENPGP;
+	default:
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
 }
 
 /* Maps record size to numbers according to the
  * extensions draft.
  */
-inline static int
-_gnutls_cert_type2num (int cert_type)
+inline static int _gnutls_cert_type2num(int cert_type)
 {
-  switch (cert_type)
-    {
-    case GNUTLS_CRT_X509:
-      return 0;
-    case GNUTLS_CRT_OPENPGP:
-      return 1;
-    default:
-      return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-    }
+	switch (cert_type) {
+	case GNUTLS_CRT_X509:
+		return 0;
+	case GNUTLS_CRT_OPENPGP:
+		return 1;
+	default:
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
 
 }

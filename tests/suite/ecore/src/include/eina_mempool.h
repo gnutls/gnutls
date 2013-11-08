@@ -49,20 +49,30 @@ typedef struct _Eina_Mempool_Backend Eina_Mempool_Backend;
 
 EAPI extern Eina_Error EINA_ERROR_NOT_MEMPOOL_MODULE;
 
-EAPI Eina_Mempool *                     eina_mempool_add(const char *module,const char *context,const char *options,...) EINA_MALLOC EINA_WARN_UNUSED_RESULT EINA_ARG_NONNULL(1);
-EAPI void                               eina_mempool_del(Eina_Mempool *mp) EINA_ARG_NONNULL(1);
+EAPI Eina_Mempool *eina_mempool_add(const char *module,
+				    const char *context,
+				    const char *options, ...)
+EINA_MALLOC EINA_WARN_UNUSED_RESULT EINA_ARG_NONNULL(1);
+EAPI void eina_mempool_del(Eina_Mempool * mp) EINA_ARG_NONNULL(1);
 
-static inline void *                    eina_mempool_realloc(Eina_Mempool *mp,void *element,unsigned int size) EINA_ARG_NONNULL(1) EINA_WARN_UNUSED_RESULT;
-static inline void *                    eina_mempool_malloc(Eina_Mempool *mp,unsigned int size) EINA_MALLOC EINA_ARG_NONNULL(1) EINA_WARN_UNUSED_RESULT;
-static inline void                      eina_mempool_free(Eina_Mempool *mp,void *element) EINA_ARG_NONNULL(1);
+static inline void *eina_mempool_realloc(Eina_Mempool * mp, void *element,
+					 unsigned int size)
+EINA_ARG_NONNULL(1) EINA_WARN_UNUSED_RESULT;
+static inline void *eina_mempool_malloc(Eina_Mempool * mp,
+					unsigned int size)
+EINA_MALLOC EINA_ARG_NONNULL(1) EINA_WARN_UNUSED_RESULT;
+static inline void eina_mempool_free(Eina_Mempool * mp,
+				     void *element) EINA_ARG_NONNULL(1);
 
-EAPI void                               eina_mempool_gc(Eina_Mempool *mp) EINA_ARG_NONNULL(1);
-EAPI void                               eina_mempool_statistics(Eina_Mempool *mp) EINA_ARG_NONNULL(1);
+EAPI void eina_mempool_gc(Eina_Mempool * mp) EINA_ARG_NONNULL(1);
+EAPI void eina_mempool_statistics(Eina_Mempool * mp) EINA_ARG_NONNULL(1);
 
-EAPI Eina_Bool                          eina_mempool_register(Eina_Mempool_Backend *be) EINA_ARG_NONNULL(1);
-EAPI void                               eina_mempool_unregister(Eina_Mempool_Backend *be) EINA_ARG_NONNULL(1);
+EAPI Eina_Bool eina_mempool_register(Eina_Mempool_Backend *
+				     be) EINA_ARG_NONNULL(1);
+EAPI void eina_mempool_unregister(Eina_Mempool_Backend *
+				  be) EINA_ARG_NONNULL(1);
 
-EAPI unsigned int                       eina_mempool_alignof(unsigned int size);
+EAPI unsigned int eina_mempool_alignof(unsigned int size);
 
 #include "eina_inline_mempool.x"
 
@@ -74,4 +84,4 @@ EAPI unsigned int                       eina_mempool_alignof(unsigned int size);
  * @}
  */
 
-#endif /* EINA_MEMPOOL_H_ */
+#endif				/* EINA_MEMPOOL_H_ */

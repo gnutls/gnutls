@@ -41,29 +41,29 @@
  * The @salt parameter must be always 8 octets.
  **/
 cdk_error_t
-cdk_s2k_new (cdk_s2k_t * ret_s2k, int mode, int digest_algo,
-             const byte * salt)
+cdk_s2k_new(cdk_s2k_t * ret_s2k, int mode, int digest_algo,
+	    const byte * salt)
 {
-  cdk_s2k_t s2k;
+	cdk_s2k_t s2k;
 
-  if (!ret_s2k)
-    return CDK_Inv_Value;
+	if (!ret_s2k)
+		return CDK_Inv_Value;
 
-  if (mode != 0x00 && mode != 0x01 && mode != 0x03)
-    return CDK_Inv_Mode;
+	if (mode != 0x00 && mode != 0x01 && mode != 0x03)
+		return CDK_Inv_Mode;
 
-  if (_gnutls_hash_get_algo_len (mac_to_entry(digest_algo)) <= 0)
-    return CDK_Inv_Algo;
+	if (_gnutls_hash_get_algo_len(mac_to_entry(digest_algo)) <= 0)
+		return CDK_Inv_Algo;
 
-  s2k = cdk_calloc (1, sizeof *s2k);
-  if (!s2k)
-    return CDK_Out_Of_Core;
-  s2k->mode = mode;
-  s2k->hash_algo = digest_algo;
-  if (salt)
-    memcpy (s2k->salt, salt, 8);
-  *ret_s2k = s2k;
-  return 0;
+	s2k = cdk_calloc(1, sizeof *s2k);
+	if (!s2k)
+		return CDK_Out_Of_Core;
+	s2k->mode = mode;
+	s2k->hash_algo = digest_algo;
+	if (salt)
+		memcpy(s2k->salt, salt, 8);
+	*ret_s2k = s2k;
+	return 0;
 }
 
 
@@ -73,25 +73,23 @@ cdk_s2k_new (cdk_s2k_t * ret_s2k, int mode, int digest_algo,
  * 
  * Release the given S2K object.
  **/
-void
-cdk_s2k_free (cdk_s2k_t s2k)
+void cdk_s2k_free(cdk_s2k_t s2k)
 {
-  cdk_free (s2k);
+	cdk_free(s2k);
 }
 
 
 /* Make a copy of the source s2k into R_DST. */
-cdk_error_t
-_cdk_s2k_copy (cdk_s2k_t * r_dst, cdk_s2k_t src)
+cdk_error_t _cdk_s2k_copy(cdk_s2k_t * r_dst, cdk_s2k_t src)
 {
-  cdk_s2k_t dst;
-  cdk_error_t err;
+	cdk_s2k_t dst;
+	cdk_error_t err;
 
-  err = cdk_s2k_new (&dst, src->mode, src->hash_algo, src->salt);
-  if (err)
-    return err;
-  dst->count = src->count;
-  *r_dst = dst;
+	err = cdk_s2k_new(&dst, src->mode, src->hash_algo, src->salt);
+	if (err)
+		return err;
+	dst->count = src->count;
+	*r_dst = dst;
 
-  return 0;
+	return 0;
 }

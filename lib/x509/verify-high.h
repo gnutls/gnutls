@@ -20,5 +20,5 @@
  *
  */
 
-int _gnutls_trustlist_inlist (gnutls_x509_trust_list_t list,
-			      gnutls_x509_crt_t cert);
+int _gnutls_trustlist_inlist(gnutls_x509_trust_list_t list,
+			     gnutls_x509_crt_t cert);

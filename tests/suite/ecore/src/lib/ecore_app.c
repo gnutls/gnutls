@@ -1,17 +1,17 @@
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdlib.h>
 
 #ifndef _MSC_VER
-# include <unistd.h>
+#include <unistd.h>
 #else
-# include <process.h>
+#include <process.h>
 #endif
 
 #ifdef HAVE_EVIL
-# include <Evil.h>
+#include <Evil.h>
 #endif
 
 #include "Ecore.h"
@@ -28,13 +28,12 @@ static char **app_argv = NULL;
  * A call to this function will store the programs command-line arguments
  * for later use by ecore_app_restart() or ecore_app_args_get().
  */
-EAPI void
-ecore_app_args_set(int argc, const char **argv)
+EAPI void ecore_app_args_set(int argc, const char **argv)
 {
-   if ((argc < 1) ||
-       (!argv)) return;
-   app_argc = argc;
-   app_argv = (char **)argv;
+	if ((argc < 1) || (!argv))
+		return;
+	app_argc = argc;
+	app_argv = (char **) argv;
 }
 
 /**
@@ -48,11 +47,12 @@ ecore_app_args_set(int argc, const char **argv)
  * also if the pointer is not NULL. The values they are filled with will be the
  * same set by ecore_app_args_set().
  */
-EAPI void
-ecore_app_args_get(int *argc, char ***argv)
+EAPI void ecore_app_args_get(int *argc, char ***argv)
 {
-   if (argc) *argc = app_argc;
-   if (argv) *argv = app_argv;
+	if (argc)
+		*argc = app_argc;
+	if (argv)
+		*argv = app_argv;
 }
 
 /**
@@ -63,15 +63,17 @@ ecore_app_args_get(int *argc, char ***argv)
  * an easy way for a program to restart itself for cleanup purposes,
  * configuration reasons or in the event of a crash.
  */
-EAPI void
-ecore_app_restart(void)
+EAPI void ecore_app_restart(void)
 {
-   char *args[4096];
-   int i;
+	char *args[4096];
+	int i;
 
-   if ((app_argc < 1) || (!app_argv)) return;
-   if (app_argc >= 4096) return;
-   for (i = 0; i < app_argc; i++) args[i] = app_argv[i];
-   args[i] = NULL;
-   execvp(app_argv[0], args);
+	if ((app_argc < 1) || (!app_argv))
+		return;
+	if (app_argc >= 4096)
+		return;
+	for (i = 0; i < app_argc; i++)
+		args[i] = app_argv[i];
+	args[i] = NULL;
+	execvp(app_argv[0], args);
 }

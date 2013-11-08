@@ -1,6 +1,6 @@
 #define min(x,y) ((x)<(y)?(x):(y))
 
-extern const char* side;
+extern const char *side;
 
 #define HANDSHAKE_EXPECT(c, s, clierr, serverr) \
   sret = cret = GNUTLS_E_AGAIN; \
@@ -133,10 +133,10 @@ extern const char* side;
   TRANSFER2(c, s, msg, msglen, buf, buflen, 0); \
   TRANSFER2(c, s, msg, msglen, buf, buflen, 1)
 
-static char to_server[64*1024];
+static char to_server[64 * 1024];
 static size_t to_server_len = 0;
 
-static char to_client[64*1024];
+static char to_client[64 * 1024];
 static size_t to_client_len = 0;
 
 #ifdef RANDOMIZE
@@ -153,158 +153,173 @@ static size_t to_client_len = 0;
 
 #ifndef IGNORE_PUSH
 static ssize_t
-client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
+client_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-  size_t newlen;
-  RETURN_RND_EAGAIN(tr);
+	size_t newlen;
+	RETURN_RND_EAGAIN(tr);
 
-  len = min(len, sizeof(to_server)-to_server_len);
+	len = min(len, sizeof(to_server) - to_server_len);
 
-  newlen = to_server_len + len;
-  memcpy (to_server + to_server_len, data, len);
-  to_server_len = newlen;
+	newlen = to_server_len + len;
+	memcpy(to_server + to_server_len, data, len);
+	to_server_len = newlen;
 #ifdef EAGAIN_DEBUG
-  fprintf(stderr, "eagain: pushed %d bytes to server (avail: %d)\n", (int)len, (int)to_server_len);
+	fprintf(stderr, "eagain: pushed %d bytes to server (avail: %d)\n",
+		(int) len, (int) to_server_len);
 #endif
-  return len;
+	return len;
 }
 
 #endif
 
 static ssize_t
-client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
+client_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 {
-  RETURN_RND_EAGAIN(tr);
+	RETURN_RND_EAGAIN(tr);
 
-  if (to_client_len == 0)
-    {
+	if (to_client_len == 0) {
 #ifdef EAGAIN_DEBUG
-      fprintf(stderr, "eagain: Not enough data by server (asked for: %d, have: %d)\n", (int)len, (int)to_client_len);
+		fprintf(stderr,
+			"eagain: Not enough data by server (asked for: %d, have: %d)\n",
+			(int) len, (int) to_client_len);
 #endif
-      gnutls_transport_set_errno ((gnutls_session_t)tr, EAGAIN);
-      return -1;
-    }
+		gnutls_transport_set_errno((gnutls_session_t) tr, EAGAIN);
+		return -1;
+	}
 
-  len = min(len, to_client_len);
+	len = min(len, to_client_len);
 
-  memcpy (data, to_client, len);
+	memcpy(data, to_client, len);
 
-  memmove (to_client, to_client + len, to_client_len - len);
-  to_client_len -= len;
+	memmove(to_client, to_client + len, to_client_len - len);
+	to_client_len -= len;
 #ifdef EAGAIN_DEBUG
-  fprintf(stderr, "eagain: pulled %d bytes by client (avail: %d)\n", (int)len, (int)to_client_len);
+	fprintf(stderr, "eagain: pulled %d bytes by client (avail: %d)\n",
+		(int) len, (int) to_client_len);
 #endif
-  return len;
+	return len;
 }
 
 static ssize_t
-server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
+server_pull(gnutls_transport_ptr_t tr, void *data, size_t len)
 {
-  //success ("server_pull len %d has %d\n", len, to_server_len);
-  RETURN_RND_EAGAIN(tr);
+	//success ("server_pull len %d has %d\n", len, to_server_len);
+	RETURN_RND_EAGAIN(tr);
 
-  if (to_server_len == 0)
-    {
+	if (to_server_len == 0) {
 #ifdef EAGAIN_DEBUG
-      fprintf(stderr, "eagain: Not enough data by client (asked for: %d, have: %d)\n", (int)len, (int)to_server_len);
+		fprintf(stderr,
+			"eagain: Not enough data by client (asked for: %d, have: %d)\n",
+			(int) len, (int) to_server_len);
 #endif
-      gnutls_transport_set_errno ((gnutls_session_t)tr, EAGAIN);
-      return -1;
-    }
+		gnutls_transport_set_errno((gnutls_session_t) tr, EAGAIN);
+		return -1;
+	}
 
-  len = min(len, to_server_len);
+	len = min(len, to_server_len);
 #ifdef EAGAIN_DEBUG
-  fprintf(stderr, "eagain: pulled %d bytes by server (avail: %d)\n", (int)len, (int)to_server_len);
+	fprintf(stderr, "eagain: pulled %d bytes by server (avail: %d)\n",
+		(int) len, (int) to_server_len);
 #endif
-  memcpy (data, to_server, len);
+	memcpy(data, to_server, len);
 
-  memmove (to_server, to_server + len, to_server_len - len);
-  to_server_len -= len;
+	memmove(to_server, to_server + len, to_server_len - len);
+	to_server_len -= len;
 
-  return len;
+	return len;
 }
 
 #ifndef IGNORE_PUSH
 static ssize_t
-server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
+server_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-  size_t newlen;
-  RETURN_RND_EAGAIN(tr);
+	size_t newlen;
+	RETURN_RND_EAGAIN(tr);
 
 //  hexprint (data, len);
 
-  len = min(len, sizeof(to_client)-to_client_len);
+	len = min(len, sizeof(to_client) - to_client_len);
 
-  newlen = to_client_len + len;
-  memcpy (to_client + to_client_len, data, len);
-  to_client_len = newlen;
+	newlen = to_client_len + len;
+	memcpy(to_client + to_client_len, data, len);
+	to_client_len = newlen;
 #ifdef EAGAIN_DEBUG
-  fprintf(stderr, "eagain: pushed %d bytes to client (avail: %d)\n", (int)len, (int)to_client_len);
+	fprintf(stderr, "eagain: pushed %d bytes to client (avail: %d)\n",
+		(int) len, (int) to_client_len);
 #endif
 
-  return len;
+	return len;
 }
 
 #endif
 
 /* inline is used to avoid a gcc warning if used in mini-eagain */
-inline static int server_pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms)
+inline static int server_pull_timeout_func(gnutls_transport_ptr_t ptr,
+					   unsigned int ms)
 {
-int ret;
+	int ret;
 
-  if (to_server_len > 0)
-    ret = 1; /* available data */
-  else
-    ret = 0; /* timeout */
+	if (to_server_len > 0)
+		ret = 1;	/* available data */
+	else
+		ret = 0;	/* timeout */
 
 #ifdef EAGAIN_DEBUG
-  fprintf(stderr, "eagain: server_pull_timeout: %d (avail: cli %d, serv %d)\n", ret, (int)to_client_len, (int)to_server_len);
+	fprintf(stderr,
+		"eagain: server_pull_timeout: %d (avail: cli %d, serv %d)\n",
+		ret, (int) to_client_len, (int) to_server_len);
 #endif
 
-  return ret;
+	return ret;
 }
 
-inline static int client_pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms)
+inline static int client_pull_timeout_func(gnutls_transport_ptr_t ptr,
+					   unsigned int ms)
 {
-int ret;
+	int ret;
 
-  if (to_client_len > 0)
-    ret = 1;
-  else
-    ret = 0;
+	if (to_client_len > 0)
+		ret = 1;
+	else
+		ret = 0;
 
 #ifdef EAGAIN_DEBUG
-  fprintf(stderr, "eagain: client_pull_timeout: %d (avail: cli %d, serv %d)\n", ret, (int)to_client_len, (int)to_server_len);
+	fprintf(stderr,
+		"eagain: client_pull_timeout: %d (avail: cli %d, serv %d)\n",
+		ret, (int) to_client_len, (int) to_server_len);
 #endif
 
-  return ret;
+	return ret;
 }
 
 inline static void reset_buffers(void)
 {
-  to_server_len = 0;
-  to_client_len = 0;
+	to_server_len = 0;
+	to_client_len = 0;
 }
 
-inline static int record_send_loop(gnutls_session_t session, const void * data, size_t sizeofdata, int use_null_on_retry)
+inline static int record_send_loop(gnutls_session_t session,
+				   const void *data, size_t sizeofdata,
+				   int use_null_on_retry)
 {
-int ret;
-const void * retry_data;
-size_t retry_sizeofdata;
+	int ret;
+	const void *retry_data;
+	size_t retry_sizeofdata;
 
-  if( use_null_on_retry ) {
-      retry_data = 0;
-      retry_sizeofdata = 0;
-  }
-  else {
-      retry_data = data;
-      retry_sizeofdata = sizeofdata;
-  }
+	if (use_null_on_retry) {
+		retry_data = 0;
+		retry_sizeofdata = 0;
+	} else {
+		retry_data = data;
+		retry_sizeofdata = sizeofdata;
+	}
 
-  ret = gnutls_record_send( session, data, sizeofdata );
-  while( ret == GNUTLS_E_AGAIN ) {
-    ret = gnutls_record_send( session, retry_data, retry_sizeofdata );
-  }
+	ret = gnutls_record_send(session, data, sizeofdata);
+	while (ret == GNUTLS_E_AGAIN) {
+		ret =
+		    gnutls_record_send(session, retry_data,
+				       retry_sizeofdata);
+	}
 
-  return ret;
+	return ret;
 }

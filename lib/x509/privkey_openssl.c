@@ -35,76 +35,69 @@
 #include <pbkdf2-sha1.h>
 
 static int
-openssl_hash_password (const char *pass, gnutls_datum_t * key, gnutls_datum_t * salt)
+openssl_hash_password(const char *pass, gnutls_datum_t * key,
+		      gnutls_datum_t * salt)
 {
-  unsigned char md5[16];
-  gnutls_hash_hd_t hash;
-  unsigned int count = 0;
-  int err;
+	unsigned char md5[16];
+	gnutls_hash_hd_t hash;
+	unsigned int count = 0;
+	int err;
 
-  while (count < key->size)
-    {
-      err = gnutls_hash_init (&hash, GNUTLS_DIG_MD5);
-      if (err)
-        {
-          gnutls_assert ();
-          return err;
-        }
-      if (count)
-        {
-          err = gnutls_hash (hash, md5, sizeof (md5));
-          if (err)
-            {
-            hash_err:
-              gnutls_hash_deinit (hash, NULL);
-              gnutls_assert();
-              return err;
-            }
-        }
-      if (pass)
-        {
-          err = gnutls_hash (hash, pass, strlen (pass));
-          if (err)
-            {
-              gnutls_assert();
-              goto hash_err;
-            }
-        }
-      err = gnutls_hash (hash, salt->data, 8);
-      if (err)
-        {
-          gnutls_assert();
-          goto hash_err;
-        }
+	while (count < key->size) {
+		err = gnutls_hash_init(&hash, GNUTLS_DIG_MD5);
+		if (err) {
+			gnutls_assert();
+			return err;
+		}
+		if (count) {
+			err = gnutls_hash(hash, md5, sizeof(md5));
+			if (err) {
+			      hash_err:
+				gnutls_hash_deinit(hash, NULL);
+				gnutls_assert();
+				return err;
+			}
+		}
+		if (pass) {
+			err = gnutls_hash(hash, pass, strlen(pass));
+			if (err) {
+				gnutls_assert();
+				goto hash_err;
+			}
+		}
+		err = gnutls_hash(hash, salt->data, 8);
+		if (err) {
+			gnutls_assert();
+			goto hash_err;
+		}
 
-      gnutls_hash_deinit (hash, md5);
+		gnutls_hash_deinit(hash, md5);
 
-      if (key->size - count <= sizeof (md5))
-        {
-          memcpy (&key->data[count], md5, key->size - count);
-          break;
-        }
+		if (key->size - count <= sizeof(md5)) {
+			memcpy(&key->data[count], md5, key->size - count);
+			break;
+		}
 
-      memcpy (&key->data[count], md5, sizeof (md5));
-      count += sizeof (md5);
-    }
+		memcpy(&key->data[count], md5, sizeof(md5));
+		count += sizeof(md5);
+	}
 
-  return 0;
+	return 0;
 }
 
 static const struct pem_cipher {
-  const char *name;
-  gnutls_cipher_algorithm_t cipher;
+	const char *name;
+	gnutls_cipher_algorithm_t cipher;
 } pem_ciphers[] = {
-  { "DES-CBC", GNUTLS_CIPHER_DES_CBC },
-  { "DES-EDE3-CBC", GNUTLS_CIPHER_3DES_CBC },
-  { "AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC },
-  { "AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC },
-  { "AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC },
-  { "CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC },
-  { "CAMELLIA-192-CBC", GNUTLS_CIPHER_CAMELLIA_192_CBC },
-  { "CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC },
-};
+	{
+	"DES-CBC", GNUTLS_CIPHER_DES_CBC}, {
+	"DES-EDE3-CBC", GNUTLS_CIPHER_3DES_CBC}, {
+	"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC}, {
+	"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC}, {
+	"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC}, {
+	"CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC}, {
+	"CAMELLIA-192-CBC", GNUTLS_CIPHER_CAMELLIA_192_CBC}, {
+"CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC},};
 
 /**
  * gnutls_x509_privkey_import_openssl:
@@ -126,224 +119,211 @@ static const struct pem_cipher {
  *   negative error value.
  **/
 int
-gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
-                                    const gnutls_datum_t *data, const char* password)
+gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
+				   const gnutls_datum_t * data,
+				   const char *password)
 {
-  gnutls_cipher_hd_t handle;
-  gnutls_cipher_algorithm_t cipher = GNUTLS_CIPHER_UNKNOWN;
-  gnutls_datum_t b64_data;
-  gnutls_datum_t salt, enc_key;
-  unsigned char *key_data;
-  const char *pem_header = (void*)data->data;
-  const char *pem_header_start = (void*)data->data;
-  ssize_t pem_header_size;
-  int ret;
-  unsigned int i, iv_size, l;
+	gnutls_cipher_hd_t handle;
+	gnutls_cipher_algorithm_t cipher = GNUTLS_CIPHER_UNKNOWN;
+	gnutls_datum_t b64_data;
+	gnutls_datum_t salt, enc_key;
+	unsigned char *key_data;
+	const char *pem_header = (void *) data->data;
+	const char *pem_header_start = (void *) data->data;
+	ssize_t pem_header_size;
+	int ret;
+	unsigned int i, iv_size, l;
 
-  pem_header_size = data->size;
+	pem_header_size = data->size;
 
-  pem_header = memmem(pem_header, pem_header_size, "PRIVATE KEY---", 14);
-  if (pem_header == NULL)
-    {
-      gnutls_assert();
-      return GNUTLS_E_PARSING_ERROR;
-    }
-    
-  pem_header_size -= (ptrdiff_t)(pem_header-pem_header_start);
+	pem_header =
+	    memmem(pem_header, pem_header_size, "PRIVATE KEY---", 14);
+	if (pem_header == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
 
-  pem_header = memmem(pem_header, pem_header_size, "DEK-Info: ", 10);
-  if (pem_header == NULL)
-    {
-      gnutls_assert();
-      return GNUTLS_E_PARSING_ERROR;
-    }
-  
-  pem_header_size = data->size - (ptrdiff_t)(pem_header-pem_header_start) - 10;
-  pem_header += 10;
+	pem_header_size -= (ptrdiff_t) (pem_header - pem_header_start);
 
-  for (i = 0; i < sizeof(pem_ciphers)/sizeof(pem_ciphers[0]); i++) 
-    {
-      l = strlen(pem_ciphers[i].name);
-      if (!strncmp(pem_header, pem_ciphers[i].name, l) &&
-          pem_header[l] == ',') 
-        {
-          pem_header += l + 1;
-          cipher = pem_ciphers[i].cipher;
-          break;
-        }
-    }
+	pem_header = memmem(pem_header, pem_header_size, "DEK-Info: ", 10);
+	if (pem_header == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
 
-  if (cipher == GNUTLS_CIPHER_UNKNOWN)
-    {
-      _gnutls_debug_log ("Unsupported PEM encryption type: %.10s\n", pem_header);
-      gnutls_assert();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	pem_header_size =
+	    data->size - (ptrdiff_t) (pem_header - pem_header_start) - 10;
+	pem_header += 10;
 
-  iv_size = gnutls_cipher_get_iv_size(cipher);
-  salt.size = iv_size;
-  salt.data = gnutls_malloc (salt.size);
-  if (!salt.data)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-    
-  for (i = 0; i < salt.size * 2; i++)
-    {
-      unsigned char x;
-      const char *c = &pem_header[i];
+	for (i = 0; i < sizeof(pem_ciphers) / sizeof(pem_ciphers[0]); i++) {
+		l = strlen(pem_ciphers[i].name);
+		if (!strncmp(pem_header, pem_ciphers[i].name, l) &&
+		    pem_header[l] == ',') {
+			pem_header += l + 1;
+			cipher = pem_ciphers[i].cipher;
+			break;
+		}
+	}
 
-      if (*c >= '0' && *c <= '9')
-        x = (*c) - '0';
-      else if (*c >= 'A' && *c <= 'F')
-        x = (*c) - 'A' + 10;
-      else
-        {
-          gnutls_assert();
-          /* Invalid salt in encrypted PEM file */
-          ret = GNUTLS_E_INVALID_REQUEST;
-          goto out_salt;
-        }
-      if (i & 1)
-        salt.data[i / 2] |= x;
-      else
-        salt.data[i / 2] = x << 4;
-    }
+	if (cipher == GNUTLS_CIPHER_UNKNOWN) {
+		_gnutls_debug_log
+		    ("Unsupported PEM encryption type: %.10s\n",
+		     pem_header);
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  pem_header += salt.size * 2;
-  if (*pem_header != '\r' && *pem_header != '\n')
-    {
-      gnutls_assert();
-      ret = GNUTLS_E_INVALID_REQUEST;
-      goto out_salt;
-    }
-  while (*pem_header == '\n' || *pem_header == '\r')
-    pem_header++;
+	iv_size = gnutls_cipher_get_iv_size(cipher);
+	salt.size = iv_size;
+	salt.data = gnutls_malloc(salt.size);
+	if (!salt.data)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-  ret = _gnutls_base64_decode((const void*)pem_header, pem_header_size, &b64_data);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto out_salt;
-    }
+	for (i = 0; i < salt.size * 2; i++) {
+		unsigned char x;
+		const char *c = &pem_header[i];
 
-  if (b64_data.size < 16)
-    {
-      /* Just to be sure our parsing is OK */
-      gnutls_assert();
-      ret = GNUTLS_E_PARSING_ERROR;
-      goto out_b64;
-    }
+		if (*c >= '0' && *c <= '9')
+			x = (*c) - '0';
+		else if (*c >= 'A' && *c <= 'F')
+			x = (*c) - 'A' + 10;
+		else {
+			gnutls_assert();
+			/* Invalid salt in encrypted PEM file */
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto out_salt;
+		}
+		if (i & 1)
+			salt.data[i / 2] |= x;
+		else
+			salt.data[i / 2] = x << 4;
+	}
 
-  ret = GNUTLS_E_MEMORY_ERROR;
-  enc_key.size = gnutls_cipher_get_key_size (cipher);
-  enc_key.data = gnutls_malloc (enc_key.size);
-  if (!enc_key.data)
-    {
-      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-      goto out_b64;
-    }
+	pem_header += salt.size * 2;
+	if (*pem_header != '\r' && *pem_header != '\n') {
+		gnutls_assert();
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto out_salt;
+	}
+	while (*pem_header == '\n' || *pem_header == '\r')
+		pem_header++;
 
-  key_data = gnutls_malloc (b64_data.size);
-  if (!key_data)
-    {
-      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-      goto out_enc_key;
-    }
+	ret =
+	    _gnutls_base64_decode((const void *) pem_header,
+				  pem_header_size, &b64_data);
+	if (ret < 0) {
+		gnutls_assert();
+		goto out_salt;
+	}
 
-  while (1)
-    {
-      memcpy (key_data, b64_data.data, b64_data.size);
+	if (b64_data.size < 16) {
+		/* Just to be sure our parsing is OK */
+		gnutls_assert();
+		ret = GNUTLS_E_PARSING_ERROR;
+		goto out_b64;
+	}
 
-      ret = openssl_hash_password (password, &enc_key, &salt);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto out;
-        }
+	ret = GNUTLS_E_MEMORY_ERROR;
+	enc_key.size = gnutls_cipher_get_key_size(cipher);
+	enc_key.data = gnutls_malloc(enc_key.size);
+	if (!enc_key.data) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto out_b64;
+	}
 
-      ret = gnutls_cipher_init (&handle, cipher, &enc_key, &salt);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          gnutls_cipher_deinit (handle);
-          goto out;
-        }
+	key_data = gnutls_malloc(b64_data.size);
+	if (!key_data) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto out_enc_key;
+	}
 
-      ret = gnutls_cipher_decrypt (handle, key_data, b64_data.size);
-      gnutls_cipher_deinit (handle);
+	while (1) {
+		memcpy(key_data, b64_data.data, b64_data.size);
 
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto out;
-        }
+		ret = openssl_hash_password(password, &enc_key, &salt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto out;
+		}
 
-      /* We have to strip any padding to accept it.
-         So a bit more ASN.1 parsing for us.*/
-      if (key_data[0] == 0x30)
-        {
-          gnutls_datum_t key_datum;
-          unsigned int blocksize = gnutls_cipher_get_block_size (cipher);
-          unsigned int keylen = key_data[1];
-          unsigned int ofs = 2;
+		ret = gnutls_cipher_init(&handle, cipher, &enc_key, &salt);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_cipher_deinit(handle);
+			goto out;
+		}
 
-          if (keylen & 0x80)
-            {
-              int lenlen = keylen & 0x7f;
-              keylen = 0;
+		ret =
+		    gnutls_cipher_decrypt(handle, key_data, b64_data.size);
+		gnutls_cipher_deinit(handle);
 
-              if (lenlen > 3)
-                {
-                  gnutls_assert();
-                  goto fail;
-                }
+		if (ret < 0) {
+			gnutls_assert();
+			goto out;
+		}
 
-              while (lenlen)
-                {
-                  keylen <<= 8;
-                  keylen |= key_data[ofs++];
-                  lenlen--;
-                }
-            }
-          keylen += ofs;
+		/* We have to strip any padding to accept it.
+		   So a bit more ASN.1 parsing for us. */
+		if (key_data[0] == 0x30) {
+			gnutls_datum_t key_datum;
+			unsigned int blocksize =
+			    gnutls_cipher_get_block_size(cipher);
+			unsigned int keylen = key_data[1];
+			unsigned int ofs = 2;
 
-          /* If there appears to be more padding than required, fail */
-          if (b64_data.size - keylen > blocksize)
-            {
-              gnutls_assert();
-              goto fail;
-            }
+			if (keylen & 0x80) {
+				int lenlen = keylen & 0x7f;
+				keylen = 0;
 
-          /* If the padding bytes aren't all equal to the amount of padding, fail */
-          ofs = keylen;
-          while (ofs < b64_data.size)
-            {
-              if (key_data[ofs] != b64_data.size - keylen)
-                {
-                  gnutls_assert();
-                  goto fail;
-                }
-              ofs++;
-            }
+				if (lenlen > 3) {
+					gnutls_assert();
+					goto fail;
+				}
 
-          key_datum.data = key_data;
-          key_datum.size = keylen;
-          ret =
-              gnutls_x509_privkey_import (key, &key_datum,
-                                          GNUTLS_X509_FMT_DER);
-          if (ret == 0)
-            goto out;
-        }
-    fail:
-      ret = GNUTLS_E_DECRYPTION_FAILED;
-      goto out;
-    }
-out:
-  gnutls_free (key_data);
-out_enc_key:
-  gnutls_free (enc_key.data);
-out_b64:
-  gnutls_free (b64_data.data);
-out_salt:
-  gnutls_free (salt.data);
-  return ret;
+				while (lenlen) {
+					keylen <<= 8;
+					keylen |= key_data[ofs++];
+					lenlen--;
+				}
+			}
+			keylen += ofs;
+
+			/* If there appears to be more padding than required, fail */
+			if (b64_data.size - keylen > blocksize) {
+				gnutls_assert();
+				goto fail;
+			}
+
+			/* If the padding bytes aren't all equal to the amount of padding, fail */
+			ofs = keylen;
+			while (ofs < b64_data.size) {
+				if (key_data[ofs] !=
+				    b64_data.size - keylen) {
+					gnutls_assert();
+					goto fail;
+				}
+				ofs++;
+			}
+
+			key_datum.data = key_data;
+			key_datum.size = keylen;
+			ret =
+			    gnutls_x509_privkey_import(key, &key_datum,
+						       GNUTLS_X509_FMT_DER);
+			if (ret == 0)
+				goto out;
+		}
+	      fail:
+		ret = GNUTLS_E_DECRYPTION_FAILED;
+		goto out;
+	}
+      out:
+	gnutls_free(key_data);
+      out_enc_key:
+	gnutls_free(enc_key.data);
+      out_b64:
+	gnutls_free(b64_data.data);
+      out_salt:
+	gnutls_free(salt.data);
+	return ret;
 }

@@ -49,20 +49,19 @@
 #include "gnutls_num.h"
 
 typedef int (*supp_recv_func) (gnutls_session_t session,
-                               const uint8_t * data, size_t data_size);
+			       const uint8_t * data, size_t data_size);
 typedef int (*supp_send_func) (gnutls_session_t session,
-                               gnutls_buffer_st * buf);
+			       gnutls_buffer_st * buf);
 
-typedef struct
-{
-  const char *name;
-  gnutls_supplemental_data_format_type_t type;
-  supp_recv_func supp_recv_func;
-  supp_send_func supp_send_func;
+typedef struct {
+	const char *name;
+	gnutls_supplemental_data_format_type_t type;
+	supp_recv_func supp_recv_func;
+	supp_send_func supp_send_func;
 } gnutls_supplemental_entry;
 
 gnutls_supplemental_entry _gnutls_supplemental[] = {
-  {0, 0, 0, 0}
+	{0, 0, 0, 0}
 };
 
 /**
@@ -75,141 +74,134 @@ gnutls_supplemental_entry _gnutls_supplemental[] = {
  * Returns: a string that contains the name of the specified
  *   supplemental data format type, or %NULL for unknown types.
  **/
-const char *
-gnutls_supplemental_get_name (gnutls_supplemental_data_format_type_t type)
+const char
+    *gnutls_supplemental_get_name(gnutls_supplemental_data_format_type_t
+				  type)
 {
-  gnutls_supplemental_entry *p;
+	gnutls_supplemental_entry *p;
 
-  for (p = _gnutls_supplemental; p->name != NULL; p++)
-    if (p->type == type)
-      return p->name;
+	for (p = _gnutls_supplemental; p->name != NULL; p++)
+		if (p->type == type)
+			return p->name;
 
-  return NULL;
+	return NULL;
 }
 
 static supp_recv_func
-get_supp_func_recv (gnutls_supplemental_data_format_type_t type)
+get_supp_func_recv(gnutls_supplemental_data_format_type_t type)
 {
-  gnutls_supplemental_entry *p;
+	gnutls_supplemental_entry *p;
 
-  for (p = _gnutls_supplemental; p->name != NULL; p++)
-    if (p->type == type)
-      return p->supp_recv_func;
+	for (p = _gnutls_supplemental; p->name != NULL; p++)
+		if (p->type == type)
+			return p->supp_recv_func;
 
-  return NULL;
+	return NULL;
 }
 
 int
-_gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer_st * buf)
+_gnutls_gen_supplemental(gnutls_session_t session, gnutls_buffer_st * buf)
 {
-  gnutls_supplemental_entry *p;
-  int ret;
+	gnutls_supplemental_entry *p;
+	int ret;
 
-  /* Make room for 3 byte length field. */
-  ret = _gnutls_buffer_append_data (buf, "\0\0\0", 3);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	/* Make room for 3 byte length field. */
+	ret = _gnutls_buffer_append_data(buf, "\0\0\0", 3);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  for (p = _gnutls_supplemental; p->name; p++)
-    {
-      supp_send_func supp_send = p->supp_send_func;
-      size_t sizepos = buf->length;
+	for (p = _gnutls_supplemental; p->name; p++) {
+		supp_send_func supp_send = p->supp_send_func;
+		size_t sizepos = buf->length;
 
-      /* Make room for supplement type and length byte length field. */
-      ret = _gnutls_buffer_append_data (buf, "\0\0\0\0", 4);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
+		/* Make room for supplement type and length byte length field. */
+		ret = _gnutls_buffer_append_data(buf, "\0\0\0\0", 4);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 
-      ret = supp_send (session, buf);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
+		ret = supp_send(session, buf);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 
-      /* If data were added, store type+length, otherwise reset. */
-      if (buf->length > sizepos + 4)
-        {
-          buf->data[sizepos] = 0;
-          buf->data[sizepos + 1] = p->type;
-          buf->data[sizepos + 2] = ((buf->length - sizepos - 4) >> 8) & 0xFF;
-          buf->data[sizepos + 3] = (buf->length - sizepos - 4) & 0xFF;
-        }
-      else
-        buf->length -= 4;
-    }
+		/* If data were added, store type+length, otherwise reset. */
+		if (buf->length > sizepos + 4) {
+			buf->data[sizepos] = 0;
+			buf->data[sizepos + 1] = p->type;
+			buf->data[sizepos + 2] =
+			    ((buf->length - sizepos - 4) >> 8) & 0xFF;
+			buf->data[sizepos + 3] =
+			    (buf->length - sizepos - 4) & 0xFF;
+		} else
+			buf->length -= 4;
+	}
 
-  buf->data[0] = ((buf->length - 3) >> 16) & 0xFF;
-  buf->data[1] = ((buf->length - 3) >> 8) & 0xFF;
-  buf->data[2] = (buf->length - 3) & 0xFF;
+	buf->data[0] = ((buf->length - 3) >> 16) & 0xFF;
+	buf->data[1] = ((buf->length - 3) >> 8) & 0xFF;
+	buf->data[2] = (buf->length - 3) & 0xFF;
 
-  _gnutls_debug_log ("EXT[%p]: Sending %d bytes of supplemental data\n",
-                     session, (int) buf->length);
+	_gnutls_debug_log
+	    ("EXT[%p]: Sending %d bytes of supplemental data\n", session,
+	     (int) buf->length);
 
-  return buf->length;
+	return buf->length;
 }
 
 int
-_gnutls_parse_supplemental (gnutls_session_t session,
-                            const uint8_t * data, int datalen)
+_gnutls_parse_supplemental(gnutls_session_t session,
+			   const uint8_t * data, int datalen)
 {
-  const uint8_t *p = data;
-  ssize_t dsize = datalen;
-  size_t total_size;
+	const uint8_t *p = data;
+	ssize_t dsize = datalen;
+	size_t total_size;
 
-  DECR_LEN (dsize, 3);
-  total_size = _gnutls_read_uint24 (p);
-  p += 3;
+	DECR_LEN(dsize, 3);
+	total_size = _gnutls_read_uint24(p);
+	p += 3;
 
-  if (dsize != (ssize_t) total_size)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-    }
+	if (dsize != (ssize_t) total_size) {
+		gnutls_assert();
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
 
-  do
-    {
-      uint16_t supp_data_type;
-      uint16_t supp_data_length;
-      supp_recv_func recv_func;
+	do {
+		uint16_t supp_data_type;
+		uint16_t supp_data_length;
+		supp_recv_func recv_func;
 
-      DECR_LEN (dsize, 2);
-      supp_data_type = _gnutls_read_uint16 (p);
-      p += 2;
+		DECR_LEN(dsize, 2);
+		supp_data_type = _gnutls_read_uint16(p);
+		p += 2;
 
-      DECR_LEN (dsize, 2);
-      supp_data_length = _gnutls_read_uint16 (p);
-      p += 2;
+		DECR_LEN(dsize, 2);
+		supp_data_length = _gnutls_read_uint16(p);
+		p += 2;
 
-      _gnutls_debug_log ("EXT[%p]: Got supplemental type=%02x length=%d\n",
-                         session, supp_data_type, supp_data_length);
+		_gnutls_debug_log
+		    ("EXT[%p]: Got supplemental type=%02x length=%d\n",
+		     session, supp_data_type, supp_data_length);
 
-      recv_func = get_supp_func_recv (supp_data_type);
-      if (recv_func)
-        {
-          int ret = recv_func (session, p, supp_data_length);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
-        }
-      else
-        {
-          gnutls_assert ();
-          return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-        }
+		recv_func = get_supp_func_recv(supp_data_type);
+		if (recv_func) {
+			int ret = recv_func(session, p, supp_data_length);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+		} else {
+			gnutls_assert();
+			return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		}
 
-      DECR_LEN (dsize, supp_data_length);
-      p += supp_data_length;
-    }
-  while (dsize > 0);
+		DECR_LEN(dsize, supp_data_length);
+		p += supp_data_length;
+	}
+	while (dsize > 0);
 
-  return 0;
+	return 0;
 }

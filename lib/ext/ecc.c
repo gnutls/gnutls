@@ -36,40 +36,41 @@
  * extensions draft.
  */
 
-static int _gnutls_supported_ecc_recv_params (gnutls_session_t session,
-                                          const uint8_t * data,
-                                          size_t data_size);
-static int _gnutls_supported_ecc_send_params (gnutls_session_t session,
-                                          gnutls_buffer_st * extdata);
+static int _gnutls_supported_ecc_recv_params(gnutls_session_t session,
+					     const uint8_t * data,
+					     size_t data_size);
+static int _gnutls_supported_ecc_send_params(gnutls_session_t session,
+					     gnutls_buffer_st * extdata);
 
-static int _gnutls_supported_ecc_pf_recv_params (gnutls_session_t session,
-                                          const uint8_t * data,
-                                          size_t data_size);
-static int _gnutls_supported_ecc_pf_send_params (gnutls_session_t session,
-                                          gnutls_buffer_st * extdata);
+static int _gnutls_supported_ecc_pf_recv_params(gnutls_session_t session,
+						const uint8_t * data,
+						size_t data_size);
+static int _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
+						gnutls_buffer_st *
+						extdata);
 
 extension_entry_st ext_mod_supported_ecc = {
-  .name = "SUPPORTED ECC",
-  .type = GNUTLS_EXTENSION_SUPPORTED_ECC,
-  .parse_type = GNUTLS_EXT_TLS,
+	.name = "SUPPORTED ECC",
+	.type = GNUTLS_EXTENSION_SUPPORTED_ECC,
+	.parse_type = GNUTLS_EXT_TLS,
 
-  .recv_func = _gnutls_supported_ecc_recv_params,
-  .send_func = _gnutls_supported_ecc_send_params,
-  .pack_func = NULL,
-  .unpack_func = NULL,
-  .deinit_func = NULL
+	.recv_func = _gnutls_supported_ecc_recv_params,
+	.send_func = _gnutls_supported_ecc_send_params,
+	.pack_func = NULL,
+	.unpack_func = NULL,
+	.deinit_func = NULL
 };
 
 extension_entry_st ext_mod_supported_ecc_pf = {
-  .name = "SUPPORTED ECC POINT FORMATS",
-  .type = GNUTLS_EXTENSION_SUPPORTED_ECC_PF,
-  .parse_type = GNUTLS_EXT_TLS,
+	.name = "SUPPORTED ECC POINT FORMATS",
+	.type = GNUTLS_EXTENSION_SUPPORTED_ECC_PF,
+	.parse_type = GNUTLS_EXT_TLS,
 
-  .recv_func = _gnutls_supported_ecc_pf_recv_params,
-  .send_func = _gnutls_supported_ecc_pf_send_params,
-  .pack_func = NULL,
-  .unpack_func = NULL,
-  .deinit_func = NULL
+	.recv_func = _gnutls_supported_ecc_pf_recv_params,
+	.send_func = _gnutls_supported_ecc_pf_send_params,
+	.pack_func = NULL,
+	.unpack_func = NULL,
+	.deinit_func = NULL
 };
 
 /* 
@@ -81,111 +82,118 @@ extension_entry_st ext_mod_supported_ecc_pf = {
  *
  */
 static int
-_gnutls_supported_ecc_recv_params (gnutls_session_t session,
-                               const uint8_t * data, size_t _data_size)
+_gnutls_supported_ecc_recv_params(gnutls_session_t session,
+				  const uint8_t * data, size_t _data_size)
 {
-  int new_type = -1, ret, i;
-  ssize_t data_size = _data_size;
-  uint16_t len;
-  const uint8_t* p = data;
+	int new_type = -1, ret, i;
+	ssize_t data_size = _data_size;
+	uint16_t len;
+	const uint8_t *p = data;
 
-  if (session->security_parameters.entity == GNUTLS_CLIENT)
-    {
-      /* A client shouldn't receive this extension */
-      return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
-    }
-  else
-    { /* SERVER SIDE - we must check if the sent supported ecc type is the right one 
-       */
-      if (data_size < 2)
-        return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		/* A client shouldn't receive this extension */
+		return
+		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+	} else {		/* SERVER SIDE - we must check if the sent supported ecc type is the right one 
+				 */
+		if (data_size < 2)
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
-      DECR_LEN (data_size, 2);
-      len = _gnutls_read_uint16(p);
-      p += 2;
+		DECR_LEN(data_size, 2);
+		len = _gnutls_read_uint16(p);
+		p += 2;
 
-      DECR_LEN (data_size, len);
+		DECR_LEN(data_size, len);
 
-      for (i = 0; i < len; i+=2)
-        {
-          new_type = _gnutls_tls_id_to_ecc_curve (_gnutls_read_uint16(&p[i]));
-          if (new_type < 0)
-            continue;
+		for (i = 0; i < len; i += 2) {
+			new_type =
+			    _gnutls_tls_id_to_ecc_curve(_gnutls_read_uint16
+							(&p[i]));
+			if (new_type < 0)
+				continue;
 
-          /* Check if we support this supported_ecc */
-          if ((ret =
-               _gnutls_session_supports_ecc_curve (session, new_type)) < 0)
-            {
-              continue;
-            }
-          else
-            break;
-          /* new_type is ok */
-        }
+			/* Check if we support this supported_ecc */
+			if ((ret =
+			     _gnutls_session_supports_ecc_curve(session,
+								new_type))
+			    < 0) {
+				continue;
+			} else
+				break;
+			/* new_type is ok */
+		}
 
-      if (new_type < 0)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-        }
+		if (new_type < 0) {
+			gnutls_assert();
+			return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		}
 
-      if ((ret =
-           _gnutls_session_supports_ecc_curve (session, new_type)) < 0)
-        {
-              /* The peer has requested unsupported ecc
-               * types. Instead of failing, procceed normally.
-               * (the ciphersuite selection would fail, or a
-               * non certificate ciphersuite will be selected).
-               */
-          return gnutls_assert_val(0);
-        }
+		if ((ret =
+		     _gnutls_session_supports_ecc_curve(session,
+							new_type)) < 0) {
+			/* The peer has requested unsupported ecc
+			 * types. Instead of failing, procceed normally.
+			 * (the ciphersuite selection would fail, or a
+			 * non certificate ciphersuite will be selected).
+			 */
+			return gnutls_assert_val(0);
+		}
 
-      _gnutls_session_ecc_curve_set (session, new_type);
-    }
+		_gnutls_session_ecc_curve_set(session, new_type);
+	}
 
-  return 0;
+	return 0;
 }
 
 
 /* returns data_size or a negative number on failure
  */
 static int
-_gnutls_supported_ecc_send_params (gnutls_session_t session, gnutls_buffer_st* extdata)
+_gnutls_supported_ecc_send_params(gnutls_session_t session,
+				  gnutls_buffer_st * extdata)
 {
-  unsigned len, i;
-  int ret;
-  uint16_t p;
-  
-  /* this extension is only being sent on client side */
-  if (session->security_parameters.entity == GNUTLS_CLIENT)
-    {
+	unsigned len, i;
+	int ret;
+	uint16_t p;
 
-      if (session->internals.priorities.supported_ecc.algorithms > 0)
-        {
+	/* this extension is only being sent on client side */
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
-          len = session->internals.priorities.supported_ecc.algorithms;
+		if (session->internals.priorities.supported_ecc.
+		    algorithms > 0) {
 
-          /* this is a vector!
-           */
-          ret = _gnutls_buffer_append_prefix(extdata, 16, len*2);
-          if (ret < 0)
-            return gnutls_assert_val(ret);
+			len =
+			    session->internals.priorities.supported_ecc.
+			    algorithms;
 
-          for (i = 0; i < len; i++)
-            {
-              p =
-                _gnutls_ecc_curve_get_tls_id (session->internals.priorities.
-                                       supported_ecc.priority[i]);
-              ret = _gnutls_buffer_append_prefix(extdata, 16, p);
-              if (ret < 0)
-                return gnutls_assert_val(ret);
-            }
-          return (len + 1)*2;
-        }
+			/* this is a vector!
+			 */
+			ret =
+			    _gnutls_buffer_append_prefix(extdata, 16,
+							 len * 2);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
-    }
+			for (i = 0; i < len; i++) {
+				p = _gnutls_ecc_curve_get_tls_id(session->
+								 internals.
+								 priorities.supported_ecc.
+								 priority
+								 [i]);
+				ret =
+				    _gnutls_buffer_append_prefix(extdata,
+								 16, p);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+			}
+			return (len + 1) * 2;
+		}
 
-  return 0;
+	}
+
+	return 0;
 }
 
 /* 
@@ -197,56 +205,61 @@ _gnutls_supported_ecc_send_params (gnutls_session_t session, gnutls_buffer_st* e
  *
  */
 static int
-_gnutls_supported_ecc_pf_recv_params (gnutls_session_t session,
-                               const uint8_t * data, size_t _data_size)
+_gnutls_supported_ecc_pf_recv_params(gnutls_session_t session,
+				     const uint8_t * data,
+				     size_t _data_size)
 {
-int len, i;
-int uncompressed = 0;
-int data_size = _data_size;
+	int len, i;
+	int uncompressed = 0;
+	int data_size = _data_size;
 
-  if (session->security_parameters.entity == GNUTLS_CLIENT)
-    {
-      if (data_size < 1)
-        return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
-      
-      len = data[0];
-      DECR_LEN (data_size, len+1);
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		if (data_size < 1)
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
 
-      for (i=1;i<=len;i++)
-        if (data[i] == 0) /* uncompressed */
-          uncompressed = 1;
-      
-      if (uncompressed == 0)
-        return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
-    }
-  else
-    {
-      /* only sanity check here. We only support uncompressed points
-       * and a client must support it thus nothing to check.
-       */
-      if (_data_size < 1)
-        return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
-    }
+		len = data[0];
+		DECR_LEN(data_size, len + 1);
 
-  return 0;
+		for (i = 1; i <= len; i++)
+			if (data[i] == 0)	/* uncompressed */
+				uncompressed = 1;
+
+		if (uncompressed == 0)
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+	} else {
+		/* only sanity check here. We only support uncompressed points
+		 * and a client must support it thus nothing to check.
+		 */
+		if (_data_size < 1)
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+	}
+
+	return 0;
 }
 
 /* returns data_size or a negative number on failure
  */
 static int
-_gnutls_supported_ecc_pf_send_params (gnutls_session_t session, gnutls_buffer_st* extdata)
+_gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
+				     gnutls_buffer_st * extdata)
 {
-  const uint8_t p[2] = {0x01, 0x00}; /* only support uncompressed point format */
-  
-  if (session->security_parameters.entity == GNUTLS_SERVER && !_gnutls_session_is_ecc(session))
-    return 0;
-  
-  if (session->internals.priorities.supported_ecc.algorithms > 0)
-    {
-      _gnutls_buffer_append_data(extdata, p, 2);
-      return 2;
-    }
-  return 0;
+	const uint8_t p[2] = { 0x01, 0x00 };	/* only support uncompressed point format */
+
+	if (session->security_parameters.entity == GNUTLS_SERVER
+	    && !_gnutls_session_is_ecc(session))
+		return 0;
+
+	if (session->internals.priorities.supported_ecc.algorithms > 0) {
+		_gnutls_buffer_append_data(extdata, p, 2);
+		return 2;
+	}
+	return 0;
 }
 
 
@@ -254,18 +267,21 @@ _gnutls_supported_ecc_pf_send_params (gnutls_session_t session, gnutls_buffer_st
  * session. A negative error value is returned otherwise.
  */
 int
-_gnutls_session_supports_ecc_curve (gnutls_session_t session, unsigned int ecc_type)
+_gnutls_session_supports_ecc_curve(gnutls_session_t session,
+				   unsigned int ecc_type)
 {
-  unsigned i;
-  
-  if (session->internals.priorities.supported_ecc.algorithms > 0)
-    {
-      for (i = 0; i < session->internals.priorities.supported_ecc.algorithms; i++)
-        {
-          if (session->internals.priorities.supported_ecc.priority[i] == ecc_type)
-            return 0;
-        }
-    }
+	unsigned i;
 
-  return GNUTLS_E_ECC_UNSUPPORTED_CURVE;
+	if (session->internals.priorities.supported_ecc.algorithms > 0) {
+		for (i = 0;
+		     i <
+		     session->internals.priorities.supported_ecc.
+		     algorithms; i++) {
+			if (session->internals.priorities.supported_ecc.
+			    priority[i] == ecc_type)
+				return 0;
+		}
+	}
+
+	return GNUTLS_E_ECC_UNSUPPORTED_CURVE;
 }

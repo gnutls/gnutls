@@ -26,24 +26,25 @@
 #include <gnutls_auth.h>
 
 int
-_gnutls_gen_ecdh_common_client_kx (gnutls_session_t session, 
-                                   gnutls_buffer_st* data);
+_gnutls_gen_ecdh_common_client_kx(gnutls_session_t session,
+				  gnutls_buffer_st * data);
 
 int
-_gnutls_gen_ecdh_common_client_kx_int (gnutls_session_t session, 
-                                   gnutls_buffer_st* data, 
-                                   gnutls_datum_t * psk_key);
+_gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
+				      gnutls_buffer_st * data,
+				      gnutls_datum_t * psk_key);
 
 int
-_gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
-                                    uint8_t * data, size_t _data_size,
-                                    gnutls_ecc_curve_t curve,
-                                    gnutls_datum_t *psk_key);
+_gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
+				   uint8_t * data, size_t _data_size,
+				   gnutls_ecc_curve_t curve,
+				   gnutls_datum_t * psk_key);
 
-int _gnutls_ecdh_common_print_server_kx (gnutls_session_t, gnutls_buffer_st* data,
-                                         gnutls_ecc_curve_t curve);
-int _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session, uint8_t * data,
-                                      size_t _data_size);
+int _gnutls_ecdh_common_print_server_kx(gnutls_session_t,
+					gnutls_buffer_st * data,
+					gnutls_ecc_curve_t curve);
+int _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
+				       uint8_t * data, size_t _data_size);
 
 
 

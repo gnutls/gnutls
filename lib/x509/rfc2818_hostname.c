@@ -38,67 +38,66 @@
  * Returns: non-zero for a successful match, and zero on failure.
  **/
 int
-gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
+gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
+			       const char *hostname)
 {
 
-  char dnsname[MAX_CN];
-  size_t dnsnamesize;
-  int found_dnsname = 0;
-  int ret = 0;
-  int i = 0;
+	char dnsname[MAX_CN];
+	size_t dnsnamesize;
+	int found_dnsname = 0;
+	int ret = 0;
+	int i = 0;
 
-  /* try matching against:
-   *  1) a DNS name as an alternative name (subjectAltName) extension
-   *     in the certificate
-   *  2) the common name (CN) in the certificate
-   *
-   *  either of these may be of the form: *.domain.tld
-   *
-   *  only try (2) if there is no subjectAltName extension of
-   *  type dNSName
-   */
+	/* try matching against:
+	 *  1) a DNS name as an alternative name (subjectAltName) extension
+	 *     in the certificate
+	 *  2) the common name (CN) in the certificate
+	 *
+	 *  either of these may be of the form: *.domain.tld
+	 *
+	 *  only try (2) if there is no subjectAltName extension of
+	 *  type dNSName
+	 */
 
-  /* Check through all included subjectAltName extensions, comparing
-   * against all those of type dNSName.
-   */
-  for (i = 0; !(ret < 0); i++)
-    {
+	/* Check through all included subjectAltName extensions, comparing
+	 * against all those of type dNSName.
+	 */
+	for (i = 0; !(ret < 0); i++) {
 
-      dnsnamesize = sizeof (dnsname);
-      ret = gnutls_x509_crt_get_subject_alt_name (cert, i,
-                                                  dnsname, &dnsnamesize,
-                                                  NULL);
+		dnsnamesize = sizeof(dnsname);
+		ret = gnutls_x509_crt_get_subject_alt_name(cert, i,
+							   dnsname,
+							   &dnsnamesize,
+							   NULL);
 
-      if (ret == GNUTLS_SAN_DNSNAME)
-        {
-          found_dnsname = 1;
-          if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname, 0))
-            {
-              return 1;
-            }
-        }
-    }
+		if (ret == GNUTLS_SAN_DNSNAME) {
+			found_dnsname = 1;
+			if (_gnutls_hostname_compare
+			    (dnsname, dnsnamesize, hostname, 0)) {
+				return 1;
+			}
+		}
+	}
 
-  if (!found_dnsname)
-    {
-      /* not got the necessary extension, use CN instead
-       */
-      dnsnamesize = sizeof (dnsname);
-      if (gnutls_x509_crt_get_dn_by_oid (cert, OID_X520_COMMON_NAME, 0,
-                                         0, dnsname, &dnsnamesize) < 0)
-        {
-          /* got an error, can't find a name
-           */
-          return 0;
-        }
+	if (!found_dnsname) {
+		/* not got the necessary extension, use CN instead
+		 */
+		dnsnamesize = sizeof(dnsname);
+		if (gnutls_x509_crt_get_dn_by_oid
+		    (cert, OID_X520_COMMON_NAME, 0, 0, dnsname,
+		     &dnsnamesize) < 0) {
+			/* got an error, can't find a name
+			 */
+			return 0;
+		}
 
-      if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname, 0))
-        {
-          return 1;
-        }
-    }
+		if (_gnutls_hostname_compare
+		    (dnsname, dnsnamesize, hostname, 0)) {
+			return 1;
+		}
+	}
 
-  /* not found a matching name
-   */
-  return 0;
+	/* not found a matching name
+	 */
+	return 0;
 }

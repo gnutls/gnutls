@@ -24,24 +24,21 @@
 #include <gnutls_auth.h>
 #include <auth/dh_common.h>
 
-typedef struct gnutls_anon_server_credentials_st
-{
-  gnutls_dh_params_t dh_params;
-  /* this callback is used to retrieve the DH or RSA
-   * parameters.
-   */
-  gnutls_params_function *params_func;
+typedef struct gnutls_anon_server_credentials_st {
+	gnutls_dh_params_t dh_params;
+	/* this callback is used to retrieve the DH or RSA
+	 * parameters.
+	 */
+	gnutls_params_function *params_func;
 } anon_server_credentials_st;
 
-typedef struct gnutls_anon_client_credentials_st
-{
-  int dummy;
+typedef struct gnutls_anon_client_credentials_st {
+	int dummy;
 } anon_client_credentials_st;
 
-typedef struct anon_auth_info_st
-{
-  dh_info_st dh;
-  gnutls_ecc_curve_t curve;
+typedef struct anon_auth_info_st {
+	dh_info_st dh;
+	gnutls_ecc_curve_t curve;
 } *anon_auth_info_t;
 
 typedef struct anon_auth_info_st anon_auth_info_st;

@@ -28,8 +28,8 @@
 extern extension_entry_st ext_mod_status_request;
 
 int
-_gnutls_send_server_certificate_status (gnutls_session_t session, int again);
-int
-_gnutls_recv_server_certificate_status (gnutls_session_t session);
+_gnutls_send_server_certificate_status(gnutls_session_t session,
+				       int again);
+int _gnutls_recv_server_certificate_status(gnutls_session_t session);
 
 #endif

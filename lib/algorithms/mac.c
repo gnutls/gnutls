@@ -26,19 +26,24 @@
 #include <x509/common.h>
 
 static const mac_entry_st hash_algorithms[] = {
-  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 20, 0, 0, 1, 64},
-  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 16, 0, 0, 0, 64},
-  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 32, 0, 0, 1, 64},
-  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 0, 1, 64},
-  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 0, 1, 64},
-  {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 0, 1, 64},
-  {"UMAC-96", NULL, GNUTLS_MAC_UMAC_96, 12, 16, 8, 0, 1, 0},
-  {"UMAC-128", NULL, GNUTLS_MAC_UMAC_128, 16, 16, 8, 0, 1, 0},
-  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 0, 0, 1, 1, 0},
-  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0, 0, 0, 0},     /* not used as MAC */
-  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 20, 0, 0, 1, 64},
-  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0}
+	{"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 20, 0, 0, 1, 64},
+	{"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 16, 0, 0, 0, 64},
+	{"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 32, 0, 0, 1,
+	 64},
+	{"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 48, 0, 0, 1,
+	 64},
+	{"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 64, 0, 0, 1,
+	 64},
+	{"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 28, 0, 0, 1,
+	 64},
+	{"UMAC-96", NULL, GNUTLS_MAC_UMAC_96, 12, 16, 8, 0, 1, 0},
+	{"UMAC-128", NULL, GNUTLS_MAC_UMAC_128, 16, 16, 8, 0, 1, 0},
+	{"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 0, 0, 1, 1, 0},
+	{"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0, 0, 0, 0, 0},	/* not used as MAC */
+	{"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 20, 0, 0, 1,
+	 64},
+	{"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0, 0, 0, 0}
 };
 
 
@@ -49,24 +54,24 @@ static const mac_entry_st hash_algorithms[] = {
 #define GNUTLS_HASH_ALG_LOOP(a) \
                         GNUTLS_HASH_LOOP( if(p->id == algorithm) { a; break; } )
 
-const mac_entry_st* mac_to_entry(gnutls_mac_algorithm_t c)
+const mac_entry_st *mac_to_entry(gnutls_mac_algorithm_t c)
 {
-  GNUTLS_HASH_LOOP (if (c==p->id) return p);
+	GNUTLS_HASH_LOOP(if (c == p->id) return p);
 
-  return NULL;
+	return NULL;
 }
 
 int
-_gnutls_mac_priority (gnutls_session_t session,
-                      gnutls_mac_algorithm_t algorithm)
-{                               /* actually returns the priority */
-  unsigned int i;
-  for (i = 0; i < session->internals.priorities.mac.algorithms; i++)
-    {
-      if (session->internals.priorities.mac.priority[i] == algorithm)
-        return i;
-    }
-  return -1;
+_gnutls_mac_priority(gnutls_session_t session,
+		     gnutls_mac_algorithm_t algorithm)
+{				/* actually returns the priority */
+	unsigned int i;
+	for (i = 0; i < session->internals.priorities.mac.algorithms; i++) {
+		if (session->internals.priorities.mac.priority[i] ==
+		    algorithm)
+			return i;
+	}
+	return -1;
 }
 
 /**
@@ -78,15 +83,14 @@ _gnutls_mac_priority (gnutls_session_t session,
  * Returns: a string that contains the name of the specified MAC
  *   algorithm, or %NULL.
  **/
-const char *
-gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
+const char *gnutls_mac_get_name(gnutls_mac_algorithm_t algorithm)
 {
-  const char *ret = NULL;
+	const char *ret = NULL;
 
-  /* avoid prefix */
-  GNUTLS_HASH_ALG_LOOP (ret = p->name);
+	/* avoid prefix */
+	GNUTLS_HASH_ALG_LOOP(ret = p->name);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -98,20 +102,18 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
  * Returns: a string that contains the name of the specified digest
  *   algorithm, or %NULL.
  **/
-const char *
-gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm)
+const char *gnutls_digest_get_name(gnutls_digest_algorithm_t algorithm)
 {
-  const char *ret = NULL;
+	const char *ret = NULL;
 
-  GNUTLS_HASH_LOOP (
-    if (algorithm == (unsigned)p->id && p->oid != NULL)
-      {
-        ret = p->name;
-        break;
-      }
-  );
+	GNUTLS_HASH_LOOP(
+		if (algorithm == (unsigned) p->id && p->oid != NULL) {
+			ret = p->name;
+			break;
+		}
+	);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -124,20 +126,18 @@ gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm)
  * Returns: a #gnutls_digest_algorithm_t id of the specified MAC
  *   algorithm string, or %GNUTLS_DIG_UNKNOWN on failures.
  **/
-gnutls_digest_algorithm_t
-gnutls_digest_get_id (const char *name)
+gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
 {
-  gnutls_digest_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
+	gnutls_digest_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
 
-  GNUTLS_HASH_LOOP (
-    if (p->oid != NULL && strcasecmp (p->name, name) == 0) 
-      {
-        ret = p->id;
-        break;
-      }
-  );
+	GNUTLS_HASH_LOOP(
+		if (p->oid != NULL && strcasecmp(p->name, name) == 0) {
+			ret = p->id;
+			break;
+		}
+	);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -150,20 +150,18 @@ gnutls_digest_get_id (const char *name)
  * Returns: a #gnutls_mac_algorithm_t id of the specified MAC
  *   algorithm string, or %GNUTLS_MAC_UNKNOWN on failures.
  **/
-gnutls_mac_algorithm_t
-gnutls_mac_get_id (const char *name)
+gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name)
 {
-  gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
+	gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
 
-  GNUTLS_HASH_LOOP (
-    if (strcasecmp (p->name, name) == 0) 
-      {
-        ret = p->id;
-        break;
-      }
-  );
+	GNUTLS_HASH_LOOP(
+		if (strcasecmp(p->name, name) == 0) {
+			ret = p->id;
+			break;
+		}
+	);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -175,15 +173,14 @@ gnutls_mac_get_id (const char *name)
  * Returns: length (in bytes) of the given MAC key size, or 0 if the
  *   given MAC algorithm is invalid.
  **/
-size_t
-gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
+size_t gnutls_mac_get_key_size(gnutls_mac_algorithm_t algorithm)
 {
-  size_t ret = 0;
+	size_t ret = 0;
 
-  /* avoid prefix */
-  GNUTLS_HASH_ALG_LOOP (ret = p->key_size);
+	/* avoid prefix */
+	GNUTLS_HASH_ALG_LOOP(ret = p->key_size);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -196,15 +193,14 @@ gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
  *
  * Since: 3.2.0
  **/
-size_t
-gnutls_mac_get_nonce_size (gnutls_mac_algorithm_t algorithm)
+size_t gnutls_mac_get_nonce_size(gnutls_mac_algorithm_t algorithm)
 {
-  size_t ret = 0;
+	size_t ret = 0;
 
-  /* avoid prefix */
-  GNUTLS_HASH_ALG_LOOP (ret = p->nonce_size);
+	/* avoid prefix */
+	GNUTLS_HASH_ALG_LOOP(ret = p->nonce_size);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -217,23 +213,21 @@ gnutls_mac_get_nonce_size (gnutls_mac_algorithm_t algorithm)
  * Returns: Return a (0)-terminated list of #gnutls_mac_algorithm_t
  *   integers indicating the available MACs.
  **/
-const gnutls_mac_algorithm_t *
-gnutls_mac_list (void)
+const gnutls_mac_algorithm_t *gnutls_mac_list(void)
 {
-static gnutls_mac_algorithm_t supported_macs[MAX_ALGOS] = { 0 };
+	static gnutls_mac_algorithm_t supported_macs[MAX_ALGOS] = { 0 };
 
-  if (supported_macs[0] == 0)
-    {
-      int i = 0;
+	if (supported_macs[0] == 0) {
+		int i = 0;
 
-      GNUTLS_HASH_LOOP ( 
-        if (p->placeholder != 0 || _gnutls_mac_exists(p->id))
-          supported_macs[i++]=p->id;
-      );
-      supported_macs[i++]=0;
-    }
+		GNUTLS_HASH_LOOP(
+			if (p->placeholder != 0 || _gnutls_mac_exists(p->id))
+				 supported_macs[i++] = p->id;
+		);
+		supported_macs[i++] = 0;
+	}
 
-  return supported_macs;
+	return supported_macs;
 }
 
 /**
@@ -246,39 +240,39 @@ static gnutls_mac_algorithm_t supported_macs[MAX_ALGOS] = { 0 };
  * Returns: Return a (0)-terminated list of #gnutls_digest_algorithm_t
  *   integers indicating the available digests.
  **/
-const gnutls_digest_algorithm_t *
-gnutls_digest_list (void)
+const gnutls_digest_algorithm_t *gnutls_digest_list(void)
 {
-static gnutls_digest_algorithm_t supported_digests[MAX_ALGOS] = { 0 };
+	static gnutls_digest_algorithm_t supported_digests[MAX_ALGOS] =
+	    { 0 };
 
-  if (supported_digests[0] == 0)
-    {
-      int i = 0;
+	if (supported_digests[0] == 0) {
+		int i = 0;
 
-      GNUTLS_HASH_LOOP ( 
-        if (p->oid != NULL && (p->placeholder != 0 || _gnutls_mac_exists(p->id)))
-          supported_digests[i++]=p->id;
-      );
-      supported_digests[i++]=0;
-    }
+		GNUTLS_HASH_LOOP(
+			if (p->oid != NULL && (p->placeholder != 0 ||
+				_gnutls_mac_exists(p->id))) {
+				
+				supported_digests[i++] = p->id;
+			}
+		);
+		supported_digests[i++] = 0;
+	}
 
-  return supported_digests;
+	return supported_digests;
 }
 
-gnutls_digest_algorithm_t
-_gnutls_x509_oid_to_digest (const char *oid)
+gnutls_digest_algorithm_t _gnutls_x509_oid_to_digest(const char *oid)
 {
-  gnutls_digest_algorithm_t ret = 0;
+	gnutls_digest_algorithm_t ret = 0;
 
-  GNUTLS_HASH_LOOP (if (p->oid && strcmp (oid, p->oid) == 0)
-                    {
-                    ret = (gnutls_digest_algorithm_t)p->id; 
-                    break;
-                    }
-  );
+	GNUTLS_HASH_LOOP(
+		if (p->oid && strcmp(oid, p->oid) == 0) {
+			ret = (gnutls_digest_algorithm_t) p->id; 
+			break;
+		}
+	);
 
-  if (ret == 0)
-    return GNUTLS_DIG_UNKNOWN;
-  return ret;
+	if (ret == 0)
+		return GNUTLS_DIG_UNKNOWN;
+	return ret;
 }
-

@@ -36,41 +36,44 @@ extern gnutls_crypto_pk_st _gnutls_pk_ops;
 #define _gnutls_pk_hash_algorithm( pk, sig, params, hash) _gnutls_pk_ops.hash_algorithm(pk, sig, params, hash)
 
 inline static int
-_gnutls_pk_fixup (gnutls_pk_algorithm_t algo, gnutls_direction_t direction,
-                  gnutls_pk_params_st * params)
+_gnutls_pk_fixup(gnutls_pk_algorithm_t algo, gnutls_direction_t direction,
+		 gnutls_pk_params_st * params)
 {
-  if (_gnutls_pk_ops.pk_fixup_private_params)
-    return _gnutls_pk_ops.pk_fixup_private_params (algo, direction, params);
-  return 0;
+	if (_gnutls_pk_ops.pk_fixup_private_params)
+		return _gnutls_pk_ops.pk_fixup_private_params(algo,
+							      direction,
+							      params);
+	return 0;
 }
 
-int _gnutls_pk_params_copy (gnutls_pk_params_st * dst, const gnutls_pk_params_st * src);
+int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
+			   const gnutls_pk_params_st * src);
 
 /* The internal PK interface */
 int
-_gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s);
+_gnutls_encode_ber_rs(gnutls_datum_t * sig_value, bigint_t r, bigint_t s);
 int
-_gnutls_encode_ber_rs_raw (gnutls_datum_t * sig_value, 
-                           const gnutls_datum_t *r, 
-                           const gnutls_datum_t *s);
-
-int
-_gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
-                       bigint_t * s);
+_gnutls_encode_ber_rs_raw(gnutls_datum_t * sig_value,
+			  const gnutls_datum_t * r,
+			  const gnutls_datum_t * s);
 
 int
-encode_ber_digest_info (const mac_entry_st* e,
-                        const gnutls_datum_t * digest,
-                        gnutls_datum_t * output);
+_gnutls_decode_ber_rs(const gnutls_datum_t * sig_value, bigint_t * r,
+		      bigint_t * s);
 
 int
-decode_ber_digest_info (const gnutls_datum_t * info,
-                        gnutls_digest_algorithm_t * hash,
-                        uint8_t * digest, unsigned int *digest_size);
+encode_ber_digest_info(const mac_entry_st * e,
+		       const gnutls_datum_t * digest,
+		       gnutls_datum_t * output);
 
-int _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk,
-                                   gnutls_pk_params_st*,
-                                   gnutls_digest_algorithm_t * dig,
-                                   unsigned int *mand);
+int
+decode_ber_digest_info(const gnutls_datum_t * info,
+		       gnutls_digest_algorithm_t * hash,
+		       uint8_t * digest, unsigned int *digest_size);
 
-#endif /* GNUTLS_PK_H */
+int _gnutls_pk_get_hash_algorithm(gnutls_pk_algorithm_t pk,
+				  gnutls_pk_params_st *,
+				  gnutls_digest_algorithm_t * dig,
+				  unsigned int *mand);
+
+#endif				/* GNUTLS_PK_H */

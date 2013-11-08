@@ -23,7 +23,7 @@
 #ifdef ENABLE_PSK
 
 /* this is locally allocated. It should be freed using the provided function */
-int _gnutls_psk_pwd_find_entry (gnutls_session_t, char *username,
-                                gnutls_datum_t * key);
+int _gnutls_psk_pwd_find_entry(gnutls_session_t, char *username,
+			       gnutls_datum_t * key);
 
-#endif /* ENABLE_SRP */
+#endif				/* ENABLE_SRP */

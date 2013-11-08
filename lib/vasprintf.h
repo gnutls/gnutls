@@ -1,5 +1,5 @@
 #ifndef VASPRINTF_H
-# define VASPRINTF_H
+#define VASPRINTF_H
 #include <config.h>
 
 #ifndef HAVE_VASPRINTF

@@ -58,63 +58,127 @@ typedef struct _Eina_List_Accounting Eina_List_Accounting;
  * @struct _Eina_List
  * Type for a generic double linked list.
  */
-struct _Eina_List
-{
-   void *data; /**< Pointer to list element payload */
-   Eina_List *next; /**< Next member in the list */
-   Eina_List *prev; /**< Previous member in the list */
-   Eina_List_Accounting *accounting; /**< Private list accounting info - don't touch */
+struct _Eina_List {
+	void *data;
+	       /**< Pointer to list element payload */
+	Eina_List *next;
+		    /**< Next member in the list */
+	Eina_List *prev;
+		    /**< Previous member in the list */
+	Eina_List_Accounting *accounting;
+				     /**< Private list accounting info - don't touch */
 
-   EINA_MAGIC
-};
+ EINA_MAGIC};
 
-struct _Eina_List_Accounting
-{
-   Eina_List *last;
-   unsigned int count;
-   EINA_MAGIC
-};
+struct _Eina_List_Accounting {
+	Eina_List *last;
+	unsigned int count;
+ EINA_MAGIC};
 
-EAPI Eina_List *               eina_list_append (Eina_List *list, const void *data) EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_prepend (Eina_List *list, const void *data) EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_append_relative (Eina_List *list, const void *data, const void *relative) EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_append_relative_list (Eina_List *list, const void *data, Eina_List *relative) EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_prepend_relative (Eina_List *list, const void *data, const void *relative) EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_prepend_relative_list (Eina_List *list, const void *data, Eina_List *relative) EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_sorted_insert(Eina_List *list, Eina_Compare_Cb func, const void *data) EINA_ARG_NONNULL(2,                     3) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_remove (Eina_List *list, const void *data) EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_remove_list (Eina_List *list, Eina_List *remove_list) EINA_ARG_NONNULL(   2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_promote_list (Eina_List *list, Eina_List *move_list) EINA_ARG_NONNULL(   2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_demote_list (Eina_List *list, Eina_List *move_list);
-EAPI void *                    eina_list_data_find(const Eina_List *list, const void *data) EINA_PURE EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_data_find_list (const Eina_List *list, const void *data) EINA_PURE EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_free (Eina_List *list);
-EAPI void *                    eina_list_nth(const Eina_List *list, unsigned int n) EINA_PURE EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_nth_list (const Eina_List *list, unsigned int n) EINA_PURE EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_reverse (Eina_List *list) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_reverse_clone(const Eina_List *list) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_clone(const Eina_List *list) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_sort (Eina_List *list, unsigned int size, Eina_Compare_Cb func) EINA_ARG_NONNULL(3) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_merge (Eina_List *left, Eina_List *right) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_sorted_merge(Eina_List *left, Eina_List *right, Eina_Compare_Cb func) EINA_ARG_NONNULL(3) EINA_WARN_UNUSED_RESULT;
-EAPI Eina_List *               eina_list_split_list(Eina_List *list, Eina_List *relative, Eina_List **right) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_append(Eina_List * list,
+				 const void *data) EINA_ARG_NONNULL(2)
+    EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_prepend(Eina_List * list,
+				  const void *data) EINA_ARG_NONNULL(2)
+    EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_append_relative(Eina_List * list,
+					  const void *data,
+					  const void *relative)
+EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_append_relative_list(Eina_List * list,
+					       const void *data,
+					       Eina_List *
+					       relative)
+EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_prepend_relative(Eina_List * list,
+					   const void *data,
+					   const void *relative)
+EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_prepend_relative_list(Eina_List * list,
+						const void *data,
+						Eina_List *
+						relative)
+EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_sorted_insert(Eina_List * list,
+					Eina_Compare_Cb func,
+					const void *data)
+EINA_ARG_NONNULL(2, 3) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_remove(Eina_List * list,
+				 const void *data) EINA_ARG_NONNULL(2)
+    EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_remove_list(Eina_List * list,
+				      Eina_List *
+				      remove_list) EINA_ARG_NONNULL(2)
+    EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_promote_list(Eina_List * list,
+				       Eina_List *
+				       move_list) EINA_ARG_NONNULL(2)
+    EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_demote_list(Eina_List * list,
+				      Eina_List * move_list);
+EAPI void *eina_list_data_find(const Eina_List * list, const void *data)
+EINA_PURE EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_data_find_list(const Eina_List * list,
+					 const void *data)
+EINA_PURE EINA_ARG_NONNULL(2) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_free(Eina_List * list);
+EAPI void *eina_list_nth(const Eina_List * list, unsigned int n)
+EINA_PURE EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_nth_list(const Eina_List * list, unsigned int n)
+EINA_PURE EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_reverse(Eina_List *
+				  list) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_reverse_clone(const Eina_List *
+					list) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_clone(const Eina_List *
+				list) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_sort(Eina_List * list, unsigned int size,
+			       Eina_Compare_Cb func) EINA_ARG_NONNULL(3)
+    EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_merge(Eina_List * left,
+				Eina_List * right) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_sorted_merge(Eina_List * left, Eina_List * right,
+				       Eina_Compare_Cb func)
+EINA_ARG_NONNULL(3) EINA_WARN_UNUSED_RESULT;
+EAPI Eina_List *eina_list_split_list(Eina_List * list,
+				     Eina_List * relative,
+				     Eina_List **
+				     right) EINA_WARN_UNUSED_RESULT;
 
 
-EAPI Eina_List *               eina_list_search_sorted_near_list(const Eina_List *list, Eina_Compare_Cb func, const void *data, int *result_cmp);
-EAPI Eina_List *               eina_list_search_sorted_list(const Eina_List *list, Eina_Compare_Cb func, const void *data);
-EAPI void *                    eina_list_search_sorted(const Eina_List *list, Eina_Compare_Cb func, const void *data);
-EAPI Eina_List *               eina_list_search_unsorted_list(const Eina_List *list, Eina_Compare_Cb func, const void *data);
-EAPI void *                    eina_list_search_unsorted(const Eina_List *list, Eina_Compare_Cb func, const void *data);
+EAPI Eina_List *eina_list_search_sorted_near_list(const Eina_List * list,
+						  Eina_Compare_Cb func,
+						  const void *data,
+						  int *result_cmp);
+EAPI Eina_List *eina_list_search_sorted_list(const Eina_List * list,
+					     Eina_Compare_Cb func,
+					     const void *data);
+EAPI void *eina_list_search_sorted(const Eina_List * list,
+				   Eina_Compare_Cb func, const void *data);
+EAPI Eina_List *eina_list_search_unsorted_list(const Eina_List * list,
+					       Eina_Compare_Cb func,
+					       const void *data);
+EAPI void *eina_list_search_unsorted(const Eina_List * list,
+				     Eina_Compare_Cb func,
+				     const void *data);
 
-static inline Eina_List *               eina_list_last (const Eina_List *list) EINA_PURE EINA_WARN_UNUSED_RESULT;
-static inline Eina_List *               eina_list_next (const Eina_List *list) EINA_PURE EINA_WARN_UNUSED_RESULT;
-static inline Eina_List *               eina_list_prev (const Eina_List *list) EINA_PURE EINA_WARN_UNUSED_RESULT;
-static inline void *                    eina_list_data_get(const Eina_List *list) EINA_PURE EINA_WARN_UNUSED_RESULT;
-static inline unsigned int              eina_list_count(const Eina_List *list) EINA_PURE;
+static inline Eina_List *eina_list_last(const Eina_List * list)
+EINA_PURE EINA_WARN_UNUSED_RESULT;
+static inline Eina_List *eina_list_next(const Eina_List * list)
+EINA_PURE EINA_WARN_UNUSED_RESULT;
+static inline Eina_List *eina_list_prev(const Eina_List * list)
+EINA_PURE EINA_WARN_UNUSED_RESULT;
+static inline void *eina_list_data_get(const Eina_List * list)
+EINA_PURE EINA_WARN_UNUSED_RESULT;
+static inline unsigned int eina_list_count(const Eina_List *
+					   list) EINA_PURE;
 
-EAPI Eina_Iterator *               eina_list_iterator_new(const Eina_List *list) EINA_MALLOC EINA_WARN_UNUSED_RESULT;
-EAPI Eina_Iterator *               eina_list_iterator_reversed_new(const Eina_List *list) EINA_MALLOC EINA_WARN_UNUSED_RESULT;
-EAPI Eina_Accessor *               eina_list_accessor_new(const Eina_List *list) EINA_MALLOC EINA_WARN_UNUSED_RESULT;
+EAPI Eina_Iterator *eina_list_iterator_new(const Eina_List * list)
+EINA_MALLOC EINA_WARN_UNUSED_RESULT;
+EAPI Eina_Iterator *eina_list_iterator_reversed_new(const Eina_List * list)
+EINA_MALLOC EINA_WARN_UNUSED_RESULT;
+EAPI Eina_Accessor *eina_list_accessor_new(const Eina_List * list)
+EINA_MALLOC EINA_WARN_UNUSED_RESULT;
 
 /**
  * @def EINA_LIST_FOREACH
@@ -346,4 +410,4 @@ EAPI Eina_Accessor *               eina_list_accessor_new(const Eina_List *list)
  * @}
  */
 
-#endif /* EINA_LIST_H_ */
+#endif				/* EINA_LIST_H_ */

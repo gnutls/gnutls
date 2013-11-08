@@ -23,19 +23,18 @@
 #include <config.h>
 #include <accelerated.h>
 #if defined(ASM_X86)
-# include <x86/aes-x86.h>
-# include <x86/x86.h>
+#include <x86/aes-x86.h>
+#include <x86/x86.h>
 #endif
 
 void _gnutls_register_accel_crypto(void)
 {
 #if defined(ASM_X86)
-  if (gnutls_have_cpuid() != 0)
-    {
-      register_x86_crypto ();
-      register_padlock_crypto ();
-    }
+	if (gnutls_have_cpuid() != 0) {
+		register_x86_crypto();
+		register_padlock_crypto();
+	}
 #endif
 
-  return;
+	return;
 }

@@ -34,28 +34,26 @@
 #else
 #define gnutls_assert()
 #endif
-#else /* __FILE__ not defined */
+#else				/* __FILE__ not defined */
 #define gnutls_assert()
 #endif
 
-int _gnutls_asn2err (int asn_err);
-void
-_gnutls_log (int, const char *fmt, ...)
+int _gnutls_asn2err(int asn_err);
+void _gnutls_log(int, const char *fmt, ...)
 #ifdef __GNUC__
-  __attribute__ ((format (printf, 2, 3)));
+    __attribute__ ((format(printf, 2, 3)));
 #else
- ;
+;
 #endif
 
-void
-_gnutls_audit_log (gnutls_session_t, const char *fmt, ...)
+void _gnutls_audit_log(gnutls_session_t, const char *fmt, ...)
 #ifdef __GNUC__
-  __attribute__ ((format (printf, 2, 3)));
+    __attribute__ ((format(printf, 2, 3)));
 #else
- ;
+;
 #endif
 
-void _gnutls_mpi_log (const char *prefix, bigint_t a);
+void _gnutls_mpi_log(const char *prefix, bigint_t a);
 
 #ifdef C99_MACROS
 #define LEVEL(l, ...) do { if (unlikely(_gnutls_log_level >= l)) \
@@ -84,9 +82,9 @@ void _gnutls_mpi_log (const char *prefix, bigint_t a);
 #define _gnutls_read_log _gnutls_null_log
 #define _gnutls_write_log _gnutls_null_log
 
-void _gnutls_null_log (void *, ...);
+void _gnutls_null_log(void *, ...);
 
-#endif /* C99_MACROS */
+#endif				/* C99_MACROS */
 
 /* GCC won't inline this by itself and results in a "fatal warning"
    otherwise. Making this a macro has been tried, but it interacts
@@ -94,15 +92,15 @@ void _gnutls_null_log (void *, ...);
    side. */
 static inline
 #ifdef __GNUC__
-       __attribute__ ((always_inline))
+    __attribute__ ((always_inline))
 #endif
-int gnutls_assert_val_int (int val, const char *file, int line)
+int gnutls_assert_val_int(int val, const char *file, int line)
 {
-  _gnutls_debug_log ("ASSERT: %s:%d\n", file, line);
-  return val;
+	_gnutls_debug_log("ASSERT: %s:%d\n", file, line);
+	return val;
 }
 
 #define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
 #define gnutls_assert_val_fatal(x) (((x)!=GNUTLS_E_AGAIN && (x)!=GNUTLS_E_INTERRUPTED)?gnutls_assert_val_int(x, __FILE__, __LINE__):(x))
 
-#endif /* GNUTLS_ERRORS_H */
+#endif				/* GNUTLS_ERRORS_H */

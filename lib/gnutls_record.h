@@ -26,38 +26,38 @@
 #include <gnutls/gnutls.h>
 #include <gnutls_buffers.h>
 
-ssize_t _gnutls_send_tlen_int (gnutls_session_t session, content_type_t type,
-                               gnutls_handshake_description_t htype,
-                               unsigned int epoch_rel, const void *data,
-                               size_t sizeofdata, 
-                               size_t min_pad,
-                               unsigned int mflags);
+ssize_t _gnutls_send_tlen_int(gnutls_session_t session,
+			      content_type_t type,
+			      gnutls_handshake_description_t htype,
+			      unsigned int epoch_rel, const void *data,
+			      size_t sizeofdata, size_t min_pad,
+			      unsigned int mflags);
 
 inline static ssize_t
-_gnutls_send_int (gnutls_session_t session, content_type_t type,
-                  gnutls_handshake_description_t htype,
-                  unsigned int epoch_rel, const void *_data,
-                  size_t data_size, unsigned int mflags)
+_gnutls_send_int(gnutls_session_t session, content_type_t type,
+		 gnutls_handshake_description_t htype,
+		 unsigned int epoch_rel, const void *_data,
+		 size_t data_size, unsigned int mflags)
 {
-  return _gnutls_send_tlen_int(session,type,htype,epoch_rel,_data,data_size,0,mflags);
+	return _gnutls_send_tlen_int(session, type, htype, epoch_rel,
+				     _data, data_size, 0, mflags);
 }
 
-ssize_t _gnutls_recv_int (gnutls_session_t session, content_type_t type,
-                          gnutls_handshake_description_t, uint8_t * data,
-                          size_t sizeofdata, void* seq, unsigned int ms);
+ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
+			 gnutls_handshake_description_t, uint8_t * data,
+			 size_t sizeofdata, void *seq, unsigned int ms);
 
-inline
-static int get_max_decrypted_data(gnutls_session_t session)
+inline static int get_max_decrypted_data(gnutls_session_t session)
 {
-int ret;
+	int ret;
 
-  ret = MAX_RECORD_RECV_SIZE(session) + MAX_RECORD_OVERHEAD(session);
+	ret = MAX_RECORD_RECV_SIZE(session) + MAX_RECORD_OVERHEAD(session);
 
-  if (session->internals.priorities.allow_large_records != 0 &&
-      gnutls_compression_get(session)==GNUTLS_COMP_NULL)
-    ret += EXTRA_COMP_SIZE;
+	if (session->internals.priorities.allow_large_records != 0 &&
+	    gnutls_compression_get(session) == GNUTLS_COMP_NULL)
+		ret += EXTRA_COMP_SIZE;
 
-  return ret;
+	return ret;
 }
 
 #endif

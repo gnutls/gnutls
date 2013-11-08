@@ -34,191 +34,172 @@
  *
  * They should be used only with null terminated strings.
  */
-void
-_gnutls_str_cat (char *dest, size_t dest_tot_size, const char *src)
+void _gnutls_str_cat(char *dest, size_t dest_tot_size, const char *src)
 {
-  size_t str_size = strlen (src);
-  size_t dest_size = strlen (dest);
+	size_t str_size = strlen(src);
+	size_t dest_size = strlen(dest);
 
-  if (dest_tot_size - dest_size > str_size)
-    {
-      strcat (dest, src);
-    }
-  else
-    {
-      if (dest_tot_size - dest_size > 0)
-        {
-          strncat (dest, src, (dest_tot_size - dest_size) - 1);
-          dest[dest_tot_size - 1] = 0;
-        }
-    }
+	if (dest_tot_size - dest_size > str_size) {
+		strcat(dest, src);
+	} else {
+		if (dest_tot_size - dest_size > 0) {
+			strncat(dest, src,
+				(dest_tot_size - dest_size) - 1);
+			dest[dest_tot_size - 1] = 0;
+		}
+	}
+}
+
+void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src)
+{
+	size_t str_size = strlen(src);
+
+	if (dest_tot_size > str_size) {
+		strcpy(dest, src);
+	} else {
+		if (dest_tot_size > 0) {
+			strncpy(dest, src, (dest_tot_size) - 1);
+			dest[dest_tot_size - 1] = 0;
+		}
+	}
 }
 
 void
-_gnutls_str_cpy (char *dest, size_t dest_tot_size, const char *src)
+_gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,
+		size_t src_size)
 {
-  size_t str_size = strlen (src);
 
-  if (dest_tot_size > str_size)
-    {
-      strcpy (dest, src);
-    }
-  else
-    {
-      if (dest_tot_size > 0)
-        {
-          strncpy (dest, src, (dest_tot_size) - 1);
-          dest[dest_tot_size - 1] = 0;
-        }
-    }
+	if (dest_tot_size >= src_size) {
+		memcpy(dest, src, src_size);
+	} else {
+		if (dest_tot_size > 0) {
+			memcpy(dest, src, dest_tot_size);
+		}
+	}
 }
 
-void
-_gnutls_mem_cpy (char *dest, size_t dest_tot_size, const char *src,
-                 size_t src_size)
+void _gnutls_buffer_init(gnutls_buffer_st * str)
 {
-
-  if (dest_tot_size >= src_size)
-    {
-      memcpy (dest, src, src_size);
-    }
-  else
-    {
-      if (dest_tot_size > 0)
-        {
-          memcpy (dest, src, dest_tot_size);
-        }
-    }
+	str->data = str->allocd = NULL;
+	str->max_length = 0;
+	str->length = 0;
 }
 
-void
-_gnutls_buffer_init (gnutls_buffer_st * str)
+void _gnutls_buffer_replace_data(gnutls_buffer_st * buf,
+				 gnutls_datum_t * data)
 {
-  str->data = str->allocd = NULL;
-  str->max_length = 0;
-  str->length = 0;
+	gnutls_free(buf->allocd);
+	buf->allocd = buf->data = data->data;
+	buf->max_length = buf->length = data->size;
 }
 
-void _gnutls_buffer_replace_data( gnutls_buffer_st * buf, gnutls_datum_t * data)
+void _gnutls_buffer_clear(gnutls_buffer_st * str)
 {
-    gnutls_free(buf->allocd);
-    buf->allocd = buf->data = data->data;
-    buf->max_length = buf->length = data->size;
-}
+	if (str == NULL || str->allocd == NULL)
+		return;
+	gnutls_free(str->allocd);
 
-void
-_gnutls_buffer_clear (gnutls_buffer_st * str)
-{
-  if (str == NULL || str->allocd == NULL)
-    return;
-  gnutls_free (str->allocd);
-
-  str->data = str->allocd = NULL;
-  str->max_length = 0;
-  str->length = 0;
+	str->data = str->allocd = NULL;
+	str->max_length = 0;
+	str->length = 0;
 }
 
 #define MIN_CHUNK 1024
 
 int
-_gnutls_buffer_append_data (gnutls_buffer_st * dest, const void *data,
-                            size_t data_size)
+_gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
+			   size_t data_size)
 {
-  size_t tot_len = data_size + dest->length;
+	size_t tot_len = data_size + dest->length;
 
-  if (data_size == 0) return 0;
+	if (data_size == 0)
+		return 0;
 
-  if (dest->max_length >= tot_len)
-    {
-      size_t unused = MEMSUB (dest->data, dest->allocd);
+	if (dest->max_length >= tot_len) {
+		size_t unused = MEMSUB(dest->data, dest->allocd);
 
-      if (dest->max_length - unused <= tot_len)
-        {
-          if (dest->length && dest->data)
-            memmove (dest->allocd, dest->data, dest->length);
+		if (dest->max_length - unused <= tot_len) {
+			if (dest->length && dest->data)
+				memmove(dest->allocd, dest->data,
+					dest->length);
 
-          dest->data = dest->allocd;
-        }
-      memmove (&dest->data[dest->length], data, data_size);
-      dest->length = tot_len;
+			dest->data = dest->allocd;
+		}
+		memmove(&dest->data[dest->length], data, data_size);
+		dest->length = tot_len;
 
-      return tot_len;
-    }
-  else
-    {
-      size_t unused = MEMSUB (dest->data, dest->allocd);
-      size_t new_len =
-        MAX (data_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
+		return tot_len;
+	} else {
+		size_t unused = MEMSUB(dest->data, dest->allocd);
+		size_t new_len =
+		    MAX(data_size, MIN_CHUNK) + MAX(dest->max_length,
+						    MIN_CHUNK);
 
-      dest->allocd = gnutls_realloc_fast (dest->allocd, new_len);
-      if (dest->allocd == NULL)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-      dest->max_length = new_len;
-      dest->data = dest->allocd + unused;
+		dest->allocd = gnutls_realloc_fast(dest->allocd, new_len);
+		if (dest->allocd == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		dest->max_length = new_len;
+		dest->data = dest->allocd + unused;
 
-      if (dest->length && dest->data)
-        memmove (dest->allocd, dest->data, dest->length);
-      dest->data = dest->allocd;
+		if (dest->length && dest->data)
+			memmove(dest->allocd, dest->data, dest->length);
+		dest->data = dest->allocd;
 
-      memcpy (&dest->data[dest->length], data, data_size);
-      dest->length = tot_len;
+		memcpy(&dest->data[dest->length], data, data_size);
+		dest->length = tot_len;
 
-      return tot_len;
-    }
+		return tot_len;
+	}
 }
 
-int
-_gnutls_buffer_resize (gnutls_buffer_st * dest, size_t new_size)
+int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 {
-  if (dest->max_length >= new_size)
-    {
-      size_t unused = MEMSUB (dest->data, dest->allocd);
-      if (dest->max_length - unused <= new_size)
-        {
-          if (dest->length && dest->data)
-            memmove (dest->allocd, dest->data, dest->length);
-          dest->data = dest->allocd;
-        }
+	if (dest->max_length >= new_size) {
+		size_t unused = MEMSUB(dest->data, dest->allocd);
+		if (dest->max_length - unused <= new_size) {
+			if (dest->length && dest->data)
+				memmove(dest->allocd, dest->data,
+					dest->length);
+			dest->data = dest->allocd;
+		}
 
-      return 0;
-    }
-  else
-    {
-      size_t unused = MEMSUB (dest->data, dest->allocd);
-      size_t alloc_len =
-        MAX (new_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
+		return 0;
+	} else {
+		size_t unused = MEMSUB(dest->data, dest->allocd);
+		size_t alloc_len =
+		    MAX(new_size, MIN_CHUNK) + MAX(dest->max_length,
+						   MIN_CHUNK);
 
-      dest->allocd = gnutls_realloc_fast (dest->allocd, alloc_len);
-      if (dest->allocd == NULL)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-      dest->max_length = alloc_len;
-      dest->data = dest->allocd + unused;
+		dest->allocd =
+		    gnutls_realloc_fast(dest->allocd, alloc_len);
+		if (dest->allocd == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		dest->max_length = alloc_len;
+		dest->data = dest->allocd + unused;
 
-      if (dest->length && dest->data)
-        memmove (dest->allocd, dest->data, dest->length);
-      dest->data = dest->allocd;
+		if (dest->length && dest->data)
+			memmove(dest->allocd, dest->data, dest->length);
+		dest->data = dest->allocd;
 
-      return 0;
-    }
+		return 0;
+	}
 }
 
 /* Appends the provided string. The null termination byte is appended
  * but not included in length.
  */
-int
-_gnutls_buffer_append_str (gnutls_buffer_st * dest, const char *src)
+int _gnutls_buffer_append_str(gnutls_buffer_st * dest, const char *src)
 {
-int ret;
-  ret = _gnutls_buffer_append_data (dest, src, strlen (src) + 1);
-  if (ret >= 0) dest->length--;
-  
-  return ret;
+	int ret;
+	ret = _gnutls_buffer_append_data(dest, src, strlen(src) + 1);
+	if (ret >= 0)
+		dest->length--;
+
+	return ret;
 }
 
 /* returns data from a string in a constant buffer.
@@ -226,214 +207,204 @@ int ret;
  * data are appended in the buffer.
  */
 void
-_gnutls_buffer_pop_datum (gnutls_buffer_st * str, gnutls_datum_t * data,
-                          size_t req_size)
+_gnutls_buffer_pop_datum(gnutls_buffer_st * str, gnutls_datum_t * data,
+			 size_t req_size)
 {
 
-  if (str->length == 0)
-    {
-      data->data = NULL;
-      data->size = 0;
-      return;
-    }
+	if (str->length == 0) {
+		data->data = NULL;
+		data->size = 0;
+		return;
+	}
 
-  if (req_size > str->length)
-    req_size = str->length;
+	if (req_size > str->length)
+		req_size = str->length;
 
-  data->data = str->data;
-  data->size = req_size;
+	data->data = str->data;
+	data->size = req_size;
 
-  str->data += req_size;
-  str->length -= req_size;
+	str->data += req_size;
+	str->length -= req_size;
 
-  /* if string becomes empty start from begining */
-  if (str->length == 0)
-    {
-      str->data = str->allocd;
-    }
+	/* if string becomes empty start from begining */
+	if (str->length == 0) {
+		str->data = str->allocd;
+	}
 
-  return;
+	return;
 }
 
 /* converts the buffer to a datum if possible. After this call 
  * (failed or not) the buffer should be considered deinitialized.
  */
-int
-_gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
+int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data)
 {
 
-  if (str->length == 0)
-    {
-      data->data = NULL;
-      data->size = 0;
-      _gnutls_buffer_clear (str);
-      return 0;
-    }
+	if (str->length == 0) {
+		data->data = NULL;
+		data->size = 0;
+		_gnutls_buffer_clear(str);
+		return 0;
+	}
 
-  if (str->allocd != str->data)
-    {
-      data->data = gnutls_malloc (str->length);
-      if (data->data == NULL)
-        {
-          gnutls_assert ();
-          _gnutls_buffer_clear (str);
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-      memcpy (data->data, str->data, str->length);
-      data->size = str->length;
-      _gnutls_buffer_clear (str);
-    }
-  else
-    {
-      data->data = str->data;
-      data->size = str->length;
-      _gnutls_buffer_init(str);
-    }
+	if (str->allocd != str->data) {
+		data->data = gnutls_malloc(str->length);
+		if (data->data == NULL) {
+			gnutls_assert();
+			_gnutls_buffer_clear(str);
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		memcpy(data->data, str->data, str->length);
+		data->size = str->length;
+		_gnutls_buffer_clear(str);
+	} else {
+		data->data = str->data;
+		data->size = str->length;
+		_gnutls_buffer_init(str);
+	}
 
-  return 0;
+	return 0;
 }
 
 /* returns data from a string in a constant buffer.
  */
 void
-_gnutls_buffer_pop_data (gnutls_buffer_st * str, void *data,
-                         size_t * req_size)
+_gnutls_buffer_pop_data(gnutls_buffer_st * str, void *data,
+			size_t * req_size)
 {
-  gnutls_datum_t tdata;
+	gnutls_datum_t tdata;
 
-  _gnutls_buffer_pop_datum (str, &tdata, *req_size);
-  if (tdata.data == NULL)
-    {
-      *req_size = 0;
-      return;
-    }
+	_gnutls_buffer_pop_datum(str, &tdata, *req_size);
+	if (tdata.data == NULL) {
+		*req_size = 0;
+		return;
+	}
 
-  *req_size = tdata.size;
-  memcpy (data, tdata.data, tdata.size);
+	*req_size = tdata.size;
+	memcpy(data, tdata.data, tdata.size);
 
-  return;
+	return;
 }
 
 int
-_gnutls_buffer_append_printf (gnutls_buffer_st * dest, const char *fmt, ...)
+_gnutls_buffer_append_printf(gnutls_buffer_st * dest, const char *fmt, ...)
 {
-  va_list args;
-  int len;
-  char *str;
+	va_list args;
+	int len;
+	char *str;
 
-  va_start (args, fmt);
-  len = vasprintf (&str, fmt, args);
-  va_end (args);
+	va_start(args, fmt);
+	len = vasprintf(&str, fmt, args);
+	va_end(args);
 
-  if (len < 0 || !str)
-    return -1;
+	if (len < 0 || !str)
+		return -1;
 
-  len = _gnutls_buffer_append_str (dest, str);
+	len = _gnutls_buffer_append_str(dest, str);
 
-  free (str);
+	free(str);
 
-  return len;
+	return len;
 }
 
 static int
-_gnutls_buffer_insert_data (gnutls_buffer_st * dest, int pos, const void *str,
-                            size_t str_size)
+_gnutls_buffer_insert_data(gnutls_buffer_st * dest, int pos,
+			   const void *str, size_t str_size)
 {
-  size_t orig_length = dest->length;
-  int ret;
+	size_t orig_length = dest->length;
+	int ret;
 
-  ret = _gnutls_buffer_resize (dest, dest->length + str_size);  /* resize to make space */
-  if (ret < 0)
-    return ret;
+	ret = _gnutls_buffer_resize(dest, dest->length + str_size);	/* resize to make space */
+	if (ret < 0)
+		return ret;
 
-  memmove (&dest->data[pos + str_size], &dest->data[pos], orig_length - pos);
+	memmove(&dest->data[pos + str_size], &dest->data[pos],
+		orig_length - pos);
 
-  memcpy (&dest->data[pos], str, str_size);
-  dest->length += str_size;
+	memcpy(&dest->data[pos], str, str_size);
+	dest->length += str_size;
 
-  return 0;
+	return 0;
 }
 
 static void
-_gnutls_buffer_delete_data (gnutls_buffer_st * dest, int pos, size_t str_size)
+_gnutls_buffer_delete_data(gnutls_buffer_st * dest, int pos,
+			   size_t str_size)
 {
-  memmove (&dest->data[pos], &dest->data[pos + str_size],
-           dest->length - pos - str_size);
+	memmove(&dest->data[pos], &dest->data[pos + str_size],
+		dest->length - pos - str_size);
 
-  dest->length -= str_size;
+	dest->length -= str_size;
 
-  return;
+	return;
 }
 
 
 int
-_gnutls_buffer_escape (gnutls_buffer_st * dest, int all,
-                       const char *const invalid_chars)
+_gnutls_buffer_escape(gnutls_buffer_st * dest, int all,
+		      const char *const invalid_chars)
 {
-  int rv = -1;
-  char t[5];
-  unsigned int pos = 0;
+	int rv = -1;
+	char t[5];
+	unsigned int pos = 0;
 
-  while (pos < dest->length)
-    {
+	while (pos < dest->length) {
 
-      if (all != 0 || (dest->data[pos] == '\\' || strchr (invalid_chars, dest->data[pos])
-          || !c_isgraph (dest->data[pos])))
-        {
+		if (all != 0
+		    || (dest->data[pos] == '\\'
+			|| strchr(invalid_chars, dest->data[pos])
+			|| !c_isgraph(dest->data[pos]))) {
 
-          snprintf (t, sizeof (t), "%%%.2X", (unsigned int) dest->data[pos]);
+			snprintf(t, sizeof(t), "%%%.2X",
+				 (unsigned int) dest->data[pos]);
 
-          _gnutls_buffer_delete_data (dest, pos, 1);
+			_gnutls_buffer_delete_data(dest, pos, 1);
 
-          if (_gnutls_buffer_insert_data (dest, pos, t, 3) < 0)
-            {
-              rv = -1;
-              goto cleanup;
-            }
-          pos+=3;
-        }
-      else
-        pos++;
-    }
+			if (_gnutls_buffer_insert_data(dest, pos, t, 3) <
+			    0) {
+				rv = -1;
+				goto cleanup;
+			}
+			pos += 3;
+		} else
+			pos++;
+	}
 
-  rv = 0;
+	rv = 0;
 
-cleanup:
+      cleanup:
 
-  return rv;
+	return rv;
 }
 
-int
-_gnutls_buffer_unescape (gnutls_buffer_st * dest)
+int _gnutls_buffer_unescape(gnutls_buffer_st * dest)
 {
-  int rv = -1;
-  unsigned int pos = 0;
+	int rv = -1;
+	unsigned int pos = 0;
 
-  while (pos < dest->length)
-    {
-      if (dest->data[pos] == '%')
-        {
-          char b[3];
-          unsigned int u;
-          unsigned char x;
+	while (pos < dest->length) {
+		if (dest->data[pos] == '%') {
+			char b[3];
+			unsigned int u;
+			unsigned char x;
 
-          b[0] = dest->data[pos + 1];
-          b[1] = dest->data[pos + 2];
-          b[2] = 0;
+			b[0] = dest->data[pos + 1];
+			b[1] = dest->data[pos + 2];
+			b[2] = 0;
 
-          sscanf (b, "%02x", &u);
+			sscanf(b, "%02x", &u);
 
-          x = u;
+			x = u;
 
-          _gnutls_buffer_delete_data (dest, pos, 3);
-          _gnutls_buffer_insert_data (dest, pos, &x, 1);
-        }
-      pos++;
-    }
+			_gnutls_buffer_delete_data(dest, pos, 3);
+			_gnutls_buffer_insert_data(dest, pos, &x, 1);
+		}
+		pos++;
+	}
 
-  rv = 0;
+	rv = 0;
 
-  return rv;
+	return rv;
 }
 
 
@@ -442,39 +413,37 @@ _gnutls_buffer_unescape (gnutls_buffer_st * dest)
  * If the buffer does not have enough space to hold the string, a
  * truncated hex string is returned (always null terminated).
  */
-char *
-_gnutls_bin2hex (const void *_old, size_t oldlen,
-                 char *buffer, size_t buffer_size, const char *separator)
+char *_gnutls_bin2hex(const void *_old, size_t oldlen,
+		      char *buffer, size_t buffer_size,
+		      const char *separator)
 {
-  unsigned int i, j;
-  const uint8_t *old = _old;
-  int step = 2;
-  const char empty[] = "";
+	unsigned int i, j;
+	const uint8_t *old = _old;
+	int step = 2;
+	const char empty[] = "";
 
-  if (separator != NULL && separator[0] != 0)
-    step = 3;
-  else
-    separator = empty;
+	if (separator != NULL && separator[0] != 0)
+		step = 3;
+	else
+		separator = empty;
 
-  if (buffer_size < 3)
-    {
-      gnutls_assert();
-      return NULL;
-    }
+	if (buffer_size < 3) {
+		gnutls_assert();
+		return NULL;
+	}
 
-  i = j = 0;
-  sprintf (&buffer[j], "%.2x", old[i]);
-  j += 2;
-  i++;
+	i = j = 0;
+	sprintf(&buffer[j], "%.2x", old[i]);
+	j += 2;
+	i++;
 
-  for (; i < oldlen && j + step < buffer_size; j += step)
-    {
-      sprintf (&buffer[j], "%s%.2x", separator, old[i]);
-      i++;
-    }
-  buffer[j] = '\0';
+	for (; i < oldlen && j + step < buffer_size; j += step) {
+		sprintf(&buffer[j], "%s%.2x", separator, old[i]);
+		i++;
+	}
+	buffer[j] = '\0';
 
-  return buffer;
+	return buffer;
 }
 
 /**
@@ -492,52 +461,49 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
  * Since: 2.4.0
  **/
 int
-gnutls_hex2bin (const char *hex_data,
-                size_t hex_size, void *bin_data, size_t * bin_size)
+gnutls_hex2bin(const char *hex_data,
+	       size_t hex_size, void *bin_data, size_t * bin_size)
 {
-  return _gnutls_hex2bin (hex_data, hex_size, (void*)bin_data, bin_size);
+	return _gnutls_hex2bin(hex_data, hex_size, (void *) bin_data,
+			       bin_size);
 }
 
 int
-_gnutls_hex2bin (const char * hex_data, size_t hex_size, uint8_t * bin_data,
-                 size_t * bin_size)
+_gnutls_hex2bin(const char *hex_data, size_t hex_size, uint8_t * bin_data,
+		size_t * bin_size)
 {
-  unsigned int i, j;
-  uint8_t hex2_data[3];
-  unsigned long val;
+	unsigned int i, j;
+	uint8_t hex2_data[3];
+	unsigned long val;
 
-  hex2_data[2] = 0;
+	hex2_data[2] = 0;
 
-  for (i = j = 0; i < hex_size;)
-    {
-      if (!isxdigit (hex_data[i]))      /* skip non-hex such as the ':' in 00:FF */
-        {
-          i++;
-          continue;
-        }
+	for (i = j = 0; i < hex_size;) {
+		if (!isxdigit(hex_data[i])) {	/* skip non-hex such as the ':' in 00:FF */
+			i++;
+			continue;
+		}
 
-      if (j > *bin_size)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_SHORT_MEMORY_BUFFER;
-        }
+		if (j > *bin_size) {
+			gnutls_assert();
+			return GNUTLS_E_SHORT_MEMORY_BUFFER;
+		}
 
-      hex2_data[0] = hex_data[i];
-      hex2_data[1] = hex_data[i + 1];
-      i += 2;
+		hex2_data[0] = hex_data[i];
+		hex2_data[1] = hex_data[i + 1];
+		i += 2;
 
-      val = strtoul ((char *) hex2_data, NULL, 16);
-      if (val == ULONG_MAX)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_PARSING_ERROR;
-        }
-      bin_data[j] = val;
-      j++;
-    }
-  *bin_size = j;
+		val = strtoul((char *) hex2_data, NULL, 16);
+		if (val == ULONG_MAX) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+		bin_data[j] = val;
+		j++;
+	}
+	*bin_size = j;
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -555,18 +521,18 @@ _gnutls_hex2bin (const char * hex_data, size_t hex_size, uint8_t * bin_data,
  *   long enough, or 0 on success.
  **/
 int
-gnutls_hex_decode (const gnutls_datum_t * hex_data, void *result,
-                   size_t * result_size)
+gnutls_hex_decode(const gnutls_datum_t * hex_data, void *result,
+		  size_t * result_size)
 {
-  int ret;
+	int ret;
 
-  ret =
-    _gnutls_hex2bin ((char*)hex_data->data, hex_data->size, (uint8_t *) result,
-                     result_size);
-  if (ret < 0)
-    return ret;
+	ret =
+	    _gnutls_hex2bin((char *) hex_data->data, hex_data->size,
+			    (uint8_t *) result, result_size);
+	if (ret < 0)
+		return ret;
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -584,21 +550,21 @@ gnutls_hex_decode (const gnutls_datum_t * hex_data, void *result,
  * long enough, or 0 on success.
  **/
 int
-gnutls_hex_encode (const gnutls_datum_t * data, char *result,
-                   size_t * result_size)
+gnutls_hex_encode(const gnutls_datum_t * data, char *result,
+		  size_t * result_size)
 {
-  size_t res = data->size + data->size + 1;
+	size_t res = data->size + data->size + 1;
 
-  if (*result_size < res)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
-    }
+	if (*result_size < res) {
+		gnutls_assert();
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
 
-  _gnutls_bin2hex (data->data, data->size, result, *result_size, NULL);
-  *result_size = res;
+	_gnutls_bin2hex(data->data, data->size, result, *result_size,
+			NULL);
+	*result_size = res;
 
-  return 0;
+	return 0;
 }
 
 
@@ -611,254 +577,245 @@ gnutls_hex_encode (const gnutls_datum_t * data, char *result,
  * @level: is used for recursion. Use 0 when you call this function.
  */
 int
-_gnutls_hostname_compare (const char *certname,
-                          size_t certnamesize, const char *hostname, int level)
+_gnutls_hostname_compare(const char *certname,
+			 size_t certnamesize, const char *hostname,
+			 int level)
 {
 
-  if (level > 5)
-    return 0;
+	if (level > 5)
+		return 0;
 
-  /* find the first different character */
-  for (; *certname && *hostname && c_toupper (*certname) == c_toupper (*hostname);
-       certname++, hostname++, certnamesize--)
-    ;
+	/* find the first different character */
+	for (;
+	     *certname && *hostname
+	     && c_toupper(*certname) == c_toupper(*hostname);
+	     certname++, hostname++, certnamesize--);
 
-  /* the strings are the same */
-  if (certnamesize == 0 && *hostname == '\0')
-    return 1;
+	/* the strings are the same */
+	if (certnamesize == 0 && *hostname == '\0')
+		return 1;
 
-  if (*certname == '*')
-    {
-      /* a wildcard certificate */
+	if (*certname == '*') {
+		/* a wildcard certificate */
 
-      certname++;
-      certnamesize--;
+		certname++;
+		certnamesize--;
 
-      while (1)
-        {
-          /* Use a recursive call to allow multiple wildcards */
-          if (_gnutls_hostname_compare (certname, certnamesize, hostname, level+1))
-            return 1;
+		while (1) {
+			/* Use a recursive call to allow multiple wildcards */
+			if (_gnutls_hostname_compare
+			    (certname, certnamesize, hostname, level + 1))
+				return 1;
 
-          /* wildcards are only allowed to match a single domain
-             component or component fragment */
-          if (*hostname == '\0' || *hostname == '.')
-            break;
-          hostname++;
-        }
+			/* wildcards are only allowed to match a single domain
+			   component or component fragment */
+			if (*hostname == '\0' || *hostname == '.')
+				break;
+			hostname++;
+		}
 
-      return 0;
-    }
+		return 0;
+	}
 
-  return 0;
+	return 0;
 }
 
 int
-_gnutls_buffer_append_prefix (gnutls_buffer_st * buf, int pfx_size, size_t data_size)
+_gnutls_buffer_append_prefix(gnutls_buffer_st * buf, int pfx_size,
+			     size_t data_size)
 {
-  uint8_t ss[4];
+	uint8_t ss[4];
 
-  if (pfx_size == 32)
-    {
-      _gnutls_write_uint32 (data_size, ss);
-      pfx_size = 4;
-    }
-  else if (pfx_size == 24)
-    {
-      _gnutls_write_uint24 (data_size, ss);
-      pfx_size = 3;
-    }
-  else if (pfx_size == 16)
-    {
-      _gnutls_write_uint16 (data_size, ss);
-      pfx_size = 2;
-    }
-  else if (pfx_size == 8)
-    {
-      ss[0] = data_size;
-      pfx_size = 1;
-    }
-  else
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (pfx_size == 32) {
+		_gnutls_write_uint32(data_size, ss);
+		pfx_size = 4;
+	} else if (pfx_size == 24) {
+		_gnutls_write_uint24(data_size, ss);
+		pfx_size = 3;
+	} else if (pfx_size == 16) {
+		_gnutls_write_uint16(data_size, ss);
+		pfx_size = 2;
+	} else if (pfx_size == 8) {
+		ss[0] = data_size;
+		pfx_size = 1;
+	} else
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  return _gnutls_buffer_append_data (buf, ss, pfx_size);
+	return _gnutls_buffer_append_data(buf, ss, pfx_size);
 }
 
 /* Reads an uint32 number from the buffer. If check is non zero it will also check whether
  * the number read, is less than the data in the buffer
  */
 int
-_gnutls_buffer_pop_prefix (gnutls_buffer_st * buf, size_t * data_size,
-                           int check)
+_gnutls_buffer_pop_prefix(gnutls_buffer_st * buf, size_t * data_size,
+			  int check)
 {
-  size_t size;
+	size_t size;
 
-  if (buf->length < 4)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_PARSING_ERROR;
-    }
+	if (buf->length < 4) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
 
-  size = _gnutls_read_uint32 (buf->data);
-  if (check && size > buf->length - 4)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_PARSING_ERROR;
-    }
+	size = _gnutls_read_uint32(buf->data);
+	if (check && size > buf->length - 4) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
 
-  buf->data += 4;
-  buf->length -= 4;
+	buf->data += 4;
+	buf->length -= 4;
 
-  *data_size = size;
+	*data_size = size;
 
-  return 0;
+	return 0;
 }
 
 int
-_gnutls_buffer_pop_datum_prefix (gnutls_buffer_st * buf,
-                                 gnutls_datum_t * data)
+_gnutls_buffer_pop_datum_prefix(gnutls_buffer_st * buf,
+				gnutls_datum_t * data)
 {
-  size_t size;
-  int ret;
+	size_t size;
+	int ret;
 
-  ret = _gnutls_buffer_pop_prefix (buf, &size, 1);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  if (size > 0)
-    {
-      size_t osize = size;
-      _gnutls_buffer_pop_datum (buf, data, size);
-      if (osize != data->size)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_PARSING_ERROR;
-        }
-    }
-  else
-    {
-      data->size = 0;
-      data->data = NULL;
-    }
+	if (size > 0) {
+		size_t osize = size;
+		_gnutls_buffer_pop_datum(buf, data, size);
+		if (osize != data->size) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+	} else {
+		data->size = 0;
+		data->data = NULL;
+	}
 
-  return 0;
+	return 0;
 }
 
 int
-_gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, 
-    int pfx_size, const void *data, size_t data_size)
+_gnutls_buffer_append_data_prefix(gnutls_buffer_st * buf,
+				  int pfx_size, const void *data,
+				  size_t data_size)
 {
-int ret = 0, ret1;
+	int ret = 0, ret1;
 
-  ret1 = _gnutls_buffer_append_prefix (buf, pfx_size, data_size);
-  if (ret1 < 0)
-    return gnutls_assert_val(ret1);
+	ret1 = _gnutls_buffer_append_prefix(buf, pfx_size, data_size);
+	if (ret1 < 0)
+		return gnutls_assert_val(ret1);
 
-  if (data_size > 0)
-    {
-      ret = _gnutls_buffer_append_data (buf, data, data_size);
+	if (data_size > 0) {
+		ret = _gnutls_buffer_append_data(buf, data, data_size);
 
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-    }
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
 
-  return ret + ret1;
+	return ret + ret1;
 }
 
-int _gnutls_buffer_append_mpi (gnutls_buffer_st * buf, int pfx_size, bigint_t mpi, int lz)
+int _gnutls_buffer_append_mpi(gnutls_buffer_st * buf, int pfx_size,
+			      bigint_t mpi, int lz)
 {
-gnutls_datum_t dd;
-int ret;
+	gnutls_datum_t dd;
+	int ret;
 
-  if (lz)
-    ret = _gnutls_mpi_dprint_lz (mpi, &dd);
-  else
-    ret = _gnutls_mpi_dprint (mpi, &dd);
+	if (lz)
+		ret = _gnutls_mpi_dprint_lz(mpi, &dd);
+	else
+		ret = _gnutls_mpi_dprint(mpi, &dd);
 
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  ret = _gnutls_buffer_append_data_prefix(buf, pfx_size, dd.data, dd.size);
-  
-  _gnutls_free_datum(&dd);
-  
-  return ret;
+	ret =
+	    _gnutls_buffer_append_data_prefix(buf, pfx_size, dd.data,
+					      dd.size);
+
+	_gnutls_free_datum(&dd);
+
+	return ret;
 }
 
 int
-_gnutls_buffer_pop_data_prefix (gnutls_buffer_st * buf, void *data,
-                                size_t * data_size)
+_gnutls_buffer_pop_data_prefix(gnutls_buffer_st * buf, void *data,
+			       size_t * data_size)
 {
-  size_t size;
-  int ret;
+	size_t size;
+	int ret;
 
-  ret = _gnutls_buffer_pop_prefix (buf, &size, 1);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  if (size > 0)
-    _gnutls_buffer_pop_data (buf, data, data_size);
+	if (size > 0)
+		_gnutls_buffer_pop_data(buf, data, data_size);
 
-  return 0;
+	return 0;
 }
 
 void
-_gnutls_buffer_hexprint (gnutls_buffer_st * str,
-			 const void *_data, size_t len)
+_gnutls_buffer_hexprint(gnutls_buffer_st * str,
+			const void *_data, size_t len)
 {
-  size_t j;
-  const unsigned char* data = _data;
+	size_t j;
+	const unsigned char *data = _data;
 
-  if (len == 0)
-    _gnutls_buffer_append_str (str, "00");
-  else
-    {
-      for (j = 0; j < len; j++)
-        _gnutls_buffer_append_printf (str, "%.2x", (unsigned) data[j]);
-    }
+	if (len == 0)
+		_gnutls_buffer_append_str(str, "00");
+	else {
+		for (j = 0; j < len; j++)
+			_gnutls_buffer_append_printf(str, "%.2x",
+						     (unsigned) data[j]);
+	}
 }
 
 void
-_gnutls_buffer_hexdump (gnutls_buffer_st * str, const void *_data, size_t len,
-			const char *spc)
+_gnutls_buffer_hexdump(gnutls_buffer_st * str, const void *_data,
+		       size_t len, const char *spc)
 {
-  size_t j;
-  const unsigned char* data = _data;
+	size_t j;
+	const unsigned char *data = _data;
 
-  if (spc)
-    _gnutls_buffer_append_str (str, spc);
-  for (j = 0; j < len; j++)
-    {
-      if (((j + 1) % 16) == 0)
-        {
-          _gnutls_buffer_append_printf (str, "%.2x\n", (unsigned)data[j]);
-          if (spc && j != (len - 1))
-            _gnutls_buffer_append_str (str, spc);
-        }
-      else if (j == (len - 1))
-        _gnutls_buffer_append_printf (str, "%.2x", (unsigned)data[j]);
-      else
-        _gnutls_buffer_append_printf (str, "%.2x:", (unsigned)data[j]);
-    }
-  if ((j % 16) != 0)
-    _gnutls_buffer_append_str (str, "\n");
+	if (spc)
+		_gnutls_buffer_append_str(str, spc);
+	for (j = 0; j < len; j++) {
+		if (((j + 1) % 16) == 0) {
+			_gnutls_buffer_append_printf(str, "%.2x\n",
+						     (unsigned) data[j]);
+			if (spc && j != (len - 1))
+				_gnutls_buffer_append_str(str, spc);
+		} else if (j == (len - 1))
+			_gnutls_buffer_append_printf(str, "%.2x",
+						     (unsigned) data[j]);
+		else
+			_gnutls_buffer_append_printf(str, "%.2x:",
+						     (unsigned) data[j]);
+	}
+	if ((j % 16) != 0)
+		_gnutls_buffer_append_str(str, "\n");
 }
 
 void
-_gnutls_buffer_asciiprint (gnutls_buffer_st * str,
-			   const char *data, size_t len)
+_gnutls_buffer_asciiprint(gnutls_buffer_st * str,
+			  const char *data, size_t len)
 {
-  size_t j;
+	size_t j;
 
-  for (j = 0; j < len; j++)
-    if (c_isprint (data[j]))
-      _gnutls_buffer_append_printf (str, "%c", (unsigned char) data[j]);
-    else
-      _gnutls_buffer_append_printf (str, ".");
+	for (j = 0; j < len; j++)
+		if (c_isprint(data[j]))
+			_gnutls_buffer_append_printf(str, "%c",
+						     (unsigned char)
+						     data[j]);
+		else
+			_gnutls_buffer_append_printf(str, ".");
 }

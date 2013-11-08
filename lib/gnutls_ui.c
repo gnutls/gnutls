@@ -53,21 +53,23 @@
  *   an error code is returned.
  *
  **/
-int gnutls_random_art (gnutls_random_art_t type, 
-                       const char* key_type, unsigned int key_size,
-                       void * fpr, size_t fpr_size,
-                       gnutls_datum_t* art)
+int gnutls_random_art(gnutls_random_art_t type,
+		      const char *key_type, unsigned int key_size,
+		      void *fpr, size_t fpr_size, gnutls_datum_t * art)
 {
-  if (type != GNUTLS_RANDOM_ART_OPENSSH)
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (type != GNUTLS_RANDOM_ART_OPENSSH)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  art->data = (void*)_gnutls_key_fingerprint_randomart(fpr, fpr_size, key_type, key_size, NULL);
-  if (art->data == NULL)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-  
-  art->size = strlen((char*)art->data);
-  
-  return 0;
+	art->data =
+	    (void *) _gnutls_key_fingerprint_randomart(fpr, fpr_size,
+						       key_type, key_size,
+						       NULL);
+	if (art->data == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	art->size = strlen((char *) art->data);
+
+	return 0;
 }
 
 /* ANON & DHE */
@@ -99,11 +101,13 @@ int gnutls_random_art (gnutls_random_art_t type,
  *
  *
  **/
-void
-gnutls_dh_set_prime_bits (gnutls_session_t session, unsigned int bits)
+void gnutls_dh_set_prime_bits(gnutls_session_t session, unsigned int bits)
 {
-  if (bits <= 512 && bits != 0) _gnutls_audit_log(session, "Note that the security level of the Diffie-Hellman key exchange has been lowered to %u bits and this may allow decryption of the session data\n", bits);
-  session->internals.priorities.dh_prime_bits = bits;
+	if (bits <= 512 && bits != 0)
+		_gnutls_audit_log(session,
+				  "Note that the security level of the Diffie-Hellman key exchange has been lowered to %u bits and this may allow decryption of the session data\n",
+				  bits);
+	session->internals.priorities.dh_prime_bits = bits;
 }
 
 
@@ -123,56 +127,55 @@ gnutls_dh_set_prime_bits (gnutls_session_t session, unsigned int bits)
  *   an error code is returned.
  **/
 int
-gnutls_dh_get_group (gnutls_session_t session,
-                     gnutls_datum_t * raw_gen, gnutls_datum_t * raw_prime)
+gnutls_dh_get_group(gnutls_session_t session,
+		    gnutls_datum_t * raw_gen, gnutls_datum_t * raw_prime)
 {
-  dh_info_st *dh;
-  int ret;
-  anon_auth_info_t anon_info;
-  cert_auth_info_t cert_info;
-  psk_auth_info_t psk_info;
+	dh_info_st *dh;
+	int ret;
+	anon_auth_info_t anon_info;
+	cert_auth_info_t cert_info;
+	psk_auth_info_t psk_info;
 
-  switch (gnutls_auth_get_type (session))
-    {
-    case GNUTLS_CRD_ANON:
-      anon_info = _gnutls_get_auth_info (session);
-      if (anon_info == NULL)
-        return GNUTLS_E_INTERNAL_ERROR;
-      dh = &anon_info->dh;
-      break;
-    case GNUTLS_CRD_PSK:
-      psk_info = _gnutls_get_auth_info (session);
-      if (psk_info == NULL)
-        return GNUTLS_E_INTERNAL_ERROR;
-      dh = &psk_info->dh;
-      break;
-    case GNUTLS_CRD_CERTIFICATE:
-      cert_info = _gnutls_get_auth_info (session);
-      if (cert_info == NULL)
-        return GNUTLS_E_INTERNAL_ERROR;
-      dh = &cert_info->dh;
-      break;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	switch (gnutls_auth_get_type(session)) {
+	case GNUTLS_CRD_ANON:
+		anon_info = _gnutls_get_auth_info(session);
+		if (anon_info == NULL)
+			return GNUTLS_E_INTERNAL_ERROR;
+		dh = &anon_info->dh;
+		break;
+	case GNUTLS_CRD_PSK:
+		psk_info = _gnutls_get_auth_info(session);
+		if (psk_info == NULL)
+			return GNUTLS_E_INTERNAL_ERROR;
+		dh = &psk_info->dh;
+		break;
+	case GNUTLS_CRD_CERTIFICATE:
+		cert_info = _gnutls_get_auth_info(session);
+		if (cert_info == NULL)
+			return GNUTLS_E_INTERNAL_ERROR;
+		dh = &cert_info->dh;
+		break;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  ret = _gnutls_set_datum (raw_prime, dh->prime.data, dh->prime.size);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+	ret = _gnutls_set_datum(raw_prime, dh->prime.data, dh->prime.size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-  ret = _gnutls_set_datum (raw_gen, dh->generator.data, dh->generator.size);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      _gnutls_free_datum (raw_prime);
-      return ret;
-    }
+	ret =
+	    _gnutls_set_datum(raw_gen, dh->generator.data,
+			      dh->generator.size);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum(raw_prime);
+		return ret;
+	}
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -189,47 +192,46 @@ gnutls_dh_get_group (gnutls_session_t session,
  *   an error code is returned.
  **/
 int
-gnutls_dh_get_pubkey (gnutls_session_t session, gnutls_datum_t * raw_key)
+gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
 {
-  dh_info_st *dh;
-  anon_auth_info_t anon_info;
-  cert_auth_info_t cert_info;
-  cert_auth_info_t psk_info;
+	dh_info_st *dh;
+	anon_auth_info_t anon_info;
+	cert_auth_info_t cert_info;
+	cert_auth_info_t psk_info;
 
-  switch (gnutls_auth_get_type (session))
-    {
-    case GNUTLS_CRD_ANON:
-      {
-        anon_info = _gnutls_get_auth_info (session);
-        if (anon_info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
-        dh = &anon_info->dh;
-        break;
-      }
-    case GNUTLS_CRD_PSK:
-      {
-        psk_info = _gnutls_get_auth_info (session);
-        if (psk_info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
-        dh = &psk_info->dh;
-        break;
-      }
-    case GNUTLS_CRD_CERTIFICATE:
-      {
+	switch (gnutls_auth_get_type(session)) {
+	case GNUTLS_CRD_ANON:
+		{
+			anon_info = _gnutls_get_auth_info(session);
+			if (anon_info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = &anon_info->dh;
+			break;
+		}
+	case GNUTLS_CRD_PSK:
+		{
+			psk_info = _gnutls_get_auth_info(session);
+			if (psk_info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = &psk_info->dh;
+			break;
+		}
+	case GNUTLS_CRD_CERTIFICATE:
+		{
 
-        cert_info = _gnutls_get_auth_info (session);
-        if (cert_info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
-        dh = &cert_info->dh;
-        break;
-      }
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+			cert_info = _gnutls_get_auth_info(session);
+			if (cert_info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = &cert_info->dh;
+			break;
+		}
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  return _gnutls_set_datum (raw_key, dh->public_key.data,
-                            dh->public_key.size);
+	return _gnutls_set_datum(raw_key, dh->public_key.data,
+				 dh->public_key.size);
 }
 
 /**
@@ -243,63 +245,59 @@ gnutls_dh_get_pubkey (gnutls_session_t session, gnutls_datum_t * raw_key)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
-int
-gnutls_dh_get_secret_bits (gnutls_session_t session)
+int gnutls_dh_get_secret_bits(gnutls_session_t session)
 {
-  switch (gnutls_auth_get_type (session))
-    {
-    case GNUTLS_CRD_ANON:
-      {
-        anon_auth_info_t info;
+	switch (gnutls_auth_get_type(session)) {
+	case GNUTLS_CRD_ANON:
+		{
+			anon_auth_info_t info;
 
-        info = _gnutls_get_auth_info (session);
-        if (info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
-        return info->dh.secret_bits;
-      }
-    case GNUTLS_CRD_PSK:
-      {
-        psk_auth_info_t info;
+			info = _gnutls_get_auth_info(session);
+			if (info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			return info->dh.secret_bits;
+		}
+	case GNUTLS_CRD_PSK:
+		{
+			psk_auth_info_t info;
 
-        info = _gnutls_get_auth_info (session);
-        if (info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
-        return info->dh.secret_bits;
-      }
-    case GNUTLS_CRD_CERTIFICATE:
-      {
-        cert_auth_info_t info;
+			info = _gnutls_get_auth_info(session);
+			if (info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			return info->dh.secret_bits;
+		}
+	case GNUTLS_CRD_CERTIFICATE:
+		{
+			cert_auth_info_t info;
 
-        info = _gnutls_get_auth_info (session);
-        if (info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
+			info = _gnutls_get_auth_info(session);
+			if (info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
 
-        return info->dh.secret_bits;
-      }
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+			return info->dh.secret_bits;
+		}
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 }
 
 
-static int
-mpi_buf2bits (gnutls_datum_t * mpi_buf)
+static int mpi_buf2bits(gnutls_datum_t * mpi_buf)
 {
-  bigint_t mpi;
-  int rc;
+	bigint_t mpi;
+	int rc;
 
-  rc = _gnutls_mpi_scan_nz (&mpi, mpi_buf->data, mpi_buf->size);
-  if (rc)
-    {
-      gnutls_assert ();
-      return rc;
-    }
+	rc = _gnutls_mpi_scan_nz(&mpi, mpi_buf->data, mpi_buf->size);
+	if (rc) {
+		gnutls_assert();
+		return rc;
+	}
 
-  rc = _gnutls_mpi_get_nbits (mpi);
-  _gnutls_mpi_release (&mpi);
+	rc = _gnutls_mpi_get_nbits(mpi);
+	_gnutls_mpi_release(&mpi);
 
-  return rc;
+	return rc;
 }
 
 /**
@@ -316,50 +314,48 @@ mpi_buf2bits (gnutls_datum_t * mpi_buf)
  *   Diffie-Hellman key exchange was done, or a negative error code on
  *   failure.
  **/
-int
-gnutls_dh_get_prime_bits (gnutls_session_t session)
+int gnutls_dh_get_prime_bits(gnutls_session_t session)
 {
-  dh_info_st *dh;
+	dh_info_st *dh;
 
-  switch (gnutls_auth_get_type (session))
-    {
-    case GNUTLS_CRD_ANON:
-      {
-        anon_auth_info_t info;
+	switch (gnutls_auth_get_type(session)) {
+	case GNUTLS_CRD_ANON:
+		{
+			anon_auth_info_t info;
 
-        info = _gnutls_get_auth_info (session);
-        if (info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
-        dh = &info->dh;
-        break;
-      }
-    case GNUTLS_CRD_PSK:
-      {
-        psk_auth_info_t info;
+			info = _gnutls_get_auth_info(session);
+			if (info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = &info->dh;
+			break;
+		}
+	case GNUTLS_CRD_PSK:
+		{
+			psk_auth_info_t info;
 
-        info = _gnutls_get_auth_info (session);
-        if (info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
-        dh = &info->dh;
-        break;
-      }
-    case GNUTLS_CRD_CERTIFICATE:
-      {
-        cert_auth_info_t info;
+			info = _gnutls_get_auth_info(session);
+			if (info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = &info->dh;
+			break;
+		}
+	case GNUTLS_CRD_CERTIFICATE:
+		{
+			cert_auth_info_t info;
 
-        info = _gnutls_get_auth_info (session);
-        if (info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
+			info = _gnutls_get_auth_info(session);
+			if (info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
 
-        dh = &info->dh;
-        break;
-      }
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+			dh = &info->dh;
+			break;
+		}
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  return mpi_buf2bits (&dh->prime);
+	return mpi_buf2bits(&dh->prime);
 }
 
 
@@ -373,52 +369,50 @@ gnutls_dh_get_prime_bits (gnutls_session_t session)
  * Returns: The public key bit size used in the last Diffie-Hellman
  *   key exchange with the peer, or a negative error code in case of error.
  **/
-int
-gnutls_dh_get_peers_public_bits (gnutls_session_t session)
+int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
 {
-  dh_info_st *dh;
+	dh_info_st *dh;
 
-  switch (gnutls_auth_get_type (session))
-    {
-    case GNUTLS_CRD_ANON:
-      {
-        anon_auth_info_t info;
+	switch (gnutls_auth_get_type(session)) {
+	case GNUTLS_CRD_ANON:
+		{
+			anon_auth_info_t info;
 
-        info = _gnutls_get_auth_info (session);
-        if (info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
+			info = _gnutls_get_auth_info(session);
+			if (info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
 
-        dh = &info->dh;
-        break;
-      }
-    case GNUTLS_CRD_PSK:
-      {
-        psk_auth_info_t info;
+			dh = &info->dh;
+			break;
+		}
+	case GNUTLS_CRD_PSK:
+		{
+			psk_auth_info_t info;
 
-        info = _gnutls_get_auth_info (session);
-        if (info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
+			info = _gnutls_get_auth_info(session);
+			if (info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
 
-        dh = &info->dh;
-        break;
-      }
-    case GNUTLS_CRD_CERTIFICATE:
-      {
-        cert_auth_info_t info;
+			dh = &info->dh;
+			break;
+		}
+	case GNUTLS_CRD_CERTIFICATE:
+		{
+			cert_auth_info_t info;
 
-        info = _gnutls_get_auth_info (session);
-        if (info == NULL)
-          return GNUTLS_E_INTERNAL_ERROR;
+			info = _gnutls_get_auth_info(session);
+			if (info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
 
-        dh = &info->dh;
-        break;
-      }
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+			dh = &info->dh;
+			break;
+		}
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  return mpi_buf2bits (&dh->public_key);
+	return mpi_buf2bits(&dh->public_key);
 }
 
 /**
@@ -434,13 +428,13 @@ gnutls_dh_get_peers_public_bits (gnutls_session_t session)
  *
  **/
 void
-gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
-                                  gnutls_dh_params_t dh_params)
+gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
+				 gnutls_dh_params_t dh_params)
 {
-  res->dh_params = dh_params;
+	res->dh_params = dh_params;
 }
 
-#endif /* DH */
+#endif				/* DH */
 
 /* CERTIFICATE STUFF */
 
@@ -456,25 +450,23 @@ gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
  *   certificate, or %NULL in case of an error or if no certificate
  *   was used.
  **/
-const gnutls_datum_t *
-gnutls_certificate_get_ours (gnutls_session_t session)
+const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
 {
-  gnutls_certificate_credentials_t cred;
+	gnutls_certificate_credentials_t cred;
 
-  CHECK_AUTH (GNUTLS_CRD_CERTIFICATE, NULL);
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
-  cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session, GNUTLS_CRD_CERTIFICATE, NULL);
-  if (cred == NULL || cred->certs == NULL)
-    {
-      gnutls_assert ();
-      return NULL;
-    }
+	cred = (gnutls_certificate_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE, NULL);
+	if (cred == NULL || cred->certs == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
 
-  if (session->internals.selected_cert_list == NULL)
-    return NULL;
+	if (session->internals.selected_cert_list == NULL)
+		return NULL;
 
-  return &session->internals.selected_cert_list[0].cert;
+	return &session->internals.selected_cert_list[0].cert;
 }
 
 /**
@@ -495,20 +487,20 @@ gnutls_certificate_get_ours (gnutls_session_t session)
  *   certificates, or %NULL in case of an error or if no certificate
  *   was used.
  **/
-const gnutls_datum_t *
-gnutls_certificate_get_peers (gnutls_session_t
-                              session, unsigned int *list_size)
+const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t
+						   session,
+						   unsigned int *list_size)
 {
-  cert_auth_info_t info;
+	cert_auth_info_t info;
 
-  CHECK_AUTH (GNUTLS_CRD_CERTIFICATE, NULL);
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
-  info = _gnutls_get_auth_info (session);
-  if (info == NULL)
-    return NULL;
+	info = _gnutls_get_auth_info(session);
+	if (info == NULL)
+		return NULL;
 
-  *list_size = info->ncerts;
-  return info->raw_certificate_list;
+	*list_size = info->ncerts;
+	return info->raw_certificate_list;
 }
 
 #ifdef ENABLE_OPENPGP
@@ -526,20 +518,20 @@ gnutls_certificate_get_peers (gnutls_session_t
  * Since: 3.1.3
  **/
 int gnutls_certificate_get_peers_subkey_id(gnutls_session_t session,
-                                           gnutls_datum_t *id)
+					   gnutls_datum_t * id)
 {
-  cert_auth_info_t info;
+	cert_auth_info_t info;
 
-  CHECK_AUTH (GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-  info = _gnutls_get_auth_info (session);
-  if (info == NULL)
-    return GNUTLS_E_INVALID_REQUEST;
-    
-  id->data = info->subkey_id;
-  id->size = GNUTLS_OPENPGP_KEYID_SIZE;
+	info = _gnutls_get_auth_info(session);
+	if (info == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
 
-  return 0;
+	id->data = info->subkey_id;
+	id->size = GNUTLS_OPENPGP_KEYID_SIZE;
+
+	return 0;
 }
 #endif
 
@@ -553,10 +545,9 @@ int gnutls_certificate_get_peers_subkey_id(gnutls_session_t session,
  *   authentication or 1 otherwise, or a negative error code in case of
  *   error.
  **/
-int
-gnutls_certificate_client_get_request_status (gnutls_session_t session)
+int gnutls_certificate_client_get_request_status(gnutls_session_t session)
 {
-  return session->key.crt_requested;
+	return session->key.crt_requested;
 }
 
 /**
@@ -580,28 +571,29 @@ gnutls_certificate_client_get_request_status (gnutls_session_t session)
  *   an error code is returned.
  **/
 int
-gnutls_fingerprint (gnutls_digest_algorithm_t algo,
-                    const gnutls_datum_t * data, void *result,
-                    size_t * result_size)
+gnutls_fingerprint(gnutls_digest_algorithm_t algo,
+		   const gnutls_datum_t * data, void *result,
+		   size_t * result_size)
 {
-  int ret;
-  int hash_len = _gnutls_hash_get_algo_len (mac_to_entry(algo));
+	int ret;
+	int hash_len = _gnutls_hash_get_algo_len(mac_to_entry(algo));
 
-  if (hash_len < 0 || (unsigned) hash_len > *result_size || result == NULL)
-    {
-      *result_size = hash_len;
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
-    }
-  *result_size = hash_len;
+	if (hash_len < 0 || (unsigned) hash_len > *result_size
+	    || result == NULL) {
+		*result_size = hash_len;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+	*result_size = hash_len;
 
-  if (result)
-    {
-      ret = _gnutls_hash_fast( algo, data->data, data->size, result);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-    }
+	if (result) {
+		ret =
+		    _gnutls_hash_fast(algo, data->data, data->size,
+				      result);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -614,10 +606,10 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
  * authentication.  The callback should return %GNUTLS_E_SUCCESS (0) on success.
  **/
 void
-gnutls_certificate_set_params_function (gnutls_certificate_credentials_t res,
-                                        gnutls_params_function * func)
+gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
+				       res, gnutls_params_function * func)
 {
-  res->params_func = func;
+	res->params_func = func;
 }
 
 /**
@@ -631,10 +623,10 @@ gnutls_certificate_set_params_function (gnutls_certificate_credentials_t res,
  *
  **/
 void
-gnutls_certificate_set_verify_flags (gnutls_certificate_credentials_t
-                                     res, unsigned int flags)
+gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
+				    res, unsigned int flags)
 {
-  res->verify_flags = flags;
+	res->verify_flags = flags;
 }
 
 /**
@@ -649,12 +641,12 @@ gnutls_certificate_set_verify_flags (gnutls_certificate_credentials_t
  * limits.
  **/
 void
-gnutls_certificate_set_verify_limits (gnutls_certificate_credentials_t res,
-                                      unsigned int max_bits,
-                                      unsigned int max_depth)
+gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t res,
+				     unsigned int max_bits,
+				     unsigned int max_depth)
 {
-  res->verify_depth = max_depth;
-  res->verify_bits = max_bits;
+	res->verify_depth = max_depth;
+	res->verify_bits = max_bits;
 }
 
 #ifdef ENABLE_PSK
@@ -668,10 +660,10 @@ gnutls_certificate_set_verify_limits (gnutls_certificate_credentials_t res,
  * callback should return %GNUTLS_E_SUCCESS (0) on success.
  **/
 void
-gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
-                                gnutls_params_function * func)
+gnutls_psk_set_params_function(gnutls_psk_server_credentials_t res,
+			       gnutls_params_function * func)
 {
-  res->params_func = func;
+	res->params_func = func;
 }
 #endif
 
@@ -686,10 +678,10 @@ gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
  * The callback should return %GNUTLS_E_SUCCESS (0) on success.
  **/
 void
-gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,
-                                 gnutls_params_function * func)
+gnutls_anon_set_params_function(gnutls_anon_server_credentials_t res,
+				gnutls_params_function * func)
 {
-  res->params_func = func;
+	res->params_func = func;
 }
 #endif
 
@@ -707,26 +699,25 @@ gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,
  *
  * Since 3.1.0
  **/
-int gnutls_load_file(const char* filename, gnutls_datum_t * data)
+int gnutls_load_file(const char *filename, gnutls_datum_t * data)
 {
-size_t len;
+	size_t len;
 
-  data->data = (void*)read_binary_file(filename, &len);
-  if (data->data == NULL)
-    return GNUTLS_E_FILE_ERROR;
-  
-  if (malloc != gnutls_malloc)
-    {
-      void* tmp = gnutls_malloc(len);
-      
-      memcpy(tmp, data->data, len);
-      free(data->data);
-      data->data = tmp;
-    }
-  
-  data->size = len;
-  
-  return 0;
+	data->data = (void *) read_binary_file(filename, &len);
+	if (data->data == NULL)
+		return GNUTLS_E_FILE_ERROR;
+
+	if (malloc != gnutls_malloc) {
+		void *tmp = gnutls_malloc(len);
+
+		memcpy(tmp, data->data, len);
+		free(data->data);
+		data->data = tmp;
+	}
+
+	data->size = len;
+
+	return 0;
 }
 
 /**
@@ -744,9 +735,10 @@ size_t len;
  * or sent and was invalid.
  **/
 int
-gnutls_ocsp_status_request_is_checked (gnutls_session_t session, unsigned int flags)
+gnutls_ocsp_status_request_is_checked(gnutls_session_t session,
+				      unsigned int flags)
 {
-  return session->internals.ocsp_check_ok;
+	return session->internals.ocsp_check_ok;
 }
 
 #ifdef ENABLE_RSA_EXPORT
@@ -765,11 +757,11 @@ gnutls_ocsp_status_request_is_checked (gnutls_session_t session, unsigned int fl
  *   an error code is returned.
  **/
 int
-gnutls_rsa_export_get_pubkey (gnutls_session_t session,
-                              gnutls_datum_t * exponent,
-                              gnutls_datum_t * modulus)
+gnutls_rsa_export_get_pubkey(gnutls_session_t session,
+			     gnutls_datum_t * exponent,
+			     gnutls_datum_t * modulus)
 {
-  return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
 /**
@@ -781,10 +773,9 @@ gnutls_rsa_export_get_pubkey (gnutls_session_t session,
  * Returns: The bits used in the last RSA-EXPORT key exchange with the
  *   peer, or a negative error code in case of error.
  **/
-int
-gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
+int gnutls_rsa_export_get_modulus_bits(gnutls_session_t session)
 {
-  return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 }
 
 /**
@@ -797,10 +788,11 @@ gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
  * RSA-EXPORT cipher suites.
  **/
 void
-gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
-                                          res, gnutls_rsa_params_t rsa_params)
+gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials_t
+					 res,
+					 gnutls_rsa_params_t rsa_params)
 {
-  return;
+	return;
 }
 #endif
 
@@ -817,58 +809,62 @@ gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
  *
  * Since: 3.1.10
  **/
-char *
-gnutls_session_get_desc (gnutls_session_t session)
+char *gnutls_session_get_desc(gnutls_session_t session)
 {
-    gnutls_kx_algorithm_t kx;
-    unsigned type;
-    char kx_name[32];
-    char proto_name[32];
-    const char* curve_name = NULL;
-    unsigned dh_bits = 0;
-    char* desc;
+	gnutls_kx_algorithm_t kx;
+	unsigned type;
+	char kx_name[32];
+	char proto_name[32];
+	const char *curve_name = NULL;
+	unsigned dh_bits = 0;
+	char *desc;
 
-    kx = session->security_parameters.kx_algorithm;
-    
-    if (kx == GNUTLS_KX_ANON_ECDH || kx == GNUTLS_KX_ECDHE_PSK ||
-        kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA) 
-      {
-        curve_name = gnutls_ecc_curve_get_name(gnutls_ecc_curve_get(session));
-      }
-    else if (kx == GNUTLS_KX_ANON_DH || kx == GNUTLS_KX_DHE_PSK ||
-        kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) 
-      {
-        dh_bits = gnutls_dh_get_prime_bits (session);
-      }
-      
-    if (curve_name != NULL)
-      snprintf(kx_name, sizeof(kx_name), "%s-%s", gnutls_kx_get_name(kx), curve_name);
-    else if (dh_bits != 0)
-      snprintf(kx_name, sizeof(kx_name), "%s-%u", gnutls_kx_get_name(kx), dh_bits);
-    else
-      snprintf(kx_name, sizeof(kx_name), "%s", gnutls_kx_get_name(kx));
+	kx = session->security_parameters.kx_algorithm;
 
-    type = gnutls_certificate_type_get (session);
-    if (type == GNUTLS_CRT_X509)
-      snprintf(proto_name, sizeof(proto_name), "%s-PKIX", gnutls_protocol_get_name(get_num_version(session)));
-    else
-      snprintf(proto_name, sizeof(proto_name), "%s-%s", gnutls_protocol_get_name(get_num_version(session)),
-                                                        gnutls_certificate_type_get_name(type));
-    
-    gnutls_protocol_get_name(get_num_version (session)),
+	if (kx == GNUTLS_KX_ANON_ECDH || kx == GNUTLS_KX_ECDHE_PSK ||
+	    kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA) {
+		curve_name =
+		    gnutls_ecc_curve_get_name(gnutls_ecc_curve_get
+					      (session));
+	} else if (kx == GNUTLS_KX_ANON_DH || kx == GNUTLS_KX_DHE_PSK
+		   || kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
+		dh_bits = gnutls_dh_get_prime_bits(session);
+	}
 
-    desc = gnutls_malloc(DESC_SIZE);
-    if (desc == NULL)
-      return NULL;
+	if (curve_name != NULL)
+		snprintf(kx_name, sizeof(kx_name), "%s-%s",
+			 gnutls_kx_get_name(kx), curve_name);
+	else if (dh_bits != 0)
+		snprintf(kx_name, sizeof(kx_name), "%s-%u",
+			 gnutls_kx_get_name(kx), dh_bits);
+	else
+		snprintf(kx_name, sizeof(kx_name), "%s",
+			 gnutls_kx_get_name(kx));
 
-    snprintf(desc, DESC_SIZE,
-             "(%s)-(%s)-(%s)-(%s)",
-            proto_name,
-            kx_name,
-            gnutls_cipher_get_name (gnutls_cipher_get (session)),
-            gnutls_mac_get_name (gnutls_mac_get (session)));
-            
-    return desc;
+	type = gnutls_certificate_type_get(session);
+	if (type == GNUTLS_CRT_X509)
+		snprintf(proto_name, sizeof(proto_name), "%s-PKIX",
+			 gnutls_protocol_get_name(get_num_version
+						  (session)));
+	else
+		snprintf(proto_name, sizeof(proto_name), "%s-%s",
+			 gnutls_protocol_get_name(get_num_version
+						  (session)),
+			 gnutls_certificate_type_get_name(type));
+
+	gnutls_protocol_get_name(get_num_version(session)),
+	    desc = gnutls_malloc(DESC_SIZE);
+	if (desc == NULL)
+		return NULL;
+
+	snprintf(desc, DESC_SIZE,
+		 "(%s)-(%s)-(%s)-(%s)",
+		 proto_name,
+		 kx_name,
+		 gnutls_cipher_get_name(gnutls_cipher_get(session)),
+		 gnutls_mac_get_name(gnutls_mac_get(session)));
+
+	return desc;
 }
 
 /**
@@ -886,19 +882,19 @@ gnutls_session_get_desc (gnutls_session_t session)
  *   an error code is returned.
  **/
 int
-gnutls_session_set_id (gnutls_session_t session, 
-                              const gnutls_datum_t * sid)
+gnutls_session_set_id(gnutls_session_t session, const gnutls_datum_t * sid)
 {
-  if (session->security_parameters.entity == GNUTLS_SERVER ||
-      sid->size > TLS_MAX_SESSION_ID_SIZE)
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (session->security_parameters.entity == GNUTLS_SERVER ||
+	    sid->size > TLS_MAX_SESSION_ID_SIZE)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  memset (&session->internals.resumed_security_parameters, 0,
-          sizeof (session->internals.resumed_security_parameters));
+	memset(&session->internals.resumed_security_parameters, 0,
+	       sizeof(session->internals.resumed_security_parameters));
 
-  session->internals.resumed_security_parameters.session_id_size = sid->size;
-  memcpy(session->internals.resumed_security_parameters.session_id,
-  	sid->data, sid->size);
+	session->internals.resumed_security_parameters.session_id_size =
+	    sid->size;
+	memcpy(session->internals.resumed_security_parameters.session_id,
+	       sid->data, sid->size);
 
-  return 0;
+	return 0;
 }

@@ -44,45 +44,44 @@
  *
  * Since: 3.0
  **/
-int gnutls_pcert_import_x509 (gnutls_pcert_st* pcert,
-	gnutls_x509_crt_t crt, unsigned int flags)
+int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,
+			     gnutls_x509_crt_t crt, unsigned int flags)
 {
-int ret;
+	int ret;
 
-  memset(pcert, 0, sizeof(*pcert));
+	memset(pcert, 0, sizeof(*pcert));
 
-  pcert->type = GNUTLS_CRT_X509;
-  pcert->cert.data = NULL;
+	pcert->type = GNUTLS_CRT_X509;
+	pcert->cert.data = NULL;
 
-  ret = gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_DER, &pcert->cert);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	ret =
+	    gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_DER,
+				    &pcert->cert);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  ret = gnutls_pubkey_init(&pcert->pubkey);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	ret = gnutls_pubkey_init(&pcert->pubkey);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  ret = gnutls_pubkey_import_x509(pcert->pubkey, crt, 0);
-  if (ret < 0)
-    {
-      gnutls_pubkey_deinit(pcert->pubkey);
-      pcert->pubkey = NULL;
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	ret = gnutls_pubkey_import_x509(pcert->pubkey, crt, 0);
+	if (ret < 0) {
+		gnutls_pubkey_deinit(pcert->pubkey);
+		pcert->pubkey = NULL;
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  return 0;
+	return 0;
 
-cleanup:
-  _gnutls_free_datum(&pcert->cert);
+      cleanup:
+	_gnutls_free_datum(&pcert->cert);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -105,50 +104,50 @@ cleanup:
  * Since: 3.0
  **/
 int
-gnutls_pcert_list_import_x509_raw (gnutls_pcert_st * pcerts,
-                             unsigned int *pcert_max,
-                             const gnutls_datum_t * data,
-                             gnutls_x509_crt_fmt_t format, unsigned int flags)
+gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
+				  unsigned int *pcert_max,
+				  const gnutls_datum_t * data,
+				  gnutls_x509_crt_fmt_t format,
+				  unsigned int flags)
 {
-int ret;
-unsigned int i = 0, j;
-gnutls_x509_crt_t *crt;
+	int ret;
+	unsigned int i = 0, j;
+	gnutls_x509_crt_t *crt;
 
-  crt = gnutls_malloc((*pcert_max) * sizeof(gnutls_x509_crt_t));
+	crt = gnutls_malloc((*pcert_max) * sizeof(gnutls_x509_crt_t));
 
-  if (crt == NULL)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	if (crt == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-  ret = gnutls_x509_crt_list_import( crt, pcert_max, data, format, flags);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
-  
-  for (i=0;i<*pcert_max;i++)
-    {
-      ret = gnutls_pcert_import_x509(&pcerts[i], crt[i], flags);
-      if (ret < 0)
-        {
-          ret = gnutls_assert_val(ret);
-          goto cleanup_pcert;
-        }
-    }
+	ret =
+	    gnutls_x509_crt_list_import(crt, pcert_max, data, format,
+					flags);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  ret = 0;
-  goto cleanup;
+	for (i = 0; i < *pcert_max; i++) {
+		ret = gnutls_pcert_import_x509(&pcerts[i], crt[i], flags);
+		if (ret < 0) {
+			ret = gnutls_assert_val(ret);
+			goto cleanup_pcert;
+		}
+	}
 
-cleanup_pcert:
-  for (j=0;j<i;j++)
-    gnutls_pcert_deinit(&pcerts[j]);
+	ret = 0;
+	goto cleanup;
 
-cleanup:
-  for (i=0;i<*pcert_max;i++)
-    gnutls_x509_crt_deinit(crt[i]);
+      cleanup_pcert:
+	for (j = 0; j < i; j++)
+		gnutls_pcert_deinit(&pcerts[j]);
 
-  gnutls_free(crt);
-  return ret;
+      cleanup:
+	for (i = 0; i < *pcert_max; i++)
+		gnutls_x509_crt_deinit(crt[i]);
+
+	gnutls_free(crt);
+	return ret;
 
 }
 
@@ -168,39 +167,38 @@ cleanup:
  *
  * Since: 3.0
  **/
-int gnutls_pcert_import_x509_raw (gnutls_pcert_st *pcert,
-	const gnutls_datum_t* cert, 
-	gnutls_x509_crt_fmt_t format, unsigned int flags)
+int gnutls_pcert_import_x509_raw(gnutls_pcert_st * pcert,
+				 const gnutls_datum_t * cert,
+				 gnutls_x509_crt_fmt_t format,
+				 unsigned int flags)
 {
-int ret;
-gnutls_x509_crt_t crt;
+	int ret;
+	gnutls_x509_crt_t crt;
 
-  memset(pcert, 0, sizeof(*pcert));
+	memset(pcert, 0, sizeof(*pcert));
 
-  ret = gnutls_x509_crt_init(&crt);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	ret = gnutls_x509_crt_init(&crt);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  ret = gnutls_x509_crt_import(crt, cert, format);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	ret = gnutls_x509_crt_import(crt, cert, format);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  ret = gnutls_pcert_import_x509(pcert, crt, flags);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	ret = gnutls_pcert_import_x509(pcert, crt, flags);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  ret = 0;
+	ret = 0;
 
-cleanup:
-  gnutls_x509_crt_deinit(crt);
+      cleanup:
+	gnutls_x509_crt_deinit(crt);
 
-  return ret;
+	return ret;
 }
 
 #ifdef ENABLE_OPENPGP
@@ -220,62 +218,62 @@ cleanup:
  *
  * Since: 3.0
  **/
-int gnutls_pcert_import_openpgp (gnutls_pcert_st* pcert,
-	gnutls_openpgp_crt_t crt, unsigned int flags)
+int gnutls_pcert_import_openpgp(gnutls_pcert_st * pcert,
+				gnutls_openpgp_crt_t crt,
+				unsigned int flags)
 {
-int ret;
-size_t sz;
+	int ret;
+	size_t sz;
 
-  memset(pcert, 0, sizeof(*pcert));
+	memset(pcert, 0, sizeof(*pcert));
 
-  pcert->type = GNUTLS_CRT_OPENPGP;
-  pcert->cert.data = NULL;
+	pcert->type = GNUTLS_CRT_OPENPGP;
+	pcert->cert.data = NULL;
 
-  sz = 0;
-  ret = gnutls_openpgp_crt_export(crt, GNUTLS_OPENPGP_FMT_RAW, NULL, &sz);
-  if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	sz = 0;
+	ret =
+	    gnutls_openpgp_crt_export(crt, GNUTLS_OPENPGP_FMT_RAW, NULL,
+				      &sz);
+	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  pcert->cert.data = gnutls_malloc(sz);
-  if (pcert->cert.data == NULL)
-    {
-      ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-      goto cleanup;
-    }
+	pcert->cert.data = gnutls_malloc(sz);
+	if (pcert->cert.data == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto cleanup;
+	}
 
-  ret = gnutls_openpgp_crt_export(crt, GNUTLS_X509_FMT_DER, pcert->cert.data, &sz);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
-  pcert->cert.size = sz;
+	ret =
+	    gnutls_openpgp_crt_export(crt, GNUTLS_X509_FMT_DER,
+				      pcert->cert.data, &sz);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
+	pcert->cert.size = sz;
 
-  ret = gnutls_pubkey_init(&pcert->pubkey);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	ret = gnutls_pubkey_init(&pcert->pubkey);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  ret = gnutls_pubkey_import_openpgp(pcert->pubkey, crt, 0);
-  if (ret < 0)
-    {
-      gnutls_pubkey_deinit(pcert->pubkey);
-      pcert->pubkey = NULL;
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	ret = gnutls_pubkey_import_openpgp(pcert->pubkey, crt, 0);
+	if (ret < 0) {
+		gnutls_pubkey_deinit(pcert->pubkey);
+		pcert->pubkey = NULL;
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  return 0;
+	return 0;
 
-cleanup:
-  _gnutls_free_datum(&pcert->cert);
+      cleanup:
+	_gnutls_free_datum(&pcert->cert);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -295,49 +293,46 @@ cleanup:
  *
  * Since: 3.0
  **/
-int gnutls_pcert_import_openpgp_raw (gnutls_pcert_st *pcert,
-	const gnutls_datum_t* cert, 
-	gnutls_openpgp_crt_fmt_t format, 
-	gnutls_openpgp_keyid_t keyid,
-	unsigned int flags)
+int gnutls_pcert_import_openpgp_raw(gnutls_pcert_st * pcert,
+				    const gnutls_datum_t * cert,
+				    gnutls_openpgp_crt_fmt_t format,
+				    gnutls_openpgp_keyid_t keyid,
+				    unsigned int flags)
 {
-int ret;
-gnutls_openpgp_crt_t crt;
+	int ret;
+	gnutls_openpgp_crt_t crt;
 
-  memset(pcert, 0, sizeof(*pcert));
+	memset(pcert, 0, sizeof(*pcert));
 
-  pcert->cert.data = NULL;
+	pcert->cert.data = NULL;
 
-  ret = gnutls_openpgp_crt_init(&crt);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+	ret = gnutls_openpgp_crt_init(&crt);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-  ret = gnutls_openpgp_crt_import(crt, cert, format);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	ret = gnutls_openpgp_crt_import(crt, cert, format);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  ret = gnutls_openpgp_crt_set_preferred_key_id(crt, keyid);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
+	ret = gnutls_openpgp_crt_set_preferred_key_id(crt, keyid);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
 
-  ret = gnutls_pcert_import_openpgp(pcert, crt, flags);
-  if (ret < 0)
-    {
-      ret = gnutls_assert_val(ret);
-      goto cleanup;
-    }
-  ret = 0;
+	ret = gnutls_pcert_import_openpgp(pcert, crt, flags);
+	if (ret < 0) {
+		ret = gnutls_assert_val(ret);
+		goto cleanup;
+	}
+	ret = 0;
 
-cleanup:
-  gnutls_openpgp_crt_deinit(crt);
+      cleanup:
+	gnutls_openpgp_crt_deinit(crt);
 
-  return ret;
+	return ret;
 }
 
 #endif
@@ -350,36 +345,41 @@ cleanup:
  *
  * Since: 3.0
  **/
-void
-gnutls_pcert_deinit (gnutls_pcert_st *pcert)
+void gnutls_pcert_deinit(gnutls_pcert_st * pcert)
 {
-  gnutls_pubkey_deinit(pcert->pubkey);
-  pcert->pubkey = NULL;
-  _gnutls_free_datum(&pcert->cert);
+	gnutls_pubkey_deinit(pcert->pubkey);
+	pcert->pubkey = NULL;
+	_gnutls_free_datum(&pcert->cert);
 }
 
 /* Converts the first certificate for the cert_auth_info structure
  * to a pcert.
  */
 int
-_gnutls_get_auth_info_pcert (gnutls_pcert_st* pcert,
-                             gnutls_certificate_type_t type,
-                             cert_auth_info_t info)
+_gnutls_get_auth_info_pcert(gnutls_pcert_st * pcert,
+			    gnutls_certificate_type_t type,
+			    cert_auth_info_t info)
 {
-  switch (type)
-    {
-    case GNUTLS_CRT_X509:
-      return gnutls_pcert_import_x509_raw(pcert, &info->raw_certificate_list[0], 
-        GNUTLS_X509_FMT_DER, GNUTLS_PCERT_NO_CERT);
+	switch (type) {
+	case GNUTLS_CRT_X509:
+		return gnutls_pcert_import_x509_raw(pcert,
+						    &info->
+						    raw_certificate_list
+						    [0],
+						    GNUTLS_X509_FMT_DER,
+						    GNUTLS_PCERT_NO_CERT);
 #ifdef ENABLE_OPENPGP
-    case GNUTLS_CRT_OPENPGP:
-      return gnutls_pcert_import_openpgp_raw(pcert,
-                                               &info->raw_certificate_list[0],
-                                               GNUTLS_OPENPGP_FMT_RAW,
-                                               info->subkey_id, GNUTLS_PCERT_NO_CERT);
+	case GNUTLS_CRT_OPENPGP:
+		return gnutls_pcert_import_openpgp_raw(pcert,
+						       &info->
+						       raw_certificate_list
+						       [0],
+						       GNUTLS_OPENPGP_FMT_RAW,
+						       info->subkey_id,
+						       GNUTLS_PCERT_NO_CERT);
 #endif
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
 }

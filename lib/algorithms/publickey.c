@@ -27,17 +27,16 @@
 
 
 /* KX mappings to PK algorithms */
-typedef struct
-{
-  gnutls_kx_algorithm_t kx_algorithm;
-  gnutls_pk_algorithm_t pk_algorithm;
-  enum encipher_type encipher_type;     /* CIPHER_ENCRYPT if this algorithm is to be used
-                                         * for encryption, CIPHER_SIGN if signature only,
-                                         * CIPHER_IGN if this does not apply at all.
-                                         *
-                                         * This is useful to certificate cipher suites, which check
-                                         * against the certificate key usage bits.
-                                         */
+typedef struct {
+	gnutls_kx_algorithm_t kx_algorithm;
+	gnutls_pk_algorithm_t pk_algorithm;
+	enum encipher_type encipher_type;	/* CIPHER_ENCRYPT if this algorithm is to be used
+						 * for encryption, CIPHER_SIGN if signature only,
+						 * CIPHER_IGN if this does not apply at all.
+						 *
+						 * This is useful to certificate cipher suites, which check
+						 * against the certificate key usage bits.
+						 */
 } gnutls_pk_map;
 
 /* This table maps the Key exchange algorithms to
@@ -46,15 +45,15 @@ typedef struct
  * use GNUTLS_KX_RSA or GNUTLS_KX_DHE_RSA.
  */
 static const gnutls_pk_map pk_mappings[] = {
-  {GNUTLS_KX_RSA, GNUTLS_PK_RSA, CIPHER_ENCRYPT},
-  {GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
-  {GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
-  {GNUTLS_KX_ECDHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
-  {GNUTLS_KX_ECDHE_ECDSA, GNUTLS_PK_EC, CIPHER_SIGN},
-  {GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
-  {GNUTLS_KX_SRP_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
-  {GNUTLS_KX_RSA_PSK, GNUTLS_PK_RSA, CIPHER_ENCRYPT},
-  {0, 0, 0}
+	{GNUTLS_KX_RSA, GNUTLS_PK_RSA, CIPHER_ENCRYPT},
+	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
+	{GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
+	{GNUTLS_KX_ECDHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
+	{GNUTLS_KX_ECDHE_ECDSA, GNUTLS_PK_EC, CIPHER_SIGN},
+	{GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
+	{GNUTLS_KX_SRP_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
+	{GNUTLS_KX_RSA_PSK, GNUTLS_PK_RSA, CIPHER_ENCRYPT},
+	{0, 0, 0}
 };
 
 #define GNUTLS_PK_MAP_LOOP(b) \
@@ -69,37 +68,36 @@ static const gnutls_pk_map pk_mappings[] = {
  * the given gnutls_kx_algorithm_t.
  */
 gnutls_pk_algorithm_t
-_gnutls_map_pk_get_pk (gnutls_kx_algorithm_t kx_algorithm)
+_gnutls_map_pk_get_pk(gnutls_kx_algorithm_t kx_algorithm)
 {
-  gnutls_pk_algorithm_t ret = -1;
+	gnutls_pk_algorithm_t ret = -1;
 
-  GNUTLS_PK_MAP_ALG_LOOP (ret = p->pk_algorithm) return ret;
+	GNUTLS_PK_MAP_ALG_LOOP(ret = p->pk_algorithm) return ret;
 }
 
 /* pk algorithms;
  */
-struct gnutls_pk_entry
-{
-  const char *name;
-  const char *oid;
-  gnutls_pk_algorithm_t id;
+struct gnutls_pk_entry {
+	const char *name;
+	const char *oid;
+	gnutls_pk_algorithm_t id;
 };
 typedef struct gnutls_pk_entry gnutls_pk_entry;
 
 static const gnutls_pk_entry pk_algorithms[] = {
-  /* having duplicate entries is ok, as long as the one
-   * we want to return OID from is first */
-  {"UNKNOWN", NULL, GNUTLS_PK_UNKNOWN},
-  {"RSA", PK_PKIX1_RSA_OID, GNUTLS_PK_RSA},
-  {"RSA (X.509)", PK_X509_RSA_OID, GNUTLS_PK_RSA},      /* some certificates use this OID for RSA */
-  {"RSA-MD5", SIG_RSA_MD5_OID, GNUTLS_PK_RSA},        /* some other broken certificates set RSA with MD5 as an indicator of RSA */
-  {"RSA-SHA1", SIG_RSA_SHA1_OID, GNUTLS_PK_RSA},      /* some other broken certificates set RSA with SHA1 as an indicator of RSA */
-  {"RSA-SHA1", ISO_SIG_RSA_SHA1_OID, GNUTLS_PK_RSA},      /* some other broken certificates set RSA with SHA1 as an indicator of RSA */
-  {"DSA", PK_DSA_OID, GNUTLS_PK_DSA},
-  {"GOST R 34.10-2001", PK_GOST_R3410_2001_OID, GNUTLS_PK_UNKNOWN},
-  {"GOST R 34.10-94", PK_GOST_R3410_94_OID, GNUTLS_PK_UNKNOWN},
-  {"EC", "1.2.840.10045.2.1", GNUTLS_PK_EC},
-  {0, 0, 0}
+	/* having duplicate entries is ok, as long as the one
+	 * we want to return OID from is first */
+	{"UNKNOWN", NULL, GNUTLS_PK_UNKNOWN},
+	{"RSA", PK_PKIX1_RSA_OID, GNUTLS_PK_RSA},
+	{"RSA (X.509)", PK_X509_RSA_OID, GNUTLS_PK_RSA},	/* some certificates use this OID for RSA */
+	{"RSA-MD5", SIG_RSA_MD5_OID, GNUTLS_PK_RSA},	/* some other broken certificates set RSA with MD5 as an indicator of RSA */
+	{"RSA-SHA1", SIG_RSA_SHA1_OID, GNUTLS_PK_RSA},	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
+	{"RSA-SHA1", ISO_SIG_RSA_SHA1_OID, GNUTLS_PK_RSA},	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
+	{"DSA", PK_DSA_OID, GNUTLS_PK_DSA},
+	{"GOST R 34.10-2001", PK_GOST_R3410_2001_OID, GNUTLS_PK_UNKNOWN},
+	{"GOST R 34.10-94", PK_GOST_R3410_94_OID, GNUTLS_PK_UNKNOWN},
+	{"EC", "1.2.840.10045.2.1", GNUTLS_PK_EC},
+	{0, 0, 0}
 };
 
 #define GNUTLS_PK_LOOP(b) \
@@ -116,20 +114,18 @@ static const gnutls_pk_entry pk_algorithms[] = {
  * Returns: a string that contains the name of the specified public
  *   key algorithm, or %NULL.
  **/
-const char *
-gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
+const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm)
 {
-  const char *ret = NULL;
+	const char *ret = NULL;
 
-  GNUTLS_PK_LOOP(
-    if (p->id == algorithm)
-      {
-        ret = p->name;
-        break;
-      }
-  );
+	GNUTLS_PK_LOOP(
+		if (p->id == algorithm) {
+			ret = p->name;
+			break;
+		}
+	);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -144,20 +140,21 @@ gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
  *
  * Since: 2.6.0
  **/
-const gnutls_pk_algorithm_t *
-gnutls_pk_list (void)
+const gnutls_pk_algorithm_t *gnutls_pk_list(void)
 {
-static gnutls_pk_algorithm_t supported_pks[MAX_ALGOS] = {0};
+	static gnutls_pk_algorithm_t supported_pks[MAX_ALGOS] = { 0 };
 
-  if (supported_pks[0] == 0)
-    {
-      int i = 0;
+	if (supported_pks[0] == 0) {
+		int i = 0;
 
-      GNUTLS_PK_LOOP (if (p->id != GNUTLS_PK_UNKNOWN && supported_pks[i>0?(i-1):0]!=p->id) supported_pks[i++]=p->id);
-      supported_pks[i++]=0;
-    }
+		GNUTLS_PK_LOOP(
+			if (p->id != GNUTLS_PK_UNKNOWN && supported_pks[i > 0 ? (i - 1) : 0] != p->id) 
+				supported_pks[i++] = p->id
+		);
+		supported_pks[i++] = 0;
+	}
 
-  return supported_pks;
+	return supported_pks;
 }
 
 /**
@@ -173,20 +170,18 @@ static gnutls_pk_algorithm_t supported_pks[MAX_ALGOS] = {0};
  *
  * Since: 2.6.0
  **/
-gnutls_pk_algorithm_t
-gnutls_pk_get_id (const char *name)
+gnutls_pk_algorithm_t gnutls_pk_get_id(const char *name)
 {
-  gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
-  const gnutls_pk_entry *p;
+	gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
+	const gnutls_pk_entry *p;
 
-  for (p = pk_algorithms; p->name != NULL; p++)
-    if (name && strcmp (p->name, name) == 0)
-      {
-        ret = p->id;
-        break;
-      }
+	for (p = pk_algorithms; p->name != NULL; p++)
+		if (name && strcmp(p->name, name) == 0) {
+			ret = p->id;
+			break;
+		}
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -200,52 +195,46 @@ gnutls_pk_get_id (const char *name)
  *
  * Since: 2.6.0
  **/
-const char *
-gnutls_pk_get_name (gnutls_pk_algorithm_t algorithm)
+const char *gnutls_pk_get_name(gnutls_pk_algorithm_t algorithm)
 {
-  const char *ret = "Unknown";
-  const gnutls_pk_entry *p;
+	const char *ret = "Unknown";
+	const gnutls_pk_entry *p;
 
-  for (p = pk_algorithms; p->name != NULL; p++)
-    if (algorithm == p->id)
-      {
-        ret = p->name;
-        break;
-      }
+	for (p = pk_algorithms; p->name != NULL; p++)
+		if (algorithm == p->id) {
+			ret = p->name;
+			break;
+		}
 
-  return ret;
+	return ret;
 }
 
-gnutls_pk_algorithm_t
-_gnutls_x509_oid2pk_algorithm (const char *oid)
+gnutls_pk_algorithm_t _gnutls_x509_oid2pk_algorithm(const char *oid)
 {
-  gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
-  const gnutls_pk_entry *p;
+	gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
+	const gnutls_pk_entry *p;
 
-  for (p = pk_algorithms; p->name != NULL; p++)
-    if (p->oid && strcmp (p->oid, oid) == 0)
-      {
-        ret = p->id;
-        break;
-      }
+	for (p = pk_algorithms; p->name != NULL; p++)
+		if (p->oid && strcmp(p->oid, oid) == 0) {
+			ret = p->id;
+			break;
+		}
 
-  return ret;
+	return ret;
 }
 
-const char *
-_gnutls_x509_pk_to_oid (gnutls_pk_algorithm_t algorithm)
+const char *_gnutls_x509_pk_to_oid(gnutls_pk_algorithm_t algorithm)
 {
-  const char *ret = NULL;
-  const gnutls_pk_entry *p;
+	const char *ret = NULL;
+	const gnutls_pk_entry *p;
 
-  for (p = pk_algorithms; p->name != NULL; p++)
-    if (p->id == algorithm)
-      {
-        ret = p->oid;
-        break;
-      }
+	for (p = pk_algorithms; p->name != NULL; p++)
+		if (p->id == algorithm) {
+			ret = p->oid;
+			break;
+		}
 
-  return ret;
+	return ret;
 }
 
 /* Returns the encipher type for the given key exchange algorithm.
@@ -254,10 +243,11 @@ _gnutls_x509_pk_to_oid (gnutls_pk_algorithm_t algorithm)
  * ex. GNUTLS_KX_RSA requires a certificate able to encrypt... so returns CIPHER_ENCRYPT.
  */
 enum encipher_type
-_gnutls_kx_encipher_type (gnutls_kx_algorithm_t kx_algorithm)
+_gnutls_kx_encipher_type(gnutls_kx_algorithm_t kx_algorithm)
 {
-  int ret = CIPHER_IGN;
-  GNUTLS_PK_MAP_ALG_LOOP (ret = p->encipher_type) return ret;
+	int ret = CIPHER_IGN;
+	GNUTLS_PK_MAP_ALG_LOOP(ret = p->encipher_type)
+
+	return ret;
 
 }
-

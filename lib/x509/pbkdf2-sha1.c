@@ -52,146 +52,139 @@
  */
 
 int
-_gnutls_pbkdf2_sha1 (const char *P, size_t Plen,
-                     const unsigned char *S, size_t Slen,
-                     unsigned int c, unsigned char *DK, size_t dkLen)
+_gnutls_pbkdf2_sha1(const char *P, size_t Plen,
+		    const unsigned char *S, size_t Slen,
+		    unsigned int c, unsigned char *DK, size_t dkLen)
 {
-  unsigned int hLen = 20;
-  char U[20];
-  char T[20];
-  unsigned int u;
-  unsigned int l;
-  unsigned int r;
-  unsigned int i;
-  unsigned int k;
-  int rc;
-  char *tmp;
-  size_t tmplen = Slen + 4;
+	unsigned int hLen = 20;
+	char U[20];
+	char T[20];
+	unsigned int u;
+	unsigned int l;
+	unsigned int r;
+	unsigned int i;
+	unsigned int k;
+	int rc;
+	char *tmp;
+	size_t tmplen = Slen + 4;
 
-  if (c == 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	if (c == 0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  if (dkLen == 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-  /*
-   *
-   *  Steps:
-   *
-   *     1. If dkLen > (2^32 - 1) * hLen, output "derived key too long" and
-   *        stop.
-   */
+	if (dkLen == 0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	/*
+	 *
+	 *  Steps:
+	 *
+	 *     1. If dkLen > (2^32 - 1) * hLen, output "derived key too long" and
+	 *        stop.
+	 */
 
-  if (dkLen > 4294967295U)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	if (dkLen > 4294967295U) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  /*
-   *     2. Let l be the number of hLen-octet blocks in the derived key,
-   *        rounding up, and let r be the number of octets in the last
-   *        block:
-   *
-   *                  l = CEIL (dkLen / hLen) ,
-   *                  r = dkLen - (l - 1) * hLen .
-   *
-   *        Here, CEIL (x) is the "ceiling" function, i.e. the smallest
-   *        integer greater than, or equal to, x.
-   */
+	/*
+	 *     2. Let l be the number of hLen-octet blocks in the derived key,
+	 *        rounding up, and let r be the number of octets in the last
+	 *        block:
+	 *
+	 *                  l = CEIL (dkLen / hLen) ,
+	 *                  r = dkLen - (l - 1) * hLen .
+	 *
+	 *        Here, CEIL (x) is the "ceiling" function, i.e. the smallest
+	 *        integer greater than, or equal to, x.
+	 */
 
-  l = ((dkLen - 1) / hLen) + 1;
-  r = dkLen - (l - 1) * hLen;
+	l = ((dkLen - 1) / hLen) + 1;
+	r = dkLen - (l - 1) * hLen;
 
-  /*
-   *     3. For each block of the derived key apply the function F defined
-   *        below to the password P, the salt S, the iteration count c, and
-   *        the block index to compute the block:
-   *
-   *                  T_1 = F (P, S, c, 1) ,
-   *                  T_2 = F (P, S, c, 2) ,
-   *                  ...
-   *                  T_l = F (P, S, c, l) ,
-   *
-   *        where the function F is defined as the exclusive-or sum of the
-   *        first c iterates of the underlying pseudorandom function PRF
-   *        applied to the password P and the concatenation of the salt S
-   *        and the block index i:
-   *
-   *                  F (P, S, c, i) = U_1 \xor U_2 \xor ... \xor U_c
-   *
-   *        where
-   *
-   *                  U_1 = PRF (P, S || INT (i)) ,
-   *                  U_2 = PRF (P, U_1) ,
-   *                  ...
-   *                  U_c = PRF (P, U_{c-1}) .
-   *
-   *        Here, INT (i) is a four-octet encoding of the integer i, most
-   *        significant octet first.
-   *
-   *     4. Concatenate the blocks and extract the first dkLen octets to
-   *        produce a derived key DK:
-   *
-   *                  DK = T_1 || T_2 ||  ...  || T_l<0..r-1>
-   *
-   *     5. Output the derived key DK.
-   *
-   *  Note. The construction of the function F follows a "belt-and-
-   *  suspenders" approach. The iterates U_i are computed recursively to
-   *  remove a degree of parallelism from an opponent; they are exclusive-
-   *  ored together to reduce concerns about the recursion degenerating
-   *  into a small set of values.
-   *
-   */
+	/*
+	 *     3. For each block of the derived key apply the function F defined
+	 *        below to the password P, the salt S, the iteration count c, and
+	 *        the block index to compute the block:
+	 *
+	 *                  T_1 = F (P, S, c, 1) ,
+	 *                  T_2 = F (P, S, c, 2) ,
+	 *                  ...
+	 *                  T_l = F (P, S, c, l) ,
+	 *
+	 *        where the function F is defined as the exclusive-or sum of the
+	 *        first c iterates of the underlying pseudorandom function PRF
+	 *        applied to the password P and the concatenation of the salt S
+	 *        and the block index i:
+	 *
+	 *                  F (P, S, c, i) = U_1 \xor U_2 \xor ... \xor U_c
+	 *
+	 *        where
+	 *
+	 *                  U_1 = PRF (P, S || INT (i)) ,
+	 *                  U_2 = PRF (P, U_1) ,
+	 *                  ...
+	 *                  U_c = PRF (P, U_{c-1}) .
+	 *
+	 *        Here, INT (i) is a four-octet encoding of the integer i, most
+	 *        significant octet first.
+	 *
+	 *     4. Concatenate the blocks and extract the first dkLen octets to
+	 *        produce a derived key DK:
+	 *
+	 *                  DK = T_1 || T_2 ||  ...  || T_l<0..r-1>
+	 *
+	 *     5. Output the derived key DK.
+	 *
+	 *  Note. The construction of the function F follows a "belt-and-
+	 *  suspenders" approach. The iterates U_i are computed recursively to
+	 *  remove a degree of parallelism from an opponent; they are exclusive-
+	 *  ored together to reduce concerns about the recursion degenerating
+	 *  into a small set of values.
+	 *
+	 */
 
-  tmp = gnutls_malloc (tmplen);
-  if (tmp == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+	tmp = gnutls_malloc(tmplen);
+	if (tmp == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-  memcpy (tmp, S, Slen);
+	memcpy(tmp, S, Slen);
 
-  for (i = 1; i <= l; i++)
-    {
-      memset (T, 0, hLen);
+	for (i = 1; i <= l; i++) {
+		memset(T, 0, hLen);
 
-      for (u = 1; u <= c; u++)
-        {
-          if (u == 1)
-            {
-              tmp[Slen + 0] = (i & 0xff000000) >> 24;
-              tmp[Slen + 1] = (i & 0x00ff0000) >> 16;
-              tmp[Slen + 2] = (i & 0x0000ff00) >> 8;
-              tmp[Slen + 3] = (i & 0x000000ff) >> 0;
+		for (u = 1; u <= c; u++) {
+			if (u == 1) {
+				tmp[Slen + 0] = (i & 0xff000000) >> 24;
+				tmp[Slen + 1] = (i & 0x00ff0000) >> 16;
+				tmp[Slen + 2] = (i & 0x0000ff00) >> 8;
+				tmp[Slen + 3] = (i & 0x000000ff) >> 0;
 
-              rc =
-                _gnutls_mac_fast (GNUTLS_MAC_SHA1, P, Plen, tmp, tmplen, U);
-            }
-          else
-            rc = _gnutls_mac_fast (GNUTLS_MAC_SHA1, P, Plen, U, hLen, U);
+				rc = _gnutls_mac_fast(GNUTLS_MAC_SHA1, P,
+						      Plen, tmp, tmplen,
+						      U);
+			} else
+				rc = _gnutls_mac_fast(GNUTLS_MAC_SHA1, P,
+						      Plen, U, hLen, U);
 
-          if (rc < 0)
-            {
-              gnutls_free (tmp);
-              return rc;
-            }
+			if (rc < 0) {
+				gnutls_free(tmp);
+				return rc;
+			}
 
-          for (k = 0; k < hLen; k++)
-            T[k] ^= U[k];
-        }
+			for (k = 0; k < hLen; k++)
+				T[k] ^= U[k];
+		}
 
-      memcpy (DK + (i - 1) * hLen, T, i == l ? r : hLen);
-    }
+		memcpy(DK + (i - 1) * hLen, T, i == l ? r : hLen);
+	}
 
-  gnutls_free (tmp);
+	gnutls_free(tmp);
 
-  return 0;
+	return 0;
 }
