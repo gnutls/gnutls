@@ -60,7 +60,6 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 	ck_certificate_type_t type = CKC_X_509;
 	ck_object_handle_t obj;
 	int a_val;
-	gnutls_datum_t subject = { NULL, 0 };
 	struct pkcs11_session_info sinfo;
 
 	memset(&sinfo, 0, sizeof(sinfo));
@@ -112,12 +111,6 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_crt_get_raw_dn(crt, &subject);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
 	/* FIXME: copy key usage flags */
 
 	a[0].type = CKA_CLASS;
@@ -139,8 +132,8 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 	a_val = 5;
 
 	a[a_val].type = CKA_SUBJECT;
-	a[a_val].value = subject.data;
-	a[a_val].value_len = subject.size;
+	a[a_val].value = crt->raw_dn.data;
+	a[a_val].value_len = crt->raw_dn.size;
 	a_val++;
 
 	if (label) {
@@ -190,7 +183,6 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
       cleanup:
 	gnutls_free(der);
 	pkcs11_close_session(&sinfo);
-	_gnutls_free_datum(&subject);
 	return ret;
 
 }
