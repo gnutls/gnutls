@@ -53,12 +53,14 @@ dist-hook:
 	cd $(distdir)/src/ && for i in *.def;do \
 		if test x"$$i" = x"args-std.def";then  continue; fi; \
 		autogen $$i; \
-		touch $$i; \
 		cp $$i $$i.tmp; \
 		sed -i 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $$i.tmp; \
 		autogen -Tagman-cmd.tpl $$i.tmp; \
 		rm -f $$i.tmp; \
 		mv -f *.1 ../doc/manpages/; \
+	done
+	cd $(distdir)/src/ && for i in *-args.c *-args.h;do \
+		mv $$i $$i.bak; \
 	done
 	sed 's/\@\@VERSION\@\@/$(VERSION)/g' -i $(distdir)/doc/invoke-*.texi
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
