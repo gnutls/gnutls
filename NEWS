@@ -8,6 +8,9 @@ See the end for copying conditions.
 
 ** libgnutls: Added support for ISO OID for RSA-SHA1 signatures.
 
+** libgnutls: When traversing PKCS #11 tokens looking for an object, avoid
+looking in unrelated to the object tokens.
+
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
 
