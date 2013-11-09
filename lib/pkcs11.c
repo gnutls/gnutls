@@ -992,6 +992,13 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
               continue;
             }
 
+          if (info != NULL)
+            {
+              if (!p11_kit_uri_match_token_info (info, &tinfo.tinfo) ||
+                  !p11_kit_uri_match_module_info (info, &providers[x].info))
+                continue;
+            }
+
           rv = (module)->C_OpenSession (slots[z],
                                         ((flags & SESSION_WRITE)
                                           ? CKF_RW_SESSION : 0) |
