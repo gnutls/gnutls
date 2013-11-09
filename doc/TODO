@@ -8,8 +8,6 @@ Current list:
 * Priority strings should also set the minimum acceptable DH key size and
   certificate size.
 * Add an authenticated-encryption API.
-* When importing a PKCS #11 certificate, check for its issuers to generate a
-  chain (e.g. use the DN to retrieve possible signers).
 * Think about supporting the groups in RFC3526 and RFC5114. If other
   implementations use them too we may be able to achieve some speedups
   in DH (by knowing q).
