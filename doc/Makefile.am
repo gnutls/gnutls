@@ -223,7 +223,7 @@ MAINTAINERCLEANFILES += $(API_FILES)
 
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -234,7 +234,7 @@ gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 
 dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -245,7 +245,7 @@ dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 
 x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort |uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -256,7 +256,7 @@ x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 
 xssl-api.texi: $(top_srcdir)/lib/includes/gnutls/xssl.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -267,7 +267,7 @@ xssl-api.texi: $(top_srcdir)/lib/includes/gnutls/xssl.h
 
 pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -279,7 +279,7 @@ pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
 
 pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -290,7 +290,7 @@ pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 
 pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -301,7 +301,7 @@ pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
 
 tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -312,7 +312,7 @@ tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
 
 abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -323,7 +323,7 @@ abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h
 
 compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -334,7 +334,7 @@ compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h
 
 dtls-api.texi: $(top_srcdir)/lib/includes/gnutls/dtls.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -345,7 +345,7 @@ dtls-api.texi: $(top_srcdir)/lib/includes/gnutls/dtls.h
 
 crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -356,8 +356,8 @@ crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 
 ocsp-api.texi: $(top_srcdir)/lib/includes/gnutls/ocsp.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
-		echo $(ECHO_N) "Creating documentation for file $$i... " && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -446,7 +446,7 @@ compare-makefile: enums.texi
 		perl -p -e "s,^ENUMS =,ENUMS =$$STR," > tmp-$@; \
 	diff -u $(srcdir)/Makefile.am tmp-$@
 	rm -f tmp-$@
-	FUNCS=`cat $(HEADER_FILES) | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d`; \
+	FUNCS=`cat $(HEADER_FILES) | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d|uniq`; \
 	MANS=""; \
 	for i in $$FUNCS; do \
 		MANS="$$MANS\nFUNCS += functions/$$i\nFUNCS += functions/$$i.short"; \

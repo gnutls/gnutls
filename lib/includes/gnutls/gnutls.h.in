@@ -1522,9 +1522,11 @@ typedef ssize_t(*gnutls_vec_push_func) (gnutls_transport_ptr_t,
 
 typedef int (*gnutls_errno_func) (gnutls_transport_ptr_t);
 
-/* This will be defined as macro.
+#if 0
+ /* This will be defined as macro. */
   void gnutls_transport_set_int (gnutls_session_t session, int r);
- */
+#endif
+
 void gnutls_transport_set_int2(gnutls_session_t session, int r, int s);
 #define gnutls_transport_set_int(s, i) gnutls_transport_set_int2(s, i, i)
 
@@ -1614,8 +1616,8 @@ int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t
 
 const char *gnutls_srp_server_get_username(gnutls_session_t session);
 
-extern void gnutls_srp_set_prime_bits(gnutls_session_t session,
-				      unsigned int bits);
+void gnutls_srp_set_prime_bits(gnutls_session_t session,
+                               unsigned int bits);
 
 int gnutls_srp_verifier(const char *username,
 			const char *password,

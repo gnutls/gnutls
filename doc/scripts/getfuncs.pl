@@ -3,6 +3,7 @@ eval '(exit $?0)' && eval 'exec perl -wST "$0" ${1+"$@"}'
     if 0;
 
 # Copyright (C) 2011-2012 Free Software Foundation, Inc.
+# Copyright (C) 2013 Nikos Mavrogiannopoulos
 #
 # This file is part of GnuTLS.
 #
@@ -23,27 +24,87 @@ eval '(exit $?0)' && eval 'exec perl -wST "$0" ${1+"$@"}'
 # given a header file in stdin it will print all functions
 
 my $line;
-my $func;
+my $func_name;
+my $prototype;
+
+$state = 0;
+
+# 0: scanning
+# 1: comment
+# 2: struct||enum
+# 3: function
+
+sub function_print {
+  my $prototype = shift @_;
+
+  if ($prototype =~ m/^\s*\w\s+[A-Za-z0-9_]+[\s\*]+([A-Za-z0-9_]+)\s*\(.*/) {
+    $func_name = $1;
+  } elsif ($prototype =~ m/^\s*[A-Za-z0-9_]+[\s\*]+([A-Za-z0-9_]+)\s*\([^\)]+/) {
+    $func_name = $1;
+  } elsif ($prototype =~ m/^\s*\w+\s+\w+[\s\*]+([A-Za-z0-9_]+)\s*\([^\)]+/) {
+    $func_name = $1;
+  } elsif ($prototype =~ m/^[\s\*]*([A-Za-z0-9_]+)\s*\([^\)]+/) {
+    $func_name = $1;
+  } elsif ($prototype =~ m/^[\s\*]*[A-Za-z0-9_]+\s+([A-Za-z0-9_]+)/) {
+    $func_name = $1;
+  }
+
+#print STDERR "function: $prototype\n";
+  if ($func_name ne '' && ($func_name =~ m/gnutls_.*/ || $func_name =~ m/dane_.*/ || $func_name =~ m/xssl_.*/)) {
+    print $func_name . "\n";
+  }
+      
+  return;
+}
 
 while ($line=<STDIN>) {
 
-  if ($line !~ m/typedef/ && $line !~ m/Copyright/ && $line !~ m/doc-skip/) {
-    $func = '';
-    
-    if ($line =~ m/^\s*\w+[\s\*]+([A-Za-z0-9_]+)\s*\([^\)]+/) {
-        $func = $1;
-    }
+  next if ($line eq '');
+# print STDERR "line($state): $line";
 
-    if ($line =~ m/^\s*\w+\s+\w+[\s\*]+([A-Za-z0-9_]+)\s*\([^\)]+/) {
-        $func = $1;
-    }
+  #skip comments
+  if ($state == 0) {
+    if ($line =~ m/^\s*\/\*/) {
 
-    if ($line =~ m/^[\s\*]*([A-Za-z0-9_]+)\s*\([^\)]+/) {
-        $func = $1;
+      next if ($line =~ m/\*\//);
+
+      $state = 1;
+      next;
+    } elsif ($line =~ m/^\s*typedef\s+enum/ || $line =~ m/^\s*enum/ || 
+             $line =~ m/^\s*struct/ || $line =~ m/^\s*typedef\s+struct/) {
+
+      next if ($line =~ m/;/);
+      $state = 2;
+      next;
+    } elsif ($line !~ m/^\s*extern/ && $line !~ m/^\s*typedef/ && $line !~ m/doc-skip/ && $line =~ m/^\s*\w/) {
+      $state = 3;
+
+      $prototype = "$line";
+      $func_name = '';
+
+      if ($line =~ m/;/) {
+        function_print($prototype);
+        $state = 0;
+        next;
+      }
     }
+  } elsif ($state == 1) { # comment
+    if ($line =~ m/\*\//) {
+      $state = 0;
+      next;
+    }
+  } elsif ($state == 2) { #struct||enum
+    if ($line =~ m/;/) {
+      $state = 0;
+      next;
+    }
+  } elsif ($state == 3) {
+    $prototype .= $line;
     
-    if ($func ne '' && ($func =~ m/gnutls_.*/ || $func =~ m/dane_.*/)) {
-      print $func . "\n";
+    if ($line =~ m/;/) {
+      $state = 0;
+
+      function_print($prototype);
     }
   }
 

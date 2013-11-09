@@ -937,6 +937,7 @@ $section = $section_default;
 $enum = 0;
 
 $lineno = 0;
+
 foreach $file (@ARGV) {
     if (!open(IN,"<$file")) {
 	print STDERR "Error: Cannot open file $file\n";
@@ -992,7 +993,7 @@ foreach $file (@ARGV) {
 		    $contents = "";
 		}
 
-		$prototype = "";
+		$prototype = '';
 		$state = 3;
 	    } elsif ($line =~ /$doc_content/) {
 		# miguel-style comment kludge, look for blank lines after
@@ -1009,19 +1010,25 @@ foreach $file (@ARGV) {
 		print STDERR "warning: $lineno: Bad line: $_";
 	    }
 	} elsif ($state == 3) {	# scanning for function { (end of prototype)
+	    if ($line =~ /([a-zA-Z\s]+)enum(.*)$/) {
+	        $enum = 1;
+	    }
+
 	    if ($line =~ m#\s*/\*\s+MACDOC\s*#io) {
 	      # do nothing
 	    }
-	    elsif ($enum == 1 && $line =~ /(^\s*\{).*/) {
-		$prototype .= "{";
+	    elsif ($enum == 1 && $line =~ /(\s*\{).*/) {
+		$prototype = "typedef enum {";
 	    }
 	    elsif ($line =~ /([^\{]*)/) {
 		$prototype .= $1;
 	    }
-	    if ($enum == 0 && $line =~ /\{/) {
+
+	    if ($enum == 0 && $line =~ /;/) {
 		$prototype =~ s@/\*.*?\*/@@gos;	# strip comments.
 		$prototype =~ s@[\r\n]+@ @gos; # strip newlines/cr's.
 		$prototype =~ s@^ +@@gos; # strip leading spaces
+
 		dump_function($prototype);
 
 		$function = "";
@@ -1040,6 +1047,7 @@ foreach $file (@ARGV) {
 		$prototype =~ s@/\*.*?\*/@@gos;	# strip comments.
 		$prototype =~ s@[\r\n]+@ @gos; # strip newlines/cr's.
 		$prototype =~ s@^ +@@gos; # strip leading spaces
+
 		dump_enum($prototype);
 
 		$function = "";
@@ -1054,10 +1062,8 @@ foreach $file (@ARGV) {
 
 		$state = 0;
 	    }
-	    elsif ($line =~ /([a-zA-Z\s]+)enum(.*)$/) {
-	        $enum = 1;
-	    }
     
 	}
     }
+
 }
