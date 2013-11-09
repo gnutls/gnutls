@@ -125,6 +125,14 @@ int gnutls_pkcs11_obj_export(gnutls_pkcs11_obj_t obj,
 int gnutls_pkcs11_obj_export2(gnutls_pkcs11_obj_t obj,
 			      gnutls_datum_t * out);
 
+int gnutls_pkcs11_obj_export3(gnutls_pkcs11_obj_t obj, gnutls_x509_crt_fmt_t fmt,
+			      gnutls_datum_t * out);
+
+int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
+			     gnutls_datum_t * issuer,
+			     gnutls_x509_crt_fmt_t fmt,
+			     unsigned int flags);
+
 int gnutls_pkcs11_copy_x509_crt(const char *token_url,
 				gnutls_x509_crt_t crt,
 				const char *label, unsigned int flags
@@ -247,8 +255,7 @@ gnutls_pkcs11_token_get_mechanism(const char *url,
 				  unsigned int idx,
 				  unsigned long *mechanism);
 
-int gnutls_pkcs11_token_set_pin(const char *token_url, const char *oldpin, const char *newpin, unsigned int flags	/*gnutls_pin_flag_t */
-    );
+int gnutls_pkcs11_token_set_pin(const char *token_url, const char *oldpin, const char *newpin, unsigned int flags	/*gnutls_pin_flag_t */);
 
 int gnutls_pkcs11_token_get_url(unsigned int seq,
 				gnutls_pkcs11_url_type_t detailed,

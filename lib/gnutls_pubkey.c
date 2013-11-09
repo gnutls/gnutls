@@ -36,7 +36,6 @@
 #include <abstract_int.h>
 #include <gnutls_ecc.h>
 
-#define PK_PEM_HEADER "PUBLIC KEY"
 
 #define OPENPGP_KEY_PRIMARY 2
 #define OPENPGP_KEY_SUBKEY 1
@@ -641,7 +640,7 @@ gnutls_pubkey_export(gnutls_pubkey_t key,
 	}
 
 	result = _gnutls_x509_export_int_named(spk, "",
-					       format, PK_PEM_HEADER,
+					       format, PEM_PK,
 					       output_data,
 					       output_data_size);
 	if (result < 0) {
@@ -706,7 +705,7 @@ gnutls_pubkey_export2(gnutls_pubkey_t key,
 	}
 
 	result = _gnutls_x509_export_int_named2(spk, "",
-						format, PK_PEM_HEADER,
+						format, PEM_PK,
 						out);
 	if (result < 0) {
 		gnutls_assert();
@@ -1011,7 +1010,7 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
 	if (format == GNUTLS_X509_FMT_PEM) {
 		/* Try the first header */
 		result =
-		    _gnutls_fbase64_decode(PK_PEM_HEADER, data->data,
+		    _gnutls_fbase64_decode(PEM_PK, data->data,
 					   data->size, &_data);
 
 		if (result < 0) {

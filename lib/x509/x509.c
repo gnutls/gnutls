@@ -2549,7 +2549,7 @@ gnutls_x509_crt_export(gnutls_x509_crt_t cert,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_export_int(cert->cert, format, "CERTIFICATE",
+	return _gnutls_x509_export_int(cert->cert, format, PEM_X509_CERT2,
 				       output_data, output_data_size);
 }
 
@@ -2579,7 +2579,7 @@ gnutls_x509_crt_export2(gnutls_x509_crt_t cert,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_export_int2(cert->cert, format, "CERTIFICATE",
+	return _gnutls_x509_export_int2(cert->cert, format, PEM_X509_CERT2,
 					out);
 }
 

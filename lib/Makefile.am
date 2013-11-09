@@ -81,7 +81,8 @@ COBJECTS = gnutls_range.c gnutls_record.c \
 	crypto-backend.c verify-tofu.c pin.c tpm.c 
 
 if ENABLE_PKCS11
-COBJECTS += pkcs11.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c
+COBJECTS += pkcs11.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \
+	pkcs11_int.c
 endif
 
 if ENABLE_NETTLE

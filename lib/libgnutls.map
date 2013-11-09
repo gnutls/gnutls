@@ -925,6 +925,8 @@ GNUTLS_3_1_0 {
 	gnutls_priority_kx_list;
 	gnutls_record_set_timeout;
 	gnutls_pkcs11_token_get_random;
+	gnutls_pkcs11_obj_export3;
+	gnutls_pkcs11_get_raw_issuer;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

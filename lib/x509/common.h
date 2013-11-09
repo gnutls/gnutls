@@ -36,6 +36,7 @@
 #define PEM_X509_CERT2 "CERTIFICATE"
 #define PEM_PKCS7 "PKCS7"
 #define PEM_PKCS12 "PKCS12"
+#define PEM_PK "PUBLIC KEY"
 
 /* public key algorithm's OIDs
  */
