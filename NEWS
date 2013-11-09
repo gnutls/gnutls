@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.33 (unreleased)
 
+** libgnutls: When traversing PKCS #11 tokens looking for an object, avoid
+looking in unrelated to the object tokens.
+
 ** srptool: Fixed index command line option. Patch by Attila Molnar.
 
 ** certtool: pathlen constraint is now read correctly. Reported by
