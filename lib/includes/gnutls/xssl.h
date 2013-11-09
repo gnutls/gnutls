@@ -21,6 +21,12 @@
 #ifndef GNUTLS_SBUF_H
 #define GNUTLS_SBUF_H
 
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+extern "C" {
+#endif
+/* *INDENT-ON* */
+
 #include <gnutls/gnutls.h>
 
 /* Buffered session I/O */
@@ -109,5 +115,11 @@ int xssl_cred_init(xssl_cred_t * c, unsigned vflags,
 		   gnutls_cinput_st * aux, unsigned aux_size);
 void xssl_cred_deinit(xssl_cred_t cred);
 
+
+/* *INDENT-OFF* */
+#ifdef __cplusplus
+}
+#endif
+/* *INDENT-ON* */
 
 #endif				/* GNUTLS_SBUF_H */
