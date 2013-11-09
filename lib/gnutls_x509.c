@@ -808,7 +808,7 @@ read_cas_url(gnutls_certificate_credentials_t res, const char *url)
 
 }
 
-
+#define MAX_PKCS11_CERT_CHAIN 8
 /* Reads a certificate key from a token.
  */
 static int
@@ -818,10 +818,12 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 	gnutls_x509_crt_t crt;
 	gnutls_pcert_st *ccert;
 	gnutls_str_array_t names;
+	gnutls_datum_t t = {NULL, 0};
+	unsigned i;
 
 	_gnutls_str_array_init(&names);
 
-	ccert = gnutls_malloc(sizeof(*ccert));
+	ccert = gnutls_malloc(sizeof(*ccert)*MAX_PKCS11_CERT_CHAIN);
 	if (ccert == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -845,34 +847,56 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 
 	if (ret < 0) {
 		gnutls_assert();
-		gnutls_x509_crt_deinit(crt);
-		goto cleanup;
+		goto cleanup1;
 	}
 
 	ret = get_x509_name(crt, &names);
 	if (ret < 0) {
 		gnutls_assert();
+		goto cleanup1;
+	}
+
+	/* Try to load the whole certificate chain from the PKCS #11 token */
+	for (i=0;i<MAX_PKCS11_CERT_CHAIN;i++) {
+		ret = gnutls_pcert_import_x509(&ccert[i], crt, 0);
 		gnutls_x509_crt_deinit(crt);
-		goto cleanup;
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = gnutls_pkcs11_get_raw_issuer(url, crt, &t, GNUTLS_X509_FMT_DER, 0);
+		if (ret < 0)
+			break;
+			
+		ret = gnutls_x509_crt_init(&crt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		
+		ret = gnutls_x509_crt_import(crt, &t, GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup1;
+		}
+		gnutls_free(t.data);
+		t.data = NULL;
 	}
 
-	ret = gnutls_pcert_import_x509(ccert, crt, 0);
-	gnutls_x509_crt_deinit(crt);
-
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = certificate_credential_append_crt_list(res, names, ccert, 1);
+	ret = certificate_credential_append_crt_list(res, names, ccert, i+1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	return 0;
+cleanup1:
+	gnutls_x509_crt_deinit(crt);
 
-      cleanup:
+cleanup:
+	gnutls_free(t.data);
 	_gnutls_str_array_clear(&names);
 	gnutls_free(ccert);
 	return ret;
