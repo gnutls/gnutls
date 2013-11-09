@@ -349,7 +349,9 @@ if [ test "$NEED_LIBOPTS_DIR" != "true" ];then
 	dnl delete libopts-generated files
 	for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
 		nam=`echo $i|sed 's/.bak//g'`
-		cp -f $i $nam
+		if [ test -f $i ];then
+			cp -f $i $nam
+		fi
 	done
 	AC_SUBST([AUTOGEN], [/bin/true])
 fi
