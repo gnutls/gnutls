@@ -30,6 +30,12 @@ flag = {
 };
 
 flag = {
+    name      = export-chain;
+    descrip   = "Export the certificate specified by the URL and its chain of trust";
+    doc = "Exports the certificate specified by the URL and generates its chain of trust based on the stored certificates in the module.";
+};
+
+flag = {
     name      = list-mechanisms;
     descrip   = "List all available mechanisms in a token";
     doc = "";
@@ -211,6 +217,19 @@ flag = {
 flag = {
     name      = inraw;
     aliases   = inder;
+};
+
+flag = {
+    name      = outder;
+    descrip   = "Use DER format for output certificates, private keys, and DH parameters";
+    disabled;
+    disable   = "no";
+    doc       = "The output will be in DER or RAW format.";
+};
+
+flag = {
+    name      = outraw;
+    aliases   = outder;
 };
 
 flag = {

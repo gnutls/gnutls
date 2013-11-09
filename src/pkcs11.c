@@ -168,11 +168,9 @@ void
 pkcs11_export(FILE * outfile, const char *url, unsigned int login,
 	      common_info_st * info)
 {
-	gnutls_pkcs11_obj_t crt;
-	gnutls_x509_crt_t xcrt;
-	gnutls_pubkey_t pubkey;
+	gnutls_pkcs11_obj_t obj;
+	gnutls_datum_t t;
 	int ret;
-	size_t size;
 	unsigned int obj_flags = 0;
 
 	if (login)
@@ -183,113 +181,132 @@ pkcs11_export(FILE * outfile, const char *url, unsigned int login,
 	if (url == NULL)
 		url = "pkcs11:";
 
-	ret = gnutls_pkcs11_obj_init(&crt);
+	ret = gnutls_pkcs11_obj_init(&obj);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_obj_import_url(crt, url, obj_flags);
+	ret = gnutls_pkcs11_obj_import_url(obj, url, obj_flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
 		exit(1);
 	}
-
-	switch (gnutls_pkcs11_obj_get_type(crt)) {
-	case GNUTLS_PKCS11_OBJ_X509_CRT:
-		ret = gnutls_x509_crt_init(&xcrt);
-		if (ret < 0) {
-			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+	
+	ret = gnutls_pkcs11_obj_export3(obj, info->outcert_format, &t);
+	if (ret < 0) {
+        	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
-			exit(1);
-		}
+                exit(1);
+        }
 
-		ret = gnutls_x509_crt_import_pkcs11(xcrt, crt);
-		if (ret < 0) {
-			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-				__LINE__, gnutls_strerror(ret));
-			exit(1);
-		}
+	fwrite(t.data, 1, t.size, outfile);
+	gnutls_free(t.data);
 
-		size = buffer_size;
-		ret =
-		    gnutls_x509_crt_export(xcrt, GNUTLS_X509_FMT_PEM,
-					   buffer, &size);
-		if (ret < 0) {
-			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-				__LINE__, gnutls_strerror(ret));
-			exit(1);
-		}
-		fwrite(buffer, 1, size, outfile);
+	if (info->outcert_format == GNUTLS_X509_FMT_PEM)
+        	fputs("\n\n", outfile);
 
-		gnutls_x509_crt_deinit(xcrt);
-		break;
-	case GNUTLS_PKCS11_OBJ_PUBKEY:
-		ret = gnutls_pubkey_init(&pubkey);
-		if (ret < 0) {
-			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-				__LINE__, gnutls_strerror(ret));
-			exit(1);
-		}
-
-		ret = gnutls_pubkey_import_pkcs11(pubkey, crt, 0);
-		if (ret < 0) {
-			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-				__LINE__, gnutls_strerror(ret));
-			exit(1);
-		}
-
-		size = buffer_size;
-		ret =
-		    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_PEM,
-					 buffer, &size);
-		if (ret < 0) {
-			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-				__LINE__, gnutls_strerror(ret));
-			exit(1);
-		}
-		fwrite(buffer, 1, size, outfile);
-
-		gnutls_pubkey_deinit(pubkey);
-		break;
-	default:
-		{
-			gnutls_datum_t data, enc;
-
-			size = buffer_size;
-			ret = gnutls_pkcs11_obj_export(crt, buffer, &size);
-			if (ret < 0) {
-				break;
-			}
-
-			data.data = buffer;
-			data.size = size;
-
-			ret =
-			    gnutls_pem_base64_encode_alloc("DATA", &data,
-							   &enc);
-			if (ret < 0) {
-				fprintf(stderr, "Error in %s:%d: %s\n",
-					__func__, __LINE__,
-					gnutls_strerror(ret));
-				exit(1);
-			}
-
-			fwrite(enc.data, 1, enc.size, outfile);
-
-			gnutls_free(enc.data);
-			break;
-		}
-	}
-	fputs("\n\n", outfile);
-
-
-	gnutls_pkcs11_obj_deinit(crt);
+	gnutls_pkcs11_obj_deinit(obj);
 
 	return;
+}
 
+void
+pkcs11_export_chain(FILE * outfile, const char *url, unsigned int login,
+	      common_info_st * info)
+{
+	gnutls_pkcs11_obj_t obj;
+	gnutls_x509_crt_t xcrt;
+	gnutls_datum_t t;
+	int ret;
+	unsigned int obj_flags = 0;
+
+	if (login)
+		obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+
+	pkcs11_common();
+
+	if (url == NULL)
+		url = "pkcs11:";
+
+	ret = gnutls_pkcs11_obj_init(&obj);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_pkcs11_obj_import_url(obj, url, obj_flags);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	/* make a crt */
+	ret = gnutls_x509_crt_init(&xcrt);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	ret = gnutls_x509_crt_import_pkcs11(xcrt, obj);
+	if (ret < 0) {
+        	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+				__LINE__, gnutls_strerror(ret));
+                exit(1);
+        }
+
+	ret = gnutls_pkcs11_obj_export3(obj, GNUTLS_X509_FMT_PEM, &t);
+	if (ret < 0) {
+        	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+				__LINE__, gnutls_strerror(ret));
+                exit(1);
+        }
+	fwrite(t.data, 1, t.size, outfile);
+       	fputs("\n\n", outfile);
+        gnutls_free(t.data);
+
+        gnutls_pkcs11_obj_deinit(obj);
+        
+        do {
+                ret = gnutls_pkcs11_get_raw_issuer(url, xcrt, &t, GNUTLS_X509_FMT_PEM, 0);
+
+        	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	                break;
+        	if (ret < 0) {
+                	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+		        		__LINE__, gnutls_strerror(ret));
+                        exit(1);
+                }
+                
+        	fwrite(t.data, 1, t.size, outfile);
+               	fputs("\n\n", outfile);
+               	
+               	gnutls_x509_crt_deinit(xcrt);
+               	
+               	ret = gnutls_x509_crt_init(&xcrt);
+        	if (ret < 0) {
+                	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+		        		__LINE__, gnutls_strerror(ret));
+                        exit(1);
+                }
+
+               	ret = gnutls_x509_crt_import(xcrt, &t, GNUTLS_X509_FMT_PEM);
+        	if (ret < 0) {
+                	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+		        		__LINE__, gnutls_strerror(ret));
+                        exit(1);
+                }
+
+                gnutls_free(t.data);
+                
+        } while(1);
+        
+	return;
 }
 
 void

@@ -144,6 +144,11 @@ static void cmd_parser(int argc, char **argv)
 	else
 		cinfo.incert_format = GNUTLS_X509_FMT_PEM;
 
+	if (HAVE_OPT(OUTDER) || HAVE_OPT(OUTRAW))
+		cinfo.outcert_format = GNUTLS_X509_FMT_DER;
+	else
+		cinfo.outcert_format = GNUTLS_X509_FMT_PEM;
+
 	if (HAVE_OPT(LOAD_CERTIFICATE))
 		cinfo.cert = OPT_ARG(LOAD_CERTIFICATE);
 
@@ -212,6 +217,8 @@ static void cmd_parser(int argc, char **argv)
 			    login, detailed_url, &cinfo);
 	} else if (HAVE_OPT(EXPORT)) {
 		pkcs11_export(outfile, url, login, &cinfo);
+	} else if (HAVE_OPT(EXPORT_CHAIN)) {
+		pkcs11_export_chain(outfile, url, login, &cinfo);
 	} else if (HAVE_OPT(WRITE)) {
 		int priv;
 
