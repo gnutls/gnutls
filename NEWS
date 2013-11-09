@@ -8,11 +8,18 @@ See the end for copying conditions.
 ** libgnutls: gnutls_cipher_get_iv_size() now returns the correct IV size in
 GCM ciphers.
 
+** libgnutls: gnutls_certificate_set_x509_key_file() et al when provided a
+PKCS #11 URL with a certificate, will attempt to load the whole chain.
+
+** libgnutls: When traversing PKCS #11 tokens looking for an object, avoid
+looking in unrelated to the object tokens.
+
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_obj_export3: Added
+gnutls_pkcs11_get_raw_issuer: Added
 
 
 * Version 3.2.6 (released 2013-10-31)
