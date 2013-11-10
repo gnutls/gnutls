@@ -40,6 +40,14 @@ gl_EARLY
 AM_PROG_AS
 AM_PROG_AR
 AC_PROG_CXX
+AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [/bin/true])
+if test x"$AUTOGEN" = "x/bin/true"; then
+  AC_MSG_WARN([[
+***
+*** autogen not found. Will not link against libopts.
+*** ]])
+NEED_LIBOPTS_DIR=true
+fi
 
 # For includes/gnutls/gnutls.h.in.
 AC_SUBST(MAJOR_VERSION, `echo $PACKAGE_VERSION | sed 's/\(.*\)\..*\..*/\1/g'`)
@@ -306,11 +314,17 @@ fi
 
 AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 
-enable_local_libopts=yes
-dnl PKG_CHECK_MODULES([autoopts], autoopts >= 36.2.11,, [enable_local_libopts=yes])
-
-NEED_LIBOPTS_DIR=true
 LIBOPTS_CHECK([src/libopts])
+if test "$NEED_LIBOPTS_DIR" != "true";then
+	dnl delete libopts-generated files
+	for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
+		nam=`echo $i|sed 's/.bak//g'`
+		if test -f $i;then
+			cp -f $i $nam
+		fi
+	done
+	AC_SUBST([AUTOGEN], [/bin/true])
+fi
 
 AC_CHECK_TYPE(ssize_t,
   [
