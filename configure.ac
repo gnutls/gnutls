@@ -156,7 +156,7 @@ AC_ARG_ENABLE([gcc-warnings],
 )
 
 if test "$gl_gcc_warnings" = yes; then
-  gl_WARN_ADD([-Wframe-larger-than=5120], [WSTACK_CFLAGS])
+  gl_WARN_ADD([-Wframe-larger-than=1024], [WSTACK_CFLAGS])
 
   nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
   nw="$nw -Wc++-compat"             # We don't care about C++ compilers
