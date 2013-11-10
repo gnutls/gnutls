@@ -106,7 +106,10 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
     }
 
   id_size = sizeof (id);
-  ret = gnutls_x509_crt_get_key_id (crt, 0, id, &id_size);
+  ret = gnutls_x509_crt_get_subject_key_id(crt, id, &id_size, NULL);
+  
+  if (ret < 0)
+    ret = gnutls_x509_crt_get_key_id (crt, 0, id, &id_size);
   if (ret < 0)
     {
       gnutls_assert ();
