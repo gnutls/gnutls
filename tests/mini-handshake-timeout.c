@@ -225,6 +225,7 @@ static void ch_handler(int sig)
 void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
 
 	/* make sure that normal handshake occurs */
 	start(0);
