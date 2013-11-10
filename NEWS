@@ -11,6 +11,8 @@ See the end for copying conditions.
 ** libgnutls: When traversing PKCS #11 tokens looking for an object, avoid
 looking in unrelated to the object tokens.
 
+** libgnutls: Fixed bug in gnutls_x509_crt_set_dn() at DN parsing.
+
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
 
