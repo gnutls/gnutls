@@ -191,7 +191,8 @@ static int
 pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 {
 	FILE *fd;
-	char line[2 * 1024];
+	char *line = NULL;
+	size_t line_size = 0;
 	unsigned i, len;
 	char indexstr[10];
 	int ret;
@@ -205,13 +206,14 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 	}
 
 	len = strlen(indexstr);
-	while (fgets(line, sizeof(line), fd) != NULL) {
+	while (getline(&line, &line_size, fd) > 0) {
 		/* move to first ':' */
 		i = 0;
 		while ((line[i] != ':') && (line[i] != '\0')
-		       && (i < sizeof(line))) {
+		       && (i < line_size)) {
 			i++;
 		}
+
 		if (strncmp(indexstr, line, MAX(i, len)) == 0) {
 			if ((idx =
 			     parse_tpasswd_conf_values(entry,
@@ -226,7 +228,8 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 	}
 	ret = GNUTLS_E_SRP_PWD_ERROR;
 
-      cleanup:
+cleanup:
+	free(line);
 	fclose(fd);
 	return ret;
 
@@ -238,7 +241,8 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 {
 	gnutls_srp_server_credentials_t cred;
 	FILE *fd = NULL;
-	char line[2 * 1024];
+	char *line = NULL;
+	size_t line_size = 0;
 	unsigned i, len;
 	int ret;
 	int idx;
@@ -308,11 +312,11 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 	}
 
 	len = strlen(username);
-	while (fgets(line, sizeof(line), fd) != NULL) {
+	while (getline(&line, &line_size, fd) > 0) {
 		/* move to first ':' */
 		i = 0;
 		while ((line[i] != ':') && (line[i] != '\0')
-		       && (i < sizeof(line))) {
+		       && (i < line_size)) {
 			i++;
 		}
 
@@ -324,6 +328,7 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 				if (pwd_read_conf
 				    (cred->password_conf_file, entry,
 				     idx) == 0) {
+					ret = 0;
 					goto found;
 				} else {
 					gnutls_assert();
@@ -348,18 +353,18 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 			goto cleanup;
 		}
 
+		ret = 0;
 		goto found;
 	}
 
 	ret = GNUTLS_E_SRP_PWD_ERROR;
-      cleanup:
-	gnutls_assert();
-	if (fd)
-		fclose(fd);
-	_gnutls_srp_entry_free(entry);
-	return ret;
 
-      found:
+cleanup:
+	gnutls_assert();
+	_gnutls_srp_entry_free(entry);
+
+found:
+	free(line);
 	if (fd)
 		fclose(fd);
 	return 0;

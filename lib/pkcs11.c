@@ -1014,9 +1014,7 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
                         }
 
 			rv = (module)->C_OpenSession(slots[z],
-						     ((flags &
-						       SESSION_WRITE)
-						      ? CKF_RW_SESSION : 0)
+						     ((flags & SESSION_WRITE) ? CKF_RW_SESSION : 0)
 						     | CKF_SERIAL_SESSION,
 						     NULL, NULL, &pks);
 			if (rv != CKR_OK) {
@@ -1029,9 +1027,7 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			if (flags & SESSION_LOGIN) {
 				ret =
 				    pkcs11_login(&sinfo, pin_info, &tinfo,
-						 info,
-						 (flags & SESSION_SO) ? 1 :
-						 0);
+						 info, (flags & SESSION_SO) ? 1 :	 0);
 				if (ret < 0) {
 					gnutls_assert();
 					return ret;
@@ -1039,8 +1035,7 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			}
 
 			ret =
-			    find_func(&sinfo, &tinfo, &providers[x].info,
-				      input);
+			    find_func(&sinfo, &tinfo, &providers[x].info, input);
 
 			if (ret == 0) {
 				found = 1;
@@ -1155,55 +1150,59 @@ pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
 	return 0;
 }
 
+#define MAX_PK_PARAM_SIZE 2048
+
 int pkcs11_read_pubkey(struct ck_function_list *module,
 		       ck_session_handle_t pks, ck_object_handle_t obj,
 		       ck_key_type_t key_type, gnutls_datum_t * pubkey)
 {
 	struct ck_attribute a[4];
-	uint8_t tmp1[2048];
-	uint8_t tmp2[2048];
+	uint8_t *tmp1;
+	uint8_t *tmp2 = NULL;
+	size_t tmp1_size, tmp2_size;
 	int ret;
+	
+	tmp1_size = tmp2_size = MAX_PK_PARAM_SIZE;
+	tmp1 = gnutls_malloc(tmp1_size);
+	if (tmp1 == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	tmp2 = gnutls_malloc(tmp2_size);
+	if (tmp2 == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto cleanup;
+	}
 
 	switch (key_type) {
 	case CKK_RSA:
 		a[0].type = CKA_MODULUS;
 		a[0].value = tmp1;
-		a[0].value_len = sizeof(tmp1);
+		a[0].value_len = tmp1_size;
 		a[1].type = CKA_PUBLIC_EXPONENT;
 		a[1].value = tmp2;
-		a[1].value_len = sizeof(tmp2);
+		a[1].value_len = tmp2_size;
 
 		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
 		    CKR_OK) {
 
-			ret =
-			    _gnutls_set_datum(&pubkey[0],
-					      a[0].value, a[0].value_len);
+			pubkey[0].data = a[0].value;
+			pubkey[0].size = a[0].value_len;
 
-			if (ret >= 0)
-				ret =
-				    _gnutls_set_datum(&pubkey
-						      [1], a[1].value,
-						      a[1].value_len);
-
-			if (ret < 0) {
-				gnutls_assert();
-				_gnutls_free_datum(&pubkey[1]);
-				_gnutls_free_datum(&pubkey[0]);
-				return GNUTLS_E_MEMORY_ERROR;
-			}
+			pubkey[1].data = a[1].value;
+			pubkey[1].size = a[1].value_len;
 		} else {
 			gnutls_assert();
-			return GNUTLS_E_PKCS11_ERROR;
+			ret = GNUTLS_E_PKCS11_ERROR;
+			goto cleanup;
 		}
 		break;
 	case CKK_DSA:
 		a[0].type = CKA_PRIME;
 		a[0].value = tmp1;
-		a[0].value_len = sizeof(tmp1);
+		a[0].value_len = tmp1_size;
 		a[1].type = CKA_SUBPRIME;
 		a[1].value = tmp2;
-		a[1].value_len = sizeof(tmp2);
+		a[1].value_len = tmp2_size;
 
 		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
 		    CKR_OK) {
@@ -1221,82 +1220,71 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 				gnutls_assert();
 				_gnutls_free_datum(&pubkey[1]);
 				_gnutls_free_datum(&pubkey[0]);
-				return GNUTLS_E_MEMORY_ERROR;
+				ret = GNUTLS_E_MEMORY_ERROR;
+				goto cleanup;
 			}
 		} else {
 			gnutls_assert();
-			return GNUTLS_E_PKCS11_ERROR;
+			ret = GNUTLS_E_PKCS11_ERROR;
+			goto cleanup;
 		}
 
 		a[0].type = CKA_BASE;
 		a[0].value = tmp1;
-		a[0].value_len = sizeof(tmp1);
+		a[0].value_len = tmp1_size;
 		a[1].type = CKA_VALUE;
 		a[1].value = tmp2;
-		a[1].value_len = sizeof(tmp2);
+		a[1].value_len = tmp2_size;
 
 		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
 		    CKR_OK) {
-			ret =
-			    _gnutls_set_datum(&pubkey[2], a[0].value,
-					      a[0].value_len);
+			pubkey[2].data = a[0].value;
+			pubkey[2].size = a[0].value_len;
 
-			if (ret >= 0)
-				ret =
-				    _gnutls_set_datum(&pubkey
-						      [3], a[1].value,
-						      a[1].value_len);
+			pubkey[3].data = a[1].value;
+			pubkey[3].size = a[1].value_len;
 
-			if (ret < 0) {
-				gnutls_assert();
-				_gnutls_free_datum(&pubkey[0]);
-				_gnutls_free_datum(&pubkey[1]);
-				_gnutls_free_datum(&pubkey[2]);
-				_gnutls_free_datum(&pubkey[3]);
-				return GNUTLS_E_MEMORY_ERROR;
-			}
 		} else {
 			gnutls_assert();
-			return GNUTLS_E_PKCS11_ERROR;
+			ret = GNUTLS_E_PKCS11_ERROR;
+			goto cleanup;
 		}
 		break;
 	case CKK_ECDSA:
 		a[0].type = CKA_EC_PARAMS;
 		a[0].value = tmp1;
-		a[0].value_len = sizeof(tmp1);
+		a[0].value_len = tmp1_size;
 		a[1].type = CKA_EC_POINT;
 		a[1].value = tmp2;
-		a[1].value_len = sizeof(tmp2);
+		a[1].value_len = tmp2_size;
 
 		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
 		    CKR_OK) {
-			ret =
-			    _gnutls_set_datum(&pubkey[0], a[0].value,
-					      a[0].value_len);
 
-			if (ret >= 0)
-				ret =
-				    _gnutls_set_datum(&pubkey
-						      [1], a[1].value,
-						      a[1].value_len);
+			pubkey[0].data = a[0].value;
+			pubkey[0].size = a[0].value_len;
 
-			if (ret < 0) {
-				gnutls_assert();
-				_gnutls_free_datum(&pubkey[1]);
-				_gnutls_free_datum(&pubkey[0]);
-				return GNUTLS_E_MEMORY_ERROR;
-			}
+			pubkey[1].data = a[1].value;
+			pubkey[1].size = a[1].value_len;
 		} else {
 			gnutls_assert();
-			return GNUTLS_E_PKCS11_ERROR;
+			ret = GNUTLS_E_PKCS11_ERROR;
+			goto cleanup;
 		}
 
 		break;
 	default:
-		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+		goto cleanup;
 	}
 
 	return 0;
+
+cleanup:
+	gnutls_free(tmp1);
+	gnutls_free(tmp2);
+	
+	return ret;
 }
 
 static int

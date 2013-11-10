@@ -322,7 +322,7 @@ decode_ber_digest_info(const gnutls_datum_t * info,
 {
 	ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
 	int result;
-	char str[1024];
+	char str[MAX(MAX_OID_SIZE, MAX_HASH_SIZE)];
 	int len;
 
 	if ((result = asn1_create_element(_gnutls_get_gnutls_asn(),

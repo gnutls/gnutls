@@ -198,8 +198,8 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
  */
 static int is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 {
-	uint8_t id1[512];
-	uint8_t id2[512];
+	uint8_t id1[MAX_KEY_ID_SIZE];
+	uint8_t id2[MAX_KEY_ID_SIZE];
 	size_t id1_size;
 	size_t id2_size;
 	int ret;

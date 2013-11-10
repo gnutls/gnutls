@@ -3401,24 +3401,17 @@ gnutls_x509_crt_list_import2(gnutls_x509_crt_t ** certs,
 
 static int check_if_sorted(gnutls_x509_crt_t * crt, int nr)
 {
-	char prev_dn[MAX_DN];
-	char dn[MAX_DN];
-	size_t prev_dn_size, dn_size;
+	void *prev_dn = NULL;
+	void *dn;
+	size_t prev_dn_size = 0, dn_size;
 	int i, ret;
 
 	/* check if the X.509 list is ordered */
 	if (nr > 1) {
-
 		for (i = 0; i < nr; i++) {
 			if (i > 0) {
-				dn_size = sizeof(dn);
-				ret =
-				    gnutls_x509_crt_get_dn(crt[i], dn,
-							   &dn_size);
-				if (ret < 0) {
-					ret = gnutls_assert_val(ret);
-					goto cleanup;
-				}
+				dn = crt[i]->raw_dn.data;
+				dn_size = crt[i]->raw_dn.size;
 
 				if (dn_size != prev_dn_size
 				    || memcmp(dn, prev_dn, dn_size) != 0) {
@@ -3429,20 +3422,13 @@ static int check_if_sorted(gnutls_x509_crt_t * crt, int nr)
 				}
 			}
 
-			prev_dn_size = sizeof(prev_dn);
-			ret =
-			    gnutls_x509_crt_get_issuer_dn(crt[i], prev_dn,
-							  &prev_dn_size);
-			if (ret < 0) {
-				ret = gnutls_assert_val(ret);
-				goto cleanup;
-			}
+			prev_dn = crt[i]->raw_issuer_dn.data;
+			prev_dn_size = crt[i]->raw_issuer_dn.size;
 		}
 	}
-
 	ret = 0;
 
-      cleanup:
+cleanup:
 	return ret;
 }
 

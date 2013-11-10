@@ -119,7 +119,8 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session, char *username,
 {
 	gnutls_psk_server_credentials_t cred;
 	FILE *fd;
-	char line[2 * 1024];
+	char *line = NULL;
+	size_t line_size = 0;
 	unsigned i, len;
 	int ret;
 
@@ -169,36 +170,41 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session, char *username,
 	}
 
 	len = strlen(username);
-	while (fgets(line, sizeof(line), fd) != NULL) {
+	while (getline(&line, &line_size, fd) > 0) {
 		/* move to first ':' */
 		i = 0;
 		while ((line[i] != ':') && (line[i] != '\0')
-		       && (i < sizeof(line))) {
+		       && (i < line_size)) {
 			i++;
 		}
 
 		if (strncmp(username, line, MAX(i, len)) == 0) {
 			ret = pwd_put_values(psk, line);
-			fclose(fd);
 			if (ret < 0) {
 				gnutls_assert();
-				return GNUTLS_E_SRP_PWD_ERROR;
+				ret = GNUTLS_E_SRP_PWD_ERROR;
+				goto cleanup;
 			}
 			return 0;
 		}
 	}
-	fclose(fd);
 
 	/* user was not found. Fake him. 
 	 * the last index found and randomize the entry.
 	 */
 	ret = _randomize_psk(psk);
 	if (ret < 0) {
-		gnutls_assert();
+		goto cleanup;
 		return ret;
 	}
 
-	return 0;
+	ret = 0;
+cleanup:
+	if (fd != NULL)
+		fclose(fd);
+	free(line);
+
+	return ret;
 
 }
 

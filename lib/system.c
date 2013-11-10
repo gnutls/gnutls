@@ -29,8 +29,6 @@
 #include <sys/types.h>
 #include <c-ctype.h>
 
-#define GNUTLS_PATH_MAX 1024
-
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>
@@ -314,50 +312,42 @@ void gnutls_system_global_deinit()
  */
 int _gnutls_find_config_path(char *path, size_t max_size)
 {
-	char tmp_home_dir[GNUTLS_PATH_MAX];
 	const char *home_dir = getenv("HOME");
 
+	if (home_dir != NULL && home_dir[0] != 0) {
+		snprintf(path, max_size, "%s/" CONFIG_PATH, home_dir);
+		return 0;
+	}
+
 #ifdef _WIN32
-	if (home_dir == NULL || home_dir[0] == '\0') {
+	while(0) {
 		const char *home_drive = getenv("HOMEDRIVE");
 		const char *home_path = getenv("HOMEPATH");
 
 		if (home_drive != NULL && home_path != NULL) {
-			snprintf(tmp_home_dir, sizeof(tmp_home_dir),
-				 "%s%s", home_drive, home_path);
+			snprintf(path, max_size, "%s%s/" CONFIG_PATH, home_drive, home_path);
 		} else {
-			tmp_home_dir[0] = 0;
+			path[0] = 0;
 		}
-
-		home_dir = tmp_home_dir;
 	}
 #elif defined(HAVE_GETPWUID_R)
-	if (home_dir == NULL || home_dir[0] == '\0') {
+	while(0) {
 		struct passwd *pwd;
 		struct passwd _pwd;
-		char buf[1024];
+		char tmp[512];
 
-		getpwuid_r(getuid(), &_pwd, buf, sizeof(buf), &pwd);
+		getpwuid_r(getuid(), &_pwd, tmp, sizeof(tmp), &pwd);
 		if (pwd != NULL) {
-			snprintf(tmp_home_dir, sizeof(tmp_home_dir), "%s",
-				 pwd->pw_dir);
+			snprintf(path, max_size, "%s/" CONFIG_PATH, pwd->pw_dir);
 		} else {
-			tmp_home_dir[0] = 0;
+			path[0] = 0;
 		}
-
-		home_dir = tmp_home_dir;
 	}
 #else
-	if (home_dir == NULL || home_dir[0] == '\0') {
-		tmp_home_dir[0] = 0;
-		home_dir = tmp_home_dir;
+	while(0) {
+			path[0] = 0;
 	}
 #endif
-
-	if (home_dir == NULL || home_dir[0] == 0)
-		path[0] = 0;
-	else
-		snprintf(path, max_size, "%s/" CONFIG_PATH, home_dir);
 
 	return 0;
 }
