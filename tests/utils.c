@@ -51,8 +51,7 @@ void fail(const char *format, ...)
 	va_end(arg_ptr);
 	fputs(str, stderr);
 	error_count++;
-	if (break_on_error)
-		exit(1);
+	exit(1);
 }
 
 void success(const char *format, ...)
