@@ -7,6 +7,10 @@ and security modules.
 
 To use PKCS #11 tokens with gnutls the configuration file 
 /etc/gnutls/pkcs11.conf has to exist and contain a number of lines of the form 'load=/usr/lib/opensc-pkcs11.so'.
+Alternatively the p11-kit configuration files have to be setup.
+
+To provide the PIN for all the operations below use the environment variable
+GNUTLS_PKCS11_PIN.
 ";
 
 short-usage   = "p11tool [options] [url]\np11tool --help for usage instructions.\n";

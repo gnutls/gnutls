@@ -961,7 +961,7 @@ pin_callback(void *user, int attempt, const char *token_url,
 	     const char *token_label, unsigned int flags, char *pin,
 	     size_t pin_max)
 {
-	const char *password;
+	const char *password = NULL;
 	const char *desc;
 	int cache = MAX_CACHE_TRIES;
 	unsigned len;
@@ -1007,8 +1007,18 @@ pin_callback(void *user, int attempt, const char *token_url,
 
 	printf("Token '%s' with URL '%s' ", token_label, token_url);
 	printf("requires %s PIN\n", desc);
+	
+	password = getenv("GNUTLS_PKCS11_PIN");
 
-	password = getpass("Enter PIN: ");
+	if (password == NULL)
+		password = getpass("Enter PIN: ");
+	else {
+		if (flags & GNUTLS_PIN_WRONG) {
+			fprintf(stderr, "Cannot continue with a wrong password in the environment.\n");
+			exit(1);
+		}
+	}
+
 	if (password == NULL || password[0] == 0) {
 		fprintf(stderr, "No password given\n");
 		exit(1);
