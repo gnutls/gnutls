@@ -981,8 +981,8 @@ _gnutls_x509_decode_string(unsigned int etype,
 /* Reads a value from an ASN1 tree, and puts the output
  * in an allocated variable in the given datum.
  *
- * Note that this function always places allocates one plus
- * the required data size (to allow for a null byte).
+ * Note that this function always allocates one plus
+ * the required data size (and places a null byte).
  */
 int
 _gnutls_x509_read_value(ASN1_TYPE c, const char *root,

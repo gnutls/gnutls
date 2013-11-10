@@ -38,10 +38,9 @@ get_extension(ASN1_TYPE asn, const char *root,
 {
 	int k, result, len;
 	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
-	char str[1024];
 	char str_critical[10];
 	int critical = 0;
-	char extnID[128];
+	char extnID[MAX_OID_SIZE];
 	gnutls_datum_t value;
 	int indx_counter = 0;
 
@@ -54,23 +53,36 @@ get_extension(ASN1_TYPE asn, const char *root,
 
 		snprintf(name, sizeof(name), "%s.?%u", root, k);
 
-		len = sizeof(str) - 1;
-		result = asn1_read_value(asn, name, str, &len);
+		_gnutls_str_cpy(name2, sizeof(name2), name);
+		_gnutls_str_cat(name2, sizeof(name2), ".extnID");
 
-		/* move to next
-		 */
+		len = sizeof(extnID) - 1;
+		result = asn1_read_value(asn, name2, extnID, &len);
 
 		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			gnutls_assert();
 			break;
+		} else if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
 		}
 
-		do {
+		/* Handle Extension 
+		 */
+		if (strcmp(extnID, extension_id) == 0
+		    && indx == indx_counter++) {
+			/* extension was found 
+			 */
 
+			/* read the critical status.
+			 */
 			_gnutls_str_cpy(name2, sizeof(name2), name);
-			_gnutls_str_cat(name2, sizeof(name2), ".extnID");
+			_gnutls_str_cat(name2, sizeof(name2), ".critical");
 
-			len = sizeof(extnID) - 1;
-			result = asn1_read_value(asn, name2, extnID, &len);
+			len = sizeof(str_critical);
+			result =
+			    asn1_read_value(asn, name2,
+					    str_critical, &len);
 
 			if (result == ASN1_ELEMENT_NOT_FOUND) {
 				gnutls_assert();
@@ -80,65 +92,32 @@ get_extension(ASN1_TYPE asn, const char *root,
 				return _gnutls_asn2err(result);
 			}
 
-			/* Handle Extension 
+			if (str_critical[0] == 'T')
+				critical = 1;
+			else
+				critical = 0;
+
+			/* read the value.
 			 */
-			if (strcmp(extnID, extension_id) == 0
-			    && indx == indx_counter++) {
-				/* extension was found 
-				 */
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2),
+					".extnValue");
 
-				/* read the critical status.
-				 */
-				_gnutls_str_cpy(name2, sizeof(name2),
-						name);
-				_gnutls_str_cat(name2, sizeof(name2),
-						".critical");
-
-				len = sizeof(str_critical);
-				result =
-				    asn1_read_value(asn, name2,
-						    str_critical, &len);
-
-				if (result == ASN1_ELEMENT_NOT_FOUND) {
-					gnutls_assert();
-					break;
-				} else if (result != ASN1_SUCCESS) {
-					gnutls_assert();
-					return _gnutls_asn2err(result);
-				}
-
-				if (str_critical[0] == 'T')
-					critical = 1;
-				else
-					critical = 0;
-
-				/* read the value.
-				 */
-				_gnutls_str_cpy(name2, sizeof(name2),
-						name);
-				_gnutls_str_cat(name2, sizeof(name2),
-						".extnValue");
-
-				result =
-				    _gnutls_x509_read_value(asn, name2,
-							    &value);
-				if (result < 0) {
-					gnutls_assert();
-					return result;
-				}
-
-				ret->data = value.data;
-				ret->size = value.size;
-
-				if (_critical)
-					*_critical = critical;
-
-				return 0;
+			result =
+			    _gnutls_x509_read_value(asn, name2, &value);
+			if (result < 0) {
+				gnutls_assert();
+				return result;
 			}
 
+			ret->data = value.data;
+			ret->size = value.size;
 
+			if (_critical)
+				*_critical = critical;
+
+			return 0;
 		}
-		while (0);
 	}
 	while (1);
 
@@ -192,8 +171,7 @@ get_extension_oid(ASN1_TYPE asn, const char *root,
 {
 	int k, result, len;
 	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
-	char str[1024];
-	char extnID[128];
+	char extnID[MAX_OID_SIZE];
 	int indx_counter = 0;
 
 	k = 0;
@@ -202,53 +180,38 @@ get_extension_oid(ASN1_TYPE asn, const char *root,
 
 		snprintf(name, sizeof(name), "%s.?%u", root, k);
 
-		len = sizeof(str) - 1;
-		result = asn1_read_value(asn, name, str, &len);
+		_gnutls_str_cpy(name2, sizeof(name2), name);
+		_gnutls_str_cat(name2, sizeof(name2), ".extnID");
 
-		/* move to next
-		 */
+		len = sizeof(extnID) - 1;
+		result = asn1_read_value(asn, name2, extnID, &len);
 
 		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			gnutls_assert();
 			break;
+		} else if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
 		}
 
-		do {
+		/* Handle Extension 
+		 */
+		if (indx == indx_counter++) {
+			len = strlen(extnID) + 1;
 
-			_gnutls_str_cpy(name2, sizeof(name2), name);
-			_gnutls_str_cat(name2, sizeof(name2), ".extnID");
-
-			len = sizeof(extnID) - 1;
-			result = asn1_read_value(asn, name2, extnID, &len);
-
-			if (result == ASN1_ELEMENT_NOT_FOUND) {
+			if (*sizeof_oid < (unsigned) len) {
+				*sizeof_oid = len;
 				gnutls_assert();
-				break;
-			} else if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				return _gnutls_asn2err(result);
+				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
 
-			/* Handle Extension 
-			 */
-			if (indx == indx_counter++) {
-				len = strlen(extnID) + 1;
+			memcpy(oid, extnID, len);
+			*sizeof_oid = len - 1;
 
-				if (*sizeof_oid < (unsigned) len) {
-					*sizeof_oid = len;
-					gnutls_assert();
-					return
-					    GNUTLS_E_SHORT_MEMORY_BUFFER;
-				}
-
-				memcpy(oid, extnID, len);
-				*sizeof_oid = len - 1;
-
-				return 0;
-			}
-
-
+			return 0;
 		}
-		while (0);
+
+
 	}
 	while (1);
 
@@ -398,7 +361,7 @@ set_extension(ASN1_TYPE asn, const char *root,
 	int result;
 	int k, len;
 	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
-	char extnID[128];
+	char extnID[MAX_OID_SIZE];
 
 	/* Find the index of the given extension.
 	 */
