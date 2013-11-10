@@ -265,6 +265,7 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_ALPN = 16,
 	GNUTLS_EXTENSION_SESSION_TICKET = 35,
 	GNUTLS_EXTENSION_NEW_RECORD_PADDING = 48015,	/* aka: 0xbeaf */
+	GNUTLS_EXTENSION_DUMBFW = 48016,
 	GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
 } extensions_t;
 
@@ -634,6 +635,7 @@ struct gnutls_priority_st {
 	unsigned int allow_large_records:1;
 	unsigned int new_record_padding:1;
 	unsigned int max_empty_records;
+	unsigned int dumbfw;
 	safe_renegotiation_t sr;
 	unsigned int ssl3_record_version:1;
 	unsigned int server_precedence:1;

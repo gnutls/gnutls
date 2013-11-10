@@ -992,6 +992,9 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			if (strcasecmp(&broken_list[i][1], "COMPAT") == 0) {
 				ENABLE_COMPAT((*priority_cache));
 			} else
+			  if (strcasecmp(&broken_list[i][1], "DUMBFW") == 0) {
+				(*priority_cache)->dumbfw = 1;
+			} else
 			    if (strcasecmp
 				(&broken_list[i][1],
 				 "NO_EXTENSIONS") == 0) {

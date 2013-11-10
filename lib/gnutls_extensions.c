@@ -41,6 +41,7 @@
 #include <ext/status_request.h>
 #include <ext/srtp.h>
 #include <ext/alpn.h>
+#include <ext/dumbfw.h>
 #include <ext/new_record_padding.h>
 #include <gnutls_num.h>
 
@@ -367,6 +368,10 @@ int _gnutls_ext_init(void)
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 #endif
+
+	ret = _gnutls_ext_register(&ext_mod_dumbfw);
+	if (ret != GNUTLS_E_SUCCESS)
+		return ret;
 
 	return GNUTLS_E_SUCCESS;
 }
