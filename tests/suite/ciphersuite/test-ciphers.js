@@ -31,6 +31,7 @@ include('./registry-ciphers.js');
     }
     if (cs.name !== i) {
       console.log("Name doesn't match index:", cs.name, i);
+      process.exit(1);
     }
     if (!registry_ciphersuites[cs.id]) {
       if (cipher.match(/SALSA20/)) {
@@ -45,7 +46,10 @@ include('./registry-ciphers.js');
       }
     } else if (registry_ciphersuites[cs.id] !== cs.name) {
       console.log("Name doesn't match official name for id:", cs.name, registry_ciphersuites[cs.id], cs.id);
+      process.exit(1);
     }
   }
+  
+  process.exit(0);
 
 })();
