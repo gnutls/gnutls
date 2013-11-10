@@ -1008,7 +1008,7 @@ pin_callback(void *user, int attempt, const char *token_url,
 	printf("Token '%s' with URL '%s' ", token_label, token_url);
 	printf("requires %s PIN\n", desc);
 	
-	password = getenv("GNUTLS_PKCS11_PIN");
+	password = getenv("GNUTLS_PIN");
 
 	if (password == NULL)
 		password = getpass("Enter PIN: ");

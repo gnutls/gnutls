@@ -63,7 +63,7 @@ if test x"$TOKEN" = x;then
 	exit 1
 fi
 
-export GNUTLS_PKCS11_PIN=1234
+export GNUTLS_PIN=1234
 
 echo -n "* Writing a client private key... "
 $P11TOOL --login --write --label gnutls-client2 --load-privkey $srcdir/pkcs11-certs/client.key "$TOKEN" >/dev/null 2>&1
