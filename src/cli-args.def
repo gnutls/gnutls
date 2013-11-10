@@ -388,6 +388,37 @@ Compression: COMP-NULL
 Elliptic curves: CURVE-SECP384R1, CURVE-SECP521R1
 PK-signatures: SIGN-RSA-SHA384, SIGN-ECDSA-SHA384, SIGN-RSA-SHA512, SIGN-ECDSA-SHA512
 @end example
+
+@subheading Connecting using a PKCS #11 token
+To connect to a server using a certificate and a private key present in a PKCS #11 token you 
+need to substitute the PKCS 11 URLs in the x509certfile and x509keyfile parameters.
+
+Those can be found using "p11tool --list-tokens" and then listing all the objects in the
+needed token, and using the appropriate.
+@example
+$ p11tool --list-tokens
+
+Token 0:
+	URL: pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test
+	Label: Test
+	Manufacturer: EnterSafe
+	Model: PKCS15
+	Serial: 1234
+
+$ p11tool --login --list-certs "pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test"
+
+Object 0:
+	URL: pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;object-type=cert
+	Type: X.509 Certificate
+	Label: client
+	ID: 2a:97:0d:58:d1:51:3c:23:07:ae:4e:0d:72:26:03:7d:99:06:02:6a
+
+$ export MYCERT="pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;object-type=cert"
+$ export MYKEY="pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;object-type=private"
+
+$ gnutls-cli www.example.com --x509keyfile $MYKEY --x509certfile MYCERT
+@end example
+Notice that the private key only differs from the certificate in the object-type.
 _EOF_;
 };
 
