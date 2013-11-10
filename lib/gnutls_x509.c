@@ -858,6 +858,12 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 
 	/* Try to load the whole certificate chain from the PKCS #11 token */
 	for (i=0;i<MAX_PKCS11_CERT_CHAIN;i++) {
+                ret = gnutls_x509_crt_check_issuer(crt, crt);
+                if (i > 0 && ret != 0) {
+                        /* self signed */
+                        break;
+                }
+
 		ret = gnutls_pcert_import_x509(&ccert[i], crt, 0);
 		gnutls_x509_crt_deinit(crt);
 

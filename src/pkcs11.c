@@ -274,7 +274,6 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int login,
         
         do {
                 ret = gnutls_pkcs11_get_raw_issuer(url, xcrt, &t, GNUTLS_X509_FMT_PEM, 0);
-
         	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 	                break;
         	if (ret < 0) {
@@ -303,6 +302,12 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int login,
                 }
 
                 gnutls_free(t.data);
+                
+                ret = gnutls_x509_crt_check_issuer(xcrt, xcrt);
+                if (ret != 0) {
+                        /* self signed */
+                        break;
+                }
                 
         } while(1);
         
