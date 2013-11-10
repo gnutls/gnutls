@@ -1,0 +1,176 @@
+#!/bin/sh
+
+# Copyright (C) 2013 Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+srcdir="${srcdir:-.}"
+P11TOOL="${P11TOOL:-../../src/p11tool$EXEEXT}"
+CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+DIFF="${DIFF:-diff -b -B}"
+SERV="${SERV:-../../src/gnutls-serv$EXEEXT} -q"
+CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
+PORT="${PORT:-5558}"
+unset RETCODE
+
+if test "${WINDIR}" != "";then
+  exit 77
+fi 
+
+. $srcdir/../scripts/common.sh
+
+echo "Testing PKCS11 support"
+
+# erase SC
+echo -n "* Erasing smart card... "
+pkcs15-init -E >/dev/null 2>&1
+if test $? == 0;then
+  echo ok
+else
+  echo failed
+  exit 1
+fi
+
+echo -n "* Initializing smart card... "
+pkcs15-init --create-pkcs15 --profile pkcs15+onepin --use-default-transport-key --so-pin 1234 --pin 1234 --puk 111111 --label "GnuTLS-Test" >/dev/null 2>&1
+if test $? == 0;then
+  echo ok
+else
+  echo failed
+  exit 1
+fi
+
+# find token name
+TOKEN=`$P11TOOL --list-tokens pkcs11:token=Nikos|grep URL|grep token=GnuTLS-Test|sed 's/\s*URL\: //g'`
+
+echo "* Token: $TOKEN"
+if test x"$TOKEN" = x;then
+	echo "Could not find generated token"
+	exit 1
+fi
+
+export GNUTLS_PKCS11_PIN=1234
+
+echo -n "* Writing a client private key... "
+$P11TOOL --login --write --label gnutls-client2 --load-privkey $srcdir/pkcs11-certs/client.key "$TOKEN" >/dev/null 2>&1
+if test $? == 0;then
+  echo ok
+else
+  echo failed
+  exit 1
+fi
+
+echo -n "* Generating client private key... "
+$P11TOOL --login --label gnutls-client --generate-rsa --bits 1024 "$TOKEN" >tmp-client.pub 2>&1
+if test $? == 0;then
+  echo ok
+else
+  echo failed
+  exit 1
+fi
+
+echo -n "* Generating client certificate... "
+$CERTTOOL --generate-certificate --load-ca-privkey $srcdir/pkcs11-certs/ca.key --load-ca-certificate $srcdir/pkcs11-certs/ca.crt \
+	--template $srcdir/pkcs11-certs/client-tmpl --load-privkey "$TOKEN;object=gnutls-client;object-type=private" \
+	--load-pubkey tmp-client.pub > tmp-client.crt 2>/dev/null
+if test $? == 0;then
+  echo ok
+else
+  echo failed
+  exit 1
+fi
+
+echo -n "* Writing client certificate... "
+$P11TOOL --login --write --label gnutls-client --load-certificate tmp-client.crt "$TOKEN" >/dev/null 2>&1
+if test $? == 0;then
+  echo ok
+else
+  echo failed
+  exit 1
+fi
+
+echo -n "* Writing certificate of client's CA... "
+$P11TOOL --login --write --label gnutls-ca --load-certificate $srcdir/pkcs11-certs/ca.crt "$TOKEN" >/dev/null 2>&1
+if test $? == 0;then
+  echo ok
+else
+  echo failed
+  exit 1
+fi
+
+echo -n "* Trying to obtain back the cert... "
+$P11TOOL --export "$TOKEN;object=gnutls-ca;object-type=cert" >crt1.tmp 2>/dev/null
+$DIFF crt1.tmp $srcdir/pkcs11-certs/ca.crt
+if [ $? != 0 ];then
+	echo "failed. Exported certificate differs!"
+	exit 1
+fi
+rm -f crt1.tmp
+if test $? == 0;then
+  echo ok
+else
+  echo failed
+  exit 1
+fi
+
+echo -n "* Trying to obtain the full chain... "
+$P11TOOL --export-chain "$TOKEN;object=gnutls-client;object-type=cert"|$CERTTOOL -i >crt1.tmp 2>/dev/null
+
+cat tmp-client.crt $srcdir/pkcs11-certs/ca.crt|$CERTTOOL -i >crt2.tmp
+$DIFF crt1.tmp crt2.tmp
+if [ $? != 0 ];then
+	echo "failed. Exported certificate chain differs!"
+	exit 1
+fi
+rm -f crt1.tmp crt2.tmp
+if test $? == 0;then
+  echo ok
+else
+  echo failed
+  exit 1
+fi
+
+echo -n "* Trying using PKCS #11 with gnutls-cli... "
+# start server
+launch_server $$ --echo --priority NORMAL --x509certfile=$srcdir/pkcs11-certs/server.crt \
+	--x509keyfile=$srcdir/pkcs11-certs/server.key --x509cafile=$srcdir/pkcs11-certs/ca.crt \
+	--require-client-cert >/dev/null 2>&1 &
+PID=$!
+wait_server $PID
+
+# connect to server using SC
+$CLI -p $PORT localhost --priority NORMAL --x509cafile=$srcdir/pkcs11-certs/ca.crt </dev/null >/dev/null 2>&1 && \
+  fail $PID "Connection should have failed!"
+
+$CLI -p $PORT localhost --priority NORMAL --x509certfile=$srcdir/pkcs11-certs/client.crt \
+	--x509keyfile=$srcdir/pkcs11-certs/client.key --x509cafile=$srcdir/pkcs11-certs/ca.crt </dev/null >/dev/null 2>&1 || \
+  fail $PID "Connection (with files) should have succeeded!"
+
+$CLI -p $PORT localhost --priority NORMAL --x509certfile="$TOKEN;object=gnutls-client;object-type=cert" \
+	--x509keyfile="$TOKEN;object=gnutls-client;object-type=private" \
+	--x509cafile=$srcdir/pkcs11-certs/ca.crt </dev/null >/dev/null 2>&1 || \
+  fail $PID "Connection (with SC) should have succeeded!"
+
+kill $PID
+wait
+
+echo ok
+
+echo "* All smart cards tests succeeded"
+rm -f tmp-client.crt tmp-client.pub
+
+exit 0
