@@ -17,6 +17,8 @@ looking in unrelated to the object tokens.
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
 
+** tools: The environment variable GNUTLS_PKCS11_PIN can be used to read the PIN.
+
 ** API and ABI modifications:
 gnutls_pkcs11_obj_export3: Added
 gnutls_pkcs11_get_raw_issuer: Added
