@@ -6,7 +6,7 @@ See the end for copying conditions.
 * Version 3.2.7 (unreleased)
 
 ** libgnutls: gnutls_cipher_get_iv_size() now returns the correct IV size in
-GCM ciphers.
+GCM ciphers (previously it returned the implicit IV used in TLS).
 
 ** libgnutls: gnutls_certificate_set_x509_key_file() et al when provided a
 PKCS #11 URL with a certificate, will attempt to load the whole chain.
