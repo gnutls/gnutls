@@ -24,7 +24,10 @@ SUBDIRS += crywrap
 endif
 
 if NEED_LIBOPTS
+LIBOPTS = ../libopts/libopts.a
 SUBDIRS += libopts
+else
+LIBOPTS = $(LIBOPTS_LDADD)
 endif
 
 EXTRA_DIST = args-std.def
@@ -67,7 +70,7 @@ noinst_LTLIBRARIES =
 if ENABLE_SRP
 srptool_SOURCES = srptool.c
 srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la ../gl/libgnu.la 
-srptool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+srptool_LDADD += $(LIBOPTS) $(LTLIBINTL)
 noinst_LTLIBRARIES += libcmd-srp.la
 libcmd_srp_la_CFLAGS =
 libcmd_srp_la_SOURCES = srptool-args.def srptool-args.c srptool-args.h
@@ -75,7 +78,7 @@ endif
 
 psktool_SOURCES = psk.c
 psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la ../gl/libgnu.la 
-psktool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+psktool_LDADD += $(LIBOPTS) $(LTLIBINTL)
 noinst_LTLIBRARIES += libcmd-psk.la
 libcmd_psk_la_CFLAGS = 
 libcmd_psk_la_SOURCES = psk-args.def psk-args.c psk-args.h
@@ -86,7 +89,7 @@ if ENABLE_OCSP
 ocsptool_SOURCES = ocsptool.c ocsptool-common.h ocsptool-common.c \
 	socket.c socket.h
 ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la 
-ocsptool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL) $(GETADDRINFO_LIB)
+ocsptool_LDADD += $(LIBOPTS) $(LTLIBINTL) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-ocsp.la
 libcmd_ocsp_la_CFLAGS =
 libcmd_ocsp_la_SOURCES = ocsptool-args.def ocsptool-args.h ocsptool-args.c
@@ -99,7 +102,7 @@ gnutls_serv_SOURCES =		\
   certtool-common.h 
 gnutls_serv_LDADD = ../lib/libgnutls.la
 gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
-gnutls_serv_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+gnutls_serv_LDADD += $(LIBOPTS) $(LTLIBINTL)
 gnutls_serv_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_CFLAGS =
@@ -116,7 +119,7 @@ gnutls_cli_LDADD = ../lib/libgnutls.la
 if ENABLE_DANE
 gnutls_cli_LDADD += ../libdane/libgnutls-dane.la
 endif
-gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS_LDADD) $(LTLIBINTL)
+gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS) $(LTLIBINTL)
 gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME) \
 	 $(SERVENT_LIB)
 noinst_LTLIBRARIES += libcmd-cli.la
@@ -129,7 +132,7 @@ gnutls_cli_debug_SOURCES = cli-debug.c tests.h tests.c \
 		socket.c socket.h common.h common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la 
 gnutls_cli_debug_LDADD += ../gl/libgnu.la
-gnutls_cli_debug_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+gnutls_cli_debug_LDADD += $(LIBOPTS) $(LTLIBINTL)
 gnutls_cli_debug_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-cli-debug.la
 libcmd_cli_debug_la_CFLAGS =
@@ -146,7 +149,7 @@ libcmd_certtool_la_CFLAGS =
 libcmd_certtool_la_SOURCES = certtool-args.c certtool-args.def certtool-args.h	\
 	certtool-cfg.h certtool-cfg.c
 libcmd_certtool_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
-libcmd_certtool_la_LIBADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+libcmd_certtool_la_LIBADD += $(LIBOPTS) $(LTLIBINTL)
 libcmd_certtool_la_LIBADD += $(LTLIBREADLINE)
 libcmd_certtool_la_LIBADD += $(INET_PTON_LIB)
 
@@ -162,7 +165,7 @@ libcmd_danetool_la_CFLAGS =
 libcmd_danetool_la_SOURCES = danetool-args.c danetool-args.def danetool-args.h \
 	certtool-cfg.h certtool-cfg.c
 libcmd_danetool_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
-libcmd_danetool_la_LIBADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+libcmd_danetool_la_LIBADD += $(LIBOPTS) $(LTLIBINTL)
 libcmd_danetool_la_LIBADD += $(LTLIBREADLINE)
 libcmd_danetool_la_LIBADD += $(INET_PTON_LIB)
 
@@ -173,7 +176,7 @@ p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c \
 	certtool-extras.c p11tool.h common.c
 p11tool_LDADD = ../lib/libgnutls.la
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la
-p11tool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+p11tool_LDADD += $(LIBOPTS) $(LTLIBINTL)
 
 noinst_LTLIBRARIES += libcmd-p11tool.la
 libcmd_p11tool_la_CFLAGS =
@@ -189,7 +192,7 @@ if ENABLE_TROUSERS
 tpmtool_SOURCES = tpmtool-args.def tpmtool.c certtool-common.c certtool-extras.c common.c
 tpmtool_LDADD = ../lib/libgnutls.la
 tpmtool_LDADD += libcmd-tpmtool.la ../gl/libgnu.la
-tpmtool_LDADD += $(LIBOPTS_LDADD) $(LTLIBINTL)
+tpmtool_LDADD += $(LIBOPTS) $(LTLIBINTL)
 
 noinst_LTLIBRARIES += libcmd-tpmtool.la
 libcmd_tpmtool_la_CFLAGS =
