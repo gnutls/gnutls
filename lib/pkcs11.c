@@ -45,6 +45,7 @@
 struct gnutls_pkcs11_provider_s {
 	struct ck_function_list *module;
 	struct ck_info info;
+	unsigned int initialized;
 };
 
 struct flags_find_data_st {
@@ -67,6 +68,7 @@ struct crt_find_data_st {
 
 static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
+static unsigned int initialized_registered = 0;
 
 gnutls_pkcs11_token_callback_t _gnutls_token_func;
 void *_gnutls_token_data;
@@ -222,27 +224,20 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 	struct ck_function_list *module;
 	int ret;
 
-	module = p11_kit_module_load(name, P11_KIT_MODULE_CRITICAL);
-	if (module == NULL) {
+	if (p11_kit_load_initialize_module(name, &module) != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("p11: Cannot load provider %s\n", name);
 		return GNUTLS_E_PKCS11_LOAD_ERROR;
 	}
 
-	if (p11_kit_module_initialize(module) != CKR_OK) {
-		p11_kit_module_release(module);
-		gnutls_assert();
-		_gnutls_debug_log("p11: Cannot initialize provider %s\n",
-				  name);
-		return GNUTLS_E_PKCS11_LOAD_ERROR;
-	}
-
 	ret = pkcs11_add_module(name, module);
-	if (ret != 0) {
+	if (ret == 0) {
+		/* Mark this one as having been separately initialized */
+		providers[active_providers - 1].initialized = 1;
+	} else {
 		if (ret == GNUTLS_E_INT_RET_0)
 			ret = 0;
-		p11_kit_module_finalize(module);
-		p11_kit_module_release(module);
+		p11_kit_finalize_module(module);
 		gnutls_assert();
 	}
 
@@ -441,19 +436,23 @@ static int initialize_automatic_p11_kit(void)
 {
 	struct ck_function_list **modules;
 	char *name;
+	ck_rv_t rv;
 	int i, ret;
 
-	modules = p11_kit_modules_load_and_initialize(0);
-	if (modules == NULL) {
+	rv = p11_kit_initialize_registered();
+	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log
-		    ("Cannot initialize registered modules: %s\n",
-		     p11_kit_message());
-		return GNUTLS_E_PKCS11_LOAD_ERROR;
+		    ("Cannot initialize registered module: %s\n",
+		     p11_kit_strerror(rv));
+		return pkcs11_rv_to_err(rv);
 	}
 
+	initialized_registered = 1;
+
+	modules = p11_kit_registered_modules();
 	for (i = 0; modules[i] != NULL; i++) {
-		name = p11_kit_module_get_name(modules[i]);
+		name = p11_kit_registered_module_to_name(modules[i]);
 		ret = pkcs11_add_module(name, modules[i]);
 		if (ret != 0 && ret != GNUTLS_E_INT_RET_0) {
 			gnutls_assert();
@@ -463,7 +462,6 @@ static int initialize_automatic_p11_kit(void)
 		free(name);
 	}
 
-	/* Shallow free */
 	free(modules);
 	return 0;
 }
@@ -536,8 +534,8 @@ int gnutls_pkcs11_reinit(void)
 
 	for (i = 0; i < active_providers; i++) {
 		if (providers[i].module != NULL) {
-			rv = p11_kit_module_initialize(providers
-						       [i].module);
+			rv = p11_kit_initialize_module(providers[i].
+						       module);
 			if (rv != CKR_OK)
 				_gnutls_debug_log
 				    ("Cannot initialize registered module '%s': %s\n",
@@ -569,10 +567,14 @@ void gnutls_pkcs11_deinit(void)
 	}
 
 	for (i = 0; i < active_providers; i++) {
-		p11_kit_module_finalize(providers[i].module);
-		p11_kit_module_release(providers[i].module);
+		if (providers[i].initialized)
+			p11_kit_finalize_module(providers[i].module);
 	}
 	active_providers = 0;
+
+	if (initialized_registered != 0)
+		p11_kit_finalize_registered();
+	initialized_registered = 0;
 
 	gnutls_pkcs11_set_pin_function(NULL, NULL);
 	gnutls_pkcs11_set_token_function(NULL, NULL);
@@ -1004,14 +1006,16 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			}
 
 			if (info != NULL) {
-    			    if (!p11_kit_uri_match_token_info
-	    		        (info, &tinfo.tinfo)
-	    		        || !p11_kit_uri_match_module_info(info,
-							      &providers
-							      [x].info)) {
-				continue;
-                            }
-                        }
+				if (!p11_kit_uri_match_token_info
+				    (info, &tinfo.tinfo)
+				    || !p11_kit_uri_match_module_info(info,
+								      &providers
+								      [x].
+								      info))
+				{
+					continue;
+				}
+			}
 
 			rv = (module)->C_OpenSession(slots[z],
 						     ((flags &
@@ -1500,8 +1504,9 @@ find_obj_url(struct pkcs11_session_info *sinfo,
 				    pkcs11_obj_import_pubkey(sinfo->module,
 							     sinfo->pks,
 							     obj,
-							     find_data->crt,
-							     &id, &label,
+							     find_data->
+							     crt, &id,
+							     &label,
 							     &info->tinfo,
 							     lib_info);
 			} else {
@@ -2433,8 +2438,10 @@ find_objs(struct pkcs11_session_info *sinfo,
 				    pkcs11_obj_import_pubkey(sinfo->module,
 							     sinfo->pks,
 							     obj,
-							     find_data->p_list
-							     [find_data->current],
+							     find_data->
+							     p_list
+							     [find_data->
+							      current],
 							     &id, &label,
 							     &info->tinfo,
 							     lib_info);
