@@ -33,6 +33,12 @@
 #include <windows.h>		/* for Sleep */
 #endif
 
+#ifdef _POSIX_PATH_MAX
+# define GNUTLS_PATH_MAX _POSIX_PATH_MAX
+#else
+# define GNUTLS_PATH_MAX 256
+#endif
+
 int system_errno(gnutls_transport_ptr_t);
 int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms);
 
