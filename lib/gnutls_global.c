@@ -32,6 +32,7 @@
 #include <system.h>
 #include <accelerated/cryptodev.h>
 #include <accelerated/accelerated.h>
+#include <fips.h>
 
 #include "sockets.h"
 #include "gettext.h"
@@ -201,6 +202,8 @@ int gnutls_global_init(void)
 
 	if (_gnutls_init++)
 		goto out;
+
+	_gnutls_switch_fips_state(FIPS_STATE_INIT);
 		
 	e = getenv("GNUTLS_DEBUG_LEVEL");
 	if (e != NULL) {
@@ -279,8 +282,17 @@ int gnutls_global_init(void)
 #endif
 
 	_gnutls_cryptodev_init();
+	
+	if (_gnutls_fips_mode_enabled()) {
+		result = _gnutls_fips_perform_self_checks();
+		if (result < 0) {
+			gnutls_assert();
+			goto out;
+		}
+		_gnutls_switch_fips_state(FIPS_STATE_OPERATIONAL);
+	}
 
-      out:
+out:
 	return result;
 }
 

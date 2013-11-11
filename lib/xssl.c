@@ -25,6 +25,7 @@
 #include <gnutls_num.h>
 #include <gnutls/xssl.h>
 #include <auth/cert.h>
+#include <fips.h>
 #include "vasprintf.h"
 
 #include <xssl.h>
@@ -301,6 +302,8 @@ int xssl_cred_init(xssl_cred_t * c, unsigned vflags,
 int xssl_sinit(xssl_t * isb, gnutls_session_t session, unsigned int flags)
 {
 	struct xssl_st *sb;
+	
+	FAIL_IF_FIPS_ERROR;
 
 	sb = gnutls_calloc(1, sizeof(*sb));
 	if (sb == NULL)
@@ -347,6 +350,8 @@ int xssl_client_init(xssl_t * isb, const char *hostname,
 	gnutls_session_t session;
 	int ret;
 	unsigned len;
+	
+	FAIL_IF_FIPS_ERROR;
 
 	ret = gnutls_init(&session, GNUTLS_CLIENT);
 	if (ret < 0)

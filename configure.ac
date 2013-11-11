@@ -125,6 +125,16 @@ AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 AC_ARG_ENABLE(self-checks,
   AS_HELP_STRING([--enable-self-checks], [enable self checking functionality]),
     enable_self_checks=$enableval, enable_self_checks=no)
+
+AC_ARG_ENABLE(fips140-mode,
+  AS_HELP_STRING([--enable-fips140-mode], [enable FIPS140-2 mode (implies self checks)]),
+    enable_fips=$enableval, enable_fips=no)
+AM_CONDITIONAL(ENABLE_FIPS140, test "$enable_fips" = "yes")
+if [ test "$enable_fips" = "yes" ];then
+   enable_self_checks=yes
+   AC_DEFINE([ENABLE_FIPS140], 1, [Enable FIPS140-2 mode])
+fi
+
 AM_CONDITIONAL(ENABLE_SELF_CHECKS, test "$enable_self_checks" = "yes")
 if [ test "$enable_self_checks" = "yes" ];then
    AC_DEFINE([ENABLE_SELF_CHECKS], 1, [Self checks are included in the library])
@@ -729,6 +739,7 @@ if features are disabled)
   RSA-EXPORT compat:    $ac_enable_rsa_export
   Unicode support:      $ac_have_unicode
   Self checks:          $enable_self_checks
+  FIPS140 mode:         $enable_fips
 ])
 
 AC_MSG_NOTICE([Optional applications:

@@ -45,6 +45,7 @@
 #include <gnutls_extensions.h>
 #include <system.h>
 #include <random.h>
+#include <fips.h>
 #include <gnutls/dtls.h>
 
 /* These should really be static, but src/tests.c calls them.  Make
@@ -307,6 +308,8 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 {
 	int ret;
 	record_parameters_st *epoch;
+	
+	FAIL_IF_FIPS_ERROR;
 
 	*session = gnutls_calloc(1, sizeof(struct gnutls_session_int));
 	if (*session == NULL)

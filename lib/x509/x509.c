@@ -44,7 +44,11 @@
  **/
 int gnutls_x509_crt_init(gnutls_x509_crt_t * cert)
 {
-	gnutls_x509_crt_t tmp =
+	gnutls_x509_crt_t tmp;
+	
+	FAIL_IF_FIPS_ERROR;
+
+	tmp =
 	    gnutls_calloc(1, sizeof(gnutls_x509_crt_int));
 	int result;
 

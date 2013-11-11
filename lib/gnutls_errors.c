@@ -396,6 +396,12 @@ static const gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY(N_
 		    ("No common application protocol could be negotiated."),
 		    GNUTLS_E_NO_APPLICATION_PROTOCOL, 1),
+	ERROR_ENTRY(N_("Error while performing self checks."),
+		    GNUTLS_E_SELF_TEST_ERROR, 1),
+	ERROR_ENTRY(N_("There is no self test for this algorithm."),
+		    GNUTLS_E_NO_SELF_TEST, 1),
+	ERROR_ENTRY(N_("An error has been detected in the library and cannot continue operations."),
+		    GNUTLS_E_LIB_IN_ERROR_STATE, 1),
 	{NULL, NULL, 0, 0}
 };
 

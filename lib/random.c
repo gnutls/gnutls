@@ -26,6 +26,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <random.h>
+#include <fips.h>
 
 void *gnutls_rnd_ctx;
 
@@ -65,6 +66,7 @@ void _gnutls_rnd_deinit(void)
  **/
 int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
+	FAIL_IF_FIPS_ERROR;
 	return _gnutls_rnd(level, data, len);
 }
 
