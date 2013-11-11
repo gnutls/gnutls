@@ -23,6 +23,7 @@
 #ifndef FIPS_H
 # define FIPS_H
 
+#include <gnutls_int.h>
 #include <gnutls/gnutls.h>
 
 typedef enum {

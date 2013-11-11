@@ -20,30 +20,102 @@
  *
  */
 
+#include <gnutls_int.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/crypto.h>
+#include <unistd.h>
+#include <gnutls_errors.h>
+#include <fips.h>
+
 #ifdef ENABLE_FIPS140
 
-# include <gnutls_int.h>
-# include <gnutls/gnutls.h>
-# include <unistd.h>
-
-unsigned int _gnutls_fips_mode = STATE_POWERON;
+unsigned int _gnutls_fips_mode = FIPS_STATE_POWERON;
 
 unsigned _gnutls_fips_mode_enabled(void)
 {
 	/* FIXME: There are some subtle differences here. Check it out later */
 	if (access("/proc/sys/crypto/fips_enabled", R_OK) == 0 &&
-		access("/etc/system-fips", R_OK) == 0)
+	    access("/etc/system-fips", R_OK) == 0)
 		return 1;
-	
+
 	return 0;
 }
 
+#ifdef HAVE_DLADDR
+static const char fips_key[] = "I'd rather be skiing.";
+
+#define HMAC_SUFFIX ".hmac"
+
+
+/* Run an HMAC using the key above on the library binary data. 
+ * Returns true success and false on error.
+ */
+static unsigned check_binary_integrity(void)
+{
+	int ret;
+	Dl_info info;
+	unsigned prev;
+	char mac_file[GNUTLS_PATH_MAX];
+	uint8_t sha256_hmac[32];
+	uint8_t new_sha256_hmac[32];
+	size_t sha256_hmac_size;
+	gnutls_datum_t data;
+
+	ret = dladdr("gnutls_global_init", &info);
+	if (ret == 0)
+		return gnutls_assert_val(0);
+
+	ret = gnutls_load_file(info.dli_fname, &data);
+	if (ret < 0)
+		return gnutls_assert_val(0);
+
+	prev = _gnutls_get_fips_state();
+	_gnutls_switch_fips_state(FIPS_STATE_OPERATIONAL);
+	ret = gnutls_hmac_fast(GNUTLS_MAC_SHA256, fips_key, sizeof(fips_key)-1,
+		data.data, data.size, new_sha256_hmac);
+	_gnutls_switch_fips_state(prev);
+	
+	gnutls_free(data.data);
+
+	if (ret < 0)
+		return gnutls_assert_val(0);
+
+	/* now open the .hmac file and compare */
+	snprintf(mac_file, sizeof(mac_file), "%s"HMAC_SUFFIX, info.dli_fname);
+	
+	ret = gnutls_load_file(info.dli_fname, &data);
+	if (ret < 0)
+		return gnutls_assert_val(0);
+
+	sha256_hmac_size = sizeof(sha256_hmac);
+	ret = _gnutls_hex2bin(data.data, data.size, sha256_hmac, &sha256_hmac_size);
+	gnutls_free(data.data);
+
+	if (ret < 0)
+		return gnutls_assert_val(0);
+
+	if (sha256_hmac_size != sizeof(sha256_hmac) ||
+			memcmp(sha256_hmac, new_sha256_hmac, sizeof(sha256_hmac)) != 0)
+		return gnutls_assert_val(0);
+	
+	return 1;
+}
+
+#else
+static int check_binary_integrity(void)
+{
+	return 1;
+}
+#endif
+
 int _gnutls_fips_perform_self_checks(void)
 {
+	int ret;
+
 	_gnutls_switch_fips_state(FIPS_STATE_SELFTEST);
-	
+
 	/* Tests the FIPS algorithms */
-	
+
 	/* ciphers */
 	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_AES_128_CBC);
 	if (ret < 0) {
@@ -62,7 +134,7 @@ int _gnutls_fips_perform_self_checks(void)
 		gnutls_assert();
 		goto error;
 	}
-	
+
 	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_3DES_CBC);
 	if (ret < 0) {
 		gnutls_assert();
@@ -131,7 +203,13 @@ int _gnutls_fips_perform_self_checks(void)
 		goto error;
 	}
 
-	ret = gnutls_pk_self_test(0, GNUTLS_PK_ECDSA);
+	ret = gnutls_pk_self_test(0, GNUTLS_PK_EC);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+	
+	ret = check_binary_integrity();
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -140,7 +218,8 @@ int _gnutls_fips_perform_self_checks(void)
 	return 0;
 error:
 	_gnutls_switch_fips_state(FIPS_STATE_ERROR);
-	return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERR);
+
+	return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 }
 
 #endif
