@@ -8,7 +8,7 @@ See the end for copying conditions.
 ** libgnutls: Depend on p11-kit 0.19.1 or later.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_privkey_generate: Added
 
 
 * Version 3.2.6 (released 2013-10-31)
