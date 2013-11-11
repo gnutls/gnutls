@@ -12,15 +12,14 @@
  * cpu instructions (AES-NI or padlock).
  */
 
-static void
-tls_log_func (int level, const char *str)
+static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
 #ifndef ENABLE_SELF_CHECKS
-# include "../../lib/crypto-selftests.c"
-# include "../../lib/crypto-selftests-pk.c"
+#include "../../lib/crypto-selftests.c"
+#include "../../lib/crypto-selftests-pk.c"
 #endif
 
 int main(int argc, char **argv)
@@ -31,22 +30,22 @@ int main(int argc, char **argv)
 
 	global_init();
 
-    /* ciphers */
-    if (gnutls_cipher_self_test(1, 0) < 0)
-        return 1;
+	/* ciphers */
+	if (gnutls_cipher_self_test(1, 0) < 0)
+		return 1;
 
-    /* message digests */        
-    if (gnutls_digest_self_test(1, 0) < 0)
-        return 1;
+	/* message digests */
+	if (gnutls_digest_self_test(1, 0) < 0)
+		return 1;
 
-    /* MAC */
-    if (gnutls_mac_self_test(1, 0) < 0)
-        return 1;
+	/* MAC */
+	if (gnutls_mac_self_test(1, 0) < 0)
+		return 1;
 
-    /* PK */
-    if (gnutls_pk_self_test(1, 0) < 0)
-        return 1;
+	/* PK */
+	if (gnutls_pk_self_test(1, 0) < 0)
+		return 1;
 
-    gnutls_global_deinit ();
-    return 0;
+	gnutls_global_deinit();
+	return 0;
 }
