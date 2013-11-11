@@ -1401,6 +1401,9 @@ gnutls_certificate_set_trust_list(gnutls_certificate_credentials_t res,
  * will import the private key and certificate indicated by the URLs. Note
  * that the supported URLs are the ones indicated by gnutls_url_is_supported().
  *
+ * In case the @certfile is provided as a PKCS #11 URL, then the certificate, and its
+ * present issuers in the token are are imported (i.e., the required trust chain).
+ *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  **/
 int
@@ -1438,6 +1441,9 @@ gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t res,
  * This function can also accept URLs at @keyfile and @certfile. In that case it
  * will import the private key and certificate indicated by the URLs. Note
  * that the supported URLs are the ones indicated by gnutls_url_is_supported().
+ *
+ * In case the @certfile is provided as a PKCS #11 URL, then the certificate, and its
+ * present issuers in the token are are imported (i.e., the required trust chain).
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  **/
