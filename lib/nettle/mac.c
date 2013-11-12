@@ -183,6 +183,8 @@ static int wrap_nettle_mac_fast(gnutls_mac_algorithm_t algo,
 	ctx.set_key(&ctx, key_size, key);
 	ctx.update(&ctx, text_size, text);
 	ctx.digest(&ctx, ctx.length, digest);
+	
+	zeroize_temp_key(&ctx, sizeof(ctx));
 
 	return 0;
 }
@@ -278,7 +280,10 @@ wrap_nettle_mac_output(void *src_ctx, void *digest, size_t digestsize)
 
 static void wrap_nettle_mac_deinit(void *hd)
 {
-	gnutls_free(hd);
+	struct nettle_mac_ctx *ctx = hd;
+	
+	zeroize_temp_key(ctx, sizeof(*ctx));
+	gnutls_free(ctx);
 }
 
 /* Hash functions 

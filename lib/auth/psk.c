@@ -104,7 +104,7 @@ _gnutls_set_psk_session_key(gnutls_session_t session,
 	ret = 0;
 
       error:
-	_gnutls_free_datum(&pwd_psk);
+	_gnutls_zfree_datum(&pwd_psk);
 	return ret;
 }
 
@@ -190,7 +190,7 @@ _gnutls_gen_psk_client_kx(gnutls_session_t session,
       cleanup:
 	if (free) {
 		gnutls_free(username.data);
-		gnutls_free(key.data);
+		_gnutls_zfree_datum(&key);
 	}
 
 	return ret;
@@ -258,7 +258,7 @@ _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	ret = 0;
 
       error:
-	_gnutls_free_datum(&psk_key);
+	_gnutls_zfree_datum(&psk_key);
 
 	return ret;
 }

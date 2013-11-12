@@ -310,6 +310,8 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
+		zeroize_temp_key(des_key, sizeof(des_key));
+
 		break;
 	case GNUTLS_CIPHER_DES_CBC:
 		if (keysize != DES_KEY_SIZE) {
@@ -323,6 +325,7 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
+		zeroize_temp_key(des_key, sizeof(des_key));
 		break;
 	case GNUTLS_CIPHER_ARCFOUR_128:
 	case GNUTLS_CIPHER_ARCFOUR_40:
@@ -424,9 +427,12 @@ static void wrap_nettle_cipher_tag(void *_ctx, void *tag, size_t tagsize)
 
 }
 
-static void wrap_nettle_cipher_close(void *h)
+static void wrap_nettle_cipher_close(void *_ctx)
 {
-	gnutls_free(h);
+	struct nettle_cipher_ctx *ctx = _ctx;
+
+	zeroize_temp_key(ctx, sizeof(*ctx));
+	gnutls_free(ctx);
 }
 
 gnutls_crypto_cipher_st _gnutls_cipher_ops = {

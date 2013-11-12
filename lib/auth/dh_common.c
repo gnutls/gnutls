@@ -81,7 +81,7 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 		return gnutls_assert_val(ret);
 
 	_gnutls_mpi_release(&session->key.client_Y);
-	_gnutls_mpi_release(&session->key.dh_secret);
+	zrelease_temp_mpi_key(&session->key.dh_secret);
 
 
 	if (psk_key == NULL) {
@@ -100,11 +100,11 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 		ret =
 		    _gnutls_set_psk_session_key(session, psk_key,
 						&tmp_dh_key);
-		_gnutls_free_datum(&tmp_dh_key);
+		_gnutls_zfree_datum(&tmp_dh_key);
 
 	}
 
-	_gnutls_mpi_release(&session->key.KEY);
+	zrelease_temp_mpi_key(&session->key.KEY);
 
 	if (ret < 0) {
 		return ret;
@@ -124,10 +124,10 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 				    gnutls_buffer_st * data,
 				    gnutls_datum_t * pskkey)
 {
-	bigint_t x = NULL, X = NULL;
+	bigint_t x = NULL, Y = NULL;
 	int ret;
 
-	ret = gnutls_calc_dh_secret(&X, &x, session->key.client_g,
+	ret = gnutls_calc_dh_secret(&Y, &x, session->key.client_g,
 				    session->key.client_p, 0);
 	if (ret < 0) {
 		gnutls_assert();
@@ -136,7 +136,7 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 
 	_gnutls_dh_set_secret_bits(session, _gnutls_mpi_get_nbits(x));
 
-	ret = _gnutls_buffer_append_mpi(data, 16, X, 0);
+	ret = _gnutls_buffer_append_mpi(data, 16, Y, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -175,10 +175,10 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 		ret =
 		    _gnutls_set_psk_session_key(session, pskkey,
 						&tmp_dh_key);
-		_gnutls_free_datum(&tmp_dh_key);
+		_gnutls_zfree_datum(&tmp_dh_key);
 	}
 
-	_gnutls_mpi_release(&session->key.KEY);
+	zrelease_temp_mpi_key(&session->key.KEY);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -188,8 +188,8 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 	ret = data->length;
 
       error:
-	_gnutls_mpi_release(&x);
-	_gnutls_mpi_release(&X);
+	zrelease_temp_mpi_key(&x);
+	_gnutls_mpi_release(&Y);
 	return ret;
 }
 
@@ -314,7 +314,7 @@ _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 	}
 
 	ret = data->length;
-      cleanup:
+cleanup:
 	_gnutls_mpi_release(&Y);
 
 	return ret;

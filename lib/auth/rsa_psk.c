@@ -240,9 +240,9 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 
       cleanup:
 	_gnutls_free_datum(&sdata);
-	_gnutls_free_datum(&premaster_secret);
+	_gnutls_zfree_datum(&premaster_secret);
 	if (free) {
-		gnutls_free(key.data);
+		_gnutls_zfree_datum(&key);
 		gnutls_free(username.data);
 	}
 
@@ -399,8 +399,8 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 
 	ret = 0;
       cleanup:
-	_gnutls_free_datum(&pwd_psk);
-	_gnutls_free_datum(&premaster_secret);
+	_gnutls_zfree_datum(&pwd_psk);
+	_gnutls_zfree_datum(&premaster_secret);
 
 	return ret;
 }

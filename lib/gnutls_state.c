@@ -467,26 +467,27 @@ void gnutls_deinit(gnutls_session_t session)
 	_gnutls_selected_certs_deinit(session);
 
 	gnutls_pk_params_release(&session->key.ecdh_params);
-	_gnutls_mpi_release(&session->key.ecdh_x);
-	_gnutls_mpi_release(&session->key.ecdh_y);
+	zrelease_temp_mpi_key(&session->key.ecdh_x);
+	zrelease_temp_mpi_key(&session->key.ecdh_y);
 
-	_gnutls_mpi_release(&session->key.KEY);
-	_gnutls_mpi_release(&session->key.client_Y);
-	_gnutls_mpi_release(&session->key.client_p);
-	_gnutls_mpi_release(&session->key.client_g);
+	zrelease_temp_mpi_key(&session->key.KEY);
+	zrelease_temp_mpi_key(&session->key.client_Y);
+	zrelease_temp_mpi_key(&session->key.client_p);
+	zrelease_temp_mpi_key(&session->key.client_g);
 
-	_gnutls_mpi_release(&session->key.u);
-	_gnutls_mpi_release(&session->key.a);
-	_gnutls_mpi_release(&session->key.x);
-	_gnutls_mpi_release(&session->key.A);
-	_gnutls_mpi_release(&session->key.B);
-	_gnutls_mpi_release(&session->key.b);
+	zrelease_temp_mpi_key(&session->key.u);
+	zrelease_temp_mpi_key(&session->key.a);
+	zrelease_temp_mpi_key(&session->key.x);
+	zrelease_temp_mpi_key(&session->key.A);
+	zrelease_temp_mpi_key(&session->key.B);
+	zrelease_temp_mpi_key(&session->key.b);
 
 	/* RSA */
-	_gnutls_mpi_release(&session->key.rsa[0]);
-	_gnutls_mpi_release(&session->key.rsa[1]);
+	zrelease_temp_mpi_key(&session->key.rsa[0]);
+	zrelease_temp_mpi_key(&session->key.rsa[1]);
 
-	_gnutls_mpi_release(&session->key.dh_secret);
+	zrelease_temp_mpi_key(&session->key.dh_secret);
+	_gnutls_zfree_datum(&session->key.key);
 
 	gnutls_free(session);
 }

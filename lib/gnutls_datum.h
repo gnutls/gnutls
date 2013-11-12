@@ -29,6 +29,31 @@ int _gnutls_set_datum(gnutls_datum_t * dat, const void *data,
 int _gnutls_datum_append(gnutls_datum_t * dat, const void *data,
 			 size_t data_size);
 
-void _gnutls_free_datum(gnutls_datum_t * dat);
+
+inline static
+void _gnutls_free_datum(gnutls_datum_t * dat)
+{
+	if (dat->data != NULL)
+		gnutls_free(dat->data);
+
+	dat->data = NULL;
+	dat->size = 0;
+}
+
+#ifdef ENABLE_FIPS140
+inline static
+void _gnutls_zfree_datum(gnutls_datum_t * dat)
+{
+	if (dat->data != NULL) {
+		memset(dat->data, 0, dat->size);
+		gnutls_free(dat->data);
+        }
+
+	dat->data = NULL;
+	dat->size = 0;
+}
+#else
+# define _gnutls_zfree_datum _gnutls_free_datum
+#endif
 
 #endif
