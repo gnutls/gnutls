@@ -23,6 +23,10 @@ nobase_include_HEADERS = gnutls/x509.h gnutls/pkcs12.h gnutls/compat.h	\
 	gnutls/abstract.h gnutls/dtls.h gnutls/ocsp.h gnutls/tpm.h	\
 	gnutls/xssl.h
 
+if ENABLE_FIPS140
+nobase_include_HEADERS += gnutls/fips140.h
+endif
+
 if ENABLE_CXX
 nobase_include_HEADERS += gnutls/gnutlsxx.h
 endif

@@ -75,6 +75,10 @@ ctests = simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range \
 	 mini-cert-status mini-rsa-psk mini-record-2
 
+if ENABLE_FIPS140
+ctests += fips-test
+endif
+
 if ENABLE_OCSP
 ctests += ocsp
 endif

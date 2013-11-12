@@ -55,9 +55,12 @@ int _gnutls_fips_perform_self_checks(void);
 unsigned _gnutls_fips_mode_enabled(void);
 
 # define FAIL_IF_FIPS_ERROR \
-	if (_gnutls_get_fips_state() != FIPS_STATE_OPERATIONAL) return GNUTLS_E_LIB_IN_ERROR_STATE
+	if (_gnutls_get_fips_state() != FIPS_STATE_OPERATIONAL && \
+	  _gnutls_get_fips_state() != FIPS_STATE_SELFTEST) return GNUTLS_E_LIB_IN_ERROR_STATE
 
 void _gnutls_switch_fips_state(gnutls_fips_state_t state);
+
+void _gnutls_fips140_simulate_error(void);
 
 #else
 

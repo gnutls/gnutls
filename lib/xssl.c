@@ -303,8 +303,6 @@ int xssl_sinit(xssl_t * isb, gnutls_session_t session, unsigned int flags)
 {
 	struct xssl_st *sb;
 	
-	FAIL_IF_FIPS_ERROR;
-
 	sb = gnutls_calloc(1, sizeof(*sb));
 	if (sb == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -351,8 +349,6 @@ int xssl_client_init(xssl_t * isb, const char *hostname,
 	int ret;
 	unsigned len;
 	
-	FAIL_IF_FIPS_ERROR;
-
 	ret = gnutls_init(&session, GNUTLS_CLIENT);
 	if (ret < 0)
 		return gnutls_assert_val(ret);

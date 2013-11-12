@@ -9,6 +9,7 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 gnutls_privkey_generate: Added
+gnutls_fips140_mode_enabled: Added
 
 
 * Version 3.2.6 (released 2013-10-31)

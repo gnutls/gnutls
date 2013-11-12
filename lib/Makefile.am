@@ -132,6 +132,10 @@ if NEEDS_LIBRT
 thirdparty_libadd += $(LTLIBRT)
 endif
 
+if ENABLE_FIPS140
+thirdparty_libadd += $(FIPS140_LIBS)
+endif
+
 if ENABLE_OPENPGP
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
 libgnutls_la_LIBADD += opencdk/libminiopencdk.la

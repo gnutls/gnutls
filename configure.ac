@@ -131,8 +131,20 @@ AC_ARG_ENABLE(fips140-mode,
     enable_fips=$enableval, enable_fips=no)
 AM_CONDITIONAL(ENABLE_FIPS140, test "$enable_fips" = "yes")
 if [ test "$enable_fips" = "yes" ];then
-   enable_self_checks=yes
-   AC_DEFINE([ENABLE_FIPS140], 1, [Enable FIPS140-2 mode])
+  AC_LIB_HAVE_LINKFLAGS(dl,, [#include <dlfcn.h>], [dladdr (0, 0);])
+  if test "x$HAVE_LIBDL" = "xyes";then
+    enable_self_checks=yes
+    AC_DEFINE([ENABLE_FIPS140], 1, [Enable FIPS140-2 mode])
+
+    AC_SUBST([FIPS140_LIBS], $LIBDL)
+  else
+    enable_fips=no
+    AC_MSG_WARN([[
+*** 
+*** This system is not supported in FIPS140 mode.
+*** libdl and dladdr() are required.
+*** ]])
+  fi
 fi
 
 AM_CONDITIONAL(ENABLE_SELF_CHECKS, test "$enable_self_checks" = "yes")

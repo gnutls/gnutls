@@ -26,6 +26,10 @@
 #include <unistd.h>
 #include <gnutls_errors.h>
 #include <fips.h>
+#include <gnutls/fips140.h>
+#include <dlfcn.h>
+
+#define FIPS140_TEST
 
 #ifdef ENABLE_FIPS140
 
@@ -38,14 +42,18 @@ unsigned _gnutls_fips_mode_enabled(void)
 	    access("/etc/system-fips", R_OK) == 0)
 		return 1;
 
+#ifndef FIPS140_TEST
 	return 0;
+#else
+	return 1;
+#endif
 }
 
-#ifdef HAVE_DLADDR
 static const char fips_key[] = "I'd rather be skiing.";
 
 #define HMAC_SUFFIX ".hmac"
-
+#define HMAC_SIZE 32
+#define HMAC_ALGO GNUTLS_MAC_SHA256
 
 /* Run an HMAC using the key above on the library binary data. 
  * Returns true success and false on error.
@@ -56,23 +64,24 @@ static unsigned check_binary_integrity(void)
 	Dl_info info;
 	unsigned prev;
 	char mac_file[GNUTLS_PATH_MAX];
-	uint8_t sha256_hmac[32];
-	uint8_t new_sha256_hmac[32];
-	size_t sha256_hmac_size;
+	uint8_t hmac[HMAC_SIZE];
+	uint8_t new_hmac[HMAC_SIZE];
+	size_t hmac_size;
 	gnutls_datum_t data;
 
 	ret = dladdr("gnutls_global_init", &info);
 	if (ret == 0)
 		return gnutls_assert_val(0);
 
+	_gnutls_debug_log("Loading: %s\n", info.dli_fname);
 	ret = gnutls_load_file(info.dli_fname, &data);
 	if (ret < 0)
 		return gnutls_assert_val(0);
 
 	prev = _gnutls_get_fips_state();
 	_gnutls_switch_fips_state(FIPS_STATE_OPERATIONAL);
-	ret = gnutls_hmac_fast(GNUTLS_MAC_SHA256, fips_key, sizeof(fips_key)-1,
-		data.data, data.size, new_sha256_hmac);
+	ret = gnutls_hmac_fast(HMAC_ALGO, fips_key, sizeof(fips_key)-1,
+		data.data, data.size, new_hmac);
 	_gnutls_switch_fips_state(prev);
 	
 	gnutls_free(data.data);
@@ -83,30 +92,25 @@ static unsigned check_binary_integrity(void)
 	/* now open the .hmac file and compare */
 	snprintf(mac_file, sizeof(mac_file), "%s"HMAC_SUFFIX, info.dli_fname);
 	
-	ret = gnutls_load_file(info.dli_fname, &data);
+	ret = gnutls_load_file(mac_file, &data);
 	if (ret < 0)
 		return gnutls_assert_val(0);
 
-	sha256_hmac_size = sizeof(sha256_hmac);
-	ret = _gnutls_hex2bin(data.data, data.size, sha256_hmac, &sha256_hmac_size);
+	hmac_size = sizeof(hmac);
+	ret = _gnutls_hex2bin((void*)data.data, data.size, hmac, &hmac_size);
 	gnutls_free(data.data);
 
 	if (ret < 0)
 		return gnutls_assert_val(0);
 
-	if (sha256_hmac_size != sizeof(sha256_hmac) ||
-			memcmp(sha256_hmac, new_sha256_hmac, sizeof(sha256_hmac)) != 0)
+	if (hmac_size != sizeof(hmac) ||
+			memcmp(hmac, new_hmac, sizeof(hmac)) != 0) {
+		_gnutls_debug_log("Calculated MAC does not match\n");
 		return gnutls_assert_val(0);
+	}
 	
 	return 1;
 }
-
-#else
-static int check_binary_integrity(void)
-{
-	return 1;
-}
-#endif
 
 int _gnutls_fips_perform_self_checks(void)
 {
@@ -210,16 +214,43 @@ int _gnutls_fips_perform_self_checks(void)
 	}
 	
 	ret = check_binary_integrity();
-	if (ret < 0) {
+	if (ret == 0) {
 		gnutls_assert();
+#ifndef FIPS140_TEST
 		goto error;
+#endif
 	}
 
 	return 0;
 error:
 	_gnutls_switch_fips_state(FIPS_STATE_ERROR);
 
-	return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+	return GNUTLS_E_SELF_TEST_ERROR;
+}
+#endif
+
+/**
+ * gnutls_fips140_mode_enabled:
+ *
+ * Checks whether this library is in FIPS140 mode.
+ *
+ * Returns: return non-zero if true or zero if false.
+ *
+ * Since: 3.3.0
+ **/
+int gnutls_fips140_mode_enabled(void)
+{
+#ifdef ENABLE_FIPS140
+
+	return _gnutls_fips_mode_enabled();
+#else
+	return 0;
+#endif
 }
 
+void _gnutls_fips140_simulate_error(void)
+{
+#ifdef ENABLE_FIPS140
+	_gnutls_switch_fips_state(FIPS_STATE_ERROR);
 #endif
+}
