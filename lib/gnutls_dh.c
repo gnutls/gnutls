@@ -34,7 +34,7 @@
 	his_key  = X ^ y mod p;
 
 //      generate our secret and the public value (X) for it
-	X = gnutls_calc_dh_secret(&x, g, p);
+	gnutls_calc_dh_secret(&Y, &X, g, p);
 //      now we can calculate the shared secret
 	key = gnutls_calc_dh_key(Y, x, g, p);
 	_gnutls_mpi_release(x);
@@ -43,7 +43,7 @@
 
 #define MAX_BITS 18000
 
-/* returns the public value (X), and the secret (ret_x).
+/* returns the public value (Y), and the secret (X).
  */
 int
 gnutls_calc_dh_secret(bigint_t * ret_y, bigint_t * ret_x, bigint_t g,
