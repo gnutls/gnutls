@@ -34,6 +34,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef NO_SSIZE_T
 #define HAVE_SSIZE_T
@@ -439,10 +440,10 @@ typedef struct cipher_entry_st {
 	gnutls_cipher_algorithm_t id;
 	uint16_t blocksize;
 	uint16_t keysize;
-	unsigned block:1;
+	bool block;
 	uint16_t iv;		/* the size of implicit IV - TLS related */
 	uint16_t cipher_iv;	/* the size of IV needed by the cipher */
-	unsigned aead:1;	/* Whether it is authenc cipher */
+	bool aead;	/* Whether it is authenc cipher */
 } cipher_entry_st;
 
 typedef struct mac_entry_st {
@@ -463,11 +464,11 @@ typedef struct {
 	uint8_t major;		/* defined by the protocol */
 	uint8_t minor;		/* defined by the protocol */
 	transport_t transport;	/* Type of transport, stream or datagram */
-	unsigned int supported:1;	/* 0 not supported, > 0 is supported */
-	unsigned int explicit_iv:1;
-	unsigned int extensions:1;	/* whether it supports extensions */
-	unsigned int selectable_sighash:1;	/* whether signatures can be selected */
-	unsigned int selectable_prf:1;	/* whether the PRF is ciphersuite-defined */
+	bool supported;	/* 0 not supported, > 0 is supported */
+	bool explicit_iv;
+	bool extensions;	/* whether it supports extensions */
+	bool selectable_sighash;	/* whether signatures can be selected */
+	bool selectable_prf;	/* whether the PRF is ciphersuite-defined */
 } version_entry_st;
 
 
@@ -631,18 +632,18 @@ struct gnutls_priority_st {
 	priority_st supported_ecc;
 
 	/* to disable record padding */
-	unsigned int no_extensions:1;
-	unsigned int allow_large_records:1;
-	unsigned int new_record_padding:1;
+	bool no_extensions;
+	bool allow_large_records;
+	bool new_record_padding;
 	unsigned int max_empty_records;
 	unsigned int dumbfw;
 	safe_renegotiation_t sr;
-	unsigned int ssl3_record_version:1;
-	unsigned int server_precedence:1;
-	unsigned int allow_weak_keys:1;
-	unsigned int allow_wrong_pms:1;
+	bool ssl3_record_version;
+	bool server_precedence;
+	bool allow_weak_keys;
+	bool allow_wrong_pms;
 	/* Whether stateless compression will be used */
-	unsigned int stateless_compression:1;
+	bool stateless_compression;
 	unsigned int additional_verify_flags;
 
 	/* The session's expected security level.
@@ -692,9 +693,9 @@ typedef struct {
 	uint16_t mtu;
 
 	/* a flight transmission is in process */
-	unsigned int flight_init:1;
+	bool flight_init;
 	/* whether this is the last flight in the protocol  */
-	unsigned int last_flight:1;
+	bool last_flight;
 
 	/* the retransmission timeout in milliseconds */
 	unsigned int retrans_timeout_ms;
@@ -704,7 +705,7 @@ typedef struct {
 	unsigned int hsk_hello_verify_requests;
 
 	/* non blocking stuff variables */
-	unsigned int blocking:1;
+	bool blocking;
 	/* starting time of current handshake */
 	struct timespec handshake_start_time;
 
@@ -735,8 +736,8 @@ typedef struct {
 						 * the last received message */
 	gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake 
 						 * message */
-	unsigned int resumable:1;	/* TRUE or FALSE - if we can resume that session */
-	unsigned int ticket_sent:1;	/* whether a session ticket was sent */
+	bool resumable;	/* TRUE or FALSE - if we can resume that session */
+	bool ticket_sent;	/* whether a session ticket was sent */
 	handshake_state_t handshake_final_state;
 	handshake_state_t handshake_state;	/* holds
 						 * a number which indicates where
@@ -745,12 +746,12 @@ typedef struct {
 						 * no interruption has happened.
 						 */
 
-	int invalid_connection:1;	/* true or FALSE - if this session is valid */
+	bool invalid_connection;	/* true or FALSE - if this session is valid */
 
-	int may_not_read:1;	/* if it's 0 then we can read/write, otherwise it's forbiden to read/write
+	bool may_not_read;	/* if it's 0 then we can read/write, otherwise it's forbiden to read/write
 				 */
-	int may_not_write:1;
-	int read_eof:1;		/* non-zero if we have received a closure alert. */
+	bool may_not_write;
+	bool read_eof;		/* non-zero if we have received a closure alert. */
 
 	int last_alert;		/* last alert received */
 
@@ -763,8 +764,8 @@ typedef struct {
 	struct gnutls_priority_st priorities;
 
 	/* resumed session */
-	unsigned int resumed:1;	/* RESUME_TRUE or FALSE - if we are resuming a session */
-	unsigned int resumption_requested:1;	/* non-zero if resumption was requested by client */
+	bool resumed;	/* RESUME_TRUE or FALSE - if we are resuming a session */
+	bool resumption_requested;	/* non-zero if resumption was requested by client */
 	security_parameters_st resumed_security_parameters;
 
 	/* These buffers are used in the handshake
@@ -850,7 +851,7 @@ typedef struct {
 	gnutls_pcert_st *selected_cert_list;
 	int16_t selected_cert_list_length;
 	struct gnutls_privkey_st *selected_key;
-	unsigned selected_need_free:1;
+	bool selected_need_free;
 
 	/* holds the extensions we sent to the peer
 	 * (in case of a client)
@@ -861,7 +862,7 @@ typedef struct {
 	/* is 0 if we are to send the whole PGP key, or non zero
 	 * if the fingerprint is to be sent.
 	 */
-	unsigned pgp_fingerprint:1;
+	bool pgp_fingerprint;
 
 	/* This holds the default version that our first
 	 * record packet will have. */
@@ -869,7 +870,7 @@ typedef struct {
 
 	void *user_ptr;
 
-	unsigned enable_private:1;	/* non zero to
+	bool enable_private;	/* non zero to
 					 * enable cipher suites
 					 * which have 0xFF status.
 					 */
@@ -877,7 +878,7 @@ typedef struct {
 	/* Holds 0 if the last called function was interrupted while
 	 * receiving, and non zero otherwise.
 	 */
-	unsigned direction:1;
+	bool direction;
 
 	/* This callback will be used (if set) to receive an
 	 * openpgp key. (if the peer sends a fingerprint)
@@ -887,7 +888,7 @@ typedef struct {
 	/* If non zero the server will not advertise the CA's he
 	 * trusts (do not send an RDN sequence).
 	 */
-	unsigned ignore_rdn_sequence:1;
+	bool ignore_rdn_sequence;
 
 	/* This is used to set an arbitary version in the RSA
 	 * PMS secret. Can be used by clients to test whether the
@@ -923,18 +924,18 @@ typedef struct {
 	uint16_t srp_prime_bits;
 
 	/* A handshake process has been completed */
-	unsigned int initial_negotiation_completed:1;
+	bool initial_negotiation_completed;
 
 	struct {
 		uint16_t type;
 		extension_priv_data_t priv;
-		unsigned set:1;
+		bool set;
 	} extension_int_data[MAX_EXT_TYPES];
 
 	struct {
 		uint16_t type;
 		extension_priv_data_t priv;
-		unsigned set:1;
+		bool set;
 	} resumed_extension_int_data[MAX_EXT_TYPES];
 	/* The type of transport protocol; stream or datagram */
 	transport_t transport;
@@ -944,7 +945,7 @@ typedef struct {
 
 	/* if set it means that the master key was set using
 	 * gnutls_session_set_master() rather than being negotiated. */
-	unsigned int premaster_set:1;
+	bool premaster_set;
 
 	unsigned int cb_tls_unique_len;
 	unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
@@ -961,15 +962,15 @@ typedef struct {
 	unsigned int hb_retrans_timeout_ms;	/* the default timeout, in milliseconds */
 	unsigned int hb_total_timeout_ms;	/* the total timeout, in milliseconds */
 
-	unsigned int ocsp_check_ok:1;	/* will be zero if the OCSP response TLS extension
+	bool ocsp_check_ok;	/* will be zero if the OCSP response TLS extension
 					 * check failed (OCSP was old/unrelated or so). */
 
 	heartbeat_state_t hb_state;	/* for ping */
 
 	recv_state_t recv_state;	/* state of the receive function */
 
-	unsigned int sc_random_set:1;
-	unsigned int no_replay_protection:1;	/* DTLS replay protection */
+	bool sc_random_set;
+	bool no_replay_protection;	/* DTLS replay protection */
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
