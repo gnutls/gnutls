@@ -188,10 +188,9 @@ static int _gnutls_init = 0;
  * Note!  This function is not thread safe.  If two threads call this
  * function simultaneously, they can cause a race between checking
  * the global counter and incrementing it, causing both threads to
- * execute the library initialization code.  That would lead to a
- * memory leak.  To handle this, your application could invoke this
- * function after aquiring a thread mutex.  To ignore the potential
- * memory leak is also an option.
+ * execute the library initialization code.  That could lead to a
+ * memory leak or even a crash.  To handle this, your application should 
+ * invoke this function after aquiring a thread mutex.  
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
