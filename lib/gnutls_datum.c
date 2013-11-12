@@ -64,11 +64,3 @@ _gnutls_datum_append(gnutls_datum_t * dst, const void *data,
 	return 0;
 }
 
-void _gnutls_free_datum(gnutls_datum_t * dat)
-{
-	if (dat->data != NULL)
-		gnutls_free(dat->data);
-
-	dat->data = NULL;
-	dat->size = 0;
-}
