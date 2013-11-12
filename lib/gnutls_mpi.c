@@ -102,15 +102,6 @@ _gnutls_mpi_randomize(bigint_t r, unsigned int bits,
 	return NULL;
 }
 
-void _gnutls_mpi_release(bigint_t * x)
-{
-	if (*x == NULL)
-		return;
-
-	_gnutls_mpi_ops.bigint_release(*x);
-	*x = NULL;
-}
-
 /* returns %GNUTLS_E_SUCCESS (0) on success
  */
 int _gnutls_mpi_scan(bigint_t * ret_mpi, const void *buffer, size_t nbytes)

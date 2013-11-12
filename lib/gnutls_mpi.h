@@ -59,7 +59,15 @@ bigint_t _gnutls_mpi_randomize(bigint_t, unsigned int bits,
 #define _gnutls_mpi_print_pgp(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_PGP)
 #define _gnutls_mpi_copy( a) _gnutls_mpi_set( NULL, a)
 
-void _gnutls_mpi_release(bigint_t * x);
+inline static
+void _gnutls_mpi_release(bigint_t * x)
+{
+	if (*x == NULL)
+		return;
+
+	_gnutls_mpi_ops.bigint_release(*x);
+	*x = NULL;
+}
 
 int _gnutls_mpi_scan(bigint_t * ret_mpi, const void *buffer,
 		     size_t nbytes);
