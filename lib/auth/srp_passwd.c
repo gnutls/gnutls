@@ -115,7 +115,7 @@ static int parse_tpasswd_values(SRP_PWD_ENTRY * entry, char *str)
 	entry->username = gnutls_strdup(str);
 	if (entry->username == NULL) {
 		_gnutls_free_datum(&entry->salt);
-		_gnutls_free_temp_key_datum(&entry->v);
+		_gnutls_free_key_datum(&entry->v);
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -229,6 +229,7 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 	ret = GNUTLS_E_SRP_PWD_ERROR;
 
 cleanup:
+	zeroize_key(line, line_size);
 	free(line);
 	fclose(fd);
 	return ret;
@@ -364,6 +365,7 @@ cleanup:
 	_gnutls_srp_entry_free(entry);
 
 found:
+	zeroize_key(line, line_size);
 	free(line);
 	if (fd)
 		fclose(fd);
@@ -426,7 +428,7 @@ static int _randomize_pwd_entry(SRP_PWD_ENTRY * entry)
  */
 void _gnutls_srp_entry_free(SRP_PWD_ENTRY * entry)
 {
-	_gnutls_free_temp_key_datum(&entry->v);
+	_gnutls_free_key_datum(&entry->v);
 	_gnutls_free_datum(&entry->salt);
 
 	if ((entry->g.data != gnutls_srp_1024_group_generator.data)

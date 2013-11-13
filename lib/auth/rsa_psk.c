@@ -399,7 +399,7 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 
 	ret = 0;
       cleanup:
-	_gnutls_free_temp_key_datum(&pwd_psk);
+	_gnutls_free_key_datum(&pwd_psk);
 	_gnutls_free_temp_key_datum(&premaster_secret);
 
 	return ret;

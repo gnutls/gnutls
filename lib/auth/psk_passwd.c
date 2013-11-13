@@ -203,6 +203,7 @@ cleanup:
 	if (fd != NULL)
 		fclose(fd);
         
+        zeroize_key(line, line_size);
 	free(line);
 
 	return ret;

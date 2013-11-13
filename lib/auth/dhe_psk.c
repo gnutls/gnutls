@@ -328,7 +328,7 @@ proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	ret = _gnutls_proc_dh_common_client_kx(session, data, data_size,
 					       g, p, &psk_key);
 
-	_gnutls_free_temp_key_datum(&psk_key);
+	_gnutls_free_key_datum(&psk_key);
 
 	return ret;
 
@@ -393,7 +393,7 @@ proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 						 _gnutls_session_ecc_curve_get
 						 (session), &psk_key);
 
-	_gnutls_free_temp_key_datum(&psk_key);
+	_gnutls_free_key_datum(&psk_key);
 
 	return ret;
 }

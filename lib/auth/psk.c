@@ -258,7 +258,7 @@ _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	ret = 0;
 
       error:
-	_gnutls_free_temp_key_datum(&psk_key);
+	_gnutls_free_key_datum(&psk_key);
 
 	return ret;
 }
