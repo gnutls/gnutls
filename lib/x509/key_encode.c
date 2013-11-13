@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Red Hat
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -465,7 +466,7 @@ _gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 
       cleanup:
 	if (ret < 0)
-		asn1_delete_structure(c2);
+		asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
 
 	gnutls_pk_params_clear(&pk_params);
 	gnutls_pk_params_release(&pk_params);
@@ -554,8 +555,8 @@ _gnutls_asn1_encode_ecc(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 	_gnutls_free_datum(&pubkey);
 	return 0;
 
-      cleanup:
-	asn1_delete_structure(c2);
+cleanup:
+	asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
 	_gnutls_free_datum(&pubkey);
 
 	return ret;
@@ -635,7 +636,7 @@ _gnutls_asn1_encode_dsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 	return 0;
 
 cleanup:
-	asn1_delete_structure(c2);
+	asn1_delete_structure2(c2, ASN1_DELETE_FLAG_ZEROIZE);
 
 	return ret;
 }

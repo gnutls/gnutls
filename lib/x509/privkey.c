@@ -70,7 +70,7 @@ void gnutls_x509_privkey_deinit(gnutls_x509_privkey_t key)
 
 	gnutls_pk_params_clear(&key->params);
 	gnutls_pk_params_release(&key->params);
-	asn1_delete_structure(&key->key);
+	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 	gnutls_free(key);
 }
 
@@ -222,7 +222,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	return pkey_asn;
 
       error:
-	asn1_delete_structure(&pkey_asn);
+	asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	gnutls_pk_params_clear(&pkey->params);
 	gnutls_pk_params_release(&pkey->params);
 	return NULL;
@@ -324,7 +324,7 @@ _gnutls_privkey_decode_ecc_key(const gnutls_datum_t * raw_key,
 	return pkey_asn;
 
       error:
-	asn1_delete_structure(&pkey_asn);
+	asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	gnutls_pk_params_clear(&pkey->params);
 	gnutls_pk_params_release(&pkey->params);
 	return NULL;
@@ -399,7 +399,7 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 	return dsa_asn;
 
       error:
-	asn1_delete_structure(&dsa_asn);
+	asn1_delete_structure2(&dsa_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	gnutls_pk_params_clear(&pkey->params);
 	gnutls_pk_params_release(&pkey->params);
 	return NULL;
@@ -1776,7 +1776,7 @@ int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	asn1_delete_structure(&key->key);
+	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 
 	ret =
 	    _gnutls_asn1_encode_privkey(key->pk_algorithm, &key->key,
