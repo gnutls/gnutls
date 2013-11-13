@@ -128,6 +128,7 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 	gnutls_datum_t b64_data;
 	gnutls_datum_t salt, enc_key;
 	unsigned char *key_data;
+	size_t key_data_size;
 	const char *pem_header = (void *) data->data;
 	const char *pem_header_start = (void *) data->data;
 	ssize_t pem_header_size;
@@ -231,14 +232,15 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 		goto out_b64;
 	}
 
-	key_data = gnutls_malloc(b64_data.size);
+	key_data_size = b64_data.size;
+	key_data = gnutls_malloc(key_data_size);
 	if (!key_data) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto out_enc_key;
 	}
 
 	while (1) {
-		memcpy(key_data, b64_data.data, b64_data.size);
+		memcpy(key_data, b64_data.data, key_data_size);
 
 		ret = openssl_hash_password(password, &enc_key, &salt);
 		if (ret < 0) {
@@ -254,7 +256,7 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 		}
 
 		ret =
-		    gnutls_cipher_decrypt(handle, key_data, b64_data.size);
+		    gnutls_cipher_decrypt(handle, key_data, key_data_size);
 		gnutls_cipher_deinit(handle);
 
 		if (ret < 0) {
@@ -289,16 +291,16 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 			keylen += ofs;
 
 			/* If there appears to be more padding than required, fail */
-			if (b64_data.size - keylen > blocksize) {
+			if (key_data_size - keylen > blocksize) {
 				gnutls_assert();
 				goto fail;
 			}
 
 			/* If the padding bytes aren't all equal to the amount of padding, fail */
 			ofs = keylen;
-			while (ofs < b64_data.size) {
+			while (ofs < key_data_size) {
 				if (key_data[ofs] !=
-				    b64_data.size - keylen) {
+				    key_data_size - keylen) {
 					gnutls_assert();
 					goto fail;
 				}
@@ -318,9 +320,10 @@ gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 		goto out;
 	}
       out:
+	zeroize_key(key_data, key_data_size);
 	gnutls_free(key_data);
       out_enc_key:
-	gnutls_free(enc_key.data);
+	_gnutls_free_key_datum(&enc_key);
       out_b64:
 	gnutls_free(b64_data.data);
       out_salt:
