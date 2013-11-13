@@ -39,4 +39,4 @@ if test "$TSTAMP" != "1158969600"; then
     exit 77
 fi
 
-datefudge "2007-04-22" ./testcompat-main
+datefudge "2011-06-22" ./testcompat-main

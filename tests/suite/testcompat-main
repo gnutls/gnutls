@@ -542,7 +542,7 @@ wait_server $PID
 
 
 
-$OPENSSL_CLI s_client  -host localhost -port $PORT -dtls1 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null | grep "\:error\:" && \
+$OPENSSL_CLI s_client  -host localhost -port $PORT -dtls1 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
   fail $PID "Failed"
 
 kill $PID
