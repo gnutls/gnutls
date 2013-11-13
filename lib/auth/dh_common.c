@@ -100,7 +100,7 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 		ret =
 		    _gnutls_set_psk_session_key(session, psk_key,
 						&tmp_dh_key);
-		_gnutls_zfree_datum(&tmp_dh_key);
+		_gnutls_free_temp_key_datum(&tmp_dh_key);
 
 	}
 
@@ -175,7 +175,7 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 		ret =
 		    _gnutls_set_psk_session_key(session, pskkey,
 						&tmp_dh_key);
-		_gnutls_zfree_datum(&tmp_dh_key);
+		_gnutls_free_temp_key_datum(&tmp_dh_key);
 	}
 
 	zrelease_temp_mpi_key(&session->key.KEY);

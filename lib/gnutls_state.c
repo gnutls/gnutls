@@ -487,7 +487,7 @@ void gnutls_deinit(gnutls_session_t session)
 	zrelease_temp_mpi_key(&session->key.rsa[1]);
 
 	zrelease_temp_mpi_key(&session->key.dh_secret);
-	_gnutls_zfree_datum(&session->key.key);
+	_gnutls_free_temp_key_datum(&session->key.key);
 
 	gnutls_free(session);
 }
