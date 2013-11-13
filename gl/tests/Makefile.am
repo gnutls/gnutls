@@ -480,13 +480,6 @@ EXTRA_DIST += test-inet_pton.c signature.h macros.h
 
 ## end   gnulib module inet_pton-tests
 
-## begin gnulib module intprops
-
-
-EXTRA_DIST += intprops.h
-
-## end   gnulib module intprops
-
 ## begin gnulib module intprops-tests
 
 TESTS += test-intprops
