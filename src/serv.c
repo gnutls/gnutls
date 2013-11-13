@@ -627,7 +627,7 @@ const char *human_addr(const struct sockaddr *sa, socklen_t salen,
 	if (!buf || !buflen)
 		return NULL;
 
-	*buf = '\0';
+	*buf = 0;
 
 	switch (sa->sa_family) {
 #if HAVE_IPV6
@@ -641,27 +641,30 @@ const char *human_addr(const struct sockaddr *sa, socklen_t salen,
 		break;
 	}
 
-	l = strlen(buf);
+	l = 5;
 	buf += l;
 	buflen -= l;
 
 	if (getnameinfo(sa, salen, buf, buflen, NULL, 0, NI_NUMERICHOST) !=
-	    0)
-		return NULL;
+	    0) {	
+		   return NULL;
+        }
 
 	l = strlen(buf);
 	buf += l;
 	buflen -= l;
 
-	strncat(buf, " port ", buflen);
+	if (buflen < 8)
+		return save_buf;
 
-	l = strlen(buf);
-	buf += l;
-	buflen -= l;
+	strcat(buf, " port ");
+	buf += 6;
+	buflen -= 6;
 
 	if (getnameinfo(sa, salen, NULL, 0, buf, buflen, NI_NUMERICSERV) !=
-	    0)
-		return NULL;
+	    0) {
+		snprintf(buf, buflen, "%s", " unknown");
+        }
 
 	return save_buf;
 }
