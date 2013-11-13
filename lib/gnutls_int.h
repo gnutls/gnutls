@@ -1053,15 +1053,18 @@ inline static size_t max_user_send_size(gnutls_session_t session,
 	return max;
 }
 
-#ifdef ENABLE_FIPS140
-# define zeroize_temp_key(x, size) memset(x, 0, size)
-# define zrelease_temp_mpi_key(mpi) if (*mpi!=NULL) { \
+#define zrelease_mpi_key(mpi) if (*mpi!=NULL) { \
                 _gnutls_mpi_clear(*mpi); \
                 _gnutls_mpi_release(mpi); \
         }
+
+#ifdef ENABLE_FIPS140
+# define zeroize_temp_key(x, size) memset(x, 0, size)
+# define zrelease_temp_mpi_key zrelease_mpi_key
 #else
 # define zeroize_temp_key(x, size)
 # define zrelease_temp_mpi_key(mpi) _gnutls_mpi_release(mpi)
 #endif
+
 
 #endif				/* GNUTLS_INT_H */

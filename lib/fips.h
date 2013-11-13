@@ -26,6 +26,9 @@
 #include <gnutls_int.h>
 #include <gnutls/gnutls.h>
 
+/* This must be removed when finished */
+#define FIPS140_TEST
+
 typedef enum {
   FIPS_STATE_POWERON,
   FIPS_STATE_INIT,

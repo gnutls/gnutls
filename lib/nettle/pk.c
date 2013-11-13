@@ -55,6 +55,21 @@ static void rnd_func(void *_ctx, unsigned length, uint8_t * data)
 }
 
 static void
+ecc_scalar_zclear (struct ecc_scalar *s)
+{
+        memset(s->p, 0, ecc_size(s->ecc)*sizeof(mp_limb_t));
+        ecc_scalar_clear(s);
+}
+
+static void 
+ecc_point_zclear (struct ecc_point *p)
+{
+        memset(p->p, 0, 2*ecc_size(p->ecc)*sizeof(mp_limb_t));
+        ecc_point_clear(p);
+}
+  
+
+static void
 _dsa_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 		      struct dsa_public_key *pub)
 {
@@ -188,7 +203,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 
 		      ecc_cleanup:
 			ecc_point_clear(&ecc_pub);
-			ecc_scalar_clear(&ecc_priv);
+			ecc_scalar_zclear(&ecc_priv);
 			if (ret < 0)
 				goto cleanup;
 			break;
@@ -388,7 +403,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 						  &sig.s);
 
 			dsa_signature_clear(&sig);
-			ecc_scalar_clear(&priv);
+			ecc_scalar_zclear(&priv);
 
 			if (ret < 0) {
 				gnutls_assert();
@@ -884,7 +899,7 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 
 			_gnutls_mpi_sub_ui(t1, params->params[RSA_PRIME2],
 					   1);
-			_gnutls_mpi_release(&t2);
+			zrelease_mpi_key(&t2);
 
 			t2 = _gnutls_mpi_mod(params->params[RSA_PRIV], t1);
 			if (t2 == NULL) {
@@ -905,8 +920,8 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 			ret = 0;
 
 		      rsa_cleanup:
-			_gnutls_mpi_release(&t1);
-			_gnutls_mpi_release(&t2);
+			zrelease_mpi_key(&t1);
+			zrelease_mpi_key(&t2);
 		}
 
 		break;
@@ -940,7 +955,7 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 			ret = 0;
 
 		      dsa_cleanup:
-			_gnutls_mpi_release(&t1);
+			zrelease_mpi_key(&t1);
 		}
 
 		break;
@@ -991,7 +1006,7 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 			mpz_init(x1);
 			mpz_init(y1);
 			ecc_point_get(&r, x1, y1);
-			ecc_point_clear(&r);
+			ecc_point_zclear(&r);
 
 			mpz_init(x2);
 			mpz_init(y2);
@@ -1008,7 +1023,7 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 			ret = 0;
 
 		      ecc_cleanup:
-			ecc_scalar_clear(&priv);
+			ecc_scalar_zclear(&priv);
 			ecc_point_clear(&pub);
 		}
 		break;
@@ -1042,7 +1057,7 @@ static int calc_rsa_exp(gnutls_pk_params_st * params)
 	params->params[7] =
 	    _gnutls_mpi_mod(params->params[2] /*d */ , tmp);
 
-	_gnutls_mpi_release(&tmp);
+	zrelease_mpi_key(&tmp);
 
 	if (params->params[7] == NULL || params->params[6] == NULL) {
 		gnutls_assert();
@@ -1071,8 +1086,8 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 			   TOMPZ(params->params[RSA_PRIME1]));
 
 		/* calculate exp1 [6] and exp2 [7] */
-		_gnutls_mpi_release(&params->params[RSA_E1]);
-		_gnutls_mpi_release(&params->params[RSA_E2]);
+		zrelease_mpi_key(&params->params[RSA_E1]);
+		zrelease_mpi_key(&params->params[RSA_E2]);
 
 		result = calc_rsa_exp(params);
 		if (result < 0) {
@@ -1133,7 +1148,8 @@ extract_digest_info(const struct rsa_public_key *key,
 
 	return 1;
 
-      cleanup:
+cleanup:
+        memset(em, 0, sizeof(key->size));
 	gnutls_free(em);
 
 	return ret;

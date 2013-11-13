@@ -19,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *
  */
-
 #include <gnutls_int.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
@@ -28,8 +27,6 @@
 #include <fips.h>
 #include <gnutls/fips140.h>
 #include <dlfcn.h>
-
-#define FIPS140_TEST
 
 #ifdef ENABLE_FIPS140
 
