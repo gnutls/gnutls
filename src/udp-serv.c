@@ -41,7 +41,7 @@
 typedef struct {
   gnutls_session_t session;
   int fd;
-  struct sockaddr * cli_addr;
+  struct sockaddr_storage *cli_addr;
   socklen_t cli_addr_size;
 } priv_data_st;
 
@@ -54,7 +54,7 @@ static ssize_t pull_func(gnutls_transport_ptr_t p, void * data, size_t size);
 void udp_server(const char* name, int port, int mtu)
 {
     int sock, ret;
-    struct sockaddr_in cli_addr;
+    struct sockaddr_storage cli_addr;
     socklen_t cli_addr_size;
     char buffer[MAX_BUFFER];
     priv_data_st priv;
@@ -89,7 +89,7 @@ void udp_server(const char* name, int port, int mtu)
         if (ret > 0)
           {
             memset(&prestate, 0, sizeof(prestate));
-            ret = gnutls_dtls_cookie_verify(&cookie_key, &cli_addr, sizeof(cli_addr), buffer, ret, &prestate);
+            ret = gnutls_dtls_cookie_verify(&cookie_key, &cli_addr, cli_addr_size, buffer, ret, &prestate);
             if (ret < 0) /* cookie not valid */
               {
                 priv_data_st s;
@@ -97,11 +97,11 @@ void udp_server(const char* name, int port, int mtu)
                 memset(&s,0,sizeof(s));
                 s.fd = sock;
                 s.cli_addr = (void*)&cli_addr;
-                s.cli_addr_size = sizeof(cli_addr);
+                s.cli_addr_size = cli_addr_size;
                 
                 printf("Sending hello verify request to %s\n", human_addr ((struct sockaddr *)
-                  &cli_addr, sizeof(cli_addr), buffer, sizeof(buffer)));
-                gnutls_dtls_cookie_send(&cookie_key, &cli_addr, sizeof(cli_addr), &prestate, (gnutls_transport_ptr_t)&s, push_func);
+                  &cli_addr, cli_addr_size, buffer, sizeof(buffer)));
+                gnutls_dtls_cookie_send(&cookie_key, &cli_addr, cli_addr_size, &prestate, (gnutls_transport_ptr_t)&s, push_func);
 
                 /* discard peeked data*/
                 recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&cli_addr, &cli_addr_size);
@@ -109,7 +109,7 @@ void udp_server(const char* name, int port, int mtu)
               }
             printf ("Accepted connection from %s\n",
                             human_addr ((struct sockaddr *)
-                                        &cli_addr, sizeof(cli_addr), buffer,
+                                        &cli_addr, cli_addr_size, buffer,
                                         sizeof (buffer)));
           }
         else
@@ -121,8 +121,8 @@ void udp_server(const char* name, int port, int mtu)
 
         priv.session = session;
         priv.fd = sock;
-        priv.cli_addr = (struct sockaddr *)&cli_addr;
-        priv.cli_addr_size = sizeof(cli_addr);
+        priv.cli_addr = &cli_addr;
+        priv.cli_addr_size = cli_addr_size;
 
         gnutls_transport_set_ptr (session, &priv);
         gnutls_transport_set_push_function (session, push_func);
@@ -237,7 +237,7 @@ static ssize_t push_func (gnutls_transport_ptr_t p, const void * data, size_t si
 {
 priv_data_st *priv = p;
 
-  return sendto(priv->fd, data, size, 0, priv->cli_addr, priv->cli_addr_size);
+  return sendto(priv->fd, data, size, 0, (struct sockaddr*)priv->cli_addr, priv->cli_addr_size);
 }
 
 static ssize_t pull_func(gnutls_transport_ptr_t p, void * data, size_t size)
