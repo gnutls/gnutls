@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2013 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -19,9 +19,9 @@
  * 02110-1301, USA
  */
 
-unsigned int _asn1_str_cpy(char *dest, size_t dest_tot_size,
-			   const char *src);
-void _asn1_str_cat(char *dest, size_t dest_tot_size, const char *src);
+unsigned int _asn1_str_cpy (char *dest, size_t dest_tot_size,
+			    const char *src);
+void _asn1_str_cat (char *dest, size_t dest_tot_size, const char *src);
 
 #define Estrcpy(x,y) _asn1_str_cpy(x,ASN1_MAX_ERROR_DESCRIPTION_SIZE,y)
 #define Estrcat(x,y) _asn1_str_cat(x,ASN1_MAX_ERROR_DESCRIPTION_SIZE,y)

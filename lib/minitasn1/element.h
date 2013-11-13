@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2013 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -23,12 +23,12 @@
 #define _ELEMENT_H
 
 
-int _asn1_append_sequence_set(asn1_node node);
+int _asn1_append_sequence_set (asn1_node node);
 
-int _asn1_convert_integer(const unsigned char *value,
-			  unsigned char *value_out,
-			  int value_out_size, int *len);
+int _asn1_convert_integer (const unsigned char *value,
+			   unsigned char *value_out,
+			   int value_out_size, int *len);
 
-void _asn1_hierarchical_name(asn1_node node, char *name, int name_size);
+void _asn1_hierarchical_name (asn1_node node, char *name, int name_size);
 
 #endif
