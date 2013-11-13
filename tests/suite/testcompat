@@ -27,12 +27,13 @@ fi
 
 /usr/bin/openssl version|grep fips >/dev/null 2>&1
 if test $? = 0;then
-	echo "You need the full openssl to run this test (fips is not enough)"
-	exit 77
+	export FIPS=1
+else
+	export FIPS=0
 fi
 
 # Check for datefudge
-TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s`
+TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s 2>/dev/null`
 if test "$TSTAMP" != "1158969600"; then
     echo "You need datefudge to run this test"
     exit 77
