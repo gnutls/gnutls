@@ -2286,7 +2286,7 @@ _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 
       error:
 	asn1_delete_structure(&pbes2_asn);
-	asn1_delete_structure(&pkcs7_asn2, ASN1_DELETE_FLAG_ZEROIZE);
+	asn1_delete_structure2(&pkcs7_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	return result;
 }
 
