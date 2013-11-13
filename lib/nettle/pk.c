@@ -64,7 +64,7 @@ ecc_scalar_zclear (struct ecc_scalar *s)
 static void 
 ecc_point_zclear (struct ecc_point *p)
 {
-        memset(p->p, 0, 2*ecc_size(p->ecc)*sizeof(mp_limb_t));
+        memset(p->p, 0, ecc_size_a(p->ecc)*sizeof(mp_limb_t));
         ecc_point_clear(p);
 }
   
