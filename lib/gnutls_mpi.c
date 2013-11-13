@@ -251,9 +251,9 @@ _gnutls_mpi_dprint_size(const bigint_t a, gnutls_datum_t * dest,
  * from asn1 structs. Combines the read and mpi_scan
  * steps.
  */
-int
-_gnutls_x509_read_int(ASN1_TYPE node, const char *value,
-		      bigint_t * ret_mpi)
+static int
+__gnutls_x509_read_int(ASN1_TYPE node, const char *value,
+		      bigint_t * ret_mpi, int overwrite)
 {
 	int result;
 	uint8_t *tmpstr = NULL;
@@ -280,6 +280,9 @@ _gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 	}
 
 	result = _gnutls_mpi_scan(ret_mpi, tmpstr, tmpstr_size);
+
+	if (overwrite)
+                zeroize_key(tmpstr, tmpstr_size);
 	gnutls_free(tmpstr);
 
 	if (result < 0) {
@@ -290,11 +293,25 @@ _gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 	return 0;
 }
 
+int
+_gnutls_x509_read_int(ASN1_TYPE node, const char *value,
+		      bigint_t * ret_mpi)
+{
+	return __gnutls_x509_read_int(node, value, ret_mpi, 0);
+}
+
+int
+_gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
+		      bigint_t * ret_mpi)
+{
+	return __gnutls_x509_read_int(node, value, ret_mpi, 1);
+}
+
 /* Writes the specified integer into the specified node.
  */
-int
-_gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
-		       int lz)
+static int
+__gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
+		       int lz, int overwrite)
 {
 	uint8_t *tmpstr;
 	size_t s_len;
@@ -329,6 +346,9 @@ _gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 	}
 
 	result = asn1_write_value(node, value, tmpstr, s_len);
+	
+	if (overwrite)
+		zeroize_key(tmpstr, s_len);
 
 	gnutls_free(tmpstr);
 
@@ -338,4 +358,18 @@ _gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 	}
 
 	return 0;
+}
+
+int
+_gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
+		       int lz)
+{
+	return __gnutls_x509_write_int(node, value, mpi, lz, 0);
+}
+
+int
+_gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
+		       int lz)
+{
+	return __gnutls_x509_write_int(node, value, mpi, lz, 1);
 }

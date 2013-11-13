@@ -264,7 +264,8 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 	result =
 	    asn1_write_value(*pkey_info, "privateKeyAlgorithm.parameters",
 			     algo_params.data, algo_params.size);
-	_gnutls_free_datum(&algo_params);
+	_gnutls_zfree_datum(&algo_params);
+
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -283,7 +284,7 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 	result =
 	    asn1_write_value(*pkey_info, "privateKey", algo_privkey.data,
 			     algo_privkey.size);
-	_gnutls_free_datum(&algo_privkey);
+	_gnutls_zfree_datum(&algo_privkey);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -331,7 +332,7 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
       error:
 	asn1_delete_structure(pkey_info);
 	_gnutls_free_datum(&algo_params);
-	_gnutls_free_datum(&algo_privkey);
+	_gnutls_zfree_datum(&algo_privkey);
 	return result;
 
 }
@@ -527,14 +528,14 @@ encode_to_pkcs8_key(schema_id schema, const gnutls_datum_t * der_key,
 	}
 
 	_gnutls_free_datum(&tmp);
-	_gnutls_free_datum(&key);
+	_gnutls_zfree_datum(&key);
 
 	*out = pkcs8_asn;
 
 	return 0;
 
       error:
-	_gnutls_free_datum(&key);
+	_gnutls_zfree_datum(&key);
 	_gnutls_free_datum(&tmp);
 	asn1_delete_structure(&pkcs8_asn);
 	return result;
@@ -688,7 +689,7 @@ gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 
 	if (((flags & GNUTLS_PKCS_PLAIN) || password == NULL)
 	    && !(flags & GNUTLS_PKCS_NULL_PASSWORD)) {
-		_gnutls_free_datum(&tmp);
+		_gnutls_zfree_datum(&tmp);
 
 		ret =
 		    _gnutls_x509_export_int2(pkey_info, format,
@@ -701,7 +702,7 @@ gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 		ret =
 		    encode_to_pkcs8_key(schema, &tmp, password,
 					&pkcs8_asn);
-		_gnutls_free_datum(&tmp);
+		_gnutls_zfree_datum(&tmp);
 
 		if (ret < 0) {
 			gnutls_assert();
@@ -927,7 +928,7 @@ static int decrypt_pkcs8_key(const gnutls_datum_t * raw_key,
 	}
 
 	result = decode_private_key_info(&tmp, pkey);
-	_gnutls_free_datum(&tmp);
+	_gnutls_zfree_datum(&tmp);
 
 	if (result < 0) {
 		/* We've gotten this far. In the real world it's almost certain
@@ -1016,7 +1017,8 @@ _decode_pkcs8_rsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	}
 
 	pkey->key = _gnutls_privkey_decode_pkcs1_rsa_key(&tmp, pkey);
-	_gnutls_free_datum(&tmp);
+	_gnutls_zfree_datum(&tmp);
+
 	if (pkey->key == NULL) {
 		gnutls_assert();
 		goto error;
@@ -1043,7 +1045,8 @@ _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	}
 
 	pkey->key = _gnutls_privkey_decode_ecc_key(&tmp, pkey);
-	_gnutls_free_datum(&tmp);
+	_gnutls_zfree_datum(&tmp);
+
 	if (pkey->key == NULL) {
 		ret = GNUTLS_E_PARSING_ERROR;
 		gnutls_assert();
@@ -1073,7 +1076,7 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	ret =
 	    _gnutls_x509_read_der_int(tmp.data, tmp.size,
 				      &pkey->params.params[4]);
-	_gnutls_free_datum(&tmp);
+	_gnutls_zfree_datum(&tmp);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -2391,7 +2394,7 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 	}
 
 	_gnutls_free_datum(&tmp);
-	_gnutls_free_datum(&key);
+	_gnutls_zfree_datum(&key);
 
 	/* Now write the rest of the pkcs-7 stuff.
 	 */
@@ -2431,7 +2434,7 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 
 
       error:
-	_gnutls_free_datum(&key);
+	_gnutls_zfree_datum(&key);
 	_gnutls_free_datum(&tmp);
 	asn1_delete_structure(&pkcs7_asn);
 	return result;
