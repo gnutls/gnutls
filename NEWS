@@ -12,6 +12,8 @@ looking in unrelated to the object tokens.
 ** certtool: pathlen constraint is now read correctly. Reported by
 Christoph Seitz.
 
+** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
+
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
 
