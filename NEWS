@@ -13,6 +13,8 @@ looking in unrelated to the object tokens.
 
 ** libgnutls: Fixed bug in gnutls_x509_crt_set_dn() at DN parsing.
 
+** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
+
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
 
