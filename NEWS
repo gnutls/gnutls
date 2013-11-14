@@ -18,6 +18,8 @@ looking in unrelated to the object tokens.
 hole behavior in some firewalls by sending a large client hello. See
 http://www.ietf.org/mail-archive/web/tls/current/msg10423.html
 
+** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
+
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
 
