@@ -29,8 +29,6 @@
 #include <sys/types.h>
 #include <c-ctype.h>
 
-#define GNUTLS_PATH_MAX 1024
-
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>
