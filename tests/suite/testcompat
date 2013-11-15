@@ -25,11 +25,18 @@ if ! test -x /usr/bin/openssl;then
     exit 77
 fi
 
+/usr/bin/openssl version|grep fips >/dev/null 2>&1
+if test $? = 0;then
+	export FIPS=1
+else
+	export FIPS=0
+fi
+
 # Check for datefudge
-TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s`
+TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s 2>/dev/null`
 if test "$TSTAMP" != "1158969600"; then
     echo "You need datefudge to run this test"
     exit 77
 fi
 
-datefudge "2007-04-22" ./testcompat-main
+datefudge "2011-06-22" ./testcompat-main
