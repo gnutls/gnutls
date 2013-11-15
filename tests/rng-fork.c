@@ -85,12 +85,12 @@ void doit(void)
 		remove(FILENAME);
 
 		if (ret != sizeof(buf1)) {
-			fail("error testing the random generator.");
+			fail("error testing the random generator.\n");
 			return;
 		}
 
 		if (memcmp(buf1, buf2, sizeof(buf1)) == 0) {
-			fail("error in the random generator. Produces same valus after fork()");
+			fail("error in the random generator. Produces same valus after fork()\n");
 			return;
 		}
 		if (debug)

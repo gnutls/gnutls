@@ -38,7 +38,7 @@ endif
 noinst_LTLIBRARIES = libcrypto.la
 
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c egd.c egd.h \
-	gnettle.h gcm-camellia.h gcm-camellia.c
+	gnettle.h gcm-camellia.h gcm-camellia.c rnd-common.h rnd-common.c
 
 if ENABLE_FIPS140
 libcrypto_la_SOURCES += rnd-fips.c

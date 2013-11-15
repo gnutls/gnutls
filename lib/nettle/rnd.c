@@ -256,4 +256,5 @@ gnutls_crypto_rnd_st _gnutls_rnd_ops = {
 	.deinit = wrap_nettle_rnd_deinit,
 	.rnd = wrap_nettle_rnd,
 	.rnd_refresh = wrap_nettle_rnd_refresh,
+	.self_test = NULL,
 };

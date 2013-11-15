@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <gnutls_errors.h>
 #include <fips.h>
+#include <random.h>
 #include <gnutls/fips140.h>
 #include <dlfcn.h>
 
@@ -216,6 +217,17 @@ int _gnutls_fips_perform_self_checks(void)
 #ifndef FIPS140_TEST
 		goto error;
 #endif
+	}
+	
+	if (_gnutls_rnd_ops.self_test == NULL) {
+		gnutls_assert();
+		goto error;
+	}
+        
+	ret = _gnutls_rnd_ops.self_test();
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
 	}
 
 	return 0;

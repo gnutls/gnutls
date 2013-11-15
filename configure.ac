@@ -134,6 +134,12 @@ if [ test "$enable_fips" = "yes" ];then
   AC_LIB_HAVE_LINKFLAGS(dl,, [#include <dlfcn.h>], [dladdr (0, 0);])
   if test "x$HAVE_LIBDL" = "xyes";then
     enable_self_checks=yes
+
+    dnl clock_gettime precision is needed on the FIPS140 DRBG.
+    if test "$ac_cv_func_clock_gettime" != "yes";then
+      AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [clock_gettime (0, 0);])
+    fi
+
     AC_DEFINE([ENABLE_FIPS140], 1, [Enable FIPS140-2 mode])
 
     AC_SUBST([FIPS140_LIBS], $LIBDL)

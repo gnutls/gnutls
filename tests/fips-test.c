@@ -20,8 +20,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
-static char key16[16];
-static char iv16[16];
+static uint8_t key16[16];
+static uint8_t iv16[16];
 
 void doit(void)
 {
@@ -135,8 +135,8 @@ int ret;
 	}
 	
 	gnutls_global_deinit();
-	return 0;
+	return;
 #else
-	return 1; /* fail. This script shouldn't be called on this case */
+	exit(1); /* fail. This script shouldn't be called on this case */
 #endif
 }

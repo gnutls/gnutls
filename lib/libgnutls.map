@@ -939,6 +939,11 @@ GNUTLS_3_1_0 {
 GNUTLS_PRIVATE {
   global:
     # Internal symbols needed by libgnutls-extra:
+    /* fips */
+    _rngfips_deinit_external_test;
+    _rngfips_run_external_test;
+    _rngfips_init_external_test;
+
     gnutls_crypto_single_mac_register;
     gnutls_crypto_single_digest_register;
     _gnutls_log_level;
