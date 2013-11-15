@@ -51,6 +51,11 @@ gnutls_log_func _gnutls_log_func = NULL;
 gnutls_audit_log_func _gnutls_audit_log_func = NULL;
 int _gnutls_log_level = 0;	/* default log level */
 
+static void default_log_func(int level, const char* str)
+{
+	fprintf(stderr, "gnutls[%d]: %s\n", level, str);
+}
+
 /**
  * gnutls_global_set_log_function:
  * @log_func: it's a log function
@@ -191,10 +196,19 @@ static int _gnutls_init = 0;
 int gnutls_global_init(void)
 {
 	int result = 0;
-	int res;
+	int res, level;
+	const char* e;
 
 	if (_gnutls_init++)
 		goto out;
+		
+	e = getenv("GNUTLS_DEBUG_LEVEL");
+	if (e != NULL) {
+		level = atoi(e);
+		gnutls_global_set_log_level(level);
+		gnutls_global_set_log_function(default_log_func);
+		fprintf(stderr, "Enabled GnuTLS logging on stderr\n");
+	}
 
 	if (gl_sockets_startup(SOCKETS_1_1))
 		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
