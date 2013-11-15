@@ -1599,6 +1599,11 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
       memcpy (session->internals.resumed_security_parameters.client_random,
               session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
 
+      memcpy(session->security_parameters.cipher_suite,
+			session->internals.resumed_security_parameters.cipher_suite, 2);
+      session->security_parameters.compression_method =
+		        session->internals.resumed_security_parameters.compression_method;
+
       _gnutls_epoch_set_cipher_suite
         (session, EPOCH_NEXT,
          session->internals.
