@@ -777,12 +777,12 @@ P_hash(gnutls_mac_algorithm_t algorithm,
 	int output_bytes, result;
 	const mac_entry_st *me = mac_to_entry(algorithm);
 
-	if (seed_size > MAX_SEED_SIZE || total_bytes <= 0) {
+	blocksize = _gnutls_mac_get_algo_len(me);
+
+	if (seed_size > MAX_SEED_SIZE || total_bytes <= 0 || blocksize == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
-
-	blocksize = _gnutls_mac_get_algo_len(me);
 
 	output_bytes = 0;
 	do {
