@@ -22,6 +22,9 @@ http://www.ietf.org/mail-archive/web/tls/current/msg10423.html
 ** libgnutls: The GNUTLS_DEBUG_LEVEL variable if set to a log level number
 will force output of debug messages to stderr.
 
+** Fixed the setting of the ciphersuite when gnutls_premaster_set() is used
+with another protocol than the GNUTLS_DTLS0_9 protocol.
+
 ** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
 
 ** certtool: When exporting an encrypted PEM private key do not output the key
