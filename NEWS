@@ -24,7 +24,8 @@ http://www.ietf.org/mail-archive/web/tls/current/msg10423.html
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
 
-** tools: The environment variable GNUTLS_PIN can be used to read the PIN.
+** tools: The environment variable GNUTLS_PIN can be used to read any PIN
+requested from tokens.
 
 ** API and ABI modifications:
 gnutls_pkcs11_obj_export3: Added
