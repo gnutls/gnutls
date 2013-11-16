@@ -37,10 +37,12 @@ AC_MSG_RESULT([***
 dnl Checks for programs.
 AC_PROG_CC
 gl_EARLY
+ggl_EARLY
 AM_PROG_AS
 AM_PROG_AR
 AC_PROG_CXX
 AM_PROG_CC_C_O
+AC_PROG_YACC
 AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [/bin/true])
 
 if test x"$AUTOGEN" = "x/bin/true"; then
@@ -141,6 +143,7 @@ AM_GNU_GETTEXT_VERSION([0.18])
 AC_C_BIGENDIAN
 
 gl_INIT
+ggl_INIT
 
 dnl GCC warnings to enable
 
@@ -648,6 +651,7 @@ AC_CONFIG_FILES([
   po/Makefile.in
   src/Makefile
   src/crywrap/Makefile
+  src/gl/Makefile
   tests/Makefile
   tests/cert-tests/Makefile
   tests/dsa/Makefile
