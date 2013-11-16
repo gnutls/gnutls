@@ -35,6 +35,7 @@ EXTRA_DIST = args-std.def
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(srcdir)/../gl			\
+	-I$(srcdir)/gl				\
 	-I$(builddir)/../gl			\
 	-I$(builddir)/../lib/includes		\
 	-I$(srcdir)/../lib/includes		\
@@ -148,8 +149,8 @@ noinst_LTLIBRARIES += libcmd-certtool.la
 libcmd_certtool_la_CFLAGS =
 libcmd_certtool_la_SOURCES = certtool-args.c certtool-args.def certtool-args.h	\
 	certtool-cfg.h certtool-cfg.c
-libcmd_certtool_la_LIBADD = $(LIBOPTS) ../gl/libgnu.la ../lib/libgnutls.la gl/libgnu_gpl.a
-libcmd_certtool_la_LIBADD += $(LTLIBINTL)
+libcmd_certtool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_certtool_la_LIBADD += $(LIBOPTS) $(LTLIBINTL)
 libcmd_certtool_la_LIBADD += $(LTLIBREADLINE)
 libcmd_certtool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
@@ -164,10 +165,11 @@ noinst_LTLIBRARIES += libcmd-danetool.la
 libcmd_danetool_la_CFLAGS =
 libcmd_danetool_la_SOURCES = danetool-args.c danetool-args.def danetool-args.h \
 	certtool-cfg.h certtool-cfg.c
-libcmd_danetool_la_LIBADD = $(LIBOPTS) ../gl/libgnu.la ../lib/libgnutls.la
+libcmd_danetool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_danetool_la_LIBADD += $(LIBOPTS)
 libcmd_danetool_la_LIBADD += $(LTLIBINTL)
 libcmd_danetool_la_LIBADD += $(LTLIBREADLINE)
-libcmd_danetool_la_LIBADD += $(INET_PTON_LIB)
+libcmd_danetool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
 # p11 tool
 if ENABLE_PKCS11
@@ -182,8 +184,8 @@ noinst_LTLIBRARIES += libcmd-p11tool.la
 libcmd_p11tool_la_CFLAGS =
 libcmd_p11tool_la_SOURCES = p11tool-args.def p11tool-args.c p11tool-args.h \
 	certtool-cfg.h certtool-cfg.c
-libcmd_p11tool_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
-libcmd_p11tool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB)
+libcmd_p11tool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_p11tool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
 endif # ENABLE_PKCS11
 
@@ -198,8 +200,8 @@ noinst_LTLIBRARIES += libcmd-tpmtool.la
 libcmd_tpmtool_la_CFLAGS =
 libcmd_tpmtool_la_SOURCES = tpmtool-args.def tpmtool-args.c tpmtool-args.h \
 	certtool-cfg.h certtool-cfg.c
-libcmd_tpmtool_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la
-libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB)
+libcmd_tpmtool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
 endif # ENABLE_TROUSERS
 

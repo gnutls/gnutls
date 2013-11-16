@@ -582,6 +582,11 @@ serial = 007
 # Use -1 if there is no expiration date.
 expiration_days = 700
 
+# Alternatively you may set concrete dates. Acceptable dates are dates
+# read by getdate().
+#activation_date = "2004-02-29 16:21:42"
+#expiration_date = "2025-02-29 16:24:41"
+
 # X.509 v3 extensions
 
 # A dnsname in case of a WWW server.

@@ -38,7 +38,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <intprops.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -231,8 +230,8 @@ generate_certificate(gnutls_privkey_t * ret_key,
 	size_t size;
 	int ret;
 	int client;
-	int days, result, ca_status = 0, is_ike = 0, path_len;
-	time_t secs, now;
+	int result, ca_status = 0, is_ike = 0, path_len;
+	time_t secs;
 	int vers;
 	unsigned int usage = 0, server;
 	gnutls_x509_crq_t crq;	/* request */
@@ -329,28 +328,16 @@ generate_certificate(gnutls_privkey_t * ret_key,
 	if (!batch)
 		fprintf(stderr, "\n\nActivation/Expiration time.\n");
 
-	now = time(NULL);
+	secs = get_activation_date();
 
-	gnutls_x509_crt_set_activation_time(crt, now);
+	result = gnutls_x509_crt_set_activation_time(crt, secs);
+	if (result < 0) {
+		fprintf(stderr, "set_activation: %s",
+			gnutls_strerror(result));
+		exit(1);
+	}
 
-	days = get_days();
-	secs = days;
-
-	if (secs != (time_t)-1) {
-	        if (INT_MULTIPLY_OVERFLOW(secs, 24*60*60)) {
-	                secs = -1;
-	        } else {
-	                secs *= 24*60*60;
-	        }
-        }
-
-	if (secs != (time_t)-1) {
-	        if (INT_ADD_OVERFLOW(secs, now)) {
-	                secs = -1;
-	        } else {
-	                secs += now;
-	        }
-        }
+	secs = get_expiration_date();
 
 	result = gnutls_x509_crt_set_expiration_time(crt, secs);
 	if (result < 0) {
@@ -942,8 +929,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 	int result;
 	gnutls_privkey_t ca_key;
 	gnutls_x509_crt_t ca_crt;
-	int days;
-	time_t tim = time(NULL);
+	time_t tim;
 
 	fprintf(stderr, "Generating a signed certificate...\n");
 
@@ -952,15 +938,20 @@ static void update_signed_certificate(common_info_st * cinfo)
 	crt = load_cert(1, cinfo);
 
 	fprintf(stderr, "Activation/Expiration time.\n");
-	gnutls_x509_crt_set_activation_time(crt, tim);
+	tim = get_activation_date();
 
-	days = get_days();
+	result = gnutls_x509_crt_set_activation_time(crt, tim);
+	if (result < 0) {
+		fprintf(stderr, "set_activation: %s",
+			gnutls_strerror(result));
+		exit(1);
+	}
+
+	tim = get_expiration_date();
 
 	result =
 	    gnutls_x509_crt_set_expiration_time(crt,
-						tim +
-						((time_t) days) * 24 * 60 *
-						60);
+						tim);
 	if (result < 0) {
 		fprintf(stderr, "set_expiration: %s",
 			gnutls_strerror(result));
