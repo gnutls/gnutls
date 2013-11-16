@@ -13,10 +13,17 @@ looking in unrelated to the object tokens.
 
 ** libgnutls: Fixed bug in gnutls_x509_crt_set_dn() at DN parsing.
 
+** libgnutls: gnutls_x509_crt_set_expiration_time() will set the no well defined
+expiration date when (time_t)-1 is specified as date.
+
 ** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
 
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
+
+** certtool: Expiration days template option allows for a -1 value which
+will set to the no well defined expiration date (RFC5280), and no longer
+chokes on integer overflows. Suggested by Stefan Buehler.
 
 ** tools: The environment variable GNUTLS_PIN can be used to read any PIN
 requested from tokens.

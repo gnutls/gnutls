@@ -14,7 +14,7 @@ copyright = {
     owner = "Free Software Foundation";
     author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; "
              "see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
-    eaddr  = "bug-gnutls@gnu.org";
+    eaddr  = "bugs@gnutls.org";
     type  = gpl;
 };
 
