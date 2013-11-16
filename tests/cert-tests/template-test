@@ -46,7 +46,7 @@ datefudge "2007-04-22" \
     --template $srcdir/template-test.tmpl \
     --outfile tmp-tt.pem 2>/dev/null
 
-diff $srcdir/template-test.pem tmp-tt.pem
+diff $srcdir/template-test.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
 counter=`expr $counter + 1` 
 done
@@ -70,7 +70,7 @@ datefudge "2007-04-22" \
     --template $srcdir/template-utf8.tmpl \
     --outfile tmp-tt.pem 2>/dev/null
 
-diff $srcdir/template-utf8.pem tmp-tt.pem
+diff $srcdir/template-utf8.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
 counter=`expr $counter + 1` 
 done
@@ -94,7 +94,7 @@ datefudge "2007-04-22" \
     --template $srcdir/template-dn.tmpl \
     --outfile tmp-tt.pem 2>/dev/null
 
-diff $srcdir/template-dn.pem tmp-tt.pem
+diff $srcdir/template-dn.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
 counter=`expr $counter + 1` 
 done
@@ -107,5 +107,52 @@ fi
 
 rm -f tmp-tt.pem
 
+rc=1
+counter=1
+
+while [ "$rc" != "0" -a $counter -le 3 ]
+do
+datefudge "2007-04-22" \
+    $CERTTOOL --generate-self-signed \
+    --load-privkey $srcdir/template-test.key \
+    --template $srcdir/template-overflow.tmpl \
+    --outfile tmp-tt.pem 2>/dev/null
+
+diff $srcdir/template-overflow.pem tmp-tt.pem >/dev/null 2>&1 
+rc=$?
+counter=`expr $counter + 1` 
+done
+
+# We're done.
+if test "$rc" != "0"; then
+  echo "Test 4 (overflow1) failed"
+  exit $rc
+fi
+
+rm -f tmp-tt.pem
+
+rc=1
+counter=1
+
+while [ "$rc" != "0" -a $counter -le 3 ]
+do
+datefudge "2007-04-22" \
+    $CERTTOOL --generate-self-signed \
+    --load-privkey $srcdir/template-test.key \
+    --template $srcdir/template-overflow2.tmpl \
+    --outfile tmp-tt.pem 2>/dev/null
+
+diff $srcdir/template-overflow2.pem tmp-tt.pem >/dev/null 2>&1
+rc=$?
+counter=`expr $counter + 1` 
+done
+
+# We're done.
+if test "$rc" != "0"; then
+  echo "Test 5 (overflow2) failed"
+  exit $rc
+fi
+
+rm -f tmp-tt.pem
 
 exit 0
