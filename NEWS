@@ -46,6 +46,7 @@ requested from tokens.
 ** API and ABI modifications:
 gnutls_pkcs11_obj_export3: Added
 gnutls_pkcs11_get_raw_issuer: Added
+gnutls_est_record_overhead_size: Exported
 
 
 * Version 3.2.6 (released 2013-10-31)
