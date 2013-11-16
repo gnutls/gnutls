@@ -921,6 +921,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/hash-pjw-bare.h
   lib/inet_ntop.c
   lib/inet_pton.c
+  lib/intprops.h
   lib/itold.c
   lib/listen.c
   lib/lseek.c
@@ -1275,7 +1276,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/glthread/lock.h
   tests=lib/glthread/threadlib.c
   tests=lib/ignore-value.h
-  tests=lib/intprops.h
   tests=lib/inttypes.in.h
   tests=lib/ioctl.c
   tests=lib/lstat.c
