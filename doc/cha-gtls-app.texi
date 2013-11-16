@@ -1036,7 +1036,7 @@ over the maximum allowed TLS record.
 @item %DUMBFW @tab
 will add a private extension with bogus data that make the client
 hello exceed 512 bytes. This avoids a black hole behavior in some
-firewalls.
+firewalls. This is a non-standard TLS extension, use with care.
 
 @item %NO_EXTENSIONS @tab
 will prevent the sending of any TLS extensions in client side. Note
