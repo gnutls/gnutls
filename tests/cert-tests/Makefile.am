@@ -24,7 +24,8 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	funny-spacing.pem ca-certs.pem dane-test.rr cert-ecc256.pem \
 	bmpstring.pem template-utf8.pem template-utf8.tmpl \
 	template-dn.tmpl template-dn.pem complex-cert.pem template-overflow.pem \
-	template-overflow.tmpl template-overflow2.pem template-overflow2.tmpl
+	template-overflow.tmpl template-overflow2.pem template-overflow2.tmpl \
+	template-date.tmpl template-date.pem
 
 dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane
 
