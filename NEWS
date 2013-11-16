@@ -3,29 +3,12 @@ Copyright (C) 2000-2012 Free Software Foundation, Inc.
 Copyright (C) 2013 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.2.7 (unreleased)
+* Version 3.3.0 (unreleased)
 
-** libgnutls: gnutls_cipher_get_iv_size() now returns the correct IV size in
-GCM ciphers (previously it returned the implicit IV used in TLS).
-
-** libgnutls: gnutls_certificate_set_x509_key_file() et al when provided a
-PKCS #11 URL with a certificate, will attempt to load the whole chain.
-
-** libgnutls: When traversing PKCS #11 tokens looking for an object, avoid
-looking in unrelated to the object tokens.
-
-** libgnutls: Added %DUMBFW option for priority strings. This avoids a black
-hole behavior in some firewalls by sending a large client hello. See
-http://www.ietf.org/mail-archive/web/tls/current/msg10423.html
-
-** certtool: When exporting an encrypted PEM private key do not output the key
-parameters.
-
-** tools: The environment variable GNUTLS_PIN can be used to read the PIN.
+** libgnutls: Depend on p11-kit 0.19.1 or later.
 
 ** API and ABI modifications:
-gnutls_pkcs11_obj_export3: Added
-gnutls_pkcs11_get_raw_issuer: Added
+No changes since last version.
 
 
 * Version 3.2.6 (released 2013-10-31)
