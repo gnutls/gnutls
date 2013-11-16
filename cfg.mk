@@ -80,8 +80,8 @@ bootstrap: autoreconf
 # The only non-lgpl modules used are: gettime progname timespec. Those
 # are not used (and must not be used) in the library)
 glimport:
-	gnulib-tool --local-dir=gl --add-import --lgpl=2
-	gnulib-tool --local-dir=src/gl --add-import
+	../gnulib/gnulib-tool --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --add-import --lgpl=2
+	../gnulib/gnulib-tool --dir=. --local-dir=src/gl/override --lib=libgnu_gpl --source-base=src/gl --m4-base=src/gl/m4 --doc-base=doc --tests-base=tests --aux-dir=build-aux --add-import
 
 # Code Coverage
 
