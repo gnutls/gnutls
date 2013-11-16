@@ -39,6 +39,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <error.h>
+#include <intprops.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -243,6 +244,7 @@ generate_certificate (gnutls_privkey_t * ret_key,
   int ret;
   int client;
   int days, result, ca_status = 0, is_ike = 0, path_len;
+  time_t secs;
   int vers;
   unsigned int usage = 0, server;
   gnutls_x509_crq_t crq;        /* request */
@@ -333,10 +335,28 @@ generate_certificate (gnutls_privkey_t * ret_key,
   gnutls_x509_crt_set_activation_time (crt, time (NULL));
 
   days = get_days ();
+  secs = days;
+
+  if (secs != (time_t)-1) {
+      if (INT_MULTIPLY_OVERFLOW(secs, 24*60*60)) {
+          secs = -1;
+      } else {
+           secs *= 24*60*60;
+      }
+   }
+
+   if (secs != (time_t)-1) {
+      time_t now = time(0);
+
+      if (INT_ADD_OVERFLOW(secs, now)) {
+         secs = -1;
+      } else {
+          secs += now;
+      }
+   }
 
   result =
-    gnutls_x509_crt_set_expiration_time (crt,
-                                         time (NULL) + ((time_t) days) * 24 * 60 * 60);
+    gnutls_x509_crt_set_expiration_time (crt, secs);
   if (result < 0)
     error (EXIT_FAILURE, 0, "set_expiration: %s", gnutls_strerror (result));
 
@@ -565,7 +585,6 @@ generate_certificate (gnutls_privkey_t * ret_key,
 
   *ret_key = key;
   return crt;
-
 }
 
 static gnutls_x509_crl_t
