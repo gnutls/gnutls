@@ -914,7 +914,6 @@ GNUTLS_3_1_0 {
 	gnutls_certificate_set_trust_list;
 	gnutls_cipher_get_tag_size;
 	gnutls_record_overhead_size;
-	gnutls_record_overhead_size2;
 	gnutls_handshake_set_hook_function;
 	gnutls_handshake_description_get_name;
 	gnutls_digest_list;
@@ -927,6 +926,7 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs11_token_get_random;
 	gnutls_pkcs11_obj_export3;
 	gnutls_pkcs11_get_raw_issuer;
+	gnutls_est_record_overhead_size;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
