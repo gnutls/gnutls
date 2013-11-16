@@ -38,6 +38,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <intprops.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -328,17 +329,28 @@ generate_certificate(gnutls_privkey_t * ret_key,
 	if (!batch)
 		fprintf(stderr, "\n\nActivation/Expiration time.\n");
 
-	gnutls_x509_crt_set_activation_time(crt, time(NULL));
-
 	now = time(NULL);
 
-	do {
-		days = get_days();
-		secs = days * 24 * 60 * 60 + now;
-	}
-	while (secs < now
-	       || (unsigned) (secs - now) / (24 * 60 * 60) !=
-	       (unsigned) days);
+	gnutls_x509_crt_set_activation_time(crt, now);
+
+	days = get_days();
+	secs = days;
+
+	if (secs != (time_t)-1) {
+	        if (INT_MULTIPLY_OVERFLOW(secs, 24*60*60)) {
+	                secs = -1;
+	        } else {
+	                secs *= 24*60*60;
+	        }
+        }
+
+	if (secs != (time_t)-1) {
+	        if (INT_ADD_OVERFLOW(secs, now)) {
+	                secs = -1;
+	        } else {
+	                secs += now;
+	        }
+        }
 
 	result = gnutls_x509_crt_set_expiration_time(crt, secs);
 	if (result < 0) {

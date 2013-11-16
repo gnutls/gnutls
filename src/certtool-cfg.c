@@ -842,7 +842,7 @@ int get_days(void)
 	int days;
 
 	if (batch) {
-		if (cfg.expiration_days <= 0)
+		if (cfg.expiration_days == 0 || cfg.expiration_days < -2)
 			return 365;
 		else
 			return cfg.expiration_days;
