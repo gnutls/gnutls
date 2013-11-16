@@ -53,7 +53,7 @@ int _gnutls_log_level = 0;	/* default log level */
 
 static void default_log_func(int level, const char* str)
 {
-	fprintf(stderr, "gnutls[%d]: %s\n", level, str);
+	fprintf(stderr, "gnutls[%d]: %s", level, str);
 }
 
 /**
