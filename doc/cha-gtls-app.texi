@@ -145,6 +145,10 @@ verbose information on the @acronym{GnuTLS} functions internal flow.
 
 @showfuncB{gnutls_global_set_log_level,gnutls_global_set_log_function}
 
+Alternatively the environment variable @code{GNUTLS_DEBUG_LEVEL} can be
+set to a logging level and GnuTLS will output debugging output to standard
+error.
+
 When debugging is not required, important issues, such as detected
 attacks on the protocol still need to be logged. This is provided
 by the logging function set by
