@@ -727,6 +727,12 @@ gtime2generalTime (time_t gtime, char *str_time, size_t str_time_size)
 {
   size_t ret;
   struct tm _tm;
+	
+  if (gtime == (time_t)-1) 
+    {
+       	snprintf(str_time, str_time_size, "99991231235959Z");
+       	return 0;
+    }
 
   if (!gmtime_r (&gtime, &_tm))
     {
