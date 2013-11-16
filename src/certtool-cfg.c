@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -30,7 +31,9 @@
 #include <limits.h>
 #include <inttypes.h>
 #include <time.h>
+#include <parse-datetime.h>
 #include <autoopts/options.h>
+#include <intprops.h>
 
 /* for inet_pton */
 #include <sys/types.h>
@@ -74,6 +77,8 @@ typedef struct _cfg_ctx {
 	char *crl_dist_points;
 	char *password;
 	char *pkcs12_key_name;
+	char *expiration_date;
+	char *activation_date;
 	int serial;
 	int expiration_days;
 	int ca;
@@ -237,6 +242,14 @@ int template_parse(const char *template)
 	val = optionGetValue(pov, "country");
 	if (val != NULL && val->valType == OPARG_TYPE_STRING)
 		cfg.country = strdup(val->v.strVal);
+
+	val = optionGetValue(pov, "expiration_date");
+	if (val != NULL && val->valType == OPARG_TYPE_STRING)
+		cfg.expiration_date = strdup(val->v.strVal);
+
+	val = optionGetValue(pov, "activation_date");
+	if (val != NULL && val->valType == OPARG_TYPE_STRING)
+		cfg.activation_date = strdup(val->v.strVal);
 
 	for (i = 0; i < MAX_POLICIES; i++) {
 		snprintf(tmpstr, sizeof(tmpstr), "policy%d", i + 1);
@@ -837,23 +850,82 @@ int get_serial(void)
 	}
 }
 
-int get_days(void)
+static
+time_t get_date(const char* date)
 {
-	int days;
+	time_t t;
+	struct timespec r;
+	
+	if (date==NULL || parse_datetime(&r, date, NULL) == 0) {
+	        fprintf(stderr, "Cannot parse date: %s\n", date);
+	        exit(1);
+        }
+        
+        return r.tv_sec;
+}
 
+time_t get_activation_date()
+{
+
+	if (batch && cfg.activation_date != NULL) {
+       		return get_date(cfg.activation_date);
+	}
+	
+	return time(NULL);
+}
+
+static
+time_t days_to_secs(int days)
+{
+time_t secs = days;
+time_t now = time(NULL);
+
+       	if (secs != (time_t)-1) {
+      	        if (INT_MULTIPLY_OVERFLOW(secs, 24*60*60)) {
+       	                secs = -1;
+	        } else {
+    	                secs *= 24*60*60;
+      	        }
+        }
+                                
+        if (secs != (time_t)-1) {
+                if (INT_ADD_OVERFLOW(secs, now)) {
+                        secs = -1;
+                } else {
+                        secs += now;
+                }
+        }
+        
+        return secs;
+}
+
+time_t get_expiration_date()
+{
 	if (batch) {
-		if (cfg.expiration_days == 0 || cfg.expiration_days < -2)
-			return 365;
-		else
-			return cfg.expiration_days;
+		if (cfg.expiration_date == NULL) {
+		        time_t secs, now;
+		        
+		        now = time(NULL);
+
+        		if (cfg.expiration_days == 0 || cfg.expiration_days < -2)
+        		        secs = days_to_secs(365);
+                        else {
+                                secs = days_to_secs(cfg.expiration_days);
+                        }
+
+			return secs;
+		} else
+			return get_date(cfg.expiration_date);
 	} else {
+		int days;
+
 		do {
 			days =
 			    read_int
 			    ("The certificate will expire in (days): ");
 		}
 		while (days == 0);
-		return days;
+		return days_to_secs(days);
 	}
 }
 
