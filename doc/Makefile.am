@@ -22,7 +22,7 @@
 EXTRA_DIST = TODO certtool.cfg gnutls.pdf gnutls.html	\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
 	gnutls-guile.pdf gnutls-guile.html stamp_enums stamp_functions \
-	doc.mk
+	doc.mk stamp_invoke
 
 SUBDIRS = examples cyclo scripts manpages credentials latex
 if ENABLE_GTK_DOC
@@ -56,28 +56,28 @@ SRC_DEF_TPMTOOL += ../src/tpmtool-args.def
 endif
 
 invoke-gnutls-cli.texi: $(SRC_DEF_CLI)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-gnutls-cli-debug.texi: $(SRC_DEF_CLI_DEBUG)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-gnutls-cli-debug.texi: $(SRC_DEF_CLI_DEBUG) invoke-gnutls-cli.texi
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-gnutls-serv.texi: $(SRC_DEF_SERV)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-gnutls-serv.texi: $(SRC_DEF_SERV) invoke-gnutls-cli-debug.texi
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-certtool.texi: $(SRC_DEF_CERTTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-certtool.texi: $(SRC_DEF_CERTTOOL) invoke-gnutls-serv.texi
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -85,8 +85,8 @@ invoke-certtool.texi: $(SRC_DEF_CERTTOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL) invoke-certtool.texi
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -94,8 +94,8 @@ invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-danetool.texi: $(SRC_DEF_DANETOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-danetool.texi: $(SRC_DEF_DANETOOL) invoke-ocsptool.texi
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -103,8 +103,8 @@ invoke-danetool.texi: $(SRC_DEF_DANETOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-srptool.texi: $(SRC_DEF_SRPTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-srptool.texi: $(SRC_DEF_SRPTOOL) invoke-danetool.texi
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -112,8 +112,8 @@ invoke-srptool.texi: $(SRC_DEF_SRPTOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsubsection/g' ../doc/$@
 
-invoke-psktool.texi: $(SRC_DEF_PSKTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-psktool.texi: $(SRC_DEF_PSKTOOL) invoke-srptool.texi
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -121,8 +121,8 @@ invoke-psktool.texi: $(SRC_DEF_PSKTOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsubsection/g' ../doc/$@
 
-invoke-p11tool.texi: $(SRC_DEF_P11TOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-p11tool.texi: $(SRC_DEF_P11TOOL) invoke-psktool.texi
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -130,8 +130,8 @@ invoke-p11tool.texi: $(SRC_DEF_P11TOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-tpmtool.texi: $(SRC_DEF_TPMTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-tpmtool.texi: $(SRC_DEF_TPMTOOL) invoke-p11tool.texi
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -149,12 +149,13 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi 	\
 	cha-tokens.texi cha-crypto.texi cha-auth.texi
 
-gnutls_TEXINFOS += invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
+stamp_invoke: invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
 	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi \
 	invoke-tpmtool.texi invoke-danetool.texi
+	echo $@ > $@
 
-gnutls_TEXINFOS += stamp_functions
+gnutls_TEXINFOS += stamp_functions stamp_invoke
 
 # Examples.
 gnutls_TEXINFOS += examples/ex-client-anon.c				\
@@ -213,7 +214,7 @@ API_FILES=gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi \
 	xssl-api.texi
 
 clean-local:
-	-rm -f stamp_enums stamp_functions
+	-rm -f stamp_enums stamp_functions stamp_invoke
 	-rm -rf functions/ enums/
 	-rm -f $(API_FILES)
 
@@ -413,7 +414,7 @@ enums.texi: $(HEADER_FILES)
 	mv -f $@-tmp $@
 
 gnutls_TEXINFOS += $(ENUMS) $(FUNCS)
-DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
+DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions stamp_invoke
 
 
 stamp_functions: $(API_FILES)
