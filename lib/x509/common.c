@@ -707,7 +707,11 @@ gtime2generalTime(time_t gtime, char *str_time, size_t str_time_size)
 	size_t ret;
 	struct tm _tm;
 	
-	if (gtime == (time_t)-1) {
+	if (gtime == (time_t)-1
+#if SIZEOF_LONG == 8
+		|| gtime >= 253402210800
+#endif
+	 ) {
         	snprintf(str_time, str_time_size, "99991231235959Z");
         	return 0;
 	}
@@ -796,7 +800,6 @@ _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 		    gtime2generalTime(tim, str_time, sizeof(str_time));
 		if (result < 0)
 			return gnutls_assert_val(result);
-
 		len = strlen(str_time);
 		result = asn1_write_value(c2, where, str_time, len);
 		if (result != ASN1_SUCCESS)
