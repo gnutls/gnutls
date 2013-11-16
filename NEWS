@@ -22,13 +22,20 @@ http://www.ietf.org/mail-archive/web/tls/current/msg10423.html
 ** libgnutls: The GNUTLS_DEBUG_LEVEL variable if set to a log level number
 will force output of debug messages to stderr.
 
-** Fixed the setting of the ciphersuite when gnutls_premaster_set() is used
-with another protocol than the GNUTLS_DTLS0_9 protocol.
+** libgnutls: Fixed the setting of the ciphersuite when gnutls_premaster_set() 
+is used with another protocol than the GNUTLS_DTLS0_9 protocol.
+
+** libgnutls: gnutls_x509_crt_set_expiration_time() will set the no well defined
+expiration date when (time_t)-1 is specified as date.
 
 ** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
 
 ** certtool: When exporting an encrypted PEM private key do not output the key
 parameters.
+
+** certtool: Expiration days template option allows for a -1 value which
+will set to the no well defined expiration date (RFC5280), and no longer
+chokes on integer overflows. Suggested by Stefan Buehler.
 
 ** tools: The environment variable GNUTLS_PIN can be used to read any PIN
 requested from tokens.
