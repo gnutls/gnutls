@@ -670,3 +670,13 @@ src/srptool-args.c
 src/srptool-args.h
 src/tpmtool-args.c
 src/tpmtool-args.h
+src/gl/alloca.h
+src/gl/arg-nonnull.h
+src/gl/c++defs.h
+src/gl/parse-datetime.c
+src/gl/stdlib.h
+src/gl/string.h
+src/gl/sys/
+src/gl/time.h
+src/gl/unistd.h
+src/gl/warn-on-use.h

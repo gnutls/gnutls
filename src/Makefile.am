@@ -17,7 +17,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS =
+SUBDIRS = gl
 
 if ENABLE_CRYWRAP
 SUBDIRS += crywrap
@@ -148,10 +148,10 @@ noinst_LTLIBRARIES += libcmd-certtool.la
 libcmd_certtool_la_CFLAGS =
 libcmd_certtool_la_SOURCES = certtool-args.c certtool-args.def certtool-args.h	\
 	certtool-cfg.h certtool-cfg.c
-libcmd_certtool_la_LIBADD = $(LIBOPTS) ../gl/libgnu.la ../lib/libgnutls.la
+libcmd_certtool_la_LIBADD = $(LIBOPTS) ../gl/libgnu.la ../lib/libgnutls.la gl/libgnu_gpl.a
 libcmd_certtool_la_LIBADD += $(LTLIBINTL)
 libcmd_certtool_la_LIBADD += $(LTLIBREADLINE)
-libcmd_certtool_la_LIBADD += $(INET_PTON_LIB)
+libcmd_certtool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
 danetool_SOURCES = danetool.c certtool-common.c certtool-extras.c common.c
 danetool_LDADD = ../lib/libgnutls.la 
