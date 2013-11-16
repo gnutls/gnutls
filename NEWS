@@ -37,6 +37,9 @@ parameters.
 will set to the no well defined expiration date (RFC5280), and no longer
 chokes on integer overflows. Suggested by Stefan Buehler.
 
+** certtool: Added new template options: 'activation_date', and
+'expiration_date'.
+
 ** tools: The environment variable GNUTLS_PIN can be used to read any PIN
 requested from tokens.
 
