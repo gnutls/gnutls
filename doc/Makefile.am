@@ -22,7 +22,7 @@
 EXTRA_DIST = TODO certtool.cfg gnutls.pdf gnutls.html	\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
 	gnutls-guile.pdf gnutls-guile.html stamp_enums stamp_functions \
-	doc.mk stamp_invoke
+	doc.mk
 
 SUBDIRS = examples cyclo scripts manpages credentials latex
 if ENABLE_GTK_DOC
@@ -149,13 +149,12 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi 	\
 	cha-tokens.texi cha-crypto.texi cha-auth.texi
 
-stamp_invoke: invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
+AUTOGENED_DOC = invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
 	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi \
 	invoke-tpmtool.texi invoke-danetool.texi
-	echo $@ > $@
 
-gnutls_TEXINFOS += stamp_functions stamp_invoke
+gnutls_TEXINFOS += stamp_functions
 
 # Examples.
 gnutls_TEXINFOS += examples/ex-client-anon.c				\
@@ -214,7 +213,7 @@ API_FILES=gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi \
 	xssl-api.texi
 
 clean-local:
-	-rm -f stamp_enums stamp_functions stamp_invoke
+	-rm -f stamp_enums stamp_functions
 	-rm -rf functions/ enums/
 	-rm -f $(API_FILES)
 
@@ -413,8 +412,8 @@ enums.texi: $(HEADER_FILES)
 	done
 	mv -f $@-tmp $@
 
-gnutls_TEXINFOS += $(ENUMS) $(FUNCS)
-DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions stamp_invoke
+gnutls_TEXINFOS += $(ENUMS) $(FUNCS) $(AUTOGENED_DOC)
+DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
 
 
 stamp_functions: $(API_FILES)
@@ -445,7 +444,8 @@ compare-makefile: enums.texi
 	done; \
 	grep -v -e '^ENUMS += ' $(srcdir)/Makefile.am | \
 		perl -p -e "s,^ENUMS =,ENUMS =$$STR," > tmp-$@; \
-	diff -u $(srcdir)/Makefile.am tmp-$@
+	echo "If the following step fails copy $(srcdir)/tmp-compare-makefile to Makefile.am"
+	diff -u $(srcdir)/Makefile.am tmp-$@ >/dev/null
 	rm -f tmp-$@
 	FUNCS=`cat $(HEADER_FILES) | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d|uniq`; \
 	MANS=""; \
@@ -454,7 +454,8 @@ compare-makefile: enums.texi
 	done; \
 	grep -v -e '^FUNCS += ' $(srcdir)/Makefile.am > tmp-$@; \
 	echo "\"s,^FUNCS =,FUNCS =$$MANS,\" -i tmp-$@"|xargs sed
-	diff -u $(srcdir)/Makefile.am tmp-$@
+	echo "If the following step fails copy $(srcdir)/tmp-compare-makefile to Makefile.am"
+	diff -u $(srcdir)/Makefile.am tmp-$@ >/dev/null
 	rm -f tmp-$@
 
 .PHONY: compare-makefile
@@ -540,6 +541,7 @@ ENUMS += enums/gnutls_pkcs11_obj_attr_t
 ENUMS += enums/gnutls_pkcs11_obj_info_t
 ENUMS += enums/gnutls_pkcs11_obj_type_t
 ENUMS += enums/gnutls_pkcs11_token_info_t
+ENUMS += enums/gnutls_pkcs11_url_type_t
 ENUMS += enums/gnutls_pkcs12_bag_type_t
 ENUMS += enums/gnutls_pkcs_encrypt_flags_t
 ENUMS += enums/gnutls_privkey_flags_t
@@ -635,6 +637,8 @@ FUNCS += functions/gnutls_certificate_allocate_credentials
 FUNCS += functions/gnutls_certificate_allocate_credentials.short
 FUNCS += functions/gnutls_certificate_client_get_request_status
 FUNCS += functions/gnutls_certificate_client_get_request_status.short
+FUNCS += functions/gnutls_certificate_client_set_retrieve_function
+FUNCS += functions/gnutls_certificate_client_set_retrieve_function.short
 FUNCS += functions/gnutls_certificate_expiration_time_peers
 FUNCS += functions/gnutls_certificate_expiration_time_peers.short
 FUNCS += functions/gnutls_certificate_free_ca_names
@@ -661,6 +665,8 @@ FUNCS += functions/gnutls_certificate_send_x509_rdn_sequence
 FUNCS += functions/gnutls_certificate_send_x509_rdn_sequence.short
 FUNCS += functions/gnutls_certificate_server_set_request
 FUNCS += functions/gnutls_certificate_server_set_request.short
+FUNCS += functions/gnutls_certificate_server_set_retrieve_function
+FUNCS += functions/gnutls_certificate_server_set_retrieve_function.short
 FUNCS += functions/gnutls_certificate_set_dh_params
 FUNCS += functions/gnutls_certificate_set_dh_params.short
 FUNCS += functions/gnutls_certificate_set_key
@@ -1181,6 +1187,8 @@ FUNCS += functions/gnutls_openpgp_privkey_get_subkey_count
 FUNCS += functions/gnutls_openpgp_privkey_get_subkey_count.short
 FUNCS += functions/gnutls_openpgp_privkey_get_subkey_creation_time
 FUNCS += functions/gnutls_openpgp_privkey_get_subkey_creation_time.short
+FUNCS += functions/gnutls_openpgp_privkey_get_subkey_expiration_time
+FUNCS += functions/gnutls_openpgp_privkey_get_subkey_expiration_time.short
 FUNCS += functions/gnutls_openpgp_privkey_get_subkey_fingerprint
 FUNCS += functions/gnutls_openpgp_privkey_get_subkey_fingerprint.short
 FUNCS += functions/gnutls_openpgp_privkey_get_subkey_id
@@ -1245,6 +1253,8 @@ FUNCS += functions/gnutls_pkcs11_delete_url
 FUNCS += functions/gnutls_pkcs11_delete_url.short
 FUNCS += functions/gnutls_pkcs11_get_pin_function
 FUNCS += functions/gnutls_pkcs11_get_pin_function.short
+FUNCS += functions/gnutls_pkcs11_get_raw_issuer
+FUNCS += functions/gnutls_pkcs11_get_raw_issuer.short
 FUNCS += functions/gnutls_pkcs11_init
 FUNCS += functions/gnutls_pkcs11_init.short
 FUNCS += functions/gnutls_pkcs11_obj_deinit
@@ -1253,6 +1263,8 @@ FUNCS += functions/gnutls_pkcs11_obj_export
 FUNCS += functions/gnutls_pkcs11_obj_export.short
 FUNCS += functions/gnutls_pkcs11_obj_export2
 FUNCS += functions/gnutls_pkcs11_obj_export2.short
+FUNCS += functions/gnutls_pkcs11_obj_export3
+FUNCS += functions/gnutls_pkcs11_obj_export3.short
 FUNCS += functions/gnutls_pkcs11_obj_export_url
 FUNCS += functions/gnutls_pkcs11_obj_export_url.short
 FUNCS += functions/gnutls_pkcs11_obj_get_info
@@ -2299,3 +2311,27 @@ FUNCS += functions/gnutls_x509_trust_list_verify_crt
 FUNCS += functions/gnutls_x509_trust_list_verify_crt.short
 FUNCS += functions/gnutls_x509_trust_list_verify_named_crt
 FUNCS += functions/gnutls_x509_trust_list_verify_named_crt.short
+FUNCS += functions/xssl_client_init
+FUNCS += functions/xssl_client_init.short
+FUNCS += functions/xssl_cred_deinit
+FUNCS += functions/xssl_cred_deinit.short
+FUNCS += functions/xssl_cred_init
+FUNCS += functions/xssl_cred_init.short
+FUNCS += functions/xssl_deinit
+FUNCS += functions/xssl_deinit.short
+FUNCS += functions/xssl_flush
+FUNCS += functions/xssl_flush.short
+FUNCS += functions/xssl_getdelim
+FUNCS += functions/xssl_getdelim.short
+FUNCS += functions/xssl_get_session
+FUNCS += functions/xssl_get_session.short
+FUNCS += functions/xssl_printf
+FUNCS += functions/xssl_printf.short
+FUNCS += functions/xssl_read
+FUNCS += functions/xssl_read.short
+FUNCS += functions/xssl_server_init
+FUNCS += functions/xssl_server_init.short
+FUNCS += functions/xssl_sinit
+FUNCS += functions/xssl_sinit.short
+FUNCS += functions/xssl_write
+FUNCS += functions/xssl_write.short
