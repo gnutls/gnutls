@@ -111,6 +111,7 @@ APIMANS += gnutls_bye.3
 APIMANS += gnutls_certificate_activation_time_peers.3
 APIMANS += gnutls_certificate_allocate_credentials.3
 APIMANS += gnutls_certificate_client_get_request_status.3
+APIMANS += gnutls_certificate_client_set_retrieve_function.3
 APIMANS += gnutls_certificate_expiration_time_peers.3
 APIMANS += gnutls_certificate_free_ca_names.3
 APIMANS += gnutls_certificate_free_cas.3
@@ -124,6 +125,7 @@ APIMANS += gnutls_certificate_get_peers.3
 APIMANS += gnutls_certificate_get_peers_subkey_id.3
 APIMANS += gnutls_certificate_send_x509_rdn_sequence.3
 APIMANS += gnutls_certificate_server_set_request.3
+APIMANS += gnutls_certificate_server_set_retrieve_function.3
 APIMANS += gnutls_certificate_set_dh_params.3
 APIMANS += gnutls_certificate_set_key.3
 APIMANS += gnutls_certificate_set_ocsp_status_request_file.3
@@ -384,6 +386,7 @@ APIMANS += gnutls_openpgp_privkey_get_preferred_key_id.3
 APIMANS += gnutls_openpgp_privkey_get_revoked_status.3
 APIMANS += gnutls_openpgp_privkey_get_subkey_count.3
 APIMANS += gnutls_openpgp_privkey_get_subkey_creation_time.3
+APIMANS += gnutls_openpgp_privkey_get_subkey_expiration_time.3
 APIMANS += gnutls_openpgp_privkey_get_subkey_fingerprint.3
 APIMANS += gnutls_openpgp_privkey_get_subkey_id.3
 APIMANS += gnutls_openpgp_privkey_get_subkey_idx.3
@@ -416,10 +419,12 @@ APIMANS += gnutls_pkcs11_copy_x509_privkey.3
 APIMANS += gnutls_pkcs11_deinit.3
 APIMANS += gnutls_pkcs11_delete_url.3
 APIMANS += gnutls_pkcs11_get_pin_function.3
+APIMANS += gnutls_pkcs11_get_raw_issuer.3
 APIMANS += gnutls_pkcs11_init.3
 APIMANS += gnutls_pkcs11_obj_deinit.3
 APIMANS += gnutls_pkcs11_obj_export.3
 APIMANS += gnutls_pkcs11_obj_export2.3
+APIMANS += gnutls_pkcs11_obj_export3.3
 APIMANS += gnutls_pkcs11_obj_export_url.3
 APIMANS += gnutls_pkcs11_obj_get_info.3
 APIMANS += gnutls_pkcs11_obj_get_type.3
@@ -943,6 +948,18 @@ APIMANS += gnutls_x509_trust_list_remove_trust_file.3
 APIMANS += gnutls_x509_trust_list_remove_trust_mem.3
 APIMANS += gnutls_x509_trust_list_verify_crt.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3
+APIMANS += xssl_client_init.3
+APIMANS += xssl_cred_deinit.3
+APIMANS += xssl_cred_init.3
+APIMANS += xssl_deinit.3
+APIMANS += xssl_flush.3
+APIMANS += xssl_getdelim.3
+APIMANS += xssl_get_session.3
+APIMANS += xssl_printf.3
+APIMANS += xssl_read.3
+APIMANS += xssl_server_init.3
+APIMANS += xssl_sinit.3
+APIMANS += xssl_write.3
 
 dist_man_MANS += $(APIMANS)
 
@@ -956,7 +973,9 @@ compare-makefile:
 	done; \
 	grep -v -e '^APIMANS += ' Makefile.am | \
 		perl -p -e "s/^APIMANS =/APIMANS =$$MANS/" > tmp-$@; \
-	diff -u $(srcdir)/Makefile.am tmp-$@
+	echo "If the following step fails copy $(srcdir)/tmp-compare-makefile to Makefile.am"
+	diff -u $(srcdir)/Makefile.am tmp-$@ >/dev/null
+	rm -f tmp-$@
 
 stamp_mans: $(HEADER_FILES)
 	@echo $(ECHO_N) "Creating man pages for gnutls.h..." && \
@@ -1120,6 +1139,20 @@ stamp_mans: $(HEADER_FILES)
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/tpm.h" \
+			-seeinfo $(PACKAGE) -verbatimcopying \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-function $$i \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+		echo $(ECHO_N) "."; \
+	done
+	@echo ""
+	@echo $(ECHO_N) "Creating man pages for xssl.h..." && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/xssl.h`; do \
+		$(top_srcdir)/doc/scripts/gdoc -man \
+			-module $(PACKAGE) -sourceversion $(VERSION) \
+			-bugsto $(PACKAGE_BUGREPORT) \
+			-pkg-name "$(PACKAGE_NAME)" \
+			-include "gnutls/xssl.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
