@@ -44,10 +44,10 @@ ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4 -I src/gl/m4
 EXTRA_DIST = cfg.mk maint.mk .clcopying
 
 dist-hook: 
-	rm -f ChangeLog
-	make ChangeLog
 	make -C doc/ compare-makefile
 	make -C doc/manpages compare-makefile
+	rm -f ChangeLog
+	make ChangeLog
 	cp -f ChangeLog $(distdir)/
 	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
 	cd $(distdir)/src/ && for i in *.def;do \
