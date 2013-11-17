@@ -31,8 +31,9 @@ $state = 0;
 
 # 0: scanning
 # 1: comment
-# 2: struct||enum
+# 2: struct||enum||typedef func
 # 3: function
+# 4: inline function { }
 
 sub function_print {
   my $prototype = shift @_;
@@ -71,10 +72,17 @@ while ($line=<STDIN>) {
       $state = 1;
       next;
     } elsif ($line =~ m/^\s*typedef\s+enum/ || $line =~ m/^\s*enum/ || 
-             $line =~ m/^\s*struct/ || $line =~ m/^\s*typedef\s+struct/) {
+             $line =~ m/^\s*struct/ || $line =~ m/^\s*typedef\s+struct/ ||
+             $line =~ m/^\s*typedef/) {
 
       next if ($line =~ m/;/);
       $state = 2;
+      next;
+    } elsif ($line =~ m/^\s*extern\s+"C"/) {
+      next;
+    } elsif ($line =~ m/^\s*\{/) {
+      next if ($line =~ m/\}/);
+      $state = 4;
       next;
     } elsif ($line !~ m/^\s*extern/ && $line !~ m/^\s*typedef/ && $line !~ m/doc-skip/ && $line =~ m/^\s*\w/) {
       $state = 3;
@@ -93,18 +101,23 @@ while ($line=<STDIN>) {
       $state = 0;
       next;
     }
-  } elsif ($state == 2) { #struct||enum
+  } elsif ($state == 2) { #struct||enum||typedef
     if ($line =~ m/;/) {
       $state = 0;
       next;
     }
-  } elsif ($state == 3) {
+  } elsif ($state == 3) { #possible function
     $prototype .= $line;
     
     if ($line =~ m/;/) {
       $state = 0;
 
       function_print($prototype);
+    }
+  } elsif ($state == 4) { #inline function to be skipped
+    if ($line =~ m/\}/) {
+      $state = 0;
+      next;
     }
   }
 
