@@ -1,7 +1,8 @@
 /* random-fips.c - FIPS style random number generator
  * Copyright (C) 2008  Free Software Foundation, Inc.
+ * Copyright (C) 2013 Red Hat
  *
- * This file is part of Libgcrypt.
+ * This file is part of GnuTLS.
  *
  * Libgcrypt is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -17,7 +18,7 @@
  * License along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* This is a modified for gnutls version of the libgcrypt DRBG.
+/* This is a (heavily) modified for gnutls version of the libgcrypt DRBG.
  */
 
 /*
@@ -43,17 +44,11 @@
    (SEED_TTL) output blocks; the re-seeding is disabled in test mode.
 
    The GNUTLS_RND_KEY and GNUTLS_RND_RANDOM generators are
-   keyed and seeded from the /dev/random device.  Thus these
-   generators may block until the kernel has collected enough entropy.
+   keyed and seeded from the /dev/urandom device. These generators
+   never block.
 
-   The gcry_create_nonce generator is keyed and seeded from the
-   GNUTLS_RND_RANDOM generator.  It may also block if the
-   GNUTLS_RND_RANDOM generator has not yet been used before and thus
-   gets initialized on the first use by gcry_create_nonce.  This
-   special treatment is justified by the weaker requirements for a
-   nonce generator and to save precious kernel entropy for use by the
-   real random generators.
-
+   In all cases the generators check for a change of PID (e.g., a fork)
+   and in that case they are automatically re-keyed and re-seeded.
  */
 
 #include <config.h>
@@ -102,12 +97,12 @@ struct rng_context {
 
 	/* If this flag is true, the SEED_V buffer below carries a valid
 	   seed.  */
-	unsigned is_seeded:1;
+	uint8_t is_seeded;
 
 	/* The very first block generated is used to compare the result
 	   against the last result.  This flag indicates that such a block
 	   is available.  */
-	unsigned compare_value_valid:1;
+	uint8_t compare_value_valid;
 
 	/* A counter used to trigger re-seeding.  */
 	unsigned int use_counter;
@@ -275,7 +270,7 @@ x931_aes_driver(struct rng_context* rng_ctx, unsigned char *output, size_t lengt
 
 		/* Due to the design of the RNG, we always receive 16 bytes (128
 		   bit) of random even if we require less.  The extra bytes
-		   returned are not used.  Intheory we could save them for the
+		   returned are not used.  In theory we could save them for the
 		   next invocation, but that would make the control flow harder
 		   to read.  */
 		nbytes = length < 16 ? length : 16;
@@ -395,11 +390,7 @@ int ret;
 	return 0;
 }
 
-/* Initialize this random subsystem.  If FULL is false, this function
-   merely calls the basic initialization of the module and does not do
-   anything more.  Doing this is not really required but when running
-   in a threaded environment we might get a race condition
-   otherwise. */
+/* Initialize this random subsystem. */
 static int _rngfips_init(void** _ctx)
 {
 /* Basic initialization is required to initialize mutexes and
