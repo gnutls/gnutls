@@ -119,9 +119,6 @@ struct rng_context {
 	   compare_value_valid is set.  */
 	unsigned char compare_value[16];
 
-	/* The external test may want to suppress the duplicate bock check.
-	   This is done if the this flag is set.  */
-	unsigned char test_no_dup_check;
 	/* To implement a KAT we need to provide a know DT value.  To
 	   accomplish this the x931_get_dt function checks whether this
 	   field is not NULL and then uses the 16 bytes at this address for
@@ -287,28 +284,22 @@ x931_aes_driver(struct rng_context* rng_ctx, unsigned char *output, size_t lengt
 		x931_aes(&rng_ctx->cctx, result_buffer, datetime_DT, rng_ctx->seed_V);
 		rng_ctx->use_counter++;
 
-		if (rng_ctx->test_no_dup_check
-		    && rng_ctx->test_dt_ptr) {
-			/* This is a test context which does not want the duplicate
-			   block check. */
-		} else {
-			/* Do a basic check on the output to avoid a stuck generator.  */
-			if (!rng_ctx->compare_value_valid) {
-				/* First time used, only save the result.  */
-				memcpy(rng_ctx->compare_value, result_buffer, 16);
-				rng_ctx->compare_value_valid = 1;
-				continue;
-			}
-			if (!memcmp(rng_ctx->compare_value, result_buffer, 16)) {
-				/* Ooops, we received the same 128 bit block - that should
-				   in theory never happen.  The FIPS requirement says that
-				   we need to put ourself into the error state in such
-				   case.  */
-				_gnutls_switch_fips_state(FIPS_STATE_ERROR);
-				return GNUTLS_E_LIB_IN_ERROR_STATE;
-			}
+		/* This is the continuous random number generator test */
+		if (!rng_ctx->compare_value_valid) {
+			/* First time used, only save the result.  */
 			memcpy(rng_ctx->compare_value, result_buffer, 16);
+			rng_ctx->compare_value_valid = 1;
+			continue;
 		}
+		if (!memcmp(rng_ctx->compare_value, result_buffer, 16)) {
+			/* Ooops, we received the same 128 bit block - that should
+			   in theory never happen.  The FIPS requirement says that
+			   we need to put ourself into the error state in such
+			   case.  */
+			_gnutls_switch_fips_state(FIPS_STATE_ERROR);
+			return GNUTLS_E_LIB_IN_ERROR_STATE;
+		}
+		memcpy(rng_ctx->compare_value, result_buffer, 16);
 
 		/* Append to outbut.  */
 		memcpy(output, result_buffer, nbytes);
@@ -596,78 +587,6 @@ leave:
 		_gnutls_debug_log("FIPS KAT: %s\n", errtxt);
 	return ret;
 }
-
-#if 0
-
-/* Create a new test context for an external RNG test driver.  On
-   success the test context is stored at R_CONTEXT; on failure NULL is
-   stored at R_CONTEXT and an error code is returned.  */
-int
-_rngfips_init_external_test(void **r_context, unsigned int flags,
-			    const void *key, size_t keylen,
-			    const void *seed, size_t seedlen,
-			    const void *dt, size_t dtlen)
-{
-	int ret;
-	struct rng_context * test_ctx;
-
-	if (!r_context
-	    || !key || keylen != 16
-	    || !seed || seedlen != 16 || !dt || dtlen != 16)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	test_ctx = gnutls_calloc(1, sizeof *test_ctx + dtlen);
-	if (test_ctx == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	aes_set_encrypt_key(&text_ctx->cctx, keylen, key);
-	test_ctx->pid = getpid();
-
-	/* Setup the seed.  */
-	memcpy(test_ctx->seed_V, seed, seedlen);
-	test_ctx->is_seeded = 1;
-
-	/* Setup a DT value.  Because our context structure only stores a
-	   pointer we copy the DT value to the extra space we allocated in
-	   the test_ctx and set the pointer to that address.  */
-	memcpy((unsigned char *) test_ctx + sizeof *test_ctx, dt, dtlen);
-	test_ctx->test_dt_ptr =
-	    (unsigned char *) test_ctx + sizeof *test_ctx;
-	test_ctx->test_dt_counter = ((test_ctx->test_dt_ptr[12] << 24)
-				     | (test_ctx->test_dt_ptr[13] << 16)
-				     | (test_ctx->test_dt_ptr[14] << 8)
-				     | (test_ctx->test_dt_ptr[15]));
-
-	if ((flags & 1))
-		test_ctx->test_no_dup_check = 1;
-
-    return 0;
-}
-
-
-/* Get BUFLEN bytes from the RNG using the test CONTEXT and store them
-   at BUFFER.  Return 0 on success or an error code.  */
-int
-_rngfips_run_external_test(void *context, char *buffer, size_t buflen)
-{
-	struct rng_context * test_ctx = context;
-	int ret;
-
-	if (!test_ctx || !buffer || buflen != 16)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	RND_LOCK;
-	ret = get_random(test_ctx, buffer, buflen);
-	RND_UNLOCK;
-	return ret;
-}
-
-/* Release the test CONTEXT.  */
-void _rngfips_deinit_external_test(void *context)
-{
-	gnutls_free(context);
-}
-#endif
 
 static void _rngfips_deinit(void * _ctx)
 {
