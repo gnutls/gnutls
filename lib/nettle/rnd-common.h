@@ -39,7 +39,11 @@ struct event_st {
 #endif
 		unsigned count; /* a running counter */
 		unsigned err; /* the last errno */
-};
+} 
+#ifdef __GNUC__
+__attribute__((packed))
+#endif
+;
 
 void _rnd_get_event(struct event_st *e);
 

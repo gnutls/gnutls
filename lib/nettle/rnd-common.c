@@ -39,23 +39,22 @@
 void _rnd_get_event(struct event_st *e)
 {
 	static unsigned count = 0;
-	static struct event_st event;
 
-	gettime(&event.now);
+	gettime(&e->now);
 
 #ifdef HAVE_GETRUSAGE
-	if (getrusage(RUSAGE_SELF, &event.rusage) < 0) {
+	if (getrusage(RUSAGE_SELF, &e->rusage) < 0) {
 		_gnutls_debug_log("getrusage failed: %s\n",
 				  strerror(errno));
 		abort();
 	}
 #endif
 
-	event.count = count++;
 #ifdef HAVE_GETPID
-	event.pid = getpid();
+	e->pid = getpid();
 #endif
-	event.err = errno;
+	e->count = count++;
+	e->err = errno;
 
 	return;
 }

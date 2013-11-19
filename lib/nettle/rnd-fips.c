@@ -395,11 +395,11 @@ static int _rngfips_init(void** _ctx)
 {
 /* Basic initialization is required to initialize mutexes and
    do a few checks on the implementation.  */
-	static int initialized;
+	static int initialized = 0;
 	struct fips_ctx* ctx;
 	int ret;
 
-	if (initialized)
+	if (initialized != 0)
 		return 0;
 	initialized = 1;
 
