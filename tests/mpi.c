@@ -37,10 +37,8 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-#define RND_BITS 510		/* not multiple of 8 */
 void doit(void)
 {
-	int rc;
 	bigint_t n1, n2, n3, n4;
 
 	global_init();
@@ -61,13 +59,9 @@ void doit(void)
 	if (n3 == NULL)
 		fail("mpi_set_ui failed\n");
 
-	_gnutls_mpi_randomize(n1, RND_BITS, GNUTLS_RND_NONCE);
-
-	_gnutls_mpi_log("rand:", n1);
-
-	rc = _gnutls_mpi_get_nbits(n1);
-	if (rc > RND_BITS)
-		fail("mpi_get_nbits failed... returned %d\n", rc);
+	n1 = _gnutls_mpi_set_ui(NULL, 12498924);
+	if (n3 == NULL)
+		fail("mpi_set_ui failed\n");
 
 	n4 = _gnutls_mpi_addm(NULL, n1, n3, n2);
 	if (n4 == NULL)

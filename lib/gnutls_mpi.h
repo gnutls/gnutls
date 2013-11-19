@@ -30,7 +30,7 @@
 extern int crypto_bigint_prio;
 extern gnutls_crypto_bigint_st _gnutls_mpi_ops;
 
-bigint_t _gnutls_mpi_randomize(bigint_t, unsigned int bits,
+bigint_t _gnutls_mpi_random_modp(bigint_t, bigint_t p,
 			       gnutls_rnd_level_t level);
 
 #define _gnutls_mpi_new _gnutls_mpi_ops.bigint_new
@@ -38,6 +38,7 @@ bigint_t _gnutls_mpi_randomize(bigint_t, unsigned int bits,
 #define _gnutls_mpi_cmp _gnutls_mpi_ops.bigint_cmp
 #define _gnutls_mpi_cmp_ui _gnutls_mpi_ops.bigint_cmp_ui
 #define _gnutls_mpi_mod _gnutls_mpi_ops.bigint_mod
+#define _gnutls_mpi_modm _gnutls_mpi_ops.bigint_modm
 #define _gnutls_mpi_set _gnutls_mpi_ops.bigint_set
 #define _gnutls_mpi_set_ui _gnutls_mpi_ops.bigint_set_ui
 #define _gnutls_mpi_get_nbits _gnutls_mpi_ops.bigint_get_nbits

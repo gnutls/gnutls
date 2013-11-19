@@ -191,15 +191,15 @@ static void wrap_nettle_mpi_clear(bigint_t a)
 	       TOMPZ(a)[0]._mp_alloc * sizeof(mp_limb_t));
 }
 
-static bigint_t wrap_nettle_mpi_mod(const bigint_t a, const bigint_t b)
+static bigint_t wrap_nettle_mpi_modm(bigint_t r, const bigint_t a, const bigint_t b)
 {
-	bigint_t r = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(b));
-
-	if (r == NULL)
-		return NULL;
-
+	if (r == NULL) {
+                r = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(b));
+                if (r == NULL) return NULL;
+	}
+	
 	mpz_mod(TOMPZ(r), TOMPZ(a), TOMPZ(b));
-
+	
 	return r;
 }
 
@@ -584,7 +584,7 @@ gnutls_crypto_bigint_st _gnutls_mpi_ops = {
 	.bigint_new = wrap_nettle_mpi_new,
 	.bigint_cmp = wrap_nettle_mpi_cmp,
 	.bigint_cmp_ui = wrap_nettle_mpi_cmp_ui,
-	.bigint_mod = wrap_nettle_mpi_mod,
+	.bigint_modm = wrap_nettle_mpi_modm,
 	.bigint_set = wrap_nettle_mpi_set,
 	.bigint_set_ui = wrap_nettle_mpi_set_ui,
 	.bigint_get_nbits = wrap_nettle_mpi_get_nbits,

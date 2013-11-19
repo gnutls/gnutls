@@ -35,19 +35,19 @@
 /* Functions that refer to the mpi library.
  */
 
-#define clearbit(v,n)    ((unsigned char)(v) & ~( (unsigned char)(1) << (unsigned)(n)))
-
+/* Returns a random number r, 0 < r < p */
 bigint_t
-_gnutls_mpi_randomize(bigint_t r, unsigned int bits,
+_gnutls_mpi_random_modp(bigint_t r, bigint_t p,
 		      gnutls_rnd_level_t level)
 {
-	size_t size = 1 + (bits / 8);
+	size_t size;
 	int ret;
-	int rem, i;
 	bigint_t tmp;
 	uint8_t tmpbuf[512];
 	uint8_t *buf;
 	int buf_release = 0;
+	
+	size = ((_gnutls_mpi_get_nbits(p)+64)/8) + 1;
 
 	if (size < sizeof(tmpbuf)) {
 		buf = tmpbuf;
@@ -60,28 +60,22 @@ _gnutls_mpi_randomize(bigint_t r, unsigned int bits,
 		buf_release = 1;
 	}
 
-
 	ret = _gnutls_rnd(level, buf, size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
-
-	/* mask the bits that weren't requested */
-	rem = bits % 8;
-
-	if (rem == 0) {
-		buf[0] = 0;
-	} else {
-		for (i = 8; i >= rem; i--)
-			buf[0] = clearbit(buf[0], i);
-	}
-
+	
 	ret = _gnutls_mpi_scan(&tmp, buf, size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
+	
+	_gnutls_mpi_modm(tmp, tmp, p);
+
+	if (_gnutls_mpi_cmp_ui(tmp, 0) == 0)
+		_gnutls_mpi_add_ui(tmp, tmp, 1);
 
 	if (buf_release != 0) {
 		gnutls_free(buf);

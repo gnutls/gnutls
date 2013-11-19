@@ -881,7 +881,7 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 			/* [RSA_PRIME1] = d % p-1, [RSA_PRIME2] = d % q-1 */
 			_gnutls_mpi_sub_ui(t1, params->params[RSA_PRIME1],
 					   1);
-			t2 = _gnutls_mpi_mod(params->params[RSA_PRIV], t1);
+			t2 = _gnutls_mpi_modm(NULL, params->params[RSA_PRIV], t1);
 			if (t2 == NULL) {
 				ret =
 				    gnutls_assert_val
@@ -901,7 +901,7 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 					   1);
 			zrelease_mpi_key(&t2);
 
-			t2 = _gnutls_mpi_mod(params->params[RSA_PRIV], t1);
+			t2 = _gnutls_mpi_modm(NULL, params->params[RSA_PRIV], t1);
 			if (t2 == NULL) {
 				ret =
 				    gnutls_assert_val
@@ -1051,11 +1051,11 @@ static int calc_rsa_exp(gnutls_pk_params_st * params)
 	/* [6] = d % p-1, [7] = d % q-1 */
 	_gnutls_mpi_sub_ui(tmp, params->params[3], 1);
 	params->params[6] =
-	    _gnutls_mpi_mod(params->params[2] /*d */ , tmp);
+	    _gnutls_mpi_modm(NULL, params->params[2] /*d */ , tmp);
 
 	_gnutls_mpi_sub_ui(tmp, params->params[4], 1);
 	params->params[7] =
-	    _gnutls_mpi_mod(params->params[2] /*d */ , tmp);
+	    _gnutls_mpi_modm(NULL, params->params[2] /*d */ , tmp);
 
 	zrelease_mpi_key(&tmp);
 

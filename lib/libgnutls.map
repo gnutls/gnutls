@@ -982,7 +982,6 @@ GNUTLS_PRIVATE {
     _gnutls_pbkdf2_sha1;
     # Internal symbols needed by tests/mpi:
     _gnutls_mpi_ops;
-    _gnutls_mpi_randomize;
     _gnutls_mpi_log;
     _gnutls_mpi_release;
     # Internal symbols needed by tests/pkcs12_s2k:
