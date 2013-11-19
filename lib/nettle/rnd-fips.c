@@ -386,7 +386,7 @@ int ret;
 		return gnutls_assert_val(ret);
 
 	ctx->pid = getpid();
-	
+
 	return 0;
 }
 
@@ -395,13 +395,8 @@ static int _rngfips_init(void** _ctx)
 {
 /* Basic initialization is required to initialize mutexes and
    do a few checks on the implementation.  */
-	static int initialized = 0;
 	struct fips_ctx* ctx;
 	int ret;
-
-	if (initialized != 0)
-		return 0;
-	initialized = 1;
 
 	ret = gnutls_mutex_init(&rnd_mutex);
 	if (ret < 0)
@@ -451,6 +446,22 @@ int ret;
 	
 	return ret;
 }
+
+static void _rngfips_deinit(void * _ctx)
+{
+struct fips_ctx* ctx = _ctx;
+	zeroize_key(ctx, sizeof(*ctx));
+	free(ctx);
+	gnutls_mutex_deinit(&rnd_mutex);
+	rnd_mutex = NULL;
+}
+
+static void _rngfips_refresh(void *_ctx)
+{
+	/* this is predictable RNG. Don't refresh */
+	return;
+}
+
 
 /* Run a Know-Answer-Test using a dedicated test context.  Note that
    we can't use the samples from the NISR RNGVS document because they
@@ -577,22 +588,6 @@ leave:
 	if (errtxt)
 		_gnutls_debug_log("FIPS KAT: %s\n", errtxt);
 	return ret;
-}
-
-static void _rngfips_deinit(void * _ctx)
-{
-struct fips_ctx* ctx = _ctx;
-
-	zeroize_key(ctx, sizeof(*ctx));
-	free(ctx);
-	gnutls_mutex_deinit(&rnd_mutex);
-	rnd_mutex = NULL;
-}
-
-static void _rngfips_refresh(void *_ctx)
-{
-	/* this is predictable RNG. Don't refresh */
-	return;
 }
 
 
