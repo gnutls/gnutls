@@ -6,6 +6,8 @@ See the end for copying conditions.
 
 ** libgnutls: Support for TPM via trousers is now enabled by default.
 
+** libgnutls: GCM mode is prioritized over CBC in all of the default priority strings.
+
 ** libgnutls: Added support for ISO OID for RSA-SHA1 signatures.
 
 ** libgnutls: When traversing PKCS #11 tokens looking for an object, avoid
@@ -15,6 +17,9 @@ looking in unrelated to the object tokens.
 
 ** libgnutls: gnutls_x509_crt_set_expiration_time() will set the no well defined
 expiration date when (time_t)-1 is specified as date.
+
+** libgnutls: Backported memory leak fix when a handshake is terminated by
+an EOF.
 
 ** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
 
