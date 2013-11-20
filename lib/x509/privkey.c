@@ -1490,7 +1490,13 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 			bits = _gnutls_ecc_bits_to_curve(bits);
 	}
 
-	ret = _gnutls_pk_generate(algo, bits, &key->params);
+	ret = _gnutls_pk_generate_params(algo, bits, &key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = _gnutls_pk_generate_keys(algo, bits, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

@@ -181,6 +181,7 @@ typedef struct {
 	bigint_t params[GNUTLS_MAX_PK_PARAMS];
 	unsigned int params_nr;	/* the number of parameters */
 	unsigned int flags;
+	gnutls_pk_algorithm_t algo;
 } gnutls_pk_params_st;
 
 /**
@@ -317,7 +318,9 @@ typedef struct gnutls_crypto_pk {
 	/* sanity checks the public key parameters */
 	int (*verify_params) (gnutls_pk_algorithm_t,
 			      const gnutls_pk_params_st * pub);
-	int (*generate) (gnutls_pk_algorithm_t, unsigned int nbits,
+	int (*generate_keys) (gnutls_pk_algorithm_t, unsigned int nbits,
+			 gnutls_pk_params_st *);
+	int (*generate_params) (gnutls_pk_algorithm_t, unsigned int nbits,
 			 gnutls_pk_params_st *);
 	/* this function should convert params to ones suitable
 	 * for the above functions

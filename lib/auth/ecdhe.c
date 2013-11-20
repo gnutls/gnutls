@@ -202,8 +202,8 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 
 	/* generate temporal key */
 	ret =
-	    _gnutls_pk_generate(GNUTLS_PK_EC, curve,
-				&session->key.ecdh_params);
+	    _gnutls_pk_generate_keys(GNUTLS_PK_EC, curve,
+				     &session->key.ecdh_params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -320,8 +320,8 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 
 	/* generate temporal key */
 	ret =
-	    _gnutls_pk_generate(GNUTLS_PK_EC, curve,
-				&session->key.ecdh_params);
+	    _gnutls_pk_generate_keys(GNUTLS_PK_EC, curve,
+				     &session->key.ecdh_params);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
