@@ -27,9 +27,9 @@ CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 DIFF=${DIFF:-diff}
 
 $CERTTOOL --certificate-info --infile $srcdir/ca-no-pathlen.pem \
-	  --outfile new-ca-no-pathlen.pem
+	  |grep -v "Algorithm Security Level" > new-ca-no-pathlen.pem
 $CERTTOOL --certificate-info --infile $srcdir/no-ca-or-pathlen.pem \
-	  --outfile new-no-ca-or-pathlen.pem
+	  |grep -v "Algorithm Security Level" > new-no-ca-or-pathlen.pem
 
 $DIFF $srcdir/ca-no-pathlen.pem new-ca-no-pathlen.pem
 rc1=$?

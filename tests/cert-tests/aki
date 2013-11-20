@@ -27,7 +27,7 @@ CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 DIFF=${DIFF:-diff}
 
 $CERTTOOL --certificate-info --infile $srcdir/aki-cert.pem \
-	  --outfile tmp-aki.pem
+	  |grep -v "Algorithm Security Level" > tmp-aki.pem
 
 $DIFF $srcdir/aki-cert.pem tmp-aki.pem
 rc=$?
