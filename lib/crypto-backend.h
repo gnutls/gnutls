@@ -85,12 +85,6 @@ typedef struct gnutls_crypto_rnd {
 
 typedef void *bigint_t;
 
-typedef struct {
-	bigint_t g;		/* group generator */
-	bigint_t p;		/* prime */
-	int q_bits;		/* the number of bits of q */
-} gnutls_group_st;
-
 /**
  * gnutls_bigint_format_t:
  * @GNUTLS_MPI_FORMAT_USG: Raw unsigned integer format.
@@ -160,8 +154,6 @@ typedef struct gnutls_crypto_bigint {
 				const bigint_t b);
 	/* 0 if prime */
 	int (*bigint_prime_check) (const bigint_t pp);
-	int (*bigint_generate_group) (gnutls_group_st * gg,
-				      unsigned int bits);
 
 	/* reads a bigint from a buffer */
 	/* stores a bigint into the buffer.  returns

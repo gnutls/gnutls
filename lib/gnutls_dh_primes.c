@@ -30,6 +30,7 @@
 #include <x509/common.h>
 #include <gnutls/crypto.h>
 #include "x509/x509_int.h"
+#include <gnutls_mpi.h>
 #include "debug.h"
 
 
@@ -158,7 +159,7 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src)
 
 /**
  * gnutls_dh_params_generate2:
- * @params: Is the structure that the DH parameters will be stored
+ * @dparams: Is the structure that the DH parameters will be stored
  * @bits: is the prime's number of bits
  *
  * This function will generate a new pair of prime and generator for use in
@@ -176,21 +177,23 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src)
  *   otherwise a negative error code is returned.
  **/
 int
-gnutls_dh_params_generate2(gnutls_dh_params_t params, unsigned int bits)
+gnutls_dh_params_generate2(gnutls_dh_params_t dparams, unsigned int bits)
 {
 	int ret;
-	gnutls_group_st group;
+	gnutls_pk_params_st params;
+	
+	gnutls_pk_params_init(&params);
+	
+	ret = _gnutls_pk_generate_params(GNUTLS_PK_DH, bits, &params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-	ret = _gnutls_mpi_generate_group(&group, bits);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	dparams->params[0] = params.params[DSA_P];
+	dparams->params[1] = params.params[DSA_G];
+	dparams->q_bits = _gnutls_mpi_get_nbits(params.params[DSA_Q]);
 
-	params->params[0] = group.p;
-	params->params[1] = group.g;
-	params->q_bits = group.q_bits;
-
+	_gnutls_mpi_release(&params.params[DSA_Q]);
+		
 	return 0;
 }
 
