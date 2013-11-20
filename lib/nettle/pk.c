@@ -671,7 +671,6 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	int ret;
 	unsigned int i, q_bits;
 
-	memset(params, 0, sizeof(*params));
 	params->algo = algo;
 
 	switch (algo) {
