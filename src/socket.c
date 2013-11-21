@@ -198,8 +198,9 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 
 		err = connect(sd, ptr->ai_addr, ptr->ai_addrlen);
 		if (err < 0) {
+			int e = errno;
 			fprintf(stderr, "Cannot connect to %s:%s: %s\n",
-				buffer, portname, strerror(errno));
+				buffer, portname, strerror(e));
 			continue;
 		}
 		break;
