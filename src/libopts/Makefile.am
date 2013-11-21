@@ -1,12 +1,12 @@
 ## LIBOPTS Makefile
 MAINTAINERCLEANFILES    = Makefile.in
 
-noinst_LIBRARIES      = libopts.a
-
-libopts_a_SOURCES      = libopts.c
-libopts_a_CPPFLAGS     = -I$(top_srcdir)
-libopts_a_LIBADD       = $(LTLIBINTL)
-
+noinst_LTLIBRARIES      = libopts.la
+ 
+libopts_la_SOURCES      = libopts.c
+libopts_la_CPPFLAGS     = -I$(top_srcdir)
+libopts_la_LIBADD       = $(LTLIBINTL)
+ 
 EXTRA_DIST              = \
     ag-char-map.h           alias.c                 ao-strs.c  \
     ao-strs.h               autoopts/options.h      autoopts/usage-txt.h  \
