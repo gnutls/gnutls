@@ -1,8 +1,8 @@
+SMP=-j4
+
 GNUTLS_VERSION:=3.2.7
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
-
-SMP=-j4
 
 GMP_VERSION=5.1.2
 GMP_FILE:=gmp-$(GMP_VERSION).tar.bz2
@@ -21,7 +21,7 @@ BIN_DIR:=$(CROSS_DIR)/bin
 LIB_DIR:=$(CROSS_DIR)/lib
 HEADERS_DIR:=$(CROSS_DIR)/include
 DEVCPP_DIR:=$(PWD)/devcpp
-LDFLAGS=-static-libgcc
+LDFLAGS=
 
 all: update-gpg-keys gnutls-w32
 
@@ -83,6 +83,7 @@ $(GMP_DIR)/.configured:
 	gpg --verify $(GMP_FILE).sig
 	test -d $(GMP_DIR) || tar -xf $(GMP_FILE)
 	cd $(GMP_DIR) && LDFLAGS="$(LDFLAGS)" ./configure $(CONFIG_FLAGS) --enable-fat --exec-prefix=$(LIB_DIR)  --oldincludedir=$(HEADERS_DIR) && cd ..
+	cp $(GMP_DIR)/COPYING.LIB $(CROSS_DIR)/COPYING.GMP
 	touch $@
 
 $(GMP_DIR)/.installed: $(GMP_DIR)/.configured
@@ -112,9 +113,11 @@ $(NETTLE_DIR)/.installed: $(NETTLE_DIR)/.configured
 
 $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	make -C $(GNUTLS_DIR) $(SMP)
-	make -C $(GNUTLS_DIR) -C tests check
+	sed -i 's/^"$$@" >$$log_file/echo $$@|grep exe >\/dev\/null; if [ $$? == 0 ];then wine "$$@" >$$log_file;else \/bin\/true >$$log_file;fi/g' $(GNUTLS_DIR)/build-aux/test-driver
+	make -C $(GNUTLS_DIR) -C tests check $(SMP)
 	make -C $(GNUTLS_DIR) install -i
 	cp $(GNUTLS_DIR)/COPYING $(GNUTLS_DIR)/COPYING.LESSER $(CROSS_DIR)
+	cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc_s_sjlj-1.dll $(BIN_DIR)/
 	touch $@
 
 $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
