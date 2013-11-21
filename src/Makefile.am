@@ -209,22 +209,22 @@ BUILT_SOURCES = ocsptool-args.c p11tool-args.c psk-args.c cli-debug-args.c \
 		cli-args.c serv-args.c srptool-args.c certtool-args.c danetool-args.c
 
 danetool-args.c: $(srcdir)/args-std.def $(srcdir)/danetool-args.def
-	-autogen danetool-args.def
+	-$(AUTOGEN) danetool-args.def
 ocsptool-args.c: $(srcdir)/args-std.def $(srcdir)/ocsptool-args.def
-	-autogen ocsptool-args.def
+	-$(AUTOGEN) ocsptool-args.def
 tpmtool-args.c: $(srcdir)/args-std.def $(srcdir)/tpmtool-args.def
-	-autogen tpmtool-args.def
+	-$(AUTOGEN) tpmtool-args.def
 p11tool-args.c: $(srcdir)/args-std.def $(srcdir)/p11tool-args.def
-	-autogen p11tool-args.def
+	-$(AUTOGEN) p11tool-args.def
 psk-args.c: $(srcdir)/args-std.def $(srcdir)/psk-args.def
-	-autogen psk-args.def
+	-$(AUTOGEN) psk-args.def
 cli-debug-args.c: $(srcdir)/args-std.def $(srcdir)/cli-debug-args.def
-	-autogen cli-debug-args.def
+	-$(AUTOGEN) cli-debug-args.def
 cli-args.c: $(srcdir)/args-std.def $(srcdir)/cli-args.def
-	-autogen cli-args.def
+	-$(AUTOGEN) cli-args.def
 serv-args.c: $(srcdir)/args-std.def $(srcdir)/serv-args.def
-	-autogen serv-args.def
+	-$(AUTOGEN) serv-args.def
 srptool-args.c: $(srcdir)/args-std.def $(srcdir)/srptool-args.def
-	-autogen srptool-args.def
+	-$(AUTOGEN) srptool-args.def
 certtool-args.c: $(srcdir)/args-std.def $(srcdir)/certtool-args.def
-	-autogen certtool-args.def
+	-$(AUTOGEN) certtool-args.def
