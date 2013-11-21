@@ -56,28 +56,28 @@ SRC_DEF_TPMTOOL += ../src/tpmtool-args.def
 endif
 
 invoke-gnutls-cli.texi: $(SRC_DEF_CLI)
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
 invoke-gnutls-cli-debug.texi: $(SRC_DEF_CLI_DEBUG) invoke-gnutls-cli.texi
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
 invoke-gnutls-serv.texi: $(SRC_DEF_SERV) invoke-gnutls-cli-debug.texi
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
 invoke-certtool.texi: $(SRC_DEF_CERTTOOL) invoke-gnutls-serv.texi
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -86,7 +86,7 @@ invoke-certtool.texi: $(SRC_DEF_CERTTOOL) invoke-gnutls-serv.texi
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
 invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL) invoke-certtool.texi
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -95,7 +95,7 @@ invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL) invoke-certtool.texi
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
 invoke-danetool.texi: $(SRC_DEF_DANETOOL) invoke-ocsptool.texi
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -104,7 +104,7 @@ invoke-danetool.texi: $(SRC_DEF_DANETOOL) invoke-ocsptool.texi
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
 invoke-srptool.texi: $(SRC_DEF_SRPTOOL) invoke-danetool.texi
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -113,7 +113,7 @@ invoke-srptool.texi: $(SRC_DEF_SRPTOOL) invoke-danetool.texi
 	sed -i 's/@section/@subsubsection/g' ../doc/$@
 
 invoke-psktool.texi: $(SRC_DEF_PSKTOOL) invoke-srptool.texi
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -122,7 +122,7 @@ invoke-psktool.texi: $(SRC_DEF_PSKTOOL) invoke-srptool.texi
 	sed -i 's/@section/@subsubsection/g' ../doc/$@
 
 invoke-p11tool.texi: $(SRC_DEF_P11TOOL) invoke-psktool.texi
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -131,7 +131,7 @@ invoke-p11tool.texi: $(SRC_DEF_P11TOOL) invoke-psktool.texi
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
 invoke-tpmtool.texi: $(SRC_DEF_TPMTOOL) invoke-p11tool.texi
-	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
