@@ -20,10 +20,13 @@
  *
  */
 
+#include <config.h>
 #include <system.h>
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 
+#include <sys/socket.h>
+#include <sys/select.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -51,12 +54,6 @@ static HMODULE Crypt32_dll;
 #include <pwd.h>
 #endif
 #endif
-
-/* We need to disable gnulib's replacement wrappers to get native
-   Windows interfaces. */
-#undef recv
-#undef send
-#undef select
 
 /* System specific function wrappers.
  */
