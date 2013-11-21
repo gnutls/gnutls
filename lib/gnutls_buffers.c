@@ -388,8 +388,10 @@ _gnutls_writev_emu(gnutls_session_t session, gnutls_transport_ptr_t fd,
 		    session->internals.push_func(fd, giovec[j].iov_base,
 						 giovec[j].iov_len);
 
-		if (ret == -1)
+		if (ret == -1) {
+		        gnutls_assert();
 			break;
+                }
 
 		total += ret;
 
