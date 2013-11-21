@@ -71,7 +71,7 @@ noinst_LTLIBRARIES =
 if ENABLE_SRP
 srptool_SOURCES = srptool.c
 srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la $(LIBOPTS) ../gl/libgnu.la 
-srptool_LDADD += $(LTLIBINTL)
+srptool_LDADD += $(LTLIBINTL) gl/libgnu_gpl.la
 noinst_LTLIBRARIES += libcmd-srp.la
 libcmd_srp_la_CFLAGS =
 libcmd_srp_la_SOURCES = srptool-args.def srptool-args.c srptool-args.h
@@ -79,7 +79,7 @@ endif
 
 psktool_SOURCES = psk.c
 psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la $(LIBOPTS) ../gl/libgnu.la 
-psktool_LDADD += $(LTLIBINTL)
+psktool_LDADD += $(LTLIBINTL) gl/libgnu_gpl.la
 noinst_LTLIBRARIES += libcmd-psk.la
 libcmd_psk_la_CFLAGS = 
 libcmd_psk_la_SOURCES = psk-args.def psk-args.c psk-args.h
@@ -90,7 +90,7 @@ if ENABLE_OCSP
 ocsptool_SOURCES = ocsptool.c ocsptool-common.h ocsptool-common.c \
 	socket.c socket.h
 ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la $(LIBOPTS) ../gl/libgnu.la 
-ocsptool_LDADD += $(LTLIBINTL) $(GETADDRINFO_LIB)
+ocsptool_LDADD += $(LTLIBINTL) $(GETADDRINFO_LIB) gl/libgnu_gpl.la
 noinst_LTLIBRARIES += libcmd-ocsp.la
 libcmd_ocsp_la_CFLAGS =
 libcmd_ocsp_la_SOURCES = ocsptool-args.def ocsptool-args.h ocsptool-args.c
@@ -103,7 +103,7 @@ gnutls_serv_SOURCES =		\
   certtool-common.h 
 gnutls_serv_LDADD = ../lib/libgnutls.la
 gnutls_serv_LDADD += libcmd-serv.la $(LIBOPTS) ../gl/libgnu.la
-gnutls_serv_LDADD += $(LTLIBINTL)
+gnutls_serv_LDADD += $(LTLIBINTL) gl/libgnu_gpl.la
 gnutls_serv_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_CFLAGS =
@@ -122,7 +122,7 @@ gnutls_cli_LDADD += ../libdane/libgnutls-dane.la
 endif
 gnutls_cli_LDADD += libcmd-cli.la $(LIBOPTS) ../gl/libgnu.la $(LTLIBINTL)
 gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME) \
-	 $(SERVENT_LIB)
+	 $(SERVENT_LIB) gl/libgnu_gpl.la
 noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS = 
 libcmd_cli_la_SOURCES = cli-args.def cli-args.c cli-args.h
@@ -132,7 +132,7 @@ endif
 gnutls_cli_debug_SOURCES = cli-debug.c tests.h tests.c \
 		socket.c socket.h common.h common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la 
-gnutls_cli_debug_LDADD += $(LIBOPTS) ../gl/libgnu.la
+gnutls_cli_debug_LDADD += $(LIBOPTS) ../gl/libgnu.la gl/libgnu_gpl.la
 gnutls_cli_debug_LDADD += $(LTLIBINTL)
 gnutls_cli_debug_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-cli-debug.la
@@ -143,7 +143,7 @@ libcmd_cli_debug_la_SOURCES = cli-debug-args.def cli-debug-args.c cli-debug-args
 
 certtool_SOURCES = certtool.c certtool-common.c certtool-extras.c common.c
 certtool_LDADD = ../lib/libgnutls.la 
-certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
+certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la gl/libgnu_gpl.la
 
 noinst_LTLIBRARIES += libcmd-certtool.la
 libcmd_certtool_la_CFLAGS =
@@ -151,12 +151,12 @@ libcmd_certtool_la_SOURCES = certtool-args.c certtool-args.def certtool-args.h	\
 	certtool-cfg.h certtool-cfg.c
 libcmd_certtool_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
 libcmd_certtool_la_LIBADD += $(LIBOPTS) $(LTLIBINTL)
-libcmd_certtool_la_LIBADD += $(LTLIBREADLINE)
+libcmd_certtool_la_LIBADD += $(LTLIBREADLINE) gl/libgnu_gpl.la
 libcmd_certtool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
 danetool_SOURCES = danetool.c certtool-common.c certtool-extras.c common.c
 danetool_LDADD = ../lib/libgnutls.la 
-danetool_LDADD += libcmd-danetool.la ../gl/libgnu.la
+danetool_LDADD += libcmd-danetool.la ../gl/libgnu.la gl/libgnu_gpl.la
 if ENABLE_DANE
 danetool_LDADD += ../libdane/libgnutls-dane.la
 endif
@@ -177,7 +177,7 @@ if ENABLE_PKCS11
 p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c \
 	certtool-extras.c p11tool.h common.c
 p11tool_LDADD = ../lib/libgnutls.la
-p11tool_LDADD += libcmd-p11tool.la $(LIBOPTS) ../gl/libgnu.la
+p11tool_LDADD += libcmd-p11tool.la $(LIBOPTS) ../gl/libgnu.la gl/libgnu_gpl.la
 p11tool_LDADD += $(LTLIBINTL)
 
 noinst_LTLIBRARIES += libcmd-p11tool.la
@@ -193,7 +193,7 @@ if ENABLE_TROUSERS
 
 tpmtool_SOURCES = tpmtool-args.def tpmtool.c certtool-common.c certtool-extras.c common.c
 tpmtool_LDADD = ../lib/libgnutls.la
-tpmtool_LDADD += libcmd-tpmtool.la $(LIBOPTS) ../gl/libgnu.la
+tpmtool_LDADD += libcmd-tpmtool.la $(LIBOPTS) ../gl/libgnu.la gl/libgnu_gpl.la
 tpmtool_LDADD += $(LTLIBINTL)
 
 noinst_LTLIBRARIES += libcmd-tpmtool.la
