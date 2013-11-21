@@ -127,6 +127,7 @@ doc/manpages/gnutls-cli.1
 doc/manpages/gnutls-serv.1
 doc/manpages/gnutls_*.3
 doc/manpages/dane_*.3
+doc/manpages/xssl_*.3
 doc/manpages/ocsptool.1
 doc/manpages/p11tool.1
 doc/manpages/psktool.1
