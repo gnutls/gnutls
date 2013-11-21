@@ -59,6 +59,7 @@ AC_DEFUN([ggl_EARLY],
   # Code from module msvc-nothrow:
   # Code from module multiarch:
   # Code from module parse-datetime:
+  # Code from module progname:
   # Code from module setenv:
   # Code from module snippet/_Noreturn:
   # Code from module snippet/arg-nonnull:
@@ -139,6 +140,8 @@ AC_DEFUN([ggl_INIT],
   fi
   gl_MULTIARCH
   gl_PARSE_DATETIME
+  AC_CHECK_DECLS([program_invocation_name], [], [], [#include <errno.h>])
+  AC_CHECK_DECLS([program_invocation_short_name], [], [], [#include <errno.h>])
   gl_FUNC_SETENV
   if test $HAVE_SETENV = 0 || test $REPLACE_SETENV = 1; then
     AC_LIBOBJ([setenv])
@@ -346,6 +349,8 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/msvc-nothrow.h
   lib/parse-datetime.h
   lib/parse-datetime.y
+  lib/progname.c
+  lib/progname.h
   lib/setenv.c
   lib/stdbool.in.h
   lib/stddef.in.h
