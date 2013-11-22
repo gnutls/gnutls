@@ -202,7 +202,10 @@ fallback:
 
 void _rnd_system_entropy_deinit(void)
 {
-	close(device_fd);
+	if (device_fd > 0) {
+		close(device_fd);
+		device_fd = -1;
+	}
 }
 #endif
 

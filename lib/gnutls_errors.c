@@ -402,6 +402,8 @@ static const gnutls_error_entry error_algorithms[] = {
 		    GNUTLS_E_NO_SELF_TEST, 1),
 	ERROR_ENTRY(N_("An error has been detected in the library and cannot continue operations."),
 		    GNUTLS_E_LIB_IN_ERROR_STATE, 1),
+	ERROR_ENTRY(N_("Error in sockets initialization."),
+		    GNUTLS_E_SOCKETS_INIT_ERROR, 1),
 	{NULL, NULL, 0, 0}
 };
 

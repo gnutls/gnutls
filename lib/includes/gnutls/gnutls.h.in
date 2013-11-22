@@ -1421,6 +1421,12 @@ int gnutls_ocsp_status_request_is_checked(gnutls_session_t session,
 
 /* global state functions
  */
+#define GNUTLS_GLOBAL_INIT_ALL (~((unsigned int)0))
+#define GNUTLS_GLOBAL_INIT_MINIMAL (1)
+#define GNUTLS_GLOBAL_INIT_PKCS11 (1<<1)
+#define GNUTLS_GLOBAL_INIT_CRYPTO (1<<2)
+
+int gnutls_global_init2(unsigned int flags);
 int gnutls_global_init(void);
 void gnutls_global_deinit(void);
 
@@ -2285,6 +2291,7 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk);
 #define GNUTLS_E_RANDOM_DEVICE_ERROR -342
 #define GNUTLS_E_AUTH_ERROR -343
 #define GNUTLS_E_NO_APPLICATION_PROTOCOL -344
+#define GNUTLS_E_SOCKETS_INIT_ERROR -345
 
 #define GNUTLS_E_SELF_TEST_ERROR -400
 #define GNUTLS_E_NO_SELF_TEST -401
