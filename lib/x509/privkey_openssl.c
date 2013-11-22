@@ -39,39 +39,39 @@ openssl_hash_password(const char *pass, gnutls_datum_t * key,
 		      gnutls_datum_t * salt)
 {
 	unsigned char md5[16];
-	gnutls_hash_hd_t hash;
+	digest_hd_st hd;
 	unsigned int count = 0;
 	int err;
 
 	while (count < key->size) {
-		err = gnutls_hash_init(&hash, GNUTLS_DIG_MD5);
+		err = _gnutls_hash_init(&hd, mac_to_entry(GNUTLS_MAC_MD5));
 		if (err) {
 			gnutls_assert();
 			return err;
 		}
 		if (count) {
-			err = gnutls_hash(hash, md5, sizeof(md5));
+			err = _gnutls_hash(&hd, md5, sizeof(md5));
 			if (err) {
 			      hash_err:
-				gnutls_hash_deinit(hash, NULL);
+				_gnutls_hash_deinit(&hd, NULL);
 				gnutls_assert();
 				return err;
 			}
 		}
 		if (pass) {
-			err = gnutls_hash(hash, pass, strlen(pass));
+			err = _gnutls_hash(&hd, pass, strlen(pass));
 			if (err) {
 				gnutls_assert();
 				goto hash_err;
 			}
 		}
-		err = gnutls_hash(hash, salt->data, 8);
+		err = _gnutls_hash(&hd, salt->data, 8);
 		if (err) {
 			gnutls_assert();
 			goto hash_err;
 		}
 
-		gnutls_hash_deinit(hash, md5);
+		_gnutls_hash_deinit(&hd, md5);
 
 		if (key->size - count <= sizeof(md5)) {
 			memcpy(&key->data[count], md5, key->size - count);
