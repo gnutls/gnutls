@@ -379,6 +379,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 	ret = 0;
 
       cleanup:
+	gnutls_free(sig.data);
 	if (pub != 0)
 		gnutls_pubkey_deinit(pub);
 	gnutls_privkey_deinit(key);
