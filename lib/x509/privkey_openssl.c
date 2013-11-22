@@ -85,19 +85,21 @@ openssl_hash_password(const char *pass, gnutls_datum_t * key,
 	return 0;
 }
 
-static const struct pem_cipher {
+struct pem_cipher {
 	const char *name;
 	gnutls_cipher_algorithm_t cipher;
-} pem_ciphers[] = {
-	{
-	"DES-CBC", GNUTLS_CIPHER_DES_CBC}, {
-	"DES-EDE3-CBC", GNUTLS_CIPHER_3DES_CBC}, {
-	"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC}, {
-	"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC}, {
-	"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC}, {
-	"CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC}, {
-	"CAMELLIA-192-CBC", GNUTLS_CIPHER_CAMELLIA_192_CBC}, {
-"CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC},};
+};
+
+static const struct pem_cipher pem_ciphers[] = {
+	{"DES-CBC", GNUTLS_CIPHER_DES_CBC}, 
+	{"DES-EDE3-CBC", GNUTLS_CIPHER_3DES_CBC}, 
+	{"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC}, 
+	{"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC}, 
+	{"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC}, 
+	{"CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC}, 
+	{"CAMELLIA-192-CBC", GNUTLS_CIPHER_CAMELLIA_192_CBC}, 
+	{"CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC},
+};
 
 /**
  * gnutls_x509_privkey_import_openssl:
