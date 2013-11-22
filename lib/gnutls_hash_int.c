@@ -68,6 +68,20 @@ int _gnutls_hash_init(digest_hd_st * dig, const mac_entry_st * e)
 	return 0;
 }
 
+/* Returns true(non-zero) or false(0) if the 
+ * provided hash exists
+ */
+int _gnutls_digest_exists(gnutls_digest_algorithm_t algo)
+{
+	const gnutls_crypto_digest_st *cc = NULL;
+
+	cc = _gnutls_get_crypto_digest(algo);
+	if (cc != NULL)
+		return 1;
+
+	return _gnutls_digest_ops.exists(algo);
+}
+
 void _gnutls_hash_deinit(digest_hd_st * handle, void *digest)
 {
 	if (handle->handle == NULL) {

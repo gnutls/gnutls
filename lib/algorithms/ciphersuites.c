@@ -298,6 +298,9 @@ typedef struct {
 
 #define CIPHER_SUITES_COUNT (sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1)
 
+/* The following is a potential list of ciphersuites. For the options to be
+ * available, the ciphers and MACs must be available to gnutls as well.
+ */
 static const gnutls_cipher_suite_entry cs_algorithms[] = {
 	/* RSA-NULL */
 	ENTRY(GNUTLS_RSA_NULL_MD5,
