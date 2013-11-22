@@ -667,6 +667,11 @@ static inline const struct ecc_curve *get_supported_curve(int curve)
 	}
 }
 
+static int _wrap_nettle_pk_curve_exists(gnutls_ecc_curve_t curve)
+{
+	return ((get_supported_curve(curve)!=NULL)?1:0);
+}
+
 /* Generates algorithm's parameters. That is:
  *  For DSA: p, q, and g are generated.
  *  For RSA: nothing
@@ -1355,4 +1360,5 @@ gnutls_crypto_pk_st _gnutls_pk_ops = {
 	.generate_keys = wrap_nettle_pk_generate_keys,
 	.pk_fixup_private_params = wrap_nettle_pk_fixup,
 	.derive = _wrap_nettle_pk_derive,
+	.curve_exists = _wrap_nettle_pk_curve_exists,
 };

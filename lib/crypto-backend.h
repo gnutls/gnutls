@@ -324,7 +324,7 @@ typedef struct gnutls_crypto_pk {
 		       const gnutls_pk_params_st * priv,
 		       const gnutls_pk_params_st * pub);
 
-
+	int (*curve_exists) (gnutls_ecc_curve_t);	/* true/false */
 } gnutls_crypto_pk_st;
 
 /* priority: infinity for backend algorithms, 90 for kernel
