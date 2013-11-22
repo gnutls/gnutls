@@ -28,6 +28,8 @@ is used with another protocol than the GNUTLS_DTLS0_9 protocol.
 ** libgnutls: gnutls_x509_crt_set_expiration_time() will set the no well defined
 expiration date when (time_t)-1 is specified as date.
 
+** libgnutls: Session tickets are encrypted using AES-GCM.
+
 ** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
 
 ** certtool: When exporting an encrypted PEM private key do not output the key
