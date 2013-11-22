@@ -314,6 +314,12 @@ gnutls_hmac_init(gnutls_hmac_hd_t * dig,
 		 gnutls_mac_algorithm_t algorithm,
 		 const void *key, size_t keylen)
 {
+#ifdef ENABLE_FIPS140
+	/* MD5 is only allowed internally for TLS */
+	if (algorithm == GNUTLS_MAC_MD5)
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+#endif
+
 	*dig = gnutls_malloc(sizeof(mac_hd_st));
 	if (*dig == NULL) {
 		gnutls_assert();
@@ -451,6 +457,12 @@ int
 gnutls_hash_init(gnutls_hash_hd_t * dig,
 		 gnutls_digest_algorithm_t algorithm)
 {
+#ifdef ENABLE_FIPS140
+	/* MD5 is only allowed internally for TLS */
+	if (algorithm == GNUTLS_DIG_MD5)
+		return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+#endif
+
 	*dig = gnutls_malloc(sizeof(digest_hd_st));
 	if (*dig == NULL) {
 		gnutls_assert();
