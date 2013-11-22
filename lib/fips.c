@@ -258,6 +258,7 @@ int _gnutls_fips_perform_self_checks(void)
 	return 0;
 error:
 	_gnutls_switch_fips_state(FIPS_STATE_ERROR);
+	_gnutls_audit_log(NULL, "FIPS140-2 self testing failed\n");
 
 	return GNUTLS_E_SELF_TEST_ERROR;
 }
