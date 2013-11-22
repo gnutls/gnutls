@@ -335,6 +335,7 @@ void doit(void)
 	start
 	    ("NONE:+VERS-DTLS1.0:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA",
 	     37);
+#ifndef ENABLE_FIPS140
 	/* 13 + 20(tag) */
 	start
 	    ("NONE:+VERS-DTLS1.0:+SALSA20-256:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
@@ -343,6 +344,7 @@ void doit(void)
 	start
 	    ("NONE:+VERS-DTLS1.0:+SALSA20-256:+UMAC-96:+SIGN-ALL:+COMP-NULL:+RSA",
 	     25);
+#endif
 }
 
 #endif				/* _WIN32 */

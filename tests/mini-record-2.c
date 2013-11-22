@@ -377,9 +377,6 @@ void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
-	start(NULL_SHA1, 0);
-
-	start(NEW_ARCFOUR_SHA1, 1);
 	start(NEW_AES_CBC, 1);
 	start(NEW_AES_CBC_SHA256, 1);
 	start(NEW_AES_GCM, 1);
@@ -388,8 +385,13 @@ void doit(void)
 	start(AES_CBC_SHA256, 1);
 	start(AES_GCM, 0);
 
+#ifndef ENABLE_FIPS140
+	start(NULL_SHA1, 0);
+	start(NEW_ARCFOUR_SHA1, 1);
+
 	start(ARCFOUR_SHA1, 0);
 	start(ARCFOUR_MD5, 0);
+#endif
 
 	start(ARCFOUR_SHA1_ZLIB, 0);
 	start(NEW_ARCFOUR_SHA1_ZLIB, 1);

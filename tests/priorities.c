@@ -31,6 +31,14 @@
 
 #include "utils.h"
 
+#ifdef ENABLE_FIPS140
+void doit(void)
+{
+	exit(77);
+}
+
+#else
+
 static void
 try_prio(const char *prio, unsigned expected_cs, unsigned expected_ciphers)
 {
@@ -109,3 +117,5 @@ void doit(void)
 	try_prio("SECURE128:+SECURE256:+NORMAL", normal, 10);	/* should be the same as NORMAL */
 	try_prio("SUITEB192", 1, 1);
 }
+
+#endif
