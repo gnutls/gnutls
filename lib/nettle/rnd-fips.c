@@ -583,7 +583,7 @@ leave:
 
 	gnutls_free(test_ctx);
 	if (errtxt)
-		_gnutls_debug_log("FIPS KAT: %s\n", errtxt);
+		_gnutls_debug_log("FIPS DRBG KAT: %s\n", errtxt);
 	return ret;
 }
 
