@@ -44,6 +44,7 @@
 #include <nettle/ecc.h>
 #include <nettle/ecdsa.h>
 #include <nettle/ecc-curve.h>
+#include <fips.h>
 
 #define TOMPZ(x) (*((mpz_t*)(x)))
 
@@ -51,8 +52,13 @@ static inline const struct ecc_curve *get_supported_curve(int curve);
 
 static void rnd_func(void *_ctx, unsigned length, uint8_t * data)
 {
-	if (_gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0)
+	if (_gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
+#ifdef ENABLE_FIPS140
+		_gnutls_switch_fips_state(FIPS_STATE_ERROR);
+#else
 		abort();
+#endif
+	}
 }
 
 static void
@@ -272,8 +278,9 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 	ret = 0;
 
       cleanup:
-
 	mpz_clear(p);
+
+	FAIL_IF_FIPS_ERROR;
 	return ret;
 }
 
@@ -350,6 +357,7 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 	if (ret < 0)
 		gnutls_free(plaintext->data);
 
+	FAIL_IF_FIPS_ERROR;
 	return ret;
 }
 
@@ -504,6 +512,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
       cleanup:
 
+	FAIL_IF_FIPS_ERROR;
 	return ret;
 }
 
@@ -734,6 +743,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	FAIL_IF_FIPS_ERROR;
 	return 0;
 
       fail:
@@ -743,6 +753,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	}
 	params->params_nr = 0;
 
+	FAIL_IF_FIPS_ERROR;
 	return ret;
 }
 
@@ -914,6 +925,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	FAIL_IF_FIPS_ERROR;
 	return 0;
 
       fail:
@@ -923,6 +935,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	}
 	params->params_nr = 0;
 
+	FAIL_IF_FIPS_ERROR;
 	return ret;
 }
 
