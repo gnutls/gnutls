@@ -84,8 +84,10 @@ ctests += ocsp
 endif
 
 if ENABLE_OPENSSL
+if !ENABLE_FIPS140
 ctests +=  openssl
 openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
+endif
 endif
 
 mini_xssl_LDADD = $(LDADD) ../lib/libgnutls-xssl.la
