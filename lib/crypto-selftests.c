@@ -304,7 +304,7 @@ static int test_cipher(gnutls_cipher_algorithm_t cipher,
 	}
 
 	_gnutls_debug_log
-	    ("%s self check was successful\n",
+	    ("%s self check succeeded\n",
 	     gnutls_cipher_get_name(cipher));
 
 	return 0;
@@ -390,7 +390,7 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 	}
 
 	_gnutls_debug_log
-	    ("%s self check was successful\n",
+	    ("%s self check succeeded\n",
 	     gnutls_cipher_get_name(cipher));
 
 	return 0;
@@ -515,7 +515,7 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 		}
 	}
 
-	_gnutls_debug_log("%s self check was successful\n",
+	_gnutls_debug_log("%s self check succeeded\n",
 			  gnutls_digest_get_name(dig));
 
 	return 0;
@@ -641,7 +641,7 @@ static int test_mac(gnutls_mac_algorithm_t mac,
 	}
 
 	_gnutls_debug_log
-	    ("MAC-%s self check was successful\n",
+	    ("MAC-%s self check succeeded\n",
 	     gnutls_mac_get_name(mac));
 
 	return 0;

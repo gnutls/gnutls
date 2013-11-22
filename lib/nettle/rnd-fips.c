@@ -576,14 +576,14 @@ static int selftest_kat(void)
 		test_ctx->is_seeded = 0;
 	}
 
-	errtxt = "success";
+	errtxt = "succeeded";
 	ret = 0;
 leave:
 	RND_UNLOCK;
 
 	gnutls_free(test_ctx);
 	if (errtxt)
-		_gnutls_debug_log("FIPS DRBG KAT: %s\n", errtxt);
+		_gnutls_debug_log("DRBG-AES self test: %s\n", errtxt);
 	return ret;
 }
 
