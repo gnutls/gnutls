@@ -9,7 +9,12 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 gnutls_privkey_generate: Added
+gnutls_global_init2: Added
 gnutls_fips140_mode_enabled: Added
+gnutls_digest_self_test: Added
+gnutls_mac_self_test: Added
+gnutls_pk_self_test: Added
+gnutls_cipher_self_test: Added
 
 
 * Version 3.2.6 (released 2013-10-31)
