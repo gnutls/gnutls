@@ -25,29 +25,51 @@
 #include <unistd.h>
 #include <gnutls_errors.h>
 #include <fips.h>
+#include <stdio.h>
 #include <random.h>
 #include <gnutls/fips140.h>
 #include <dlfcn.h>
 
 #ifdef ENABLE_FIPS140
 
+#define FIPS_KERNEL_FILE "/proc/sys/crypto/fips_enabled"
+#define FIPS_SYSTEM_FILE "/etc/system-fips"
+
 unsigned int _gnutls_fips_mode = FIPS_STATE_POWERON;
 
 unsigned _gnutls_fips_mode_enabled(void)
 {
-	/* FIXME: There are some subtle differences here. Check it out later */
-	if (access("/proc/sys/crypto/fips_enabled", R_OK) == 0 &&
-	    access("/etc/system-fips", R_OK) == 0)
-		return 1;
+unsigned f1p, f2p;
+FILE* fd;
 
-#ifndef FIPS140_TEST
+	fd = fopen(FIPS_KERNEL_FILE, "r");
+	if (fd != NULL) {
+		f1p = fgetc(fd);
+		fclose(fd);
+		
+		if (f1p == '1') f1p = 1;
+		else f1p = 0;
+	}
+
+	f2p = !access(FIPS_SYSTEM_FILE, R_OK);
+
+	if (f1p != 0 && f2p != 0) {
+		_gnutls_debug_log("FIPS140-2 mode enabled\n");
+		return 1;
+	}
+
+	if (f2p != 0) {
+		/* a funny state where self tests are performed
+		 * and ignored */
+		_gnutls_switch_fips_state(FIPS_STATE_ZOMBIE);
+		_gnutls_debug_log("FIPS140-2 ZOMBIE mode enabled\n");
+		return 1;
+	}
+
 	return 0;
-#else
-	return 1;
-#endif
 }
 
-static const char fips_key[] = "I'd rather be skiing.";
+static const char fips_key[] = "orboDeJITITejsirpADONivirpUkvarP";
 
 #define HMAC_SUFFIX ".hmac"
 #define HMAC_SIZE 32
@@ -91,21 +113,26 @@ static unsigned check_binary_integrity(void)
 	snprintf(mac_file, sizeof(mac_file), "%s"HMAC_SUFFIX, info.dli_fname);
 	
 	ret = gnutls_load_file(mac_file, &data);
-	if (ret < 0)
+	if (ret < 0) {
+		_gnutls_debug_log("Could not open %s%s for MAC testing: %s\n", info.dli_fname, HMAC_SUFFIX, gnutls_strerror(ret));
 		return gnutls_assert_val(0);
+	}
 
 	hmac_size = sizeof(hmac);
 	ret = _gnutls_hex2bin((void*)data.data, data.size, hmac, &hmac_size);
 	gnutls_free(data.data);
 
-	if (ret < 0)
+	if (ret < 0) {
+		_gnutls_debug_log("Could not convert hex data to binary for MAC testing.\n");
 		return gnutls_assert_val(0);
+	}
 
 	if (hmac_size != sizeof(hmac) ||
 			memcmp(hmac, new_hmac, sizeof(hmac)) != 0) {
 		_gnutls_debug_log("Calculated MAC does not match\n");
 		return gnutls_assert_val(0);
 	}
+	_gnutls_debug_log("Successfully verified library MAC\n");
 	
 	return 1;
 }
@@ -214,9 +241,7 @@ int _gnutls_fips_perform_self_checks(void)
 	ret = check_binary_integrity();
 	if (ret == 0) {
 		gnutls_assert();
-#ifndef FIPS140_TEST
 		goto error;
-#endif
 	}
 	
 	if (_gnutls_rnd_ops.self_test == NULL) {

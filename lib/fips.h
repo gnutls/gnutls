@@ -26,13 +26,11 @@
 #include <gnutls_int.h>
 #include <gnutls/gnutls.h>
 
-/* This must be removed when finished */
-#define FIPS140_TEST
-
 #define FIPS140_RND_KEY_SIZE 32
 
 typedef enum {
   FIPS_STATE_POWERON,
+  FIPS_STATE_ZOMBIE,
   FIPS_STATE_INIT,
   FIPS_STATE_SELFTEST,
   FIPS_STATE_OPERATIONAL,
@@ -48,7 +46,9 @@ extern unsigned int _gnutls_fips_mode;
 inline static 
 void _gnutls_switch_fips_state(gnutls_fips_state_t state)
 {
-	_gnutls_fips_mode = state;
+	/* Once into zombie state no errors can change us */
+	if (_gnutls_fips_mode != FIPS_STATE_ZOMBIE)
+		_gnutls_fips_mode = state;
 }
 
 inline static gnutls_fips_state_t _gnutls_get_fips_state(void)
@@ -61,7 +61,8 @@ unsigned _gnutls_fips_mode_enabled(void);
 
 # define FAIL_IF_FIPS_ERROR \
 	if (_gnutls_get_fips_state() != FIPS_STATE_OPERATIONAL && \
-	  _gnutls_get_fips_state() != FIPS_STATE_SELFTEST) return GNUTLS_E_LIB_IN_ERROR_STATE
+	  _gnutls_get_fips_state() != FIPS_STATE_SELFTEST && \
+	  _gnutls_get_fips_state() != FIPS_STATE_ZOMBIE) return GNUTLS_E_LIB_IN_ERROR_STATE
 
 void _gnutls_switch_fips_state(gnutls_fips_state_t state);
 

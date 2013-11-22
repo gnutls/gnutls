@@ -282,12 +282,17 @@ int gnutls_global_init(void)
 #endif
 
 	_gnutls_cryptodev_init();
-	
-	if (_gnutls_fips_mode_enabled()) {
+
+	result = _gnutls_fips_mode_enabled();
+	if (result != 0) {
 		result = _gnutls_fips_perform_self_checks();
-		if (result < 0) {
-			gnutls_assert();
-			goto out;
+		if (_gnutls_get_fips_state() != FIPS_STATE_ZOMBIE) {
+			if (result < 0) {
+				gnutls_assert();
+				goto out;
+			}
+		} else {
+			result = 0;
 		}
 		_gnutls_switch_fips_state(FIPS_STATE_OPERATIONAL);
 	}
