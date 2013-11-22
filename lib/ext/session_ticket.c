@@ -72,7 +72,6 @@ typedef struct
 {
   int session_ticket_enable;
   int session_ticket_renew;
-  uint8_t session_ticket_IV[SESSION_TICKET_IV_SIZE];
 
   uint8_t *session_ticket;
   int session_ticket_len;
@@ -191,6 +190,7 @@ encrypt_ticket (gnutls_session_t session, session_ticket_ext_st * priv,
 {
   cipher_hd_st cipher_hd;
   gnutls_datum_t key, IV, mac_secret, state, encrypted_state;
+  uint8_t iv[IV_SIZE];
   int blocksize;
   int ret;
 
@@ -219,8 +219,17 @@ encrypt_ticket (gnutls_session_t session, session_ticket_ext_st * priv,
   /* Encrypt state using 128-bit AES in CBC mode. */
   key.data = (void *) &priv->key[KEY_POS];
   key.size = KEY_SIZE;
-  IV.data = priv->session_ticket_IV;
+  IV.data = iv;
   IV.size = IV_SIZE;
+
+  ret = _gnutls_rnd (GNUTLS_RND_NONCE, iv, IV_SIZE);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (&encrypted_state);
+      return ret;
+    }
+
   ret =
     _gnutls_cipher_init (&cipher_hd, GNUTLS_CIPHER_AES_128_CBC, &key, &IV, 1);
   if (ret < 0)
@@ -536,7 +545,6 @@ int
 gnutls_session_ticket_enable_server (gnutls_session_t session,
                                      const gnutls_datum_t * key)
 {
-  int ret;
   session_ticket_ext_st *priv = NULL;
   extension_priv_data_t epriv;
 
@@ -554,13 +562,6 @@ gnutls_session_ticket_enable_server (gnutls_session_t session,
       return GNUTLS_E_MEMORY_ERROR;
     }
   epriv.ptr = priv;
-
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, priv->session_ticket_IV, IV_SIZE);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
 
   memcpy (&priv->key, key->data, key->size);
   priv->session_ticket_enable = 1;
