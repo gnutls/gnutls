@@ -46,7 +46,8 @@ void doit(void)
 
 	mode = gnutls_fips140_mode_enabled();
 	if (mode == 0) {
-		fail("We are not in FIPS140 mode\n");
+		success("We are not in FIPS140 mode\n");
+		exit(77);
 	}
 
 	ret = global_init();
@@ -98,50 +99,44 @@ void doit(void)
 	gnutls_deinit(session);
 
 	/* Test when FIPS140 is set to error state */
-	if (mode == 1) {	/* this works in full fips140 mode */
-		_gnutls_fips140_simulate_error();
+	_gnutls_fips140_simulate_error();
 
 
-		/* Try crypto.h functionality */
-		ret =
-		    gnutls_cipher_init(&ch, GNUTLS_CIPHER_AES_128_CBC,
-				       &key, &iv);
-		if (ret >= 0) {
-			fail("gnutls_cipher_init succeeded when in FIPS140 error state\n");
-		}
+	/* Try crypto.h functionality */
+	ret =
+	    gnutls_cipher_init(&ch, GNUTLS_CIPHER_AES_128_CBC, &key, &iv);
+	if (ret >= 0) {
+		fail("gnutls_cipher_init succeeded when in FIPS140 error state\n");
+	}
 
-		ret =
-		    gnutls_hmac_init(&mh, GNUTLS_MAC_SHA1, key.data,
-				     key.size);
-		if (ret >= 0) {
-			fail("gnutls_hmac_init succeeded when in FIPS140 error state\n");
-		}
+	ret = gnutls_hmac_init(&mh, GNUTLS_MAC_SHA1, key.data, key.size);
+	if (ret >= 0) {
+		fail("gnutls_hmac_init succeeded when in FIPS140 error state\n");
+	}
 
-		ret = gnutls_rnd(GNUTLS_RND_NONCE, key16, sizeof(key16));
-		if (ret >= 0) {
-			fail("gnutls_rnd succeeded when in FIPS140 error state\n");
-		}
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, key16, sizeof(key16));
+	if (ret >= 0) {
+		fail("gnutls_rnd succeeded when in FIPS140 error state\n");
+	}
 
-		ret = gnutls_pubkey_init(&pubkey);
-		if (ret >= 0) {
-			fail("gnutls_pubkey_init succeeded when in FIPS140 error state\n");
-		}
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret >= 0) {
+		fail("gnutls_pubkey_init succeeded when in FIPS140 error state\n");
+	}
 
-		ret = gnutls_privkey_init(&privkey);
-		if (ret >= 0) {
-			fail("gnutls_privkey_init succeeded when in FIPS140 error state\n");
-		}
+	ret = gnutls_privkey_init(&privkey);
+	if (ret >= 0) {
+		fail("gnutls_privkey_init succeeded when in FIPS140 error state\n");
+	}
 
-		ret = gnutls_x509_privkey_init(&xprivkey);
-		if (ret >= 0) {
-			fail("gnutls_x509_privkey_init succeeded when in FIPS140 error state\n");
-		}
+	ret = gnutls_x509_privkey_init(&xprivkey);
+	if (ret >= 0) {
+		fail("gnutls_x509_privkey_init succeeded when in FIPS140 error state\n");
+	}
 
-		ret = gnutls_init(&session, 0);
-		if (ret >= 0) {
-			fail("gnutls_init succeeded when in FIPS140 error state\n");
-		}
-
+	ret = gnutls_init(&session, 0);
+	if (ret >= 0) {
+		fail("gnutls_init succeeded when in FIPS140 error state\n");
 	}
 
 	gnutls_global_deinit();

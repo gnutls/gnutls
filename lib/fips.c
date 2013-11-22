@@ -63,7 +63,7 @@ FILE* fd;
 		 * and ignored */
 		_gnutls_switch_fips_state(FIPS_STATE_ZOMBIE);
 		_gnutls_debug_log("FIPS140-2 ZOMBIE mode enabled\n");
-		return 1;
+		return 2;
 	}
 
 	return 0;
@@ -276,8 +276,11 @@ error:
 int gnutls_fips140_mode_enabled(void)
 {
 #ifdef ENABLE_FIPS140
+int ret = _gnutls_fips_mode_enabled();
 
-	return _gnutls_fips_mode_enabled();
+	if (ret == 1)
+		return ret;
+	return 0;
 #else
 	return 0;
 #endif
