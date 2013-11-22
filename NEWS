@@ -15,9 +15,9 @@ chain.
 ** libgnutls: When traversing PKCS #11 tokens looking for an object, avoid
 looking in unrelated to the object tokens.
 
-** libgnutls: Added %DUMBFW option for priority strings. This avoids a black
-hole behavior in some firewalls by sending a large client hello. See
-http://www.ietf.org/mail-archive/web/tls/current/msg10423.html
+** libgnutls: Added an experimental %DUMBFW option in priority strings. This 
+avoids a black hole behavior in some firewalls by sending a large client hello. 
+See http://www.ietf.org/mail-archive/web/tls/current/msg10423.html
 
 ** libgnutls: The GNUTLS_DEBUG_LEVEL variable if set to a log level number
 will force output of debug messages to stderr.
