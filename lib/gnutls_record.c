@@ -1088,7 +1088,7 @@ static int recv_headers(gnutls_session_t session, content_type_t type,
 	     record_check_version(session, htype, record->version)) < 0)
 		return gnutls_assert_val(ret);
 
-	if (record->length > MAX_RECV_SIZE(session)) {
+	if (record->length > max_record_recv_size(session)) {
 		_gnutls_audit_log
 		    (session, "Received packet with illegal length: %u\n",
 		     (unsigned int) record->length);
@@ -1195,9 +1195,11 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	/* We allocate the maximum possible to allow few compressed bytes to expand to a
-	 * full record.
+	 * full record. Moreover we add space for any pad and the MAC (in case
+	 * they are encrypted).
 	 */
-	decrypted = _mbuffer_alloc(record.length, record.length);
+	ret = max_decrypted_size(session) + MAX_PAD_SIZE + MAX_HASH_SIZE;
+	decrypted = _mbuffer_alloc(ret, ret);
 	if (decrypted == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
