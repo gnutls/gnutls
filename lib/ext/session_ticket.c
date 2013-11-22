@@ -187,7 +187,11 @@ encrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 	
 	t = gnutls_time(0);
 	memcpy(iv, &t, 4);
-	_gnutls_rnd(GNUTLS_RND_NONCE, iv+4, IV_SIZE-4);
+	ret = _gnutls_rnd(GNUTLS_RND_NONCE, iv+4, IV_SIZE-4);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	ret =
 	    _gnutls_cipher_init(&cipher_hd,
