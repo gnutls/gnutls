@@ -237,13 +237,7 @@ int _gnutls_fips_perform_self_checks(void)
 		gnutls_assert();
 		goto error;
 	}
-	
-	ret = check_binary_integrity();
-	if (ret == 0) {
-		gnutls_assert();
-		goto error;
-	}
-	
+
 	if (_gnutls_rnd_ops.self_test == NULL) {
 		gnutls_assert();
 		goto error;
@@ -251,6 +245,12 @@ int _gnutls_fips_perform_self_checks(void)
         
 	ret = _gnutls_rnd_ops.self_test();
 	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = check_binary_integrity();
+	if (ret == 0) {
 		gnutls_assert();
 		goto error;
 	}
