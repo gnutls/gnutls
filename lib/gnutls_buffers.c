@@ -185,8 +185,8 @@ _gnutls_dgram_read(gnutls_session_t session, mbuffer_st ** bufel,
 	ssize_t i, ret;
 	uint8_t *ptr;
 	struct timespec t1, t2;
-	size_t max_size = get_max_decrypted_data(session);
-	size_t recv_size = MAX_RECV_SIZE(session);
+	size_t max_size = max_record_recv_size(session);
+	size_t recv_size = max_record_recv_size(session);
 	gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 	unsigned int diff;
 
@@ -261,7 +261,7 @@ _gnutls_stream_read(gnutls_session_t session, mbuffer_st ** bufel,
 {
 	size_t left;
 	ssize_t i = 0;
-	size_t max_size = get_max_decrypted_data(session);
+	size_t max_size = max_record_recv_size(session);
 	uint8_t *ptr;
 	gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 	int ret;
@@ -436,7 +436,7 @@ _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
  * This function is like recv(with MSG_PEEK). But it does not return -1 on error.
  * It does return gnutls_errno instead.
  * This function reads data from the socket and keeps them in a buffer, of up to
- * MAX_RECV_SIZE. 
+ * max_record_recv_size. 
  *
  * This is not a general purpose function. It returns EXACTLY the data requested,
  * which are stored in a local (in the session) buffer.
@@ -454,7 +454,7 @@ _gnutls_io_read_buffered(gnutls_session_t session, size_t total,
 	mbuffer_st *bufel = NULL;
 	size_t recvdata, readsize;
 
-	if (total > MAX_RECV_SIZE(session) || total == 0) {
+	if (total > max_record_recv_size(session) || total == 0) {
 		gnutls_assert();	/* internal error */
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -483,7 +483,7 @@ _gnutls_io_read_buffered(gnutls_session_t session, size_t total,
 	 * receive are longer than the maximum receive buffer size.
 	 */
 	if ((session->internals.record_recv_buffer.byte_length +
-	     recvdata) > MAX_RECV_SIZE(session)) {
+	     recvdata) > max_record_recv_size(session)) {
 		gnutls_assert();	/* internal error */
 		return GNUTLS_E_INVALID_REQUEST;
 	}
