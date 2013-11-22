@@ -81,9 +81,6 @@ static void *rnd_mutex;
 #define SEED_TTL 1000
 
 
-/* The length of the key we use:  16 bytes (128 bit) for AES128.  */
-#define X931_AES_KEYLEN  16
-
 /* This random context type is used to track properties of one random
    generator. Thee context are usually allocated in secure memory so
    that the seed value is well protected.  There are a couble of guard
@@ -312,7 +309,7 @@ x931_aes_driver(struct rng_context* rng_ctx, unsigned char *output, size_t lengt
    the standard generator.  On error NULL is returned.  */
 static int x931_generate_key(struct aes_ctx* ctx)
 {
-	uint8_t buffer[X931_AES_KEYLEN];
+	uint8_t buffer[FIPS140_RND_KEY_SIZE];
 	int ret;
 
 	/* Get a key from the standard RNG or from the entropy source.  */

@@ -29,6 +29,8 @@
 /* This must be removed when finished */
 #define FIPS140_TEST
 
+#define FIPS140_RND_KEY_SIZE 32
+
 typedef enum {
   FIPS_STATE_POWERON,
   FIPS_STATE_INIT,

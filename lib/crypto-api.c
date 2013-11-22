@@ -28,6 +28,7 @@
 #include <algorithms.h>
 #include <random.h>
 #include <crypto.h>
+#include <fips.h>
 
 typedef struct api_cipher_hd_st {
 	cipher_hd_st ctx_enc;
@@ -575,6 +576,14 @@ gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 {
 	int ret;
+
+#ifdef ENABLE_FIPS140
+	/* The FIPS140 approved RNGs are not allowed to be used
+	 * to extract key sizes longer than their original seed.
+	 */
+	if (key_size > FIPS140_RND_KEY_SIZE)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+#endif
 
 	key->size = key_size;
 	key->data = gnutls_malloc(key->size);
