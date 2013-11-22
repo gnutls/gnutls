@@ -30,6 +30,9 @@ expiration date when (time_t)-1 is specified as date.
 
 ** libgnutls: Session tickets are encrypted using AES-GCM.
 
+** libgnutls: Corrected issue in record decompression. Issue pinpointed
+by Frank Zschockel.
+
 ** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
 
 ** certtool: When exporting an encrypted PEM private key do not output the key
