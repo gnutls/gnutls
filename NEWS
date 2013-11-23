@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.17 (unreleased)
+* Version 3.1.17 (released 2013-11-23)
 
 ** libgnutls: Support for TPM via trousers is now enabled by default.
 
@@ -34,6 +34,9 @@ chokes on integer overflows. Suggested by Stefan Buehler.
 
 ** tools: The environment variable GNUTLS_PIN can be used to read any PIN
 requested from tokens.
+
+** tools: The installed version of libopts is used if the autogen tool is
+present.
 
 ** API and ABI modifications:
 No changes since last version.
