@@ -107,6 +107,20 @@ fi
 
 rm -f tmp-tt.pem
 
+datefudge "2007-04-22" \
+    $CERTTOOL --generate-self-signed \
+    --load-privkey $srcdir/template-test.key \
+    --template $srcdir/template-dn-err.tmpl \
+    --outfile tmp-tt.pem 2>/dev/null
+rc=$?
+
+if test "$rc" == "0"; then
+  echo "Test 3 (DN-err) failed"
+  exit $rc
+fi
+
+rm -f tmp-tt.pem
+
 rc=1
 counter=1
 
