@@ -21,6 +21,8 @@ expiration date when (time_t)-1 is specified as date.
 ** libgnutls: Backported memory leak fix when a handshake is terminated by
 an EOF.
 
+** libgnutls: Forbid all compression methods in DTLS.
+
 ** gnutls-serv: Fixed issue with IPv6 address in UDP mode.
 
 ** certtool: When exporting an encrypted PEM private key do not output the key
