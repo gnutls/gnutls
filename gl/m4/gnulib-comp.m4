@@ -563,6 +563,18 @@ AC_SUBST([LTALLOCA])
     gl_PREREQ_STRDUP
   fi
   gl_STRING_MODULE_INDICATOR([strdup])
+  gl_FUNC_STRERROR
+  if test $REPLACE_STRERROR = 1; then
+    AC_LIBOBJ([strerror])
+  fi
+  gl_MODULE_INDICATOR([strerror])
+  gl_STRING_MODULE_INDICATOR([strerror])
+  AC_REQUIRE([gl_HEADER_ERRNO_H])
+  AC_REQUIRE([gl_FUNC_STRERROR_0])
+  if test -n "$ERRNO_H" || test $REPLACE_STRERROR_0 = 1; then
+    AC_LIBOBJ([strerror-override])
+    gl_PREREQ_SYS_H_WINSOCK2
+  fi
   gl_HEADER_STRING_H
   gl_HEADER_STRINGS_H
   gl_FUNC_STRNDUP
@@ -745,18 +757,6 @@ changequote([, ])dnl
   gl_SYS_STAT_MODULE_INDICATOR([stat])
   AC_REQUIRE([gt_TYPE_WCHAR_T])
   AC_REQUIRE([gt_TYPE_WINT_T])
-  gl_FUNC_STRERROR
-  if test $REPLACE_STRERROR = 1; then
-    AC_LIBOBJ([strerror])
-  fi
-  gl_MODULE_INDICATOR([strerror])
-  gl_STRING_MODULE_INDICATOR([strerror])
-  AC_REQUIRE([gl_HEADER_ERRNO_H])
-  AC_REQUIRE([gl_FUNC_STRERROR_0])
-  if test -n "$ERRNO_H" || test $REPLACE_STRERROR_0 = 1; then
-    AC_LIBOBJ([strerror-override])
-    gl_PREREQ_SYS_H_WINSOCK2
-  fi
   gl_FUNC_STRERROR_R
   if test $HAVE_DECL_STRERROR_R = 0 || test $REPLACE_STRERROR_R = 1; then
     AC_LIBOBJ([strerror_r])
@@ -966,6 +966,9 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/str-two-way.h
   lib/strcasecmp.c
   lib/strdup.c
+  lib/strerror-override.c
+  lib/strerror-override.h
+  lib/strerror.c
   lib/string.in.h
   lib/strings.in.h
   lib/strncasecmp.c
@@ -1285,9 +1288,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/pipe.c
   tests=lib/same-inode.h
   tests=lib/stat.c
-  tests=lib/strerror-override.c
-  tests=lib/strerror-override.h
-  tests=lib/strerror.c
   tests=lib/strerror_r.c
   tests=lib/symlink.c
   tests=lib/sys_ioctl.in.h

@@ -934,24 +934,6 @@ EXTRA_DIST += test-stdlib.c test-sys_wait.h
 
 ## end   gnulib module stdlib-tests
 
-## begin gnulib module strerror
-
-
-EXTRA_DIST += strerror.c
-
-EXTRA_libtests_a_SOURCES += strerror.c
-
-## end   gnulib module strerror
-
-## begin gnulib module strerror-override
-
-
-EXTRA_DIST += strerror-override.c strerror-override.h
-
-EXTRA_libtests_a_SOURCES += strerror-override.c
-
-## end   gnulib module strerror-override
-
 ## begin gnulib module strerror-tests
 
 TESTS += test-strerror
