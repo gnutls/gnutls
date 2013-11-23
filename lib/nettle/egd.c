@@ -126,7 +126,7 @@ static const char *find_egd_name(void)
    error, otherwise print an error message and die. */
 int _rndegd_connect_socket(void)
 {
-	int fd;
+	int fd, e;
 	const char *name;
 	struct sockaddr_un addr;
 	int addr_len;
@@ -155,12 +155,14 @@ int _rndegd_connect_socket(void)
 
 	fd = socket(LOCAL_SOCKET_TYPE, SOCK_STREAM, 0);
 	if (fd == -1) {
+		e = errno;
 		_gnutls_debug_log("can't create unix domain socket: %s\n",
-				  strerror(errno));
+				  strerror(e));
 		return -1;
 	} else if (connect(fd, (struct sockaddr *) &addr, addr_len) == -1) {
+		e = errno;
 		_gnutls_debug_log("can't connect to EGD socket `%s': %s\n",
-				  name, strerror(errno));
+				  name, strerror(e));
 		close(fd);
 		fd = -1;
 	}
@@ -182,7 +184,7 @@ int _rndegd_read(int *fd, void *_output, size_t _length)
 {
 	ssize_t n;
 	uint8_t buffer[256 + 2];
-	int nbytes;
+	int nbytes, e;
 	int do_restart = 0;
 	unsigned char *output = _output;
 	ssize_t length = (ssize_t) _length;
@@ -201,14 +203,17 @@ int _rndegd_read(int *fd, void *_output, size_t _length)
 	buffer[0] = 1;		/* non blocking */
 	buffer[1] = nbytes;
 
-	if (do_write(*fd, buffer, 2) == -1)
+	if (do_write(*fd, buffer, 2) == -1) {
+		e = errno;
 		_gnutls_debug_log("can't write to the EGD: %s\n",
-				  strerror(errno));
+				  strerror(e));
+	}
 
 	n = do_read(*fd, buffer, 1);
 	if (n == -1) {
+		e = errno;
 		_gnutls_debug_log("read error on EGD: %s\n",
-				  strerror(errno));
+				  strerror(e));
 		do_restart = 1;
 		goto restart;
 	}
@@ -217,8 +222,9 @@ int _rndegd_read(int *fd, void *_output, size_t _length)
 	if (n) {
 		n = do_read(*fd, buffer, n);
 		if (n == -1) {
+			e = errno;
 			_gnutls_debug_log("read error on EGD: %s\n",
-					  strerror(errno));
+					  strerror(e));
 			do_restart = 1;
 			goto restart;
 		}
@@ -239,13 +245,17 @@ int _rndegd_read(int *fd, void *_output, size_t _length)
 
 		buffer[0] = 2;	/* blocking */
 		buffer[1] = nbytes;
-		if (do_write(*fd, buffer, 2) == -1)
+		if (do_write(*fd, buffer, 2) == -1) {
+			e = errno;
 			_gnutls_debug_log("can't write to the EGD: %s\n",
-					  strerror(errno));
+					  strerror(e));
+		}
+
 		n = do_read(*fd, buffer, nbytes);
 		if (n == -1) {
+			e = errno;
 			_gnutls_debug_log("read error on EGD: %s\n",
-					  strerror(errno));
+					  strerror(e));
 			do_restart = 1;
 			goto restart;
 		}
