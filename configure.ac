@@ -50,7 +50,7 @@ if test x"$AUTOGEN" = "x/bin/true"; then
 ***
 *** autogen not found. Will not link against libopts.
 *** ]])
-NEED_LIBOPTS_DIR=true
+enable_local_libopts=yes
 fi
 
 # For includes/gnutls/gnutls.h.in.
@@ -346,9 +346,8 @@ fi
 
 AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 
-ac_enable_local_libopts=yes
 LIBOPTS_CHECK([src/libopts])
-if test "$NEED_LIBOPTS_DIR" != "true";then
+if test "$NEED_LIBOPTS_DIR" == "true";then
 	dnl delete libopts-generated files
 	for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
 		nam=`echo $i|sed 's/.bak//g'`
@@ -357,7 +356,9 @@ if test "$NEED_LIBOPTS_DIR" != "true";then
 		fi
 	done
 	AC_SUBST([AUTOGEN], [/bin/true])
-	ac_enable_local_libopts=no
+	enable_local_libopts=yes
+else
+	enable_local_libopts=no
 fi
 
 AC_CHECK_TYPE(ssize_t,
@@ -716,7 +717,7 @@ if features are disabled)
 AC_MSG_NOTICE([Optional applications:
 
   crywrap app:          $libidn
-  local libopts:        ${ac_enable_local_libopts}
+  local libopts:        ${enable_local_libopts}
   local libtasn1:       ${included_libtasn1}
 ])
 
