@@ -314,9 +314,8 @@ fi
 
 AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 
-enable_local_libopts=yes
 LIBOPTS_CHECK([src/libopts])
-if test "$NEED_LIBOPTS_DIR" != "true";then
+if test "$NEED_LIBOPTS_DIR" == "true";then
 	dnl delete libopts-generated files
 	for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
 		nam=`echo $i|sed 's/.bak//g'`
@@ -325,9 +324,9 @@ if test "$NEED_LIBOPTS_DIR" != "true";then
 		fi
 	done
 	AC_SUBST([AUTOGEN], [/bin/true])
-	enable_local_libopts=no
-else
 	enable_local_libopts=yes
+else
+	enable_local_libopts=no
 fi
 
 AC_CHECK_TYPE(ssize_t,
