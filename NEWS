@@ -3,7 +3,7 @@ Copyright (C) 2000-2012 Free Software Foundation, Inc.
 Copyright (C) 2013 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.2.7 (unreleased)
+* Version 3.2.7 (released 2013-11-23)
 
 ** libgnutls: gnutls_cipher_get_iv_size() now returns the correct IV size in
 GCM ciphers (previously it returned the implicit IV used in TLS).
