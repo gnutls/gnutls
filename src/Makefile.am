@@ -24,7 +24,7 @@ SUBDIRS += crywrap
 endif
 
 if NEED_LIBOPTS
-LIBOPTS = libopts/libopts.a
+LIBOPTS = libopts/libopts.la
 SUBDIRS += libopts
 else
 LIBOPTS = $(LIBOPTS_LDADD)

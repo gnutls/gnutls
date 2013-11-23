@@ -328,6 +328,8 @@ if test "$NEED_LIBOPTS_DIR" == "true";then
 else
 	enable_local_libopts=no
 fi
+AM_CONDITIONAL(NEED_LIBOPTS, test "$enable_local_libopts" = "yes")
+
 
 AC_CHECK_TYPE(ssize_t,
   [
