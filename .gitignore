@@ -694,3 +694,13 @@ doc/invoke-p11tool.texi
 doc/invoke-psktool.texi
 doc/invoke-srptool.texi
 doc/invoke-tpmtool.texi
+doc/invoke-certtool.texi
+doc/invoke-danetool.texi
+doc/invoke-gnutls-cli-debug.texi
+doc/invoke-gnutls-cli.texi
+doc/invoke-gnutls-serv.texi
+doc/invoke-ocsptool.texi
+doc/invoke-p11tool.texi
+doc/invoke-psktool.texi
+doc/invoke-srptool.texi
+doc/invoke-tpmtool.texi
