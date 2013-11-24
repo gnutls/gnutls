@@ -288,7 +288,7 @@ int gnutls_x509_crl_sign2(gnutls_x509_crl_t crl,
 
 time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt_t cert);
 
-#define GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION (4294197631)
+#define GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION ((time_t)4294197631)
 
 time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt_t cert);
 int gnutls_x509_crt_get_serial(gnutls_x509_crt_t cert,
