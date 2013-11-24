@@ -965,6 +965,8 @@ dist_man_MANS += $(APIMANS)
 
 $(APIMANS): stamp_mans
 
+YEAR=`date +%Y`
+
 compare-makefile:
 	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d`; \
 	MANS=""; \
@@ -983,10 +985,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/gnutls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -997,10 +999,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/compat.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1011,10 +1013,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/dane.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1025,10 +1027,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/x509.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1039,10 +1041,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/ocsp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1053,10 +1055,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/abstract.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1067,10 +1069,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/pkcs12.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1081,10 +1083,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/pkcs11.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1095,10 +1097,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/dtls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1109,10 +1111,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/openpgp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1123,10 +1125,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/crypto.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1137,10 +1139,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/tpm.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1151,10 +1153,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-name "$(PACKAGE_NAME)" \
+			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/xssl.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2013 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
