@@ -884,8 +884,8 @@ gnutls_x509_crt_set_activation_time(gnutls_x509_crt_t cert,
  * @exp_time: The actual time
  *
  * This function will set the time this Certificate will expire.
- * Setting an expiration time of (time_t)-1 will set to the
- * no well-defined expiration date value. 
+ * Setting an expiration time to (time_t)-1 or to %GNUTLS_X509_NO_WELL_DEFINED_EXPIRATION
+ * will set to the no well-defined expiration date value. 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
