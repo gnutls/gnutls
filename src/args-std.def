@@ -10,11 +10,11 @@ no-misuse-usage;
 export          = '#include <gettext.h>';
 
 copyright = {
-    date  = "2000-2012";
-    owner = "Free Software Foundation";
+    date  = "2000-@YEAR@";
+    owner = "Free Software Foundation, and others";
     author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; "
-             "see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
-    eaddr  = "bugs@gnutls.org";
+             "see /usr/share/doc/gnutls/AUTHORS for a complete list.";
+    eaddr  = "@PACKAGE_BUGREPORT@";
     type  = gpl;
 };
 

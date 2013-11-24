@@ -42,6 +42,7 @@ endif
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4 -I src/gl/m4
 
 EXTRA_DIST = cfg.mk maint.mk .clcopying
+YEAR=$(shell date +%Y)
 
 dist-hook: 
 	make -C doc/ compare-makefile
@@ -50,6 +51,8 @@ dist-hook:
 	make ChangeLog
 	cp -f ChangeLog $(distdir)/
 	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
+	sed 's/\@YEAR\@/$(YEAR)/g' -i $(distdir)/src/args-std.def
+	sed 's/\@PACKAGE_BUGREPORT\@/$(PACKAGE_BUGREPORT)/g' -i $(distdir)/src/args-std.def
 	cd $(distdir)/src/ && for i in *.def;do \
 		if test x"$$i" = x"args-std.def";then  continue; fi; \
 		autogen $$i; \
@@ -62,5 +65,4 @@ dist-hook:
 	cd $(distdir)/src/ && for i in *-args.c *-args.h;do \
 		mv $$i $$i.bak; \
 	done
-	sed 's/\@\@VERSION\@\@/$(VERSION)/g' -i $(distdir)/doc/invoke-*.texi
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
