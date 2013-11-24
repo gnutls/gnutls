@@ -764,12 +764,8 @@ void generate_self_signed(common_info_st * cinfo)
 
 	uri = get_crl_dist_point_url();
 	if (uri) {
-		result =
-		    gnutls_x509_crt_set_crl_dist_points(crt,
-							GNUTLS_SAN_URI,
-							uri,
-							0 /* all reasons */
-							);
+		result = gnutls_x509_crt_set_crl_dist_points(crt, GNUTLS_SAN_URI, uri, 0	/* all reasons */
+		    );
 		if (result < 0) {
 			fprintf(stderr, "crl_dist_points: %s",
 				gnutls_strerror(result));
@@ -949,9 +945,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 
 	tim = get_expiration_date();
 
-	result =
-	    gnutls_x509_crt_set_expiration_time(crt,
-						tim);
+	result = gnutls_x509_crt_set_expiration_time(crt, tim);
 	if (result < 0) {
 		fprintf(stderr, "set_expiration: %s",
 			gnutls_strerror(result));
@@ -2219,10 +2213,12 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 /* Will verify a certificate chain. If no CA certificates
  * are provided, then the last certificate in the certificate
  * chain is used as a CA.
+ *
+ * If @system is non-zero then the system's CA will be used.
  */
 static int
 _verify_x509_mem(const void *cert, int cert_size, const void *ca,
-		 int ca_size)
+		 int ca_size, unsigned system)
 {
 	int ret;
 	gnutls_datum_t tmp;
@@ -2240,73 +2236,104 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 		exit(1);
 	}
 
-	if (ca == NULL) {
-		tmp.data = (void *) cert;
-		tmp.size = cert_size;
-	} else {
-		tmp.data = (void *) ca;
-		tmp.size = ca_size;
-
-		/* Load CAs */
-		ret =
-		    gnutls_x509_crt_list_import2(&x509_ca_list, &x509_ncas,
-						 &tmp, GNUTLS_X509_FMT_PEM,
-						 0);
-		if (ret < 0 || x509_ncas < 1) {
-			fprintf(stderr, "error parsing CAs: %s",
+	if (system != 0) {
+		ret = gnutls_x509_trust_list_add_system_trust(list, 0, 0);
+		if (ret < 0) {
+			fprintf(stderr, "Error loading system trust: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
-	}
 
-	ret =
-	    gnutls_x509_crl_list_import2(&x509_crl_list, &x509_ncrls, &tmp,
-					 GNUTLS_X509_FMT_PEM, 0);
-	if (ret < 0) {
-		x509_crl_list = NULL;
-		x509_ncrls = 0;
-	}
+		x509_ncas = ret;
 
-	tmp.data = (void *) cert;
-	tmp.size = cert_size;
+		tmp.data = (void *) cert;
+		tmp.size = cert_size;
 
-	/* ignore errors. CRLs might not be given */
-	ret =
-	    gnutls_x509_crt_list_import2(&x509_cert_list, &x509_ncerts,
-					 &tmp, GNUTLS_X509_FMT_PEM, 0);
-	if (ret < 0 || x509_ncerts < 1) {
-		fprintf(stderr, "error parsing CRTs: %s",
-			gnutls_strerror(ret));
-		exit(1);
-	}
+		/* ignore errors. CRLs might not be given */
+		ret =
+		    gnutls_x509_crt_list_import2(&x509_cert_list,
+						 &x509_ncerts, &tmp,
+						 GNUTLS_X509_FMT_PEM, 0);
+		if (ret < 0 || x509_ncerts < 1) {
+			fprintf(stderr, "error parsing CRTs: %s",
+				gnutls_strerror(ret));
+			exit(1);
+		}
 
-	if (ca == NULL) {
-		x509_ca_list = &x509_cert_list[x509_ncerts - 1];
-		x509_ncas = 1;
+	} else {
+		if (ca == NULL) {
+			tmp.data = (void *) cert;
+			tmp.size = cert_size;
+		} else {
+			tmp.data = (void *) ca;
+			tmp.size = ca_size;
+
+			/* Load CAs */
+			ret =
+			    gnutls_x509_crt_list_import2(&x509_ca_list,
+							 &x509_ncas, &tmp,
+							 GNUTLS_X509_FMT_PEM,
+							 0);
+			if (ret < 0 || x509_ncas < 1) {
+				fprintf(stderr, "error parsing CAs: %s",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
+		ret =
+		    gnutls_x509_crl_list_import2(&x509_crl_list,
+						 &x509_ncrls, &tmp,
+						 GNUTLS_X509_FMT_PEM, 0);
+		if (ret < 0) {
+			x509_crl_list = NULL;
+			x509_ncrls = 0;
+		}
+
+
+		tmp.data = (void *) cert;
+		tmp.size = cert_size;
+
+		/* ignore errors. CRLs might not be given */
+		ret =
+		    gnutls_x509_crt_list_import2(&x509_cert_list,
+						 &x509_ncerts, &tmp,
+						 GNUTLS_X509_FMT_PEM, 0);
+		if (ret < 0 || x509_ncerts < 1) {
+			fprintf(stderr, "error parsing CRTs: %s",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (ca == NULL) {
+			x509_ca_list = &x509_cert_list[x509_ncerts - 1];
+			x509_ncas = 1;
+		}
+
+		ret =
+		    gnutls_x509_trust_list_add_cas(list, x509_ca_list,
+						   x509_ncas, 0);
+		if (ret < 0) {
+			fprintf(stderr, "gnutls_x509_trust_add_cas: %s",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		ret =
+		    gnutls_x509_trust_list_add_crls(list, x509_crl_list,
+						    x509_ncrls, 0, 0);
+		if (ret < 0) {
+			fprintf(stderr, "gnutls_x509_trust_add_crls: %s",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		gnutls_free(x509_crl_list);
 	}
 
 	fprintf(stdout, "Loaded %d certificates, %d CAs and %d CRLs\n\n",
 		x509_ncerts, x509_ncas, x509_ncrls);
 
-	ret =
-	    gnutls_x509_trust_list_add_cas(list, x509_ca_list, x509_ncas,
-					   0);
-	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_trust_add_cas: %s",
-			gnutls_strerror(ret));
-		exit(1);
-	}
-
-	ret =
-	    gnutls_x509_trust_list_add_crls(list, x509_crl_list,
-					    x509_ncrls, 0, 0);
-	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_trust_add_crls: %s",
-			gnutls_strerror(ret));
-		exit(1);
-	}
-
-	gnutls_free(x509_crl_list);
 
 	ret =
 	    gnutls_x509_trust_list_verify_crt(list, x509_cert_list,
@@ -2373,21 +2400,16 @@ static void verify_chain(void)
 
 	buf[size] = 0;
 
-	_verify_x509_mem(buf, size, NULL, 0);
+	_verify_x509_mem(buf, size, NULL, 0, 0);
 
 }
 
 static void verify_certificate(common_info_st * cinfo)
 {
 	char *cert;
-	char *cas;
-	size_t cert_size, ca_size;
-	FILE *ca_file = fopen(cinfo->ca, "r");
-
-	if (ca_file == NULL) {
-		fprintf(stderr, "opening CA file");
-		exit(1);
-	}
+	char *cas = NULL;
+	size_t cert_size, ca_size = 0;
+	FILE *ca_file;
 
 	cert = (void *) fread_file(infile, &cert_size);
 	if (cert == NULL) {
@@ -2395,18 +2417,27 @@ static void verify_certificate(common_info_st * cinfo)
 		exit(1);
 	}
 
-	cert[cert_size] = 0;
+	if (cinfo->ca != NULL) {
+		ca_file = fopen(cinfo->ca, "r");
+		if (ca_file == NULL) {
+			fprintf(stderr, "Could not open %s\n", cinfo->ca);
+			exit(1);
+		}
 
-	cas = (void *) fread_file(ca_file, &ca_size);
-	if (cas == NULL) {
-		fprintf(stderr, "reading CA list");
-		exit(1);
+		cert[cert_size] = 0;
+
+		cas = (void *) fread_file(ca_file, &ca_size);
+		if (cas == NULL) {
+			fprintf(stderr, "reading CA list");
+			exit(1);
+		}
+
+		cas[ca_size] = 0;
+		fclose(ca_file);
 	}
 
-	cas[ca_size] = 0;
-	fclose(ca_file);
-
-	_verify_x509_mem(cert, cert_size, cas, ca_size);
+	_verify_x509_mem(cert, cert_size, cas, ca_size,
+			 (cinfo->ca != NULL) ? 0 : 1);
 
 
 }

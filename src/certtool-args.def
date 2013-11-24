@@ -71,8 +71,8 @@ flag = {
 flag = {
     name      = verify;
     descrip   = "Verify a PEM encoded certificate chain using a trusted list";
-    doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
-    flags-must = load-ca-certificate;
+    doc = "The trusted certificate list can be loaded with --load-ca-certificate. If no
+certificate list is provided, then the system's certificate list is used.";
 };
 
 flag = {
