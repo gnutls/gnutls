@@ -122,6 +122,13 @@ AM_CONDITIONAL(ASM_X86, test x"$hw_accel" = x"x86" || test x"$hw_accel" = x"x86-
 AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
+AC_ARG_ENABLE(non-suiteb-curves,
+  AS_HELP_STRING([--disable-non-suiteb-curves], [disable curves not in SuiteB]),
+    enable_non_suiteb=$enableval, enable_non_suiteb=yes)
+if [ test "$enable_non_suiteb" = "yes" ];then
+  AC_DEFINE([ENABLE_NON_SUITEB_CURVES], 1, [Enable all curves])
+fi
+
 dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
@@ -732,6 +739,7 @@ if features are disabled)
   Heartbeat support:    $ac_enable_heartbeat
   RSA-EXPORT compat:    $ac_enable_rsa_export
   Unicode support:      $ac_have_unicode
+  Non-SuiteB curves:    $enable_non_suiteb
 ])
 
 AC_MSG_NOTICE([Optional applications:
