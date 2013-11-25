@@ -153,6 +153,13 @@ if [ test "$enable_fips" = "yes" ];then
   fi
 fi
 
+AC_ARG_ENABLE(non-suiteb-curves,
+  AS_HELP_STRING([--disable-non-suiteb-curves], [disable curves not in SuiteB]),
+    enable_non_suiteb=$enableval, enable_non_suiteb=yes)
+if [ test "$enable_non_suiteb" = "yes" ];then
+  AC_DEFINE([ENABLE_NON_SUITEB_CURVES], 1, [Enable all curves])
+fi
+
 AM_CONDITIONAL(ENABLE_SELF_CHECKS, test "$enable_self_checks" = "yes")
 if [ test "$enable_self_checks" = "yes" ];then
    AC_DEFINE([ENABLE_SELF_CHECKS], 1, [Self checks are included in the library])
@@ -757,6 +764,7 @@ if features are disabled)
   RSA-EXPORT compat:    $ac_enable_rsa_export
   Unicode support:      $ac_have_unicode
   Self checks:          $enable_self_checks
+  Non-SuiteB curves:    $enable_non_suiteb
   FIPS140 mode:         $enable_fips
 ])
 

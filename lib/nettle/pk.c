@@ -653,10 +653,12 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 static inline const struct ecc_curve *get_supported_curve(int curve)
 {
 	switch (curve) {
+#ifdef ENABLE_NON_SUITEB_CURVES
 	case GNUTLS_ECC_CURVE_SECP192R1:
 		return &nettle_secp_192r1;
 	case GNUTLS_ECC_CURVE_SECP224R1:
 		return &nettle_secp_224r1;
+#endif
 	case GNUTLS_ECC_CURVE_SECP256R1:
 		return &nettle_secp_256r1;
 	case GNUTLS_ECC_CURVE_SECP384R1:
