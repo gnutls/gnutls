@@ -696,3 +696,4 @@ doc/invoke-srptool.texi
 doc/invoke-tpmtool.texi
 doc/parse-datetime.texi
 tests/fips-test
+tests/global-init
