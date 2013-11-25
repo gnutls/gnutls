@@ -465,7 +465,7 @@ gnutls_hash_init(gnutls_hash_hd_t * dig,
 	/* MD5 is only allowed internally for TLS */
 	if (_gnutls_get_fips_state() != FIPS_STATE_SELFTEST && 
 		_gnutls_get_fips_state() != FIPS_STATE_ZOMBIE) {
-		if (algorithm == GNUTLS_MAC_MD5)
+		if (algorithm == GNUTLS_DIG_MD5)
 			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
 	}
 #endif
