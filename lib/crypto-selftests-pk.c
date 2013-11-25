@@ -213,6 +213,7 @@ static const char ecdsa_secp256r1_privkey[] =
 static const char ecdsa_secp256r1_sig[] =
     "\x30\x45\x02\x21\x00\x9b\x8f\x60\xed\x9e\x40\x8d\x74\x82\x73\xab\x20\x1a\x69\xfc\xf9\xee\x3c\x41\x80\xc0\x39\xdd\x21\x1a\x64\xfd\xbf\x7e\xaa\x43\x70\x02\x20\x44\x28\x05\xdd\x30\x47\x58\x96\x18\x39\x94\x18\xba\xe7\x7a\xf6\x1e\x2d\xba\xb1\xe0\x7d\x73\x9e\x2f\x58\xee\x0c\x2a\x89\xe8\x35";
 
+#ifdef ENABLE_NON_SUITEB_CURVES
 /* sha256 */
 static const char ecdsa_secp192r1_privkey[] =
     "-----BEGIN EC PRIVATE KEY-----"
@@ -231,6 +232,7 @@ static const char ecdsa_secp224r1_privkey[] =
 
 static const char ecdsa_secp224r1_sig[] =
     "\x30\x3d\x02\x1c\x76\x03\x8d\x74\xf4\xd3\x09\x2a\xb5\xdf\x6b\x5b\xf4\x4b\x86\xb8\x62\x81\x5d\x7b\x7a\xbb\x37\xfc\xf1\x46\x1c\x2b\x02\x1d\x00\xa0\x98\x5d\x80\x43\x89\xe5\xee\x1a\xec\x46\x08\x04\x55\xbc\x50\xfa\x2a\xd5\xa6\x18\x92\x19\xdb\x68\xa0\x2a\xda";
+#endif
 
 static const char ecdsa_secp384r1_privkey[] =
     "-----BEGIN EC PRIVATE KEY-----"
@@ -443,6 +445,7 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 			      dsa_privkey, dsa_sig);
 		PK_TEST(GNUTLS_PK_DSA, test_sig, 1024, GNUTLS_DIG_SHA1);
 	case GNUTLS_PK_EC:	/* Testing ECDSA */
+#ifdef ENABLE_NON_SUITEB_CURVES
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
 			      GNUTLS_CURVE_TO_BITS
 			      (GNUTLS_ECC_CURVE_SECP192R1),
@@ -460,7 +463,7 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 		PK_TEST(GNUTLS_PK_EC, test_sig,
 			GNUTLS_CURVE_TO_BITS(GNUTLS_ECC_CURVE_SECP224R1),
 			GNUTLS_DIG_SHA256);
-
+#endif
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
 			      GNUTLS_CURVE_TO_BITS
 			      (GNUTLS_ECC_CURVE_SECP256R1),

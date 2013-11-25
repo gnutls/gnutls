@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(_WIN32)
+#if defined(_WIN32) || !defined(ENABLE_NON_SUITEB_CURVES)
 
 int main()
 {
@@ -70,7 +70,7 @@ static time_t mytime(time_t * t)
 
 static void server_log_func(int level, const char *str)
 {
-//  fprintf (stderr, "server|<%d>| %s", level, str);
+  fprintf (stderr, "server|<%d>| %s", level, str);
 }
 
 static void client_log_func(int level, const char *str)
@@ -257,13 +257,12 @@ static void server(int fd, unsigned vmethod)
 	gnutls_cinput_st aux[6];
 	unsigned aux_size = 0;
 
-	global_init();
-
 	if (debug) {
-		gnutls_global_set_log_function(client_log_func);
+		gnutls_global_set_log_function(server_log_func);
 		gnutls_global_set_log_level(7);
 	}
 
+	global_init();
 
 	aux[aux_size].type = GNUTLS_CINPUT_TYPE_MEM;
 	aux[aux_size].contents = GNUTLS_CINPUT_KEYPAIR;
