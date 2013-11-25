@@ -1024,11 +1024,10 @@ _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
-	pkey->key = _gnutls_privkey_decode_ecc_key(&tmp, pkey);
+	ret = _gnutls_privkey_decode_ecc_key(&pkey->key, &tmp, pkey);
 	_gnutls_free_key_datum(&tmp);
 
-	if (pkey->key == NULL) {
-		ret = GNUTLS_E_PARSING_ERROR;
+	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
