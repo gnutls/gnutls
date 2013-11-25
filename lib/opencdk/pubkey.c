@@ -73,7 +73,6 @@ cdk_pk_verify(cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
 	gnutls_datum_t s_sig = { NULL, 0 }, di = {
 	NULL, 0};
 	byte *encmd = NULL;
-	size_t enclen;
 	cdk_error_t rc;
 	int ret, algo;
 	unsigned int i;
