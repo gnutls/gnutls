@@ -243,8 +243,6 @@ static void _rngfips_refresh(void *_ctx)
 	return;
 }
 
-
-
 static int selftest_kat(void)
 {
 	int ret;
