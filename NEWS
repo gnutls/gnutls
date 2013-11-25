@@ -5,6 +5,27 @@ See the end for copying conditions.
 
 * Version 3.3.0 (unreleased)
 
+** libgnutls: gnutls_global_init2() was added to allow splitting
+initialization to a minimal part (which can be part of a library
+constructor) and the rest, which includes things that cannot be
+in a constructor such as the PKCS #11 initialization.
+
+** libgnutls: Added --enable-fips140-mode configuration option. That
+option enables:
+ o FIPS-186-4 compliant DSA and DH key generation (using provable primes)
+ o The FIPS-140-2 compliant DRBG-AES deterministic random generator.
+ o Self-tests on initialization on ciphers/MACs, public key algorithms and
+   random generator.
+ o Initialization on library load (when GnuTLS is a shared library)
+ o MD5 is included (for TLS purposed but cannot be used by the high level
+   hashing functions)
+ o All ciphers except AES are disabled.
+ o All MACs except SHA are disabled (i.e., HMAC-MD5).
+ o All keys (temporal and long term) are zeroized after use.
+ o Security levels are adjusted to the FIPS140-2 recommendations (rather
+   than ECRYPT).
+ o The ECC curves are restricted to SuiteB curves.
+
 ** libgnutls: Depend on p11-kit 0.19.1 or later.
 
 ** API and ABI modifications:
