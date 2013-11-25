@@ -404,6 +404,8 @@ static const gnutls_error_entry error_algorithms[] = {
 		    GNUTLS_E_LIB_IN_ERROR_STATE, 1),
 	ERROR_ENTRY(N_("Error in sockets initialization."),
 		    GNUTLS_E_SOCKETS_INIT_ERROR, 1),
+	ERROR_ENTRY(N_("Error in public key generation."),
+		    GNUTLS_E_PK_GENERATION_ERROR, 1),
 	{NULL, NULL, 0, 0}
 };
 

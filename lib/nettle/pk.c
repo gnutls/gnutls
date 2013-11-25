@@ -38,6 +38,7 @@
 #include <random.h>
 #include <gnutls_pk.h>
 #include <nettle/dsa.h>
+#include <dsa-fips.h>
 #include <nettle/rsa.h>
 #include <gnutls/crypto.h>
 #include <nettle/bignum.h>
@@ -693,9 +694,12 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 		{
 			struct dsa_public_key pub;
 			struct dsa_private_key priv;
+			struct dss_params_validation_seeds cert;
+			unsigned index;
 
 			dsa_public_key_init(&pub);
 			dsa_private_key_init(&priv);
+			
 
 			/* the best would be to use _gnutls_pk_bits_to_subgroup_bits()
 			 * but we do NIST DSA here */
@@ -704,15 +708,43 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 			else
 				q_bits = 256;
 
+#ifdef ENABLE_FIPS140
+			if (algo==GNUTLS_PK_DSA)
+				index = 1;
+			else
+				index = 2;
+
 			ret =
-			    dsa_generate_keypair(&pub, &priv, NULL,
-						 rnd_func, NULL, NULL,
+			    dsa_generate_dss_keypair(&pub, &priv, &cert,
+			    			 index,
+						 NULL, rnd_func, 
+						 NULL, NULL,
 						 level, q_bits);
 			if (ret != 1) {
 				gnutls_assert();
-				ret = GNUTLS_E_INTERNAL_ERROR;
+				ret = GNUTLS_E_PK_GENERATION_ERROR;
 				goto dsa_fail;
 			}
+			
+			/* verify the generated parameters */
+			ret = dsa_validate_dss_keypair(&pub, &cert, index);
+			if (ret != 1) {
+				gnutls_assert();
+				ret = GNUTLS_E_PK_GENERATION_ERROR;
+				goto dsa_fail;
+			}
+#else
+			ret =
+			    dsa_generate_keypair(&pub, &priv,
+						 NULL, rnd_func, 
+						 NULL, NULL,
+						 level, q_bits);
+			if (ret != 1) {
+				gnutls_assert();
+				ret = GNUTLS_E_PK_GENERATION_ERROR;
+				goto dsa_fail;
+			}
+#endif
 
 			params->params_nr = 0;
 			for (i = 0; i < DSA_PRIVATE_PARAMS-2; i++) {

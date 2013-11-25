@@ -2296,6 +2296,7 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk);
 #define GNUTLS_E_SELF_TEST_ERROR -400
 #define GNUTLS_E_NO_SELF_TEST -401
 #define GNUTLS_E_LIB_IN_ERROR_STATE -402
+#define GNUTLS_E_PK_GENERATION_ERROR -403
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
