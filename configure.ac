@@ -268,6 +268,7 @@ if [ test "$enable_fips" = "yes" ];then
     dnl clock_gettime precision is needed on the FIPS140 DRBG.
     if test "$ac_cv_func_clock_gettime" != "yes";then
       AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [clock_gettime (0, 0);])
+      gnutls_needs_librt=yes
     fi
 
     AC_DEFINE([ENABLE_FIPS140], 1, [Enable FIPS140-2 mode])
