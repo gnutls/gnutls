@@ -37,7 +37,6 @@ my $globl = sub {
 				$ret .= ".align	3\n";
 				$ret .= "$name:\n";
 				$ret .= ".quad	.$name,.TOC.\@tocbase,0\n";
-				$ret .= ".size	$name,24\n";
 				$ret .= ".previous\n";
 
 				$name = ".$name";
@@ -62,9 +61,12 @@ my $machine = sub {
     ".machine	$arch";
 };
 my $size = sub {
-    if ($flavour =~ /linux.*32/)
+    if ($flavour =~ /linux/)
     {	shift;
-	".size	" . join(",",@_);
+	my $name = shift; $name =~ s|^[\.\_]||;
+	my $ret  = ".size	$name,.-".($flavour=~/64/?".":"").$name;
+	$ret .= "\n.size	.$name,.-.$name" if ($flavour=~/64/);
+	$ret;
     }
     else
     {	"";	}
@@ -76,6 +78,25 @@ my $asciz = sub {
     {	".byte	" . join(",",unpack("C*",$1),0) . "\n.align	2";	}
     else
     {	"";	}
+};
+my $quad = sub {
+    shift;
+    my @ret;
+    my ($hi,$lo);
+    for (@_) {
+	if (/^0x([0-9a-f]*?)([0-9a-f]{1,8})$/io)
+	{  $hi=$1?"0x$1":"0"; $lo="0x$2";  }
+	elsif (/^([0-9]+)$/o)
+	{  $hi=$1>>32; $lo=$1&0xffffffff;  } # error-prone with 32-bit perl
+	else
+	{  $hi=undef; $lo=$_; }
+
+	if (defined($hi))
+	{  push(@ret,$flavour=~/le$/o?".long\t$lo,$hi":".long\t$hi,$lo");  }
+	else
+	{  push(@ret,".quad	$lo");  }
+    }
+    join("\n",@ret);
 };
 
 ################################################################
