@@ -16,7 +16,9 @@ sub ::generic
     # fix hexadecimal constants
     for (@arg) { s/(?<![\w\$\.])0x([0-9a-f]+)/0$1h/oi; }
 
-    if ($opcode !~ /movq/)
+    if ($opcode =~ /lea/ && @arg[1] =~ s/.*PTR\s+(\(.*\))$/OFFSET $1/)	# no []
+    {	$opcode="mov";	}
+    elsif ($opcode !~ /movq/)
     {	# fix xmm references
 	$arg[0] =~ s/\b[A-Z]+WORD\s+PTR/XMMWORD PTR/i if ($arg[1]=~/\bxmm[0-7]\b/i);
 	$arg[1] =~ s/\b[A-Z]+WORD\s+PTR/XMMWORD PTR/i if ($arg[0]=~/\bxmm[0-7]\b/i);
@@ -36,6 +38,8 @@ sub ::lock	{ &::data_byte(0xf0);	}
 sub get_mem
 { my($size,$addr,$reg1,$reg2,$idx)=@_;
   my($post,$ret);
+
+    if (!defined($idx) && 1*$reg2) { $idx=$reg2; $reg2=$reg1; undef $reg1; }
 
     $ret .= "$size PTR " if ($size ne "");
 
@@ -131,7 +135,7 @@ ___
     if (grep {/\b${nmdecor}OPENSSL_ia32cap_P\b/i} @out)
     {	my $comm=<<___;
 .bss	SEGMENT 'BSS'
-COMM	${nmdecor}OPENSSL_ia32cap_P:QWORD
+COMM	${nmdecor}OPENSSL_ia32cap_P:DWORD:4
 .bss	ENDS
 ___
 	# comment out OPENSSL_ia32cap_P declarations
