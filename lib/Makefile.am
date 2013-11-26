@@ -120,9 +120,13 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	accelerated/libaccelerated.la ext/libgnutls_ext.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	extras/libgnutls_extras.la
-thirdparty_libadd = $(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBRT) \
+thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) \
 	$(LTLIBPTHREAD) $(LTLIBICONV) $(P11_KIT_LIBS) $(LIB_SELECT) $(TSS_LIBS) \
 	$(LTLIBICONV)
+
+if NEEDS_LIBRT
+thirdparty_libadd += $(LTLIBRT)
+endif
 
 if ENABLE_OPENPGP
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la

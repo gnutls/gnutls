@@ -232,6 +232,7 @@ fi
 
 if test "$ac_cv_func_nanosleep" != "yes";then
   AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [nanosleep (0, 0);])
+  gnutls_needs_librt=yes
 fi
 
 ac_have_unicode=no
@@ -551,6 +552,7 @@ LIBGNUTLS_CFLAGS="-I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
 
+AM_CONDITIONAL(NEEDS_LIBRT, test "$gnutls_needs_librt" = "yes")
 
 AC_DEFINE([GNUTLS_COMPAT_H], 1, [Make sure we don't use old features in code.])
 AC_DEFINE([GNUTLS_INTERNAL_BUILD], 1, [We allow temporarily usage of deprecated functions - until they are removed.])
