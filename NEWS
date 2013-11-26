@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 3.2.8 (unreleased)
 
+** libgnutls: Updated code for AES-NI. That prevents an uninitialized
+variable complaint from valgrind.
+
+** libgnutls: It only links to librt if the required functions are
+not present in libc.
+
 ** certtool: The --verify option will use the system CAs if the
 load-ca-certificate option is not provided.
 
