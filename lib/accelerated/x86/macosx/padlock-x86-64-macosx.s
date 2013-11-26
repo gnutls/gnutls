@@ -597,6 +597,468 @@ L$cbc_abort:
 	popq	%rbp
 	.byte	0xf3,0xc3
 
+.globl	_padlock_cfb_encrypt
+
+.p2align	4
+_padlock_cfb_encrypt:
+	pushq	%rbp
+	pushq	%rbx
+
+	xorl	%eax,%eax
+	testq	$15,%rdx
+	jnz	L$cfb_abort
+	testq	$15,%rcx
+	jnz	L$cfb_abort
+	leaq	L$padlock_saved_context(%rip),%rax
+	pushf
+	cld
+	call	_padlock_verify_ctx
+	leaq	16(%rdx),%rdx
+	xorl	%eax,%eax
+	xorl	%ebx,%ebx
+	testl	$32,(%rdx)
+	jnz	L$cfb_aligned
+	testq	$15,%rdi
+	setz	%al
+	testq	$15,%rsi
+	setz	%bl
+	testl	%ebx,%eax
+	jnz	L$cfb_aligned
+	negq	%rax
+	movq	$512,%rbx
+	notq	%rax
+	leaq	(%rsp),%rbp
+	cmpq	%rbx,%rcx
+	cmovcq	%rcx,%rbx
+	andq	%rbx,%rax
+	movq	%rcx,%rbx
+	negq	%rax
+	andq	$512-1,%rbx
+	leaq	(%rax,%rbp,1),%rsp
+	movq	$512,%rax
+	cmovzq	%rax,%rbx
+	jmp	L$cfb_loop
+.p2align	4
+L$cfb_loop:
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
+	movq	%rdi,%r8
+	movq	%rsi,%r9
+	movq	%rcx,%r10
+	movq	%rbx,%rcx
+	movq	%rbx,%r11
+	testq	$15,%rdi
+	cmovnzq	%rsp,%rdi
+	testq	$15,%rsi
+	jz	L$cfb_inp_aligned
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+	movq	%rbx,%rcx
+	movq	%rdi,%rsi
+L$cfb_inp_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,224	
+	movdqa	(%rax),%xmm0
+	movdqa	%xmm0,-16(%rdx)
+	movq	%r8,%rdi
+	movq	%r11,%rbx
+	testq	$15,%rdi
+	jz	L$cfb_out_aligned
+	movq	%rbx,%rcx
+	leaq	(%rsp),%rsi
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+L$cfb_out_aligned:
+	movq	%r9,%rsi
+	movq	%r10,%rcx
+	addq	%rbx,%rdi
+	addq	%rbx,%rsi
+	subq	%rbx,%rcx
+	movq	$512,%rbx
+	jnz	L$cfb_loop
+	cmpq	%rbp,%rsp
+	je	L$cfb_done
+
+	pxor	%xmm0,%xmm0
+	leaq	(%rsp),%rax
+L$cfb_bzero:
+	movaps	%xmm0,(%rax)
+	leaq	16(%rax),%rax
+	cmpq	%rax,%rbp
+	ja	L$cfb_bzero
+
+L$cfb_done:
+	leaq	(%rbp),%rsp
+	jmp	L$cfb_exit
+
+.p2align	4
+L$cfb_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,224	
+	movdqa	(%rax),%xmm0
+	movdqa	%xmm0,-16(%rdx)
+L$cfb_exit:
+	movl	$1,%eax
+	leaq	8(%rsp),%rsp
+L$cfb_abort:
+	popq	%rbx
+	popq	%rbp
+	.byte	0xf3,0xc3
+
+.globl	_padlock_ofb_encrypt
+
+.p2align	4
+_padlock_ofb_encrypt:
+	pushq	%rbp
+	pushq	%rbx
+
+	xorl	%eax,%eax
+	testq	$15,%rdx
+	jnz	L$ofb_abort
+	testq	$15,%rcx
+	jnz	L$ofb_abort
+	leaq	L$padlock_saved_context(%rip),%rax
+	pushf
+	cld
+	call	_padlock_verify_ctx
+	leaq	16(%rdx),%rdx
+	xorl	%eax,%eax
+	xorl	%ebx,%ebx
+	testl	$32,(%rdx)
+	jnz	L$ofb_aligned
+	testq	$15,%rdi
+	setz	%al
+	testq	$15,%rsi
+	setz	%bl
+	testl	%ebx,%eax
+	jnz	L$ofb_aligned
+	negq	%rax
+	movq	$512,%rbx
+	notq	%rax
+	leaq	(%rsp),%rbp
+	cmpq	%rbx,%rcx
+	cmovcq	%rcx,%rbx
+	andq	%rbx,%rax
+	movq	%rcx,%rbx
+	negq	%rax
+	andq	$512-1,%rbx
+	leaq	(%rax,%rbp,1),%rsp
+	movq	$512,%rax
+	cmovzq	%rax,%rbx
+	jmp	L$ofb_loop
+.p2align	4
+L$ofb_loop:
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
+	movq	%rdi,%r8
+	movq	%rsi,%r9
+	movq	%rcx,%r10
+	movq	%rbx,%rcx
+	movq	%rbx,%r11
+	testq	$15,%rdi
+	cmovnzq	%rsp,%rdi
+	testq	$15,%rsi
+	jz	L$ofb_inp_aligned
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+	movq	%rbx,%rcx
+	movq	%rdi,%rsi
+L$ofb_inp_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,232	
+	movdqa	(%rax),%xmm0
+	movdqa	%xmm0,-16(%rdx)
+	movq	%r8,%rdi
+	movq	%r11,%rbx
+	testq	$15,%rdi
+	jz	L$ofb_out_aligned
+	movq	%rbx,%rcx
+	leaq	(%rsp),%rsi
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+L$ofb_out_aligned:
+	movq	%r9,%rsi
+	movq	%r10,%rcx
+	addq	%rbx,%rdi
+	addq	%rbx,%rsi
+	subq	%rbx,%rcx
+	movq	$512,%rbx
+	jnz	L$ofb_loop
+	cmpq	%rbp,%rsp
+	je	L$ofb_done
+
+	pxor	%xmm0,%xmm0
+	leaq	(%rsp),%rax
+L$ofb_bzero:
+	movaps	%xmm0,(%rax)
+	leaq	16(%rax),%rax
+	cmpq	%rax,%rbp
+	ja	L$ofb_bzero
+
+L$ofb_done:
+	leaq	(%rbp),%rsp
+	jmp	L$ofb_exit
+
+.p2align	4
+L$ofb_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,232	
+	movdqa	(%rax),%xmm0
+	movdqa	%xmm0,-16(%rdx)
+L$ofb_exit:
+	movl	$1,%eax
+	leaq	8(%rsp),%rsp
+L$ofb_abort:
+	popq	%rbx
+	popq	%rbp
+	.byte	0xf3,0xc3
+
+.globl	_padlock_ctr32_encrypt
+
+.p2align	4
+_padlock_ctr32_encrypt:
+	pushq	%rbp
+	pushq	%rbx
+
+	xorl	%eax,%eax
+	testq	$15,%rdx
+	jnz	L$ctr32_abort
+	testq	$15,%rcx
+	jnz	L$ctr32_abort
+	leaq	L$padlock_saved_context(%rip),%rax
+	pushf
+	cld
+	call	_padlock_verify_ctx
+	leaq	16(%rdx),%rdx
+	xorl	%eax,%eax
+	xorl	%ebx,%ebx
+	testl	$32,(%rdx)
+	jnz	L$ctr32_aligned
+	testq	$15,%rdi
+	setz	%al
+	testq	$15,%rsi
+	setz	%bl
+	testl	%ebx,%eax
+	jnz	L$ctr32_aligned
+	negq	%rax
+	movq	$512,%rbx
+	notq	%rax
+	leaq	(%rsp),%rbp
+	cmpq	%rbx,%rcx
+	cmovcq	%rcx,%rbx
+	andq	%rbx,%rax
+	movq	%rcx,%rbx
+	negq	%rax
+	andq	$512-1,%rbx
+	leaq	(%rax,%rbp,1),%rsp
+	movq	$512,%rax
+	cmovzq	%rax,%rbx
+L$ctr32_reenter:
+	movl	-4(%rdx),%eax
+	bswapl	%eax
+	negl	%eax
+	andl	$31,%eax
+	movq	$512,%rbx
+	shll	$4,%eax
+	cmovzq	%rbx,%rax
+	cmpq	%rax,%rcx
+	cmovaq	%rax,%rbx
+	cmovbeq	%rcx,%rbx
+	cmpq	%rbx,%rcx
+	ja	L$ctr32_loop
+	movq	%rsi,%rax
+	cmpq	%rsp,%rbp
+	cmoveq	%rdi,%rax
+	addq	%rcx,%rax
+	negq	%rax
+	andq	$4095,%rax
+	cmpq	$32,%rax
+	movq	$-32,%rax
+	cmovaeq	%rbx,%rax
+	andq	%rax,%rbx
+	jz	L$ctr32_unaligned_tail
+	jmp	L$ctr32_loop
+.p2align	4
+L$ctr32_loop:
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
+	movq	%rdi,%r8
+	movq	%rsi,%r9
+	movq	%rcx,%r10
+	movq	%rbx,%rcx
+	movq	%rbx,%r11
+	testq	$15,%rdi
+	cmovnzq	%rsp,%rdi
+	testq	$15,%rsi
+	jz	L$ctr32_inp_aligned
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+	movq	%rbx,%rcx
+	movq	%rdi,%rsi
+L$ctr32_inp_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,216	
+	movl	-4(%rdx),%eax
+	testl	$4294901760,%eax
+	jnz	L$ctr32_no_carry
+	bswapl	%eax
+	addl	$65536,%eax
+	bswapl	%eax
+	movl	%eax,-4(%rdx)
+L$ctr32_no_carry:
+	movq	%r8,%rdi
+	movq	%r11,%rbx
+	testq	$15,%rdi
+	jz	L$ctr32_out_aligned
+	movq	%rbx,%rcx
+	leaq	(%rsp),%rsi
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+L$ctr32_out_aligned:
+	movq	%r9,%rsi
+	movq	%r10,%rcx
+	addq	%rbx,%rdi
+	addq	%rbx,%rsi
+	subq	%rbx,%rcx
+	movq	$512,%rbx
+	jz	L$ctr32_break
+	cmpq	%rbx,%rcx
+	jae	L$ctr32_loop
+	movq	%rcx,%rbx
+	movq	%rsi,%rax
+	cmpq	%rsp,%rbp
+	cmoveq	%rdi,%rax
+	addq	%rcx,%rax
+	negq	%rax
+	andq	$4095,%rax
+	cmpq	$32,%rax
+	movq	$-32,%rax
+	cmovaeq	%rbx,%rax
+	andq	%rax,%rbx
+	jnz	L$ctr32_loop
+L$ctr32_unaligned_tail:
+	xorl	%eax,%eax
+	cmpq	%rsp,%rbp
+	cmoveq	%rcx,%rax
+	movq	%rdi,%r8
+	movq	%rcx,%rbx
+	subq	%rax,%rsp
+	shrq	$3,%rcx
+	leaq	(%rsp),%rdi
+.byte	0xf3,0x48,0xa5		
+	movq	%rsp,%rsi
+	movq	%r8,%rdi
+	movq	%rbx,%rcx
+	jmp	L$ctr32_loop
+.p2align	4
+L$ctr32_break:
+	cmpq	%rbp,%rsp
+	je	L$ctr32_done
+
+	pxor	%xmm0,%xmm0
+	leaq	(%rsp),%rax
+L$ctr32_bzero:
+	movaps	%xmm0,(%rax)
+	leaq	16(%rax),%rax
+	cmpq	%rax,%rbp
+	ja	L$ctr32_bzero
+
+L$ctr32_done:
+	leaq	(%rbp),%rsp
+	jmp	L$ctr32_exit
+
+.p2align	4
+L$ctr32_aligned:
+	movl	-4(%rdx),%eax
+	bswapl	%eax
+	negl	%eax
+	andl	$65535,%eax
+	movq	$1048576,%rbx
+	shll	$4,%eax
+	cmovzq	%rbx,%rax
+	cmpq	%rax,%rcx
+	cmovaq	%rax,%rbx
+	cmovbeq	%rcx,%rbx
+	jbe	L$ctr32_aligned_skip
+
+L$ctr32_aligned_loop:
+	movq	%rcx,%r10
+	movq	%rbx,%rcx
+	movq	%rbx,%r11
+
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,216	
+
+	movl	-4(%rdx),%eax
+	bswapl	%eax
+	addl	$65536,%eax
+	bswapl	%eax
+	movl	%eax,-4(%rdx)
+
+	movq	%r10,%rcx
+	subq	%r11,%rcx
+	movq	$1048576,%rbx
+	jz	L$ctr32_exit
+	cmpq	%rbx,%rcx
+	jae	L$ctr32_aligned_loop
+
+L$ctr32_aligned_skip:
+	leaq	(%rsi,%rcx,1),%rbp
+	negq	%rbp
+	andq	$4095,%rbp
+	xorl	%eax,%eax
+	cmpq	$32,%rbp
+	movq	$32-1,%rbp
+	cmovaeq	%rax,%rbp
+	andq	%rcx,%rbp
+	subq	%rbp,%rcx
+	jz	L$ctr32_aligned_tail
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,216	
+	testq	%rbp,%rbp
+	jz	L$ctr32_exit
+
+L$ctr32_aligned_tail:
+	movq	%rdi,%r8
+	movq	%rbp,%rbx
+	movq	%rbp,%rcx
+	leaq	(%rsp),%rbp
+	subq	%rcx,%rsp
+	shrq	$3,%rcx
+	leaq	(%rsp),%rdi
+.byte	0xf3,0x48,0xa5		
+	leaq	(%r8),%rdi
+	leaq	(%rsp),%rsi
+	movq	%rbx,%rcx
+	jmp	L$ctr32_loop
+L$ctr32_exit:
+	movl	$1,%eax
+	leaq	8(%rsp),%rsp
+L$ctr32_abort:
+	popq	%rbx
+	popq	%rbp
+	.byte	0xf3,0xc3
+
 .byte	86,73,65,32,80,97,100,108,111,99,107,32,120,56,54,95,54,52,32,109,111,100,117,108,101,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .p2align	4
 .data	
