@@ -686,6 +686,501 @@ padlock_cbc_encrypt:
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
 .LSEH_end_padlock_cbc_encrypt:
+.globl	padlock_cfb_encrypt
+.def	padlock_cfb_encrypt;	.scl 2;	.type 32;	.endef
+.p2align	4
+padlock_cfb_encrypt:
+	movq	%rdi,8(%rsp)
+	movq	%rsi,16(%rsp)
+	movq	%rsp,%rax
+.LSEH_begin_padlock_cfb_encrypt:
+	movq	%rcx,%rdi
+	movq	%rdx,%rsi
+	movq	%r8,%rdx
+	movq	%r9,%rcx
+
+	pushq	%rbp
+	pushq	%rbx
+
+	xorl	%eax,%eax
+	testq	$15,%rdx
+	jnz	.Lcfb_abort
+	testq	$15,%rcx
+	jnz	.Lcfb_abort
+	leaq	.Lpadlock_saved_context(%rip),%rax
+	pushf
+	cld
+	call	_padlock_verify_ctx
+	leaq	16(%rdx),%rdx
+	xorl	%eax,%eax
+	xorl	%ebx,%ebx
+	testl	$32,(%rdx)
+	jnz	.Lcfb_aligned
+	testq	$15,%rdi
+	setz	%al
+	testq	$15,%rsi
+	setz	%bl
+	testl	%ebx,%eax
+	jnz	.Lcfb_aligned
+	negq	%rax
+	movq	$512,%rbx
+	notq	%rax
+	leaq	(%rsp),%rbp
+	cmpq	%rbx,%rcx
+	cmovcq	%rcx,%rbx
+	andq	%rbx,%rax
+	movq	%rcx,%rbx
+	negq	%rax
+	andq	$512-1,%rbx
+	leaq	(%rax,%rbp,1),%rsp
+	movq	$512,%rax
+	cmovzq	%rax,%rbx
+	jmp	.Lcfb_loop
+.p2align	4
+.Lcfb_loop:
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
+	movq	%rdi,%r8
+	movq	%rsi,%r9
+	movq	%rcx,%r10
+	movq	%rbx,%rcx
+	movq	%rbx,%r11
+	testq	$15,%rdi
+	cmovnzq	%rsp,%rdi
+	testq	$15,%rsi
+	jz	.Lcfb_inp_aligned
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+	movq	%rbx,%rcx
+	movq	%rdi,%rsi
+.Lcfb_inp_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,224	
+	movdqa	(%rax),%xmm0
+	movdqa	%xmm0,-16(%rdx)
+	movq	%r8,%rdi
+	movq	%r11,%rbx
+	testq	$15,%rdi
+	jz	.Lcfb_out_aligned
+	movq	%rbx,%rcx
+	leaq	(%rsp),%rsi
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+.Lcfb_out_aligned:
+	movq	%r9,%rsi
+	movq	%r10,%rcx
+	addq	%rbx,%rdi
+	addq	%rbx,%rsi
+	subq	%rbx,%rcx
+	movq	$512,%rbx
+	jnz	.Lcfb_loop
+	cmpq	%rbp,%rsp
+	je	.Lcfb_done
+
+	pxor	%xmm0,%xmm0
+	leaq	(%rsp),%rax
+.Lcfb_bzero:
+	movaps	%xmm0,(%rax)
+	leaq	16(%rax),%rax
+	cmpq	%rax,%rbp
+	ja	.Lcfb_bzero
+
+.Lcfb_done:
+	leaq	(%rbp),%rsp
+	jmp	.Lcfb_exit
+
+.p2align	4
+.Lcfb_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,224	
+	movdqa	(%rax),%xmm0
+	movdqa	%xmm0,-16(%rdx)
+.Lcfb_exit:
+	movl	$1,%eax
+	leaq	8(%rsp),%rsp
+.Lcfb_abort:
+	popq	%rbx
+	popq	%rbp
+	movq	8(%rsp),%rdi
+	movq	16(%rsp),%rsi
+	.byte	0xf3,0xc3
+.LSEH_end_padlock_cfb_encrypt:
+.globl	padlock_ofb_encrypt
+.def	padlock_ofb_encrypt;	.scl 2;	.type 32;	.endef
+.p2align	4
+padlock_ofb_encrypt:
+	movq	%rdi,8(%rsp)
+	movq	%rsi,16(%rsp)
+	movq	%rsp,%rax
+.LSEH_begin_padlock_ofb_encrypt:
+	movq	%rcx,%rdi
+	movq	%rdx,%rsi
+	movq	%r8,%rdx
+	movq	%r9,%rcx
+
+	pushq	%rbp
+	pushq	%rbx
+
+	xorl	%eax,%eax
+	testq	$15,%rdx
+	jnz	.Lofb_abort
+	testq	$15,%rcx
+	jnz	.Lofb_abort
+	leaq	.Lpadlock_saved_context(%rip),%rax
+	pushf
+	cld
+	call	_padlock_verify_ctx
+	leaq	16(%rdx),%rdx
+	xorl	%eax,%eax
+	xorl	%ebx,%ebx
+	testl	$32,(%rdx)
+	jnz	.Lofb_aligned
+	testq	$15,%rdi
+	setz	%al
+	testq	$15,%rsi
+	setz	%bl
+	testl	%ebx,%eax
+	jnz	.Lofb_aligned
+	negq	%rax
+	movq	$512,%rbx
+	notq	%rax
+	leaq	(%rsp),%rbp
+	cmpq	%rbx,%rcx
+	cmovcq	%rcx,%rbx
+	andq	%rbx,%rax
+	movq	%rcx,%rbx
+	negq	%rax
+	andq	$512-1,%rbx
+	leaq	(%rax,%rbp,1),%rsp
+	movq	$512,%rax
+	cmovzq	%rax,%rbx
+	jmp	.Lofb_loop
+.p2align	4
+.Lofb_loop:
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
+	movq	%rdi,%r8
+	movq	%rsi,%r9
+	movq	%rcx,%r10
+	movq	%rbx,%rcx
+	movq	%rbx,%r11
+	testq	$15,%rdi
+	cmovnzq	%rsp,%rdi
+	testq	$15,%rsi
+	jz	.Lofb_inp_aligned
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+	movq	%rbx,%rcx
+	movq	%rdi,%rsi
+.Lofb_inp_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,232	
+	movdqa	(%rax),%xmm0
+	movdqa	%xmm0,-16(%rdx)
+	movq	%r8,%rdi
+	movq	%r11,%rbx
+	testq	$15,%rdi
+	jz	.Lofb_out_aligned
+	movq	%rbx,%rcx
+	leaq	(%rsp),%rsi
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+.Lofb_out_aligned:
+	movq	%r9,%rsi
+	movq	%r10,%rcx
+	addq	%rbx,%rdi
+	addq	%rbx,%rsi
+	subq	%rbx,%rcx
+	movq	$512,%rbx
+	jnz	.Lofb_loop
+	cmpq	%rbp,%rsp
+	je	.Lofb_done
+
+	pxor	%xmm0,%xmm0
+	leaq	(%rsp),%rax
+.Lofb_bzero:
+	movaps	%xmm0,(%rax)
+	leaq	16(%rax),%rax
+	cmpq	%rax,%rbp
+	ja	.Lofb_bzero
+
+.Lofb_done:
+	leaq	(%rbp),%rsp
+	jmp	.Lofb_exit
+
+.p2align	4
+.Lofb_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,232	
+	movdqa	(%rax),%xmm0
+	movdqa	%xmm0,-16(%rdx)
+.Lofb_exit:
+	movl	$1,%eax
+	leaq	8(%rsp),%rsp
+.Lofb_abort:
+	popq	%rbx
+	popq	%rbp
+	movq	8(%rsp),%rdi
+	movq	16(%rsp),%rsi
+	.byte	0xf3,0xc3
+.LSEH_end_padlock_ofb_encrypt:
+.globl	padlock_ctr32_encrypt
+.def	padlock_ctr32_encrypt;	.scl 2;	.type 32;	.endef
+.p2align	4
+padlock_ctr32_encrypt:
+	movq	%rdi,8(%rsp)
+	movq	%rsi,16(%rsp)
+	movq	%rsp,%rax
+.LSEH_begin_padlock_ctr32_encrypt:
+	movq	%rcx,%rdi
+	movq	%rdx,%rsi
+	movq	%r8,%rdx
+	movq	%r9,%rcx
+
+	pushq	%rbp
+	pushq	%rbx
+
+	xorl	%eax,%eax
+	testq	$15,%rdx
+	jnz	.Lctr32_abort
+	testq	$15,%rcx
+	jnz	.Lctr32_abort
+	leaq	.Lpadlock_saved_context(%rip),%rax
+	pushf
+	cld
+	call	_padlock_verify_ctx
+	leaq	16(%rdx),%rdx
+	xorl	%eax,%eax
+	xorl	%ebx,%ebx
+	testl	$32,(%rdx)
+	jnz	.Lctr32_aligned
+	testq	$15,%rdi
+	setz	%al
+	testq	$15,%rsi
+	setz	%bl
+	testl	%ebx,%eax
+	jnz	.Lctr32_aligned
+	negq	%rax
+	movq	$512,%rbx
+	notq	%rax
+	leaq	(%rsp),%rbp
+	cmpq	%rbx,%rcx
+	cmovcq	%rcx,%rbx
+	andq	%rbx,%rax
+	movq	%rcx,%rbx
+	negq	%rax
+	andq	$512-1,%rbx
+	leaq	(%rax,%rbp,1),%rsp
+	movq	$512,%rax
+	cmovzq	%rax,%rbx
+.Lctr32_reenter:
+	movl	-4(%rdx),%eax
+	bswapl	%eax
+	negl	%eax
+	andl	$31,%eax
+	movq	$512,%rbx
+	shll	$4,%eax
+	cmovzq	%rbx,%rax
+	cmpq	%rax,%rcx
+	cmovaq	%rax,%rbx
+	cmovbeq	%rcx,%rbx
+	cmpq	%rbx,%rcx
+	ja	.Lctr32_loop
+	movq	%rsi,%rax
+	cmpq	%rsp,%rbp
+	cmoveq	%rdi,%rax
+	addq	%rcx,%rax
+	negq	%rax
+	andq	$4095,%rax
+	cmpq	$32,%rax
+	movq	$-32,%rax
+	cmovaeq	%rbx,%rax
+	andq	%rax,%rbx
+	jz	.Lctr32_unaligned_tail
+	jmp	.Lctr32_loop
+.p2align	4
+.Lctr32_loop:
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
+	movq	%rdi,%r8
+	movq	%rsi,%r9
+	movq	%rcx,%r10
+	movq	%rbx,%rcx
+	movq	%rbx,%r11
+	testq	$15,%rdi
+	cmovnzq	%rsp,%rdi
+	testq	$15,%rsi
+	jz	.Lctr32_inp_aligned
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+	movq	%rbx,%rcx
+	movq	%rdi,%rsi
+.Lctr32_inp_aligned:
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,216	
+	movl	-4(%rdx),%eax
+	testl	$4294901760,%eax
+	jnz	.Lctr32_no_carry
+	bswapl	%eax
+	addl	$65536,%eax
+	bswapl	%eax
+	movl	%eax,-4(%rdx)
+.Lctr32_no_carry:
+	movq	%r8,%rdi
+	movq	%r11,%rbx
+	testq	$15,%rdi
+	jz	.Lctr32_out_aligned
+	movq	%rbx,%rcx
+	leaq	(%rsp),%rsi
+	shrq	$3,%rcx
+.byte	0xf3,0x48,0xa5		
+	subq	%rbx,%rdi
+.Lctr32_out_aligned:
+	movq	%r9,%rsi
+	movq	%r10,%rcx
+	addq	%rbx,%rdi
+	addq	%rbx,%rsi
+	subq	%rbx,%rcx
+	movq	$512,%rbx
+	jz	.Lctr32_break
+	cmpq	%rbx,%rcx
+	jae	.Lctr32_loop
+	movq	%rcx,%rbx
+	movq	%rsi,%rax
+	cmpq	%rsp,%rbp
+	cmoveq	%rdi,%rax
+	addq	%rcx,%rax
+	negq	%rax
+	andq	$4095,%rax
+	cmpq	$32,%rax
+	movq	$-32,%rax
+	cmovaeq	%rbx,%rax
+	andq	%rax,%rbx
+	jnz	.Lctr32_loop
+.Lctr32_unaligned_tail:
+	xorl	%eax,%eax
+	cmpq	%rsp,%rbp
+	cmoveq	%rcx,%rax
+	movq	%rdi,%r8
+	movq	%rcx,%rbx
+	subq	%rax,%rsp
+	shrq	$3,%rcx
+	leaq	(%rsp),%rdi
+.byte	0xf3,0x48,0xa5		
+	movq	%rsp,%rsi
+	movq	%r8,%rdi
+	movq	%rbx,%rcx
+	jmp	.Lctr32_loop
+.p2align	4
+.Lctr32_break:
+	cmpq	%rbp,%rsp
+	je	.Lctr32_done
+
+	pxor	%xmm0,%xmm0
+	leaq	(%rsp),%rax
+.Lctr32_bzero:
+	movaps	%xmm0,(%rax)
+	leaq	16(%rax),%rax
+	cmpq	%rax,%rbp
+	ja	.Lctr32_bzero
+
+.Lctr32_done:
+	leaq	(%rbp),%rsp
+	jmp	.Lctr32_exit
+
+.p2align	4
+.Lctr32_aligned:
+	movl	-4(%rdx),%eax
+	bswapl	%eax
+	negl	%eax
+	andl	$65535,%eax
+	movq	$1048576,%rbx
+	shll	$4,%eax
+	cmovzq	%rbx,%rax
+	cmpq	%rax,%rcx
+	cmovaq	%rax,%rbx
+	cmovbeq	%rcx,%rbx
+	jbe	.Lctr32_aligned_skip
+
+.Lctr32_aligned_loop:
+	movq	%rcx,%r10
+	movq	%rbx,%rcx
+	movq	%rbx,%r11
+
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,216	
+
+	movl	-4(%rdx),%eax
+	bswapl	%eax
+	addl	$65536,%eax
+	bswapl	%eax
+	movl	%eax,-4(%rdx)
+
+	movq	%r10,%rcx
+	subq	%r11,%rcx
+	movq	$1048576,%rbx
+	jz	.Lctr32_exit
+	cmpq	%rbx,%rcx
+	jae	.Lctr32_aligned_loop
+
+.Lctr32_aligned_skip:
+	leaq	(%rsi,%rcx,1),%rbp
+	negq	%rbp
+	andq	$4095,%rbp
+	xorl	%eax,%eax
+	cmpq	$32,%rbp
+	movq	$32-1,%rbp
+	cmovaeq	%rax,%rbp
+	andq	%rcx,%rbp
+	subq	%rbp,%rcx
+	jz	.Lctr32_aligned_tail
+	leaq	-16(%rdx),%rax
+	leaq	16(%rdx),%rbx
+	shrq	$4,%rcx
+.byte	0xf3,0x0f,0xa7,216	
+	testq	%rbp,%rbp
+	jz	.Lctr32_exit
+
+.Lctr32_aligned_tail:
+	movq	%rdi,%r8
+	movq	%rbp,%rbx
+	movq	%rbp,%rcx
+	leaq	(%rsp),%rbp
+	subq	%rcx,%rsp
+	shrq	$3,%rcx
+	leaq	(%rsp),%rdi
+.byte	0xf3,0x48,0xa5		
+	leaq	(%r8),%rdi
+	leaq	(%rsp),%rsi
+	movq	%rbx,%rcx
+	jmp	.Lctr32_loop
+.Lctr32_exit:
+	movl	$1,%eax
+	leaq	8(%rsp),%rsp
+.Lctr32_abort:
+	popq	%rbx
+	popq	%rbp
+	movq	8(%rsp),%rdi
+	movq	16(%rsp),%rsi
+	.byte	0xf3,0xc3
+.LSEH_end_padlock_ctr32_encrypt:
 .byte	86,73,65,32,80,97,100,108,111,99,107,32,120,56,54,95,54,52,32,109,111,100,117,108,101,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .p2align	4
 .data	
