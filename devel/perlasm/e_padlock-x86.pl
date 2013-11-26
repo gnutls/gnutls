@@ -400,9 +400,9 @@ my ($mode,$opcode) = @_;
 
 &generate_mode("ecb",0xc8);
 &generate_mode("cbc",0xd0);
-#&generate_mode("cfb",0xe0);
-#&generate_mode("ofb",0xe8);
-#&generate_mode("ctr32",0xc8);	# yes, it implements own CTR with ECB opcode,
+&generate_mode("cfb",0xe0);
+&generate_mode("ofb",0xe8);
+&generate_mode("ctr32",0xc8);	# yes, it implements own CTR with ECB opcode,
 				# because hardware CTR was introduced later
 				# and even has errata on certain C7 stepping.
 				# own implementation *always* works, though
