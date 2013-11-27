@@ -10,6 +10,9 @@ initialization to a minimal part (which can be part of a library
 constructor) and the rest, which includes things that cannot be
 in a constructor such as the PKCS #11 initialization.
 
+* Added --disable-non-suiteb-curves option to configure. This option
+restricts the supported curves to SuiteB curves.
+
 ** libgnutls: Added --enable-fips140-mode configuration option. That
 option enables:
  o FIPS-186-4 compliant DSA and DH key generation (using provable primes)
@@ -24,7 +27,6 @@ option enables:
  o All keys (temporal and long term) are zeroized after use.
  o Security levels are adjusted to the FIPS140-2 recommendations (rather
    than ECRYPT).
- o The ECC curves are restricted to SuiteB curves.
 
 ** libgnutls: Depend on p11-kit 0.19.1 or later.
 
