@@ -69,34 +69,73 @@ FILE* fd;
 	return 0;
 }
 
+#define GNUTLS_LIBRARY_NAME "libgnutls.so.28"
+#define TASN1_LIBRARY_NAME "libtasn1.so.6"
+#define NETTLE_LIBRARY_NAME "libnettle.so.4"
+#define HOGWEED_LIBRARY_NAME "libhogweed.so.2"
+
 static const char fips_key[] = "orboDeJITITejsirpADONivirpUkvarP";
 
 #define HMAC_SUFFIX ".hmac"
 #define HMAC_SIZE 32
 #define HMAC_ALGO GNUTLS_MAC_SHA256
 
+static int get_library_path(const char* lib, const char* symbol, char* path, size_t path_size)
+{
+Dl_info info;
+int ret;
+void *dl, *sym;
+
+	dl = dlopen(lib, RTLD_LAZY);
+	if (dl == NULL)
+		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+
+	sym = dlsym(dl, symbol);
+	if (sym == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+		goto cleanup;
+	}
+	
+	ret = dladdr(sym, &info);
+	if (ret == 0) {
+		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+		goto cleanup;
+	}
+	
+	snprintf(path, path_size, "%s", info.dli_fname);
+
+	ret = 0;
+cleanup:
+	dlclose(dl);
+	return ret;
+}
+
 /* Run an HMAC using the key above on the library binary data. 
- * Returns true success and false on error.
+ * Returns true on success and false on error.
  */
-static unsigned check_binary_integrity(void)
+static unsigned check_binary_integrity(const char* libname, const char* symbol)
 {
 	int ret;
-	Dl_info info;
 	unsigned prev;
 	char mac_file[GNUTLS_PATH_MAX];
+	char file[GNUTLS_PATH_MAX];
 	uint8_t hmac[HMAC_SIZE];
 	uint8_t new_hmac[HMAC_SIZE];
 	size_t hmac_size;
 	gnutls_datum_t data;
+	
+	ret = get_library_path(libname, symbol, file, sizeof(file));
+	if (ret < 0) {
+		_gnutls_debug_log("Could not get path for library %s\n", libname);
+		return 0;
+	}
 
-	ret = dladdr("gnutls_global_init", &info);
-	if (ret == 0)
+	_gnutls_debug_log("Loading: %s\n", file);
+	ret = gnutls_load_file(file, &data);
+	if (ret < 0) {
+		_gnutls_debug_log("Could not load: %s\n", file);
 		return gnutls_assert_val(0);
-
-	_gnutls_debug_log("Loading: %s\n", info.dli_fname);
-	ret = gnutls_load_file(info.dli_fname, &data);
-	if (ret < 0)
-		return gnutls_assert_val(0);
+	}
 
 	prev = _gnutls_get_fips_state();
 	_gnutls_switch_fips_state(FIPS_STATE_OPERATIONAL);
@@ -110,11 +149,11 @@ static unsigned check_binary_integrity(void)
 		return gnutls_assert_val(0);
 
 	/* now open the .hmac file and compare */
-	snprintf(mac_file, sizeof(mac_file), "%s"HMAC_SUFFIX, info.dli_fname);
+	snprintf(mac_file, sizeof(mac_file), "%s"HMAC_SUFFIX, file);
 	
 	ret = gnutls_load_file(mac_file, &data);
 	if (ret < 0) {
-		_gnutls_debug_log("Could not open %s%s for MAC testing: %s\n", info.dli_fname, HMAC_SUFFIX, gnutls_strerror(ret));
+		_gnutls_debug_log("Could not open %s"HMAC_SUFFIX" for MAC testing: %s\n", file, gnutls_strerror(ret));
 		return gnutls_assert_val(0);
 	}
 
@@ -123,16 +162,16 @@ static unsigned check_binary_integrity(void)
 	gnutls_free(data.data);
 
 	if (ret < 0) {
-		_gnutls_debug_log("Could not convert hex data to binary for MAC testing.\n");
+		_gnutls_debug_log("Could not convert hex data to binary for MAC testing for %s.\n", libname);
 		return gnutls_assert_val(0);
 	}
 
 	if (hmac_size != sizeof(hmac) ||
 			memcmp(hmac, new_hmac, sizeof(hmac)) != 0) {
-		_gnutls_debug_log("Calculated MAC does not match\n");
+		_gnutls_debug_log("Calculated MAC for %s does not match\n", libname);
 		return gnutls_assert_val(0);
 	}
-	_gnutls_debug_log("Successfully verified library MAC\n");
+	_gnutls_debug_log("Successfully verified library MAC for %s\n", libname);
 	
 	return 1;
 }
@@ -249,13 +288,32 @@ int _gnutls_fips_perform_self_checks(void)
 		goto error;
 	}
 
-	ret = check_binary_integrity();
+	ret = check_binary_integrity(GNUTLS_LIBRARY_NAME, "gnutls_global_init");
 	if (ret == 0) {
 		gnutls_assert();
 		goto error;
 	}
 
+	ret = check_binary_integrity(TASN1_LIBRARY_NAME, "asn1_check_version");
+	if (ret == 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = check_binary_integrity(NETTLE_LIBRARY_NAME, "nettle_aes_set_encrypt_key");
+	if (ret == 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = check_binary_integrity(HOGWEED_LIBRARY_NAME, "nettle_mpz_sizeinbase_256_u");
+	if (ret == 0) {
+		gnutls_assert();
+		goto error;
+	}
+	
 	return 0;
+
 error:
 	_gnutls_switch_fips_state(FIPS_STATE_ERROR);
 	_gnutls_audit_log(NULL, "FIPS140-2 self testing failed\n");
