@@ -112,9 +112,10 @@ const gnutls_datum_t server_key = { server_key_pem,
 
 #define MAX_BUF 24*1024
 
-static void client(int fd, const char *prio)
+static void client(int fd, const char *prio, int ign)
 {
 	int ret;
+	unsigned i;
 	char buffer[MAX_BUF + 1];
 	gnutls_anon_client_credentials_t anoncred;
 	gnutls_certificate_credentials_t x509_cred;
@@ -167,6 +168,41 @@ static void client(int fd, const char *prio)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
+	/* Test sending */
+	for (i = 1; i < 16384; i++) {
+		do {
+			ret = gnutls_record_send(session, buffer, i);
+		} while (ret == GNUTLS_E_AGAIN
+			 || ret == GNUTLS_E_INTERRUPTED);
+
+		if (ret < 0) {
+			fail("server (%s): Error sending %d byte packet: %s\n", prio, i, gnutls_strerror(ret));
+			terminate();
+		}
+	}
+
+	/* Try sending a bit more */
+	i = 21056;
+	do {
+		ret = gnutls_record_send(session, buffer, i);
+	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+	if (ret < 0) {
+		fail("server (%s): Error sending %d byte packet: %s\n",
+		     prio, i, gnutls_strerror(ret));
+		exit(1);
+	} else if (ign == 0 && ret != 16384) {
+		fail("server (%s): Error sending %d byte packet; sent %d bytes instead of 16384\n", prio, i, ret);
+		exit(1);
+	}
+	
+	ret = gnutls_alert_send(session, GNUTLS_AL_WARNING, GNUTLS_A_USER_CANCELED);
+	if (ret < 0) {
+		fail("server (%s): Error sending alert\n", prio);
+		exit(1);
+	}
+
+	/* Test receiving */
 	do {
 		do {
 			ret = gnutls_record_recv(session, buffer, MAX_BUF);
@@ -267,6 +303,30 @@ static void server(int fd, const char *prio, int ign)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
+	/* Here we do both a receive and a send test because if valgrind
+	 * detects an error on the peer, the main process will never know.
+	 */
+
+	/* Test receiving */
+	do {
+		do {
+			ret = gnutls_record_recv(session, buffer, MAX_BUF);
+		} while (ret == GNUTLS_E_AGAIN
+			 || ret == GNUTLS_E_INTERRUPTED);
+	} while (ret > 0);
+	
+	if (ret != GNUTLS_E_WARNING_ALERT_RECEIVED ||
+		gnutls_alert_get(session) != GNUTLS_A_USER_CANCELED) {
+
+		if (ret <= 0) {
+			if (ret != 0) {
+				fail("client: Error: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+	}
+
+	/* Test sending */
 	for (i = 1; i < 16384; i++) {
 		do {
 			ret = gnutls_record_send(session, buffer, i);
@@ -335,7 +395,7 @@ static void start(const char *prio, int ign)
 		kill(child, SIGTERM);
 	} else {
 		close(fd[0]);
-		client(fd[1], prio);
+		client(fd[1], prio, ign);
 		exit(0);
 	}
 }
@@ -400,7 +460,6 @@ void doit(void)
 #endif
 	start(AES_GCM_ZLIB, 0);
 	start(NEW_AES_GCM_ZLIB, 1);
-
 }
 
 #endif				/* _WIN32 */
