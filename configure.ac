@@ -287,7 +287,11 @@ AC_ARG_WITH(unbound-root-key-file, AS_HELP_STRING([--with-unbound-root-key-file]
 if test "$have_win" = yes; then
     unbound_root_key_file="C:\\Program Files\\Unbound\\root.key"
 else
-    unbound_root_key_file="/etc/unbound/root.key"
+    if test -f /var/lib/unbound/root.key;then
+    	unbound_root_key_file="/var/lib/unbound/root.key"
+    else
+        unbound_root_key_file="/etc/unbound/root.key"
+    fi
 fi
 )
 
