@@ -702,13 +702,9 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 			dsa_public_key_init(&pub);
 			dsa_private_key_init(&priv);
 			
-
-			/* the best would be to use _gnutls_pk_bits_to_subgroup_bits()
-			 * but we do NIST DSA here */
-			if (level <= 1024)
-				q_bits = 160;
-			else
-				q_bits = 256;
+			q_bits = _gnutls_pk_bits_to_subgroup_bits(level);
+			if (q_bits == 0)
+				return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 #ifdef ENABLE_FIPS140
 			if (algo==GNUTLS_PK_DSA)
