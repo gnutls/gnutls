@@ -37,12 +37,14 @@ svoid *gnutls_secure_calloc(size_t nmemb, size_t size);
 void *_gnutls_calloc(size_t nmemb, size_t size);
 char *_gnutls_strdup(const char *);
 
+void *_gnutls_bzero(void *v, size_t n);
+
 #define zrelease_mpi_key(mpi) if (*mpi!=NULL) { \
                 _gnutls_mpi_clear(*mpi); \
                 _gnutls_mpi_release(mpi); \
         }
 
-#define zeroize_key(x, size) memset(x, 0, size)
+#define zeroize_key(x, size) _gnutls_bzero(x, size)
 
 #ifdef ENABLE_FIPS140
 # define zeroize_temp_key zeroize_key

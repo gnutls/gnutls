@@ -82,6 +82,13 @@ char *_gnutls_strdup(const char *str)
 	return ret;
 }
 
+void *_gnutls_bzero(void *mem, size_t size)
+{
+	volatile uint8_t *p = mem;
+	while (size--)
+        	*p++ = 0;
+	return mem;
+}
 
 #if 0
 /* don't use them. They are included for documentation.
