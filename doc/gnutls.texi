@@ -51,7 +51,7 @@ Documentation License''.
 @sp 7
 @center @image{gnutls-logo,6cm,6cm}
 @author Nikos Mavrogiannopoulos
-@author Simon Josefsson (@email{bug-gnutls@@gnu.org})
+@author Simon Josefsson (@email{bugs@@gnutls.org})
 @page
 @vskip 0pt plus 1filll
 @insertcopying
