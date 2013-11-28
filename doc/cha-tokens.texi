@@ -200,9 +200,12 @@ system, being the @acronym{Gnome Keyring}.
 
 @node PKCS11 Initialization
 @subsection Initialization
-To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS} #11 tokens
-you can use a configuration per module, stored in @code{/etc/pkcs11/modules/}. 
-These are the configuration files of @acronym{p11-kit}@footnote{@url{http://p11-glue.freedesktop.org/}}.
+To allow all @acronym{GnuTLS} applications to transparently access smard cards
+and tokens, @acronym{PKCS} #11 is automatically initialized during the global 
+initialization (see @funcref{gnutls_global_init}). The initialization function, to select
+which modules to load reads certain module configuration files.
+Those are stored in @code{/etc/pkcs11/modules/} and 
+are the configuration files of @acronym{p11-kit}@footnote{@url{http://p11-glue.freedesktop.org/}}.
 For example a file that will load the @acronym{OpenSC} module, could be named
 @code{/etc/pkcs11/modules/opensc} and contain the following:
 
@@ -210,15 +213,17 @@ For example a file that will load the @acronym{OpenSC} module, could be named
 module: /usr/lib/opensc-pkcs11.so
 @end example
 
-If you use this file, then there is no need for other initialization in
+If you use these configuration files, then there is no need for other initialization in
 @acronym{GnuTLS}, except for the PIN and token functions (see next section).  
 In several cases, however, it is desirable to limit badly behaving modules 
 (e.g., modules that add an unacceptable delay on initialization)
 to single applications. That can be done using the ``enable-in:'' option
 followed by the base name of applications that this module should be used.
 
-In all cases, you may also manually initialize the PKCS #11 subsystem if the 
-default settings are not desirable.
+In all cases, you can also manually initialize the PKCS #11 subsystem if the 
+default settings are not desirable. To completely disable PKCS #11 support you
+need to call @funcref{gnutls_pkcs11_init} with the flag @code{GNUTLS_PKCS11_FLAG_MANUAL}
+prior to @funcref{gnutls_global_init}.
 
 @showfuncdesc{gnutls_pkcs11_init}
 
