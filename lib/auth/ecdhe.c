@@ -92,7 +92,7 @@ static int calc_ecdh_key(gnutls_session_t session,
 	gnutls_pk_params_st pub;
 	int ret;
 
-	memset(&pub, 0, sizeof(pub));
+	gnutls_pk_params_init(&pub);
 	pub.params[ECC_X] = session->key.ecdh_x;
 	pub.params[ECC_Y] = session->key.ecdh_y;
 	pub.flags = curve;
@@ -154,15 +154,21 @@ int _gnutls_proc_ecdh_common_client_kx(gnutls_session_t session,
 	    _gnutls_ecc_ansi_x963_import(&data[i], point_size,
 					 &session->key.ecdh_x,
 					 &session->key.ecdh_y);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	/* generate pre-shared key */
 	ret = calc_ecdh_key(session, psk_key, curve);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-	return 0;
+cleanup:
+      	gnutls_pk_params_clear(&session->key.ecdh_params);
+	return ret;
 }
 
 static int
@@ -213,23 +219,32 @@ _gnutls_gen_ecdh_common_client_kx_int(gnutls_session_t session,
 					 params[ECC_X] /* x */ ,
 					 session->key.ecdh_params.
 					 params[ECC_Y] /* y */ , &out);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	ret =
 	    _gnutls_buffer_append_data_prefix(data, 8, out.data, out.size);
 
 	_gnutls_free_datum(&out);
 
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	/* generate pre-shared key */
 	ret = calc_ecdh_key(session, psk_key, curve);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-	return data->length;
+	ret = data->length;
+cleanup:
+      	gnutls_pk_params_clear(&session->key.ecdh_params);
+	return ret;
 }
 
 static int
