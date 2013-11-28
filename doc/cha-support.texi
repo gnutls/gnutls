@@ -13,14 +13,14 @@
 @section Getting Help
 
 A mailing list where users may help each other exists, and you can
-reach it by sending e-mail to @email{help-gnutls@@gnu.org}.  Archives
+reach it by sending e-mail to @email{gnutls-help@@gnutls.org}.  Archives
 of the mailing list discussions, and an interface to manage
 subscriptions, is available through the World Wide Web at
-@url{http://lists.gnu.org/mailman/listinfo/help-gnutls}.
+@url{http://lists.gnutls.org/pipermail/gnutls-help/}.
 
 A mailing list for developers are also available, see
-@url{http://www.gnu.org/software/gnutls/lists.html}.
-Bug reports should be sent to @email{bug-gnutls@@gnu.org}, see
+@url{http://www.gnutls.org/lists.html}.
+Bug reports should be sent to @email{bugs@@gnutls.org}, see
 @ref{Bug Reports}.
 
 @node Commercial Support
@@ -98,7 +98,7 @@ note.
 
 Send your bug report to:
 
-@center @samp{bug-gnutls@@gnu.org}
+@center @samp{bugs@@gnutls.org}
 
 @node Contributing
 @section Contributing
