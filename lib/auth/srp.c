@@ -57,10 +57,10 @@ const mod_auth_st srp_auth_struct = {
 #define B session->key.B
 #define _a session->key.a
 #define A session->key.A
-#define N session->key.client_p
-#define G session->key.client_g
+#define N session->key.srp_p
+#define G session->key.srp_g
 #define V session->key.x
-#define S session->key.KEY
+#define S session->key.srp_key
 
 /* Checks if a%n==0,+1,-1%n which is a fatal srp error.
  * Returns a proper error code in that case, and 0 when
@@ -309,7 +309,7 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 	zrelease_temp_mpi_key(&session->key.u);
 	zrelease_temp_mpi_key(&B);
 
-	ret = _gnutls_mpi_dprint(session->key.KEY, &session->key.key);
+	ret = _gnutls_mpi_dprint(session->key.srp_key, &session->key.key);
 	zrelease_temp_mpi_key(&S);
 
 	if (ret < 0) {
@@ -384,7 +384,7 @@ _gnutls_proc_srp_client_kx(gnutls_session_t session, uint8_t * data,
 	zrelease_temp_mpi_key(&session->key.u);
 	zrelease_temp_mpi_key(&B);
 
-	ret = _gnutls_mpi_dprint(session->key.KEY, &session->key.key);
+	ret = _gnutls_mpi_dprint(session->key.srp_key, &session->key.key);
 	zrelease_temp_mpi_key(&S);
 
 	if (ret < 0) {

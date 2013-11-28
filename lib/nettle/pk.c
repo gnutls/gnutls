@@ -81,12 +81,14 @@ static void
 _dsa_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 		      struct dsa_public_key *pub)
 {
-	memcpy(&pub->p, pk_params->params[0], sizeof(mpz_t));
-	memcpy(&pub->q, pk_params->params[1], sizeof(mpz_t));
-	memcpy(&pub->g, pk_params->params[2], sizeof(mpz_t));
+	memcpy(&pub->p, pk_params->params[DSA_P], sizeof(mpz_t));
+
+	if (pk_params->params[DSA_Q])
+		memcpy(&pub->q, pk_params->params[DSA_Q], sizeof(mpz_t));
+	memcpy(&pub->g, pk_params->params[DSA_G], sizeof(mpz_t));
 	
-	if (pk_params->params[3] != NULL)
-		memcpy(&pub->y, pk_params->params[3], sizeof(mpz_t));
+	if (pk_params->params[DSA_Y] != NULL)
+		memcpy(&pub->y, pk_params->params[DSA_Y], sizeof(mpz_t));
 }
 
 static void
@@ -165,6 +167,11 @@ ecc_shared_secret(struct ecc_scalar *private_key,
 	return;
 }
 
+#define MAX_DH_BITS 16*1024
+
+/* This is used for DH or ECDH key derivation. In DH for example
+ * it is given the peers Y and our x, and calculates Y^x 
+ */
 static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 				  gnutls_datum_t * out,
 				  const gnutls_pk_params_st * priv,
@@ -173,6 +180,60 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 	int ret;
 
 	switch (algo) {
+	case GNUTLS_PK_DH: {
+		bigint_t f, x, prime;
+		bigint_t k = NULL, ff;
+		unsigned int bits;
+		
+		f = pub->params[DH_Y];
+		x = priv->params[DH_X];
+		prime = priv->params[DH_P];
+
+		ff = _gnutls_mpi_modm(NULL, f, prime);
+		_gnutls_mpi_add_ui(ff, ff, 1);
+
+		/* check if f==0,1,p-1. 
+		 * or (ff=f+1) equivalently ff==1,2,p */
+		if ((_gnutls_mpi_cmp_ui(ff, 2) == 0)
+		    || (_gnutls_mpi_cmp_ui(ff, 1) == 0)
+		    || (_gnutls_mpi_cmp(ff, prime) == 0)) {
+			gnutls_assert();
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto dh_cleanup;
+		}
+
+		/* prevent denial of service */
+		bits = _gnutls_mpi_get_nbits(prime);
+		if (bits == 0 || bits > MAX_DH_BITS) {
+			gnutls_assert();
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto dh_cleanup;
+		}
+
+		k = _gnutls_mpi_alloc_like(prime);
+		if (k == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto dh_cleanup;
+		}
+
+		_gnutls_mpi_powm(k, f, x, prime);
+		
+		ret = _gnutls_mpi_dprint(k, out);
+		if (ret < 0) {
+			gnutls_assert();
+			goto dh_cleanup;
+		}
+
+		ret = 0;
+dh_cleanup:
+		_gnutls_mpi_release(&ff);
+		zrelease_temp_mpi_key(&k);
+		if (ret < 0)
+			goto cleanup;
+		
+		break;
+	}
 	case GNUTLS_PK_EC:
 		{
 			struct ecc_scalar ecc_priv;
@@ -442,8 +503,8 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			if (hash_len > vdata->size) {
 				gnutls_assert();
 				_gnutls_debug_log
-				    ("Security level of algorithm requires hash %s(%d) or better\n",
-				     _gnutls_mac_get_name(me), hash_len);
+				    ("Security level of algorithm requires hash %s(%d) or better (have: %d)\n",
+				     _gnutls_mac_get_name(me), hash_len, (int)vdata->size);
 				hash_len = vdata->size;
 			}
 
@@ -792,6 +853,9 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	return ret;
 }
 
+/* To generate a DH key either q must be set in the params or
+ * level should be set to the number of required bits.
+ */
 static int
 wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			       unsigned int level /*bits */ ,
@@ -807,19 +871,33 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			struct dsa_public_key pub;
 			mpz_t r;
 			mpz_t x, y;
+			unsigned have_q = 0;
 			
 			if (algo != params->algo)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 			_dsa_params_to_pubkey(params, &pub);
+			
+			if (params->params[DSA_Q] != NULL)
+				have_q = 1;
+				
+			if (algo == GNUTLS_PK_DSA && have_q == 0)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 			mpz_init(r);
 			mpz_init(x);
 			mpz_init(y);
-			mpz_set(r, pub.q);
-			mpz_sub_ui(r, r, 2);
-			nettle_mpz_random(x, NULL, rnd_func, r);
-			mpz_add_ui(x, x, 1);
+			
+			if (have_q) {
+				mpz_set(r, pub.q);
+				mpz_sub_ui(r, r, 2);
+				nettle_mpz_random(x, NULL, rnd_func, r);
+				mpz_add_ui(x, x, 1);
+			} else {
+				if (level == 0)
+					level = mpz_sizeinbase(pub.p, 2);
+				nettle_mpz_random_size(x, NULL, rnd_func, level);
+			}
 
 			mpz_powm(y, pub.g, x, pub.p);
 			

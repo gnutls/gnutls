@@ -34,6 +34,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_x509.h>
 #include <gnutls_state.h>
+#include <gnutls_pk.h>
 #include <auth/dh_common.h>
 #include <algorithms.h>
 #include <auth/psk.h>
@@ -60,7 +61,10 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 	size_t _n_Y;
 	int ret;
 	ssize_t data_size = _data_size;
-
+	gnutls_datum_t tmp_dh_key = {NULL, 0};
+	gnutls_pk_params_st peer_pub;
+	
+	gnutls_pk_params_init(&peer_pub);
 
 	DECR_LEN(data_size, 2);
 	n_Y = _gnutls_read_uint16(&data[0]);
@@ -74,43 +78,37 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 
 	_gnutls_dh_set_peer_public(session, session->key.client_Y);
 
-	ret =
-	    gnutls_calc_dh_key(&session->key.KEY, session->key.client_Y,
-			       session->key.dh_secret, p);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	peer_pub.params[DH_Y] = session->key.client_Y;
 
-	_gnutls_mpi_release(&session->key.client_Y);
-	zrelease_temp_mpi_key(&session->key.dh_secret);
+	/* calculate the key after calculating the message */
+	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key, &session->key.dh_params, &peer_pub);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
 
 
 	if (psk_key == NULL) {
-		ret =
-		    _gnutls_mpi_dprint(session->key.KEY,
-				       &session->key.key);
+		session->key.key.data = tmp_dh_key.data;
+		session->key.key.size = tmp_dh_key.size;
 	} else {		/* In DHE_PSK the key is set differently */
-
-		gnutls_datum_t tmp_dh_key;
-		ret = _gnutls_mpi_dprint(session->key.KEY, &tmp_dh_key);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-
 		ret =
 		    _gnutls_set_psk_session_key(session, psk_key,
 						&tmp_dh_key);
 		_gnutls_free_temp_key_datum(&tmp_dh_key);
-
 	}
-
-	zrelease_temp_mpi_key(&session->key.KEY);
-
+	
 	if (ret < 0) {
-		return ret;
+		gnutls_assert();
+		goto error;
 	}
 
-	return 0;
+	ret = 0;
+error:
+	_gnutls_mpi_release(&session->key.client_Y);
+      	gnutls_pk_params_clear(&session->key.dh_params);
+
+	return ret;
 }
 
 int _gnutls_gen_dh_common_client_kx(gnutls_session_t session,
@@ -124,61 +122,46 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 				    gnutls_buffer_st * data,
 				    gnutls_datum_t * pskkey)
 {
-	bigint_t x = NULL, Y = NULL;
 	int ret;
+	gnutls_pk_params_st peer_pub;
+	gnutls_datum_t tmp_dh_key = {NULL, 0};
+	
+	gnutls_pk_params_init(&peer_pub);
 
-	ret = gnutls_calc_dh_secret(&Y, &x, session->key.client_g,
-				    session->key.client_p, 0);
+	ret =
+	    _gnutls_pk_generate_keys(GNUTLS_PK_DH, 0,
+				     &session->key.dh_params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	_gnutls_dh_set_secret_bits(session, _gnutls_mpi_get_nbits(session->key.dh_params.params[DH_X]));
+
+	ret = _gnutls_buffer_append_mpi(data, 16, session->key.dh_params.params[DH_Y], 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
-
-	_gnutls_dh_set_secret_bits(session, _gnutls_mpi_get_nbits(x));
-
-	ret = _gnutls_buffer_append_mpi(data, 16, Y, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
+	
+	peer_pub.params[DH_Y] = session->key.client_Y;
 
 	/* calculate the key after calculating the message */
-	ret =
-	    gnutls_calc_dh_key(&session->key.KEY, session->key.client_Y, x,
-			       session->key.client_p);
+	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &tmp_dh_key, &session->key.dh_params, &peer_pub);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
-
-	/* THESE SHOULD BE DISCARDED */
-	_gnutls_mpi_release(&session->key.client_Y);
-	_gnutls_mpi_release(&session->key.client_p);
-	_gnutls_mpi_release(&session->key.client_g);
 
 	if (_gnutls_cipher_suite_get_kx_algo
 	    (session->security_parameters.cipher_suite)
 	    != GNUTLS_KX_DHE_PSK) {
-		ret =
-		    _gnutls_mpi_dprint(session->key.KEY,
-				       &session->key.key);
+		session->key.key.data = tmp_dh_key.data;
+		session->key.key.size = tmp_dh_key.size;
 	} else {		/* In DHE_PSK the key is set differently */
-
-		gnutls_datum_t tmp_dh_key;
-
-		ret = _gnutls_mpi_dprint(session->key.KEY, &tmp_dh_key);
-		if (ret < 0) {
-			gnutls_assert();
-			goto error;
-		}
-
 		ret =
 		    _gnutls_set_psk_session_key(session, pskkey,
 						&tmp_dh_key);
 		_gnutls_free_temp_key_datum(&tmp_dh_key);
 	}
-
-	zrelease_temp_mpi_key(&session->key.KEY);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -188,9 +171,30 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 	ret = data->length;
 
       error:
-	zrelease_temp_mpi_key(&x);
-	_gnutls_mpi_release(&Y);
+      	gnutls_pk_params_clear(&session->key.dh_params);
 	return ret;
+}
+
+int _gnutls_set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
+				unsigned q_bits)
+{
+	gnutls_pk_params_init(&session->key.dh_params);
+
+	session->key.dh_params.params[DH_G] = _gnutls_mpi_copy(g);
+	if (session->key.dh_params.params[DH_G] == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	
+	session->key.dh_params.params[DH_P] = _gnutls_mpi_copy(p);
+	if (session->key.dh_params.params[DH_P] == NULL) {
+		_gnutls_mpi_release(&session->key.dh_params.params[DH_G]);
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	session->key.dh_params.params_nr = 3; /* include empty q */
+	session->key.dh_params.algo = GNUTLS_PK_DH;
+	session->key.dh_params.flags = q_bits;
+	
+	return 0;
 }
 
 /* Returns the bytes parsed */
@@ -205,6 +209,8 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	uint8_t *data_Y;
 	int i, bits, ret;
 	ssize_t data_size = _data_size;
+	
+	gnutls_pk_params_init(&session->key.dh_params);
 
 	i = 0;
 
@@ -240,14 +246,17 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (_gnutls_mpi_scan_nz(&session->key.client_g, data_g, _n_g) != 0) {
+	if (_gnutls_mpi_scan_nz(&session->key.dh_params.params[DH_G], data_g, _n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-	if (_gnutls_mpi_scan_nz(&session->key.client_p, data_p, _n_p) != 0) {
+
+	if (_gnutls_mpi_scan_nz(&session->key.dh_params.params[DH_P], data_p, _n_p) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
+	session->key.dh_params.params_nr = 3; /* include empty q */
+	session->key.dh_params.algo = GNUTLS_PK_DH;
 
 	bits = _gnutls_dh_get_min_prime_bits(session);
 	if (bits < 0) {
@@ -255,20 +264,19 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 		return bits;
 	}
 
-	if (_gnutls_mpi_get_nbits(session->key.client_p) < (size_t) bits) {
+	if (_gnutls_mpi_get_nbits(session->key.dh_params.params[DH_P]) < (size_t) bits) {
 		/* the prime used by the peer is not acceptable
 		 */
 		gnutls_assert();
 		_gnutls_debug_log
 		    ("Received a prime of %u bits, limit is %u\n",
-		     (unsigned) _gnutls_mpi_get_nbits(session->key.
-						      client_p),
+		     (unsigned) _gnutls_mpi_get_nbits(session->key.dh_params.params[DH_P]),
 		     (unsigned) bits);
 		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
 	}
 
-	_gnutls_dh_set_group(session, session->key.client_g,
-			     session->key.client_p);
+	_gnutls_dh_set_group(session, session->key.dh_params.params[DH_G],
+			     session->key.dh_params.params[DH_P]);
 	_gnutls_dh_set_peer_public(session, session->key.client_Y);
 
 	ret = n_Y + n_p + n_g + 6;
@@ -278,45 +286,41 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 
 int
 _gnutls_dh_common_print_server_kx(gnutls_session_t session,
-				  bigint_t g, bigint_t p,
-				  unsigned int q_bits,
 				  gnutls_buffer_st * data)
 {
-	bigint_t x, Y;
 	int ret;
+	unsigned q_bits = session->key.dh_params.flags;
 
 	/* Y=g^x mod p */
-	ret = gnutls_calc_dh_secret(&Y, &x, g, p, q_bits);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	ret =
+	    _gnutls_pk_generate_keys(GNUTLS_PK_DH, q_bits,
+				     &session->key.dh_params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-	session->key.dh_secret = x;
-	_gnutls_dh_set_secret_bits(session, _gnutls_mpi_get_nbits(x));
+	_gnutls_dh_set_secret_bits(session, _gnutls_mpi_get_nbits(session->key.dh_params.params[DH_X]));
 
-	ret = _gnutls_buffer_append_mpi(data, 16, p, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = _gnutls_buffer_append_mpi(data, 16, g, 0);
+	ret = _gnutls_buffer_append_mpi(data, 16, session->key.dh_params.params[DH_P], 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_buffer_append_mpi(data, 16, Y, 0);
+	ret = _gnutls_buffer_append_mpi(data, 16, session->key.dh_params.params[DH_G], 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_buffer_append_mpi(data, 16, session->key.dh_params.params[DH_Y], 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
 	ret = data->length;
-cleanup:
-	_gnutls_mpi_release(&Y);
 
+cleanup:
 	return ret;
 }
 

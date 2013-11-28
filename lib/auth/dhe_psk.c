@@ -222,9 +222,12 @@ gen_dhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	ret = _gnutls_set_dh_pk_params(session, g, p, dh_params->q_bits);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	ret =
-	    _gnutls_dh_common_print_server_kx(session, g, p,
-					      dh_params->q_bits, data);
+	    _gnutls_dh_common_print_server_kx(session, data);
 	if (ret < 0)
 		gnutls_assert();
 

@@ -467,13 +467,15 @@ void gnutls_deinit(gnutls_session_t session)
 	_gnutls_selected_certs_deinit(session);
 
 	gnutls_pk_params_release(&session->key.ecdh_params);
+	gnutls_pk_params_release(&session->key.dh_params);
 	zrelease_temp_mpi_key(&session->key.ecdh_x);
 	zrelease_temp_mpi_key(&session->key.ecdh_y);
 
-	zrelease_temp_mpi_key(&session->key.KEY);
 	zrelease_temp_mpi_key(&session->key.client_Y);
-	zrelease_temp_mpi_key(&session->key.client_p);
-	zrelease_temp_mpi_key(&session->key.client_g);
+
+	zrelease_temp_mpi_key(&session->key.srp_p);
+	zrelease_temp_mpi_key(&session->key.srp_g);
+	zrelease_temp_mpi_key(&session->key.srp_key);
 
 	zrelease_temp_mpi_key(&session->key.u);
 	zrelease_temp_mpi_key(&session->key.a);
@@ -486,7 +488,6 @@ void gnutls_deinit(gnutls_session_t session)
 	zrelease_temp_mpi_key(&session->key.rsa[0]);
 	zrelease_temp_mpi_key(&session->key.rsa[1]);
 
-	zrelease_temp_mpi_key(&session->key.dh_secret);
 	_gnutls_free_temp_key_datum(&session->key.key);
 
 	gnutls_free(session);

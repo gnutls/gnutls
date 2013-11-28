@@ -196,6 +196,7 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
 
 /* parameters should not be larger than this limit */
 #define DSA_PUBLIC_PARAMS 4
+#define DH_PUBLIC_PARAMS 4
 #define RSA_PUBLIC_PARAMS 2
 #define ECC_PUBLIC_PARAMS 2
 
@@ -204,6 +205,7 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
 
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5
+#define DH_PRIVATE_PARAMS 5
 #define RSA_PRIVATE_PARAMS 8
 #define ECC_PRIVATE_PARAMS 3
 
@@ -241,6 +243,8 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
  *  [3] is y (public key)
  *  [4] is x (private key only)
  *
+ * DH: as DSA
+ *
  * ECC:
  *  [0] is prime
  *  [1] is order
@@ -262,6 +266,12 @@ void gnutls_pk_params_init(gnutls_pk_params_st * p);
 #define DSA_G 2
 #define DSA_Y 3
 #define DSA_X 4
+
+#define DH_P 0
+#define DH_Q 1
+#define DH_G 2
+#define DH_Y 3
+#define DH_X 4
 
 #define RSA_MODULUS 0
 #define RSA_PUB 1
