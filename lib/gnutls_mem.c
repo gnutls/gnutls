@@ -82,12 +82,14 @@ char *_gnutls_strdup(const char *str)
 	return ret;
 }
 
-void *_gnutls_bzero(void *mem, size_t size)
+void _gnutls_bzero(void *mem, size_t size)
 {
-	volatile uint8_t *p = mem;
-	while (size--)
-        	*p++ = 0;
-	return mem;
+	/* The reason we use that function instead of directly
+	 * calling memset is to prevent the compiler
+	 * optimizing out certain calls that may look
+	 * pointless to him, but needed to erase
+	 * private keys. */
+	memset(mem, 0, size);
 }
 
 #if 0
