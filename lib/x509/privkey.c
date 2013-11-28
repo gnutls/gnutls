@@ -1456,6 +1456,48 @@ gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey_t key,
 	return 0;
 }
 
+#ifdef ENABLE_FIPS140
+static int pct_test(gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params)
+{
+int ret;
+gnutls_datum_t sig = {NULL, 0};
+const char data[20] = "onetwothreefourfive";
+gnutls_datum_t ddata;
+
+	ddata.data = (void*)data;
+	ddata.size = sizeof(data);
+
+	switch (algo) {
+	case GNUTLS_PK_RSA:
+		/* Here we don't know the purpose of the key. Assume signing
+		 */
+	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
+	case GNUTLS_PK_DSA:
+		ret = _gnutls_pk_sign(algo, &sig, &ddata, params);
+		if (ret < 0) {
+			ret = GNUTLS_E_PK_GENERATION_ERROR;
+			return gnutls_assert_val(ret);
+		}
+
+		ret = _gnutls_pk_verify(algo, &ddata, &sig, params);
+		if (ret < 0) {
+			ret = GNUTLS_E_PK_GENERATION_ERROR;
+			gnutls_assert();
+			goto cleanup;
+		}
+		break;
+
+	default:
+		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+	}
+
+	ret = 0;
+cleanup:
+	gnutls_free(sig.data);
+	return ret;
+}
+#endif
+
 /**
  * gnutls_x509_privkey_generate:
  * @key: should contain a #gnutls_x509_privkey_t structure
@@ -1503,6 +1545,16 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 	}
 
 	ret = _gnutls_pk_generate_keys(algo, bits, &key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+#ifndef ENABLE_FIPS140
+	ret = _gnutls_pk_verify_params(algo, &key->params);
+#else
+	ret = pct_test(algo, &key->params);
+#endif
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
