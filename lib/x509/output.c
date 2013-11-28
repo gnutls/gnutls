@@ -162,7 +162,7 @@ static void print_aia(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
 	int err;
 	int seq = 0;
-	gnutls_datum_t data;
+	gnutls_datum_t data = { NULL, 0 };
 
 	for (;;) {
 		err = gnutls_x509_crt_get_authority_info_access
@@ -172,7 +172,7 @@ static void print_aia(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 		if (err < 0) {
 			addf(str, "error: get_aia: %s\n",
 			     gnutls_strerror(err));
-			return;
+			goto cleanup;
 		}
 
 		addf(str, _("\t\t\tAccess Method: %.*s"), data.size,
@@ -188,33 +188,47 @@ static void print_aia(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 		else
 			adds(str, " (UNKNOWN)\n");
 
+		gnutls_free(data.data);
+		data.data = NULL;
+
 		err = gnutls_x509_crt_get_authority_info_access
 		    (cert, seq, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE,
 		     &data, NULL);
 		if (err < 0) {
 			addf(str, "error: get_aia type: %s\n",
 			     gnutls_strerror(err));
-			return;
+			goto cleanup;
 		}
 
 		if (data.size == sizeof("uniformResourceIdentifier") &&
 		    memcmp(data.data, "uniformResourceIdentifier",
 			   data.size) == 0) {
+
+			gnutls_free(data.data);
+			data.data = NULL;
+
 			adds(str, "\t\t\tAccess Location URI: ");
 			err = gnutls_x509_crt_get_authority_info_access
 			    (cert, seq, GNUTLS_IA_URI, &data, NULL);
 			if (err < 0) {
 				addf(str, "error: get_aia uri: %s\n",
 				     gnutls_strerror(err));
-				return;
+				goto cleanup;
 			}
 			addf(str, "%.*s\n", data.size, data.data);
 		} else
 			adds(str,
 			     "\t\t\tUnsupported accessLocation type\n");
 
+		gnutls_free(data.data);
+		data.data = NULL;
+
 		seq++;
 	}
+
+	return;
+cleanup:
+	gnutls_free(data.data);
 }
 
 static void print_ski(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
