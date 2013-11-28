@@ -871,6 +871,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			struct dsa_public_key pub;
 			mpz_t r;
 			mpz_t x, y;
+			int max_tries;
 			unsigned have_q = 0;
 			
 			if (algo != params->algo)
@@ -888,18 +889,31 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			mpz_init(x);
 			mpz_init(y);
 			
-			if (have_q) {
-				mpz_set(r, pub.q);
-				mpz_sub_ui(r, r, 2);
-				nettle_mpz_random(x, NULL, rnd_func, r);
-				mpz_add_ui(x, x, 1);
-			} else {
-				if (level == 0)
-					level = mpz_sizeinbase(pub.p, 2);
-				nettle_mpz_random_size(x, NULL, rnd_func, level);
-			}
+			max_tries = 3;
+			do {
+				if (have_q) {
+					mpz_set(r, pub.q);
+					mpz_sub_ui(r, r, 2);
+					nettle_mpz_random(x, NULL, rnd_func, r);
+					mpz_add_ui(x, x, 1);
+				} else {
+					if (level == 0)
+						level = mpz_sizeinbase(pub.p, 2);
+					nettle_mpz_random_size(x, NULL, rnd_func, level);
 
-			mpz_powm(y, pub.g, x, pub.p);
+					if (level >= mpz_sizeinbase(pub.p, 2))
+						mpz_mod(x, x, pub.p);
+				}
+
+				mpz_powm(y, pub.g, x, pub.p);
+
+				max_tries--;
+				if (max_tries <= 0) {
+					gnutls_assert();
+					ret = GNUTLS_E_RANDOM_FAILED;
+					goto dsa_fail;
+				}
+			} while(mpz_cmp_ui(y, 1) == 0);
 			
 			params->params[DSA_Y] = _gnutls_mpi_alloc_like(&pub.p);
 			if (params->params[DSA_Y] == NULL) {
@@ -909,6 +923,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			params->params[DSA_X] = _gnutls_mpi_alloc_like(&pub.p);
 			if (params->params[DSA_X] == NULL) {
+				_gnutls_mpi_release(&params->params[DSA_Y]);
 				ret = GNUTLS_E_MEMORY_ERROR;
 				goto dsa_fail;
 			}
