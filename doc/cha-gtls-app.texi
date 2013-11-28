@@ -196,6 +196,10 @@ int main()
 @}
 @end example
 
+Note that @funcref{gnutls_global_init} is itself not thread safe. It is also not recommended
+to initialize it on every available thread, but if need to, it should be protected using
+mutex locks.
+
 @showfuncdesc{gnutls_global_set_mutex}
 
 @node Callback functions
@@ -246,9 +250,11 @@ library.
 
 GnuTLS must be initialized before it can be used.  The library is
 initialized by calling @funcref{gnutls_global_init}. That call
-typically enables CPU-specific acceleration, and performs any requires
-precalculations needed by the library. The resources
-allocated by the initialization process can be released if the
+typically enables CPU-specific acceleration, performs any required
+precalculations needed, and initializes subsystems that could be
+used later (e.g., PKCS #11 -- see @ref{PKCS11 Initialization}).
+
+The resources allocated by the initialization process can be released if the
 application no longer has a need to call GnuTLS functions, this is
 done by calling @funcref{gnutls_global_deinit}.
 
