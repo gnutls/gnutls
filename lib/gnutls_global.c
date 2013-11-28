@@ -338,18 +338,6 @@ out:
 	return result;
 }
 
-#ifdef ENABLE_FIPS140
-__attribute__((constructor))
-static void lib_init(void)
-{
-	if (gnutls_global_init2(GNUTLS_GLOBAL_INIT_MINIMAL|GNUTLS_GLOBAL_INIT_CRYPTO) < 0) {
-		fprintf(stderr, "Error in GnuTLS initialization");
-		abort();
-	}
-}
-#endif
-
-
 /**
  * gnutls_global_init:
  *
