@@ -504,6 +504,108 @@ cleanup:
 	return ret;
 }
 
+/* Known answer tests for DH */
+static int test_ecdh(void)
+{
+	int ret;
+	gnutls_pk_params_st priv;
+	gnutls_pk_params_st pub;
+	gnutls_datum_t out = {NULL, 0};
+	static const uint8_t known_key[] = { 
+		0x22, 0x7a, 0x95, 0x98, 0x5f, 0xb1, 0x25, 0x79, 
+		0xee, 0x07, 0xe3, 0x8b, 0x1a, 0x97, 0x1d, 0x63, 
+		0x53, 0xa8, 0xbd, 0xde, 0x67, 0x4b, 0xcf, 0xa4, 
+		0x5f, 0x5e, 0x67, 0x27, 0x6d, 0x86, 0x27, 0x26 };
+	static const uint8_t test_k[] = { /* priv */
+		0x52, 0x9c, 0x30, 0xac, 0x6b, 0xce, 0x71, 0x9a, 
+		0x37, 0xcd, 0x40, 0x93, 0xbf, 0xf0, 0x36, 0x89, 
+		0x53, 0xcc, 0x0e, 0x17, 0xc6, 0xb6, 0xe2, 0x6a, 
+		0x3c, 0x2c, 0x51, 0xdb, 0xa6, 0x69, 0x8c, 0xb1 };
+	static const uint8_t test_x[] = {
+		0x51, 0x35, 0xd1, 0xd2, 0xb6, 0xad, 0x13, 0xf4, 
+		0xa2, 0x25, 0xd3, 0x85, 0x83, 0xbe, 0x42, 0x1e, 
+		0x19, 0x09, 0x54, 0x39, 0x00, 0x46, 0x91, 0x49, 
+		0x0f, 0x3f, 0xaf, 0x3f, 0x67, 0xda, 0x10, 0x6f };
+	static const uint8_t test_y[] = { /* y=g^x mod p */
+		0x07, 0x3a, 0xa1, 0xa2, 0x47, 0x3d, 0xa2, 0x74, 
+		0x74, 0xc2, 0xde, 0x62, 0xb6, 0xb9, 0x59, 0xc9, 
+		0x56, 0xf6, 0x9e, 0x17, 0xea, 0xbf, 0x7d, 0xa1, 
+		0xd7, 0x65, 0xd6, 0x7b, 0xac, 0xca, 0xd5, 0xe3 };
+	gnutls_pk_params_init(&priv);
+	gnutls_pk_params_init(&pub);
+	
+	priv.flags = GNUTLS_ECC_CURVE_SECP256R1;
+	pub.flags = GNUTLS_ECC_CURVE_SECP256R1;
+	
+	priv.algo = pub.algo = GNUTLS_PK_EC;
+	
+	ret = _gnutls_mpi_scan(&priv.params[ECC_K], test_k, sizeof(test_k));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_scan(&priv.params[ECC_X], test_x, sizeof(test_x));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_scan(&priv.params[ECC_Y], test_y, sizeof(test_y));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_scan(&pub.params[ECC_X], test_x, sizeof(test_x));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_scan(&pub.params[ECC_Y], test_y, sizeof(test_y));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* check whether Y^X mod p is the expected value */
+	ret = _gnutls_pk_derive(GNUTLS_PK_EC, &out, &priv, &pub);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (sizeof(known_key) != out.size) {
+		ret = GNUTLS_E_SELF_TEST_ERROR;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (memcmp(out.data, known_key, out.size) != 0) {
+		ret = GNUTLS_E_SELF_TEST_ERROR;
+		gnutls_assert();
+		goto cleanup;
+	}
+	
+	ret = 0;
+cleanup:
+	_gnutls_mpi_release(&pub.params[ECC_Y]);
+	_gnutls_mpi_release(&pub.params[ECC_X]);
+	_gnutls_mpi_release(&priv.params[ECC_K]);
+	_gnutls_mpi_release(&priv.params[ECC_X]);
+	_gnutls_mpi_release(&priv.params[ECC_Y]);
+	gnutls_free(out.data);
+
+	if (ret < 0) {
+		_gnutls_debug_log("ECDH self test failed\n");
+	} else {
+		_gnutls_debug_log("ECDH self test succeeded\n");
+	}
+
+	return ret;
+}
+
 /**
  * gnutls_pk_self_test:
  * @all: if non-zero then tests to all public key algorithms are performed.
@@ -545,6 +647,17 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 			      dsa_privkey, dsa_sig);
 		PK_TEST(GNUTLS_PK_DSA, test_sig, 1024, GNUTLS_DIG_SHA1);
 	case GNUTLS_PK_EC:	/* Testing ECDSA */
+		/* Test ECDH */
+		ret = test_ecdh();
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		if (all == 0)
+			return 0;
+
+		/* Test ECDSA */
 #ifdef ENABLE_NON_SUITEB_CURVES
 		PK_KNOWN_TEST(GNUTLS_PK_EC, 0,
 			      GNUTLS_CURVE_TO_BITS
