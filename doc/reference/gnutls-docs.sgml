@@ -11,7 +11,7 @@
     <releaseinfo>
       for GnuTLS &version;.
       The latest version of this documentation can be found on-line at
-      <ulink role="online-location" url="https://www.gnu.org/software/gnutls/reference/">https://www.gnu.org/software/gnutls/reference/</ulink>.
+      <ulink role="online-location" url="http://www.gnutls.org/reference/">http://www.gnutls.org/reference/</ulink>.
     </releaseinfo>
   </bookinfo>
 
@@ -25,8 +25,8 @@
 
     <para>
       More up to date information can be found at
-      <ulink url="http://www.gnu.org/software/gnutls/">
-	http://www.gnu.org/software/gnutls/</ulink>.
+      <ulink url="http://www.gnutls.org/">
+	http://www.gnutls.org/</ulink>.
     </para>
 
     <xi:include href="xml/gnutls.xml"/>
