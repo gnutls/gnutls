@@ -1461,11 +1461,23 @@ static int pct_test(gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* param
 {
 int ret;
 gnutls_datum_t sig = {NULL, 0};
-const char data[20] = "onetwothreefourfive";
+const char const_data[20] = "onetwothreefourfive";
 gnutls_datum_t ddata;
+char* gen_data = NULL;
 
-	ddata.data = (void*)data;
-	ddata.size = sizeof(data);
+	if (algo == GNUTLS_PK_DSA) {
+		unsigned hash_len;
+
+		_gnutls_dsa_q_to_hash(algo, params, &hash_len);
+		gen_data = gnutls_malloc(hash_len);
+		gnutls_rnd(GNUTLS_RND_NONCE, gen_data, hash_len);
+
+		ddata.data = (void*)gen_data;
+		ddata.size = hash_len;
+	} else {
+		ddata.data = (void*)const_data;
+		ddata.size = sizeof(const_data);
+	}
 
 	switch (algo) {
 	case GNUTLS_PK_RSA:
@@ -1476,7 +1488,7 @@ gnutls_datum_t ddata;
 		ret = _gnutls_pk_sign(algo, &sig, &ddata, params);
 		if (ret < 0) {
 			ret = GNUTLS_E_PK_GENERATION_ERROR;
-			return gnutls_assert_val(ret);
+			goto cleanup;
 		}
 
 		ret = _gnutls_pk_verify(algo, &ddata, &sig, params);
@@ -1486,13 +1498,16 @@ gnutls_datum_t ddata;
 			goto cleanup;
 		}
 		break;
+		
 
 	default:
-		return gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+		ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+		goto cleanup;
 	}
 
 	ret = 0;
 cleanup:
+	gnutls_free(gen_data);
 	gnutls_free(sig.data);
 	return ret;
 }
