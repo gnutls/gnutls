@@ -62,6 +62,9 @@ static int _rngfips_reinit(struct fips_ctx* fctx);
    
    The output number will be always unique if this function is called 
    less than 2^32 times per nanosecond.
+    
+   This function is used to get an initial value for the DT of DRBG-AES
+   which is later being incremented.
 */
 static int
 get_dt(void* priv, uint8_t dt[AES_BLOCK_SIZE])
@@ -117,7 +120,7 @@ static int reseed(struct drbg_aes_ctx *ctx)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	drbg_aes_seed(ctx, buffer);
+	drbg_aes_seed(ctx, buffer, NULL, get_dt);
 
 	return 0;
 }
@@ -134,7 +137,7 @@ static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx* fctx,
 			return gnutls_assert_val(ret);
 	}
 
-	ret = drbg_aes_random(ctx, length, buffer, NULL, get_dt);
+	ret = drbg_aes_random(ctx, length, buffer);
 	if (ret == 0)
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
 
@@ -251,8 +254,11 @@ static int selftest_kat(void)
 	ret = drbg_aes_self_test();
 	RND_UNLOCK;
 
-	if (ret == 0)
+	if (ret == 0) {
+		_gnutls_debug_log("DRBG-AES self test failed\n");
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+	} else
+		_gnutls_debug_log("DRBG-AES self test succeeded\n");
 		
 	return 0;
 }

@@ -129,12 +129,6 @@ int drbg_aes_self_test(void)
 		if (ret == 0)
 			return 0;
 
-		/* Setup the seed.  */
-		drbg_aes_seed(&test_ctx, tv[i].v);
-
-		if (drbg_aes_is_seeded(&test_ctx) == 0)
-			return 0;
-
 		priv.dt = tv[i].dt;
 		priv.counter =
 		    ((tv[i].dt[12] << 24) | (tv[i].dt[13] << 16) | (tv[i].
@@ -142,11 +136,17 @@ int drbg_aes_self_test(void)
 								    << 8) |
 		     (tv[i].dt[15]));
 
+		/* Setup the seed.  */
+		drbg_aes_seed(&test_ctx, tv[i].v, &priv, get_dt);
+
+		if (drbg_aes_is_seeded(&test_ctx) == 0)
+			return 0;
+
 		/* Get and compare the first three results.  */
 		for (j = 0; j < 3; j++) {
 			/* Compute the next value.  */
 			if (drbg_aes_random
-			    (&test_ctx, 16, result, &priv, get_dt) == 0)
+			    (&test_ctx, 16, result) == 0)
 				return 0;
 
 			/* Compare it to the known value.  */

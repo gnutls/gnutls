@@ -42,17 +42,30 @@ drbg_aes_set_key(struct drbg_aes_ctx *ctx, unsigned length,
 
 /* Set's V value */
 void
-drbg_aes_seed(struct drbg_aes_ctx *ctx, const uint8_t seed[AES_BLOCK_SIZE])
+drbg_aes_seed(struct drbg_aes_ctx *ctx, const uint8_t seed[AES_BLOCK_SIZE],
+	void *dt_priv, aes_dt dt_func)
 {
 	memcpy(ctx->v, seed, AES_BLOCK_SIZE);
+	
+	dt_func(dt_priv, ctx->dt);
+	
 	ctx->seeded = 1;
 }
 
+/* This is nettle's increment macro */
+/* Requires that size > 0 */
+#define INCREMENT(size, ctr)                    \
+  do {                                          \
+    unsigned increment_i = (size) - 1;          \
+    if (++(ctr)[increment_i] == 0)              \
+      while (increment_i > 0                    \
+             && ++(ctr)[--increment_i] == 0 )   \
+        ;                                       \
+  } while (0)
+ 
 int
-drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
-		void *dt_priv, aes_dt dt_func)
+drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
 {
-	uint8_t dt[AES_BLOCK_SIZE];
 	uint8_t intermediate[AES_BLOCK_SIZE];
 	uint8_t tmp[AES_BLOCK_SIZE];
 	unsigned left;
@@ -63,10 +76,8 @@ drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 	/* Throw the first block generated. FIPS 140-2 requirement 
 	 */
 	if (ctx->prev_block_present == 0) {
-		dt_func(dt_priv, dt);
-
 		/* I = AES_K(dt) */
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, intermediate, dt);
+		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, intermediate, ctx->dt);
 
 		/* tmp = I XOR V */
 		memxor3(tmp, ctx->v, intermediate, AES_BLOCK_SIZE);
@@ -81,15 +92,16 @@ drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->v, tmp);
 
 		ctx->prev_block_present = 1;
+		
+		INCREMENT(sizeof(ctx->dt), ctx->dt);
 	}
 
 	/* Perform the actual encryption */
 	for (left = length; left >= AES_BLOCK_SIZE;
 	     left -= AES_BLOCK_SIZE, dst += AES_BLOCK_SIZE) {
-		dt_func(dt_priv, dt);
 
 		/* I = AES_K(dt) */
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, intermediate, dt);
+		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, intermediate, ctx->dt);
 
 		/* tmp = I XOR V */
 		memxor3(tmp, ctx->v, intermediate, AES_BLOCK_SIZE);
@@ -106,12 +118,14 @@ drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 		/* V = AES_K(R XOR I) */
 		memxor3(tmp, dst, intermediate, AES_BLOCK_SIZE);
 		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->v, tmp);
+		
+		INCREMENT(sizeof(ctx->dt), ctx->dt);
 	}
 
 	if (left > 0) {		/* partial fill */
 
 		/* I = AES_K(dt) */
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, intermediate, dt);
+		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, intermediate, ctx->dt);
 		memxor3(tmp, ctx->v, intermediate, AES_BLOCK_SIZE);
 
 		/* tmp = R = AES_K(I XOR V) */
@@ -127,6 +141,8 @@ drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 		/* V = AES_K(R XOR I) */
 		memxor(tmp, intermediate, AES_BLOCK_SIZE);
 		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->v, tmp);
+		
+		INCREMENT(sizeof(ctx->dt), ctx->dt);
 	}
 
 	return 1;
