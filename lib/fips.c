@@ -277,6 +277,12 @@ int _gnutls_fips_perform_self_checks(void)
 		goto error;
 	}
 
+	ret = gnutls_pk_self_test(0, GNUTLS_PK_DH);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	if (_gnutls_rnd_ops.self_test == NULL) {
 		gnutls_assert();
 		goto error;

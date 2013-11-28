@@ -27,6 +27,8 @@
 #include <gnutls/crypto.h>
 #include <gnutls_errors.h>
 #include <gnutls/abstract.h>
+#include <gnutls_pk.h>
+#include <debug.h>
 
 #define DATASTR "Hello there!"
 static const gnutls_datum_t signed_data = {
@@ -414,6 +416,94 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 			if (all == 0) \
 				return 0
 
+
+/* Known answer tests for DH */
+static int test_dh(void)
+{
+	int ret;
+	gnutls_pk_params_st priv;
+	gnutls_pk_params_st pub;
+	gnutls_datum_t out = {NULL, 0};
+	static const uint8_t known_dh_k[] = {
+		0x10, 0x25, 0x04, 0xb5, 0xc6, 0xc2, 0xcb, 
+		0x0c, 0xe9, 0xc5, 0x58, 0x0d, 0x22, 0x62};
+	static const uint8_t test_p[] = {
+		0x24, 0x85, 0xdd, 0x3a, 0x74, 0x42, 0xe4, 
+		0xb3, 0xf1, 0x0b, 0x13, 0xf9, 0x17, 0x4d };
+	static const uint8_t test_g[] = { 0x02 };
+	static const uint8_t test_x[] = {
+		0x06, 0x2c, 0x96, 0xae, 0x0e, 0x9e, 0x9b, 
+		0xbb, 0x41, 0x51, 0x7a, 0xa7, 0xc5, 0xfe };
+	static const uint8_t test_y[] = { /* y=g^x mod p */
+		0x1e, 0xca, 0x23, 0x2a, 0xfd, 0x34, 0xe1, 
+		0x10, 0x7a, 0xff, 0xaf, 0x2d, 0xaa, 0x53 };
+
+	gnutls_pk_params_init(&priv);
+	gnutls_pk_params_init(&pub);
+	
+	priv.algo = pub.algo = GNUTLS_PK_DH;
+	
+	ret = _gnutls_mpi_scan(&priv.params[DH_P], test_p, sizeof(test_p));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_scan(&priv.params[DH_G], test_g, sizeof(test_g));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_scan(&priv.params[DH_X], test_x, sizeof(test_x));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_scan(&pub.params[DH_Y], test_y, sizeof(test_y));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* check whether Y^X mod p is the expected value */
+	ret = _gnutls_pk_derive(GNUTLS_PK_DH, &out, &priv, &pub);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (sizeof(known_dh_k) != out.size) {
+		ret = GNUTLS_E_SELF_TEST_ERROR;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (memcmp(out.data, known_dh_k, out.size) != 0) {
+		ret = GNUTLS_E_SELF_TEST_ERROR;
+		gnutls_assert();
+		goto cleanup;
+	}
+	
+	
+	ret = 0;
+cleanup:
+	_gnutls_mpi_release(&pub.params[DH_Y]);
+	_gnutls_mpi_release(&priv.params[DH_G]);
+	_gnutls_mpi_release(&priv.params[DH_P]);
+	_gnutls_mpi_release(&priv.params[DH_X]);
+	gnutls_free(out.data);
+
+	if (ret < 0) {
+		_gnutls_debug_log("DH self test failed\n");
+	} else {
+		_gnutls_debug_log("DH self test succeeded\n");
+	}
+
+	return ret;
+}
+
 /**
  * gnutls_pk_self_test:
  * @all: if non-zero then tests to all public key algorithms are performed.
@@ -434,6 +524,16 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 
 	switch (pk) {
 	case GNUTLS_PK_UNKNOWN:
+	
+	case GNUTLS_PK_DH:
+		ret = test_dh();
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		if (all == 0)
+			return 0;
 
 	case GNUTLS_PK_RSA:
 		PK_KNOWN_TEST(GNUTLS_PK_RSA, 1, 512, GNUTLS_DIG_SHA1,
