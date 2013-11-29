@@ -11,6 +11,9 @@ variable complaint from valgrind.
 ** libgnutls: It only links to librt if the required functions are
 not present in libc. This also prevents an indirect linking to libpthread.
 
+** libgnutls: Fixed issue with gnulib strerror replacement by adding
+the strerror gnulib module.
+
 ** certtool: The --verify option will use the system CAs if the
 load-ca-certificate option is not provided.
 
