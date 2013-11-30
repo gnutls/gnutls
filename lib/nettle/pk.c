@@ -793,6 +793,14 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 				goto dsa_fail;
 			}
 #else
+			/* unfortunately nettle only accepts 160 or 256
+			 * q_bits size. The check below makes sure we handle
+			 * cases in between by rounding up, but fail when
+			 * larger numbers are requested. */
+			if (q_bits < 160)
+				q_bits = 160;
+			else if (q_bits > 160 && q_bits <= 256)
+				q_bits = 256;
 			ret =
 			    dsa_generate_keypair(&pub, &priv,
 						 NULL, rnd_func, 
