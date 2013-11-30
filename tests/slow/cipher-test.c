@@ -18,8 +18,9 @@ static void tls_log_func(int level, const char *str)
 }
 
 #ifndef ENABLE_SELF_CHECKS
-#include "../../lib/crypto-selftests.c"
-#include "../../lib/crypto-selftests-pk.c"
+# define AVOID_INTERNALS
+# include "../../lib/crypto-selftests.c"
+# include "../../lib/crypto-selftests-pk.c"
 #endif
 
 int main(int argc, char **argv)
