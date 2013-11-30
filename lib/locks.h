@@ -70,8 +70,11 @@ extern mutex_unlock_func gnutls_mutex_unlock;
 # define GNUTLS_STATIC_MUTEX_UNLOCK(mutex) \
 	pthread_mutex_unlock(&mutex)
 
-# define GNUTLS_STATIC_MUTEX_DEINIT(mutex) \
-	pthread_mutex_destroy(&mutex)
+# define GNUTLS_STATIC_MUTEX_DEINIT(mutex) { \
+		static const pthread_mutex_t t = PTHREAD_MUTEX_INITIALIZER; \
+		pthread_mutex_destroy(&mutex); \
+		memcpy(&mutex, &t, sizeof(mutex)); \
+	}
 
 #else
 # define GNUTLS_STATIC_MUTEX(mutex)
