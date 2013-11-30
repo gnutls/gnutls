@@ -412,13 +412,28 @@ test_code_t test_aes_gcm(gnutls_session_t session)
 	return ret;
 }
 
-test_code_t test_camellia(gnutls_session_t session)
+test_code_t test_camellia_cbc(gnutls_session_t session)
 {
 	int ret;
 
 	sprintf(prio_str,
 		INIT_STR "+CAMELLIA-128-CBC:" ALL_COMP ":" ALL_CERTTYPES
 		":%s:" ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+	return ret;
+}
+
+test_code_t test_camellia_gcm(gnutls_session_t session)
+{
+	int ret;
+
+	sprintf(prio_str,
+		INIT_STR "+CAMELLIA-128-GCM:+AEAD:" ALL_COMP ":" ALL_CERTTYPES
+		":%s:" ALL_KX ":%s", protocol_str, rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
