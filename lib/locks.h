@@ -25,10 +25,59 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls_int.h>
+#include <system.h>
 
 extern mutex_init_func gnutls_mutex_init;
 extern mutex_deinit_func gnutls_mutex_deinit;
 extern mutex_lock_func gnutls_mutex_lock;
 extern mutex_unlock_func gnutls_mutex_unlock;
+
+#if defined(HAVE_WIN32_LOCKS)
+# include <windows.h>
+
+/* Idea based based on comment 2 at:
+ * http://stackoverflow.com/questions/3555859/is-it-possible-to-do-static-initialization-of-mutexes-in-windows
+ */
+# define GNUTLS_STATIC_MUTEX(mutex) \
+	static CRITICAL_SECTION *mutex = NULL
+
+# define GNUTLS_STATIC_MUTEX_LOCK(mutex) \
+	if (mutex == NULL) { \
+		CRITICAL_SECTION *mutex##tmp = malloc(sizeof(CRITICAL_SECTION)); \
+		InitializeCriticalSection(mutex##tmp); \
+		if (InterlockedCompareExchangePointer((PVOID*)&mutex, (PVOID)mutex##tmp, NULL) != NULL) { \
+			DeleteCriticalSection(mutex##tmp); \
+			free(mutex##tmp); \
+		} \
+	} \
+	EnterCriticalSection(mutex)
+
+# define GNUTLS_STATIC_MUTEX_UNLOCK(mutex) \
+	LeaveCriticalSection(mutex)
+
+# define GNUTLS_STATIC_MUTEX_DEINIT(mutex) \
+	DeleteCriticalSection(mutex); \
+	free(mutex); mutex = NULL
+
+#elif defined(HAVE_PTHREAD_LOCKS)
+# include <pthread.h>
+# define GNUTLS_STATIC_MUTEX(mutex) \
+	static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER
+
+# define GNUTLS_STATIC_MUTEX_LOCK(mutex) \
+	pthread_mutex_lock(&mutex)
+
+# define GNUTLS_STATIC_MUTEX_UNLOCK(mutex) \
+	pthread_mutex_unlock(&mutex)
+
+# define GNUTLS_STATIC_MUTEX_DEINIT(mutex) \
+	pthread_mutex_destroy(&mutex)
+
+#else
+# define GNUTLS_STATIC_MUTEX(mutex)
+# define GNUTLS_STATIC_MUTEX_LOCK(mutex)
+# define GNUTLS_STATIC_MUTEX_UNLOCK(mutex)
+# define GNUTLS_STATIC_MUTEX_DEINIT(mutex)
+#endif
 
 #endif

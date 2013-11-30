@@ -165,6 +165,7 @@ gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
 
 }
 
+GNUTLS_STATIC_MUTEX(global_init_mutex);
 static int _gnutls_init = 0;
 
 /**
@@ -183,21 +184,16 @@ static int _gnutls_init = 0;
  * function can be called many times, but will only do something the
  * first time.
  *
- * Note!  This function is not thread safe.  If two threads call this
- * function simultaneously, they can cause a race between checking
- * the global counter and incrementing it, causing both threads to
- * execute the library initialization code.  That could lead to a
- * memory leak or even a crash.  To handle this, your application should 
- * invoke this function after aquiring a thread mutex.  
- *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
 int gnutls_global_init(void)
 {
-	int result = 0;
-	int res, level;
+	int ret = 0, res;
+	int level;
 	const char* e;
+	
+	GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
 
 	if (_gnutls_init++)
 		goto out;
@@ -211,15 +207,18 @@ int gnutls_global_init(void)
 		_gnutls_debug_log("Enabled GnuTLS logging...\n");
 	}
 
-	if (gl_sockets_startup(SOCKETS_1_1))
-		return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+	if (gl_sockets_startup(SOCKETS_1_1)) {
+		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+		goto out;
+	}
 
 	bindtextdomain(PACKAGE, LOCALEDIR);
 
-	res = gnutls_crypto_init();
-	if (res != 0) {
+	ret = gnutls_crypto_init();
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_CRYPTO_INIT_FAILED;
+		ret = GNUTLS_E_CRYPTO_INIT_FAILED;
+		goto out;
 	}
 
 	_gnutls_register_accel_crypto();
@@ -234,43 +233,44 @@ int gnutls_global_init(void)
 		    ("Checking for libtasn1 failed: %s < %s\n",
 		     asn1_check_version(NULL),
 		     GNUTLS_MIN_LIBTASN1_VERSION);
-		return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
+		ret = GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
+		goto out;
 	}
 
 	res = asn1_array2tree(pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
 	if (res != ASN1_SUCCESS) {
-		result = _gnutls_asn2err(res);
+		ret = _gnutls_asn2err(res);
 		goto out;
 	}
 
 	res = asn1_array2tree(gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
 	if (res != ASN1_SUCCESS) {
-		result = _gnutls_asn2err(res);
+		ret = _gnutls_asn2err(res);
 		goto out;
 	}
 
 	/* Initialize the random generator */
-	result = _gnutls_rnd_init();
-	if (result < 0) {
+	ret = _gnutls_rnd_init();
+	if (ret < 0) {
 		gnutls_assert();
 		goto out;
 	}
 
 	/* Initialize the default TLS extensions */
-	result = _gnutls_ext_init();
-	if (result < 0) {
+	ret = _gnutls_ext_init();
+	if (ret < 0) {
 		gnutls_assert();
 		goto out;
 	}
 
-	result = gnutls_mutex_init(&_gnutls_file_mutex);
-	if (result < 0) {
+	ret = gnutls_mutex_init(&_gnutls_file_mutex);
+	if (ret < 0) {
 		gnutls_assert();
 		goto out;
 	}
 
-	result = gnutls_system_global_init();
-	if (result < 0) {
+	ret = gnutls_system_global_init();
+	if (ret < 0) {
 		gnutls_assert();
 		goto out;
 	}
@@ -281,7 +281,8 @@ int gnutls_global_init(void)
 	_gnutls_cryptodev_init();
 
       out:
-	return result;
+	GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
+	return ret;
 }
 
 /**
@@ -290,12 +291,13 @@ int gnutls_global_init(void)
  * This function deinitializes the global data, that were initialized
  * using gnutls_global_init().
  *
- * Note!  This function is not thread safe.  See the discussion for
- * gnutls_global_init() for more information.
  **/
 void gnutls_global_deinit(void)
 {
+	GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
 	if (_gnutls_init == 1) {
+		_gnutls_init = 0;
+		GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
 		gl_sockets_cleanup();
 		gnutls_crypto_deinit();
 		_gnutls_rnd_deinit();
@@ -309,14 +311,13 @@ void gnutls_global_deinit(void)
 		gnutls_pkcs11_deinit();
 #endif
 		gnutls_mutex_deinit(&_gnutls_file_mutex);
+		GNUTLS_STATIC_MUTEX_DEINIT(global_init_mutex);
+	} else {
+		if (_gnutls_init > 0)
+			_gnutls_init--;
+		GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
 	}
-	_gnutls_init--;
 }
-
-/* These functions should be elsewere. Kept here for
- * historical reasons.
- */
-
 
 /**
  * gnutls_check_version:
