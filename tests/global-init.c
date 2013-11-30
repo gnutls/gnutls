@@ -40,7 +40,6 @@ void doit(void)
 {
 	int ret;
 
-#ifdef ENABLE_FIPS140
 	/* In FIPS140 a constructor is being used for MINIMAL so
 	 * the following should succeed.
 	 */
@@ -48,12 +47,6 @@ void doit(void)
 	if (ret < 0) {
 		fail("Could not initialize: %d\n", __LINE__);
 	}
-#else
-	ret = gnutls_global_init2(GNUTLS_GLOBAL_INIT_PKCS11);
-	if (ret != GNUTLS_E_INVALID_REQUEST) {
-		fail("Initialization should have failed: %d\n", __LINE__);
-	}
-#endif
 	
 	ret = gnutls_global_init();
 	if (ret < 0) {
