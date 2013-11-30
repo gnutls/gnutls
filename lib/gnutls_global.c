@@ -210,7 +210,8 @@ int gnutls_global_init2(unsigned int flags)
 	flags &= ~loaded_modules;
 	
 	if (flags == 0) { /* The requested were already loaded */
-		return 0;
+		ret = 0;
+		goto out;
 	}
 	
 	if (!(flags & GNUTLS_GLOBAL_INIT_MINIMAL) &&
@@ -235,8 +236,10 @@ int gnutls_global_init2(unsigned int flags)
 			_gnutls_debug_log("Enabled GnuTLS logging...\n");
 		}
 
-		if (gl_sockets_startup(SOCKETS_1_1))
-			return gnutls_assert_val(GNUTLS_E_SOCKETS_INIT_ERROR);
+		if (gl_sockets_startup(SOCKETS_1_1)) {
+			ret = gnutls_assert_val(GNUTLS_E_SOCKETS_INIT_ERROR);
+			goto out;
+		}
 
 		bindtextdomain(PACKAGE, LOCALEDIR);
 
