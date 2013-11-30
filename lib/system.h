@@ -53,14 +53,12 @@ ssize_t system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 ssize_t system_read(gnutls_transport_ptr_t ptr, void *data,
 		    size_t data_size);
 
-#ifdef _WIN32
-#define HAVE_WIN32_LOCKS
+#if defined(_WIN32)
+# define HAVE_WIN32_LOCKS
+#elif defined(HAVE_LIBPTHREAD) || defined(HAVE_PTHREAD_MUTEX_LOCK)
+# define HAVE_PTHREAD_LOCKS
 #else
-#ifdef HAVE_LIBPTHREAD
-#define HAVE_PTHREAD_LOCKS
-#else
-#define HAVE_NO_LOCKS
-#endif
+# define HAVE_NO_LOCKS
 #endif
 
 extern gnutls_time_func gnutls_time;
