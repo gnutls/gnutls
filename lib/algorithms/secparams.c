@@ -51,7 +51,7 @@ static const gnutls_sec_params_entry sec_params[] = {
 #else
 	{"Low", GNUTLS_SEC_PARAM_LOW, 80, 1248, 1024, 160, 160},
 	{"Legacy", GNUTLS_SEC_PARAM_LEGACY, 96, 1776, 2048, 192, 192},
-	{"Normal", GNUTLS_SEC_PARAM_NORMAL, 112, 2432, 2048, 224, 224},
+	{"Normal", GNUTLS_SEC_PARAM_NORMAL, 112, 2432, 2048, 256, 224},
 	{"High", GNUTLS_SEC_PARAM_HIGH, 128, 3248, 3072, 256, 256},
 	{"Ultra", GNUTLS_SEC_PARAM_ULTRA, 256, 15424, 3072, 512, 512},
 #endif
@@ -110,7 +110,6 @@ unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits)
 			break;
 		}
 	);
-
 	return ret;
 }
 
