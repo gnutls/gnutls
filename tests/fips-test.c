@@ -10,7 +10,7 @@
 #include <gnutls/x509.h>
 #include <gnutls/fips140.h>
 
-void _gnutls_fips140_simulate_error(void);
+void _gnutls_lib_simulate_error(void);
 
 /* This does check the FIPS140 support.
  */
@@ -99,7 +99,7 @@ void doit(void)
 	gnutls_deinit(session);
 
 	/* Test when FIPS140 is set to error state */
-	_gnutls_fips140_simulate_error();
+	_gnutls_lib_simulate_error();
 
 
 	/* Try crypto.h functionality */

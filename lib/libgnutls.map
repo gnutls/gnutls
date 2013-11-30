@@ -972,7 +972,7 @@ GNUTLS_PRIVATE {
     _gnutls_buffer_to_datum;
 
     # Internal symbols used by fips-test
-    _gnutls_fips140_simulate_error;
+    _gnutls_lib_simulate_error;
     # Internal symbols needed by psktool:
 
     # Internal symbols needed by gnutls-cli-debug:

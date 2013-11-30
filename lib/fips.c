@@ -364,7 +364,7 @@ int ret = _gnutls_fips_mode_enabled();
 #endif
 }
 
-void _gnutls_fips140_simulate_error(void)
+void _gnutls_lib_simulate_error(void)
 {
 	_gnutls_switch_lib_state(LIB_STATE_ERROR);
 }
