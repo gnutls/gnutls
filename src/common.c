@@ -921,7 +921,7 @@ int check_command(gnutls_session_t session, const char *str)
 	size_t len = strnlen(str, 128);
 	int ret;
 
-	fprintf(stderr, "*** Processing %zu bytes command: %s\n", len,
+	fprintf(stderr, "*** Processing %u bytes command: %s\n", (unsigned)len,
 		str);
 	if (len > 2 && str[0] == str[1] && str[0] == '*') {
 		if (strncmp
