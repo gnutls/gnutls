@@ -77,7 +77,7 @@ gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
 {
 	gnutls_x509_trust_list_t tmp;
 	
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 	
 	tmp =
 	    gnutls_calloc(1, sizeof(struct gnutls_x509_trust_list_st));

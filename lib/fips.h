@@ -29,52 +29,41 @@
 #define FIPS140_RND_KEY_SIZE 32
 
 typedef enum {
-  FIPS_STATE_POWERON,
-  FIPS_STATE_ZOMBIE,
-  FIPS_STATE_INIT,
-  FIPS_STATE_SELFTEST,
-  FIPS_STATE_OPERATIONAL,
-  FIPS_STATE_ERROR,
-  FIPS_STATE_SHUTDOWN
-} gnutls_fips_state_t;
-
-#ifdef ENABLE_FIPS140
+  LIB_STATE_POWERON,
+  LIB_STATE_ZOMBIE,
+  LIB_STATE_INIT,
+  LIB_STATE_SELFTEST,
+  LIB_STATE_OPERATIONAL,
+  LIB_STATE_ERROR,
+  LIB_STATE_SHUTDOWN
+} gnutls_lib_state_t;
 
 /* do not access directly */
-extern unsigned int _gnutls_fips_mode;
+extern unsigned int _gnutls_lib_mode;
 
 inline static 
-void _gnutls_switch_fips_state(gnutls_fips_state_t state)
+void _gnutls_switch_lib_state(gnutls_lib_state_t state)
 {
 	/* Once into zombie state no errors can change us */
-	if (_gnutls_fips_mode != FIPS_STATE_ZOMBIE)
-		_gnutls_fips_mode = state;
+	if (_gnutls_lib_mode != LIB_STATE_ZOMBIE)
+		_gnutls_lib_mode = state;
 }
 
-inline static gnutls_fips_state_t _gnutls_get_fips_state(void)
+inline static gnutls_lib_state_t _gnutls_get_lib_state(void)
 {
-	return _gnutls_fips_mode;
+	return _gnutls_lib_mode;
 }
 
 int _gnutls_fips_perform_self_checks(void);
 unsigned _gnutls_fips_mode_enabled(void);
 
-# define FAIL_IF_FIPS_ERROR \
-	if (_gnutls_get_fips_state() != FIPS_STATE_OPERATIONAL && \
-	  _gnutls_get_fips_state() != FIPS_STATE_SELFTEST && \
-	  _gnutls_get_fips_state() != FIPS_STATE_ZOMBIE) return GNUTLS_E_LIB_IN_ERROR_STATE
+# define FAIL_IF_LIB_ERROR \
+	if (_gnutls_get_lib_state() != LIB_STATE_OPERATIONAL && \
+	  _gnutls_get_lib_state() != LIB_STATE_SELFTEST && \
+	  _gnutls_get_lib_state() != LIB_STATE_ZOMBIE) return GNUTLS_E_LIB_IN_ERROR_STATE
 
-void _gnutls_switch_fips_state(gnutls_fips_state_t state);
+void _gnutls_switch_lib_state(gnutls_lib_state_t state);
 
 void _gnutls_fips140_simulate_error(void);
-
-#else
-
-# define _gnutls_switch_fips_state(x) 0
-# define _gnutls_get_fips_state() STATE_OPERATIONAL
-# define FAIL_IF_FIPS_ERROR 0
-# define _gnutls_fips_perform_self_checks() 0
-# define _gnutls_fips_mode_enabled() 0
-#endif
 
 #endif /* FIPS_H */

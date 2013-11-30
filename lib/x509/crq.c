@@ -50,7 +50,7 @@ int gnutls_x509_crq_init(gnutls_x509_crq_t * crq)
 {
 	int result;
 	
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 
 	*crq = gnutls_calloc(1, sizeof(gnutls_x509_crq_int));
 	if (!*crq)

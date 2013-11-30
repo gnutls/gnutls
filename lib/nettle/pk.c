@@ -342,7 +342,7 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
       cleanup:
 	mpz_clear(p);
 
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 	return ret;
 }
 
@@ -419,7 +419,7 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 	if (ret < 0)
 		gnutls_free(plaintext->data);
 
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 	return ret;
 }
 
@@ -574,7 +574,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
       cleanup:
 
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 	return ret;
 }
 
@@ -839,7 +839,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 	return 0;
 
       fail:
@@ -849,7 +849,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	}
 	params->params_nr = 0;
 
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 	return ret;
 }
 
@@ -1053,7 +1053,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 	return 0;
 
       fail:
@@ -1063,7 +1063,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	}
 	params->params_nr = 0;
 
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 	return ret;
 }
 

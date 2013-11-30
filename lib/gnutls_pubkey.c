@@ -111,7 +111,7 @@ int gnutls_pubkey_get_key_usage(gnutls_pubkey_t key, unsigned int *usage)
  **/
 int gnutls_pubkey_init(gnutls_pubkey_t * key)
 {
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 
 	*key = gnutls_calloc(1, sizeof(struct gnutls_pubkey_st));
 	if (*key == NULL) {

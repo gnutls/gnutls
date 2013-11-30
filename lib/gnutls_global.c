@@ -224,7 +224,7 @@ int gnutls_global_init2(unsigned int flags)
 	loaded_modules |= flags;
 
 	if (flags & GNUTLS_GLOBAL_INIT_MINIMAL) {
-		_gnutls_switch_fips_state(FIPS_STATE_INIT);
+		_gnutls_switch_lib_state(LIB_STATE_INIT);
 
 		e = getenv("GNUTLS_DEBUG_LEVEL");
 		if (e != NULL) {
@@ -320,18 +320,16 @@ int gnutls_global_init2(unsigned int flags)
 		res = _gnutls_fips_mode_enabled();
 		if (res != 0) {
 			ret = _gnutls_fips_perform_self_checks();
-			if (_gnutls_get_fips_state() != FIPS_STATE_ZOMBIE) {
+			if (_gnutls_get_lib_state() != LIB_STATE_ZOMBIE) {
 				if (ret < 0) {
 					gnutls_assert();
 					goto out;
 				}
-			} else {
-				ret = 0;
 			}
-			_gnutls_switch_fips_state(FIPS_STATE_OPERATIONAL);
 		}
 	}
 #endif
+	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
 	ret = 0;
 
       out:

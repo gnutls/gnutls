@@ -238,7 +238,7 @@ _gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
  **/
 int gnutls_privkey_init(gnutls_privkey_t * key)
 {
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 
 	*key = gnutls_calloc(1, sizeof(struct gnutls_privkey_st));
 	if (*key == NULL) {

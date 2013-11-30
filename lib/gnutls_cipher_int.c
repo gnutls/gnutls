@@ -63,7 +63,7 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 	if (unlikely(e == NULL || e->id == GNUTLS_CIPHER_NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		
-        FAIL_IF_FIPS_ERROR;
+        FAIL_IF_LIB_ERROR;
 
 	handle->e = e;
 
@@ -147,7 +147,7 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 	if (unlikely(e == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-        FAIL_IF_FIPS_ERROR;
+        FAIL_IF_LIB_ERROR;
 
 	memset(handle, 0, sizeof(*handle));
 

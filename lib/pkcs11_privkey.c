@@ -52,7 +52,7 @@ struct gnutls_pkcs11_privkey_st {
  **/
 int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 {
-        FAIL_IF_FIPS_ERROR;
+        FAIL_IF_LIB_ERROR;
 
 	*key = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_privkey_st));
 	if (*key == NULL) {

@@ -309,7 +309,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	int ret;
 	record_parameters_st *epoch;
 	
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 
 	*session = gnutls_calloc(1, sizeof(struct gnutls_session_int));
 	if (*session == NULL)

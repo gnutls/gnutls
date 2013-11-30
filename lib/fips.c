@@ -30,12 +30,11 @@
 #include <gnutls/fips140.h>
 #include <dlfcn.h>
 
+unsigned int _gnutls_lib_mode = LIB_STATE_POWERON;
 #ifdef ENABLE_FIPS140
 
 #define FIPS_KERNEL_FILE "/proc/sys/crypto/fips_enabled"
 #define FIPS_SYSTEM_FILE "/etc/system-fips"
-
-unsigned int _gnutls_fips_mode = FIPS_STATE_POWERON;
 
 unsigned _gnutls_fips_mode_enabled(void)
 {
@@ -61,7 +60,7 @@ FILE* fd;
 	if (f2p != 0) {
 		/* a funny state where self tests are performed
 		 * and ignored */
-		_gnutls_switch_fips_state(FIPS_STATE_ZOMBIE);
+		_gnutls_switch_lib_state(LIB_STATE_ZOMBIE);
 		_gnutls_debug_log("FIPS140-2 ZOMBIE mode enabled\n");
 		return 2;
 	}
@@ -137,11 +136,11 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 		return gnutls_assert_val(0);
 	}
 
-	prev = _gnutls_get_fips_state();
-	_gnutls_switch_fips_state(FIPS_STATE_OPERATIONAL);
+	prev = _gnutls_get_lib_state();
+	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
 	ret = gnutls_hmac_fast(HMAC_ALGO, fips_key, sizeof(fips_key)-1,
 		data.data, data.size, new_hmac);
-	_gnutls_switch_fips_state(prev);
+	_gnutls_switch_lib_state(prev);
 	
 	gnutls_free(data.data);
 
@@ -180,7 +179,7 @@ int _gnutls_fips_perform_self_checks(void)
 {
 	int ret;
 
-	_gnutls_switch_fips_state(FIPS_STATE_SELFTEST);
+	_gnutls_switch_lib_state(LIB_STATE_SELFTEST);
 
 	/* Tests the FIPS algorithms */
 
@@ -321,7 +320,7 @@ int _gnutls_fips_perform_self_checks(void)
 	return 0;
 
 error:
-	_gnutls_switch_fips_state(FIPS_STATE_ERROR);
+	_gnutls_switch_lib_state(LIB_STATE_ERROR);
 	_gnutls_audit_log(NULL, "FIPS140-2 self testing failed\n");
 
 	return GNUTLS_E_SELF_TEST_ERROR;
@@ -367,7 +366,5 @@ int ret = _gnutls_fips_mode_enabled();
 
 void _gnutls_fips140_simulate_error(void)
 {
-#ifdef ENABLE_FIPS140
-	_gnutls_switch_fips_state(FIPS_STATE_ERROR);
-#endif
+	_gnutls_switch_lib_state(LIB_STATE_ERROR);
 }

@@ -66,7 +66,7 @@ void _gnutls_rnd_deinit(void)
  **/
 int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
 {
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 	return _gnutls_rnd(level, data, len);
 }
 

@@ -46,7 +46,7 @@
  **/
 int gnutls_x509_crl_init(gnutls_x509_crl_t * crl)
 {
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 
 	*crl = gnutls_calloc(1, sizeof(gnutls_x509_crl_int));
 

@@ -44,7 +44,7 @@
  **/
 int gnutls_x509_privkey_init(gnutls_x509_privkey_t * key)
 {
-	FAIL_IF_FIPS_ERROR;
+	FAIL_IF_LIB_ERROR;
 
 	*key = gnutls_calloc(1, sizeof(gnutls_x509_privkey_int));
 
