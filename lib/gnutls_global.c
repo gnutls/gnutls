@@ -430,3 +430,22 @@ const char *gnutls_check_version(const char *req_version)
 
 	return NULL;
 }
+
+#if defined(__GNUC__) || defined(ENABLE_FIPS140)
+__attribute__((constructor))
+#endif
+static void lib_init(void)
+{
+	if (gnutls_global_init2(GNUTLS_GLOBAL_INIT_MINIMAL|GNUTLS_GLOBAL_INIT_CRYPTO) < 0) {
+		fprintf(stderr, "Error in GnuTLS initialization");
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+	}
+}
+
+#if defined(__GNUC__) || defined(ENABLE_FIPS140)
+__attribute__((destructor))
+#endif
+static void lib_deinit(void)
+{
+	gnutls_global_deinit();
+}
