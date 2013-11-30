@@ -157,7 +157,7 @@ static void client(int fd, const char *prio, unsigned overhead)
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
-		fail("client: Handshake failed\n");
+		fail("client: Handshake failed for %s\n", prio);
 		gnutls_perror(ret);
 		exit(1);
 	} else {
@@ -252,8 +252,8 @@ static void server(int fd, const char *prio)
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
-		fail("server: Handshake has failed (%s)\n\n",
-		     gnutls_strerror(ret));
+		fail("server: Handshake has failed (%s) for %s\n\n",
+		     gnutls_strerror(ret), prio);
 		terminate();
 	}
 	if (debug)
@@ -339,10 +339,6 @@ void doit(void)
 	start
 	    ("NONE:+VERS-DTLS1.0:+SALSA20-256:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA",
 	     33);
-	/* 13 + 12(tag) */
-	start
-	    ("NONE:+VERS-DTLS1.0:+SALSA20-256:+UMAC-96:+SIGN-ALL:+COMP-NULL:+RSA",
-	     25);
 }
 
 #endif				/* _WIN32 */
