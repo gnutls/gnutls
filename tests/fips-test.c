@@ -26,7 +26,6 @@ static uint8_t iv16[16];
 void doit(void)
 {
 	int ret;
-#ifdef ENABLE_FIPS140
 	unsigned int mode;
 	gnutls_cipher_hd_t ch;
 	gnutls_hmac_hd_t mh;
@@ -38,7 +37,7 @@ void doit(void)
 	gnutls_datum_t iv = { iv16, sizeof(iv16) };
 
 	fprintf(stderr,
-		"Please note that you need to assure the library's integrity prior to running this test\n");
+		"Please note that if in FIPS140 mode, you need to assure the library's integrity prior to running this test\n");
 
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
@@ -47,7 +46,6 @@ void doit(void)
 	mode = gnutls_fips140_mode_enabled();
 	if (mode == 0) {
 		success("We are not in FIPS140 mode\n");
-		exit(77);
 	}
 
 	ret = global_init();
@@ -141,7 +139,4 @@ void doit(void)
 
 	gnutls_global_deinit();
 	return;
-#else
-	exit(1);		/* fail. This script shouldn't be called on this case */
-#endif
 }
