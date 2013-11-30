@@ -121,14 +121,14 @@ generate_private_key_int(common_info_st * cinfo)
 
 	ret = gnutls_x509_privkey_generate(key, key_type, bits, 0);
 	if (ret < 0) {
-		fprintf(stderr, "privkey_generate: %s",
+		fprintf(stderr, "privkey_generate: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
 
 	ret = gnutls_x509_privkey_verify_params(key);
 	if (ret < 0) {
-		fprintf(stderr, "privkey_verify_params: %s",
+		fprintf(stderr, "privkey_verify_params: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
