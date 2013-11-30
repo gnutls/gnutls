@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2001-2013 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -32,6 +32,7 @@
 #include <system.h>
 #include <accelerated/cryptodev.h>
 #include <accelerated/accelerated.h>
+#include <fips.h>
 
 #include "sockets.h"
 #include "gettext.h"
@@ -110,7 +111,7 @@ void gnutls_global_set_time_function(gnutls_time_func time_func)
 
 /**
  * gnutls_global_set_log_level:
- * @level: it's an integer from 0 to 9.
+ * @level: it's an integer from 0 to 99.
  *
  * This is the function that allows you to set the log level.  The
  * level is an integer between 0 and 9.  Higher values mean more
@@ -167,9 +168,14 @@ gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
 
 GNUTLS_STATIC_MUTEX(global_init_mutex);
 static int _gnutls_init = 0;
+static unsigned int loaded_modules = 0;
+
+#define GLOBAL_INIT_ALL (GNUTLS_GLOBAL_INIT_MINIMAL|GNUTLS_GLOBAL_INIT_PKCS11|GNUTLS_GLOBAL_INIT_CRYPTO)
 
 /**
- * gnutls_global_init:
+ * gnutls_global_init2:
+ *
+ * @flags: it's a %GNUTLS_GLOBAL_* flag
  *
  * This function performs any required precalculations, detects
  * the supported CPU capabilities and initializes the underlying
@@ -187,7 +193,7 @@ static int _gnutls_init = 0;
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
-int gnutls_global_init(void)
+int gnutls_global_init2(unsigned int flags)
 {
 	int ret = 0, res;
 	int level;
@@ -195,94 +201,173 @@ int gnutls_global_init(void)
 	
 	GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
 
-	if (_gnutls_init++)
+	_gnutls_init++;
+
+	/* rationalize flags */
+	if (flags == GNUTLS_GLOBAL_INIT_ALL)
+		flags = GLOBAL_INIT_ALL;
+
+	flags &= ~loaded_modules;
+	
+	if (flags == 0) { /* The requested were already loaded */
+		return 0;
+	}
+	
+	if (!(flags & GNUTLS_GLOBAL_INIT_MINIMAL) &&
+		!(loaded_modules & GNUTLS_GLOBAL_INIT_MINIMAL)) {
+		/* Must always initialize the minimal before everything else */
+		_gnutls_init--;
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		goto out;
+	}
+
+	loaded_modules |= flags;
+
+	if (flags & GNUTLS_GLOBAL_INIT_MINIMAL) {
+		_gnutls_switch_fips_state(FIPS_STATE_INIT);
+
+		e = getenv("GNUTLS_DEBUG_LEVEL");
+		if (e != NULL) {
+			level = atoi(e);
+			gnutls_global_set_log_level(level);
+			if (_gnutls_log_func == NULL)
+				gnutls_global_set_log_function(default_log_func);
+			_gnutls_debug_log("Enabled GnuTLS logging...\n");
+		}
+
+		if (gl_sockets_startup(SOCKETS_1_1))
+			return gnutls_assert_val(GNUTLS_E_SOCKETS_INIT_ERROR);
+
+		bindtextdomain(PACKAGE, LOCALEDIR);
+
+		res = gnutls_crypto_init();
+		if (res != 0) {
+			gnutls_assert();
+			ret = GNUTLS_E_CRYPTO_INIT_FAILED;
+			goto out;
+		}
+
+		/* initialize ASN.1 parser
+		 * This should not deal with files in the final
+		 * version.
+		 */
+		if (asn1_check_version(GNUTLS_MIN_LIBTASN1_VERSION) == NULL) {
+			gnutls_assert();
+			_gnutls_debug_log
+			    ("Checking for libtasn1 failed: %s < %s\n",
+			     asn1_check_version(NULL),
+			     GNUTLS_MIN_LIBTASN1_VERSION);
+			ret = GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
+			goto out;
+		}
+
+		res = asn1_array2tree(pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
+		if (res != ASN1_SUCCESS) {
+			ret = _gnutls_asn2err(res);
+			goto out;
+		}
+
+		res = asn1_array2tree(gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
+		if (res != ASN1_SUCCESS) {
+			ret = _gnutls_asn2err(res);
+			goto out;
+		}
+
+		/* Initialize the random generator */
+		ret = _gnutls_rnd_init();
+		if (ret < 0) {
+			gnutls_assert();
+			goto out;
+		}
+
+		/* Initialize the default TLS extensions */
+		ret = _gnutls_ext_init();
+		if (ret < 0) {
+			gnutls_assert();
+			goto out;
+		}
+
+		ret = gnutls_mutex_init(&_gnutls_file_mutex);
+		if (ret < 0) {
+			gnutls_assert();
+			goto out;
+		}
+
+		ret = gnutls_system_global_init();
+		if (ret < 0) {
+			gnutls_assert();
+			goto out;
+		}
 		
-	e = getenv("GNUTLS_DEBUG_LEVEL");
-	if (e != NULL) {
-		level = atoi(e);
-		gnutls_global_set_log_level(level);
-		if (_gnutls_log_func == NULL)
-			gnutls_global_set_log_function(default_log_func);
-		_gnutls_debug_log("Enabled GnuTLS logging...\n");
 	}
 
-	if (gl_sockets_startup(SOCKETS_1_1)) {
-		ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
-		goto out;
+	if (flags & GNUTLS_GLOBAL_INIT_CRYPTO) {
+		_gnutls_register_accel_crypto();
+
+		_gnutls_cryptodev_init();
 	}
 
-	bindtextdomain(PACKAGE, LOCALEDIR);
-
-	ret = gnutls_crypto_init();
-	if (ret < 0) {
-		gnutls_assert();
-		ret = GNUTLS_E_CRYPTO_INIT_FAILED;
-		goto out;
-	}
-
-	_gnutls_register_accel_crypto();
-
-	/* initialize ASN.1 parser
-	 * This should not deal with files in the final
-	 * version.
-	 */
-	if (asn1_check_version(GNUTLS_MIN_LIBTASN1_VERSION) == NULL) {
-		gnutls_assert();
-		_gnutls_debug_log
-		    ("Checking for libtasn1 failed: %s < %s\n",
-		     asn1_check_version(NULL),
-		     GNUTLS_MIN_LIBTASN1_VERSION);
-		ret = GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
-		goto out;
-	}
-
-	res = asn1_array2tree(pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
-	if (res != ASN1_SUCCESS) {
-		ret = _gnutls_asn2err(res);
-		goto out;
-	}
-
-	res = asn1_array2tree(gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
-	if (res != ASN1_SUCCESS) {
-		ret = _gnutls_asn2err(res);
-		goto out;
-	}
-
-	/* Initialize the random generator */
-	ret = _gnutls_rnd_init();
-	if (ret < 0) {
-		gnutls_assert();
-		goto out;
-	}
-
-	/* Initialize the default TLS extensions */
-	ret = _gnutls_ext_init();
-	if (ret < 0) {
-		gnutls_assert();
-		goto out;
-	}
-
-	ret = gnutls_mutex_init(&_gnutls_file_mutex);
-	if (ret < 0) {
-		gnutls_assert();
-		goto out;
-	}
-
-	ret = gnutls_system_global_init();
-	if (ret < 0) {
-		gnutls_assert();
-		goto out;
-	}
 #ifdef ENABLE_PKCS11
-	gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+	if (flags & GNUTLS_GLOBAL_INIT_PKCS11) {
+		gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+	}
 #endif
 
-	_gnutls_cryptodev_init();
+#ifdef ENABLE_FIPS140
+	/* Perform FIPS140 checks last, so that all modules
+	 * have been loaded */
+	if (flags & GNUTLS_GLOBAL_INIT_MINIMAL) {
+		res = _gnutls_fips_mode_enabled();
+		if (res != 0) {
+			ret = _gnutls_fips_perform_self_checks();
+			if (_gnutls_get_fips_state() != FIPS_STATE_ZOMBIE) {
+				if (ret < 0) {
+					gnutls_assert();
+					goto out;
+				}
+			} else {
+				ret = 0;
+			}
+			_gnutls_switch_fips_state(FIPS_STATE_OPERATIONAL);
+		}
+	}
+#endif
+	ret = 0;
 
       out:
 	GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
 	return ret;
+}
+
+/**
+ * gnutls_global_init:
+ *
+ * This function performs any required precalculations, detects
+ * the supported CPU capabilities and initializes the underlying
+ * cryptographic backend. In order to free any resources 
+ * taken by this call you should gnutls_global_deinit() 
+ * when gnutls usage is no longer needed.
+ *
+ * This function increments a global counter, so that
+ * gnutls_global_deinit() only releases resources when it has been
+ * called as many times as gnutls_global_init().  This is useful when
+ * GnuTLS is used by more than one library in an application.  This
+ * function can be called many times, but will only do something the
+ * first time.
+ *
+ * Note!  This function is not thread safe.  If two threads call this
+ * function simultaneously, they can cause a race between checking
+ * the global counter and incrementing it, causing both threads to
+ * execute the library initialization code.  That could lead to a
+ * memory leak or even a crash.  To handle this, your application should 
+ * invoke this function after aquiring a thread mutex.  
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ **/
+int gnutls_global_init(void)
+{
+	return gnutls_global_init2(GNUTLS_GLOBAL_INIT_ALL);
 }
 
 /**
@@ -305,12 +390,19 @@ void gnutls_global_deinit(void)
 		asn1_delete_structure(&_gnutls_gnutls_asn);
 		asn1_delete_structure(&_gnutls_pkix1_asn);
 		_gnutls_crypto_deregister();
-		_gnutls_cryptodev_deinit();
 		gnutls_system_global_deinit();
+		
+		if (loaded_modules & GNUTLS_GLOBAL_INIT_CRYPTO) {
+			_gnutls_cryptodev_deinit();
+		}
 #ifdef ENABLE_PKCS11
-		gnutls_pkcs11_deinit();
+		if (loaded_modules & GNUTLS_GLOBAL_INIT_PKCS11) {
+			gnutls_pkcs11_deinit();
+		}
 #endif
+
 		gnutls_mutex_deinit(&_gnutls_file_mutex);
+		loaded_modules = 0;
 		GNUTLS_STATIC_MUTEX_DEINIT(global_init_mutex);
 	} else {
 		if (_gnutls_init > 0)

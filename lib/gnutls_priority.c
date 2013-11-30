@@ -231,8 +231,10 @@ gnutls_certificate_type_set_priority(gnutls_session_t session,
 }
 
 static const int supported_ecc_normal[] = {
+#ifdef ENABLE_NON_SUITEB_CURVES
 	GNUTLS_ECC_CURVE_SECP192R1,
 	GNUTLS_ECC_CURVE_SECP224R1,
+#endif
 	GNUTLS_ECC_CURVE_SECP256R1,
 	GNUTLS_ECC_CURVE_SECP384R1,
 	GNUTLS_ECC_CURVE_SECP521R1,
@@ -336,6 +338,7 @@ static const int kx_priority_secure[] = {
 	0
 };
 
+#ifndef ENABLE_FIPS140
 /* If GCM and AES acceleration is available then prefer
  * them over anything else.
  */
@@ -366,6 +369,25 @@ static const int cipher_priority_normal[] = {
 	GNUTLS_CIPHER_ARCFOUR_128,
 	0
 };
+#else
+static const int cipher_priority_performance[] = {
+	GNUTLS_CIPHER_AES_128_GCM,
+	GNUTLS_CIPHER_AES_256_GCM,
+	GNUTLS_CIPHER_AES_128_CBC,
+	GNUTLS_CIPHER_AES_256_CBC,
+	GNUTLS_CIPHER_3DES_CBC,
+	0
+};
+
+static const int cipher_priority_normal[] = {
+	GNUTLS_CIPHER_AES_128_GCM,
+	GNUTLS_CIPHER_AES_256_GCM,
+	GNUTLS_CIPHER_AES_128_CBC,
+	GNUTLS_CIPHER_AES_256_CBC,
+	GNUTLS_CIPHER_3DES_CBC,
+	0
+};
+#endif
 
 static const int cipher_priority_suiteb128[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
@@ -463,7 +485,9 @@ static const int mac_priority_normal[] = {
 	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
+#ifndef ENABLE_FIPS140
 	GNUTLS_MAC_MD5,
+#endif
 	0
 };
 

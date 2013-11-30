@@ -156,7 +156,7 @@ int _gnutls_x509_verify_data(const mac_entry_st * me,
 ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t *
 					       raw_key,
 					       gnutls_x509_privkey_t pkey);
-ASN1_TYPE _gnutls_privkey_decode_ecc_key(const gnutls_datum_t *
+int _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t *
 					 raw_key,
 					 gnutls_x509_privkey_t pkey);
 
@@ -276,6 +276,12 @@ int _gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 			  bigint_t * ret_mpi);
 int _gnutls_x509_write_int(ASN1_TYPE node, const char *value, bigint_t mpi,
 			   int lz);
+
+int _gnutls_x509_read_key_int(ASN1_TYPE node, const char *value,
+			  bigint_t * ret_mpi);
+int _gnutls_x509_write_key_int(ASN1_TYPE node, const char *value, bigint_t mpi,
+			   int lz);
+
 int _gnutls_x509_write_uint32(ASN1_TYPE node, const char *value,
 			      uint32_t num);
 

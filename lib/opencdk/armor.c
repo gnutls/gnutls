@@ -205,31 +205,6 @@ static int check_armor(cdk_stream_t inp, int *r_zipalgo)
 	return check;
 }
 
-
-static int is_armored(int ctb)
-{
-	int pkttype = 0;
-
-	if (!(ctb & 0x80)) {
-		gnutls_assert();
-		return 1;	/* invalid packet: assume it is armored */
-	}
-	pkttype = ctb & 0x40 ? (ctb & 0x3f) : ((ctb >> 2) & 0xf);
-	switch (pkttype) {
-	case CDK_PKT_MARKER:
-	case CDK_PKT_ONEPASS_SIG:
-	case CDK_PKT_PUBLIC_KEY:
-	case CDK_PKT_SECRET_KEY:
-	case CDK_PKT_PUBKEY_ENC:
-	case CDK_PKT_SIGNATURE:
-	case CDK_PKT_LITERAL:
-	case CDK_PKT_COMPRESSED:
-		return 0;	/* seems to be a regular packet: not armored */
-	}
-	return 1;
-}
-
-
 static u32 update_crc(u32 crc, const byte * buf, size_t buflen)
 {
 	unsigned int j;

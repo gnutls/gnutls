@@ -93,7 +93,15 @@ static const cipher_entry_st algorithms[] = {
 	 CIPHER_BLOCK, 16,
 	 16, 0},
 #endif
+
+#ifndef ENABLE_FIPS140
+	/* All the other ciphers are disabled on the back-end library.
+	 * This needs to be disabled here as it is merely a placeholder
+	 * rather than an actual cipher.
+	 */
 	{"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0, 0},
+#endif
+
 	{0, 0, 0, 0, 0, 0, 0}
 };
 
@@ -226,7 +234,8 @@ gnutls_cipher_algorithm_t gnutls_cipher_get_id(const char *name)
 
 	GNUTLS_CIPHER_LOOP(
 		if (strcasecmp(p->name, name) == 0) {
-			ret = p->id; 
+			if (p->id == GNUTLS_CIPHER_NULL || _gnutls_cipher_exists(p->id))
+				ret = p->id; 
 			break;
 		}
 	);
@@ -257,7 +266,7 @@ const gnutls_cipher_algorithm_t *gnutls_cipher_list(void)
 		int i = 0;
 
 		GNUTLS_CIPHER_LOOP(
-			if (_gnutls_cipher_exists(p->id))
+			if (p->id == GNUTLS_CIPHER_NULL || _gnutls_cipher_exists(p->id))
 				supported_ciphers[i++] = p->id;
 		);
 		supported_ciphers[i++] = 0;

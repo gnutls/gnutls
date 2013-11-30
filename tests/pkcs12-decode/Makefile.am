@@ -24,7 +24,9 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12 pkcs12_2certs.p12 \
 
 dist_check_SCRIPTS = pkcs12
 
+if !ENABLE_FIPS140
 TESTS = pkcs12
+endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2013 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -41,10 +41,11 @@
  * Returns: Version string of run-time library, or %NULL if the
  *   run-time library does not meet the required version number.
  */
-const char *asn1_check_version(const char *req_version)
+const char *
+asn1_check_version (const char *req_version)
 {
-	if (!req_version || strverscmp(req_version, ASN1_VERSION) <= 0)
-		return ASN1_VERSION;
+  if (!req_version || strverscmp (req_version, ASN1_VERSION) <= 0)
+    return ASN1_VERSION;
 
-	return NULL;
+  return NULL;
 }

@@ -27,6 +27,7 @@
 #include <pkcs11_int.h>
 #include <gnutls_sig.h>
 #include <gnutls_pk.h>
+#include <fips.h>
 #include <p11-kit/uri.h>
 
 struct gnutls_pkcs11_privkey_st {
@@ -51,6 +52,8 @@ struct gnutls_pkcs11_privkey_st {
  **/
 int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 {
+        FAIL_IF_FIPS_ERROR;
+
 	*key = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_privkey_st));
 	if (*key == NULL) {
 		gnutls_assert();

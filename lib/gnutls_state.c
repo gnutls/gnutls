@@ -45,6 +45,7 @@
 #include <gnutls_extensions.h>
 #include <system.h>
 #include <random.h>
+#include <fips.h>
 #include <gnutls/dtls.h>
 
 /* These should really be static, but src/tests.c calls them.  Make
@@ -307,6 +308,8 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 {
 	int ret;
 	record_parameters_st *epoch;
+	
+	FAIL_IF_FIPS_ERROR;
 
 	*session = gnutls_calloc(1, sizeof(struct gnutls_session_int));
 	if (*session == NULL)
@@ -464,26 +467,28 @@ void gnutls_deinit(gnutls_session_t session)
 	_gnutls_selected_certs_deinit(session);
 
 	gnutls_pk_params_release(&session->key.ecdh_params);
-	_gnutls_mpi_release(&session->key.ecdh_x);
-	_gnutls_mpi_release(&session->key.ecdh_y);
+	gnutls_pk_params_release(&session->key.dh_params);
+	zrelease_temp_mpi_key(&session->key.ecdh_x);
+	zrelease_temp_mpi_key(&session->key.ecdh_y);
 
-	_gnutls_mpi_release(&session->key.KEY);
-	_gnutls_mpi_release(&session->key.client_Y);
-	_gnutls_mpi_release(&session->key.client_p);
-	_gnutls_mpi_release(&session->key.client_g);
+	zrelease_temp_mpi_key(&session->key.client_Y);
 
-	_gnutls_mpi_release(&session->key.u);
-	_gnutls_mpi_release(&session->key.a);
-	_gnutls_mpi_release(&session->key.x);
-	_gnutls_mpi_release(&session->key.A);
-	_gnutls_mpi_release(&session->key.B);
-	_gnutls_mpi_release(&session->key.b);
+	zrelease_temp_mpi_key(&session->key.srp_p);
+	zrelease_temp_mpi_key(&session->key.srp_g);
+	zrelease_temp_mpi_key(&session->key.srp_key);
+
+	zrelease_temp_mpi_key(&session->key.u);
+	zrelease_temp_mpi_key(&session->key.a);
+	zrelease_temp_mpi_key(&session->key.x);
+	zrelease_temp_mpi_key(&session->key.A);
+	zrelease_temp_mpi_key(&session->key.B);
+	zrelease_temp_mpi_key(&session->key.b);
 
 	/* RSA */
-	_gnutls_mpi_release(&session->key.rsa[0]);
-	_gnutls_mpi_release(&session->key.rsa[1]);
+	zrelease_temp_mpi_key(&session->key.rsa[0]);
+	zrelease_temp_mpi_key(&session->key.rsa[1]);
 
-	_gnutls_mpi_release(&session->key.dh_secret);
+	_gnutls_free_temp_key_datum(&session->key.key);
 
 	gnutls_free(session);
 }

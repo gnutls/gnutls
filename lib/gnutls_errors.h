@@ -30,7 +30,7 @@
 
 #ifdef __FILE__
 #ifdef __LINE__
-#define gnutls_assert() _gnutls_debug_log( "ASSERT: %s:%d\n", __FILE__,__LINE__);
+#define gnutls_assert() _gnutls_assert_log( "ASSERT: %s:%d\n", __FILE__,__LINE__);
 #else
 #define gnutls_assert()
 #endif
@@ -59,20 +59,21 @@ void _gnutls_mpi_log(const char *prefix, bigint_t a);
 #define LEVEL(l, ...) do { if (unlikely(_gnutls_log_level >= l)) \
       _gnutls_log( l, __VA_ARGS__); } while(0)
 
-#define LEVEL_EQ(l, ...) do { if (unlikely(_gnutls_log_level == l || _gnutls_log_level > 9)) \
-      _gnutls_log( l, __VA_ARGS__); } while(0)
-
 #define _gnutls_debug_log(...) LEVEL(2, __VA_ARGS__)
-#define _gnutls_handshake_log(...) LEVEL(3, __VA_ARGS__)
-#define _gnutls_io_log(...) LEVEL_EQ(5, __VA_ARGS__)
-#define _gnutls_buffers_log(...) LEVEL_EQ(6, __VA_ARGS__)
-#define _gnutls_hard_log(...) LEVEL(9, __VA_ARGS__)
-#define _gnutls_record_log(...) LEVEL(4, __VA_ARGS__)
+#define _gnutls_assert_log(...) LEVEL(3, __VA_ARGS__)
+#define _gnutls_handshake_log(...) LEVEL(4, __VA_ARGS__)
+#define _gnutls_record_log(...) LEVEL(5, __VA_ARGS__)
 #define _gnutls_dtls_log(...) LEVEL(6, __VA_ARGS__)
-#define _gnutls_read_log(...) LEVEL_EQ(7, __VA_ARGS__)
-#define _gnutls_write_log(...) LEVEL_EQ(7, __VA_ARGS__)
+
+#define _gnutls_hard_log(...) LEVEL(9, __VA_ARGS__)
+
+#define _gnutls_read_log(...) LEVEL(10, __VA_ARGS__)
+#define _gnutls_write_log(...) LEVEL(11, __VA_ARGS__)
+#define _gnutls_io_log(...) LEVEL(12, __VA_ARGS__)
+#define _gnutls_buffers_log(...) LEVEL(13, __VA_ARGS__)
 #else
 #define _gnutls_debug_log _gnutls_null_log
+#define _gnutls_assert_log _gnutls_null_log
 #define _gnutls_handshake_log _gnutls_null_log
 #define _gnutls_io_log _gnutls_null_log
 #define _gnutls_buffers_log _gnutls_null_log
@@ -96,7 +97,7 @@ static inline
 #endif
 int gnutls_assert_val_int(int val, const char *file, int line)
 {
-	_gnutls_debug_log("ASSERT: %s:%d\n", file, line);
+	_gnutls_assert_log("ASSERT: %s:%d\n", file, line);
 	return val;
 }
 

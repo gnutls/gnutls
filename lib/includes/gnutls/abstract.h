@@ -225,9 +225,13 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 int gnutls_privkey_init(gnutls_privkey_t * key);
 void gnutls_privkey_deinit(gnutls_privkey_t key);
 
-void gnutls_privkey_set_pin_function(gnutls_privkey_t key,
-				     gnutls_pin_callback_t fn,
-				     void *userdata);
+int
+gnutls_privkey_generate (gnutls_privkey_t key,
+                         gnutls_pk_algorithm_t algo, unsigned int bits,
+                         unsigned int flags);
+
+void gnutls_privkey_set_pin_function (gnutls_privkey_t key,
+                                      gnutls_pin_callback_t fn, void *userdata);
 
 int gnutls_privkey_get_pk_algorithm(gnutls_privkey_t key,
 				    unsigned int *bits);

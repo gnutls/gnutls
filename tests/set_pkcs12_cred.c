@@ -34,6 +34,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "<%d>| %s", level, str);
 }
 
+#ifndef ENABLE_FIPS140
 void doit(void)
 {
 	gnutls_certificate_credentials_t x509cred;
@@ -113,3 +114,9 @@ void doit(void)
 
 	gnutls_global_deinit();
 }
+#else
+void doit(void)
+{
+	exit(77);
+}
+#endif

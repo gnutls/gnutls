@@ -127,8 +127,6 @@ static int check_schema(const char *oid)
 inline static int
 _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 {
-	size_t size = 0;
-	uint8_t *data = NULL;
 	int ret;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
@@ -136,31 +134,13 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 	case GNUTLS_PK_RSA:
 	case GNUTLS_PK_EC:
 		ret =
-		    gnutls_x509_privkey_export(pkey, GNUTLS_X509_FMT_DER,
-					       NULL, &size);
-		if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			gnutls_assert();
-			goto error;
-		}
-
-		data = gnutls_malloc(size);
-		if (data == NULL) {
-			gnutls_assert();
-			ret = GNUTLS_E_MEMORY_ERROR;
-			goto error;
-		}
-
-
-		ret =
-		    gnutls_x509_privkey_export(pkey, GNUTLS_X509_FMT_DER,
-					       data, &size);
+		    gnutls_x509_privkey_export2(pkey, GNUTLS_X509_FMT_DER,
+					        raw);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
 		}
 
-		raw->data = data;
-		raw->size = size;
 		break;
 	case GNUTLS_PK_DSA:
 		/* DSAPublicKey == INTEGER */
@@ -185,7 +165,7 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 			goto error;
 		}
 
-		asn1_delete_structure(&spk);
+		asn1_delete_structure2(&spk, ASN1_DELETE_FLAG_ZEROIZE);
 		break;
 
 	default:
@@ -196,7 +176,7 @@ _encode_privkey(gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 	return 0;
 
       error:
-	gnutls_free(data);
+	asn1_delete_structure2(&spk, ASN1_DELETE_FLAG_ZEROIZE);
 	asn1_delete_structure(&spk);
 	return ret;
 
@@ -264,7 +244,8 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 	result =
 	    asn1_write_value(*pkey_info, "privateKeyAlgorithm.parameters",
 			     algo_params.data, algo_params.size);
-	_gnutls_free_datum(&algo_params);
+	_gnutls_free_key_datum(&algo_params);
+
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -283,7 +264,7 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 	result =
 	    asn1_write_value(*pkey_info, "privateKey", algo_privkey.data,
 			     algo_privkey.size);
-	_gnutls_free_datum(&algo_privkey);
+	_gnutls_free_key_datum(&algo_privkey);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -329,9 +310,9 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 	return 0;
 
       error:
-	asn1_delete_structure(pkey_info);
+	asn1_delete_structure2(pkey_info, ASN1_DELETE_FLAG_ZEROIZE);
 	_gnutls_free_datum(&algo_params);
-	_gnutls_free_datum(&algo_privkey);
+	_gnutls_free_key_datum(&algo_privkey);
 	return result;
 
 }
@@ -527,16 +508,16 @@ encode_to_pkcs8_key(schema_id schema, const gnutls_datum_t * der_key,
 	}
 
 	_gnutls_free_datum(&tmp);
-	_gnutls_free_datum(&key);
+	_gnutls_free_key_datum(&key);
 
 	*out = pkcs8_asn;
 
 	return 0;
 
       error:
-	_gnutls_free_datum(&key);
+	_gnutls_free_key_datum(&key);
 	_gnutls_free_datum(&tmp);
-	asn1_delete_structure(&pkcs8_asn);
+	asn1_delete_structure2(&pkcs8_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	return result;
 }
 
@@ -608,14 +589,14 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
 					    PEM_UNENCRYPTED_PKCS8,
 					    output_data, output_data_size);
 
-		asn1_delete_structure(&pkey_info);
+		asn1_delete_structure2(&pkey_info, ASN1_DELETE_FLAG_ZEROIZE);
 	} else {
-		asn1_delete_structure(&pkey_info);	/* we don't need it */
+		asn1_delete_structure2(&pkey_info, ASN1_DELETE_FLAG_ZEROIZE);	/* we don't need it */
 
 		ret =
 		    encode_to_pkcs8_key(schema, &tmp, password,
 					&pkcs8_asn);
-		_gnutls_free_datum(&tmp);
+		_gnutls_free_key_datum(&tmp);
 
 		if (ret < 0) {
 			gnutls_assert();
@@ -626,7 +607,7 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
 		    _gnutls_x509_export_int(pkcs8_asn, format, PEM_PKCS8,
 					    output_data, output_data_size);
 
-		asn1_delete_structure(&pkcs8_asn);
+		asn1_delete_structure2(&pkcs8_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	}
 
 	return ret;
@@ -688,20 +669,20 @@ gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 
 	if (((flags & GNUTLS_PKCS_PLAIN) || password == NULL)
 	    && !(flags & GNUTLS_PKCS_NULL_PASSWORD)) {
-		_gnutls_free_datum(&tmp);
+		_gnutls_free_key_datum(&tmp);
 
 		ret =
 		    _gnutls_x509_export_int2(pkey_info, format,
 					     PEM_UNENCRYPTED_PKCS8, out);
 
-		asn1_delete_structure(&pkey_info);
+		asn1_delete_structure2(&pkey_info, ASN1_DELETE_FLAG_ZEROIZE);
 	} else {
-		asn1_delete_structure(&pkey_info);	/* we don't need it */
+		asn1_delete_structure2(&pkey_info, ASN1_DELETE_FLAG_ZEROIZE);	/* we don't need it */
 
 		ret =
 		    encode_to_pkcs8_key(schema, &tmp, password,
 					&pkcs8_asn);
-		_gnutls_free_datum(&tmp);
+		_gnutls_free_key_datum(&tmp);
 
 		if (ret < 0) {
 			gnutls_assert();
@@ -712,7 +693,7 @@ gnutls_x509_privkey_export2_pkcs8(gnutls_x509_privkey_t key,
 		    _gnutls_x509_export_int2(pkcs8_asn, format, PEM_PKCS8,
 					     out);
 
-		asn1_delete_structure(&pkcs8_asn);
+		asn1_delete_structure2(&pkcs8_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	}
 
 	return ret;
@@ -775,7 +756,7 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 			goto error;
 		}
 
-		asn1_delete_structure(&pbes2_asn);
+		asn1_delete_structure2(&pbes2_asn, ASN1_DELETE_FLAG_ZEROIZE);
 
 		result = cipher_to_schema(enc_params->cipher);
 		if (result < 0) {
@@ -927,7 +908,7 @@ static int decrypt_pkcs8_key(const gnutls_datum_t * raw_key,
 	}
 
 	result = decode_private_key_info(&tmp, pkey);
-	_gnutls_free_datum(&tmp);
+	_gnutls_free_key_datum(&tmp);
 
 	if (result < 0) {
 		/* We've gotten this far. In the real world it's almost certain
@@ -996,7 +977,7 @@ decode_pkcs8_key(const gnutls_datum_t * raw_key,
 		result = 0;
 
       error:
-	asn1_delete_structure(&pkcs8_asn);
+	asn1_delete_structure2(&pkcs8_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	return result;
 
 }
@@ -1016,7 +997,8 @@ _decode_pkcs8_rsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	}
 
 	pkey->key = _gnutls_privkey_decode_pkcs1_rsa_key(&tmp, pkey);
-	_gnutls_free_datum(&tmp);
+	_gnutls_free_key_datum(&tmp);
+
 	if (pkey->key == NULL) {
 		gnutls_assert();
 		goto error;
@@ -1042,10 +1024,10 @@ _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
-	pkey->key = _gnutls_privkey_decode_ecc_key(&tmp, pkey);
-	_gnutls_free_datum(&tmp);
-	if (pkey->key == NULL) {
-		ret = GNUTLS_E_PARSING_ERROR;
+	ret = _gnutls_privkey_decode_ecc_key(&pkey->key, &tmp, pkey);
+	_gnutls_free_key_datum(&tmp);
+
+	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -1073,7 +1055,7 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	ret =
 	    _gnutls_x509_read_der_int(tmp.data, tmp.size,
 				      &pkey->params.params[4]);
-	_gnutls_free_datum(&tmp);
+	_gnutls_free_key_datum(&tmp);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -1195,8 +1177,8 @@ decode_private_key_info(const gnutls_datum_t * der,
 
 	result = 0;
 
-      error:
-	asn1_delete_structure(&pkcs8_asn);
+error:
+	asn1_delete_structure2(&pkcs8_asn, ASN1_DELETE_FLAG_ZEROIZE);
 
 	return result;
 
@@ -2295,7 +2277,7 @@ _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 		goto error;
 	}
 
-	asn1_delete_structure(&pkcs7_asn);
+	asn1_delete_structure2(&pkcs7_asn, ASN1_DELETE_FLAG_ZEROIZE);
 
 	*dec = tmp;
 
@@ -2303,7 +2285,7 @@ _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 
       error:
 	asn1_delete_structure(&pbes2_asn);
-	asn1_delete_structure(&pkcs7_asn);
+	asn1_delete_structure2(&pkcs7_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	return result;
 }
 
@@ -2391,7 +2373,7 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 	}
 
 	_gnutls_free_datum(&tmp);
-	_gnutls_free_datum(&key);
+	_gnutls_free_key_datum(&key);
 
 	/* Now write the rest of the pkcs-7 stuff.
 	 */
@@ -2422,7 +2404,7 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 	 */
 	result = _gnutls_x509_der_encode(pkcs7_asn, "", enc, 0);
 
-	asn1_delete_structure(&pkcs7_asn);
+	asn1_delete_structure2(&pkcs7_asn, ASN1_DELETE_FLAG_ZEROIZE);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -2431,8 +2413,8 @@ _gnutls_pkcs7_encrypt_data(schema_id schema,
 
 
       error:
-	_gnutls_free_datum(&key);
+	_gnutls_free_key_datum(&key);
 	_gnutls_free_datum(&tmp);
-	asn1_delete_structure(&pkcs7_asn);
+	asn1_delete_structure2(&pkcs7_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	return result;
 }

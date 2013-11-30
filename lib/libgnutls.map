@@ -927,11 +927,23 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs11_obj_export3;
 	gnutls_pkcs11_get_raw_issuer;
 	gnutls_est_record_overhead_size;
+	gnutls_cipher_self_test;
+	gnutls_pk_self_test;
+	gnutls_mac_self_test;
+	gnutls_digest_self_test;
+	gnutls_privkey_generate;
+	gnutls_global_init2;
+	gnutls_fips140_mode_enabled;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
   global:
     # Internal symbols needed by libgnutls-extra:
+    /* fips */
+    _rngfips_deinit_external_test;
+    _rngfips_run_external_test;
+    _rngfips_init_external_test;
+
     gnutls_crypto_single_mac_register;
     gnutls_crypto_single_digest_register;
     _gnutls_log_level;
@@ -958,6 +970,9 @@ GNUTLS_PRIVATE {
     _gnutls_buffer_init;
     _gnutls_buffer_append_str;
     _gnutls_buffer_to_datum;
+
+    # Internal symbols used by fips-test
+    _gnutls_fips140_simulate_error;
     # Internal symbols needed by psktool:
 
     # Internal symbols needed by gnutls-cli-debug:
@@ -967,7 +982,6 @@ GNUTLS_PRIVATE {
     _gnutls_pbkdf2_sha1;
     # Internal symbols needed by tests/mpi:
     _gnutls_mpi_ops;
-    _gnutls_mpi_randomize;
     _gnutls_mpi_log;
     _gnutls_mpi_release;
     # Internal symbols needed by tests/pkcs12_s2k:

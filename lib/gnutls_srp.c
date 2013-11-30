@@ -108,7 +108,7 @@ _gnutls_calc_srp_B(bigint_t * ret_b, bigint_t g, bigint_t n, bigint_t v)
 		goto error;
 	}
 
-	b = _gnutls_mpi_randomize(NULL, bits, GNUTLS_RND_RANDOM);
+	b = _gnutls_mpi_random_modp(NULL, n, GNUTLS_RND_RANDOM);
 
 	tmpB = _gnutls_mpi_new(bits);
 	if (tmpB == NULL) {
@@ -251,7 +251,7 @@ bigint_t _gnutls_calc_srp_A(bigint_t * a, bigint_t g, bigint_t n)
 	int bits;
 
 	bits = _gnutls_mpi_get_nbits(n);
-	tmpa = _gnutls_mpi_randomize(NULL, bits, GNUTLS_RND_RANDOM);
+	tmpa = _gnutls_mpi_random_modp(NULL, n, GNUTLS_RND_RANDOM);
 
 	A = _gnutls_mpi_new(bits);
 	if (A == NULL) {

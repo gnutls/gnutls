@@ -297,7 +297,7 @@ _gnutls_fbase64_decode(const char *header, const uint8_t * data,
 
 	if (rdata == NULL) {
 		gnutls_assert();
-		_gnutls_debug_log("Could not find '%s'\n", pem_header);
+		_gnutls_hard_log("Could not find '%s'\n", pem_header);
 		return GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR;
 	}
 
@@ -314,7 +314,7 @@ _gnutls_fbase64_decode(const char *header, const uint8_t * data,
 	 */
 	if (kdata == NULL) {
 		gnutls_assert();
-		_gnutls_debug_log("Could not find '%s'\n", ENDSTR);
+		_gnutls_hard_log("Could not find '%s'\n", ENDSTR);
 		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
 	data_size -= strlen(ENDSTR);

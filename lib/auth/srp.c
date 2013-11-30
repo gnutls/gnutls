@@ -57,10 +57,10 @@ const mod_auth_st srp_auth_struct = {
 #define B session->key.B
 #define _a session->key.a
 #define A session->key.A
-#define N session->key.client_p
-#define G session->key.client_g
+#define N session->key.srp_p
+#define G session->key.srp_g
 #define V session->key.x
-#define S session->key.KEY
+#define S session->key.srp_key
 
 /* Checks if a%n==0,+1,-1%n which is a fatal srp error.
  * Returns a proper error code in that case, and 0 when
@@ -71,7 +71,7 @@ inline static int check_param_mod_n(bigint_t a, bigint_t n, int is_a)
 	int ret, err = 0;
 	bigint_t r;
 
-	r = _gnutls_mpi_mod(a, n);
+	r = _gnutls_mpi_modm(NULL, a, n);
 	if (r == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -304,13 +304,13 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 
 	_gnutls_mpi_log("SRP B: ", B);
 
-	_gnutls_mpi_release(&_b);
-	_gnutls_mpi_release(&V);
-	_gnutls_mpi_release(&session->key.u);
-	_gnutls_mpi_release(&B);
+	zrelease_temp_mpi_key(&_b);
+	zrelease_temp_mpi_key(&V);
+	zrelease_temp_mpi_key(&session->key.u);
+	zrelease_temp_mpi_key(&B);
 
-	ret = _gnutls_mpi_dprint(session->key.KEY, &session->key.key);
-	_gnutls_mpi_release(&S);
+	ret = _gnutls_mpi_dprint(session->key.srp_key, &session->key.key);
+	zrelease_temp_mpi_key(&S);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -379,13 +379,13 @@ _gnutls_proc_srp_client_kx(gnutls_session_t session, uint8_t * data,
 	_gnutls_mpi_log("SRP S: ", S);
 
 	_gnutls_mpi_release(&A);
-	_gnutls_mpi_release(&_b);
-	_gnutls_mpi_release(&V);
-	_gnutls_mpi_release(&session->key.u);
-	_gnutls_mpi_release(&B);
+	zrelease_temp_mpi_key(&_b);
+	zrelease_temp_mpi_key(&V);
+	zrelease_temp_mpi_key(&session->key.u);
+	zrelease_temp_mpi_key(&B);
 
-	ret = _gnutls_mpi_dprint(session->key.KEY, &session->key.key);
-	_gnutls_mpi_release(&S);
+	ret = _gnutls_mpi_dprint(session->key.srp_key, &session->key.key);
+	zrelease_temp_mpi_key(&S);
 
 	if (ret < 0) {
 		gnutls_assert();

@@ -73,15 +73,21 @@ ctests = simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities	\
 	 mini-dtls-srtp mini-xssl rsa-encrypt-decrypt mini-loss-time \
 	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range \
-	 mini-cert-status mini-rsa-psk mini-record-2
+	 mini-cert-status mini-rsa-psk mini-record-2 global-init
+
+if ENABLE_FIPS140
+ctests += fips-test
+endif
 
 if ENABLE_OCSP
 ctests += ocsp
 endif
 
 if ENABLE_OPENSSL
+if !ENABLE_FIPS140
 ctests +=  openssl
 openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
+endif
 endif
 
 mini_xssl_LDADD = $(LDADD) ../lib/libgnutls-xssl.la

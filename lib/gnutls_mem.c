@@ -82,6 +82,15 @@ char *_gnutls_strdup(const char *str)
 	return ret;
 }
 
+void _gnutls_bzero(void *mem, size_t size)
+{
+	/* The reason we use that function instead of directly
+	 * calling memset is to prevent the compiler
+	 * optimizing out certain calls that may look
+	 * pointless to him, but needed to erase
+	 * private keys. */
+	memset(mem, 0, size);
+}
 
 #if 0
 /* don't use them. They are included for documentation.

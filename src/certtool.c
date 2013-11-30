@@ -139,7 +139,11 @@ generate_private_key_int(common_info_st * cinfo)
 static int cipher_to_flags(const char *cipher)
 {
 	if (cipher == NULL) {
+#ifdef ENABLE_FIPS140
+		return GNUTLS_PKCS_USE_PBES2_AES_128;
+#else /* compatibility mode - most implementations don't support AES */
 		return GNUTLS_PKCS_USE_PKCS12_ARCFOUR;
+#endif
 	} else if (strcasecmp(cipher, "3des") == 0) {
 		return GNUTLS_PKCS_USE_PBES2_3DES;
 	} else if (strcasecmp(cipher, "3des-pkcs12") == 0) {

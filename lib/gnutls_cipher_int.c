@@ -27,6 +27,7 @@
 #include <gnutls_datum.h>
 #include <gnutls/crypto.h>
 #include <crypto.h>
+#include <fips.h>
 #include <algorithms.h>
 
 #define SR(x, cleanup) if ( (x)<0 ) { \
@@ -61,6 +62,8 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 
 	if (unlikely(e == NULL || e->id == GNUTLS_CIPHER_NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		
+        FAIL_IF_FIPS_ERROR;
 
 	handle->e = e;
 
@@ -143,6 +146,8 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 
 	if (unlikely(e == NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+        FAIL_IF_FIPS_ERROR;
 
 	memset(handle, 0, sizeof(*handle));
 

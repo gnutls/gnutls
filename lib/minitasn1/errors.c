@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2013 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -26,32 +26,33 @@
 
 #define LIBTASN1_ERROR_ENTRY(name) { #name, name }
 
-struct libtasn1_error_entry {
-	const char *name;
-	int number;
+struct libtasn1_error_entry
+{
+  const char *name;
+  int number;
 };
 typedef struct libtasn1_error_entry libtasn1_error_entry;
 
 static const libtasn1_error_entry error_algorithms[] = {
-	LIBTASN1_ERROR_ENTRY(ASN1_SUCCESS),
-	LIBTASN1_ERROR_ENTRY(ASN1_FILE_NOT_FOUND),
-	LIBTASN1_ERROR_ENTRY(ASN1_ELEMENT_NOT_FOUND),
-	LIBTASN1_ERROR_ENTRY(ASN1_IDENTIFIER_NOT_FOUND),
-	LIBTASN1_ERROR_ENTRY(ASN1_DER_ERROR),
-	LIBTASN1_ERROR_ENTRY(ASN1_VALUE_NOT_FOUND),
-	LIBTASN1_ERROR_ENTRY(ASN1_GENERIC_ERROR),
-	LIBTASN1_ERROR_ENTRY(ASN1_VALUE_NOT_VALID),
-	LIBTASN1_ERROR_ENTRY(ASN1_TAG_ERROR),
-	LIBTASN1_ERROR_ENTRY(ASN1_TAG_IMPLICIT),
-	LIBTASN1_ERROR_ENTRY(ASN1_ERROR_TYPE_ANY),
-	LIBTASN1_ERROR_ENTRY(ASN1_SYNTAX_ERROR),
-	LIBTASN1_ERROR_ENTRY(ASN1_MEM_ERROR),
-	LIBTASN1_ERROR_ENTRY(ASN1_MEM_ALLOC_ERROR),
-	LIBTASN1_ERROR_ENTRY(ASN1_DER_OVERFLOW),
-	LIBTASN1_ERROR_ENTRY(ASN1_NAME_TOO_LONG),
-	LIBTASN1_ERROR_ENTRY(ASN1_ARRAY_ERROR),
-	LIBTASN1_ERROR_ENTRY(ASN1_ELEMENT_NOT_EMPTY),
-	{0, 0}
+  LIBTASN1_ERROR_ENTRY (ASN1_SUCCESS),
+  LIBTASN1_ERROR_ENTRY (ASN1_FILE_NOT_FOUND),
+  LIBTASN1_ERROR_ENTRY (ASN1_ELEMENT_NOT_FOUND),
+  LIBTASN1_ERROR_ENTRY (ASN1_IDENTIFIER_NOT_FOUND),
+  LIBTASN1_ERROR_ENTRY (ASN1_DER_ERROR),
+  LIBTASN1_ERROR_ENTRY (ASN1_VALUE_NOT_FOUND),
+  LIBTASN1_ERROR_ENTRY (ASN1_GENERIC_ERROR),
+  LIBTASN1_ERROR_ENTRY (ASN1_VALUE_NOT_VALID),
+  LIBTASN1_ERROR_ENTRY (ASN1_TAG_ERROR),
+  LIBTASN1_ERROR_ENTRY (ASN1_TAG_IMPLICIT),
+  LIBTASN1_ERROR_ENTRY (ASN1_ERROR_TYPE_ANY),
+  LIBTASN1_ERROR_ENTRY (ASN1_SYNTAX_ERROR),
+  LIBTASN1_ERROR_ENTRY (ASN1_MEM_ERROR),
+  LIBTASN1_ERROR_ENTRY (ASN1_MEM_ALLOC_ERROR),
+  LIBTASN1_ERROR_ENTRY (ASN1_DER_OVERFLOW),
+  LIBTASN1_ERROR_ENTRY (ASN1_NAME_TOO_LONG),
+  LIBTASN1_ERROR_ENTRY (ASN1_ARRAY_ERROR),
+  LIBTASN1_ERROR_ENTRY (ASN1_ELEMENT_NOT_EMPTY),
+  {0, 0}
 };
 
 /**
@@ -62,14 +63,13 @@ static const libtasn1_error_entry error_algorithms[] = {
  * function is like perror().  The only difference is that it accepts
  * an error returned by a libtasn1 function.
  *
- * This function replaces libtasn1_perror() in older libtasn1.
- *
  * Since: 1.6
  **/
-void asn1_perror(int error)
+void
+asn1_perror (int error)
 {
-	const char *str = asn1_strerror(error);
-	fprintf(stderr, "LIBTASN1 ERROR: %s\n", str ? str : "(null)");
+  const char *str = asn1_strerror (error);
+  fprintf (stderr, "LIBTASN1 ERROR: %s\n", str ? str : "(null)");
 }
 
 /**
@@ -80,20 +80,19 @@ void asn1_perror(int error)
  * similar to strerror.  The only difference is that it accepts an
  * error (number) returned by a libtasn1 function.
  *
- * This function replaces libtasn1_strerror() in older libtasn1.
- *
  * Returns: Pointer to static zero-terminated string describing error
  *   code.
  *
  * Since: 1.6
  **/
-const char *asn1_strerror(int error)
+const char *
+asn1_strerror (int error)
 {
-	const libtasn1_error_entry *p;
+  const libtasn1_error_entry *p;
 
-	for (p = error_algorithms; p->name != NULL; p++)
-		if (p->number == error)
-			return p->name + sizeof("ASN1_") - 1;
+  for (p = error_algorithms; p->name != NULL; p++)
+    if (p->number == error)
+      return p->name + sizeof ("ASN1_") - 1;
 
-	return NULL;
+  return NULL;
 }

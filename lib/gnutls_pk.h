@@ -32,8 +32,10 @@ extern gnutls_crypto_pk_st _gnutls_pk_ops;
 #define _gnutls_pk_verify( algo, data, sig, params) _gnutls_pk_ops.verify( algo, data, sig, params)
 #define _gnutls_pk_verify_params( algo, params) _gnutls_pk_ops.verify_params( algo, params)
 #define _gnutls_pk_derive( algo, out, pub, priv) _gnutls_pk_ops.derive( algo, out, pub, priv)
-#define _gnutls_pk_generate( algo, bits, priv) _gnutls_pk_ops.generate( algo, bits, priv)
+#define _gnutls_pk_generate_keys( algo, bits, priv) _gnutls_pk_ops.generate_keys( algo, bits, priv)
+#define _gnutls_pk_generate_params( algo, bits, priv) _gnutls_pk_ops.generate_params( algo, bits, priv)
 #define _gnutls_pk_hash_algorithm( pk, sig, params, hash) _gnutls_pk_ops.hash_algorithm(pk, sig, params, hash)
+#define _gnutls_pk_curve_exists( curve) _gnutls_pk_ops.curve_exists(curve)
 
 inline static int
 _gnutls_pk_fixup(gnutls_pk_algorithm_t algo, gnutls_direction_t direction,

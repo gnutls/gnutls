@@ -34,6 +34,7 @@
 #include <x509/common.h>
 #include <x509_b64.h>
 #include <abstract_int.h>
+#include <fips.h>
 #include <gnutls_ecc.h>
 
 
@@ -110,6 +111,8 @@ int gnutls_pubkey_get_key_usage(gnutls_pubkey_t key, unsigned int *usage)
  **/
 int gnutls_pubkey_init(gnutls_pubkey_t * key)
 {
+	FAIL_IF_FIPS_ERROR;
+
 	*key = gnutls_calloc(1, sizeof(struct gnutls_pubkey_st));
 	if (*key == NULL) {
 		gnutls_assert();

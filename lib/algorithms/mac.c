@@ -132,7 +132,8 @@ gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
 
 	GNUTLS_HASH_LOOP(
 		if (p->oid != NULL && strcasecmp(p->name, name) == 0) {
-			ret = p->id;
+			if (_gnutls_digest_exists(p->id))
+				ret = p->id;
 			break;
 		}
 	);
@@ -156,7 +157,8 @@ gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name)
 
 	GNUTLS_HASH_LOOP(
 		if (strcasecmp(p->name, name) == 0) {
-			ret = p->id;
+			if (p->placeholder != 0 || _gnutls_mac_exists(p->id))
+  				ret = p->id;
 			break;
 		}
 	);

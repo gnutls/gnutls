@@ -44,6 +44,8 @@
  **/
 int gnutls_x509_privkey_init(gnutls_x509_privkey_t * key)
 {
+	FAIL_IF_FIPS_ERROR;
+
 	*key = gnutls_calloc(1, sizeof(gnutls_x509_privkey_int));
 
 	if (*key) {
@@ -68,7 +70,7 @@ void gnutls_x509_privkey_deinit(gnutls_x509_privkey_t key)
 
 	gnutls_pk_params_clear(&key->params);
 	gnutls_pk_params_release(&key->params);
-	asn1_delete_structure(&key->key);
+	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 	gnutls_free(key);
 }
 
@@ -161,14 +163,14 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	pkey->params.params_nr++;
 
 	if ((result =
-	     _gnutls_x509_read_int(pkey_asn, "privateExponent",
+	     _gnutls_x509_read_key_int(pkey_asn, "privateExponent",
 				   &pkey->params.params[2])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
 	pkey->params.params_nr++;
 
-	if ((result = _gnutls_x509_read_int(pkey_asn, "prime1",
+	if ((result = _gnutls_x509_read_key_int(pkey_asn, "prime1",
 					    &pkey->params.params[3])) < 0)
 	{
 		gnutls_assert();
@@ -176,7 +178,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	}
 	pkey->params.params_nr++;
 
-	if ((result = _gnutls_x509_read_int(pkey_asn, "prime2",
+	if ((result = _gnutls_x509_read_key_int(pkey_asn, "prime2",
 					    &pkey->params.params[4])) < 0)
 	{
 		gnutls_assert();
@@ -184,7 +186,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	}
 	pkey->params.params_nr++;
 
-	if ((result = _gnutls_x509_read_int(pkey_asn, "coefficient",
+	if ((result = _gnutls_x509_read_key_int(pkey_asn, "coefficient",
 					    &pkey->params.params[5])) < 0)
 	{
 		gnutls_assert();
@@ -192,7 +194,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	}
 	pkey->params.params_nr++;
 
-	if ((result = _gnutls_x509_read_int(pkey_asn, "exponent1",
+	if ((result = _gnutls_x509_read_key_int(pkey_asn, "exponent1",
 					    &pkey->params.params[6])) < 0)
 	{
 		gnutls_assert();
@@ -200,7 +202,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	}
 	pkey->params.params_nr++;
 
-	if ((result = _gnutls_x509_read_int(pkey_asn, "exponent2",
+	if ((result = _gnutls_x509_read_key_int(pkey_asn, "exponent2",
 					    &pkey->params.params[7])) < 0)
 	{
 		gnutls_assert();
@@ -220,7 +222,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	return pkey_asn;
 
       error:
-	asn1_delete_structure(&pkey_asn);
+	asn1_delete_structure2(&pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	gnutls_pk_params_clear(&pkey->params);
 	gnutls_pk_params_release(&pkey->params);
 	return NULL;
@@ -230,12 +232,11 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 /* Converts an ECC key to
  * an internal structure (gnutls_private_key)
  */
-ASN1_TYPE
-_gnutls_privkey_decode_ecc_key(const gnutls_datum_t * raw_key,
+int
+_gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_key,
 			       gnutls_x509_privkey_t pkey)
 {
 	int ret;
-	ASN1_TYPE pkey_asn;
 	unsigned int version;
 	char oid[MAX_OID_SIZE];
 	int oid_size;
@@ -246,20 +247,21 @@ _gnutls_privkey_decode_ecc_key(const gnutls_datum_t * raw_key,
 	if ((ret =
 	     asn1_create_element(_gnutls_get_gnutls_asn(),
 				 "GNUTLS.ECPrivateKey",
-				 &pkey_asn)) != ASN1_SUCCESS) {
+				 pkey_asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
-		return NULL;
+		return _gnutls_asn2err(ret);
 	}
 
 	ret =
-	    asn1_der_decoding(&pkey_asn, raw_key->data, raw_key->size,
+	    asn1_der_decoding(pkey_asn, raw_key->data, raw_key->size,
 			      NULL);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
 		goto error;
 	}
 
-	ret = _gnutls_x509_read_uint(pkey_asn, "Version", &version);
+	ret = _gnutls_x509_read_uint(*pkey_asn, "Version", &version);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -270,16 +272,18 @@ _gnutls_privkey_decode_ecc_key(const gnutls_datum_t * raw_key,
 		    ("ECC private key version %u is not supported\n",
 		     version);
 		gnutls_assert();
+		ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
 		goto error;
 	}
 
 	/* read the curve */
 	oid_size = sizeof(oid);
 	ret =
-	    asn1_read_value(pkey_asn, "parameters.namedCurve", oid,
+	    asn1_read_value(*pkey_asn, "parameters.namedCurve", oid,
 			    &oid_size);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
+		ret = _gnutls_asn2err(ret);
 		goto error;
 	}
 
@@ -287,11 +291,12 @@ _gnutls_privkey_decode_ecc_key(const gnutls_datum_t * raw_key,
 	if (pkey->params.flags == GNUTLS_ECC_CURVE_INVALID) {
 		_gnutls_debug_log("Curve %s is not supported\n", oid);
 		gnutls_assert();
+		ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
 		goto error;
 	}
 
 	/* read the public key */
-	ret = _gnutls_x509_read_value(pkey_asn, "publicKey", &out);
+	ret = _gnutls_x509_read_value(*pkey_asn, "publicKey", &out);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
@@ -311,7 +316,7 @@ _gnutls_privkey_decode_ecc_key(const gnutls_datum_t * raw_key,
 
 	/* read the private key */
 	ret =
-	    _gnutls_x509_read_int(pkey_asn, "privateKey",
+	    _gnutls_x509_read_key_int(*pkey_asn, "privateKey",
 				  &pkey->params.params[ECC_K]);
 	if (ret < 0) {
 		gnutls_assert();
@@ -319,13 +324,13 @@ _gnutls_privkey_decode_ecc_key(const gnutls_datum_t * raw_key,
 	}
 	pkey->params.params_nr++;
 
-	return pkey_asn;
+	return 0;
 
       error:
-	asn1_delete_structure(&pkey_asn);
+	asn1_delete_structure2(pkey_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	gnutls_pk_params_clear(&pkey->params);
 	gnutls_pk_params_release(&pkey->params);
-	return NULL;
+	return ret;
 
 }
 
@@ -386,7 +391,7 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 	}
 	pkey->params.params_nr++;
 
-	if ((result = _gnutls_x509_read_int(dsa_asn, "priv",
+	if ((result = _gnutls_x509_read_key_int(dsa_asn, "priv",
 					    &pkey->params.params[4])) < 0)
 	{
 		gnutls_assert();
@@ -397,7 +402,7 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 	return dsa_asn;
 
       error:
-	asn1_delete_structure(&dsa_asn);
+	asn1_delete_structure2(&dsa_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	gnutls_pk_params_clear(&pkey->params);
 	gnutls_pk_params_release(&pkey->params);
 	return NULL;
@@ -495,9 +500,11 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 		if (key->key == NULL)
 			gnutls_assert();
 	} else if (key->pk_algorithm == GNUTLS_PK_EC) {
-		key->key = _gnutls_privkey_decode_ecc_key(&_data, key);
-		if (key->key == NULL)
+		result = _gnutls_privkey_decode_ecc_key(&key->key, &_data, key);
+		if (result < 0) {
 			gnutls_assert();
+			goto failover;
+		}
 	} else {
 		/* Try decoding with both, and accept the one that
 		 * succeeds.
@@ -511,11 +518,12 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 			key->key = decode_dsa_key(&_data, key);
 			if (key->key == NULL) {
 				key->pk_algorithm = GNUTLS_PK_EC;
-				key->key =
-				    _gnutls_privkey_decode_ecc_key(&_data,
-								   key);
-				if (key->key == NULL)
+				result =
+				    _gnutls_privkey_decode_ecc_key(&key->key, &_data, key);
+				if (result < 0) {
 					gnutls_assert();
+					goto failover;
+				}
 			}
 		}
 	}
@@ -1448,6 +1456,63 @@ gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey_t key,
 	return 0;
 }
 
+#ifdef ENABLE_FIPS140
+static int pct_test(gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params)
+{
+int ret;
+gnutls_datum_t sig = {NULL, 0};
+const char const_data[20] = "onetwothreefourfive";
+gnutls_datum_t ddata;
+char* gen_data = NULL;
+
+	if (algo == GNUTLS_PK_DSA) {
+		unsigned hash_len;
+
+		_gnutls_dsa_q_to_hash(algo, params, &hash_len);
+		gen_data = gnutls_malloc(hash_len);
+		gnutls_rnd(GNUTLS_RND_NONCE, gen_data, hash_len);
+
+		ddata.data = (void*)gen_data;
+		ddata.size = hash_len;
+	} else {
+		ddata.data = (void*)const_data;
+		ddata.size = sizeof(const_data);
+	}
+
+	switch (algo) {
+	case GNUTLS_PK_RSA:
+		/* Here we don't know the purpose of the key. Assume signing
+		 */
+	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
+	case GNUTLS_PK_DSA:
+		ret = _gnutls_pk_sign(algo, &sig, &ddata, params);
+		if (ret < 0) {
+			ret = GNUTLS_E_PK_GENERATION_ERROR;
+			goto cleanup;
+		}
+
+		ret = _gnutls_pk_verify(algo, &ddata, &sig, params);
+		if (ret < 0) {
+			ret = GNUTLS_E_PK_GENERATION_ERROR;
+			gnutls_assert();
+			goto cleanup;
+		}
+		break;
+		
+
+	default:
+		ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);
+		goto cleanup;
+	}
+
+	ret = 0;
+cleanup:
+	gnutls_free(gen_data);
+	gnutls_free(sig.data);
+	return ret;
+}
+#endif
+
 /**
  * gnutls_x509_privkey_generate:
  * @key: should contain a #gnutls_x509_privkey_t structure
@@ -1488,7 +1553,23 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 			bits = _gnutls_ecc_bits_to_curve(bits);
 	}
 
-	ret = _gnutls_pk_generate(algo, bits, &key->params);
+	ret = _gnutls_pk_generate_params(algo, bits, &key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = _gnutls_pk_generate_keys(algo, bits, &key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+#ifndef ENABLE_FIPS140
+	ret = _gnutls_pk_verify_params(algo, &key->params);
+#else
+	ret = pct_test(algo, &key->params);
+#endif
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1774,7 +1855,7 @@ int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	asn1_delete_structure(&key->key);
+	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 
 	ret =
 	    _gnutls_asn1_encode_privkey(key->pk_algorithm, &key->key,

@@ -26,7 +26,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([1.12.2 no-dist-gzip dist-xz dist-lzip -Wall -Wno-override])
+AM_INIT_AUTOMAKE([1.12.2 subdir-objects no-dist-gzip dist-xz dist-lzip -Wall -Wno-override])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CONFIG_HEADERS([config.h])
 
@@ -121,6 +121,7 @@ AM_CONDITIONAL(ASM_X86_32, test x"$hw_accel" = x"x86")
 AM_CONDITIONAL(ASM_X86, test x"$hw_accel" = x"x86" || test x"$hw_accel" = x"x86-64")
 AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
+
 
 dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
@@ -249,6 +250,50 @@ if test "$ac_have_unicode" != "yes";then
   if test "$have_win" = "yes";then
     ac_have_unicode=yes
   fi
+fi
+
+AC_ARG_ENABLE(self-checks,
+  AS_HELP_STRING([--enable-self-checks], [enable self checking functionality]),
+    enable_self_checks=$enableval, enable_self_checks=no)
+
+AC_ARG_ENABLE(fips140-mode,
+  AS_HELP_STRING([--enable-fips140-mode], [enable FIPS140-2 mode (implies self checks)]),
+    enable_fips=$enableval, enable_fips=no)
+AM_CONDITIONAL(ENABLE_FIPS140, test "$enable_fips" = "yes")
+if [ test "$enable_fips" = "yes" ];then
+  AC_LIB_HAVE_LINKFLAGS(dl,, [#include <dlfcn.h>], [dladdr (0, 0);])
+  if test "x$HAVE_LIBDL" = "xyes";then
+    enable_self_checks=yes
+
+    dnl clock_gettime precision is needed on the FIPS140 DRBG.
+    if test "$ac_cv_func_clock_gettime" != "yes";then
+      AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [clock_gettime (0, 0);])
+      gnutls_needs_librt=yes
+    fi
+
+    AC_DEFINE([ENABLE_FIPS140], 1, [Enable FIPS140-2 mode])
+
+    AC_SUBST([FIPS140_LIBS], $LIBDL)
+  else
+    enable_fips=no
+    AC_MSG_WARN([[
+*** 
+*** This system is not supported in FIPS140 mode.
+*** libdl and dladdr() are required.
+*** ]])
+  fi
+fi
+
+AC_ARG_ENABLE(non-suiteb-curves,
+  AS_HELP_STRING([--disable-non-suiteb-curves], [disable curves not in SuiteB]),
+    enable_non_suiteb=$enableval, enable_non_suiteb=yes)
+if [ test "$enable_non_suiteb" = "yes" ];then
+  AC_DEFINE([ENABLE_NON_SUITEB_CURVES], 1, [Enable all curves])
+fi
+
+AM_CONDITIONAL(ENABLE_SELF_CHECKS, test "$enable_self_checks" = "yes")
+if [ test "$enable_self_checks" = "yes" ];then
+   AC_DEFINE([ENABLE_SELF_CHECKS], 1, [Self checks are included in the library])
 fi
 
 AC_MSG_CHECKING([whether to build libdane])
@@ -720,6 +765,9 @@ if features are disabled)
   Heartbeat support:    $ac_enable_heartbeat
   RSA-EXPORT compat:    $ac_enable_rsa_export
   Unicode support:      $ac_have_unicode
+  Self checks:          $enable_self_checks
+  Non-SuiteB curves:    $enable_non_suiteb
+  FIPS140 mode:         $enable_fips
 ])
 
 AC_MSG_NOTICE([Optional applications:

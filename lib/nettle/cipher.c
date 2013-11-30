@@ -126,21 +126,23 @@ static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
 	switch (algo) {
 	case GNUTLS_CIPHER_AES_128_GCM:
 	case GNUTLS_CIPHER_AES_256_GCM:
+	case GNUTLS_CIPHER_AES_128_CBC:
+	case GNUTLS_CIPHER_AES_192_CBC:
+	case GNUTLS_CIPHER_AES_256_CBC:
+	case GNUTLS_CIPHER_3DES_CBC:
+#ifndef ENABLE_FIPS140
 	case GNUTLS_CIPHER_CAMELLIA_128_GCM:
 	case GNUTLS_CIPHER_CAMELLIA_256_GCM:
 	case GNUTLS_CIPHER_CAMELLIA_128_CBC:
 	case GNUTLS_CIPHER_CAMELLIA_192_CBC:
 	case GNUTLS_CIPHER_CAMELLIA_256_CBC:
-	case GNUTLS_CIPHER_AES_128_CBC:
-	case GNUTLS_CIPHER_AES_192_CBC:
-	case GNUTLS_CIPHER_AES_256_CBC:
-	case GNUTLS_CIPHER_3DES_CBC:
 	case GNUTLS_CIPHER_DES_CBC:
 	case GNUTLS_CIPHER_ARCFOUR_128:
 	case GNUTLS_CIPHER_SALSA20_256:
 	case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
 	case GNUTLS_CIPHER_ARCFOUR_40:
 	case GNUTLS_CIPHER_RC2_40_CBC:
+#endif
 		return 1;
 	default:
 		return 0;
@@ -173,6 +175,25 @@ wrap_nettle_cipher_init(gnutls_cipher_algorithm_t algo, void **_ctx,
 		ctx->ctx_ptr = &ctx->ctx.aes_gcm;
 		ctx->block_size = AES_BLOCK_SIZE;
 		break;
+	case GNUTLS_CIPHER_AES_128_CBC:
+	case GNUTLS_CIPHER_AES_192_CBC:
+	case GNUTLS_CIPHER_AES_256_CBC:
+		ctx->encrypt = cbc_encrypt;
+		ctx->decrypt = cbc_decrypt;
+		ctx->i_encrypt = (nettle_crypt_func *) aes_encrypt;
+		ctx->i_decrypt = (nettle_crypt_func *) aes_decrypt;
+		ctx->ctx_ptr = &ctx->ctx.aes;
+		ctx->block_size = AES_BLOCK_SIZE;
+		break;
+	case GNUTLS_CIPHER_3DES_CBC:
+		ctx->encrypt = cbc_encrypt;
+		ctx->decrypt = cbc_decrypt;
+		ctx->i_encrypt = (nettle_crypt_func *) des3_encrypt;
+		ctx->i_decrypt = (nettle_crypt_func *) des3_decrypt;
+		ctx->ctx_ptr = &ctx->ctx.des3;
+		ctx->block_size = DES3_BLOCK_SIZE;
+		break;
+#ifndef ENABLE_FIPS140
 	case GNUTLS_CIPHER_CAMELLIA_128_GCM:
 	case GNUTLS_CIPHER_CAMELLIA_256_GCM:
 		ctx->encrypt = _camellia_gcm_encrypt;
@@ -192,24 +213,6 @@ wrap_nettle_cipher_init(gnutls_cipher_algorithm_t algo, void **_ctx,
 		ctx->i_decrypt = (nettle_crypt_func *) camellia_crypt;
 		ctx->ctx_ptr = &ctx->ctx.camellia;
 		ctx->block_size = CAMELLIA_BLOCK_SIZE;
-		break;
-	case GNUTLS_CIPHER_AES_128_CBC:
-	case GNUTLS_CIPHER_AES_192_CBC:
-	case GNUTLS_CIPHER_AES_256_CBC:
-		ctx->encrypt = cbc_encrypt;
-		ctx->decrypt = cbc_decrypt;
-		ctx->i_encrypt = (nettle_crypt_func *) aes_encrypt;
-		ctx->i_decrypt = (nettle_crypt_func *) aes_decrypt;
-		ctx->ctx_ptr = &ctx->ctx.aes;
-		ctx->block_size = AES_BLOCK_SIZE;
-		break;
-	case GNUTLS_CIPHER_3DES_CBC:
-		ctx->encrypt = cbc_encrypt;
-		ctx->decrypt = cbc_decrypt;
-		ctx->i_encrypt = (nettle_crypt_func *) des3_encrypt;
-		ctx->i_decrypt = (nettle_crypt_func *) des3_decrypt;
-		ctx->ctx_ptr = &ctx->ctx.des3;
-		ctx->block_size = DES3_BLOCK_SIZE;
 		break;
 	case GNUTLS_CIPHER_DES_CBC:
 		ctx->encrypt = cbc_encrypt;
@@ -252,6 +255,7 @@ wrap_nettle_cipher_init(gnutls_cipher_algorithm_t algo, void **_ctx,
 		ctx->ctx_ptr = &ctx->ctx.arctwo;
 		ctx->block_size = ARCTWO_BLOCK_SIZE;
 		break;
+#endif
 	default:
 		gnutls_assert();
 		gnutls_free(ctx);
@@ -273,11 +277,6 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 	case GNUTLS_CIPHER_AES_128_GCM:
 	case GNUTLS_CIPHER_AES_256_GCM:
 		gcm_aes_set_key(&ctx->ctx.aes_gcm, keysize, key);
-		break;
-	case GNUTLS_CIPHER_CAMELLIA_128_GCM:
-	case GNUTLS_CIPHER_CAMELLIA_256_GCM:
-		_gcm_camellia_set_key(&ctx->ctx.camellia_gcm, keysize,
-				      key);
 		break;
 	case GNUTLS_CIPHER_AES_128_CBC:
 	case GNUTLS_CIPHER_AES_192_CBC:
@@ -310,6 +309,14 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
+		zeroize_temp_key(des_key, sizeof(des_key));
+
+		break;
+#ifndef ENABLE_FIPS140
+	case GNUTLS_CIPHER_CAMELLIA_128_GCM:
+	case GNUTLS_CIPHER_CAMELLIA_256_GCM:
+		_gcm_camellia_set_key(&ctx->ctx.camellia_gcm, keysize,
+				      key);
 		break;
 	case GNUTLS_CIPHER_DES_CBC:
 		if (keysize != DES_KEY_SIZE) {
@@ -323,6 +330,7 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
+		zeroize_temp_key(des_key, sizeof(des_key));
 		break;
 	case GNUTLS_CIPHER_ARCFOUR_128:
 	case GNUTLS_CIPHER_ARCFOUR_40:
@@ -335,6 +343,7 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 	case GNUTLS_CIPHER_RC2_40_CBC:
 		arctwo_set_key(ctx->ctx_ptr, keysize, key);
 		break;
+#endif
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -357,6 +366,7 @@ wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t ivsize)
 		gcm_aes_set_iv(&ctx->ctx.aes_gcm, GCM_DEFAULT_NONCE_SIZE,
 			       iv);
 		break;
+#ifndef ENABLE_FIPS140
 	case GNUTLS_CIPHER_CAMELLIA_128_GCM:
 	case GNUTLS_CIPHER_CAMELLIA_256_GCM:
 		if (ivsize != GCM_DEFAULT_NONCE_SIZE)
@@ -372,6 +382,7 @@ wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t ivsize)
 
 		salsa20_set_iv(&ctx->ctx.salsa20, iv);
 		break;
+#endif
 	default:
 		if (ivsize > ctx->block_size)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -424,9 +435,12 @@ static void wrap_nettle_cipher_tag(void *_ctx, void *tag, size_t tagsize)
 
 }
 
-static void wrap_nettle_cipher_close(void *h)
+static void wrap_nettle_cipher_close(void *_ctx)
 {
-	gnutls_free(h);
+	struct nettle_cipher_ctx *ctx = _ctx;
+
+	zeroize_temp_key(ctx, sizeof(*ctx));
+	gnutls_free(ctx);
 }
 
 gnutls_crypto_cipher_st _gnutls_cipher_ops = {

@@ -43,12 +43,14 @@ static int wrap_nettle_hash_init(gnutls_digest_algorithm_t algo,
 struct nettle_hash_ctx {
 	union {
 		struct md5_ctx md5;
-		struct md2_ctx md2;
 		struct sha224_ctx sha224;
 		struct sha256_ctx sha256;
 		struct sha384_ctx sha384;
 		struct sha512_ctx sha512;
 		struct sha1_ctx sha1;
+#ifndef ENABLE_FIPS140
+		struct md2_ctx md2;
+#endif
 	} ctx;
 	void *ctx_ptr;
 	gnutls_digest_algorithm_t algo;
@@ -65,8 +67,10 @@ struct nettle_mac_ctx {
 		struct hmac_sha384_ctx sha384;
 		struct hmac_sha512_ctx sha512;
 		struct hmac_sha1_ctx sha1;
+#ifndef ENABLE_FIPS140
 		struct umac96_ctx umac96;
 		struct umac128_ctx umac128;
+#endif
 	} ctx;
 
 	void *ctx_ptr;
@@ -78,6 +82,7 @@ struct nettle_mac_ctx {
 	set_nonce_func set_nonce;
 };
 
+#ifndef ENABLE_FIPS140
 static void
 _wrap_umac96_set_key(void *ctx, unsigned len, const uint8_t * key)
 {
@@ -93,6 +98,7 @@ _wrap_umac128_set_key(void *ctx, unsigned len, const uint8_t * key)
 		abort();
 	umac128_set_key(ctx, key);
 }
+#endif
 
 static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 			 struct nettle_mac_ctx *ctx)
@@ -141,6 +147,7 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.sha512;
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
+#ifndef ENABLE_FIPS140
 	case GNUTLS_MAC_UMAC_96:
 		ctx->update = (update_func) umac96_update;
 		ctx->digest = (digest_func) umac96_digest;
@@ -157,6 +164,7 @@ static int _mac_ctx_init(gnutls_mac_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.umac128;
 		ctx->length = 16;
 		break;
+#endif
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -183,6 +191,8 @@ static int wrap_nettle_mac_fast(gnutls_mac_algorithm_t algo,
 	ctx.set_key(&ctx, key_size, key);
 	ctx.update(&ctx, text_size, text);
 	ctx.digest(&ctx, ctx.length, digest);
+	
+	zeroize_temp_key(&ctx, sizeof(ctx));
 
 	return 0;
 }
@@ -196,8 +206,10 @@ static int wrap_nettle_mac_exists(gnutls_mac_algorithm_t algo)
 	case GNUTLS_MAC_SHA256:
 	case GNUTLS_MAC_SHA384:
 	case GNUTLS_MAC_SHA512:
+#ifndef ENABLE_FIPS140
 	case GNUTLS_MAC_UMAC_96:
 	case GNUTLS_MAC_UMAC_128:
+#endif
 		return 1;
 	default:
 		return 0;
@@ -278,7 +290,10 @@ wrap_nettle_mac_output(void *src_ctx, void *digest, size_t digestsize)
 
 static void wrap_nettle_mac_deinit(void *hd)
 {
-	gnutls_free(hd);
+	struct nettle_mac_ctx *ctx = hd;
+	
+	zeroize_temp_key(ctx, sizeof(*ctx));
+	gnutls_free(ctx);
 }
 
 /* Hash functions 
@@ -303,11 +318,14 @@ static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 	switch (algo) {
 	case GNUTLS_DIG_MD5:
 	case GNUTLS_DIG_SHA1:
-	case GNUTLS_DIG_MD2:
+
 	case GNUTLS_DIG_SHA224:
 	case GNUTLS_DIG_SHA256:
 	case GNUTLS_DIG_SHA384:
 	case GNUTLS_DIG_SHA512:
+#ifndef ENABLE_FIPS140
+	case GNUTLS_DIG_MD2:
+#endif
 		return 1;
 	default:
 		return 0;
@@ -331,13 +349,6 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->digest = (digest_func) sha1_digest;
 		ctx->ctx_ptr = &ctx->ctx.sha1;
 		ctx->length = SHA1_DIGEST_SIZE;
-		break;
-	case GNUTLS_DIG_MD2:
-		md2_init(&ctx->ctx.md2);
-		ctx->update = (update_func) md2_update;
-		ctx->digest = (digest_func) md2_digest;
-		ctx->ctx_ptr = &ctx->ctx.md2;
-		ctx->length = MD2_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA224:
 		sha224_init(&ctx->ctx.sha224);
@@ -367,6 +378,15 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.sha512;
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
+#ifndef ENABLE_FIPS140
+	case GNUTLS_DIG_MD2:
+		md2_init(&ctx->ctx.md2);
+		ctx->update = (update_func) md2_update;
+		ctx->digest = (digest_func) md2_digest;
+		ctx->ctx_ptr = &ctx->ctx.md2;
+		ctx->length = MD2_DIGEST_SIZE;
+		break;
+#endif
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;

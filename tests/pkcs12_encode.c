@@ -81,7 +81,7 @@ void doit(void)
 	int ret, indx;
 	char outbuf[10240];
 	size_t size;
-	int i;
+	unsigned tests, i;
 
 	ret = global_init();
 	if (ret < 0) {
@@ -128,7 +128,12 @@ void doit(void)
 	}
 
 	/* Generate and add PKCS#12 cert bags. */
-	for (i = 0; i < 2; i++) {
+#ifndef ENABLE_FIPS140
+	tests = 2; /* include RC2 */
+#else
+	tests = 1;
+#endif
+	for (i = 0; i < tests; i++) {
 		ret = gnutls_pkcs12_bag_init(&bag);
 		if (ret < 0) {
 			fprintf(stderr, "bag_init: %d", ret);

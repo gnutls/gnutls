@@ -33,6 +33,7 @@
 #include <openpgp/gnutls_openpgp.h>
 #include <gnutls_sig.h>
 #include <algorithms.h>
+#include <fips.h>
 #include <abstract_int.h>
 
 /**
@@ -237,6 +238,8 @@ _gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
  **/
 int gnutls_privkey_init(gnutls_privkey_t * key)
 {
+	FAIL_IF_FIPS_ERROR;
+
 	*key = gnutls_calloc(1, sizeof(struct gnutls_privkey_st));
 	if (*key == NULL) {
 		gnutls_assert();
@@ -542,6 +545,52 @@ gnutls_privkey_import_x509(gnutls_privkey_t pkey,
 	pkey->flags = flags;
 
 	return 0;
+}
+
+/**
+ * gnutls_privkey_generate:
+ * @pkey: The private key
+ * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
+ * @bits: the size of the modulus
+ * @flags: unused for now.  Must be 0.
+ *
+ * This function will generate a random private key. Note that this
+ * function must be called on an empty private key.
+ *
+ * Note that when generating an elliptic curve key, the curve
+ * can be substituted in the place of the bits parameter using the
+ * GNUTLS_CURVE_TO_BITS() macro.
+ *
+ * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.3.0
+ **/
+int
+gnutls_privkey_generate (gnutls_privkey_t pkey,
+                         gnutls_pk_algorithm_t algo, unsigned int bits,
+                         unsigned int flags)
+{
+int ret;
+
+  ret = gnutls_x509_privkey_init(&pkey->key.x509);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+      
+  ret = gnutls_x509_privkey_generate(pkey->key.x509, algo, bits, flags);
+  if (ret < 0)
+    {
+      gnutls_x509_privkey_deinit(pkey->key.x509);
+      return gnutls_assert_val(ret);
+    }
+
+  pkey->type = GNUTLS_PRIVKEY_X509;
+  pkey->pk_algorithm = algo;
+  pkey->flags = flags;
+
+  return 0;
 }
 
 #ifdef ENABLE_OPENPGP

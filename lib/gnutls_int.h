@@ -381,12 +381,15 @@ struct gnutls_key_st {
 
 	/* For DH KX */
 	gnutls_datum_t key;
-	bigint_t KEY;
+	
+	/* For DH KX */
+	gnutls_pk_params_st dh_params;
 	bigint_t client_Y;
-	bigint_t client_g;
-	bigint_t client_p;
-	bigint_t dh_secret;
 	/* for SRP */
+
+	bigint_t srp_key;
+	bigint_t srp_g;
+	bigint_t srp_p;
 	bigint_t A;
 	bigint_t B;
 	bigint_t u;

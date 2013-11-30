@@ -67,6 +67,8 @@ typedef struct {
 } mac_hd_st;
 
 /* basic functions */
+int _gnutls_digest_exists(gnutls_digest_algorithm_t algo);
+
 int _gnutls_mac_exists(gnutls_mac_algorithm_t algorithm);
 int _gnutls_mac_init(mac_hd_st *, const mac_entry_st * e,
 		     const void *key, int keylen);

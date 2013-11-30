@@ -38,13 +38,14 @@ static void tls_log_func(int level, const char *str)
 
 void doit(void)
 {
+#ifdef ENABLE_NON_SUITEB_CURVES
 	const char *filename, *password = "1234";
 	gnutls_pkcs12_t pkcs12;
 	unsigned char *file_data;
 	size_t file_size;
 	gnutls_datum_t data;
 	gnutls_x509_crt_t *chain, *extras;
-	unsigned int chain_size, extras_size, i;
+	unsigned int chain_size = 0, extras_size = 0, i;
 	gnutls_x509_privkey_t pkey;
 	int ret;
 
@@ -148,4 +149,7 @@ void doit(void)
 	free(file_data);
 
 	gnutls_global_deinit();
+#else
+	exit(77);
+#endif
 }

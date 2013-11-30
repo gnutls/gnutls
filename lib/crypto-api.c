@@ -28,6 +28,7 @@
 #include <algorithms.h>
 #include <random.h>
 #include <crypto.h>
+#include <fips.h>
 
 typedef struct api_cipher_hd_st {
 	cipher_hd_st ctx_enc;
@@ -314,6 +315,15 @@ gnutls_hmac_init(gnutls_hmac_hd_t * dig,
 		 gnutls_mac_algorithm_t algorithm,
 		 const void *key, size_t keylen)
 {
+#ifdef ENABLE_FIPS140
+	/* MD5 is only allowed internally for TLS */
+	if (_gnutls_get_fips_state() != FIPS_STATE_SELFTEST && 
+		_gnutls_get_fips_state() != FIPS_STATE_ZOMBIE) {
+		if (algorithm == GNUTLS_MAC_MD5)
+			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+	}
+#endif
+
 	*dig = gnutls_malloc(sizeof(mac_hd_st));
 	if (*dig == NULL) {
 		gnutls_assert();
@@ -451,6 +461,15 @@ int
 gnutls_hash_init(gnutls_hash_hd_t * dig,
 		 gnutls_digest_algorithm_t algorithm)
 {
+#ifdef ENABLE_FIPS140
+	/* MD5 is only allowed internally for TLS */
+	if (_gnutls_get_fips_state() != FIPS_STATE_SELFTEST && 
+		_gnutls_get_fips_state() != FIPS_STATE_ZOMBIE) {
+		if (algorithm == GNUTLS_DIG_MD5)
+			return gnutls_assert_val(GNUTLS_E_UNWANTED_ALGORITHM);
+	}
+#endif
+
 	*dig = gnutls_malloc(sizeof(digest_hd_st));
 	if (*dig == NULL) {
 		gnutls_assert();
@@ -563,6 +582,14 @@ gnutls_hash_fast(gnutls_digest_algorithm_t algorithm,
 int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 {
 	int ret;
+
+#ifdef ENABLE_FIPS140
+	/* The FIPS140 approved RNGs are not allowed to be used
+	 * to extract key sizes longer than their original seed.
+	 */
+	if (key_size > FIPS140_RND_KEY_SIZE)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+#endif
 
 	key->size = key_size;
 	key->data = gnutls_malloc(key->size);

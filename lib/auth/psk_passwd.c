@@ -202,6 +202,8 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session, char *username,
 cleanup:
 	if (fd != NULL)
 		fclose(fd);
+        
+        zeroize_key(line, line_size);
 	free(line);
 
 	return ret;

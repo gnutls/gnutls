@@ -150,7 +150,7 @@ generate_normal_master(gnutls_session_t session,
 	}
 
 	if (!keep_premaster)
-		_gnutls_free_datum(premaster);
+		_gnutls_free_temp_key_datum(premaster);
 
 	if (ret < 0)
 		return ret;
