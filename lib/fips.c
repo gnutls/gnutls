@@ -343,10 +343,8 @@ int ret = _gnutls_fips_mode_enabled();
 
 	if (ret == 1)
 		return ret;
-	return 0;
-#else
-	return 0;
 #endif
+	return 0;
 }
 
 void _gnutls_lib_simulate_error(void)
