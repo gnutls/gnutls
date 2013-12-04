@@ -55,7 +55,7 @@ static void rnd_func(void *_ctx, unsigned length, uint8_t * data)
 {
 	if (_gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
 #ifdef ENABLE_FIPS140
-		_gnutls_switch_fips_state(FIPS_STATE_ERROR);
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 #else
 		abort();
 #endif
