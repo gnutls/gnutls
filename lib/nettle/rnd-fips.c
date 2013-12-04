@@ -42,7 +42,9 @@ struct fips_ctx {
 	struct drbg_aes_ctx nonce_context;
 	struct drbg_aes_ctx normal_context;
 	struct drbg_aes_ctx strong_context;
+#ifdef HAVE_GETPID
 	pid_t pid;
+#endif
 };
 
 static int _rngfips_reinit(struct fips_ctx* fctx);
@@ -130,8 +132,11 @@ static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx* fctx,
 {
 	int ret;
 
-	if (fctx->pid != getpid() || 
-		ctx->reseed_counter > DRBG_AES_RESEED_TIME) {
+	if (ctx->reseed_counter > DRBG_AES_RESEED_TIME
+#ifdef HAVE_GETPID
+		|| fctx->pid != getpid()
+#endif
+		) {
 
 		ret = _rngfips_reinit(fctx);
 		if (ret < 0)
@@ -176,7 +181,9 @@ int ret;
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+#ifdef HAVE_GETPID
 	fctx->pid = getpid();
+#endif
 
 	return 0;
 }
