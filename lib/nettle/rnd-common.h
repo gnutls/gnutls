@@ -29,6 +29,9 @@
 # include <sys/resource.h>
 #endif
 
+#include <drbg-aes.h>
+#include <fips.h>
+
 struct event_st {
 		struct timespec now; /* current time */
 #ifdef HAVE_GETRUSAGE
@@ -53,3 +56,6 @@ void _rnd_system_entropy_deinit(void);
 typedef int (*get_entropy_func)(void* rnd, size_t size);
 
 extern get_entropy_func _rnd_get_system_entropy;
+
+int drbg_reseed(struct drbg_aes_ctx *ctx);
+int drbg_generate_key(struct drbg_aes_ctx *ctx);

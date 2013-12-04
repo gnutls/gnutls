@@ -29,7 +29,6 @@
 #include <gnutls_errors.h>
 #include <nettle/aes.h>
 #include <nettle/memxor.h>
-#include <hash-pjw-bare.h>
 #include <locks.h>
 #include <rnd-common.h>
 
@@ -49,83 +48,6 @@ struct fips_ctx {
 
 static int _rngfips_reinit(struct fips_ctx* fctx);
 
-/* Get the DT vector for use with the core PRNG function. 
-
-   Buffer:       00112233445566778899AABBCCDDEEFF
-                 !--+---!!--+---!!--+---!!--+---!
-   seconds ---------/      |        |       |
-   nanoseconds ------------/        |       |
-                                    |       |
-   counter  ------------------------/       |
-   hash    --------------------------------/
-
-   hash is a hash of all the event values (including rusage when present,
-   and pid), and counter is a 32-bit running counter.
-   
-   The output number will be always unique if this function is called 
-   less than 2^32 times per nanosecond.
-    
-   This function is used to get an initial value for the DT of DRBG-AES
-   which is later being incremented.
-*/
-static int
-get_dt(void* priv, uint8_t dt[AES_BLOCK_SIZE])
-{
-	struct event_st event;
-	uint32_t secs, usecs;
-	uint32_t v1, v2;
-
-	_rnd_get_event(&event);
-	secs = event.now.tv_sec;
-	usecs = event.now.tv_nsec;
-	/* v2 is a hash of all values including rusage -when present
-	 * and getpid(). */
-	v1 = event.count;
-	v2 = hash_pjw_bare(&event, sizeof(event));
-	
-	memcpy(dt, &secs, 4);
-	memcpy(dt+4, &usecs, 4);
-	memcpy(dt+8, &v1, 4);
-	memcpy(dt+12, &v2, 4);
-	
-	return 1;
-}
-
-static int generate_key(struct drbg_aes_ctx *ctx)
-{
-	uint8_t buffer[FIPS140_RND_KEY_SIZE];
-	int ret;
-
-	/* Get a key from the standard RNG or from the entropy source.  */
-	ret = _rnd_get_system_entropy(buffer, sizeof(buffer));
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = drbg_aes_set_key(ctx, sizeof(buffer), buffer);
-	if (ret == 0)
-		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
-
-	zeroize_key(buffer, sizeof(buffer));
-
-	return 0;
-}
-
-
-/* Reseed a generator.  This is also used for the initial seeding. */
-static int reseed(struct drbg_aes_ctx *ctx)
-{
-	uint8_t buffer[AES_BLOCK_SIZE];
-	int ret;
-
-	/* The other two generators are seeded from /dev/random.  */
-	ret = _rnd_get_system_entropy(buffer, sizeof(buffer));
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	drbg_aes_seed(ctx, buffer, NULL, get_dt);
-
-	return 0;
-}
 
 static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx* fctx,
 			void *buffer, size_t length)
@@ -155,29 +77,29 @@ static int _rngfips_reinit(struct fips_ctx* fctx)
 int ret;
 
 	/* strong */
-	ret = generate_key(&fctx->strong_context);
+	ret = drbg_generate_key(&fctx->strong_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 	
-	ret = reseed(&fctx->strong_context);
+	ret = drbg_reseed(&fctx->strong_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	/* normal */
-	ret = generate_key(&fctx->normal_context);
+	ret = drbg_generate_key(&fctx->normal_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 	
-	ret = reseed(&fctx->normal_context);
+	ret = drbg_reseed(&fctx->normal_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	/* nonce */
-	ret = generate_key(&fctx->nonce_context);
+	ret = drbg_generate_key(&fctx->nonce_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 	
-	ret = reseed(&fctx->nonce_context);
+	ret = drbg_reseed(&fctx->nonce_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

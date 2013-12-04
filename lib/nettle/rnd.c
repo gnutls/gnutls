@@ -50,6 +50,7 @@ enum {
 
 static struct yarrow256_ctx yctx;
 static struct yarrow_source ysources[SOURCES];
+static struct drbg_aes_ctx nonce_ctx;
 
 static struct timespec device_last_read = { 0, 0 };
 
@@ -175,6 +176,8 @@ static int wrap_nettle_rnd_init(void **ctx)
 		gnutls_assert();
 		return ret;
 	}
+
+	/* initialize the main RNG */
 	yarrow256_init(&yctx, SOURCES, ysources);
 
 	ret = do_device_source(1);
@@ -190,6 +193,15 @@ static int wrap_nettle_rnd_init(void **ctx)
 	}
 
 	yarrow256_slow_reseed(&yctx);
+	
+	/* initialize the nonce RNG */
+	ret = drbg_generate_key(&nonce_ctx);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = drbg_reseed(&nonce_ctx);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }
@@ -201,7 +213,7 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	int ret, reseed = 0;
 
 	RND_LOCK;
-
+	
 #ifdef HAVE_GETPID
 	if (getpid() != pid) {	/* fork() detected */
 		memset(&device_last_read, 0, sizeof(device_last_read));
@@ -210,12 +222,8 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	}
 #endif
 
-	/* update state only when having a non-nonce or if nonce
-	 * and nsecs%4096 == 0, i.e., one out of 4096 times called .
-	 *
-	 * The reason we do that is to avoid any delays when generating nonces.
-	 */
-	if (level != GNUTLS_RND_NONCE || reseed != 0) {
+	if (level != GNUTLS_RND_NONCE) {
+		/* reseed main */
 		ret = do_trivia_source(0);
 		if (ret < 0) {
 			RND_UNLOCK;
@@ -229,14 +237,36 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 			gnutls_assert();
 			return ret;
 		}
-
-		if (reseed)
-			yarrow256_slow_reseed(&yctx);
+	} else if (nonce_ctx.reseed_counter > DRBG_AES_RESEED_TIME){
+		reseed = 1;
 	}
 
-	yarrow256_random(&yctx, datasize, data);
+	if (level == GNUTLS_RND_NONCE) {
+		if (reseed != 0) {
+			/* reseed nonce */
+			ret = drbg_generate_key(&nonce_ctx);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			ret = drbg_reseed(&nonce_ctx);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
+
+		ret = drbg_aes_random(&nonce_ctx, datasize, data);
+		if (ret == 0)
+			ret = GNUTLS_E_RANDOM_FAILED;
+		else
+			ret = 0;
+	} else {
+		if (reseed != 0)
+			yarrow256_slow_reseed(&yctx);
+
+		yarrow256_random(&yctx, datasize, data);
+		ret = 0;
+	}
 	RND_UNLOCK;
-	return 0;
+	return ret;
 }
 
 static void wrap_nettle_rnd_refresh(void *_ctx)
