@@ -27,7 +27,6 @@
 #include <fips.h>
 #include <stdio.h>
 #include <random.h>
-#include <gnutls/fips140.h>
 #include <dlfcn.h>
 
 unsigned int _gnutls_lib_mode = LIB_STATE_POWERON;
@@ -60,7 +59,6 @@ FILE* fd;
 	if (f2p != 0) {
 		/* a funny state where self tests are performed
 		 * and ignored */
-		_gnutls_switch_lib_state(LIB_STATE_ZOMBIE);
 		_gnutls_debug_log("FIPS140-2 ZOMBIE mode enabled\n");
 		return 2;
 	}

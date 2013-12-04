@@ -8,7 +8,6 @@
 #include <gnutls/crypto.h>
 #include <gnutls/abstract.h>
 #include <gnutls/x509.h>
-#include <gnutls/fips140.h>
 
 void _gnutls_lib_simulate_error(void);
 

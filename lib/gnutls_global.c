@@ -321,9 +321,13 @@ int gnutls_global_init2(unsigned int flags)
 	 * have been loaded */
 	if (flags & GNUTLS_GLOBAL_INIT_MINIMAL) {
 		res = _gnutls_fips_mode_enabled();
+		/* res == 1 -> fips140-2 mode enabled
+		 * res == 2 -> only self checks performed - but no failure
+		 * res == not in fips140 mode
+		 */
 		if (res != 0) {
 			ret = _gnutls_fips_perform_self_checks();
-			if (_gnutls_get_lib_state() != LIB_STATE_ZOMBIE) {
+			if (res != 2) {
 				if (ret < 0) {
 					gnutls_assert();
 					goto out;

@@ -30,7 +30,6 @@
 
 typedef enum {
   LIB_STATE_POWERON,
-  LIB_STATE_ZOMBIE,
   LIB_STATE_INIT,
   LIB_STATE_SELFTEST,
   LIB_STATE_OPERATIONAL,
@@ -45,8 +44,7 @@ inline static
 void _gnutls_switch_lib_state(gnutls_lib_state_t state)
 {
 	/* Once into zombie state no errors can change us */
-	if (_gnutls_lib_mode != LIB_STATE_ZOMBIE)
-		_gnutls_lib_mode = state;
+	_gnutls_lib_mode = state;
 }
 
 inline static gnutls_lib_state_t _gnutls_get_lib_state(void)
@@ -59,8 +57,8 @@ unsigned _gnutls_fips_mode_enabled(void);
 
 # define FAIL_IF_LIB_ERROR \
 	if (_gnutls_get_lib_state() != LIB_STATE_OPERATIONAL && \
-	  _gnutls_get_lib_state() != LIB_STATE_SELFTEST && \
-	  _gnutls_get_lib_state() != LIB_STATE_ZOMBIE) return GNUTLS_E_LIB_IN_ERROR_STATE
+	  _gnutls_get_lib_state() != LIB_STATE_SELFTEST) \
+	return GNUTLS_E_LIB_IN_ERROR_STATE
 
 void _gnutls_switch_lib_state(gnutls_lib_state_t state);
 
