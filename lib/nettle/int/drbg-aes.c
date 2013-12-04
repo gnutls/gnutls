@@ -35,6 +35,7 @@ drbg_aes_set_key(struct drbg_aes_ctx *ctx, unsigned length,
 
 	aes_set_encrypt_key(&ctx->key, length, key);
 	ctx->seeded = 0;
+	ctx->reseed_counter = 0;
 	ctx->prev_block_present = 0;
 
 	return 1;
@@ -49,19 +50,9 @@ drbg_aes_seed(struct drbg_aes_ctx *ctx, const uint8_t seed[AES_BLOCK_SIZE],
 	
 	dt_func(dt_priv, ctx->dt);
 	
+	ctx->reseed_counter = 0;
 	ctx->seeded = 1;
 }
-
-/* This is nettle's increment macro */
-/* Requires that size > 0 */
-#define INCREMENT(size, ctr)                    \
-  do {                                          \
-    unsigned increment_i = (size) - 1;          \
-    if (++(ctr)[increment_i] == 0)              \
-      while (increment_i > 0                    \
-             && ++(ctr)[--increment_i] == 0 )   \
-        ;                                       \
-  } while (0)
  
 int
 drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
@@ -144,6 +135,10 @@ drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
 		
 		INCREMENT(sizeof(ctx->dt), ctx->dt);
 	}
+	
+	if (ctx->reseed_counter > DRBG_AES_RESEED_TIME)
+		return 0;
+	ctx->reseed_counter++;
 
 	return 1;
 }

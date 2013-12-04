@@ -27,6 +27,17 @@
 #include <config.h>
 #include <nettle/aes.h>
 
+/* This is nettle's increment macro */
+/* Requires that size > 0 */
+#define INCREMENT(size, ctr)                    \
+  do {                                          \
+    unsigned increment_i = (size) - 1;          \
+    if (++(ctr)[increment_i] == 0)              \
+      while (increment_i > 0                    \
+             && ++(ctr)[--increment_i] == 0 )   \
+        ;                                       \
+  } while (0)
+
 /* This is the AES-based random-number generator from ANSI X9.31 
  * Appendix A.2.4. Note that the DT value from the document is obtained
  * during seeding. Then it is used as an 128-bit counter which is
@@ -43,7 +54,13 @@ struct drbg_aes_ctx {
 
 	unsigned prev_block_present;
 	uint8_t prev_block[AES_BLOCK_SIZE];
+	unsigned reseed_counter;
 };
+
+/* This DRBG should be reseeded if reseed_counter exceeds
+ * that number.
+ */
+#define DRBG_AES_RESEED_TIME 65536
 
 typedef int (*aes_dt) (void *priv, uint8_t dt[AES_BLOCK_SIZE]);
 

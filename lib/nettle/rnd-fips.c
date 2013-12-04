@@ -130,8 +130,9 @@ static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx* fctx,
 {
 	int ret;
 
-	if (fctx->pid != getpid()) {
-		/* We are in a child of us. */
+	if (fctx->pid != getpid() || 
+		ctx->reseed_counter > DRBG_AES_RESEED_TIME) {
+
 		ret = _rngfips_reinit(fctx);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
