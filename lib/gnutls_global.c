@@ -383,7 +383,6 @@ void gnutls_global_deinit(void)
 	GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
 	if (_gnutls_init == 1) {
 		_gnutls_init = 0;
-		GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
 		gl_sockets_cleanup();
 		gnutls_crypto_deinit();
 		_gnutls_rnd_deinit();
@@ -404,12 +403,11 @@ void gnutls_global_deinit(void)
 
 		gnutls_mutex_deinit(&_gnutls_file_mutex);
 		loaded_modules = 0;
-		GNUTLS_STATIC_MUTEX_DEINIT(global_init_mutex);
 	} else {
 		if (_gnutls_init > 0)
 			_gnutls_init--;
-		GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
 	}
+	GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
 }
 
 /**

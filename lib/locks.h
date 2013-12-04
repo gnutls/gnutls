@@ -55,10 +55,6 @@ extern mutex_unlock_func gnutls_mutex_unlock;
 # define GNUTLS_STATIC_MUTEX_UNLOCK(mutex) \
 	LeaveCriticalSection(mutex)
 
-# define GNUTLS_STATIC_MUTEX_DEINIT(mutex) \
-	DeleteCriticalSection(mutex); \
-	free(mutex); mutex = NULL
-
 #elif defined(HAVE_PTHREAD_LOCKS)
 # include <pthread.h>
 # define GNUTLS_STATIC_MUTEX(mutex) \
@@ -70,17 +66,10 @@ extern mutex_unlock_func gnutls_mutex_unlock;
 # define GNUTLS_STATIC_MUTEX_UNLOCK(mutex) \
 	pthread_mutex_unlock(&mutex)
 
-# define GNUTLS_STATIC_MUTEX_DEINIT(mutex) { \
-		static const pthread_mutex_t t = PTHREAD_MUTEX_INITIALIZER; \
-		pthread_mutex_destroy(&mutex); \
-		memcpy(&mutex, &t, sizeof(mutex)); \
-	}
-
 #else
 # define GNUTLS_STATIC_MUTEX(mutex)
 # define GNUTLS_STATIC_MUTEX_LOCK(mutex)
 # define GNUTLS_STATIC_MUTEX_UNLOCK(mutex)
-# define GNUTLS_STATIC_MUTEX_DEINIT(mutex)
 #endif
 
 #endif
