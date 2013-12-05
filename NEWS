@@ -6,12 +6,8 @@ See the end for copying conditions.
 * Version 3.3.0 (unreleased)
 
 ** libgnutls: The initialization of the library was moved to a
-constructor.
-
-** libgnutls: gnutls_global_init2() was added to allow splitting
-initialization to a minimal part (which can be part of a library
-constructor) and the rest, which includes things that cannot be
-in a constructor such as the PKCS #11 initialization.
+constructor. That is, gnutls_global_init() is no longer required
+unless linking with a static library.
 
 ** libgnutls: DH parameter generation is now delegated to nettle.
 
@@ -46,7 +42,6 @@ restricts the supported curves to SuiteB curves.
 
 ** API and ABI modifications:
 gnutls_privkey_generate: Added
-gnutls_global_init2: Added
 gnutls_fips140_mode_enabled: Added
 gnutls_digest_self_test: Added
 gnutls_mac_self_test: Added

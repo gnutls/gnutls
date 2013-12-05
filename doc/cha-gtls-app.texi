@@ -253,6 +253,9 @@ initialized by calling @funcref{gnutls_global_init}. That call
 typically enables CPU-specific acceleration, performs any required
 precalculations needed, and initializes subsystems that could be
 used later (e.g., PKCS #11 -- see @ref{PKCS11 Initialization}).
+Note that since GnuTLS 3.3.0 it is no longer required to call
+@funcref{gnutls_global_init} in systems that support library constructors
+(i.e, ELF systems and Windows).
 
 The resources allocated by the initialization process can be released if the
 application no longer has a need to call GnuTLS functions, this is

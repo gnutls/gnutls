@@ -1421,12 +1421,6 @@ int gnutls_ocsp_status_request_is_checked(gnutls_session_t session,
 
 /* global state functions
  */
-#define GNUTLS_GLOBAL_INIT_ALL (~((unsigned int)0))
-#define GNUTLS_GLOBAL_INIT_MINIMAL (1)
-#define GNUTLS_GLOBAL_INIT_PKCS11 (1<<1)
-#define GNUTLS_GLOBAL_INIT_CRYPTO (1<<2)
-
-int gnutls_global_init2(unsigned int flags);
 int gnutls_global_init(void);
 void gnutls_global_deinit(void);
 

@@ -171,9 +171,14 @@ GNUTLS_STATIC_MUTEX(global_init_mutex);
 static int _gnutls_init = 0;
 static unsigned int loaded_modules = 0;
 
+#define GNUTLS_GLOBAL_INIT_ALL (~((unsigned int)0))
+#define GNUTLS_GLOBAL_INIT_MINIMAL (1)
+#define GNUTLS_GLOBAL_INIT_PKCS11 (1<<1)
+#define GNUTLS_GLOBAL_INIT_CRYPTO (1<<2)
+
 #define GLOBAL_INIT_ALL (GNUTLS_GLOBAL_INIT_MINIMAL|GNUTLS_GLOBAL_INIT_PKCS11|GNUTLS_GLOBAL_INIT_CRYPTO)
 
-/**
+/*-
  * gnutls_global_init2:
  *
  * @flags: it's a %GNUTLS_GLOBAL_* flag
@@ -193,8 +198,8 @@ static unsigned int loaded_modules = 0;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
- **/
-int gnutls_global_init2(unsigned int flags)
+ -*/
+static int gnutls_global_init2(unsigned int flags)
 {
 	int ret = 0, res;
 	int level;
@@ -449,7 +454,7 @@ __attribute__((constructor))
 #endif
 static void lib_init(void)
 {
-	if (gnutls_global_init2(GNUTLS_GLOBAL_INIT_MINIMAL|GNUTLS_GLOBAL_INIT_CRYPTO) < 0) {
+	if (gnutls_global_init() < 0) {
 		fprintf(stderr, "Error in GnuTLS initialization");
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 	}
