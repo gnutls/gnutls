@@ -589,6 +589,9 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
  * This is required by PKCS 11 when an application uses fork(). The
  * reinitialization function must be called on the child.
  *
+ * Note that since GnuTLS 3.3.0, the reinitialization of the PKCS #11
+ * subsystem occurs automatically after fork.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *

@@ -228,10 +228,9 @@ prior to @funcref{gnutls_global_init}.
 @showfuncdesc{gnutls_pkcs11_init}
 
 Note that PKCS #11 modules must be reinitialized on the child processes
-after a @funcintref{fork}. @acronym{GnuTLS} provides @funcref{gnutls_pkcs11_reinit}
-to be called for this purpose.
-
-@showfuncdesc{gnutls_pkcs11_reinit}
+after a @funcintref{fork}. In older versions of @acronym{GnuTLS} it was
+required to call @funcref{gnutls_pkcs11_reinit}; since 3.3.0 this is no
+longer required, as reinitialization occurs automatically.
 
 @node Accessing objects that require a PIN
 @subsection Accessing objects that require a PIN

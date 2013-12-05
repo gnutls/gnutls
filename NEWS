@@ -17,6 +17,13 @@ in a constructor such as the PKCS #11 initialization.
 
 ** libgnutls: Separated nonce RNG from the main RNG.
 
+** libgnutls: PKCS #11 initialization is delayed to first usage.
+That avoids long delays in gnutls initialization due to broken PKCS #11
+modules.
+
+** libgnutls: The PKCS #11 subsystem is reinitialized automatically when 
+a fork is detected.
+
 ** libgnutls: Added --enable-fips140-mode configuration option. That
 option enables:
  o FIPS-186-4 compliant DSA and DH key generation (using provable primes)
