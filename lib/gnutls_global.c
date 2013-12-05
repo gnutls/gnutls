@@ -44,6 +44,7 @@
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
 void *_gnutls_file_mutex;
+void *_gnutls_pkcs11_mutex;
 
 ASN1_TYPE _gnutls_pkix1_asn;
 ASN1_TYPE _gnutls_gnutls_asn;
@@ -296,6 +297,12 @@ int gnutls_global_init2(unsigned int flags)
 			goto out;
 		}
 
+		ret = gnutls_mutex_init(&_gnutls_pkcs11_mutex);
+		if (ret < 0) {
+			gnutls_assert();
+			goto out;
+		}
+
 		ret = gnutls_system_global_init();
 		if (ret < 0) {
 			gnutls_assert();
@@ -406,6 +413,7 @@ void gnutls_global_deinit(void)
 #endif
 
 		gnutls_mutex_deinit(&_gnutls_file_mutex);
+		gnutls_mutex_deinit(&_gnutls_pkcs11_mutex);
 		loaded_modules = 0;
 	} else {
 		if (_gnutls_init > 0)

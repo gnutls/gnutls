@@ -46,7 +46,7 @@ struct token_info {
 	struct ck_token_info tinfo;
 	struct ck_slot_info sinfo;
 	ck_slot_id_t sid;
-	struct gnutls_pkcs11_provider_s *prov;
+	struct gnutls_pkcs11_provider_st *prov;
 };
 
 struct gnutls_pkcs11_obj_st {

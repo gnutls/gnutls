@@ -30,6 +30,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
 #include <x509/common.h>
+#include <locks.h>
 
 #include <pin.h>
 #include <pkcs11_int.h>
@@ -42,8 +43,11 @@
 #define MAX_CERT_SIZE 8*1024
 #define MAX_SLOTS 48
 
-struct gnutls_pkcs11_provider_s {
+extern void *_gnutls_pkcs11_mutex;
+
+struct gnutls_pkcs11_provider_st {
 	struct ck_function_list *module;
+	unsigned active;
 	struct ck_info info;
 };
 
@@ -65,8 +69,9 @@ struct crt_find_data_st {
 };
 
 
-static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
+static struct gnutls_pkcs11_provider_st providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
+static unsigned int providers_initialized = 0;
 
 gnutls_pkcs11_token_callback_t _gnutls_token_func;
 void *_gnutls_token_data;
@@ -157,7 +162,7 @@ int pkcs11_rv_to_err(ck_rv_t rv)
 }
 
 
-static int scan_slots(struct gnutls_pkcs11_provider_s *p,
+static int scan_slots(struct gnutls_pkcs11_provider_st *p,
 		      ck_slot_id_t * slots, unsigned long *nslots)
 {
 	ck_rv_t rv;
@@ -171,10 +176,10 @@ static int scan_slots(struct gnutls_pkcs11_provider_s *p,
 }
 
 static int
-pkcs11_add_module(const char *name, struct ck_function_list *module)
+pkcs11_add_module(struct ck_function_list *module)
 {
-	struct ck_info info;
 	unsigned int i;
+	char *name;
 
 	if (active_providers >= MAX_PROVIDERS) {
 		gnutls_assert();
@@ -182,12 +187,12 @@ pkcs11_add_module(const char *name, struct ck_function_list *module)
 	}
 
 	/* initially check if this module is a duplicate */
-	memset(&info, 0, sizeof(info));
-	pkcs11_get_module_info(module, &info);
 	for (i = 0; i < active_providers; i++) {
 		/* already loaded, skip the rest */
-		if (memcmp(&info, &providers[i].info, sizeof(info)) == 0) {
-			_gnutls_debug_log("%s is already loaded.\n", name);
+		if (module == providers[i].module) {
+			name = p11_kit_module_get_name(providers[i].module);
+			_gnutls_debug_log("p11: module %s is already loaded.\n", name);
+			free(name);
 			return GNUTLS_E_INT_RET_0;
 		}
 	}
@@ -195,10 +200,57 @@ pkcs11_add_module(const char *name, struct ck_function_list *module)
 	active_providers++;
 	providers[active_providers - 1].module = module;
 
-	memcpy(&providers[active_providers - 1].info, &info, sizeof(info));
+	memset(&providers[active_providers - 1].info, 0, sizeof(providers[active_providers - 1].info));
 
-	_gnutls_debug_log("p11: loaded provider '%s'\n", name);
+	return 0;
+}
 
+static int
+pkcs11_init_modules(void)
+{
+	unsigned int i;
+	int ret;
+	char* name;
+	
+	ret = gnutls_mutex_lock(&_gnutls_pkcs11_mutex);
+	if (ret != 0)
+		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
+
+	if (providers_initialized != 0) {
+		gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
+		return 0;
+	}
+	
+	providers_initialized = 1;
+	gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
+	
+	/* initialize */
+	ret = gnutls_pkcs11_reinit();
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* cache module info */
+	for (i = 0; i < active_providers; i++) {
+		memset(&providers[i].info, 0, sizeof(providers[i].info));
+
+		if (providers[i].active == 0)
+			continue;
+
+		name = p11_kit_module_get_name(providers[i].module);
+
+		ret = pkcs11_get_module_info(providers[i].module, &providers[i].info);
+		if (ret != CKR_OK) {
+			_gnutls_debug_log("p11: could not get provider info '%s'\n", name);
+			free(name);
+			providers[i].active = 0;
+			p11_kit_module_finalize(providers[i].module);
+			continue;
+		}
+		
+		_gnutls_debug_log("p11: loaded provider info for '%s'\n", name);
+		free(name);
+	}
+	
 	return 0;
 }
 
@@ -211,6 +263,8 @@ pkcs11_add_module(const char *name, struct ck_function_list *module)
  * This function will load and add a PKCS 11 module to the module
  * list used in gnutls. After this function is called the module will
  * be used for PKCS 11 operations.
+ *
+ * Note that this function is not thread safe.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -229,19 +283,10 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 		return GNUTLS_E_PKCS11_LOAD_ERROR;
 	}
 
-	if (p11_kit_module_initialize(module) != CKR_OK) {
-		p11_kit_module_release(module);
-		gnutls_assert();
-		_gnutls_debug_log("p11: Cannot initialize provider %s\n",
-				  name);
-		return GNUTLS_E_PKCS11_LOAD_ERROR;
-	}
-
-	ret = pkcs11_add_module(name, module);
+	ret = pkcs11_add_module(module);
 	if (ret != 0) {
 		if (ret == GNUTLS_E_INT_RET_0)
 			ret = 0;
-		p11_kit_module_finalize(module);
 		p11_kit_module_release(module);
 		gnutls_assert();
 	}
@@ -392,7 +437,7 @@ static int init = 0;
 
 /* tries to load modules from /etc/gnutls/pkcs11.conf if it exists
  */
-static void _pkcs11_compat_init(const char *configfile)
+static void compat_load(const char *configfile)
 {
 	FILE *fp;
 	int ret;
@@ -437,13 +482,12 @@ static void _pkcs11_compat_init(const char *configfile)
 	return;
 }
 
-static int initialize_automatic_p11_kit(void)
+static int auto_load(void)
 {
 	struct ck_function_list **modules;
-	char *name;
 	int i, ret;
 
-	modules = p11_kit_modules_load_and_initialize(0);
+	modules = p11_kit_modules_load("", 0);
 	if (modules == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log
@@ -453,14 +497,12 @@ static int initialize_automatic_p11_kit(void)
 	}
 
 	for (i = 0; modules[i] != NULL; i++) {
-		name = p11_kit_module_get_name(modules[i]);
-		ret = pkcs11_add_module(name, modules[i]);
-		if (ret != 0 && ret != GNUTLS_E_INT_RET_0) {
+		ret = pkcs11_add_module(modules[i]);
+		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log
-			    ("Cannot add registered module: %s\n", name);
+			    ("Cannot load PKCS #11 module\n");
 		}
-		free(name);
 	}
 
 	/* Shallow free */
@@ -470,7 +512,7 @@ static int initialize_automatic_p11_kit(void)
 
 /**
  * gnutls_pkcs11_init:
- * @flags: %GNUTLS_PKCS11_FLAG_MANUAL or %GNUTLS_PKCS11_FLAG_AUTO
+ * @flags: An ORed sequence of %GNUTLS_PKCS11_FLAG_*
  * @deprecated_config_file: either NULL or the location of a deprecated
  *     configuration file
  *
@@ -505,14 +547,17 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
 
 	if (flags == GNUTLS_PKCS11_FLAG_MANUAL)
 		return 0;
-	else if (flags == GNUTLS_PKCS11_FLAG_AUTO) {
+	else if (flags & GNUTLS_PKCS11_FLAG_AUTO) {
 		if (deprecated_config_file == NULL)
-			ret = initialize_automatic_p11_kit();
+			ret = auto_load();
 
-		_pkcs11_compat_init(deprecated_config_file);
+		compat_load(deprecated_config_file);
 
 		return ret;
 	}
+
+	if (flags & GNUTLS_PKCS11_FLAG_INIT)
+		return pkcs11_init_modules();
 
 	return 0;
 }
@@ -538,11 +583,15 @@ int gnutls_pkcs11_reinit(void)
 		if (providers[i].module != NULL) {
 			rv = p11_kit_module_initialize(providers
 						       [i].module);
-			if (rv != CKR_OK)
+			if (rv == CKR_OK) {
+				providers[i].active = 1;
+			} else {
+				providers[i].active = 0;
 				_gnutls_debug_log
 				    ("Cannot initialize registered module '%s': %s\n",
 				     providers[i].info.library_description,
 				     p11_kit_strerror(rv));
+			}
 		}
 	}
 
@@ -569,10 +618,12 @@ void gnutls_pkcs11_deinit(void)
 	}
 
 	for (i = 0; i < active_providers; i++) {
-		p11_kit_module_finalize(providers[i].module);
+		if (providers[i].active)
+			p11_kit_module_finalize(providers[i].module);
 		p11_kit_module_release(providers[i].module);
 	}
 	active_providers = 0;
+	providers_initialized = 0;
 
 	gnutls_pkcs11_set_pin_function(NULL, NULL);
 	gnutls_pkcs11_set_token_function(NULL, NULL);
@@ -867,8 +918,14 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 	int ret;
 	unsigned long nslots;
 	ck_slot_id_t slots[MAX_SLOTS];
+	
+	/* make sure that modules are initialized */
+	pkcs11_init_modules();
 
 	for (x = 0; x < active_providers; x++) {
+		if (providers[x].active == 0)
+			continue;
+
 		nslots = sizeof(slots) / sizeof(slots[0]);
 		ret = scan_slots(&providers[x], slots, &nslots);
 		if (ret < 0) {
@@ -977,7 +1034,12 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 	unsigned long nslots;
 	ck_slot_id_t slots[MAX_SLOTS];
 
+	/* make sure that modules are initialized */
+	pkcs11_init_modules();
+
 	for (x = 0; x < active_providers; x++) {
+		if (providers[x].active == 0)
+			continue;
 
 		nslots = sizeof(slots) / sizeof(slots[0]);
 		ret = scan_slots(&providers[x], slots, &nslots);
