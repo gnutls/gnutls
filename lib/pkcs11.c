@@ -36,6 +36,9 @@
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
 #include <p11-kit/pin.h>
+#ifdef HAVE_GETPID
+# include <unistd.h>
+#endif
 
 #define MAX_PROVIDERS 16
 
@@ -72,6 +75,9 @@ struct crt_find_data_st {
 static struct gnutls_pkcs11_provider_st providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
 static unsigned int providers_initialized = 0;
+#ifdef HAVE_GETPID
+static pid_t init_pid = -1;
+#endif
 
 gnutls_pkcs11_token_callback_t _gnutls_token_func;
 void *_gnutls_token_data;
@@ -216,11 +222,25 @@ pkcs11_init_modules(void)
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
+
 	if (providers_initialized != 0) {
+		ret = 0;
+#ifdef HAVE_GETPID
+		if (init_pid != getpid()) {
+			/* if we are initialized but a fork is detected */
+			ret = gnutls_pkcs11_reinit();
+			init_pid = getpid();
+		}
+#endif
+
 		gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
-		return 0;
+		return ret;
 	}
-	
+
+#ifdef HAVE_GETPID
+	init_pid = getpid();
+#endif
+
 	providers_initialized = 1;
 	gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 	
