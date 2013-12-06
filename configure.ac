@@ -214,9 +214,7 @@ AC_SUBST([WARN_CFLAGS])
 
 dnl Programs for compilation or development
 AC_PROG_LN_S
-AC_LIBTOOL_WIN32_DLL
-LT_INIT([disable-static])
-AC_PROG_LIBTOOL
+LT_INIT([disable-static,win32-dll,shared])
 
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
