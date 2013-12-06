@@ -38,6 +38,8 @@ option enables:
 ** libgnutls: Added --disable-non-suiteb-curves option. This option
 restricts the supported curves to SuiteB curves.
 
+** libgnutls: static libraries are not built by default.
+
 ** libgnutls: Depend on p11-kit 0.19.1 or later.
 
 ** API and ABI modifications:
