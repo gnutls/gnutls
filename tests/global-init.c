@@ -40,14 +40,6 @@ void doit(void)
 {
 	int ret;
 
-	/* In FIPS140 a constructor is being used for MINIMAL so
-	 * the following should succeed.
-	 */
-	ret = gnutls_global_init2(GNUTLS_GLOBAL_INIT_PKCS11);
-	if (ret < 0) {
-		fail("Could not initialize: %d\n", __LINE__);
-	}
-	
 	ret = gnutls_global_init();
 	if (ret < 0) {
 		fail("Could not initialize\n");
@@ -75,16 +67,6 @@ void doit(void)
 		fail("Could not initialize: %d\n", __LINE__);
 	}
 
-	ret = gnutls_global_init2(GNUTLS_GLOBAL_INIT_CRYPTO);
-	if (ret < 0) {
-		fail("Could not initialize: %d\n", __LINE__);
-	}
-
-	ret = gnutls_global_init2(GNUTLS_GLOBAL_INIT_PKCS11);
-	if (ret < 0) {
-		fail("Could not initialize: %d\n", __LINE__);
-	}
-	
 	gnutls_global_deinit();
 	gnutls_global_deinit();
 	gnutls_global_deinit();
@@ -92,12 +74,7 @@ void doit(void)
 	gnutls_global_deinit();
 
 	/* This should fail */
-	ret = gnutls_global_init2(GNUTLS_GLOBAL_INIT_CRYPTO);
-	if (ret != GNUTLS_E_INVALID_REQUEST) {
-		fail("Initialization should have failed: %d\n", __LINE__);
-	}
-	
-	ret = gnutls_global_init2(GNUTLS_GLOBAL_INIT_MINIMAL);
+	ret = gnutls_global_init();
 	if (ret < 0) {
 		fail("Could not initialize: %d\n", __LINE__);
 	}
