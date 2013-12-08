@@ -507,7 +507,7 @@ static int auto_load(void)
 	struct ck_function_list **modules;
 	int i, ret;
 
-	modules = p11_kit_modules_load("", 0);
+	modules = p11_kit_modules_load(NULL, 0);
 	if (modules == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log
