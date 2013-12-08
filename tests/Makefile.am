@@ -74,7 +74,7 @@ ctests = simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-dtls-srtp mini-xssl rsa-encrypt-decrypt mini-loss-time \
 	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range \
 	 mini-cert-status mini-rsa-psk mini-record-2 global-init \
-	 fips-test
+	 fips-test mini-global-load
 
 if ENABLE_OCSP
 ctests += ocsp
@@ -88,6 +88,10 @@ endif
 endif
 
 mini_xssl_LDADD = $(LDADD) ../lib/libgnutls-xssl.la
+
+if !WINDOWS
+mini_global_load_LDADD = $(LDADD) -ldl
+endif
 
 if ENABLE_OPENPGP
 ctests += openpgp-auth openpgp-auth2 openpgp-keyring pgps2kgnu
