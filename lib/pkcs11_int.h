@@ -34,7 +34,6 @@
 #include <p11-kit/uri.h>
 typedef unsigned char ck_bool_t;
 
-
 struct pkcs11_session_info {
 	struct ck_function_list *module;
 	struct ck_token_info tinfo;
@@ -61,6 +60,15 @@ struct gnutls_pkcs11_obj_st {
 
 	struct pin_info_st pin;
 };
+
+/* This must be called on every function that uses a PKCS #11 function
+ * directly */
+int _gnutls_pkcs11_check_init(void);
+
+#define PKCS11_CHECK_INIT \
+	ret = _gnutls_pkcs11_check_init(); \
+	if (ret < 0) \
+		return gnutls_assert_val(ret)
 
 /* thus function is called for every token in the traverse_tokens
  * function. Once everything is traversed it is called with NULL tinfo.

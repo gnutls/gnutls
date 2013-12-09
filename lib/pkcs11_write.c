@@ -61,6 +61,8 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 	ck_object_handle_t obj;
 	int a_val;
 	struct pkcs11_session_info sinfo;
+	
+	PKCS11_CHECK_INIT;
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
@@ -228,6 +230,8 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	gnutls_datum_t p, q, g, y, x;
 	gnutls_datum_t m, e, d, u, exp1, exp2;
 	struct pkcs11_session_info sinfo;
+
+	PKCS11_CHECK_INIT;
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
@@ -634,6 +638,8 @@ int gnutls_pkcs11_delete_url(const char *object_url, unsigned int flags)
 	int ret;
 	struct delete_data_st find_data;
 
+	PKCS11_CHECK_INIT;
+
 	memset(&find_data, 0, sizeof(find_data));
 
 	ret = pkcs11_url_to_info(object_url, &find_data.info);
@@ -681,6 +687,8 @@ gnutls_pkcs11_token_init(const char *token_url,
 	struct ck_function_list *module;
 	ck_slot_id_t slot;
 	char flabel[32];
+
+	PKCS11_CHECK_INIT;
 
 	ret = pkcs11_url_to_info(token_url, &info);
 	if (ret < 0) {
@@ -737,6 +745,8 @@ gnutls_pkcs11_token_set_pin(const char *token_url,
 	ck_rv_t rv;
 	unsigned int ses_flags;
 	struct pkcs11_session_info sinfo;
+
+	PKCS11_CHECK_INIT;
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
@@ -812,6 +822,8 @@ gnutls_pkcs11_token_get_random(const char *token_url,
 	struct p11_kit_uri *info = NULL;
 	ck_rv_t rv;
 	struct pkcs11_session_info sinfo;
+
+	PKCS11_CHECK_INIT;
 
 	memset(&sinfo, 0, sizeof(sinfo));
 

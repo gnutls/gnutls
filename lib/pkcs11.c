@@ -212,8 +212,7 @@ pkcs11_add_module(const char* name, struct ck_function_list *module)
 	return 0;
 }
 
-static int
-pkcs11_check_init(void)
+int _gnutls_pkcs11_check_init(void)
 {
 	int ret;
 	
@@ -942,11 +941,6 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 	unsigned long nslots;
 	ck_slot_id_t slots[MAX_SLOTS];
 	
-	/* make sure that modules are initialized */
-	ret = pkcs11_check_init();
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
 	for (x = 0; x < active_providers; x++) {
 		if (providers[x].active == 0)
 			continue;
@@ -1009,7 +1003,7 @@ pkcs11_open_session(struct pkcs11_session_info *sinfo,
 	struct ck_function_list *module;
 	ck_slot_id_t slot;
 	struct token_info tinfo;
-
+	
 	ret = pkcs11_find_slot(&module, &slot, info, &tinfo);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1058,11 +1052,6 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 	struct ck_function_list *module = NULL;
 	unsigned long nslots;
 	ck_slot_id_t slots[MAX_SLOTS];
-
-	/* make sure that modules are initialized */
-	ret = pkcs11_check_init();
-	if (ret < 0)
-		return gnutls_assert_val(ret);
 
 	for (x = 0; x < active_providers; x++) {
 		if (providers[x].active == 0)
@@ -1651,6 +1640,8 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 	int ret;
 	struct url_find_data_st find_data;
 
+	PKCS11_CHECK_INIT;
+
 	/* fill in the find data structure */
 	find_data.crt = obj;
 
@@ -1727,6 +1718,8 @@ gnutls_pkcs11_token_get_url(unsigned int seq,
 {
 	int ret;
 	struct token_num tn;
+
+	PKCS11_CHECK_INIT;
 
 	memset(&tn, 0, sizeof(tn));
 	tn.seq = seq;
@@ -2582,6 +2575,8 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
 	int ret;
 	struct crt_find_data_st priv;
 
+	PKCS11_CHECK_INIT;
+
 	memset(&priv, 0, sizeof(priv));
 
 	/* fill in the find data structure */
@@ -2842,6 +2837,8 @@ int gnutls_pkcs11_token_get_flags(const char *url, unsigned int *flags)
 	struct flags_find_data_st find_data;
 	int ret;
 
+	PKCS11_CHECK_INIT;
+
 	memset(&find_data, 0, sizeof(find_data));
 	ret = pkcs11_url_to_info(url, &find_data.info);
 	if (ret < 0) {
@@ -2893,6 +2890,8 @@ gnutls_pkcs11_token_get_mechanism(const char *url, unsigned int idx,
 	struct p11_kit_uri *info = NULL;
 	unsigned long count;
 	ck_mechanism_type_t mlist[400];
+	
+	PKCS11_CHECK_INIT;
 
 	ret = pkcs11_url_to_info(url, &info);
 	if (ret < 0) {
@@ -3134,6 +3133,8 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	uint8_t id[PKCS11_ID_SIZE];
 	size_t id_size;
 	struct p11_kit_uri *info = NULL;
+
+	PKCS11_CHECK_INIT;
 
 	memset(&priv, 0, sizeof(priv));
 

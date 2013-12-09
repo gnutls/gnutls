@@ -218,6 +218,8 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	struct pkcs11_session_info *sinfo;
 	ck_object_handle_t obj;
 
+	PKCS11_CHECK_INIT;
+
 	if (key->sinfo.init != 0) {
 		sinfo = &key->sinfo;
 		obj = key->obj;
@@ -322,6 +324,8 @@ int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
 	struct pkcs11_session_info *sinfo;
 	ck_object_handle_t obj;
 	struct ck_session_info session_info;
+	
+	PKCS11_CHECK_INIT;
 
 	if (key->sinfo.init != 0) {
 		sinfo = &key->sinfo;
@@ -370,6 +374,8 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	struct ck_attribute a[4];
 	ck_key_type_t key_type;
 	struct pkcs11_session_info sinfo;
+
+	PKCS11_CHECK_INIT;
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
@@ -460,6 +466,8 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	ck_object_handle_t obj;
 	struct pkcs11_session_info _sinfo;
 	struct pkcs11_session_info *sinfo;
+
+	PKCS11_CHECK_INIT;
 
 	if (key->sinfo.init != 0) {
 		sinfo = &key->sinfo;
@@ -613,6 +621,8 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	struct ck_mechanism mech;
 	gnutls_pubkey_t pkey = NULL;
 	gnutls_pkcs11_obj_t obj = NULL;
+
+	PKCS11_CHECK_INIT;
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
