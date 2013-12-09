@@ -338,6 +338,8 @@ static int gnutls_global_init2(unsigned int flags)
 		 * res == not in fips140 mode
 		 */
 		if (res != 0) {
+			_gnutls_priority_update_fips();
+
 			ret = _gnutls_fips_perform_self_checks();
 			if (res != 2) {
 				if (ret < 0) {

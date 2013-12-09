@@ -53,7 +53,12 @@ inline static gnutls_lib_state_t _gnutls_get_lib_state(void)
 }
 
 int _gnutls_fips_perform_self_checks(void);
+
+#ifdef ENABLE_FIPS140
 unsigned _gnutls_fips_mode_enabled(void);
+#else
+# define _gnutls_fips_mode_enabled() 0
+#endif
 
 # define FAIL_IF_LIB_ERROR \
 	if (_gnutls_get_lib_state() != LIB_STATE_OPERATIONAL && \

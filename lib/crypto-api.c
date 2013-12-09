@@ -317,7 +317,7 @@ gnutls_hmac_init(gnutls_hmac_hd_t * dig,
 {
 #ifdef ENABLE_FIPS140
 	/* MD5 is only allowed internally for TLS */
-	if (gnutls_fips140_mode_enabled() != 0 &&
+	if (_gnutls_fips_mode_enabled() != 0 &&
 		_gnutls_get_lib_state() != LIB_STATE_SELFTEST) {
 
 		if (algorithm == GNUTLS_MAC_MD5)
@@ -464,7 +464,7 @@ gnutls_hash_init(gnutls_hash_hd_t * dig,
 {
 #ifdef ENABLE_FIPS140
 	/* MD5 is only allowed internally for TLS */
-	if (gnutls_fips140_mode_enabled() != 0 &&
+	if (_gnutls_fips_mode_enabled() != 0 &&
 		_gnutls_get_lib_state() != LIB_STATE_SELFTEST) {
 
 		if (algorithm == GNUTLS_DIG_MD5)
@@ -589,7 +589,8 @@ int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 	/* The FIPS140 approved RNGs are not allowed to be used
 	 * to extract key sizes longer than their original seed.
 	 */
-	if (key_size > FIPS140_RND_KEY_SIZE)
+	if (_gnutls_fips_mode_enabled() != 0 &&
+	    key_size > FIPS140_RND_KEY_SIZE)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 #endif
 

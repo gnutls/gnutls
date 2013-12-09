@@ -39,7 +39,11 @@ unsigned _gnutls_fips_mode_enabled(void)
 {
 unsigned f1p, f2p;
 FILE* fd;
+static int fips_mode = -1;
 
+	if (fips_mode != -1)
+		return fips_mode;
+		
 	fd = fopen(FIPS_KERNEL_FILE, "r");
 	if (fd != NULL) {
 		f1p = fgetc(fd);
@@ -53,17 +57,20 @@ FILE* fd;
 
 	if (f1p != 0 && f2p != 0) {
 		_gnutls_debug_log("FIPS140-2 mode enabled\n");
-		return 1;
+		fips_mode = 1;
+		return fips_mode;
 	}
 
 	if (f2p != 0) {
 		/* a funny state where self tests are performed
 		 * and ignored */
 		_gnutls_debug_log("FIPS140-2 ZOMBIE mode enabled\n");
-		return 2;
+		fips_mode = 2;
+		return fips_mode;
 	}
 
-	return 0;
+	fips_mode = 0;
+	return fips_mode;
 }
 
 #define GNUTLS_LIBRARY_NAME "libgnutls.so.28"

@@ -1022,6 +1022,8 @@ inline static unsigned get_num_version(gnutls_session_t session)
 		return GNUTLS_VERSION_UNKNOWN;
 }
 
+void _gnutls_priority_update_fips(void);
+
 #define _gnutls_set_current_version(s, v) { \
   s->security_parameters.pversion = version_to_entry(v); \
   }

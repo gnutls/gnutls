@@ -338,25 +338,24 @@ static const int kx_priority_secure[] = {
 	0
 };
 
-#ifndef ENABLE_FIPS140
+static const int cipher_priority_performance_default[] = {
+	GNUTLS_CIPHER_ARCFOUR_128,
+	GNUTLS_CIPHER_AES_128_GCM,
+	GNUTLS_CIPHER_AES_256_GCM,
+	GNUTLS_CIPHER_CAMELLIA_128_GCM,
+	GNUTLS_CIPHER_CAMELLIA_256_GCM,
+	GNUTLS_CIPHER_AES_128_CBC,
+	GNUTLS_CIPHER_AES_256_CBC,
+	GNUTLS_CIPHER_CAMELLIA_128_CBC,
+	GNUTLS_CIPHER_CAMELLIA_256_CBC,
+	GNUTLS_CIPHER_3DES_CBC,
+	0
+};
+
 /* If GCM and AES acceleration is available then prefer
  * them over anything else.
  */
-static const int cipher_priority_performance[] = {
-	GNUTLS_CIPHER_ARCFOUR_128,
-	GNUTLS_CIPHER_AES_128_GCM,
-	GNUTLS_CIPHER_AES_256_GCM,
-	GNUTLS_CIPHER_CAMELLIA_128_GCM,
-	GNUTLS_CIPHER_CAMELLIA_256_GCM,
-	GNUTLS_CIPHER_AES_128_CBC,
-	GNUTLS_CIPHER_AES_256_CBC,
-	GNUTLS_CIPHER_CAMELLIA_128_CBC,
-	GNUTLS_CIPHER_CAMELLIA_256_CBC,
-	GNUTLS_CIPHER_3DES_CBC,
-	0
-};
-
-static const int cipher_priority_normal[] = {
+static const int cipher_priority_normal_default[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_CAMELLIA_128_GCM,
@@ -369,8 +368,8 @@ static const int cipher_priority_normal[] = {
 	GNUTLS_CIPHER_ARCFOUR_128,
 	0
 };
-#else
-static const int cipher_priority_performance[] = {
+
+static const int cipher_priority_performance_fips[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_AES_128_CBC,
@@ -379,7 +378,7 @@ static const int cipher_priority_performance[] = {
 	0
 };
 
-static const int cipher_priority_normal[] = {
+static const int cipher_priority_normal_fips[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_AES_128_CBC,
@@ -387,7 +386,7 @@ static const int cipher_priority_normal[] = {
 	GNUTLS_CIPHER_3DES_CBC,
 	0
 };
-#endif
+
 
 static const int cipher_priority_suiteb128[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
@@ -480,16 +479,34 @@ static const int sign_priority_secure192[] = {
 	0
 };
 
-static const int mac_priority_normal[] = {
+static const int mac_priority_normal_default[] = {
 	GNUTLS_MAC_SHA1,
 	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
-#ifndef ENABLE_FIPS140
 	GNUTLS_MAC_MD5,
-#endif
 	0
 };
+
+static const int mac_priority_normal_fips[] = {
+	GNUTLS_MAC_SHA1,
+	GNUTLS_MAC_SHA256,
+	GNUTLS_MAC_SHA384,
+	GNUTLS_MAC_AEAD,
+	0
+};
+
+static const int * cipher_priority_performance = cipher_priority_performance_default;
+static const int * cipher_priority_normal = cipher_priority_normal_default;
+static const int * mac_priority_normal = mac_priority_normal_default;
+
+/* if called with replace the default priorities with the FIPS140 ones */
+void _gnutls_priority_update_fips(void)
+{
+	cipher_priority_performance = cipher_priority_performance_fips;
+	cipher_priority_normal = cipher_priority_normal_fips;
+	mac_priority_normal = mac_priority_normal_fips;
+}
 
 static const int mac_priority_suiteb128[] = {
 	GNUTLS_MAC_AEAD,
