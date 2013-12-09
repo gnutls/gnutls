@@ -221,6 +221,10 @@ pkcs11_check_init(void)
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
+#ifdef HAVE_GETPID
+	if (init_pid == 0)
+		init_pid = getpid();
+#endif
 
 	if (providers_initialized != 0) {
 		ret = 0;
@@ -240,7 +244,8 @@ pkcs11_check_init(void)
 #endif
 
 	providers_initialized = 1;
-	ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, "");
+	_gnutls_debug_log("Initializing PKCS #11 modules\n");
+	ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
 	
 	gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 	
@@ -278,7 +283,10 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 		_gnutls_debug_log("p11: Cannot load provider %s\n", name);
 		return GNUTLS_E_PKCS11_LOAD_ERROR;
 	}
-	
+
+	_gnutls_debug_log
+		    ("p11: Initializing module: %s\n", name);
+
 	ret = p11_kit_module_initialize(module);
 	if (ret != CKR_OK) {
 		p11_kit_module_release(module);
@@ -503,6 +511,8 @@ static int auto_load(void)
 
 	for (i = 0; modules[i] != NULL; i++) {
 		name = p11_kit_module_get_name(modules[i]);
+		_gnutls_debug_log
+			    ("p11: Initializing module: %s\n", name);
 
 		ret = pkcs11_add_module(name, modules[i]);
 		if (ret < 0) {
