@@ -14,6 +14,9 @@ not present in libc. This also prevents an indirect linking to libpthread.
 ** libgnutls: Fixed issue with gnulib strerror replacement by adding
 the strerror gnulib module.
 
+** libgnutls: The time provided in the random values is only precise
+on its first 3 bytes.
+
 ** certtool: The --verify option will use the system CAs if the
 load-ca-certificate option is not provided.
 
