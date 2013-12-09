@@ -173,10 +173,9 @@ static unsigned int loaded_modules = 0;
 
 #define GNUTLS_GLOBAL_INIT_ALL (~((unsigned int)0))
 #define GNUTLS_GLOBAL_INIT_MINIMAL (1)
-#define GNUTLS_GLOBAL_INIT_PKCS11 (1<<1)
 #define GNUTLS_GLOBAL_INIT_CRYPTO (1<<2)
 
-#define GLOBAL_INIT_ALL (GNUTLS_GLOBAL_INIT_MINIMAL|GNUTLS_GLOBAL_INIT_PKCS11|GNUTLS_GLOBAL_INIT_CRYPTO)
+#define GLOBAL_INIT_ALL (GNUTLS_GLOBAL_INIT_MINIMAL|GNUTLS_GLOBAL_INIT_CRYPTO)
 
 /*-
  * gnutls_global_init2:
@@ -322,12 +321,6 @@ static int gnutls_global_init2(unsigned int flags)
 		_gnutls_cryptodev_init();
 	}
 
-#ifdef ENABLE_PKCS11
-	if (flags & GNUTLS_GLOBAL_INIT_PKCS11) {
-		gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
-	}
-#endif
-
 #ifdef ENABLE_FIPS140
 	/* Perform FIPS140 checks last, so that all modules
 	 * have been loaded */
@@ -414,9 +407,7 @@ void gnutls_global_deinit(void)
 			_gnutls_cryptodev_deinit();
 		}
 #ifdef ENABLE_PKCS11
-		if (loaded_modules & GNUTLS_GLOBAL_INIT_PKCS11) {
-			gnutls_pkcs11_deinit();
-		}
+		gnutls_pkcs11_deinit();
 #endif
 
 		gnutls_mutex_deinit(&_gnutls_file_mutex);

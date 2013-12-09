@@ -182,41 +182,40 @@ static int scan_slots(struct gnutls_pkcs11_provider_st *p,
 }
 
 static int
-pkcs11_add_module(struct ck_function_list *module)
+pkcs11_add_module(const char* name, struct ck_function_list *module)
 {
 	unsigned int i;
-	char *name;
+	struct ck_info info;
 
 	if (active_providers >= MAX_PROVIDERS) {
 		gnutls_assert();
 		return GNUTLS_E_CONSTRAINT_ERROR;
 	}
+	
+	memset(&info, 0, sizeof(info));
+	pkcs11_get_module_info(module, &info);
 
 	/* initially check if this module is a duplicate */
 	for (i = 0; i < active_providers; i++) {
 		/* already loaded, skip the rest */
 		if (module == providers[i].module) {
-			name = p11_kit_module_get_name(providers[i].module);
 			_gnutls_debug_log("p11: module %s is already loaded.\n", name);
-			free(name);
 			return GNUTLS_E_INT_RET_0;
 		}
 	}
 
 	active_providers++;
 	providers[active_providers - 1].module = module;
-
-	memset(&providers[active_providers - 1].info, 0, sizeof(providers[active_providers - 1].info));
+	providers[active_providers - 1].active = 1;
+	memcpy(&providers[active_providers - 1].info, &info, sizeof(info));
 
 	return 0;
 }
 
 static int
-pkcs11_init_modules(void)
+pkcs11_check_init(void)
 {
-	unsigned int i;
 	int ret;
-	char* name;
 	
 	ret = gnutls_mutex_lock(&_gnutls_pkcs11_mutex);
 	if (ret != 0)
@@ -242,35 +241,13 @@ pkcs11_init_modules(void)
 #endif
 
 	providers_initialized = 1;
+	ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, "");
+	
 	gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 	
-	/* initialize */
-	ret = gnutls_pkcs11_reinit();
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	/* cache module info */
-	for (i = 0; i < active_providers; i++) {
-		memset(&providers[i].info, 0, sizeof(providers[i].info));
-
-		if (providers[i].active == 0)
-			continue;
-
-		name = p11_kit_module_get_name(providers[i].module);
-
-		ret = pkcs11_get_module_info(providers[i].module, &providers[i].info);
-		if (ret != CKR_OK) {
-			_gnutls_debug_log("p11: could not get provider info '%s'\n", name);
-			free(name);
-			providers[i].active = 0;
-			p11_kit_module_finalize(providers[i].module);
-			continue;
-		}
-		
-		_gnutls_debug_log("p11: loaded provider info for '%s'\n", name);
-		free(name);
-	}
-	
 	return 0;
 }
 
@@ -302,11 +279,19 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 		_gnutls_debug_log("p11: Cannot load provider %s\n", name);
 		return GNUTLS_E_PKCS11_LOAD_ERROR;
 	}
+	
+	ret = p11_kit_module_initialize(module);
+	if (ret != CKR_OK) {
+		p11_kit_module_release(module);
+		gnutls_assert();
+		return pkcs11_rv_to_err(ret);
+	}
 
-	ret = pkcs11_add_module(module);
+	ret = pkcs11_add_module(name, module);
 	if (ret != 0) {
 		if (ret == GNUTLS_E_INT_RET_0)
 			ret = 0;
+		p11_kit_module_finalize(module);
 		p11_kit_module_release(module);
 		gnutls_assert();
 	}
@@ -506,8 +491,9 @@ static int auto_load(void)
 {
 	struct ck_function_list **modules;
 	int i, ret;
+	char* name;
 
-	modules = p11_kit_modules_load(NULL, 0);
+	modules = p11_kit_modules_load_and_initialize(0);
 	if (modules == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log
@@ -517,12 +503,15 @@ static int auto_load(void)
 	}
 
 	for (i = 0; modules[i] != NULL; i++) {
-		ret = pkcs11_add_module(modules[i]);
+		name = p11_kit_module_get_name(modules[i]);
+
+		ret = pkcs11_add_module(name, modules[i]);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log
-			    ("Cannot load PKCS #11 module\n");
+			    ("Cannot load PKCS #11 module: %s\n", name);
 		}
+		free(name);
 	}
 
 	/* Shallow free */
@@ -542,8 +531,9 @@ static int auto_load(void)
  * if %GNUTLS_PKCS11_FLAG_MANUAL is specified.
  *
  * Normally you don't need to call this function since it is being called
- * by gnutls_global_init() using the %GNUTLS_PKCS11_FLAG_AUTO. If other option
- * is required then it must be called before it.
+ * when the first PKCS 11 operation is requested using the %GNUTLS_PKCS11_FLAG_AUTO
+ * flag. If another flags are required then it must be called independently
+ * prior to any PKCS 11 operation.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -576,9 +566,6 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
 		return ret;
 	}
 
-	if (flags & GNUTLS_PKCS11_FLAG_INIT)
-		return pkcs11_init_modules();
-
 	return 0;
 }
 
@@ -606,12 +593,12 @@ int gnutls_pkcs11_reinit(void)
 		if (providers[i].module != NULL) {
 			rv = p11_kit_module_initialize(providers
 						       [i].module);
-			if (rv == CKR_OK) {
+			if (rv != CKR_OK) {
 				providers[i].active = 1;
 			} else {
 				providers[i].active = 0;
 				_gnutls_debug_log
-				    ("Cannot initialize registered module '%s': %s\n",
+				    ("Cannot re-initialize registered module '%s': %s\n",
 				     providers[i].info.library_description,
 				     p11_kit_strerror(rv));
 			}
@@ -625,6 +612,8 @@ int gnutls_pkcs11_reinit(void)
  * gnutls_pkcs11_deinit:
  *
  * This function will deinitialize the PKCS 11 subsystem in gnutls.
+ * This function is only needed if you need to deinitialize the
+ * subsystem without calling gnutls_global_deinit().
  *
  * Since: 2.12.0
  **/
@@ -632,13 +621,12 @@ void gnutls_pkcs11_deinit(void)
 {
 	unsigned int i;
 
+	if (init == 0)
+		return;
+
 	init--;
 	if (init > 0)
 		return;
-	if (init < 0) {
-		init = 0;
-		return;
-	}
 
 	for (i = 0; i < active_providers; i++) {
 		if (providers[i].active)
@@ -943,7 +931,9 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 	ck_slot_id_t slots[MAX_SLOTS];
 	
 	/* make sure that modules are initialized */
-	pkcs11_init_modules();
+	ret = pkcs11_check_init();
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	for (x = 0; x < active_providers; x++) {
 		if (providers[x].active == 0)
@@ -1058,7 +1048,9 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 	ck_slot_id_t slots[MAX_SLOTS];
 
 	/* make sure that modules are initialized */
-	pkcs11_init_modules();
+	ret = pkcs11_check_init();
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	for (x = 0; x < active_providers; x++) {
 		if (providers[x].active == 0)
