@@ -228,7 +228,6 @@ pkcs11_check_init(void)
 		if (init_pid != getpid()) {
 			/* if we are initialized but a fork is detected */
 			ret = gnutls_pkcs11_reinit();
-			init_pid = getpid();
 		}
 #endif
 
@@ -604,6 +603,9 @@ int gnutls_pkcs11_reinit(void)
 			}
 		}
 	}
+#ifdef HAVE_GETPID
+	init_pid = getpid();
+#endif
 
 	return 0;
 }
