@@ -114,6 +114,20 @@ cleanup:
 	return ret;
 }
 
+static void get_hmac_file(char *mac_file, size_t mac_file_size, const char* orig)
+{
+char* p;
+
+	p = strrchr(orig, '/');
+
+	if (p==NULL) {
+		snprintf(mac_file, mac_file_size, ".%s"HMAC_SUFFIX, orig);
+		return;
+	}
+
+	snprintf(mac_file, mac_file_size, "%.*s/.%s"HMAC_SUFFIX, (int)(p-orig), orig, p+1);
+}
+
 /* Run an HMAC using the key above on the library binary data. 
  * Returns true on success and false on error.
  */
@@ -127,7 +141,7 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 	uint8_t new_hmac[HMAC_SIZE];
 	size_t hmac_size;
 	gnutls_datum_t data;
-	
+
 	ret = get_library_path(libname, symbol, file, sizeof(file));
 	if (ret < 0) {
 		_gnutls_debug_log("Could not get path for library %s\n", libname);
@@ -153,7 +167,7 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 		return gnutls_assert_val(0);
 
 	/* now open the .hmac file and compare */
-	snprintf(mac_file, sizeof(mac_file), "%s"HMAC_SUFFIX, file);
+	get_hmac_file(mac_file, sizeof(mac_file), file);
 	
 	ret = gnutls_load_file(mac_file, &data);
 	if (ret < 0) {
