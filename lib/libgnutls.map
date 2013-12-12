@@ -933,6 +933,7 @@ GNUTLS_3_1_0 {
 	gnutls_digest_self_test;
 	gnutls_privkey_generate;
 	gnutls_fips140_mode_enabled;
+	gnutls_record_check_corked;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
