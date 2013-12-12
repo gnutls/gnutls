@@ -951,6 +951,7 @@ size_t gnutls_record_get_max_size(gnutls_session_t session);
 ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size);
 
 size_t gnutls_record_check_pending(gnutls_session_t session);
+size_t gnutls_record_check_corked(gnutls_session_t session);
 
 void gnutls_session_force_valid(gnutls_session_t session);
 
