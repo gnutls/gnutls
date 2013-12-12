@@ -21,7 +21,7 @@ on its first 3 bytes.
 load-ca-certificate option is not provided.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_record_check_corked: Added
 
 
 * Version 3.2.7 (released 2013-11-23)
