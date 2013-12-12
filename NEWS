@@ -27,8 +27,8 @@ option enables:
  o Self-tests on initialization on ciphers/MACs, public key algorithms and
    random generator.
  o Initialization on library load (when GnuTLS is a shared library)
- o MD5 is included (for TLS purposed but cannot be used by the high level
-   hashing functions)
+ o MD5 is included for TLS purposed but cannot be used by the high level
+   hashing functions.
  o All ciphers except AES are disabled.
  o All MACs except SHA are disabled (i.e., HMAC-MD5).
  o All keys (temporal and long term) are zeroized after use.
