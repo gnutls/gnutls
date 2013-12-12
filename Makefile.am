@@ -42,7 +42,6 @@ endif
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4 -I src/gl/m4
 
 EXTRA_DIST = cfg.mk maint.mk .clcopying
-YEAR=$(shell date +%Y)
 
 dist-hook: 
 	make -C doc/ compare-makefile

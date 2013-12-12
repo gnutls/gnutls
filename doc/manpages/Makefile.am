@@ -965,8 +965,6 @@ dist_man_MANS += $(APIMANS)
 
 $(APIMANS): stamp_mans
 
-YEAR=$(shell date +%Y)
-
 compare-makefile:
 	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d`; \
 	MANS=""; \

@@ -614,6 +614,10 @@ AM_CONDITIONAL(ENABLE_CRYWRAP, test "x$crywrap" != "xno")
 
 dnl end of crywrap requirements
 
+dnl Some variables needed in makefiles
+YEAR=`date +%Y`
+AC_SUBST([YEAR], $YEAR)
+
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
 AC_CONFIG_FILES([
   Makefile
