@@ -207,7 +207,7 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	uint8_t *data_p;
 	uint8_t *data_g;
 	uint8_t *data_Y;
-	int i, bits, ret;
+	int i, bits, ret, p_bits;
 	ssize_t data_size = _data_size;
 	
 	gnutls_pk_params_init(&session->key.dh_params);
@@ -264,7 +264,8 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 		return bits;
 	}
 
-	if (_gnutls_mpi_get_nbits(session->key.dh_params.params[DH_P]) < (size_t) bits) {
+	p_bits = _gnutls_mpi_get_nbits(session->key.dh_params.params[DH_P]);
+	if (p_bits < bits) {
 		/* the prime used by the peer is not acceptable
 		 */
 		gnutls_assert();
@@ -272,6 +273,15 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 		    ("Received a prime of %u bits, limit is %u\n",
 		     (unsigned) _gnutls_mpi_get_nbits(session->key.dh_params.params[DH_P]),
 		     (unsigned) bits);
+		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
+	}
+
+	if (p_bits >= DEFAULT_MAX_VERIFY_BITS) {
+		gnutls_assert();
+		_gnutls_debug_log
+		    ("Received a prime of %u bits, limit is %u\n",
+		     (unsigned) p_bits,
+		     (unsigned) DEFAULT_MAX_VERIFY_BITS);
 		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
 	}
 
