@@ -97,6 +97,22 @@ size_t gnutls_record_check_pending(gnutls_session_t session)
 	return _gnutls_record_buffer_get_size(session);
 }
 
+/**
+ * gnutls_record_check_corked:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function checks if there pending corked
+ * data in the gnutls buffers --see gnutls_cork(). 
+ *
+ * Returns: Returns the size of the corked data or zero.
+ *
+ * Since: 3.2.8
+ **/
+size_t gnutls_record_check_corked(gnutls_session_t session)
+{
+	return session->internals.record_presend_buffer.length;
+}
+
 int
 _gnutls_record_buffer_get(content_type_t type,
 			  gnutls_session_t session, uint8_t * data,

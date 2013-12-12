@@ -1492,6 +1492,11 @@ void gnutls_record_cork(gnutls_session_t session)
  * occurs (i.e., the function will retry on %GNUTLS_E_AGAIN and
  * %GNUTLS_E_INTERRUPTED).
  *
+ * If the flag %GNUTLS_RECORD_WAIT is not specified and the function
+ * is interrupted then the %GNUTLS_E_AGAIN or %GNUTLS_E_INTERRUPTED
+ * errors will be returned. To obtain the data left in the corked
+ * buffer use gnutls_record_check_corked().
+ *
  * Returns: On success the number of transmitted data is returned, or 
  * otherwise a negative error code. 
  *
