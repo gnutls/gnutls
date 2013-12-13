@@ -209,8 +209,8 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 	while (getline(&line, &line_size, fd) > 0) {
 		/* move to first ':' */
 		i = 0;
-		while ((line[i] != ':') && (line[i] != '\0')
-		       && (i < line_size)) {
+		while ((i < line_size) && (line[i] != ':')
+                       && (line[i] != '\0')) {
 			i++;
 		}
 
@@ -316,8 +316,8 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 	while (getline(&line, &line_size, fd) > 0) {
 		/* move to first ':' */
 		i = 0;
-		while ((line[i] != ':') && (line[i] != '\0')
-		       && (i < line_size)) {
+		while ((i < line_size) && (line[i] != '\0')
+		       && (line[i] != ':')) {
 			i++;
 		}
 
