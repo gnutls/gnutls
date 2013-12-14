@@ -30,7 +30,7 @@ extern const struct nettle_hash padlock_sha256;
 extern const struct nettle_hash padlock_sha384;
 extern const struct nettle_hash padlock_sha512;
 
-extern const gnutls_crypto_mac_st hmac_sha_padlock_nano_struct;
-extern const gnutls_crypto_digest_st sha_padlock_nano_struct;
+extern const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock_nano;
+extern const gnutls_crypto_digest_st _gnutls_sha_padlock_nano;
 
 #endif

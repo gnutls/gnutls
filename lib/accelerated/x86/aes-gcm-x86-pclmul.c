@@ -258,7 +258,7 @@ static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 	memcpy(tag, ctx->gcm.Xi.c, MIN(GCM_BLOCK_SIZE, tagsize));
 }
 
-const gnutls_crypto_cipher_st aes_gcm_pclmul = {
+const gnutls_crypto_cipher_st _gnutls_aes_gcm_pclmul = {
 	.init = aes_gcm_cipher_init,
 	.setkey = aes_gcm_cipher_setkey,
 	.setiv = aes_gcm_setiv,
