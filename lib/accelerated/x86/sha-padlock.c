@@ -30,6 +30,7 @@
 #include <aes-padlock.h>
 #include <assert.h>
 #include <sha-padlock.h>
+#include <x86.h>
 
 #ifdef HAVE_LIBNETTLE
 
@@ -351,11 +352,11 @@ int wrap_padlock_hash_fast(gnutls_digest_algorithm_t algo,
 	return 0;
 }
 
-const struct nettle_hash padlock_sha1 = _NETTLE_HASH(sha1, SHA1);
-const struct nettle_hash padlock_sha224 = _NETTLE_HASH(sha224, SHA224);
-const struct nettle_hash padlock_sha256 = _NETTLE_HASH(sha256, SHA256);
-const struct nettle_hash padlock_sha384 = _NETTLE_HASH(sha384, SHA384);
-const struct nettle_hash padlock_sha512 = _NETTLE_HASH(sha512, SHA512);
+const struct nettle_hash padlock_sha1 = NN_HASH(sha1, padlock_sha1_update, padlock_sha1_digest, SHA1);
+const struct nettle_hash padlock_sha224 = NN_HASH(sha224, padlock_sha256_update, padlock_sha256_digest, SHA224);
+const struct nettle_hash padlock_sha256 = NN_HASH(sha256, padlock_sha256_update, padlock_sha256_digest, SHA256);
+const struct nettle_hash padlock_sha384 = NN_HASH(sha384, padlock_sha512_update, padlock_sha512_digest, SHA384);
+const struct nettle_hash padlock_sha512 = NN_HASH(sha512, padlock_sha512_update, padlock_sha512_digest, SHA512);
 
 const gnutls_crypto_digest_st sha_padlock_struct = {
 	.init = NULL,

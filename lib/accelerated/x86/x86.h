@@ -33,4 +33,15 @@ unsigned int gnutls_have_cpuid(void);
 #define gnutls_have_cpuid() 1
 #endif				/* ASM_X86_32 */
 
+#define NN_HASH(name, update_func, digest_func, NAME) {	\
+ #name,						\
+ sizeof(struct name##_ctx),			\
+ NAME##_DIGEST_SIZE,				\
+ NAME##_DATA_SIZE,				\
+ (nettle_hash_init_func *) name##_init,		\
+ (nettle_hash_update_func *) update_func,	\
+ (nettle_hash_digest_func *) digest_func	\
+} 
+
+
 #endif
