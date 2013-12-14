@@ -67,3 +67,5 @@ gnutls_cpuid:
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
 .LSEH_end_gnutls_cpuid:
+
+.section .note.GNU-stack,"",%progbits
