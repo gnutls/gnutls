@@ -172,8 +172,7 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session, char *username,
 	while (fgets(line, sizeof(line), fd) != NULL) {
 		/* move to first ':' */
 		i = 0;
-		while ((line[i] != ':') && (line[i] != '\0')
-		       && (i < sizeof(line))) {
+		while ((i < sizeof(line)) && (line[i] != ':') && (line[i] != '\0')) {
 			i++;
 		}
 

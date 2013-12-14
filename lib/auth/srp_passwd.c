@@ -208,8 +208,7 @@ pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 	while (fgets(line, sizeof(line), fd) != NULL) {
 		/* move to first ':' */
 		i = 0;
-		while ((line[i] != ':') && (line[i] != '\0')
-		       && (i < sizeof(line))) {
+		while ((i < sizeof(line)) && (line[i] != ':') && (line[i] != '\0')) {
 			i++;
 		}
 		if (strncmp(indexstr, line, MAX(i, len)) == 0) {
@@ -311,8 +310,7 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 	while (fgets(line, sizeof(line), fd) != NULL) {
 		/* move to first ':' */
 		i = 0;
-		while ((line[i] != ':') && (line[i] != '\0')
-		       && (i < sizeof(line))) {
+		while ((i < sizeof(line)) && (line[i] != ':') && (line[i] != '\0')) {
 			i++;
 		}
 
