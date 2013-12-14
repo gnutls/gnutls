@@ -31,9 +31,6 @@ extern const gnutls_crypto_cipher_st aes_gcm_padlock_struct;
 extern const gnutls_crypto_mac_st hmac_sha_padlock_struct;
 extern const gnutls_crypto_digest_st sha_padlock_struct;
 
-extern const gnutls_crypto_mac_st hmac_sha_padlock_nano_struct;
-extern const gnutls_crypto_digest_st sha_padlock_nano_struct;
-
 int padlock_aes_cipher_setkey(void *_ctx, const void *userkey,
 			      size_t keysize);
 

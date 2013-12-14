@@ -31,41 +31,44 @@ if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../../minitasn1
 endif
 
-EXTRA_DIST = README license.txt
+EXTRA_DIST = README license.txt files.mk
 
 noinst_LTLIBRARIES = libx86.la
 
-libx86_la_SOURCES = sha-padlock.c hmac-padlock.c aes-x86.c aes-padlock.c aes-gcm-padlock.c aes-padlock.h aes-x86.h x86.h sha-padlock.h
+libx86_la_SOURCES = sha-padlock.c hmac-padlock.c aes-x86.c aes-padlock.c aes-gcm-padlock.c \
+	aes-padlock.h aes-x86.h x86.h sha-padlock.h sha-x86.c sha-x86.h hmac-x86.c
+
+include files.mk
 
 if ASM_X86_64
 AM_CFLAGS += -DASM_X86_64 -DASM_X86
 libx86_la_SOURCES += aes-gcm-x86.c
 
 if WINDOWS
-libx86_la_SOURCES += coff/appro-aes-x86-64-coff.s coff/padlock-x86-64-coff.s coff/cpuid-x86-64-coff.s coff/appro-aes-gcm-x86-64-coff.s
+libx86_la_SOURCES += $(X86_64_FILES_COFF)
 endif
 
 if MACOSX
-libx86_la_SOURCES += macosx/appro-aes-x86-64-macosx.s macosx/padlock-x86-64-macosx.s macosx/cpuid-x86-64-macosx.s macosx/appro-aes-gcm-x86-64-macosx.s
+libx86_la_SOURCES += $(X86_64_FILES_MACOSX)
 endif
 
 if ELF
-libx86_la_SOURCES += elf/appro-aes-x86-64.s elf/appro-aes-gcm-x86-64.s elf/padlock-x86-64.s elf/cpuid-x86-64.s
+libx86_la_SOURCES += $(X86_64_FILES_ELF)
 endif
 
 else #ASM_X86_64
 AM_CFLAGS += -DASM_X86_32 -DASM_X86
 
 if WINDOWS
-libx86_la_SOURCES += coff/appro-aes-x86-coff.s coff/padlock-x86-coff.s coff/cpuid-x86-coff.s
+libx86_la_SOURCES += $(X86_FILES_ELF)
 endif
 
 if MACOSX
-libx86_la_SOURCES += macosx/appro-aes-x86-macosx.s macosx/padlock-x86-macosx.s macosx/cpuid-x86-macosx.s
+libx86_la_SOURCES += $(X86_FILES_MACOSX)
 endif
 
 if ELF
-libx86_la_SOURCES += elf/appro-aes-x86.s elf/padlock-x86.s elf/cpuid-x86.s
+libx86_la_SOURCES += $(X86_FILES_ELF)
 endif
 
 endif #ASM_X86_64

@@ -30,6 +30,7 @@
 #include <gnutls/crypto.h>
 #include <gnutls_errors.h>
 #include <aes-x86.h>
+#include <sha-x86.h>
 #include <x86.h>
 
 struct aes_ctx {
@@ -37,6 +38,8 @@ struct aes_ctx {
 	uint8_t iv[16];
 	int enc;
 };
+
+unsigned int _gnutls_x86_cpuid_s[4];
 
 static int
 aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
@@ -126,19 +129,18 @@ static const gnutls_crypto_cipher_st cipher_struct = {
 
 static unsigned check_optimized_aes(void)
 {
-	unsigned int a, b, c, d;
-	gnutls_cpuid(1, &a, &b, &c, &d);
+	return (_gnutls_x86_cpuid_s[2] & 0x2000000);
+}
 
-	return (c & 0x2000000);
+static unsigned check_ssse3(void)
+{
+	return (_gnutls_x86_cpuid_s[2] & 0x0000200);
 }
 
 #ifdef ASM_X86_64
 static unsigned check_pclmul(void)
 {
-	unsigned int a, b, c, d;
-	gnutls_cpuid(1, &a, &b, &c, &d);
-
-	return (c & 0x2);
+	return (_gnutls_x86_cpuid_s[2] & 0x2);
 }
 #endif
 
@@ -164,6 +166,88 @@ void register_x86_crypto(void)
 
 	if (check_intel_or_amd() == 0)
 		return;
+
+	gnutls_cpuid(1, &_gnutls_x86_cpuid_s[0], &_gnutls_x86_cpuid_s[1], 
+		&_gnutls_x86_cpuid_s[2], &_gnutls_x86_cpuid_s[3]);
+	
+	if (check_ssse3()) {
+		_gnutls_debug_log("Intel SSSE3 was detected\n");
+		
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
+							 80,
+							 &sha_x86_struct);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
+							 80,
+							 &sha_x86_struct);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
+							 80,
+							 &sha_x86_struct);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+
+		ret =
+		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA1,
+							 80,
+							 &hmac_sha_x86_struct);
+		if (ret < 0)
+			gnutls_assert();
+
+		ret =
+		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA224,
+							 80,
+							 &hmac_sha_x86_struct);
+		if (ret < 0)
+			gnutls_assert();
+
+		ret =
+		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA256,
+							 80,
+							 &hmac_sha_x86_struct);
+		if (ret < 0)
+			gnutls_assert();
+
+#ifdef ENABLE_SHA512
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA384,
+							 80,
+							 &sha_x86_struct);
+		if (ret < 0)
+			gnutls_assert();
+
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA512,
+							 80,
+							 &sha_x86_struct);
+		if (ret < 0)
+			gnutls_assert();
+		ret =
+		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA384,
+							 80,
+							 &hmac_sha_x86_struct);
+		if (ret < 0)
+			gnutls_assert();
+
+		ret =
+		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA512,
+							 80,
+							 &hmac_sha_x86_struct);
+		if (ret < 0)
+			gnutls_assert();
+#endif
+	}
 
 	if (check_optimized_aes()) {
 		_gnutls_debug_log("Intel AES accelerator was detected\n");
@@ -210,6 +294,9 @@ void register_x86_crypto(void)
 		}
 #endif
 	}
+
+	/* convert _gnutls_x86_cpuid_s the way openssl asm expects it */
+	_gnutls_x86_cpuid_s[1] = _gnutls_x86_cpuid_s[2];
 
 	return;
 }

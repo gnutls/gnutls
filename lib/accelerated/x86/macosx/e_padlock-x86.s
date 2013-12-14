@@ -1,4 +1,3 @@
-/*
 # Copyright (c) 2011-2012, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
@@ -38,7 +37,6 @@
 #
 # *** This file is auto-generated ***
 #
-*/
 .file	"devel/perlasm/e_padlock-x86.s"
 .text
 .globl	_padlock_capability
@@ -1034,3 +1032,5 @@ L_padlock_sha512_blocks_begin:
 .align	2,0x90
 Lpadlock_saved_context:
 .long	0
+
+.section .note.GNU-stack,"",%progbits
