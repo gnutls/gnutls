@@ -228,7 +228,7 @@ void register_x86_crypto(void)
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_GCM, 79,
+		    (GNUTLS_CIPHER_AES_128_GCM, 90,
 		     &aes_gcm_x86_ssse3);
 			if (ret < 0) {
 				gnutls_assert();
@@ -236,7 +236,7 @@ void register_x86_crypto(void)
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_GCM, 79,
+		    (GNUTLS_CIPHER_AES_256_GCM, 90,
 		     &aes_gcm_x86_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
@@ -244,21 +244,21 @@ void register_x86_crypto(void)
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 79, &aes_ssse3);
+		    (GNUTLS_CIPHER_AES_128_CBC, 90, &aes_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 79, &aes_ssse3);
+		    (GNUTLS_CIPHER_AES_192_CBC, 90, &aes_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 79, &aes_ssse3);
+		    (GNUTLS_CIPHER_AES_256_CBC, 90, &aes_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
 		}
