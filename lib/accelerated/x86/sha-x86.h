@@ -16,7 +16,7 @@ void x86_sha1_update(struct sha1_ctx *ctx, size_t length, const uint8_t * data);
 void x86_sha256_update(struct sha256_ctx *ctx, size_t length, const uint8_t * data);
 void x86_sha512_update(struct sha512_ctx *ctx, size_t length, const uint8_t * data);
 
-extern const gnutls_crypto_digest_st sha_x86_struct;
-extern const gnutls_crypto_mac_st hmac_sha_x86_struct;
+extern const gnutls_crypto_digest_st sha_x86_ssse3;
+extern const gnutls_crypto_mac_st hmac_sha_x86_ssse3;
 
 #endif
