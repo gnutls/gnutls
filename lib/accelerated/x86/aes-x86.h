@@ -36,6 +36,12 @@ void aesni_ctr32_encrypt_blocks(const unsigned char *in,
 				const void *key,
 				const unsigned char *ivec);
 
+int vpaes_set_encrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);  
+int vpaes_set_decrypt_key(const unsigned char *userKey, int bits, AES_KEY *key);
+void vpaes_cbc_encrypt(const unsigned char *in, unsigned char *out,
+                       size_t length, const AES_KEY *key, unsigned char *ivec, int enc);
+void vpaes_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
+void vpaes_decrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
 
 extern const gnutls_crypto_cipher_st aes_gcm_struct;
 
