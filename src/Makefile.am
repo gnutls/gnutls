@@ -212,9 +212,6 @@ libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIM
 
 endif # ENABLE_TROUSERS
 
-BUILT_SOURCES = ocsptool-args.c p11tool-args.c psk-args.c cli-debug-args.c \
-		cli-args.c serv-args.c srptool-args.c certtool-args.c danetool-args.c
-
 danetool-args.c: $(srcdir)/args-std.def $(srcdir)/danetool-args.def
 	-$(AUTOGEN) danetool-args.def
 ocsptool-args.c: $(srcdir)/args-std.def $(srcdir)/ocsptool-args.def
