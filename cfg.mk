@@ -176,6 +176,8 @@ ASM_SOURCES_XXX := \
 	lib/accelerated/x86/XXX/sha256-ssse3-x86.s \
 	lib/accelerated/x86/XXX/sha512-ssse3-x86.s \
 	lib/accelerated/x86/XXX/sha512-ssse3-x86_64.s \
+	lib/accelerated/x86/XXX/aes-ssse3-x86.s \
+	lib/accelerated/x86/XXX/aes-ssse3-x86_64.s
 
 ASM_SOURCES_ELF := $(subst XXX,elf,$(ASM_SOURCES_XXX))
 ASM_SOURCES_COFF := $(subst XXX,coff,$(ASM_SOURCES_XXX))
@@ -187,10 +189,10 @@ asm-sources-clean:
 	rm -f $(ASM_SOURCES_ELF) $(ASM_SOURCES_COFF) $(ASM_SOURCES_MACOSX) lib/accelerated/x86/files.mk
 
 X86_FILES=XXX/aesni-x86.s XXX/cpuid-x86.s XXX/e_padlock-x86.s XXX/sha1-ssse3-x86.s \
-	XXX/sha256-ssse3-x86.s XXX/sha512-ssse3-x86.s
+	XXX/sha256-ssse3-x86.s XXX/sha512-ssse3-x86.s XXX/aes-ssse3-x86.s
 
 X86_64_FILES=XXX/aesni-x86_64.s XXX/cpuid-x86_64.s XXX/e_padlock-x86_64.s XXX/ghash-x86_64.s \
-	XXX/sha1-ssse3-x86_64.s XXX/sha512-ssse3-x86_64.s
+	XXX/sha1-ssse3-x86_64.s XXX/sha512-ssse3-x86_64.s XXX/aes-ssse3-x86_64.s
 
 X86_FILES_ELF := $(subst XXX,elf,$(X86_FILES))
 X86_FILES_COFF := $(subst XXX,coff,$(X86_FILES))
@@ -199,7 +201,7 @@ X86_64_FILES_ELF := $(subst XXX,elf,$(X86_64_FILES))
 X86_64_FILES_COFF := $(subst XXX,coff,$(X86_64_FILES))
 X86_64_FILES_MACOSX := $(subst XXX,macosx,$(X86_64_FILES))
 
-lib/accelerated/x86/files.mk:
+lib/accelerated/x86/files.mk: $(ASM_SOURCES_ELF)
 	echo X86_FILES_ELF=$(X86_FILES_ELF) > $@.tmp
 	echo X86_FILES_COFF=$(X86_FILES_COFF) >> $@.tmp
 	echo X86_FILES_MACOSX=$(X86_FILES_MACOSX) >> $@.tmp
@@ -208,56 +210,30 @@ lib/accelerated/x86/files.mk:
 	echo X86_64_FILES_MACOSX=$(X86_64_FILES_MACOSX) >> $@.tmp
 	mv $@.tmp $@
 
-# CPUID is handled differently (other license)
-lib/accelerated/x86/elf/cpuid-%.s: devel/perlasm/cpuid-%.pl $(objects)
-	cat devel/perlasm/license-gnutls.txt > $@
-	perl $< elf >> $@
-	echo "" >> $@
-	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
-
-lib/accelerated/x86/coff/cpuid-x86.s: devel/perlasm/cpuid-x86.pl $(objects)
-	cat devel/perlasm/license-gnutls.txt > $@
-	perl $< coff >> $@
-	echo "" >> $@
-	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
-
-lib/accelerated/x86/coff/cpuid-x86_64.s: devel/perlasm/cpuid-x86_64.pl $(objects)
-	cat devel/perlasm/license-gnutls.txt > $@
-	perl $< mingw64 >> $@
-	echo "" >> $@
-	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
-
-lib/accelerated/x86/macosx/cpuid-%.s: devel/perlasm/cpuid-%.pl $(objects)
-	cat devel/perlasm/license-gnutls.txt > $@
-	perl $< macosx >> $@
-	echo "" >> $@
-	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
-
-
 # Appro's code
-lib/accelerated/x86/elf/%.s: devel/perlasm/%.pl $(objects)
-	cat devel/perlasm/license.txt > $@
+lib/accelerated/x86/elf/%.s: devel/perlasm/%.pl
+	cat $^.license > $@
 	perl $< elf >> $@
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl $(objects)
-	cat devel/perlasm/license.txt > $@
+lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl
+	cat $^.license > $@
 	perl $< coff >> $@
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl $(objects)
-	cat devel/perlasm/license.txt > $@
+lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl
+	cat $^.license > $@
 	perl $< mingw64 >> $@
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl $(objects)
-	cat devel/perlasm/license.txt > $@
+lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl
+	cat $^.license > $@
 	perl $< macosx >> $@
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@

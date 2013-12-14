@@ -118,12 +118,65 @@ static void aes_deinit(void *_ctx)
 	gnutls_free(_ctx);
 }
 
-static const gnutls_crypto_cipher_st cipher_struct = {
+static const gnutls_crypto_cipher_st aesni_struct = {
 	.init = aes_cipher_init,
 	.setkey = aes_cipher_setkey,
 	.setiv = aes_setiv,
 	.encrypt = aes_encrypt,
 	.decrypt = aes_decrypt,
+	.deinit = aes_deinit,
+};
+
+static int
+aes_ssse3_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
+{
+	struct aes_ctx *ctx = _ctx;
+	int ret;
+
+	if (ctx->enc)
+		ret =
+		    vpaes_set_encrypt_key(userkey, keysize * 8,
+					  ALIGN16(&ctx->expanded_key));
+	else
+		ret =
+		    vpaes_set_decrypt_key(userkey, keysize * 8,
+					  ALIGN16(&ctx->expanded_key));
+
+	if (ret != 0)
+		return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
+
+	return 0;
+}
+
+static int
+aes_ssse3_encrypt(void *_ctx, const void *src, size_t src_size,
+	    void *dst, size_t dst_size)
+{
+	struct aes_ctx *ctx = _ctx;
+
+	vpaes_cbc_encrypt(src, dst, src_size, ALIGN16(&ctx->expanded_key),
+			  ctx->iv, 1);
+	return 0;
+}
+
+static int
+aes_ssse3_decrypt(void *_ctx, const void *src, size_t src_size,
+	    void *dst, size_t dst_size)
+{
+	struct aes_ctx *ctx = _ctx;
+
+	vpaes_cbc_encrypt(src, dst, src_size, ALIGN16(&ctx->expanded_key),
+			  ctx->iv, 0);
+
+	return 0;
+}
+
+static const gnutls_crypto_cipher_st aes_ssse3_struct = {
+	.init = aes_cipher_init,
+	.setkey = aes_ssse3_cipher_setkey,
+	.setiv = aes_setiv,
+	.encrypt = aes_ssse3_encrypt,
+	.decrypt = aes_ssse3_decrypt,
 	.deinit = aes_deinit,
 };
 
@@ -172,7 +225,28 @@ void register_x86_crypto(void)
 	
 	if (check_ssse3()) {
 		_gnutls_debug_log("Intel SSSE3 was detected\n");
-		
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_128_CBC, 79, &aes_ssse3_struct);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_192_CBC, 79, &aes_ssse3_struct);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_256_CBC, 79, &aes_ssse3_struct);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
 							 80,
@@ -253,21 +327,21 @@ void register_x86_crypto(void)
 		_gnutls_debug_log("Intel AES accelerator was detected\n");
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 80, &cipher_struct);
+		    (GNUTLS_CIPHER_AES_128_CBC, 80, &aesni_struct);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &cipher_struct);
+		    (GNUTLS_CIPHER_AES_192_CBC, 80, &aesni_struct);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 80, &cipher_struct);
+		    (GNUTLS_CIPHER_AES_256_CBC, 80, &aesni_struct);
 		if (ret < 0) {
 			gnutls_assert();
 		}

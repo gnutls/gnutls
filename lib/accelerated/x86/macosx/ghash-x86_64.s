@@ -1,4 +1,4 @@
-# Copyright (c) 2011-2012, Andy Polyakov <appro@openssl.org>
+# Copyright (c) 2011-2013, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
