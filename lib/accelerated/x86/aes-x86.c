@@ -115,6 +115,9 @@ aes_decrypt(void *_ctx, const void *src, size_t src_size,
 
 static void aes_deinit(void *_ctx)
 {
+	struct aes_ctx *ctx = _ctx;
+	
+	zeroize_temp_key(ctx, sizeof(*ctx));
 	gnutls_free(_ctx);
 }
 

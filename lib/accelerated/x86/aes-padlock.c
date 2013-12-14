@@ -151,7 +151,10 @@ padlock_aes_cbc_decrypt(void *_ctx, const void *src, size_t src_size,
 
 static void aes_deinit(void *_ctx)
 {
-	gnutls_free(_ctx);
+	struct padlock_ctx *ctx = _ctx;
+	
+	zeroize_temp_key(ctx, sizeof(*ctx));
+	gnutls_free(ctx);
 }
 
 static const gnutls_crypto_cipher_st aes_padlock_struct = {

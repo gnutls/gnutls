@@ -138,8 +138,11 @@ static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 	GCM_DIGEST(ctx, x86_aes_encrypt, tagsize, tag);
 }
 
-static void aes_gcm_deinit(void *ctx)
+static void aes_gcm_deinit(void *_ctx)
 {
+	struct gcm_x86_aes_ctx *ctx = _ctx;
+
+	zeroize_temp_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
 

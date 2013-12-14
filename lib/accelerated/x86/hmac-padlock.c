@@ -320,6 +320,8 @@ wrap_padlock_hmac_fast(gnutls_mac_algorithm_t algo,
 
 		wrap_padlock_hmac_output(&ctx, digest, ctx.length);
 		wrap_padlock_hmac_deinit(&ctx);
+
+		zeroize_temp_key(&ctx, sizeof(ctx));
 	}
 
 	return 0;

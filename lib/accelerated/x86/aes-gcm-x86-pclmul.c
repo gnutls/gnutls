@@ -65,6 +65,9 @@ void gcm_gmult_clmul(u64 Xi[2], const u128 Htable[16]);
 
 static void aes_gcm_deinit(void *_ctx)
 {
+	struct aes_gcm_ctx *ctx = _ctx;
+
+	zeroize_temp_key(ctx, sizeof(*ctx));
 	gnutls_free(_ctx);
 }
 
