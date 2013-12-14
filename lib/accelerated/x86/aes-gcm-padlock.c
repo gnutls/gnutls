@@ -72,7 +72,7 @@ static void aes_gcm_deinit(void *_ctx)
 	struct padlock_ctx *ctx = _ctx;
 
 	zeroize_temp_key(ctx, sizeof(*ctx));
-	gnutls_free(_ctx);
+	gnutls_free(ctx);
 }
 
 static int

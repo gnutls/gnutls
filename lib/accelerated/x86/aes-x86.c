@@ -118,7 +118,7 @@ static void aes_deinit(void *_ctx)
 	struct aes_ctx *ctx = _ctx;
 	
 	zeroize_temp_key(ctx, sizeof(*ctx));
-	gnutls_free(_ctx);
+	gnutls_free(ctx);
 }
 
 static const gnutls_crypto_cipher_st aesni_x86 = {
