@@ -9,7 +9,9 @@ See the end for copying conditions.
 variable complaint from valgrind.
 
 ** libgnutls: Added SSSE3 optimized SHA1, and SHA256, using Andy Polyakov's 
-assembly code.
+code.
+
+** libgnutls: Added SSSE3 optimized AES using Mike Hamburg's code.
 
 ** libgnutls: It only links to librt if the required functions are
 not present in libc. This also prevents an indirect linking to libpthread.
