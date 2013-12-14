@@ -37,7 +37,7 @@ noinst_LTLIBRARIES = libx86.la
 
 libx86_la_SOURCES = sha-padlock.c hmac-padlock.c aes-x86.c aes-padlock.c aes-gcm-padlock.c \
 	aes-padlock.h aes-x86.h x86.h sha-padlock.h sha-x86-ssse3.c sha-x86.h hmac-x86-ssse3.c \
-	aes-gcm-x86-ssse3.c
+	aes-gcm-x86-ssse3.c aes-gcm-x86-aesni.c
 
 include files.mk
 
