@@ -287,7 +287,7 @@ static int wrap_x86_hmac_fast(gnutls_mac_algorithm_t algo,
 	return 0;
 }
 
-const gnutls_crypto_mac_st hmac_sha_x86_struct = {
+const gnutls_crypto_mac_st hmac_sha_x86_ssse3 = {
 	.init = wrap_x86_hmac_init,
 	.setkey = wrap_x86_hmac_setkey,
 	.setnonce = NULL,

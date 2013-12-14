@@ -118,7 +118,7 @@ static void aes_deinit(void *_ctx)
 	gnutls_free(_ctx);
 }
 
-static const gnutls_crypto_cipher_st aesni_struct = {
+static const gnutls_crypto_cipher_st aesni_x86 = {
 	.init = aes_cipher_init,
 	.setkey = aes_cipher_setkey,
 	.setiv = aes_setiv,
@@ -171,7 +171,7 @@ aes_ssse3_decrypt(void *_ctx, const void *src, size_t src_size,
 	return 0;
 }
 
-static const gnutls_crypto_cipher_st aes_ssse3_struct = {
+static const gnutls_crypto_cipher_st aes_ssse3 = {
 	.init = aes_cipher_init,
 	.setkey = aes_ssse3_cipher_setkey,
 	.setiv = aes_setiv,
@@ -228,21 +228,37 @@ void register_x86_crypto(void)
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 79, &aes_ssse3_struct);
+		    (GNUTLS_CIPHER_AES_128_GCM, 79,
+		     &aes_gcm_x86_ssse3);
+			if (ret < 0) {
+				gnutls_assert();
+			}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_256_GCM, 79,
+		     &aes_gcm_x86_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 79, &aes_ssse3_struct);
+		    (GNUTLS_CIPHER_AES_128_CBC, 79, &aes_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 79, &aes_ssse3_struct);
+		    (GNUTLS_CIPHER_AES_192_CBC, 79, &aes_ssse3);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_256_CBC, 79, &aes_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -250,7 +266,7 @@ void register_x86_crypto(void)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
 							 80,
-							 &sha_x86_struct);
+							 &sha_x86_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -258,7 +274,7 @@ void register_x86_crypto(void)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
 							 80,
-							 &sha_x86_struct);
+							 &sha_x86_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -266,7 +282,7 @@ void register_x86_crypto(void)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
 							 80,
-							 &sha_x86_struct);
+							 &sha_x86_ssse3);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -275,21 +291,21 @@ void register_x86_crypto(void)
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA1,
 							 80,
-							 &hmac_sha_x86_struct);
+							 &hmac_sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA224,
 							 80,
-							 &hmac_sha_x86_struct);
+							 &hmac_sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA256,
 							 80,
-							 &hmac_sha_x86_struct);
+							 &hmac_sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 
@@ -297,27 +313,27 @@ void register_x86_crypto(void)
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA384,
 							 80,
-							 &sha_x86_struct);
+							 &sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA512,
 							 80,
-							 &sha_x86_struct);
+							 &sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA384,
 							 80,
-							 &hmac_sha_x86_struct);
+							 &hmac_sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
 		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA512,
 							 80,
-							 &hmac_sha_x86_struct);
+							 &hmac_sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 #endif
@@ -327,21 +343,21 @@ void register_x86_crypto(void)
 		_gnutls_debug_log("Intel AES accelerator was detected\n");
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 80, &aesni_struct);
+		    (GNUTLS_CIPHER_AES_128_CBC, 80, &aesni_x86);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &aesni_struct);
+		    (GNUTLS_CIPHER_AES_192_CBC, 80, &aesni_x86);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 80, &aesni_struct);
+		    (GNUTLS_CIPHER_AES_256_CBC, 80, &aesni_x86);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -353,7 +369,7 @@ void register_x86_crypto(void)
 			ret =
 			    gnutls_crypto_single_cipher_register
 			    (GNUTLS_CIPHER_AES_128_GCM, 80,
-			     &aes_gcm_struct);
+			     &aes_gcm_pclmul);
 			if (ret < 0) {
 				gnutls_assert();
 			}
@@ -361,7 +377,7 @@ void register_x86_crypto(void)
 			ret =
 			    gnutls_crypto_single_cipher_register
 			    (GNUTLS_CIPHER_AES_256_GCM, 80,
-			     &aes_gcm_struct);
+			     &aes_gcm_pclmul);
 			if (ret < 0) {
 				gnutls_assert();
 			}

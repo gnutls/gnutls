@@ -43,6 +43,7 @@ void vpaes_cbc_encrypt(const unsigned char *in, unsigned char *out,
 void vpaes_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
 void vpaes_decrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
 
-extern const gnutls_crypto_cipher_st aes_gcm_struct;
+extern const gnutls_crypto_cipher_st aes_gcm_pclmul;
+extern const gnutls_crypto_cipher_st aes_gcm_x86_ssse3;
 
 #endif
