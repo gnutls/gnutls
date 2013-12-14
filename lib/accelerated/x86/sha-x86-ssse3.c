@@ -356,7 +356,7 @@ const struct nettle_hash x86_sha512 =
 NN_HASH(sha512, x86_sha512_update, sha512_digest, SHA512);
 #endif
 
-const gnutls_crypto_digest_st sha_x86_ssse3 = {
+const gnutls_crypto_digest_st _gnutls_sha_x86_ssse3 = {
 	.init = wrap_x86_hash_init,
 	.hash = wrap_x86_hash_update,
 	.output = wrap_x86_hash_output,

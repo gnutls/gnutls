@@ -143,11 +143,10 @@ static void aes_gcm_deinit(void *_ctx)
 {
 	struct gcm_x86_aes_ctx *ctx = _ctx;
 
-	zeroize_temp_key(ctx, sizeof(*ctx));
 	gnutls_free(ctx);
 }
 
-const gnutls_crypto_cipher_st aes_gcm_x86_aesni = {
+const gnutls_crypto_cipher_st _gnutls_aes_gcm_x86_aesni = {
 	.init = aes_gcm_cipher_init,
 	.setkey = aes_gcm_cipher_setkey,
 	.setiv = aes_gcm_setiv,

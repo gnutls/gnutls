@@ -4,7 +4,6 @@
 #include <gnutls_int.h>
 
 void register_x86_crypto(void);
-void register_padlock_crypto(void);
 
 #define ALIGN16(x) \
         ((void *)(((ptrdiff_t)(x)+(ptrdiff_t)0x0f)&~((ptrdiff_t)0x0f)))
@@ -43,8 +42,10 @@ void vpaes_cbc_encrypt(const unsigned char *in, unsigned char *out,
 void vpaes_encrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
 void vpaes_decrypt(const unsigned char *in, unsigned char *out, const AES_KEY *key);
 
-extern const gnutls_crypto_cipher_st aes_gcm_pclmul;
-extern const gnutls_crypto_cipher_st aes_gcm_x86_ssse3;
-extern const gnutls_crypto_cipher_st aes_gcm_x86_aesni;
+extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_pclmul;
+extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_x86_ssse3;
+extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_x86_aesni;
+extern const gnutls_crypto_cipher_st _gnutls_aes_ssse3;
+extern const gnutls_crypto_cipher_st _gnutls_aesni_x86;
 
 #endif

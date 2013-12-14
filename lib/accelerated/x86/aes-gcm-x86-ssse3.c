@@ -143,7 +143,7 @@ static void aes_gcm_deinit(void *ctx)
 	gnutls_free(ctx);
 }
 
-const gnutls_crypto_cipher_st aes_gcm_x86_ssse3 = {
+const gnutls_crypto_cipher_st _gnutls_aes_gcm_x86_ssse3 = {
 	.init = aes_gcm_cipher_init,
 	.setkey = aes_gcm_cipher_setkey,
 	.setiv = aes_gcm_setiv,

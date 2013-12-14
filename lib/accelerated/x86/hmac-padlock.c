@@ -325,7 +325,7 @@ wrap_padlock_hmac_fast(gnutls_mac_algorithm_t algo,
 	return 0;
 }
 
-const gnutls_crypto_mac_st hmac_sha_padlock_struct = {
+const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock = {
 	.init = NULL,
 	.setkey = NULL,
 	.setnonce = NULL,
@@ -335,7 +335,7 @@ const gnutls_crypto_mac_st hmac_sha_padlock_struct = {
 	.fast = wrap_padlock_hmac_fast
 };
 
-const gnutls_crypto_mac_st hmac_sha_padlock_nano_struct = {
+const gnutls_crypto_mac_st _gnutls_hmac_sha_padlock_nano = {
 	.init = wrap_padlock_hmac_init,
 	.setkey = wrap_padlock_hmac_setkey,
 	.setnonce = NULL,

@@ -150,7 +150,7 @@ static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 	GCM_DIGEST(ctx, padlock_aes_encrypt, tagsize, tag);
 }
 
-const gnutls_crypto_cipher_st aes_gcm_padlock_struct = {
+const gnutls_crypto_cipher_st _gnutls_aes_gcm_padlock = {
 	.init = aes_gcm_cipher_init,
 	.setkey = aes_gcm_cipher_setkey,
 	.setiv = aes_gcm_setiv,
