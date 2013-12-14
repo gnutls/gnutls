@@ -50,14 +50,12 @@ const char *side = "";
 
 #define PRIO_ARCFOUR_128_SHA1 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_SALSA20_256_UMAC_96 "NONE:+VERS-TLS1.0:+SALSA20-256:+UMAC-96:+SIGN-ALL:+COMP-NULL:+RSA"
-#define PRIO_ESTREAM_SALSA20_256_UMAC_96 "NONE:+VERS-TLS1.0:+ESTREAM-SALSA20-256:+UMAC-96:+SIGN-ALL:+COMP-NULL:+RSA"
 
 #define PRIO_AES_CBC_SHA1 "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_ARCFOUR_128_MD5 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_AES_GCM "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_SALSA20_256_SHA1 "NONE:+VERS-TLS1.0:+SALSA20-256:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
-#define PRIO_ESTREAM_SALSA20_256_SHA1 "NONE:+VERS-TLS1.0:+ESTREAM-SALSA20-256:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
 static const int rsa_bits = 1776, ec_bits = 192;
 
@@ -464,8 +462,6 @@ void benchmark_tls(int debug_level, int ciphers)
 
 		test_ciphersuite(PRIO_SALSA20_256_UMAC_96, size);
 		test_ciphersuite(PRIO_SALSA20_256_SHA1, size);
-		test_ciphersuite(PRIO_ESTREAM_SALSA20_256_UMAC_96, size);
-		test_ciphersuite(PRIO_ESTREAM_SALSA20_256_SHA1, size);
 		test_ciphersuite(PRIO_ARCFOUR_128_SHA1, size);
 		test_ciphersuite(PRIO_ARCFOUR_128_MD5, size);
 		test_ciphersuite(PRIO_AES_GCM, size);
@@ -478,8 +474,6 @@ void benchmark_tls(int debug_level, int ciphers)
 		     size);
 		test_ciphersuite(PRIO_SALSA20_256_UMAC_96, size);
 		test_ciphersuite(PRIO_SALSA20_256_SHA1, size);
-		test_ciphersuite(PRIO_ESTREAM_SALSA20_256_UMAC_96, size);
-		test_ciphersuite(PRIO_ESTREAM_SALSA20_256_SHA1, size);
 		test_ciphersuite(PRIO_ARCFOUR_128_SHA1, size);
 		test_ciphersuite(PRIO_ARCFOUR_128_MD5, size);
 		test_ciphersuite(PRIO_AES_GCM, size);
