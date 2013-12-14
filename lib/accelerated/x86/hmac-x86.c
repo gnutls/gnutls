@@ -282,8 +282,6 @@ static int wrap_x86_hmac_fast(gnutls_mac_algorithm_t algo,
 	ctx.update(&ctx, text_size, text);
 	ctx.digest(&ctx, ctx.length, digest);
 	
-	zeroize_temp_key(&ctx, sizeof(ctx));
-
 	return 0;
 }
 
