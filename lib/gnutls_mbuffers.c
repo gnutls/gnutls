@@ -249,15 +249,12 @@ int _mbuffer_head_remove_bytes(mbuffer_head_st * buf, size_t bytes)
  * any buffer.
  *
  * maximum_size: Amount of data that this segment can contain.
- * size: Amount of useful data that is contained in this
- *  buffer. Generally 0, but this is a shortcut when a fixed amount of
- *  data will immediately be added to this segment.
  *
  * Returns the segment or NULL on error.
  *
  * Cost: O(1)
  */
-mbuffer_st *_mbuffer_alloc(size_t payload_size, size_t maximum_size)
+mbuffer_st *_mbuffer_alloc(size_t maximum_size)
 {
 	mbuffer_st *st;
 
@@ -272,7 +269,7 @@ mbuffer_st *_mbuffer_alloc(size_t payload_size, size_t maximum_size)
 
 	/* payload points after the mbuffer_st structure */
 	st->msg.data = (uint8_t *) st + sizeof(mbuffer_st);
-	st->msg.size = payload_size;
+	st->msg.size = 0;
 	st->maximum_size = maximum_size;
 
 	return st;
@@ -322,7 +319,7 @@ int _mbuffer_linearize(mbuffer_head_st * buf)
 		/* Nothing to do */
 		return 0;
 
-	bufel = _mbuffer_alloc(buf->byte_length, buf->byte_length);
+	bufel = _mbuffer_alloc(buf->byte_length);
 	if (!bufel) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -331,6 +328,7 @@ int _mbuffer_linearize(mbuffer_head_st * buf)
 	for (cur = _mbuffer_head_get_first(buf, &msg);
 	     msg.data != NULL; cur = _mbuffer_head_get_next(cur, &msg)) {
 		memcpy(&bufel->msg.data[pos], msg.data, msg.size);
+		bufel->msg.size += msg.size;
 		pos += msg.size;
 	}
 

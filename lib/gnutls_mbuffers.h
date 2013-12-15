@@ -31,7 +31,7 @@ void _mbuffer_head_clear(mbuffer_head_st * buf);
 void _mbuffer_enqueue(mbuffer_head_st * buf, mbuffer_st * bufel);
 mbuffer_st *_mbuffer_dequeue(mbuffer_head_st * buf, mbuffer_st * bufel);
 int _mbuffer_head_remove_bytes(mbuffer_head_st * buf, size_t bytes);
-mbuffer_st *_mbuffer_alloc(size_t payload_size, size_t maximum_size);
+mbuffer_st *_mbuffer_alloc(size_t maximum_size);
 
 mbuffer_st *_mbuffer_head_get_first(mbuffer_head_st * buf,
 				    gnutls_datum_t * msg);
@@ -107,16 +107,16 @@ inline static mbuffer_st *_gnutls_handshake_alloc(gnutls_session_t session,
 						  size_t size,
 						  size_t maximum)
 {
-	mbuffer_st *ret =
-	    _mbuffer_alloc(HANDSHAKE_HEADER_SIZE(session) + size,
-			   HANDSHAKE_HEADER_SIZE(session) + maximum);
+	mbuffer_st *bufel =
+	    _mbuffer_alloc(HANDSHAKE_HEADER_SIZE(session) + maximum);
 
-	if (!ret)
+	if (!bufel)
 		return NULL;
 
-	_mbuffer_set_uhead_size(ret, HANDSHAKE_HEADER_SIZE(session));
+	_mbuffer_set_udata_size(bufel, HANDSHAKE_HEADER_SIZE(session) + size);
+	_mbuffer_set_uhead_size(bufel, HANDSHAKE_HEADER_SIZE(session));
 
-	return ret;
+	return bufel;
 }
 
 /* Free a segment, if the pointer is not NULL

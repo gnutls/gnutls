@@ -218,7 +218,7 @@ _gnutls_dgram_read(gnutls_session_t session, mbuffer_st ** bufel,
 		gettime(&t1);
 	}
 
-	*bufel = _mbuffer_alloc(0, max_size);
+	*bufel = _mbuffer_alloc(max_size);
 	if (*bufel == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -286,7 +286,7 @@ _gnutls_stream_read(gnutls_session_t session, mbuffer_st ** bufel,
 
 	session->internals.direction = 0;
 
-	*bufel = _mbuffer_alloc(0, MAX(max_size, size));
+	*bufel = _mbuffer_alloc(MAX(max_size, size));
 	if (!*bufel) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;

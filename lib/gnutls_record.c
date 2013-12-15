@@ -501,7 +501,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 		/* now proceed to packet encryption
 		 */
 		cipher_size = MAX_RECORD_SEND_SIZE(session);
-		bufel = _mbuffer_alloc(0, cipher_size + CIPHER_SLACK_SIZE);
+		bufel = _mbuffer_alloc(cipher_size + CIPHER_SLACK_SIZE);
 		if (bufel == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -1199,10 +1199,11 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	 * they are encrypted).
 	 */
 	ret = max_decrypted_size(session) + MAX_PAD_SIZE + MAX_HASH_SIZE;
-	decrypted = _mbuffer_alloc(ret, ret);
+	decrypted = _mbuffer_alloc(ret);
 	if (decrypted == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
+	_mbuffer_set_udata_size(decrypted, ret);
 	ciphertext.data =
 	    (uint8_t *) _mbuffer_get_udata_ptr(bufel) + record.header_size;
 	ciphertext.size = record.length;
