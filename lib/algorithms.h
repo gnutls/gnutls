@@ -191,7 +191,23 @@ _gnutls_cipher_get_implicit_iv_size(const cipher_entry_st * e)
 {
 	if (unlikely(e == NULL))
 		return 0;
-	return e->iv;
+	return e->implicit_iv;
+}
+
+inline static int
+_gnutls_cipher_get_iv_size(const cipher_entry_st * e)
+{
+	if (unlikely(e == NULL))
+		return 0;
+	return e->cipher_iv;
+}
+
+inline static int
+_gnutls_cipher_get_explicit_iv_size(const cipher_entry_st * e)
+{
+	if (unlikely(e == NULL))
+		return 0;
+	return e->explicit_iv;
 }
 
 inline static int _gnutls_cipher_get_key_size(const cipher_entry_st * e)

@@ -32,6 +32,7 @@ void _mbuffer_enqueue(mbuffer_head_st * buf, mbuffer_st * bufel);
 mbuffer_st *_mbuffer_dequeue(mbuffer_head_st * buf, mbuffer_st * bufel);
 int _mbuffer_head_remove_bytes(mbuffer_head_st * buf, size_t bytes);
 mbuffer_st *_mbuffer_alloc(size_t maximum_size);
+int _mbuffer_linearize(mbuffer_head_st * buf);
 
 mbuffer_st *_mbuffer_head_get_first(mbuffer_head_st * buf,
 				    gnutls_datum_t * msg);
@@ -44,7 +45,6 @@ mbuffer_st *_mbuffer_head_pop_first(mbuffer_head_st * buf);
  */
 int _mbuffer_append_data(mbuffer_st * bufel, void *newdata,
 			 size_t newdata_size);
-int _mbuffer_linearize(mbuffer_head_st * buf);
 
 
 /* For "user" use. One can have buffer data and header.
@@ -132,5 +132,13 @@ inline static void _mbuffer_xfree(mbuffer_st ** bufel)
 
 	*bufel = NULL;
 }
+
+#ifdef ENABLE_CRYPTODEV
+mbuffer_st *_mbuffer_alloc_align16(size_t maximum_size, unsigned align_pos);
+int _mbuffer_linearize_align16(mbuffer_head_st * buf, unsigned align_pos);
+#else
+# define _mbuffer_alloc_align16(x,y) _mbuffer_alloc(x)
+# define _mbuffer_linearize_align16(x,y) _mbuffer_linearize(x)
+#endif
 
 #endif

@@ -501,7 +501,9 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 		/* now proceed to packet encryption
 		 */
 		cipher_size = MAX_RECORD_SEND_SIZE(session);
-		bufel = _mbuffer_alloc(cipher_size + CIPHER_SLACK_SIZE);
+
+		bufel = _mbuffer_alloc_align16(cipher_size + CIPHER_SLACK_SIZE, 
+			get_total_headers2(session, record_params));
 		if (bufel == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -510,7 +512,6 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 		/* Use the default record version, if it is
 		 * set. */
 		copy_record_version(session, htype, &headers[1]);
-		header_size = RECORD_HEADER_SIZE(session);
 		/* Adjust header length and add sequence for DTLS */
 		if (IS_DTLS(session))
 			memcpy(&headers[3],
@@ -521,6 +522,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 		     session, _gnutls_packet2str(type), type,
 		     (int) data_size, (int) min_pad);
 
+		header_size = RECORD_HEADER_SIZE(session);
 		_mbuffer_set_udata_size(bufel, cipher_size);
 		_mbuffer_set_uhead_size(bufel, header_size);
 
@@ -1020,7 +1022,9 @@ record_read_headers(gnutls_session_t session,
 }
 
 
-static int recv_headers(gnutls_session_t session, content_type_t type,
+static int recv_headers(gnutls_session_t session, 
+			record_parameters_st *record_params,
+			content_type_t type,
 			gnutls_handshake_description_t htype,
 			struct tls_record_st *record, unsigned int *ms)
 {
@@ -1045,7 +1049,8 @@ static int recv_headers(gnutls_session_t session, content_type_t type,
 		return gnutls_assert_val(ret);
 	}
 
-	ret = _mbuffer_linearize(&session->internals.record_recv_buffer);
+	ret = _mbuffer_linearize_align16(&session->internals.record_recv_buffer, 
+		get_total_headers2(session, record_params));
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1160,7 +1165,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	record_state = &record_params->read;
 
 	/* receive headers */
-	ret = recv_headers(session, type, htype, &record, &ms);
+	ret = recv_headers(session, record_params, type, htype, &record, &ms);
 	if (ret < 0) {
 		ret = gnutls_assert_val_fatal(ret);
 		goto recv_error;
@@ -1184,7 +1189,8 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	/* ok now we are sure that we have read all the data - so
 	 * move on !
 	 */
-	ret = _mbuffer_linearize(&session->internals.record_recv_buffer);
+	ret = _mbuffer_linearize_align16(&session->internals.record_recv_buffer, 
+		get_total_headers2(session, record_params));
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -1199,7 +1205,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	 * they are encrypted).
 	 */
 	ret = max_decrypted_size(session) + MAX_PAD_SIZE + MAX_HASH_SIZE;
-	decrypted = _mbuffer_alloc(ret);
+	decrypted = _mbuffer_alloc_align16(ret, 0);
 	if (decrypted == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 

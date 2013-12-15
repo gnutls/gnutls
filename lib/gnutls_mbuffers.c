@@ -275,6 +275,7 @@ mbuffer_st *_mbuffer_alloc(size_t maximum_size)
 	return st;
 }
 
+
 /* Copy data into a segment. The segment must not be part of a buffer
  * head when using this function.
  *
@@ -301,24 +302,112 @@ _mbuffer_append_data(mbuffer_st * bufel, void *newdata,
 	return 0;
 }
 
+#ifdef ENABLE_CRYPTODEV
+# define ALIGN_SIZE 16
+
+/* Allocate a 16-byte alligned buffer segment. The segment is not initially "owned" by
+ * any buffer.
+ *
+ * maximum_size: Amount of data that this segment can contain.
+ * align_pos: identifies the position of the buffer that will be aligned at 16-bytes
+ *
+ * This function should be used to ensure that encrypted data or data to
+ * be encrypted are properly aligned.
+ *
+ * Returns the segment or NULL on error.
+ *
+ * Cost: O(1)
+ */
+mbuffer_st *_mbuffer_alloc_align16(size_t maximum_size, unsigned align_pos)
+{
+	mbuffer_st *st;
+	size_t cur_alignment;
+
+	st = gnutls_malloc(maximum_size + sizeof(mbuffer_st) + ALIGN_SIZE);
+	if (st == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	/* set the structure to zero */
+	memset(st, 0, sizeof(*st));
+
+	/* payload points after the mbuffer_st structure */
+	st->msg.data = (uint8_t *) st + sizeof(mbuffer_st);
+	
+	cur_alignment = ((size_t)(st->msg.data+align_pos)) % ALIGN_SIZE;
+	if (cur_alignment > 0)
+		st->msg.data += ALIGN_SIZE - cur_alignment;
+
+	st->msg.size = 0;
+	st->maximum_size = maximum_size;
+
+	return st;
+}
+
+static unsigned is_aligned16(mbuffer_st * bufel, unsigned align_pos)
+{
+uint8_t * ptr = _mbuffer_get_udata_ptr(bufel);
+
+	if (((size_t)(ptr+align_pos)) % ALIGN_SIZE == 0)
+		return 1;
+	else
+		return 0;
+}
+
 /* Takes a buffer in multiple chunks and puts all the data in a single
- * contiguous segment.
+ * contiguous segment, ensuring that the @align_pos is 16-byte aligned.
  *
  * Returns 0 on success or an error code otherwise.
  *
  * Cost: O(n)
  * n: number of segments initially in the buffer
  */
+int _mbuffer_linearize_align16(mbuffer_head_st * buf, unsigned align_pos)
+{
+	mbuffer_st *bufel, *cur;
+	gnutls_datum_t msg;
+	size_t pos = 0;
+
+	if (buf->length == 0) {
+		/* Nothing to do */
+		return 0;
+	}
+	
+	bufel = _mbuffer_head_get_first(buf, NULL);
+	if (buf->length == 1 && is_aligned16(bufel, align_pos))
+		return 0;
+
+	bufel = _mbuffer_alloc_align16(buf->byte_length, align_pos);
+	if (!bufel) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	for (cur = _mbuffer_head_get_first(buf, &msg);
+	     msg.data != NULL; cur = _mbuffer_head_get_next(cur, &msg)) {
+		memcpy(&bufel->msg.data[pos], msg.data, msg.size);
+		bufel->msg.size += msg.size;
+		pos += msg.size;
+	}
+
+	_mbuffer_head_clear(buf);
+	_mbuffer_enqueue(buf, bufel);
+
+	return 0;
+}
+#else
 int _mbuffer_linearize(mbuffer_head_st * buf)
 {
 	mbuffer_st *bufel, *cur;
 	gnutls_datum_t msg;
 	size_t pos = 0;
 
-	if (buf->length <= 1)
+	if (buf->length <= 1) {
 		/* Nothing to do */
 		return 0;
-
+	}
+	
 	bufel = _mbuffer_alloc(buf->byte_length);
 	if (!bufel) {
 		gnutls_assert();
@@ -337,3 +426,4 @@ int _mbuffer_linearize(mbuffer_head_st * buf)
 
 	return 0;
 }
+#endif

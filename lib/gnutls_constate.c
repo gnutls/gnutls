@@ -343,7 +343,14 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 		    gnutls_assert_val
 		    (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
 
-	IV_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
+	if (!_gnutls_version_has_explicit_iv(ver)) {
+		if (_gnutls_cipher_is_block(params->cipher) != CIPHER_STREAM) {
+			IV_size = _gnutls_cipher_get_iv_size(params->cipher);
+		} else
+			IV_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
+	} else
+		IV_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
+
 	key_size = _gnutls_cipher_get_key_size(params->cipher);
 	hash_size = _gnutls_mac_get_key_size(params->mac);
 

@@ -444,7 +444,8 @@ typedef struct cipher_entry_st {
 	uint16_t blocksize;
 	uint16_t keysize;
 	bool block;
-	uint16_t iv;		/* the size of implicit IV - TLS related */
+	uint16_t implicit_iv;	/* the size of implicit IV - the IV generated but not sent */
+	uint16_t explicit_iv;	/* the size of explicit IV - the IV stored in record */
 	uint16_t cipher_iv;	/* the size of IV needed by the cipher */
 	bool aead;	/* Whether it is authenc cipher */
 } cipher_entry_st;
@@ -556,7 +557,7 @@ typedef struct {
 	/* Holds the signature algorithm used in this session - If any */
 	gnutls_sign_algorithm_t server_sign_algo;
 	gnutls_sign_algorithm_t client_sign_algo;
-
+	
 	/* FIXME: The following are not saved in the session storage
 	 * for session resumption.
 	 */
