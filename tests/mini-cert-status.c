@@ -49,8 +49,8 @@ int main()
 
 #include "utils.h"
 
-/* This program tests the robustness of record
- * decoding.
+/* This program tests whether the GNUTLS_CERT_* flags
+ * work as expected.
  */
 
 static void server_log_func(int level, const char *str)
