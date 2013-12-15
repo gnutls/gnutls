@@ -13,6 +13,10 @@ unless linking with a static library.
 
 ** libgnutls: Separated nonce RNG from the main RNG.
 
+** libgnutls: The buffer alignment provided to crypto backend is
+enforced to be 16-byte aligned, when compiled with cryptodev
+support.
+
 ** libgnutls: PKCS #11 initialization is delayed to first usage.
 That avoids long delays in gnutls initialization due to broken PKCS #11
 modules.
