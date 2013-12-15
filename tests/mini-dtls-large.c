@@ -48,7 +48,7 @@ int main()
 
 static void terminate(void);
 
-/* This program tests the rehandshake in DTLS
+/* This program tests large packet sending in DTLS
  */
 
 static void server_log_func(int level, const char *str)
@@ -153,7 +153,6 @@ static void terminate(void)
 
 	kill(child, SIGTERM);
 	wait(&status);
-	exit(1);
 }
 
 static void server(int fd)
@@ -194,9 +193,9 @@ static void server(int fd)
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
+		terminate();
 		fail("server: Handshake has failed (%s)\n\n",
 		     gnutls_strerror(ret));
-		terminate();
 	}
 	if (debug)
 		success("server: Handshake was completed\n");
@@ -213,24 +212,24 @@ static void server(int fd)
 	    gnutls_record_send(session, buffer,
 			       gnutls_dtls_get_data_mtu(session) + 12);
 	if (ret != GNUTLS_E_LARGE_PACKET) {
-		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 	}
 
 	ret =
 	    gnutls_record_send(session, buffer,
 			       gnutls_dtls_get_data_mtu(session) + 5048);
 	if (ret != GNUTLS_E_LARGE_PACKET) {
-		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 	}
 
 	ret =
 	    gnutls_record_send(session, buffer,
 			       gnutls_dtls_get_data_mtu(session));
 	if (ret < 0) {
-		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 	}
 
 	gnutls_dtls_set_mtu(session, MAX_MTU);
@@ -238,24 +237,24 @@ static void server(int fd)
 	    gnutls_record_send(session, buffer,
 			       gnutls_dtls_get_data_mtu(session) + 12);
 	if (ret != GNUTLS_E_LARGE_PACKET) {
-		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 	}
 
 	ret =
 	    gnutls_record_send(session, buffer,
 			       gnutls_dtls_get_data_mtu(session) + 5048);
 	if (ret != GNUTLS_E_LARGE_PACKET) {
-		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 	}
 
 	ret =
 	    gnutls_record_send(session, buffer,
 			       gnutls_dtls_get_data_mtu(session));
 	if (ret > 16384 || ret < 0) {
-		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 	}
 
 	/* do not wait for the peer to close the connection.
