@@ -59,6 +59,10 @@ typedef int ssize_t;
 #define memxor gl_memxor
 #endif
 
+#ifdef ENABLE_CRYPTODEV
+# define ENABLE_ALIGN16
+#endif
+
 #ifdef __GNUC__
 #ifndef _GNUTLS_GCC_VERSION
 #define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)

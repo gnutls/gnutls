@@ -133,7 +133,7 @@ inline static void _mbuffer_xfree(mbuffer_st ** bufel)
 	*bufel = NULL;
 }
 
-#ifdef ENABLE_CRYPTODEV
+#ifdef ENABLE_ALIGN16
 mbuffer_st *_mbuffer_alloc_align16(size_t maximum_size, unsigned align_pos);
 int _mbuffer_linearize_align16(mbuffer_head_st * buf, unsigned align_pos);
 #else

@@ -302,7 +302,7 @@ _mbuffer_append_data(mbuffer_st * bufel, void *newdata,
 	return 0;
 }
 
-#ifdef ENABLE_CRYPTODEV
+#ifdef ENABLE_ALIGN16
 # define ALIGN_SIZE 16
 
 /* Allocate a 16-byte alligned buffer segment. The segment is not initially "owned" by
