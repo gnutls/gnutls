@@ -53,7 +53,7 @@ L$oop_enc1_1:
 	decl	%eax
 	movups	(%rdx),%xmm1
 	leaq	16(%rdx),%rdx
-	jnz	L$oop_enc1_1	
+	jnz	L$oop_enc1_1
 .byte	102,15,56,221,209
 	movups	%xmm2,(%rsi)
 	.byte	0xf3,0xc3
@@ -74,7 +74,7 @@ L$oop_dec1_2:
 	decl	%eax
 	movups	(%rdx),%xmm1
 	leaq	16(%rdx),%rdx
-	jnz	L$oop_dec1_2	
+	jnz	L$oop_dec1_2
 .byte	102,15,56,223,209
 	movups	%xmm2,(%rsi)
 	.byte	0xf3,0xc3
@@ -583,7 +583,7 @@ L$oop_enc1_3:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_3	
+	jnz	L$oop_enc1_3
 .byte	102,15,56,221,209
 	movups	%xmm2,(%rsi)
 	jmp	L$ecb_ret
@@ -728,7 +728,7 @@ L$oop_dec1_4:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_4	
+	jnz	L$oop_dec1_4
 .byte	102,15,56,223,209
 	movups	%xmm2,(%rsi)
 	jmp	L$ecb_ret
@@ -857,7 +857,7 @@ L$oop_enc1_5:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_5	
+	jnz	L$oop_enc1_5
 .byte	102,15,56,221,209
 	movups	(%rdi),%xmm8
 	paddq	%xmm6,%xmm9
@@ -916,7 +916,7 @@ L$oop_enc1_6:
 	decl	%eax
 	movups	(%r11),%xmm1
 	leaq	16(%r11),%r11
-	jnz	L$oop_enc1_6	
+	jnz	L$oop_enc1_6
 .byte	102,15,56,221,217
 	movups	%xmm3,(%r9)
 	.byte	0xf3,0xc3
@@ -1340,7 +1340,7 @@ L$oop_enc1_7:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_7	
+	jnz	L$oop_enc1_7
 .byte	102,15,56,221,209
 	xorps	%xmm10,%xmm2
 	movups	%xmm2,(%rsi)
@@ -1374,7 +1374,7 @@ L$oop_enc1_8:
 	decl	%eax
 	movups	(%r8),%xmm1
 	leaq	16(%r8),%r8
-	jnz	L$oop_enc1_8	
+	jnz	L$oop_enc1_8
 .byte	102,68,15,56,221,249
 	movups	(%rcx),%xmm0
 	movq	%rcx,%r11
@@ -1676,7 +1676,7 @@ L$oop_enc1_9:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_9	
+	jnz	L$oop_enc1_9
 .byte	102,15,56,221,209
 	xorps	%xmm10,%xmm2
 	movdqa	%xmm11,%xmm10
@@ -1781,7 +1781,7 @@ L$oop_enc1_10:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_10	
+	jnz	L$oop_enc1_10
 .byte	102,15,56,221,209
 	xorps	%xmm10,%xmm2
 	movups	%xmm2,-16(%rsi)
@@ -1813,7 +1813,7 @@ L$oop_enc1_11:
 	decl	%eax
 	movups	(%r8),%xmm1
 	leaq	16(%r8),%r8
-	jnz	L$oop_enc1_11	
+	jnz	L$oop_enc1_11
 .byte	102,68,15,56,221,249
 	xorl	%eax,%eax
 	testq	$15,%rdx
@@ -2130,7 +2130,7 @@ L$oop_dec1_12:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_12	
+	jnz	L$oop_dec1_12
 .byte	102,15,56,223,209
 	xorps	%xmm10,%xmm2
 	movdqa	%xmm11,%xmm10
@@ -2228,7 +2228,7 @@ L$oop_dec1_13:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_13	
+	jnz	L$oop_dec1_13
 .byte	102,15,56,223,209
 	xorps	%xmm11,%xmm2
 	movups	%xmm2,(%rsi)
@@ -2258,7 +2258,7 @@ L$oop_dec1_14:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_14	
+	jnz	L$oop_dec1_14
 .byte	102,15,56,223,209
 	xorps	%xmm10,%xmm2
 	movups	%xmm2,(%rsi)
@@ -2302,7 +2302,7 @@ L$oop_enc1_15:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_15	
+	jnz	L$oop_enc1_15
 .byte	102,15,56,221,209
 	movl	%r10d,%eax
 	movq	%r11,%rcx
@@ -2318,17 +2318,17 @@ L$oop_enc1_15:
 L$cbc_enc_tail:
 	movq	%rdx,%rcx
 	xchgq	%rdi,%rsi
-.long	0x9066A4F3	
+.long	0x9066A4F3
 	movl	$16,%ecx
 	subq	%rdx,%rcx
 	xorl	%eax,%eax
-.long	0x9066AAF3	
+.long	0x9066AAF3
 	leaq	-16(%rdi),%rdi
 	movl	%r10d,%eax
 	movq	%rdi,%rsi
 	movq	%r11,%rcx
 	xorq	%rdx,%rdx
-	jmp	L$cbc_enc_loop	
+	jmp	L$cbc_enc_loop
 
 .p2align	4
 L$cbc_decrypt:
@@ -2659,7 +2659,7 @@ L$oop_dec1_16:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_16	
+	jnz	L$oop_dec1_16
 .byte	102,15,56,223,209
 	xorps	%xmm10,%xmm2
 	movaps	%xmm11,%xmm10
@@ -2719,7 +2719,7 @@ L$cbc_dec_tail_partial:
 	movq	%rsi,%rdi
 	subq	%rdx,%rcx
 	leaq	(%rsp),%rsi
-.long	0x9066A4F3	
+.long	0x9066A4F3
 
 L$cbc_dec_ret:
 	leaq	(%rbp),%rsp
@@ -2731,7 +2731,7 @@ L$cbc_ret:
 
 .p2align	4
 _aesni_set_decrypt_key:
-.byte	0x48,0x83,0xEC,0x08	
+.byte	0x48,0x83,0xEC,0x08
 	call	__aesni_set_encrypt_key
 	shll	$4,%esi
 	testl	%eax,%eax
@@ -2770,7 +2770,7 @@ L$SEH_end_set_decrypt_key:
 .p2align	4
 _aesni_set_encrypt_key:
 __aesni_set_encrypt_key:
-.byte	0x48,0x83,0xEC,0x08	
+.byte	0x48,0x83,0xEC,0x08
 	movq	$-1,%rax
 	testq	%rdi,%rdi
 	jz	L$enc_key_ret

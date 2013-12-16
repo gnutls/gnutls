@@ -231,7 +231,7 @@ _vpaes_schedule_core:
 
 
 
-	call	_vpaes_preheat		
+	call	_vpaes_preheat
 	movdqa	.Lk_rcon(%rip),%xmm8
 	movdqu	(%rdi),%xmm0
 
@@ -277,7 +277,7 @@ _vpaes_schedule_core:
 	call	_vpaes_schedule_round
 	decq	%rsi
 	jz	.Lschedule_mangle_last
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	jmp	.Loop_schedule_128
 
 
@@ -298,7 +298,7 @@ _vpaes_schedule_core:
 .align	16
 .Lschedule_192:
 	movdqu	8(%rdi),%xmm0
-	call	_vpaes_schedule_transform	
+	call	_vpaes_schedule_transform
 	movdqa	%xmm0,%xmm6
 	pxor	%xmm4,%xmm4
 	movhlps	%xmm4,%xmm6
@@ -307,13 +307,13 @@ _vpaes_schedule_core:
 .Loop_schedule_192:
 	call	_vpaes_schedule_round
 .byte	102,15,58,15,198,8
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	call	_vpaes_schedule_192_smear
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	call	_vpaes_schedule_round
 	decq	%rsi
 	jz	.Lschedule_mangle_last
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	call	_vpaes_schedule_192_smear
 	jmp	.Loop_schedule_192
 
@@ -330,18 +330,18 @@ _vpaes_schedule_core:
 .align	16
 .Lschedule_256:
 	movdqu	16(%rdi),%xmm0
-	call	_vpaes_schedule_transform	
+	call	_vpaes_schedule_transform
 	movl	$7,%esi
 
 .Loop_schedule_256:
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	movdqa	%xmm0,%xmm6
 
 
 	call	_vpaes_schedule_round
 	decq	%rsi
 	jz	.Lschedule_mangle_last
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 
 
 	pshufd	$255,%xmm0,%xmm0
@@ -379,7 +379,7 @@ _vpaes_schedule_core:
 .Lschedule_mangle_last_dec:
 	addq	$-16,%rdx
 	pxor	.Lk_s63(%rip),%xmm0
-	call	_vpaes_schedule_transform 
+	call	_vpaes_schedule_transform
 	movdqu	%xmm0,(%rdx)
 
 

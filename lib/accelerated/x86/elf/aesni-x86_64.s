@@ -53,7 +53,7 @@ aesni_encrypt:
 	decl	%eax
 	movups	(%rdx),%xmm1
 	leaq	16(%rdx),%rdx
-	jnz	.Loop_enc1_1	
+	jnz	.Loop_enc1_1
 .byte	102,15,56,221,209
 	movups	%xmm2,(%rsi)
 	.byte	0xf3,0xc3
@@ -74,7 +74,7 @@ aesni_decrypt:
 	decl	%eax
 	movups	(%rdx),%xmm1
 	leaq	16(%rdx),%rdx
-	jnz	.Loop_dec1_2	
+	jnz	.Loop_dec1_2
 .byte	102,15,56,223,209
 	movups	%xmm2,(%rsi)
 	.byte	0xf3,0xc3
@@ -583,7 +583,7 @@ aesni_ecb_encrypt:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_enc1_3	
+	jnz	.Loop_enc1_3
 .byte	102,15,56,221,209
 	movups	%xmm2,(%rsi)
 	jmp	.Lecb_ret
@@ -728,7 +728,7 @@ aesni_ecb_encrypt:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_dec1_4	
+	jnz	.Loop_dec1_4
 .byte	102,15,56,223,209
 	movups	%xmm2,(%rsi)
 	jmp	.Lecb_ret
@@ -857,7 +857,7 @@ aesni_ccm64_decrypt_blocks:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_enc1_5	
+	jnz	.Loop_enc1_5
 .byte	102,15,56,221,209
 	movups	(%rdi),%xmm8
 	paddq	%xmm6,%xmm9
@@ -916,7 +916,7 @@ aesni_ccm64_decrypt_blocks:
 	decl	%eax
 	movups	(%r11),%xmm1
 	leaq	16(%r11),%r11
-	jnz	.Loop_enc1_6	
+	jnz	.Loop_enc1_6
 .byte	102,15,56,221,217
 	movups	%xmm3,(%r9)
 	.byte	0xf3,0xc3
@@ -1340,7 +1340,7 @@ aesni_ctr32_encrypt_blocks:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_enc1_7	
+	jnz	.Loop_enc1_7
 .byte	102,15,56,221,209
 	xorps	%xmm10,%xmm2
 	movups	%xmm2,(%rsi)
@@ -1374,7 +1374,7 @@ aesni_xts_encrypt:
 	decl	%eax
 	movups	(%r8),%xmm1
 	leaq	16(%r8),%r8
-	jnz	.Loop_enc1_8	
+	jnz	.Loop_enc1_8
 .byte	102,68,15,56,221,249
 	movups	(%rcx),%xmm0
 	movq	%rcx,%r11
@@ -1676,7 +1676,7 @@ aesni_xts_encrypt:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_enc1_9	
+	jnz	.Loop_enc1_9
 .byte	102,15,56,221,209
 	xorps	%xmm10,%xmm2
 	movdqa	%xmm11,%xmm10
@@ -1781,7 +1781,7 @@ aesni_xts_encrypt:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_enc1_10	
+	jnz	.Loop_enc1_10
 .byte	102,15,56,221,209
 	xorps	%xmm10,%xmm2
 	movups	%xmm2,-16(%rsi)
@@ -1813,7 +1813,7 @@ aesni_xts_decrypt:
 	decl	%eax
 	movups	(%r8),%xmm1
 	leaq	16(%r8),%r8
-	jnz	.Loop_enc1_11	
+	jnz	.Loop_enc1_11
 .byte	102,68,15,56,221,249
 	xorl	%eax,%eax
 	testq	$15,%rdx
@@ -2130,7 +2130,7 @@ aesni_xts_decrypt:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_dec1_12	
+	jnz	.Loop_dec1_12
 .byte	102,15,56,223,209
 	xorps	%xmm10,%xmm2
 	movdqa	%xmm11,%xmm10
@@ -2228,7 +2228,7 @@ aesni_xts_decrypt:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_dec1_13	
+	jnz	.Loop_dec1_13
 .byte	102,15,56,223,209
 	xorps	%xmm11,%xmm2
 	movups	%xmm2,(%rsi)
@@ -2258,7 +2258,7 @@ aesni_xts_decrypt:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_dec1_14	
+	jnz	.Loop_dec1_14
 .byte	102,15,56,223,209
 	xorps	%xmm10,%xmm2
 	movups	%xmm2,(%rsi)
@@ -2302,7 +2302,7 @@ aesni_cbc_encrypt:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_enc1_15	
+	jnz	.Loop_enc1_15
 .byte	102,15,56,221,209
 	movl	%r10d,%eax
 	movq	%r11,%rcx
@@ -2318,17 +2318,17 @@ aesni_cbc_encrypt:
 .Lcbc_enc_tail:
 	movq	%rdx,%rcx
 	xchgq	%rdi,%rsi
-.long	0x9066A4F3	
+.long	0x9066A4F3
 	movl	$16,%ecx
 	subq	%rdx,%rcx
 	xorl	%eax,%eax
-.long	0x9066AAF3	
+.long	0x9066AAF3
 	leaq	-16(%rdi),%rdi
 	movl	%r10d,%eax
 	movq	%rdi,%rsi
 	movq	%r11,%rcx
 	xorq	%rdx,%rdx
-	jmp	.Lcbc_enc_loop	
+	jmp	.Lcbc_enc_loop
 
 .align	16
 .Lcbc_decrypt:
@@ -2659,7 +2659,7 @@ aesni_cbc_encrypt:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	.Loop_dec1_16	
+	jnz	.Loop_dec1_16
 .byte	102,15,56,223,209
 	xorps	%xmm10,%xmm2
 	movaps	%xmm11,%xmm10
@@ -2719,7 +2719,7 @@ aesni_cbc_encrypt:
 	movq	%rsi,%rdi
 	subq	%rdx,%rcx
 	leaq	(%rsp),%rsi
-.long	0x9066A4F3	
+.long	0x9066A4F3
 
 .Lcbc_dec_ret:
 	leaq	(%rbp),%rsp
@@ -2731,7 +2731,7 @@ aesni_cbc_encrypt:
 .type	aesni_set_decrypt_key,@function
 .align	16
 aesni_set_decrypt_key:
-.byte	0x48,0x83,0xEC,0x08	
+.byte	0x48,0x83,0xEC,0x08
 	call	__aesni_set_encrypt_key
 	shll	$4,%esi
 	testl	%eax,%eax
@@ -2770,7 +2770,7 @@ aesni_set_decrypt_key:
 .align	16
 aesni_set_encrypt_key:
 __aesni_set_encrypt_key:
-.byte	0x48,0x83,0xEC,0x08	
+.byte	0x48,0x83,0xEC,0x08
 	movq	$-1,%rax
 	testq	%rdi,%rdi
 	jz	.Lenc_key_ret

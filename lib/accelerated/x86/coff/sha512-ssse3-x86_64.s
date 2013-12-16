@@ -2956,12 +2956,12 @@ se_handler:
 
 	leaq	.Lepilogue(%rip),%r10
 	cmpq	%r10,%rbx
-	jb	.Lin_prologue		
+	jb	.Lin_prologue
 
 	leaq	64+32(%rsi),%rsi
 	leaq	512(%r8),%rdi
 	movl	$8,%ecx
-.long	0xa548f3fc		
+.long	0xa548f3fc
 
 .Lin_prologue:
 	movq	8(%rax),%rdi
@@ -2973,7 +2973,7 @@ se_handler:
 	movq	40(%r9),%rdi
 	movq	%r8,%rsi
 	movl	$154,%ecx
-.long	0xa548f3fc		
+.long	0xa548f3fc
 
 	movq	%r9,%rsi
 	xorq	%rcx,%rcx
@@ -3016,10 +3016,10 @@ se_handler:
 .LSEH_info_sha256_block_data_order:
 .byte	9,0,0,0
 .rva	se_handler
-.rva	.Lprologue,.Lepilogue			
+.rva	.Lprologue,.Lepilogue
 .LSEH_info_sha256_block_data_order_ssse3:
 .byte	9,0,0,0
 .rva	se_handler
-.rva	.Lprologue_ssse3,.Lepilogue_ssse3	
+.rva	.Lprologue_ssse3,.Lepilogue_ssse3
 
 .section .note.GNU-stack,"",%progbits

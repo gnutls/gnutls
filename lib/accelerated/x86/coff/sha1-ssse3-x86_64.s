@@ -2532,16 +2532,16 @@ _ssse3_shortcut:
 .LSEH_end_sha1_block_data_order_ssse3:
 .p2align	6
 K_XX_XX:
-.long	0x5a827999,0x5a827999,0x5a827999,0x5a827999	
-.long	0x5a827999,0x5a827999,0x5a827999,0x5a827999	
-.long	0x6ed9eba1,0x6ed9eba1,0x6ed9eba1,0x6ed9eba1	
-.long	0x6ed9eba1,0x6ed9eba1,0x6ed9eba1,0x6ed9eba1	
-.long	0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc	
-.long	0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc	
-.long	0xca62c1d6,0xca62c1d6,0xca62c1d6,0xca62c1d6	
-.long	0xca62c1d6,0xca62c1d6,0xca62c1d6,0xca62c1d6	
-.long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f	
-.long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f	
+.long	0x5a827999,0x5a827999,0x5a827999,0x5a827999
+.long	0x5a827999,0x5a827999,0x5a827999,0x5a827999
+.long	0x6ed9eba1,0x6ed9eba1,0x6ed9eba1,0x6ed9eba1
+.long	0x6ed9eba1,0x6ed9eba1,0x6ed9eba1,0x6ed9eba1
+.long	0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc
+.long	0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc
+.long	0xca62c1d6,0xca62c1d6,0xca62c1d6,0xca62c1d6
+.long	0xca62c1d6,0xca62c1d6,0xca62c1d6,0xca62c1d6
+.long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f
+.long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f
 .byte	83,72,65,49,32,98,108,111,99,107,32,116,114,97,110,115,102,111,114,109,32,102,111,114,32,120,56,54,95,54,52,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .p2align	6
 
@@ -2622,7 +2622,7 @@ ssse3_handler:
 	leaq	64(%rax),%rsi
 	leaq	512(%r8),%rdi
 	movl	$12,%ecx
-.long	0xa548f3fc		
+.long	0xa548f3fc
 	leaq	184(%rax),%rax
 
 	movq	-8(%rax),%rbx
@@ -2642,7 +2642,7 @@ ssse3_handler:
 	movq	40(%r9),%rdi
 	movq	%r8,%rsi
 	movl	$154,%ecx
-.long	0xa548f3fc		
+.long	0xa548f3fc
 
 	movq	%r9,%rsi
 	xorq	%rcx,%rcx
@@ -2688,6 +2688,6 @@ ssse3_handler:
 .LSEH_info_sha1_block_data_order_ssse3:
 .byte	9,0,0,0
 .rva	ssse3_handler
-.rva	.Lprologue_ssse3,.Lepilogue_ssse3	
+.rva	.Lprologue_ssse3,.Lepilogue_ssse3
 
 .section .note.GNU-stack,"",%progbits
