@@ -50,11 +50,15 @@ struct node_st {
 	/* The trusted CRLs */
 	gnutls_x509_crl_t *crls;
 	unsigned int crl_size;
+
 };
 
 struct gnutls_x509_trust_list_st {
 	unsigned int size;
 	struct node_st *node;
+
+	gnutls_x509_crt_t *blacklisted;
+	unsigned int blacklisted_size;
 };
 
 #define DEFAULT_SIZE 127
@@ -115,6 +119,11 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
 	if (!list)
 		return;
 
+	for (j = 0; j < list->blacklisted_size; j++) {
+		gnutls_x509_crt_deinit(list->blacklisted[j]);
+	}
+	gnutls_free(list->blacklisted);
+
 	for (i = 0; i < list->size; i++) {
 		if (all)
 			for (j = 0; j < list->node[i].trusted_ca_size; j++) {
@@ -122,6 +131,7 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
 						       trusted_cas[j]);
 			}
 		gnutls_free(list->node[i].trusted_cas);
+
 
 		if (all)
 			for (j = 0; j < list->node[i].crl_size; j++) {
@@ -191,6 +201,26 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 	return i;
 }
 
+static gnutls_x509_crt_t crt_cpy(gnutls_x509_crt_t src)
+{
+gnutls_x509_crt_t dst;
+int ret;
+
+	ret = gnutls_x509_crt_init(&dst);
+	if (ret < 0) {
+		gnutls_assert();
+		return NULL;
+	}
+	
+	ret = _gnutls_x509_crt_cpy(dst, src);
+	if (ret < 0) {
+		gnutls_assert();
+		return NULL;
+	}
+	
+	return dst;
+}
+
 /**
  * gnutls_x509_trust_list_remove_cas:
  * @list: The structure of the list
@@ -198,7 +228,13 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
  * @clist_size: The length of the CA list
  *
  * This function will remove the given certificate authorities
- * from the trusted list. 
+ * from the trusted list.
+ *
+ * Note that this function can accept certificates and authorities
+ * not yet known. In that case they will be kept in a separate
+ * black list that will be used during certificate verification.
+ * Unlike gnutls_x509_trust_list_add_cas() there is no deinitialization
+ * restriction for  certificate list provided in this function.
  *
  * Returns: The number of removed elements is returned.
  *
@@ -223,6 +259,8 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 			if (_gnutls_check_if_same_cert
 			    (clist[i],
 			     list->node[hash].trusted_cas[j]) != 0) {
+
+			     	fprintf(stderr, "removing CA with hash %.4x\n", (unsigned)hash);
 				gnutls_x509_crt_deinit(list->node[hash].
 						       trusted_cas[j]);
 				list->node[hash].trusted_cas[j] =
@@ -233,8 +271,24 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 								 - 1];
 				list->node[hash].trusted_ca_size--;
 				r++;
+				break;
 			}
 		}
+		
+		/* Add the CA (or plain) certificate to the black list as well.
+		 * This will prevent a subordinate CA from being valid, and 
+		 * ensure that a server certificate will also get rejected.
+		 */
+		list->blacklisted =
+		    gnutls_realloc_fast(list->blacklisted,
+				(list->blacklisted_size + 1) *
+				sizeof(list->blacklisted[0]));
+		if (list->blacklisted == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		list->blacklisted[list->blacklisted_size] = crt_cpy(clist[i]);
+		if (list->blacklisted[list->blacklisted_size] != NULL)
+			list->blacklisted_size++;
 	}
 
 	return r;
@@ -538,6 +592,26 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
 
+static
+int check_if_in_blacklist(gnutls_x509_crt_t * cert_list, unsigned int cert_list_size,
+	gnutls_x509_crt_t * blacklist, unsigned int blacklist_size)
+{
+unsigned i, j;
+
+	if (blacklist_size == 0)
+		return 0;
+	
+	for (i=0;i<cert_list_size;i++) {
+		for (j=0;j<blacklist_size;j++) {
+			if (_gnutls_check_if_same_cert(cert_list[i], blacklist[j]) != 0) {
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
 /**
  * gnutls_x509_trust_list_verify_crt:
  * @list: The structure of the list
@@ -585,6 +659,14 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 			  cert_list[cert_list_size -
 				    1]->raw_issuer_dn.size);
 	hash %= list->size;
+
+	ret = check_if_in_blacklist(cert_list, cert_list_size,
+		list->blacklisted, list->blacklisted_size);
+	if (ret != 0) {
+		*verify |= GNUTLS_CERT_REVOKED;
+		*verify |= GNUTLS_CERT_INVALID;
+		return 0;
+	}
 
 	*verify =
 	    _gnutls_x509_verify_certificate(cert_list, cert_list_size,
