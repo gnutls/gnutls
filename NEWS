@@ -20,7 +20,9 @@ not present in libc. This also prevents an indirect linking to libpthread.
 the strerror gnulib module.
 
 ** libgnutls: The time provided in the TLS random values is only precise
-on its first 3 bytes.
+on its first 3 bytes. That prevents leakage of the precise system
+time (at least on the client side when only few connections are
+done on a single server).
 
 ** certtool: The --verify option will use the system CAs if the
 load-ca-certificate option is not provided.
