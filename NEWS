@@ -35,7 +35,7 @@ option enables:
  o MD5 is included for TLS purposed but cannot be used by the high level
    hashing functions.
  o All ciphers except AES are disabled.
- o All MACs except SHA are disabled (i.e., HMAC-MD5).
+ o All MACs and hashes except SHA are disabled (i.e., HMAC-MD5).
  o All keys (temporal and long term) are zeroized after use.
  o Security levels are adjusted to the FIPS140-2 recommendations (rather
    than ECRYPT).
