@@ -1,0 +1,3 @@
+[submodule "devel/openssl"]
+	path = devel/openssl
+	url = git://git.openssl.org/openssl.git
