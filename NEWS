@@ -25,6 +25,9 @@ on its first 3 bytes.
 ** certtool: The --verify option will use the system CAs if the
 load-ca-certificate option is not provided.
 
+** configure: Added option --with-default-blacklist-file to allow
+specifying a certificate blacklist file.
+
 ** API and ABI modifications:
 gnutls_record_check_corked: Added
 
