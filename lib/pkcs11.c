@@ -597,6 +597,10 @@ int gnutls_pkcs11_reinit(void)
 	unsigned i;
 	ck_rv_t rv;
 
+	/* make sure that we don't call more than once after a fork */
+	if (init_pid == getpid())
+		return 0;
+
 	for (i = 0; i < active_providers; i++) {
 		if (providers[i].module != NULL) {
 			rv = p11_kit_module_initialize(providers
