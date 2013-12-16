@@ -113,10 +113,10 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
  * @cas: A buffer containing a list of CAs (optional)
  * @type: The format of the certificates
  *
- * This function will add the given certificate authorities
- * to the trusted list. 
+ * This function will remove the provided certificate authorities
+ * from the trusted list. 
  *
- * Returns: The number of added elements is returned.
+ * Returns: The number of removed elements is returned.
  *
  * Since: 3.1.10
  **/
@@ -329,8 +329,8 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
  * @ca_file: A file containing a list of CAs
  * @type: The format of the certificates
  *
- * This function will add the given certificate authorities
- * to the trusted list. pkcs11 URLs are also accepted, instead
+ * This function will remove the given certificate authorities
+ * from the trusted list. pkcs11 URLs are also accepted, instead
  * of files, by this function.
  *
  * Returns: The number of added elements is returned.
