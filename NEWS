@@ -30,6 +30,9 @@ load-ca-certificate option is not provided.
 ** configure: Added option --with-default-blacklist-file to allow
 specifying a certificate blacklist file.
 
+** configure: Added --disable-non-suiteb-curves option. This option
+restricts the supported curves to SuiteB curves.
+
 ** API and ABI modifications:
 gnutls_record_check_corked: Added
 
