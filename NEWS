@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** libgnutls: Updated code for AES-NI. That prevents an uninitialized
 variable complaint from valgrind.
 
+** configure: Added option --with-default-blacklist-file to allow
+specifying a certificate blacklist file.
+
 ** API and ABI modifications:
 No changes since last version.
 
