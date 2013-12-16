@@ -75,7 +75,12 @@ update-po: refresh-po
 config:
 	./configure $(CFGFLAGS)
 
-bootstrap: autoreconf
+.submodule.stamp:
+	git submodule init
+	git submodule update
+	touch $@
+
+bootstrap: autoreconf .submodule.stamp
 
 # The only non-lgpl modules used are: gettime progname timespec. Those
 # are not used (and must not be used) in the library)
@@ -211,28 +216,28 @@ lib/accelerated/x86/files.mk: $(ASM_SOURCES_ELF)
 	mv $@.tmp $@
 
 # Appro's code
-lib/accelerated/x86/elf/%.s: devel/perlasm/%.pl
+lib/accelerated/x86/elf/%.s: .submodule.stamp devel/perlasm/%.pl
 	cat $^.license > $@
 	perl $< elf >> $@
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl
+lib/accelerated/x86/coff/%-x86.s: .submodule.stamp devel/perlasm/%-x86.pl
 	cat $^.license > $@
 	perl $< coff >> $@
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl
+lib/accelerated/x86/coff/%-x86_64.s: .submodule.stamp devel/perlasm/%-x86_64.pl
 	cat $^.license > $@
 	perl $< mingw64 >> $@
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl
+lib/accelerated/x86/macosx/%.s: .submodule.stamp devel/perlasm/%.pl
 	cat $^.license > $@
 	perl $< macosx >> $@
 	echo "" >> $@

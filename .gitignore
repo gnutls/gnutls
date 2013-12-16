@@ -698,3 +698,4 @@ doc/parse-datetime.texi
 tests/fips-test
 tests/global-init
 tests/mini-global-load
+.submodule.stamp
