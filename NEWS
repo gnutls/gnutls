@@ -15,7 +15,8 @@ unless linking with a static library.
 
 ** libgnutls: The buffer alignment provided to crypto backend is
 enforced to be 16-byte aligned, when compiled with cryptodev
-support.
+support. That allows certain cryptodev drivers to operate more
+efficiently.
 
 ** libgnutls: PKCS #11 initialization is delayed to first usage.
 That avoids long delays in gnutls initialization due to broken PKCS #11
@@ -38,9 +39,6 @@ option enables:
  o All keys (temporal and long term) are zeroized after use.
  o Security levels are adjusted to the FIPS140-2 recommendations (rather
    than ECRYPT).
-
-** libgnutls: Added --disable-non-suiteb-curves option. This option
-restricts the supported curves to SuiteB curves.
 
 ** libgnutls: static libraries are not built by default.
 
