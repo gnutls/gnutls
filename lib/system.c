@@ -413,6 +413,13 @@ add_system_trust(gnutls_x509_trust_list_t list,
     r += ret;
 # endif
 
+#ifdef DEFAULT_BLACKLIST_FILE
+  ret = gnutls_x509_trust_list_remove_trust_file(list, DEFAULT_BLACKLIST_FILE, GNUTLS_X509_FMT_PEM);
+  if (ret < 0) {
+	_gnutls_debug_log("Could not load blacklist file '%s'\n", DEFAULT_BLACKLIST_FILE);
+  }
+#endif
+
   return r;
 }
 #elif defined(_WIN32)
@@ -463,6 +470,13 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags, unsig
     CertCloseStore(store, 0);
   }
   
+#ifdef DEFAULT_BLACKLIST_FILE
+  ret = gnutls_x509_trust_list_remove_trust_file(list, DEFAULT_BLACKLIST_FILE, GNUTLS_X509_FMT_PEM);
+  if (ret < 0) {
+	_gnutls_debug_log("Could not load blacklist file '%s'\n", DEFAULT_BLACKLIST_FILE);
+  }
+#endif
+
   return r;
 }
 #elif defined(ANDROID) || defined(__ANDROID__)
