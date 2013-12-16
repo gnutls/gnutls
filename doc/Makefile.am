@@ -56,28 +56,28 @@ SRC_DEF_TPMTOOL += ../src/tpmtool-args.def
 endif
 
 invoke-gnutls-cli.texi: $(SRC_DEF_CLI)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-gnutls-cli-debug.texi: $(SRC_DEF_CLI_DEBUG)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-gnutls-cli-debug.texi: $(SRC_DEF_CLI_DEBUG) invoke-gnutls-cli.texi
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-gnutls-serv.texi: $(SRC_DEF_SERV)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-gnutls-serv.texi: $(SRC_DEF_SERV) invoke-gnutls-cli-debug.texi
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-certtool.texi: $(SRC_DEF_CERTTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-certtool.texi: $(SRC_DEF_CERTTOOL) invoke-gnutls-serv.texi
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -85,8 +85,8 @@ invoke-certtool.texi: $(SRC_DEF_CERTTOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL) invoke-certtool.texi
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -94,8 +94,8 @@ invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-danetool.texi: $(SRC_DEF_DANETOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-danetool.texi: $(SRC_DEF_DANETOOL) invoke-ocsptool.texi
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -103,8 +103,8 @@ invoke-danetool.texi: $(SRC_DEF_DANETOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-srptool.texi: $(SRC_DEF_SRPTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-srptool.texi: $(SRC_DEF_SRPTOOL) invoke-danetool.texi
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -112,8 +112,8 @@ invoke-srptool.texi: $(SRC_DEF_SRPTOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsubsection/g' ../doc/$@
 
-invoke-psktool.texi: $(SRC_DEF_PSKTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-psktool.texi: $(SRC_DEF_PSKTOOL) invoke-srptool.texi
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -121,8 +121,8 @@ invoke-psktool.texi: $(SRC_DEF_PSKTOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsubsection/g' ../doc/$@
 
-invoke-p11tool.texi: $(SRC_DEF_P11TOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-p11tool.texi: $(SRC_DEF_P11TOOL) invoke-psktool.texi
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -130,8 +130,8 @@ invoke-p11tool.texi: $(SRC_DEF_P11TOOL)
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-tpmtool.texi: $(SRC_DEF_TPMTOOL)
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+invoke-tpmtool.texi: $(SRC_DEF_TPMTOOL) invoke-p11tool.texi
+	-cd ../src/ && $(AUTOGEN) -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
 	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
 	mv -f ../doc/$@.tmp ../doc/$@ && \
@@ -149,7 +149,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi 	\
 	cha-tokens.texi cha-crypto.texi cha-auth.texi
 
-gnutls_TEXINFOS += invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
+AUTOGENED_DOC = invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
 	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi \
 	invoke-tpmtool.texi invoke-danetool.texi
@@ -223,7 +223,7 @@ MAINTAINERCLEANFILES += $(API_FILES)
 
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -234,7 +234,7 @@ gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 
 dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -245,7 +245,7 @@ dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 
 x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort |uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -256,7 +256,7 @@ x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 
 xssl-api.texi: $(top_srcdir)/lib/includes/gnutls/xssl.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -267,7 +267,7 @@ xssl-api.texi: $(top_srcdir)/lib/includes/gnutls/xssl.h
 
 pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -279,7 +279,7 @@ pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
 
 pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -290,7 +290,7 @@ pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 
 pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -301,7 +301,7 @@ pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
 
 tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -312,7 +312,7 @@ tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
 
 abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -323,7 +323,7 @@ abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h
 
 compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -334,7 +334,7 @@ compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h
 
 dtls-api.texi: $(top_srcdir)/lib/includes/gnutls/dtls.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -345,7 +345,7 @@ dtls-api.texi: $(top_srcdir)/lib/includes/gnutls/dtls.h
 
 crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -356,8 +356,8 @@ crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 
 ocsp-api.texi: $(top_srcdir)/lib/includes/gnutls/ocsp.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $<|sort|uniq`; do \
-		echo $(ECHO_N) "Creating documentation for file $$i... " && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
+		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
@@ -412,7 +412,7 @@ enums.texi: $(HEADER_FILES)
 	done
 	mv -f $@-tmp $@
 
-gnutls_TEXINFOS += $(ENUMS) $(FUNCS)
+gnutls_TEXINFOS += $(ENUMS) $(FUNCS) $(AUTOGENED_DOC)
 DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
 
 
@@ -444,16 +444,18 @@ compare-makefile: enums.texi
 	done; \
 	grep -v -e '^ENUMS += ' $(srcdir)/Makefile.am | \
 		perl -p -e "s,^ENUMS =,ENUMS =$$STR," > tmp-$@; \
-	diff -u $(srcdir)/Makefile.am tmp-$@
+	echo "If the following step fails copy $(srcdir)/tmp-compare-makefile to Makefile.am"
+	diff -u $(srcdir)/Makefile.am tmp-$@ >/dev/null
 	rm -f tmp-$@
-	FUNCS=`cat $(HEADER_FILES) | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d`; \
+	FUNCS=`cat $(HEADER_FILES) | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d|uniq`; \
 	MANS=""; \
 	for i in $$FUNCS; do \
 		MANS="$$MANS\nFUNCS += functions/$$i\nFUNCS += functions/$$i.short"; \
 	done; \
 	grep -v -e '^FUNCS += ' $(srcdir)/Makefile.am > tmp-$@; \
 	echo "\"s,^FUNCS =,FUNCS =$$MANS,\" -i tmp-$@"|xargs sed
-	diff -u $(srcdir)/Makefile.am tmp-$@
+	echo "If the following step fails copy $(srcdir)/tmp-compare-makefile to Makefile.am"
+	diff -u $(srcdir)/Makefile.am tmp-$@ >/dev/null
 	rm -f tmp-$@
 
 .PHONY: compare-makefile
