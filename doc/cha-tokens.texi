@@ -207,7 +207,7 @@ which modules to load reads certain module configuration files.
 Those are stored in @code{/etc/pkcs11/modules/} and 
 are the configuration files of @acronym{p11-kit}@footnote{@url{http://p11-glue.freedesktop.org/}}.
 For example a file that will load the @acronym{OpenSC} module, could be named
-@code{/etc/pkcs11/modules/opensc} and contain the following:
+@code{/etc/pkcs11/modules/opensc.module} and contain the following:
 
 @example
 module: /usr/lib/opensc-pkcs11.so
