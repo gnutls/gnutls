@@ -576,6 +576,7 @@ cn = "Cindy Lauper"
 #dn = "cn=Nik,st=Attiki,C=GR,surName=Mavrogiannopoulos,2.5.4.9=Arkadias"
 
 # The serial number of the certificate
+# Comment the field for a time-based serial number.
 serial = 007
 
 # In how many days, counting from today, this certificate will expire.
