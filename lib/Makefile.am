@@ -20,9 +20,13 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-SUBDIRS = includes x509 accelerated auth ext algorithms extras
+SUBDIRS = includes x509 auth ext algorithms extras
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
+endif
+
+if ENABLE_NETTLE
+SUBDIRS += accelerated 
 endif
 
 localedir = $(datadir)/locale
@@ -121,12 +125,16 @@ libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
-	accelerated/libaccelerated.la ext/libgnutls_ext.la \
+	ext/libgnutls_ext.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	extras/libgnutls_extras.la
 thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) \
 	$(LTLIBPTHREAD) $(LTLIBICONV) $(P11_KIT_LIBS) $(LIB_SELECT) $(TSS_LIBS) \
 	$(LTLIBICONV)
+
+if ENABLE_NETTLE
+libgnutls_la_LIBADD += accelerated/libaccelerated.la
+endif
 
 if NEEDS_LIBRT
 thirdparty_libadd += $(LTLIBRT)
