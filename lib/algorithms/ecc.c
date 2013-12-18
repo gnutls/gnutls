@@ -186,7 +186,7 @@ gnutls_ecc_curve_t _gnutls_ecc_curve_get_id(const char *name)
  -*/
 gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(int bits)
 {
-	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_SECP224R1;
+	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_SECP256R1;
 
 	GNUTLS_ECC_CURVE_LOOP(
 		if (8 * p->size >= bits && _gnutls_pk_curve_exists(p->id)) {
