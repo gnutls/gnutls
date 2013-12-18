@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** libgnutls: Updated code for AES-NI. That prevents an uninitialized
 variable complaint from valgrind.
 
+** libgnutls: Enforce a maximum size for DH primes.
+
 ** libgnutls: Added SSSE3 optimized SHA1, and SHA256, using Andy Polyakov's 
 code.
 
