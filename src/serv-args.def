@@ -276,7 +276,7 @@ use @code{gnutls-serv} as a simple HTTPS server.
 The most basic server can be started as:
 
 @example
-gnutls-serv --http
+gnutls-serv --http --priority "NORMAL:+ANON-ECDH:+ANON-DH"
 @end example
 
 It will only support anonymous ciphersuites, which many TLS clients
