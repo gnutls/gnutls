@@ -30,6 +30,7 @@
  */
 
 static const gnutls_ecc_curve_entry_st ecc_curves[] = {
+#ifdef ENABLE_NON_SUITEB_CURVES
 	{
 	 .name = "SECP192R1",
 	 .oid = "1.2.840.10045.3.1.1",
@@ -44,6 +45,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 	 .tls_id = 21,
 	 .size = 28,
 	 },
+#endif
 	{
 	 .name = "SECP256R1",
 	 .oid = "1.2.840.10045.3.1.7",
@@ -180,7 +182,7 @@ gnutls_ecc_curve_t _gnutls_ecc_curve_get_id(const char *name)
  -*/
 gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(int bits)
 {
-	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_SECP224R1;
+	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_SECP256R1;
 
 	GNUTLS_ECC_CURVE_LOOP(
 		if (8 * p->size >= bits) {
