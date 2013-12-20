@@ -20,7 +20,10 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
+BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c
+
 SUBDIRS = includes x509 auth ext algorithms extras
+
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
@@ -205,7 +208,6 @@ pkix_asn1_tab.c: $(srcdir)/pkix.asn
 
 gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
 	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
-
 
 libgnutls_xssl_la_LDFLAGS = -no-undefined
 
