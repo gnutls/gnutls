@@ -841,7 +841,7 @@ gnutls_pkcs11_token_get_random(const char *token_url,
 		return ret;
 	}
 
-	rv = pkcs11_get_random(sinfo.module, sinfo.pks, rnddata, len);
+	rv = _gnutls_pkcs11_get_random(sinfo.module, sinfo.pks, rnddata, len);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("pkcs11: %s\n", pkcs11_strerror(rv));

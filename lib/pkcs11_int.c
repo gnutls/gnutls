@@ -213,7 +213,7 @@ pkcs11_set_pin(struct ck_function_list * module,
 }
 
 ck_rv_t
-pkcs11_get_random(struct ck_function_list * module,
+_gnutls_pkcs11_get_random(struct ck_function_list * module,
 		  ck_session_handle_t sess, void *data, size_t len)
 {
 	return (module)->C_GenerateRandom(sess, data, len);
