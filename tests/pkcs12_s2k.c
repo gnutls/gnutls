@@ -27,9 +27,9 @@
 #include <stdio.h>
 
 #include <utils.h>
-#include "../../lib/gnutls_int.h"
-#include "../../lib/x509/x509_int.h"
-#include "../../lib/debug.h"
+#include "../lib/gnutls_int.h"
+#include "../lib/x509/x509_int.h"
+#include "../lib/debug.h"
 
 static void tls_log_func(int level, const char *str)
 {
