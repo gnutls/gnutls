@@ -61,7 +61,7 @@ else #ASM_X86_64
 AM_CFLAGS += -DASM_X86_32 -DASM_X86
 
 if WINDOWS
-libx86_la_SOURCES += $(X86_FILES_ELF)
+libx86_la_SOURCES += $(X86_FILES_COFF)
 endif
 
 if MACOSX
