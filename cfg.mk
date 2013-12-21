@@ -222,19 +222,16 @@ lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl
 	cat $^.license > $@
 	perl $< coff >> $@
 	echo "" >> $@
-	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl
 	cat $^.license > $@
 	perl $< mingw64 >> $@
 	echo "" >> $@
-	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl
 	cat $^.license > $@
 	perl $< macosx >> $@
 	echo "" >> $@
-	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
