@@ -118,6 +118,5 @@ TESTS_ENVIRONMENT =						\
 	srcdir="$(srcdir)"
 
 if WANT_TEST_SUITE
-TESTS_ENVIRONMENT +=						\
-	$(VALGRIND)
+LOG_COMPILER = $(VALGRIND)
 endif
