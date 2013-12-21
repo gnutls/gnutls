@@ -285,6 +285,7 @@ int main(int argc, char **argv)
 
 		gnutls_transport_set_ptr(state, (gnutls_transport_ptr_t)
 					 gl_fd_to_handle(sd));
+		set_read_funcs(state);
 		if (hostname && !isdigit(hostname[0])
 		    && strchr(hostname, ':') == 0)
 			gnutls_server_name_set(state, GNUTLS_NAME_DNS,

@@ -1265,6 +1265,7 @@ static void tcp_server(const char *name, int port)
 					j->tls_session = tls_session;
 					gnutls_transport_set_int
 					    (tls_session, accept_fd);
+					set_read_funcs(tls_session);
 					j->handshake_ok = 0;
 
 					if (verbose != 0) {
