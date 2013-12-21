@@ -59,6 +59,12 @@ static HMODULE Crypt32_dll;
  */
 
 #ifdef _WIN32
+/* Do not use the gnulib functions for sending and receiving data.
+ * Using them makes gnutls only working with gnulib applications.
+ */
+#undef send
+#undef recv
+
 int system_errno(gnutls_transport_ptr p)
 {
 	int tmperr = WSAGetLastError();
