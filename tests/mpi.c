@@ -59,7 +59,7 @@ void doit(void)
 	if (n3 == NULL)
 		fail("mpi_set_ui failed\n");
 
-	n1 = _gnutls_mpi_set_ui(NULL, 12498924);
+	n1 = _gnutls_mpi_set_ui(n1, 12498924);
 	if (n3 == NULL)
 		fail("mpi_set_ui failed\n");
 
