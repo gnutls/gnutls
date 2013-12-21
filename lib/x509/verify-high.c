@@ -264,7 +264,6 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 			    (clist[i],
 			     list->node[hash].trusted_cas[j]) != 0) {
 
-			     	fprintf(stderr, "removing CA with hash %.4x\n", (unsigned)hash);
 				gnutls_x509_crt_deinit(list->node[hash].
 						       trusted_cas[j]);
 				list->node[hash].trusted_cas[j] =
