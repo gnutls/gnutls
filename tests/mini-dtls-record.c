@@ -24,8 +24,6 @@
 #include <config.h>
 #endif
 
-#define REL_LAYER
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -50,6 +48,8 @@ int main()
 #include <gnutls/dtls.h>
 
 #include "utils.h"
+
+#define REL_LAYER
 
 static int test_finished = 0;
 static void terminate(void);
