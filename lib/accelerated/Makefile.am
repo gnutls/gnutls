@@ -38,10 +38,12 @@ EXTRA_DIST = accelerated.h cryptodev.h
 libaccelerated_la_SOURCES = accelerated.c cryptodev.c cryptodev-gcm.c
 libaccelerated_la_LIBADD =
 
+if ENABLE_NETTLE
 if ASM_X86
 SUBDIRS += x86
 AM_CFLAGS += -DASM_X86
 libaccelerated_la_LIBADD += x86/libx86.la
+endif
 endif
 
 if ASM_X86_32

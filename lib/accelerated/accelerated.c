@@ -29,7 +29,7 @@
 
 void _gnutls_register_accel_crypto(void)
 {
-#if defined(ASM_X86)
+#if defined(ASM_X86) && defined(ENABLE_NETTLE)
 	if (gnutls_have_cpuid() != 0) {
 		register_x86_crypto();
 	}

@@ -22,14 +22,10 @@ ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
 BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c
 
-SUBDIRS = includes x509 auth ext algorithms extras
+SUBDIRS = includes x509 auth ext algorithms extras accelerated
 
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
-endif
-
-if ENABLE_NETTLE
-SUBDIRS += accelerated 
 endif
 
 localedir = $(datadir)/locale
