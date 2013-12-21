@@ -64,6 +64,7 @@ static HMODULE Crypt32_dll;
  */
 #undef send
 #undef recv
+#undef select
 
 int system_errno(gnutls_transport_ptr p)
 {
