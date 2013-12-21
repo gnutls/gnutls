@@ -216,27 +216,27 @@ lib/accelerated/x86/files.mk: $(ASM_SOURCES_ELF)
 	mv $@.tmp $@
 
 # Appro's code
-lib/accelerated/x86/elf/%.s: .submodule.stamp devel/perlasm/%.pl
-	cat $^.license > $@
+lib/accelerated/x86/elf/%.s: devel/perlasm/%.pl .submodule.stamp 
+	cat $<.license > $@
 	perl $< elf >> $@
 	echo "" >> $@
 	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/coff/%-x86.s: .submodule.stamp devel/perlasm/%-x86.pl
-	cat $^.license > $@
+lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl .submodule.stamp 
+	cat $<.license > $@
 	perl $< coff >> $@
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/coff/%-x86_64.s: .submodule.stamp devel/perlasm/%-x86_64.pl
-	cat $^.license > $@
+lib/accelerated/x86/coff/%-x86_64.s: devel/perlasm/%-x86_64.pl .submodule.stamp 
+	cat $<.license > $@
 	perl $< mingw64 >> $@
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
-lib/accelerated/x86/macosx/%.s: .submodule.stamp devel/perlasm/%.pl
-	cat $^.license > $@
+lib/accelerated/x86/macosx/%.s: devel/perlasm/%.pl .submodule.stamp 
+	cat $<.license > $@
 	perl $< macosx >> $@
 	echo "" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
