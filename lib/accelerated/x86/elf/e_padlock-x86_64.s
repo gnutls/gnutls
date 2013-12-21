@@ -127,7 +127,7 @@ padlock_aes_block:
 	movq	$1,%rcx
 	leaq	32(%rdx),%rbx
 	leaq	16(%rdx),%rdx
-.byte	0xf3,0x0f,0xa7,0xc8
+.byte	0xf3,0x0f,0xa7,0xc8	
 	movq	%r8,%rbx
 	.byte	0xf3,0xc3
 .size	padlock_aes_block,.-padlock_aes_block
@@ -137,7 +137,7 @@ padlock_aes_block:
 .align	16
 padlock_xstore:
 	movl	%esi,%edx
-.byte	0x0f,0xa7,0xc0
+.byte	0x0f,0xa7,0xc0		
 	.byte	0xf3,0xc3
 .size	padlock_xstore,.-padlock_xstore
 
@@ -154,7 +154,7 @@ padlock_sha1_oneshot:
 	movq	%rsp,%rdi
 	movl	%eax,16(%rsp)
 	xorq	%rax,%rax
-.byte	0xf3,0x0f,0xa6,0xc8
+.byte	0xf3,0x0f,0xa6,0xc8	
 	movaps	(%rsp),%xmm0
 	movl	16(%rsp),%eax
 	addq	$128+8,%rsp
@@ -176,7 +176,7 @@ padlock_sha1_blocks:
 	movq	%rsp,%rdi
 	movl	%eax,16(%rsp)
 	movq	$-1,%rax
-.byte	0xf3,0x0f,0xa6,0xc8
+.byte	0xf3,0x0f,0xa6,0xc8	
 	movaps	(%rsp),%xmm0
 	movl	16(%rsp),%eax
 	addq	$128+8,%rsp
@@ -198,7 +198,7 @@ padlock_sha256_oneshot:
 	movq	%rsp,%rdi
 	movaps	%xmm1,16(%rsp)
 	xorq	%rax,%rax
-.byte	0xf3,0x0f,0xa6,0xd0
+.byte	0xf3,0x0f,0xa6,0xd0	
 	movaps	(%rsp),%xmm0
 	movaps	16(%rsp),%xmm1
 	addq	$128+8,%rsp
@@ -220,7 +220,7 @@ padlock_sha256_blocks:
 	movq	%rsp,%rdi
 	movaps	%xmm1,16(%rsp)
 	movq	$-1,%rax
-.byte	0xf3,0x0f,0xa6,0xd0
+.byte	0xf3,0x0f,0xa6,0xd0	
 	movaps	(%rsp),%xmm0
 	movaps	16(%rsp),%xmm1
 	addq	$128+8,%rsp
@@ -245,7 +245,7 @@ padlock_sha512_blocks:
 	movaps	%xmm1,16(%rsp)
 	movaps	%xmm2,32(%rsp)
 	movaps	%xmm3,48(%rsp)
-.byte	0xf3,0x0f,0xa6,0xe0
+.byte	0xf3,0x0f,0xa6,0xe0	
 	movaps	(%rsp),%xmm0
 	movaps	16(%rsp),%xmm1
 	movaps	32(%rsp),%xmm2
@@ -276,6 +276,8 @@ padlock_ecb_encrypt:
 	leaq	16(%rdx),%rdx
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
+	cmpq	$128,%rcx
+	jbe	.Lecb_short
 	testl	$32,(%rdx)
 	jnz	.Lecb_aligned
 	testq	$15,%rdi
@@ -295,21 +297,6 @@ padlock_ecb_encrypt:
 	negq	%rax
 	andq	$512-1,%rbx
 	leaq	(%rax,%rbp,1),%rsp
-	movq	$512,%rax
-	cmovzq	%rax,%rbx
-	cmpq	%rbx,%rcx
-	ja	.Lecb_loop
-	movq	%rsi,%rax
-	cmpq	%rsp,%rbp
-	cmoveq	%rdi,%rax
-	addq	%rcx,%rax
-	negq	%rax
-	andq	$4095,%rax
-	cmpq	$128,%rax
-	movq	$-128,%rax
-	cmovaeq	%rbx,%rax
-	andq	%rax,%rbx
-	jz	.Lecb_unaligned_tail
 	jmp	.Lecb_loop
 .align	16
 .Lecb_loop:
@@ -325,7 +312,7 @@ padlock_ecb_encrypt:
 	testq	$15,%rsi
 	jz	.Lecb_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -333,15 +320,15 @@ padlock_ecb_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,200
+.byte	0xf3,0x0f,0xa7,200	
 	movq	%r8,%rdi
 	movq	%r11,%rbx
 	testq	$15,%rdi
 	jz	.Lecb_out_aligned
 	movq	%rbx,%rcx
-	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+	leaq	(%rsp),%rsi
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lecb_out_aligned:
 	movq	%r9,%rsi
@@ -350,26 +337,9 @@ padlock_ecb_encrypt:
 	addq	%rbx,%rsi
 	subq	%rbx,%rcx
 	movq	$512,%rbx
-	jz	.Lecb_break
-	cmpq	%rbx,%rcx
-	jae	.Lecb_loop
-.Lecb_unaligned_tail:
-	xorl	%eax,%eax
+	jnz	.Lecb_loop
+
 	cmpq	%rsp,%rbp
-	cmoveq	%rcx,%rax
-	movq	%rdi,%r8
-	movq	%rcx,%rbx
-	subq	%rax,%rsp
-	shrq	$3,%rcx
-	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
-	movq	%rsp,%rsi
-	movq	%r8,%rdi
-	movq	%rbx,%rcx
-	jmp	.Lecb_loop
-.align	16
-.Lecb_break:
-	cmpq	%rbp,%rsp
 	je	.Lecb_done
 
 	pxor	%xmm0,%xmm0
@@ -383,39 +353,26 @@ padlock_ecb_encrypt:
 .Lecb_done:
 	leaq	(%rbp),%rsp
 	jmp	.Lecb_exit
-
+.align	16
+.Lecb_short:
+	movq	%rsp,%rbp
+	subq	%rcx,%rsp
+	xorq	%rbx,%rbx
+.Lecb_short_copy:
+	movups	(%rsi,%rbx,1),%xmm0
+	leaq	16(%rbx),%rbx
+	cmpq	%rbx,%rcx
+	movaps	%xmm0,-16(%rsp,%rbx,1)
+	ja	.Lecb_short_copy
+	movq	%rsp,%rsi
+	movq	%rcx,%rbx
+	jmp	.Lecb_loop
 .align	16
 .Lecb_aligned:
-	leaq	(%rsi,%rcx,1),%rbp
-	negq	%rbp
-	andq	$4095,%rbp
-	xorl	%eax,%eax
-	cmpq	$128,%rbp
-	movq	$128-1,%rbp
-	cmovaeq	%rax,%rbp
-	andq	%rcx,%rbp
-	subq	%rbp,%rcx
-	jz	.Lecb_aligned_tail
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,200
-	testq	%rbp,%rbp
-	jz	.Lecb_exit
-
-.Lecb_aligned_tail:
-	movq	%rdi,%r8
-	movq	%rbp,%rbx
-	movq	%rbp,%rcx
-	leaq	(%rsp),%rbp
-	subq	%rcx,%rsp
-	shrq	$3,%rcx
-	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
-	leaq	(%r8),%rdi
-	leaq	(%rsp),%rsi
-	movq	%rbx,%rcx
-	jmp	.Lecb_loop
+.byte	0xf3,0x0f,0xa7,200	
 .Lecb_exit:
 	movl	$1,%eax
 	leaq	8(%rsp),%rsp
@@ -443,6 +400,8 @@ padlock_cbc_encrypt:
 	leaq	16(%rdx),%rdx
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
+	cmpq	$64,%rcx
+	jbe	.Lcbc_short
 	testl	$32,(%rdx)
 	jnz	.Lcbc_aligned
 	testq	$15,%rdi
@@ -462,21 +421,6 @@ padlock_cbc_encrypt:
 	negq	%rax
 	andq	$512-1,%rbx
 	leaq	(%rax,%rbp,1),%rsp
-	movq	$512,%rax
-	cmovzq	%rax,%rbx
-	cmpq	%rbx,%rcx
-	ja	.Lcbc_loop
-	movq	%rsi,%rax
-	cmpq	%rsp,%rbp
-	cmoveq	%rdi,%rax
-	addq	%rcx,%rax
-	negq	%rax
-	andq	$4095,%rax
-	cmpq	$64,%rax
-	movq	$-64,%rax
-	cmovaeq	%rbx,%rax
-	andq	%rax,%rbx
-	jz	.Lcbc_unaligned_tail
 	jmp	.Lcbc_loop
 .align	16
 .Lcbc_loop:
@@ -492,7 +436,7 @@ padlock_cbc_encrypt:
 	testq	$15,%rsi
 	jz	.Lcbc_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -500,7 +444,7 @@ padlock_cbc_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,208
+.byte	0xf3,0x0f,0xa7,208	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	movq	%r8,%rdi
@@ -508,9 +452,9 @@ padlock_cbc_encrypt:
 	testq	$15,%rdi
 	jz	.Lcbc_out_aligned
 	movq	%rbx,%rcx
-	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+	leaq	(%rsp),%rsi
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lcbc_out_aligned:
 	movq	%r9,%rsi
@@ -519,26 +463,9 @@ padlock_cbc_encrypt:
 	addq	%rbx,%rsi
 	subq	%rbx,%rcx
 	movq	$512,%rbx
-	jz	.Lcbc_break
-	cmpq	%rbx,%rcx
-	jae	.Lcbc_loop
-.Lcbc_unaligned_tail:
-	xorl	%eax,%eax
+	jnz	.Lcbc_loop
+
 	cmpq	%rsp,%rbp
-	cmoveq	%rcx,%rax
-	movq	%rdi,%r8
-	movq	%rcx,%rbx
-	subq	%rax,%rsp
-	shrq	$3,%rcx
-	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
-	movq	%rsp,%rsi
-	movq	%r8,%rdi
-	movq	%rbx,%rcx
-	jmp	.Lcbc_loop
-.align	16
-.Lcbc_break:
-	cmpq	%rbp,%rsp
 	je	.Lcbc_done
 
 	pxor	%xmm0,%xmm0
@@ -552,41 +479,28 @@ padlock_cbc_encrypt:
 .Lcbc_done:
 	leaq	(%rbp),%rsp
 	jmp	.Lcbc_exit
-
+.align	16
+.Lcbc_short:
+	movq	%rsp,%rbp
+	subq	%rcx,%rsp
+	xorq	%rbx,%rbx
+.Lcbc_short_copy:
+	movups	(%rsi,%rbx,1),%xmm0
+	leaq	16(%rbx),%rbx
+	cmpq	%rbx,%rcx
+	movaps	%xmm0,-16(%rsp,%rbx,1)
+	ja	.Lcbc_short_copy
+	movq	%rsp,%rsi
+	movq	%rcx,%rbx
+	jmp	.Lcbc_loop
 .align	16
 .Lcbc_aligned:
-	leaq	(%rsi,%rcx,1),%rbp
-	negq	%rbp
-	andq	$4095,%rbp
-	xorl	%eax,%eax
-	cmpq	$64,%rbp
-	movq	$64-1,%rbp
-	cmovaeq	%rax,%rbp
-	andq	%rcx,%rbp
-	subq	%rbp,%rcx
-	jz	.Lcbc_aligned_tail
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,208
+.byte	0xf3,0x0f,0xa7,208	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
-	testq	%rbp,%rbp
-	jz	.Lcbc_exit
-
-.Lcbc_aligned_tail:
-	movq	%rdi,%r8
-	movq	%rbp,%rbx
-	movq	%rbp,%rcx
-	leaq	(%rsp),%rbp
-	subq	%rcx,%rsp
-	shrq	$3,%rcx
-	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
-	leaq	(%r8),%rdi
-	leaq	(%rsp),%rsi
-	movq	%rbx,%rcx
-	jmp	.Lcbc_loop
 .Lcbc_exit:
 	movl	$1,%eax
 	leaq	8(%rsp),%rsp
@@ -633,8 +547,6 @@ padlock_cfb_encrypt:
 	negq	%rax
 	andq	$512-1,%rbx
 	leaq	(%rax,%rbp,1),%rsp
-	movq	$512,%rax
-	cmovzq	%rax,%rbx
 	jmp	.Lcfb_loop
 .align	16
 .Lcfb_loop:
@@ -650,7 +562,7 @@ padlock_cfb_encrypt:
 	testq	$15,%rsi
 	jz	.Lcfb_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -658,7 +570,7 @@ padlock_cfb_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,224
+.byte	0xf3,0x0f,0xa7,224	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	movq	%r8,%rdi
@@ -666,9 +578,9 @@ padlock_cfb_encrypt:
 	testq	$15,%rdi
 	jz	.Lcfb_out_aligned
 	movq	%rbx,%rcx
-	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+	leaq	(%rsp),%rsi
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lcfb_out_aligned:
 	movq	%r9,%rsi
@@ -678,7 +590,8 @@ padlock_cfb_encrypt:
 	subq	%rbx,%rcx
 	movq	$512,%rbx
 	jnz	.Lcfb_loop
-	cmpq	%rbp,%rsp
+
+	cmpq	%rsp,%rbp
 	je	.Lcfb_done
 
 	pxor	%xmm0,%xmm0
@@ -692,13 +605,12 @@ padlock_cfb_encrypt:
 .Lcfb_done:
 	leaq	(%rbp),%rsp
 	jmp	.Lcfb_exit
-
 .align	16
 .Lcfb_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,224
+.byte	0xf3,0x0f,0xa7,224	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 .Lcfb_exit:
@@ -747,8 +659,6 @@ padlock_ofb_encrypt:
 	negq	%rax
 	andq	$512-1,%rbx
 	leaq	(%rax,%rbp,1),%rsp
-	movq	$512,%rax
-	cmovzq	%rax,%rbx
 	jmp	.Lofb_loop
 .align	16
 .Lofb_loop:
@@ -764,7 +674,7 @@ padlock_ofb_encrypt:
 	testq	$15,%rsi
 	jz	.Lofb_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -772,7 +682,7 @@ padlock_ofb_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,232
+.byte	0xf3,0x0f,0xa7,232	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	movq	%r8,%rdi
@@ -780,9 +690,9 @@ padlock_ofb_encrypt:
 	testq	$15,%rdi
 	jz	.Lofb_out_aligned
 	movq	%rbx,%rcx
-	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+	leaq	(%rsp),%rsi
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lofb_out_aligned:
 	movq	%r9,%rsi
@@ -792,7 +702,8 @@ padlock_ofb_encrypt:
 	subq	%rbx,%rcx
 	movq	$512,%rbx
 	jnz	.Lofb_loop
-	cmpq	%rbp,%rsp
+
+	cmpq	%rsp,%rbp
 	je	.Lofb_done
 
 	pxor	%xmm0,%xmm0
@@ -806,13 +717,12 @@ padlock_ofb_encrypt:
 .Lofb_done:
 	leaq	(%rbp),%rsp
 	jmp	.Lofb_exit
-
 .align	16
 .Lofb_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,232
+.byte	0xf3,0x0f,0xa7,232	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 .Lofb_exit:
@@ -842,6 +752,8 @@ padlock_ctr32_encrypt:
 	leaq	16(%rdx),%rdx
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
+	cmpq	$64,%rcx
+	jbe	.Lctr32_short
 	testl	$32,(%rdx)
 	jnz	.Lctr32_aligned
 	testq	$15,%rdi
@@ -861,32 +773,15 @@ padlock_ctr32_encrypt:
 	negq	%rax
 	andq	$512-1,%rbx
 	leaq	(%rax,%rbp,1),%rsp
-	movq	$512,%rax
-	cmovzq	%rax,%rbx
 .Lctr32_reenter:
 	movl	-4(%rdx),%eax
 	bswapl	%eax
 	negl	%eax
 	andl	$31,%eax
-	movq	$512,%rbx
+	jz	.Lctr32_loop
 	shll	$4,%eax
-	cmovzq	%rbx,%rax
 	cmpq	%rax,%rcx
 	cmovaq	%rax,%rbx
-	cmovbeq	%rcx,%rbx
-	cmpq	%rbx,%rcx
-	ja	.Lctr32_loop
-	movq	%rsi,%rax
-	cmpq	%rsp,%rbp
-	cmoveq	%rdi,%rax
-	addq	%rcx,%rax
-	negq	%rax
-	andq	$4095,%rax
-	cmpq	$32,%rax
-	movq	$-32,%rax
-	cmovaeq	%rbx,%rax
-	andq	%rax,%rbx
-	jz	.Lctr32_unaligned_tail
 	jmp	.Lctr32_loop
 .align	16
 .Lctr32_loop:
@@ -902,7 +797,7 @@ padlock_ctr32_encrypt:
 	testq	$15,%rsi
 	jz	.Lctr32_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -910,23 +805,23 @@ padlock_ctr32_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,216
+.byte	0xf3,0x0f,0xa7,216	
 	movl	-4(%rdx),%eax
 	testl	$4294901760,%eax
-	jnz	.Lctr32_no_carry
+	jnz	.Lctr32_no_corr
 	bswapl	%eax
 	addl	$65536,%eax
 	bswapl	%eax
 	movl	%eax,-4(%rdx)
-.Lctr32_no_carry:
+.Lctr32_no_corr:
 	movq	%r8,%rdi
 	movq	%r11,%rbx
 	testq	$15,%rdi
 	jz	.Lctr32_out_aligned
 	movq	%rbx,%rcx
-	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+	leaq	(%rsp),%rsi
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lctr32_out_aligned:
 	movq	%r9,%rsi
@@ -935,38 +830,9 @@ padlock_ctr32_encrypt:
 	addq	%rbx,%rsi
 	subq	%rbx,%rcx
 	movq	$512,%rbx
-	jz	.Lctr32_break
-	cmpq	%rbx,%rcx
-	jae	.Lctr32_loop
-	movq	%rcx,%rbx
-	movq	%rsi,%rax
-	cmpq	%rsp,%rbp
-	cmoveq	%rdi,%rax
-	addq	%rcx,%rax
-	negq	%rax
-	andq	$4095,%rax
-	cmpq	$32,%rax
-	movq	$-32,%rax
-	cmovaeq	%rbx,%rax
-	andq	%rax,%rbx
 	jnz	.Lctr32_loop
-.Lctr32_unaligned_tail:
-	xorl	%eax,%eax
+
 	cmpq	%rsp,%rbp
-	cmoveq	%rcx,%rax
-	movq	%rdi,%r8
-	movq	%rcx,%rbx
-	subq	%rax,%rsp
-	shrq	$3,%rcx
-	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
-	movq	%rsp,%rsi
-	movq	%r8,%rdi
-	movq	%rbx,%rcx
-	jmp	.Lctr32_loop
-.align	16
-.Lctr32_break:
-	cmpq	%rbp,%rsp
 	je	.Lctr32_done
 
 	pxor	%xmm0,%xmm0
@@ -980,75 +846,56 @@ padlock_ctr32_encrypt:
 .Lctr32_done:
 	leaq	(%rbp),%rsp
 	jmp	.Lctr32_exit
-
+.align	16
+.Lctr32_short:
+	movq	%rsp,%rbp
+	subq	%rcx,%rsp
+	xorq	%rbx,%rbx
+.Lctr32_short_copy:
+	movups	(%rsi,%rbx,1),%xmm0
+	leaq	16(%rbx),%rbx
+	cmpq	%rbx,%rcx
+	movaps	%xmm0,-16(%rsp,%rbx,1)
+	ja	.Lctr32_short_copy
+	movq	%rsp,%rsi
+	movq	%rcx,%rbx
+	jmp	.Lctr32_reenter
 .align	16
 .Lctr32_aligned:
 	movl	-4(%rdx),%eax
+	movq	$1048576,%rbx
 	bswapl	%eax
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
 	negl	%eax
 	andl	$65535,%eax
-	movq	$1048576,%rbx
+	jz	.Lctr32_aligned_loop
 	shll	$4,%eax
-	cmovzq	%rbx,%rax
 	cmpq	%rax,%rcx
 	cmovaq	%rax,%rbx
-	cmovbeq	%rcx,%rbx
-	jbe	.Lctr32_aligned_skip
-
+	jmp	.Lctr32_aligned_loop
+.align	16
 .Lctr32_aligned_loop:
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
 	movq	%rcx,%r10
 	movq	%rbx,%rcx
 	movq	%rbx,%r11
-
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,216
-
+.byte	0xf3,0x0f,0xa7,216	
 	movl	-4(%rdx),%eax
 	bswapl	%eax
 	addl	$65536,%eax
 	bswapl	%eax
 	movl	%eax,-4(%rdx)
 
+	movq	%r11,%rbx
 	movq	%r10,%rcx
-	subq	%r11,%rcx
+	subq	%rbx,%rcx
 	movq	$1048576,%rbx
-	jz	.Lctr32_exit
-	cmpq	%rbx,%rcx
-	jae	.Lctr32_aligned_loop
-
-.Lctr32_aligned_skip:
-	leaq	(%rsi,%rcx,1),%rbp
-	negq	%rbp
-	andq	$4095,%rbp
-	xorl	%eax,%eax
-	cmpq	$32,%rbp
-	movq	$32-1,%rbp
-	cmovaeq	%rax,%rbp
-	andq	%rcx,%rbp
-	subq	%rbp,%rcx
-	jz	.Lctr32_aligned_tail
-	leaq	-16(%rdx),%rax
-	leaq	16(%rdx),%rbx
-	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,216
-	testq	%rbp,%rbp
-	jz	.Lctr32_exit
-
-.Lctr32_aligned_tail:
-	movq	%rdi,%r8
-	movq	%rbp,%rbx
-	movq	%rbp,%rcx
-	leaq	(%rsp),%rbp
-	subq	%rcx,%rsp
-	shrq	$3,%rcx
-	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
-	leaq	(%r8),%rdi
-	leaq	(%rsp),%rsi
-	movq	%rbx,%rcx
-	jmp	.Lctr32_loop
+	jnz	.Lctr32_aligned_loop
 .Lctr32_exit:
 	movl	$1,%eax
 	leaq	8(%rsp),%rsp

@@ -1,59 +1,69 @@
+#!/usr/bin/env perl
 #
-# Copyright (C) 2011-2013 Free Software Foundation, Inc.
-# Copyright (C) 2013 Nikos Mavrogiannopoulos
+# ====================================================================
+# Written by Nikos Mavrogiannopoulos
+# Based on e_padlock-x86_64
+# ====================================================================
 #
-# Author: Nikos Mavrogiannopoulos
-#
-# This file is part of GnuTLS.
-#
-# The GnuTLS is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public License
-# as published by the Free Software Foundation; either version 2.1 of
-# the License, or (at your option) any later version.
-#
-# This library is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# *** This file is auto-generated ***
-#
-.text	
-.globl	gnutls_cpuid
-.type	gnutls_cpuid,@function
+
+$flavour = shift;
+$output  = shift;
+if ($flavour =~ /\./) { $output = $flavour; undef $flavour; }
+
+$win64=0; $win64=1 if ($flavour =~ /[nm]asm|mingw64/ || $output =~ /\.asm$/);
+
+$0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
+( $xlate="${dir}x86_64-xlate.pl" and -f $xlate ) or
+( $xlate="${dir}../../crypto/perlasm/x86_64-xlate.pl" and -f $xlate) or
+die "can't locate x86_64-xlate.pl";
+
+open STDOUT,"| $^X $xlate $flavour $output";
+
+$code=".text\n";
+
+($arg1,$arg2,$arg3,$arg4)=$win64?("%rcx","%rdx","%r8", "%r9") : # Win64 order
+                                 ("%rdi","%rsi","%rdx","%rcx"); # Unix order
+
+
+$code.=<<___;
+.globl gnutls_cpuid
+.type gnutls_cpuid,\@function
 .align	16
 gnutls_cpuid:
 	pushq	%rbp
-	movq	%rsp,%rbp
+	movq	%rsp, %rbp
 	pushq	%rbx
-	movl	%edi,-12(%rbp)
-	movq	%rsi,-24(%rbp)
-	movq	%rdx,-32(%rbp)
-	movq	%rcx,-40(%rbp)
-	movq	%r8,-48(%rbp)
-	movl	-12(%rbp),%eax
-	movl	%eax,-60(%rbp)
-	movl	-60(%rbp),%eax
+	movl	%edi, -12(%rbp)
+	movq	%rsi, -24(%rbp)
+	movq	%rdx, -32(%rbp)
+	movq	%rcx, -40(%rbp)
+	movq	%r8, -48(%rbp)
+	movl	-12(%rbp), %eax
+	movl	%eax, -60(%rbp)
+	movl	-60(%rbp), %eax
 	cpuid
-	movl	%edx,-56(%rbp)
-	movl	%ecx,%esi
-	movl	%eax,-52(%rbp)
-	movq	-24(%rbp),%rax
-	movl	-52(%rbp),%edx
-	movl	%edx,(%rax)
-	movq	-32(%rbp),%rax
-	movl	%ebx,(%rax)
-	movq	-40(%rbp),%rax
-	movl	%esi,(%rax)
-	movq	-48(%rbp),%rax
-	movl	-56(%rbp),%ecx
-	movl	%ecx,(%rax)
+	movl	%edx, -56(%rbp)
+	movl	%ecx, %esi
+	movl	%eax, -52(%rbp)
+	movq	-24(%rbp), %rax
+	movl	-52(%rbp), %edx
+	movl	%edx, (%rax)
+	movq	-32(%rbp), %rax
+	movl	%ebx, (%rax)
+	movq	-40(%rbp), %rax
+	movl	%esi, (%rax)
+	movq	-48(%rbp), %rax
+	movl	-56(%rbp), %ecx
+	movl	%ecx, (%rax)
 	popq	%rbx
 	leave
-	.byte	0xf3,0xc3
-.size	gnutls_cpuid,.-gnutls_cpuid
+	ret
+.size gnutls_cpuid,.-gnutls_cpuid
+___
 
-.section .note.GNU-stack,"",%progbits
+$code =~ s/\`([^\`]*)\`/eval($1)/gem;
+
+print $code;
+
+close STDOUT;
+

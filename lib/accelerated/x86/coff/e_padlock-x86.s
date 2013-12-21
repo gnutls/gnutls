@@ -180,14 +180,16 @@ _padlock_ecb_encrypt:
 	leal	16(%edx),%edx
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
+	cmpl	$128,%ecx
+	jbe	.L006ecb_short
 	testl	$32,(%edx)
-	jnz	.L006ecb_aligned
+	jnz	.L007ecb_aligned
 	testl	$15,%edi
 	setz	%al
 	testl	$15,%esi
 	setz	%bl
 	testl	%ebx,%eax
-	jnz	.L006ecb_aligned
+	jnz	.L007ecb_aligned
 	negl	%eax
 	movl	$512,%ebx
 	notl	%eax
@@ -199,28 +201,10 @@ _padlock_ecb_encrypt:
 	negl	%eax
 	andl	$511,%ebx
 	leal	(%eax,%ebp,1),%esp
-	movl	$512,%eax
-	cmovzl	%eax,%ebx
-	movl	%ebp,%eax
-	andl	$-16,%ebp
 	andl	$-16,%esp
-	movl	%eax,16(%ebp)
-	cmpl	%ebx,%ecx
-	ja	.L007ecb_loop
-	movl	%esi,%eax
-	cmpl	%esp,%ebp
-	cmovel	%edi,%eax
-	addl	%ecx,%eax
-	negl	%eax
-	andl	$4095,%eax
-	cmpl	$128,%eax
-	movl	$-128,%eax
-	cmovael	%ebx,%eax
-	andl	%eax,%ebx
-	jz	.L008ecb_unaligned_tail
-	jmp	.L007ecb_loop
+	jmp	.L008ecb_loop
 .align	16
-.L007ecb_loop:
+.L008ecb_loop:
 	movl	%edi,(%ebp)
 	movl	%esi,4(%ebp)
 	movl	%ecx,8(%ebp)
@@ -245,8 +229,8 @@ _padlock_ecb_encrypt:
 	testl	$15,%edi
 	jz	.L010ecb_out_aligned
 	movl	%ebx,%ecx
-	leal	(%esp),%esi
 	shrl	$2,%ecx
+	leal	(%esp),%esi
 .byte	243,165
 	subl	%ebx,%edi
 .L010ecb_out_aligned:
@@ -256,75 +240,43 @@ _padlock_ecb_encrypt:
 	addl	%ebx,%esi
 	subl	%ebx,%ecx
 	movl	$512,%ebx
-	jz	.L011ecb_break
-	cmpl	%ebx,%ecx
-	jae	.L007ecb_loop
-.L008ecb_unaligned_tail:
-	xorl	%eax,%eax
+	jnz	.L008ecb_loop
 	cmpl	%ebp,%esp
-	cmovel	%ecx,%eax
-	subl	%eax,%esp
-	movl	%edi,%eax
-	movl	%ecx,%ebx
-	shrl	$2,%ecx
-	leal	(%esp),%edi
-.byte	243,165
-	movl	%esp,%esi
-	movl	%eax,%edi
-	movl	%ebx,%ecx
-	jmp	.L007ecb_loop
-.align	16
-.L011ecb_break:
-	cmpl	%ebp,%esp
-	je	.L012ecb_done
+	je	.L011ecb_done
 	pxor	%xmm0,%xmm0
 	leal	(%esp),%eax
-.L013ecb_bzero:
+.L012ecb_bzero:
 	movaps	%xmm0,(%eax)
 	leal	16(%eax),%eax
 	cmpl	%eax,%ebp
-	ja	.L013ecb_bzero
-.L012ecb_done:
-	movl	16(%ebp),%ebp
+	ja	.L012ecb_bzero
+.L011ecb_done:
 	leal	24(%ebp),%esp
-	jmp	.L014ecb_exit
+	jmp	.L013ecb_exit
 .align	16
-.L006ecb_aligned:
-	leal	(%esi,%ecx,1),%ebp
-	negl	%ebp
-	andl	$4095,%ebp
+.L006ecb_short:
 	xorl	%eax,%eax
-	cmpl	$128,%ebp
-	movl	$127,%ebp
-	cmovael	%eax,%ebp
-	andl	%ecx,%ebp
-	subl	%ebp,%ecx
-	jz	.L015ecb_aligned_tail
+	leal	-24(%esp),%ebp
+	subl	%ecx,%eax
+	leal	(%eax,%ebp,1),%esp
+	andl	$-16,%esp
+	xorl	%ebx,%ebx
+.L014ecb_short_copy:
+	movups	(%esi,%ebx,1),%xmm0
+	leal	16(%ebx),%ebx
+	cmpl	%ebx,%ecx
+	movaps	%xmm0,-16(%esp,%ebx,1)
+	ja	.L014ecb_short_copy
+	movl	%esp,%esi
+	movl	%ecx,%ebx
+	jmp	.L008ecb_loop
+.align	16
+.L007ecb_aligned:
 	leal	-16(%edx),%eax
 	leal	16(%edx),%ebx
 	shrl	$4,%ecx
 .byte	243,15,167,200
-	testl	%ebp,%ebp
-	jz	.L014ecb_exit
-.L015ecb_aligned_tail:
-	movl	%ebp,%ecx
-	leal	-24(%esp),%ebp
-	movl	%ebp,%esp
-	movl	%ebp,%eax
-	subl	%ecx,%esp
-	andl	$-16,%ebp
-	andl	$-16,%esp
-	movl	%eax,16(%ebp)
-	movl	%edi,%eax
-	movl	%ecx,%ebx
-	shrl	$2,%ecx
-	leal	(%esp),%edi
-.byte	243,165
-	movl	%esp,%esi
-	movl	%eax,%edi
-	movl	%ebx,%ecx
-	jmp	.L007ecb_loop
-.L014ecb_exit:
+.L013ecb_exit:
 	movl	$1,%eax
 	leal	4(%esp),%esp
 .L004ecb_abort:
@@ -347,17 +299,19 @@ _padlock_cbc_encrypt:
 	movl	28(%esp),%edx
 	movl	32(%esp),%ecx
 	testl	$15,%edx
-	jnz	.L016cbc_abort
+	jnz	.L015cbc_abort
 	testl	$15,%ecx
-	jnz	.L016cbc_abort
+	jnz	.L015cbc_abort
 	leal	.Lpadlock_saved_context,%eax
 	pushfl
 	cld
 	call	__padlock_verify_ctx
-.L017cbc_pic_point:
+.L016cbc_pic_point:
 	leal	16(%edx),%edx
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
+	cmpl	$64,%ecx
+	jbe	.L017cbc_short
 	testl	$32,(%edx)
 	jnz	.L018cbc_aligned
 	testl	$15,%edi
@@ -377,25 +331,7 @@ _padlock_cbc_encrypt:
 	negl	%eax
 	andl	$511,%ebx
 	leal	(%eax,%ebp,1),%esp
-	movl	$512,%eax
-	cmovzl	%eax,%ebx
-	movl	%ebp,%eax
-	andl	$-16,%ebp
 	andl	$-16,%esp
-	movl	%eax,16(%ebp)
-	cmpl	%ebx,%ecx
-	ja	.L019cbc_loop
-	movl	%esi,%eax
-	cmpl	%esp,%ebp
-	cmovel	%edi,%eax
-	addl	%ecx,%eax
-	negl	%eax
-	andl	$4095,%eax
-	cmpl	$64,%eax
-	movl	$-64,%eax
-	cmovael	%ebx,%eax
-	andl	%eax,%ebx
-	jz	.L020cbc_unaligned_tail
 	jmp	.L019cbc_loop
 .align	16
 .L019cbc_loop:
@@ -407,13 +343,13 @@ _padlock_cbc_encrypt:
 	testl	$15,%edi
 	cmovnzl	%esp,%edi
 	testl	$15,%esi
-	jz	.L021cbc_inp_aligned
+	jz	.L020cbc_inp_aligned
 	shrl	$2,%ecx
 .byte	243,165
 	subl	%ebx,%edi
 	movl	%ebx,%ecx
 	movl	%edi,%esi
-.L021cbc_inp_aligned:
+.L020cbc_inp_aligned:
 	leal	-16(%edx),%eax
 	leal	16(%edx),%ebx
 	shrl	$4,%ecx
@@ -423,93 +359,61 @@ _padlock_cbc_encrypt:
 	movl	(%ebp),%edi
 	movl	12(%ebp),%ebx
 	testl	$15,%edi
-	jz	.L022cbc_out_aligned
+	jz	.L021cbc_out_aligned
 	movl	%ebx,%ecx
-	leal	(%esp),%esi
 	shrl	$2,%ecx
+	leal	(%esp),%esi
 .byte	243,165
 	subl	%ebx,%edi
-.L022cbc_out_aligned:
+.L021cbc_out_aligned:
 	movl	4(%ebp),%esi
 	movl	8(%ebp),%ecx
 	addl	%ebx,%edi
 	addl	%ebx,%esi
 	subl	%ebx,%ecx
 	movl	$512,%ebx
-	jz	.L023cbc_break
-	cmpl	%ebx,%ecx
-	jae	.L019cbc_loop
-.L020cbc_unaligned_tail:
-	xorl	%eax,%eax
+	jnz	.L019cbc_loop
 	cmpl	%ebp,%esp
-	cmovel	%ecx,%eax
-	subl	%eax,%esp
-	movl	%edi,%eax
-	movl	%ecx,%ebx
-	shrl	$2,%ecx
-	leal	(%esp),%edi
-.byte	243,165
-	movl	%esp,%esi
-	movl	%eax,%edi
-	movl	%ebx,%ecx
-	jmp	.L019cbc_loop
-.align	16
-.L023cbc_break:
-	cmpl	%ebp,%esp
-	je	.L024cbc_done
+	je	.L022cbc_done
 	pxor	%xmm0,%xmm0
 	leal	(%esp),%eax
-.L025cbc_bzero:
+.L023cbc_bzero:
 	movaps	%xmm0,(%eax)
 	leal	16(%eax),%eax
 	cmpl	%eax,%ebp
-	ja	.L025cbc_bzero
-.L024cbc_done:
-	movl	16(%ebp),%ebp
+	ja	.L023cbc_bzero
+.L022cbc_done:
 	leal	24(%ebp),%esp
-	jmp	.L026cbc_exit
+	jmp	.L024cbc_exit
+.align	16
+.L017cbc_short:
+	xorl	%eax,%eax
+	leal	-24(%esp),%ebp
+	subl	%ecx,%eax
+	leal	(%eax,%ebp,1),%esp
+	andl	$-16,%esp
+	xorl	%ebx,%ebx
+.L025cbc_short_copy:
+	movups	(%esi,%ebx,1),%xmm0
+	leal	16(%ebx),%ebx
+	cmpl	%ebx,%ecx
+	movaps	%xmm0,-16(%esp,%ebx,1)
+	ja	.L025cbc_short_copy
+	movl	%esp,%esi
+	movl	%ecx,%ebx
+	jmp	.L019cbc_loop
 .align	16
 .L018cbc_aligned:
-	leal	(%esi,%ecx,1),%ebp
-	negl	%ebp
-	andl	$4095,%ebp
-	xorl	%eax,%eax
-	cmpl	$64,%ebp
-	movl	$63,%ebp
-	cmovael	%eax,%ebp
-	andl	%ecx,%ebp
-	subl	%ebp,%ecx
-	jz	.L027cbc_aligned_tail
 	leal	-16(%edx),%eax
 	leal	16(%edx),%ebx
 	shrl	$4,%ecx
 .byte	243,15,167,208
 	movaps	(%eax),%xmm0
 	movaps	%xmm0,-16(%edx)
-	testl	%ebp,%ebp
-	jz	.L026cbc_exit
-.L027cbc_aligned_tail:
-	movl	%ebp,%ecx
-	leal	-24(%esp),%ebp
-	movl	%ebp,%esp
-	movl	%ebp,%eax
-	subl	%ecx,%esp
-	andl	$-16,%ebp
-	andl	$-16,%esp
-	movl	%eax,16(%ebp)
-	movl	%edi,%eax
-	movl	%ecx,%ebx
-	shrl	$2,%ecx
-	leal	(%esp),%edi
-.byte	243,165
-	movl	%esp,%esi
-	movl	%eax,%edi
-	movl	%ebx,%ecx
-	jmp	.L019cbc_loop
-.L026cbc_exit:
+.L024cbc_exit:
 	movl	$1,%eax
 	leal	4(%esp),%esp
-.L016cbc_abort:
+.L015cbc_abort:
 	popl	%edi
 	popl	%esi
 	popl	%ebx
@@ -529,25 +433,25 @@ _padlock_cfb_encrypt:
 	movl	28(%esp),%edx
 	movl	32(%esp),%ecx
 	testl	$15,%edx
-	jnz	.L028cfb_abort
+	jnz	.L026cfb_abort
 	testl	$15,%ecx
-	jnz	.L028cfb_abort
+	jnz	.L026cfb_abort
 	leal	.Lpadlock_saved_context,%eax
 	pushfl
 	cld
 	call	__padlock_verify_ctx
-.L029cfb_pic_point:
+.L027cfb_pic_point:
 	leal	16(%edx),%edx
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
 	testl	$32,(%edx)
-	jnz	.L030cfb_aligned
+	jnz	.L028cfb_aligned
 	testl	$15,%edi
 	setz	%al
 	testl	$15,%esi
 	setz	%bl
 	testl	%ebx,%eax
-	jnz	.L030cfb_aligned
+	jnz	.L028cfb_aligned
 	negl	%eax
 	movl	$512,%ebx
 	notl	%eax
@@ -559,15 +463,10 @@ _padlock_cfb_encrypt:
 	negl	%eax
 	andl	$511,%ebx
 	leal	(%eax,%ebp,1),%esp
-	movl	$512,%eax
-	cmovzl	%eax,%ebx
-	movl	%ebp,%eax
-	andl	$-16,%ebp
 	andl	$-16,%esp
-	movl	%eax,16(%ebp)
-	jmp	.L031cfb_loop
+	jmp	.L029cfb_loop
 .align	16
-.L031cfb_loop:
+.L029cfb_loop:
 	movl	%edi,(%ebp)
 	movl	%esi,4(%ebp)
 	movl	%ecx,8(%ebp)
@@ -576,13 +475,13 @@ _padlock_cfb_encrypt:
 	testl	$15,%edi
 	cmovnzl	%esp,%edi
 	testl	$15,%esi
-	jz	.L032cfb_inp_aligned
+	jz	.L030cfb_inp_aligned
 	shrl	$2,%ecx
 .byte	243,165
 	subl	%ebx,%edi
 	movl	%ebx,%ecx
 	movl	%edi,%esi
-.L032cfb_inp_aligned:
+.L030cfb_inp_aligned:
 	leal	-16(%edx),%eax
 	leal	16(%edx),%ebx
 	shrl	$4,%ecx
@@ -592,45 +491,61 @@ _padlock_cfb_encrypt:
 	movl	(%ebp),%edi
 	movl	12(%ebp),%ebx
 	testl	$15,%edi
-	jz	.L033cfb_out_aligned
+	jz	.L031cfb_out_aligned
 	movl	%ebx,%ecx
-	leal	(%esp),%esi
 	shrl	$2,%ecx
+	leal	(%esp),%esi
 .byte	243,165
 	subl	%ebx,%edi
-.L033cfb_out_aligned:
+.L031cfb_out_aligned:
 	movl	4(%ebp),%esi
 	movl	8(%ebp),%ecx
 	addl	%ebx,%edi
 	addl	%ebx,%esi
 	subl	%ebx,%ecx
 	movl	$512,%ebx
-	jnz	.L031cfb_loop
+	jnz	.L029cfb_loop
 	cmpl	%ebp,%esp
-	je	.L034cfb_done
+	je	.L032cfb_done
 	pxor	%xmm0,%xmm0
 	leal	(%esp),%eax
-.L035cfb_bzero:
+.L033cfb_bzero:
 	movaps	%xmm0,(%eax)
 	leal	16(%eax),%eax
 	cmpl	%eax,%ebp
-	ja	.L035cfb_bzero
-.L034cfb_done:
-	movl	16(%ebp),%ebp
+	ja	.L033cfb_bzero
+.L032cfb_done:
 	leal	24(%ebp),%esp
-	jmp	.L036cfb_exit
+	jmp	.L034cfb_exit
 .align	16
-.L030cfb_aligned:
+.L035cfb_short:
+	xorl	%eax,%eax
+	leal	-24(%esp),%ebp
+	subl	%ecx,%eax
+	leal	(%eax,%ebp,1),%esp
+	andl	$-16,%esp
+	xorl	%ebx,%ebx
+.L036cfb_short_copy:
+	movups	(%esi,%ebx,1),%xmm0
+	leal	16(%ebx),%ebx
+	cmpl	%ebx,%ecx
+	movaps	%xmm0,-16(%esp,%ebx,1)
+	ja	.L036cfb_short_copy
+	movl	%esp,%esi
+	movl	%ecx,%ebx
+	jmp	.L029cfb_loop
+.align	16
+.L028cfb_aligned:
 	leal	-16(%edx),%eax
 	leal	16(%edx),%ebx
 	shrl	$4,%ecx
 .byte	243,15,167,224
 	movaps	(%eax),%xmm0
 	movaps	%xmm0,-16(%edx)
-.L036cfb_exit:
+.L034cfb_exit:
 	movl	$1,%eax
 	leal	4(%esp),%esp
-.L028cfb_abort:
+.L026cfb_abort:
 	popl	%edi
 	popl	%esi
 	popl	%ebx
@@ -680,12 +595,7 @@ _padlock_ofb_encrypt:
 	negl	%eax
 	andl	$511,%ebx
 	leal	(%eax,%ebp,1),%esp
-	movl	$512,%eax
-	cmovzl	%eax,%ebx
-	movl	%ebp,%eax
-	andl	$-16,%ebp
 	andl	$-16,%esp
-	movl	%eax,16(%ebp)
 	jmp	.L040ofb_loop
 .align	16
 .L040ofb_loop:
@@ -715,8 +625,8 @@ _padlock_ofb_encrypt:
 	testl	$15,%edi
 	jz	.L042ofb_out_aligned
 	movl	%ebx,%ecx
-	leal	(%esp),%esi
 	shrl	$2,%ecx
+	leal	(%esp),%esi
 .byte	243,165
 	subl	%ebx,%edi
 .L042ofb_out_aligned:
@@ -737,9 +647,25 @@ _padlock_ofb_encrypt:
 	cmpl	%eax,%ebp
 	ja	.L044ofb_bzero
 .L043ofb_done:
-	movl	16(%ebp),%ebp
 	leal	24(%ebp),%esp
 	jmp	.L045ofb_exit
+.align	16
+.L046ofb_short:
+	xorl	%eax,%eax
+	leal	-24(%esp),%ebp
+	subl	%ecx,%eax
+	leal	(%eax,%ebp,1),%esp
+	andl	$-16,%esp
+	xorl	%ebx,%ebx
+.L047ofb_short_copy:
+	movups	(%esi,%ebx,1),%xmm0
+	leal	16(%ebx),%ebx
+	cmpl	%ebx,%ecx
+	movaps	%xmm0,-16(%esp,%ebx,1)
+	ja	.L047ofb_short_copy
+	movl	%esp,%esi
+	movl	%ecx,%ebx
+	jmp	.L040ofb_loop
 .align	16
 .L039ofb_aligned:
 	leal	-16(%edx),%eax
@@ -771,14 +697,14 @@ _padlock_ctr32_encrypt:
 	movl	28(%esp),%edx
 	movl	32(%esp),%ecx
 	testl	$15,%edx
-	jnz	.L046ctr32_abort
+	jnz	.L048ctr32_abort
 	testl	$15,%ecx
-	jnz	.L046ctr32_abort
+	jnz	.L048ctr32_abort
 	leal	.Lpadlock_saved_context,%eax
 	pushfl
 	cld
 	call	__padlock_verify_ctx
-.L047ctr32_pic_point:
+.L049ctr32_pic_point:
 	leal	16(%edx),%edx
 	xorl	%eax,%eax
 	movq	-16(%edx),%mm0
@@ -792,15 +718,10 @@ _padlock_ctr32_encrypt:
 	negl	%eax
 	andl	$511,%ebx
 	leal	(%eax,%ebp,1),%esp
-	movl	$512,%eax
-	cmovzl	%eax,%ebx
-	movl	%ebp,%eax
-	andl	$-16,%ebp
 	andl	$-16,%esp
-	movl	%eax,16(%ebp)
-	jmp	.L048ctr32_loop
+	jmp	.L050ctr32_loop
 .align	16
-.L048ctr32_loop:
+.L050ctr32_loop:
 	movl	%edi,(%ebp)
 	movl	%esi,4(%ebp)
 	movl	%ecx,8(%ebp)
@@ -809,7 +730,7 @@ _padlock_ctr32_encrypt:
 	movl	-4(%edx),%ecx
 	xorl	%edi,%edi
 	movl	-8(%edx),%eax
-.L049ctr32_prepare:
+.L051ctr32_prepare:
 	movl	%ecx,12(%esp,%edi,1)
 	bswap	%ecx
 	movq	%mm0,(%esp,%edi,1)
@@ -818,7 +739,7 @@ _padlock_ctr32_encrypt:
 	bswap	%ecx
 	leal	16(%edi),%edi
 	cmpl	%ebx,%edi
-	jb	.L049ctr32_prepare
+	jb	.L051ctr32_prepare
 	movl	%ecx,-4(%edx)
 	leal	(%esp),%esi
 	leal	(%esp),%edi
@@ -831,33 +752,32 @@ _padlock_ctr32_encrypt:
 	movl	12(%ebp),%ebx
 	movl	4(%ebp),%esi
 	xorl	%ecx,%ecx
-.L050ctr32_xor:
+.L052ctr32_xor:
 	movups	(%esi,%ecx,1),%xmm1
 	leal	16(%ecx),%ecx
 	pxor	-16(%esp,%ecx,1),%xmm1
 	movups	%xmm1,-16(%edi,%ecx,1)
 	cmpl	%ebx,%ecx
-	jb	.L050ctr32_xor
+	jb	.L052ctr32_xor
 	movl	8(%ebp),%ecx
 	addl	%ebx,%edi
 	addl	%ebx,%esi
 	subl	%ebx,%ecx
 	movl	$512,%ebx
-	jnz	.L048ctr32_loop
+	jnz	.L050ctr32_loop
 	pxor	%xmm0,%xmm0
 	leal	(%esp),%eax
-.L051ctr32_bzero:
+.L053ctr32_bzero:
 	movaps	%xmm0,(%eax)
 	leal	16(%eax),%eax
 	cmpl	%eax,%ebp
-	ja	.L051ctr32_bzero
-.L052ctr32_done:
-	movl	16(%ebp),%ebp
+	ja	.L053ctr32_bzero
+.L054ctr32_done:
 	leal	24(%ebp),%esp
 	movl	$1,%eax
 	leal	4(%esp),%esp
 	emms
-.L046ctr32_abort:
+.L048ctr32_abort:
 	popl	%edi
 	popl	%esi
 	popl	%ebx
@@ -881,10 +801,10 @@ __win32_segv_handler:
 	movl	4(%esp),%edx
 	movl	12(%esp),%ecx
 	cmpl	$3221225477,(%edx)
-	jne	.L053ret
+	jne	.L055ret
 	addl	$4,184(%ecx)
 	movl	$0,%eax
-.L053ret:
+.L055ret:
 	ret
 .globl	_padlock_sha1_oneshot
 .def	_padlock_sha1_oneshot;	.scl	2;	.type	32;	.endef
@@ -1060,4 +980,3 @@ _padlock_sha512_blocks:
 .Lpadlock_saved_context:
 .long	0
 
-.section .note.GNU-stack,"",%progbits

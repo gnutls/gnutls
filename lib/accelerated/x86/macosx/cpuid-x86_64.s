@@ -56,4 +56,3 @@ _gnutls_cpuid:
 	.byte	0xf3,0xc3
 
 
-.section .note.GNU-stack,"",%progbits

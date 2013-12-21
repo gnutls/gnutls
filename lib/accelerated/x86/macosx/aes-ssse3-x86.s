@@ -82,33 +82,33 @@ __vpaes_encrypt_core:
 	movdqa	%xmm6,%xmm1
 	movdqa	(%ebp),%xmm2
 	pandn	%xmm0,%xmm1
-	pand	%xmm6,%xmm0
 	movdqu	(%edx),%xmm5
+	psrld	$4,%xmm1
+	pand	%xmm6,%xmm0
 .byte	102,15,56,0,208
 	movdqa	16(%ebp),%xmm0
-	pxor	%xmm5,%xmm2
-	psrld	$4,%xmm1
-	addl	$16,%edx
 .byte	102,15,56,0,193
-	leal	192(%ebp),%ebx
+	pxor	%xmm5,%xmm2
 	pxor	%xmm2,%xmm0
+	addl	$16,%edx
+	leal	192(%ebp),%ebx
 	jmp	L000enc_entry
 .align	4,0x90
 L001enc_loop:
 	movdqa	32(%ebp),%xmm4
-	movdqa	48(%ebp),%xmm0
 .byte	102,15,56,0,226
-.byte	102,15,56,0,195
 	pxor	%xmm5,%xmm4
-	movdqa	64(%ebp),%xmm5
+	movdqa	48(%ebp),%xmm0
+.byte	102,15,56,0,195
 	pxor	%xmm4,%xmm0
-	movdqa	-64(%ebx,%ecx,1),%xmm1
+	movdqa	64(%ebp),%xmm5
 .byte	102,15,56,0,234
+	movdqa	-64(%ebx,%ecx,1),%xmm1
 	movdqa	80(%ebp),%xmm2
-	movdqa	(%ebx,%ecx,1),%xmm4
 .byte	102,15,56,0,211
-	movdqa	%xmm0,%xmm3
 	pxor	%xmm5,%xmm2
+	movdqa	(%ebx,%ecx,1),%xmm4
+	movdqa	%xmm0,%xmm3
 .byte	102,15,56,0,193
 	addl	$16,%edx
 	pxor	%xmm2,%xmm0
@@ -117,28 +117,28 @@ L001enc_loop:
 	pxor	%xmm0,%xmm3
 .byte	102,15,56,0,193
 	andl	$48,%ecx
-	subl	$1,%eax
 	pxor	%xmm3,%xmm0
+	subl	$1,%eax
 L000enc_entry:
 	movdqa	%xmm6,%xmm1
-	movdqa	-32(%ebp),%xmm5
 	pandn	%xmm0,%xmm1
 	psrld	$4,%xmm1
 	pand	%xmm6,%xmm0
+	movdqa	-32(%ebp),%xmm5
 .byte	102,15,56,0,232
-	movdqa	%xmm7,%xmm3
 	pxor	%xmm1,%xmm0
-.byte	102,15,56,0,217
-	movdqa	%xmm7,%xmm4
-	pxor	%xmm5,%xmm3
-.byte	102,15,56,0,224
-	movdqa	%xmm7,%xmm2
-	pxor	%xmm5,%xmm4
-.byte	102,15,56,0,211
 	movdqa	%xmm7,%xmm3
+.byte	102,15,56,0,217
+	pxor	%xmm5,%xmm3
+	movdqa	%xmm7,%xmm4
+.byte	102,15,56,0,224
+	pxor	%xmm5,%xmm4
+	movdqa	%xmm7,%xmm2
+.byte	102,15,56,0,211
 	pxor	%xmm0,%xmm2
-.byte	102,15,56,0,220
+	movdqa	%xmm7,%xmm3
 	movdqu	(%edx),%xmm5
+.byte	102,15,56,0,220
 	pxor	%xmm1,%xmm3
 	jnz	L001enc_loop
 	movdqa	96(%ebp),%xmm4
@@ -152,8 +152,8 @@ L000enc_entry:
 	ret
 .align	4
 __vpaes_decrypt_core:
-	leal	608(%ebp),%ebx
 	movl	240(%edx),%eax
+	leal	608(%ebp),%ebx
 	movdqa	%xmm6,%xmm1
 	movdqa	-64(%ebx),%xmm2
 	pandn	%xmm0,%xmm1
@@ -176,56 +176,56 @@ __vpaes_decrypt_core:
 .align	4,0x90
 L003dec_loop:
 	movdqa	-32(%ebx),%xmm4
-	movdqa	-16(%ebx),%xmm1
 .byte	102,15,56,0,226
-.byte	102,15,56,0,203
-	pxor	%xmm4,%xmm0
-	movdqa	(%ebx),%xmm4
-	pxor	%xmm1,%xmm0
-	movdqa	16(%ebx),%xmm1
-.byte	102,15,56,0,226
-.byte	102,15,56,0,197
-.byte	102,15,56,0,203
-	pxor	%xmm4,%xmm0
-	movdqa	32(%ebx),%xmm4
-	pxor	%xmm1,%xmm0
-	movdqa	48(%ebx),%xmm1
-.byte	102,15,56,0,226
-.byte	102,15,56,0,197
-.byte	102,15,56,0,203
-	pxor	%xmm4,%xmm0
-	movdqa	64(%ebx),%xmm4
-	pxor	%xmm1,%xmm0
-	movdqa	80(%ebx),%xmm1
-.byte	102,15,56,0,226
-.byte	102,15,56,0,197
-.byte	102,15,56,0,203
+	pxor	%xmm0,%xmm4
+	movdqa	-16(%ebx),%xmm0
+.byte	102,15,56,0,195
 	pxor	%xmm4,%xmm0
 	addl	$16,%edx
-.byte	102,15,58,15,237,12
-	pxor	%xmm1,%xmm0
+.byte	102,15,56,0,197
+	movdqa	(%ebx),%xmm4
+.byte	102,15,56,0,226
+	pxor	%xmm0,%xmm4
+	movdqa	16(%ebx),%xmm0
+.byte	102,15,56,0,195
+	pxor	%xmm4,%xmm0
 	subl	$1,%eax
+.byte	102,15,56,0,197
+	movdqa	32(%ebx),%xmm4
+.byte	102,15,56,0,226
+	pxor	%xmm0,%xmm4
+	movdqa	48(%ebx),%xmm0
+.byte	102,15,56,0,195
+	pxor	%xmm4,%xmm0
+.byte	102,15,56,0,197
+	movdqa	64(%ebx),%xmm4
+.byte	102,15,56,0,226
+	pxor	%xmm0,%xmm4
+	movdqa	80(%ebx),%xmm0
+.byte	102,15,56,0,195
+	pxor	%xmm4,%xmm0
+.byte	102,15,58,15,237,12
 L002dec_entry:
 	movdqa	%xmm6,%xmm1
-	movdqa	-32(%ebp),%xmm2
 	pandn	%xmm0,%xmm1
-	pand	%xmm6,%xmm0
 	psrld	$4,%xmm1
+	pand	%xmm6,%xmm0
+	movdqa	-32(%ebp),%xmm2
 .byte	102,15,56,0,208
-	movdqa	%xmm7,%xmm3
 	pxor	%xmm1,%xmm0
+	movdqa	%xmm7,%xmm3
 .byte	102,15,56,0,217
-	movdqa	%xmm7,%xmm4
 	pxor	%xmm2,%xmm3
+	movdqa	%xmm7,%xmm4
 .byte	102,15,56,0,224
 	pxor	%xmm2,%xmm4
 	movdqa	%xmm7,%xmm2
 .byte	102,15,56,0,211
-	movdqa	%xmm7,%xmm3
 	pxor	%xmm0,%xmm2
+	movdqa	%xmm7,%xmm3
 .byte	102,15,56,0,220
-	movdqu	(%edx),%xmm0
 	pxor	%xmm1,%xmm3
+	movdqu	(%edx),%xmm0
 	jnz	L003dec_loop
 	movdqa	96(%ebx),%xmm4
 .byte	102,15,56,0,226
@@ -330,12 +330,12 @@ L013schedule_mangle_last_dec:
 	ret
 .align	4
 __vpaes_schedule_192_smear:
-	pshufd	$128,%xmm6,%xmm1
+	pshufd	$128,%xmm6,%xmm0
+	pxor	%xmm0,%xmm6
 	pshufd	$254,%xmm7,%xmm0
-	pxor	%xmm1,%xmm6
-	pxor	%xmm1,%xmm1
 	pxor	%xmm0,%xmm6
 	movdqa	%xmm6,%xmm0
+	pxor	%xmm1,%xmm1
 	movhlps	%xmm1,%xmm6
 	ret
 .align	4
@@ -588,8 +588,6 @@ L_vpaes_cbc_encrypt_begin:
 	movl	24(%esp),%edi
 	movl	28(%esp),%eax
 	movl	32(%esp),%edx
-	subl	$16,%eax
-	jc	L020cbc_abort
 	leal	-56(%esp),%ebx
 	movl	36(%esp),%ebp
 	andl	$-16,%ebx
@@ -599,17 +597,18 @@ L_vpaes_cbc_encrypt_begin:
 	subl	%esi,%edi
 	movl	%ebx,48(%esp)
 	movl	%edi,(%esp)
+	subl	$16,%eax
 	movl	%edx,4(%esp)
 	movl	%ebp,8(%esp)
 	movl	%eax,%edi
-	leal	L_vpaes_consts+0x30-L021pic_point,%ebp
+	leal	L_vpaes_consts+0x30-L020pic_point,%ebp
 	call	__vpaes_preheat
-L021pic_point:
+L020pic_point:
 	cmpl	$0,%ecx
-	je	L022cbc_dec_loop
-	jmp	L023cbc_enc_loop
+	je	L021cbc_dec_loop
+	jmp	L022cbc_enc_loop
 .align	4,0x90
-L023cbc_enc_loop:
+L022cbc_enc_loop:
 	movdqu	(%esi),%xmm0
 	pxor	%xmm1,%xmm0
 	call	__vpaes_encrypt_core
@@ -619,10 +618,10 @@ L023cbc_enc_loop:
 	movdqu	%xmm0,(%ebx,%esi,1)
 	leal	16(%esi),%esi
 	subl	$16,%edi
-	jnc	L023cbc_enc_loop
-	jmp	L024cbc_done
+	jnc	L022cbc_enc_loop
+	jmp	L023cbc_done
 .align	4,0x90
-L022cbc_dec_loop:
+L021cbc_dec_loop:
 	movdqu	(%esi),%xmm0
 	movdqa	%xmm1,16(%esp)
 	movdqa	%xmm0,32(%esp)
@@ -634,16 +633,14 @@ L022cbc_dec_loop:
 	movdqu	%xmm0,(%ebx,%esi,1)
 	leal	16(%esi),%esi
 	subl	$16,%edi
-	jnc	L022cbc_dec_loop
-L024cbc_done:
+	jnc	L021cbc_dec_loop
+L023cbc_done:
 	movl	8(%esp),%ebx
 	movl	48(%esp),%esp
 	movdqu	%xmm1,(%ebx)
-L020cbc_abort:
 	popl	%edi
 	popl	%esi
 	popl	%ebx
 	popl	%ebp
 	ret
 
-.section .note.GNU-stack,"",%progbits
