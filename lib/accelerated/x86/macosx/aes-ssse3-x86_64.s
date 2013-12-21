@@ -838,4 +838,3 @@ L$k_dsbo:
 .p2align	6
 
 
-.section .note.GNU-stack,"",%progbits

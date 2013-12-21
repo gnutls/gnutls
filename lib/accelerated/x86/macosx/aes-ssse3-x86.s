@@ -646,4 +646,3 @@ L020cbc_abort:
 	popl	%ebp
 	ret
 
-.section .note.GNU-stack,"",%progbits

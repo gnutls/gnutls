@@ -69,4 +69,3 @@ gnutls_cpuid:
 	.byte	0xf3,0xc3
 .LSEH_end_gnutls_cpuid:
 
-.section .note.GNU-stack,"",%progbits

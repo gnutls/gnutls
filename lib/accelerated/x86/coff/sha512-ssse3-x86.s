@@ -602,4 +602,3 @@ _sha512_block_data_order:
 .byte	112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103
 .byte	62,0
 
-.section .note.GNU-stack,"",%progbits

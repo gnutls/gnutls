@@ -1064,4 +1064,3 @@ L$ctr32_abort:
 L$padlock_saved_context:
 .quad	0
 
-.section .note.GNU-stack,"",%progbits

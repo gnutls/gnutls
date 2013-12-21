@@ -2878,4 +2878,3 @@ L$epilogue_ssse3:
 	.byte	0xf3,0xc3
 
 
-.section .note.GNU-stack,"",%progbits

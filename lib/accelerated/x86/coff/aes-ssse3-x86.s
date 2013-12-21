@@ -659,4 +659,3 @@ _vpaes_cbc_encrypt:
 	popl	%ebp
 	ret
 
-.section .note.GNU-stack,"",%progbits

@@ -1134,4 +1134,3 @@ se_handler:
 .rva	se_handler
 .rva	.Lcbc_body,.Lcbc_epilogue		
 
-.section .note.GNU-stack,"",%progbits

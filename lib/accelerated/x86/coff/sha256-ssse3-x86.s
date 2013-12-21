@@ -3399,4 +3399,3 @@ _sha256_block_data_order:
 	ret
 .comm	__gnutls_x86_cpuid_s,16
 
-.section .note.GNU-stack,"",%progbits

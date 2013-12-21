@@ -2690,4 +2690,3 @@ ssse3_handler:
 .rva	ssse3_handler
 .rva	.Lprologue_ssse3,.Lepilogue_ssse3	
 
-.section .note.GNU-stack,"",%progbits

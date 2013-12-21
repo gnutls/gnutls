@@ -3402,4 +3402,3 @@ L__gnutls_x86_cpuid_s$non_lazy_ptr:
 .long	0
 .comm	__gnutls_x86_cpuid_s,16,2
 
-.section .note.GNU-stack,"",%progbits
