@@ -190,7 +190,7 @@ void doit(void)
 {
 	int ret;
 	gnutls_datum_t data;
-	gnutls_x509_crt_t server_crt, ca_crt;
+	gnutls_x509_crt_t server_crt, ca_crt, ca_crt2;
 	gnutls_x509_trust_list_t tl;
 	unsigned int status;
 
@@ -207,6 +207,7 @@ void doit(void)
 	gnutls_x509_trust_list_init(&tl, 0);
 	gnutls_x509_crt_init(&server_crt);
 	gnutls_x509_crt_init(&ca_crt);
+	gnutls_x509_crt_init(&ca_crt2);
 
 	ret =
 	    gnutls_x509_crt_import(server_crt, &cert, GNUTLS_X509_FMT_PEM);
@@ -214,6 +215,10 @@ void doit(void)
 		fail("gnutls_x509_crt_import");
 
 	ret = gnutls_x509_crt_import(ca_crt, &ca, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("gnutls_x509_crt_import");
+
+	ret = gnutls_x509_crt_import(ca_crt2, &ca, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("gnutls_x509_crt_import");
 
@@ -292,7 +297,7 @@ void doit(void)
 		fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n",
 		     __LINE__, gnutls_strerror(ret));
 
-	ret = gnutls_x509_trust_list_remove_cas(tl, &ca_crt, 1);
+	ret = gnutls_x509_trust_list_remove_cas(tl, &ca_crt2, 1);
 	if (ret < 1)
 		fail("gnutls_x509_trust_list_add_cas");
 
