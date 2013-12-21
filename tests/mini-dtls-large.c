@@ -208,6 +208,9 @@ static void server(int fd)
 
 	/* see the Getting peer's information example */
 	/* print_info(session); */
+	
+	/* avoid uninitialized warnings */
+	memset(buffer, 1, sizeof(buffer));
 
 	ret =
 	    gnutls_record_send(session, buffer,

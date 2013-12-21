@@ -117,8 +117,6 @@ static void client(int fd, int wait)
 			success("client: expected timeout occured\n");
 		return;
 	} else {
-		gnutls_bye(session, GNUTLS_SHUT_WR);
-
 		if (wait != 0) {
 			fail("client: handshake was completed unexpectedly\n");
 			gnutls_perror(ret);
