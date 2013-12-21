@@ -1483,6 +1483,8 @@ static int do_handshake(socket_st * socket)
 	int ret;
 
 	gnutls_transport_set_int(socket->session, socket->fd);
+	set_read_funcs(socket->session);
+
 	do {
 		gnutls_handshake_set_timeout(socket->session,
 					     GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);

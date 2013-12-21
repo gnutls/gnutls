@@ -66,3 +66,40 @@ pin_callback(void *user, int attempt, const char *token_url,
 	     size_t pin_max);
 
 void pkcs11_common(void);
+
+#ifdef _WIN32
+static int neterrno()
+{
+int err = WSAGetLastError();
+  
+	if (err == WSAEWOULDBLOCK)
+  		return EAGAIN;
+	else if (err == WSAEINTR)
+  		return EINTR;
+	else if (err == WSAEINPROGRESS)
+		return EINPROGRESS;
+	return 0;
+}
+
+static ssize_t
+system_write(gnutls_transport_ptr ptr, const void *data, size_t data_size)
+{
+	return send((long)ptr, data, data_size, 0);
+}
+
+static ssize_t
+system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
+{
+	return recv((long)ptr, data, data_size, 0);
+}
+
+void set_read_funcs(gnutls_session_t session)
+{
+	gnutls_transport_set_push_function(vpninfo->https_sess, system_write);
+	gnutls_transport_set_pull_function(vpninfo->https_sess, system_read);
+	gnutls_transport_set_errno_function(vpninfo->https_sess, neterrno);
+
+}
+#else
+# define set_read_funcs(x)
+#endif
