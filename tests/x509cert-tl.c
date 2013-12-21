@@ -308,6 +308,7 @@ void doit(void)
 		fail("gnutls_x509_trust_list_verify_crt\n");
 
 	gnutls_x509_trust_list_deinit(tl, 1);
+	gnutls_x509_crt_deinit(ca_crt2);
 
 	gnutls_global_deinit();
 
