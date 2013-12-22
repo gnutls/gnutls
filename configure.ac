@@ -149,6 +149,45 @@ AM_GNU_GETTEXT_VERSION([0.18])
 
 AC_C_BIGENDIAN
 
+dnl No fork on MinGW, disable some self-tests until we fix them.
+dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
+AC_CHECK_FUNCS([fork getrusage getpwuid_r nanosleep daemon getpid clock_gettime pthread_mutex_lock iconv localtime vasprintf],,)
+AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
+
+AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>
+#include <signal.h>
+], [timer_create (0,0,0);])
+
+if test "$ac_cv_func_pthread_mutex_lock" != "yes";then
+  AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+fi
+
+if test "$ac_cv_func_nanosleep" != "yes";then
+  AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [nanosleep (0, 0);])
+  gnutls_needs_librt=yes
+fi
+
+if test "$ac_cv_func_clock_gettime" != "yes";then
+  AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [clock_gettime (0, 0);])
+  gnutls_needs_librt=yes
+fi
+
+ac_have_unicode=no
+if test "$ac_cv_func_iconv" != "yes";then
+  AC_LIB_HAVE_LINKFLAGS(iconv,, [#include <iconv.h>], [iconv (0, 0, 0, 0, 0);])
+  if test "$HAVE_LIBICONV" = "yes";then
+    ac_have_unicode=yes
+  fi
+else
+  ac_have_unicode=yes
+fi
+
+if test "$ac_have_unicode" != "yes";then
+  if test "$have_win" = "yes";then
+    ac_have_unicode=yes
+  fi
+fi
+
 gl_INIT
 ggl_INIT
 
@@ -223,40 +262,6 @@ AC_PROG_LN_S
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
-
-dnl No fork on MinGW, disable some self-tests until we fix them.
-dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork getrusage getpwuid_r nanosleep daemon getpid clock_gettime pthread_mutex_lock iconv localtime vasprintf],,)
-AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
-
-AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>
-#include <signal.h>
-], [timer_create (0,0,0);])
-
-if test "$ac_cv_func_pthread_mutex_lock" != "yes";then
-  AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
-fi
-
-if test "$ac_cv_func_nanosleep" != "yes";then
-  AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [nanosleep (0, 0);])
-  gnutls_needs_librt=yes
-fi
-
-ac_have_unicode=no
-if test "$ac_cv_func_iconv" != "yes";then
-  AC_LIB_HAVE_LINKFLAGS(iconv,, [#include <iconv.h>], [iconv (0, 0, 0, 0, 0);])
-  if test "$HAVE_LIBICONV" = "yes";then
-    ac_have_unicode=yes
-  fi
-else
-  ac_have_unicode=yes
-fi
-
-if test "$ac_have_unicode" != "yes";then
-  if test "$have_win" = "yes";then
-    ac_have_unicode=yes
-  fi
-fi
 
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
