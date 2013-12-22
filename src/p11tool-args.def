@@ -70,6 +70,16 @@ flag = {
 };
 
 flag = {
+    name      = list-privkeys;
+    aliases   = list-all-privkeys;
+};
+
+flag = {
+    name      = list-keys;
+    aliases   = list-all-privkeys;
+};
+
+flag = {
     name      = list-all-trusted;
     descrip   = "List all available certificates marked as trusted";
     doc = "";
