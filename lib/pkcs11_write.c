@@ -552,12 +552,12 @@ delete_obj_url(struct pkcs11_session_info *sinfo,
 			class = *((ck_object_class_t *) attr->value);
 		if (class == CKO_CERTIFICATE)
 			type = CKC_X_509;
-	}
 
-	a[a_vals].type = CKA_CLASS;
-	a[a_vals].value = &class;
-	a[a_vals].value_len = sizeof(class);
-	a_vals++;
+		a[a_vals].type = CKA_CLASS;
+		a[a_vals].value = &class;
+		a[a_vals].value_len = sizeof(class);
+		a_vals++;
+	}
 
 	attr = p11_kit_uri_get_attribute(find_data->info, CKA_ID);
 	if (attr != NULL) {
