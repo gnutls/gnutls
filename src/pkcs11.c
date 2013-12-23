@@ -34,6 +34,13 @@
 #include <stdint.h>
 #include <common.h>
 
+#define FIX(url) \
+	if (url == NULL) { \
+		fprintf(stderr, "warning: no token was provided; use --list-tokens for the available ones.\n" \
+			"warning: assuming 'pkcs11:'\n"); \
+		url = "pkcs11:"; \
+	}
+
 void
 pkcs11_delete(FILE * outfile, const char *url, int batch,
 	      unsigned int login, common_info_st * info)
@@ -86,8 +93,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int login,
 
 	pkcs11_common();
 
-	if (url == NULL)
-		url = "pkcs11:";
+	FIX(url);
 
 	if (type == PKCS11_TYPE_TRUSTED) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED;
@@ -178,8 +184,7 @@ pkcs11_export(FILE * outfile, const char *url, unsigned int login,
 
 	pkcs11_common();
 
-	if (url == NULL)
-		url = "pkcs11:";
+	FIX(url);
 
 	ret = gnutls_pkcs11_obj_init(&obj);
 	if (ret < 0) {
@@ -228,8 +233,7 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int login,
 
 	pkcs11_common();
 
-	if (url == NULL)
-		url = "pkcs11:";
+	FIX(url);
 
 	ret = gnutls_pkcs11_obj_init(&obj);
 	if (ret < 0) {
@@ -416,8 +420,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 
 	pkcs11_common();
 
-	if (url == NULL)
-		url = "pkcs11:";
+	FIX(url);
 
 	secret_key = load_secret_key(0, info);
 	if (secret_key != NULL) {
@@ -493,8 +496,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 
 	pkcs11_common();
 
-	if (url == NULL)
-		url = "pkcs11:";
+	FIX(url);
 
 	if (private == 1)
 		flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
@@ -792,8 +794,7 @@ pkcs11_mechanism_list(FILE * outfile, const char *url, unsigned int login,
 
 	pkcs11_common();
 
-	if (url == NULL)
-		url = "pkcs11:";
+	FIX(url);
 
 	idx = 0;
 	do {
@@ -826,8 +827,7 @@ pkcs11_get_random(FILE * outfile, const char *url, unsigned bytes,
 
 	pkcs11_common();
 
-	if (url == NULL)
-		url = "pkcs11:";
+	FIX(url);
 
 	output = malloc(bytes);
 	if (output == NULL) {
