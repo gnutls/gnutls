@@ -120,7 +120,7 @@ static gnutls_privkey_t pgp_key = NULL;
 static void
 get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
 {
-  size_t keyid_size = sizeof (keyid);
+  size_t keyid_size = GNUTLS_OPENPGP_KEYID_SIZE;
 
   if (strlen (str) != 16)
     {
