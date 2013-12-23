@@ -152,10 +152,23 @@ flag = {
 
 flag = {
     name      = login;
-    descrip   = "Force login to token";
+    descrip   = "Force (user) login to token";
     disabled;
     disable   = "no";
     doc       = "";
+};
+
+flag = {
+    name      = so-login;
+    descrip   = "Force security office login to token";
+    disabled;
+    disable   = "no";
+    doc       = "";
+};
+
+flag = {
+    name      = admin-login;
+    aliases   = so-login;
 };
 
 flag = {
