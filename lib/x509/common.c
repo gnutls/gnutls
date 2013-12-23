@@ -92,6 +92,8 @@ static const struct oid_to_string _oid2str[] = {
 	{"0.9.2342.19200300.100.1.25", "DC", NULL, ASN1_ETYPE_IA5_STRING},
 	{"0.9.2342.19200300.100.1.1", "UID", "PKIX1.DirectoryString",
 	 ASN1_ETYPE_INVALID},
+	{"1.2.840.113556.1.4.656", "userPrincipalName", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID},
 
 	/* Extended validation
 	 */
