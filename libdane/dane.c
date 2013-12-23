@@ -738,30 +738,30 @@ dane_verify_crt(dane_state_t s,
 		unsigned int sflags, unsigned int vflags,
 		unsigned int *verify)
 {
-	dane_state_t _s = NULL;
+	dane_state_t state = NULL;
 	dane_query_t r = NULL;
 	int ret;
 
 	*verify = 0;
 	if (s == NULL) {
-		ret = dane_state_init(&_s, sflags);
+		ret = dane_state_init(&state, sflags);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
 	} else
-		_s = s;
+		state = s;
 
-	ret = dane_query_tlsa(_s, &r, hostname, proto, port);
+	ret = dane_query_tlsa(state, &r, hostname, proto, port);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
-	ret = dane_verify_crt_raw(s, chain, chain_size, chain_type,
+	ret = dane_verify_crt_raw(state, chain, chain_size, chain_type,
 				  r, sflags, vflags, verify);
       cleanup:
-	if (s == NULL)
-		dane_state_deinit(_s);
+	if (state != NULL)
+		dane_state_deinit(state);
 	if (r != NULL)
 		dane_query_deinit(r);
 	return ret;
