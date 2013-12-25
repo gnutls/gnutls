@@ -50,14 +50,6 @@ int _mbuffer_append_data(mbuffer_st * bufel, void *newdata,
 /* For "user" use. One can have buffer data and header.
  */
 
-inline static void
-_mbuffer_set_udata(mbuffer_st * bufel, void *data, size_t data_size)
-{
-	memcpy(bufel->msg.data + bufel->mark + bufel->uhead_mark, data,
-	       data_size);
-	bufel->msg.size = data_size + bufel->uhead_mark + bufel->mark;
-}
-
 inline static void *_mbuffer_get_uhead_ptr(mbuffer_st * bufel)
 {
 	return bufel->msg.data + bufel->mark;
@@ -71,6 +63,14 @@ inline static void *_mbuffer_get_udata_ptr(mbuffer_st * bufel)
 inline static void _mbuffer_set_udata_size(mbuffer_st * bufel, size_t size)
 {
 	bufel->msg.size = size + bufel->uhead_mark + bufel->mark;
+}
+
+inline static void
+_mbuffer_set_udata(mbuffer_st * bufel, void *data, size_t data_size)
+{
+	memcpy(_mbuffer_get_udata_ptr(bufel), data,
+	       data_size);
+	_mbuffer_set_udata_size(bufel, data_size);
 }
 
 inline static size_t _mbuffer_get_udata_size(mbuffer_st * bufel)
@@ -104,7 +104,6 @@ inline static void _mbuffer_set_uhead_size(mbuffer_st * bufel, size_t size)
 
 
 inline static mbuffer_st *_gnutls_handshake_alloc(gnutls_session_t session,
-						  size_t size,
 						  size_t maximum)
 {
 	mbuffer_st *bufel =
@@ -113,8 +112,8 @@ inline static mbuffer_st *_gnutls_handshake_alloc(gnutls_session_t session,
 	if (!bufel)
 		return NULL;
 
-	_mbuffer_set_udata_size(bufel, HANDSHAKE_HEADER_SIZE(session) + size);
 	_mbuffer_set_uhead_size(bufel, HANDSHAKE_HEADER_SIZE(session));
+	_mbuffer_set_udata_size(bufel, maximum);
 
 	return bufel;
 }

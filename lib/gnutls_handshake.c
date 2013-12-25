@@ -677,7 +677,7 @@ static int _gnutls_send_finished(gnutls_session_t session, int again)
 
 	if (again == 0) {
 		bufel =
-		    _gnutls_handshake_alloc(session, MAX_VERIFY_DATA_SIZE,
+		    _gnutls_handshake_alloc(session, 
 					    MAX_VERIFY_DATA_SIZE);
 		if (bufel == NULL) {
 			gnutls_assert();
@@ -1150,7 +1150,7 @@ _gnutls_send_empty_handshake(gnutls_session_t session,
 	mbuffer_st *bufel;
 
 	if (again == 0) {
-		bufel = _gnutls_handshake_alloc(session, 0, 0);
+		bufel = _gnutls_handshake_alloc(session, 0);
 		if (bufel == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
@@ -1942,12 +1942,13 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 		 */
 
 		bufel =
-		    _gnutls_handshake_alloc(session, datalen,
+		    _gnutls_handshake_alloc(session, 
 					    datalen + MAX_EXT_DATA_LENGTH);
 		if (bufel == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
+		_mbuffer_set_udata_size(bufel, datalen);
 		data = _mbuffer_get_udata_ptr(bufel);
 
 		/* if we are resuming a session then we set the
@@ -2153,7 +2154,6 @@ static int _gnutls_send_server_hello(gnutls_session_t session, int again)
 
 		bufel =
 		    _gnutls_handshake_alloc(session,
-					    datalen + extdata.length,
 					    datalen + extdata.length);
 		if (bufel == NULL) {
 			gnutls_assert();
@@ -2437,7 +2437,7 @@ static int _gnutls_send_supplemental(gnutls_session_t session, int again)
 		}
 
 		bufel =
-		    _gnutls_handshake_alloc(session, buf.length,
+		    _gnutls_handshake_alloc(session, 
 					    buf.length);
 		if (bufel == NULL) {
 			gnutls_assert();
@@ -2843,7 +2843,7 @@ static ssize_t send_change_cipher_spec(gnutls_session_t session, int again)
 	const version_entry_st *vers;
 
 	if (again == 0) {
-		bufel = _gnutls_handshake_alloc(session, 1, 1);
+		bufel = _gnutls_handshake_alloc(session, 1);
 		if (bufel == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 

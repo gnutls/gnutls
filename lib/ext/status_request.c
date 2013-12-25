@@ -540,7 +540,7 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 
 		data_size = priv->response.size + 4;
 		bufel =
-		    _gnutls_handshake_alloc(session, data_size, data_size);
+		    _gnutls_handshake_alloc(session, data_size);
 		if (!bufel)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
