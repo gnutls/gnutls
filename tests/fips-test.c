@@ -45,6 +45,7 @@ void doit(void)
 	mode = gnutls_fips140_mode_enabled();
 	if (mode == 0) {
 		success("We are not in FIPS140 mode\n");
+		exit(77);
 	}
 
 	ret = global_init();
