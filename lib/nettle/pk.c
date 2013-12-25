@@ -167,7 +167,7 @@ ecc_shared_secret(struct ecc_scalar *private_key,
 	return;
 }
 
-#define MAX_DH_BITS 16*1024
+#define MAX_DH_BITS DEFAULT_MAX_VERIFY_BITS
 
 /* This is used for DH or ECDH key derivation. In DH for example
  * it is given the peers Y and our x, and calculates Y^x 
