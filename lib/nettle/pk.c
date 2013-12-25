@@ -168,6 +168,11 @@ ecc_shared_secret(struct ecc_scalar *private_key,
 }
 
 #define MAX_DH_BITS DEFAULT_MAX_VERIFY_BITS
+/* This is used when we have no idea on the structure
+ * of p-1 used by the peer. It is still a conservative
+ * choice, but small than what we've been using before.
+ */
+#define DH_EXPONENT_SIZE (2*_gnutls_pk_bits_to_subgroup_bits(GNUTLS_SEC_PARAM_HIGH))
 
 /* This is used for DH or ECDH key derivation. In DH for example
  * it is given the peers Y and our x, and calculates Y^x 
@@ -905,11 +910,12 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					nettle_mpz_random(x, NULL, rnd_func, r);
 					mpz_add_ui(x, x, 1);
 				} else {
+					unsigned size = mpz_sizeinbase(pub.p, 2);
 					if (level == 0)
-						level = mpz_sizeinbase(pub.p, 2);
+						level = MIN(size, DH_EXPONENT_SIZE);
 					nettle_mpz_random_size(x, NULL, rnd_func, level);
 
-					if (level >= mpz_sizeinbase(pub.p, 2))
+					if (level >= size)
 						mpz_mod(x, x, pub.p);
 				}
 
