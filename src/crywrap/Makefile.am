@@ -28,3 +28,4 @@ bin_PROGRAMS = crywrap
 
 crywrap_SOURCES = crywrap.c primes.h crywrap.h
 crywrap_LDADD = ../../lib/libgnutls.la ../../gl/libgnu.la -lidn
+crywrap_LDADD += $(LIB_CLOCK_GETTIME)
