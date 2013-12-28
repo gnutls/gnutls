@@ -191,7 +191,7 @@ pkix_asn1_tab.c: $(srcdir)/pkix.asn
 gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
 	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
 
-libgnutls_xssl_la_LDFLAGS = -no-undefined
+libgnutls_xssl_la_LDFLAGS = -no-undefined -export-symbols-regex '^xssl.*'
 
 lib_LTLIBRARIES += libgnutls-xssl.la
 
