@@ -369,6 +369,8 @@ int _gnutls_ext_init(void)
 		return ret;
 #endif
 
+	/* This must be the last extension registered.
+	 */
 	ret = _gnutls_ext_register(&ext_mod_dumbfw);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
