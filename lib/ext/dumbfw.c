@@ -48,7 +48,7 @@ _gnutls_dumbfw_send_params(gnutls_session_t session,
 
 	if (session->security_parameters.entity == GNUTLS_SERVER ||
 	    session->internals.priorities.dumbfw == 0 ||
-	    extdata->length >= 512) {
+	    (extdata->length < 256 || extdata->length >= 512)) {
 		return 0;
 	} else {
 	        memset(pad, 0, sizeof(pad));
