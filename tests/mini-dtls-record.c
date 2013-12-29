@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2013 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -54,7 +55,9 @@ int main()
 static int test_finished = 0;
 static void terminate(void);
 
-/* This program tests the rehandshake in DTLS
+/* This program tests whether messages in DTLS are received
+ * with the expected sequence. That is whether the message
+ * sequence numbers returned correspond to the received messages.
  */
 
 /*
@@ -261,7 +264,7 @@ static void client(int fd)
 
 			if ((uint32_t) recv_msg_seq[current] !=
 			    (uint32_t) useq) {
-				fail("received message sequence differs\n");
+				fail("received message sequence differs (got: %u, expected: %u)\n", (unsigned)useq, (unsigned)recv_msg_seq[current]);
 				terminate();
 			}
 
