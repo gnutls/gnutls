@@ -24,6 +24,14 @@
 #include "gnutls_num.h"
 #include <ext/dumbfw.h>
 
+/* This extension adds additional padding data in the TLS client hello.
+ * There is an issue with some firewalls [0] rejecting TLS client hello
+ * data that are between 256 and 511 bytes, and this extension will
+ * make sure that client hello isn't in this range.
+ *
+ * [0]. http://www.ietf.org/mail-archive/web/tls/current/msg10423.html
+ */
+
 static int _gnutls_dumbfw_send_params(gnutls_session_t session,
 				    gnutls_buffer_st * extdata);
 
