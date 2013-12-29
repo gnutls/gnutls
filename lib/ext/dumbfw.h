@@ -22,8 +22,6 @@
 
 #include <gnutls_extensions.h>
 
-#define DUMBFW_PADDING_SIZE 465
-
 extern extension_entry_st ext_mod_dumbfw;
 
 #endif

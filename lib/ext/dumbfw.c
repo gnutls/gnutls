@@ -52,23 +52,26 @@ _gnutls_dumbfw_send_params(gnutls_session_t session,
 			 gnutls_buffer_st * extdata)
 {
 	int total_size = 0, ret;
-	uint8_t pad[DUMBFW_PADDING_SIZE];
+	uint8_t pad[257];
+	unsigned pad_size;
 
 	if (session->security_parameters.entity == GNUTLS_SERVER ||
 	    session->internals.priorities.dumbfw == 0 ||
 	    (extdata->length < 256 || extdata->length >= 512)) {
 		return 0;
 	} else {
-	        memset(pad, 0, sizeof(pad));
+		/* 256 <= extdata->length < 512 */
+		pad_size = 512 - extdata->length;
+	        memset(pad, 0, pad_size);
 
 		ret =
 		    _gnutls_buffer_append_data_prefix(extdata, 16,
 							      pad,
-							      sizeof(pad)-2);
+							      pad_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		total_size += sizeof(pad);
+		total_size += 2 + pad_size;
 	}
 
 	return total_size;
