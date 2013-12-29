@@ -107,7 +107,15 @@ void doit(void)
 	for (i = 0; i <= 65539; i++) {
 		ret = gnutls_rnd(GNUTLS_RND_NONCE, buf1, sizeof(buf1));
 		if (ret < 0) {
-			fail("Error iterating RNG more than %u times\n", i);
+			fail("Error iterating RNG-nonce more than %u times\n", i);
+			exit(1);
+		}
+	}
+
+	for (i = 0; i <= 65539; i++) {
+		ret = gnutls_rnd(GNUTLS_RND_RANDOM, buf1, sizeof(buf1));
+		if (ret < 0) {
+			fail("Error iterating RNG-random more than %u times\n", i);
 			exit(1);
 		}
 	}
