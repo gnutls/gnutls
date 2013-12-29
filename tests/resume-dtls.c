@@ -105,7 +105,7 @@ static void client(int sds[], struct params_res *params)
 
 	if (debug) {
 		gnutls_global_set_log_function(tls_log_func);
-		gnutls_global_set_log_level(2);
+		gnutls_global_set_log_level(3);
 	}
 	global_init();
 
@@ -143,11 +143,14 @@ static void client(int sds[], struct params_res *params)
 
 		/* Perform the TLS handshake
 		 */
-		ret = gnutls_handshake(session);
+		gnutls_handshake_set_timeout(session, 20 * 1000);
+		do {
+			ret = gnutls_handshake(session);
+		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 		if (ret < 0) {
-			fail("client: Handshake failed\n");
 			gnutls_perror(ret);
+			fail("client: Handshake failed\n");
 			goto end;
 		} else {
 			if (debug)
@@ -296,7 +299,7 @@ static void server(int sds[], struct params_res *params)
 	 */
 	if (debug) {
 		gnutls_global_set_log_function(tls_log_func);
-		gnutls_global_set_log_level(2);
+		gnutls_global_set_log_level(3);
 	}
 
 	global_init();
@@ -322,10 +325,15 @@ static void server(int sds[], struct params_res *params)
 		session = initialize_tls_session(params);
 
 		gnutls_transport_set_int(session, sd);
-		ret = gnutls_handshake(session);
+		gnutls_handshake_set_timeout(session, 20 * 1000);
+		
+		do {
+			ret = gnutls_handshake(session);
+		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(session);
+			kill(child, SIGTERM);
 			fail("server: Handshake has failed (%s)\n\n",
 			     gnutls_strerror(ret));
 			return;
@@ -346,6 +354,7 @@ static void server(int sds[], struct params_res *params)
 					    ("server: Peer has closed the GnuTLS connection\n");
 				break;
 			} else if (ret < 0) {
+				kill(child, SIGTERM);
 				fail("server: Received corrupted data(%d). Closing...\n", ret);
 				break;
 			} else if (ret > 0) {
@@ -414,6 +423,10 @@ void doit(void)
 			if (WEXITSTATUS(status) > 0)
 				error_count++;
 			global_stop();
+
+			if (error_count)
+				exit(1);
+
 		} else {
 			client(client_sds, &resume_tests[i]);
 			gnutls_global_deinit();
