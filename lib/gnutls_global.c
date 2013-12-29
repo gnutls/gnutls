@@ -40,6 +40,14 @@
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
 
+#if defined(__GNUC__) || defined(ENABLE_FIPS140)
+# define _CONSTRUCTOR __attribute__((constructor))
+# define _DESTRUCTOR __attribute__((destructor))
+#else
+# define _CONSTRUCTOR
+# define _DESTRUCTOR
+#endif
+
 /* created by asn1c */
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
@@ -378,21 +386,18 @@ const char *gnutls_check_version(const char *req_version)
 	return NULL;
 }
 
-#if defined(__GNUC__) || defined(ENABLE_FIPS140)
-__attribute__((constructor))
-#endif
-static void lib_init(void)
+_CONSTRUCTOR static void lib_init(void)
 {
-	if (gnutls_global_init() < 0) {
-		fprintf(stderr, "Error in GnuTLS initialization");
+int ret;
+
+	ret = gnutls_global_init();
+	if (ret < 0) {
+		fprintf(stderr, "Error in GnuTLS initialization: %s", gnutls_strerror(ret));
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 	}
 }
 
-#if defined(__GNUC__) || defined(ENABLE_FIPS140)
-__attribute__((destructor))
-#endif
-static void lib_deinit(void)
+_DESTRUCTOR static void lib_deinit(void)
 {
 	gnutls_global_deinit();
 }
