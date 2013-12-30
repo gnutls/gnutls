@@ -3,6 +3,18 @@ Copyright (C) 2000-2012 Free Software Foundation, Inc.
 Copyright (C) 2013 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.9 (unreleased)
+
+** libgnutls: The %DUMBFW option in priority string only
+appends data to client hello if the expected size is in the
+"black hole" range.
+
+* libgnutls: Allow deleting multiple non-certificate data.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.8 (released 2013-12-20)
 
 ** libgnutls: Updated code for AES-NI. That prevents an uninitialized
