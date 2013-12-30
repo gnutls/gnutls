@@ -28,7 +28,7 @@ a fork is detected.
 ** libgnutls: Added --enable-fips140-mode configuration option. That
 option enables:
  o DSA and DH key generation as in FIPS-186-4 (using provable primes)
- o The DRBG-AES deterministic random generator from The ANSI X9.31 
+ o The DRBG-AES deterministic random generator from ANSI X9.31 
    Appendix A.2.4.
  o Self-tests on initialization on ciphers/MACs, public key algorithms 
    and the random generator.
