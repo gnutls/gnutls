@@ -59,7 +59,7 @@ noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 libutils_la_LIBADD = ../gl/libgnu.la
 
-ctests = simple gc set_pkcs12_cred certder certuniqueid	\
+ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mpi certificate_set_x509_crl dn parse_ca moredn record-sizes \
 	 hostname-check cve-2008-4989 pkcs12_s2k chainverify record-sizes-range \
 	 crq_key_id x509sign-verify cve-2009-1415 cve-2009-1416		\
@@ -73,7 +73,7 @@ ctests = simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-dtls-heartbeat mini-x509-callbacks key-openssl priorities	\
 	 mini-dtls-srtp mini-xssl rsa-encrypt-decrypt mini-loss-time \
 	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range \
-	 mini-cert-status mini-rsa-psk mini-record-2 global-init \
+	 mini-cert-status mini-rsa-psk global-init \
 	 fips-test mini-global-load
 
 if ENABLE_OCSP
