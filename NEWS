@@ -11,6 +11,9 @@ appends data to client hello if the expected size is in the
 
 * libgnutls: Allow deleting multiple non-certificate data.
 
+** p11tool: Added --so-login option to force login as security
+officer (admin).
+
 ** API and ABI modifications:
 No changes since last version.
 
