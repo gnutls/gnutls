@@ -66,7 +66,7 @@ flag = {
 flag = {
     name      = list-all-privkeys;
     descrip   = "List all available private keys in a token";
-    doc = "";
+    doc = "Lists all the private keys in a token that match the specified URL.";
 };
 
 flag = {
@@ -160,10 +160,10 @@ flag = {
 
 flag = {
     name      = so-login;
-    descrip   = "Force security office login to token";
+    descrip   = "Force security officer login to token";
     disabled;
     disable   = "no";
-    doc       = "";
+    doc       = "Forces login to the token as security officer (admin).";
 };
 
 flag = {
