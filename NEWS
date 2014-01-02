@@ -7,7 +7,8 @@ See the end for copying conditions.
 
 ** libgnutls: The initialization of the library was moved to a
 constructor. That is, gnutls_global_init() is no longer required
-unless linking with a static library.
+unless linking with a static library or a system that does not
+support library constructors.
 
 ** libgnutls: DH parameter generation is now delegated to nettle.
 
