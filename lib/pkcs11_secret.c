@@ -130,7 +130,7 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &obj);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pkcs11: %s\n", pkcs11_strerror(rv));
+		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}

@@ -174,7 +174,7 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &obj);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pkcs11: %s\n", pkcs11_strerror(rv));
+		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -459,7 +459,7 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &obj);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pkcs11: %s\n", pkcs11_strerror(rv));
+		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -582,7 +582,7 @@ delete_obj_url(struct pkcs11_session_info *sinfo,
 				      a_vals);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pk11: FindObjectsInit failed.\n");
+		_gnutls_debug_log("p11: FindObjectsInit failed.\n");
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -593,7 +593,7 @@ delete_obj_url(struct pkcs11_session_info *sinfo,
 		rv = pkcs11_destroy_object(sinfo->module, sinfo->pks, obj);
 		if (rv != CKR_OK) {
 			_gnutls_debug_log
-			    ("pkcs11: Cannot destroy object: %s\n",
+			    ("p11: Cannot destroy object: %s\n",
 			     pkcs11_strerror(rv));
 		} else {
 			find_data->deleted++;
@@ -705,7 +705,7 @@ gnutls_pkcs11_token_init(const char *token_url,
 			       strlen(so_pin), (uint8_t *) flabel);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pkcs11: %s\n", pkcs11_strerror(rv));
+		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
 		return pkcs11_rv_to_err(rv);
 	}
 
@@ -765,7 +765,7 @@ gnutls_pkcs11_token_set_pin(const char *token_url,
 				     (uint8_t *) newpin, strlen(newpin));
 		if (rv != CKR_OK) {
 			gnutls_assert();
-			_gnutls_debug_log("pkcs11: %s\n",
+			_gnutls_debug_log("p11: %s\n",
 					  pkcs11_strerror(rv));
 			ret = pkcs11_rv_to_err(rv);
 			goto finish;
@@ -776,7 +776,7 @@ gnutls_pkcs11_token_set_pin(const char *token_url,
 				    newpin, strlen(newpin));
 		if (rv != CKR_OK) {
 			gnutls_assert();
-			_gnutls_debug_log("pkcs11: %s\n",
+			_gnutls_debug_log("p11: %s\n",
 					  pkcs11_strerror(rv));
 			ret = pkcs11_rv_to_err(rv);
 			goto finish;
@@ -832,7 +832,7 @@ gnutls_pkcs11_token_get_random(const char *token_url,
 	rv = _gnutls_pkcs11_get_random(sinfo.module, sinfo.pks, rnddata, len);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pkcs11: %s\n", pkcs11_strerror(rv));
+		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
 		ret = pkcs11_rv_to_err(rv);
 		goto finish;
 	}

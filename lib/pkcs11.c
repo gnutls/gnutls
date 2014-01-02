@@ -1473,7 +1473,7 @@ find_obj_url(struct pkcs11_session_info *sinfo,
 				      a_vals);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pk11: FindObjectsInit failed.\n");
+		_gnutls_debug_log("p11: FindObjectsInit failed.\n");
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -1526,7 +1526,7 @@ find_obj_url(struct pkcs11_session_info *sinfo,
 			break;
 		} else {
 			_gnutls_debug_log
-			    ("pk11: Skipped cert, missing attrs.\n");
+			    ("p11: Skipped cert, missing attrs.\n");
 		}
 	}
 
@@ -1957,7 +1957,7 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 	/* Check if a pinfile is specified, and use that if possible */
 	pinfile = p11_kit_uri_get_pinfile(info);
 	if (pinfile != NULL) {
-		_gnutls_debug_log("pk11: Using pinfile to retrieve PIN\n");
+		_gnutls_debug_log("p11: Using pinfile to retrieve PIN\n");
 		ret =
 		    retrieve_pin_from_source(pinfile, token_info, attempts,
 					     user_type, pin);
@@ -1975,7 +1975,7 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_debug_log
-		    ("pk11: No suitable pin callback but login required.\n");
+		    ("p11: No suitable pin callback but login required.\n");
 	}
 
 	return ret;
@@ -1995,7 +1995,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 	user_type = (so == 0) ? CKU_USER : CKU_SO;
 	if (so == 0 && (tokinfo->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
 		gnutls_assert();
-		_gnutls_debug_log("pk11: No login required.\n");
+		_gnutls_debug_log("p11: No login required.\n");
 		return 0;
 	}
 
@@ -2012,7 +2012,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		} else {
 			gnutls_assert();
 			_gnutls_debug_log
-			    ("pk11: Protected login failed.\n");
+			    ("p11: Protected login failed.\n");
 			ret = GNUTLS_E_PKCS11_ERROR;
 			goto cleanup;
 		}
@@ -2042,7 +2042,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 			     &tinfo) != CKR_OK) {
 				gnutls_assert();
 				_gnutls_debug_log
-				    ("pk11: GetTokenInfo failed\n");
+				    ("p11: GetTokenInfo failed\n");
 				ret = GNUTLS_E_PKCS11_ERROR;
 				goto cleanup;
 			}
@@ -2066,7 +2066,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 	}
 	while (rv == CKR_PIN_INCORRECT);
 
-	_gnutls_debug_log("pk11: Login result = %lu\n", rv);
+	_gnutls_debug_log("p11: Login result = %lu\n", rv);
 
 
 	ret = (rv == CKR_OK
@@ -2354,7 +2354,7 @@ find_objs(struct pkcs11_session_info *sinfo,
 				      tot_values);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pk11: FindObjectsInit failed.\n");
+		_gnutls_debug_log("p11: FindObjectsInit failed.\n");
 		return pkcs11_rv_to_err(rv);
 	}
 
@@ -2968,7 +2968,7 @@ find_issuer(struct pkcs11_session_info *sinfo,
 		if (rv != CKR_OK) {
 			gnutls_assert();
 			_gnutls_debug_log
-			    ("pk11: FindObjectsInit failed.\n");
+			    ("p11: FindObjectsInit failed.\n");
 			ret = pkcs11_rv_to_err(rv);
 			goto cleanup;
 		}
@@ -3012,7 +3012,7 @@ find_issuer(struct pkcs11_session_info *sinfo,
 				break;
 			} else {
 				_gnutls_debug_log
-				    ("pk11: Skipped cert, missing attrs.\n");
+				    ("p11: Skipped cert, missing attrs.\n");
 			}
 		}
 
