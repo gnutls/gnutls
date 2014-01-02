@@ -78,8 +78,11 @@ struct find_pkey_list_st {
 
 struct find_cert_st {
 	gnutls_datum_t dn;
+	gnutls_datum_t issuer_dn;
 	gnutls_datum_t key_id;
+	gnutls_datum_t serial;
 
+	unsigned need_import;
 	gnutls_pkcs11_obj_t crt;
 	unsigned flags;
 };
@@ -2199,7 +2202,7 @@ find_objs(struct pkcs11_session_info *sinfo,
 	struct ck_attribute *attr;
 	ck_object_class_t class = (ck_object_class_t) - 1;
 	ck_certificate_type_t type = (ck_certificate_type_t) - 1;
-	unsigned char trusted;
+	ck_bool_t trusted;
 	unsigned long category;
 	ck_rv_t rv;
 	ck_object_handle_t obj;
@@ -2895,11 +2898,16 @@ const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type)
 	}
 }
 
+#ifndef CKA_X_DISTRUSTED
+# define CKA_X_VENDOR (CKA_VENDOR_DEFINED | 0x58444700UL)
+# define CKA_X_DISTRUSTED (CKA_X_VENDOR + 100)
+#endif
+
 static int
 find_cert(struct pkcs11_session_info *sinfo,
 	    struct token_info *info, struct ck_info *lib_info, void *input)
 {
-	struct ck_attribute a[5];
+	struct ck_attribute a[10];
 	ck_object_class_t class = -1;
 	ck_certificate_type_t type = (ck_certificate_type_t) - 1;
 	ck_rv_t rv;
@@ -2907,18 +2915,19 @@ find_cert(struct pkcs11_session_info *sinfo,
 	unsigned long count, a_vals;
 	int found = 0, ret;
 	uint8_t *cert_data = NULL;
-	struct find_cert_st *fs = input;
+	struct find_cert_st *priv = input;
 	char label_tmp[PKCS11_LABEL_SIZE];
 	char id_tmp[PKCS11_ID_SIZE];
 	unsigned tries, i, finalized;
-	unsigned char trusted = 1;
+	ck_bool_t trusted = 1;
 
 	if (info == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if (fs->dn.size == 0 && fs->key_id.size == 0)
+	if (priv->dn.size == 0 && priv->key_id.size == 0 && priv->issuer_dn.size == 0 &&
+		priv->serial.size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* search the token for the key ID */
@@ -2931,7 +2940,7 @@ find_cert(struct pkcs11_session_info *sinfo,
 
 	/* Find objects with given class and type */
 
-	if (fs->key_id.size > 0 && fs->dn.size > 0)
+	if (priv->key_id.size > 0 && priv->dn.size > 0)
 		tries = 2;
 	else
 		tries = 1;
@@ -2945,28 +2954,53 @@ find_cert(struct pkcs11_session_info *sinfo,
 		a[a_vals].value_len = sizeof class;
 		a_vals++;
 
-		if (!(fs->flags & GNUTLS_PKCS11_ISSUER_ANY)) {
+		if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED) {
 			a[a_vals].type = CKA_TRUSTED;
 			a[a_vals].value = &trusted;
 			a[a_vals].value_len = sizeof trusted;
 			a_vals++;
 		}
 
-		type = CKC_X_509;
-		a[a_vals].type = CKA_CERTIFICATE_TYPE;
-		a[a_vals].value = &type;
-		a[a_vals].value_len = sizeof type;
-		a_vals++;
-
-		if (i == 0 && fs->key_id.size > 0) {
-			a[a_vals].type = CKA_ID;
-			a[a_vals].value = fs->key_id.data;
-			a[a_vals].value_len = fs->key_id.size;
+		if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) {
+			a[a_vals].type = CKA_X_DISTRUSTED;
+			a[a_vals].value = &trusted;
+			a[a_vals].value_len = sizeof trusted;
 			a_vals++;
-		} else {
+		}
+
+		if (priv->need_import != 0) {
+			type = CKC_X_509;
+			a[a_vals].type = CKA_CERTIFICATE_TYPE;
+			a[a_vals].value = &type;
+			a[a_vals].value_len = sizeof type;
+			a_vals++;
+		}
+
+		if (i == 0 && priv->key_id.size > 0) {
+			a[a_vals].type = CKA_ID;
+			a[a_vals].value = priv->key_id.data;
+			a[a_vals].value_len = priv->key_id.size;
+			a_vals++;
+		}
+
+		if (priv->dn.size > 0) {
 			a[a_vals].type = CKA_SUBJECT;
-			a[a_vals].value = fs->dn.data;
-			a[a_vals].value_len = fs->dn.size;
+			a[a_vals].value = priv->dn.data;
+			a[a_vals].value_len = priv->dn.size;
+			a_vals++;
+		}
+
+		if (priv->serial.size > 0) {
+			a[a_vals].type = CKA_SERIAL_NUMBER;
+			a[a_vals].value = priv->serial.data;
+			a[a_vals].value_len = priv->serial.size;
+			a_vals++;
+		}
+
+		if (priv->issuer_dn.size > 0) {
+			a[a_vals].type = CKA_ISSUER;
+			a[a_vals].value = priv->issuer_dn.data;
+			a[a_vals].value_len = priv->issuer_dn.size;
 			a_vals++;
 		}
 
@@ -2984,6 +3018,11 @@ find_cert(struct pkcs11_session_info *sinfo,
 		while (pkcs11_find_objects
 		       (sinfo->module, sinfo->pks, &obj, 1,
 			&count) == CKR_OK && count == 1) {
+
+			if (priv->need_import == 0) {
+				found = 1;
+				break;
+			}
 
 			a[0].type = CKA_VALUE;
 			a[0].value = cert_data;
@@ -3008,7 +3047,7 @@ find_cert(struct pkcs11_session_info *sinfo,
 				    { a[1].value, a[1].value_len };
 
 				ret =
-				    pkcs11_obj_import(class, fs->crt,
+				    pkcs11_obj_import(class, priv->crt,
 						      &data, &id, &label,
 						      &info->tinfo,
 						      lib_info);
@@ -3053,11 +3092,12 @@ find_cert(struct pkcs11_session_info *sinfo,
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any in an allocated buffer. 
  * @fmt: The format of the exported issuer.
- * @flags: Use zero or flags from %gnutls_pkcs11_issuer_flag_t.
+ * @flags: Use zero or flags from %GNUTLS_PKCS11_OBJ_FLAG.
  *
  * This function will return the issuer of a given certificate, if it
  * is stored in the token. By default only marked as trusted issuers
- * are retuned.
+ * are retuned. If any issuer should be returned specify
+ * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY in @flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -3097,6 +3137,10 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 
 	priv.dn.data = cert->raw_issuer_dn.data;
 	priv.dn.size = cert->raw_issuer_dn.size;
+
+	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY))
+		flags |= GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED;
+
 	priv.flags = flags;
 
 	ret = gnutls_pkcs11_obj_init(&priv.crt);
@@ -3104,6 +3148,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 		gnutls_assert();
 		goto cleanup;
 	}
+	priv.need_import = 1;
 
 	ret =
 	    _pkcs11_traverse_tokens(find_cert, &priv, info,
@@ -3124,6 +3169,91 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
       cleanup:
 	if (priv.crt)
 		gnutls_pkcs11_obj_deinit(priv.crt);
+	if (info)
+		p11_kit_uri_free(info);
+
+	return ret;
+}
+
+/**
+ * gnutls_pkcs11_crt_exists:
+ * @url: A PKCS 11 url identifying a token
+ * @cert: is the certificate to find issuer for
+ * @issuer: Will hold the issuer if any in an allocated buffer. 
+ * @fmt: The format of the exported issuer.
+ * @flags: Use zero or flags from %GNUTLS_PKCS11_OBJ_FLAG.
+ *
+ * This function will check whether the provided certificate is stored
+ * in the specified token. This is useful in combination with 
+ * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED or %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED,
+ * to check whether a CA is present or a certificate is blacklisted in
+ * trust PKCS #11 modules.
+ *
+ * Returns: If the certificate exists non-zero is returned, otherwise zero.
+ *
+ * Since: 3.2.9
+ **/
+int gnutls_pkcs11_crt_exists(const char *url, gnutls_x509_crt_t cert,
+				 unsigned int flags)
+{
+	int ret;
+	struct find_cert_st priv;
+	uint8_t serial[ASN1_MAX_TL_SIZE+64];
+	size_t serial_size;
+	uint8_t tag[ASN1_MAX_TL_SIZE];
+	unsigned int tag_size;
+	struct p11_kit_uri *info = NULL;
+
+	memset(&priv, 0, sizeof(priv));
+
+	if (url == NULL || url[0] == 0) {
+		url = "pkcs11:";
+	}
+
+	ret = pkcs11_url_to_info(url, &info);
+	if (ret < 0) {
+		gnutls_assert();
+		return 0;
+	}
+
+	serial_size = sizeof(serial) - sizeof(tag);
+	ret =
+	    gnutls_x509_crt_get_serial(cert, serial+sizeof(tag), &serial_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return 0;
+	}
+
+	/* PKCS#11 requires a DER encoded serial, wtf. $@(*$@ */
+	tag_size = sizeof(tag);
+	ret = asn1_encode_simple_der(ASN1_ETYPE_INTEGER, serial+sizeof(tag), serial_size,
+		tag, &tag_size);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		return 0;
+	}
+
+	memcpy(serial+sizeof(tag)-tag_size, tag, tag_size);
+	
+	priv.serial.data = serial+sizeof(tag)-tag_size;
+	priv.serial.size = serial_size + tag_size;
+
+	priv.issuer_dn.data = cert->raw_issuer_dn.data;
+	priv.issuer_dn.size = cert->raw_issuer_dn.size;
+	priv.flags = flags;
+
+	ret =
+	    _pkcs11_traverse_tokens(find_cert, &priv, info,
+				    NULL, pkcs11_obj_flags_to_int(flags));
+	if (ret < 0) {
+		gnutls_assert();
+		ret = 0;
+		goto cleanup;
+	}
+
+	ret = 1;
+
+      cleanup:
 	if (info)
 		p11_kit_uri_free(info);
 
