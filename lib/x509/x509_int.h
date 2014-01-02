@@ -371,6 +371,15 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 				unsigned int flags,
 				gnutls_verify_output_function func);
 
+#ifdef ENABLE_PKCS11
+unsigned int
+_gnutls_pkcs11_verify_certificate(const char* url,
+				const gnutls_x509_crt_t * certificate_list,
+				int clist_size,
+				unsigned int flags,
+				gnutls_verify_output_function func);
+#endif
+
 int _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
 
 int

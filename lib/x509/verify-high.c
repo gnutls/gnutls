@@ -53,14 +53,6 @@ struct node_st {
 
 };
 
-struct gnutls_x509_trust_list_st {
-	unsigned int size;
-	struct node_st *node;
-
-	gnutls_x509_crt_t *blacklisted;
-	unsigned int blacklisted_size;
-};
-
 #define DEFAULT_SIZE 127
 
 /**
@@ -79,7 +71,9 @@ int
 gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
 			    unsigned int size)
 {
-	gnutls_x509_trust_list_t tmp =
+	gnutls_x509_trust_list_t tmp;
+
+	tmp =
 	    gnutls_calloc(1, sizeof(struct gnutls_x509_trust_list_st));
 
 	if (!tmp)
@@ -150,6 +144,7 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
 	}
 
 	gnutls_free(list->node);
+	gnutls_free(list->pkcs11_token);
 	gnutls_free(list);
 }
 
@@ -211,13 +206,13 @@ int ret;
 		gnutls_assert();
 		return NULL;
 	}
-	
+
 	ret = _gnutls_x509_crt_cpy(dst, src);
 	if (ret < 0) {
 		gnutls_assert();
 		return NULL;
 	}
-	
+
 	return dst;
 }
 
@@ -273,7 +268,7 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 				break;
 			}
 		}
-		
+
 		/* Add the CA (or plain) certificate to the black list as well.
 		 * This will prevent a subordinate CA from being valid, and 
 		 * ensure that a server certificate will also get rejected.
@@ -599,7 +594,7 @@ unsigned i, j;
 
 	if (blacklist_size == 0)
 		return 0;
-	
+
 	for (i=0;i<cert_list_size;i++) {
 		for (j=0;j<blacklist_size;j++) {
 			if (_gnutls_check_if_same_cert(cert_list[i], blacklist[j]) != 0) {
@@ -667,12 +662,23 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 		return 0;
 	}
 
-	*verify =
-	    _gnutls_x509_verify_certificate(cert_list, cert_list_size,
-					    list->node[hash].trusted_cas,
-					    list->
-					    node[hash].trusted_ca_size,
-					    flags, func);
+#ifdef ENABLE_PKCS11
+	if (list->pkcs11_token) {
+		/* use the token for verification */	
+
+		*verify = _gnutls_pkcs11_verify_certificate(list->pkcs11_token,
+								cert_list, cert_list_size,
+								flags, func);
+	} else
+#endif
+	{
+		*verify =
+		    _gnutls_x509_verify_certificate(cert_list, cert_list_size,
+						    list->node[hash].trusted_cas,
+						    list->
+						    node[hash].trusted_ca_size,
+						    flags, func);
+	}
 
 	if (*verify != 0 || (flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS))
 		return 0;
@@ -723,10 +729,10 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * @verify: will hold the certificate verification output.
  * @func: If non-null will be called on each chain element verification with the output.
  *
- * This function will try to find a certificate that is associated with the provided 
- * name --see gnutls_x509_trust_list_add_named_crt(). If a match is found the certificate is considered valid. In addition to that
- * this function will also check CRLs. The @verify parameter will hold an OR'ed sequence of
- * %gnutls_certificate_status_t flags.
+ * This function will try to find a certificate that is associated with the provided
+ * name --see gnutls_x509_trust_list_add_named_crt(). If a match is found the certificate is considered valid. 
+ * In addition to that this function will also check CRLs. 
+ * The @verify parameter will hold an OR'ed sequence of %gnutls_certificate_status_t flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
