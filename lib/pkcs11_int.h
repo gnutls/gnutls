@@ -70,6 +70,11 @@ int _gnutls_pkcs11_check_init(void);
 	if (ret < 0) \
 		return gnutls_assert_val(ret)
 
+#define PKCS11_CHECK_INIT_RET(x) \
+	ret = _gnutls_pkcs11_check_init(); \
+	if (ret < 0) \
+		return gnutls_assert_val(x)
+
 /* thus function is called for every token in the traverse_tokens
  * function. Once everything is traversed it is called with NULL tinfo.
  * It should return 0 if found what it was looking for.
