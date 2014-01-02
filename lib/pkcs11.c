@@ -2893,13 +2893,14 @@ struct find_issuer_st {
 	gnutls_datum_t issuer_key_id;
 
 	gnutls_pkcs11_obj_t crt;
+	unsigned flags;
 };
 
 static int
 find_issuer(struct pkcs11_session_info *sinfo,
 	    struct token_info *info, struct ck_info *lib_info, void *input)
 {
-	struct ck_attribute a[4];
+	struct ck_attribute a[5];
 	ck_object_class_t class = -1;
 	ck_certificate_type_t type = (ck_certificate_type_t) - 1;
 	ck_rv_t rv;
@@ -2911,6 +2912,7 @@ find_issuer(struct pkcs11_session_info *sinfo,
 	char label_tmp[PKCS11_LABEL_SIZE];
 	char id_tmp[PKCS11_ID_SIZE];
 	unsigned tries, i, finalized;
+	unsigned char trusted = 1;
 
 	if (info == NULL) {
 		gnutls_assert();
@@ -2943,6 +2945,13 @@ find_issuer(struct pkcs11_session_info *sinfo,
 		a[a_vals].value = &class;
 		a[a_vals].value_len = sizeof class;
 		a_vals++;
+
+		if (!(fs->flags & GNUTLS_PKCS11_ISSUER_ANY)) {
+			a[a_vals].type = CKA_TRUSTED;
+			a[a_vals].value = &trusted;
+			a[a_vals].value_len = sizeof trusted;
+			a_vals++;
+		}
 
 		type = CKC_X_509;
 		a[a_vals].type = CKA_CERTIFICATE_TYPE;
@@ -2984,6 +2993,7 @@ find_issuer(struct pkcs11_session_info *sinfo,
 			a[1].type = CKA_LABEL;
 			a[1].value = label_tmp;
 			a[1].value_len = sizeof(label_tmp);
+
 			a[2].type = CKA_ID;
 			a[2].value = id_tmp;
 			a[2].value_len = sizeof(id_tmp);
@@ -3044,10 +3054,11 @@ find_issuer(struct pkcs11_session_info *sinfo,
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any in an allocated buffer. 
  * @fmt: The format of the exported issuer.
- * @flags: Use zero.
+ * @flags: Use zero or flags from %gnutls_pkcs11_issuer_flag_t.
  *
  * This function will return the issuer of a given certificate, if it
- * is stored in the token. 
+ * is stored in the token. By default only marked as trusted issuers
+ * are retuned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -3087,6 +3098,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 
 	priv.issuer_dn.data = cert->raw_issuer_dn.data;
 	priv.issuer_dn.size = cert->raw_issuer_dn.size;
+	priv.flags = flags;
 
 	ret = gnutls_pkcs11_obj_init(&priv.crt);
 	if (ret < 0) {

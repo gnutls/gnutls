@@ -128,6 +128,15 @@ int gnutls_pkcs11_obj_export2(gnutls_pkcs11_obj_t obj,
 int gnutls_pkcs11_obj_export3(gnutls_pkcs11_obj_t obj, gnutls_x509_crt_fmt_t fmt,
 			      gnutls_datum_t * out);
 
+/**
+ * gnutls_pkcs11_url_type_t:
+ * @GNUTLS_PKCS11_ISSUER_ANY: No need for the issuer to be a trusted one
+ *
+ * Enumeration of different issuer retrieval flags.
+ */
+typedef enum {
+	GNUTLS_PKCS11_ISSUER_ANY,
+} gnutls_pkcs11_issuer_flag_t;
 int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 			     gnutls_datum_t * issuer,
 			     gnutls_x509_crt_fmt_t fmt,
