@@ -682,6 +682,80 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 	return 0;
 }
 
+#ifdef ENABLE_PKCS11
+/* Verify X.509 certificate chain using a PKCS #11 token.
+ *
+ * Note that the return value is an OR of GNUTLS_CERT_* elements.
+ *
+ * This function verifies a X.509 certificate list. The certificate
+ * list should lead to a trusted certificate in order to be trusted.
+ */
+unsigned int
+_gnutls_pkcs11_verify_certificate(const char* url,
+				const gnutls_x509_crt_t * certificate_list,
+				int clist_size,
+				unsigned int flags,
+				gnutls_verify_output_function func)
+{
+	int ret;
+	unsigned int status = 0;
+	gnutls_x509_crt_t issuer = NULL;
+	gnutls_datum_t raw_issuer = {NULL, 0};
+
+	if (clist_size > 1) {
+		/* Check if the last certificate in the path is self signed.
+		 * In that case ignore it (a certificate is trusted only if it
+		 * leads to a trusted party by us, not the server's).
+		 *
+		 * This prevents from verifying self signed certificates against
+		 * themselves. This (although not bad) caused verification
+		 * failures on some root self signed certificates that use the
+		 * MD2 algorithm.
+		 */
+		if (gnutls_x509_crt_check_issuer
+		    (certificate_list[clist_size - 1],
+		     certificate_list[clist_size - 1]) != 0) {
+			clist_size--;
+		}
+	}
+
+	ret = gnutls_pkcs11_get_raw_issuer(url, certificate_list[clist_size - 1],
+		&raw_issuer, GNUTLS_X509_FMT_DER, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		status |= GNUTLS_CERT_INVALID;
+		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+		return status;
+	}
+
+	ret = gnutls_x509_crt_init(&issuer);
+	if (ret < 0) {
+		gnutls_assert();
+		status |= GNUTLS_CERT_INVALID;
+		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+		goto cleanup;
+	}
+
+	ret = gnutls_x509_crt_import(issuer, &raw_issuer, GNUTLS_X509_FMT_DER);
+	if (ret < 0) {
+		gnutls_assert();
+		status |= GNUTLS_CERT_INVALID;
+		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+		goto cleanup;
+	}
+
+	status = _gnutls_x509_verify_certificate(certificate_list, clist_size,
+				&issuer, 1, flags, func);
+
+cleanup:
+	gnutls_free(raw_issuer.data);
+	if (issuer != NULL)
+		gnutls_x509_crt_deinit(issuer);
+	
+	return status;
+}
+#endif
+
 /* This will return the appropriate hash to verify the given signature.
  * If signature is NULL it will return an (or the) appropriate hash for
  * the given parameters.

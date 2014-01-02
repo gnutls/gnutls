@@ -20,5 +20,20 @@
  *
  */
 
+#ifndef VERIFY_HIGH_H
+# define VERIFY_HIGH_H
+
+struct gnutls_x509_trust_list_st {
+	unsigned int size;
+	struct node_st *node;
+
+	gnutls_x509_crt_t *blacklisted;
+	unsigned int blacklisted_size;
+	
+	char* pkcs11_token;
+};
+
 int _gnutls_trustlist_inlist(gnutls_x509_trust_list_t list,
 			     gnutls_x509_crt_t cert);
+
+#endif

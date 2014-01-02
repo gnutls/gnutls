@@ -479,7 +479,7 @@ dnl auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.h
 AC_ARG_WITH([default-trust-store-file],
   [AS_HELP_STRING([--with-default-trust-store-file=FILE],
     [use the given file default trust store])], with_default_trust_store_file="$withval",
-  [if test "$build" = "$host";then
+  [if test "$build" = "$host" && test x$with_default_trust_store_pkcs11 = x;then
   for i in \
     /etc/ssl/ca-bundle.pem \
     /etc/ssl/certs/ca-certificates.crt \
@@ -487,7 +487,7 @@ AC_ARG_WITH([default-trust-store-file],
     /usr/local/share/certs/ca-root-nss.crt \
     /etc/ssl/cert.pem
     do
-    if test -e $i; then
+    if test -e "$i"; then
       with_default_trust_store_file="$i"
       break
     fi
@@ -803,7 +803,7 @@ AC_MSG_NOTICE([Optional libraries:
 
 AC_MSG_NOTICE([System files:
 
-  Trust store pkcs:     $with_default_trust_store_pkcs11
+  Trust store pkcs11:   $with_default_trust_store_pkcs11
   Trust store file:     $with_default_trust_store_file
   Blacklist file:       $with_default_blacklist_file
   CRL file:             $with_default_crl_file
