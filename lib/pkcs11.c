@@ -48,21 +48,40 @@ struct gnutls_pkcs11_provider_s {
 	unsigned int initialized;
 };
 
-struct flags_find_data_st {
+struct find_flags_data_st {
 	struct p11_kit_uri *info;
 	unsigned int slot_flags;
 };
 
-struct url_find_data_st {
+struct find_url_data_st {
 	gnutls_pkcs11_obj_t crt;
 };
 
-struct crt_find_data_st {
+struct find_obj_data_st {
 	gnutls_pkcs11_obj_t *p_list;
 	unsigned int *n_list;
 	unsigned int current;
 	gnutls_pkcs11_obj_attr_t flags;
 	struct p11_kit_uri *info;
+};
+
+struct find_token_num {
+	struct p11_kit_uri *info;
+	unsigned int seq;	/* which one we are looking for */
+	unsigned int current;	/* which one are we now */
+};
+
+struct find_pkey_list_st {
+	gnutls_buffer_st *key_ids;
+	size_t key_ids_size;
+};
+
+struct find_cert_st {
+	gnutls_datum_t dn;
+	gnutls_datum_t key_id;
+
+	gnutls_pkcs11_obj_t crt;
+	unsigned flags;
 };
 
 
@@ -1396,7 +1415,7 @@ find_obj_url(struct pkcs11_session_info *sinfo,
 	     struct token_info *info, struct ck_info *lib_info,
 	     void *input)
 {
-	struct url_find_data_st *find_data = input;
+	struct find_url_data_st *find_data = input;
 	struct ck_attribute a[4];
 	struct ck_attribute *attr;
 	ck_object_class_t class = -1;
@@ -1577,7 +1596,7 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 			     unsigned int flags)
 {
 	int ret;
-	struct url_find_data_st find_data;
+	struct find_url_data_st find_data;
 
 	/* fill in the find data structure */
 	find_data.crt = obj;
@@ -1601,18 +1620,12 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 	return 0;
 }
 
-struct token_num {
-	struct p11_kit_uri *info;
-	unsigned int seq;	/* which one we are looking for */
-	unsigned int current;	/* which one are we now */
-};
-
 static int
 find_token_num(struct pkcs11_session_info *sinfo,
 	       struct token_info *tinfo,
 	       struct ck_info *lib_info, void *input)
 {
-	struct token_num *find_data = input;
+	struct find_token_num *find_data = input;
 
 	if (tinfo == NULL) {	/* we don't support multiple calls */
 		gnutls_assert();
@@ -1654,7 +1667,7 @@ gnutls_pkcs11_token_get_url(unsigned int seq,
 			    gnutls_pkcs11_url_type_t detailed, char **url)
 {
 	int ret;
-	struct token_num tn;
+	struct find_token_num tn;
 
 	memset(&tn, 0, sizeof(tn));
 	tn.seq = seq;
@@ -1794,12 +1807,6 @@ gnutls_pkcs11_obj_get_type(gnutls_pkcs11_obj_t obj)
 {
 	return obj->type;
 }
-
-struct pkey_list {
-	gnutls_buffer_st *key_ids;
-	size_t key_ids_size;
-};
-
 
 static int
 retrieve_pin_from_source(const char *pinfile,
@@ -2094,7 +2101,7 @@ int pkcs11_call_token_func(struct p11_kit_uri *info, const unsigned retry)
 
 static int
 find_privkeys(struct pkcs11_session_info *sinfo,
-	      struct token_info *info, struct pkey_list *list)
+	      struct token_info *info, struct find_pkey_list_st *list)
 {
 	struct ck_attribute a[3];
 	ck_object_class_t class;
@@ -2187,7 +2194,7 @@ static int
 find_objs(struct pkcs11_session_info *sinfo,
 	  struct token_info *info, struct ck_info *lib_info, void *input)
 {
-	struct crt_find_data_st *find_data = input;
+	struct find_obj_data_st *find_data = input;
 	struct ck_attribute a[6];
 	struct ck_attribute *attr;
 	ck_object_class_t class = (ck_object_class_t) - 1;
@@ -2201,7 +2208,7 @@ find_objs(struct pkcs11_session_info *sinfo,
 	char certid_tmp[PKCS11_ID_SIZE];
 	char label_tmp[PKCS11_LABEL_SIZE];
 	int ret;
-	struct pkey_list plist;	/* private key holder */
+	struct find_pkey_list_st plist;	/* private key holder */
 	unsigned int i, tot_values = 0;
 
 	if (info == NULL) {	/* final call */
@@ -2510,7 +2517,7 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
 				  unsigned int flags)
 {
 	int ret;
-	struct crt_find_data_st priv;
+	struct find_obj_data_st priv;
 
 	memset(&priv, 0, sizeof(priv));
 
@@ -2733,7 +2740,7 @@ static int
 find_flags(struct pkcs11_session_info *sinfo,
 	   struct token_info *info, struct ck_info *lib_info, void *input)
 {
-	struct flags_find_data_st *find_data = input;
+	struct find_flags_data_st *find_data = input;
 
 	if (info == NULL) {	/* we don't support multiple calls */
 		gnutls_assert();
@@ -2769,7 +2776,7 @@ find_flags(struct pkcs11_session_info *sinfo,
  **/
 int gnutls_pkcs11_token_get_flags(const char *url, unsigned int *flags)
 {
-	struct flags_find_data_st find_data;
+	struct find_flags_data_st find_data;
 	int ret;
 
 	memset(&find_data, 0, sizeof(find_data));
@@ -2888,16 +2895,8 @@ const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type)
 	}
 }
 
-struct find_issuer_st {
-	gnutls_datum_t issuer_dn;
-	gnutls_datum_t issuer_key_id;
-
-	gnutls_pkcs11_obj_t crt;
-	unsigned flags;
-};
-
 static int
-find_issuer(struct pkcs11_session_info *sinfo,
+find_cert(struct pkcs11_session_info *sinfo,
 	    struct token_info *info, struct ck_info *lib_info, void *input)
 {
 	struct ck_attribute a[5];
@@ -2908,7 +2907,7 @@ find_issuer(struct pkcs11_session_info *sinfo,
 	unsigned long count, a_vals;
 	int found = 0, ret;
 	uint8_t *cert_data = NULL;
-	struct find_issuer_st *fs = input;
+	struct find_cert_st *fs = input;
 	char label_tmp[PKCS11_LABEL_SIZE];
 	char id_tmp[PKCS11_ID_SIZE];
 	unsigned tries, i, finalized;
@@ -2919,7 +2918,7 @@ find_issuer(struct pkcs11_session_info *sinfo,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if (fs->issuer_dn.size == 0 && fs->issuer_key_id.size == 0)
+	if (fs->dn.size == 0 && fs->key_id.size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	/* search the token for the key ID */
@@ -2932,7 +2931,7 @@ find_issuer(struct pkcs11_session_info *sinfo,
 
 	/* Find objects with given class and type */
 
-	if (fs->issuer_key_id.size > 0 && fs->issuer_dn.size > 0)
+	if (fs->key_id.size > 0 && fs->dn.size > 0)
 		tries = 2;
 	else
 		tries = 1;
@@ -2959,15 +2958,15 @@ find_issuer(struct pkcs11_session_info *sinfo,
 		a[a_vals].value_len = sizeof type;
 		a_vals++;
 
-		if (i == 0 && fs->issuer_key_id.size > 0) {
+		if (i == 0 && fs->key_id.size > 0) {
 			a[a_vals].type = CKA_ID;
-			a[a_vals].value = fs->issuer_key_id.data;
-			a[a_vals].value_len = fs->issuer_key_id.size;
+			a[a_vals].value = fs->key_id.data;
+			a[a_vals].value_len = fs->key_id.size;
 			a_vals++;
 		} else {
 			a[a_vals].type = CKA_SUBJECT;
-			a[a_vals].value = fs->issuer_dn.data;
-			a[a_vals].value_len = fs->issuer_dn.size;
+			a[a_vals].value = fs->dn.data;
+			a[a_vals].value_len = fs->dn.size;
 			a_vals++;
 		}
 
@@ -3049,7 +3048,7 @@ find_issuer(struct pkcs11_session_info *sinfo,
 }
 
 /**
- * gnutls_pkcs11_get_issuer:
+ * gnutls_pkcs11_get_raw_issuer:
  * @url: A PKCS 11 url identifying a token
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any in an allocated buffer. 
@@ -3071,7 +3070,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 				 unsigned int flags)
 {
 	int ret;
-	struct find_issuer_st priv;
+	struct find_cert_st priv;
 	uint8_t id[PKCS11_ID_SIZE];
 	size_t id_size;
 	struct p11_kit_uri *info = NULL;
@@ -3092,12 +3091,12 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	ret =
 	    gnutls_x509_crt_get_authority_key_id(cert, id, &id_size, NULL);
 	if (ret >= 0) {
-		priv.issuer_key_id.data = id;
-		priv.issuer_key_id.size = id_size;
+		priv.key_id.data = id;
+		priv.key_id.size = id_size;
 	}
 
-	priv.issuer_dn.data = cert->raw_issuer_dn.data;
-	priv.issuer_dn.size = cert->raw_issuer_dn.size;
+	priv.dn.data = cert->raw_issuer_dn.data;
+	priv.dn.size = cert->raw_issuer_dn.size;
 	priv.flags = flags;
 
 	ret = gnutls_pkcs11_obj_init(&priv.crt);
@@ -3107,7 +3106,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	}
 
 	ret =
-	    _pkcs11_traverse_tokens(find_issuer, &priv, info,
+	    _pkcs11_traverse_tokens(find_cert, &priv, info,
 				    NULL, pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
 		gnutls_assert();
