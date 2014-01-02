@@ -152,7 +152,7 @@ find_object(struct pkcs11_session_info *sinfo,
 				      attr_count);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pk11: FindObjectsInit failed.\n");
+		_gnutls_debug_log("p11: FindObjectsInit failed.\n");
 		ret = pkcs11_rv_to_err(rv);
 		goto fail;
 	}
@@ -762,7 +762,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 				      a_val, p, p_val, &pub, &priv);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		_gnutls_debug_log("pkcs11: %s\n", pkcs11_strerror(rv));
+		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
