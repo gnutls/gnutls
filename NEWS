@@ -14,14 +14,14 @@ appends data to client hello if the expected size is in the
 ** libgnutls: When a PKCS #11 trust store is specified (e.g. using the
 configure option --with-default-trust-store-pkcs11), then the PKCS #11
 token is used on demand to obtain the trusted anchors, rather than
-preloading all trusted certificates. That allows CA certificate management
-to occur outside the process boundaries.
+preloading all trusted certificates. That delegates CA certificate management
+and blacklist checking to the PKCS #11 module.
 
 ** p11tool: Added --so-login option to force login as security
 officer (admin).
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_crt_exists: Added
 
 
 * Version 3.2.8 (released 2013-12-20)
