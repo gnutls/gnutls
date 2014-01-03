@@ -382,7 +382,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 unsigned int
 _gnutls_pkcs11_verify_certificate(const char* url,
 				const gnutls_x509_crt_t * certificate_list,
-				int clist_size,
+				unsigned clist_size,
 				unsigned int flags,
 				gnutls_verify_output_function func);
 #endif
