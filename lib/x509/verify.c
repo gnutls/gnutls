@@ -693,12 +693,12 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 unsigned int
 _gnutls_pkcs11_verify_certificate(const char* url,
 				const gnutls_x509_crt_t * certificate_list,
-				int clist_size,
+				unsigned clist_size,
 				unsigned int flags,
 				gnutls_verify_output_function func)
 {
 	int ret;
-	unsigned int status = 0;
+	unsigned int status = 0, i;
 	gnutls_x509_crt_t issuer = NULL;
 	gnutls_datum_t raw_issuer = {NULL, 0};
 
@@ -719,6 +719,42 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 		}
 	}
 
+	/* We want to shorten the chain by removing the cert that matches
+	 * one of the certs we trust and all the certs after that i.e. if
+	 * cert chain is A signed-by B signed-by C signed-by D (signed-by
+	 * self-signed E but already removed above), and we trust B, remove
+	 * B, C and D. */
+	if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
+		i = 0;		/* also replace the first one */
+	else
+		i = 1;		/* do not replace the first one */
+
+	for (; i < clist_size; i++) {
+		if (gnutls_pkcs11_crt_exists (url, certificate_list[i], GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED) != 0) {
+			clist_size = i;
+			break;
+		}
+		/* clist_size may have been changed which gets out of loop */
+	}
+
+	if (clist_size == 0) {
+		/* The certificate is already present in the trusted certificate list.
+		 * Nothing to verify. */
+		return status;
+	}
+
+	/* check for blacklists */
+	for (i = 0; i < clist_size; i++) {
+		if (gnutls_pkcs11_crt_exists (url, certificate_list[i], GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) != 0) {
+			status |= GNUTLS_CERT_INVALID;
+			status |= GNUTLS_CERT_REVOKED;
+			if (func)
+				func(certificate_list[i], certificate_list[i], NULL, status);
+			goto cleanup;
+		}
+	}
+
+	/* check against issuer */
 	ret = gnutls_pkcs11_get_raw_issuer(url, certificate_list[clist_size - 1],
 		&raw_issuer, GNUTLS_X509_FMT_DER, 0);
 	if (ret < 0) {
@@ -743,7 +779,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 		goto cleanup;
 	}
-
+	
 	status = _gnutls_x509_verify_certificate(certificate_list, clist_size,
 				&issuer, 1, flags, func);
 
