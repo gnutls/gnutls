@@ -337,6 +337,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 		if (sig.size != ssig.size
 		    || memcmp(sig.data, ssig.data, sig.size) != 0) {
 			ret = GNUTLS_E_SELF_TEST_ERROR;
+#if 0
 			unsigned i;
 			fprintf(stderr, "\nstored[%d]: ", ssig.size);
 			for (i = 0; i < ssig.size; i++)
@@ -345,7 +346,7 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 			fprintf(stderr, "\ngenerated[%d]: ", sig.size);
 			for (i = 0; i < sig.size; i++)
 				fprintf(stderr, "%.2x", sig.data[i]);
-
+#endif
 			gnutls_assert();
 			goto cleanup;
 		}
