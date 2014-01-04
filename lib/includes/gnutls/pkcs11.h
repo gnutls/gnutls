@@ -98,8 +98,10 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE (1<<4)	/* marked as private (requires PIN to access) */
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE (1<<5)	/* marked as not private */
 #define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY (1<<6) /* No need for the certificate to be a trusted one */
-#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED (1<<7) /* The certificate must be marked as trusted */
+#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED (1<<7) /* The certificate must be marked as trusted 
+	* in gnutls_pkcs11_crt_is_known() it implies GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_COMPARE */
 #define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED (1<<8) /* The certificate must be marked as distrusted */
+#define GNUTLS_PKCS11_OBJ_FLAG_COMPARE (1<<9) /* The certificate must be fully compared */
 
 /**
  * gnutls_pkcs11_url_type_t:
@@ -136,7 +138,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 			     gnutls_x509_crt_fmt_t fmt,
 			     unsigned int flags);
 
-int gnutls_pkcs11_crt_exists(const char *url, gnutls_x509_crt_t cert,
+int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 			     unsigned int flags);
 
 int gnutls_pkcs11_copy_x509_crt(const char *token_url,

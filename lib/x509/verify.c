@@ -75,6 +75,31 @@ _gnutls_check_if_same_cert(gnutls_x509_crt_t cert1,
 	return result;
 }
 
+int
+_gnutls_check_if_same_cert2(gnutls_x509_crt_t cert1,
+			    gnutls_datum_t * cert2bin)
+{
+	gnutls_datum_t cert1bin = { NULL, 0 };
+	int result;
+
+	result = _gnutls_x509_der_encode(cert1->cert, "", &cert1bin, 0);
+	if (result < 0) {
+		result = 0;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if ((cert1bin.size == cert2bin->size) &&
+	    (memcmp(cert1bin.data, cert2bin->data, cert1bin.size) == 0))
+		result = 1;
+	else
+		result = 0;
+
+      cleanup:
+	_gnutls_free_datum(&cert1bin);
+	return result;
+}
+
 /* Checks if the issuer of a certificate is a
  * Certificate Authority, or if the certificate is the same
  * as the issuer (and therefore it doesn't need to be a CA).
@@ -730,7 +755,8 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 		i = 1;		/* do not replace the first one */
 
 	for (; i < clist_size; i++) {
-		if (gnutls_pkcs11_crt_exists (url, certificate_list[i], GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED) != 0) {
+		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
+			GNUTLS_PKCS11_OBJ_FLAG_COMPARE|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED) != 0) {
 			clist_size = i;
 			break;
 		}
@@ -745,7 +771,8 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 
 	/* check for blacklists */
 	for (i = 0; i < clist_size; i++) {
-		if (gnutls_pkcs11_crt_exists (url, certificate_list[i], GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) != 0) {
+		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
+			GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) != 0) {
 			status |= GNUTLS_CERT_INVALID;
 			status |= GNUTLS_CERT_REVOKED;
 			if (func)

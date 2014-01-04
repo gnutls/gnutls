@@ -934,7 +934,7 @@ GNUTLS_3_1_0 {
 	gnutls_privkey_generate;
 	gnutls_fips140_mode_enabled;
 	gnutls_record_check_corked;
-	gnutls_pkcs11_crt_exists;
+	gnutls_pkcs11_crt_is_known;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

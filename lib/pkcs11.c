@@ -89,7 +89,8 @@ struct find_cert_st {
 	gnutls_datum_t serial;
 
 	unsigned need_import;
-	gnutls_pkcs11_obj_t crt;
+	gnutls_pkcs11_obj_t obj;
+	gnutls_x509_crt_t crt; /* used when compare flag is specified */
 	unsigned flags;
 };
 
@@ -3092,7 +3093,7 @@ find_cert(struct pkcs11_session_info *sinfo,
 		       (sinfo->module, sinfo->pks, &obj, 1,
 			&count) == CKR_OK && count == 1) {
 
-			if (priv->need_import == 0) {
+			if (priv->need_import == 0 && !(priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE)) {
 				found = 1;
 				break;
 			}
@@ -3119,14 +3120,28 @@ find_cert(struct pkcs11_session_info *sinfo,
 				gnutls_datum_t label =
 				    { a[1].value, a[1].value_len };
 
-				ret =
-				    pkcs11_obj_import(class, priv->crt,
-						      &data, &id, &label,
-						      &info->tinfo,
-						      lib_info);
-				if (ret < 0) {
-					gnutls_assert();
-					goto cleanup;
+				if (priv->need_import != 0) {
+					ret =
+					    pkcs11_obj_import(class, priv->obj,
+							      &data, &id, &label,
+							      &info->tinfo,
+							      lib_info);
+					if (ret < 0) {
+						gnutls_assert();
+						goto cleanup;
+					}
+				}
+				
+				if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE) {
+					if (priv->crt == NULL) {
+						gnutls_assert();
+						break;
+					}
+
+					if (_gnutls_check_if_same_cert2(priv->crt, &data) == 0) {
+						/* doesn't match */
+						break;
+					}
 				}
 
 				found = 1;
@@ -3218,7 +3233,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 
 	priv.flags = flags;
 
-	ret = gnutls_pkcs11_obj_init(&priv.crt);
+	ret = gnutls_pkcs11_obj_init(&priv.obj);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -3233,7 +3248,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	ret = gnutls_pkcs11_obj_export3(priv.crt, fmt, issuer);
+	ret = gnutls_pkcs11_obj_export3(priv.obj, fmt, issuer);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -3242,8 +3257,8 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	ret = 0;
 
       cleanup:
-	if (priv.crt)
-		gnutls_pkcs11_obj_deinit(priv.crt);
+	if (priv.obj)
+		gnutls_pkcs11_obj_deinit(priv.obj);
 	if (info)
 		p11_kit_uri_free(info);
 
@@ -3251,7 +3266,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_pkcs11_crt_exists:
+ * gnutls_pkcs11_crt_is_known:
  * @url: A PKCS 11 url identifying a token
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any in an allocated buffer. 
@@ -3268,7 +3283,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
  *
  * Since: 3.2.9
  **/
-int gnutls_pkcs11_crt_exists(const char *url, gnutls_x509_crt_t cert,
+int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 				 unsigned int flags)
 {
 	int ret;
@@ -3314,9 +3329,16 @@ int gnutls_pkcs11_crt_exists(const char *url, gnutls_x509_crt_t cert,
 	
 	priv.serial.data = serial+sizeof(tag)-tag_size;
 	priv.serial.size = serial_size + tag_size;
+	priv.crt = cert;
 
 	priv.issuer_dn.data = cert->raw_issuer_dn.data;
 	priv.issuer_dn.size = cert->raw_issuer_dn.size;
+	
+	/* when looking for a trusted certificate, we always fully compare
+	 * with the given */
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED)
+		flags |= GNUTLS_PKCS11_OBJ_FLAG_COMPARE;
+
 	priv.flags = flags;
 
 	ret =
