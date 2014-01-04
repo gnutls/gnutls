@@ -26,7 +26,7 @@ http://p11-glue.freedesktop.org/doc/storing-trust-policy/storing-trust-pkcs11.ht
 officer (admin).
 
 ** API and ABI modifications:
-gnutls_pkcs11_crt_exists: Added
+gnutls_pkcs11_crt_is_known: Added
 
 
 * Version 3.2.8 (released 2013-12-20)
