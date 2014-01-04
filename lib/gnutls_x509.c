@@ -738,75 +738,6 @@ read_key_url(gnutls_certificate_credentials_t res, const char *url)
 }
 
 #ifdef ENABLE_PKCS11
-static int
-read_cas_url(gnutls_certificate_credentials_t res, const char *url)
-{
-	int ret;
-	gnutls_x509_crt_t *xcrt_list = NULL;
-	gnutls_pkcs11_obj_t *pcrt_list = NULL;
-	unsigned int pcrt_list_size = 0;
-
-	/* FIXME: should we use login? */
-	ret =
-	    gnutls_pkcs11_obj_list_import_url(NULL, &pcrt_list_size, url,
-					      GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA,
-					      0);
-	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		gnutls_assert();
-		return ret;
-	}
-
-	if (pcrt_list_size == 0) {
-		gnutls_assert();
-		return 0;
-	}
-
-	pcrt_list = gnutls_malloc(sizeof(*pcrt_list) * pcrt_list_size);
-	if (pcrt_list == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	ret =
-	    gnutls_pkcs11_obj_list_import_url(pcrt_list, &pcrt_list_size,
-					      url,
-					      GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA,
-					      0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	xcrt_list = gnutls_malloc(sizeof(*xcrt_list) * pcrt_list_size);
-	if (xcrt_list == NULL) {
-		gnutls_assert();
-		ret = GNUTLS_E_MEMORY_ERROR;
-		goto cleanup;
-	}
-
-	ret =
-	    gnutls_x509_crt_list_import_pkcs11(xcrt_list, pcrt_list_size,
-					       pcrt_list, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret =
-	    gnutls_x509_trust_list_add_cas(res->tlist, xcrt_list,
-					   pcrt_list_size, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-      cleanup:
-	gnutls_free(xcrt_list);
-	gnutls_free(pcrt_list);
-
-	return ret;
-
-}
 
 #define MAX_PKCS11_CERT_CHAIN 8
 /* Reads a certificate key from a token.
@@ -909,7 +840,6 @@ cleanup:
 }
 #else
 #define read_cert_url(x,y) gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE)
-#define read_cas_url(x,y) gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE)
 #endif
 
 /* Reads a certificate file
@@ -1577,90 +1507,6 @@ _gnutls_check_key_usage(const gnutls_pcert_st * cert,
 	return 0;
 }
 
-static int
-parse_pem_ca_mem(gnutls_certificate_credentials_t res,
-		 const uint8_t * input_cert, int input_cert_size)
-{
-	gnutls_x509_crt_t *x509_cert_list;
-	unsigned int x509_ncerts;
-	gnutls_datum_t tmp;
-	int ret;
-
-	tmp.data = (void *) input_cert;
-	tmp.size = input_cert_size;
-
-	ret =
-	    gnutls_x509_crt_list_import2(&x509_cert_list, &x509_ncerts,
-					 &tmp, GNUTLS_X509_FMT_PEM, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	if ((ret =
-	     add_new_crt_to_rdn_seq(res, x509_cert_list,
-				    x509_ncerts)) < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret =
-	    gnutls_x509_trust_list_add_cas(res->tlist, x509_cert_list,
-					   x509_ncerts, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-      cleanup:
-	gnutls_free(x509_cert_list);
-	return ret;
-}
-
-/* Reads a DER encoded certificate list from memory and stores it to a
- * gnutls_cert structure.  Returns the number of certificates parsed.
- */
-static int
-parse_der_ca_mem(gnutls_certificate_credentials_t res,
-		 const void *input_cert, int input_cert_size)
-{
-	gnutls_x509_crt_t crt;
-	gnutls_datum_t tmp;
-	int ret;
-
-	tmp.data = (void *) input_cert;
-	tmp.size = input_cert_size;
-
-	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = gnutls_x509_crt_import(crt, &tmp, GNUTLS_X509_FMT_DER);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	if ((ret = add_new_crt_to_rdn_seq(res, &crt, 1)) < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_x509_trust_list_add_cas(res->tlist, &crt, 1, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	return ret;
-
-      cleanup:
-	gnutls_x509_crt_deinit(crt);
-	return ret;
-}
-
 /**
  * gnutls_certificate_set_x509_trust_mem:
  * @res: is a #gnutls_certificate_credentials_t structure.
@@ -1685,13 +1531,9 @@ gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t res,
 				      const gnutls_datum_t * ca,
 				      gnutls_x509_crt_fmt_t type)
 {
-	int ret;
+int ret;
 
-	if (type == GNUTLS_X509_FMT_DER)
-		ret = parse_der_ca_mem(res, ca->data, ca->size);
-	else
-		ret = parse_pem_ca_mem(res, ca->data, ca->size);
-
+	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, ca, NULL, type, 0, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
 
@@ -1793,32 +1635,7 @@ gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials_t
 				       cred, const char *cafile,
 				       gnutls_x509_crt_fmt_t type)
 {
-	int ret;
-	gnutls_datum_t cas;
-	size_t size;
-
-	if (strncmp(cafile, "pkcs11:", 7) == 0) {
-		return read_cas_url(cred, cafile);
-	}
-
-	cas.data = (void *) read_binary_file(cafile, &size);
-	if (cas.data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_FILE_ERROR;
-	}
-
-	cas.size = size;
-
-	ret = gnutls_certificate_set_x509_trust_mem(cred, &cas, type);
-
-	free(cas.data);
-
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	return ret;
+	return gnutls_x509_trust_list_add_trust_file(cred->tlist, cafile, NULL, type, 0, 0);
 }
 
 /**
