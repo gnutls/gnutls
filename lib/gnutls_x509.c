@@ -1635,7 +1635,13 @@ gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials_t
 				       cred, const char *cafile,
 				       gnutls_x509_crt_fmt_t type)
 {
-	return gnutls_x509_trust_list_add_trust_file(cred->tlist, cafile, NULL, type, 0, 0);
+int ret;
+
+	ret = gnutls_x509_trust_list_add_trust_file(cred->tlist, cafile, NULL, type, 0, 0);
+	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
+		return 0;
+
+	return ret;
 }
 
 /**
@@ -1660,100 +1666,6 @@ gnutls_certificate_set_x509_system_trust(gnutls_certificate_credentials_t
 	return gnutls_x509_trust_list_add_system_trust(cred->tlist, 0, 0);
 }
 
-static int
-parse_pem_crl_mem(gnutls_x509_trust_list_t tlist,
-		  const char *input_crl, unsigned int input_crl_size)
-{
-	gnutls_x509_crl_t *x509_crl_list;
-	unsigned int x509_ncrls;
-	gnutls_datum_t tmp;
-	int ret;
-
-	tmp.data = (void *) input_crl;
-	tmp.size = input_crl_size;
-
-	ret =
-	    gnutls_x509_crl_list_import2(&x509_crl_list, &x509_ncrls, &tmp,
-					 GNUTLS_X509_FMT_PEM, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret =
-	    gnutls_x509_trust_list_add_crls(tlist, x509_crl_list,
-					    x509_ncrls, 0, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-      cleanup:
-	gnutls_free(x509_crl_list);
-	return ret;
-}
-
-/* Reads a DER encoded certificate list from memory and stores it to a
- * gnutls_cert structure. Returns the number of certificates parsed.
- */
-static int
-parse_der_crl_mem(gnutls_x509_trust_list_t tlist,
-		  const void *input_crl, unsigned int input_crl_size)
-{
-	gnutls_x509_crl_t crl;
-	gnutls_datum_t tmp;
-	int ret;
-
-	tmp.data = (void *) input_crl;
-	tmp.size = input_crl_size;
-
-	ret = gnutls_x509_crl_init(&crl);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = gnutls_x509_crl_import(crl, &tmp, GNUTLS_X509_FMT_DER);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_x509_trust_list_add_crls(tlist, &crl, 1, 0, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	return ret;
-
-      cleanup:
-	gnutls_x509_crl_deinit(crl);
-	return ret;
-
-}
-
-
-/* Reads a DER or PEM CRL from memory
- */
-static int
-read_crl_mem(gnutls_certificate_credentials_t res, const void *crl,
-	     int crl_size, gnutls_x509_crt_fmt_t type)
-{
-	int ret;
-
-	if (type == GNUTLS_X509_FMT_DER)
-		ret = parse_der_crl_mem(res->tlist, crl, crl_size);
-	else
-		ret = parse_pem_crl_mem(res->tlist, crl, crl_size);
-
-	if (ret < 0) {
-		gnutls_assert();
-	}
-
-	return ret;
-}
-
 /**
  * gnutls_certificate_set_x509_crl_mem:
  * @res: is a #gnutls_certificate_credentials_t structure.
@@ -1773,7 +1685,13 @@ gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials_t res,
 				    const gnutls_datum_t * CRL,
 				    gnutls_x509_crt_fmt_t type)
 {
-	return read_crl_mem(res, CRL->data, CRL->size, type);
+int ret;
+
+	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, NULL, CRL, type, 0, 0);
+	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
+		return 0;
+
+	return ret;
 }
 
 /**
@@ -1850,26 +1768,11 @@ gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials_t res,
 				     const char *crlfile,
 				     gnutls_x509_crt_fmt_t type)
 {
-	int ret;
-	size_t size;
-	char *data = (void *) read_binary_file(crlfile, &size);
+int ret;
 
-	if (data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_FILE_ERROR;
-	}
-
-	if (type == GNUTLS_X509_FMT_DER)
-		ret = parse_der_crl_mem(res->tlist, data, size);
-	else
-		ret = parse_pem_crl_mem(res->tlist, data, size);
-
-	free(data);
-
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	ret = gnutls_x509_trust_list_add_trust_file(res->tlist, NULL, crlfile, type, 0, 0);
+	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
+		return 0;
 
 	return ret;
 }
