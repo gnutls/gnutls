@@ -243,7 +243,7 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 
 #ifdef ENABLE_PKCS11
 	if (strncmp(ca_file, "pkcs11:", 7) == 0) {
-		list->pkcs11_token = strdup(ca_file);
+		list->pkcs11_token = gnutls_strdup(ca_file);
 
 		return 0;
 	} else
