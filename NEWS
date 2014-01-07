@@ -22,6 +22,9 @@ or in gnutls_x509_trust_list_add_trust_file(), then the module is used
 to obtain the verification anchors and any required blacklists as in
 http://p11-glue.freedesktop.org/doc/storing-trust-policy/storing-trust-pkcs11.html
 
+** libgnutls: Fix in OCSP certificate status extension handling
+in non-blocking servers. Patch by Nils Maier.
+
 ** p11tool: Added --so-login option to force login as security
 officer (admin).
 
