@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.19 (unreleased)
+
+** libgnutls: Fix in OCSP certificate status extension handling
+in non-blocking servers. Patch by Nils Maier.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.18 (released 2013-12-20)
 
 ** libgnutls: Updated code for AES-NI. That prevents an uninitialized
