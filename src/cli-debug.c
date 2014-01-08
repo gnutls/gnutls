@@ -63,6 +63,7 @@ unsigned int verbose = 0;
 
 extern int tls1_ok;
 extern int tls1_1_ok;
+extern int tls1_2_ok;
 extern int ssl3_ok;
 
 static void tls_log_func(int level, const char *str)
@@ -248,10 +249,10 @@ int main(int argc, char **argv)
 
 		/* if neither of SSL3 and TLSv1 are supported, exit
 		 */
-		if (i > 6 && tls1_1_ok == 0 && tls1_ok == 0
+		if (i > 6 && tls1_2_ok == 0 && tls1_1_ok == 0 && tls1_ok == 0
 		    && ssl3_ok == 0) {
 			fprintf(stderr,
-				"\nServer does not support any of SSL 3.0, TLS 1.0 and TLS 1.1\n");
+				"\nServer does not support any of SSL 3.0, TLS 1.0 and TLS 1.1 and TLS 1.2\n");
 			break;
 		}
 
