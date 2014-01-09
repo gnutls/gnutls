@@ -29,7 +29,7 @@ in non-blocking servers. Patch by Nils Maier.
 officer (admin).
 
 ** API and ABI modifications:
-gnutls_pkcs11_crt_is_known: Added
+No changes since last version.
 
 
 * Version 3.2.8 (released 2013-12-20)

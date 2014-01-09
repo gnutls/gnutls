@@ -274,6 +274,10 @@ _gnutls_pkcs11_get_random(struct ck_function_list *module,
 
 const char *pkcs11_strerror(ck_rv_t rv);
 
+int _gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
+			     unsigned int flags);
+
+
 #endif				/* ENABLE_PKCS11 */
 
 #endif

@@ -34,6 +34,7 @@
 #include <gnutls_datum.h>
 #include <x509_int.h>
 #include <common.h>
+#include <pkcs11_int.h>
 #include <gnutls_pk.h>
 
 /* Checks if two certs are identical.  Return 1 on match. */
@@ -755,7 +756,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 		i = 1;		/* do not replace the first one */
 
 	for (; i < clist_size; i++) {
-		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
+		if (_gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
 			GNUTLS_PKCS11_OBJ_FLAG_COMPARE|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED) != 0) {
 			clist_size = i;
 			break;
@@ -771,7 +772,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 
 	/* check for blacklists */
 	for (i = 0; i < clist_size; i++) {
-		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
+		if (_gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
 			GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) != 0) {
 			status |= GNUTLS_CERT_INVALID;
 			status |= GNUTLS_CERT_REVOKED;

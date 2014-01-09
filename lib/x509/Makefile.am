@@ -23,7 +23,8 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../includes		\
 	-I$(builddir)/../includes	\
 	-I$(srcdir)/..			\
-	$(LIBOPENCDK_CFLAGS)
+	$(LIBOPENCDK_CFLAGS)		\
+	$(P11_KIT_CFLAGS)
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../minitasn1

@@ -138,9 +138,6 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 			     gnutls_x509_crt_fmt_t fmt,
 			     unsigned int flags);
 
-int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
-			     unsigned int flags);
-
 int gnutls_pkcs11_copy_x509_crt(const char *token_url,
 				gnutls_x509_crt_t crt,
 				const char *label, unsigned int flags

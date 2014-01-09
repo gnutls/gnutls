@@ -3190,8 +3190,8 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	return ret;
 }
 
-/**
- * gnutls_pkcs11_crt_is_known:
+/*-
+ * _gnutls_pkcs11_crt_is_known:
  * @url: A PKCS 11 url identifying a token
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any in an allocated buffer. 
@@ -3207,8 +3207,8 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
  * Returns: If the certificate exists non-zero is returned, otherwise zero.
  *
  * Since: 3.2.9
- **/
-int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
+ -*/
+int _gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 				 unsigned int flags)
 {
 	int ret;
