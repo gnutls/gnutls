@@ -3281,7 +3281,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
  *
  * Returns: If the certificate exists non-zero is returned, otherwise zero.
  *
- * Since: 3.2.9
+ * Since: 3.3.0
  **/
 int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 				 unsigned int flags)
