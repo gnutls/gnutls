@@ -628,10 +628,8 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 				/* explicity time check for trusted CA that we remove from
 				 * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
 				 */
-				if (!
-				    (flags &
-				     GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS)
-&& !(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
+				if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
+					!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
 					status |=
 					    check_time(trusted_cas[j],
 						       now);
@@ -788,7 +786,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 		gnutls_assert();
 		status |= GNUTLS_CERT_INVALID;
 		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
-		return status;
+		goto cleanup;
 	}
 
 	ret = gnutls_x509_crt_init(&issuer);
