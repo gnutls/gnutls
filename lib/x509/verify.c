@@ -306,7 +306,6 @@ find_issuer(gnutls_x509_crt_t cert,
 
 	/* this is serial search. 
 	 */
-
 	for (i = 0; i < tcas_size; i++) {
 		if (is_issuer(cert, trusted_cas[i]) != 0) {
 			if (issuer == NULL) {
@@ -390,6 +389,7 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	gnutls_x509_crt_t issuer = NULL;
 	int issuer_version, result, hash_algo;
 	unsigned int out = 0, usage;
+	int sigalg;
 
 	if (output)
 		*output = 0;
@@ -483,8 +483,9 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 		gnutls_assert();
 		goto cleanup;
 	}
+	sigalg = result;
 
-	hash_algo = gnutls_sign_get_hash_algorithm(result);
+	hash_algo = gnutls_sign_get_hash_algorithm(sigalg);
 
 	result =
 	    _gnutls_x509_verify_data(mac_to_entry(hash_algo),
@@ -506,20 +507,15 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	 * used are secure. If the certificate is self signed it doesn't
 	 * really matter.
 	 */
-	if (is_issuer(cert, cert) == 0) {
-		int sigalg;
-
-		sigalg = gnutls_x509_crt_get_signature_algorithm(cert);
-
-		if (gnutls_sign_is_secure(sigalg) == 0
-		    && is_broken_allowed(sigalg, flags) == 0) {
-			out =
-			    GNUTLS_CERT_INSECURE_ALGORITHM |
-			    GNUTLS_CERT_INVALID;
-			if (output)
-				*output |= out;
-			result = 0;
-		}
+	if (gnutls_sign_is_secure(sigalg) == 0 &&
+	    is_broken_allowed(sigalg, flags) == 0 &&
+	    is_issuer(cert, cert) == 0) {
+		out =
+		    GNUTLS_CERT_INSECURE_ALGORITHM |
+		    GNUTLS_CERT_INVALID;
+		if (output)
+			*output |= out;
+		result = 0;
 	}
 
 	/* Check activation/expiration times
@@ -625,7 +621,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 		for (j = 0; j < tcas_size; j++) {
 			if (_gnutls_check_if_same_cert
 			    (certificate_list[i], trusted_cas[j]) != 0) {
-				/* explicity time check for trusted CA that we remove from
+				/* explicit time check for trusted CA that we remove from
 				 * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
 				 */
 				if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
