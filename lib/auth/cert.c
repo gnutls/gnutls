@@ -41,6 +41,7 @@
 #include <gnutls_state.h>
 #include <gnutls_pk.h>
 #include <gnutls_x509.h>
+#include <x509/verify-high.h>
 #include <gnutls/abstract.h>
 #include "debug.h"
 
@@ -1699,14 +1700,11 @@ _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 
 	if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
 	    session->internals.ignore_rdn_sequence == 0) {
+
 		ret =
 		    _gnutls_buffer_append_data_prefix(data, 16,
-						      cred->
-						      x509_rdn_sequence.
-						      data,
-						      cred->
-						      x509_rdn_sequence.
-						      size);
+					      cred->tlist->x509_rdn_sequence.data,
+					      cred->tlist->x509_rdn_sequence.size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	} else {

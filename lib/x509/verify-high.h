@@ -27,6 +27,11 @@ struct gnutls_x509_trust_list_st {
 	unsigned int size;
 	struct node_st *node;
 
+	/* holds a sequence of the RDNs of the CAs above.
+	 * This is used when using the trust list in TLS.
+	 */
+	gnutls_datum_t x509_rdn_sequence;
+
 	gnutls_x509_crt_t *blacklisted;
 	unsigned int blacklisted_size;
 	

@@ -1098,6 +1098,8 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t
 				      gnutls_x509_crt_t * issuer,
 				      unsigned int flags);
 
+#define GNUTLS_TL_VERIFY_CRL 1
+#define GNUTLS_TL_USE_IN_TLS (1<<1)
 int
 gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			       const gnutls_x509_crt_t * clist,
@@ -1114,7 +1116,6 @@ int gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t
 					 size_t name_size,
 					 unsigned int flags);
 
-#define GNUTLS_TL_VERIFY_CRL 1
 int
 gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 				const gnutls_x509_crl_t *

@@ -145,9 +145,65 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
 		gnutls_free(list->node[i].named_certs);
 	}
 
+	gnutls_free(list->x509_rdn_sequence.data);
 	gnutls_free(list->node);
 	gnutls_free(list->pkcs11_token);
 	gnutls_free(list);
+}
+
+static int
+add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
+		       gnutls_x509_crt_t ca)
+{
+	gnutls_datum_t tmp;
+	int ret;
+	size_t newsize;
+	unsigned char *newdata, *p;
+
+	/* Add DN of the last added CAs to the RDN sequence
+	 * This will be sent to clients when a certificate
+	 * request message is sent.
+	 */
+
+	/* FIXME: in case of a client it is not needed
+	 * to do that. This would save time and memory.
+	 * However we don't have that information available
+	 * here.
+	 * Further, this function is now much more efficient,
+	 * so optimizing that is less important.
+	 */
+	if ((ret = gnutls_x509_crt_get_raw_dn(ca, &tmp)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	newsize = list->x509_rdn_sequence.size + 2 + tmp.size;
+	if (newsize < list->x509_rdn_sequence.size) {
+		gnutls_assert();
+		_gnutls_free_datum(&tmp);
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
+	newdata =
+	    gnutls_realloc_fast(list->x509_rdn_sequence.data,
+				newsize);
+	if (newdata == NULL) {
+		gnutls_assert();
+		_gnutls_free_datum(&tmp);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	p = newdata + list->x509_rdn_sequence.size;
+	_gnutls_write_uint16(tmp.size, p);
+	if (tmp.data != NULL)
+		memcpy(p + 2, tmp.data, tmp.size);
+
+	_gnutls_free_datum(&tmp);
+
+	list->x509_rdn_sequence.size = newsize;
+	list->x509_rdn_sequence.data = newdata;
+
+	return 0;
 }
 
 /**
@@ -172,6 +228,7 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 {
 	int i;
 	uint32_t hash;
+	int ret;
 
 	for (i = 0; i < clist_size; i++) {
 		hash =
@@ -193,6 +250,14 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 		list->node[hash].trusted_cas[list->node[hash].
 					     trusted_ca_size] = clist[i];
 		list->node[hash].trusted_ca_size++;
+
+		if (flags & GNUTLS_TL_USE_IN_TLS) {
+			ret = add_new_ca_to_rdn_seq(list, clist[i]);
+			if (ret < 0) {
+				gnutls_assert();
+				return i;
+			}
+		}
 	}
 
 	return i;

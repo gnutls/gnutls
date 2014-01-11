@@ -37,6 +37,7 @@
 #include <gnutls_auth.h>
 #include <gnutls_x509.h>
 #include <gnutls_str_array.h>
+#include <x509/verify-high.h>
 #include "x509/x509_int.h"
 #ifdef ENABLE_OPENPGP
 #include "openpgp/gnutls_openpgp.h"
@@ -172,7 +173,7 @@ gnutls_certificate_get_crt_raw(gnutls_certificate_credentials_t sc,
  **/
 void gnutls_certificate_free_ca_names(gnutls_certificate_credentials_t sc)
 {
-	_gnutls_free_datum(&sc->x509_rdn_sequence);
+	_gnutls_free_datum(&sc->tlist->x509_rdn_sequence);
 }
 
 
@@ -192,7 +193,6 @@ gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
 {
 	gnutls_x509_trust_list_deinit(sc->tlist, 1);
 	gnutls_certificate_free_keys(sc);
-	gnutls_certificate_free_ca_names(sc);
 	gnutls_free(sc->ocsp_response_file);
 	memset(sc->pin_tmp, 0, sizeof(sc->pin_tmp));
 #ifdef ENABLE_OPENPGP

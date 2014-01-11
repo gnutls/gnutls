@@ -68,13 +68,6 @@ typedef struct gnutls_certificate_credentials_st {
 	unsigned int verify_depth;
 	unsigned int verify_bits;
 
-	/* holds a sequence of the
-	 * RDNs of the CAs above.
-	 * This is better than
-	 * generating on every handshake.
-	 */
-	gnutls_datum_t x509_rdn_sequence;
-
 	/* It's a mess here. However we need to keep the old 3 functions
 	 * for compatibility */
 	gnutls_certificate_retrieve_function *get_cert_callback;	/* deprecated */

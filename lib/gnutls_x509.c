@@ -1392,65 +1392,6 @@ gnutls_certificate_set_x509_key_file2(gnutls_certificate_credentials_t res,
 	return 0;
 }
 
-static int
-add_new_crt_to_rdn_seq(gnutls_certificate_credentials_t res,
-		       gnutls_x509_crt_t * crts, unsigned int crt_size)
-{
-	gnutls_datum_t tmp;
-	int ret;
-	size_t newsize;
-	unsigned char *newdata, *p;
-	unsigned i;
-
-	/* Add DN of the last added CAs to the RDN sequence
-	 * This will be sent to clients when a certificate
-	 * request message is sent.
-	 */
-
-	/* FIXME: in case of a client it is not needed
-	 * to do that. This would save time and memory.
-	 * However we don't have that information available
-	 * here.
-	 * Further, this function is now much more efficient,
-	 * so optimizing that is less important.
-	 */
-
-	for (i = 0; i < crt_size; i++) {
-		if ((ret = gnutls_x509_crt_get_raw_dn(crts[i], &tmp)) < 0) {
-			gnutls_assert();
-			return ret;
-		}
-
-		newsize = res->x509_rdn_sequence.size + 2 + tmp.size;
-		if (newsize < res->x509_rdn_sequence.size) {
-			gnutls_assert();
-			_gnutls_free_datum(&tmp);
-			return GNUTLS_E_SHORT_MEMORY_BUFFER;
-		}
-
-		newdata =
-		    gnutls_realloc_fast(res->x509_rdn_sequence.data,
-					newsize);
-		if (newdata == NULL) {
-			gnutls_assert();
-			_gnutls_free_datum(&tmp);
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-
-		p = newdata + res->x509_rdn_sequence.size;
-		_gnutls_write_uint16(tmp.size, p);
-		if (tmp.data != NULL)
-			memcpy(p + 2, tmp.data, tmp.size);
-
-		_gnutls_free_datum(&tmp);
-
-		res->x509_rdn_sequence.size = newsize;
-		res->x509_rdn_sequence.data = newdata;
-	}
-
-	return 0;
-}
-
 /* Returns 0 if it's ok to use the gnutls_kx_algorithm_t with this 
  * certificate (uses the KeyUsage field). 
  */
@@ -1533,7 +1474,8 @@ gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t res,
 {
 int ret;
 
-	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, ca, NULL, type, 0, 0);
+	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, ca, NULL, 
+					type, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
 
@@ -1583,15 +1525,9 @@ gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 		}
 	}
 
-	if ((ret =
-	     add_new_crt_to_rdn_seq(res, new_list, ca_list_size)) < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
 	ret =
 	    gnutls_x509_trust_list_add_cas(res->tlist, new_list,
-					   ca_list_size, 0);
+					   ca_list_size, GNUTLS_TL_USE_IN_TLS);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1637,7 +1573,8 @@ gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials_t
 {
 int ret;
 
-	ret = gnutls_x509_trust_list_add_trust_file(cred->tlist, cafile, NULL, type, 0, 0);
+	ret = gnutls_x509_trust_list_add_trust_file(cred->tlist, cafile, NULL, 
+						type, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
 
@@ -1663,7 +1600,8 @@ int
 gnutls_certificate_set_x509_system_trust(gnutls_certificate_credentials_t
 					 cred)
 {
-	return gnutls_x509_trust_list_add_system_trust(cred->tlist, 0, 0);
+	return gnutls_x509_trust_list_add_system_trust(cred->tlist, 
+					GNUTLS_TL_USE_IN_TLS, 0);
 }
 
 /**
@@ -1687,7 +1625,8 @@ gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials_t res,
 {
 int ret;
 
-	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, NULL, CRL, type, 0, 0);
+	ret = gnutls_x509_trust_list_add_trust_mem(res->tlist, NULL, CRL, 
+					type, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
 
@@ -1734,7 +1673,7 @@ gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
 
 	ret =
 	    gnutls_x509_trust_list_add_crls(res->tlist, new_crl,
-					    crl_list_size, 0, 0);
+				    crl_list_size, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1770,7 +1709,8 @@ gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials_t res,
 {
 int ret;
 
-	ret = gnutls_x509_trust_list_add_trust_file(res->tlist, NULL, crlfile, type, 0, 0);
+	ret = gnutls_x509_trust_list_add_trust_file(res->tlist, NULL, crlfile, 
+						type, GNUTLS_TL_USE_IN_TLS, 0);
 	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
 		return 0;
 
