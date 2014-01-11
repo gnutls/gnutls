@@ -131,8 +131,8 @@ cert_callback(gnutls_session_t session,
 	gnutls_x509_dn_t dn;
 
 	if (nreqs != 1) {
-		fail("client: invoked to provide client cert, %d CA .\n",
-		     nreqs);
+		fail("client: invoked to provide client cert, but %d CAs are requested by server.\n",
+		 	nreqs);
 		return -1;
 	}
 
@@ -199,8 +199,12 @@ static void client(int sd)
 
 	/* sets the trusted cas file
 	 */
-	gnutls_certificate_set_x509_trust_mem(xcred, &ca,
+	ret = gnutls_certificate_set_x509_trust_mem(xcred, &ca,
 					      GNUTLS_X509_FMT_PEM);
+	if (ret <= 0) {
+		fail("client: no CAs loaded!\n");
+		goto end;
+	}
 
 	gnutls_certificate_set_retrieve_function2(xcred, cert_callback);
 
@@ -280,30 +284,6 @@ static void client(int sd)
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_credentials_t x509_cred;
-
-static gnutls_session_t initialize_tls_session(void)
-{
-	gnutls_session_t session;
-
-	gnutls_init(&session, GNUTLS_SERVER);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_set_default_priority(session);
-
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
-
-	/* request client certificate if any.
-	 */
-	gnutls_certificate_server_set_request(session,
-					      GNUTLS_CERT_REQUEST);
-
-	gnutls_dh_set_prime_bits(session, DH_BITS);
-
-	return session;
-}
 
 static gnutls_dh_params_t dh_params;
 
@@ -320,11 +300,6 @@ static int generate_dh_params(void)
 					     GNUTLS_X509_FMT_PEM);
 }
 
-int err, ret;
-char topbuf[512];
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
-int optval = 1;
 
 
 static unsigned char server_cert_pem[] =
@@ -370,6 +345,10 @@ const gnutls_datum_t server_key = { server_key_pem,
 
 static void server(int sd)
 {
+gnutls_certificate_credentials_t x509_cred;
+int ret;
+gnutls_session_t session;
+char buffer[MAX_BUF + 1];
 	/* this must be called once in the program
 	 */
 	global_init();
@@ -379,8 +358,11 @@ static void server(int sd)
 		gnutls_global_set_log_level(4711);
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
-	gnutls_certificate_set_x509_trust_mem(x509_cred, &ca,
+	ret = gnutls_certificate_set_x509_trust_mem(x509_cred, &ca,
 					      GNUTLS_X509_FMT_PEM);
+	if (ret == 0) {
+		fail("server: no CAs loaded\n");
+	}
 
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
 					    &server_key,
@@ -393,9 +375,25 @@ static void server(int sd)
 
 	gnutls_certificate_set_dh_params(x509_cred, dh_params);
 
-	session = initialize_tls_session();
+	gnutls_init(&session, GNUTLS_SERVER);
+
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_set_default_priority(session);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+
+	/* request client certificate if any.
+	 */
+	gnutls_certificate_server_set_request(session,
+					      GNUTLS_CERT_REQUEST);
+
+	gnutls_dh_set_prime_bits(session, DH_BITS);
 
 	gnutls_transport_set_int(session, sd);
+	gnutls_handshake_set_timeout(session, 20 * 1000);
+
 	ret = gnutls_handshake(session);
 	if (ret < 0) {
 		close(sd);
@@ -456,6 +454,7 @@ static void server(int sd)
 void doit(void)
 {
 	int sockets[2];
+	int err;
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
