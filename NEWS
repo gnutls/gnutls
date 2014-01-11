@@ -27,14 +27,14 @@ modules.
 a fork is detected.
 
 ** libgnutls: Added --enable-fips140-mode configuration option. That
-option enables:
+option enables (when running on FIPS140-enabled system):
  o DSA and DH key generation as in FIPS-186-4 (using provable primes)
  o The DRBG-AES deterministic random generator from ANSI X9.31 
    Appendix A.2.4.
  o Self-tests on initialization on ciphers/MACs, public key algorithms 
    and the random generator.
  o HMAC-SHA256 verification of the library on load.
- o MD5 is included for TLS purposed but cannot be used by the high level
+ o MD5 is included for TLS purposes but cannot be used by the high level
    hashing functions.
  o All ciphers except AES are disabled.
  o All MACs and hashes except GCM and SHA are disabled (e.g., HMAC-MD5).
