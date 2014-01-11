@@ -817,6 +817,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	char proto_name[32];
 	const char *curve_name = NULL;
 	unsigned dh_bits = 0;
+	unsigned mac_id;
 	char *desc;
 
 	kx = session->security_parameters.kx_algorithm;
@@ -843,7 +844,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 
 	type = gnutls_certificate_type_get(session);
 	if (type == GNUTLS_CRT_X509)
-		snprintf(proto_name, sizeof(proto_name), "%s-PKIX",
+		snprintf(proto_name, sizeof(proto_name), "%s",
 			 gnutls_protocol_get_name(get_num_version
 						  (session)));
 	else
@@ -857,12 +858,21 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	if (desc == NULL)
 		return NULL;
 
-	snprintf(desc, DESC_SIZE,
-		 "(%s)-(%s)-(%s)-(%s)",
-		 proto_name,
-		 kx_name,
-		 gnutls_cipher_get_name(gnutls_cipher_get(session)),
-		 gnutls_mac_get_name(gnutls_mac_get(session)));
+	mac_id = gnutls_mac_get(session);
+	if (mac_id == GNUTLS_MAC_AEAD) { /* no need to print */
+		snprintf(desc, DESC_SIZE,
+			 "(%s)-(%s)-(%s)",
+			 proto_name,
+			 kx_name,
+			 gnutls_cipher_get_name(gnutls_cipher_get(session)));
+	} else {
+		snprintf(desc, DESC_SIZE,
+			 "(%s)-(%s)-(%s)-(%s)",
+			 proto_name,
+			 kx_name,
+			 gnutls_cipher_get_name(gnutls_cipher_get(session)),
+			 gnutls_mac_get_name(mac_id));
+	}
 
 	return desc;
 }
