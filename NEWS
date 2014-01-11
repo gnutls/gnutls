@@ -9,6 +9,9 @@ See the end for copying conditions.
 appends data to client hello if the expected size is in the
 "black hole" range.
 
+** libgnutls: gnutls_session_get_desc() returns a more compact
+ciphersuite description.
+
 * libgnutls: Allow deleting multiple non-certificate data.
 
 ** libgnutls: When a PKCS #11 trust store is specified (e.g. using the
