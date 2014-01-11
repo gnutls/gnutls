@@ -1797,10 +1797,14 @@ int ret;
  * only password based security, and the same password for all
  * operations, are supported.
  *
- * PKCS#12 file may contain many keys and/or certificates, and there
- * is no way to identify which key/certificate pair you want.  You
- * should make sure the PKCS#12 file only contain one key/certificate
- * pair and/or one CRL.
+ * PKCS#12 file may contain many keys and/or certificates, and this
+ * function will try to auto-detect based on the key ID the certificate
+ * and key pair to use. If the PKCS#12 file contain the issuer of
+ * the selected certificate, it will be appended to the certificate
+ * to form a chain.
+ *
+ * If more than one private keys are stored in the PKCS#12 file,
+ * then only one key will be read (and it is undefined which one).
  *
  * It is believed that the limitations of this function is acceptable
  * for most usage, and that any more flexibility would introduce
@@ -1848,10 +1852,14 @@ int
  * only password based security, and the same password for all
  * operations, are supported.
  *
- * PKCS#12 file may contain many keys and/or certificates, and there
- * is no way to identify which key/certificate pair you want.  You
- * should make sure the PKCS#12 file only contain one key/certificate
- * pair and/or one CRL.
+ * PKCS#12 file may contain many keys and/or certificates, and this
+ * function will try to auto-detect based on the key ID the certificate
+ * and key pair to use. If the PKCS#12 file contain the issuer of
+ * the selected certificate, it will be appended to the certificate
+ * to form a chain.
+ *
+ * If more than one private keys are stored in the PKCS#12 file,
+ * then only one key will be read (and it is undefined which one).
  *
  * It is believed that the limitations of this function is acceptable
  * for most usage, and that any more flexibility would introduce
