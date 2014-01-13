@@ -1112,6 +1112,34 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					      "SERVER_PRECEDENCE") == 0) {
 				(*priority_cache)->server_precedence = 1;
 			} else if (strcasecmp(&broken_list[i][1],
+					      "PROFILE_LOW") == 0) {
+				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
+				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_LOW);
+			} else if (strcasecmp(&broken_list[i][1],
+					      "PROFILE_LEGACY") == 0) {
+				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
+				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_LEGACY);
+			} else if (strcasecmp(&broken_list[i][1],
+					      "PROFILE_NORMAL") == 0) {
+				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
+				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_NORMAL);
+			} else if (strcasecmp(&broken_list[i][1],
+					      "PROFILE_HIGH") == 0) {
+				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
+				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_HIGH);
+			} else if (strcasecmp(&broken_list[i][1],
+					      "PROFILE_ULTRA") == 0) {
+				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
+				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_ULTRA);
+			} else if (strcasecmp(&broken_list[i][1],
+					      "PROFILE_SUITEB128") == 0) {
+				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
+				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_SUITEB128);
+			} else if (strcasecmp(&broken_list[i][1],
+					      "PROFILE_SUITEB192") == 0) {
+				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
+				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_SUITEB192);
+			} else if (strcasecmp(&broken_list[i][1],
 					      "NEW_PADDING") == 0) {
 				(*priority_cache)->new_record_padding = 1;
 			} else
