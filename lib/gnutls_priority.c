@@ -760,6 +760,108 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 	return 0;
 }
 
+static void enable_compat(gnutls_priority_t c)
+{
+	ENABLE_COMPAT(c);
+}
+static void enable_dumbfw(gnutls_priority_t c)
+{
+	c->dumbfw = 1;
+}
+static void enable_no_extensions(gnutls_priority_t c)
+{
+	c->no_extensions = 1;
+}
+static void enable_stateless_compression(gnutls_priority_t c)
+{
+	c->stateless_compression = 1;
+}
+static void enable_profile_low(gnutls_priority_t c)
+{
+	c->additional_verify_flags &= 0x00ffffff;
+	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LOW);
+}
+static void enable_profile_legacy(gnutls_priority_t c)
+{
+	c->additional_verify_flags &= 0x00ffffff;
+	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LEGACY);
+}
+static void enable_profile_high(gnutls_priority_t c)
+{
+	c->additional_verify_flags &= 0x00ffffff;
+	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_HIGH);
+}
+static void enable_profile_ultra(gnutls_priority_t c)
+{
+	c->additional_verify_flags &= 0x00ffffff;
+	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA);
+}
+static void enable_profile_normal(gnutls_priority_t c)
+{
+	c->additional_verify_flags &= 0x00ffffff;
+	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_NORMAL);
+}
+static void enable_profile_suiteb128(gnutls_priority_t c)
+{
+	c->additional_verify_flags &= 0x00ffffff;
+	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB128);
+}
+static void enable_profile_suiteb192(gnutls_priority_t c)
+{
+	c->additional_verify_flags &= 0x00ffffff;
+	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB192);
+}
+static void enable_safe_renegotiation(gnutls_priority_t c)
+{
+	c->sr = SR_SAFE;
+
+}
+static void enable_unsafe_renegotiation(gnutls_priority_t c)
+{
+	c->sr = SR_UNSAFE;
+}
+static void enable_partial_safe_renegotiation(gnutls_priority_t c)
+{
+	c->sr = SR_PARTIAL;
+}
+static void disable_safe_renegotiation(gnutls_priority_t c)
+{
+	c->sr = SR_DISABLED;
+}
+static void enable_latest_record_version(gnutls_priority_t c)
+{
+	c->ssl3_record_version = 0;
+}
+static void enable_ssl3_record_version(gnutls_priority_t c)
+{
+	c->ssl3_record_version = 1;
+}
+static void enable_verify_allow_rsa_md5(gnutls_priority_t c)
+{
+	c->additional_verify_flags |=
+	    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5;
+}
+static void disable_crl_checks(gnutls_priority_t c)
+{
+	c->additional_verify_flags |=
+		GNUTLS_VERIFY_DISABLE_CRL_CHECKS;
+}
+static void enable_server_precedence(gnutls_priority_t c)
+{
+	c->server_precedence = 1;
+}
+static void enable_verify_allow_v1_ca_crt(gnutls_priority_t c)
+{
+	c->additional_verify_flags |=
+		GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
+}
+static void enable_new_padding(gnutls_priority_t c)
+{
+	c->new_record_padding = 1;
+}
+
+#include <priority_options.h>
+
 /**
  * gnutls_priority_init:
  * @priority_cache: is a #gnutls_prioritity_t structure.
@@ -1045,105 +1147,14 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			} else
 				goto error;
 		} else if (broken_list[i][0] == '%') {
-			if (strcasecmp(&broken_list[i][1], "COMPAT") == 0) {
-				ENABLE_COMPAT((*priority_cache));
-			} else
-			  if (strcasecmp(&broken_list[i][1], "DUMBFW") == 0) {
-				(*priority_cache)->dumbfw = 1;
-			} else
-			    if (strcasecmp
-				(&broken_list[i][1],
-				 "NO_EXTENSIONS") == 0) {
-				(*priority_cache)->no_extensions = 1;
-			} else
-			    if (strcasecmp
-				(&broken_list[i][1],
-				 "STATELESS_COMPRESSION") == 0) {
-				(*priority_cache)->stateless_compression =
-				    1;
-			} else
-			    if (strcasecmp
-				(&broken_list[i][1],
-				 "VERIFY_ALLOW_SIGN_RSA_MD5") == 0) {
-				prio_add(&(*priority_cache)->sign_algo,
-					 GNUTLS_SIGN_RSA_MD5);
-				(*priority_cache)->
-				    additional_verify_flags |=
-				    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5;
-			} else
-			    if (strcasecmp
-				(&broken_list[i][1],
-				 "VERIFY_DISABLE_CRL_CHECKS") == 0) {
-				(*priority_cache)->
-				    additional_verify_flags |=
-				    GNUTLS_VERIFY_DISABLE_CRL_CHECKS;
-			} else
-			    if (strcasecmp
-				(&broken_list[i][1],
-				 "SSL3_RECORD_VERSION") == 0)
-				(*priority_cache)->ssl3_record_version = 1;
-			else if (strcasecmp(&broken_list[i][1],
-					    "LATEST_RECORD_VERSION") == 0)
-				(*priority_cache)->ssl3_record_version = 0;
-			else if (strcasecmp(&broken_list[i][1],
-					    "VERIFY_ALLOW_X509_V1_CA_CRT")
-				 == 0)
-				(*priority_cache)->
-				    additional_verify_flags |=
-				    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
-			else if (strcasecmp
-				 (&broken_list[i][1],
-				  "UNSAFE_RENEGOTIATION") == 0) {
-				(*priority_cache)->sr = SR_UNSAFE;
-			} else
-			    if (strcasecmp
-				(&broken_list[i][1],
-				 "SAFE_RENEGOTIATION") == 0) {
-				(*priority_cache)->sr = SR_SAFE;
-			} else if (strcasecmp(&broken_list[i][1],
-					      "PARTIAL_RENEGOTIATION") ==
-				   0) {
-				(*priority_cache)->sr = SR_PARTIAL;
-			} else if (strcasecmp(&broken_list[i][1],
-					      "DISABLE_SAFE_RENEGOTIATION")
-				   == 0) {
-				(*priority_cache)->sr = SR_DISABLED;
-			} else if (strcasecmp(&broken_list[i][1],
-					      "SERVER_PRECEDENCE") == 0) {
-				(*priority_cache)->server_precedence = 1;
-			} else if (strcasecmp(&broken_list[i][1],
-					      "PROFILE_LOW") == 0) {
-				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
-				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_LOW);
-			} else if (strcasecmp(&broken_list[i][1],
-					      "PROFILE_LEGACY") == 0) {
-				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
-				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_LEGACY);
-			} else if (strcasecmp(&broken_list[i][1],
-					      "PROFILE_NORMAL") == 0) {
-				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
-				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_NORMAL);
-			} else if (strcasecmp(&broken_list[i][1],
-					      "PROFILE_HIGH") == 0) {
-				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
-				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_HIGH);
-			} else if (strcasecmp(&broken_list[i][1],
-					      "PROFILE_ULTRA") == 0) {
-				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
-				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_ULTRA);
-			} else if (strcasecmp(&broken_list[i][1],
-					      "PROFILE_SUITEB128") == 0) {
-				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
-				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_SUITEB128);
-			} else if (strcasecmp(&broken_list[i][1],
-					      "PROFILE_SUITEB192") == 0) {
-				(*priority_cache)->additional_verify_flags &= 0x00ffffff;
-				(*priority_cache)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_SUITEB192);
-			} else if (strcasecmp(&broken_list[i][1],
-					      "NEW_PADDING") == 0) {
-				(*priority_cache)->new_record_padding = 1;
-			} else
+			const struct priority_options_st * o;
+			/* to add a new option modify
+			 * priority_options.gperf */
+			o = in_word_set(&broken_list[i][1], strlen(&broken_list[i][1]));
+			if (o == NULL) {
 				goto error;
+			}
+			o->func(*priority_cache);
 		} else
 			goto error;
 	}

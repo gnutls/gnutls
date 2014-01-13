@@ -20,7 +20,7 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c
+BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 
 SUBDIRS = includes x509 auth ext algorithms extras accelerated
 
@@ -203,6 +203,9 @@ pkix_asn1_tab.c: $(srcdir)/pkix.asn
 
 gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
 	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
+
+priority_options.h: $(srcdir)/priority_options.gperf
+	-gperf -t $^ > $@
 
 libgnutls_xssl_la_LDFLAGS = -no-undefined -export-symbols-regex '^xssl.*'
 
