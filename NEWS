@@ -5,6 +5,18 @@ See the end for copying conditions.
 
 * Version 3.3.0 (unreleased)
 
+** libgnutls: certificate verification profiles were introduced
+that can be specified as flags to verification functions. They
+are enumerations in gnutls_certificate_verification_profiles_t
+and can be converted to flags using GNUTLS_PROFILE_TO_VFLAGS()
+
+** libgnutls: When specifying a priority string a corresponding
+certificate verification profile is automatically set.
+
+** libgnutls: Increased the default security level of priority
+strings to corresponding defaults. The %COMPAT keyword is extended
+to revert to old defaults, by reducing the overall security level.
+
 ** libgnutls: The initialization of the library was moved to a
 constructor. That is, gnutls_global_init() is no longer required
 unless linking with a static library or a system that does not

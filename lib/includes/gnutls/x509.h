@@ -733,7 +733,9 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
  * @GNUTLS_VERIFY_DISABLE_CRL_CHECKS: Disable checking for validity
  *   using certificate revocation lists or the available OCSP data.
  *
- * Enumeration of different certificate verify flags.
+ * Enumeration of different certificate verify flags. Additional
+ * verification profiles can be set using GNUTLS_PROFILE_TO_VFLAGS()
+ * and %gnutls_certificate_verification_profiles_t.
  */
 typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DISABLE_CA_SIGN = 1 << 0,
@@ -751,7 +753,7 @@ typedef enum gnutls_certificate_verify_flags {
 } gnutls_certificate_verify_flags;
 
 /**
- * gnutls_certificate_verification_profiles:
+ * gnutls_certificate_verification_profiles_t:
  * @GNUTLS_PROFILE_LOW: A verification profile that
  *  corresponds to @GNUTLS_SEC_PARAM_LOW (80 bits)
  * @GNUTLS_PROFILE_LEGACY: A verification profile that
@@ -762,14 +764,14 @@ typedef enum gnutls_certificate_verify_flags {
  *  corresponds to @GNUTLS_SEC_PARAM_HIGH (128 bits)
  * @GNUTLS_PROFILE_ULTRA: A verification profile that
  *  corresponds to @GNUTLS_SEC_PARAM_ULTRA (256 bits)
- * @GNUTLS_PROFILE_SUITEB128: A verification profile that
+% * @GNUTLS_PROFILE_SUITEB128: A verification profile that
  *  applies the SUITEB128 rules
  * @GNUTLS_PROFILE_SUITEB192: A verification profile that
  *  applies the SUITEB192 rules
  *
  * Enumeration of different certificate verification profiles.
  */
-typedef enum gnutls_certificate_verification_profiles {
+typedef enum gnutls_certificate_verification_profiles_t {
 	GNUTLS_PROFILE_LOW = 2,
 	GNUTLS_PROFILE_LEGACY = 4,
 	GNUTLS_PROFILE_NORMAL = 5,

@@ -686,6 +686,11 @@ unsigned i, j;
  * its status. The @verify parameter will hold an OR'ed sequence of
  * %gnutls_certificate_status_t flags.
  *
+ * Additionally a certificate verification profile can be specified
+ * from the ones in %gnutls_certificate_verification_profiles_t by
+ * ORing the result of GNUTLS_PROFILE_TO_VFLAGS() to the verification
+ * flags.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -800,6 +805,11 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * name --see gnutls_x509_trust_list_add_named_crt(). If a match is found the certificate is considered valid. 
  * In addition to that this function will also check CRLs. 
  * The @verify parameter will hold an OR'ed sequence of %gnutls_certificate_status_t flags.
+ *
+ * Additionally a certificate verification profile can be specified
+ * from the ones in %gnutls_certificate_verification_profiles_t by
+ * ORing the result of GNUTLS_PROFILE_TO_VFLAGS() to the verification
+ * flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
