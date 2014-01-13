@@ -670,7 +670,10 @@ struct gnutls_priority_st {
 #define ENABLE_COMPAT(x) \
               (x)->allow_large_records = 1; \
               (x)->allow_wrong_pms = 1; \
-              (x)->allow_weak_keys = 1
+              (x)->allow_weak_keys = 1; \
+              (x)->additional_verify_flags &= 0x00ffffff; \
+              (x)->additional_verify_flags |= GNUTLS_VFLAGS_TO_PROFILE(GNUTLS_PROFILE_LOW); \
+              (x)->level = GNUTLS_SEC_PARAM_VERY_WEAK
 
 /* DH and RSA parameters types.
  */

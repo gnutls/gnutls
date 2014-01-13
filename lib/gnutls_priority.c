@@ -27,6 +27,7 @@
 #include "algorithms.h"
 #include "gnutls_errors.h"
 #include <gnutls_num.h>
+#include <gnutls/x509.h>
 
 static void
 break_comma_list(char *etag,
@@ -659,6 +660,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
+		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LEGACY);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_VERY_WEAK;
 		return 1;
@@ -669,6 +672,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
+		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LEGACY);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_VERY_WEAK;
 		return 1;
@@ -679,6 +684,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
+		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LEGACY);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_VERY_WEAK;
 		return 1;
@@ -692,6 +699,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		     supported_ecc_secure192);
 
 		/* be conservative for now. Set the bits to correspond to 96-bit level */
+		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_LEGACY;
 		return 1;
@@ -704,7 +713,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_secure128);
 
-		/* be conservative for now. Set the bits to correspond to an 72-bit level */
+		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_HIGH);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_WEAK;
 		return 1;
@@ -717,6 +727,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_suiteb128);
 
+		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB128);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_HIGH;
 		return 1;
@@ -729,6 +741,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_suiteb192);
 
+		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB192);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_ULTRA;
 		return 1;
