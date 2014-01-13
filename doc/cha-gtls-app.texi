@@ -1117,6 +1117,15 @@ will disable CRL or OCSP checks in the verification of the certificate chain.
 @item %VERIFY_ALLOW_X509_V1_CA_CRT @tab
 will allow V1 CAs in chains.
 
+@item %PROFILE_(LOW|LEGACY|NORMAL|HIGH|ULTRA) @tab
+require a certificate verification profile the corresponds to the provided
+security level.
+
+@item %PROFILE_(SUITEB128|SUITEB192) @tab
+require a certificate verification profile the corresponds to SUITEB. Note
+that an initial keyword that enables SUITEB automatically sets the profile.
+
+
 @end multitable
 @caption{More priority string keywords.}
 @end float
