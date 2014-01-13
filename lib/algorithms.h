@@ -329,4 +329,14 @@ static inline int _gnutls_kx_is_ecc(gnutls_kx_algorithm_t kx)
 	return 0;
 }
 
+static inline int _sig_is_ecdsa(gnutls_sign_algorithm_t sig)
+{
+	if (sig == GNUTLS_SIGN_ECDSA_SHA1 || sig == GNUTLS_SIGN_ECDSA_SHA224 ||
+	    sig == GNUTLS_SIGN_ECDSA_SHA256 || sig == GNUTLS_SIGN_ECDSA_SHA384 ||
+	    sig == GNUTLS_SIGN_ECDSA_SHA512)
+		return 1;
+
+	return 0;
+}
+
 #endif

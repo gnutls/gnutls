@@ -362,6 +362,141 @@ int is_broken_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
 	return 0;
 }
 
+#define CASE_SEC_PARAM(profile, level) \
+	case profile: \
+		sp = gnutls_pk_bits_to_sec_param(pkalg, bits); \
+		if (sp < level) { \
+			_gnutls_debug_log(#level": certificate's security level is unacceptable\n"); \
+			return gnutls_assert_val(0); \
+		} \
+		sp = gnutls_pk_bits_to_sec_param(issuer_pkalg, issuer_bits); \
+		if (sp < level) { \
+			_gnutls_debug_log(#level": certificate's issuer security level is unacceptable\n"); \
+			return gnutls_assert_val(0); \
+		} \
+		break;
+
+/* Checks whether the provided certificates are acceptable
+ * according to verification profile specified.
+ *
+ * @crt: a certificate
+ * @issuer: the certificates issuer
+ * @sigalg: the signature algorithm used
+ * @flags: the specified verification flags
+ */
+static int is_level_acceptable(
+	gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
+	gnutls_sign_algorithm_t sigalg, unsigned flags)
+{
+gnutls_certificate_verification_profiles_t profile = GNUTLS_VFLAGS_TO_PROFILE(flags);
+int issuer_pkalg, pkalg, ret;
+unsigned bits = 0, issuer_bits = 0;
+gnutls_pk_params_st params;
+gnutls_sec_param_t sp;
+
+	if (profile == 0)
+		return 1;
+
+	pkalg = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
+	if (pkalg < 0)
+		return gnutls_assert_val(0);
+
+	issuer_pkalg = gnutls_x509_crt_get_pk_algorithm(crt, &issuer_bits);
+	if (issuer_pkalg < 0)
+		return gnutls_assert_val(0);
+
+	switch (profile) {
+		CASE_SEC_PARAM(GNUTLS_PROFILE_LOW, GNUTLS_SEC_PARAM_LOW);
+		CASE_SEC_PARAM(GNUTLS_PROFILE_LEGACY, GNUTLS_SEC_PARAM_LEGACY);
+		CASE_SEC_PARAM(GNUTLS_PROFILE_NORMAL, GNUTLS_SEC_PARAM_NORMAL);
+		CASE_SEC_PARAM(GNUTLS_PROFILE_HIGH, GNUTLS_SEC_PARAM_HIGH);
+		CASE_SEC_PARAM(GNUTLS_PROFILE_ULTRA, GNUTLS_SEC_PARAM_ULTRA);
+		case GNUTLS_PROFILE_SUITEB128:
+		case GNUTLS_PROFILE_SUITEB192: {
+			unsigned curve, issuer_curve;
+
+			/* check suiteB params validity: rfc5759 */
+
+			if (gnutls_x509_crt_get_version(crt) != 3) {
+				_gnutls_debug_log("SUITEB: certificate uses an unacceptable version number\n");
+				return gnutls_assert_val(0);
+			}
+
+			if (gnutls_x509_crt_get_version(issuer) != 3) {
+				_gnutls_debug_log("SUITEB: certificate's issuer uses an unacceptable version number\n");
+				return gnutls_assert_val(0);
+			}
+
+			if (sigalg != GNUTLS_SIGN_ECDSA_SHA256 && sigalg != GNUTLS_SIGN_ECDSA_SHA384) {
+				_gnutls_debug_log("SUITEB: certificate is not signed using ECDSA-SHA256 or ECDSA-SHA384\n");
+				return gnutls_assert_val(0);
+			}
+
+			if (pkalg != GNUTLS_PK_EC) {
+				_gnutls_debug_log("SUITEB: certificate does not contain ECC parameters\n");
+				return gnutls_assert_val(0);
+			}
+
+			if (issuer_pkalg != GNUTLS_PK_EC) {
+				_gnutls_debug_log("SUITEB: certificate's issuer does not have ECC parameters\n");
+				return gnutls_assert_val(0);
+			}
+
+			ret = _gnutls_x509_crt_get_mpis(crt, &params);
+			if (ret < 0) {
+				_gnutls_debug_log("SUITEB: cannot read certificate params\n");
+				return gnutls_assert_val(0);
+			}
+
+			curve = params.flags;
+			gnutls_pk_params_release(&params);
+
+			ret = _gnutls_x509_crt_get_mpis(issuer, &params);
+			if (ret < 0) {
+				_gnutls_debug_log("SUITEB: cannot read certificate params\n");
+				return gnutls_assert_val(0);
+			}
+
+			issuer_curve = params.flags;
+			gnutls_pk_params_release(&params);
+
+			if (issuer_curve != GNUTLS_ECC_CURVE_SECP256R1 &&
+				issuer_curve != GNUTLS_ECC_CURVE_SECP384R1) {
+				_gnutls_debug_log("SUITEB: certificate's issuer ECC params do not contain SECP256R1 or SECP384R1\n");
+				return gnutls_assert_val(0);
+			}
+
+			if (curve != GNUTLS_ECC_CURVE_SECP256R1 &&
+				curve != GNUTLS_ECC_CURVE_SECP384R1) {
+				_gnutls_debug_log("SUITEB: certificate's ECC params do not contain SECP256R1 or SECP384R1\n");
+				return gnutls_assert_val(0);
+			}
+
+			if (issuer_curve < curve) {
+				_gnutls_debug_log("SUITEB: certificate's issuer ECC params are weaker than the certificate's\n");
+				return gnutls_assert_val(0);
+			}
+
+			if (sigalg == GNUTLS_SIGN_ECDSA_SHA256 && 
+				issuer_curve == GNUTLS_ECC_CURVE_SECP384R1) {
+				_gnutls_debug_log("SUITEB: certificate is signed with ECDSA-SHA256 when using SECP384R1\n");
+				return gnutls_assert_val(0);
+			}
+
+			if (profile == GNUTLS_PROFILE_SUITEB192) {
+				if (curve != GNUTLS_ECC_CURVE_SECP384R1) {
+					_gnutls_debug_log("SUITEB192: certificate does not use SECP384R1\n");
+					return gnutls_assert_val(0);
+				}
+			}
+
+			break;
+		}
+	}
+
+	return 1;
+}
+
 /* 
  * Verifies the given certificate again a certificate list of
  * trusted CAs.
@@ -485,21 +620,13 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	}
 	sigalg = result;
 
-	hash_algo = gnutls_sign_get_hash_algorithm(sigalg);
-
-	result =
-	    _gnutls_x509_verify_data(mac_to_entry(hash_algo),
-				     &cert_signed_data, &cert_signature,
-				     issuer);
-	if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
-		gnutls_assert();
-		out |= GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE;
-		/* error. ignore it */
+	if (is_level_acceptable(cert, issuer, sigalg, flags) == 0) {
+		out =
+		    GNUTLS_CERT_INSECURE_ALGORITHM |
+		    GNUTLS_CERT_INVALID;
 		if (output)
 			*output |= out;
 		result = 0;
-	} else if (result < 0) {
-		gnutls_assert();
 		goto cleanup;
 	}
 
@@ -516,6 +643,25 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 		if (output)
 			*output |= out;
 		result = 0;
+		goto cleanup;
+	}
+
+	hash_algo = gnutls_sign_get_hash_algorithm(sigalg);
+
+	result =
+	    _gnutls_x509_verify_data(mac_to_entry(hash_algo),
+				     &cert_signed_data, &cert_signature,
+				     issuer);
+	if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
+		gnutls_assert();
+		out |= GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE;
+		/* error. ignore it */
+		if (output)
+			*output |= out;
+		result = 0;
+	} else if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
 
 	/* Check activation/expiration times

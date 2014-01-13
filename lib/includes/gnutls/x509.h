@@ -750,6 +750,44 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN = 1 << 11,
 } gnutls_certificate_verify_flags;
 
+/**
+ * gnutls_certificate_verification_profiles:
+ * @GNUTLS_PROFILE_LOW: A verification profile that
+ *  corresponds to @GNUTLS_SEC_PARAM_LOW (80 bits)
+ * @GNUTLS_PROFILE_LEGACY: A verification profile that
+ *  corresponds to @GNUTLS_SEC_PARAM_LEGACY (96 bits)
+ * @GNUTLS_PROFILE_NORMAL: A verification profile that
+ *  corresponds to @GNUTLS_SEC_PARAM_NORMAL (112 bits)
+ * @GNUTLS_PROFILE_HIGH: A verification profile that
+ *  corresponds to @GNUTLS_SEC_PARAM_HIGH (128 bits)
+ * @GNUTLS_PROFILE_ULTRA: A verification profile that
+ *  corresponds to @GNUTLS_SEC_PARAM_ULTRA (256 bits)
+ * @GNUTLS_PROFILE_SUITEB128: A verification profile that
+ *  applies the SUITEB128 rules
+ * @GNUTLS_PROFILE_SUITEB192: A verification profile that
+ *  applies the SUITEB192 rules
+ *
+ * Enumeration of different certificate verification profiles.
+ */
+typedef enum gnutls_certificate_verification_profiles {
+	GNUTLS_PROFILE_LOW = 2,
+	GNUTLS_PROFILE_LEGACY = 4,
+	GNUTLS_PROFILE_NORMAL = 5,
+	GNUTLS_PROFILE_HIGH = 6,
+	GNUTLS_PROFILE_ULTRA = 7,
+	
+	GNUTLS_PROFILE_SUITEB128=32,
+	GNUTLS_PROFILE_SUITEB192=33,
+	/*GNUTLS_PROFILE_MAX=255*/
+} gnutls_certificate_verification_profiles_t;
+
+#define GNUTLS_PROFILE_TO_VFLAGS(x) \
+	(((unsigned)x)<<24)
+
+#define GNUTLS_VFLAGS_TO_PROFILE(x) \
+	((((unsigned)x)>>24)&0xff)
+
+
 int gnutls_x509_crt_check_issuer(gnutls_x509_crt_t cert,
 				 gnutls_x509_crt_t issuer);
 
