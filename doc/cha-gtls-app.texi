@@ -1197,7 +1197,7 @@ authentication.
 @item 112
 @tab 2048
 @tab 224
-@tab @code{Medium}
+@tab @code{MEDIUM}
 @tab Medium-term protection
 
 @item 128
