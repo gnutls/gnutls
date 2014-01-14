@@ -936,6 +936,8 @@ size_t n, n2;
 
 		ret = p;
 		goto finish;
+	} else {
+		return strdup(p);
 	}
 
 apply_backup:
