@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
 	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_set_default_priority(client);
+	gnutls_priority_set_direct(client, "NORMAL", NULL);
 
 	/* Test setting the same credential type twice.  Earlier GnuTLS had
 	   a bug that crashed when this happened. */

@@ -213,7 +213,7 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_set_default_priority(session);
+	gnutls_priority_set_direct(session, "NORMAL", NULL);
 
 	/* put the x509 credentials to the current session
 	 */
@@ -380,7 +380,7 @@ char buffer[MAX_BUF + 1];
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_set_default_priority(session);
+	gnutls_priority_set_direct(session, "NORMAL", NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
