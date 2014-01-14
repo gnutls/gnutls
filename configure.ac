@@ -346,6 +346,15 @@ fi
 AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
   ["$unbound_root_key_file"], [The DNSSEC root key file])
 
+AC_ARG_WITH(system-priority-file, AS_HELP_STRING([--with-system-priority-file],
+                                 [specify the system priority file]),
+            system_priority_file="$withval", 
+system_priority_file="/etc/gnutls/default-priority"
+)
+
+AC_DEFINE_UNQUOTED([SYSTEM_PRIORITY_FILE],
+  ["$system_priority_file"], [The system priority file])
+
 dnl Check for p11-kit
 P11_KIT_MINIMUM=0.19.1
 AC_ARG_WITH(p11-kit,
@@ -807,6 +816,7 @@ AC_MSG_NOTICE([System files:
   Trust store file:     $with_default_trust_store_file
   Blacklist file:       $with_default_blacklist_file
   CRL file:             $with_default_crl_file
+  Priority file:        $system_priority_file
   DNSSEC root key file: $unbound_root_key_file
 ])
 

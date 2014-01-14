@@ -28,6 +28,7 @@
 #include "gnutls_errors.h"
 #include <gnutls_num.h>
 #include <gnutls/x509.h>
+#include <c-ctype.h>
 
 static void
 break_comma_list(char *etag,
@@ -869,6 +870,79 @@ static void enable_new_padding(gnutls_priority_t c)
 
 #include <priority_options.h>
 
+/* Returns the new priorities if SYSTEM is specified in
+ * an allocated string, or just a copy of the provided
+ * priorities.
+ */
+static char* resolve_priorities(const char* priorities)
+{
+char *p = (char*)priorities;
+char* backup;
+char *ret = NULL;
+FILE* fp = NULL;
+size_t n;
+
+	if (c_isspace(*p))
+		p++;
+
+	backup = p;
+
+	if (strncasecmp(p, "SYSTEM", 6) == 0) {
+		backup = p + 6;
+		if (*backup == ':') backup++;
+
+		fp = fopen(SYSTEM_PRIORITY_FILE, "r");
+		if (fp == NULL) {/* use backup */
+			goto apply_backup;
+		}
+
+		fseek(fp, 0, SEEK_END);
+		n = ftell(fp);
+		fseek(fp, 0, SEEK_SET);
+
+		if (n == 0) {
+			goto apply_backup;
+		}
+
+		p = gnutls_malloc(n+1);
+		if (p == NULL) {
+			ret = NULL;
+			goto finish;
+		}
+
+		if (fgets(p, n, fp) == NULL) {
+			gnutls_free(p);
+			goto apply_backup;
+		}
+
+		n = strlen(p);
+
+		if (n > 1 && p[n-1] == '\n') {
+			n--;
+			p[n] = 0;
+		}
+		if (n > 1 && p[n-1] == '\r') {
+			n--;
+			p[n] = 0;
+		}
+
+		ret = p;
+		goto finish;
+	}
+
+apply_backup:
+	ret = gnutls_strdup(backup);
+
+finish:
+	if (ret != NULL) {
+		_gnutls_debug_log("selected priority string: %s\n", ret);
+	}
+	if (fp != NULL)
+		fclose(fp);
+
+	return ret;
+}
+
 /**
  * gnutls_priority_init:
  * @priority_cache: is a #gnutls_prioritity_t structure.
@@ -883,8 +957,12 @@ static void enable_new_padding(gnutls_priority_t c)
  * Some keywords are defined to provide quick access
  * to common preferences.
  *
- * Unless there is a special need, using "NORMAL" or "NORMAL:%COMPAT" for compatibility 
- * is recommended.
+ * Unless there is a special need, using "SYSTEM:NORMAL" or "SYSTEM:NORMAL:%COMPAT" 
+ * for compatibility is recommended.
+ *
+ * "SYSTEM" The system administrator imposed settings. If followed with
+ * an additional level, it will be used as backup when there are no
+ * settings available in the system.
  *
  * "PERFORMANCE" means all the "secure" ciphersuites are enabled,
  * limited to 128 bit ciphers and sorted by terms of speed
@@ -970,13 +1048,12 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	(*priority_cache)->sr = SR_PARTIAL;
 	(*priority_cache)->ssl3_record_version = 1;
 
-
 	(*priority_cache)->max_empty_records = DEFAULT_MAX_EMPTY_RECORDS;
 
 	if (priorities == NULL)
-		priorities = LEVEL_NORMAL;
+		priorities = "SYSTEM:"LEVEL_NORMAL;
 
-	darg = gnutls_strdup(priorities);
+	darg = resolve_priorities(priorities);
 	if (darg == NULL) {
 		gnutls_assert();
 		goto error;
@@ -1286,7 +1363,7 @@ break_comma_list(char *etag,
  **/
 int gnutls_set_default_priority(gnutls_session_t session)
 {
-	return gnutls_priority_set_direct(session, "NORMAL", NULL);
+	return gnutls_priority_set_direct(session, NULL, NULL);
 }
 
 /**

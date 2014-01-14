@@ -891,6 +891,12 @@ additional algorithm or special keywords.
 @float Table,tab:prio-keywords
 @multitable @columnfractions .20 .70
 @headitem Keyword @tab Description
+@item SYSTEM @tab
+Means that a compile-time specified configuration file will be used
+to read the priorities. That is used to impose system-specific policies.
+It may be followed by a priority string that will be used as backup, e.g.,
+"SYSTEM:NORMAL".
+
 @item PERFORMANCE @tab
 All the known to be secure ciphersuites are enabled,
 limited to 128 bit ciphers and sorted by terms of speed
@@ -1117,7 +1123,7 @@ will disable CRL or OCSP checks in the verification of the certificate chain.
 @item %VERIFY_ALLOW_X509_V1_CA_CRT @tab
 will allow V1 CAs in chains.
 
-@item %PROFILE_(LOW|LEGACY|NORMAL|HIGH|ULTRA) @tab
+@item %PROFILE_(LOW|LEGACY|MEDIUM|HIGH|ULTRA) @tab
 require a certificate verification profile the corresponds to the provided
 security level.
 
@@ -1137,7 +1143,7 @@ or by using the priority functions as in @ref{Listing the ciphersuites in a prio
 Example priority strings are:
 @example
 The default priority without the HMAC-MD5:
-    "NORMAL:-MD5"
+    "SYSTEM:NORMAL:-MD5"
 
 Specifying RSA with AES-128-CBC:
     "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"

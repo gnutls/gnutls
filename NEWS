@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 3.3.0 (unreleased)
 
+** libgnutls: Added the SYSTEM priority string initial keyword.
+That allows a compile-time specified configuration file to be
+used to read the priorities. That can be used to impose system
+specific policies.
+
 ** libgnutls: Security parameter SEC_PARAM_NORMAL was renamed to 
 SEC_PARAM_MEDIUM to avoid confusion with the priority string NORMAL.
 
