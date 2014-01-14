@@ -82,6 +82,21 @@ gnutls_sec_param_t p;
 		return 1;
 	}
 
+	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH, 1024);
+#ifdef ENABLE_FIPS140
+	if (p != GNUTLS_SEC_PARAM_LEGACY) {
+#else
+	if (p != GNUTLS_SEC_PARAM_LOW) {
+#endif
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		return 1;
+	}
+
+	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_DH, 2048);
+	if (p != GNUTLS_SEC_PARAM_MEDIUM) {
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		return 1;
+	}
 
 	gnutls_global_deinit();
 
