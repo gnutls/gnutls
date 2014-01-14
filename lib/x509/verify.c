@@ -627,7 +627,6 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 		if (output)
 			*output |= out;
 		result = 0;
-		goto cleanup;
 	}
 
 	/* If the certificate is not self signed check if the algorithms
@@ -643,7 +642,6 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 		if (output)
 			*output |= out;
 		result = 0;
-		goto cleanup;
 	}
 
 	hash_algo = gnutls_sign_get_hash_algorithm(sigalg);
