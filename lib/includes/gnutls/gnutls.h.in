@@ -701,7 +701,7 @@ typedef enum {
  * @GNUTLS_SEC_PARAM_WEAK: 72 bits of security
  * @GNUTLS_SEC_PARAM_LOW: 80 bits of security
  * @GNUTLS_SEC_PARAM_LEGACY: 96 bits of security
- * @GNUTLS_SEC_PARAM_NORMAL: 112 bits of security
+ * @GNUTLS_SEC_PARAM_MEDIUM: 112 bits of security (used to be %GNUTLS_SEC_PARAM_NORMAL)
  * @GNUTLS_SEC_PARAM_HIGH: 128 bits of security
  * @GNUTLS_SEC_PARAM_ULTRA: 192 bits of security
  *
@@ -715,10 +715,13 @@ typedef enum {
 	GNUTLS_SEC_PARAM_UNKNOWN = 0,
 	GNUTLS_SEC_PARAM_LOW = 1,
 	GNUTLS_SEC_PARAM_LEGACY = 2,
-	GNUTLS_SEC_PARAM_NORMAL = 3,
+	GNUTLS_SEC_PARAM_MEDIUM = 3,
 	GNUTLS_SEC_PARAM_HIGH = 4,
 	GNUTLS_SEC_PARAM_ULTRA = 5,
 } gnutls_sec_param_t;
+
+/* old name */
+#define GNUTLS_SEC_PARAM_NORMAL GNUTLS_SEC_PARAM_MEDIUM
 
 /**
  * gnutls_channel_binding_t:

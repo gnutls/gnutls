@@ -780,36 +780,43 @@ static void enable_profile_low(gnutls_priority_t c)
 {
 	c->additional_verify_flags &= 0x00ffffff;
 	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LOW);
+	c->level = GNUTLS_SEC_PARAM_LOW;
 }
 static void enable_profile_legacy(gnutls_priority_t c)
 {
 	c->additional_verify_flags &= 0x00ffffff;
 	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LEGACY);
+	c->level = GNUTLS_SEC_PARAM_LEGACY;
 }
 static void enable_profile_high(gnutls_priority_t c)
 {
 	c->additional_verify_flags &= 0x00ffffff;
 	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_HIGH);
+	c->level = GNUTLS_SEC_PARAM_HIGH;
 }
 static void enable_profile_ultra(gnutls_priority_t c)
 {
 	c->additional_verify_flags &= 0x00ffffff;
 	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA);
+	c->level = GNUTLS_SEC_PARAM_ULTRA;
 }
-static void enable_profile_normal(gnutls_priority_t c)
+static void enable_profile_medium(gnutls_priority_t c)
 {
 	c->additional_verify_flags &= 0x00ffffff;
-	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_NORMAL);
+	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_MEDIUM);
+	c->level = GNUTLS_SEC_PARAM_MEDIUM;
 }
 static void enable_profile_suiteb128(gnutls_priority_t c)
 {
 	c->additional_verify_flags &= 0x00ffffff;
 	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB128);
+	c->level = GNUTLS_SEC_PARAM_HIGH;
 }
 static void enable_profile_suiteb192(gnutls_priority_t c)
 {
 	c->additional_verify_flags &= 0x00ffffff;
 	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB192);
+	c->level = GNUTLS_SEC_PARAM_ULTRA;
 }
 static void enable_safe_renegotiation(gnutls_priority_t c)
 {

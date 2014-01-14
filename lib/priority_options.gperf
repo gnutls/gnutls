@@ -22,7 +22,7 @@ DISABLE_SAFE_RENEGOTIATION, disable_safe_renegotiation
 SERVER_PRECEDENCE, enable_server_precedence
 PROFILE_LOW, enable_profile_low
 PROFILE_LEGACY, enable_profile_legacy
-PROFILE_NORMAL, enable_profile_normal
+PROFILE_MEDIUM, enable_profile_medium
 PROFILE_HIGH, enable_profile_high
 PROFILE_ULTRA, enable_profile_ultra
 PROFILE_SUITEB128, enable_profile_suiteb128
