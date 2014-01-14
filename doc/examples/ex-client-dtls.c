@@ -48,7 +48,7 @@ int main(void)
         gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 
         /* Use default priorities */
-        ret = gnutls_priority_set_direct(session, "NORMAL", &err);
+        ret = gnutls_priority_set_direct(session, "SYSTEM", &err);
         if (ret < 0) {
                 if (ret == GNUTLS_E_INVALID_REQUEST) {
                         fprintf(stderr, "Syntax error at: %s\n", err);

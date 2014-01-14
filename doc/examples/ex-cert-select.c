@@ -103,7 +103,7 @@ int main(void)
         gnutls_certificate_allocate_credentials(&xcred);
 
         /* priorities */
-        gnutls_priority_init(&priorities_cache, "NORMAL", NULL);
+        gnutls_priority_init(&priorities_cache, "SYSTEM", NULL);
 
 
         /* sets the trusted cas file

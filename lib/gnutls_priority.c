@@ -872,24 +872,25 @@ static void enable_new_padding(gnutls_priority_t c)
 
 /* Returns the new priorities if SYSTEM is specified in
  * an allocated string, or just a copy of the provided
- * priorities.
+ * priorities, appended with any additional present in
+ * the priorities string.
+ *
+ * The returned string must be released using free().
  */
 static char* resolve_priorities(const char* priorities)
 {
 char *p = (char*)priorities;
-char* backup;
+char* additional = NULL;
 char *ret = NULL;
 FILE* fp = NULL;
-size_t n;
+size_t n, n2;
 
 	if (c_isspace(*p))
 		p++;
 
-	backup = p;
-
 	if (strncasecmp(p, "SYSTEM", 6) == 0) {
-		backup = p + 6;
-		if (*backup == ':') backup++;
+		additional = p + 6;
+		if (*additional == ':') additional++;
 
 		fp = fopen(SYSTEM_PRIORITY_FILE, "r");
 		if (fp == NULL) {/* use backup */
@@ -904,7 +905,9 @@ size_t n;
 			goto apply_backup;
 		}
 
-		p = gnutls_malloc(n+1);
+		n2 = strlen(additional);
+
+		p = malloc(n+n2+1+1);
 		if (p == NULL) {
 			ret = NULL;
 			goto finish;
@@ -925,13 +928,22 @@ size_t n;
 			n--;
 			p[n] = 0;
 		}
+		if (n2 > 0) {
+			p[n] = ':';
+			memcpy(&p[n+1], additional, n2);
+			p[n+n2+1] = 0;
+		}
 
 		ret = p;
 		goto finish;
 	}
 
 apply_backup:
-	ret = gnutls_strdup(backup);
+	if (additional != NULL) {
+		n = asprintf(&ret, "NORMAL:%s", additional);
+	} else {
+		ret = strdup("NORMAL");
+	}
 
 finish:
 	if (ret != NULL) {
@@ -957,12 +969,14 @@ finish:
  * Some keywords are defined to provide quick access
  * to common preferences.
  *
- * Unless there is a special need, using "SYSTEM:NORMAL" or "SYSTEM:NORMAL:%COMPAT" 
- * for compatibility is recommended.
+ * Unless there is a special need, using "SYSTEM" would be the ideal choice
+ * for daemons or services that want to use the system-imposed level,
+ * "NORMAL" for a typical server that requires a reasonable security level,
+ * or even "NORMAL:%COMPAT" for compatibility.
  *
- * "SYSTEM" The system administrator imposed settings. If followed with
- * an additional level, it will be used as backup when there are no
- * settings available in the system.
+ * "SYSTEM" The system administrator imposed settings. Any options that follow
+ * will be appended to the system string. If there is no system string,
+ * then NORMAL will be used instead.
  *
  * "PERFORMANCE" means all the "secure" ciphersuites are enabled,
  * limited to 128 bit ciphers and sorted by terms of speed
@@ -1051,7 +1065,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	(*priority_cache)->max_empty_records = DEFAULT_MAX_EMPTY_RECORDS;
 
 	if (priorities == NULL)
-		priorities = "SYSTEM:"LEVEL_NORMAL;
+		priorities = "SYSTEM";
 
 	darg = resolve_priorities(priorities);
 	if (darg == NULL) {
@@ -1243,7 +1257,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			goto error;
 	}
 
-	gnutls_free(darg);
+	free(darg);
 	return 0;
 
       error:
@@ -1253,7 +1267,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			(*err_pos) += strlen(broken_list[j]) + 1;
 		}
 	}
-	gnutls_free(darg);
+	free(darg);
 	gnutls_free(*priority_cache);
 
 	return GNUTLS_E_INVALID_REQUEST;

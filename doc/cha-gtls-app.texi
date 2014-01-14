@@ -894,8 +894,10 @@ additional algorithm or special keywords.
 @item SYSTEM @tab
 Means that a compile-time specified configuration file will be used
 to read the priorities. That is used to impose system-specific policies.
-It may be followed by a priority string that will be used as backup, e.g.,
-"SYSTEM:NORMAL".
+It may be followed by additional options that will be appended to the
+system string (e.g., "SYSTEM:+SRP"). If there is no available system priority
+string then the default acceptable security level by GnuTLS will be
+set (i.e., NORMAL).
 
 @item PERFORMANCE @tab
 All the known to be secure ciphersuites are enabled,
@@ -1142,8 +1144,11 @@ or by using the priority functions as in @ref{Listing the ciphersuites in a prio
 
 Example priority strings are:
 @example
+The system imposed security level:
+    "SYSTEM"
+
 The default priority without the HMAC-MD5:
-    "SYSTEM:NORMAL:-MD5"
+    "NORMAL:-MD5"
 
 Specifying RSA with AES-128-CBC:
     "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"

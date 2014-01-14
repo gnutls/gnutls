@@ -85,7 +85,7 @@ int main(void)
         for (;;) {
                 gnutls_init(&session, GNUTLS_SERVER);
                 gnutls_priority_set_direct(session,
-                                           "NORMAL:-KX-ALL:+SRP:+SRP-DSS:+SRP-RSA",
+                                           "SYSTEM:-KX-ALL:+SRP:+SRP-DSS:+SRP-RSA",
                                            NULL);
                 gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
                 /* for the certificate authenticated ciphersuites.

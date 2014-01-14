@@ -51,7 +51,7 @@ int main(void)
         /* Set the priorities.
          */
         gnutls_priority_set_direct(session,
-                                   "NORMAL:+SRP:+SRP-RSA:+SRP-DSS", NULL);
+                                   "SYSTEM:+SRP:+SRP-RSA:+SRP-DSS", NULL);
 
         /* put the SRP credentials to the current session
          */

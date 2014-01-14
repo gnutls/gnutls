@@ -103,7 +103,7 @@ int main(void)
         for (;;) {
                 gnutls_init(&session, GNUTLS_SERVER);
                 gnutls_priority_set_direct(session,
-                                           "NORMAL:+CTYPE-OPENPGP", NULL);
+                                           "SYSTEM:+CTYPE-OPENPGP", NULL);
 
                 /* request client certificate if any.
                  */
