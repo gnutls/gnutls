@@ -214,16 +214,6 @@
 {
    nettle memxor3
    Memcheck:Addr8
+   obj:*
    fun:memxor3
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   fun:nettle_gcm_encrypt
-   fun:nettle_gcm_aes_encrypt
-   fun:wrap_nettle_cipher_encrypt
 }
