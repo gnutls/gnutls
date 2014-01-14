@@ -37,7 +37,7 @@ int main(void)
          */
         bits =
             gnutls_sec_param_to_pk_bits(GNUTLS_PK_RSA,
-                                        GNUTLS_SEC_PARAM_NORMAL);
+                                        GNUTLS_SEC_PARAM_MEDIUM);
         gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, bits, 0);
 
         /* Add stuff to the distinguished name

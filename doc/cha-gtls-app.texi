@@ -1183,10 +1183,10 @@ authentication.
 @tab Short term protection against small organizations
 
 @item 80
-@tab 1248
+@tab 1024
 @tab 160
 @tab @code{LOW}
-@tab Very short term protection against agencies
+@tab Very short term protection against agencies (corresponds to ENISA legacy level)
 
 @item 96
 @tab 1776
@@ -1195,13 +1195,13 @@ authentication.
 @tab Legacy standard level
 
 @item 112
-@tab 2432
+@tab 2048
 @tab 224
-@tab @code{NORMAL}
+@tab @code{Medium}
 @tab Medium-term protection
 
 @item 128
-@tab 3248
+@tab 3072
 @tab 256
 @tab @code{HIGH}
 @tab Long term protection
