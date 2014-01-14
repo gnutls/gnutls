@@ -36,7 +36,7 @@
 #define MAX_TRIES 2
 
 static int sec_param[MAX_TRIES] =
-    { GNUTLS_SEC_PARAM_LOW, GNUTLS_SEC_PARAM_NORMAL };
+    { GNUTLS_SEC_PARAM_LOW, GNUTLS_SEC_PARAM_MEDIUM };
 
 static void tls_log_func(int level, const char *str)
 {
