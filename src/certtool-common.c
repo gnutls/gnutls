@@ -632,7 +632,7 @@ get_bits(gnutls_pk_algorithm_t key_type, int info_bits,
 		} else
 			bits =
 			    gnutls_sec_param_to_pk_bits(key_type,
-							GNUTLS_SEC_PARAM_NORMAL);
+							GNUTLS_SEC_PARAM_MEDIUM);
 	}
 
 	return bits;
@@ -644,8 +644,8 @@ gnutls_sec_param_t str_to_sec_param(const char *str)
 		return GNUTLS_SEC_PARAM_LOW;
 	} else if (strcasecmp(str, "legacy") == 0) {
 		return GNUTLS_SEC_PARAM_LEGACY;
-	} else if (strcasecmp(str, "normal") == 0) {
-		return GNUTLS_SEC_PARAM_NORMAL;
+	} else if (strcasecmp(str, "normal") == 0 || strcasecmp(str, "medium")) {
+		return GNUTLS_SEC_PARAM_MEDIUM;
 	} else if (strcasecmp(str, "high") == 0) {
 		return GNUTLS_SEC_PARAM_HIGH;
 	} else if (strcasecmp(str, "ultra") == 0) {

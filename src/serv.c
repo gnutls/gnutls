@@ -170,7 +170,7 @@ static int generate_dh_primes(void)
 {
 	int prime_bits =
 	    gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH,
-					GNUTLS_SEC_PARAM_NORMAL);
+					GNUTLS_SEC_PARAM_MEDIUM);
 
 	if (gnutls_dh_params_init(&dh_params) < 0) {
 		fprintf(stderr, "Error in dh parameter initialization\n");

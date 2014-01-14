@@ -5,8 +5,8 @@ See the end for copying conditions.
 
 * Version 3.3.0 (unreleased)
 
-** libgnutls: Security parameter NORMAL was renamed to MEDIUM
-to avoid confusion with the priority string NORMAL.
+** libgnutls: Security parameter SEC_PARAM_NORMAL was renamed to 
+SEC_PARAM_MEDIUM to avoid confusion with the priority string NORMAL.
 
 ** libgnutls: certificate verification profiles were introduced
 that can be specified as flags to verification functions. They
