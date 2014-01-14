@@ -19,6 +19,12 @@
 #include <fcntl.h>
 #include <getpass.h>            /* for getpass() */
 
+#if GNUTLS_VERSION_NUMBER >= 0x030300
+# define DEFAULT_PRIORITY "SYSTEM"
+#else
+# define DEFAULT_PRIORITY "NORMAL"
+#endif
+
 /* A TLS client that loads the certificate and key.
  */
 
@@ -79,6 +85,11 @@ int main(void)
         /* Allow connections to servers that have OpenPGP keys as well.
          */
 
+        if (gnutls_check_version("3.1.4") == NULL) {
+                fprintf(stderr, "GnuTLS 3.1.4 is required for this example\n");
+                exit(1);
+        }
+
         gnutls_global_init();
         /* PKCS11 private key operations might require PIN.
          * Register a callback.
@@ -89,7 +100,7 @@ int main(void)
         gnutls_certificate_allocate_credentials(&xcred);
 
         /* priorities */
-        gnutls_priority_init(&priorities_cache, "SYSTEM", NULL);
+        gnutls_priority_init(&priorities_cache, DEFAULT_PRIORITY, NULL);
 
         /* sets the trusted cas file
          */

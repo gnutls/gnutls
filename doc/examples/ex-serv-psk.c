@@ -15,6 +15,12 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
+#if GNUTLS_VERSION_NUMBER >= 0x030300
+# define DEFAULT_PRIORITY "SYSTEM"
+#else
+# define DEFAULT_PRIORITY "NORMAL"
+#endif
+
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
@@ -78,8 +84,11 @@ int main(void)
         int optval = 1;
         int kx;
 
-        /* this must be called once in the program
-         */
+        if (gnutls_check_version("3.1.4") == NULL) {
+                fprintf(stderr, "GnuTLS 3.1.4 is required for this example\n");
+                exit(1);
+        }
+
         gnutls_global_init();
 
         gnutls_certificate_allocate_credentials(&x509_cred);
@@ -98,7 +107,8 @@ int main(void)
         generate_dh_params();
 
         gnutls_priority_init(&priority_cache,
-                             "SYSTEM:+PSK:+ECDHE-PSK:+DHE-PSK", NULL);
+                             DEFAULT_PRIORITY":+PSK:+ECDHE-PSK:+DHE-PSK",
+                             NULL);
 
         gnutls_certificate_set_dh_params(x509_cred, dh_params);
 

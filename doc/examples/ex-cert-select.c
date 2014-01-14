@@ -28,6 +28,12 @@
 #define KEY_FILE "key.pem"
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 
+#if GNUTLS_VERSION_NUMBER >= 0x030300
+# define DEFAULT_PRIORITY "SYSTEM"
+#else
+# define DEFAULT_PRIORITY "NORMAL"
+#endif
+
 extern int tcp_connect(void);
 extern void tcp_close(int sd);
 
@@ -92,8 +98,11 @@ int main(void)
         gnutls_priority_t priorities_cache;
         char buffer[MAX_BUF + 1];
         gnutls_certificate_credentials_t xcred;
-        /* Allow connections to servers that have OpenPGP keys as well.
-         */
+        
+        if (gnutls_check_version("3.1.4") == NULL) {
+                fprintf(stderr, "GnuTLS 3.1.4 is required for this example\n");
+                exit(1);
+        }
 
         gnutls_global_init();
 
@@ -103,8 +112,7 @@ int main(void)
         gnutls_certificate_allocate_credentials(&xcred);
 
         /* priorities */
-        gnutls_priority_init(&priorities_cache, "SYSTEM", NULL);
-
+        gnutls_priority_init(&priorities_cache, DEFAULT_PRIORITY, NULL);
 
         /* sets the trusted cas file
          */

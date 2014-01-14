@@ -15,6 +15,12 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
+#if GNUTLS_VERSION_NUMBER >= 0x030300
+# define DEFAULT_PRIORITY "SYSTEM"
+#else
+# define DEFAULT_PRIORITY "NORMAL"
+#endif
+
 #define SRP_PASSWD "tpasswd"
 #define SRP_PASSWD_CONF "tpasswd.conf"
 
@@ -45,6 +51,11 @@ int main(void)
         char name[256];
 
         strcpy(name, "Echo Server");
+
+        if (gnutls_check_version("3.1.4") == NULL) {
+                fprintf(stderr, "GnuTLS 3.1.4 is required for this example\n");
+                exit(1);
+        }
 
         gnutls_global_init();
 
@@ -85,7 +96,8 @@ int main(void)
         for (;;) {
                 gnutls_init(&session, GNUTLS_SERVER);
                 gnutls_priority_set_direct(session,
-                                           "SYSTEM:-KX-ALL:+SRP:+SRP-DSS:+SRP-RSA",
+                                           DEFAULT_PRIORITY
+                                           ":-KX-ALL:+SRP:+SRP-DSS:+SRP-RSA",
                                            NULL);
                 gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
                 /* for the certificate authenticated ciphersuites.

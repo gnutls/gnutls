@@ -16,6 +16,12 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/openpgp.h>
 
+#if GNUTLS_VERSION_NUMBER >= 0x030300
+# define DEFAULT_PRIORITY "SYSTEM"
+#else
+# define DEFAULT_PRIORITY "NORMAL"
+#endif
+
 #define KEYFILE "secret.asc"
 #define CERTFILE "public.asc"
 #define RINGFILE "ring.gpg"
@@ -63,8 +69,11 @@ int main(void)
 
         strcpy(name, "Echo Server");
 
-        /* this must be called once in the program
-         */
+        if (gnutls_check_version("3.1.4") == NULL) {
+                fprintf(stderr, "GnuTLS 3.1.4 is required for this example\n");
+                exit(1);
+        }
+
         gnutls_global_init();
 
         gnutls_certificate_allocate_credentials(&cred);
@@ -103,7 +112,7 @@ int main(void)
         for (;;) {
                 gnutls_init(&session, GNUTLS_SERVER);
                 gnutls_priority_set_direct(session,
-                                           "SYSTEM:+CTYPE-OPENPGP", NULL);
+                                           DEFAULT_PRIORITY":+CTYPE-OPENPGP", NULL);
 
                 /* request client certificate if any.
                  */
