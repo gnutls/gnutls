@@ -156,7 +156,6 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
 		       gnutls_x509_crt_t ca)
 {
 	gnutls_datum_t tmp;
-	int ret;
 	size_t newsize;
 	unsigned char *newdata, *p;
 
@@ -172,15 +171,12 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
 	 * Further, this function is now much more efficient,
 	 * so optimizing that is less important.
 	 */
-	if ((ret = gnutls_x509_crt_get_raw_dn(ca, &tmp)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	tmp.data = ca->raw_dn.data;
+	tmp.size = ca->raw_dn.size;
 
 	newsize = list->x509_rdn_sequence.size + 2 + tmp.size;
 	if (newsize < list->x509_rdn_sequence.size) {
 		gnutls_assert();
-		_gnutls_free_datum(&tmp);
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
@@ -189,7 +185,6 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
 				newsize);
 	if (newdata == NULL) {
 		gnutls_assert();
-		_gnutls_free_datum(&tmp);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -197,8 +192,6 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
 	_gnutls_write_uint16(tmp.size, p);
 	if (tmp.data != NULL)
 		memcpy(p + 2, tmp.data, tmp.size);
-
-	_gnutls_free_datum(&tmp);
 
 	list->x509_rdn_sequence.size = newsize;
 	list->x509_rdn_sequence.data = newdata;
