@@ -650,7 +650,6 @@ struct gnutls_priority_st {
 	safe_renegotiation_t sr;
 	bool ssl3_record_version;
 	bool server_precedence;
-	bool allow_weak_keys;
 	bool allow_wrong_pms;
 	/* Whether stateless compression will be used */
 	bool stateless_compression;
@@ -672,7 +671,6 @@ struct gnutls_priority_st {
 #define ENABLE_COMPAT(x) \
               (x)->allow_large_records = 1; \
               (x)->allow_wrong_pms = 1; \
-              (x)->allow_weak_keys = 1; \
               (x)->level = GNUTLS_SEC_PARAM_VERY_WEAK
 
 /* DH and RSA parameters types.
