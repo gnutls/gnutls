@@ -662,7 +662,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
 		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LEGACY);
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LOW);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_LOW;
 		return 1;
@@ -674,7 +674,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
 		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LEGACY);
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LOW);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_LOW;
 		return 1;
@@ -686,7 +686,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
 		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LEGACY);
+			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LOW);
 		if (priority_cache->level == 0)
 			priority_cache->level = GNUTLS_SEC_PARAM_LOW;
 		return 1;
