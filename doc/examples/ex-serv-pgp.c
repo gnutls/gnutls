@@ -16,9 +16,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/openpgp.h>
 
-#if GNUTLS_VERSION_NUMBER >= 0x030300
-# define DEFAULT_PRIORITY "SYSTEM"
-#else
+#if GNUTLS_VERSION_NUMBER < 0x030300
 # define DEFAULT_PRIORITY "NORMAL"
 #endif
 
@@ -112,7 +110,8 @@ int main(void)
         for (;;) {
                 gnutls_init(&session, GNUTLS_SERVER);
                 gnutls_priority_set_direct(session,
-                                           DEFAULT_PRIORITY":+CTYPE-OPENPGP", NULL);
+                                           GNUTLS_DEFAULT_PRIORITY
+                                           ":+CTYPE-OPENPGP", NULL);
 
                 /* request client certificate if any.
                  */

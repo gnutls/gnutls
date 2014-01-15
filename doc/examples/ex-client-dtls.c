@@ -14,10 +14,8 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
 
-#if GNUTLS_VERSION_NUMBER >= 0x030300
-# define DEFAULT_PRIORITY "SYSTEM"
-#else
-# define DEFAULT_PRIORITY "NORMAL"
+#if GNUTLS_VERSION_NUMBER < 0x030300
+# define GNUTLS_DEFAULT_PRIORITY "NORMAL"
 #endif
 
 /* A very basic Datagram TLS client, over UDP with X.509 authentication.
@@ -59,7 +57,8 @@ int main(void)
         gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 
         /* Use default priorities */
-        ret = gnutls_priority_set_direct(session, DEFAULT_PRIORITY, &err);
+        ret = gnutls_priority_set_direct(session, 
+                                         GNUTLS_DEFAULT_PRIORITY, &err);
         if (ret < 0) {
                 if (ret == GNUTLS_E_INVALID_REQUEST) {
                         fprintf(stderr, "Syntax error at: %s\n", err);

@@ -15,9 +15,7 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
-#if GNUTLS_VERSION_NUMBER >= 0x030300
-# define DEFAULT_PRIORITY "SYSTEM"
-#else
+#if GNUTLS_VERSION_NUMBER < 0x030300
 # define DEFAULT_PRIORITY "NORMAL"
 #endif
 
@@ -107,7 +105,8 @@ int main(void)
         generate_dh_params();
 
         gnutls_priority_init(&priority_cache,
-                             DEFAULT_PRIORITY":+PSK:+ECDHE-PSK:+DHE-PSK",
+                             GNUTLS_DEFAULT_PRIORITY
+                             ":+PSK:+ECDHE-PSK:+DHE-PSK",
                              NULL);
 
         gnutls_certificate_set_dh_params(x509_cred, dh_params);

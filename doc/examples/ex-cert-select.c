@@ -28,10 +28,8 @@
 #define KEY_FILE "key.pem"
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 
-#if GNUTLS_VERSION_NUMBER >= 0x030300
-# define DEFAULT_PRIORITY "SYSTEM"
-#else
-# define DEFAULT_PRIORITY "NORMAL"
+#if GNUTLS_VERSION_NUMBER < 0x030300
+# define GNUTLS_DEFAULT_PRIORITY "NORMAL"
 #endif
 
 extern int tcp_connect(void);
@@ -112,7 +110,8 @@ int main(void)
         gnutls_certificate_allocate_credentials(&xcred);
 
         /* priorities */
-        gnutls_priority_init(&priorities_cache, DEFAULT_PRIORITY, NULL);
+        gnutls_priority_init(&priorities_cache, 
+                             GNUTLS_DEFAULT_PRIORITY, NULL);
 
         /* sets the trusted cas file
          */

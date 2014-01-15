@@ -1078,6 +1078,8 @@ int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size);
 
 /* if you just want some defaults, use the following.
  */
+
+#define GNUTLS_DEFAULT_PRIORITY "SYSTEM"
 int gnutls_priority_init(gnutls_priority_t * priority_cache,
 			 const char *priorities, const char **err_pos);
 void gnutls_priority_deinit(gnutls_priority_t priority_cache);
