@@ -454,6 +454,8 @@ typedef struct cipher_entry_st {
 	bool aead;	/* Whether it is authenc cipher */
 } cipher_entry_st;
 
+/* This structure is used both for MACs and digests
+ */
 typedef struct mac_entry_st {
 	const char *name;
 	const char *oid;	/* OID of the hash - if it is a hash */
@@ -462,7 +464,7 @@ typedef struct mac_entry_st {
 	unsigned key_size;
 	unsigned nonce_size;
 	unsigned placeholder;	/* if set, then not a real MAC */
-	unsigned secure;	/* if set the this algorithm is secure as hash */
+	unsigned secure;	/* must be set to zero if this hash is known to be broken */
 	unsigned block_size;	/* internal block size for HMAC */
 } mac_entry_st;
 
