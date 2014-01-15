@@ -97,6 +97,32 @@ gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 	return ret;
 }
 
+/**
+ * gnutls_sec_param_to_symmetric_bits:
+ * @algo: is a public key algorithm
+ * @param: is a security parameter
+ *
+ * This function will return the number of bits that correspond to
+ * symmetric cipher strength for the given security parameter.
+ *
+ * Returns: The number of bits, or (0).
+ *
+ * Since: 3.3.0
+ **/
+unsigned int
+gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param)
+{
+	unsigned int ret = 0;
+
+	/* handle DSA differently */
+	GNUTLS_SEC_PARAM_LOOP(
+	if (p->sec_param == param) {
+		ret = p->bits; break;
+	}
+	);
+	return ret;
+}
+
 /* Returns the corresponding size for subgroup bits (q),
  * given the group bits (p).
  */

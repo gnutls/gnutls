@@ -802,6 +802,8 @@ gnutls_sec_param_t gnutls_pk_bits_to_sec_param(gnutls_pk_algorithm_t algo,
 const char *gnutls_sec_param_get_name(gnutls_sec_param_t param);
 unsigned int gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 					 gnutls_sec_param_t param);
+unsigned int
+gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param);
 
 /* Elliptic curves */
 const char *gnutls_ecc_curve_get_name(gnutls_ecc_curve_t curve);
