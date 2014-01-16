@@ -1548,7 +1548,7 @@ int ret;
  * Returns: the number of certificates processed or a negative error code
  * on error.
  *
- * Since: 3.0
+ * Since: 3.0.20
  **/
 int
 gnutls_certificate_set_x509_system_trust(gnutls_certificate_credentials_t
