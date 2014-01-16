@@ -2581,10 +2581,7 @@ int gnutls_handshake(gnutls_session_t session)
  * to the provided value. Use an @ms value of zero to disable
  * timeout.
  *
- * Note that in order for the timeout to be enforced
- * gnutls_transport_set_pull_timeout_function() must be set
- * (it is set by default in most systems).
- *
+ * Since: 3.1.0
  **/
 void
 gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
