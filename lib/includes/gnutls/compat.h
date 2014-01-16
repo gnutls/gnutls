@@ -391,6 +391,12 @@ static inline const void
 }
 #endif
 
+void
+gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
+				gnutls_alloc_function secure_alloc_func,
+				gnutls_is_secure_function is_secure_func,
+				gnutls_realloc_function realloc_func,
+				gnutls_free_function free_func) _GNUTLS_GCC_ATTR_DEPRECATED;
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

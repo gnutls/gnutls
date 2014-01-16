@@ -75,6 +75,7 @@ gnutls_digest_self_test: Added (conditionally)
 gnutls_mac_self_test: Added (conditionally)
 gnutls_pk_self_test: Added (conditionally)
 gnutls_cipher_self_test: Added (conditionally)
+gnutls_global_set_mem_functions: Deprecated
 
 
 * Version 3.2.6 (released 2013-10-31)

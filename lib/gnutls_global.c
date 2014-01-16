@@ -142,6 +142,9 @@ void gnutls_global_set_log_level(int level)
  * @realloc_func: A realloc function
  * @free_func: The function that frees allocated data. Must accept a NULL pointer.
  *
+ * Deprecated: since 3.3.0 it is no longer possible to replace the internally used 
+ *  memory allocation functions
+ *
  * This is the function where you set the memory allocation functions
  * gnutls is going to use. By default the libc's allocation functions
  * (malloc(), free()), are used by gnutls, to allocate both sensitive
@@ -158,26 +161,11 @@ gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
 				gnutls_realloc_function realloc_func,
 				gnutls_free_function free_func)
 {
-	gnutls_secure_malloc = secure_alloc_func;
-	gnutls_malloc = alloc_func;
-	gnutls_realloc = realloc_func;
-	gnutls_free = free_func;
-
-	/* if using the libc's default malloc
-	 * use libc's calloc as well.
-	 */
-	if (gnutls_malloc == malloc) {
-		gnutls_calloc = calloc;
-	} else {		/* use the included ones */
-		gnutls_calloc = _gnutls_calloc;
-	}
-	gnutls_strdup = _gnutls_strdup;
-
+	_gnutls_debug_log("called the deprecated gnutls_global_set_mem_functions()\n");
 }
 
 GNUTLS_STATIC_MUTEX(global_init_mutex);
 static int _gnutls_init = 0;
-static unsigned int loaded_modules = 0;
 
 /**
  * gnutls_global_init:
@@ -356,7 +344,6 @@ void gnutls_global_deinit(void)
 
 		gnutls_mutex_deinit(&_gnutls_file_mutex);
 		gnutls_mutex_deinit(&_gnutls_pkcs11_mutex);
-		loaded_modules = 0;
 	} else {
 		if (_gnutls_init > 0)
 			_gnutls_init--;
