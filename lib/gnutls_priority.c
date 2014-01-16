@@ -1079,6 +1079,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	}
 	gnutls_free(darg);
 	gnutls_free(*priority_cache);
+	*priority_cache = NULL;
 
 	return GNUTLS_E_INVALID_REQUEST;
 
