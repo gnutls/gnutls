@@ -210,12 +210,11 @@ static int selftest_kat(void)
 	return 0;
 }
 
-int crypto_rnd_prio = INT_MAX;
-
-gnutls_crypto_rnd_st _gnutls_rnd_ops = {
+gnutls_crypto_rnd_st _gnutls_fips_rnd_ops = {
 	.init = _rngfips_init,
 	.deinit = _rngfips_deinit,
 	.rnd = _rngfips_rnd,
 	.rnd_refresh = _rngfips_refresh,
 	.self_test = selftest_kat,
 };
+

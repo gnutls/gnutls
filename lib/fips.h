@@ -39,6 +39,7 @@ typedef enum {
 
 /* do not access directly */
 extern unsigned int _gnutls_lib_mode;
+extern gnutls_crypto_rnd_st _gnutls_fips_rnd_ops;
 
 inline static 
 void _gnutls_switch_lib_state(gnutls_lib_state_t state)

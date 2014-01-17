@@ -39,6 +39,19 @@ int _gnutls_rnd_init(void)
 		}
 	}
 
+#ifdef ENABLE_FIPS140
+	/* The FIPS140 random generator is only enabled when we are compiled
+	 * with FIPS support, _and_ the system requires FIPS140.
+	 */
+	if (_gnutls_fips_mode_enabled() == 1) {
+		int ret;
+
+		ret = gnutls_crypto_rnd_register(100, &_gnutls_fips_rnd_ops);
+		if (ret < 0)
+			return ret;
+	}
+#endif
+
 	return 0;
 }
 
