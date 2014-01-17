@@ -38,19 +38,17 @@
         ;                                       \
   } while (0)
 
-/* This is the AES-based random-number generator from ANSI X9.31 
- * Appendix A.2.4. Note that the DT value from the document is obtained
- * during seeding. Then it is used as an 128-bit counter which is
- * incremented on block encrypted in drbg_aes_random().
+#define DRBG_AES_KEY_SIZE 32
+#define DRBG_AES_SEED_SIZE (AES_BLOCK_SIZE+DRBG_AES_KEY_SIZE)
+
+/* This is the CTR-AES-256-based random-number generator from SP800-90A.
  */
 struct drbg_aes_ctx {
 	unsigned seeded;
-	/* The current key and counter block */
+	/* The current key */
 	struct aes_ctx key;
-	uint8_t v[AES_BLOCK_SIZE];
 
-	/* An initial value based on timestamp */
-	uint8_t dt[AES_BLOCK_SIZE];
+	uint8_t v[AES_BLOCK_SIZE];
 
 	unsigned prev_block_present;
 	uint8_t prev_block[AES_BLOCK_SIZE];
@@ -58,22 +56,23 @@ struct drbg_aes_ctx {
 };
 
 /* This DRBG should be reseeded if reseed_counter exceeds
- * that number.
+ * that number. Otherwise drbg_aes_random() will fail.
  */
 #define DRBG_AES_RESEED_TIME 65536
 
-typedef int (*aes_dt) (void *priv, uint8_t dt[AES_BLOCK_SIZE]);
-
-/* should return zero on error */
+/* The entropy provided in these functions should be of
+ * size DRBG_AES_SEED_SIZE. Additional data and pers.
+ * string may be <= DRBG_AES_SEED_SIZE.
+ */
 int
-drbg_aes_set_key(struct drbg_aes_ctx *ctx, unsigned length,
-		 const uint8_t * key);
+drbg_aes_init(struct drbg_aes_ctx *ctx, 
+	unsigned entropy_size, const uint8_t *entropy, 
+	unsigned pstring_size, const uint8_t* pstring);
 
-/* Set's V value */
-void
-drbg_aes_seed(struct drbg_aes_ctx *ctx,
-	      const uint8_t seed[AES_BLOCK_SIZE],
-	      void *dt_priv, aes_dt dt);
+int
+drbg_aes_reseed(struct drbg_aes_ctx *ctx, 
+	unsigned entropy_size, const uint8_t *entropy, 
+	unsigned add_size, const uint8_t* add);
 
 int
 drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length,

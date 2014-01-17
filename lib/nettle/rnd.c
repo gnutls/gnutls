@@ -195,11 +195,7 @@ static int wrap_nettle_rnd_init(void **ctx)
 	yarrow256_slow_reseed(&yctx);
 	
 	/* initialize the nonce RNG */
-	ret = drbg_generate_key(&nonce_ctx);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = drbg_reseed(&nonce_ctx);
+	ret = drbg_init(&nonce_ctx);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -244,10 +240,6 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	if (level == GNUTLS_RND_NONCE) {
 		if (reseed != 0) {
 			/* reseed nonce */
-			ret = drbg_generate_key(&nonce_ctx);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-
 			ret = drbg_reseed(&nonce_ctx);
 			if (ret < 0)
 				return gnutls_assert_val(ret);

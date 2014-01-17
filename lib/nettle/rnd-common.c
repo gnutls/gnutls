@@ -211,51 +211,11 @@ void _rnd_system_entropy_deinit(void)
 }
 #endif
 
-/* Get the DT vector for use with the core PRNG function. 
-
-   Buffer:       00112233445566778899AABBCCDDEEFF
-                 !--+---!!--+---!!--+---!!--+---!
-   seconds ---------/      |        |       |
-   nanoseconds ------------/        |       |
-                                    |       |
-   counter  ------------------------/       |
-   hash    --------------------------------/
-
-   hash is a hash of all the event values (including rusage when present,
-   and pid), and counter is a 32-bit running counter.
-   
-   The output number will be always unique if this function is called 
-   less than 2^32 times per nanosecond.
-    
-   This function is used to get an initial value for the DT of DRBG-AES
-   which is later being incremented.
-*/
-static int
-get_dt(void* priv, uint8_t dt[AES_BLOCK_SIZE])
+#define PSTRING "gnutls-rng"
+#define PSTRING_SIZE (sizeof(PSTRING)-1)
+int drbg_init(struct drbg_aes_ctx *ctx)
 {
-	struct event_st event;
-	uint32_t secs, usecs;
-	uint32_t v1, v2;
-
-	_rnd_get_event(&event);
-	secs = event.now.tv_sec;
-	usecs = event.now.tv_nsec;
-	/* v2 is a hash of all values including rusage -when present
-	 * and getpid(). */
-	v1 = event.count;
-	v2 = hash_pjw_bare(&event, sizeof(event));
-	
-	memcpy(dt, &secs, 4);
-	memcpy(dt+4, &usecs, 4);
-	memcpy(dt+8, &v1, 4);
-	memcpy(dt+12, &v2, 4);
-	
-	return 1;
-}
-
-int drbg_generate_key(struct drbg_aes_ctx *ctx)
-{
-	uint8_t buffer[FIPS140_RND_KEY_SIZE];
+	uint8_t buffer[DRBG_AES_SEED_SIZE];
 	int ret;
 
 	/* Get a key from the standard RNG or from the entropy source.  */
@@ -263,7 +223,7 @@ int drbg_generate_key(struct drbg_aes_ctx *ctx)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = drbg_aes_set_key(ctx, sizeof(buffer), buffer);
+	ret = drbg_aes_init(ctx, sizeof(buffer), buffer, PSTRING_SIZE, (void*)PSTRING);
 	if (ret == 0)
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
 
@@ -272,10 +232,10 @@ int drbg_generate_key(struct drbg_aes_ctx *ctx)
 	return 0;
 }
 
-/* Reseed a generator.  This is also used for the initial seeding. */
+/* Reseed a generator. */
 int drbg_reseed(struct drbg_aes_ctx *ctx)
 {
-	uint8_t buffer[AES_BLOCK_SIZE];
+	uint8_t buffer[DRBG_AES_SEED_SIZE];
 	int ret;
 
 	/* The other two generators are seeded from /dev/random.  */
@@ -283,7 +243,7 @@ int drbg_reseed(struct drbg_aes_ctx *ctx)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	drbg_aes_seed(ctx, buffer, NULL, get_dt);
+	drbg_aes_reseed(ctx, sizeof(buffer), buffer, 0, NULL);
 
 	return 0;
 }

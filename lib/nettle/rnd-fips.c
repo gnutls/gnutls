@@ -1,4 +1,4 @@
-/* random-fips.c - FIPS140-2 random number generator
+/*
  * Copyright (C) 2013 Red Hat
  *
  * This file is part of GnuTLS.
@@ -32,6 +32,12 @@
 #include <locks.h>
 #include <rnd-common.h>
 
+/* This provides a random generator for gnutls. It uses
+ * three instances of the DRBG-AES-CTR generator, one for
+ * each level of randomness. It uses /dev/urandom for their
+ * seeding.
+ */
+
 #define RND_LOCK if (gnutls_mutex_lock(&rnd_mutex)!=0) abort()
 #define RND_UNLOCK if (gnutls_mutex_unlock(&rnd_mutex)!=0) abort()
 
@@ -46,21 +52,21 @@ struct fips_ctx {
 #endif
 };
 
-static int _rngfips_reinit(struct fips_ctx* fctx);
+static int _rngfips_ctx_reinit(struct fips_ctx *fctx);
+static int _rngfips_ctx_init(struct fips_ctx *fctx);
 
-
-static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx* fctx,
-			void *buffer, size_t length)
+static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx *fctx,
+		      void *buffer, size_t length)
 {
 	int ret;
 
 	if (ctx->reseed_counter > DRBG_AES_RESEED_TIME
 #ifdef HAVE_GETPID
-		|| fctx->pid != getpid()
+	    || fctx->pid != getpid()
 #endif
-		) {
+	    ) {
 
-		ret = _rngfips_reinit(fctx);
+		ret = _rngfips_ctx_reinit(fctx);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -72,33 +78,46 @@ static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx* fctx,
 	return 0;
 }
 
-static int _rngfips_reinit(struct fips_ctx* fctx)
+static int _rngfips_ctx_init(struct fips_ctx *fctx)
 {
-int ret;
+	int ret;
 
 	/* strong */
-	ret = drbg_generate_key(&fctx->strong_context);
+	ret = drbg_init(&fctx->strong_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
-	
+
+	/* normal */
+	ret = drbg_init(&fctx->normal_context);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* nonce */
+	ret = drbg_init(&fctx->nonce_context);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+#ifdef HAVE_GETPID
+	fctx->pid = getpid();
+#endif
+	return 0;
+}
+
+static int _rngfips_ctx_reinit(struct fips_ctx *fctx)
+{
+	int ret;
+
+	/* strong */
 	ret = drbg_reseed(&fctx->strong_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	/* normal */
-	ret = drbg_generate_key(&fctx->normal_context);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-	
 	ret = drbg_reseed(&fctx->normal_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	/* nonce */
-	ret = drbg_generate_key(&fctx->nonce_context);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-	
 	ret = drbg_reseed(&fctx->nonce_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -106,16 +125,15 @@ int ret;
 #ifdef HAVE_GETPID
 	fctx->pid = getpid();
 #endif
-
 	return 0;
 }
 
 /* Initialize this random subsystem. */
-static int _rngfips_init(void** _ctx)
+static int _rngfips_init(void **_ctx)
 {
 /* Basic initialization is required to initialize mutexes and
    do a few checks on the implementation.  */
-	struct fips_ctx* ctx;
+	struct fips_ctx *ctx;
 	int ret;
 
 	ret = _rnd_system_entropy_init();
@@ -130,7 +148,7 @@ static int _rngfips_init(void** _ctx)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _rngfips_reinit(ctx);
+	ret = _rngfips_ctx_init(ctx);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -139,29 +157,28 @@ static int _rngfips_init(void** _ctx)
 	return 0;
 }
 
-static int
-_rngfips_rnd(void *_ctx, int level, void *buffer, size_t length)
+static int _rngfips_rnd(void *_ctx, int level, void *buffer, size_t length)
 {
-struct fips_ctx* ctx = _ctx;
-int ret;
+	struct fips_ctx *ctx = _ctx;
+	int ret;
 
 	RND_LOCK;
-	switch(level) {
-		case GNUTLS_RND_RANDOM:
-			ret = get_random(&ctx->normal_context, ctx, buffer, length);
-		case GNUTLS_RND_KEY:
-			ret = get_random(&ctx->strong_context, ctx, buffer, length);
-		default:
-			ret = get_random(&ctx->nonce_context, ctx, buffer, length);
+	switch (level) {
+	case GNUTLS_RND_RANDOM:
+		ret = get_random(&ctx->normal_context, ctx, buffer, length);
+	case GNUTLS_RND_KEY:
+		ret = get_random(&ctx->strong_context, ctx, buffer, length);
+	default:
+		ret = get_random(&ctx->nonce_context, ctx, buffer, length);
 	}
 	RND_UNLOCK;
-	
+
 	return ret;
 }
 
-static void _rngfips_deinit(void * _ctx)
+static void _rngfips_deinit(void *_ctx)
 {
-	struct fips_ctx* ctx = _ctx;
+	struct fips_ctx *ctx = _ctx;
 
 	gnutls_mutex_deinit(&rnd_mutex);
 	rnd_mutex = NULL;
@@ -179,7 +196,7 @@ static void _rngfips_refresh(void *_ctx)
 static int selftest_kat(void)
 {
 	int ret;
-	
+
 	RND_LOCK;
 	ret = drbg_aes_self_test();
 	RND_UNLOCK;
@@ -189,7 +206,7 @@ static int selftest_kat(void)
 		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
 	} else
 		_gnutls_debug_log("DRBG-AES self test succeeded\n");
-		
+
 	return 0;
 }
 

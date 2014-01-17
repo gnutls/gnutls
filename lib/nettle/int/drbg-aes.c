@@ -23,41 +23,78 @@
 #include <config.h>
 #include <drbg-aes.h>
 #include <nettle/memxor.h>
+#include <minmax.h>
 #include <string.h>
 #include <stdio.h>
 
 int
-drbg_aes_set_key(struct drbg_aes_ctx *ctx, unsigned length,
-		 const uint8_t * key)
+drbg_aes_init(struct drbg_aes_ctx *ctx,
+	      unsigned entropy_size, const uint8_t * entropy,
+	      unsigned pstring_size, const uint8_t * pstring)
 {
-	if (length != 16 && length != 24 && length != 32)
+	memset(ctx, 0, sizeof(*ctx));
+
+	return drbg_aes_reseed(ctx, entropy_size, entropy,
+			       pstring_size, pstring);
+}
+
+/* Sets V and key based on pdata */
+static void
+drbg_aes_update(struct drbg_aes_ctx *ctx,
+		unsigned pdata_size, const uint8_t * pdata)
+{
+	unsigned len = 0;
+	uint8_t tmp[DRBG_AES_SEED_SIZE];
+	uint8_t *t = tmp;
+
+	while (len < DRBG_AES_SEED_SIZE) {
+		INCREMENT(sizeof(ctx->v), ctx->v);
+		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, t, ctx->v);
+		t += AES_BLOCK_SIZE;
+		len += AES_BLOCK_SIZE;
+	}
+
+	memxor(tmp, pdata, DRBG_AES_SEED_SIZE);
+
+	aes_set_encrypt_key(&ctx->key, DRBG_AES_KEY_SIZE, tmp);
+
+	ctx->prev_block_present = 0;
+
+	memcpy(ctx->v, &tmp[AES_BLOCK_SIZE], AES_BLOCK_SIZE);
+
+	ctx->reseed_counter = 1;
+	ctx->seeded = 1;
+}
+
+int
+drbg_aes_reseed(struct drbg_aes_ctx *ctx,
+		unsigned entropy_size, const uint8_t * entropy,
+		unsigned add_size, const uint8_t * add)
+{
+	uint8_t tmp[DRBG_AES_SEED_SIZE];
+	unsigned len = 0;
+
+	if (add_size > DRBG_AES_SEED_SIZE || entropy_size != DRBG_AES_SEED_SIZE)
 		return 0;
 
-	aes_set_encrypt_key(&ctx->key, length, key);
-	ctx->seeded = 0;
-	ctx->reseed_counter = 0;
-	ctx->prev_block_present = 0;
+	if (add_size <= DRBG_AES_SEED_SIZE && add_size > 0) {
+		memcpy(tmp, add, add_size);
+		len = add_size;
+	}
+
+	if (len != DRBG_AES_SEED_SIZE)
+		memset(&tmp[len], 0, DRBG_AES_SEED_SIZE - len);
+
+	memxor(tmp, entropy, entropy_size);
+
+	drbg_aes_update(ctx, DRBG_AES_SEED_SIZE, tmp);
 
 	return 1;
 }
 
-/* Set's V value */
-void
-drbg_aes_seed(struct drbg_aes_ctx *ctx, const uint8_t seed[AES_BLOCK_SIZE],
-	void *dt_priv, aes_dt dt_func)
+/* we don't use additional input */
+int drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
 {
-	memcpy(ctx->v, seed, AES_BLOCK_SIZE);
-	
-	dt_func(dt_priv, ctx->dt);
-	
-	ctx->reseed_counter = 0;
-	ctx->seeded = 1;
-}
- 
-int
-drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
-{
-	uint8_t intermediate[AES_BLOCK_SIZE];
 	uint8_t tmp[AES_BLOCK_SIZE];
 	unsigned left;
 
@@ -67,60 +104,30 @@ drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
 	/* Throw the first block generated. FIPS 140-2 requirement 
 	 */
 	if (ctx->prev_block_present == 0) {
-		/* I = AES_K(dt) */
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, intermediate, ctx->dt);
-
-		/* tmp = I XOR V */
-		memxor3(tmp, ctx->v, intermediate, AES_BLOCK_SIZE);
-
-		/* dst = R = AES_K(I XOR V) */
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->prev_block,
-			    tmp);
-
-		/* V = AES_K(R XOR I) */
-		memxor3(tmp, ctx->prev_block, intermediate,
-			AES_BLOCK_SIZE);
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->v, tmp);
+		INCREMENT(sizeof(ctx->v), ctx->v);
+		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->prev_block, ctx->v);
 
 		ctx->prev_block_present = 1;
-		
-		INCREMENT(sizeof(ctx->dt), ctx->dt);
 	}
 
 	/* Perform the actual encryption */
 	for (left = length; left >= AES_BLOCK_SIZE;
 	     left -= AES_BLOCK_SIZE, dst += AES_BLOCK_SIZE) {
 
-		/* I = AES_K(dt) */
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, intermediate, ctx->dt);
-
-		/* tmp = I XOR V */
-		memxor3(tmp, ctx->v, intermediate, AES_BLOCK_SIZE);
-
-		/* dst = R = AES_K(I XOR V) */
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, dst, tmp);
+		INCREMENT(sizeof(ctx->v), ctx->v);
+		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, dst, ctx->v);
 
 		/* if detected loop */
 		if (memcmp(dst, ctx->prev_block, AES_BLOCK_SIZE) == 0)
 			return 0;
 
 		memcpy(ctx->prev_block, dst, AES_BLOCK_SIZE);
-
-		/* V = AES_K(R XOR I) */
-		memxor3(tmp, dst, intermediate, AES_BLOCK_SIZE);
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->v, tmp);
-		
-		INCREMENT(sizeof(ctx->dt), ctx->dt);
 	}
 
 	if (left > 0) {		/* partial fill */
 
-		/* I = AES_K(dt) */
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, intermediate, ctx->dt);
-		memxor3(tmp, ctx->v, intermediate, AES_BLOCK_SIZE);
-
-		/* tmp = R = AES_K(I XOR V) */
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, tmp, tmp);
+		INCREMENT(sizeof(ctx->v), ctx->v);
+		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, tmp, ctx->v);
 
 		/* if detected loop */
 		if (memcmp(tmp, ctx->prev_block, AES_BLOCK_SIZE) == 0)
@@ -128,14 +135,8 @@ drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
 
 		memcpy(ctx->prev_block, tmp, AES_BLOCK_SIZE);
 		memcpy(dst, tmp, left);
-
-		/* V = AES_K(R XOR I) */
-		memxor(tmp, intermediate, AES_BLOCK_SIZE);
-		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, ctx->v, tmp);
-		
-		INCREMENT(sizeof(ctx->dt), ctx->dt);
 	}
-	
+
 	if (ctx->reseed_counter > DRBG_AES_RESEED_TIME)
 		return 0;
 	ctx->reseed_counter++;
