@@ -379,7 +379,7 @@ int ret;
 
 	ret = gnutls_global_init();
 	if (ret < 0) {
-		fprintf(stderr, "Error in GnuTLS initialization: %s", gnutls_strerror(ret));
+		fprintf(stderr, "Error in GnuTLS initialization: %s\n", gnutls_strerror(ret));
 		_gnutls_switch_lib_state(LIB_STATE_ERROR);
 	}
 }
