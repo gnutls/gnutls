@@ -1900,25 +1900,19 @@ _gnutls_copy_comp_methods(gnutls_session_t session,
 	return ret;
 }
 
-/* This should be sufficient by now. It should hold all the extensions
- * plus the headers in a hello message.
- */
-#define MAX_EXT_DATA_LENGTH 32*1024
-
 /* This function sends the client hello handshake message.
  */
 static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 {
 	mbuffer_st *bufel = NULL;
-	uint8_t *data = NULL;
-	int pos = 0, type;
-	int datalen = 0, ret = 0;
+	int type;
+	int ret = 0;
 	const version_entry_st *hver;
+	uint8_t tver[2];
 	gnutls_buffer_st extdata;
 	int rehandshake = 0;
 	uint8_t session_id_len =
 	    session->internals.resumed_security_parameters.session_id_size;
-	uint8_t cookie_len;
 
 	_gnutls_buffer_init(&extdata);
 
@@ -1928,28 +1922,6 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 		rehandshake = 1;
 
 	if (again == 0) {
-		if (IS_DTLS(session)) {
-			cookie_len =
-			    session->internals.dtls.cookie_len + 1;
-		} else {
-			cookie_len = 0;
-		}
-
-		datalen =
-		    2 + (session_id_len + 1) + GNUTLS_RANDOM_SIZE +
-		    cookie_len;
-		/* 2 for version, (4 for unix time + 28 for random bytes==GNUTLS_RANDOM_SIZE) 
-		 */
-
-		bufel =
-		    _gnutls_handshake_alloc(session, datalen,
-					    datalen + MAX_EXT_DATA_LENGTH);
-		if (bufel == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		data = _mbuffer_get_udata_ptr(bufel);
-
 		/* if we are resuming a session then we set the
 		 * version number to the previously established.
 		 */
@@ -1970,12 +1942,16 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 
 		if (hver == NULL) {
 			gnutls_assert();
-			gnutls_free(bufel);
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
-		data[pos++] = hver->major;
-		data[pos++] = hver->minor;
+		tver[0] = hver->major;
+		tver[1] = hver->minor;
+		ret = _gnutls_buffer_append_data(&extdata, tver, 2);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		/* Set the version we advertized as maximum 
 		 * (RSA uses it).
@@ -2015,35 +1991,38 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			memcpy(&data[pos],
-			       session->security_parameters.client_random,
-			       GNUTLS_RANDOM_SIZE);
+			ret = _gnutls_buffer_append_data(&extdata,
+						session->security_parameters.client_random,
+						GNUTLS_RANDOM_SIZE);
 		} else
-			memcpy(&data[pos],
-			       session->security_parameters.client_random,
-			       GNUTLS_RANDOM_SIZE);
+			ret = _gnutls_buffer_append_data(&extdata,
+						session->security_parameters.client_random,
+						GNUTLS_RANDOM_SIZE);
 
-		pos += GNUTLS_RANDOM_SIZE;
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
 		/* Copy the Session ID 
 		 */
-		data[pos++] = session_id_len;
-
-		if (session_id_len > 0) {
-			memcpy(&data[pos],
-			       session->internals.
-			       resumed_security_parameters.session_id,
-			       session_id_len);
-			pos += session_id_len;
+		ret = _gnutls_buffer_append_data_prefix(&extdata, 8, 
+						session->internals.resumed_security_parameters.session_id,
+						session_id_len);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
 		}
 
 		/* Copy the DTLS cookie
 		 */
 		if (IS_DTLS(session)) {
-			data[pos++] = session->internals.dtls.cookie_len;
-			memcpy(&data[pos], &session->internals.dtls.cookie,
-			       session->internals.dtls.cookie_len);
-			/* pos += session->internals.dtls.cookie_len; */
+			ret = _gnutls_buffer_append_data_prefix(&extdata, 8, session->internals.dtls.cookie,
+				session->internals.dtls.cookie_len);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 		}
 
 		/* Copy the ciphersuites.
@@ -2100,6 +2079,14 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 				goto cleanup;
 			}
 
+		}
+
+		bufel =
+		    _gnutls_handshake_alloc(session, 0, extdata.length);
+		if (bufel == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto cleanup; 
 		}
 
 		ret =
