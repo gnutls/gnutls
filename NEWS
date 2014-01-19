@@ -14,7 +14,7 @@ appends data to client hello if the expected size is in the
 ** libgnutls: gnutls_session_get_desc() returns a more compact
 ciphersuite description.
 
-* libgnutls: Allow deleting multiple non-certificate data.
+* libgnutls: In PKCS #11 allow deleting multiple non-certificate data.
 
 ** libgnutls: When a PKCS #11 trust store is specified (e.g. using the
 configure option --with-default-trust-store-pkcs11), then the PKCS #11
