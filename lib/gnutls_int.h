@@ -661,6 +661,7 @@ struct gnutls_priority_st {
 #define ENABLE_COMPAT(x) \
               (x)->allow_large_records = 1; \
               (x)->allow_wrong_pms = 1; \
+              (x)->dumbfw = 1; \
               (x)->allow_weak_keys = 1
 
 /* DH and RSA parameters types.

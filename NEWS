@@ -9,6 +9,8 @@ See the end for copying conditions.
 appends data to client hello if the expected size is in the
 "black hole" range.
 
+** libgnutls: %COMPAT implies %DUMBFW.
+
 ** libgnutls: gnutls_session_get_desc() returns a more compact
 ciphersuite description.
 
