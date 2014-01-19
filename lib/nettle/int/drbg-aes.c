@@ -23,6 +23,7 @@
 #include <config.h>
 #include <drbg-aes.h>
 #include <nettle/memxor.h>
+#include <nettle/aes.h>
 #include <minmax.h>
 #include <string.h>
 #include <stdio.h>
@@ -32,7 +33,12 @@ drbg_aes_init(struct drbg_aes_ctx *ctx,
 	      unsigned entropy_size, const uint8_t * entropy,
 	      unsigned pstring_size, const uint8_t * pstring)
 {
+	uint8_t tmp[DRBG_AES_KEY_SIZE];
+
 	memset(ctx, 0, sizeof(*ctx));
+	memset(tmp, 0, sizeof(tmp));
+
+	aes_set_encrypt_key(&ctx->key, DRBG_AES_KEY_SIZE, tmp);
 
 	return drbg_aes_reseed(ctx, entropy_size, entropy,
 			       pstring_size, pstring);
