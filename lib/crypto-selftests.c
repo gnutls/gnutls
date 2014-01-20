@@ -222,6 +222,19 @@ const struct cipher_vectors_st tdes_cbc_vectors[] = {
 	 },
 };
 
+const struct cipher_vectors_st arcfour_vectors[] = { /* RFC6229 */
+	{
+	 STR(key, key_size,
+	     "\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"),
+	 STR(plaintext, plaintext_size,
+	     "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"),
+	 .ciphertext = (uint8_t *)
+	 "\x9a\xc7\xcc\x9a\x60\x9d\x1e\xf7\xb2\x93\x28\x99\xcd\xe4\x1b\x97",
+	 .iv = NULL,
+	 .iv_size = 0
+	},
+};
+
 static int test_cipher(gnutls_cipher_algorithm_t cipher,
 		       const struct cipher_vectors_st *vectors,
 		       size_t vectors_size)
@@ -230,14 +243,16 @@ static int test_cipher(gnutls_cipher_algorithm_t cipher,
 	int ret;
 	unsigned int i;
 	uint8_t tmp[128];
-	gnutls_datum_t key, iv;
+	gnutls_datum_t key, iv = {NULL, 0};
 
 	for (i = 0; i < vectors_size; i++) {
 		key.data = (void *) vectors[i].key;
 		key.size = vectors[i].key_size;
 
-		iv.data = (void *) vectors[i].iv;
-		iv.size = gnutls_cipher_get_iv_size(cipher);
+		if (vectors[i].iv != NULL) {
+			iv.data = (void *) vectors[i].iv;
+			iv.size = gnutls_cipher_get_iv_size(cipher);
+		}
 
 		if (iv.size != vectors[i].iv_size)
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
@@ -681,6 +696,8 @@ int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher)
 		     aes256_cbc_vectors);
 		CASE(GNUTLS_CIPHER_3DES_CBC, test_cipher,
 		     tdes_cbc_vectors);
+		CASE(GNUTLS_CIPHER_ARCFOUR_128, test_cipher,
+		     arcfour_vectors);
 		CASE(GNUTLS_CIPHER_AES_128_GCM, test_cipher_aead,
 		     aes128_gcm_vectors);
 		CASE(GNUTLS_CIPHER_AES_256_GCM, test_cipher_aead,
