@@ -58,6 +58,11 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 {
 	api_cipher_hd_st *h;
 	int ret;
+	const cipher_entry_st* e;
+
+	e = cipher_to_entry(cipher);
+	if (e == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	*handle = gnutls_calloc(1, sizeof(api_cipher_hd_st));
 	if (*handle == NULL) {
@@ -67,14 +72,12 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 
 	h = *handle;
 	ret =
-	    _gnutls_cipher_init(&h->ctx_enc, cipher_to_entry(cipher), key,
+	    _gnutls_cipher_init(&h->ctx_enc, e, key,
 				iv, 1);
 
-	if (ret >= 0 && _gnutls_cipher_is_aead(&h->ctx_enc) == 0)	/* AEAD ciphers are stream - so far */
+	if (ret >= 0 && _gnutls_cipher_is_block(e) != 0)
 		ret =
-		    _gnutls_cipher_init(&h->ctx_dec,
-					cipher_to_entry(cipher), key, iv,
-					0);
+		    _gnutls_cipher_init(&h->ctx_dec, e, key, iv, 0);
 
 	return ret;
 }
@@ -153,7 +156,7 @@ gnutls_cipher_set_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
 
 	_gnutls_cipher_setiv(&h->ctx_enc, iv, ivlen);
 
-	if (_gnutls_cipher_is_aead(&h->ctx_enc) == 0)
+	if (_gnutls_cipher_is_block(h->ctx_enc.e) != 0)
 		_gnutls_cipher_setiv(&h->ctx_dec, iv, ivlen);
 }
 
@@ -201,7 +204,7 @@ gnutls_cipher_decrypt(gnutls_cipher_hd_t handle, void *ciphertext,
 {
 	api_cipher_hd_st *h = handle;
 
-	if (_gnutls_cipher_is_aead(&h->ctx_enc) != 0)
+	if (_gnutls_cipher_is_block(h->ctx_enc.e) == 0)
 		return _gnutls_cipher_decrypt(&h->ctx_enc, ciphertext,
 					      ciphertextlen);
 	else
@@ -259,7 +262,7 @@ gnutls_cipher_decrypt2(gnutls_cipher_hd_t handle, const void *ciphertext,
 {
 	api_cipher_hd_st *h = handle;
 
-	if (_gnutls_cipher_is_aead(&h->ctx_enc) != 0)
+	if (_gnutls_cipher_is_block(h->ctx_enc.e) == 0)
 		return _gnutls_cipher_decrypt2(&h->ctx_enc, ciphertext,
 					       ciphertextlen, text,
 					       textlen);
@@ -283,7 +286,7 @@ void gnutls_cipher_deinit(gnutls_cipher_hd_t handle)
 	api_cipher_hd_st *h = handle;
 
 	_gnutls_cipher_deinit(&h->ctx_enc);
-	if (_gnutls_cipher_is_aead(&h->ctx_enc) == 0)
+	if (_gnutls_cipher_is_block(h->ctx_enc.e) != 0)
 		_gnutls_cipher_deinit(&h->ctx_dec);
 	gnutls_free(handle);
 }
