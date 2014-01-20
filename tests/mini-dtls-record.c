@@ -50,8 +50,6 @@ int main()
 
 #include "utils.h"
 
-#define REL_LAYER
-
 static int test_finished = 0;
 static void terminate(void);
 
@@ -90,10 +88,9 @@ static pid_t child;
 
 static int msg_seq[] =
     { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 16, 5, 32, 11, 11, 11, 11, 12,
-10, 13, 14,
-	15, 16, 17, 19, 20, 18, 22, 24, 23, 25, 26, 27, 29, 28, 29, 29, 30,
-	    31, 32, 33, 34, 35, 37, 36, 38, 39,
-	42, 37, 40, 41, 41, -1
+	10, 13, 14, 15, 16, 17, 19, 20, 18, 22, 24, 23, 25, 26, 27, 29, 28,
+	29, 29, 30, 31, 32, 33, 34, 35, 37, 36, 38, 39, 42, 37, 40, 41, 41,
+	-1
 };
 
 static unsigned int current = 0;
@@ -102,8 +99,7 @@ static unsigned int pos = 0;
 unsigned char *stored_messages[MAX_SEQ];
 unsigned int stored_sizes[MAX_SEQ];
 
-static ssize_t
-odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
 	ssize_t ret;
 	unsigned i;
@@ -121,21 +117,21 @@ odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		for (i = pos; i <= current; i++) {
 			if (stored_messages[msg_seq[i]] != NULL) {
 				do {
+
 					ret =
-					    send((long int) tr,
+					    send((long int)tr,
 						 stored_messages[msg_seq
 								 [i]],
-						 stored_sizes[msg_seq[i]],
-						 0);
+						 stored_sizes[msg_seq[i]], 0);
 				}
 				while (ret == -1 && errno == EAGAIN);
 				pos++;
 			} else
 				break;
 		}
-	} else if (msg_seq[current] == (int) current) {
+	} else if (msg_seq[current] == (int)current) {
 		do {
-			ret = send((long int) tr, data, len, 0);
+			ret = send((long int)tr, data, len, 0);
 		}
 		while (ret == -1 && errno == EAGAIN);
 
@@ -146,7 +142,7 @@ odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	} else if (stored_messages[msg_seq[current]] != NULL) {
 		do {
 			ret =
-			    send((long int) tr,
+			    send((long int)tr,
 				 stored_messages[msg_seq[current]],
 				 stored_sizes[msg_seq[current]], 0);
 		}
@@ -161,17 +157,16 @@ odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return len;
 }
 
-static ssize_t
-n_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+static ssize_t n_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-	return send((unsigned long) tr, data, len, 0);
+	return send((unsigned long)tr, data, len, 0);
 }
 
 /* The first five messages are handshake. Thus corresponds to msg_seq+5 */
 static int recv_msg_seq[] =
     { 1, 2, 3, 4, 5, 6, 12, 28, 7, 8, 9, 10, 11, 13, 15, 16, 14, 18, 20,
-19, 21, 22,
-	23, 25, 24, 26, 27, 29, 30, 31, 33, 32, 34, 35, 38, 36, 37, -1
+	19, 21, 22, 23, 25, 24, 26, 27, 29, 30, 31, 33, 32, 34, 35, 38, 36, 37,
+	    -1
 };
 
 static void client(int fd)
@@ -183,12 +178,6 @@ static void client(int fd)
 	unsigned char seq[8];
 	uint64_t useq;
 	unsigned current = 0;
-#ifndef REL_LAYER
-	struct timespec ts;
-
-	ts.tv_sec = 0;
-	ts.tv_nsec = 100 * 1000 * 1000;
-#endif
 
 	memset(buffer, 0, sizeof(buffer));
 
@@ -199,7 +188,7 @@ static void client(int fd)
 
 	if (debug) {
 		gnutls_global_set_log_function(client_log_func);
-		gnutls_global_set_log_level(99);
+		gnutls_global_set_log_level(2);
 	}
 
 	gnutls_anon_allocate_client_credentials(&anoncred);
@@ -262,17 +251,13 @@ static void client(int fd)
 				terminate();
 			}
 
-			if ((uint32_t) recv_msg_seq[current] !=
-			    (uint32_t) useq) {
+			if ((uint32_t) recv_msg_seq[current] != (uint32_t) useq) {
 				fail("received message sequence differs (got: %u, expected: %u)\n", (unsigned)useq, (unsigned)recv_msg_seq[current]);
 				terminate();
 			}
 
 			current++;
 		}
-#ifndef REL_LAYER
-		nanosleep(&ts, NULL);
-#endif
 	}
 	while ((ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED
 		|| ret > 0));
@@ -287,7 +272,6 @@ static void client(int fd)
 
 	gnutls_global_deinit();
 }
-
 
 static void terminate(void)
 {
@@ -304,18 +288,12 @@ static void server(int fd)
 	gnutls_session_t session;
 	gnutls_anon_server_credentials_t anoncred;
 	char c;
-#ifndef REL_LAYER
-	struct timespec ts;
-
-	ts.tv_sec = 0;
-	ts.tv_nsec = 100 * 1000 * 1000;
-#endif
 
 	global_init();
 
 	if (debug) {
 		gnutls_global_set_log_function(server_log_func);
-		gnutls_global_set_log_level(4711);
+		gnutls_global_set_log_level(2);
 	}
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
@@ -359,23 +337,16 @@ static void server(int fd)
 		do {
 			ret = gnutls_record_send(session, &c, 1);
 		}
-		while (ret == GNUTLS_E_AGAIN
-		       || ret == GNUTLS_E_INTERRUPTED);
+		while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 		if (ret < 0) {
 			fail("send: %s\n", gnutls_strerror(ret));
 			terminate();
 		}
-#ifndef REL_LAYER
-		nanosleep(&ts, NULL);
-#endif
 	}
 	while (test_finished == 0);
 
 	gnutls_transport_set_push_function(session, n_push);
-#ifndef REL_LAYER
-	nanosleep(&ts, NULL);
-#endif
 	do {
 		ret = gnutls_bye(session, GNUTLS_SHUT_WR);
 	}
@@ -397,11 +368,7 @@ static void start(void)
 	int fd[2];
 	int ret;
 
-#ifdef REL_LAYER
 	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
-#else
-	ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
-#endif
 	if (ret < 0) {
 		perror("socketpair");
 		exit(1);
@@ -417,7 +384,7 @@ static void start(void)
 	if (child) {
 		int status;
 		/* parent */
-
+		close(fd[1]);
 		server(fd[0]);
 		wait(&status);
 		if (WEXITSTATUS(status) != 0)
