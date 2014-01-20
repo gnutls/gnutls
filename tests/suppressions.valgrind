@@ -210,3 +210,10 @@
    fun:gnutls_pkcs11_init
    fun:gnutls_global_init
 }
+
+{
+   nettle memxor3
+   Memcheck:Addr8
+   obj:*
+   fun:memxor3
+}
