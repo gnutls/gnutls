@@ -1965,7 +1965,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       if (IS_DTLS(session))
         {
           data[pos++] = session->internals.dtls.cookie_len;
-          memcpy(&data[pos], &session->internals.dtls.cookie, session->internals.dtls.cookie_len);
+          memcpy(&data[pos], session->internals.dtls.cookie, session->internals.dtls.cookie_len);
           /* pos += session->internals.dtls.cookie_len; */
         }
 
