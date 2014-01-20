@@ -513,9 +513,12 @@ gnutls_pubkey_get_openpgp_key_id(gnutls_pubkey_t key, unsigned int flags,
 	if (key->openpgp_key_id_set == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (key->openpgp_key_id_set == OPENPGP_KEY_SUBKEY)
-		if (subkey)
+	if (subkey) {
+		if (key->openpgp_key_id_set == OPENPGP_KEY_SUBKEY)
 			*subkey = 1;
+		else
+			*subkey = 0;
+	}
 
 	if (output_data) {
 		memcpy(output_data, key->openpgp_key_id,
