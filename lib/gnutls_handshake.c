@@ -1991,14 +1991,11 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			ret = _gnutls_buffer_append_data(&extdata,
-						session->security_parameters.client_random,
-						GNUTLS_RANDOM_SIZE);
-		} else
-			ret = _gnutls_buffer_append_data(&extdata,
-						session->security_parameters.client_random,
-						GNUTLS_RANDOM_SIZE);
+		}
 
+		ret = _gnutls_buffer_append_data(&extdata,
+					session->security_parameters.client_random,
+					GNUTLS_RANDOM_SIZE);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -2078,7 +2075,6 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 				gnutls_assert();
 				goto cleanup;
 			}
-
 		}
 
 		bufel =
