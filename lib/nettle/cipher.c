@@ -324,10 +324,8 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 
 		des_fix_parity(keysize, des_key, key);
 
-		/* this fails on weak keys */
 		if (des3_set_key(ctx->ctx_ptr, des_key) != 1) {
 			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
 		}
 		zeroize_temp_key(des_key, sizeof(des_key));
 
