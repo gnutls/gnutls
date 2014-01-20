@@ -88,8 +88,6 @@ struct nettle_cipher_ctx {
 	int enc;
 };
 
-#define GCM_DEFAULT_NONCE_SIZE 12
-
 static void _aes_gcm_encrypt(void *_ctx, nettle_crypt_func f,
 			     unsigned block_size, uint8_t * iv,
 			     unsigned length, uint8_t * dst,
@@ -395,19 +393,13 @@ wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t ivsize)
 	switch (ctx->algo) {
 	case GNUTLS_CIPHER_AES_128_GCM:
 	case GNUTLS_CIPHER_AES_256_GCM:
-		if (ivsize != GCM_DEFAULT_NONCE_SIZE)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-		gcm_aes_set_iv(&ctx->ctx.aes_gcm, GCM_DEFAULT_NONCE_SIZE,
-			       iv);
+		gcm_aes_set_iv(&ctx->ctx.aes_gcm, 
+				ivsize, iv);
 		break;
 	case GNUTLS_CIPHER_CAMELLIA_128_GCM:
 	case GNUTLS_CIPHER_CAMELLIA_256_GCM:
-		if (ivsize != GCM_DEFAULT_NONCE_SIZE)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		_gcm_camellia_set_iv(&ctx->ctx.camellia_gcm,
-				     GCM_DEFAULT_NONCE_SIZE, iv);
+				     ivsize, iv);
 		break;
 	case GNUTLS_CIPHER_SALSA20_256:
 	case GNUTLS_CIPHER_ESTREAM_SALSA20_256:
