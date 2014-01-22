@@ -96,7 +96,7 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
   mpz_set_ui(r, 1);
   mpz_mul_2exp (r, r, q_bits - 1);
 
-  if (mpz_cmp(s, r) < 0)
+  if (mpz_cmp(s, r) >= 0)
     goto fail;
 
   cert->qseed_length = sizeof(cert->qseed);
