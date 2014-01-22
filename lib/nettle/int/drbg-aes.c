@@ -1,6 +1,6 @@
 /* drbg-aes.c */
 
-/* Copyright (C) 2013 Red Hat
+/* Copyright (C) 2013, 2014 Red Hat
  *
  * This file is part of GnuTLS.
  *  
@@ -47,7 +47,7 @@ drbg_aes_init(struct drbg_aes_ctx *ctx,
 /* Sets V and key based on pdata */
 static void
 drbg_aes_update(struct drbg_aes_ctx *ctx,
-		unsigned pdata_size, const uint8_t * pdata)
+		const uint8_t pdata[DRBG_AES_SEED_SIZE])
 {
 	unsigned len = 0;
 	uint8_t tmp[DRBG_AES_SEED_SIZE];
@@ -64,9 +64,7 @@ drbg_aes_update(struct drbg_aes_ctx *ctx,
 
 	aes_set_encrypt_key(&ctx->key, DRBG_AES_KEY_SIZE, tmp);
 
-	ctx->prev_block_present = 0;
-
-	memcpy(ctx->v, &tmp[AES_BLOCK_SIZE], AES_BLOCK_SIZE);
+	memcpy(ctx->v, &tmp[DRBG_AES_KEY_SIZE], AES_BLOCK_SIZE);
 
 	ctx->reseed_counter = 1;
 	ctx->seeded = 1;
@@ -93,21 +91,36 @@ drbg_aes_reseed(struct drbg_aes_ctx *ctx,
 
 	memxor(tmp, entropy, entropy_size);
 
-	drbg_aes_update(ctx, DRBG_AES_SEED_SIZE, tmp);
+	drbg_aes_update(ctx, tmp);
 
 	return 1;
 }
 
 /* we don't use additional input */
-int drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
+int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
+			unsigned add_size, const uint8_t *add)
 {
 	uint8_t tmp[AES_BLOCK_SIZE];
+	uint8_t seed[DRBG_AES_SEED_SIZE];
 	unsigned left;
 
 	if (ctx->seeded == 0)
 		return 0;
 
-	/* Throw the first block generated. FIPS 140-2 requirement 
+	if (add_size > 0) {
+		if (add_size > DRBG_AES_SEED_SIZE)
+			return 0;
+		memcpy(seed, add, add_size);
+		if (add_size != DRBG_AES_SEED_SIZE)
+			memset(&seed[add_size], 0, DRBG_AES_SEED_SIZE - add_size);
+
+		drbg_aes_update(ctx, seed);
+	} else {
+		memset(seed, 0, DRBG_AES_SEED_SIZE);
+	}
+
+	/* Throw the first block generated. FIPS 140-2 requirement (see 
+	 * the continuous random number generator test in 4.9.2)
 	 */
 	if (ctx->prev_block_present == 0) {
 		INCREMENT(sizeof(ctx->v), ctx->v);
@@ -146,6 +159,8 @@ int drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst)
 	if (ctx->reseed_counter > DRBG_AES_RESEED_TIME)
 		return 0;
 	ctx->reseed_counter++;
+
+	drbg_aes_update(ctx, seed);
 
 	return 1;
 }

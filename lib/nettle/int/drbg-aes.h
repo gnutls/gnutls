@@ -74,9 +74,11 @@ drbg_aes_reseed(struct drbg_aes_ctx *ctx,
 	unsigned entropy_size, const uint8_t *entropy, 
 	unsigned add_size, const uint8_t* add);
 
+#define drbg_aes_random(ctx, l, dst) drbg_aes_generate(ctx, l, dst, 0, NULL)
+
 int
-drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length,
-		uint8_t * dst);
+drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length,
+		uint8_t * dst, unsigned add_size, const uint8_t* add);
 
 int drbg_aes_is_seeded(struct drbg_aes_ctx *ctx);
 
