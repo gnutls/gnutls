@@ -383,7 +383,11 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 	if (ret == 0)
 		return 0;
 
-	cert->seed_length = (q_bits / 8) + 1;
+	cert->seed_length = 2 * (q_bits / 8) + 1;
+
+	if (cert->seed_length > sizeof(cert->seed))
+		return 0;
+
 	random(random_ctx, cert->seed_length, cert->seed);
 
 	ret = _dsa_generate_dss_pq(pub, cert, cert->seed_length, cert->seed,
