@@ -51,8 +51,7 @@ st_provable_prime (mpz_t p,
 			  void *progress_ctx, nettle_progress_func * progress);
 
 int
-dsa_generate_dss_keypair(struct dsa_public_key *pub,
-		     struct dsa_private_key *key,
+dsa_generate_dss_pqg(struct dsa_public_key *pub,
 		     struct dss_params_validation_seeds* cert,
 		     unsigned index,
 		     void *random_ctx, nettle_random_func *random,
@@ -60,7 +59,13 @@ dsa_generate_dss_keypair(struct dsa_public_key *pub,
 		     unsigned p_bits /* = L */, unsigned q_bits /* = N */);
 
 int
-dsa_validate_dss_keypair(struct dsa_public_key *pub,
+dsa_generate_dss_keypair(struct dsa_public_key *pub,
+		     struct dsa_private_key *key,
+		     void *random_ctx, nettle_random_func *random,
+		     void *progress_ctx, nettle_progress_func *progress);
+
+int
+dsa_validate_dss_pqg(struct dsa_public_key *pub,
 		     struct dss_params_validation_seeds* cert,
 		     unsigned index);
 

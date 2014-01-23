@@ -48,7 +48,7 @@
  * 
  */
 int
-dsa_validate_dss_keypair(struct dsa_public_key *pub,
+dsa_validate_dss_pqg(struct dsa_public_key *pub,
 			 struct dss_params_validation_seeds *cert,
 			 unsigned index)
 {

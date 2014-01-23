@@ -370,8 +370,7 @@ _dsa_generate_dss_xy(struct dsa_public_key *pub,
  * 
  */
 int
-dsa_generate_dss_keypair(struct dsa_public_key *pub,
-			 struct dsa_private_key *key,
+dsa_generate_dss_pqg(struct dsa_public_key *pub,
 			 struct dss_params_validation_seeds *cert,
 			 unsigned index,
 			 void *random_ctx, nettle_random_func * random,
@@ -397,6 +396,16 @@ dsa_generate_dss_keypair(struct dsa_public_key *pub,
 	if (ret == 0)
 		return 0;
 
+	return 1;
+
+}
+
+int
+dsa_generate_dss_keypair(struct dsa_public_key *pub,
+			 struct dsa_private_key *key,
+			 void *random_ctx, nettle_random_func * random,
+			 void *progress_ctx, nettle_progress_func * progress)
+{
 	_dsa_generate_dss_xy(pub, key, random_ctx, random);
 
 	if (progress)
