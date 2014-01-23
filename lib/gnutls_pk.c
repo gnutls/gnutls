@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2001-2014 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -173,6 +173,9 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	dst->flags = src->flags;
+	dst->algo = src->algo;
 
 	for (i = 0; i < src->params_nr; i++) {
 		dst->params[i] = _gnutls_mpi_set(NULL, src->params[i]);

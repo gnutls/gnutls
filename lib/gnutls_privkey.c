@@ -108,6 +108,8 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 	int ret;
 
 	pub->algo = priv->algo;
+	pub->flags = priv->flags;
+
 	switch (pk) {
 	case GNUTLS_PK_RSA:
 		pub->params[0] = _gnutls_mpi_copy(priv->params[0]);
@@ -143,7 +145,6 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 		pub->params[ECC_Y] = _gnutls_mpi_copy(priv->params[ECC_Y]);
 
 		pub->params_nr = ECC_PUBLIC_PARAMS;
-		pub->flags = priv->flags;
 
 		if (pub->params[ECC_X] == NULL
 		    || pub->params[ECC_Y] == NULL) {
