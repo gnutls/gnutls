@@ -993,6 +993,11 @@ GNUTLS_PRIVATE {
     drbg_aes_reseed;
     drbg_aes_init;
     drbg_aes_generate;
+    _dsa_generate_dss_pq;
+    _dsa_generate_dss_g;
+    _dsa_validate_dss_g;
+    _dsa_validate_dss_pq;
+    dsa_generate_dss_keypair;
   local:
     *;
 };
