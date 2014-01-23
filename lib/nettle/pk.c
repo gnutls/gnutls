@@ -884,12 +884,13 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			struct dsa_public_key pub;
 			struct dsa_private_key priv;
 
-			if (params->params[DSA_Q] != NULL)
+			if (params->params[DSA_Q] == NULL)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 			_dsa_params_to_pubkey(params, &pub);
 
 			dsa_private_key_init(&priv);
+			mpz_init(pub.y);
 
 			ret =
 			    dsa_generate_dss_keypair(&pub, &priv, 
@@ -920,6 +921,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 		      dsa_fail:
 			dsa_private_key_clear(&priv);
+			mpz_clear(pub.y);
 
 			if (ret < 0)
 				goto fail;
