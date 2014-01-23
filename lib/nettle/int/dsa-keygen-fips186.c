@@ -24,7 +24,7 @@
  */
 
 #if HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include <assert.h>
@@ -38,24 +38,23 @@
 
 unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits)
 {
-  switch (q_bits)
-    {
-    case 160:
-      if (p_bits != 1024)
+	switch (q_bits) {
+	case 160:
+		if (p_bits != 1024)
+			return 0;
+		break;
+	case 224:
+		if (p_bits != 2048)
+			return 0;
+		break;
+	case 256:
+		if (p_bits != 2048 && p_bits != 3072)
+			return 0;
+		break;
+	default:
 		return 0;
-      break;
-    case 224:
-      if (p_bits != 2048)
-		return 0;
-      break;
-    case 256:
-      if (p_bits != 2048 && p_bits != 3072)
-		return 0;
-      break;
-    default:
-      return 0;
-    }
-  return 1;
+	}
+	return 1;
 }
 
 /* This generates p,q params using the algorithm in FIPS 186-4.
@@ -64,275 +63,269 @@ unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits)
  */
 int
 _dsa_generate_dss_pq(struct dsa_public_key *pub,
-		     struct dss_params_validation_seeds* cert,
-		     unsigned seed_length, void* seed,
-		     void *progress_ctx, nettle_progress_func *progress,
-		     unsigned p_bits /* = L */, unsigned q_bits /* = N */)
+		     struct dss_params_validation_seeds *cert,
+		     unsigned seed_length, void *seed,
+		     void *progress_ctx, nettle_progress_func * progress,
+		     unsigned p_bits /* = L */ , unsigned q_bits /* = N */ )
 {
-  mpz_t r, p0, t, z, s, tmp, dp0;
-  int ret;
-  unsigned iterations, old_counter, i;
-  uint8_t *storage = NULL;
-  unsigned storage_length;
+	mpz_t r, p0, t, z, s, tmp, dp0;
+	int ret;
+	unsigned iterations, old_counter, i;
+	uint8_t *storage = NULL;
+	unsigned storage_length;
 
-  ret = _dsa_check_qp_sizes(q_bits, p_bits);
-  if (ret == 0)
-    return 0;
+	ret = _dsa_check_qp_sizes(q_bits, p_bits);
+	if (ret == 0)
+		return 0;
 
-  if (seed_length < q_bits/8)
-	return 0;
+	if (seed_length < q_bits / 8)
+		return 0;
 
-  mpz_init (p0);
-  mpz_init (dp0);
-  mpz_init (r);
-  mpz_init (t);
-  mpz_init (z);
-  mpz_init (s);
-  mpz_init (tmp);
+	mpz_init(p0);
+	mpz_init(dp0);
+	mpz_init(r);
+	mpz_init(t);
+	mpz_init(z);
+	mpz_init(s);
+	mpz_init(tmp);
 
-  nettle_mpz_set_str_256_u (s, seed_length, seed);
+	nettle_mpz_set_str_256_u(s, seed_length, seed);
 
-  /* firstseed <= 2^(N-1) */
-  mpz_set_ui(r, 1);
-  mpz_mul_2exp (r, r, q_bits - 1);
+	/* firstseed <= 2^(N-1) */
+	mpz_set_ui(r, 1);
+	mpz_mul_2exp(r, r, q_bits - 1);
 
-  if (mpz_cmp(s, r) >= 0)
-    goto fail;
+	if (mpz_cmp(s, r) >= 0)
+		goto fail;
 
-  cert->qseed_length = sizeof(cert->qseed);
-  cert->pseed_length = sizeof(cert->pseed);
+	cert->qseed_length = sizeof(cert->qseed);
+	cert->pseed_length = sizeof(cert->pseed);
 
-  ret = st_provable_prime (pub->q,
-			  &cert->qseed_length, cert->qseed,
-			  &cert->qgen_counter,
-			  q_bits,
-			  seed_length, seed,
-			  progress_ctx, progress);
-  if (ret == 0)
-    goto fail;
+	ret = st_provable_prime(pub->q,
+				&cert->qseed_length, cert->qseed,
+				&cert->qgen_counter,
+				q_bits,
+				seed_length, seed, progress_ctx, progress);
+	if (ret == 0)
+		goto fail;
 
-  if (progress)
-	progress (progress_ctx, 'q');
+	if (progress)
+		progress(progress_ctx, 'q');
 
-  ret = st_provable_prime (p0,
-			  &cert->pseed_length, cert->pseed,
-			  &cert->pgen_counter,
-			  1+((p_bits+1)/2),
-			  cert->qseed_length, cert->qseed,
-			  progress_ctx, progress);
-  if (ret == 0)
-    goto fail;
+	ret = st_provable_prime(p0,
+				&cert->pseed_length, cert->pseed,
+				&cert->pgen_counter,
+				1 + ((p_bits + 1) / 2),
+				cert->qseed_length, cert->qseed,
+				progress_ctx, progress);
+	if (ret == 0)
+		goto fail;
 
-  iterations = ((p_bits+DIGEST_SIZE-1)/DIGEST_SIZE) - 1;
-  old_counter = cert->pgen_counter;
-  
-  storage_length = iterations * DIGEST_SIZE;
-  storage = malloc (storage_length);
-  if (storage == NULL)
-	goto fail;
+	iterations = ((p_bits + DIGEST_SIZE - 1) / DIGEST_SIZE) - 1;
+	old_counter = cert->pgen_counter;
 
-  nettle_mpz_set_str_256_u (s, cert->pseed_length, cert->pseed);
-  for (i = 0; i < iterations; i++)
-    {
-      cert->pseed_length = nettle_mpz_sizeinbase_256_u (s);
-      nettle_mpz_get_str_256 (cert->pseed_length, cert->pseed, s);
+	storage_length = iterations * DIGEST_SIZE;
+	storage = malloc(storage_length);
+	if (storage == NULL)
+		goto fail;
 
-      hash (&storage[(iterations - i - 1) * DIGEST_SIZE], 
-	        cert->pseed_length, cert->pseed);
-      mpz_add_ui (s, s, 1);
-    }
-  mpz_add_ui (s, s, 1);
-  
-  cert->pseed_length = nettle_mpz_sizeinbase_256_u (s);
-  nettle_mpz_get_str_256 (cert->pseed_length, cert->pseed, s);
+	nettle_mpz_set_str_256_u(s, cert->pseed_length, cert->pseed);
+	for (i = 0; i < iterations; i++) {
+		cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
+		nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
 
-  /* x = 2^(p_bits-1) + (x mod 2^(p_bits-1)) */
-  nettle_mpz_set_str_256_u (tmp, storage_length, storage);
+		hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
+		     cert->pseed_length, cert->pseed);
+		mpz_add_ui(s, s, 1);
+	}
+	mpz_add_ui(s, s, 1);
 
-  mpz_set_ui (r, 1);
-  mpz_mul_2exp (r, r, p_bits - 1);
+	cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
+	nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
 
-  mpz_mod_2exp (tmp, tmp, p_bits - 1);
-  mpz_add (tmp, tmp, r);
-  
-  /* Generate candidate prime p in [2^(bits-1), 2^bits] */
+	/* x = 2^(p_bits-1) + (x mod 2^(p_bits-1)) */
+	nettle_mpz_set_str_256_u(tmp, storage_length, storage);
 
-  /* t = u[x/2c0] */
-  mpz_mul_2exp (dp0, p0, 1); /* dp0 = 2*p0 */
-  mpz_mul (dp0, dp0, pub->q); /* dp0 = 2*p0*q */
+	mpz_set_ui(r, 1);
+	mpz_mul_2exp(r, r, p_bits - 1);
 
-  mpz_cdiv_q (t, tmp, dp0);
+	mpz_mod_2exp(tmp, tmp, p_bits - 1);
+	mpz_add(tmp, tmp, r);
 
-retry:
-  /* c = 2p0*q*t + 1 */
-  mpz_mul (pub->p, dp0, t);
-  mpz_add_ui (pub->p, pub->p, 1);
+	/* Generate candidate prime p in [2^(bits-1), 2^bits] */
 
-  if (mpz_sizeinbase (pub->p, 2) > p_bits)
-    {
-      /* t = 2^(bits-1)/2qp0 */
-      mpz_set_ui (tmp, 1);
-      mpz_mul_2exp (tmp, tmp, p_bits - 1);
-      mpz_cdiv_q (t, tmp, dp0);
+	/* t = u[x/2c0] */
+	mpz_mul_2exp(dp0, p0, 1);	/* dp0 = 2*p0 */
+	mpz_mul(dp0, dp0, pub->q);	/* dp0 = 2*p0*q */
 
-      /* p = t* 2tq p0 + 1 */
-      mpz_mul (pub->p, dp0, t);
-      mpz_add_ui (pub->p, pub->p, 1);
-    }
+	mpz_cdiv_q(t, tmp, dp0);
 
-  cert->pgen_counter++;
+ retry:
+	/* c = 2p0*q*t + 1 */
+	mpz_mul(pub->p, dp0, t);
+	mpz_add_ui(pub->p, pub->p, 1);
 
-  for (i = 0; i < iterations; i++)
-    {
-      cert->pseed_length = nettle_mpz_sizeinbase_256_u (s);
-      nettle_mpz_get_str_256 (cert->pseed_length, cert->pseed, s);
+	if (mpz_sizeinbase(pub->p, 2) > p_bits) {
+		/* t = 2^(bits-1)/2qp0 */
+		mpz_set_ui(tmp, 1);
+		mpz_mul_2exp(tmp, tmp, p_bits - 1);
+		mpz_cdiv_q(t, tmp, dp0);
 
-      hash (&storage[(iterations - i - 1) * DIGEST_SIZE], 
-	    cert->pseed_length, cert->pseed);
-      mpz_add_ui (s, s, 1);
-    }
-  mpz_add_ui (s, s, 1);
+		/* p = t* 2tq p0 + 1 */
+		mpz_mul(pub->p, dp0, t);
+		mpz_add_ui(pub->p, pub->p, 1);
+	}
 
-  cert->pseed_length = nettle_mpz_sizeinbase_256_u (s);
-  nettle_mpz_get_str_256 (cert->pseed_length, cert->pseed, s);
+	cert->pgen_counter++;
 
-  /* r = a */
-  nettle_mpz_set_str_256_u (r, storage_length, storage);
+	for (i = 0; i < iterations; i++) {
+		cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
+		nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
 
-  /* a = 2 + (a mod (p-3)) */
-  mpz_sub_ui (tmp, pub->p, 3); /* c is too large to worry about negatives */
-  mpz_mod (r, r, tmp);
-  mpz_add_ui (r, r, 2);
+		hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
+		     cert->pseed_length, cert->pseed);
+		mpz_add_ui(s, s, 1);
+	}
+	mpz_add_ui(s, s, 1);
 
-  /* z = a^(2tq) mod p */
-  mpz_mul_2exp (tmp, t, 1); /* tmp = 2t */
-  mpz_mul(tmp, t, pub->q); /* tmp = 2tq */
-  mpz_powm (z, r, tmp, pub->p);
+	cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
+	nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
 
-  mpz_sub_ui (tmp, z, 1);
+	/* r = a */
+	nettle_mpz_set_str_256_u(r, storage_length, storage);
 
-  mpz_gcd (tmp, tmp, pub->p);
-  if (mpz_cmp_ui (tmp, 1) == 0)
-	{
-	  mpz_powm (tmp, z, p0, pub->p);
-	  if (mpz_cmp_ui (tmp, 1) == 0)
-		{
-		  goto success;
+	/* a = 2 + (a mod (p-3)) */
+	mpz_sub_ui(tmp, pub->p, 3);	/* c is too large to worry about negatives */
+	mpz_mod(r, r, tmp);
+	mpz_add_ui(r, r, 2);
+
+	/* z = a^(2tq) mod p */
+	mpz_mul_2exp(tmp, t, 1);	/* tmp = 2t */
+	mpz_mul(tmp, t, pub->q);	/* tmp = 2tq */
+	mpz_powm(z, r, tmp, pub->p);
+
+	mpz_sub_ui(tmp, z, 1);
+
+	mpz_gcd(tmp, tmp, pub->p);
+	if (mpz_cmp_ui(tmp, 1) == 0) {
+		mpz_powm(tmp, z, p0, pub->p);
+		if (mpz_cmp_ui(tmp, 1) == 0) {
+			goto success;
 		}
 	}
 
-  if (progress)
-	progress (progress_ctx, 'x');
+	if (progress)
+		progress(progress_ctx, 'x');
 
-  if (cert->pgen_counter >= (4 * p_bits + old_counter))
-	return 0;
+	if (cert->pgen_counter >= (4 * p_bits + old_counter))
+		return 0;
 
-  mpz_add_ui (t, t, 1);
-  goto retry;
+	mpz_add_ui(t, t, 1);
+	goto retry;
 
-success:
-  if (progress)
-	progress (progress_ctx, 'p');
+ success:
+	if (progress)
+		progress(progress_ctx, 'p');
 
-  ret = 1;
-  goto finish;
+	ret = 1;
+	goto finish;
 
-fail:
-  ret = 0;
+ fail:
+	ret = 0;
 
-finish:
-  mpz_clear (dp0);
-  mpz_clear (p0);
-  mpz_clear (tmp);
-  mpz_clear (t);
-  mpz_clear (z);
-  mpz_clear (s);
-  mpz_clear (r);
-  free (storage);
-  return ret;
+ finish:
+	mpz_clear(dp0);
+	mpz_clear(p0);
+	mpz_clear(tmp);
+	mpz_clear(t);
+	mpz_clear(z);
+	mpz_clear(s);
+	mpz_clear(r);
+	free(storage);
+	return ret;
 }
 
 int
 _dsa_generate_dss_g(struct dsa_public_key *pub,
-		     struct dss_params_validation_seeds* cert,
-		     unsigned first_seed_length, const void* first_seed,
-		     void *progress_ctx, nettle_progress_func *progress,
-		     unsigned index)
+		    struct dss_params_validation_seeds *cert,
+		    unsigned first_seed_length, const void *first_seed,
+		    void *progress_ctx, nettle_progress_func * progress,
+		    unsigned index)
 {
-mpz_t e, w;
-uint16_t count;
-uint8_t* dseed = NULL;
-unsigned dseed_size;
-unsigned pos;
-uint8_t digest[DIGEST_SIZE];
-int ret;
+	mpz_t e, w;
+	uint16_t count;
+	uint8_t *dseed = NULL;
+	unsigned dseed_size;
+	unsigned pos;
+	uint8_t digest[DIGEST_SIZE];
+	int ret;
 
-  if (index != 1 && index != 2)
-    return 0;
-    
-  dseed_size = first_seed_length+cert->pseed_length+cert->qseed_length+4+1+2;
-  dseed = malloc(dseed_size);
-  if (dseed == NULL)
-    return 0;
+	if (index != 1 && index != 2)
+		return 0;
 
-  mpz_init(e);
-  mpz_init(w);
-  
-  memcpy(dseed, first_seed, first_seed_length);
-  pos = first_seed_length;
-  
-  memcpy(dseed+pos, cert->pseed, cert->pseed_length);
-  pos += cert->pseed_length;
-  
-  memcpy(dseed+pos, cert->qseed, cert->qseed_length);
-  pos += cert->qseed_length;
-  
-  memcpy(dseed+pos, "\x67\x67\x65\x6e", 4);
-  pos += 4;
+	dseed_size =
+	    first_seed_length + cert->pseed_length + cert->qseed_length + 4 +
+	    1 + 2;
+	dseed = malloc(dseed_size);
+	if (dseed == NULL)
+		return 0;
 
-  *(dseed+pos) = (uint8_t)index;
-  pos += 1;
-  
-  mpz_sub_ui(e, pub->p, 1);
-  mpz_fdiv_q(e, pub->p, pub->q);
+	mpz_init(e);
+	mpz_init(w);
 
-  for (count=1;count < 65535;count++)
-    {
-      *(dseed+pos) = (count >> 8) & 0xff;
-      *(dseed+pos+1) = count & 0xff;
-      
-      hash(digest, dseed_size, dseed);
-      
-      nettle_mpz_set_str_256_u (w, DIGEST_SIZE, digest);
-      
-      mpz_powm (pub->g, w, e, pub->p);
-      
-      if (mpz_cmp_ui(pub->g, 2) < 0)
-        {
-          if (progress)
-            progress (progress_ctx, 'x');
-    	  continue;
-        }
-      
-      /* found */
-      goto success;
-    }
-	
-  /* if we're here we failed */
-  ret = 0;
-  goto finish;
-  
-success:
-  if (progress)
-    progress (progress_ctx, 'g');
+	memcpy(dseed, first_seed, first_seed_length);
+	pos = first_seed_length;
 
-  ret = 1;
+	memcpy(dseed + pos, cert->pseed, cert->pseed_length);
+	pos += cert->pseed_length;
 
-finish:
-  free(dseed);
-  mpz_clear(e);
-  mpz_clear(w);
-  return ret;
+	memcpy(dseed + pos, cert->qseed, cert->qseed_length);
+	pos += cert->qseed_length;
+
+	memcpy(dseed + pos, "\x67\x67\x65\x6e", 4);
+	pos += 4;
+
+	*(dseed + pos) = (uint8_t) index;
+	pos += 1;
+
+	mpz_sub_ui(e, pub->p, 1);
+	mpz_fdiv_q(e, pub->p, pub->q);
+
+	for (count = 1; count < 65535; count++) {
+		*(dseed + pos) = (count >> 8) & 0xff;
+		*(dseed + pos + 1) = count & 0xff;
+
+		hash(digest, dseed_size, dseed);
+
+		nettle_mpz_set_str_256_u(w, DIGEST_SIZE, digest);
+
+		mpz_powm(pub->g, w, e, pub->p);
+
+		if (mpz_cmp_ui(pub->g, 2) < 0) {
+			if (progress)
+				progress(progress_ctx, 'x');
+			continue;
+		}
+
+		/* found */
+		goto success;
+	}
+
+	/* if we're here we failed */
+	ret = 0;
+	goto finish;
+
+ success:
+	if (progress)
+		progress(progress_ctx, 'g');
+
+	ret = 1;
+
+ finish:
+	free(dseed);
+	mpz_clear(e);
+	mpz_clear(w);
+	return ret;
 
 }
 
@@ -341,19 +334,19 @@ finish:
 void
 _dsa_generate_dss_xy(struct dsa_public_key *pub,
 		     struct dsa_private_key *key,
-		     void *random_ctx, nettle_random_func *random)
+		     void *random_ctx, nettle_random_func * random)
 {
-mpz_t r;
+	mpz_t r;
 
-  mpz_init(r);
-  mpz_set(r, pub->q);
-  mpz_sub_ui(r, r, 2);
-  nettle_mpz_random(key->x, random_ctx, random, r);
-  mpz_add_ui(key->x, key->x, 1);
+	mpz_init(r);
+	mpz_set(r, pub->q);
+	mpz_sub_ui(r, r, 2);
+	nettle_mpz_random(key->x, random_ctx, random, r);
+	mpz_add_ui(key->x, key->x, 1);
 
-  mpz_powm(pub->y, pub->g, key->x, pub->p);
-  
-  mpz_clear(r);
+	mpz_powm(pub->y, pub->g, key->x, pub->p);
+
+	mpz_clear(r);
 }
 
 /* This generates p, q, g params using the algorithms from FIPS 186-4.
@@ -372,37 +365,37 @@ mpz_t r;
  */
 int
 dsa_generate_dss_keypair(struct dsa_public_key *pub,
-		     struct dsa_private_key *key,
-		     struct dss_params_validation_seeds* cert,
-		     unsigned index,
-		     void *random_ctx, nettle_random_func *random,
-		     void *progress_ctx, nettle_progress_func *progress,
-		     unsigned p_bits /* = L */, unsigned q_bits /* = N */)
+			 struct dsa_private_key *key,
+			 struct dss_params_validation_seeds *cert,
+			 unsigned index,
+			 void *random_ctx, nettle_random_func * random,
+			 void *progress_ctx, nettle_progress_func * progress,
+			 unsigned p_bits /* = L */ , unsigned q_bits /* = N */ )
 {
-  int ret;
+	int ret;
 
-  ret = _dsa_check_qp_sizes(q_bits, p_bits);
-  if (ret == 0)
-    return 0;
-  
-  cert->seed_length = (q_bits/8) + 1;
-  random(random_ctx, cert->seed_length, cert->seed);
+	ret = _dsa_check_qp_sizes(q_bits, p_bits);
+	if (ret == 0)
+		return 0;
 
-  ret = _dsa_generate_dss_pq(pub, cert, cert->seed_length, cert->seed,
-	progress_ctx, progress, p_bits, q_bits);
-  if (ret == 0)
-    return 0;
+	cert->seed_length = (q_bits / 8) + 1;
+	random(random_ctx, cert->seed_length, cert->seed);
 
-  ret = _dsa_generate_dss_g(pub, cert, cert->seed_length, cert->seed, 
-    progress_ctx, progress, index);
-  if (ret == 0)
-    return 0;
+	ret = _dsa_generate_dss_pq(pub, cert, cert->seed_length, cert->seed,
+				   progress_ctx, progress, p_bits, q_bits);
+	if (ret == 0)
+		return 0;
 
-  _dsa_generate_dss_xy(pub, key, random_ctx, random);
+	ret = _dsa_generate_dss_g(pub, cert, cert->seed_length, cert->seed,
+				  progress_ctx, progress, index);
+	if (ret == 0)
+		return 0;
 
-  if (progress)
-    progress (progress_ctx, '\n');
+	_dsa_generate_dss_xy(pub, key, random_ctx, random);
 
-  return 1;
-    
+	if (progress)
+		progress(progress_ctx, '\n');
+
+	return 1;
+
 }
