@@ -1343,6 +1343,9 @@ cleanup:
  * can be substituted in the place of the bits parameter using the
  * GNUTLS_CURVE_TO_BITS() macro.
  *
+ * For DSA keys, if the subgroup size needs to be specified check
+ * the GNUTLS_SUBGROUP_TO_BITS() macro.
+ *
  * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a

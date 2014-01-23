@@ -225,6 +225,13 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 int gnutls_privkey_init(gnutls_privkey_t * key);
 void gnutls_privkey_deinit(gnutls_privkey_t key);
 
+/* macros to allow specifying a subgroup and group size in gnutls_privkey_generate()
+ * and gnutls_x509_privkey_generate() */
+#define GNUTLS_SUBGROUP_TO_BITS(group, subgroup) (unsigned int)((subgroup<<16)|(group))
+#define GNUTLS_BITS_TO_SUBGROUP(bits) ((bits >> 16) & 0xFFFF)
+#define GNUTLS_BITS_TO_GROUP(bits) (bits & 0xFFFF)
+#define GNUTLS_BITS_HAVE_SUBGROUP(bits) ((bits) & 0xFFFF0000)
+
 int
 gnutls_privkey_generate (gnutls_privkey_t key,
                          gnutls_pk_algorithm_t algo, unsigned int bits,

@@ -768,7 +768,13 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 			dsa_public_key_init(&pub);
 			dsa_private_key_init(&priv);
 
-			q_bits = _gnutls_pk_bits_to_subgroup_bits(level);
+			if (GNUTLS_BITS_HAVE_SUBGROUP(level)) {
+				q_bits = GNUTLS_BITS_TO_SUBGROUP(level);
+				level = GNUTLS_BITS_TO_GROUP(level);
+			} else {
+				q_bits = _gnutls_pk_bits_to_subgroup_bits(level);
+			}
+
 			if (q_bits == 0)
 				return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
