@@ -1181,42 +1181,12 @@ int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
 				       gnutls_datum_t * y,
 				       gnutls_datum_t * k)
 {
-	int ret;
-
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	*curve = key->params.flags;
-
-	/* X */
-	ret = _gnutls_mpi_dprint_lz(key->params.params[ECC_X], x);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	/* Y */
-	ret = _gnutls_mpi_dprint_lz(key->params.params[ECC_Y], y);
-	if (ret < 0) {
-		gnutls_assert();
-		_gnutls_free_datum(x);
-		return ret;
-	}
-
-
-	/* K */
-	ret = _gnutls_mpi_dprint_lz(key->params.params[ECC_K], k);
-	if (ret < 0) {
-		gnutls_assert();
-		_gnutls_free_datum(x);
-		_gnutls_free_datum(y);
-		return ret;
-	}
-
-	return 0;
-
+	return _gnutls_params_get_ecc_raw(&key->params, curve, x, y, k);
 }
 
 /**
@@ -1242,9 +1212,7 @@ gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey_t key,
 				   gnutls_datum_t * d, gnutls_datum_t * p,
 				   gnutls_datum_t * q, gnutls_datum_t * u)
 {
-
-	return gnutls_x509_privkey_export_rsa_raw2(key, m, e, d, p, q, u,
-						   NULL, NULL);
+	return _gnutls_params_get_rsa_raw(&key->params, m, e, d, p, q, u, NULL, NULL);
 }
 
 /**
@@ -1276,105 +1244,7 @@ gnutls_x509_privkey_export_rsa_raw2(gnutls_x509_privkey_t key,
 				    gnutls_datum_t * e1,
 				    gnutls_datum_t * e2)
 {
-	int ret;
-	gnutls_pk_params_st pk_params;
-
-	gnutls_pk_params_init(&pk_params);
-
-	if (key == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	m->data = e->data = d->data = p->data = q->data = u->data = NULL;
-	m->size = e->size = d->size = p->size = q->size = u->size = 0;
-
-	ret = _gnutls_pk_params_copy(&pk_params, &key->params);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = _gnutls_pk_fixup(GNUTLS_PK_RSA, GNUTLS_EXPORT, &pk_params);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	ret = _gnutls_mpi_dprint_lz(pk_params.params[0], m);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* E */
-	ret = _gnutls_mpi_dprint_lz(pk_params.params[1], e);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* D */
-	ret = _gnutls_mpi_dprint_lz(pk_params.params[2], d);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* P */
-	ret = _gnutls_mpi_dprint_lz(pk_params.params[3], p);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* Q */
-	ret = _gnutls_mpi_dprint_lz(pk_params.params[4], q);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* U */
-	ret = _gnutls_mpi_dprint_lz(key->params.params[5], u);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	/* E1 */
-	if (e1) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[6], e1);
-		if (ret < 0) {
-			gnutls_assert();
-			goto error;
-		}
-	}
-
-	/* E2 */
-	if (e2) {
-		ret = _gnutls_mpi_dprint_lz(key->params.params[7], e2);
-		if (ret < 0) {
-			gnutls_assert();
-			goto error;
-		}
-	}
-
-	gnutls_pk_params_clear(&pk_params);
-	gnutls_pk_params_release(&pk_params);
-
-	return 0;
-
-      error:
-	_gnutls_free_datum(m);
-	_gnutls_free_datum(d);
-	_gnutls_free_datum(e);
-	_gnutls_free_datum(p);
-	_gnutls_free_datum(q);
-	gnutls_pk_params_clear(&pk_params);
-	gnutls_pk_params_release(&pk_params);
-
-	return ret;
+	return _gnutls_params_get_rsa_raw(&key->params, m, e, d, p, q, u, e1, e2);
 }
 
 /**
@@ -1399,61 +1269,7 @@ gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey_t key,
 				   gnutls_datum_t * g, gnutls_datum_t * y,
 				   gnutls_datum_t * x)
 {
-	int ret;
-
-	if (key == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	/* P */
-	ret = _gnutls_mpi_dprint_lz(key->params.params[0], p);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	/* Q */
-	ret = _gnutls_mpi_dprint_lz(key->params.params[1], q);
-	if (ret < 0) {
-		gnutls_assert();
-		_gnutls_free_datum(p);
-		return ret;
-	}
-
-
-	/* G */
-	ret = _gnutls_mpi_dprint_lz(key->params.params[2], g);
-	if (ret < 0) {
-		gnutls_assert();
-		_gnutls_free_datum(p);
-		_gnutls_free_datum(q);
-		return ret;
-	}
-
-
-	/* Y */
-	ret = _gnutls_mpi_dprint_lz(key->params.params[3], y);
-	if (ret < 0) {
-		gnutls_assert();
-		_gnutls_free_datum(p);
-		_gnutls_free_datum(g);
-		_gnutls_free_datum(q);
-		return ret;
-	}
-
-	/* X */
-	ret = _gnutls_mpi_dprint_lz(key->params.params[4], x);
-	if (ret < 0) {
-		gnutls_assert();
-		_gnutls_free_datum(y);
-		_gnutls_free_datum(p);
-		_gnutls_free_datum(g);
-		_gnutls_free_datum(q);
-		return ret;
-	}
-
-	return 0;
+	return _gnutls_params_get_dsa_raw(&key->params, p, q, g, y, x);
 }
 
 #ifdef ENABLE_FIPS140

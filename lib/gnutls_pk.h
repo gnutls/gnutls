@@ -78,4 +78,24 @@ int _gnutls_pk_get_hash_algorithm(gnutls_pk_algorithm_t pk,
 				  gnutls_digest_algorithm_t * dig,
 				  unsigned int *mand);
 
+int
+_gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
+				    gnutls_datum_t * m, gnutls_datum_t * e,
+				    gnutls_datum_t * d, gnutls_datum_t * p,
+				    gnutls_datum_t * q, gnutls_datum_t * u,
+				    gnutls_datum_t * e1,
+				    gnutls_datum_t * e2);
+
+int
+_gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
+			     gnutls_datum_t * p, gnutls_datum_t * q,
+			     gnutls_datum_t * g, gnutls_datum_t * y,
+			     gnutls_datum_t * x);
+
+int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k);
+
 #endif				/* GNUTLS_PK_H */

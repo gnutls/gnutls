@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2001-2013 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -387,4 +387,238 @@ decode_ber_digest_info(const gnutls_datum_t * info,
 	asn1_delete_structure(&dinfo);
 
 	return 0;
+}
+
+int
+_gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
+				    gnutls_datum_t * m, gnutls_datum_t * e,
+				    gnutls_datum_t * d, gnutls_datum_t * p,
+				    gnutls_datum_t * q, gnutls_datum_t * u,
+				    gnutls_datum_t * e1,
+				    gnutls_datum_t * e2)
+{
+	int ret;
+
+	if (params == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (params->algo != GNUTLS_PK_RSA) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (m) {
+		ret = _gnutls_mpi_dprint_lz(params->params[0], m);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
+	/* E */
+	if (e) {
+		ret = _gnutls_mpi_dprint_lz(params->params[1], e);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
+	/* D */
+	if (d) {
+		ret = _gnutls_mpi_dprint_lz(params->params[2], d);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
+	/* P */
+	if (p) {
+		ret = _gnutls_mpi_dprint_lz(params->params[3], p);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
+	/* Q */
+	if (q) {
+		ret = _gnutls_mpi_dprint_lz(params->params[4], q);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
+	/* U */
+	if (u) {
+		ret = _gnutls_mpi_dprint_lz(params->params[5], u);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
+	/* E1 */
+	if (e1) {
+		ret = _gnutls_mpi_dprint_lz(params->params[6], e1);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
+	/* E2 */
+	if (e2) {
+		ret = _gnutls_mpi_dprint_lz(params->params[7], e2);
+		if (ret < 0) {
+			gnutls_assert();
+			goto error;
+		}
+	}
+
+	return 0;
+
+      error:
+	_gnutls_free_datum(m);
+	_gnutls_free_datum(d);
+	_gnutls_free_datum(e);
+	_gnutls_free_datum(e1);
+	_gnutls_free_datum(e2);
+	_gnutls_free_datum(p);
+	_gnutls_free_datum(q);
+
+	return ret;
+}
+
+int
+_gnutls_params_get_dsa_raw(const gnutls_pk_params_st* params,
+			     gnutls_datum_t * p, gnutls_datum_t * q,
+			     gnutls_datum_t * g, gnutls_datum_t * y,
+			     gnutls_datum_t * x)
+{
+	int ret;
+
+	if (params == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (params->algo != GNUTLS_PK_DSA) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* P */
+	if (p) {
+		ret = _gnutls_mpi_dprint_lz(params->params[0], p);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
+
+	/* Q */
+	if (q) {
+		ret = _gnutls_mpi_dprint_lz(params->params[1], q);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(p);
+			return ret;
+		}
+	}
+
+
+	/* G */
+	if (g) {
+		ret = _gnutls_mpi_dprint_lz(params->params[2], g);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(p);
+			_gnutls_free_datum(q);
+			return ret;
+		}
+	}
+
+
+	/* Y */
+	if (y) {
+		ret = _gnutls_mpi_dprint_lz(params->params[3], y);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(p);
+			_gnutls_free_datum(g);
+			_gnutls_free_datum(q);
+			return ret;
+		}
+	}
+
+	/* X */
+	if (x) {
+		ret = _gnutls_mpi_dprint_lz(params->params[4], x);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(y);
+			_gnutls_free_datum(p);
+			_gnutls_free_datum(g);
+			_gnutls_free_datum(q);
+			return ret;
+		}
+	}
+
+	return 0;
+}
+
+int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k)
+{
+	int ret;
+
+	if (params == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (curve)
+		*curve = params->flags;
+
+	/* X */
+	if (x) {
+		ret = _gnutls_mpi_dprint_lz(params->params[ECC_X], x);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
+
+	/* Y */
+	if (y) {
+		ret = _gnutls_mpi_dprint_lz(params->params[ECC_Y], y);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(x);
+			return ret;
+		}
+	}
+
+
+	/* K */
+	if (k) {
+		ret = _gnutls_mpi_dprint_lz(params->params[ECC_K], k);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum(x);
+			_gnutls_free_datum(y);
+			return ret;
+		}
+	}
+
+	return 0;
+
 }

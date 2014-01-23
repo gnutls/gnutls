@@ -35,6 +35,9 @@ int _gnutls_datum_append(gnutls_datum_t * dat, const void *data,
 inline static
 void _gnutls_free_datum(gnutls_datum_t * dat)
 {
+	if (dat == NULL)
+		return;
+
 	if (dat->data != NULL)
 		gnutls_free(dat->data);
 

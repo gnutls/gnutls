@@ -107,6 +107,7 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 {
 	int ret;
 
+	pub->algo = priv->algo;
 	switch (pk) {
 	case GNUTLS_PK_RSA:
 		pub->params[0] = _gnutls_mpi_copy(priv->params[0]);
@@ -166,19 +167,16 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 
 /* Returns the public key of the private key (if possible)
  */
-int
-_gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
+static int
+_gnutls_privkey_get_mpis(gnutls_privkey_t key,
 				gnutls_pk_params_st * params)
 {
 	int ret;
-	gnutls_pk_algorithm_t pk =
-	    gnutls_privkey_get_pk_algorithm(key, NULL);
 
 	switch (key->type) {
 #ifdef ENABLE_OPENPGP
 	case GNUTLS_PRIVKEY_OPENPGP:
 		{
-			gnutls_pk_params_st tmp_params;
 			uint32_t kid[2];
 			uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
@@ -192,35 +190,53 @@ _gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
 								     key.
 								     openpgp,
 								     kid,
-								     &tmp_params);
+								     params);
 			} else
 				ret =
 				    _gnutls_openpgp_privkey_get_mpis(key->
 								     key.
 								     openpgp,
 								     NULL,
-								     &tmp_params);
+								     params);
 
 			if (ret < 0) {
 				gnutls_assert();
 				return ret;
 			}
-
-			ret = privkey_to_pubkey(pk, &tmp_params, params);
-
-			gnutls_pk_params_release(&tmp_params);
 		}
 
 		break;
 #endif
 	case GNUTLS_PRIVKEY_X509:
-		ret = privkey_to_pubkey(pk,
-					&key->key.x509->params, params);
+		ret = _gnutls_pk_params_copy(params, &key->key.x509->params);
 		break;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	return ret;
+}
+
+int
+_gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
+				gnutls_pk_params_st * params)
+{
+	int ret;
+	gnutls_pk_params_st tmp1;
+
+	gnutls_pk_params_init(&tmp1);
+
+	ret = _gnutls_privkey_get_mpis(key, &tmp1);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = privkey_to_pubkey(key->pk_algorithm, &tmp1, params);
+
+	gnutls_pk_params_release(&tmp1);
+
+	if (ret < 0)
+		gnutls_assert();
 
 	return ret;
 }
@@ -1111,3 +1127,142 @@ int gnutls_privkey_status(gnutls_privkey_t key)
 		return 1;
 	}
 }
+
+/**
+ * gnutls_privkey_get_pk_rsa_raw:
+ * @key: Holds the certificate
+ * @m: will hold the modulus
+ * @e: will hold the public exponent
+ * @d: will hold the private exponent
+ * @p: will hold the first prime (p)
+ * @q: will hold the second prime (q)
+ * @u: will hold the coefficient
+ * @e1: will hold e1 = d mod (p-1)
+ * @e2: will hold e2 = d mod (q-1)
+ *
+ * This function will export the RSA private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.3.0
+ **/
+int
+gnutls_privkey_get_pk_rsa_raw(gnutls_privkey_t key,
+				    gnutls_datum_t * m, gnutls_datum_t * e,
+				    gnutls_datum_t * d, gnutls_datum_t * p,
+				    gnutls_datum_t * q, gnutls_datum_t * u,
+				    gnutls_datum_t * e1,
+				    gnutls_datum_t * e2)
+{
+gnutls_pk_params_st params;
+int ret;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
+	gnutls_pk_params_init(&params);
+
+	ret = _gnutls_privkey_get_mpis(key, &params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_params_get_rsa_raw(&params, m, e, d, p, q, u, e1, e2);
+
+	gnutls_pk_params_release(&params);
+
+	return ret;
+}
+
+/**
+ * gnutls_privkey_get_pk_dsa_raw:
+ * @key: Holds the public key
+ * @p: will hold the p
+ * @q: will hold the q
+ * @g: will hold the g
+ * @y: will hold the y
+ * @x: will hold the x
+ *
+ * This function will export the DSA private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.3.0
+ **/
+int
+gnutls_privkey_get_pk_dsa_raw(gnutls_privkey_t key,
+			     gnutls_datum_t * p, gnutls_datum_t * q,
+			     gnutls_datum_t * g, gnutls_datum_t * y,
+			     gnutls_datum_t * x)
+{
+gnutls_pk_params_st params;
+int ret;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
+	gnutls_pk_params_init(&params);
+
+	ret = _gnutls_privkey_get_mpis(key, &params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_params_get_dsa_raw(&params, p, q, g, y, x);
+
+	gnutls_pk_params_release(&params);
+
+	return ret;
+}
+
+
+/**
+ * gnutls_privkey_get_pk_ecc_raw:
+ * @key: Holds the public key
+ * @curve: will hold the curve
+ * @x: will hold the x coordinate
+ * @y: will hold the y coordinate
+ * @k: will hold the private key
+ *
+ * This function will export the ECC private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.3.0
+ **/
+int
+gnutls_privkey_get_pk_ecc_raw(gnutls_privkey_t key,
+				       gnutls_ecc_curve_t * curve,
+				       gnutls_datum_t * x,
+				       gnutls_datum_t * y,
+				       gnutls_datum_t * k)
+{
+gnutls_pk_params_st params;
+int ret;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
+	gnutls_pk_params_init(&params);
+
+	ret = _gnutls_privkey_get_mpis(key, &params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_params_get_ecc_raw(&params, curve, x, y, k);
+
+	gnutls_pk_params_release(&params);
+
+	return ret;
+}
+

@@ -804,6 +804,7 @@ _gnutls_openpgp_privkey_get_mpis(gnutls_openpgp_privkey_t pkey,
 
 	pk_algorithm =
 	    _gnutls_openpgp_get_algo(pkt->pkt.secret_key->pk->pubkey_algo);
+	params->algo = pk_algorithm;
 
 	switch (pk_algorithm) {
 	case GNUTLS_PK_RSA:
