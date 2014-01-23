@@ -991,6 +991,8 @@ static unsigned small_prime_check(uint32_t x)
 	return 1;
 }
 
+#define div_ceil(x,y) ((x+(y)-1)/(y))
+
 /* The Shawe-Taylor algorithm described in FIPS 186-4. 
  * 
  * p: (output) the prime
@@ -1107,7 +1109,7 @@ st_provable_prime(mpz_t p,
 		unsigned old_counter, i;
 		mpz_t s, tmp, r, dc0, c0, c, t, z;
 		uint8_t *storage = NULL;
-		unsigned storage_length;
+		unsigned storage_length = 0;
 
 		mpz_init(s);
 		mpz_init(tmp);
@@ -1125,36 +1127,42 @@ st_provable_prime(mpz_t p,
 		if (ret == 0)
 			goto fail2;
 
-		iterations =
-		    (bits + DIGEST_SIZE * 8 - 1) / (DIGEST_SIZE * 8) - 1;
-
-		storage_length = iterations * DIGEST_SIZE;
-		storage = malloc(storage_length);
-		if (storage == NULL)
-			goto fail2;
-
 		nettle_mpz_set_str_256_u(s, pseed_length, pseed);
+		mpz_set_ui(tmp, 0);	/* x */
 
-		for (i = 0; i < iterations; i++) {
-			tseed_length = nettle_mpz_sizeinbase_256_u(s);
-			if (tseed_length > sizeof(tseed))
+		iterations = div_ceil(bits, DIGEST_SIZE * 8) - 1;
+
+		if (iterations > 0) {
+			storage_length = iterations * DIGEST_SIZE;
+
+			storage = malloc(storage_length);
+			if (storage == NULL)
 				goto fail2;
-			nettle_mpz_get_str_256(tseed_length, tseed, s);
 
-			hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
-			     tseed_length, tseed);
-			mpz_add_ui(s, s, 1);
+			for (i = 0; i < iterations; i++) {
+				tseed_length = nettle_mpz_sizeinbase_256_u(s);
+				if (tseed_length > sizeof(tseed))
+					goto fail2;
+				nettle_mpz_get_str_256(tseed_length, tseed, s);
+
+				hash(&storage
+				     [(iterations - i - 1) * DIGEST_SIZE],
+				     tseed_length, tseed);
+				mpz_add_ui(s, s, 1);
+			}
+
+			nettle_mpz_set_str_256_u(tmp, storage_length, storage);
 		}
+
 		mpz_add_ui(s, s, 1);
 
 		/* x = 2^(bits-1) + (x mod 2^(bits-1)) */
-		nettle_mpz_set_str_256_u(tmp, storage_length, storage);
 
 		mpz_set_ui(r, 1);
-		mpz_mul_2exp(r, r, bits - 1);
+		mpz_mul_2exp(r, r, bits - 1);	/* r = 2^(bits-1) */
 
 		mpz_mod_2exp(tmp, tmp, bits - 1);
-		mpz_add(tmp, tmp, r);
+		mpz_add(tmp, tmp, r);	/* tmp = x */
 
 		/* Generate candidate prime c in [2^(bits-1), 2^bits] */
 
@@ -1167,7 +1175,8 @@ st_provable_prime(mpz_t p,
 		mpz_mul(c, dc0, t);
 		mpz_add_ui(c, c, 1);
 
-		if (mpz_sizeinbase(tmp, 2) > bits) {
+		/* if 2tc0+1 > 2^bits */
+		if (mpz_sizeinbase(c, 2) > bits) {
 			/* t = 2^(bits-1)/2c0 */
 			mpz_set_ui(tmp, 1);
 			mpz_mul_2exp(tmp, tmp, bits - 1);
@@ -1180,21 +1189,27 @@ st_provable_prime(mpz_t p,
 
 		gen_counter++;
 
-		for (i = 0; i < iterations; i++) {
-			tseed_length = nettle_mpz_sizeinbase_256_u(s);
-			if (tseed_length > sizeof(tseed))
-				goto fail2;
+		mpz_set_ui(r, 0);
+		if (iterations > 0) {
 
-			nettle_mpz_get_str_256(tseed_length, tseed, s);
+			for (i = 0; i < iterations; i++) {
+				tseed_length = nettle_mpz_sizeinbase_256_u(s);
+				if (tseed_length > sizeof(tseed))
+					goto fail2;
 
-			hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
-			     tseed_length, tseed);
-			mpz_add_ui(s, s, 1);
+				nettle_mpz_get_str_256(tseed_length, tseed, s);
+
+				hash(&storage
+				     [(iterations - i - 1) * DIGEST_SIZE],
+				     tseed_length, tseed);
+				mpz_add_ui(s, s, 1);
+			}
+
+			/* r = a */
+			nettle_mpz_set_str_256_u(r, storage_length, storage);
 		}
-		mpz_add_ui(s, s, 1);
 
-		/* r = a */
-		nettle_mpz_set_str_256_u(r, storage_length, storage);
+		mpz_add_ui(s, s, 1);
 
 		/* a = 2 + (a mod (c-3)) */
 		mpz_sub_ui(tmp, c, 3);	/* c is too large to worry about negatives */
