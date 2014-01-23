@@ -78,8 +78,9 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 	if (ret == 0)
 		return 0;
 
-	if (seed_length < q_bits / 8)
+	if (seed_length < q_bits / 8) {
 		return 0;
+	}
 
 	mpz_init(p0);
 	mpz_init(dp0);
@@ -91,12 +92,13 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 
 	nettle_mpz_set_str_256_u(s, seed_length, seed);
 
-	/* firstseed <= 2^(N-1) */
+	/* firstseed < 2^(N-1) */
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, q_bits - 1);
 
-	if (mpz_cmp(s, r) >= 0)
+	if (mpz_cmp(s, r) < 0) {
 		goto fail;
+	}
 
 	cert->qseed_length = sizeof(cert->qseed);
 	cert->pseed_length = sizeof(cert->pseed);
@@ -106,8 +108,9 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 				&cert->qgen_counter,
 				q_bits,
 				seed_length, seed, progress_ctx, progress);
-	if (ret == 0)
+	if (ret == 0) {
 		goto fail;
+	}
 
 	if (progress)
 		progress(progress_ctx, 'q');
@@ -118,8 +121,9 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 				1 + ((p_bits + 1) / 2),
 				cert->qseed_length, cert->qseed,
 				progress_ctx, progress);
-	if (ret == 0)
+	if (ret == 0) {
 		goto fail;
+	}
 
 	iterations = ((p_bits + DIGEST_SIZE - 1) / DIGEST_SIZE) - 1;
 	old_counter = cert->pgen_counter;
@@ -289,7 +293,7 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 	pos += 1;
 
 	mpz_sub_ui(e, pub->p, 1);
-	mpz_fdiv_q(e, pub->p, pub->q);
+	mpz_fdiv_q(e, e, pub->q);
 
 	for (count = 1; count < 65535; count++) {
 		*(dseed + pos) = (count >> 8) & 0xff;
@@ -312,6 +316,8 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 	}
 
 	/* if we're here we failed */
+	if (progress)
+		progress(progress_ctx, 'X');
 	ret = 0;
 	goto finish;
 

@@ -53,6 +53,93 @@ dsa_validate_dss_keypair(struct dsa_public_key *pub,
 			 unsigned index)
 {
 	int ret;
+
+	ret = _dsa_validate_dss_pq(pub, cert);
+	if (ret == 0)
+		return 0;
+
+	ret = _dsa_validate_dss_g(pub, cert, index);
+	if (ret == 0)
+		return 0;
+
+	return 1;
+}
+
+int
+_dsa_validate_dss_g(struct dsa_public_key *pub,
+		    struct dss_params_validation_seeds *cert, unsigned index)
+{
+	int ret;
+	unsigned p_bits, q_bits;
+	struct dsa_public_key pub2;
+	struct dss_params_validation_seeds cert2;
+	mpz_t r;
+
+	p_bits = mpz_sizeinbase(pub->p, 2);
+	q_bits = mpz_sizeinbase(pub->q, 2);
+
+	ret = _dsa_check_qp_sizes(q_bits, p_bits);
+	if (ret == 0) {
+		return 0;
+	}
+
+	memcpy(&cert2, cert, sizeof(cert2));
+
+	mpz_init(r);
+	dsa_public_key_init(&pub2);
+
+	mpz_set(pub2.p, pub->p);
+	mpz_set(pub2.q, pub->q);
+
+	/* verify g */
+	if (index != 1 && index != 2) {
+		goto fail;
+	}
+
+	/* 2<= g <= p-1 */
+	mpz_set(r, pub->p);
+	mpz_sub_ui(r, r, 1);
+	if (mpz_cmp_ui(pub->g, 2) < 0 || mpz_cmp(pub->g, r) >= 0) {
+		goto fail;
+	}
+
+	/* g^q == 1 mod p */
+	mpz_powm(r, pub->g, pub->q, pub->p);
+	if (mpz_cmp_ui(r, 1) != 0) {
+		goto fail;
+	}
+
+	/* repeat g generation */
+	ret = _dsa_generate_dss_g(&pub2,
+				  &cert2, cert->seed_length, cert->seed,
+				  NULL, NULL, index);
+	if (ret == 0) {
+		goto fail;
+	}
+
+	if (mpz_cmp(pub->g, pub2.g) != 0) {
+		goto fail;
+	}
+
+	/* everything looks ok */
+	ret = 1;
+	goto finish;
+
+ fail:
+	ret = 0;
+
+ finish:
+	dsa_public_key_clear(&pub2);
+	mpz_clear(r);
+
+	return ret;
+}
+
+int
+_dsa_validate_dss_pq(struct dsa_public_key *pub,
+		     struct dss_params_validation_seeds *cert)
+{
+	int ret;
 	unsigned p_bits, q_bits;
 	struct dsa_public_key pub2;
 	struct dss_params_validation_seeds cert2;
@@ -62,8 +149,9 @@ dsa_validate_dss_keypair(struct dsa_public_key *pub,
 	q_bits = mpz_sizeinbase(pub->q, 2);
 
 	ret = _dsa_check_qp_sizes(q_bits, p_bits);
-	if (ret == 0)
+	if (ret == 0) {
 		return 0;
+	}
 
 	mpz_init(r);
 	mpz_init(s);
@@ -71,78 +159,59 @@ dsa_validate_dss_keypair(struct dsa_public_key *pub,
 
 	nettle_mpz_set_str_256_u(s, cert->seed_length, cert->seed);
 
-	/* firstseed <= 2^(N-1) */
+	/* firstseed < 2^(N-1) */
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, q_bits - 1);
 
-	if (mpz_cmp(s, r) < 0)
+	if (mpz_cmp(s, r) < 0) {
 		goto fail;
+	}
 
 	/* 2^N <= q */
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, q_bits);
 
-	if (mpz_cmp(r, pub->q) <= 0)
+	if (mpz_cmp(r, pub->q) <= 0) {
 		goto fail;
+	}
 
 	/* 2^L <= p */
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, p_bits);
 
-	if (mpz_cmp(r, pub->p) <= 0)
+	if (mpz_cmp(r, pub->p) <= 0) {
 		goto fail;
+	}
 
 	/* p-1 mod q != 0 */
 	mpz_set(r, pub->p);
 	mpz_sub_ui(r, r, 1);
 
 	mpz_mod(r, r, pub->q);
-	if (mpz_cmp_ui(r, 0) != 0)
+	if (mpz_cmp_ui(r, 0) != 0) {
 		goto fail;
+	}
 
 	/* replay the construction */
 	ret = _dsa_generate_dss_pq(&pub2, &cert2, cert->seed_length, cert->seed,
 				   NULL, NULL, p_bits, q_bits);
-	if (ret == 0)
+	if (ret == 0) {
 		goto fail;
+	}
 
 	if (cert->pseed_length != cert2.pseed_length ||
 	    cert->qseed_length != cert2.qseed_length ||
 	    cert->pgen_counter != cert2.pgen_counter ||
 	    cert->qgen_counter != cert2.qgen_counter ||
 	    memcmp(cert->qseed, cert2.qseed, cert2.qseed_length) != 0 ||
-	    memcmp(cert->pseed, cert2.pseed, cert2.pseed_length) != 0)
+	    memcmp(cert->pseed, cert2.pseed, cert2.pseed_length) != 0) {
 		goto fail;
+	}
 
-	if (mpz_sizeinbase(s, 2) < q_bits - 1)
+	if (mpz_sizeinbase(s, 2) < q_bits - 1) {
 		goto fail;
+	}
 
-	/* verify g */
-	if (index != 1 && index != 2)
-		goto fail;
-
-	/* 2<= g <= p-1 */
-	mpz_set(r, pub->p);
-	mpz_sub_ui(r, r, 1);
-	if (mpz_cmp_ui(pub->g, 2) < 0 || mpz_cmp(pub->g, r) >= 0)
-		goto fail;
-
-	/* g^q == 1 mod p */
-	mpz_powm(r, pub->g, pub->q, pub->p);
-	if (mpz_cmp_ui(r, 1) != 0)
-		goto fail;
-
-	/* repeat g generation */
-	ret = _dsa_generate_dss_g(&pub2,
-				  &cert2, cert->seed_length, cert->seed,
-				  NULL, NULL, index);
-	if (ret == 0)
-		goto fail;
-
-	if (mpz_cmp(pub->g, pub2.g) != 0)
-		goto fail;
-
-	/* every looks ok */
 	ret = 1;
 	goto finish;
 

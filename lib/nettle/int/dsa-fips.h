@@ -28,7 +28,7 @@
 #include <nettle/dsa.h>
 #include <nettle/sha2.h>
 
-#define MAX_PVP_SEED_SIZE 128
+#define MAX_PVP_SEED_SIZE 256
 
 struct dss_params_validation_seeds {
 	unsigned seed_length; /* first seed */
@@ -61,6 +61,15 @@ dsa_generate_dss_keypair(struct dsa_public_key *pub,
 
 int
 dsa_validate_dss_keypair(struct dsa_public_key *pub,
+		     struct dss_params_validation_seeds* cert,
+		     unsigned index);
+
+int
+_dsa_validate_dss_pq(struct dsa_public_key *pub,
+		     struct dss_params_validation_seeds* cert);
+
+int
+_dsa_validate_dss_g(struct dsa_public_key *pub,
 		     struct dss_params_validation_seeds* cert,
 		     unsigned index);
 
