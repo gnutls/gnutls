@@ -991,6 +991,101 @@ static unsigned small_prime_check(uint32_t x)
 	return 1;
 }
 
+static int st_provable_prime_small(mpz_t p,
+				   unsigned *prime_seed_length,
+				   void *prime_seed,
+				   unsigned *prime_gen_counter, unsigned bits,
+				   unsigned seed_length, const void *seed,
+				   void *progress_ctx,
+				   nettle_progress_func * progress)
+{
+	unsigned gen_counter = 0;
+	unsigned tseed_length;
+	uint8_t tseed[MAX_PVP_SEED_SIZE];
+	uint8_t h1[DIGEST_SIZE];
+	uint8_t h2[DIGEST_SIZE];
+	uint32_t c;
+	mpz_t s;
+	unsigned highbit;
+
+	assert(bits >= 2);
+
+	mpz_init(s);
+
+	/* seed is handled as mpz_t instead of simply using INCREMENT
+	 * for the few (unlikely) cases where seed overflows. */
+	nettle_mpz_set_str_256_u(s, seed_length, seed);
+
+ retry1:
+	tseed_length = nettle_mpz_sizeinbase_256_u(s);
+	if (tseed_length > sizeof(tseed))
+		goto fail1;
+
+	/* c = Hash(seed) XOR Hash(seed+1) */
+	nettle_mpz_get_str_256(tseed_length, tseed, s);
+
+	hash(h1, tseed_length, tseed);
+
+	mpz_add_ui(s, s, 1);
+
+	tseed_length = nettle_mpz_sizeinbase_256_u(s);
+	if (tseed_length > sizeof(tseed))
+		goto fail1;
+
+	nettle_mpz_get_str_256(tseed_length, tseed, s);
+
+	hash(h2, tseed_length, tseed);
+
+	memxor(h1, h2, sizeof(h1));
+
+	/* c = 2^(bits-1) + (c mod 2^(bits-1)) */
+	highbit = 1L << (bits - 1);
+	c = READ_UINT32(&h1[DIGEST_SIZE - 4]);
+
+	c &= highbit - 1;
+
+	/* Make sure c is odd and high bit is set */
+	c |= highbit | 1;
+
+	gen_counter++;
+
+	/* seed++ */
+	mpz_add_ui(s, s, 1);
+
+	/* deterministic primality check on c */
+	if (small_prime_check(c) == 0) {
+		if (gen_counter >= 4 * bits)
+			goto fail1;	/* failed */
+
+		if (progress)
+			progress(progress_ctx, 'x');
+
+		goto retry1;
+	}
+
+	/* success */
+	mpz_set_ui(p, c);
+
+	if (prime_seed != 0) {
+		tseed_length = nettle_mpz_sizeinbase_256_u(s);
+		if (*prime_seed_length < tseed_length)
+			goto fail1;
+
+		nettle_mpz_get_str_256(tseed_length, prime_seed, s);
+		*prime_seed_length = tseed_length;
+	}
+
+	if (prime_gen_counter)
+		*prime_gen_counter = gen_counter;
+
+	mpz_clear(s);
+	return 1;
+
+ fail1:
+	mpz_clear(s);
+	return 0;
+}
+
 #define div_ceil(x,y) ((x+(y)-1)/(y))
 
 /* The Shawe-Taylor algorithm described in FIPS 186-4. 
@@ -1018,261 +1113,181 @@ st_provable_prime(mpz_t p,
 	unsigned gen_counter = 0;
 	unsigned tseed_length;
 	uint8_t tseed[MAX_PVP_SEED_SIZE];
-
-	assert(bits >= 2);
+	int ret;
+	unsigned pseed_length, iterations;
+	uint8_t pseed[seed_length + 2];
+	unsigned old_counter, i;
+	mpz_t s, tmp, r, dc0, c0, c, t, z;
+	uint8_t *storage = NULL;
+	unsigned storage_length = 0;
 
 	if (bits < 33) {
-		uint8_t h1[DIGEST_SIZE];
-		uint8_t h2[DIGEST_SIZE];
-		uint32_t c;
-		mpz_t s;
-		unsigned highbit;
+		return st_provable_prime_small(p, prime_seed_length, prime_seed,
+					       prime_gen_counter, bits,
+					       seed_length, seed, progress_ctx,
+					       progress);
+	}
 
-		mpz_init(s);
+	mpz_init(s);
+	mpz_init(tmp);
+	mpz_init(r);
+	mpz_init(c);
+	mpz_init(z);
+	mpz_init(t);
+	mpz_init(c0);
+	mpz_init(dc0);
 
-		/* seed is handled as mpz_t instead of simply using INCREMENT
-		 * for the few (unlikely) cases where seed overflows. */
-		nettle_mpz_set_str_256_u(s, seed_length, seed);
+	pseed_length = sizeof(pseed);
+	ret = st_provable_prime(c0, &pseed_length, pseed, &old_counter,
+				((bits + 1) / 2) + 1, seed_length, seed,
+				progress_ctx, progress);
+	if (ret == 0)
+		goto fail2;
 
- retry1:
-		tseed_length = nettle_mpz_sizeinbase_256_u(s);
-		if (tseed_length > sizeof(tseed))
-			goto fail1;
+	nettle_mpz_set_str_256_u(s, pseed_length, pseed);
+	mpz_set_ui(tmp, 0);	/* x */
 
-		/* c = Hash(seed) XOR Hash(seed+1) */
-		nettle_mpz_get_str_256(tseed_length, tseed, s);
+	iterations = div_ceil(bits, DIGEST_SIZE * 8) - 1;
 
-		hash(h1, tseed_length, tseed);
+	if (iterations > 0) {
+		storage_length = iterations * DIGEST_SIZE;
 
-		mpz_add_ui(s, s, 1);
-
-		tseed_length = nettle_mpz_sizeinbase_256_u(s);
-		if (tseed_length > sizeof(tseed))
-			goto fail1;
-
-		nettle_mpz_get_str_256(tseed_length, tseed, s);
-
-		hash(h2, tseed_length, tseed);
-
-		memxor(h1, h2, sizeof(h1));
-
-		/* c = 2^(bits-1) + (c mod 2^(bits-1)) */
-		highbit = 1L << (bits - 1);
-		c = READ_UINT32(&h1[DIGEST_SIZE - 4]);
-
-		c &= highbit - 1;
-
-		/* Make sure c is odd and high bit is set */
-		c |= highbit | 1;
-
-		gen_counter++;
-
-		/* seed++ */
-		mpz_add_ui(s, s, 1);
-
-		/* deterministic primality check on c */
-		if (small_prime_check(c) == 0) {
-			if (gen_counter >= 4 * bits)
-				goto fail1;	/* failed */
-
-			if (progress)
-				progress(progress_ctx, 'x');
-
-			goto retry1;
-		}
-
-		/* success */
-		mpz_set_ui(p, c);
-
-		if (prime_seed != 0) {
-			tseed_length = nettle_mpz_sizeinbase_256_u(s);
-			if (*prime_seed_length < tseed_length)
-				goto fail1;
-
-			nettle_mpz_get_str_256(tseed_length, prime_seed, s);
-			*prime_seed_length = tseed_length;
-		}
-
-		if (prime_gen_counter)
-			*prime_gen_counter = gen_counter;
-
-		mpz_clear(s);
-		return 1;
-
- fail1:
-		mpz_clear(s);
-		return 0;
-	} else {
-		int ret;
-		unsigned pseed_length, iterations;
-		uint8_t pseed[seed_length + 2];
-		unsigned old_counter, i;
-		mpz_t s, tmp, r, dc0, c0, c, t, z;
-		uint8_t *storage = NULL;
-		unsigned storage_length = 0;
-
-		mpz_init(s);
-		mpz_init(tmp);
-		mpz_init(r);
-		mpz_init(c);
-		mpz_init(z);
-		mpz_init(t);
-		mpz_init(c0);
-		mpz_init(dc0);
-
-		pseed_length = sizeof(pseed);
-		ret = st_provable_prime(c0, &pseed_length, pseed, &old_counter,
-					((bits + 1) / 2) + 1, seed_length, seed,
-					progress_ctx, progress);
-		if (ret == 0)
+		storage = malloc(storage_length);
+		if (storage == NULL)
 			goto fail2;
 
-		nettle_mpz_set_str_256_u(s, pseed_length, pseed);
-		mpz_set_ui(tmp, 0);	/* x */
-
-		iterations = div_ceil(bits, DIGEST_SIZE * 8) - 1;
-
-		if (iterations > 0) {
-			storage_length = iterations * DIGEST_SIZE;
-
-			storage = malloc(storage_length);
-			if (storage == NULL)
+		for (i = 0; i < iterations; i++) {
+			tseed_length = nettle_mpz_sizeinbase_256_u(s);
+			if (tseed_length > sizeof(tseed))
 				goto fail2;
+			nettle_mpz_get_str_256(tseed_length, tseed, s);
 
-			for (i = 0; i < iterations; i++) {
-				tseed_length = nettle_mpz_sizeinbase_256_u(s);
-				if (tseed_length > sizeof(tseed))
-					goto fail2;
-				nettle_mpz_get_str_256(tseed_length, tseed, s);
-
-				hash(&storage
-				     [(iterations - i - 1) * DIGEST_SIZE],
-				     tseed_length, tseed);
-				mpz_add_ui(s, s, 1);
-			}
-
-			nettle_mpz_set_str_256_u(tmp, storage_length, storage);
+			hash(&storage
+			     [(iterations - i - 1) * DIGEST_SIZE],
+			     tseed_length, tseed);
+			mpz_add_ui(s, s, 1);
 		}
 
-		mpz_add_ui(s, s, 1);
+		nettle_mpz_set_str_256_u(tmp, storage_length, storage);
+	}
 
-		/* x = 2^(bits-1) + (x mod 2^(bits-1)) */
+	mpz_add_ui(s, s, 1);
 
-		mpz_set_ui(r, 1);
-		mpz_mul_2exp(r, r, bits - 1);	/* r = 2^(bits-1) */
+	/* x = 2^(bits-1) + (x mod 2^(bits-1)) */
 
-		mpz_mod_2exp(tmp, tmp, bits - 1);
-		mpz_add(tmp, tmp, r);	/* tmp = x */
+	mpz_set_ui(r, 1);
+	mpz_mul_2exp(r, r, bits - 1);	/* r = 2^(bits-1) */
 
-		/* Generate candidate prime c in [2^(bits-1), 2^bits] */
+	mpz_mod_2exp(tmp, tmp, bits - 1);
+	mpz_add(tmp, tmp, r);	/* tmp = x */
 
-		/* t = u[x/2c0] */
-		mpz_mul_2exp(dc0, c0, 1);	/* dc0 = 2*c0 */
-		mpz_cdiv_q(t, tmp, dc0);
+	/* Generate candidate prime c in [2^(bits-1), 2^bits] */
+
+	/* t = u[x/2c0] */
+	mpz_mul_2exp(dc0, c0, 1);	/* dc0 = 2*c0 */
+	mpz_cdiv_q(t, tmp, dc0);
 
  retry2:
-		/* c = t*(2c0) + 1 */
+	/* c = t*(2c0) + 1 */
+	mpz_mul(c, dc0, t);
+	mpz_add_ui(c, c, 1);
+
+	/* if 2tc0+1 > 2^bits */
+	if (mpz_sizeinbase(c, 2) > bits) {
+		/* t = 2^(bits-1)/2c0 */
+		mpz_set_ui(tmp, 1);
+		mpz_mul_2exp(tmp, tmp, bits - 1);
+		mpz_cdiv_q(t, tmp, dc0);
+
+		/* c = t* 2c0 + 1 */
 		mpz_mul(c, dc0, t);
 		mpz_add_ui(c, c, 1);
+	}
 
-		/* if 2tc0+1 > 2^bits */
-		if (mpz_sizeinbase(c, 2) > bits) {
-			/* t = 2^(bits-1)/2c0 */
-			mpz_set_ui(tmp, 1);
-			mpz_mul_2exp(tmp, tmp, bits - 1);
-			mpz_cdiv_q(t, tmp, dc0);
+	gen_counter++;
 
-			/* c = t* 2c0 + 1 */
-			mpz_mul(c, dc0, t);
-			mpz_add_ui(c, c, 1);
+	mpz_set_ui(r, 0);
+	if (iterations > 0) {
+
+		for (i = 0; i < iterations; i++) {
+			tseed_length = nettle_mpz_sizeinbase_256_u(s);
+			if (tseed_length > sizeof(tseed))
+				goto fail2;
+
+			nettle_mpz_get_str_256(tseed_length, tseed, s);
+
+			hash(&storage
+			     [(iterations - i - 1) * DIGEST_SIZE],
+			     tseed_length, tseed);
+			mpz_add_ui(s, s, 1);
 		}
 
-		gen_counter++;
+		/* r = a */
+		nettle_mpz_set_str_256_u(r, storage_length, storage);
+	}
 
-		mpz_set_ui(r, 0);
-		if (iterations > 0) {
+	mpz_add_ui(s, s, 1);
 
-			for (i = 0; i < iterations; i++) {
+	/* a = 2 + (a mod (c-3)) */
+	mpz_sub_ui(tmp, c, 3);	/* c is too large to worry about negatives */
+	mpz_mod(r, r, tmp);
+	mpz_add_ui(r, r, 2);
+
+	/* z = a^(2t) mod c */
+	mpz_mul_2exp(tmp, t, 1);	/* tmp = 2t */
+	mpz_powm(z, r, tmp, c);
+
+	mpz_sub_ui(tmp, z, 1);
+
+	mpz_gcd(tmp, tmp, c);
+
+	if (mpz_cmp_ui(tmp, 1) == 0) {
+		mpz_powm(tmp, z, c0, c);
+		if (mpz_cmp_ui(tmp, 1) == 0) {
+			mpz_set(p, c);
+
+			if (prime_seed != NULL) {
 				tseed_length = nettle_mpz_sizeinbase_256_u(s);
-				if (tseed_length > sizeof(tseed))
+				if (*prime_seed_length < tseed_length)
 					goto fail2;
 
-				nettle_mpz_get_str_256(tseed_length, tseed, s);
-
-				hash(&storage
-				     [(iterations - i - 1) * DIGEST_SIZE],
-				     tseed_length, tseed);
-				mpz_add_ui(s, s, 1);
+				nettle_mpz_get_str_256(tseed_length,
+						       prime_seed, s);
+				*prime_seed_length = tseed_length;
 			}
 
-			/* r = a */
-			nettle_mpz_set_str_256_u(r, storage_length, storage);
+			if (prime_gen_counter)
+				*prime_gen_counter = gen_counter;
+
+			goto success2;
 		}
+	}
 
-		mpz_add_ui(s, s, 1);
+	if (progress)
+		progress(progress_ctx, 'x');
 
-		/* a = 2 + (a mod (c-3)) */
-		mpz_sub_ui(tmp, c, 3);	/* c is too large to worry about negatives */
-		mpz_mod(r, r, tmp);
-		mpz_add_ui(r, r, 2);
+	if (gen_counter >= (4 * bits + old_counter))
+		return 0;
 
-		/* z = a^(2t) mod c */
-		mpz_mul_2exp(tmp, t, 1);	/* tmp = 2t */
-		mpz_powm(z, r, tmp, c);
-
-		mpz_sub_ui(tmp, z, 1);
-
-		mpz_gcd(tmp, tmp, c);
-
-		if (mpz_cmp_ui(tmp, 1) == 0) {
-			mpz_powm(tmp, z, c0, c);
-			if (mpz_cmp_ui(tmp, 1) == 0) {
-				mpz_set(p, c);
-
-				if (prime_seed != NULL) {
-					tseed_length =
-					    nettle_mpz_sizeinbase_256_u(s);
-					if (*prime_seed_length < tseed_length)
-						goto fail2;
-
-					nettle_mpz_get_str_256(tseed_length,
-							       prime_seed, s);
-					*prime_seed_length = tseed_length;
-				}
-
-				if (prime_gen_counter)
-					*prime_gen_counter = gen_counter;
-
-				goto success2;
-			}
-		}
-
-		if (progress)
-			progress(progress_ctx, 'x');
-
-		if (gen_counter >= (4 * bits + old_counter))
-			return 0;
-
-		mpz_add_ui(t, t, 1);
-		goto retry2;
+	mpz_add_ui(t, t, 1);
+	goto retry2;
 
  success2:
-		ret = 1;
-		goto finish2;
+	ret = 1;
+	goto finish2;
 
  fail2:
-		ret = 0;
+	ret = 0;
 
  finish2:
-		mpz_clear(c0);
-		mpz_clear(dc0);
-		mpz_clear(r);
-		mpz_clear(s);
-		mpz_clear(z);
-		mpz_clear(t);
-		mpz_clear(tmp);
-		mpz_clear(c);
-		free(storage);
-		return ret;
-	}
+	mpz_clear(c0);
+	mpz_clear(dc0);
+	mpz_clear(r);
+	mpz_clear(s);
+	mpz_clear(z);
+	mpz_clear(t);
+	mpz_clear(tmp);
+	mpz_clear(c);
+	free(storage);
+	return ret;
 }
