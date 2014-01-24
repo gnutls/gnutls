@@ -68,7 +68,8 @@ pin_callback(void *user, int attempt, const char *token_url,
 void pkcs11_common(void);
 
 #ifdef _WIN32
-static int neterrno()
+# include <errno.h>
+static int neterrno(void)
 {
 int err = WSAGetLastError();
   
@@ -93,11 +94,12 @@ system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 	return recv((long)ptr, data, data_size, 0);
 }
 
+static
 void set_read_funcs(gnutls_session_t session)
 {
-	gnutls_transport_set_push_function(vpninfo->https_sess, system_write);
-	gnutls_transport_set_pull_function(vpninfo->https_sess, system_read);
-	gnutls_transport_set_errno_function(vpninfo->https_sess, neterrno);
+	gnutls_transport_set_push_function(session, system_write);
+	gnutls_transport_set_pull_function(session, system_read);
+	gnutls_transport_set_errno_function(session, neterrno);
 
 }
 #else
