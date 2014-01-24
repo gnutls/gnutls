@@ -52,12 +52,19 @@ dsa_validate_dss_pqg(struct dsa_public_key *pub,
 		     struct dss_params_validation_seeds *cert, unsigned index)
 {
 	int ret;
+	uint8_t domain_seed[MAX_PVP_SEED_SIZE*3];
+	unsigned domain_seed_size = 0;
 
 	ret = _dsa_validate_dss_pq(pub, cert);
 	if (ret == 0)
 		return 0;
 
-	ret = _dsa_validate_dss_g(pub, cert, index);
+	domain_seed_size = cert->seed_length + cert->qseed_length + cert->pseed_length;
+	memcpy(domain_seed, cert->seed, cert->seed_length);
+	memcpy(&domain_seed[cert->seed_length], cert->pseed, cert->pseed_length);
+	memcpy(&domain_seed[cert->seed_length+cert->pseed_length], cert->qseed, cert->qseed_length);
+
+	ret = _dsa_validate_dss_g(pub, domain_seed_size, domain_seed, index);
 	if (ret == 0)
 		return 0;
 
@@ -66,12 +73,11 @@ dsa_validate_dss_pqg(struct dsa_public_key *pub,
 
 int
 _dsa_validate_dss_g(struct dsa_public_key *pub,
-		    struct dss_params_validation_seeds *cert, unsigned index)
+		    unsigned domain_seed_size, const uint8_t *domain_seed, unsigned index)
 {
 	int ret;
 	unsigned p_bits, q_bits;
 	struct dsa_public_key pub2;
-	struct dss_params_validation_seeds cert2;
 	mpz_t r;
 
 	p_bits = mpz_sizeinbase(pub->p, 2);
@@ -82,8 +88,6 @@ _dsa_validate_dss_g(struct dsa_public_key *pub,
 		return 0;
 	}
 
-	memcpy(&cert2, cert, sizeof(cert2));
-
 	mpz_init(r);
 	dsa_public_key_init(&pub2);
 
@@ -91,7 +95,7 @@ _dsa_validate_dss_g(struct dsa_public_key *pub,
 	mpz_set(pub2.q, pub->q);
 
 	/* verify g */
-	if (index > 65535) {
+	if (index > 255) {
 		goto fail;
 	}
 
@@ -110,7 +114,7 @@ _dsa_validate_dss_g(struct dsa_public_key *pub,
 
 	/* repeat g generation */
 	ret = _dsa_generate_dss_g(&pub2,
-				  &cert2, cert->seed_length, cert->seed,
+				  domain_seed_size, domain_seed,
 				  NULL, NULL, index);
 	if (ret == 0) {
 		goto fail;

@@ -77,8 +77,7 @@ _dsa_validate_dss_pq(struct dsa_public_key *pub,
 
 int
 _dsa_validate_dss_g(struct dsa_public_key *pub,
-		     struct dss_params_validation_seeds* cert,
-		     unsigned index);
+		    unsigned domain_seed_size, const uint8_t *domain_seed, unsigned index);
 
 unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits);
 
@@ -93,10 +92,9 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 
 int
 _dsa_generate_dss_g(struct dsa_public_key *pub,
-		     struct dss_params_validation_seeds* cert,
-		     unsigned first_seed_length, const void* first_seed,
-		     void *progress_ctx, nettle_progress_func *progress,
-		     unsigned index);
+		    unsigned domain_seed_size, const uint8_t* domain_seed,
+		    void *progress_ctx, nettle_progress_func * progress,
+		    unsigned index);
 
 void
 _dsa_generate_dss_xy(struct dsa_public_key *pub,

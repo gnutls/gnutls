@@ -253,8 +253,7 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 
 int
 _dsa_generate_dss_g(struct dsa_public_key *pub,
-		    struct dss_params_validation_seeds *cert,
-		    unsigned first_seed_length, const void *first_seed,
+		    unsigned domain_seed_size, const uint8_t* domain_seed,
 		    void *progress_ctx, nettle_progress_func * progress,
 		    unsigned index)
 {
@@ -266,12 +265,10 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 	uint8_t digest[DIGEST_SIZE];
 	int ret;
 
-	if (index > 65535)
+	if (index > 255 || domain_seed_size == 0)
 		return 0;
 
-	dseed_size =
-	    first_seed_length + cert->pseed_length + cert->qseed_length + 4 +
-	    1 + 2;
+	dseed_size = domain_seed_size + 4 + 1 + 2;
 	dseed = malloc(dseed_size);
 	if (dseed == NULL)
 		return 0;
@@ -279,14 +276,8 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 	mpz_init(e);
 	mpz_init(w);
 
-	memcpy(dseed, first_seed, first_seed_length);
-	pos = first_seed_length;
-
-	memcpy(dseed + pos, cert->pseed, cert->pseed_length);
-	pos += cert->pseed_length;
-
-	memcpy(dseed + pos, cert->qseed, cert->qseed_length);
-	pos += cert->qseed_length;
+	memcpy(dseed, domain_seed, domain_seed_size);
+	pos = domain_seed_size;
 
 	memcpy(dseed + pos, "\x67\x67\x65\x6e", 4);
 	pos += 4;
@@ -307,14 +298,12 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 
 		mpz_powm(pub->g, w, e, pub->p);
 
-		if (mpz_cmp_ui(pub->g, 2) < 0) {
-			if (progress)
-				progress(progress_ctx, 'x');
-			continue;
+		if (mpz_cmp_ui(pub->g, 2) >= 0) {
+			/* found */
+			goto success;
 		}
-
-		/* found */
-		goto success;
+		if (progress)
+			progress(progress_ctx, 'x');
 	}
 
 	/* if we're here we failed */
@@ -380,6 +369,8 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 			 unsigned p_bits /* = L */ , unsigned q_bits /* = N */ )
 {
 	int ret;
+	uint8_t domain_seed[MAX_PVP_SEED_SIZE*3];
+	unsigned domain_seed_size = 0;
 
 	ret = _dsa_check_qp_sizes(q_bits, p_bits);
 	if (ret == 0)
@@ -397,7 +388,11 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 	if (ret == 0)
 		return 0;
 
-	ret = _dsa_generate_dss_g(pub, cert, cert->seed_length, cert->seed,
+	domain_seed_size = cert->seed_length + cert->qseed_length + cert->pseed_length;
+	memcpy(domain_seed, cert->seed, cert->seed_length);
+	memcpy(&domain_seed[cert->seed_length], cert->pseed, cert->pseed_length);
+	memcpy(&domain_seed[cert->seed_length+cert->pseed_length], cert->qseed, cert->qseed_length);
+	ret = _dsa_generate_dss_g(pub, domain_seed_size, domain_seed,
 				  progress_ctx, progress, index);
 	if (ret == 0)
 		return 0;
