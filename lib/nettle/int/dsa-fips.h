@@ -30,6 +30,8 @@
 
 #define MAX_PVP_SEED_SIZE 256
 
+#define div_ceil(x,y) ((x+(y)-1)/(y))
+
 struct dss_params_validation_seeds {
 	unsigned seed_length; /* first seed */
 	uint8_t seed[MAX_PVP_SEED_SIZE+1];

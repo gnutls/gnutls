@@ -49,8 +49,7 @@
  */
 int
 dsa_validate_dss_pqg(struct dsa_public_key *pub,
-			 struct dss_params_validation_seeds *cert,
-			 unsigned index)
+		     struct dss_params_validation_seeds *cert, unsigned index)
 {
 	int ret;
 
@@ -199,12 +198,25 @@ _dsa_validate_dss_pq(struct dsa_public_key *pub,
 		goto fail;
 	}
 
-	if (cert->pseed_length != cert2.pseed_length ||
-	    cert->qseed_length != cert2.qseed_length ||
-	    cert->pgen_counter != cert2.pgen_counter ||
-	    cert->qgen_counter != cert2.qgen_counter ||
-	    memcmp(cert->qseed, cert2.qseed, cert2.qseed_length) != 0 ||
-	    memcmp(cert->pseed, cert2.pseed, cert2.pseed_length) != 0) {
+	if ((cert->pseed_length > 0 && cert->pseed_length != cert2.pseed_length)
+	    || (cert->qseed_length > 0
+		&& cert->qseed_length != cert2.qseed_length)
+	    || (cert->pgen_counter > 0
+		&& cert->pgen_counter != cert2.pgen_counter)
+	    || (cert->qgen_counter > 0
+		&& cert->qgen_counter != cert2.qgen_counter)
+	    || (cert->qseed_length > 0
+		&& memcmp(cert->qseed, cert2.qseed, cert2.qseed_length) != 0)
+	    || (cert->pseed_length > 0
+		&& memcmp(cert->pseed, cert2.pseed, cert2.pseed_length) != 0)) {
+		goto fail;
+	}
+
+	if (mpz_cmp(pub->q, pub2.q) != 0) {
+		goto fail;
+	}
+
+	if (mpz_cmp(pub->p, pub2.p) != 0) {
 		goto fail;
 	}
 

@@ -57,7 +57,7 @@ unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits)
 	return 1;
 }
 
-/* This generates p,q params using the algorithm in FIPS 186-4.
+/* This generates p,q params using the A.1.2.1 algorithm in FIPS 186-4.
  * 
  * The hash function used is SHA384.
  */
@@ -72,11 +72,12 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 	int ret;
 	unsigned iterations, old_counter, i;
 	uint8_t *storage = NULL;
-	unsigned storage_length;
+	unsigned storage_length = 0;
 
 	ret = _dsa_check_qp_sizes(q_bits, p_bits);
-	if (ret == 0)
+	if (ret == 0) {
 		return 0;
+	}
 
 	if (seed_length < q_bits / 8) {
 		return 0;
@@ -90,12 +91,11 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 	mpz_init(s);
 	mpz_init(tmp);
 
-	nettle_mpz_set_str_256_u(s, seed_length, seed);
-
 	/* firstseed < 2^(N-1) */
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, q_bits - 1);
 
+	nettle_mpz_set_str_256_u(s, seed_length, seed);
 	if (mpz_cmp(s, r) < 0) {
 		goto fail;
 	}
@@ -118,37 +118,36 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 	ret = st_provable_prime(p0,
 				&cert->pseed_length, cert->pseed,
 				&cert->pgen_counter,
-				1 + ((p_bits + 1) / 2),
+				1 + div_ceil(p_bits, 2),
 				cert->qseed_length, cert->qseed,
 				progress_ctx, progress);
 	if (ret == 0) {
 		goto fail;
 	}
 
-	iterations = ((p_bits + DIGEST_SIZE - 1) / DIGEST_SIZE) - 1;
+	iterations = div_ceil(p_bits, DIGEST_SIZE*8);
 	old_counter = cert->pgen_counter;
 
-	storage_length = iterations * DIGEST_SIZE;
-	storage = malloc(storage_length);
-	if (storage == NULL)
-		goto fail;
+	if (iterations > 0) {
+		storage_length = iterations * DIGEST_SIZE;
+		storage = malloc(storage_length);
+		if (storage == NULL) {
+			goto fail;
+		}
 
-	nettle_mpz_set_str_256_u(s, cert->pseed_length, cert->pseed);
-	for (i = 0; i < iterations; i++) {
-		cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
-		nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
+		nettle_mpz_set_str_256_u(s, cert->pseed_length, cert->pseed);
+		for (i = 0; i < iterations; i++) {
+			cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
+			nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
 
-		hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
-		     cert->pseed_length, cert->pseed);
-		mpz_add_ui(s, s, 1);
+			hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
+			     cert->pseed_length, cert->pseed);
+			mpz_add_ui(s, s, 1);
+		}
+
+		/* x = 2^(p_bits-1) + (x mod 2^(p_bits-1)) */
+		nettle_mpz_set_str_256_u(tmp, storage_length, storage);
 	}
-	mpz_add_ui(s, s, 1);
-
-	cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
-	nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
-
-	/* x = 2^(p_bits-1) + (x mod 2^(p_bits-1)) */
-	nettle_mpz_set_str_256_u(tmp, storage_length, storage);
 
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, p_bits - 1);
@@ -182,21 +181,24 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 
 	cert->pgen_counter++;
 
-	for (i = 0; i < iterations; i++) {
-		cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
-		nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
+	mpz_set_ui(r, 0);
 
-		hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
-		     cert->pseed_length, cert->pseed);
-		mpz_add_ui(s, s, 1);
+	if (iterations > 0) {
+		for (i = 0; i < iterations; i++) {
+			cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
+			nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
+
+			hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
+			     cert->pseed_length, cert->pseed);
+			mpz_add_ui(s, s, 1);
+		}
+
+		/* r = a */
+		nettle_mpz_set_str_256_u(r, storage_length, storage);
 	}
-	mpz_add_ui(s, s, 1);
 
 	cert->pseed_length = nettle_mpz_sizeinbase_256_u(s);
 	nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
-
-	/* r = a */
-	nettle_mpz_set_str_256_u(r, storage_length, storage);
 
 	/* a = 2 + (a mod (p-3)) */
 	mpz_sub_ui(tmp, pub->p, 3);	/* c is too large to worry about negatives */

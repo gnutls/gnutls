@@ -973,18 +973,19 @@ static const uint16_t primes[] = {
 
 /* Tests if the (small) number provided is a prime.
  */
-static unsigned small_prime_check(uint32_t x)
+static unsigned small_prime_check(unsigned x)
 {
-	unsigned j, t, square;
+	unsigned j, t, square, prime;
 
 	for (j = 0; primes[j] > 0; j++) {
-		square = primes[j] * primes[j];
+		prime = primes[j];
+		square = prime * prime;
 
 		if (square > x)
 			break;
 
-		t = x / primes[j];
-		if (t * primes[j] == x)
+		t = x / prime;
+		if (t * prime == x)
 			return 0;
 	}
 
@@ -1008,7 +1009,7 @@ static int st_provable_prime_small(mpz_t p,
 	mpz_t s;
 	unsigned highbit;
 
-	assert(bits >= 2);
+	assert(bits >= 2 && bits <= 32);
 
 	mpz_init(s);
 
@@ -1016,10 +1017,10 @@ static int st_provable_prime_small(mpz_t p,
 	 * for the few (unlikely) cases where seed overflows. */
 	nettle_mpz_set_str_256_u(s, seed_length, seed);
 
- retry1:
+ retry:
 	tseed_length = nettle_mpz_sizeinbase_256_u(s);
 	if (tseed_length > sizeof(tseed))
-		goto fail1;
+		goto fail;
 
 	/* c = Hash(seed) XOR Hash(seed+1) */
 	nettle_mpz_get_str_256(tseed_length, tseed, s);
@@ -1030,16 +1031,17 @@ static int st_provable_prime_small(mpz_t p,
 
 	tseed_length = nettle_mpz_sizeinbase_256_u(s);
 	if (tseed_length > sizeof(tseed))
-		goto fail1;
+		goto fail;
 
 	nettle_mpz_get_str_256(tseed_length, tseed, s);
 
 	hash(h2, tseed_length, tseed);
 
-	memxor(h1, h2, sizeof(h1));
+	memxor(h1, h2, DIGEST_SIZE);
 
 	/* c = 2^(bits-1) + (c mod 2^(bits-1)) */
 	highbit = 1L << (bits - 1);
+
 	c = READ_UINT32(&h1[DIGEST_SIZE - 4]);
 
 	c &= highbit - 1;
@@ -1054,22 +1056,23 @@ static int st_provable_prime_small(mpz_t p,
 
 	/* deterministic primality check on c */
 	if (small_prime_check(c) == 0) {
+		/* not a prime */
 		if (gen_counter >= 4 * bits)
-			goto fail1;	/* failed */
+			goto fail;	/* failed */
 
 		if (progress)
 			progress(progress_ctx, 'x');
 
-		goto retry1;
+		goto retry;
 	}
 
 	/* success */
 	mpz_set_ui(p, c);
 
-	if (prime_seed != 0) {
+	if (prime_seed != NULL) {
 		tseed_length = nettle_mpz_sizeinbase_256_u(s);
 		if (*prime_seed_length < tseed_length)
-			goto fail1;
+			goto fail;
 
 		nettle_mpz_get_str_256(tseed_length, prime_seed, s);
 		*prime_seed_length = tseed_length;
@@ -1081,12 +1084,10 @@ static int st_provable_prime_small(mpz_t p,
 	mpz_clear(s);
 	return 1;
 
- fail1:
+ fail:
 	mpz_clear(s);
 	return 0;
 }
-
-#define div_ceil(x,y) ((x+(y)-1)/(y))
 
 /* The Shawe-Taylor algorithm described in FIPS 186-4. 
  * 
@@ -1110,7 +1111,7 @@ st_provable_prime(mpz_t p,
 		  unsigned seed_length, const void *seed,
 		  void *progress_ctx, nettle_progress_func * progress)
 {
-	unsigned gen_counter = 0;
+	unsigned gen_counter;
 	unsigned tseed_length;
 	uint8_t tseed[MAX_PVP_SEED_SIZE];
 	int ret;
@@ -1138,28 +1139,30 @@ st_provable_prime(mpz_t p,
 	mpz_init(dc0);
 
 	pseed_length = sizeof(pseed);
-	ret = st_provable_prime(c0, &pseed_length, pseed, &old_counter,
-				((bits + 1) / 2) + 1, seed_length, seed,
+	ret = st_provable_prime(c0, &pseed_length, pseed, &gen_counter,
+				1+div_ceil(bits, 2), seed_length, seed,
 				progress_ctx, progress);
 	if (ret == 0)
-		goto fail2;
+		goto fail;
 
 	nettle_mpz_set_str_256_u(s, pseed_length, pseed);
-	mpz_set_ui(tmp, 0);	/* x */
 
-	iterations = div_ceil(bits, DIGEST_SIZE * 8) - 1;
+	/* the spec says to remove 1 here */
+	iterations = div_ceil(bits, DIGEST_SIZE * 8);
+	old_counter = gen_counter;
 
+	mpz_set_ui(tmp, 0);	/* x = 0 */
 	if (iterations > 0) {
 		storage_length = iterations * DIGEST_SIZE;
 
 		storage = malloc(storage_length);
 		if (storage == NULL)
-			goto fail2;
+			goto fail;
 
 		for (i = 0; i < iterations; i++) {
 			tseed_length = nettle_mpz_sizeinbase_256_u(s);
 			if (tseed_length > sizeof(tseed))
-				goto fail2;
+				goto fail;
 			nettle_mpz_get_str_256(tseed_length, tseed, s);
 
 			hash(&storage
@@ -1171,10 +1174,7 @@ st_provable_prime(mpz_t p,
 		nettle_mpz_set_str_256_u(tmp, storage_length, storage);
 	}
 
-	mpz_add_ui(s, s, 1);
-
-	/* x = 2^(bits-1) + (x mod 2^(bits-1)) */
-
+	/* tmp = 2^(bits-1) + (tmp mod 2^(bits-1)) */
 	mpz_set_ui(r, 1);
 	mpz_mul_2exp(r, r, bits - 1);	/* r = 2^(bits-1) */
 
@@ -1187,17 +1187,20 @@ st_provable_prime(mpz_t p,
 	mpz_mul_2exp(dc0, c0, 1);	/* dc0 = 2*c0 */
 	mpz_cdiv_q(t, tmp, dc0);
 
- retry2:
+ retry:
 	/* c = t*(2c0) + 1 */
 	mpz_mul(c, dc0, t);
 	mpz_add_ui(c, c, 1);
 
+	mpz_set_ui(r, 1);
+	mpz_mul_2exp(r, r, bits);	/* r = 2^(bits) */
+
 	/* if 2tc0+1 > 2^bits */
-	if (mpz_sizeinbase(c, 2) > bits) {
+	if (mpz_cmp(c, r) > 0) {
 		/* t = 2^(bits-1)/2c0 */
-		mpz_set_ui(tmp, 1);
-		mpz_mul_2exp(tmp, tmp, bits - 1);
-		mpz_cdiv_q(t, tmp, dc0);
+
+		mpz_div_2exp(r, r, 1); /* r = 2^(bits-1) */
+		mpz_cdiv_q(t, r, dc0);
 
 		/* c = t* 2c0 + 1 */
 		mpz_mul(c, dc0, t);
@@ -1206,13 +1209,13 @@ st_provable_prime(mpz_t p,
 
 	gen_counter++;
 
-	mpz_set_ui(r, 0);
+	mpz_set_ui(r, 0); /* a = 0 */
 	if (iterations > 0) {
 
 		for (i = 0; i < iterations; i++) {
 			tseed_length = nettle_mpz_sizeinbase_256_u(s);
 			if (tseed_length > sizeof(tseed))
-				goto fail2;
+				goto fail;
 
 			nettle_mpz_get_str_256(tseed_length, tseed, s);
 
@@ -1226,22 +1229,20 @@ st_provable_prime(mpz_t p,
 		nettle_mpz_set_str_256_u(r, storage_length, storage);
 	}
 
-	mpz_add_ui(s, s, 1);
-
 	/* a = 2 + (a mod (c-3)) */
 	mpz_sub_ui(tmp, c, 3);	/* c is too large to worry about negatives */
 	mpz_mod(r, r, tmp);
 	mpz_add_ui(r, r, 2);
 
 	/* z = a^(2t) mod c */
-	mpz_mul_2exp(tmp, t, 1);	/* tmp = 2t */
+	mpz_mul_2exp(tmp, t, 1); /* tmp = 2t */
 	mpz_powm(z, r, tmp, c);
 
 	mpz_sub_ui(tmp, z, 1);
 
-	mpz_gcd(tmp, tmp, c);
+	mpz_gcd(r, tmp, c);
 
-	if (mpz_cmp_ui(tmp, 1) == 0) {
+	if (mpz_cmp_ui(r, 1) == 0) {
 		mpz_powm(tmp, z, c0, c);
 		if (mpz_cmp_ui(tmp, 1) == 0) {
 			mpz_set(p, c);
@@ -1249,7 +1250,7 @@ st_provable_prime(mpz_t p,
 			if (prime_seed != NULL) {
 				tseed_length = nettle_mpz_sizeinbase_256_u(s);
 				if (*prime_seed_length < tseed_length)
-					goto fail2;
+					goto fail;
 
 				nettle_mpz_get_str_256(tseed_length,
 						       prime_seed, s);
@@ -1259,7 +1260,7 @@ st_provable_prime(mpz_t p,
 			if (prime_gen_counter)
 				*prime_gen_counter = gen_counter;
 
-			goto success2;
+			goto success;
 		}
 	}
 
@@ -1267,19 +1268,19 @@ st_provable_prime(mpz_t p,
 		progress(progress_ctx, 'x');
 
 	if (gen_counter >= (4 * bits + old_counter))
-		return 0;
+		goto fail;
 
 	mpz_add_ui(t, t, 1);
-	goto retry2;
+	goto retry;
 
- success2:
+ success:
 	ret = 1;
-	goto finish2;
+	goto finish;
 
- fail2:
+ fail:
 	ret = 0;
 
- finish2:
+ finish:
 	mpz_clear(c0);
 	mpz_clear(dc0);
 	mpz_clear(r);
