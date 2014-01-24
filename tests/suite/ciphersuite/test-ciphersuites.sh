@@ -1,11 +1,11 @@
 #! /bin/sh
 
 nodejs --help >/dev/null 2>&1
-if test $? == 0;then
+if test $? = 0;then
 NODEJS=nodejs
 else
   node --help >/dev/null 2>&1
-  if test $? == 0;then
+  if test $? = 0;then
   NODEJS=node
   fi
 fi
