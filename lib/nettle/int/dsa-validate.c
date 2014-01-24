@@ -91,7 +91,7 @@ _dsa_validate_dss_g(struct dsa_public_key *pub,
 	mpz_set(pub2.q, pub->q);
 
 	/* verify g */
-	if (index != 1 && index != 2) {
+	if (index > 65535) {
 		goto fail;
 	}
 

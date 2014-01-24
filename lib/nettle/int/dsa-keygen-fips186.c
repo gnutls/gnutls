@@ -266,7 +266,7 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 	uint8_t digest[DIGEST_SIZE];
 	int ret;
 
-	if (index != 1 && index != 2)
+	if (index > 65535)
 		return 0;
 
 	dseed_size =
