@@ -45,7 +45,11 @@ void _rnd_get_event(struct event_st *e)
 	gettime(&e->now);
 
 #ifdef HAVE_GETRUSAGE
+#ifdef RUSAGE_THREAD
+	if (getrusage(RUSAGE_THREAD, &e->rusage) < 0) {
+#else
 	if (getrusage(RUSAGE_SELF, &e->rusage) < 0) {
+#endif
 		_gnutls_debug_log("getrusage failed: %s\n",
 				  strerror(errno));
 		abort();
