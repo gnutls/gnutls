@@ -1,6 +1,6 @@
 SMP=-j4
 
-GNUTLS_VERSION:=3.2.7
+GNUTLS_VERSION:=3.2.9
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -119,7 +119,8 @@ $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	make -C $(GNUTLS_DIR) -C tests check $(SMP)
 	make -C $(GNUTLS_DIR) install -i
 	cp $(GNUTLS_DIR)/COPYING $(GNUTLS_DIR)/COPYING.LESSER $(CROSS_DIR)
-	cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc_s_sjlj-1.dll $(BIN_DIR)/
+	-cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc_s_sjlj-1.dll $(BIN_DIR)/
+	-cp /usr/lib/gcc/i686-w64-mingw32/4.6/libgcc_s_sjlj-1.dll $(BIN_DIR)/
 	touch $@
 
 $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
