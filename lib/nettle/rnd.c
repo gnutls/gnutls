@@ -71,50 +71,43 @@ timespec_sub_sec(struct timespec *a, struct timespec *b)
 #define DEVICE_READ_INTERVAL (1200)
 /* universal functions */
 
-static int do_trivia_source(int init)
+static int do_trivia_source(int init, struct event_st *event)
 {
-	static struct event_st event;
 	unsigned entropy = 0;
-	
-	_rnd_get_event(&event);
 
 	if (init) {
 		trivia_time_count = 0;
 	} else {
 		trivia_time_count++;
 
-		if (event.now.tv_sec != trivia_previous_time) {
+		if (event->now.tv_sec != trivia_previous_time) {
 			/* Count one bit of entropy if we either have more than two
 			 * invocations in one second, or more than two seconds
 			 * between invocations. */
 			if ((trivia_time_count > 2)
-			    || ((event.now.tv_sec - trivia_previous_time) > 2))
+			    || ((event->now.tv_sec - trivia_previous_time) > 2))
 				entropy++;
 
 			trivia_time_count = 0;
 		}
 	}
-	trivia_previous_time = event.now.tv_sec;
+	trivia_previous_time = event->now.tv_sec;
 
 	return yarrow256_update(&yctx, RANDOM_SOURCE_TRIVIA, entropy,
-				sizeof(event), (void *) &event);
+				sizeof(*event), (void *) event);
 }
 
 #define DEVICE_READ_SIZE 16
 #define DEVICE_READ_SIZE_MAX 32
 
-static int do_device_source(int init)
+static int do_device_source(int init, struct event_st *event)
 {
 	unsigned int read_size = DEVICE_READ_SIZE;
-	struct timespec current_time;
 	int ret;
 
-	gettime(&current_time);
-
 	if (init) {
-
 #ifdef HAVE_GETPID
-		pid = getpid();
+		pid = event->pid;
 #endif
 
 		ret = _rnd_system_entropy_init();
@@ -123,14 +116,14 @@ static int do_device_source(int init)
 			return gnutls_assert_val(ret);
 		}
 
-		memcpy(&device_last_read, &current_time,
+		memcpy(&device_last_read, &event->now,
 		       sizeof(device_last_read));
 
 		read_size = DEVICE_READ_SIZE_MAX;	/* initially read more data */
 	}
 
 	if ((init
-	     || (timespec_sub_sec(&current_time, &device_last_read) >
+	     || (timespec_sub_sec(&event->now, &device_last_read) >
 		 DEVICE_READ_INTERVAL))) {
 		/* More than 20 minutes since we last read the device */
 		uint8_t buf[DEVICE_READ_SIZE_MAX];
@@ -139,8 +132,9 @@ static int do_device_source(int init)
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		memcpy(&device_last_read, &current_time,
+		memcpy(&device_last_read, &event->now,
 		       sizeof(device_last_read));
+
 		return yarrow256_update(&yctx, RANDOM_SOURCE_DEVICE,
 					read_size * 8 /
 					2 /* we trust the RNG */ ,
@@ -164,6 +158,7 @@ static void wrap_nettle_rnd_deinit(void *ctx)
 static int wrap_nettle_rnd_init(void **ctx)
 {
 	int ret;
+	struct event_st event;
 
 	ret = gnutls_mutex_init(&rnd_mutex);
 	if (ret < 0) {
@@ -180,13 +175,15 @@ static int wrap_nettle_rnd_init(void **ctx)
 	/* initialize the main RNG */
 	yarrow256_init(&yctx, SOURCES, ysources);
 
-	ret = do_device_source(1);
+	_rnd_get_event(&event);
+
+	ret = do_device_source(1, &event);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret = do_trivia_source(1);
+	ret = do_trivia_source(1, &event);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -207,27 +204,30 @@ static int
 wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 {
 	int ret, reseed = 0;
+	struct event_st event;
+
+	_rnd_get_event(&event);
 
 	RND_LOCK;
 	
 #ifdef HAVE_GETPID
-	if (getpid() != pid) {	/* fork() detected */
+	if (event.pid != pid) {	/* fork() detected */
 		memset(&device_last_read, 0, sizeof(device_last_read));
-		pid = getpid();
+		pid = event.pid;
 		reseed = 1;
 	}
 #endif
 
 	if (level != GNUTLS_RND_NONCE) {
 		/* reseed main */
-		ret = do_trivia_source(0);
+		ret = do_trivia_source(0, &event);
 		if (ret < 0) {
 			RND_UNLOCK;
 			gnutls_assert();
 			return ret;
 		}
 
-		ret = do_device_source(0);
+		ret = do_device_source(0, &event);
 		if (ret < 0) {
 			RND_UNLOCK;
 			gnutls_assert();
@@ -263,9 +263,13 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 
 static void wrap_nettle_rnd_refresh(void *_ctx)
 {
+	struct event_st event;
+
+	_rnd_get_event(&event);
+
 	RND_LOCK;
-	do_trivia_source(0);
-	do_device_source(0);
+	do_trivia_source(0, &event);
+	do_device_source(0, &event);
 
 	RND_UNLOCK;
 	return;
