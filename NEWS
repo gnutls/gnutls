@@ -6,7 +6,7 @@ See the end for copying conditions.
 * Version 3.2.10 (unreleased)
 
 ** libgnutls: When obtaining usage statistics for the random generator
-use RUSAGE_THREAD to prevent getrusage() becoming bottleneck.
+use system calls outside the mutex locks to prevent them from becoming bottleneck.
 
 ** API and ABI modifications:
 No changes since last version.
