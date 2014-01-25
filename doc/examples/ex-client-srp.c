@@ -9,10 +9,6 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 
-#if GNUTLS_VERSION_NUMBER < 0x030300
-# define GNUTLS_DEFAULT_PRIORITY "NORMAL"
-#endif
-
 /* Those functions are defined in other examples.
  */
 extern void check_alert(gnutls_session_t session, int ret);
@@ -60,8 +56,7 @@ int main(void)
         /* Set the priorities.
          */
         gnutls_priority_set_direct(session,
-                                   GNUTLS_DEFAULT_PRIORITY
-                                   ":+SRP:+SRP-RSA:+SRP-DSS",
+                                   "NORMAL:+SRP:+SRP-RSA:+SRP-DSS",
                                    NULL);
 
         /* put the SRP credentials to the current session

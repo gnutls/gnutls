@@ -15,10 +15,6 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
-#if GNUTLS_VERSION_NUMBER < 0x030300
-# define GNUTLS_DEFAULT_PRIORITY "NORMAL"
-#endif
-
 #define SRP_PASSWD "tpasswd"
 #define SRP_PASSWD_CONF "tpasswd.conf"
 
@@ -94,7 +90,7 @@ int main(void)
         for (;;) {
                 gnutls_init(&session, GNUTLS_SERVER);
                 gnutls_priority_set_direct(session,
-                                           GNUTLS_DEFAULT_PRIORITY
+                                           "NORMAL"
                                            ":-KX-ALL:+SRP:+SRP-DSS:+SRP-RSA",
                                            NULL);
                 gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);

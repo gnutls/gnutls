@@ -19,10 +19,6 @@
 #include <fcntl.h>
 #include <getpass.h>            /* for getpass() */
 
-#if GNUTLS_VERSION_NUMBER < 0x030300
-# define GNUTLS_DEFAULT_PRIORITY "NORMAL"
-#endif
-
 /* A TLS client that loads the certificate and key.
  */
 
@@ -99,7 +95,7 @@ int main(void)
 
         /* priorities */
         gnutls_priority_init(&priorities_cache, 
-                             GNUTLS_DEFAULT_PRIORITY, NULL);
+                             "NORMAL", NULL);
 
         /* sets the trusted cas file
          */

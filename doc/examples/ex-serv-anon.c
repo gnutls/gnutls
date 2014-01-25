@@ -15,10 +15,6 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
-#if GNUTLS_VERSION_NUMBER < 0x030300
-# define GNUTLS_DEFAULT_PRIORITY "NORMAL"
-#endif
-
 /* This is a sample TLS 1.0 echo server, for anonymous authentication only.
  */
 
@@ -96,8 +92,7 @@ int main(void)
         for (;;) {
                 gnutls_init(&session, GNUTLS_SERVER);
                 gnutls_priority_set_direct(session,
-                                           GNUTLS_DEFAULT_PRIORITY
-                                           ":+ANON-ECDH:+ANON-DH",
+                                           "NORMAL::+ANON-ECDH:+ANON-DH",
                                            NULL);
                 gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 

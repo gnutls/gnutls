@@ -11,10 +11,6 @@
 #include <gnutls/x509.h>
 #include "examples.h"
 
-#if GNUTLS_VERSION_NUMBER < 0x030300
-# define GNUTLS_DEFAULT_PRIORITY "NORMAL"
-#endif
-
 /* A very basic TLS client, with X.509 authentication and server certificate
  * verification. Note that error checking for missing files etc. is omitted
  * for simplicity.
@@ -71,7 +67,7 @@ int main(void)
 
         /* Use default priorities */
         ret = gnutls_priority_set_direct(session, 
-                                         GNUTLS_DEFAULT_PRIORITY, &err);
+                                         "NORMAL", &err);
         if (ret < 0) {
                 if (ret == GNUTLS_E_INVALID_REQUEST) {
                         fprintf(stderr, "Syntax error at: %s\n", err);

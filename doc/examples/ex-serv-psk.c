@@ -15,10 +15,6 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
-#if GNUTLS_VERSION_NUMBER < 0x030300
-# define DEFAULT_PRIORITY "NORMAL"
-#endif
-
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
@@ -105,8 +101,7 @@ int main(void)
         generate_dh_params();
 
         gnutls_priority_init(&priority_cache,
-                             GNUTLS_DEFAULT_PRIORITY
-                             ":+PSK:+ECDHE-PSK:+DHE-PSK",
+                             "NORMAL:+PSK:+ECDHE-PSK:+DHE-PSK",
                              NULL);
 
         gnutls_certificate_set_dh_params(x509_cred, dh_params);
