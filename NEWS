@@ -10,6 +10,15 @@ use system calls outside the mutex locks to prevent them from becoming bottlenec
 
 ** API and ABI modifications:
 gnutls_x509_policy_release: Exported
+gnutls_pubkey_set_key_usage: Exported
+gnutls_x509_privkey_import_rsa_raw2: Exported
+gnutls_pkcs11_token_get_flags: Exported
+gnutls_pubkey_get_pk_ecc_x962: Exported
+gnutls_pubkey_import_ecc_x962: Exported
+gnutls_rnd_refresh: Exported
+gnutls_mac_get_nonce_size: Exported
+gnutls_x509_crl_get_raw_issuer_dn: Exported
+gnutls_certificate_get_crt_raw: Exported
 
 
 * Version 3.2.9 (released 2014-01-24)

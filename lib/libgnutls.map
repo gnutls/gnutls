@@ -886,7 +886,7 @@ GNUTLS_3_1_0 {
 	gnutls_range_split;
 	gnutls_record_send_range;
 	gnutls_db_check_entry_time;
-	gnutls_handshake_set_server_random;
+	gnutls_handshake_set_random;
 	gnutls_record_cork;
 	gnutls_record_uncork;
 	gnutls_transport_set_int2;
@@ -927,6 +927,15 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs11_obj_export3;
 	gnutls_pkcs11_get_raw_issuer;
 	gnutls_est_record_overhead_size;
+	gnutls_pubkey_set_key_usage;
+        gnutls_x509_privkey_import_rsa_raw2;
+        gnutls_pkcs11_token_get_flags;
+        gnutls_pubkey_get_pk_ecc_x962;
+        gnutls_pubkey_import_ecc_x962;
+        gnutls_rnd_refresh;
+        gnutls_mac_get_nonce_size;
+        gnutls_x509_crl_get_raw_issuer_dn;
+        gnutls_certificate_get_crt_raw;
 	gnutls_record_check_corked;
 } GNUTLS_3_0_0;
 
