@@ -125,22 +125,22 @@ typedef struct gnutls_crypto_bigint {
 	int (*bigint_powm) (bigint_t w, const bigint_t b,
 				 const bigint_t e, const bigint_t m);
 	/* w = a + b mod m */
-	 bigint_t(*bigint_addm) (bigint_t w, const bigint_t a,
+	int (*bigint_addm) (bigint_t w, const bigint_t a,
 				 const bigint_t b, const bigint_t m);
 	/* w = a - b mod m */
-	 bigint_t(*bigint_subm) (bigint_t w, const bigint_t a,
+	int (*bigint_subm) (bigint_t w, const bigint_t a,
 				 const bigint_t b, const bigint_t m);
 	/* w = a * b mod m */
-	 bigint_t(*bigint_mulm) (bigint_t w, const bigint_t a,
+	int (*bigint_mulm) (bigint_t w, const bigint_t a,
 				 const bigint_t b, const bigint_t m);
-	/* w = a + b */ bigint_t(*bigint_add) (bigint_t w,
+	/* w = a + b */ int (*bigint_add) (bigint_t w,
 					       const bigint_t a,
 					       const bigint_t b);
-	/* w = a - b */ bigint_t(*bigint_sub) (bigint_t w,
+	/* w = a - b */ int (*bigint_sub) (bigint_t w,
 					       const bigint_t a,
 					       const bigint_t b);
 	/* w = a * b */
-	bigint_t(*bigint_mul) (bigint_t w, const bigint_t a,
+	int (*bigint_mul) (bigint_t w, const bigint_t a,
 				const bigint_t b);
 	/* w = a + b */
 	int (*bigint_add_ui) (bigint_t w, const bigint_t a,

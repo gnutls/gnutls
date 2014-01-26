@@ -48,7 +48,7 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(99);
 
-	ret = _gnutls_mpi_init_multi(&n1, &n2, &n3, NULL);
+	ret = _gnutls_mpi_init_multi(&n1, &n2, &n3, &n4, NULL);
 	if (ret < 0)
 		fail("mpi_new failed\n");
 
@@ -64,8 +64,8 @@ void doit(void)
 	if (ret < 0)
 		fail("mpi_set_ui failed\n");
 
-	n4 = _gnutls_mpi_addm(NULL, n1, n3, n2);
-	if (n4 == 0)
+	ret = _gnutls_mpi_addm(n4, n1, n3, n2);
+	if (ret < 0)
 		fail("mpi_set_ui failed\n");
 
 	if (_gnutls_mpi_cmp_ui(n4, 0) != 0

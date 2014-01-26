@@ -171,7 +171,13 @@ _gnutls_pkcs12_string_to_key(unsigned int id, const uint8_t * salt,
 				gnutls_assert();
 				goto cleanup;
 			}
-			_gnutls_mpi_addm(num_ij, num_ij, num_b1, mpi512);
+
+			rc = _gnutls_mpi_addm(num_ij, num_ij, num_b1, mpi512);
+			if (rc < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
 			n = 64;
 #ifndef PKCS12_BROKEN_KEYGEN
 			m = (_gnutls_mpi_get_nbits(num_ij) + 7) / 8;

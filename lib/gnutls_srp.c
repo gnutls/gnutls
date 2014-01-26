@@ -115,13 +115,23 @@ _gnutls_calc_srp_B(bigint_t * ret_b, bigint_t g, bigint_t n, bigint_t v)
 		goto error;
 	}
 
-	_gnutls_mpi_mulm(tmpV, k, v, n);
-	
-	ret = _gnutls_mpi_powm(tmpB, g, b, n);
-	if (ret < 0)
+	ret = _gnutls_mpi_mulm(tmpV, k, v, n);
+	if (ret < 0) {
+		gnutls_assert();
 		goto error;
+	}
 
-	_gnutls_mpi_addm(B, tmpV, tmpB, n);
+	ret = _gnutls_mpi_powm(tmpB, g, b, n);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = _gnutls_mpi_addm(B, tmpV, tmpB, n);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
 
 	_gnutls_mpi_release(&k);
 	_gnutls_mpi_release(&tmpB);
@@ -212,10 +222,17 @@ _gnutls_calc_srp_S1(bigint_t A, bigint_t b, bigint_t u, bigint_t v,
 		return NULL;
 
 	ret = _gnutls_mpi_powm(tmp1, v, u, n);
-	if (ret < 0)
+	if (ret < 0) {
+		gnutls_assert();
 		goto error;
+	}
 
-	_gnutls_mpi_mulm(tmp2, A, tmp1, n);
+	ret = _gnutls_mpi_mulm(tmp2, A, tmp1, n);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	_gnutls_mpi_powm(S, tmp2, b, n);
 
 	_gnutls_mpi_release(&tmp1);
@@ -338,12 +355,30 @@ _gnutls_calc_srp_S2(bigint_t B, bigint_t g, bigint_t x, bigint_t a,
 		goto freeall;
 	}
 
-	_gnutls_mpi_mulm(tmp3, tmp1, k, n);	/* k*g^x mod n */
-	_gnutls_mpi_subm(tmp2, B, tmp3, n);
+	ret = _gnutls_mpi_mulm(tmp3, tmp1, k, n);	/* k*g^x mod n */
+	if (ret < 0) {
+		gnutls_assert();
+		goto freeall;
+	}
 
-	_gnutls_mpi_mul(tmp1, u, x);
-	_gnutls_mpi_add(tmp4, a, tmp1);
-	
+	ret = _gnutls_mpi_subm(tmp2, B, tmp3, n);
+	if (ret < 0) {
+		gnutls_assert();
+		goto freeall;
+	}
+
+	ret = _gnutls_mpi_mul(tmp1, u, x);
+	if (ret < 0) {
+		gnutls_assert();
+		goto freeall;
+	}
+
+	ret = _gnutls_mpi_add(tmp4, a, tmp1);
+	if (ret < 0) {
+		gnutls_assert();
+		goto freeall;
+	}
+
 	ret = _gnutls_mpi_powm(S, tmp2, tmp4, n);
 	if (ret < 0) {
 		gnutls_assert();

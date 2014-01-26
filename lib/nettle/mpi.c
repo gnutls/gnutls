@@ -251,106 +251,58 @@ wrap_nettle_mpi_powm(bigint_t w, const bigint_t b, const bigint_t e,
 	return 0;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_addm(bigint_t w, const bigint_t a, const bigint_t b,
 		     const bigint_t m)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_add(TOMPZ(w), TOMPZ(b), TOMPZ(a));
 	mpz_fdiv_r(TOMPZ(w), TOMPZ(w), TOMPZ(m));
 
-	return w;
+	return 0;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_subm(bigint_t w, const bigint_t a, const bigint_t b,
 		     const bigint_t m)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_sub(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 	mpz_fdiv_r(TOMPZ(w), TOMPZ(w), TOMPZ(m));
 
-	return w;
+	return 0;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_mulm(bigint_t w, const bigint_t a, const bigint_t b,
 		     const bigint_t m)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_mul(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 	mpz_fdiv_r(TOMPZ(w), TOMPZ(w), TOMPZ(m));
 
-	return w;
+	return 0;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_add(bigint_t w, const bigint_t a, const bigint_t b)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_add(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 
-	return w;
+	return 0;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_sub(bigint_t w, const bigint_t a, const bigint_t b)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_sub(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 
-	return w;
+	return 0;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_mul(bigint_t w, const bigint_t a, const bigint_t b)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_mul(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 
-	return w;
+	return 0;
 }
 
 /* q = a / b */
@@ -370,7 +322,7 @@ wrap_nettle_mpi_add_ui(bigint_t w, const bigint_t a, unsigned long b)
 	return 0;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_sub_ui(bigint_t w, const bigint_t a, unsigned long b)
 {
 	mpz_sub_ui(TOMPZ(w), TOMPZ(a), b);
