@@ -87,7 +87,10 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p,
 	}
 
 	if (r != NULL) {
-		_gnutls_mpi_set(r, tmp);
+		ret = _gnutls_mpi_set(r, tmp);
+		if (ret < 0)
+			goto cleanup;
+
 		_gnutls_mpi_release(&tmp);
 		return r;
 	}

@@ -829,18 +829,19 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 
 			params->params_nr = 0;
 			
-			ret = _gnutls_mpi_init_multi(&params->params[0], &params->params[1],
-					&params->params[2], NULL);
+			ret = _gnutls_mpi_init_multi(&params->params[DSA_P], &params->params[DSA_Q],
+					&params->params[DSA_G], NULL);
 			if (ret < 0) {
 				gnutls_assert();
 				goto dsa_fail;
 			}
 			params->params_nr = 3;
 
+			mpz_set(TOMPZ(params->params[DSA_P]), pub.p);
+			mpz_set(TOMPZ(params->params[DSA_Q]), pub.q);
+			mpz_set(TOMPZ(params->params[DSA_G]), pub.g);
+
 			ret = 0;
-			_gnutls_mpi_set(params->params[0], pub.p);
-			_gnutls_mpi_set(params->params[1], pub.q);
-			_gnutls_mpi_set(params->params[2], pub.g);
 
 		      dsa_fail:
 			dsa_private_key_clear(&priv);
@@ -916,8 +917,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				goto dsa_fail;
 			}
 
-			_gnutls_mpi_set(params->params[DSA_Y], pub.y);
-			_gnutls_mpi_set(params->params[DSA_X], priv.x);
+			mpz_set(TOMPZ(params->params[DSA_Y]), pub.y);
+			mpz_set(TOMPZ(params->params[DSA_X]), pub.x);
 			params->params_nr += 2;
 
 		      dsa_fail:
@@ -986,8 +987,8 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				goto dh_fail;
 			}
 
-			_gnutls_mpi_set(params->params[DSA_Y], y);
-			_gnutls_mpi_set(params->params[DSA_X], x);
+			mpz_set(TOMPZ(params->params[DSA_Y]), y);
+			mpz_set(TOMPZ(params->params[DSA_X]), x);
 			params->params_nr += 2;
 
 			ret = 0;
@@ -1010,7 +1011,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			rsa_public_key_init(&pub);
 			rsa_private_key_init(&priv);
 
-			_gnutls_mpi_set_ui(&pub.e, 65537);
+			mpz_set_ui(pub.e, 65537);
 
 			ret =
 			    rsa_generate_keypair(&pub, &priv, NULL,
@@ -1032,16 +1033,16 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				params->params_nr++;
 			}
 
-			ret = 0;
+			mpz_set(TOMPZ(params->params[0]), pub.n);
+			mpz_set(TOMPZ(params->params[1]), pub.e);
+			mpz_set(TOMPZ(params->params[2]), priv.d);
+			mpz_set(TOMPZ(params->params[3]), priv.p);
+			mpz_set(TOMPZ(params->params[4]), priv.q);
+			mpz_set(TOMPZ(params->params[5]), priv.c);
+			mpz_set(TOMPZ(params->params[6]), priv.a);
+			mpz_set(TOMPZ(params->params[7]), priv.b);
 
-			_gnutls_mpi_set(params->params[0], pub.n);
-			_gnutls_mpi_set(params->params[1], pub.e);
-			_gnutls_mpi_set(params->params[2], priv.d);
-			_gnutls_mpi_set(params->params[3], priv.p);
-			_gnutls_mpi_set(params->params[4], priv.q);
-			_gnutls_mpi_set(params->params[5], priv.c);
-			_gnutls_mpi_set(params->params[6], priv.a);
-			_gnutls_mpi_set(params->params[7], priv.b);
+			ret = 0;
 
 		      rsa_fail:
 			rsa_private_key_clear(&priv);

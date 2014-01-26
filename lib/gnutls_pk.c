@@ -178,16 +178,20 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 	dst->algo = src->algo;
 
 	for (i = 0; i < src->params_nr; i++) {
-		dst->params[i] = _gnutls_mpi_set(NULL, src->params[i]);
+		dst->params[i] = _gnutls_mpi_copy(src->params[i]);
 		if (dst->params[i] == NULL) {
-			for (j = 0; j < i; j++)
-				_gnutls_mpi_release(&dst->params[j]);
-			return GNUTLS_E_MEMORY_ERROR;
+			goto fail;
 		}
+
 		dst->params_nr++;
 	}
 
 	return 0;
+
+fail:
+	for (j = 0; j < i; j++)
+		_gnutls_mpi_release(&dst->params[j]);
+	return GNUTLS_E_MEMORY_ERROR;
 }
 
 void gnutls_pk_params_init(gnutls_pk_params_st * p)

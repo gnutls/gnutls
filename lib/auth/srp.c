@@ -738,7 +738,12 @@ group_check_g_n(gnutls_session_t session, bigint_t g, bigint_t n)
 
 	/* q = q/2, remember that q is divisible by 2 (prime - 1)
 	 */
-	_gnutls_mpi_set_ui(two, 2);
+	ret = _gnutls_mpi_set_ui(two, 2);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
 	_gnutls_mpi_div(q, q, two);
 
 	if (_gnutls_prime_check(q) != 0) {
@@ -746,7 +751,8 @@ group_check_g_n(gnutls_session_t session, bigint_t g, bigint_t n)
 		 */
 		_gnutls_mpi_log("no prime Q: ", q);
 		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		goto error;
 	}
 
 	/* We also check whether g is a generator,

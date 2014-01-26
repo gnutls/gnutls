@@ -93,32 +93,27 @@ static int wrap_nettle_mpi_init_multi(bigint_t *w, ...)
 {
 	va_list args;
 	bigint_t *next;
-	mpz_t *r;
+	int ret;
 	bigint_t* last_failed = NULL;
 
-	r = gnutls_malloc(sizeof(*r));
-	if (r == NULL) {
+	ret = wrap_nettle_mpi_init(w);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return ret;
 	}
 
-	mpz_init(*r);
-	*w = r;
-	
 	va_start(args, w);
 	
 	do {
 		next = va_arg(args, bigint_t*);
 		if (next != NULL) {
-			r = gnutls_malloc(sizeof(*r));
-			if (r == NULL) {
+			ret = wrap_nettle_mpi_init(next);
+			if (ret < 0) {
 				gnutls_assert();
 				va_end(args);
 				last_failed = next;
 				goto fail;
 			}
-			mpz_init(*r);
-			*next = r;
 		}
 	} while(next != 0);
 	
@@ -206,40 +201,32 @@ static int wrap_nettle_mpi_cmp_ui(const bigint_t u, unsigned long v)
 	return mpz_cmp_ui(*i1, v);
 }
 
-static bigint_t wrap_nettle_mpi_set(bigint_t w, const bigint_t u)
+static int wrap_nettle_mpi_set(bigint_t w, const bigint_t u)
 {
-	mpz_t *i1, *i2 = u;
-	int ret;
+	mpz_set(TOMPZ(w), TOMPZ(u));
 
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
-	i1 = w;
-
-	mpz_set(*i1, *i2);
-
-	return i1;
+	return 0;
 }
 
-static bigint_t wrap_nettle_mpi_set_ui(bigint_t w, unsigned long u)
+static bigint_t wrap_nettle_mpi_copy(const bigint_t u)
 {
-	mpz_t *i1;
 	int ret;
+	bigint_t w;
 
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
+	ret = wrap_nettle_mpi_init(&w);
+	if (ret < 0)
+		return NULL;
 
-	i1 = w;
+	mpz_set(TOMPZ(w), u);
 
-	mpz_set_ui(*i1, u);
+	return w;
+}
 
-	return i1;
+static int wrap_nettle_mpi_set_ui(bigint_t w, unsigned long u)
+{
+	mpz_set_ui(TOMPZ(w), u);
+
+	return 0;
 }
 
 static unsigned int wrap_nettle_mpi_get_nbits(bigint_t a)
@@ -474,6 +461,7 @@ gnutls_crypto_bigint_st _gnutls_mpi_ops = {
 	.bigint_cmp = wrap_nettle_mpi_cmp,
 	.bigint_cmp_ui = wrap_nettle_mpi_cmp_ui,
 	.bigint_modm = wrap_nettle_mpi_modm,
+	.bigint_copy = wrap_nettle_mpi_copy,
 	.bigint_set = wrap_nettle_mpi_set,
 	.bigint_set_ui = wrap_nettle_mpi_set_ui,
 	.bigint_get_nbits = wrap_nettle_mpi_get_nbits,

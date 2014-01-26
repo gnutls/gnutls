@@ -58,7 +58,7 @@ bigint_t _gnutls_mpi_random_modp(bigint_t, bigint_t p,
 #define _gnutls_mpi_print(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_USG)
 #define _gnutls_mpi_print_lz(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_STD)
 #define _gnutls_mpi_print_pgp(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_PGP)
-#define _gnutls_mpi_copy( a) _gnutls_mpi_set( NULL, a)
+#define _gnutls_mpi_copy _gnutls_mpi_ops.bigint_copy
 
 inline static
 void _gnutls_mpi_release(bigint_t * x)
