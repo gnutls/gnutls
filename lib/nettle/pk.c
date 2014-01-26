@@ -765,8 +765,10 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 		{
 			struct dsa_public_key pub;
 			struct dsa_private_key priv;
+#ifdef ENABLE_FIPS140
 			struct dss_params_validation_seeds cert;
 			unsigned index;
+#endif
 
 			dsa_public_key_init(&pub);
 			dsa_private_key_init(&priv);
