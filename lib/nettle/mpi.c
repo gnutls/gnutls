@@ -354,20 +354,12 @@ int ret;
 }
 
 /* q = a / b */
-static bigint_t
+static int
 wrap_nettle_mpi_div(bigint_t q, const bigint_t a, const bigint_t b)
 {
-int ret;
-
-	if (q == NULL) {
-		ret = wrap_nettle_mpi_init(&q);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_cdiv_q(TOMPZ(q), TOMPZ(a), TOMPZ(b));
 
-	return q;
+	return 0;
 }
 
 static int

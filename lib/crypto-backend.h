@@ -152,7 +152,7 @@ typedef struct gnutls_crypto_bigint {
 	int (*bigint_mul_ui) (bigint_t w, const bigint_t a,
 				   unsigned long b);
 	/* q = a / b */
-	 bigint_t(*bigint_div) (bigint_t q, const bigint_t a,
+	int (*bigint_div) (bigint_t q, const bigint_t a,
 				const bigint_t b);
 	/* 0 if prime */
 	int (*bigint_prime_check) (const bigint_t pp);

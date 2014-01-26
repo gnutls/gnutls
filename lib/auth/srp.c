@@ -753,7 +753,11 @@ group_check_g_n(gnutls_session_t session, bigint_t g, bigint_t n)
 		goto error;
 	}
 
-	_gnutls_mpi_div(q, q, two);
+	ret = _gnutls_mpi_div(q, q, two);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
 
 	if (_gnutls_prime_check(q) != 0) {
 		/* N was not on the form N=2q+1, where q = prime
