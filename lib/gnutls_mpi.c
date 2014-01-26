@@ -66,7 +66,7 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p,
 		goto cleanup;
 	}
 	
-	ret = _gnutls_mpi_scan(&tmp, buf, size);
+	ret = _gnutls_mpi_init_scan(&tmp, buf, size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -105,15 +105,24 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p,
 
 /* returns %GNUTLS_E_SUCCESS (0) on success
  */
-int _gnutls_mpi_scan(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
+int _gnutls_mpi_init_scan(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 {
-	*ret_mpi =
-	    _gnutls_mpi_ops.bigint_scan(buffer, nbytes,
-					GNUTLS_MPI_FORMAT_USG);
-	if (*ret_mpi == NULL) {
+bigint_t r;
+int ret;
+
+	ret = _gnutls_mpi_init(&r);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret =
+	    _gnutls_mpi_scan(r, buffer, nbytes);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		_gnutls_mpi_release(&r);
+		return ret;
 	}
+
+	*ret_mpi = r;
 
 	return 0;
 }
@@ -121,11 +130,11 @@ int _gnutls_mpi_scan(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 /* returns %GNUTLS_E_SUCCESS (0) on success. Fails if the number is zero.
  */
 int
-_gnutls_mpi_scan_nz(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
+_gnutls_mpi_init_scan_nz(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 {
 	int ret;
 
-	ret = _gnutls_mpi_scan(ret_mpi, buffer, nbytes);
+	ret = _gnutls_mpi_init_scan(ret_mpi, buffer, nbytes);
 	if (ret < 0)
 		return ret;
 
@@ -140,15 +149,24 @@ _gnutls_mpi_scan_nz(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 }
 
 int
-_gnutls_mpi_scan_pgp(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
+_gnutls_mpi_init_scan_pgp(bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 {
-	*ret_mpi =
-	    _gnutls_mpi_ops.bigint_scan(buffer, nbytes,
-					GNUTLS_MPI_FORMAT_PGP);
-	if (*ret_mpi == NULL) {
+bigint_t r;
+int ret;
+
+	ret = _gnutls_mpi_init(&r);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret =
+	    _gnutls_mpi_scan_pgp(r, buffer, nbytes);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		_gnutls_mpi_release(&r);
+		return ret;
 	}
+
+	*ret_mpi = r;
 
 	return 0;
 }
@@ -280,7 +298,7 @@ __gnutls_x509_read_int(ASN1_TYPE node, const char *value,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_mpi_scan(ret_mpi, tmpstr, tmpstr_size);
+	result = _gnutls_mpi_init_scan(ret_mpi, tmpstr, tmpstr_size);
 
 	if (overwrite)
                 zeroize_key(tmpstr, tmpstr_size);

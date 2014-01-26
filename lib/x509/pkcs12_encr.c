@@ -96,7 +96,7 @@ _gnutls_pkcs12_string_to_key(unsigned int id, const uint8_t * salt,
 		return rc;
 	}
 
-	rc = _gnutls_mpi_scan(&mpi512, buf_512, sizeof(buf_512));
+	rc = _gnutls_mpi_init_scan(&mpi512, buf_512, sizeof(buf_512));
 	if (rc < 0) {
 		gnutls_assert();
 		return rc;
@@ -152,7 +152,7 @@ _gnutls_pkcs12_string_to_key(unsigned int id, const uint8_t * salt,
 		for (i = 0; i < 64; i++)
 			buf_b[i] = hash[i % 20];
 		n = 64;
-		rc = _gnutls_mpi_scan(&num_b1, buf_b, n);
+		rc = _gnutls_mpi_init_scan(&num_b1, buf_b, n);
 		if (rc < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -160,7 +160,7 @@ _gnutls_pkcs12_string_to_key(unsigned int id, const uint8_t * salt,
 		_gnutls_mpi_add_ui(num_b1, num_b1, 1);
 		for (i = 0; i < 128; i += 64) {
 			n = 64;
-			rc = _gnutls_mpi_scan(&num_ij, buf_i + i, n);
+			rc = _gnutls_mpi_init_scan(&num_ij, buf_i + i, n);
 			if (rc < 0) {
 				gnutls_assert();
 				goto cleanup;

@@ -162,7 +162,7 @@ typedef struct gnutls_crypto_bigint {
 	 * GNUTLS_E_SHORT_MEMORY_BUFFER if buf_size is not sufficient to
 	 * store this integer, and updates the buf_size;
 	 */
-	 bigint_t(*bigint_scan) (const void *buf, size_t buf_size,
+	int (*bigint_scan) (bigint_t m, const void *buf, size_t buf_size,
 				 gnutls_bigint_format_t format);
 	int (*bigint_print) (const bigint_t a, void *buf,
 			     size_t * buf_size,

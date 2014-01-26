@@ -381,7 +381,7 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 				    gnutls_assert_val
 				    (GNUTLS_E_DECRYPTION_FAILED);
 
-			if (_gnutls_mpi_scan_nz
+			if (_gnutls_mpi_init_scan_nz
 			    (&c, ciphertext->data,
 			     ciphertext->size) != 0) {
 				ret =
@@ -687,7 +687,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 				    (GNUTLS_E_PK_SIG_VERIFY_FAILED);
 
 			ret =
-			    _gnutls_mpi_scan_nz(&tmp[0], signature->data,
+			    _gnutls_mpi_init_scan_nz(&tmp[0], signature->data,
 						signature->size);
 			if (ret < 0) {
 				gnutls_assert();

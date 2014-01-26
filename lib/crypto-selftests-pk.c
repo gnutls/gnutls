@@ -447,25 +447,25 @@ static int test_dh(void)
 	
 	priv.algo = pub.algo = GNUTLS_PK_DH;
 	
-	ret = _gnutls_mpi_scan(&priv.params[DH_P], test_p, sizeof(test_p));
+	ret = _gnutls_mpi_init_scan(&priv.params[DH_P], test_p, sizeof(test_p));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_mpi_scan(&priv.params[DH_G], test_g, sizeof(test_g));
+	ret = _gnutls_mpi_init_scan(&priv.params[DH_G], test_g, sizeof(test_g));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_mpi_scan(&priv.params[DH_X], test_x, sizeof(test_x));
+	ret = _gnutls_mpi_init_scan(&priv.params[DH_X], test_x, sizeof(test_x));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_mpi_scan(&pub.params[DH_Y], test_y, sizeof(test_y));
+	ret = _gnutls_mpi_init_scan(&pub.params[DH_Y], test_y, sizeof(test_y));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -543,31 +543,31 @@ static int test_ecdh(void)
 	
 	priv.algo = pub.algo = GNUTLS_PK_EC;
 	
-	ret = _gnutls_mpi_scan(&priv.params[ECC_K], test_k, sizeof(test_k));
+	ret = _gnutls_mpi_init_scan(&priv.params[ECC_K], test_k, sizeof(test_k));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_mpi_scan(&priv.params[ECC_X], test_x, sizeof(test_x));
+	ret = _gnutls_mpi_init_scan(&priv.params[ECC_X], test_x, sizeof(test_x));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_mpi_scan(&priv.params[ECC_Y], test_y, sizeof(test_y));
+	ret = _gnutls_mpi_init_scan(&priv.params[ECC_Y], test_y, sizeof(test_y));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_mpi_scan(&pub.params[ECC_X], test_x, sizeof(test_x));
+	ret = _gnutls_mpi_init_scan(&pub.params[ECC_X], test_x, sizeof(test_x));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = _gnutls_mpi_scan(&pub.params[ECC_Y], test_y, sizeof(test_y));
+	ret = _gnutls_mpi_init_scan(&pub.params[ECC_Y], test_y, sizeof(test_y));
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

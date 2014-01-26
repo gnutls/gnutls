@@ -136,7 +136,7 @@ static cdk_error_t read_mpi(cdk_stream_t inp, bigint_t * ret_m, int secure)
 	buf[0] = nbits >> 8;
 	buf[1] = nbits >> 0;
 	nread += 2;
-	err = _gnutls_mpi_scan_pgp(&m, buf, nread);
+	err = _gnutls_mpi_init_scan_pgp(&m, buf, nread);
 	if (err < 0)
 		return gnutls_assert_val(map_gnutls_error(err));
 

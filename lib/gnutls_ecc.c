@@ -92,12 +92,12 @@ _gnutls_ecc_ansi_x963_import(const uint8_t * in,
 	}
 
 	/* read data */
-	ret = _gnutls_mpi_scan(x, in + 1, (inlen - 1) >> 1);
+	ret = _gnutls_mpi_init_scan(x, in + 1, (inlen - 1) >> 1);
 	if (ret < 0)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	ret =
-	    _gnutls_mpi_scan(y, in + 1 + ((inlen - 1) >> 1),
+	    _gnutls_mpi_init_scan(y, in + 1 + ((inlen - 1) >> 1),
 			     (inlen - 1) >> 1);
 	if (ret < 0) {
 		_gnutls_mpi_release(x);

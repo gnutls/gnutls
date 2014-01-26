@@ -965,14 +965,14 @@ gnutls_x509_crq_set_key_rsa_raw(gnutls_x509_crq_t crq,
 	memset(&temp_params, 0, sizeof(temp_params));
 
 	siz = m->size;
-	if (_gnutls_mpi_scan_nz(&temp_params.params[0], m->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&temp_params.params[0], m->data, siz)) {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_SCAN_FAILED;
 		goto error;
 	}
 
 	siz = e->size;
-	if (_gnutls_mpi_scan_nz(&temp_params.params[1], e->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&temp_params.params[1], e->data, siz)) {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_SCAN_FAILED;
 		goto error;

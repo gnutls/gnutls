@@ -71,7 +71,7 @@ _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 	_n_Y = n_Y;
 
 	DECR_LEN(data_size, n_Y);
-	if (_gnutls_mpi_scan_nz(&session->key.client_Y, &data[2], _n_Y)) {
+	if (_gnutls_mpi_init_scan_nz(&session->key.client_Y, &data[2], _n_Y)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -241,17 +241,17 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	_n_g = n_g;
 	_n_p = n_p;
 
-	if (_gnutls_mpi_scan_nz(&session->key.client_Y, data_Y, _n_Y) != 0) {
+	if (_gnutls_mpi_init_scan_nz(&session->key.client_Y, data_Y, _n_Y) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (_gnutls_mpi_scan_nz(&session->key.dh_params.params[DH_G], data_g, _n_g) != 0) {
+	if (_gnutls_mpi_init_scan_nz(&session->key.dh_params.params[DH_G], data_g, _n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (_gnutls_mpi_scan_nz(&session->key.dh_params.params[DH_P], data_p, _n_p) != 0) {
+	if (_gnutls_mpi_init_scan_nz(&session->key.dh_params.params[DH_P], data_p, _n_p) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}

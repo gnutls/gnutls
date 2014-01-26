@@ -141,19 +141,10 @@ fail:
 	return GNUTLS_E_MEMORY_ERROR;
 }
 
-static bigint_t
-wrap_nettle_mpi_scan(const void *buffer, size_t nbytes,
+static int
+wrap_nettle_mpi_scan(bigint_t r, const void *buffer, size_t nbytes,
 		     gnutls_bigint_format_t format)
 {
-	int ret;
-	bigint_t r;
-	
-	ret = wrap_nettle_mpi_init(&r);
-	if (ret < 0) {
-		gnutls_assert();
-		return NULL;
-	}
-
 	if (format == GNUTLS_MPI_FORMAT_USG) {
 		nettle_mpz_set_str_256_u(TOMPZ(r), nbytes, buffer);
 	} else if (format == GNUTLS_MPI_FORMAT_STD) {
@@ -180,11 +171,9 @@ wrap_nettle_mpi_scan(const void *buffer, size_t nbytes,
 		goto fail;
 	}
 
-	return r;
-      fail:
-	_gnutls_mpi_release(&r);
-	return NULL;
-
+	return 0;
+ fail:
+	return GNUTLS_E_MPI_SCAN_FAILED;
 }
 
 static int wrap_nettle_mpi_cmp(const bigint_t u, const bigint_t v)

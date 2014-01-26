@@ -1194,7 +1194,7 @@ _gnutls_read_pgp_mpi(cdk_packet_t pkt, unsigned int priv, size_t idx,
 		return _gnutls_map_cdk_rc(err);
 	}
 
-	err = _gnutls_mpi_scan(m, buf, buf_size);
+	err = _gnutls_mpi_init_scan(m, buf, buf_size);
 	gnutls_free(buf);
 
 	if (err < 0) {

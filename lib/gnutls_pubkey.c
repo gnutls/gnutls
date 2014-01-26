@@ -1280,13 +1280,13 @@ gnutls_pubkey_import_rsa_raw(gnutls_pubkey_t key,
 	gnutls_pk_params_init(&key->params);
 
 	siz = m->size;
-	if (_gnutls_mpi_scan_nz(&key->params.params[0], m->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[0], m->data, siz)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = e->size;
-	if (_gnutls_mpi_scan_nz(&key->params.params[1], e->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[1], e->data, siz)) {
 		gnutls_assert();
 		_gnutls_mpi_release(&key->params.params[0]);
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -1329,7 +1329,7 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 
 	key->params.flags = curve;
 
-	if (_gnutls_mpi_scan_nz
+	if (_gnutls_mpi_init_scan_nz
 	    (&key->params.params[ECC_X], x->data, x->size)) {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_SCAN_FAILED;
@@ -1337,7 +1337,7 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 	}
 	key->params.params_nr++;
 
-	if (_gnutls_mpi_scan_nz
+	if (_gnutls_mpi_init_scan_nz
 	    (&key->params.params[ECC_Y], y->data, y->size)) {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_SCAN_FAILED;
@@ -1440,20 +1440,20 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 	gnutls_pk_params_init(&key->params);
 
 	siz = p->size;
-	if (_gnutls_mpi_scan_nz(&key->params.params[0], p->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[0], p->data, siz)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = q->size;
-	if (_gnutls_mpi_scan_nz(&key->params.params[1], q->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[1], q->data, siz)) {
 		gnutls_assert();
 		_gnutls_mpi_release(&key->params.params[0]);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = g->size;
-	if (_gnutls_mpi_scan_nz(&key->params.params[2], g->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[2], g->data, siz)) {
 		gnutls_assert();
 		_gnutls_mpi_release(&key->params.params[1]);
 		_gnutls_mpi_release(&key->params.params[0]);
@@ -1461,7 +1461,7 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 	}
 
 	siz = y->size;
-	if (_gnutls_mpi_scan_nz(&key->params.params[3], y->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[3], y->data, siz)) {
 		gnutls_assert();
 		_gnutls_mpi_release(&key->params.params[2]);
 		_gnutls_mpi_release(&key->params.params[1]);

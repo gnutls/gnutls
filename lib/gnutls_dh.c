@@ -103,13 +103,13 @@ gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
 	size_t siz;
 
 	siz = prime->size;
-	if (_gnutls_mpi_scan_nz(&tmp_prime, prime->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&tmp_prime, prime->data, siz)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = generator->size;
-	if (_gnutls_mpi_scan_nz(&tmp_g, generator->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&tmp_g, generator->data, siz)) {
 		_gnutls_mpi_release(&tmp_prime);
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
