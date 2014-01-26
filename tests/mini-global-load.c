@@ -98,24 +98,6 @@ void doit(void)
 	gnutls_session_t client;
 	int cret = GNUTLS_E_AGAIN;
 
-#ifndef _WIN32
-	/* check if we are statically linked, because in that
-	 * case we _need_ gnutls_global_init() to be called. */
-	void * sym;
-	void *h = dlopen (NULL, RTLD_LAZY);
-	
-	if (h == NULL)
-		exit(77);
-	
-	sym = dlsym (h, "gnutls_init");
-	
-	dlclose(h);
-	
-	if (sym != NULL) /* yes we are */
-		exit(77);
-#endif
-
-
 	/* General init. */
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
