@@ -225,7 +225,11 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 		}
 
 
-		_gnutls_mpi_powm(k, f, x, prime);
+		ret = _gnutls_mpi_powm(k, f, x, prime);
+		if (ret < 0) {
+			gnutls_assert();
+			goto dh_cleanup;
+		}
 
 		ret = _gnutls_mpi_dprint(k, out);
 		if (ret < 0) {
@@ -1218,9 +1222,13 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 				return
 				    gnutls_assert_val(ret);
 
-			_gnutls_mpi_powm(t1, params->params[DSA_G],
+			ret = _gnutls_mpi_powm(t1, params->params[DSA_G],
 					 params->params[DSA_X],
 					 params->params[DSA_P]);
+			if (ret < 0) {
+				gnutls_assert();
+				goto dsa_cleanup;
+			}
 
 			if (_gnutls_mpi_cmp(t1, params->params[DSA_Y]) !=
 			    0) {

@@ -44,7 +44,7 @@ static int
 _gnutls_srp_gx(uint8_t * text, size_t textsize, uint8_t ** result,
 	       bigint_t g, bigint_t prime)
 {
-	bigint_t x, e;
+	bigint_t x, e = NULL;
 	size_t result_size;
 	int ret;
 
@@ -55,26 +55,34 @@ _gnutls_srp_gx(uint8_t * text, size_t textsize, uint8_t ** result,
 
 	ret = _gnutls_mpi_init(&e);
 	if (ret < 0)
-		return gnutls_assert_val(ret);
+		goto cleanup;
 
 	/* e = g^x mod prime (n) */
-	_gnutls_mpi_powm(e, g, x, prime);
-	_gnutls_mpi_release(&x);
+	ret = _gnutls_mpi_powm(e, g, x, prime);
+	if (ret < 0)
+		goto cleanup;
 
 	ret = _gnutls_mpi_print(e, NULL, &result_size);
 	if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		*result = gnutls_malloc(result_size);
-		if ((*result) == NULL)
-			return GNUTLS_E_MEMORY_ERROR;
+		if ((*result) == NULL) {
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto cleanup;
+		}
 
-		_gnutls_mpi_print(e, *result, &result_size);
+		ret = _gnutls_mpi_print(e, *result, &result_size);
+		if (ret < 0)
+			goto cleanup;
+
 		ret = result_size;
 	} else {
 		gnutls_assert();
 		ret = GNUTLS_E_MPI_PRINT_FAILED;
 	}
 
+cleanup:
 	_gnutls_mpi_release(&e);
+	_gnutls_mpi_release(&x);
 
 	return ret;
 
@@ -108,7 +116,10 @@ _gnutls_calc_srp_B(bigint_t * ret_b, bigint_t g, bigint_t n, bigint_t v)
 	}
 
 	_gnutls_mpi_mulm(tmpV, k, v, n);
-	_gnutls_mpi_powm(tmpB, g, b, n);
+	
+	ret = _gnutls_mpi_powm(tmpB, g, b, n);
+	if (ret < 0)
+		goto error;
 
 	_gnutls_mpi_addm(B, tmpV, tmpB, n);
 
@@ -200,7 +211,10 @@ _gnutls_calc_srp_S1(bigint_t A, bigint_t b, bigint_t u, bigint_t v,
 	if (ret < 0)
 		return NULL;
 
-	_gnutls_mpi_powm(tmp1, v, u, n);
+	ret = _gnutls_mpi_powm(tmp1, v, u, n);
+	if (ret < 0)
+		goto error;
+
 	_gnutls_mpi_mulm(tmp2, A, tmp1, n);
 	_gnutls_mpi_powm(S, tmp2, b, n);
 
@@ -208,6 +222,12 @@ _gnutls_calc_srp_S1(bigint_t A, bigint_t b, bigint_t u, bigint_t v,
 	_gnutls_mpi_release(&tmp2);
 
 	return S;
+
+error:
+	_gnutls_mpi_release(&S);
+	_gnutls_mpi_release(&tmp1);
+	_gnutls_mpi_release(&tmp2);
+	return NULL;
 }
 
 /* A = g^a % N 
@@ -227,7 +247,9 @@ bigint_t _gnutls_calc_srp_A(bigint_t * a, bigint_t g, bigint_t n)
 
 	_gnutls_mpi_random_modp(tmpa, n, GNUTLS_RND_RANDOM);
 
-	_gnutls_mpi_powm(A, g, tmpa, n);
+	ret = _gnutls_mpi_powm(A, g, tmpa, n);
+	if (ret < 0)
+		goto error;
 
 	if (a != NULL)
 		*a = tmpa;
@@ -235,6 +257,10 @@ bigint_t _gnutls_calc_srp_A(bigint_t * a, bigint_t g, bigint_t n)
 		_gnutls_mpi_release(&tmpa);
 
 	return A;
+error:
+	_gnutls_mpi_release(&tmpa);
+	_gnutls_mpi_release(&A);
+	return NULL;
 }
 
 /* generate x = SHA(s | SHA(U | ":" | p))
@@ -306,13 +332,23 @@ _gnutls_calc_srp_S2(bigint_t B, bigint_t g, bigint_t x, bigint_t a,
 		goto freeall;
 	}
 
-	_gnutls_mpi_powm(tmp1, g, x, n);	/* g^x */
+	ret = _gnutls_mpi_powm(tmp1, g, x, n);	/* g^x */
+	if (ret < 0) {
+		gnutls_assert();
+		goto freeall;
+	}
+
 	_gnutls_mpi_mulm(tmp3, tmp1, k, n);	/* k*g^x mod n */
 	_gnutls_mpi_subm(tmp2, B, tmp3, n);
 
 	_gnutls_mpi_mul(tmp1, u, x);
 	_gnutls_mpi_add(tmp4, a, tmp1);
-	_gnutls_mpi_powm(S, tmp2, tmp4, n);
+	
+	ret = _gnutls_mpi_powm(S, tmp2, tmp4, n);
+	if (ret < 0) {
+		gnutls_assert();
+		goto freeall;
+	}
 
 	_gnutls_mpi_release(&tmp1);
 	_gnutls_mpi_release(&tmp2);

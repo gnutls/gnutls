@@ -122,7 +122,7 @@ typedef struct gnutls_crypto_bigint {
 	int (*bigint_set_ui) (bigint_t a, unsigned long b);
 	unsigned int (*bigint_get_nbits) (const bigint_t a);
 	/* w = b ^ e mod m */
-	 bigint_t(*bigint_powm) (bigint_t w, const bigint_t b,
+	int (*bigint_powm) (bigint_t w, const bigint_t b,
 				 const bigint_t e, const bigint_t m);
 	/* w = a + b mod m */
 	 bigint_t(*bigint_addm) (bigint_t w, const bigint_t a,

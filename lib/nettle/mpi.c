@@ -242,21 +242,13 @@ static int wrap_nettle_mpi_modm(bigint_t r, const bigint_t a, const bigint_t b)
 	return 0;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_powm(bigint_t w, const bigint_t b, const bigint_t e,
 		     const bigint_t m)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_powm(TOMPZ(w), TOMPZ(b), TOMPZ(e), TOMPZ(m));
 
-	return w;
+	return 0;
 }
 
 static bigint_t

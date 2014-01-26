@@ -769,7 +769,11 @@ group_check_g_n(gnutls_session_t session, bigint_t g, bigint_t n)
 	/* check if g^q mod N == N-1
 	 * w = g^q mod N
 	 */
-	_gnutls_mpi_powm(w, g, q, n);
+	ret = _gnutls_mpi_powm(w, g, q, n);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
 
 	/* w++
 	 */

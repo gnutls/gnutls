@@ -1087,8 +1087,12 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
-	_gnutls_mpi_powm(pkey->params.params[3], pkey->params.params[2],
+	ret = _gnutls_mpi_powm(pkey->params.params[3], pkey->params.params[2],
 			 pkey->params.params[4], pkey->params.params[0]);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
 
 	ret =
 	    _gnutls_asn1_encode_privkey(GNUTLS_PK_DSA, &pkey->key,
