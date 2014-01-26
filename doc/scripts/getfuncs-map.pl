@@ -41,6 +41,7 @@ my %known_false_positives = (
 	'gnutls_malloc' => 1,
 	'gnutls_calloc' => 1,
 	'gnutls_secure_malloc' => 1,
+	'gnutls_realloc_fast' => 1,
 	'gnutls_secure_calloc' => 1
 );
 

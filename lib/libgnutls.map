@@ -951,7 +951,9 @@ GNUTLS_PRIVATE {
     _gnutls_buffer_init;
     _gnutls_buffer_append_str;
     _gnutls_buffer_to_datum;
-    # Internal symbols needed by psktool:
+
+    # Internal symbols needed by xssl:
+    gnutls_realloc_fast;
 
     # Internal symbols needed by gnutls-cli-debug:
     _gnutls_rsa_pms_set_version;
