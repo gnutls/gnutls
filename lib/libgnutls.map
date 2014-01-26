@@ -872,7 +872,7 @@ GNUTLS_3_1_0 {
 	gnutls_sign_is_secure;
 	gnutls_pkcs11_privkey_generate2;
 	gnutls_x509_crt_get_policy;
-	gnutls_certificate_policy_release;
+	gnutls_x509_policy_release;
 	gnutls_x509_crt_set_policy;
 	gnutls_pubkey_import_x509_crq;
 	gnutls_pubkey_print;
