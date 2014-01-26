@@ -114,7 +114,7 @@ typedef struct gnutls_crypto_bigint {
 	/* as bigint_cmp */
 	int (*bigint_cmp_ui) (const bigint_t m1, unsigned long m2);
 	/* r = a % b */
-	bigint_t (*bigint_modm) (bigint_t r, const bigint_t a, const bigint_t b);
+	int (*bigint_modm) (bigint_t r, const bigint_t a, const bigint_t b);
 	/* a = b -> ret == a */
 	bigint_t (*bigint_set) (bigint_t a, const bigint_t b);
 	/* a = b -> ret == a */

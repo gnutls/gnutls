@@ -72,7 +72,11 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p,
 		goto cleanup;
 	}
 	
-	_gnutls_mpi_modm(tmp, tmp, p);
+	ret = _gnutls_mpi_modm(tmp, tmp, p);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	if (_gnutls_mpi_cmp_ui(tmp, 0) == 0)
 		_gnutls_mpi_add_ui(tmp, tmp, 1);

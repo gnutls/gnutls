@@ -71,10 +71,14 @@ inline static int check_param_mod_n(bigint_t a, bigint_t n, int is_a)
 	int ret, err = 0;
 	bigint_t r;
 
-	r = _gnutls_mpi_modm(NULL, a, n);
-	if (r == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+	ret = _gnutls_mpi_init(&r);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_mpi_modm(r, a, n);
+	if (ret < 0) {
+		_gnutls_mpi_release(&r);
+		return gnutls_assert_val(ret);
 	}
 
 	ret = _gnutls_mpi_cmp_ui(r, 0);

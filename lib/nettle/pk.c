@@ -187,14 +187,23 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_DH: {
 		bigint_t f, x, prime;
-		bigint_t k = NULL, ff;
+		bigint_t k = NULL, ff = NULL;
 		unsigned int bits;
 
 		f = pub->params[DH_Y];
 		x = priv->params[DH_X];
 		prime = priv->params[DH_P];
 
-		ff = _gnutls_mpi_modm(NULL, f, prime);
+		ret = _gnutls_mpi_init_multi(&k, &ff, NULL);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = _gnutls_mpi_modm(ff, f, prime);
+		if (ret < 0) {
+			gnutls_assert();
+			goto dh_cleanup;
+		}
+
 		_gnutls_mpi_add_ui(ff, ff, 1);
 
 		/* check if f==0,1,p-1. 
@@ -215,11 +224,6 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			goto dh_cleanup;
 		}
 
-		ret = _gnutls_mpi_init(&k);
-		if (ret < 0) {
-			gnutls_assert();
-			goto dh_cleanup;
-		}
 
 		_gnutls_mpi_powm(k, f, x, prime);
 
@@ -1125,7 +1129,7 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 				    gnutls_assert_val
 				    (GNUTLS_E_INVALID_REQUEST);
 
-			ret = _gnutls_mpi_init(&t1);
+			ret = _gnutls_mpi_init_multi(&t1, &t2, NULL);
 			if (ret < 0)
 				return
 				    gnutls_assert_val(ret);
@@ -1154,8 +1158,8 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 			/* [RSA_PRIME1] = d % p-1, [RSA_PRIME2] = d % q-1 */
 			_gnutls_mpi_sub_ui(t1, params->params[RSA_PRIME1],
 					   1);
-			t2 = _gnutls_mpi_modm(NULL, params->params[RSA_PRIV], t1);
-			if (t2 == NULL) {
+			ret = _gnutls_mpi_modm(t2, params->params[RSA_PRIV], t1);
+			if (ret < 0) {
 				ret =
 				    gnutls_assert_val
 				    (GNUTLS_E_MEMORY_ERROR);
@@ -1172,10 +1176,9 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 
 			_gnutls_mpi_sub_ui(t1, params->params[RSA_PRIME2],
 					   1);
-			zrelease_mpi_key(&t2);
 
-			t2 = _gnutls_mpi_modm(NULL, params->params[RSA_PRIV], t1);
-			if (t2 == NULL) {
+			ret = _gnutls_mpi_modm(t2, params->params[RSA_PRIV], t1);
+			if (ret < 0) {
 				ret =
 				    gnutls_assert_val
 				    (GNUTLS_E_MEMORY_ERROR);
@@ -1315,28 +1318,36 @@ static int calc_rsa_exp(gnutls_pk_params_st * params)
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
+	
+	params->params[6] = params->params[7] = NULL;
 
-	ret = _gnutls_mpi_init(&tmp);
+	ret = _gnutls_mpi_init_multi(&tmp, &params->params[6], &params->params[7], NULL);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	/* [6] = d % p-1, [7] = d % q-1 */
 	_gnutls_mpi_sub_ui(tmp, params->params[3], 1);
-	params->params[6] =
-	    _gnutls_mpi_modm(NULL, params->params[2] /*d */ , tmp);
+	ret =
+	    _gnutls_mpi_modm(params->params[6], params->params[2] /*d */ , tmp);
+	if (ret < 0)
+		goto fail;
 
 	_gnutls_mpi_sub_ui(tmp, params->params[4], 1);
-	params->params[7] =
-	    _gnutls_mpi_modm(NULL, params->params[2] /*d */ , tmp);
+	ret =
+	    _gnutls_mpi_modm(params->params[7], params->params[2] /*d */ , tmp);
+	if (ret < 0)
+		goto fail;
 
 	zrelease_mpi_key(&tmp);
 
-	if (params->params[7] == NULL || params->params[6] == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
 	return 0;
+
+fail:
+	zrelease_mpi_key(&tmp);
+	zrelease_mpi_key(&params->params[6]);
+	zrelease_mpi_key(&params->params[7]);
+
+	return ret;
 }
 
 

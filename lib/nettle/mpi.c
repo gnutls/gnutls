@@ -128,6 +128,8 @@ static int wrap_nettle_mpi_init_multi(bigint_t *w, ...)
 fail:
 	mpz_clear(TOMPZ(*w));
 	gnutls_free(*w);
+	*w = NULL;
+
 	va_start(args, w);
 	
 	do {
@@ -135,6 +137,7 @@ fail:
 		if (next != last_failed) {
 			mpz_clear(TOMPZ(*next));
 			gnutls_free(*next);
+			*next = NULL;
 		}
 	} while(next != last_failed);
 	
@@ -256,19 +259,11 @@ static void wrap_nettle_mpi_clear(bigint_t a)
 	       TOMPZ(a)[0]._mp_alloc * sizeof(mp_limb_t));
 }
 
-static bigint_t wrap_nettle_mpi_modm(bigint_t r, const bigint_t a, const bigint_t b)
+static int wrap_nettle_mpi_modm(bigint_t r, const bigint_t a, const bigint_t b)
 {
-int ret;
-
-	if (r == NULL) {
-		ret = wrap_nettle_mpi_init(&r);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_mod(TOMPZ(r), TOMPZ(a), TOMPZ(b));
 	
-	return r;
+	return 0;
 }
 
 static bigint_t
