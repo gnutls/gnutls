@@ -1081,9 +1081,8 @@ _decode_pkcs8_dsa_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 	}
 
 	/* the public key can be generated as g^x mod p */
-	pkey->params.params[3] =
-	    _gnutls_mpi_alloc_like(pkey->params.params[0]);
-	if (pkey->params.params[3] == NULL) {
+	ret = _gnutls_mpi_init(&pkey->params.params[3]);
+	if (ret < 0) {
 		gnutls_assert();
 		goto error;
 	}

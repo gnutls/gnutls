@@ -722,17 +722,10 @@ group_check_g_n(gnutls_session_t session, bigint_t g, bigint_t n)
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
-	two = _gnutls_mpi_new(4);
-	if (two == NULL) {
+	ret = _gnutls_mpi_init_multi(&two, &q, &w, NULL);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	q = _gnutls_mpi_alloc_like(n);
-	if (q == NULL) {
-		gnutls_assert();
-		ret = GNUTLS_E_MEMORY_ERROR;
-		goto error;
+		return ret;
 	}
 
 	/* q = n-1 
@@ -760,13 +753,6 @@ group_check_g_n(gnutls_session_t session, bigint_t g, bigint_t n)
 	if (_gnutls_mpi_cmp(g, q) >= 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-		goto error;
-	}
-
-	w = _gnutls_mpi_alloc_like(q);
-	if (w == NULL) {
-		gnutls_assert();
-		ret = GNUTLS_E_MEMORY_ERROR;
 		goto error;
 	}
 

@@ -53,12 +53,9 @@ _gnutls_srp_gx(uint8_t * text, size_t textsize, uint8_t ** result,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	e = _gnutls_mpi_alloc_like(prime);
-	if (e == NULL) {
-		gnutls_assert();
-		_gnutls_mpi_release(&x);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
+	ret = _gnutls_mpi_init(&e);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	/* e = g^x mod prime (n) */
 	_gnutls_mpi_powm(e, g, x, prime);
@@ -94,33 +91,15 @@ _gnutls_calc_srp_B(bigint_t * ret_b, bigint_t g, bigint_t n, bigint_t v)
 {
 	bigint_t tmpB = NULL, tmpV = NULL;
 	bigint_t b = NULL, B = NULL, k = NULL;
-	int bits;
-
+	int ret;
 
 	/* calculate:  B = (k*v + g^b) % N 
 	 */
-	bits = _gnutls_mpi_get_nbits(n);
+	ret = _gnutls_mpi_init_multi(&tmpV, &tmpB, &B, &b, NULL);
+	if (ret < 0)
+		return NULL;
 
-	tmpV = _gnutls_mpi_alloc_like(n);
-
-	if (tmpV == NULL) {
-		gnutls_assert();
-		goto error;
-	}
-
-	b = _gnutls_mpi_random_modp(NULL, n, GNUTLS_RND_RANDOM);
-
-	tmpB = _gnutls_mpi_new(bits);
-	if (tmpB == NULL) {
-		gnutls_assert();
-		goto error;
-	}
-
-	B = _gnutls_mpi_new(bits);
-	if (B == NULL) {
-		gnutls_assert();
-		goto error;
-	}
+	_gnutls_mpi_random_modp(b, n, GNUTLS_RND_RANDOM);
 
 	k = _gnutls_calc_srp_u(n, g, n);
 	if (k == NULL) {
@@ -215,16 +194,11 @@ _gnutls_calc_srp_S1(bigint_t A, bigint_t b, bigint_t u, bigint_t v,
 {
 	bigint_t tmp1 = NULL, tmp2 = NULL;
 	bigint_t S = NULL;
+	int ret;
 
-	S = _gnutls_mpi_alloc_like(n);
-	if (S == NULL)
+	ret = _gnutls_mpi_init_multi(&S, &tmp1, &tmp2, NULL);
+	if (ret < 0)
 		return NULL;
-
-	tmp1 = _gnutls_mpi_alloc_like(n);
-	tmp2 = _gnutls_mpi_alloc_like(n);
-
-	if (tmp1 == NULL || tmp2 == NULL)
-		goto freeall;
 
 	_gnutls_mpi_powm(tmp1, v, u, n);
 	_gnutls_mpi_mulm(tmp2, A, tmp1, n);
@@ -234,11 +208,6 @@ _gnutls_calc_srp_S1(bigint_t A, bigint_t b, bigint_t u, bigint_t v,
 	_gnutls_mpi_release(&tmp2);
 
 	return S;
-
-      freeall:
-	_gnutls_mpi_release(&tmp1);
-	_gnutls_mpi_release(&tmp2);
-	return NULL;
 }
 
 /* A = g^a % N 
@@ -248,17 +217,16 @@ bigint_t _gnutls_calc_srp_A(bigint_t * a, bigint_t g, bigint_t n)
 {
 	bigint_t tmpa;
 	bigint_t A;
-	int bits;
+	int ret;
 
-	bits = _gnutls_mpi_get_nbits(n);
-	tmpa = _gnutls_mpi_random_modp(NULL, n, GNUTLS_RND_RANDOM);
-
-	A = _gnutls_mpi_new(bits);
-	if (A == NULL) {
+	ret = _gnutls_mpi_init_multi(&A, &tmpa, NULL);
+	if (ret < 0) {
 		gnutls_assert();
-		_gnutls_mpi_release(&tmpa);
 		return NULL;
 	}
+
+	_gnutls_mpi_random_modp(tmpa, n, GNUTLS_RND_RANDOM);
+
 	_gnutls_mpi_powm(A, g, tmpa, n);
 
 	if (a != NULL)
@@ -326,17 +294,11 @@ _gnutls_calc_srp_S2(bigint_t B, bigint_t g, bigint_t x, bigint_t a,
 {
 	bigint_t S = NULL, tmp1 = NULL, tmp2 = NULL;
 	bigint_t tmp4 = NULL, tmp3 = NULL, k = NULL;
+	int ret;
 
-	S = _gnutls_mpi_alloc_like(n);
-	if (S == NULL)
+	ret = _gnutls_mpi_init_multi(&S, &tmp1, &tmp2, &tmp3, &tmp4, NULL);
+	if (ret < 0)
 		return NULL;
-
-	tmp1 = _gnutls_mpi_alloc_like(n);
-	tmp2 = _gnutls_mpi_alloc_like(n);
-	tmp3 = _gnutls_mpi_alloc_like(n);
-	if (tmp1 == NULL || tmp2 == NULL || tmp3 == NULL) {
-		goto freeall;
-	}
 
 	k = _gnutls_calc_srp_u(n, g, n);
 	if (k == NULL) {
@@ -347,10 +309,6 @@ _gnutls_calc_srp_S2(bigint_t B, bigint_t g, bigint_t x, bigint_t a,
 	_gnutls_mpi_powm(tmp1, g, x, n);	/* g^x */
 	_gnutls_mpi_mulm(tmp3, tmp1, k, n);	/* k*g^x mod n */
 	_gnutls_mpi_subm(tmp2, B, tmp3, n);
-
-	tmp4 = _gnutls_mpi_alloc_like(n);
-	if (tmp4 == NULL)
-		goto freeall;
 
 	_gnutls_mpi_mul(tmp1, u, x);
 	_gnutls_mpi_add(tmp4, a, tmp1);

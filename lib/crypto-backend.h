@@ -105,7 +105,8 @@ typedef enum {
 
 /* Multi precision integer arithmetic */
 typedef struct gnutls_crypto_bigint {
-	bigint_t(*bigint_new) (int nbits);
+	int (*bigint_init) (bigint_t*);
+	int (*bigint_init_multi) (bigint_t*, ...);
 	void (*bigint_release) (bigint_t n);
 	void (*bigint_clear) (bigint_t n);	/* zeros the int */
 	/* 0 for equality, > 0 for m1>m2, < 0 for m1<m2 */

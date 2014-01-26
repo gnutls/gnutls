@@ -72,32 +72,88 @@ wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t * nbytes,
 	return 0;
 }
 
-static bigint_t wrap_nettle_mpi_new(int nbits)
+static int wrap_nettle_mpi_init(bigint_t *w)
 {
-	mpz_t *p;
+mpz_t *r;
 
-	p = gnutls_malloc(sizeof(*p));
-	if (p == NULL) {
+	r = gnutls_malloc(sizeof(*r));
+	if (r == NULL) {
 		gnutls_assert();
-		return NULL;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
-	if (nbits == 0)
-		mpz_init(*p);
-	else
-		mpz_init2(*p, nbits);
 
-	return p;
+	mpz_init(*r);
+	
+	*w = r;
+
+	return 0;
+}
+
+static int wrap_nettle_mpi_init_multi(bigint_t *w, ...)
+{
+	va_list args;
+	bigint_t *next;
+	mpz_t *r;
+	bigint_t* last_failed = NULL;
+
+	r = gnutls_malloc(sizeof(*r));
+	if (r == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	mpz_init(*r);
+	*w = r;
+	
+	va_start(args, w);
+	
+	do {
+		next = va_arg(args, bigint_t*);
+		if (next != NULL) {
+			r = gnutls_malloc(sizeof(*r));
+			if (r == NULL) {
+				gnutls_assert();
+				va_end(args);
+				last_failed = next;
+				goto fail;
+			}
+			mpz_init(*r);
+			*next = r;
+		}
+	} while(next != 0);
+	
+	va_end(args);
+
+	return 0;
+fail:
+	mpz_clear(TOMPZ(*w));
+	gnutls_free(*w);
+	va_start(args, w);
+	
+	do {
+		next = va_arg(args, bigint_t*);
+		if (next != last_failed) {
+			mpz_clear(TOMPZ(*next));
+			gnutls_free(*next);
+		}
+	} while(next != last_failed);
+	
+	va_end(args);
+	
+	return GNUTLS_E_MEMORY_ERROR;
 }
 
 static bigint_t
 wrap_nettle_mpi_scan(const void *buffer, size_t nbytes,
 		     gnutls_bigint_format_t format)
 {
-	bigint_t r = wrap_nettle_mpi_new(nbytes * 8);
-
-	if (r == NULL) {
+	int ret;
+	bigint_t r;
+	
+	ret = wrap_nettle_mpi_init(&r);
+	if (ret < 0) {
 		gnutls_assert();
-		return r;
+		return NULL;
 	}
 
 	if (format == GNUTLS_MPI_FORMAT_USG) {
@@ -150,9 +206,14 @@ static int wrap_nettle_mpi_cmp_ui(const bigint_t u, unsigned long v)
 static bigint_t wrap_nettle_mpi_set(bigint_t w, const bigint_t u)
 {
 	mpz_t *i1, *i2 = u;
+	int ret;
 
-	if (w == NULL)
-		w = _gnutls_mpi_alloc_like(u);
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
+
 	i1 = w;
 
 	mpz_set(*i1, *i2);
@@ -163,9 +224,13 @@ static bigint_t wrap_nettle_mpi_set(bigint_t w, const bigint_t u)
 static bigint_t wrap_nettle_mpi_set_ui(bigint_t w, unsigned long u)
 {
 	mpz_t *i1;
+	int ret;
 
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(32);
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	i1 = w;
 
@@ -193,11 +258,14 @@ static void wrap_nettle_mpi_clear(bigint_t a)
 
 static bigint_t wrap_nettle_mpi_modm(bigint_t r, const bigint_t a, const bigint_t b)
 {
+int ret;
+
 	if (r == NULL) {
-                r = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(b));
-                if (r == NULL) return NULL;
+		ret = wrap_nettle_mpi_init(&r);
+		if (ret < 0)
+			return NULL;
 	}
-	
+
 	mpz_mod(TOMPZ(r), TOMPZ(a), TOMPZ(b));
 	
 	return r;
@@ -207,11 +275,13 @@ static bigint_t
 wrap_nettle_mpi_powm(bigint_t w, const bigint_t b, const bigint_t e,
 		     const bigint_t m)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(m));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_powm(TOMPZ(w), TOMPZ(b), TOMPZ(e), TOMPZ(m));
 
@@ -222,11 +292,13 @@ static bigint_t
 wrap_nettle_mpi_addm(bigint_t w, const bigint_t a, const bigint_t b,
 		     const bigint_t m)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(a));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_add(TOMPZ(w), TOMPZ(b), TOMPZ(a));
 	mpz_fdiv_r(TOMPZ(w), TOMPZ(w), TOMPZ(m));
@@ -238,11 +310,13 @@ static bigint_t
 wrap_nettle_mpi_subm(bigint_t w, const bigint_t a, const bigint_t b,
 		     const bigint_t m)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(a));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_sub(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 	mpz_fdiv_r(TOMPZ(w), TOMPZ(w), TOMPZ(m));
@@ -254,11 +328,13 @@ static bigint_t
 wrap_nettle_mpi_mulm(bigint_t w, const bigint_t a, const bigint_t b,
 		     const bigint_t m)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(m));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_mul(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 	mpz_fdiv_r(TOMPZ(w), TOMPZ(w), TOMPZ(m));
@@ -269,11 +345,13 @@ wrap_nettle_mpi_mulm(bigint_t w, const bigint_t a, const bigint_t b,
 static bigint_t
 wrap_nettle_mpi_add(bigint_t w, const bigint_t a, const bigint_t b)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(b));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_add(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 
@@ -283,11 +361,13 @@ wrap_nettle_mpi_add(bigint_t w, const bigint_t a, const bigint_t b)
 static bigint_t
 wrap_nettle_mpi_sub(bigint_t w, const bigint_t a, const bigint_t b)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(a));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_sub(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 
@@ -297,11 +377,13 @@ wrap_nettle_mpi_sub(bigint_t w, const bigint_t a, const bigint_t b)
 static bigint_t
 wrap_nettle_mpi_mul(bigint_t w, const bigint_t a, const bigint_t b)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(a));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_mul(TOMPZ(w), TOMPZ(a), TOMPZ(b));
 
@@ -312,11 +394,13 @@ wrap_nettle_mpi_mul(bigint_t w, const bigint_t a, const bigint_t b)
 static bigint_t
 wrap_nettle_mpi_div(bigint_t q, const bigint_t a, const bigint_t b)
 {
-	if (q == NULL)
-		q = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(a));
+int ret;
 
-	if (q == NULL)
-		return NULL;
+	if (q == NULL) {
+		ret = wrap_nettle_mpi_init(&q);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_cdiv_q(TOMPZ(q), TOMPZ(a), TOMPZ(b));
 
@@ -326,11 +410,13 @@ wrap_nettle_mpi_div(bigint_t q, const bigint_t a, const bigint_t b)
 static bigint_t
 wrap_nettle_mpi_add_ui(bigint_t w, const bigint_t a, unsigned long b)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(a));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_add_ui(TOMPZ(w), TOMPZ(a), b);
 
@@ -340,11 +426,13 @@ wrap_nettle_mpi_add_ui(bigint_t w, const bigint_t a, unsigned long b)
 static bigint_t
 wrap_nettle_mpi_sub_ui(bigint_t w, const bigint_t a, unsigned long b)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(a));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_sub_ui(TOMPZ(w), TOMPZ(a), b);
 
@@ -355,11 +443,13 @@ wrap_nettle_mpi_sub_ui(bigint_t w, const bigint_t a, unsigned long b)
 static bigint_t
 wrap_nettle_mpi_mul_ui(bigint_t w, const bigint_t a, unsigned long b)
 {
-	if (w == NULL)
-		w = wrap_nettle_mpi_new(wrap_nettle_mpi_get_nbits(a));
+int ret;
 
-	if (w == NULL)
-		return NULL;
+	if (w == NULL) {
+		ret = wrap_nettle_mpi_init(&w);
+		if (ret < 0)
+			return NULL;
+	}
 
 	mpz_mul_ui(TOMPZ(w), TOMPZ(a), b);
 
@@ -370,8 +460,8 @@ wrap_nettle_mpi_mul_ui(bigint_t w, const bigint_t a, unsigned long b)
 static int wrap_nettle_prime_check(bigint_t pp)
 {
 	int ret;
-	ret = mpz_probab_prime_p(TOMPZ(pp), PRIME_CHECK_PARAM);
 
+	ret = mpz_probab_prime_p(TOMPZ(pp), PRIME_CHECK_PARAM);
 	if (ret > 0) {
 		return 0;
 	}
@@ -384,7 +474,8 @@ static int wrap_nettle_prime_check(bigint_t pp)
 int crypto_bigint_prio = INT_MAX;
 
 gnutls_crypto_bigint_st _gnutls_mpi_ops = {
-	.bigint_new = wrap_nettle_mpi_new,
+	.bigint_init = wrap_nettle_mpi_init,
+	.bigint_init_multi = wrap_nettle_mpi_init_multi,
 	.bigint_cmp = wrap_nettle_mpi_cmp,
 	.bigint_cmp_ui = wrap_nettle_mpi_cmp_ui,
 	.bigint_modm = wrap_nettle_mpi_modm,
