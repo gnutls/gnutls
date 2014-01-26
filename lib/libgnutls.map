@@ -36,8 +36,6 @@ GNUTLS_1_4
     gnutls_auth_get_type;
     gnutls_auth_server_get_type;
     gnutls_bye;
-    gnutls_calc_dh_key;
-    gnutls_calc_dh_secret;
     gnutls_calloc;
     gnutls_certificate_activation_time_peers;
     gnutls_certificate_allocate_credentials;
@@ -82,7 +80,6 @@ GNUTLS_1_4
     gnutls_certificate_type_list;
     gnutls_certificate_type_set_priority;
     gnutls_certificate_verify_peers2;
-    gnutls_certificate_verify_peers;
     gnutls_check_version;
     gnutls_cipher_get;
     gnutls_cipher_get_id;
@@ -153,7 +150,6 @@ GNUTLS_1_4
     gnutls_mac_list;
     gnutls_mac_set_priority;
     gnutls_malloc;
-    gnutls_openpgp_count_key_names;
     gnutls_openpgp_crt_check_hostname;
     gnutls_openpgp_crt_deinit;
     gnutls_openpgp_crt_export;
@@ -187,7 +183,6 @@ GNUTLS_1_4
     gnutls_openpgp_crt_set_preferred_key_id;
     gnutls_openpgp_crt_verify_ring;
     gnutls_openpgp_crt_verify_self;
-    gnutls_openpgp_get_key;
     gnutls_openpgp_keyring_check_id;
     gnutls_openpgp_keyring_deinit;
     gnutls_openpgp_keyring_get_crt;
@@ -228,8 +223,6 @@ GNUTLS_1_4
     gnutls_pk_get_id;
     gnutls_pk_get_name;
     gnutls_pk_list;
-    gnutls_pk_params_init;
-    gnutls_pk_params_release;
     gnutls_pkcs12_bag_decrypt;
     gnutls_pkcs12_bag_deinit;
     gnutls_pkcs12_bag_encrypt;
@@ -282,7 +275,6 @@ GNUTLS_1_4
     gnutls_psk_client_get_hint;
     gnutls_psk_free_client_credentials;
     gnutls_psk_free_server_credentials;
-    gnutls_psk_netconf_derive_key;
     gnutls_psk_server_get_username;
     gnutls_psk_set_client_credentials;
     gnutls_psk_set_client_credentials_function;
@@ -293,7 +285,6 @@ GNUTLS_1_4
     gnutls_psk_set_server_dh_params;
     gnutls_psk_set_server_params_function;
     gnutls_realloc;
-    gnutls_realloc_fast;
     gnutls_record_check_pending;
     gnutls_record_disable_padding;
     gnutls_record_get_direction;
@@ -323,11 +314,9 @@ GNUTLS_1_4
     gnutls_session_get_ptr;
     gnutls_session_is_resumed;
     gnutls_session_set_data;
-    gnutls_session_set_finished_function;
     gnutls_session_set_ptr;
     gnutls_set_default_export_priority;
     gnutls_set_default_priority;
-    gnutls_sign_algorithm_get_name;
     gnutls_sign_callback_get;
     gnutls_sign_callback_set;
     gnutls_sign_get_id;
@@ -361,7 +350,6 @@ GNUTLS_1_4
     gnutls_transport_get_ptr2;
     gnutls_transport_get_ptr;
     gnutls_transport_set_errno;
-    gnutls_transport_set_global_errno;
     gnutls_transport_set_ptr2;
     gnutls_transport_set_ptr;
     gnutls_transport_set_pull_function;
@@ -661,7 +649,6 @@ GNUTLS_2_12
 	gnutls_pkcs11_token_get_mechanism;
 	gnutls_privkey_sign_hash;
 	gnutls_privkey_sign_data;
-	gnutls_openpgp_crt_verify_hash;
 	gnutls_pubkey_import_privkey;
 	gnutls_pubkey_verify_data;
 	gnutls_certificate_get_issuer;
@@ -715,7 +702,6 @@ GNUTLS_3_0_0 {
 	gnutls_pcert_list_import_x509_raw;
 	gnutls_pkcs11_privkey_generate;
 	gnutls_pubkey_import_ecc_raw;
-	gnutls_pubkey_import_ecc_raw2;
 	gnutls_record_get_discarded;
 	gnutls_x509_crt_get_authority_info_access;
 	gnutls_ocsp_req_add_cert;
@@ -876,7 +862,6 @@ GNUTLS_3_1_0 {
 	gnutls_x509_crt_set_policy;
 	gnutls_pubkey_import_x509_crq;
 	gnutls_pubkey_print;
-	gnutls_record_get_random_padding_status;
 	gnutls_x509_crt_set_dn;
 	gnutls_x509_crq_set_dn;
 	gnutls_x509_crt_set_issuer_dn;
@@ -942,8 +927,6 @@ GNUTLS_3_1_0 {
 GNUTLS_PRIVATE {
   global:
     # Internal symbols needed by libgnutls-extra:
-    gnutls_crypto_single_mac_register;
-    gnutls_crypto_single_digest_register;
     _gnutls_log_level;
     _gnutls_write_uint24;
     _gnutls_log;
