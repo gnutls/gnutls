@@ -50,8 +50,8 @@ static void dump(const char *name, unsigned char *buf, int buf_size)
 
 void doit(void)
 {
-	unsigned char buf1[32];
-	unsigned char buf2[32];
+	unsigned char buf1[64];
+	unsigned char buf2[64];
 	pid_t pid;
 	int ret;
 	FILE *fp;
