@@ -45,6 +45,7 @@ EXTRA_DIST = cfg.mk maint.mk .clcopying
 
 dist-hook: 
 	make -C doc/ compare-makefile
+	make -C doc/ compare-exported
 	make -C doc/manpages compare-makefile
 	rm -f ChangeLog
 	make ChangeLog
