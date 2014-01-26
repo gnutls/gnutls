@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2014 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -242,7 +242,7 @@ gnutls_x509_dn_oid_name (const char *oid, unsigned int flags)
 
   do
     {
-      if (strcmp (_oid2str[i].oid, oid) == 0)
+      if (strcmp (_oid2str[i].oid, oid) == 0 && _oid2str[i].ldap_desc != NULL)
         return _oid2str[i].ldap_desc;
       i++;
     }
