@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.2.10 (unreleased)
 
+** libgnutls: fixed null pointer derefence when printing a certificate
+DN and an LDAP description isn't present.
+
 ** libgnutls: When obtaining usage statistics for the random generator
 use system calls outside the mutex locks to prevent them from becoming bottleneck.
 
