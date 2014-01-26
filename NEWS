@@ -2,6 +2,12 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.20 (unreleased)
+
+** API and ABI modifications:
+gnutls_x509_policy_release: Exported
+
+
 * Version 3.1.19 (released 2014-01-24)
 
 ** libgnutls: Fix in OCSP certificate status extension handling
