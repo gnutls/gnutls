@@ -436,6 +436,18 @@ $(ENUMS): stamp_enums
 
 $(FUNCS): stamp_functions
 
+compare-exported:
+	rm -f tmp-exp-$@ tmp-head-$@
+	for i in ../libdane/includes/gnutls/*.h ../lib/includes/gnutls/*.h;do perl scripts/getfuncs.pl <$$i >>tmp-head-$@;done
+	sort -u tmp-head-$@|grep -v ^xssl > tmp2-head-$@
+	mv tmp2-head-$@ tmp-head-$@
+	scripts/getfuncs-map.pl <../lib/libgnutls.map >tmp-exp-$@
+	scripts/getfuncs-map.pl <../libdane/libdane.map >>tmp-exp-$@
+	sort -u tmp-exp-$@|grep -v ^xssl > tmp2-exp-$@
+	mv tmp2-exp-$@ tmp-exp-$@
+	diff -u tmp-exp-$@ tmp-head-$@
+	rm -f tmp-exp-$@ tmp-head-$@
+
 compare-makefile: enums.texi
 	ENUMS=`grep '^@c ' $(srcdir)/enums.texi | sed 's/@c //g' | sort -d`; \
 	STR=""; \
@@ -458,7 +470,7 @@ compare-makefile: enums.texi
 	diff -u $(srcdir)/Makefile.am tmp-$@ >/dev/null
 	rm -f tmp-$@
 
-.PHONY: compare-makefile
+.PHONY: compare-makefile compare-exported
 
 # Guile texinfos.
 
