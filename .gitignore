@@ -699,3 +699,4 @@ tests/fips-test
 tests/global-init
 tests/mini-global-load
 .submodule.stamp
+lib/priority_options.h
