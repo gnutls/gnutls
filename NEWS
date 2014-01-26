@@ -9,7 +9,7 @@ See the end for copying conditions.
 use system calls outside the mutex locks to prevent them from becoming bottleneck.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_policy_release: Exported
 
 
 * Version 3.2.9 (released 2014-01-24)
