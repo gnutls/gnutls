@@ -35,7 +35,6 @@
 #include <nettle/yarrow.h>
 #include <errno.h>
 #include <rnd-common.h>
-#include <drbg-aes.h>
 #include <hash-pjw-bare.h>
 
 void _rnd_get_event(struct event_st *e)

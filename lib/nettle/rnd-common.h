@@ -29,7 +29,6 @@
 # include <sys/resource.h>
 #endif
 
-#include <drbg-aes.h>
 #include <fips.h>
 
 struct event_st {
@@ -57,5 +56,3 @@ typedef int (*get_entropy_func)(void* rnd, size_t size);
 
 extern get_entropy_func _rnd_get_system_entropy;
 
-int drbg_reseed(struct drbg_aes_ctx *ctx);
-int drbg_init(struct drbg_aes_ctx *ctx);

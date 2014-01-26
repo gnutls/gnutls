@@ -41,9 +41,10 @@ noinst_LTLIBRARIES = libcrypto.la
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c egd.c egd.h \
 	gnettle.h rnd-common.h rnd-common.c \
 	int/gcm-camellia.h int/gcm-camellia.c \
-	int/drbg-aes.c int/drbg-aes.h rnd.c
+	rnd.c
 
 if ENABLE_FIPS140
 libcrypto_la_SOURCES += rnd-fips.c int/drbg-aes-self-test.c \
-	int/dsa-fips.h int/dsa-keygen-fips186.c int/dsa-validate.c int/provable-prime.c
+	int/dsa-fips.h int/dsa-keygen-fips186.c int/dsa-validate.c int/provable-prime.c \
+	int/drbg-aes.c int/drbg-aes.h
 endif
