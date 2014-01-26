@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.1.20 (unreleased)
 
+** libgnutls: fixed null pointer derefence when printing a certificate
+DN and an LDAP description isn't present.
+
 ** API and ABI modifications:
 gnutls_x509_policy_release: Exported
 
