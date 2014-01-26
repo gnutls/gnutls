@@ -39,11 +39,18 @@ data2hex(const void *data, size_t data_size,
 
 struct oid_to_string {
 	const char *oid;
+	unsigned oid_size;
 	const char *ldap_desc;
+	unsigned ldap_desc_size;
 	const char *asn_desc;	/* description in the pkix file if complex type */
 	unsigned int etype;	/* the libtasn1 ASN1_ETYPE or INVALID
 				 * if cannot be simply parsed */
 };
+
+#define ENTRY(oid, ldap, asn, etype) {oid, sizeof(oid)-1, ldap, sizeof(ldap)-1, asn, etype}
+
+/* when there is no ldap description */
+#define ENTRY_ND(oid, asn, etype) {oid, sizeof(oid)-1, NULL, 0, asn, etype}
 
 /* This list contains all the OIDs that may be
  * contained in a rdnSequence and are printable.
@@ -51,85 +58,87 @@ struct oid_to_string {
 static const struct oid_to_string _oid2str[] = {
 	/* PKIX
 	 */
-	{"1.3.6.1.5.5.7.9.2", "placeOfBirth", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
-	{"1.3.6.1.5.5.7.9.3", "gender", NULL, ASN1_ETYPE_PRINTABLE_STRING},
-	{"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", NULL,
-	 ASN1_ETYPE_PRINTABLE_STRING},
-	{"1.3.6.1.5.5.7.9.5", "countryOfResidence", NULL,
-	 ASN1_ETYPE_PRINTABLE_STRING},
+	ENTRY("1.3.6.1.5.5.7.9.2", "placeOfBirth", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
+	ENTRY("1.3.6.1.5.5.7.9.3", "gender", NULL, ASN1_ETYPE_PRINTABLE_STRING),
+	ENTRY("1.3.6.1.5.5.7.9.4", "countryOfCitizenship", NULL,
+	 ASN1_ETYPE_PRINTABLE_STRING),
+	ENTRY("1.3.6.1.5.5.7.9.5", "countryOfResidence", NULL,
+	 ASN1_ETYPE_PRINTABLE_STRING),
 
-	{"2.5.4.6", "C", NULL, ASN1_ETYPE_PRINTABLE_STRING},
-	{"2.5.4.9", "street", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"2.5.4.12", "title", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"2.5.4.10", "O", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"2.5.4.11", "OU", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"2.5.4.3", "CN", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"2.5.4.7", "L", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"2.5.4.8", "ST", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"2.5.4.13", "description", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
+	ENTRY("2.5.4.6", "C", NULL, ASN1_ETYPE_PRINTABLE_STRING),
+	ENTRY("2.5.4.9", "street", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.12", "title", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.10", "O", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.11", "OU", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.3", "CN", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.7", "L", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.8", "ST", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.13", "description", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
 
-	{"2.5.4.5", "serialNumber", NULL, ASN1_ETYPE_PRINTABLE_STRING},
-	{"2.5.4.20", "telephoneNumber", NULL, ASN1_ETYPE_PRINTABLE_STRING},
-	{"2.5.4.4", "surName", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
-	{"2.5.4.43", "initials", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
-	{"2.5.4.44", "generationQualifier", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
-	{"2.5.4.42", "givenName", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
-	{"2.5.4.65", "pseudonym", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
-	{"2.5.4.46", "dnQualifier", NULL, ASN1_ETYPE_PRINTABLE_STRING},
-	{"2.5.4.17", "postalCode", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
-	{"2.5.4.41", "name", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"2.5.4.15", "businessCategory", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
+	ENTRY("2.5.4.5", "serialNumber", NULL, ASN1_ETYPE_PRINTABLE_STRING),
+	ENTRY("2.5.4.20", "telephoneNumber", NULL, ASN1_ETYPE_PRINTABLE_STRING),
+	ENTRY("2.5.4.4", "surName", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.43", "initials", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.44", "generationQualifier", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.42", "givenName", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.65", "pseudonym", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.46", "dnQualifier", NULL, ASN1_ETYPE_PRINTABLE_STRING),
+	ENTRY("2.5.4.17", "postalCode", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.41", "name", "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("2.5.4.15", "businessCategory", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
 
-	{"0.9.2342.19200300.100.1.25", "DC", NULL, ASN1_ETYPE_IA5_STRING},
-	{"0.9.2342.19200300.100.1.1", "UID", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
-	{"1.2.840.113556.1.4.656", "userPrincipalName", "PKIX1.DirectoryString",
-	 ASN1_ETYPE_INVALID},
+	ENTRY("0.9.2342.19200300.100.1.25", "DC", NULL, ASN1_ETYPE_IA5_STRING),
+	ENTRY("0.9.2342.19200300.100.1.1", "UID", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
+	ENTRY("1.2.840.113556.1.4.656", "userPrincipalName", "PKIX1.DirectoryString",
+	 ASN1_ETYPE_INVALID),
 
 	/* Extended validation
 	 */
-	{"1.3.6.1.4.1.311.60.2.1.1",
+	ENTRY("1.3.6.1.4.1.311.60.2.1.1",
 	 "jurisdictionOfIncorporationLocalityName",
-	 "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"1.3.6.1.4.1.311.60.2.1.2",
+	 "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("1.3.6.1.4.1.311.60.2.1.2",
 	 "jurisdictionOfIncorporationStateOrProvinceName",
-	 "PKIX1.DirectoryString", ASN1_ETYPE_INVALID},
-	{"1.3.6.1.4.1.311.60.2.1.3",
+	 "PKIX1.DirectoryString", ASN1_ETYPE_INVALID),
+	ENTRY("1.3.6.1.4.1.311.60.2.1.3",
 	 "jurisdictionOfIncorporationCountryName",
-	 NULL, ASN1_ETYPE_PRINTABLE_STRING},
+	 NULL, ASN1_ETYPE_PRINTABLE_STRING),
 
 	/* PKCS #9
 	 */
-	{"1.2.840.113549.1.9.1", "EMAIL", NULL, ASN1_ETYPE_IA5_STRING},
-	{"1.2.840.113549.1.9.7", NULL, "PKIX1.pkcs-9-challengePassword",
-	 ASN1_ETYPE_INVALID},
+	ENTRY("1.2.840.113549.1.9.1", "EMAIL", NULL, ASN1_ETYPE_IA5_STRING),
+	ENTRY_ND("1.2.840.113549.1.9.7", "PKIX1.pkcs-9-challengePassword",
+	 ASN1_ETYPE_INVALID),
 
 	/* friendly name */
-	{"1.2.840.113549.1.9.20", NULL, NULL, ASN1_ETYPE_BMP_STRING},
+	ENTRY_ND("1.2.840.113549.1.9.20", NULL, ASN1_ETYPE_BMP_STRING),
 	/* local key id */
-	{"1.2.840.113549.1.9.21", NULL, NULL, ASN1_ETYPE_OCTET_STRING},
+	ENTRY_ND("1.2.840.113549.1.9.21", NULL, ASN1_ETYPE_OCTET_STRING),
 
 	/* rfc3920 section 5.1.1 */
-	{"1.3.6.1.5.5.7.8.5", "XmppAddr", NULL, ASN1_ETYPE_UTF8_STRING},
+	ENTRY("1.3.6.1.5.5.7.8.5", "XmppAddr", NULL, ASN1_ETYPE_UTF8_STRING),
 
-	{NULL, NULL, NULL, 0}
+	{NULL, 0, NULL, 0, NULL, 0}
 };
 
 static const struct oid_to_string *get_oid_entry(const char *oid)
 {
 	unsigned int i = 0;
+	unsigned len = strlen(oid);
 
 	do {
-		if (strcmp(_oid2str[i].oid, oid) == 0)
+		if (len == _oid2str[i].oid_size &&
+			strcmp(_oid2str[i].oid, oid) == 0)
 			return &_oid2str[i];
 		i++;
 	}
@@ -144,7 +153,7 @@ const char *_gnutls_ldap_string_to_oid(const char *str, unsigned str_len)
 
 	do {
 		if ((_oid2str[i].ldap_desc != NULL) &&
-		    (str_len == strlen(_oid2str[i].ldap_desc)) &&
+		    (str_len == _oid2str[i].ldap_desc_size) &&
 		    (strncasecmp(_oid2str[i].ldap_desc, str, str_len) ==
 		     0))
 			return _oid2str[i].oid;
@@ -221,9 +230,11 @@ static int str_escape(const gnutls_datum_t * str, gnutls_datum_t * escaped)
 int gnutls_x509_dn_oid_known(const char *oid)
 {
 	unsigned int i = 0;
+	unsigned len = strlen(oid);
 
 	do {
-		if (strcmp(_oid2str[i].oid, oid) == 0)
+		if (len == _oid2str[i].oid_size &&
+			strcmp(_oid2str[i].oid, oid) == 0)
 			return 1;
 		i++;
 	}
@@ -249,9 +260,11 @@ int gnutls_x509_dn_oid_known(const char *oid)
 const char *gnutls_x509_dn_oid_name(const char *oid, unsigned int flags)
 {
 	unsigned int i = 0;
+	unsigned len = strlen(oid);
 
 	do {
-		if (strcmp(_oid2str[i].oid, oid) == 0 && _oid2str[i].ldap_desc != NULL)
+		if ((_oid2str[i].oid_size == len) && 
+			strcmp(_oid2str[i].oid, oid) == 0 && _oid2str[i].ldap_desc != NULL)
 			return _oid2str[i].ldap_desc;
 		i++;
 	}
