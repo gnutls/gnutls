@@ -204,7 +204,11 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo,
 			goto dh_cleanup;
 		}
 
-		_gnutls_mpi_add_ui(ff, ff, 1);
+		ret = _gnutls_mpi_add_ui(ff, ff, 1);
+		if (ret < 0) {
+			gnutls_assert();
+			goto dh_cleanup;
+		}
 
 		/* check if f==0,1,p-1. 
 		 * or (ff=f+1) equivalently ff==1,2,p */

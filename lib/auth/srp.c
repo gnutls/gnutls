@@ -90,7 +90,12 @@ inline static int check_param_mod_n(bigint_t a, bigint_t n, int is_a)
 		if (ret == 0)
 			err = 1;
 
-		_gnutls_mpi_add_ui(r, r, 1);
+		ret = _gnutls_mpi_add_ui(r, r, 1);
+		if (ret < 0) {
+			_gnutls_mpi_release(&r);
+			return gnutls_assert_val(ret);
+		}
+		
 		ret = _gnutls_mpi_cmp(r, n);
 		if (ret == 0)
 			err = 1;
@@ -734,7 +739,11 @@ group_check_g_n(gnutls_session_t session, bigint_t g, bigint_t n)
 
 	/* q = n-1 
 	 */
-	_gnutls_mpi_sub_ui(q, n, 1);
+	ret = _gnutls_mpi_sub_ui(q, n, 1);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
 
 	/* q = q/2, remember that q is divisible by 2 (prime - 1)
 	 */
@@ -777,7 +786,11 @@ group_check_g_n(gnutls_session_t session, bigint_t g, bigint_t n)
 
 	/* w++
 	 */
-	_gnutls_mpi_add_ui(w, w, 1);
+	ret = _gnutls_mpi_add_ui(w, w, 1);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
 
 	if (_gnutls_mpi_cmp(w, n) != 0) {
 		gnutls_assert();

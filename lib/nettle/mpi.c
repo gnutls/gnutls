@@ -370,54 +370,28 @@ int ret;
 	return q;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_add_ui(bigint_t w, const bigint_t a, unsigned long b)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_add_ui(TOMPZ(w), TOMPZ(a), b);
 
-	return w;
+	return 0;
 }
 
 static bigint_t
 wrap_nettle_mpi_sub_ui(bigint_t w, const bigint_t a, unsigned long b)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_sub_ui(TOMPZ(w), TOMPZ(a), b);
 
-	return w;
-
+	return 0;
 }
 
-static bigint_t
+static int
 wrap_nettle_mpi_mul_ui(bigint_t w, const bigint_t a, unsigned long b)
 {
-int ret;
-
-	if (w == NULL) {
-		ret = wrap_nettle_mpi_init(&w);
-		if (ret < 0)
-			return NULL;
-	}
-
 	mpz_mul_ui(TOMPZ(w), TOMPZ(a), b);
 
-	return w;
-
+	return 0;
 }
 
 static int wrap_nettle_prime_check(bigint_t pp)

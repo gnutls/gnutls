@@ -157,7 +157,13 @@ _gnutls_pkcs12_string_to_key(unsigned int id, const uint8_t * salt,
 			gnutls_assert();
 			goto cleanup;
 		}
-		_gnutls_mpi_add_ui(num_b1, num_b1, 1);
+
+		rc = _gnutls_mpi_add_ui(num_b1, num_b1, 1);
+		if (rc < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		
 		for (i = 0; i < 128; i += 64) {
 			n = 64;
 			rc = _gnutls_mpi_init_scan(&num_ij, buf_i + i, n);

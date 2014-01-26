@@ -78,8 +78,13 @@ _gnutls_mpi_random_modp(bigint_t r, bigint_t p,
 		goto cleanup;
 	}
 
-	if (_gnutls_mpi_cmp_ui(tmp, 0) == 0)
-		_gnutls_mpi_add_ui(tmp, tmp, 1);
+	if (_gnutls_mpi_cmp_ui(tmp, 0) == 0) {
+		ret = _gnutls_mpi_add_ui(tmp, tmp, 1);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
 
 	if (buf_release != 0) {
 		gnutls_free(buf);
