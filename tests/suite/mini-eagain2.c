@@ -68,7 +68,7 @@ static const char
  */
 static int tcp_connect(void)
 {
-	const char *PORT = "4445";
+	const char *PORT = "5445";
 	const char *SERVER = "127.0.0.1";	//verisign.com
 	int err, sd;
 	int flag = 1, curstate = 0;
@@ -113,6 +113,8 @@ _process_data(gnutls_session_t client, Ecore_Fd_Handler * fd_handler)
 {
 	static int ret, lastret;
 	static unsigned int count = 0;
+
+	gnutls_handshake_set_timeout(client, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
 
 	if (!done) {
 		lastret = ret;
@@ -170,7 +172,7 @@ int main(void)
 	global_init();
 	ecore_init();
 //  gnutls_global_set_log_function (tls_log_func);
-//  gnutls_global_set_log_level (2);
+//  gnutls_global_set_log_level (6);
 
 	/* Init client */
 	gnutls_anon_allocate_client_credentials(&c_anoncred);

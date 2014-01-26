@@ -22,7 +22,7 @@
 
 srcdir="${srcdir:-.}"
 SERV="${SERV:-../../src/gnutls-serv$EXEEXT} -q"
-PORT="${PORT:-4445}"
+PORT="${PORT:-5445}"
 
 
 $SERV -p $PORT --echo --priority "NORMAL:+ANON-DH" --dhparams $srcdir/params.dh >/dev/null 2>&1 &
