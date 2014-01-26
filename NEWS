@@ -32,7 +32,8 @@ support library constructors.
 
 ** libgnutls: DH parameter generation is now delegated to nettle.
 
-** libgnutls: Separated nonce RNG from the main RNG.
+** libgnutls: Separated nonce RNG from the main RNG. The nonce
+random number generator is based on salsa20.
 
 ** libgnutls: The buffer alignment provided to crypto backend is
 enforced to be 16-byte aligned, when compiled with cryptodev
