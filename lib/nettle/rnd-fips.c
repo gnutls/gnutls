@@ -78,6 +78,43 @@ static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx *fctx,
 	return 0;
 }
 
+#define PSTRING "gnutls-rng"
+#define PSTRING_SIZE (sizeof(PSTRING)-1)
+static int drbg_init(struct drbg_aes_ctx *ctx)
+{
+	uint8_t buffer[DRBG_AES_SEED_SIZE];
+	int ret;
+
+	/* Get a key from the standard RNG or from the entropy source.  */
+	ret = _rnd_get_system_entropy(buffer, sizeof(buffer));
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = drbg_aes_init(ctx, sizeof(buffer), buffer, PSTRING_SIZE, (void*)PSTRING);
+	if (ret == 0)
+		return gnutls_assert_val(GNUTLS_E_RANDOM_FAILED);
+
+	zeroize_key(buffer, sizeof(buffer));
+
+	return 0;
+}
+
+/* Reseed a generator. */
+static int drbg_reseed(struct drbg_aes_ctx *ctx)
+{
+	uint8_t buffer[DRBG_AES_SEED_SIZE];
+	int ret;
+
+	/* The other two generators are seeded from /dev/random.  */
+	ret = _rnd_get_system_entropy(buffer, sizeof(buffer));
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	drbg_aes_reseed(ctx, sizeof(buffer), buffer, 0, NULL);
+
+	return 0;
+}
+
 static int _rngfips_ctx_init(struct fips_ctx *fctx)
 {
 	int ret;

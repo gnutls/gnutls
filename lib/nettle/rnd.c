@@ -32,6 +32,7 @@
 #include <locks.h>
 #include <gnutls_num.h>
 #include <nettle/yarrow.h>
+#include <nettle/salsa20.h>
 #ifdef HAVE_GETPID
 #include <unistd.h>		/* getpid */
 #endif
@@ -50,7 +51,18 @@ enum {
 
 static struct yarrow256_ctx yctx;
 static struct yarrow_source ysources[SOURCES];
-static struct drbg_aes_ctx nonce_ctx;
+
+struct nonce_ctx_st {
+	struct salsa20_ctx ctx;
+	unsigned int counter;
+#ifdef HAVE_GETPID
+	pid_t pid;		/* detect fork() */
+#endif
+};
+
+/* after this number of bytes salsa20 will reseed */
+#define NONCE_RESEED_BYTES (1048576)
+static struct nonce_ctx_st nonce_ctx;
 
 static struct timespec device_last_read = { 0, 0 };
 
@@ -153,6 +165,28 @@ static void wrap_nettle_rnd_deinit(void *ctx)
 	rnd_mutex = NULL;
 }
 
+static int nonce_rng_init(struct nonce_ctx_st *ctx)
+{
+	uint8_t buffer[SALSA20_KEY_SIZE];
+	int ret;
+
+	/* Get a key from the standard RNG or from the entropy source.  */
+	ret = _rnd_get_system_entropy(buffer, sizeof(buffer));
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	salsa20_set_key(&ctx->ctx, sizeof(buffer), buffer);
+
+	zeroize_key(buffer, sizeof(buffer));
+
+	ctx->counter = 0;
+#ifdef HAVE_GETPID
+	ctx->pid = getpid();
+#endif
+
+	return 0;
+}
+
 /* API functions */
 
 static int wrap_nettle_rnd_init(void **ctx)
@@ -165,7 +199,7 @@ static int wrap_nettle_rnd_init(void **ctx)
 		gnutls_assert();
 		return ret;
 	}
-	
+
 	ret = _rnd_system_entropy_init();
 	if (ret < 0) {
 		gnutls_assert();
@@ -190,14 +224,53 @@ static int wrap_nettle_rnd_init(void **ctx)
 	}
 
 	yarrow256_slow_reseed(&yctx);
-	
+
 	/* initialize the nonce RNG */
-	ret = drbg_init(&nonce_ctx);
+	ret = nonce_rng_init(&nonce_ctx);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	return 0;
 }
+
+static int
+wrap_nettle_rnd_nonce(void *_ctx, void *data, size_t datasize)
+{
+	int ret, reseed = 0;
+#ifdef HAVE_GETPID
+	pid_t tpid = getpid();
+#endif
+
+	RND_LOCK;
+
+#ifdef HAVE_GETPID
+	if (tpid != nonce_ctx.pid) {	/* fork() detected */
+		reseed = 1;
+	}
+#endif
+
+	if (reseed != 0 || nonce_ctx.counter > NONCE_RESEED_BYTES) {
+		/* reseed nonce */
+		ret = nonce_rng_init(&nonce_ctx);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	/* we don't really need memset here, but otherwise we
+	 * get filled with valgrind warnings */
+	memset(data, 0, datasize);
+	salsa20r12_crypt(&nonce_ctx.ctx, datasize, data, data);
+	nonce_ctx.counter += datasize;
+
+	ret = 0;
+
+cleanup:
+	RND_UNLOCK;
+	return ret;
+}
+
 
 
 static int
@@ -206,10 +279,13 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	int ret, reseed = 0;
 	struct event_st event;
 
+	if (level == GNUTLS_RND_NONCE)
+		return wrap_nettle_rnd_nonce(_ctx, data, datasize);
+
 	_rnd_get_event(&event);
 
 	RND_LOCK;
-	
+
 #ifdef HAVE_GETPID
 	if (event.pid != pid) {	/* fork() detected */
 		memset(&device_last_read, 0, sizeof(device_last_read));
@@ -218,45 +294,26 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	}
 #endif
 
-	if (level != GNUTLS_RND_NONCE) {
-		/* reseed main */
-		ret = do_trivia_source(0, &event);
-		if (ret < 0) {
-			RND_UNLOCK;
-			gnutls_assert();
-			return ret;
-		}
-
-		ret = do_device_source(0, &event);
-		if (ret < 0) {
-			RND_UNLOCK;
-			gnutls_assert();
-			return ret;
-		}
-	} else if (nonce_ctx.reseed_counter > DRBG_AES_RESEED_TIME){
-		reseed = 1;
+	/* reseed main */
+	ret = do_trivia_source(0, &event);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
 
-	if (level == GNUTLS_RND_NONCE) {
-		if (reseed != 0) {
-			/* reseed nonce */
-			ret = drbg_reseed(&nonce_ctx);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-		}
-
-		ret = drbg_aes_random(&nonce_ctx, datasize, data);
-		if (ret == 0)
-			ret = GNUTLS_E_RANDOM_FAILED;
-		else
-			ret = 0;
-	} else {
-		if (reseed != 0)
-			yarrow256_slow_reseed(&yctx);
-
-		yarrow256_random(&yctx, datasize, data);
-		ret = 0;
+	ret = do_device_source(0, &event);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
+
+	if (reseed != 0)
+		yarrow256_slow_reseed(&yctx);
+
+	yarrow256_random(&yctx, datasize, data);
+	ret = 0;
+
+cleanup:
 	RND_UNLOCK;
 	return ret;
 }
