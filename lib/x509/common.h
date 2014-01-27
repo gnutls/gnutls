@@ -53,6 +53,8 @@
 /* those two from draft-ietf-pkix-sha2-dsa-ecdsa-06 */
 #define SIG_DSA_SHA224_OID "2.16.840.1.101.3.4.3.1"
 #define SIG_DSA_SHA256_OID "2.16.840.1.101.3.4.3.2"
+#define SIG_DSA_SHA384_OID "2.16.840.1.101.3.4.3.3"
+#define SIG_DSA_SHA512_OID "2.16.840.1.101.3.4.3.4"
 
 #define SIG_RSA_MD5_OID "1.2.840.113549.1.1.4"
 #define SIG_RSA_MD2_OID "1.2.840.113549.1.1.2"
