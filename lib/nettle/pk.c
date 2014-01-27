@@ -928,7 +928,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			}
 
 			mpz_set(TOMPZ(params->params[DSA_Y]), pub.y);
-			mpz_set(TOMPZ(params->params[DSA_X]), pub.x);
+			mpz_set(TOMPZ(params->params[DSA_X]), priv.x);
 			params->params_nr += 2;
 
 		      dsa_fail:
