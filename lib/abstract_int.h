@@ -108,4 +108,7 @@ const mac_entry_st *_gnutls_dsa_q_to_hash(gnutls_pk_algorithm_t algo,
 					  const gnutls_pk_params_st *
 					  params, unsigned int *hash_len);
 
+int
+_gnutls_privkey_get_mpis(gnutls_privkey_t key, gnutls_pk_params_st * params);
+
 #endif

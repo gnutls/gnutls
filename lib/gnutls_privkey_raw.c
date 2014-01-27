@@ -224,7 +224,7 @@ gnutls_x509_privkey_t xkey;
 	return 0;
 
 error:
-	gnutls_x509_privkey_deinit(&xkey);
+	gnutls_x509_privkey_deinit(xkey);
 	return ret;
 }
 
@@ -274,7 +274,7 @@ gnutls_x509_privkey_t xkey;
 	return 0;
 
 error:
-	gnutls_x509_privkey_deinit(&xkey);
+	gnutls_x509_privkey_deinit(xkey);
 	return ret;
 }
 
@@ -324,7 +324,7 @@ gnutls_x509_privkey_t xkey;
 	return 0;
 
 error:
-	gnutls_x509_privkey_deinit(&xkey);
+	gnutls_x509_privkey_deinit(xkey);
 	return ret;
 }
 

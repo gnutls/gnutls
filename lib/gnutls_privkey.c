@@ -162,7 +162,7 @@ privkey_to_pubkey(gnutls_pk_algorithm_t pk,
 
 /* Returns the public key of the private key (if possible)
  */
-static int
+int
 _gnutls_privkey_get_mpis(gnutls_privkey_t key, gnutls_pk_params_st * params)
 {
 	int ret;
