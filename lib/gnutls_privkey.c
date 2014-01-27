@@ -605,7 +605,7 @@ int ret;
 
   pkey->type = GNUTLS_PRIVKEY_X509;
   pkey->pk_algorithm = algo;
-  pkey->flags = flags;
+  pkey->flags = flags|GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE;
 
   return 0;
 }
