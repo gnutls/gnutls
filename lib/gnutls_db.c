@@ -167,12 +167,12 @@ uint32_t magic;
   if (entry->size < 8)
     return gnutls_assert_val(0);
   
-  memcpy(&magic, entry->data, 4);
+  magic = _gnutls_read_uint32(entry->data);
   
   if (magic != PACKED_SESSION_MAGIC)
     return gnutls_assert_val(0);
   
-  memcpy(&t, &entry->data[4], 4);
+  t = _gnutls_read_uint32(&entry->data[4]);
 
   return t;
 }
