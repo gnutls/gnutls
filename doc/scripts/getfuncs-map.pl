@@ -21,8 +21,8 @@ eval '(exit $?0)' && eval 'exec perl -wST "$0" ${1+"$@"}'
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-# given a header file in stdin it will print all functions
-
+# This list contains exported values, but prototype isn't easy
+# to obtain (e.g., it's a pointer to a function or not a function).
 my %known_false_positives = (
 	'gnutls_srp_1024_group_generator' => 1,
 	'gnutls_srp_1024_group_prime' => 1,
@@ -42,9 +42,15 @@ my %known_false_positives = (
 	'gnutls_calloc' => 1,
 	'gnutls_secure_malloc' => 1,
 	'gnutls_realloc_fast' => 1,
-	'gnutls_secure_calloc' => 1
+	'gnutls_secure_calloc' => 1,
+	'gnutls_pubkey_get_pk_dsa_raw' => 1,
+	'gnutls_pubkey_get_pk_ecc_raw' => 1,
+	'gnutls_pubkey_get_pk_ecc_x962' => 1,
+	'gnutls_pubkey_get_pk_rsa_raw' => 1,
 );
 
+# API functions that although documented as such, are simply
+# macros that expand to another function.
 my %known_false_negatives = (
 	'gnutls_transport_set_int' => 1,
 );
