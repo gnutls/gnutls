@@ -430,7 +430,13 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	int ret, reseed = 0;
 	struct event_st event;
 
-	_rnd_get_event(&event);
+	if (level != GNUTLS_RND_NONCE) {
+		_rnd_get_event(&event);
+	}
+#ifdef HAVE_GETPID
+	else
+		event.pid = getpid();
+#endif
 
 	RND_LOCK;
 
@@ -439,6 +445,10 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 		memset(&device_last_read, 0, sizeof(device_last_read));
 		pid = event.pid;
 		reseed = 1;
+
+		/* now we need that as it was not executed before */
+		if (level == GNUTLS_RND_NONCE)
+			_rnd_get_event(&event);
 	}
 #endif
 
