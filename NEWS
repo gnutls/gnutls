@@ -7,7 +7,7 @@ See the end for copying conditions.
 ** libgnutls: fixed null pointer derefence when printing a certificate
 DN and an LDAP description isn't present.
 
-** libgnutls: gnutls_db_check_entry_time will correctly report the
+** libgnutls: gnutls_db_check_entry_time will correctly report the time;
 report and patch by Jonathan Roudiere.
 
 ** API and ABI modifications:
