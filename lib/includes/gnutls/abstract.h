@@ -125,16 +125,23 @@ int gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 					       gnutls_digest_algorithm_t
 					       * hash, unsigned int *mand);
 
-int gnutls_pubkey_get_pk_rsa_raw(gnutls_pubkey_t key,
+#define gnutls_pubkey_get_pk_rsa_raw gnutls_pubkey_export_rsa_raw
+int gnutls_pubkey_export_rsa_raw(gnutls_pubkey_t key,
 				 gnutls_datum_t * m, gnutls_datum_t * e);
-int gnutls_pubkey_get_pk_dsa_raw(gnutls_pubkey_t key,
+
+#define gnutls_pubkey_get_pk_dsa_raw gnutls_pubkey_export_dsa_raw
+int gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
 				 gnutls_datum_t * p,
 				 gnutls_datum_t * q,
 				 gnutls_datum_t * g, gnutls_datum_t * y);
-int gnutls_pubkey_get_pk_ecc_raw(gnutls_pubkey_t key,
+
+#define gnutls_pubkey_get_pk_ecc_raw gnutls_pubkey_export_ecc_raw
+int gnutls_pubkey_export_ecc_raw(gnutls_pubkey_t key,
 				 gnutls_ecc_curve_t * curve,
 				 gnutls_datum_t * x, gnutls_datum_t * y);
-int gnutls_pubkey_get_pk_ecc_x962(gnutls_pubkey_t key,
+
+#define gnutls_pubkey_get_pk_ecc_x962 gnutls_pubkey_export_ecc_x962
+int gnutls_pubkey_export_ecc_x962(gnutls_pubkey_t key,
 				  gnutls_datum_t * parameters,
 				  gnutls_datum_t * ecpoint);
 
@@ -367,7 +374,7 @@ int gnutls_privkey_decrypt_data(gnutls_privkey_t key,
 				gnutls_datum_t * plaintext);
 
 int
-gnutls_privkey_get_pk_rsa_raw(gnutls_privkey_t key,
+gnutls_privkey_export_rsa_raw(gnutls_privkey_t key,
 				    gnutls_datum_t * m, gnutls_datum_t * e,
 				    gnutls_datum_t * d, gnutls_datum_t * p,
 				    gnutls_datum_t * q, gnutls_datum_t * u,
@@ -375,13 +382,13 @@ gnutls_privkey_get_pk_rsa_raw(gnutls_privkey_t key,
 				    gnutls_datum_t * e2);
 
 int
-gnutls_privkey_get_pk_dsa_raw(gnutls_privkey_t key,
+gnutls_privkey_export_dsa_raw(gnutls_privkey_t key,
 			     gnutls_datum_t * p, gnutls_datum_t * q,
 			     gnutls_datum_t * g, gnutls_datum_t * y,
 			     gnutls_datum_t * x);
 
 int
-gnutls_privkey_get_pk_ecc_raw(gnutls_privkey_t key,
+gnutls_privkey_export_ecc_raw(gnutls_privkey_t key,
 				       gnutls_ecc_curve_t * curve,
 				       gnutls_datum_t * x,
 				       gnutls_datum_t * y,

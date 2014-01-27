@@ -35,7 +35,7 @@
 #include <abstract_int.h>
 
 /**
- * gnutls_privkey_get_pk_rsa_raw:
+ * gnutls_privkey_export_rsa_raw:
  * @key: Holds the certificate
  * @m: will hold the modulus
  * @e: will hold the public exponent
@@ -55,7 +55,7 @@
  * Since: 3.3.0
  **/
 int
-gnutls_privkey_get_pk_rsa_raw(gnutls_privkey_t key,
+gnutls_privkey_export_rsa_raw(gnutls_privkey_t key,
 				    gnutls_datum_t * m, gnutls_datum_t * e,
 				    gnutls_datum_t * d, gnutls_datum_t * p,
 				    gnutls_datum_t * q, gnutls_datum_t * u,
@@ -84,7 +84,7 @@ int ret;
 }
 
 /**
- * gnutls_privkey_get_pk_dsa_raw:
+ * gnutls_privkey_export_dsa_raw:
  * @key: Holds the public key
  * @p: will hold the p
  * @q: will hold the q
@@ -101,7 +101,7 @@ int ret;
  * Since: 3.3.0
  **/
 int
-gnutls_privkey_get_pk_dsa_raw(gnutls_privkey_t key,
+gnutls_privkey_export_dsa_raw(gnutls_privkey_t key,
 			     gnutls_datum_t * p, gnutls_datum_t * q,
 			     gnutls_datum_t * g, gnutls_datum_t * y,
 			     gnutls_datum_t * x)
@@ -129,7 +129,7 @@ int ret;
 
 
 /**
- * gnutls_privkey_get_pk_ecc_raw:
+ * gnutls_privkey_export_ecc_raw:
  * @key: Holds the public key
  * @curve: will hold the curve
  * @x: will hold the x coordinate
@@ -145,7 +145,7 @@ int ret;
  * Since: 3.3.0
  **/
 int
-gnutls_privkey_get_pk_ecc_raw(gnutls_privkey_t key,
+gnutls_privkey_export_ecc_raw(gnutls_privkey_t key,
 				       gnutls_ecc_curve_t * curve,
 				       gnutls_datum_t * x,
 				       gnutls_datum_t * y,
