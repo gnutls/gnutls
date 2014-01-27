@@ -11,6 +11,9 @@ DN and an LDAP description isn't present.
 ** libgnutls: When obtaining usage statistics for the random generator
 use system calls outside the mutex locks to prevent them from becoming bottleneck.
 
+** libgnutls: gnutls_db_check_entry_time will correctly report the
+report and patch by Jonathan Roudiere.
+
 ** API and ABI modifications:
 gnutls_x509_policy_release: Exported
 gnutls_pubkey_set_key_usage: Exported
