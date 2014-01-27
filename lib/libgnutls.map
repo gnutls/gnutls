@@ -933,6 +933,9 @@ GNUTLS_3_1_0 {
 	gnutls_privkey_get_pk_ecc_raw;
 	gnutls_privkey_get_pk_dsa_raw;
 	gnutls_privkey_get_pk_rsa_raw;
+	gnutls_privkey_import_rsa_raw;
+	gnutls_privkey_import_dsa_raw;
+	gnutls_privkey_import_ecc_raw;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

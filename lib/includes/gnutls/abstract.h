@@ -325,6 +325,29 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
 			   gnutls_privkey_deinit_func deinit_func,
 			   unsigned int flags);
 
+int gnutls_privkey_import_dsa_raw(gnutls_privkey_t key,
+				       const gnutls_datum_t * p,
+				       const gnutls_datum_t * q,
+				       const gnutls_datum_t * g,
+				       const gnutls_datum_t * y,
+				       const gnutls_datum_t * x);
+
+int gnutls_privkey_import_rsa_raw(gnutls_privkey_t key,
+					const gnutls_datum_t * m,
+					const gnutls_datum_t * e,
+					const gnutls_datum_t * d,
+					const gnutls_datum_t * p,
+					const gnutls_datum_t * q,
+					const gnutls_datum_t * u,
+					const gnutls_datum_t * e1,
+					const gnutls_datum_t * e2);
+int gnutls_privkey_import_ecc_raw(gnutls_privkey_t key,
+				       gnutls_ecc_curve_t curve,
+				       const gnutls_datum_t * x,
+				       const gnutls_datum_t * y,
+				       const gnutls_datum_t * k);
+
+
 int gnutls_privkey_sign_data(gnutls_privkey_t signer,
 			     gnutls_digest_algorithm_t hash,
 			     unsigned int flags,
