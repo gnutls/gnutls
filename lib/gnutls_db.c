@@ -130,6 +130,18 @@ void gnutls_db_set_cache_expiration(gnutls_session_t session, int seconds)
 }
 
 /**
+ * gnutls_db_get_cache_expiration:
+ *
+ * Returns: the expiration time (in seconds) of stored sessions for resumption. 
+ *
+ * Since 3.2.10
+ **/
+unsigned gnutls_db_get_cache_expiration(void)
+{
+	return DEFAULT_EXPIRE_TIME;
+}
+
+/**
  * gnutls_db_check_entry:
  * @session: is a #gnutls_session_t structure.
  * @session_entry: is the session data (not key)
