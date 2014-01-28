@@ -1385,7 +1385,7 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 	}
 
 #ifndef ENABLE_FIPS140
-	ret = _gnutls_pk_verify_params(algo, &key->params);
+	ret = _gnutls_pk_verify_priv_params(algo, &key->params);
 #else
 	ret = pct_test(algo, &key->params);
 #endif
@@ -1424,7 +1424,7 @@ int gnutls_x509_privkey_verify_params(gnutls_x509_privkey_t key)
 {
 	int ret;
 
-	ret = _gnutls_pk_verify_params(key->pk_algorithm, &key->params);
+	ret = _gnutls_pk_verify_priv_params(key->pk_algorithm, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

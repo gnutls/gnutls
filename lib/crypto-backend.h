@@ -320,7 +320,9 @@ typedef struct gnutls_crypto_pk {
 			       gnutls_pk_params_st * issuer_params,
 			       gnutls_digest_algorithm_t *);
 	/* sanity checks the public key parameters */
-	int (*verify_params) (gnutls_pk_algorithm_t,
+	int (*verify_priv_params) (gnutls_pk_algorithm_t,
+			      const gnutls_pk_params_st * priv);
+	int (*verify_pub_params) (gnutls_pk_algorithm_t,
 			      const gnutls_pk_params_st * pub);
 	int (*generate_keys) (gnutls_pk_algorithm_t, unsigned int nbits,
 			 gnutls_pk_params_st *);

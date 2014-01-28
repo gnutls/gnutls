@@ -1125,7 +1125,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 }
 
 static int
-wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
+wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 			     const gnutls_pk_params_st * params)
 {
 	int ret;
@@ -1314,6 +1314,64 @@ wrap_nettle_pk_verify_params(gnutls_pk_algorithm_t algo,
 
 		      ecc_cleanup:
 			ecc_scalar_zclear(&priv);
+			ecc_point_clear(&pub);
+		}
+		break;
+	default:
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
+
+	return ret;
+}
+
+static int
+wrap_nettle_pk_verify_pub_params(gnutls_pk_algorithm_t algo,
+			     const gnutls_pk_params_st * params)
+{
+	int ret;
+
+	switch (algo) {
+	case GNUTLS_PK_RSA:
+	case GNUTLS_PK_DSA:
+		return 0;
+	case GNUTLS_PK_EC:
+		{
+			/* just verify that x and y lie on the curve */
+			struct ecc_point r, pub;
+			mpz_t x1, y1, x2, y2;
+			const struct ecc_curve *curve;
+
+			if (params->params_nr != ECC_PUBLIC_PARAMS)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_INVALID_REQUEST);
+
+			curve = get_supported_curve(params->flags);
+			if (curve == NULL)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+			ret = _ecc_params_to_pubkey(params, &pub, curve);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			ecc_point_init(&r, curve);
+			/* verify that x,y lie on the curve */
+			ret =
+			    ecc_point_set(&r, TOMPZ(params->params[ECC_X]),
+					  TOMPZ(params->params[ECC_Y]));
+			if (ret == 0) {
+				ret =
+				    gnutls_assert_val
+				    (GNUTLS_E_ILLEGAL_PARAMETER);
+				goto ecc_cleanup;
+			}
+			ecc_point_clear(&r);
+
+			ret = 0;
+
+		      ecc_cleanup:
 			ecc_point_clear(&pub);
 		}
 		break;
@@ -1544,7 +1602,8 @@ gnutls_crypto_pk_st _gnutls_pk_ops = {
 	.decrypt = _wrap_nettle_pk_decrypt,
 	.sign = _wrap_nettle_pk_sign,
 	.verify = _wrap_nettle_pk_verify,
-	.verify_params = wrap_nettle_pk_verify_params,
+	.verify_priv_params = wrap_nettle_pk_verify_priv_params,
+	.verify_pub_params = wrap_nettle_pk_verify_pub_params,
 	.generate_params = wrap_nettle_pk_generate_params,
 	.generate_keys = wrap_nettle_pk_generate_keys,
 	.pk_fixup_private_params = wrap_nettle_pk_fixup,
