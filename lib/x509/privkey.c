@@ -1281,7 +1281,7 @@ const char const_data[20] = "onetwothreefourfive";
 gnutls_datum_t ddata;
 char* gen_data = NULL;
 
-	if (algo == GNUTLS_PK_DSA) {
+	if (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_EC) {
 		unsigned hash_len;
 
 		_gnutls_dsa_q_to_hash(algo, params, &hash_len);
