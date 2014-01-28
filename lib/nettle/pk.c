@@ -1338,7 +1338,6 @@ wrap_nettle_pk_verify_pub_params(gnutls_pk_algorithm_t algo,
 		{
 			/* just verify that x and y lie on the curve */
 			struct ecc_point r, pub;
-			mpz_t x1, y1, x2, y2;
 			const struct ecc_curve *curve;
 
 			if (params->params_nr != ECC_PUBLIC_PARAMS)
