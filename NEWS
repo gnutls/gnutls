@@ -79,12 +79,14 @@ gnutls_pubkey_export_ecc_x962: Added (replaces gnutls_pubkey_get_pk_ecc_x962)
 gnutls_pubkey_export_ecc_raw: Added (replaces gnutls_pubkey_get_pk_ecc_raw)
 gnutls_pubkey_export_dsa_raw: Added (replaces gnutls_pubkey_get_pk_dsa_raw)
 gnutls_pubkey_export_rsa_raw: Added (replaces gnutls_pubkey_get_pk_rsa_raw)
+gnutls_pubkey_verify_params: Added
 gnutls_privkey_export_ecc_raw: Added
 gnutls_privkey_export_dsa_raw: Added
 gnutls_privkey_export_rsa_raw: Added
 gnutls_privkey_import_ecc_raw: Added
 gnutls_privkey_import_dsa_raw: Added
 gnutls_privkey_import_rsa_raw: Added
+gnutls_privkey_verify_params: Added
 gnutls_digest_self_test: Added (conditionally)
 gnutls_mac_self_test: Added (conditionally)
 gnutls_pk_self_test: Added (conditionally)
