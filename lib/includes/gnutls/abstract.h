@@ -71,6 +71,8 @@ typedef void (*gnutls_privkey_deinit_func) (gnutls_privkey_t key,
 int gnutls_pubkey_init(gnutls_pubkey_t * key);
 void gnutls_pubkey_deinit(gnutls_pubkey_t key);
 
+int gnutls_pubkey_verify_params(gnutls_pubkey_t key);
+
 void gnutls_pubkey_set_pin_function(gnutls_pubkey_t key,
 				    gnutls_pin_callback_t fn,
 				    void *userdata);
@@ -243,6 +245,8 @@ int
 gnutls_privkey_generate (gnutls_privkey_t key,
                          gnutls_pk_algorithm_t algo, unsigned int bits,
                          unsigned int flags);
+
+int gnutls_privkey_verify_params(gnutls_privkey_t key);
 
 void gnutls_privkey_set_pin_function (gnutls_privkey_t key,
                                       gnutls_pin_callback_t fn, void *userdata);

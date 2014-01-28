@@ -1,7 +1,7 @@
 /*
  * GnuTLS PKCS#11 support
- * Copyright (C) 2010-2012 Free Software Foundation, Inc.
- * Copyright (C) 2012 Nikos Mavrogiannopoulos
+ * Copyright (C) 2010-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2014 Nikos Mavrogiannopoulos
  * 
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1092,4 +1092,36 @@ int gnutls_privkey_status(gnutls_privkey_t key)
 	default:
 		return 1;
 	}
+}
+
+/**
+ * gnutls_privkey_verify_params:
+ * @key: should contain a #gnutls_privkey_t structure
+ *
+ * This function will verify the private key parameters.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int gnutls_privkey_verify_params(gnutls_privkey_t key)
+{
+	gnutls_pk_params_st params;
+	int ret;
+
+	gnutls_pk_params_init(&params);
+
+	ret = _gnutls_privkey_get_mpis(key, &params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_pk_verify_priv_params(key->pk_algorithm, &params);
+
+	gnutls_pk_params_release(&params);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
 }

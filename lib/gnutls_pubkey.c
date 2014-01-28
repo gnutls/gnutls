@@ -2098,6 +2098,28 @@ int gnutls_pubkey_import_x509_raw(gnutls_pubkey_t pkey,
 	return ret;
 }
 
+/**
+ * gnutls_pubkey_verify_params:
+ * @key: should contain a #gnutls_pubkey_t structure
+ *
+ * This function will verify the private key parameters.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int gnutls_pubkey_verify_params(gnutls_pubkey_t key)
+{
+	int ret;
+
+	ret = _gnutls_pk_verify_pub_params(key->pk_algorithm, &key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
 /* ABI Compatibility functions */
 #undef gnutls_pubkey_get_pk_ecc_x962
 int gnutls_pubkey_get_pk_ecc_x962(gnutls_pubkey_t key,
