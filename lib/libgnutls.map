@@ -942,6 +942,7 @@ GNUTLS_3_1_0 {
 	gnutls_pubkey_export_rsa_raw;
 	gnutls_privkey_verify_params;
 	gnutls_pubkey_verify_params;
+	gnutls_db_get_cache_expiration;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
