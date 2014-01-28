@@ -25,6 +25,7 @@ gnutls_rnd_refresh: Exported
 gnutls_mac_get_nonce_size: Exported
 gnutls_x509_crl_get_raw_issuer_dn: Exported
 gnutls_certificate_get_crt_raw: Exported
+gnutls_db_get_default_cache_expiration: Added
 
 
 * Version 3.2.9 (released 2014-01-24)
