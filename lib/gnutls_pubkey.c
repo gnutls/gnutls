@@ -2106,6 +2106,8 @@ int gnutls_pubkey_import_x509_raw(gnutls_pubkey_t pkey,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.3.0
  **/
 int gnutls_pubkey_verify_params(gnutls_pubkey_t key)
 {

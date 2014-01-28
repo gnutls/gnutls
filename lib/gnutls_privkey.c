@@ -1102,6 +1102,8 @@ int gnutls_privkey_status(gnutls_privkey_t key)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.3.0
  **/
 int gnutls_privkey_verify_params(gnutls_privkey_t key)
 {
