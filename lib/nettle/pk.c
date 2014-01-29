@@ -38,7 +38,10 @@
 #include <random.h>
 #include <gnutls_pk.h>
 #include <nettle/dsa.h>
-#include <dsa-fips.h>
+#ifdef ENABLE_FIPS140
+# include <dsa-fips.h>
+# include <rsa-fips.h>
+#endif
 #include <nettle/rsa.h>
 #include <gnutls/crypto.h>
 #include <nettle/bignum.h>
@@ -1022,11 +1025,17 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			rsa_private_key_init(&priv);
 
 			mpz_set_ui(pub.e, 65537);
-
+#ifdef ENABLE_FIPS140
+			ret =
+			    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
+						 rnd_func, NULL, NULL,
+						 level);
+#else
 			ret =
 			    rsa_generate_keypair(&pub, &priv, NULL,
 						 rnd_func, NULL, NULL,
 						 level, 0);
+#endif
 			if (ret != 1) {
 				gnutls_assert();
 				ret = GNUTLS_E_INTERNAL_ERROR;

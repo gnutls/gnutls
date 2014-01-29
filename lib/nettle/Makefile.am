@@ -46,5 +46,5 @@ libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c egd.c egd.h \
 if ENABLE_FIPS140
 libcrypto_la_SOURCES += rnd-fips.c int/drbg-aes-self-test.c \
 	int/dsa-fips.h int/dsa-keygen-fips186.c int/dsa-validate.c int/provable-prime.c \
-	int/drbg-aes.c int/drbg-aes.h
+	int/drbg-aes.c int/drbg-aes.h int/rsa-fips.h int/rsa-keygen-fips186.c
 endif

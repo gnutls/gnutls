@@ -1005,6 +1005,7 @@ GNUTLS_PRIVATE {
     _dsa_validate_dss_pq;
     dsa_generate_dss_keypair;
     _gnutls_encode_ber_rs_raw;
+    _rsa_generate_fips186_4_keypair;
   local:
     *;
 };
