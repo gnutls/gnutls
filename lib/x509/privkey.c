@@ -130,6 +130,8 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 
 	gnutls_pk_params_init(&pkey->params);
 
+	pkey->params.algo = GNUTLS_PK_RSA;
+
 	if ((result =
 	     asn1_create_element(_gnutls_get_gnutls_asn(),
 				 "GNUTLS.RSAPrivateKey",
@@ -244,6 +246,8 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 
 	gnutls_pk_params_init(&pkey->params);
 
+	pkey->params.algo = GNUTLS_PK_EC;
+
 	if ((ret =
 	     asn1_create_element(_gnutls_get_gnutls_asn(),
 				 "GNUTLS.ECPrivateKey",
@@ -349,7 +353,9 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 		return NULL;
 	}
 
-	pkey->params.params_nr = 0;
+	gnutls_pk_params_init(&pkey->params);
+
+	pkey->params.algo = GNUTLS_PK_DSA;
 
 	result =
 	    asn1_der_decoding(&dsa_asn, raw_key->data, raw_key->size,
