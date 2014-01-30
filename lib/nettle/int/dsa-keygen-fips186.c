@@ -207,7 +207,7 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 
 	/* z = a^(2tq) mod p */
 	mpz_mul_2exp(tmp, t, 1);	/* tmp = 2t */
-	mpz_mul(tmp, t, pub->q);	/* tmp = 2tq */
+	mpz_mul(tmp, tmp, pub->q);	/* tmp = 2tq */
 	mpz_powm(z, r, tmp, pub->p);
 
 	mpz_sub_ui(tmp, z, 1);
