@@ -1038,7 +1038,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 #endif
 			if (ret != 1) {
 				gnutls_assert();
-				ret = GNUTLS_E_INTERNAL_ERROR;
+				ret = GNUTLS_E_PK_GENERATION_ERROR;
 				goto rsa_fail;
 			}
 
