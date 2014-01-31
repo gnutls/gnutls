@@ -93,7 +93,11 @@ do_trivia_source (int init)
 
   memcpy(&event.now, &current_time, sizeof(event.now));
 #ifdef HAVE_GETRUSAGE
+#ifdef RUSAGE_THREAD
+  if (getrusage (RUSAGE_THREAD, &event.rusage) < 0)
+#else
   if (getrusage (RUSAGE_SELF, &event.rusage) < 0)
+#endif
     {
       _gnutls_debug_log ("getrusage failed: %s\n", strerror (errno));
       abort ();
