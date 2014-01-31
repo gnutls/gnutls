@@ -198,6 +198,7 @@ APIMANS += gnutls_credentials_clear.3
 APIMANS += gnutls_credentials_set.3
 APIMANS += gnutls_db_check_entry.3
 APIMANS += gnutls_db_check_entry_time.3
+APIMANS += gnutls_db_get_default_cache_expiration.3
 APIMANS += gnutls_db_get_ptr.3
 APIMANS += gnutls_db_remove_session.3
 APIMANS += gnutls_db_set_cache_expiration.3
