@@ -168,7 +168,7 @@ static void wrap_nettle_rnd_deinit(void *ctx)
 	rnd_ctx.mutex = NULL;
 }
 
-static int nonce_rng_init(struct nonce_ctx_st *ctx, struct event_st *event)
+static int nonce_rng_init(struct nonce_ctx_st *ctx, struct event_st *event, unsigned init)
 {
 	uint8_t buffer[SALSA20_KEY_SIZE];
 	int ret;
@@ -178,6 +178,11 @@ static int nonce_rng_init(struct nonce_ctx_st *ctx, struct event_st *event)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	if (init == 0) {
+		/* Add continuity by XORing the new key with data generated
+		 * from the old key */
+		salsa20r12_crypt(&ctx->ctx, sizeof(buffer), buffer, buffer);
+	}
 
 	salsa20_set_key(&ctx->ctx, sizeof(buffer), buffer);
 
@@ -245,7 +250,7 @@ static int wrap_nettle_rnd_init(void **ctx)
 	yarrow256_slow_reseed(&rnd_ctx.yctx);
 
 	/* initialize the nonce RNG */
-	ret = nonce_rng_init(&nonce_ctx, &event);
+	ret = nonce_rng_init(&nonce_ctx, &event, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -274,7 +279,7 @@ wrap_nettle_rnd_nonce(void *_ctx, void *data, size_t datasize)
 
 	if (reseed != 0 || nonce_ctx.counter > NONCE_RESEED_BYTES) {
 		/* reseed nonce */
-		ret = nonce_rng_init(&nonce_ctx, NULL);
+		ret = nonce_rng_init(&nonce_ctx, NULL, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -350,7 +355,7 @@ static void wrap_nettle_rnd_refresh(void *_ctx)
 	RND_UNLOCK(&rnd_ctx);
 
 	RND_LOCK(&nonce_ctx);
-	nonce_rng_init(&nonce_ctx, &event);
+	nonce_rng_init(&nonce_ctx, &event, 0);
 	RND_UNLOCK(&nonce_ctx);
 
 	return;
