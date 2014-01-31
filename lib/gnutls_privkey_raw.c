@@ -180,9 +180,9 @@ int ret;
  * @d: holds the private exponent
  * @p: holds the first prime (p)
  * @q: holds the second prime (q)
- * @u: holds the coefficient
- * @e1: holds e1 = d mod (p-1), may be null
- * @e2: holds e2 = d mod (q-1), may be null
+ * @u: holds the coefficient (optional)
+ * @e1: holds e1 = d mod (p-1) (optional)
+ * @e2: holds e2 = d mod (q-1) (optional)
  *
  * This function will convert the given RSA raw parameters to the
  * native #gnutls_privkey_t format.  The output will be stored in

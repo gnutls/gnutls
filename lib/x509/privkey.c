@@ -718,9 +718,9 @@ gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
  * @d: holds the private exponent
  * @p: holds the first prime (p)
  * @q: holds the second prime (q)
- * @u: holds the coefficient
- * @e1: holds e1 = d mod (p-1)
- * @e2: holds e2 = d mod (q-1)
+ * @u: holds the coefficient (optional)
+ * @e1: holds e1 = d mod (p-1) (optional)
+ * @e2: holds e2 = d mod (q-1) (optional)
  *
  * This function will convert the given RSA raw parameters to the
  * native #gnutls_x509_privkey_t format.  The output will be stored in
@@ -790,18 +790,20 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
 	}
 	key->params.params_nr++;
 
-	siz = u->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[5], u->data, siz)) {
-		gnutls_assert();
-		ret = GNUTLS_E_MPI_SCAN_FAILED;
-		goto cleanup;
+	if (u) {
+		siz = u->size;
+		if (_gnutls_mpi_init_scan_nz(&key->params.params[RSA_COEF], u->data, siz)) {
+			gnutls_assert();
+			ret = GNUTLS_E_MPI_SCAN_FAILED;
+			goto cleanup;
+		}
+		key->params.params_nr++;
 	}
-	key->params.params_nr++;
 
 	if (e1 && e2) {
 		siz = e1->size;
 		if (_gnutls_mpi_init_scan_nz
-		    (&key->params.params[6], e1->data, siz)) {
+		    (&key->params.params[RSA_E1], e1->data, siz)) {
 			gnutls_assert();
 			ret = GNUTLS_E_MPI_SCAN_FAILED;
 			goto cleanup;
@@ -810,7 +812,7 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
 
 		siz = e2->size;
 		if (_gnutls_mpi_init_scan_nz
-		    (&key->params.params[7], e2->data, siz)) {
+		    (&key->params.params[RSA_E2], e2->data, siz)) {
 			gnutls_assert();
 			ret = GNUTLS_E_MPI_SCAN_FAILED;
 			goto cleanup;

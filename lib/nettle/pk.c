@@ -1437,7 +1437,7 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		     gnutls_direction_t direction,
 		     gnutls_pk_params_st * params)
 {
-	int result;
+	int ret;
 
 	if (direction == GNUTLS_IMPORT && algo == GNUTLS_PK_RSA) {
 		/* do not trust the generated values. Some old private keys
@@ -1445,6 +1445,14 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		 * old but it seemed some of the shipped example private
 		 * keys were as old.
 		 */
+		if (params->params_nr < RSA_PRIVATE_PARAMS - 3)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		if (params->params[RSA_COEF] == NULL) {
+			ret = _gnutls_mpi_init(&params->params[RSA_COEF]);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
 		mpz_invert(TOMPZ(params->params[RSA_COEF]),
 			   TOMPZ(params->params[RSA_PRIME2]),
 			   TOMPZ(params->params[RSA_PRIME1]));
@@ -1453,11 +1461,10 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 		zrelease_mpi_key(&params->params[RSA_E1]);
 		zrelease_mpi_key(&params->params[RSA_E2]);
 
-		result = calc_rsa_exp(params);
-		if (result < 0) {
-			gnutls_assert();
-			return result;
-		}
+		ret = calc_rsa_exp(params);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
 		params->params_nr = RSA_PRIVATE_PARAMS;
 	}
 
