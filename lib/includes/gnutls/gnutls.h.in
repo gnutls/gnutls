@@ -1171,7 +1171,7 @@ typedef int (*gnutls_db_remove_func) (void *, gnutls_datum_t key);
 typedef gnutls_datum_t(*gnutls_db_retr_func) (void *, gnutls_datum_t key);
 
 void gnutls_db_set_cache_expiration(gnutls_session_t session, int seconds);
-unsigned gnutls_db_get_cache_expiration(void);
+unsigned gnutls_db_get_default_cache_expiration(void);
 
 void gnutls_db_remove_session(gnutls_session_t session);
 void gnutls_db_set_retrieve_function(gnutls_session_t session,
