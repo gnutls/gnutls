@@ -37,6 +37,9 @@ int _gnutls_hash_init(digest_hd_st * dig, const mac_entry_st * e)
 
 	FAIL_IF_LIB_ERROR;
 
+	if (unlikely(e == NULL || e->id == GNUTLS_MAC_NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	dig->e = e;
 
 	/* check if a digest has been registered 
@@ -186,6 +189,9 @@ _gnutls_mac_init(mac_hd_st * mac, const mac_entry_st * e,
 	const gnutls_crypto_mac_st *cc = NULL;
 
 	FAIL_IF_LIB_ERROR;
+
+	if (unlikely(e == NULL || e->id == GNUTLS_MAC_NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	mac->e = e;
 	mac->mac_len = _gnutls_mac_get_algo_len(e);
