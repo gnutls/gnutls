@@ -374,7 +374,7 @@ int is_broken_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
 			return gnutls_assert_val(0); \
 		} \
 		if (entry->secure == 0 || entry->output_size*8/2 < sym_bits) { \
-			_gnutls_debug_log(#level": certificate's signature hash size is unacceptable (is %u bits, needed %u)\n", entry->output_size*8/2, sym_bits); \
+			_gnutls_debug_log(#level": certificate's signature hash strength is unacceptable (is %u bits, needed %u)\n", entry->output_size*8/2, sym_bits); \
 			return gnutls_assert_val(0); \
 		} \
 		sp = gnutls_pk_bits_to_sec_param(pkalg, bits); \
