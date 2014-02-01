@@ -91,9 +91,10 @@ _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 	const uint8_t *p = data;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		/* A client shouldn't receive this extension */
-		return
-		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION);
+		/* A client shouldn't receive this extension, but of course
+		 * there are servers out there that send it. Just ignore it. */
+		_gnutls_debug_log("received SUPPORTED ECC extension on client side!!!\n");
+		return 0;
 	} else {		/* SERVER SIDE - we must check if the sent supported ecc type is the right one 
 				 */
 		if (data_size < 2)
