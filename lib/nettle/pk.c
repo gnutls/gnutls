@@ -175,7 +175,7 @@ ecc_shared_secret(struct ecc_scalar *private_key,
  * of p-1 used by the peer. It is still a conservative
  * choice, but small than what we've been using before.
  */
-#define DH_EXPONENT_SIZE (2*_gnutls_pk_bits_to_subgroup_bits(GNUTLS_SEC_PARAM_HIGH))
+#define DH_EXPONENT_SIZE(p_size) (2*_gnutls_pk_bits_to_subgroup_bits(p_size))
 
 /* This is used for DH or ECDH key derivation. In DH for example
  * it is given the peers Y and our x, and calculates Y^x 
@@ -977,7 +977,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				} else {
 					unsigned size = mpz_sizeinbase(pub.p, 2);
 					if (level == 0)
-						level = MIN(size, DH_EXPONENT_SIZE);
+						level = MIN(size, DH_EXPONENT_SIZE(size));
 					nettle_mpz_random_size(x, NULL, rnd_func, level);
 
 					if (level >= size)
