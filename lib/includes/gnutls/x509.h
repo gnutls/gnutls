@@ -786,6 +786,8 @@ typedef enum gnutls_certificate_verification_profiles_t {
 #define GNUTLS_PROFILE_TO_VFLAGS(x) \
 	(((unsigned)x)<<24)
 
+#define GNUTLS_VFLAGS_PROFILE_MASK (0xff000000)
+
 #define GNUTLS_VFLAGS_TO_PROFILE(x) \
 	((((unsigned)x)>>24)&0xff)
 

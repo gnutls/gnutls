@@ -643,11 +643,19 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 #define LEVEL_SUITEB192 "SUITEB192"
 #define LEVEL_EXPORT "EXPORT"
 
+#define SET_PROFILE(to_set) \
+	profile = GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags); \
+	if (profile == 0 || profile > to_set) { \
+		priority_cache->additional_verify_flags &= !GNUTLS_VFLAGS_PROFILE_MASK; \
+		priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(to_set); \
+	}
+
 static
 int check_level(const char *level, gnutls_priority_t priority_cache,
 		int add)
 {
 	bulk_rmadd_func *func;
+	unsigned profile = 0;
 
 	if (add)
 		func = _add_priority;
@@ -661,9 +669,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LOW);
-		if (priority_cache->level == 0)
+		SET_PROFILE(GNUTLS_PROFILE_LOW);
+		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_LOW)
 			priority_cache->level = GNUTLS_SEC_PARAM_LOW;
 		return 1;
 	} else if (strcasecmp(level, LEVEL_NORMAL) == 0) {
@@ -673,9 +680,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LOW);
-		if (priority_cache->level == 0)
+		SET_PROFILE(GNUTLS_PROFILE_LOW);
+		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_LOW)
 			priority_cache->level = GNUTLS_SEC_PARAM_LOW;
 		return 1;
 	} else if (strcasecmp(level, LEVEL_PFS) == 0) {
@@ -685,9 +691,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_LOW);
-		if (priority_cache->level == 0)
+		SET_PROFILE(GNUTLS_PROFILE_LOW);
+		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_LOW)
 			priority_cache->level = GNUTLS_SEC_PARAM_LOW;
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SECURE256) == 0
@@ -699,10 +704,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_secure192);
 
-		/* be conservative for now. Set the bits to correspond to 96-bit level */
-		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_ULTRA);
-		if (priority_cache->level == 0)
+		SET_PROFILE(GNUTLS_PROFILE_ULTRA);
+		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_ULTRA)
 			priority_cache->level = GNUTLS_SEC_PARAM_ULTRA;
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SECURE128) == 0
@@ -714,9 +717,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_secure128);
 
-		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_HIGH);
-		if (priority_cache->level == 0)
+		SET_PROFILE(GNUTLS_PROFILE_HIGH);
+		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_HIGH)
 			priority_cache->level = GNUTLS_SEC_PARAM_HIGH;
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SUITEB128) == 0) {
@@ -728,9 +730,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_suiteb128);
 
-		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB128);
-		if (priority_cache->level == 0)
+		SET_PROFILE(GNUTLS_PROFILE_SUITEB128);
+		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_HIGH)
 			priority_cache->level = GNUTLS_SEC_PARAM_HIGH;
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SUITEB192) == 0) {
@@ -742,9 +743,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_suiteb192);
 
-		if (GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags) == 0)
-			priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB192);
-		if (priority_cache->level == 0)
+		SET_PROFILE(GNUTLS_PROFILE_SUITEB192);
+		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_ULTRA)
 			priority_cache->level = GNUTLS_SEC_PARAM_ULTRA;
 		return 1;
 	} else if (strcasecmp(level, LEVEL_EXPORT) == 0) {
@@ -754,7 +754,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		if (priority_cache->level == 0)
+		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_EXPORT)
 			priority_cache->level = GNUTLS_SEC_PARAM_EXPORT;
 		return 1;
 	}
