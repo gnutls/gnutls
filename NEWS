@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 3.2.11 (unreleased)
 
-** libgnutls: Tolerate servers that sent the SUPPORTED ECC extension.
+** libgnutls: Tolerate servers that send the SUPPORTED ECC extension.
 
 ** libgnutls: Reduced the TLS and DTLS version requirements for all
 ciphersuites that are not GCM.
