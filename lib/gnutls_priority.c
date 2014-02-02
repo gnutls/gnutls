@@ -788,6 +788,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	char *broken_list[MAX_ELEMENTS];
 	int broken_list_size = 0, i = 0, j;
 	char *darg = NULL;
+	unsigned ikeyword_set = 0;
 	int algo;
 	rmadd_func *fn;
 	bulk_rmadd_func *bulk_fn;
@@ -842,7 +843,8 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	}
 
 	for (; i < broken_list_size; i++) {
-		if (check_level(broken_list[i], *priority_cache, 0) != 0) {
+		if (check_level(broken_list[i], *priority_cache, ikeyword_set) != 0) {
+			ikeyword_set = 1;
 			continue;
 		} else if (broken_list[i][0] == '!'
 			   || broken_list[i][0] == '+'
