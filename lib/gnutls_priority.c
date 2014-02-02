@@ -839,6 +839,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			      supported_ecc_normal);
 		i = 0;
 	} else {
+		ikeyword_set = 1;
 		i = 1;
 	}
 
