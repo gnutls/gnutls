@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: Reduced the TLS and DTLS version requirements for all
 ciphersuites that are not GCM.
 
+** libgnutls: When two initial keywords are specified then treat the
+second as having the '+' modifier.
+
 ** API and ABI modifications:
 No changes since last version.
 
