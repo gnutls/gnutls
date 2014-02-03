@@ -650,6 +650,10 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 		priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(to_set); \
 	}
 
+#define SET_LEVEL(to_set) \
+		if (priority_cache->level == 0 || priority_cache->level > to_set) \
+			priority_cache->level = to_set
+
 static
 int check_level(const char *level, gnutls_priority_t priority_cache,
 		int add)
@@ -670,8 +674,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
 		SET_PROFILE(GNUTLS_PROFILE_LOW);
-		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_LOW)
-			priority_cache->level = GNUTLS_SEC_PARAM_LOW;
+		SET_LEVEL(GNUTLS_SEC_PARAM_LOW);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_NORMAL) == 0) {
 		func(&priority_cache->cipher, cipher_priority_normal);
@@ -681,8 +684,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
 		SET_PROFILE(GNUTLS_PROFILE_LOW);
-		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_LOW)
-			priority_cache->level = GNUTLS_SEC_PARAM_LOW;
+		SET_LEVEL(GNUTLS_SEC_PARAM_LOW);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_PFS) == 0) {
 		func(&priority_cache->cipher, cipher_priority_normal);
@@ -692,8 +694,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
 		SET_PROFILE(GNUTLS_PROFILE_LOW);
-		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_LOW)
-			priority_cache->level = GNUTLS_SEC_PARAM_LOW;
+		SET_LEVEL(GNUTLS_SEC_PARAM_LOW);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SECURE256) == 0
 		   || strcasecmp(level, LEVEL_SECURE192) == 0) {
@@ -705,8 +706,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		     supported_ecc_secure192);
 
 		SET_PROFILE(GNUTLS_PROFILE_ULTRA);
-		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_ULTRA)
-			priority_cache->level = GNUTLS_SEC_PARAM_ULTRA;
+		SET_LEVEL(GNUTLS_SEC_PARAM_ULTRA);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SECURE128) == 0
 		   || strcasecmp(level, "SECURE") == 0) {
@@ -718,8 +718,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		     supported_ecc_secure128);
 
 		SET_PROFILE(GNUTLS_PROFILE_HIGH);
-		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_HIGH)
-			priority_cache->level = GNUTLS_SEC_PARAM_HIGH;
+		SET_LEVEL(GNUTLS_SEC_PARAM_HIGH);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SUITEB128) == 0) {
 		func(&priority_cache->protocol, protocol_priority_suiteb);
@@ -731,8 +730,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		     supported_ecc_suiteb128);
 
 		SET_PROFILE(GNUTLS_PROFILE_SUITEB128);
-		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_HIGH)
-			priority_cache->level = GNUTLS_SEC_PARAM_HIGH;
+		SET_LEVEL(GNUTLS_SEC_PARAM_HIGH);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SUITEB192) == 0) {
 		func(&priority_cache->protocol, protocol_priority_suiteb);
@@ -744,8 +742,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		     supported_ecc_suiteb192);
 
 		SET_PROFILE(GNUTLS_PROFILE_SUITEB192);
-		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_ULTRA)
-			priority_cache->level = GNUTLS_SEC_PARAM_ULTRA;
+		SET_LEVEL(GNUTLS_SEC_PARAM_ULTRA);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_EXPORT) == 0) {
 		func(&priority_cache->cipher, cipher_priority_performance);
@@ -754,8 +751,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		if (priority_cache->level == 0 || priority_cache->level > GNUTLS_SEC_PARAM_EXPORT)
-			priority_cache->level = GNUTLS_SEC_PARAM_EXPORT;
+		SET_LEVEL(GNUTLS_SEC_PARAM_EXPORT);
 		return 1;
 	}
 	return 0;
