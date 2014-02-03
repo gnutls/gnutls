@@ -220,10 +220,11 @@ typedef enum {
 
 /**
  * gnutls_pkcs11_token_info_t:
- * @GNUTLS_PKCS11_TOKEN_LABEL: The token's label
- * @GNUTLS_PKCS11_TOKEN_SERIAL: The token's serial number
- * @GNUTLS_PKCS11_TOKEN_MANUFACTURER: The token's manufacturer
- * @GNUTLS_PKCS11_TOKEN_MODEL: The token's model
+ * @GNUTLS_PKCS11_TOKEN_LABEL: The token's label (string)
+ * @GNUTLS_PKCS11_TOKEN_SERIAL: The token's serial number (string)
+ * @GNUTLS_PKCS11_TOKEN_MANUFACTURER: The token's manufacturer (string)
+ * @GNUTLS_PKCS11_TOKEN_MODEL: The token's model (string)
+ * @GNUTLS_PKCS11_TOKEN_TRUSTED: Whether the token is marked as trusted in p11-kit (unsigned int)
  *
  * Enumeration of types for retrieving token information.
  */
@@ -231,7 +232,8 @@ typedef enum {
 	GNUTLS_PKCS11_TOKEN_LABEL,
 	GNUTLS_PKCS11_TOKEN_SERIAL,
 	GNUTLS_PKCS11_TOKEN_MANUFACTURER,
-	GNUTLS_PKCS11_TOKEN_MODEL
+	GNUTLS_PKCS11_TOKEN_MODEL,
+	GNUTLS_PKCS11_TOKEN_TRUSTED_UINT,
 } gnutls_pkcs11_token_info_t;
 
 /**
