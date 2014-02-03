@@ -13,8 +13,12 @@ ciphersuites that are not GCM.
 ** libgnutls: When two initial keywords are specified then treat the
 second as having the '+' modifier.
 
+** libgnutls:  When using a PKCS #11 module for verification ensure that
+it has been marked a trusted policy module in p11-kit.
+http://p11-glue.freedesktop.org/doc/p11-kit/pkcs11-conf.html
+
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_PKCS11_TOKEN_TRUSTED_UINT: Added
 
 
 * Version 3.2.10 (released 2014-01-31)
