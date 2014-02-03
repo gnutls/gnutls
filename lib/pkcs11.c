@@ -1727,8 +1727,6 @@ gnutls_pkcs11_token_get_info(const char *url,
 	size_t len;
 	int ret;
 
-	PKCS11_CHECK_INIT;
-
 	ret = pkcs11_url_to_info(url, &info);
 	if (ret < 0) {
 		gnutls_assert();
