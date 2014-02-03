@@ -602,6 +602,10 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 #define LEVEL_SUITEB192 "SUITEB192"
 #define LEVEL_EXPORT "EXPORT"
 
+#define SET_LEVEL(to_set) \
+	if (priority_cache->level == 0 || priority_cache->level > to_set) \
+		priority_cache->level = to_set
+
 static
 int check_level(const char *level, gnutls_priority_t priority_cache,
 		int add)
@@ -620,8 +624,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		if (priority_cache->level == 0)
-			priority_cache->level = GNUTLS_SEC_PARAM_VERY_WEAK;
+		SET_LEVEL(GNUTLS_SEC_PARAM_VERY_WEAK);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_NORMAL) == 0) {
 		func(&priority_cache->cipher, cipher_priority_normal);
@@ -630,8 +633,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		if (priority_cache->level == 0)
-			priority_cache->level = GNUTLS_SEC_PARAM_VERY_WEAK;
+		SET_LEVEL(GNUTLS_SEC_PARAM_VERY_WEAK);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_PFS) == 0) {
 		func(&priority_cache->cipher, cipher_priority_normal);
@@ -640,8 +642,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		if (priority_cache->level == 0)
-			priority_cache->level = GNUTLS_SEC_PARAM_VERY_WEAK;
+		SET_LEVEL(GNUTLS_SEC_PARAM_VERY_WEAK);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SECURE256) == 0
 		   || strcasecmp(level, LEVEL_SECURE192) == 0) {
@@ -653,8 +654,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		     supported_ecc_secure192);
 
 		/* be conservative for now. Set the bits to correspond to 96-bit level */
-		if (priority_cache->level == 0)
-			priority_cache->level = GNUTLS_SEC_PARAM_LEGACY;
+		SET_LEVEL(GNUTLS_SEC_PARAM_LEGACY);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SECURE128) == 0
 		   || strcasecmp(level, "SECURE") == 0) {
@@ -666,8 +666,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		     supported_ecc_secure128);
 
 		/* be conservative for now. Set the bits to correspond to an 72-bit level */
-		if (priority_cache->level == 0)
-			priority_cache->level = GNUTLS_SEC_PARAM_WEAK;
+		SET_LEVEL(GNUTLS_SEC_PARAM_WEAK);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SUITEB128) == 0) {
 		func(&priority_cache->protocol, protocol_priority_suiteb);
@@ -678,8 +677,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_suiteb128);
 
-		if (priority_cache->level == 0)
-			priority_cache->level = GNUTLS_SEC_PARAM_HIGH;
+		SET_LEVEL(GNUTLS_SEC_PARAM_HIGH);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SUITEB192) == 0) {
 		func(&priority_cache->protocol, protocol_priority_suiteb);
@@ -690,8 +688,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_suiteb192);
 
-		if (priority_cache->level == 0)
-			priority_cache->level = GNUTLS_SEC_PARAM_ULTRA;
+		SET_LEVEL(GNUTLS_SEC_PARAM_ULTRA);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_EXPORT) == 0) {
 		func(&priority_cache->cipher, cipher_priority_performance);
@@ -700,8 +697,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		if (priority_cache->level == 0)
-			priority_cache->level = GNUTLS_SEC_PARAM_EXPORT;
+		SET_LEVEL(GNUTLS_SEC_PARAM_EXPORT);
 		return 1;
 	}
 	return 0;
