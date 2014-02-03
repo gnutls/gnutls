@@ -1706,6 +1706,9 @@ gnutls_pkcs11_token_get_url(unsigned int seq,
  * This function will return information about the PKCS 11 token such
  * as the label, id, etc.
  *
+ * All types are strings, except the type %GNUTLS_PKCS11_TOKEN_TRUSTED_UINT which
+ * returns an integer with true (1) or false (0) value.
+ *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code
  * on error.
  *
@@ -1717,10 +1720,14 @@ gnutls_pkcs11_token_get_info(const char *url,
 			     void *output, size_t * output_size)
 {
 	struct p11_kit_uri *info = NULL;
+	struct ck_function_list *module;
+	ck_slot_id_t slot;
 	const uint8_t *str;
 	size_t str_max;
 	size_t len;
 	int ret;
+
+	PKCS11_CHECK_INIT;
 
 	ret = pkcs11_url_to_info(url, &info);
 	if (ret < 0) {
@@ -1745,6 +1752,26 @@ gnutls_pkcs11_token_get_info(const char *url,
 		str = p11_kit_uri_get_token_info(info)->model;
 		str_max = 16;
 		break;
+	case GNUTLS_PKCS11_TOKEN_TRUSTED_UINT:
+		if (*output_size < sizeof(ret)) {
+			*output_size = sizeof(ret);
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+		}
+
+		ret = pkcs11_find_slot(&module, &slot, info, NULL);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		if (p11_kit_module_get_flags(module) & P11_KIT_MODULE_TRUSTED) {
+			ret = 1;
+		} else {
+			ret = 0;
+		}
+		memcpy(output, &ret, sizeof(ret));
+		ret = 0;
+		goto cleanup;
 	default:
 		p11_kit_uri_free(info);
 		gnutls_assert();
@@ -1763,8 +1790,10 @@ gnutls_pkcs11_token_get_info(const char *url,
 
 	*output_size = len;
 
+	ret = 0;
+cleanup:
 	p11_kit_uri_free(info);
-	return 0;
+	return ret;
 }
 
 /**
