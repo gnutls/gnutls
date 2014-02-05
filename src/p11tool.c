@@ -51,6 +51,7 @@ static void cmd_parser(int argc, char **argv);
 
 static FILE *outfile;
 int batch = 0;
+int ask_pass = 0;
 
 static void tls_log_func(int level, const char *str)
 {

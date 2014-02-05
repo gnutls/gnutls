@@ -59,6 +59,7 @@ static gnutls_tpmkey_fmt_t inkey_format, outkey_format;
 static FILE *outfile;
 static FILE *infile;
 int batch = 0;
+int ask_pass = 0;
 
 static void tls_log_func(int level, const char *str)
 {
