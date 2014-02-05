@@ -365,6 +365,13 @@ flag = {
 };
 
 flag = {
+    name      = ask-pass;
+    disabled;
+    descrip   = "Enable interaction for entering password when in batch mode.";
+    doc   = "This option will enable interaction to enter password when in batch mode. That is useful when the template option has been specified.";
+};
+
+flag = {
     name      = pkcs-cipher;
     arg-type  = string;
     arg-name  = "Cipher";

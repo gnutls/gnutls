@@ -81,6 +81,7 @@ gnutls_certificate_print_formats_t full_format = GNUTLS_CRT_PRINT_FULL;
 /* non interactive operation if set
  */
 int batch;
+int ask_pass;
 
 
 static void tls_log_func(int level, const char *str)
@@ -1053,6 +1054,8 @@ static void cmd_parser(int argc, char **argv)
 		batch = 1;
 		template_parse(OPT_ARG(TEMPLATE));
 	}
+
+	ask_pass = ENABLED_OPT(ASK_PASS);
 
 	gnutls_global_set_log_function(tls_log_func);
 

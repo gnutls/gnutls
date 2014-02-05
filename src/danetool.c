@@ -63,7 +63,8 @@ static gnutls_digest_algorithm_t default_dig;
 
 /* non interactive operation if set
  */
-int batch;
+int batch = 0;
+int ask_pass = 0;
 
 
 static void tls_log_func(int level, const char *str)

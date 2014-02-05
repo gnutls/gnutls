@@ -50,6 +50,7 @@
 #include "certtool-common.h"
 
 extern int batch;
+extern int ask_pass;
 
 #define MAX_ENTRIES 128
 #define MAX_POLICIES 8
@@ -462,7 +463,7 @@ int read_yesno(const char *input_str, int def)
  */
 const char *get_pass(void)
 {
-	if (batch)
+	if (batch && !ask_pass)
 		return cfg.password;
 	else
 		return getpass("Enter password: ");
@@ -470,7 +471,7 @@ const char *get_pass(void)
 
 const char *get_confirmed_pass(bool empty_ok)
 {
-	if (batch)
+	if (batch && !ask_pass)
 		return cfg.password;
 	else {
 		const char *pass = NULL;
@@ -498,7 +499,7 @@ const char *get_confirmed_pass(bool empty_ok)
 
 const char *get_challenge_pass(void)
 {
-	if (batch)
+	if (batch && !ask_pass)
 		return cfg.challenge_password;
 	else
 		return getpass("Enter a challenge password: ");
