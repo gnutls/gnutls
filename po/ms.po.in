@@ -824,7 +824,7 @@ msgstr ""
 
 #: lib/x509/output.c:985
 msgid ""
-"\tPublic Key ID:\n"
+"\tPublic Key Id:\n"
 "\t\t"
 msgstr ""
 "\tId Kekunci Awam:\n"

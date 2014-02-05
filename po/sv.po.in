@@ -1241,7 +1241,7 @@ msgstr ""
 
 #: lib/x509/output.c:1385 lib/x509/output.c:2248
 msgid ""
-"\tPublic Key ID:\n"
+"\tPublic Key Id:\n"
 "\t\t"
 msgstr ""
 "\tPublik nyckel-identitet:\n"

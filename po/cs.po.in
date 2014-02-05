@@ -1365,7 +1365,7 @@ msgstr ""
 
 #: lib/x509/output.c:1611 lib/x509/output.c:2450
 msgid ""
-"\tPublic Key ID:\n"
+"\tPublic Key Id:\n"
 "\t\t"
 msgstr ""
 "\tID veřejného klíče:\n"
