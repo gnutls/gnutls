@@ -866,7 +866,7 @@ msgstr ""
 
 #: x509/output.c:1188 x509/output.c:1956
 msgid ""
-"\tPublic Key ID:\n"
+"\tPublic Key Id:\n"
 "\t\t"
 msgstr ""
 "\tId de clef publique:\n"
