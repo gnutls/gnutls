@@ -401,8 +401,10 @@ void doit(void)
 	start(ARCFOUR_SHA1, 0);
 	start(ARCFOUR_MD5, 0);
 
+#ifdef HAVE_LIBZ
 	start(ARCFOUR_SHA1_ZLIB, 0);
 	start(NEW_ARCFOUR_SHA1_ZLIB, 1);
+#endif
 }
 
 #endif				/* _WIN32 */
