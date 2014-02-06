@@ -98,7 +98,7 @@ subjectPublicKeyInfo object.
 
 To export the key-specific parameters, or obtain a unique key ID the following functions are provided.
 
-@showfuncD{gnutls_pubkey_get_pk_rsa_raw,gnutls_pubkey_get_pk_dsa_raw,gnutls_pubkey_get_pk_ecc_raw,gnutls_pubkey_get_pk_ecc_x962}
+@showfuncD{gnutls_pubkey_export_rsa_raw,gnutls_pubkey_export_dsa_raw,gnutls_pubkey_export_ecc_raw,gnutls_pubkey_export_ecc_x962}
 
 @node Abstract private keys
 @subsection Private keys
