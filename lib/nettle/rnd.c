@@ -83,7 +83,7 @@ timespec_sub_sec(struct timespec *a, struct timespec *b)
 	return (a->tv_sec - b->tv_sec);
 }
 
-#define DEVICE_READ_INTERVAL (1200)
+#define DEVICE_READ_INTERVAL (10800)
 /* universal functions */
 
 static int do_trivia_source(struct rnd_ctx_st *ctx, int init, struct event_st *event)
