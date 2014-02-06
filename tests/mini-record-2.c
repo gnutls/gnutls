@@ -117,6 +117,7 @@ static void client(int fd, const char *prio, int ign)
 	int ret;
 	unsigned i;
 	char buffer[MAX_BUF + 1];
+	const char* err;
 	gnutls_anon_client_credentials_t anoncred;
 	gnutls_certificate_credentials_t x509_cred;
 	gnutls_session_t session;
@@ -138,7 +139,11 @@ static void client(int fd, const char *prio, int ign)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, prio, NULL);
+	ret = gnutls_priority_set_direct(session, prio, &err);
+	if (ret < 0) {
+		fail("error setting priority: %s\n", err);
+		exit(1);
+	}
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -250,6 +255,7 @@ static void server(int fd, const char *prio, int ign)
 {
 	int ret;
 	unsigned i;
+	const char* err;
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
 	gnutls_anon_server_credentials_t anoncred;
@@ -277,7 +283,11 @@ static void server(int fd, const char *prio, int ign)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, prio, NULL);
+	ret = gnutls_priority_set_direct(session, prio, &err);
+	if (ret < 0) {
+		fail("error setting priority: %s\n", err);
+		exit(1);
+	}
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
