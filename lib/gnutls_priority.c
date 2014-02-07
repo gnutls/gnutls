@@ -705,8 +705,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_secure192);
 
-		SET_PROFILE(GNUTLS_PROFILE_ULTRA);
-		SET_LEVEL(GNUTLS_SEC_PARAM_ULTRA);
+		SET_PROFILE(GNUTLS_PROFILE_HIGH);
+		SET_LEVEL(GNUTLS_SEC_PARAM_HIGH);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SECURE128) == 0
 		   || strcasecmp(level, "SECURE") == 0) {
@@ -717,8 +717,11 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc,
 		     supported_ecc_secure128);
 
-		SET_PROFILE(GNUTLS_PROFILE_HIGH);
-		SET_LEVEL(GNUTLS_SEC_PARAM_HIGH);
+		/* The profile should have been HIGH but if we don't allow
+		 * SHA-1 (80-bits) as signature algorithm we are not able
+		 * to connect anywhere with this level */
+		SET_PROFILE(GNUTLS_PROFILE_LOW);
+		SET_LEVEL(GNUTLS_SEC_PARAM_LOW);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SUITEB128) == 0) {
 		func(&priority_cache->protocol, protocol_priority_suiteb);
