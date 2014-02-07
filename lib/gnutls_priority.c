@@ -689,7 +689,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 	} else if (strcasecmp(level, LEVEL_PFS) == 0) {
 		func(&priority_cache->cipher, cipher_priority_normal);
 		func(&priority_cache->kx, kx_priority_pfs);
-		func(&priority_cache->mac, mac_priority_normal);
+		func(&priority_cache->mac, mac_priority_secure128);
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 

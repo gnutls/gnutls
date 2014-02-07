@@ -902,40 +902,47 @@ set (i.e., NORMAL).
 @item PERFORMANCE @tab
 All the known to be secure ciphersuites are enabled,
 limited to 128 bit ciphers and sorted by terms of speed
-performance. The message authenticity security level is of 64 bits or more.
+performance. The message authenticity security level is of 64 bits or more,
+and the certificate verification profile is set to GNUTLS_PROFILE_LOW (80-bits).
 
 @item NORMAL @tab
 Means all the known to be secure ciphersuites. The ciphers are sorted by security
 margin, although the 256-bit ciphers are included as a fallback only.
-The message authenticity security level is of 64 bits or more.
+The message authenticity security level is of 64 bits or more,
+and the certificate verification profile is set to GNUTLS_PROFILE_LOW (80-bits).
 
 @item PFS @tab
 Means all the known to be secure ciphersuites that support perfect forward
 secrecy. The ciphers are sorted by security
 margin, although the 256-bit ciphers are included as a fallback only.
-The message authenticity security level is of 64 bits or more. This
-option is available since 3.2.4 or later.
+The message authenticity security level is of 80 bits or more,
+and the certificate verification profile is set to GNUTLS_PROFILE_LOW (80-bits).
+This option is available since 3.2.4 or later.
 
 @item SECURE128 @tab
 Means all known to be secure ciphersuites that offer a 
-security level 128-bit or more and a message authenticity
-security level of 80 bits or more.
+security level 128-bit or more.
+The message authenticity security level is of 80 bits or more,
+and the certificate verification profile is set to GNUTLS_PROFILE_LOW (80-bits).
 
 @item SECURE192 @tab
 Means all the known to be secure ciphersuites that offer a 
-security level 192-bit or more and a message authenticity
-security level of 128 bits or more.
+security level 192-bit or more.
+The message authenticity security level is of 128 bits or more,
+and the certificate verification profile is set to GNUTLS_PROFILE_HIGH (128-bits).
 
 @item SECURE256 @tab
 Currently alias for SECURE192.
 
 @item SUITEB128 @tab
 Means all the NSA Suite B cryptography (RFC5430) ciphersuites
-with an 128 bit security level.
+with an 128 bit security level, as well as the enabling of the corresponding
+verification profile.
 
 @item SUITEB192 @tab
 Means all the NSA Suite B cryptography (RFC5430) ciphersuites
-with an 192 bit security level.
+with an 192 bit security level, as well as the enabling of the corresponding
+verification profile.
 
 @item EXPORT @tab
 Means all ciphersuites are enabled, including the
