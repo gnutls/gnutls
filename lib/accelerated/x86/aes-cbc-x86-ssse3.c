@@ -39,8 +39,6 @@ struct aes_ctx {
 	int enc;
 };
 
-unsigned int _gnutls_x86_cpuid_s[4];
-
 static int
 aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
