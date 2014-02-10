@@ -1536,8 +1536,8 @@ refresh-po:
 INDENT_SOURCES ?= $(C_SOURCES)
 .PHONY: indent
 indent:
-	indent $(INDENT_SOURCES)
-	indent $(INDENT_SOURCES)
+	indent -linux $(INDENT_SOURCES)
+	indent -linux $(INDENT_SOURCES)
 
 # If you want to set UPDATE_COPYRIGHT_* environment variables,
 # put the assignments in this variable.
