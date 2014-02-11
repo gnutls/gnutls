@@ -313,16 +313,14 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 
 	{
-		int serial = get_serial();
-		char bin_serial[5];
+		size_t serial_size;
+		unsigned char serial[16];
+		
+		serial_size = sizeof(serial);
+		
+		get_serial(serial, &serial_size);
 
-		bin_serial[4] = serial & 0xff;
-		bin_serial[3] = (serial >> 8) & 0xff;
-		bin_serial[2] = (serial >> 16) & 0xff;
-		bin_serial[1] = (serial >> 24) & 0xff;
-		bin_serial[0] = 0;
-
-		result = gnutls_x509_crt_set_serial(crt, bin_serial, 5);
+		result = gnutls_x509_crt_set_serial(crt, serial, serial_size);
 		if (result < 0) {
 			fprintf(stderr, "serial: %s",
 				gnutls_strerror(result));

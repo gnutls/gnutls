@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
- * Copyright (C) 2013 Nikos Mavrogiannopoulos
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2013,2014 Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <certtool-cfg.h>
 #include <gnutls/x509.h>
 #include <string.h>
@@ -34,6 +35,7 @@
 #include <parse-datetime.h>
 #include <autoopts/options.h>
 #include <intprops.h>
+#include <gnutls/crypto.h>
 
 /* for inet_pton */
 #include <sys/types.h>
@@ -80,7 +82,7 @@ typedef struct _cfg_ctx {
 	char *pkcs12_key_name;
 	char *expiration_date;
 	char *activation_date;
-	int serial;
+	int64_t serial;
 	int expiration_days;
 	int ca;
 	int path_len;
@@ -180,7 +182,7 @@ void cfg_init(void)
       if (val->valType == OPARG_TYPE_NUMERIC) \
         s_name = val->v.longVal; \
       else if (val->valType == OPARG_TYPE_STRING) \
-        s_name = atoi(val->v.strVal); \
+        s_name = strtol(val->v.strVal, NULL, 10); \
     }
 
 int template_parse(const char *template)
@@ -374,7 +376,7 @@ read_crq_set(gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 
 /* The input_str should contain %d or %u to print the default.
  */
-static int read_int_with_default(const char *input_str, int def)
+static long read_int_with_default(const char *input_str, long def)
 {
 	char *endptr;
 	long l, len;
@@ -405,10 +407,10 @@ static int read_int_with_default(const char *input_str, int def)
 	if (input == endptr)
 		l = def;
 
-	return (int) l;
+	return l;
 }
 
-int read_int(const char *input_str)
+long read_int(const char *input_str)
 {
 	return read_int_with_default(input_str, 0);
 }
@@ -836,19 +838,65 @@ void get_pkcs9_email_crt_set(gnutls_x509_crt_t crt)
 
 }
 
-int get_serial(void)
+void get_serial(unsigned char* serial, size_t * size)
 {
-	int default_serial = time(NULL);
+	struct timespec ts;
+	char dserial[12];
+	uint32_t default_serial[2];
+
+	/* default format:
+	 * |  4 b |  4 b  |  4b
+	 * | secs | nsecs | rnd  |
+	 */
+	gettime(&ts);
+
+	if (*size < 12) {
+		fprintf(stderr, "error in get_serial()!\n");
+		exit(1);
+	}
+
+	if (batch && cfg.serial < 0) {
+		serial[0] = (ts.tv_sec >> 24) & 0xff;
+		serial[1] = (ts.tv_sec >> 16) & 0xff;
+		serial[2] = (ts.tv_sec >> 8) & 0xff;
+		serial[3] = (ts.tv_sec) & 0xff;
+		serial[4] = (ts.tv_nsec >> 24) & 0xff;
+		serial[5] = (ts.tv_nsec >> 16) & 0xff;
+		serial[6] = (ts.tv_nsec >> 8) & 0xff;
+		serial[7] = (ts.tv_nsec) & 0xff;
+		serial[0] &= 0x7F;
+		gnutls_rnd(GNUTLS_RND_NONCE, &serial[8], 4);
+		*size = 12;
+		return;
+	}
 
 	if (batch) {
-		if (cfg.serial < 0)
-			return default_serial;
-		return cfg.serial;
+		default_serial[0] = cfg.serial >> 32;
+		default_serial[1] = cfg.serial;
 	} else {
-		return read_int_with_default
-		    ("Enter the certificate's serial number in decimal (default: %u): ",
-		     default_serial);
+		unsigned long default_serial_int = (ts.tv_sec << 32) | ts.tv_nsec;
+
+		default_serial_int = read_int_with_default
+		    ("Enter the certificate's serial number in decimal (default: %lu): ",
+		     (unsigned long)default_serial_int);
+
+		default_serial[0] = default_serial_int >> 32;
+		default_serial[1] = default_serial_int;
 	}
+
+	serial[0] = (default_serial[0] >> 24) & 0xff;
+	serial[1] = (default_serial[0] >> 16) & 0xff;
+	serial[2] = (default_serial[0] >> 8) & 0xff;
+	serial[3] = (default_serial[0]) & 0xff;
+	serial[4] = (default_serial[1] >> 24) & 0xff;
+	serial[5] = (default_serial[1] >> 16) & 0xff;
+	serial[6] = (default_serial[1] >> 8) & 0xff;
+	serial[7] = (default_serial[1]) & 0xff;
+	serial[0] &= 0x7F;
+
+	*size = 8;
+
+	return;
 }
 
 static
@@ -856,7 +904,7 @@ time_t get_date(const char* date)
 {
 	time_t t;
 	struct timespec r;
-	
+
 	if (date==NULL || parse_datetime(&r, date, NULL) == 0) {
 	        fprintf(stderr, "Cannot parse date: %s\n", date);
 	        exit(1);
@@ -871,7 +919,7 @@ time_t get_activation_date()
 	if (batch && cfg.activation_date != NULL) {
        		return get_date(cfg.activation_date);
 	}
-	
+
 	return time(NULL);
 }
 

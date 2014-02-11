@@ -30,7 +30,7 @@ void read_crt_set(gnutls_x509_crt_t crt, const char *input_str,
 		  const char *oid);
 void read_crq_set(gnutls_x509_crq_t crq, const char *input_str,
 		  const char *oid);
-int read_int(const char *input_str);
+long read_int(const char *input_str);
 const char *read_str(const char *input_str);
 int read_yesno(const char *input_str, int def);
 
@@ -50,7 +50,7 @@ void get_uid_crt_set(gnutls_x509_crt_t crt);
 void get_pkcs9_email_crt_set(gnutls_x509_crt_t crt);
 void get_oid_crt_set(gnutls_x509_crt_t crt);
 void get_key_purpose_set(int type, void *crt);
-int get_serial(void);
+void get_serial(unsigned char* serial, size_t* serial_size);
 time_t get_expiration_date(void);
 time_t get_activation_date(void);
 int get_ca_status(void);
