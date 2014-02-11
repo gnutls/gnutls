@@ -70,6 +70,9 @@ option enables (when running on FIPS140-enabled system):
 
 ** libgnutls: Depend on p11-kit 0.19.1 or later.
 
+** certtool: Timestamps for serial numbers were increased to 8 bytes,
+and in batch mode to 12 (appended with 4 random bytes).
+
 ** API and ABI modifications:
 gnutls_privkey_generate: Added
 gnutls_pkcs11_crt_is_known: Added
