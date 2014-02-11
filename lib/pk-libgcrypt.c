@@ -121,7 +121,7 @@ _wrap_gcry_pk_encrypt (gnutls_pk_algorithm_t algo,
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint_size (res, ciphertext, plaintext->size);
+  ret = _gnutls_mpi_dprint_size (res, ciphertext, (_gnutls_mpi_get_nbits(pk_params->params[0])+7)/8);
   _gnutls_mpi_release (&res);
   if (ret < 0)
     {
