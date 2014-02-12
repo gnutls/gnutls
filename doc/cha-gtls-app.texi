@@ -879,12 +879,11 @@ are listed in @ref{The Alert Protocol}.
 @section Priority strings
 @cindex Priority strings
 
-In order to specify cipher suite preferences on a TLS session
-there are priority functions that accept a string
-specifying the enabled for the handshake algorithms.
-That string may contain a single initial keyword such as
-in @ref{tab:prio-keywords} and may be followed by
-additional algorithm or special keywords.
+The GnuTLS priority string specifies the TLS session's handshake
+algorithms and options in a compact, easy-to-use format.  That string
+may contain a single initial keyword such as in
+@ref{tab:prio-keywords} and may be followed by additional algorithm or
+special keywords.
 
 @showfuncB{gnutls_priority_set_direct,gnutls_priority_set}
 
@@ -910,6 +909,8 @@ Means all the known to be secure ciphersuites. The ciphers are sorted by securit
 margin, although the 256-bit ciphers are included as a fallback only.
 The message authenticity security level is of 64 bits or more,
 and the certificate verification profile is set to GNUTLS_PROFILE_LOW (80-bits).
+
+This priority string implicitly enables DHE and ECDHE.
 
 @item PFS @tab
 Means all the known to be secure ciphersuites that support perfect forward
@@ -1009,6 +1010,8 @@ RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
 PSK, DHE-PSK, ECDHE-RSA, ANON-ECDH, ANON-DH. The
 Catch all name is KX-ALL which will add all the algorithms from NORMAL
 priority.
+
+Add @code{!DHE-RSA:!DHE-DSS} to the priority string to disable DHE.
 
 @item MAC @tab
 MD5, SHA1, SHA256, AEAD (used with
