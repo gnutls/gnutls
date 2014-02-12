@@ -17,6 +17,9 @@ second as having the '+' modifier.
 it has been marked a trusted policy module in p11-kit.
 http://p11-glue.freedesktop.org/doc/p11-kit/pkcs11-conf.html
 
+** libgnutls: Fixed bug that prevented the rejection of v1 intermediate
+CA certificates.
+
 ** certtool: Added the --ask-pass option.
 
 ** API and ABI modifications:
