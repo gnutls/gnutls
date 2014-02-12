@@ -193,6 +193,7 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 		result = 1;
 		goto cleanup;
 	}
+
 	/* Handle V1 CAs that do not have a basicConstraint, but accept
 	   these certs only if the appropriate flags are set. */
 	else if ((result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) &&
@@ -692,8 +693,10 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 		/* note that here we disable this V1 CA flag. So that no version 1
 		 * certificates can exist in a supplied chain.
 		 */
-		if (!(flags & GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT))
+		if (!(flags & GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT)) {
 			flags &= ~(GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+			flags |= GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT;
+		}
 		if ((ret =
 		     _gnutls_verify_certificate2(certificate_list[i - 1],
 						 &certificate_list[i], 1,
