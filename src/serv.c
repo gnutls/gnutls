@@ -712,7 +712,7 @@ int listen_socket(const char *name, int listen_port, int socktype)
 {
 	struct addrinfo hints, *res, *ptr;
 	char portname[6];
-	int s;
+	int s = -1;
 	int yes;
 	listener_item *j = NULL;
 
@@ -732,6 +732,7 @@ int listen_socket(const char *name, int listen_port, int socktype)
 	}
 
 	for (ptr = res; ptr != NULL; ptr = ptr->ai_next) {
+		int news;
 #ifndef HAVE_IPV6
 		if (ptr->ai_family != AF_INET)
 			continue;
@@ -747,11 +748,12 @@ int listen_socket(const char *name, int listen_port, int socktype)
 						 sizeof(topbuf)));
 		}
 
-		if ((s = socket(ptr->ai_family, ptr->ai_socktype,
+		if ((news = socket(ptr->ai_family, ptr->ai_socktype,
 				ptr->ai_protocol)) < 0) {
 			perror("socket() failed");
 			continue;
 		}
+		s = news; /* to not overwrite existing s from previous loops */
 #if defined(HAVE_IPV6) && !defined(_WIN32)
 		if (ptr->ai_family == AF_INET6) {
 			yes = 1;
