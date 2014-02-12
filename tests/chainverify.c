@@ -145,6 +145,63 @@ static const char *v1_invalid_check2[] = {
   NULL
 };
 
+static const char *pathlen_check[] = {
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIDGzCCAgOgAwIBAgIIUvuL4ymDgpEwDQYJKoZIhvcNAQELBQAwDjEMMAoGA1UE\n"
+  "AxMDQ0ExMCIYDzIwMTQwMjEyMTQ1NzQwWhgPOTk5OTEyMzEyMzU5NTlaMBExDzAN\n"
+  "BgNVBAMTBnNlcnZlcjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALkh\n"
+  "OTKvbV/OQcP9fn02UGzWNLGwS06248rOo+fHqCngf3nl/IefzktuI4Al5Qq9pq42\n"
+  "X2oLn/zr8kaO3L0rDcc54nVRuipfsw5nxAmwmjpfwnDgyla4Y88n57dhia/tmFlL\n"
+  "rpspg4YJ8Jt4/tGaNVS0OZ57LEoW7/OrqoGM7U3Xxa2QbzaNYMGcSt2ePvccCg13\n"
+  "+CJcXxOQcr/cUxyuk9neATJoulFtO8ycpmkLFUdi0WoThBjNCCJ8s7ZuvnGpF4vD\n"
+  "3fuvyM2ftiS08B2c5cv6FH9+4I7Elrb++TdVf43F0Awc2pLhm8L1fAuTtMjtbd9w\n"
+  "pxs0yaWR8IvQYbWM/XUCAwEAAaN2MHQwDAYDVR0TAQH/BAIwADATBgNVHSUEDDAK\n"
+  "BggrBgEFBQcDATAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBTlqmq9/mceVMMP\n"
+  "Z0HtoWZvHDc/tTAfBgNVHSMEGDAWgBRq1Eg1exmWS45j+lFklVwTQe5NsjANBgkq\n"
+  "hkiG9w0BAQsFAAOCAQEAAWX2f1XE/bR+DYCMaNAFpTjOFZ54eCBdazUqfVamPRoP\n"
+  "/8qyEYpMaA+IpHkJ5tXsx/rdKLgg1kNv/6bXyCwVgVcNBxpt05WUxqFG9xxLLz1K\n"
+  "UkbOZUA0/P9GqjRt9HeodP0Hqog1c1d4jgU3Ng7FIn5JXmLNVfl5qXfXCJ2S9WKu\n"
+  "pHw0M9TLOKUD2DD2T5K/iZAU0AXGRVUH39e+xsFIoawPWflfN5eNz8uikMQc+kxt\n"
+  "DdEMfPZidecToAcMolle53F7zZvqQswfla/3esb/bnndFAqIsnXRpi6Oj06ajzwE\n"
+  "TKP745KouHnNPZ3Hz1mPeusn4EJkLfTb5aBT3nJ+Kw==\n"
+  "-----END CERTIFICATE-----\n",
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIICmzCCAYMCCFL7i7wg78R3MA0GCSqGSIb3DQEBCwUAMA4xDDAKBgNVBAMTA0NB\n"
+  "MjAiGA8yMDE0MDIxMjE0NTcwMloYDzk5OTkxMjMxMjM1OTU5WjAOMQwwCgYDVQQD\n"
+  "EwNDQTEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDDS0OoKnGy/0Ju\n"
+  "U/Q+T3b5RR53oe24OoISkKE4Sia50aHeQZbYitIsQUEvMq06kdjaSA2p8qT29p9n\n"
+  "feDYsrhgZkWm4stp2EMkbbkB6k0hBobo4YQiQRa4ttYIsOWLMk/xR0z5ST+UoUv6\n"
+  "L/5IOxxJzdpUEbMJpM0Zp8AUZRKnXTc88a/zpPbYiO+LicdhlIKiUvIlnVTlvHOz\n"
+  "yN9y5o0Dry9i3IlDSTK8Ls54Nm6v7Z+1F1UwIXkYJCX0WxJ6w/4jHmbiRSitbH9s\n"
+  "UqSUm9sHCUakBJA3Y9/9K2SVWNJrG/G4LmZ+Zwr8NdZN3RrxQnWnudL4bTtM0WgY\n"
+  "QynV12XDAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAGJbRVVxERtx5Li15n1bdAzW\n"
+  "HaDNKt/TkUcZvnfdtggvZLkKhPiNWksQ+9jk1RS71dSZHT9Kb9bIVhaYzaHdI+hG\n"
+  "7coftkY66wjD9xLv2DyqnwvuR0S8Uhj9jas5xf/P9S79ZDk61Afg7yX8aLBJpJIH\n"
+  "citi1c65C8rYwB8zsF1Zbbh2/6Enty+eFhS1JOuEgUFP1oO2Nj2vh4IqR3yEGdGt\n"
+  "Tr57CD/C97fcaeRE4LlHJIMQ9toeZ5Fc9avnOzNIxJd7BPqWWvOnu3TWufj7uaq+\n"
+  "CcHTlq9h0NKf9dI1GsxbscJbO3+I+hzOwYfFcNrQ+8BFGbcwx9ZcS2xO3Rx9dbc=\n"
+  "-----END CERTIFICATE-----\n",
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIC6DCCAdCgAwIBAgIIUvuTdCOiZ3IwDQYJKoZIhvcNAQELBQAwDjEMMAoGA1UE\n"
+  "AxMDQ0EyMCIYDzIwMTQwMjEyMTUyOTU3WhgPOTk5OTEyMzEyMzU5NTlaMA4xDDAK\n"
+  "BgNVBAMTA0NBMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMGT87cJ\n"
+  "s9d+jgUk07eKV8rPXU32jgWo6ztrOCXD2tAvuw9sH1g/eNatatNU1efkICw0xezj\n"
+  "uVUl7dlt6XCpV0vy5djfLMU2lC3FQqHRaxznXx1dVeuVZVoSTpz3aW6AbTNlfCKK\n"
+  "8vndpjV2U8JHDSf2fGAVGQk3kdc2i46tBgCE8iaDIiOPsfQ43PogQxiWq0VuwPyc\n"
+  "gzeBBYw88LL3VqR4O9dCPqrSp5TDv8IRJsPa9y+POiU0pa6667lElRmPVFiab+tm\n"
+  "s9Y27ut3fOvzwadMWwaYr9cQNKkkqrjf0x7q02dGNDEtL26ZwGJMLPGMZxQFdU1O\n"
+  "AewGdCECHWY6Oh0CAwEAAaNGMEQwEgYDVR0TAQH/BAgwBgEB/wIBADAPBgNVHQ8B\n"
+  "Af8EBQMDBwQAMB0GA1UdDgQWBBTVa5E3/FqECiJqM3OnQasfCfLb4TANBgkqhkiG\n"
+  "9w0BAQsFAAOCAQEAtQudk32tQ30ldwLy5QyNzwpxTq1izycXGMkh3LvNUQrxmwzl\n"
+  "8EPi1d4bxdAi3ghwppImJPZ1aWOrSl9cxl7kH4clq/QdG6bKhhr/40ImZctV35fA\n"
+  "Kd1/aDlUUNQIv7cD/T8fb8rMmZ7RPoLsgLcVfodKwafY+X/y4ZacA2uF2L2dX37T\n"
+  "etQprA+hjeKu6rej9eb+ERZqYChDvp7FNbJ5fOnIZ9iG1Z714fUeuRDzvosJl6n8\n"
+  "aVIRHXdZbhCgKdJTR4bvFPGVFL86xLMkV7jhCImNBN9rmd59wD6g79nTUUoPDM3r\n"
+  "rpNkoLGmlBhUorRWbx0YAz9UojNdd4GWMefwZw==\n"
+  "-----END CERTIFICATE-----\n",
+  NULL
+};
+
 /* Triggers incorrect verification success on older versions */
 static const char *cve_2008_4989_chain[] = {
   /* chain[0] */
@@ -854,6 +911,9 @@ static struct
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5, 0 },
   { "v1ca fail", v1ca, &v1ca[2],
     GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
+
+  { "pathlen fail", pathlen_check, &pathlen_check[2],
+    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT | GNUTLS_VERIFY_DISABLE_TIME_CHECKS, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE},
 
   /* Test whether a V1 root certificate is correctly accepted */
   { "v1root fail", v1_invalid_check2, &v1_invalid_check2[1],
