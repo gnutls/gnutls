@@ -12,6 +12,9 @@ ciphersuites that are not GCM.
 ** libgnutls: When two initial keywords are specified then treat the
 second as having the '+' modifier.
 
+** libgnutls: Fixed bug that prevented the rejection of v1 intermediate
+CA certificates.
+
 ** API and ABI modifications:
 No changes since last version.
 
