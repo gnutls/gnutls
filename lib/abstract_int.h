@@ -85,7 +85,6 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t,
 				       gnutls_pubkey_t pubkey,
 				       const version_entry_st * ver,
 				       gnutls_sign_algorithm_t sign);
-int _gnutls_pubkey_is_over_rsa_512(gnutls_pubkey_t pubkey);
 int
 _gnutls_pubkey_get_mpis(gnutls_pubkey_t key, gnutls_pk_params_st * params);
 

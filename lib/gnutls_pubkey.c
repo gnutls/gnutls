@@ -1764,17 +1764,6 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 	return 0;
 }
 
-/* Returns zero if the public key has more than 512 bits */
-int _gnutls_pubkey_is_over_rsa_512(gnutls_pubkey_t pubkey)
-{
-	if (pubkey->pk_algorithm == GNUTLS_PK_RSA
-	    && _gnutls_mpi_get_nbits(pubkey->params.params[0]) > 512)
-		return 0;
-	else
-		return GNUTLS_E_INVALID_REQUEST;	/* doesn't matter */
-
-}
-
 /* Returns the public key. 
  */
 int
