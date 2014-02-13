@@ -1090,6 +1090,9 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 		if (providers[x].active == 0)
 			continue;
 
+		if (flags & SESSION_TRUSTED && providers[x].trusted == 0)
+			continue;
+
 		nslots = sizeof(slots) / sizeof(slots[0]);
 		ret = scan_slots(&providers[x], slots, &nslots);
 		if (ret < 0) {
@@ -1102,8 +1105,7 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			struct token_info tinfo;
 
 			if (pkcs11_get_token_info(module, slots[z],
-						  &tinfo.tinfo) != CKR_OK)
-			{
+						  &tinfo.tinfo) != CKR_OK) {
 				continue;
 			}
 			tinfo.sid = slots[z];
@@ -1646,6 +1648,8 @@ unsigned int pkcs11_obj_flags_to_int(unsigned int flags)
 		ret_flags |= SESSION_LOGIN;
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO)
 		ret_flags |= SESSION_LOGIN | SESSION_SO;
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE)
+		ret_flags |= SESSION_TRUSTED;
 
 	return ret_flags;
 }
@@ -3310,9 +3314,14 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
  *
  * This function will check whether the provided certificate is stored
  * in the specified token. This is useful in combination with 
- * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED or %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED,
+ * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED or 
+ * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED,
  * to check whether a CA is present or a certificate is blacklisted in
- * trust PKCS #11 modules.
+ * a trust PKCS #11 module.
+ *
+ * This function can be used with a @url of "pkcs11:", and in that case all modules
+ * will be searched. To restrict the modules to the marked as trusted in p11-kit
+ * use the %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE flag.
  *
  * Returns: If the certificate exists non-zero is returned, otherwise zero.
  *
