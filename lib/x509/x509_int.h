@@ -134,6 +134,11 @@ int _gnutls_parse_general_name(ASN1_TYPE src, const char *src_name,
 			       int seq, void *name, size_t * name_size,
 			       unsigned int *ret_type, int othername_oid);
 
+int
+_gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
+			   int seq, gnutls_datum_t *dname, 
+			   unsigned int *ret_type, int othername_oid);
+
 /* dsa.c */
 
 

@@ -1110,13 +1110,14 @@ inline static int is_type_printable(int type)
  * Type is also returned as a parameter in case of an error.
  */
 int
-_gnutls_parse_general_name(ASN1_TYPE src, const char *src_name,
-			   int seq, void *name, size_t * name_size,
+_gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
+			   int seq, gnutls_datum_t *dname, 
 			   unsigned int *ret_type, int othername_oid)
 {
-	int len;
+	int len, ret;
 	char nptr[ASN1_MAX_NAME_SIZE];
 	int result;
+	gnutls_datum_t tmp = {NULL, 0};
 	char choice_type[128];
 	gnutls_x509_subject_alt_name_t type;
 
@@ -1140,7 +1141,6 @@ _gnutls_parse_general_name(ASN1_TYPE src, const char *src_name,
 		return _gnutls_asn2err(result);
 	}
 
-
 	type = _gnutls_x509_san_find_type(choice_type);
 	if (type == (gnutls_x509_subject_alt_name_t) - 1) {
 		gnutls_assert();
@@ -1158,21 +1158,15 @@ _gnutls_parse_general_name(ASN1_TYPE src, const char *src_name,
 			_gnutls_str_cat(nptr, sizeof(nptr),
 					".otherName.value");
 
-		len = *name_size;
-		result = asn1_read_value(src, nptr, name, &len);
-		*name_size = len;
-
-		if (result == ASN1_MEM_ERROR)
-			return GNUTLS_E_SHORT_MEMORY_BUFFER;
-
-		if (result != ASN1_SUCCESS) {
+		ret = _gnutls_x509_read_value(src, nptr, &tmp);
+		if (ret < 0) {
 			gnutls_assert();
-			return _gnutls_asn2err(result);
+			return ret;
 		}
 
 		if (othername_oid) {
-			if ((unsigned) len > strlen(XMPP_OID)
-			    && strcmp(name, XMPP_OID) == 0)
+			if ((unsigned) tmp.size == (sizeof(XMPP_OID)-1)
+			    && memcmp(tmp.data, XMPP_OID, sizeof(XMPP_OID)-1) == 0)
 				type = GNUTLS_SAN_OTHERNAME_XMPP;
 		} else {
 			char oid[42];
@@ -1189,83 +1183,105 @@ _gnutls_parse_general_name(ASN1_TYPE src, const char *src_name,
 			result = asn1_read_value(src, nptr, oid, &len);
 			if (result != ASN1_SUCCESS) {
 				gnutls_assert();
-				return _gnutls_asn2err(result);
+				ret = _gnutls_asn2err(result);
+				goto cleanup;
 			}
 
-			if ((unsigned) len > strlen(XMPP_OID)
-			    && strcmp(oid, XMPP_OID) == 0) {
+			if ((unsigned) len == (sizeof(XMPP_OID)-1)
+			    && memcmp(oid, XMPP_OID, sizeof(XMPP_OID)-1) == 0) {
 				gnutls_datum_t out;
 
-				result =
+				ret =
 				    _gnutls_x509_decode_string
-				    (ASN1_ETYPE_UTF8_STRING, name,
-				     *name_size, &out);
-				if (result < 0) {
+				    (ASN1_ETYPE_UTF8_STRING, tmp.data,
+				     tmp.size, &out);
+				if (ret < 0) {
 					gnutls_assert();
-					return result;
+					goto cleanup;
 				}
 
-				if (*name_size <= out.size) {
-					gnutls_assert();
-					gnutls_free(out.data);
-					*name_size = len + 1;
-					return
-					    GNUTLS_E_SHORT_MEMORY_BUFFER;
-				}
+				dname->data = out.data;
+				dname->size = out.size;
 
-				*name_size = out.size;
-				memcpy(name, out.data, out.size);
-				/* null terminate it */
-				((char *) name)[*name_size] = 0;
-				gnutls_free(out.data);
+				/* out is already null terminated */
+				ret = type;
+				goto cleanup;
 			}
 		}
 	} else if (type == GNUTLS_SAN_DN) {
 		_gnutls_str_cat(nptr, sizeof(nptr), ".directoryName");
-		result = _gnutls_x509_parse_dn(src, nptr, name, name_size);
+		ret = _gnutls_x509_get_dn(src, nptr, dname);
 		if (result < 0) {
 			gnutls_assert();
-			return result;
+			goto cleanup;
 		}
-	} else if (othername_oid)
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	else {
-		size_t orig_name_size = *name_size;
-
+	} else if (othername_oid) {
+		gnutls_assert();
+		ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		goto cleanup;
+	} else {
 		_gnutls_str_cat(nptr, sizeof(nptr), ".");
 		_gnutls_str_cat(nptr, sizeof(nptr), choice_type);
 
-		len = *name_size;
-		result = asn1_read_value(src, nptr, name, &len);
-		*name_size = len;
-
-		if (result == ASN1_MEM_ERROR) {
-			if (is_type_printable(type))
-				(*name_size)++;
-			return GNUTLS_E_SHORT_MEMORY_BUFFER;
-		}
-
-		if (result != ASN1_SUCCESS) {
+		ret = _gnutls_x509_read_value(src, nptr, &tmp);
+		if (ret < 0) {
 			gnutls_assert();
-			return _gnutls_asn2err(result);
+			return ret;
 		}
 
 		if (is_type_printable(type)) {
-
-			if ((unsigned) len + 1 > orig_name_size) {
-				gnutls_assert();
-				(*name_size)++;
-				return GNUTLS_E_SHORT_MEMORY_BUFFER;
-			}
-
-			/* null terminate it */
-			if (name)
-				((char *) name)[*name_size] = 0;
+			/* _gnutls_x509_read_value() null terminates */
+			dname->size = tmp.size;
+			dname->data = tmp.data;
 		}
-
 	}
 
 	return type;
+
+ cleanup:
+	gnutls_free(tmp.data);
+	return ret;
+}
+
+/* returns the type and the name on success.
+ * Type is also returned as a parameter in case of an error.
+ */
+int
+_gnutls_parse_general_name(ASN1_TYPE src, const char *src_name,
+			   int seq, void *name, size_t * name_size,
+			   unsigned int *ret_type, int othername_oid)
+{
+	int ret;
+	gnutls_datum_t res = {NULL,0};
+	unsigned size_to_check, type;
+
+	ret = _gnutls_parse_general_name2(src, src_name, seq, &res, ret_type, othername_oid);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	type = ret;
+
+	if (is_type_printable(type)) {
+		size_to_check = res.size + 1;
+	} else {
+		size_to_check = res.size;
+	}
+
+	if ((unsigned) size_to_check > *name_size) {
+		gnutls_assert();
+		(*name_size) = size_to_check;
+		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+		goto cleanup;
+	}
+
+	if (name != NULL) {
+		memcpy(name, res.data, res.size);
+	}
+	*name_size = res.size;
+	ret = type;
+cleanup:
+	gnutls_free(res.data);
+	return ret;
 }
 
 static int
