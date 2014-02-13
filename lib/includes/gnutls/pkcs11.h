@@ -276,6 +276,7 @@ int gnutls_pkcs11_token_get_info(const char *url,
 				 void *output, size_t * output_size);
 
 #define GNUTLS_PKCS11_TOKEN_HW 1
+#define GNUTLS_PKCS11_TOKEN_TRUSTED (1<<1) /* p11-kit trusted */
 int gnutls_pkcs11_token_get_flags(const char *url, unsigned int *flags);
 
 int gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
