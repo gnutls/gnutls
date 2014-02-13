@@ -36,7 +36,11 @@
 #define MAX_TRIES 2
 
 static int sec_param[MAX_TRIES] =
+#ifdef ENABLE_FIPS140
+    { GNUTLS_SEC_PARAM_MEDIUM, GNUTLS_SEC_PARAM_HIGH };
+#else
     { GNUTLS_SEC_PARAM_LOW, GNUTLS_SEC_PARAM_MEDIUM };
+#endif
 
 static void tls_log_func(int level, const char *str)
 {
@@ -75,7 +79,8 @@ void doit(void)
 							  sec_param[i]),
 							 0);
 			if (ret < 0) {
-				fail("gnutls_x509_privkey_generate (%s): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm), gnutls_strerror(ret), ret);
+				fail("gnutls_x509_privkey_generate (%s-%d): %s (%d)\n", gnutls_pk_algorithm_get_name(algorithm),
+					gnutls_sec_param_to_pk_bits(algorithm,sec_param[i]), gnutls_strerror(ret), ret);
 			} else if (debug) {
 				success("Key[%s] generation ok: %d\n",
 					gnutls_pk_algorithm_get_name
