@@ -1108,6 +1108,13 @@ inline static int is_type_printable(int type)
 
 /* returns the type and the name on success.
  * Type is also returned as a parameter in case of an error.
+ *
+ * @seq: in case of GeneralNames it will return the corresponding name.
+ *       in case of GeneralName, it must be -1
+ * @dname: the name returned
+ * @ret_type: The type of the name
+ * @othername_oid: if the name is AnotherName return the OID
+ *
  */
 int
 _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
@@ -1121,12 +1128,16 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 	char choice_type[128];
 	gnutls_x509_subject_alt_name_t type;
 
-	seq++;			/* 0->1, 1->2 etc */
+	if (seq != -1) {
+		seq++;	/* 0->1, 1->2 etc */
 
-	if (src_name[0] != 0)
-		snprintf(nptr, sizeof(nptr), "%s.?%u", src_name, seq);
-	else
-		snprintf(nptr, sizeof(nptr), "?%u", seq);
+		if (src_name[0] != 0)
+			snprintf(nptr, sizeof(nptr), "%s.?%u", src_name, seq);
+		else
+			snprintf(nptr, sizeof(nptr), "?%u", seq);
+	} else {
+		snprintf(nptr, sizeof(nptr), "%s", src_name);
+	}
 
 	len = sizeof(choice_type);
 	result = asn1_read_value(src, nptr, choice_type, &len);

@@ -215,6 +215,11 @@ _gnutls_x509_ext_gen_number(const uint8_t * nuber, size_t nr_size,
 			    gnutls_datum_t * der_ext);
 
 
+int
+_gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
+		       gnutls_x509_subject_alt_name_t type,
+		       const void *data, unsigned int data_size);
+
 int _gnutls_x509_ext_gen_basicConstraints(int CA, int pathLenConstraint,
 					  gnutls_datum_t * der_ext);
 int _gnutls_x509_ext_gen_keyUsage(uint16_t usage,

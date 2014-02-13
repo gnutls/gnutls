@@ -943,6 +943,15 @@ GNUTLS_3_1_0 {
 	gnutls_privkey_verify_params;
 	gnutls_pubkey_verify_params;
 	gnutls_db_get_default_cache_expiration;
+	gnutls_x509_name_constraints_init;
+	gnutls_x509_name_constraints_deinit;
+	gnutls_x509_crt_get_name_constraints;
+	gnutls_x509_name_constraints_add_permitted;
+	gnutls_x509_name_constraints_add_excluded;
+	gnutls_x509_crt_set_name_constraints;
+	gnutls_x509_name_constraints_get_permitted;
+	gnutls_x509_name_constraints_get_excluded;
+	gnutls_x509_name_constraints_check;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

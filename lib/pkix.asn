@@ -655,4 +655,15 @@ CRLReason ::= ENUMERATED {
      privilegeWithdrawn      (9),
      aACompromise           (10) }
 
+NameConstraints ::= SEQUENCE {
+     permittedSubtrees       [0]     GeneralSubtrees OPTIONAL,
+     excludedSubtrees        [1]     GeneralSubtrees OPTIONAL }
+
+GeneralSubtrees ::= SEQUENCE SIZE (1..MAX) OF GeneralSubtree
+
+GeneralSubtree ::= SEQUENCE {
+     base                    GeneralName,
+     minimum         [0]     INTEGER DEFAULT 0,
+     maximum         [1]     INTEGER OPTIONAL }
+
 END

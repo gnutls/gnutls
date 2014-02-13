@@ -820,20 +820,14 @@ int _gnutls_x509_ext_gen_keyUsage(uint16_t usage, gnutls_datum_t * der_ext)
 	return 0;
 }
 
-static int
-write_new_general_name(ASN1_TYPE ext, const char *ext_name,
+int
+_gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
 		       gnutls_x509_subject_alt_name_t type,
 		       const void *data, unsigned int data_size)
 {
 	const char *str;
 	int result;
 	char name[128];
-
-	result = asn1_write_value(ext, ext_name, "NEW", 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
 
 	switch (type) {
 	case GNUTLS_SAN_DNSNAME:
@@ -853,6 +847,38 @@ write_new_general_name(ASN1_TYPE ext, const char *ext_name,
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
+	result = asn1_write_value(ext, ext_name, str, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	snprintf(name, sizeof(name), "%s.%s", ext_name, str);
+
+	result = asn1_write_value(ext, name, data, data_size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&ext);
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+static int
+write_new_general_name(ASN1_TYPE ext, const char *ext_name,
+		       gnutls_x509_subject_alt_name_t type,
+		       const void *data, unsigned int data_size)
+{
+	int result;
+	char name[128];
+
+	result = asn1_write_value(ext, ext_name, "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
 	if (ext_name[0] == 0) {	/* no dot */
 		_gnutls_str_cpy(name, sizeof(name), "?LAST");
 	} else {
@@ -860,20 +886,11 @@ write_new_general_name(ASN1_TYPE ext, const char *ext_name,
 		_gnutls_str_cat(name, sizeof(name), ".?LAST");
 	}
 
-	result = asn1_write_value(ext, name, str, 1);
-	if (result != ASN1_SUCCESS) {
+	result = _gnutls_write_general_name(ext, name, type,
+		data, data_size);
+	if (result < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	_gnutls_str_cat(name, sizeof(name), ".");
-	_gnutls_str_cat(name, sizeof(name), str);
-
-	result = asn1_write_value(ext, name, data, data_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
+		return result;
 	}
 
 	return 0;

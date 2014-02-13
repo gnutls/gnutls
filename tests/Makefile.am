@@ -74,7 +74,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-dtls-srtp mini-xssl rsa-encrypt-decrypt mini-loss-time \
 	 mini-record mini-dtls-record mini-handshake-timeout mini-record-range \
 	 mini-cert-status mini-rsa-psk global-init sec-params \
-	 fips-test mini-global-load
+	 fips-test mini-global-load name-constraints
 
 if ENABLE_OCSP
 ctests += ocsp

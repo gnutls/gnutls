@@ -233,6 +233,33 @@ int gnutls_x509_crt_get_authority_info_access(gnutls_x509_crt_t
 					      data, unsigned int
 					      *critical);
 
+typedef struct gnutls_name_constraints_st *gnutls_x509_name_constraints_t;
+
+unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
+				       gnutls_x509_subject_alt_name_t type,
+				       const gnutls_datum_t * name);
+
+int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc);
+void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc);
+int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
+					 gnutls_x509_name_constraints_t nc,
+					 unsigned int *critical);
+int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t nc,
+					       gnutls_x509_subject_alt_name_t type,
+					       const gnutls_datum_t * name);
+int gnutls_x509_name_constraints_add_excluded(gnutls_x509_name_constraints_t nc,
+					      gnutls_x509_subject_alt_name_t type,
+					      const gnutls_datum_t * name);
+int gnutls_x509_crt_set_name_constraints(gnutls_x509_crt_t crt, 
+					 gnutls_x509_name_constraints_t nc);
+int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t nc,
+				     unsigned idx,
+				     unsigned *type, gnutls_datum_t * name);
+int gnutls_x509_name_constraints_get_excluded(gnutls_x509_name_constraints_t nc,
+				     unsigned idx,
+				     unsigned *type, gnutls_datum_t * name);
+
+
 #define GNUTLS_CRL_REASON_SUPERSEEDED GNUTLS_CRL_REASON_SUPERSEDED,
   /**
    * gnutls_x509_crl_reason_flags_t:
