@@ -44,6 +44,8 @@
 
 struct gnutls_pkcs11_provider_s {
 	struct ck_function_list *module;
+	unsigned trusted; /* in the sense of p11-kit trusted:
+	                   * it can be used for verification */
 	struct ck_info info;
 	unsigned int initialized;
 };
@@ -219,6 +221,9 @@ pkcs11_add_module(const char *name, struct ck_function_list *module)
 
 	active_providers++;
 	providers[active_providers - 1].module = module;
+
+	if (p11_kit_module_get_flags(module) & P11_KIT_MODULE_TRUSTED)
+		providers[active_providers - 1].trusted = 1;
 
 	memcpy(&providers[active_providers - 1].info, &info, sizeof(info));
 
