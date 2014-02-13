@@ -53,6 +53,7 @@ struct gnutls_pkcs11_provider_s {
 struct find_flags_data_st {
 	struct p11_kit_uri *info;
 	unsigned int slot_flags;
+	unsigned int trusted;
 };
 
 struct find_url_data_st {
@@ -2796,7 +2797,10 @@ find_flags(struct pkcs11_session_info *sinfo,
 	}
 
 	/* found token! */
-
+	if (p11_kit_module_get_flags(sinfo->module) & P11_KIT_MODULE_TRUSTED)
+		find_data->trusted = 1;
+	else
+		find_data->trusted = 0;
 	find_data->slot_flags = info->sinfo.flags;
 
 	return 0;
@@ -2808,7 +2812,8 @@ find_flags(struct pkcs11_session_info *sinfo,
  * @flags: The output flags (GNUTLS_PKCS11_TOKEN_*)
  *
  * This function will return information about the PKCS 11 token flags.
- * The flags from the %gnutls_pkcs11_token_info_t enumeration.
+ *
+ * The supported flags are: %GNUTLS_PKCS11_TOKEN_HW and %GNUTLS_PKCS11_TOKEN_TRUSTED.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  *
@@ -2839,6 +2844,9 @@ int gnutls_pkcs11_token_get_flags(const char *url, unsigned int *flags)
 	*flags = 0;
 	if (find_data.slot_flags & CKF_HW_SLOT)
 		*flags |= GNUTLS_PKCS11_TOKEN_HW;
+
+	if (find_data.trusted != 0)
+		*flags |= GNUTLS_PKCS11_TOKEN_TRUSTED;
 
 	return 0;
 
