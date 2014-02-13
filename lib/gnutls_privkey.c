@@ -583,6 +583,7 @@ gnutls_privkey_generate(gnutls_privkey_t pkey,
 	ret = gnutls_x509_privkey_generate(pkey->key.x509, algo, bits, flags);
 	if (ret < 0) {
 		gnutls_x509_privkey_deinit(pkey->key.x509);
+		pkey->key.x509 = NULL;
 		return gnutls_assert_val(ret);
 	}
 
