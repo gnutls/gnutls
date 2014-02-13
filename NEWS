@@ -14,7 +14,9 @@ ciphersuites that are not GCM.
 second as having the '+' modifier.
 
 ** libgnutls:  When using a PKCS #11 module for verification ensure that
-it has been marked a trusted policy module in p11-kit.
+it has been marked a trusted policy module in p11-kit. Moreover, when an
+empty (i.e., "pkcs11:") URL is specified, then try all trusted modules
+in the system for verification.
 http://p11-glue.freedesktop.org/doc/p11-kit/pkcs11-conf.html
 
 ** libgnutls: Fixed bug that prevented the rejection of v1 intermediate
