@@ -1023,8 +1023,7 @@ _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
 	}
 
 	if (etype == ASN1_ETYPE_BIT_STRING) {
-		len /= 8;
-		len++;
+		len = (len + 7)/8;
 	}
 
 	tmp = gnutls_malloc((size_t) len + 1);
@@ -1042,12 +1041,11 @@ _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
 	}
 
 	if (etype == ASN1_ETYPE_BIT_STRING) {
-		ret->size = len / 8;
-		if (len % 8 > 0)
-			ret->size++;
+		ret->size = (len+7) / 8;
 	} else
 		ret->size = (unsigned) len;
 
+	tmp[ret->size] = 0;
 	ret->data = tmp;
 
 	return 0;
