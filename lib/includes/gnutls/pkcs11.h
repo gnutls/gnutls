@@ -97,11 +97,12 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
 #define GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO (1<<3)	/* force login as a security officer in the token for the operation */
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE (1<<4)	/* marked as private (requires PIN to access) */
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE (1<<5)	/* marked as not private */
-#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY (1<<6) /* No need for the certificate to be a trusted one */
-#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED (1<<7) /* The certificate must be marked as trusted 
+#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY (1<<6) /* No need for the object to be a trusted one */
+#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED (1<<7) /* The object must be marked as trusted 
 	* in gnutls_pkcs11_crt_is_known() it implies GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_COMPARE */
-#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED (1<<8) /* The certificate must be marked as distrusted */
-#define GNUTLS_PKCS11_OBJ_FLAG_COMPARE (1<<9) /* The certificate must be fully compared */
+#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED (1<<8) /* The object must be marked as distrusted */
+#define GNUTLS_PKCS11_OBJ_FLAG_COMPARE (1<<9) /* The object must be fully compared */
+#define GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE (1<<10) /* The object must be present in a marked as trusted module */
 
 /**
  * gnutls_pkcs11_url_type_t:
