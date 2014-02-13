@@ -942,7 +942,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 
 	/* check against issuer */
 	ret = gnutls_pkcs11_get_raw_issuer(url, certificate_list[clist_size - 1],
-		&raw_issuer, GNUTLS_X509_FMT_DER, 0);
+		&raw_issuer, GNUTLS_X509_FMT_DER, GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 	if (ret < 0) {
 		gnutls_assert();
 		status |= GNUTLS_CERT_INVALID;
