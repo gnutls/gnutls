@@ -41,12 +41,42 @@ static const gnutls_datum_t bad_data = {
 	.size = sizeof(DATASTR) - 2
 };
 
+static const char rsa_key[] =
+ "-----BEGIN RSA PRIVATE KEY-----\n"
+ "MIIBOgIBAAJBAKM6KQdDzLVKeKrAWHjY69wh2j2ouvVq1V1NktkbfpDAqXWFxGlV\n"
+ "deFp8yWWH6zYNxXhtplVuYDQkPTupD3kd2ECAwEAAQJAWgIZW8s0WAgf8DCu2Lzt\n"
+ "mu8D9JpVtj1aOOAtCRGTQmhJcx/HTTDe0m1mppM81rpd+Gs4JoWT0kCsCgaenbCU\n"
+ "rQIhAMCycveYvrVZg1yubw0e/UZaCltb9Stqv2iObR029KlHAiEA2NlWCT1PKAsy\n"
+ "V0dJ1/4wI43dxS+xejtLt5nLeGPNrhcCIG5v12P/rozQ2HBtqEek0xNW10i00zYm\n"
+ "37xUpERyEpZRAiEAnH8VMWvWsZ6LASQIreHbWf1rXICUBBPBDEro5gSZDpcCICEk\n"
+ "Y8EN+ycYePTcrVTEQjlnLqOZZEnC7cf/WV8UTWV5\n"
+ "-----END RSA PRIVATE KEY-----\n";
+
+static const char ecc_key[] =
+ "-----BEGIN EC PRIVATE KEY-----\n"
+ "MHgCAQEEIQDzaOg65+brGV6INN0zXrUodxwRuocGG+GtKzN7ko26v6AKBggqhkjO\n"
+ "PQMBB6FEA0IABEppi34ngyNQ2a9kJmnT5QxIHAUGI1SpnsAyCfze4j6MJ7o/g7qx\n"
+ "MSHpe5vd0TQz+/GAa1zxle8mB/Cdh0JaTrA=\n"
+ "-----END EC PRIVATE KEY-----\n";
+
+static const char dsa_key[] =
+ "-----BEGIN DSA PRIVATE KEY-----\n"
+ "MIH4AgEAAkEA6KUOSXfFNcInFLPdOlLlKNCe79zJrkxnsQN+lllxuk1ifZrE07r2\n"
+ "3edTrc4riQNnZ2nZ372tYUAMJg+5jM6IIwIVAOa58exwZ+42Tl+p3b4Kbpyu2Ron\n"
+ "AkBocj7gkiBYHtv6HMIIzooaxn4vpGR0Ns6wBfroBUGvrnSAgfT3WyiNaHkIF28e\n"
+ "quWcEeOJjUgFvatcM8gcY288AkEAyKWlgzBurIYST8TM3j4PuQJDTvdHDaGoAUAa\n"
+ "EfjmOw2UXKwqTmwPiT5BYKgCo2ILS87ttlTpd8vndH37pmnmVQIUQIVuKpZ8y9Bw\n"
+ "VzO8qcrLCFvTOXY=\n"
+ "-----END DSA PRIVATE KEY-----\n";
+
+
 static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 			unsigned bits, gnutls_digest_algorithm_t ign)
 {
 	int ret;
 	gnutls_datum_t enc = { NULL, 0 };
 	gnutls_datum_t dec = { NULL, 0 };
+	gnutls_datum_t raw_rsa_key = { (void*)rsa_key, sizeof(rsa_key)-1 };
 	gnutls_privkey_t key;
 	gnutls_pubkey_t pub = NULL;
 
@@ -60,7 +90,7 @@ static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 		goto cleanup;
 	}
 
-	ret = gnutls_privkey_generate(key, pk, bits, 0);
+	ret = gnutls_privkey_import_x509_raw(key, &raw_rsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -114,6 +144,9 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 {
 	int ret;
 	gnutls_datum_t sig = { NULL, 0 };
+	gnutls_datum_t raw_rsa_key = { (void*)rsa_key, sizeof(rsa_key)-1 };
+	gnutls_datum_t raw_dsa_key = { (void*)dsa_key, sizeof(dsa_key)-1 };
+	gnutls_datum_t raw_ecc_key = { (void*)ecc_key, sizeof(ecc_key)-1 };
 	gnutls_privkey_t key;
 	gnutls_pubkey_t pub = NULL;
 	char param_name[32];
@@ -136,7 +169,17 @@ static int test_sig(gnutls_pk_algorithm_t pk,
 		goto cleanup;
 	}
 
-	ret = gnutls_privkey_generate(key, pk, bits, 0);
+	if (pk == GNUTLS_PK_RSA) {
+		ret = gnutls_privkey_import_x509_raw(key, &raw_rsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	} else if (pk == GNUTLS_PK_DSA) {
+		ret = gnutls_privkey_import_x509_raw(key, &raw_dsa_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	} else if (pk == GNUTLS_PK_ECC) {
+		ret = gnutls_privkey_import_x509_raw(key, &raw_ecc_key, GNUTLS_X509_FMT_PEM, NULL, 0);
+	} else {
+		gnutls_assert();
+		ret = GNUTLS_E_INTERNAL_ERROR;
+	}
+
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
