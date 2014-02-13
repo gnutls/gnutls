@@ -883,25 +883,6 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 	unsigned int status = 0, i;
 	gnutls_x509_crt_t issuer = NULL;
 	gnutls_datum_t raw_issuer = {NULL, 0};
-	unsigned int is_token_ok = 0;
-	size_t t;
-
-	t = sizeof(is_token_ok);
-	ret = gnutls_pkcs11_token_get_info(url, GNUTLS_PKCS11_TOKEN_TRUSTED_UINT,
-		&is_token_ok, &t);
-	if (ret < 0) {
-		_gnutls_debug_log("Cannot allow verifying against a token it's trust status cannot be determined\n");
-		gnutls_assert();
-		status |= GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND;
-		return status;
-	}
-
-	if (is_token_ok == 0) {
-		_gnutls_debug_log("Cannot allow verifying against a token that is not a trust module\n");
-		gnutls_assert();
-		status |= GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND;
-		return status;
-	}
 
 	if (clist_size > 1) {
 		/* Check if the last certificate in the path is self signed.
@@ -932,6 +913,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 
 	for (; i < clist_size; i++) {
 		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
+			GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
 			GNUTLS_PKCS11_OBJ_FLAG_COMPARE|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED) != 0) {
 			clist_size = i;
 			break;
@@ -948,6 +930,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 	/* check for blacklists */
 	for (i = 0; i < clist_size; i++) {
 		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
+			GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
 			GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) != 0) {
 			status |= GNUTLS_CERT_INVALID;
 			status |= GNUTLS_CERT_REVOKED;
