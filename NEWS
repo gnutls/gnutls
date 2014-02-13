@@ -23,7 +23,8 @@ CA certificates. Reported and investigated by Suman Jana.
 ** certtool: Added the --ask-pass option.
 
 ** API and ABI modifications:
-GNUTLS_PKCS11_TOKEN_TRUSTED_UINT: Added
+GNUTLS_PKCS11_TOKEN_TRUSTED: Added
+GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE: Added
 
 
 * Version 3.2.10 (released 2014-01-31)
