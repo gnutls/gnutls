@@ -703,10 +703,6 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
  *   unless you know what this means.
  * @GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS: If set a signer in the trusted
  *   list is never checked for expiration or activation.
- * @GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT: Allow trusted CA certificates
- *   with version 1. This is safer than %GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT,
- *   and should be used instead. That way only signers in your trusted list
- *   will be allowed to have certificates of version 1. This is the default.
  * @GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT: Do not allow trusted CA
  *   certificates that have version 1.  This option is to be used
  *   to deprecate all certificates of version 1.
@@ -721,8 +717,7 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
  * @GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT: Allow CA certificates that
  *   have version 1 (both root and intermediate). This might be
  *   dangerous since those haven't the basicConstraints
- *   extension. Must be used in combination with
- *   %GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT.
+ *   extension. 
  * @GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2: Allow certificates to be signed
  *   using the broken MD2 algorithm.
  * @GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5: Allow certificates to be signed
