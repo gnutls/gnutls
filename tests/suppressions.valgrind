@@ -214,6 +214,7 @@
 {
    nettle memxor3
    Memcheck:Addr8
-   obj:*
    fun:memxor3
+   obj:*
 }
+
