@@ -739,7 +739,6 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
  */
 typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DISABLE_CA_SIGN = 1 << 0,
-	GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT = 1 << 1,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_SAME = 1 << 2,
 	GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 1 << 3,
 	GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 1 << 4,

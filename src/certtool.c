@@ -2343,9 +2343,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 	ret =
 	    gnutls_x509_trust_list_verify_crt(list, x509_cert_list,
 					      x509_ncerts,
-					      GNUTLS_VERIFY_DO_NOT_ALLOW_SAME
-					      |
-					      GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
+					      GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
 					      &output,
 					      detailed_verification);
 	if (ret < 0) {

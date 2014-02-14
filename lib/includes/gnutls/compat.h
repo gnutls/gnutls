@@ -113,6 +113,9 @@ typedef gnutls_datum_t gnutls_datum _GNUTLS_GCC_ATTR_DEPRECATED;
 typedef gnutls_transport_ptr_t gnutls_transport_ptr
     _GNUTLS_GCC_ATTR_DEPRECATED;
 
+/* Old verification flags */
+#define GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT  (0)
+
 /* Old SRP alerts removed in 2.1.x because the TLS-SRP RFC was
    modified to use the PSK alert. */
 #define GNUTLS_A_MISSING_SRP_USERNAME GNUTLS_A_UNKNOWN_PSK_IDENTITY

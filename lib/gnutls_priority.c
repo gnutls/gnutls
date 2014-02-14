@@ -857,14 +857,12 @@ static void enable_server_precedence(gnutls_priority_t c)
 {
 	c->server_precedence = 1;
 }
-static void enable_verify_allow_v1_ca_crt(gnutls_priority_t c)
-{
-	c->additional_verify_flags |=
-		GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
-}
 static void enable_new_padding(gnutls_priority_t c)
 {
 	c->new_record_padding = 1;
+}
+static void dummy_func(gnutls_priority_t c)
+{
 }
 
 #include <priority_options.h>

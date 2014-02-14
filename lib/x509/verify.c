@@ -847,7 +847,6 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 		 * certificates can exist in a supplied chain.
 		 */
 		if (!(flags & GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT)) {
-			flags &= ~(GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 			flags |= GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT;
 		}
 		if ((ret =
