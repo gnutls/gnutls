@@ -124,7 +124,7 @@ gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
 					flags);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);
-		goto cleanup;
+		goto cleanup_crt;
 	}
 
 	for (i = 0; i < *pcert_max; i++) {
@@ -138,14 +138,15 @@ gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
 	ret = 0;
 	goto cleanup;
 
-      cleanup_pcert:
+ cleanup_pcert:
 	for (j = 0; j < i; j++)
 		gnutls_pcert_deinit(&pcerts[j]);
 
-      cleanup:
+ cleanup:
 	for (i = 0; i < *pcert_max; i++)
 		gnutls_x509_crt_deinit(crt[i]);
-
+ 
+ cleanup_crt:
 	gnutls_free(crt);
 	return ret;
 
