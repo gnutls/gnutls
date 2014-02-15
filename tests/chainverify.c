@@ -49,7 +49,7 @@ static time_t mytime(time_t * t)
 
 /* *INDENT-OFF* */
 
-static const char *v1_invalid_check[] = {
+static const char *v1_intermed_check[] = {
   "-----BEGIN CERTIFICATE-----\n"
   "MIIDGzCCAgOgAwIBAgIIUvuL4ymDgpEwDQYJKoZIhvcNAQELBQAwDjEMMAoGA1UE\n"
   "AxMDQ0ExMCIYDzIwMTQwMjEyMTQ1NzQwWhgPOTk5OTEyMzEyMzU5NTlaMBExDzAN\n"
@@ -106,7 +106,7 @@ static const char *v1_invalid_check[] = {
   NULL
 };
 
-static const char *v1_invalid_check2[] = {
+static const char *v1_root_check[] = {
   "-----BEGIN CERTIFICATE-----\n"
   "MIIDGzCCAgOgAwIBAgIIUvuL4ymDgpEwDQYJKoZIhvcNAQELBQAwDjEMMAoGA1UE\n"
   "AxMDQ0ExMCIYDzIwMTQwMjEyMTQ1NzQwWhgPOTk5OTEyMzEyMzU5NTlaMBExDzAN\n"
@@ -916,15 +916,15 @@ static struct
     GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT | GNUTLS_VERIFY_DISABLE_TIME_CHECKS, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE},
 
   /* Test whether a V1 root certificate is correctly accepted */
-  { "v1root fail", v1_invalid_check2, &v1_invalid_check2[1],
+  { "v1root fail", v1_root_check, &v1_root_check[1],
     GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT | GNUTLS_VERIFY_DISABLE_TIME_CHECKS, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
-  { "v1root ok", v1_invalid_check2, &v1_invalid_check[1],
+  { "v1root ok", v1_root_check, &v1_root_check[1],
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS, 0 },
 
   /* test whether a v1 intermediate certificate is rejected */
-  { "v1invalid fail", v1_invalid_check, &v1_invalid_check[2],
+  { "v1invalid fail", v1_intermed_check, &v1_intermed_check[2],
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
-  { "v1 leaf ok", &v1_invalid_check[1], &v1_invalid_check[2],
+  { "v1 leaf ok", &v1_intermed_check[1], &v1_intermed_check[2],
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS, 0 },
 
   { "v1ca expired", v1ca, &v1ca[2],
