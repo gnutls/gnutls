@@ -123,7 +123,7 @@ gnutls_x509_crt_t *crt;
   if (ret < 0)
     {
       ret = gnutls_assert_val(ret);
-      goto cleanup;
+      goto cleanup_crt;
     }
   
   for (i=0;i<*pcert_max;i++)
@@ -147,9 +147,9 @@ cleanup:
   for (i=0;i<*pcert_max;i++)
     gnutls_x509_crt_deinit(crt[i]);
 
+cleanup_crt:
   gnutls_free(crt);
   return ret;
-
 }
 
 /**
