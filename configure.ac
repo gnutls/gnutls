@@ -319,7 +319,7 @@ AC_ARG_WITH(p11-kit,
 	AS_HELP_STRING([--without-p11-kit],
 		[Build without p11-kit and PKCS#11 support]))
 if test "$with_p11_kit" != "no"; then
-	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= 0.11], [with_p11_kit=yes], [with_p11_kit=no])
+	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= 0.20.0], [with_p11_kit=yes], [with_p11_kit=no])
 	if test "$with_p11_kit" != "no";then
 		AC_DEFINE([ENABLE_PKCS11], 1, [Build PKCS#11 support])
 		if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
