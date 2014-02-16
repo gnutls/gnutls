@@ -3,6 +3,15 @@ Copyright (C) 2000-2012 Free Software Foundation, Inc.
 Copyright (C) 2013 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.12 (unreleased)
+
+** libgnutls: Corrected issue in gnutls_pcert_list_import_x509_raw
+when provided with invalid data. Reported by Dmitriy Anisimkov.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.11 (released 2014-02-13)
 
 ** libgnutls: Tolerate servers that send the SUPPORTED ECC extension.
