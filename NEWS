@@ -25,6 +25,10 @@ certificate verification profile is automatically set.
 strings to corresponding defaults. The %COMPAT keyword is extended
 to revert to old defaults, by reducing the overall security level.
 
+** libgnutls: Added support for the name constraints PKIX extension.
+This extension is not currently being used when verifying
+certificates.
+
 ** libgnutls: The initialization of the library was moved to a
 constructor. That is, gnutls_global_init() is no longer required
 unless linking with a static library or a system that does not
@@ -90,6 +94,15 @@ gnutls_privkey_import_ecc_raw: Added
 gnutls_privkey_import_dsa_raw: Added
 gnutls_privkey_import_rsa_raw: Added
 gnutls_privkey_verify_params: Added
+gnutls_x509_name_constraints_init: Added
+gnutls_x509_name_constraints_deinit: Added
+gnutls_x509_crt_get_name_constraints: Added
+gnutls_x509_name_constraints_add_permitted: Added
+gnutls_x509_name_constraints_add_excluded: Added
+gnutls_x509_crt_set_name_constraints: Added
+gnutls_x509_name_constraints_get_permitted: Added
+gnutls_x509_name_constraints_get_excluded: Added
+gnutls_x509_name_constraints_check: Added
 gnutls_digest_self_test: Added (conditionally)
 gnutls_mac_self_test: Added (conditionally)
 gnutls_pk_self_test: Added (conditionally)
