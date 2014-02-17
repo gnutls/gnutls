@@ -857,10 +857,6 @@ static void enable_server_precedence(gnutls_priority_t c)
 {
 	c->server_precedence = 1;
 }
-static void enable_new_padding(gnutls_priority_t c)
-{
-	c->new_record_padding = 1;
-}
 static void dummy_func(gnutls_priority_t c)
 {
 }

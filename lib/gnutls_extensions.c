@@ -42,7 +42,6 @@
 #include <ext/srtp.h>
 #include <ext/alpn.h>
 #include <ext/dumbfw.h>
-#include <ext/new_record_padding.h>
 #include <gnutls_num.h>
 
 
@@ -336,10 +335,6 @@ int _gnutls_ext_init(void)
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 #endif
-
-	ret = _gnutls_ext_register(&ext_mod_new_record_padding);
-	if (ret != GNUTLS_E_SUCCESS)
-		return ret;
 
 	ret = _gnutls_ext_register(&ext_mod_session_ticket);
 	if (ret != GNUTLS_E_SUCCESS)

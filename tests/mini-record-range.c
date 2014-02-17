@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if defined(_WIN32)
+#if 1
 
 int main()
 {
@@ -358,7 +358,7 @@ static void start(const char *prio)
 	}
 }
 
-#define AES_CBC "NORMAL:+ANON-ECDH:+CURVE-ALL:%NEW_PADDING"
+#define AES_CBC "NORMAL:+ANON-ECDH:+CURVE-ALL"
 
 static void ch_handler(int sig)
 {

@@ -83,9 +83,6 @@ unsigned int get_total_headers(gnutls_session_t session)
 	record_parameters_st *params;
 	unsigned total = RECORD_HEADER_SIZE(session);
 
-	if (session->security_parameters.new_record_padding)
-		total += 2;
-
 	ret = _gnutls_epoch_get(session, EPOCH_WRITE_CURRENT, &params);
 	if (ret < 0) {
 		return total;
@@ -98,9 +95,6 @@ inline static
 unsigned int get_total_headers2(gnutls_session_t session, record_parameters_st *params)
 {
 	unsigned total = RECORD_HEADER_SIZE(session);
-
-	if (session->security_parameters.new_record_padding)
-		total += 2;
 
 	return total + _gnutls_cipher_get_explicit_iv_size(params->cipher);
 }

@@ -548,9 +548,6 @@ typedef struct {
 	uint8_t session_id_size;
 	time_t timestamp;
 
-	/* if non-zero the new record padding is used */
-	uint8_t new_record_padding;
-
 	/* The send size is the one requested by the programmer.
 	 * The recv size is the one negotiated with the peer.
 	 */
@@ -582,7 +579,6 @@ struct record_state_st {
 	auth_cipher_hd_st cipher_state;
 	comp_hd_st compression_state;
 	uint64 sequence_number;
-	uint8_t new_record_padding;
 };
 
 
@@ -644,7 +640,6 @@ struct gnutls_priority_st {
 	/* to disable record padding */
 	bool no_extensions;
 	bool allow_large_records;
-	bool new_record_padding;
 	unsigned int max_empty_records;
 	unsigned int dumbfw;
 	safe_renegotiation_t sr;
@@ -1052,9 +1047,6 @@ inline static size_t max_user_send_size(gnutls_session_t session,
 	else {
 		max = session->security_parameters.max_record_send_size;
 		/* DTLS data MTU accounts for those */
-
-		if (record_params->write.new_record_padding != 0)
-			max -= 2;
 
 		if (_gnutls_cipher_is_block(record_params->cipher))
 			max -=

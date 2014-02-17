@@ -1081,12 +1081,6 @@ This is the default.
 @item %LATEST_RECORD_VERSION @tab
 will use the latest TLS version record version in client hello.
 
-@item %NEW_PADDING @tab
-will enable the new padding extension negotiation. If the new padding extension
-is negotiated, GnuTLS will use a more efficient length-hiding mechanism.
-Use @funcref{gnutls_record_can_use_length_hiding} to check whether length-hiding
-can be used in the current session. This is a GnuTLS extension to the protocol.
-
 @end multitable
 @caption{Special priority string keywords.}
 @end float

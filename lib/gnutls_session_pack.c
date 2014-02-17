@@ -769,8 +769,6 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_APPEND_NUM(ps,
 			  session->security_parameters.
 			  max_record_recv_size);
-	BUFFER_APPEND(ps, &session->security_parameters.new_record_padding,
-		      1);
 	BUFFER_APPEND_NUM(ps, session->security_parameters.ecc_curve);
 
 	BUFFER_APPEND_NUM(ps,
@@ -854,10 +852,6 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
 		       max_record_recv_size);
-
-	BUFFER_POP(ps,
-		   &session->internals.resumed_security_parameters.
-		   new_record_padding, 1);
 
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
