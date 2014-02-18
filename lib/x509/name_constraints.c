@@ -109,7 +109,7 @@ static int extract_name_constraints(ASN1_TYPE c2, const char *vstr,
  * gnutls_x509_crt_get_name_constraints:
  * @crt: should contain a #gnutls_x509_crt_t structure
  * @nc: The nameconstraints intermediate structure
- * @append: whether the constraints from the certificate will be set or appended
+ * @flags: zero or %GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND
  * @critical: the extension status
  *
  * This function will return an intermediate structure containing
@@ -117,7 +117,8 @@ static int extract_name_constraints(ASN1_TYPE c2, const char *vstr,
  * structure can be used in combination with gnutls_x509_name_constraints_check()
  * to verify whether a server's name is in accordance with the constraints.
  *
- * When the @append flag is set to 1, then if the @nc structure is empty
+ * When the @flags is set to %GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND, then if 
+ * the @nc structure is empty
  * this function will behave identically as if the flag was not set.
  * Otherwise if there are elements in the @nc structure then only the
  * excluded constraints will be appended to the constraints.
@@ -131,7 +132,7 @@ static int extract_name_constraints(ASN1_TYPE c2, const char *vstr,
  **/
 int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 					 gnutls_x509_name_constraints_t nc,
-					 unsigned int append,
+					 unsigned int flags,
 					 unsigned int *critical)
 {
 	int result, ret;
@@ -167,7 +168,7 @@ int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 		goto cleanup;
 	}
 
-	if (append == 0 || (nc->permitted == NULL && nc->excluded == NULL)) {
+	if (!(flags & GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND) || (nc->permitted == NULL && nc->excluded == NULL)) {
 		ret = extract_name_constraints(c2, "permittedSubtrees", &nc->permitted);
 		if (ret < 0) {
 			gnutls_assert();

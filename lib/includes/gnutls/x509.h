@@ -241,9 +241,11 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
 
 int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc);
 void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc);
+
+#define GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND 1
 int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 					 gnutls_x509_name_constraints_t nc,
-					 unsigned int append,
+					 unsigned int flags,
 					 unsigned int *critical);
 int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t nc,
 					       gnutls_x509_subject_alt_name_t type,
