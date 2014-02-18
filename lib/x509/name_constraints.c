@@ -489,6 +489,31 @@ static unsigned dnsname_matches(const gnutls_datum_t *name, const gnutls_datum_t
 	return ends_with(name, suffix);
 }
 
+static
+unsigned check_unsupported_constraint(gnutls_x509_name_constraints_t nc,
+				       gnutls_x509_subject_alt_name_t type)
+{
+unsigned i;
+int ret;
+unsigned rtype;
+gnutls_datum_t rname;
+
+	/* check if there is a restrictions with that type, if
+	 * yes, then reject the name.
+	 */
+	i = 0;
+	do {
+		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype, &rname);
+		if (ret >= 0 && rtype != type)
+			continue;
+
+		return gnutls_assert_val(0);
+
+	} while(ret == 0);
+
+	return 1;
+}
+
 /**
  * gnutls_x509_name_constraints_check:
  * @nc: the extracted name constraints structure
@@ -514,7 +539,7 @@ unsigned allowed_found = 0;
 gnutls_datum_t rname;
 
 	if (type != GNUTLS_SAN_DNSNAME)
-		return gnutls_assert_val(0);
+		return check_unsupported_constraint(nc, type);
 
 	/* check restrictions */
 	i = 0;
@@ -523,8 +548,10 @@ gnutls_datum_t rname;
 		if (ret >= 0 && rtype != type)
 			continue;
 
+		/* a name of value 0 means that the CA shouldn't have issued
+		 * a certificate with a DNSNAME. */
 		if (rname.size == 0)
-			continue;
+			return gnutls_assert_val(0);
 
 		if (dnsname_matches(name, &rname) != 0)
 			return gnutls_assert_val(0); /* rejected */
