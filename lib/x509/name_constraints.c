@@ -219,6 +219,7 @@ void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc)
 		free(t);
 		t = next;
 	}
+	gnutls_free(nc);
 }
 
 /**
