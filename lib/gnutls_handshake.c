@@ -2351,8 +2351,8 @@ _gnutls_recv_hello_verify_request(gnutls_session_t session,
  * rehandshake is mandatory to terminate if it does not start after
  * some threshold.
  *
- * If the client does not wish to renegotiate parameters he will
- * should with an alert message, thus the return code will be
+ * If the client does not wish to renegotiate parameters he 
+ * should reply with an alert message, thus the return code will be
  * %GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
  * %GNUTLS_A_NO_RENEGOTIATION.  A client may also choose to ignore
  * this message.
