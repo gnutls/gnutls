@@ -101,16 +101,6 @@ static int extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 
 	ret = 0;
  cleanup:
- 	if (ret < 0) {
- 		nc = *_nc;
- 		while (nc != NULL) {
-			prev = nc->next;
-			free(nc->name.data);
-			free(nc);
-			nc = prev;
-		}
-		*_nc = NULL;
-	}
 	gnutls_free(tmp.data);
 	return ret;
 }
