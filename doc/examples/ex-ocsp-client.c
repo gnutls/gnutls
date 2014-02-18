@@ -20,10 +20,10 @@ static gnutls_x509_crt_t load_cert(const char *cert_file);
 static void _response_info(const gnutls_datum_t * data);
 static void
 _generate_request(gnutls_datum_t * rdata, gnutls_x509_crt_t cert,
-                  gnutls_x509_crt_t issuer);
+                  gnutls_x509_crt_t issuer, gnutls_datum_t *nonce);
 static int
 _verify_response(gnutls_datum_t * data, gnutls_x509_crt_t cert,
-                 gnutls_x509_crt_t signer);
+                 gnutls_x509_crt_t signer, gnutls_datum_t *nonce);
 
 /* This program queries an OCSP server.
    It expects three files. argv[1] containing the certificate to
@@ -49,11 +49,17 @@ int main(int argc, char *argv[])
         const char *issuer_file = argv[2];
         const char *signer_file = argv[3];
         char *hostname = NULL;
+        unsigned char noncebuf[23];
+        gnutls_datum_t nonce = { noncebuf, sizeof(noncebuf) };
 
         gnutls_global_init();
 
         if (argc > 4)
                 hostname = argv[4];
+
+        ret = gnutls_rnd(GNUTLS_RND_NONCE, nonce.data, nonce.size);
+        if (ret < 0)
+                exit(1);
 
         cert = load_cert(cert_file);
         issuer = load_cert(issuer_file);
@@ -101,7 +107,7 @@ int main(int argc, char *argv[])
         memset(&ud, 0, sizeof(ud));
         fprintf(stderr, "Connecting to %s\n", hostname);
 
-        _generate_request(&req, cert, issuer);
+        _generate_request(&req, cert, issuer, &nonce);
 
 #ifndef NO_LIBCURL
         curl_global_init(CURL_GLOBAL_ALL);
@@ -132,7 +138,7 @@ int main(int argc, char *argv[])
 
         _response_info(&ud);
 
-        v = _verify_response(&ud, cert, signer);
+        v = _verify_response(&ud, cert, signer, &nonce);
 
         gnutls_x509_crt_deinit(cert);
         gnutls_x509_crt_deinit(issuer);
@@ -198,27 +204,21 @@ static gnutls_x509_crt_t load_cert(const char *cert_file)
 
 static void
 _generate_request(gnutls_datum_t * rdata, gnutls_x509_crt_t cert,
-                  gnutls_x509_crt_t issuer)
+                  gnutls_x509_crt_t issuer, gnutls_datum_t *nonce)
 {
         gnutls_ocsp_req_t req;
         int ret;
-        unsigned char noncebuf[23];
-        gnutls_datum_t nonce = { noncebuf, sizeof(noncebuf) };
 
         ret = gnutls_ocsp_req_init(&req);
         if (ret < 0)
                 exit(1);
 
-
         ret = gnutls_ocsp_req_add_cert(req, GNUTLS_DIG_SHA1, issuer, cert);
         if (ret < 0)
                 exit(1);
 
-        ret = gnutls_rnd(GNUTLS_RND_RANDOM, nonce.data, nonce.size);
-        if (ret < 0)
-                exit(1);
 
-        ret = gnutls_ocsp_req_set_nonce(req, 0, &nonce);
+        ret = gnutls_ocsp_req_set_nonce(req, 0, nonce);
         if (ret < 0)
                 exit(1);
 
@@ -233,11 +233,12 @@ _generate_request(gnutls_datum_t * rdata, gnutls_x509_crt_t cert,
 
 static int
 _verify_response(gnutls_datum_t * data, gnutls_x509_crt_t cert,
-                 gnutls_x509_crt_t signer)
+                 gnutls_x509_crt_t signer, gnutls_datum_t *nonce)
 {
         gnutls_ocsp_resp_t resp;
         int ret;
         unsigned verify;
+        gnutls_datum_t rnonce;
 
         ret = gnutls_ocsp_resp_init(&resp);
         if (ret < 0)
@@ -250,6 +251,15 @@ _verify_response(gnutls_datum_t * data, gnutls_x509_crt_t cert,
         ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
         if (ret < 0)
                 exit(1);
+
+	ret = gnutls_ocsp_resp_get_nonce(resp, NULL, &rnonce);
+	if (ret < 0)
+		exit(1);
+
+	if (rnonce.size != nonce->size || memcmp(nonce->data, rnonce.data,
+		nonce->size) != 0) {
+		exit(1);
+	}
 
         ret = gnutls_ocsp_resp_verify_direct(resp, signer, &verify, 0);
         if (ret < 0)
