@@ -11,6 +11,12 @@ when provided with invalid data. Reported by Dmitriy Anisimkov.
 ** libgnutls: Corrected timeout issue in subsequent to the first
 DTLS handshakes.
 
+** ocsptool: When verifying a response and a signer isn't provided
+assume that the signer is the issuer.
+
+** ocsptool: When sending a nonce, verify that the nonce exists
+in the OCSP response.
+
 ** API and ABI modifications:
 No changes since last version.
 
