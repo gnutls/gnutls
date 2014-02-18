@@ -292,6 +292,7 @@ _verify_response(gnutls_datum_t * data, gnutls_x509_crt_t cert,
         if (verify & GNUTLS_OCSP_VERIFY_CERT_EXPIRED)
                 printf("Signer cert expired\n");
 
+        gnutls_free(rnonce.data);
         gnutls_ocsp_resp_deinit(resp);
 
         return verify;
