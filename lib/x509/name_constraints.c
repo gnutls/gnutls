@@ -339,6 +339,7 @@ int gnutls_x509_name_constraints_add_excluded(gnutls_x509_name_constraints_t nc,
  * gnutls_x509_crt_set_name_constraints:
  * @crt: The certificate structure
  * @nc: The nameconstraints structure
+ * @critical: whether this extension will be critical
  *
  * This function will set the provided name constraints to
  * the certificate extension list. This extension is always
@@ -349,7 +350,8 @@ int gnutls_x509_name_constraints_add_excluded(gnutls_x509_name_constraints_t nc,
  * Since: 3.3.0
  **/
 int gnutls_x509_crt_set_name_constraints(gnutls_x509_crt_t crt, 
-					 gnutls_x509_name_constraints_t nc)
+					 gnutls_x509_name_constraints_t nc,
+					 unsigned int critical)
 {
 int ret, result;
 gnutls_datum_t der_data;
@@ -447,7 +449,7 @@ struct name_constraints_node_st * tmp;
 	}
 
 	ret =
-	    _gnutls_x509_crt_set_extension(crt, "2.5.29.30", &der_data, 1);
+	    _gnutls_x509_crt_set_extension(crt, "2.5.29.30", &der_data, critical);
 
 	_gnutls_free_datum(&der_data);
 

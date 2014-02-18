@@ -251,7 +251,8 @@ int gnutls_x509_name_constraints_add_excluded(gnutls_x509_name_constraints_t nc,
 					      gnutls_x509_subject_alt_name_t type,
 					      const gnutls_datum_t * name);
 int gnutls_x509_crt_set_name_constraints(gnutls_x509_crt_t crt, 
-					 gnutls_x509_name_constraints_t nc);
+					 gnutls_x509_name_constraints_t nc,
+					 unsigned int critical);
 int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t nc,
 				     unsigned idx,
 				     unsigned *type, gnutls_datum_t * name);
