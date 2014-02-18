@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** libgnutls: Corrected issue in gnutls_pcert_list_import_x509_raw
 when provided with invalid data. Reported by Dmitriy Anisimkov.
 
+** libgnutls: Corrected timeout issue in subsequent to the first
+DTLS handshakes.
+
 ** API and ABI modifications:
 No changes since last version.
 
