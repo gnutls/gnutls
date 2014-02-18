@@ -170,7 +170,7 @@ static void print_nc(gnutls_buffer_st * str, const char* prefix, gnutls_x509_crt
 	if (ret < 0)
 		return;
 
-	ret = gnutls_x509_crt_get_name_constraints(cert, nc, &critical);
+	ret = gnutls_x509_crt_get_name_constraints(cert, nc, 0, &critical);
 	if (ret < 0)
 		goto cleanup;
 

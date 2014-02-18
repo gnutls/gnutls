@@ -243,6 +243,7 @@ int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc);
 void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc);
 int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 					 gnutls_x509_name_constraints_t nc,
+					 unsigned int append,
 					 unsigned int *critical);
 int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t nc,
 					       gnutls_x509_subject_alt_name_t type,
