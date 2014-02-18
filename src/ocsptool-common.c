@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2014 Free Software Foundation, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -73,7 +73,7 @@ static const char *host_from_url(const char *url, unsigned int *port)
 
 void
 _generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		  gnutls_datum_t * rdata, int nonce)
+		  gnutls_datum_t * rdata, gnutls_datum_t *nonce)
 {
 	gnutls_ocsp_req_t req;
 	int ret;
@@ -92,18 +92,7 @@ _generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	}
 
 	if (nonce) {
-		unsigned char noncebuf[23];
-		gnutls_datum_t nonce = { noncebuf, sizeof(noncebuf) };
-
-		ret =
-		    gnutls_rnd(GNUTLS_RND_RANDOM, nonce.data, nonce.size);
-		if (ret < 0) {
-			fprintf(stderr, "gnutls_rnd: %s",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		ret = gnutls_ocsp_req_set_nonce(req, 0, &nonce);
+		ret = gnutls_ocsp_req_set_nonce(req, 0, nonce);
 		if (ret < 0) {
 			fprintf(stderr, "ocsp_req_set_nonce: %s",
 				gnutls_strerror(ret));
@@ -144,7 +133,7 @@ static size_t get_data(void *buffer, size_t size, size_t nmemb,
 /* Returns 0 on ok, and -1 on error */
 int send_ocsp_request(const char *server,
 		      gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		      gnutls_datum_t * resp_data, int nonce)
+		      gnutls_datum_t * resp_data, gnutls_datum_t *nonce)
 {
 	gnutls_datum_t ud;
 	int ret;
@@ -311,7 +300,8 @@ void print_ocsp_verify_res(unsigned int output)
  */
 int
 check_ocsp_response(gnutls_x509_crt_t cert,
-		    gnutls_x509_crt_t issuer, gnutls_datum_t * data)
+		    gnutls_x509_crt_t issuer, gnutls_datum_t * data,
+		    gnutls_datum_t * nonce)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
@@ -361,6 +351,7 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
+
 	ret = gnutls_ocsp_resp_get_single(resp, 0, NULL, NULL, NULL, NULL,
 					  &cert_status, &vtime, &ntime,
 					  &rtime, NULL);
@@ -395,10 +386,35 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 		}
 	}
 
+	if (nonce) {
+	        gnutls_datum_t rnonce;
+
+		ret = gnutls_ocsp_resp_get_nonce(resp, NULL, &rnonce);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			fprintf(stderr, "*** The OCSP reply did not include the requested nonce.\n");
+			goto finish_ok;
+		}
+
+		if (ret < 0) {
+			fprintf(stderr, "could not read response's nonce: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (rnonce.size != nonce->size || memcmp(nonce->data, rnonce.data,
+			nonce->size) != 0) {
+			fprintf(stderr, "nonce in the response doesn't match\n");
+			exit(1);
+		}
+
+	        gnutls_free(rnonce.data);
+	}
+
+ finish_ok:
 	printf("- OCSP server flags certificate not revoked as of %s",
 	       ctime(&vtime));
 	ret = 1;
-      cleanup:
+ cleanup:
 	gnutls_ocsp_resp_deinit(resp);
 
 	return ret;

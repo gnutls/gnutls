@@ -45,6 +45,7 @@
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
 #include <gnutls/pkcs11.h>
+#include <gnutls/crypto.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -1710,6 +1711,8 @@ static int cert_verify_ocsp(gnutls_session_t session)
 	unsigned int cert_list_size = 0;
 	int deinit_issuer = 0;
 	gnutls_datum_t resp;
+	unsigned char noncebuf[23];
+	gnutls_datum_t nonce = { noncebuf, sizeof(noncebuf) };
 	int ret;
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
@@ -1746,7 +1749,16 @@ static int cert_verify_ocsp(gnutls_session_t session)
 		goto cleanup;
 	}
 
-	ret = send_ocsp_request(NULL, crt, issuer, &resp, 1);
+	ret =
+	    gnutls_rnd(GNUTLS_RND_NONCE, nonce.data, nonce.size);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_rnd: %s",
+			gnutls_strerror(ret));
+		ret = -1;
+		goto cleanup;
+	}
+
+	ret = send_ocsp_request(NULL, crt, issuer, &resp, &nonce);
 	if (ret < 0) {
 		fprintf(stderr, "Cannot contact OCSP server\n");
 		ret = -1;
@@ -1754,7 +1766,7 @@ static int cert_verify_ocsp(gnutls_session_t session)
 	}
 
 	/* verify and check the response for revoked cert */
-	ret = check_ocsp_response(crt, issuer, &resp);
+	ret = check_ocsp_response(crt, issuer, &resp, &nonce);
 
       cleanup:
 	if (deinit_issuer)
