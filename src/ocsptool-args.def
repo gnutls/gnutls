@@ -56,7 +56,7 @@ flag = {
     name      = nonce;
     disabled  = yes;
     disable   = "no";
-    descrip   = "Don't add nonce to OCSP request";
+    descrip   = "Use (or not) a nonce to OCSP request";
     doc = "";
 };
 

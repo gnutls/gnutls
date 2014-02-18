@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2011-2014 Free Software Foundation, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -230,12 +230,11 @@ static gnutls_x509_crt_t load_cert(void)
 	return crt;
 }
 
-static void generate_request(void)
+static void generate_request(gnutls_datum_t *nonce)
 {
 	gnutls_datum_t dat;
 
-	_generate_request(load_cert(), load_issuer(), &dat,
-			  ENABLED_OPT(NONCE));
+	_generate_request(load_cert(), load_issuer(), &dat, nonce);
 
 	fwrite(dat.data, 1, dat.size, outfile);
 
@@ -243,7 +242,7 @@ static void generate_request(void)
 }
 
 
-static int _verify_response(gnutls_datum_t * data)
+static int _verify_response(gnutls_datum_t * data, gnutls_datum_t * nonce)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
@@ -267,6 +266,25 @@ static int _verify_response(gnutls_datum_t * data)
 		fprintf(stderr, "importing response: %s",
 			gnutls_strerror(ret));
 		exit(1);
+	}
+
+	if (nonce) {
+	        gnutls_datum_t rnonce;
+
+		ret = gnutls_ocsp_resp_get_nonce(resp, NULL, &rnonce);
+		if (ret < 0) {
+			fprintf(stderr, "could not read response's nonce: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (rnonce.size != nonce->size || memcmp(nonce->data, rnonce.data,
+			nonce->size) != 0) {
+			fprintf(stderr, "nonce in the response doesn't match\n");
+			exit(1);
+		}
+
+	        gnutls_free(rnonce.data);
 	}
 
 	if (HAVE_OPT(LOAD_TRUST)) {
@@ -407,7 +425,7 @@ static int _verify_response(gnutls_datum_t * data)
 	return verify;
 }
 
-static void verify_response(void)
+static void verify_response(gnutls_datum_t *nonce)
 {
 	gnutls_datum_t dat;
 	size_t size;
@@ -424,7 +442,7 @@ static void verify_response(void)
 	}
 	dat.size = size;
 
-	_verify_response(&dat);
+	_verify_response(&dat, nonce);
 }
 
 static void ask_server(const char *url)
@@ -432,13 +450,27 @@ static void ask_server(const char *url)
 	gnutls_datum_t resp_data;
 	int ret, v;
 	gnutls_x509_crt_t cert, issuer;
+	unsigned char noncebuf[23];
+	gnutls_datum_t nonce = { noncebuf, sizeof(noncebuf) };
 
 	cert = load_cert();
 	issuer = load_issuer();
 
-	ret =
-	    send_ocsp_request(url, cert, issuer, &resp_data,
-			      ENABLED_OPT(NONCE));
+	if (ENABLED_OPT(NONCE)) {
+		ret =
+		    gnutls_rnd(GNUTLS_RND_NONCE, nonce.data, nonce.size);
+		if (ret < 0) {
+			fprintf(stderr, "gnutls_rnd: %s",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		ret =
+		    send_ocsp_request(url, cert, issuer, &resp_data, &nonce);
+	} else {
+		ret =
+		    send_ocsp_request(url, cert, issuer, &resp_data, NULL);
+	}
 	if (ret < 0) {
 		fprintf(stderr, "Cannot send OCSP request\n");
 		exit(1);
@@ -448,7 +480,11 @@ static void ask_server(const char *url)
 
 	if (HAVE_OPT(LOAD_SIGNER) || HAVE_OPT(LOAD_TRUST)) {
 		fprintf(outfile, "\n");
-		v = _verify_response(&resp_data);
+		if (ENABLED_OPT(NONCE)) {
+			v = _verify_response(&resp_data, &nonce);
+		} else {
+			v = _verify_response(&resp_data, NULL);
+		}
 	} else {
 		fprintf(stderr,
 			"\nResponse could not be verified (use --load-signer).\n");
@@ -502,9 +538,9 @@ int main(int argc, char **argv)
 	else if (HAVE_OPT(RESPONSE_INFO))
 		response_info();
 	else if (HAVE_OPT(GENERATE_REQUEST))
-		generate_request();
+		generate_request(NULL);
 	else if (HAVE_OPT(VERIFY_RESPONSE))
-		verify_response();
+		verify_response(NULL);
 	else if (HAVE_OPT(ASK))
 		ask_server(OPT_ARG(ASK));
 	else {

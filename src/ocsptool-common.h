@@ -34,14 +34,14 @@ enum {
 extern void ocsptool_version(void);
 void
 _generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		  gnutls_datum_t * rdata, int nonce);
+		  gnutls_datum_t * rdata, gnutls_datum_t* nonce);
 int send_ocsp_request(const char *server,
 		      gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		      gnutls_datum_t * resp_data, int nonce);
+		      gnutls_datum_t * resp_data, gnutls_datum_t* nonce);
 void print_ocsp_verify_res(unsigned int output);
 
 int
 check_ocsp_response(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		    gnutls_datum_t * data);
+		    gnutls_datum_t * data, gnutls_datum_t *nonce);
 
 #endif
