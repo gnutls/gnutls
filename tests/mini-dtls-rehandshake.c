@@ -134,6 +134,7 @@ static void client(int fd, int server_init)
 			(gnutls_protocol_get_version(session)));
 
 	if (!server_init) {
+		sleep(60);
 		if (debug)
 			success("Initiating client rehandshake\n");
 		do {
