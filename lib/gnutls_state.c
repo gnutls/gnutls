@@ -263,7 +263,6 @@ static void _gnutls_handshake_internal_state_init(gnutls_session_t session)
 
 	session->internals.dtls.hsk_read_seq = 0;
 	session->internals.dtls.hsk_write_seq = 0;
-	gettime(&session->internals.dtls.handshake_start_time);
 }
 
 void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
