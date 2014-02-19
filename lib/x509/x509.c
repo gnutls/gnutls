@@ -1240,11 +1240,9 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 			return ret;
 		}
 
-		if (is_type_printable(type)) {
-			/* _gnutls_x509_read_value() null terminates */
-			dname->size = tmp.size;
-			dname->data = tmp.data;
-		}
+		/* _gnutls_x509_read_value() null terminates */
+		dname->size = tmp.size;
+		dname->data = tmp.data;
 	}
 
 	return type;
