@@ -218,3 +218,10 @@
    obj:*
 }
 
+{
+   nettle memxor
+   Memcheck:Addr8
+   fun:memxor
+   obj:*
+}
+

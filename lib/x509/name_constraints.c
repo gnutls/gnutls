@@ -481,15 +481,45 @@ unsigned ends_with(const gnutls_datum_t * str, const gnutls_datum_t * suffix)
 	return 0;
 }
 
+static
+unsigned email_ends_with(const gnutls_datum_t * str, const gnutls_datum_t * suffix)
+{
+	if (suffix->size >= str->size)
+		return 0;
+
+	if (suffix->size > 1 && suffix->data[0] == '.') {
+		/* .domain.com */
+		if (memcmp(str->data + str->size - suffix->size, suffix->data, suffix->size) == 0)
+			return 1;
+	} else {
+		if (memcmp(str->data + str->size - suffix->size, suffix->data, suffix->size) == 0 &&
+			str->data[str->size - suffix->size -1] == '@')
+			return 1;
+	}
+
+	return 0;
+}
+
 static unsigned dnsname_matches(const gnutls_datum_t *name, const gnutls_datum_t *suffix)
 {
-	_gnutls_hard_log("matching %.*s with constraint %.*s\n", name->size, name->data,
+	_gnutls_hard_log("matching %.*s with DNS constraint %.*s\n", name->size, name->data,
 		suffix->size, suffix->data);
 
 	if (suffix->size == name->size && memcmp(suffix->data, name->data, suffix->size) == 0)
 		return 1; /* match */
 
 	return ends_with(name, suffix);
+}
+
+static unsigned email_matches(const gnutls_datum_t *name, const gnutls_datum_t *suffix)
+{
+	_gnutls_hard_log("matching %.*s with e-mail constraint %.*s\n", name->size, name->data,
+		suffix->size, suffix->data);
+
+	if (suffix->size == name->size && memcmp(suffix->data, name->data, suffix->size) == 0)
+		return 1; /* match */
+
+	return email_ends_with(name, suffix);
 }
 
 static
@@ -519,6 +549,110 @@ gnutls_datum_t rname;
 	return 1;
 }
 
+static
+unsigned check_dns_constraints(gnutls_x509_name_constraints_t nc,
+				       const gnutls_datum_t * name)
+{
+unsigned i;
+int ret;
+unsigned rtype;
+unsigned allowed_found = 0;
+gnutls_datum_t rname;
+
+	/* check restrictions */
+	i = 0;
+	do {
+		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype, &rname);
+		if (ret >= 0) {
+			if (rtype != GNUTLS_SAN_DNSNAME)
+				continue;
+
+			/* a name of value 0 means that the CA shouldn't have issued
+			 * a certificate with a DNSNAME. */
+			if (rname.size == 0)
+				return gnutls_assert_val(0);
+
+			if (dnsname_matches(name, &rname) != 0)
+				return gnutls_assert_val(0); /* rejected */
+		}
+	} while(ret == 0);
+
+	/* check allowed */
+	i = 0;
+	do {
+		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &rtype, &rname);
+		if (ret >= 0) {
+			if (rtype != GNUTLS_SAN_DNSNAME)
+				continue;
+
+			if (rname.size == 0)
+				continue;
+
+			allowed_found = 1;
+
+			if (dnsname_matches(name, &rname) != 0)
+				return 1; /* accepted */
+		}
+	} while(ret == 0);
+
+	if (allowed_found != 0) /* there are allowed directives but this host wasn't found */
+		return gnutls_assert_val(0);
+
+	return 1;
+}
+
+static
+unsigned check_email_constraints(gnutls_x509_name_constraints_t nc,
+				       const gnutls_datum_t * name)
+{
+unsigned i;
+int ret;
+unsigned rtype;
+unsigned allowed_found = 0;
+gnutls_datum_t rname;
+
+	/* check restrictions */
+	i = 0;
+	do {
+		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype, &rname);
+		if (ret >= 0) {
+			if (rtype != GNUTLS_SAN_RFC822NAME)
+				continue;
+
+			/* a name of value 0 means that the CA shouldn't have issued
+			 * a certificate with an e-mail. */
+			if (rname.size == 0)
+				return gnutls_assert_val(0);
+
+			if (email_matches(name, &rname) != 0)
+				return gnutls_assert_val(0); /* rejected */
+		}
+	} while(ret == 0);
+
+	/* check allowed */
+	i = 0;
+	do {
+		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &rtype, &rname);
+		if (ret >= 0) {
+			if (rtype != GNUTLS_SAN_RFC822NAME)
+				continue;
+
+			if (rname.size == 0)
+				continue;
+
+			allowed_found = 1;
+
+			if (email_matches(name, &rname) != 0)
+				return 1; /* accepted */
+		}
+	} while(ret == 0);
+
+	if (allowed_found != 0) /* there are allowed directives but this host wasn't found */
+		return gnutls_assert_val(0);
+
+	return 1;
+}
+
 /**
  * gnutls_x509_name_constraints_check:
  * @nc: the extracted name constraints structure
@@ -527,7 +661,7 @@ gnutls_datum_t rname;
  *
  * This function will check the provided name against the constraints in
  * @nc using the RFC5280 rules. Currently this function is limited to DNS
- * names (of type %GNUTLS_SAN_DNSNAME).
+ * names and emails (of type %GNUTLS_SAN_DNSNAME and %GNUTLS_SAN_RFC822NAME).
  *
  * Returns: zero if the provided name is not acceptable, and non-zero otherwise.
  *
@@ -537,51 +671,13 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
 				       gnutls_x509_subject_alt_name_t type,
 				       const gnutls_datum_t * name)
 {
-unsigned i;
-int ret;
-unsigned rtype;
-unsigned allowed_found = 0;
-gnutls_datum_t rname;
+	if (type == GNUTLS_SAN_DNSNAME)
+		return check_dns_constraints(nc, name);
 
-	if (type != GNUTLS_SAN_DNSNAME)
-		return check_unsupported_constraint(nc, type);
+	if (type == GNUTLS_SAN_RFC822NAME)
+		return check_email_constraints(nc, name);
 
-	/* check restrictions */
-	i = 0;
-	do {
-		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype, &rname);
-		if (ret >= 0 && rtype != type)
-			continue;
-
-		/* a name of value 0 means that the CA shouldn't have issued
-		 * a certificate with a DNSNAME. */
-		if (rname.size == 0)
-			return gnutls_assert_val(0);
-
-		if (dnsname_matches(name, &rname) != 0)
-			return gnutls_assert_val(0); /* rejected */
-	} while(ret == 0);
-
-	/* check allowed */
-	i = 0;
-	do {
-		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &rtype, &rname);
-		if (ret >= 0 && rtype != type)
-			continue;
-
-		if (rname.size == 0)
-			continue;
-
-		allowed_found = 1;
-
-		if (dnsname_matches(name, &rname) != 0)
-			return 1; /* accepted */
-	} while(ret == 0);
-
-	if (allowed_found != 0) /* there are allowed directives but this host wasn't found */
-		return gnutls_assert_val(0);
-	
-	return 1;
+	return check_unsupported_constraint(nc, type);
 }
 
 /**

@@ -77,6 +77,11 @@ const gnutls_datum_t name1 = { (void*)"com", 3 };
 const gnutls_datum_t name2 = { (void*)"example.com", sizeof("example.com")-1 };
 const gnutls_datum_t name3 = { (void*)"another.example.com", sizeof("another.example.com")-1 };
 
+const gnutls_datum_t mail1 = { (void*)"example.com", sizeof("example.com")-1 };
+const gnutls_datum_t mail2 = { (void*)".example.net", sizeof(".example.net")-1 };
+const gnutls_datum_t mail3 = { (void*)"nmav@redhat.com", sizeof("nmav@redhat.com")-1 };
+const gnutls_datum_t mail4 = { (void*)"koko.example.net", sizeof("koko.example.net")-1 };
+
 void doit(void)
 {
 	int ret;
@@ -168,6 +173,26 @@ void doit(void)
 	if (ret < 0)
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME,
+		&mail1);
+	if (ret < 0)
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME,
+		&mail2);
+	if (ret < 0)
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME,
+		&mail3);
+	if (ret < 0)
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_RFC822NAME,
+		&mail4);
+	if (ret < 0)
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+
 	ret = gnutls_x509_crt_set_name_constraints(crt, nc, 1);
 	if (ret < 0)
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
@@ -185,8 +210,8 @@ void doit(void)
 		}
 	} while(ret == 0);
 
-	if (i-1 != 1) {
-		fail("Could not read all contraints; read %d, expected %d\n", i-1, 1);
+	if (i-1 != 4) {
+		fail("Could not read all contraints; read %d, expected %d\n", i-1, 4);
 	}
 
 	i = 0;
@@ -205,19 +230,56 @@ void doit(void)
 		}
 	} while(ret == 0);
 
-	if (i-1 != 3) {
-		fail("Could not read all excluded contraints; read %d, expected %d\n", i-1, 3);
+	if (i-1 != 4) {
+		fail("Could not read all excluded contraints; read %d, expected %d\n", i-1, 4);
 	}
 
 	/* 3: test the name constraints check function */
 
-	/* This name constraints structure doesn't have any excluded RFC822NAME so
+	/* This name constraints structure doesn't have any excluded GNUTLS_SAN_DN so
 	 * this test should succeed */
+	name.data = (unsigned char*)"ASFHAJHjhafjs";
+	name.size = strlen((char*)name.data);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DN, &name);
+	if (ret == 0)
+		fail("Checking DN should have succeeded\n");
+
+	/* Test e-mails */
+	name.data = (unsigned char*)"nmav@redhat.com";
+	name.size = strlen((char*)name.data);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
+	if (ret == 0)
+		fail("Checking email should have succeeded\n");
+
+	name.data = (unsigned char*)"nmav@radhat.com";
+	name.size = strlen((char*)name.data);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
+	if (ret != 0)
+		fail("Checking email should have failed\n");
+
 	name.data = (unsigned char*)"nmav@example.com";
 	name.size = strlen((char*)name.data);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
 	if (ret == 0)
-		fail("Checking e-mail should have succeeded\n");
+		fail("Checking email should have succeeded\n");
+
+	name.data = (unsigned char*)"nmav@test.example.net";
+	name.size = strlen((char*)name.data);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
+	if (ret == 0)
+		fail("Checking email should have succeeded\n");
+
+	name.data = (unsigned char*)"nmav@example.net";
+	name.size = strlen((char*)name.data);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
+	if (ret != 0)
+		fail("Checking email should have failed\n");
+
+	name.data = (unsigned char*)"nmav@koko.example.net";
+	name.size = strlen((char*)name.data);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
+	if (ret != 0)
+		fail("Checking email should have failed\n");
 
 	/* This name constraints structure does have an excluded URI so
 	 * this test should fail */
