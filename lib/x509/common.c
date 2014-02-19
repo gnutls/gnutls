@@ -1016,6 +1016,12 @@ _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
 	unsigned int etype;
 
 	result = asn1_read_value_type(c, root, NULL, &len, &etype);
+	if (result == 0 && len == 0) {
+		ret->data = NULL;
+		ret->size = 0;
+		return 0;
+	}
+
 	if (result != ASN1_MEM_ERROR) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);

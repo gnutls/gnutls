@@ -70,8 +70,10 @@ static int extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 		ret =
 		    _gnutls_parse_general_name2(c2, tmpstr, -1, &tmp, &type, 0);
 
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_assert();
 			break;
+		}
 
 		if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME
 		    && type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI) {
