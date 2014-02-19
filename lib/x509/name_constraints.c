@@ -507,10 +507,12 @@ gnutls_datum_t rname;
 	i = 0;
 	do {
 		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &rtype, &rname);
-		if (ret >= 0 && rtype != type)
-			continue;
-
-		return gnutls_assert_val(0);
+		if (ret >= 0) {
+			if (rtype != type)
+				continue;
+			else
+				return gnutls_assert_val(0);
+		}
 
 	} while(ret == 0);
 
