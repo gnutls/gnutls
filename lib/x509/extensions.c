@@ -829,8 +829,12 @@ _gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
 	int result;
 	char name[128];
 
-	if (data == NULL)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (data == NULL) {
+		if (data_size == 0)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		else
+			data = (void*)"";
+	}
 
 	switch (type) {
 	case GNUTLS_SAN_DNSNAME:
