@@ -106,7 +106,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   if (result < 0)
     {
       gnutls_assert ();
-      goto cleanup;
+      goto fail;
     }
 
   result =
@@ -115,7 +115,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   if (result < 0)
     {
       gnutls_assert ();
-      goto cleanup;
+      goto fail;
     }
 
   result =
@@ -123,7 +123,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   if (result < 0)
     {
       gnutls_assert ();
-      goto cleanup;
+      goto fail;
     }
 
   result =
@@ -131,7 +131,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   if (result < 0)
     {
       gnutls_assert ();
-      goto cleanup;
+      goto fail;
     }
 
   /* If the subject certificate is the same as the issuer
@@ -183,6 +183,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   else
     gnutls_assert ();
 
+fail:
   result = 0;
 
 cleanup:
@@ -408,14 +409,15 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   if (issuer_version < 0)
     {
       gnutls_assert ();
-      return issuer_version;
+      result = 0;
+      goto cleanup;
     }
   
   if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
       ((flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT)
        || issuer_version != 1))
     {
-      if (check_if_ca (cert, issuer, max_path, flags) == 0)
+      if (check_if_ca (cert, issuer, max_path, flags) != 1)
         {
           gnutls_assert ();
           out = GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID;
@@ -446,6 +448,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   if (result < 0)
     {
       gnutls_assert ();
+      result = 0;
       goto cleanup;
     }
 
@@ -454,6 +457,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   if (result < 0)
     {
       gnutls_assert ();
+      result = 0;
       goto cleanup;
     }
 
@@ -461,6 +465,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   if (result < 0)
     {
       gnutls_assert ();
+      result = 0;
       goto cleanup;
     }
 
@@ -481,6 +486,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   else if (result < 0)
     {
       gnutls_assert();
+      result = 0;
       goto cleanup;
     }
 
@@ -650,7 +656,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
   ret = _gnutls_verify_certificate2 (certificate_list[clist_size - 1],
                                      trusted_cas, tcas_size, flags, &output,
                                      &issuer, now, &max_path, func);
-  if (ret == 0)
+  if (ret != 1)
     {
       /* if the last certificate in the certificate
        * list is invalid, then the certificate is not
@@ -681,7 +687,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
       if ((ret =
            _gnutls_verify_certificate2 (certificate_list[i - 1],
                                         &certificate_list[i], 1, flags,
-                                        &output, NULL, now, &max_path, func)) == 0)
+                                        &output, NULL, now, &max_path, func)) != 1)
         {
           status |= output;
           status |= GNUTLS_CERT_INVALID;
