@@ -681,6 +681,121 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
 }
 
 /**
+ * gnutls_x509_name_constraints_check_crt:
+ * @nc: the extracted name constraints structure
+ * @type: the type of the constraint to check (of type gnutls_x509_subject_alt_name_t)
+ * @cert: the certificate to be checked
+ *
+ * This function will check the provided certificate names against the constraints in
+ * @nc using the RFC5280 rules. It will traverse all the certificate's names and
+ * alternative names.
+ *
+ * Currently this function is limited to DNS
+ * names and emails (of type %GNUTLS_SAN_DNSNAME and %GNUTLS_SAN_RFC822NAME).
+ *
+ * Returns: zero if the provided name is not acceptable, and non-zero otherwise.
+ *
+ * Since: 3.3.0
+ **/
+unsigned gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
+				       gnutls_x509_subject_alt_name_t type,
+				       gnutls_x509_crt_t cert)
+{
+char name[MAX_CN];
+size_t name_size;
+int ret;
+unsigned idx, t, san_type;
+gnutls_datum_t n;
+
+	if (type == GNUTLS_SAN_RFC822NAME) {
+		idx = 0;
+		do {
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_PKCS9_EMAIL,
+				idx++, 0, name, &name_size);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			else if (ret < 0)
+				return gnutls_assert_val(0);
+
+			n.data = (void*)name;
+			n.size = name_size;
+			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+				&n);
+			if (t == 0)
+				return gnutls_assert_val(t);
+		} while(ret >= 0);
+
+		idx = 0;
+		do {
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
+				idx++, name, &name_size, &san_type, NULL);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			else if (ret < 0)
+				return gnutls_assert_val(0);
+
+			if (san_type != GNUTLS_SAN_RFC822NAME)
+				continue;
+
+			n.data = (void*)name;
+			n.size = name_size;
+			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+				&n);
+			if (t == 0)
+				return gnutls_assert_val(t);
+		} while(ret >= 0);
+
+		/* passed */
+		return 1;
+	} else if (type == GNUTLS_SAN_DNSNAME) {
+		idx = 0;
+		do {
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
+				idx++, 0, name, &name_size);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			else if (ret < 0)
+				return gnutls_assert_val(0);
+
+			n.data = (void*)name;
+			n.size = name_size;
+			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME,
+				&n);
+			if (t == 0)
+				return gnutls_assert_val(t);
+		} while(ret >= 0);
+
+		idx = 0;
+		do {
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
+				idx++, name, &name_size, &san_type, NULL);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			else if (ret < 0)
+				return gnutls_assert_val(0);
+
+			if (san_type != GNUTLS_SAN_DNSNAME)
+				continue;
+
+			n.data = (void*)name;
+			n.size = name_size;
+			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME,
+				&n);
+			if (t == 0)
+				return gnutls_assert_val(t);
+		} while(ret >= 0);
+
+		/* passed */
+		return 1;
+	} else
+		return check_unsupported_constraint(nc, type);
+}
+
+/**
  * gnutls_x509_name_constraints_get_permitted:
  * @nc: the extracted name constraints structure
  * @idx: the index of the constraint

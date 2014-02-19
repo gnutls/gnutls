@@ -103,6 +103,7 @@ gnutls_x509_crt_set_name_constraints: Added
 gnutls_x509_name_constraints_get_permitted: Added
 gnutls_x509_name_constraints_get_excluded: Added
 gnutls_x509_name_constraints_check: Added
+gnutls_x509_name_constraints_check_crt: Added
 gnutls_digest_self_test: Added (conditionally)
 gnutls_mac_self_test: Added (conditionally)
 gnutls_pk_self_test: Added (conditionally)

@@ -238,6 +238,9 @@ typedef struct gnutls_name_constraints_st *gnutls_x509_name_constraints_t;
 unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
 				       gnutls_x509_subject_alt_name_t type,
 				       const gnutls_datum_t * name);
+unsigned gnutls_x509_name_constraints_check_crt(gnutls_x509_name_constraints_t nc,
+				       gnutls_x509_subject_alt_name_t type,
+				       gnutls_x509_crt_t crt);
 
 int gnutls_x509_name_constraints_init(gnutls_x509_name_constraints_t *nc);
 void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc);
