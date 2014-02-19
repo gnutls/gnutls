@@ -203,7 +203,7 @@ print_private_key(common_info_st * cinfo, gnutls_x509_privkey_t key)
 						     pass, flags, buffer,
 						     &size);
 		if (ret < 0) {
-			fprintf(stderr, "privkey_export_pkcs8: %s",
+			fprintf(stderr, "privkey_export_pkcs8: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -243,7 +243,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 	ret = gnutls_x509_crt_init(&crt);
 	if (ret < 0) {
-		fprintf(stderr, "crt_init: %s", gnutls_strerror(ret));
+		fprintf(stderr, "crt_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -267,7 +267,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			    gnutls_x509_crt_set_proxy_dn(crt, ca_crt, 0,
 							 NULL, 0);
 			if (result < 0) {
-				fprintf(stderr, "set_proxy_dn: %s",
+				fprintf(stderr, "set_proxy_dn: %s\n",
 					gnutls_strerror(result));
 				exit(1);
 			}
@@ -298,14 +298,14 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 		result = gnutls_x509_crt_set_pubkey(crt, pubkey);
 		if (result < 0) {
-			fprintf(stderr, "set_key: %s",
+			fprintf(stderr, "set_key: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
 	} else {
 		result = gnutls_x509_crt_set_crq(crt, crq);
 		if (result < 0) {
-			fprintf(stderr, "set_crq: %s",
+			fprintf(stderr, "set_crq: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -322,7 +322,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 		result = gnutls_x509_crt_set_serial(crt, serial, serial_size);
 		if (result < 0) {
-			fprintf(stderr, "serial: %s",
+			fprintf(stderr, "serial: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -335,7 +335,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 	result = gnutls_x509_crt_set_activation_time(crt, secs);
 	if (result < 0) {
-		fprintf(stderr, "set_activation: %s",
+		fprintf(stderr, "set_activation: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -344,7 +344,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 
 	result = gnutls_x509_crt_set_expiration_time(crt, secs);
 	if (result < 0) {
-		fprintf(stderr, "set_expiration: %s",
+		fprintf(stderr, "set_expiration: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -356,7 +356,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 	if (crq && get_crq_extensions_status() != 0) {
 		result = gnutls_x509_crt_set_crq_extensions(crt, crq);
 		if (result < 0) {
-			fprintf(stderr, "set_crq: %s",
+			fprintf(stderr, "set_crq: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -386,7 +386,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 						      policylanguage,
 						      policy, policylen);
 			if (result < 0) {
-				fprintf(stderr, "set_proxy: %s",
+				fprintf(stderr, "set_proxy: %s\n",
 					gnutls_strerror(result));
 				exit(1);
 			}
@@ -403,7 +403,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		    gnutls_x509_crt_set_basic_constraints(crt, ca_status,
 							  path_len);
 		if (result < 0) {
-			fprintf(stderr, "basic_constraints: %s",
+			fprintf(stderr, "basic_constraints: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -414,7 +414,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 								     GNUTLS_KP_TLS_WWW_CLIENT,
 								     0);
 			if (result < 0) {
-				fprintf(stderr, "key_kp: %s",
+				fprintf(stderr, "key_kp: %s\n",
 					gnutls_strerror(result));
 				exit(1);
 			}
@@ -436,7 +436,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 								GNUTLS_KP_TLS_WWW_SERVER,
 								0);
 			if (result < 0) {
-				fprintf(stderr, "key_kp: %s",
+				fprintf(stderr, "key_kp: %s\n",
 					gnutls_strerror(result));
 				exit(1);
 			}
@@ -468,7 +468,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				    gnutls_x509_crt_set_key_purpose_oid
 				    (crt, GNUTLS_KP_IPSEC_IKE, 0);
 				if (result < 0) {
-					fprintf(stderr, "key_kp: %s",
+					fprintf(stderr, "key_kp: %s\n",
 						gnutls_strerror(result));
 					exit(1);
 				}
@@ -491,7 +491,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				    gnutls_x509_crt_set_key_purpose_oid
 				    (crt, GNUTLS_KP_CODE_SIGNING, 0);
 				if (result < 0) {
-					fprintf(stderr, "key_kp: %s",
+					fprintf(stderr, "key_kp: %s\n",
 						gnutls_strerror(result));
 					exit(1);
 				}
@@ -505,7 +505,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				    gnutls_x509_crt_set_key_purpose_oid
 				    (crt, GNUTLS_KP_OCSP_SIGNING, 0);
 				if (result < 0) {
-					fprintf(stderr, "key_kp: %s",
+					fprintf(stderr, "key_kp: %s\n",
 						gnutls_strerror(result));
 					exit(1);
 				}
@@ -517,7 +517,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				    gnutls_x509_crt_set_key_purpose_oid
 				    (crt, GNUTLS_KP_TIME_STAMPING, 0);
 				if (result < 0) {
-					fprintf(stderr, "key_kp: %s",
+					fprintf(stderr, "key_kp: %s\n",
 						gnutls_strerror(result));
 					exit(1);
 				}
@@ -534,7 +534,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				usage |= GNUTLS_KEY_NON_REPUDIATION;
 			result = gnutls_x509_crt_set_key_usage(crt, usage);
 			if (result < 0) {
-				fprintf(stderr, "key_usage: %s",
+				fprintf(stderr, "key_usage: %s\n",
 					gnutls_strerror(result));
 				exit(1);
 			}
@@ -549,7 +549,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			    gnutls_x509_crt_set_subject_key_id(crt, buffer,
 							       size);
 			if (result < 0) {
-				fprintf(stderr, "set_subject_key_id: %s",
+				fprintf(stderr, "set_subject_key_id: %s\n",
 					gnutls_strerror(result));
 				exit(1);
 			}
@@ -577,7 +577,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				    (crt, buffer, size);
 				if (result < 0) {
 					fprintf(stderr,
-						"set_authority_key_id: %s",
+						"set_authority_key_id: %s\n",
 						gnutls_strerror(result));
 					exit(1);
 				}
@@ -593,7 +593,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		vers = 3;
 	result = gnutls_x509_crt_set_version(crt, vers);
 	if (result < 0) {
-		fprintf(stderr, "set_version: %s",
+		fprintf(stderr, "set_version: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -615,7 +615,7 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 
 	result = gnutls_x509_crl_init(&crl);
 	if (result < 0) {
-		fprintf(stderr, "crl_init: %s", gnutls_strerror(result));
+		fprintf(stderr, "crl_init: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -624,7 +624,7 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 	for (i = 0; i < size; i++) {
 		result = gnutls_x509_crl_set_crt(crl, crts[i], now);
 		if (result < 0) {
-			fprintf(stderr, "crl_set_crt: %s",
+			fprintf(stderr, "crl_set_crt: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -632,7 +632,7 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 
 	result = gnutls_x509_crl_set_this_update(crl, now);
 	if (result < 0) {
-		fprintf(stderr, "this_update: %s",
+		fprintf(stderr, "this_update: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -644,14 +644,14 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 	    gnutls_x509_crl_set_next_update(crl,
 					    now + days * 24 * 60 * 60);
 	if (result < 0) {
-		fprintf(stderr, "next_update: %s",
+		fprintf(stderr, "next_update: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
 
 	result = gnutls_x509_crl_set_version(crl, 2);
 	if (result < 0) {
-		fprintf(stderr, "set_version: %s",
+		fprintf(stderr, "set_version: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -674,7 +674,7 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 								 buffer,
 								 size);
 			if (result < 0) {
-				fprintf(stderr, "set_authority_key_id: %s",
+				fprintf(stderr, "set_authority_key_id: %s\n",
 					gnutls_strerror(result));
 				exit(1);
 			}
@@ -694,7 +694,7 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 
 		result = gnutls_x509_crl_set_number(crl, bin_number, 5);
 		if (result < 0) {
-			fprintf(stderr, "set_number: %s",
+			fprintf(stderr, "set_number: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -715,7 +715,7 @@ static gnutls_digest_algorithm_t get_dig_for_pub(gnutls_pubkey_t pubkey)
 	if (result < 0) {
 		{
 			fprintf(stderr,
-				"crt_get_preferred_hash_algorithm: %s",
+				"crt_get_preferred_hash_algorithm: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -739,7 +739,7 @@ static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt_t crt)
 	result = gnutls_pubkey_import_x509(pubkey, crt, 0);
 	if (result < 0) {
 		{
-			fprintf(stderr, "gnutls_pubkey_import_x509: %s",
+			fprintf(stderr, "gnutls_pubkey_import_x509: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -772,7 +772,7 @@ void generate_self_signed(common_info_st * cinfo)
 		result = gnutls_x509_crt_set_crl_dist_points(crt, GNUTLS_SAN_URI, uri, 0	/* all reasons */
 		    );
 		if (result < 0) {
-			fprintf(stderr, "crl_dist_points: %s",
+			fprintf(stderr, "crl_dist_points: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -785,7 +785,7 @@ void generate_self_signed(common_info_st * cinfo)
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, crt, key, get_dig(crt), 0);
 	if (result < 0) {
-		fprintf(stderr, "crt_sign: %s", gnutls_strerror(result));
+		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -793,7 +793,7 @@ void generate_self_signed(common_info_st * cinfo)
 	result =
 	    gnutls_x509_crt_export(crt, outcert_format, buffer, &size);
 	if (result < 0) {
-		fprintf(stderr, "crt_export: %s", gnutls_strerror(result));
+		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -833,7 +833,7 @@ static void generate_signed_certificate(common_info_st * cinfo)
 	    gnutls_x509_crt_privkey_sign(crt, ca_crt, ca_key,
 					 get_dig(ca_crt), 0);
 	if (result < 0) {
-		fprintf(stderr, "crt_sign: %s", gnutls_strerror(result));
+		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -841,7 +841,7 @@ static void generate_signed_certificate(common_info_st * cinfo)
 	result =
 	    gnutls_x509_crt_export(crt, outcert_format, buffer, &size);
 	if (result < 0) {
-		fprintf(stderr, "crt_export: %s", gnutls_strerror(result));
+		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -874,7 +874,7 @@ static void generate_proxy_certificate(common_info_st * cinfo)
 	    gnutls_x509_crt_privkey_sign(crt, eecrt, eekey, get_dig(eecrt),
 					 0);
 	if (result < 0) {
-		fprintf(stderr, "crt_sign: %s", gnutls_strerror(result));
+		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -882,7 +882,7 @@ static void generate_proxy_certificate(common_info_st * cinfo)
 	result =
 	    gnutls_x509_crt_export(crt, outcert_format, buffer, &size);
 	if (result < 0) {
-		fprintf(stderr, "crt_export: %s", gnutls_strerror(result));
+		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -912,7 +912,7 @@ static void generate_signed_crl(common_info_st * cinfo)
 	    gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_key,
 					 get_dig(ca_crt), 0);
 	if (result < 0) {
-		fprintf(stderr, "crl_privkey_sign: %s",
+		fprintf(stderr, "crl_privkey_sign: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -943,7 +943,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 
 	result = gnutls_x509_crt_set_activation_time(crt, tim);
 	if (result < 0) {
-		fprintf(stderr, "set_activation: %s",
+		fprintf(stderr, "set_activation: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -952,7 +952,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 
 	result = gnutls_x509_crt_set_expiration_time(crt, tim);
 	if (result < 0) {
-		fprintf(stderr, "set_expiration: %s",
+		fprintf(stderr, "set_expiration: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -963,7 +963,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 	    gnutls_x509_crt_privkey_sign(crt, ca_crt, ca_key,
 					 get_dig(ca_crt), 0);
 	if (result < 0) {
-		fprintf(stderr, "crt_sign: %s", gnutls_strerror(result));
+		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -971,7 +971,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 	result =
 	    gnutls_x509_crt_export(crt, outcert_format, buffer, &size);
 	if (result < 0) {
-		fprintf(stderr, "crt_export: %s", gnutls_strerror(result));
+		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -1048,7 +1048,7 @@ static void cmd_parser(int argc, char **argv)
 		else if (strcasecmp(OPT_ARG(HASH), "rmd160") == 0)
 			default_dig = GNUTLS_DIG_RMD160;
 		else {
-			fprintf(stderr, "invalid hash: %s", OPT_ARG(HASH));
+			fprintf(stderr, "invalid hash: %s\n", OPT_ARG(HASH));
 			exit(1);
 		}
 	}
@@ -1069,7 +1069,7 @@ static void cmd_parser(int argc, char **argv)
 	}
 
 	if ((ret = gnutls_global_init()) < 0) {
-		fprintf(stderr, "global_init: %s", gnutls_strerror(ret));
+		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 #ifdef ENABLE_PKCS11
@@ -1224,7 +1224,7 @@ void certificate_info(int pubkey, common_info_st * cinfo)
 						  incert_format, 0);
 	}
 	if (ret < 0) {
-		fprintf(stderr, "import error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1254,7 +1254,7 @@ void certificate_info(int pubkey, common_info_st * cinfo)
 			    gnutls_x509_crt_export(crt[i], outcert_format,
 						   buffer, &size);
 			if (ret < 0) {
-				fprintf(stderr, "export error: %s",
+				fprintf(stderr, "export error: %s\n",
 					gnutls_strerror(ret));
 				exit(1);
 			}
@@ -1281,7 +1281,7 @@ void pgp_certificate_info(void)
 
 	ret = gnutls_openpgp_crt_init(&crt);
 	if (ret < 0) {
-		fprintf(stderr, "openpgp_crt_init: %s",
+		fprintf(stderr, "openpgp_crt_init: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -1289,7 +1289,7 @@ void pgp_certificate_info(void)
 	ret = gnutls_openpgp_crt_import(crt, &pem, incert_format);
 
 	if (ret < 0) {
-		fprintf(stderr, "import error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1308,7 +1308,7 @@ void pgp_certificate_info(void)
 	ret = gnutls_openpgp_crt_verify_self(crt, 0, &verify_status);
 	if (ret < 0) {
 		{
-			fprintf(stderr, "verify signature error: %s",
+			fprintf(stderr, "verify signature error: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -1327,7 +1327,7 @@ void pgp_certificate_info(void)
 	ret =
 	    gnutls_openpgp_crt_export(crt, outcert_format, buffer, &size);
 	if (ret < 0) {
-		fprintf(stderr, "export error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "export error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1356,7 +1356,7 @@ void pgp_privkey_info(void)
 					    NULL, 0);
 
 	if (ret < 0) {
-		fprintf(stderr, "import error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1364,7 +1364,7 @@ void pgp_privkey_info(void)
 	 */
 	subkeys = gnutls_openpgp_privkey_get_subkey_count(key);
 	if (subkeys < 0) {
-		fprintf(stderr, "privkey_get_subkey_count: %s",
+		fprintf(stderr, "privkey_get_subkey_count: %s\n",
 			gnutls_strerror(subkeys));
 		exit(1);
 	}
@@ -1496,7 +1496,7 @@ void pgp_privkey_info(void)
 	ret = gnutls_openpgp_privkey_export(key, GNUTLS_OPENPGP_FMT_BASE64,
 					    NULL, 0, buffer, &size);
 	if (ret < 0) {
-		fprintf(stderr, "export error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "export error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1518,7 +1518,7 @@ void pgp_ring_info(void)
 
 	ret = gnutls_openpgp_keyring_init(&ring);
 	if (ret < 0) {
-		fprintf(stderr, "openpgp_keyring_init: %s",
+		fprintf(stderr, "openpgp_keyring_init: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -1526,7 +1526,7 @@ void pgp_ring_info(void)
 	ret = gnutls_openpgp_keyring_import(ring, &pem, incert_format);
 
 	if (ret < 0) {
-		fprintf(stderr, "import error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1538,7 +1538,7 @@ void pgp_ring_info(void)
 			"Keyring contains %d OpenPGP certificates\n\n",
 			count);
 	else {
-		fprintf(stderr, "keyring error: %s",
+		fprintf(stderr, "keyring error: %s\n",
 			gnutls_strerror(count));
 		exit(1);
 	}
@@ -1546,7 +1546,7 @@ void pgp_ring_info(void)
 	for (i = 0; i < count; i++) {
 		ret = gnutls_openpgp_keyring_get_crt(ring, i, &crt);
 		if (ret < 0) {
-			fprintf(stderr, "export error: %s",
+			fprintf(stderr, "export error: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -1555,7 +1555,7 @@ void pgp_ring_info(void)
 		ret = gnutls_openpgp_crt_export(crt, outcert_format,
 						buffer, &size);
 		if (ret < 0) {
-			fprintf(stderr, "export error: %s",
+			fprintf(stderr, "export error: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -1609,7 +1609,7 @@ static void print_crl_info(gnutls_x509_crl_t crl, FILE * out)
 
 	ret = gnutls_x509_crl_print(crl, full_format, &data);
 	if (ret < 0) {
-		fprintf(stderr, "crl_print: %s", gnutls_strerror(ret));
+		fprintf(stderr, "crl_print: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1622,7 +1622,7 @@ static void print_crl_info(gnutls_x509_crl_t crl, FILE * out)
 	    gnutls_x509_crl_export(crl, GNUTLS_X509_FMT_PEM, buffer,
 				   &size);
 	if (ret < 0) {
-		fprintf(stderr, "crl_export: %s", gnutls_strerror(ret));
+		fprintf(stderr, "crl_export: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1638,7 +1638,7 @@ void crl_info(void)
 
 	ret = gnutls_x509_crl_init(&crl);
 	if (ret < 0) {
-		fprintf(stderr, "crl_init: %s", gnutls_strerror(ret));
+		fprintf(stderr, "crl_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1654,7 +1654,7 @@ void crl_info(void)
 
 	free(pem.data);
 	if (ret < 0) {
-		fprintf(stderr, "import error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1672,7 +1672,7 @@ static void print_crq_info(gnutls_x509_crq_t crq, FILE * out)
 	if (outcert_format == GNUTLS_X509_FMT_PEM) {
 		ret = gnutls_x509_crq_print(crq, full_format, &data);
 		if (ret < 0) {
-			fprintf(stderr, "crq_print: %s",
+			fprintf(stderr, "crq_print: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -1692,7 +1692,7 @@ static void print_crq_info(gnutls_x509_crq_t crq, FILE * out)
 	size = buffer_size;
 	ret = gnutls_x509_crq_export(crq, outcert_format, buffer, &size);
 	if (ret < 0) {
-		fprintf(stderr, "crq_export: %s", gnutls_strerror(ret));
+		fprintf(stderr, "crq_export: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1708,7 +1708,7 @@ void crq_info(void)
 
 	ret = gnutls_x509_crq_init(&crq);
 	if (ret < 0) {
-		fprintf(stderr, "crq_init: %s", gnutls_strerror(ret));
+		fprintf(stderr, "crq_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1724,7 +1724,7 @@ void crq_info(void)
 
 	free(pem.data);
 	if (ret < 0) {
-		fprintf(stderr, "import error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1878,7 +1878,7 @@ void privkey_info(common_info_st * cinfo)
 						  flags);
 	}
 	if (ret < 0) {
-		fprintf(stderr, "import error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1894,7 +1894,7 @@ void privkey_info(common_info_st * cinfo)
 	ret =
 	    gnutls_x509_privkey_export(key, outcert_format, buffer, &size);
 	if (ret < 0) {
-		fprintf(stderr, "export error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "export error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1920,7 +1920,7 @@ void generate_request(common_info_st * cinfo)
 
 	ret = gnutls_x509_crq_init(&crq);
 	if (ret < 0) {
-		fprintf(stderr, "crq_init: %s", gnutls_strerror(ret));
+		fprintf(stderr, "crq_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -1931,7 +1931,7 @@ void generate_request(common_info_st * cinfo)
 	if (!pkey) {
 		ret = gnutls_privkey_init(&pkey);
 		if (ret < 0) {
-			fprintf(stderr, "privkey_init: %s",
+			fprintf(stderr, "privkey_init: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -1944,7 +1944,7 @@ void generate_request(common_info_st * cinfo)
 		    gnutls_privkey_import_x509(pkey, xkey,
 					       GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
 		if (ret < 0) {
-			fprintf(stderr, "privkey_import_x509: %s",
+			fprintf(stderr, "privkey_import_x509: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -1979,7 +1979,7 @@ void generate_request(common_info_st * cinfo)
 	if (pass != NULL && pass[0] != 0) {
 		ret = gnutls_x509_crq_set_challenge_password(crq, pass);
 		if (ret < 0) {
-			fprintf(stderr, "set_pass: %s",
+			fprintf(stderr, "set_pass: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -1996,7 +1996,7 @@ void generate_request(common_info_st * cinfo)
 		    gnutls_x509_crq_set_basic_constraints(crq, ca_status,
 							  path_len);
 		if (ret < 0) {
-			fprintf(stderr, "set_basic_constraints: %s",
+			fprintf(stderr, "set_basic_constraints: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -2030,7 +2030,7 @@ void generate_request(common_info_st * cinfo)
 				ret = gnutls_x509_crq_set_key_purpose_oid
 				    (crq, GNUTLS_KP_CODE_SIGNING, 0);
 				if (ret < 0) {
-					fprintf(stderr, "key_kp: %s",
+					fprintf(stderr, "key_kp: %s\n",
 						gnutls_strerror(ret));
 					exit(1);
 				}
@@ -2041,7 +2041,7 @@ void generate_request(common_info_st * cinfo)
 				ret = gnutls_x509_crq_set_key_purpose_oid
 				    (crq, GNUTLS_KP_OCSP_SIGNING, 0);
 				if (ret < 0) {
-					fprintf(stderr, "key_kp: %s",
+					fprintf(stderr, "key_kp: %s\n",
 						gnutls_strerror(ret));
 					exit(1);
 				}
@@ -2052,7 +2052,7 @@ void generate_request(common_info_st * cinfo)
 				ret = gnutls_x509_crq_set_key_purpose_oid
 				    (crq, GNUTLS_KP_TIME_STAMPING, 0);
 				if (ret < 0) {
-					fprintf(stderr, "key_kp: %s",
+					fprintf(stderr, "key_kp: %s\n",
 						gnutls_strerror(ret));
 					exit(1);
 				}
@@ -2063,7 +2063,7 @@ void generate_request(common_info_st * cinfo)
 				ret = gnutls_x509_crq_set_key_purpose_oid
 				    (crq, GNUTLS_KP_IPSEC_IKE, 0);
 				if (ret < 0) {
-					fprintf(stderr, "key_kp: %s",
+					fprintf(stderr, "key_kp: %s\n",
 						gnutls_strerror(ret));
 					exit(1);
 				}
@@ -2072,7 +2072,7 @@ void generate_request(common_info_st * cinfo)
 
 		ret = gnutls_x509_crq_set_key_usage(crq, usage);
 		if (ret < 0) {
-			fprintf(stderr, "key_usage: %s",
+			fprintf(stderr, "key_usage: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -2082,7 +2082,7 @@ void generate_request(common_info_st * cinfo)
 			ret = gnutls_x509_crq_set_key_purpose_oid
 			    (crq, GNUTLS_KP_TLS_WWW_CLIENT, 0);
 			if (ret < 0) {
-				fprintf(stderr, "key_kp: %s",
+				fprintf(stderr, "key_kp: %s\n",
 					gnutls_strerror(ret));
 				exit(1);
 			}
@@ -2093,7 +2093,7 @@ void generate_request(common_info_st * cinfo)
 			ret = gnutls_x509_crq_set_key_purpose_oid
 			    (crq, GNUTLS_KP_TLS_WWW_SERVER, 0);
 			if (ret < 0) {
-				fprintf(stderr, "key_kp: %s",
+				fprintf(stderr, "key_kp: %s\n",
 					gnutls_strerror(ret));
 				exit(1);
 			}
@@ -2104,7 +2104,7 @@ void generate_request(common_info_st * cinfo)
 
 	ret = gnutls_x509_crq_set_pubkey(crq, pubkey);
 	if (ret < 0) {
-		fprintf(stderr, "set_key: %s", gnutls_strerror(ret));
+		fprintf(stderr, "set_key: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -2112,7 +2112,7 @@ void generate_request(common_info_st * cinfo)
 	    gnutls_x509_crq_privkey_sign(crq, pkey,
 					 get_dig_for_pub(pubkey), 0);
 	if (ret < 0) {
-		fprintf(stderr, "sign: %s", gnutls_strerror(ret));
+		fprintf(stderr, "sign: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -2143,7 +2143,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 	    gnutls_x509_crt_get_issuer_dn(cert, issuer_name,
 					  &issuer_name_size);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_crt_get_issuer_dn: %s",
+		fprintf(stderr, "gnutls_x509_crt_get_issuer_dn: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -2151,7 +2151,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 	name_size = sizeof(name);
 	ret = gnutls_x509_crt_get_dn(cert, name, &name_size);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_crt_get_dn: %s",
+		fprintf(stderr, "gnutls_x509_crt_get_dn: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -2166,7 +2166,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 					   &issuer_name_size);
 		if (ret < 0) {
 			fprintf(stderr,
-				"gnutls_x509_crt_get_issuer_dn: %s",
+				"gnutls_x509_crt_get_issuer_dn: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -2183,7 +2183,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 						  &issuer_name_size);
 		if (ret < 0) {
 			fprintf(stderr,
-				"gnutls_x509_crl_get_issuer_dn: %s",
+				"gnutls_x509_crl_get_issuer_dn: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -2200,7 +2200,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 			name_size = sizeof(name);
 			ret = gnutls_hex_encode(&data, name, &name_size);
 			if (ret < 0) {
-				fprintf(stderr, "gnutls_hex_encode: %s",
+				fprintf(stderr, "gnutls_hex_encode: %s\n",
 					gnutls_strerror(ret));
 				exit(1);
 			}
@@ -2238,7 +2238,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 
 	ret = gnutls_x509_trust_list_init(&list, 0);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_trust_list_init: %s",
+		fprintf(stderr, "gnutls_x509_trust_list_init: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -2262,7 +2262,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 						 &x509_ncerts, &tmp,
 						 GNUTLS_X509_FMT_PEM, 0);
 		if (ret < 0 || x509_ncerts < 1) {
-			fprintf(stderr, "error parsing CRTs: %s",
+			fprintf(stderr, "error parsing CRTs: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -2282,7 +2282,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 							 GNUTLS_X509_FMT_PEM,
 							 0);
 			if (ret < 0 || x509_ncas < 1) {
-				fprintf(stderr, "error parsing CAs: %s",
+				fprintf(stderr, "error parsing CAs: %s\n",
 					gnutls_strerror(ret));
 				exit(1);
 			}
@@ -2307,7 +2307,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 						 &x509_ncerts, &tmp,
 						 GNUTLS_X509_FMT_PEM, 0);
 		if (ret < 0 || x509_ncerts < 1) {
-			fprintf(stderr, "error parsing CRTs: %s",
+			fprintf(stderr, "error parsing CRTs: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -2321,7 +2321,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 		    gnutls_x509_trust_list_add_cas(list, x509_ca_list,
 						   x509_ncas, 0);
 		if (ret < 0) {
-			fprintf(stderr, "gnutls_x509_trust_add_cas: %s",
+			fprintf(stderr, "gnutls_x509_trust_add_cas: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -2330,7 +2330,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 		    gnutls_x509_trust_list_add_crls(list, x509_crl_list,
 						    x509_ncrls, 0, 0);
 		if (ret < 0) {
-			fprintf(stderr, "gnutls_x509_trust_add_crls: %s",
+			fprintf(stderr, "gnutls_x509_trust_add_crls: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -2349,7 +2349,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 					      &output,
 					      detailed_verification);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_x509_trusted_list_verify_crt: %s",
+		fprintf(stderr, "gnutls_x509_trusted_list_verify_crt: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -2464,7 +2464,7 @@ void verify_crl(common_info_st * cinfo)
 	dn_size = sizeof(dn);
 	ret = gnutls_x509_crt_get_dn(issuer, dn, &dn_size);
 	if (ret < 0) {
-		fprintf(stderr, "crt_get_dn: %s", gnutls_strerror(ret));
+		fprintf(stderr, "crt_get_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -2472,7 +2472,7 @@ void verify_crl(common_info_st * cinfo)
 
 	ret = gnutls_x509_crl_init(&crl);
 	if (ret < 0) {
-		fprintf(stderr, "crl_init: %s", gnutls_strerror(ret));
+		fprintf(stderr, "crl_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -2482,7 +2482,7 @@ void verify_crl(common_info_st * cinfo)
 	ret = gnutls_x509_crl_import(crl, &pem, incert_format);
 	free(pem.data);
 	if (ret < 0) {
-		fprintf(stderr, "import error: %s", gnutls_strerror(ret));
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -2491,7 +2491,7 @@ void verify_crl(common_info_st * cinfo)
 	fprintf(outfile, "Verification output: ");
 	ret = gnutls_x509_crl_verify(crl, &issuer, 1, 0, &output);
 	if (ret < 0) {
-		fprintf(stderr, "verification error: %s",
+		fprintf(stderr, "verification error: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -2542,7 +2542,7 @@ void generate_pkcs8(common_info_st * cinfo)
 					     &size);
 
 	if (result < 0) {
-		fprintf(stderr, "key_export: %s", gnutls_strerror(result));
+		fprintf(stderr, "key_export: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -2580,7 +2580,7 @@ void generate_pkcs12(common_info_st * cinfo)
 
 	result = gnutls_pkcs12_init(&pkcs12);
 	if (result < 0) {
-		fprintf(stderr, "pkcs12_init: %s",
+		fprintf(stderr, "pkcs12_init: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -2593,14 +2593,14 @@ void generate_pkcs12(common_info_st * cinfo)
 
 		result = gnutls_pkcs12_bag_init(&bag);
 		if (result < 0) {
-			fprintf(stderr, "bag_init: %s",
+			fprintf(stderr, "bag_init: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
 
 		result = gnutls_pkcs12_bag_set_crt(bag, crts[i]);
 		if (result < 0) {
-			fprintf(stderr, "set_crt[%d]: %s", i,
+			fprintf(stderr, "set_crt[%d]: %s\n", i,
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2613,7 +2613,7 @@ void generate_pkcs12(common_info_st * cinfo)
 								name);
 			if (result < 0) {
 				fprintf(stderr,
-					"bag_set_friendly_name: %s",
+					"bag_set_friendly_name: %s\n",
 					gnutls_strerror(result));
 				exit(1);
 			}
@@ -2623,7 +2623,7 @@ void generate_pkcs12(common_info_st * cinfo)
 		result =
 		    gnutls_x509_crt_get_key_id(crts[i], 0, _key_id, &size);
 		if (result < 0) {
-			fprintf(stderr, "key_id[%d]: %s", i,
+			fprintf(stderr, "key_id[%d]: %s\n", i,
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2633,21 +2633,21 @@ void generate_pkcs12(common_info_st * cinfo)
 
 		result = gnutls_pkcs12_bag_set_key_id(bag, indx, &key_id);
 		if (result < 0) {
-			fprintf(stderr, "bag_set_key_id: %s",
+			fprintf(stderr, "bag_set_key_id: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
 
 		result = gnutls_pkcs12_bag_encrypt(bag, pass, flags);
 		if (result < 0) {
-			fprintf(stderr, "bag_encrypt: %s",
+			fprintf(stderr, "bag_encrypt: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
 
 		result = gnutls_pkcs12_set_bag(pkcs12, bag);
 		if (result < 0) {
-			fprintf(stderr, "set_bag: %s",
+			fprintf(stderr, "set_bag: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2658,7 +2658,7 @@ void generate_pkcs12(common_info_st * cinfo)
 
 		result = gnutls_pkcs12_bag_init(&kbag);
 		if (result < 0) {
-			fprintf(stderr, "bag_init: %s",
+			fprintf(stderr, "bag_init: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2670,7 +2670,7 @@ void generate_pkcs12(common_info_st * cinfo)
 						     pass, flags, buffer,
 						     &size);
 		if (result < 0) {
-			fprintf(stderr, "key_export[%d]: %s", i,
+			fprintf(stderr, "key_export[%d]: %s\n", i,
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2682,7 +2682,7 @@ void generate_pkcs12(common_info_st * cinfo)
 					       GNUTLS_BAG_PKCS8_ENCRYPTED_KEY,
 					       &data);
 		if (result < 0) {
-			fprintf(stderr, "bag_set_data: %s",
+			fprintf(stderr, "bag_set_data: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2692,7 +2692,7 @@ void generate_pkcs12(common_info_st * cinfo)
 		result =
 		    gnutls_pkcs12_bag_set_friendly_name(kbag, indx, name);
 		if (result < 0) {
-			fprintf(stderr, "bag_set_friendly_name: %s",
+			fprintf(stderr, "bag_set_friendly_name: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2702,7 +2702,7 @@ void generate_pkcs12(common_info_st * cinfo)
 		    gnutls_x509_privkey_get_key_id(keys[i], 0, _key_id,
 						   &size);
 		if (result < 0) {
-			fprintf(stderr, "key_id[%d]: %s", i,
+			fprintf(stderr, "key_id[%d]: %s\n", i,
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2712,14 +2712,14 @@ void generate_pkcs12(common_info_st * cinfo)
 
 		result = gnutls_pkcs12_bag_set_key_id(kbag, indx, &key_id);
 		if (result < 0) {
-			fprintf(stderr, "bag_set_key_id: %s",
+			fprintf(stderr, "bag_set_key_id: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
 
 		result = gnutls_pkcs12_set_bag(pkcs12, kbag);
 		if (result < 0) {
-			fprintf(stderr, "set_bag: %s",
+			fprintf(stderr, "set_bag: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2727,7 +2727,7 @@ void generate_pkcs12(common_info_st * cinfo)
 
 	result = gnutls_pkcs12_generate_mac(pkcs12, pass);
 	if (result < 0) {
-		fprintf(stderr, "generate_mac: %s",
+		fprintf(stderr, "generate_mac: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -2736,7 +2736,7 @@ void generate_pkcs12(common_info_st * cinfo)
 	result =
 	    gnutls_pkcs12_export(pkcs12, outcert_format, buffer, &size);
 	if (result < 0) {
-		fprintf(stderr, "pkcs12_export: %s",
+		fprintf(stderr, "pkcs12_export: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -2777,7 +2777,7 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 
 	count = gnutls_pkcs12_bag_get_count(bag);
 	if (count < 0) {
-		fprintf(stderr, "get_count: %s", gnutls_strerror(count));
+		fprintf(stderr, "get_count: %s\n", gnutls_strerror(count));
 		exit(1);
 	}
 
@@ -2786,7 +2786,7 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 	for (i = 0; i < count; i++) {
 		type = gnutls_pkcs12_bag_get_type(bag, i);
 		if (type < 0) {
-			fprintf(stderr, "get_type: %s",
+			fprintf(stderr, "get_type: %s\n",
 				gnutls_strerror(type));
 			exit(1);
 		}
@@ -2798,7 +2798,7 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 		    gnutls_pkcs12_bag_get_friendly_name(bag, i,
 							(char **) &name);
 		if (result < 0) {
-			fprintf(stderr, "get_friendly_name: %s",
+			fprintf(stderr, "get_friendly_name: %s\n",
 				gnutls_strerror(type));
 			exit(1);
 		}
@@ -2810,7 +2810,7 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 		id.size = 0;
 		result = gnutls_pkcs12_bag_get_key_id(bag, i, &id);
 		if (result < 0) {
-			fprintf(stderr, "get_key_id: %s",
+			fprintf(stderr, "get_key_id: %s\n",
 				gnutls_strerror(type));
 			exit(1);
 		}
@@ -2821,7 +2821,7 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 
 		result = gnutls_pkcs12_bag_get_data(bag, i, &cdata);
 		if (result < 0) {
-			fprintf(stderr, "get_data: %s",
+			fprintf(stderr, "get_data: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2867,7 +2867,7 @@ void pkcs12_info(common_info_st * cinfo)
 
 	result = gnutls_pkcs12_init(&pkcs12);
 	if (result < 0) {
-		fprintf(stderr, "p12_init: %s", gnutls_strerror(result));
+		fprintf(stderr, "p12_init: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -2877,7 +2877,7 @@ void pkcs12_info(common_info_st * cinfo)
 	result = gnutls_pkcs12_import(pkcs12, &data, incert_format, 0);
 	free(data.data);
 	if (result < 0) {
-		fprintf(stderr, "p12_import: %s", gnutls_strerror(result));
+		fprintf(stderr, "p12_import: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -2886,13 +2886,13 @@ void pkcs12_info(common_info_st * cinfo)
 	result = gnutls_pkcs12_verify_mac(pkcs12, pass);
 	if (result < 0) {
 		fail = 1;
-		fprintf(stderr, "verify_mac: %s", gnutls_strerror(result));
+		fprintf(stderr, "verify_mac: %s\n", gnutls_strerror(result));
 	}
 
 	for (indx = 0;; indx++) {
 		result = gnutls_pkcs12_bag_init(&bag);
 		if (result < 0) {
-			fprintf(stderr, "bag_init: %s",
+			fprintf(stderr, "bag_init: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2903,7 +2903,7 @@ void pkcs12_info(common_info_st * cinfo)
 
 		result = gnutls_pkcs12_bag_get_count(bag);
 		if (result < 0) {
-			fprintf(stderr, "bag_count: %s",
+			fprintf(stderr, "bag_count: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2912,7 +2912,7 @@ void pkcs12_info(common_info_st * cinfo)
 
 		result = gnutls_pkcs12_bag_get_type(bag, 0);
 		if (result < 0) {
-			fprintf(stderr, "bag_init: %s",
+			fprintf(stderr, "bag_init: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -2925,14 +2925,14 @@ void pkcs12_info(common_info_st * cinfo)
 
 			if (result < 0) {
 				fail = 1;
-				fprintf(stderr, "bag_decrypt: %s",
+				fprintf(stderr, "bag_decrypt: %s\n",
 					gnutls_strerror(result));
 				continue;
 			}
 
 			result = gnutls_pkcs12_bag_get_count(bag);
 			if (result < 0) {
-				fprintf(stderr, "encrypted bag_count: %s",
+				fprintf(stderr, "encrypted bag_count: %s\n",
 					gnutls_strerror(result));
 				exit(1);
 			}
@@ -2960,7 +2960,7 @@ void pkcs7_info(void)
 
 	result = gnutls_pkcs7_init(&pkcs7);
 	if (result < 0) {
-		fprintf(stderr, "p7_init: %s", gnutls_strerror(result));
+		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -2970,7 +2970,7 @@ void pkcs7_info(void)
 	result = gnutls_pkcs7_import(pkcs7, &data, incert_format);
 	free(data.data);
 	if (result < 0) {
-		fprintf(stderr, "import error: %s",
+		fprintf(stderr, "import error: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -2979,7 +2979,7 @@ void pkcs7_info(void)
 	 */
 	result = gnutls_pkcs7_get_crt_count(pkcs7);
 	if (result < 0) {
-		fprintf(stderr, "p7_crt_count: %s",
+		fprintf(stderr, "p7_crt_count: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -3005,7 +3005,7 @@ void pkcs7_info(void)
 		    gnutls_pem_base64_encode_alloc("CERTIFICATE", &data,
 						   &b64);
 		if (result < 0) {
-			fprintf(stderr, "encoding: %s",
+			fprintf(stderr, "encoding: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -3018,7 +3018,7 @@ void pkcs7_info(void)
 	 */
 	result = gnutls_pkcs7_get_crl_count(pkcs7);
 	if (result < 0) {
-		fprintf(stderr, "p7_crl_count: %s",
+		fprintf(stderr, "p7_crl_count: %s\n",
 			gnutls_strerror(result));
 		exit(1);
 	}
@@ -3044,7 +3044,7 @@ void pkcs7_info(void)
 		    gnutls_pem_base64_encode_alloc("X509 CRL", &data,
 						   &b64);
 		if (result < 0) {
-			fprintf(stderr, "encoding: %s",
+			fprintf(stderr, "encoding: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}
@@ -3111,7 +3111,7 @@ void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {
-		fprintf(stderr, "pubkey_init: %s", gnutls_strerror(ret));
+		fprintf(stderr, "pubkey_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
@@ -3126,14 +3126,14 @@ void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
 	if (crt != NULL) {
 		ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
 		if (ret < 0) {
-			fprintf(stderr, "pubkey_import_x509: %s",
+			fprintf(stderr, "pubkey_import_x509: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
 	} else if (crq != NULL) {
 		ret = gnutls_pubkey_import_x509_crq(pubkey, crq, 0);
 		if (ret < 0) {
-			fprintf(stderr, "pubkey_import_x509_crq: %s",
+			fprintf(stderr, "pubkey_import_x509_crq: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -3146,7 +3146,7 @@ void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
 							 0, 0);
 			if (ret < 0) {
 				fprintf(stderr,
-					"pubkey_import_privkey: %s",
+					"pubkey_import_privkey: %s\n",
 					gnutls_strerror(ret));
 				exit(1);
 			}
@@ -3162,7 +3162,7 @@ void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
 		    gnutls_pubkey_export(pubkey, outcert_format, buffer,
 					 &size);
 		if (ret < 0) {
-			fprintf(stderr, "export error: %s",
+			fprintf(stderr, "export error: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
