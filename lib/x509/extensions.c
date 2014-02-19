@@ -831,9 +831,9 @@ _gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
 
 	if (data == NULL) {
 		if (data_size == 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		else
 			data = (void*)"";
+		else
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
 	switch (type) {
