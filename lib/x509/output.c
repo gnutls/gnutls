@@ -836,7 +836,7 @@ print_altname(gnutls_buffer_st * str, const char *prefix,
 
 		if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;
-		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		if (err < 0 && err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 			addf(str,
 			     "error: get_subject/issuer_alt_name: %s\n",
 			     gnutls_strerror(err));
