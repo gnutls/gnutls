@@ -26,6 +26,7 @@
 #include <algorithms.h>
 #include <abstract_int.h>
 #include <x509/x509_int.h>
+#include <stdbool.h>
 #include <fips.h>
 
 #define MAX_STRING_LEN 512
@@ -171,11 +172,11 @@ int
 _gnutls_x509_get_raw_dn2(ASN1_TYPE c2, gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn);
 
-int
+bool
 _gnutls_check_if_same_cert(gnutls_x509_crt_t cert1,
 			   gnutls_x509_crt_t cert2);
 
-int
+bool
 _gnutls_check_if_same_cert2(gnutls_x509_crt_t cert1,
 			    gnutls_datum_t * cert2bin);
 
@@ -191,5 +192,7 @@ int set_extension(ASN1_TYPE asn, const char *root,
 
 int _gnutls_strdatum_to_buf(gnutls_datum_t * d, void *buf,
 			    size_t * sizeof_buf);
+
+bool _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
 
 #endif

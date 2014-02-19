@@ -397,8 +397,6 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 				gnutls_verify_output_function func);
 #endif
 
-int _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
-
 int
 _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 				  const gnutls_x509_crl_t * crl_list,

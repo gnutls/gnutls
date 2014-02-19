@@ -37,9 +37,10 @@
 #include <x509_int.h>
 #include <common.h>
 #include <gnutls_pk.h>
+#include <stdbool.h>
 
 /* Checks if two certs are identical.  Return 1 on match. */
-int
+bool
 _gnutls_check_if_same_cert(gnutls_x509_crt_t cert1,
 			   gnutls_x509_crt_t cert2)
 {
@@ -77,7 +78,7 @@ _gnutls_check_if_same_cert(gnutls_x509_crt_t cert1,
 	return result;
 }
 
-int
+bool
 _gnutls_check_if_same_cert2(gnutls_x509_crt_t cert1,
 			    gnutls_datum_t * cert2bin)
 {
@@ -109,7 +110,7 @@ _gnutls_check_if_same_cert2(gnutls_x509_crt_t cert1,
  * Returns true or false, if the issuer is a CA,
  * or not.
  */
-static int
+static bool
 check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	    unsigned int *max_path, unsigned int flags)
 {
@@ -225,7 +226,7 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
  *
  * Returns 1 if they match and (0) if they don't match. 
  */
-static int is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
+static bool is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 {
 	uint8_t id1[MAX_KEY_ID_SIZE];
 	uint8_t id2[MAX_KEY_ID_SIZE];
@@ -276,7 +277,7 @@ static int is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 /* Check if the given certificate is the issuer of the CRL.
  * Returns 1 on success and 0 otherwise.
  */
-static int is_crl_issuer(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer)
+static bool is_crl_issuer(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer)
 {
 	if (_gnutls_x509_compare_raw_dn
 	    (&crl->raw_issuer_dn, &issuer->raw_dn) != 0)
@@ -289,7 +290,7 @@ static int is_crl_issuer(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer)
  * Returns 1 if they match and (0) if they don't match. Otherwise
  * a negative error code is returned to indicate error.
  */
-int _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
+bool _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
 {
 	if (_gnutls_x509_compare_raw_dn(&cert1->raw_dn, &cert2->raw_dn) !=
 	    0)
@@ -399,7 +400,7 @@ int is_broken_allowed(gnutls_sign_algorithm_t sig, unsigned int flags)
  * @sigalg: the signature algorithm used
  * @flags: the specified verification flags
  */
-static int is_level_acceptable(
+static bool is_level_acceptable(
 	gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 	gnutls_sign_algorithm_t sigalg, unsigned flags)
 {
@@ -527,7 +528,7 @@ int hash;
  * Output will hold some extra information about the verification
  * procedure. Issuer will hold the actual issuer from the trusted list.
  */
-static int
+static bool
 verify_crt(gnutls_x509_crt_t cert,
 			    const gnutls_x509_crt_t * trusted_cas,
 			    int tcas_size, unsigned int flags,
