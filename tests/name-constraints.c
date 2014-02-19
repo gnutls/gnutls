@@ -119,7 +119,7 @@ void doit(void)
 	i = 0;
 	do {
 		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &type, &name);
-		
+
 		if (ret >= 0 && i == 2) {
 			if (name.size != 3 || memcmp(name.data, ".eu", 3) != 0) {
 				fail("error reading 2nd constraint\n");
@@ -130,7 +130,7 @@ void doit(void)
 	if (i-1 != 8) {
 		fail("Could not read all contraints; read %d, expected %d\n", i-1, 8);
 	}
-	
+
 	gnutls_x509_name_constraints_deinit(nc);
 	gnutls_x509_crt_deinit(crt);
 
@@ -163,6 +163,11 @@ void doit(void)
 	if (ret < 0)
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 
+	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_URI,
+		&name3);
+	if (ret < 0)
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+
 	ret = gnutls_x509_crt_set_name_constraints(crt, nc, 1);
 	if (ret < 0)
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
@@ -172,7 +177,7 @@ void doit(void)
 	i = 0;
 	do {
 		ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &type, &name);
-		
+
 		if (ret >= 0 && i == 1) {
 			if (name.size != name1.size || memcmp(name.data, name1.data, name1.size) != 0) {
 				fail("%d: error reading 1st constraint\n", __LINE__);
@@ -187,7 +192,7 @@ void doit(void)
 	i = 0;
 	do {
 		ret = gnutls_x509_name_constraints_get_excluded(nc, i++, &type, &name);
-		
+
 		if (ret >= 0 && i == 1) {
 			if (name.size != name2.size || memcmp(name.data, name2.data, name2.size) != 0) {
 				fail("%d: error reading 1st excluded constraint\n", __LINE__);
@@ -200,16 +205,27 @@ void doit(void)
 		}
 	} while(ret == 0);
 
-	if (i-1 != 2) {
-		fail("Could not read all excluded contraints; read %d, expected %d\n", i-1, 2);
+	if (i-1 != 3) {
+		fail("Could not read all excluded contraints; read %d, expected %d\n", i-1, 3);
 	}
-	
+
 	/* 3: test the name constraints check function */
+
+	/* This name constraints structure doesn't have any excluded RFC822NAME so
+	 * this test should succeed */
 	name.data = (unsigned char*)"nmav@example.com";
 	name.size = strlen((char*)name.data);
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &name);
+	if (ret == 0)
+		fail("Checking e-mail should have succeeded\n");
+
+	/* This name constraints structure does have an excluded URI so
+	 * this test should fail */
+	name.data = (unsigned char*)"http://www.com";
+	name.size = strlen((char*)name.data);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_URI, &name);
 	if (ret != 0)
-		fail("Checking e-mail should have failed\n");
+		fail("Checking URI should have failed\n");
 
 	name.data = (unsigned char*)"goodexample.com";
 	name.size = strlen((char*)name.data);
@@ -237,7 +253,7 @@ void doit(void)
 
 	gnutls_x509_name_constraints_deinit(nc);
 	gnutls_x509_crt_deinit(crt);
-	
+
 	gnutls_global_deinit();
 
 	if (debug)
