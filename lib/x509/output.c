@@ -34,6 +34,7 @@
 #define addf _gnutls_buffer_append_printf
 #define adds _gnutls_buffer_append_str
 
+#define NON_NULL(x) (((x)!=NULL)?((char*)(x)):"")
 #define ERROR_STR (char*) "(error)"
 
 static char *ip_to_string(void *_ip, int ip_size, char *string,
@@ -182,11 +183,11 @@ static void print_nc(gnutls_buffer_st * str, const char* prefix, gnutls_x509_crt
 				addf(str,  _("%s\t\t\tPermitted:\n"), prefix);
 
 			if (type == GNUTLS_SAN_DNSNAME) {
-				addf(str,  _("%s\t\t\t\tDNSname:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tDNSname:%s\n"), prefix, NON_NULL(name.data));
 			} else if (type == GNUTLS_SAN_RFC822NAME) {
-				addf(str,  _("%s\t\t\t\tRFC822Name:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tRFC822Name:%s\n"), prefix, NON_NULL(name.data));
 			} else if (type == GNUTLS_SAN_URI) {
-				addf(str,  _("%s\t\t\t\tURI:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tURI:%s\n"), prefix, NON_NULL(name.data));
 			} else if (type == GNUTLS_SAN_DN) {
 				addf(str,  _("%s\t\t\t\tdirectoryName:"), prefix);
 				_gnutls_buffer_hexprint(str, name.data, name.size);
@@ -204,11 +205,11 @@ static void print_nc(gnutls_buffer_st * str, const char* prefix, gnutls_x509_crt
 				addf(str,  _("%s\t\t\tExcluded:\n"), prefix);
 
 			if (type == GNUTLS_SAN_DNSNAME) {
-				addf(str,  _("%s\t\t\t\tDNSname:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tDNSname:%s\n"), prefix, NON_NULL(name.data));
 			} else if (type == GNUTLS_SAN_RFC822NAME) {
-				addf(str,  _("%s\t\t\t\tRFC822Name:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tRFC822Name:%s\n"), prefix, NON_NULL(name.data));
 			} else if (type == GNUTLS_SAN_URI) {
-				addf(str,  _("%s\t\t\t\tURI:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tURI:%s\n"), prefix, NON_NULL(name.data));
 			} else if (type == GNUTLS_SAN_DN) {
 				addf(str,  _("%s\t\t\t\tdirectoryName:"), prefix);
 				_gnutls_buffer_hexprint(str, name.data, name.size);
