@@ -75,8 +75,9 @@ static int extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 			break;
 		}
 
-		if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME
-		    && type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI) {
+		if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME &&
+		    type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI &&
+		    type != GNUTLS_SAN_IPADDRESS) {
 			gnutls_assert();
 			ret = GNUTLS_E_ILLEGAL_PARAMETER;
 			goto cleanup;
@@ -262,7 +263,7 @@ int name_constraints_add(gnutls_x509_name_constraints_t nc,
 	int ret;
 
 	if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME &&
-		type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI)
+		type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI && type != GNUTLS_SAN_IPADDRESS)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (type == GNUTLS_SAN_DNSNAME && name->size > 0 && name->data[0] == '.') {
