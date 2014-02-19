@@ -616,6 +616,12 @@ verify_crt(gnutls_x509_crt_t cert,
 			gnutls_assert();
 			goto nc_fail;
 		}
+
+		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_IPADDRESS, cert);
+		if (result == 0) {
+			gnutls_assert();
+			goto nc_fail;
+		}
 	}
 
 	issuer_version = gnutls_x509_crt_get_version(issuer);
