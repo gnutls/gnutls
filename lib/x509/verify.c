@@ -130,7 +130,7 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 					 &issuer_signed_data);
 	if (result < 0) {
 		gnutls_assert();
-		goto cleanup;
+		goto fail;
 	}
 
 	result =
@@ -138,7 +138,7 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 					 &cert_signed_data);
 	if (result < 0) {
 		gnutls_assert();
-		goto cleanup;
+		goto fail;
 	}
 
 	result =
@@ -146,7 +146,7 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 				       &issuer_signature);
 	if (result < 0) {
 		gnutls_assert();
-		goto cleanup;
+		goto fail;
 	}
 
 	result =
@@ -154,7 +154,7 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 				       &cert_signature);
 	if (result < 0) {
 		gnutls_assert();
-		goto cleanup;
+		goto fail;
 	}
 
 	/* If the subject certificate is the same as the issuer
@@ -207,9 +207,10 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	} else
 		gnutls_assert();
 
+ fail:
 	result = 0;
 
-      cleanup:
+ cleanup:
 	_gnutls_free_datum(&cert_signed_data);
 	_gnutls_free_datum(&issuer_signed_data);
 	_gnutls_free_datum(&cert_signature);
