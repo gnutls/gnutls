@@ -699,25 +699,20 @@ void crt_constraints_set(gnutls_x509_crt_t crt)
 	gnutls_datum_t name;
 
 	if (batch) {
-fprintf(stderr, "XXX: %d\n", __LINE__);
 		if (cfg.permitted_nc_dns == NULL && cfg.permitted_nc_email == NULL &&
 			cfg.excluded_nc_dns == NULL && cfg.excluded_nc_email == NULL)
 			return; /* nothing to do */
 
-fprintf(stderr, "XXX: %d\n", __LINE__);
 		ret = gnutls_x509_name_constraints_init(&nc);
 		if (ret < 0) {
 			fprintf(stderr, "nc_init: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
 
-fprintf(stderr, "XXX: %d\n", __LINE__);
 		if (cfg.permitted_nc_dns) {
 
-fprintf(stderr, "XXX: %d\n", __LINE__);
 			for (i = 0; cfg.permitted_nc_dns[i] != NULL; i++) {
 
-fprintf(stderr, "XXX: %d\n", __LINE__);
 				name.data = cfg.permitted_nc_dns[i];
 				name.size = strlen((char*)name.data);
 				ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME, &name);
