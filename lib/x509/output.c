@@ -182,13 +182,13 @@ static void print_nc(gnutls_buffer_st * str, const char* prefix, gnutls_x509_crt
 				addf(str,  _("%s\t\t\tPermitted:\n"), prefix);
 
 			if (type == GNUTLS_SAN_DNSNAME) {
-				addf(str,  _("%s\t\t\tDNSname:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tDNSname:%s\n"), prefix, name.data);
 			} else if (type == GNUTLS_SAN_RFC822NAME) {
-				addf(str,  _("%s\t\t\tRFC822Name:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tRFC822Name:%s\n"), prefix, name.data);
 			} else if (type == GNUTLS_SAN_URI) {
-				addf(str,  _("%s\t\t\tURI:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tURI:%s\n"), prefix, name.data);
 			} else if (type == GNUTLS_SAN_DN) {
-				addf(str,  _("%s\t\t\tdirectoryName:"), prefix);
+				addf(str,  _("%s\t\t\t\tdirectoryName:"), prefix);
 				_gnutls_buffer_hexprint(str, name.data, name.size);
 				adds(str,  _(" \n"));
 			}
@@ -204,13 +204,13 @@ static void print_nc(gnutls_buffer_st * str, const char* prefix, gnutls_x509_crt
 				addf(str,  _("%s\t\t\tExcluded:\n"), prefix);
 
 			if (type == GNUTLS_SAN_DNSNAME) {
-				addf(str,  _("%s\t\t\tDNSname:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tDNSname:%s\n"), prefix, name.data);
 			} else if (type == GNUTLS_SAN_RFC822NAME) {
-				addf(str,  _("%s\t\t\tRFC822Name:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tRFC822Name:%s\n"), prefix, name.data);
 			} else if (type == GNUTLS_SAN_URI) {
-				addf(str,  _("%s\t\t\tURI:%s\n"), prefix, name.data);
+				addf(str,  _("%s\t\t\t\tURI:%s\n"), prefix, name.data);
 			} else if (type == GNUTLS_SAN_DN) {
-				addf(str,  _("%s\t\t\tdirectoryName:"), prefix);
+				addf(str,  _("%s\t\t\t\tdirectoryName:"), prefix);
 				_gnutls_buffer_hexprint(str, name.data, name.size);
 				adds(str,  _(" \n"));
 			}
