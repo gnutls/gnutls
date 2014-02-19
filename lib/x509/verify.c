@@ -527,7 +527,7 @@ int hash;
  * procedure. Issuer will hold the actual issuer from the trusted list.
  */
 static int
-_gnutls_verify_certificate2(gnutls_x509_crt_t cert,
+verify_crt(gnutls_x509_crt_t cert,
 			    const gnutls_x509_crt_t * trusted_cas,
 			    int tcas_size, unsigned int flags,
 			    unsigned int *output,
@@ -876,7 +876,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 	 */
 	output = 0;
 	max_path = MAX_VERIFY_DEPTH;
-	ret = _gnutls_verify_certificate2(certificate_list[clist_size - 1],
+	ret = verify_crt(certificate_list[clist_size - 1],
 					  trusted_cas, tcas_size, flags,
 					  &output, &issuer, now, &max_path,
 					  nc, func);
@@ -905,7 +905,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 			flags |= GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT;
 		}
 		if ((ret =
-		     _gnutls_verify_certificate2(certificate_list[i - 1],
+		     verify_crt(certificate_list[i - 1],
 						 &certificate_list[i], 1,
 						 flags, &output, NULL, now,
 						 &max_path, nc, func)) == 0) {
