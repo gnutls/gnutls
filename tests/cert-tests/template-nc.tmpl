@@ -52,6 +52,9 @@ nc_permit_dns = example.com
 nc_exclude_dns = net
 nc_exclude_dns = org
 
+#empty DNS means that subordinates cannot sign certs with DNS names
+nc_exclude_dns = ''
+
 nc_permit_email = nmav@example.com
 nc_exclude_email = example.net
 nc_exclude_email = example.li
