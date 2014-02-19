@@ -26,8 +26,8 @@ strings to corresponding defaults. The %COMPAT keyword is extended
 to revert to old defaults, by reducing the overall security level.
 
 ** libgnutls: Added support for the name constraints PKIX extension.
-This extension is not currently being used when verifying
-certificates.
+Currently only DNS names and e-mails are supported (no URIs, IPs
+or DNs).
 
 ** libgnutls: The initialization of the library was moved to a
 constructor. That is, gnutls_global_init() is no longer required
