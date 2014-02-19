@@ -497,6 +497,8 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				}
 			}
 
+			crt_constraints_set(crt);
+
 			result = get_ocsp_sign_status();
 			if (result) {
 				result =

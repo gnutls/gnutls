@@ -77,6 +77,10 @@ typedef struct _cfg_ctx {
 	char **ip_addr;
 	char **email;
 	char **dn_oid;
+	char **permitted_nc_dns;
+	char **excluded_nc_dns;
+	char **permitted_nc_email;
+	char **excluded_nc_email;
 	char *crl_dist_points;
 	char *password;
 	char *pkcs12_key_name;
@@ -285,6 +289,11 @@ int template_parse(const char *template)
 	READ_MULTI_LINE("ip_address", cfg.ip_addr);
 	READ_MULTI_LINE("email", cfg.email);
 	READ_MULTI_LINE("key_purpose_oid", cfg.key_purpose_oids);
+
+	READ_MULTI_LINE("nc_exclude_dns", cfg.excluded_nc_dns);
+	READ_MULTI_LINE("nc_exclude_email", cfg.excluded_nc_email);
+	READ_MULTI_LINE("nc_permit_dns", cfg.permitted_nc_dns);
+	READ_MULTI_LINE("nc_permit_email", cfg.permitted_nc_email);
 
 	READ_MULTI_LINE_TOKENIZED("dn_oid", cfg.dn_oid);
 
@@ -678,6 +687,90 @@ void get_dn_crt_set(gnutls_x509_crt_t crt)
 				gnutls_strerror(ret), err);
 			exit(1);
 		}
+	}
+}
+
+void crt_constraints_set(gnutls_x509_crt_t crt)
+{
+	int ret;
+	const char *err;
+	unsigned i;
+	gnutls_x509_name_constraints_t nc;
+	gnutls_datum_t name;
+
+	if (batch) {
+fprintf(stderr, "XXX: %d\n", __LINE__);
+		if (cfg.permitted_nc_dns == NULL && cfg.permitted_nc_email == NULL &&
+			cfg.excluded_nc_dns == NULL && cfg.excluded_nc_email == NULL)
+			return; /* nothing to do */
+
+fprintf(stderr, "XXX: %d\n", __LINE__);
+		ret = gnutls_x509_name_constraints_init(&nc);
+		if (ret < 0) {
+			fprintf(stderr, "nc_init: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+
+fprintf(stderr, "XXX: %d\n", __LINE__);
+		if (cfg.permitted_nc_dns) {
+
+fprintf(stderr, "XXX: %d\n", __LINE__);
+			for (i = 0; cfg.permitted_nc_dns[i] != NULL; i++) {
+
+fprintf(stderr, "XXX: %d\n", __LINE__);
+				name.data = cfg.permitted_nc_dns[i];
+				name.size = strlen((char*)name.data);
+				ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME, &name);
+				if (ret < 0) {
+					fprintf(stderr, "error adding constraint: %s\n", gnutls_strerror(ret));
+					exit(1);
+				}
+			}
+		}
+
+		if (cfg.excluded_nc_dns) {
+			for (i = 0; cfg.excluded_nc_dns[i] != NULL; i++) {
+				name.data = cfg.excluded_nc_dns[i];
+				name.size = strlen((char*)name.data);
+				ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME, &name);
+				if (ret < 0) {
+					fprintf(stderr, "error adding constraint: %s\n", gnutls_strerror(ret));
+					exit(1);
+				}
+			}
+		}
+
+		if (cfg.permitted_nc_email) {
+			for (i = 0; cfg.permitted_nc_email[i] != NULL; i++) {
+				name.data = cfg.permitted_nc_email[i];
+				name.size = strlen((char*)name.data);
+				ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME, &name);
+				if (ret < 0) {
+					fprintf(stderr, "error adding constraint: %s\n", gnutls_strerror(ret));
+					exit(1);
+				}
+			}
+		}
+
+		if (cfg.permitted_nc_email) {
+			for (i = 0; cfg.excluded_nc_email[i] != NULL; i++) {
+				name.data = cfg.excluded_nc_email[i];
+				name.size = strlen((char*)name.data);
+				ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_RFC822NAME, &name);
+				if (ret < 0) {
+					fprintf(stderr, "error adding constraint: %s\n", gnutls_strerror(ret));
+					exit(1);
+				}
+			}
+		}
+
+		ret = gnutls_x509_crt_set_name_constraints(crt, nc, 1);
+		if (ret < 0) {
+			fprintf(stderr, "error setting constraints: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+
+		gnutls_x509_name_constraints_deinit(nc);
 	}
 }
 
