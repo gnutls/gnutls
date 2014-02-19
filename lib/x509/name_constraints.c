@@ -713,11 +713,37 @@ size_t name_size;
 int ret;
 unsigned idx, t, san_type;
 gnutls_datum_t n;
+unsigned found_one;
 
 	if (is_nc_empty(nc) != 0)
 		return 1; /* shortcut; no constraints to check */
 
 	if (type == GNUTLS_SAN_RFC822NAME) {
+		idx = found_one = 0;
+		do {
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
+				idx++, name, &name_size, &san_type, NULL);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			else if (ret < 0)
+				return gnutls_assert_val(0);
+
+			if (san_type != GNUTLS_SAN_RFC822NAME)
+				continue;
+
+			found_one = 1;
+			n.data = (void*)name;
+			n.size = name_size;
+			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
+				&n);
+			if (t == 0)
+				return gnutls_assert_val(t);
+		} while(ret >= 0);
+
+		if (found_one != 0)
+			return 1;
+
 		idx = 0;
 		do {
 			name_size = sizeof(name);
@@ -736,49 +762,10 @@ gnutls_datum_t n;
 				return gnutls_assert_val(t);
 		} while(ret >= 0);
 
-		idx = 0;
-		do {
-			name_size = sizeof(name);
-			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
-				idx++, name, &name_size, &san_type, NULL);
-			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-				break;
-			else if (ret < 0)
-				return gnutls_assert_val(0);
-
-			if (san_type != GNUTLS_SAN_RFC822NAME)
-				continue;
-
-			n.data = (void*)name;
-			n.size = name_size;
-			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
-				&n);
-			if (t == 0)
-				return gnutls_assert_val(t);
-		} while(ret >= 0);
-
 		/* passed */
 		return 1;
 	} else if (type == GNUTLS_SAN_DNSNAME) {
-		idx = 0;
-		do {
-			name_size = sizeof(name);
-			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
-				idx++, 0, name, &name_size);
-			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-				break;
-			else if (ret < 0)
-				return gnutls_assert_val(0);
-
-			n.data = (void*)name;
-			n.size = name_size;
-			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME,
-				&n);
-			if (t == 0)
-				return gnutls_assert_val(t);
-		} while(ret >= 0);
-
-		idx = 0;
+		idx = found_one = 0;
 		do {
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
@@ -790,6 +777,28 @@ gnutls_datum_t n;
 
 			if (san_type != GNUTLS_SAN_DNSNAME)
 				continue;
+
+			found_one = 1;
+			n.data = (void*)name;
+			n.size = name_size;
+			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME,
+				&n);
+			if (t == 0)
+				return gnutls_assert_val(t);
+		} while(ret >= 0);
+
+		if (found_one != 0)
+			return 1;
+
+		idx = 0;
+		do {
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
+				idx++, 0, name, &name_size);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			else if (ret < 0)
+				return gnutls_assert_val(0);
 
 			n.data = (void*)name;
 			n.size = name_size;
