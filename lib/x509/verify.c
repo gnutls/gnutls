@@ -515,7 +515,7 @@ int hash;
 }
 
 /* 
- * Verifies the given certificate again a certificate list of
+ * Verifies the given certificate against a certificate list of
  * trusted CAs.
  *
  * Returns only 0 or 1. If 1 it means that the certificate 
@@ -534,6 +534,7 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 			    gnutls_x509_crt_t * _issuer,
 			    time_t now,
 			    unsigned int *max_path,
+			    gnutls_x509_name_constraints_t nc,
 			    gnutls_verify_output_function func)
 {
 	gnutls_datum_t cert_signed_data = { NULL, 0 };
@@ -576,10 +577,52 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	if (_issuer != NULL)
 		*_issuer = issuer;
 
+	if (nc != NULL) {
+		/* append the issuer's constraints */
+		result = gnutls_x509_crt_get_name_constraints(issuer, nc, 
+			GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND, NULL);
+		if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+ nc_fail:
+			out =
+			    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE |
+			    GNUTLS_CERT_INVALID;
+			if (output)
+				*output |= out;
+			gnutls_assert();
+			result = 0;
+			goto cleanup;
+		}
+
+		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DNSNAME, cert);
+		if (result == 0) {
+			gnutls_assert();
+			goto nc_fail;
+		}
+
+		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_RFC822NAME, cert);
+		if (result == 0) {
+			gnutls_assert();
+			goto nc_fail;
+		}
+
+		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DN, cert);
+		if (result == 0) {
+			gnutls_assert();
+			goto nc_fail;
+		}
+
+		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_URI, cert);
+		if (result == 0) {
+			gnutls_assert();
+			goto nc_fail;
+		}
+	}
+
 	issuer_version = gnutls_x509_crt_get_version(issuer);
 	if (issuer_version < 0) {
 		gnutls_assert();
-		return issuer_version;
+		result = 0;
+		goto cleanup;
 	}
 
 	if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
@@ -616,6 +659,7 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	    _gnutls_x509_get_signed_data(cert->cert, "tbsCertificate",
 					 &cert_signed_data);
 	if (result < 0) {
+		result = 0;
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -624,6 +668,7 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	    _gnutls_x509_get_signature(cert->cert, "signature",
 				       &cert_signature);
 	if (result < 0) {
+		result = 0;
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -632,6 +677,7 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	    _gnutls_x509_get_signature_algorithm(cert->cert,
 						 "signatureAlgorithm.algorithm");
 	if (result < 0) {
+		result = 0;
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -675,6 +721,7 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 			*output |= out;
 		result = 0;
 	} else if (result < 0) {
+		result = 0;
 		gnutls_assert();
 		goto cleanup;
 	}
@@ -748,6 +795,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 	time_t now = gnutls_time(0);
 	gnutls_x509_crt_t issuer = NULL;
 	unsigned int max_path;
+	gnutls_x509_name_constraints_t nc;
 
 	if (clist_size > 1) {
 		/* Check if the last certificate in the path is self signed.
@@ -813,6 +861,13 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 		return status;
 	}
 
+	ret = gnutls_x509_name_constraints_init(&nc);
+	if (ret < 0) {
+		gnutls_assert();
+		status |= GNUTLS_CERT_INVALID;
+		return status;
+	}
+
 	/* Verify the last certificate in the certificate path
 	 * against the trusted CA certificate list.
 	 *
@@ -824,7 +879,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 	ret = _gnutls_verify_certificate2(certificate_list[clist_size - 1],
 					  trusted_cas, tcas_size, flags,
 					  &output, &issuer, now, &max_path,
-					  func);
+					  nc, func);
 	if (ret == 0) {
 		/* if the last certificate in the certificate
 		 * list is invalid, then the certificate is not
@@ -833,7 +888,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 		gnutls_assert();
 		status |= output;
 		status |= GNUTLS_CERT_INVALID;
-		return status;
+		goto cleanup;
 	}
 
 	/* Verify the certificate path (chain)
@@ -853,14 +908,17 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 		     _gnutls_verify_certificate2(certificate_list[i - 1],
 						 &certificate_list[i], 1,
 						 flags, &output, NULL, now,
-						 &max_path, func)) == 0) {
+						 &max_path, nc, func)) == 0) {
 			status |= output;
 			status |= GNUTLS_CERT_INVALID;
-			return status;
+			goto cleanup;
 		}
 	}
 
-	return 0;
+	status = 0;
+cleanup:
+	gnutls_x509_name_constraints_deinit(nc);
+	return status;
 }
 
 #ifdef ENABLE_PKCS11
@@ -964,7 +1022,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 		goto cleanup;
 	}
-	
+
 	status = _gnutls_x509_verify_certificate(certificate_list, clist_size,
 				&issuer, 1, flags, func);
 
@@ -972,7 +1030,7 @@ cleanup:
 	gnutls_free(raw_issuer.data);
 	if (issuer != NULL)
 		gnutls_x509_crt_deinit(issuer);
-	
+
 	return status;
 }
 #endif

@@ -44,6 +44,13 @@ typedef struct name_constraints_node_st {
 	struct name_constraints_node_st *next;
 } name_constraints_node_st;
 
+static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc)
+{
+	if (nc->permitted == NULL && nc->excluded == NULL)
+		return 1;
+	return 0;
+}
+
 static int extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 				    name_constraints_node_st ** _nc)
 {
@@ -706,6 +713,9 @@ size_t name_size;
 int ret;
 unsigned idx, t, san_type;
 gnutls_datum_t n;
+
+	if (is_nc_empty(nc) != 0)
+		return 1; /* shortcut; no constraints to check */
 
 	if (type == GNUTLS_SAN_RFC822NAME) {
 		idx = 0;
