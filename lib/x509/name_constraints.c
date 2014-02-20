@@ -61,7 +61,11 @@ static int extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 	unsigned int type;
 	struct name_constraints_node_st *nc, *prev;
 
-	nc = prev = *_nc;
+	prev = *_nc;
+	if (prev != NULL) {
+		while(prev->next != NULL)
+			prev = prev->next;
+	}
 
 	do {
 		indx++;
