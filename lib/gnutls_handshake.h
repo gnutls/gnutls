@@ -62,10 +62,12 @@ void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session);
 inline static int handshake_remaining_time(gnutls_session_t session)
 {
 	if (session->internals.handshake_endtime) {
-		time_t now = gnutls_time(0);
-		if (now < session->internals.handshake_endtime)
+		struct timespec now;
+		gettime(&now);
+
+		if (now.tv_sec < session->internals.handshake_endtime)
 			return (session->internals.handshake_endtime -
-				now) * 1000;
+				now.tv_sec) * 1000;
 		else
 			return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
 	}
