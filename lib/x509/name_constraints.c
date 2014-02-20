@@ -217,16 +217,16 @@ void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc)
 	t = nc->permitted;
 	while (t != NULL) {
 		next = t->next;
-		free(t->name.data);
-		free(t);
+		gnutls_free(t->name.data);
+		gnutls_free(t);
 		t = next;
 	}
 
 	t = nc->excluded;
 	while (t != NULL) {
 		next = t->next;
-		free(t->name.data);
-		free(t);
+		gnutls_free(t->name.data);
+		gnutls_free(t);
 		t = next;
 	}
 	gnutls_free(nc);
