@@ -33,6 +33,7 @@
 #include <gnutls_num.h>
 #include <gnutls_helper.h>
 #include <algorithms.h>
+#include <random.h>
 
 #include "debug.h"
 
@@ -489,9 +490,22 @@ void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
 {
 	gnutls_free(sc->password_file);
 	gnutls_free(sc->password_conf_file);
+	_gnutls_free_datum(&sc->fake_salt_seed);
 
 	gnutls_free(sc);
 }
+
+/* Size of the default (random) seed if
+ * gnutls_srp_set_server_fake_salt_seed() is not called to set
+ * a seed.
+ */
+#define DEFAULT_FAKE_SALT_SEED_SIZE 20
+
+/* Size of the fake salts generated if
+ * gnutls_srp_set_server_fake_salt_seed() is not called to set
+ * another size.
+ */
+#define DEFAULT_FAKE_SALT_SIZE 16
 
 /**
  * gnutls_srp_allocate_server_credentials:
@@ -507,12 +521,36 @@ int
 gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *
 				       sc)
 {
+	int ret;
 	*sc = gnutls_calloc(1, sizeof(srp_server_cred_st));
 
 	if (*sc == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
+	(*sc)->fake_salt_seed.size = DEFAULT_FAKE_SALT_SEED_SIZE;
+	(*sc)->fake_salt_seed.data = gnutls_malloc(
+					DEFAULT_FAKE_SALT_SEED_SIZE);
+	if ((*sc)->fake_salt_seed.data == NULL) {
+		ret = GNUTLS_E_MEMORY_ERROR;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_rnd(GNUTLS_RND_RANDOM, (*sc)->fake_salt_seed.data,
+				DEFAULT_FAKE_SALT_SEED_SIZE);
+
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	(*sc)->fake_salt_length = DEFAULT_FAKE_SALT_SIZE;
 	return 0;
+
+cleanup:
+	_gnutls_free_datum(&(*sc)->fake_salt_seed);
+	gnutls_free(*sc);
+	return ret;
 }
 
 /**
@@ -586,13 +624,13 @@ gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t res,
  * in using the gnutls_malloc(). For convenience @prime and @generator
  * may also be one of the static parameters defined in gnutls.h.
  *
- * In case the callback returned a negative number then gnutls will
- * assume that the username does not exist.
- *
  * In order to prevent attackers from guessing valid usernames,
  * if a user does not exist, g and n values should be filled in
  * using a random user's parameters. In that case the callback must
  * return the special value (1).
+ * See #gnutls_srp_set_server_fake_salt_seed too.
+ * If this is not required for your application, return a negative
+ * number from the callback to abort the handshake.
  *
  * The callback function will only be called once per handshake.
  * The callback function should return 0 on success, while
@@ -743,6 +781,53 @@ gnutls_srp_verifier(const char *username, const char *password,
 void gnutls_srp_set_prime_bits(gnutls_session_t session, unsigned int bits)
 {
 	session->internals.srp_prime_bits = bits;
+}
+
+/**
+ * gnutls_srp_set_server_fake_salt_seed:
+ * @cred: is a #gnutls_srp_server_credentials_t structure
+ * @seed: is the seed data, only needs to be valid until the function
+ * returns; size of the seed must be greater than zero
+ * @salt_length: is the length of the generated fake salts
+ *
+ * This function sets the seed that is used to generate salts for
+ * invalid (non-existent) usernames.
+ *
+ * In order to prevent attackers from guessing valid usernames,
+ * when a user does not exist gnutls generates a salt and a verifier
+ * and proceeds with the protocol as usual.
+ * The authentication will ultimately fail, but the client cannot tell
+ * whether the username is valid (exists) or invalid.
+ *
+ * If an attacker learns the seed, given a salt (which is part of the
+ * handshake) which was generated when the seed was in use, it can tell
+ * whether or not the authentication failed because of an unknown username.
+ * This seed cannot be used to reveal application data or passwords.
+ *
+ * @salt_length should represent the salt length your application uses.
+ * Generating fake salts longer than 20 bytes is not supported.
+ *
+ * By default the seed is a random value, different each time a
+ * #gnutls_srp_server_credentials_t is allocated and fake salts are
+ * 16 bytes long.
+ *
+ * Since: 3.3.0
+ **/
+void
+gnutls_srp_set_server_fake_salt_seed(gnutls_srp_server_credentials_t cred,
+				     const gnutls_datum_t * seed,
+				     unsigned int salt_length)
+{
+	_gnutls_free_datum(&cred->fake_salt_seed);
+	_gnutls_set_datum(&cred->fake_salt_seed, seed->data, seed->size);
+
+	/* Cap the salt length at the output size of the MAC algorithm
+	 * we are using to generate the fake salts.
+	 */
+	const mac_entry_st * me = mac_to_entry(SRP_FAKE_SALT_MAC);
+	const size_t mac_len = me->output_size;
+
+	cred->fake_salt_length = (salt_length < mac_len ? salt_length : mac_len);
 }
 
 #endif				/* ENABLE_SRP */

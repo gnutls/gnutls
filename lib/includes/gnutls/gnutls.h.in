@@ -1679,6 +1679,12 @@ int gnutls_srp_base64_decode(const gnutls_datum_t * b64_data, char *result,
 int gnutls_srp_base64_decode_alloc(const gnutls_datum_t * b64_data,
 				   gnutls_datum_t * result);
 
+void
+gnutls_srp_set_server_fake_salt_seed(gnutls_srp_server_credentials_t
+				     sc,
+				     const gnutls_datum_t * seed,
+				     unsigned int salt_length);
+
 /* PSK stuff */
 typedef struct gnutls_psk_server_credentials_st
 *gnutls_psk_server_credentials_t;

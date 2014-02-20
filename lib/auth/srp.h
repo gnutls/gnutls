@@ -38,6 +38,8 @@ typedef struct gnutls_srp_server_credentials_st {
 	 * password files.
 	 */
 	gnutls_srp_server_credentials_function *pwd_callback;
+	gnutls_datum_t fake_salt_seed;
+	unsigned int fake_salt_length;
 } srp_server_cred_st;
 
 /* these structures should not use allocated data */
@@ -59,6 +61,10 @@ int _gnutls_proc_srp_server_kx(gnutls_session_t, uint8_t *, size_t);
 int _gnutls_proc_srp_client_kx(gnutls_session_t, uint8_t *, size_t);
 
 typedef struct srp_server_auth_info_st srp_server_auth_info_st;
+
+/* MAC algorithm used to generate fake salts for unknown usernames
+ */
+#define SRP_FAKE_SALT_MAC GNUTLS_MAC_SHA1
 
 #endif				/* ENABLE_SRP */
 

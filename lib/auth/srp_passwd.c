@@ -38,8 +38,11 @@
 #include <gnutls_datum.h>
 #include <gnutls_num.h>
 #include <random.h>
+#include <algorithms.h>
 
-static int _randomize_pwd_entry(SRP_PWD_ENTRY * entry);
+static int _randomize_pwd_entry(SRP_PWD_ENTRY * entry,
+				gnutls_srp_server_credentials_t cred,
+				const char * username);
 
 /* this function parses tpasswd.conf file. Format is:
  * string(username):base64(v):base64(salt):int(index)
@@ -273,7 +276,7 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 
 		if (ret == 1) {	/* the user does not exist */
 			if (entry->g.size != 0 && entry->n.size != 0) {
-				ret = _randomize_pwd_entry(entry);
+				ret = _randomize_pwd_entry(entry, cred, username);
 				if (ret < 0) {
 					gnutls_assert();
 					goto cleanup;
@@ -348,7 +351,7 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 	 * the last index found and randomize the entry.
 	 */
 	if (pwd_read_conf(cred->password_conf_file, entry, 1) == 0) {
-		ret = _randomize_pwd_entry(entry);
+		ret = _randomize_pwd_entry(entry, cred, username);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -373,25 +376,22 @@ found:
 }
 
 /* Randomizes the given password entry. It actually sets the verifier
- * and the salt. Returns 0 on success.
+ * to random data and sets the salt based on fake_salt_seed and
+ * username. Returns 0 on success.
  */
-static int _randomize_pwd_entry(SRP_PWD_ENTRY * entry)
+static int _randomize_pwd_entry(SRP_PWD_ENTRY * entry,
+				gnutls_srp_server_credentials_t sc,
+				const char * username)
 {
-	unsigned char rnd;
 	int ret;
+	const mac_entry_st *me = mac_to_entry(SRP_FAKE_SALT_MAC);
+	mac_hd_st ctx;
+	size_t username_len = strlen(username);
 
 	if (entry->g.size == 0 || entry->n.size == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
-
-	ret = _gnutls_rnd(GNUTLS_RND_NONCE, &rnd, 1);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	entry->salt.size = (rnd % 10) + 9;
 
 	entry->v.data = gnutls_malloc(20);
 	entry->v.size = 20;
@@ -406,19 +406,35 @@ static int _randomize_pwd_entry(SRP_PWD_ENTRY * entry)
 		return ret;
 	}
 
-	entry->salt.data = gnutls_malloc(entry->salt.size);
+	/* Always allocate and work with the output size of the MAC,
+	 * even if they don't need salts that long, for convenience.
+	 *
+	 * In case an error occurs 'entry' (and the salt inside)
+	 * is deallocated by our caller: _gnutls_srp_pwd_read_entry().
+	 */
+	entry->salt.data = gnutls_malloc(me->output_size);
 	if (entry->salt.data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret =
-	    _gnutls_rnd(GNUTLS_RND_NONCE, entry->salt.data,
-			entry->salt.size);
+	ret = _gnutls_mac_init(&ctx, me, sc->fake_salt_seed.data,
+			sc->fake_salt_seed.size);
+
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
+
+	_gnutls_mac(&ctx, "salt", 4);
+	_gnutls_mac(&ctx, username, username_len);
+	_gnutls_mac_deinit(&ctx, entry->salt.data);
+
+	/* Set length to the actual number of bytes they asked for.
+	 * This is always less than or equal to the output size of
+	 * the MAC, enforced by gnutls_srp_set_server_fake_salt_seed().
+	 */
+	entry->salt.size = sc->fake_salt_length;
 
 	return 0;
 }
