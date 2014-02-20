@@ -65,7 +65,7 @@ struct node_st {
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
@@ -104,7 +104,7 @@ gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
  *
  * This function will deinitialize a trust list.
  *
- * Since: 3.0
+ * Since: 3.0.0
  **/
 void
 gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
@@ -212,7 +212,7 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
  *
  * Returns: The number of added elements is returned.
  *
- * Since: 3.0
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
@@ -371,7 +371,7 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
@@ -672,7 +672,7 @@ unsigned i, j;
  * @cert_list: is the certificate list to be verified
  * @cert_list_size: is the certificate list size
  * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
- * @verify: will hold the certificate verification output.
+ * @voutput: will hold the certificate verification output.
  * @func: If non-null will be called on each chain element verification with the output.
  *
  * This function will try to verify the given certificate and return
@@ -694,7 +694,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 				  gnutls_x509_crt_t * cert_list,
 				  unsigned int cert_list_size,
 				  unsigned int flags,
-				  unsigned int *verify,
+				  unsigned int *voutput,
 				  gnutls_verify_output_function func)
 {
 	int ret;
@@ -722,8 +722,8 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 	ret = check_if_in_blacklist(cert_list, cert_list_size,
 		list->blacklisted, list->blacklisted_size);
 	if (ret != 0) {
-		*verify |= GNUTLS_CERT_REVOKED;
-		*verify |= GNUTLS_CERT_INVALID;
+		*voutput |= GNUTLS_CERT_REVOKED;
+		*voutput |= GNUTLS_CERT_INVALID;
 		return 0;
 	}
 
@@ -731,13 +731,13 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 	if (list->pkcs11_token) {
 		/* use the token for verification */	
 
-		*verify = _gnutls_pkcs11_verify_certificate(list->pkcs11_token,
+		*voutput = _gnutls_pkcs11_verify_certificate(list->pkcs11_token,
 								cert_list, cert_list_size,
 								flags, func);
 	} else
 #endif
 	{
-		*verify =
+		*voutput =
 		    _gnutls_x509_verify_certificate(cert_list, cert_list_size,
 						    list->node[hash].trusted_cas,
 						    list->
@@ -745,7 +745,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 						    flags, func);
 	}
 
-	if (*verify != 0 || (flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS))
+	if (*voutput != 0 || (flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS))
 		return 0;
 
 	/* Check revocation of individual certificates.
@@ -758,8 +758,8 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 					      list->node[hash].crl_size,
 					      func);
 	if (ret == 1) {		/* revoked */
-		*verify |= GNUTLS_CERT_REVOKED;
-		*verify |= GNUTLS_CERT_INVALID;
+		*voutput |= GNUTLS_CERT_REVOKED;
+		*voutput |= GNUTLS_CERT_INVALID;
 		return 0;
 	}
 
@@ -774,9 +774,11 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 							crls,
 							list->node[hash].
 							crl_size, func);
-		if (ret == 1) {	/* revoked */
-			*verify |= GNUTLS_CERT_REVOKED;
-			*verify |= GNUTLS_CERT_INVALID;
+		if (ret < 0) {
+			gnutls_assert();
+		} else if (ret == 1) {	/* revoked */
+			*voutput |= GNUTLS_CERT_REVOKED;
+			*voutput |= GNUTLS_CERT_INVALID;
 			return 0;
 		}
 	}
@@ -791,13 +793,13 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * @name: is the certificate's name
  * @name_size: is the certificate's name size
  * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
- * @verify: will hold the certificate verification output.
+ * @voutput: will hold the certificate verification output.
  * @func: If non-null will be called on each chain element verification with the output.
  *
  * This function will try to find a certificate that is associated with the provided
  * name --see gnutls_x509_trust_list_add_named_crt(). If a match is found the certificate is considered valid. 
  * In addition to that this function will also check CRLs. 
- * The @verify parameter will hold an OR'ed sequence of %gnutls_certificate_status_t flags.
+ * The @voutput parameter will hold an OR'ed sequence of %gnutls_certificate_status_t flags.
  *
  * Additionally a certificate verification profile can be specified
  * from the ones in %gnutls_certificate_verification_profiles_t by
@@ -807,7 +809,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
@@ -815,7 +817,7 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 					const void *name,
 					size_t name_size,
 					unsigned int flags,
-					unsigned int *verify,
+					unsigned int *voutput,
 					gnutls_verify_output_function func)
 {
 	int ret;
@@ -827,7 +829,7 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 			  cert->raw_issuer_dn.size);
 	hash %= list->size;
 
-	*verify = GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND;
+	*voutput = GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND;
 
 	for (i = 0; i < list->node[hash].named_cert_size; i++) {
 		if (_gnutls_check_if_same_cert(cert, list->node[hash].named_certs[i].cert) != 0) {	/* check if name matches */
@@ -835,13 +837,13 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 			    name_size
 			    && memcmp(list->node[hash].named_certs[i].name,
 				      name, name_size) == 0) {
-				*verify = 0;
+				*voutput = 0;
 				break;
 			}
 		}
 	}
 
-	if (*verify != 0 || (flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS))
+	if (*voutput != 0 || (flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS))
 		return 0;
 
 	/* Check revocation of individual certificates.
@@ -852,8 +854,8 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 						list->node[hash].crl_size,
 						func);
 	if (ret == 1) {		/* revoked */
-		*verify |= GNUTLS_CERT_REVOKED;
-		*verify |= GNUTLS_CERT_INVALID;
+		*voutput |= GNUTLS_CERT_REVOKED;
+		*voutput |= GNUTLS_CERT_INVALID;
 		return 0;
 	}
 
