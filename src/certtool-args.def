@@ -698,7 +698,7 @@ encryption_key
 #nc_exclude_dns = test.example.com
 
 # EMAIL
-#nc_permit_email = nmav@example.net
+#nc_permit_email = nmav@@example.net
 
 # Exclude subdomains of example.com
 #nc_exclude_email = .example.com
