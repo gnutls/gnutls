@@ -114,7 +114,7 @@ datefudge "2007-04-22" \
     --outfile tmp-tt.pem 2>/dev/null
 rc=$?
 
-if test "$rc" == "0"; then
+if test "$rc" = "0"; then
   echo "Test 3 (DN-err) failed"
   exit $rc
 fi
