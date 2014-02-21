@@ -171,8 +171,6 @@ int _rnd_get_system_entropy_egd(void* _rnd, size_t size)
 	return 0;
 }
 
-typedef int (*get_entropy_func)(void* rnd, size_t size);
-
 get_entropy_func _rnd_get_system_entropy = NULL;
 
 int _rnd_system_entropy_init(void)
