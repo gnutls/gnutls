@@ -10,8 +10,8 @@ The rules here are not always used, although we try to stick to them.
 
 
 *** Indentation style:
-  In general, use the GNU Coding Standard.  You may indent the source
-  using GNU indent, e.g. "indent -gnu -i2 -nut *.c".
+  In general, use the Linux coding style.  You may indent the source
+  using GNU indent, e.g. "indent -linux *.c".
 
 
 *** Git commits:
@@ -23,7 +23,7 @@ other projects).
 
 *** Function names:
   All the function names use underscore "_", to separate words,
- functions like gnutlsDoThat are not used. The function names
+ functions like gnutlsDoThat are not used. The exported function names
  usually start with "gnutls_" prefix, and the words that follow
  specify the exact part of gnutls that this function refers to.
  E.g. "gnutls_x509_crt_get_dn", refers to the X.509
