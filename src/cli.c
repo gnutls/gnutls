@@ -421,6 +421,11 @@ static int cert_verify_callback(gnutls_session_t session)
 	int rc;
 	unsigned int status = 0;
 	int ssh = ENABLED_OPT(TOFU);
+	int strictssh = ENABLED_OPT(STRICT_TOFU);
+	if (strictssh) {
+		ssh = strictssh;
+	}
+
 #ifdef HAVE_DANE
 	int dane = ENABLED_OPT(DANE);
 #endif
@@ -490,10 +495,13 @@ static int cert_verify_callback(gnutls_session_t session)
 					"Its certificate is valid for %s.\n",
 					hostname);
 
-			rc = read_yesno
-			    ("Do you trust the received key? (y/N): ");
-			if (rc == 0)
-				return -1;
+			if (strictssh == 0) {
+				rc = read_yesno
+					("Do you trust the received key? (y/N): ");
+				if (rc == 0)
+					return -1;
+			} else return -1;
+
 		} else if (rc < 0) {
 			fprintf(stderr,
 				"gnutls_verify_stored_pubkey: %s\n",
