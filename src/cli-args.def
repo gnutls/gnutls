@@ -21,6 +21,14 @@ flag = {
 };
 
 flag = {
+    name      = strict-tofu;
+    descrip   = "Fail to connect if a known certificate has changed";
+    disabled;
+    disable   = "no";
+    doc       = "This option will perform authentication as with option --tofu; however, while --tofu asks whether to trust a changed certificate, this option will fail in case of certificate changes.";
+};
+
+flag = {
     name      = dane;
     descrip   = "Enable DANE certificate verification (DNSSEC)";
     disabled;
@@ -421,4 +429,3 @@ $ gnutls-cli www.example.com --x509keyfile $MYKEY --x509certfile MYCERT
 Notice that the private key only differs from the certificate in the object-type.
 _EOF_;
 };
-
