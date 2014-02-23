@@ -17,6 +17,9 @@ assume that the signer is the issuer.
 ** ocsptool: When sending a nonce, verify that the nonce exists
 in the OCSP response.
 
+** gnutls-cli: Added --strict-tofu option; contributed by Jens
+Lechtenboerger.
+
 ** API and ABI modifications:
 No changes since last version.
 
