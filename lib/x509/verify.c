@@ -542,9 +542,10 @@ verify_crt(gnutls_x509_crt_t cert,
 	gnutls_datum_t cert_signed_data = { NULL, 0 };
 	gnutls_datum_t cert_signature = { NULL, 0 };
 	gnutls_x509_crt_t issuer = NULL;
-	int issuer_version, result, hash_algo;
+	int issuer_version, result = 0, hash_algo;
+	const mac_entry_st * me;
 	unsigned int out = 0, usage;
-	int sigalg;
+	int sigalg, ret;
 
 	if (output)
 		*output = 0;
@@ -581,9 +582,9 @@ verify_crt(gnutls_x509_crt_t cert,
 
 	if (nc != NULL) {
 		/* append the issuer's constraints */
-		result = gnutls_x509_crt_get_name_constraints(issuer, nc, 
+		ret = gnutls_x509_crt_get_name_constraints(issuer, nc, 
 			GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND, NULL);
-		if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
  nc_fail:
 			out =
 			    GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE |
@@ -595,32 +596,32 @@ verify_crt(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DNSNAME, cert);
-		if (result == 0) {
+		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DNSNAME, cert);
+		if (ret == 0) {
 			gnutls_assert();
 			goto nc_fail;
 		}
 
-		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_RFC822NAME, cert);
-		if (result == 0) {
+		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_RFC822NAME, cert);
+		if (ret == 0) {
 			gnutls_assert();
 			goto nc_fail;
 		}
 
-		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DN, cert);
-		if (result == 0) {
+		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DN, cert);
+		if (ret == 0) {
 			gnutls_assert();
 			goto nc_fail;
 		}
 
-		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_URI, cert);
-		if (result == 0) {
+		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_URI, cert);
+		if (ret == 0) {
 			gnutls_assert();
 			goto nc_fail;
 		}
 
-		result = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_IPADDRESS, cert);
-		if (result == 0) {
+		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_IPADDRESS, cert);
+		if (ret == 0) {
 			gnutls_assert();
 			goto nc_fail;
 		}
@@ -663,41 +664,43 @@ verify_crt(gnutls_x509_crt_t cert,
 		}
 	}
 
-	result =
+	ret =
 	    _gnutls_x509_get_signed_data(cert->cert, "tbsCertificate",
 					 &cert_signed_data);
-	if (result < 0) {
+	if (ret < 0) {
 		result = 0;
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	result =
+	ret =
 	    _gnutls_x509_get_signature(cert->cert, "signature",
 				       &cert_signature);
-	if (result < 0) {
+	if (ret < 0) {
 		result = 0;
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	result =
+	ret =
 	    _gnutls_x509_get_signature_algorithm(cert->cert,
 						 "signatureAlgorithm.algorithm");
-	if (result < 0) {
+	if (ret < 0) {
 		result = 0;
 		gnutls_assert();
 		goto cleanup;
 	}
-	sigalg = result;
+	sigalg = ret;
 
 	if (is_level_acceptable(cert, issuer, sigalg, flags) == 0) {
+		gnutls_assert();
 		out =
 		    GNUTLS_CERT_INSECURE_ALGORITHM |
 		    GNUTLS_CERT_INVALID;
 		if (output)
 			*output |= out;
 		result = 0;
+		goto cleanup;
 	}
 
 	/* If the certificate is not self signed check if the algorithms
@@ -707,18 +710,26 @@ verify_crt(gnutls_x509_crt_t cert,
 	if (gnutls_sign_is_secure(sigalg) == 0 &&
 	    is_broken_allowed(sigalg, flags) == 0 &&
 	    is_issuer(cert, cert) == 0) {
+		gnutls_assert();
 		out =
 		    GNUTLS_CERT_INSECURE_ALGORITHM |
 		    GNUTLS_CERT_INVALID;
 		if (output)
 			*output |= out;
 		result = 0;
+		goto cleanup;
 	}
 
 	hash_algo = gnutls_sign_get_hash_algorithm(sigalg);
+	me = mac_to_entry(hash_algo);
+	if (me == NULL) {
+		gnutls_assert();
+		result = 0;
+		goto cleanup;
+	}
 
 	result =
-	    _gnutls_x509_verify_data(mac_to_entry(hash_algo),
+	    _gnutls_x509_verify_data(me,
 				     &cert_signed_data, &cert_signature,
 				     issuer);
 	if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
