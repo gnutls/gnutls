@@ -11,6 +11,10 @@ when provided with invalid data. Reported by Dmitriy Anisimkov.
 ** libgnutls: Corrected timeout issue in subsequent to the first
 DTLS handshakes.
 
+** libgnutls: Removed unconditional not-trusted message in 
+gnutls_certificate_verification_status_print() when used with
+OpenPGP certificates. Reported by Michel Briand.
+
 ** ocsptool: When verifying a response and a signer isn't provided
 assume that the signer is the issuer.
 
