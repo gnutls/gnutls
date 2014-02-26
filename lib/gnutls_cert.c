@@ -957,10 +957,6 @@ gnutls_certificate_verification_status_print(unsigned int status,
 						  _
 						  ("The certificate issuer is not a CA. "));
 	} else if (type == GNUTLS_CRT_OPENPGP) {
-		_gnutls_buffer_append_str(&str,
-					  _
-					  ("The certificate is not trusted. "));
-
 		if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
 			_gnutls_buffer_append_str(&str,
 						  _
