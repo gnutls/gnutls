@@ -962,8 +962,6 @@ gnutls_certificate_verification_status_print (unsigned int status,
       }
     else if (type == GNUTLS_CRT_OPENPGP)
       {
-        _gnutls_buffer_append_str (&str, _("The certificate is not trusted. "));
-
         if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
           _gnutls_buffer_append_str (&str, _("Could not find a signer of the certificate. "));
 
