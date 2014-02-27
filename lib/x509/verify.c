@@ -141,7 +141,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   if (result < 0)
     {
       gnutls_assert ();
-      goto cleanup;
+      goto fail;
     }
 
   result =
@@ -150,7 +150,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   if (result < 0)
     {
       gnutls_assert ();
-      goto cleanup;
+      goto fail;
     }
 
   result =
@@ -158,7 +158,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   if (result < 0)
     {
       gnutls_assert ();
-      goto cleanup;
+      goto fail;
     }
 
   result =
@@ -166,7 +166,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   if (result < 0)
     {
       gnutls_assert ();
-      goto cleanup;
+      goto fail;
     }
 
   /* If the subject certificate is the same as the issuer
@@ -206,6 +206,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
   else
     gnutls_assert ();
 
+fail:
   result = 0;
 
 cleanup:
@@ -330,7 +331,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   gnutls_datum_t cert_signed_data = { NULL, 0 };
   gnutls_datum_t cert_signature = { NULL, 0 };
   gnutls_x509_crt_t issuer = NULL;
-  int issuer_version, result;
+  int issuer_version, result = 0;
 
   if (output)
     *output = 0;
@@ -363,7 +364,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   if (issuer_version < 0)
     {
       gnutls_assert ();
-      return issuer_version;
+      return 0;
     }
 
   if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
@@ -385,6 +386,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   if (result < 0)
     {
       gnutls_assert ();
+      result = 0;
       goto cleanup;
     }
 
@@ -393,6 +395,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   if (result < 0)
     {
       gnutls_assert ();
+      result = 0;
       goto cleanup;
     }
 
@@ -410,6 +413,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   else if (result < 0)
     {
       gnutls_assert();
+      result = 0;
       goto cleanup;
     }
 
