@@ -7,7 +7,8 @@ Version 2.12.24 (unreleased)
 
 ** libgnutls: Fix in TLS record decoding (GNUTLS-SA-2013-2)
 
-** libgnutls: Fix in certificate verification (GNUTLS-SA-2014-1)
+** libgnutls: Fix in certificate verification (GNUTLS-SA-2014-1,
+GNUTLS-SA-2014-2)
 
 ** API and ABI modifications:
 No changes since last version.
