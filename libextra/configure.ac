@@ -26,7 +26,7 @@ AC_INIT([libgnutls-extra], [2.12.23], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.10 -Wall -Werror -Wno-override])
+AM_INIT_AUTOMAKE([1.10 -Wall -Wno-override])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CONFIG_HEADERS([config.h])
 
