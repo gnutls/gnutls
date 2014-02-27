@@ -249,6 +249,8 @@ static bool is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 		    gnutls_x509_crt_get_authority_key_id(cert, id1,
 							 &id1_size, NULL);
 		if (ret < 0) {
+			/* If there is no authority key identifier in the
+			 * certificate, assume they match */
 			ret = 1;
 			goto cleanup;
 		}
@@ -258,6 +260,8 @@ static bool is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 		    gnutls_x509_crt_get_subject_key_id(issuer, id2,
 						       &id2_size, NULL);
 		if (ret < 0) {
+			/* If there is no subject key identifier in the
+			 * issuer certificate, assume they match */
 			ret = 1;
 			gnutls_assert();
 			goto cleanup;
