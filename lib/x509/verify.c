@@ -118,8 +118,8 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	gnutls_datum_t issuer_signed_data = { NULL, 0 };
 	gnutls_datum_t cert_signature = { NULL, 0 };
 	gnutls_datum_t issuer_signature = { NULL, 0 };
-	int pathlen, result;
-	unsigned int ca_status;
+	int pathlen = -1, result;
+	unsigned int ca_status = 0;
 
 	/* Check if the issuer is the same with the
 	 * certificate. This is added in order for trusted
