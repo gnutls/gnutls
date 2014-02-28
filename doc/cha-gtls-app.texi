@@ -996,7 +996,7 @@ priority.
 Add @code{!DHE-RSA:!DHE-DSS} to the priority string to disable DHE.
 
 @item MAC @tab
-MD5, SHA1, SHA256, AEAD (used with
+MD5, SHA1, SHA256, SHA384, AEAD (used with
 GCM ciphers only). All algorithms from NORMAL priority can be accessed with MAC-ALL.
 
 @item Compression algorithms @tab
