@@ -15,6 +15,10 @@ DTLS handshakes.
 gnutls_certificate_verification_status_print() when used with
 OpenPGP certificates. Reported by Michel Briand.
 
+** libgnutls: All ciphersuites that were available in TLS1.0 or
+later are now made available in SSL3.0 or later to prevent
+any incompatibilities with servers that negotiate them in SSL 3.0.
+
 ** ocsptool: When verifying a response and a signer isn't provided
 assume that the signer is the issuer.
 
