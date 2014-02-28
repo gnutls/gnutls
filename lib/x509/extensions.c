@@ -1315,7 +1315,7 @@ _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
   if (pathLenConstraint < 0)
     {
       result = asn1_write_value (ext, "pCPathLenConstraint", NULL, 0);
-      if (result < 0)
+      if (result != ASN1_SUCCESS)
         result = _gnutls_asn2err (result);
     }
   else
@@ -1330,7 +1330,7 @@ _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
 
   result = asn1_write_value (ext, "proxyPolicy.policyLanguage",
                              policyLanguage, 1);
-  if (result < 0)
+  if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       asn1_delete_structure (&ext);
@@ -1339,7 +1339,7 @@ _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
 
   result = asn1_write_value (ext, "proxyPolicy.policy",
                              policy, sizeof_policy);
-  if (result < 0)
+  if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       asn1_delete_structure (&ext);
