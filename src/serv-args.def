@@ -394,7 +394,7 @@ gpg -a --export-secret-keys 5D1D14D8 > openpgp-server-key.txt
 Let's start the server with support for OpenPGP credentials:
 
 @example
-gnutls-serv --http \
+gnutls-serv --http --priority NORMAL:+CTYPE-OPENPGP \
             --pgpkeyfile openpgp-server-key.txt \
             --pgpcertfile openpgp-server.txt
 @end example
@@ -404,7 +404,7 @@ an SRP password file created with @code{srptool}.
 To start the server with SRP support:
 
 @example
-gnutls-serv --http \
+gnutls-serv --http --priority NORMAL:+SRP-RSA:+SRP \
             --srppasswdconf srp-tpasswd.conf \
             --srppasswd srp-passwd.txt
 @end example
@@ -413,7 +413,7 @@ Let's also start a server with support for PSK. This would require
 a password file created with @code{psktool}.
 
 @example
-gnutls-serv --http \
+gnutls-serv --http --priority NORMAL:+ECDHE-PSK:+PSK \
             --pskpasswd psk-passwd.txt
 @end example
 
@@ -421,7 +421,7 @@ Finally, we start the server with all the earlier parameters and you
 get this command:
 
 @example
-gnutls-serv --http \
+gnutls-serv --http --priority NORMAL:+PSK:+SRP:+CTYPE-OPENPGP \
             --x509cafile x509-ca.pem \
             --x509keyfile x509-server-key.pem \
             --x509certfile x509-server.pem \
