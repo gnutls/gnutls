@@ -1065,7 +1065,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	(*priority_cache)->max_empty_records = DEFAULT_MAX_EMPTY_RECORDS;
 
 	if (priorities == NULL)
-		priorities = "NORMAL";
+		priorities = "SYSTEM";
 
 	darg = resolve_priorities(priorities);
 	if (darg == NULL) {
