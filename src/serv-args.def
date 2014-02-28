@@ -101,7 +101,7 @@ flag = {
     descrip   = "Priorities string";
     doc      = "TLS algorithms and protocols to enable. You can
 use predefined sets of ciphersuites such as PERFORMANCE,
-NORMAL, SECURE128, SECURE256.
+NORMAL, SECURE128, SECURE256. The default is NORMAL.
 
 Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
 information on allowed keywords";
