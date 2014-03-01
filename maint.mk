@@ -2,7 +2,7 @@
 # This Makefile fragment tries to be general-purpose enough to be
 # used by many projects via the gnulib maintainer-makefile module.
 
-## Copyright (C) 2001-2013 Free Software Foundation, Inc.
+## Copyright (C) 2001-2014 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ _dot_escaped_srcdir = $(subst .,\.,$(srcdir))
 ifeq ($(srcdir),.)
   _prepend_srcdir_prefix =
 else
-  _prepend_srcdir_prefix = | sed 's|^|$(srcdir)/|'
+  _prepend_srcdir_prefix = | $(SED) 's|^|$(srcdir)/|'
 endif
 
 # In order to be able to consistently filter "."-relative names,
@@ -85,7 +85,7 @@ endif
 _sc_excl = \
   $(or $(exclude_file_name_regexp--$@),^$$)
 VC_LIST_EXCEPT = \
-  $(VC_LIST) | sed 's|^$(_dot_escaped_srcdir)/||' \
+  $(VC_LIST) | $(SED) 's|^$(_dot_escaped_srcdir)/||' \
 	| if test -f $(srcdir)/.x-$@; then grep -vEf $(srcdir)/.x-$@; \
 	  else grep -Ev -e "$${VC_LIST_EXCEPT_DEFAULT-ChangeLog}"; fi \
 	| grep -Ev -e '($(VC_LIST_ALWAYS_EXCLUDE_REGEX)|$(_sc_excl))' \
@@ -158,8 +158,8 @@ export LC_ALL = C
 _cfg_mk := $(wildcard $(srcdir)/cfg.mk)
 
 # Collect the names of rules starting with 'sc_'.
-syntax-check-rules := $(sort $(shell sed -n 's/^\(sc_[a-zA-Z0-9_-]*\):.*/\1/p' \
-			$(srcdir)/$(ME) $(_cfg_mk)))
+syntax-check-rules := $(sort $(shell $(SED) -n \
+   's/^\(sc_[a-zA-Z0-9_-]*\):.*/\1/p' $(srcdir)/$(ME) $(_cfg_mk)))
 .PHONY: $(syntax-check-rules)
 
 ifeq ($(shell $(VC_LIST) >/dev/null 2>&1; echo $$?),0)
@@ -448,7 +448,7 @@ sc_require_config_h_first:
 	@if $(VC_LIST_EXCEPT) | grep -l '\.c$$' > /dev/null; then	\
 	  fail=0;							\
 	  for i in $$($(VC_LIST_EXCEPT) | grep '\.c$$'); do		\
-	    grep '^# *include\>' $$i | sed 1q				\
+	    grep '^# *include\>' $$i | $(SED) 1q			\
 		| grep -E '^# *include $(config_h_header)' > /dev/null	\
 	      || { echo $$i; fail=1; };					\
 	  done;								\
@@ -468,7 +468,7 @@ sc_prohibit_HAVE_MBRTOWC:
 # re: a regular expression that matches IFF something provided by $h is used.
 define _sc_header_without_use
   dummy=; : so we do not need a semicolon before each use;		\
-  h_esc=`echo '[<"]'"$$h"'[">]'|sed 's/\./\\\\./g'`;			\
+  h_esc=`echo '[<"]'"$$h"'[">]'|$(SED) 's/\./\\\\./g'`;			\
   if $(VC_LIST_EXCEPT) | grep -l '\.c$$' > /dev/null; then		\
     files=$$(grep -l '^# *include '"$$h_esc"				\
 	     $$($(VC_LIST_EXCEPT) | grep '\.c$$')) &&			\
@@ -591,7 +591,7 @@ sc_prohibit_root_dev_ino_without_use:
 
 sc_prohibit_openat_without_use:
 	@h='openat.h' \
-	re='\<(openat_(permissive|needs_fchdir|(save|restore)_fail)|l?(stat|ch(own|mod))at|(euid)?accessat)\>' \
+	re='\<(openat_(permissive|needs_fchdir|(save|restore)_fail)|l?(stat|ch(own|mod))at|(euid)?accessat|(FCHMOD|FCHOWN|STAT)AT_INLINE)\>' \
 	  $(_sc_header_without_use)
 
 # Prohibit the inclusion of c-ctype.h without an actual use.
@@ -789,7 +789,7 @@ sc_useless_cpp_parens:
 # #if HAVE_HEADER_H that you remove, be sure that your project explicitly
 # requires the gnulib module that guarantees the usability of that header.
 gl_assured_headers_ = \
-  cd $(gnulib_dir)/lib && echo *.in.h|sed 's/\.in\.h//g'
+  cd $(gnulib_dir)/lib && echo *.in.h|$(SED) 's/\.in\.h//g'
 
 # Convert the list of names to upper case, and replace each space with "|".
 az_ = abcdefghijklmnopqrstuvwxyz
@@ -840,7 +840,7 @@ define def_sym_regex
 	      && perl -lne '$(gl_extract_significant_defines_)' $$f;	\
 	  done;								\
 	) | sort -u							\
-	  | sed 's/^/^ *# *(define|undef)  */;s/$$/\\>/'
+	  | $(SED) 's/^/^ *# *(define|undef)  */;s/$$/\\>/'
 endef
 
 # Don't define macros that we already get from gnulib header files.
@@ -1054,12 +1054,12 @@ sc_const_long_option:
 	  $(_sc_search_regexp)
 
 NEWS_hash =								\
-  $$(sed -n '/^\*.* $(PREV_VERSION_REGEXP) ([0-9-]*)/,$$p'		\
+  $$($(SED) -n '/^\*.* $(PREV_VERSION_REGEXP) ([0-9-]*)/,$$p'		\
        $(srcdir)/NEWS							\
      | perl -0777 -pe							\
 	's/^Copyright.+?Free\sSoftware\sFoundation,\sInc\.\n//ms'	\
      | md5sum -								\
-     | sed 's/ .*//')
+     | $(SED) 's/ .*//')
 
 # Ensure that we don't accidentally insert an entry into an old NEWS block.
 sc_immutable_NEWS:
@@ -1097,7 +1097,7 @@ sc_makefile_at_at_check:
 	  && { echo '$(ME): use $$(...), not @...@' 1>&2; exit 1; } || :
 
 news-check: NEWS
-	$(AM_V_GEN)if sed -n $(news-check-lines-spec)p $<		\
+	$(AM_V_GEN)if $(SED) -n $(news-check-lines-spec)p $<		\
 	    | grep -E $(news-check-regexp) >/dev/null; then		\
 	  :;								\
 	else								\
@@ -1146,7 +1146,7 @@ sc_po_check:
 	    files="$$files $$file";					\
 	  done;								\
 	  grep -E -l '$(_gl_translatable_string_re)' $$files		\
-	    | sed 's|^$(_dot_escaped_srcdir)/||' | sort -u > $@-2;	\
+	    | $(SED) 's|^$(_dot_escaped_srcdir)/||' | sort -u > $@-2;	\
 	  diff -u -L $(po_file) -L $(po_file) $@-1 $@-2			\
 	    || { printf '$(ME): '$(fix_po_file_diag) 1>&2; exit 1; };	\
 	  rm -f $@-1 $@-2;						\
@@ -1395,8 +1395,8 @@ public-submodule-commit:
 		&& git --version >/dev/null 2>&1; then			\
 	  cd $(srcdir) &&						\
 	  git submodule --quiet foreach					\
-	      test '"$$(git rev-parse "$$sha1")"'			\
-	      = '"$$(git merge-base origin "$$sha1")"'			\
+	      'test "$$(git rev-parse "$$sha1")"			\
+		  = "$$(git merge-base origin "$$sha1")"'		\
 	    || { echo '$(ME): found non-public submodule commit' >&2;	\
 		 exit 1; };						\
 	else								\
@@ -1511,7 +1511,7 @@ refresh-gnulib-patches:
 	  test -n "$$t" && gl=$$t;					\
 	fi;								\
 	for diff in $$(cd $$gl; git ls-files | grep '\.diff$$'); do	\
-	  b=$$(printf %s "$$diff"|sed 's/\.diff$$//');			\
+	  b=$$(printf %s "$$diff"|$(SED) 's/\.diff$$//');		\
 	  VERSION_CONTROL=none						\
 	    patch "$(gnulib_dir)/$$b" "$$gl/$$diff" || exit 1;		\
 	  ( cd $(gnulib_dir) || exit 1;					\
@@ -1530,14 +1530,15 @@ refresh-po:
 	wget --no-verbose --directory-prefix $(PODIR) --no-directories --recursive --level 1 --accept .po --accept .po.1 $(POURL) && \
 	echo 'en@boldquot' > $(PODIR)/LINGUAS && \
 	echo 'en@quot' >> $(PODIR)/LINGUAS && \
-	ls $(PODIR)/*.po | sed 's/\.po//;s,$(PODIR)/,,' | sort >> $(PODIR)/LINGUAS
+	ls $(PODIR)/*.po | $(SED) 's/\.po//;s,$(PODIR)/,,' | \
+	  sort >> $(PODIR)/LINGUAS
 
  # Running indent once is not idempotent, but running it twice is.
 INDENT_SOURCES ?= $(C_SOURCES)
 .PHONY: indent
 indent:
-	indent -linux $(INDENT_SOURCES)
-	indent -linux $(INDENT_SOURCES)
+	indent $(INDENT_SOURCES)
+	indent $(INDENT_SOURCES)
 
 # If you want to set UPDATE_COPYRIGHT_* environment variables,
 # put the assignments in this variable.
@@ -1640,18 +1641,18 @@ _gl_tight_scope: $(bin_PROGRAMS)
 	       test -f $$f && d= || d=$(srcdir)/; echo $$d$$f; done`;	\
 	( printf '^%s$$\n' '__.*' $(_gl_TS_unmarked_extern_functions);	\
 	  grep -h -A1 '^extern .*[^;]$$' $$src				\
-	    | grep -vE '^(extern |--)' | sed 's/ .*//';			\
+	    | grep -vE '^(extern |--)' | $(SED) 's/ .*//';		\
 	  perl -lne							\
 	     '$(_gl_TS_function_match) and print "^$$1\$$"' $$hdr;	\
 	) | sort -u > $$t;						\
-	nm -e $(_gl_TS_obj_files) | sed -n 's/.* T //p'|grep -Ev -f $$t	\
+	nm -e $(_gl_TS_obj_files)|$(SED) -n 's/.* T //p'|grep -Ev -f $$t \
 	  && { echo the above functions should have static scope >&2;	\
 	       exit 1; } || : ;						\
 	( printf '^%s$$\n' '__.*' $(_gl_TS_unmarked_extern_vars);	\
 	  perl -lne '$(_gl_TS_var_match) and print "^$$1\$$"'		\
 		$$hdr $(_gl_TS_other_headers)				\
 	) | sort -u > $$t;						\
-	nm -e $(_gl_TS_obj_files) | sed -n 's/.* [BCDGRS] //p'		\
+	nm -e $(_gl_TS_obj_files) | $(SED) -n 's/.* [BCDGRS] //p'	\
             | sort -u | grep -Ev -f $$t					\
 	  && { echo the above variables should have static scope >&2;	\
 	       exit 1; } || :
