@@ -1,14 +1,14 @@
 SMP=-j4
 
-GNUTLS_VERSION:=3.2.9
+GNUTLS_VERSION:=3.2.12
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
-GMP_VERSION=5.1.2
+GMP_VERSION=5.1.3
 GMP_FILE:=gmp-$(GMP_VERSION).tar.bz2
 GMP_DIR:=gmp-$(GMP_VERSION)
 
-P11_KIT_VERSION=0.18.2
+P11_KIT_VERSION=0.20.2
 P11_KIT_FILE:=p11-kit-$(P11_KIT_VERSION).tar.gz
 P11_KIT_DIR:=p11-kit-$(P11_KIT_VERSION)
 
@@ -67,7 +67,7 @@ $(P11_KIT_DIR)/.configured:
 	test -f $(P11_KIT_FILE).sig || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE).sig
 	gpg --verify $(P11_KIT_FILE).sig
 	test -d $(P11_KIT_DIR) || tar -xf $(P11_KIT_FILE)
-	cd $(P11_KIT_DIR) && LDFLAGS="$(LDFLAGS)" $(CONFIG_ENV) ./configure $(CONFIG_FLAGS) --without-libtasn1 && cd ..
+	cd $(P11_KIT_DIR) && LDFLAGS="$(LDFLAGS)" $(CONFIG_ENV) ./configure $(CONFIG_FLAGS) --without-libffi --without-libtasn1 && cd ..
 	touch $@
 
 $(P11_KIT_DIR)/.installed: $(P11_KIT_DIR)/.configured
