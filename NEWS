@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 3.2.12 (released 2014-03-03)
 
+** libgnutls: Corrected certificate verification issue (GNUTLS-SA-2014-2)
+
 ** libgnutls: Corrected issue in gnutls_pcert_list_import_x509_raw
 when provided with invalid data. Reported by Dmitriy Anisimkov.
 
