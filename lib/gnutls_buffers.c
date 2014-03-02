@@ -671,8 +671,10 @@ int _gnutls_io_check_recv(gnutls_session_t session, unsigned int ms)
 
 	if (unlikely
 	    (session->internals.pull_timeout_func == system_recv_timeout
-	     && session->internals.pull_func != system_read))
+	     && session->internals.pull_func != system_read)) {
+		_gnutls_debug_log("The pull function has been replaced but not the pull timeout.");
 		return gnutls_assert_val(GNUTLS_E_PULL_ERROR);
+	}
 
 	reset_errno(session);
 
