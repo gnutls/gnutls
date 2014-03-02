@@ -715,6 +715,14 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
     hash = hash_pjw_bare(cert->raw_issuer_dn.data, cert->raw_issuer_dn.size);
     hash %= list->size;
 
+    ret = check_if_in_blacklist(&cert, 1,
+		list->blacklisted, list->blacklisted_size);
+    if (ret != 0) {
+	*verify |= GNUTLS_CERT_REVOKED;
+	*verify |= GNUTLS_CERT_INVALID;
+	return 0;
+    }
+
     *verify = GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND;
 
     for (i = 0; i < list->node[hash].named_cert_size; i++) {
