@@ -34,6 +34,7 @@
 #ifdef _WIN32
 #include <io.h>
 #include <winbase.h>
+#include <sys/select.h>
 #undef OCSP_RESPONSE
 #endif
 
@@ -68,18 +69,23 @@ pin_callback(void *user, int attempt, const char *token_url,
 void pkcs11_common(void);
 
 #ifdef _WIN32
-# include <errno.h>
-static int neterrno(void)
+static int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
-int err = WSAGetLastError();
-  
-	if (err == WSAEWOULDBLOCK)
-  		return EAGAIN;
-	else if (err == WSAEINTR)
-  		return EINTR;
-	else if (err == WSAEINPROGRESS)
-		return EINPROGRESS;
-	return 0;
+	fd_set rfds;
+	struct timeval tv;
+	int ret, fd = (long)ptr;
+
+	FD_ZERO(&rfds);
+	FD_SET(fd, &rfds);
+
+	tv.tv_sec = 0;
+	tv.tv_usec = ms * 1000;
+	while (tv.tv_usec >= 1000000) {
+		tv.tv_usec -= 1000000;
+		tv.tv_sec++;
+	}
+
+	return select(fd + 1, &rfds, NULL, NULL, &tv);
 }
 
 static ssize_t
@@ -99,8 +105,7 @@ void set_read_funcs(gnutls_session_t session)
 {
 	gnutls_transport_set_push_function(session, system_write);
 	gnutls_transport_set_pull_function(session, system_read);
-	gnutls_transport_set_errno_function(session, neterrno);
-
+	gnutls_transport_set_pull_timeout_function(session, system_recv_timeout);
 }
 #else
 # define set_read_funcs(x)
