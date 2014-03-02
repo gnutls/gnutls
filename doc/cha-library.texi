@@ -104,7 +104,7 @@ options are given.
 --disable-openssl-compatibility
 --disable-libdane
 --without-p11-kit
---with-tpm
+--without-tpm
 --disable-dtls-srtp-support
 @end verbatim
 
