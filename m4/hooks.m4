@@ -145,8 +145,8 @@ AC_MSG_ERROR([[
   AM_CONDITIONAL(ENABLE_DTLS_SRTP, test "$ac_enable_srtp" != "no")
 
   AC_MSG_CHECKING([whether to disable ALPN extension])
-  AC_ARG_ENABLE(dtls-alpn-support,
-    AS_HELP_STRING([--disable-dtls-alpn-support],
+  AC_ARG_ENABLE(alpn-support,
+    AS_HELP_STRING([--disable-alpn-support],
                    [disable support for the Application Layer Protocol Negotiation (ALPN) extension]),
     ac_enable_alpn=$enableval,ac_enable_alpn=yes)
   if test x$ac_enable_alpn != xno; then
@@ -244,20 +244,6 @@ AC_MSG_ERROR([[
    AC_MSG_RESULT(yes)
   fi
   AM_CONDITIONAL(ENABLE_ECDHE, test "$ac_enable_ecdhe" != "no")
-
-  AC_MSG_CHECKING([whether to disable RSA-EXPORT support])
-  AC_ARG_ENABLE(rsa-export,
-    AS_HELP_STRING([--disable-rsa-export],
-                   [disable the RSA-EXPORT support]),
-    ac_enable_rsa_export=$enableval, ac_enable_rsa_export=yes)
-  if test x$ac_enable_rsa_export != xno; then
-   AC_MSG_RESULT(no)
-   AC_DEFINE([ENABLE_RSA_EXPORT], 1, [enable RSA-EXPORT])
-  else
-   ac_full=0
-   AC_MSG_RESULT(yes)
-  fi
-  AM_CONDITIONAL(ENABLE_RSA_EXPORT, test "$ac_enable_rsa_export" != "no")
 
   ac_enable_openpgp=yes
   AC_MSG_CHECKING([whether to disable OpenPGP Certificate authentication support])

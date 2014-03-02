@@ -96,16 +96,18 @@ options are given.
 --disable-srp-authentication
 --disable-psk-authentication
 --disable-anon-authentication
+--disable-openpgp-authentication
 --disable-dhe
 --disable-ecdhe
---disable-rsa-export
---disable-extra-pki
---disable-openpgp-authentication
 --disable-openssl-compatibility
+--disable-dtls-srtp-support
+--disable-alpn-support
+--disable-heartbeat-support
 --disable-libdane
 --without-p11-kit
 --without-tpm
---disable-dtls-srtp-support
+--without-zlib
+
 @end verbatim
 
 For the complete list, refer to the output from @code{configure --help}.

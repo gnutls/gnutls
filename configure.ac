@@ -746,7 +746,6 @@ if features are disabled)
   ECDHE support:        $ac_enable_ecdhe
   Anon auth support:    $ac_enable_anon
   Heartbeat support:    $ac_enable_heartbeat
-  RSA-EXPORT compat:    $ac_enable_rsa_export
   Unicode support:      $ac_have_unicode
   Non-SuiteB curves:    $enable_non_suiteb
 ])
