@@ -668,6 +668,9 @@ static int _crywrap_listen(const crywrap_config_t * config)
 	case AF_INET:
 		cur->ai_addrlen = sizeof(struct sockaddr_in);
 		break;
+	default:
+		ret = -1;
+		goto cleanup;
 	}
 
 	cur->ai_addr = malloc(cur->ai_addrlen);
@@ -678,6 +681,8 @@ static int _crywrap_listen(const crywrap_config_t * config)
 
 	ret = _crywrap_bind(cur, htons(config->listen.port));
 	free(cur->ai_addr);
+
+ cleanup:
 	free(cur);
 
 	return ret;
@@ -711,6 +716,9 @@ _crywrap_remote_connect(const struct sockaddr_storage *addr, int port)
 	case AF_INET:
 		cur->ai_addrlen = sizeof(struct sockaddr_in);
 		break;
+	default:
+		sock = -1;
+		goto cleanup;
 	}
 
 	cur->ai_addr = malloc(cur->ai_addrlen);
@@ -740,6 +748,8 @@ _crywrap_remote_connect(const struct sockaddr_storage *addr, int port)
 	}
 
 	free(cur->ai_addr);
+
+ cleanup:
 	free(cur);
 
 	return sock;
