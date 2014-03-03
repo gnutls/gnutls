@@ -321,7 +321,7 @@ static int
 _crywrap_parse_ip(const char *ip, in_port_t * port,
 		  struct sockaddr_storage **addr, char **host)
 {
-	char *s_ip;
+	char *s_ip = NULL;
 	char *tmp;
 
 	tmp = strchr(ip, '/');
@@ -343,7 +343,9 @@ _crywrap_parse_ip(const char *ip, in_port_t * port,
 	if (host)
 		*host = strdup(s_ip);
 
-	return _crywrap_addr_get(s_ip, addr);
+	ret = _crywrap_addr_get(s_ip, addr);
+	free(s_ip);
+	return ret;
 }
 
 /** Argument parsing routine.
