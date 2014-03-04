@@ -189,7 +189,6 @@ gl/Makefile
 gl/Makefile.in
 gl/alloca.h
 gl/arg-nonnull.h
-gl/arpa/
 gl/c++defs.h
 gl/dirent.h
 gl/getopt.h
@@ -671,6 +670,12 @@ src/srptool-args.c
 src/srptool-args.h
 src/tpmtool-args.c
 src/tpmtool-args.h
+src/gl/netdb.h
+src/gl/netinet/
+src/gl/signal.h
+src/gl/stdio.h
+src/gl/wchar.h
+src/gl/arpa/
 src/gl/alloca.h
 src/gl/arg-nonnull.h
 src/gl/c++defs.h

@@ -45,7 +45,6 @@
 #elif HAVE_WS2TCPIP_H
 #include <ws2tcpip.h>
 #endif
-#include <arpa/inet.h>
 
 /* Gnulib portability files. */
 #include <getpass.h>
