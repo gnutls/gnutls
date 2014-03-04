@@ -323,6 +323,7 @@ _crywrap_parse_ip(const char *ip, in_port_t * port,
 {
 	char *s_ip = NULL;
 	char *tmp;
+	int ret;
 
 	tmp = strchr(ip, '/');
 
