@@ -17,7 +17,7 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GnuTLS.
 
-Copyright @copyright{} 2001-2012 Free Software Foundation, Inc.
+Copyright @copyright{} 2001-2012, 2014 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -64,7 +64,10 @@ Documentation License''.
 * Guile API Conventions::       Naming conventions and other idiosyncrasies.
 * Guile Examples::              Quick start.
 * Guile Reference::             The Scheme GnuTLS programming interface.
-* Copying Information::         Copying information.
+
+* Copying Information::         You can copy and modify this manual.
+* Procedure Index::
+* Concept Index::
 @end menu
 
 @node Preface
@@ -663,5 +666,15 @@ GNU Guile Reference Manual}).
 @c End:
 
 @include cha-copying.texi
+
+@node Procedure Index
+@unnumbered Procedure Index
+
+@printindex fn
+
+@node Concept Index
+@unnumbered Concept Index
+
+@printindex cp
 
 @bye
