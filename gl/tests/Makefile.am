@@ -285,22 +285,6 @@ EXTRA_DIST += test-fread.c signature.h macros.h
 
 ## end   gnulib module fread-tests
 
-## begin gnulib module fseek-tests
-
-TESTS += test-fseek.sh test-fseek2.sh
-check_PROGRAMS += test-fseek
-EXTRA_DIST += test-fseek.c test-fseek.sh test-fseek2.sh signature.h macros.h
-
-## end   gnulib module fseek-tests
-
-## begin gnulib module fseeko-tests
-
-TESTS += test-fseeko.sh test-fseeko2.sh test-fseeko3.sh test-fseeko4.sh
-check_PROGRAMS += test-fseeko test-fseeko3 test-fseeko4
-EXTRA_DIST += test-fseeko.c test-fseeko.sh test-fseeko2.sh test-fseeko3.c test-fseeko3.sh test-fseeko4.c test-fseeko4.sh signature.h macros.h
-
-## end   gnulib module fseeko-tests
-
 ## begin gnulib module fstat-tests
 
 TESTS += test-fstat
@@ -342,24 +326,6 @@ check_PROGRAMS += test-fwrite
 EXTRA_DIST += test-fwrite.c signature.h macros.h
 
 ## end   gnulib module fwrite-tests
-
-## begin gnulib module getdelim-tests
-
-TESTS += test-getdelim
-check_PROGRAMS += test-getdelim
-MOSTLYCLEANFILES += test-getdelim.txt
-EXTRA_DIST += test-getdelim.c signature.h macros.h
-
-## end   gnulib module getdelim-tests
-
-## begin gnulib module getline-tests
-
-TESTS += test-getline
-check_PROGRAMS += test-getline
-MOSTLYCLEANFILES += test-getline.txt
-EXTRA_DIST += test-getline.c signature.h macros.h
-
-## end   gnulib module getline-tests
 
 ## begin gnulib module getpagesize
 

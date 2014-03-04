@@ -74,11 +74,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module fpucw:
   # Code from module fputc-tests:
   # Code from module fread-tests:
-  # Code from module fseek:
-  # Code from module fseek-tests:
-  # Code from module fseeko:
-  AC_REQUIRE([AC_FUNC_FSEEKO])
-  # Code from module fseeko-tests:
   # Code from module fstat:
   # Code from module fstat-tests:
   # Code from module ftell:
@@ -90,12 +85,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module func-tests:
   # Code from module fwrite-tests:
   # Code from module gendocs:
-  # Code from module getdelim:
-  # Code from module getdelim-tests:
-  # Code from module getline:
-  # Code from module getline-tests:
   # Code from module getpagesize:
-  # Code from module getpass:
   # Code from module gettext:
   # Code from module gettext-h:
   # Code from module gettimeofday:
@@ -161,7 +151,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module stdlib:
   # Code from module stdlib-tests:
   # Code from module strcase:
-  # Code from module strdup-posix:
   # Code from module string:
   # Code from module string-tests:
   # Code from module strings:
@@ -249,17 +238,6 @@ AC_SUBST([LTALLOCA])
   if test $REPLACE_ITOLD = 1; then
     AC_LIBOBJ([itold])
   fi
-  gl_FUNC_FSEEK
-  if test $REPLACE_FSEEK = 1; then
-    AC_LIBOBJ([fseek])
-  fi
-  gl_STDIO_MODULE_INDICATOR([fseek])
-  gl_FUNC_FSEEKO
-  if test $HAVE_FSEEKO = 0 || test $REPLACE_FSEEKO = 1; then
-    AC_LIBOBJ([fseeko])
-    gl_PREREQ_FSEEKO
-  fi
-  gl_STDIO_MODULE_INDICATOR([fseeko])
   gl_FUNC_FSTAT
   if test $REPLACE_FSTAT = 1; then
     AC_LIBOBJ([fstat])
@@ -278,23 +256,6 @@ AC_SUBST([LTALLOCA])
   fi
   gl_STDIO_MODULE_INDICATOR([ftello])
   gl_FUNC
-  gl_FUNC_GETDELIM
-  if test $HAVE_GETDELIM = 0 || test $REPLACE_GETDELIM = 1; then
-    AC_LIBOBJ([getdelim])
-    gl_PREREQ_GETDELIM
-  fi
-  gl_STDIO_MODULE_INDICATOR([getdelim])
-  gl_FUNC_GETLINE
-  if test $REPLACE_GETLINE = 1; then
-    AC_LIBOBJ([getline])
-    gl_PREREQ_GETLINE
-  fi
-  gl_STDIO_MODULE_INDICATOR([getline])
-  gl_FUNC_GETPASS
-  if test $HAVE_GETPASS = 0; then
-    AC_LIBOBJ([getpass])
-    gl_PREREQ_GETPASS
-  fi
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.18.1])
   AC_SUBST([LIBINTL])
@@ -387,12 +348,6 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([strncasecmp])
     gl_PREREQ_STRNCASECMP
   fi
-  gl_FUNC_STRDUP_POSIX
-  if test $ac_cv_func_strdup = no || test $REPLACE_STRDUP = 1; then
-    AC_LIBOBJ([strdup])
-    gl_PREREQ_STRDUP
-  fi
-  gl_STRING_MODULE_INDICATOR([strdup])
   gl_HEADER_STRING_H
   gl_HEADER_STRINGS_H
   gl_FUNC_STRNDUP
@@ -502,8 +457,6 @@ changequote([, ])dnl
     gl_PREREQ_FDOPEN
   fi
   gl_STDIO_MODULE_INDICATOR([fdopen])
-  gl_FUNC_UNGETC_WORKS
-  gl_FUNC_UNGETC_WORKS
   gl_FUNC_UNGETC_WORKS
   gl_FUNC_UNGETC_WORKS
   gl_FUNC_GETPAGESIZE
@@ -653,15 +606,9 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/float+.h
   lib/float.c
   lib/float.in.h
-  lib/fseek.c
-  lib/fseeko.c
   lib/fstat.c
   lib/ftell.c
   lib/ftello.c
-  lib/getdelim.c
-  lib/getline.c
-  lib/getpass.c
-  lib/getpass.h
   lib/gettext.h
   lib/gettimeofday.c
   lib/hash-pjw-bare.c
@@ -698,7 +645,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/stdlib.in.h
   lib/str-two-way.h
   lib/strcasecmp.c
-  lib/strdup.c
   lib/string.in.h
   lib/strings.in.h
   lib/strncasecmp.c
@@ -743,16 +689,12 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/fdopen.m4
   m4/float_h.m4
   m4/fpieee.m4
-  m4/fseek.m4
   m4/fseeko.m4
   m4/fstat.m4
   m4/ftell.m4
   m4/ftello.m4
   m4/func.m4
-  m4/getdelim.m4
-  m4/getline.m4
   m4/getpagesize.m4
-  m4/getpass.m4
   m4/gettext.m4
   m4/gettimeofday.m4
   m4/glibc2.m4
@@ -815,7 +757,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdio_h.m4
   m4/stdlib_h.m4
   m4/strcase.m4
-  m4/strdup.m4
   m4/string_h.m4
   m4/strings_h.m4
   m4/strndup.m4
@@ -863,16 +804,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-float.c
   tests/test-fputc.c
   tests/test-fread.c
-  tests/test-fseek.c
-  tests/test-fseek.sh
-  tests/test-fseek2.sh
-  tests/test-fseeko.c
-  tests/test-fseeko.sh
-  tests/test-fseeko2.sh
-  tests/test-fseeko3.c
-  tests/test-fseeko3.sh
-  tests/test-fseeko4.c
-  tests/test-fseeko4.sh
   tests/test-fstat.c
   tests/test-ftell.c
   tests/test-ftell.sh
@@ -886,8 +817,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-ftello4.sh
   tests/test-func.c
   tests/test-fwrite.c
-  tests/test-getdelim.c
-  tests/test-getline.c
   tests/test-gettimeofday.c
   tests/test-iconv.c
   tests/test-inet_pton.c
