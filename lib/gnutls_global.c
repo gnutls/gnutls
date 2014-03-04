@@ -34,7 +34,6 @@
 #include <accelerated/accelerated.h>
 #include <fips.h>
 
-#include "sockets.h"
 #include "gettext.h"
 
 /* Minimum library versions we accept. */
@@ -215,11 +214,6 @@ int gnutls_global_init(void)
 		_gnutls_debug_log("Enabled GnuTLS logging...\n");
 	}
 
-	if (gl_sockets_startup(SOCKETS_1_1)) {
-		ret = gnutls_assert_val(GNUTLS_E_SOCKETS_INIT_ERROR);
-		goto out;
-	}
-
 	bindtextdomain(PACKAGE, LOCALEDIR);
 
 	res = gnutls_crypto_init();
@@ -328,7 +322,6 @@ void gnutls_global_deinit(void)
 	GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
 	if (_gnutls_init == 1) {
 		_gnutls_init = 0;
-		gl_sockets_cleanup();
 		gnutls_crypto_deinit();
 		_gnutls_rnd_deinit();
 		_gnutls_ext_deinit();
