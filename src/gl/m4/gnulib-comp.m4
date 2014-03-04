@@ -56,7 +56,14 @@ AC_DEFUN([ggl_EARLY],
   # Code from module extern-inline:
   # Code from module fd-hook:
   # Code from module float:
+  # Code from module fseek:
+  # Code from module fseeko:
+  AC_REQUIRE([AC_FUNC_FSEEKO])
+  # Code from module fstat:
   # Code from module getaddrinfo:
+  # Code from module getdelim:
+  # Code from module getline:
+  # Code from module getpass:
   # Code from module getpeername:
   # Code from module gettext-h:
   # Code from module gettime:
@@ -66,7 +73,11 @@ AC_DEFUN([ggl_EARLY],
   # Code from module inet_ntop:
   # Code from module inet_pton:
   # Code from module intprops:
+  # Code from module largefile:
+  AC_REQUIRE([AC_SYS_LARGEFILE])
   # Code from module listen:
+  # Code from module lseek:
+  # Code from module malloc-posix:
   # Code from module malloca:
   # Code from module memchr:
   # Code from module mktime:
@@ -77,6 +88,7 @@ AC_DEFUN([ggl_EARLY],
   # Code from module netinet_in:
   # Code from module parse-datetime:
   # Code from module progname:
+  # Code from module realloc-posix:
   # Code from module recv:
   # Code from module recvfrom:
   # Code from module select:
@@ -104,11 +116,13 @@ AC_DEFUN([ggl_EARLY],
   # Code from module stdint:
   # Code from module stdio:
   # Code from module stdlib:
+  # Code from module strdup-posix:
   # Code from module strerror:
   # Code from module strerror-override:
   # Code from module string:
   # Code from module sys_select:
   # Code from module sys_socket:
+  # Code from module sys_stat:
   # Code from module sys_time:
   # Code from module sys_types:
   # Code from module sys_uio:
@@ -183,6 +197,23 @@ AC_SUBST([LTALLOCA])
   if test $REPLACE_ITOLD = 1; then
     AC_LIBOBJ([itold])
   fi
+  gl_FUNC_FSEEK
+  if test $REPLACE_FSEEK = 1; then
+    AC_LIBOBJ([fseek])
+  fi
+  gl_STDIO_MODULE_INDICATOR([fseek])
+  gl_FUNC_FSEEKO
+  if test $HAVE_FSEEKO = 0 || test $REPLACE_FSEEKO = 1; then
+    AC_LIBOBJ([fseeko])
+    gl_PREREQ_FSEEKO
+  fi
+  gl_STDIO_MODULE_INDICATOR([fseeko])
+  gl_FUNC_FSTAT
+  if test $REPLACE_FSTAT = 1; then
+    AC_LIBOBJ([fstat])
+    gl_PREREQ_FSTAT
+  fi
+  gl_SYS_STAT_MODULE_INDICATOR([fstat])
   gl_GETADDRINFO
   if test $HAVE_GETADDRINFO = 0; then
     AC_LIBOBJ([getaddrinfo])
@@ -191,6 +222,23 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([gai_strerror])
   fi
   gl_NETDB_MODULE_INDICATOR([getaddrinfo])
+  gl_FUNC_GETDELIM
+  if test $HAVE_GETDELIM = 0 || test $REPLACE_GETDELIM = 1; then
+    AC_LIBOBJ([getdelim])
+    gl_PREREQ_GETDELIM
+  fi
+  gl_STDIO_MODULE_INDICATOR([getdelim])
+  gl_FUNC_GETLINE
+  if test $REPLACE_GETLINE = 1; then
+    AC_LIBOBJ([getline])
+    gl_PREREQ_GETLINE
+  fi
+  gl_STDIO_MODULE_INDICATOR([getline])
+  gl_FUNC_GETPASS
+  if test $HAVE_GETPASS = 0; then
+    AC_LIBOBJ([getpass])
+    gl_PREREQ_GETPASS
+  fi
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([getpeername])
@@ -218,11 +266,22 @@ AC_SUBST([LTALLOCA])
     gl_PREREQ_INET_PTON
   fi
   gl_ARPA_INET_MODULE_INDICATOR([inet_pton])
+  AC_REQUIRE([gl_LARGEFILE])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([listen])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([listen])
+  gl_FUNC_LSEEK
+  if test $REPLACE_LSEEK = 1; then
+    AC_LIBOBJ([lseek])
+  fi
+  gl_UNISTD_MODULE_INDICATOR([lseek])
+  gl_FUNC_MALLOC_POSIX
+  if test $REPLACE_MALLOC = 1; then
+    AC_LIBOBJ([malloc])
+  fi
+  gl_STDLIB_MODULE_INDICATOR([malloc-posix])
   gl_MALLOCA
   gl_FUNC_MEMCHR
   if test $HAVE_MEMCHR = 0 || test $REPLACE_MEMCHR = 1; then
@@ -251,6 +310,11 @@ AC_SUBST([LTALLOCA])
   gl_PARSE_DATETIME
   AC_CHECK_DECLS([program_invocation_name], [], [], [#include <errno.h>])
   AC_CHECK_DECLS([program_invocation_short_name], [], [], [#include <errno.h>])
+  gl_FUNC_REALLOC_POSIX
+  if test $REPLACE_REALLOC = 1; then
+    AC_LIBOBJ([realloc])
+  fi
+  gl_STDLIB_MODULE_INDICATOR([realloc-posix])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([recv])
@@ -321,6 +385,12 @@ AC_SUBST([LTALLOCA])
   gl_STDINT_H
   gl_STDIO_H
   gl_STDLIB_H
+  gl_FUNC_STRDUP_POSIX
+  if test $ac_cv_func_strdup = no || test $REPLACE_STRDUP = 1; then
+    AC_LIBOBJ([strdup])
+    gl_PREREQ_STRDUP
+  fi
+  gl_STRING_MODULE_INDICATOR([strdup])
   gl_FUNC_STRERROR
   if test $REPLACE_STRERROR = 1; then
     AC_LIBOBJ([strerror])
@@ -337,6 +407,8 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_SYS_SELECT
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_SOCKET
+  AC_PROG_MKDIR_P
+  gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_TIME_H
   AC_PROG_MKDIR_P
@@ -523,8 +595,15 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/float+.h
   lib/float.c
   lib/float.in.h
+  lib/fseek.c
+  lib/fseeko.c
+  lib/fstat.c
   lib/gai_strerror.c
   lib/getaddrinfo.c
+  lib/getdelim.c
+  lib/getline.c
+  lib/getpass.c
+  lib/getpass.h
   lib/getpeername.c
   lib/gettext.h
   lib/gettime.c
@@ -534,6 +613,8 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/intprops.h
   lib/itold.c
   lib/listen.c
+  lib/lseek.c
+  lib/malloc.c
   lib/malloca.c
   lib/malloca.h
   lib/malloca.valgrind
@@ -555,6 +636,7 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/printf-parse.h
   lib/progname.c
   lib/progname.h
+  lib/realloc.c
   lib/recv.c
   lib/recvfrom.c
   lib/select.c
@@ -573,8 +655,10 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/stdbool.in.h
   lib/stddef.in.h
   lib/stdint.in.h
+  lib/stdio-impl.h
   lib/stdio.in.h
   lib/stdlib.in.h
+  lib/strdup.c
   lib/strerror-override.c
   lib/strerror-override.h
   lib/strerror.c
@@ -582,6 +666,7 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/sys_select.in.h
   lib/sys_socket.c
   lib/sys_socket.in.h
+  lib/sys_stat.in.h
   lib/sys_time.in.h
   lib/sys_types.in.h
   lib/sys_uio.in.h
@@ -619,7 +704,13 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/extensions.m4
   m4/extern-inline.m4
   m4/float_h.m4
+  m4/fseek.m4
+  m4/fseeko.m4
+  m4/fstat.m4
   m4/getaddrinfo.m4
+  m4/getdelim.m4
+  m4/getline.m4
+  m4/getpass.m4
   m4/gettime.m4
   m4/gettimeofday.m4
   m4/gnulib-common.m4
@@ -629,7 +720,10 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/inet_pton.m4
   m4/intmax_t.m4
   m4/inttypes_h.m4
+  m4/largefile.m4
   m4/longlong.m4
+  m4/lseek.m4
+  m4/malloc.m4
   m4/malloca.m4
   m4/math_h.m4
   m4/memchr.m4
@@ -643,6 +737,7 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/off_t.m4
   m4/parse-datetime.m4
   m4/printf.m4
+  m4/realloc.m4
   m4/select.m4
   m4/servent.m4
   m4/setenv.m4
@@ -661,10 +756,12 @@ AC_DEFUN([ggl_FILE_LIST], [
   m4/stdint_h.m4
   m4/stdio_h.m4
   m4/stdlib_h.m4
+  m4/strdup.m4
   m4/strerror.m4
   m4/string_h.m4
   m4/sys_select_h.m4
   m4/sys_socket_h.m4
+  m4/sys_stat_h.m4
   m4/sys_time_h.m4
   m4/sys_types_h.m4
   m4/sys_uio_h.m4

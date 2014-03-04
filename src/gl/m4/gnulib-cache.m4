@@ -27,7 +27,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=src/gl/override --lib=libgnu_gpl --source-base=src/gl --m4-base=src/gl/m4 --doc-base=doc --tests-base=tests --aux-dir=build-aux --no-conditional-dependencies --libtool --macro-prefix=ggl --no-vc-files accept close getaddrinfo inet_ntop inet_pton listen parse-datetime progname recv recvfrom select send sendto servent setsockopt shutdown socket sockets socklen
+#   gnulib-tool --import --dir=. --local-dir=src/gl/override --lib=libgnu_gpl --source-base=src/gl --m4-base=src/gl/m4 --doc-base=doc --tests-base=tests --aux-dir=build-aux --no-conditional-dependencies --libtool --macro-prefix=ggl --no-vc-files accept close getaddrinfo getpass inet_ntop inet_pton listen parse-datetime progname recv recvfrom select send sendto servent setsockopt shutdown socket sockets socklen
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([src/gl/override])
@@ -35,6 +35,7 @@ gl_MODULES([
   accept
   close
   getaddrinfo
+  getpass
   inet_ntop
   inet_pton
   listen
