@@ -158,6 +158,20 @@ AC_MSG_ERROR([[
   fi
   AM_CONDITIONAL(ENABLE_ALPN, test "$ac_enable_alpn" != "no")
 
+  AC_MSG_CHECKING([whether to disable RSA-EXPORT support])
+  AC_ARG_ENABLE(rsa-export,
+    AS_HELP_STRING([--disable-rsa-export],
+                   [disable the RSA-EXPORT support]),
+    ac_enable_rsa_export=$enableval, ac_enable_rsa_export=yes)
+  if test x$ac_enable_rsa_export != xno; then
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ENABLE_RSA_EXPORT], 1, [enable RSA-EXPORT])
+  else
+   ac_full=0
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(ENABLE_RSA_EXPORT, test "$ac_enable_rsa_export" != "no")
+
   ac_enable_heartbeat=yes
   AC_MSG_CHECKING([whether to disable TLS heartbeat support])
   AC_ARG_ENABLE(heartbeat-support,
