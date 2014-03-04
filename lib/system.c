@@ -26,33 +26,35 @@
 #include <gnutls_errors.h>
 
 #include <sys/socket.h>
-#include <sys/select.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <c-ctype.h>
 
 #ifdef _WIN32
-#include <windows.h>
-#include <wincrypt.h>
-#if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
+# include <windows.h>
+# include <wincrypt.h>
+# if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
 typedef PCCRL_CONTEXT WINAPI(*Type_CertEnumCRLsInStore) (HCERTSTORE
 							 hCertStore,
 							 PCCRL_CONTEXT
 							 pPrevCrlContext);
 static Type_CertEnumCRLsInStore Loaded_CertEnumCRLsInStore;
 static HMODULE Crypt32_dll;
-#else
-#define Loaded_CertEnumCRLsInStore CertEnumCRLsInStore
-#endif
-#else
-#ifdef HAVE_PTHREAD_LOCKS
-#include <pthread.h>
-#endif
+# else
+#  define Loaded_CertEnumCRLsInStore CertEnumCRLsInStore
+# endif
 
-#if defined(HAVE_GETPWUID_R)
-#include <pwd.h>
-#endif
+#else /* _WIN32 */
+# include <sys/select.h>
+
+# ifdef HAVE_PTHREAD_LOCKS
+#  include <pthread.h>
+# endif
+
+# if defined(HAVE_GETPWUID_R)
+#  include <pwd.h>
+# endif
 #endif
 
 /* System specific function wrappers.

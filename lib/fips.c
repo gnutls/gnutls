@@ -27,10 +27,11 @@
 #include <fips.h>
 #include <stdio.h>
 #include <random.h>
-#include <dlfcn.h>
 
 unsigned int _gnutls_lib_mode = LIB_STATE_POWERON;
 #ifdef ENABLE_FIPS140
+
+#include <dlfcn.h>
 
 #define FIPS_KERNEL_FILE "/proc/sys/crypto/fips_enabled"
 #define FIPS_SYSTEM_FILE "/etc/system-fips"
