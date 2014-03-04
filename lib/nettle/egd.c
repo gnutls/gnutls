@@ -47,6 +47,9 @@
 #define offsetof(type, member) ((size_t) &((type *)0)->member)
 #endif
 
+/* gnulib wants to claim strerror even if it cannot provide it. WTF */
+#undef strerror
+
 static int egd_socket = -1;
 
 static int do_write(int fd, void *buf, size_t nbytes)

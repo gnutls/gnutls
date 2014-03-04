@@ -37,6 +37,9 @@
 #include <rnd-common.h>
 #include <hash-pjw-bare.h>
 
+/* gnulib wants to claim strerror even if it cannot provide it. WTF */
+#undef strerror
+
 void _rnd_get_event(struct event_st *e)
 {
 	static unsigned count = 0;
