@@ -27,35 +27,29 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lock-tests --avoid=lseek-tests --lgpl=2 --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files accept alloca base64 bind byteswap c-ctype close connect extensions func gendocs getaddrinfo getpass gettext gettimeofday hash-pjw-bare havelib iconv inet_ntop inet_pton intprops lib-msvc-compat lib-symbol-versions listen maintainer-makefile manywarnings memmem-simple minmax netdb netinet_in pmccabe2html read-file recv recvfrom select send sendto servent setsockopt shutdown snprintf socket sockets socklen stdint strcase strerror strndup strtok_r strverscmp sys_socket sys_stat time_r u64 unistd valgrind-tests vasprintf vsnprintf warnings
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lock-tests --avoid=lseek-tests --lgpl=2 --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files alloca base64 bind byteswap c-ctype connect extensions func gendocs getpass gettext gettimeofday hash-pjw-bare havelib iconv intprops lib-msvc-compat lib-symbol-versions maintainer-makefile manywarnings memmem-simple minmax netdb netinet_in pmccabe2html read-file snprintf stdint strcase strndup strtok_r strverscmp sys_socket sys_stat time_r u64 unistd valgrind-tests vasprintf vsnprintf warnings
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
 gl_MODULES([
-  accept
   alloca
   base64
   bind
   byteswap
   c-ctype
-  close
   connect
   extensions
   func
   gendocs
-  getaddrinfo
   getpass
   gettext
   gettimeofday
   hash-pjw-bare
   havelib
   iconv
-  inet_ntop
-  inet_pton
   intprops
   lib-msvc-compat
   lib-symbol-versions
-  listen
   maintainer-makefile
   manywarnings
   memmem-simple
@@ -64,21 +58,9 @@ gl_MODULES([
   netinet_in
   pmccabe2html
   read-file
-  recv
-  recvfrom
-  select
-  send
-  sendto
-  servent
-  setsockopt
-  shutdown
   snprintf
-  socket
-  sockets
-  socklen
   stdint
   strcase
-  strerror
   strndup
   strtok_r
   strverscmp
