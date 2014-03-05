@@ -411,14 +411,19 @@ AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 
 LIBOPTS_CHECK([src/libopts])
 if test "$NEED_LIBOPTS_DIR" = "true";then
-	dnl delete libopts-generated files
+	dnl replace libopts-generated files with distributed backups, if present
+	missing_baks=
 	for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
 		nam=`echo $i|sed 's/.bak//g'`
 		if test -f $i;then
 			cp -f $i $nam
+		else
+			missing_baks=true
 		fi
 	done
-	AC_SUBST([AUTOGEN], [/bin/true])
+	if test -z "$missing_baks"; then
+		AC_SUBST([AUTOGEN], [/bin/true])
+	fi
 	enable_local_libopts=yes
 else
 	enable_local_libopts=no
