@@ -2781,18 +2781,22 @@ static int _gnutls_handshake_client(gnutls_session_t session)
 		if (session->internals.resumed == RESUME_FALSE) {
 			ret = _gnutls_send_handshake_final(session, TRUE);
 			IMED_RET("send handshake final 2", ret, 1);
+#ifdef ENABLE_SESSION_TICKETS
 		} else {
 			ret = _gnutls_recv_new_session_ticket(session);
 			IMED_RET("recv handshake new session ticket", ret,
 				 1);
+#endif
 		}
 
 	case STATE16:
 		STATE = STATE16;
 		if (session->internals.resumed == RESUME_FALSE) {
+#ifdef ENABLE_SESSION_TICKETS
 			ret = _gnutls_recv_new_session_ticket(session);
 			IMED_RET("recv handshake new session ticket", ret,
 				 1);
+#endif
 		} else {
 			ret = _gnutls_recv_handshake_final(session, TRUE);
 			IMED_RET("recv handshake final", ret, 1);
@@ -3153,12 +3157,13 @@ static int _gnutls_handshake_server(gnutls_session_t session)
 		}
 
 	case STATE13:
+#ifdef ENABLE_SESSION_TICKETS
 		ret =
 		    _gnutls_send_new_session_ticket(session,
 						    AGAIN(STATE13));
 		STATE = STATE13;
 		IMED_RET("send handshake new session ticket", ret, 0);
-
+#endif
 	case STATE14:
 		STATE = STATE14;
 		if (session->internals.resumed == RESUME_FALSE) {	/* if we are not resuming */

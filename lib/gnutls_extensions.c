@@ -340,9 +340,11 @@ int _gnutls_ext_init(void)
 		return ret;
 #endif
 
+#ifdef ENABLE_SESSION_TICKETS
 	ret = _gnutls_ext_register(&ext_mod_session_ticket);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
+#endif
 
 	ret = _gnutls_ext_register(&ext_mod_supported_ecc);
 	if (ret != GNUTLS_E_SUCCESS)

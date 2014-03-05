@@ -348,9 +348,11 @@ gnutls_session_t initialize_session(int dtls)
 		gnutls_db_set_ptr(session, NULL);
 	}
 
+#ifdef ENABLE_SESSION_TICKETS
 	if (noticket == 0)
 		gnutls_session_ticket_enable_server(session,
 						    &session_ticket_key);
+#endif
 
 	if (gnutls_priority_set_direct(session, priorities, &err) < 0) {
 		fprintf(stderr, "Syntax error at: %s\n", err);
@@ -1153,8 +1155,10 @@ int main(int argc, char **argv)
 /*      gnutls_anon_set_server_dh_params(dh_cred, dh_params); */
 #endif
 
+#ifdef ENABLE_SESSION_TICKETS
 	if (noticket == 0)
 		gnutls_session_ticket_key_generate(&session_ticket_key);
+#endif
 
 	if (HAVE_OPT(MTU))
 		mtu = OPT_VALUE_MTU;
