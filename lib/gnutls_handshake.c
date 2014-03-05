@@ -2697,6 +2697,7 @@ static int _gnutls_handshake_client(gnutls_session_t session)
 		IMED_RET("recv server certificate", ret, 1);
 
 	case STATE6:
+#ifdef ENABLE_OCSP
 		/* RECV CERTIFICATE STATUS */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
@@ -2704,7 +2705,7 @@ static int _gnutls_handshake_client(gnutls_session_t session)
 			    (session);
 		STATE = STATE6;
 		IMED_RET("recv server certificate", ret, 1);
-
+#endif
 	case STATE7:
 		ret = run_verify_callback(session, GNUTLS_CLIENT);
 		STATE = STATE7;
@@ -3067,6 +3068,7 @@ static int _gnutls_handshake_server(gnutls_session_t session)
 		IMED_RET("send server certificate", ret, 0);
 
 	case STATE4:
+#ifdef ENABLE_OCSP
 		if (session->internals.resumed == RESUME_FALSE)
 			ret =
 			    _gnutls_send_server_certificate_status(session,
@@ -3074,7 +3076,7 @@ static int _gnutls_handshake_server(gnutls_session_t session)
 								   (STATE4));
 		STATE = STATE4;
 		IMED_RET("send server certificate status", ret, 0);
-
+#endif
 	case STATE5:
 		/* send server key exchange (A) */
 		if (session->internals.resumed == RESUME_FALSE)

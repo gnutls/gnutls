@@ -34,6 +34,8 @@
 #include <auth/cert.h>
 #include <gnutls_handshake.h>
 
+#ifdef ENABLE_OCSP
+
 typedef struct {
 	gnutls_datum_t *responder_id;
 	size_t responder_id_size;
@@ -628,3 +630,5 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 
 	return ret;
 }
+
+#endif

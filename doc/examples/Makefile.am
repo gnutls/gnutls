@@ -45,7 +45,10 @@ CXX_LDADD = ../../lib/libgnutlsxx.la \
 noinst_PROGRAMS = ex-client-resume ex-client-dtls
 noinst_PROGRAMS += ex-cert-select ex-client-x509
 noinst_PROGRAMS += ex-serv-dtls ex-client-xssl1 ex-client-xssl2
-noinst_PROGRAMS += print-ciphersuites ex-serv-x509
+noinst_PROGRAMS += print-ciphersuites
+if ENABLE_OCSP
+noinst_PROGRAMS += ex-serv-x509
+endif
 
 ex_client_xssl1_LDADD = $(LDADD) ../../lib/libgnutls-xssl.la
 ex_client_xssl2_LDADD = $(LDADD) ../../lib/libgnutls-xssl.la

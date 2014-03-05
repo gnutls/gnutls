@@ -31,6 +31,8 @@
 #include <gnutls_state.h>
 #include <gnutls_num.h>
 
+#ifdef ENABLE_OPENPGP
+
 /* Maps record size to numbers according to the
  * extensions draft.
  */
@@ -247,3 +249,5 @@ inline static int _gnutls_cert_type2num(int cert_type)
 	}
 
 }
+
+#endif

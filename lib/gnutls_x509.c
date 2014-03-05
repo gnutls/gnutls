@@ -254,6 +254,7 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	}
 
 	/* Use the OCSP extension if any */
+#ifdef ENABLE_OCSP
 	if (verify_flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS)
 		goto skip_ocsp;
 
@@ -273,7 +274,6 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 		}
 	}
 
-#ifdef ENABLE_OCSP
 	ret =
 	    check_ocsp_response(session, peer_certificate_list[0], issuer,
 				&resp, &ocsp_status);

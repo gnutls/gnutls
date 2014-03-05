@@ -404,8 +404,10 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	/* Enable useful extensions */
 	if ((flags & GNUTLS_CLIENT) && !(flags & GNUTLS_NO_EXTENSIONS)) {
 		gnutls_session_ticket_enable_client(*session);
+#ifdef ENABLE_OCSP
 		gnutls_ocsp_status_request_enable_client(*session, NULL, 0,
 							 NULL);
+#endif
 	}
 
 	if (flags & GNUTLS_NO_REPLAY_PROTECTION)
