@@ -195,7 +195,7 @@ libgnutls_xssl_la_LDFLAGS = -no-undefined -export-symbols-regex '^xssl.*'
 
 lib_LTLIBRARIES += libgnutls-xssl.la
 
-libgnutls_xssl_la_SOURCES = xssl.c xssl_getline.c xssl.h
+libgnutls_xssl_la_SOURCES = xssl.c xssl_getline.c xssl.h vasprintf.c vasprintf.h
 
 libgnutls_xssl_la_LIBADD = ../gl/libgnu.la libgnutls.la
 
