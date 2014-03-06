@@ -3,6 +3,15 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.13 (unreleased)
+
+** libgnutls: gnutls_openpgp_keyring_import will no longer fail silently
+if there are no base64 data. Report and patch by Ramkumar Chinchani.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.12.1 (released 2014-03-04)
 
 ** libgnutls: Reverted change that broke ABI. Reported by Andreas Metzler.
