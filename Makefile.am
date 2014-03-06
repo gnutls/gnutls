@@ -47,6 +47,14 @@ dist-hook:
 	make -C doc/ compare-makefile
 	make -C doc/ compare-exported
 	make -C doc/manpages compare-makefile
+	echo "*****************************************************************"
+	echo "Checking symbol changes. If the next step fails, verify that the"
+	echo "symbols added or removed are correct and copy symbols.last.tmp as"
+	echo "symbols.last"
+	echo "*****************************************************************"
+	objdump -T $(srcdir)/lib/.libs/libgnutls.so.28  | grep -v ' \*UND\*' | awk '{print $$7 "@" $$6;}' | sort -u >symbols.last.tmp
+	diff -u symbols.last symbols.last.tmp >/dev/null 2>&1
+	rm -f symbols.last.tmp
 	rm -f ChangeLog
 	make ChangeLog
 	cp -f ChangeLog $(distdir)/
