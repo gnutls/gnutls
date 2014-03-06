@@ -198,7 +198,7 @@ images_DATA = \
 	gnutls-logo.png gnutls-x509.png	\
 	pkcs11-vision.png
 
-AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc --no-split
+AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
 	--no-split --css-include=$(srcdir)/texinfo.css
