@@ -85,11 +85,11 @@ void cdk_strlist_free(cdk_strlist_t sl)
  **/
 cdk_strlist_t cdk_strlist_add(cdk_strlist_t * list, const char *string)
 {
-	cdk_strlist_t sl;
-	int string_size = strlen(string);
-
 	if (!string)
 		return NULL;
+	
+	cdk_strlist_t sl;
+	int string_size = strlen(string);
 
 	sl = cdk_calloc(1, sizeof *sl + string_size + 2);
 	if (!sl)
