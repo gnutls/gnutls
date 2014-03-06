@@ -199,6 +199,7 @@ APIMANS += gnutls_credentials_clear.3
 APIMANS += gnutls_credentials_set.3
 APIMANS += gnutls_db_check_entry.3
 APIMANS += gnutls_db_check_entry_time.3
+APIMANS += gnutls_db_get_default_cache_expiration.3
 APIMANS += gnutls_db_get_ptr.3
 APIMANS += gnutls_db_remove_session.3
 APIMANS += gnutls_db_set_cache_expiration.3
@@ -420,6 +421,7 @@ APIMANS += gnutls_pkcs11_add_provider.3
 APIMANS += gnutls_pkcs11_copy_secret_key.3
 APIMANS += gnutls_pkcs11_copy_x509_crt.3
 APIMANS += gnutls_pkcs11_copy_x509_privkey.3
+APIMANS += gnutls_pkcs11_crt_is_known.3
 APIMANS += gnutls_pkcs11_deinit.3
 APIMANS += gnutls_pkcs11_delete_url.3
 APIMANS += gnutls_pkcs11_get_pin_function.3
@@ -519,15 +521,21 @@ APIMANS += gnutls_priority_set_direct.3
 APIMANS += gnutls_priority_sign_list.3
 APIMANS += gnutls_privkey_decrypt_data.3
 APIMANS += gnutls_privkey_deinit.3
+APIMANS += gnutls_privkey_export_dsa_raw.3
+APIMANS += gnutls_privkey_export_ecc_raw.3
+APIMANS += gnutls_privkey_export_rsa_raw.3
 APIMANS += gnutls_privkey_generate.3
 APIMANS += gnutls_privkey_get_pk_algorithm.3
 APIMANS += gnutls_privkey_get_type.3
+APIMANS += gnutls_privkey_import_dsa_raw.3
+APIMANS += gnutls_privkey_import_ecc_raw.3
 APIMANS += gnutls_privkey_import_ext.3
 APIMANS += gnutls_privkey_import_ext2.3
 APIMANS += gnutls_privkey_import_openpgp.3
 APIMANS += gnutls_privkey_import_openpgp_raw.3
 APIMANS += gnutls_privkey_import_pkcs11.3
 APIMANS += gnutls_privkey_import_pkcs11_url.3
+APIMANS += gnutls_privkey_import_rsa_raw.3
 APIMANS += gnutls_privkey_import_tpm_raw.3
 APIMANS += gnutls_privkey_import_tpm_url.3
 APIMANS += gnutls_privkey_import_url.3
@@ -539,6 +547,7 @@ APIMANS += gnutls_privkey_sign_data.3
 APIMANS += gnutls_privkey_sign_hash.3
 APIMANS += gnutls_privkey_sign_raw_data.3
 APIMANS += gnutls_privkey_status.3
+APIMANS += gnutls_privkey_verify_params.3
 APIMANS += gnutls_protocol_get_id.3
 APIMANS += gnutls_protocol_get_name.3
 APIMANS += gnutls_protocol_get_version.3
@@ -562,14 +571,14 @@ APIMANS += gnutls_pubkey_deinit.3
 APIMANS += gnutls_pubkey_encrypt_data.3
 APIMANS += gnutls_pubkey_export.3
 APIMANS += gnutls_pubkey_export2.3
+APIMANS += gnutls_pubkey_export_dsa_raw.3
+APIMANS += gnutls_pubkey_export_ecc_raw.3
+APIMANS += gnutls_pubkey_export_ecc_x962.3
+APIMANS += gnutls_pubkey_export_rsa_raw.3
 APIMANS += gnutls_pubkey_get_key_id.3
 APIMANS += gnutls_pubkey_get_key_usage.3
 APIMANS += gnutls_pubkey_get_openpgp_key_id.3
 APIMANS += gnutls_pubkey_get_pk_algorithm.3
-APIMANS += gnutls_pubkey_get_pk_dsa_raw.3
-APIMANS += gnutls_pubkey_get_pk_ecc_raw.3
-APIMANS += gnutls_pubkey_get_pk_ecc_x962.3
-APIMANS += gnutls_pubkey_get_pk_rsa_raw.3
 APIMANS += gnutls_pubkey_get_preferred_hash_algorithm.3
 APIMANS += gnutls_pubkey_get_verify_algorithm.3
 APIMANS += gnutls_pubkey_import.3
@@ -596,6 +605,7 @@ APIMANS += gnutls_pubkey_verify_data.3
 APIMANS += gnutls_pubkey_verify_data2.3
 APIMANS += gnutls_pubkey_verify_hash.3
 APIMANS += gnutls_pubkey_verify_hash2.3
+APIMANS += gnutls_pubkey_verify_params.3
 APIMANS += gnutls_random_art.3
 APIMANS += gnutls_range_split.3
 APIMANS += gnutls_record_can_use_length_hiding.3
@@ -631,6 +641,7 @@ APIMANS += gnutls_rsa_params_init.3
 APIMANS += gnutls_safe_renegotiation_status.3
 APIMANS += gnutls_sec_param_get_name.3
 APIMANS += gnutls_sec_param_to_pk_bits.3
+APIMANS += gnutls_sec_param_to_symmetric_bits.3
 APIMANS += gnutls_server_name_get.3
 APIMANS += gnutls_server_name_set.3
 APIMANS += gnutls_session_channel_binding.3
@@ -679,6 +690,7 @@ APIMANS += gnutls_srp_set_client_credentials_function.3
 APIMANS += gnutls_srp_set_prime_bits.3
 APIMANS += gnutls_srp_set_server_credentials_file.3
 APIMANS += gnutls_srp_set_server_credentials_function.3
+APIMANS += gnutls_srp_set_server_fake_salt_seed.3
 APIMANS += gnutls_srp_verifier.3
 APIMANS += gnutls_srtp_get_keys.3
 APIMANS += gnutls_srtp_get_mki.3
@@ -837,6 +849,7 @@ APIMANS += gnutls_x509_crt_get_issuer_unique_id.3
 APIMANS += gnutls_x509_crt_get_key_id.3
 APIMANS += gnutls_x509_crt_get_key_purpose_oid.3
 APIMANS += gnutls_x509_crt_get_key_usage.3
+APIMANS += gnutls_x509_crt_get_name_constraints.3
 APIMANS += gnutls_x509_crt_get_pk_algorithm.3
 APIMANS += gnutls_x509_crt_get_pk_dsa_raw.3
 APIMANS += gnutls_x509_crt_get_pk_rsa_raw.3
@@ -885,6 +898,7 @@ APIMANS += gnutls_x509_crt_set_issuer_dn_by_oid.3
 APIMANS += gnutls_x509_crt_set_key.3
 APIMANS += gnutls_x509_crt_set_key_purpose_oid.3
 APIMANS += gnutls_x509_crt_set_key_usage.3
+APIMANS += gnutls_x509_crt_set_name_constraints.3
 APIMANS += gnutls_x509_crt_set_pin_function.3
 APIMANS += gnutls_x509_crt_set_policy.3
 APIMANS += gnutls_x509_crt_set_private_key_usage_period.3
@@ -909,6 +923,14 @@ APIMANS += gnutls_x509_dn_import.3
 APIMANS += gnutls_x509_dn_init.3
 APIMANS += gnutls_x509_dn_oid_known.3
 APIMANS += gnutls_x509_dn_oid_name.3
+APIMANS += gnutls_x509_name_constraints_add_excluded.3
+APIMANS += gnutls_x509_name_constraints_add_permitted.3
+APIMANS += gnutls_x509_name_constraints_check.3
+APIMANS += gnutls_x509_name_constraints_check_crt.3
+APIMANS += gnutls_x509_name_constraints_deinit.3
+APIMANS += gnutls_x509_name_constraints_get_excluded.3
+APIMANS += gnutls_x509_name_constraints_get_permitted.3
+APIMANS += gnutls_x509_name_constraints_init.3
 APIMANS += gnutls_x509_policy_release.3
 APIMANS += gnutls_x509_privkey_cpy.3
 APIMANS += gnutls_x509_privkey_deinit.3
@@ -980,9 +1002,7 @@ compare-makefile:
 	done; \
 	grep -v -e '^APIMANS += ' Makefile.am | \
 		perl -p -e "s/^APIMANS =/APIMANS =$$MANS/" > tmp-$@; \
-	echo "If the following step fails copy $(srcdir)/tmp-compare-makefile to Makefile.am"
-	diff -u $(srcdir)/Makefile.am tmp-$@ >/dev/null
-	rm -f tmp-$@
+	diff -u $(srcdir)/Makefile.am tmp-$@
 
 stamp_mans: $(HEADER_FILES)
 	@echo $(ECHO_N) "Creating man pages for gnutls.h..." && \
@@ -990,10 +1010,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/gnutls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1004,10 +1024,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/compat.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1018,10 +1038,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/dane.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1032,10 +1052,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/x509.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1046,10 +1066,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/ocsp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1060,10 +1080,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/abstract.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1074,10 +1094,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/pkcs12.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1088,10 +1108,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/pkcs11.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1102,10 +1122,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/dtls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1116,10 +1136,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/openpgp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1130,10 +1150,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/crypto.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1144,24 +1164,10 @@ stamp_mans: $(HEADER_FILES)
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
+			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/tpm.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
-			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
-		echo $(ECHO_N) "."; \
-	done
-	@echo ""
-	@echo $(ECHO_N) "Creating man pages for xssl.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/xssl.h`; do \
-		$(top_srcdir)/doc/scripts/gdoc -man \
-			-module $(PACKAGE) -sourceversion $(VERSION) \
-			-bugsto $(PACKAGE_BUGREPORT) \
-			-pkg-site "http://www.gnutls.org" \
-			-include "gnutls/xssl.h" \
-			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-$(YEAR) Free Software Foundation, Inc" \
+			-copyright "2001-2013 Free Software Foundation, Inc." \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
