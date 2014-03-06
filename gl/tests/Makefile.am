@@ -67,50 +67,6 @@ EXTRA_DIST += test-alloca-opt.c
 
 ## end   gnulib module alloca-opt-tests
 
-## begin gnulib module arpa_inet
-
-BUILT_SOURCES += arpa/inet.h
-
-# We need the following in order to create <arpa/inet.h> when the system
-# doesn't have one.
-arpa/inet.h: arpa_inet.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(WARN_ON_USE_H) $(ARG_NONNULL_H)
-	$(AM_V_at)$(MKDIR_P) arpa
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed -e 's|@''GUARD_PREFIX''@|GL|g' \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
-	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
-	      -e 's|@''HAVE_FEATURES_H''@|$(HAVE_FEATURES_H)|g' \
-	      -e 's|@''NEXT_ARPA_INET_H''@|$(NEXT_ARPA_INET_H)|g' \
-	      -e 's|@''HAVE_ARPA_INET_H''@|$(HAVE_ARPA_INET_H)|g' \
-	      -e 's/@''GNULIB_INET_NTOP''@/$(GNULIB_INET_NTOP)/g' \
-	      -e 's/@''GNULIB_INET_PTON''@/$(GNULIB_INET_PTON)/g' \
-	      -e 's|@''HAVE_DECL_INET_NTOP''@|$(HAVE_DECL_INET_NTOP)|g' \
-	      -e 's|@''HAVE_DECL_INET_PTON''@|$(HAVE_DECL_INET_PTON)|g' \
-	      -e 's|@''REPLACE_INET_NTOP''@|$(REPLACE_INET_NTOP)|g' \
-	      -e 's|@''REPLACE_INET_PTON''@|$(REPLACE_INET_PTON)|g' \
-	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
-	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
-	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
-	      < $(srcdir)/arpa_inet.in.h; \
-	} > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += arpa/inet.h arpa/inet.h-t
-MOSTLYCLEANDIRS += arpa
-
-EXTRA_DIST += arpa_inet.in.h
-
-## end   gnulib module arpa_inet
-
-## begin gnulib module arpa_inet-tests
-
-TESTS += test-arpa_inet
-check_PROGRAMS += test-arpa_inet
-EXTRA_DIST += test-arpa_inet.c
-
-## end   gnulib module arpa_inet-tests
-
 ## begin gnulib module base64-tests
 
 TESTS += test-base64
@@ -134,15 +90,6 @@ EXTRA_DIST += test-binary-io.sh test-binary-io.c macros.h
 
 ## end   gnulib module binary-io-tests
 
-## begin gnulib module bind-tests
-
-TESTS += test-bind
-check_PROGRAMS += test-bind
-test_bind_LDADD = $(LDADD) @LIBSOCKET@ $(INET_PTON_LIB)
-EXTRA_DIST += test-bind.c signature.h macros.h
-
-## end   gnulib module bind-tests
-
 ## begin gnulib module byteswap-tests
 
 TESTS += test-byteswap
@@ -159,15 +106,6 @@ check_PROGRAMS += test-c-ctype
 EXTRA_DIST += test-c-ctype.c macros.h
 
 ## end   gnulib module c-ctype-tests
-
-## begin gnulib module connect-tests
-
-TESTS += test-connect
-check_PROGRAMS += test-connect
-test_connect_LDADD = $(LDADD) @LIBSOCKET@ $(INET_PTON_LIB)
-EXTRA_DIST += test-connect.c signature.h macros.h
-
-## end   gnulib module connect-tests
 
 ## begin gnulib module errno-tests
 
@@ -220,14 +158,6 @@ check_PROGRAMS += test-fcntl-h
 EXTRA_DIST += test-fcntl-h.c
 
 ## end   gnulib module fcntl-h-tests
-
-## begin gnulib module fd-hook
-
-libtests_a_SOURCES += fd-hook.c
-
-EXTRA_DIST += fd-hook.h
-
-## end   gnulib module fd-hook
 
 ## begin gnulib module fdopen
 
@@ -354,24 +284,6 @@ test_iconv_LDADD = $(LDADD) @LIBICONV@
 EXTRA_DIST += test-iconv.c signature.h macros.h
 
 ## end   gnulib module iconv-tests
-
-## begin gnulib module inet_pton
-
-
-EXTRA_DIST += inet_pton.c
-
-EXTRA_libtests_a_SOURCES += inet_pton.c
-
-## end   gnulib module inet_pton
-
-## begin gnulib module inet_pton-tests
-
-TESTS += test-inet_pton
-check_PROGRAMS += test-inet_pton
-test_inet_pton_LDADD = $(LDADD) @INET_PTON_LIB@
-EXTRA_DIST += test-inet_pton.c signature.h macros.h
-
-## end   gnulib module inet_pton-tests
 
 ## begin gnulib module intprops-tests
 
@@ -555,23 +467,6 @@ check_PROGRAMS += test-snprintf
 EXTRA_DIST += test-snprintf.c signature.h macros.h
 
 ## end   gnulib module snprintf-tests
-
-## begin gnulib module sockets
-
-libtests_a_SOURCES += sockets.h sockets.c
-
-EXTRA_DIST += w32sock.h
-
-## end   gnulib module sockets
-
-## begin gnulib module sockets-tests
-
-TESTS += test-sockets
-check_PROGRAMS += test-sockets
-test_sockets_LDADD = $(LDADD) @LIBSOCKET@
-EXTRA_DIST += test-sockets.c
-
-## end   gnulib module sockets-tests
 
 ## begin gnulib module stdalign-tests
 
