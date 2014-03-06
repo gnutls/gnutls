@@ -139,7 +139,7 @@ gnutls_openpgp_keyring_import(gnutls_openpgp_keyring_t keyring,
 	 * not thread safe.
 	 */
 	if (format == GNUTLS_OPENPGP_FMT_BASE64) {
-		size_t written = 0;
+		size_t seen = 0;
 
 		err =
 		    cdk_stream_tmp_from_mem(data->data, data->size,
@@ -168,15 +168,20 @@ gnutls_openpgp_keyring_import(gnutls_openpgp_keyring_t keyring,
 
 		do {
 			err =
-			    cdk_stream_read(input, raw_data + written,
-					    raw_len - written);
+			    cdk_stream_read(input, raw_data + seen,
+					    raw_len - seen);
 
 			if (err > 0)
-				written += err;
+				seen += err;
 		}
-		while (written < raw_len && err != EOF && err > 0);
+		while (seen < raw_len && err != EOF && err > 0);
 
-		raw_len = written;
+		raw_len = seen;
+		if (raw_len == 0) {
+			gnutls_assert();
+			err = GNUTLS_E_BASE64_DECODING_ERROR;
+			goto error;
+		}
 	} else {		/* RAW */
 		raw_len = data->size;
 		raw_data = data->data;
