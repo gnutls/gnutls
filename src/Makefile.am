@@ -221,8 +221,8 @@ tpmtool-args.c: $(srcdir)/args-std.def $(srcdir)/tpmtool-args.def
 	-$(AUTOGEN) tpmtool-args.def
 p11tool-args.c: $(srcdir)/args-std.def $(srcdir)/p11tool-args.def
 	-$(AUTOGEN) p11tool-args.def
-psk-args.c: $(srcdir)/args-std.def $(srcdir)/psk-args.def
-	-$(AUTOGEN) psk-args.def
+psktool-args.c: $(srcdir)/args-std.def $(srcdir)/psktool-args.def
+	-$(AUTOGEN) psktool-args.def
 cli-debug-args.c: $(srcdir)/args-std.def $(srcdir)/cli-debug-args.def
 	-$(AUTOGEN) cli-debug-args.def
 cli-args.c: $(srcdir)/args-std.def $(srcdir)/cli-args.def
