@@ -236,14 +236,15 @@ static bool is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 	size_t id1_size;
 	size_t id2_size;
 	int ret;
+	bool result;
 
 	if (_gnutls_x509_compare_raw_dn
 	    (&cert->raw_issuer_dn, &issuer->raw_dn) != 0)
-		ret = 1;
+		result = 1;
 	else
-		ret = 0;
+		result = 0;
 
-	if (ret != 0) {
+	if (result != 0) {
 		/* check if the authority key identifier matches the subject key identifier
 		 * of the issuer */
 		id1_size = sizeof(id1);
@@ -254,7 +255,7 @@ static bool is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 		if (ret < 0) {
 			/* If there is no authority key identifier in the
 			 * certificate, assume they match */
-			ret = 1;
+			result = 1;
 			goto cleanup;
 		}
 
@@ -265,20 +266,20 @@ static bool is_issuer(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 		if (ret < 0) {
 			/* If there is no subject key identifier in the
 			 * issuer certificate, assume they match */
-			ret = 1;
+			result = 1;
 			gnutls_assert();
 			goto cleanup;
 		}
 
 		if (id1_size == id2_size
 		    && memcmp(id1, id2, id1_size) == 0)
-			ret = 1;
+			result = 1;
 		else
-			ret = 0;
+			result = 0;
 	}
 
       cleanup:
-	return ret;
+	return result;
 }
 
 /* Check if the given certificate is the issuer of the CRL.
