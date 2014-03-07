@@ -429,7 +429,7 @@ stamp_functions: $(API_FILES)
 
 stamp_enums: enums.texi
 	-mkdir enums
-	$(srcdir)/scripts/split-texi.pl enums enum < $(srcdir)/enums.texi
+	$(srcdir)/scripts/split-texi.pl enums enum < $<
 	echo $@ > $@
 
 $(ENUMS): stamp_enums
@@ -449,7 +449,7 @@ compare-exported:
 	rm -f tmp-exp-$@ tmp-head-$@
 
 compare-makefile: enums.texi
-	ENUMS=`grep '^@c ' $(srcdir)/enums.texi | sed 's/@c //g' | sort -d`; \
+	ENUMS=`grep '^@c ' $< | sed 's/@c //g' | sort -d`; \
 	STR=""; \
 	for i in $$ENUMS; do \
 		STR="$$STR\nENUMS += enums/$$i"; \
