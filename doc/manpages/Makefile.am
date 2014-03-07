@@ -84,7 +84,7 @@ tpmtool.1: ../../src/tpmtool-args.def
 	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp
 
-psktool.1: ../../src/psk-args.def
+psktool.1: ../../src/psktool-args.def
 	-sed 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $< > "$<".tmp && \
 	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl "$<".tmp && \
 	rm -f "$<".tmp

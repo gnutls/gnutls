@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 #include <string.h>
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
-#include <psk-args.h>
+#include <psktool-args.h>
 
 #include <gnutls/crypto.h>	/* for random */
 

@@ -662,8 +662,8 @@ src/ocsptool-args.c
 src/ocsptool-args.h
 src/p11tool-args.c
 src/p11tool-args.h
-src/psk-args.c
-src/psk-args.h
+src/psktool-args.c
+src/psktool-args.h
 src/serv-args.c
 src/serv-args.h
 src/srptool-args.c

@@ -20,7 +20,7 @@
 SUBDIRS = gl
 
 BUILT_SOURCES = srptool-args.c srptool-args.h \
-	psk-args.c psk-args.h ocsptool-args.h ocsptool-args.c \
+	psktool-args.c psktool-args.h ocsptool-args.h ocsptool-args.c \
 	serv-args.c serv-args.h cli-args.c cli-args.h \
 	cli-debug-args.c cli-debug-args.h certtool-args.c certtool-args.h \
 	danetool-args.c danetool-args.h p11tool-args.c p11tool-args.h \
@@ -90,7 +90,7 @@ psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la $(LIBOPTS) ../gl/libgnu.la
 psktool_LDADD += $(LTLIBINTL) gl/libgnu_gpl.la
 noinst_LTLIBRARIES += libcmd-psk.la
 libcmd_psk_la_CFLAGS = 
-libcmd_psk_la_SOURCES = psk-args.def psk-args.c psk-args.h
+libcmd_psk_la_SOURCES = psktool-args.def psktool-args.c psktool-args.h
 
 
 if ENABLE_OCSP
