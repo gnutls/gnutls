@@ -46,23 +46,24 @@ _gnutls_check_if_same_cert(gnutls_x509_crt_t cert1,
 {
 	gnutls_datum_t cert1bin = { NULL, 0 }, cert2bin = {
 	NULL, 0};
-	int result;
+	int ret;
+	bool result;
 
-	result = _gnutls_is_same_dn(cert1, cert2);
-	if (result == 0)
+	ret = _gnutls_is_same_dn(cert1, cert2);
+	if (ret == 0)
 		return 0;
 
-	result = _gnutls_x509_der_encode(cert1->cert, "", &cert1bin, 0);
-	if (result < 0) {
-		result = 0;
+	ret = _gnutls_x509_der_encode(cert1->cert, "", &cert1bin, 0);
+	if (ret < 0) {
 		gnutls_assert();
+		result = 0;
 		goto cleanup;
 	}
 
-	result = _gnutls_x509_der_encode(cert2->cert, "", &cert2bin, 0);
-	if (result < 0) {
-		result = 0;
+	ret = _gnutls_x509_der_encode(cert2->cert, "", &cert2bin, 0);
+	if (ret < 0) {
 		gnutls_assert();
+		result = 0;
 		goto cleanup;
 	}
 
@@ -83,10 +84,11 @@ _gnutls_check_if_same_cert2(gnutls_x509_crt_t cert1,
 			    gnutls_datum_t * cert2bin)
 {
 	gnutls_datum_t cert1bin = { NULL, 0 };
-	int result;
+	int ret;
+	bool result;
 
-	result = _gnutls_x509_der_encode(cert1->cert, "", &cert1bin, 0);
-	if (result < 0) {
+	ret = _gnutls_x509_der_encode(cert1->cert, "", &cert1bin, 0);
+	if (ret < 0) {
 		result = 0;
 		gnutls_assert();
 		goto cleanup;
@@ -118,7 +120,8 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	gnutls_datum_t issuer_signed_data = { NULL, 0 };
 	gnutls_datum_t cert_signature = { NULL, 0 };
 	gnutls_datum_t issuer_signature = { NULL, 0 };
-	int pathlen = -1, result;
+	int pathlen = -1, ret;
+	bool result;
 	unsigned int ca_status = 0;
 
 	/* Check if the issuer is the same with the
@@ -126,34 +129,34 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	 * certificates to be able to verify themselves.
 	 */
 
-	result =
+	ret =
 	    _gnutls_x509_get_signed_data(issuer->cert, "tbsCertificate",
 					 &issuer_signed_data);
-	if (result < 0) {
+	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
 	}
 
-	result =
+	ret =
 	    _gnutls_x509_get_signed_data(cert->cert, "tbsCertificate",
 					 &cert_signed_data);
-	if (result < 0) {
+	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
 	}
 
-	result =
+	ret =
 	    _gnutls_x509_get_signature(issuer->cert, "signature",
 				       &issuer_signature);
-	if (result < 0) {
+	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
 	}
 
-	result =
+	ret =
 	    _gnutls_x509_get_signature(cert->cert, "signature",
 				       &cert_signature);
-	if (result < 0) {
+	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
 	}
@@ -178,10 +181,10 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 			}
 		}
 
-	result =
+	ret =
 	    gnutls_x509_crt_get_basic_constraints(issuer, NULL, &ca_status,
 						  &pathlen);
-	if (result < 0) {
+	if (ret < 0) {
 		ca_status = 0;
 		pathlen = -1;
 	}
@@ -195,18 +198,18 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 		result = 1;
 		goto cleanup;
 	}
-
 	/* Handle V1 CAs that do not have a basicConstraint, but accept
 	   these certs only if the appropriate flags are set. */
-	else if ((result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) &&
+	else if ((ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) &&
 		 ((flags & GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT) ||
 		  (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT) &&
 		   (gnutls_x509_crt_check_issuer(issuer, issuer) != 0)))) {
 		gnutls_assert();
 		result = 1;
 		goto cleanup;
-	} else
+	} else {
 		gnutls_assert();
+	}
 
  fail:
 	result = 0;
