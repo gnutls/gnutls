@@ -550,7 +550,8 @@ verify_crt(gnutls_x509_crt_t cert,
 	gnutls_datum_t cert_signed_data = { NULL, 0 };
 	gnutls_datum_t cert_signature = { NULL, 0 };
 	gnutls_x509_crt_t issuer = NULL;
-	int issuer_version, result = 0, hash_algo;
+	int issuer_version, hash_algo;
+	bool result = 0;
 	const mac_entry_st * me;
 	unsigned int out = 0, usage;
 	int sigalg, ret;
@@ -656,9 +657,9 @@ verify_crt(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		result =
+		ret =
 		    gnutls_x509_crt_get_key_usage(issuer, &usage, NULL);
-		if (result >= 0) {
+		if (ret >= 0) {
 			if (!(usage & GNUTLS_KEY_KEY_CERT_SIGN)) {
 				gnutls_assert();
 				out =
@@ -736,18 +737,18 @@ verify_crt(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	result =
+	ret =
 	    _gnutls_x509_verify_data(me,
 				     &cert_signed_data, &cert_signature,
 				     issuer);
-	if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
+	if (ret == GNUTLS_E_PK_SIG_VERIFY_FAILED) {
 		gnutls_assert();
 		out |= GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE;
 		/* error. ignore it */
 		if (output)
 			*output |= out;
 		result = 0;
-	} else if (result < 0) {
+	} else if (ret < 0) {
 		result = 0;
 		gnutls_assert();
 		goto cleanup;
@@ -775,8 +776,12 @@ verify_crt(gnutls_x509_crt_t cert,
 	}
 
       cleanup:
-	if (result >= 0 && func)
+	if (func) {
+		if (result == 0) {
+			out |= GNUTLS_CERT_INVALID;
+		}
 		func(cert, issuer, NULL, out);
+	}
 	_gnutls_free_datum(&cert_signed_data);
 	_gnutls_free_datum(&cert_signature);
 
