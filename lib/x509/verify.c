@@ -752,7 +752,8 @@ verify_crt(gnutls_x509_crt_t cert,
 		result = 0;
 		gnutls_assert();
 		goto cleanup;
-	}
+	} else if (ret == 1)
+		result = 1;
 
 	/* Check activation/expiration times
 	 */
@@ -761,6 +762,7 @@ verify_crt(gnutls_x509_crt_t cert,
 		if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS)) {
 			out |= check_time(issuer, now);
 			if (out != 0) {
+				gnutls_assert();
 				result = 0;
 				if (output)
 					*output |= out;
@@ -769,6 +771,7 @@ verify_crt(gnutls_x509_crt_t cert,
 
 		out |= check_time(cert, now);
 		if (out != 0) {
+			gnutls_assert();
 			result = 0;
 			if (output)
 				*output |= out;
@@ -941,6 +944,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 						 &certificate_list[i], 1,
 						 flags, &output, NULL, now,
 						 &max_path, nc, func)) != 1) {
+			gnutls_assert();
 			status |= output;
 			status |= GNUTLS_CERT_INVALID;
 			goto cleanup;
