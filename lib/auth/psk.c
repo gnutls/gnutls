@@ -158,7 +158,7 @@ _gnutls_gen_psk_client_kx(gnutls_session_t session,
 			  gnutls_buffer_st * data)
 {
 	int ret, free;
-	gnutls_datum_t username;
+	gnutls_datum_t username = {NULL, 0};
 	gnutls_datum_t key;
 	gnutls_psk_client_credentials_t cred;
 

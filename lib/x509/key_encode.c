@@ -462,7 +462,7 @@ _gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
-	result = 0;
+	ret = 0;
 
       cleanup:
 	if (ret < 0)
@@ -470,7 +470,7 @@ _gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 
 	gnutls_pk_params_clear(&pk_params);
 	gnutls_pk_params_release(&pk_params);
-	return result;
+	return ret;
 }
 
 /* Encodes the ECC parameters into an ASN.1 ECPrivateKey structure.

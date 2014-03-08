@@ -1716,7 +1716,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 				       const version_entry_st * ver,
 				       gnutls_sign_algorithm_t sign)
 {
-	unsigned int hash_size;
+	unsigned int hash_size = 0;
 	unsigned int sig_hash_size;
 	const mac_entry_st *me;
 
@@ -1744,7 +1744,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 	} else if (pubkey->pk_algorithm == GNUTLS_PK_EC) {
 		if (_gnutls_version_has_selectable_sighash(ver)
 		    && sign != GNUTLS_SIGN_UNKNOWN) {
-			me = _gnutls_dsa_q_to_hash(pubkey->pk_algorithm,
+			_gnutls_dsa_q_to_hash(pubkey->pk_algorithm,
 						   &pubkey->params,
 						   &hash_size);
 

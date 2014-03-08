@@ -372,7 +372,7 @@ found:
 	free(line);
 	if (fd)
 		fclose(fd);
-	return 0;
+	return ret;
 }
 
 /* Randomizes the given password entry. It actually sets the verifier
