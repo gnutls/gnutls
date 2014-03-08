@@ -360,7 +360,7 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
       found:
 	if (fd)
 		fclose(fd);
-	return 0;
+	return ret;
 }
 
 /* Randomizes the given password entry. It actually sets the verifier

@@ -709,7 +709,8 @@ int gnutls_pkcs11_obj_init(gnutls_pkcs11_obj_t * obj)
 
 	(*obj)->info = p11_kit_uri_new();
 	if ((*obj)->info == NULL) {
-		free(*obj);
+		gnutls_free(*obj);
+		*obj = NULL;
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}

@@ -80,6 +80,8 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 
 	hash_algo =
 	    mac_to_entry(gnutls_sign_get_hash_algorithm(*sign_algo));
+	if (hash_algo == NULL)
+		return gnutls_assert_val(GNUTLS_E_UNKNOWN_HASH_ALGORITHM);
 
 	_gnutls_handshake_log
 	    ("HSK[%p]: signing handshake data: using %s\n", session,

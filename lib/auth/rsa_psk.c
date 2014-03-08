@@ -236,7 +236,7 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 		goto cleanup;
 	}
 
-	ret = 0;
+	ret = data->length;
 
       cleanup:
 	_gnutls_free_datum(&sdata);
@@ -246,7 +246,7 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 		gnutls_free(username.data);
 	}
 
-	return data->length;
+	return ret;
 }
 
 /*
