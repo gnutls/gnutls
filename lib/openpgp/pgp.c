@@ -169,7 +169,16 @@ _gnutls_openpgp_export(cdk_kbnode_t node,
 
 	if (format == GNUTLS_OPENPGP_FMT_BASE64) {
 		unsigned char *in = gnutls_calloc(1, *output_data_size);
-		memcpy(in, output_data, *output_data_size);
+		if (in == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		rc = cdk_kbnode_write_to_mem(node, in, output_data_size);
+		if (rc) {
+			gnutls_free(in);
+			rc = _gnutls_map_cdk_rc(rc);
+			gnutls_assert();
+			return rc;
+		}
 
 		/* Calculate the size of the encoded data and check if the provided
 		   buffer is large enough. */
