@@ -349,7 +349,7 @@ decode_complex_string(const struct oid_to_string *oentry, void *value,
 	ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 	char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
 	unsigned int etype;
-	gnutls_datum_t td;
+	gnutls_datum_t td = {NULL, 0};
 
 	if (oentry->asn_desc == NULL) {
 		gnutls_assert();
@@ -877,7 +877,7 @@ _gnutls_x509_export_int_named(ASN1_TYPE asn1_data, const char *name,
 			      size_t * output_data_size)
 {
 	int ret;
-	gnutls_datum_t out;
+	gnutls_datum_t out = {NULL,0};
 	size_t size;
 
 	ret = _gnutls_x509_export_int_named2(asn1_data, name,
