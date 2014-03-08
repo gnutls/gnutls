@@ -387,7 +387,7 @@ read_crq_set(gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 static long read_int_with_default(const char *input_str, long def)
 {
 	char *endptr;
-	long l, len;
+	long l;
 	static char input[128];
 
 	fprintf(stderr, input_str, def);
@@ -396,8 +396,6 @@ static long read_int_with_default(const char *input_str, long def)
 
 	if (IS_NEWLINE(input))
 		return def;
-
-	len = strlen(input);
 
 	l = strtol(input, &endptr, 0);
 
@@ -1039,10 +1037,8 @@ time_t get_expiration_date()
 {
 	if (batch) {
 		if (cfg.expiration_date == NULL) {
-		        time_t secs, now;
+		        time_t secs;
 		        
-		        now = time(NULL);
-
         		if (cfg.expiration_days == 0 || cfg.expiration_days < -2)
         		        secs = days_to_secs(365);
                         else {
