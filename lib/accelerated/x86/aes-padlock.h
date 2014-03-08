@@ -9,14 +9,14 @@ struct padlock_cipher_data {
 	union {
 		unsigned int pad[4];
 		struct {
-			int rounds:4;
-			int dgst:1;	/* n/a in C3 */
-			int align:1;	/* n/a in C3 */
-			int ciphr:1;	/* n/a in C3 */
+			unsigned rounds:4;
+			unsigned dgst:1;	/* n/a in C3 */
+			unsigned align:1;	/* n/a in C3 */
+			unsigned ciphr:1;	/* n/a in C3 */
 			unsigned int keygen:1;
-			int interm:1;
+			unsigned interm:1;
 			unsigned int encdec:1;
-			int ksize:2;
+			unsigned ksize:2;
 		} b;
 	} cword;		/* Control word */
 	AES_KEY ks;		/* Encryption key */

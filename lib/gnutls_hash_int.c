@@ -44,9 +44,9 @@ int _gnutls_hash_init(digest_hd_st * dig, const mac_entry_st * e)
 
 	/* check if a digest has been registered 
 	 */
-	cc = _gnutls_get_crypto_digest(e->id);
+	cc = _gnutls_get_crypto_digest((gnutls_digest_algorithm_t)e->id);
 	if (cc != NULL && cc->init) {
-		if (cc->init(e->id, &dig->handle) < 0) {
+		if (cc->init((gnutls_digest_algorithm_t)e->id, &dig->handle) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_HASH_FAILED;
 		}
@@ -58,7 +58,7 @@ int _gnutls_hash_init(digest_hd_st * dig, const mac_entry_st * e)
 		return 0;
 	}
 
-	result = _gnutls_digest_ops.init(e->id, &dig->handle);
+	result = _gnutls_digest_ops.init((gnutls_digest_algorithm_t)e->id, &dig->handle);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -252,12 +252,12 @@ void _gnutls_mac_deinit(mac_hd_st * handle, void *digest)
 	handle->handle = NULL;
 }
 
-inline static int get_padsize(gnutls_digest_algorithm_t algorithm)
+inline static int get_padsize(gnutls_mac_algorithm_t algorithm)
 {
 	switch (algorithm) {
-	case GNUTLS_DIG_MD5:
+	case GNUTLS_MAC_MD5:
 		return 48;
-	case GNUTLS_DIG_SHA1:
+	case GNUTLS_MAC_SHA1:
 		return 40;
 	default:
 		return 0;

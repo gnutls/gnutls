@@ -1554,7 +1554,7 @@ static int wrap_nettle_hash_algorithm(gnutls_pk_algorithm_t pk,
 
 		me = _gnutls_dsa_q_to_hash(pk, issuer_params, NULL);
 		if (hash_algo)
-			*hash_algo = me->id;
+			*hash_algo = (gnutls_digest_algorithm_t)me->id;
 
 		ret = 0;
 		break;
@@ -1587,7 +1587,8 @@ static int wrap_nettle_hash_algorithm(gnutls_pk_algorithm_t pk,
 		}
 
 		if (digest_size !=
-		    _gnutls_hash_get_algo_len(mac_to_entry(*hash_algo))) {
+		    _gnutls_hash_get_algo_len(mac_to_entry(
+		    	(gnutls_mac_algorithm_t)*hash_algo))) {
 			gnutls_assert();
 			ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
 			goto cleanup;

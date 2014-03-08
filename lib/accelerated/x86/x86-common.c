@@ -203,21 +203,21 @@ void register_x86_intel_crypto(void)
 
 
 		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA1,
+		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
 							 80,
 							 &_gnutls_hmac_sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA224,
+		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA224,
 							 80,
 							 &_gnutls_hmac_sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA256,
+		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
 							 80,
 							 &_gnutls_hmac_sha_x86_ssse3);
 		if (ret < 0)
@@ -238,14 +238,14 @@ void register_x86_intel_crypto(void)
 		if (ret < 0)
 			gnutls_assert();
 		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA384,
+		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA384,
 							 80,
 							 &_gnutls_hmac_sha_x86_ssse3);
 		if (ret < 0)
 			gnutls_assert();
 
 		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_DIG_SHA512,
+		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA512,
 							 80,
 							 &_gnutls_hmac_sha_x86_ssse3);
 		if (ret < 0)
