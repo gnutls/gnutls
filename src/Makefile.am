@@ -213,23 +213,23 @@ libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIM
 
 endif # ENABLE_TROUSERS
 
-danetool-args.c: $(srcdir)/args-std.def $(srcdir)/danetool-args.def
-	-$(AUTOGEN) danetool-args.def
-ocsptool-args.c: $(srcdir)/args-std.def $(srcdir)/ocsptool-args.def
-	-$(AUTOGEN) ocsptool-args.def
-tpmtool-args.c: $(srcdir)/args-std.def $(srcdir)/tpmtool-args.def
-	-$(AUTOGEN) tpmtool-args.def
-p11tool-args.c: $(srcdir)/args-std.def $(srcdir)/p11tool-args.def
-	-$(AUTOGEN) p11tool-args.def
-psktool-args.c: $(srcdir)/args-std.def $(srcdir)/psktool-args.def
-	-$(AUTOGEN) psktool-args.def
-cli-debug-args.c: $(srcdir)/args-std.def $(srcdir)/cli-debug-args.def
-	-$(AUTOGEN) cli-debug-args.def
-cli-args.c: $(srcdir)/args-std.def $(srcdir)/cli-args.def
-	-$(AUTOGEN) cli-args.def
-serv-args.c: $(srcdir)/args-std.def $(srcdir)/serv-args.def
-	-$(AUTOGEN) serv-args.def
-srptool-args.c: $(srcdir)/args-std.def $(srcdir)/srptool-args.def
-	-$(AUTOGEN) srptool-args.def
-certtool-args.c: $(srcdir)/args-std.def $(srcdir)/certtool-args.def
-	-$(AUTOGEN) certtool-args.def
+danetool-args.c danetool-args.h: $(srcdir)/danetool-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+ocsptool-args.c ocsptool-args.h: $(srcdir)/ocsptool-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+tpmtool-args.c tpmtool-args.h: $(srcdir)/tpmtool-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+p11tool-args.c p11tool-args.h: $(srcdir)/p11tool-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+psktool-args.c psktool-args.h: $(srcdir)/psktool-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+cli-debug-args.c cli-debug-args.h: $(srcdir)/cli-debug-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+cli-args.c cli-args.h: $(srcdir)/cli-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+serv-args.c serv-args.h: $(srcdir)/serv-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+srptool-args.c srptool-args.h: $(srcdir)/srptool-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+certtool-args.c certtool-args.h: $(srcdir)/certtool-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
