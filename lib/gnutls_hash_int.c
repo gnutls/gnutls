@@ -276,7 +276,7 @@ _gnutls_mac_init_ssl3(digest_hd_st * ret, const mac_entry_st * e,
 
 	FAIL_IF_LIB_ERROR;
 
-	padsize = get_padsize((gnutls_digest_algorithm_t) e->id);
+	padsize = get_padsize(e->id);
 	if (padsize == 0) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;

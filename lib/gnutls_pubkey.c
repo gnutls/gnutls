@@ -1516,7 +1516,7 @@ gnutls_pubkey_verify_data(gnutls_pubkey_t pubkey, unsigned int flags,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = pubkey_verify_data(pubkey->pk_algorithm, mac_to_entry(hash),
+	ret = pubkey_verify_data(pubkey->pk_algorithm, hash_to_entry(hash),
 				 data, signature, &pubkey->params);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1559,7 +1559,10 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	me = mac_to_entry(gnutls_sign_get_hash_algorithm(algo));
+	me = hash_to_entry(gnutls_sign_get_hash_algorithm(algo));
+	if (me == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	ret = pubkey_verify_data(pubkey->pk_algorithm, me,
 				 data, signature, &pubkey->params);
 	if (ret < 0) {
@@ -1641,7 +1644,7 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		return _gnutls_pk_verify(GNUTLS_PK_RSA, hash, signature,
 					 &key->params);
 	} else {
-		me = mac_to_entry(gnutls_sign_get_hash_algorithm(algo));
+		me = hash_to_entry(gnutls_sign_get_hash_algorithm(algo));
 		return pubkey_verify_hashed_data(key->pk_algorithm, me,
 						 hash, signature,
 						 &key->params);
@@ -1731,7 +1734,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 				    gnutls_assert_val
 				    (GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
 		} else if (sign != GNUTLS_SIGN_UNKNOWN) {
-			me = mac_to_entry(gnutls_sign_get_hash_algorithm
+			me = hash_to_entry(gnutls_sign_get_hash_algorithm
 					  (sign));
 			sig_hash_size = _gnutls_hash_get_algo_len(me);
 			if (sig_hash_size < hash_size)
@@ -1748,7 +1751,7 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_session_t session,
 						   &pubkey->params,
 						   &hash_size);
 
-			me = mac_to_entry(gnutls_sign_get_hash_algorithm
+			me = hash_to_entry(gnutls_sign_get_hash_algorithm
 					  (sign));
 			sig_hash_size = _gnutls_hash_get_algo_len(me);
 

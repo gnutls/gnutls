@@ -754,7 +754,7 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 {
 	int ret;
 	gnutls_datum_t digest;
-	const mac_entry_st *me = mac_to_entry(hash);
+	const mac_entry_st *me = hash_to_entry(hash);
 
 	if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -833,7 +833,7 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 	memcpy(digest.data, hash_data->data, digest.size);
 
 	ret =
-	    pk_prepare_hash(signer->pk_algorithm, mac_to_entry(hash_algo),
+	    pk_prepare_hash(signer->pk_algorithm, hash_to_entry(hash_algo),
 			    &digest);
 	if (ret < 0) {
 		gnutls_assert();

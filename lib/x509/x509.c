@@ -2623,7 +2623,7 @@ _gnutls_get_key_id(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params,
 	gnutls_datum_t der = { NULL, 0 };
 	const gnutls_digest_algorithm_t hash = GNUTLS_DIG_SHA1;
 	unsigned int digest_len =
-	    _gnutls_hash_get_algo_len(mac_to_entry(hash));
+	    _gnutls_hash_get_algo_len(hash_to_entry(hash));
 
 	if (output_data == NULL || *output_data_size < digest_len) {
 		gnutls_assert();
@@ -3000,7 +3000,7 @@ gnutls_x509_crt_verify_hash(gnutls_x509_crt_t crt, unsigned int flags,
 
 	ret =
 	    pubkey_verify_hashed_data(gnutls_x509_crt_get_pk_algorithm
-				      (crt, NULL), mac_to_entry(algo),
+				      (crt, NULL), hash_to_entry(algo),
 				      hash, signature, &params);
 	if (ret < 0) {
 		gnutls_assert();

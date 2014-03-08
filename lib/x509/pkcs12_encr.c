@@ -134,7 +134,7 @@ _gnutls_pkcs12_string_to_key(unsigned int id, const uint8_t * salt,
 		_gnutls_hash(&md, buf_i, pw ? i_size : 64);
 		_gnutls_hash_deinit(&md, hash);
 		for (i = 1; i < iter; i++) {
-			rc = _gnutls_hash_fast(GNUTLS_MAC_SHA1, hash, 20,
+			rc = _gnutls_hash_fast(GNUTLS_DIG_SHA1, hash, 20,
 					       hash);
 			if (rc < 0) {
 				gnutls_assert();

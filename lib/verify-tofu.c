@@ -212,8 +212,8 @@ static int parse_commitment_line(char *line,
 
 	/* hash and hex encode */
 	ret =
-	    _gnutls_hash_fast(hash_algo->id, skey->data, skey->size,
-			      phash);
+	    _gnutls_hash_fast((gnutls_digest_algorithm_t)hash_algo->id, 
+	    			skey->data, skey->size, phash);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -715,9 +715,9 @@ gnutls_store_commitment(const char *db_name,
 	FILE *fd = NULL;
 	int ret;
 	char local_file[MAX_FILENAME];
-	const mac_entry_st *me = mac_to_entry(hash_algo);
+	const mac_entry_st *me = hash_to_entry(hash_algo);
 
-	if (_gnutls_digest_is_secure(me) == 0)
+	if (me == NULL || _gnutls_digest_is_secure(me) == 0)
 		return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 	if (_gnutls_hash_get_algo_len(me) != hash->size)
@@ -744,7 +744,8 @@ gnutls_store_commitment(const char *db_name,
 
 	_gnutls_debug_log("Configuration file: %s\n", db_name);
 
-	tdb->cstore(db_name, host, service, expiration, me->id, hash);
+	tdb->cstore(db_name, host, service, expiration, 
+		(gnutls_digest_algorithm_t)me->id, hash);
 
 	ret = 0;
 

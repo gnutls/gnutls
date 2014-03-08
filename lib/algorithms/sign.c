@@ -143,7 +143,7 @@ int gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm)
 	GNUTLS_SIGN_ALG_LOOP(dig = p->mac);
 
 	if (dig != GNUTLS_DIG_UNKNOWN)
-		return _gnutls_digest_is_secure(mac_to_entry(dig));
+		return _gnutls_digest_is_secure(hash_to_entry(dig));
 
 	return 0;
 }

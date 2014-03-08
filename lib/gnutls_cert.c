@@ -247,7 +247,7 @@ _gnutls_selected_cert_supported_kx(gnutls_session_t session,
 				   gnutls_kx_algorithm_t * alg,
 				   int *alg_size)
 {
-	gnutls_kx_algorithm_t kx;
+	unsigned kx;
 	gnutls_pk_algorithm_t pk, cert_pk;
 	gnutls_pcert_st *cert;
 	int i;

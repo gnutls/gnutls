@@ -247,7 +247,7 @@ int gnutls_pcert_import_openpgp(gnutls_pcert_st * pcert,
 	}
 
 	ret =
-	    gnutls_openpgp_crt_export(crt, GNUTLS_X509_FMT_DER,
+	    gnutls_openpgp_crt_export(crt, GNUTLS_OPENPGP_FMT_RAW,
 				      pcert->cert.data, &sz);
 	if (ret < 0) {
 		ret = gnutls_assert_val(ret);

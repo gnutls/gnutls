@@ -1624,7 +1624,7 @@ gnutls_x509_privkey_sign_data(gnutls_x509_privkey_t key,
 	int result;
 	gnutls_datum_t sig = { NULL, 0 };
 	gnutls_datum_t hash;
-	const mac_entry_st *me = mac_to_entry(digest);
+	const mac_entry_st *me = hash_to_entry(digest);
 
 	if (key == NULL) {
 		gnutls_assert();

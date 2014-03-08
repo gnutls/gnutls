@@ -482,7 +482,7 @@ gnutls_hash_init(gnutls_hash_hd_t * dig,
 	}
 
 	return _gnutls_hash_init(((digest_hd_st *) * dig),
-				 mac_to_entry(algorithm));
+				 hash_to_entry(algorithm));
 }
 
 /**
@@ -547,7 +547,7 @@ void gnutls_hash_deinit(gnutls_hash_hd_t handle, void *digest)
  **/
 int gnutls_hash_get_len(gnutls_digest_algorithm_t algorithm)
 {
-	return _gnutls_hash_get_algo_len(mac_to_entry(algorithm));
+	return _gnutls_hash_get_algo_len(hash_to_entry(algorithm));
 }
 
 /**

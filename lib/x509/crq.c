@@ -2530,7 +2530,7 @@ int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 
 	ret =
 	    pubkey_verify_data(gnutls_x509_crq_get_pk_algorithm(crq, NULL),
-			       mac_to_entry(algo), &data, &signature,
+			       hash_to_entry(algo), &data, &signature,
 			       &params);
 	if (ret < 0) {
 		gnutls_assert();

@@ -186,7 +186,7 @@ bigint_t _gnutls_calc_srp_u(bigint_t A, bigint_t B, bigint_t n)
 	_gnutls_mpi_print(A, &holder[n_size - a_size], &a_size);
 	_gnutls_mpi_print(B, &holder[n_size + n_size - b_size], &b_size);
 
-	ret = _gnutls_hash_fast(GNUTLS_MAC_SHA1, holder, holder_size, hd);
+	ret = _gnutls_hash_fast(GNUTLS_DIG_SHA1, holder, holder_size, hd);
 	if (ret < 0) {
 		gnutls_free(holder);
 		gnutls_assert();

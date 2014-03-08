@@ -73,7 +73,7 @@ static void print_req(gnutls_buffer_st * str, gnutls_ocsp_req_t req)
 			continue;
 		}
 		addf(str, "\t\t\tHash Algorithm: %s\n",
-		     _gnutls_digest_get_name(mac_to_entry(digest)));
+		     _gnutls_digest_get_name(hash_to_entry(digest)));
 
 		adds(str, "\t\t\tIssuer Name Hash: ");
 		_gnutls_buffer_hexprint(str, in.data, in.size);
@@ -343,7 +343,7 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 			continue;
 		}
 		addf(str, "\t\t\tHash Algorithm: %s\n",
-		     _gnutls_digest_get_name(mac_to_entry(digest)));
+		     _gnutls_digest_get_name(hash_to_entry(digest)));
 
 		adds(str, "\t\t\tIssuer Name Hash: ");
 		_gnutls_buffer_hexprint(str, in.data, in.size);

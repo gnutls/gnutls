@@ -1310,7 +1310,7 @@ _gnutls_handshake_io_recv_int(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 	}
 
-	if (htype != (unsigned) -1) {
+	if (htype != (gnutls_handshake_description_t) -1) {
 		ret = handshake_remaining_time(session);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
