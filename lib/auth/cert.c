@@ -257,7 +257,7 @@ _find_x509_cert(const gnutls_certificate_credentials_t cred,
 					return result;
 				}
 
-				if (odn.size != size)
+				if (odn.size == 0 || odn.size != size)
 					continue;
 
 				/* If the DN matches and

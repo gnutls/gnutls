@@ -172,7 +172,7 @@ static int parse_commitment_line(char *line,
 	if (p == NULL)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-	if (p[0] != '*' && strcmp(p, host) != 0)
+	if (p[0] != '*' && host != NULL && strcmp(p, host) != 0)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
 	/* read service */
@@ -180,7 +180,7 @@ static int parse_commitment_line(char *line,
 	if (p == NULL)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-	if (p[0] != '*' && strcmp(p, service) != 0)
+	if (p[0] != '*' && service != NULL && strcmp(p, service) != 0)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
 	/* read expiration */
@@ -268,7 +268,7 @@ static int parse_line(char *line,
 	if (p == NULL)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-	if (p[0] != '*' && strcmp(p, host) != 0)
+	if (p[0] != '*' && host != NULL && strcmp(p, host) != 0)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
 	/* read service */
@@ -276,7 +276,7 @@ static int parse_line(char *line,
 	if (p == NULL)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-	if (p[0] != '*' && strcmp(p, service) != 0)
+	if (p[0] != '*' && service != NULL && strcmp(p, service) != 0)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
 	/* read expiration */
