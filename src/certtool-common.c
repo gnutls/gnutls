@@ -74,7 +74,7 @@ safe_open_rw (const char *file, int privkey_op)
 gnutls_datum_t *
 load_secret_key (int mand, common_info_st * info)
 {
-  char raw_key[64];
+  static char raw_key[64];
   size_t raw_key_size = sizeof (raw_key);
   static gnutls_datum_t key;
   gnutls_datum_t hex_key;
