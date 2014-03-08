@@ -322,6 +322,7 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 				if (pwd_read_conf
 				    (cred->password_conf_file, entry,
 				     idx) == 0) {
+				        ret = 0;
 					goto found;
 				} else {
 					gnutls_assert();
