@@ -82,13 +82,23 @@ AC_MSG_ERROR([[
 
   GNUTLS_REQUIRES_PRIVATE="Requires.private: nettle, hogweed"
 
+  AC_ARG_WITH(nettle-mini,
+    AS_HELP_STRING([--with-nettle-mini], [Link against a mini-nettle (that includes mini-gmp)]),
+      mini_nettle=$withval,
+      mini_nettle=no)
+
   AC_ARG_VAR(GMP_CFLAGS, [C compiler flags for gmp])
   AC_ARG_VAR(GMP_LIBS, [linker flags for gmp])
-  if test x$GMP_LIBS = x; then
-  	AC_CHECK_LIB(gmp, __gmpz_cmp, [GMP_LIBS="-lgmp"], [AC_MSG_ERROR([[
+  if test "$mini_nettle" != no;then
+    GMP_CLFLAGS=""
+    GMP_LIBS=""
+  else
+    if test x$GMP_LIBS = x; then
+    	AC_CHECK_LIB(gmp, __gmpz_cmp, [GMP_LIBS="-lgmp"], [AC_MSG_ERROR([[
 ***
 *** gmp was not found.
 ]])])
+    fi
   fi
   AC_SUBST(GMP_CFLAGS)
   AC_SUBST(GMP_LIBS)
