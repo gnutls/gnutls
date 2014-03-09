@@ -769,6 +769,9 @@ AC_MSG_NOTICE([summary of build options:
   Compiler:             ${CC}
   CFlags:               ${CFLAGS}
   Library types:        Shared=${enable_shared}, Static=${enable_static}
+  Local libopts:        ${enable_local_libopts}
+  Local libtasn1:       ${included_libtasn1}
+  Use nettle-mini:      ${mini_nettle}
 ])
 
 AC_MSG_NOTICE([External hardware support:
@@ -803,8 +806,6 @@ if features are disabled)
 AC_MSG_NOTICE([Optional applications:
 
   crywrap app:          $libidn
-  local libopts:        ${enable_local_libopts}
-  local libtasn1:       ${included_libtasn1}
 ])
 
 AC_MSG_NOTICE([Optional libraries:

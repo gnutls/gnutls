@@ -28,8 +28,7 @@
 #include <algorithms.h>
 #include <gnutls_num.h>
 #include <gnutls_mpi.h>
-#include <gmp.h>
-#include <nettle/bignum.h>
+#include <nettle/bignum.h> /* includes gmp.h */
 #include <gnettle.h>
 #include <random.h>
 
