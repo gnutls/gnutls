@@ -207,19 +207,3 @@ gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
 priority_options.h: $(srcdir)/priority_options.gperf
 	-gperf -t $^ > $@
 
-libgnutls_xssl_la_LDFLAGS = -no-undefined -export-symbols-regex '^xssl.*'
-
-lib_LTLIBRARIES += libgnutls-xssl.la
-
-libgnutls_xssl_la_SOURCES = xssl.c xssl_getline.c xssl.h vasprintf.c vasprintf.h
-
-libgnutls_xssl_la_LIBADD = ../gl/libgnu.la libgnutls.la
-
-libgnutls_xssl_la_LDFLAGS += -version-info $(LT_XSSL_CURRENT):$(LT_XSSL_REVISION):$(LT_XSSL_AGE)
-
-if HAVE_LD_OUTPUT_DEF
-libgnutls_xssl_la_LDFLAGS += \
-	-Wl,--output-def,libgnutls-xssl-$(DLL_VERSION).def
-libgnutls-xssl-$(DLL_VERSION).def: libgnutls-xssl.la
-defexec_DATA += libgnutls-xssl-$(DLL_VERSION).def
-endif

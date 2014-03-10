@@ -202,8 +202,7 @@ MAINTAINERCLEANFILES =
 
 API_FILES=gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi \
 	tpm-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi \
-	dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi dane-api.texi \
-	xssl-api.texi
+	dtls-api.texi crypto-api.texi ocsp-api.texi tpm-api.texi dane-api.texi
 
 clean-local:
 	-rm -f stamp_enums stamp_functions
@@ -239,17 +238,6 @@ dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort |uniq`; do \
-		echo $(ECHO_N) "Creating documentation for $$i... " && \
-		$(srcdir)/scripts/gdoc -texinfo \
-			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
-		echo "ok"; \
-	done
-	mv -f $@-tmp $@
-
-xssl-api.texi: $(top_srcdir)/lib/includes/gnutls/xssl.h
-	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
@@ -432,11 +420,11 @@ $(FUNCS): stamp_functions
 compare-exported:
 	rm -f tmp-exp-$@ tmp-head-$@
 	for i in ../libdane/includes/gnutls/*.h ../lib/includes/gnutls/*.h;do perl scripts/getfuncs.pl <$$i >>tmp-head-$@;done
-	sort -u tmp-head-$@|grep -v ^xssl > tmp2-head-$@
+	sort -u tmp-head-$@ > tmp2-head-$@
 	mv tmp2-head-$@ tmp-head-$@
 	scripts/getfuncs-map.pl <../lib/libgnutls.map >tmp-exp-$@
 	scripts/getfuncs-map.pl <../libdane/libdane.map >>tmp-exp-$@
-	sort -u tmp-exp-$@|grep -v ^xssl > tmp2-exp-$@
+	sort -u tmp-exp-$@ > tmp2-exp-$@
 	mv tmp2-exp-$@ tmp-exp-$@
 	diff -u tmp-exp-$@ tmp-head-$@
 	rm -f tmp-exp-$@ tmp-head-$@
@@ -2379,27 +2367,3 @@ FUNCS += functions/gnutls_x509_trust_list_verify_crt
 FUNCS += functions/gnutls_x509_trust_list_verify_crt.short
 FUNCS += functions/gnutls_x509_trust_list_verify_named_crt
 FUNCS += functions/gnutls_x509_trust_list_verify_named_crt.short
-FUNCS += functions/xssl_client_init
-FUNCS += functions/xssl_client_init.short
-FUNCS += functions/xssl_cred_deinit
-FUNCS += functions/xssl_cred_deinit.short
-FUNCS += functions/xssl_cred_init
-FUNCS += functions/xssl_cred_init.short
-FUNCS += functions/xssl_deinit
-FUNCS += functions/xssl_deinit.short
-FUNCS += functions/xssl_flush
-FUNCS += functions/xssl_flush.short
-FUNCS += functions/xssl_getdelim
-FUNCS += functions/xssl_getdelim.short
-FUNCS += functions/xssl_get_session
-FUNCS += functions/xssl_get_session.short
-FUNCS += functions/xssl_printf
-FUNCS += functions/xssl_printf.short
-FUNCS += functions/xssl_read
-FUNCS += functions/xssl_read.short
-FUNCS += functions/xssl_server_init
-FUNCS += functions/xssl_server_init.short
-FUNCS += functions/xssl_sinit
-FUNCS += functions/xssl_sinit.short
-FUNCS += functions/xssl_write
-FUNCS += functions/xssl_write.short

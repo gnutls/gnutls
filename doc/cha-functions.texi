@@ -4,7 +4,6 @@
 
 @menu
 * Core TLS API::
-* High level TLS API::
 * Datagram TLS API::
 * X509 certificate API::
 * OCSP API::
@@ -25,14 +24,6 @@ The prototypes for the following functions lie in
 @file{gnutls/gnutls.h}.
 
 @include gnutls-api.texi
-
-@node High level TLS API
-@section High level TLS API
-
-The prototypes for the following functions lie in
-@file{gnutls/xssl.h}.
-
-@include xssl-api.texi
 
 @node Datagram TLS API
 @section Datagram TLS API

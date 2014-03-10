@@ -977,18 +977,6 @@ APIMANS += gnutls_x509_trust_list_remove_trust_file.3
 APIMANS += gnutls_x509_trust_list_remove_trust_mem.3
 APIMANS += gnutls_x509_trust_list_verify_crt.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3
-APIMANS += xssl_client_init.3
-APIMANS += xssl_cred_deinit.3
-APIMANS += xssl_cred_init.3
-APIMANS += xssl_deinit.3
-APIMANS += xssl_flush.3
-APIMANS += xssl_getdelim.3
-APIMANS += xssl_get_session.3
-APIMANS += xssl_printf.3
-APIMANS += xssl_read.3
-APIMANS += xssl_server_init.3
-APIMANS += xssl_sinit.3
-APIMANS += xssl_write.3
 
 dist_man_MANS += $(APIMANS)
 
