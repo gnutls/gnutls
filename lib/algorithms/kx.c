@@ -98,7 +98,7 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 #if defined(ENABLE_ANON) && defined(ENABLE_ECDHE)
 	{"ANON-ECDH", GNUTLS_KX_ANON_ECDH, &anon_ecdh_auth_struct, 0, GNUTLS_PK_UNKNOWN},
 #endif
-	{"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, GNUTLS_PK_RSA},
+	{"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, GNUTLS_PK_RSA},
 #ifdef ENABLE_DHE
 	{"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, GNUTLS_PK_RSA},
 	{"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, GNUTLS_PK_DSA},
@@ -124,7 +124,7 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 	{"ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, &ecdhe_psk_auth_struct, 0, GNUTLS_PK_UNKNOWN},
 #endif
 #endif
-	{0, 0, 0, 0}
+	{0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_KX_LOOP(b) \
