@@ -1024,9 +1024,36 @@ _gnutls_gen_cert_server_crt(gnutls_session_t session,
 	}
 }
 
+static
+int check_pk_compat(gnutls_session_t session, gnutls_pubkey_t pubkey)
+{
+	unsigned cert_pk;
+	unsigned req_cert_pk;
+	unsigned kx;
+
+	cert_pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
+	if (cert_pk == GNUTLS_PK_UNKNOWN) {
+		gnutls_assert();
+		return GNUTLS_E_CERTIFICATE_ERROR;
+	}
+
+	kx = _gnutls_cipher_suite_get_kx_algo(session->security_parameters.cipher_suite);
+
+	req_cert_pk = _gnutls_kx_cert_pk_params(kx);
+
+	if (req_cert_pk == GNUTLS_PK_UNKNOWN) /* doesn't matter */
+		return 0;
+
+	if (req_cert_pk != cert_pk) {
+		gnutls_assert();
+		return GNUTLS_E_CERTIFICATE_ERROR;
+	}
+
+	return 0;
+}
+
 /* Process server certificate
  */
-
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_pcert_deinit(&peer_certificate_list[x])
 static int
 _gnutls_proc_x509_server_crt(gnutls_session_t session,
@@ -1134,6 +1161,11 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 		p += len;
 	}
 
+	ret = check_pk_compat(session, peer_certificate_list[0].pubkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	if ((ret =
 	     _gnutls_copy_certificate_auth_info(info,

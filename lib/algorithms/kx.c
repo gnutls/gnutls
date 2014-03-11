@@ -87,40 +87,41 @@ struct gnutls_kx_algo_entry {
 	gnutls_kx_algorithm_t algorithm;
 	mod_auth_st *auth_struct;
 	int needs_dh_params;
+	gnutls_pk_algorithm_t cert_pk; /* the type of certificate required */
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 #if defined(ENABLE_ANON) && defined(ENABLE_DHE)
-	{"ANON-DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1},
+	{"ANON-DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, GNUTLS_PK_UNKNOWN},
 #endif
 #if defined(ENABLE_ANON) && defined(ENABLE_ECDHE)
-	{"ANON-ECDH", GNUTLS_KX_ANON_ECDH, &anon_ecdh_auth_struct, 0},
+	{"ANON-ECDH", GNUTLS_KX_ANON_ECDH, &anon_ecdh_auth_struct, 0, GNUTLS_PK_UNKNOWN},
 #endif
-	{"RSA", GNUTLS_KX_RSA, &rsa_auth_struct},
+	{"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, GNUTLS_PK_RSA},
 #ifdef ENABLE_DHE
-	{"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1},
-	{"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1},
+	{"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, GNUTLS_PK_RSA},
+	{"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, GNUTLS_PK_DSA},
 #endif
 #ifdef ENABLE_ECDHE
-	{"ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, &ecdhe_rsa_auth_struct, 0},
+	{"ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, &ecdhe_rsa_auth_struct, 0, GNUTLS_PK_RSA},
 	{"ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, &ecdhe_ecdsa_auth_struct,
-	 0},
+	 0, GNUTLS_PK_EC},
 #endif
 #ifdef ENABLE_SRP
-	{"SRP-DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0},
-	{"SRP-RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0},
-	{"SRP", GNUTLS_KX_SRP, &srp_auth_struct, 0},
+	{"SRP-DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0, GNUTLS_PK_DSA},
+	{"SRP-RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0, GNUTLS_PK_RSA},
+	{"SRP", GNUTLS_KX_SRP, &srp_auth_struct, 0, GNUTLS_PK_UNKNOWN},
 #endif
 #ifdef ENABLE_PSK
-	{"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0},
-	{"RSA-PSK", GNUTLS_KX_RSA_PSK, &rsa_psk_auth_struct, 0},
+	{"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0, GNUTLS_PK_UNKNOWN},
+	{"RSA-PSK", GNUTLS_KX_RSA_PSK, &rsa_psk_auth_struct, 0, GNUTLS_PK_RSA},
 #ifdef ENABLE_DHE
 	{"DHE-PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct,
-	 1 /* needs DHE params */ },
+	 1 /* needs DHE params */, GNUTLS_PK_UNKNOWN},
 #endif
 #ifdef ENABLE_ECDHE
-	{"ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, &ecdhe_psk_auth_struct, 0},
+	{"ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, &ecdhe_psk_auth_struct, 0, GNUTLS_PK_UNKNOWN},
 #endif
 #endif
 	{0, 0, 0, 0}
@@ -238,6 +239,13 @@ int _gnutls_kx_needs_dh_params(gnutls_kx_algorithm_t algorithm)
 {
 	ssize_t ret = 0;
 	GNUTLS_KX_ALG_LOOP(ret = p->needs_dh_params);
+	return ret;
+}
+
+int _gnutls_kx_cert_pk_params(gnutls_kx_algorithm_t algorithm)
+{
+	ssize_t ret = 0;
+	GNUTLS_KX_ALG_LOOP(ret = p->cert_pk);
 	return ret;
 }
 
