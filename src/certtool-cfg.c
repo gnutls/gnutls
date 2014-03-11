@@ -959,8 +959,12 @@ void get_serial(unsigned char* serial, size_t * size)
 		default_serial[0] = cfg.serial >> 32;
 		default_serial[1] = cfg.serial;
 	} else {
-		unsigned long default_serial_int = (ts.tv_sec << 32) | ts.tv_nsec;
-
+		unsigned long default_serial_int;
+#if SIZEOF_LONG < 8
+		default_serial_int = ts.tv_sec;
+#else
+		default_serial_int = (ts.tv_sec << 32) | ts.tv_nsec;
+#endif
 		default_serial_int = read_int_with_default
 		    ("Enter the certificate's serial number in decimal (default: %lu): ",
 		     (unsigned long)default_serial_int);
