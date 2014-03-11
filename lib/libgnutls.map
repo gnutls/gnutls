@@ -955,6 +955,7 @@ GNUTLS_PRIVATE {
 
     # Internal symbols needed by xssl:
     gnutls_realloc_fast;
+    _gnutls_vasprintf;
 
     # Internal symbols needed by gnutls-cli-debug:
     _gnutls_rsa_pms_set_version;
