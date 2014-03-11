@@ -986,6 +986,9 @@ int check_pk_compat(gnutls_session_t session, gnutls_pubkey_t pubkey)
 	unsigned req_cert_pk;
 	unsigned kx;
 
+	if (session->security_parameters.entity != GNUTLS_CLIENT)
+		return 0;
+
 	cert_pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
 	if (cert_pk == GNUTLS_PK_UNKNOWN) {
 		gnutls_assert();
@@ -1307,6 +1310,12 @@ _gnutls_proc_openpgp_server_crt(gnutls_session_t session,
 		gnutls_pubkey_get_openpgp_key_id(peer_certificate_list
 						 [0].pubkey, 0, subkey_id, &t,
 						 NULL);
+	}
+
+	ret = check_pk_compat(session, peer_certificate_list[0].pubkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
 
 	ret =
