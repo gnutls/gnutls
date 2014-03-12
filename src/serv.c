@@ -425,7 +425,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	char *http_buffer;
 	gnutls_kx_algorithm_t kx_alg;
 	size_t len = 20 * 1024 + strlen(header);
-	char *crtinfo, *crtinfo_old = NULL;
+	char *crtinfo = NULL, *crtinfo_old = NULL;
 	size_t ncrtinfo = 0;
 
 	if (verbose == 0) {
