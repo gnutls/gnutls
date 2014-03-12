@@ -425,7 +425,7 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 	char *http_buffer;
 	gnutls_kx_algorithm_t kx_alg;
 	size_t len = 20 * 1024 + strlen(header);
-	char *crtinfo = NULL;
+	char *crtinfo, *crtinfo_old = NULL;
 	size_t ncrtinfo = 0;
 
 	if (verbose == 0) {
@@ -463,13 +463,16 @@ static char *peer_print_info(gnutls_session_t session, int *ret_length,
 						     GNUTLS_CRT_PRINT_FULL,
 						     &info) == 0) {
 				const char *post = "</PRE><P><PRE>";
-
+				
+				crtinfo_old = crtinfo;
 				crtinfo =
 				    realloc(crtinfo,
 					    ncrtinfo + info.size +
 					    strlen(post) + 1);
-				if (crtinfo == NULL)
+				if (crtinfo == NULL) {
+					free(crtinfo_old);
 					return NULL;
+				}
 				memcpy(crtinfo + ncrtinfo, info.data,
 				       info.size);
 				ncrtinfo += info.size;
