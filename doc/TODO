@@ -3,6 +3,7 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* Allow setting a fixed key on the anonymous key exchange methods.
 * Deprecate GNUTLS_E_CERTIFICATE_LIST_UNSORTED, and automatically sort
   input chains in gnutls_certificate_set_x509_key_*.
 * Priority strings should also set the minimum acceptable DH key size and
@@ -16,7 +17,6 @@ Current list:
    2.5.29.33: Policy Mappings
    2.5.29.54: Inhibit Any-policy
    2.5.29.46: Freshest CRL
-   2.5.29.30: Name Constraints
 * Add support for RSA-PSS. This signature algorithm is seen in some
   passport CAs. Should be added in nettle and then in gnutls.
 - Add certificate image support (see RFC3709, RFC6170)
