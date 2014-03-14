@@ -80,6 +80,8 @@ been removed. It was not approved by IETF.
 ** libgnutls: The experimental xssl library is removed from the gnutls
 distribution.
 
+** libgnutls: Reduced the number of gnulib modules used.
+
 ** certtool: Timestamps for serial numbers were increased to 8 bytes,
 and in batch mode to 12 (appended with 4 random bytes).
 
