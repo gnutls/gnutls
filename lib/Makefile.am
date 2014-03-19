@@ -20,6 +20,7 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
+EXTRA_DIST = priority_options.gperf
 BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 
 SUBDIRS = includes x509 auth ext algorithms extras accelerated
@@ -107,7 +108,8 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_state.h gnutls_x509.h crypto-backend.h			\
 	gnutls_srp.h auth/srp.h auth/srp_passwd.h	\
 	gnutls_helper.h gnutls_supplemental.h crypto.h random.h system.h\
-	locks.h gnutls_mbuffers.h gnutls_ecc.h pin.h fips.h
+	locks.h gnutls_mbuffers.h gnutls_ecc.h pin.h fips.h \
+	priority_options.h
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h
@@ -205,5 +207,5 @@ gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
 	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
 
 priority_options.h: $(srcdir)/priority_options.gperf
-	-gperf -t $^ > $@
+	-gperf -t $^ > $@-tmp && mv $@-tmp $@
 
