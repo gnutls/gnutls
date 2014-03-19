@@ -697,3 +697,6 @@ tests/global-init
 tests/mini-global-load
 .submodule.stamp
 lib/priority_options.h
+tests/name-constraints
+tests/x509-extensions
+tests/sec-params

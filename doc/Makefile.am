@@ -235,15 +235,17 @@ dane-api.texi: $(top_srcdir)/libdane/includes/gnutls/dane.h
 	done
 	mv -f $@-tmp $@
 
-x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
+x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h $(top_srcdir)/lib/includes/gnutls/x509-ext.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort |uniq`; do \
+	cat $^ > $@-tmp2
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $@-tmp2 |sort |uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
+	rm -f $@-tmp2
 	mv -f $@-tmp $@
 
 pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
@@ -426,10 +428,16 @@ compare-exported:
 	scripts/getfuncs-map.pl <../libdane/libdane.map >>tmp-exp-$@
 	sort -u tmp-exp-$@ > tmp2-exp-$@
 	mv tmp2-exp-$@ tmp-exp-$@
+	@echo "******************************************************************************"
+	@echo "If the following step fails there is a symbol in headers that is not exported or vice-versa"
+	@echo "******************************************************************************"
 	diff -u tmp-exp-$@ tmp-head-$@
 	rm -f tmp-exp-$@ tmp-head-$@
 
 compare-makefile: enums.texi
+	@echo "******************************************************************************"
+	@echo "If the following step fails copy $(srcdir)/doc/tmp-compare-makefile to doc/Makefile.am"
+	@echo "******************************************************************************"
 	ENUMS=`grep '^@c ' $< | sed 's/@c //g' | sort -d`; \
 	STR=""; \
 	for i in $$ENUMS; do \
@@ -437,9 +445,6 @@ compare-makefile: enums.texi
 	done; \
 	grep -v -e '^ENUMS += ' $(srcdir)/Makefile.am | \
 		perl -p -e "s,^ENUMS =,ENUMS =$$STR," > tmp-$@; \
-	echo "******************************************************************************"
-	echo "If the following step fails copy $(srcdir)/doc/tmp-compare-makefile to doc/Makefile.am"
-	echo "******************************************************************************"
 	diff -u $(srcdir)/Makefile.am tmp-$@ >/dev/null
 	rm -f tmp-$@
 	FUNCS=`cat $(HEADER_FILES) | $(top_srcdir)/doc/scripts/getfuncs.pl|sort -d|uniq`; \
@@ -449,9 +454,9 @@ compare-makefile: enums.texi
 	done; \
 	grep -v -e '^FUNCS += ' $(srcdir)/Makefile.am > tmp-$@; \
 	echo "\"s,^FUNCS =,FUNCS =$$MANS,\" -i tmp-$@"|xargs sed
-	echo "******************************************************************************"
-	echo "If the following step fails copy $(srcdir)/doc/tmp-compare-makefile to doc/Makefile.am"
-	echo "******************************************************************************"
+	@echo "******************************************************************************"
+	@echo "If the following step fails copy $(srcdir)/doc/tmp-compare-makefile to doc/Makefile.am"
+	@echo "******************************************************************************"
 	diff -u $(srcdir)/Makefile.am tmp-$@ >/dev/null
 	rm -f tmp-$@
 
@@ -1821,6 +1826,14 @@ FUNCS += functions/gnutls_strerror
 FUNCS += functions/gnutls_strerror.short
 FUNCS += functions/gnutls_strerror_name
 FUNCS += functions/gnutls_strerror_name.short
+FUNCS += functions/gnutls_subject_alt_names_deinit
+FUNCS += functions/gnutls_subject_alt_names_deinit.short
+FUNCS += functions/gnutls_subject_alt_names_get
+FUNCS += functions/gnutls_subject_alt_names_get.short
+FUNCS += functions/gnutls_subject_alt_names_init
+FUNCS += functions/gnutls_subject_alt_names_init.short
+FUNCS += functions/gnutls_subject_alt_names_set
+FUNCS += functions/gnutls_subject_alt_names_set.short
 FUNCS += functions/gnutls_supplemental_get_name
 FUNCS += functions/gnutls_supplemental_get_name.short
 FUNCS += functions/gnutls_tdb_deinit
@@ -1875,10 +1888,38 @@ FUNCS += functions/gnutls_url_is_supported
 FUNCS += functions/gnutls_url_is_supported.short
 FUNCS += functions/gnutls_verify_stored_pubkey
 FUNCS += functions/gnutls_verify_stored_pubkey.short
+FUNCS += functions/gnutls_x509_aia_deinit
+FUNCS += functions/gnutls_x509_aia_deinit.short
+FUNCS += functions/gnutls_x509_aia_get
+FUNCS += functions/gnutls_x509_aia_get.short
+FUNCS += functions/gnutls_x509_aia_init
+FUNCS += functions/gnutls_x509_aia_init.short
+FUNCS += functions/gnutls_x509_aia_set
+FUNCS += functions/gnutls_x509_aia_set.short
+FUNCS += functions/gnutls_x509_aki_deinit
+FUNCS += functions/gnutls_x509_aki_deinit.short
+FUNCS += functions/gnutls_x509_aki_get_cert_issuer
+FUNCS += functions/gnutls_x509_aki_get_cert_issuer.short
+FUNCS += functions/gnutls_x509_aki_get_id
+FUNCS += functions/gnutls_x509_aki_get_id.short
+FUNCS += functions/gnutls_x509_aki_init
+FUNCS += functions/gnutls_x509_aki_init.short
+FUNCS += functions/gnutls_x509_aki_set_cert_issuer
+FUNCS += functions/gnutls_x509_aki_set_cert_issuer.short
+FUNCS += functions/gnutls_x509_aki_set_id
+FUNCS += functions/gnutls_x509_aki_set_id.short
 FUNCS += functions/gnutls_x509_crl_check_issuer
 FUNCS += functions/gnutls_x509_crl_check_issuer.short
 FUNCS += functions/gnutls_x509_crl_deinit
 FUNCS += functions/gnutls_x509_crl_deinit.short
+FUNCS += functions/gnutls_x509_crl_dist_points_deinit
+FUNCS += functions/gnutls_x509_crl_dist_points_deinit.short
+FUNCS += functions/gnutls_x509_crl_dist_points_get
+FUNCS += functions/gnutls_x509_crl_dist_points_get.short
+FUNCS += functions/gnutls_x509_crl_dist_points_init
+FUNCS += functions/gnutls_x509_crl_dist_points_init.short
+FUNCS += functions/gnutls_x509_crl_dist_points_set
+FUNCS += functions/gnutls_x509_crl_dist_points_set.short
 FUNCS += functions/gnutls_x509_crl_export
 FUNCS += functions/gnutls_x509_crl_export.short
 FUNCS += functions/gnutls_x509_crl_export2
@@ -1895,6 +1936,8 @@ FUNCS += functions/gnutls_x509_crl_get_dn_oid
 FUNCS += functions/gnutls_x509_crl_get_dn_oid.short
 FUNCS += functions/gnutls_x509_crl_get_extension_data
 FUNCS += functions/gnutls_x509_crl_get_extension_data.short
+FUNCS += functions/gnutls_x509_crl_get_extension_data2
+FUNCS += functions/gnutls_x509_crl_get_extension_data2.short
 FUNCS += functions/gnutls_x509_crl_get_extension_info
 FUNCS += functions/gnutls_x509_crl_get_extension_info.short
 FUNCS += functions/gnutls_x509_crl_get_extension_oid
@@ -1979,6 +2022,8 @@ FUNCS += functions/gnutls_x509_crq_get_extension_by_oid
 FUNCS += functions/gnutls_x509_crq_get_extension_by_oid.short
 FUNCS += functions/gnutls_x509_crq_get_extension_data
 FUNCS += functions/gnutls_x509_crq_get_extension_data.short
+FUNCS += functions/gnutls_x509_crq_get_extension_data2
+FUNCS += functions/gnutls_x509_crq_get_extension_data2.short
 FUNCS += functions/gnutls_x509_crq_get_extension_info
 FUNCS += functions/gnutls_x509_crq_get_extension_info.short
 FUNCS += functions/gnutls_x509_crq_get_key_id
@@ -2081,6 +2126,8 @@ FUNCS += functions/gnutls_x509_crt_get_extension_by_oid
 FUNCS += functions/gnutls_x509_crt_get_extension_by_oid.short
 FUNCS += functions/gnutls_x509_crt_get_extension_data
 FUNCS += functions/gnutls_x509_crt_get_extension_data.short
+FUNCS += functions/gnutls_x509_crt_get_extension_data2
+FUNCS += functions/gnutls_x509_crt_get_extension_data2.short
 FUNCS += functions/gnutls_x509_crt_get_extension_info
 FUNCS += functions/gnutls_x509_crt_get_extension_info.short
 FUNCS += functions/gnutls_x509_crt_get_extension_oid
@@ -2199,6 +2246,8 @@ FUNCS += functions/gnutls_x509_crt_set_expiration_time
 FUNCS += functions/gnutls_x509_crt_set_expiration_time.short
 FUNCS += functions/gnutls_x509_crt_set_extension_by_oid
 FUNCS += functions/gnutls_x509_crt_set_extension_by_oid.short
+FUNCS += functions/gnutls_x509_crt_set_issuer_alt_name
+FUNCS += functions/gnutls_x509_crt_set_issuer_alt_name.short
 FUNCS += functions/gnutls_x509_crt_set_issuer_dn
 FUNCS += functions/gnutls_x509_crt_set_issuer_dn.short
 FUNCS += functions/gnutls_x509_crt_set_issuer_dn_by_oid
@@ -2259,6 +2308,62 @@ FUNCS += functions/gnutls_x509_dn_oid_known
 FUNCS += functions/gnutls_x509_dn_oid_known.short
 FUNCS += functions/gnutls_x509_dn_oid_name
 FUNCS += functions/gnutls_x509_dn_oid_name.short
+FUNCS += functions/gnutls_x509_ext_get_aia
+FUNCS += functions/gnutls_x509_ext_get_aia.short
+FUNCS += functions/gnutls_x509_ext_get_authority_key_id
+FUNCS += functions/gnutls_x509_ext_get_authority_key_id.short
+FUNCS += functions/gnutls_x509_ext_get_basic_constraints
+FUNCS += functions/gnutls_x509_ext_get_basic_constraints.short
+FUNCS += functions/gnutls_x509_ext_get_crl_dist_points
+FUNCS += functions/gnutls_x509_ext_get_crl_dist_points.short
+FUNCS += functions/gnutls_x509_ext_get_key_purposes
+FUNCS += functions/gnutls_x509_ext_get_key_purposes.short
+FUNCS += functions/gnutls_x509_ext_get_key_usage
+FUNCS += functions/gnutls_x509_ext_get_key_usage.short
+FUNCS += functions/gnutls_x509_ext_get_name_constraints
+FUNCS += functions/gnutls_x509_ext_get_name_constraints.short
+FUNCS += functions/gnutls_x509_ext_get_policies
+FUNCS += functions/gnutls_x509_ext_get_policies.short
+FUNCS += functions/gnutls_x509_ext_get_private_key_usage_period
+FUNCS += functions/gnutls_x509_ext_get_private_key_usage_period.short
+FUNCS += functions/gnutls_x509_ext_get_proxy
+FUNCS += functions/gnutls_x509_ext_get_proxy.short
+FUNCS += functions/gnutls_x509_ext_get_subject_alt_names
+FUNCS += functions/gnutls_x509_ext_get_subject_alt_names.short
+FUNCS += functions/gnutls_x509_ext_get_subject_key_id
+FUNCS += functions/gnutls_x509_ext_get_subject_key_id.short
+FUNCS += functions/gnutls_x509_ext_set_aia
+FUNCS += functions/gnutls_x509_ext_set_aia.short
+FUNCS += functions/gnutls_x509_ext_set_authority_key_id
+FUNCS += functions/gnutls_x509_ext_set_authority_key_id.short
+FUNCS += functions/gnutls_x509_ext_set_basic_constraints
+FUNCS += functions/gnutls_x509_ext_set_basic_constraints.short
+FUNCS += functions/gnutls_x509_ext_set_crl_dist_points
+FUNCS += functions/gnutls_x509_ext_set_crl_dist_points.short
+FUNCS += functions/gnutls_x509_ext_set_key_purposes
+FUNCS += functions/gnutls_x509_ext_set_key_purposes.short
+FUNCS += functions/gnutls_x509_ext_set_key_usage
+FUNCS += functions/gnutls_x509_ext_set_key_usage.short
+FUNCS += functions/gnutls_x509_ext_set_name_constraints
+FUNCS += functions/gnutls_x509_ext_set_name_constraints.short
+FUNCS += functions/gnutls_x509_ext_set_policies
+FUNCS += functions/gnutls_x509_ext_set_policies.short
+FUNCS += functions/gnutls_x509_ext_set_private_key_usage_period
+FUNCS += functions/gnutls_x509_ext_set_private_key_usage_period.short
+FUNCS += functions/gnutls_x509_ext_set_proxy
+FUNCS += functions/gnutls_x509_ext_set_proxy.short
+FUNCS += functions/gnutls_x509_ext_set_subject_alt_names
+FUNCS += functions/gnutls_x509_ext_set_subject_alt_names.short
+FUNCS += functions/gnutls_x509_ext_set_subject_key_id
+FUNCS += functions/gnutls_x509_ext_set_subject_key_id.short
+FUNCS += functions/gnutls_x509_key_purpose_deinit
+FUNCS += functions/gnutls_x509_key_purpose_deinit.short
+FUNCS += functions/gnutls_x509_key_purpose_get
+FUNCS += functions/gnutls_x509_key_purpose_get.short
+FUNCS += functions/gnutls_x509_key_purpose_init
+FUNCS += functions/gnutls_x509_key_purpose_init.short
+FUNCS += functions/gnutls_x509_key_purpose_set
+FUNCS += functions/gnutls_x509_key_purpose_set.short
 FUNCS += functions/gnutls_x509_name_constraints_add_excluded
 FUNCS += functions/gnutls_x509_name_constraints_add_excluded.short
 FUNCS += functions/gnutls_x509_name_constraints_add_permitted
@@ -2275,6 +2380,14 @@ FUNCS += functions/gnutls_x509_name_constraints_get_permitted
 FUNCS += functions/gnutls_x509_name_constraints_get_permitted.short
 FUNCS += functions/gnutls_x509_name_constraints_init
 FUNCS += functions/gnutls_x509_name_constraints_init.short
+FUNCS += functions/gnutls_x509_policies_deinit
+FUNCS += functions/gnutls_x509_policies_deinit.short
+FUNCS += functions/gnutls_x509_policies_get
+FUNCS += functions/gnutls_x509_policies_get.short
+FUNCS += functions/gnutls_x509_policies_init
+FUNCS += functions/gnutls_x509_policies_init.short
+FUNCS += functions/gnutls_x509_policies_set
+FUNCS += functions/gnutls_x509_policies_set.short
 FUNCS += functions/gnutls_x509_policy_release
 FUNCS += functions/gnutls_x509_policy_release.short
 FUNCS += functions/gnutls_x509_privkey_cpy

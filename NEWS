@@ -52,8 +52,8 @@ efficiently.
 That avoids long delays in gnutls initialization due to broken PKCS #11
 modules.
 
-** libgnutls: The PKCS #11 subsystem is reinitialized automatically when 
-a fork is detected.
+** libgnutls: The PKCS #11 subsystem is re-initialized "automatically"
+on the first PKCS #11 API call after a fork. 
 
 ** libgnutls: Added --enable-fips140-mode configuration option. That
 option enables (when running on FIPS140-enabled system):
@@ -112,6 +112,59 @@ gnutls_x509_name_constraints_get_permitted: Added
 gnutls_x509_name_constraints_get_excluded: Added
 gnutls_x509_name_constraints_check: Added
 gnutls_x509_name_constraints_check_crt: Added
+gnutls_x509_crl_get_extension_data2: Added
+gnutls_x509_crt_get_extension_data2: Added
+gnutls_x509_crq_get_extension_data2: Added
+gnutls_subject_alt_names_init: Added
+gnutls_subject_alt_names_deinit: Added
+gnutls_subject_alt_names_get: Added
+gnutls_subject_alt_names_set: Added
+gnutls_x509_ext_get_subject_alt_names: Added
+gnutls_x509_ext_set_subject_alt_names: Added
+gnutls_x509_crl_dist_points_init: Added
+gnutls_x509_crl_dist_points_deinit: Added
+gnutls_x509_crl_dist_points_get: Added
+gnutls_x509_crl_dist_points_set: Added
+gnutls_x509_ext_get_crl_dist_points: Added
+gnutls_x509_ext_set_crl_dist_points: Added
+gnutls_x509_ext_get_name_constraints: Added
+gnutls_x509_ext_set_name_constraints: Added
+gnutls_x509_aia_init: Added
+gnutls_x509_aia_deinit: Added
+gnutls_x509_aia_get: Added
+gnutls_x509_aia_set: Added
+gnutls_x509_ext_get_aia: Added
+gnutls_x509_ext_set_aia: Added
+gnutls_x509_ext_get_subject_key_id: Added
+gnutls_x509_ext_set_subject_key_id: Added
+gnutls_x509_ext_set_authority_key_id: Added
+gnutls_x509_ext_get_authority_key_id: Added
+gnutls_x509_aki_init: Added
+gnutls_x509_aki_get_id: Added
+gnutls_x509_aki_get_cert_issuer: Added
+gnutls_x509_aki_set_id: Added
+gnutls_x509_aki_set_cert_issuer: Added
+gnutls_x509_aki_deinit: Added
+gnutls_x509_ext_get_private_key_usage_period: Added
+gnutls_x509_ext_set_private_key_usage_period: Added
+gnutls_x509_ext_get_basic_constraints: Added
+gnutls_x509_ext_set_basic_constraints: Added
+gnutls_x509_ext_get_key_usage: Added
+gnutls_x509_ext_set_key_usage: Added
+gnutls_x509_ext_get_proxy: Added
+gnutls_x509_ext_set_proxy: Added
+gnutls_x509_policies_init: Added
+gnutls_x509_policies_deinit: Added
+gnutls_x509_policies_get: Added
+gnutls_x509_policies_set: Added
+gnutls_x509_ext_get_policies: Added
+gnutls_x509_ext_set_policies: Added
+gnutls_x509_key_purpose_init: Added
+gnutls_x509_key_purpose_deinit: Added
+gnutls_x509_key_purpose_set: Added
+gnutls_x509_key_purpose_get: Added
+gnutls_x509_ext_get_key_purposes: Added
+gnutls_x509_ext_set_key_purposes: Added
 gnutls_digest_self_test: Added (conditionally)
 gnutls_mac_self_test: Added (conditionally)
 gnutls_pk_self_test: Added (conditionally)
