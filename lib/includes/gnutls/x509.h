@@ -87,6 +87,20 @@ extern "C" {
 #define GNUTLS_FSAN_SET 0
 #define GNUTLS_FSAN_APPEND 1
 
+#define GNUTLS_X509EXT_OID_SUBJECT_KEY_ID "2.5.29.14"
+#define GNUTLS_X509EXT_OID_KEY_USAGE "2.5.29.15"
+#define GNUTLS_X509EXT_OID_PRIVATE_KEY_USAGE_PERIOD "2.5.29.16"
+#define GNUTLS_X509EXT_OID_SAN "2.5.29.17"
+#define GNUTLS_X509EXT_OID_IAN "2.5.29.18"
+#define GNUTLS_X509EXT_OID_BASIC_CONSTRAINTS "2.5.29.19"
+#define GNUTLS_X509EXT_OID_NAME_CONSTRAINTS "2.5.29.30"
+#define GNUTLS_X509EXT_OID_CRL_DIST_POINTS "2.5.29.31"
+#define GNUTLS_X509EXT_OID_CRT_POLICY "2.5.29.32"
+#define GNUTLS_X509EXT_OID_AUTHORITY_KEY_ID "2.5.29.35"
+#define GNUTLS_X509EXT_OID_EXTENDED_KEY_USAGE "2.5.29.37"
+#define GNUTLS_X509EXT_OID_AUTHORITY_INFO_ACCESS "1.3.6.1.5.5.7.1.1"
+#define GNUTLS_X509EXT_OID_PROXY_CRT_INFO "1.3.6.1.5.5.7.1.14"
+
 /* Certificate handling functions.
  */
 
@@ -221,6 +235,7 @@ typedef enum gnutls_info_access_what_t {
 	/* use 100-108 for the generalName types, populate as needed */
 	GNUTLS_IA_URI = 106,
 	/* quick-access variants that match both OID and name type. */
+	GNUTLS_IA_UNKNOWN = 10000,
 	GNUTLS_IA_OCSP_URI = 10006,
 	GNUTLS_IA_CAISSUERS_URI = 10106
 } gnutls_info_access_what_t;
@@ -426,7 +441,7 @@ void gnutls_x509_policy_release(struct gnutls_x509_policy_st
 				*policy);
 int gnutls_x509_crt_get_policy(gnutls_x509_crt_t crt, int indx, struct gnutls_x509_policy_st
 			       *policy, unsigned int *critical);
-int gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt, struct gnutls_x509_policy_st
+int gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt, const struct gnutls_x509_policy_st
 			       *policy, unsigned int critical);
 
 int gnutls_x509_dn_oid_known(const char *oid);
@@ -452,6 +467,10 @@ int gnutls_x509_crt_get_extension_info(gnutls_x509_crt_t cert,
 int gnutls_x509_crt_get_extension_data(gnutls_x509_crt_t cert,
 				       int indx, void *data,
 				       size_t * sizeof_data);
+int
+gnutls_x509_crt_get_extension_data2(gnutls_x509_crt_t cert,
+			       unsigned indx, gnutls_datum_t * data);
+
 
 int gnutls_x509_crt_set_extension_by_oid(gnutls_x509_crt_t crt,
 					 const char *oid,
@@ -495,6 +514,13 @@ int gnutls_x509_crt_set_subject_alt_name(gnutls_x509_crt_t crt,
 					 type, const void *data,
 					 unsigned int data_size,
 					 unsigned int flags);
+
+int gnutls_x509_crt_set_issuer_alt_name(gnutls_x509_crt_t crt,
+					 gnutls_x509_subject_alt_name_t
+					 type, const void *data,
+					 unsigned int data_size,
+					 unsigned int flags);
+
 int gnutls_x509_crt_sign(gnutls_x509_crt_t crt,
 			 gnutls_x509_crt_t issuer,
 			 gnutls_x509_privkey_t issuer_key);
@@ -684,6 +710,9 @@ int gnutls_x509_crl_get_extension_info(gnutls_x509_crl_t crl,
 int gnutls_x509_crl_get_extension_data(gnutls_x509_crl_t crl,
 				       int indx, void *data,
 				       size_t * sizeof_data);
+int
+gnutls_x509_crl_get_extension_data2(gnutls_x509_crl_t crl,
+			       unsigned indx, gnutls_datum_t * data);
 
 int gnutls_x509_crl_set_authority_key_id(gnutls_x509_crl_t crl,
 					 const void *id, size_t id_size);
@@ -1108,6 +1137,10 @@ int gnutls_x509_crq_get_key_purpose_oid(gnutls_x509_crq_t crq,
 int gnutls_x509_crq_get_extension_data(gnutls_x509_crq_t crq,
 				       int indx, void *data,
 				       size_t * sizeof_data);
+int
+gnutls_x509_crq_get_extension_data2(gnutls_x509_crq_t crq,
+			       unsigned indx,
+			       gnutls_datum_t * data);
 int gnutls_x509_crq_get_extension_info(gnutls_x509_crq_t crq,
 				       int indx, void *oid,
 				       size_t * sizeof_oid,

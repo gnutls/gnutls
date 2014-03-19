@@ -1850,3 +1850,40 @@ _gnutls_x509_get_raw_dn2(ASN1_TYPE c2, gnutls_datum_t * raw,
       cleanup:
 	return result;
 }
+
+int _gnutls_copy_string(gnutls_datum_t* str, uint8_t *out, size_t *out_size)
+{
+unsigned size_to_check;
+
+	size_to_check = str->size + 1;
+
+	if ((unsigned) size_to_check > *out_size) {
+		gnutls_assert();
+		(*out_size) = size_to_check;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
+	if (out != NULL) {
+		memcpy(out, str->data, str->size);
+		out[str->size] = 0;
+	}
+	*out_size = str->size;
+
+	return 0;
+}
+
+int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size)
+{
+	if ((unsigned) str->size > *out_size) {
+		gnutls_assert();
+		(*out_size) = str->size;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
+	if (out != NULL) {
+		memcpy(out, str->data, str->size);
+	}
+	*out_size = str->size;
+
+	return 0;
+}

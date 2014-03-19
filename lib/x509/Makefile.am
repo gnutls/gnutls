@@ -59,7 +59,8 @@ libgnutls_x509_la_SOURCES =	\
 	name_constraints.c	\
 	verify-high.c		\
 	verify-high2.c		\
-	verify-high.h
+	verify-high.h		\
+	x509_ext.c
 
 if ENABLE_OCSP
 libgnutls_x509_la_SOURCES += ocsp.c ocsp_output.c

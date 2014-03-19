@@ -27,22 +27,13 @@
 #include <gnutls_errors.h>
 #include <common.h>
 #include <gnutls_x509.h>
+#include <gnutls/x509-ext.h>
 #include <x509_b64.h>
 #include <x509_int.h>
 #include <libtasn1.h>
 
 /* Name constraints is limited to DNS names.
  */
-typedef struct gnutls_name_constraints_st {
-	struct name_constraints_node_st * permitted;
-	struct name_constraints_node_st * excluded;
-} gnutls_name_constraints_st;
-
-typedef struct name_constraints_node_st {
-	unsigned type;
-	gnutls_datum_t name;
-	struct name_constraints_node_st *next;
-} name_constraints_node_st;
 
 static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc)
 {
@@ -51,7 +42,7 @@ static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc)
 	return 0;
 }
 
-static int extract_name_constraints(ASN1_TYPE c2, const char *vstr,
+int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 				    name_constraints_node_st ** _nc)
 {
 	int ret;
@@ -149,9 +140,8 @@ int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 					 unsigned int flags,
 					 unsigned int *critical)
 {
-	int result, ret;
+	int ret;
 	gnutls_datum_t der = { NULL, 0 };
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
 	if (crt == NULL) {
 		gnutls_assert();
@@ -167,30 +157,7 @@ int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 	if (der.size == 0 || der.data == NULL)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	result = asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.NameConstraints", &c2);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		ret = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	result = asn1_der_decoding(&c2, der.data, der.size, NULL);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		ret = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	if (!(flags & GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND) || (nc->permitted == NULL && nc->excluded == NULL)) {
-		ret = extract_name_constraints(c2, "permittedSubtrees", &nc->permitted);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-	}
-
-	ret = extract_name_constraints(c2, "excludedSubtrees", &nc->excluded);
+	ret = gnutls_x509_ext_get_name_constraints(&der, nc, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -200,7 +167,6 @@ int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 
  cleanup:
 	_gnutls_free_datum(&der);
-	asn1_delete_structure(&c2);
 
 	return ret;
 
@@ -368,106 +334,15 @@ int gnutls_x509_crt_set_name_constraints(gnutls_x509_crt_t crt,
 					 gnutls_x509_name_constraints_t nc,
 					 unsigned int critical)
 {
-int ret, result;
-gnutls_datum_t der_data;
-uint8_t null = 0;
-ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-struct name_constraints_node_st * tmp;
+int ret;
+gnutls_datum_t der;
 
-	if (nc->permitted == NULL && nc->excluded == NULL)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	result = asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.NameConstraints", &c2);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	if (nc->permitted == NULL) {
-		asn1_write_value(c2, "permittedSubtrees", NULL, 0);
-	} else {
-		tmp = nc->permitted;
-		do {
-			result = asn1_write_value(c2, "permittedSubtrees", "NEW", 1);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				ret = _gnutls_asn2err(result);
-				goto cleanup;
-			}
-
-			result = asn1_write_value(c2, "permittedSubtrees.?LAST.maximum", NULL, 0);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				ret = _gnutls_asn2err(result);
-				goto cleanup;
-			}
-
-			result = asn1_write_value(c2, "permittedSubtrees.?LAST.minimum", &null, 1);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				ret = _gnutls_asn2err(result);
-				goto cleanup;
-			}
-
-			ret = _gnutls_write_general_name(c2, "permittedSubtrees.?LAST.base", 
-						tmp->type, tmp->name.data, tmp->name.size);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-			}
-			tmp = tmp->next;
-		} while(tmp != NULL);
-	}
-
-	if (nc->excluded == NULL) {
-		asn1_write_value(c2, "excludedSubtrees", NULL, 0);
-	} else {
-		tmp = nc->excluded;
-		do {
-			result = asn1_write_value(c2, "excludedSubtrees", "NEW", 1);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				ret = _gnutls_asn2err(result);
-				goto cleanup;
-			}
-
-			result = asn1_write_value(c2, "excludedSubtrees.?LAST.maximum", NULL, 0);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				ret = _gnutls_asn2err(result);
-				goto cleanup;
-			}
-
-			result = asn1_write_value(c2, "excludedSubtrees.?LAST.minimum", &null, 1);
-			if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				ret = _gnutls_asn2err(result);
-				goto cleanup;
-			}
-
-			ret = _gnutls_write_general_name(c2, "excludedSubtrees.?LAST.base", 
-						tmp->type, tmp->name.data, tmp->name.size);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-			}
-			tmp = tmp->next;
-		} while(tmp != NULL);
-
-	}
-
-	ret = _gnutls_x509_der_encode(c2, "", &der_data, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+	ret = gnutls_x509_ext_set_name_constraints(nc, &der);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	ret =
-	    _gnutls_x509_crt_set_extension(crt, "2.5.29.30", &der_data, critical);
-
-	_gnutls_free_datum(&der_data);
-
+	    _gnutls_x509_crt_set_extension(crt, "2.5.29.30", &der, critical);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -477,9 +352,8 @@ struct name_constraints_node_st * tmp;
 	crt->use_extensions = 1;
 
 cleanup:
-	asn1_delete_structure(&c2);
+	_gnutls_free_datum(&der);
 	return ret;
-
 }
 
 static

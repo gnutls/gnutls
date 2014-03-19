@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2014 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -28,6 +28,8 @@
 #include <gnutls_global.h>
 #include <libtasn1.h>
 #include <common.h>
+#include <gnutls/x509-ext.h>
+#include <gnutls/x509.h>
 #include <x509_int.h>
 #include <gnutls_datum.h>
 
@@ -129,35 +131,95 @@ get_extension(ASN1_TYPE asn, const char *root,
 	}
 }
 
-/* This function will attempt to return the requested extension found in
- * the given X509v3 certificate. The return value is allocated and stored into
- * ret.
- *
- * Critical will be either 0 or 1.
- *
- * If the extension does not exist, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
- * be returned.
- */
+static int
+get_indx_extension(ASN1_TYPE asn, const char *root,
+	      int indx, gnutls_datum_t * out)
+{
+	char name[ASN1_MAX_NAME_SIZE];
+	int ret;
+
+	out->data = NULL;
+	out->size = 0;
+
+	snprintf(name, sizeof(name), "%s.?%u.extnValue", root, indx+1);
+
+	ret = _gnutls_x509_read_value(asn, name, out);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	return 0;
+}
+
 int
 _gnutls_x509_crt_get_extension(gnutls_x509_crt_t cert,
 			       const char *extension_id, int indx,
-			       gnutls_datum_t * ret,
-			       unsigned int *_critical)
+			       gnutls_datum_t * data, unsigned int *critical)
 {
 	return get_extension(cert->cert, "tbsCertificate.extensions",
-			     extension_id, indx, ret, _critical);
+			     extension_id, indx, data, critical);
+}
+
+/**
+ * gnutls_x509_crt_get_extension_data2:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @indx: Specifies which extension OID to read. Use (0) to get the first one.
+ * @data: will contain the extension DER-encoded data
+ *
+ * This function will return the requested by the index extension data in the
+ * certificate.  The extension data will be allocated using
+ * gnutls_malloc().
+ *
+ * Use gnutls_x509_crt_get_extension_info() to extract the OID.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.  If you have reached the
+ *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ *   will be returned.
+ **/
+int
+gnutls_x509_crt_get_extension_data2(gnutls_x509_crt_t cert,
+			       unsigned indx,
+			       gnutls_datum_t * data)
+{
+	return get_indx_extension(cert->cert, "tbsCertificate.extensions",
+			     indx, data);
 }
 
 int
 _gnutls_x509_crl_get_extension(gnutls_x509_crl_t crl,
 			       const char *extension_id, int indx,
-			       gnutls_datum_t * ret,
-			       unsigned int *_critical)
+			       gnutls_datum_t * data,
+			       unsigned int *critical)
 {
 	return get_extension(crl->crl, "tbsCertList.crlExtensions",
-			     extension_id, indx, ret, _critical);
+			     extension_id, indx, data, critical);
 }
 
+/**
+ * gnutls_x509_crl_get_extension_data2:
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ * @indx: Specifies which extension OID to read. Use (0) to get the first one.
+ * @data: will contain the extension DER-encoded data
+ *
+ * This function will return the requested by the index extension data in the
+ * certificate revocation list.  The extension data will be allocated using
+ * gnutls_malloc().
+ *
+ * Use gnutls_x509_crt_get_extension_info() to extract the OID.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.  If you have reached the
+ *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ *   will be returned.
+ **/
+int
+gnutls_x509_crl_get_extension_data2(gnutls_x509_crl_t crl,
+			       unsigned indx,
+			       gnutls_datum_t * data)
+{
+	return get_indx_extension(crl->crl, "tbsCertList.crlExtensions",
+			     indx, data);
+}
 
 /* This function will attempt to return the requested extension OID found in
  * the given X509v3 certificate. 
@@ -165,14 +227,13 @@ _gnutls_x509_crl_get_extension(gnutls_x509_crl_t crl,
  * If you have passed the last extension, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
  * be returned.
  */
-static int
-get_extension_oid(ASN1_TYPE asn, const char *root,
-		  int indx, void *oid, size_t * sizeof_oid)
+static int get_extension_oid(ASN1_TYPE asn, const char *root,
+		  unsigned indx, void *oid, size_t * sizeof_oid)
 {
 	int k, result, len;
 	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
 	char extnID[MAX_OID_SIZE];
-	int indx_counter = 0;
+	unsigned indx_counter = 0;
 
 	k = 0;
 	do {
@@ -358,7 +419,7 @@ set_extension(ASN1_TYPE asn, const char *root,
 	      const char *ext_id,
 	      const gnutls_datum_t * ext_data, unsigned int critical)
 {
-	int result;
+	int result = 0;
 	int k, len;
 	char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
 	char extnID[MAX_OID_SIZE];
@@ -544,164 +605,6 @@ _gnutls_x509_crq_set_extension(gnutls_x509_crq_t crq,
 	return 0;
 }
 
-/* Here we only extract the KeyUsage field, from the DER encoded
- * extension.
- */
-int
-_gnutls_x509_ext_extract_keyUsage(uint16_t * keyUsage,
-				  uint8_t * extnValue, int extnValueLen)
-{
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	int len, result;
-	uint8_t str[2];
-
-	str[0] = str[1] = 0;
-	*keyUsage = 0;
-
-	if ((result = asn1_create_element
-	     (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext)) != ASN1_SUCCESS)
-	{
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&ext, extnValue, extnValueLen, NULL);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
-	}
-
-	len = sizeof(str);
-	result = asn1_read_value(ext, "", str, &len);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return 0;
-	}
-
-	*keyUsage = str[0] | (str[1] << 8);
-
-	asn1_delete_structure(&ext);
-
-	return 0;
-}
-
-/* extract the basicConstraints from the DER encoded extension
- */
-int
-_gnutls_x509_ext_extract_basicConstraints(unsigned int *CA,
-					  int *pathLenConstraint,
-					  uint8_t * extnValue,
-					  int extnValueLen)
-{
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	char str[128];
-	int len, result;
-
-	if ((result = asn1_create_element
-	     (_gnutls_get_pkix(), "PKIX1.BasicConstraints",
-	      &ext)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&ext, extnValue, extnValueLen, NULL);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
-	}
-
-	if (pathLenConstraint) {
-		result = _gnutls_x509_read_uint(ext, "pathLenConstraint",
-						(unsigned int *)
-						pathLenConstraint);
-		if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-			*pathLenConstraint = -1;
-		else if (result != GNUTLS_E_SUCCESS) {
-			gnutls_assert();
-			asn1_delete_structure(&ext);
-			return _gnutls_asn2err(result);
-		}
-	}
-
-	/* the default value of cA is false.
-	 */
-	len = sizeof(str) - 1;
-	result = asn1_read_value(ext, "cA", str, &len);
-	if (result == ASN1_SUCCESS && strcmp(str, "TRUE") == 0)
-		*CA = 1;
-	else
-		*CA = 0;
-
-	asn1_delete_structure(&ext);
-
-	return 0;
-}
-
-/* generate the basicConstraints in a DER encoded extension
- * Use 0 or 1 (TRUE) for CA.
- * Use negative error codes for pathLenConstraint to indicate that the field
- * should not be present, >= 0 to indicate set values.
- */
-int
-_gnutls_x509_ext_gen_basicConstraints(int CA,
-				      int pathLenConstraint,
-				      gnutls_datum_t * der_ext)
-{
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	const char *str;
-	int result;
-
-	if (CA == 0)
-		str = "FALSE";
-	else
-		str = "TRUE";
-
-	result =
-	    asn1_create_element(_gnutls_get_pkix(),
-				"PKIX1.BasicConstraints", &ext);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_write_value(ext, "cA", str, 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
-	}
-
-	if (pathLenConstraint < 0) {
-		result =
-		    asn1_write_value(ext, "pathLenConstraint", NULL, 0);
-		if (result < 0)
-			result = _gnutls_asn2err(result);
-	} else
-		result =
-		    _gnutls_x509_write_uint32(ext, "pathLenConstraint",
-					      pathLenConstraint);
-	if (result < 0) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return result;
-	}
-
-	result = _gnutls_x509_der_encode(ext, "", der_ext, 0);
-
-	asn1_delete_structure(&ext);
-
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	return 0;
-}
-
 /* extract an INTEGER from the DER encoded extension
  */
 int
@@ -781,45 +684,6 @@ _gnutls_x509_ext_gen_number(const uint8_t * number, size_t nr_size,
 	return 0;
 }
 
-/* generate the keyUsage in a DER encoded extension
- * Use an ORed SEQUENCE of GNUTLS_KEY_* for usage.
- */
-int _gnutls_x509_ext_gen_keyUsage(uint16_t usage, gnutls_datum_t * der_ext)
-{
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	int result;
-	uint8_t str[2];
-
-	result =
-	    asn1_create_element(_gnutls_get_pkix(), "PKIX1.KeyUsage",
-				&ext);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	str[0] = usage & 0xff;
-	str[1] = usage >> 8;
-
-	result = asn1_write_value(ext, "", str, 9);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
-	}
-
-	result = _gnutls_x509_der_encode(ext, "", der_ext, 0);
-
-	asn1_delete_structure(&ext);
-
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	return 0;
-}
-
 int
 _gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
 		       gnutls_x509_subject_alt_name_t type,
@@ -872,8 +736,8 @@ _gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
 	return 0;
 }
 
-static int
-write_new_general_name(ASN1_TYPE ext, const char *ext_name,
+int
+_gnutls_write_new_general_name(ASN1_TYPE ext, const char *ext_name,
 		       gnutls_x509_subject_alt_name_t type,
 		       const void *data, unsigned int data_size)
 {
@@ -910,86 +774,49 @@ int
 _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name_t
 				      type, const void *data,
 				      unsigned int data_size,
-				      gnutls_datum_t * prev_der_ext,
+				      const gnutls_datum_t * prev_der_ext,
 				      gnutls_datum_t * der_ext)
 {
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	int result;
+	int ret;
+	gnutls_subject_alt_names_t sans = NULL;
+	gnutls_datum_t name;
 
-	result =
-	    asn1_create_element(_gnutls_get_pkix(), "PKIX1.GeneralNames",
-				&ext);
-	if (result != ASN1_SUCCESS) {
+	ret = gnutls_subject_alt_names_init(&sans);
+	if (ret < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		return ret;
 	}
 
-	if (prev_der_ext != NULL && prev_der_ext->data != NULL
-	    && prev_der_ext->size != 0) {
-		result =
-		    asn1_der_decoding(&ext, prev_der_ext->data,
-				      prev_der_ext->size, NULL);
+	if (prev_der_ext && prev_der_ext->data != NULL && 
+		prev_der_ext->size != 0) {
 
-		if (result != ASN1_SUCCESS) {
+		ret = gnutls_x509_ext_get_subject_alt_names(prev_der_ext, sans, 0);
+		if (ret < 0) {
 			gnutls_assert();
-			asn1_delete_structure(&ext);
-			return _gnutls_asn2err(result);
+			goto cleanup;
 		}
 	}
 
-	result = write_new_general_name(ext, "", type, data, data_size);
-	if (result < 0) {
+	name.data = (void*)data;
+	name.size = data_size;
+	ret = gnutls_subject_alt_names_set(sans, type, &name, NULL);
+	if (ret < 0) {
 		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return result;
+		goto cleanup;
 	}
 
-	result = _gnutls_x509_der_encode(ext, "", der_ext, 0);
-
-	asn1_delete_structure(&ext);
-
-	if (result < 0) {
+	ret = gnutls_x509_ext_set_subject_alt_names(sans, der_ext);
+	if (ret < 0) {
 		gnutls_assert();
-		return result;
+		goto cleanup;
 	}
 
-	return 0;
-}
+	ret = 0;
+cleanup:
+	if (sans != NULL)
+		gnutls_subject_alt_names_deinit(sans);
 
-/* generate the SubjectKeyID in a DER encoded extension
- */
-int
-_gnutls_x509_ext_gen_key_id(const void *id, size_t id_size,
-			    gnutls_datum_t * der_ext)
-{
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	int result;
-
-	result =
-	    asn1_create_element(_gnutls_get_pkix(),
-				"PKIX1.SubjectKeyIdentifier", &ext);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_write_value(ext, "", id, id_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
-	}
-
-	result = _gnutls_x509_der_encode(ext, "", der_ext, 0);
-
-	asn1_delete_structure(&ext);
-
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	return 0;
+	return ret;
 }
 
 /* generate the AuthorityKeyID in a DER encoded extension
@@ -998,273 +825,31 @@ int
 _gnutls_x509_ext_gen_auth_key_id(const void *id, size_t id_size,
 				 gnutls_datum_t * der_ext)
 {
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	int result;
+	gnutls_x509_aki_t aki;
+	int ret;
+	gnutls_datum_t l_id;
 
-	result =
-	    asn1_create_element(_gnutls_get_pkix(),
-				"PKIX1.AuthorityKeyIdentifier", &ext);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
+	ret = gnutls_x509_aki_init(&aki);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
-	result = asn1_write_value(ext, "keyIdentifier", id, id_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
-	}
-
-	asn1_write_value(ext, "authorityCertIssuer", NULL, 0);
-	asn1_write_value(ext, "authorityCertSerialNumber", NULL, 0);
-
-	result = _gnutls_x509_der_encode(ext, "", der_ext, 0);
-
-	asn1_delete_structure(&ext);
-
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	return 0;
-}
-
-
-/* Creates and encodes the CRL Distribution points. data_string should be a name
- * and type holds the type of the name. 
- * reason_flags should be an or'ed sequence of GNUTLS_CRL_REASON_*.
- *
- */
-int
-_gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name_t
-				     type, const void *data,
-				     unsigned int data_size,
-				     unsigned int reason_flags,
-				     gnutls_datum_t * der_ext)
-{
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	gnutls_datum_t gnames = { NULL, 0 };
-	int result;
-	uint8_t reasons[2];
-
-	reasons[0] = reason_flags & 0xff;
-	reasons[1] = reason_flags >> 8;
-
-	result =
-	    asn1_create_element(_gnutls_get_pkix(),
-				"PKIX1.CRLDistributionPoints", &ext);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	result = asn1_write_value(ext, "", "NEW", 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	if (reason_flags) {
-		result =
-		    asn1_write_value(ext, "?LAST.reasons", reasons, 9);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			result = _gnutls_asn2err(result);
-			goto cleanup;
-		}
-	} else {
-		result = asn1_write_value(ext, "?LAST.reasons", NULL, 0);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			result = _gnutls_asn2err(result);
-			goto cleanup;
-		}
-	}
-
-	result = asn1_write_value(ext, "?LAST.cRLIssuer", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	/* When used as type CHOICE.
-	 */
-	result =
-	    asn1_write_value(ext, "?LAST.distributionPoint", "fullName",
-			     1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-#if 0
-	/* only needed in old code (where defined as SEQUENCE OF) */
-	asn1_write_value(ext,
-			 "?LAST.distributionPoint.nameRelativeToCRLIssuer",
-			 NULL, 0);
-#endif
-
-	result =
-	    write_new_general_name(ext, "?LAST.distributionPoint.fullName",
-				   type, data, data_size);
-	if (result < 0) {
+	l_id.data = (void*)id;
+	l_id.size = id_size;
+	ret = gnutls_x509_aki_set_id(aki, &l_id);
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	result = _gnutls_x509_der_encode(ext, "", der_ext, 0);
-
-	if (result < 0) {
+	ret = gnutls_x509_ext_set_authority_key_id(aki, der_ext);
+	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	result = 0;
+	ret = 0;
 
-      cleanup:
-	_gnutls_free_datum(&gnames);
-	asn1_delete_structure(&ext);
-
-	return result;
-}
-
-/* extract the proxyCertInfo from the DER encoded extension
- */
-int
-_gnutls_x509_ext_extract_proxyCertInfo(int *pathLenConstraint,
-				       char **policyLanguage,
-				       char **policy,
-				       size_t * sizeof_policy,
-				       uint8_t * extnValue,
-				       int extnValueLen)
-{
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	int result;
-	gnutls_datum_t value;
-
-	if ((result = asn1_create_element
-	     (_gnutls_get_pkix(), "PKIX1.ProxyCertInfo",
-	      &ext)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&ext, extnValue, extnValueLen, NULL);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
-	}
-
-	if (pathLenConstraint) {
-		result = _gnutls_x509_read_uint(ext, "pCPathLenConstraint",
-						(unsigned int *)
-						pathLenConstraint);
-		if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-			*pathLenConstraint = -1;
-		else if (result != GNUTLS_E_SUCCESS) {
-			asn1_delete_structure(&ext);
-			return _gnutls_asn2err(result);
-		}
-	}
-
-	result = _gnutls_x509_read_value(ext, "proxyPolicy.policyLanguage",
-					 &value);
-	if (result < 0) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return result;
-	}
-
-	if (policyLanguage)
-		*policyLanguage = gnutls_strdup((char *) value.data);
-
-	result =
-	    _gnutls_x509_read_value(ext, "proxyPolicy.policy", &value);
-	if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
-		if (policy)
-			*policy = NULL;
-		if (sizeof_policy)
-			*sizeof_policy = 0;
-	} else if (result < 0) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return result;
-	} else {
-		if (policy)
-			*policy = (char *) value.data;
-		if (sizeof_policy)
-			*sizeof_policy = value.size;
-	}
-
-	asn1_delete_structure(&ext);
-
-	return 0;
-}
-
-/* generate the proxyCertInfo in a DER encoded extension
- */
-int
-_gnutls_x509_ext_gen_proxyCertInfo(int pathLenConstraint,
-				   const char *policyLanguage,
-				   const char *policy,
-				   size_t sizeof_policy,
-				   gnutls_datum_t * der_ext)
-{
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	int result;
-
-	result = asn1_create_element(_gnutls_get_pkix(),
-				     "PKIX1.ProxyCertInfo", &ext);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	if (pathLenConstraint < 0) {
-		result =
-		    asn1_write_value(ext, "pCPathLenConstraint", NULL, 0);
-		if (result != ASN1_SUCCESS)
-			result = _gnutls_asn2err(result);
-	} else
-		result =
-		    _gnutls_x509_write_uint32(ext, "pCPathLenConstraint",
-					      pathLenConstraint);
-	if (result < 0) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return result;
-	}
-
-	result = asn1_write_value(ext, "proxyPolicy.policyLanguage",
-				  policyLanguage, 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_write_value(ext, "proxyPolicy.policy",
-				  policy, sizeof_policy);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return _gnutls_asn2err(result);
-	}
-
-	result = _gnutls_x509_der_encode(ext, "", der_ext, 0);
-
-	asn1_delete_structure(&ext);
-
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	return 0;
+ cleanup:
+ 	gnutls_x509_aki_deinit(aki);
+ 	return ret;
 }

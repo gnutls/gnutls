@@ -24,6 +24,7 @@
 #define X509_H
 
 #include <gnutls/x509.h>
+#include <gnutls/x509-ext.h>
 #include <gnutls/abstract.h>
 
 #include <libtasn1.h>
@@ -139,6 +140,11 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 			   int seq, gnutls_datum_t *dname, 
 			   unsigned int *ret_type, int othername_oid);
 
+int
+_gnutls_write_new_general_name(ASN1_TYPE ext, const char *ext_name,
+		       gnutls_x509_subject_alt_name_t type,
+		       const void *data, unsigned int data_size);
+
 /* dsa.c */
 
 
@@ -173,11 +179,6 @@ int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
 				gnutls_pk_params_st * params);
 
 /* extensions.c */
-int _gnutls_x509_crl_get_extension(gnutls_x509_crl_t crl,
-				   const char *extension_id, int indx,
-				   gnutls_datum_t * ret,
-				   unsigned int *_critical);
-
 int _gnutls_x509_crl_get_extension_oid(gnutls_x509_crl_t crl,
 				       int indx, void *oid,
 				       size_t * sizeof_oid);
@@ -187,20 +188,20 @@ int _gnutls_x509_crl_set_extension(gnutls_x509_crl_t crl,
 				   const gnutls_datum_t * ext_data,
 				   unsigned int critical);
 
-int _gnutls_x509_crt_get_extension(gnutls_x509_crt_t cert,
-				   const char *extension_id, int indx,
-				   gnutls_datum_t * ret,
-				   unsigned int *critical);
+int
+_gnutls_x509_crl_get_extension(gnutls_x509_crl_t crl,
+			       const char *extension_id, int indx,
+			       gnutls_datum_t * data,
+			       unsigned int *critical);
+
+int
+_gnutls_x509_crt_get_extension(gnutls_x509_crt_t cert,
+			       const char *extension_id, int indx,
+			       gnutls_datum_t * data, unsigned int *critical);
+
 int _gnutls_x509_crt_get_extension_oid(gnutls_x509_crt_t cert,
 				       int indx, void *ret,
 				       size_t * ret_size);
-int _gnutls_x509_ext_extract_keyUsage(uint16_t * keyUsage,
-				      uint8_t * extnValue,
-				      int extnValueLen);
-int _gnutls_x509_ext_extract_basicConstraints(unsigned int *CA,
-					      int *pathLenConstraint,
-					      uint8_t * extnValue,
-					      int extnValueLen);
 int _gnutls_x509_crt_set_extension(gnutls_x509_crt_t cert,
 				   const char *extension_id,
 				   const gnutls_datum_t * ext_data,
@@ -220,35 +221,13 @@ _gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
 		       gnutls_x509_subject_alt_name_t type,
 		       const void *data, unsigned int data_size);
 
-int _gnutls_x509_ext_gen_basicConstraints(int CA, int pathLenConstraint,
-					  gnutls_datum_t * der_ext);
-int _gnutls_x509_ext_gen_keyUsage(uint16_t usage,
-				  gnutls_datum_t * der_ext);
 int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name_t
 					  type, const void *data,
 					  unsigned int data_size,
-					  gnutls_datum_t * prev_der_ext,
+					  const gnutls_datum_t * prev_der_ext,
 					  gnutls_datum_t * der_ext);
-int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name_t
-					 type, const void *data,
-					 unsigned int data_size,
-					 unsigned int reason_flags,
-					 gnutls_datum_t * der_ext);
-int _gnutls_x509_ext_gen_key_id(const void *id, size_t id_size,
-				gnutls_datum_t * der_data);
 int _gnutls_x509_ext_gen_auth_key_id(const void *id, size_t id_size,
 				     gnutls_datum_t * der_data);
-int _gnutls_x509_ext_extract_proxyCertInfo(int *pathLenConstraint,
-					   char **policyLanguage,
-					   char **policy,
-					   size_t * sizeof_policy,
-					   uint8_t * extnValue,
-					   int extnValueLen);
-int _gnutls_x509_ext_gen_proxyCertInfo(int pathLenConstraint,
-				       const char *policyLanguage,
-				       const char *policy,
-				       size_t sizeof_policy,
-				       gnutls_datum_t * der_ext);
 
 /* mpi.c */
 int _gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
@@ -402,5 +381,21 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 				  const gnutls_x509_crl_t * crl_list,
 				  int crl_list_length,
 				  gnutls_verify_output_function func);
+
+typedef struct gnutls_name_constraints_st {
+	struct name_constraints_node_st * permitted;
+	struct name_constraints_node_st * excluded;
+} gnutls_name_constraints_st;
+
+typedef struct name_constraints_node_st {
+	unsigned type;
+	gnutls_datum_t name;
+	struct name_constraints_node_st *next;
+} name_constraints_node_st;
+
+int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
+				    name_constraints_node_st ** _nc);
+
+void _gnutls_x509_policies_erase(gnutls_x509_policies_t policies, unsigned int seq);
 
 #endif

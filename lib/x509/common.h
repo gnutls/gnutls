@@ -195,4 +195,7 @@ int _gnutls_strdatum_to_buf(gnutls_datum_t * d, void *buf,
 
 bool _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
 
+int _gnutls_copy_string(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
+int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
+
 #endif
