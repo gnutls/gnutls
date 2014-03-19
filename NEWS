@@ -29,6 +29,10 @@ to revert to old defaults, by reducing the overall security level.
 Currently only DNS names and e-mails are supported (no URIs, IPs
 or DNs).
 
+** libgnutls: Added new API in x509-ext.h to handle X.509 extensions.
+This API handles the X.509 extensions in isolation, allowing to parse
+similarly formatted extensions stored in other structures.
+
 ** libgnutls: The initialization of the library was moved to a
 constructor. That is, gnutls_global_init() is no longer required
 unless linking with a static library or a system that does not
