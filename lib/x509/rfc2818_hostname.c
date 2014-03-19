@@ -35,6 +35,9 @@
  * described in RFC2818 (HTTPS), which takes into account wildcards,
  * and the DNSName/IPAddress subject alternative name PKIX extension.
  *
+ * Wildcards are only considered if the domain name consists of three
+ * components or more.
+ *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
 int

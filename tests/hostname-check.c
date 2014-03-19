@@ -39,6 +39,29 @@
   http://lists.gnupg.org/pipermail/gnutls-dev/2007-February/001385.html
 */
 
+/* CN="*.com"
+ * dns_name = *.org
+ * dns_name = .example.net
+ * dns_name = .example.edu.gr
+*/
+char wildcards[] = "-----BEGIN CERTIFICATE-----"
+"MIICwDCCAimgAwIBAgICPd8wDQYJKoZIhvcNAQELBQAwVTEOMAwGA1UEAwwFKi5j"
+"b20xETAPBgNVBAsTCENBIGRlcHQuMRIwEAYDVQQKEwlLb2tvIGluYy4xDzANBgNV"
+"BAgTBkF0dGlraTELMAkGA1UEBhMCR1IwIhgPMjAxNDAzMTkxMzI4MDhaGA85OTk5"
+"MTIzMTIzNTk1OVowVTEOMAwGA1UEAwwFKi5jb20xETAPBgNVBAsTCENBIGRlcHQu"
+"MRIwEAYDVQQKEwlLb2tvIGluYy4xDzANBgNVBAgTBkF0dGlraTELMAkGA1UEBhMC"
+"R1IwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKXGznVDhL9kngInE/EDWfd5"
+"LZLtfC9QpAPxLXm5hosFfjq7RKqvhM8TmB4cSjj3My16n3LUa20msDE3cBD7QunY"
+"nRhlfhlJ/AWWBGiDHneGv+315RI7E/4zGJwaeh1pr0cCYHofuejP28g0MFGWPYyW"
+"XAC8Yd4ID7E2IX+pAOMFAgMBAAGjgZowgZcwDAYDVR0TAQH/BAIwADBCBgNVHREE"
+"OzA5gg93d3cuZXhhbXBsZS5jb22CBSoub3Jngg0qLmV4YW1wbGUubmV0ghAqLmV4"
+"YW1wbGUuZWR1LmdyMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdDwEB/wQFAwMH"
+"oAAwHQYDVR0OBBYEFF1ArfDOlECVi36ZlB2SVCLKcjZfMA0GCSqGSIb3DQEBCwUA"
+"A4GBAGcDnJIJFqjaDMk806xkfz7/FtbHYkj18ma3l7wgp27jeO/QDYunns5pqbqV"
+"sxaKuPKLdWQdfIG7l4+TUnm/Hue6h2PFgbAyZtZbHlAtpEmLoSCmYlFqbRNqux0z"
+"F5H1ocGzmbu1WQYXMlY1FYBvRDrAk7Wxt09WLdajH00S/fPT"
+"-----END CERTIFICATE-----";
+
 /* Certificate with no SAN nor CN. */
 char pem1[] =
     "X.509 Certificate Information:\n"
@@ -654,6 +677,26 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_openpgp_crt_init: %d\n", ret);
 #endif
+	if (debug)
+		success("Testing wildcards...\n");
+	data.data = (unsigned char *) wildcards;
+	data.size = strlen(wildcards);
+
+	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "example.com");
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "example.org");
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "www.example.net");
+	if (ret==0)
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem1...\n");
@@ -788,17 +831,23 @@ void doit(void)
 	if (ret < 0)
 		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
+	/* this was passing in old gnutls versions, but that was not a
+	 * good idea. See http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7380
+	 * for a discussion. */
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.org");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
+	/* this was passing in old gnutls versions, but that was not a
+	 * good idea. See http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7380
+	 * for a discussion. */
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.com");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.foo.com");
 	if (ret)
