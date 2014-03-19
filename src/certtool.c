@@ -758,7 +758,6 @@ void generate_self_signed(common_info_st * cinfo)
 	gnutls_privkey_t key;
 	size_t size;
 	int result;
-	const char *uri;
 
 	fprintf(stderr, "Generating a self signed certificate...\n");
 
@@ -767,16 +766,7 @@ void generate_self_signed(common_info_st * cinfo)
 	if (!key)
 		key = load_private_key(1, cinfo);
 
-	uri = get_crl_dist_point_url();
-	if (uri) {
-		result = gnutls_x509_crt_set_crl_dist_points(crt, GNUTLS_SAN_URI, uri, 0	/* all reasons */
-		    );
-		if (result < 0) {
-			fprintf(stderr, "crl_dist_points: %s\n",
-				gnutls_strerror(result));
-			exit(1);
-		}
-	}
+	get_crl_dist_point_set(crt);
 
 	print_certificate_info(crt, stderr, 0);
 

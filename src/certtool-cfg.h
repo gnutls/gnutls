@@ -37,7 +37,7 @@ int read_yesno(const char *input_str, int def);
 const char *get_pass(void);
 const char *get_confirmed_pass(bool empty_ok);
 const char *get_challenge_pass(void);
-const char *get_crl_dist_point_url(void);
+void get_crl_dist_point_set(gnutls_x509_crt_t crt);
 void crt_constraints_set(gnutls_x509_crt_t crt);
 void get_country_crt_set(gnutls_x509_crt_t crt);
 void get_organization_crt_set(gnutls_x509_crt_t crt);

@@ -80,7 +80,7 @@ typedef struct _cfg_ctx {
 	char **excluded_nc_dns;
 	char **permitted_nc_email;
 	char **excluded_nc_email;
-	char *crl_dist_points;
+	char **crl_dist_points;
 	char *password;
 	char *pkcs12_key_name;
 	char *expiration_date;
@@ -296,9 +296,7 @@ int template_parse(const char *template)
 
 	READ_MULTI_LINE_TOKENIZED("dn_oid", cfg.dn_oid);
 
-	val = optionGetValue(pov, "crl_dist_points");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.crl_dist_points = strdup(val->v.strVal);
+	READ_MULTI_LINE("crl_dist_points", cfg.crl_dist_points);
 
 	val = optionGetValue(pov, "pkcs12_key_name");
 	if (val != NULL && val->valType == OPARG_TYPE_STRING)
@@ -513,14 +511,42 @@ const char *get_challenge_pass(void)
 		return getpass("Enter a challenge password: ");
 }
 
-const char *get_crl_dist_point_url(void)
+void get_crl_dist_point_set(gnutls_x509_crt_t crt)
 {
-	if (batch)
-		return cfg.crl_dist_points;
-	else
-		return
-		    read_str
-		    ("Enter the URI of the CRL distribution point: ");
+	int ret = 0, i;
+
+	if (batch) {
+		if (!cfg.crl_dist_points)
+			return;
+
+		for (i = 0; cfg.crl_dist_points[i] != NULL; i++) {
+			ret =
+			    gnutls_x509_crt_set_crl_dist_points
+			    (crt, GNUTLS_SAN_URI, cfg.crl_dist_points[i],
+			     0);
+			if (ret < 0)
+				break;
+		}
+	} else {
+		const char *p;
+
+		do {
+			p = read_str
+			    ("Enter the URI of the CRL distribution point: ");
+			if (!p)
+				return;
+
+			ret = gnutls_x509_crt_set_crl_dist_points
+			    (crt, GNUTLS_SAN_URI, p, 0);
+		}
+		while (p);
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_x509_crt_set_crl_dist_points: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
 }
 
 void get_country_crt_set(gnutls_x509_crt_t crt)
