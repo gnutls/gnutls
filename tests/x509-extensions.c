@@ -31,44 +31,44 @@
 #include "utils.h"
 
 static char pem[] =
-  "-----BEGIN CERTIFICATE-----"
-  "MIIFajCCBNOgAwIBAgIBBzANBgkqhkiG9w0BAQsFADCBkzEVMBMGA1UEAxMMQ2lu"
-  "ZHkgTGF1cGVyMRcwFQYKCZImiZPyLGQBARMHY2xhdXBlcjERMA8GA1UECxMIQ0Eg"
-  "ZGVwdC4xEjAQBgNVBAoTCUtva28gaW5jLjEPMA0GA1UECBMGQXR0aWtpMQswCQYD"
-  "VQQGEwJHUjEcMBoGCSqGSIb3DQEJARYNbm9uZUBub25lLm9yZzAiGA8yMDA3MDQy"
-  "MTIyMDAwMFoYDzk5OTkxMjMxMjM1OTU5WjCBkzEVMBMGA1UEAxMMQ2luZHkgTGF1"
-  "cGVyMRcwFQYKCZImiZPyLGQBARMHY2xhdXBlcjERMA8GA1UECxMIQ0EgZGVwdC4x"
-  "EjAQBgNVBAoTCUtva28gaW5jLjEPMA0GA1UECBMGQXR0aWtpMQswCQYDVQQGEwJH"
-  "UjEcMBoGCSqGSIb3DQEJARYNbm9uZUBub25lLm9yZzCBnzANBgkqhkiG9w0BAQEF"
-  "AAOBjQAwgYkCgYEApcbOdUOEv2SeAicT8QNZ93ktku18L1CkA/EtebmGiwV+OrtE"
-  "qq+EzxOYHhxKOPczLXqfctRrbSawMTdwEPtC6didGGV+GUn8BZYEaIMed4a/7fXl"
-  "EjsT/jMYnBp6HWmvRwJgeh+56M/byDQwUZY9jJZcALxh3ggPsTYhf6kA4wUCAwEA"
-  "AaOCAsYwggLCMBIGA1UdEwEB/wQIMAYBAf8CAQQwagYDVR0RBGMwYYIMd3d3Lm5v"
-  "bmUub3JnghN3d3cubW9yZXRoYW5vbmUub3Jnghd3d3cuZXZlbm1vcmV0aGFub25l"
-  "Lm9yZ4cEwKgBAYENbm9uZUBub25lLm9yZ4EOd2hlcmVAbm9uZS5vcmcwgfcGA1Ud"
-  "IASB7zCB7DB3BgwrBgEEAapsAQpjAQAwZzAwBggrBgEFBQcCAjAkDCJUaGlzIGlz"
-  "IGEgbG9uZyBwb2xpY3kgdG8gc3VtbWFyaXplMDMGCCsGAQUFBwIBFidodHRwOi8v"
-  "d3d3LmV4YW1wbGUuY29tL2EtcG9saWN5LXRvLXJlYWQwcQYMKwYBBAGqbAEKYwEB"
-  "MGEwJAYIKwYBBQUHAgIwGAwWVGhpcyBpcyBhIHNob3J0IHBvbGljeTA5BggrBgEF"
-  "BQcCARYtaHR0cDovL3d3dy5leGFtcGxlLmNvbS9hbm90aGVyLXBvbGljeS10by1y"
-  "ZWFkMFgGA1UdHgEB/wROMEygJDANggtleGFtcGxlLmNvbTATgRFubWF2QEBleGFt"
-  "cGxlLm5ldKEkMBKCEHRlc3QuZXhhbXBsZS5jb20wDoEMLmV4YW1wbGUuY29tMBMG"
-  "A1UdJQQMMAoGCCsGAQUFBwMJMDYGCCsGAQUFBwEBBCowKDAmBggrBgEFBQcwAYYa"
-  "aHR0cDovL215Lm9jc3Auc2VydmVyL29jc3AwDwYDVR0PAQH/BAUDAwcEADAdBgNV"
-  "HQ4EFgQUXUCt8M6UQJWLfpmUHZJUIspyNl8wbwYDVR0fBGgwZjBkoGKgYIYeaHR0"
-  "cDovL3d3dy5nZXRjcmwuY3JsL2dldGNybDEvhh5odHRwOi8vd3d3LmdldGNybC5j"
-  "cmwvZ2V0Y3JsMi+GHmh0dHA6Ly93d3cuZ2V0Y3JsLmNybC9nZXRjcmwzLzANBgkq"
-  "hkiG9w0BAQsFAAOBgQCbNFcngrQinuzUy/8N9zHRtScxN3KaqLoJqyIWeFPunL10"
-  "HmhzNyicK+dXOkv542PJUG6Cs40rWULK29f8pR/BqE4jv37XKolZPXoQyTaw2H8o"
-  "aKTsadqPJks3tYFi/4mKy3HRymzyaVaU7dII+++y1qzozZo6oX5v+XDCLchirg=="
-  "-----END CERTIFICATE-----";
+    "-----BEGIN CERTIFICATE-----"
+    "MIIFdDCCBN2gAwIBAgIBBzANBgkqhkiG9w0BAQsFADCBkzEVMBMGA1UEAxMMQ2lu"
+    "ZHkgTGF1cGVyMRcwFQYKCZImiZPyLGQBARMHY2xhdXBlcjERMA8GA1UECxMIQ0Eg"
+    "ZGVwdC4xEjAQBgNVBAoTCUtva28gaW5jLjEPMA0GA1UECBMGQXR0aWtpMQswCQYD"
+    "VQQGEwJHUjEcMBoGCSqGSIb3DQEJARYNbm9uZUBub25lLm9yZzAiGA8yMDA3MDQy"
+    "MTIyMDAwMFoYDzk5OTkxMjMxMjM1OTU5WjCBkzEVMBMGA1UEAxMMQ2luZHkgTGF1"
+    "cGVyMRcwFQYKCZImiZPyLGQBARMHY2xhdXBlcjERMA8GA1UECxMIQ0EgZGVwdC4x"
+    "EjAQBgNVBAoTCUtva28gaW5jLjEPMA0GA1UECBMGQXR0aWtpMQswCQYDVQQGEwJH"
+    "UjEcMBoGCSqGSIb3DQEJARYNbm9uZUBub25lLm9yZzCBnzANBgkqhkiG9w0BAQEF"
+    "AAOBjQAwgYkCgYEApcbOdUOEv2SeAicT8QNZ93ktku18L1CkA/EtebmGiwV+OrtE"
+    "qq+EzxOYHhxKOPczLXqfctRrbSawMTdwEPtC6didGGV+GUn8BZYEaIMed4a/7fXl"
+    "EjsT/jMYnBp6HWmvRwJgeh+56M/byDQwUZY9jJZcALxh3ggPsTYhf6kA4wUCAwEA"
+    "AaOCAtAwggLMMBIGA1UdEwEB/wQIMAYBAf8CAQQwagYDVR0RBGMwYYIMd3d3Lm5v"
+    "bmUub3JnghN3d3cubW9yZXRoYW5vbmUub3Jnghd3d3cuZXZlbm1vcmV0aGFub25l"
+    "Lm9yZ4cEwKgBAYENbm9uZUBub25lLm9yZ4EOd2hlcmVAbm9uZS5vcmcwgfcGA1Ud"
+    "IASB7zCB7DB3BgwrBgEEAapsAQpjAQAwZzAwBggrBgEFBQcCAjAkDCJUaGlzIGlz"
+    "IGEgbG9uZyBwb2xpY3kgdG8gc3VtbWFyaXplMDMGCCsGAQUFBwIBFidodHRwOi8v"
+    "d3d3LmV4YW1wbGUuY29tL2EtcG9saWN5LXRvLXJlYWQwcQYMKwYBBAGqbAEKYwEB"
+    "MGEwJAYIKwYBBQUHAgIwGAwWVGhpcyBpcyBhIHNob3J0IHBvbGljeTA5BggrBgEF"
+    "BQcCARYtaHR0cDovL3d3dy5leGFtcGxlLmNvbS9hbm90aGVyLXBvbGljeS10by1y"
+    "ZWFkMB0GA1UdJQQWMBQGCCsGAQUFBwMDBggrBgEFBQcDCTBYBgNVHR4BAf8ETjBM"
+    "oCQwDYILZXhhbXBsZS5jb20wE4ERbm1hdkBAZXhhbXBsZS5uZXShJDASghB0ZXN0"
+    "LmV4YW1wbGUuY29tMA6BDC5leGFtcGxlLmNvbTA2BggrBgEFBQcBAQQqMCgwJgYI"
+    "KwYBBQUHMAGGGmh0dHA6Ly9teS5vY3NwLnNlcnZlci9vY3NwMA8GA1UdDwEB/wQF"
+    "AwMHBgAwHQYDVR0OBBYEFF1ArfDOlECVi36ZlB2SVCLKcjZfMG8GA1UdHwRoMGYw"
+    "ZKBioGCGHmh0dHA6Ly93d3cuZ2V0Y3JsLmNybC9nZXRjcmwxL4YeaHR0cDovL3d3"
+    "dy5nZXRjcmwuY3JsL2dldGNybDIvhh5odHRwOi8vd3d3LmdldGNybC5jcmwvZ2V0"
+    "Y3JsMy8wDQYJKoZIhvcNAQELBQADgYEAdacOt4/Vgc9Y3pSkik3HBifDeK2OtiW0"
+    "BZ7xOXqXtL8Uwx6wx/DybZsUbzuR55GLUROYAc3cio5M/0pTwjqmmQ8vuHIt2p8A"
+    "2fegFcBbNLX38XxACQh4TDAT/4ftPwOtEol4UR4ItZ1d7faDzDXNpmGE+sp5s6ii"
+    "3cIIpInMKE8=" "-----END CERTIFICATE-----";
 
 #define MAX_DATA_SIZE 1024
 
 typedef int (*ext_parse_func) (const gnutls_datum_t * der);
 
 struct ext_handler_st {
-	const char * oid;
+	const char *oid;
 	ext_parse_func handler;
 	unsigned critical;
 };
@@ -82,7 +82,7 @@ static int basic_constraints(const gnutls_datum_t * der)
 		Basic Constraints (critical):
 			Certificate Authority (CA): TRUE
 			Path Length Constraint: 4
-*/	
+*/
 	ret = gnutls_x509_ext_get_basic_constraints(der, &ca, &pathlen);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
@@ -102,7 +102,8 @@ static int basic_constraints(const gnutls_datum_t * der)
 	return 0;
 }
 
-static int cmp_name(unsigned type, gnutls_datum_t *name, unsigned expected_type, const char *expected_name)
+static int cmp_name(unsigned type, gnutls_datum_t * name,
+		    unsigned expected_type, const char *expected_name)
 {
 	if (type != expected_type) {
 		fprintf(stderr, "error in %d\n", __LINE__);
@@ -114,7 +115,7 @@ static int cmp_name(unsigned type, gnutls_datum_t *name, unsigned expected_type,
 		return -1;
 	}
 
-	if (strcmp((char*)name->data, expected_name) != 0) {
+	if (strcmp((char *)name->data, expected_name) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -178,7 +179,9 @@ static int subject_alt_name(const gnutls_datum_t * der)
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
 	}
-	ret = cmp_name(type, &name, GNUTLS_SAN_DNSNAME, "www.evenmorethanone.org");
+	ret =
+	    cmp_name(type, &name, GNUTLS_SAN_DNSNAME,
+		     "www.evenmorethanone.org");
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -223,7 +226,7 @@ static int subject_alt_name(const gnutls_datum_t * der)
 	}
 
 	gnutls_subject_alt_names_deinit(san);
-	
+
 	return 0;
 }
 
@@ -255,9 +258,22 @@ static int ext_key_usage(const gnutls_datum_t * der)
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
 	}
-	
-	if (strcmp((char*)oid.data, "1.3.6.1.5.5.7.3.9") != 0) {
-		fprintf(stderr, "error in %d: %s\n", __LINE__, (char*)oid.data);
+
+	if (strcmp((char *)oid.data, "1.3.6.1.5.5.7.3.3") != 0) {
+		fprintf(stderr, "error in %d: %s\n", __LINE__,
+			(char *)oid.data);
+		return -1;
+	}
+
+	ret = gnutls_x509_key_purpose_get(p, i++, &oid);
+	if (ret < 0) {
+		fprintf(stderr, "error in %d\n", __LINE__);
+		return ret;
+	}
+
+	if (strcmp((char *)oid.data, "1.3.6.1.5.5.7.3.9") != 0) {
+		fprintf(stderr, "error in %d: %s\n", __LINE__,
+			(char *)oid.data);
 		return -1;
 	}
 
@@ -268,7 +284,7 @@ static int ext_key_usage(const gnutls_datum_t * der)
 	}
 
 	gnutls_x509_key_purpose_deinit(p);
-	
+
 	return 0;
 }
 
@@ -305,20 +321,23 @@ static int crt_policies(const gnutls_datum_t * der)
 				Note: This is a short policy
 				URI: http://www.example.com/another-policy-to-read
 */
-	if (strcmp(policy.oid, "1.3.6.1.4.1.5484.1.10.99.1.0") != 0 || policy.qualifiers != 2) {
+	if (strcmp(policy.oid, "1.3.6.1.4.1.5484.1.10.99.1.0") != 0
+	    || policy.qualifiers != 2) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
 
 	if (policy.qualifier[0].type != GNUTLS_X509_QUALIFIER_NOTICE ||
-		policy.qualifier[0].size != 34) {
+	    policy.qualifier[0].size != 34) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
 
 	if (policy.qualifier[1].type != GNUTLS_X509_QUALIFIER_URI ||
-		policy.qualifier[1].size != strlen("http://www.example.com/a-policy-to-read") ||
-		strcmp("http://www.example.com/a-policy-to-read", policy.qualifier[1].data) != 0) {
+	    policy.qualifier[1].size !=
+	    strlen("http://www.example.com/a-policy-to-read")
+	    || strcmp("http://www.example.com/a-policy-to-read",
+		      policy.qualifier[1].data) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -329,20 +348,23 @@ static int crt_policies(const gnutls_datum_t * der)
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
 	}
-	if (strcmp(policy.oid, "1.3.6.1.4.1.5484.1.10.99.1.1") != 0 || policy.qualifiers != 2) {
+	if (strcmp(policy.oid, "1.3.6.1.4.1.5484.1.10.99.1.1") != 0
+	    || policy.qualifiers != 2) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
 
 	if (policy.qualifier[0].type != GNUTLS_X509_QUALIFIER_NOTICE ||
-		policy.qualifier[0].size != 22) {
+	    policy.qualifier[0].size != 22) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
 
 	if (policy.qualifier[1].type != GNUTLS_X509_QUALIFIER_URI ||
-		policy.qualifier[1].size != strlen("http://www.example.com/another-policy-to-read") ||
-		strcmp("http://www.example.com/another-policy-to-read", policy.qualifier[1].data) != 0) {
+	    policy.qualifier[1].size !=
+	    strlen("http://www.example.com/another-policy-to-read")
+	    || strcmp("http://www.example.com/another-policy-to-read",
+		      policy.qualifier[1].data) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -354,7 +376,7 @@ static int crt_policies(const gnutls_datum_t * der)
 	}
 
 	gnutls_x509_policies_deinit(policies);
-	
+
 	return 0;
 }
 
@@ -373,11 +395,11 @@ static int key_usage(const gnutls_datum_t * der)
 		return ret;
 	}
 
-	if (usage != GNUTLS_KEY_KEY_CERT_SIGN) {
+	if (usage != (GNUTLS_KEY_KEY_CERT_SIGN | GNUTLS_KEY_CRL_SIGN)) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
-	
+
 	return 0;
 }
 
@@ -397,12 +419,14 @@ static int subject_key_id(const gnutls_datum_t * der)
 	}
 
 	if (id.size != 20 ||
-		memcmp(id.data, "\x5d\x40\xad\xf0\xce\x94\x40\x95\x8b\x7e\x99\x94\x1d\x92\x54\x22\xca\x72\x36\x5f", 20) != 0) {
+	    memcmp(id.data,
+		   "\x5d\x40\xad\xf0\xce\x94\x40\x95\x8b\x7e\x99\x94\x1d\x92\x54\x22\xca\x72\x36\x5f",
+		   20) != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
 	gnutls_free(id.data);
-	
+
 	return 0;
 }
 
@@ -434,7 +458,6 @@ static int crl_dist_points(const gnutls_datum_t * der)
 		return ret;
 	}
 
-
 	ret = gnutls_x509_crl_dist_points_get(dp, i++, &type, &url, &flags);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
@@ -442,7 +465,7 @@ static int crl_dist_points(const gnutls_datum_t * der)
 	}
 
 	if (type != GNUTLS_SAN_URI || flags != 0 ||
-		strcmp((char*)url.data, "http://www.getcrl.crl/getcrl1/") != 0) {
+	    strcmp((char *)url.data, "http://www.getcrl.crl/getcrl1/") != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -454,7 +477,7 @@ static int crl_dist_points(const gnutls_datum_t * der)
 	}
 
 	if (type != GNUTLS_SAN_URI || flags != 0 ||
-		strcmp((char*)url.data, "http://www.getcrl.crl/getcrl2/") != 0) {
+	    strcmp((char *)url.data, "http://www.getcrl.crl/getcrl2/") != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -466,7 +489,7 @@ static int crl_dist_points(const gnutls_datum_t * der)
 	}
 
 	if (type != GNUTLS_SAN_URI || flags != 0 ||
-		strcmp((char*)url.data, "http://www.getcrl.crl/getcrl3/") != 0) {
+	    strcmp((char *)url.data, "http://www.getcrl.crl/getcrl3/") != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -476,9 +499,9 @@ static int crl_dist_points(const gnutls_datum_t * der)
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
-	
+
 	gnutls_x509_crl_dist_points_deinit(dp);
-	
+
 	return 0;
 }
 
@@ -512,7 +535,6 @@ static int name_constraints(const gnutls_datum_t * der)
 		return ret;
 	}
 
-
 	ret = gnutls_x509_name_constraints_get_permitted(nc, i++, &type, &name);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
@@ -520,7 +542,7 @@ static int name_constraints(const gnutls_datum_t * der)
 	}
 
 	if (type != GNUTLS_SAN_DNSNAME || name.size != 11 ||
-		strcmp((char*)name.data, "example.com") != 0) {
+	    strcmp((char *)name.data, "example.com") != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -532,7 +554,7 @@ static int name_constraints(const gnutls_datum_t * der)
 	}
 
 	if (type != GNUTLS_SAN_RFC822NAME || name.size != 17 ||
-		strcmp((char*)name.data, "nmav@@example.net") != 0) {
+	    strcmp((char *)name.data, "nmav@@example.net") != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -551,7 +573,7 @@ static int name_constraints(const gnutls_datum_t * der)
 	}
 
 	if (type != GNUTLS_SAN_DNSNAME || name.size != 16 ||
-		strcmp((char*)name.data, "test.example.com") != 0) {
+	    strcmp((char *)name.data, "test.example.com") != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -563,7 +585,7 @@ static int name_constraints(const gnutls_datum_t * der)
 	}
 
 	if (type != GNUTLS_SAN_RFC822NAME || name.size != 12 ||
-		strcmp((char*)name.data, ".example.com") != 0) {
+	    strcmp((char *)name.data, ".example.com") != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -573,9 +595,9 @@ static int name_constraints(const gnutls_datum_t * der)
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
-	
+
 	gnutls_x509_name_constraints_deinit(nc);
-	
+
 	return 0;
 }
 
@@ -604,20 +626,19 @@ static int ext_aia(const gnutls_datum_t * der)
 		return ret;
 	}
 
-
 	ret = gnutls_x509_aia_get(aia, i++, &oid, &type, &name);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
 	}
 
-	if (strcmp((char*)oid.data, "1.3.6.1.5.5.7.48.1") != 0) {
+	if (strcmp((char *)oid.data, "1.3.6.1.5.5.7.48.1") != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
 
 	if (type != GNUTLS_SAN_URI || name.size != 26 ||
-		strcmp((char*)name.data, "http://my.ocsp.server/ocsp") != 0) {
+	    strcmp((char *)name.data, "http://my.ocsp.server/ocsp") != 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return -1;
 	}
@@ -629,12 +650,11 @@ static int ext_aia(const gnutls_datum_t * der)
 	}
 
 	gnutls_x509_aia_deinit(aia);
-	
+
 	return 0;
 }
 
-struct ext_handler_st handlers[] =
-{
+struct ext_handler_st handlers[] = {
 	{GNUTLS_X509EXT_OID_BASIC_CONSTRAINTS, basic_constraints, 1},
 	{GNUTLS_X509EXT_OID_SAN, subject_alt_name, 0},
 	{GNUTLS_X509EXT_OID_CRT_POLICY, crt_policies, 0},
@@ -650,7 +670,7 @@ struct ext_handler_st handlers[] =
 void doit(void)
 {
 	int ret;
-	gnutls_datum_t derCert = { (void *) pem, sizeof(pem) };
+	gnutls_datum_t derCert = { (void *)pem, sizeof(pem) };
 	gnutls_x509_crt_t cert;
 	size_t oid_len = MAX_DATA_SIZE;
 	gnutls_datum_t ext;
@@ -670,27 +690,32 @@ void doit(void)
 	if (ret < 0)
 		fail("crt_import %d\n", ret);
 
-	for (i=0;;i++) {
+	for (i = 0;; i++) {
 		oid_len = sizeof(oid);
-		ret = gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_len, &critical);
+		ret =
+		    gnutls_x509_crt_get_extension_info(cert, i, oid, &oid_len,
+						       &critical);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			if (i != 9) {
-				fail("unexpected number of extensions: %d\n", i);
+				fail("unexpected number of extensions: %d\n",
+				     i);
 			}
 			break;
 		}
 
 		if (ret < 0) {
-			fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+			fail("error in %d: %s\n", __LINE__,
+			     gnutls_strerror(ret));
 		}
 
 		ret = gnutls_x509_crt_get_extension_data2(cert, i, &ext);
 		if (ret < 0) {
-			fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+			fail("error in %d: %s\n", __LINE__,
+			     gnutls_strerror(ret));
 		}
 
 		/* find the handler for this extension and run it */
-		for (j=0;;j++) {
+		for (j = 0;; j++) {
 			if (handlers[j].oid == NULL) {
 				fail("could not find handler for extension %s\n", oid);
 				break;
@@ -698,12 +723,14 @@ void doit(void)
 
 			if (strcmp(handlers[j].oid, oid) == 0) {
 				if (critical != handlers[j].critical) {
-					fail("error in %d (%s)\n", __LINE__, oid);
+					fail("error in %d (%s)\n", __LINE__,
+					     oid);
 				}
 
 				ret = handlers[j].handler(&ext);
 				if (ret < 0) {
-					fail("error in %d (%s): %s\n", __LINE__, oid, gnutls_strerror(ret));
+					fail("error in %d (%s): %s\n", __LINE__,
+					     oid, gnutls_strerror(ret));
 				}
 				break;
 			}
@@ -790,7 +817,6 @@ nc_exclude_email = .example.com
 
 proxy_policy_language = 1.3.6.1.5.5.7.21.1
 
-
 policy1 = 1.3.6.1.4.1.5484.1.10.99.1.0
 policy1_txt = "This is a long policy to summarize"
 policy1_url = http://www.example.com/a-policy-to-read
@@ -801,15 +827,11 @@ policy2_url = http://www.example.com/another-policy-to-read
 
 ocsp_uri = http://my.ocsp.server/ocsp
 
-
 # Whether this certificate will be used for a TLS client
 #tls_www_client
 
 # Whether this certificate will be used for a TLS server
 #tls_www_server
-cert_signing_key
-ocsp_signing_key
-
 
 # Whether this certificate will be used to sign data (needed
 # in TLS DHE ciphersuites).
@@ -824,10 +846,10 @@ signing_key
 cert_signing_key
 
 # Whether this key will be used to sign CRLs.
-#crl_signing_key
+crl_signing_key
 
 # Whether this key will be used to sign code.
-#code_signing_key
+code_signing_key
 
 # Whether this key will be used to sign OCSP data.
 ocsp_signing_key
@@ -837,7 +859,5 @@ ocsp_signing_key
 
 # Whether this key will be used for IPsec IKE operations.
 #ipsec_ike_key
-
-#endif
 
 */
