@@ -81,6 +81,7 @@ acceptable.  The framework is illustrated on @ref{fig-x509}.
 * X.509 certificate structure::
 * Importing an X.509 certificate::
 * X.509 distinguished names::
+* X.509 extensions::
 * X.509 public and private keys::
 * Verifying X.509 certificate paths::
 * Verifying a certificate in the context of TLS session::
@@ -138,53 +139,6 @@ The @emph{validity} dates are there to indicate the date that the
 specific certificate was activated and the date the certificate's key
 would be considered invalid.
 
-Certificate @emph{extensions} are there to include information about
-the certificate's subject that did not fit in the typical certificate
-fields. Those may be e-mail addresses, flags that indicate whether the
-belongs to a CA etc.  All the supported @acronym{X.509} version 3
-extensions are shown in @ref{tab:x509-ext}.
-
-@float Table,tab:x509-ext
-@multitable @columnfractions .3 .2 .4
-
-@headitem Extension @tab OID @tab Description
-
-@item Subject key id @tab 2.5.29.14 @tab
-An identifier of the key of the subject.
-
-@item Authority key id @tab 2.5.29.35 @tab
-An identifier of the authority's key used to sign the certificate.
-
-@item Subject alternative name @tab 2.5.29.17 @tab
-Alternative names to subject's distinguished name.
-
-@item Key usage @tab 2.5.29.15 @tab
-Constraints the key's usage of the certificate.
-
-@item Extended key usage @tab 2.5.29.37 @tab
-Constraints the purpose of the certificate.
-
-@item Basic constraints @tab 2.5.29.19 @tab
-Indicates whether this is a CA certificate or not, and specify the
-maximum path lengths of certificate chains.
-
-@item CRL distribution points @tab 2.5.29.31 @tab
-This extension is set by the CA, in order to inform about the issued
-CRLs.
-
-@item Certificate policy @tab 2.5.29.32 @tab
-This extension is set to indicate the certificate policy as object
-identifier and may contain a descriptive string or URL.
-
-@item Proxy Certification Information @tab 1.3.6.1.5.5.7.1.14 @tab
-Proxy Certificates includes this extension that contains the OID of
-the proxy policy language used, and can specify limits on the maximum
-lengths of proxy chains.  Proxy Certificates are specified in
-@xcite{RFC3820}.
-
-@end multitable
-@caption{X.509 certificate extensions.}
-@end float
 
 In @acronym{GnuTLS} the @acronym{X.509} certificate structures are
 handled using the @code{gnutls_x509_crt_t} type and the corresponding
@@ -237,6 +191,107 @@ to the contents of the distinguished name structure.
 
 @showfuncB{gnutls_x509_crt_get_subject,gnutls_x509_crt_get_issuer}
 @showfuncdesc{gnutls_x509_dn_get_rdn_ava}
+
+@node X.509 extensions
+@subsubsection X.509 extensions
+@cindex X.509 extensions
+
+X.509 version 3 certificates include a list of extensions that can
+be used to obtain additional information on the subject or the issuer
+of the certificate. Those may be e-mail addresses, flags that indicate whether the
+belongs to a CA etc.  All the supported @acronym{X.509} version 3
+extensions are shown in @ref{tab:x509-ext}.
+
+The certificate extensions access is split into two parts. The first
+requires to retrieve the extension, and the second is the parsing part.
+
+To enumerate and retrieve the DER-encoded extension data available in a certificate the following
+two functions are available.
+@showfuncB{gnutls_x509_crt_get_extension_info,gnutls_x509_crt_get_extension_data2}
+
+After a supported DER-encoded extension is retrieved it can be parsed using the APIs in @code{x509-ext.h}.
+Complex extensions may require initializing an intermediate structure that holds the
+parsed extension data.
+
+Examples of simple parsing functions are shown below.
+@showfuncD{gnutls_x509_ext_get_basic_constraints,gnutls_x509_ext_set_basic_constraints,gnutls_x509_ext_get_key_usage,gnutls_x509_ext_set_key_usage}
+
+More complex extensions, such as Name Constraints, require an intermediate structure, in that
+case @code{gnutls_x509_name_constraints_t} to be initialized in order to store the parsed
+extension data. 
+@showfuncB{gnutls_x509_ext_get_name_constraints,gnutls_x509_ext_set_name_constraints}
+
+After the name constraints are extracted in the structure, the following functions
+can be used to access them.
+
+@showfuncD{gnutls_x509_name_constraints_get_permitted,gnutls_x509_name_constraints_get_excluded,gnutls_x509_name_constraints_add_permitted,gnutls_x509_name_constraints_add_excluded}
+@showfuncB{gnutls_x509_name_constraints_check,gnutls_x509_name_constraints_check_crt}
+
+Other utility functions are listed below.
+@showfuncB{gnutls_x509_name_constraints_init,gnutls_x509_name_constraints_deinit}
+
+Similar functions exist for all of the other supported extensions, listed in @ref{tab:x509-ext}.
+
+@float Table,tab:x509-ext
+@multitable @columnfractions .3 .2 .4
+
+@headitem Extension @tab OID @tab Description
+
+@item Subject key id @tab 2.5.29.14 @tab
+An identifier of the key of the subject.
+
+@item Key usage @tab 2.5.29.15 @tab
+Constraints the key's usage of the certificate.
+
+@item Private key usage period @tab 2.5.29.16 @tab
+Constraints the validity time of the private key.
+
+@item Subject alternative name @tab 2.5.29.17 @tab
+Alternative names to subject's distinguished name.
+
+@item Issuer alternative name @tab 2.5.29.18 @tab
+Alternative names to the issuer's distinguished name.
+
+@item Basic constraints @tab 2.5.29.19 @tab
+Indicates whether this is a CA certificate or not, and specify the
+maximum path lengths of certificate chains.
+
+@item Name constraints @tab 2.5.29.30 @tab
+A field in CA certificates that restricts the scope of the name of
+issued certificates.
+
+@item CRL distribution points @tab 2.5.29.31 @tab
+This extension is set by the CA, in order to inform about the issued
+CRLs.
+
+@item Certificate policy @tab 2.5.29.32 @tab
+This extension is set to indicate the certificate policy as object
+identifier and may contain a descriptive string or URL.
+
+@item Authority key identifier @tab 2.5.29.35 @tab
+An identifier of the key of the issuer of the certificate. That is
+used to distinguish between different keys of the same issuer.
+
+@item Extended key usage @tab 2.5.29.37 @tab
+Constraints the purpose of the certificate.
+
+@item Authority information access @tab 1.3.6.1.5.5.7.1.1 @tab
+Information on services by the issuer of the certificate.
+
+@item Proxy Certification Information @tab 1.3.6.1.5.5.7.1.14 @tab
+Proxy Certificates includes this extension that contains the OID of
+the proxy policy language used, and can specify limits on the maximum
+lengths of proxy chains.  Proxy Certificates are specified in
+@xcite{RFC3820}.
+
+@end multitable
+@caption{Supported X.509 certificate extensions.}
+@end float
+
+Note, that there are also direct APIs to access extensions that may
+be simpler to use for non-complex extensions. They are available
+in @code{x509.h} and some examples are listed below.
+@showfuncD{gnutls_x509_crt_get_basic_constraints,gnutls_x509_crt_set_basic_constraints,gnutls_x509_crt_get_key_usage,gnutls_x509_crt_set_key_usage}
 
 
 @node X.509 public and private keys
