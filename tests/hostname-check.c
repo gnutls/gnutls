@@ -662,11 +662,11 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foo");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem2...\n");
@@ -675,19 +675,19 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foo");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "*.example.org");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem3...\n");
@@ -696,19 +696,19 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foo");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "*.example.org");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem4...\n");
@@ -717,23 +717,23 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foo");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foo.example.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foo.example.com");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem6...\n");
@@ -742,15 +742,15 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foo.example.org");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "bar.foo.example.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem7...\n");
@@ -759,25 +759,25 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foo.bar.example.org");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret =
 	    gnutls_x509_crt_check_hostname(x509, "foobar.bar.example.org");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foobar.example.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	ret =
 	    gnutls_x509_crt_check_hostname(x509, "foobazbar.example.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem8...\n");
@@ -786,23 +786,23 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.com");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example.foo.com");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem9...\n");
@@ -811,15 +811,15 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "foo.example.org");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "bar.example.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem10...\n");
@@ -828,11 +828,11 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "localhost");
 	if (ret)
-		fail("Hostname incorrectly matches (%d)\n", ret);
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	if (debug)
 		success("Testing pem_too_many...\n");
@@ -841,13 +841,13 @@ void doit(void)
 
 	ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-		fail("gnutls_x509_crt_import: %d\n", ret);
+		fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
 	ret =
 	    gnutls_x509_crt_check_hostname(x509,
 					   "localhost.gnutls.gnutls.org");
 	if (ret)
-		fail("Hostname verification should have failed (too many wildcards)\n");
+		fail("%d: Hostname verification should have failed (too many wildcards)\n", __LINE__);
 
 #ifdef ENABLE_OPENPGP
 	if (debug)
@@ -859,11 +859,11 @@ void doit(void)
 	    gnutls_openpgp_crt_import(pgp, &data,
 				      GNUTLS_OPENPGP_FMT_BASE64);
 	if (ret < 0)
-		fail("gnutls_openpgp_crt_import: %d\n", ret);
+		fail("%d: gnutls_openpgp_crt_import: %d\n", __LINE__, ret);
 
 	ret = gnutls_openpgp_crt_check_hostname(pgp, "test.gnutls.org");
 	if (!ret)
-		fail("Hostname incorrectly does not match (%d)\n", ret);
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 	gnutls_openpgp_crt_deinit(pgp);
 #endif
