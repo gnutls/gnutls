@@ -692,7 +692,7 @@ void doit(void)
 		/* find the handler for this extension and run it */
 		for (j=0;;j++) {
 			if (handlers[j].oid == NULL) {
-//				fail("could not find handler for extension %s\n", oid);
+				fail("could not find handler for extension %s\n", oid);
 				break;
 			}
 
