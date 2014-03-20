@@ -73,7 +73,7 @@ struct rnd_ctx_st {
 
 static struct rnd_ctx_st rnd_ctx;
 
-/* after this number of bytes salsa20 will reseed */
+/* after this number of bytes salsa20 will rekey */
 #define NONCE_RESEED_BYTES (1048576)
 static struct nonce_ctx_st nonce_ctx;
 
@@ -168,30 +168,34 @@ static void wrap_nettle_rnd_deinit(void *ctx)
 	rnd_ctx.mutex = NULL;
 }
 
-static int nonce_rng_init(struct nonce_ctx_st *ctx, struct event_st *event, unsigned init)
+static int nonce_rng_init(struct nonce_ctx_st *ctx, unsigned init)
 {
 	uint8_t buffer[SALSA20_KEY_SIZE];
+	uint8_t iv[8];
 	int ret;
 
-	/* Get a key from the standard RNG or from the entropy source.  */
+	/* Get a key from the system randomness source.  */
 	ret = _rnd_get_system_entropy(buffer, sizeof(buffer));
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
 	if (init == 0) {
-		/* Add continuity by XORing the new key with data generated
+		/* use the previous key to generate IV as well */
+		memset(iv, 0, sizeof(iv)); /* to prevent valgrind from whinning */
+		salsa20r12_crypt(&ctx->ctx, sizeof(iv), iv, iv);
+
+		/* Add key continuity by XORing the new key with data generated
 		 * from the old key */
 		salsa20r12_crypt(&ctx->ctx, sizeof(buffer), buffer, buffer);
+	} else {
+		/* when initializing read the IV from the system randomness source */
+		ret = _rnd_get_system_entropy(iv, sizeof(iv));
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 	}
 
 	salsa20_set_key(&ctx->ctx, sizeof(buffer), buffer);
-
-	if (sizeof(struct event_st) < 8) {
-		abort();
-	}
-
-	if (event != NULL)
-		salsa20_set_iv(&ctx->ctx, (void*)event);
+	salsa20_set_iv(&ctx->ctx, iv);
 
 	zeroize_key(buffer, sizeof(buffer));
 
@@ -250,7 +254,7 @@ static int wrap_nettle_rnd_init(void **ctx)
 	yarrow256_slow_reseed(&rnd_ctx.yctx);
 
 	/* initialize the nonce RNG */
-	ret = nonce_rng_init(&nonce_ctx, &event, 1);
+	ret = nonce_rng_init(&nonce_ctx, 1);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -279,7 +283,7 @@ wrap_nettle_rnd_nonce(void *_ctx, void *data, size_t datasize)
 
 	if (reseed != 0 || nonce_ctx.counter > NONCE_RESEED_BYTES) {
 		/* reseed nonce */
-		ret = nonce_rng_init(&nonce_ctx, NULL, 0);
+		ret = nonce_rng_init(&nonce_ctx, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -355,7 +359,7 @@ static void wrap_nettle_rnd_refresh(void *_ctx)
 	RND_UNLOCK(&rnd_ctx);
 
 	RND_LOCK(&nonce_ctx);
-	nonce_rng_init(&nonce_ctx, &event, 0);
+	nonce_rng_init(&nonce_ctx, 0);
 	RND_UNLOCK(&nonce_ctx);
 
 	return;

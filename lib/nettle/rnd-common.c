@@ -40,6 +40,14 @@
 /* gnulib wants to claim strerror even if it cannot provide it. WTF */
 #undef strerror
 
+#ifdef HAVE_GETRUSAGE
+# ifdef RUSAGE_THREAD
+#  define ARG_RUSAGE RUSAGE_THREAD
+# else
+#  define ARG_RUSAGE RUSAGE_SELF
+# endif
+#endif
+
 void _rnd_get_event(struct event_st *e)
 {
 	static unsigned count = 0;
@@ -47,11 +55,7 @@ void _rnd_get_event(struct event_st *e)
 	gettime(&e->now);
 
 #ifdef HAVE_GETRUSAGE
-#ifdef RUSAGE_THREAD
-	if (getrusage(RUSAGE_THREAD, &e->rusage) < 0) {
-#else
-	if (getrusage(RUSAGE_SELF, &e->rusage) < 0) {
-#endif
+	if (getrusage(ARG_RUSAGE, &e->rusage) < 0) {
 		_gnutls_debug_log("getrusage failed: %s\n",
 				  strerror(errno));
 		abort();
@@ -68,6 +72,8 @@ void _rnd_get_event(struct event_st *e)
 }
 
 #ifdef _WIN32
+/* The windows randomness gatherer.
+ */
 
 #include <windows.h>
 #include <wincrypt.h>
@@ -108,6 +114,9 @@ void _rnd_system_entropy_deinit(void)
 }
 
 #else /* POSIX */
+
+/* The POSIX (Linux-BSD) randomness gatherer.
+ */
 
 #include <time.h>
 #include <sys/types.h>
