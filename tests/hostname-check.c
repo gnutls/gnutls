@@ -39,6 +39,29 @@
   http://lists.gnupg.org/pipermail/gnutls-dev/2007-February/001385.html
 */
 
+/* CN="*.com"
+ * dns_name = *.org
+ * dns_name = .example.net
+ * dns_name = .example.edu.gr
+*/
+char wildcards[] = "-----BEGIN CERTIFICATE-----"
+  "MIICwDCCAimgAwIBAgICPd8wDQYJKoZIhvcNAQELBQAwVTEOMAwGA1UEAwwFKi5j"
+  "b20xETAPBgNVBAsTCENBIGRlcHQuMRIwEAYDVQQKEwlLb2tvIGluYy4xDzANBgNV"
+  "BAgTBkF0dGlraTELMAkGA1UEBhMCR1IwIhgPMjAxNDAzMTkxMzI4MDhaGA85OTk5"
+  "MTIzMTIzNTk1OVowVTEOMAwGA1UEAwwFKi5jb20xETAPBgNVBAsTCENBIGRlcHQu"
+  "MRIwEAYDVQQKEwlLb2tvIGluYy4xDzANBgNVBAgTBkF0dGlraTELMAkGA1UEBhMC"
+  "R1IwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKXGznVDhL9kngInE/EDWfd5"
+  "LZLtfC9QpAPxLXm5hosFfjq7RKqvhM8TmB4cSjj3My16n3LUa20msDE3cBD7QunY"
+  "nRhlfhlJ/AWWBGiDHneGv+315RI7E/4zGJwaeh1pr0cCYHofuejP28g0MFGWPYyW"
+  "XAC8Yd4ID7E2IX+pAOMFAgMBAAGjgZowgZcwDAYDVR0TAQH/BAIwADBCBgNVHREE"
+  "OzA5gg93d3cuZXhhbXBsZS5jb22CBSoub3Jngg0qLmV4YW1wbGUubmV0ghAqLmV4"
+  "YW1wbGUuZWR1LmdyMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdDwEB/wQFAwMH"
+  "oAAwHQYDVR0OBBYEFF1ArfDOlECVi36ZlB2SVCLKcjZfMA0GCSqGSIb3DQEBCwUA"
+  "A4GBAGcDnJIJFqjaDMk806xkfz7/FtbHYkj18ma3l7wgp27jeO/QDYunns5pqbqV"
+  "sxaKuPKLdWQdfIG7l4+TUnm/Hue6h2PFgbAyZtZbHlAtpEmLoSCmYlFqbRNqux0z"
+  "F5H1ocGzmbu1WQYXMlY1FYBvRDrAk7Wxt09WLdajH00S/fPT"
+  "-----END CERTIFICATE-----";
+
 /* Certificate with no SAN nor CN. */
 char pem1[] =
   "X.509 Certificate Information:\n"
@@ -81,7 +104,7 @@ char pem1[] =
   "                fd845ded8c28ba5e78d6c1844ceafd24\n"
   "        SHA-1 fingerprint:\n"
   "                0bae431dda3cae76012b82276e4cd92ad7961798\n"
-  "        Public Key Id:\n"
+  "        Public Key ID:\n"
   "                e93c1cfbad926ee606a4562ca2e1c05327c8f295\n"
   "\n"
   "-----BEGIN CERTIFICATE-----\n"
@@ -139,7 +162,7 @@ char pem2[] =
   "                30cda7de4f0360892547974f45111ac1\n"
   "        SHA-1 fingerprint:\n"
   "                39e3f8fec6a8d842390b6536998a957c1a6b7322\n"
-  "        Public Key Id:\n"
+  "        Public Key ID:\n"
   "                e93c1cfbad926ee606a4562ca2e1c05327c8f295\n"
   "\n"
   "-----BEGIN CERTIFICATE-----\n"
@@ -201,7 +224,7 @@ char pem3[] =
   "                df3f57d00c8149bd826b177d6ea4f369\n"
   "        SHA-1 fingerprint:\n"
   "                e95e56e2acac305f72ea6f698c11624663a595bd\n"
-  "        Public Key Id:\n"
+  "        Public Key ID:\n"
   "                e93c1cfbad926ee606a4562ca2e1c05327c8f295\n"
   "\n"
   "-----BEGIN CERTIFICATE-----\n"
@@ -264,7 +287,7 @@ char pem4[] =
   "                a411da7b0fa064d214116d5f94e06c24\n"
   "        SHA-1 fingerprint:\n"
   "                3596e796c73ed096d762ab3d440a9ab55a386b3b\n"
-  "        Public Key Id:\n"
+  "        Public Key ID:\n"
   "                e93c1cfbad926ee606a4562ca2e1c05327c8f295\n"
   "\n"
   "-----BEGIN CERTIFICATE-----\n"
@@ -311,7 +334,7 @@ char pem6[] =
   "                Subject Key Identifier (not critical):\n"
   "                        5493e6599b283b4529378818aef9a4abbf4d9918\n"
   "Other Information:\n"
-  "        Public Key Id:\n"
+  "        Public Key ID:\n"
   "                5493e6599b283b4529378818aef9a4abbf4d9918\n"
   "\n"
   "-----BEGIN CERTIFICATE-----\n"
@@ -359,7 +382,7 @@ char pem7[] =
   "                Subject Key Identifier (not critical):\n"
   "                        5493e6599b283b4529378818aef9a4abbf4d9918\n"
   "Other Information:\n"
-  "        Public Key Id:\n"
+  "        Public Key ID:\n"
   "                5493e6599b283b4529378818aef9a4abbf4d9918\n"
   "\n"
   "-----BEGIN CERTIFICATE-----\n"
@@ -407,7 +430,7 @@ char pem8[] =
   "                Subject Key Identifier (not critical):\n"
   "                        5493e6599b283b4529378818aef9a4abbf4d9918\n"
   "Other Information:\n"
-  "        Public Key Id:\n"
+  "        Public Key ID:\n"
   "                5493e6599b283b4529378818aef9a4abbf4d9918\n"
   "\n"
   "-----BEGIN CERTIFICATE-----\n"
@@ -470,7 +493,7 @@ char pem9[] =
   "		f27b18092c7497f206e70f504eee0f8e\n"
   "	SHA-1 fingerprint:\n"
   "		bebdac9d0dd54e8f044642e0f065fae5d75ca6e5\n"
-  "	Public Key Id:\n"
+  "	Public Key ID:\n"
   "		4cb90a9bfa1d34e37edecbd20715fea1dacb6891\n"
   "\n"
   "-----BEGIN CERTIFICATE-----\n"
@@ -549,7 +572,7 @@ char pem10[] =
   "		0b4d6d944200cdd1639008b24dc0fe0a\n"
   "	SHA-1 fingerprint:\n"
   "		ce85660f5451b0cc12f525577f0eb9411a20c76b\n"
-  "	Public Key Id:\n"
+  "	Public Key ID:\n"
   "		a1d18c15e65c7c4935512eeea7ca5d3e6baad4e1\n"
   "\n"
   "-----BEGIN CERTIFICATE-----\n"
@@ -595,8 +618,7 @@ char pem_too_many[] = "\n"
   "QLBjqqeYzIvWqwT4z14tIkN0VWWqqVo/dzV+lfNwQy0UL8iWVYnks8wKs2SBkVHx\n"
   "41wBR3uCgCDwlYGDLIG1cm0n7mXrnE7KNcrwQKXL8WGNRAVvx5MVO1vDoWPyQ1Y4\n"
   "sDdnQiVER9ee/KxO6IgCTGh+nCBTSSYgLX2E/m789quPvzyi9Hf/go28he6E3dSK\n"
-  "q7/LRSxaZenB/Q==\n"
-  "-----END CERTIFICATE-----\n";
+  "q7/LRSxaZenB/Q==\n" "-----END CERTIFICATE-----\n";
 
 #ifdef ENABLE_OPENPGP
 /* Check basic OpenPGP comparison too.
@@ -655,210 +677,238 @@ doit (void)
   if (ret < 0)
     fail ("gnutls_openpgp_crt_init: %d\n", ret);
 #endif
+  if (debug)
+    success ("Testing wildcards...\n");
+  data.data = (unsigned char *) wildcards;
+  data.size = strlen (wildcards);
+
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
+  if (ret < 0)
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+  ret = gnutls_x509_crt_check_hostname (x509, "example.com");
+  if (ret)
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+  ret = gnutls_x509_crt_check_hostname (x509, "example.org");
+  if (ret)
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+  ret = gnutls_x509_crt_check_hostname (x509, "www.example.net");
+  if (ret == 0)
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem1...\n");
-  data.data = (unsigned char*)pem1;
+  data.data = (unsigned char *) pem1;
   data.size = strlen (pem1);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem2...\n");
-  data.data = (unsigned char*)pem2;
+  data.data = (unsigned char *) pem2;
   data.size = strlen (pem2);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "*.example.org");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem3...\n");
-  data.data = (unsigned char*)pem3;
+  data.data = (unsigned char *) pem3;
   data.size = strlen (pem3);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "*.example.org");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem4...\n");
-  data.data = (unsigned char*)pem4;
+  data.data = (unsigned char *) pem4;
   data.size = strlen (pem4);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo.example.org");
   if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo.example.com");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem6...\n");
-  data.data = (unsigned char*)pem6;
+  data.data = (unsigned char *) pem6;
   data.size = strlen (pem6);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo.example.org");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "bar.foo.example.org");
   if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem7...\n");
-  data.data = (unsigned char*)pem7;
+  data.data = (unsigned char *) pem7;
   data.size = strlen (pem7);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo.bar.example.org");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foobar.bar.example.org");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foobar.example.org");
   if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foobazbar.example.org");
   if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem8...\n");
-  data.data = (unsigned char*)pem8;
+  data.data = (unsigned char *) pem8;
   data.size = strlen (pem8);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
+  /* this was passing in old gnutls versions, but that was not a
+   * good idea. See http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7380
+   * for a discussion. */
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
-  if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+  if (ret)
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.");
-  if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+  if (ret)
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
+  /* this was passing in old gnutls versions, but that was not a
+   * good idea. See http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7380
+   * for a discussion. */
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.com");
-  if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+  if (ret)
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.foo.com");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem9...\n");
-  data.data = (unsigned char*)pem9;
+  data.data = (unsigned char *) pem9;
   data.size = strlen (pem9);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo.example.org");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "bar.example.org");
   if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem10...\n");
-  data.data = (unsigned char*)pem10;
+  data.data = (unsigned char *) pem10;
   data.size = strlen (pem10);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "localhost");
   if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
   if (debug)
     success ("Testing pem_too_many...\n");
-  data.data = (unsigned char*)pem_too_many;
+  data.data = (unsigned char *) pem_too_many;
   data.size = strlen (pem_too_many);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
+    fail ("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "localhost.gnutls.gnutls.org");
   if (ret)
-    fail ("Hostname verification should have failed (too many wildcards)\n");
+    fail
+      ("%d: Hostname verification should have failed (too many wildcards)\n",
+       __LINE__);
 
 #ifdef ENABLE_OPENPGP
   if (debug)
     success ("Testing pem11...\n");
-  data.data = (unsigned char*)pem11;
+  data.data = (unsigned char *) pem11;
   data.size = strlen (pem11);
 
   ret = gnutls_openpgp_crt_import (pgp, &data, GNUTLS_OPENPGP_FMT_BASE64);
   if (ret < 0)
-    fail ("gnutls_openpgp_crt_import: %d\n", ret);
+    fail ("%d: gnutls_openpgp_crt_import: %d\n", __LINE__, ret);
 
   ret = gnutls_openpgp_crt_check_hostname (pgp, "test.gnutls.org");
   if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
+    fail ("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
   gnutls_openpgp_crt_deinit (pgp);
 #endif

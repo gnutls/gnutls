@@ -613,6 +613,7 @@ int
 _gnutls_hostname_compare (const char *certname,
                           size_t certnamesize, const char *hostname, int level)
 {
+  char *p;
 
   if (level > 5)
     return 0;
@@ -629,6 +630,14 @@ _gnutls_hostname_compare (const char *certname,
   if (*certname == '*')
     {
       /* a wildcard certificate */
+
+      /* ensure that we have at least two domain components after
+       * the wildcard. */
+      p = strrchr(certname, '.');
+      if (p == NULL || strchr(certname, '.') == p || p[1] == 0)
+        {
+          return 0;
+        }
 
       certname++;
       certnamesize--;
