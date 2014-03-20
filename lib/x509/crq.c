@@ -1641,7 +1641,7 @@ gnutls_x509_crq_get_key_usage(gnutls_x509_crq_t crq,
 
 	bd.data = buf;
 	bd.size = buf_size;
-	result = gnutls_x509_ext_get_key_usage(&bd, key_usage);
+	result = gnutls_x509_ext_import_key_usage(&bd, key_usage);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -1698,7 +1698,7 @@ gnutls_x509_crq_get_basic_constraints(gnutls_x509_crq_t crq,
 
 	bd.data = buf;
 	bd.size = buf_size;
-	result = gnutls_x509_ext_get_basic_constraints(&bd, &tmp_ca, pathlen);
+	result = gnutls_x509_ext_import_basic_constraints(&bd, &tmp_ca, pathlen);
 	if (ca)
 		*ca = tmp_ca;
 
@@ -2069,7 +2069,7 @@ gnutls_x509_crq_set_basic_constraints(gnutls_x509_crq_t crq,
 
 	/* generate the extension.
 	 */
-	result = gnutls_x509_ext_set_basic_constraints(ca, pathLenConstraint, &der_data);
+	result = gnutls_x509_ext_export_basic_constraints(ca, pathLenConstraint, &der_data);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -2114,7 +2114,7 @@ gnutls_x509_crq_set_key_usage(gnutls_x509_crq_t crq, unsigned int usage)
 	/* generate the extension.
 	 */
 	result =
-	    gnutls_x509_ext_set_key_usage(usage, &der_data);
+	    gnutls_x509_ext_export_key_usage(usage, &der_data);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

@@ -442,7 +442,7 @@ gnutls_x509_crt_set_basic_constraints(gnutls_x509_crt_t crt,
 
 	/* generate the extension.
 	 */
-	result = gnutls_x509_ext_set_basic_constraints(ca, pathLenConstraint, &der_data);
+	result = gnutls_x509_ext_export_basic_constraints(ca, pathLenConstraint, &der_data);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -504,7 +504,7 @@ gnutls_x509_crt_set_key_usage(gnutls_x509_crt_t crt, unsigned int usage)
 	/* generate the extension.
 	 */
 	result =
-	    gnutls_x509_ext_set_key_usage(usage, &der_data);
+	    gnutls_x509_ext_export_key_usage(usage, &der_data);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -770,7 +770,7 @@ gnutls_x509_crt_set_proxy(gnutls_x509_crt_t crt,
 
 	/* generate the extension.
 	 */
-	result = gnutls_x509_ext_set_proxy(pathLenConstraint,
+	result = gnutls_x509_ext_export_proxy(pathLenConstraint,
 					    policyLanguage,
 					    policy, sizeof_policy,
 					    &der_data);
@@ -818,7 +818,7 @@ gnutls_x509_crt_set_private_key_usage_period(gnutls_x509_crt_t crt,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	result = gnutls_x509_ext_set_private_key_usage_period(activation,
+	result = gnutls_x509_ext_export_private_key_usage_period(activation,
 		expiration, &der_data);
 	if (result < 0) {
 		gnutls_assert();
@@ -1091,7 +1091,7 @@ gnutls_x509_crt_set_crl_dist_points2(gnutls_x509_crt_t crt,
 					   &critical);
 
 	if (ret >= 0 && old_der.data != NULL) {
-		ret = gnutls_x509_ext_get_crl_dist_points(&old_der, cdp, 0);
+		ret = gnutls_x509_ext_import_crl_dist_points(&old_der, cdp, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -1109,7 +1109,7 @@ gnutls_x509_crt_set_crl_dist_points2(gnutls_x509_crt_t crt,
 	/* generate the extension.
 	 */
 	ret =
-	    gnutls_x509_ext_set_crl_dist_points(cdp, &der_data);
+	    gnutls_x509_ext_export_crl_dist_points(cdp, &der_data);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1229,7 +1229,7 @@ gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt_t cert,
 	d_id.data = (void*)id;
 	d_id.size = id_size;
 
-	result = gnutls_x509_ext_set_subject_key_id(&d_id, &der_data);
+	result = gnutls_x509_ext_export_subject_key_id(&d_id, &der_data);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -1353,7 +1353,7 @@ gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt_t cert,
 					   NULL);
 
 	if (ret >= 0) {
-		ret = gnutls_x509_ext_get_key_purposes(&old_id, p, 0);
+		ret = gnutls_x509_ext_import_key_purposes(&old_id, p, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -1366,7 +1366,7 @@ gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_set_key_purposes(p, &der);
+	ret = gnutls_x509_ext_export_key_purposes(p, &der);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1481,7 +1481,7 @@ gnutls_x509_crt_set_authority_info_access(gnutls_x509_crt_t crt,
 	ret = _gnutls_x509_crt_get_extension(crt, GNUTLS_OID_AIA, 0, &der,
 					     &c);
 	if (ret >= 0) {		/* decode it */
-		ret = gnutls_x509_ext_get_aia(&der, aia_ctx, 0);
+		ret = gnutls_x509_ext_import_aia(&der, aia_ctx, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -1500,7 +1500,7 @@ gnutls_x509_crt_set_authority_info_access(gnutls_x509_crt_t crt,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_set_aia(aia_ctx, &new_der);
+	ret = gnutls_x509_ext_export_aia(aia_ctx, &new_der);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1572,7 +1572,7 @@ gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt,
 
 
 	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-		ret = gnutls_x509_ext_get_policies(&prev_der_data,
+		ret = gnutls_x509_ext_import_policies(&prev_der_data,
 			policies, 0);
 		if (ret < 0) {
 			gnutls_assert();
@@ -1586,7 +1586,7 @@ gnutls_x509_crt_set_policy(gnutls_x509_crt_t crt,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_set_policies(policies, &der_data);
+	ret = gnutls_x509_ext_export_policies(policies, &der_data);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

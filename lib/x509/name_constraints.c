@@ -157,7 +157,7 @@ int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 	if (der.size == 0 || der.data == NULL)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	ret = gnutls_x509_ext_get_name_constraints(&der, nc, flags);
+	ret = gnutls_x509_ext_import_name_constraints(&der, nc, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -337,7 +337,7 @@ int gnutls_x509_crt_set_name_constraints(gnutls_x509_crt_t crt,
 int ret;
 gnutls_datum_t der;
 
-	ret = gnutls_x509_ext_set_name_constraints(nc, &der);
+	ret = gnutls_x509_ext_export_name_constraints(nc, &der);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

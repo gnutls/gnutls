@@ -733,7 +733,7 @@ gnutls_x509_crt_get_private_key_usage_period(gnutls_x509_crt_t cert,
 		    gnutls_assert_val
 		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	ret = gnutls_x509_ext_get_private_key_usage_period(&der, activation, expiration);
+	ret = gnutls_x509_ext_import_private_key_usage_period(&der, activation, expiration);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -824,7 +824,7 @@ gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt_t cert, void *ret,
 		return result;
 	}
 
-	result = gnutls_x509_ext_get_subject_key_id(&der, &id);
+	result = gnutls_x509_ext_import_subject_key_id(&der, &id);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -913,7 +913,7 @@ gnutls_x509_crt_get_authority_key_gn_serial(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_get_authority_key_id(&der, aki, 0);
+	ret = gnutls_x509_ext_import_authority_key_id(&der, aki, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1000,7 +1000,7 @@ gnutls_x509_crt_get_authority_key_id(gnutls_x509_crt_t cert, void *id,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_get_authority_key_id(&der, aki, 0);
+	ret = gnutls_x509_ext_import_authority_key_id(&der, aki, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1301,7 +1301,7 @@ get_alt_name(gnutls_x509_crt_t cert, const char *extension_id,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_get_subject_alt_names(&dnsname, sans, 0);
+	ret = gnutls_x509_ext_import_subject_alt_names(&dnsname, sans, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1618,7 +1618,7 @@ gnutls_x509_crt_get_basic_constraints(gnutls_x509_crt_t cert,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	result = gnutls_x509_ext_get_basic_constraints(&basicConstraints, &tmp_ca, pathlen);
+	result = gnutls_x509_ext_import_basic_constraints(&basicConstraints, &tmp_ca, pathlen);
 	if (ca)
 		*ca = tmp_ca;
 
@@ -1702,7 +1702,7 @@ gnutls_x509_crt_get_key_usage(gnutls_x509_crt_t cert,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	result = gnutls_x509_ext_get_key_usage(&keyUsage, key_usage);
+	result = gnutls_x509_ext_import_key_usage(&keyUsage, key_usage);
 	_gnutls_free_datum(&keyUsage);
 
 	if (result < 0) {
@@ -1757,7 +1757,7 @@ gnutls_x509_crt_get_proxy(gnutls_x509_crt_t cert,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	result = gnutls_x509_ext_get_proxy(&proxyCertInfo, pathlen,
+	result = gnutls_x509_ext_import_proxy(&proxyCertInfo, pathlen,
 							policyLanguage,
 							policy,
 							sizeof_policy);
@@ -1839,7 +1839,7 @@ gnutls_x509_crt_get_policy(gnutls_x509_crt_t crt, int indx,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_get_policies(&tmpd, policies, 0);
+	ret = gnutls_x509_ext_import_policies(&tmpd, policies, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -2870,7 +2870,7 @@ gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_get_crl_dist_points(&dist_points, cdp, 0);
+	ret = gnutls_x509_ext_import_crl_dist_points(&dist_points, cdp, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -2956,7 +2956,7 @@ gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 	
-	ret = gnutls_x509_ext_get_key_purposes(&ext, p, 0);
+	ret = gnutls_x509_ext_import_key_purposes(&ext, p, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -3560,7 +3560,7 @@ legacy_parse_aia(ASN1_TYPE src,
  * @critical: pointer to output integer that is set to non-0 if the extension is marked as critical (may be %NULL)
  *
  * Note that a simpler API to access the authority info data is provided
- * by gnutls_x509_aia_get() and gnutls_x509_ext_get_aia().
+ * by gnutls_x509_aia_get() and gnutls_x509_ext_import_aia().
  * 
  * This function extracts the Authority Information Access (AIA)
  * extension, see RFC 5280 section 4.2.2.1 for more information.  The

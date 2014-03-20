@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2007-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2007-2014 Free Software Foundation, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -216,7 +216,7 @@ static void print_aia(gnutls_buffer_st * str, const gnutls_datum_t *der)
 	if (err < 0)
 		return;
 
-	err = gnutls_x509_ext_get_aia(der, aia, 0);
+	err = gnutls_x509_ext_import_aia(der, aia, 0);
 	if (err < 0) {
 		addf(str, "error: get_aia: %s\n",
 		     gnutls_strerror(err));

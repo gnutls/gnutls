@@ -790,7 +790,7 @@ _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name_t
 	if (prev_der_ext && prev_der_ext->data != NULL && 
 		prev_der_ext->size != 0) {
 
-		ret = gnutls_x509_ext_get_subject_alt_names(prev_der_ext, sans, 0);
+		ret = gnutls_x509_ext_import_subject_alt_names(prev_der_ext, sans, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -805,7 +805,7 @@ _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name_t
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_set_subject_alt_names(sans, der_ext);
+	ret = gnutls_x509_ext_export_subject_alt_names(sans, der_ext);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -841,7 +841,7 @@ _gnutls_x509_ext_gen_auth_key_id(const void *id, size_t id_size,
 		goto cleanup;
 	}
 
-	ret = gnutls_x509_ext_set_authority_key_id(aki, der_ext);
+	ret = gnutls_x509_ext_export_authority_key_id(aki, der_ext);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

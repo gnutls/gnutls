@@ -214,12 +214,12 @@ Complex extensions may require initializing an intermediate structure that holds
 parsed extension data.
 
 Examples of simple parsing functions are shown below.
-@showfuncD{gnutls_x509_ext_get_basic_constraints,gnutls_x509_ext_set_basic_constraints,gnutls_x509_ext_get_key_usage,gnutls_x509_ext_set_key_usage}
+@showfuncD{gnutls_x509_ext_import_basic_constraints,gnutls_x509_ext_export_basic_constraints,gnutls_x509_ext_import_key_usage,gnutls_x509_ext_export_key_usage}
 
 More complex extensions, such as Name Constraints, require an intermediate structure, in that
 case @code{gnutls_x509_name_constraints_t} to be initialized in order to store the parsed
 extension data. 
-@showfuncB{gnutls_x509_ext_get_name_constraints,gnutls_x509_ext_set_name_constraints}
+@showfuncB{gnutls_x509_ext_import_name_constraints,gnutls_x509_ext_export_name_constraints}
 
 After the name constraints are extracted in the structure, the following functions
 can be used to access them.

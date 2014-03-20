@@ -203,7 +203,7 @@ int gnutls_subject_alt_names_set(gnutls_subject_alt_names_t sans,
 }
 
 /**
- * gnutls_x509_ext_get_subject_alt_names:
+ * gnutls_x509_ext_import_subject_alt_names:
  * @ext: The DER-encoded extension data
  * @sans: The alternative names structure
  * @flags: should be zero
@@ -219,7 +219,7 @@ int gnutls_subject_alt_names_set(gnutls_subject_alt_names_t sans,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_subject_alt_names(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_subject_alt_names(const gnutls_datum_t * ext,
 					  gnutls_subject_alt_names_t sans,
 					  unsigned int flags)
 {
@@ -285,7 +285,7 @@ int gnutls_x509_ext_get_subject_alt_names(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_subject_alt_names:
+ * gnutls_x509_ext_export_subject_alt_names:
  * @sans: The alternative names structure
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
  *
@@ -297,7 +297,7 @@ int gnutls_x509_ext_get_subject_alt_names(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_subject_alt_names(gnutls_subject_alt_names_t sans,
+int gnutls_x509_ext_export_subject_alt_names(gnutls_subject_alt_names_t sans,
 					  gnutls_datum_t * ext)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -340,7 +340,7 @@ int gnutls_x509_ext_set_subject_alt_names(gnutls_subject_alt_names_t sans,
 }
 
 /**
- * gnutls_x509_ext_get_name_constraints:
+ * gnutls_x509_ext_import_name_constraints:
  * @ext: a DER encoded extension
  * @nc: The nameconstraints intermediate structure
  * @flags: zero or %GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND
@@ -363,7 +363,7 @@ int gnutls_x509_ext_set_subject_alt_names(gnutls_subject_alt_names_t sans,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_name_constraints(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_name_constraints(const gnutls_datum_t * ext,
 					 gnutls_x509_name_constraints_t nc,
 					 unsigned int flags)
 {
@@ -412,7 +412,7 @@ int gnutls_x509_ext_get_name_constraints(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_name_constraints:
+ * gnutls_x509_ext_export_name_constraints:
  * @nc: The nameconstraints structure
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
  *
@@ -424,7 +424,7 @@ int gnutls_x509_ext_get_name_constraints(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_name_constraints(gnutls_x509_name_constraints_t nc,
+int gnutls_x509_ext_export_name_constraints(gnutls_x509_name_constraints_t nc,
 					 gnutls_datum_t * ext)
 {
 	int ret, result;
@@ -551,7 +551,7 @@ int gnutls_x509_ext_set_name_constraints(gnutls_x509_name_constraints_t nc,
 }
 
 /**
- * gnutls_x509_ext_get_subject_key_id:
+ * gnutls_x509_ext_import_subject_key_id:
  * @ext: a DER encoded extension
  * @id: will contain the subject key ID
  *
@@ -564,7 +564,7 @@ int gnutls_x509_ext_set_name_constraints(gnutls_x509_name_constraints_t nc,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_subject_key_id(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_subject_key_id(const gnutls_datum_t * ext,
 				       gnutls_datum_t * id)
 {
 	int result, ret;
@@ -604,7 +604,7 @@ int gnutls_x509_ext_get_subject_key_id(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_subject_key_id:
+ * gnutls_x509_ext_export_subject_key_id:
  * @id: The key identifier
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
  *
@@ -617,7 +617,7 @@ int gnutls_x509_ext_get_subject_key_id(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_subject_key_id(const gnutls_datum_t * id,
+int gnutls_x509_ext_export_subject_key_id(const gnutls_datum_t * id,
 				       gnutls_datum_t * ext)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -839,7 +839,7 @@ int gnutls_x509_aki_get_cert_issuer(gnutls_x509_aki_t aki, unsigned int seq,
 }
 
 /**
- * gnutls_x509_ext_get_authority_key_id:
+ * gnutls_x509_ext_import_authority_key_id:
  * @ext: a DER encoded extension
  * @aki: An initialized authority key identifier structure
  * @flags: should be zero
@@ -852,7 +852,7 @@ int gnutls_x509_aki_get_cert_issuer(gnutls_x509_aki_t aki, unsigned int seq,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_authority_key_id(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_authority_key_id(const gnutls_datum_t * ext,
 					 gnutls_x509_aki_t aki,
 					 unsigned int flags)
 {
@@ -944,7 +944,7 @@ int gnutls_x509_ext_get_authority_key_id(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_authority_key_id:
+ * gnutls_x509_ext_export_authority_key_id:
  * @aki: An initialized authority key identifier structure
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
  *
@@ -957,7 +957,7 @@ int gnutls_x509_ext_get_authority_key_id(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_authority_key_id(gnutls_x509_aki_t aki,
+int gnutls_x509_ext_export_authority_key_id(gnutls_x509_aki_t aki,
 					 gnutls_datum_t * ext)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -1033,7 +1033,7 @@ int gnutls_x509_ext_set_authority_key_id(gnutls_x509_aki_t aki,
 }
 
 /**
- * gnutls_x509_ext_get_key_usage:
+ * gnutls_x509_ext_import_key_usage:
  * @ext: the DER encoded extension data
  * @key_usage: where the key usage bits will be stored
  *
@@ -1052,7 +1052,7 @@ int gnutls_x509_ext_set_authority_key_id(gnutls_x509_aki_t aki,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_key_usage(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_key_usage(const gnutls_datum_t * ext,
 				  unsigned int *key_usage)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -1091,7 +1091,7 @@ int gnutls_x509_ext_get_key_usage(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_key_usage:
+ * gnutls_x509_ext_export_key_usage:
  * @usage: an ORed sequence of the GNUTLS_KEY_* elements.
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
  *
@@ -1104,7 +1104,7 @@ int gnutls_x509_ext_get_key_usage(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_key_usage(unsigned int usage, gnutls_datum_t * ext)
+int gnutls_x509_ext_export_key_usage(unsigned int usage, gnutls_datum_t * ext)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result;
@@ -1139,7 +1139,7 @@ int gnutls_x509_ext_set_key_usage(unsigned int usage, gnutls_datum_t * ext)
 }
 
 /**
- * gnutls_x509_ext_get_private_key_usage_period:
+ * gnutls_x509_ext_import_private_key_usage_period:
  * @ext: the DER encoded extension data
  * @activation: Will hold the activation time
  * @expiration: Will hold the expiration time
@@ -1153,7 +1153,7 @@ int gnutls_x509_ext_set_key_usage(unsigned int usage, gnutls_datum_t * ext)
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_private_key_usage_period(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_private_key_usage_period(const gnutls_datum_t * ext,
 						 time_t * activation,
 						 time_t * expiration)
 {
@@ -1190,7 +1190,7 @@ int gnutls_x509_ext_get_private_key_usage_period(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_private_key_usage_period:
+ * gnutls_x509_ext_export_private_key_usage_period:
  * @activation: The activation time
  * @expiration: The expiration time
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
@@ -1206,7 +1206,7 @@ int gnutls_x509_ext_get_private_key_usage_period(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_private_key_usage_period(time_t activation,
+int gnutls_x509_ext_export_private_key_usage_period(time_t activation,
 						 time_t expiration,
 						 gnutls_datum_t * ext)
 {
@@ -1247,7 +1247,7 @@ int gnutls_x509_ext_set_private_key_usage_period(time_t activation,
 }
 
 /**
- * gnutls_x509_ext_get_basic_constraints:
+ * gnutls_x509_ext_import_basic_constraints:
  * @ext: the DER encoded extension data
  * @ca: will be non zero if the CA status is true
  * @pathlen: the path length constraint; will be set to -1 for no limit
@@ -1260,7 +1260,7 @@ int gnutls_x509_ext_set_private_key_usage_period(time_t activation,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_basic_constraints(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_basic_constraints(const gnutls_datum_t * ext,
 					  unsigned int *ca, int *pathlen)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -1312,7 +1312,7 @@ int gnutls_x509_ext_get_basic_constraints(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_basic_constraints:
+ * gnutls_x509_ext_export_basic_constraints:
  * @ca: non-zero for a CA
  * @pathlen: The path length constraint (set to -1 for no constraint)
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
@@ -1328,7 +1328,7 @@ int gnutls_x509_ext_get_basic_constraints(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_basic_constraints(unsigned int ca, int pathlen,
+int gnutls_x509_ext_export_basic_constraints(unsigned int ca, int pathlen,
 					  gnutls_datum_t * ext)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -1383,7 +1383,7 @@ int gnutls_x509_ext_set_basic_constraints(unsigned int ca, int pathlen,
 }
 
 /**
- * gnutls_x509_ext_get_proxy:
+ * gnutls_x509_ext_import_proxy:
  * @ext: the DER encoded extension data
  * @pathlen: pointer to output integer indicating path length (may be
  *   NULL), non-negative error codes indicate a present pCPathLenConstraint
@@ -1400,7 +1400,7 @@ int gnutls_x509_ext_set_basic_constraints(unsigned int ca, int pathlen,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_proxy(const gnutls_datum_t * ext, int *pathlen,
+int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 			      char **policyLanguage, char **policy,
 			      size_t * sizeof_policy)
 {
@@ -1475,7 +1475,7 @@ int gnutls_x509_ext_get_proxy(const gnutls_datum_t * ext, int *pathlen,
 }
 
 /**
- * gnutls_x509_ext_set_proxy:
+ * gnutls_x509_ext_export_proxy:
  * @pathLenConstraint: non-negative error codes indicate maximum length of path,
  *   and negative error codes indicate that the pathLenConstraints field should
  *   not be present.
@@ -1494,7 +1494,7 @@ int gnutls_x509_ext_get_proxy(const gnutls_datum_t * ext, int *pathlen,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_proxy(int pathLenConstraint, const char *policyLanguage,
+int gnutls_x509_ext_export_proxy(int pathLenConstraint, const char *policyLanguage,
 			      const char *policy, size_t sizeof_policy,
 			      gnutls_datum_t * ext)
 {
@@ -1756,7 +1756,7 @@ int gnutls_x509_policies_set(gnutls_x509_policies_t policies,
 }
 
 /**
- * gnutls_x509_ext_get_policies:
+ * gnutls_x509_ext_import_policies:
  * @ext: the DER encoded extension data
  * @policies: A pointer to an initialized policies structures.
  * @flags: should be zero
@@ -1768,7 +1768,7 @@ int gnutls_x509_policies_set(gnutls_x509_policies_t policies,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_policies(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_policies(const gnutls_datum_t * ext,
 				 gnutls_x509_policies_t policies,
 				 unsigned int flags)
 {
@@ -1963,7 +1963,7 @@ static int encode_user_notice(const gnutls_datum_t * txt,
 }
 
 /**
- * gnutls_x509_ext_set_policies:
+ * gnutls_x509_ext_export_policies:
  * @policies: A pointer to an initialized policies structure.
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
  *
@@ -1976,7 +1976,7 @@ static int encode_user_notice(const gnutls_datum_t * txt,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_policies(gnutls_x509_policies_t policies,
+int gnutls_x509_ext_export_policies(gnutls_x509_policies_t policies,
 				 gnutls_datum_t * ext)
 {
 	int result;
@@ -2256,7 +2256,7 @@ int gnutls_x509_crl_dist_points_set(gnutls_x509_crl_dist_points_t cdp,
 }
 
 /**
- * gnutls_x509_ext_get_crl_dist_points:
+ * gnutls_x509_ext_import_crl_dist_points:
  * @ext: the DER encoded extension data
  * @cdp: A pointer to an initialized CRL distribution points structure.
  * @flags: should be zero
@@ -2268,7 +2268,7 @@ int gnutls_x509_crl_dist_points_set(gnutls_x509_crl_dist_points_t cdp,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_crl_dist_points(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 					gnutls_x509_crl_dist_points_t cdp,
 					unsigned int flags)
 {
@@ -2361,7 +2361,7 @@ int gnutls_x509_ext_get_crl_dist_points(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_crl_dist_points:
+ * gnutls_x509_ext_export_crl_dist_points:
  * @cdp: A pointer to an initialized CRL distribution points structure.
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
  *
@@ -2374,7 +2374,7 @@ int gnutls_x509_ext_get_crl_dist_points(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_crl_dist_points(gnutls_x509_crl_dist_points_t cdp,
+int gnutls_x509_ext_export_crl_dist_points(gnutls_x509_crl_dist_points_t cdp,
 					gnutls_datum_t * ext)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -2666,7 +2666,7 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
 }
 
 /**
- * gnutls_x509_ext_get_aia:
+ * gnutls_x509_ext_import_aia:
  * @ext: The DER-encoded extension data
  * @aia: The authority info access structure
  * @flags: should be zero
@@ -2680,7 +2680,7 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_aia(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_aia(const gnutls_datum_t * ext,
 					      gnutls_x509_aia_t aia,
 					      unsigned int flags)
 {
@@ -2719,7 +2719,7 @@ int gnutls_x509_ext_get_aia(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_aia:
+ * gnutls_x509_ext_export_aia:
  * @aia: The authority info access structure
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
  *
@@ -2732,7 +2732,7 @@ int gnutls_x509_ext_get_aia(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_aia(gnutls_x509_aia_t aia,
+int gnutls_x509_ext_export_aia(gnutls_x509_aia_t aia,
 					      gnutls_datum_t * ext)
 {
 	int ret, result;
@@ -2892,7 +2892,7 @@ int gnutls_x509_key_purpose_get(gnutls_x509_key_purposes_t p, unsigned idx, gnut
 }
 
 /**
- * gnutls_x509_ext_get_key_purposes:
+ * gnutls_x509_ext_import_key_purposes:
  * @ext: The DER-encoded extension data
  * @p: The key purposes structure
  * @flags: should be zero
@@ -2905,7 +2905,7 @@ int gnutls_x509_key_purpose_get(gnutls_x509_key_purposes_t p, unsigned idx, gnut
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_get_key_purposes(const gnutls_datum_t * ext,
+int gnutls_x509_ext_import_key_purposes(const gnutls_datum_t * ext,
 				     gnutls_x509_key_purposes_t p,
 				     unsigned int flags)
 {
@@ -2966,7 +2966,7 @@ int gnutls_x509_ext_get_key_purposes(const gnutls_datum_t * ext,
 }
 
 /**
- * gnutls_x509_ext_set_key_purposes:
+ * gnutls_x509_ext_export_key_purposes:
  * @p: The key purposes structure
  * @ext: The DER-encoded extension data; must be freed using gnutls_free().
  *
@@ -2978,7 +2978,7 @@ int gnutls_x509_ext_get_key_purposes(const gnutls_datum_t * ext,
  *
  * Since: 3.3.0
  **/
-int gnutls_x509_ext_set_key_purposes(gnutls_x509_key_purposes_t p,
+int gnutls_x509_ext_export_key_purposes(gnutls_x509_key_purposes_t p,
 				     gnutls_datum_t * ext)
 {
 	int result, ret;
