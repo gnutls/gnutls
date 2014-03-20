@@ -8,6 +8,11 @@ See the end for copying conditions.
 only available in TLS 1.0 as SSL 3.0 doesn't specify parameters for
 these algorithms.
 
+** libgnutls: Changed the behaviour in wildcard acceptance in certificates.
+Wildcards are only accepted when there are more than two domain components
+after the wildcard. This will prevent accepting certificates from CAs that
+issued '*.com', or 'www.*'.
+
 ** API and ABI modifications:
 No changes since last version.
 
