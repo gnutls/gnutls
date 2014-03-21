@@ -303,6 +303,7 @@ char pem4[] =
     "FAMjWofnMxAyEViiu/HlWoiHu4AbtrsSGMsV1Tr8meRCWrpF\n"
     "-----END CERTIFICATE-----\n";
 
+#ifdef SUPPORT_COMPLEX_WILDCARDS
 /* Certificate with multiple wildcards SAN but no CN. */
 char pem6[] =
     "X.509 Certificate Information:\n"
@@ -398,6 +399,7 @@ char pem7[] =
     "8NsZQVKKLYc1Y4y8LRPhvnxkSnlcGa1RzYZY1s12BZ6OVIfyxD1Z9BcNdqRSq7bQ\n"
     "kEicsGp5ugGQTNq6aSlzYOUD9/fUP3jDsH7HVb36aCF3waGCQWj+pLqK0LYcW2p/\n"
     "xnr5+z4YevFBhn7l/fMhg8TzKejxYm7TECg=\n" "-----END CERTIFICATE-----\n";
+#endif
 
 /* Certificate with ending wildcard SAN but no CN. */
 char pem8[] =
@@ -778,6 +780,7 @@ void doit(void)
 	if (ret)
 		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
+#ifdef SUPPORT_COMPLEX_WILDCARDS
 	if (debug)
 		success("Testing pem6...\n");
 	data.data = (unsigned char *) pem6;
@@ -821,6 +824,7 @@ void doit(void)
 	    gnutls_x509_crt_check_hostname(x509, "foobazbar.example.org");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
+#endif
 
 	if (debug)
 		success("Testing pem8...\n");

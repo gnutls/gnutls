@@ -614,7 +614,7 @@ gnutls_openpgp_crt_check_hostname(gnutls_openpgp_crt_t key,
 			dnsnamesize--;
 
 			if (_gnutls_hostname_compare
-			    (dnsname, dnsnamesize, hostname, 0))
+			    (dnsname, dnsnamesize, hostname))
 				return 1;
 		}
 	}

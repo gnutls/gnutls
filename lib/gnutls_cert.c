@@ -687,8 +687,9 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * to trust a certificate does not imply a negative return value).
  *
  * If the @hostname provided is non-NULL then this function will compare
- * the hostname in the certificate against the given. If they do not match 
- * the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
+ * the hostname in the certificate against the given. The comparison will
+ * be accurate for ascii names; non-ascii names are compared byte-by-byte. 
+ * If names do not match the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  *
  * If available the OCSP Certificate Status extension will be
  * utilized by this function.

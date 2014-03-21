@@ -35,8 +35,11 @@
  * described in RFC2818 (HTTPS), which takes into account wildcards,
  * and the DNSName/IPAddress subject alternative name PKIX extension.
  *
+ * The comparison may have false-negatives as it is done byte by byte in 
+ * non-ascii names.
+ *
  * Wildcards are only considered if the domain name consists of three
- * components or more.
+ * components or more, and the wildcard starts at the leftmost position.
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
@@ -76,7 +79,7 @@ gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 		if (ret == GNUTLS_SAN_DNSNAME) {
 			found_dnsname = 1;
 			if (_gnutls_hostname_compare
-			    (dnsname, dnsnamesize, hostname, 0)) {
+			    (dnsname, dnsnamesize, hostname)) {
 				return 1;
 			}
 		}
@@ -95,7 +98,7 @@ gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 		}
 
 		if (_gnutls_hostname_compare
-		    (dnsname, dnsnamesize, hostname, 0)) {
+		    (dnsname, dnsnamesize, hostname)) {
 			return 1;
 		}
 	}

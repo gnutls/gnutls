@@ -567,26 +567,19 @@ gnutls_hex_encode(const gnutls_datum_t * data, char *result,
 	return 0;
 }
 
-
-/* compare hostname against certificate, taking account of wildcards
- * return 1 on success or 0 on error
- *
- * note: certnamesize is required as X509 certs can contain embedded NULs in
- * the strings such as CN or subjectAltName.
- *
- * @level: is used for recursion. Use 0 when you call this function.
- */
-int
-_gnutls_hostname_compare(const char *certname,
-			 size_t certnamesize, const char *hostname,
-			 int level)
+static int
+hostname_compare_raw(const char *certname,
+			 size_t certnamesize, const char *hostname)
 {
-	char *p;
+	if (certnamesize == strlen(hostname) && memcmp(hostname, certname, certnamesize) == 0)
+		return 1;
+	return 0;
+}
 
-	if (level > 5)
-		return 0;
-
-	/* find the first different character */
+static int
+hostname_compare_ascii(const char *certname,
+			 size_t certnamesize, const char *hostname)
+{
 	for (;
 	     *certname && *hostname
 	     && c_toupper(*certname) == c_toupper(*hostname);
@@ -595,6 +588,31 @@ _gnutls_hostname_compare(const char *certname,
 	/* the strings are the same */
 	if (certnamesize == 0 && *hostname == '\0')
 		return 1;
+
+	return 0;
+}
+
+/* compare hostname against certificate, taking account of wildcards
+ * return 1 on success or 0 on error
+ *
+ * note: certnamesize is required as X509 certs can contain embedded NULs in
+ * the strings such as CN or subjectAltName.
+ *
+ * Wildcards are taken into account only if they are the leftmost
+ * component, and if the string is ascii only (partial advice from rfc6125)
+ *
+ */
+int
+_gnutls_hostname_compare(const char *certname,
+			 size_t certnamesize, const char *hostname)
+{
+	char *p;
+	unsigned i;
+
+	for (i=0;i<certnamesize;i++) {
+		if (c_isprint(certname[i]) == 0)
+			return hostname_compare_raw(certname, certnamesize, hostname);
+	}
 
 	if (*certname == '*') {
 		/* a wildcard certificate */
@@ -611,8 +629,7 @@ _gnutls_hostname_compare(const char *certname,
 
 		while (1) {
 			/* Use a recursive call to allow multiple wildcards */
-			if (_gnutls_hostname_compare
-			    (certname, certnamesize, hostname, level + 1))
+			if (hostname_compare_ascii(certname, certnamesize, hostname))
 				return 1;
 
 			/* wildcards are only allowed to match a single domain
@@ -623,9 +640,9 @@ _gnutls_hostname_compare(const char *certname,
 		}
 
 		return 0;
+	} else {
+		return hostname_compare_ascii(certname, certnamesize, hostname);
 	}
-
-	return 0;
 }
 
 int

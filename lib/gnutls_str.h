@@ -114,7 +114,7 @@ int _gnutls_hex2bin(const char *hex_data, size_t hex_size,
 		    uint8_t * bin_data, size_t * bin_size);
 
 int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
-			     const char *hostname, int level);
+			     const char *hostname);
 
 #define MAX_CN 256
 #define MAX_DN 1024
