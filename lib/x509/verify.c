@@ -341,7 +341,7 @@ find_issuer(gnutls_x509_crt_t cert,
 	return issuer;
 }
 
-static unsigned int check_time(gnutls_x509_crt_t crt, time_t now)
+static unsigned int check_time_status(gnutls_x509_crt_t crt, time_t now)
 {
 	int status = 0;
 	time_t t;
@@ -760,7 +760,7 @@ verify_crt(gnutls_x509_crt_t cert,
 	if (!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
 		/* check the time of the issuer first */
 		if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS)) {
-			out |= check_time(issuer, now);
+			out |= check_time_status(issuer, now);
 			if (out != 0) {
 				gnutls_assert();
 				result = 0;
@@ -769,7 +769,7 @@ verify_crt(gnutls_x509_crt_t cert,
 			}
 		}
 
-		out |= check_time(cert, now);
+		out |= check_time_status(cert, now);
 		if (out != 0) {
 			gnutls_assert();
 			result = 0;
@@ -818,7 +818,7 @@ gnutls_x509_crt_check_issuer(gnutls_x509_crt_t cert,
  * list should lead to a trusted certificate in order to be trusted.
  */
 unsigned int
-_gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
+_gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 				int clist_size,
 				const gnutls_x509_crt_t * trusted_cas,
 				int tcas_size,
@@ -871,7 +871,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 				if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
 					!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
 					status |=
-					    check_time(trusted_cas[j],
+					    check_time_status(trusted_cas[j],
 						       now);
 					if (status != 0) {
 						if (func)
@@ -966,7 +966,7 @@ cleanup:
  * list should lead to a trusted certificate in order to be trusted.
  */
 unsigned int
-_gnutls_pkcs11_verify_certificate(const char* url,
+_gnutls_pkcs11_verify_crt_status(const char* url,
 				const gnutls_x509_crt_t * certificate_list,
 				unsigned clist_size,
 				unsigned int flags,
@@ -1059,7 +1059,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 		goto cleanup;
 	}
 
-	status = _gnutls_x509_verify_certificate(certificate_list, clist_size,
+	status = _gnutls_verify_crt_status(certificate_list, clist_size,
 				&issuer, 1, flags, func);
 
 cleanup:
@@ -1168,7 +1168,7 @@ gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
 	/* Verify certificate 
 	 */
 	*verify =
-	    _gnutls_x509_verify_certificate(cert_list, cert_list_length,
+	    _gnutls_verify_crt_status(cert_list, cert_list_length,
 					    CA_list, CA_list_length,
 					    flags, NULL);
 
@@ -1211,7 +1211,7 @@ gnutls_x509_crt_verify(gnutls_x509_crt_t cert,
 	/* Verify certificate 
 	 */
 	*verify =
-	    _gnutls_x509_verify_certificate(&cert, 1,
+	    _gnutls_verify_crt_status(&cert, 1,
 					    CA_list, CA_list_length,
 					    flags, NULL);
 	return 0;

@@ -489,8 +489,6 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 /* Takes a certificate list and shortens it if there are
  * intermedia certificates already trusted by us.
  *
- * FIXME: This is very similar to _gnutls_x509_verify_certificate().
- *
  * Returns the new size of the list or a negative number on error.
  */
 static int shorten_clist(gnutls_x509_trust_list_t list,
@@ -731,14 +729,14 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 	if (list->pkcs11_token) {
 		/* use the token for verification */	
 
-		*voutput = _gnutls_pkcs11_verify_certificate(list->pkcs11_token,
+		*voutput = _gnutls_pkcs11_verify_crt_status(list->pkcs11_token,
 								cert_list, cert_list_size,
 								flags, func);
 	} else
 #endif
 	{
 		*voutput =
-		    _gnutls_x509_verify_certificate(cert_list, cert_list_size,
+		    _gnutls_verify_crt_status(cert_list, cert_list_size,
 						    list->node[hash].trusted_cas,
 						    list->
 						    node[hash].trusted_ca_size,

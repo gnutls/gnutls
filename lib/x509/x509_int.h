@@ -360,7 +360,7 @@ int _gnutls_x509_crq_set_extension(gnutls_x509_crq_t crq,
 				   unsigned int critical);
 
 unsigned int
-_gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
+_gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 				int clist_size,
 				const gnutls_x509_crt_t * trusted_cas,
 				int tcas_size,
@@ -369,7 +369,7 @@ _gnutls_x509_verify_certificate(const gnutls_x509_crt_t * certificate_list,
 
 #ifdef ENABLE_PKCS11
 unsigned int
-_gnutls_pkcs11_verify_certificate(const char* url,
+_gnutls_pkcs11_verify_crt_status(const char* url,
 				const gnutls_x509_crt_t * certificate_list,
 				unsigned clist_size,
 				unsigned int flags,
