@@ -83,7 +83,7 @@ static int basic_constraints(const gnutls_datum_t * der)
 			Certificate Authority (CA): TRUE
 			Path Length Constraint: 4
 */
-	ret = gnutls_x509_ext_get_basic_constraints(der, &ca, &pathlen);
+	ret = gnutls_x509_ext_import_basic_constraints(der, &ca, &pathlen);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -136,7 +136,7 @@ static int subject_alt_name(const gnutls_datum_t * der)
 		return ret;
 	}
 
-	ret = gnutls_x509_ext_get_subject_alt_names(der, san, 0);
+	ret = gnutls_x509_ext_import_subject_alt_names(der, san, 0);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -247,7 +247,7 @@ static int ext_key_usage(const gnutls_datum_t * der)
 		return ret;
 	}
 
-	ret = gnutls_x509_ext_get_key_purposes(der, p, 0);
+	ret = gnutls_x509_ext_import_key_purposes(der, p, 0);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -301,7 +301,7 @@ static int crt_policies(const gnutls_datum_t * der)
 		return ret;
 	}
 
-	ret = gnutls_x509_ext_get_policies(der, policies, 0);
+	ret = gnutls_x509_ext_import_policies(der, policies, 0);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -389,7 +389,7 @@ static int key_usage(const gnutls_datum_t * der)
 	int ret;
 	unsigned int usage = 0;
 
-	ret = gnutls_x509_ext_get_key_usage(der, &usage);
+	ret = gnutls_x509_ext_import_key_usage(der, &usage);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -412,7 +412,7 @@ static int subject_key_id(const gnutls_datum_t * der)
 	int ret;
 	gnutls_datum_t id;
 
-	ret = gnutls_x509_ext_get_subject_key_id(der, &id);
+	ret = gnutls_x509_ext_import_subject_key_id(der, &id);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -452,7 +452,7 @@ static int crl_dist_points(const gnutls_datum_t * der)
 		return ret;
 	}
 
-	ret = gnutls_x509_ext_get_crl_dist_points(der, dp, 0);
+	ret = gnutls_x509_ext_import_crl_dist_points(der, dp, 0);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -529,7 +529,7 @@ static int name_constraints(const gnutls_datum_t * der)
 		return ret;
 	}
 
-	ret = gnutls_x509_ext_get_name_constraints(der, nc, 0);
+	ret = gnutls_x509_ext_import_name_constraints(der, nc, 0);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
@@ -620,7 +620,7 @@ static int ext_aia(const gnutls_datum_t * der)
 		return ret;
 	}
 
-	ret = gnutls_x509_ext_get_aia(der, aia, 0);
+	ret = gnutls_x509_ext_import_aia(der, aia, 0);
 	if (ret < 0) {
 		fprintf(stderr, "error in %d\n", __LINE__);
 		return ret;
