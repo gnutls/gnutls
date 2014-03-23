@@ -168,7 +168,7 @@ uint8_t hphash[MAX_HASH_SIZE*2+1];
   if (p == NULL)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
     
-  if (p[0] != '*' && strcmp(p, host) != 0)
+  if (p[0] != '*' && host != NULL && strcmp(p, host) != 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
   /* read service */
@@ -176,7 +176,7 @@ uint8_t hphash[MAX_HASH_SIZE*2+1];
   if (p == NULL)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
     
-  if (p[0] != '*' && strcmp(p, service) != 0)
+  if (p[0] != '*' && service != NULL && strcmp(p, service) != 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
   /* read expiration */
@@ -257,7 +257,7 @@ time_t expiration;
   if (p == NULL)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  if (p[0] != '*' && strcmp(p, host) != 0)
+  if (p[0] != '*' && host != NULL && strcmp(p, host) != 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
   /* read service */
@@ -265,7 +265,7 @@ time_t expiration;
   if (p == NULL)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
     
-  if (p[0] != '*' && strcmp(p, service) != 0)
+  if (p[0] != '*' && service != NULL && strcmp(p, service) != 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
   /* read expiration */
