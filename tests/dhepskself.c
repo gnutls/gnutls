@@ -106,6 +106,16 @@ static void client(int sd)
 			success("client: Handshake was completed\n");
 	}
 
+	ret = gnutls_dh_get_prime_bits(session);
+	if (ret < 512) {
+		fail("server: too small prime size: %d\n", ret);
+	}
+
+	ret = gnutls_dh_get_secret_bits(session);
+	if (ret < 256) {
+		fail("server: too small secret key size: %d\n", ret);
+	}
+
 	gnutls_record_send(session, MSG, strlen(MSG));
 
 	ret = gnutls_record_recv(session, buffer, MAX_BUF);
@@ -229,6 +239,16 @@ static void server(int sd)
 	}
 	if (debug)
 		success("server: Handshake was completed\n");
+
+	ret = gnutls_dh_get_prime_bits(session);
+	if (ret < 512) {
+		fail("server: too small prime size: %d\n", ret);
+	}
+
+	ret = gnutls_dh_get_secret_bits(session);
+	if (ret < 256) {
+		fail("server: too small secret key size: %d\n", ret);
+	}
 
 	/* see the Getting peer's information example */
 	/* print_info(session); */
