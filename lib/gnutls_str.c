@@ -600,6 +600,16 @@ gnutls_hex_encode (const gnutls_datum_t * data, char *result,
   return 0;
 }
 
+static int
+hostname_compare_raw (const char *certname,
+                      size_t certnamesize, const char *hostname)
+{
+  if (certnamesize == strlen (hostname)
+      && memcmp (hostname, certname, certnamesize) == 0)
+    return 1;
+  return 0;
+}
+
 
 /* compare hostname against certificate, taking account of wildcards
  * return 1 on success or 0 on error
@@ -614,8 +624,17 @@ _gnutls_hostname_compare (const char *certname,
                           size_t certnamesize, const char *hostname, int level)
 {
   char *p;
+  unsigned i;
 
-  if (level > 5)
+  if (level == 0)
+    {
+      for (i = 0; i < certnamesize; i++)
+        {
+          if (c_isascii (certname[i]) == 0)
+            return hostname_compare_raw (certname, certnamesize, hostname);
+        }
+    }
+  else if (level > 5)
     return 0;
 
   /* find the first different character */
