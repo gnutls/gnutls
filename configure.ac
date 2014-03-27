@@ -795,6 +795,7 @@ if features are disabled)
   PSK support:          $ac_enable_psk
   DHE support:          $ac_enable_dhe
   ECDHE support:        $ac_enable_ecdhe
+  RSA-EXPORT support:   $ac_enable_rsa_export
   Anon auth support:    $ac_enable_anon
   Heartbeat support:    $ac_enable_heartbeat
   Unicode support:      $ac_have_unicode
