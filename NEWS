@@ -10,6 +10,15 @@ constructor. That is, gnutls_global_init() is no longer required
 unless linking with a static library or a system that does not
 support library constructors.
 
+** libgnutls: static libraries are not built by default.
+
+** libgnutls: PKCS #11 initialization is delayed to first usage.
+That avoids long delays in gnutls initialization due to broken PKCS #11
+modules.
+
+** libgnutls: The PKCS #11 subsystem is re-initialized "automatically"
+on the first PKCS #11 API call after a fork. 
+
 ** libgnutls: certificate verification profiles were introduced
 that can be specified as flags to verification functions. They
 are enumerations in gnutls_certificate_verification_profiles_t
@@ -20,9 +29,6 @@ That allows a compile-time specified configuration file to be
 used to read the priorities. That can be used to impose system
 specific policies.
 
-** libgnutls: Security parameter SEC_PARAM_NORMAL was renamed to 
-SEC_PARAM_MEDIUM to avoid confusion with the priority string NORMAL.
-
 ** libgnutls: Increased the default security level of priority
 strings (NORMAL and PFS strings require at minimum a 1008 DH prime), 
 and set a verification profile by default.  The LEGACY keyword is 
@@ -31,6 +37,9 @@ introduced to set the old defaults.
 ** libgnutls: Added support for the name constraints PKIX extension.
 Currently only DNS names and e-mails are supported (no URIs, IPs
 or DNs).
+
+** libgnutls: Security parameter SEC_PARAM_NORMAL was renamed to 
+SEC_PARAM_MEDIUM to avoid confusion with the priority string NORMAL.
 
 ** libgnutls: Added new API in x509-ext.h to handle X.509 extensions.
 This API handles the X.509 extensions in isolation, allowing to parse
@@ -52,30 +61,6 @@ enforced to be 16-byte aligned, when compiled with cryptodev
 support. That allows certain cryptodev drivers to operate more
 efficiently.
 
-** libgnutls: PKCS #11 initialization is delayed to first usage.
-That avoids long delays in gnutls initialization due to broken PKCS #11
-modules.
-
-** libgnutls: The PKCS #11 subsystem is re-initialized "automatically"
-on the first PKCS #11 API call after a fork. 
-
-** libgnutls: Added --enable-fips140-mode configuration option. That
-option enables (when running on FIPS140-enabled system):
- o RSA, DSA and DH key generation as in FIPS-186-4 (using provable primes)
- o The DRBG-CTR-AES256 deterministic random generator from SP800-90A.
- o Self-tests on initialization on ciphers/MACs, public key algorithms 
-   and the random generator.
- o HMAC-SHA256 verification of the library on load.
- o MD5 is included for TLS purposes but cannot be used by the high level
-   hashing functions.
- o All ciphers except AES are disabled.
- o All MACs and hashes except GCM and SHA are disabled (e.g., HMAC-MD5).
- o All keys (temporal and long term) are zeroized after use.
- o Security levels are adjusted to the FIPS140-2 recommendations (rather
-   than ECRYPT).
-
-** libgnutls: static libraries are not built by default.
-
 ** libgnutls: Depend on p11-kit 0.20.0 or later.
 
 ** libgnutls: The new padding (%NEW_PADDING) experimental TLS extension has
@@ -88,6 +73,21 @@ distribution.
 
 ** certtool: Timestamps for serial numbers were increased to 8 bytes,
 and in batch mode to 12 (appended with 4 random bytes).
+
+** libgnutls: Added --enable-fips140-mode configuration option (unsupported).
+That option enables (when running on FIPS140-enabled system):
+ o RSA, DSA and DH key generation as in FIPS-186-4 (using provable primes)
+ o The DRBG-CTR-AES256 deterministic random generator from SP800-90A.
+ o Self-tests on initialization on ciphers/MACs, public key algorithms 
+   and the random generator.
+ o HMAC-SHA256 verification of the library on load.
+ o MD5 is included for TLS purposes but cannot be used by the high level
+   hashing functions.
+ o All ciphers except AES are disabled.
+ o All MACs and hashes except GCM and SHA are disabled (e.g., HMAC-MD5).
+ o All keys (temporal and long term) are zeroized after use.
+ o Security levels are adjusted to the FIPS140-2 recommendations (rather
+   than ECRYPT).
 
 ** API and ABI modifications:
 gnutls_privkey_generate: Added
