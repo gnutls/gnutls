@@ -14,9 +14,9 @@ these algorithms.
 
 ** libgnutls: Changed the behaviour in wildcard acceptance in certificates.
 Wildcards are only accepted when there are more than two domain components
-after the wildcard. This will prevent accepting certificates from CAs that
-issued '*.com', or 'www.*'.
-
+after the wildcard. This drops support for the permissive RFC2818 wildcards
+and adds more conservative support for the suggestions in RFC6125. Suggested 
+by Jeffrey Walton.
 
 ** API and ABI modifications:
 No changes since last version.
