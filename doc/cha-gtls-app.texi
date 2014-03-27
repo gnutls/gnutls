@@ -912,6 +912,13 @@ and the certificate verification profile is set to GNUTLS_PROFILE_LOW (80-bits).
 
 This priority string implicitly enables DHE and ECDHE.
 
+@item LEGACY @tab
+This sets the NORMAL settings that were used for GnuTLS 3.2.x or earlier. There is
+no verification profile set, and the allowed DH primes are considered
+weak today (but are often used by misconfigured servers).
+
+This priority string implicitly enables DHE and ECDHE.
+
 @item PFS @tab
 Means all the known to be secure ciphersuites that support perfect forward
 secrecy. The ciphers are sorted by security

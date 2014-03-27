@@ -5,6 +5,16 @@ See the end for copying conditions.
 
 * Version 3.3.0 (unreleased)
 
+** libgnutls: The initialization of the library was moved to a
+constructor. That is, gnutls_global_init() is no longer required
+unless linking with a static library or a system that does not
+support library constructors.
+
+** libgnutls: certificate verification profiles were introduced
+that can be specified as flags to verification functions. They
+are enumerations in gnutls_certificate_verification_profiles_t
+and can be converted to flags using GNUTLS_PROFILE_TO_VFLAGS()
+
 ** libgnutls: Added the SYSTEM priority string initial keyword.
 That allows a compile-time specified configuration file to be
 used to read the priorities. That can be used to impose system
@@ -13,17 +23,10 @@ specific policies.
 ** libgnutls: Security parameter SEC_PARAM_NORMAL was renamed to 
 SEC_PARAM_MEDIUM to avoid confusion with the priority string NORMAL.
 
-** libgnutls: certificate verification profiles were introduced
-that can be specified as flags to verification functions. They
-are enumerations in gnutls_certificate_verification_profiles_t
-and can be converted to flags using GNUTLS_PROFILE_TO_VFLAGS()
-
-** libgnutls: When specifying a priority string a corresponding
-certificate verification profile is automatically set.
-
 ** libgnutls: Increased the default security level of priority
-strings to corresponding defaults. The %COMPAT keyword is extended
-to revert to old defaults, by reducing the overall security level.
+strings (NORMAL and PFS strings require at minimum a 1008 DH prime), 
+and set a verification profile by default.  The LEGACY keyword is 
+introduced to set the old defaults.
 
 ** libgnutls: Added support for the name constraints PKIX extension.
 Currently only DNS names and e-mails are supported (no URIs, IPs
@@ -32,11 +35,6 @@ or DNs).
 ** libgnutls: Added new API in x509-ext.h to handle X.509 extensions.
 This API handles the X.509 extensions in isolation, allowing to parse
 similarly formatted extensions stored in other structures.
-
-** libgnutls: The initialization of the library was moved to a
-constructor. That is, gnutls_global_init() is no longer required
-unless linking with a static library or a system that does not
-support library constructors.
 
 ** libgnutls: When generating DSA keys the macro GNUTLS_SUBGROUP_TO_BITS
 can be used to specify a particular subgroup as the number of bits in

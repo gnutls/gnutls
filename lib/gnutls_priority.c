@@ -642,6 +642,7 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 #define LEVEL_SUITEB128 "SUITEB128"
 #define LEVEL_SUITEB192 "SUITEB192"
 #define LEVEL_EXPORT "EXPORT"
+#define LEVEL_LEGACY "LEGACY"
 
 #define SET_PROFILE(to_set) \
 	profile = GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags); \
@@ -746,6 +747,15 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 
 		SET_PROFILE(GNUTLS_PROFILE_SUITEB192);
 		SET_LEVEL(GNUTLS_SEC_PARAM_ULTRA);
+		return 1;
+	} else if (strcasecmp(level, LEVEL_LEGACY) == 0) {
+		func(&priority_cache->cipher, cipher_priority_normal);
+		func(&priority_cache->kx, kx_priority_secure);
+		func(&priority_cache->mac, mac_priority_normal);
+		func(&priority_cache->sign_algo, sign_priority_default);
+		func(&priority_cache->supported_ecc, supported_ecc_normal);
+
+		SET_LEVEL(GNUTLS_SEC_PARAM_VERY_WEAK);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_EXPORT) == 0) {
 		func(&priority_cache->cipher, cipher_priority_performance);
@@ -976,6 +986,10 @@ finish:
  * "PERFORMANCE" means all the "secure" ciphersuites are enabled,
  * limited to 128 bit ciphers and sorted by terms of speed
  * performance.
+ *
+ * "LEGACY" the NORMAL settings for GnuTLS 3.2.x or earlier. There is
+ * no verification profile set, and the allowed DH primes are considered
+ * weak today.
  *
  * "NORMAL" means all "secure" ciphersuites. The 256-bit ciphers are
  * included as a fallback only.  The ciphers are sorted by security
