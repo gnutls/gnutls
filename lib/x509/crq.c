@@ -161,7 +161,7 @@ gnutls_x509_crq_import(gnutls_x509_crq_t crq,
 
 /**
  * gnutls_x509_crq_get_private_key_usage_period:
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @activation: The activation time
  * @expiration: The expiration time
  * @critical: the extension status
@@ -1499,7 +1499,7 @@ gnutls_x509_crq_get_extension_data(gnutls_x509_crq_t crq, int indx,
 
 /**
  * gnutls_x509_crq_get_extension_data2:
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @extension_id: An X.509 extension OID.
  * @indx: Specifies which extension OID to read. Use (0) to get the first one.
  * @data: will contain the extension DER-encoded data

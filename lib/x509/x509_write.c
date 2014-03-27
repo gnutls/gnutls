@@ -1527,7 +1527,7 @@ gnutls_x509_crt_set_authority_info_access(gnutls_x509_crt_t crt,
 
 /**
  * gnutls_x509_crt_set_policy:
- * @cert: should contain a #gnutls_x509_crt_t structure
+ * @crt: should contain a #gnutls_x509_crt_t structure
  * @policy: A pointer to a policy structure.
  * @critical: use non-zero if the extension is marked as critical
  *

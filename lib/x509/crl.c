@@ -270,7 +270,7 @@ gnutls_x509_crl_get_dn_oid(gnutls_x509_crl_t crl,
 
 /**
  * gnutls_x509_crl_get_issuer_dn2:
- * @cert: should contain a #gnutls_x509_crt_t structure
+ * @crl: should contain a #gnutls_x509_crl_t structure
  * @dn: a pointer to a structure to hold the name
  *
  * This function will allocate buffer and copy the name of the CRL issuer.

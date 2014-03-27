@@ -1791,7 +1791,7 @@ void gnutls_x509_policy_release(struct gnutls_x509_policy_st *policy)
 
 /**
  * gnutls_x509_crt_get_policy:
- * @cert: should contain a #gnutls_x509_crt_t structure
+ * @crt: should contain a #gnutls_x509_crt_t structure
  * @indx: This specifies which policy to return. Use (0) to get the first one.
  * @policy: A pointer to a policy structure.
  * @critical: will be non-zero if the extension is marked as critical

@@ -422,7 +422,7 @@ static int file_ocsp_func(gnutls_session_t session, void *ptr,
 
 /**
  * gnutls_certificate_set_ocsp_status_request_file:
- * @session: is a #gnutls_session_t structure.
+ * @sc: is a credentials structure.
  * @response_file: a filename of the OCSP response
  * @flags: should be zero
  *
