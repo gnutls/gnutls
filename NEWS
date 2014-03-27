@@ -3,7 +3,7 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.0 (unreleased)
+* Version 3.3.0 (pre-release 2014-03-27)
 
 ** libgnutls: The initialization of the library was moved to a
 constructor. That is, gnutls_global_init() is no longer required
