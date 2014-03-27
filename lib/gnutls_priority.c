@@ -896,8 +896,9 @@ size_t n, n2;
 		if (*additional == ':') additional++;
 
 		fp = fopen(SYSTEM_PRIORITY_FILE, "r");
-		if (fp == NULL) {/* use backup */
-			goto apply_backup;
+		if (fp == NULL) {/* fail */
+			ret = NULL;
+			goto finish;
 		}
 
 		fseek(fp, 0, SEEK_END);
@@ -905,7 +906,8 @@ size_t n, n2;
 		fseek(fp, 0, SEEK_SET);
 
 		if (n == 0) {
-			goto apply_backup;
+			ret = NULL;
+			goto finish;
 		}
 
 		n2 = strlen(additional);
@@ -916,9 +918,16 @@ size_t n, n2;
 			goto finish;
 		}
 
-		if (fgets(p, n, fp) == NULL) {
-			gnutls_free(p);
-			goto apply_backup;
+		/* read the first line that doesn't start with # */
+		while(1) {
+			if (fgets(p, n, fp) == NULL) {
+				gnutls_free(p);
+				ret = NULL;
+				goto finish;
+			} else if (p[0] == '#')
+				continue;
+
+			break;
 		}
 
 		n = strlen(p);
@@ -938,16 +947,8 @@ size_t n, n2;
 		}
 
 		ret = p;
-		goto finish;
 	} else {
 		return strdup(p);
-	}
-
-apply_backup:
-	if (additional != NULL) {
-		n = asprintf(&ret, "NORMAL:%s", additional);
-	} else {
-		ret = strdup("NORMAL");
 	}
 
 finish:
@@ -981,7 +982,7 @@ finish:
  *
  * "SYSTEM" The system administrator imposed settings. Any options that follow
  * will be appended to the system string. If there is no system string,
- * then NORMAL will be used instead.
+ * then the function will fail.
  *
  * "PERFORMANCE" means all the "secure" ciphersuites are enabled,
  * limited to 128 bit ciphers and sorted by terms of speed
