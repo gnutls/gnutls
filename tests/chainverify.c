@@ -465,6 +465,52 @@ static const char *pathlen_check[] = {
   NULL
 };
 
+static const char *cve_2014_0092_check[] = {
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIDtDCCAmygAwIBAgIETeC0yjANBgkqhkiG9w0BAQsFADAZMRcwFQYDVQQDEw5H\n"
+  "bnVUTFMgVGVzdCBDQTAeFw0xMTA1MjgwODM5MzlaFw0zODEwMTIwODM5NDBaMC8x\n"
+  "LTArBgNVBAMTJEdudUFBQSBUZXN0IFNlcnZlciAoUlNBIGNlcnRpZmljYXRlKTCC\n"
+  "AVIwDQYJKoZIhvcNAQEBBQADggE/ADCCAToCggExALRrJ5glr8H/HsqwfvTYvO1D\n"
+  "hmdUXdq0HsKQX4M8AhH8E3KFsoikZUELdl8jvoqf/nlLczsux0s8vxbJl1U1F/Oh\n"
+  "ckswwuAnlBLzVgDmzoJLEV2kHpv6+rkbKk0Ytbql5gzHqKihbaqIhNyWDrJsHDWq\n"
+  "58eUPfnVx8KiDUuzbnr3CF/FCc0Vkxr3mN8qTGaJJO0f0BZjgWWlWDuhzSVim5mB\n"
+  "VAgXGOx8LwiiOyhXMp0XRwqG+2KxQZnm+96o6iB+8xvuuuqaIWQpkvKtc+UZBZ03\n"
+  "U+IRnxhfIrriiw0AjJ4vp4c9QL5KoqWSCAwuYcBYfJqZ4dasgzklzz4b7eujbZ3L\n"
+  "xTjewcdumzQUvjA+gpAeuUqaduTvMwxGojFy9sNhC/iqZ4n0peV2N6Epn4B5qnUC\n"
+  "AwEAAaOBjTCBijAMBgNVHRMBAf8EAjAAMBQGA1UdEQQNMAuCCWxvY2FsaG9zdDAT\n"
+  "BgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBR2\n"
+  "B1hM6rUp9S2ABoyDSoINCeyT3jAfBgNVHSMEGDAWgBRNVrdqAFjxZ5L0pnVVG45T\n"
+  "AQPvzzANBgkqhkiG9w0BAQsFAAOCATEBdNWmTsh5uIfngyhOWwm7pK2+vgUMY8nH\n"
+  "gMoMFHt0yuxuImcUMXu3LRS1dZSoCJACBpTFGi/Dg2U0qvOHQcEmc3OwNqHB90R3\n"
+  "LG5jUSCtq/bYW7h/6Gd9KeWCgZczaHbQ9IPTjLH1dLswVPt+fXKB6Eh0ggSrGATE\n"
+  "/wRZT/XgDCW8t4C+2+TmJ8ZEzvU87KAPQ9rUBS1+p3EUAR/FfMApApsEig1IZ+ZD\n"
+  "5joaGBW7zh1H0B9mEKidRvD7yuRJyzAcvD25nT15NLW0QR3dEeXosLc720xxJl1h\n"
+  "h8NJ7YOvn323mOjR9er4i4D6iJlXmJ8tvN9vakCankWvBzb7plFn2sfMQqICFpRc\n"
+  "w075D8hdQxfpGffL2tEeKSgjyNHXS7x3dFhUpN3IQjUi2x4f2e/ZXg==\n"
+  "-----END CERTIFICATE-----\n",
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIDUDCCAgigAwIBAgIBADANBgkqhkiG9w0BAQsFADAZMRcwFQYDVQQDEw5HbnVU\n"
+  "TFMgVGVzdCBDQTAeFw0xMTA1MjgwODM2MzBaFw0zODEwMTIwODM2MzNaMBkxFzAV\n"
+  "BgNVBAMTDkdudVRMUyBUZXN0IENBMIIBUjANBgkqhkiG9w0BAQEFAAOCAT8AMIIB\n"
+  "OgKCATEAnORCsX1unl//fy2d1054XduIg/3CqVBaT3Hca65SEoDwh0KiPtQoOgZL\n"
+  "dKY2cobGs/ojYtOjcs0KnlPYdmtjEh6WEhuJU95v4TQdC4OLMiE56eIGq252hZAb\n"
+  "HoTL84Q14DxQWGuzQK830iml7fbw2WcIcRQ8vFGs8SzfXw63+MI6Fq6iMAQIqP08\n"
+  "WzGmRRzL5wvCiPhCVkrPmwbXoABub6AAsYwWPJB91M9/lx5gFH5k9/iPfi3s2Kg3\n"
+  "F8MOcppqFYjxDSnsfiz6eMh1+bYVIAo367vGVYHigXMEZC2FezlwIHaZzpEoFlY3\n"
+  "a7LFJ00yrjQ910r8UE+CEMTYzE40D0olCMo7FA9RCjeO3bUIoYaIdVTUGWEGHWSe\n"
+  "oxGei9Gkm6u+ASj8f+i0jxdD2qXsewIDAQABo0MwQTAPBgNVHRMBAf8EBTADAQH/\n"
+  "MA8GA1UdDwEB/wQFAwMHBgAwHQYDVR0OBBYEFE1Wt2oAWPFnkvSmdVUbjlMBA+/P\n"
+  "MA0GCSqGSIb3DQEBCwUAA4IBMQAesOgjGFi1zOYpA/N3gkUVRcBHDxmN7g2yOcqH\n"
+  "VfhFc+e4zhOehR11WCt2RgzNlnYVmV5zBmQBdTAt8Po/MVhLCDW1BULHlLvL0DFc\n"
+  "4sB1RlcGeQcCKQa4b+Q9VWf4f6TfuEWZQC5j5stiXjVgOqrOMrzKZ2eKWA4JsL9s\n"
+  "V+7ANSZE+hOt1X1mA8moyqe95U2Ecih+nFJSWSBd1WFiEzVnXv4FVWPXbH9HERDK\n"
+  "VbasjofWWmQO1YlQPishLgm1IbwqOkOk4sDgoLuUZ4GgP0DDeN6EmRDOzByrv+9u\n"
+  "f45Bl9IQf4IJNPLU9lEqjyMOydqT6kBi7fjV5ICuQZ4EeVJsOGuX7PqNyoDzJHLv\n"
+  "ferRfNLr6eQSHSxBhS0cVyDjb5gCawK6u7xTU+b7xikEie9k\n"
+  "-----END CERTIFICATE-----\n",
+  NULL
+};
+
 /* Triggers incorrect verification success on older versions */
 static const char *cve_2008_4989_chain[] = {
   /* chain[0] */
@@ -1135,6 +1181,8 @@ static struct
   unsigned int expected_verify_result;
 } chains[] =
 {
+  { "CVE-2014-0092", cve_2014_0092_check, &cve_2014_0092_check[1],
+    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
   { "CVE-2008-4989", cve_2008_4989_chain, &cve_2008_4989_chain[2],
     0, GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID },
   { "verisign.com v1 fail", verisign_com_chain, &verisign_com_chain[3],
