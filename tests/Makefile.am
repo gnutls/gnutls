@@ -87,8 +87,6 @@ openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
 endif
 endif
 
-mini_xssl_LDADD = $(LDADD) ../lib/libgnutls-xssl.la
-
 if !WINDOWS
 mini_global_load_LDADD = $(LDADD) -ldl
 endif
