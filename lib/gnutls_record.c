@@ -1524,7 +1524,7 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
 						       record_presend_buffer.
 						       length);
 			}
-			while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+			while (ret < 0 && (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN));
 		} else {
 			ret =
 			    gnutls_record_send(session,
