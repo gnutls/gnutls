@@ -1456,7 +1456,7 @@ ssize_t total = 0;
               ret = gnutls_record_send(session, session->internals.record_presend_buffer.data, 
                                        session->internals.record_presend_buffer.length);
             }
-          while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+          while (ret < 0 && (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN));
         }
       else
         {
