@@ -70,7 +70,6 @@ static pid_t child;
 #define MAX_BUF 24*1024
 #define MAX_MTU 20*1024
 
-
 static void client(int fd)
 {
 	gnutls_session_t session;
@@ -129,8 +128,7 @@ static void client(int fd)
 	do {
 		ret = gnutls_record_recv(session, buffer, sizeof(buffer));
 	}
-	while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED
-	       || ret > 0);
+	while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED || ret > 0);
 
 	if (ret < 0) {
 		fail("recv: %s\n", gnutls_strerror(ret));
@@ -145,7 +143,6 @@ static void client(int fd)
 
 	gnutls_global_deinit();
 }
-
 
 static void terminate(void)
 {
@@ -207,7 +204,7 @@ static void server(int fd)
 
 	/* see the Getting peer's information example */
 	/* print_info(session); */
-	
+
 	/* avoid uninitialized warnings */
 	memset(buffer, 1, sizeof(buffer));
 
@@ -256,6 +253,47 @@ static void server(int fd)
 	    gnutls_record_send(session, buffer,
 			       gnutls_dtls_get_data_mtu(session));
 	if (ret > 16384 || ret < 0) {
+		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
+	}
+
+	/* test cork and uncork */
+	gnutls_record_cork(session);
+
+	ret =
+	    gnutls_record_send(session, buffer,
+			       gnutls_dtls_get_data_mtu(session));
+	if (ret < 0) {
+		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
+	}
+
+	ret = gnutls_record_uncork(session, 0);
+	if (ret < 0) {
+		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
+	}
+
+	gnutls_record_cork(session);
+
+	ret =
+	    gnutls_record_send(session, buffer,
+			       gnutls_dtls_get_data_mtu(session) - 16);
+	if (ret < 0) {
+		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
+	}
+
+	ret =
+	    gnutls_record_send(session, buffer,
+			       gnutls_dtls_get_data_mtu(session));
+	if (ret != GNUTLS_E_LARGE_PACKET) {
+		terminate();
+		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
+	}
+
+	ret = gnutls_record_uncork(session, GNUTLS_RECORD_WAIT);
+	if (ret < 0) {
 		terminate();
 		fail("send[%d]: %s\n", __LINE__, gnutls_strerror(ret));
 	}
