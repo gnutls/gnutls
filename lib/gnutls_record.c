@@ -1445,6 +1445,10 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
  * by gnutls_dtls_get_data_mtu(). The errno value EMSGSIZE
  * also maps to %GNUTLS_E_LARGE_PACKET.
  *
+ * Note that since 3.3.0 when sending under cork in DTLS mode, this
+ * function will refuse to send data over the MTU size by returning
+ * %GNUTLS_E_LARGE_PACKET.
+ *
  * Returns: The number of bytes sent, or a negative error code.  The
  *   number of bytes sent might be less than @data_size.  The maximum
  *   number of bytes this function can send in a single call depends
@@ -1461,6 +1465,13 @@ gnutls_record_send(gnutls_session_t session, const void *data,
 	} else {		/* GNUTLS_CORKED */
 
 		int ret;
+
+		if (IS_DTLS(session)) {
+			if (data_size + session->internals.record_presend_buffer.length >
+				gnutls_dtls_get_data_mtu(session)) {
+				return gnutls_assert_val(GNUTLS_E_LARGE_PACKET);
+			}
+		}
 
 		ret =
 		    _gnutls_buffer_append_data(&session->internals.
@@ -1480,6 +1491,8 @@ gnutls_record_send(gnutls_session_t session, const void *data,
  * If called gnutls_record_send() will no longer send partial records.
  * All queued records will be sent when gnutls_uncork() is called, or
  * when the maximum record size is reached.
+ *
+ * This function is safe to use with DTLS after GnuTLS 3.3.0.
  *
  * Since: 3.1.9
  **/
@@ -1531,7 +1544,7 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
 						       record_presend_buffer.
 						       length);
 			}
-			while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+			while (ret < 0 && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 		} else {
 			ret =
 			    gnutls_record_send(session,
