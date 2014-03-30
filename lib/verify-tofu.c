@@ -81,8 +81,8 @@ struct gnutls_tdb_int default_tdb = {
  * @cert: The raw (der) data of the certificate
  * @flags: should be 0.
  *
- * This function will try to verify the provided certificate using
- * a list of stored public keys.  The @service field if non-NULL should
+ * This function will try to verify the provided (raw or DER-encoded) certificate 
+ * using a list of stored public keys.  The @service field if non-NULL should
  * be a port number.
  *
  * The @retrieve variable if non-null specifies a custom backend for
@@ -103,7 +103,7 @@ struct gnutls_tdb_int default_tdb = {
  * is returned. On success, %GNUTLS_E_SUCCESS (0) is returned, 
  * or a negative error value on other errors.
  *
- * Since: 3.0
+ * Since: 3.0.13
  **/
 int
 gnutls_verify_stored_pubkey(const char *db_name,
@@ -602,7 +602,7 @@ int store_commitment(const char *db_name, const char *host,
  * @expiration: The expiration time (use 0 to disable expiration)
  * @flags: should be 0.
  *
- * This function will store the provided certificate to 
+ * This function will store the provided (raw or DER-encoded) certificate to 
  * the list of stored public keys. The key will be considered valid until 
  * the provided expiration time.
  *
@@ -613,7 +613,7 @@ int store_commitment(const char *db_name, const char *host,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0
+ * Since: 3.0.13
  **/
 int
 gnutls_store_pubkey(const char *db_name,
