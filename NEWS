@@ -8,8 +8,8 @@ See the end for copying conditions.
 ** libgnutls: gnutls_openpgp_keyring_import will no longer fail silently
 if there are no base64 data. Report and patch by Ramkumar Chinchani.
 
-** libgnutls: gnutls_record_send is now safe to be called when in corked
-mode.
+** libgnutls: gnutls_record_send is now safe to be called under DTLS when
+in corked mode.
 
 ** libgnutls: Ciphersuites that use the SHA256 or SHA384 MACs are
 only available in TLS 1.0 as SSL 3.0 doesn't specify parameters for
