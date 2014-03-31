@@ -542,8 +542,7 @@ int gnutls_certificate_get_peers_subkey_id(gnutls_session_t session,
  * Get whether client certificate is requested or not.
  *
  * Returns: 0 if the peer (server) did not request client
- *   authentication or 1 otherwise, or a negative error code in case of
- *   error.
+ *   authentication or 1 otherwise.
  **/
 int gnutls_certificate_client_get_request_status(gnutls_session_t session)
 {
