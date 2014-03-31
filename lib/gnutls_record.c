@@ -1438,7 +1438,7 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
  * error code if the send data exceed the data MTU value - as returned
  * by gnutls_dtls_get_data_mtu(). The errno value EMSGSIZE
  * also maps to %GNUTLS_E_LARGE_PACKET. 
- * Note that since 3.2.12 this function can be called under cork in DTLS
+ * Note that since 3.2.13 this function can be called under cork in DTLS
  * mode, and will refuse to send data over the MTU size by returning
  * %GNUTLS_E_LARGE_PACKET.
  *
