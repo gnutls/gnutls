@@ -1429,23 +1429,23 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
  * difference is that it accepts a GnuTLS session, and uses different
  * error codes.
  * Note that if the send buffer is full, send() will block this
- * function.  See the send() documentation for full information.  You
- * can replace the default push function by using
- * gnutls_transport_set_ptr2() with a call to send() with a
- * MSG_DONTWAIT flag if blocking is a problem.
- * If the EINTR is returned by the internal push function (the
- * default is send()) then %GNUTLS_E_INTERRUPTED will be returned. If
+ * function.  See the send() documentation for more information.  
+ *
+ * You can replace the default push function which is send(), by using
+ * gnutls_transport_set_push_function().
+ *
+ * If the EINTR is returned by the internal push function 
+ * then %GNUTLS_E_INTERRUPTED will be returned. If
  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
- * call this function again, with the same parameters; alternatively
+ * call this function again, with the exact same parameters; alternatively
  * you could provide a %NULL pointer for data, and 0 for
  * size. cf. gnutls_record_get_direction(). 
  *
  * Note that in DTLS this function will return the %GNUTLS_E_LARGE_PACKET
  * error code if the send data exceed the data MTU value - as returned
  * by gnutls_dtls_get_data_mtu(). The errno value EMSGSIZE
- * also maps to %GNUTLS_E_LARGE_PACKET.
- *
- * Note that since 3.3.0 when sending under cork in DTLS mode, this
+ * also maps to %GNUTLS_E_LARGE_PACKET. 
+ * Note that since 3.3.0 when called under cork in DTLS mode, this
  * function will refuse to send data over the MTU size by returning
  * %GNUTLS_E_LARGE_PACKET.
  *
