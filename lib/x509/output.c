@@ -1720,10 +1720,8 @@ print_fingerprint(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 		return;
 	}
 
-	if (algo == GNUTLS_DIG_MD5)
-		adds(str, _("\tMD5 fingerprint:\n\t\t"));
-	else
-		adds(str, _("\tSHA-1 fingerprint:\n\t\t"));
+	addf(str, _("\t%s fingerprint:\n\t\t"), gnutls_mac_get_name((gnutls_mac_algorithm_t)algo));
+
 	_gnutls_buffer_hexprint(str, buffer, size);
 	adds(str, "\n");
 }
@@ -1773,6 +1771,7 @@ print_other(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 {
 	if (format != GNUTLS_CRT_PRINT_UNSIGNED_FULL) {
 		print_fingerprint(str, cert, GNUTLS_DIG_SHA1);
+		print_fingerprint(str, cert, GNUTLS_DIG_SHA256);
 	}
 	print_keyid(str, cert);
 }
