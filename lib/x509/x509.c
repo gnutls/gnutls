@@ -2298,7 +2298,8 @@ gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn,
  * @buf_size: initially holds the size of @buf
  *
  * This function will calculate and copy the certificate's fingerprint
- * in the provided buffer.
+ * in the provided buffer. The fingerprint is a hash of the DER-encoded
+ * data of the certificate.
  *
  * If the buffer is null then only the size will be filled.
  *
