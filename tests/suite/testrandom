@@ -26,6 +26,31 @@ CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 counter=0
 file=test.out
 
+counter=0
+
+echo "Testing verification with randomly generated certificates..."
+while [ $counter -lt 400 ]
+do
+  $srcdir/x509random.pl > $srcdir/$file
+  $CERTTOOL -i --inder --infile $srcdir/$file --outfile $srcdir/$file.pem >/dev/null 2>&1
+  if test $? != 0;then
+  	continue
+  fi
+
+  cat $srcdir/$file.pem $srcdir/../certs/ca-cert-ecc.pem > $srcdir/$file-chain.pem
+
+  $CERTTOOL -e --infile $srcdir/$file-chain.pem >/dev/null 2>&1
+  ret=$?
+  if [ $ret != 1 ];then
+  	echo "Succeeded verification with $file-chain.pem!"
+  	exit 1
+  fi
+  rm -f $srcdir/$file.pem $srcdir/$file-chain.pem
+
+  counter=`expr $counter + 1`
+done
+
+
 echo "Testing with randomly generated certificates..."
 while [ $counter -lt 200 ]
 do
