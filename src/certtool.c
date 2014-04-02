@@ -315,9 +315,9 @@ generate_certificate(gnutls_privkey_t * ret_key,
 	{
 		size_t serial_size;
 		unsigned char serial[16];
-		
+
 		serial_size = sizeof(serial);
-		
+
 		get_serial(serial, &serial_size);
 
 		result = gnutls_x509_crt_set_serial(crt, serial, serial_size);
@@ -683,18 +683,16 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 	}
 
 	{
-		unsigned int number = get_crl_number();
-		char bin_number[5];
+		size_t serial_size;
+		unsigned char serial[16];
 
-		bin_number[4] = number & 0xff;
-		bin_number[3] = (number >> 8) & 0xff;
-		bin_number[2] = (number >> 16) & 0xff;
-		bin_number[1] = (number >> 24) & 0xff;
-		bin_number[0] = 0;
+		serial_size = sizeof(serial);
 
-		result = gnutls_x509_crl_set_number(crl, bin_number, 5);
+		get_crl_number(serial, &serial_size);
+
+		result = gnutls_x509_crl_set_number(crl, serial, serial_size);
 		if (result < 0) {
-			fprintf(stderr, "set_number: %s\n",
+			fprintf(stderr, "crl set_number: %s\n",
 				gnutls_strerror(result));
 			exit(1);
 		}

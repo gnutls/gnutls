@@ -717,6 +717,7 @@ encryption_key
 #crl_next_update = 43
 
 # this is the 5th CRL by this CA
+# Comment the field for a time-based number.
 #crl_number = 5
 
 @end example

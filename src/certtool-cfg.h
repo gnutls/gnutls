@@ -55,7 +55,7 @@ void get_serial(unsigned char* serial, size_t* serial_size);
 time_t get_expiration_date(void);
 time_t get_activation_date(void);
 int get_ca_status(void);
-int get_crl_number(void);
+void get_crl_number(unsigned char* serial, size_t* serial_size);
 int get_path_len(void);
 int get_crq_extensions_status(void);
 const char *get_pkcs12_key_name(void);

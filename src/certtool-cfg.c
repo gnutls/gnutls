@@ -114,6 +114,7 @@ void cfg_init(void)
 {
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.path_len = -1;
+	cfg.crl_number = -1;
 	cfg.serial = -1;
 }
 
@@ -949,7 +950,8 @@ void get_pkcs9_email_crt_set(gnutls_x509_crt_t crt)
 
 }
 
-void get_serial(unsigned char* serial, size_t * size)
+
+void get_rand_int_value(unsigned char* serial, size_t * size, int64_t cfg_val, const char *msg)
 {
 	struct timespec ts;
 	char dserial[12];
@@ -966,7 +968,7 @@ void get_serial(unsigned char* serial, size_t * size)
 		exit(1);
 	}
 
-	if (batch && cfg.serial < 0) {
+	if (batch && cfg_val < 0) {
 		serial[0] = (ts.tv_sec >> 24) & 0xff;
 		serial[1] = (ts.tv_sec >> 16) & 0xff;
 		serial[2] = (ts.tv_sec >> 8) & 0xff;
@@ -982,18 +984,19 @@ void get_serial(unsigned char* serial, size_t * size)
 	}
 
 	if (batch) {
-		default_serial[0] = cfg.serial >> 32;
-		default_serial[1] = cfg.serial;
+		default_serial[0] = cfg_val >> 32;
+		default_serial[1] = cfg_val;
 	} else {
 		unsigned long default_serial_int;
+		char tmsg[256];
+
 #if SIZEOF_LONG < 8
 		default_serial_int = ts.tv_sec;
 #else
 		default_serial_int = (ts.tv_sec << 32) | ts.tv_nsec;
 #endif
-		default_serial_int = read_int_with_default
-		    ("Enter the certificate's serial number in decimal (default: %lu): ",
-		     (unsigned long)default_serial_int);
+		snprintf(tmsg, sizeof(tmsg), "%s (default: %lu): ", msg);
+		default_serial_int = read_int_with_default(tmsg, (long)default_serial_int);
 
 		default_serial[0] = default_serial_int >> 32;
 		default_serial[1] = default_serial_int;
@@ -1012,6 +1015,11 @@ void get_serial(unsigned char* serial, size_t * size)
 	*size = 8;
 
 	return;
+}
+
+void get_serial(unsigned char* serial, size_t * size)
+{
+	return get_rand_int_value(serial, size, cfg.serial, "Enter the certificate's serial number in decimal");
 }
 
 static
@@ -1115,13 +1123,9 @@ int get_crq_extensions_status(void)
 	}
 }
 
-int get_crl_number(void)
+void get_crl_number(unsigned char* serial, size_t * size)
 {
-	if (batch) {
-		return cfg.crl_number;
-	} else {
-		return read_int_with_default("CRL Number: ", 1);
-	}
+	return get_rand_int_value(serial, size, cfg.serial, "CRL Number");
 }
 
 int get_path_len(void)
