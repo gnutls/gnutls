@@ -772,6 +772,10 @@ void doit(void)
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
+	ret = gnutls_x509_crt_check_hostname2(x509, "www.example.org", GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS);
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
 	ret = gnutls_x509_crt_check_hostname(x509, "foo.example.org");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);

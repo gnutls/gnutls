@@ -171,6 +171,8 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert,
 				  size_t * buf_size);
 int gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 				   const char *hostname);
+int gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
+	 			    const char *hostname, unsigned int flags);
 
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert);
 int gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
@@ -790,6 +792,8 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
  *   this unless you understand the security implications.
  * @GNUTLS_VERIFY_DISABLE_CRL_CHECKS: Disable checking for validity
  *   using certificate revocation lists or the available OCSP data.
+ * @GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS: When including a hostname
+ *   check in the verification, do not consider any wildcards.
  *
  * Enumeration of different certificate verify flags. Additional
  * verification profiles can be set using GNUTLS_PROFILE_TO_VFLAGS()
@@ -807,6 +811,7 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DISABLE_CRL_CHECKS = 1 << 9,
 	GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN = 1 << 10,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN = 1 << 11,
+	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12,
 } gnutls_certificate_verify_flags;
 
 /**

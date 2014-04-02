@@ -93,6 +93,7 @@ That option enables (when running on FIPS140-enabled system):
    than ECRYPT).
 
 ** API and ABI modifications:
+GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS: Added
 gnutls_privkey_generate: Added
 gnutls_pkcs11_crt_is_known: Added
 gnutls_fips140_mode_enabled: Added
@@ -109,6 +110,8 @@ gnutls_privkey_import_ecc_raw: Added
 gnutls_privkey_import_dsa_raw: Added
 gnutls_privkey_import_rsa_raw: Added
 gnutls_privkey_verify_params: Added
+gnutls_x509_crt_check_hostname2: Added
+gnutls_openpgp_crt_check_hostname2: Added
 gnutls_x509_name_constraints_init: Added
 gnutls_x509_name_constraints_deinit: Added
 gnutls_x509_crt_get_name_constraints: Added

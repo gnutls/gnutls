@@ -604,7 +604,7 @@ hostname_compare_ascii(const char *certname,
  */
 int
 _gnutls_hostname_compare(const char *certname,
-			 size_t certnamesize, const char *hostname)
+			 size_t certnamesize, const char *hostname, unsigned vflags)
 {
 	char *p;
 	unsigned i;
@@ -614,7 +614,7 @@ _gnutls_hostname_compare(const char *certname,
 			return hostname_compare_raw(certname, certnamesize, hostname);
 	}
 
-	if (*certname == '*') {
+	if (*certname == '*' && !(vflags & GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS)) {
 		/* a wildcard certificate */
 
 		/* ensure that we have at least two domain components after
@@ -628,7 +628,6 @@ _gnutls_hostname_compare(const char *certname,
 		certnamesize--;
 
 		while (1) {
-			/* Use a recursive call to allow multiple wildcards */
 			if (hostname_compare_ascii(certname, certnamesize, hostname))
 				return 1;
 

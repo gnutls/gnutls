@@ -1008,6 +1008,8 @@ GNUTLS_3_1_0 {
 	gnutls_x509_key_purpose_get;
 	gnutls_x509_ext_import_key_purposes;
 	gnutls_x509_ext_export_key_purposes;
+	gnutls_x509_crt_check_hostname2;
+	gnutls_openpgp_crt_check_hostname2;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

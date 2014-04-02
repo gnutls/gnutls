@@ -300,8 +300,8 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 
 	if (hostname) {
 		ret =
-		    gnutls_x509_crt_check_hostname(peer_certificate_list
-						   [0], hostname);
+		    gnutls_x509_crt_check_hostname2(peer_certificate_list
+						   [0], hostname, verify_flags);
 		if (ret == 0)
 			*status |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
 	}

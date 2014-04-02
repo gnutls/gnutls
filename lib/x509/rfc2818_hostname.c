@@ -47,6 +47,33 @@ int
 gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 			       const char *hostname)
 {
+	return gnutls_x509_crt_check_hostname2(cert, hostname, 0);
+}
+
+/**
+ * gnutls_x509_crt_check_hostname:
+ * @cert: should contain an gnutls_x509_crt_t structure
+ * @hostname: A null terminated string that contains a DNS name
+ * @flags: gnutls_certificate_verify_flags
+ *
+ * This function will check if the given certificate's subject matches
+ * the given hostname.  This is a basic implementation of the matching
+ * described in RFC2818 (HTTPS), which takes into account wildcards,
+ * and the DNSName/IPAddress subject alternative name PKIX extension.
+ *
+ * The comparison may have false-negatives as it is done byte by byte in 
+ * non-ascii names.
+ *
+ * Unless, the flag %GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS is specified,
+ * wildcards are only considered if the domain name consists of three
+ * components or more, and the wildcard starts at the leftmost position.
+ *
+ * Returns: non-zero for a successful match, and zero on failure.
+ **/
+int
+gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
+			        const char *hostname, unsigned int flags)
+{
 
 	char dnsname[MAX_CN];
 	size_t dnsnamesize;
@@ -79,7 +106,7 @@ gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 		if (ret == GNUTLS_SAN_DNSNAME) {
 			found_dnsname = 1;
 			if (_gnutls_hostname_compare
-			    (dnsname, dnsnamesize, hostname)) {
+			    (dnsname, dnsnamesize, hostname, flags)) {
 				return 1;
 			}
 		}
@@ -98,7 +125,7 @@ gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 		}
 
 		if (_gnutls_hostname_compare
-		    (dnsname, dnsnamesize, hostname)) {
+		    (dnsname, dnsnamesize, hostname, flags)) {
 			return 1;
 		}
 	}

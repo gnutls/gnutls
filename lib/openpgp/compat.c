@@ -47,7 +47,9 @@ int
 _gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t cred,
 			   const char *hostname,
 			   const gnutls_datum_t * cert_list,
-			   int cert_list_length, unsigned int *status)
+			   int cert_list_length,
+			   unsigned int verify_flags,
+			   unsigned int *status)
 {
 	int ret = 0;
 	gnutls_openpgp_crt_t key = NULL;
@@ -96,7 +98,7 @@ _gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t cred,
 		*status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 
 	if (hostname) {
-		ret = gnutls_openpgp_crt_check_hostname(key, hostname);
+		ret = gnutls_openpgp_crt_check_hostname2(key, hostname, verify_flags);
 		if (ret == 0)
 			*status |= GNUTLS_CERT_UNEXPECTED_OWNER;
 	}

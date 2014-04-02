@@ -575,6 +575,7 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
 	cert_auth_info_t info;
 	gnutls_certificate_credentials_t cred;
 	int peer_certificate_list_size, ret;
+	unsigned int verify_flags;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
@@ -594,6 +595,8 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 
+	verify_flags = cred->verify_flags | session->internals.priorities.additional_verify_flags;
+
 	/* generate a list of gnutls_certs based on the auth info
 	 * raw certs.
 	 */
@@ -609,7 +612,9 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
 	ret =
 	    _gnutls_openpgp_verify_key(cred, hostname,
 				       &info->raw_certificate_list[0],
-				       peer_certificate_list_size, status);
+				       peer_certificate_list_size,
+				       verify_flags,
+				       status);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -630,6 +635,8 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
  * values or zero if the certificate is trusted. Note that value in @status
  * is set only when the return value of this function is success (i.e, failure 
  * to trust a certificate does not imply a negative return value).
+ * The default verification flags used by this function can be overriden
+ * using gnutls_certificate_set_verify_flags().
  *
  * If available the OCSP Certificate Status extension will be
  * utilized by this function.
@@ -685,6 +692,8 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * values or zero if the certificate is trusted. Note that value in @status
  * is set only when the return value of this function is success (i.e, failure 
  * to trust a certificate does not imply a negative return value).
+ * The default verification flags used by this function can be overriden
+ * using gnutls_certificate_set_verify_flags().
  *
  * If the @hostname provided is non-NULL then this function will compare
  * the hostname in the certificate against the given. The comparison will
