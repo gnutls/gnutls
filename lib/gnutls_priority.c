@@ -786,6 +786,10 @@ static void enable_stateless_compression(gnutls_priority_t c)
 {
 	c->stateless_compression = 1;
 }
+static void disable_wildcards(gnutls_priority_t c)
+{
+	c->additional_verify_flags |= GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS;
+}
 static void enable_profile_low(gnutls_priority_t c)
 {
 	c->additional_verify_flags &= 0x00ffffff;

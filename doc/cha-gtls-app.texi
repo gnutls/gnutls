@@ -1105,6 +1105,10 @@ is in control of input data. This has to be used only when the
 data that are possibly controlled by an attacker are placed in
 separate records.
 
+@item %DISABLE_WILDCARDS @tab
+will disable matching wildcards when comparing hostnames
+in certificates.
+
 @item %DISABLE_SAFE_RENEGOTIATION @tab
 will completely disable safe renegotiation
 completely.  Do not use unless you know what you are doing.

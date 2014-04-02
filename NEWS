@@ -71,6 +71,8 @@ distribution.
 
 ** libgnutls: Reduced the number of gnulib modules used.
 
+** libgnutls: Added priority string %DISABLE_WILDCARDS.
+
 ** certtool: Timestamps for serial numbers were increased to 8 bytes,
 and in batch mode to 12 (appended with 4 random bytes).
 
