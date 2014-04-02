@@ -360,7 +360,7 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 
 	fd = fopen(info->cert, "r");
 	if (fd == NULL) {
-		fprintf(stderr, "%s\n", info->cert);
+		fprintf(stderr, "Could not open %s\n", info->cert);
 		exit(1);
 	}
 
