@@ -1125,7 +1125,7 @@ int get_crq_extensions_status(void)
 
 void get_crl_number(unsigned char* serial, size_t * size)
 {
-	return get_rand_int_value(serial, size, cfg.serial, "CRL Number");
+	return get_rand_int_value(serial, size, cfg.crl_number, "CRL Number");
 }
 
 int get_path_len(void)
