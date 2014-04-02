@@ -61,7 +61,7 @@ int get_crq_extensions_status(void);
 const char *get_pkcs12_key_name(void);
 int get_tls_client_status(void);
 int get_tls_server_status(void);
-int get_crl_next_update(void);
+time_t get_crl_next_update(void);
 int get_time_stamp_status(void);
 int get_ocsp_sign_status(void);
 int get_code_sign_status(void);

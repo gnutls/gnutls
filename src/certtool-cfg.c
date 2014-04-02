@@ -1071,21 +1071,21 @@ time_t now = time(NULL);
         return secs;
 }
 
-time_t get_expiration_date()
+time_t get_int_date(const char *txt_val, int int_val, const char *msg)
 {
 	if (batch) {
-		if (cfg.expiration_date == NULL) {
+		if (txt_val == NULL) {
 		        time_t secs;
 		        
-        		if (cfg.expiration_days == 0 || cfg.expiration_days < -2)
+        		if (int_val == 0 || int_val < -2)
         		        secs = days_to_secs(365);
                         else {
-                                secs = days_to_secs(cfg.expiration_days);
+                                secs = days_to_secs(int_val);
                         }
 
 			return secs;
 		} else
-			return get_date(cfg.expiration_date);
+			return get_date(txt_val);
 	} else {
 		int days;
 
@@ -1097,6 +1097,11 @@ time_t get_expiration_date()
 		while (days == 0);
 		return days_to_secs(days);
 	}
+}
+
+time_t get_expiration_date()
+{
+	return get_int_date(cfg.expiration_date, cfg.expiration_days, "The certificate will expire in (days): ");
 }
 
 int get_ca_status(void)
@@ -1661,24 +1666,9 @@ int get_ipsec_ike_status(void)
 	}
 }
 
-int get_crl_next_update(void)
+time_t get_crl_next_update()
 {
-	int days;
-
-	if (batch) {
-		if (cfg.crl_next_update <= 0)
-			return 365;
-		else
-			return cfg.crl_next_update;
-	} else {
-		do {
-			days =
-			    read_int
-			    ("The next CRL will be issued in (days): ");
-		}
-		while (days == 0);
-		return days;
-	}
+	return get_int_date(NULL, cfg.crl_next_update, "The next CRL will be issued in (days): ");
 }
 
 const char *get_proxy_policy(char **policy, size_t * policylen)

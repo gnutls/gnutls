@@ -713,7 +713,8 @@ encryption_key
 
 # Options for generating a CRL
 
-# next CRL update will be in 43 days (wow)
+# The number of days the next CRL update will be due.
+# next CRL update will be in 43 days
 #crl_next_update = 43
 
 # this is the 5th CRL by this CA

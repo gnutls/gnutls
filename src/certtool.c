@@ -609,9 +609,9 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 	gnutls_x509_crl_t crl;
 	gnutls_x509_crt_t *crts;
 	size_t size;
-	int days, result;
+	int result;
 	unsigned int i;
-	time_t now = time(NULL);
+	time_t secs, now = time(0);
 
 	result = gnutls_x509_crl_init(&crl);
 	if (result < 0) {
@@ -638,11 +638,10 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 	}
 
 	fprintf(stderr, "Update times.\n");
-	days = get_crl_next_update();
+	secs = get_crl_next_update();
 
 	result =
-	    gnutls_x509_crl_set_next_update(crl,
-					    now + days * 24 * 60 * 60);
+	    gnutls_x509_crl_set_next_update(crl, secs);
 	if (result < 0) {
 		fprintf(stderr, "next_update: %s\n",
 			gnutls_strerror(result));
