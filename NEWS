@@ -8,6 +8,9 @@ See the end for copying conditions.
 only available in TLS 1.0 as SSL 3.0 doesn't specify parameters for
 these algorithms.
 
+** libgnutls: gnutls_record_send is now safe to be called under DTLS when
+in corked mode.
+
 ** libgnutls: Changed the behaviour in wildcard acceptance in certificates.
 Wildcards are only accepted when there are more than two domain components
 after the wildcard. This drops support for the permissive RFC2818 wildcards
