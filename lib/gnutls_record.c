@@ -1485,7 +1485,7 @@ gnutls_record_send(gnutls_session_t session, const void *data,
  * All queued records will be sent when gnutls_uncork() is called, or
  * when the maximum record size is reached.
  *
- * This function is safe to use with DTLS after GnuTLS 3.3.0.
+ * This function is safe to use with DTLS after GnuTLS 3.2.13.
  *
  * Since: 3.1.9
  **/
