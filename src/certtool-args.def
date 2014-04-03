@@ -166,7 +166,13 @@ flag = {
 flag = {
     name      = null-password;
     descrip   = "Enforce a NULL password";
-    doc   = "This option enforces a NULL password. This may be different than the empty password in some schemas.";
+    doc   = "This option enforces a NULL password. This is different than the empty password in schemas like PKCS #8.";
+};
+
+flag = {
+    name      = empty-password;
+    descrip   = "Enforce an empty password";
+    doc   = "This option enforces a NULL password. This is different than the null password in schemas like PKCS #8.";
 };
 
 flag = {
