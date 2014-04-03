@@ -104,20 +104,25 @@ gnutls_datum_t *load_secret_key(int mand, common_info_st * info)
 const char *get_password(common_info_st * cinfo, unsigned int *flags,
 			 int confirm)
 {
+	const char *p;
+
 	if (cinfo->null_password) {
 		if (flags)
 			*flags |= GNUTLS_PKCS_NULL_PASSWORD;
 		return NULL;
 	} else if (cinfo->password) {
-		if (cinfo->password[0] == 0 && flags)
-			*flags |= GNUTLS_PKCS_PLAIN;
-		return cinfo->password;
+		p = cinfo->password;
 	} else {
 		if (confirm)
-			return get_confirmed_pass(true);
+			p = get_confirmed_pass(true);
 		else
-			return get_pass();
+			p = get_pass();
 	}
+
+	if (p[0] == 0 && flags && !cinfo->empty_password)
+		*flags |= GNUTLS_PKCS_PLAIN;
+
+	return p;
 }
 
 static gnutls_privkey_t _load_privkey(gnutls_datum_t * dat,
