@@ -76,6 +76,10 @@ distribution.
 ** certtool: Timestamps for serial numbers were increased to 8 bytes,
 and in batch mode to 12 (appended with 4 random bytes).
 
+** certtool: When no password is provided to export a PKCS #8 keys, do
+not encrypt by default. The previous behavior of encrypting using a
+null password can be replicating using the new parameter --empty-password.
+
 ** certtool: When no CRL number is provided (or value set to -1), then
 a time-based number will be used.
 
