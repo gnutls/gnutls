@@ -644,6 +644,21 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
                                               trusted_ca_size, flags,
                                               func);
 
+#define LAST_DN cert_list[cert_list_size-1]->raw_dn
+#define LAST_IDN cert_list[cert_list_size-1]->raw_issuer_dn
+
+    if ((*verify) & GNUTLS_CERT_SIGNER_NOT_FOUND &&
+      (LAST_DN.size != LAST_IDN.size || memcmp(LAST_DN.data, LAST_IDN.data, LAST_IDN.size) != 0)) 
+      {
+        hash = hash_pjw_bare(cert_list[cert_list_size - 1]->raw_dn.data, cert_list[cert_list_size - 1]->raw_dn.size);
+        hash %= list->size;
+        *verify = _gnutls_x509_verify_certificate(cert_list, cert_list_size,
+                                              list->node[hash].trusted_cas,
+                                              list->node[hash].
+                                              trusted_ca_size, flags,
+                                              func);
+      }
+
     if (*verify != 0 || (flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS))
         return 0;
 
