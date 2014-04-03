@@ -26,6 +26,7 @@ by running './configure --help'.
     cd gnutls-<version>
     ./configure --prefix=/usr
     make
+    make check
     sudo make install
 
 The commands above build and install the static archive (libgnutls.a),
