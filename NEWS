@@ -17,6 +17,10 @@ after the wildcard. This drops support for the permissive RFC2818 wildcards
 and adds more conservative support based on the suggestions in RFC6125. Suggested 
 by Jeffrey Walton.
 
+** certtool: When no password is provided to export a PKCS #8 keys, do
+not encrypt by default. The previous behavior of encrypting using a
+null password can be replicating using the new parameter --empty-password.
+
 ** API and ABI modifications:
 No changes since last version.
 
