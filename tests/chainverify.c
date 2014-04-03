@@ -1308,7 +1308,8 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	for (i = 0; chains[i].chain; i++) {
-		unsigned int verify_status;
+		gnutls_x509_trust_list_t tl;
+		unsigned int verify_status, verify_status1;
 		gnutls_x509_crt_t certs[4];
 		gnutls_x509_crt_t ca;
 		gnutls_datum_t tmp;
@@ -1428,6 +1429,39 @@ void doit(void)
 				exit(1);
 		} else if (debug)
 			printf("done\n");
+
+		gnutls_x509_trust_list_init(&tl, 0);
+
+		ret =
+		    gnutls_x509_trust_list_add_cas(tl, &ca, 1, 0);
+		if (ret != 1) {
+			fail("gnutls_x509_trust_list_add_trust_mem\n");
+			exit(1);
+		}
+
+		/* make sure that the two functions don't diverge */
+		ret = gnutls_x509_trust_list_verify_crt(tl, certs, j, chains[i].verify_flags,
+						&verify_status1, NULL);
+		if (ret < 0) {
+			fprintf(stderr,
+				"gnutls_x509_crt_list_verify[%d,%d]: %s\n",
+				(int) i, (int) j, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (verify_status != verify_status1) {
+			gnutls_datum_t out1, out2;
+			gnutls_certificate_verification_status_print
+			    (verify_status, GNUTLS_CRT_X509, &out1, 0);
+			gnutls_certificate_verification_status_print(verify_status1,
+								     GNUTLS_CRT_X509,
+								     &out2,
+								     0);
+			fail("chain[%s]:\nverify_status: %d: %s\ntrust list vstatus: %d: %s\n", chains[i].name, verify_status, out1.data, verify_status1, out2.data);
+			gnutls_free(out1.data);
+			gnutls_free(out2.data);
+		}
+
 		if (debug)
 			printf("\tCleanup...");
 
