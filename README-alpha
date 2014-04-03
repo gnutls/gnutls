@@ -66,6 +66,10 @@ Then build the project normally:
 $ make
 $ make check
 
+Individual tests that may require additional hardware (e.g., smart cards)
+are:
+$ sh tests/suite/testpkcs11
+
 If you wish to contribute, you may read more about our coding style in
 doc/README.CODING_STYLE. Note that when contributing code that is not 
 assigned to FSF, you will need to assert that the contribution is in 
