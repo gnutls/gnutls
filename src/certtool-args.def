@@ -148,7 +148,7 @@ flag = {
     name      = password;
     arg-type  = string;
     descrip   = "Password to use";
-    doc   = "";
+    doc   = "You can use this option to specify the password in the command line instead of reading it from the tty. Note, that the command line arguments are available for view in others in the system. Specifying password as '' is the same as specifying no password.";
 };
 
 flag = {
@@ -166,7 +166,7 @@ flag = {
 flag = {
     name      = null-password;
     descrip   = "Enforce a NULL password";
-    doc   = "This option enforces a NULL password. This may be different than the empty password in some schemas.";
+    doc   = "This option enforces a NULL password. This is different than the empty or no password in schemas like PKCS #8.";
 };
 
 flag = {
