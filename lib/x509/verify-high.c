@@ -741,6 +741,29 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 						    list->
 						    node[hash].trusted_ca_size,
 						    flags, func);
+
+#define LAST_DN cert_list[cert_list_size-1]->raw_dn
+#define LAST_IDN cert_list[cert_list_size-1]->raw_issuer_dn
+
+		if ((*voutput) & GNUTLS_CERT_SIGNER_NOT_FOUND &&
+			(LAST_DN.size != LAST_IDN.size ||
+			 memcmp(LAST_DN.data, LAST_IDN.data, LAST_IDN.size) != 0)) {
+
+			/* if we couldn't find the issuer, try to see if the last
+			 * certificate is in the trusted list and try to verify against
+			 * (if it is not self signed) */
+			hash =
+			    hash_pjw_bare(cert_list[cert_list_size - 1]->raw_dn.
+				  data, cert_list[cert_list_size - 1]->raw_dn.size);
+			hash %= list->size;
+
+			*voutput =
+			    _gnutls_verify_crt_status(cert_list, cert_list_size,
+						    list->node[hash].trusted_cas,
+						    list->
+						    node[hash].trusted_ca_size,
+						    flags, func);
+		}
 	}
 
 	if (*voutput != 0 || (flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS))
