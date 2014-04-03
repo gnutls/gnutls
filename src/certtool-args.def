@@ -170,6 +170,12 @@ flag = {
 };
 
 flag = {
+    name      = empty-password;
+    descrip   = "Enforce an empty password";
+    doc   = "This option enforces an empty password. This is different than the NULL or no password in schemas like PKCS #8.";
+};
+
+flag = {
     name      = certificate-info;
     value     = i;
     descrip   = "Print information on the given certificate";

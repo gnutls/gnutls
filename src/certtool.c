@@ -1129,6 +1129,11 @@ static void cmd_parser(int argc, char **argv)
 		cinfo.password = "";
 	}
 
+	if (HAVE_OPT(EMPTY_PASSWORD)) {
+		cinfo.empty_password = 1;
+		cinfo.password = "";
+	}
+
 	if (HAVE_OPT(GENERATE_SELF_SIGNED))
 		generate_self_signed(&cinfo);
 	else if (HAVE_OPT(GENERATE_CERTIFICATE))
