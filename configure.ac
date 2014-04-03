@@ -742,7 +742,7 @@ AC_CONFIG_FILES([
   tests/dtls/Makefile
   tests/srp/Makefile
   tests/ecdsa/Makefile
-  tests/key-id/Makefile
+  tests/key-tests/Makefile
   tests/openpgp-certs/Makefile
   tests/pkcs1-padding/Makefile
   tests/pkcs12-decode/Makefile

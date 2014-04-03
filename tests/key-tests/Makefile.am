@@ -20,11 +20,12 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 EXTRA_DIST = README key-ca.pem key-user.pem \
-	ca-gnutls-keyid.pem ca-no-keyid.pem ca-weird-keyid.pem
+	ca-gnutls-keyid.pem ca-no-keyid.pem ca-weird-keyid.pem \
+	key-ca-1234.p8 key-ca-empty.p8 key-ca-null.p8 
 
 dist_check_SCRIPTS = key-id
 
-TESTS = key-id
+TESTS = key-id pkcs8
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
