@@ -2947,6 +2947,14 @@ find_cert(struct pkcs11_session_info *sinfo,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
+	/* the DISTRUSTED flag is p11-kit module specific */
+	if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED) {
+		if (memcmp(lib_info->manufacturer_id, "PKCS#11 Kit", 11) != 0) {
+			gnutls_assert();
+			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		}
+	}
+
 	if (priv->dn.size == 0 && priv->key_id.size == 0 && priv->issuer_dn.size == 0 &&
 		priv->serial.size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -3228,6 +3236,9 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
  * This function can be used with a @url of "pkcs11:", and in that case all modules
  * will be searched. To restrict the modules to the marked as trusted in p11-kit
  * use the %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE flag.
+ *
+ * Note that the flag %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED is
+ * specific to p11-kit trust modules.
  *
  * Returns: If the certificate exists non-zero is returned, otherwise zero.
  *
