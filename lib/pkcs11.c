@@ -208,7 +208,7 @@ static int scan_slots(struct gnutls_pkcs11_provider_st *p,
 }
 
 static int
-pkcs11_add_module(const char* name, struct ck_function_list *module)
+pkcs11_add_module(const char* name, struct ck_function_list *module, const char *params)
 {
 	unsigned int i;
 	struct ck_info info;
@@ -234,7 +234,8 @@ pkcs11_add_module(const char* name, struct ck_function_list *module)
 	providers[active_providers - 1].module = module;
 	providers[active_providers - 1].active = 1;
 
-	if (p11_kit_module_get_flags(module) & P11_KIT_MODULE_TRUSTED)
+	if (p11_kit_module_get_flags(module) & P11_KIT_MODULE_TRUSTED ||
+		(params != NULL && strstr(params, "trusted") != 0))
 		providers[active_providers - 1].trusted = 1;
 
 	memcpy(&providers[active_providers - 1].info, &info, sizeof(info));
@@ -294,6 +295,9 @@ int _gnutls_pkcs11_check_init(void)
  * list used in gnutls. After this function is called the module will
  * be used for PKCS 11 operations.
  *
+ * When loading a module to be used for certificate verification,
+ * use the string 'trusted' as @params.
+ *
  * Note that this function is not thread safe.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -323,7 +327,7 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 		return pkcs11_rv_to_err(ret);
 	}
 
-	ret = pkcs11_add_module(name, module);
+	ret = pkcs11_add_module(name, module, params);
 	if (ret != 0) {
 		if (ret == GNUTLS_E_INT_RET_0)
 			ret = 0;
@@ -543,7 +547,7 @@ static int auto_load(void)
 		_gnutls_debug_log
 			    ("p11: Initializing module: %s\n", name);
 
-		ret = pkcs11_add_module(name, modules[i]);
+		ret = pkcs11_add_module(name, modules[i], NULL);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log
