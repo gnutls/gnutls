@@ -952,9 +952,7 @@ gnutls_certificate_set_x509_key_mem2(gnutls_certificate_credentials_t res,
 static int check_if_sorted(gnutls_pcert_st * crt, int nr)
 {
 	gnutls_x509_crt_t x509;
-	void *prev_dn = NULL;
-	void *dn;
-	size_t prev_dn_size = 0, dn_size;
+	gnutls_x509_crt_t prev = NULL;
 	int i, ret;
 
 	/* check if the X.509 list is ordered */
@@ -974,28 +972,25 @@ static int check_if_sorted(gnutls_pcert_st * crt, int nr)
 			}
 
 			if (i > 0) {
-				dn_size = x509->raw_dn.size;
-				dn = x509->raw_dn.data;
-
-				if (dn_size != prev_dn_size
-				    || memcmp(dn, prev_dn, dn_size) != 0) {
+				if (gnutls_x509_crt_check_issuer(prev, x509) == 0) {
 					ret =
 					    gnutls_assert_val
 					    (GNUTLS_E_CERTIFICATE_LIST_UNSORTED);
 					goto cleanup;
 				}
+
+				gnutls_x509_crt_deinit(prev);
 			}
 
-			prev_dn_size = x509->raw_issuer_dn.size;
-			prev_dn = x509->raw_issuer_dn.data;
-
-			gnutls_x509_crt_deinit(x509);
+			prev = x509;
 		}
+		gnutls_x509_crt_deinit(prev);
 	}
 
 	return 0;
 
 cleanup:
+	gnutls_x509_crt_deinit(prev);
 	gnutls_x509_crt_deinit(x509);
 	return ret;
 }
