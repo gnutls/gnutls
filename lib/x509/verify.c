@@ -868,6 +868,7 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 				/* explicit time check for trusted CA that we remove from
 				 * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
 				 */
+
 				if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
 					!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
 					status |=
@@ -976,6 +977,7 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 	unsigned int status = 0, i;
 	gnutls_x509_crt_t issuer = NULL;
 	gnutls_datum_t raw_issuer = {NULL, 0};
+	time_t now = gnutls_time(0);
 
 	if (clist_size > 1) {
 		/* Check if the last certificate in the path is self signed.
@@ -1008,6 +1010,21 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
 			GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
 			GNUTLS_PKCS11_OBJ_FLAG_COMPARE|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED) != 0) {
+
+			if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
+				!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
+				status |=
+				    check_time_status(certificate_list[i], now);
+				if (status != 0) {
+					if (func)
+						func(certificate_list[i], certificate_list[i], NULL, status);
+					return status;
+				}
+			}
+			if (func)
+				func(certificate_list[i],
+				     certificate_list[i], NULL, status);
+
 			clist_size = i;
 			break;
 		}
@@ -1039,6 +1056,7 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 	if (ret < 0) {
 		gnutls_assert();
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE && clist_size > 2) {
+
 			/* check if the last certificate in the chain is present
 			 * in our trusted list, and if yes, verify against it. */
 			ret = gnutls_pkcs11_crt_is_known(url, certificate_list[clist_size - 1],
@@ -1048,6 +1066,7 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 					&certificate_list[clist_size - 1], 1, flags, func);
 			}
 		}
+
 		status |= GNUTLS_CERT_INVALID;
 		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 		goto cleanup;
