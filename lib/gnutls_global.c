@@ -310,16 +310,10 @@ int gnutls_global_init(void)
 	return ret;
 }
 
-/**
- * gnutls_global_deinit:
- *
- * This function deinitializes the global data, that were initialized
- * using gnutls_global_init().
- *
- **/
-void gnutls_global_deinit(void)
+static void _gnutls_global_deinit(unsigned destructor)
 {
 	GNUTLS_STATIC_MUTEX_LOCK(global_init_mutex);
+
 	if (_gnutls_init == 1) {
 		_gnutls_init = 0;
 		gnutls_crypto_deinit();
@@ -329,10 +323,16 @@ void gnutls_global_deinit(void)
 		asn1_delete_structure(&_gnutls_pkix1_asn);
 		_gnutls_crypto_deregister();
 		gnutls_system_global_deinit();
-		
 		_gnutls_cryptodev_deinit();
+
 #ifdef ENABLE_PKCS11
-		gnutls_pkcs11_deinit();
+		/* Do not try to deinitialize the PKCS #11 libraries
+		 * from the destructor. If we do and the PKCS #11 modules
+		 * are already being unloaded, we may crash.
+		 */
+		if (destructor == 0) {
+			gnutls_pkcs11_deinit();
+		}
 #endif
 
 		gnutls_mutex_deinit(&_gnutls_file_mutex);
@@ -342,6 +342,18 @@ void gnutls_global_deinit(void)
 			_gnutls_init--;
 	}
 	GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
+}
+
+/**
+ * gnutls_global_deinit:
+ *
+ * This function deinitializes the global data, that were initialized
+ * using gnutls_global_init().
+ *
+ **/
+void gnutls_global_deinit(void)
+{
+	return _gnutls_global_deinit(0);
 }
 
 /**
@@ -379,5 +391,5 @@ int ret;
 
 _DESTRUCTOR static void lib_deinit(void)
 {
-	gnutls_global_deinit();
+	_gnutls_global_deinit(1);
 }
