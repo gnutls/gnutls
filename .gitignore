@@ -700,3 +700,7 @@ lib/priority_options.h
 tests/name-constraints
 tests/x509-extensions
 tests/sec-params
+tests/suite/pkcs11-chainverify
+tests/suite/softhsm.config
+tests/suite/softhsm.db
+tests/suite/softhsm.db-journal
