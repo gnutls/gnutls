@@ -3256,6 +3256,7 @@ int _gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 		return 0;
 	}
 
+	/* Attempt searching using the issuer DN + serial number */
 	serial_size = sizeof(serial) - sizeof(tag);
 	ret =
 	    gnutls_x509_crt_get_serial(cert, serial+sizeof(tag), &serial_size);
@@ -3292,6 +3293,17 @@ int _gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 	ret =
 	    _pkcs11_traverse_tokens(find_cert, &priv, info,
 				    NULL, pkcs11_obj_flags_to_int(flags));
+	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		/* attempt searching with the subject DN only */
+		memset(&priv, 0, sizeof(priv));
+		priv.crt = cert;
+
+		priv.dn.data = cert->raw_dn.data;
+		priv.dn.size = cert->raw_dn.size;
+		ret =
+		    _pkcs11_traverse_tokens(find_cert, &priv, info,
+				    NULL, pkcs11_obj_flags_to_int(flags));
+	}
 	if (ret < 0) {
 		gnutls_assert();
 		ret = 0;

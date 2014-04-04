@@ -805,6 +805,16 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 		&raw_issuer, GNUTLS_X509_FMT_DER, GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 	if (ret < 0) {
 		gnutls_assert();
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE && clist_size > 2) {
+			/* check if the last certificate in the chain is present
+			 * in our trusted list, and if yes, verify against it. */
+			ret = gnutls_pkcs11_crt_is_known(url, certificate_list[clist_size - 1],
+			 	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_COMPARE);
+			if (ret != 0) {
+				return _gnutls_verify_crt_status(certificate_list, clist_size,
+					&certificate_list[clist_size - 1], 1, flags, func);
+			}
+		}
 		status |= GNUTLS_CERT_INVALID;
 		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 		return status;
