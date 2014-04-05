@@ -56,12 +56,13 @@ if test "$1" = "pkcs15";then
     exit 1
   fi
 else
-  export SOFTHSM_CONF="softhsm.config"
+  export SOFTHSM_CONF="softhsm-testpkcs11.config"
   if test -f /usr/lib/softhsm/libsofthsm.so;then
     ADDITIONAL_PARAM="--provider /usr/lib/softhsm/libsofthsm.so"
   else
     ADDITIONAL_PARAM="--provider /usr/lib/softhsm/libsofthsm.so"
   fi
+  echo "0:./softhsm-testpkcs11.db" > $SOFTHSM_CONF
 
   echo -n "* Initializing smart card... "
   softhsm --init-token --slot 0 --label "GnuTLS-Test" --so-pin 1234 --pin 1234 >/dev/null 2>&1
@@ -190,6 +191,6 @@ wait
 echo ok
 
 echo "* All smart cards tests succeeded"
-rm -f tmp-client.crt tmp-client.pub
+rm -f tmp-client.crt tmp-client.pub $SOFTHSM_CONF
 
 exit 0

@@ -702,5 +702,6 @@ tests/x509-extensions
 tests/sec-params
 tests/suite/pkcs11-chainverify
 tests/suite/softhsm.config
-tests/suite/softhsm.db
-tests/suite/softhsm.db-journal
+tests/suite/softhsm*.db
+tests/suite/softhsm*.db-journal
+tests/suite/softhsm*.config
