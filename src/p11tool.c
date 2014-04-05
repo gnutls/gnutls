@@ -99,9 +99,6 @@ cmd_parser (int argc, char **argv)
   if (debug > 1)
     printf ("Setting log level to %d\n", debug);
 
-  if ((ret = gnutls_global_init ()) < 0)
-    error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
-
   if (HAVE_OPT(PROVIDER))
     {
       ret = gnutls_pkcs11_init (GNUTLS_PKCS11_FLAG_MANUAL, NULL);
@@ -115,12 +112,9 @@ cmd_parser (int argc, char **argv)
                    gnutls_strerror (ret));
         }
     }
-  else
-    {
-      ret = gnutls_pkcs11_init (GNUTLS_PKCS11_FLAG_AUTO, NULL);
-      if (ret < 0)
-        fprintf (stderr, "pkcs11_init: %s", gnutls_strerror (ret));
-    }
+
+  if ((ret = gnutls_global_init ()) < 0)
+    error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
 
   if (HAVE_OPT(OUTFILE))
     {
