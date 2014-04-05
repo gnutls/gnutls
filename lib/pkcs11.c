@@ -3392,6 +3392,7 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 		/* attempt searching with the subject DN only */
 		memset(&priv, 0, sizeof(priv));
 		priv.crt = cert;
+		priv.flags = flags;
 
 		priv.dn.data = cert->raw_dn.data;
 		priv.dn.size = cert->raw_dn.size;
