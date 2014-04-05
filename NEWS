@@ -21,6 +21,9 @@ by Jeffrey Walton.
 not encrypt by default. The previous behavior of encrypting using a
 null password can be replicating using the new parameter --empty-password.
 
+** p11tool: Avoid dual initialization of the PKCS #11 subsystem when
+the --provider option is given.
+
 ** API and ABI modifications:
 No changes since last version.
 
