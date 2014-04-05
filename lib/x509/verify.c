@@ -778,7 +778,7 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 			if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
 				!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
 				status |=
-				    check_time_status(certificate_list[i], now);
+				    check_time(certificate_list[i], now);
 				if (status != 0) {
 					if (func)
 						func(certificate_list[i], certificate_list[i], NULL, status);
@@ -823,10 +823,10 @@ _gnutls_pkcs11_verify_certificate(const char* url,
 
 			/* check if the last certificate in the chain is present
 			 * in our trusted list, and if yes, verify against it. */
-			ret = gnutls_pkcs11_crt_is_known(url, certificate_list[clist_size - 1],
+			ret = _gnutls_pkcs11_crt_is_known(url, certificate_list[clist_size - 1],
 			 	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_COMPARE);
 			if (ret != 0) {
-				return _gnutls_verify_crt_status(certificate_list, clist_size,
+				return _gnutls_x509_verify_certificate(certificate_list, clist_size,
 					&certificate_list[clist_size - 1], 1, flags, func);
 			}
 		}
