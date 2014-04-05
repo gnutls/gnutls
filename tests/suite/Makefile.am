@@ -83,9 +83,11 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 
-nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom
+nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom \
+	testpkcs11
 
-TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn testcompat chain invalid-cert
+TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn testcompat chain invalid-cert \
+	testpkcs11
 
 if ENABLE_PKCS11
 check_PROGRAMS += pkcs11-chainverify

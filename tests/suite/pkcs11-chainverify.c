@@ -36,6 +36,7 @@
 #include "../test-chains.h"
 
 #define URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
+#define CONFIG "softhsm.config"
 
 /* GnuTLS internally calls time() to find out the current time when
    verifying certificates.  To avoid a time bomb, we hard code the
@@ -113,7 +114,7 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	/* write softhsm.config */
-	fp = fopen("softhsm.config", "w");
+	fp = fopen(CONFIG, "w");
 	if (fp == NULL) {
 		fprintf(stderr, "error writing softhsm.config\n");
 		exit(1);
@@ -121,7 +122,7 @@ void doit(void)
 	fputs("0:./softhsm.db\n", fp);
 	fclose(fp);
 
-	setenv("SOFTHSM_CONF", "softhsm.config", 0);
+	setenv("SOFTHSM_CONF", CONFIG, 0);
 
 	system("softhsm --init-token --slot 0 --label test --so-pin 1234 --pin 1234");
 
@@ -292,6 +293,7 @@ void doit(void)
 
 	if (debug)
 		printf("Exit status...%d\n", exit_val);
+	remove(CONFIG);
 
 	exit(exit_val);
 }
