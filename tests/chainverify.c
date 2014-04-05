@@ -1189,6 +1189,7 @@ void doit(void)
 		if (debug)
 			printf("\tCleanup...");
 
+		gnutls_x509_trust_list_deinit(tl, 0);
 		gnutls_x509_crt_deinit(ca);
 		for (j = 0; chains[i].chain[j]; j++)
 			gnutls_x509_crt_deinit(certs[j]);
