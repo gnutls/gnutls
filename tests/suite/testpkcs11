@@ -31,6 +31,10 @@ if test "${WINDIR}" != "";then
   exit 77
 fi 
 
+if ! test -x "/usr/bin/softhsm";then
+  exit 77
+fi
+
 . $srcdir/../scripts/common.sh
 
 echo "Testing PKCS11 support"
