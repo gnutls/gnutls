@@ -385,6 +385,14 @@ flag = {
     doc   = "Cipher may be one of 3des, 3des-pkcs12, aes-128, aes-192, aes-256, rc2-40, arcfour.";
 };
 
+flag = {
+    name      = provider;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Specify the PKCS #11 provider library";
+    doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
+};
+
 doc-section = {
   ds-type = 'SEE ALSO';
   ds-format = 'texi';

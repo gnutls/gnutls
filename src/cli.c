@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2013-2014 Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -1614,6 +1615,25 @@ psk_callback(gnutls_session_t session, char **username,
 static void init_global_tls_stuff(void)
 {
 	int ret;
+
+#ifdef ENABLE_PKCS11
+	if (HAVE_OPT(PROVIDER)) {
+		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
+		if (ret < 0)
+			fprintf(stderr, "pkcs11_init: %s",
+				gnutls_strerror(ret));
+		else {
+			ret =
+			    gnutls_pkcs11_add_provider(OPT_ARG(PROVIDER),
+						       NULL);
+			if (ret < 0) {
+				fprintf(stderr, "pkcs11_add_provider: %s",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+	}
+#endif
 
 	/* X509 stuff */
 	if (gnutls_certificate_allocate_credentials(&xcred) < 0) {
