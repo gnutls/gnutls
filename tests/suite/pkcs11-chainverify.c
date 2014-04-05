@@ -67,12 +67,16 @@ int pin_func(void* userdata, int attempt, const char* url, const char *label,
 	return -1;
 }
 
+#define LIB1 "/usr/lib64/softhsm/libsofthsm.so"
+#define LIB2 "/usr/lib/softhsm/libsofthsm.so"
+
 void doit(void)
 {
 	int exit_val = 0;
 	size_t i;
 	int ret;
 	FILE *fp;
+	const char *lib;
 
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
@@ -81,10 +85,20 @@ void doit(void)
 	exit(77);
 #endif
 
-	if (access("/usr/bin/softhsm", X_OK) < 0 ||
-	    access("/usr/lib64/softhsm/libsofthsm.so", X_OK) < 0) {
+	if (access("/usr/bin/softhsm", X_OK) < 0) {
+		fprintf(stderr, "cannot find softhsm binary\n");
 		exit(77);
 	}
+
+	if (access(LIB1, R_OK) == 0) {
+		lib = LIB1;
+	} else if (access(LIB2, R_OK) == 0) {
+		lib = LIB2;
+	} else {
+		fprintf(stderr, "cannot find softhsm module\n");
+		exit(77);
+	}
+
 
 	ret = global_init();
 	if (ret != 0) {
@@ -108,10 +122,10 @@ void doit(void)
 	fclose(fp);
 
 	setenv("SOFTHSM_CONF", "softhsm.config", 0);
-	
+
 	system("softhsm --init-token --slot 0 --label test --so-pin 1234 --pin 1234");
 
-	ret = gnutls_pkcs11_add_provider("/usr/lib64/softhsm/libsofthsm.so", "trusted");
+	ret = gnutls_pkcs11_add_provider(lib, "trusted");
 	if (ret < 0) {
 		fprintf(stderr, "gnutls_x509_crt_init: %s\n",
 			gnutls_strerror(ret));
