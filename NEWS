@@ -18,8 +18,9 @@ and adds more conservative support based on the suggestions in RFC6125. Suggeste
 by Jeffrey Walton.
 
 ** certtool: When no password is provided to export a PKCS #8 keys, do
-not encrypt by default. The previous behavior of encrypting using a
-null password can be replicating using the new parameter --empty-password.
+not encrypt by default. This reverts to the certtool behavior of gnutls
+3.0. The previous behavior of encrypting using an empty password can be
+replicating using the new parameter --empty-password.
 
 ** p11tool: Avoid dual initialization of the PKCS #11 subsystem when
 the --provider option is given.
