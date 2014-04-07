@@ -882,7 +882,7 @@ static char *check_str(char *line, size_t line_size, const char *needle, size_t 
 	char *p;
 	unsigned n;
 
-	if (c_isspace(*line)) {
+	while (c_isspace(*line)) {
 		line++;
 		line_size--;
 	}
@@ -892,9 +892,18 @@ static char *check_str(char *line, size_t line_size, const char *needle, size_t 
 
 	if (memcmp(line, needle, needle_size) == 0) {
 		p = &line[needle_size];
-		if (*p == '=' || c_isspace(*p)) {
+		while (c_isspace(*p)) {
 			p++;
 		}
+		if (*p != '=') {
+			return NULL;
+		} else
+			p++;
+
+		while (c_isspace(*p)) {
+			p++;
+		}
+
 		n = strlen(p);
 
 		if (n > 1 && p[n-1] == '\n') {
@@ -930,7 +939,7 @@ int l;
 FILE* fp = NULL;
 size_t n, n2 = 0, line_size;
 
-	if (c_isspace(*p))
+	while (c_isspace(*p))
 		p++;
 
 	if (*p == '@') {
