@@ -1,11 +1,13 @@
 SMP=-j4
 
-GNUTLS_VERSION:=3.2.12
+GNUTLS_VERSION:=3.2.13
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
-GMP_VERSION=5.1.3
-GMP_FILE:=gmp-$(GMP_VERSION).tar.bz2
+GMP_VERSION=6.0.0
+GMP_VERSIONA=6.0.0a
+GMP_FILE:=gmp-$(GMP_VERSIONA).tar.bz2
+GMP_SERV_DIR:=gmp-$(GMP_VERSIONA)
 GMP_DIR:=gmp-$(GMP_VERSION)
 
 P11_KIT_VERSION=0.20.2
@@ -59,7 +61,8 @@ $(BIN_DIR):
 $(LIB_DIR):
 	mkdir -p $(LIB_DIR)
 
-CONFIG_ENV := PKG_CONFIG_LIBDIR="$(PKG_CONFIG_DIR):$(PKG_CONFIG_PATH)"
+CONFIG_ENV := PKG_CONFIG_PATH="$(PKG_CONFIG_DIR)"
+CONFIG_ENV += PKG_CONFIG_LIBDIR="$(PKG_CONFIG_DIR)"
 CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR)
 
 $(P11_KIT_DIR)/.configured:
@@ -80,12 +83,12 @@ $(P11_KIT_DIR)/.installed: $(P11_KIT_DIR)/.configured
 	touch $@
 
 $(GMP_DIR)/.configured: 
-	test -f $(GMP_FILE) || wget ftp://ftp.gmplib.org/pub/$(GMP_DIR)/$(GMP_FILE)
-	test -f $(GMP_FILE).sig || wget ftp://ftp.gmplib.org/pub/$(GMP_DIR)/$(GMP_FILE).sig
+	test -f $(GMP_FILE) || wget ftp://ftp.gmplib.org/pub/$(GMP_SERV_DIR)/$(GMP_FILE)
+	test -f $(GMP_FILE).sig || wget ftp://ftp.gmplib.org/pub/$(GMP_SERV_DIR)/$(GMP_FILE).sig
 	gpg --verify $(GMP_FILE).sig
 	test -d $(GMP_DIR) || tar -xf $(GMP_FILE)
 	cd $(GMP_DIR) && LDFLAGS="$(LDFLAGS)" $(CONFIG_ENV) ./configure $(CONFIG_FLAGS) --enable-fat --exec-prefix=$(LIB_DIR)  --oldincludedir=$(HEADERS_DIR) && cd ..
-	cp $(GMP_DIR)/COPYING.LIB $(CROSS_DIR)/COPYING.GMP
+	cp $(GMP_DIR)/COPYING.LESSERv3 $(CROSS_DIR)/COPYING.GMP
 	touch $@
 
 $(GMP_DIR)/.installed: $(GMP_DIR)/.configured
@@ -129,10 +132,11 @@ $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 	gpg --verify $(GNUTLS_FILE).sig
 	test -d $(GNUTLS_DIR) || tar -xf $(GNUTLS_FILE)
 	cd $(GNUTLS_DIR) && \
-		LDFLAGS="$(LDFLAGS) -L$(LIB_DIR)" CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" \
-		$(CONFIG_ENV) ./configure $(CONFIG_FLAGS) --enable-local-libopts --with-libnettle-prefix=$(LIB_DIR) \
+		$(CONFIG_ENV) LDFLAGS="$(LDFLAGS) -L$(LIB_DIR)" CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" \
+		./configure $(CONFIG_FLAGS) --enable-local-libopts --disable-cxx \
 		--enable-gcc-warnings --disable-libdane --disable-openssl-compatibility --with-included-libtasn1 && cd ..
 	touch $@
+
 
 clean:
 	rm -rf $(CROSS_DIR) $(GNUTLS_DIR)/.installed $(NETTLE_DIR)/.installed $(GMP_DIR)/.installed $(P11_KIT_DIR)/.installed
