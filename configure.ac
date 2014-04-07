@@ -349,7 +349,7 @@ AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
 AC_ARG_WITH(system-priority-file, AS_HELP_STRING([--with-system-priority-file],
                                  [specify the system priority file]),
             system_priority_file="$withval", 
-system_priority_file="/etc/gnutls/default-priority"
+system_priority_file="/etc/gnutls/default-priorities"
 )
 
 AC_DEFINE_UNQUOTED([SYSTEM_PRIORITY_FILE],

@@ -877,6 +877,41 @@ static void dummy_func(gnutls_priority_t c)
 
 #include <priority_options.h>
 
+static char *check_str(char *line, size_t line_size, const char *needle, size_t needle_size)
+{
+	char *p;
+	unsigned n;
+
+	if (c_isspace(*line)) {
+		line++;
+		line_size--;
+	}
+
+	if (line[0] == '#' || needle_size >= line_size)
+		return NULL;
+
+	if (memcmp(line, needle, needle_size) == 0) {
+		p = &line[needle_size];
+		if (*p == '=' || c_isspace(*p)) {
+			p++;
+		}
+		n = strlen(p);
+
+		if (n > 1 && p[n-1] == '\n') {
+			n--;
+			p[n] = 0;
+		}
+
+		if (n > 1 && p[n-1] == '\r') {
+			n--;
+			p[n] = 0;
+		}
+		return p;
+	}
+
+	return NULL;
+}
+
 /* Returns the new priorities if SYSTEM is specified in
  * an allocated string, or just a copy of the provided
  * priorities, appended with any additional present in
@@ -884,20 +919,30 @@ static void dummy_func(gnutls_priority_t c)
  *
  * The returned string must be released using free().
  */
-static char* resolve_priorities(const char* priorities)
+static char *resolve_priorities(const char* priorities)
 {
 char *p = (char*)priorities;
-char* additional = NULL;
+char *additional = NULL;
 char *ret = NULL;
+char *ss, *line = NULL;
+unsigned ss_len;
+int l;
 FILE* fp = NULL;
-size_t n, n2;
+size_t n, n2 = 0, line_size;
 
 	if (c_isspace(*p))
 		p++;
 
-	if (strncasecmp(p, "SYSTEM", 6) == 0) {
-		additional = p + 6;
-		if (*additional == ':') additional++;
+	if (*p == '@') {
+		ss = p+1;
+
+		additional = strchr(p, ':');
+		if (additional != NULL) {
+			ss_len = additional - ss;
+			additional++;
+		} else {
+			ss_len = strlen(ss);
+		}
 
 		fp = fopen(SYSTEM_PRIORITY_FILE, "r");
 		if (fp == NULL) {/* fail */
@@ -905,52 +950,37 @@ size_t n, n2;
 			goto finish;
 		}
 
-		fseek(fp, 0, SEEK_END);
-		n = ftell(fp);
-		fseek(fp, 0, SEEK_SET);
+		do {
+			l = getline(&line, &line_size, fp);
+			if (l > 0) {
+				p = check_str(line, line_size, ss, ss_len);
+				if (p != NULL)
+					break;
+			}
+		} while (l>0);
 
-		if (n == 0) {
-			ret = NULL;
-			goto finish;
-		}
-
-		n2 = strlen(additional);
-
-		p = malloc(n+n2+1+1);
 		if (p == NULL) {
 			ret = NULL;
 			goto finish;
 		}
 
-		/* read the first line that doesn't start with # */
-		while(1) {
-			if (fgets(p, n, fp) == NULL) {
-				gnutls_free(p);
-				ret = NULL;
-				goto finish;
-			} else if (p[0] == '#')
-				continue;
-
-			break;
-		}
-
 		n = strlen(p);
+		if (additional)
+			n2 = strlen(additional);
 
-		if (n > 1 && p[n-1] == '\n') {
-			n--;
-			p[n] = 0;
-		}
-		if (n > 1 && p[n-1] == '\r') {
-			n--;
-			p[n] = 0;
-		}
-		if (n2 > 0) {
-			p[n] = ':';
-			memcpy(&p[n+1], additional, n2);
-			p[n+n2+1] = 0;
+		ret = malloc(n+n2+1+1);
+		if (ret == NULL) {
+			goto finish;
 		}
 
-		ret = p;
+		memcpy(ret, p, n);
+		if (additional != NULL) {
+			ret[n] = ':';
+			memcpy(&ret[n+1], additional, n2);
+			ret[n+n2+1] = 0;
+		} else {
+			ret[n] = 0;
+		}
 	} else {
 		return strdup(p);
 	}
@@ -959,6 +989,7 @@ finish:
 	if (ret != NULL) {
 		_gnutls_debug_log("selected priority string: %s\n", ret);
 	}
+	free(line);
 	if (fp != NULL)
 		fclose(fp);
 
@@ -979,14 +1010,8 @@ finish:
  * Some keywords are defined to provide quick access
  * to common preferences.
  *
- * Unless there is a special need, using "SYSTEM" would be the ideal choice
- * for daemons or services that want to use the system-imposed level,
- * "NORMAL" for a typical server that requires a reasonable security level,
- * or even "NORMAL:%COMPAT" for compatibility.
- *
- * "SYSTEM" The system administrator imposed settings. Any options that follow
- * will be appended to the system string. If there is no system string,
- * then the function will fail.
+ * Unless there is a special need, use the "NORMAL" keyword to
+ * apply a reasonable security level, or "NORMAL:%COMPAT" for compatibility.
  *
  * "PERFORMANCE" means all the "secure" ciphersuites are enabled,
  * limited to 128 bit ciphers and sorted by terms of speed
@@ -1021,6 +1046,13 @@ finish:
  *
  * "NONE" means nothing is enabled.  This disables even protocols and
  * compression methods.
+ *
+ * "@KEYWORD" The system administrator imposed settings. The provided keywords
+ * will be expanded from a configuration-time provided file - default is:
+ * /etc/gnutls/default-priorities. Any keywords that follow it, will 
+ * be appended to the expanded string. If there is no system string,
+ * then the function will fail. The system file should be formatted
+ * as "KEYWORD=VALUE", e.g., "SYSTEM=NORMAL:-ARCFOUR-128".
  *
  * Special keywords are "!", "-" and "+".
  * "!" or "-" appended with an algorithm will remove this algorithm.

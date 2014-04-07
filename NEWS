@@ -24,10 +24,10 @@ that can be specified as flags to verification functions. They
 are enumerations in gnutls_certificate_verification_profiles_t
 and can be converted to flags using GNUTLS_PROFILE_TO_VFLAGS()
 
-** libgnutls: Added the SYSTEM priority string initial keyword.
-That allows a compile-time specified configuration file to be
-used to read the priorities. That can be used to impose system
-specific policies.
+** libgnutls: Added the ability to read system-specific initial
+keywords, if they are prefixed with '@'. That allows a compile-time
+specified configuration file to be used to read pre-configured priority strings from.
+That can be used to impose system specific policies.
 
 ** libgnutls: Increased the default security level of priority
 strings (NORMAL and PFS strings require at minimum a 1008 DH prime), 

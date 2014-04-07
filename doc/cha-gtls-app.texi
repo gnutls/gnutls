@@ -890,13 +890,12 @@ special keywords.
 @float Table,tab:prio-keywords
 @multitable @columnfractions .20 .70
 @headitem Keyword @tab Description
-@item SYSTEM @tab
-Means that a compile-time specified configuration file will be used
-to read the priorities. That is used to impose system-specific policies.
+@item @@KEYWORD @tab
+Means that a compile-time specified system configuration file@footnote{The default is @code{/etc/gnutls/default-priorities}.} 
+will be used to expand the provided keyword. That is used to impose system-specific policies.
 It may be followed by additional options that will be appended to the
-system string (e.g., "SYSTEM:+SRP"). If there is no available system priority
-string then the default acceptable security level by GnuTLS will be
-set (i.e., NORMAL).
+system string (e.g., "@@SYSTEM:+SRP"). The system file should have the
+format 'KEYWORD=VALUE', e.g., 'SYSTEM=NORMAL:-ARCFOUR-128'.
 
 @item PERFORMANCE @tab
 All the known to be secure ciphersuites are enabled,
