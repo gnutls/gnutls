@@ -145,15 +145,18 @@ AC_C_BIGENDIAN
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork getrusage getpwuid_r nanosleep daemon getpid clock_gettime pthread_mutex_lock iconv localtime vasprintf],,)
+AC_CHECK_FUNCS([fork getrusage getpwuid_r nanosleep daemon getpid clock_gettime iconv localtime vasprintf],,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>
 #include <signal.h>
 ], [timer_create (0,0,0);])
 
-if test "$ac_cv_func_pthread_mutex_lock" != "yes";then
-  AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+if test "$have_win" != "yes";then
+  if test "$ac_cv_func_pthread_mutex_lock" != "yes";then
+    AC_CHECK_FUNCS([pthread_mutex_lock],,)
+    AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+  fi
 fi
 
 if test "$ac_cv_func_nanosleep" != "yes";then
