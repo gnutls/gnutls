@@ -251,6 +251,8 @@ typedef enum recv_state_t {
  */
 #define MAX_ALGOS GNUTLS_MAX_ALGORITHM_NUM
 
+/* http://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml
+ */
 typedef enum extensions_t {
 	GNUTLS_EXTENSION_SERVER_NAME = 0,
 	GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1,
@@ -263,9 +265,9 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_SRTP = 14,
 	GNUTLS_EXTENSION_HEARTBEAT = 15,
 	GNUTLS_EXTENSION_ALPN = 16,
+	GNUTLS_EXTENSION_DUMBFW = 21,
 	GNUTLS_EXTENSION_SESSION_TICKET = 35,
 	GNUTLS_EXTENSION_NEW_RECORD_PADDING = 48015,	/* aka: 0xbeaf */
-	GNUTLS_EXTENSION_DUMBFW = 48016,
 	GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
 } extensions_t;
 
