@@ -674,8 +674,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->sign_algo, sign_priority_default);
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
-		SET_PROFILE(GNUTLS_PROFILE_LOW);
-		SET_LEVEL(GNUTLS_SEC_PARAM_LOW);
+		SET_PROFILE(GNUTLS_PROFILE_LOW); /* set certificate level */
+		SET_LEVEL(GNUTLS_SEC_PARAM_WEAK); /* set DH params level */
 		return 1;
 	} else if (strcasecmp(level, LEVEL_NORMAL) == 0) {
 		func(&priority_cache->cipher, cipher_priority_normal);
@@ -685,7 +685,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
 		SET_PROFILE(GNUTLS_PROFILE_LOW);
-		SET_LEVEL(GNUTLS_SEC_PARAM_LOW);
+		SET_LEVEL(GNUTLS_SEC_PARAM_WEAK);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_PFS) == 0) {
 		func(&priority_cache->cipher, cipher_priority_normal);
@@ -695,7 +695,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 		func(&priority_cache->supported_ecc, supported_ecc_normal);
 
 		SET_PROFILE(GNUTLS_PROFILE_LOW);
-		SET_LEVEL(GNUTLS_SEC_PARAM_LOW);
+		SET_LEVEL(GNUTLS_SEC_PARAM_WEAK);
 		return 1;
 	} else if (strcasecmp(level, LEVEL_SECURE256) == 0
 		   || strcasecmp(level, LEVEL_SECURE192) == 0) {
