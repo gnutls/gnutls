@@ -64,7 +64,7 @@ else
   if test -f /usr/lib/softhsm/libsofthsm.so;then
     ADDITIONAL_PARAM="--provider /usr/lib/softhsm/libsofthsm.so"
   else
-    ADDITIONAL_PARAM="--provider /usr/lib/softhsm/libsofthsm.so"
+    ADDITIONAL_PARAM="--provider /usr/lib64/softhsm/libsofthsm.so"
   fi
   echo "0:./softhsm-testpkcs11.db" > $SOFTHSM_CONF
 
