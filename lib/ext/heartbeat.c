@@ -41,8 +41,11 @@
   * @type: one of the GNUTLS_HB_* flags
   *
   * If this function is called with the %GNUTLS_HB_PEER_ALLOWED_TO_SEND
-  * GnuTLS will allow heartbeat messages to be received. Moreover it also
+  * @type, GnuTLS will allow heartbeat messages to be received. Moreover it also
   * request the peer to accept heartbeat messages.
+  *
+  * If the @type used is %GNUTLS_HB_LOCAL_ALLOWED_TO_SEND, then the peer
+  * will be asked to accept heartbeat messages but not send ones.
   *
   * The function gnutls_heartbeat_allowed() can be used to test Whether
   * locally generated heartbeat messages can be accepted by the peer.
