@@ -39,6 +39,30 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
+static unsigned char ca_cert_pem[] =
+"-----BEGIN CERTIFICATE-----\n"
+"MIIC4DCCAcigAwIBAgIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
+"MCIYDzIwMTQwNDA0MTk1OTA1WhgPOTk5OTEyMzEyMzU5NTlaMA8xDTALBgNVBAMT\n"
+"BENBLTAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQD46JAPKrTsNTHl\n"
+"zD06eIYBF/8Z+TR0wukp9Cdh8Sw77dODLjy/QrVKiDgDZZdyUc8Agsdr86i95O0p\n"
+"w19Np3a0wja0VC9uwppZrpuHsrWukwxIBXoViyBc20Y6Ce8j0scCbR10SP565qXC\n"
+"i8vr86S4xmQMRZMtwohP/GWQzt45jqkHPYHjdKzwo2b2XI7joDq0dvbr3MSONkGs\n"
+"z7A/1Bl3iH5keDTWjqpJRWqXE79IhGOhELy+gG4VLJDGHWCr2mq24b9Kirp+TTxl\n"
+"lUwJRbchqUqerlFdt1NgDoGaJyd73Sh0qcZzmEiOI2hGvBtG86tdQ6veC9dl05et\n"
+"pM+6RMABAgMBAAGjQzBBMA8GA1UdEwEB/wQFMAMBAf8wDwYDVR0PAQH/BAUDAwcE\n"
+"ADAdBgNVHQ4EFgQUGD0RYr2H7kfjQUcBMxSTCDQnhu0wDQYJKoZIhvcNAQELBQAD\n"
+"ggEBALnHMubZ6WJ/XOFyDuo0imwg2onrPas3MuKT4+y0aHY943BgAOEc3jKitRjc\n"
+"qhb0IUD+NS7itRwNtCgI3v5Ym5nnQoVk+aOD/D724TjJ9XaPQJzOnuGaZX99VN2F\n"
+"sgwAtDXedlDQ+I6KLzLd6VW+UyWTG4qiRjOGDnG2kM1wAEOM27TzHV/YWleGjhtA\n"
+"bRHxkioOni5goNlTzazxF4v9VD2uinWrIFyZmF6vQuMm6rKFgq6higAU8uesFo7+\n"
+"3qpeRjNrPC4fNJUBvv+PC0WnP0PLnD/rY/ZcTYjLb/vJp1fiMJ5fU7jJklBhX2TE\n"
+"tstcP7FUV5HA/s9BxgAh0Z2wyyY=\n"
+"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t ca_cert = { ca_cert_pem,
+	sizeof(ca_cert_pem)
+};
+
 static unsigned char server_cert_pem[] =
 "-----BEGIN CERTIFICATE-----\n"
 "MIIDIzCCAgugAwIBAgIMUz8PCR2sdRK56V6OMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
@@ -119,6 +143,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 void doit(void)
 {
 	int exit_code = EXIT_SUCCESS;
+	int ret;
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
 	gnutls_session_t server;
@@ -154,10 +179,23 @@ void doit(void)
 	gnutls_transport_set_ptr(server, server);
 
 	/* Init client */
-	gnutls_certificate_allocate_credentials(&clientx509cred);
-	gnutls_init(&client, GNUTLS_CLIENT);
-	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
+	ret = gnutls_certificate_allocate_credentials(&clientx509cred);
+	if (ret < 0)
+		exit(1);
+
+	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
+	if (ret < 0)
+		exit(1);
+
+	ret = gnutls_init(&client, GNUTLS_CLIENT);
+	if (ret < 0)
+		exit(1);
+
+	ret = gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 			       clientx509cred);
+	if (ret < 0)
+		exit(1);
+
 	gnutls_priority_set_direct(client, "NORMAL", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
@@ -168,10 +206,33 @@ void doit(void)
 	/* check the number of certificates received */
 	{
 		unsigned cert_list_size = 0;
+		unsigned status;
 
 		gnutls_certificate_get_peers(client, &cert_list_size);
 		if (cert_list_size < 2) {
 			fprintf(stderr, "received a certificate list of %d!\n", cert_list_size);
+			exit(1);
+		}
+
+		ret = gnutls_certificate_verify_peers4(client, "localhost1", GNUTLS_KP_TLS_WWW_SERVER, &status);
+		if (ret < 0) {
+			fprintf(stderr, "could not verify certificate: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (status == 0) {
+			fprintf(stderr, "should not have accepted!\n");
+			exit(1);
+		}
+
+		ret = gnutls_certificate_verify_peers4(client, "localhost", GNUTLS_KP_TLS_WWW_SERVER, &status);
+		if (ret < 0) {
+			fprintf(stderr, "could not verify certificate: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (status != 0) {
+			fprintf(stderr, "could not verify certificate: %.4x\n", status);
 			exit(1);
 		}
 	}

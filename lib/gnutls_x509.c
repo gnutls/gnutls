@@ -182,7 +182,9 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
  -*/
 int
 _gnutls_x509_cert_verify_peers(gnutls_session_t session,
-			       const char *hostname, unsigned int *status)
+			       const char *hostname,
+			       const char *purpose,
+			       unsigned int *status)
 {
 	cert_auth_info_t info;
 	gnutls_certificate_credentials_t cred;
@@ -304,6 +306,33 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 						   [0], hostname, verify_flags);
 		if (ret == 0)
 			*status |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+	}
+
+	if (purpose) {
+		char oid[MAX_OID_SIZE];
+		size_t oid_size;
+
+		for (i=0;;i++) {
+			oid_size = sizeof(oid);
+			ret = gnutls_x509_crt_get_key_purpose_oid(peer_certificate_list[0],
+				i, oid, &oid_size, NULL);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+				if (i==0)
+					break;
+				else { /* no acceptable purpose was found */
+					gnutls_assert();
+					*status |= GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE|GNUTLS_CERT_INVALID;
+					break;
+				}
+			} else if (ret < 0) {
+				gnutls_assert();
+				*status |= GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE|GNUTLS_CERT_INVALID;
+				break;
+			}
+
+			if (strcmp(oid, purpose) == 0 || strcmp(oid, GNUTLS_KP_ANY) == 0)
+				break;
+		}
 	}
 
 	CLEAR_CERTS;

@@ -158,7 +158,9 @@ static int _verify_certificate_callback(gnutls_session_t session)
         /* This verification function uses the trusted CAs in the credentials
          * structure. So you must have installed one or more CA certificates.
          */
-        ret = gnutls_certificate_verify_peers3(session, hostname, &status);
+        ret = gnutls_certificate_verify_peers4(session, hostname,
+					       GNUTLS_KP_TLS_WWW_SERVER,
+					       &status);
         if (ret < 0) {
                 printf("Error\n");
                 return GNUTLS_E_CERTIFICATE_ERROR;

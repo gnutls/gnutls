@@ -103,6 +103,7 @@ That option enables (when running on FIPS140-enabled system):
 
 ** API and ABI modifications:
 GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS: Added
+gnutls_certificate_verify_peers4: Added
 gnutls_privkey_generate: Added
 gnutls_pkcs11_crt_is_known: Added
 gnutls_fips140_mode_enabled: Added

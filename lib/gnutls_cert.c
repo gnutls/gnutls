@@ -656,7 +656,7 @@ int
 gnutls_certificate_verify_peers2(gnutls_session_t session,
 				 unsigned int *status)
 {
-	return gnutls_certificate_verify_peers3(session, NULL, status);
+	return gnutls_certificate_verify_peers4(session, NULL, NULL, status);
 }
 
 /**
@@ -679,6 +679,9 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * be accurate for ascii names; non-ascii names are compared byte-by-byte. 
  * If names do not match the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  *
+ * In order to verify the purpose of the end-certificate (by checking the extended
+ * key usage), use gnutls_certificate_verify_peers4().
+ *
  * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
  *
  * Since: 3.1.4
@@ -686,6 +689,44 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
 int
 gnutls_certificate_verify_peers3(gnutls_session_t session,
 				 const char *hostname,
+				 unsigned int *status)
+{
+	return gnutls_certificate_verify_peers4(session, hostname, NULL, status);
+}
+
+/**
+ * gnutls_certificate_verify_peers4:
+ * @session: is a gnutls session
+ * @hostname: is the expected name of the peer; may be %NULL
+ * @purpose: is the expected key purpose OID, see the %GNUTLS_KP definitions
+ * @status: is the output of the verification
+ *
+ * This function will verify the peer's certificate and store the
+ * status in the @status variable as a bitwise or'd gnutls_certificate_status_t
+ * values or zero if the certificate is trusted. Note that value in @status
+ * is set only when the return value of this function is success (i.e, failure 
+ * to trust a certificate does not imply a negative return value).
+ * The default verification flags used by this function can be overriden
+ * using gnutls_certificate_set_verify_flags(). See the documentation
+ * of gnutls_certificate_verify_peers2() for details in the verification process.
+ *
+ * If the @hostname provided is non-NULL then this function will compare
+ * the hostname in the certificate against the given. The comparison will
+ * be accurate for ascii names; non-ascii names are compared byte-by-byte. 
+ * If names do not match the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
+ *
+ * If @purpose is non-NULL and the end-certificate contains the extended key usage
+ * PKIX extension, it will be required to be have the provided key purpose (e.g., %GNUTLS_KP_TLS_WWW_SERVER),
+ * or verification will fail with %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE status.
+ *
+ * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Since: 3.3.0
+ **/
+int
+gnutls_certificate_verify_peers4(gnutls_session_t session,
+				 const char *hostname,
+				 const char *purpose,
 				 unsigned int *status)
 {
 	cert_auth_info_t info;
@@ -703,6 +744,7 @@ gnutls_certificate_verify_peers3(gnutls_session_t session,
 	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
 		return _gnutls_x509_cert_verify_peers(session, hostname,
+						      purpose,
 						      status);
 #ifdef ENABLE_OPENPGP
 	case GNUTLS_CRT_OPENPGP:
