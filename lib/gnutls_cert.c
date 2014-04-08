@@ -656,30 +656,7 @@ int
 gnutls_certificate_verify_peers2(gnutls_session_t session,
 				 unsigned int *status)
 {
-	cert_auth_info_t info;
-
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
-
-	info = _gnutls_get_auth_info(session);
-	if (info == NULL) {
-		return GNUTLS_E_NO_CERTIFICATE_FOUND;
-	}
-
-	if (info->raw_certificate_list == NULL || info->ncerts == 0)
-		return GNUTLS_E_NO_CERTIFICATE_FOUND;
-
-	switch (gnutls_certificate_type_get(session)) {
-	case GNUTLS_CRT_X509:
-		return _gnutls_x509_cert_verify_peers(session, NULL,
-						      status);
-#ifdef ENABLE_OPENPGP
-	case GNUTLS_CRT_OPENPGP:
-		return _gnutls_openpgp_crt_verify_peers(session, NULL,
-							status);
-#endif
-	default:
-		return GNUTLS_E_INVALID_REQUEST;
-	}
+	return gnutls_certificate_verify_peers3(session, NULL, status);
 }
 
 /**
