@@ -638,8 +638,9 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
  * The default verification flags used by this function can be overriden
  * using gnutls_certificate_set_verify_flags().
  *
- * If available the OCSP Certificate Status extension will be
- * utilized by this function.
+ * This function will take into account the OCSP Certificate Status TLS extension,
+ * as well as the following X.509 certificate extensions: Name Constraints,
+ * Key Usage, and Basic Constraints (pathlen).
  * 
  * To avoid denial of service attacks some
  * default upper limits regarding the certificate key size and chain
@@ -693,19 +694,13 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * is set only when the return value of this function is success (i.e, failure 
  * to trust a certificate does not imply a negative return value).
  * The default verification flags used by this function can be overriden
- * using gnutls_certificate_set_verify_flags().
+ * using gnutls_certificate_set_verify_flags(). See the documentation
+ * of gnutls_certificate_verify_peers2() for details in the verification process.
  *
  * If the @hostname provided is non-NULL then this function will compare
  * the hostname in the certificate against the given. The comparison will
  * be accurate for ascii names; non-ascii names are compared byte-by-byte. 
  * If names do not match the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
- *
- * If available the OCSP Certificate Status extension will be
- * utilized by this function.
- * 
- * To avoid denial of service attacks some
- * default upper limits regarding the certificate key size and chain
- * size are set. To override them use gnutls_certificate_set_verify_limits().
  *
  * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
  *
