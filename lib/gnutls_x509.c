@@ -1081,6 +1081,9 @@ certificate_credentials_append_pkey(gnutls_certificate_credentials_t res,
  * entity certificate (e.g., also an intermediate CA cert) then put
  * the certificate chain in @cert_list.
  *
+ * Note that the certificates and keys provided, can be safely deinitialized
+ * after this function is called.
+ *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
  * Since: 2.4.0
