@@ -46,6 +46,7 @@ AC_DEFUN([ggl_EARLY],
   # Code from module c-ctype:
   # Code from module clock-time:
   # Code from module close:
+  # Code from module connect:
   # Code from module dup2:
   # Code from module environ:
   # Code from module errno:
@@ -172,6 +173,11 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([close])
   fi
   gl_UNISTD_MODULE_INDICATOR([close])
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    AC_LIBOBJ([connect])
+  fi
+  gl_SYS_SOCKET_MODULE_INDICATOR([connect])
   gl_FUNC_DUP2
   if test $HAVE_DUP2 = 0 || test $REPLACE_DUP2 = 1; then
     AC_LIBOBJ([dup2])
@@ -584,6 +590,7 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/c-ctype.c
   lib/c-ctype.h
   lib/close.c
+  lib/connect.c
   lib/dup2.c
   lib/errno.in.h
   lib/error.c
