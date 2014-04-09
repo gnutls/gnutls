@@ -122,8 +122,7 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	extras/libgnutls_extras.la
 thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) \
-	$(LTLIBICONV) $(P11_KIT_LIBS) $(LIB_SELECT) $(TSS_LIBS) \
-	$(LTLIBICONV)
+	$(LTLIBICONV) $(P11_KIT_LIBS) $(LIB_SELECT) $(TSS_LIBS)
 
 if !WINDOWS
 thirdparty_libadd += $(LTLIBPTHREAD)
