@@ -32,7 +32,9 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
+#ifndef _WIN32
+# include <arpa/inet.h>
+#endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
