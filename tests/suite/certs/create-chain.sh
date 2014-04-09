@@ -45,6 +45,7 @@ while test $counter -lt $NUM; do
 			echo "expiration_days = -1" >>$TEMPLATE
 			echo "signing_key" >>$TEMPLATE
 			echo "encryption_key" >>$TEMPLATE
+			echo "tls_www_server" >>$TEMPLATE
 			$CERTTOOL --generate-certificate --load-privkey $OUTPUT/$name.key \
 				--load-ca-certificate $OUTPUT/$prev_name.crt \
 				--load-ca-privkey $OUTPUT/$prev_name.key \
