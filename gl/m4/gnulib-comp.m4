@@ -78,6 +78,10 @@ AC_DEFUN([gl_EARLY],
   # Code from module func-tests:
   # Code from module fwrite-tests:
   # Code from module gendocs:
+  # Code from module getdelim:
+  # Code from module getdelim-tests:
+  # Code from module getline:
+  # Code from module getline-tests:
   # Code from module getpagesize:
   # Code from module gettext:
   # Code from module gettext-h:
@@ -234,6 +238,18 @@ AC_SUBST([LTALLOCA])
   fi
   gl_STDIO_MODULE_INDICATOR([ftello])
   gl_FUNC
+  gl_FUNC_GETDELIM
+  if test $HAVE_GETDELIM = 0 || test $REPLACE_GETDELIM = 1; then
+    AC_LIBOBJ([getdelim])
+    gl_PREREQ_GETDELIM
+  fi
+  gl_STDIO_MODULE_INDICATOR([getdelim])
+  gl_FUNC_GETLINE
+  if test $REPLACE_GETLINE = 1; then
+    AC_LIBOBJ([getline])
+    gl_PREREQ_GETLINE
+  fi
+  gl_STDIO_MODULE_INDICATOR([getline])
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.18.1])
   AC_SUBST([LIBINTL])
@@ -574,6 +590,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/fstat.c
   lib/ftell.c
   lib/ftello.c
+  lib/getdelim.c
+  lib/getline.c
   lib/gettext.h
   lib/gettimeofday.c
   lib/hash-pjw-bare.c
@@ -657,6 +675,8 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/ftell.m4
   m4/ftello.m4
   m4/func.m4
+  m4/getdelim.m4
+  m4/getline.m4
   m4/getpagesize.m4
   m4/gettext.m4
   m4/gettimeofday.m4
@@ -774,6 +794,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-ftello4.sh
   tests/test-func.c
   tests/test-fwrite.c
+  tests/test-getdelim.c
+  tests/test-getline.c
   tests/test-gettimeofday.c
   tests/test-iconv.c
   tests/test-init.sh
