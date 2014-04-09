@@ -43,6 +43,7 @@ AC_DEFUN([ggl_EARLY],
   # Code from module alloca:
   # Code from module alloca-opt:
   # Code from module arpa_inet:
+  # Code from module bind:
   # Code from module c-ctype:
   # Code from module clock-time:
   # Code from module close:
@@ -167,6 +168,11 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_ALLOCA
   gl_HEADER_ARPA_INET
   AC_PROG_MKDIR_P
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    AC_LIBOBJ([bind])
+  fi
+  gl_SYS_SOCKET_MODULE_INDICATOR([bind])
   gl_CLOCK_TIME
   gl_FUNC_CLOSE
   if test $REPLACE_CLOSE = 1; then
@@ -587,6 +593,7 @@ AC_DEFUN([ggl_FILE_LIST], [
   lib/alloca.in.h
   lib/arpa_inet.in.h
   lib/asnprintf.c
+  lib/bind.c
   lib/c-ctype.c
   lib/c-ctype.h
   lib/close.c
