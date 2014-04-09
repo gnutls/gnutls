@@ -104,6 +104,7 @@ TESTS += testdane
 endif
 
 if !MACOSX
+if !WINDOWS
 noinst_LTLIBRARIES = libecore.la
 
 mini_record_timing_LDADD = -lrt $(LDADD)
@@ -114,4 +115,4 @@ noinst_PROGRAMS = eagain-cli mini-record-timing
 
 TESTS += eagain
 endif
-
+endif
