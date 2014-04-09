@@ -153,8 +153,8 @@ AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>
 ], [timer_create (0,0,0);])
 
 if test "$have_win" != "yes";then
+  AC_CHECK_FUNCS([pthread_mutex_lock],,)
   if test "$ac_cv_func_pthread_mutex_lock" != "yes";then
-    AC_CHECK_FUNCS([pthread_mutex_lock],,)
     AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
   fi
 fi
