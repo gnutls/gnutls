@@ -355,7 +355,7 @@ may be used to verify the peer's certificate chain and identity. The flags
 are set similarly to the verification functions in the previous section.
 Note that in certain cases it is required to check the marked purpose of
 the end certificate (e.g. @code{GNUTLS_KP_TLS_WWW_SERVER}); in these case
-@funcref{gnutls_certificate_verify_peers4} should be used instead.
+@funcref{gnutls_certificate_verify_peers} should be used instead.
 
 There is also the possibility to pass some input to the verification
 functions in the form of flags. For @funcref{gnutls_x509_trust_list_verify_crt} the

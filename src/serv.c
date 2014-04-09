@@ -1356,7 +1356,7 @@ static void tcp_server(const char *name, int port)
 								cert_verify
 								    (j->
 								     tls_session,
-								     NULL);
+								     NULL, NULL);
 						}
 						j->handshake_ok = 1;
 					}
@@ -1536,7 +1536,7 @@ static void tcp_server(const char *name, int port)
 								cert_verify
 								    (j->
 								     tls_session,
-								     NULL);
+								     NULL, NULL);
 						}
 						j->handshake_ok = 1;
 					}

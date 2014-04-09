@@ -1911,11 +1911,32 @@ int gnutls_certificate_verify_peers2(gnutls_session_t session,
 int gnutls_certificate_verify_peers3(gnutls_session_t session,
 				     const char *hostname,
 				     unsigned int *status);
+
+/**
+ * gnutls_vdata_types_t:
+ * @GNUTLS_DT_UNKNOWN: Unknown data type.
+ * @GNUTLS_DT_DNS_HOSTNAME: The data contain a null-terminated DNS hostname.
+ * @GNUTLS_DT_KEY_PURPOSE_OID: The data contain a null-terminated key purpose OID.
+ *
+ * Enumeration of different key exchange algorithms.
+ */
+typedef enum {
+	GNUTLS_DT_UNKNOWN = 0,
+	GNUTLS_DT_DNS_HOSTNAME = 1,
+	GNUTLS_DT_KEY_PURPOSE_OID = 2,
+} gnutls_vdata_types_t;
+
+typedef struct {
+	gnutls_vdata_types_t type;
+	unsigned char *data;
+	unsigned int size;
+} gnutls_typed_vdata_st;
+
 int
-gnutls_certificate_verify_peers4(gnutls_session_t session,
-				 const char *hostname,
-				 const char *purpose,
-				 unsigned int *status);
+gnutls_certificate_verify_peers(gnutls_session_t session,
+				gnutls_typed_vdata_st * data,
+				unsigned int elements,
+				unsigned int *status);
 
 int gnutls_certificate_verification_status_print(unsigned int status,
 						 gnutls_certificate_type_t

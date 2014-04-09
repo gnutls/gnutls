@@ -164,6 +164,7 @@ void doit(void)
 	gnutls_certificate_set_x509_key_mem(serverx509cred,
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
+
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 			       serverx509cred);
@@ -206,7 +207,16 @@ void doit(void)
 	/* check the number of certificates received */
 	{
 		unsigned cert_list_size = 0;
+		gnutls_typed_vdata_st data[2];
 		unsigned status;
+
+		memset(data, 0, sizeof(data));
+
+		data[0].type = GNUTLS_DT_DNS_HOSTNAME;
+		data[0].data = (void*)"localhost1";
+
+		data[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
+		data[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
 
 		gnutls_certificate_get_peers(client, &cert_list_size);
 		if (cert_list_size < 2) {
@@ -214,7 +224,7 @@ void doit(void)
 			exit(1);
 		}
 
-		ret = gnutls_certificate_verify_peers4(client, "localhost1", GNUTLS_KP_TLS_WWW_SERVER, &status);
+		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
 			fprintf(stderr, "could not verify certificate: %s\n", gnutls_strerror(ret));
 			exit(1);
@@ -225,7 +235,10 @@ void doit(void)
 			exit(1);
 		}
 
-		ret = gnutls_certificate_verify_peers4(client, "localhost", GNUTLS_KP_TLS_WWW_SERVER, &status);
+		data[0].type = GNUTLS_DT_DNS_HOSTNAME;
+		data[0].data = (void*)"localhost";
+
+		ret = gnutls_certificate_verify_peers(client, data, 2, &status);
 		if (ret < 0) {
 			fprintf(stderr, "could not verify certificate: %s\n", gnutls_strerror(ret));
 			exit(1);

@@ -436,7 +436,7 @@ static int cert_verify_callback(gnutls_session_t session)
 	print_cert_info(session, verbose, print_cert);
 
 	if (ca_verify) {
-		rc = cert_verify(session, hostname);
+		rc = cert_verify(session, hostname, GNUTLS_KP_TLS_WWW_SERVER);
 		if (rc == 0) {
 			printf
 			    ("*** Verifying server certificate failed...\n");

@@ -285,14 +285,30 @@ print_openpgp_info(gnutls_session_t session, int flag, int print_cert)
 
 /* returns false (0) if not verified, or true (1) otherwise 
  */
-int cert_verify(gnutls_session_t session, const char *hostname)
+int cert_verify(gnutls_session_t session, const char *hostname, const char *purpose)
 {
 	int rc;
 	unsigned int status = 0;
 	gnutls_datum_t out;
 	int type;
+	gnutls_typed_vdata_st data[2];
+	unsigned elements = 0;
 
-	rc = gnutls_certificate_verify_peers3(session, hostname, &status);
+	memset(data, 0, sizeof(data));
+
+	if (hostname) {
+		data[elements].type = GNUTLS_DT_DNS_HOSTNAME;
+		data[elements].data = (void*)hostname;
+		elements++;
+	}
+
+	if (purpose) {
+		data[elements].type = GNUTLS_DT_KEY_PURPOSE_OID;
+		data[elements].data = (void*)purpose;
+		elements++;
+	}
+
+	rc = gnutls_certificate_verify_peers(session, data, elements, &status);
 	if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND) {
 		printf("- Peer did not send any certificate.\n");
 		return 0;

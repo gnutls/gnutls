@@ -656,7 +656,7 @@ int
 gnutls_certificate_verify_peers2(gnutls_session_t session,
 				 unsigned int *status)
 {
-	return gnutls_certificate_verify_peers4(session, NULL, NULL, status);
+	return gnutls_certificate_verify_peers(session, NULL, 0, status);
 }
 
 /**
@@ -680,7 +680,7 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * If names do not match the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  *
  * In order to verify the purpose of the end-certificate (by checking the extended
- * key usage), use gnutls_certificate_verify_peers4().
+ * key usage), use gnutls_certificate_verify_peers().
  *
  * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
  *
@@ -691,14 +691,20 @@ gnutls_certificate_verify_peers3(gnutls_session_t session,
 				 const char *hostname,
 				 unsigned int *status)
 {
-	return gnutls_certificate_verify_peers4(session, hostname, NULL, status);
+gnutls_typed_vdata_st data;
+
+	data.type = GNUTLS_DT_DNS_HOSTNAME;
+	data.size = 0;
+	data.data = (void*)hostname;
+
+	return gnutls_certificate_verify_peers(session, &data, 1, status);
 }
 
 /**
- * gnutls_certificate_verify_peers4:
+ * gnutls_certificate_verify_peers:
  * @session: is a gnutls session
- * @hostname: is the expected name of the peer; may be %NULL
- * @purpose: is the expected key purpose OID, see the %GNUTLS_KP definitions
+ * @data: an array of typed data
+ * @elements: the number of data elements
  * @status: is the output of the verification
  *
  * This function will verify the peer's certificate and store the
@@ -710,26 +716,31 @@ gnutls_certificate_verify_peers3(gnutls_session_t session,
  * using gnutls_certificate_set_verify_flags(). See the documentation
  * of gnutls_certificate_verify_peers2() for details in the verification process.
  *
- * If the @hostname provided is non-NULL then this function will compare
+ * The acceptable data types are %GNUTLS_DT_DNS_HOSTNAME and %GNUTLS_DT_KEY_PURPOSE_OID.
+ * If a DNS hostname is provided then this function will compare
  * the hostname in the certificate against the given. The comparison will
  * be accurate for ascii names; non-ascii names are compared byte-by-byte. 
  * If names do not match the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  *
- * If @purpose is non-NULL and the end-certificate contains the extended key usage
- * PKIX extension, it will be required to be have the provided key purpose (e.g., %GNUTLS_KP_TLS_WWW_SERVER),
- * or verification will fail with %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE status.
+ * If a key purpose OID is provided and the end-certificate contains the extended key
+ * usage PKIX extension, it will be required to be have the provided key purpose 
+ * (e.g., %GNUTLS_KP_TLS_WWW_SERVER), or be marked for any purpose, otherwise 
+ * verification will fail with %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE status.
  *
  * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
  *
  * Since: 3.3.0
  **/
 int
-gnutls_certificate_verify_peers4(gnutls_session_t session,
-				 const char *hostname,
-				 const char *purpose,
-				 unsigned int *status)
+gnutls_certificate_verify_peers(gnutls_session_t session,
+				gnutls_typed_vdata_st * data,
+				unsigned int elements,
+				unsigned int *status)
 {
 	cert_auth_info_t info;
+	const char *hostname = NULL;
+	const char *purpose = NULL;
+	unsigned i;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
@@ -740,6 +751,16 @@ gnutls_certificate_verify_peers4(gnutls_session_t session,
 
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
+
+	for (i=0;i<elements;i++) {
+		if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
+			hostname = (void*)data[i].data;
+		} else if (data[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
+			purpose = (void*)data[i].data;
+		} else {
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+	}
 
 	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
