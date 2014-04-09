@@ -83,8 +83,8 @@ $(P11_KIT_DIR)/.installed: $(P11_KIT_DIR)/.configured
 	touch $@
 
 $(GMP_DIR)/.configured: 
-	test -f $(GMP_FILE) || wget ftp://ftp.gmplib.org/pub/$(GMP_SERV_DIR)/$(GMP_FILE)
-	test -f $(GMP_FILE).sig || wget ftp://ftp.gmplib.org/pub/$(GMP_SERV_DIR)/$(GMP_FILE).sig
+	test -f $(GMP_FILE) || wget ftp://ftp.gmplib.org/pub/$(GMP_DIR)/$(GMP_FILE)
+	test -f $(GMP_FILE).sig || wget ftp://ftp.gmplib.org/pub/$(GMP_DIR)/$(GMP_FILE).sig
 	gpg --verify $(GMP_FILE).sig
 	test -d $(GMP_DIR) || tar -xf $(GMP_FILE)
 	cd $(GMP_DIR) && LDFLAGS="$(LDFLAGS)" $(CONFIG_ENV) ./configure $(CONFIG_FLAGS) --enable-fat --exec-prefix=$(LIB_DIR)  --oldincludedir=$(HEADERS_DIR) && cd ..
