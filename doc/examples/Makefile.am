@@ -37,6 +37,7 @@ AM_LDFLAGS = -no-install
 LDADD = libexamples.la				\
 	../../lib/libgnutls.la			\
 	../../gl/libgnu.la			\
+	../../src/gl/libgnu_gpl.la		\
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
 CXX_LDADD = ../../lib/libgnutlsxx.la \
