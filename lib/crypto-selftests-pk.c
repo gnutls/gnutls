@@ -654,7 +654,7 @@ cleanup:
 }
 #endif
 
-/**
+/*-
  * gnutls_pk_self_test:
  * @all: if non-zero then tests to all public key algorithms are performed.
  * @pk: the algorithm to use
@@ -664,7 +664,7 @@ cleanup:
  * Returns: Zero or a negative error code on error.
  *
  * Since: 3.3.0-FIPS140
- **/
+ -*/
 int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 {
 	int ret;
