@@ -3,7 +3,7 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.0 (unreleased)
+* Version 3.3.0 (released 2014-04-10)
 
 ** libgnutls: The initialization of the library was moved to a
 constructor. That is, gnutls_global_init() is no longer required
@@ -22,12 +22,13 @@ on the first PKCS #11 API call after a fork.
 ** libgnutls: certificate verification profiles were introduced
 that can be specified as flags to verification functions. They
 are enumerations in gnutls_certificate_verification_profiles_t
-and can be converted to flags using GNUTLS_PROFILE_TO_VFLAGS()
+and can be converted to flags for use in a verification function
+using GNUTLS_PROFILE_TO_VFLAGS().
 
 ** libgnutls: Added the ability to read system-specific initial
 keywords, if they are prefixed with '@'. That allows a compile-time
-specified configuration file to be used to read pre-configured priority strings from.
-That can be used to impose system specific policies.
+specified configuration file to be used to read pre-configured priority
+strings from. That can be used to impose system specific policies.
 
 ** libgnutls: Increased the default security level of priority
 strings (NORMAL and PFS strings require at minimum a 1008 DH prime), 
@@ -61,8 +62,8 @@ enforced to be 16-byte aligned, when compiled with cryptodev
 support. That allows certain cryptodev drivers to operate more
 efficiently.
 
-** libgnutls: Error when a public/private key pair that doesn't match
-is set into a credentials structure.
+** libgnutls: Return error when a public/private key pair that doesn't
+match is set into a credentials structure.
 
 ** libgnutls: Depend on p11-kit 0.20.0 or later.
 
@@ -72,19 +73,21 @@ been removed. It was not approved by IETF.
 ** libgnutls: The experimental xssl library is removed from the gnutls
 distribution.
 
-** libgnutls: Reduced the number of gnulib modules used.
+** libgnutls: Reduced the number of gnulib modules used in the main library.
 
 ** libgnutls: Added priority string %DISABLE_WILDCARDS.
+
+** libgnutls: Added the more extensible verification function
+gnutls_certificate_verify_peers(), that allows checking, in addition
+to a peer's DNS hostname, for the key purpose of the end certificate
+(via PKIX extended key usage).
 
 ** certtool: Timestamps for serial numbers were increased to 8 bytes,
 and in batch mode to 12 (appended with 4 random bytes).
 
-** certtool: When no password is provided to export a PKCS #8 keys, do
-not encrypt by default. The previous behavior of encrypting using a
-null password can be replicating using the new parameter --empty-password.
-
 ** certtool: When no CRL number is provided (or value set to -1), then
-a time-based number will be used.
+a time-based number will be used, similarly to the serial generation
+number in certificates.
 
 ** certtool: Print the SHA256 fingerprint of a certificate in addition
 to SHA1.
