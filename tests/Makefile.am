@@ -87,10 +87,6 @@ openssl_LDADD = ../extra/libgnutls-openssl.la $(LDADD)
 endif
 endif
 
-if !WINDOWS
-mini_global_load_LDADD = $(LDADD) -ldl
-endif
-
 if ENABLE_OPENPGP
 ctests += openpgp-auth openpgp-auth2 openpgp-keyring pgps2kgnu
 endif

@@ -34,9 +34,6 @@
 #include <gnutls/gnutls.h>
 #include "utils.h"
 #include "eagain-common.h"
-#ifndef _WIN32
-# include <dlfcn.h>
-#endif
 
 const char *side;
 
