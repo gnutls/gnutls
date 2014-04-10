@@ -64,9 +64,10 @@ gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
  * The comparison may have false-negatives as it is done byte by byte in 
  * non-ascii names.
  *
- * Unless, the flag %GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS is specified,
- * wildcards are only considered if the domain name consists of three
- * components or more, and the wildcard starts at the leftmost position.
+ * When the flag %GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS is specified no
+ * wildcards are considered. Otherwise they are only considered if the
+ * domain name consists of three components or more, and the wildcard
+ * starts at the leftmost position.
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
