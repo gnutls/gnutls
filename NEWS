@@ -61,6 +61,9 @@ enforced to be 16-byte aligned, when compiled with cryptodev
 support. That allows certain cryptodev drivers to operate more
 efficiently.
 
+** libgnutls: Error when a public/private key pair that doesn't match
+is set into a credentials structure.
+
 ** libgnutls: Depend on p11-kit 0.20.0 or later.
 
 ** libgnutls: The new padding (%NEW_PADDING) experimental TLS extension has
