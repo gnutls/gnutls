@@ -663,7 +663,7 @@ cleanup:
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 3.3.0
+ * Since: 3.3.0-FIPS140
  **/
 int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 {

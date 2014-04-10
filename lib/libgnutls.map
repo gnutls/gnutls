@@ -921,10 +921,6 @@ GNUTLS_3_1_0 {
 	gnutls_mac_get_nonce_size;
 	gnutls_x509_crl_get_raw_issuer_dn;
 	gnutls_certificate_get_crt_raw;
-	gnutls_cipher_self_test;
-	gnutls_pk_self_test;
-	gnutls_mac_self_test;
-	gnutls_digest_self_test;
 	gnutls_privkey_generate;
 	gnutls_fips140_mode_enabled;
 	gnutls_record_check_corked;
@@ -1013,6 +1009,24 @@ GNUTLS_3_1_0 {
 	gnutls_certificate_verify_peers;
 } GNUTLS_3_0_0;
 
+GNUTLS_FIPS140 {
+	gnutls_cipher_self_test;
+	gnutls_pk_self_test;
+	gnutls_mac_self_test;
+	gnutls_digest_self_test;
+	#for FIPS140-2 validation
+	rbg_aes_reseed;
+	drbg_aes_init;
+	drbg_aes_generate;
+	_dsa_generate_dss_pq;
+	_dsa_generate_dss_g;
+	_dsa_validate_dss_g;
+	_dsa_validate_dss_pq;
+	dsa_generate_dss_keypair;
+	_gnutls_encode_ber_rs_raw;
+	_rsa_generate_fips186_4_keypair;
+};
+
 GNUTLS_PRIVATE {
   global:
     # Internal symbols needed by libgnutls-extra:
@@ -1063,17 +1077,6 @@ GNUTLS_PRIVATE {
     # Internal symbols needed by tests/pkcs12_s2k:
     _gnutls_pkcs12_string_to_key;
     _gnutls_bin2hex;
-    #for FIPS140-2 validation
-    drbg_aes_reseed;
-    drbg_aes_init;
-    drbg_aes_generate;
-    _dsa_generate_dss_pq;
-    _dsa_generate_dss_g;
-    _dsa_validate_dss_g;
-    _dsa_validate_dss_pq;
-    dsa_generate_dss_keypair;
-    _gnutls_encode_ber_rs_raw;
-    _rsa_generate_fips186_4_keypair;
   local:
     *;
 };

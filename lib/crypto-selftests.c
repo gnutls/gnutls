@@ -677,7 +677,7 @@ static int test_mac(gnutls_mac_algorithm_t mac,
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 3.3.0
+ * Since: 3.3.0-FIPS140
  **/
 int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher)
 {
@@ -719,7 +719,7 @@ int gnutls_cipher_self_test(unsigned all, gnutls_cipher_algorithm_t cipher)
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 3.3.0
+ * Since: 3.3.0-FIPS140
  **/
 int gnutls_mac_self_test(unsigned all, gnutls_mac_algorithm_t mac)
 {
@@ -754,7 +754,7 @@ int gnutls_mac_self_test(unsigned all, gnutls_mac_algorithm_t mac)
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 3.3.0
+ * Since: 3.3.0-FIPS140
  **/
 int gnutls_digest_self_test(unsigned all, gnutls_digest_algorithm_t digest)
 {
