@@ -1030,11 +1030,6 @@ GNUTLS_FIPS140 {
 GNUTLS_PRIVATE {
   global:
     # Internal symbols needed by libgnutls-extra:
-    /* fips */
-    _rngfips_deinit_external_test;
-    _rngfips_run_external_test;
-    _rngfips_init_external_test;
-
     _gnutls_log_level;
     _gnutls_write_uint24;
     _gnutls_log;

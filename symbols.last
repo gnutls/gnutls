@@ -6,6 +6,7 @@ GNUTLS_2_12@GNUTLS_2_12
 GNUTLS_2_8@GNUTLS_2_8
 GNUTLS_3_0_0@GNUTLS_3_0_0
 GNUTLS_3_1_0@GNUTLS_3_1_0
+GNUTLS_FIPS140@GNUTLS_FIPS140
 GNUTLS_PRIVATE@GNUTLS_PRIVATE
 _gnutls_PRF@GNUTLS_PRIVATE
 _gnutls_asn2err@GNUTLS_PRIVATE
@@ -19,7 +20,7 @@ _gnutls_buffer_init@GNUTLS_PRIVATE
 _gnutls_buffer_pop_data@GNUTLS_PRIVATE
 _gnutls_buffer_pop_prefix@GNUTLS_PRIVATE
 _gnutls_buffer_to_datum@GNUTLS_PRIVATE
-_gnutls_encode_ber_rs_raw@GNUTLS_PRIVATE
+_gnutls_encode_ber_rs_raw@GNUTLS_FIPS140
 _gnutls_ext_get_session_data@GNUTLS_PRIVATE
 _gnutls_ext_register@GNUTLS_PRIVATE
 _gnutls_ext_set_session_data@GNUTLS_PRIVATE
