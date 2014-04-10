@@ -46,12 +46,7 @@ void _gnutls_bzero(void *v, size_t n);
 
 #define zeroize_key(x, size) _gnutls_bzero(x, size)
 
-#ifdef ENABLE_FIPS140
-# define zeroize_temp_key zeroize_key
-# define zrelease_temp_mpi_key zrelease_mpi_key
-#else
-# define zeroize_temp_key(x, size)
-# define zrelease_temp_mpi_key(mpi) _gnutls_mpi_release(mpi)
-#endif
+#define zeroize_temp_key zeroize_key
+#define zrelease_temp_mpi_key zrelease_mpi_key
 
 #endif				/* GNUTLS_MEM_H */
