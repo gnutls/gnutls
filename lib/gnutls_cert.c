@@ -914,15 +914,20 @@ gnutls_sign_callback_get(gnutls_session_t session, void **userdata)
 	return session->internals.sign_func;
 }
 
+#define TEST_TEXT "test text"
 /* returns error if the certificate has different algorithm than
  * the given key parameters.
  */
 int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 {
-	int pk =
+	gnutls_datum_t test = {(void*)TEST_TEXT, sizeof(TEST_TEXT)-1};
+	gnutls_datum_t sig = {NULL, 0};
+	int pk, pk2, ret;
+
+	pk =
 	    gnutls_pubkey_get_pk_algorithm(res->certs[res->ncerts - 1].
 					   cert_list[0].pubkey, NULL);
-	int pk2 =
+	pk2 =
 	    gnutls_privkey_get_pk_algorithm(res->pkey[res->ncerts - 1],
 					    NULL);
 
@@ -931,6 +936,29 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	}
 
+	/* now check if keys really match. We use the sign/verify approach
+	 * because we cannot always obtain the parameters from the abstract
+	 * keys (e.g. PKCS #11). */
+	ret = gnutls_privkey_sign_data(res->pkey[res->ncerts - 1],
+		GNUTLS_DIG_SHA256, 0, &test, &sig);
+	if (ret < 0) {
+		/* for some reason we couldn't sign that. That shouldn't have
+		 * happened, but since it did, report the issue and do not
+		 * try the key matching test */
+		_gnutls_debug_log("%s: failed signing\n", __func__);
+		goto finish;
+	}
+
+	ret = gnutls_pubkey_verify_data2(res->certs[res->ncerts - 1].cert_list[0].pubkey,
+		gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256),
+		0, &test, &sig);
+
+	gnutls_free(sig.data);
+
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
+
+ finish:
 	return 0;
 }
 
