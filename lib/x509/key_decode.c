@@ -182,7 +182,7 @@ _gnutls_x509_read_dsa_params(uint8_t * der, int dersize,
  */
 int
 _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
-			     gnutls_pk_params_st * params)
+			     unsigned int * curve)
 {
 	int ret;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -214,8 +214,8 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 		goto cleanup;
 	}
 
-	params->flags = _gnutls_oid_to_ecc_curve(oid);
-	if (params->flags == GNUTLS_ECC_CURVE_INVALID) {
+	*curve = _gnutls_oid_to_ecc_curve(oid);
+	if (*curve == GNUTLS_ECC_CURVE_INVALID) {
 		_gnutls_debug_log("Curve %s is not supported\n", oid);
 		gnutls_assert();
 		ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
@@ -270,7 +270,7 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_DSA:
 		return _gnutls_x509_read_dsa_params(der, dersize, params);
 	case GNUTLS_PK_EC:
-		return _gnutls_x509_read_ecc_params(der, dersize, params);
+		return _gnutls_x509_read_ecc_params(der, dersize, &params->flags);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}

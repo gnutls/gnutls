@@ -236,7 +236,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
  */
 int
 _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_key,
-			       gnutls_x509_privkey_t pkey)
+			       gnutls_x509_privkey_t pkey, gnutls_ecc_curve_t curve)
 {
 	int ret;
 	unsigned int version;
@@ -247,7 +247,6 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 	gnutls_pk_params_init(&pkey->params);
 
 	pkey->params.algo = GNUTLS_PK_EC;
-
 	if ((ret =
 	     asn1_create_element(_gnutls_get_gnutls_asn(),
 				 "GNUTLS.ECPrivateKey",
@@ -281,23 +280,29 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 	}
 
 	/* read the curve */
-	oid_size = sizeof(oid);
-	ret =
-	    asn1_read_value(*pkey_asn, "parameters.namedCurve", oid,
+	if (curve == GNUTLS_ECC_CURVE_INVALID) {
+		oid_size = sizeof(oid);
+		ret =
+		    asn1_read_value(*pkey_asn, "parameters.namedCurve", oid,
 			    &oid_size);
-	if (ret != ASN1_SUCCESS) {
-		gnutls_assert();
-		ret = _gnutls_asn2err(ret);
-		goto error;
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto error;
+		}
+
+		pkey->params.flags = _gnutls_oid_to_ecc_curve(oid);
+
+		if (pkey->params.flags == GNUTLS_ECC_CURVE_INVALID) {
+			_gnutls_debug_log("Curve %s is not supported\n", oid);
+			gnutls_assert();
+			ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
+			goto error;
+		}
+	} else {
+		pkey->params.flags = curve;
 	}
 
-	pkey->params.flags = _gnutls_oid_to_ecc_curve(oid);
-	if (pkey->params.flags == GNUTLS_ECC_CURVE_INVALID) {
-		_gnutls_debug_log("Curve %s is not supported\n", oid);
-		gnutls_assert();
-		ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
-		goto error;
-	}
 
 	/* read the public key */
 	ret = _gnutls_x509_read_value(*pkey_asn, "publicKey", &out);
@@ -506,7 +511,7 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 		if (key->key == NULL)
 			gnutls_assert();
 	} else if (key->pk_algorithm == GNUTLS_PK_EC) {
-		result = _gnutls_privkey_decode_ecc_key(&key->key, &_data, key);
+		result = _gnutls_privkey_decode_ecc_key(&key->key, &_data, key, 0);
 		if (result < 0) {
 			gnutls_assert();
 			goto failover;
@@ -525,7 +530,7 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 			if (key->key == NULL) {
 				key->pk_algorithm = GNUTLS_PK_EC;
 				result =
-				    _gnutls_privkey_decode_ecc_key(&key->key, &_data, key);
+				    _gnutls_privkey_decode_ecc_key(&key->key, &_data, key, 0);
 				if (result < 0) {
 					gnutls_assert();
 					goto failover;
@@ -1322,7 +1327,6 @@ char* gen_data = NULL;
 			goto cleanup;
 		}
 		break;
-		
 
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_UNKNOWN_PK_ALGORITHM);

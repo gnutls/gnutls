@@ -1384,7 +1384,7 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
 
 	ret =
 	    _gnutls_x509_read_ecc_params(parameters->data,
-					 parameters->size, &key->params);
+					 parameters->size, &key->params.flags);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

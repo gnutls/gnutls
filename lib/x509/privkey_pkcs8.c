@@ -1017,6 +1017,23 @@ _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 {
 	int ret;
 	gnutls_datum_t tmp;
+	unsigned char oid[MAX_OID_SIZE];
+	unsigned curve = GNUTLS_ECC_CURVE_INVALID;
+	int len, result;
+
+	/* openssl PKCS #8 files with ECC keys place the curve in
+	 * privateKeyAlgorithm.parameters instead of the ECPrivateKey.parameters.
+	 */
+	len = sizeof(oid);
+	result =
+	    asn1_read_value(pkcs8_asn, "privateKeyAlgorithm.parameters",
+			    oid, &len);
+	if (result == ASN1_SUCCESS) {
+		ret = _gnutls_x509_read_ecc_params(oid, len, &curve);
+		if (ret < 0) {
+			curve = GNUTLS_ECC_CURVE_INVALID;
+		}
+	}
 
 	ret = _gnutls_x509_read_value(pkcs8_asn, "privateKey", &tmp);
 	if (ret < 0) {
@@ -1024,7 +1041,7 @@ _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 
-	ret = _gnutls_privkey_decode_ecc_key(&pkey->key, &tmp, pkey);
+	ret = _gnutls_privkey_decode_ecc_key(&pkey->key, &tmp, pkey, curve);
 	_gnutls_free_key_datum(&tmp);
 
 	if (ret < 0) {
@@ -1116,7 +1133,7 @@ decode_private_key_info(const gnutls_datum_t * der,
 			gnutls_x509_privkey_t pkey)
 {
 	int result, len;
-	char oid[64];
+	char oid[MAX_OID_SIZE];
 	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
 
 
