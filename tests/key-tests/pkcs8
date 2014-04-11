@@ -106,6 +106,32 @@ if test "$rc" != "0"; then
   exit $rc
 fi
 
+# Tests for PKCS #8 ECC keys
+
+$CERTTOOL -k --infile $srcdir/key-ecc.pem >/dev/null 2>&1
+rc=$?
+# We're done.
+if test "$rc" != "0"; then
+  echo "Error in reading saved ECC key"
+  exit $rc
+fi
+
+$CERTTOOL -k --pkcs8 --infile $srcdir/key-ecc.p8 >/dev/null 2>&1
+rc=$?
+# We're done.
+if test "$rc" != "0"; then
+  echo "Error in reading saved PKCS #8 ECC key"
+  exit $rc
+fi
+
+$CERTTOOL -k --pkcs8 --infile $srcdir/openssl-key-ecc.p8 >/dev/null 2>&1
+rc=$?
+# We're done.
+if test "$rc" != "0"; then
+  echo "Error in reading saved openssl PKCS #8 ECC key"
+  exit $rc
+fi
+
 rm -f tmp-key-ca.p8
 
 exit 0

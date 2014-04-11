@@ -21,7 +21,8 @@
 
 EXTRA_DIST = README key-ca.pem key-user.pem \
 	ca-gnutls-keyid.pem ca-no-keyid.pem ca-weird-keyid.pem \
-	key-ca-1234.p8 key-ca-empty.p8 key-ca-null.p8 
+	key-ca-1234.p8 key-ca-empty.p8 key-ca-null.p8 \
+	openssl-key-ecc.p8 key-ecc.p8 key-ecc.pem
 
 dist_check_SCRIPTS = key-id pkcs8
 
