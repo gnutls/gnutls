@@ -3,6 +3,18 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.1 (unreleased)
+
+** libgnutls: Enforce more strict checks to heartbeat messages
+concerning padding and payload. Suggested by Peter Williams.
+
+** libgnutls: Allow decoding PKCS #8 files with ECC parameters
+from openssl.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.0 (released 2014-04-10)
 
 ** libgnutls: The initialization of the library was moved to a
