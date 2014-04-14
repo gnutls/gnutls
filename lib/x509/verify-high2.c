@@ -241,20 +241,22 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 	size_t size;
 	int ret;
 
+	if (ca_file != NULL) {
 #ifdef ENABLE_PKCS11
-	if (strncmp(ca_file, "pkcs11:", 7) == 0) {
-		list->pkcs11_token = gnutls_strdup(ca_file);
+		if (strncmp(ca_file, "pkcs11:", 7) == 0) {
+			list->pkcs11_token = gnutls_strdup(ca_file);
 
-		return 0;
-	} else
+			return 0;
+		} else
 #endif
-	{
-		cas.data = (void *) read_binary_file(ca_file, &size);
-		if (cas.data == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_FILE_ERROR;
+		{
+			cas.data = (void *) read_binary_file(ca_file, &size);
+			if (cas.data == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_FILE_ERROR;
+			}
+			cas.size = size;
 		}
-		cas.size = size;
 	}
 
 	if (crl_file) {
