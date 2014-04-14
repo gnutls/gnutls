@@ -909,18 +909,19 @@ margin, although the 256-bit ciphers are included as a fallback only.
 The message authenticity security level is of 64 bits or more,
 and the certificate verification profile is set to GNUTLS_PROFILE_LOW (80-bits).
 
-This priority string implicitly enables DHE and ECDHE.
+This priority string implicitly enables ECDHE and DHE. The ECDHE ciphersuites
+are placed first in the priority order, but due to compatibility 
+issues with the DHE ciphersuites they are placed last in the priority order,
+after the plain RSA ciphersuites.
 
 @item LEGACY @tab
 This sets the NORMAL settings that were used for GnuTLS 3.2.x or earlier. There is
 no verification profile set, and the allowed DH primes are considered
 weak today (but are often used by misconfigured servers).
 
-This priority string implicitly enables DHE and ECDHE.
-
 @item PFS @tab
 Means all the known to be secure ciphersuites that support perfect forward
-secrecy. The ciphers are sorted by security
+secrecy (ECDHE and DHE). The ciphers are sorted by security
 margin, although the 256-bit ciphers are included as a fallback only.
 The message authenticity security level is of 80 bits or more,
 and the certificate verification profile is set to GNUTLS_PROFILE_LOW (80-bits).
