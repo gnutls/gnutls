@@ -135,18 +135,6 @@ cdk_error_t _cdk_map_gnutls_error(int err)
 }
 
 
-/* Remove all trailing white spaces from the string. */
-void _cdk_trim_string(char *s)
-{
-	int len = strlen(s);
-	while (s && *s &&
-	       (s[len - 1] == '\t' ||
-		s[len - 1] == '\r' ||
-		s[len - 1] == '\n' || s[len - 1] == ' '))
-		s[len - 1] = '\0';
-}
-
-
 int _cdk_check_args(int overwrite, const char *in, const char *out)
 {
 	struct stat stbuf;

@@ -156,7 +156,9 @@ static int compress_get_algo(cdk_stream_t inp, int *r_zipalgo)
 	int nread, pkttype;
 	size_t plain_size;
 
-	*r_zipalgo = 0;
+	if (r_zipalgo)
+		*r_zipalgo = 0;
+
 	cdk_stream_seek(inp, 0);
 	while (!cdk_stream_eof(inp)) {
 		nread = _cdk_stream_gets(inp, buf, DIM(buf) - 1);
@@ -183,50 +185,6 @@ static int compress_get_algo(cdk_stream_t inp, int *r_zipalgo)
 		}
 	}
 	return 0;
-}
-
-
-static int check_armor(cdk_stream_t inp, int *r_zipalgo)
-{
-	char buf[4096];
-	size_t nread;
-	int check;
-
-	check = 0;
-	nread = cdk_stream_read(inp, buf, DIM(buf) - 1);
-	if (nread > 0) {
-		buf[nread] = '\0';
-		if (strstr(buf, "-----BEGIN PGP")) {
-			compress_get_algo(inp, r_zipalgo);
-			check = 1;
-		}
-		cdk_stream_seek(inp, 0);
-	}
-	return check;
-}
-
-
-static int is_armored(int ctb)
-{
-	int pkttype = 0;
-
-	if (!(ctb & 0x80)) {
-		gnutls_assert();
-		return 1;	/* invalid packet: assume it is armored */
-	}
-	pkttype = ctb & 0x40 ? (ctb & 0x3f) : ((ctb >> 2) & 0xf);
-	switch (pkttype) {
-	case CDK_PKT_MARKER:
-	case CDK_PKT_ONEPASS_SIG:
-	case CDK_PKT_PUBLIC_KEY:
-	case CDK_PKT_SECRET_KEY:
-	case CDK_PKT_PUBKEY_ENC:
-	case CDK_PKT_SIGNATURE:
-	case CDK_PKT_LITERAL:
-	case CDK_PKT_COMPRESSED:
-		return 0;	/* seems to be a regular packet: not armored */
-	}
-	return 1;
 }
 
 
@@ -258,8 +216,8 @@ static cdk_error_t armor_encode(void *data, FILE * in, FILE * out)
 		gnutls_assert();
 		return CDK_Inv_Value;
 	}
-	if (afx->idx < 0 || afx->idx > (int) DIM(armor_begin) ||
-	    afx->idx2 < 0 || afx->idx2 > (int) DIM(armor_end)) {
+	if (afx->idx < 0 || afx->idx >= (int) DIM(armor_begin) ||
+	    afx->idx2 < 0 || afx->idx2 >= (int) DIM(armor_end)) {
 		gnutls_assert();
 		return CDK_Inv_Value;
 	}

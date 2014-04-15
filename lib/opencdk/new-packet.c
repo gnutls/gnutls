@@ -269,7 +269,7 @@ cdk_error_t cdk_pkt_alloc(cdk_packet_t * r_pkt, cdk_packet_type_t pkttype)
 
 	switch (pkttype) {
 	case CDK_PKT_USER_ID:
-		pkt->pkt.user_id = cdk_calloc(1, sizeof pkt->pkt.user_id);
+		pkt->pkt.user_id = cdk_calloc(1, sizeof *pkt->pkt.user_id);
 		if (!pkt->pkt.user_id)
 			return CDK_Out_Of_Core;
 		pkt->pkt.user_id->name = NULL;
@@ -287,10 +287,16 @@ cdk_error_t cdk_pkt_alloc(cdk_packet_t * r_pkt, cdk_packet_type_t pkttype)
 	case CDK_PKT_SECRET_SUBKEY:
 		pkt->pkt.secret_key =
 		    cdk_calloc(1, sizeof *pkt->pkt.secret_key);
+		if (!pkt->pkt.secret_key)
+			return CDK_Out_Of_Core;
+
 		pkt->pkt.secret_key->pk =
 		    cdk_calloc(1, sizeof *pkt->pkt.secret_key->pk);
-		if (!pkt->pkt.secret_key || !pkt->pkt.secret_key->pk)
+		if (!pkt->pkt.secret_key->pk) {
+			cdk_free(pkt->pkt.secret_key);
+			pkt->pkt.secret_key = NULL;
 			return CDK_Out_Of_Core;
+		}
 		break;
 
 	case CDK_PKT_SIGNATURE:
