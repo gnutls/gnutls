@@ -1570,10 +1570,10 @@ gnutls_x509_crq_get_extension_data2(gnutls_x509_crq_t crq,
 		goto cleanup;
 	}
 
-	ret = asn1_der_decoding(&c2, extensions, extensions_size, NULL);
-	if (ret != ASN1_SUCCESS) {
+	result = asn1_der_decoding(&c2, extensions, extensions_size, NULL);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		ret = _gnutls_asn2err(ret);
+		ret = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 

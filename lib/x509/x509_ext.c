@@ -2655,8 +2655,8 @@ static int parse_aia(ASN1_TYPE c2, gnutls_x509_aia_t aia)
 			break;
 
 		aia->size++;
+
 	}
-	while (ret >= 0);
 	
 	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		return ret;
