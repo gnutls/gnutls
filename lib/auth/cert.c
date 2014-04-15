@@ -624,8 +624,7 @@ call_get_cert_callback(gnutls_session_t session,
 	}
 
 	_gnutls_selected_certs_set(session, local_certs,
-				   (local_certs != NULL) ? st2.ncerts : 0,
-				   local_key, 1);
+				   st2.ncerts, local_key, 1);
 
 	ret = 0;
 
@@ -1342,8 +1341,10 @@ _gnutls_proc_openpgp_server_crt(gnutls_session_t session,
       cleanup:
 
 	_gnutls_free_datum(&akey);
-	gnutls_pcert_deinit(&peer_certificate_list[0]);
-	gnutls_free(peer_certificate_list);
+	if (peer_certificate_list != NULL) {
+		gnutls_pcert_deinit(&peer_certificate_list[0]);
+		gnutls_free(peer_certificate_list);
+	}
 	return ret;
 
 }

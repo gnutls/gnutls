@@ -248,10 +248,6 @@ gnutls_record_send_range(gnutls_session_t session, const void *data,
 	if (ret == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (ret == 0 && range->low != range->high)
-		/* Cannot use LH, but a range was given */
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 	_gnutls_set_range(&cur_range, range->low, range->high);
 
 	_gnutls_record_log

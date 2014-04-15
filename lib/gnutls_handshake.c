@@ -2908,6 +2908,7 @@ static int _gnutls_send_handshake_final(gnutls_session_t session, int init)
 			return ret;
 		}
 
+		/* fallthrough */
 	case STATE2:
 		/* send the finished message */
 		ret = _gnutls_send_finished(session, FAGAIN(STATE2));
@@ -2999,6 +3000,7 @@ static int _gnutls_recv_handshake_final(gnutls_session_t session, int init)
 			return ret;
 		}
 
+		/* fallthrough */
 	case STATE31:
 		FINAL_STATE = STATE31;
 

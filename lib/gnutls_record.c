@@ -304,7 +304,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 			gnutls_assert();
 			return ret;
 		}
-
+		/* fallthrough */
 	case STATE61:
 		ret =
 		    gnutls_alert_send(session, GNUTLS_AL_WARNING,

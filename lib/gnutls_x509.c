@@ -1773,7 +1773,7 @@ gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 	return ret;
 
       cleanup:
-	for (j = 0; j < i; i++)
+	for (j = 0; j < i; j++)
 		gnutls_x509_crt_deinit(new_list[j]);
 
 	return ret;
