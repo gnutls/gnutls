@@ -50,7 +50,11 @@ _gnutls_x509_get_tbs(ASN1_TYPE cert, const char *tbs_name,
 	int buf_size;
 
 	buf_size = 0;
-	asn1_der_coding(cert, tbs_name, NULL, &buf_size, NULL);
+	result = asn1_der_coding(cert, tbs_name, NULL, &buf_size, NULL);
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
 
 	buf = gnutls_malloc(buf_size);
 	if (buf == NULL) {

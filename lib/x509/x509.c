@@ -2495,7 +2495,11 @@ gnutls_x509_crt_get_fingerprint(gnutls_x509_crt_t cert,
 	}
 
 	cert_buf_size = 0;
-	asn1_der_coding(cert->cert, "", NULL, &cert_buf_size, NULL);
+	result = asn1_der_coding(cert->cert, "", NULL, &cert_buf_size, NULL);
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
 
 	cert_buf = gnutls_malloc(cert_buf_size);
 	if (cert_buf == NULL) {

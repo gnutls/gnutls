@@ -855,7 +855,6 @@ gnutls_x509_crl_get_number(gnutls_x509_crl_t crl, void *ret,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-
 	if (ret)
 		memset(ret, 0, *ret_size);
 	else
