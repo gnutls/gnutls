@@ -417,7 +417,7 @@ cdk_kbnode_write_to_mem_alloc(cdk_kbnode_t node,
 	cdk_kbnode_t n;
 	cdk_stream_t s;
 	cdk_error_t rc;
-	size_t len;
+	ssize_t len;
 
 	if (!node || !r_buf || !r_buflen) {
 		gnutls_assert();
@@ -453,6 +453,9 @@ cdk_kbnode_write_to_mem_alloc(cdk_kbnode_t node,
 
 	cdk_stream_seek(s, 0);
 	len = cdk_stream_get_length(s);
+	if (len == 0)
+		return gnutls_assert_val(CDK_General_Error);
+
 	*r_buf = cdk_calloc(1, len);
 	*r_buflen = cdk_stream_read(s, *r_buf, len);
 	cdk_stream_close(s);
@@ -477,7 +480,7 @@ cdk_kbnode_write_to_mem(cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
 	cdk_kbnode_t n;
 	cdk_stream_t s;
 	cdk_error_t rc;
-	size_t len;
+	ssize_t len;
 
 	if (!node || !r_nbytes) {
 		gnutls_assert();
@@ -509,7 +512,11 @@ cdk_kbnode_write_to_mem(cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
 	}
 
 	cdk_stream_seek(s, 0);
+
 	len = cdk_stream_get_length(s);
+	if (len == 0)
+		return gnutls_assert_val(CDK_General_Error);
+
 	if (!buf) {
 		*r_nbytes = len;	/* Only return the length of the buffer */
 		cdk_stream_close(s);

@@ -546,7 +546,7 @@ off_t cdk_stream_get_length(cdk_stream_t s)
 
 	if (!s) {
 		gnutls_assert();
-		return (off_t) - 1;
+		return (off_t) 0;
 	}
 
 	/* The user callback does not support stat. */
@@ -557,13 +557,13 @@ off_t cdk_stream_get_length(cdk_stream_t s)
 	if (rc) {
 		s->error = rc;
 		gnutls_assert();
-		return (off_t) - 1;
+		return (off_t) 0;
 	}
 
 	if (fstat(fileno(s->fp), &statbuf)) {
 		s->error = CDK_File_Error;
 		gnutls_assert();
-		return (off_t) - 1;
+		return (off_t) 0;
 	}
 
 	return statbuf.st_size;
@@ -922,7 +922,7 @@ int cdk_stream_read(cdk_stream_t s, void *buf, size_t buflen)
 		s->flags.filtrated = 1;
 	}
 
-	if (!buf && !buflen)
+	if (!buf || !buflen)
 		return 0;
 
 	nread = fread(buf, 1, buflen, s->fp);
@@ -1052,7 +1052,7 @@ int cdk_stream_putc(cdk_stream_t s, int c)
 
 off_t cdk_stream_tell(cdk_stream_t s)
 {
-	return s ? ftell(s->fp) : (off_t) - 1;
+	return s ? ftell(s->fp) : (off_t) 0;
 }
 
 

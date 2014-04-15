@@ -187,12 +187,14 @@ static cdk_error_t literal_encode(void *data, FILE * in, FILE * out)
 	filelen = strlen(pfx->filename);
 	cdk_pkt_new(&pkt);
 	pt = pkt->pkt.literal = cdk_calloc(1, sizeof *pt + filelen);
-	pt->name = (char *) pt + sizeof(*pt);
-	if (!pt) {
+	if (pt == NULL) {
 		cdk_pkt_release(pkt);
 		cdk_stream_close(si);
-		return CDK_Out_Of_Core;
+		return gnutls_assert_val(CDK_Out_Of_Core);
 	}
+
+	pt->name = (char *) pt + sizeof(*pt);
+
 	memcpy(pt->name, pfx->filename, filelen);
 	pt->namelen = filelen;
 	pt->name[pt->namelen] = '\0';
@@ -230,6 +232,20 @@ int _cdk_filter_literal(void *data, int ctl, FILE * in, FILE * out)
 	return CDK_Inv_Mode;
 }
 
+/* Remove all trailing white spaces from the string. */
+static void _cdk_trim_string(char *s)
+{
+	int len = strlen(s);
+	unsigned i;
+
+	for (i=len-1;i>=0;i--) {
+		if ((s[i] == '\t' || s[i] == '\r' || s[i] == '\n' || s[i] == ' ')) {
+			s[i] = 0;
+		} else {
+			break;
+		}
+	}
+}
 
 static int text_encode(void *data, FILE * in, FILE * out)
 {

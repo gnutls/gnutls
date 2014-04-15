@@ -225,7 +225,7 @@ static cdk_error_t
 keydb_idx_search(cdk_stream_t inp, u32 * keyid, const byte * fpr,
 		 off_t * r_off)
 {
-	key_idx_t idx;
+	key_idx_t idx = 0;
 
 	if (!inp || !r_off) {
 		gnutls_assert();
@@ -757,8 +757,6 @@ void cdk_keydb_search_release(cdk_keydb_search_t st)
 	if (st->idx)
 		cdk_stream_close(st->idx);
 
-	if (!st)
-		return;
 	if (st->type == CDK_DBSEARCH_EXACT
 	    || st->type == CDK_DBSEARCH_SUBSTR)
 		cdk_free(st->u.pattern);
