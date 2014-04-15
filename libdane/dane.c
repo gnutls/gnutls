@@ -760,7 +760,7 @@ dane_verify_crt(dane_state_t s,
 	ret = dane_verify_crt_raw(state, chain, chain_size, chain_type,
 				  r, sflags, vflags, verify);
       cleanup:
-	if (state != NULL)
+	if (state != s)
 		dane_state_deinit(state);
 	if (r != NULL)
 		dane_query_deinit(r);
