@@ -242,7 +242,10 @@ _gnutls_gen_extensions(gnutls_session_t session,
 	size_t i, init_size = extdata->length;
 
 	pos = extdata->length;	/* we will store length later on */
-	_gnutls_buffer_append_prefix(extdata, 16, 0);
+
+	ret = _gnutls_buffer_append_prefix(extdata, 16, 0);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	for (i = 0; i < extfunc_size; i++) {
 		extension_entry_st *p = &extfunc[i];

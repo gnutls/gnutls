@@ -234,8 +234,7 @@ int _gnutls_server_register_current_session(gnutls_session_t session)
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
-	if (session->security_parameters.session_id == NULL
-	    || session->security_parameters.session_id_size == 0) {
+	if (session->security_parameters.session_id_size == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}

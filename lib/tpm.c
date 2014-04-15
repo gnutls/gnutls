@@ -808,7 +808,7 @@ static int decode_tpmkey_url(const char *url, struct tpmkey_url_st *s)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 	}
 
-	if ((p = strstr(url, "storage=user")) != NULL)
+	if (strstr(url, "storage=user") != NULL)
 		s->storage = TSS_PS_TYPE_USER;
 	else
 		s->storage = TSS_PS_TYPE_SYSTEM;

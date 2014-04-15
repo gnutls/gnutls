@@ -2506,8 +2506,11 @@ find_objs(struct pkcs11_session_info *sinfo,
 			a[0].value = &class;
 			a[0].value_len = sizeof class;
 
-			pkcs11_get_attribute_value(sinfo->module,
+			rv = pkcs11_get_attribute_value(sinfo->module,
 						   sinfo->pks, obj, a, 1);
+			if (rv != CKR_OK) {
+				class = -1;
+			}
 		}
 
 		if (find_data->flags ==

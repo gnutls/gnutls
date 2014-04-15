@@ -293,7 +293,12 @@ encode_ber_digest_info(const mac_entry_st * e,
 	}
 
 	tmp_output_size = 0;
-	asn1_der_coding(dinfo, "", NULL, &tmp_output_size, NULL);
+	result = asn1_der_coding(dinfo, "", NULL, &tmp_output_size, NULL);
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		asn1_delete_structure(&dinfo);
+		return _gnutls_asn2err(result);
+	}
 
 	tmp_output = gnutls_malloc(tmp_output_size);
 	if (tmp_output == NULL) {

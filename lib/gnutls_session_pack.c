@@ -598,15 +598,8 @@ pack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 	if (info == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	if (info->username)
-		username_len = strlen(info->username) + 1;	/* include the terminating null */
-	else
-		username_len = 0;
-
-	if (info->hint)
-		hint_len = strlen(info->hint) + 1;	/* include the terminating null */
-	else
-		hint_len = 0;
+	username_len = strlen(info->username) + 1;	/* include the terminating null */
+	hint_len = strlen(info->hint) + 1;	/* include the terminating null */
 
 	size_offset = ps->length;
 	BUFFER_APPEND_NUM(ps, 0);

@@ -193,13 +193,13 @@ gnutls_compression_set_priority(gnutls_session_t session, const int *list)
  **/
 int gnutls_protocol_set_priority(gnutls_session_t session, const int *list)
 {
-	_set_priority(&session->internals.priorities.protocol, list);
-
-	/* set the current version to the first in the chain.
-	 * This will be overridden later.
-	 */
-	if (list)
+	if (list) {
+		_set_priority(&session->internals.priorities.protocol, list);
+		/* set the current version to the first in the chain.
+		 * This will be overridden later.
+		 */
 		_gnutls_set_current_version(session, list[0]);
+	}
 
 	return 0;
 }
@@ -647,7 +647,7 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 #define SET_PROFILE(to_set) \
 	profile = GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags); \
 	if (profile == 0 || profile > to_set) { \
-		priority_cache->additional_verify_flags &= !GNUTLS_VFLAGS_PROFILE_MASK; \
+		priority_cache->additional_verify_flags &= ~GNUTLS_VFLAGS_PROFILE_MASK; \
 		priority_cache->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(to_set); \
 	}
 

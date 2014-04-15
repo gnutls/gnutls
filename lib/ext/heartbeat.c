@@ -200,6 +200,8 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 		gettime(&session->internals.hb_ping_start);
 		session->internals.hb_local_data.length = data_size;
 		session->internals.hb_state = SHB_SEND2;
+
+		/* fallthrough */
 	case SHB_SEND2:
 		session->internals.hb_actual_retrans_timeout_ms =
 		    session->internals.hb_retrans_timeout_ms;
