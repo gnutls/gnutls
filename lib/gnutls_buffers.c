@@ -901,7 +901,7 @@ int ret;
   if (exists == 0)
     pos = session->internals.handshake_recv_buffer_size;
 
-  if (pos > MAX_HANDSHAKE_MSGS)
+  if (pos >= MAX_HANDSHAKE_MSGS)
     return gnutls_assert_val(GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS);
 
   if (exists == 0)
