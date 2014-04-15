@@ -32,6 +32,7 @@
 #include <limits.h>
 #include <inttypes.h>
 #include <time.h>
+#include <timespec.h>
 #include <parse-datetime.h>
 #include <autoopts/options.h>
 #include <intprops.h>
@@ -42,6 +43,7 @@
 
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #elif HAVE_WS2TCPIP_H
 #include <ws2tcpip.h>
 #endif
@@ -192,7 +194,6 @@ void cfg_init(void)
 int template_parse(const char *template)
 {
 	/* Parsing return code */
-	int ret;
 	unsigned int i;
 	tOptionValue const *pov;
 	const tOptionValue *val;
@@ -717,7 +718,6 @@ void get_dn_crt_set(gnutls_x509_crt_t crt)
 void crt_constraints_set(gnutls_x509_crt_t crt)
 {
 	int ret;
-	const char *err;
 	unsigned i;
 	gnutls_x509_name_constraints_t nc;
 	gnutls_datum_t name;
@@ -737,7 +737,7 @@ void crt_constraints_set(gnutls_x509_crt_t crt)
 
 			for (i = 0; cfg.permitted_nc_dns[i] != NULL; i++) {
 
-				name.data = cfg.permitted_nc_dns[i];
+				name.data = (void*)cfg.permitted_nc_dns[i];
 				name.size = strlen((char*)name.data);
 				ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME, &name);
 				if (ret < 0) {
@@ -749,7 +749,7 @@ void crt_constraints_set(gnutls_x509_crt_t crt)
 
 		if (cfg.excluded_nc_dns) {
 			for (i = 0; cfg.excluded_nc_dns[i] != NULL; i++) {
-				name.data = cfg.excluded_nc_dns[i];
+				name.data = (void*)cfg.excluded_nc_dns[i];
 				name.size = strlen((char*)name.data);
 				ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_DNSNAME, &name);
 				if (ret < 0) {
@@ -761,7 +761,7 @@ void crt_constraints_set(gnutls_x509_crt_t crt)
 
 		if (cfg.permitted_nc_email) {
 			for (i = 0; cfg.permitted_nc_email[i] != NULL; i++) {
-				name.data = cfg.permitted_nc_email[i];
+				name.data = (void*)cfg.permitted_nc_email[i];
 				name.size = strlen((char*)name.data);
 				ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_RFC822NAME, &name);
 				if (ret < 0) {
@@ -773,7 +773,7 @@ void crt_constraints_set(gnutls_x509_crt_t crt)
 
 		if (cfg.permitted_nc_email) {
 			for (i = 0; cfg.excluded_nc_email[i] != NULL; i++) {
-				name.data = cfg.excluded_nc_email[i];
+				name.data = (void*)cfg.excluded_nc_email[i];
 				name.size = strlen((char*)name.data);
 				ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_RFC822NAME, &name);
 				if (ret < 0) {
@@ -884,7 +884,7 @@ void get_ocsp_issuer_set(gnutls_x509_crt_t crt)
 		if (!cfg.ocsp_uris)
 			return;
 		for (i = 0; cfg.ocsp_uris[i] != NULL; i++) {
-			uri.data = cfg.ocsp_uris[i];
+			uri.data = (void*)cfg.ocsp_uris[i];
 			uri.size = strlen(cfg.ocsp_uris[i]);
 			ret =
 			    gnutls_x509_crt_set_authority_info_access(crt,
@@ -909,7 +909,7 @@ void get_ca_issuers_set(gnutls_x509_crt_t crt)
 		if (!cfg.ca_issuers_uris)
 			return;
 		for (i = 0; cfg.ca_issuers_uris[i] != NULL; i++) {
-			uri.data = cfg.ca_issuers_uris[i];
+			uri.data = (void*)cfg.ca_issuers_uris[i];
 			uri.size = strlen(cfg.ca_issuers_uris[i]);
 			ret =
 			    gnutls_x509_crt_set_authority_info_access(crt,
@@ -951,10 +951,10 @@ void get_pkcs9_email_crt_set(gnutls_x509_crt_t crt)
 }
 
 
+static
 void get_rand_int_value(unsigned char* serial, size_t * size, int64_t cfg_val, const char *msg)
 {
 	struct timespec ts;
-	char dserial[12];
 	uint32_t default_serial[2];
 
 	/* default format:
@@ -995,7 +995,7 @@ void get_rand_int_value(unsigned char* serial, size_t * size, int64_t cfg_val, c
 #else
 		default_serial_int = (ts.tv_sec << 32) | ts.tv_nsec;
 #endif
-		snprintf(tmsg, sizeof(tmsg), "%s (default: %lu): ", msg);
+		snprintf(tmsg, sizeof(tmsg), "%s (default: %lu): ", msg, default_serial_int);
 		default_serial_int = read_int_with_default(tmsg, (long)default_serial_int);
 
 		default_serial[0] = default_serial_int >> 32;
@@ -1025,7 +1025,6 @@ void get_serial(unsigned char* serial, size_t * size)
 static
 time_t get_date(const char* date)
 {
-	time_t t;
 	struct timespec r;
 
 	if (date==NULL || parse_datetime(&r, date, NULL) == 0) {
@@ -1071,6 +1070,7 @@ time_t now = time(NULL);
         return secs;
 }
 
+static
 time_t get_int_date(const char *txt_val, int int_val, const char *msg)
 {
 	if (batch) {
