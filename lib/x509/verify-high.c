@@ -100,9 +100,12 @@ gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
 /**
  * gnutls_x509_trust_list_deinit:
  * @list: The structure to be deinitialized
- * @all: if non-(0) it will deinitialize all the certificates and CRLs contained in the structure.
+ * @all: if non-zero it will deinitialize all the certificates and CRLs contained in the structure.
  *
- * This function will deinitialize a trust list.
+ * This function will deinitialize a trust list. Note that the
+ * @all flag should be typically non-zero unless you have specified
+ * your certificates using gnutls_x509_trust_list_add_cas() and you
+ * want to prevent them from being deinitialized by this function.
  *
  * Since: 3.0.0
  **/
@@ -121,27 +124,30 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
 	gnutls_free(list->blacklisted);
 
 	for (i = 0; i < list->size; i++) {
-		if (all)
+		if (all) {
 			for (j = 0; j < list->node[i].trusted_ca_size; j++) {
 				gnutls_x509_crt_deinit(list->node[i].
 						       trusted_cas[j]);
 			}
+		}
 		gnutls_free(list->node[i].trusted_cas);
 
 
-		if (all)
+		if (all) {
 			for (j = 0; j < list->node[i].crl_size; j++) {
 				gnutls_x509_crl_deinit(list->node[i].
 						       crls[j]);
 			}
+		}
 		gnutls_free(list->node[i].crls);
 
-		if (all)
+		if (all) {
 			for (j = 0; j < list->node[i].named_cert_size; j++) {
 				gnutls_x509_crt_deinit(list->node[i].
 						       named_certs[j].
 						       cert);
 			}
+		}
 		gnutls_free(list->node[i].named_certs);
 	}
 
@@ -606,7 +612,7 @@ static gnutls_x509_crt_t *sort_clist(gnutls_x509_crt_t
  * @list: The structure of the list
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any. Should be treated as constant.
- * @flags: Use (0).
+ * @flags: Use zero.
  *
  * This function will attempt to find the issuer of the
  * given certificate.
