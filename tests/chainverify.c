@@ -58,6 +58,12 @@ void doit(void)
 	int exit_val = 0;
 	size_t i;
 	int ret;
+	gnutls_x509_trust_list_t tl;
+	unsigned int verify_status, verify_status1;
+	gnutls_x509_crt_t certs[10];
+	gnutls_x509_crt_t ca;
+	gnutls_datum_t tmp;
+	size_t j;
 
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
@@ -78,12 +84,6 @@ void doit(void)
 		gnutls_global_set_log_level(4711);
 
 	for (i = 0; chains[i].chain; i++) {
-		gnutls_x509_trust_list_t tl;
-		unsigned int verify_status, verify_status1;
-		gnutls_x509_crt_t certs[4];
-		gnutls_x509_crt_t ca;
-		gnutls_datum_t tmp;
-		size_t j;
 
 		if (debug)
 			printf("Chain '%s' (%d)...\n", chains[i].name,
