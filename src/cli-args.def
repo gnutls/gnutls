@@ -25,7 +25,7 @@ flag = {
     descrip   = "Fail to connect if a known certificate has changed";
     disabled;
     disable   = "no";
-    doc       = "This option will perform authentication as with option --tofu; however, while --tofu asks whether to trust a changed certificate, this option will fail in case of certificate changes.";
+    doc       = "This option will perform authentication as with option --tofu; however, while --tofu asks whether to trust a changed public key, this option will fail in case of public key changes.";
 };
 
 flag = {
