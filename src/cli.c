@@ -471,7 +471,6 @@ static int cert_verify_callback(gnutls_session_t session)
 						 txt_service,
 						 GNUTLS_CRT_X509, cert, 0);
 		if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND) {
-			print_cert_info_compact(session);
 			fprintf(stderr,
 				"Host %s (%s) has never been contacted before.\n",
 				hostname, txt_service);
@@ -485,7 +484,6 @@ static int cert_verify_callback(gnutls_session_t session)
 			if (rc == 0)
 				return -1;
 		} else if (rc == GNUTLS_E_CERTIFICATE_KEY_MISMATCH) {
-			print_cert_info_compact(session);
 			fprintf(stderr,
 				"Warning: host %s is known and it is associated with a different key.\n",
 				hostname);
