@@ -60,7 +60,7 @@ void doit(void)
 	int ret;
 	gnutls_x509_trust_list_t tl;
 	unsigned int verify_status, verify_status1;
-	gnutls_x509_crt_t certs[10];
+	gnutls_x509_crt_t certs[MAX_CHAIN];
 	gnutls_x509_crt_t ca;
 	gnutls_datum_t tmp;
 	size_t j;

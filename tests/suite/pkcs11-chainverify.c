@@ -136,7 +136,7 @@ void doit(void)
 	for (i = 0; chains[i].chain; i++) {
 		gnutls_x509_trust_list_t tl;
 		unsigned int verify_status;
-		gnutls_x509_crt_t certs[4];
+		gnutls_x509_crt_t certs[MAX_CHAIN];
 		gnutls_x509_crt_t ca;
 		gnutls_datum_t tmp;
 		size_t j;

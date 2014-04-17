@@ -22,6 +22,8 @@
 
 /* *INDENT-OFF* */
 
+#define MAX_CHAIN 10
+
 static const char *nc_bad1[] = {
 "-----BEGIN CERTIFICATE-----\n"
 "MIIDiTCCAkGgAwIBAgIMUwS5Fgr3eOV9V76jMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
