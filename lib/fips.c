@@ -38,7 +38,7 @@ unsigned int _gnutls_lib_mode = LIB_STATE_POWERON;
 
 unsigned _gnutls_fips_mode_enabled(void)
 {
-unsigned f1p, f2p;
+unsigned f1p = 0, f2p;
 FILE* fd;
 static int fips_mode = -1;
 
