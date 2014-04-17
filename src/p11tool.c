@@ -96,14 +96,14 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(PROVIDER)) {
 		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
 		if (ret < 0)
-			fprintf(stderr, "pkcs11_init: %s",
+			fprintf(stderr, "pkcs11_init: %s\n",
 				gnutls_strerror(ret));
 		else {
 			ret =
 			    gnutls_pkcs11_add_provider(OPT_ARG(PROVIDER),
 						       NULL);
 			if (ret < 0) {
-				fprintf(stderr, "pkcs11_add_provider: %s",
+				fprintf(stderr, "pkcs11_add_provider: %s\n",
 					gnutls_strerror(ret));
 				exit(1);
 			}
@@ -111,14 +111,14 @@ static void cmd_parser(int argc, char **argv)
 	}
 
 	if ((ret = gnutls_global_init()) < 0) {
-		fprintf(stderr, "global_init: %s", gnutls_strerror(ret));
+		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
 	if (HAVE_OPT(OUTFILE)) {
 		outfile = safe_open_rw(OPT_ARG(OUTFILE), 0);
 		if (outfile == NULL) {
-			fprintf(stderr, "%s", OPT_ARG(OUTFILE));
+			fprintf(stderr, "cannot open %s\n", OPT_ARG(OUTFILE));
 			exit(1);
 		}
 	} else
