@@ -11,6 +11,11 @@ concerning padding and payload. Suggested by Peter Dettman.
 ** libgnutls: Allow decoding PKCS #8 files with ECC parameters
 from openssl.
 
+** libgnutls: Several small bug fixed found by coverity.
+
+** libgnutls: The conditionally available self-test functions
+were moved to self-test.h.
+
 ** API and ABI modifications:
 No changes since last version.
 
