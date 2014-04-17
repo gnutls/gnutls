@@ -439,7 +439,7 @@ static int cert_verify_callback(gnutls_session_t session)
 		rc = cert_verify(session, hostname, GNUTLS_KP_TLS_WWW_SERVER);
 		if (rc == 0) {
 			printf
-			    ("*** Verifying server certificate failed...\n");
+			    ("*** PKI verification of server certificate failed...\n");
 			if (!insecure && !ssh)
 				return -1;
 		} else if (ENABLED_OPT(OCSP) && gnutls_ocsp_status_request_is_checked(session, 0) == 0) {	/* off-line verification succeeded. Try OCSP */
@@ -450,7 +450,7 @@ static int cert_verify_callback(gnutls_session_t session)
 				if (!insecure && !ssh)
 					return -1;
 			} else if (rc == -1)
-				printf("*** OCSP response ignored\n");
+				printf("*** OCSP response ignored...\n");
 		}
 	}
 
