@@ -16,6 +16,10 @@ from openssl.
 ** libgnutls: The conditionally available self-test functions
 were moved to self-test.h.
 
+** libgnutls: Fixed issue with the check of incoming data when two
+different recv and send pointers have been specified. Reported and
+investigated by JMRecio.
+
 ** API and ABI modifications:
 No changes since last version.
 
