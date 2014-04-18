@@ -666,7 +666,7 @@ ssize_t _gnutls_io_write_flush(gnutls_session_t session)
  */
 int _gnutls_io_check_recv(gnutls_session_t session, unsigned int ms)
 {
-	gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
+	gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 	int ret = 0, err;
 
 	if (unlikely
