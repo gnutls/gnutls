@@ -121,7 +121,7 @@ int gnutls_subject_alt_names_get(gnutls_subject_alt_names_t sans,
 	if (san_type)
 		*san_type = sans->names[seq].type;
 
-	if (sans->names[seq].type == GNUTLS_SAN_OTHERNAME) {
+	if (othername_oid != NULL && sans->names[seq].type == GNUTLS_SAN_OTHERNAME) {
 		othername_oid->data = sans->names[seq].othername_oid.data;
 		othername_oid->size = sans->names[seq].othername_oid.size;
 	}
