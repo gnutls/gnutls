@@ -246,6 +246,7 @@ int gnutls_x509_ext_import_subject_alt_names(const gnutls_datum_t * ext,
 	i = 0;
 	do {
 		san.data = NULL;
+		san.size = 0;
 		othername_oid.data = NULL;
 
 		ret = _gnutls_parse_general_name2(c2, "", i, &san, &type, 0);
@@ -259,6 +260,10 @@ int gnutls_x509_ext_import_subject_alt_names(const gnutls_datum_t * ext,
 							NULL, 1);
 			if (ret < 0)
 				break;
+
+		} else if (san.size == 0 || san.data == NULL) {
+			ret = gnutls_assert_val(GNUTLS_E_X509_UNKNOWN_SAN);
+			break;
 		}
 
 		ret = subject_alt_names_set(&sans->names, &sans->size,
@@ -880,6 +885,7 @@ int gnutls_x509_ext_import_authority_key_id(const gnutls_datum_t * ext,
 	i = 0;
 	do {
 		san.data = NULL;
+		san.size = 0;
 		othername_oid.data = NULL;
 
 		ret = _gnutls_parse_general_name2(c2, "authorityCertIssuer", i,
@@ -2302,6 +2308,7 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 	i = 0;
 	do {
 		san.data = NULL;
+		san.size = 0;
 
 		snprintf(name, sizeof(name), "?%u.reasons", (unsigned)i + 1);
 
@@ -2953,6 +2960,7 @@ int gnutls_x509_ext_import_key_purposes(const gnutls_datum_t * ext,
 		p->oid[i].size = oid.size;
 
 		oid.data = NULL;
+		oid.size = 0;
 		p->size++;
 	}
 
