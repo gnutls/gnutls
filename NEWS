@@ -2,6 +2,16 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.24 (unreleased)
+
+** libgnutls: Fixed issue with the check of incoming data when two
+different recv and send pointers have been specified. Reported and
+investigated by JMRecio.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.23 (released 2014-04-07)
 
 ** libgnutls: Ciphersuites that use the SHA256 or SHA384 MACs are
