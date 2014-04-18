@@ -253,24 +253,6 @@ const void *_gnutls_get_cred(gnutls_session_t session,
 }
 
 /*-
- * _gnutls_get_auth_info - Returns a pointer to authentication information.
- * @session: is a #gnutls_session_t structure.
- *
- * This function must be called after a successful gnutls_handshake().
- * Returns a pointer to authentication information. That information
- * is data obtained by the handshake protocol, the key exchange algorithm,
- * and the TLS extensions messages.
- *
- * In case of GNUTLS_CRD_ANON returns a type of &anon_(server/client)_auth_info_t;
- * In case of GNUTLS_CRD_CERTIFICATE returns a type of &cert_auth_info_t;
- * In case of GNUTLS_CRD_SRP returns a type of &srp_(server/client)_auth_info_t;
- -*/
-void *_gnutls_get_auth_info(gnutls_session_t session)
-{
-	return session->key.auth_info;
-}
-
-/*-
  * _gnutls_free_auth_info - Frees the auth info structure
  * @session: is a #gnutls_session_t structure.
  *
@@ -293,7 +275,7 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 	case GNUTLS_CRD_ANON:
 		{
 			anon_auth_info_t info =
-			    _gnutls_get_auth_info(session);
+			    _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 
 			if (info == NULL)
 				break;
@@ -305,7 +287,7 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 	case GNUTLS_CRD_PSK:
 		{
 			psk_auth_info_t info =
-			    _gnutls_get_auth_info(session);
+			    _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 
 			if (info == NULL)
 				break;
@@ -318,7 +300,7 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 		{
 			unsigned int i;
 			cert_auth_info_t info =
-			    _gnutls_get_auth_info(session);
+			    _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 
 			if (info == NULL)
 				break;

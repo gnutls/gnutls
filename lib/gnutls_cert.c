@@ -579,7 +579,7 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
@@ -744,7 +744,7 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL) {
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
@@ -793,7 +793,7 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session_t session)
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL) {
 		return (time_t) - 1;
 	}
@@ -837,7 +837,7 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session_t session)
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL) {
 		return (time_t) - 1;
 	}

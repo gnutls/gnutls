@@ -189,7 +189,7 @@ _gnutls_session_unpack(gnutls_session_t session,
 		return ret;
 	}
 
-	if (_gnutls_get_auth_info(session) != NULL) {
+	if (session->key.auth_info != NULL) {
 		_gnutls_free_auth_info(session);
 	}
 
@@ -298,7 +298,7 @@ pack_certificate_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 {
 	unsigned int i;
 	int cur_size, ret;
-	cert_auth_info_t info = _gnutls_get_auth_info(session);
+	cert_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	int size_offset;
 
 	size_offset = ps->length;
@@ -359,7 +359,7 @@ unpack_certificate_auth_info(gnutls_session_t session,
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
@@ -415,7 +415,7 @@ unpack_certificate_auth_info(gnutls_session_t session,
 static int
 pack_srp_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 {
-	srp_server_auth_info_t info = _gnutls_get_auth_info(session);
+	srp_server_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
 	int len, ret;
 	int size_offset;
 	size_t cur_size;
@@ -462,7 +462,7 @@ unpack_srp_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
 	if (info == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
@@ -497,7 +497,7 @@ static int
 pack_anon_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 {
 	int cur_size, ret;
-	anon_auth_info_t info = _gnutls_get_auth_info(session);
+	anon_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 	int size_offset;
 
 	size_offset = ps->length;
@@ -544,7 +544,7 @@ unpack_anon_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 	if (info == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
@@ -594,7 +594,7 @@ pack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 	int size_offset;
 	size_t cur_size;
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 	if (info == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
@@ -637,7 +637,7 @@ unpack_psk_auth_info(gnutls_session_t session, gnutls_buffer_st * ps)
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 	if (info == NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 

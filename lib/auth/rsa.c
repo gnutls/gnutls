@@ -74,7 +74,7 @@ _gnutls_get_public_rsa_params(gnutls_session_t session,
 
 	/* normal non export case */
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 
 	if (info == NULL || info->ncerts == 0) {
 		gnutls_assert();

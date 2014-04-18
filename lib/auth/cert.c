@@ -1041,7 +1041,7 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 
 	if (data == NULL || data_size == 0) {
 		gnutls_assert();
@@ -1179,7 +1179,7 @@ _gnutls_proc_openpgp_server_crt(gnutls_session_t session,
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 
 	if (data == NULL || data_size == 0) {
 		gnutls_assert();
@@ -1573,7 +1573,7 @@ _gnutls_proc_cert_client_crt_vrfy(gnutls_session_t session,
 	ssize_t dsize = data_size;
 	uint8_t *pdata = data;
 	gnutls_datum_t sig;
-	cert_auth_info_t info = _gnutls_get_auth_info(session);
+	cert_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	gnutls_pcert_st peer_cert;
 	gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
 	const version_entry_st *ver = get_version(session);
@@ -2207,7 +2207,7 @@ _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
 	int sigsize;
 	gnutls_datum_t signature;
 	int ret;
-	cert_auth_info_t info = _gnutls_get_auth_info(session);
+	cert_auth_info_t info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	ssize_t data_size = _data_size;
 	gnutls_pcert_st peer_cert;
 	gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;

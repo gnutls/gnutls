@@ -57,9 +57,30 @@ const void *_gnutls_get_cred(gnutls_session_t session,
 			     gnutls_credentials_type_t kx, int *err);
 const void *_gnutls_get_kx_cred(gnutls_session_t session,
 				gnutls_kx_algorithm_t algo, int *err);
-void *_gnutls_get_auth_info(gnutls_session_t session);
 int _gnutls_auth_info_set(gnutls_session_t session,
 			  gnutls_credentials_type_t type, int size,
 			  int allow_change);
+
+/*-
+ * _gnutls_get_auth_info - Returns a pointer to authentication information.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function must be called after a successful gnutls_handshake().
+ * Returns a pointer to authentication information. That information
+ * is data obtained by the handshake protocol, the key exchange algorithm,
+ * and the TLS extensions messages.
+ *
+ * In case of GNUTLS_CRD_ANON returns a type of &anon_(server/client)_auth_info_t;
+ * In case of GNUTLS_CRD_CERTIFICATE returns a type of &cert_auth_info_t;
+ * In case of GNUTLS_CRD_SRP returns a type of &srp_(server/client)_auth_info_t;
+ -*/
+inline static
+void *_gnutls_get_auth_info(gnutls_session_t session, gnutls_credentials_type_t type)
+{
+	if (type == session->key.auth_info_type)
+		return session->key.auth_info;
+	else
+		return NULL;
+}
 
 #endif

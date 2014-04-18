@@ -144,7 +144,10 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
+	if (info == NULL)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
 	username = info->username;
 
 	_gnutls_str_cpy(username, MAX_USERNAME_SIZE, priv->username);

@@ -200,7 +200,7 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 	if (info == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;

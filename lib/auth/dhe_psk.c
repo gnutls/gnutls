@@ -310,7 +310,11 @@ proc_dhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 
 	/* copy the username to the auth info structures
 	 */
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
+	if (info == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
 
 	if (username.size > MAX_USERNAME_SIZE) {
 		gnutls_assert();
@@ -372,7 +376,12 @@ proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 
 	/* copy the username to the auth info structures
 	 */
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
+	if (info == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
 
 	if (username.size > MAX_USERNAME_SIZE) {
 		gnutls_assert();

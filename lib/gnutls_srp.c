@@ -696,7 +696,7 @@ const char *gnutls_srp_server_get_username(gnutls_session_t session)
 
 	CHECK_AUTH(GNUTLS_CRD_SRP, NULL);
 
-	info = _gnutls_get_auth_info(session);
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_SRP);
 	if (info == NULL)
 		return NULL;
 	return info->username;
