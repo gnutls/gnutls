@@ -1,5 +1,5 @@
 /* base64.c -- Encode binary data using printable characters.
-   Copyright (C) 1999-2001, 2004-2006, 2009-2013 Free Software Foundation, Inc.
+   Copyright (C) 1999-2001, 2004-2006, 2009-2014 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -96,7 +96,10 @@ base64_encode (const char *restrict in, size_t inlen,
      large inputs is to have both constraints satisfied, so we depend
      on both in base_encode_fast().  */
   if (outlen % 4 == 0 && inlen == outlen / 4 * 3)
-    return base64_encode_fast (in, inlen, out);
+    {
+      base64_encode_fast (in, inlen, out);
+      return;
+    }
 
   while (inlen && outlen)
     {
