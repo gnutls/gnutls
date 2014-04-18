@@ -198,26 +198,6 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-/* These are global */
-gnutls_psk_server_credentials_t server_pskcred;
-
-static gnutls_session_t initialize_tls_session(void)
-{
-	gnutls_session_t session;
-
-	gnutls_init(&session, GNUTLS_SERVER);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+RSA-PSK",
-				   NULL);
-
-	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
-
-	return session;
-}
-
 static int
 pskfunc(gnutls_session_t session, const char *username,
 	gnutls_datum_t * key)
@@ -242,6 +222,7 @@ int optval = 1;
 static void server(int sd)
 {
 	gnutls_certificate_credentials_t serverx509cred;
+	gnutls_psk_server_credentials_t server_pskcred;
 
 	/* this must be called once in the program
 	 */
@@ -255,13 +236,22 @@ static void server(int sd)
 	gnutls_psk_allocate_server_credentials(&server_pskcred);
 	gnutls_psk_set_server_credentials_function(server_pskcred,
 						   pskfunc);
+	gnutls_psk_set_server_credentials_hint(server_pskcred, "hint");
 	gnutls_certificate_allocate_credentials(&serverx509cred);
 	gnutls_certificate_set_x509_key_mem(serverx509cred,
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 
-	session = initialize_tls_session();
+	gnutls_init(&session, GNUTLS_SERVER);
 
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(session, "NORMAL:-KX-ALL:+RSA-PSK",
+				   NULL);
+
+
+	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 			       serverx509cred);
 
