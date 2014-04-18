@@ -53,6 +53,9 @@ static int _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 					 gnutls_buffer_st * data);
 static int _gnutls_proc_rsa_psk_client_kx(gnutls_session_t, uint8_t *,
 					  size_t);
+static int
+_gnutls_proc_rsa_psk_server_kx(gnutls_session_t session, uint8_t * data,
+			   size_t _data_size);
 
 const mod_auth_st rsa_psk_auth_struct = {
 	"RSA PSK",
@@ -64,7 +67,7 @@ const mod_auth_st rsa_psk_auth_struct = {
 	NULL,			/* generate_server_certificate_request */
 	_gnutls_proc_crt,
 	NULL,			/* process_client_certificate */
-	_gnutls_proc_psk_server_kx,
+	_gnutls_proc_rsa_psk_server_kx,
 	_gnutls_proc_rsa_psk_client_kx,
 	NULL,			/* process_client_cert_vrfy */
 	NULL			/* process_server_certificate_reuqest */
@@ -403,6 +406,20 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	_gnutls_free_datum(&premaster_secret);
 
 	return ret;
+}
+
+static int
+_gnutls_proc_rsa_psk_server_kx(gnutls_session_t session, uint8_t * data,
+			   size_t _data_size)
+{
+	/* In RSA-PSK the key is calculated elsewhere.
+	 * Moreover, since we only keep a single auth info structure, we cannot
+	 * store the hint (as we store certificate auth info).
+	 * Ideally we need to handle that by multiple auth info
+	 * structures or something similar.
+	 */
+
+	return 0;
 }
 
 #endif				/* ENABLE_PSK */
