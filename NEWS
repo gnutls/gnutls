@@ -3,6 +3,16 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.14 (unreleased)
+
+** libgnutls: Fixed issue with the check of incoming data when two
+different recv and send pointers have been specified. Reported and
+investigated by JMRecio.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.13 (released 2014-04-07)
 
 ** libgnutls: gnutls_openpgp_keyring_import will no longer fail silently
