@@ -9,6 +9,9 @@ See the end for copying conditions.
 different recv and send pointers have been specified. Reported and
 investigated by JMRecio.
 
+** libgnutls: Fixed issue in the RSA-PSK key exchange, which would 
+result to illegal memory access if a server hint was provided.
+
 ** API and ABI modifications:
 No changes since last version.
 
