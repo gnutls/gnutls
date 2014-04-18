@@ -1863,9 +1863,11 @@ unsigned size_to_check;
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	if (out != NULL) {
+	if (out != NULL && str->data != NULL) {
 		memcpy(out, str->data, str->size);
 		out[str->size] = 0;
+	} else if (out != NULL) {
+		out[0] = 0;
 	}
 	*out_size = str->size;
 
@@ -1880,7 +1882,7 @@ int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size)
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	if (out != NULL) {
+	if (out != NULL && str->data != NULL) {
 		memcpy(out, str->data, str->size);
 	}
 	*out_size = str->size;
