@@ -81,7 +81,8 @@ COBJECTS = gnutls_range.c gnutls_record.c \
 	gnutls_rsa_export.c gnutls_helper.c gnutls_supplemental.c	\
 	random.c crypto-api.c gnutls_privkey.c gnutls_pcert.c		\
 	gnutls_pubkey.c locks.c gnutls_dtls.c system_override.c	\
-	crypto-backend.c verify-tofu.c pin.c tpm.c fips.c
+	crypto-backend.c verify-tofu.c pin.c tpm.c fips.c \
+	safe-memset.c
 
 if ENABLE_SELF_CHECKS
 COBJECTS += crypto-selftests.c crypto-selftests-pk.c
@@ -109,7 +110,7 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_srp.h auth/srp.h auth/srp_passwd.h	\
 	gnutls_helper.h gnutls_supplemental.h crypto.h random.h system.h\
 	locks.h gnutls_mbuffers.h gnutls_ecc.h pin.h fips.h \
-	priority_options.h
+	priority_options.h safe-memset.h
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h
