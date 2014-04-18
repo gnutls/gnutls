@@ -69,6 +69,8 @@
 #define SIG_GOST_R3410_2001_OID "1.2.643.2.2.3"
 #define ISO_SIG_RSA_SHA1_OID "1.3.14.3.2.29"
 
+#define XMPP_OID "1.3.6.1.5.5.7.8.5"
+
 #define ASN1_NULL "\x05\x00"
 #define ASN1_NULL_SIZE 2
 
@@ -197,5 +199,7 @@ bool _gnutls_is_same_dn(gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
 
 int _gnutls_copy_string(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
 int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
+
+int _san_othername_to_virtual(const char *oid, size_t oid_size);
 
 #endif

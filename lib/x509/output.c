@@ -802,7 +802,6 @@ print_altname(gnutls_buffer_st * str, const char *prefix,
 			return;
 		}
 
-
 		if (err == GNUTLS_SAN_OTHERNAME) {
 			char *oid = NULL;
 			size_t oidsize;
@@ -824,8 +823,8 @@ print_altname(gnutls_buffer_st * str, const char *prefix,
 			if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 				gnutls_free(buffer);
 				addf(str,
-				     "error: get_subject/issuer_alt_othername_oid: %s\n",
-				     gnutls_strerror(err));
+				     "error: get_subject/issuer_alt_othername_oid: %s (%d)\n",
+				     gnutls_strerror(err), err);
 				return;
 			}
 

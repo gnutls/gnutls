@@ -847,7 +847,7 @@ gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt_t cert, void *ret,
 inline static int is_type_printable(int type)
 {
 	if (type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_RFC822NAME ||
-	    type == GNUTLS_SAN_URI)
+	    type == GNUTLS_SAN_URI || type == GNUTLS_SAN_OTHERNAME_XMPP)
 		return 1;
 	else
 		return 0;
@@ -1081,8 +1081,6 @@ gnutls_x509_crt_get_pk_algorithm(gnutls_x509_crt_t cert,
 
 }
 
-#define XMPP_OID "1.3.6.1.5.5.7.8.5"
-
 /* returns the type and the name on success.
  * Type is also returned as a parameter in case of an error.
  *
@@ -1090,7 +1088,7 @@ gnutls_x509_crt_get_pk_algorithm(gnutls_x509_crt_t cert,
  *       in case of GeneralName, it must be -1
  * @dname: the name returned
  * @ret_type: The type of the name
- * @othername_oid: if the name is AnotherName return the OID
+ * @othername_oid: if the name is otherName return the OID
  *
  */
 int
@@ -1153,11 +1151,10 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 		}
 
 		if (othername_oid) {
-			if ((unsigned) tmp.size == (sizeof(XMPP_OID)-1)
-			    && memcmp(tmp.data, XMPP_OID, sizeof(XMPP_OID)-1) == 0)
-				type = GNUTLS_SAN_OTHERNAME_XMPP;
+			dname->size = tmp.size;
+			dname->data = tmp.data;
 		} else {
-			char oid[42];
+			char oid[MAX_OID_SIZE];
 
 			if (src_name[0] != 0)
 				snprintf(nptr, sizeof(nptr),
@@ -1168,15 +1165,16 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 					 "?%u.otherName.type-id", seq);
 
 			len = sizeof(oid);
+
 			result = asn1_read_value(src, nptr, oid, &len);
 			if (result != ASN1_SUCCESS) {
 				gnutls_assert();
 				ret = _gnutls_asn2err(result);
 				goto cleanup;
 			}
+			if (len > 0) len--;
 
-			if ((unsigned) len == (sizeof(XMPP_OID)-1)
-			    && memcmp(oid, XMPP_OID, sizeof(XMPP_OID)-1) == 0) {
+			if (_san_othername_to_virtual(oid, len) == GNUTLS_SAN_OTHERNAME_XMPP) {
 				gnutls_datum_t out;
 
 				ret =
@@ -1194,12 +1192,15 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 				/* out is already null terminated */
 				ret = type;
 				goto cleanup;
+			} else {
+				dname->size = tmp.size;
+				dname->data = tmp.data;
 			}
 		}
 	} else if (type == GNUTLS_SAN_DN) {
 		_gnutls_str_cat(nptr, sizeof(nptr), ".directoryName");
 		ret = _gnutls_x509_get_dn(src, nptr, dname);
-		if (result < 0) {
+		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
@@ -1272,6 +1273,7 @@ get_alt_name(gnutls_x509_crt_t cert, const char *extension_id,
 {
 	int ret;
 	gnutls_datum_t dnsname = {NULL, 0};
+	gnutls_datum_t ooid = {NULL, 0};
 	gnutls_datum_t res;
 	gnutls_subject_alt_names_t sans = NULL;
 	unsigned int type;
@@ -1307,19 +1309,27 @@ get_alt_name(gnutls_x509_crt_t cert, const char *extension_id,
 		goto cleanup;
 	}
 
-	ret = gnutls_subject_alt_names_get(sans, seq, &type, &res, NULL);
+	ret = gnutls_subject_alt_names_get(sans, seq, &type, &res, &ooid);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
+	if (othername_oid && type == GNUTLS_SAN_OTHERNAME) {
+		type = _san_othername_to_virtual((char*)ooid.data, ooid.size);
+	}
+
 	if (alt_type)
 		*alt_type = type;
 
-	if (is_type_printable(type)) {
-		ret = _gnutls_copy_string(&res, alt, alt_size);
+	if (othername_oid) {
+		ret = _gnutls_copy_string(&ooid, alt, alt_size);
 	} else {
-		ret = _gnutls_copy_data(&res, alt, alt_size);
+		if (is_type_printable(type)) {
+			ret = _gnutls_copy_string(&res, alt, alt_size);
+		} else {
+			ret = _gnutls_copy_data(&res, alt, alt_size);
+		}
 	}
 
 	if (ret < 0) {
