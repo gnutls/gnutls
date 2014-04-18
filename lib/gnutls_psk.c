@@ -151,6 +151,7 @@ gnutls_psk_set_client_credentials(gnutls_psk_client_credentials_t res,
 void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc)
 {
 	gnutls_free(sc->password_file);
+	gnutls_free(sc->hint);
 	gnutls_free(sc);
 }
 
