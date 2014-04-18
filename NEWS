@@ -27,6 +27,8 @@ by André Klitzing.
 ** libgnutls: Fixed client memory leak in the PSK key exchange, if a
 server hint was provided.
 
+** libgnutls: Corrected the *get_*_othername_oid() functions.
+
 ** API and ABI modifications:
 No changes since last version.
 
