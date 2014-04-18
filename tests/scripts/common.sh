@@ -58,7 +58,7 @@ launch_bare_server() {
 
 wait_server() {
 	trap "kill $1" 1 15 2
-	sleep 2
+	sleep 4
 }
 
 trap "fail \"Failed to launch a gnutls-serv server, aborting test... \"" 10 
