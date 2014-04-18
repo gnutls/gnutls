@@ -483,12 +483,13 @@ static int cert_verify_callback(gnutls_session_t session)
 			if (rc < 0) {
 				fprintf(stderr, "*** DANE error: %s\n",
 					dane_strerror(rc));
-				if (!insecure && !ssh)
-					return -1;
+			} else {
+				fprintf(stderr, "- DANE: %s\n", out.data);
+				gnutls_free(out.data);
 			}
 
-			fprintf(stderr, "- DANE: %s\n", out.data);
-			gnutls_free(out.data);
+			if (!insecure && !ssh)
+				return -1;
 		}
 
 	}
