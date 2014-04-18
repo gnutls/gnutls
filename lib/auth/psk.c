@@ -35,7 +35,10 @@
 #include <gnutls_datum.h>
 
 
-int _gnutls_proc_psk_client_kx(gnutls_session_t, uint8_t *, size_t);
+static int _gnutls_proc_psk_client_kx(gnutls_session_t, uint8_t *, size_t);
+static int
+_gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t * data,
+			   size_t _data_size);
 
 
 const mod_auth_st psk_auth_struct = {
@@ -199,7 +202,7 @@ _gnutls_gen_psk_client_kx(gnutls_session_t session,
 
 /* just read the username from the client key exchange.
  */
-int
+static int
 _gnutls_proc_psk_client_kx(gnutls_session_t session, uint8_t * data,
 			   size_t _data_size)
 {
@@ -306,7 +309,7 @@ _gnutls_gen_psk_server_kx(gnutls_session_t session,
 
 /* just read the hint from the server key exchange.
  */
-int
+static int
 _gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t * data,
 			   size_t _data_size)
 {
@@ -350,15 +353,8 @@ _gnutls_proc_psk_server_kx(gnutls_session_t session, uint8_t * data,
 	memcpy(info->hint, hint.data, hint.size);
 	info->hint[hint.size] = 0;
 
-	ret = _gnutls_set_psk_session_key(session, &cred->key, NULL);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
 	ret = 0;
 
-      error:
 	return ret;
 }
 
