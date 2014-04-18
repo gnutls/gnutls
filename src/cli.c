@@ -423,15 +423,19 @@ static int cert_verify_callback(gnutls_session_t session)
 	unsigned int status = 0;
 	int ssh = ENABLED_OPT(TOFU);
 	int strictssh = ENABLED_OPT(STRICT_TOFU);
-	if (strictssh) {
-		ssh = strictssh;
-	}
-
 #ifdef HAVE_DANE
 	int dane = ENABLED_OPT(DANE);
 #endif
 	int ca_verify = ENABLED_OPT(CA_VERIFICATION);
 	const char *txt_service;
+
+	/* On an session with TOFU the PKI/DANE verification
+	 * become advisory.
+	 */
+
+	if (strictssh) {
+		ssh = strictssh;
+	}
 
 	print_cert_info(session, verbose, print_cert);
 
@@ -453,6 +457,42 @@ static int cert_verify_callback(gnutls_session_t session)
 				printf("*** OCSP response ignored...\n");
 		}
 	}
+
+#ifdef HAVE_DANE
+	if (dane) {		/* try DANE auth */
+		int port;
+		unsigned int sflags =
+		    ENABLED_OPT(LOCAL_DNS) ? 0 :
+		    DANE_F_IGNORE_LOCAL_RESOLVER;
+
+		port = service_to_port(service);
+		rc = dane_verify_session_crt(NULL, session, hostname,
+					     udp ? "udp" : "tcp", port,
+					     sflags, 0, &status);
+		if (rc < 0) {
+			fprintf(stderr,
+				"*** DANE verification error: %s\n",
+				dane_strerror(rc));
+			if (!insecure && !ssh)
+				return -1;
+		} else {
+			gnutls_datum_t out;
+
+			rc = dane_verification_status_print(status, &out,
+							    0);
+			if (rc < 0) {
+				fprintf(stderr, "*** DANE error: %s\n",
+					dane_strerror(rc));
+				if (!insecure && !ssh)
+					return -1;
+			}
+
+			fprintf(stderr, "- DANE: %s\n", out.data);
+			gnutls_free(out.data);
+		}
+
+	}
+#endif
 
 	if (ssh) {		/* try ssh auth */
 		unsigned int list_size;
@@ -519,42 +559,6 @@ static int cert_verify_callback(gnutls_session_t session)
 					gnutls_strerror(rc));
 		}
 	}
-#ifdef HAVE_DANE
-	if (dane) {		/* try DANE auth */
-		int port;
-		unsigned int sflags =
-		    ENABLED_OPT(LOCAL_DNS) ? 0 :
-		    DANE_F_IGNORE_LOCAL_RESOLVER;
-
-		port = service_to_port(service);
-		rc = dane_verify_session_crt(NULL, session, hostname,
-					     udp ? "udp" : "tcp", port,
-					     sflags, 0, &status);
-		if (rc < 0) {
-			fprintf(stderr,
-				"*** DANE verification error: %s\n",
-				dane_strerror(rc));
-			if (!insecure)
-				return -1;
-		} else {
-			gnutls_datum_t out;
-
-			rc = dane_verification_status_print(status, &out,
-							    0);
-			if (rc < 0) {
-				fprintf(stderr, "*** DANE error: %s\n",
-					dane_strerror(rc));
-				if (!insecure)
-					return -1;
-			}
-
-			fprintf(stderr, "- DANE: %s\n", out.data);
-			gnutls_free(out.data);
-		}
-
-	}
-#endif
-
 	return 0;
 }
 
