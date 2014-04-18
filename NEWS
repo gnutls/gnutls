@@ -21,7 +21,8 @@ different recv and send pointers have been specified. Reported and
 investigated by JMRecio.
 
 ** libgnutls: Fixed issue in the RSA-PSK key exchange, which would 
-result to illegal memory access if a server hint was provided.
+result to illegal memory access if a server hint was provided. Reported
+by André Klitzing.
 
 ** libgnutls: Fixed client memory leak in the PSK key exchange, if a
 server hint was provided.
