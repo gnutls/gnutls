@@ -333,8 +333,9 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 
 }
 
-/* This function will set the auth info structure in the key
- * structure.
+/* This function will create the auth info structure in the key
+ * structure if needed.
+ *
  * If allow change is !=0 then this will allow changing the auth
  * info structure to a different type.
  */
@@ -359,8 +360,7 @@ _gnutls_auth_info_set(gnutls_session_t session,
 			 * ciphersuite which is negotiated has different authentication
 			 * schema.
 			 */
-			if (gnutls_auth_get_type(session) !=
-			    session->key.auth_info_type) {
+			if (type != session->key.auth_info_type) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;
 			}
@@ -371,8 +371,7 @@ _gnutls_auth_info_set(gnutls_session_t session,
 			 * certificate (in order to prevent revealing the certificate's contents,
 			 * to passive eavesdropers.
 			 */
-			if (gnutls_auth_get_type(session) !=
-			    session->key.auth_info_type) {
+			if (type != session->key.auth_info_type) {
 
 				_gnutls_free_auth_info(session);
 
