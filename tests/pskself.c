@@ -201,6 +201,7 @@ static void server(int sd)
 	side = "server";
 
 	gnutls_psk_allocate_server_credentials(&server_pskcred);
+	gnutls_psk_set_server_credentials_hint(server_pskcred, "hint");
 	gnutls_psk_set_server_credentials_function(server_pskcred,
 						   pskfunc);
 
