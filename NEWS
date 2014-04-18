@@ -23,6 +23,9 @@ investigated by JMRecio.
 ** libgnutls: Fixed issue in the RSA-PSK key exchange, which would 
 result to illegal memory access if a server hint was provided.
 
+** libgnutls: Fixed client memory leak in the PSK key exchange, if a
+server hint was provided.
+
 ** API and ABI modifications:
 No changes since last version.
 
