@@ -148,7 +148,7 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 	gnutls_datum_t premaster_secret;
 	premaster_secret.size = GNUTLS_MASTER_SIZE;
 	premaster_secret.data =
-	    gnutls_secure_malloc(premaster_secret.size);
+	    gnutls_malloc(premaster_secret.size);
 
 	if (premaster_secret.data == NULL) {
 		gnutls_assert();

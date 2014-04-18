@@ -25,7 +25,6 @@
 #include <gnutls_num.h>
 #include <xsize.h>
 
-gnutls_alloc_function gnutls_secure_malloc = malloc;
 gnutls_alloc_function gnutls_malloc = malloc;
 gnutls_free_function gnutls_free = free;
 gnutls_realloc_function gnutls_realloc = realloc;
@@ -38,16 +37,6 @@ void *_gnutls_calloc(size_t nmemb, size_t size)
 	void *ret;
 	size_t n = xtimes(nmemb, size);
 	ret = (size_in_bounds_p(n) ? gnutls_malloc(n) : NULL);
-	if (ret != NULL)
-		memset(ret, 0, size);
-	return ret;
-}
-
-svoid *gnutls_secure_calloc(size_t nmemb, size_t size)
-{
-	svoid *ret;
-	size_t n = xtimes(nmemb, size);
-	ret = (size_in_bounds_p(n) ? gnutls_secure_malloc(n) : NULL);
 	if (ret != NULL)
 		memset(ret, 0, size);
 	return ret;
