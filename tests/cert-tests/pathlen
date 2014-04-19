@@ -25,11 +25,27 @@ set -e
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 DIFF=${DIFF:-diff}
+if ! test -z "${VALGRIND}";then
+VALGRIND="libtool --mode=execute ${VALGRIND}"
+fi
 
-$CERTTOOL --certificate-info --infile $srcdir/ca-no-pathlen.pem \
+$VALGRIND $CERTTOOL --certificate-info --infile $srcdir/ca-no-pathlen.pem \
 	  |grep -v "Algorithm Security Level" > new-ca-no-pathlen.pem
-$CERTTOOL --certificate-info --infile $srcdir/no-ca-or-pathlen.pem \
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "info 1 failed"
+  exit $rc
+fi
+
+$VALGRIND $CERTTOOL --certificate-info --infile $srcdir/no-ca-or-pathlen.pem \
 	  |grep -v "Algorithm Security Level" > new-no-ca-or-pathlen.pem
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "info 2 failed"
+  exit $rc
+fi
 
 $DIFF $srcdir/ca-no-pathlen.pem new-ca-no-pathlen.pem
 rc1=$?

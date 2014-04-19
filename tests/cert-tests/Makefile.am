@@ -41,7 +41,8 @@ TESTS += dane
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
-	LC_ALL="C"						\
-	top_builddir="$(top_builddir)"				\
+	LC_ALL="C"				\
+	VALGRIND="$(VALGRIND)"			\
+	top_builddir="$(top_builddir)"		\
 	srcdir="$(srcdir)"
 

@@ -25,9 +25,19 @@ set -e
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 DIFF=${DIFF:-diff}
+if ! test -z "${VALGRIND}";then
+VALGRIND="libtool --mode=execute ${VALGRIND}"
+fi
 
-$CERTTOOL --certificate-info --infile $srcdir/aki-cert.pem \
+$VALGRIND $CERTTOOL --certificate-info --infile $srcdir/aki-cert.pem \
 	  |grep -v "Algorithm Security Level" > tmp-aki.pem
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "info failed"
+  exit $rc
+fi
+
 
 $DIFF $srcdir/aki-cert.pem tmp-aki.pem
 rc=$?

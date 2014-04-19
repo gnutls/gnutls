@@ -25,9 +25,12 @@
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 DIFF=${DIFF:-diff}
+if ! test -z "${VALGRIND}";then
+VALGRIND="libtool --mode=execute ${VALGRIND}"
+fi
 
 #check whether "funny" spaces can be interpreted
-$CERTTOOL --certificate-info --infile $srcdir/funny-spacing.pem >/dev/null 2>&1
+$VALGRIND $CERTTOOL --certificate-info --infile $srcdir/funny-spacing.pem >/dev/null 2>&1
 rc=$?
 
 # We're done.
@@ -37,7 +40,7 @@ if test "$rc" != "0"; then
 fi
 
 #check whether a BMPString attribute can be properly decoded
-$CERTTOOL --certificate-info --infile $srcdir/bmpstring.pem >tmp-pem.pem
+$VALGRIND $CERTTOOL --certificate-info --infile $srcdir/bmpstring.pem >tmp-pem.pem
 rc=$?
 
 if test "$rc" != "0"; then
@@ -56,7 +59,7 @@ if test "$rc" != "0"; then
 fi
 
 #check whether complex-cert is decoded as expected
-$CERTTOOL --certificate-info --infile $srcdir/complex-cert.pem >tmp-pem.pem
+$VALGRIND $CERTTOOL --certificate-info --infile $srcdir/complex-cert.pem >tmp-pem.pem
 rc=$?
 
 if test "$rc" != "0"; then
@@ -75,7 +78,7 @@ if test "$rc" != "0"; then
 fi
 
 #check whether the cert with many othernames is decoded as expected
-$CERTTOOL --certificate-info --infile $srcdir/xmpp-othername.pem >tmp-pem.pem
+$VALGRIND $CERTTOOL --certificate-info --infile $srcdir/xmpp-othername.pem >tmp-pem.pem
 rc=$?
 
 if test "$rc" != "0"; then
