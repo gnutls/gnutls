@@ -635,7 +635,7 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
  * values or zero if the certificate is trusted. Note that value in @status
  * is set only when the return value of this function is success (i.e, failure 
  * to trust a certificate does not imply a negative return value).
- * The default verification flags used by this function can be overriden
+ * The default verification flags used by this function can be overridden
  * using gnutls_certificate_set_verify_flags().
  *
  * This function will take into account the OCSP Certificate Status TLS extension,
@@ -670,7 +670,7 @@ gnutls_certificate_verify_peers2(gnutls_session_t session,
  * values or zero if the certificate is trusted. Note that value in @status
  * is set only when the return value of this function is success (i.e, failure 
  * to trust a certificate does not imply a negative return value).
- * The default verification flags used by this function can be overriden
+ * The default verification flags used by this function can be overridden
  * using gnutls_certificate_set_verify_flags(). See the documentation
  * of gnutls_certificate_verify_peers2() for details in the verification process.
  *
@@ -712,7 +712,7 @@ gnutls_typed_vdata_st data;
  * values or zero if the certificate is trusted. Note that value in @status
  * is set only when the return value of this function is success (i.e, failure 
  * to trust a certificate does not imply a negative return value).
- * The default verification flags used by this function can be overriden
+ * The default verification flags used by this function can be overridden
  * using gnutls_certificate_set_verify_flags(). See the documentation
  * of gnutls_certificate_verify_peers2() for details in the verification process.
  *
