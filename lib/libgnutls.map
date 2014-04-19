@@ -303,7 +303,6 @@ GNUTLS_1_4
     gnutls_rsa_params_import_pkcs1;
     gnutls_rsa_params_import_raw;
     gnutls_rsa_params_init;
-    gnutls_secure_calloc;
     gnutls_secure_malloc;
     gnutls_server_name_get;
     gnutls_server_name_set;

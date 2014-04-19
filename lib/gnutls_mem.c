@@ -25,6 +25,7 @@
 #include <gnutls_num.h>
 #include <xsize.h>
 
+gnutls_alloc_function gnutls_secure_malloc = malloc;
 gnutls_alloc_function gnutls_malloc = malloc;
 gnutls_free_function gnutls_free = free;
 gnutls_realloc_function gnutls_realloc = realloc;

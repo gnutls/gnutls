@@ -596,7 +596,6 @@ gnutls_safe_renegotiation_status@GNUTLS_2_10
 gnutls_sec_param_get_name@GNUTLS_2_12
 gnutls_sec_param_to_pk_bits@GNUTLS_2_12
 gnutls_sec_param_to_symmetric_bits@GNUTLS_3_1_0
-gnutls_secure_calloc@GNUTLS_1_4
 gnutls_secure_malloc@GNUTLS_1_4
 gnutls_server_name_get@GNUTLS_1_4
 gnutls_server_name_set@GNUTLS_1_4
