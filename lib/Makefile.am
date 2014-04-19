@@ -110,7 +110,7 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_srp.h auth/srp.h auth/srp_passwd.h	\
 	gnutls_helper.h gnutls_supplemental.h crypto.h random.h system.h\
 	locks.h gnutls_mbuffers.h gnutls_ecc.h pin.h fips.h \
-	priority_options.h safe-memset.h
+	priority_options.h
 
 if ENABLE_PKCS11
 HFILES += pkcs11_int.h
