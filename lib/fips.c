@@ -36,6 +36,11 @@ unsigned int _gnutls_lib_mode = LIB_STATE_POWERON;
 #define FIPS_KERNEL_FILE "/proc/sys/crypto/fips_enabled"
 #define FIPS_SYSTEM_FILE "/etc/system-fips"
 
+/* Returns:
+ * 0 - FIPS mode disabled
+ * 1 - FIPS mode enabled and enforced
+ * 2 - FIPS in testing mode
+ */
 unsigned _gnutls_fips_mode_enabled(void)
 {
 unsigned f1p = 0, f2p;
