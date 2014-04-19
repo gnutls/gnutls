@@ -24,7 +24,7 @@ CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
 DIFF="${DIFF:-diff -b -B}"
 SERV="${SERV:-../../src/gnutls-serv$EXEEXT} -q"
 CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
-PORT="${PORT:-5558}"
+PORT="${PORT:-5561}"
 unset RETCODE
 
 if test "${WINDIR}" != "";then
