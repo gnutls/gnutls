@@ -3364,11 +3364,6 @@ scm_init_gnutls (void)
 #include "core.x"
 
   /* Use Guile's allocation routines, which will run the GC if need be.  */
-  gnutls_malloc = scm_malloc;
-  gnutls_realloc = scm_realloc;
-  gnutls_secure_malloc = scm_malloc;
-  gnutls_free = free;
-
   (void) gnutls_global_init ();
 
   scm_gnutls_define_enums ();
