@@ -724,12 +724,14 @@ print_altname(gnutls_buffer_st * str, const char *prefix,
 {
 	unsigned int altname_idx;
 	gnutls_datum_t t;
+	char *buffer;
+	size_t size;
+	int err;
 
 	for (altname_idx = 0;; altname_idx++) {
-		char *buffer = NULL;
-		size_t size = 0;
-		int err;
 
+		buffer = NULL;
+		size = 0;
 		if (altname_type == TYPE_CRT_SAN)
 			err =
 			    gnutls_x509_crt_get_subject_alt_name(cert.crt,
@@ -771,14 +773,14 @@ print_altname(gnutls_buffer_st * str, const char *prefix,
 			return;
 		}
 
-		if (altname_type == TYPE_CRT_SAN)
+		if (altname_type == TYPE_CRT_SAN) {
 			err =
 			    gnutls_x509_crt_get_subject_alt_name(cert.crt,
 								 altname_idx,
 								 buffer,
 								 &size,
 								 NULL);
-		else if (altname_type == TYPE_CRQ_SAN)
+		} else if (altname_type == TYPE_CRQ_SAN) {
 			err =
 			    gnutls_x509_crq_get_subject_alt_name(cert.crq,
 								 altname_idx,
@@ -786,14 +788,14 @@ print_altname(gnutls_buffer_st * str, const char *prefix,
 								 &size,
 								 NULL,
 								 NULL);
-		else if (altname_type == TYPE_CRT_IAN)
+		} else if (altname_type == TYPE_CRT_IAN) {
 			err =
 			    gnutls_x509_crt_get_issuer_alt_name(cert.crt,
 								altname_idx,
 								buffer,
 								&size,
 								NULL);
-
+		}
 		if (err < 0) {
 			gnutls_free(buffer);
 			addf(str,
