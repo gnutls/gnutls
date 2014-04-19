@@ -59,7 +59,7 @@ static int fips_mode = -1;
 		else f1p = 0;
 	}
 
-	f2p = !access(FIPS_SYSTEM_FILE, R_OK);
+	f2p = !access(FIPS_SYSTEM_FILE, F_OK);
 
 	if (f1p != 0 && f2p != 0) {
 		_gnutls_debug_log("FIPS140-2 mode enabled\n");
