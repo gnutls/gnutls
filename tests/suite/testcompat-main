@@ -24,6 +24,9 @@ srcdir="${srcdir:-.}"
 CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
 PORT="${PORT:-5568}"
 unset RETCODE
+if ! test -z "${VALGRIND}";then
+VALGRIND="libtool --mode=execute ${VALGRIND}"
+fi
 
 if test "${WINDIR}" != "";then
   exit 77
@@ -84,17 +87,17 @@ wait_server $PID
 
 # Test SSL 3.0 with RSA ciphersuite
 echo "Checking SSL 3.0 with RSA..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 # Test SSL 3.0 with DHE-RSA ciphersuite
 echo "Checking SSL 3.0 with DHE-RSA..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 # Test SSL 3.0 with DHE-DSS ciphersuite
 echo "Checking SSL 3.0 with DHE-DSS..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -109,7 +112,7 @@ wait_server $PID
 
 # Test TLS 1.0 with RSA-NULL ciphersuite
 echo "Checking TLS 1.0 with RSA-NULL..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+NULL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+NULL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -123,22 +126,22 @@ wait_server $PID
 
 # Test TLS 1.0 with RSA ciphersuite
 echo "Checking TLS 1.0 with RSA..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 # Test TLS 1.0 with DHE-RSA ciphersuite
 echo "Checking TLS 1.0 with DHE-RSA..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 # Test TLS 1.0 with DHE-RSA ciphersuite
 echo "Checking TLS 1.0 with ECDHE-RSA..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 # Test TLS 1.0 with DHE-DSS ciphersuite
 echo "Checking TLS 1.0 with DHE-DSS..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -153,7 +156,7 @@ wait_server $PID
 
 # Test TLS 1.0 with ECDHE-ECDSA ciphersuite
 echo "Checking TLS 1.0 with ECDHE-ECDSA (SECP224R1)..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -168,7 +171,7 @@ wait_server $PID
 
 # Test TLS 1.0 with ECDHE-ECDSA ciphersuite
 echo "Checking TLS 1.0 with ECDHE-ECDSA (SECP384R1)..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -182,7 +185,7 @@ wait_server $PID
 
 # Test TLS 1.0 with ECDHE-ECDSA ciphersuite
 echo "Checking TLS 1.0 with ECDHE-ECDSA (SECP521R1)..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -198,11 +201,11 @@ PID=$!
 wait_server $PID
 
 echo "Checking TLS 1.2 with RSA..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 echo "Checking TLS 1.2 with DHE-RSA..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 echo "Checking TLS 1.2 with ECDHE-RSA..." 
@@ -210,7 +213,7 @@ $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL
   fail $PID "Failed"
 
 echo "Checking TLS 1.2 with DHE-DSS..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -223,7 +226,7 @@ PID=$!
 wait_server $PID
 
 echo "Checking TLS 1.2 with ECDHE-ECDSA... (SECP224R1)" 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -236,7 +239,7 @@ PID=$!
 wait_server $PID
 
 echo "Checking TLS 1.2 with ECDHE-ECDSA... (SECP384R1)" 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -249,7 +252,7 @@ PID=$!
 wait_server $PID
 
 echo "Checking TLS 1.2 with ECDHE-ECDSA... (SECP521R1)" 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --insecure --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -264,7 +267,7 @@ wait_server $PID
 
 # Test DTLS 1.0 with RSA ciphersuite
 echo "Checking DTLS 1.0 with RSA..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+RSA" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+RSA" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -276,7 +279,7 @@ wait_server $PID
 
 # Test DTLS 1.0 with DHE-RSA ciphersuite
 echo "Checking DTLS 1.0 with DHE-RSA..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-RSA" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-RSA" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -288,7 +291,7 @@ wait_server $PID
 
 # Test DTLS 1.0 with DHE-DSS ciphersuite
 echo "Checking DTLS 1.0 with DHE-DSS..." 
-$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-DSS" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-DSS" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID

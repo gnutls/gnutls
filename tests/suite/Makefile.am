@@ -96,6 +96,7 @@ endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
+	VALGRIND="$(VALGRIND)"			\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
 
@@ -116,3 +117,9 @@ noinst_PROGRAMS = eagain-cli mini-record-timing
 TESTS += eagain
 endif
 endif
+
+#pkcs11-chainverify cannot run under valgrind (or hell breaks loose)
+
+#if WANT_TEST_SUITE
+#LOG_COMPILER = $(VALGRIND)
+#endif

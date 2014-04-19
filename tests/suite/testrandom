@@ -22,6 +22,9 @@
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+if ! test -z "${VALGRIND}";then
+VALGRIND="libtool --mode=execute ${VALGRIND}"
+fi
 
 counter=0
 file=test.out
@@ -32,14 +35,14 @@ echo "Testing verification with randomly generated certificates..."
 while [ $counter -lt 400 ]
 do
   $srcdir/x509random.pl > $srcdir/$file
-  $CERTTOOL -i --inder --infile $srcdir/$file --outfile $srcdir/$file.pem >/dev/null 2>&1
+  $VALGRIND $CERTTOOL -i --inder --infile $srcdir/$file --outfile $srcdir/$file.pem >/dev/null 2>&1
   if test $? != 0;then
   	continue
   fi
 
   cat $srcdir/$file.pem $srcdir/../certs/ca-cert-ecc.pem > $srcdir/$file-chain.pem
 
-  $CERTTOOL -e --infile $srcdir/$file-chain.pem >/dev/null 2>&1
+  $VALGRIND $CERTTOOL -e --infile $srcdir/$file-chain.pem >/dev/null 2>&1
   ret=$?
   if [ $ret != 1 ];then
   	echo "Succeeded verification with $file-chain.pem!"
@@ -55,7 +58,7 @@ echo "Testing with randomly generated certificates..."
 while [ $counter -lt 200 ]
 do
   $srcdir/x509random.pl > $srcdir/$file
-  $CERTTOOL -i --inder --infile $srcdir/$file >/dev/null
+  $VALGRIND $CERTTOOL -i --inder --infile $srcdir/$file >/dev/null
   ret=$?
   if [ $ret != 0 -a $ret != 1 ];then
   	echo "Unknown exit code with $file"
@@ -71,7 +74,7 @@ echo "Testing with random ASN.1 data..."
 while [ $counter -lt 200 ]
 do
   $srcdir/asn1random.pl > $srcdir/$file
-  $CERTTOOL -i --inder --infile $srcdir/$file >/dev/null 2>/dev/null
+  $VALGRIND $CERTTOOL -i --inder --infile $srcdir/$file >/dev/null 2>/dev/null
   ret=$?
   if [ $ret != 0 -a $ret != 1 ];then
   	echo "Unknown exit code with $file"

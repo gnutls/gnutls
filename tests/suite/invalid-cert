@@ -22,8 +22,11 @@
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+if ! test -z "${VALGRIND}";then
+VALGRIND="libtool --mode=execute ${VALGRIND}"
+fi
 
-$CERTTOOL --certificate-info --inder --infile $srcdir/invalid-cert.der 2>/dev/null
+$VALGRIND $CERTTOOL --certificate-info --inder --infile $srcdir/invalid-cert.der 2>/dev/null
 
 rc=$?
 
