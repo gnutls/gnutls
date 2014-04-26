@@ -1616,19 +1616,20 @@ static void print_crl_info(gnutls_x509_crl_t crl, FILE * out)
 	int ret;
 	size_t size;
 
-	ret = gnutls_x509_crl_print(crl, full_format, &data);
-	if (ret < 0) {
-		fprintf(stderr, "crl_print: %s\n", gnutls_strerror(ret));
-		exit(1);
+	if (outcert_format == GNUTLS_X509_FMT_PEM) {
+		ret = gnutls_x509_crl_print(crl, full_format, &data);
+		if (ret < 0) {
+			fprintf(stderr, "crl_print: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		fprintf(out, "%s\n", data.data);
+
+		gnutls_free(data.data);
 	}
-
-	fprintf(out, "%s\n", data.data);
-
-	gnutls_free(data.data);
 
 	size = buffer_size;
 	ret =
-	    gnutls_x509_crl_export(crl, GNUTLS_X509_FMT_PEM, buffer,
+	    gnutls_x509_crl_export(crl, outcert_format, buffer,
 				   &size);
 	if (ret < 0) {
 		fprintf(stderr, "crl_export: %s\n", gnutls_strerror(ret));
