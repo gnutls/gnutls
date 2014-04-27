@@ -58,7 +58,7 @@ static const uint8_t asciitable[128] = {
 	0xff, 0xff
 };
 
-inline static int encode(uint8_t * result, const uint8_t * rdata, int left)
+inline static int encode(uint8_t * result, const uint8_t * rdata, unsigned left)
 {
 
 	int data_len;
@@ -143,7 +143,7 @@ _gnutls_sbase64_encode(uint8_t * data, size_t data_size, char **result)
 	unsigned i, j;
 	int ret, tmp;
 	uint8_t tmpres[4];
-	int mod = data_size % 3;
+	unsigned mod = data_size % 3;
 
 	ret = mod;
 	if (ret != 0)
