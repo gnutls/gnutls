@@ -30,7 +30,7 @@
 #include <aes-padlock.h>
 #include <assert.h>
 #include <sha-padlock.h>
-#include <x86.h>
+#include <x86-common.h>
 
 #ifdef HAVE_LIBNETTLE
 

@@ -30,7 +30,7 @@
 #include <gnutls/crypto.h>
 #include <gnutls_errors.h>
 #include <aes-x86.h>
-#include <x86.h>
+#include <x86-common.h>
 #include <byteswap.h>
 
 #define GCM_BLOCK_SIZE 16

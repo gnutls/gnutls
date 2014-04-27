@@ -33,7 +33,7 @@
 #include <gnutls/crypto.h>
 #include <gnutls_errors.h>
 #include <aes-x86.h>
-#include <x86.h>
+#include <x86-common.h>
 #include <byteswap.h>
 #include <nettle/gcm.h>
 #include <aes-x86.h>
