@@ -63,8 +63,13 @@ void *gnutls_realloc_fast(void *ptr, size_t size)
 
 char *_gnutls_strdup(const char *str)
 {
-	size_t siz = strlen(str) + 1;
+	size_t siz;
 	char *ret;
+
+	if(unlikely(!str))
+		return NULL;
+
+	siz = strlen(str) + 1;
 
 	ret = gnutls_malloc(siz);
 	if (ret != NULL)
