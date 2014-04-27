@@ -31,7 +31,7 @@
 #include <gnutls_errors.h>
 #include <aes-x86.h>
 #include <sha-x86.h>
-#include <x86.h>
+#include <x86-common.h>
 
 struct aes_ctx {
 	AES_KEY expanded_key;

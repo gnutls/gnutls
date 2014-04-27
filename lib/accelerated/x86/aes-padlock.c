@@ -30,7 +30,7 @@
 #include <gnutls/crypto.h>
 #include <gnutls_errors.h>
 #include <aes-x86.h>
-#include <x86.h>
+#include <x86-common.h>
 #ifdef HAVE_LIBNETTLE
 # include <nettle/aes.h>		/* for key generation in 192 and 256 bits */
 # include <sha-padlock.h>

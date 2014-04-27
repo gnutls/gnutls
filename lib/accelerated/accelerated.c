@@ -24,7 +24,7 @@
 #include <accelerated.h>
 #if defined(ASM_X86)
 #include <x86/aes-x86.h>
-#include <x86/x86.h>
+#include <x86/x86-common.h>
 #endif
 
 void _gnutls_register_accel_crypto(void)
