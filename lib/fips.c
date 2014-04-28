@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <gnutls_errors.h>
 #include <fips.h>
+#include <gnutls/self-test.h>
 #include <stdio.h>
 #include <random.h>
 

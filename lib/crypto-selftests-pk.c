@@ -25,6 +25,7 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 #include <gnutls/crypto.h>
+#include <gnutls/self-test.h>
 #include <gnutls_errors.h>
 #include <gnutls/abstract.h>
 #include <gnutls_pk.h>
