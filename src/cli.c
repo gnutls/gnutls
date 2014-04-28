@@ -488,7 +488,7 @@ static int cert_verify_callback(gnutls_session_t session)
 				gnutls_free(out.data);
 			}
 
-			if (!insecure && !ssh)
+			if (status != 0 && !insecure && !ssh)
 				return -1;
 		}
 
