@@ -90,8 +90,8 @@ TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn testcompat chain invalid
 	testpkcs11
 
 if ENABLE_PKCS11
-check_PROGRAMS += pkcs11-chainverify
-TESTS += pkcs11-chainverify
+check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer
+TESTS += pkcs11-chainverify pkcs11-get-issuer
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
