@@ -12,6 +12,9 @@ initialization.
 
 ** libgnutls: null-terminate othername alternative names.
 
+** libgnutls: gnutls_x509_trust_list_get_issuer() will operate correctly
+on a PKCS #11 trust list.
+
 ** libgnutls-dane: Accept a certificate using DANE if there is at least one
 entry that matches the certificate. Patch by simon [at] arlott.org.
 
