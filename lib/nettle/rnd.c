@@ -125,12 +125,6 @@ static int do_device_source(struct rnd_ctx_st *ctx, int init, struct event_st *e
 		ctx->pid = event->pid;
 #endif
 
-		ret = _rnd_system_entropy_init();
-		if (ret < 0) {
-			_gnutls_debug_log("Cannot initialize entropy gatherer\n");
-			return gnutls_assert_val(ret);
-		}
-
 		memcpy(&ctx->device_last_read, &event->now,
 		       sizeof(ctx->device_last_read));
 

@@ -126,7 +126,7 @@ void _rnd_system_entropy_deinit(void)
 #include <locks.h>
 #include "egd.h"
 
-static int device_fd;
+static int device_fd = -1;
 
 static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 {
@@ -217,7 +217,7 @@ fallback:
 
 void _rnd_system_entropy_deinit(void)
 {
-	if (device_fd > 0) {
+	if (device_fd >= 0) {
 		close(device_fd);
 		device_fd = -1;
 	}
