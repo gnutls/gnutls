@@ -17,6 +17,9 @@ server hint was provided.
 
 ** libgnutls: Several small bug fixes found by coverity.
 
+** libgnutls-dane: Accept a certificate using DANE if there is at least one 
+entry that matches the certificate. Patch by simon [at] arlott.org.
+
 ** API and ABI modifications:
 No changes since last version.
 
