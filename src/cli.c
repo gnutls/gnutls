@@ -532,6 +532,9 @@ cert_verify_callback (gnutls_session_t session)
           
           fprintf(stderr, "- DANE: %s\n", out.data);
           gnutls_free(out.data);
+
+          if (status != 0 && !insecure)
+            return -1;
         }
 
     }
