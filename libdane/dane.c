@@ -36,7 +36,7 @@
 #include <gnutls/crypto.h>
 #include "../lib/gnutls_int.h"
 
-#define MAX_DATA_ENTRIES 4
+#define MAX_DATA_ENTRIES 100
 
 #ifdef DEBUG
 #define gnutls_assert() fprintf(stderr, "ASSERT: %s: %d\n", __FILE__, __LINE__);
