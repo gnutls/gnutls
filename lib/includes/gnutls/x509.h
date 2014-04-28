@@ -1208,10 +1208,11 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t
 
 #define GNUTLS_TL_VERIFY_CRL 1
 #define GNUTLS_TL_USE_IN_TLS (1<<1)
+#define GNUTLS_TL_NO_DUPLICATES (1<<2)
 int
 gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			       const gnutls_x509_crt_t * clist,
-			       int clist_size, unsigned int flags);
+			       unsigned clist_size, unsigned int flags);
 int gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t
 				      list,
 				      const gnutls_x509_crt_t *

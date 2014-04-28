@@ -210,7 +210,7 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
  * @list: The structure of the list
  * @clist: A list of CAs
  * @clist_size: The length of the CA list
- * @flags: should be 0.
+ * @flags: should be 0 or an or'ed sequence of %GNUTLS_TL options.
  *
  * This function will add the given certificate authorities
  * to the trusted list. The list of CAs must not be deinitialized
@@ -223,17 +223,34 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
 int
 gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			       const gnutls_x509_crt_t * clist,
-			       int clist_size, unsigned int flags)
+			       unsigned clist_size, unsigned int flags)
 {
-	int i;
+	unsigned i, j;
 	uint32_t hash;
 	int ret;
+	unsigned exists;
 
 	for (i = 0; i < clist_size; i++) {
+		exists = 0;
 		hash =
 		    hash_pjw_bare(clist[i]->raw_dn.data,
 				  clist[i]->raw_dn.size);
 		hash %= list->size;
+
+		/* avoid duplicates */
+		if (flags & GNUTLS_TL_NO_DUPLICATES) {
+			for (j=0;j<list->node[hash].trusted_ca_size;j++) {
+				if (_gnutls_check_if_same_cert(list->node[hash].trusted_cas[j], clist[i]) != 0) {
+					exists = 1;
+					break;
+				}
+			}
+
+			if (exists != 0) {
+				gnutls_x509_crt_deinit(clist[i]);
+				continue;
+			}
+		}
 
 		list->node[hash].trusted_cas =
 		    gnutls_realloc_fast(list->node[hash].trusted_cas,
@@ -607,22 +624,8 @@ static gnutls_x509_crt_t *sort_clist(gnutls_x509_crt_t
 	return sorted;
 }
 
-/**
- * gnutls_x509_trust_list_get_issuer:
- * @list: The structure of the list
- * @cert: is the certificate to find issuer for
- * @issuer: Will hold the issuer if any. Should be treated as constant.
- * @flags: Use zero.
- *
- * This function will attempt to find the issuer of the
- * given certificate.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- *
- * Since: 3.0
- **/
-int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
+static
+int trust_list_get_issuer(gnutls_x509_trust_list_t list,
 				      gnutls_x509_crt_t cert,
 				      gnutls_x509_crt_t * issuer,
 				      unsigned int flags)
@@ -648,6 +651,52 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 	}
 
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+}
+
+/**
+ * gnutls_x509_trust_list_get_issuer:
+ * @list: The structure of the list
+ * @cert: is the certificate to find issuer for
+ * @issuer: Will hold the issuer if any. Should be treated as constant.
+ * @flags: Use zero.
+ *
+ * This function will attempt to find the issuer of the
+ * given certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.0
+ **/
+int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
+				      gnutls_x509_crt_t cert,
+				      gnutls_x509_crt_t * issuer,
+				      unsigned int flags)
+{
+	int ret;
+
+#ifdef ENABLE_PKCS11
+	if (list->pkcs11_token) {
+		gnutls_datum_t der = {NULL, 0};
+		/* use the token for verification */
+		ret = gnutls_pkcs11_get_raw_issuer(list->pkcs11_token, cert, &der,
+			GNUTLS_X509_FMT_DER, 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		/* we add this CA to the trusted list in order to make it
+		 * persistent. It will be deallocated when the trust list is.
+		 */
+		ret = gnutls_x509_trust_list_add_trust_mem(list, &der, NULL,
+			GNUTLS_X509_FMT_DER, GNUTLS_TL_NO_DUPLICATES, 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		gnutls_free(der.data);
+	}
+#endif
+
+	return trust_list_get_issuer(list, cert, issuer, flags);
 }
 
 static
@@ -733,7 +782,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 
 #ifdef ENABLE_PKCS11
 	if (list->pkcs11_token) {
-		/* use the token for verification */	
+		/* use the token for verification */
 
 		*voutput = _gnutls_pkcs11_verify_crt_status(list->pkcs11_token,
 								cert_list, cert_list_size,
