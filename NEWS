@@ -12,6 +12,9 @@ initialization.
 
 ** libgnutls: null-terminate othername alternative names.
 
+** libgnutls-dane: Accept a certificate using DANE if there is at least one
+entry that matches the certificate. Patch by simon [at] arlott.org.
+
 ** libgnutls-guile: Fixed compilation issue.
 
 ** certtool: Allow exporting a CRL on DER format.
