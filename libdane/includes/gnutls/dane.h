@@ -140,19 +140,20 @@ typedef enum dane_verify_flags_t {
 
 /**
  * dane_verify_status_t:
- * @DANE_VERIFY_CA_CONSTRAINTS_VIOLATED: The CA constrains was violated.
+ * @DANE_VERIFY_CA_CONSTRAINTS_VIOLATED: The CA constraints were violated.
  * @DANE_VERIFY_CERT_DIFFERS: The certificate obtained via DNS differs.
- * @DANE_VERIFY_NO_DANE_INFO: No DANE data were found in the DNS record.
+ * @DANE_VERIFY_UNKNOWN_DANE_INFO: No known DANE data was found in the DNS record.
  *
  * Enumeration of different verification status flags.
  */
 typedef enum dane_verify_status_t {
 	DANE_VERIFY_CA_CONSTRAINTS_VIOLATED = 1,
 	DANE_VERIFY_CERT_DIFFERS = 1 << 1,
-	DANE_VERIFY_NO_DANE_INFO = 1 << 2,
+	DANE_VERIFY_UNKNOWN_DANE_INFO = 1 << 2,
 } dane_verify_status_t;
 
 #define DANE_VERIFY_CA_CONSTRAINS_VIOLATED DANE_VERIFY_CA_CONSTRAINTS_VIOLATED
+#define DANE_VERIFY_NO_DANE_INFO DANE_VERIFY_UNKNOWN_DANE_INFO
 
 int
 dane_verification_status_print(unsigned int status,

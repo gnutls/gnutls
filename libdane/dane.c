@@ -649,6 +649,8 @@ dane_verify_crt_raw(dane_state_t s,
 	*verify = 0;
 	idx = 0;
 	do {
+		unsigned int record_verify = 0;
+
 		ret =
 		    dane_query_data(r, idx++, &usage, &type, &match,
 				    &data);
@@ -665,23 +667,35 @@ dane_verify_crt_raw(dane_state_t s,
 			|| usage == DANE_CERT_USAGE_CA)) {
 			ret =
 			    verify_ca(chain, chain_size, chain_type, type,
-				      match, &data, verify);
+				      match, &data, &record_verify);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 			checked = 1;
+			if (record_verify == 0) {
+				*verify = 0;
+				break;
+			} else {
+				*verify |= record_verify;
+			}
 		} else if (!(vflags & DANE_VFLAG_ONLY_CHECK_CA_USAGE)
 			   && (usage == DANE_CERT_USAGE_LOCAL_EE
 			       || usage == DANE_CERT_USAGE_EE)) {
 			ret =
 			    verify_ee(&chain[0], chain_type, type, match,
-				      &data, verify);
+				      &data, &record_verify);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 			checked = 1;
+			if (record_verify == 0) {
+				*verify = 0;
+				break;
+			} else {
+				*verify |= record_verify;
+			}
 		}
 	}
 	while (1);
@@ -689,6 +703,10 @@ dane_verify_crt_raw(dane_state_t s,
 	if ((vflags & DANE_VFLAG_FAIL_IF_NOT_CHECKED) && checked == 0)
 		ret =
 		    gnutls_assert_val(DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
+	else if (checked == 0)
+	{
+		*verify |= DANE_VERIFY_UNKNOWN_DANE_INFO;
+	}
 	else
 		ret = 0;
 
