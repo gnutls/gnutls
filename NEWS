@@ -8,6 +8,10 @@ See the end for copying conditions.
 ** libgnutls: Corrected file descriptor leak on random generator
 initialization.
 
+** libgnutls: Avoid deinitialization if initialization has failed.
+
+** libgnutls: null-terminate othername alternative names.
+
 ** libgnutls-guile: Fixed compilation issue.
 
 ** certtool: Allow exporting a CRL on DER format.
