@@ -53,8 +53,8 @@ extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
 void *_gnutls_file_mutex;
 void *_gnutls_pkcs11_mutex;
 
-ASN1_TYPE _gnutls_pkix1_asn;
-ASN1_TYPE _gnutls_gnutls_asn;
+ASN1_TYPE _gnutls_pkix1_asn = ASN1_TYPE_EMPTY;
+ASN1_TYPE _gnutls_gnutls_asn = ASN1_TYPE_EMPTY;
 
 gnutls_log_func _gnutls_log_func = NULL;
 gnutls_audit_log_func _gnutls_audit_log_func = NULL;
@@ -166,6 +166,9 @@ gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
 GNUTLS_STATIC_MUTEX(global_init_mutex);
 static int _gnutls_init = 0;
 
+/* cache the return code */
+static int _gnutls_init_ret = 0;
+
 /**
  * gnutls_global_init:
  *
@@ -186,6 +189,9 @@ static int _gnutls_init = 0;
  * do not support library constructors and static linking. This
  * function also became thread safe.
  *
+ * A subsequent call of this function if the initial has failed will
+ * return the same error code.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  **/
@@ -199,7 +205,7 @@ int gnutls_global_init(void)
 
 	_gnutls_init++;
 	if (_gnutls_init > 1) {
-		ret = 0;
+		ret = _gnutls_init_ret;
 		goto out;
 	}
 
@@ -235,14 +241,17 @@ int gnutls_global_init(void)
 		goto out;
 	}
 
+	_gnutls_pkix1_asn = ASN1_TYPE_EMPTY;
 	res = asn1_array2tree(pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
 	if (res != ASN1_SUCCESS) {
+		gnutls_assert();
 		ret = _gnutls_asn2err(res);
 		goto out;
 	}
 
 	res = asn1_array2tree(gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
 	if (res != ASN1_SUCCESS) {
+		gnutls_assert();
 		ret = _gnutls_asn2err(res);
 		goto out;
 	}
@@ -306,6 +315,7 @@ int gnutls_global_init(void)
 	ret = 0;
 
       out:
+	_gnutls_init_ret = ret;
 	GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
 	return ret;
 }
@@ -316,11 +326,19 @@ static void _gnutls_global_deinit(unsigned destructor)
 
 	if (_gnutls_init == 1) {
 		_gnutls_init = 0;
+		if (_gnutls_init_ret < 0) {
+			/* only deinitialize if gnutls_global_init() has
+			 * succeeded */
+			gnutls_assert();
+			goto fail;
+		}
+
 		gnutls_crypto_deinit();
 		_gnutls_rnd_deinit();
 		_gnutls_ext_deinit();
 		asn1_delete_structure(&_gnutls_gnutls_asn);
 		asn1_delete_structure(&_gnutls_pkix1_asn);
+
 		_gnutls_crypto_deregister();
 		gnutls_system_global_deinit();
 		_gnutls_cryptodev_deinit();
@@ -341,6 +359,8 @@ static void _gnutls_global_deinit(unsigned destructor)
 		if (_gnutls_init > 0)
 			_gnutls_init--;
 	}
+
+ fail:
 	GNUTLS_STATIC_MUTEX_UNLOCK(global_init_mutex);
 }
 
