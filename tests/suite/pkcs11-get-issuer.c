@@ -124,7 +124,7 @@ void doit(void)
 		fprintf(stderr, "error writing %s\n", CONFIG);
 		exit(1);
 	}
-	fputs("0:./softhsm.db\n", fp);
+	fputs("0:./softhsm-issuer.db\n", fp);
 	fclose(fp);
 
 	setenv("SOFTHSM_CONF", CONFIG, 0);
