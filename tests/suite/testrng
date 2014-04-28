@@ -32,10 +32,12 @@ else
 fi
 
 OUTFILE=rng.log
-RNGFILE=rng.rng
+RNGFILE=rng.out
+RNGFILE2=rng2.out
 
 rm -f $OUTFILE
 rm -f $RNGFILE
+rm -f $RNGFILE2
 
 . $srcdir/../scripts/common.sh
 
@@ -47,6 +49,16 @@ if test -z "$RINPUTNO";then
 fi
 
 echo "Testing nonce PRNG"
+
+./rng nonce 64 $RNGFILE
+./rng nonce 64 $RNGFILE2
+cmp $RNGFILE $RNGFILE2  >/dev/null 2>&1
+ret=$?
+
+if test $ret = 0;then
+	echo "numbers are repeated in nonce!"
+	exit 1
+fi
 
 ./rng nonce 100000000 $RNGFILE
 
@@ -72,6 +84,17 @@ fi
 
 rm -f $OUTFILE
 echo "Testing key PRNG"
+
+./rng key 64 $RNGFILE
+./rng key 64 $RNGFILE2
+cmp $RNGFILE $RNGFILE2 >/dev/null 2>&1
+ret=$?
+
+if test $ret = 0;then
+	echo "numbers are repeated in nonce!"
+	exit 1
+fi
+
 ./rng key 100000000 $RNGFILE
 
 dieharder -q -f $RNGFILE -g $RINPUTNO $OPTIONS >$OUTFILE 2>&1
@@ -121,5 +144,6 @@ fi
 
 rm -f $OUTFILE
 rm -f $RNGFILE
+rm -f $RNGFILE2
 
 exit 0
