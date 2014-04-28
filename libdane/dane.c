@@ -700,15 +700,14 @@ dane_verify_crt_raw(dane_state_t s,
 	}
 	while (1);
 
-	if ((vflags & DANE_VFLAG_FAIL_IF_NOT_CHECKED) && checked == 0)
+	if ((vflags & DANE_VFLAG_FAIL_IF_NOT_CHECKED) && checked == 0) {
 		ret =
 		    gnutls_assert_val(DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
-	else if (checked == 0)
-	{
+	} else if (checked == 0) {
 		*verify |= DANE_VERIFY_UNKNOWN_DANE_INFO;
-	}
-	else
+	} else {
 		ret = 0;
+	}
 
       cleanup:
 	return ret;
