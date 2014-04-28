@@ -201,9 +201,6 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session)
 					   &epriv);
 	if (ret < 0) {
 		set = 1;
-	} else if (ret < 0) {
-		gnutls_assert();
-		return ret;
 	}
 
 	if (set != 0) {
@@ -238,9 +235,6 @@ int _gnutls_ext_sr_send_cs(gnutls_session_t session)
 					   &epriv);
 	if (ret < 0) {
 		set = 1;
-	} else if (ret < 0) {
-		gnutls_assert();
-		return ret;
 	}
 
 	if (set != 0) {
