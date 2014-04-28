@@ -216,6 +216,10 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
  * to the trusted list. The list of CAs must not be deinitialized
  * during this structure's lifetime.
  *
+ * If the flag %GNUTLS_TL_NO_DUPLICATES is specified, then
+ * the provided @clist entries that are duplicates will not be
+ * added to the list and will be deinitialized.
+ *
  * Returns: The number of added elements is returned.
  *
  * Since: 3.0.0
