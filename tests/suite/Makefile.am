@@ -30,7 +30,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/tests/suite/ecore/src/include \
 	-I$(top_srcdir)/tests/suite/ecore/src/lib
 
-check_PROGRAMS =
+check_PROGRAMS = rng
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
 	../../gl/libgnu.la \
@@ -84,10 +84,10 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom \
-	testpkcs11
+	testpkcs11 testrng
 
 TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn testcompat chain invalid-cert \
-	testpkcs11
+	testpkcs11 testrng
 
 if ENABLE_PKCS11
 check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer
