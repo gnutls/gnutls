@@ -83,6 +83,7 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 		return ret;
 	}
 
+	der_size = 0;
 	ret =
 	    gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_DER, NULL,
 				   &der_size);
