@@ -373,7 +373,7 @@ static void _gnutls_global_deinit(unsigned destructor)
  **/
 void gnutls_global_deinit(void)
 {
-	return _gnutls_global_deinit(0);
+	_gnutls_global_deinit(0);
 }
 
 /**
