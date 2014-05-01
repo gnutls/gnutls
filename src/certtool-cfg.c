@@ -1019,7 +1019,7 @@ void get_rand_int_value(unsigned char* serial, size_t * size, int64_t cfg_val, c
 
 void get_serial(unsigned char* serial, size_t * size)
 {
-	return get_rand_int_value(serial, size, cfg.serial, "Enter the certificate's serial number in decimal");
+	get_rand_int_value(serial, size, cfg.serial, "Enter the certificate's serial number in decimal");
 }
 
 static
@@ -1130,7 +1130,7 @@ int get_crq_extensions_status(void)
 
 void get_crl_number(unsigned char* serial, size_t * size)
 {
-	return get_rand_int_value(serial, size, cfg.crl_number, "CRL Number");
+	get_rand_int_value(serial, size, cfg.crl_number, "CRL Number");
 }
 
 int get_path_len(void)
