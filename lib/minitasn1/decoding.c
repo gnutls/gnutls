@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -376,6 +376,7 @@ asn1_get_bit_der (const unsigned char *der, int der_len,
   return ASN1_SUCCESS;
 }
 
+
 static int
 _asn1_extract_tag_der (asn1_node node, const unsigned char *der, int der_len,
 		       int *ret_len)
@@ -537,6 +538,9 @@ _asn1_extract_tag_der (asn1_node node, const unsigned char *der, int der_len,
 	case ASN1_ETYPE_ANY:
 	  counter -= len2;
 	  break;
+	case ASN1_ETYPE_CHOICE:
+	  counter -= len2;
+	  break;
 	default:
 	  return ASN1_DER_ERROR;
 	  break;
@@ -546,6 +550,31 @@ _asn1_extract_tag_der (asn1_node node, const unsigned char *der, int der_len,
   counter += len2;
   *ret_len = counter;
   return ASN1_SUCCESS;
+}
+
+static int
+extract_tag_der_recursive(asn1_node node, const unsigned char *der, int der_len,
+		       int *ret_len)
+{
+asn1_node p;
+int ris = ASN1_DER_ERROR;
+
+  if (type_field (node->type) == ASN1_ETYPE_CHOICE)
+    {
+      p = node->down;
+      while (p)
+        {
+          ris = _asn1_extract_tag_der (p, der, der_len, ret_len);
+          if (ris == ASN1_SUCCESS)
+            break;
+          p = p->right;
+	}
+
+      *ret_len = 0;
+      return ris;
+    }
+  else
+    return _asn1_extract_tag_der (node, der, der_len, ret_len);
 }
 
 static int
@@ -782,6 +811,17 @@ _asn1_get_indefinite_length_string (const unsigned char *der, int *len)
 
 }
 
+static void delete_unneeded_choice_fields(asn1_node p)
+{
+  asn1_node p2;
+
+  while (p->right)
+    {
+      p2 = p->right;
+      asn1_delete_structure (&p2);
+    }
+}
+
 /**
  * asn1_der_decoding:
  * @element: pointer to an ASN1 structure.
@@ -865,23 +905,9 @@ asn1_der_decoding (asn1_node * element, const void *ider, int len,
 		{
 		  if ((p2->type & CONST_SET) && (p2->type & CONST_NOT_USED))
 		    {
-		      if (type_field (p2->type) != ASN1_ETYPE_CHOICE)
-			ris =
-			  _asn1_extract_tag_der (p2, der + counter,
+		      ris =
+			  extract_tag_der_recursive (p2, der + counter,
 						 len - counter, &len2);
-		      else
-			{
-			  p3 = p2->down;
-			  while (p3)
-			    {
-			      ris =
-				_asn1_extract_tag_der (p3, der + counter,
-						       len - counter, &len2);
-			      if (ris == ASN1_SUCCESS)
-				break;
-			      p3 = p3->right;
-			    }
-			}
 		      if (ris == ASN1_SUCCESS)
 			{
 			  p2->type &= ~CONST_NOT_USED;
@@ -926,17 +952,13 @@ asn1_der_decoding (asn1_node * element, const void *ider, int len,
 		{
 		  if (counter < len)
 		    ris =
-		      _asn1_extract_tag_der (p->down, der + counter,
+		      extract_tag_der_recursive (p->down, der + counter,
 					     len - counter, &len2);
 		  else
 		    ris = ASN1_DER_ERROR;
 		  if (ris == ASN1_SUCCESS)
 		    {
-		      while (p->down->right)
-			{
-			  p2 = p->down->right;
-			  asn1_delete_structure (&p2);
-			}
+		      delete_unneeded_choice_fields(p->down);
 		      break;
 		    }
 		  else if (ris == ASN1_ERROR_TYPE_ANY)
@@ -959,7 +981,7 @@ asn1_der_decoding (asn1_node * element, const void *ider, int len,
 		      goto cleanup;
 		    }
 		}
-	      else
+	      else if (type_field (p->type) != ASN1_ETYPE_CHOICE)
 		p = p->down;
 	    }
 
@@ -973,7 +995,7 @@ asn1_der_decoding (asn1_node * element, const void *ider, int len,
 
 	  if (ris == ASN1_SUCCESS)
 	    ris =
-	      _asn1_extract_tag_der (p, der + counter, len - counter, &len2);
+	      extract_tag_der_recursive (p, der + counter, len - counter, &len2);
 	  if (ris != ASN1_SUCCESS)
 	    {
 	      if (p->type & CONST_OPTION)
@@ -1473,23 +1495,9 @@ asn1_der_decoding_element (asn1_node * structure, const char *elementName,
 		{
 		  if ((p2->type & CONST_SET) && (p2->type & CONST_NOT_USED))
 		    {
-		      if (type_field (p2->type) != ASN1_ETYPE_CHOICE)
-			ris =
-			  _asn1_extract_tag_der (p2, der + counter,
+		      ris =
+			  extract_tag_der_recursive (p2, der + counter,
 						 len - counter, &len2);
-		      else
-			{
-			  p3 = p2->down;
-			  while (p3)
-			    {
-			      ris =
-				_asn1_extract_tag_der (p3, der + counter,
-						       len - counter, &len2);
-			      if (ris == ASN1_SUCCESS)
-				break;
-			      p3 = p3->right;
-			    }
-			}
 		      if (ris == ASN1_SUCCESS)
 			{
 			  p2->type &= ~CONST_NOT_USED;
@@ -1540,11 +1548,7 @@ asn1_der_decoding_element (asn1_node * structure, const char *elementName,
 		    ris = ASN1_DER_ERROR;
 		  if (ris == ASN1_SUCCESS)
 		    {
-		      while (p->down->right)
-			{
-			  p2 = p->down->right;
-			  asn1_delete_structure (&p2);
-			}
+		      delete_unneeded_choice_fields(p->down);
 		      break;
 		    }
 		  else if (ris == ASN1_ERROR_TYPE_ANY)
@@ -1567,7 +1571,7 @@ asn1_der_decoding_element (asn1_node * structure, const char *elementName,
 		      goto cleanup;
 		    }
 		}
-	      else
+	      else if (type_field (p->type) != ASN1_ETYPE_CHOICE)
 		p = p->down;
 	    }
 
@@ -2185,7 +2189,7 @@ int
 asn1_der_decoding_startEnd (asn1_node element, const void *ider, int len,
 			    const char *name_element, int *start, int *end)
 {
-  asn1_node node, node_to_find, p, p2, p3;
+  asn1_node node, node_to_find, p, p2;
   int counter, len2, len3, len4, move, ris;
   unsigned char class;
   unsigned long tag;
@@ -2256,20 +2260,9 @@ asn1_der_decoding_startEnd (asn1_node element, const void *ider, int len,
 		{
 		  if ((p2->type & CONST_SET) && (p2->type & CONST_NOT_USED))
 		    {		/* CONTROLLARE */
-		      if (type_field (p2->type) != ASN1_ETYPE_CHOICE)
-			ris =
-			  _asn1_extract_tag_der (p2, der + counter,
+		      ris =
+			  extract_tag_der_recursive (p2, der + counter,
 						 len - counter, &len2);
-		      else
-			{
-			  p3 = p2->down;
-			  if (p3 == NULL)
-			    return ASN1_DER_ERROR;
-
-			  ris =
-			    _asn1_extract_tag_der (p3, der + counter,
-						   len - counter, &len2);
-			}
 		      if (ris == ASN1_SUCCESS)
 			{
 			  p2->type &= ~CONST_NOT_USED;
@@ -2516,18 +2509,18 @@ asn1_der_decoding_startEnd (asn1_node element, const void *ider, int len,
 int
 asn1_expand_any_defined_by (asn1_node definitions, asn1_node * element)
 {
-  char definitionsName[ASN1_MAX_NAME_SIZE], name[2 * ASN1_MAX_NAME_SIZE + 1],
+  char name[2 * ASN1_MAX_NAME_SIZE + 1],
     value[ASN1_MAX_NAME_SIZE];
   int retCode = ASN1_SUCCESS, result;
   int len, len2, len3;
   asn1_node p, p2, p3, aux = NULL;
   char errorDescription[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
+  const char *definitionsName;
 
   if ((definitions == NULL) || (*element == NULL))
     return ASN1_ELEMENT_NOT_FOUND;
 
-  strcpy (definitionsName, definitions->name);
-  strcat (definitionsName, ".");
+  definitionsName = definitions->name;
 
   p = *element;
   while (p)
@@ -2602,8 +2595,7 @@ asn1_expand_any_defined_by (asn1_node definitions, asn1_node * element)
 		  if ((type_field (p2->type) == ASN1_ETYPE_OBJECT_ID) &&
 		      (p2->type & CONST_ASSIGN))
 		    {
-		      strcpy (name, definitionsName);
-		      strcat (name, p2->name);
+		      snprintf(name, sizeof(name), "%s.%s", definitionsName, p2->name);
 
 		      len = ASN1_MAX_NAME_SIZE;
 		      result =
@@ -2619,8 +2611,7 @@ asn1_expand_any_defined_by (asn1_node definitions, asn1_node * element)
 
 			  if (p2)
 			    {
-			      strcpy (name, definitionsName);
-			      strcat (name, p2->name);
+			      snprintf(name, sizeof(name), "%s.%s", definitionsName, p2->name);
 
 			      result =
 				asn1_create_element (definitions, name, &aux);

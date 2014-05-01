@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -44,7 +44,7 @@ extern "C"
 {
 #endif
 
-#define ASN1_VERSION "3.4"
+#define ASN1_VERSION "3.5"
 
   /*****************************************/
   /* Errors returned by libtasn1 functions */

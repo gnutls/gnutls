@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -30,6 +30,7 @@
 #include "parser_aux.h"
 #include <gstr.h>
 #include "element.h"
+#include "minmax.h"
 #include <structure.h>
 
 #define MAX_TAG_LEN 16
@@ -327,7 +328,8 @@ _asn1_get_utctime_der(unsigned char *der,int *der_len,unsigned char *str)
 /*            must store the length of DER.           */
 /* Return:                                            */
 /*   ASN1_MEM_ERROR when DER isn't big enough         */
-/*   ASN1_SUCCESS otherwise                           */
+/*   ASN1_SUCCESS if succesful                        */
+/*   or an error value.                               */
 /******************************************************/
 static int
 _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
@@ -474,6 +476,8 @@ _asn1_complete_explicit_tag (asn1_node node, unsigned char *der,
   if (node->type & CONST_TAG)
     {
       p = node->down;
+      if (p == NULL)
+        return ASN1_DER_ERROR;
       /* When there are nested tags we must complete them reverse to
          the order they were created. This is because completing a tag
          modifies all data within it, including the incomplete tags
@@ -693,8 +697,10 @@ _asn1_insert_tag_der (asn1_node node, unsigned char *der, int *counter,
 /*   der: string with the DER coding.                 */
 /*   node: pointer to the SET element.                */
 /* Return:                                            */
+/*    ASN1_SUCCESS if successful                      */
+/*    or an error value.                              */
 /******************************************************/
-static void
+static int
 _asn1_ordering_set (unsigned char *der, int der_len, asn1_node node)
 {
   struct vet
@@ -708,27 +714,31 @@ _asn1_ordering_set (unsigned char *der, int der_len, asn1_node node)
   struct vet *first, *last, *p_vet, *p2_vet;
   asn1_node p;
   unsigned char class, *temp;
-  unsigned long tag;
+  unsigned long tag, t;
+  int err;
 
   counter = 0;
 
   if (type_field (node->type) != ASN1_ETYPE_SET)
-    return;
+    return ASN1_VALUE_NOT_VALID;
 
   p = node->down;
-  while ((type_field (p->type) == ASN1_ETYPE_TAG)
-	 || (type_field (p->type) == ASN1_ETYPE_SIZE))
+  while (p && ((type_field (p->type) == ASN1_ETYPE_TAG) ||
+	 (type_field (p->type) == ASN1_ETYPE_SIZE)))
     p = p->right;
 
   if ((p == NULL) || (p->right == NULL))
-    return;
+    return ASN1_SUCCESS;
 
   first = last = NULL;
   while (p)
     {
       p_vet = malloc (sizeof (struct vet));
       if (p_vet == NULL)
-	return;
+        {
+	  err = ASN1_MEM_ALLOC_ERROR;
+	  goto error;
+	}
 
       p_vet->next = NULL;
       p_vet->prev = last;
@@ -739,17 +749,22 @@ _asn1_ordering_set (unsigned char *der, int der_len, asn1_node node)
       last = p_vet;
 
       /* tag value calculation */
-      if (asn1_get_tag_der
-	  (der + counter, der_len - counter, &class, &len2,
-	   &tag) != ASN1_SUCCESS)
-	return;
-      p_vet->value = (class << 24) | tag;
+      err = asn1_get_tag_der (der + counter, der_len - counter, &class, &len2,
+			      &tag);
+      if (err != ASN1_SUCCESS)
+	goto error;
+
+      t = class << 24;
+      p_vet->value = t | tag;
       counter += len2;
 
       /* extraction and length */
       len2 = asn1_get_length_der (der + counter, der_len - counter, &len);
       if (len2 < 0)
-	return;
+	{
+	  err = ASN1_DER_ERROR;
+	  goto error;
+	}
       counter += len + len2;
 
       p_vet->end = counter;
@@ -769,7 +784,10 @@ _asn1_ordering_set (unsigned char *der, int der_len, asn1_node node)
 	      /* change position */
 	      temp = malloc (p_vet->end - counter);
 	      if (temp == NULL)
-		return;
+		{
+		  err = ASN1_MEM_ALLOC_ERROR;
+		  goto error;
+		}
 
 	      memcpy (temp, der + counter, p_vet->end - counter);
 	      memcpy (der + counter, der + p_vet->end,
@@ -797,6 +815,16 @@ _asn1_ordering_set (unsigned char *der, int der_len, asn1_node node)
       free (p_vet);
       p_vet = first;
     }
+  return ASN1_SUCCESS;
+
+error:
+  while (first != NULL)
+    {
+      p_vet = first;
+      first = first->next;
+      free(p_vet);
+    }
+  return err;
 }
 
 /******************************************************/
@@ -807,8 +835,10 @@ _asn1_ordering_set (unsigned char *der, int der_len, asn1_node node)
 /*   der: string with the DER coding.                 */
 /*   node: pointer to the SET OF element.             */
 /* Return:                                            */
+/*    ASN1_SUCCESS if successful                      */
+/*    or an error value.                              */
 /******************************************************/
-static void
+static int
 _asn1_ordering_set_of (unsigned char *der, int der_len, asn1_node node)
 {
   struct vet
@@ -821,28 +851,34 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, asn1_node node)
   struct vet *first, *last, *p_vet, *p2_vet;
   asn1_node p;
   unsigned char *temp, class;
-  unsigned long k, max;
+  unsigned long k, length;
+  int err;
 
   counter = 0;
 
   if (type_field (node->type) != ASN1_ETYPE_SET_OF)
-    return;
+    return ASN1_VALUE_NOT_VALID;
 
   p = node->down;
-  while ((type_field (p->type) == ASN1_ETYPE_TAG)
-	 || (type_field (p->type) == ASN1_ETYPE_SIZE))
+  while (p && ((type_field (p->type) == ASN1_ETYPE_TAG) ||
+	 (type_field (p->type) == ASN1_ETYPE_SIZE)))
     p = p->right;
+  if (p == NULL)
+    return ASN1_VALUE_NOT_VALID;
   p = p->right;
 
   if ((p == NULL) || (p->right == NULL))
-    return;
+    return ASN1_SUCCESS;
 
   first = last = NULL;
   while (p)
     {
       p_vet = malloc (sizeof (struct vet));
       if (p_vet == NULL)
-	return;
+	{
+	  err = ASN1_MEM_ALLOC_ERROR;
+	  goto error;
+	}
 
       p_vet->next = NULL;
       p_vet->prev = last;
@@ -856,16 +892,24 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, asn1_node node)
       if (der_len - counter > 0)
 	{
 
-	  if (asn1_get_tag_der
-	      (der + counter, der_len - counter, &class, &len,
-	       NULL) != ASN1_SUCCESS)
-	    return;
+	  err = asn1_get_tag_der (der + counter, der_len - counter, &class,
+	                          &len, NULL);
+	  if (err != ASN1_SUCCESS)
+	    goto error;
 	  counter += len;
 
 	  len2 = asn1_get_length_der (der + counter, der_len - counter, &len);
 	  if (len2 < 0)
-	    return;
+	    {
+	      err = ASN1_DER_ERROR;
+	      goto error;
+	    }
 	  counter += len + len2;
+	}
+      else
+	{
+	  err = ASN1_DER_ERROR;
+	  goto error;
 	}
 
       p_vet->end = counter;
@@ -880,13 +924,9 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, asn1_node node)
       counter = 0;
       while (p2_vet)
 	{
-	  if ((p_vet->end - counter) > (p2_vet->end - p_vet->end))
-	    max = p_vet->end - counter;
-	  else
-	    max = p2_vet->end - p_vet->end;
-
+	  length = MIN(p_vet->end - counter, p2_vet->end - p_vet->end);
 	  change = -1;
-	  for (k = 0; k < max; k++)
+	  for (k = 0; k < length; k++)
 	    if (der[counter + k] > der[p_vet->end + k])
 	      {
 		change = 1;
@@ -907,7 +947,10 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, asn1_node node)
 	      /* change position */
 	      temp = malloc (p_vet->end - counter);
 	      if (temp == NULL)
-		return;
+		{
+		  err = ASN1_MEM_ALLOC_ERROR;
+		  goto error;
+		}
 
 	      memcpy (temp, der + counter, (p_vet->end) - counter);
 	      memcpy (der + counter, der + (p_vet->end),
@@ -931,6 +974,16 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, asn1_node node)
       free (p_vet);
       p_vet = first;
     }
+  return ASN1_SUCCESS;
+
+error:
+  while (first != NULL)
+    {
+      p_vet = first;
+      first = first->next;
+      free(p_vet);
+    }
+  return err;
 }
 
 /**
@@ -1163,7 +1216,11 @@ asn1_der_coding (asn1_node element, const char *name, void *ider, int *len,
 	      len2 = _asn1_strtol (p->value, NULL, 10);
 	      _asn1_set_value (p, NULL, 0);
 	      if ((type_field (p->type) == ASN1_ETYPE_SET) && (max_len >= 0))
-		_asn1_ordering_set (der + len2, max_len - len2, p);
+		{
+		  err = _asn1_ordering_set (der + len2, counter - len2, p);
+		  if (err != ASN1_SUCCESS)
+		    goto error;
+		}
 	      asn1_length_der (counter - len2, temp, &len3);
 	      max_len -= len3;
 	      if (max_len >= 0)
@@ -1203,9 +1260,11 @@ asn1_der_coding (asn1_node element, const char *name, void *ider, int *len,
 	      len2 = _asn1_strtol (p->value, NULL, 10);
 	      _asn1_set_value (p, NULL, 0);
 	      if ((type_field (p->type) == ASN1_ETYPE_SET_OF)
-		  && (max_len - len2 > 0))
+		  && (counter - len2 > 0) && (max_len >= 0))
 		{
-		  _asn1_ordering_set_of (der + len2, max_len - len2, p);
+		  err = _asn1_ordering_set_of (der + len2, counter - len2, p);
+		  if (err != ASN1_SUCCESS)
+		    goto error;
 		}
 	      asn1_length_der (counter - len2, temp, &len3);
 	      max_len -= len3;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -1087,18 +1087,17 @@ asn1_number_of_elements (asn1_node element, const char *name, int *num)
 const char *
 asn1_find_structure_from_oid (asn1_node definitions, const char *oidValue)
 {
-  char definitionsName[ASN1_MAX_NAME_SIZE], name[2 * ASN1_MAX_NAME_SIZE + 1];
+  char name[2 * ASN1_MAX_NAME_SIZE + 1];
   char value[ASN1_MAX_NAME_SIZE];
   asn1_node p;
   int len;
   int result;
+  const char *definitionsName;
 
   if ((definitions == NULL) || (oidValue == NULL))
     return NULL;		/* ASN1_ELEMENT_NOT_FOUND; */
 
-
-  strcpy (definitionsName, definitions->name);
-  strcat (definitionsName, ".");
+  definitionsName = definitions->name;
 
   /* search the OBJECT_ID into definitions */
   p = definitions->down;
@@ -1107,8 +1106,7 @@ asn1_find_structure_from_oid (asn1_node definitions, const char *oidValue)
       if ((type_field (p->type) == ASN1_ETYPE_OBJECT_ID) &&
 	  (p->type & CONST_ASSIGN))
 	{
-	  strcpy (name, definitionsName);
-	  strcat (name, p->name);
+          snprintf(name, sizeof(name), "%s.%s", definitionsName, p->name);
 
 	  len = ASN1_MAX_NAME_SIZE;
 	  result = asn1_read_value (definitions, name, value, &len);

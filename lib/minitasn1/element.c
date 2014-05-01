@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -290,7 +290,7 @@ asn1_write_value (asn1_node node_root, const char *name,
 
   type = type_field (node->type);
 
-  if ((type == ASN1_ETYPE_SEQUENCE_OF) && (value == NULL) && (len == 0))
+  if ((type == ASN1_ETYPE_SEQUENCE_OF || type == ASN1_ETYPE_SET_OF) && (value == NULL) && (len == 0))
     {
       p = node->down;
       while ((type_field (p->type) == ASN1_ETYPE_TAG)
@@ -301,6 +301,12 @@ asn1_write_value (asn1_node node_root, const char *name,
 	asn1_delete_structure (&p->right);
 
       return ASN1_SUCCESS;
+    }
+
+  /* Don't allow element deletion for other types */
+  if (value == NULL)
+    {
+      return ASN1_VALUE_NOT_VALID;
     }
 
   switch (type)
@@ -615,16 +621,18 @@ asn1_write_value (asn1_node node_root, const char *name,
 	if (ptr_size < data_size) { \
 		return ASN1_MEM_ERROR; \
 	} else { \
-		memcpy( ptr, data, data_size); \
+		if (ptr) \
+		  memcpy (ptr, data, data_size); \
 	}
 
 #define PUT_STR_VALUE( ptr, ptr_size, data) \
-	*len = _asn1_strlen(data) + 1; \
+	*len = _asn1_strlen (data) + 1; \
 	if (ptr_size < *len) { \
 		return ASN1_MEM_ERROR; \
 	} else { \
 		/* this strcpy is checked */ \
-		_asn1_strcpy(ptr, data); \
+		if (ptr) \
+		  _asn1_strcpy (ptr, data); \
 	}
 
 #define PUT_AS_STR_VALUE( ptr, ptr_size, data, data_size) \
@@ -633,17 +641,19 @@ asn1_write_value (asn1_node node_root, const char *name,
 		return ASN1_MEM_ERROR; \
 	} else { \
 		/* this strcpy is checked */ \
-		memcpy(ptr, data, data_size); \
-		ptr[data_size] = 0; \
+		if (ptr) { \
+		  memcpy (ptr, data, data_size); \
+		  ptr[data_size] = 0; \
+		} \
 	}
 
 #define ADD_STR_VALUE( ptr, ptr_size, data) \
-	*len = (int) _asn1_strlen(data) + 1; \
-	if (ptr_size < (int) _asn1_strlen(ptr)+(*len)) { \
+	*len = (int) _asn1_strlen (data) + 1; \
+	if (ptr_size < (int) _asn1_strlen (ptr) + (*len)) { \
 		return ASN1_MEM_ERROR; \
 	} else { \
 		/* this strcat is checked */ \
-		_asn1_strcat(ptr, data); \
+		if (ptr) _asn1_strcat (ptr, data); \
 	}
 
 /**
