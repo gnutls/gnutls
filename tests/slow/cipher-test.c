@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
+#include <gnutls/self-test.h>
 
 /* This does check the AES and SHA implementation against test vectors.
  * This should not run under valgrind in order to use the native
