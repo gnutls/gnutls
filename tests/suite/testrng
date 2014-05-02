@@ -44,8 +44,8 @@ rm -f $RNGFILE2
 RINPUTNO=`dieharder -g -1|grep file_input_raw|cut -d '|' -f 2|cut -d ' ' -f 1`
 
 if test -z "$RINPUTNO";then
-	echo "Cannot determine dieharder option for raw file input"
-	exit 1
+	echo "Cannot determine dieharder option for raw file input, assuming 201"
+	RINPUTNO=201
 fi
 
 echo "Testing nonce PRNG"
@@ -62,9 +62,9 @@ fi
 
 ./rng nonce 100000000 $RNGFILE
 
-dieharder -q -f $RNGFILE -g $RINPUTNO $OPTIONS >$OUTFILE 2>&1
+dieharder -f $RNGFILE -g $RINPUTNO $OPTIONS >$OUTFILE 2>&1
 if ! test -z "$OPTIONS2";then
-	dieharder -q -f $RNGFILE -g $RINPUTNO $OPTIONS2 >>$OUTFILE 2>&1
+	dieharder -f $RNGFILE -g $RINPUTNO $OPTIONS2 >>$OUTFILE 2>&1
 fi
 grep FAILED $OUTFILE >/dev/null 2>&1
 ret=$?
@@ -97,9 +97,9 @@ fi
 
 ./rng key 100000000 $RNGFILE
 
-dieharder -q -f $RNGFILE -g $RINPUTNO $OPTIONS >$OUTFILE 2>&1
+dieharder -f $RNGFILE -g $RINPUTNO $OPTIONS >$OUTFILE 2>&1
 if ! test -z "$OPTIONS2";then
-	dieharder -q -f $RNGFILE -g $RINPUTNO $OPTIONS2 >>$OUTFILE 2>&1
+	dieharder -f $RNGFILE -g $RINPUTNO $OPTIONS2 >>$OUTFILE 2>&1
 fi
 grep FAILED $OUTFILE >/dev/null 2>&1 
 ret=$?
@@ -122,9 +122,9 @@ rm -f $OUTFILE
 echo "Testing /dev/zero PRNG"
 dd if=/dev/zero of=$RNGFILE bs=4 count=10000000 >/dev/null 2>&1
 
-dieharder -q -f $RNGFILE -g $RINPUTNO $OPTIONS >$OUTFILE 2>&1
+dieharder -f $RNGFILE -g $RINPUTNO $OPTIONS >$OUTFILE 2>&1
 if ! test -z "$OPTIONS2";then
-	dieharder -q -f $RNGFILE -g $RINPUTNO $OPTIONS2 >>$OUTFILE 2>&1
+	dieharder -f $RNGFILE -g $RINPUTNO $OPTIONS2 >>$OUTFILE 2>&1
 fi
 grep PASSED $OUTFILE >/dev/null 2>&1 
 ret=$?
