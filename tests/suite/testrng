@@ -27,7 +27,7 @@ fi
 if test "$1" = "full";then
   OPTIONS="-a"
 else
-  OPTIONS="-d 5"
+  OPTIONS="-d 202"
   OPTIONS2="-d 10"
 fi
 
@@ -48,6 +48,7 @@ if test -z "$RINPUTNO";then
 	RINPUTNO=201
 fi
 
+echo ""
 echo "Testing nonce PRNG"
 
 ./rng nonce 64 $RNGFILE
@@ -82,7 +83,9 @@ if test "$ret" != "0";then
 	exit 1
 fi
 
+cat $OUTFILE
 rm -f $OUTFILE
+echo ""
 echo "Testing key PRNG"
 
 ./rng key 64 $RNGFILE
@@ -118,7 +121,9 @@ if test "$ret" != "0";then
 	exit 1
 fi
 
+cat $OUTFILE
 rm -f $OUTFILE
+echo ""
 echo "Testing /dev/zero PRNG"
 dd if=/dev/zero of=$RNGFILE bs=4 count=10000000 >/dev/null 2>&1
 
@@ -142,6 +147,7 @@ if test "$ret" != "0";then
 	exit 1
 fi
 
+cat $OUTFILE
 rm -f $OUTFILE
 rm -f $RNGFILE
 rm -f $RNGFILE2
