@@ -71,16 +71,15 @@ wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t * nbytes,
 
 static int wrap_nettle_mpi_init(bigint_t *w)
 {
-mpz_t *r;
+bigint_t r;
 
-	r = gnutls_malloc(sizeof(*r));
+	r = gnutls_malloc(SIZEOF_MPZT);
 	if (r == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	mpz_init(*r);
-	
+	mpz_init(TOMPZ(r));
 	*w = r;
 
 	return 0;
