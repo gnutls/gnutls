@@ -48,9 +48,8 @@
 #include <nettle/ecc.h>
 #include <nettle/ecdsa.h>
 #include <nettle/ecc-curve.h>
+#include <gnettle.h>
 #include <fips.h>
-
-#define TOMPZ(x) (*((mpz_t*)(x)))
 
 static inline const struct ecc_curve *get_supported_curve(int curve);
 

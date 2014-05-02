@@ -32,8 +32,6 @@
 #include <gnettle.h>
 #include <random.h>
 
-#define TOMPZ(x) (*((mpz_t*)(x)))
-
 static int
 wrap_nettle_mpi_print(const bigint_t a, void *buffer, size_t * nbytes,
 		      gnutls_bigint_format_t format)
