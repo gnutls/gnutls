@@ -20,6 +20,9 @@ server hint was provided.
 ** libgnutls-dane: Accept a certificate using DANE if there is at least one 
 entry that matches the certificate. Patch by simon [at] arlott.org.
 
+** configure: Added --with-nettle-mini option, which allows linking
+with a libnettle that contains gmp.
+
 ** API and ABI modifications:
 No changes since last version.
 
