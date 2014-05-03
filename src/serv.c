@@ -274,11 +274,7 @@ get_params(gnutls_session_t session, gnutls_params_type_t type,
 	   gnutls_params_st * st)
 {
 
-	if (type == GNUTLS_PARAMS_RSA_EXPORT) {
-		if (rsa_params == NULL)
-			return -1;
-		st->params.rsa_export = rsa_params;
-	} else if (type == GNUTLS_PARAMS_DH) {
+	if (type == GNUTLS_PARAMS_DH) {
 		if (dh_params == NULL)
 			return -1;
 		st->params.dh = dh_params;
@@ -290,36 +286,6 @@ get_params(gnutls_session_t session, gnutls_params_type_t type,
 
 	return 0;
 }
-
-#ifdef ENABLE_RSA_EXPORT
-static int generate_rsa_params(void)
-{
-	if (gnutls_rsa_params_init(&rsa_params) < 0) {
-		fprintf(stderr, "Error in rsa parameter initialization\n");
-		exit(1);
-	}
-
-	/* Generate RSA parameters - for use with RSA-export
-	 * cipher suites. These should be discarded and regenerated
-	 * once a day, once every 500 transactions etc. Depends on the
-	 * security requirements.
-	 */
-	printf("Generating temporary RSA parameters. Please wait...\n");
-	fflush(stdout);
-
-	if (gnutls_rsa_params_generate2(rsa_params, 512) < 0) {
-		fprintf(stderr, "Error in rsa parameter generation\n");
-		exit(1);
-	}
-
-	return 0;
-}
-#else
-static int generate_rsa_params(void)
-{
-	return 0;
-}
-#endif
 
 LIST_DECLARE_INIT(listener_list, listener_item, listener_free);
 
@@ -966,7 +932,6 @@ int main(int argc, char **argv)
 	 * gnutls_dh_params_set().
 	 */
 	if (generate != 0) {
-		generate_rsa_params();
 		generate_dh_primes();
 	} else if (dh_params_file) {
 		read_dh_params();
@@ -1181,6 +1146,65 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+static void retry_handshake(listener_item *j)
+{
+	int r, ret;
+
+	r = gnutls_handshake(j->tls_session);
+	if (r < 0 && gnutls_error_is_fatal(r) == 0) {
+		check_alert(j->tls_session, r);
+		/* nothing */
+	} else if (r < 0) {
+		j->http_state = HTTP_STATE_CLOSING;
+		check_alert(j->tls_session, r);
+		fprintf(stderr, "Error in handshake\n");
+		GERR(r);
+
+		do {
+			ret = gnutls_alert_send_appropriate(j->tls_session, r);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	} else if (r == 0) {
+		if (gnutls_session_is_resumed(j->tls_session) != 0 && verbose != 0)
+			printf("*** This is a resumed session\n");
+
+		if (verbose != 0) {
+#if 0
+			printf("- connection from %s\n",
+			     human_addr((struct sockaddr *)
+				&client_address,
+				calen,
+				topbuf,
+				sizeof(topbuf)));
+#endif
+
+			print_info(j->tls_session, verbose, verbose);
+		}
+
+		if (gnutls_auth_get_type(j->tls_session) == GNUTLS_CRD_CERTIFICATE)
+			cert_verify(j->tls_session,NULL, NULL);
+		j->handshake_ok = 1;
+	}
+}
+
+static void try_rehandshake(listener_item *j)
+{
+int r, ret;
+	fprintf(stderr, "*** Received hello message\n");
+	do {
+		r = gnutls_handshake(j->tls_session);
+	} while (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN);
+
+	if (r < 0) {
+		do {
+			ret = gnutls_alert_send_appropriate(j->tls_session, r);
+		} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		GERR(r);
+		j->http_state = HTTP_STATE_CLOSING;
+	} else {
+		j->http_state = HTTP_STATE_REQUEST;
+	}
+}
+
 static void tcp_server(const char *name, int port)
 {
 	int n, s;
@@ -1246,10 +1270,6 @@ static void tcp_server(const char *name, int port)
 
 			/* a new connection has arrived */
 			if (FD_ISSET(j->fd, &rd) && j->listen_socket) {
-				gnutls_session_t tls_session;
-
-				tls_session = initialize_session(0);
-
 				calen = sizeof(client_address);
 				memset(&client_address, 0, calen);
 				accept_fd =
@@ -1271,10 +1291,10 @@ static void tcp_server(const char *name, int port)
 					j->http_state = HTTP_STATE_REQUEST;
 					j->fd = accept_fd;
 
-					j->tls_session = tls_session;
+					j->tls_session = initialize_session(0);
 					gnutls_transport_set_int
-					    (tls_session, accept_fd);
-					set_read_funcs(tls_session);
+					    (j->tls_session, accept_fd);
+					set_read_funcs(j->tls_session);
 					j->handshake_ok = 0;
 
 					if (verbose != 0) {
@@ -1300,66 +1320,10 @@ static void tcp_server(const char *name, int port)
 			if (FD_ISSET(j->fd, &rd) && !j->listen_socket) {
 /* read partial GET request */
 				char buf[1024];
-				int r, ret;
+				int r;
 
 				if (j->handshake_ok == 0) {
-					r = gnutls_handshake(j->
-							     tls_session);
-					if (r < 0
-					    && gnutls_error_is_fatal(r) ==
-					    0) {
-						check_alert(j->tls_session,
-							    r);
-						/* nothing */
-					} else if (r < 0
-						   &&
-						   gnutls_error_is_fatal(r)
-						   == 1) {
-						check_alert(j->tls_session,
-							    r);
-						fprintf(stderr,
-							"Error in handshake\n");
-						GERR(r);
-
-						do {
-							ret =
-							    gnutls_alert_send_appropriate
-							    (j->
-							     tls_session,
-							     r);
-						}
-						while (ret ==
-						       GNUTLS_E_AGAIN
-						       || ret ==
-						       GNUTLS_E_INTERRUPTED);
-						j->http_state =
-						    HTTP_STATE_CLOSING;
-					} else if (r == 0) {
-						if (gnutls_session_is_resumed(j->tls_session) != 0 && verbose != 0)
-							printf
-							    ("*** This is a resumed session\n");
-
-						if (verbose != 0) {
-							printf
-							    ("\n* Successful handshake from %s\n",
-							     human_addr((struct sockaddr *)
-									&client_address,
-									calen,
-									topbuf,
-									sizeof
-									(topbuf)));
-							print_info(j->
-								   tls_session,
-								   verbose,
-								   verbose);
-							if (gnutls_auth_get_type(j->tls_session) == GNUTLS_CRD_CERTIFICATE)
-								cert_verify
-								    (j->
-								     tls_session,
-								     NULL, NULL);
-						}
-						j->handshake_ok = 1;
-					}
+					retry_handshake(j);
 				}
 
 				if (j->handshake_ok == 1) {
@@ -1368,59 +1332,20 @@ static void tcp_server(const char *name, int port)
 							       buf,
 							       MIN(1024,
 								   SMALL_READ_TEST));
-					if (r ==
-					    GNUTLS_E_HEARTBEAT_PING_RECEIVED)
-					{
-						gnutls_heartbeat_pong(j->
-								      tls_session,
-								      0);
-					}
-					if (r == GNUTLS_E_INTERRUPTED
-					    || r == GNUTLS_E_AGAIN) {
+					if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN) {
 						/* do nothing */
 					} else if (r <= 0) {
-						if (r ==
-						    GNUTLS_E_REHANDSHAKE) {
-							fprintf(stderr,
-								"*** Received hello message\n");
-							do {
-								r = gnutls_handshake(j->tls_session);
-							}
-							while (r ==
-							       GNUTLS_E_INTERRUPTED
-							       || r ==
-							       GNUTLS_E_AGAIN);
-
-							if (r < 0) {
-								do {
-									ret = gnutls_alert_send_appropriate(j->tls_session, r);
-								}
-								while (ret
-								       ==
-								       GNUTLS_E_AGAIN
-								       ||
-								       ret
-								       ==
-								       GNUTLS_E_INTERRUPTED);
-
-								GERR(r);
-								j->http_state = HTTP_STATE_CLOSING;
-							}
+						if (r == GNUTLS_E_HEARTBEAT_PING_RECEIVED) {
+							gnutls_heartbeat_pong(j->tls_session, 0);
+						} else if (r == GNUTLS_E_REHANDSHAKE) {
+						    	try_rehandshake(j);
 						} else {
+							j->http_state = HTTP_STATE_CLOSING;
 							if (r < 0) {
-								if (r !=
-								    GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
-								{
-									j->http_state = HTTP_STATE_CLOSING;
-									check_alert
-									    (j->
-									     tls_session,
-									     r);
-									fprintf
-									    (stderr,
-									     "Error while receiving data\n");
-									GERR(r);
-								}
+								check_alert(j->tls_session, r);
+								fprintf(stderr,
+								     "Error while receiving data\n");
+								GERR(r);
 							}
 						}
 					} else {
@@ -1443,15 +1368,15 @@ static void tcp_server(const char *name, int port)
 							j->http_request[j->
 									request_length]
 							    = '\0';
-						} else
+						} else {
 							j->http_state =
 							    HTTP_STATE_CLOSING;
-
+						}
 					}
 /* check if we have a full HTTP header */
 
 					j->http_response = NULL;
-					if (j->http_request != NULL) {
+					if (j->http_state == HTTP_STATE_REQUEST && j->http_request != NULL) {
 						if ((http == 0
 						     && strchr(j->
 							       http_request,
@@ -1478,106 +1403,30 @@ static void tcp_server(const char *name, int port)
 					}
 				}
 			}
+
 			if (FD_ISSET(j->fd, &wr)) {
 /* write partial response request */
 				int r;
 
 				if (j->handshake_ok == 0) {
-					r = gnutls_handshake(j->
-							     tls_session);
-					if (r < 0
-					    && gnutls_error_is_fatal(r) ==
-					    0) {
-						check_alert(j->tls_session,
-							    r);
-						/* nothing */
-					} else if (r < 0
-						   &&
-						   gnutls_error_is_fatal(r)
-						   == 1) {
-						int ret;
-
-						j->http_state =
-						    HTTP_STATE_CLOSING;
-						check_alert(j->tls_session,
-							    r);
-						fprintf(stderr,
-							"Error in handshake\n");
-						GERR(r);
-
-						do {
-							ret =
-							    gnutls_alert_send_appropriate
-							    (j->
-							     tls_session,
-							     r);
-						}
-						while (ret ==
-						       GNUTLS_E_AGAIN);
-					} else if (r == 0) {
-						if (gnutls_session_is_resumed(j->tls_session) != 0 && verbose != 0)
-							printf
-							    ("*** This is a resumed session\n");
-						if (verbose != 0) {
-							printf
-							    ("- connection from %s\n",
-							     human_addr((struct sockaddr *)
-									&client_address,
-									calen,
-									topbuf,
-									sizeof
-									(topbuf)));
-
-							print_info(j->
-								   tls_session,
-								   verbose,
-								   verbose);
-							if (gnutls_auth_get_type(j->tls_session) == GNUTLS_CRD_CERTIFICATE)
-								cert_verify
-								    (j->
-								     tls_session,
-								     NULL, NULL);
-						}
-						j->handshake_ok = 1;
-					}
+					retry_handshake(j);
 				}
 
-				if (j->handshake_ok == 1
-				    && j->http_response != NULL) {
-					/* FIXME if j->http_response == NULL? */
-					r = gnutls_record_send(j->
-							       tls_session,
-							       j->
-							       http_response
+				if (j->handshake_ok == 1 && j->http_response == NULL) {
+					j->http_state = HTTP_STATE_CLOSING;
+				} else if (j->handshake_ok == 1 && j->http_response != NULL) {
+					r = gnutls_record_send(j->tls_session,
+							       j->http_response
 							       +
-							       j->
-							       response_written,
-							       MIN(j->
-								   response_length
+							       j->response_written,
+							       MIN(j->response_length
 								   -
-								   j->
-								   response_written,
+								   j->response_written,
 								   SMALL_READ_TEST));
-					if (r == GNUTLS_E_INTERRUPTED
-					    || r == GNUTLS_E_AGAIN) {
+					if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN) {
 						/* do nothing */
 					} else if (r <= 0) {
-						if (http != 0)
-							j->http_state =
-							    HTTP_STATE_CLOSING;
-						else {
-							j->http_state =
-							    HTTP_STATE_REQUEST;
-							free(j->
-							     http_response);
-							j->response_length
-							    = 0;
-							j->request_length =
-							    0;
-							j->http_request[0]
-							    = 0;
-						}
-
+						j->http_state = HTTP_STATE_CLOSING;
 						if (r < 0) {
 							fprintf(stderr,
 								"Error while sending data\n");
