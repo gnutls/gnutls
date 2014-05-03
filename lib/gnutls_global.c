@@ -39,7 +39,7 @@
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
 
-#ifdef SOLARIS
+#ifdef __sun
 # pragma fini(lib_deinit)
 # pragma init(lib_init)
 # define _CONSTRUCTOR
