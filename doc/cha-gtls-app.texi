@@ -953,8 +953,8 @@ with an 192 bit security level, as well as the enabling of the corresponding
 verification profile.
 
 @item EXPORT @tab
-Means all ciphersuites are enabled, including the
-low-security 40 bit ciphers.
+This priority string should be treated as deprecated. 
+GnuTLS no longer negotiates 40-bit ciphers.
 
 @item NONE @tab
 Means nothing is enabled.  This disables even protocols and
