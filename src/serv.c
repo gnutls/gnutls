@@ -1180,8 +1180,16 @@ static void retry_handshake(listener_item *j)
 			print_info(j->tls_session, verbose, verbose);
 		}
 
-		if (gnutls_auth_get_type(j->tls_session) == GNUTLS_CRD_CERTIFICATE)
-			cert_verify(j->tls_session,NULL, NULL);
+		if (gnutls_auth_get_type(j->tls_session) == GNUTLS_CRD_CERTIFICATE) {
+			if (require_cert && cert_verify(j->tls_session, NULL, NULL) == 0) {
+				do {
+					ret = gnutls_alert_send(j->tls_session, GNUTLS_AL_FATAL, GNUTLS_A_ACCESS_DENIED);
+				} while(ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+
+				j->http_state = HTTP_STATE_CLOSING;
+				return;
+			}
+		}
 		j->handshake_ok = 1;
 	}
 }
@@ -1500,7 +1508,7 @@ static void cmd_parser(int argc, char **argv)
 	optionProcess(&gnutls_servOptions, argc, argv);
 
 	disable_client_cert = HAVE_OPT(DISABLE_CLIENT_CERT);
-	require_cert = HAVE_OPT(REQUIRE_CLIENT_CERT);
+	require_cert = ENABLED_OPT(REQUIRE_CLIENT_CERT);
 	if (HAVE_OPT(DEBUG))
 		debug = OPT_VALUE_DEBUG;
 
