@@ -39,12 +39,14 @@
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
 
-#if defined(__GNUC__) || defined(ENABLE_FIPS140)
-# define _CONSTRUCTOR __attribute__((constructor))
-# define _DESTRUCTOR __attribute__((destructor))
-#else
+#ifdef SOLARIS
+# pragma fini(lib_deinit)
+# pragma init(lib_init)
 # define _CONSTRUCTOR
 # define _DESTRUCTOR
+#else
+# define _CONSTRUCTOR __attribute__((constructor))
+# define _DESTRUCTOR __attribute__((destructor))
 #endif
 
 /* created by asn1c */
@@ -398,7 +400,7 @@ const char *gnutls_check_version(const char *req_version)
 	return NULL;
 }
 
-_CONSTRUCTOR static void lib_init(void)
+static void _CONSTRUCTOR lib_init(void)
 {
 int ret;
 
@@ -409,7 +411,7 @@ int ret;
 	}
 }
 
-_DESTRUCTOR static void lib_deinit(void)
+static void _DESTRUCTOR lib_deinit(void)
 {
 	_gnutls_global_deinit(1);
 }
