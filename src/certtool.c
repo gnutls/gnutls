@@ -116,6 +116,10 @@ generate_private_key_int(common_info_st * cinfo)
 	fprintf(stderr, "Generating a %d bit %s private key...\n",
 		bits, gnutls_pk_algorithm_get_name(key_type));
 
+	if (bits < 256 && key_type == GNUTLS_PK_EC)
+		fprintf(stderr,
+			"Note that ECDSA keys with size less than 256 are not widely supported.\n\n");
+
 	if (bits > 1024 && key_type == GNUTLS_PK_DSA)
 		fprintf(stderr,
 			"Note that DSA keys with size over 1024 may cause incompatibility problems when used with earlier than TLS 1.2 versions.\n\n");
