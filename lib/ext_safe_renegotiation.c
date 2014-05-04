@@ -258,11 +258,6 @@ _gnutls_ext_sr_send_cs (gnutls_session_t session)
     {
       set = 1;
     }
-  else if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
 
   if (set != 0)
     {
@@ -288,12 +283,16 @@ static int
 _gnutls_sr_recv_params (gnutls_session_t session,
                         const opaque * data, size_t _data_size)
 {
-  int len = data[0];
+  unsigned int len;
   ssize_t data_size = _data_size;
   sr_ext_st *priv;
   extension_priv_data_t epriv;
   int set = 0, ret;
 
+  if (data_size == 0)
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
+  len = data[0];
   DECR_LEN (data_size, len + 1 /* count the first byte and payload */ );
 
   if (session->internals.priorities.sr == SR_DISABLED)
