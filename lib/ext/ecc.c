@@ -106,6 +106,9 @@ _gnutls_supported_ecc_recv_params(gnutls_session_t session,
 		len = _gnutls_read_uint16(p);
 		p += 2;
 
+		if (len % 2 != 0)
+			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
 		DECR_LEN(data_size, len);
 
 		for (i = 0; i < len; i += 2) {
