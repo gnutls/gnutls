@@ -135,6 +135,7 @@ LIST_TYPE_DECLARE(listener_item, char *http_request; char *http_response;
 		  int listen_socket; int fd;
 		  gnutls_session_t tls_session;
 		  int handshake_ok;
+		  time_t start;
     );
 
 static const char *safe_strerror(int value)
@@ -1220,6 +1221,7 @@ static void tcp_server(const char *name, int port)
 	int accept_fd;
 	struct sockaddr_storage client_address;
 	socklen_t calen;
+	struct timeval tv;
 
 	s = listen_socket(name, port, SOCK_STREAM);
 	if (s < 0)
@@ -1228,6 +1230,7 @@ static void tcp_server(const char *name, int port)
 	for (;;) {
 		listener_item *j;
 		fd_set rd, wr;
+		time_t now = time(0);
 #ifndef _WIN32
 		int val;
 #endif
@@ -1248,6 +1251,12 @@ static void tcp_server(const char *name, int port)
 				exit(1);
 			}
 #endif
+			if (j->start != 0 && now - j->start > 30) {
+				if (verbose != 0) {
+					fprintf(stderr, "Scheduling inactive connection for close\n");
+				}
+				j->http_state = HTTP_STATE_CLOSING;
+			}
 
 			if (j->listen_socket) {
 				FD_SET(j->fd, &rd);
@@ -1265,7 +1274,9 @@ static void tcp_server(const char *name, int port)
 		lloopend(listener_list, j);
 
 /* core operation */
-		n = select(n + 1, &rd, &wr, NULL, NULL);
+		tv.tv_sec = 10;
+		tv.tv_usec = 0;
+		n = select(n + 1, &rd, &wr, NULL, &tv);
 		if (n == -1 && errno == EINTR)
 			continue;
 		if (n < 0) {
@@ -1288,7 +1299,7 @@ static void tcp_server(const char *name, int port)
 				if (accept_fd < 0) {
 					perror("accept()");
 				} else {
-					time_t tt;
+					time_t tt = time(0);
 					char *ctt;
 
 					/* new list entry for the connection */
@@ -1298,6 +1309,7 @@ static void tcp_server(const char *name, int port)
 					    (char *) strdup("");
 					j->http_state = HTTP_STATE_REQUEST;
 					j->fd = accept_fd;
+					j->start = tt;
 
 					j->tls_session = initialize_session(0);
 					gnutls_transport_set_int
@@ -1306,7 +1318,6 @@ static void tcp_server(const char *name, int port)
 					j->handshake_ok = 0;
 
 					if (verbose != 0) {
-						tt = time(0);
 						ctt = ctime(&tt);
 						ctt[strlen(ctt) - 1] = 0;
 
