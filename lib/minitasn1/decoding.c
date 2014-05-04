@@ -149,7 +149,7 @@ asn1_get_tag_der (const unsigned char *der, int der_len,
       /* Long form */
       punt = 1;
       ris = 0;
-      while (punt <= der_len && der[punt] & 128)
+      while (punt < der_len && der[punt] & 128)
 	{
 
 	  if (INT_MULTIPLY_OVERFLOW (ris, 128))
