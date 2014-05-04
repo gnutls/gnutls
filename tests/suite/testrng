@@ -24,11 +24,18 @@ if ! test -x "/usr/bin/dieharder";then
   exit 77
 fi
 
+VERSION=`dieharder -l|grep version|cut -d ' ' -f 6`
+
 if test "$1" = "full";then
   OPTIONS="-a"
 else
-  OPTIONS="-d 202"
-  OPTIONS2="-d 10"
+  if test "$VERSION" = "2.28.1";then
+    OPTIONS="-d 5"
+    OPTIONS2="-d 10"
+  else
+    OPTIONS="-d 202"
+    OPTIONS2="-d 10"
+  fi
 fi
 
 OUTFILE=rng.log
@@ -40,6 +47,7 @@ rm -f $RNGFILE
 rm -f $RNGFILE2
 
 . $srcdir/../scripts/common.sh
+
 
 RINPUTNO=`dieharder -g -1|grep file_input_raw|cut -d '|' -f 2|cut -d ' ' -f 1`
 
