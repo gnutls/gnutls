@@ -133,7 +133,7 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
       if (cred == NULL)
         return 0;
 
-      priv = gnutls_malloc (sizeof (*priv));
+      priv = gnutls_calloc (1, sizeof (*priv));
       if (priv == NULL)
         {
           gnutls_assert ();
