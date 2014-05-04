@@ -185,17 +185,16 @@ _gnutls_psk_pwd_find_entry(gnutls_session_t session, char *username,
 				ret = GNUTLS_E_SRP_PWD_ERROR;
 				goto cleanup;
 			}
-			return 0;
+			ret = 0;
+			goto cleanup;
 		}
 	}
 
 	/* user was not found. Fake him. 
-	 * the last index found and randomize the entry.
 	 */
 	ret = _randomize_psk(psk);
 	if (ret < 0) {
 		goto cleanup;
-		return ret;
 	}
 
 	ret = 0;
