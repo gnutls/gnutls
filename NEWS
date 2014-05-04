@@ -15,6 +15,9 @@ result to illegal memory access if a server hint was provided.
 ** libgnutls: Fixed client memory leak in the PSK key exchange, if a
 server hint was provided.
 
+** libgnutls: Several small bug fixes identified using valgrind and
+the Codenomicon TLS test suite.
+
 ** libgnutls: Several small bug fixes found by coverity.
 
 ** libgnutls-dane: Accept a certificate using DANE if there is at least one 
