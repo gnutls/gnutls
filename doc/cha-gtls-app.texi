@@ -1147,7 +1147,7 @@ will allow V1 CAs in chains.
 
 @item %PROFILE_(LOW|LEGACY|MEDIUM|HIGH|ULTRA) @tab
 require a certificate verification profile the corresponds to the specified
-security level, see @ref{Table,tab:key-sizes} for the mappings to values.
+security level, see @ref{tab:key-sizes} for the mappings to values.
 
 @item %PROFILE_(SUITEB128|SUITEB192) @tab
 require a certificate verification profile the corresponds to SUITEB. Note
