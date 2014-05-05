@@ -225,6 +225,11 @@ typedef enum record_flush_t {
 #define MEMSUB(x,y) ((ssize_t)((ptrdiff_t)x-(ptrdiff_t)y))
 
 #define DECR_LEN(len, x) do { len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;} } while (0)
+#define DECR_LEN_FINAL(len, x) do { \
+	len-=x; \
+	if (len != 0) \
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH); \
+	} while (0)
 #define DECR_LENGTH_RET(len, x, RET) do { len-=x; if (len<0) {gnutls_assert(); return RET;} } while (0)
 #define DECR_LENGTH_COM(len, x, COM) do { len-=x; if (len<0) {gnutls_assert(); COM;} } while (0)
 

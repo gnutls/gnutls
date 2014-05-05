@@ -1073,6 +1073,9 @@ _gnutls_proc_x509_server_crt(gnutls_session_t session,
 		i -= len + 3;
 	}
 
+	if (dsize != 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
 	if (peer_certificate_list_size == 0) {
 		gnutls_assert();
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
@@ -1284,6 +1287,9 @@ _gnutls_proc_openpgp_server_crt(gnutls_session_t session,
 		return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 	}
 
+	if (dsize != 0)
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
 	/* ok we now have the peer's key in tmp datum
 	 */
 	peer_certificate_list = gnutls_calloc(1, sizeof(gnutls_pcert_st));
@@ -1476,7 +1482,7 @@ _gnutls_proc_cert_cert_req(gnutls_session_t session, uint8_t * data,
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	DECR_LEN(dsize, size);
+	DECR_LEN_FINAL(dsize, size);
 
 	/* now we ask the user to tell which one
 	 * he wants to use.
@@ -1600,16 +1606,14 @@ _gnutls_proc_cert_client_crt_vrfy(gnutls_session_t session,
 	}
 
 	ret = _gnutls_session_sign_algo_enabled(session, sign_algo);
-	if (ret < 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
-	}
+	if (ret < 0)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM);
 
 	DECR_LEN(dsize, 2);
 	size = _gnutls_read_uint16(pdata);
 	pdata += 2;
 
-	DECR_LEN(dsize, size);
+	DECR_LEN_FINAL(dsize, size);
 
 	sig.data = pdata;
 	sig.size = size;
@@ -2240,7 +2244,7 @@ _gnutls_proc_dhe_signature(gnutls_session_t session, uint8_t * data,
 	sigsize = _gnutls_read_uint16(data);
 	data += 2;
 
-	DECR_LEN(data_size, sigsize);
+	DECR_LEN_FINAL(data_size, sigsize);
 	signature.data = data;
 	signature.size = sigsize;
 
