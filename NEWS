@@ -11,6 +11,8 @@ investigated by JMRecio.
 ** libgnutls: Several small bug fixes identified using valgrind and
 the Codenomicon TLS test suite.
 
+** libgnutls: Several small bug fixes found by coverity.
+
 ** libgnutls-dane: Accept a certificate using DANE if there is at least one 
 entry that matches the certificate. Patch by simon [at] arlott.org.
 
