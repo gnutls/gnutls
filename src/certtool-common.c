@@ -575,15 +575,17 @@ get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_sec_pa
     }
   else
     {
-      if (info_sec_param)
+      if (info_sec_param == 0)
         {
-          bits =
-            gnutls_sec_param_to_pk_bits (key_type,
-                                         str_to_sec_param (info_sec_param));
+          /* For ECDSA keys use 256 bits or better, as they are widely supported */
+          if (key_type == GNUTLS_PK_EC)
+            info_sec_param = "HIGH";
+          else
+            info_sec_param = "NORMAL";
         }
-      else
-        bits =
-          gnutls_sec_param_to_pk_bits (key_type, GNUTLS_SEC_PARAM_NORMAL);
+      bits =
+        gnutls_sec_param_to_pk_bits (key_type,
+                                     str_to_sec_param (info_sec_param));
     }
 
   return bits;
