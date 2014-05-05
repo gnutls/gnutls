@@ -648,9 +648,6 @@ static gnutls_session_t init_tls_session(const char *hostname)
 	unsigned i;
 	gnutls_session_t session;
 
-	if (priorities == NULL)
-		priorities = "NORMAL";
-
 	if (udp) {
 		gnutls_init(&session, GNUTLS_DATAGRAM | init_flags);
 		if (mtu)
