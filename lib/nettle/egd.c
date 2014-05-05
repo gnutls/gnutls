@@ -211,6 +211,9 @@ restart:
   if (*fd == -1 || do_restart)
     *fd = _rndegd_connect_socket ();
 
+  if (*fd == -1)
+    return -1;
+
   do_restart = 0;
 
   nbytes = length < 255 ? length : 255;

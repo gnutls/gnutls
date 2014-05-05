@@ -360,7 +360,7 @@ static int raw_pubkey_to_base64(const gnutls_datum_t* raw, gnutls_datum_t * b64)
   char* out;
   
   ret = base64_encode_alloc((void*)raw->data, raw->size, &out);
-  if (ret == 0)
+  if (ret == 0 || out == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
   
   b64->data = (void*)out;
