@@ -790,6 +790,12 @@ static void disable_wildcards(gnutls_priority_t c)
 {
 	c->additional_verify_flags |= GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS;
 }
+static void enable_profile_very_weak(gnutls_priority_t c)
+{
+	c->additional_verify_flags &= 0x00ffffff;
+	c->additional_verify_flags |= GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_VERY_WEAK);
+	c->level = GNUTLS_SEC_PARAM_VERY_WEAK;
+}
 static void enable_profile_low(gnutls_priority_t c)
 {
 	c->additional_verify_flags &= 0x00ffffff;

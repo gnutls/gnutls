@@ -816,6 +816,8 @@ typedef enum gnutls_certificate_verify_flags {
 
 /**
  * gnutls_certificate_verification_profiles_t:
+ * @GNUTLS_PROFILE_VERY_WEAK: A verification profile that
+ *  corresponds to @GNUTLS_SEC_PARAM_VERY_WEAK (64 bits)
  * @GNUTLS_PROFILE_LOW: A verification profile that
  *  corresponds to @GNUTLS_SEC_PARAM_LOW (80 bits)
  * @GNUTLS_PROFILE_LEGACY: A verification profile that
@@ -834,6 +836,7 @@ typedef enum gnutls_certificate_verify_flags {
  * Enumeration of different certificate verification profiles.
  */
 typedef enum gnutls_certificate_verification_profiles_t {
+	GNUTLS_PROFILE_VERY_WEAK = 1,
 	GNUTLS_PROFILE_LOW = 2,
 	GNUTLS_PROFILE_LEGACY = 4,
 	GNUTLS_PROFILE_MEDIUM = 5,

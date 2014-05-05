@@ -1207,6 +1207,12 @@ authentication.
 @tab @code{INSECURE}
 @tab Considered to be insecure
 
+@item 64
+@tab 768
+@tab 128
+@tab @code{VERY WEAK}
+@tab Short term protection against individuals
+
 @item 72
 @tab 1008
 @tab 160

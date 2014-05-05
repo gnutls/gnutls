@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.3.2 (unreleased)
 
+** libgnutls: Added the 'very weak' certificate verification profile
+that corresponds to 64-bit security level.
+
 ** libgnutls: Corrected file descriptor leak on random generator
 initialization.
 
@@ -29,7 +32,7 @@ entry that matches the certificate. Patch by simon [at] arlott.org.
 ** certtool: Allow exporting a CRL on DER format.
 
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_PROFILE_VERY_WEAK: Added
 
 
 * Version 3.3.1 (released 2014-04-19)
