@@ -203,23 +203,33 @@ libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIM
 
 endif # ENABLE_TROUSERS
 
-danetool-args.c danetool-args.h: $(srcdir)/danetool-args.def $(srcdir)/args-std.def
+danetool-args.h: danetool-args.c
+danetool-args.c: $(srcdir)/danetool-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
-ocsptool-args.c ocsptool-args.h: $(srcdir)/ocsptool-args.def $(srcdir)/args-std.def
+ocsptool-args.h: ocsptool-args.c
+ocsptool-args.c: $(srcdir)/ocsptool-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
-tpmtool-args.c tpmtool-args.h: $(srcdir)/tpmtool-args.def $(srcdir)/args-std.def
+tpmtool-args.h: tpmtool-args.c
+tpmtool-args.c: $(srcdir)/tpmtool-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
-p11tool-args.c p11tool-args.h: $(srcdir)/p11tool-args.def $(srcdir)/args-std.def
+p11tool-args.h: p11tool-args.c
+p11tool-args.c: $(srcdir)/p11tool-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
-psktool-args.c psktool-args.h: $(srcdir)/psktool-args.def $(srcdir)/args-std.def
+psktool-args.h: psktool-args.c
+psktool-args.c: $(srcdir)/psktool-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
-cli-debug-args.c cli-debug-args.h: $(srcdir)/cli-debug-args.def $(srcdir)/args-std.def
+cli-debug-args.h: cli-debug-args.c
+cli-debug-args.c: $(srcdir)/cli-debug-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
+cli-args.h: cli-args.c
 cli-args.c cli-args.h: $(srcdir)/cli-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
-serv-args.c serv-args.h: $(srcdir)/serv-args.def $(srcdir)/args-std.def
+serv-args.h: serv-args.c
+serv-args.c: $(srcdir)/serv-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
-srptool-args.c srptool-args.h: $(srcdir)/srptool-args.def $(srcdir)/args-std.def
+srptool-args.h: srptool-args.c
+srptool-args.c: $(srcdir)/srptool-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
-certtool-args.c certtool-args.h: $(srcdir)/certtool-args.def $(srcdir)/args-std.def
+certtool-args.h: certtool-args.c
+certtool-args.c: $(srcdir)/certtool-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
