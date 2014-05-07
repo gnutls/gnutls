@@ -463,12 +463,12 @@ algorithm preferences. To get those preferences use
 @funcref{gnutls_sign_algorithm_get_requested}. Both functions are shown below.
 
 @showfuncC{gnutls_certificate_set_retrieve_function,gnutls_certificate_set_retrieve_function2,gnutls_sign_algorithm_get_requested}
-
+c
 The functions above do not handle the requested server name automatically.
 A server would need to check the name requested by the client
 using @funcref{gnutls_server_name_get}, and serve the appropriate
 certificate. Note that some of these functions require the @code{gnutls_pcert_st} structure to be
-filled in. Helper functions to make the required structures are listed below.
+filled in. Helper functions to fill in the structure are listed below.
 
 @verbatim
 typedef struct gnutls_pcert_st
