@@ -782,10 +782,10 @@ record_add_to_buffers(gnutls_session_t session,
 			break;
 
 		case GNUTLS_CHANGE_CIPHER_SPEC:
-			if (!(IS_DTLS(session)))
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_UNEXPECTED_PACKET);
+			if (!(IS_DTLS(session))) {
+				ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+				goto cleanup;
+			}
 
 			_gnutls_record_buffer_put(session, recv->type, seq,
 						  bufel);
@@ -816,16 +816,8 @@ record_add_to_buffers(gnutls_session_t session,
 			    || (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO
 				&& type == GNUTLS_HANDSHAKE)) {
 				/* even if data is unexpected put it into the buffer */
-				if ((ret =
-				     _gnutls_record_buffer_put(session,
-							       recv->type,
-							       seq,
-							       bufel)) <
-				    0) {
-					gnutls_assert();
-					goto cleanup;
-				}
-
+				_gnutls_record_buffer_put(session, recv->type,
+							  seq, bufel);
 				return
 				    gnutls_assert_val
 				    (GNUTLS_E_GOT_APPLICATION_DATA);
@@ -889,14 +881,9 @@ record_add_to_buffers(gnutls_session_t session,
 			    && bufel->htype ==
 			    GNUTLS_HANDSHAKE_CLIENT_HELLO) {
 				gnutls_assert();
-				ret =
-				    _gnutls_record_buffer_put(session,
+				_gnutls_record_buffer_put(session,
 							      recv->type,
 							      seq, bufel);
-				if (ret < 0) {
-					gnutls_assert();
-					goto cleanup;
-				}
 				return GNUTLS_E_REHANDSHAKE;
 			}
 
@@ -1289,9 +1276,9 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		goto begin;
 	}
 
-	if (record.v2)
+	if (record.v2) {
 		decrypted->htype = GNUTLS_HANDSHAKE_CLIENT_HELLO_V2;
-	else {
+	} else {
 		uint8_t *p = _mbuffer_get_udata_ptr(decrypted);
 		decrypted->htype = p[0];
 	}
@@ -1300,7 +1287,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	    record_add_to_buffers(session, &record, type, htype,
 				  packet_sequence, decrypted);
 
-	/* bufel is now either deinitialized or buffered somewhere else */
+	/* decrypted is now either deinitialized or buffered somewhere else */
 
 	if (ret < 0)
 		return gnutls_assert_val(ret);

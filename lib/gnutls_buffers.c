@@ -65,7 +65,7 @@
 /* Buffers received packets of type APPLICATION DATA,
  * HANDSHAKE DATA and HEARTBEAT.
  */
-int
+void
 _gnutls_record_buffer_put(gnutls_session_t session,
 			  content_type_t type, uint64 * seq,
 			  mbuffer_st * bufel)
@@ -78,7 +78,7 @@ _gnutls_record_buffer_put(gnutls_session_t session,
 	_gnutls_buffers_log("BUF[REC]: Inserted %d bytes of Data(%d)\n",
 			    (int) bufel->msg.size, (int) type);
 
-	return 0;
+	return;
 }
 
 /**
