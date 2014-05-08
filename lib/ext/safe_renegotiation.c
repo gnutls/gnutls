@@ -294,8 +294,13 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		epriv.ptr = priv;
-	} else
+
+		_gnutls_ext_set_session_data(session,
+					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
+					     epriv);
+	} else {
 		priv = epriv.ptr;
+	}
 
 	/* It is not legal to receive this extension on a renegotiation and
 	 * not receive it on the initial negotiation.
@@ -322,10 +327,6 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 	priv->safe_renegotiation_received = 1;
 	priv->connection_using_safe_renegotiation = 1;
 
-	if (set != 0)
-		_gnutls_ext_set_session_data(session,
-					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
-					     epriv);
 	return 0;
 }
 
