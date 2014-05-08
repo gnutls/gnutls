@@ -1,6 +1,6 @@
 SMP=-j4
 
-GNUTLS_VERSION:=3.3.0
+GNUTLS_VERSION:=3.2.14
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -25,6 +25,8 @@ LIB_DIR:=$(CROSS_DIR)/lib
 HEADERS_DIR:=$(CROSS_DIR)/include
 DEVCPP_DIR:=$(PWD)/devcpp
 LDFLAGS=
+#doesn't seem to work
+#LDFLAGS=-static-libgcc
 
 all: update-gpg-keys gnutls-w32
 
@@ -63,7 +65,8 @@ $(LIB_DIR):
 
 CONFIG_ENV := PKG_CONFIG_PATH="$(PKG_CONFIG_DIR)"
 CONFIG_ENV += PKG_CONFIG_LIBDIR="$(PKG_CONFIG_DIR)"
-CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR)
+CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static \
+	--bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR) --enable-threads=win32 
 
 $(P11_KIT_DIR)/.configured:
 	test -f $(P11_KIT_FILE) || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE)
@@ -119,11 +122,11 @@ $(NETTLE_DIR)/.installed: $(NETTLE_DIR)/.configured
 $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	make -C $(GNUTLS_DIR) $(SMP)
 	sed -i 's/^"$$@" >$$log_file/echo $$@|grep exe >\/dev\/null; if [ $$? == 0 ];then wine "$$@" >$$log_file;else \/bin\/true >$$log_file;fi/g' $(GNUTLS_DIR)/build-aux/test-driver
-	make -C $(GNUTLS_DIR) -C tests check $(SMP)
+	make -C $(GNUTLS_DIR)/tests check $(SMP)
 	make -C $(GNUTLS_DIR) install -i
 	cp $(GNUTLS_DIR)/COPYING $(GNUTLS_DIR)/COPYING.LESSER $(CROSS_DIR)
-	-cp /usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc_s_sjlj-1.dll $(BIN_DIR)/
-	-cp /usr/lib/gcc/i686-w64-mingw32/4.6/libgcc_s_sjlj-1.dll $(BIN_DIR)/
+	-cp /usr/lib/gcc/i686-w64-mingw32/4.8/libgcc_s_sjlj-1.dll/libgcc_s_sjlj-1.dll $(BIN_DIR)/
+	-cp /usr/i686-w64-mingw32/lib/libwinpthread-1.dll $(BIN_DIR)/
 	touch $@
 
 $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
