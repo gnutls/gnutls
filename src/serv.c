@@ -1182,7 +1182,7 @@ static void retry_handshake(listener_item *j)
 		}
 
 		if (gnutls_auth_get_type(j->tls_session) == GNUTLS_CRD_CERTIFICATE) {
-			if (require_cert && cert_verify(j->tls_session, NULL, NULL) == 0) {
+			if ((require_cert || ENABLED_OPT(VERIFY_CLIENT_CERT)) && cert_verify(j->tls_session, NULL, NULL) == 0) {
 				do {
 					ret = gnutls_alert_send(j->tls_session, GNUTLS_AL_FATAL, GNUTLS_A_ACCESS_DENIED);
 				} while(ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);

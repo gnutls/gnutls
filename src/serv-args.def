@@ -83,6 +83,13 @@ flag = {
 };
 
 flag = {
+    name      = verify-client-cert;
+    disabled;
+    descrip   = "If a client certificate is sent then verify it.";
+    doc      = "Do not require, but if a client certificate is sent then verify it and close the connection if invalid.";
+};
+
+flag = {
     name      = heartbeat;
     value     = b;
     descrip   = "Activate heartbeat support";
