@@ -178,6 +178,9 @@ _gnutls_gen_dh_common_client_kx_int(gnutls_session_t session,
 int _gnutls_set_dh_pk_params(gnutls_session_t session, bigint_t g, bigint_t p,
 				unsigned q_bits)
 {
+	/* just in case we are resuming a session */
+	gnutls_pk_params_release(&session->key.dh_params);
+
 	gnutls_pk_params_init(&session->key.dh_params);
 
 	session->key.dh_params.params[DH_G] = _gnutls_mpi_copy(g);
@@ -210,6 +213,9 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	int i, bits, ret, p_bits;
 	ssize_t data_size = _data_size;
 	
+	/* just in case we are resuming a session */
+	gnutls_pk_params_release(&session->key.dh_params);
+
 	gnutls_pk_params_init(&session->key.dh_params);
 
 	i = 0;

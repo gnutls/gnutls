@@ -274,6 +274,11 @@ _gnutls_proc_ecdh_common_server_kx(gnutls_session_t session,
 	gnutls_ecc_curve_t curve;
 	ssize_t data_size = _data_size;
 
+	/* just in case we are resuming a session */
+	gnutls_pk_params_release(&session->key.ecdh_params);
+
+	gnutls_pk_params_init(&session->key.ecdh_params);
+
 	i = 0;
 	DECR_LEN(data_size, 1);
 	if (data[i++] != 3)
@@ -379,6 +384,11 @@ gen_ecdhe_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		gnutls_assert();
 		return ret;
 	}
+
+	/* just in case we are resuming a session */
+	gnutls_pk_params_release(&session->key.ecdh_params);
+
+	gnutls_pk_params_init(&session->key.ecdh_params);
 
 	ret =
 	    _gnutls_ecdh_common_print_server_kx(session, data,
