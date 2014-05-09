@@ -64,6 +64,19 @@ typedef struct {
       opaque Extensions<0..2^16-1>;
 */
 
+static void deinit_responder_id(status_request_ext_st *priv)
+{
+unsigned i;
+
+	for (i = 0; i < priv->responder_id_size; i++)
+		gnutls_free(priv->responder_id[i].data);
+
+	gnutls_free(priv->responder_id);
+	priv->responder_id = NULL;
+	priv->responder_id_size = 0;
+}
+
+
 static int
 client_send(gnutls_session_t session,
 	    gnutls_buffer_st * extdata, status_request_ext_st * priv)
@@ -146,7 +159,10 @@ server_recv(gnutls_session_t session,
 		return
 		    gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 
-	priv->responder_id = gnutls_malloc(priv->responder_id_size
+	if (priv->responder_id != NULL)
+		deinit_responder_id(priv);
+
+	priv->responder_id = gnutls_calloc(1, priv->responder_id_size
 					   * sizeof(*priv->responder_id));
 	if (priv->responder_id == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -272,7 +288,8 @@ _gnutls_status_request_recv_params(gnutls_session_t session,
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		return client_recv(session, priv, data, size);
-	return server_recv(session, priv, data, size);
+	else
+		return server_recv(session, priv, data, size);
 }
 
 /**
@@ -453,15 +470,11 @@ gnutls_certificate_set_ocsp_status_request_file
 static void _gnutls_status_request_deinit_data(extension_priv_data_t epriv)
 {
 	status_request_ext_st *priv = epriv.ptr;
-	size_t i;
 
 	if (priv == NULL)
 		return;
 
-	for (i = 0; i < priv->responder_id_size; i++)
-		gnutls_free(priv->responder_id[i].data);
-
-	gnutls_free(priv->responder_id);
+	deinit_responder_id(priv);
 	gnutls_free(priv->request_extensions.data);
 	gnutls_free(priv->response.data);
 	gnutls_free(priv);
