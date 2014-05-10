@@ -141,6 +141,44 @@ gnutls_credentials_set(gnutls_session_t session,
 }
 
 /**
+ * gnutls_credentials_get:
+ * @session: is a #gnutls_session_t structure.
+ * @type: is the type of the credentials to return
+ * @cred: will contain the pointer to the credentials structure.
+ *
+ * Returns the previously provided credentials structures.
+ *
+ * For %GNUTLS_CRD_ANON, @cred will be
+ * #gnutls_anon_client_credentials_t in case of a client.  In case of
+ * a server it should be #gnutls_anon_server_credentials_t.
+ *
+ * For %GNUTLS_CRD_SRP, @cred will be #gnutls_srp_client_credentials_t
+ * in case of a client, and #gnutls_srp_server_credentials_t, in case
+ * of a server.
+ *
+ * For %GNUTLS_CRD_CERTIFICATE, @cred will be
+ * #gnutls_certificate_credentials_t.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ **/
+int
+gnutls_credentials_get(gnutls_session_t session,
+		       gnutls_credentials_type_t type, void **cred)
+{
+const void *_cred;
+
+	_cred = _gnutls_get_cred(session, type, NULL);
+	if (_cred == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (cred)
+		*cred = (void*)_cred;
+
+	return 0;
+}
+
+/**
  * gnutls_auth_get_type:
  * @session: is a #gnutls_session_t structure.
  *

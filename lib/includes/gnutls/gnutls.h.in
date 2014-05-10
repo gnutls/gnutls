@@ -1239,6 +1239,8 @@ void gnutls_credentials_clear(gnutls_session_t session);
  */
 int gnutls_credentials_set(gnutls_session_t session,
 			   gnutls_credentials_type_t type, void *cred);
+int gnutls_credentials_get(gnutls_session_t session,
+			   gnutls_credentials_type_t type, void **cred);
 #define gnutls_cred_set	gnutls_credentials_set
 
 /* x.509 types */
