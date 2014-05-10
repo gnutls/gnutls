@@ -8,8 +8,11 @@ See the end for copying conditions.
 ** libgnutls: gnutls_global_set_mutex() was modified to operate with the
 new initialization process.
 
+** libgnutls-dane: Improved dane_verify_session_crt(), which now attempts to
+create a full chain. This addresses points from https://savannah.gnu.org/support/index.php?108552
+
 ** API and ABI modifications:
-No changes since last version.
+dane_verify_crt_raw2: Added
 
 
 * Version 3.3.2 (released 2014-05-06)
