@@ -13,6 +13,7 @@ create a full chain. This addresses points from https://savannah.gnu.org/support
 
 ** API and ABI modifications:
 dane_verify_crt_raw2: Added
+gnutls_memset: Added
 
 
 * Version 3.3.2 (released 2014-05-06)

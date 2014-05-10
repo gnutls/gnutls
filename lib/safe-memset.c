@@ -24,14 +24,27 @@
 # include <gnutls_int.h>
 #endif
 
-/* This is based on a nice trick for safe memset,
- * sent by David Jacobson in the openssl-dev mailing list.
- */
-
-void _gnutls_safe_memset(void *data, int c, size_t size)
+/**
+ * gnutls_memset:
+ * @data: the memory to set
+ * @c: the constant byte to fill the memory with
+ * @n: the size of memory
+ *
+ * This function will operate similarly to memset(), but will
+ * not be optimized out by the compiler.
+ *
+ * Returns: void.
+ *
+ * Since: 3.3.3
+ **/
+void gnutls_memset(void *data, int c, size_t size)
 {
 	volatile unsigned volatile_zero = 0;
 	volatile char *vdata = (volatile char*)data;
+
+	/* This is based on a nice trick for safe memset,
+	 * sent by David Jacobson in the openssl-dev mailing list.
+	 */
 
 	do {
 		memset(data, c, size);
@@ -43,7 +56,7 @@ int main()
 {
 	char x[64];
 
-	safe_memset(x, 0, sizeof(x));
+	gnutls_memset(x, 0, sizeof(x));
 
 	return 0;
 

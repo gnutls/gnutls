@@ -36,9 +36,7 @@ char *_gnutls_strdup(const char *);
                 _gnutls_mpi_release(mpi); \
         }
 
-void _gnutls_safe_memset(void *data, int c, size_t size);
-
-#define zeroize_key(x, size) _gnutls_safe_memset(x, 0, size)
+#define zeroize_key(x, size) gnutls_memset(x, 0, size)
 
 #define zeroize_temp_key zeroize_key
 #define zrelease_temp_mpi_key zrelease_mpi_key
