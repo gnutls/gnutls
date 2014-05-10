@@ -169,9 +169,8 @@ int dane_verify_crt_raw(dane_state_t s,
 
 int
 dane_verify_crt_raw2(dane_state_t s,
-		    const gnutls_datum_t *chain, unsigned chain_size,
+		    const gnutls_datum_t * chain, unsigned chain_size,
 		    gnutls_certificate_type_t chain_type,
-		    const char *hostname,
 		    dane_query_t r,
 		    unsigned int sflags, unsigned int vflags,
 		    unsigned int *verify);
