@@ -12,7 +12,6 @@ new initialization process.
 create a full chain. This addresses points from https://savannah.gnu.org/support/index.php?108552
 
 ** API and ABI modifications:
-dane_verify_crt_raw2: Added
 gnutls_memset: Added
 
 
