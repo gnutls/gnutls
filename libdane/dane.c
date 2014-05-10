@@ -37,7 +37,7 @@
 #include "../lib/gnutls_int.h"
 
 #define MAX_DATA_ENTRIES 100
-
+#define DEBUG
 #ifdef DEBUG
 #define gnutls_assert() fprintf(stderr, "ASSERT: %s: %d\n", __FILE__, __LINE__);
 #define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
@@ -734,7 +734,8 @@ dane_verify_crt_raw(dane_state_t s,
  * record then the verify flag %DANE_VERIFY_NO_DNSSEC_DATA is set.
  *
  * Note that the CA constraint only applies for the directly certifying CA
- * and does not account for long CA chains.
+ * and does not account for long CA chains. Moreover this function does not
+ * validate the provided chain.
  *
  * Due to the many possible options of DANE, there is no single threat
  * model countered. When notifying the user about DANE verification results
@@ -799,6 +800,10 @@ dane_verify_crt(dane_state_t s,
  * CA constrains and/or the certificate available via DANE.
  * See dane_verify_crt() for more information.
  *
+ * This will not verify the chain for validity; unless the DANE
+ * verification is restricted to end certificates, this has to
+ * be performed separately using gnutls_certificate_verify_peers3().
+ *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -813,6 +818,7 @@ dane_verify_session_crt(dane_state_t s,
 	const gnutls_datum_t *cert_list;
 	unsigned int cert_list_size = 0;
 	unsigned int type;
+	int ret;
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 	if (cert_list_size == 0) {
@@ -821,6 +827,69 @@ dane_verify_session_crt(dane_state_t s,
 
 	type = gnutls_certificate_type_get(session);
 
+	/* this list may be incomplete, try to get the self-signed CA if any */
+	if (cert_list_size > 0) {
+		gnutls_datum_t new_cert_list[cert_list_size+1];
+		gnutls_x509_crt_t crt, ca;
+		gnutls_certificate_credentials_t sc;
+
+		ret = gnutls_x509_crt_init(&crt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto failsafe;
+		}
+
+		ret = gnutls_x509_crt_import(crt, &cert_list[cert_list_size-1], GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_x509_crt_deinit(crt);
+			goto failsafe;
+		}
+
+		/* if it is already self signed continue normally */
+		ret = gnutls_x509_crt_check_issuer(crt, crt);
+		if (ret != 0) {
+			gnutls_assert();
+			gnutls_x509_crt_deinit(crt);
+			goto failsafe;
+		}
+
+		/* chain does not finish in a self signed cert, try to obtain the issuer */
+		ret = gnutls_credentials_get(session, GNUTLS_CRD_CERTIFICATE, (void**)&sc);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_x509_crt_deinit(crt);
+			goto failsafe;
+		}
+
+		ret = gnutls_certificate_get_issuer(sc, crt, &ca, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_x509_crt_deinit(crt);
+			goto failsafe;
+		}
+
+		/* make the new list */
+		memcpy(new_cert_list, cert_list, cert_list_size*sizeof(gnutls_datum_t));
+
+		ret = gnutls_x509_crt_export2(ca, GNUTLS_X509_FMT_DER, &new_cert_list[cert_list_size]);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_x509_crt_deinit(crt);
+			goto failsafe;
+		}
+
+		ret = dane_verify_crt(s, new_cert_list, cert_list_size+1, type,
+			       hostname, proto, port, sflags, vflags,
+			       verify);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+		gnutls_free(new_cert_list[cert_list_size].data);
+		return ret;
+	}
+
+ failsafe:
 	return dane_verify_crt(s, cert_list, cert_list_size, type,
 			       hostname, proto, port, sflags, vflags,
 			       verify);
