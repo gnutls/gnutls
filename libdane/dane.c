@@ -37,7 +37,7 @@
 #include "../lib/gnutls_int.h"
 
 #define MAX_DATA_ENTRIES 100
-
+#define DEBUG
 #ifdef DEBUG
 #define gnutls_assert() fprintf(stderr, "ASSERT: %s: %d\n", __FILE__, __LINE__);
 #define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
@@ -561,7 +561,7 @@ verify_ca(const gnutls_datum_t * raw_crt, unsigned raw_crt_size,
 }
 
 static int
-verify_ee(const char *hostname, const gnutls_datum_t * raw_crt,
+verify_ee(const gnutls_datum_t * raw_crt,
 	  gnutls_certificate_type_t crt_type, dane_cert_type_t ctype,
 	  dane_match_type_t match, gnutls_datum_t * data,
 	  unsigned int *verify)
@@ -569,30 +569,8 @@ verify_ee(const char *hostname, const gnutls_datum_t * raw_crt,
 	gnutls_datum_t pubkey = { NULL, 0 };
 	int ret;
 
-	if (crt_type == GNUTLS_CRT_X509 && hostname != NULL) {
-		gnutls_x509_crt_t crt;
-
-		ret = gnutls_x509_crt_init(&crt);
-		if (ret < 0) {
-			gnutls_assert();
-			return DANE_E_CERT_ERROR;
-		}
-
-		ret = gnutls_x509_crt_import(crt, raw_crt, GNUTLS_X509_FMT_DER);
-		if (ret < 0) {
-			gnutls_assert();
-			gnutls_x509_crt_deinit(crt);
-			return DANE_E_CERT_ERROR;
-		}
-
-		ret = gnutls_x509_crt_check_hostname2(crt, hostname, 0);
-		if (ret == 0) {
-			*verify |= DANE_VERIFY_HOSTNAME_DIFFERS;
-		}
-		gnutls_x509_crt_deinit(crt);
-	}
-
 	if (ctype == DANE_CERT_X509 && crt_type == GNUTLS_CRT_X509) {
+
 		if (!matches(raw_crt, data, match)) {
 			gnutls_assert();
 			*verify |= DANE_VERIFY_CERT_DIFFERS;
@@ -639,9 +617,7 @@ verify_ee(const char *hostname, const gnutls_datum_t * raw_crt,
  * record then the verify flag %DANE_VERIFY_NO_DNSSEC_DATA is set.
  *
  * Note that the CA constraint only applies for the directly certifying CA
- * and does not account for long CA chains. Moreover this function will NOT
- * check the hostname of the end certificate. If that isn't done manually
- * use dane_verify_crt_raw2().
+ * and does not account for long CA chains.
  *
  * Due to the many possible options of DANE, there is no single threat
  * model countered. When notifying the user about DANE verification results
@@ -652,58 +628,10 @@ verify_ee(const char *hostname, const gnutls_datum_t * raw_crt,
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
- *
- * Deprecated: use dane_verify_crt_raw2().
  *
  **/
 int
 dane_verify_crt_raw(dane_state_t s,
-		    const gnutls_datum_t * chain, unsigned chain_size,
-		    gnutls_certificate_type_t chain_type,
-		    dane_query_t r,
-		    unsigned int sflags, unsigned int vflags,
-		    unsigned int *verify)
-{
-	return dane_verify_crt_raw2(s, chain, chain_size, chain_type, NULL,
-				r, sflags, vflags, verify);
-}
-
-/**
- * dane_verify_crt_raw2:
- * @s: A DANE state structure (may be NULL)
- * @chain: A certificate chain
- * @chain_size: The size of the chain
- * @chain_type: The type of the certificate chain
- * @hostname: The hostname of the end certificate (to be combined with %DANE_VFLAG_ONLY_CHECK_EE_USAGE)
- * @r: DANE data to check against
- * @sflags: Flags for the the initialization of @s (if NULL)
- * @vflags: Verification flags; an OR'ed list of %dane_verify_flags_t.
- * @verify: An OR'ed list of %dane_verify_status_t.
- *
- * This function will verify the given certificate chain against the
- * CA constrains and/or the certificate available via DANE.
- * If no information via DANE can be obtained the flag %DANE_VERIFY_NO_DANE_INFO
- * is set. If a DNSSEC signature is not available for the DANE
- * record then the verify flag %DANE_VERIFY_NO_DNSSEC_DATA is set.
- *
- * Note that the CA constraint only applies for the directly certifying CA
- * and does not account for long CA chains. 
- *
- * Due to the many possible options of DANE, there is no single threat
- * model countered. When notifying the user about DANE verification results
- * it may be better to mention: DANE verification did not reject the certificate,
- * rather than mentioning a successful DANE verication.
- *
- * If the @q parameter is provided it will be used for caching entries.
- *
- * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- *
- * Since 3.3.3.
- *
- **/
-int
-dane_verify_crt_raw2(dane_state_t s,
 		    const gnutls_datum_t * chain, unsigned chain_size,
 		    gnutls_certificate_type_t chain_type,
 		    dane_query_t r,
@@ -755,7 +683,7 @@ dane_verify_crt_raw2(dane_state_t s,
 			   && (usage == DANE_CERT_USAGE_LOCAL_EE
 			       || usage == DANE_CERT_USAGE_EE)) {
 			ret =
-			    verify_ee(hostname, &chain[0], chain_type, type, match,
+			    verify_ee(&chain[0], chain_type, type, match,
 				      &data, &record_verify);
 			if (ret < 0) {
 				gnutls_assert();
@@ -847,8 +775,8 @@ dane_verify_crt(dane_state_t s,
 		gnutls_assert();
 		goto cleanup;
 	}
-	ret = dane_verify_crt_raw2(state, chain, chain_size, chain_type,
-				  hostname, r, sflags, vflags, verify);
+	ret = dane_verify_crt_raw(state, chain, chain_size, chain_type,
+				  r, sflags, vflags, verify);
       cleanup:
 	if (state != s)
 		dane_state_deinit(state);

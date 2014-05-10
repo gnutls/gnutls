@@ -20,7 +20,6 @@ DANE_0_0
 	dane_state_set_dlv_file;
 	dane_verify_crt_raw;
 	dane_raw_tlsa;
-	dane_verify_crt_raw2;
   local:
     *;
 };
