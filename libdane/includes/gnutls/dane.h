@@ -150,6 +150,7 @@ typedef enum dane_verify_status_t {
 	DANE_VERIFY_CA_CONSTRAINTS_VIOLATED = 1,
 	DANE_VERIFY_CERT_DIFFERS = 1 << 1,
 	DANE_VERIFY_UNKNOWN_DANE_INFO = 1 << 2,
+	DANE_VERIFY_HOSTNAME_DIFFERS = 1 << 3,
 } dane_verify_status_t;
 
 #define DANE_VERIFY_CA_CONSTRAINS_VIOLATED DANE_VERIFY_CA_CONSTRAINTS_VIOLATED
@@ -165,6 +166,14 @@ int dane_verify_crt_raw(dane_state_t s,
 			dane_query_t r,
 			unsigned int sflags, unsigned int vflags,
 			unsigned int *verify);
+
+int
+dane_verify_crt_raw2(dane_state_t s,
+		    const gnutls_datum_t * chain, unsigned chain_size,
+		    gnutls_certificate_type_t chain_type,
+		    dane_query_t r,
+		    unsigned int sflags, unsigned int vflags,
+		    unsigned int *verify);
 
 int dane_verify_crt(dane_state_t s,
 		    const gnutls_datum_t * chain, unsigned chain_size,
