@@ -260,7 +260,7 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 	priv = epriv.ptr;
 
 	cred = (gnutls_srp_client_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_SRP, NULL);
+	    _gnutls_get_cred(session, GNUTLS_CRD_SRP);
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -847,7 +847,7 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 	priv = epriv.ptr;
 
 	cred = (gnutls_srp_client_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_SRP, NULL);
+	    _gnutls_get_cred(session, GNUTLS_CRD_SRP);
 
 	if (cred == NULL) {
 		gnutls_assert();

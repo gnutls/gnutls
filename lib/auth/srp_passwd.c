@@ -260,7 +260,7 @@ _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 	entry = *_entry;
 
 	cred = (gnutls_srp_server_credentials_t)
-	    _gnutls_get_cred(state, GNUTLS_CRD_SRP, NULL);
+	    _gnutls_get_cred(state, GNUTLS_CRD_SRP);
 	if (cred == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_INSUFFICIENT_CREDENTIALS;

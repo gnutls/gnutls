@@ -184,8 +184,7 @@ _gnutls_session_cert_type_supported(gnutls_session_t session,
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		cred = (gnutls_certificate_credentials_t)
-		    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE,
-				     NULL);
+		    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
 
 		if (cred == NULL)
 			return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;

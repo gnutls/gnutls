@@ -889,7 +889,7 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 	unsigned int i, j, cipher_suites_size;
 	size_t pk_algos_size;
 	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE];
-	int retval, err;
+	int retval;
 	gnutls_pk_algorithm_t pk_algos[MAX_ALGOS];	/* will hold the pk algorithms
 							 * supported by the peer.
 							 */
@@ -1036,8 +1036,7 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 	if (_gnutls_get_kx_cred
 	    (session,
 	     _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
-					      cipher_suite), &err) == NULL
-	    && err != 0) {
+					      cipher_suite)) == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
@@ -1519,7 +1518,7 @@ _gnutls_client_set_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	uint8_t z;
 	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE];
 	int cipher_suite_size;
-	int i, err;
+	int i;
 
 	z = 1;
 	cipher_suite_size =
@@ -1564,8 +1563,7 @@ _gnutls_client_set_ciphersuite(gnutls_session_t session, uint8_t suite[2])
 	    _gnutls_get_kx_cred
 	    (session,
 	     _gnutls_cipher_suite_get_kx_algo
-	     (session->security_parameters.cipher_suite), &err) == NULL
-	    && err != 0) {
+	     (session->security_parameters.cipher_suite)) == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
@@ -2604,8 +2602,7 @@ static int run_verify_callback(gnutls_session_t session, unsigned int side)
 
 	cred =
 	    (gnutls_certificate_credentials_t) _gnutls_get_cred(session,
-								GNUTLS_CRD_CERTIFICATE,
-								NULL);
+								GNUTLS_CRD_CERTIFICATE);
 
 	if (side == GNUTLS_CLIENT)
 		type = gnutls_auth_server_get_type(session);
@@ -3255,8 +3252,7 @@ check_server_params(gnutls_session_t session,
 		int delete;
 		gnutls_certificate_credentials_t x509_cred =
 		    (gnutls_certificate_credentials_t)
-		    _gnutls_get_cred(session,
-				     cred_type, NULL);
+		    _gnutls_get_cred(session, cred_type);
 
 		if (x509_cred != NULL) {
 			dh_params =
@@ -3283,8 +3279,7 @@ check_server_params(gnutls_session_t session,
 	} else if (cred_type == GNUTLS_CRD_ANON) {
 		gnutls_anon_server_credentials_t anon_cred =
 		    (gnutls_anon_server_credentials_t)
-		    _gnutls_get_cred(session,
-				     cred_type, NULL);
+		    _gnutls_get_cred(session, cred_type);
 
 		if (anon_cred != NULL) {
 			dh_params =
@@ -3297,8 +3292,7 @@ check_server_params(gnutls_session_t session,
 	} else if (cred_type == GNUTLS_CRD_PSK) {
 		gnutls_psk_server_credentials_t psk_cred =
 		    (gnutls_psk_server_credentials_t)
-		    _gnutls_get_cred(session,
-				     cred_type, NULL);
+		    _gnutls_get_cred(session, cred_type);
 
 		if (psk_cred != NULL) {
 			dh_params =
@@ -3355,8 +3349,7 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 	 */
 	cert_cred =
 	    (gnutls_certificate_credentials_t) _gnutls_get_cred(session,
-								GNUTLS_CRD_CERTIFICATE,
-								NULL);
+								GNUTLS_CRD_CERTIFICATE);
 
 	/* If there are certificate credentials, find an appropriate certificate
 	 * or disable them;
@@ -3399,7 +3392,7 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 		/* if it is defined but had no credentials 
 		 */
 		if (!session->internals.premaster_set &&
-		    _gnutls_get_kx_cred(session, kx, NULL) == NULL) {
+		    _gnutls_get_kx_cred(session, kx) == NULL) {
 			delete = 1;
 		} else {
 			delete = 0;
@@ -3426,7 +3419,7 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 		   SRP credential too.  */
 		if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS) {
 			if (!_gnutls_get_cred
-			    (session, GNUTLS_CRD_SRP, NULL)) {
+			    (session, GNUTLS_CRD_SRP)) {
 				delete = 1;
 			}
 		}

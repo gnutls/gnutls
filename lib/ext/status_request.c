@@ -210,7 +210,7 @@ server_send(gnutls_session_t session,
 	gnutls_certificate_credentials_t cred;
 
 	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE, NULL);
+	    _gnutls_get_cred(session, GNUTLS_CRD_CERTIFICATE);
 	if (cred == NULL)	/* no certificate authentication */
 		return gnutls_assert_val(0);
 

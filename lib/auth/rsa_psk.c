@@ -194,7 +194,7 @@ _gnutls_gen_rsa_psk_client_kx(gnutls_session_t session,
 	gnutls_pk_params_release(&params);
 
 	cred = (gnutls_psk_client_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK, NULL);
+	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -271,7 +271,7 @@ _gnutls_proc_rsa_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	gnutls_datum_t premaster_secret = { NULL, 0 };
 
 	cred = (gnutls_psk_server_credentials_t)
-	    _gnutls_get_cred(session, GNUTLS_CRD_PSK, NULL);
+	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
 
 	if (cred == NULL) {
 		gnutls_assert();

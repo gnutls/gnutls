@@ -96,7 +96,6 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	gnutls_protocol_t adv_version;
 	uint8_t rnd[GNUTLS_RANDOM_SIZE];
 	int len = datalen;
-	int err;
 	uint16_t challenge;
 	uint8_t session_id[TLS_MAX_SESSION_ID_SIZE];
 
@@ -169,8 +168,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	if (_gnutls_get_kx_cred
 	    (session,
 	     _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
-					      cipher_suite), &err) == NULL
-	    && err != 0) {
+					      cipher_suite)) == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}

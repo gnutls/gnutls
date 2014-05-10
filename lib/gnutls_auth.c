@@ -168,7 +168,7 @@ gnutls_credentials_get(gnutls_session_t session,
 {
 const void *_cred;
 
-	_cred = _gnutls_get_cred(session, type, NULL);
+	_cred = _gnutls_get_cred(session, type);
 	if (_cred == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
@@ -253,21 +253,18 @@ gnutls_auth_client_get_type(gnutls_session_t session)
  * free that!!!
  */
 const void *_gnutls_get_kx_cred(gnutls_session_t session,
-				gnutls_kx_algorithm_t algo, int *err)
+				gnutls_kx_algorithm_t algo)
 {
 	int server =
 	    session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
 
 	return _gnutls_get_cred(session,
-				_gnutls_map_kx_get_cred(algo, server),
-				err);
+				_gnutls_map_kx_get_cred(algo, server));
 }
 
 const void *_gnutls_get_cred(gnutls_session_t session,
-			     gnutls_credentials_type_t type, int *err)
+			     gnutls_credentials_type_t type)
 {
-	const void *retval = NULL;
-	int _err = -1;
 	auth_cred_st *ccred;
 	gnutls_key_st *key = &session->key;
 
@@ -279,15 +276,9 @@ const void *_gnutls_get_cred(gnutls_session_t session,
 		ccred = ccred->next;
 	}
 	if (ccred == NULL)
-		goto out;
+		return NULL;
 
-	_err = 0;
-	retval = ccred->credentials;
-
-      out:
-	if (err != NULL)
-		*err = _err;
-	return retval;
+	return ccred->credentials;
 }
 
 /*-
