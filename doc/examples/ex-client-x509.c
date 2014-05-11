@@ -60,14 +60,19 @@ int main(void)
         gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
                                strlen("my_host_name"));
 
-        /* Use default priorities */
-        ret = gnutls_priority_set_direct(session, "NORMAL", &err);
+        /* use default priorities */
+        gnutls_set_default_priority(session);
+#if 0
+	/* if more fine-graned control is required */
+        ret = gnutls_priority_set_direct(session, 
+                                         "NORMAL", &err);
         if (ret < 0) {
                 if (ret == GNUTLS_E_INVALID_REQUEST) {
                         fprintf(stderr, "Syntax error at: %s\n", err);
                 }
                 exit(1);
         }
+#endif
 
         /* put the x509 credentials to the current session
          */

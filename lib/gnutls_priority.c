@@ -1107,6 +1107,8 @@ void gnutls_priority_deinit(gnutls_priority_t priority_cache)
  * priority cache and is used to directly set string priorities to a
  * TLS session.  For documentation check the gnutls_priority_init().
  *
+ * To simply use a reasonable default, consider using gnutls_set_default_priority().
+ *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
  * %GNUTLS_E_SUCCESS on success, or an error code.
  **/
@@ -1173,9 +1175,8 @@ break_comma_list(char *etag,
  * Sets some default priority on the ciphers, key exchange methods,
  * macs and compression methods.
  *
- * This is the same as calling:
- *
- * gnutls_priority_set_direct (session, "NORMAL", NULL);
+ * This typically sets a default priority that is considered
+ * sufficiently secure to establish encrypted sessions.
  *
  * This function is kept around for backwards compatibility, but
  * because of its wide use it is still fully supported.  If you wish
