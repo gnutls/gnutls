@@ -97,11 +97,11 @@ static int calc_ecdh_key(gnutls_session_t session,
 	pub.params[ECC_Y] = session->key.ecdh_y;
 	pub.flags = curve;
 
-	if (psk_key == NULL)
+	if (psk_key == NULL) {
 		ret =
 		    _gnutls_pk_derive(GNUTLS_PK_EC, &session->key.key,
 				      &session->key.ecdh_params, &pub);
-	else {
+	} else {
 		gnutls_datum_t tmp_dh_key;
 
 		ret =
@@ -303,6 +303,11 @@ int _gnutls_ecdh_common_print_server_kx(gnutls_session_t session,
 
 	if (curve == GNUTLS_ECC_CURVE_INVALID)
 		return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
+
+	/* just in case we are resuming a session */
+	gnutls_pk_params_release(&session->key.ecdh_params);
+
+	gnutls_pk_params_init(&session->key.ecdh_params);
 
 	/* curve type */
 	p = 3;
