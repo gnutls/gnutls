@@ -793,7 +793,7 @@ dane_verify_crt(dane_state_t s,
  * @proto: The protocol of the service connecting (e.g. tcp)
  * @port: The port of the service connecting (e.g. 443)
  * @sflags: Flags for the the initialization of @s (if NULL)
- * @vflags: Verification flags; should be zero
+ * @vflags: Verification flags; an OR'ed list of %dane_verify_flags_t.
  * @verify: An OR'ed list of %dane_verify_status_t.
  *
  * This function will verify session's certificate chain against the
