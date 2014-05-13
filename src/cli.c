@@ -456,14 +456,20 @@ static int cert_verify_callback(gnutls_session_t session)
 #ifdef HAVE_DANE
 	if (dane) {		/* try DANE auth */
 		int port;
+		unsigned vflags = 0;
 		unsigned int sflags =
 		    ENABLED_OPT(LOCAL_DNS) ? 0 :
 		    DANE_F_IGNORE_LOCAL_RESOLVER;
 
+		/* if we didn't verify the chain it only makes sense
+		 * to check the end certificate using dane. */
+		if (ca_verify == 0)
+			vflags |= DANE_VFLAG_ONLY_CHECK_EE_USAGE;
+
 		port = service_to_port(service);
 		rc = dane_verify_session_crt(NULL, session, hostname,
 					     udp ? "udp" : "tcp", port,
-					     sflags, 0, &status);
+					     sflags, vflags, &status);
 		if (rc < 0) {
 			fprintf(stderr,
 				"*** DANE verification error: %s\n",
