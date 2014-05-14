@@ -119,7 +119,7 @@ const char *get_password(common_info_st * cinfo, unsigned int *flags,
 			p = get_pass();
 	}
 
-	if (p[0] == 0 && flags && !cinfo->empty_password)
+	if ((p == NULL || p[0] == 0) && flags && !cinfo->empty_password)
 		*flags |= GNUTLS_PKCS_PLAIN;
 
 	return p;
