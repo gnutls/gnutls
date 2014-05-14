@@ -100,8 +100,10 @@ _ecc_params_to_privkey(const gnutls_pk_params_st * pk_params,
 		       const struct ecc_curve *curve)
 {
 	ecc_scalar_init(priv, curve);
-	if (ecc_scalar_set(priv, pk_params->params[ECC_K]) == 0)
+	if (ecc_scalar_set(priv, pk_params->params[ECC_K]) == 0) {
+		ecc_scalar_clear(priv);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
 	return 0;
 }
@@ -112,8 +114,10 @@ _ecc_params_to_pubkey(const gnutls_pk_params_st * pk_params,
 {
 	ecc_point_init(pub, curve);
 	if (ecc_point_set
-	    (pub, pk_params->params[ECC_X], pk_params->params[ECC_Y]) == 0)
+	    (pub, pk_params->params[ECC_X], pk_params->params[ECC_Y]) == 0) {
+		ecc_point_clear(pub);
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 
 	return 0;
 }
