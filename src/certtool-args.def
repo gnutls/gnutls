@@ -118,8 +118,7 @@ flag = {
 flag = {
     name      = load-request;
     descrip   = "Loads a certificate request file";
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     doc = "";
 };
 
@@ -364,8 +363,7 @@ flag = {
 
 flag = {
     name      = template;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "Template file to use for non-interactive operation";
     doc   = "";
 };
