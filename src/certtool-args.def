@@ -118,8 +118,7 @@ flag = {
 flag = {
     name      = load-request;
     descrip   = "Loads a certificate request file";
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     doc = "";
 };
 
@@ -364,8 +363,7 @@ flag = {
 
 flag = {
     name      = template;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "Template file to use for non-interactive operation";
     doc   = "";
 };
@@ -387,8 +385,7 @@ flag = {
 
 flag = {
     name      = provider;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "Specify the PKCS #11 provider library";
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
 };
