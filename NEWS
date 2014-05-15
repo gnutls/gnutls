@@ -11,6 +11,9 @@ new initialization process.
 ** libgnutls-dane: Improved dane_verify_session_crt(), which now attempts to
 create a full chain. This addresses points from https://savannah.gnu.org/support/index.php?108552
 
+** gnutls-cli: --dane will only check the end certificate if PKIX validation
+has been disabled.
+
 ** API and ABI modifications:
 gnutls_memset: Added
 
