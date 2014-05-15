@@ -113,6 +113,7 @@ TESTS_ENVIRONMENT =						\
 	PKCS12PASSWORD=foobar					\
 	PKCS12FILE_2=$(srcdir)/pkcs12-decode/pkcs12_2certs.p12	\
 	PKCS12PASSWORD_2=""					\
+	PKCS12PATH=$(srcdir)/pkcs12-decode/			\
 	EXEEXT=$(EXEEXT)					\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
