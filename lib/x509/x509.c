@@ -2253,7 +2253,7 @@ gnutls_x509_crt_get_extension_data(gnutls_x509_crt_t cert, int indx,
 
 	if (result == ASN1_ELEMENT_NOT_FOUND)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	else if (result < 0) {
+	else if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
