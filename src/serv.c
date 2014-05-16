@@ -290,6 +290,28 @@ get_params(gnutls_session_t session, gnutls_params_type_t type,
 
 LIST_DECLARE_INIT(listener_list, listener_item, listener_free);
 
+static int cert_verify_callback(gnutls_session_t session)
+{
+listener_item * j = gnutls_session_get_ptr(session);
+unsigned int size;
+int ret;
+
+	if (gnutls_auth_get_type(session) == GNUTLS_CRD_CERTIFICATE) {
+		if (!require_cert && gnutls_certificate_get_peers(session, &size) == NULL)
+			return 0;
+
+		if ((require_cert || ENABLED_OPT(VERIFY_CLIENT_CERT)) && cert_verify(session, NULL, NULL) == 0) {
+			do {
+				ret = gnutls_alert_send(session, GNUTLS_AL_FATAL, GNUTLS_A_ACCESS_DENIED);
+			} while(ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+
+			j->http_state = HTTP_STATE_CLOSING;
+			return -1;
+		}
+	}
+	return 0;
+}
+
 gnutls_session_t initialize_session(int dtls)
 {
 	gnutls_session_t session;
@@ -334,9 +356,13 @@ gnutls_session_t initialize_session(int dtls)
 	if (psk_cred != NULL)
 		gnutls_credentials_set(session, GNUTLS_CRD_PSK, psk_cred);
 
-	if (cert_cred != NULL)
+	if (cert_cred != NULL) {
+		gnutls_certificate_set_verify_function(cert_cred,
+					       cert_verify_callback);
+
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 				       cert_cred);
+	}
 
 	if (disable_client_cert)
 		gnutls_certificate_server_set_request(session,
@@ -1181,16 +1207,6 @@ static void retry_handshake(listener_item *j)
 			print_info(j->tls_session, verbose, verbose);
 		}
 
-		if (gnutls_auth_get_type(j->tls_session) == GNUTLS_CRD_CERTIFICATE) {
-			if ((require_cert || ENABLED_OPT(VERIFY_CLIENT_CERT)) && cert_verify(j->tls_session, NULL, NULL) == 0) {
-				do {
-					ret = gnutls_alert_send(j->tls_session, GNUTLS_AL_FATAL, GNUTLS_A_ACCESS_DENIED);
-				} while(ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-
-				j->http_state = HTTP_STATE_CLOSING;
-				return;
-			}
-		}
 		j->handshake_ok = 1;
 	}
 }
@@ -1312,6 +1328,7 @@ static void tcp_server(const char *name, int port)
 					j->start = tt;
 
 					j->tls_session = initialize_session(0);
+					gnutls_session_set_ptr(j->tls_session, j);
 					gnutls_transport_set_int
 					    (j->tls_session, accept_fd);
 					set_read_funcs(j->tls_session);
