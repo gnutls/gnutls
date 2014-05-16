@@ -472,7 +472,7 @@ const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
 /**
  * gnutls_certificate_get_peers:
  * @session: is a gnutls session
- * @list_size: is the length of the certificate list
+ * @list_size: is the length of the certificate list (may be %NULL)
  *
  * Get the peer's raw certificate (chain) as sent by the peer.  These
  * certificates are in raw format (DER encoded for X.509).  In case of
@@ -499,7 +499,8 @@ const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t
 	if (info == NULL)
 		return NULL;
 
-	*list_size = info->ncerts;
+	if (list_size)
+		*list_size = info->ncerts;
 	return info->raw_certificate_list;
 }
 
