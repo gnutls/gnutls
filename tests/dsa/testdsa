@@ -23,7 +23,7 @@
 srcdir="${srcdir:-.}"
 SERV="${SERV:-../../src/gnutls-serv} -q"
 CLI="${CLI:-../../src/gnutls-cli}"
-PORT="${PORT:-5559}"
+PORT="${PORT:-5558}"
 DEBUG=""
 unset RETCODE
 
