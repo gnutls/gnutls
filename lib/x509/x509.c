@@ -596,7 +596,7 @@ gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
 	}
 
 	bits = len;
-	if (bits % 8 != 0) {
+	if (bits % 8 != 0 || bits == 0) {
 		gnutls_assert();
 		return GNUTLS_E_CERTIFICATE_ERROR;
 	}
@@ -613,6 +613,7 @@ gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
+	*sizeof_sig = (unsigned)(len/8);
 
 	return 0;
 }
