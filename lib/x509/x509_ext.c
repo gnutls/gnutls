@@ -1270,7 +1270,7 @@ int gnutls_x509_ext_import_basic_constraints(const gnutls_datum_t * ext,
 					  unsigned int *ca, int *pathlen)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-	char str[128];
+	char str[128]="";
 	int len, result;
 
 	if ((result = asn1_create_element
