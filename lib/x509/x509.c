@@ -568,7 +568,7 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert)
  * gnutls_x509_crt_get_signature:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @sig: a pointer where the signature part will be copied (may be null).
- * @sizeof_sig: initially holds the size of @sig
+ * @sig_size: initially holds the size of @sig
  *
  * This function will extract the signature field of a certificate.
  *
@@ -577,45 +577,28 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert)
  **/
 int
 gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
-			      char *sig, size_t * sizeof_sig)
+			      char *sig, size_t * sig_size)
 {
-	int result;
-	unsigned int bits;
-	int len;
+	gnutls_datum_t dsig = {NULL, 0};
+	int ret;
 
-	if (cert == NULL) {
+	if (cert == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret = _gnutls_x509_get_signature(cert->cert, "signature", &dsig);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_copy_data(&dsig, (uint8_t*)sig, sig_size);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
 	}
 
-	len = 0;
-	result = asn1_read_value(cert->cert, "signature", NULL, &len);
-	if (result != ASN1_MEM_ERROR) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	bits = len;
-	if (bits % 8 != 0 || bits < 8) {
-		gnutls_assert();
-		return GNUTLS_E_CERTIFICATE_ERROR;
-	}
-
-	len = bits / 8;
-
-	if (*sizeof_sig < (unsigned int) len) {
-		*sizeof_sig = len;
-		return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	}
-
-	result = asn1_read_value(cert->cert, "signature", sig, &len);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-	*sizeof_sig = (unsigned)(len/8);
-
-	return 0;
+	ret = 0;
+ cleanup:
+ 	gnutls_free(dsig.data);
+ 	return ret;
 }
 
 /**
