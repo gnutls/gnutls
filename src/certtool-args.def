@@ -481,7 +481,7 @@ $ certtool --load-ca-certificate ca.pem \
 @subheading Diffie-Hellman parameter generation
 To generate parameters for Diffie-Hellman key exchange, use the command:
 @example
-$ certtool --generate-dh-params --outfile dh.pem --sec-param normal
+$ certtool --generate-dh-params --outfile dh.pem --sec-param medium
 @end example
 
 @subheading Proxy certificate generation
