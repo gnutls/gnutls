@@ -30,6 +30,7 @@ void *gnutls_realloc_fast(void *ptr, size_t size);
 
 void *_gnutls_calloc(size_t nmemb, size_t size);
 char *_gnutls_strdup(const char *);
+void gnutls_memset(void *data, int c, size_t size);
 
 #define zrelease_mpi_key(mpi) if (*mpi!=NULL) { \
                 _gnutls_mpi_clear(*mpi); \

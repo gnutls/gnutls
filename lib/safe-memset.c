@@ -24,7 +24,7 @@
 # include <gnutls_int.h>
 #endif
 
-/**
+/*-
  * gnutls_memset:
  * @data: the memory to set
  * @c: the constant byte to fill the memory with
@@ -36,7 +36,7 @@
  * Returns: void.
  *
  * Since: 3.3.3
- **/
+ -*/
 void gnutls_memset(void *data, int c, size_t size)
 {
 	volatile unsigned volatile_zero = 0;
