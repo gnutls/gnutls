@@ -5,7 +5,9 @@
 *.log
 *.trs
 *.o
+*.plist
 *~
+suppressions.valgrind
 .deps
 .libs
 ABOUT-NLS
@@ -707,3 +709,4 @@ tests/suite/softhsm*.db
 tests/suite/softhsm*.db-journal
 tests/suite/softhsm*.config
 gl/errno.h
+tests/suite/pkcs11-get-issuer
