@@ -628,7 +628,7 @@ gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
-  *sizeof_sig = len;
+  *sizeof_sig = len/8;
 
   return 0;
 }
