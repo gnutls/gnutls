@@ -26,6 +26,7 @@ my $menu = 0;
 my $i = 0;
 
 while ($line = <>) {
+
   if ($line =~ /\@node (.*)/) {
     if ($init == 0) {
       $init = 1;
@@ -55,6 +56,10 @@ while ($line = <>) {
     if ($line !~ /help/) {
       next;
     }
+  }
+
+  if ($line =~ /^Please send bug reports.*/) {
+    next;
   }
 
   print $line;
