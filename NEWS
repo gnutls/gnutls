@@ -15,7 +15,7 @@ create a full chain. This addresses points from https://savannah.gnu.org/support
 has been disabled.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_credentials_get: Added
 
 
 * Version 3.3.2 (released 2014-05-06)
