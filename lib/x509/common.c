@@ -1594,7 +1594,7 @@ _gnutls_x509_get_signature(ASN1_TYPE src, const char *src_name,
 			   gnutls_datum_t * signature)
 {
 	int result, len;
-	unsigned int bits;
+	int bits;
 
 	signature->data = NULL;
 	signature->size = 0;
@@ -1630,7 +1630,7 @@ _gnutls_x509_get_signature(ASN1_TYPE src, const char *src_name,
 	 */
 	bits = len;
 	result =
-	    asn1_read_value(src, src_name, signature->data, (int *) &bits);
+	    asn1_read_value(src, src_name, signature->data, &bits);
 
 	if (result != ASN1_SUCCESS) {
 		result = _gnutls_asn2err(result);
