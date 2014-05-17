@@ -3,6 +3,19 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.15 (unreleased)
+
+** libgnutls: Several memory leaks caused by error conditions were
+fixed. The leaks were identified using valgrind and the Codenomicon
+TLS test suite.
+
+** gnutls-cli: if dane is requested but not PKIX verification, then
+only do verify the end certificate.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.14 (released 2014-05-06)
 
 ** libgnutls: Fixed issue with the check of incoming data when two
