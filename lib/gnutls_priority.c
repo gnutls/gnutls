@@ -30,7 +30,7 @@
 #include <gnutls/x509.h>
 #include <c-ctype.h>
 
-#define MAX_ELEMENTS 48
+#define MAX_ELEMENTS 64
 
 static void
 break_list(char *etag,
