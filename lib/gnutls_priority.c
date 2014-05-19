@@ -30,10 +30,11 @@
 #include <gnutls/x509.h>
 #include <c-ctype.h>
 
+#define MAX_ELEMENTS 48
+
 static void
-break_comma_list(char *etag,
-		 char **broken_etag, int *elements, int max_elements,
-		 char sep);
+break_list(char *etag,
+		 char *broken_etag[MAX_ELEMENTS], int *size);
 
 /**
  * gnutls_cipher_set_priority:
@@ -630,8 +631,6 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 }
 
 
-#define MAX_ELEMENTS 48
-
 #define LEVEL_NONE "NONE"
 #define LEVEL_NORMAL "NORMAL"
 #define LEVEL_PFS "PFS"
@@ -1135,8 +1134,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 		goto error;
 	}
 
-	break_comma_list(darg, broken_list, &broken_list_size,
-			 MAX_ELEMENTS, ':');
+	break_list(darg, broken_list, &broken_list_size);
 	/* This is our default set of protocol version, certificate types and
 	 * compression methods.
 	 */
@@ -1395,22 +1393,19 @@ gnutls_priority_set_direct(gnutls_session_t session,
  * MAX_COMMA_SEP_ELEMENTS size; Note that the given string is modified.
   */
 static void
-break_comma_list(char *etag,
-		 char **broken_etag, int *elements, int max_elements,
-		 char sep)
+break_list(char *list,
+		 char *broken_list[MAX_ELEMENTS], int *size)
 {
-	char *p = etag;
-	if (sep == 0)
-		sep = ',';
+	char *p = list;
 
-	*elements = 0;
+	*size = 0;
 
 	do {
-		broken_etag[*elements] = p;
+		broken_list[*size] = p;
 
-		(*elements)++;
+		(*size)++;
 
-		p = strchr(p, sep);
+		p = strchr(p, ':');
 		if (p) {
 			*p = 0;
 			p++;	/* move to next entry and skip white
@@ -1420,7 +1415,7 @@ break_comma_list(char *etag,
 				p++;
 		}
 	}
-	while (p != NULL && *elements < max_elements);
+	while (p != NULL && *size < MAX_ELEMENTS);
 }
 
 /**
