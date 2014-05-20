@@ -59,8 +59,8 @@ extern int ask_pass;
 #define MAX_POLICIES 8
 
 typedef struct _cfg_ctx {
-	char *organization;
-	char *unit;
+	char **organization;
+	char **unit;
 	char *locality;
 	char *state;
 	char *dn;
@@ -207,13 +207,8 @@ int template_parse(const char *template)
 	}
 
 	/* Option variables */
-	val = optionGetValue(pov, "organization");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.organization = strdup(val->v.strVal);
-
-	val = optionGetValue(pov, "unit");
-	if (val != NULL && val->valType == OPARG_TYPE_STRING)
-		cfg.unit = strdup(val->v.strVal);
+	READ_MULTI_LINE("unit", cfg.unit);
+	READ_MULTI_LINE("unit", cfg.organization);
 
 	val = optionGetValue(pov, "locality");
 	if (val != NULL && val->valType == OPARG_TYPE_STRING)
@@ -578,21 +573,23 @@ void get_country_crt_set(gnutls_x509_crt_t crt)
 void get_organization_crt_set(gnutls_x509_crt_t crt)
 {
 	int ret;
+	unsigned i;
 
 	if (batch) {
 		if (!cfg.organization)
 			return;
 
-		ret =
-		    gnutls_x509_crt_set_dn_by_oid(crt,
+		for (i = 0; cfg.organization[i] != NULL; i++) {
+			ret =
+			    gnutls_x509_crt_set_dn_by_oid(crt,
 						  GNUTLS_OID_X520_ORGANIZATION_NAME,
-						  0, cfg.organization,
-						  strlen(cfg.
-							 organization));
-		if (ret < 0) {
-			fprintf(stderr, "set_dn: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
+						  0, cfg.organization[i],
+						  strlen(cfg.organization[i]));
+			if (ret < 0) {
+				fprintf(stderr, "set_dn: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
 		}
 	} else {
 		read_crt_set(crt, "Organization name: ",
@@ -604,20 +601,23 @@ void get_organization_crt_set(gnutls_x509_crt_t crt)
 void get_unit_crt_set(gnutls_x509_crt_t crt)
 {
 	int ret;
+	unsigned i;
 
 	if (batch) {
 		if (!cfg.unit)
 			return;
 
-		ret =
-		    gnutls_x509_crt_set_dn_by_oid(crt,
+		for (i = 0; cfg.unit[i] != NULL; i++) {
+			ret =
+			    gnutls_x509_crt_set_dn_by_oid(crt,
 						  GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
-						  0, cfg.unit,
-						  strlen(cfg.unit));
-		if (ret < 0) {
-			fprintf(stderr, "set_dn: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
+						  0, cfg.unit[i],
+						  strlen(cfg.unit[i]));
+			if (ret < 0) {
+				fprintf(stderr, "set_dn: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
 		}
 	} else {
 		read_crt_set(crt, "Organizational unit name: ",
@@ -1729,21 +1729,24 @@ void get_country_crq_set(gnutls_x509_crq_t crq)
 void get_organization_crq_set(gnutls_x509_crq_t crq)
 {
 	int ret;
+	unsigned i;
 
 	if (batch) {
 		if (!cfg.organization)
 			return;
 
-		ret =
-		    gnutls_x509_crq_set_dn_by_oid(crq,
+		for (i = 0; cfg.organization[i] != NULL; i++) {
+			ret =
+			    gnutls_x509_crq_set_dn_by_oid(crq,
 						  GNUTLS_OID_X520_ORGANIZATION_NAME,
-						  0, cfg.organization,
+						  0, cfg.organization[i],
 						  strlen(cfg.
-							 organization));
-		if (ret < 0) {
-			fprintf(stderr, "set_dn: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
+							 organization[i]));
+			if (ret < 0) {
+				fprintf(stderr, "set_dn: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
 		}
 	} else {
 		read_crq_set(crq, "Organization name: ",
@@ -1755,20 +1758,23 @@ void get_organization_crq_set(gnutls_x509_crq_t crq)
 void get_unit_crq_set(gnutls_x509_crq_t crq)
 {
 	int ret;
+	unsigned i;
 
 	if (batch) {
 		if (!cfg.unit)
 			return;
 
-		ret =
-		    gnutls_x509_crq_set_dn_by_oid(crq,
+		for (i = 0; cfg.unit[i] != NULL; i++) {
+			ret =
+			    gnutls_x509_crq_set_dn_by_oid(crq,
 						  GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
-						  0, cfg.unit,
-						  strlen(cfg.unit));
-		if (ret < 0) {
-			fprintf(stderr, "set_dn: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
+						  0, cfg.unit[i],
+						  strlen(cfg.unit[i]));
+			if (ret < 0) {
+				fprintf(stderr, "set_dn: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
 		}
 	} else {
 		read_crq_set(crq, "Organizational unit name: ",
