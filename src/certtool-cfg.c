@@ -208,7 +208,14 @@ int template_parse(const char *template)
 
 	/* Option variables */
 	READ_MULTI_LINE("unit", cfg.unit);
-	READ_MULTI_LINE("unit", cfg.organization);
+	if (cfg.unit == NULL) {
+		READ_MULTI_LINE("ou", cfg.unit);
+	}
+
+	READ_MULTI_LINE("organization", cfg.organization);
+	if (cfg.organization == NULL) {
+		READ_MULTI_LINE("o", cfg.organization);
+	}
 
 	val = optionGetValue(pov, "locality");
 	if (val != NULL && val->valType == OPARG_TYPE_STRING)
