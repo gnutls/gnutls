@@ -1246,7 +1246,7 @@ print_extensions(gnutls_buffer_st * str, const char *prefix, int type,
 				return;
 			}
 
-			if (err < 0) {
+			if (err < 0 && err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 				addf(str,
 				     "error: get_extension_data: %s\n",
 				     gnutls_strerror(err));
@@ -1270,7 +1270,7 @@ print_extensions(gnutls_buffer_st * str, const char *prefix, int type,
 				    gnutls_x509_crq_get_extension_data
 				    (cert.crq, i, buffer, &extlen);
 
-			if (err < 0) {
+			if (err < 0 && err) {
 				gnutls_free(buffer);
 				addf(str,
 				     "error: get_extension_data2: %s\n",
@@ -2218,7 +2218,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 								       i,
 								       NULL,
 								       &extlen);
-				if (err < 0) {
+				if (err < 0 && err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 					addf(str,
 					     "error: get_extension_data: %s\n",
 					     gnutls_strerror(err));
