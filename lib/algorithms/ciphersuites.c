@@ -1286,6 +1286,9 @@ _gnutls_supported_ciphersuites(gnutls_session_t session,
 	const version_entry_st *version = get_version(session);
 	unsigned int is_dtls = IS_DTLS(session);
 
+	if (version == NULL)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
 	for (i = 0; i < session->internals.priorities.kx.algorithms; i++)
 		for (j = 0;
 		     j < session->internals.priorities.cipher.algorithms;
