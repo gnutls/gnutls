@@ -423,7 +423,7 @@ decode_complex_string(const struct oid_to_string *oentry, void *value,
 	} else {
 		out->data = td.data;
 		out->size = td.size;
-		out->data[out->size] = 0;
+		/* _gnutls_x509_read_value always null terminates */
 	}
 
 	/* Refuse to deal with strings containing NULs. */
