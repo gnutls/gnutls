@@ -642,7 +642,7 @@ _gnutls_read_client_hello(gnutls_session_t session, uint8_t * data,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		return _gnutls_user_hello_func(session, adv_version);
+		return 0;
 	}
 
 	/* select an appropriate cipher suite
