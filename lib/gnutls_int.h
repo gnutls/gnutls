@@ -1021,16 +1021,21 @@ inline static unsigned get_num_version(gnutls_session_t session)
 		return GNUTLS_VERSION_UNKNOWN;
 }
 
-#define _gnutls_set_current_version(s, v) { \
-  s->security_parameters.pversion = version_to_entry(v); \
-  }
-
 #define timespec_sub_ms _gnutls_timespec_sub_ms
 unsigned int
 /* returns a-b in ms */
  timespec_sub_ms(struct timespec *a, struct timespec *b);
 
 #include <algorithms.h>
+inline static int _gnutls_set_current_version(gnutls_session_t s, unsigned v)
+{
+	s->security_parameters.pversion = version_to_entry(v);
+	if (s->security_parameters.pversion == NULL) {
+		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+	}
+	return 0;
+}
+
 inline static size_t max_user_send_size(gnutls_session_t session,
 					record_parameters_st *
 					record_params)
