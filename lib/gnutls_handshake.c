@@ -168,10 +168,11 @@ static int resume_copy_required_values(gnutls_session_t session)
 	    NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	_gnutls_set_current_version(session,
+	if (_gnutls_set_current_version(session,
 				    session->internals.
 				    resumed_security_parameters.pversion->
-				    id);
+				    id) < 0)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 	session->security_parameters.cert_type =
 	    session->internals.resumed_security_parameters.cert_type;
@@ -419,7 +420,8 @@ _gnutls_negotiate_version(gnutls_session_t session,
 		ret = adv_version;
 	}
 
-	_gnutls_set_current_version(session, ret);
+	if (_gnutls_set_current_version(session, ret) < 0)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 	return ret;
 }
@@ -1724,7 +1726,8 @@ _gnutls_read_server_hello(gnutls_session_t session,
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	} else {
-		_gnutls_set_current_version(session, version);
+		if (_gnutls_set_current_version(session, version) < 0)
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	}
 
 	pos += 2;
@@ -1955,7 +1958,8 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 		 * (RSA uses it).
 		 */
 		set_adv_version(session, hver->major, hver->minor);
-		_gnutls_set_current_version(session, hver->id);
+		if (_gnutls_set_current_version(session, hver->id) < 0)
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 		if (session->internals.priorities.ssl3_record_version != 0) {
 			/* Advertize the SSL 3.0 record packet version in
