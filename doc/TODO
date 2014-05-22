@@ -7,8 +7,7 @@ Current list:
   it being used with the tofu API).
 * Deprecate GNUTLS_E_CERTIFICATE_LIST_UNSORTED, and automatically sort
   input chains in gnutls_certificate_set_x509_key_*.
-* Priority strings should also set the minimum acceptable DH key size and
-  certificate size.
+* Allow the manipulation of certificates, i.e., allow to remove fields.
 * Add an authenticated-encryption API.
 * Think about supporting the groups in RFC3526 and RFC5114. If other
   implementations use them too we may be able to achieve some speedups
