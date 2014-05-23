@@ -1694,8 +1694,10 @@ client_check_if_resuming(gnutls_session_t session,
 		session->internals.resumed = RESUME_FALSE;	/* we are not resuming */
 		session->security_parameters.session_id_size =
 		    session_id_len;
-		memcpy(session->security_parameters.session_id, session_id,
-		       session_id_len);
+		if (session_id_len > 0) {
+			memcpy(session->security_parameters.session_id, session_id,
+			       session_id_len);
+		}
 
 		return -1;
 	}
