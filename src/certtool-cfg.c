@@ -58,6 +58,67 @@ extern int ask_pass;
 #define MAX_ENTRIES 128
 #define MAX_POLICIES 8
 
+enum option_types { OPTION_NUMERIC, OPTION_STRING, OPTION_BOOLEAN, OPTION_MULTI_LINE };
+
+struct cfg_options {
+	const char *name;
+	unsigned type;
+
+	/* used when parsing */
+	unsigned found; 
+};
+
+static struct cfg_options available_options[] = {
+	{ .name = "unit", .type = OPTION_MULTI_LINE },
+	{ .name = "ou", .type = OPTION_MULTI_LINE },
+	{ .name = "organization", .type = OPTION_MULTI_LINE },
+	{ .name = "o", .type = OPTION_MULTI_LINE },
+	{ .name = "dc", .type = OPTION_MULTI_LINE },
+	{ .name = "dns_name", .type = OPTION_MULTI_LINE },
+	{ .name = "ip_address", .type = OPTION_MULTI_LINE },
+	{ .name = "email", .type = OPTION_MULTI_LINE },
+	{ .name = "key_purpose_oid", .type = OPTION_MULTI_LINE },
+	{ .name = "nc_exclude_dns", .type = OPTION_MULTI_LINE },
+	{ .name = "nc_exclude_email", .type = OPTION_MULTI_LINE },
+	{ .name = "nc_permit_dns", .type = OPTION_MULTI_LINE },
+	{ .name = "nc_permit_email", .type = OPTION_MULTI_LINE },
+	{ .name = "dn_oid", .type = OPTION_MULTI_LINE },
+	{ .name = "crl_dist_points", .type = OPTION_MULTI_LINE },
+	{ .name = "ocsp_uri", .type = OPTION_MULTI_LINE },
+	{ .name = "ca_issuers_uri", .type = OPTION_MULTI_LINE },
+	{ .name = "locality", .type = OPTION_STRING },
+	{ .name = "state", .type = OPTION_STRING },
+	{ .name = "dn", .type = OPTION_STRING },
+	{ .name = "cn", .type = OPTION_STRING },
+	{ .name = "uid", .type = OPTION_STRING },
+	{ .name = "challenge_password", .type = OPTION_STRING },
+	{ .name = "password", .type = OPTION_STRING },
+	{ .name = "pkcs9_email", .type = OPTION_STRING },
+	{ .name = "country", .type = OPTION_STRING },
+	{ .name = "expiration_date", .type = OPTION_STRING },
+	{ .name = "activation_date", .type = OPTION_STRING },
+	{ .name = "policy*", .type = OPTION_STRING },
+	{ .name = "pkcs12_key_name", .type = OPTION_STRING },
+	{ .name = "proxy_policy_language", .type = OPTION_STRING },
+	{ .name = "serial", .type = OPTION_NUMERIC },
+	{ .name = "expiration_days", .type = OPTION_NUMERIC },
+	{ .name = "crl_next_update", .type = OPTION_NUMERIC },
+	{ .name = "crl_number", .type = OPTION_NUMERIC },
+	{ .name = "path_len", .type = OPTION_NUMERIC },
+	{ .name = "ca", .type = OPTION_BOOLEAN },
+	{ .name = "honor_crq_extensions", .type = OPTION_BOOLEAN },
+	{ .name = "tls_www_client", .type = OPTION_BOOLEAN },
+	{ .name = "tls_www_server", .type = OPTION_BOOLEAN },
+	{ .name = "signing_key", .type = OPTION_BOOLEAN },
+	{ .name = "encryption_key", .type = OPTION_BOOLEAN },
+	{ .name = "cert_signing_key", .type = OPTION_BOOLEAN },
+	{ .name = "crl_signing_key", .type = OPTION_BOOLEAN },
+	{ .name = "code_signing_key", .type = OPTION_BOOLEAN },
+	{ .name = "ocsp_signing_key", .type = OPTION_BOOLEAN },
+	{ .name = "time_stamping_key", .type = OPTION_BOOLEAN },
+	{ .name = "ipsec_ike_key", .type = OPTION_BOOLEAN },
+};
+
 typedef struct _cfg_ctx {
 	char **organization;
 	char **unit;
@@ -191,12 +252,31 @@ void cfg_init(void)
         s_name = strtol(val->v.strVal, NULL, 10); \
     }
 
+
+static int handle_option(const tOptionValue* val)
+{
+unsigned j;
+
+	for (j=0;j<sizeof(available_options)/sizeof(available_options[0]);j++) {
+		if (strcasecmp(val->pzName, available_options[j].name) == 0) {
+			if (available_options[j].type != OPTION_MULTI_LINE && 
+			    available_options[j].found != 0) {
+			    fprintf(stderr, "Warning: multiple options found for '%s'; only the first will be taken into account.\n", available_options[j].name);
+			}
+			available_options[j].found = 1;
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 int template_parse(const char *template)
 {
 	/* Parsing return code */
 	unsigned int i;
 	tOptionValue const *pov;
-	const tOptionValue *val;
+	const tOptionValue *val, *prev;
 	char tmpstr[256];
 
 	pov = configFileLoad(template);
@@ -204,6 +284,15 @@ int template_parse(const char *template)
 		perror("configFileLoad");
 		fprintf(stderr, "Error loading template: %s\n", template);
 		exit(1);
+	}
+
+	val = optionGetValue(pov, NULL);
+	while (val != NULL) {
+		if (handle_option(val) == 0) {
+			fprintf(stderr, "Warning: skipping unknown option '%s'\n", val->pzName);
+		}
+		prev = val;
+		val = optionNextValue(pov, prev);
 	}
 
 	/* Option variables */
