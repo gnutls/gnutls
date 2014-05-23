@@ -14,8 +14,10 @@ create a full chain. This addresses points from https://savannah.gnu.org/support
 ** gnutls-cli: --dane will only check the end certificate if PKIX validation
 has been disabled.
 
-** certtool: allow multiple organizations and organizational unit names to
+** certtool: Allow multiple organizations and organizational unit names to
 be specified in a template.
+
+** certtool: Warn when invalid configuration options are set to a template.
 
 ** API and ABI modifications:
 gnutls_credentials_get: Added
