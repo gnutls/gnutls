@@ -476,6 +476,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 			      session, data[pos], data[pos + 1]);
 
 	adv_version = _gnutls_version_get(data[pos], data[pos + 1]);
+
 	set_adv_version(session, data[pos], data[pos + 1]);
 	pos += 2;
 
@@ -1728,10 +1729,10 @@ read_server_hello(gnutls_session_t session,
 	if (_gnutls_version_is_supported(session, version) == 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-	} else {
-		if (_gnutls_set_current_version(session, version) < 0)
-			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 	}
+
+	if (_gnutls_set_current_version(session, version) < 0)
+		return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
 	pos += 2;
 

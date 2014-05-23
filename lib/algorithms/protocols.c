@@ -182,7 +182,7 @@ const gnutls_protocol_t *gnutls_protocol_list(void)
  */
 gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor)
 {
-	int ret = -1;
+	int ret = GNUTLS_VERSION_UNKNOWN;
 
 	GNUTLS_VERSION_LOOP(
 		if ((p->major == major) && (p->minor == minor))
