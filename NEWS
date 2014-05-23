@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 3.3.3 (unreleased)
 
+** libgnutls: Eliminated null pointer dereferences in ASN.1 parser.
+Issues discovered using the Codenomicon TLS test suite.
+
+** libgnutls: Eliminated null pointer dereference in ciphersuite parsing.
+Issue reported by Joonas Kuorilehto of Codenomicon.
+
 ** libgnutls: gnutls_global_set_mutex() was modified to operate with the
 new initialization process.
 
