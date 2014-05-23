@@ -97,7 +97,7 @@ static struct cfg_options available_options[] = {
 	{ .name = "country", .type = OPTION_STRING },
 	{ .name = "expiration_date", .type = OPTION_STRING },
 	{ .name = "activation_date", .type = OPTION_STRING },
-	{ .name = "policy*", .type = OPTION_STRING },
+	{ .name = "policy*", .type = OPTION_MULTI_LINE }, /* not a multi-line but there are multi as it is a wildcard */
 	{ .name = "pkcs12_key_name", .type = OPTION_STRING },
 	{ .name = "proxy_policy_language", .type = OPTION_STRING },
 	{ .name = "serial", .type = OPTION_NUMERIC },
@@ -256,9 +256,16 @@ void cfg_init(void)
 static int handle_option(const tOptionValue* val)
 {
 unsigned j;
+unsigned len, cmp;
 
 	for (j=0;j<sizeof(available_options)/sizeof(available_options[0]);j++) {
-		if (strcasecmp(val->pzName, available_options[j].name) == 0) {
+		len = strlen(available_options[j].name);
+		if (len > 2 && available_options[j].name[len-1] == '*')
+			cmp = strncasecmp(val->pzName, available_options[j].name, len-1);
+		else
+			cmp = strcasecmp(val->pzName, available_options[j].name);
+
+		if (cmp == 0) {
 			if (available_options[j].type != OPTION_MULTI_LINE && 
 			    available_options[j].found != 0) {
 			    fprintf(stderr, "Warning: multiple options found for '%s'; only the first will be taken into account.\n", available_options[j].name);
