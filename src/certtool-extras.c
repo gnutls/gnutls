@@ -121,8 +121,8 @@ gnutls_x509_privkey_t *load_privkey_list(int mand, size_t * privkey_size,
 
 		ptr_size = file_data.size;
 		ptr_size -=
-		    (unsigned int) ((unsigned char *) ptr -
-				    (unsigned char *) buffer);
+		    ((unsigned char *) ptr -
+				    (unsigned char *) file_data.data);
 
 		if (ptr_size < 0)
 			break;
