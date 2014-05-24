@@ -146,48 +146,6 @@ static const char *valid_headers[] = {
 static char b64chars[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-/* Return the compression algorithm in @r_zipalgo.
-   If the parameter is not set after execution,
-   the stream is not compressed. */
-static int compress_get_algo(cdk_stream_t inp, int *r_zipalgo)
-{
-	byte plain[512];
-	char buf[128];
-	int nread, pkttype;
-	size_t plain_size;
-
-	if (r_zipalgo)
-		*r_zipalgo = 0;
-
-	cdk_stream_seek(inp, 0);
-	while (!cdk_stream_eof(inp)) {
-		nread = _cdk_stream_gets(inp, buf, DIM(buf) - 1);
-		if (!nread || nread == -1)
-			break;
-		if (nread == 1 && !cdk_stream_eof(inp)
-		    && (nread =
-			_cdk_stream_gets(inp, buf, DIM(buf) - 1)) > 0) {
-			plain_size = sizeof(plain);
-			base64_decode(buf, nread, (char *) plain,
-				      &plain_size);
-			if (!(*plain & 0x80))
-				break;
-			pkttype =
-			    *plain & 0x40 ? (*plain & 0x3f)
-			    : ((*plain >> 2) & 0xf);
-			if (pkttype == CDK_PKT_COMPRESSED && r_zipalgo) {
-				_gnutls_buffers_log
-				    ("armor compressed (algo=%d)\n",
-				     *(plain + 1));
-				*r_zipalgo = *(plain + 1);
-			}
-			break;
-		}
-	}
-	return 0;
-}
-
-
 static u32 update_crc(u32 crc, const byte * buf, size_t buflen)
 {
 	unsigned int j;
