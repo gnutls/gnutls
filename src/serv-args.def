@@ -103,6 +103,12 @@ flag = {
 };
 
 flag = {
+    name      = print-cert;
+    descrip   = "Print peer's certificate in PEM format";
+    doc      = "";
+};
+
+flag = {
     name      = priority;
     arg-type  = string;
     descrip   = "Priorities string";
