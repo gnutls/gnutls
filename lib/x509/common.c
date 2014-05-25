@@ -1179,10 +1179,10 @@ _gnutls_x509_der_encode(ASN1_TYPE src, const char *src_name,
 
 	size = 0;
 	result = asn1_der_coding(src, src_name, NULL, &size, NULL);
+	/* this check explicitly covers the case where size == 0 && result == 0 */
 	if (result != ASN1_MEM_ERROR) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
+		return _gnutls_asn2err(result);
 	}
 
 	/* allocate data for the der
@@ -1195,8 +1195,7 @@ _gnutls_x509_der_encode(ASN1_TYPE src, const char *src_name,
 	data = gnutls_malloc((size_t) size);
 	if (data == NULL) {
 		gnutls_assert();
-		result = GNUTLS_E_MEMORY_ERROR;
-		goto cleanup;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	result = asn1_der_coding(src, src_name, data, &size, NULL);
@@ -1389,7 +1388,6 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 			    ".algorithm.parameters");
 
 	result = asn1_write_value(dst, name, der.data, der.size);
-
 	_gnutls_free_datum(&der);
 
 	if (result != ASN1_SUCCESS) {
