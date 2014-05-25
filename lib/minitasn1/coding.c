@@ -594,7 +594,7 @@ _asn1_insert_tag_der (asn1_node node, unsigned char *der, int *counter,
 {
   asn1_node p;
   int tag_len, is_tag_implicit;
-  unsigned char class, class_implicit = 0, temp[SIZEOF_UNSIGNED_INT * 3 + 1];
+  unsigned char class, class_implicit = 0, temp[MAX(SIZEOF_UNSIGNED_INT * 3 + 1, LTOSTR_MAX_SIZE)];
   unsigned long tag_implicit = 0;
   unsigned char tag_der[MAX_TAG_LEN];
 
@@ -1012,7 +1012,7 @@ asn1_der_coding (asn1_node element, const char *name, void *ider, int *len,
 		 char *ErrorDescription)
 {
   asn1_node node, p, p2;
-  unsigned char temp[SIZEOF_UNSIGNED_LONG_INT * 3 + 1];
+  unsigned char temp[MAX(LTOSTR_MAX_SIZE, SIZEOF_UNSIGNED_LONG_INT * 3 + 1)];
   int counter, counter_old, len2, len3, tlen, move, max_len, max_len_old;
   int err;
   unsigned char *der = ider;

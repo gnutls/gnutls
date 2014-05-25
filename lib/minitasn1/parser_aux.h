@@ -22,8 +22,6 @@
 #ifndef _PARSER_AUX_H
 #define _PARSER_AUX_H
 
-#define DER_LEN 16
-
 /***************************************/
 /*  Functions used by ASN.1 parser     */
 /***************************************/
@@ -54,6 +52,7 @@ void _asn1_delete_list (void);
 
 void _asn1_delete_list_and_nodes (void);
 
+#define LTOSTR_MAX_SIZE 20
 char *_asn1_ltostr (long v, char *str);
 
 asn1_node _asn1_find_up (asn1_node node);

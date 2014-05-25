@@ -458,11 +458,16 @@ _asn1_remove_node (asn1_node node, unsigned int flags)
   if (node == NULL)
     return;
 
-  if (flags & ASN1_DELETE_FLAG_ZEROIZE)
-    memset(node->value, 0, node->value_len);
+  if (node->value != NULL)
+    {
+      if (flags & ASN1_DELETE_FLAG_ZEROIZE)
+        {
+          safe_memset(node->value, 0, node->value_len);
+        }
 
-  if (node->value != NULL && node->value != node->small_value)
-    free (node->value);
+      if (node->value != node->small_value)
+        free (node->value);
+    }
   free (node);
 }
 
@@ -531,7 +536,7 @@ char *
 _asn1_ltostr (long v, char *str)
 {
   long d, r;
-  char temp[20];
+  char temp[LTOSTR_MAX_SIZE];
   int count, k, start;
 
   if (v < 0)
