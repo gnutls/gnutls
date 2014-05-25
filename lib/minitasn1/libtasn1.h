@@ -44,7 +44,18 @@ extern "C"
 {
 #endif
 
-#define ASN1_VERSION "3.5"
+#define ASN1_VERSION "3.6"
+
+#if defined(__GNUC__) && !defined(ASN1_INTERNAL_BUILD)
+# define _ASN1_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+# if _ASN1_GCC_VERSION >= 30100
+#  define _ASN1_GCC_ATTR_DEPRECATED __attribute__ ((__deprecated__))
+# endif
+#endif
+
+#ifndef _ASN1_GCC_ATTR_DEPRECATED
+#define _ASN1_GCC_ATTR_DEPRECATED
+#endif
 
   /*****************************************/
   /* Errors returned by libtasn1 functions */
@@ -251,11 +262,12 @@ extern "C"
     asn1_der_decoding (asn1_node * element, const void *ider,
 		       int len, char *errorDescription);
 
+  /* Do not use. Use asn1_der_decoding() instead. */
   extern ASN1_API int
     asn1_der_decoding_element (asn1_node * structure,
 			       const char *elementName,
 			       const void *ider, int len,
-			       char *errorDescription);
+			       char *errorDescription) _ASN1_GCC_ATTR_DEPRECATED;
 
   extern ASN1_API int
     asn1_der_decoding_startEnd (asn1_node element,
