@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -192,7 +192,7 @@ asn1_array2tree (const asn1_static_node * array, asn1_node * definitions,
   k = 0;
   while (array[k].value || array[k].type || array[k].name)
     {
-      type = convert_old_type(array[k].type);
+      type = convert_old_type (array[k].type);
 
       p = _asn1_add_static_node (type & (~CONST_DOWN));
       if (array[k].name)
@@ -287,6 +287,23 @@ asn1_array2tree (const asn1_static_node * array, asn1_node * definitions,
 int
 asn1_delete_structure (asn1_node * structure)
 {
+  return asn1_delete_structure2(structure, 0);
+}
+
+/**
+ * asn1_delete_structure2:
+ * @structure: pointer to the structure that you want to delete.
+ * @flags: additional flags (see %ASN1_DELETE_FLAG)
+ *
+ * Deletes the structure *@structure.  At the end, *@structure is set
+ * to NULL.
+ *
+ * Returns: %ASN1_SUCCESS if successful, %ASN1_ELEMENT_NOT_FOUND if
+ *   *@structure was NULL.
+ **/
+int
+asn1_delete_structure2 (asn1_node * structure, unsigned int flags)
+{
   asn1_node p, p2, p3;
 
   if (*structure == NULL)
@@ -306,7 +323,7 @@ asn1_delete_structure (asn1_node * structure)
 	    {
 	      p3 = _asn1_find_up (p);
 	      _asn1_set_down (p3, p2);
-	      _asn1_remove_node (p);
+	      _asn1_remove_node (p, flags);
 	      p = p3;
 	    }
 	  else
@@ -325,7 +342,7 @@ asn1_delete_structure (asn1_node * structure)
 		}
 	      else
 		_asn1_set_right (p3, p2);
-	      _asn1_remove_node (p);
+	      _asn1_remove_node (p, flags);
 	      p = NULL;
 	    }
 	}
@@ -409,22 +426,22 @@ _asn1_copy_structure3 (asn1_node source_node)
 	}
 
       if (p_s == source_node)
-        break;
+	break;
 
       if (p_s->right)
-        {
-	    move = RIGHT;
-	    p_s = p_s->right;
-	    p_d_prev = p_d;
-	    p_d = _asn1_add_single_node (p_s->type);
-	    _asn1_set_right (p_d_prev, p_d);
-        }
+	{
+	  move = RIGHT;
+	  p_s = p_s->right;
+	  p_d_prev = p_d;
+	  p_d = _asn1_add_single_node (p_s->type);
+	  _asn1_set_right (p_d_prev, p_d);
+	}
       else
-        {
-	    move = UP;
-	    p_s = _asn1_find_up (p_s);
-	    p_d = _asn1_find_up (p_d);
-        }
+	{
+	  move = UP;
+	  p_s = _asn1_find_up (p_s);
+	  p_d = _asn1_find_up (p_d);
+	}
     }
   while (p_s != source_node);
 
@@ -460,7 +477,8 @@ _asn1_type_choice_config (asn1_node node)
     {
       if (move != UP)
 	{
-	  if ((type_field (p->type) == ASN1_ETYPE_CHOICE) && (p->type & CONST_TAG))
+	  if ((type_field (p->type) == ASN1_ETYPE_CHOICE)
+	      && (p->type & CONST_TAG))
 	    {
 	      p2 = p->down;
 	      while (p2)
@@ -548,7 +566,7 @@ _asn1_expand_identifier (asn1_node * node, asn1_node root)
 	{
 	  if (type_field (p->type) == ASN1_ETYPE_IDENTIFIER)
 	    {
-	      snprintf(name2, sizeof (name2), "%s.%s", root->name, p->value);
+	      snprintf (name2, sizeof (name2), "%s.%s", root->name, p->value);
 	      p2 = _asn1_copy_structure2 (root, name2);
 	      if (p2 == NULL)
 		{
@@ -597,7 +615,7 @@ _asn1_expand_identifier (asn1_node * node, asn1_node root)
 
 	      if (p == *node)
 		*node = p2;
-	      _asn1_remove_node (p);
+	      _asn1_remove_node (p, 0);
 	      p = p2;
 	      move = DOWN;
 	      continue;
@@ -765,7 +783,7 @@ asn1_print_structure (FILE * out, asn1_node structure, const char *name,
 	    case ASN1_ETYPE_DEFINITIONS:
 	      fprintf (out, "type:DEFINITIONS");
 	      break;
-            CASE_HANDLED_ETYPES:
+	    CASE_HANDLED_ETYPES:
 	      fprintf (out, "%s", _asn1_tags[type].desc);
 	      break;
 	    default:
@@ -854,7 +872,7 @@ asn1_print_structure (FILE * out, asn1_node structure, const char *name,
 	      if (p->value)
 		{
 		  fprintf (out, "  value:");
-                  for (k = 0; k < p->value_len; k++)
+		  for (k = 0; k < p->value_len; k++)
 		    fprintf (out, "%c", (p->value)[k]);
 		}
 	      break;
@@ -1069,18 +1087,17 @@ asn1_number_of_elements (asn1_node element, const char *name, int *num)
 const char *
 asn1_find_structure_from_oid (asn1_node definitions, const char *oidValue)
 {
-  char definitionsName[ASN1_MAX_NAME_SIZE], name[2 * ASN1_MAX_NAME_SIZE + 1];
+  char name[2 * ASN1_MAX_NAME_SIZE + 1];
   char value[ASN1_MAX_NAME_SIZE];
   asn1_node p;
   int len;
   int result;
+  const char *definitionsName;
 
   if ((definitions == NULL) || (oidValue == NULL))
     return NULL;		/* ASN1_ELEMENT_NOT_FOUND; */
 
-
-  strcpy (definitionsName, definitions->name);
-  strcat (definitionsName, ".");
+  definitionsName = definitions->name;
 
   /* search the OBJECT_ID into definitions */
   p = definitions->down;
@@ -1089,8 +1106,7 @@ asn1_find_structure_from_oid (asn1_node definitions, const char *oidValue)
       if ((type_field (p->type) == ASN1_ETYPE_OBJECT_ID) &&
 	  (p->type & CONST_ASSIGN))
 	{
-	  strcpy (name, definitionsName);
-	  strcat (name, p->name);
+          snprintf(name, sizeof(name), "%s.%s", definitionsName, p->name);
 
 	  len = ASN1_MAX_NAME_SIZE;
 	  result = asn1_read_value (definitions, name, value, &len);

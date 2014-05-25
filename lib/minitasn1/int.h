@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -46,7 +46,7 @@
 struct asn1_node_st
 {
   /* public fields: */
-  char name[ASN1_MAX_NAME_SIZE+1];			/* Node name */
+  char name[ASN1_MAX_NAME_SIZE + 1];	/* Node name */
   unsigned int name_hash;
   unsigned int type;		/* Node type */
   unsigned char *value;		/* Node value */
@@ -58,10 +58,11 @@ struct asn1_node_st
   unsigned char small_value[ASN1_SMALL_VALUE_SIZE];	/* For small values */
 };
 
-typedef struct tag_and_class_st {
+typedef struct tag_and_class_st
+{
   unsigned tag;
   unsigned class;
-  const char* desc;
+  const char *desc;
 } tag_and_class_st;
 
 /* the types that are handled in _asn1_tags */
@@ -156,23 +157,25 @@ extern const tag_and_class_st _asn1_tags[];
 /* Returns the first 8 bits.            */
 /* Used with the field type of asn1_node_st */
 /****************************************/
-inline static unsigned int type_field(unsigned int ntype)
+inline static unsigned int
+type_field (unsigned int ntype)
 {
   return (ntype & 0xff);
 }
 
 /* To convert old types from a static structure */
-inline static unsigned int convert_old_type(unsigned int ntype)
+inline static unsigned int
+convert_old_type (unsigned int ntype)
 {
-unsigned int type = ntype & 0xff;
+  unsigned int type = ntype & 0xff;
   if (type == ASN1_ETYPE_TIME)
     {
       if (ntype & CONST_UTC)
-        type = ASN1_ETYPE_UTC_TIME;
+	type = ASN1_ETYPE_UTC_TIME;
       else
-        type = ASN1_ETYPE_GENERALIZED_TIME;
+	type = ASN1_ETYPE_GENERALIZED_TIME;
 
-      ntype &= ~(CONST_UTC|CONST_GENERALIZED);
+      ntype &= ~(CONST_UTC | CONST_GENERALIZED);
       ntype &= 0xffffff00;
       ntype |= type;
 

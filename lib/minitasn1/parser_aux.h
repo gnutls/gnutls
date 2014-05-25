@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -21,8 +21,6 @@
 
 #ifndef _PARSER_AUX_H
 #define _PARSER_AUX_H
-
-#define DER_LEN 16
 
 /***************************************/
 /*  Functions used by ASN.1 parser     */
@@ -48,12 +46,13 @@ asn1_node _asn1_set_right (asn1_node node, asn1_node right);
 
 asn1_node _asn1_get_last_right (asn1_node node);
 
-void _asn1_remove_node (asn1_node node);
+void _asn1_remove_node (asn1_node node, unsigned int flags);
 
 void _asn1_delete_list (void);
 
 void _asn1_delete_list_and_nodes (void);
 
+#define LTOSTR_MAX_SIZE 20
 char *_asn1_ltostr (long v, char *str);
 
 asn1_node _asn1_find_up (asn1_node node);

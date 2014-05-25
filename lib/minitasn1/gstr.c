@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -68,6 +68,7 @@ _asn1_str_cpy (char *dest, size_t dest_tot_size, const char *src)
 	  dest[str_size] = 0;
 	  return str_size;
 	}
-      else return 0;
+      else
+	return 0;
     }
 }

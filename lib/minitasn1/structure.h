@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2014 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -29,8 +29,7 @@
 #define _STRUCTURE_H
 
 int _asn1_create_static_structure (asn1_node pointer,
-					    char *output_file_name,
-					    char *vector_name);
+				   char *output_file_name, char *vector_name);
 
 asn1_node _asn1_copy_structure3 (asn1_node source_node);
 
