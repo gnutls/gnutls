@@ -40,7 +40,7 @@
 #include <ocsptool-common.h>
 
 #define MAX_BUF 4*1024
-#define HEADER_PATTERN "POST / HTTP/1.1\r\n" \
+#define HEADER_PATTERN "POST /%s HTTP/1.1\r\n" \
   "Host: %s\r\n" \
   "Accept: */*\r\n" \
   "Content-Type: application/ocsp-request\r\n" \
@@ -49,18 +49,23 @@
 static char buffer[MAX_BUF + 1];
 
 /* returns the host part of a URL */
-static const char* host_from_url(const char* url, unsigned int* port)
+static const char* host_from_url(const char* url, unsigned int* port, const char **path)
 {
 static char hostname[512];
 char * p;
 
   *port = 0;
+  *path = "";
 
   if ((p=strstr(url, "http://")) != NULL)
     {
       snprintf(hostname, sizeof(hostname), "%s", p+7);
       p = strchr(hostname, '/');
-      if (p != NULL) *p = 0;
+      if (p != NULL)
+        {
+          *p = 0;
+          *path = p+1;
+        }
 
       p = strchr(hostname, ':');
       if (p != NULL) {
@@ -146,7 +151,7 @@ char* url = (void*)server;
 char headers[1024];
 char service[16];
 unsigned char * p;
-const char *hostname;
+const char *hostname, *path;
 unsigned int headers_size = 0, port;
 socket_st hd;
 
@@ -176,7 +181,7 @@ socket_st hd;
       gnutls_free(data.data);
     }
     
-  hostname = host_from_url(url, &port);
+  hostname = host_from_url(url, &port, &path);
   if (port != 0)
     snprintf(service, sizeof(service), "%u", port);
   else strcpy(service, "80");
@@ -187,7 +192,7 @@ socket_st hd;
 
   _generate_request(cert, issuer, &req, nonce);
 
-  snprintf(headers, sizeof(headers), HEADER_PATTERN, hostname, (unsigned int)req.size);
+  snprintf(headers, sizeof(headers), HEADER_PATTERN, path, hostname, (unsigned int)req.size);
   headers_size = strlen(headers);
   
   socket_open(&hd, hostname, service, 0);
