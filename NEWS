@@ -20,6 +20,9 @@ create a full chain. This addresses points from https://savannah.gnu.org/support
 ** gnutls-cli: --dane will only check the end certificate if PKIX validation
 has been disabled.
 
+** gnutls-cli: --benchmark-soft-ciphers has been removed. That option cannot
+be emulated with the implicit initialization of gnutls.
+
 ** certtool: Allow multiple organizations and organizational unit names to
 be specified in a template.
 
