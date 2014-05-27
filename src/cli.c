@@ -1346,12 +1346,7 @@ static void cmd_parser(int argc, char **argv)
 		rest = argv[0];
 
 	if (HAVE_OPT(BENCHMARK_CIPHERS)) {
-		benchmark_cipher(1, OPT_VALUE_DEBUG);
-		exit(0);
-	}
-
-	if (HAVE_OPT(BENCHMARK_SOFT_CIPHERS)) {
-		benchmark_cipher(0, OPT_VALUE_DEBUG);
+		benchmark_cipher(OPT_VALUE_DEBUG);
 		exit(0);
 	}
 

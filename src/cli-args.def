@@ -262,12 +262,6 @@ flag = {
 };
 
 flag = {
-    name      = benchmark-soft-ciphers;
-    descrip   = "Benchmark individual software ciphers (no hw acceleration)";
-    doc      = "";
-};
-
-flag = {
     name      = benchmark-tls-kx;
     descrip   = "Benchmark TLS key exchange methods";
     doc      = "";

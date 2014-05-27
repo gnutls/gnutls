@@ -191,16 +191,13 @@ static void mac_bench(int algo, int size)
 	free(_key);
 }
 
-void benchmark_cipher(int init, int debug_level)
+void benchmark_cipher(int debug_level)
 {
+	int size = 16;
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(debug_level);
-	int size = 16;
 
-	if (init) {
-		gnutls_global_init();
-		gnutls_rnd(GNUTLS_RND_NONCE, data, sizeof(data));
-	}
+	gnutls_rnd(GNUTLS_RND_NONCE, data, sizeof(data));
 
 	printf("Checking ciphers, payload size: %u\n", size * 1024);
 	cipher_mac_bench(GNUTLS_CIPHER_SALSA20_256, GNUTLS_MAC_SHA1, size);
