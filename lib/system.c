@@ -326,7 +326,7 @@ int _gnutls_find_config_path(char *path, size_t max_size)
 	}
 
 #ifdef _WIN32
-	while(0) {
+	if (home_dir == NULL || home_dir[0] == '\0') {
 		const char *home_drive = getenv("HOMEDRIVE");
 		const char *home_path = getenv("HOMEPATH");
 
@@ -337,20 +337,21 @@ int _gnutls_find_config_path(char *path, size_t max_size)
 		}
 	}
 #elif defined(HAVE_GETPWUID_R)
-	while(0) {
+	if (home_dir == NULL || home_dir[0] == '\0') {
 		struct passwd *pwd;
 		struct passwd _pwd;
+		int ret;
 		char tmp[512];
 
-		getpwuid_r(getuid(), &_pwd, tmp, sizeof(tmp), &pwd);
-		if (pwd != NULL) {
+		ret = getpwuid_r(getuid(), &_pwd, tmp, sizeof(tmp), &pwd);
+		if (ret == 0 && pwd != NULL) {
 			snprintf(path, max_size, "%s/" CONFIG_PATH, pwd->pw_dir);
 		} else {
 			path[0] = 0;
 		}
 	}
 #else
-	while(0) {
+	if (home_dir == NULL || home_dir[0] == '\0') {
 			path[0] = 0;
 	}
 #endif
