@@ -15,8 +15,18 @@ Issue reported by Joonas Kuorilehto of Codenomicon.
 fixed. The leaks were identified using valgrind and the Codenomicon
 TLS test suite.
 
+** libgnutls: increased the maximum certificate size buffer
+in the PKCS #11 subsystem.
+
+** libgnutls: Check the return code of getpwuid_r() instead of relying
+on the result value. That avoids issue in certain systems, when using
+tofu authentication and the home path cannot be determined.
+
 ** gnutls-cli: if dane is requested but not PKIX verification, then
 only do verify the end certificate.
+
+** ocsptool: Include path in ocsp request. This resolves #108582
+(https://savannah.gnu.org/support/?108582), reported by Matt McCutchen.
 
 ** API and ABI modifications:
 No changes since last version.
