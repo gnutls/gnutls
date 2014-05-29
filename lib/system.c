@@ -355,10 +355,11 @@ const char *home_dir = getenv ("HOME");
     {
       struct passwd *pwd;
       struct passwd _pwd;
+      int ret;
       char buf[1024];
 
-      getpwuid_r(getuid(), &_pwd, buf, sizeof(buf), &pwd);
-      if (pwd != NULL)
+      ret = getpwuid_r(getuid(), &_pwd, buf, sizeof(buf), &pwd);
+      if (ret == 0 && pwd != NULL)
         {
           snprintf(tmp_home_dir, sizeof(tmp_home_dir), "%s", pwd->pw_dir);
         }
