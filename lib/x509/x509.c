@@ -1889,7 +1889,7 @@ static int decode_user_notice(const void* data, size_t size, gnutls_datum_t *txt
       goto cleanup;
     }
 
-  if (strcmp(choice_type, "utf8String") != 0 && strcmp(choice_type, "IA5String") != 0 &&
+  if (strcmp(choice_type, "utf8String") != 0 && strcmp(choice_type, "ia5String") != 0 &&
       strcmp(choice_type, "bmpString") != 0 && strcmp(choice_type, "visibleString") != 0)
     {
       gnutls_assert();
