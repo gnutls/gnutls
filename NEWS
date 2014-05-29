@@ -2,6 +2,22 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.25 (unreleased)
+
+** libgnutls: increased the maximum certificate size buffer 
+in the PKCS #11 subsystem.
+
+** libgnutls: Check the return code of getpwuid_r() instead of relying
+on the result value. That avoids issue in certain systems, when using
+tofu authentication and the home path cannot be determined.
+
+** ocsptool: Include path in ocsp request. This resolves #108582
+(https://savannah.gnu.org/support/?108582), reported by Matt McCutchen.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.24 (released 2014-05-06)
 
 ** libgnutls: Fixed issue with the check of incoming data when two
