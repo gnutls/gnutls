@@ -14,6 +14,13 @@ Issue reported by Joonas Kuorilehto of Codenomicon.
 ** libgnutls: gnutls_global_set_mutex() was modified to operate with the
 new initialization process.
 
+** libgnutls: increased the maximum certificate size buffer
+in the PKCS #11 subsystem.
+
+** libgnutls: Check the return code of getpwuid_r() instead of relying
+on the result value. That avoids issue in certain systems, when using
+tofu authentication and the home path cannot be determined.
+
 ** libgnutls-dane: Improved dane_verify_session_crt(), which now attempts to
 create a full chain. This addresses points from https://savannah.gnu.org/support/index.php?108552
 
@@ -27,6 +34,9 @@ be emulated with the implicit initialization of gnutls.
 be specified in a template.
 
 ** certtool: Warn when invalid configuration options are set to a template.
+
+** ocsptool: Include path in ocsp request. This resolves #108582
+(https://savannah.gnu.org/support/?108582), reported by Matt McCutchen.
 
 ** API and ABI modifications:
 gnutls_credentials_get: Added
