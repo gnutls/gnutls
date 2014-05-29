@@ -144,6 +144,7 @@ gnutls_compression_get_name@GNUTLS_1_4
 gnutls_compression_list@GNUTLS_1_4
 gnutls_compression_set_priority@GNUTLS_1_4
 gnutls_credentials_clear@GNUTLS_1_4
+gnutls_credentials_get@GNUTLS_3_1_0
 gnutls_credentials_set@GNUTLS_1_4
 gnutls_db_check_entry@GNUTLS_1_4
 gnutls_db_check_entry_time@GNUTLS_3_1_0

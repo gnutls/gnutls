@@ -197,6 +197,7 @@ APIMANS += gnutls_compression_get_name.3
 APIMANS += gnutls_compression_list.3
 APIMANS += gnutls_compression_set_priority.3
 APIMANS += gnutls_credentials_clear.3
+APIMANS += gnutls_credentials_get.3
 APIMANS += gnutls_credentials_set.3
 APIMANS += gnutls_db_check_entry.3
 APIMANS += gnutls_db_check_entry_time.3
