@@ -43,7 +43,7 @@
 #define MAX_PROVIDERS 16
 
 /* XXX: try to eliminate this */
-#define MAX_CERT_SIZE 8*1024
+#define MAX_CERT_SIZE 32*1024
 #define MAX_SLOTS 48
 
 extern void *_gnutls_pkcs11_mutex;
