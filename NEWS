@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.1.25 (unreleased)
 
+** libgnutls: Eliminated memory corruption issue in Server Hello parsing.
+Issue reported by Joonas Kuorilehto of Codenomicon.
+
 ** libgnutls: increased the maximum certificate size buffer 
 in the PKCS #11 subsystem.
 
