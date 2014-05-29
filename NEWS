@@ -3,24 +3,22 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.2.15 (unreleased)
+* Version 3.2.15 (released 2014-05-30)
 
-** libgnutls: Eliminated null pointer dereferences in ASN.1 parser.
-Issues discovered using the Codenomicon TLS test suite.
-
-** libgnutls: Eliminated null pointer dereference in ciphersuite parsing.
+** libgnutls: Eliminated memory corruption issue in Server Hello parsing.
 Issue reported by Joonas Kuorilehto of Codenomicon.
 
 ** libgnutls: Several memory leaks caused by error conditions were
 fixed. The leaks were identified using valgrind and the Codenomicon
 TLS test suite.
 
-** libgnutls: increased the maximum certificate size buffer
+** libgnutls: Increased the maximum certificate size buffer
 in the PKCS #11 subsystem.
 
 ** libgnutls: Check the return code of getpwuid_r() instead of relying
 on the result value. That avoids issue in certain systems, when using
-tofu authentication and the home path cannot be determined.
+tofu authentication and the home path cannot be determined. Issue reported
+by Viktor Dukhovni.
 
 ** gnutls-cli: if dane is requested but not PKIX verification, then
 only do verify the end certificate.
