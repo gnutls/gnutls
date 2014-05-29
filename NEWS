@@ -2,17 +2,18 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.25 (unreleased)
+* Version 3.1.25 (released 2014-05-30)
 
 ** libgnutls: Eliminated memory corruption issue in Server Hello parsing.
 Issue reported by Joonas Kuorilehto of Codenomicon.
 
-** libgnutls: increased the maximum certificate size buffer 
+** libgnutls: Increased the maximum certificate size buffer 
 in the PKCS #11 subsystem.
 
 ** libgnutls: Check the return code of getpwuid_r() instead of relying
 on the result value. That avoids issue in certain systems, when using
-tofu authentication and the home path cannot be determined.
+tofu authentication and the home path cannot be determined. Issue reported
+by Viktor Dukhovni.
 
 ** ocsptool: Include path in ocsp request. This resolves #108582
 (https://savannah.gnu.org/support/?108582), reported by Matt McCutchen.
