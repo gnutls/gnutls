@@ -710,3 +710,4 @@ tests/suite/softhsm*.db-journal
 tests/suite/softhsm*.config
 gl/errno.h
 tests/suite/pkcs11-get-issuer
+tests/long-session-id
