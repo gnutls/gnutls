@@ -3,7 +3,7 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.4 (unreleased)
+* Version 3.3.4 (released 2014-05-31)
 
 ** libgnutls: Updated Andy Polyakov's assembly code. That prevents a
 crash on certain CPUs.
