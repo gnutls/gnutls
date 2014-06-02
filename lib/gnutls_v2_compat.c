@@ -54,15 +54,15 @@ _gnutls_handshake_select_v2_suite(gnutls_session_t session,
 	_gnutls_handshake_log
 	    ("HSK[%p]: Parsing a version 2.0 client hello.\n", session);
 
+	if (datalen % 3 != 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
+
 	_data = gnutls_malloc(datalen);
 	if (_data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	if (datalen % 3 != 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
 	i = _datalen = 0;
