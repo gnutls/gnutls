@@ -144,7 +144,7 @@ AC_MSG_ERROR([[
   AC_ARG_ENABLE(dtls-srtp-support,
     AS_HELP_STRING([--disable-dtls-srtp-support],
                    [disable support for the DTLS-SRTP extension]),
-    ac_enable_srtp=no)
+    ac_enable_srtp=$enableval)
   if test x$ac_enable_srtp != xno; then
    AC_MSG_RESULT(no)
    AC_DEFINE([ENABLE_DTLS_SRTP], 1, [enable DTLS-SRTP support])
@@ -187,7 +187,7 @@ AC_MSG_ERROR([[
   AC_ARG_ENABLE(heartbeat-support,
     AS_HELP_STRING([--disable-heartbeat-support],
                    [disable support for the heartbeat extension]),
-    ac_enable_heartbeat=$enableval,ac_enable_heartbeat=yes)
+    ac_enable_heartbeat=$enableval)
   if test x$ac_enable_heartbeat != xno; then
    AC_MSG_RESULT(yes)
    AC_DEFINE([ENABLE_HEARTBEAT], 1, [enable heartbeat support])
@@ -201,7 +201,7 @@ AC_MSG_ERROR([[
   AC_ARG_ENABLE(srp-authentication,
     AS_HELP_STRING([--disable-srp-authentication],
                    [disable the SRP authentication support]),
-    ac_enable_srp=no)
+    ac_enable_srp=$enableval)
   if test x$ac_enable_srp != xno; then
    AC_MSG_RESULT(no)
    AC_DEFINE([ENABLE_SRP], 1, [enable SRP authentication])
@@ -216,7 +216,7 @@ AC_MSG_ERROR([[
   AC_ARG_ENABLE(psk-authentication,
     AS_HELP_STRING([--disable-psk-authentication],
                    [disable the PSK authentication support]),
-    ac_enable_psk=no)
+    ac_enable_psk=$enableval)
   if test x$ac_enable_psk != xno; then
    AC_MSG_RESULT(no)
    AC_DEFINE([ENABLE_PSK], 1, [enable PSK authentication])
@@ -231,7 +231,7 @@ AC_MSG_ERROR([[
   AC_ARG_ENABLE(anon-authentication,
     AS_HELP_STRING([--disable-anon-authentication],
                    [disable the anonymous authentication support]),
-    ac_enable_anon=no)
+    ac_enable_anon=$enableval)
   if test x$ac_enable_anon != xno; then
    AC_MSG_RESULT(no)
    AC_DEFINE([ENABLE_ANON], 1, [enable anonymous authentication])
@@ -274,7 +274,7 @@ AC_MSG_ERROR([[
   AC_ARG_ENABLE(openpgp-authentication,
     AS_HELP_STRING([--disable-openpgp-authentication],
                    [disable the OpenPGP authentication support]),
-    ac_enable_openpgp=no)
+    ac_enable_openpgp=$enableval)
   if test x$ac_enable_openpgp = xno; then
    AC_MSG_RESULT(yes)
    ac_full=0
@@ -288,7 +288,7 @@ AC_MSG_ERROR([[
   AC_MSG_CHECKING([whether to add cryptodev support])
   AC_ARG_ENABLE(cryptodev,
     AS_HELP_STRING([--enable-cryptodev], [enable cryptodev support]),
-  enable_cryptodev=yes,enable_cryptodev=no)
+  enable_cryptodev=$enableval,enable_cryptodev=no)
   AC_MSG_RESULT($enable_cryptodev)
 
   if test "$enable_cryptodev" = "yes"; then
@@ -299,7 +299,7 @@ AC_MSG_ERROR([[
   AC_ARG_ENABLE(ocsp,
     AS_HELP_STRING([--disable-ocsp],
                    [disable OCSP support]),
-    ac_enable_ocsp=no)
+    ac_enable_ocsp=$enableval,ac_enable_ocsp=yes)
   if test x$ac_enable_ocsp != xno; then
    ac_enable_ocsp=yes
    AC_MSG_RESULT(no)
