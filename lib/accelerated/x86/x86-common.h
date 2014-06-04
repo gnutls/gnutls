@@ -29,11 +29,13 @@ extern unsigned int _gnutls_x86_cpuid_s[4];
 void gnutls_cpuid(unsigned int func, unsigned int *ax, unsigned int *bx,
 		  unsigned int *cx, unsigned int *dx);
 
-#ifdef ASM_X86_32
+# ifdef ASM_X86_32
 unsigned int gnutls_have_cpuid(void);
-#else
-#define gnutls_have_cpuid() 1
-#endif				/* ASM_X86_32 */
+# else
+#  define gnutls_have_cpuid() 1
+# endif				/* ASM_X86_32 */
+
+#endif
 
 #define NN_HASH(name, update_func, digest_func, NAME) {	\
  #name,						\
@@ -44,5 +46,3 @@ unsigned int gnutls_have_cpuid(void);
  (nettle_hash_update_func *) update_func,	\
  (nettle_hash_digest_func *) digest_func	\
 } 
-
-#endif
