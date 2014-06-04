@@ -5,12 +5,12 @@ See the end for copying conditions.
 
 * Version 3.3.5 (unreleased)
 
-** libgnutls: gnutls_x509_crl_get_crt_serial2() was added as a
+** libgnutls: gnutls_x509_crl_iter_crt_serial() was added as a
 faster variant of gnutls_x509_crl_get_crt_serial() when coping with
 very large structures.
 
 ** API and ABI modifications:
-gnutls_x509_crl_get_crt_serial2: Added
+gnutls_x509_crl_iter_crt_serial: Added
 
 
 * Version 3.3.4 (released 2014-05-31)

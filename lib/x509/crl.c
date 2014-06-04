@@ -546,7 +546,7 @@ gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
 }
 
 /**
- * gnutls_x509_crl_get_crt_serial2:
+ * gnutls_x509_crl_iter_crt_serial:
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @serial: where the serial number will be copied
  * @serial_size: initially holds the size of serial
@@ -566,7 +566,7 @@ gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
  *   negative error value. and a negative error code on error.
  **/
 int
-gnutls_x509_crl_get_crt_serial2(gnutls_x509_crl_t crl,
+gnutls_x509_crl_iter_crt_serial(gnutls_x509_crl_t crl,
 			       unsigned char *serial,
 			       size_t * serial_size, time_t * t)
 {

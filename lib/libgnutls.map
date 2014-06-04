@@ -1007,7 +1007,7 @@ GNUTLS_3_1_0 {
 	gnutls_openpgp_crt_check_hostname2;
 	gnutls_certificate_verify_peers;
 	gnutls_credentials_get;
-	gnutls_x509_crl_get_crt_serial2;
+	gnutls_x509_crl_iter_crt_serial;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

@@ -2278,11 +2278,11 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 			time_t tim;
 
 			err =
-			    gnutls_x509_crl_get_crt_serial2(crl, serial,
+			    gnutls_x509_crl_iter_crt_serial(crl, serial,
 							   &serial_size,
 							   &tim);
 			if (err < 0) {
-				addf(str, "error: get_crt_serial2: %s\n",
+				addf(str, "error: iter_crt_serial: %s\n",
 				     gnutls_strerror(err));
 				break;
 			} else {
