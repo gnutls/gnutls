@@ -2281,10 +2281,11 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 			    gnutls_x509_crl_get_crt_serial(crl, j, serial,
 							   &serial_size,
 							   &tim);
-			if (err < 0)
+			if (err < 0) {
 				addf(str, "error: get_crt_serial: %s\n",
 				     gnutls_strerror(err));
-			else {
+				break;
+			} else {
 				char s[42];
 				size_t max = sizeof(s);
 				struct tm t;
