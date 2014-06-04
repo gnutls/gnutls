@@ -103,7 +103,8 @@ int gnutls_random_art(gnutls_random_art_t type,
  **/
 void gnutls_dh_set_prime_bits(gnutls_session_t session, unsigned int bits)
 {
-	if (bits <= 512 && bits != 0)
+	if (bits <= gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_VERY_WEAK)
+		&& bits != 0)
 		_gnutls_audit_log(session,
 				  "Note that the security level of the Diffie-Hellman key exchange has been lowered to %u bits and this may allow decryption of the session data\n",
 				  bits);
