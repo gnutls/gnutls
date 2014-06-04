@@ -2571,7 +2571,7 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 		for (i = 0; i < ncerts; i++) {
 			serial_size = sizeof(serial);
 			ret =
-			    gnutls_x509_crl_get_crt_serial(crl_list[j], i,
+			    gnutls_x509_crl_get_crt_serial2(crl_list[j],
 							   serial,
 							   &serial_size,
 							   NULL);

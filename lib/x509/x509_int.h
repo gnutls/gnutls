@@ -44,6 +44,10 @@
 
 typedef struct gnutls_x509_crl_int {
 	ASN1_TYPE crl;
+
+	/* This is used to optimize reads by gnutls_x509_crl_get_crt_serial2() */
+	ASN1_TYPE rcache;
+	unsigned rcache_idx;
 	int use_extensions;
 	gnutls_datum_t raw_issuer_dn;
 } gnutls_x509_crl_int;

@@ -546,6 +546,84 @@ gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
 }
 
 /**
+ * gnutls_x509_crl_get_crt_serial2:
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ * @serial: where the serial number will be copied
+ * @serial_size: initially holds the size of serial
+ * @t: if non null, will hold the time this certificate was revoked
+ *
+ * This function performs the same as gnutls_x509_crl_get_crt_serial(),
+ * but reads sequentially and keeps state internally (in the @crl structure) 
+ * between calls. That allows it to provide better performance in sequences 
+ * with many elements (50000+).
+ * However, it is not thread safe, if the same @crl structure is accessed
+ * by many threads.
+ *
+ * When past the last element is accessed %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * is returned and the internal index is reset.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on error.
+ **/
+int
+gnutls_x509_crl_get_crt_serial2(gnutls_x509_crl_t crl,
+			       unsigned char *serial,
+			       size_t * serial_size, time_t * t)
+{
+
+	int result, _serial_size;
+	char serial_name[ASN1_MAX_NAME_SIZE];
+	char date_name[ASN1_MAX_NAME_SIZE];
+
+	if (crl == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (crl->rcache == NULL) {
+		crl->rcache = asn1_find_node (crl->crl, "tbsCertList.revokedCertificates.?1");
+		crl->rcache_idx = 1;
+	} else {
+		snprintf(serial_name, sizeof(serial_name),
+			 "?%d", crl->rcache_idx);
+		crl->rcache = asn1_find_node (crl->rcache, serial_name);
+	}
+	if (crl->rcache == NULL) {
+		/* reset */
+		crl->rcache = NULL;
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	}
+
+	snprintf(serial_name, sizeof(serial_name),
+		 "?%d.userCertificate", crl->rcache_idx);
+
+	_serial_size = *serial_size;
+	result =
+	    asn1_read_value(crl->rcache, serial_name, serial, &_serial_size);
+
+	*serial_size = _serial_size;
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			/* reset */
+			crl->rcache = NULL;
+			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		}
+		return _gnutls_asn2err(result);
+	}
+
+	if (t) {
+		snprintf(date_name, sizeof(date_name),
+			 "?%d.revocationDate", crl->rcache_idx);
+		*t = _gnutls_x509_get_time(crl->rcache, date_name, 0);
+	}
+
+	crl->rcache_idx++;
+
+	return 0;
+}
+
+/**
  * gnutls_x509_crl_get_raw_issuer_dn:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @dn: will hold the starting point of the DN
