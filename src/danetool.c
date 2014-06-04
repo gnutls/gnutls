@@ -74,6 +74,7 @@ static void tls_log_func(int level, const char *str)
 
 int main(int argc, char **argv)
 {
+	fix_lbuffer(0);
 	cmd_parser(argc, argv);
 
 	return 0;
@@ -234,8 +235,8 @@ static void dane_check(const char *host, const char *proto,
 		}
 
 
-		size = buffer_size;
-		ret = gnutls_hex_encode(&data, (void *) buffer, &size);
+		size = lbuffer_size;
+		ret = gnutls_hex_encode(&data, (void *) lbuffer, &size);
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_hex_encode: %s\n",
 				dane_strerror(ret));
@@ -247,14 +248,14 @@ static void dane_check(const char *host, const char *proto,
 
 		fprintf(outfile,
 			"_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n",
-			port, proto, host, usage, type, match, buffer);
+			port, proto, host, usage, type, match, lbuffer);
 		printf("Certificate usage: %s (%.2x)\n",
 		       dane_cert_usage_name(usage), usage);
 		printf("Certificate type:  %s (%.2x)\n",
 		       dane_cert_type_name(type), type);
 		printf("Contents:          %s (%.2x)\n",
 		       dane_match_type_name(match), match);
-		printf("Data:              %s\n", buffer);
+		printf("Data:              %s\n", lbuffer);
 
 		/* Verify the DANE data */
 		if (cinfo->cert) {
@@ -376,10 +377,10 @@ static void dane_info(const char *host, const char *proto,
 	if (crt != NULL && HAVE_OPT(X509)) {
 		selector = 0;	/* X.509 */
 
-		size = buffer_size;
+		size = lbuffer_size;
 		ret =
 		    gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_DER,
-					   buffer, &size);
+					   lbuffer, &size);
 		if (ret < 0) {
 			fprintf(stderr, "export error: %s\n",
 				gnutls_strerror(ret));
@@ -407,11 +408,11 @@ static void dane_info(const char *host, const char *proto,
 				exit(1);
 			}
 
-			size = buffer_size;
+			size = lbuffer_size;
 			ret =
 			    gnutls_pubkey_export(pubkey,
 						 GNUTLS_X509_FMT_DER,
-						 buffer, &size);
+						 lbuffer, &size);
 			if (ret < 0) {
 				fprintf(stderr, "pubkey_export: %s\n",
 					gnutls_strerror(ret));
@@ -422,11 +423,11 @@ static void dane_info(const char *host, const char *proto,
 		} else {
 			pubkey = load_pubkey(1, cinfo);
 
-			size = buffer_size;
+			size = lbuffer_size;
 			ret =
 			    gnutls_pubkey_export(pubkey,
 						 GNUTLS_X509_FMT_DER,
-						 buffer, &size);
+						 lbuffer, &size);
 			if (ret < 0) {
 				fprintf(stderr, "export error: %s\n",
 					gnutls_strerror(ret));
@@ -445,7 +446,7 @@ static void dane_info(const char *host, const char *proto,
 		default_dig = GNUTLS_DIG_SHA256;
 	}
 
-	ret = gnutls_hash_fast(default_dig, buffer, size, digest);
+	ret = gnutls_hash_fast(default_dig, lbuffer, size, digest);
 	if (ret < 0) {
 		fprintf(stderr, "hash error: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -472,8 +473,8 @@ static void dane_info(const char *host, const char *proto,
 	t.data = digest;
 	t.size = gnutls_hash_get_len(default_dig);
 
-	size = buffer_size;
-	ret = gnutls_hex_encode(&t, (void *) buffer, &size);
+	size = lbuffer_size;
+	ret = gnutls_hex_encode(&t, (void *) lbuffer, &size);
 	if (ret < 0) {
 		fprintf(stderr, "hex encode error: %s\n",
 			gnutls_strerror(ret));
@@ -481,6 +482,6 @@ static void dane_info(const char *host, const char *proto,
 	}
 
 	fprintf(outfile, "_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n",
-		port, proto, host, usage, selector, type, buffer);
+		port, proto, host, usage, selector, type, lbuffer);
 
 }

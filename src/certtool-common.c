@@ -45,9 +45,23 @@
 /* Gnulib portability files. */
 #include <read-file.h>
 
-unsigned char buffer[64 * 1024];
-const int buffer_size = sizeof(buffer);
+unsigned char *lbuffer = NULL;
+int lbuffer_size = 0;
 
+void fix_lbuffer(unsigned size)
+{
+	if (lbuffer_size == 0 || lbuffer == NULL) {
+		if (size == 0)
+			lbuffer_size = 64*1024;
+		else
+			lbuffer_size = size;
+		lbuffer = malloc(lbuffer_size);
+		if (lbuffer == NULL) {
+			fprintf(stderr, "memory error");
+			exit(1);
+		}
+	}
+}
 
 FILE *safe_open_rw(const char *file, int privkey_op)
 {
@@ -351,6 +365,8 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 	size_t size;
 	int ptr_size;
 
+	fix_lbuffer(0);
+
 	*crt_size = 0;
 	if (info->verbose)
 		fprintf(stderr, "Loading certificate list...\n");
@@ -369,12 +385,12 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 		exit(1);
 	}
 
-	size = fread(buffer, 1, sizeof(buffer) - 1, fd);
-	buffer[size] = 0;
+	size = fread(lbuffer, 1, sizeof(lbuffer) - 1, fd);
+	lbuffer[size] = 0;
 
 	fclose(fd);
 
-	ptr = (void *) buffer;
+	ptr = (void *) lbuffer;
 	ptr_size = size;
 
 	for (i = 0; i < MAX_CERTS; i++) {
@@ -407,7 +423,7 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 		ptr_size = size;
 		ptr_size -=
 		    (unsigned int) ((unsigned char *) ptr -
-				    (unsigned char *) buffer);
+				    (unsigned char *) lbuffer);
 
 		if (ptr_size < 0)
 			break;
@@ -800,6 +816,8 @@ void _pubkey_info(FILE * outfile,
 	int ret;
 	size_t size;
 
+	fix_lbuffer(0);
+
 	ret = gnutls_pubkey_print(pubkey, format, &data);
 	if (ret < 0) {
 		fprintf(stderr, "pubkey_print error: %s\n",
@@ -810,16 +828,16 @@ void _pubkey_info(FILE * outfile,
 	fprintf(outfile, "%s\n", data.data);
 	gnutls_free(data.data);
 
-	size = buffer_size;
+	size = lbuffer_size;
 	ret =
-	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_PEM, buffer,
+	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_PEM, lbuffer,
 				 &size);
 	if (ret < 0) {
 		fprintf(stderr, "export error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
-	fprintf(outfile, "\n%s\n", buffer);
+	fprintf(outfile, "\n%s\n", lbuffer);
 }
 
 static void
@@ -855,6 +873,8 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 	gnutls_datum_t p, g;
 	unsigned int q_bits = 0;
 
+	fix_lbuffer(0);
+
 	if (gnutls_dh_params_init(&dh_params) < 0) {
 		fprintf(stderr, "Error in dh parameter initialization\n");
 		exit(1);
@@ -883,18 +903,18 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 		print_dh_info(outfile, &p, &g, q_bits, ci->cprint);
 
 	if (!ci->cprint) {	/* generate a PKCS#3 structure */
-		size_t len = buffer_size;
+		size_t len = lbuffer_size;
 
 		ret =
 		    gnutls_dh_params_export_pkcs3(dh_params,
 						  ci->outcert_format,
-						  buffer, &len);
+						  lbuffer, &len);
 
 		if (ret == 0) {
 			if (ci->outcert_format == GNUTLS_X509_FMT_PEM) {
-				fprintf(outfile, "\n%s", buffer);
+				fprintf(outfile, "\n%s", lbuffer);
 			} else {
-				fwrite(buffer, 1, len, outfile);
+				fwrite(lbuffer, 1, len, outfile);
 			}
 		} else {
 			fprintf(stderr, "Error: %s\n",
@@ -914,6 +934,8 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 	gnutls_datum_t p, g;
 	int bits = get_bits(GNUTLS_PK_DH, info->bits, info->sec_param, 1);
 	unsigned int q_bits = 0;
+
+	fix_lbuffer(0);
 
 	gnutls_dh_params_init(&dh_params);
 
@@ -981,15 +1003,15 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 	print_dh_info(outfile, &p, &g, q_bits, info->cprint);
 
 	if (!info->cprint) {	/* generate a PKCS#3 structure */
-		size_t len = buffer_size;
+		size_t len = lbuffer_size;
 
 		ret =
 		    gnutls_dh_params_export_pkcs3(dh_params,
 						  GNUTLS_X509_FMT_PEM,
-						  buffer, &len);
+						  lbuffer, &len);
 
 		if (ret == 0) {
-			fprintf(outfile, "\n%s", buffer);
+			fprintf(outfile, "\n%s", lbuffer);
 		} else {
 			fprintf(stderr, "Error: %s\n",
 				gnutls_strerror(ret));

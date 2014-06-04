@@ -105,8 +105,9 @@ FILE *safe_open_rw(const char *file, int privkey_op);
 const char *get_password(common_info_st * cinfo, unsigned int *flags,
 			 int confirm);
 
-extern unsigned char buffer[];
-extern const int buffer_size;
+extern unsigned char *lbuffer;
+extern int lbuffer_size;
 
+void fix_lbuffer(unsigned);
 
 #endif
