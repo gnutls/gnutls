@@ -600,7 +600,7 @@ gnutls_x509_crl_iter_crt_serial(gnutls_x509_crl_t crl,
 	}
 
 	if (*iter == NULL) {
-		*iter = gnutls_calloc(1, sizeof(*iter));
+		*iter = gnutls_calloc(1, sizeof(struct gnutls_x509_crl_iter));
 		if (*iter == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 	}
