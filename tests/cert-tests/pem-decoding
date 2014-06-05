@@ -26,7 +26,7 @@ srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 DIFF=${DIFF:-diff}
 if ! test -z "${VALGRIND}";then
-VALGRIND="libtool --mode=execute ${VALGRIND}"
+VALGRIND="${LIBTOOL:libtool} --mode=execute ${VALGRIND}"
 fi
 
 #check whether "funny" spaces can be interpreted

@@ -44,6 +44,7 @@ endif
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"				\
 	VALGRIND="$(VALGRIND)"			\
+	LIBTOOL="$(LIBTOOL)"			\
 	top_builddir="$(top_builddir)"		\
 	srcdir="$(srcdir)"
 
