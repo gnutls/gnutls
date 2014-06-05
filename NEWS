@@ -10,6 +10,7 @@ faster variant of gnutls_x509_crl_get_crt_serial() when coping with
 very large structures.
 
 ** API and ABI modifications:
+gnutls_x509_crl_iter_deinit: Added
 gnutls_x509_crl_iter_crt_serial: Added
 
 

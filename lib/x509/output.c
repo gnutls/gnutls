@@ -2263,6 +2263,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 	/* Revoked certificates. */
 	{
 		int num = gnutls_x509_crl_get_crt_count(crl);
+		gnutls_x509_crl_iter_t iter = NULL;
 		int j;
 
 		if (num)
@@ -2278,7 +2279,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 			time_t tim;
 
 			err =
-			    gnutls_x509_crl_iter_crt_serial(crl, serial,
+			    gnutls_x509_crl_iter_crt_serial(crl, &iter, serial,
 							   &serial_size,
 							   &tim);
 			if (err < 0) {
@@ -2311,6 +2312,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 					     _("\t\tRevoked at: %s\n"), s);
 			}
 		}
+		gnutls_x509_crl_iter_deinit(iter);
 	}
 
 	/* Signature. */

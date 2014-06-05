@@ -2528,6 +2528,7 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 	uint8_t cert_serial[128];
 	size_t serial_size, cert_serial_size;
 	int ncerts, ret, i, j;
+	gnutls_x509_crl_iter_t iter;
 
 	if (cert == NULL) {
 		gnutls_assert();
@@ -2572,9 +2573,10 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 			serial_size = sizeof(serial);
 			ret =
 			    gnutls_x509_crl_iter_crt_serial(crl_list[j],
-							   serial,
-							   &serial_size,
-							   NULL);
+							    &iter,
+							    serial,
+							    &serial_size,
+							    NULL);
 
 			if (ret < 0) {
 				gnutls_assert();
@@ -2595,6 +2597,9 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 				}
 			}
 		}
+		gnutls_x509_crl_iter_deinit(iter);
+		iter = NULL;
+
 		if (func)
 			func(cert, NULL, crl_list[j], 0);
 

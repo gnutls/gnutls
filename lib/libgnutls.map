@@ -1008,6 +1008,7 @@ GNUTLS_3_1_0 {
 	gnutls_certificate_verify_peers;
 	gnutls_credentials_get;
 	gnutls_x509_crl_iter_crt_serial;
+	gnutls_x509_crl_iter_deinit;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

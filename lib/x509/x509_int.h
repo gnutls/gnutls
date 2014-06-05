@@ -42,6 +42,12 @@
 #define HASH_OID_SHA384 "2.16.840.1.101.3.4.2.2"
 #define HASH_OID_SHA512 "2.16.840.1.101.3.4.2.3"
 
+struct gnutls_x509_crl_iter {
+	/* This is used to optimize reads by gnutls_x509_crl_iter_crt_serial() */
+	ASN1_TYPE rcache;
+	unsigned rcache_idx;
+};
+
 typedef struct gnutls_x509_crl_int {
 	ASN1_TYPE crl;
 

@@ -66,7 +66,7 @@ int gnutls_x509_crl_init(gnutls_x509_crl_t * crl)
 
 /**
  * gnutls_x509_crl_deinit:
- * @crl: The structure to be initialized
+ * @crl: The structure to be deinitialized
  *
  * This function will deinitialize a CRL structure.
  **/
@@ -501,6 +501,9 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl_t crl)
  * This function will retrieve the serial number of the specified, by
  * the index, revoked certificate.
  *
+ * Note that this function will have performance issues in large sequences
+ * of revoked certificates. In that case use gnutls_x509_crl_iter_crt_serial().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. and a negative error code on error.
  **/
@@ -546,67 +549,89 @@ gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
 }
 
 /**
+ * gnutls_x509_crl_iter_deinit:
+ * @iter: The iterator structure to be deinitialized
+ *
+ * This function will deinitialize an iterator structure.
+ **/
+void gnutls_x509_crl_iter_deinit(gnutls_x509_crl_iter_t iter)
+{
+	if (!iter)
+		return;
+
+	gnutls_free(iter);
+}
+
+/**
  * gnutls_x509_crl_iter_crt_serial:
  * @crl: should contain a #gnutls_x509_crl_t structure
+ * @iter: A pointer to an iterator (initially the iterator should be %NULL)
  * @serial: where the serial number will be copied
  * @serial_size: initially holds the size of serial
  * @t: if non null, will hold the time this certificate was revoked
  *
  * This function performs the same as gnutls_x509_crl_get_crt_serial(),
- * but reads sequentially and keeps state internally (in the @crl structure) 
+ * but reads sequentially and keeps state in the iterator 
  * between calls. That allows it to provide better performance in sequences 
  * with many elements (50000+).
- * However, it is not thread safe, if the same @crl structure is accessed
- * by many threads.
  *
  * When past the last element is accessed %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
- * is returned and the internal index is reset.
+ * is returned and the iterator is reset.
+ *
+ * After use, the iterator must be deinitialized using gnutls_x509_crl_iter_deinit().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. and a negative error code on error.
  **/
 int
 gnutls_x509_crl_iter_crt_serial(gnutls_x509_crl_t crl,
-			       unsigned char *serial,
-			       size_t * serial_size, time_t * t)
+				gnutls_x509_crl_iter_t *iter,
+			        unsigned char *serial,
+			        size_t * serial_size, time_t * t)
 {
 
 	int result, _serial_size;
 	char serial_name[ASN1_MAX_NAME_SIZE];
 	char date_name[ASN1_MAX_NAME_SIZE];
 
-	if (crl == NULL) {
+	if (crl == NULL || iter == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (crl->rcache == NULL) {
-		crl->rcache = asn1_find_node (crl->crl, "tbsCertList.revokedCertificates.?1");
-		crl->rcache_idx = 1;
+	if (*iter == NULL) {
+		*iter = gnutls_calloc(1, sizeof(*iter));
+		if (*iter == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
+
+	if ((*iter)->rcache == NULL) {
+		(*iter)->rcache = asn1_find_node (crl->crl, "tbsCertList.revokedCertificates.?1");
+		(*iter)->rcache_idx = 1;
 	} else {
 		snprintf(serial_name, sizeof(serial_name),
-			 "?%d", crl->rcache_idx);
-		crl->rcache = asn1_find_node (crl->rcache, serial_name);
+			 "?%d", (*iter)->rcache_idx);
+		(*iter)->rcache = asn1_find_node ((*iter)->rcache, serial_name);
 	}
-	if (crl->rcache == NULL) {
+	if ((*iter)->rcache == NULL) {
 		/* reset */
-		crl->rcache = NULL;
+		(*iter)->rcache = NULL;
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 	}
 
 	snprintf(serial_name, sizeof(serial_name),
-		 "?%d.userCertificate", crl->rcache_idx);
+		 "?%d.userCertificate", (*iter)->rcache_idx);
 
 	_serial_size = *serial_size;
 	result =
-	    asn1_read_value(crl->rcache, serial_name, serial, &_serial_size);
+	    asn1_read_value((*iter)->rcache, serial_name, serial, &_serial_size);
 
 	*serial_size = _serial_size;
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		if (result == ASN1_ELEMENT_NOT_FOUND) {
 			/* reset */
-			crl->rcache = NULL;
+			(*iter)->rcache = NULL;
 			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 		}
 		return _gnutls_asn2err(result);
@@ -614,11 +639,11 @@ gnutls_x509_crl_iter_crt_serial(gnutls_x509_crl_t crl,
 
 	if (t) {
 		snprintf(date_name, sizeof(date_name),
-			 "?%d.revocationDate", crl->rcache_idx);
-		*t = _gnutls_x509_get_time(crl->rcache, date_name, 0);
+			 "?%d.revocationDate", (*iter)->rcache_idx);
+		*t = _gnutls_x509_get_time((*iter)->rcache, date_name, 0);
 	}
 
-	crl->rcache_idx++;
+	(*iter)->rcache_idx++;
 
 	return 0;
 }
