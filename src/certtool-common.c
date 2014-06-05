@@ -386,7 +386,7 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 		exit(1);
 	}
 
-	size = fread(lbuffer, 1, sizeof(lbuffer) - 1, fd);
+	size = fread(lbuffer, 1, lbuffer_size - 1, fd);
 	lbuffer[size] = 0;
 
 	fclose(fd);
