@@ -151,18 +151,6 @@ flag = {
 };
 
 flag = {
-    name      = hex-numbers;
-    descrip   = "Print big number in an easier format to parse";
-    doc   = "";
-};
-
-flag = {
-    name      = cprint;
-    descrip   = "In certain operations it prints the information in C-friendly format";
-    doc   = "In certain operations it prints the information in C-friendly format, suitable for including into C programs.";
-};
-
-flag = {
     name      = null-password;
     descrip   = "Enforce a NULL password";
     doc   = "This option enforces a NULL password. This is different than the empty or no password in schemas like PKCS #8.";
@@ -172,6 +160,19 @@ flag = {
     name      = empty-password;
     descrip   = "Enforce an empty password";
     doc   = "This option enforces an empty password. This is different than the NULL or no password in schemas like PKCS #8.";
+};
+
+
+flag = {
+    name      = hex-numbers;
+    descrip   = "Print big number in an easier format to parse";
+    doc   = "";
+};
+
+flag = {
+    name      = cprint;
+    descrip   = "In certain operations it prints the information in C-friendly format";
+    doc   = "In certain operations it prints the information in C-friendly format, suitable for including into C programs.";
 };
 
 flag = {
@@ -366,6 +367,12 @@ flag = {
     arg-type  = string;
     descrip   = "Template file to use for non-interactive operation";
     doc   = "";
+};
+
+flag = {
+    name      = stdout-info;
+    descrip   = "Print information to stdout instead of stderr";
+    doc = "";
 };
 
 flag = {

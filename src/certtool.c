@@ -47,6 +47,8 @@
 #include "certtool-args.h"
 #include "certtool-common.h"
 
+static FILE *stdlog = NULL;
+
 static void privkey_info_int(common_info_st *, gnutls_x509_privkey_t key);
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out);
 void pkcs7_info(void);
@@ -113,7 +115,7 @@ generate_private_key_int(common_info_st * cinfo)
 
 	bits = get_bits(key_type, cinfo->bits, cinfo->sec_param, 1);
 
-	fprintf(stderr, "Generating a %d bit %s private key...\n",
+	fprintf(stdlog, "Generating a %d bit %s private key...\n",
 		bits, gnutls_pk_algorithm_get_name(key_type));
 
 	if (bits < 256 && key_type == GNUTLS_PK_EC)
@@ -760,7 +762,7 @@ void generate_self_signed(common_info_st * cinfo)
 	size_t size;
 	int result;
 
-	fprintf(stderr, "Generating a self signed certificate...\n");
+	fprintf(stdlog, "Generating a self signed certificate...\n");
 
 	crt = generate_certificate(&key, NULL, 0, cinfo);
 
@@ -769,9 +771,9 @@ void generate_self_signed(common_info_st * cinfo)
 
 	get_crl_dist_point_set(crt);
 
-	print_certificate_info(crt, stderr, 0);
+	print_certificate_info(crt, stdlog, 0);
 
-	fprintf(stderr, "\n\nSigning certificate...\n");
+	fprintf(stdlog, "\n\nSigning certificate...\n");
 
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, crt, key, get_dig(crt), 0);
@@ -803,7 +805,7 @@ static void generate_signed_certificate(common_info_st * cinfo)
 	gnutls_privkey_t ca_key;
 	gnutls_x509_crt_t ca_crt;
 
-	fprintf(stderr, "Generating a signed certificate...\n");
+	fprintf(stdlog, "Generating a signed certificate...\n");
 
 	ca_key = load_ca_private_key(cinfo);
 	ca_crt = load_ca_cert(cinfo);
@@ -816,9 +818,9 @@ static void generate_signed_certificate(common_info_st * cinfo)
 	/* it doesn't matter if we couldn't copy the CRL dist points.
 	 */
 
-	print_certificate_info(crt, stderr, 0);
+	print_certificate_info(crt, stdlog, 0);
 
-	fprintf(stderr, "\n\nSigning certificate...\n");
+	fprintf(stdlog, "\n\nSigning certificate...\n");
 
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, ca_crt, ca_key,
@@ -850,16 +852,16 @@ static void generate_proxy_certificate(common_info_st * cinfo)
 	size_t size;
 	int result;
 
-	fprintf(stderr, "Generating a proxy certificate...\n");
+	fprintf(stdlog, "Generating a proxy certificate...\n");
 
 	eekey = load_ca_private_key(cinfo);
 	eecrt = load_cert(1, cinfo);
 
 	crt = generate_certificate(&key, eecrt, 1, cinfo);
 
-	print_certificate_info(crt, stderr, 0);
+	print_certificate_info(crt, stdlog, 0);
 
-	fprintf(stderr, "\n\nSigning certificate...\n");
+	fprintf(stdlog, "\n\nSigning certificate...\n");
 
 	result =
 	    gnutls_x509_crt_privkey_sign(crt, eecrt, eekey, get_dig(eecrt),
@@ -892,13 +894,13 @@ static void generate_signed_crl(common_info_st * cinfo)
 	gnutls_privkey_t ca_key;
 	gnutls_x509_crt_t ca_crt;
 
-	fprintf(stderr, "Generating a signed CRL...\n");
+	fprintf(stdlog, "Generating a signed CRL...\n");
 
 	ca_key = load_ca_private_key(cinfo);
 	ca_crt = load_ca_cert(cinfo);
 	crl = generate_crl(ca_crt, cinfo);
 
-	fprintf(stderr, "\n");
+	fprintf(stdlog, "\n");
 	result =
 	    gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_key,
 					 get_dig(ca_crt), 0);
@@ -908,7 +910,7 @@ static void generate_signed_crl(common_info_st * cinfo)
 		exit(1);
 	}
 
-	print_crl_info(crl, stderr);
+	print_crl_info(crl, stdlog);
 
 	gnutls_privkey_deinit(ca_key);
 	gnutls_x509_crl_deinit(crl);
@@ -923,7 +925,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 	gnutls_x509_crt_t ca_crt;
 	time_t tim;
 
-	fprintf(stderr, "Generating a signed certificate...\n");
+	fprintf(stdlog, "Generating a signed certificate...\n");
 
 	ca_key = load_ca_private_key(cinfo);
 	ca_crt = load_ca_cert(cinfo);
@@ -978,6 +980,13 @@ static void cmd_parser(int argc, char **argv)
 
 	optionProcess(&certtoolOptions, argc, argv);
 
+	if (HAVE_OPT(STDOUT_INFO)) {
+		/* print informational messages on stdout instead of stderr */
+		stdlog = stdout;
+	} else {
+		stdlog = stderr;
+	}
+
 	if (HAVE_OPT(GENERATE_PRIVKEY) || HAVE_OPT(GENERATE_REQUEST) ||
 	    HAVE_OPT(KEY_INFO) || HAVE_OPT(PGP_KEY_INFO))
 		privkey_op = 1;
@@ -993,6 +1002,7 @@ static void cmd_parser(int argc, char **argv)
 		}
 	} else
 		outfile = stdout;
+
 
 	if (HAVE_OPT(INFILE)) {
 		struct stat st;
