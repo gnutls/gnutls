@@ -41,6 +41,7 @@
 #include "certtool-common.h"
 #include "certtool-args.h"
 #include "certtool-cfg.h"
+#include <minmax.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -54,7 +55,7 @@ void fix_lbuffer(unsigned size)
 		if (size == 0)
 			lbuffer_size = 64*1024;
 		else
-			lbuffer_size = size;
+			lbuffer_size = MAX(64*1024,size);
 		lbuffer = malloc(lbuffer_size);
 		if (lbuffer == NULL) {
 			fprintf(stderr, "memory error");
