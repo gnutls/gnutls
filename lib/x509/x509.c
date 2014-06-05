@@ -2528,7 +2528,7 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 	uint8_t cert_serial[128];
 	size_t serial_size, cert_serial_size;
 	int ncerts, ret, i, j;
-	gnutls_x509_crl_iter_t iter;
+	gnutls_x509_crl_iter_t iter = NULL;
 
 	if (cert == NULL) {
 		gnutls_assert();
