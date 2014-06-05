@@ -30,6 +30,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/tests/suite/ecore/src/include \
 	-I$(top_srcdir)/tests/suite/ecore/src/lib
 
+EXTRA_DIST = crl/long.crl crl/long.pem
+
 check_PROGRAMS = rng
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la \
@@ -91,7 +93,7 @@ TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn testcompat chain invalid
 
 if ENABLE_PKCS11
 check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer
-TESTS += pkcs11-chainverify pkcs11-get-issuer
+TESTS += pkcs11-chainverify pkcs11-get-issuer crl-test
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
