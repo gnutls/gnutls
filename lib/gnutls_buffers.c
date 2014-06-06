@@ -160,6 +160,40 @@ _gnutls_record_buffer_get(content_type_t type,
 	return length;
 }
 
+int
+_gnutls_record_buffer_get_packet(content_type_t type, gnutls_session_t session, gnutls_packet_st *packet)
+{
+	gnutls_datum_t msg;
+	mbuffer_st *bufel;
+
+	bufel =
+	    _mbuffer_head_pop_first(&session->internals.record_buffer);
+	if (bufel == NULL)
+		return
+		    gnutls_assert_val
+		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+	if (type != bufel->type) {
+		if (IS_DTLS(session))
+			_gnutls_audit_log(session,
+					  "Discarded unexpected %s (%d) packet (expecting: %s)\n",
+					  _gnutls_packet2str(bufel->type),
+					  (int) bufel->type,
+					  _gnutls_packet2str(type));
+		_mbuffer_head_remove_bytes(&session->internals.
+					   record_buffer, msg.size);
+		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+	}
+
+	packet->ptr = bufel;
+	packet->data.size = bufel->msg.size - bufel->mark;
+	packet->data.data = bufel->msg.data + bufel->mark;
+
+	memcpy(packet->sequence, bufel->record_sequence.i, 8);
+
+	return packet->data.size;
+}
+
 inline static void reset_errno(gnutls_session_t session)
 {
 	session->internals.errnum = 0;

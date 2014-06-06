@@ -2979,7 +2979,7 @@ static int recv_handshake_final(gnutls_session_t session, int init)
 
 		ret =
 		    _gnutls_recv_int(session, GNUTLS_CHANGE_CIPHER_SPEC,
-				     -1, &ch, ccs_len, NULL, tleft);
+				     -1, NULL, &ch, ccs_len, NULL, tleft);
 		if (ret <= 0) {
 			ERR("recv ChangeCipherSpec", ret);
 			gnutls_assert();
