@@ -458,6 +458,7 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
 
 	oentry = get_oid_entry(oid);
 	if (oentry == NULL) {	/* unknown OID -> hex */
+ unknown_oid:
 		str->size = value_size * 2 + 2;
 		str->data = gnutls_malloc(str->size);
 		if (str->data == NULL)
@@ -477,14 +478,18 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
 	if (oentry->asn_desc != NULL) {	/* complex */
 		ret =
 		    decode_complex_string(oentry, value, value_size, &tmp);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			/* we failed decoding -> handle it as unknown OID */
+			goto unknown_oid;
+		}
 	} else {
 		ret =
 		    _gnutls_x509_decode_string(oentry->etype, value,
 					       value_size, &tmp);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			/* we failed decoding -> handle it as unknown OID */
+			goto unknown_oid;
+		}
 	}
 
 	ret = str_escape(&tmp, str);
