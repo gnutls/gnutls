@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 3.3.5 (unreleased)
 
+** libgnutls: Added gnutls_record_recv_packet() and gnutls_packet_deinit().
+These functions provide a variant of gnutls_record_recv() that avoids
+the final memcpy of data.
+
 ** libgnutls: gnutls_x509_crl_iter_crt_serial() was added as a
 faster variant of gnutls_x509_crl_get_crt_serial() when coping with
 very large structures.
@@ -17,6 +21,8 @@ X520countryName element.
 ** API and ABI modifications:
 gnutls_x509_crl_iter_deinit: Added
 gnutls_x509_crl_iter_crt_serial: Added
+gnutls_record_recv_packet: Added
+gnutls_packet_deinit: Added
 
 
 * Version 3.3.4 (released 2014-05-31)
