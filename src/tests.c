@@ -130,7 +130,7 @@ test_code_t test_server(gnutls_session_t session)
 	int ret, i = 0;
 	char buf[5 * 1024];
 	char *p;
-	const char snd_buf[] = "GET / HTTP/1.0\n\n";
+	const char snd_buf[] = "GET / HTTP/1.0\r\n\r\n";
 
 	if (verbose == 0)
 		return TEST_UNSURE;
