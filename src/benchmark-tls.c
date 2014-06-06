@@ -181,6 +181,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	/* Need to enable anonymous KX specifically. */
 	int ret;
 	struct benchmark_st st;
+	gnutls_packet_st packet;
 
 	/* Init server */
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
@@ -252,17 +253,17 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 
 		do {
 			ret =
-			    gnutls_record_recv(server, buffer,
-					       sizeof(buffer));
+			    gnutls_record_recv_packet(server, &packet);
 		}
 		while (ret == GNUTLS_E_AGAIN);
 
 		if (ret < 0) {
-			fprintf(stderr, "Failed receiving from client\n");
+			fprintf(stderr, "Failed receiving from client: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
 
 		st.size += size;
+		gnutls_packet_deinit(&packet);
 	}
 	while (benchmark_must_finish == 0);
 
