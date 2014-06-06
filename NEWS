@@ -3,6 +3,17 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.16 (unreleased)
+
+** libgnutls: When the decoding of a printable DN element fails, then treat
+it as unknown and print its hex value rather than failing. That works around
+an issue in a TURKTRST root certificate which improperly encodes the
+X520countryName element.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.15 (released 2014-05-30)
 
 ** libgnutls: Eliminated memory corruption issue in Server Hello parsing.
