@@ -9,6 +9,11 @@ See the end for copying conditions.
 faster variant of gnutls_x509_crl_get_crt_serial() when coping with
 very large structures.
 
+** libgnutls: When the decoding of a printable DN element fails, then treat
+it as unknown and print its hex value rather than failing. That works around
+an issue in a TURKTRST root certificate which improperly encodes the
+X520countryName element.
+
 ** API and ABI modifications:
 gnutls_x509_crl_iter_deinit: Added
 gnutls_x509_crl_iter_crt_serial: Added
