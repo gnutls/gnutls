@@ -18,6 +18,9 @@ it as unknown and print its hex value rather than failing. That works around
 an issue in a TURKTRST root certificate which improperly encodes the
 X520countryName element.
 
+** libgnutls: Allow the post client hello callback to put the handshake on
+hold, by returning GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED.
+
 ** API and ABI modifications:
 gnutls_x509_crl_iter_deinit: Added
 gnutls_x509_crl_iter_crt_serial: Added
