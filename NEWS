@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.26 (unreleased)
+
+** libgnutls: Do not call the post client hello callback twice when
+resuming using session tickets.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.25 (released 2014-05-30)
 
 ** libgnutls: Eliminated memory corruption issue in Server Hello parsing.
