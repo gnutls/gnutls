@@ -10,11 +10,13 @@ extern const char *side;
         { \
           side = "client"; \
           cret = gnutls_handshake (c); \
+          if (cret == GNUTLS_E_INTERRUPTED) cret = GNUTLS_E_AGAIN; \
         } \
       if (sret == GNUTLS_E_AGAIN) \
         { \
           side = "server"; \
           sret = gnutls_handshake (s); \
+          if (sret == GNUTLS_E_INTERRUPTED) sret = GNUTLS_E_AGAIN; \
         } \
     } \
   while ((cret == GNUTLS_E_AGAIN || (cret == 0 && sret == GNUTLS_E_AGAIN)) && (sret == GNUTLS_E_AGAIN || (sret == 0 && cret == GNUTLS_E_AGAIN))); \
