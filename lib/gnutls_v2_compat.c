@@ -91,7 +91,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 {
 	uint16_t session_id_len = 0;
 	int pos = 0;
-	int ret = 0;
+	int ret = 0, sret = 0;
 	uint16_t sizeOfSuites;
 	gnutls_protocol_t adv_version;
 	uint8_t rnd[GNUTLS_RANDOM_SIZE];
@@ -146,8 +146,12 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	 */
 	ret = _gnutls_user_hello_func(session, adv_version);
 	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) {
+			sret = GNUTLS_E_INT_RET_0;
+		} else {
+			gnutls_assert();
+			return ret;
+		}
 	}
 
 	/* find an appropriate cipher suite */
@@ -246,5 +250,5 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 				      GNUTLS_COMP_NULL);
 	session->security_parameters.compression_method = GNUTLS_COMP_NULL;
 
-	return 0;
+	return sret;
 }

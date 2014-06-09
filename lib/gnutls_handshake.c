@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2014 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -466,7 +466,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	int pos = 0, ret;
 	uint16_t suite_size, comp_size;
 	gnutls_protocol_t adv_version;
-	int neg_version;
+	int neg_version, sret = 0;
 	int len = datalen;
 	uint8_t *suite_ptr, *comp_ptr, *session_id;
 
@@ -608,8 +608,12 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	ret = _gnutls_user_hello_func(session, adv_version);
 	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) {
+			sret = GNUTLS_E_INT_RET_0;
+		} else {
+			gnutls_assert();
+			return ret;
+		}
 	}
 
 	ret = _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
@@ -666,7 +670,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		return ret;
 	}
 
-	return 0;
+	return sret;
 }
 
 /* This is to be called after sending CHANGE CIPHER SPEC packet
@@ -2241,12 +2245,6 @@ recv_hello(gnutls_session_t session, uint8_t * data, int datalen)
 		}
 	}
 
-	ret = _gnutls_ext_sr_verify(session);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
 	return 0;
 }
 
@@ -2690,101 +2688,106 @@ static int handshake_client(gnutls_session_t session)
 		IMED_RET("recv hello", ret, 1);
 
 	case STATE4:
+		ret = _gnutls_ext_sr_verify(session);
+		STATE = STATE4;
+		IMED_RET("recv hello", ret, 0);
+
+	case STATE5:
 		if (session->security_parameters.do_recv_supplemental) {
 			ret = _gnutls_recv_supplemental(session);
-			STATE = STATE4;
+			STATE = STATE5;
 			IMED_RET("recv supplemental", ret, 1);
 		}
 
-	case STATE5:
+	case STATE6:
 		/* RECV CERTIFICATE */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_server_certificate(session);
-		STATE = STATE5;
+		STATE = STATE6;
 		IMED_RET("recv server certificate", ret, 1);
 
-	case STATE6:
+	case STATE7:
 #ifdef ENABLE_OCSP
 		/* RECV CERTIFICATE STATUS */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_recv_server_certificate_status
 			    (session);
-		STATE = STATE6;
+		STATE = STATE7;
 		IMED_RET("recv server certificate", ret, 1);
 #endif
-	case STATE7:
+	case STATE8:
 		ret = run_verify_callback(session, GNUTLS_CLIENT);
-		STATE = STATE7;
+		STATE = STATE8;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-	case STATE8:
+	case STATE9:
 		/* receive the server key exchange */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_server_kx_message(session);
-		STATE = STATE8;
+		STATE = STATE9;
 		IMED_RET("recv server kx message", ret, 1);
 
-	case STATE9:
+	case STATE10:
 		/* receive the server certificate request - if any 
 		 */
 
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_server_crt_request(session);
-		STATE = STATE9;
+		STATE = STATE10;
 		IMED_RET("recv server certificate request message", ret,
 			 1);
 
-	case STATE10:
+	case STATE11:
 		/* receive the server hello done */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_recv_handshake(session,
 						   GNUTLS_HANDSHAKE_SERVER_HELLO_DONE,
 						   0, NULL);
-		STATE = STATE10;
+		STATE = STATE11;
 		IMED_RET("recv server hello done", ret, 1);
 
-	case STATE11:
+	case STATE12:
 		if (session->security_parameters.do_send_supplemental) {
 			ret =
 			    _gnutls_send_supplemental(session,
-						      AGAIN(STATE11));
-			STATE = STATE11;
+						      AGAIN(STATE12));
+			STATE = STATE12;
 			IMED_RET("send supplemental", ret, 0);
 		}
 
-	case STATE12:
+	case STATE13:
 		/* send our certificate - if any and if requested
 		 */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_send_client_certificate(session,
 							    AGAIN
-							    (STATE12));
-		STATE = STATE12;
+							    (STATE13));
+		STATE = STATE13;
 		IMED_RET("send client certificate", ret, 0);
 
-	case STATE13:
+	case STATE14:
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_send_client_kx_message(session,
-							   AGAIN(STATE13));
-		STATE = STATE13;
+							   AGAIN(STATE14));
+		STATE = STATE14;
 		IMED_RET("send client kx", ret, 0);
 
-	case STATE14:
+	case STATE15:
 		/* send client certificate verify */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_send_client_certificate_verify(session,
 								   AGAIN
-								   (STATE14));
-		STATE = STATE14;
+								   (STATE15));
+		STATE = STATE15;
 		IMED_RET("send client certificate verify", ret, 1);
 
-	case STATE15:
-		STATE = STATE15;
+	case STATE16:
+		STATE = STATE16;
 		if (session->internals.resumed == RESUME_FALSE) {
 			ret = send_handshake_final(session, TRUE);
 			IMED_RET("send handshake final 2", ret, 1);
@@ -2796,8 +2799,8 @@ static int handshake_client(gnutls_session_t session)
 #endif
 		}
 
-	case STATE16:
-		STATE = STATE16;
+	case STATE17:
+		STATE = STATE17;
 		if (session->internals.resumed == RESUME_FALSE) {
 #ifdef ENABLE_SESSION_TICKETS
 			ret = _gnutls_recv_new_session_ticket(session);
@@ -2809,8 +2812,8 @@ static int handshake_client(gnutls_session_t session)
 			IMED_RET("recv handshake final", ret, 1);
 		}
 
-	case STATE17:
-		STATE = STATE17;
+	case STATE18:
+		STATE = STATE18;
 		if (session->internals.resumed == RESUME_FALSE) {
 			ret = recv_handshake_final(session, FALSE);
 			IMED_RET("recv handshake final 2", ret, 1);
@@ -3052,111 +3055,123 @@ static int handshake_server(gnutls_session_t session)
 		    _gnutls_recv_handshake(session,
 					   GNUTLS_HANDSHAKE_CLIENT_HELLO,
 					   0, NULL);
-		STATE = STATE1;
+		if (ret == GNUTLS_E_INT_RET_0) {
+			/* this is triggered by post_client_hello, and instructs the
+			 * handshake to proceed but be put on hold */
+			ret = GNUTLS_E_INTERRUPTED;
+			STATE = STATE2; /* hello already parsed -> move on */
+		} else {
+			STATE = STATE1;
+		}
 		IMED_RET("recv hello", ret, 1);
 
 	case STATE2:
-		ret = send_hello(session, AGAIN(STATE2));
+		ret = _gnutls_ext_sr_verify(session);
 		STATE = STATE2;
+		IMED_RET("recv hello", ret, 0);
+
+	case STATE3:
+		ret = send_hello(session, AGAIN(STATE3));
+		STATE = STATE3;
 		IMED_RET("send hello", ret, 1);
 
-	case STATE70:
+	case STATE4:
 		if (session->security_parameters.do_send_supplemental) {
 			ret =
 			    _gnutls_send_supplemental(session,
-						      AGAIN(STATE70));
-			STATE = STATE70;
+						      AGAIN(STATE4));
+			STATE = STATE4;
 			IMED_RET("send supplemental data", ret, 0);
 		}
 
 		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
-	case STATE3:
+	case STATE5:
 		/* NOTE: these should not be send if we are resuming */
 
 		if (session->internals.resumed == RESUME_FALSE)
 			ret =
 			    _gnutls_send_server_certificate(session,
-							    AGAIN(STATE3));
-		STATE = STATE3;
+							    AGAIN(STATE5));
+		STATE = STATE5;
 		IMED_RET("send server certificate", ret, 0);
 
-	case STATE4:
+	case STATE6:
 #ifdef ENABLE_OCSP
 		if (session->internals.resumed == RESUME_FALSE)
 			ret =
 			    _gnutls_send_server_certificate_status(session,
 								   AGAIN
-								   (STATE4));
-		STATE = STATE4;
+								   (STATE6));
+		STATE = STATE6;
 		IMED_RET("send server certificate status", ret, 0);
 #endif
-	case STATE5:
+	case STATE7:
 		/* send server key exchange (A) */
 		if (session->internals.resumed == RESUME_FALSE)
 			ret =
 			    _gnutls_send_server_kx_message(session,
-							   AGAIN(STATE5));
-		STATE = STATE5;
+							   AGAIN(STATE7));
+		STATE = STATE7;
 		IMED_RET("send server kx", ret, 0);
 
-	case STATE6:
+	case STATE8:
 		/* Send certificate request - if requested to */
 		if (session->internals.resumed == RESUME_FALSE)
 			ret =
 			    _gnutls_send_server_crt_request(session,
-							    AGAIN(STATE6));
-		STATE = STATE6;
+							    AGAIN(STATE8));
+		STATE = STATE8;
 		IMED_RET("send server cert request", ret, 0);
 
-	case STATE7:
+	case STATE9:
 		/* send the server hello done */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_send_empty_handshake(session,
 							 GNUTLS_HANDSHAKE_SERVER_HELLO_DONE,
-							 AGAIN(STATE7));
-		STATE = STATE7;
+							 AGAIN(STATE9));
+		STATE = STATE9;
 		IMED_RET("send server hello done", ret, 1);
 
-	case STATE71:
+	case STATE10:
 		if (session->security_parameters.do_recv_supplemental) {
 			ret = _gnutls_recv_supplemental(session);
-			STATE = STATE71;
+			STATE = STATE10;
 			IMED_RET("recv client supplemental", ret, 1);
 		}
 
 		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
-	case STATE8:
+	case STATE11:
 		/* receive the client certificate message */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_client_certificate(session);
-		STATE = STATE8;
+		STATE = STATE11;
 		IMED_RET("recv client certificate", ret, 1);
 
-	case STATE9:
+	case STATE12:
 		ret = run_verify_callback(session, GNUTLS_SERVER);
-		STATE = STATE9;
+		STATE = STATE12;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-	case STATE10:
+	case STATE13:
 		/* receive the client key exchange message */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_client_kx_message(session);
-		STATE = STATE10;
+		STATE = STATE13;
 		IMED_RET("recv client kx", ret, 1);
 
-	case STATE11:
+	case STATE14:
 		/* receive the client certificate verify message */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_recv_client_certificate_verify_message
 			    (session);
-		STATE = STATE11;
+		STATE = STATE14;
 		IMED_RET("recv client certificate verify", ret, 1);
 
-	case STATE12:
-		STATE = STATE12;
+	case STATE15:
+		STATE = STATE15;
 		if (session->internals.resumed == RESUME_FALSE) {	/* if we are not resuming */
 			ret = recv_handshake_final(session, TRUE);
 			IMED_RET("recv handshake final", ret, 1);
@@ -3165,16 +3180,16 @@ static int handshake_server(gnutls_session_t session)
 			IMED_RET("send handshake final 2", ret, 1);
 		}
 
-	case STATE13:
+	case STATE16:
 #ifdef ENABLE_SESSION_TICKETS
 		ret =
 		    _gnutls_send_new_session_ticket(session,
-						    AGAIN(STATE13));
-		STATE = STATE13;
+						    AGAIN(STATE16));
+		STATE = STATE16;
 		IMED_RET("send handshake new session ticket", ret, 0);
 #endif
-	case STATE14:
-		STATE = STATE14;
+	case STATE17:
+		STATE = STATE17;
 		if (session->internals.resumed == RESUME_FALSE) {	/* if we are not resuming */
 			ret = send_handshake_final(session, FALSE);
 			IMED_RET("send handshake final", ret, 1);

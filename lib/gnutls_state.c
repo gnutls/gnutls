@@ -1211,6 +1211,11 @@ _gnutls_rsa_pms_set_version(gnutls_session_t session,
  * This callback must return 0 on success or a gnutls error code to
  * terminate the handshake.
  *
+ * Since GnuTLS 3.3.5 the callback is
+ * allowed to return %GNUTLS_E_AGAIN or %GNUTLS_E_INTERRUPTED to
+ * put the handshake on hold. In that case gnutls_handshake()
+ * will return %GNUTLS_E_INTERRUPTED and can be resumed when needed.
+ *
  * Warning: You should not use this function to terminate the
  * handshake based on client input unless you know what you are
  * doing. Before the handshake is finished there is no way to know if
