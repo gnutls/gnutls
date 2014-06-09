@@ -636,10 +636,10 @@ string. To enable, use the following functions.
 
 @showfuncB{gnutls_alpn_set_protocols,gnutls_alpn_get_selected_protocol}
 
-Note that you can use these functions with protocols that are
-registered in the Application Layer Protocol Negotiation IANA registry.
-If you wish to use them for other custom protocols then prefix them
-with the 3 characters `exp' (lower-case).
+Note that these functions are intended to be used with protocols that are
+registered in the Application Layer Protocol Negotiation IANA registry. While
+you can use them for other protocols (at the risk of collisions), it is preferable
+to register them.
 
 @include sec-tls-app.texi
 
