@@ -575,7 +575,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 
       resume_copy_required_values (session);
 
-      return _gnutls_user_hello_func (session, adv_version);
+      return 0;
     }
 
   /* select an appropriate cipher suite
