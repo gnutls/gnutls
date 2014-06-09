@@ -5,8 +5,8 @@ See the end for copying conditions.
 
 * Version 3.2.16 (unreleased)
 
-** Do not call the post client hello callback twice when resuming using session 
-tickets.
+** libgnutls: Do not call the post client hello callback twice when resuming
+using session tickets.
 
 ** libgnutls: When the decoding of a printable DN element fails, then treat
 it as unknown and print its hex value rather than failing. That works around
