@@ -175,7 +175,8 @@ const gnutls_datum_t server_key = { server_key_pem,
   sizeof (server_key_pem)
 };
 
-static time_t mytime (time_t * t)
+static time_t
+mytime (time_t * t)
 {
   time_t then = 1207000800;
 
@@ -192,7 +193,7 @@ doit (void)
 {
   int ret;
   gnutls_datum_t data;
-  gnutls_x509_crt_t server_crt, ca_crt;
+  gnutls_x509_crt_t server_crt, ca_crt, ca_crt2;
   gnutls_x509_trust_list_t tl;
   unsigned int status;
 
@@ -206,74 +207,100 @@ doit (void)
     gnutls_global_set_log_level (6);
 
   /* test for gnutls_certificate_get_issuer() */
-  gnutls_x509_trust_list_init(&tl, 0);
-  gnutls_x509_crt_init(&server_crt);
-  gnutls_x509_crt_init(&ca_crt);
+  gnutls_x509_trust_list_init (&tl, 0);
+  gnutls_x509_crt_init (&server_crt);
+  gnutls_x509_crt_init (&ca_crt);
+  gnutls_x509_crt_init (&ca_crt2);
 
-  ret = gnutls_x509_crt_import(server_crt, &cert, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (server_crt, &cert, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail("gnutls_x509_crt_import");
+    fail ("gnutls_x509_crt_import");
 
-  ret = gnutls_x509_crt_import(ca_crt, &ca, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (ca_crt, &ca, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail("gnutls_x509_crt_import");
-  
-  ret = gnutls_x509_trust_list_add_cas(tl, &ca_crt, 1, 0);
-  if (ret < 0)
-    fail("gnutls_x509_trust_list_add_cas");
+    fail ("gnutls_x509_crt_import");
 
-  ret = gnutls_x509_trust_list_add_named_crt(tl, server_crt, NAME, NAME_SIZE, 0);
+  ret = gnutls_x509_crt_import (ca_crt2, &ca, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
-    fail("gnutls_x509_trust_list_add_named_crt");
+    fail ("gnutls_x509_crt_import");
 
-  ret = gnutls_x509_trust_list_verify_crt(tl, &server_crt, 1, 0, &status, NULL);
+  ret = gnutls_x509_trust_list_add_cas (tl, &ca_crt, 1, 0);
+  if (ret < 0)
+    fail ("gnutls_x509_trust_list_add_cas");
+
+  ret =
+    gnutls_x509_trust_list_add_named_crt (tl, server_crt, NAME, NAME_SIZE, 0);
+  if (ret < 0)
+    fail ("gnutls_x509_trust_list_add_named_crt");
+
+  ret =
+    gnutls_x509_trust_list_verify_crt (tl, &server_crt, 1, 0, &status, NULL);
   if (ret < 0 || status != 0)
-    fail("gnutls_x509_trust_list_verify_crt\n");
+    fail ("gnutls_x509_trust_list_verify_crt\n");
 
-  ret = gnutls_x509_trust_list_verify_named_crt(tl, server_crt, NAME, NAME_SIZE, 0, &status, NULL);
+  ret =
+    gnutls_x509_trust_list_verify_named_crt (tl, server_crt, NAME,
+                                             NAME_SIZE, 0, &status, NULL);
   if (ret < 0 || status != 0)
-    fail("gnutls_x509_trust_list_verify_named_crt: %d\n", __LINE__);
+    fail ("gnutls_x509_trust_list_verify_named_crt: %d\n", __LINE__);
 
-  ret = gnutls_x509_trust_list_verify_named_crt(tl, server_crt, NAME, NAME_SIZE-1, 0, &status, NULL);
+  ret =
+    gnutls_x509_trust_list_verify_named_crt (tl, server_crt, NAME,
+                                             NAME_SIZE - 1, 0, &status, NULL);
   if (ret < 0 || status == 0)
-    fail("gnutls_x509_trust_list_verify_named_crt: %d\n", __LINE__);
+    fail ("gnutls_x509_trust_list_verify_named_crt: %d\n", __LINE__);
 
-  ret = gnutls_x509_trust_list_verify_named_crt(tl, server_crt, "other", 5, 0, &status, NULL);
+  ret =
+    gnutls_x509_trust_list_verify_named_crt (tl, server_crt,
+                                             "other", 5, 0, &status, NULL);
   if (ret < 0 || status == 0)
-    fail("gnutls_x509_trust_list_verify_named_crt: %d\n", __LINE__);
+    fail ("gnutls_x509_trust_list_verify_named_crt: %d\n", __LINE__);
 
   /* test convenience functions in verify-high2.c */
   data.data = cert_pem;
-  data.size = strlen((char*)cert_pem);
-  ret = gnutls_x509_trust_list_add_trust_mem(tl, &data, NULL, GNUTLS_X509_FMT_PEM, 0, 0);
+  data.size = strlen ((char *) cert_pem);
+  ret =
+    gnutls_x509_trust_list_add_trust_mem (tl, &data, NULL,
+                                          GNUTLS_X509_FMT_PEM, 0, 0);
   if (ret < 1)
-    fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
+    fail ("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n",
+          __LINE__, gnutls_strerror (ret));
 
-  ret = gnutls_x509_trust_list_remove_trust_mem(tl, &data, GNUTLS_X509_FMT_PEM);
+  ret =
+    gnutls_x509_trust_list_remove_trust_mem (tl, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 1)
-    fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
+    fail ("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n",
+          __LINE__, gnutls_strerror (ret));
 
   data.data = cert_der;
-  data.size = sizeof(cert_der);
-  ret = gnutls_x509_trust_list_add_trust_mem(tl, &data, NULL, GNUTLS_X509_FMT_DER, 0, 0);
+  data.size = sizeof (cert_der);
+  ret =
+    gnutls_x509_trust_list_add_trust_mem (tl, &data, NULL,
+                                          GNUTLS_X509_FMT_DER, 0, 0);
   if (ret < 1)
-    fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
+    fail ("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n",
+          __LINE__, gnutls_strerror (ret));
 
-  ret = gnutls_x509_trust_list_remove_trust_mem(tl, &data, GNUTLS_X509_FMT_DER);
+  ret =
+    gnutls_x509_trust_list_remove_trust_mem (tl, &data, GNUTLS_X509_FMT_DER);
   if (ret < 1)
-    fail("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n", __LINE__, gnutls_strerror(ret));
+    fail ("gnutls_x509_trust_list_add_trust_mem: %d (%s)\n",
+          __LINE__, gnutls_strerror (ret));
 
-  ret = gnutls_x509_trust_list_remove_cas(tl, &ca_crt, 1);
+  ret = gnutls_x509_trust_list_remove_cas (tl, &ca_crt2, 1);
   if (ret < 1)
-    fail("gnutls_x509_trust_list_add_cas");
+    fail ("gnutls_x509_trust_list_add_cas");
 
-  ret = gnutls_x509_trust_list_verify_crt(tl, &server_crt, 1, 0, &status, NULL);
+  ret =
+    gnutls_x509_trust_list_verify_crt (tl, &server_crt, 1, 0, &status, NULL);
   if (ret == 0 && status == 0)
-    fail("gnutls_x509_trust_list_verify_crt\n");
+    fail ("gnutls_x509_trust_list_verify_crt\n");
 
-  gnutls_x509_trust_list_deinit(tl, 1);
-  
-  gnutls_global_deinit();
-  
-  if (debug) success("success");
+  gnutls_x509_trust_list_deinit (tl, 1);
+  gnutls_x509_crt_deinit (ca_crt2);
+
+  gnutls_global_deinit ();
+
+  if (debug)
+    success ("success");
 }
