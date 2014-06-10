@@ -7,6 +7,11 @@ See the end for copying conditions.
 ** libgnutls: Do not call the post client hello callback twice when
 resuming using session tickets.
 
+** libgnutls: When the decoding of a printable DN element fails, then treat
+it as unknown and print its hex value rather than failing. That works around
+an issue in a TURKTRST root certificate which improperly encodes the
+X520countryName element.
+
 ** API and ABI modifications:
 No changes since last version.
 
