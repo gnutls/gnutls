@@ -27,7 +27,6 @@
 #include <string.h>
 #include <errno.h>
 #include <arpa/inet.h>
-#include <unbound.h>
 #include <gnutls/dane.h>
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>

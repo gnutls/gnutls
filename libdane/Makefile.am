@@ -43,7 +43,7 @@ libgnutls_dane_la_LIBADD = ../gl/libgnu.la \
 
 libgnutls_dane_la_LDFLAGS += -version-info $(LT_DANE_CURRENT):$(LT_DANE_REVISION):$(LT_DANE_AGE)
 
-libgnutls_dane_la_LIBADD += $(LIBSOCKET) $(UNBOUND_LIBS)
+libgnutls_dane_la_LIBADD += $(LIBSOCKET) $(ARES_LIBS)
 
 if HAVE_LD_VERSION_SCRIPT
 libgnutls_dane_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libdane.map

@@ -310,44 +310,26 @@ AC_ARG_ENABLE(libdane,
 AC_MSG_RESULT($enable_dane)
 
 if test "$enable_dane" != "no"; then
-    LIBS="$oldlibs -lunbound"
+    LIBS="$oldlibs -lcares"
     AC_MSG_CHECKING([for unbound library])
     AC_LINK_IFELSE([AC_LANG_PROGRAM([
-		   #include <unbound.h>],[
-		   struct ub_ctx* ctx;
-		   ctx = ub_ctx_create();])],
+		   #include <ares.h>],[
+		   ares_query(0,0,0,0,0,0);])],
 		  [AC_MSG_RESULT(yes)
-		   AC_SUBST([UNBOUND_LIBS], [-lunbound])
-		   AC_SUBST([UNBOUND_CFLAGS], [])
+		   AC_SUBST([ARES_LIBS], [-lcares])
+		   AC_SUBST([ARES_CFLAGS], [])
 		   AC_DEFINE([HAVE_DANE], 1, [Enable the DANE library])
 		   enable_dane=yes],
 		  [AC_MSG_RESULT(no)
    	           AC_MSG_WARN([[
 *** 
-*** libunbound was not found. Libdane will not be built.
+*** libc-ares was not found. Libdane will not be built.
 *** ]])
 		  enable_dane=no])
     LIBS="$oldlibs"
 fi
 
 AM_CONDITIONAL(ENABLE_DANE, test "$enable_dane" = "yes")
-
-AC_ARG_WITH(unbound-root-key-file, AS_HELP_STRING([--with-unbound-root-key-file],
-                                 [specify the unbound root key file]),
-            unbound_root_key_file="$withval", 
-if test "$have_win" = yes; then
-    unbound_root_key_file="C:\\Program Files\\Unbound\\root.key"
-else
-    if test -f /var/lib/unbound/root.key;then
-    	unbound_root_key_file="/var/lib/unbound/root.key"
-    else
-        unbound_root_key_file="/etc/unbound/root.key"
-    fi
-fi
-)
-
-AC_DEFINE_UNQUOTED([UNBOUND_ROOT_KEY_FILE],
-  ["$unbound_root_key_file"], [The DNSSEC root key file])
 
 AC_ARG_WITH(system-priority-file, AS_HELP_STRING([--with-system-priority-file],
                                  [specify the system priority file]),
@@ -837,15 +819,5 @@ AC_MSG_NOTICE([System files:
   Blacklist file:       $with_default_blacklist_file
   CRL file:             $with_default_crl_file
   Priority file:        $system_priority_file
-  DNSSEC root key file: $unbound_root_key_file
 ])
 
-if test ! -f "$unbound_root_key_file"; then
-AC_MSG_WARN([[
-*** 
-*** The DNSSEC root key file in $unbound_root_key_file was not found. 
-*** This file is needed for the verification of DNSSEC responses.
-*** Use the command: unbound-anchor -a "$unbound_root_key_file"
-*** to generate or update it.
-*** ]])
-fi

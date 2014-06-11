@@ -29,17 +29,27 @@
 #include <string.h>
 #include <errno.h>
 #include <arpa/inet.h>
-#include <unbound.h>
+#include <ares.h>
 #include <gnutls/dane.h>
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
 #include <gnutls/crypto.h>
 #include "../lib/gnutls_int.h"
 
-#define MAX_DATA_ENTRIES 100
+#ifdef __sun
+# pragma fini(lib_deinit)
+# pragma init(lib_init)
+# define _CONSTRUCTOR
+# define _DESTRUCTOR
+#else
+# define _CONSTRUCTOR __attribute__((constructor))
+# define _DESTRUCTOR __attribute__((destructor))
+#endif
+
 #define DEBUG
 #ifdef DEBUG
 #define gnutls_assert() fprintf(stderr, "ASSERT: %s: %d\n", __FILE__, __LINE__);
+#define _gnutls_debug_log(str, ...) fprintf(stderr, str, ##__VA_ARGS__)
 #define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
 static int gnutls_assert_val_int(int val, const char *file, int line)
 {
@@ -49,21 +59,25 @@ static int gnutls_assert_val_int(int val, const char *file, int line)
 #else
 #define gnutls_assert()
 #define gnutls_assert_val(x) (x)
+#define _gnutls_debug_log(...)
 #endif
 
 struct dane_state_st {
-	struct ub_ctx *ctx;
+	ares_channel channel;
 	unsigned int flags;
 };
 
+struct reply_st {
+	uint8_t		  usage;
+	uint8_t		  selector;
+	uint8_t		  mtype;
+	uint8_t		  *data;
+	unsigned 	  data_size;
+};
+
 struct dane_query_st {
-	struct ub_result *result;
-	unsigned int data_entries;
-	dane_cert_usage_t usage[MAX_DATA_ENTRIES];
-	dane_cert_type_t type[MAX_DATA_ENTRIES];
-	dane_match_type_t match[MAX_DATA_ENTRIES];
-	gnutls_datum_t data[MAX_DATA_ENTRIES];
-	unsigned int flags;
+	struct reply_st *entries;
+	unsigned int n_entries;
 	dane_query_status_t status;
 };
 
@@ -91,7 +105,7 @@ dane_query_status_t dane_query_status(dane_query_t q)
  **/
 unsigned int dane_query_entries(dane_query_t q)
 {
-	return q->data_entries;
+	return q->n_entries;
 }
 
 /**
@@ -104,7 +118,7 @@ unsigned int dane_query_entries(dane_query_t q)
  * @data: The DANE data.
  *
  * This function will provide the DANE data from the query
- * response.
+ * response. The data should be treated as constant.
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -112,23 +126,22 @@ unsigned int dane_query_entries(dane_query_t q)
 int
 dane_query_data(dane_query_t q, unsigned int idx,
 		unsigned int *usage, unsigned int *type,
-		unsigned int *match, gnutls_datum_t * data)
+		unsigned int *match, gnutls_datum_t *data)
 {
-	if (idx >= q->data_entries)
+	if (idx >= q->n_entries)
 		return
 		    gnutls_assert_val(DANE_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	if (usage)
-		*usage = q->usage[idx];
+		*usage = q->entries[idx].usage;
 	if (type)
-		*type = q->type[idx];
+		*type = q->entries[idx].selector;
 	if (match)
-		*match = q->match[idx];
+		*match = q->entries[idx].mtype;
 	if (data) {
-		data->data = q->data[idx].data;
-		data->size = q->data[idx].size;
+		data->data = q->entries[idx].data;
+		data->size = q->entries[idx].data_size;
 	}
-
 	return DANE_E_SUCCESS;
 }
 
@@ -232,55 +245,27 @@ dane_query_to_raw_tlsa(dane_query_t q, unsigned int *data_entries,
  **/
 int dane_state_init(dane_state_t * s, unsigned int flags)
 {
-	struct ub_ctx *ctx;
 	int ret;
+	struct ares_options options;
 
 	*s = calloc(1, sizeof(struct dane_state_st));
 	if (*s == NULL)
 		return gnutls_assert_val(DANE_E_MEMORY_ERROR);
 
-	ctx = ub_ctx_create();
-	if (!ctx) {
+	memset(&options, 0, sizeof(options));
+	options.flags = ARES_FLAG_DNSSEC;
+	ret = ares_init_options(&(*s)->channel, &options, ARES_OPT_FLAGS);
+	if (ret != ARES_SUCCESS) {
 		gnutls_assert();
 		ret = DANE_E_INITIALIZATION_ERROR;
 		goto cleanup;
 	}
-	ub_ctx_debugout(ctx, stderr);
 
-	if (!(flags & DANE_F_IGNORE_LOCAL_RESOLVER)) {
-		if ((ret = ub_ctx_resolvconf(ctx, NULL)) != 0) {
-			gnutls_assert();
-			ret = DANE_E_INITIALIZATION_ERROR;
-			goto cleanup;
-		}
-
-		if ((ret = ub_ctx_hosts(ctx, NULL)) != 0) {
-			gnutls_assert();
-			ret = DANE_E_INITIALIZATION_ERROR;
-			goto cleanup;
-		}
-	}
-
-	/* read public keys for DNSSEC verification */
-	if (!(flags & DANE_F_IGNORE_DNSSEC)) {
-		if ((ret =
-		     ub_ctx_add_ta_file(ctx,
-					(char *) UNBOUND_ROOT_KEY_FILE)) !=
-		    0) {
-			gnutls_assert();
-			ret = DANE_E_INITIALIZATION_ERROR;
-			goto cleanup;
-		}
-	}
-
-	(*s)->ctx = ctx;
 	(*s)->flags = flags;
 
 	return DANE_E_SUCCESS;
       cleanup:
 
-	if (ctx)
-		ub_ctx_delete(ctx);
 	free(*s);
 
 	return ret;
@@ -295,7 +280,7 @@ int dane_state_init(dane_state_t * s, unsigned int flags)
  **/
 void dane_state_deinit(dane_state_t s)
 {
-	ub_ctx_delete(s->ctx);
+	ares_destroy(s->channel);
 	free(s);
 }
 
@@ -310,14 +295,6 @@ void dane_state_deinit(dane_state_t s)
  **/
 int dane_state_set_dlv_file(dane_state_t s, const char *file)
 {
-	int ret;
-
-	ret =
-	    ub_ctx_set_option(s->ctx, (char *) "dlv-anchor-file:",
-			      (void *) file);
-	if (ret != 0)
-		return gnutls_assert_val(DANE_E_FILE_ERROR);
-
 	return 0;
 }
 
@@ -330,8 +307,12 @@ int dane_state_set_dlv_file(dane_state_t s, const char *file)
  **/
 void dane_query_deinit(dane_query_t q)
 {
-	if (q->result)
-		ub_resolve_free(q->result);
+	unsigned i;
+
+	for (i=0;i<q->n_entries;i++) {
+		free(q->entries[i].data);
+	}
+	free(q->entries);
 	free(q);
 }
 
@@ -362,28 +343,44 @@ dane_raw_tlsa(dane_state_t s, dane_query_t * r, char *const *dane_data,
 {
 	int ret = DANE_E_SUCCESS;
 	unsigned int i;
+	unsigned entries = 0;
+	char *const * p = dane_data;
+
+	while(p[entries]!=NULL) {
+		entries++;
+	}
 
 	*r = calloc(1, sizeof(struct dane_query_st));
 	if (*r == NULL)
 		return gnutls_assert_val(DANE_E_MEMORY_ERROR);
 
-	(*r)->data_entries = 0;
+	(*r)->n_entries = 0;
 
-	for (i = 0; i < MAX_DATA_ENTRIES; i++) {
+	(*r)->entries = calloc(1, sizeof((*r)->entries[0]) * entries);
+	if ((*r)->entries == NULL) {
+		free(*r);
+		return gnutls_assert_val(DANE_E_MEMORY_ERROR);
+	}
+
+	for (i = 0; i < entries; i++) {
 		if (dane_data[i] == NULL)
 			break;
 
-		if (dane_data_len[i] <= 3)
-			return
+		if (dane_data_len[i] <= 3) {
+			ret =
 			    gnutls_assert_val
 			    (DANE_E_RECEIVED_CORRUPT_DATA);
+			goto fail;
+		}
 
-		(*r)->usage[i] = dane_data[i][0];
-		(*r)->type[i] = dane_data[i][1];
-		(*r)->match[i] = dane_data[i][2];
-		(*r)->data[i].data = (void *) &dane_data[i][3];
-		(*r)->data[i].size = dane_data_len[i] - 3;
-		(*r)->data_entries++;
+		(*r)->entries[i].usage = dane_data[i][0];
+		(*r)->entries[i].selector = dane_data[i][1];
+		(*r)->entries[i].mtype = dane_data[i][2];
+		(*r)->entries[i].data = malloc(dane_data_len[i] - 3);
+		if ((*r)->entries[i].data != NULL)
+			memcpy((*r)->entries[i].data, &dane_data[i][3], dane_data_len[i] - 3);
+		(*r)->entries[i].data_size = dane_data_len[i] - 3;
+		(*r)->n_entries++;
 	}
 
 	if (!(s->flags & DANE_F_INSECURE) && !secure) {
@@ -405,8 +402,103 @@ dane_raw_tlsa(dane_state_t s, dane_query_t * r, char *const *dane_data,
 	}
 
 	return ret;
+fail:
+	free((*r)->entries);
+	free(*r);
+	return ret;
+
 }
 
+static void
+query_cb(void *arg, int status, int timeouts, uint8_t *buf, int len)
+{
+dane_query_t r = arg;
+struct ares_tlsa_reply *p, *replies = NULL;
+unsigned entries = 0, i;
+
+	r->status = DANE_QUERY_BOGUS;
+	if(status != ARES_SUCCESS){
+		_gnutls_debug_log("failed to lookup: %s\n", ares_strerror(status));
+		return;
+	}
+
+	status = ares_parse_tlsa_reply(buf, len, &replies);
+	if (status == ARES_ENODNSSEC) {
+		r->status = DANE_QUERY_NO_DNSSEC;
+		return;
+	}
+
+	if(status != ARES_SUCCESS){
+		_gnutls_debug_log("failed to parse TLSA: %s\n", ares_strerror(status));
+		return;
+	}
+
+	p = replies;
+	while(p != NULL) {
+		entries++;
+		p=p->next;
+	}
+
+	r->entries = calloc(1, entries * sizeof(r->entries[0]));
+	if (r->entries == NULL) {
+		goto cleanup;
+	}
+
+	p = replies;
+	i = 0;
+	while(p != NULL) {
+		r->entries[i].usage = p->usage;
+		r->entries[i].selector = p->selector;
+		r->entries[i].mtype = p->mtype;
+		r->entries[i].data_size = p->data_size;
+		r->entries[i].data = p->data; /* steal the allocated value */
+		p->data = NULL;
+		i++;
+		p=p->next;
+	}
+	r->status = DANE_QUERY_DNSSEC_VERIFIED;
+	r->n_entries = entries;
+
+ cleanup:
+ 	ares_free_data(replies);
+	return;
+}
+
+static void _CONSTRUCTOR lib_init(void)
+{
+int ret;
+
+	ret = ares_library_init(ARES_LIB_INIT_ALL);
+	if (ret != ARES_SUCCESS) {
+		fprintf(stderr, "Error in Ares library initialization: %s\n", ares_strerror(ret));
+	}
+}
+
+static void _DESTRUCTOR lib_deinit(void)
+{
+	ares_library_cleanup();
+}
+
+static void wait_ares(ares_channel channel)
+{
+struct timeval *tvp, tv;
+fd_set read_fds, write_fds;
+int nfds, ret;
+
+	for(;;) {
+		FD_ZERO(&read_fds);
+		FD_ZERO(&write_fds);
+		nfds = ares_fds(channel, &read_fds, &write_fds);
+		if(nfds == 0)
+			 break;
+
+		tvp = ares_timeout(channel, NULL, &tv);
+		ret = select(nfds, &read_fds, &write_fds, NULL, tvp);
+		if (ret < 0)
+			break;
+		ares_process(channel, &read_fds, &write_fds);
+	}
+}
 
 /**
  * dane_query_tlsa:
@@ -427,32 +519,29 @@ dane_query_tlsa(dane_state_t s, dane_query_t * r, const char *host,
 		const char *proto, unsigned int port)
 {
 	char ns[1024];
-	int ret;
-	struct ub_result *result;
+	int ret, id;
+
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, &id, sizeof(id));
+	if (ret < 0)
+		return gnutls_assert_val(DANE_E_INITIALIZATION_ERROR);
+	id &= 0x0000ffff;
+
+	*r = calloc(1, sizeof(struct dane_query_st));
+	if (*r == NULL)
+		return gnutls_assert_val(DANE_E_MEMORY_ERROR);
 
 	snprintf(ns, sizeof(ns), "_%u._%s.%s", port, proto, host);
 
-	/* query for webserver */
-	ret = ub_resolve(s->ctx, ns, 52, 1, &result);
-	if (ret != 0) {
+	ares_query(s->channel, ns, 1, 52, query_cb, *r);
+
+	wait_ares(s->channel);
+
+	if ((*r)->n_entries == 0) {
+		free(*r);
 		return gnutls_assert_val(DANE_E_RESOLVING_ERROR);
 	}
 
-/* show first result */
-	if (!result->havedata) {
-		ub_resolve_free(result);
-		return gnutls_assert_val(DANE_E_NO_DANE_DATA);
-	}
-
-	ret =
-	    dane_raw_tlsa(s, r, result->data, result->len, result->secure,
-			  result->bogus);
-	if (*r == NULL) {
-		ub_resolve_free(result);
-		return ret;
-	}
-	(*r)->result = result;
-	return ret;
+	return 0;
 }
 
 
