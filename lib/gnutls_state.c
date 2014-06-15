@@ -1389,7 +1389,7 @@ gnutls_handshake_set_random(gnutls_session_t session,
  * handshake message has been received or generated. This is a
  * generalization of gnutls_handshake_set_post_client_hello_function().
  *
- * To call the hook function prior to the message being sent/generation use 
+ * To call the hook function prior to the message being sent/generated use
  * %GNUTLS_HOOK_PRE as @post parameter, %GNUTLS_HOOK_POST to call
  * after, and %GNUTLS_HOOK_BOTH for both cases.
  *
@@ -1402,8 +1402,6 @@ gnutls_handshake_set_random(gnutls_session_t session,
  * handshake based on client input unless you know what you are
  * doing. Before the handshake is finished there is no way to know if
  * there is a man-in-the-middle attack being performed.
- *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 void
 gnutls_handshake_set_hook_function(gnutls_session_t session,
