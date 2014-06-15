@@ -16,9 +16,8 @@ The rules here are not always used, although we try to stick to them.
 
 *** Git commits:
   The original author of the changes should be the author of the commit.
-The "Signed-off-by" git flag is used to indicate the one who reviewed
-and approved the changes (note that this flag is used differently in
-other projects).
+The "Signed-off-by" git flag is used to indicate a commit according to
+the project's DCO.
 
 
 *** Function names:
