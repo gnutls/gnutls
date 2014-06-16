@@ -244,9 +244,17 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 	if (ca_file != NULL) {
 #ifdef ENABLE_PKCS11
 		if (strncmp(ca_file, "pkcs11:", 7) == 0) {
+			unsigned pcrt_list_size = 0;
+
 			list->pkcs11_token = gnutls_strdup(ca_file);
 
-			return 0;
+			/* enumerate the certificates */
+			ret = gnutls_pkcs11_obj_list_import_url(NULL, &pcrt_list_size,
+				ca_file, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA, 0);
+			if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+				return gnutls_assert_val(ret);
+
+			return pcrt_list_size;
 		} else
 #endif
 		{
