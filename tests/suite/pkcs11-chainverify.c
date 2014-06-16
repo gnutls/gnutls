@@ -225,7 +225,9 @@ void doit(void)
 		}
 
 		/* write CA certificate to softhsm */
-		ret = gnutls_pkcs11_copy_x509_crt(URL, ca, "test-ca", GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
+		ret = gnutls_pkcs11_copy_x509_crt(URL, ca, "test-ca", GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|
+			GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|
+			GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
 		if (ret < 0) {
 			fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
 			exit(1);
@@ -235,7 +237,12 @@ void doit(void)
 
 		ret = gnutls_x509_trust_list_add_trust_file(tl, URL, NULL, 0, 0, 0);
 		if (ret < 0) {
-			fail("gnutls_x509_trust_list_add_trust_file\n");
+			fail("gnutls_x509_trust_list_add_trust_file: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (ret < 1) {
+			fail("gnutls_x509_trust_list_add_trust_file returned zero!\n");
 			exit(1);
 		}
 
