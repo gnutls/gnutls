@@ -125,8 +125,11 @@ int main(void)
                 gnutls_priority_set(session, priority_cache);
                 gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
                                        x509_cred);
+
                 /* We don't request any certificate from the client.
-                 * If we did we would need to verify it.
+                 * If we did we would need to verify it. One way of
+                 * doing that is shown in the "Verifying a certificate"
+                 * example.
                  */
                 gnutls_certificate_server_set_request(session,
                                                       GNUTLS_CERT_IGNORE);
