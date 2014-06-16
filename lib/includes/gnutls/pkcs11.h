@@ -103,6 +103,7 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
 #define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED (1<<8) /* The object must be marked as distrusted */
 #define GNUTLS_PKCS11_OBJ_FLAG_COMPARE (1<<9) /* The object must be fully compared */
 #define GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE (1<<10) /* The object must be present in a marked as trusted module */
+#define GNUTLS_PKCS11_OBJ_FLAG_MARK_CA (1<<11)	/* object marked as CA */
 
 /**
  * gnutls_pkcs11_url_type_t:

@@ -60,6 +60,7 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 	ck_certificate_type_t type = CKC_X_509;
 	ck_object_handle_t obj;
 	int a_val;
+	unsigned long category;
 	struct pkcs11_session_info sinfo;
 	
 	PKCS11_CHECK_INIT;
@@ -147,6 +148,14 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 		a[a_val].type = CKA_LABEL;
 		a[a_val].value = (void *) label;
 		a[a_val].value_len = strlen(label);
+		a_val++;
+	}
+
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_CA) {
+		category = 2;
+		a[a_val].type = CKA_CERTIFICATE_CATEGORY;
+		a[a_val].value = (void *) &category;
+		a[a_val].value_len = sizeof(category);
 		a_val++;
 	}
 
