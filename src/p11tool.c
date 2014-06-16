@@ -184,6 +184,8 @@ static void cmd_parser(int argc, char **argv)
 				ENABLED_OPT(PRIVATE) ? "yes" : "no");
 		fprintf(stderr, "Trusted: %s\n",
 			ENABLED_OPT(TRUSTED) ? "yes" : "no");
+		fprintf(stderr, "CA: %s\n",
+			ENABLED_OPT(CA) ? "yes" : "no");
 		fprintf(stderr, "Login: %s\n",
 			ENABLED_OPT(LOGIN) ? "yes" : "no");
 		fprintf(stderr, "Detailed URLs: %s\n",
@@ -232,7 +234,9 @@ static void cmd_parser(int argc, char **argv)
 		else
 			priv = -1;
 		pkcs11_write(outfile, url, label,
-			     ENABLED_OPT(TRUSTED), priv, login, &cinfo);
+			     ENABLED_OPT(TRUSTED),
+			     ENABLED_OPT(CA),
+			     priv, login, &cinfo);
 	} else if (HAVE_OPT(INITIALIZE))
 		pkcs11_init(outfile, url, label, &cinfo);
 	else if (HAVE_OPT(DELETE))

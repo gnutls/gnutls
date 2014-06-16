@@ -401,7 +401,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 
 void
 pkcs11_write(FILE * outfile, const char *url, const char *label,
-	     int trusted, int private,
+	     int trusted, int ca, int private,
 	     unsigned int login_flags, common_info_st * info)
 {
 	gnutls_x509_crt_t xcrt;
@@ -441,6 +441,11 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 		if (trusted)
 			flags |=
 			    GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED |
+			    GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO;
+
+		if (ca)
+			flags |=
+			    GNUTLS_PKCS11_OBJ_FLAG_MARK_CA |
 			    GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO;
 
 		ret = gnutls_pkcs11_copy_x509_crt(url, xcrt, label, flags);

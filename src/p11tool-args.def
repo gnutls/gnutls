@@ -143,6 +143,14 @@ flag = {
 };
 
 flag = {
+    name      = ca;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the object to be written as a CA";
+    doc = "";
+};
+
+flag = {
     name      = private;
     disable   = "no";
     enabled;

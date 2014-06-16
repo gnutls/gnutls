@@ -41,7 +41,8 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int login,
 void pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		       common_info_st *);
 void pkcs11_write(FILE * outfile, const char *pkcs11_url,
-		  const char *label, int trusted, int private,
+		  const char *label, int trusted, 
+		  int ca, int private,
 		  unsigned int login, common_info_st *);
 void pkcs11_delete(FILE * outfile, const char *pkcs11_url, int batch,
 		   unsigned int login, common_info_st *);
