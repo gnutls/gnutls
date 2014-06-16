@@ -181,7 +181,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 	/* Need to enable anonymous KX specifically. */
 	int ret;
 	struct benchmark_st st;
-	gnutls_packet_st packet;
+	gnutls_packet_t packet;
 
 	/* Init server */
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
@@ -263,7 +263,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 		}
 
 		st.size += size;
-		gnutls_packet_deinit(&packet);
+		gnutls_packet_deinit(packet);
 	}
 	while (benchmark_must_finish == 0);
 

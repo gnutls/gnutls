@@ -1011,6 +1011,7 @@ GNUTLS_3_1_0 {
 	gnutls_x509_crl_iter_deinit;
 	gnutls_packet_deinit;
 	gnutls_record_recv_packet;
+	gnutls_packet_get;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

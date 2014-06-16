@@ -214,7 +214,7 @@ int optval = 1;
 
 static void server(int sd)
 {
-	gnutls_packet_st packet;
+	gnutls_packet_t packet;
 
 	/* this must be called once in the program
 	 */
@@ -269,6 +269,7 @@ static void server(int sd)
 		ret = gnutls_record_recv_packet(session, &packet);
 
 		if (ret == 0) {
+			gnutls_packet_deinit(packet);
 			if (debug)
 				success
 				    ("server: Peer has closed the GnuTLS connection\n");
@@ -277,12 +278,15 @@ static void server(int sd)
 			fail("server: Received corrupted data(%d). Closing...\n", ret);
 			break;
 		} else if (ret > 0) {
+			gnutls_datum_t pdata;
+
+			gnutls_packet_get(packet, &pdata, NULL);
 			/* echo data back to the client
 			 */
-			gnutls_record_send(session, packet.data.data,
-					   packet.data.size);
+			gnutls_record_send(session, pdata.data,
+					   pdata.size);
+			gnutls_packet_deinit(packet);
 		}
-		gnutls_packet_deinit(&packet);
 	}
 	/* do not wait for the peer to close the connection.
 	 */

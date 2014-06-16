@@ -46,7 +46,7 @@ _gnutls_send_int(gnutls_session_t session, content_type_t type,
 
 ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 			 gnutls_handshake_description_t, 
-			 gnutls_packet_st *packet,
+			 gnutls_packet_t *packet,
 			 uint8_t * data,
 			 size_t sizeofdata, void *seq, unsigned int ms);
 

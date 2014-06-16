@@ -161,7 +161,7 @@ _gnutls_record_buffer_get(content_type_t type,
 }
 
 int
-_gnutls_record_buffer_get_packet(content_type_t type, gnutls_session_t session, gnutls_packet_st *packet)
+_gnutls_record_buffer_get_packet(content_type_t type, gnutls_session_t session, gnutls_packet_t *packet)
 {
 	gnutls_datum_t msg;
 	mbuffer_st *bufel;
@@ -185,13 +185,9 @@ _gnutls_record_buffer_get_packet(content_type_t type, gnutls_session_t session, 
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 	}
 
-	packet->ptr = bufel;
-	packet->data.size = bufel->msg.size - bufel->mark;
-	packet->data.data = bufel->msg.data + bufel->mark;
+	*packet = bufel;
 
-	memcpy(packet->sequence, bufel->record_sequence.i, 8);
-
-	return packet->data.size;
+	return bufel->msg.size - bufel->mark;
 }
 
 inline static void reset_errno(gnutls_session_t session)

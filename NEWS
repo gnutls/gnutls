@@ -32,6 +32,7 @@ gnutls_x509_crl_iter_deinit: Added
 gnutls_x509_crl_iter_crt_serial: Added
 gnutls_record_recv_packet: Added
 gnutls_packet_deinit: Added
+gnutls_packet_get: Added
 
 
 * Version 3.3.4 (released 2014-05-31)

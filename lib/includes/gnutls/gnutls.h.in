@@ -934,17 +934,14 @@ ssize_t gnutls_record_send_range(gnutls_session_t session,
 ssize_t gnutls_record_recv(gnutls_session_t session, void *data,
 			   size_t data_size);
 
-typedef struct gnutls_packet_st {
-	void *ptr; /* pointer used internally by gnutls */
-	gnutls_datum_t data; /* the packet data to access */
-	unsigned char sequence[8]; /* the packet's sequence number */
-} gnutls_packet_st;
+typedef struct mbuffer_st *gnutls_packet_t;
 
 ssize_t
 gnutls_record_recv_packet(gnutls_session_t session, 
-		   gnutls_packet_st *packet);
+		   	  gnutls_packet_t *packet);
 
-void gnutls_packet_deinit(gnutls_packet_st *packet);
+void gnutls_packet_get(gnutls_packet_t packet, gnutls_datum_t *data, unsigned char *sequence);
+void gnutls_packet_deinit(gnutls_packet_t packet);
 
 #define gnutls_read gnutls_record_recv
 #define gnutls_write gnutls_record_send

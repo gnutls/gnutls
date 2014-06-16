@@ -54,7 +54,7 @@ int _gnutls_record_buffer_get(content_type_t type,
 			      size_t length, uint8_t seq[8]);
 int _gnutls_record_buffer_get_packet(content_type_t type,
 				     gnutls_session_t session,
-				     gnutls_packet_st *packet);
+				     gnutls_packet_t *packet);
 ssize_t _gnutls_io_read_buffered(gnutls_session_t, size_t n,
 				 content_type_t, unsigned int *ms);
 int _gnutls_io_clear_peeked_data(gnutls_session_t session);

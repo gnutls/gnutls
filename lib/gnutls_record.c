@@ -639,7 +639,7 @@ check_buffers(gnutls_session_t session, content_type_t type,
  */
 static int
 check_packet_buffers(gnutls_session_t session, content_type_t type,
-		     gnutls_packet_st *packet)
+		     gnutls_packet_t *packet)
 {
 	if (_gnutls_record_buffer_get_size(session) > 0) {
 		int ret;
@@ -659,6 +659,7 @@ check_packet_buffers(gnutls_session_t session, content_type_t type,
 		return ret;
 	}
 
+	*packet = NULL;
 	return 0;
 }
 
@@ -1387,7 +1388,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 ssize_t
 _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 		 gnutls_handshake_description_t htype,
-		 gnutls_packet_st *packet,
+		 gnutls_packet_t *packet,
 		 uint8_t * data, size_t data_size, void *seq,
 		 unsigned int ms)
 {
@@ -1448,6 +1449,38 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 }
 
 /**
+ * gnutls_packet_get:
+ * @packet: is a #gnutls_packet_t structure.
+ * @data: will contain the data present in the @packet structure (may be %NULL)
+ * @sequence: the 8-bytes of the packet sequence number (may be %NULL)
+ *
+ * This function returns the data and sequence number associated with
+ * the received packet.
+ *
+ * Since: 3.3.5
+ **/
+
+void gnutls_packet_get(gnutls_packet_t packet, gnutls_datum_t *data, unsigned char *sequence)
+{
+	if (unlikely(packet == NULL)) {
+		gnutls_assert();
+		if (data) {
+			data->data = NULL;
+			data->size = 0;
+		}
+	}
+
+	if (sequence) {
+		memcpy(sequence, packet->record_sequence.i, 8);
+	}
+
+	if (data) {
+		data->size = packet->msg.size - packet->mark;
+		data->data = packet->msg.data + packet->mark;
+	}
+}
+
+/**
  * gnutls_packet_deinit:
  * @packet: is a pointer to a #gnutls_packet_st structure.
  *
@@ -1456,9 +1489,9 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
  *
  * Since: 3.3.5
  **/
-void gnutls_packet_deinit(gnutls_packet_st *packet)
+void gnutls_packet_deinit(gnutls_packet_t packet)
 {
-	gnutls_free(packet->ptr);
+	gnutls_free(packet);
 }
 
 /**
@@ -1471,7 +1504,9 @@ void gnutls_packet_deinit(gnutls_packet_st *packet)
  * memory copy, and is mostly applicable to applications seeking high
  * performance.
  *
- * The received packet must be deinitialized using gnutls_packet_deinit().
+ * The received packet is accessed using gnutls_packet_get() and 
+ * must be deinitialized using gnutls_packet_deinit(). The returned
+ * packet will be %NULL if the return value is zero (EOF).
  *
  * Returns: The number of bytes received and zero on EOF (for stream
  * connections).  A negative error code is returned in case of an error.  
@@ -1480,7 +1515,7 @@ void gnutls_packet_deinit(gnutls_packet_st *packet)
  **/
 ssize_t
 gnutls_record_recv_packet(gnutls_session_t session, 
-		   	  gnutls_packet_st *packet)
+		   	  gnutls_packet_t *packet)
 {
 	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, -1, packet,
 				NULL, 0, NULL,
