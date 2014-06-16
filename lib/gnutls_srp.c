@@ -624,6 +624,11 @@ gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t res,
  * in using the gnutls_malloc(). For convenience @prime and @generator
  * may also be one of the static parameters defined in gnutls.h.
  *
+ * Initially, the data field is NULL in every #gnutls_datum_t
+ * structure that the callback has to fill in. When the
+ * callback is done GnuTLS deallocates all of those buffers
+ * which are non-NULL, regardless of the return value.
+ *
  * In order to prevent attackers from guessing valid usernames,
  * if a user does not exist, g and n values should be filled in
  * using a random user's parameters. In that case the callback must
