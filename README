@@ -107,8 +107,8 @@ the GNU Lesser General Public License (LGPL) version 2.1 or later.
 
 Note, however, that version 6.0.0 and later of the gmplib library used
 by GnuTLS are distributed under a LGPLv3+ or GPLv2+ dual license, and
-as such binaries of this library need to be distributed under the same
-LGPLv3+ or GPLv2+ dual license. If this is undesirable older versions
+as such binaries of this library need to be distributed under either
+LGPLv3+ or GPLv2+ license. If this is undesirable older versions
 of the gmplib which are under LGPLv2.1 (e.g., version 4.2.1) may be
 used instead. (gmplib versions between 4.2.2 through 5.1.3 were
 licensed under LGPLv3+ only).
