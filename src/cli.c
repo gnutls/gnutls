@@ -1648,7 +1648,11 @@ static void init_global_tls_stuff(void)
 							     x509_cafile,
 							     x509ctype);
 	} else {
-		ret = gnutls_certificate_set_x509_system_trust(xcred);
+		if (insecure == 0) {
+			ret = gnutls_certificate_set_x509_system_trust(xcred);
+		} else {
+			ret = 0;
+		}
 	}
 	if (ret < 0) {
 		fprintf(stderr, "Error setting the x509 trust file\n");
