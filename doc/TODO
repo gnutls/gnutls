@@ -30,8 +30,6 @@ Current list:
 - Add support for generating empty CRLs
 - Document the format for the supported DN attributes.
 - Audit the code
-- Allow setting a PKCS #11 module to gnutls_x509_trust_list_t, to verify 
-  against, similarly to NSS way.
 - Support replacing individual algorithms via a PKCS #11 module -
   maybe use p11-kit for that.
 - Add function to extract the signers of an openpgp key. Should
