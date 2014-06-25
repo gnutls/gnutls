@@ -296,10 +296,6 @@ listener_item * j = gnutls_session_get_ptr(session);
 unsigned int size;
 int ret;
 
-	if (HAVE_OPT(PRINT_CERT)) {
-		print_cert_info(session, verbose, HAVE_OPT(PRINT_CERT));
-	}
-
 	if (gnutls_auth_get_type(session) == GNUTLS_CRD_CERTIFICATE) {
 		if (!require_cert && gnutls_certificate_get_peers(session, &size) == NULL)
 			return 0;
