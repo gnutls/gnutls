@@ -1032,7 +1032,7 @@ pin_callback (void *user, int attempt, const char *token_url,
         }
     }
 
-  if (password == NULL || password[0] == 0)
+  if (password == NULL || password[0] == 0 || password[0] == '\n')
     {
       fprintf (stderr, "No password given\n");
       exit (1);
