@@ -391,7 +391,7 @@ pkcs11_get_info(struct p11_kit_uri *info,
 			*output_size = length * 3;
 			return GNUTLS_E_SHORT_MEMORY_BUFFER;
 		}
-		if (output)
+		if (output && length > 0)
 			_gnutls_bin2hex(data, length, output, *output_size,
 					":");
 		*output_size = length * 3;
