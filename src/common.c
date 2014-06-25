@@ -1010,17 +1010,17 @@ pin_callback(void *user, int attempt, const char *token_url,
 	
 	password = getenv("GNUTLS_PIN");
 
-	if (password == NULL)
+	if (password == NULL) {
 		password = getpass("Enter PIN: ");
-	else {
+	} else {
 		if (flags & GNUTLS_PIN_WRONG) {
 			fprintf(stderr, "Cannot continue with a wrong password in the environment.\n");
 			exit(1);
 		}
 	}
 
-	if (password == NULL || password[0] == 0) {
-		fprintf(stderr, "No password given\n");
+	if (password == NULL || password[0] == 0 || password[0] == '\n') {
+		fprintf(stderr, "No PIN given\n");
 		exit(1);
 	}
 
