@@ -36,9 +36,8 @@
 
 #define FIX(url) \
 	if (url == NULL) { \
-		fprintf(stderr, "warning: no token URL was provided; use --list-tokens for the available ones.\n" \
-			"warning: assuming 'pkcs11:'\n"); \
-		url = "pkcs11:"; \
+		fprintf(stderr, "warning: no token URL was provided for this operation;\nuse --list-tokens for the available ones.\n"); \
+		exit(1); \
 	}
 
 void
