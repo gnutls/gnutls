@@ -40,6 +40,11 @@
 		exit(1); \
 	}
 
+#define CHECK_LOGIN_FLAG(flag) \
+	if (flag == 0) \
+		fprintf(stderr, \
+			"note: --login was not specified and it may be required for this operation.\n")
+
 void
 pkcs11_delete(FILE * outfile, const char *url, int batch,
 	      unsigned int login_flags, common_info_st * info)
@@ -415,6 +420,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 	pkcs11_common();
 
 	FIX(url);
+	CHECK_LOGIN_FLAG(login_flags);
 
 	secret_key = load_secret_key(0, info);
 	if (secret_key != NULL) {
@@ -495,6 +501,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 	pkcs11_common();
 
 	FIX(url);
+	CHECK_LOGIN_FLAG(login_flags);
 
 	if (private == 1)
 		flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
@@ -508,10 +515,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		if (login_flags == 0)
-			fprintf(stderr,
-				"note: --login was not specified and it may be required for generation.\n");
-		else if (bits != 1024)
+		if (bits != 1024)
 			fprintf(stderr,
 				"note: several smart cards do not support arbitrary size keys; try --bits 1024 or 2048.\n");
 		exit(1);
