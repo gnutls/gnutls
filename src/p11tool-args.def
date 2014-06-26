@@ -2,14 +2,15 @@ AutoGen Definitions options;
 prog-name     = p11tool;
 prog-title    = "GnuTLS PKCS #11 tool";
 prog-desc     = "Program to handle PKCS #11 smart cards and security modules.\n";
-detail    = "Program that allows handling data from PKCS #11 smart cards
+detail    = "Program that allows operations on PKCS #11 smart cards
 and security modules. 
 
-To use PKCS #11 tokens with gnutls the configuration file 
-/etc/gnutls/pkcs11.conf has to exist and contain a number of lines of the form 'load=/usr/lib/opensc-pkcs11.so'.
-Alternatively the p11-kit configuration files have to be setup.
+To use PKCS #11 tokens with GnuTLS the p11-kit configuration files need to be setup.
+That is create a .conf file in /etc/pkcs11/modules with the contents 'module: /path/to/pkcs11.so'.
+Alternatively the configuration file /etc/gnutls/pkcs11.conf has to exist and contain a number
+of lines of the form 'load=/usr/lib/opensc-pkcs11.so'.
 
-To provide the PIN for all the operations below use the environment variable
+You can provide the PIN to be used for the PKCS #11 operations with the environment variable
 GNUTLS_PIN.
 ";
 
@@ -314,7 +315,7 @@ $ p11tool --login --generate-rsa --bits 1024 --label "MyNewKey" \
           --outfile MyNewKey.pub "pkcs11:TOKEN-URL"
 @end example
 The bits parameter in the above example is explicitly set because some
-tokens only support a limited number of bits. The output file is the
+tokens only support limited choices in the bit length. The output file is the
 corresponding public key. This key can be used to general a certificate
 request with certtool.
 @example
