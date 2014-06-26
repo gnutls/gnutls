@@ -6,7 +6,7 @@ detail    = "Program that allows operations on PKCS #11 smart cards
 and security modules. 
 
 To use PKCS #11 tokens with GnuTLS the p11-kit configuration files need to be setup.
-That is create a .conf file in /etc/pkcs11/modules with the contents 'module: /path/to/pkcs11.so'.
+That is create a .module file in /etc/pkcs11/modules with the contents 'module: /path/to/pkcs11.so'.
 Alternatively the configuration file /etc/gnutls/pkcs11.conf has to exist and contain a number
 of lines of the form 'load=/usr/lib/opensc-pkcs11.so'.
 
