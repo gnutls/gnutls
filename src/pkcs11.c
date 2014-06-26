@@ -43,7 +43,7 @@
 #define CHECK_LOGIN_FLAG(flag) \
 	if (flag == 0) \
 		fprintf(stderr, \
-			"note: --login was not specified and it may be required for this operation.\n")
+			"warning: --login was not specified and it may be required for this operation.\n")
 
 void
 pkcs11_delete(FILE * outfile, const char *url, int batch,
@@ -502,6 +502,12 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 
 	FIX(url);
 	CHECK_LOGIN_FLAG(login_flags);
+
+	if (outfile == stderr || outfile == stdout) {
+		fprintf(stderr, "warning: no --outfile was specified and the generated public key will be printed on screen.\n");
+		fprintf(stderr, "note: in some tokens it is impossible to obtain the public key in any other way after generation.\n");
+		sleep(3);
+	}
 
 	if (private == 1)
 		flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
