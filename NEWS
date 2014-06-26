@@ -24,6 +24,11 @@ of certificates present in a PKCS #11 token when loading it.
 ** libgnutls: Allow the post client hello callback to put the handshake on
 hold, by returning GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED.
 
+** certtool: option --to-p12 will now consider --load-ca-certificate
+
+** certtol: Added option to specify the PKCS #12 friendly name on command
+line.
+
 ** p11tool: Allow marking a certificate copied to a token as a CA.
 
 ** API and ABI modifications:
