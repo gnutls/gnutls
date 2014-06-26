@@ -279,7 +279,7 @@ gnutls_x509_crl_get_dn_oid(gnutls_x509_crl_t crl,
  * encoded, depending on the certificate data.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. and a negative error code on error.
+ *   negative error value.
  *
  * Since: 3.1.10
  **/
@@ -344,7 +344,7 @@ int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl_t crl)
  * This function will extract the signature field of a CRL.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. and a negative error code on error.
+ *   negative error value. 
  **/
 int
 gnutls_x509_crl_get_signature(gnutls_x509_crl_t crl,
@@ -505,7 +505,7 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl_t crl)
  * of revoked certificates. In that case use gnutls_x509_crl_iter_crt_serial().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. and a negative error code on error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
@@ -581,7 +581,7 @@ void gnutls_x509_crl_iter_deinit(gnutls_x509_crl_iter_t iter)
  * After use, the iterator must be deinitialized using gnutls_x509_crl_iter_deinit().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. and a negative error code on error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crl_iter_crt_serial(gnutls_x509_crl_t crl,
@@ -685,7 +685,7 @@ gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl_t crl,
  * of "BEGIN X509 CRL".
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. and a negative error code on failure.
+ *   negative error value.
  **/
 int
 gnutls_x509_crl_export(gnutls_x509_crl_t crl,
@@ -715,7 +715,7 @@ gnutls_x509_crl_export(gnutls_x509_crl_t crl,
  * of "BEGIN X509 CRL".
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. and a negative error code on failure.
+ *   negative error value.
  *
  * Since 3.1.3
  **/
