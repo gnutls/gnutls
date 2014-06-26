@@ -51,11 +51,17 @@ struct asn1_node_st
   unsigned int type;		/* Node type */
   unsigned char *value;		/* Node value */
   int value_len;
+  asn1_node up;			/* Pointer to the parent node */
   asn1_node down;		/* Pointer to the son node */
   asn1_node right;		/* Pointer to the brother node */
   asn1_node left;		/* Pointer to the next list element */
   /* private fields: */
   unsigned char small_value[ASN1_SMALL_VALUE_SIZE];	/* For small values */
+
+  /* values used during decoding/coding */
+  int tmp_ival;
+  unsigned start; /* the start of the DER sequence - if decoded */
+  unsigned end; /* the end of the DER sequence - if decoded */
 };
 
 typedef struct tag_and_class_st

@@ -57,6 +57,14 @@ char *_asn1_ltostr (long v, char *str);
 
 asn1_node _asn1_find_up (asn1_node node);
 
+inline static asn1_node _asn1_get_up(asn1_node node)
+{
+	if (node && node->up)
+		return node->up;
+	else
+		return _asn1_find_up(node);
+}
+
 int _asn1_change_integer_value (asn1_node node);
 
 int _asn1_expand_object_id (asn1_node node);
@@ -99,7 +107,10 @@ _asn1_set_down (asn1_node node, asn1_node down)
     return node;
   node->down = down;
   if (down)
-    down->left = node;
+    {
+      down->left = node;
+      down->up = node;
+    }
   return node;
 }
 

@@ -134,7 +134,7 @@ _asn1_create_static_structure (asn1_node pointer, char *output_file_name,
 	{
 	  while (1)
 	    {
-	      p = _asn1_find_up (p);
+	      p = _asn1_get_up (p);
 	      if (p == pointer)
 		{
 		  p = NULL;
@@ -221,7 +221,7 @@ asn1_array2tree (const asn1_static_node * array, asn1_node * definitions,
 	      if (p_last == *definitions)
 		break;
 
-	      p_last = _asn1_find_up (p_last);
+	      p_last = _asn1_get_up (p_last);
 
 	      if (p_last == NULL)
 		break;
@@ -321,7 +321,7 @@ asn1_delete_structure2 (asn1_node * structure, unsigned int flags)
 	  p2 = p->right;
 	  if (p != *structure)
 	    {
-	      p3 = _asn1_find_up (p);
+	      p3 = _asn1_get_up (p);
 	      _asn1_set_down (p3, p2);
 	      _asn1_remove_node (p, flags);
 	      p = p3;
@@ -331,7 +331,7 @@ asn1_delete_structure2 (asn1_node * structure, unsigned int flags)
 	      p3 = _asn1_find_left (p);
 	      if (!p3)
 		{
-		  p3 = _asn1_find_up (p);
+		  p3 = _asn1_get_up (p);
 		  if (p3)
 		    _asn1_set_down (p3, p2);
 		  else
@@ -379,7 +379,7 @@ asn1_delete_element (asn1_node structure, const char *element_name)
   p3 = _asn1_find_left (source_node);
   if (!p3)
     {
-      p3 = _asn1_find_up (source_node);
+      p3 = _asn1_get_up (source_node);
       if (p3)
 	_asn1_set_down (p3, p2);
       else if (source_node->right)
@@ -423,6 +423,8 @@ _asn1_copy_structure3 (asn1_node source_node)
 	      _asn1_set_down (p_d_prev, p_d);
 	      continue;
 	    }
+	  p_d->start = p_s->start;
+	  p_d->end = p_s->end;
 	}
 
       if (p_s == source_node)
@@ -439,8 +441,8 @@ _asn1_copy_structure3 (asn1_node source_node)
       else
 	{
 	  move = UP;
-	  p_s = _asn1_find_up (p_s);
-	  p_d = _asn1_find_up (p_d);
+	  p_s = _asn1_get_up (p_s);
+	  p_d = _asn1_get_up (p_d);
 	}
     }
   while (p_s != source_node);
@@ -540,7 +542,7 @@ _asn1_type_choice_config (asn1_node node)
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_find_up (p);
+	p = _asn1_get_up (p);
     }
 
   return ASN1_SUCCESS;
@@ -591,7 +593,7 @@ _asn1_expand_identifier (asn1_node * node, asn1_node root)
 		_asn1_set_right (p3, p2);
 	      else
 		{
-		  p3 = _asn1_find_up (p);
+		  p3 = _asn1_get_up (p);
 		  if (p3)
 		    _asn1_set_down (p3, p2);
 		  else
@@ -647,7 +649,7 @@ _asn1_expand_identifier (asn1_node * node, asn1_node root)
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_find_up (p);
+	p = _asn1_get_up (p);
     }
 
   return ASN1_SUCCESS;
@@ -1015,7 +1017,7 @@ asn1_print_structure (FILE * out, asn1_node structure, const char *name,
 	{
 	  while (1)
 	    {
-	      p = _asn1_find_up (p);
+	      p = _asn1_get_up (p);
 	      if (p == root)
 		{
 		  p = NULL;
@@ -1128,12 +1130,13 @@ asn1_find_structure_from_oid (asn1_node definitions, const char *oidValue)
 
 /**
  * asn1_copy_node:
- * @dst: Destination asn1_node node.
+ * @dst: Destination asn1 node.
  * @dst_name: Field name in destination node.
- * @src: Source asn1_node node.
+ * @src: Source asn1 node.
  * @src_name: Field name in source node.
  *
- * Create a deep copy of a asn1_node variable.
+ * Create a deep copy of a asn1_node variable. That
+ * function requires @dst to be expanded using asn1_create_element().
  *
  * Returns: Return %ASN1_SUCCESS on success.
  **/
@@ -1141,9 +1144,6 @@ int
 asn1_copy_node (asn1_node dst, const char *dst_name,
 		asn1_node src, const char *src_name)
 {
-/* FIXME: rewrite using copy_structure().
- * It seems quite hard to do.
- */
   int result;
   asn1_node dst_node;
   void *data = NULL;
@@ -1176,4 +1176,20 @@ asn1_copy_node (asn1_node dst, const char *dst_name,
   free (data);
 
   return result;
+}
+
+/**
+ * asn1_dup_node:
+ * @src: Source asn1 node.
+ * @src_name: Field name in source node.
+ *
+ * Create a deep copy of a asn1_node variable. This function
+ * will return an exact copy of the provided structure.
+ *
+ * Returns: Return %NULL on failure.
+ **/
+asn1_node
+asn1_dup_node (asn1_node src, const char *src_name)
+{
+  return _asn1_copy_structure2(src, src_name);
 }

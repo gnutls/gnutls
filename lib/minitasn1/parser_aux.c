@@ -108,7 +108,13 @@ asn1_find_node (asn1_node pointer, const char *name)
   p = pointer;
   n_start = name;
 
-  if (p->name[0] != 0)
+  if (name[0] == '?' && name[1] == 'C' && p->name[0] == '?')
+    { /* ?CURRENT */
+      n_start = strchr(n_start, '.');
+      if (n_start)
+        n_start++;
+    }
+  else if (p->name[0] != 0)
     {				/* has *pointer got a name ? */
       n_end = strchr (n_start, '.');	/* search the first dot */
       if (n_end)
@@ -170,13 +176,13 @@ asn1_find_node (asn1_node pointer, const char *name)
 	return NULL;
 
       p = p->down;
+      if (p == NULL)
+        return NULL;
 
       /* The identifier "?LAST" indicates the last element
          in the right chain. */
-      if (!strcmp (n, "?LAST"))
+      if (n[0] == '?' && n[1] == 'L') /* ?LAST */
 	{
-	  if (p == NULL)
-	    return NULL;
 	  while (p->right)
 	    p = p->right;
 	}
@@ -189,9 +195,9 @@ asn1_find_node (asn1_node pointer, const char *name)
 	      else
 		p = p->right;
 	    }
-	  if (p == NULL)
-	    return NULL;
 	}
+      if (p == NULL)
+        return NULL;
     }				/* while */
 
   return p;
@@ -419,7 +425,11 @@ _asn1_set_right (asn1_node node, asn1_node right)
     return node;
   node->right = right;
   if (right)
-    right->left = node;
+    {
+      right->left = node;
+      if (right->up == NULL)
+        right->up = node->up;
+    }
   return node;
 }
 
@@ -615,7 +625,7 @@ _asn1_change_integer_value (asn1_node node)
 	    {
 	      while (1)
 		{
-		  p = _asn1_find_up (p);
+		  p = _asn1_get_up (p);
 		  if (p == node)
 		    {
 		      p = NULL;
@@ -740,7 +750,7 @@ _asn1_expand_object_id (asn1_node node)
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_find_up (p);
+	p = _asn1_get_up (p);
     }
 
 
@@ -812,7 +822,7 @@ _asn1_expand_object_id (asn1_node node)
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_find_up (p);
+	p = _asn1_get_up (p);
     }
 
   return ASN1_SUCCESS;
@@ -882,7 +892,7 @@ _asn1_type_set_config (asn1_node node)
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_find_up (p);
+	p = _asn1_get_up (p);
     }
 
   return ASN1_SUCCESS;
@@ -979,7 +989,7 @@ _asn1_check_identifier (asn1_node node)
 	{
 	  while (1)
 	    {
-	      p = _asn1_find_up (p);
+	      p = _asn1_get_up (p);
 	      if (p == node)
 		{
 		  p = NULL;
@@ -1039,7 +1049,7 @@ _asn1_set_default_tag (asn1_node node)
 	{
 	  while (1)
 	    {
-	      p = _asn1_find_up (p);
+	      p = _asn1_get_up (p);
 	      if (p == node)
 		{
 		  p = NULL;

@@ -622,7 +622,7 @@ _asn1_delete_not_used (asn1_node node)
 	    {
 	      p2 = _asn1_find_left (p);
 	      if (!p2)
-		p2 = _asn1_find_up (p);
+		p2 = _asn1_get_up (p);
 	    }
 	  asn1_delete_structure (&p);
 	  p = p2;
@@ -645,7 +645,7 @@ _asn1_delete_not_used (asn1_node node)
 	    {
 	      while (1)
 		{
-		  p = _asn1_find_up (p);
+		  p = _asn1_get_up (p);
 		  if (p == node)
 		    {
 		      p = NULL;
@@ -871,20 +871,23 @@ static void delete_unneeded_choice_fields(asn1_node p)
 }
 
 
-
 /**
- * asn1_der_decoding:
+ * asn1_der_decoding2
  * @element: pointer to an ASN1 structure.
  * @ider: vector that contains the DER encoding.
- * @ider_len: number of bytes of *@ider: @ider[0]..@ider[len-1].
+ * @max_ider_len: pointer to an integer giving the information about the
+ *   maximal number of bytes occupied by *@ider. The real size of the DER
+ *   encoding is returned through this pointer.
+ * @flags: flags controlling the behaviour of the function.
  * @errorDescription: null-terminated string contains details when an
  *   error occurred.
  *
- * Fill the structure *@ELEMENT with values of a DER encoding
- * string. The structure must just be created with function
- * asn1_create_element().  If an error occurs during the decoding
- * procedure, the *@ELEMENT is deleted and set equal to
- * %NULL.
+ * Fill the structure *@element with values of a DER encoding string. The
+ * structure must just be created with function asn1_create_element().
+ *
+ * If %ASN1_DECODE_FLAG_ALLOW_PADDING flag is set then the function will ignore
+ * padding after the decoded DER data. Upon a successful return the value of
+ * *@max_ider_len will be set to the number of bytes decoded.
  *
  * Returns: %ASN1_SUCCESS if DER encoding OK, %ASN1_ELEMENT_NOT_FOUND
  *   if @ELEMENT is %NULL, and %ASN1_TAG_ERROR or
@@ -892,15 +895,16 @@ static void delete_unneeded_choice_fields(asn1_node p)
  *   name (*@ELEMENT deleted).
  **/
 int
-asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
-		   char *errorDescription)
+asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
+		    unsigned int flags, char *errorDescription)
 {
   asn1_node node, p, p2, p3;
   char temp[128];
   int counter, len2, len3, len4, move, ris, tlen;
+  asn1_node ptail = NULL;
   unsigned char class;
   unsigned long tag;
-  int indefinite, result;
+  int indefinite, result, total_len = *max_ider_len, ider_len = *max_ider_len;
   const unsigned char *der = ider;
 
   node = *element;
@@ -928,8 +932,8 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 	{
 	  if (p->type & CONST_SET)
 	    {
-	      p2 = _asn1_find_up (p);
-	      len2 = _asn1_strtol (p2->value, NULL, 10);
+	      p2 = _asn1_get_up (p);
+	      len2 = p2->tmp_ival;
 	      if (len2 == -1)
 		{
 		  if (HAVE_TWO(ider_len) && !der[counter] && !der[counter + 1])
@@ -978,10 +982,14 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 		}
 	    }
 
+	  /* the position in the DER structure this starts */
+	  p->start = counter;
+	  p->end = total_len - 1;
+
 	  if ((p->type & CONST_OPTION) || (p->type & CONST_DEFAULT))
 	    {
-	      p2 = _asn1_find_up (p);
-	      len2 = _asn1_strtol (p2->value, NULL, 10);
+	      p2 = _asn1_get_up (p);
+	      len2 = p2->tmp_ival;
 	      if (counter == len2)
 		{
 		  if (p->right)
@@ -1037,12 +1045,14 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 		}
 	      else if (type_field (p->type) != ASN1_ETYPE_CHOICE)
 		p = p->down;
+
+	      p->start = counter;
 	    }
 
 	  if ((p->type & CONST_OPTION) || (p->type & CONST_DEFAULT))
 	    {
-	      p2 = _asn1_find_up (p);
-	      len2 = _asn1_strtol (p2->value, NULL, 10);
+	      p2 = _asn1_get_up (p);
+	      len2 = p2->tmp_ival;
 
 	      if ((len2 != -1) && (counter > len2))
 		ris = ASN1_TAG_ERROR;
@@ -1208,8 +1218,8 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 	    case ASN1_ETYPE_SET:
 	      if (move == UP)
 		{
-		  len2 = _asn1_strtol (p->value, NULL, 10);
-		  _asn1_set_value (p, NULL, 0);
+		  len2 = p->tmp_ival;
+		  p->tmp_ival = 0;
 		  if (len2 == -1)
 		    {		/* indefinite length method */
 		      DECR_LEN(ider_len, 2);
@@ -1248,10 +1258,7 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 
 		  if (len3 > 0)
 		    {
-		      _asn1_ltostr (counter + len3, temp);
-		      tlen = strlen (temp);
-		      if (tlen > 0)
-			_asn1_set_value (p, temp, tlen + 1);
+		      p->tmp_ival = counter + len3;
 		      move = DOWN;
 		    }
 		  else if (len3 == 0)
@@ -1272,7 +1279,7 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 		    }
 		  else
 		    {		/* indefinite length method */
-		      _asn1_set_value (p, "-1", 3);
+		      p->tmp_ival = -1;
 		      move = DOWN;
 		    }
 		}
@@ -1281,20 +1288,19 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 	    case ASN1_ETYPE_SET_OF:
 	      if (move == UP)
 		{
-		  len2 = _asn1_strtol (p->value, NULL, 10);
+		  len2 = p->tmp_ival;
 		  if (len2 == -1)
 		    {		/* indefinite length method */
 		      if (!HAVE_TWO(ider_len) || ((der[counter]) || der[counter + 1]))
 			{
-			  _asn1_append_sequence_set (p);
-			  p = p->down;
-			  while (p->right)
-			    p = p->right;
+			  _asn1_append_sequence_set (p, &ptail);
+			  p = ptail;
 			  move = RIGHT;
 			  continue;
 			}
 
-		      _asn1_set_value (p, NULL, 0);
+		      p->tmp_ival = 0;
+		      ptail = NULL; /* finished decoding this structure */
 		      DECR_LEN(ider_len, 2);
 		      counter += 2;
 		    }
@@ -1302,15 +1308,15 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 		    {		/* definite length method */
 		      if (len2 > counter)
 			{
-			  _asn1_append_sequence_set (p);
-			  p = p->down;
-			  while (p->right)
-			    p = p->right;
+			  _asn1_append_sequence_set (p, &ptail);
+			  p = ptail;
 			  move = RIGHT;
 			  continue;
 			}
 
-		      _asn1_set_value (p, NULL, 0);
+		      p->tmp_ival = 0;
+		      ptail = NULL; /* finished decoding this structure */
+
 		      if (len2 != counter)
 			{
 			  result = ASN1_DER_ERROR;
@@ -1336,22 +1342,18 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 		    {
 		      if (len3 > 0)
 			{	/* definite length method */
-			  _asn1_ltostr (counter + len3, temp);
-			  tlen = strlen (temp);
-
-			  if (tlen > 0)
-			    _asn1_set_value (p, temp, tlen + 1);
+		          p->tmp_ival = counter + len3;
 			}
 		      else
 			{	/* indefinite length method */
-			  _asn1_set_value (p, "-1", 3);
+		          p->tmp_ival = -1;
 			}
 		      p2 = p->down;
 		      while ((type_field (p2->type) == ASN1_ETYPE_TAG)
 			     || (type_field (p2->type) == ASN1_ETYPE_SIZE))
 			p2 = p2->right;
 		      if (p2->right == NULL)
-			_asn1_append_sequence_set (p);
+			_asn1_append_sequence_set (p, &ptail);
 		      p = p2;
 		    }
 		}
@@ -1440,6 +1442,11 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 	    }
 	}
 
+      if (p)
+        {
+      	  p->end = counter - 1;
+        }
+
       if (p == node && move != DOWN)
 	break;
 
@@ -1458,23 +1465,54 @@ asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
 	    move = UP;
 	}
       if (move == UP)
-	p = _asn1_find_up (p);
+	p = _asn1_get_up (p);
     }
 
   _asn1_delete_not_used (*element);
 
-  if (ider_len != 0)
+  if ((ider_len < 0) ||
+      (!(flags & ASN1_DECODE_FLAG_ALLOW_PADDING) && (ider_len != 0)))
     {
       warn();
       result = ASN1_DER_ERROR;
       goto cleanup;
     }
 
+  *max_ider_len = total_len - ider_len;
+
   return ASN1_SUCCESS;
 
 cleanup:
   asn1_delete_structure (element);
   return result;
+}
+
+
+/**
+ * asn1_der_decoding:
+ * @element: pointer to an ASN1 structure.
+ * @ider: vector that contains the DER encoding.
+ * @ider_len: number of bytes of *@ider: @ider[0]..@ider[len-1].
+ * @errorDescription: null-terminated string contains details when an
+ *   error occurred.
+ *
+ * Fill the structure *@element with values of a DER encoding
+ * string. The structure must just be created with function
+ * asn1_create_element(). 
+ *
+ * Note that the *@element variable is provided as a pointer for
+ * historical reasons.
+ *
+ * Returns: %ASN1_SUCCESS if DER encoding OK, %ASN1_ELEMENT_NOT_FOUND
+ *   if @ELEMENT is %NULL, and %ASN1_TAG_ERROR or
+ *   %ASN1_DER_ERROR if the der encoding doesn't match the structure
+ *   name (*@ELEMENT deleted).
+ **/
+int
+asn1_der_decoding (asn1_node * element, const void *ider, int ider_len,
+		   char *errorDescription)
+{
+  return asn1_der_decoding2 (element, ider, &ider_len, 0, errorDescription);
 }
 
 #define FOUND        1
@@ -1533,6 +1571,9 @@ asn1_der_decoding_element (asn1_node * structure, const char *elementName,
  * One example is the sequence "tbsCertificate" inside an X509
  * certificate.
  *
+ * Note that since libtasn1 3.7 the @ider and @ider_len parameters
+ * can be omitted, if the element is already decoded using asn1_der_decoding().
+ *
  * Returns: %ASN1_SUCCESS if DER encoding OK, %ASN1_ELEMENT_NOT_FOUND
  *   if ELEMENT is %asn1_node EMPTY or @name_element is not a valid
  *   element, %ASN1_TAG_ERROR or %ASN1_DER_ERROR if the der encoding
@@ -1542,12 +1583,8 @@ int
 asn1_der_decoding_startEnd (asn1_node element, const void *ider, int ider_len,
 			    const char *name_element, int *start, int *end)
 {
-  asn1_node node, node_to_find, p, p2;
-  int counter, len2, len3, len4, move, ris;
-  unsigned char class;
-  unsigned long tag;
-  int indefinite, result = ASN1_DER_ERROR;
-  const unsigned char *der = ider;
+  asn1_node node, node_to_find;
+  int result = ASN1_DER_ERROR;
 
   node = element;
 
@@ -1559,377 +1596,34 @@ asn1_der_decoding_startEnd (asn1_node element, const void *ider, int ider_len,
   if (node_to_find == NULL)
     return ASN1_ELEMENT_NOT_FOUND;
 
-  if (node_to_find == node)
+  *start = node_to_find->start;
+  *end = node_to_find->end;
+
+  if (*start == 0 && *end == 0)
     {
-      *start = 0;
-      *end = ider_len - 1;
-      return ASN1_SUCCESS;
+      if (ider == NULL || ider_len == 0)
+        return ASN1_GENERIC_ERROR;
+
+      /* it seems asn1_der_decoding() wasn't called before. Do it now */
+      result = asn1_der_decoding (&node, ider, ider_len, NULL);
+      if (result != ASN1_SUCCESS)
+        {
+          warn();
+          return result;
+        }
+
+      node_to_find = asn1_find_node (node, name_element);
+      if (node_to_find == NULL)
+        return ASN1_ELEMENT_NOT_FOUND;
+
+      *start = node_to_find->start;
+      *end = node_to_find->end;
     }
 
-  if (node->type & CONST_OPTION)
+  if (*end < *start)
     return ASN1_GENERIC_ERROR;
 
-  counter = 0;
-  move = DOWN;
-  p = node;
-  while (1)
-    {
-      if (p == NULL)
-	return ASN1_DER_ERROR;
-
-      ris = ASN1_SUCCESS;
-
-      if (move != UP)
-	{
-	  if (p->type & CONST_SET)
-	    {
-	      p2 = _asn1_find_up (p);
-	      if (p2 == NULL)
-	        {
-		  warn();
-		  return ASN1_DER_ERROR;
-		}
-
-	      len2 = _asn1_strtol (p2->value, NULL, 10);
-	      if (len2 == -1)
-		{
-		  if (HAVE_TWO(ider_len) && !der[counter] && !der[counter + 1])
-		    {
-		      p = p2;
-		      move = UP;
-		      counter += 2;
-		      DECR_LEN(ider_len, 2);
-		      continue;
-		    }
-		}
-	      else if (counter == len2)
-		{
-		  p = p2;
-		  move = UP;
-		  continue;
-		}
-	      else if (counter > len2)
-	        {
-		  warn();
-		  return ASN1_DER_ERROR;
-		}
-
-	      p2 = p2->down;
-
-	      while (p2)
-		{
-		  if ((p2->type & CONST_SET) && (p2->type & CONST_NOT_USED))
-		    {		/* CONTROLLARE */
-		      ris =
-			  extract_tag_der_recursive (p2, der + counter,
-						 ider_len, &len2);
-		      if (ris == ASN1_SUCCESS)
-			{
-			  p2->type &= ~CONST_NOT_USED;
-			  p = p2;
-			  break;
-			}
-		    }
-		  p2 = p2->right;
-		}
-	      if (p2 == NULL)
-	        {
-		  warn();
-		  return ASN1_DER_ERROR;
-		}
-	    }
-
-	  if (p == node_to_find)
-	    *start = counter;
-
-	  if (type_field (p->type) == ASN1_ETYPE_CHOICE)
-	    {
-	      p = p->down;
-	      if (p == NULL)
-	        {
-		  warn();
-		  return ASN1_DER_ERROR;
-		}
-
-	      ris =
-		_asn1_extract_tag_der (p, der + counter, ider_len,
-				       &len2);
-	      if (p == node_to_find)
-		*start = counter;
-	    }
-
-	  if (ris == ASN1_SUCCESS)
-	    ris =
-	      _asn1_extract_tag_der (p, der + counter, ider_len, &len2);
-	  if (ris != ASN1_SUCCESS)
-	    {
-	      if (p->type & CONST_OPTION)
-		{
-		  p->type |= CONST_NOT_USED;
-		  move = RIGHT;
-		}
-	      else if (p->type & CONST_DEFAULT)
-		{
-		  move = RIGHT;
-		}
-	      else
-		{
-		  warn();
-		  return ASN1_TAG_ERROR;
-		}
-	    }
-	  else
-	    {
-	      DECR_LEN(ider_len, len2);
-	      counter += len2;
-	    }
-	}
-
-      if (ris == ASN1_SUCCESS)
-	{
-	  switch (type_field (p->type))
-	    {
-	    case ASN1_ETYPE_NULL:
-	       DECR_LEN(ider_len, 1);
-
-	      if (der[counter])
-	        {
-		  warn();
-		  return ASN1_DER_ERROR;
-		}
-	      counter++;
-	      move = RIGHT;
-	      break;
-	    case ASN1_ETYPE_BOOLEAN:
-              DECR_LEN(ider_len, 2);
-
-	      if (der[counter] != 1)
-	        {
-		  warn();
-		  return ASN1_DER_ERROR;
-		}
-
-	      counter += 2;
-	      move = RIGHT;
-	      break;
-	    case ASN1_ETYPE_OCTET_STRING:
-	      ris = _asn1_get_octet_string (NULL, der + counter, ider_len, &len3);
-	      if (ris != ASN1_SUCCESS)
-	        {
-		  warn();
-		  return ris;
-		}
-              DECR_LEN(ider_len, len3);
-	      counter += len3;
-	      move = RIGHT;
-	      break;
-	    case ASN1_ETYPE_UTC_TIME:
-	    case ASN1_ETYPE_GENERALIZED_TIME:
-	    case ASN1_ETYPE_OBJECT_ID:
-	    case ASN1_ETYPE_INTEGER:
-	    case ASN1_ETYPE_ENUMERATED:
-	    case ASN1_ETYPE_GENERALSTRING:
-	    case ASN1_ETYPE_NUMERIC_STRING:
-	    case ASN1_ETYPE_IA5_STRING:
-	    case ASN1_ETYPE_TELETEX_STRING:
-	    case ASN1_ETYPE_PRINTABLE_STRING:
-	    case ASN1_ETYPE_UNIVERSAL_STRING:
-	    case ASN1_ETYPE_BMP_STRING:
-	    case ASN1_ETYPE_UTF8_STRING:
-	    case ASN1_ETYPE_VISIBLE_STRING:
-	    case ASN1_ETYPE_BIT_STRING:
-	      len2 =
-		asn1_get_length_der (der + counter, ider_len, &len3);
-	      if (len2 < 0)
-	        {
-		  warn();
-		  return ASN1_DER_ERROR;
-		}
-
-              DECR_LEN(ider_len, len3 + len2);
-	      counter += len3 + len2;
-	      move = RIGHT;
-	      break;
-	    case ASN1_ETYPE_SEQUENCE:
-	    case ASN1_ETYPE_SET:
-	      if (move != UP)
-		{
-		  len3 =
-		    asn1_get_length_der (der + counter, ider_len, &len2);
-		  if (len3 < -1)
-		    {
-  		      warn();
-		      return ASN1_DER_ERROR;
-		    }
-
-                  DECR_LEN(ider_len, len2);
-		  counter += len2;
-
-		  if (len3 == 0)
-		    move = RIGHT;
-		  else
-		    move = DOWN;
-		}
-	      else
-		{
-		  if (HAVE_TWO(ider_len) && !der[counter] && !der[counter + 1])	/* indefinite length method */
-		    {
-		      counter += 2;
-		      DECR_LEN(ider_len, 2);
-		    }
-		  move = RIGHT;
-		}
-	      break;
-	    case ASN1_ETYPE_SEQUENCE_OF:
-	    case ASN1_ETYPE_SET_OF:
-	      if (move != UP)
-		{
-		  len3 =
-		    asn1_get_length_der (der + counter, ider_len, &len2);
-		  if (len3 < -1)
-		    {
-  		      warn();
-		      return ASN1_DER_ERROR;
-		    }
-
-                  DECR_LEN(ider_len, len2);
-		  counter += len2;
-
-		  if (len3 == -1)
-		    {
-		       if (HAVE_TWO(ider_len) && !der[counter] && !der[counter + 1])
-		         {
-  		           DECR_LEN(ider_len, 2);
-		           counter += 2;
-		         }
-		    }
-
-		  if (len3)
-		    {
-		      p2 = p->down;
-		      while ((type_field (p2->type) == ASN1_ETYPE_TAG) ||
-			     (type_field (p2->type) == ASN1_ETYPE_SIZE))
-			p2 = p2->right;
-		      p = p2;
-		    }
-		}
-	      else
-		{
-		  if (HAVE_TWO(ider_len) && !der[counter] && !der[counter + 1])	/* indefinite length method */
-		    {
-		      DECR_LEN(ider_len, 2);
-		      counter += 2;
-		    }
-		}
-	      move = RIGHT;
-	      break;
-	    case ASN1_ETYPE_ANY:
-	      if (asn1_get_tag_der
-		  (der + counter, ider_len, &class, &len2,
-		   &tag) != ASN1_SUCCESS)
-		 {
-  		    warn();
-		    return ASN1_DER_ERROR;
-		 }
-
-	      DECR_LEN(ider_len, len2);
-
-	      len4 =
-		asn1_get_length_der (der + counter + len2,
-				     ider_len, &len3);
-	      if (len4 < -1)
-	        {
- 	          warn();
-		  return ASN1_DER_ERROR;
-		}
-
-	      if (len4 != -1)
-		{
-		  DECR_LEN(ider_len, len3 + len4);
-		  counter += len2 + len3 + len4;
-		}
-	      else
-		{		/* indefinite length */
-		  /* Check indefinite lenth method in an EXPLICIT TAG */
-		  ider_len += len2; /* undo DECR_LEN */
-
-		  if (counter == 0)
-		    {
-		      result = ASN1_DER_ERROR;
-                      warn();
-		      goto cleanup;
-		    }
-
-		  if ((p->type & CONST_TAG) && (der[counter - 1] == 0x80))
-		    indefinite = 1;
-		  else
-		    indefinite = 0;
-
-		  ris =
-		    _asn1_get_indefinite_length_string (der + counter, ider_len, &len2);
-		  if (ris != ASN1_SUCCESS)
-		    {
- 	              warn();
-		      return ris;
-		    }
-		  counter += len2;
-		  DECR_LEN(ider_len, len2);
-
-		  /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
-		     an indefinite length method. */
-		  if (indefinite)
-		    {
-		      DECR_LEN(ider_len, 2);
-
-		      if (!der[counter] && !der[counter + 1])
-			counter += 2;
-		      else
-		        {
- 	                  warn();
-			  return ASN1_DER_ERROR;
-			}
-		    }
-		}
-	      move = RIGHT;
-	      break;
-	    default:
-	      move = (move == UP) ? RIGHT : DOWN;
-	      break;
-	    }
-	}
-
-      if ((p == node_to_find) && (move == RIGHT))
-	{
-	  *end = counter - 1;
-	  return ASN1_SUCCESS;
-	}
-
-      if (p == node && move != DOWN)
-	break;
-
-      if (move == DOWN)
-	{
-	  if (p->down)
-	    p = p->down;
-	  else
-	    move = RIGHT;
-	}
-      if ((move == RIGHT) && !(p->type & CONST_SET))
-	{
-	  if (p->right)
-	    p = p->right;
-	  else
-	    move = UP;
-	}
-      if (move == UP)
-	p = _asn1_find_up (p);
-    }
-
-  warn();
-  return ASN1_ELEMENT_NOT_FOUND;
-
-cleanup:
-  return result;
+  return ASN1_SUCCESS;
 }
 
 /**
@@ -1984,7 +1678,7 @@ asn1_expand_any_defined_by (asn1_node definitions, asn1_node * element)
 		  break;
 		}
 
-	      p3 = _asn1_find_up (p);
+	      p3 = _asn1_get_up (p);
 
 	      if (!p3)
 		{
@@ -2004,8 +1698,8 @@ asn1_expand_any_defined_by (asn1_node definitions, asn1_node * element)
 		  (p3->value == NULL))
 		{
 
-		  p3 = _asn1_find_up (p);
-		  p3 = _asn1_find_up (p3);
+		  p3 = _asn1_get_up (p);
+		  p3 = _asn1_get_up (p3);
 
 		  if (!p3)
 		    {
@@ -2140,7 +1834,7 @@ asn1_expand_any_defined_by (asn1_node definitions, asn1_node * element)
 	{
 	  while (1)
 	    {
-	      p = _asn1_find_up (p);
+	      p = _asn1_get_up (p);
 	      if (p == *element)
 		{
 		  p = NULL;
