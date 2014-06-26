@@ -354,6 +354,8 @@ gnutls_openpgp_privkey_set_preferred_key_id@GNUTLS_1_4
 gnutls_openpgp_privkey_sign_hash@GNUTLS_1_4
 gnutls_openpgp_send_cert@GNUTLS_1_4
 gnutls_openpgp_set_recv_key_function@GNUTLS_1_4
+gnutls_packet_deinit@GNUTLS_3_1_0
+gnutls_packet_get@GNUTLS_3_1_0
 gnutls_pcert_deinit@GNUTLS_3_0_0
 gnutls_pcert_import_openpgp@GNUTLS_3_0_0
 gnutls_pcert_import_openpgp_raw@GNUTLS_3_0_0
@@ -573,6 +575,7 @@ gnutls_record_get_discarded@GNUTLS_3_0_0
 gnutls_record_get_max_size@GNUTLS_1_4
 gnutls_record_overhead_size@GNUTLS_3_1_0
 gnutls_record_recv@GNUTLS_1_4
+gnutls_record_recv_packet@GNUTLS_3_1_0
 gnutls_record_recv_seq@GNUTLS_3_0_0
 gnutls_record_send@GNUTLS_1_4
 gnutls_record_send_range@GNUTLS_3_1_0
@@ -740,6 +743,8 @@ gnutls_x509_crl_get_this_update@GNUTLS_1_4
 gnutls_x509_crl_get_version@GNUTLS_1_4
 gnutls_x509_crl_import@GNUTLS_1_4
 gnutls_x509_crl_init@GNUTLS_1_4
+gnutls_x509_crl_iter_crt_serial@GNUTLS_3_1_0
+gnutls_x509_crl_iter_deinit@GNUTLS_3_1_0
 gnutls_x509_crl_list_import2@GNUTLS_3_0_0
 gnutls_x509_crl_list_import@GNUTLS_3_0_0
 gnutls_x509_crl_print@GNUTLS_1_4
