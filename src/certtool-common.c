@@ -515,12 +515,16 @@ gnutls_privkey_t load_ca_private_key(common_info_st * info)
 
 /* Loads the CA's certificate
  */
-gnutls_x509_crt_t load_ca_cert(common_info_st * info)
+gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info)
 {
 	gnutls_x509_crt_t crt;
 	int ret;
 	gnutls_datum_t dat;
 	size_t size;
+
+	if (mand == 0 && info->ca == NULL) {
+		return NULL;
+	}
 
 	if (info->ca == NULL) {
 		fprintf(stderr, "missing --load-ca-certificate\n");
@@ -537,7 +541,7 @@ gnutls_x509_crt_t load_ca_cert(common_info_st * info)
 	dat.size = size;
 
 	if (!dat.data) {
-		fprintf(stderr, "reading --load-ca-certificate: %s\n",
+		fprintf(stderr, "error reading --load-ca-certificate: %s\n",
 			info->ca);
 		exit(1);
 	}

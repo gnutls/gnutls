@@ -808,7 +808,7 @@ static void generate_signed_certificate(common_info_st * cinfo)
 	fprintf(stdlog, "Generating a signed certificate...\n");
 
 	ca_key = load_ca_private_key(cinfo);
-	ca_crt = load_ca_cert(cinfo);
+	ca_crt = load_ca_cert(1, cinfo);
 
 	crt = generate_certificate(&key, ca_crt, 0, cinfo);
 
@@ -897,7 +897,7 @@ static void generate_signed_crl(common_info_st * cinfo)
 	fprintf(stdlog, "Generating a signed CRL...\n");
 
 	ca_key = load_ca_private_key(cinfo);
-	ca_crt = load_ca_cert(cinfo);
+	ca_crt = load_ca_cert(1, cinfo);
 	crl = generate_crl(ca_crt, cinfo);
 
 	fprintf(stdlog, "\n");
@@ -928,7 +928,7 @@ static void update_signed_certificate(common_info_st * cinfo)
 	fprintf(stdlog, "Generating a signed certificate...\n");
 
 	ca_key = load_ca_private_key(cinfo);
-	ca_crt = load_ca_cert(cinfo);
+	ca_crt = load_ca_cert(1, cinfo);
 	crt = load_cert(1, cinfo);
 
 	fprintf(stderr, "Activation/Expiration time.\n");
@@ -2488,7 +2488,7 @@ void verify_crl(common_info_st * cinfo)
 	gnutls_x509_crl_t crl;
 	gnutls_x509_crt_t issuer;
 
-	issuer = load_ca_cert(cinfo);
+	issuer = load_ca_cert(1, cinfo);
 
 	fprintf(outfile, "\nCA certificate:\n");
 
@@ -2588,7 +2588,7 @@ void generate_pkcs8(common_info_st * cinfo)
 void generate_pkcs12(common_info_st * cinfo)
 {
 	gnutls_pkcs12_t pkcs12;
-	gnutls_x509_crt_t *crts;
+	gnutls_x509_crt_t *crts, ca_crt;
 	gnutls_x509_privkey_t *keys;
 	int result;
 	size_t size;
@@ -2606,8 +2606,13 @@ void generate_pkcs12(common_info_st * cinfo)
 
 	keys = load_privkey_list(0, &nkeys, cinfo);
 	crts = load_cert_list(0, &ncrts, cinfo);
+	ca_crt = load_ca_cert(0, cinfo);
 
-	name = get_pkcs12_key_name();
+	if (HAVE_OPT(P12_NAME)) {
+		name = OPT_ARG(P12_NAME);
+	} else {
+		name = get_pkcs12_key_name();
+	}
 
 	result = gnutls_pkcs12_init(&pkcs12);
 	if (result < 0) {
@@ -2665,6 +2670,39 @@ void generate_pkcs12(common_info_st * cinfo)
 		result = gnutls_pkcs12_bag_set_key_id(bag, indx, &key_id);
 		if (result < 0) {
 			fprintf(stderr, "bag_set_key_id: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+
+		result = gnutls_pkcs12_bag_encrypt(bag, pass, flags);
+		if (result < 0) {
+			fprintf(stderr, "bag_encrypt: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+
+		result = gnutls_pkcs12_set_bag(pkcs12, bag);
+		if (result < 0) {
+			fprintf(stderr, "set_bag: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+	}
+
+	/* Add the ca cert, if any */
+	if (ca_crt) {
+		gnutls_pkcs12_bag_t bag;
+
+		result = gnutls_pkcs12_bag_init(&bag);
+		if (result < 0) {
+			fprintf(stderr, "bag_init: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+
+		result = gnutls_pkcs12_bag_set_crt(bag, ca_crt);
+		if (result < 0) {
+			fprintf(stderr, "set_crt[%d]: %s\n", i,
 				gnutls_strerror(result));
 			exit(1);
 		}

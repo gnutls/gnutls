@@ -68,7 +68,7 @@ gnutls_x509_privkey_t *load_privkey_list(int mand, size_t * privkey_size,
 					 common_info_st * info);
 gnutls_x509_crq_t load_request(common_info_st * info);
 gnutls_privkey_t load_ca_private_key(common_info_st * info);
-gnutls_x509_crt_t load_ca_cert(common_info_st * info);
+gnutls_x509_crt_t load_ca_cert(unsigned mand, common_info_st * info);
 gnutls_x509_crt_t load_cert(int mand, common_info_st * info);
 gnutls_datum_t *load_secret_key(int mand, common_info_st * info);
 gnutls_pubkey_t load_pubkey(int mand, common_info_st * info);

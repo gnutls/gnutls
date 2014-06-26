@@ -227,6 +227,13 @@ flag = {
 };
 
 flag = {
+    name      = p12-name;
+    arg-type  = string;
+    descrip   = "The PKCS #12 friendly name to use";
+    doc = "The name to be used for the primary certificate and private key in a PKCS #12 file.";
+};
+
+flag = {
     name      = p7-info;
     descrip   = "Print information on a PKCS #7 structure";
     doc       = "";
