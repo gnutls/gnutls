@@ -24,6 +24,7 @@
 srcdir=${srcdir:-.}
 top_builddir=${top_builddir:-../..}
 CERTTOOL=${CERTTOOL:-${top_builddir}/src/certtool$EXEEXT}
+DIFF=${DIFF:-diff}
 DEBUG=""
 
 if test "x$1" != "x";then
@@ -56,6 +57,66 @@ if test $rc != 0; then
 	echo "PKCS12 FATAL $file"
 	ret=1
 fi
+
+# test whether we can encode a certificate and a key
+$CERTTOOL --to-p12 --password 1234 --p12-name "my-key" --load-certificate $srcdir/../certs/cert-ecc256.pem --load-privkey $srcdir/../certs/ecc256.pem --outder --outfile out.p12 >/dev/null 2>&1
+rc=$?
+if test $rc != 0; then
+	echo "PKCS12 FATAL encoding"
+	ret=1
+fi
+
+$CERTTOOL --p12-info --inder --password 1234 --infile out.p12 >out.pem 2>/dev/null
+rc=$?
+if test $rc != 0; then
+	echo "PKCS12 FATAL decrypting/decoding"
+	ret=1
+fi
+
+grep "BEGIN ENCRYPTED PRIVATE KEY" out.pem >/dev/null 2>&1
+rc=$?
+
+if test "$rc" != "0"; then
+  exit $rc
+fi
+
+grep "BEGIN CERTIFICATE" out.pem >/dev/null 2>&1
+rc=$?
+
+if test "$rc" != "0"; then
+  exit $rc
+fi
+
+# test whether we can encode a certificate, a key and a CA
+$CERTTOOL --to-p12 --password 123456 --p12-name "my-key" --load-certificate $srcdir/../certs/cert-ecc256.pem --load-privkey $srcdir/../certs/ecc256.pem --load-ca-certificate $srcdir/../certs/ca-cert-ecc.pem --outder --outfile out.p12 >/dev/null 2>&1
+rc=$?
+if test $rc != 0; then
+	echo "PKCS12 FATAL encoding 2"
+	exit 1
+fi
+
+$CERTTOOL --p12-info --inder --password 123456 --infile out.p12 >out.pem 2>/dev/null
+rc=$?
+if test $rc != 0; then
+	echo "PKCS12 FATAL decrypting/decoding 2"
+	exit 1
+fi
+
+grep "BEGIN ENCRYPTED PRIVATE KEY" out.pem >/dev/null 2>&1
+rc=$?
+
+if test "$rc" != "0"; then
+  exit $rc
+fi
+
+count=`grep -c "BEGIN CERTIFICATE" out.pem`
+
+if test "$count" != "2"; then
+  echo "Only one certificate was included"
+  exit 1
+fi
+
+rm -f out.pem out.p12
 
 #echo "NEON PKCS12 DONE (rc $ret)"
 exit $ret
