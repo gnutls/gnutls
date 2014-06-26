@@ -23,7 +23,7 @@
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:libtool} --mode=execute ${VALGRIND}"
+VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 counter=0

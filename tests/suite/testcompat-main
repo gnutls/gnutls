@@ -25,7 +25,7 @@ CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
 PORT="${PORT:-5568}"
 unset RETCODE
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:libtool} --mode=execute ${VALGRIND}"
+VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 if test "${WINDIR}" != "";then

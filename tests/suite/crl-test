@@ -24,7 +24,7 @@ srcdir=${srcdir:-.}
 DIFF=${DIFF:-diff}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:libtool} --mode=execute ${VALGRIND}"
+VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 rm -f tmp-long.pem
