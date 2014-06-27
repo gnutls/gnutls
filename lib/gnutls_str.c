@@ -291,7 +291,7 @@ _gnutls_buffer_append_printf(gnutls_buffer_st * dest, const char *fmt, ...)
 {
 	va_list args;
 	int len;
-	char *str;
+	char *str = NULL;
 
 	va_start(args, fmt);
 	len = vasprintf(&str, fmt, args);
