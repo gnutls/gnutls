@@ -31,6 +31,10 @@
 #include <gnutls_errors.h>
 #include <extras/randomart.h>
 
+#ifdef HAVE_INET_NTOP
+# include <arpa/inet.h>
+#endif
+
 #define addf _gnutls_buffer_append_printf
 #define adds _gnutls_buffer_append_str
 
@@ -56,6 +60,12 @@ static char *ip_to_string(void *_ip, int ip_size, char *string,
 		return NULL;
 	}
 
+#ifdef HAVE_INET_NTOP
+	if (ip_size == 4)
+		return inet_ntop(AF_INET, _ip, string, string_size);
+	else
+		return inet_ntop(AF_INET6, _ip, string, string_size);
+#else
 	ip = _ip;
 	switch (ip_size) {
 	case 4:
@@ -70,8 +80,8 @@ static char *ip_to_string(void *_ip, int ip_size, char *string,
 			 (ip[12] << 8) | ip[13], (ip[14] << 8) | ip[15]);
 		break;
 	}
-
 	return string;
+#endif
 }
 
 static void
