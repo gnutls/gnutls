@@ -3,6 +3,17 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.6 (unreleased)
+
+** libgnutls: Use inet_ntop to print IP addresses when available
+
+** libgnutls: gnutls_x509_crt_check_hostname and friends will also check
+IP addresses, and match documented behavior. Reported by David Woodhouse.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.5 (released 2014-06-26)
 
 ** libgnutls: Added gnutls_record_recv_packet() and gnutls_packet_deinit().
