@@ -131,11 +131,20 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 				gnutls_assert();
 				goto hostname_fallback;
 			}
-			return check_ip(cert, &ipv6, 16, flags);
+			ret = check_ip(cert, &ipv6, 16, flags);
+#else
+			ret = 0;
 #endif
 		} else {
-			return check_ip(cert, &ipv4, 4, flags);
+			ret = check_ip(cert, &ipv4, 4, flags);
 		}
+
+		if (ret != 0)
+			return ret;
+
+		/* There are several misconfigured servers, that place their IP
+		 * in the DNS field of subjectAlternativeName. Don't break these
+		 * configurations and verify the IP as it would have been a DNS name. */
 	}
 
  hostname_fallback:
