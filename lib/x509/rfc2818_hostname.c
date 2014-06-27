@@ -123,7 +123,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	if ((p=strchr(hostname, ':')) != NULL || inet_aton(hostname, &ipv4) != 0) {
 
 		if (p != NULL) {
-#ifdef AF_INET6
+#ifdef HAVE_INET_PTON
 			struct in6_addr ipv6;
 
 			ret = inet_pton(AF_INET6, hostname, &ipv6);
