@@ -24,6 +24,7 @@
 #include <x509_int.h>
 #include <common.h>
 #include <gnutls_errors.h>
+#include <arpa/inet.h>
 
 /**
  * gnutls_x509_crt_check_hostname:
@@ -48,6 +49,40 @@ gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 			       const char *hostname)
 {
 	return gnutls_x509_crt_check_hostname2(cert, hostname, 0);
+}
+
+static int
+check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size, unsigned flags)
+{
+	char temp[16];
+	size_t temp_size;
+	unsigned i;
+	int ret;
+
+	/* try matching against:
+	 *  1) a IPaddress alternative name (subjectAltName) extension
+	 *     in the certificate
+	 */
+
+	/* Check through all included subjectAltName extensions, comparing
+	 * against all those of type IPAddress.
+	 */
+	for (i = 0; !(ret < 0); i++) {
+		temp_size = sizeof(temp);
+		ret = gnutls_x509_crt_get_subject_alt_name(cert, i,
+							   temp,
+							   &temp_size,
+							   NULL);
+
+		if (ret == GNUTLS_SAN_IPADDRESS) {
+			if (temp_size == ip_size && memcmp(temp, ip, ip_size) == 0)
+				return 1;
+		}
+	}
+
+	/* not found a matching IP
+	 */
+	return 0;
 }
 
 /**
@@ -81,7 +116,29 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	int found_dnsname = 0;
 	int ret = 0;
 	int i = 0;
+	struct in_addr ipv4;
+	char *p = NULL;
 
+	/* check whether @hostname is an ip address */
+	if ((p=strchr(hostname, ':')) != NULL || inet_aton(hostname, &ipv4) != 0) {
+
+		if (p != NULL) {
+#ifdef AF_INET6
+			struct in6_addr ipv6;
+
+			ret = inet_pton(AF_INET6, hostname, &ipv6);
+			if (ret == 0) {
+				gnutls_assert();
+				goto hostname_fallback;
+			}
+			return check_ip(cert, &ipv6, 16, flags);
+#endif
+		} else {
+			return check_ip(cert, &ipv4, 4, flags);
+		}
+	}
+
+ hostname_fallback:
 	/* try matching against:
 	 *  1) a DNS name as an alternative name (subjectAltName) extension
 	 *     in the certificate
