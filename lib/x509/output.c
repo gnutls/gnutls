@@ -41,10 +41,10 @@
 #define NON_NULL(x) (((x)!=NULL)?((char*)(x)):"")
 #define ERROR_STR (char*) "(error)"
 
-static char *ip_to_string(void *_ip, int ip_size, char *string,
+static const
+char *ip_to_string(void *_ip, int ip_size, char *string,
 			  int string_size)
 {
-	uint8_t *ip;
 
 	if (ip_size != 4 && ip_size != 16) {
 		gnutls_assert();
@@ -67,21 +67,24 @@ static char *ip_to_string(void *_ip, int ip_size, char *string,
 	else
 		return inet_ntop(AF_INET6, _ip, string, string_size);
 #else
-	ip = _ip;
-	switch (ip_size) {
-	case 4:
-		snprintf(string, string_size, "%u.%u.%u.%u", ip[0], ip[1],
-			 ip[2], ip[3]);
-		break;
-	case 16:
-		snprintf(string, string_size, "%x:%x:%x:%x:%x:%x:%x:%x",
-			 (ip[0] << 8) | ip[1], (ip[2] << 8) | ip[3],
-			 (ip[4] << 8) | ip[5], (ip[6] << 8) | ip[7],
-			 (ip[8] << 8) | ip[9], (ip[10] << 8) | ip[11],
-			 (ip[12] << 8) | ip[13], (ip[14] << 8) | ip[15]);
-		break;
+	{
+		uint8_t *ip;
+		ip = _ip;
+		switch (ip_size) {
+		case 4:
+			snprintf(string, string_size, "%u.%u.%u.%u", ip[0], ip[1],
+				 ip[2], ip[3]);
+			break;
+		case 16:
+			snprintf(string, string_size, "%x:%x:%x:%x:%x:%x:%x:%x",
+				 (ip[0] << 8) | ip[1], (ip[2] << 8) | ip[3],
+				 (ip[4] << 8) | ip[5], (ip[6] << 8) | ip[7],
+				 (ip[8] << 8) | ip[9], (ip[10] << 8) | ip[11],
+				 (ip[12] << 8) | ip[13], (ip[14] << 8) | ip[15]);
+			break;
+		}
+		return string;
 	}
-	return string;
 #endif
 }
 
@@ -90,7 +93,7 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 {
 char *sname = (char*)name->data;
 char str_ip[64];
-char *p;
+const char *p;
 
 	if ((type == GNUTLS_SAN_DNSNAME
 	     || type == GNUTLS_SAN_RFC822NAME
