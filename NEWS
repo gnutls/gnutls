@@ -13,6 +13,8 @@ it as unknown and print its hex value rather than failing. That works around
 an issue in a TURKTRST root certificate which improperly encodes the
 X520countryName element.
 
+** libgnutls: IP addresses are printed using inet_ntop() when available.
+
 ** API and ABI modifications:
 No changes since last version.
 
