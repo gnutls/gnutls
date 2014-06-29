@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 Version 2.12.24 (unreleased)
 
+** libgnutls: Fix in TLS server hello parsing (GNUTLS-SA-2014-3)
+
 ** libgnutls: Fix in TLS record decoding (GNUTLS-SA-2013-2)
 
 ** libgnutls: Fix in certificate verification (GNUTLS-SA-2014-1,
