@@ -263,6 +263,7 @@ static void ch_handler(int sig)
 int main(int argc, char **argv)
 {
 	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
 
 	if (argc > 1)
 		debug = 1;
