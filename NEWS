@@ -15,6 +15,9 @@ X520countryName element.
 
 ** libgnutls: IP addresses are printed using inet_ntop() when available.
 
+** libgnutls: gnutls_x509_crt_check_hostname will also check IP addresses
+and match documented behavior. Reported by David Woodhouse.
+
 ** API and ABI modifications:
 No changes since last version.
 
