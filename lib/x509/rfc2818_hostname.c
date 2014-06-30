@@ -82,6 +82,8 @@ check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size)
  * Wildcards are only considered if the domain name consists of three
  * components or more.
  *
+ * The IPv4/v6 address comparison is since GnuTLS 3.2.16.
+ *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
 int
