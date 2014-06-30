@@ -151,7 +151,7 @@ AC_C_BIGENDIAN
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
 dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other libs)
-AC_CHECK_FUNCS([fork inet_ntop getrusage getpwuid_r nanosleep daemon getpid clock_gettime iconv localtime vasprintf],,)
+AC_CHECK_FUNCS([fork inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid clock_gettime iconv localtime vasprintf],,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>
