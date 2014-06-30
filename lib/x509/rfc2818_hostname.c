@@ -36,11 +36,7 @@
  * described in RFC2818 (HTTPS), which takes into account wildcards,
  * and the DNSName/IPAddress subject alternative name PKIX extension.
  *
- * The comparison may have false-negatives as it is done byte by byte in 
- * non-ascii names.
- *
- * Wildcards are only considered if the domain name consists of three
- * components or more, and the wildcard starts at the leftmost position.
+ * For details see also gnutls_x509_crt_check_hostname2().
  *
  * Returns: non-zero for a successful match, and zero on failure.
  **/
@@ -98,8 +94,15 @@ check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size, unsigned flag
  * described in RFC2818 (HTTPS), which takes into account wildcards,
  * and the DNSName/IPAddress subject alternative name PKIX extension.
  *
- * The comparison may have false-negatives as it is done byte by byte in 
- * non-ascii names.
+ * IPv4 addresses are accepted by this function in the dotted-decimal
+ * format (e.g, ddd.ddd.ddd.ddd), and IPv6 addresses in the hexadecimal
+ * x:x:x:x:x:x:x:x format. For them the IPAddress subject alternative
+ * name extension is consulted, as well as the DNSNames in case of a non-match.
+ * The latter fallback exists due to misconfiguration of many servers
+ * which place an IPAddress inside the DNSName extension.
+ *
+ * The comparison of dns names may have false-negatives as it is done byte 
+ * by byte in non-ascii names.
  *
  * When the flag %GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS is specified no
  * wildcards are considered. Otherwise they are only considered if the
