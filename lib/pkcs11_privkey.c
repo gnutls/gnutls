@@ -638,6 +638,7 @@ gnutls_pkcs11_privkey_generate2 (const char* url, gnutls_pk_algorithm_t pk,
   struct ck_mechanism mech;
   gnutls_pubkey_t pkey = NULL;
   gnutls_pkcs11_obj_t obj = NULL;
+  ck_key_type_t key_type;
 
   memset(&sinfo, 0, sizeof(sinfo));
 
@@ -664,7 +665,7 @@ gnutls_pkcs11_privkey_generate2 (const char* url, gnutls_pk_algorithm_t pk,
   a_val = p_val = 0;
   mech.parameter = NULL;
   mech.parameter_len = 0;
-  mech.mechanism = pk_to_genmech(pk);
+  mech.mechanism = pk_to_genmech(pk, &key_type);
 
   switch(pk)
     {
@@ -810,7 +811,7 @@ gnutls_pkcs11_privkey_generate2 (const char* url, gnutls_pk_algorithm_t pk,
 
       obj->pk_algorithm = pk;
       obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
-      ret = pkcs11_read_pubkey(sinfo.module, sinfo.pks, pub, mech.mechanism, obj->pubkey);
+      ret = pkcs11_read_pubkey(sinfo.module, sinfo.pks, pub, key_type, obj->pubkey);
       if (ret < 0)
         {
           gnutls_assert ();
