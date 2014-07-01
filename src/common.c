@@ -968,11 +968,15 @@ pin_callback(void *user, int attempt, const char *token_url,
 /* allow caching of PIN */
 	static char *cached_url = NULL;
 	static char cached_pin[32] = "";
+	const char *env;
 
-	if (flags & GNUTLS_PIN_SO)
+	if (flags & GNUTLS_PIN_SO) {
+		env = "GNUTLS_SO_PIN";
 		desc = "security officer";
-	else
+	} else {
+		env = "GNUTLS_PIN";
 		desc = "user";
+	}
 
 	if (flags & GNUTLS_PIN_FINAL_TRY) {
 		cache = 0;
@@ -1008,7 +1012,9 @@ pin_callback(void *user, int attempt, const char *token_url,
 	printf("Token '%s' with URL '%s' ", token_label, token_url);
 	printf("requires %s PIN\n", desc);
 	
-	password = getenv("GNUTLS_PIN");
+	password = getenv(env);
+	if (env == NULL) /* compatibility */
+		password = getenv("GNUTLS_PIN");
 
 	if (password == NULL) {
 		password = getpass("Enter PIN: ");
