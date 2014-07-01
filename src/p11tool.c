@@ -151,6 +151,12 @@ static void cmd_parser(int argc, char **argv)
 	else
 		cinfo.outcert_format = GNUTLS_X509_FMT_PEM;
 
+	if (HAVE_OPT(SET_PIN))
+		cinfo.pin = OPT_ARG(SET_PIN);
+
+	if (HAVE_OPT(SET_SO_PIN))
+		cinfo.so_pin = OPT_ARG(SET_SO_PIN);
+
 	if (HAVE_OPT(LOAD_CERTIFICATE))
 		cinfo.cert = OPT_ARG(LOAD_CERTIFICATE);
 

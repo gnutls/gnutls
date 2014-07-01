@@ -538,7 +538,7 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 	    common_info_st * info)
 {
 	int ret;
-	char *pin;
+	const char *pin;
 	char so_pin[32];
 
 	pkcs11_common();
@@ -548,17 +548,28 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 		exit(1);
 	}
 
-	pin = getpass("Enter Security Officer's PIN: ");
-	if (pin == NULL)
-		exit(1);
+	if (info->so_pin != NULL)
+		pin = info->so_pin;
+	else {
+		pin = getpass("Enter Security Officer's PIN: ");
+		if (pin == NULL)
+			exit(1);
+	}
 
-	if (strlen(pin) >= sizeof(so_pin))
+	if (strlen(pin) >= sizeof(so_pin) || pin[0] == '\n')
 		exit(1);
 
 	strcpy(so_pin, pin);
 
-	pin = getpass("Enter new User's PIN: ");
-	if (pin == NULL)
+	if (info->so_pin != NULL)
+		pin = info->pin;
+	else {
+		pin = getpass("Enter new User's PIN: ");
+		if (pin == NULL)
+			exit(1);
+	}
+
+	if (pin[0] == '\n')
 		exit(1);
 
 	ret = gnutls_pkcs11_token_init(url, so_pin, label);

@@ -87,12 +87,6 @@ flag = {
 };
 
 flag = {
-    name      = initialize;
-    descrip   = "Initializes a PKCS #11 token";
-    doc = "";
-};
-
-flag = {
     name      = write;
     descrip   = "Writes the loaded objects to a PKCS #11 token";
     doc = "It can be used to write private keys, certificates or secret keys to a token.";
@@ -266,6 +260,26 @@ flag = {
 flag = {
     name      = outraw;
     aliases   = outder;
+};
+
+flag = {
+    name      = initialize;
+    descrip   = "Initializes a PKCS #11 token";
+    doc = "";
+};
+
+flag = {
+    name      = set-pin;
+    arg-type  = string;
+    descrip   = "Specify the PIN to use on token initialization";
+    doc      = "";
+};
+
+flag = {
+    name      = set-so-pin;
+    arg-type  = string;
+    descrip   = "Specify the Security Officer's PIN to use on token initialization";
+    doc      = "";
 };
 
 flag = {

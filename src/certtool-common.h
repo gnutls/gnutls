@@ -53,6 +53,9 @@ typedef struct common_info {
 	unsigned int crq_extensions;
 	unsigned int v1_cert;
 
+	const char *pin;
+	const char *so_pin;
+
 	int cprint;
 
 	unsigned int verbose;
