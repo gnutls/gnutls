@@ -10,8 +10,8 @@ That is create a .module file in /etc/pkcs11/modules with the contents 'module: 
 Alternatively the configuration file /etc/gnutls/pkcs11.conf has to exist and contain a number
 of lines of the form 'load=/usr/lib/opensc-pkcs11.so'.
 
-You can provide the PIN to be used for the PKCS #11 operations with the environment variable
-GNUTLS_PIN.
+You can provide the PIN to be used for the PKCS #11 operations with the environment variables
+GNUTLS_PIN and GNUTLS_SO_PIN.
 ";
 
 short-usage   = "p11tool [options] [url]\np11tool --help for usage instructions.\n";
