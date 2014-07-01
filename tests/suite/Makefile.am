@@ -86,7 +86,7 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom \
-	testpkcs11 testrng
+	testpkcs11 testrng testpkcs11.pkcs15 testpkcs11.softhsm
 
 TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn testcompat chain invalid-cert \
 	testpkcs11 testrng
