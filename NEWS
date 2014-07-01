@@ -18,6 +18,8 @@ X520countryName element.
 ** libgnutls: gnutls_x509_crt_check_hostname will also check IP addresses
 and match documented behavior. Reported by David Woodhouse.
 
+** p11tool: use GNUTLS_SO_PIN to read the security officer's PIN if set.
+
 ** API and ABI modifications:
 No changes since last version.
 
