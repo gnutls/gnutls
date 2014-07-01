@@ -1393,6 +1393,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 
 		break;
 	default:
+		_gnutls_debug_log("requested reading public key of unsupported type %u\n", (unsigned)key_type);
 		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 		goto cleanup;
 	}
