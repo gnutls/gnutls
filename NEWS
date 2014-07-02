@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: gnutls_x509_crt_check_hostname and friends will also check
 IP addresses, and match documented behavior. Reported by David Woodhouse.
 
+** libgnutls: DSA key generation in FIPS140-2 mode doesn't allow 1024
+bit parameters.
+
 ** p11tool: use GNUTLS_SO_PIN to read the security officer's PIN if set.
 
 ** p11tool: ask for label when one isn't provided.
