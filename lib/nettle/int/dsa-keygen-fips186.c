@@ -39,10 +39,6 @@
 unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits)
 {
 	switch (q_bits) {
-	case 160:
-		if (p_bits != 1024)
-			return 0;
-		break;
 	case 224:
 		if (p_bits != 2048)
 			return 0;
