@@ -79,6 +79,25 @@ generate_rsa_privkey () {
 		echo ok
 	else
 		echo failed
+		exit 1
+	fi
+}
+
+# $1: token
+# $2: PIN
+# $3: bits
+generate_temp_rsa_privkey () {
+	export GNUTLS_PIN=$2
+	token=$1
+	bits=$3
+
+	echo -n "* Generating RSA private key ($bits)... "
+	$P11TOOL $ADDITIONAL_PARAM --login --label gnutls-client --generate-rsa --bits $bits "$token" --outfile tmp-client.pub >>$TMPFILE 2>&1
+	if test $? = 0;then
+		$P11TOOL $ADDITIONAL_PARAM --login --delete "$token;object=gnutls-client;object-type=private" >>$TMPFILE 2>&1
+		echo ok
+	else
+		echo failed
 		RETCODE=1
 	fi
 }
@@ -86,7 +105,7 @@ generate_rsa_privkey () {
 # $1: token
 # $2: PIN
 # $3: bits
-generate_ecc_privkey () {
+generate_temp_ecc_privkey () {
 	export GNUTLS_PIN=$2
 	token=$1
 	bits=$3
@@ -94,6 +113,7 @@ generate_ecc_privkey () {
 	echo -n "* Generating ECC private key ($bits)... "
 	$P11TOOL $ADDITIONAL_PARAM --login --label gnutls-client --generate-ecc --bits $bits "$token" --outfile tmp-client.pub >>$TMPFILE 2>&1
 	if test $? = 0;then
+		$P11TOOL $ADDITIONAL_PARAM --login --delete "$token;object=gnutls-client;object-type=private" >>$TMPFILE 2>&1
 		echo ok
 	else
 		echo failed
@@ -261,11 +281,11 @@ fi
 #write a given privkey
 write_privkey $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/client.key"
 
-generate_ecc_privkey $TOKEN $GNUTLS_PIN 256
+generate_temp_ecc_privkey $TOKEN $GNUTLS_PIN 256
 
-generate_ecc_privkey $TOKEN $GNUTLS_PIN 384
+generate_temp_ecc_privkey $TOKEN $GNUTLS_PIN 384
 
-generate_rsa_privkey $TOKEN $GNUTLS_PIN 2048
+#generate_temp_rsa_privkey $TOKEN $GNUTLS_PIN 2048
 
 generate_rsa_privkey $TOKEN $GNUTLS_PIN 1024
 
