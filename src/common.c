@@ -1043,7 +1043,10 @@ pin_callback(void *user, int attempt, const char *token_url,
 	}
 
 	if (password == NULL || password[0] == 0 || password[0] == '\n') {
-		fprintf(stderr, "No PIN given\n");
+		fprintf(stderr, "No PIN given.\n");
+		if (info != NULL && info->batch != 0) {
+			fprintf(stderr, "note: when operating in batch mode, set the GNUTLS_PIN or GNUTLS_SO_PIN environment variables\n");
+		}
 		exit(1);
 	}
 
