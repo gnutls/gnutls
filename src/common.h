@@ -22,6 +22,7 @@
 
 #include <config.h>
 #include <gnutls/gnutls.h>
+#include <certtool-common.h>
 
 #include <sys/socket.h>
 #include <netdb.h>
@@ -58,7 +59,6 @@ void print_list(const char *priorities, int verbose);
 int cert_verify(gnutls_session_t session, const char *hostname, const char *purpose);
 
 const char *raw_to_string(const unsigned char *raw, size_t raw_size);
-void pkcs11_common(void);
 int check_command(gnutls_session_t session, const char *str);
 
 int
@@ -66,7 +66,7 @@ pin_callback(void *user, int attempt, const char *token_url,
 	     const char *token_label, unsigned int flags, char *pin,
 	     size_t pin_max);
 
-void pkcs11_common(void);
+void pkcs11_common(common_info_st *c);
 
 #ifdef _WIN32
 static int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)

@@ -951,7 +951,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 #ifdef ENABLE_PKCS11
-	pkcs11_common();
+	pkcs11_common(NULL);
 #endif
 
 	/* Note that servers must generate parameters for

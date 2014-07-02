@@ -1080,6 +1080,8 @@ static void cmd_parser(int argc, char **argv)
 		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+
+	memset(&cinfo, 0, sizeof(cinfo));
 #ifdef ENABLE_PKCS11
 	if (HAVE_OPT(PROVIDER)) {
 		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
@@ -1098,14 +1100,13 @@ static void cmd_parser(int argc, char **argv)
 		}
 	}
 
-	pkcs11_common();
+	pkcs11_common(&cinfo);
 #endif
-
-	memset(&cinfo, 0, sizeof(cinfo));
 
 	if (HAVE_OPT(VERBOSE))
 		cinfo.verbose = 1;
 
+	cinfo.batch = batch;
 	cinfo.cprint = HAVE_OPT(CPRINT);
 
 	if (HAVE_OPT(LOAD_PRIVKEY))

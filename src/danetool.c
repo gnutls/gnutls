@@ -135,7 +135,7 @@ static void cmd_parser(int argc, char **argv)
 		exit(1);
 	}
 #ifdef ENABLE_PKCS11
-	pkcs11_common();
+	pkcs11_common(NULL);
 #endif
 
 	memset(&cinfo, 0, sizeof(cinfo));

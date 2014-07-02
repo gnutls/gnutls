@@ -978,6 +978,7 @@ pin_callback(void *user, int attempt, const char *token_url,
 	     size_t pin_max)
 {
 	const char *password = NULL;
+	common_info_st *info = user;
 	const char *desc;
 	int cache = MAX_CACHE_TRIES;
 	unsigned len;
@@ -1027,12 +1028,12 @@ pin_callback(void *user, int attempt, const char *token_url,
 
 	printf("Token '%s' with URL '%s' ", token_label, token_url);
 	printf("requires %s PIN\n", desc);
-	
+
 	password = getenv(env);
 	if (env == NULL) /* compatibility */
 		password = getenv("GNUTLS_PIN");
 
-	if (password == NULL) {
+	if (password == NULL && (info == NULL || info->batch == 0)) {
 		password = getpass("Enter PIN: ");
 	} else {
 		if (flags & GNUTLS_PIN_WRONG) {
@@ -1074,8 +1075,9 @@ static int
 token_callback(void *user, const char *label, const unsigned retry)
 {
 	char buf[32];
+	common_info_st *info = user;
 
-	if (retry > 0) {
+	if (retry > 0 || (info != NULL && info->batch != 0)) {
 		fprintf(stderr, "Could not find token %s\n", label);
 		return -1;
 	}
@@ -1086,11 +1088,11 @@ token_callback(void *user, const char *label, const unsigned retry)
 	return 0;
 }
 
-void pkcs11_common(void)
+void pkcs11_common(common_info_st *c)
 {
 
-	gnutls_pkcs11_set_pin_function(pin_callback, NULL);
-	gnutls_pkcs11_set_token_function(token_callback, NULL);
+	gnutls_pkcs11_set_pin_function(pin_callback, c);
+	gnutls_pkcs11_set_token_function(token_callback, c);
 
 }
 

@@ -100,7 +100,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int login_flags,
 
 	if (login_flags) obj_flags = login_flags;
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	FIX(url, outfile, detailed, info);
 
@@ -190,7 +190,7 @@ pkcs11_export(FILE * outfile, const char *url, unsigned int login_flags,
 
 	if (login_flags) obj_flags = login_flags;
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	FIX(url, outfile, 0, info);
 
@@ -238,7 +238,7 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int login_flags,
 
 	if (login_flags) obj_flags = login_flags;
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	FIX(url, outfile, 0, info);
 
@@ -333,7 +333,7 @@ char *get_single_token_url(common_info_st * info)
 	int ret;
 	char *url = NULL, *t = NULL;
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	ret = gnutls_pkcs11_token_get_url(0, 0, &url);
 	if (ret < 0)
@@ -359,7 +359,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 	char buf[128];
 	size_t size;
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	for (i = 0;; i++) {
 		ret = gnutls_pkcs11_token_get_url(i, detailed, &url);
@@ -451,7 +451,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 
 	if (login_flags) flags = login_flags;
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	FIX(url, outfile, 0, info);
 	CHECK_LOGIN_FLAG(login_flags);
@@ -536,7 +536,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 
 	if (login_flags) flags = login_flags;
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	FIX(url, outfile, detailed, info);
 	CHECK_LOGIN_FLAG(login_flags);
@@ -583,7 +583,7 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 	const char *pin;
 	char so_pin[32];
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	if (url == NULL) {
 		fprintf(stderr, "error: no token URL given to initialize!\n");
@@ -853,7 +853,7 @@ pkcs11_mechanism_list(FILE * outfile, const char *url, unsigned int login_flags,
 	unsigned long mechanism;
 	const char *str;
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	FIX(url, outfile, 0, info);
 
@@ -886,7 +886,7 @@ pkcs11_get_random(FILE * outfile, const char *url, unsigned bytes,
 	int ret;
 	uint8_t *output;
 
-	pkcs11_common();
+	pkcs11_common(info);
 
 	FIX(url, outfile, 0, info);
 
