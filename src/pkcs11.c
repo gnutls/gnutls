@@ -53,7 +53,7 @@ char *get_single_token_url(common_info_st * info);
 			"warning: --login was not specified and it may be required for this operation.\n")
 
 void
-pkcs11_delete(FILE * outfile, const char *url, int batch,
+pkcs11_delete(FILE * outfile, const char *url,
 	      unsigned int login_flags, common_info_st * info)
 {
 	int ret;
@@ -61,7 +61,7 @@ pkcs11_delete(FILE * outfile, const char *url, int batch,
 
 	if (login_flags) obj_flags = login_flags;
 
-	if (!batch) {
+	if (info->batch == 0) {
 		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, login_flags,
 			    GNUTLS_PKCS11_URL_LIB, info);
 		ret =
@@ -456,6 +456,10 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 	FIX(url, outfile, 0, info);
 	CHECK_LOGIN_FLAG(login_flags);
 
+	if (label == NULL && info->batch == 0) {
+		label = read_str("warning: The object's label was not specified.\nLabel: ");
+	}
+
 	secret_key = load_secret_key(0, info);
 	if (secret_key != NULL) {
 		ret =
@@ -541,6 +545,10 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 		fprintf(stderr, "warning: no --outfile was specified and the generated public key will be printed on screen.\n");
 		fprintf(stderr, "note: in some tokens it is impossible to obtain the public key in any other way after generation.\n");
 		sleep(3);
+	}
+
+	if (label == NULL && info->batch == 0) {
+		label = read_str("warning: Label was not specified.\nLabel: ");
 	}
 
 	if (private == 1)

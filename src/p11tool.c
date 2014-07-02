@@ -246,7 +246,7 @@ static void cmd_parser(int argc, char **argv)
 	} else if (HAVE_OPT(INITIALIZE))
 		pkcs11_init(outfile, url, label, &cinfo);
 	else if (HAVE_OPT(DELETE))
-		pkcs11_delete(outfile, url, 0, login, &cinfo);
+		pkcs11_delete(outfile, url, login, &cinfo);
 	else if (HAVE_OPT(GENERATE_ECC)) {
 		key_type = GNUTLS_PK_EC;
 		pkcs11_generate(outfile, url, key_type,

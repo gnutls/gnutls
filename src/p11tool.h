@@ -44,7 +44,7 @@ void pkcs11_write(FILE * outfile, const char *pkcs11_url,
 		  const char *label, int trusted, 
 		  int ca, int private,
 		  unsigned int login, common_info_st *);
-void pkcs11_delete(FILE * outfile, const char *pkcs11_url, int batch,
+void pkcs11_delete(FILE * outfile, const char *pkcs11_url,
 		   unsigned int login, common_info_st *);
 void pkcs11_init(FILE * outfile, const char *pkcs11_url, const char *label,
 		 common_info_st *);

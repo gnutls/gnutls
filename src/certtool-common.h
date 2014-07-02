@@ -58,6 +58,7 @@ typedef struct common_info {
 
 	int cprint;
 
+	unsigned int batch;
 	unsigned int verbose;
 } common_info_st;
 

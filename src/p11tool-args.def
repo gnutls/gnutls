@@ -290,6 +290,12 @@ flag = {
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
 };
 
+flag = {
+    name      = batch;
+    descrip   = "Disable all interaction with the tool. All parameters need to be specified on command line.";
+    doc = "";
+};
+
 
 doc-section = {
   ds-type = 'SEE ALSO';
