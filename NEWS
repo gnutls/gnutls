@@ -12,6 +12,10 @@ IP addresses, and match documented behavior. Reported by David Woodhouse.
 
 ** p11tool: use GNUTLS_SO_PIN to read the security officer's PIN if set.
 
+** p11tool: ask for label when one isn't provided.
+
+* p11tool: added --batch parameter to disable any interactivity.
+
 ** API and ABI modifications:
 No changes since last version.
 
