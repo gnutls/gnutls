@@ -66,23 +66,24 @@ void doit(void)
 	     algorithm++) {
 		ret = gnutls_x509_crq_init(&crq);
 		if (ret < 0)
-			fail("gnutls_x509_crq_init: %d\n", ret);
+			fail("gnutls_x509_crq_init: %d: %s\n", ret, gnutls_strerror(ret));
 
 		ret = gnutls_x509_privkey_init(&pkey);
 		if (ret < 0) {
-			fail("gnutls_x509_privkey_init: %d\n", ret);
+			fail("gnutls_x509_privkey_init: %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		ret = gnutls_privkey_init(&abs_pkey);
 		if (ret < 0) {
-			fail("gnutls_privkey_init: %d\n", ret);
+			fail("gnutls_privkey_init: %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		ret =
 		    gnutls_x509_privkey_generate(pkey, algorithm, (algorithm==GNUTLS_PK_RSA)?2048:1024, 0);
 		if (ret < 0) {
-			fail("gnutls_x509_privkey_generate (rsa): %d\n",
-			     ret);
+			fail("gnutls_x509_privkey_generate (%s): %d: %s\n",
+			     gnutls_pk_algorithm_get_name(algorithm),
+			     ret, gnutls_strerror(ret));
 		} else if (debug) {
 			success("Key[%s] generation ok: %d\n",
 				gnutls_pk_algorithm_get_name(algorithm),
@@ -93,7 +94,7 @@ void doit(void)
 		ret = gnutls_x509_privkey_get_key_id(pkey, 0, pkey_key_id,
 						     &pkey_key_id_len);
 		if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			fail("gnutls_x509_privkey_get_key_id incorrectly returns %d\n", ret);
+			fail("gnutls_x509_privkey_get_key_id incorrectly returns %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		pkey_key_id =
@@ -102,17 +103,17 @@ void doit(void)
 		    gnutls_x509_privkey_get_key_id(pkey, 0, pkey_key_id,
 						   &pkey_key_id_len);
 		if (ret != GNUTLS_E_SUCCESS) {
-			fail("gnutls_x509_privkey_get_key_id incorrectly returns %d\n", ret);
+			fail("gnutls_x509_privkey_get_key_id incorrectly returns %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		ret = gnutls_x509_crq_set_version(crq, 1);
 		if (ret < 0) {
-			fail("gnutls_x509_crq_set_version: %d\n", ret);
+			fail("gnutls_x509_crq_set_version: %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		ret = gnutls_x509_crq_set_key(crq, pkey);
 		if (ret < 0) {
-			fail("gnutls_x509_crq_set_key: %d\n", ret);
+			fail("gnutls_x509_crq_set_key: %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		ret =
@@ -120,24 +121,24 @@ void doit(void)
 						  GNUTLS_OID_X520_COMMON_NAME,
 						  0, "CN-Test", 7);
 		if (ret < 0) {
-			fail("gnutls_x509_crq_set_dn_by_oid: %d\n", ret);
+			fail("gnutls_x509_crq_set_dn_by_oid: %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		ret = gnutls_privkey_import_x509(abs_pkey, pkey, 0);
 		if (ret < 0) {
-			fail("gnutls_privkey_import_x509: %d\n", ret);
+			fail("gnutls_privkey_import_x509: %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		ret =
 		    gnutls_x509_crq_privkey_sign(crq, abs_pkey,
 						 GNUTLS_DIG_SHA1, 0);
 		if (ret < 0) {
-			fail("gnutls_x509_crq_sign: %d\n", ret);
+			fail("gnutls_x509_crq_sign: %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		ret = gnutls_x509_crq_verify(crq, 0);
 		if (ret < 0) {
-			fail("gnutls_x509_crq_verify: %d\n", ret);
+			fail("gnutls_x509_crq_verify: %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		crq_key_id_len = 0;
@@ -145,7 +146,7 @@ void doit(void)
 		    gnutls_x509_crq_get_key_id(crq, 0, crq_key_id,
 					       &crq_key_id_len);
 		if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			fail("gnutls_x509_crq_get_key_id incorrectly returns %d\n", ret);
+			fail("gnutls_x509_crq_get_key_id incorrectly returns %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		crq_key_id =
@@ -154,7 +155,7 @@ void doit(void)
 		    gnutls_x509_crq_get_key_id(crq, 0, crq_key_id,
 					       &crq_key_id_len);
 		if (ret != GNUTLS_E_SUCCESS) {
-			fail("gnutls_x509_crq_get_key_id incorrectly returns %d\n", ret);
+			fail("gnutls_x509_crq_get_key_id incorrectly returns %d: %s\n", ret, gnutls_strerror(ret));
 		}
 
 		if (crq_key_id_len == pkey_key_id_len) {
