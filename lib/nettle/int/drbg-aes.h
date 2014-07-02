@@ -1,6 +1,6 @@
 /* drbg-aes.h
  *
- * The ANSI X9.31 Appendix A.2.4 AES-based DRBG.
+ * The CTR-AES-256-based random-number generator from SP800-90A.
  */
 
 /* Copyright (C) 2013 Red Hat
