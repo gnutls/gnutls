@@ -40,7 +40,7 @@ void doit(void)
 	if (gnutls_dh_params_init(&dh_params) < 0)
 		fail("Error in dh parameter initialization\n");
 
-	if (gnutls_dh_params_generate2(dh_params, 1024) < 0)
+	if (gnutls_dh_params_generate2(dh_params, 2048) < 0)
 		fail("Error in prime generation\n");
 
 	gnutls_dh_params_deinit(dh_params);
