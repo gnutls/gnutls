@@ -79,7 +79,7 @@ void doit(void)
 		}
 
 		ret =
-		    gnutls_x509_privkey_generate(pkey, algorithm, (algorithm==GNUTLS_PK_RSA)?2048:1024, 0);
+		    gnutls_x509_privkey_generate(pkey, algorithm, (algorithm==GNUTLS_PK_RSA)?2048:2048, 0);
 		if (ret < 0) {
 			fail("gnutls_x509_privkey_generate (%s): %d: %s\n",
 			     gnutls_pk_algorithm_get_name(algorithm),
@@ -131,7 +131,7 @@ void doit(void)
 
 		ret =
 		    gnutls_x509_crq_privkey_sign(crq, abs_pkey,
-						 GNUTLS_DIG_SHA1, 0);
+						 GNUTLS_DIG_SHA256, 0);
 		if (ret < 0) {
 			fail("gnutls_x509_crq_sign: %d: %s\n", ret, gnutls_strerror(ret));
 		}
