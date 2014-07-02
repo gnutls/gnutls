@@ -14,7 +14,7 @@ IP addresses, and match documented behavior. Reported by David Woodhouse.
 
 ** p11tool: ask for label when one isn't provided.
 
-* p11tool: added --batch parameter to disable any interactivity.
+** p11tool: added --batch parameter to disable any interactivity.
 
 ** API and ABI modifications:
 No changes since last version.
