@@ -102,6 +102,8 @@ functions have been deprecated and are listed below.
 @tab The function @funcref{gnutls_privkey_sign_hash} is equivalent
 when the flag @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA} is specified.
 
+@end multitable
+
 @heading Upgrading to 3.3.x from 3.2.x
 
 GnuTLS 3.3.x is source and binary compatible with GnuTLS 3.2.x releases;
