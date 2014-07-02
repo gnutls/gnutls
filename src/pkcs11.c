@@ -593,7 +593,9 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 	if (info->so_pin != NULL)
 		pin = info->so_pin;
 	else {
-		pin = getpass("Enter Security Officer's PIN: ");
+		pin = getenv("GNUTLS_SO_PIN");
+		if (pin == NULL && info->batch == 0)
+			pin = getpass("Enter Security Officer's PIN: ");
 		if (pin == NULL)
 			exit(1);
 	}
@@ -603,10 +605,12 @@ pkcs11_init(FILE * outfile, const char *url, const char *label,
 
 	strcpy(so_pin, pin);
 
-	if (info->so_pin != NULL)
+	if (info->so_pin != NULL) {
 		pin = info->pin;
-	else {
-		pin = getpass("Enter new User's PIN: ");
+	} else {
+		pin = getenv("GNUTLS_PIN");
+		if (pin == NULL && info->batch == 0)
+			pin = getpass("Enter new User's PIN: ");
 		if (pin == NULL)
 			exit(1);
 	}

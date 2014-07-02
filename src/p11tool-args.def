@@ -272,14 +272,14 @@ flag = {
     name      = set-pin;
     arg-type  = string;
     descrip   = "Specify the PIN to use on token initialization";
-    doc      = "";
+    doc      = "Alternatively the GNUTLS_PIN environment variable may be used.";
 };
 
 flag = {
     name      = set-so-pin;
     arg-type  = string;
     descrip   = "Specify the Security Officer's PIN to use on token initialization";
-    doc      = "";
+    doc      = "Alternatively the GNUTLS_SO_PIN environment variable may be used.";
 };
 
 flag = {
