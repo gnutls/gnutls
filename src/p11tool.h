@@ -39,7 +39,7 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int login,
 	      common_info_st * info);
 
 void pkcs11_token_list(FILE * outfile, unsigned int detailed,
-		       common_info_st *);
+		       common_info_st *, unsigned brief);
 void pkcs11_write(FILE * outfile, const char *pkcs11_url,
 		  const char *label, int trusted, 
 		  int ca, int private,

@@ -34,10 +34,17 @@
 #include <stdint.h>
 #include <common.h>
 
-#define FIX(url) \
+static
+char *get_single_token_url(common_info_st * info);
+
+#define FIX(url, out, det, info) \
 	if (url == NULL) { \
-		fprintf(stderr, "warning: no token URL was provided for this operation;\nuse --list-tokens for the available ones.\n"); \
-		exit(1); \
+		url = get_single_token_url(info); \
+		if (url == NULL) { \
+			fprintf(stderr, "warning: no token URL was provided for this operation; the available tokens are:\n"); \
+			pkcs11_token_list(out, det, info, 1); \
+			exit(1); \
+		} \
 	}
 
 #define CHECK_LOGIN_FLAG(flag) \
@@ -95,7 +102,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int login_flags,
 
 	pkcs11_common();
 
-	FIX(url);
+	FIX(url, outfile, detailed, info);
 
 	if (type == PKCS11_TYPE_TRUSTED) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED;
@@ -185,7 +192,7 @@ pkcs11_export(FILE * outfile, const char *url, unsigned int login_flags,
 
 	pkcs11_common();
 
-	FIX(url);
+	FIX(url, outfile, 0, info);
 
 	ret = gnutls_pkcs11_obj_init(&obj);
 	if (ret < 0) {
@@ -233,7 +240,7 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int login_flags,
 
 	pkcs11_common();
 
-	FIX(url);
+	FIX(url, outfile, 0, info);
 
 	ret = gnutls_pkcs11_obj_init(&obj);
 	if (ret < 0) {
@@ -318,9 +325,33 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int login_flags,
 	return;
 }
 
+/* If there is a single token only present, return its URL.
+ */
+static
+char *get_single_token_url(common_info_st * info)
+{
+	int ret;
+	char *url = NULL, *t = NULL;
+
+	pkcs11_common();
+
+	ret = gnutls_pkcs11_token_get_url(0, 0, &url);
+	if (ret < 0)
+		return NULL;
+
+	ret = gnutls_pkcs11_token_get_url(1, 0, &t);
+	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		gnutls_free(url);
+		gnutls_free(t);
+		return NULL;
+	}
+
+	return url;
+}
+
 void
 pkcs11_token_list(FILE * outfile, unsigned int detailed,
-		  common_info_st * info)
+		  common_info_st * info, unsigned brief)
 {
 	int ret;
 	int i;
@@ -342,6 +373,9 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		}
 
 		fprintf(outfile, "Token %d:\n\tURL: %s\n", i, url);
+
+		if (brief != 0)
+			goto cont;
 
 		size = sizeof(buf);
 		ret =
@@ -395,7 +429,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 
 		fprintf(outfile, "\tSerial: %s\n", buf);
 		fprintf(outfile, "\n\n");
-
+ cont:
 		gnutls_free(url);
 
 	}
@@ -419,7 +453,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 
 	pkcs11_common();
 
-	FIX(url);
+	FIX(url, outfile, 0, info);
 	CHECK_LOGIN_FLAG(login_flags);
 
 	secret_key = load_secret_key(0, info);
@@ -500,7 +534,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 
 	pkcs11_common();
 
-	FIX(url);
+	FIX(url, outfile, detailed, info);
 	CHECK_LOGIN_FLAG(login_flags);
 
 	if (outfile == stderr || outfile == stdout) {
@@ -813,7 +847,7 @@ pkcs11_mechanism_list(FILE * outfile, const char *url, unsigned int login_flags,
 
 	pkcs11_common();
 
-	FIX(url);
+	FIX(url, outfile, 0, info);
 
 	idx = 0;
 	do {
@@ -846,7 +880,7 @@ pkcs11_get_random(FILE * outfile, const char *url, unsigned bytes,
 
 	pkcs11_common();
 
-	FIX(url);
+	FIX(url, outfile, 0, info);
 
 	output = malloc(bytes);
 	if (output == NULL) {
