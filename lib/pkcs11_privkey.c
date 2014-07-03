@@ -39,6 +39,14 @@
 	if (ret == 1) \
 		memset(&k->sinfo, 0, sizeof(k->sinfo))
 
+#define CHECK_SHANDLE(rv, key, sinfo) \
+		if (rv == CKR_SESSION_HANDLE_INVALID && sinfo == &key->sinfo) { \
+			if (key->sinfo.init != 0) { \
+				pkcs11_close_session(&key->sinfo); \
+				memset(&key->sinfo, 0, sizeof(key->sinfo)); \
+			} \
+		}
+
 struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int flags;
@@ -247,6 +255,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	rv = pkcs11_sign_init(sinfo->module, sinfo->pks, &mech, obj);
 	if (rv != CKR_OK) {
 		gnutls_assert();
+		CHECK_SHANDLE(rv, key, sinfo);
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -256,6 +265,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 			 NULL, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_assert();
+		CHECK_SHANDLE(rv, key, sinfo);
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -267,6 +277,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 			 tmp.data, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_assert();
+		CHECK_SHANDLE(rv, key, sinfo);
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -347,6 +358,7 @@ int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
 
 	rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks, &session_info);
 	if (rv != CKR_OK) {
+		CHECK_SHANDLE(rv, key, sinfo);
 		ret = 0;
 		goto cleanup;
 	}
@@ -499,6 +511,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	rv = pkcs11_decrypt_init(sinfo->module, sinfo->pks, &mech, obj);
 	if (rv != CKR_OK) {
 		gnutls_assert();
+		CHECK_SHANDLE(rv, key, sinfo);
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -508,6 +521,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 			    ciphertext->size, NULL, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_assert();
+		CHECK_SHANDLE(rv, key, sinfo);
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
@@ -520,6 +534,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	if (rv != CKR_OK) {
 		gnutls_free(plaintext->data);
 		gnutls_assert();
+		CHECK_SHANDLE(rv, key, sinfo);
 		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
