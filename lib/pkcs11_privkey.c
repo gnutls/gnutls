@@ -43,7 +43,8 @@
 		if (rv == CKR_SESSION_HANDLE_INVALID && sinfo == &key->sinfo) { \
 			if (key->sinfo.init != 0) { \
 				pkcs11_close_session(&key->sinfo); \
-				memset(&key->sinfo, 0, sizeof(key->sinfo)); \
+				key->sinfo.init = 0; \
+				goto restart; \
 			} \
 		}
 
@@ -237,6 +238,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
+ restart:
 	if (key->sinfo.init != 0) {
 		sinfo = &key->sinfo;
 		obj = key->obj;
@@ -347,6 +349,7 @@ int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
 	
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
+ restart:
 	if (key->sinfo.init != 0) {
 		sinfo = &key->sinfo;
 		obj = key->obj;
@@ -490,6 +493,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
+ restart:
 	if (key->sinfo.init != 0) {
 		sinfo = &key->sinfo;
 		obj = key->obj;
