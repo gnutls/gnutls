@@ -157,9 +157,14 @@ write_certificate_test () {
 	fi
 
 	echo -n "* Writing certificate of client's CA... "
-	$P11TOOL $ADDITIONAL_PARAM --so-login --ca --write --trusted --label gnutls-ca --load-certificate "$cacert" "$token" >>$TMPFILE 2>&1
+	$P11TOOL $ADDITIONAL_PARAM --login --ca --write --trusted --label gnutls-ca --load-certificate "$cacert" "$token" >>$TMPFILE 2>&1
+	ret=$?
+	if test $ret != 0;then
+		$P11TOOL $ADDITIONAL_PARAM --so-login --ca --write --trusted --label gnutls-ca --load-certificate "$cacert" "$token" >>$TMPFILE 2>&1
+		ret=$?
+	fi
 
-	if test $? = 0;then
+	if test $ret = 0;then
 		echo ok
 	else
 		echo failed
