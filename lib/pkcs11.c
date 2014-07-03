@@ -646,7 +646,7 @@ int gnutls_pkcs11_reinit(void)
 		if (providers[i].module != NULL) {
 			rv = p11_kit_module_initialize(providers
 						       [i].module);
-			if (rv != CKR_OK) {
+			if (rv == CKR_OK) {
 				providers[i].active = 1;
 			} else {
 				providers[i].active = 0;
