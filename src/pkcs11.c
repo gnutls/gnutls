@@ -483,18 +483,17 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 	if (xcrt != NULL) {
 		if (trusted)
 			flags |=
-			    GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED |
-			    GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO;
+			    GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
 
 		if (ca)
 			flags |=
-			    GNUTLS_PKCS11_OBJ_FLAG_MARK_CA |
-			    GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO;
+			    GNUTLS_PKCS11_OBJ_FLAG_MARK_CA;
 
 		ret = gnutls_pkcs11_copy_x509_crt(url, xcrt, label, flags);
 		if (ret < 0) {
-			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
-				__LINE__, gnutls_strerror(ret));
+			fprintf(stderr, "Error writing certificate: %s\n", gnutls_strerror(ret));
+			if ((ca || trusted) && (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO) == 0)
+				fprintf(stderr, "note: some tokens may require security officer login for this operation\n");
 			exit(1);
 		}
 
