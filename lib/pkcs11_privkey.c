@@ -30,6 +30,15 @@
 #include <fips.h>
 #include <p11-kit/uri.h>
 
+/* In case of a fork, it will invalidate the open session
+ * in privkey */
+#define PKCS11_CHECK_INIT_PRIVKEY(k) \
+	ret = _gnutls_pkcs11_check_init(); \
+	if (ret < 0) \
+		return gnutls_assert_val(ret); \
+	if (ret == 1) \
+		memset(&k->sinfo, 0, sizeof(k->sinfo))
+
 struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int flags;
@@ -218,7 +227,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	struct pkcs11_session_info *sinfo;
 	ck_object_handle_t obj;
 
-	PKCS11_CHECK_INIT;
+	PKCS11_CHECK_INIT_PRIVKEY(key);
 
 	if (key->sinfo.init != 0) {
 		sinfo = &key->sinfo;
@@ -325,7 +334,7 @@ int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
 	ck_object_handle_t obj;
 	struct ck_session_info session_info;
 	
-	PKCS11_CHECK_INIT;
+	PKCS11_CHECK_INIT_PRIVKEY(key);
 
 	if (key->sinfo.init != 0) {
 		sinfo = &key->sinfo;
@@ -467,7 +476,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	struct pkcs11_session_info _sinfo;
 	struct pkcs11_session_info *sinfo;
 
-	PKCS11_CHECK_INIT;
+	PKCS11_CHECK_INIT_PRIVKEY(key);
 
 	if (key->sinfo.init != 0) {
 		sinfo = &key->sinfo;
@@ -520,7 +529,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	ret = 0;
 
       cleanup:
-	if (key->sinfo.init == 0)
+	if (sinfo != &key->sinfo)
 		pkcs11_close_session(sinfo);
 
 	return ret;
@@ -811,6 +820,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 		gnutls_pkcs11_obj_deinit(obj);
 	if (pkey != NULL)
 		gnutls_pubkey_deinit(pkey);
+
 	if (sinfo.pks != 0)
 		pkcs11_close_session(&sinfo);
 

@@ -243,6 +243,11 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, const char 
 	return 0;
 }
 
+/* Returns:
+ *  - negative error code on error,
+ *  - 0 on success
+ *  - 1 on success (and a fork was detected)
+ */
 int _gnutls_pkcs11_check_init(void)
 {
 	int ret;
@@ -262,6 +267,8 @@ int _gnutls_pkcs11_check_init(void)
 		if (init_pid != getpid()) {
 			/* if we are initialized but a fork is detected */
 			ret = gnutls_pkcs11_reinit();
+			if (ret == 0)
+				ret = 1;
 		}
 #endif
 
