@@ -13,6 +13,9 @@ IP addresses, and match documented behavior. Reported by David Woodhouse.
 ** libgnutls: DSA key generation in FIPS140-2 mode doesn't allow 1024
 bit parameters.
 
+** libgnutls: fixed issue in gnutls_pkcs11_reinit() which prevented tokens
+being usable after a reinitialization.
+
 ** p11tool: use GNUTLS_SO_PIN to read the security officer's PIN if set.
 
 ** p11tool: ask for label when one isn't provided.
