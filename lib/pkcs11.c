@@ -651,8 +651,8 @@ int gnutls_pkcs11_reinit(void)
 			} else {
 				providers[i].active = 0;
 				_gnutls_debug_log
-				    ("Cannot re-initialize registered module '%s': %s\n",
-				     providers[i].info.library_description,
+				    ("Cannot re-initialize registered module '%.*s': %s\n",
+				     (int)32, providers[i].info.library_description,
 				     p11_kit_strerror(rv));
 			}
 		}
