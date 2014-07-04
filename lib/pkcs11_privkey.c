@@ -386,9 +386,9 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	}
 
 	attr = p11_kit_uri_get_attribute(pkey->info, CKA_ID);
-	if (!attr || !attr->value_len) {
+	if (!attr) {
 		attr = p11_kit_uri_get_attribute(pkey->info, CKA_LABEL);
-		if (!attr || !attr->value_len) {
+		if (!attr) {
 			gnutls_assert();
 			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 		}
