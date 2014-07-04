@@ -16,6 +16,8 @@ bit parameters.
 ** libgnutls: fixed issue in gnutls_pkcs11_reinit() which prevented tokens
 being usable after a reinitialization.
 
+** libgnutls: fixed PKCS #11 private key operations after a fork.
+
 ** p11tool: use GNUTLS_SO_PIN to read the security officer's PIN if set.
 
 ** p11tool: ask for label when one isn't provided.
