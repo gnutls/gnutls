@@ -2296,7 +2296,7 @@ find_objs(struct pkcs11_session_info *sinfo,
 	  struct token_info *info, struct ck_info *lib_info, void *input)
 {
 	struct find_obj_data_st *find_data = input;
-	struct ck_attribute a[6];
+	struct ck_attribute a[16];
 	struct ck_attribute *attr;
 	ck_object_class_t class = (ck_object_class_t) - 1;
 	ck_certificate_type_t type = (ck_certificate_type_t) - 1;
