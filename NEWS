@@ -20,6 +20,10 @@ and match documented behavior. Reported by David Woodhouse.
 
 ** p11tool: use GNUTLS_SO_PIN to read the security officer's PIN if set.
 
+** p11tool: will not implicitly enable so-login for certain types of
+objects. That avoids issues with tokens that require different login
+types.
+
 ** API and ABI modifications:
 No changes since last version.
 
