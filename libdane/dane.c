@@ -645,6 +645,9 @@ dane_verify_crt_raw(dane_state_t s,
 	if (chain_type != GNUTLS_CRT_X509)
 		return gnutls_assert_val(DANE_E_INVALID_REQUEST);
 
+	if (chain_size == 0)
+		return gnutls_assert_val(DANE_E_NO_CERT);
+
 	*verify = 0;
 	idx = 0;
 	do {
