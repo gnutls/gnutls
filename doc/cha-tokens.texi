@@ -10,7 +10,28 @@ perfect forward secrecy offering ciphersuite are also to be assumed compromised.
 If such threats need to be addressed, then it may be wise storing the keys in a security
 module such as a smart card, an HSM or the TPM chip. Those modules ensure the
 protection of the cryptographic keys by only allowing operations on them and
-preventing their extraction.
+preventing their extraction. The purpose of the abstract key API is to provide
+an API that will allow the handle of keys in memory and files, as well as keys
+stored in such modules.
+
+In GnuTLS the approach is to handle all keys transparently by the high level API, e.g.,
+the API that loads a key or certificate from a file.
+The high-level API will accept URIs in addition to files that specify keys on an HSM or in TPM,
+and a callback function will be used to obtain any required keys. The URI format is defined in 
+@xcite{TPMURI} and @xcite{PKCS11URI}, and is in the process of being standardized across systems.
+
+More information on the API is provided in the next sections. Examples of a URI of a certificate 
+stored in an HSM, as well as a key stored in the TPM chip are shown below. To discover the URIs 
+of the objects the @code{p11tool} (see @ref{p11tool Invocation}),
+or @code{tpmtool} (see @ref{tpmtool Invocation}) may be used.
+
+@example 
+pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315; \
+manufacturer=EnterSafe;object=test1;objecttype=cert
+
+tpmkey:uuid=42309df8-d101-11e1-a89a-97bb33c23ad1;storage=user
+@end example
+
 
 @menu
 * Abstract key types::
@@ -27,7 +48,7 @@ Since there are many forms of a public or private keys supported by @acronym{Gnu
 on them. For these reasons the abstract @code{gnutls_privkey_t} and @code{gnutls_pubkey_t} were
 introduced in @code{gnutls/@-abstract.h} header. Those types are initialized using a specific type of 
 key and then can be used to perform operations in an abstract way. For example in order
-to sign an X.509 certificate with a key that resides in a token the following steps must be
+to sign an X.509 certificate with a key that resides in a token the following steps can be
 used.
 
 @example
