@@ -599,6 +599,22 @@ verify_ee(const gnutls_datum_t * raw_crt,
 	return ret;
 }
 
+#define CHECK_VRET(ret, checked, record_status, status) \
+			if (ret == DANE_E_UNKNOWN_DANE_DATA) { \
+				/* skip that entry */ \
+				continue; \
+			} else if (ret < 0) { \
+				gnutls_assert(); \
+				goto cleanup; \
+			} \
+			checked = 1; \
+			if (record_status == 0) { \
+				status = 0; \
+				break; \
+			} else { \
+				status |= record_status; \
+			}
+
 /**
  * dane_verify_crt_raw:
  * @s: A DANE state structure (may be NULL)
@@ -671,34 +687,15 @@ dane_verify_crt_raw(dane_state_t s,
 			ret =
 			    verify_ca(chain, chain_size, chain_type, type,
 				      match, &data, &record_verify);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-			}
-			checked = 1;
-			if (record_verify == 0) {
-				*verify = 0;
-				break;
-			} else {
-				*verify |= record_verify;
-			}
+			CHECK_VRET(ret, checked, record_verify, *verify);
+
 		} else if (!(vflags & DANE_VFLAG_ONLY_CHECK_CA_USAGE)
 			   && (usage == DANE_CERT_USAGE_LOCAL_EE
 			       || usage == DANE_CERT_USAGE_EE)) {
 			ret =
 			    verify_ee(&chain[0], chain_type, type, match,
 				      &data, &record_verify);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-			}
-			checked = 1;
-			if (record_verify == 0) {
-				*verify = 0;
-				break;
-			} else {
-				*verify |= record_verify;
-			}
+			CHECK_VRET(ret, checked, record_verify, *verify);
 		}
 	}
 	while (1);
