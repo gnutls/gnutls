@@ -151,7 +151,10 @@ cmd_parser (int argc, char **argv)
     detailed_url = 1;
 
   if (ENABLED_OPT(LOGIN))
-    login = 1;
+    login = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+
+  if (ENABLED_OPT(SO_LOGIN))
+    login = GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO;
 
   if (HAVE_OPT(LABEL))
     {

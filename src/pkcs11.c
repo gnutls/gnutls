@@ -34,18 +34,18 @@
 #include <common.h>
 
 void
-pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login,
+pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login_flags,
                common_info_st * info)
 {
   int ret;
   unsigned int obj_flags = 0;
 
-  if (login)
-    obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+  if (login_flags)
+    obj_flags = login_flags;
 
   if (!batch)
     {
-      pkcs11_list (outfile, url, PKCS11_TYPE_ALL, login,
+      pkcs11_list (outfile, url, PKCS11_TYPE_ALL, login_flags,
                    GNUTLS_PKCS11_URL_LIB, info);
       ret =
         read_yesno ("Are you sure you want to delete those objects? (y/N): ", 0);
@@ -71,7 +71,7 @@ pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login,
 /* lists certificates from a token
  */
 void
-pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
+pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login_flags,
              unsigned int detailed, common_info_st * info)
 {
   gnutls_pkcs11_obj_t *crt_list;
@@ -81,8 +81,8 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
   int attrs;
   unsigned int obj_flags = 0;
 
-  if (login)
-    obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+  if (login_flags)
+    obj_flags = login_flags;
 
   pkcs11_common ();
 
@@ -175,7 +175,7 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
 }
 
 void
-pkcs11_export (FILE * outfile, const char *url, unsigned int login,
+pkcs11_export (FILE * outfile, const char *url, unsigned int login_flags,
                common_info_st * info)
 {
   gnutls_pkcs11_obj_t crt;
@@ -185,8 +185,8 @@ pkcs11_export (FILE * outfile, const char *url, unsigned int login,
   size_t size;
   unsigned int obj_flags = 0;
 
-  if (login)
-    obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+  if (login_flags)
+    obj_flags = login_flags;
 
   pkcs11_common ();
 
@@ -396,7 +396,7 @@ pkcs11_token_list (FILE * outfile, unsigned int detailed,
 void
 pkcs11_write (FILE * outfile, const char *url, const char *label, 
               int trusted, int private,
-              unsigned int login, common_info_st * info)
+              unsigned int login_flags, common_info_st * info)
 {
   gnutls_x509_crt_t xcrt;
   gnutls_x509_privkey_t xkey;
@@ -405,8 +405,8 @@ pkcs11_write (FILE * outfile, const char *url, const char *label,
   unsigned int key_usage = 0;
   gnutls_datum_t *secret_key;
 
-  if (login)
-    flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+  if (login_flags)
+    flags = login_flags;
 
   pkcs11_common ();
 
@@ -481,14 +481,14 @@ void
 pkcs11_generate (FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
               unsigned int bits,
               const char *label, int private, int detailed,
-              unsigned int login, common_info_st * info)
+              unsigned int login_flags, common_info_st * info)
 {
   int ret;
   unsigned int flags = 0;
   gnutls_datum_t pubkey;
 
-  if (login)
-    flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+  if (login_flags)
+    flags = login_flags;
 
   pkcs11_common ();
 
@@ -506,7 +506,7 @@ pkcs11_generate (FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
     {
       fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
                gnutls_strerror (ret));
-      if (login == 0)
+      if (login_flags == 0)
         fprintf(stderr, "Note that --login was not specified and it may be required for generation.\n");
       else if (bits != 1024)
         fprintf (stderr, "Note that several smart cards do not support arbitrary size keys.\nTry --bits 1024 or 2048.\n");
@@ -781,7 +781,7 @@ const char *mech_list[] = {
 };
 
 void
-pkcs11_mechanism_list (FILE * outfile, const char *url, unsigned int login,
+pkcs11_mechanism_list (FILE * outfile, const char *url, unsigned int login_flags,
                        common_info_st * info)
 {
   int ret;
