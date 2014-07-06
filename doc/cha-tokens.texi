@@ -202,8 +202,8 @@ available in @code{gnutls/pkcs11.h}.
 Moreover @acronym{PKCS} #11 can be (ab)used to allow all applications in the same operating system to access
 shared cryptographic keys and certificates in a uniform way, as in @ref{fig-pkcs11-vision}.
 That way applications could load their trusted certificate list, as well as user
-certificates from a common PKCS #11 module. Such a provider exists in the @acronym{Gnome} 
-system, being the @acronym{Gnome Keyring}.
+certificates from a common PKCS #11 module. Such a provider is the p11-kit trust
+storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}.
 
 @float Figure,fig-pkcs11-vision
 @image{pkcs11-vision,9cm}
