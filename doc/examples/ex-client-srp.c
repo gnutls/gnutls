@@ -31,10 +31,11 @@ int main(void)
         gnutls_certificate_credentials_t cert_cred;
 
         if (gnutls_check_version("3.1.4") == NULL) {
-                fprintf(stderr, "GnuTLS 3.1.4 is required for this example\n");
+                fprintf(stderr, "GnuTLS 3.1.4 or later is required for this example\n");
                 exit(1);
         }
 
+        /* for backwards compatibility with gnutls < 3.3.0 */
         gnutls_global_init();
 
         gnutls_srp_allocate_client_credentials(&srp_cred);

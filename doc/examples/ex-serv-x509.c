@@ -67,8 +67,7 @@ int main(void)
         char buffer[MAX_BUF + 1];
         int optval = 1;
 
-        /* this must be called once in the program
-         */
+        /* for backwards compatibility with gnutls < 3.3.0 */
         gnutls_global_init();
 
         gnutls_certificate_allocate_credentials(&x509_cred);

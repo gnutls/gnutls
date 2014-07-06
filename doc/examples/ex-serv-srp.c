@@ -47,10 +47,11 @@ int main(void)
         strcpy(name, "Echo Server");
 
         if (gnutls_check_version("3.1.4") == NULL) {
-                fprintf(stderr, "GnuTLS 3.1.4 is required for this example\n");
+                fprintf(stderr, "GnuTLS 3.1.4 or later is required for this example\n");
                 exit(1);
         }
 
+        /* for backwards compatibility with gnutls < 3.3.0 */
         gnutls_global_init();
 
         /* SRP_PASSWD a password file (created with the included srptool utility) 
