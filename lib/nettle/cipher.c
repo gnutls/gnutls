@@ -391,6 +391,8 @@ wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t ivsize)
 	switch (ctx->algo) {
 	case GNUTLS_CIPHER_AES_128_GCM:
 	case GNUTLS_CIPHER_AES_256_GCM:
+		if (_gnutls_fips_mode_enabled() != 0 && ivsize < GCM_IV_SIZE)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		gcm_aes_set_iv(&ctx->ctx.aes_gcm, 
 				ivsize, iv);
 		break;
