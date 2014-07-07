@@ -643,7 +643,7 @@ get_bits(gnutls_pk_algorithm_t key_type, int info_bits,
 	if (info_bits != 0) {
 		static int warned = 0;
 
-		if (warned == 0 && warn != 0) {
+		if (warned == 0 && warn != 0 && GNUTLS_BITS_ARE_CURVE(info_bits)==0) {
 			warned = 1;
 			fprintf(stderr,
 				"** Note: Please use the --sec-param instead of --bits\n");
@@ -760,6 +760,33 @@ print_dsa_pkey(FILE * outfile, gnutls_datum_t * x, gnutls_datum_t * y,
 	print_hex_datum(outfile, q, cprint);
 	print_head(outfile, "g", g->size, cprint);
 	print_hex_datum(outfile, g, cprint);
+}
+
+gnutls_ecc_curve_t str_to_curve(const char *str)
+{
+unsigned num = 0;
+const gnutls_ecc_curve_t *list, *p;
+
+	list = gnutls_ecc_curve_list();
+
+	p = list;
+	while(*p != 0) {
+		if (strcasecmp(str, gnutls_ecc_curve_get_name(*p)) == 0)
+			return *p;
+		p++;
+		num++;
+	}
+
+	fprintf(stderr, "Unsupported curve: %s\nAvailable curves:\n", str);
+	if (num == 0)
+		printf("none\n");
+	p = list;
+	while(*p != 0) {
+		fprintf(stderr, "\t- %s\n",
+		       gnutls_ecc_curve_get_name(*p));
+		p++;
+	}
+	exit(1);
 }
 
 void

@@ -228,6 +228,13 @@ flag = {
 };
 
 flag = {
+    name      = curve;
+    arg-type  = string;
+    descrip   = "Specify the curve used for EC key generation";
+    doc      = "";
+};
+
+flag = {
     name      = sec-param;
     arg-type  = string;
     arg-name  = "Security parameter";

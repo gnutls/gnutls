@@ -180,6 +180,10 @@ static void cmd_parser(int argc, char **argv)
 		bits = OPT_VALUE_BITS;
 	}
 
+	if (HAVE_OPT(CURVE)) {
+		bits = GNUTLS_CURVE_TO_BITS(str_to_curve(OPT_ARG(CURVE)));
+	}
+
 	if (HAVE_OPT(SEC_PARAM)) {
 		sec_param = OPT_ARG(SEC_PARAM);
 	}

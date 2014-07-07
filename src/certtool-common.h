@@ -82,6 +82,7 @@ int get_bits(gnutls_pk_algorithm_t key_type, int info_bits,
 	     const char *info_sec_param, int warn);
 
 gnutls_sec_param_t str_to_sec_param(const char *str);
+gnutls_ecc_curve_t str_to_curve(const char *str);
 
 /* prime.c */
 int generate_prime(FILE * outfile, int how, common_info_st * info);

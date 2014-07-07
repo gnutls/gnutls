@@ -1140,6 +1140,10 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(BITS))
 		cinfo.bits = OPT_VALUE_BITS;
 
+	if (HAVE_OPT(CURVE)) {
+		cinfo.bits = GNUTLS_CURVE_TO_BITS(str_to_curve(OPT_ARG(CURVE)));
+	}
+
 	if (HAVE_OPT(SEC_PARAM))
 		cinfo.sec_param = OPT_ARG(SEC_PARAM);
 
