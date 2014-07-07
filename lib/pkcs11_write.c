@@ -421,7 +421,7 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	case GNUTLS_PK_EC:
 		{
 			ret =
-			    _gnutls_x509_write_ecc_params(&key->params,
+			    _gnutls_x509_write_ecc_params(key->params.flags,
 							  &p);
 			if (ret < 0) {
 				gnutls_assert();

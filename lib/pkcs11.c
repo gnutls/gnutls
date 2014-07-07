@@ -1199,6 +1199,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 	uint8_t tmp1[2048];
 	uint8_t tmp2[2048];
 	int ret;
+	ck_rv_t rv;
 
 	switch (key_type) {
 	case CKK_RSA:
@@ -1241,7 +1242,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 		a[1].value = tmp2;
 		a[1].value_len = sizeof(tmp2);
 
-		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
+		if ((rv = pkcs11_get_attribute_value(module, pks, obj, a, 2)) ==
 		    CKR_OK) {
 			ret =
 			    _gnutls_set_datum(&pubkey[0], a[0].value,
@@ -1261,7 +1262,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 			}
 		} else {
 			gnutls_assert();
-			return GNUTLS_E_PKCS11_ERROR;
+			return pkcs11_rv_to_err(rv);
 		}
 
 		a[0].type = CKA_BASE;
@@ -1271,7 +1272,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 		a[1].value = tmp2;
 		a[1].value_len = sizeof(tmp2);
 
-		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
+		if ((rv = pkcs11_get_attribute_value(module, pks, obj, a, 2)) ==
 		    CKR_OK) {
 			ret =
 			    _gnutls_set_datum(&pubkey[2], a[0].value,
@@ -1293,18 +1294,19 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 			}
 		} else {
 			gnutls_assert();
-			return GNUTLS_E_PKCS11_ERROR;
+			return pkcs11_rv_to_err(rv);
 		}
 		break;
 	case CKK_ECDSA:
 		a[0].type = CKA_EC_PARAMS;
 		a[0].value = tmp1;
 		a[0].value_len = sizeof(tmp1);
+
 		a[1].type = CKA_EC_POINT;
 		a[1].value = tmp2;
 		a[1].value_len = sizeof(tmp2);
 
-		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
+		if ((rv = pkcs11_get_attribute_value(module, pks, obj, a, 2)) ==
 		    CKR_OK) {
 			ret =
 			    _gnutls_set_datum(&pubkey[0], a[0].value,
@@ -1324,7 +1326,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 			}
 		} else {
 			gnutls_assert();
-			return GNUTLS_E_PKCS11_ERROR;
+			return pkcs11_rv_to_err(rv);
 		}
 
 		break;

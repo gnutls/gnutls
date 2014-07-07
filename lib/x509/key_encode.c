@@ -144,7 +144,7 @@ _gnutls_x509_write_pubkey_params(gnutls_pk_algorithm_t algo,
 		der->size = ASN1_NULL_SIZE;
 		return 0;
 	case GNUTLS_PK_EC:
-		return _gnutls_x509_write_ecc_params(params, der);
+		return _gnutls_x509_write_ecc_params(params->flags, der);
 	default:
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}
@@ -234,7 +234,7 @@ _gnutls_x509_write_dsa_params(gnutls_pk_params_st * params,
  * Allocates the space used to store the DER data.
  */
 int
-_gnutls_x509_write_ecc_params(gnutls_pk_params_st * params,
+_gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
 			      gnutls_datum_t * der)
 {
 	int result;
@@ -244,13 +244,7 @@ _gnutls_x509_write_ecc_params(gnutls_pk_params_st * params,
 	der->data = NULL;
 	der->size = 0;
 
-	if (params->params_nr < ECC_PUBLIC_PARAMS) {
-		gnutls_assert();
-		result = GNUTLS_E_INVALID_REQUEST;
-		goto cleanup;
-	}
-
-	oid = _gnutls_ecc_curve_get_oid(params->flags);
+	oid = _gnutls_ecc_curve_get_oid(curve);
 	if (oid == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
