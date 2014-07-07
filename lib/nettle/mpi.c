@@ -227,7 +227,7 @@ static void wrap_nettle_mpi_release(bigint_t a)
 
 static void wrap_nettle_mpi_clear(bigint_t a)
 {
-	memset(TOMPZ(a)[0]._mp_d, 0,
+	zeroize_key(TOMPZ(a)[0]._mp_d,
 	       TOMPZ(a)[0]._mp_alloc * sizeof(mp_limb_t));
 }
 

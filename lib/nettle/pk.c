@@ -67,14 +67,14 @@ static void rnd_func(void *_ctx, unsigned length, uint8_t * data)
 static void
 ecc_scalar_zclear (struct ecc_scalar *s)
 {
-        memset(s->p, 0, ecc_size(s->ecc)*sizeof(mp_limb_t));
+        zeroize_key(s->p, ecc_size(s->ecc)*sizeof(mp_limb_t));
         ecc_scalar_clear(s);
 }
 
 static void 
 ecc_point_zclear (struct ecc_point *p)
 {
-        memset(p->p, 0, ecc_size_a(p->ecc)*sizeof(mp_limb_t));
+        zeroize_key(p->p, ecc_size_a(p->ecc)*sizeof(mp_limb_t));
         ecc_point_clear(p);
 }
   
