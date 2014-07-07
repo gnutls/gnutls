@@ -564,7 +564,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
-		if (bits != 1024)
+		if (bits != 1024 && pk == GNUTLS_PK_RSA)
 			fprintf(stderr,
 				"note: several smart cards do not support arbitrary size keys; try --bits 1024 or 2048.\n");
 		exit(1);
