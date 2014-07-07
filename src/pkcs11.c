@@ -372,10 +372,12 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 			exit(1);
 		}
 
-		fprintf(outfile, "Token %d:\n\tURL: %s\n", i, url);
-
-		if (brief != 0)
+		if (brief != 0) {
+			fprintf(outfile, "Token %d: %s\n", i, url);
 			goto cont;
+		} else {
+			fprintf(outfile, "Token %d:\n\tURL: %s\n", i, url);
+		}
 
 		size = sizeof(buf);
 		ret =
