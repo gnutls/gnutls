@@ -18,6 +18,8 @@ being usable after a reinitialization.
 
 ** libgnutls: fixed PKCS #11 private key operations after a fork.
 
+** libgnutls: fixed PKCS #11 ECDSA key generation.
+
 ** p11tool: use GNUTLS_SO_PIN to read the security officer's PIN if set.
 
 ** p11tool: ask for label when one isn't provided.
