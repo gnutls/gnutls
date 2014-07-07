@@ -1287,7 +1287,8 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 	uint8_t *tmp2 = NULL;
 	size_t tmp1_size, tmp2_size;
 	int ret;
-	
+	ck_rv_t rv;
+
 	tmp1_size = tmp2_size = MAX_PK_PARAM_SIZE;
 	tmp1 = gnutls_malloc(tmp1_size);
 	if (tmp1 == NULL)
@@ -1330,7 +1331,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 		a[1].value = tmp2;
 		a[1].value_len = tmp2_size;
 
-		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
+		if ((rv = pkcs11_get_attribute_value(module, pks, obj, a, 2)) ==
 		    CKR_OK) {
 			ret =
 			    _gnutls_set_datum(&pubkey[0], a[0].value,
@@ -1351,7 +1352,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 			}
 		} else {
 			gnutls_assert();
-			ret = GNUTLS_E_PKCS11_ERROR;
+			ret = pkcs11_rv_to_err(rv);
 			goto cleanup;
 		}
 
@@ -1362,7 +1363,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 		a[1].value = tmp2;
 		a[1].value_len = tmp2_size;
 
-		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
+		if ((rv = pkcs11_get_attribute_value(module, pks, obj, a, 2)) ==
 		    CKR_OK) {
 			pubkey[2].data = a[0].value;
 			pubkey[2].size = a[0].value_len;
@@ -1372,7 +1373,7 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 
 		} else {
 			gnutls_assert();
-			ret = GNUTLS_E_PKCS11_ERROR;
+			ret = pkcs11_rv_to_err(rv);
 			goto cleanup;
 		}
 		break;
@@ -1380,11 +1381,12 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 		a[0].type = CKA_EC_PARAMS;
 		a[0].value = tmp1;
 		a[0].value_len = tmp1_size;
+
 		a[1].type = CKA_EC_POINT;
 		a[1].value = tmp2;
 		a[1].value_len = tmp2_size;
 
-		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
+		if ((rv = pkcs11_get_attribute_value(module, pks, obj, a, 2)) ==
 		    CKR_OK) {
 
 			pubkey[0].data = a[0].value;
@@ -1394,7 +1396,8 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 			pubkey[1].size = a[1].value_len;
 		} else {
 			gnutls_assert();
-			ret = GNUTLS_E_PKCS11_ERROR;
+
+			ret = pkcs11_rv_to_err(rv);
 			goto cleanup;
 		}
 

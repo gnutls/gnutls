@@ -624,6 +624,10 @@ gnutls_pkcs11_privkey_generate(const char *url, gnutls_pk_algorithm_t pk,
  * store the DER-encoded public key in the SubjectPublicKeyInfo format 
  * in @pubkey. The @pubkey should be deinitialized using gnutls_free().
  *
+ * Note that when generating an elliptic curve key, the curve
+ * can be substituted in the place of the bits parameter using the
+ * GNUTLS_CURVE_TO_BITS() macro.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -649,6 +653,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	struct ck_mechanism mech;
 	gnutls_pubkey_t pkey = NULL;
 	gnutls_pkcs11_obj_t obj = NULL;
+	gnutls_datum_t der = {NULL, 0};
 	ck_key_type_t key_type;
 
 	PKCS11_CHECK_INIT;
@@ -733,9 +738,21 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 		a[a_val].value_len = sizeof(tval);
 		a_val++;
 
-		a[a_val].type = CKA_MODULUS_BITS;
-		a[a_val].value = &_bits;
-		a[a_val].value_len = sizeof(_bits);
+		if (GNUTLS_BITS_ARE_CURVE(bits)) {
+			bits = GNUTLS_BITS_TO_CURVE(bits);
+		} else {
+			bits = _gnutls_ecc_bits_to_curve(bits);
+		}
+
+		ret = _gnutls_x509_write_ecc_params(bits, &der);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		a[a_val].type = CKA_EC_PARAMS;
+		a[a_val].value = der.data;
+		a[a_val].value_len = der.size;
 		a_val++;
 		break;
 	default:
@@ -842,6 +859,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 
 	if (sinfo.pks != 0)
 		pkcs11_close_session(&sinfo);
+	gnutls_free(der.data);
 
 	return ret;
 }

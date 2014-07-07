@@ -254,7 +254,7 @@ int _gnutls_x509_read_pubkey_params(gnutls_pk_algorithm_t, uint8_t * der,
 int _gnutls_x509_read_pubkey(gnutls_pk_algorithm_t, uint8_t * der,
 			     int dersize, gnutls_pk_params_st * params);
 
-int _gnutls_x509_write_ecc_params(gnutls_pk_params_st * params,
+int _gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
 				  gnutls_datum_t * der);
 int _gnutls_x509_write_ecc_pubkey(gnutls_pk_params_st * params,
 				  gnutls_datum_t * der);

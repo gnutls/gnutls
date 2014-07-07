@@ -969,7 +969,7 @@ int gnutls_pubkey_export_ecc_x962(gnutls_pubkey_t key,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_x509_write_ecc_params(&key->params, parameters);
+	ret = _gnutls_x509_write_ecc_params(key->params.flags, parameters);
 	if (ret < 0) {
 		_gnutls_free_datum(ecpoint);
 		return gnutls_assert_val(ret);
