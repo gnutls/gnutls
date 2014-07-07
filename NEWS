@@ -30,6 +30,9 @@ being usable after a reinitialization.
 objects. That avoids issues with tokens that require different login
 types.
 
+** certtool/p11tool: Added the --curve parameter which allows to explicitly
+specify the curve to use.
+
 ** API and ABI modifications:
 No changes since last version.
 
