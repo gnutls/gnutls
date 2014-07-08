@@ -223,12 +223,6 @@ int _gnutls_fips_perform_self_checks(void)
 	}
 
 	/* MAC (includes message digest test) */
-	ret = gnutls_mac_self_test(0, GNUTLS_MAC_MD5);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
 	ret = gnutls_mac_self_test(0, GNUTLS_MAC_SHA1);
 	if (ret < 0) {
 		gnutls_assert();
