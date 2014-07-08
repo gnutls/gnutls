@@ -109,6 +109,13 @@ static int test_rsa_enc(gnutls_pk_algorithm_t pk,
 		goto cleanup;
 	}
 
+	if (enc.size == signed_data.size && memcmp(signed_data.data, enc.data,
+		enc.size) == 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_SELF_TEST_ERROR;
+		goto cleanup;
+	}
+
 	ret = gnutls_privkey_decrypt_data(key, 0, &enc, &dec);
 	if (ret < 0) {
 		gnutls_assert();
