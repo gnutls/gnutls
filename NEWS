@@ -20,6 +20,18 @@ being usable after a reinitialization.
 
 ** libgnutls: fixed PKCS #11 ECDSA key generation.
 
+** libgnutls: The GNUTLS_CPUID_OVERRIDE environment variable can be used to 
+explicitly enable/disable the use of certain CPU capabilities. Note that CPU
+detection cannot be overriden, i.e., VIA options cannot be enabled on an Intel
+CPU. The currently available options are:
+  0x1: Disable all run-time detected optimizations
+  0x2: Enable AES-NI
+  0x4: Enable SSSE3
+  0x8: Enable PCLMUL
+  0x100000: Enable VIA padlock
+  0x200000: Enable VIA PHE
+  0x400000: Enable VIA PHE SHA512
+
 ** p11tool: use GNUTLS_SO_PIN to read the security officer's PIN if set.
 
 ** p11tool: ask for label when one isn't provided.
