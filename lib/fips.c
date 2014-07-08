@@ -209,32 +209,8 @@ int _gnutls_fips_perform_self_checks(void)
 
 	/* Tests the FIPS algorithms */
 
-	/* ciphers */
-	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_AES_128_CBC);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_AES_192_CBC);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_AES_256_CBC);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
+	/* ciphers - one test per cipher */
 	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_3DES_CBC);
-	if (ret < 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_AES_128_GCM);
 	if (ret < 0) {
 		gnutls_assert();
 		goto error;
