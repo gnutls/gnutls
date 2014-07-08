@@ -253,7 +253,7 @@ static const char rsa_privkey[] = "-----BEGIN RSA PRIVATE KEY-----\n"
 
 /* A precomputed RSA-SHA1 signature using the key above */
 static const char rsa_sig[] =
-    "\xc8\x3a\x61\xfe\x27\x67\x23\x84\xfc\x8f\x2a\xd8\x05\x00\x83\xcd\xfd\x89\xe8\xa6\x5a\x01\x41\x4b\xaf\x5b\x37\x8e\x2e\xa9\xf0\xf3\x3e\xd2\xa9\x2f\xf1\x48\xa2\xdd\x3e\xe9\x7f\x7c\x02\xe8\x05\x4d\x2a\x3b\xeb\x74\x19\x01\x1d\x1b\x83\xc9\x45\x1b\x4b\x3c\x43\x3e";
+    "\xb7\x3a\x3e\x07\xd8\x1a\xa7\xa2\x81\xf1\xd5\xa4\x8d\xab\xca\x18\x64\xb5\x57\x35\xea\xee\x70\x37\xf6\x23\x93\x1e\x56\xf4\x72\xd8\x97\xa8\x38\x63\xef\x9a\x9c\x16\x11\x79\x0c\xae\x16\x3f\x7b\x7e\xa0\xf0\x42\x2e\xd1\x07\xde\x42\xbd\x45\xbd\x45\xaa\x87\x57\x5f";
 
 /* ECDSA key and signature */
 static const char ecdsa_secp256r1_privkey[] =
@@ -392,11 +392,12 @@ static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 			unsigned i;
 			fprintf(stderr, "\nstored[%d]: ", ssig.size);
 			for (i = 0; i < ssig.size; i++)
-				fprintf(stderr, "%.2x", ssig.data[i]);
+				fprintf(stderr, "\\x%.2x", ssig.data[i]);
 
 			fprintf(stderr, "\ngenerated[%d]: ", sig.size);
 			for (i = 0; i < sig.size; i++)
-				fprintf(stderr, "%.2x", sig.data[i]);
+				fprintf(stderr, "\\x%.2x", sig.data[i]);
+			fprintf(stderr, "\n");
 #endif
 			gnutls_assert();
 			goto cleanup;
@@ -695,10 +696,10 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 			return 0;
 #endif
 	case GNUTLS_PK_RSA:
-		PK_KNOWN_TEST(GNUTLS_PK_RSA, 1, 512, GNUTLS_DIG_SHA1,
+		PK_KNOWN_TEST(GNUTLS_PK_RSA, 1, 512, GNUTLS_DIG_SHA256,
 			      rsa_privkey, rsa_sig);
 		PK_TEST(GNUTLS_PK_RSA, test_rsa_enc, 512, 0);
-		PK_TEST(GNUTLS_PK_RSA, test_sig, 512, GNUTLS_DIG_SHA1);
+		PK_TEST(GNUTLS_PK_RSA, test_sig, 512, GNUTLS_DIG_SHA256);
 	case GNUTLS_PK_DSA:
 		PK_KNOWN_TEST(GNUTLS_PK_DSA, 0, 1024, GNUTLS_DIG_SHA1,
 			      dsa_privkey, dsa_sig);
