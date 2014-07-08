@@ -40,43 +40,91 @@
 
 unsigned int _gnutls_x86_cpuid_s[4];
 
+#ifndef bit_PCLMUL
+# define bit_PCLMUL 0x2
+#endif
+
+#ifndef bit_SSSE3
+# define bit_SSSE3 0x0000200
+#endif
+
+#ifndef bit_AES
+# define bit_AES 0x2000000
+#endif
+
+#define via_bit_PADLOCK (0x3 << 6)
+#define via_bit_PADLOCK_PHE (0x3 << 10)
+#define via_bit_PADLOCK_PHE_SHA512 (0x3 << 25)
+
+/* Our internal bit-string for cpu capabilities. Should be set
+ * in GNUTLS_CPUID_OVERRIDE */
+#define INTEL_AES_NI 1
+#define INTEL_SSSE3 (1<<1)
+#define INTEL_PCLMUL (1<<2)
+#define VIA_PADLOCK (1<<10)
+#define VIA_PADLOCK_PHE (1<<11)
+#define VIA_PADLOCK_PHE_SHA512 (1<<12)
+
+static void capabilities_to_intel_cpuid(unsigned capabilities)
+{
+	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
+	if (capabilities & INTEL_AES_NI) {
+		_gnutls_x86_cpuid_s[2] |= bit_AES;
+	}
+	if (capabilities & INTEL_SSSE3) {
+		_gnutls_x86_cpuid_s[2] |= bit_SSSE3;
+	}
+	if (capabilities & INTEL_PCLMUL) { /* ecx */
+		_gnutls_x86_cpuid_s[2] |= bit_PCLMUL;
+	}
+}
+
+static unsigned capabilities_to_via_edx(unsigned capabilities)
+{
+	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
+	if (capabilities & VIA_PADLOCK) { /* edx */
+		_gnutls_x86_cpuid_s[3] |= via_bit_PADLOCK;
+	}
+	if (capabilities & VIA_PADLOCK_PHE) { /* edx */
+		_gnutls_x86_cpuid_s[3] |= via_bit_PADLOCK_PHE;
+	}
+	if (capabilities & VIA_PADLOCK_PHE_SHA512) { /* edx */
+		_gnutls_x86_cpuid_s[3] |= via_bit_PADLOCK_PHE_SHA512;
+	}
+	return _gnutls_x86_cpuid_s[3];
+}
+
 static unsigned check_optimized_aes(void)
 {
-	return (_gnutls_x86_cpuid_s[2] & 0x2000000);
+	return (_gnutls_x86_cpuid_s[2] & bit_AES);
 }
 
 static unsigned check_ssse3(void)
 {
-	return (_gnutls_x86_cpuid_s[2] & 0x0000200);
+	return (_gnutls_x86_cpuid_s[2] & bit_SSSE3);
 }
 
 #ifdef ASM_X86_64
 static unsigned check_pclmul(void)
 {
-	return (_gnutls_x86_cpuid_s[2] & 0x2);
+	return (_gnutls_x86_cpuid_s[2] & bit_PCLMUL);
 }
 #endif
 
-static int check_padlock(void)
+static int check_padlock(unsigned edx)
 {
-	unsigned int edx = padlock_capability();
-
-	return ((edx & (0x3 << 6)) == (0x3 << 6));
+	return ((edx & via_bit_PADLOCK) == via_bit_PADLOCK);
 }
 
-static int check_phe(void)
+static int check_phe(unsigned edx)
 {
-	unsigned int edx = padlock_capability();
-
-	return ((edx & (0x3 << 10)) == (0x3 << 10));
+	return ((edx & via_bit_PADLOCK_PHE) == via_bit_PADLOCK_PHE);
 }
 
 /* We are actually checking for SHA512 */
-static int check_phe_sha512(void)
+static int check_phe_sha512(unsigned edx)
 {
-	unsigned int edx = padlock_capability();
-
-	return ((edx & (0x3 << 25)) == (0x3 << 25));
+	return ((edx & via_bit_PADLOCK_PHE_SHA512) == via_bit_PADLOCK_PHE_SHA512);
 }
 
 static int check_phe_partial(void)
@@ -127,16 +175,19 @@ static unsigned check_intel_or_amd(void)
 }
 
 static
-void register_x86_intel_crypto(void)
+void register_x86_intel_crypto(unsigned capabilities)
 {
 	int ret;
 
 	if (check_intel_or_amd() == 0)
 		return;
 
-	gnutls_cpuid(1, &_gnutls_x86_cpuid_s[0], &_gnutls_x86_cpuid_s[1], 
-		&_gnutls_x86_cpuid_s[2], &_gnutls_x86_cpuid_s[3]);
-	
+	if (capabilities == 0)
+		gnutls_cpuid(1, &_gnutls_x86_cpuid_s[0], &_gnutls_x86_cpuid_s[1], 
+			&_gnutls_x86_cpuid_s[2], &_gnutls_x86_cpuid_s[3]);
+	else
+		capabilities_to_intel_cpuid(capabilities);
+
 	if (check_ssse3()) {
 		_gnutls_debug_log("Intel SSSE3 was detected\n");
 
@@ -324,13 +375,20 @@ void register_x86_intel_crypto(void)
 }
 
 static
-void register_x86_padlock_crypto(void)
+void register_x86_padlock_crypto(unsigned capabilities)
 {
 	int ret, phe;
+	unsigned edx;
 
 	if (check_via() == 0)
 		return;
-	if (check_padlock()) {
+
+	if (capabilities == 0)
+		edx = padlock_capability();
+	else
+		edx = capabilities_to_via_edx(capabilities);
+
+	if (check_padlock(edx)) {
 		_gnutls_debug_log
 		    ("Padlock AES accelerator was detected\n");
 		ret =
@@ -373,12 +431,12 @@ void register_x86_padlock_crypto(void)
 #endif
 	}
 #ifdef HAVE_LIBNETTLE
-	phe = check_phe();
+	phe = check_phe(edx);
 
 	if (phe && check_phe_partial()) {
 		_gnutls_debug_log
 		    ("Padlock SHA1 and SHA256 (partial) accelerator was detected\n");
-		if (check_phe_sha512()) {
+		if (check_phe_sha512(edx)) {
 			_gnutls_debug_log
 			    ("Padlock SHA512 (partial) accelerator was detected\n");
 			ret =
@@ -499,7 +557,14 @@ void register_x86_padlock_crypto(void)
 
 void register_x86_crypto(void)
 {
-	register_x86_intel_crypto();
-	register_x86_padlock_crypto();
+	unsigned capabilities = 0;
+	char *p;
+	p = getenv("GNUTLS_CPUID_OVERRIDE");
+	if (p) {
+		capabilities = atoi(p);
+	}
+	
+	register_x86_intel_crypto(capabilities);
+	register_x86_padlock_crypto(capabilities);
 }
 
