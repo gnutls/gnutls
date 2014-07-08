@@ -1291,7 +1291,7 @@ static int pct_test(gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* param
 int ret;
 gnutls_datum_t sig = {NULL, 0};
 const char const_data[20] = "onetwothreefourfive";
-gnutls_datum_t ddata;
+gnutls_datum_t ddata, tmp = {NULL,0};
 char* gen_data = NULL;
 
 	if (algo == GNUTLS_PK_DSA || algo == GNUTLS_PK_EC) {
@@ -1310,19 +1310,41 @@ char* gen_data = NULL;
 
 	switch (algo) {
 	case GNUTLS_PK_RSA:
-		/* Here we don't know the purpose of the key. Assume signing
+		ret = _gnutls_pk_encrypt(algo, &sig, &ddata, params);
+		if (ret < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+			goto cleanup;
+		}
+
+		ret = _gnutls_pk_decrypt(algo, &tmp, &sig, params);
+		if (ret < 0) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+			gnutls_assert();
+			goto cleanup;
+		}
+		if (tmp.size != ddata.size || memcmp(tmp.data, ddata.data, tmp.size) != 0) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		free(sig.data);
+		sig.data = NULL;
+
+		/* Here we don't know the purpose of the key. Check both
+		 * signing and encryption.
 		 */
 	case GNUTLS_PK_EC: /* we only do keys for ECDSA */
 	case GNUTLS_PK_DSA:
 		ret = _gnutls_pk_sign(algo, &sig, &ddata, params);
 		if (ret < 0) {
-			ret = GNUTLS_E_PK_GENERATION_ERROR;
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			goto cleanup;
 		}
 
 		ret = _gnutls_pk_verify(algo, &ddata, &sig, params);
 		if (ret < 0) {
-			ret = GNUTLS_E_PK_GENERATION_ERROR;
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			gnutls_assert();
 			goto cleanup;
 		}
@@ -1337,6 +1359,7 @@ char* gen_data = NULL;
 cleanup:
 	gnutls_free(gen_data);
 	gnutls_free(sig.data);
+	gnutls_free(tmp.data);
 	return ret;
 }
 #endif
