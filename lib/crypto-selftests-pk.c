@@ -318,20 +318,30 @@ static const char ecdsa_secp521r1_sig[] =
     "\x30\x81\x87\x02\x42\x01\xb8\xcb\x52\x9e\x10\xa8\x49\x3f\xe1\x9e\x14\x0a\xcf\x96\xed\x7e\xab\x7d\x0c\xe1\x9b\xa4\x97\xdf\x01\xf5\x35\x42\x5f\x5b\x28\x15\x24\x33\x6e\x59\x6c\xaf\x10\x8b\x98\x8e\xe9\x4c\x23\x0d\x76\x92\x03\xdd\x6d\x8d\x08\x47\x15\x5b\xf8\x66\x75\x75\x40\xe8\xf4\xa0\x52\x02\x41\x15\x27\x7c\x5f\xa6\x33\xa6\x29\x68\x3f\x55\x8d\x7f\x1d\x4f\x88\xc6\x61\x6e\xac\x21\xdf\x2b\x7b\xde\x76\x9a\xdc\xe6\x3b\x94\x3f\x03\x9c\xa2\xa6\xa3\x63\x39\x48\xbd\x79\x70\x21\xf2\x6b\xff\x58\x66\xf1\x58\xc2\x58\xad\x4f\x84\x14\x5d\x05\x12\x83\xd0\x87\xbd\xf3";
 
 /* DSA key and signature */
-static const char dsa_privkey[] = "-----BEGIN DSA PRIVATE KEY-----\n"
-    "MIIBuwIBAAKBgQCMBOoV479SAPxFHL6Ty9DNCZ08nlxCWkfgSjt77Lc51tEkNlrl\n"
-    "Bx8Mid4uXPL7PDQ74YWdqDWL4In2lMkOQXZ/7B8xLqjuxZqisbyqgrYbu9/yatwo\n"
-    "hNa23vkXrd6duVasjoWOSkj1fVPqy8Pl1jik3BwWyRqXBn+ajbmyDGOsDQIVALBp\n"
-    "lrRgiO4jHfH1C8gP1CheHROrAoGBAIint1PE9y23u0Is9qEf6i/4hki+5pRCZv/K\n"
-    "VG5JGDBW+hEgVj6Rx62jFP0jkTtxJdmv1SsoccFSE42tbRkWWypOLIJKZ7nIIrHY\n"
-    "vMt3Z1S0m18mYE1G/3h9PNgbY8/Ag3YqYLwVfkthnBcTpDhSSAIo/dCwNV+3AxpS\n"
-    "v5hE0L+1AoGAYMeZCjvVWODKDMJPJ/d8pURroeudhB+p7d5BMZTq+mYUCm9uVVgu\n"
-    "doLo/RiWcs1mhrOQM9cHgKO1Hwd8NNjtj4KE8FTU1irpKbobgOViLHE5sM2Tfzc5\n"
-    "Gif2fh8SlQdrhkOnZQkGDuTFx24K9/TTCDkVmB0T+xJfQ8HIshGw7kQCFHUDZ/g5\n"
-    "K0FjzkSbhgOXhhKNTFFA\n" "-----END DSA PRIVATE KEY-----\n";
+static const char dsa_privkey[] =
+ "-----BEGIN DSA PRIVATE KEY-----\n"
+ "MIIDTQIBAAKCAQEAh60B6yPMRIT7udq2kKuwnQDohvT1U0w+RJcSr23C05cM/Ovn\n"
+ "UP/8Rrj6T8K+uYhMbKgLaZiJJW9q04jaPQk0cfUphbLvRjzVHwE/0Bkb+Y1Rv7ni\n"
+ "Jot2IFMq5iuNraf889PC0WREvFCcIkSFY2Ac4WT7mCcBtfx/raGFXDUjcUrJ0HwZ\n"
+ "IOhjQDfcXUsztuyYsYA75ociEY8kyDZq/ixyr5++R1VjNf30Re8AbQlXOEGxEN5t\n"
+ "t+Tvpq8K5L3prQs2KNSzyOUmedjb/ojH4T4qe/RL9EVjjeuIGHDNUT6F197yZ91y\n"
+ "qLLTf1WjnUyZcKij5rryX0LJBBWawEZjNSHZawIdAMQlyycia4NigCdiDR+QptUn\n"
+ "2xrj9o14fXkIrXcCggEAXRZm1rbPhsjSTo6cpCVrmDzO1grv83EHiBH4MvRQQnP8\n"
+ "FpAREsBA5cYju97XvLaLhioZeMjLn08kU7TUbHRUB+ULTuVvE2dQbBpGuKiLRRt9\n"
+ "6U2T0eD3xGLoM+o8EY/kpqaWGEpZv7hzM9xuo4vy55+viAZgFWULqmltwfG/7w7V\n"
+ "NXUHNv5H4Ipw//fSDLTPqzUlNqSSswDLz6pCjWEs0rWAqNAMaOiLTz4id9pL48Oe\n"
+ "oAfpcQR9tgTEnwyXfZBnrJVclHhkHKGeXvU05IgCzpKO76Z5R+By50T0i/JV7vzM\n"
+ "l2yS9aAl/cprT6U7yI3oU/blldCVNpMcFAFb+fO8DAKCAQBVMo8xptyvQOJeSvbO\n"
+ "SSYdJ3IiI/0GdkcGWXblWg9z7mrPaWEnT7OquEm/+vYtWd3GHDtyNM+jzsN4Xgjc\n"
+ "TL3AEd2hLiozJQ1BFKw25VU08UHAYTzUxZhO4Vwtmp46Kwj8YLDQ3NHRWCBxpDQR\n"
+ "fbiFvyXP+qXap6plMfrydnUD1mae/JSOWOYgdB7tFIehstLxVXx/cAnjwgFU03Df\n"
+ "grjsad92zA1Hc9wIjbsgAQdTR5DWnFRkRt3UtayBwoyqm6QceZHsv1NAGvkQ4ion\n"
+ "bEjkHkjF9YCkR9/rspR8cLghRIXMjOpypuSbaRPeeWq0gP2UOxFL/d3iWH0ETr/L\n"
+ "kTlCAhxYGpVgtfB96qmJukyl9GOGvfkwFTgEyIDoV84M\n"
+ "-----END DSA PRIVATE KEY-----\n";
 
 static const char dsa_sig[] =
-    "\x30\x2d\x02\x15\x00\xaf\x2a\x27\xcb\x93\xed\x33\x21\x9d\x01\x5f\x44\x8c\x80\x06\xa7\xe2\x9d\x73\x8d\x02\x14\x19\xb9\xf7\x73\x26\x62\x7a\xc7\x7f\x18\x5a\x69\x83\xc1\xa0\x1f\xbd\x9b\xe2\x92";
+    "\x30\x3d\x02\x1c\x2e\x40\x14\xb3\x7a\x3f\xc0\x4f\x06\x74\x4f\xa6\x5f\xc2\x0a\x46\x35\x38\x88\xb4\x1a\xcf\x94\x02\x40\x42\x7c\x7f\x02\x1d\x00\x98\xfc\xf1\x08\x66\xf1\x86\x28\xc9\x73\x9e\x2b\x5d\xce\x57\xe8\xb5\xeb\xcf\xa3\xf6\x60\xf6\x63\x16\x0e\xc0\x42";
 
 static int test_known_sig(gnutls_pk_algorithm_t pk, unsigned bits,
 			  gnutls_digest_algorithm_t dig,
@@ -709,9 +719,9 @@ int gnutls_pk_self_test(unsigned all, gnutls_pk_algorithm_t pk)
 		PK_TEST(GNUTLS_PK_RSA, test_rsa_enc, 2048, 0);
 		PK_TEST(GNUTLS_PK_RSA, test_sig, 3072, GNUTLS_DIG_SHA256);
 	case GNUTLS_PK_DSA:
-		PK_KNOWN_TEST(GNUTLS_PK_DSA, 0, 1024, GNUTLS_DIG_SHA1,
+		PK_KNOWN_TEST(GNUTLS_PK_DSA, 0, 2048, GNUTLS_DIG_SHA256,
 			      dsa_privkey, dsa_sig);
-		PK_TEST(GNUTLS_PK_DSA, test_sig, 1024, GNUTLS_DIG_SHA1);
+		PK_TEST(GNUTLS_PK_DSA, test_sig, 3072, GNUTLS_DIG_SHA256);
 	case GNUTLS_PK_EC:	/* Testing ECDSA */
 		/* Test ECDH */
 #ifndef AVOID_INTERNALS
