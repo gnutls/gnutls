@@ -22,7 +22,7 @@
 
 #include <config.h>
 
-extern unsigned int _gnutls_x86_cpuid_s[4];
+extern unsigned int _gnutls_x86_cpuid_s[3];
 
 #if defined(ASM_X86)
 

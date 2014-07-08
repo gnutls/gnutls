@@ -38,7 +38,10 @@
 #endif
 #include <aes-padlock.h>
 
-unsigned int _gnutls_x86_cpuid_s[4];
+/* ebx, ecx, edx 
+ * This is a format compatible with openssl's CPUID detection.
+ */
+unsigned int _gnutls_x86_cpuid_s[3];
 
 #ifndef bit_PCLMUL
 # define bit_PCLMUL 0x2
@@ -69,13 +72,13 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 {
 	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
 	if (capabilities & INTEL_AES_NI) {
-		_gnutls_x86_cpuid_s[2] |= bit_AES;
+		_gnutls_x86_cpuid_s[1] |= bit_AES;
 	}
 	if (capabilities & INTEL_SSSE3) {
-		_gnutls_x86_cpuid_s[2] |= bit_SSSE3;
+		_gnutls_x86_cpuid_s[1] |= bit_SSSE3;
 	}
 	if (capabilities & INTEL_PCLMUL) { /* ecx */
-		_gnutls_x86_cpuid_s[2] |= bit_PCLMUL;
+		_gnutls_x86_cpuid_s[1] |= bit_PCLMUL;
 	}
 }
 
@@ -83,31 +86,31 @@ static unsigned capabilities_to_via_edx(unsigned capabilities)
 {
 	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
 	if (capabilities & VIA_PADLOCK) { /* edx */
-		_gnutls_x86_cpuid_s[3] |= via_bit_PADLOCK;
+		_gnutls_x86_cpuid_s[2] |= via_bit_PADLOCK;
 	}
 	if (capabilities & VIA_PADLOCK_PHE) { /* edx */
-		_gnutls_x86_cpuid_s[3] |= via_bit_PADLOCK_PHE;
+		_gnutls_x86_cpuid_s[2] |= via_bit_PADLOCK_PHE;
 	}
 	if (capabilities & VIA_PADLOCK_PHE_SHA512) { /* edx */
-		_gnutls_x86_cpuid_s[3] |= via_bit_PADLOCK_PHE_SHA512;
+		_gnutls_x86_cpuid_s[2] |= via_bit_PADLOCK_PHE_SHA512;
 	}
-	return _gnutls_x86_cpuid_s[3];
+	return _gnutls_x86_cpuid_s[2];
 }
 
 static unsigned check_optimized_aes(void)
 {
-	return (_gnutls_x86_cpuid_s[2] & bit_AES);
+	return (_gnutls_x86_cpuid_s[1] & bit_AES);
 }
 
 static unsigned check_ssse3(void)
 {
-	return (_gnutls_x86_cpuid_s[2] & bit_SSSE3);
+	return (_gnutls_x86_cpuid_s[1] & bit_SSSE3);
 }
 
 #ifdef ASM_X86_64
 static unsigned check_pclmul(void)
 {
-	return (_gnutls_x86_cpuid_s[2] & bit_PCLMUL);
+	return (_gnutls_x86_cpuid_s[1] & bit_PCLMUL);
 }
 #endif
 
@@ -178,15 +181,17 @@ static
 void register_x86_intel_crypto(unsigned capabilities)
 {
 	int ret;
+	unsigned t;
 
 	if (check_intel_or_amd() == 0)
 		return;
 
-	if (capabilities == 0)
-		gnutls_cpuid(1, &_gnutls_x86_cpuid_s[0], &_gnutls_x86_cpuid_s[1], 
-			&_gnutls_x86_cpuid_s[2], &_gnutls_x86_cpuid_s[3]);
-	else
+	if (capabilities == 0) {
+		gnutls_cpuid(1, &t, &_gnutls_x86_cpuid_s[0], 
+			&_gnutls_x86_cpuid_s[1], &_gnutls_x86_cpuid_s[2]);
+	} else {
 		capabilities_to_intel_cpuid(capabilities);
+	}
 
 	if (check_ssse3()) {
 		_gnutls_debug_log("Intel SSSE3 was detected\n");
@@ -367,9 +372,6 @@ void register_x86_intel_crypto(unsigned capabilities)
 		}
 #endif
 	}
-
-	/* convert _gnutls_x86_cpuid_s the way openssl asm expects it */
-	_gnutls_x86_cpuid_s[1] = _gnutls_x86_cpuid_s[2];
 
 	return;
 }
