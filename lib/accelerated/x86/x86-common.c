@@ -570,7 +570,7 @@ void register_x86_crypto(void)
 	char *p;
 	p = getenv("GNUTLS_CPUID_OVERRIDE");
 	if (p) {
-		capabilities = atoi(p);
+		capabilities = strtol(p, NULL, 0);
 	}
 	
 	register_x86_intel_crypto(capabilities);
