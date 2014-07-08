@@ -61,16 +61,20 @@ unsigned int _gnutls_x86_cpuid_s[3];
 
 /* Our internal bit-string for cpu capabilities. Should be set
  * in GNUTLS_CPUID_OVERRIDE */
-#define INTEL_AES_NI 1
-#define INTEL_SSSE3 (1<<1)
-#define INTEL_PCLMUL (1<<2)
-#define VIA_PADLOCK (1<<10)
-#define VIA_PADLOCK_PHE (1<<11)
-#define VIA_PADLOCK_PHE_SHA512 (1<<12)
+#define EMPTY_SET 1
+#define INTEL_AES_NI (1<<1)
+#define INTEL_SSSE3 (1<<2)
+#define INTEL_PCLMUL (1<<3)
+#define VIA_PADLOCK (1<<20)
+#define VIA_PADLOCK_PHE (1<<21)
+#define VIA_PADLOCK_PHE_SHA512 (1<<22)
 
 static void capabilities_to_intel_cpuid(unsigned capabilities)
 {
 	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
+	if (capabilities & EMPTY_SET) {
+		return;
+	}
 	if (capabilities & INTEL_AES_NI) {
 		_gnutls_x86_cpuid_s[1] |= bit_AES;
 	}
@@ -85,6 +89,9 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 static unsigned capabilities_to_via_edx(unsigned capabilities)
 {
 	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
+	if (capabilities & EMPTY_SET) {
+		return 0;
+	}
 	if (capabilities & VIA_PADLOCK) { /* edx */
 		_gnutls_x86_cpuid_s[2] |= via_bit_PADLOCK;
 	}
