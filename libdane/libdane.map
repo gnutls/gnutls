@@ -10,6 +10,7 @@ DANE_0_0
 	dane_query_status;
 	dane_query_entries;
 	dane_query_data;
+	dane_query_to_raw_tlsa;
 	dane_query_deinit;
 	dane_verify_session_crt;
 	dane_verify_crt;

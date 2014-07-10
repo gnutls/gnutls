@@ -133,6 +133,88 @@ dane_query_data(dane_query_t q, unsigned int idx,
 }
 
 /**
+ * dane_query_to_raw_tlsa:
+ * @q: The query result structure
+ * @data_entries: Pointer set to the number of entries in the query
+ * @dane_data: Pointer to contain an array of DNS rdata items, terminated with a NULL pointer;
+ *             caller must guarantee that the referenced data remains
+ *             valid until dane_query_deinit() is called.
+ * @dane_data_len: Pointer to contain the length n bytes of the dane_data items
+ * @secure: Pointer set true if the result is validated securely, false if
+ *               validation failed or the domain queried has no security info
+ * @bogus: Pointer set true if the result was not secure due to a security failure
+ *
+ * This function will provide the DANE data from the query
+ * response.
+ *
+ * The pointers dane_data and dane_data_len are allocated with malloc()
+ * to contain a copy of the data from the query result structure (individual
+ * rdata items are not allocated separately). The query result structure can
+ * be safely deinitialized after calling this function.
+ *
+ * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ */
+int
+dane_query_to_raw_tlsa(dane_query_t q, unsigned int *data_entries,
+		char ***dane_data, int **dane_data_len, int *secure, int *bogus)
+{
+	size_t data_sz;
+	char *data_buf;
+	unsigned int idx;
+
+	*data_entries = 0;
+	*dane_data = NULL;
+	*dane_data_len = NULL;
+
+	switch (q->status) {
+	case DANE_QUERY_DNSSEC_VERIFIED:
+		*secure = 1;
+		break;
+
+	case DANE_QUERY_BOGUS:
+		*bogus = 1;
+		break;
+
+	default:
+		break;
+	}
+
+	/* pack dane_data pointer list followed by dane_data contents */
+	data_sz = sizeof (**dane_data) * (q->data_entries + 1);
+	for (idx = 0; idx < q->data_entries; idx++)
+		data_sz += 3 + q->data[idx].size;
+
+	*dane_data = calloc (1, data_sz);
+	if (*dane_data == NULL)
+		return DANE_E_MEMORY_ERROR;
+	data_buf = (char *)*dane_data;
+	data_buf += sizeof (**dane_data) * (q->data_entries + 1);
+
+	*dane_data_len = calloc (q->data_entries + 1, sizeof (**dane_data_len));
+	if (*dane_data_len == NULL) {
+		free(*dane_data);
+		*dane_data = NULL;
+		return DANE_E_MEMORY_ERROR;
+	}
+
+	for (idx = 0; idx < q->data_entries; idx++) {
+		(*dane_data)[idx] = data_buf;
+		(*dane_data)[idx][0] = q->usage[idx];
+		(*dane_data)[idx][1] = q->type[idx];
+		(*dane_data)[idx][2] = q->match[idx];
+		memcpy(&(*dane_data)[idx][3], q->data[idx].data, q->data[idx].size);
+		(*dane_data_len)[idx] = 3 + q->data[idx].size;
+		data_buf += 3 + q->data[idx].size;
+	}
+	(*dane_data)[idx] = NULL;
+	(*dane_data_len)[idx] = 0;
+	*data_entries = q->data_entries;
+
+	return DANE_E_SUCCESS;
+}
+
+/**
  * dane_state_init:
  * @s: The structure to be initialized
  * @flags: flags from the %dane_state_flags enumeration

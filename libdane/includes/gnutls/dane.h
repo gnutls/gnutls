@@ -118,6 +118,8 @@ unsigned int dane_query_entries(dane_query_t q);
 int dane_query_data(dane_query_t q, unsigned int idx,
 		    unsigned int *usage, unsigned int *type,
 		    unsigned int *match, gnutls_datum_t * data);
+int dane_query_to_raw_tlsa(dane_query_t q, unsigned int *data_entries,
+		    char ***dane_data, int **dane_data_len, int *secure, int *bogus);
 void dane_query_deinit(dane_query_t q);
 
 const char *dane_cert_type_name(dane_cert_type_t type);
