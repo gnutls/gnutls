@@ -32,6 +32,8 @@ CPU. The currently available options are:
   0x200000: Enable VIA PHE
   0x400000: Enable VIA PHE SHA512
 
+** libdane: added dane_query_to_raw_tlsa(); patch by Simon Arlott.
+
 ** p11tool: use GNUTLS_SO_PIN to read the security officer's PIN if set.
 
 ** p11tool: ask for label when one isn't provided.
