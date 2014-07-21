@@ -468,9 +468,46 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 
 	return r;
 }
-#elif defined(ANDROID) || defined(__ANDROID__)
-#include <dirent.h>
-#include <unistd.h>
+#elif defined(ANDROID) || defined(__ANDROID__) || defined(DEFAULT_TRUST_STORE_DIR)
+
+# include <dirent.h>
+# include <unistd.h>
+
+# if defined(ANDROID) || defined(__ANDROID__)
+#  define DEFAULT_TRUST_STORE_DIR "/system/etc/security/cacerts/"
+
+static int load_revoked_certs(gnutls_x509_trust_list_t list, unsigned type)
+{
+	DIR *dirp;
+	struct dirent *d;
+	int ret;
+	int r = 0;
+	char path[GNUTLS_PATH_MAX];
+
+	dirp = opendir("/data/misc/keychain/cacerts-removed/");
+	if (dirp != NULL) {
+		do {
+			d = readdir(dirp);
+			if (d != NULL && d->d_type == DT_REG) {
+				snprintf(path, sizeof(path),
+					 "/data/misc/keychain/cacerts-removed/%s",
+					 d->d_name);
+
+				ret =
+				    gnutls_x509_trust_list_remove_trust_file
+				    (list, path, type);
+				if (ret >= 0)
+					r += ret;
+			}
+		}
+		while (d != NULL);
+		closedir(dirp);
+	}
+
+	return r;
+}
+# endif
+
 static int load_dir_certs(const char *dirname,
 			  gnutls_x509_trust_list_t list,
 			  unsigned int tl_flags, unsigned int tl_vflags,
@@ -505,36 +542,6 @@ static int load_dir_certs(const char *dirname,
 	return r;
 }
 
-static int load_revoked_certs(gnutls_x509_trust_list_t list, unsigned type)
-{
-	DIR *dirp;
-	struct dirent *d;
-	int ret;
-	int r = 0;
-	char path[GNUTLS_PATH_MAX];
-
-	dirp = opendir("/data/misc/keychain/cacerts-removed/");
-	if (dirp != NULL) {
-		do {
-			d = readdir(dirp);
-			if (d != NULL && d->d_type == DT_REG) {
-				snprintf(path, sizeof(path),
-					 "/data/misc/keychain/cacerts-removed/%s",
-					 d->d_name);
-
-				ret =
-				    gnutls_x509_trust_list_remove_trust_file
-				    (list, path, type);
-				if (ret >= 0)
-					r += ret;
-			}
-		}
-		while (d != NULL);
-		closedir(dirp);
-	}
-
-	return r;
-}
 
 /* This works on android 4.x 
  */
@@ -545,11 +552,12 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 	int r = 0, ret;
 
 	ret =
-	    load_dir_certs("/system/etc/security/cacerts/", list, tl_flags,
+	    load_dir_certs(DEFAULT_TRUST_STORE_DIR, list, tl_flags,
 			   tl_vflags, GNUTLS_X509_FMT_PEM);
 	if (ret >= 0)
 		r += ret;
 
+# if defined(ANDROID) || defined(__ANDROID__)
 	ret = load_revoked_certs(list, GNUTLS_X509_FMT_DER);
 	if (ret >= 0)
 		r -= ret;
@@ -559,6 +567,7 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 			   tl_flags, tl_vflags, GNUTLS_X509_FMT_DER);
 	if (ret >= 0)
 		r += ret;
+# endif
 
 	return r;
 }

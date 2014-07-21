@@ -492,11 +492,20 @@ if test "x$with_default_trust_store_pkcs11" != x; then
     ["$with_default_trust_store_pkcs11"], [use the given pkcs11 uri as default trust store])
 fi
 
+AC_ARG_WITH([default-trust-store-dir],
+  [AS_HELP_STRING([--with-default-trust-store-dir=DIR],
+    [use the given directory as default trust store])])
+
+if test "x$with_default_trust_store_dir" != x; then
+  AC_DEFINE_UNQUOTED([DEFAULT_TRUST_STORE_DIR],
+    ["$with_default_trust_store_dir"], [use the given directory as default trust store])
+fi
+
 dnl auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.html
 AC_ARG_WITH([default-trust-store-file],
   [AS_HELP_STRING([--with-default-trust-store-file=FILE],
     [use the given file default trust store])], with_default_trust_store_file="$withval",
-  [if test "$build" = "$host" && test x$with_default_trust_store_pkcs11 = x;then
+  [if test "$build" = "$host" && test x$with_default_trust_store_pkcs11 = x && test x$with_default_trust_store_dir = x;then
   for i in \
     /etc/ssl/ca-bundle.pem \
     /etc/ssl/certs/ca-certificates.crt \
@@ -823,6 +832,7 @@ AC_MSG_NOTICE([Optional libraries:
 AC_MSG_NOTICE([System files:
 
   Trust store pkcs11:   $with_default_trust_store_pkcs11
+  Trust store dir:      $with_default_trust_store_dir
   Trust store file:     $with_default_trust_store_file
   Blacklist file:       $with_default_blacklist_file
   CRL file:             $with_default_crl_file
