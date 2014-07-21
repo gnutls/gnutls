@@ -1544,8 +1544,7 @@ gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
  * will import all certificates that are marked as trusted. Note
  * that the supported URLs are the ones indicated by gnutls_url_is_supported().
  *
- * Returns: number of certificates processed, or a negative error code on
- * error.
+ * Returns: the number of certificates processed
  **/
 int
 gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials_t
@@ -1573,8 +1572,10 @@ int ret;
  * to gnutls_certificate_set_x509_trust_file() but loads all certificates
  * in a directory.
  *
- * Returns: number of certificates processed, or a negative error code on
- * error.
+ * Returns: the number of certificates processed
+ *
+ * Since: 3.3.6
+ *
  **/
 int
 gnutls_certificate_set_x509_trust_dir(gnutls_certificate_credentials_t cred,
