@@ -190,7 +190,7 @@ void doit(void)
 {
 	int ret;
 	gnutls_datum_t data;
-	gnutls_x509_crt_t server_crt, ca_crt, ca_crt2;
+	gnutls_x509_crt_t server_crt, ca_crt2;
 	gnutls_x509_trust_list_t tl;
 	unsigned int status;
 
@@ -205,26 +205,22 @@ void doit(void)
 
 	/* test for gnutls_certificate_get_issuer() */
 	gnutls_x509_trust_list_init(&tl, 0);
+
 	gnutls_x509_crt_init(&server_crt);
-	gnutls_x509_crt_init(&ca_crt);
 	gnutls_x509_crt_init(&ca_crt2);
+
+	ret = gnutls_x509_trust_list_add_trust_dir(tl, "./x509cert-dir", NULL, GNUTLS_X509_FMT_PEM, 0, 0);
+	if (ret != 1)
+		fail("gnutls_x509_trust_list_add_trust_dir: %d\n", ret);
 
 	ret =
 	    gnutls_x509_crt_import(server_crt, &cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("gnutls_x509_crt_import");
 
-	ret = gnutls_x509_crt_import(ca_crt, &ca, GNUTLS_X509_FMT_PEM);
-	if (ret < 0)
-		fail("gnutls_x509_crt_import");
-
 	ret = gnutls_x509_crt_import(ca_crt2, &ca, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("gnutls_x509_crt_import");
-
-	ret = gnutls_x509_trust_list_add_cas(tl, &ca_crt, 1, 0);
-	if (ret < 0)
-		fail("gnutls_x509_trust_list_add_cas");
 
 	ret =
 	    gnutls_x509_trust_list_add_named_crt(tl, server_crt, NAME,
