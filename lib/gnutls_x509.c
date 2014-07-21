@@ -1563,6 +1563,35 @@ int ret;
 }
 
 /**
+ * gnutls_certificate_set_x509_trust_dir:
+ * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @ca_dir: is a directory containing the list of trusted CAs (DER or PEM list)
+ * @type: is PEM or DER
+ *
+ * This function adds the trusted CAs present in the directory in order to 
+ * verify client or server certificates. This function is identical
+ * to gnutls_certificate_set_x509_trust_file() but loads all certificates
+ * in a directory.
+ *
+ * Returns: number of certificates processed, or a negative error code on
+ * error.
+ **/
+int
+gnutls_certificate_set_x509_trust_dir(gnutls_certificate_credentials_t cred,
+				      const char *ca_dir,
+				      gnutls_x509_crt_fmt_t type)
+{
+int ret;
+
+	ret = gnutls_x509_trust_list_add_trust_dir(cred->tlist, ca_dir, NULL, 
+						type, GNUTLS_TL_USE_IN_TLS, 0);
+	if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
+		return 0;
+
+	return ret;
+}
+
+/**
  * gnutls_certificate_set_x509_system_trust:
  * @cred: is a #gnutls_certificate_credentials_t structure.
  *

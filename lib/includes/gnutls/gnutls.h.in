@@ -1351,6 +1351,11 @@ int
 gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials_t
 				       cred, const char *cafile,
 				       gnutls_x509_crt_fmt_t type);
+int
+gnutls_certificate_set_x509_trust_dir(gnutls_certificate_credentials_t cred,
+				      const char *ca_dir,
+				      gnutls_x509_crt_fmt_t type);
+
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t
 					  res, const gnutls_datum_t * ca,
 					  gnutls_x509_crt_fmt_t type);
