@@ -565,7 +565,7 @@ int gnutls_pkcs11_reinit(void)
 		if (providers[i].module != NULL) {
 			rv = p11_kit_initialize_module(providers[i].
 						       module);
-			if (rv != CKR_OK)
+			if (rv != CKR_OK && rv != CKR_CRYPTOKI_ALREADY_INITIALIZED)
 				_gnutls_debug_log
 				    ("Cannot initialize registered module '%s': %s\n",
 				     providers[i].info.library_description,
