@@ -48,7 +48,8 @@ types.
 specify the curve to use.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_certificate_set_x509_trust_dir: Added
+gnutls_x509_trust_list_add_trust_dir: Added
 
 
 * Version 3.3.5 (released 2014-06-26)
