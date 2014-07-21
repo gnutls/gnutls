@@ -508,40 +508,6 @@ static int load_revoked_certs(gnutls_x509_trust_list_t list, unsigned type)
 }
 # endif
 
-static int load_dir_certs(const char *dirname,
-			  gnutls_x509_trust_list_t list,
-			  unsigned int tl_flags, unsigned int tl_vflags,
-			  unsigned type)
-{
-	DIR *dirp;
-	struct dirent *d;
-	int ret;
-	int r = 0;
-	char path[GNUTLS_PATH_MAX];
-
-	dirp = opendir(dirname);
-	if (dirp != NULL) {
-		do {
-			d = readdir(dirp);
-			if (d != NULL && d->d_type == DT_REG) {
-				snprintf(path, sizeof(path), "%s/%s",
-					 dirname, d->d_name);
-
-				ret =
-				    gnutls_x509_trust_list_add_trust_file
-				    (list, path, NULL, type, tl_flags,
-				     tl_vflags);
-				if (ret >= 0)
-					r += ret;
-			}
-		}
-		while (d != NULL);
-		closedir(dirp);
-	}
-
-	return r;
-}
-
 
 /* This works on android 4.x 
  */
@@ -551,9 +517,8 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 {
 	int r = 0, ret;
 
-	ret =
-	    load_dir_certs(DEFAULT_TRUST_STORE_DIR, list, tl_flags,
-			   tl_vflags, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_trust_list_add_trust_dir(list, DEFAULT_TRUST_STORE_DIR,
+		NULL, GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
 	if (ret >= 0)
 		r += ret;
 
@@ -562,9 +527,8 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 	if (ret >= 0)
 		r -= ret;
 
-	ret =
-	    load_dir_certs("/data/misc/keychain/cacerts-added/", list,
-			   tl_flags, tl_vflags, GNUTLS_X509_FMT_DER);
+	ret = gnutls_x509_trust_list_add_trust_dir(list, "/data/misc/keychain/cacerts-added/",
+		NULL, GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
 	if (ret >= 0)
 		r += ret;
 # endif

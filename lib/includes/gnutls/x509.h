@@ -1286,6 +1286,14 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t
 				      unsigned int tl_vflags);
 
 int
+gnutls_x509_trust_list_add_trust_dir(gnutls_x509_trust_list_t list,
+				      const char *ca_dir,
+				      const char *crl_dir,
+				      gnutls_x509_crt_fmt_t type,
+				      unsigned int tl_flags,
+				      unsigned int tl_vflags);
+
+int
 gnutls_x509_trust_list_remove_trust_file(gnutls_x509_trust_list_t
 					 list,
 					 const char *ca_file,

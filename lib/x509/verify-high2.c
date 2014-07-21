@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2014 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -32,6 +33,8 @@
 #include <common.h>
 #include "verify-high.h"
 #include "read-file.h"
+
+#include <dirent.h>
 
 /* Convenience functions for verify-high functionality 
  */
@@ -281,6 +284,94 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 						 tl_flags, tl_vflags);
 	free(crls.data);
 	free(cas.data);
+
+	return ret;
+}
+
+static
+int load_dir_certs(const char *dirname,
+			  gnutls_x509_trust_list_t list,
+			  unsigned int tl_flags, unsigned int tl_vflags,
+			  unsigned type, unsigned crl)
+{
+	DIR *dirp;
+	struct dirent *d;
+	int ret;
+	int r = 0;
+	char path[GNUTLS_PATH_MAX];
+
+	dirp = opendir(dirname);
+	if (dirp != NULL) {
+		do {
+			d = readdir(dirp);
+			if (d != NULL && d->d_type == DT_REG) {
+				snprintf(path, sizeof(path), "%s/%s",
+					 dirname, d->d_name);
+
+				if (crl != 0) {
+					ret =
+					    gnutls_x509_trust_list_add_trust_file
+					    (list, NULL, path, type, tl_flags,
+					     tl_vflags);
+				} else {
+					ret =
+					    gnutls_x509_trust_list_add_trust_file
+					    (list, path, NULL, type, tl_flags,
+					     tl_vflags);
+				}
+				if (ret >= 0)
+					r += ret;
+			}
+		}
+		while (d != NULL);
+		closedir(dirp);
+	}
+
+	return r;
+}
+
+/**
+ * gnutls_x509_trust_list_add_trust_dir:
+ * @list: The structure of the list
+ * @ca_dir: A directory containing the CAs (optional)
+ * @crl_dir: A directory containing a list of CRLs (optional)
+ * @type: The format of the certificates
+ * @tl_flags: GNUTLS_TL_*
+ * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
+ *
+ * This function will add the given certificate authorities
+ * to the trusted list. Only directories are accepted by
+ * this function.
+ *
+ * Returns: The number of added elements is returned.
+ *
+ * Since: 3.3.6
+ **/
+int
+gnutls_x509_trust_list_add_trust_dir(gnutls_x509_trust_list_t list,
+				      const char *ca_dir,
+				      const char *crl_dir,
+				      gnutls_x509_crt_fmt_t type,
+				      unsigned int tl_flags,
+				      unsigned int tl_vflags)
+{
+	int ret = 0;
+
+	if (ca_dir != NULL) {
+		int r = 0;
+		r = load_dir_certs(ca_dir, list, tl_flags, tl_vflags, type, 0);
+
+		if (r >= 0)
+			ret += r;
+	}
+
+	if (crl_dir) {
+		int r = 0;
+		r = load_dir_certs(ca_dir, list, tl_flags, tl_vflags, type, 1);
+
+		if (r >= 0)
+			ret += r;
+	}
 
 	return ret;
 }
