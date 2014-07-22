@@ -1041,6 +1041,7 @@ GNUTLS_PRIVATE {
     _gnutls_write_uint24;
     _gnutls_log;
     _gnutls_PRF;
+    _gnutls_prf_raw;
     _gnutls_send_int;
     _gnutls_read_uint24;
     _gnutls_get_cred;

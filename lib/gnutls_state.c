@@ -842,22 +842,22 @@ P_hash(gnutls_mac_algorithm_t algorithm,
 
 #define MAX_PRF_BYTES 200
 
-/* The PRF function expands a given secret 
- * needed by the TLS specification. ret must have a least total_bytes
- * available.
+/* This function operates as _gnutls_PRF(), but does not require
+ * a pointer to the current session. It takes the @mac algorithm
+ * explicitly. For legacy TLS/SSL sessions before TLS 1.2 the MAC
+ * must be set to %GNUTLS_MAC_UNKNOWN.
  */
-int
-_gnutls_PRF(gnutls_session_t session,
-	    const uint8_t * secret, unsigned int secret_size,
-	    const char *label, int label_size, const uint8_t * seed,
-	    int seed_size, int total_bytes, void *ret)
+static int
+_gnutls_PRF_raw(gnutls_mac_algorithm_t mac,
+	    	const uint8_t * secret, unsigned int secret_size,
+	    	const char *label, int label_size, const uint8_t * seed,
+	    	int seed_size, int total_bytes, void *ret)
 {
 	int l_s, s_seed_size;
 	const uint8_t *s1, *s2;
 	uint8_t s_seed[MAX_SEED_SIZE];
 	uint8_t o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
 	int result;
-	const version_entry_st *ver = get_version(session);
 
 	if (total_bytes > MAX_PRF_BYTES) {
 		gnutls_assert();
@@ -874,11 +874,10 @@ _gnutls_PRF(gnutls_session_t session,
 	memcpy(s_seed, label, label_size);
 	memcpy(&s_seed[label_size], seed, seed_size);
 
-	if (_gnutls_version_has_selectable_prf(ver)) {
+	if (mac != GNUTLS_MAC_UNKNOWN) {
 		result =
-		    P_hash(_gnutls_cipher_suite_get_prf
-			   (session->security_parameters.cipher_suite),
-			   secret, secret_size, s_seed, s_seed_size,
+		    P_hash(mac, secret, secret_size,
+		    	   s_seed, s_seed_size,
 			   total_bytes, ret);
 		if (result < 0) {
 			gnutls_assert();
@@ -916,8 +915,79 @@ _gnutls_PRF(gnutls_session_t session,
 	}
 
 	return 0;		/* ok */
+}
+
+/* The PRF function expands a given secret 
+ * needed by the TLS specification. ret must have a least total_bytes
+ * available.
+ */
+int
+_gnutls_PRF(gnutls_session_t session,
+	    const uint8_t * secret, unsigned int secret_size,
+	    const char *label, int label_size, const uint8_t * seed,
+	    int seed_size, int total_bytes, void *ret)
+{
+	const version_entry_st *ver = get_version(session);
+
+	if (_gnutls_version_has_selectable_prf(ver)) {
+		return _gnutls_PRF_raw(
+			_gnutls_cipher_suite_get_prf(session->security_parameters.cipher_suite),
+			secret, secret_size,
+			label, label_size,
+			seed, seed_size,
+			total_bytes,
+			ret);
+	} else {
+		return _gnutls_PRF_raw(
+			GNUTLS_MAC_UNKNOWN,
+			secret, secret_size,
+			label, label_size,
+			seed, seed_size,
+			total_bytes,
+			ret);
+	}
+}
+
+#ifdef ENABLE_FIPS140
+int
+_gnutls_prf_raw(gnutls_mac_algorithm_t mac,
+	        size_t master_size, const void *master,
+	        size_t label_size, const char *label,
+	        size_t seed_size, const char *seed, size_t outsize,
+	        char *out);
+
+/*-
+ * _gnutls_prf_raw:
+ * @mac: the MAC algorithm to use, set to %GNUTLS_MAC_UNKNOWN for the TLS1.0 mac
+ * @master_size: length of the @master variable.
+ * @master: the master secret used in PRF computation
+ * @label_size: length of the @label variable.
+ * @label: label used in PRF computation, typically a short string.
+ * @seed_size: length of the @seed variable.
+ * @seed: optional extra data to seed the PRF with.
+ * @outsize: size of pre-allocated output buffer to hold the output.
+ * @out: pre-allocated buffer to hold the generated data.
+ *
+ * Apply the TLS Pseudo-Random-Function (PRF) on the master secret
+ * and the provided data.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ -*/
+int
+_gnutls_prf_raw(gnutls_mac_algorithm_t mac,
+	        size_t master_size, const void *master,
+	        size_t label_size, const char *label,
+	        size_t seed_size, const char *seed, size_t outsize,
+	        char *out)
+{
+	return _gnutls_PRF_raw(mac,
+			  master, master_size,
+			  label, label_size,
+			  (uint8_t *) seed, seed_size,
+			  outsize, out);
 
 }
+#endif
 
 /**
  * gnutls_prf_raw:
