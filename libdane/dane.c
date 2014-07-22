@@ -344,7 +344,8 @@ void dane_query_deinit(dane_query_t q)
  *              and the result is due to a security failure, bogus is true.
  *
  * This function will fill in the TLSA (DANE) structure from
- * the given raw DNS record data.
+ * the given raw DNS record data. The @dane_data must be valid
+ * during the lifetime of the query.
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
