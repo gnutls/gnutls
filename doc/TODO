@@ -3,6 +3,9 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* gnutls-cli: Allow separation of the connecting IP and the hostname to
+  advertize or check. That is, allow specifying an IP to connect to and
+  a hostname to check.
 * Allow setting a fixed key on the anonymous key exchange methods (to allow
   it being used with the tofu API).
 * Deprecate GNUTLS_E_CERTIFICATE_LIST_UNSORTED, and automatically sort
