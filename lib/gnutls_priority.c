@@ -1018,7 +1018,7 @@ finish:
  * gnutls_priority_init:
  * @priority_cache: is a #gnutls_prioritity_t structure.
  * @priorities: is a string describing priorities
- * @err_pos: In case of an error this will have the position in the string the error occured
+ * @err_pos: In case of an error this will have the position in the string the error occurred
  *
  * Sets priorities for the ciphers, key exchange methods, macs and
  * compression methods.
@@ -1111,15 +1111,15 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	rmadd_func *fn;
 	bulk_rmadd_func *bulk_fn;
 
+	if (err_pos)
+		*err_pos = priorities;
+
 	*priority_cache =
 	    gnutls_calloc(1, sizeof(struct gnutls_priority_st));
 	if (*priority_cache == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-
-	if (err_pos)
-		*err_pos = priorities;
 
 	/* for now unsafe renegotiation is default on everyone. To be removed
 	 * when we make it the default.
