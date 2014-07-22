@@ -1030,6 +1030,7 @@ GNUTLS_FIPS140 {
 	_dsa_validate_dss_g;
 	_dsa_validate_dss_pq;
 	dsa_generate_dss_keypair;
+	_gnutls_prf_raw;
 	_gnutls_encode_ber_rs_raw;
 	_rsa_generate_fips186_4_keypair;
 };
@@ -1041,7 +1042,6 @@ GNUTLS_PRIVATE {
     _gnutls_write_uint24;
     _gnutls_log;
     _gnutls_PRF;
-    _gnutls_prf_raw;
     _gnutls_send_int;
     _gnutls_read_uint24;
     _gnutls_get_cred;
