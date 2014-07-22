@@ -225,6 +225,43 @@ static void dane_check(const char *host, const char *proto,
 		exit(1);
 	}
 
+	if (ENABLED_OPT(PRINT_RAW)) {
+		unsigned entries;
+		gnutls_datum_t t;
+		char **dane_data;
+		int *dane_data_len;
+		int secure;
+		int bogus;
+		
+		ret = dane_query_to_raw_tlsa(q, &entries, &dane_data,
+			&dane_data_len, &secure, &bogus);
+		if (ret < 0) {
+			fprintf(stderr, "dane_query_to_raw_tlsa: %s\n",
+				dane_strerror(ret));
+			exit(1);
+		}
+
+		for (i=0;i<entries;i++) {
+			char *str;
+			size_t str_size;
+			t.data = (void*)dane_data[i];
+			t.size = dane_data_len[i];
+
+			str_size = t.size * 2 + 1;
+			str = gnutls_malloc(str_size);
+
+			ret = gnutls_hex_encode(&t, str, &str_size);
+			if (ret < 0) {
+				fprintf(stderr, "gnutls_hex_encode: %s\n",
+					dane_strerror(ret));
+				exit(1);
+			}
+			fprintf(outfile, "[%u]: %s\n", i, str);
+			gnutls_free(str);
+		}
+		fprintf(outfile, "\n");
+	}
+
 	entries = dane_query_entries(q);
 	for (i = 0; i < entries; i++) {
 		ret = dane_query_data(q, i, &usage, &type, &match, &data);

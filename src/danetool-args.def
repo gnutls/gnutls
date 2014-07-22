@@ -90,6 +90,14 @@ flag = {
 };
 
 flag = {
+    name      = print-raw;
+    descrip   = "Print the received DANE data in raw format";
+    disabled;
+    disable   = "no";
+    doc = "This option will print the received DANE data.";
+};
+
+flag = {
     name      = tlsa-rr;
     descrip   = "Print the DANE RR data on a certificate or public key";
     flags_must = host;
