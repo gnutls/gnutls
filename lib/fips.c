@@ -81,7 +81,6 @@ static int fips_mode = -1;
 }
 
 #define GNUTLS_LIBRARY_NAME "libgnutls.so.28"
-#define TASN1_LIBRARY_NAME "libtasn1.so.6"
 #define NETTLE_LIBRARY_NAME "libnettle.so.4"
 #define HOGWEED_LIBRARY_NAME "libhogweed.so.2"
 
@@ -290,12 +289,6 @@ int _gnutls_fips_perform_self_checks(void)
 	}
 
 	ret = check_binary_integrity(GNUTLS_LIBRARY_NAME, "gnutls_global_init");
-	if (ret == 0) {
-		gnutls_assert();
-		goto error;
-	}
-
-	ret = check_binary_integrity(TASN1_LIBRARY_NAME, "asn1_check_version");
 	if (ret == 0) {
 		gnutls_assert();
 		goto error;
