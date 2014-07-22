@@ -40,7 +40,7 @@
 
 #define ERROR_STR (char*) "(error)"
 
-static char *ip_to_string(void *_ip, int ip_size, char *string,
+static const char *ip_to_string(void *_ip, int ip_size, char *string,
 			  int string_size)
 {
 	uint8_t *ip;
@@ -89,7 +89,7 @@ add_altname(gnutls_buffer_st * str, const char *prefix,
 	    unsigned int alt_type, char *name, size_t name_size)
 {
 	char str_ip[64];
-	char *p;
+	const char *p;
 
 	if ((alt_type == GNUTLS_SAN_DNSNAME
 	     || alt_type == GNUTLS_SAN_RFC822NAME
@@ -538,7 +538,7 @@ static void print_crldist(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 	char *buffer = NULL;
 	size_t size;
 	char str_ip[64];
-	char *p;
+	const char *p;
 	int err;
 	int indx;
 
