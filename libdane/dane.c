@@ -147,10 +147,10 @@ dane_query_data(dane_query_t q, unsigned int idx,
  * This function will provide the DANE data from the query
  * response.
  *
- * The pointers dane_data and dane_data_len are allocated with malloc()
+ * The pointers dane_data and dane_data_len are allocated with gnutls_malloc()
  * to contain a copy of the data from the query result structure (individual
- * rdata items are not allocated separately). The query result structure can
- * be safely deinitialized after calling this function.
+ * rdata items are not allocated separately). The returned data are only valid
+ * during the lifetime of @q.
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -185,13 +185,13 @@ dane_query_to_raw_tlsa(dane_query_t q, unsigned int *data_entries,
 	for (idx = 0; idx < q->data_entries; idx++)
 		data_sz += 3 + q->data[idx].size;
 
-	*dane_data = calloc (1, data_sz);
+	*dane_data = gnutls_calloc (1, data_sz);
 	if (*dane_data == NULL)
 		return DANE_E_MEMORY_ERROR;
 	data_buf = (char *)*dane_data;
 	data_buf += sizeof (**dane_data) * (q->data_entries + 1);
 
-	*dane_data_len = calloc (q->data_entries + 1, sizeof (**dane_data_len));
+	*dane_data_len = gnutls_calloc (q->data_entries + 1, sizeof (**dane_data_len));
 	if (*dane_data_len == NULL) {
 		free(*dane_data);
 		*dane_data = NULL;
