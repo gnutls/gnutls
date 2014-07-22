@@ -55,6 +55,8 @@ LDADD = ../lib/libgnutls.la \
 	$(LTLIBGCRYPT)	\
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
+dane_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
+
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
 endif
@@ -83,6 +85,10 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 
 if ENABLE_OCSP
 ctests += ocsp
+endif
+
+if ENABLE_DANE
+ctests += dane
 endif
 
 if ENABLE_OPENSSL
