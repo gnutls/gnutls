@@ -67,11 +67,6 @@ static void dane_raw_check(void)
 		fail("%d: %s\n", __LINE__, dane_strerror(ret));
 	}
 
-	ret = dane_raw_tlsa(s, &r, data_entries, data_entries_size, 1, 0);
-	if (ret < 0) {
-		fail("%d: %s\n", __LINE__, dane_strerror(ret));
-	}
-
 	ret = dane_query_to_raw_tlsa(r, &entries, &r_data, &r_data_len, &secure, &bogus);
 	if (ret < 0) {
 		fail("%d: %s\n", __LINE__, dane_strerror(ret));
@@ -93,6 +88,9 @@ static void dane_raw_check(void)
 		if (memcmp(r_data[i], data_entries[i], r_data_len[i]) != 0)
 			fail("%d: %s\n", __LINE__, dane_strerror(ret));
 	}
+
+	gnutls_free(r_data);
+	gnutls_free(r_data_len);
 
 	dane_query_deinit(r);
 	dane_state_deinit(s);
