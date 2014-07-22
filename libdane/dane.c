@@ -164,26 +164,21 @@ dane_query_to_raw_tlsa(dane_query_t q, unsigned int *data_entries,
 	unsigned int idx;
 
 	*data_entries = 0;
-	if (bogus)
-		*bogus = 0;
-	if (secure)
-		*secure = 0;
 	*dane_data = NULL;
 	*dane_data_len = NULL;
 
-	switch (q->status) {
-	case DANE_QUERY_DNSSEC_VERIFIED:
-		if (secure)
+	if (secure) {
+		if (q->status & DANE_QUERY_DNSSEC_VERIFIED)
 			*secure = 1;
-		break;
+		else
+			*secure = 0;
+	}
 
-	case DANE_QUERY_BOGUS:
-		if (bogus)
+	if (bogus) {
+		if (q->status & DANE_QUERY_BOGUS)
 			*bogus = 1;
-		break;
-
-	default:
-		break;
+		else
+			*bogus = 0;
 	}
 
 	/* pack dane_data pointer list followed by dane_data contents */
