@@ -117,7 +117,7 @@ static int aes_gcm_setiv(void *_ctx, const void *iv, size_t iv_size)
 	struct aes_gcm_ctx *ctx = _ctx;
 
 	if (iv_size != GCM_BLOCK_SIZE - 4)
-		return GNUTLS_E_INVALID_REQUEST;
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	memset(ctx->gcm.Xi.c, 0, sizeof(ctx->gcm.Xi.c));
 	memset(ctx->gcm.len.c, 0, sizeof(ctx->gcm.len.c));
