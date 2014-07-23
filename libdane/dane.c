@@ -148,9 +148,9 @@ dane_query_data(dane_query_t q, unsigned int idx,
  * response.
  *
  * The pointers dane_data and dane_data_len are allocated with gnutls_malloc()
- * to contain a copy of the data from the query result structure (individual
- * rdata items are not allocated separately). The returned data are only valid
- * during the lifetime of @q.
+ * to contain the data from the query result structure (individual
+ * @dane_data items simply point to the original data and are not allocated separately).
+ * The returned @dane_data are only valid during the lifetime of @q.
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
