@@ -57,7 +57,7 @@ static void dane_raw_check(void)
 	int secure;
 	int bogus;
 
-	ret = dane_state_init(&s, 0);
+	ret = dane_state_init(&s, DANE_F_IGNORE_LOCAL_RESOLVER);
 	if (ret < 0) {
 		fail("dane_state_init: %s\n", dane_strerror(ret));
 	}
