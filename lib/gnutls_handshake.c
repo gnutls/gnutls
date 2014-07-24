@@ -2580,7 +2580,8 @@ int gnutls_handshake(gnutls_session_t session)
  *
  * This function sets the timeout for the handshake process
  * to the provided value. Use an @ms value of zero to disable
- * timeout.
+ * timeout, or %GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT for a reasonable
+ * default value.
  *
  * Since: 3.1.0
  **/
