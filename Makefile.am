@@ -58,14 +58,14 @@ dist-hook:
 	rm -f ChangeLog
 	make ChangeLog
 	cp -f ChangeLog $(distdir)/
-	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
-	sed 's/\@YEAR\@/$(YEAR)/g' -i $(distdir)/src/args-std.def
-	sed 's/\@PACKAGE_BUGREPORT\@/$(PACKAGE_BUGREPORT)/g' -i $(distdir)/src/args-std.def
+	$(SED) 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
+	$(SED) 's/\@YEAR\@/$(YEAR)/g' -i $(distdir)/src/args-std.def
+	$(SED) 's/\@PACKAGE_BUGREPORT\@/$(PACKAGE_BUGREPORT)/g' -i $(distdir)/src/args-std.def
 	cd $(distdir)/src/ && for i in *.def;do \
 		if test x"$$i" = x"args-std.def";then  continue; fi; \
 		autogen $$i; \
 		cp $$i $$i.tmp; \
-		sed -i 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $$i.tmp; \
+		$(SED) -i 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $$i.tmp; \
 		autogen -Tagman-cmd.tpl $$i.tmp; \
 		rm -f $$i.tmp; \
 		mv -f *.1 ../doc/manpages/; \

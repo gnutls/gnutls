@@ -62,7 +62,7 @@ invoke-certtool.texi: $(top_srcdir)/src/certtool-args.def invoke-gnutls-serv.tex
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	sed -e 's/@subheading/@subsubheading/g' \
+	$(SED) -e 's/@subheading/@subsubheading/g' \
 	    -e 's/@section/@subsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
@@ -73,7 +73,7 @@ invoke-ocsptool.texi: $(top_srcdir)/src/ocsptool-args.def invoke-certtool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	sed -e 's/@subheading/@subsubheading/g' \
+	$(SED) -e 's/@subheading/@subsubheading/g' \
 	    -e 's/@section/@subsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
@@ -84,7 +84,7 @@ invoke-danetool.texi: $(top_srcdir)/src/danetool-args.def invoke-ocsptool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	sed -e 's/@subheading/@subsubheading/g' \
+	$(SED) -e 's/@subheading/@subsubheading/g' \
 	    -e 's/@section/@subsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
@@ -95,7 +95,7 @@ invoke-srptool.texi: $(top_srcdir)/src/srptool-args.def invoke-danetool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	sed -e 's/@subheading/@subsubheading/g' \
+	$(SED) -e 's/@subheading/@subsubheading/g' \
 	    -e 's/@section/@subsubsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
@@ -106,7 +106,7 @@ invoke-psktool.texi: $(top_srcdir)/src/psktool-args.def invoke-srptool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	sed -e 's/@subheading/@subsubheading/g' \
+	$(SED) -e 's/@subheading/@subsubheading/g' \
 	    -e 's/@section/@subsubsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
@@ -117,7 +117,7 @@ invoke-p11tool.texi: $(top_srcdir)/src/p11tool-args.def invoke-psktool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	sed -e 's/@subheading/@subsubheading/g' \
+	$(SED) -e 's/@subheading/@subsubheading/g' \
 	    -e 's/@section/@subsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
@@ -128,7 +128,7 @@ invoke-tpmtool.texi: $(top_srcdir)/src/tpmtool-args.def invoke-p11tool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	sed -e 's/@subheading/@subsubheading/g' \
+	$(SED) -e 's/@subheading/@subsubheading/g' \
 	    -e 's/@section/@subsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
@@ -405,9 +405,9 @@ stamp_functions: $(API_FILES)
 	for i in $^; do \
 		$(srcdir)/scripts/split-texi.pl functions < $$i; \
 	done
-	sed -i 's/\@anchor{.*//g' functions/*
-	sed -i 's/\@subheading.*//g' functions/*
-	cd functions && for i in *;do grep ^"@deftypefun" $$i | sed 's/@deftypefun/@item/g;s/ {/ @var{/;s/ {/ @ref{/' > ../functions/$$i.short;done
+	$(SED) -i 's/\@anchor{.*//g' functions/*
+	$(SED) -i 's/\@subheading.*//g' functions/*
+	cd functions && for i in *;do grep ^"@deftypefun" $$i | $(SED) 's/@deftypefun/@item/g;s/ {/ @var{/;s/ {/ @ref{/' > ../functions/$$i.short;done
 	echo $@ > $@
 
 stamp_enums: enums.texi
@@ -438,7 +438,7 @@ compare-makefile: enums.texi
 	@echo "******************************************************************************"
 	@echo "If the following step fails copy $(srcdir)/doc/tmp-compare-makefile to doc/Makefile.am"
 	@echo "******************************************************************************"
-	ENUMS=`grep '^@c ' $< | sed 's/@c //g' | sort -d`; \
+	ENUMS=`grep '^@c ' $< | $(SED) 's/@c //g' | sort -d`; \
 	STR=""; \
 	for i in $$ENUMS; do \
 		STR="$$STR\nENUMS += enums/$$i"; \
@@ -453,7 +453,7 @@ compare-makefile: enums.texi
 		MANS="$$MANS\nFUNCS += functions/$$i\nFUNCS += functions/$$i.short"; \
 	done; \
 	grep -v -e '^FUNCS += ' $(srcdir)/Makefile.am > tmp-$@; \
-	echo "\"s,^FUNCS =,FUNCS =$$MANS,\" -i tmp-$@"|xargs sed
+	echo "\"s,^FUNCS =,FUNCS =$$MANS,\" -i tmp-$@"|xargs $(SED)
 	@echo "******************************************************************************"
 	@echo "If the following step fails copy $(srcdir)/doc/tmp-compare-makefile to doc/Makefile.am"
 	@echo "******************************************************************************"
@@ -498,7 +498,7 @@ endif !HAVE_GUILE
 
 gnutls.xml: epub.texi
 	makeinfo --docbook $<
-	sed -i 's/\&\#8226;//g' $@
+	$(SED) -i 's/\&\#8226;//g' $@
 
 gnutls.epub: gnutls.xml
 	dbtoepub $<

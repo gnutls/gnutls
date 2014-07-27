@@ -43,6 +43,7 @@ AM_PROG_AR
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_YACC
+AC_PROG_SED
 AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [/bin/true])
 
 if test x"$AUTOGEN" = "x/bin/true"; then
