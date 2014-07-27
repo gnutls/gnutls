@@ -51,7 +51,7 @@ extern "C" {
 typedef enum gnutls_pubkey_flags {
 	GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA = 1,
 	GNUTLS_PUBKEY_DISABLE_CALLBACKS = 1 << 2,
-	GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT = 1 << 3,
+	GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT = 1 << 3
 } gnutls_pubkey_flags_t;
 
 typedef int (*gnutls_privkey_sign_func) (gnutls_privkey_t key,
@@ -271,7 +271,7 @@ typedef enum gnutls_privkey_flags {
 	GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE = 1,
 	GNUTLS_PRIVKEY_IMPORT_COPY = 1 << 1,
 	GNUTLS_PRIVKEY_DISABLE_CALLBACKS = 1 << 2,
-	GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA = 1 << 4,
+	GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA = 1 << 4
 } gnutls_privkey_flags_t;
 
 int gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,

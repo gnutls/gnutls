@@ -46,7 +46,7 @@ extern "C" {
  */
 typedef enum gnutls_ocsp_print_formats_t {
 	GNUTLS_OCSP_PRINT_FULL = 0,
-	GNUTLS_OCSP_PRINT_COMPACT = 1,
+	GNUTLS_OCSP_PRINT_COMPACT = 1
 } gnutls_ocsp_print_formats_t;
 
 /**

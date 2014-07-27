@@ -821,7 +821,7 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DISABLE_CRL_CHECKS = 1 << 9,
 	GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN = 1 << 10,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN = 1 << 11,
-	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12,
+	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12
 } gnutls_certificate_verify_flags;
 
 /**
@@ -854,7 +854,7 @@ typedef enum gnutls_certificate_verification_profiles_t {
 	GNUTLS_PROFILE_ULTRA = 7,
 	
 	GNUTLS_PROFILE_SUITEB128=32,
-	GNUTLS_PROFILE_SUITEB192=33,
+	GNUTLS_PROFILE_SUITEB192=33
 	/*GNUTLS_PROFILE_MAX=255*/
 } gnutls_certificate_verification_profiles_t;
 
