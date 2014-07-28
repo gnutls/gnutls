@@ -24,7 +24,7 @@
 #include <x509_int.h>
 #include <common.h>
 #include <gnutls_errors.h>
-#include <arpa/inet.h>
+#include <system.h>
 
 /**
  * gnutls_x509_crt_check_hostname:
@@ -128,7 +128,6 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	if ((p=strchr(hostname, ':')) != NULL || inet_aton(hostname, &ipv4) != 0) {
 
 		if (p != NULL) {
-#ifdef HAVE_INET_PTON
 			struct in6_addr ipv6;
 
 			ret = inet_pton(AF_INET6, hostname, &ipv6);
@@ -137,9 +136,6 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 				goto hostname_fallback;
 			}
 			ret = check_ip(cert, &ipv6, 16, flags);
-#else
-			ret = 0;
-#endif
 		} else {
 			ret = check_ip(cert, &ipv4, 4, flags);
 		}
