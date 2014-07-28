@@ -85,6 +85,7 @@ acceptable.  The framework is illustrated on @ref{fig-x509}.
 * X.509 public and private keys::
 * Verifying X.509 certificate paths::
 * Verifying a certificate in the context of TLS session::
+* Verification using PKCS11::
 @end menu
 
 @node X.509 certificate structure
@@ -347,25 +348,44 @@ This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_name
 
 When operating in the context of a TLS session, the trusted certificate
 authority list may also be set using:
-@showfuncC{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_crl_file,gnutls_certificate_set_x509_system_trust}
+@showfuncD{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_trust_dir,gnutls_certificate_set_x509_crl_file,gnutls_certificate_set_x509_system_trust}
 
-In that case it is not required to setup a trusted list as above, and 
+These functions allow the specification of the trusted certificate authorities, either
+via a file, a directory or use the system-specified certificate authories. 
+Unless the authorities are application specific, it is generally recommended
+to use the system trust storage (see @funcref{gnutls_certificate_set_x509_system_trust}).
+
+Unlike the previous section it is not required to setup a trusted list, and 
 the function @funcref{gnutls_certificate_verify_peers3} 
-may be used to verify the peer's certificate chain and identity. The flags
-are set similarly to the verification functions in the previous section.
+is used to verify the peer's certificate chain and identity. The reported
+verification status is identical to the verification functions described 
+in the previous section.
 Note that in certain cases it is required to check the marked purpose of
-the end certificate (e.g. @code{GNUTLS_KP_TLS_WWW_SERVER}); in these case
-@funcref{gnutls_certificate_verify_peers} should be used instead.
+the end certificate (e.g. @code{GNUTLS_KP_TLS_WWW_SERVER}); in these cases
+the more advanced @funcref{gnutls_certificate_verify_peers} should be used instead.
 
 There is also the possibility to pass some input to the verification
 functions in the form of flags. For @funcref{gnutls_x509_trust_list_verify_crt} the
-flags are passed straightforward, but
-@funcref{gnutls_certificate_verify_peers3} depends on the flags set by
-calling @funcref{gnutls_certificate_set_verify_flags}.  All the available
+flags are passed directly, but for
+@funcref{gnutls_certificate_verify_peers3}, the flags are set using
+@funcref{gnutls_certificate_set_verify_flags}.  All the available
 flags are part of the enumeration
 @code{gnutls_@-certificate_@-verify_@-flags} shown in @ref{gnutls_certificate_verify_flags}.
 
 @showenumdesc{gnutls_certificate_verify_flags,The @code{gnutls_@-certificate_@-verify_@-flags} enumeration.}
+
+@node Verification using PKCS11
+@subsubsection Verifying a certificate using PKCS #11
+@cindex verifying certificate with pkcs11
+
+Some systems provide a system wide trusted certificate storage accessible using
+PKCS #11. That is, the trusted certificates are queried and accessed using the
+PKCS #11 API. One example is the p11-kit trust module@footnote{see @url{http://p11-glue.freedesktop.org/trust-module.html}.}.
+
+These special PKCS #11 modules can be used for GnuTLS certificate verification if marked as trust 
+policy modules, i.e., with @code{trust-policy: yes} in the p11-kit module file.
+The way to use them is by specifying to the file verification function (e.g., @funcref{gnutls_certificate_set_x509_trust_file}),
+a pkcs11 URL, or simply @code{pkcs11:} to use all the marked with trust policy modules.
 
 
 @node OpenPGP certificates
