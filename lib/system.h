@@ -98,4 +98,15 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 int gnutls_system_global_init(void);
 void gnutls_system_global_deinit(void);
 
+#include <arpa/inet.h>
+#ifdef _WIN32
+# define inet_aton _gnutls_inet_aton
+int inet_aton(const char *cp, struct in_addr *inp);
+#endif
+
+#ifndef HAVE_INET_PTON
+# define inet_pton _gnutls_inet_pton
+int inet_pton(int af, const char *src, void *dst);
+#endif
+
 #endif				/* SYSTEM_H */
