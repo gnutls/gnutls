@@ -3,6 +3,15 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.6 (unreleased)
+
+** libgnutls: bundle replacements of inet_pton and inet_aton if not
+available.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.6 (released 2014-07-23)
 
 ** libgnutls: Use inet_ntop to print IP addresses when available
