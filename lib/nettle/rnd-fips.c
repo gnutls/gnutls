@@ -30,6 +30,7 @@
 #include <nettle/aes.h>
 #include <nettle/memxor.h>
 #include <locks.h>
+#include <atfork.h>
 #include <rnd-common.h>
 
 /* This provides a random generator for gnutls. It uses
@@ -47,9 +48,7 @@ struct fips_ctx {
 	struct drbg_aes_ctx nonce_context;
 	struct drbg_aes_ctx normal_context;
 	struct drbg_aes_ctx strong_context;
-#ifdef HAVE_GETPID
-	pid_t pid;
-#endif
+	unsigned int dfork;
 };
 
 static int _rngfips_ctx_reinit(struct fips_ctx *fctx);
@@ -61,10 +60,7 @@ static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx *fctx,
 	int ret;
 
 	if (ctx->reseed_counter > DRBG_AES_RESEED_TIME
-#ifdef HAVE_GETPID
-	    || fctx->pid != getpid()
-#endif
-	    ) {
+	    || _gnutls_fork_detected(&fctx->dfork) != 0) {
 
 		ret = _rngfips_ctx_reinit(fctx);
 		if (ret < 0)
@@ -134,9 +130,7 @@ static int _rngfips_ctx_init(struct fips_ctx *fctx)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-#ifdef HAVE_GETPID
-	fctx->pid = getpid();
-#endif
+	_gnutls_fork_set_val(&fctx->dfork);
 	return 0;
 }
 
@@ -159,9 +153,6 @@ static int _rngfips_ctx_reinit(struct fips_ctx *fctx)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-#ifdef HAVE_GETPID
-	fctx->pid = getpid();
-#endif
 	return 0;
 }
 

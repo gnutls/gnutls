@@ -36,9 +36,7 @@
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
 #include <p11-kit/pin.h>
-#ifdef HAVE_GETPID
-# include <unistd.h>
-#endif
+#include <atfork.h>
 
 #define MAX_PROVIDERS 16
 
@@ -101,9 +99,7 @@ struct find_cert_st {
 static struct gnutls_pkcs11_provider_st providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
 static unsigned int providers_initialized = 0;
-#ifdef HAVE_GETPID
-static pid_t init_pid = -1;
-#endif
+static unsigned int dfork = 0;
 
 gnutls_pkcs11_token_callback_t _gnutls_token_func;
 void *_gnutls_token_data;
@@ -256,29 +252,19 @@ int _gnutls_pkcs11_check_init(void)
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
-#ifdef HAVE_GETPID
-	if (init_pid == 0)
-		init_pid = getpid();
-#endif
-
 	if (providers_initialized != 0) {
 		ret = 0;
-#ifdef HAVE_GETPID
-		if (init_pid != getpid()) {
+
+		if (_gnutls_fork_detected(&dfork)) {
 			/* if we are initialized but a fork is detected */
 			ret = gnutls_pkcs11_reinit();
 			if (ret == 0)
 				ret = 1;
 		}
-#endif
 
 		gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 		return ret;
 	}
-
-#ifdef HAVE_GETPID
-	init_pid = getpid();
-#endif
 
 	providers_initialized = 1;
 	_gnutls_debug_log("Initializing PKCS #11 modules\n");
@@ -600,6 +586,8 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
 	}
 	init++;
 
+	_gnutls_fork_set_val(&dfork);
+
 	p11_kit_pin_register_callback(P11_KIT_PIN_FALLBACK,
 				      p11_kit_pin_file_callback, NULL,
 				      NULL);
@@ -639,7 +627,7 @@ int gnutls_pkcs11_reinit(void)
 	ck_rv_t rv;
 
 	/* make sure that we don't call more than once after a fork */
-	if (init_pid == getpid())
+	if (_gnutls_fork_detected(&dfork) == 0)
 		return 0;
 
 	for (i = 0; i < active_providers; i++) {
@@ -657,9 +645,6 @@ int gnutls_pkcs11_reinit(void)
 			}
 		}
 	}
-#ifdef HAVE_GETPID
-	init_pid = getpid();
-#endif
 
 	return 0;
 }

@@ -33,10 +33,9 @@
 #include <gnutls_num.h>
 #include <nettle/yarrow.h>
 #include <nettle/salsa20.h>
-#ifdef HAVE_GETPID
-#include <unistd.h>		/* getpid */
-#endif
 #include <rnd-common.h>
+#include <system.h>
+#include <atfork.h>
 #include <errno.h>
 
 #define SOURCES 2
@@ -54,9 +53,7 @@ struct nonce_ctx_st {
 	struct salsa20_ctx ctx;
 	unsigned int counter;
 	void *mutex;
-#ifdef HAVE_GETPID
-	pid_t pid;		/* detect fork() */
-#endif
+	unsigned int dfork;
 };
 
 struct rnd_ctx_st {
@@ -66,9 +63,7 @@ struct rnd_ctx_st {
 	time_t trivia_previous_time;
 	time_t trivia_time_count;
 	void *mutex;
-#ifdef HAVE_GETPID
-	pid_t pid;		/* detect fork() */
-#endif
+	unsigned dfork;	/* detect fork() */
 };
 
 static struct rnd_ctx_st rnd_ctx;
@@ -121,10 +116,6 @@ static int do_device_source(struct rnd_ctx_st *ctx, int init, struct event_st *e
 	int ret;
 
 	if (init) {
-#ifdef HAVE_GETPID
-		ctx->pid = event->pid;
-#endif
-
 		memcpy(&ctx->device_last_read, &event->now,
 		       sizeof(ctx->device_last_read));
 
@@ -182,6 +173,8 @@ static int nonce_rng_init(struct nonce_ctx_st *ctx, unsigned init)
 		 * from the old key */
 		salsa20r12_crypt(&ctx->ctx, sizeof(buffer), buffer, buffer);
 	} else {
+		_gnutls_fork_set_val(&ctx->dfork);
+
 		/* when initializing read the IV from the system randomness source */
 		ret = _rnd_get_system_entropy(iv, sizeof(iv));
 		if (ret < 0)
@@ -194,9 +187,6 @@ static int nonce_rng_init(struct nonce_ctx_st *ctx, unsigned init)
 	zeroize_key(buffer, sizeof(buffer));
 
 	ctx->counter = 0;
-#ifdef HAVE_GETPID
-	ctx->pid = getpid();
-#endif
 
 	return 0;
 }
@@ -233,6 +223,8 @@ static int wrap_nettle_rnd_init(void **ctx)
 
 	_rnd_get_event(&event);
 
+	_gnutls_fork_set_val(&rnd_ctx.dfork);
+
 	ret = do_device_source(&rnd_ctx, 1, &event);
 	if (ret < 0) {
 		gnutls_assert();
@@ -259,9 +251,6 @@ static int
 wrap_nettle_rnd_nonce(void *_ctx, void *data, size_t datasize)
 {
 	int ret, reseed = 0;
-#ifdef HAVE_GETPID
-	pid_t tpid = getpid();
-#endif
 
 	/* we don't really need memset here, but otherwise we
 	 * get filled with valgrind warnings */
@@ -269,11 +258,9 @@ wrap_nettle_rnd_nonce(void *_ctx, void *data, size_t datasize)
 
 	RND_LOCK(&nonce_ctx);
 
-#ifdef HAVE_GETPID
-	if (tpid != nonce_ctx.pid) {	/* fork() detected */
+	if (_gnutls_fork_detected(&nonce_ctx.dfork)) {
 		reseed = 1;
 	}
-#endif
 
 	if (reseed != 0 || nonce_ctx.counter > NONCE_RESEED_BYTES) {
 		/* reseed nonce */
@@ -309,13 +296,10 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 
 	RND_LOCK(&rnd_ctx);
 
-#ifdef HAVE_GETPID
-	if (event.pid != rnd_ctx.pid) {	/* fork() detected */
+	if (_gnutls_fork_detected(&rnd_ctx.dfork)) {	/* fork() detected */
 		memset(&rnd_ctx.device_last_read, 0, sizeof(rnd_ctx.device_last_read));
-		rnd_ctx.pid = event.pid;
 		reseed = 1;
 	}
-#endif
 
 	/* reseed main */
 	ret = do_trivia_source(&rnd_ctx, 0, &event);

@@ -149,6 +149,8 @@ dnl Check clock_gettime and pthread_mutex_lock in libc (avoid linking to other l
 AC_CHECK_FUNCS([fork inet_ntop inet_pton getrusage getpwuid_r nanosleep daemon getpid clock_gettime iconv localtime vasprintf],,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
+AC_CHECK_FUNCS([pthread_atfork __register_atfork],,)
+
 AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>
 #include <signal.h>
 ], [timer_create (0,0,0);])

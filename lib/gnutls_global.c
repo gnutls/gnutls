@@ -33,6 +33,7 @@
 #include <accelerated/cryptodev.h>
 #include <accelerated/accelerated.h>
 #include <fips.h>
+#include <atfork.h>
 
 #include "gettext.h"
 
@@ -289,6 +290,14 @@ int gnutls_global_init(void)
 		gnutls_assert();
 		goto out;
 	}
+
+#ifndef _WIN32
+	ret = _gnutls_register_fork_handler();
+	if (ret < 0) {
+		gnutls_assert();
+		goto out;
+	}
+#endif
 
 	_gnutls_register_accel_crypto();
 	_gnutls_cryptodev_init();
