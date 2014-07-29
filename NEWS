@@ -3,10 +3,9 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.6 (unreleased)
+* Version 3.4.0 (unreleased)
 
-** libgnutls: bundle replacements of inet_pton and inet_aton if not
-available.
+** libgnutls: Use pthread_atfork() to detect fork.
 
 ** API and ABI modifications:
 No changes since last version.
