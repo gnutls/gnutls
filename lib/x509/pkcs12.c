@@ -1338,26 +1338,22 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
  * @flags: should be zero or one of GNUTLS_PKCS12_SP_*
  *
  * This function parses a PKCS12 blob in @p12blob and extracts the
- * private key, the corresponding certificate chain, and any additional
+ * private key, the corresponding certificate chain, any additional
  * certificates and a CRL.
  *
- * The @extra_certs_ret and @extra_certs_len parameters are optional
+ * The @extra_certs and @extra_certs_len parameters are optional
  * and both may be set to %NULL. If either is non-%NULL, then both must
- * be set.
+ * be set. The value for @extra_certs is allocated
+ * using gnutls_malloc().
  * 
- * Encrypted PKCS12 bags and PKCS8 private keys are supported.  However,
- * only password based security, and the same password for all
- * operations, are supported.
+ * Encrypted PKCS12 bags and PKCS8 private keys are supported, but
+ * only with password based security and the same password for all
+ * operations.
  *
- * A PKCS12 file may contain many keys and/or certificates, and there
- * is no way to identify which key/certificate pair you want.  You
- * should make sure the PKCS12 file only contain one key/certificate
- * pair and/or one CRL.
- *
- * It is believed that the limitations of this function are acceptable
- * for common usage, and that any more flexibility would introduce
- * complexity that would make it harder to use this functionality at
- * all.
+ * Note that a PKCS12 file may contain many keys and/or certificates,
+ * and there is no way to identify which key/certificate pair you want.
+ * For this reason this function is useful for PKCS12 files that contain 
+ * only one key/certificate pair and/or one CRL.
  *
  * If the provided structure has encrypted fields but no password
  * is provided then this function returns %GNUTLS_E_DECRYPTION_FAILED.
@@ -1370,7 +1366,7 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.1
+ * Since: 3.1.0
  **/
 int
 gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
