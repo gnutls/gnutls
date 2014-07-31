@@ -68,7 +68,7 @@ unsigned _gnutls_fork_detected(unsigned int *v)
 # endif
 
 #else /* _WIN32 */
-# define _gnutls_fork_set_val() 0
+# define _gnutls_fork_set_val(x) 0
 # define _gnutls_register_fork_handler() 0
 # define _gnutls_fork_detected(x) 0
 #endif
