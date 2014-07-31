@@ -80,6 +80,7 @@ void _rnd_get_event(struct event_st *e)
 
 static HCRYPTPROV device_fd = 0;
 
+static
 int _rnd_get_system_entropy_win32(void* rnd, size_t size)
 {
 	if (!CryptGenRandom(device_fd, (DWORD) size, rnd)) {

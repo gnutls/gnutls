@@ -304,7 +304,11 @@ int load_dir_certs(const char *dirname,
 	if (dirp != NULL) {
 		do {
 			d = readdir(dirp);
-			if (d != NULL && d->d_type == DT_REG) {
+			if (d != NULL
+#ifndef _WIN32
+				&& d->d_type == DT_REG
+#endif
+				) {
 				snprintf(path, sizeof(path), "%s/%s",
 					 dirname, d->d_name);
 
