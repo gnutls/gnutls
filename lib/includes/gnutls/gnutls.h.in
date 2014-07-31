@@ -67,6 +67,12 @@ extern "C" {
 #define GNUTLS_CIPHER_RIJNDAEL_CBC GNUTLS_CIPHER_AES_128_CBC
 #define GNUTLS_CIPHER_ARCFOUR GNUTLS_CIPHER_ARCFOUR_128
 
+#if !defined(GNUTLS_INTERNAL_BUILD) && defined(_WIN32)
+# define _SYM_EXPORT __declspec(dllimport)
+#else
+# define _SYM_EXPORT
+#endif
+
 /**
  * gnutls_cipher_algorithm_t:
  * @GNUTLS_CIPHER_UNKNOWN: Unknown algorithm.
@@ -1481,12 +1487,12 @@ typedef void *(*gnutls_realloc_function) (void *, size_t);
 void gnutls_global_set_time_function(gnutls_time_func time_func);
 
 /* For use in callbacks */
-extern gnutls_alloc_function gnutls_malloc;
-extern gnutls_realloc_function gnutls_realloc;
-extern gnutls_calloc_function gnutls_calloc;
-extern gnutls_free_function gnutls_free;
+extern _SYM_EXPORT gnutls_alloc_function gnutls_malloc;
+extern _SYM_EXPORT gnutls_realloc_function gnutls_realloc;
+extern _SYM_EXPORT gnutls_calloc_function gnutls_calloc;
+extern _SYM_EXPORT gnutls_free_function gnutls_free;
 
-extern char *(*gnutls_strdup) (const char *);
+extern _SYM_EXPORT char *(*gnutls_strdup) (const char *);
 
 typedef void (*gnutls_log_func) (int, const char *);
 typedef void (*gnutls_audit_log_func) (gnutls_session_t, const char *);
@@ -1648,20 +1654,20 @@ int gnutls_srp_verifier(const char *username,
 /* The static parameters defined in draft-ietf-tls-srp-05
  * Those should be used as input to gnutls_srp_verifier().
  */
-extern const gnutls_datum_t gnutls_srp_4096_group_prime;
-extern const gnutls_datum_t gnutls_srp_4096_group_generator;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_4096_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_4096_group_generator;
 
-extern const gnutls_datum_t gnutls_srp_3072_group_prime;
-extern const gnutls_datum_t gnutls_srp_3072_group_generator;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_3072_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_3072_group_generator;
 
-extern const gnutls_datum_t gnutls_srp_2048_group_prime;
-extern const gnutls_datum_t gnutls_srp_2048_group_generator;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_2048_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_2048_group_generator;
 
-extern const gnutls_datum_t gnutls_srp_1536_group_prime;
-extern const gnutls_datum_t gnutls_srp_1536_group_generator;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1536_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1536_group_generator;
 
-extern const gnutls_datum_t gnutls_srp_1024_group_prime;
-extern const gnutls_datum_t gnutls_srp_1024_group_generator;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1024_group_prime;
+extern _SYM_EXPORT const gnutls_datum_t gnutls_srp_1024_group_generator;
 
 typedef int gnutls_srp_server_credentials_function(gnutls_session_t,
 						   const char *username,
