@@ -861,7 +861,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 {
 	uint8_t salt[8], key[20];
 	int result;
-	const int iter = 1;
+	const int iter = 10*1024;
 	mac_hd_st td1;
 	gnutls_datum_t tmp = { NULL, 0 };
 	uint8_t sha_mac[20];
