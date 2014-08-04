@@ -54,7 +54,6 @@ static void fork_handler(void)
 
 static void set_val_on_fork(unsigned int *val, unsigned int def)
 {
-fprintf(stderr, "fvals: %d\n", fvals_size);
 	if (fvals_size >= MAX_VALS)
 		abort(); /* internal error */
 	*val = def;
