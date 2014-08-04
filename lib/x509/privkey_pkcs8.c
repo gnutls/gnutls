@@ -749,6 +749,7 @@ read_pkcs_schema_params (schema_id * schema, const char *password,
     case PKCS12_3DES_SHA1:
     case PKCS12_ARCFOUR_SHA1:
     case PKCS12_RC2_40_SHA1:
+      memset(enc_params, 0, sizeof(*enc_params));
 
       if ((*schema) == PKCS12_3DES_SHA1)
         {
