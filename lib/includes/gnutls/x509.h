@@ -950,6 +950,9 @@ typedef enum gnutls_pkcs_encrypt_flags_t {
 #define GNUTLS_PKCS_USE_PBES2_AES_192 GNUTLS_PKCS_PBES2_AES_192
 #define GNUTLS_PKCS_USE_PBES2_AES_256 GNUTLS_PKCS_PBES2_AES_256
 
+const char *gnutls_pkcs_schema_get_name(unsigned int schema);
+const char *gnutls_pkcs_schema_get_oid(unsigned int schema);
+
 int gnutls_x509_privkey_init(gnutls_x509_privkey_t * key);
 void gnutls_x509_privkey_deinit(gnutls_x509_privkey_t key);
 gnutls_sec_param_t
@@ -967,6 +970,12 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 int gnutls_x509_privkey_import_openssl(gnutls_x509_privkey_t key,
 				       const gnutls_datum_t * data,
 				       const char *password);
+
+int
+gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
+		  unsigned int *schema, unsigned int *cipher,
+		  void *salt, unsigned int *salt_size,
+		  unsigned int *iter_count);
 
 int gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 				const gnutls_datum_t * data,

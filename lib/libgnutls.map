@@ -1014,6 +1014,9 @@ GNUTLS_3_1_0 {
 	gnutls_packet_get;
 	gnutls_x509_trust_list_add_trust_dir;
 	gnutls_certificate_set_x509_trust_dir;
+	gnutls_pkcs_schema_get_name;
+	gnutls_pkcs_schema_get_oid;
+	gnutls_pkcs8_info;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {
