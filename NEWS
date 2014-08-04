@@ -12,6 +12,8 @@ it as unknown and print its hex value rather than failing. That works around
 an issue in a TURKTRST root certificate which improperly encodes the
 X520countryName element.
 
+** libgnutls: initialize parameters variable on PKCS #8 decryption.
+
 ** p11tool: will not implicitly enable so-login for certain types of
 objects. That avoids issues with tokens that require different login
 types.
