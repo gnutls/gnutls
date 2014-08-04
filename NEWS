@@ -3,6 +3,14 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.17 (unreleased)
+
+** libgnutls: initialize parameters variable on PKCS #8 decryption.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.2.16 (released 2014-07-23)
 
 ** libgnutls: Do not call the post client hello callback twice when resuming
