@@ -7,8 +7,15 @@ See the end for copying conditions.
 
 ** libgnutls: Use pthread_atfork() to detect fork.
 
+** libgnutls: Added helper functions to obtain information on PKCS #8
+structures.
+
+** certtool: Added --p8-info option
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs8_info: Added
+gnutls_pkcs_schema_get_name: Added
+gnutls_pkcs_schema_get_oid: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
