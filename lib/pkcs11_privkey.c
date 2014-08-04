@@ -655,6 +655,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	gnutls_pkcs11_obj_t obj = NULL;
 	gnutls_datum_t der = {NULL, 0};
 	ck_key_type_t key_type;
+	char pubEx[3] = { 1,0,1 }; // 65537 = 0x10001
 
 	PKCS11_CHECK_INIT;
 
@@ -710,6 +711,12 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 		a[a_val].value = &_bits;
 		a[a_val].value_len = sizeof(_bits);
 		a_val++;
+
+		a[a_val].type = CKA_PUBLIC_EXPONENT;
+		a[a_val].value = pubEx;
+		a[a_val].value_len = sizeof(pubEx);
+		a_val++;
+
 		break;
 	case GNUTLS_PK_DSA:
 		p[p_val].type = CKA_SIGN;
@@ -758,6 +765,20 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	default:
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		goto cleanup;
+	}
+
+	/*
+	 * on request, add the CKA_WRAP/CKA_UNWRAP key attribute
+	 */
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_KEY_WRAP) {
+		p[p_val].type = CKA_UNWRAP;
+		p[p_val].value = (void*)&tval;
+		p[p_val].value_len = sizeof(tval);
+		p_val++;
+		a[a_val].type = CKA_WRAP;
+		a[a_val].value = (void*)&tval;
+		a[a_val].value_len = sizeof(tval);
+		a_val++;
 	}
 
 	/* a private key is set always as private unless
