@@ -616,6 +616,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	gnutls_pkcs11_obj_t obj = NULL;
 	gnutls_datum_t der = {NULL, 0};
 	ck_key_type_t key_type;
+	char pubEx[3] = { 1,0,1 }; // 65537 = 0x10001
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
@@ -669,6 +670,12 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 		a[a_val].value = &_bits;
 		a[a_val].value_len = sizeof(_bits);
 		a_val++;
+
+		a[a_val].type = CKA_PUBLIC_EXPONENT;
+		a[a_val].value = pubEx;
+		a[a_val].value_len = sizeof(pubEx);
+		a_val++;
+
 		break;
 	case GNUTLS_PK_DSA:
 		p[p_val].type = CKA_SIGN;
