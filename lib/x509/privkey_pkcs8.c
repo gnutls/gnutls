@@ -2080,7 +2080,7 @@ generate_key(schema_id schema,
 
 	/* generate salt */
 	kdf_params->salt_size =
-	    MIN(sizeof(kdf_params->salt), (unsigned) (10 + (rnd[1] % 10)));
+	    MIN(sizeof(kdf_params->salt), (unsigned) (12 + (rnd[1] % 10)));
 
 	p = pbes2_schema_get(schema);
 	if (p != NULL && p->pbes2 != 0) { /* PBES2 */
@@ -2101,7 +2101,7 @@ generate_key(schema_id schema,
 		return GNUTLS_E_RANDOM_FAILED;
 	}
 
-	kdf_params->iter_count = 1024 + rnd[0];
+	kdf_params->iter_count = 5*1024 + rnd[0];
 	key->size = kdf_params->key_size =
 	    gnutls_cipher_get_key_size(enc_params->cipher);
 
