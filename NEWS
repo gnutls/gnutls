@@ -10,7 +10,10 @@ See the end for copying conditions.
 ** libgnutls: Added helper functions to obtain information on PKCS #8
 structures.
 
-** certtool: Added --p8-info option
+** certtool: Added --p8-info option, which will print PKCS #8 information
+even if the password is not available.
+
+** certtool: --key-info option will print PKCS #8 information if available.
 
 ** API and ABI modifications:
 gnutls_pkcs8_info: Added

@@ -246,7 +246,7 @@ flag = {
 flag = {
     name      = p8-info;
     descrip   = "Print information on a PKCS #8 structure";
-    doc       = "";
+    doc       = "This option will print information about encrypted PKCS #8 structures. That option does not require the decryption of the structure.";
 };
 
 flag = {
