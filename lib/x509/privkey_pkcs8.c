@@ -869,6 +869,8 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 		*schema = p->schema;
 		return 0;
 	} else { /* PKCS #12 schema */
+		memset(enc_params, 0, sizeof(*enc_params));
+
 		p = pbes2_schema_get(*schema);
 		if (p == NULL) {
 			gnutls_assert();
@@ -1766,8 +1768,8 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	     gnutls_datum_t * decrypted_data)
 {
 	int result;
-	int data_size;
-	uint8_t *data = NULL, *key = NULL;
+	gnutls_datum_t enc = {NULL, 0};
+	uint8_t *key = NULL;
 	gnutls_datum_t dkey, d_iv;
 	cipher_hd_st ch;
 	int ch_init = 0;
@@ -1778,24 +1780,10 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 	if (password)
 		pass_len = strlen(password);
 
-	data_size = 0;
-	result = asn1_read_value(pkcs8_asn, root, NULL, &data_size);
-	if (result != ASN1_MEM_ERROR) {
+	result = _gnutls_x509_read_value(pkcs8_asn, root, &enc);
+	if (result < 0) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
-	}
-
-	data = gnutls_malloc(data_size);
-	if (data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result = asn1_read_value(pkcs8_asn, root, data, &data_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
 	}
 
 	if (kdf_params->key_size == 0) {
@@ -1864,25 +1852,25 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	ch_init = 1;
 
-	result = _gnutls_cipher_decrypt(&ch, data, data_size);
+	result = _gnutls_cipher_decrypt(&ch, enc.data, enc.size);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
-	decrypted_data->data = data;
+	decrypted_data->data = enc.data;
 
 	if (gnutls_cipher_get_block_size(enc_params->cipher) != 1)
-		decrypted_data->size = data_size - data[data_size - 1];
+		decrypted_data->size = enc.size - enc.data[enc.size - 1];
 	else
-		decrypted_data->size = data_size;
+		decrypted_data->size = enc.size;
 
 	_gnutls_cipher_deinit(&ch);
 
 	return 0;
 
       error:
-	gnutls_free(data);
+	gnutls_free(enc.data);
 	gnutls_free(key);
 	if (ch_init != 0)
 		_gnutls_cipher_deinit(&ch);
