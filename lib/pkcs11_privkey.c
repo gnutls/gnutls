@@ -885,6 +885,123 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	return ret;
 }
 
+/*
+ * gnutls_pkcs11_privkey_get_pubkey
+ * @url: a private key url
+ * @fmt: the format of output params. PEM or DER.
+ * @pubkey: will hold the public key
+ * @flags: should be zero
+ *
+ * This function will extract the public key (modulus and public
+ * exponent) from the private key specified by the @url private key.
+ * This public key will be stored in @pubkey in the format specified
+ * by @fmt. @pubkey should be deinitialized using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_pkcs11_privkey_get_pubkey (const char* url,
+                                  gnutls_x509_crt_fmt_t fmt,
+                                  gnutls_datum_t * pubkey,
+                                  unsigned int flags)
+{
+	ck_object_handle_t priv;
+	struct pkcs11_session_info sinfo;
+	struct p11_kit_uri *info = NULL;
+	struct ck_mechanism mech;
+	gnutls_pubkey_t pkey = NULL;
+	gnutls_pkcs11_obj_t obj = NULL;
+	gnutls_pkcs11_privkey_t privkey = NULL;
+	ck_key_type_t key_type;
+	int ret;
+
+	memset(&sinfo, 0, sizeof(sinfo));
+
+	if (!pubkey) {
+		gnutls_assert();
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
+
+	/* extract the public key */
+	ret = gnutls_pkcs11_privkey_init(&privkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	ret = gnutls_pkcs11_privkey_import_url(privkey, url, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	priv = privkey->obj;
+
+	ret = gnutls_pubkey_init(&pkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_pkcs11_obj_init(&obj);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (privkey->sinfo.init) {
+		memcpy(&sinfo, &privkey->sinfo, sizeof(sinfo));
+	} else {
+		ret = pkcs11_url_to_info(url, &info);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret = pkcs11_open_session(&sinfo, NULL, info,
+					  pkcs11_obj_flags_to_int(flags));
+		p11_kit_uri_free(info);
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	obj->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm(privkey, 0);
+	obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
+	mech.mechanism = pk_to_genmech(obj->pk_algorithm, &key_type);
+	ret = pkcs11_read_pubkey(sinfo.module, sinfo.pks, priv, mech.mechanism, obj->pubkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_pubkey_import_pkcs11(pkey, obj, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_pubkey_export2(pkey, fmt, pubkey);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+
+      cleanup:
+	if (obj != NULL)
+		gnutls_pkcs11_obj_deinit(obj);
+	if (pkey != NULL)
+		gnutls_pubkey_deinit(pkey);
+	if (privkey != NULL)
+		gnutls_pkcs11_privkey_deinit(privkey);
+	if (sinfo.pks != 0)
+		pkcs11_close_session(&sinfo);
+
+	return ret;
+}
+
 /**
  * gnutls_pkcs11_privkey_set_pin_function:
  * @key: The private key
