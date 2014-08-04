@@ -343,7 +343,7 @@ int _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 			       const char *password, gnutls_datum_t * dec);
 
 typedef enum schema_id {
-	PBES2_GENERIC,		/* when the algorithm is unknown, temporal use when reading only */
+	PBES2_GENERIC=1,		/* when the algorithm is unknown, temporal use when reading only */
 	PBES2_DES,		/* the stuff in PKCS #5 */
 	PBES2_3DES,
 	PBES2_AES_128,

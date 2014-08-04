@@ -368,20 +368,15 @@ const char *gnutls_pkcs_schema_get_oid(unsigned int schema)
 	return NULL;
 }
 
-static const char *cipher_to_pbes2_params(unsigned cipher, const char **oid)
+static const struct pbes2_schema_st *cipher_to_pbes2_schema(unsigned cipher)
 {
-	PBES2_SCHEMA_LOOP(if (_p->cipher == cipher && _p->pbes2 != 0) { *oid = _p->oid; return _p->desc;});
+	PBES2_SCHEMA_LOOP(
+		if (_p->cipher == cipher && _p->pbes2 != 0) {
+			return _p;
+		});
 
 	gnutls_assert();
 	return NULL;
-}
-
-static int cipher_to_pbes2_schema(unsigned cipher)
-{
-	PBES2_SCHEMA_LOOP(if (_p->cipher == cipher && _p->pbes2 != 0) { return _p->schema;});
-
-	gnutls_assert();
-	return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 }
 
 /* returns the OID corresponding to given schema
@@ -864,13 +859,14 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 
 		asn1_delete_structure2(&pbes2_asn, ASN1_DELETE_FLAG_ZEROIZE);
 
-		result = cipher_to_pbes2_schema(enc_params->cipher);
-		if (result < 0) {
+		p = cipher_to_pbes2_schema(enc_params->cipher);
+		if (p == NULL) {
+			result = GNUTLS_E_INVALID_REQUEST;
 			gnutls_assert();
 			goto error;
 		}
 
-		*schema = result;
+		*schema = p->schema;
 		return 0;
 	} else { /* PKCS #12 schema */
 		p = pbes2_schema_get(*schema);
@@ -935,6 +931,25 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 	asn1_delete_structure(&pbes2_asn);
 	return result;
 }
+
+	/* We've gotten this far. In the real world it's almost certain
+	 * that we're dealing with a good file, but wrong password.
+	 * Sadly like 90% of random data is somehow valid DER for the
+	 * a first small number of bytes, so no easy way to guarantee. */
+#define CHECK_ERR_FOR_ENCRYPTED(result) \
+		if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND || \
+		    result == GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND || \
+		    result == GNUTLS_E_ASN1_DER_ERROR || \
+		    result == GNUTLS_E_ASN1_VALUE_NOT_FOUND || \
+		    result == GNUTLS_E_ASN1_GENERIC_ERROR || \
+		    result == GNUTLS_E_ASN1_VALUE_NOT_VALID || \
+		    result == GNUTLS_E_ASN1_TAG_ERROR || \
+		    result == GNUTLS_E_ASN1_TAG_IMPLICIT || \
+		    result == GNUTLS_E_ASN1_TYPE_ANY_ERROR || \
+		    result == GNUTLS_E_ASN1_SYNTAX_ERROR || \
+		    result == GNUTLS_E_ASN1_DER_OVERFLOW) { \
+			result = GNUTLS_E_DECRYPTION_FAILED; \
+		}
 
 static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
 			     ASN1_TYPE pkcs8_asn, const char *password,
@@ -1005,25 +1020,8 @@ static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
 	result = decode_private_key_info(&tmp, pkey);
 	_gnutls_free_key_datum(&tmp);
 
+	CHECK_ERR_FOR_ENCRYPTED(result);
 	if (result < 0) {
-		/* We've gotten this far. In the real world it's almost certain
-		 * that we're dealing with a good file, but wrong password.
-		 * Sadly like 90% of random data is somehow valid DER for the
-		 * a first small number of bytes, so no easy way to guarantee. */
-		if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND ||
-		    result == GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND ||
-		    result == GNUTLS_E_ASN1_DER_ERROR ||
-		    result == GNUTLS_E_ASN1_VALUE_NOT_FOUND ||
-		    result == GNUTLS_E_ASN1_GENERIC_ERROR ||
-		    result == GNUTLS_E_ASN1_VALUE_NOT_VALID ||
-		    result == GNUTLS_E_ASN1_TAG_ERROR ||
-		    result == GNUTLS_E_ASN1_TAG_IMPLICIT ||
-		    result == GNUTLS_E_ASN1_TYPE_ANY_ERROR ||
-		    result == GNUTLS_E_ASN1_SYNTAX_ERROR ||
-		    result == GNUTLS_E_ASN1_DER_OVERFLOW) {
-			result = GNUTLS_E_DECRYPTION_FAILED;
-		}
-
 		gnutls_assert();
 		goto error;
 	}
@@ -1062,6 +1060,7 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
+		CHECK_ERR_FOR_ENCRYPTED(result);
 		goto error;
 	}
 
@@ -1315,7 +1314,6 @@ decode_private_key_info(const gnutls_datum_t * der,
 	int result, len;
 	char oid[MAX_OID_SIZE];
 	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
-
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -1687,7 +1685,7 @@ read_pbe_enc_params(ASN1_TYPE pbes2_asn,
 	int params_len, len, result;
 	ASN1_TYPE pbe_asn = ASN1_TYPE_EMPTY;
 	char oid[MAX_OID_SIZE];
-	const char *eparams;
+	const struct pbes2_schema_st *p;
 
 	memset(params, 0, sizeof(*params));
 
@@ -1720,15 +1718,15 @@ read_pbe_enc_params(ASN1_TYPE pbes2_asn,
 
 	/* Now check the encryption parameters.
 	 */
-	eparams = cipher_to_pbes2_params(params->cipher, NULL);
-	if (eparams == NULL) {
+	p = cipher_to_pbes2_schema(params->cipher);
+	if (p == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				 eparams, &pbe_asn)) != ASN1_SUCCESS) {
+				 p->desc, &pbe_asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -2000,30 +1998,30 @@ write_pbe_enc_params(ASN1_TYPE pbes2_asn,
 {
 	int result;
 	ASN1_TYPE pbe_asn = ASN1_TYPE_EMPTY;
-	const char *oid, *eparams;
+	const struct pbes2_schema_st *p;
 
 	/* Write the encryption algorithm
 	 */
-	eparams = cipher_to_pbes2_params(params->cipher, &oid);
-	if (eparams == NULL) {
+	p = cipher_to_pbes2_schema(params->cipher);
+	if (p == NULL || p->pbes2 == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	result =
-	    asn1_write_value(pbes2_asn, "encryptionScheme.algorithm", oid,
+	    asn1_write_value(pbes2_asn, "encryptionScheme.algorithm", p->oid,
 			     1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		goto error;
 	}
-	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", oid);
+	_gnutls_hard_log("encryptionScheme.algorithm: %s\n", p->oid);
 
 	/* Now check the encryption parameters.
 	 */
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				 eparams, &pbe_asn)) != ASN1_SUCCESS) {
+				 p->desc, &pbe_asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
