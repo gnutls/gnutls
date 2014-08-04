@@ -244,6 +244,12 @@ flag = {
 };
 
 flag = {
+    name      = p8-info;
+    descrip   = "Print information on a PKCS #8 structure";
+    doc       = "";
+};
+
+flag = {
     name      = smime-to-p7;
     descrip   = "Convert S/MIME to PKCS #7 structure";
     doc       = "";

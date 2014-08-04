@@ -52,6 +52,7 @@ static FILE *stdlog = NULL;
 static void privkey_info_int(common_info_st *, gnutls_x509_privkey_t key);
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out);
 void pkcs7_info(void);
+void pkcs8_info(void);
 void crq_info(void);
 void smime_to_pkcs7(void);
 void pkcs12_info(common_info_st *);
@@ -1210,6 +1211,8 @@ static void cmd_parser(int argc, char **argv)
 		crl_info();
 	else if (HAVE_OPT(P7_INFO))
 		pkcs7_info();
+	else if (HAVE_OPT(P8_INFO))
+		pkcs8_info();
 	else if (HAVE_OPT(SMIME_TO_P7))
 		smime_to_pkcs7();
 	else if (HAVE_OPT(TO_P8))
@@ -3022,6 +3025,53 @@ void pkcs12_info(common_info_st * cinfo)
 			"There were errors parsing the structure\n");
 		exit(1);
 	}
+}
+
+void pkcs8_info(void)
+{
+	int ret;
+	size_t size;
+	gnutls_datum_t data;
+	unsigned schema;
+	unsigned cipher;
+	unsigned char salt[32];
+	char hex[64+1];
+	unsigned salt_size = sizeof(salt);
+	unsigned iter_count;
+	gnutls_datum_t bin;
+	size_t hex_size = sizeof(hex);
+	const char *str;
+
+	data.data = (void *) fread_file(infile, &size);
+	data.size = size;
+
+	ret = gnutls_pkcs8_info(&data, incert_format,
+		&schema, &cipher, salt, &salt_size, &iter_count);
+	if (ret < 0) {
+		fprintf(stderr, "PKCS #8 read error: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(outfile, "Cipher: %s\n", gnutls_cipher_get_name(cipher));
+
+	str = gnutls_pkcs_schema_get_name(schema);
+	if (str != NULL) {
+		fprintf(outfile, "Schema: %s (%s)\n", str, gnutls_pkcs_schema_get_oid(schema));
+	}
+
+	bin.data = salt;
+	bin.size = salt_size;
+	ret = gnutls_hex_encode(&bin, hex, &hex_size);
+	if (ret < 0) {
+		fprintf(stderr, "hex encode error: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(outfile, "Salt: %s\n", hex);
+	fprintf(outfile, "Salt size: %u\n", salt_size);
+	fprintf(outfile, "Iteration count: %u\n", iter_count);
 }
 
 void pkcs7_info(void)
