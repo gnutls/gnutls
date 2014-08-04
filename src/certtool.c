@@ -53,6 +53,7 @@ static void privkey_info_int(common_info_st *, gnutls_x509_privkey_t key);
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out);
 void pkcs7_info(void);
 void pkcs8_info(void);
+void pkcs8_info_int(gnutls_datum_t *data, unsigned ignore_err, FILE *out);
 void crq_info(void);
 void smime_to_pkcs7(void);
 void pkcs12_info(common_info_st *);
@@ -1910,6 +1911,9 @@ void privkey_info(common_info_st * cinfo)
 	/* If we failed to import the certificate previously try PKCS #8 */
 	if (ret == GNUTLS_E_DECRYPTION_FAILED) {
 		fprintf(stderr, "Encrypted structure detected...\n");
+
+		pkcs8_info_int(&pem, 1, outfile);
+
 		pass = get_password(cinfo, &flags, 0);
 
 		ret = gnutls_x509_privkey_import2(key, &pem,
@@ -3027,11 +3031,9 @@ void pkcs12_info(common_info_st * cinfo)
 	}
 }
 
-void pkcs8_info(void)
+void pkcs8_info_int(gnutls_datum_t *data, unsigned ignore_err, FILE *out)
 {
 	int ret;
-	size_t size;
-	gnutls_datum_t data;
 	unsigned schema;
 	unsigned cipher;
 	unsigned char salt[32];
@@ -3042,22 +3044,22 @@ void pkcs8_info(void)
 	size_t hex_size = sizeof(hex);
 	const char *str;
 
-	data.data = (void *) fread_file(infile, &size);
-	data.size = size;
-
-	ret = gnutls_pkcs8_info(&data, incert_format,
+	ret = gnutls_pkcs8_info(data, incert_format,
 		&schema, &cipher, salt, &salt_size, &iter_count);
 	if (ret < 0) {
+		if (ignore_err)
+			return;
 		fprintf(stderr, "PKCS #8 read error: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
 
-	fprintf(outfile, "Cipher: %s\n", gnutls_cipher_get_name(cipher));
+	fprintf(out, "PKCS #8 information:\n");
+	fprintf(out, "\tCipher: %s\n", gnutls_cipher_get_name(cipher));
 
 	str = gnutls_pkcs_schema_get_name(schema);
 	if (str != NULL) {
-		fprintf(outfile, "Schema: %s (%s)\n", str, gnutls_pkcs_schema_get_oid(schema));
+		fprintf(out, "\tSchema: %s (%s)\n", str, gnutls_pkcs_schema_get_oid(schema));
 	}
 
 	bin.data = salt;
@@ -3069,9 +3071,20 @@ void pkcs8_info(void)
 		exit(1);
 	}
 
-	fprintf(outfile, "Salt: %s\n", hex);
-	fprintf(outfile, "Salt size: %u\n", salt_size);
-	fprintf(outfile, "Iteration count: %u\n", iter_count);
+	fprintf(out, "\tSalt: %s\n", hex);
+	fprintf(out, "\tSalt size: %u\n", salt_size);
+	fprintf(out, "\tIteration count: %u\n\n", iter_count);
+}
+
+void pkcs8_info(void)
+{
+	size_t size;
+	gnutls_datum_t data;
+
+	data.data = (void *) fread_file(infile, &size);
+	data.size = size;
+
+	pkcs8_info_int(&data, 0, outfile);
 }
 
 void pkcs7_info(void)

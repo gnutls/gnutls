@@ -24,13 +24,17 @@ srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 DIFF=${DIFF:-diff}
 
+if ! test -z "${VALGRIND}";then
+VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+fi
+
 ret=0
 for p8 in 'encpkcs8.pem foobar' unencpkcs8.pem 'enc2pkcs8.pem baz'; do
     set -- $p8
     file=$1
     passwd=$2
-    $CERTTOOL --key-info --pkcs8 --password "$passwd" \
-		--infile $srcdir/$file | tee out >/dev/null 2>&1
+    $VALGRIND $CERTTOOL --key-info --pkcs8 --password "$passwd" \
+		--infile $srcdir/$file | tee out >/dev/null
     rc=$?
     if test $rc != 0; then
 	cat out
@@ -46,8 +50,8 @@ for p8 in openssl-aes128.p8 openssl-aes256.p8 openssl-3des.p8; do
     set -- $p8
     file=$1
     passwd=$2
-    $CERTTOOL --p8-info --password "1234" \
-		--infile $srcdir/$file | tee out >/dev/null 2>&1
+    $VALGRIND $CERTTOOL --p8-info --password "1234" \
+		--infile $srcdir/$file | tee out >/dev/null
     rc=$?
     if test $rc != 0; then
 	cat out
