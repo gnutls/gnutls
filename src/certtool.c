@@ -2961,6 +2961,7 @@ void pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, FILE *out)
 		&schema, &cipher, salt, &salt_size, &iter_count, &oid);
 	if (ret == GNUTLS_E_UNKNOWN_CIPHER_TYPE) {
 		fprintf(out, "\tSchema: unsupported (%s)\n", oid);
+		gnutls_free(oid);
 		return;
 	}
 
@@ -2969,6 +2970,7 @@ void pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, FILE *out)
 			gnutls_strerror(ret));
 		return;
 	}
+	gnutls_free(oid);
 
 	fprintf(out, "\tCipher: %s\n", gnutls_cipher_get_name(cipher));
 
@@ -3107,6 +3109,7 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned format,
 	if (ret == GNUTLS_E_UNKNOWN_CIPHER_TYPE) {
 		fprintf(out, "PKCS #8 information:\n");
 		fprintf(out, "\tSchema: unsupported (%s)\n", oid);
+		gnutls_free(oid);
 		return;
 	}
 
@@ -3117,6 +3120,7 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned format,
 			gnutls_strerror(ret));
 		exit(1);
 	}
+	gnutls_free(oid);
 
 	fprintf(out, "%sPKCS #8 information:\n", tab);
 	fprintf(out, "%s\tCipher: %s\n", tab, gnutls_cipher_get_name(cipher));
