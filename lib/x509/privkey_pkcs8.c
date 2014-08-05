@@ -641,12 +641,13 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
  * This function will provide information on the algorithms used
  * in a particular PKCS #8 structure. If the structure algorithms
  * are unknown the return code will be %GNUTLS_E_UNKNOWN_CIPHER_TYPE,
- * and only @oid, will be set. That is, @oid will be set on correct PKCS #8
- * structures either supported or not. Every other variable is set only
+ * and only @oid, will be set. That is, @oid will be set on encrypted PKCS #8
+ * structures whether supported or not. The other variables are only set
  * on supported structures.
  *
- * Returns: In case of failure a negative error code will be
- *   returned, and 0 on success.
+ * Returns: %GNUTLS_E_DECRYPTION_FAILED if the provided structure isn't encrypted,
+ *  %GNUTLS_E_UNKNOWN_CIPHER_TYPE if the structure's encryption isn't supported, or
+ *  another negative error code in case of a failure. Zero on success.
  **/
 int
 gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
