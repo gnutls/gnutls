@@ -369,9 +369,10 @@ int _gnutls_pkcs_flags_to_schema(unsigned int flags);
 int _gnutls_pkcs7_encrypt_data(schema_id schema,
 			       const gnutls_datum_t * data,
 			       const char *password, gnutls_datum_t * enc);
+
 int
 _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pbes2_schema_st **p,
-	struct pbkdf2_params *kdf_params);
+	struct pbkdf2_params *kdf_params, char **oid);
 
 int _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 				 gnutls_pkcs12_bag_t bag);

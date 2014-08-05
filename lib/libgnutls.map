@@ -1017,6 +1017,7 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs_schema_get_name;
 	gnutls_pkcs_schema_get_oid;
 	gnutls_pkcs8_info;
+	gnutls_pkcs12_bag_enc_info;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

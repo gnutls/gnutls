@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2014 Red Hat
+ * Copyright (C) 2014 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -640,12 +642,12 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
  *
  * This function will provide information on the algorithms used
  * in a particular PKCS #8 structure. If the structure algorithms
- * are unknown the return code will be %GNUTLS_E_UNKNOWN_CIPHER_TYPE,
+ * are unknown the code %GNUTLS_E_UNKNOWN_CIPHER_TYPE will be returned,
  * and only @oid, will be set. That is, @oid will be set on encrypted PKCS #8
- * structures whether supported or not. The other variables are only set
- * on supported structures.
+ * structures whether supported or not. It must be deinitialized using gnutls_free().
+ * The other variables are only set on supported structures.
  *
- * Returns: %GNUTLS_E_DECRYPTION_FAILED if the provided structure isn't encrypted,
+ * Returns: %GNUTLS_E_INVALID_REQUEST if the provided structure isn't encrypted,
  *  %GNUTLS_E_UNKNOWN_CIPHER_TYPE if the structure's encryption isn't supported, or
  *  another negative error code in case of a failure. Zero on success.
  **/
@@ -692,6 +694,8 @@ gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
 	}
 
 	ret = pkcs8_key_info(&_data, &p, &kdf, oid);
+	if (ret == GNUTLS_E_DECRYPTION_FAILED)
+		ret = GNUTLS_E_INVALID_REQUEST;
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -706,17 +710,21 @@ gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
 	if (cipher)
 		*cipher = p->cipher;
 
+	if (iter_count)
+		*iter_count = kdf.iter_count;
+
 	if (salt) {
 		if (*salt_size >= (unsigned)kdf.salt_size) {
 			memcpy(salt, kdf.salt, kdf.salt_size);
+		} else {
+			*salt_size = kdf.salt_size;
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 		}
 	}
 
 	if (salt_size)
 		*salt_size = kdf.salt_size;
 
-	if (iter_count)
-		*iter_count = kdf.iter_count;
 
 	return 0;
 
@@ -2433,7 +2441,7 @@ _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 
 int
 _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pbes2_schema_st **p,
-	struct pbkdf2_params *kdf_params)
+	struct pbkdf2_params *kdf_params, char **oid)
 {
 	int result, len;
 	char enc_oid[MAX_OID_SIZE];
@@ -2470,6 +2478,10 @@ _gnutls_pkcs7_data_enc_info(const gnutls_datum_t * data, const struct pbes2_sche
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto error;
+	}
+
+	if (oid) {
+		*oid = gnutls_strdup(enc_oid);
 	}
 
 	if ((result = check_pkcs12_schema(enc_oid)) < 0) {
