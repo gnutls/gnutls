@@ -975,7 +975,7 @@ int
 gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
 		  unsigned int *schema, unsigned int *cipher,
 		  void *salt, unsigned int *salt_size,
-		  unsigned int *iter_count);
+		  unsigned int *iter_count, char **oid);
 
 int gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 				const gnutls_datum_t * data,

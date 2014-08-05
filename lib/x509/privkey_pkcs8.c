@@ -39,7 +39,8 @@ static int _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn,
 static
 int pkcs8_key_info(const gnutls_datum_t * raw_key,
 		   const struct pbes2_schema_st **p,
-		   struct pbkdf2_params *kdf_params);
+		   struct pbkdf2_params *kdf_params,
+		   char **oid);
 
 
 #define PBES2_OID "1.2.840.113549.1.5.13"
@@ -635,9 +636,14 @@ gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
  * @salt: PBKDF2 salt (if non-NULL then @salt_size initially holds its size)
  * @salt_size: PBKDF2 salt size
  * @iter_count: PBKDF2 iteration count
+ * @oid: if non-NULL it will contain an allocated null-terminated variable with the OID
  *
  * This function will provide information on the algorithms used
- * in a particular PKCS #8 structure.
+ * in a particular PKCS #8 structure. If the structure algorithms
+ * are unknown the return code will be %GNUTLS_E_UNKNOWN_CIPHER_TYPE,
+ * and only @oid, will be set. That is, @oid will be set on correct PKCS #8
+ * structures either supported or not. Every other variable is set only
+ * on supported structures.
  *
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
@@ -646,12 +652,16 @@ int
 gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
 		  unsigned int *schema, unsigned int *cipher,
 		  void *salt, unsigned int *salt_size,
-		  unsigned int *iter_count)
+		  unsigned int *iter_count,
+		  char **oid)
 {
 	int ret = 0, need_free = 0;
 	gnutls_datum_t _data;
 	const struct pbes2_schema_st *p = NULL;
 	struct pbkdf2_params kdf;
+
+	if (oid)
+		*oid = NULL;
 
 	_data.data = data->data;
 	_data.size = data->size;
@@ -680,7 +690,7 @@ gnutls_pkcs8_info(const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
 		need_free = 1;
 	}
 
-	ret = pkcs8_key_info(&_data, &p, &kdf);
+	ret = pkcs8_key_info(&_data, &p, &kdf, oid);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1038,7 +1048,8 @@ static int pkcs8_key_decrypt(const gnutls_datum_t * raw_key,
 static
 int pkcs8_key_info(const gnutls_datum_t * raw_key,
 		   const struct pbes2_schema_st **p,
-		   struct pbkdf2_params *kdf_params)
+		   struct pbkdf2_params *kdf_params,
+		   char **oid)
 {
 	int result, len;
 	char enc_oid[MAX_OID_SIZE];
@@ -1075,6 +1086,10 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		goto error;
+	}
+
+	if (oid) {
+		*oid = gnutls_strdup(enc_oid);
 	}
 
 	if ((result = check_pkcs12_schema(enc_oid)) < 0) {

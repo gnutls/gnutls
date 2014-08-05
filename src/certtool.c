@@ -3043,9 +3043,16 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned ignore_err, FILE *out)
 	gnutls_datum_t bin;
 	size_t hex_size = sizeof(hex);
 	const char *str;
+	char *oid = NULL;
 
 	ret = gnutls_pkcs8_info(data, incert_format,
-		&schema, &cipher, salt, &salt_size, &iter_count);
+		&schema, &cipher, salt, &salt_size, &iter_count, &oid);
+	if (ret == GNUTLS_E_UNKNOWN_CIPHER_TYPE) {
+		fprintf(out, "PKCS #8 information:\n");
+		fprintf(out, "\tSchema: unsupported (%s)\n", oid);
+		return;
+	}
+
 	if (ret < 0) {
 		if (ignore_err)
 			return;
