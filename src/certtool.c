@@ -53,7 +53,8 @@ static void privkey_info_int(common_info_st *, gnutls_x509_privkey_t key);
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out);
 void pkcs7_info(void);
 void pkcs8_info(void);
-void pkcs8_info_int(gnutls_datum_t *data, unsigned ignore_err, FILE *out);
+void pkcs8_info_int(gnutls_datum_t *data, unsigned format, 
+			unsigned ignore_err, FILE *out, const char *tab);
 void crq_info(void);
 void smime_to_pkcs7(void);
 void pkcs12_info(common_info_st *);
@@ -1912,7 +1913,7 @@ void privkey_info(common_info_st * cinfo)
 	if (ret == GNUTLS_E_DECRYPTION_FAILED) {
 		fprintf(stderr, "Encrypted structure detected...\n");
 
-		pkcs8_info_int(&pem, 1, outfile);
+		pkcs8_info_int(&pem, incert_format, 1, outfile, "");
 
 		pass = get_password(cinfo, &flags, 0);
 
@@ -2874,6 +2875,17 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 
 		fprintf(stderr, "\tType: %s\n", BAGTYPE(type));
 
+		result = gnutls_pkcs12_bag_get_data(bag, i, &cdata);
+		if (result < 0) {
+			fprintf(stderr, "get_data: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+
+		if (type == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY) {
+			pkcs8_info_int(&cdata, GNUTLS_X509_FMT_DER, 1, outfile, "\t");
+		}
+
 		name = NULL;
 		result =
 		    gnutls_pkcs12_bag_get_friendly_name(bag, i,
@@ -2900,12 +2912,6 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 			fprintf(outfile, "\tKey ID: %s\n",
 				raw_to_string(id.data, id.size));
 
-		result = gnutls_pkcs12_bag_get_data(bag, i, &cdata);
-		if (result < 0) {
-			fprintf(stderr, "get_data: %s\n",
-				gnutls_strerror(result));
-			exit(1);
-		}
 
 		switch (type) {
 		case GNUTLS_BAG_PKCS8_ENCRYPTED_KEY:
@@ -2934,6 +2940,55 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 		}
 
 	}
+}
+
+static
+void pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, FILE *out)
+{
+	int ret;
+	unsigned schema;
+	unsigned cipher;
+	unsigned char salt[32];
+	char hex[64+1];
+	unsigned salt_size = sizeof(salt);
+	unsigned iter_count;
+	gnutls_datum_t bin;
+	size_t hex_size = sizeof(hex);
+	const char *str;
+	char *oid = NULL;
+
+	ret = gnutls_pkcs12_bag_enc_info(bag, 
+		&schema, &cipher, salt, &salt_size, &iter_count, &oid);
+	if (ret == GNUTLS_E_UNKNOWN_CIPHER_TYPE) {
+		fprintf(out, "\tSchema: unsupported (%s)\n", oid);
+		return;
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "PKCS #12 bag read error: %s\n",
+			gnutls_strerror(ret));
+		return;
+	}
+
+	fprintf(out, "\tCipher: %s\n", gnutls_cipher_get_name(cipher));
+
+	str = gnutls_pkcs_schema_get_name(schema);
+	if (str != NULL) {
+		fprintf(out, "\tSchema: %s (%s)\n", str, gnutls_pkcs_schema_get_oid(schema));
+	}
+
+	bin.data = salt;
+	bin.size = salt_size;
+	ret = gnutls_hex_encode(&bin, hex, &hex_size);
+	if (ret < 0) {
+		fprintf(stderr, "hex encode error: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(out, "\tSalt: %s\n", hex);
+	fprintf(out, "\tSalt size: %u\n", salt_size);
+	fprintf(out, "\tIteration count: %u\n", iter_count);
 }
 
 void pkcs12_info(common_info_st * cinfo)
@@ -3000,6 +3055,7 @@ void pkcs12_info(common_info_st * cinfo)
 
 		if (result == GNUTLS_BAG_ENCRYPTED) {
 			fprintf(stderr, "\tType: %s\n", BAGTYPE(result));
+			pkcs12_bag_enc_info(bag, stderr);
 			fprintf(stderr, "\n\tDecrypting...\n");
 
 			result = gnutls_pkcs12_bag_decrypt(bag, pass);
@@ -3031,7 +3087,8 @@ void pkcs12_info(common_info_st * cinfo)
 	}
 }
 
-void pkcs8_info_int(gnutls_datum_t *data, unsigned ignore_err, FILE *out)
+void pkcs8_info_int(gnutls_datum_t *data, unsigned format, 
+		    unsigned ignore_err, FILE *out, const char *tab)
 {
 	int ret;
 	unsigned schema;
@@ -3045,7 +3102,7 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned ignore_err, FILE *out)
 	const char *str;
 	char *oid = NULL;
 
-	ret = gnutls_pkcs8_info(data, incert_format,
+	ret = gnutls_pkcs8_info(data, format,
 		&schema, &cipher, salt, &salt_size, &iter_count, &oid);
 	if (ret == GNUTLS_E_UNKNOWN_CIPHER_TYPE) {
 		fprintf(out, "PKCS #8 information:\n");
@@ -3061,12 +3118,12 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned ignore_err, FILE *out)
 		exit(1);
 	}
 
-	fprintf(out, "PKCS #8 information:\n");
-	fprintf(out, "\tCipher: %s\n", gnutls_cipher_get_name(cipher));
+	fprintf(out, "%sPKCS #8 information:\n", tab);
+	fprintf(out, "%s\tCipher: %s\n", tab, gnutls_cipher_get_name(cipher));
 
 	str = gnutls_pkcs_schema_get_name(schema);
 	if (str != NULL) {
-		fprintf(out, "\tSchema: %s (%s)\n", str, gnutls_pkcs_schema_get_oid(schema));
+		fprintf(out, "%s\tSchema: %s (%s)\n", tab, str, gnutls_pkcs_schema_get_oid(schema));
 	}
 
 	bin.data = salt;
@@ -3078,9 +3135,9 @@ void pkcs8_info_int(gnutls_datum_t *data, unsigned ignore_err, FILE *out)
 		exit(1);
 	}
 
-	fprintf(out, "\tSalt: %s\n", hex);
-	fprintf(out, "\tSalt size: %u\n", salt_size);
-	fprintf(out, "\tIteration count: %u\n\n", iter_count);
+	fprintf(out, "%s\tSalt: %s\n", tab, hex);
+	fprintf(out, "%s\tSalt size: %u\n", tab, salt_size);
+	fprintf(out, "%s\tIteration count: %u\n\n", tab, iter_count);
 }
 
 void pkcs8_info(void)
@@ -3091,7 +3148,7 @@ void pkcs8_info(void)
 	data.data = (void *) fread_file(infile, &size);
 	data.size = size;
 
-	pkcs8_info_int(&data, 0, outfile);
+	pkcs8_info_int(&data, incert_format, 0, outfile, "");
 }
 
 void pkcs7_info(void)
