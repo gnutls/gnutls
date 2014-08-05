@@ -3570,7 +3570,7 @@ legacy_parse_aia(ASN1_TYPE src,
  * @seq: specifies the sequence number of the access descriptor (0 for the first one, 1 for the second etc.)
  * @what: what data to get, a #gnutls_info_access_what_t type.
  * @data: output data to be freed with gnutls_free().
- * @critical: pointer to output integer that is set to non-0 if the extension is marked as critical (may be %NULL)
+ * @critical: pointer to output integer that is set to non-zero if the extension is marked as critical (may be %NULL)
  *
  * Note that a simpler API to access the authority info data is provided
  * by gnutls_x509_aia_get() and gnutls_x509_ext_import_aia().

@@ -1042,7 +1042,7 @@ gnutls_prf_raw(gnutls_session_t session,
  * @session: is a #gnutls_session_t structure.
  * @label_size: length of the @label variable.
  * @label: label used in PRF computation, typically a short string.
- * @server_random_first: non-0 if server random field should be first in seed
+ * @server_random_first: non-zero if server random field should be first in seed
  * @extra_size: length of the @extra variable.
  * @extra: optional extra data to seed the PRF with.
  * @outsize: size of pre-allocated output buffer to hold the output.
@@ -1055,7 +1055,7 @@ gnutls_prf_raw(gnutls_session_t session,
  * The @label variable usually contains a string denoting the purpose
  * for the generated data.  The @server_random_first indicates whether
  * the client random field or the server random field should be first
- * in the seed.  Non-0 indicates that the server random field is first,
+ * in the seed.  Non-zero indicates that the server random field is first,
  * 0 that the client random field is first.
  *
  * The @extra variable can be used to add more data to the seed, after
