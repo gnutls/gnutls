@@ -1,0 +1,28 @@
+===================================
+People who have sent DCO for gnutls
+===================================
+
+Adam Sampson <ats||offog.org>
+	16 Jul 2013 (received by personal mail by nmav)
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/6857
+
+Frank Morgner <morgner||informatik.hu-berlin.de>
+	30 Aug 2013
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/6960
+
+Wolfgang Meyer zu Bergsten <w.bergsten||sirrix.com>
+	25 Oct 2013
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7068
+
+Jens Lechtenboerger <jens.lechtenboerger||fsfe.org>
+	22 Feb 2014
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7337
+
+Jason Spafford <nullprogrammer||gmail.com>
+	6 Mar 2014
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7352
+
+Simon Arlott <simon||arlott.org>
+	10 Jul 2014
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7572
+
