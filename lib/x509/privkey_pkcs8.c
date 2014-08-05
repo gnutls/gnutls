@@ -924,7 +924,7 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 			goto error;
 		}
 
-		if (enc_params->iv_size && password != NULL) {
+		if (enc_params->iv_size) {
 			result =
 			    _gnutls_pkcs12_string_to_key(2 /*IV*/,
 							 kdf_params->salt,
