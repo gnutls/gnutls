@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem \
+EXTRA_DIST = suppressions.valgrind encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem \
 	openssl-3des.p8	openssl-3des.p8.txt \
 	openssl-aes128.p8 openssl-aes128.p8.txt \
 	openssl-aes256.p8 openssl-aes256.p8.txt
