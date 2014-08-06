@@ -19,6 +19,8 @@ when available.
 ** certtool: --p12-info option will print PKCS #12 encryption information
 when available.
 
+** certtool: Added --mark-wrap parameter.
+
 ** API and ABI modifications:
 gnutls_pkcs12_bag_enc_info: Added
 gnutls_pkcs8_info: Added
