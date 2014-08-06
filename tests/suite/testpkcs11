@@ -34,6 +34,8 @@ if test "${WINDIR}" != "";then
   exit 77
 fi 
 
+P11TOOL="$P11TOOL --batch"
+
 . $srcdir/../scripts/common.sh
 
 rm -f $TMPFILE
@@ -94,12 +96,59 @@ generate_temp_rsa_privkey () {
 	echo -n "* Generating RSA private key ($bits)... "
 	$P11TOOL $ADDITIONAL_PARAM --login --label gnutls-client --generate-rsa --bits $bits "$token" --outfile tmp-client.pub >>$TMPFILE 2>&1
 	if test $? = 0;then
-		$P11TOOL $ADDITIONAL_PARAM --login --delete "$token;object=gnutls-client;object-type=private" >>$TMPFILE 2>&1
+		RETCODE=0
 		echo ok
 	else
 		echo failed
 		RETCODE=1
 	fi
+}
+
+# $1: token
+# $2: PIN
+delete_temp_privkey () {
+	export GNUTLS_PIN=$2
+	token=$1
+
+	test "$RETCODE" = "0" || return
+
+	echo -n "* Deleting private key... "
+	$P11TOOL $ADDITIONAL_PARAM --login --delete "$token;object=gnutls-client;object-type=private" >>$TMPFILE 2>&1
+
+	if test $? != 0;then
+		echo failed
+		RETCODE=1
+		return
+	fi
+
+	RETCODE=0
+	echo ok
+}
+
+# $1: token
+# $2: PIN
+# $3: bits
+export_pubkey_of_privkey () {
+	export GNUTLS_PIN=$2
+	token=$1
+	bits=$3
+
+	echo -n "* Exporting public key of generated private key... "
+	$P11TOOL $ADDITIONAL_PARAM --login --export-pubkey "$token;object=gnutls-client;object-type=private" --outfile tmp-client-2.pub >>$TMPFILE 2>&1
+	if test $? != 0;then
+		echo failed
+		RETCODE=1
+		return
+	fi
+
+	$DIFF tmp-client.pub tmp-client-2.pub
+	if test $? != 0;then
+		echo keys differ
+		RETCODE=1
+		return
+	fi
+
+	echo ok
 }
 
 # $1: token
@@ -113,7 +162,7 @@ generate_temp_ecc_privkey () {
 	echo -n "* Generating ECC private key ($bits)... "
 	$P11TOOL $ADDITIONAL_PARAM --login --label gnutls-client --generate-ecc --bits $bits "$token" --outfile tmp-client.pub >>$TMPFILE 2>&1
 	if test $? = 0;then
-		$P11TOOL $ADDITIONAL_PARAM --login --delete "$token;object=gnutls-client;object-type=private" >>$TMPFILE 2>&1
+		RETCODE=0
 		echo ok
 	else
 		echo failed
@@ -287,10 +336,15 @@ fi
 write_privkey $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/client.key"
 
 generate_temp_ecc_privkey $TOKEN $GNUTLS_PIN 256
+delete_temp_privkey $TOKEN $GNUTLS_PIN
 
 generate_temp_ecc_privkey $TOKEN $GNUTLS_PIN 384
+delete_temp_privkey $TOKEN $GNUTLS_PIN
 
-#generate_temp_rsa_privkey $TOKEN $GNUTLS_PIN 2048
+generate_temp_rsa_privkey $TOKEN $GNUTLS_PIN 2048
+delete_temp_privkey $TOKEN $GNUTLS_PIN
+
+export_pubkey_of_privkey $TOKEN $GNUTLS_PIN
 
 generate_rsa_privkey $TOKEN $GNUTLS_PIN 1024
 
@@ -301,6 +355,6 @@ use_certificate_test $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/server.crt" "$srcd
 if test $RETCODE = 0;then
 	echo "* All smart cards tests succeeded"
 fi
-rm -f tmp-client.crt tmp-client.pub $TMPFILE
+rm -f tmp-client.crt tmp-client.pub tmp-client-2.pub $TMPFILE
 
 exit 0
