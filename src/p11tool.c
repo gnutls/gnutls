@@ -141,6 +141,10 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(PKCS8))
 		cinfo.pkcs8 = 1;
 
+	if (HAVE_OPT(BATCH)) {
+		batch = cinfo.batch = 1;
+	}
+
 	if (ENABLED_OPT(INDER) || ENABLED_OPT(INRAW))
 		cinfo.incert_format = GNUTLS_X509_FMT_DER;
 	else
