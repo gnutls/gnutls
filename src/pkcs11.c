@@ -577,6 +577,41 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 }
 
 void
+pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed, unsigned int login_flags, common_info_st * info)
+{
+	int ret;
+	unsigned int flags = 0;
+	gnutls_datum_t pubkey;
+
+	if (login_flags) flags = login_flags;
+
+	pkcs11_common(info);
+
+	FIX(url, outfile, detailed, info);
+	CHECK_LOGIN_FLAG(login_flags);
+
+	if (outfile == stderr || outfile == stdout) {
+		fprintf(stderr, "warning: no --outfile was specified and the public key will be printed on screen.\n");
+		sleep(3);
+	}
+
+	ret =
+	    gnutls_pkcs11_privkey_get_pubkey(url,
+					    GNUTLS_X509_FMT_PEM, &pubkey,
+					    flags);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fwrite(pubkey.data, 1, pubkey.size, outfile);
+	gnutls_free(pubkey.data);
+
+	return;
+}
+
+void
 pkcs11_init(FILE * outfile, const char *url, const char *label,
 	    common_info_st * info)
 {
