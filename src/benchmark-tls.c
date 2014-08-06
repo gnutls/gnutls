@@ -44,8 +44,8 @@
 const char *side = "";
 
 #define PRIO_DH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+DHE-RSA"
-#define PRIO_ECDH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP192R1"
-#define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP192R1"
+#define PRIO_ECDH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP256R1"
+#define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP256R1"
 #define PRIO_RSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
 #define PRIO_ARCFOUR_128_SHA1 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
@@ -56,91 +56,119 @@ const char *side = "";
 #define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 #define PRIO_SALSA20_256_SHA1 "NONE:+VERS-TLS1.0:+SALSA20-256:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
-static const int rsa_bits = 1776, ec_bits = 192;
+static const int rsa_bits = 3072, ec_bits = 256;
 
-/* DH of 1840 bits that is pretty close equivalent to 192 bits of ECDH.
+/* DH of 3072 bits that is pretty close equivalent to 256 bits of ECDH.
  */
 const char *pkcs3 =
     "-----BEGIN DH PARAMETERS-----\n"
-    "MIIBxgKB3gNZMD2odqYk7HGnT+kh72vcnGrDhFMad1m4VlYZoLClkRUOH05W9gKF\n"
-    "hjBzlg5zO1Pp14hpSNWdfXcd2glWE2wzkxxxztzt23gdXK1GjfupnALyPS2Q0Oj7\n"
-    "UiLDfos46vXOSzqO3vBElM2HJQ6N1TRU+EqD5t/6aTAV6iAD+yz2Fyv4Xs+rgJC2\n"
-    "IbpunLzM2IhH2u9tLUXGkBzHPW/6Q+fJRhn88OLBC9vwOHPQvw779+FB0NPue1Qs\n"
-    "vb+4HSywpOr4BtNLWST2MzhCYBApvV1dKcZLI5k5Cfmp5ryV+wKB3gEUe9uAk+5I\n"
-    "ENkTLC7XLLNGjPEKwQhBzE7Nh7RKWlZRX+B/cX5/iT7ZF9+N83O/wf2AxEV6CRWV\n"
-    "WiCjvML/wbskpGoGmrPyef7bLHI62x4/nNacGGWEichPW8Sn/qaT80FHyYM0m7Ha\n"
-    "+Q9kYUSx0u1CW//3nGvma5dh/c2iiq8r7J9w2PSYynHts4bYMrRRx2PVeGhvU8+X\n"
-    "nRkYOqptEqoB6NG5kPRL8b5jJSp7J2hN7shDjQB/s9/N8rvF8tRmMUTJpk3Fwr9F\n"
-    "LVdX3640cbukwFTKlkqZ1evymVzx0wICAL0=\n"
+    "MIIDDQKCAYEAtnlQsMzw6EdzVgv59IvDCNXDz+V5F6S95ies6VuP2najcePLCPa4\n"
+    "yLCcQabhjV+rSpYxvqEo1hHMhAZPPsrHP3CCzFlqkSY2mmryC5LfWnoJnJCA5RSs\n"
+    "kWNlxyJ/fkXWseFKDm+E3W/yZXxBJxf3BevlcF7hMXuOrv5tGOdiltWsCrZglEMC\n"
+    "IO3NcvEwLp7Y/OuHk4J2upJSLJqL2mUoYgOUAwhoM9oh6ucjPJ0Ha/HqNRe0zdup\n"
+    "0wnwSbjBR0xa2HdHv5hr0OPk6sma0Zj1cVNi3u5xlMeiirbtEBuRPfM4mrMkhK8F\n"
+    "YBhVV7YRf+WMw8v9VhfeX+GYuE4oMdv6tJBwWoj0RdhgpD6BMG7uHwM7WOn5ZukA\n"
+    "sn9eGsXRog2gCmckUfOGn5oQWXRk1sv2myeu75GAaIPIsXMWBsJNCfxVBbi7pEU9\n"
+    "IQgi6JoLlRnvXVa2GaoVEdAuH0dl6QSIRmNeZ3VKa0ZCx1DHn/WVIt2ooMec5lCY\n"
+    "JGCqIT3tQUUzAoIBgFYzCrFBoleurEimohHxnFKMY0E0feGA0qLPDUa+Ys/4wsr6\n"
+    "SabuE9X69EHVDu4xGlbS4w9k5sMfXTqgVGIN43jbWuoN1FAdPp8YdbXACB3k+IoN\n"
+    "cCj/Ju90Tc/NOTwHN/4Axsy0LpeP+eknb48eQw6mYsHCvN9ytmLqC8AG11G+aTrF\n"
+    "boVeI7pCbfuls/cRNl4POuSyv+R12Evs1qXLoSW4crPEDvVpbIrgirjQNJbosfZY\n"
+    "5Pxf2Ofpidy1slINQqx8zhILTikl0AdfYAlnBVFEOKg1HF+EnvNbcXW0QDxxnFF/\n"
+    "W+Yv0xQpFw9UDa+hdwEVvdrDopqvuvg9BCwCfxT3vGN300RDqWAVGJUknXN4T5MZ\n"
+    "+fZrtZMhbWDCsOHMcVcUPqul7V5uQX7EAhUnfBKxE1I5NK9J8wtHeUEYioI8f7XY\n"
+    "Be6/w7WHHspV4fwIOfWUD5G0c++NxED+JwDyc8aU/qVOXVikOXwVTB/2oyatkoBX\n"
+    "r8Y+1FUiZGhRCT9dbgICAQA=\n"
     "-----END DH PARAMETERS-----\n";
 
 static unsigned char server_cert_pem[] =
     "-----BEGIN CERTIFICATE-----\n"
-    "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\n"
+    "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\n"
     "-----END CERTIFICATE-----\n";
 
 static unsigned char server_key_pem[] =
     "-----BEGIN RSA PRIVATE KEY-----\n"
-    "MIIEBAIBAAKB3wC/VSBHG5adM0r0E80dgVvt+oVnnDcKYcm9q2WbknTL6dFgjjcE\n"
-    "biHDKmnr1hgyT9jfQVE/ve2XnZqAkbpYMNrQbdieclNycjoXCj3BJSJXXz3Ra6O4\n"
-    "DLNh0/XwsxbVd/tMSQvwAK0MR60K/yfruL2oxe8j7uDmS5oY8b5O9nP/EVW2u7P1\n"
-    "KVhrNxC2rGoaK6iRpgkAX3oP2YVMhLfPONpDgYGxBvrO0tlpHCYL+miWdRzIDPMY\n"
-    "tdcU1v1zVSKAsvJ2dgEwP6FoSiWPnkw3U41i4oe+T7kVEk1F9QLCnXsCAwEAAQKB\n"
-    "3iYR2gpMAvvkaNWH2xgz1QbVAhZLjugR7QJASEdcLMEmFPMRWQEYqL8cgVbbkpTw\n"
-    "Lka9yFzWfZ/dTBCo7lr93Yv7T063kMME12oeL4tuyBZ6bOJueHT2kfq1Igpyl+iB\n"
-    "pw7WuflXKRd4a4X0nwzYBQxYWH7bKkQRZDlViKuOXKVzgT7GqD6cbTZbc/8wUTi7\n"
-    "HoyMlz4d+YH/XL5Zt6SM7cMuJ/VOGGUcBiXqlixzulloihkPwJeg6zxx0e1dVy4q\n"
-    "jvVhb+hmypWajjBDPUwIGFih0lZJ6rqIDyls/ZK2AQJwAPFeAMubo1KWcFU+nHoK\n"
-    "Q/jdOjpuAt7fwczkqhb6uOrJtS4RUtF3x3jfESFYf6Btnt6Slj1HpNKHbud2Weyw\n"
-    "i3lIkkmQq4+8uRjZXlNtp2Sd33NFeYE1D8ll3V2wiwiCOPJxYWpOOwHs7pkcOsAD\n"
-    "ywJwAMruluGFAUhoCxXOGzbJeXOC0U+LbwU72Xgk9zhEX6chaklKgdSnJ8DlHnYe\n"
-    "R+wc2vXRfSGlT1OH0X8ezn82QV8UmYo6cNpMTNarW0rzpFir51owvYSBPnPB+DLX\n"
-    "0JausRZoI6fyZSw4Vxt9PN13EQJwANnEX2FUfcmQs68le1ZclrEdIGEBSpO9PARZ\n"
-    "tuBeu6IR9OaoeJlGwXDbiYAVcajT3oefp++ICTxtNvGchUuYiW4WvO2kmjVoJ3Q1\n"
-    "Afaxs1qDWcyNvS+HKUQjJNNX6kj1/N040JRyGqkFFMyNfLArewJwAL/KfLkJjmvT\n"
-    "QV7LW3cNNYbRRWdLXZLxvJfLQAdiv5BiiWRZUZkcnfq10HNMLSdfIiYfZocNCIrm\n"
-    "mz3sbLdYHLJy8qXsk8oNQLXGX9LXsCTJ2y6nUAZSbCbVVPEgfRhcZCvMIp7Q/YOs\n"
-    "f88QLx0UMQJvYsEnYagLe9EfC0d8fXTKJr143FMxas7j3eftxLEBnx7ZsqCbJD1o\n"
-    "UsvWkp5I3kqIABEqY1ZJV/gU41MceuWURSVADpuuRDLzv8WPdeffad9o2hX/bkI6\n"
-    "2INKeuq1nILiEHAZLloH6/fdjpWZYF0D\n" "-----END RSA PRIVATE KEY-----\n";
+    "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\n"
+    "-----END RSA PRIVATE KEY-----\n";
 
 static unsigned char server_ecc_key_pem[] =
     "-----BEGIN EC PRIVATE KEY-----\n"
-    "MGACAQEEGQCovzs4UsfRncfJXO3WOZUe/Zf+usKzEcWgCgYIKoZIzj0DAQGhNAMy\n"
-    "AAREwuCcUHKNWyetsymkAaqA0GCgksI2AjewpOWsraGrfea3GPw1uuyOQRMR7kka\n"
-    "v6s=\n" "-----END EC PRIVATE KEY-----\n";
+    "MHgCAQEEIQDrAKCAbdMKPngHu4zdSQ2Pghob8PhyrbUpWAR8V07E+qAKBggqhkjO\n"
+    "PQMBB6FEA0IABDfo4YLPkO4pBpQamtObIV3J6l92vI+RkyNtaQ9gtSWDj20w/aBC\n"
+    "WlbcTsRZ2itEpJ6GdLsGOW4RRfmiubzC9JU=\n"
+    "-----END EC PRIVATE KEY-----\n";
 
 static unsigned char server_ecc_cert_pem[] =
     "-----BEGIN CERTIFICATE-----\n"
-    "MIIBYDCCARWgAwIBAgIETuILrDAKBggqhkjOPQQDAjAcMQswCQYDVQQGEwJCRTEN\n"
-    "MAsGA1UEChMEVGVzdDAeFw0xMTEyMDkxMzIyNTJaFw0xNzA4MTExMzIyNTlaMBwx\n"
-    "CzAJBgNVBAYTAkJFMQ0wCwYDVQQKEwRUZXN0MEkwEwYHKoZIzj0CAQYIKoZIzj0D\n"
-    "AQEDMgAERMLgnFByjVsnrbMppAGqgNBgoJLCNgI3sKTlrK2hq33mtxj8NbrsjkET\n"
-    "Ee5JGr+ro1UwUzAMBgNVHRMBAf8EAjAAMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8G\n"
-    "A1UdDwEB/wQFAwMHgAAwHQYDVR0OBBYEFKeR27mtYWFaH43U2zEvjd28Zf+CMAoG\n"
-    "CCqGSM49BAMCAzkAMDYCGQD7WWWiFV+ddI7tIyMFepKFA1dX4nlc/+ICGQCCPdHc\n"
-    "gMyHv2XyfOGHLhq0HmDTOOiwfC4=\n" "-----END CERTIFICATE-----\n";
+    "MIIBrjCCAVSgAwIBAgIMU+I+axGZmBD/YL96MAoGCCqGSM49BAMCMA8xDTALBgNV\n"
+    "BAMTBENBLTAwIhgPMjAxNDA4MDYxNDQwNDNaGA85OTk5MTIzMTIzNTk1OVowEzER\n"
+    "MA8GA1UEAxMIc2VydmVyLTEwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQ36OGC\n"
+    "z5DuKQaUGprTmyFdyepfdryPkZMjbWkPYLUlg49tMP2gQlpW3E7EWdorRKSehnS7\n"
+    "BjluEUX5orm8wvSVo4GNMIGKMAwGA1UdEwEB/wQCMAAwFAYDVR0RBA0wC4IJbG9j\n"
+    "YWxob3N0MBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdDwEB/wQFAwMHgAAwHQYD\n"
+    "VR0OBBYEFOuSntH2To0gJLH79Ow4wNpBuhmEMB8GA1UdIwQYMBaAFMZ1miRvZAYr\n"
+    "nBEymOtPjbfTrnblMAoGCCqGSM49BAMCA0gAMEUCIQCMP3aBcCxSPbCUhihOsUmH\n"
+    "G04AgT1PKw8z4LgZ4VGTVAIgYw3IFwS5sSYEAHRZAH8eaTXTz7XFmWmnkve9EBkN\n"
+    "cBE=\n"
+    "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
 	sizeof(server_cert_pem)
@@ -344,22 +372,36 @@ static void test_ciphersuite_kx(const char *cipher_prio)
 	gnutls_certificate_allocate_credentials(&s_certcred);
 	gnutls_anon_allocate_server_credentials(&s_anoncred);
 	gnutls_dh_params_init(&dh_params);
-	if ((ret =
+
+	ret =
 	     gnutls_dh_params_import_pkcs3(dh_params, &p3,
-					   GNUTLS_X509_FMT_PEM)) < 0) {
+					   GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
 		fprintf(stderr, "Error importing the PKCS #3 params: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
+
 	gnutls_anon_set_server_dh_params(s_anoncred, dh_params);
 	gnutls_certificate_set_dh_params(s_certcred, dh_params);
 
-	gnutls_certificate_set_x509_key_mem(s_certcred, &server_cert,
+	ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_cert,
 					    &server_key,
 					    GNUTLS_X509_FMT_PEM);
-	gnutls_certificate_set_x509_key_mem(s_certcred, &server_ecc_cert,
+	if (ret < 0) {
+		fprintf(stderr, "Error in %d: %s\n", __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_certificate_set_x509_key_mem(s_certcred, &server_ecc_cert,
 					    &server_ecc_key,
 					    GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %d: %s\n", __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
 
 	/* Init client */
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
