@@ -885,26 +885,8 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	return ret;
 }
 
-/*
- * gnutls_pkcs11_privkey_get_pubkey
- * @pkey: The private key
- * @fmt: the format of output params. PEM or DER.
- * @data: will hold the public key
- * @flags: should be zero
- *
- * This function will extract the public key (modulus and public
- * exponent) from the private key specified by the @url private key.
- * This public key will be stored in @pubkey in the format specified
- * by @fmt. @pubkey should be deinitialized using gnutls_free().
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- **/
 int
-gnutls_pkcs11_privkey_export_pubkey (gnutls_pkcs11_privkey_t pkey,
-                                     gnutls_x509_crt_fmt_t fmt,
-                                     gnutls_datum_t * data,
-				     unsigned int flags)
+_pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, unsigned flags)
 {
 	ck_object_handle_t priv_obj;
 	struct ck_mechanism mech;
@@ -915,7 +897,7 @@ gnutls_pkcs11_privkey_export_pubkey (gnutls_pkcs11_privkey_t pkey,
 
 	PKCS11_CHECK_INIT;
 
-	if (!pubkey || !pkey) {
+	if (!pkey) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -949,16 +931,57 @@ gnutls_pkcs11_privkey_export_pubkey (gnutls_pkcs11_privkey_t pkey,
 		goto cleanup;
 	}
 
+	*pub = pubkey;
+
+	pubkey = NULL;
+	ret = 0;
+
+      cleanup:
+	if (obj != NULL)
+		gnutls_pkcs11_obj_deinit(obj);
+	if (pubkey != NULL)
+		gnutls_pubkey_deinit(pubkey);
+
+	return ret;
+}
+
+/*
+ * gnutls_pkcs11_privkey_get_pubkey
+ * @pkey: The private key
+ * @fmt: the format of output params. PEM or DER.
+ * @data: will hold the public key
+ * @flags: should be zero
+ *
+ * This function will extract the public key (modulus and public
+ * exponent) from the private key specified by the @url private key.
+ * This public key will be stored in @pubkey in the format specified
+ * by @fmt. @pubkey should be deinitialized using gnutls_free().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_pkcs11_privkey_export_pubkey (gnutls_pkcs11_privkey_t pkey,
+                                     gnutls_x509_crt_fmt_t fmt,
+                                     gnutls_datum_t * data,
+				     unsigned int flags)
+{
+	int ret;
+	gnutls_pubkey_t pubkey = NULL;
+
+	ret = _pkcs11_privkey_get_pubkey(pkey, &pubkey, flags);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
 	ret = gnutls_pubkey_export2(pubkey, fmt, data);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
+	ret = 0;
 
       cleanup:
-	if (obj != NULL)
-		gnutls_pkcs11_obj_deinit(obj);
 	if (pubkey != NULL)
 		gnutls_pubkey_deinit(pubkey);
 

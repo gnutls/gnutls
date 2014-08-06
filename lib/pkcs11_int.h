@@ -140,6 +140,9 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 				    const gnutls_datum_t * ciphertext,
 				    gnutls_datum_t * plaintext);
 
+int
+_pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, unsigned flags);
+
 static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
 {
 	if (pk == GNUTLS_PK_DSA)
