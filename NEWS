@@ -5,13 +5,23 @@ See the end for copying conditions.
 
 * Version 3.3.7 (unreleased)
 
+** libgnutls: Added function to export the public key of a PKCS #11
+private key. Contributed by Wolfgang Meyer zu Bergsten.
+
+** libgnutls: Explicitly set the exponent in PKCS #11 key generation.
+That improves compatibility with certain PKCS #11 modules. Contributed by
+Wolfgang Meyer zu Bergsten.
+
+** libgnutls: When generating a PKCS #11 private key allow setting
+the WRAP/UNWRAP flags. Contributed by Wolfgang Meyer zu Bergsten.
+
 ** libgnutls: bundle replacements of inet_pton and inet_aton if not
 available.
 
 ** libgnutls: initialize parameters variable on PKCS #8 decryption.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_privkey_get_pubkey: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
