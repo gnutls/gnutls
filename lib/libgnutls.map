@@ -856,7 +856,6 @@ GNUTLS_3_1_0 {
 	gnutls_ocsp_status_request_is_checked;
 	gnutls_sign_is_secure;
 	gnutls_pkcs11_privkey_generate2;
-	gnutls_pkcs11_privkey_get_pubkey;
 	gnutls_x509_crt_get_policy;
 	gnutls_x509_policy_release;
 	gnutls_x509_crt_set_policy;
@@ -1019,6 +1018,7 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs_schema_get_oid;
 	gnutls_pkcs8_info;
 	gnutls_pkcs12_bag_enc_info;
+	gnutls_pkcs11_privkey_export_pubkey;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

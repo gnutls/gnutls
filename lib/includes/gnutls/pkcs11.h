@@ -350,7 +350,7 @@ gnutls_pkcs11_privkey_generate2(const char *url,
 				unsigned int flags);
 
 int
-gnutls_pkcs11_privkey_get_pubkey (const char* url,
+gnutls_pkcs11_privkey_export_pubkey (gnutls_pkcs11_privkey_t pkey,
 			      gnutls_x509_crt_fmt_t fmt,
 			      gnutls_datum_t * pubkey,
 			      unsigned int flags);

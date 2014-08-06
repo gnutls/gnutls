@@ -582,6 +582,7 @@ pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed, unsigned int
 	int ret;
 	unsigned int flags = 0;
 	gnutls_datum_t pubkey;
+	gnutls_pkcs11_privkey_t pkey;
 
 	if (login_flags) flags = login_flags;
 
@@ -595,15 +596,30 @@ pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed, unsigned int
 		sleep(3);
 	}
 
-	ret =
-	    gnutls_pkcs11_privkey_get_pubkey(url,
-					    GNUTLS_X509_FMT_PEM, &pubkey,
-					    flags);
+	ret = gnutls_pkcs11_privkey_init(&pkey);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
 			gnutls_strerror(ret));
 		exit(1);
 	}
+
+	ret = gnutls_pkcs11_privkey_import_url(pkey, url, 0);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret =
+	    gnutls_pkcs11_privkey_export_pubkey(pkey,
+					        GNUTLS_X509_FMT_PEM, &pubkey,
+					        flags);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+	gnutls_pkcs11_privkey_deinit(pkey);
 
 	fwrite(pubkey.data, 1, pubkey.size, outfile);
 	gnutls_free(pubkey.data);
