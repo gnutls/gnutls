@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 ** libgnutls: initialize parameters variable on PKCS #8 decryption.
 
+** libgnutls: Explicitly set the exponent in PKCS #11 key generation.
+That improves compatibility with certain PKCS #11 modules. Contributed by
+Wolfgang Meyer zu Bergsten.
+
 ** API and ABI modifications:
 No changes since last version.
 
