@@ -616,7 +616,7 @@ gnutls_pkcs11_privkey_generate(const char *url, gnutls_pk_algorithm_t pk,
  * @label: a label
  * @fmt: the format of output params. PEM or DER.
  * @pubkey: will hold the public key (may be %NULL)
- * @flags: should be zero
+ * @flags: zero or an OR'ed sequence of %GNUTLS_PKCS11_OBJ_FLAGs
  *
  * This function will generate a private key in the specified
  * by the @url token. The private key will be generate within
