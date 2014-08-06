@@ -1229,7 +1229,7 @@ authentication.
 @tab 3072
 @tab 256
 @tab @code{HIGH}
-@tab Long term protection
+@tab Long term protection (corresponds to ENISA future level)
 
 @item 256
 @tab 15424
