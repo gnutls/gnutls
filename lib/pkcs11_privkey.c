@@ -887,9 +887,9 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 
 /*
  * gnutls_pkcs11_privkey_get_pubkey
- * @url: a private key url
+ * @pkey: The private key
  * @fmt: the format of output params. PEM or DER.
- * @pubkey: will hold the public key
+ * @data: will hold the public key
  * @flags: should be zero
  *
  * This function will extract the public key (modulus and public
@@ -901,42 +901,28 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
  *   negative error value.
  **/
 int
-gnutls_pkcs11_privkey_get_pubkey (const char* url,
-                                  gnutls_x509_crt_fmt_t fmt,
-                                  gnutls_datum_t * pubkey,
-                                  unsigned int flags)
+gnutls_pkcs11_privkey_export_pubkey (gnutls_pkcs11_privkey_t pkey,
+                                     gnutls_x509_crt_fmt_t fmt,
+                                     gnutls_datum_t * data,
+				     unsigned int flags)
 {
-	ck_object_handle_t priv;
-	struct pkcs11_session_info sinfo;
-	struct p11_kit_uri *info = NULL;
+	ck_object_handle_t priv_obj;
 	struct ck_mechanism mech;
-	gnutls_pubkey_t pkey = NULL;
+	gnutls_pubkey_t pubkey = NULL;
 	gnutls_pkcs11_obj_t obj = NULL;
-	gnutls_pkcs11_privkey_t privkey = NULL;
 	ck_key_type_t key_type;
 	int ret;
 
-	memset(&sinfo, 0, sizeof(sinfo));
+	PKCS11_CHECK_INIT;
 
-	if (!pubkey) {
+	if (!pubkey || !pkey) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	/* extract the public key */
-	ret = gnutls_pkcs11_privkey_init(&privkey);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-	ret = gnutls_pkcs11_privkey_import_url(privkey, url, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-	priv = privkey->obj;
+	priv_obj = pkey->obj;
 
-	ret = gnutls_pubkey_init(&pkey);
+	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -948,41 +934,22 @@ gnutls_pkcs11_privkey_get_pubkey (const char* url,
 		goto cleanup;
 	}
 
-	if (privkey->sinfo.init) {
-		memcpy(&sinfo, &privkey->sinfo, sizeof(sinfo));
-	} else {
-		ret = pkcs11_url_to_info(url, &info);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		ret = pkcs11_open_session(&sinfo, NULL, info,
-					  pkcs11_obj_flags_to_int(flags));
-		p11_kit_uri_free(info);
-
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-	}
-
-	obj->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm(privkey, 0);
+	obj->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm(pkey, 0);
 	obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
 	mech.mechanism = pk_to_genmech(obj->pk_algorithm, &key_type);
-	ret = pkcs11_read_pubkey(sinfo.module, sinfo.pks, priv, mech.mechanism, obj->pubkey);
+	ret = pkcs11_read_pubkey(pkey->sinfo.module, pkey->sinfo.pks, priv_obj, mech.mechanism, obj->pubkey);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = gnutls_pubkey_import_pkcs11(pkey, obj, 0);
+	ret = gnutls_pubkey_import_pkcs11(pubkey, obj, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = gnutls_pubkey_export2(pkey, fmt, pubkey);
+	ret = gnutls_pubkey_export2(pubkey, fmt, data);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -992,12 +959,8 @@ gnutls_pkcs11_privkey_get_pubkey (const char* url,
       cleanup:
 	if (obj != NULL)
 		gnutls_pkcs11_obj_deinit(obj);
-	if (pkey != NULL)
-		gnutls_pubkey_deinit(pkey);
-	if (privkey != NULL)
-		gnutls_pkcs11_privkey_deinit(privkey);
-	if (sinfo.pks != 0)
-		pkcs11_close_session(&sinfo);
+	if (pubkey != NULL)
+		gnutls_pubkey_deinit(pubkey);
 
 	return ret;
 }
