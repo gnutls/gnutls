@@ -137,27 +137,50 @@ flag = {
 };
 
 flag = {
-    name      = trusted;
+    name      = mark-wrap;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the generated key to be a wrapping key";
+    doc = "Marks the generated key with the CKA_WRAP flag.";
+};
+
+flag = {
+    name      = mark-trusted;
     disable   = "no";
     disabled;
     descrip   = "Marks the object to be written as trusted";
-    doc = "";
+    doc = "Marks the object to be generated/copied with the CKA_TRUST flag.";
+};
+
+flag = {
+    name      = mark-ca;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the object to be written as a CA";
+    doc = "Marks the object to be generated/copied with the CKA_CERTIFICATE_CATEGORY as CA.";
+};
+
+flag = {
+    name      = mark-private;
+    disable   = "no";
+    enabled;
+    descrip   = "Marks the object to be written as private";
+    doc = "Marks the object to be generated/copied with the CKA_PRIVATE flag. The written object will require a PIN to be used.";
+};
+
+flag = {
+    name      = trusted;
+    aliases   = mark-trusted;
 };
 
 flag = {
     name      = ca;
-    disable   = "no";
-    disabled;
-    descrip   = "Marks the object to be written as a CA";
-    doc = "";
+    aliases   = mark-ca;
 };
 
 flag = {
     name      = private;
-    disable   = "no";
-    enabled;
-    descrip   = "Marks the object to be written as private";
-    doc = "The written object will require a PIN to be used.";
+    aliases   = mark-private;
 };
 
 flag = {
