@@ -920,7 +920,7 @@ gnutls_pkcs11_privkey_get_pubkey (const char* url,
 
 	if (!pubkey) {
 		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	/* extract the public key */
