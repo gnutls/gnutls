@@ -1675,7 +1675,7 @@ unsigned int pkcs11_obj_flags_to_int(unsigned int flags)
  * gnutls_pkcs11_obj_import_url:
  * @obj: The structure to store the object
  * @url: a PKCS 11 url identifying the key
- * @flags: One of GNUTLS_PKCS11_OBJ_* flags
+ * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will "import" a PKCS 11 URL identifying an object (e.g. certificate)
  * to the #gnutls_pkcs11_obj_t structure. This does not involve any
@@ -2604,7 +2604,7 @@ find_objs(struct pkcs11_session_info *sinfo,
  * @n_list: initially should hold the maximum size of the list. Will contain the actual size.
  * @url: A PKCS 11 url identifying a set of objects
  * @attrs: Attributes of type #gnutls_pkcs11_obj_attr_t that can be used to limit output
- * @flags: One of GNUTLS_PKCS11_OBJ_* flags
+ * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will initialize and set values to an object list
  * by using all objects identified by a PKCS 11 URL.
@@ -2667,7 +2667,7 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
  * @n_list: It will contain the size of the list.
  * @url: A PKCS 11 url identifying a set of objects
  * @attrs: Attributes of type #gnutls_pkcs11_obj_attr_t that can be used to limit output
- * @flags: One of GNUTLS_PKCS11_OBJ_* flags
+ * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will initialize and set values to an object list
  * by using all objects identified by the PKCS 11 URL. The output
