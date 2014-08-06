@@ -269,6 +269,8 @@ static void cmd_parser(int argc, char **argv)
 				get_bits(key_type, bits, sec_param, 0),
 				label, ENABLED_OPT(PRIVATE), detailed_url,
 				login, &cinfo);
+	} else if (HAVE_OPT(EXPORT_PUBKEY)) {
+		pkcs11_export_pubkey(outfile, url, detailed_url, login, &cinfo);
 	} else {
 		USAGE(1);
 	}

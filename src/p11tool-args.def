@@ -122,6 +122,13 @@ flag = {
     doc = "Generates an RSA private-public key pair on the specified token.";
 };
 
+
+flag = {
+    name      = export-pubkey;
+    descrip   = "Export the public key for a private key";
+    doc = "Exports the public key for the specified private key";
+};
+
 flag = {
     name      = label;
     arg-type  = string;

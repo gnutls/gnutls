@@ -52,6 +52,8 @@ void pkcs11_generate(FILE * outfile, const char *url,
 		     gnutls_pk_algorithm_t type, unsigned int bits,
 		     const char *label, int private, int detailed,
 		     unsigned int login, common_info_st * info);
+void pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed,
+		     unsigned int login, common_info_st * info);
 
 #define PKCS11_TYPE_CRT_ALL 1
 #define PKCS11_TYPE_TRUSTED 2
