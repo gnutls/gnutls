@@ -21,7 +21,7 @@ available.
 ** libgnutls: initialize parameters variable on PKCS #8 decryption.
 
 ** API and ABI modifications:
-gnutls_pkcs11_privkey_get_pubkey: Added
+gnutls_pkcs11_privkey_export_pubkey: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
