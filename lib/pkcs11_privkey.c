@@ -378,7 +378,7 @@ int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
  * gnutls_pkcs11_privkey_import_url:
  * @pkey: The structure to store the parsed key
  * @url: a PKCS 11 url identifying the key
- * @flags: sequence of GNUTLS_PKCS_PRIVKEY_*
+ * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will "import" a PKCS 11 URL identifying a private
  * key to the #gnutls_pkcs11_privkey_t structure. In reality since
