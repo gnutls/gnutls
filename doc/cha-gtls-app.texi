@@ -1187,7 +1187,7 @@ authentication.
 @float Table,tab:key-sizes
 @multitable @columnfractions .10 .12 .10 .20 .32
 
-@headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter @tab Description
+@headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter (profile) @tab Description
 
 @item <72
 @tab <1008
