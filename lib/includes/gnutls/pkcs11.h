@@ -330,7 +330,7 @@ const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type);
 
 int
 gnutls_pkcs11_obj_get_flags(gnutls_pkcs11_obj_t obj, unsigned int *oflags);
-char *gnutls_pkcs11_flags_get_str(unsigned int flags);
+char *gnutls_pkcs11_obj_flags_get_str(unsigned int flags);
 
 int gnutls_x509_crt_list_import_pkcs11(gnutls_x509_crt_t * certs,
 				       unsigned int cert_max,
