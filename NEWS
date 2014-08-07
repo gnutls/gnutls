@@ -15,6 +15,9 @@ Wolfgang Meyer zu Bergsten.
 ** libgnutls: When generating a PKCS #11 private key allow setting
 the WRAP/UNWRAP flags. Contributed by Wolfgang Meyer zu Bergsten.
 
+** libgnutls: gnutls_pkcs11_privkey_t will always hold an open session
+to the key.
+
 ** libgnutls: bundle replacements of inet_pton and inet_aton if not
 available.
 
