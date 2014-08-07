@@ -1015,7 +1015,7 @@ GNUTLS_3_1_0 {
 	gnutls_x509_trust_list_add_trust_dir;
 	gnutls_certificate_set_x509_trust_dir;
 	gnutls_pkcs11_privkey_export_pubkey;
-	gnutls_pkcs11_flags_get_str;
+	gnutls_pkcs11_obj_flags_get_str;
 	gnutls_pkcs11_obj_get_flags;
 } GNUTLS_3_0_0;
 

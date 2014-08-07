@@ -3480,7 +3480,7 @@ gnutls_pkcs11_obj_get_flags(gnutls_pkcs11_obj_t obj, unsigned int *oflags)
 }
 
 /**
- * gnutls_pkcs11_flags_get_str:
+ * gnutls_pkcs11_obj_flags_get_str:
  * @flags: holds the flags
  *
  * This function given an or-sequence of %GNUTLS_PKCS11_OBJ_FLAG_MARK,
@@ -3491,7 +3491,7 @@ gnutls_pkcs11_obj_get_flags(gnutls_pkcs11_obj_t obj, unsigned int *oflags)
  *
  * Since: 3.3.7
  **/
-char *gnutls_pkcs11_flags_get_str(unsigned int flags)
+char *gnutls_pkcs11_obj_flags_get_str(unsigned int flags)
 {
 	gnutls_buffer_st str;
 	gnutls_datum_t out;

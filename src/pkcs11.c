@@ -169,7 +169,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 				__LINE__, gnutls_strerror(ret));
 			exit(1);
 		}
-		str = gnutls_pkcs11_flags_get_str(oflags);
+		str = gnutls_pkcs11_obj_flags_get_str(oflags);
 		if (str != NULL) {
 			fprintf(outfile, "\tFlags: %s\n", str);
 			gnutls_free(str);
