@@ -52,6 +52,8 @@ static time_t mytime(time_t * t)
 	return then;
 }
 
+#define PIN "1234"
+
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "|<%d>| %s", level, str);
@@ -62,7 +64,7 @@ int pin_func(void* userdata, int attempt, const char* url, const char *label,
 		unsigned flags, char *pin, size_t pin_max)
 {
 	if (attempt == 0) {
-		strcpy(pin, "1234");
+		strcpy(pin, PIN);
 		return 0;
 	}
 	return -1;
@@ -84,6 +86,7 @@ void doit(void)
 	gnutls_x509_crt_t ca;
 	gnutls_datum_t tmp;
 
+	unsetenv("SOFTHSM_CONF");
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */
@@ -124,12 +127,13 @@ void doit(void)
 		fprintf(stderr, "error writing %s\n", CONFIG);
 		exit(1);
 	}
+	remove("./softhsm-issuer.db");
 	fputs("0:./softhsm-issuer.db\n", fp);
 	fclose(fp);
 
 	setenv("SOFTHSM_CONF", CONFIG, 0);
 
-	system("softhsm --init-token --slot 0 --label test --so-pin 1234 --pin 1234");
+	system("/usr/bin/softhsm --init-token --slot 0 --label test --so-pin "PIN" --pin "PIN);
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
 	if (ret < 0) {
@@ -211,7 +215,7 @@ void doit(void)
 		printf("\tVerifying...");
 
 	/* initialize softhsm token */
-	ret = gnutls_pkcs11_token_init(URL, "1234", "test");
+	ret = gnutls_pkcs11_token_init(URL, PIN, "test");
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_init\n");
 		exit(1);
