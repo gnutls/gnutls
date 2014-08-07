@@ -770,7 +770,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	/*
 	 * on request, add the CKA_WRAP/CKA_UNWRAP key attribute
 	 */
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_KEY_WRAP) {
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP) {
 		p[p_val].type = CKA_UNWRAP;
 		p[p_val].value = (void*)&tval;
 		p[p_val].value_len = sizeof(tval);
