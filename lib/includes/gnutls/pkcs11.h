@@ -91,20 +91,40 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
 					gnutls_pin_callback_t fn,
 					void *userdata);
 
-#define GNUTLS_PKCS11_OBJ_FLAG_LOGIN (1<<0)	/* force login in the token for the operation */
-#define GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED (1<<1)	/* object marked as trusted */
-#define GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE (1<<2)	/* object marked as sensitive (unexportable) */
-#define GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO (1<<3)	/* force login as a security officer in the token for the operation */
-#define GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE (1<<4)	/* marked as private (requires PIN to access) */
-#define GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE (1<<5)	/* marked as not private */
-#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY (1<<6) /* No need for the object to be a trusted one */
-#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED (1<<7) /* The object must be marked as trusted 
-	* in gnutls_pkcs11_crt_is_known() it implies GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_COMPARE */
-#define GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED (1<<8) /* The object must be marked as distrusted */
-#define GNUTLS_PKCS11_OBJ_FLAG_COMPARE (1<<9) /* The object must be fully compared */
-#define GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE (1<<10) /* The object must be present in a marked as trusted module */
-#define GNUTLS_PKCS11_OBJ_FLAG_MARK_CA (1<<11)	/* object marked as CA */
-#define GNUTLS_PKCS11_OBJ_FLAG_KEY_WRAP (1<<12) /* generated keypair shall support key wrap/unwrap */
+/**
+ * gnutls_pkcs11_obj_flags:
+ * @GNUTLS_PKCS11_OBJ_FLAG_LOGIN: Force login in the token for the operation.
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED: object marked as trusted.
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE: object marked as sensitive (unexportable).
+ * @GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO: force login as a security officer in the token for the operation.
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE: marked as private (requires PIN to access).
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE: marked as not private.
+ * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY: When retrieving an object, do not set any requirements.
+ * GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED: When retrieving an object, only retrieve the marked as trusted.
+ *   In gnutls_pkcs11_crt_is_known() it implies GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_COMPARE.
+ * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED: When retrieving an object, only retrieve the marked as distrusted.
+ * @GNUTLS_PKCS11_OBJ_FLAG_COMPARE: When checking an object's presence, full compare it before returning any result.
+ * @GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE: The object must be present in a marked as trusted module.
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_CA: Mark the object as a CA.
+ * @GNUTLS_PKCS11_OBJ_FLAG_KEY_WRAP: Mark the generated key pair as wrapping and unwrapping keys.
+ *
+ * Enumeration of different PKCS #11 object flags.
+ */
+typedef enum gnutls_pkcs11_obj_flags {
+	GNUTLS_PKCS11_OBJ_FLAG_LOGIN = (1<<0),
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED = (1<<1),
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE = (1<<2),
+	GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO = (1<<3),
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE = (1<<4),
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE = (1<<5),
+	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY = (1<<6),
+	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED = (1<<7),
+	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED = (1<<8),
+	GNUTLS_PKCS11_OBJ_FLAG_COMPARE = (1<<9),
+	GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE = (1<<10),
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_CA = (1<<11),
+	GNUTLS_PKCS11_OBJ_FLAG_KEY_WRAP = (1<<12)
+} gnutls_pkcs11_obj_flags;
 
 /**
  * gnutls_pkcs11_url_type_t:
