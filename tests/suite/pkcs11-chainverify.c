@@ -79,6 +79,7 @@ void doit(void)
 	FILE *fp;
 	const char *lib;
 
+	unsetenv("SOFTHSM_CONF");
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */
