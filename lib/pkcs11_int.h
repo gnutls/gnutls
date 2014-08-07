@@ -51,6 +51,7 @@ struct token_info {
 struct gnutls_pkcs11_obj_st {
 	gnutls_datum_t raw;
 	gnutls_pkcs11_obj_type_t type;
+	unsigned int flags;
 	struct p11_kit_uri *info;
 
 	/* only when pubkey */

@@ -1019,6 +1019,8 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs8_info;
 	gnutls_pkcs12_bag_enc_info;
 	gnutls_pkcs11_privkey_export_pubkey;
+	gnutls_pkcs11_flags_get_str;
+	gnutls_pkcs11_obj_get_flags;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

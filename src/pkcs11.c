@@ -94,7 +94,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 	gnutls_pkcs11_obj_t *crt_list;
 	unsigned int crt_list_size = 0, i;
 	int ret, otype;
-	char *output;
+	char *output, *str;
 	int attrs;
 	unsigned int obj_flags = flags;
 
@@ -133,6 +133,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 	for (i = 0; i < crt_list_size; i++) {
 		char buf[128];
 		size_t size;
+		unsigned int oflags;
 
 		ret =
 		    gnutls_pkcs11_obj_export_url(crt_list[i], detailed,
@@ -160,6 +161,19 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 			exit(1);
 		}
 		fprintf(outfile, "\tLabel: %s\n", buf);
+
+		oflags = 0;
+		ret = gnutls_pkcs11_obj_get_flags(crt_list[i], &oflags);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+				__LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+		str = gnutls_pkcs11_flags_get_str(oflags);
+		if (str != NULL) {
+			fprintf(outfile, "\tFlags: %s\n", str);
+			gnutls_free(str);
+		}
 
 		size = sizeof(buf);
 		ret =

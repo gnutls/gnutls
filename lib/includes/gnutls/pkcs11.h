@@ -106,7 +106,7 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
  * @GNUTLS_PKCS11_OBJ_FLAG_COMPARE: When checking an object's presence, full compare it before returning any result.
  * @GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE: The object must be present in a marked as trusted module.
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_CA: Mark the object as a CA.
- * @GNUTLS_PKCS11_OBJ_FLAG_KEY_WRAP: Mark the generated key pair as wrapping and unwrapping keys.
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP: Mark the generated key pair as wrapping and unwrapping keys.
  *
  * Enumeration of different PKCS #11 object flags.
  */
@@ -123,7 +123,7 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_COMPARE = (1<<9),
 	GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE = (1<<10),
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_CA = (1<<11),
-	GNUTLS_PKCS11_OBJ_FLAG_KEY_WRAP = (1<<12)
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP = (1<<12)
 } gnutls_pkcs11_obj_flags;
 
 /**
@@ -327,6 +327,10 @@ int gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 gnutls_pkcs11_obj_type_t
 gnutls_pkcs11_obj_get_type(gnutls_pkcs11_obj_t obj);
 const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type);
+
+int
+gnutls_pkcs11_obj_get_flags(gnutls_pkcs11_obj_t obj, unsigned int *oflags);
+char *gnutls_pkcs11_flags_get_str(unsigned int flags);
 
 int gnutls_x509_crt_list_import_pkcs11(gnutls_x509_crt_t * certs,
 				       unsigned int cert_max,
