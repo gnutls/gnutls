@@ -65,6 +65,7 @@ write_privkey () {
 		echo failed
 		exit_error
 	fi
+
 }
 
 # $1: token
@@ -102,6 +103,23 @@ generate_temp_rsa_privkey () {
 		echo failed
 		RETCODE=1
 	fi
+
+#	if test $RETCODE = 0;then
+#		echo -n "* Testing private key flags... "
+#		$P11TOOL $ADDITIONAL_PARAM --login --list-keys "$token;object=gnutls-client2;object-type=private" >tmp-client-2.pub 2>>$TMPFILE
+#		if test $? != 0;then
+#			echo failed
+#			exit_error
+#		fi
+#
+#		grep CKA_WRAP tmp-client-2.pub >>$TMPFILE 2>&1
+#		if test $? != 0;then
+#			echo "failed (no CKA_WRAP)"
+#			exit_error
+#		else
+#			echo ok
+#		fi
+#	fi
 }
 
 # $1: token
@@ -204,10 +222,10 @@ write_certificate_test () {
 	fi
 
 	echo -n "* Writing certificate of client's CA... "
-	$P11TOOL $ADDITIONAL_PARAM --login --ca --write --trusted --label gnutls-ca --load-certificate "$cacert" "$token" >>$TMPFILE 2>&1
+	$P11TOOL $ADDITIONAL_PARAM --login --mark-trusted --mark-ca --write --label gnutls-ca --load-certificate "$cacert" "$token" >>$TMPFILE 2>&1
 	ret=$?
 	if test $ret != 0;then
-		$P11TOOL $ADDITIONAL_PARAM --so-login --ca --write --trusted --label gnutls-ca --load-certificate "$cacert" "$token" >>$TMPFILE 2>&1
+		$P11TOOL $ADDITIONAL_PARAM --so-login --mark-ca --write --mark-trusted --label gnutls-ca --load-certificate "$cacert" "$token" >>$TMPFILE 2>&1
 		ret=$?
 	fi
 
@@ -217,6 +235,28 @@ write_certificate_test () {
 		echo failed
 		return
 	fi
+
+	echo -n "* Testing certificate flags... "
+	$P11TOOL $ADDITIONAL_PARAM --login --list-all-certs "$token;object=gnutls-ca;object-type=cert" |grep Flags|head -n 1 >tmp-client-2.pub 2>>$TMPFILE
+	if test $? != 0;then
+		echo failed
+		exit_error
+	fi
+
+	grep CKA_TRUSTED tmp-client-2.pub >>$TMPFILE 2>&1
+	if test $? != 0;then
+		echo "failed (no CKA_TRUSTED)"
+		exit_error
+	fi
+
+	grep "CKA_CERTIFICATE_CATEGORY=CA" tmp-client-2.pub >>$TMPFILE 2>&1
+	if test $? != 0;then
+		echo "failed (no CKA_CERTIFICATE_CATEGORY=CA)"
+		exit_error
+	fi
+
+	echo ok
+
 
 	echo -n "* Trying to obtain back the cert... "
 	$P11TOOL $ADDITIONAL_PARAM --export "$token;object=gnutls-ca;object-type=cert" --outfile crt1.tmp >>$TMPFILE 2>&1
