@@ -890,6 +890,8 @@ _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.3.7
  **/
 int
 gnutls_pkcs11_privkey_export_pubkey (gnutls_pkcs11_privkey_t pkey,
