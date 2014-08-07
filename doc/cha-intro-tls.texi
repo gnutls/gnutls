@@ -157,10 +157,6 @@ designed by NSA. Outputs 160 bits of data.
 @item MAC_@-SHA256 @tab
 An HMAC based on SHA256. Outputs 256 bits of data.
 
-@item MAC_@-UMAC @tab
-This is a very fast MAC algorithm based on universal hashing, described in
-@xcite{RFC4418}. This is currently a GnuTLS extension.
-
 @item MAC_@-AEAD @tab
 This indicates that an authenticated encryption algorithm, such as
 GCM, is in use.
