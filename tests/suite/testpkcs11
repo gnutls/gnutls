@@ -137,15 +137,13 @@ export_pubkey_of_privkey () {
 	$P11TOOL $ADDITIONAL_PARAM --login --export-pubkey "$token;object=gnutls-client;object-type=private" --outfile tmp-client-2.pub >>$TMPFILE 2>&1
 	if test $? != 0;then
 		echo failed
-		RETCODE=1
-		return
+		exit 1
 	fi
 
 	$DIFF tmp-client.pub tmp-client-2.pub
 	if test $? != 0;then
 		echo keys differ
-		RETCODE=1
-		return
+		exit 1
 	fi
 
 	echo ok
