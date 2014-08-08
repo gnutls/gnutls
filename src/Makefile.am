@@ -155,7 +155,7 @@ libcmd_certtool_la_LIBADD += $(LIBOPTS) $(LTLIBINTL)
 libcmd_certtool_la_LIBADD += $(LTLIBREADLINE) gl/libgnu_gpl.la
 libcmd_certtool_la_LIBADD += $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
 
-danetool_SOURCES = danetool.c certtool-common.c certtool-extras.c common.c
+danetool_SOURCES = danetool.c certtool-common.c certtool-extras.c common.c socket.c
 danetool_LDADD = ../lib/libgnutls.la 
 danetool_LDADD += libcmd-danetool.la ../gl/libgnu.la gl/libgnu_gpl.la
 if ENABLE_DANE

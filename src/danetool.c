@@ -49,7 +49,9 @@
 #include <common.h>
 #include "danetool-args.h"
 #include "certtool-common.h"
+#include "socket.h"
 
+static const char* obtain_cert(const char *hostname, const char *proto, unsigned int port);
 static void cmd_parser(int argc, char **argv);
 static void dane_info(const char *host, const char *proto,
 		      unsigned int port, unsigned int ca,
@@ -187,6 +189,7 @@ static void dane_check(const char *host, const char *proto,
 	unsigned int usage, type, match;
 	gnutls_datum_t data, file;
 	size_t size;
+	unsigned del = 0;
 	unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
 
 	if (ENABLED_OPT(LOCAL_DNS))
@@ -264,6 +267,8 @@ static void dane_check(const char *host, const char *proto,
 
 	entries = dane_query_entries(q);
 	for (i = 0; i < entries; i++) {
+		del = 0;
+
 		ret = dane_query_data(q, i, &usage, &type, &match, &data);
 		if (ret < 0) {
 			fprintf(stderr, "dane_query_data: %s\n",
@@ -292,7 +297,12 @@ static void dane_check(const char *host, const char *proto,
 		       dane_cert_type_name(type), type);
 		printf("Contents:          %s (%.2x)\n",
 		       dane_match_type_name(match), match);
-		printf("Data:              %s\n", lbuffer);
+		printf("Data:              %s\n\n", lbuffer);
+
+		if (!cinfo->cert) {
+			cinfo->cert = obtain_cert(host, proto, port);
+			del = 1;
+		}
 
 		/* Verify the DANE data */
 		if (cinfo->cert) {
@@ -375,9 +385,13 @@ static void dane_check(const char *host, const char *proto,
 				}
 				gnutls_free(clist);
 			}
+
+			if (del != 0) {
+				remove(cinfo->cert);
+			}
 		} else {
 			fprintf(stderr,
-				"\nCertificate was not verified. Use --load-certificate.\n");
+				"\nCertificate could not be obtained. You can explicitly load the certificate using --load-certificate.\n");
 		}
 	}
 
@@ -521,4 +535,122 @@ static void dane_info(const char *host, const char *proto,
 	fprintf(outfile, "_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n",
 		port, proto, host, usage, selector, type, lbuffer);
 
+}
+
+
+struct priv_st {
+	int fd;
+	int found;
+};
+
+static int cert_callback(gnutls_session_t session)
+{
+	const gnutls_datum_t *cert_list;
+	unsigned int cert_list_size = 0;
+	int ret;
+	unsigned i;
+	gnutls_datum_t t;
+	struct priv_st *priv;
+
+	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
+	if (cert_list_size == 0) {
+		fprintf(stderr, "no certificates sent by server!\n");
+		return -1;
+	}
+
+	priv = gnutls_session_get_ptr(session);
+
+	for (i=0;i<cert_list_size;i++) {
+		ret = gnutls_pem_base64_encode_alloc("CERTIFICATE", &cert_list[i], &t);
+		if (ret < 0) {
+			fprintf(stderr, "error[%d]: %s\n", __LINE__,
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		write(priv->fd, t.data, t.size);
+		gnutls_free(t.data);
+	}
+	priv->found = 1;
+
+	return -1;
+}
+
+static int get_cert(socket_st *hd, const char *hostname, unsigned udp, int fd)
+{
+	gnutls_certificate_credentials_t xcred;
+	gnutls_session_t session;
+	int ret;
+	struct priv_st priv;
+
+	priv.found = 0;
+	priv.fd = fd;
+
+	ret = gnutls_certificate_allocate_credentials(&xcred);
+	if (ret < 0) {
+		fprintf(stderr, "error[%d]: %s\n", __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+	gnutls_certificate_set_verify_function(xcred, cert_callback);
+
+	ret = gnutls_init(&session, (udp?GNUTLS_DATAGRAM:0)|GNUTLS_CLIENT);
+	if (ret < 0) {
+		fprintf(stderr, "error[%d]: %s\n", __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+	gnutls_session_set_ptr(session, &priv);
+	gnutls_transport_set_int(session, hd->fd);
+
+	gnutls_set_default_priority(session);
+	gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	do {
+		ret = gnutls_handshake(session);
+	} while(ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_WARNING_ALERT_RECEIVED);
+	/* we don't care on the result */
+
+	gnutls_deinit(session);
+	gnutls_certificate_free_credentials(xcred);
+
+	if (priv.found == 0)
+		return -1;
+
+	return 0;
+}
+
+static const char *obtain_cert(const char *hostname, const char *proto, unsigned int port)
+{
+	socket_st hd;
+	char txt_port[16];
+	unsigned udp = 0;
+	static char tmpfile[32] = "danetool-certXXXXXX";
+	int fd, ret;
+
+	if (strcmp(proto, "udp") == 0)
+		udp = 1;
+
+	sockets_init();
+	snprintf(txt_port, sizeof(txt_port), "%u", port);
+	socket_open(&hd, hostname, port_to_service(txt_port, proto), udp, "Obtaining certificate from");
+
+	fd = mkstemp(tmpfile);
+	if (fd == -1) {
+		int e = errno;
+		fprintf(stderr, "error[%d]: %s\n", __LINE__,
+			strerror(e));
+		exit(1);
+	}
+
+	ret = get_cert(&hd, hostname, udp, fd);
+	close(fd);
+
+	socket_bye(&hd);
+
+	if (ret == -1)
+		return NULL;
+	else
+		return tmpfile;
 }

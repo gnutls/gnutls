@@ -195,7 +195,7 @@ int send_ocsp_request(const char *server,
 		 (unsigned int) req.size);
 	headers_size = strlen(headers);
 
-	socket_open(&hd, hostname, service, 0);
+	socket_open(&hd, hostname, service, 0, CONNECT_MSG);
 
 	socket_send(&hd, headers, headers_size);
 	socket_send(&hd, req.data, req.size);
