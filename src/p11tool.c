@@ -222,7 +222,7 @@ static void cmd_parser(int argc, char **argv)
 		sec_param = OPT_ARG(SEC_PARAM);
 	}
 
-	if (debug > 0) {
+	if (debug > 4) {
 		if (HAVE_OPT(MARK_PRIVATE))
 			fprintf(stderr, "Private: %s\n",
 				ENABLED_OPT(MARK_PRIVATE) ? "yes" : "no");
