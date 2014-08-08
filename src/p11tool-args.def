@@ -47,6 +47,12 @@ flag = {
 };
 
 flag = {
+    name      = info;
+    descrip   = "List information on an available object in a token";
+    doc = "";
+};
+
+flag = {
     name      = list-all;
     descrip   = "List all available objects in a token";
     doc = "";

@@ -110,6 +110,8 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL;
 	} else if (type == PKCS11_TYPE_PRIVKEY) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY;
+	} else if (type == PKCS11_TYPE_INFO) {
+		attrs = GNUTLS_PKCS11_OBJ_ATTR_MATCH;
 	} else {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_ALL;
 	}
