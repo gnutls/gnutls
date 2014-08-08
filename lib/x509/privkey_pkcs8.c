@@ -34,7 +34,7 @@
 #include <algorithms.h>
 #include <gnutls_num.h>
 #include <random.h>
-#include <pbkdf2-sha1.h>
+#include <nettle/pbkdf2.h>
 
 static int _decode_pkcs8_ecc_key(ASN1_TYPE pkcs8_asn,
 				 gnutls_x509_privkey_t pkey);
@@ -1827,16 +1827,10 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 	p = pbes2_schema_get(schema);
 	if (p != NULL && p->pbes2 != 0) { /* PBES2 */
-		result = _gnutls_pbkdf2_sha1(password, pass_len,
-					     kdf_params->salt,
-					     kdf_params->salt_size,
-					     kdf_params->iter_count, key,
-					     key_size);
-
-		if (result < 0) {
-			gnutls_assert();
-			goto error;
-		}
+		pbkdf2_hmac_sha1(pass_len, (uint8_t*)password,
+				 kdf_params->iter_count,
+				 kdf_params->salt_size, kdf_params->salt,
+				 key_size, key);
 	} else if (p != NULL) { /* PKCS 12 schema */
 		result =
 		    _gnutls_pkcs12_string_to_key(1 /*KEY*/,
@@ -2129,15 +2123,10 @@ generate_key(schema_id schema,
 	 */
 
 	 if (p->pbes2 != 0) {
-		ret = _gnutls_pbkdf2_sha1(password, pass_len,
-					  kdf_params->salt,
-					  kdf_params->salt_size,
-					  kdf_params->iter_count,
-					  key->data, kdf_params->key_size);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
+		pbkdf2_hmac_sha1(pass_len, (uint8_t*)password,
+				 kdf_params->iter_count,
+				 kdf_params->salt_size, kdf_params->salt,
+				 kdf_params->key_size, key->data);
 
 		if (enc_params->iv_size) {
 			ret = _gnutls_rnd(GNUTLS_RND_NONCE,

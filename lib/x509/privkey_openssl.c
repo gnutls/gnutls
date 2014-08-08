@@ -32,7 +32,6 @@
 #include <algorithms.h>
 #include <gnutls_num.h>
 #include <random.h>
-#include <pbkdf2-sha1.h>
 
 static int
 openssl_hash_password(const char *pass, gnutls_datum_t * key,

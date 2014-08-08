@@ -41,8 +41,6 @@ libgnutls_x509_la_SOURCES =	\
 	extensions.c		\
 	mpi.c			\
 	output.c		\
-	pbkdf2-sha1.c		\
-	pbkdf2-sha1.h		\
 	pkcs12.c		\
 	pkcs12_bag.c		\
 	pkcs12_encr.c		\
