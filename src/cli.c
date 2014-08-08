@@ -374,49 +374,6 @@ static int read_yesno(const char *input_str)
 	return 0;
 }
 
-/* converts a textual service or port to
- * a service.
- */
-static const char *port_to_service(const char *sport)
-{
-	unsigned int port;
-	struct servent *sr;
-
-	port = atoi(sport);
-	if (port == 0)
-		return sport;
-
-	port = htons(port);
-
-	sr = getservbyport(port, udp ? "udp" : "tcp");
-	if (sr == NULL) {
-		fprintf(stderr,
-			"Warning: getservbyport() failed. Using port number as service.\n");
-		return sport;
-	}
-
-	return sr->s_name;
-}
-
-static int service_to_port(const char *service)
-{
-	unsigned int port;
-	struct servent *sr;
-
-	port = atoi(service);
-	if (port != 0)
-		return port;
-
-	sr = getservbyname(service, udp ? "udp" : "tcp");
-	if (sr == NULL) {
-		fprintf(stderr, "Warning: getservbyname() failed.\n");
-		exit(1);
-	}
-
-	return ntohs(sr->s_port);
-}
-
-
 static int cert_verify_callback(gnutls_session_t session)
 {
 	int rc;
@@ -471,7 +428,7 @@ static int cert_verify_callback(gnutls_session_t session)
 		if (ca_verify == 0)
 			vflags |= DANE_VFLAG_ONLY_CHECK_EE_USAGE;
 
-		port = service_to_port(service);
+		port = service_to_port(service, udp?"udp":"tcp");
 		rc = dane_verify_session_crt(NULL, session, hostname,
 					     udp ? "udp" : "tcp", port,
 					     sflags, vflags, &status);
@@ -512,7 +469,7 @@ static int cert_verify_callback(gnutls_session_t session)
 			return -1;
 		}
 
-		txt_service = port_to_service(service);
+		txt_service = port_to_service(service, udp?"udp":"tcp");
 
 		rc = gnutls_verify_stored_pubkey(NULL, NULL, hostname,
 						 txt_service,
@@ -893,7 +850,7 @@ static int try_resume(socket_st * hd)
 
 	printf
 	    ("\n\n- Connecting again- trying to resume previous session\n");
-	socket_open(hd, hostname, service, udp);
+	socket_open(hd, hostname, service, udp, CONNECT_MSG);
 
 	hd->session = init_tls_session(hostname);
 	gnutls_session_set_data(hd->session, session_data,
@@ -1116,7 +1073,8 @@ int main(int argc, char **argv)
 
 	init_global_tls_stuff();
 
-	socket_open(&hd, hostname, service, udp);
+	socket_open(&hd, hostname, service, udp, CONNECT_MSG);
+	hd.verbose = verbose;
 
 	hd.session = init_tls_session(hostname);
 	if (starttls)

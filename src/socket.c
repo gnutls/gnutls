@@ -40,7 +40,6 @@
 
 #define MAX_BUF 4096
 
-extern unsigned int verbose;
 /* Functions to manipulate sockets
  */
 
@@ -105,7 +104,7 @@ socket_send_range(const socket_st * socket, const void *buffer,
 		}
 		while (ret == -1 && errno == EINTR);
 
-	if (ret > 0 && ret != buffer_size && verbose)
+	if (ret > 0 && ret != buffer_size && socket->verbose)
 		fprintf(stderr,
 			"*** Only sent %d bytes instead of %d.\n", ret,
 			buffer_size);
@@ -144,7 +143,7 @@ void socket_bye(socket_st * socket)
 
 void
 socket_open(socket_st * hd, const char *hostname, const char *service,
-	    int udp)
+	    int udp, const char *msg)
 {
 	struct addrinfo hints, *res, *ptr;
 	int sd, err;
@@ -194,7 +193,8 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 		}
 
 
-		printf("Connecting to '%s:%s'...\n", buffer, portname);
+		if (msg)
+			printf("%s '%s:%s'...\n", msg, buffer, portname);
 
 		err = connect(sd, ptr->ai_addr, ptr->ai_addrlen);
 		if (err < 0) {
@@ -239,4 +239,46 @@ void sockets_init(void)
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+}
+
+/* converts a textual service or port to
+ * a service.
+ */
+const char *port_to_service(const char *sport, const char *proto)
+{
+	unsigned int port;
+	struct servent *sr;
+
+	port = atoi(sport);
+	if (port == 0)
+		return sport;
+
+	port = htons(port);
+
+	sr = getservbyport(port, proto);
+	if (sr == NULL) {
+		fprintf(stderr,
+			"Warning: getservbyport() failed. Using port number as service.\n");
+		return sport;
+	}
+
+	return sr->s_name;
+}
+
+int service_to_port(const char *service, const char *proto)
+{
+	unsigned int port;
+	struct servent *sr;
+
+	port = atoi(service);
+	if (port != 0)
+		return port;
+
+	sr = getservbyname(service, proto);
+	if (sr == NULL) {
+		fprintf(stderr, "Warning: getservbyname() failed.\n");
+		exit(1);
+	}
+
+	return ntohs(sr->s_port);
 }

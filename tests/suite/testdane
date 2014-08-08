@@ -19,7 +19,6 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
 DANETOOL="${DANETOOL:-../../src/danetool$EXEEXT}"
 unset RETCODE
 
@@ -40,14 +39,8 @@ HOSTS="$HOSTS nohats.ca"
 # used to work: dane.nox.su torproject.org jhcloos.com
 for i in $HOSTS;do
 echo -n "$i: "
-rm -f tmp
-$CLI $i -p 443 --print-cert --insecure >tmp 2>&1 </dev/null
-if [ $? != 0 ];then
-	echo "Error connecting to $i"
-	exit 1
-fi
 
-$DANETOOL --load-certificate tmp --check $i >/dev/null 2>&1
+$DANETOOL --check $i >/dev/null 2>&1
 if [ $? != 0 ];then
 	echo "Error checking $i"
 	exit 1
@@ -63,14 +56,7 @@ HOSTS="bad-hash.dane.verisignlabs.com bad-params.dane.verisignlabs.com"
 HOSTS="$HOSTS bad-sig.dane.verisignlabs.com"
 for i in $HOSTS;do
 echo -n "$i: "
-rm -f tmp
-$CLI $i -p 443 --print-cert --insecure >tmp 2>&1 </dev/null
-if [ $? != 0 ];then
-	echo "Error connecting to $i"
-	exit 1
-fi
-
-$DANETOOL --load-certificate tmp --check $i >/dev/null 2>&1
+$DANETOOL --check $i >/dev/null 2>&1
 if [ $? = 0 ];then
 	echo "Checking $i should have failed"
 	exit 1
