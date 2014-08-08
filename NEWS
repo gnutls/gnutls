@@ -23,9 +23,12 @@ available.
 
 ** libgnutls: initialize parameters variable on PKCS #8 decryption.
 
+** p11tool: Added --info parameter.
+
 ** certtool: Added --mark-wrap parameter.
 
 ** API and ABI modifications:
+GNUTLS_PKCS11_OBJ_ATTR_MATCH: Added
 gnutls_pkcs11_privkey_export_pubkey: Added
 gnutls_pkcs11_obj_flags_get_str: Added
 gnutls_pkcs11_obj_get_flags: Added
