@@ -243,14 +243,18 @@ static void cmd_parser(int argc, char **argv)
 
 	/* handle actions 
 	 */
-	if (HAVE_OPT(LIST_TOKENS))
+	if (HAVE_OPT(LIST_TOKENS)) {
 		pkcs11_token_list(outfile, detailed_url, &cinfo, 0);
-	else if (HAVE_OPT(LIST_MECHANISMS))
+	} else if (HAVE_OPT(LIST_MECHANISMS)) {
 		pkcs11_mechanism_list(outfile, url, flags, &cinfo);
-	else if (HAVE_OPT(GENERATE_RANDOM))
+	} else if (HAVE_OPT(GENERATE_RANDOM)) {
 		pkcs11_get_random(outfile, url, OPT_VALUE_GENERATE_RANDOM,
 				  &cinfo);
-	else if (HAVE_OPT(LIST_ALL)) {
+	} else if (HAVE_OPT(INFO)) {
+		pkcs11_type = PKCS11_TYPE_INFO;
+		pkcs11_list(outfile, url, pkcs11_type,
+			    flags, detailed_url, &cinfo);
+	} else if (HAVE_OPT(LIST_ALL)) {
 		pkcs11_type = PKCS11_TYPE_ALL;
 		pkcs11_list(outfile, url, pkcs11_type,
 			    flags, detailed_url, &cinfo);

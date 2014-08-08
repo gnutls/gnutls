@@ -59,5 +59,6 @@ void pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed,
 #define PKCS11_TYPE_PK 3
 #define PKCS11_TYPE_ALL 4
 #define PKCS11_TYPE_PRIVKEY 5
+#define PKCS11_TYPE_INFO 6
 
 #endif
