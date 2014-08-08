@@ -1517,6 +1517,14 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 	if (rv == CKR_OK && b != 0)
     		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
 
+	a[0].type = CKA_UNWRAP;
+	a[0].value = &b;
+	a[0].value_len = sizeof(b);
+
+	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
+	if (rv == CKR_OK && b != 0)
+    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
+
 	a[0].type = CKA_PRIVATE;
 	a[0].value = &b;
 	a[0].value_len = sizeof(b);
