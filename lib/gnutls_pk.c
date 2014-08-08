@@ -439,57 +439,75 @@ _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 	}
 
 	/* D */
-	if (d) {
+	if (d && params->params[2]) {
 		ret = _gnutls_mpi_dprint_lz(params->params[2], d);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
 		}
+	} else if (d) {
+		d->data = NULL;
+		d->size = 0;
 	}
 
 	/* P */
-	if (p) {
+	if (p && params->params[3]) {
 		ret = _gnutls_mpi_dprint_lz(params->params[3], p);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
 		}
+	} else if (p) {
+		p->data = NULL;
+		p->size = 0;
 	}
 
 	/* Q */
-	if (q) {
+	if (q && params->params[4]) {
 		ret = _gnutls_mpi_dprint_lz(params->params[4], q);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
 		}
+	} else if (q) {
+		q->data = NULL;
+		q->size = 0;
 	}
 
 	/* U */
-	if (u) {
+	if (u && params->params[5]) {
 		ret = _gnutls_mpi_dprint_lz(params->params[5], u);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
 		}
+	} else if (u) {
+		u->data = NULL;
+		u->size = 0;
 	}
 
 	/* E1 */
-	if (e1) {
+	if (e1 && params->params[6]) {
 		ret = _gnutls_mpi_dprint_lz(params->params[6], e1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
 		}
+	} else if (e1) {
+		e1->data = NULL;
+		e1->size = 0;
 	}
 
 	/* E2 */
-	if (e2) {
+	if (e2 && params->params[7]) {
 		ret = _gnutls_mpi_dprint_lz(params->params[7], e2);
 		if (ret < 0) {
 			gnutls_assert();
 			goto error;
 		}
+	} else if (e2) {
+		e2->data = NULL;
+		e2->size = 0;
 	}
 
 	return 0;
