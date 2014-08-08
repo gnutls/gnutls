@@ -27,6 +27,9 @@ available.
 
 ** certtool: Added --mark-wrap parameter.
 
+** danetool: --check will attempt to retrieve the server's certificate
+chain and verify against it.
+
 ** API and ABI modifications:
 GNUTLS_PKCS11_OBJ_ATTR_MATCH: Added
 gnutls_pkcs11_privkey_export_pubkey: Added
