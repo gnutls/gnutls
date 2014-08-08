@@ -877,7 +877,7 @@ _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, 
 }
 
 /*
- * gnutls_pkcs11_privkey_get_pubkey
+ * gnutls_pkcs11_privkey_export_pubkey
  * @pkey: The private key
  * @fmt: the format of output params. PEM or DER.
  * @data: will hold the public key
