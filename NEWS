@@ -30,6 +30,9 @@ available.
 ** danetool: --check will attempt to retrieve the server's certificate
 chain and verify against it.
 
+** danetool/gnutls-cli-debug: Added --app-proto parameters which can
+be used to enforce starttls (currently only SMTP) on the connection.
+
 ** API and ABI modifications:
 GNUTLS_PKCS11_OBJ_ATTR_MATCH: Added
 gnutls_pkcs11_privkey_export_pubkey: Added
