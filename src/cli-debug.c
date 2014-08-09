@@ -42,9 +42,6 @@
 
 static void cmd_parser(int argc, char **argv);
 
-#define ERR(err,s) if (err==-1) {perror(s);return(1);}
-#define MAX_BUF 4096
-
 /* global stuff here */
 int resume;
 const char *hostname = NULL;
@@ -178,17 +175,16 @@ static const TLS_TEST tls_tests[] = {
 	{NULL, NULL, NULL, NULL, NULL}
 };
 
-static int tt = 0;
 const char *ip;
 
 int main(int argc, char **argv)
 {
-	int err, ret;
-	int sd, i;
+	int ret;
+	int i;
 	gnutls_session_t state;
-	char buffer[MAX_BUF + 1];
 	char portname[6];
-	struct addrinfo hints, *res, *ptr;
+	socket_st hd;
+	const char *app_proto = NULL;
 
 	cmd_parser(argc, argv);
 
@@ -206,17 +202,8 @@ int main(int argc, char **argv)
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(debug);
 
-	printf("Resolving '%s'...\n", hostname);
 	/* get server name */
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = 0;
 	snprintf(portname, sizeof(portname), "%d", port);
-	if ((err = getaddrinfo(hostname, portname, &hints, &res)) != 0) {
-		fprintf(stderr, "Cannot resolve %s: %s\n", hostname,
-			gai_strerror(err));
-		exit(1);
-	}
 
 	/* X509 stuff */
 	if (gnutls_certificate_allocate_credentials(&xcred) < 0) {	/* space for 2 certificates */
@@ -240,6 +227,16 @@ int main(int argc, char **argv)
 	}
 #endif
 
+	if (HAVE_OPT(APP_PROTO)) {
+		app_proto = OPT_ARG(APP_PROTO);
+	}
+
+	if (app_proto == NULL) {
+		app_proto = port_to_service(portname, "tcp");
+	}
+
+	sockets_init();
+
 	i = 0;
 
 	do {
@@ -256,36 +253,13 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		sd = -1;
-		for (ptr = res; ptr != NULL; ptr = ptr->ai_next) {
-			sd = socket(ptr->ai_family, ptr->ai_socktype,
-				    ptr->ai_protocol);
-			if (sd == -1) {
-				continue;
-			}
-
-			getnameinfo(ptr->ai_addr, ptr->ai_addrlen, buffer,
-				    MAX_BUF, NULL, 0, NI_NUMERICHOST);
-			if (tt == 0) {
-				printf("Connecting to '%s:%d'...\n",
-				       buffer, port);
-				tt = 1;
-			}
-			if ((err =
-			     connect(sd, ptr->ai_addr,
-				     ptr->ai_addrlen)) != 0) {
-				close(sd);
-				sd = -1;
-				continue;
-			} else
-				break;
-		}
-		ERR(err, "connect");
+		socket_open(&hd, hostname, portname, 0, NULL);
+		socket_starttls(&hd, app_proto);
 
 		gnutls_init(&state, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS);
 
 		gnutls_transport_set_ptr(state, (gnutls_transport_ptr_t)
-					 gl_fd_to_handle(sd));
+					 gl_fd_to_handle(hd.fd));
 		set_read_funcs(state);
 		if (hostname && !isdigit(hostname[0])
 		    && strchr(hostname, ':') == 0)
@@ -314,14 +288,11 @@ int main(int argc, char **argv)
 
 		gnutls_deinit(state);
 
-		shutdown(sd, SHUT_RDWR);	/* no more receptions */
-		close(sd);
+		socket_bye(&hd);
 
 		i++;
 	}
 	while (1);
-
-	freeaddrinfo(res);
 
 #ifdef ENABLE_SRP
 	gnutls_srp_free_client_credentials(srp_cred);
