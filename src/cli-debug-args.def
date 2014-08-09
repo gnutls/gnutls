@@ -26,6 +26,13 @@ flag = {
     doc      = "";
 };
 
+flag = {
+    name      = app-proto;
+    arg-type  = string;
+    descrip   = "The application protocol to be used to obtain the server's certificate (https, smtp)";
+    doc      = "";
+};
+
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else
   ds-format = 'texi';      // or texi or mdoc format
