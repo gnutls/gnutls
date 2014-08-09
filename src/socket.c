@@ -150,7 +150,9 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 	char buffer[MAX_BUF + 1];
 	char portname[16] = { 0 };
 
-	printf("Resolving '%s'...\n", hostname);
+	if (msg != NULL)
+		printf("Resolving '%s'...\n", hostname);
+
 	/* get server name */
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_socktype = udp ? SOCK_DGRAM : SOCK_STREAM;
