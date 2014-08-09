@@ -31,7 +31,7 @@ available.
 chain and verify against it.
 
 ** danetool/gnutls-cli-debug: Added --app-proto parameters which can
-be used to enforce starttls (currently only SMTP) on the connection.
+be used to enforce starttls (currently only SMTP and IMAP) on the connection.
 
 ** API and ABI modifications:
 GNUTLS_PKCS11_OBJ_ATTR_MATCH: Added
