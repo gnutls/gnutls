@@ -131,15 +131,24 @@ ssize_t send_line(int fd, const char *txt)
 static
 ssize_t wait_for_text(int fd, const char *txt, unsigned txt_size)
 {
-	char buf[256];
+	char buf[512];
+	char *p;
 	int ret;
 
 	alarm(10);
 	do {
-		ret = recv(fd, buf, sizeof(buf), 0);
+		ret = recv(fd, buf, sizeof(buf)-1, 0);
 		if (ret == -1) {
 			fprintf(stderr, "error receiving %s\n", txt);
 			exit(1);
+		}
+		buf[ret] = 0;
+
+		p = memmem(buf, ret, txt, txt_size);
+		if (p != NULL && p != buf) {
+			p--;
+			if (*p == '\n')
+				break;
 		}
 	} while(ret < (int)txt_size || strncmp(buf, txt, txt_size) != 0);
 
@@ -157,11 +166,16 @@ socket_starttls(socket_st * socket, const char *app_proto)
 	if (app_proto == NULL || strcasecmp(app_proto, "https") == 0)
 		return;
 
-	if (strcasecmp(app_proto, "smtp") == 0) {
+	if (strcasecmp(app_proto, "smtp") == 0 || strcasecmp(app_proto, "submission") == 0) {
 		send_line(socket->fd, "EHLO mail.example.com\n");
 		wait_for_text(socket->fd, "220 ", 4);
 		send_line(socket->fd, "STARTTLS\n");
 		wait_for_text(socket->fd, "220 ", 4);
+	} else if (strcasecmp(app_proto, "imap") == 0 || strcasecmp(app_proto, "imap2") == 0) {
+		send_line(socket->fd, "a CAPABILITY\r\n");
+		wait_for_text(socket->fd, "a OK", 4);
+		send_line(socket->fd, "a STARTTLS\r\n");
+		wait_for_text(socket->fd, "a OK", 4);
 	} else {
 		fprintf(stderr, "unknown protocol %s\n", app_proto);
 	}
