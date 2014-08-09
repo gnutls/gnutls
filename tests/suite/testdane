@@ -24,19 +24,18 @@ unset RETCODE
 
 # Unfortunately it is extremely fragile and fails 99% of the
 # time.
-#if test "${WINDIR}" != "";then
+if test "${WINDIR}" != "";then
   exit 77
-#fi 
+fi 
 
 . $srcdir/../scripts/common.sh
 
 # Fine hosts
 
 echo ""
-echo "*** Testing good hosts ***"
-HOSTS="good.dane.verisignlabs.com www.kumari.net torproject.org"
+echo "*** Testing good HTTPS hosts ***"
+HOSTS="good.dane.verisignlabs.com www.freebsd.org www.kumari.net torproject.org fedoraproject.org www.vulcano.cl dane.nox.su"
 HOSTS="$HOSTS nohats.ca"
-# used to work: dane.nox.su torproject.org jhcloos.com
 for i in $HOSTS;do
 echo -n "$i: "
 
@@ -48,8 +47,21 @@ fi
 echo "ok"
 done
 
+echo ""
+echo "*** Testing good SMTP hosts ***"
+HOSTS="dougbarton.us nlnetlabs.nl"
+for i in $HOSTS;do
+echo -n "$i: "
 
-echo "*** Testing bad hosts ***"
+$DANETOOL --check $i --port 25 >/dev/null 2>&1
+if [ $? != 0 ];then
+	echo "Error checking $i"
+	exit 1
+fi
+echo "ok"
+done
+
+echo "*** Testing bad HTTPS hosts ***"
 # Not ok
 # used to work: dane-broken.rd.nic.fr 
 HOSTS="bad-hash.dane.verisignlabs.com bad-params.dane.verisignlabs.com"
