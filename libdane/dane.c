@@ -37,7 +37,6 @@
 #include "../lib/gnutls_int.h"
 
 #define MAX_DATA_ENTRIES 100
-#define DEBUG
 #ifdef DEBUG
 #define gnutls_assert() fprintf(stderr, "ASSERT: %s: %d\n", __FILE__, __LINE__);
 #define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
