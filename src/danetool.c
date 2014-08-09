@@ -45,6 +45,7 @@
 
 /* Gnulib portability files. */
 #include <read-file.h>
+#include <minmax.h>
 
 #include <common.h>
 #include "danetool-args.h"
@@ -178,6 +179,7 @@ static void cmd_parser(int argc, char **argv)
 	gnutls_global_deinit();
 }
 
+#define MAX_CLIST_SIZE 32
 static void dane_check(const char *host, const char *proto,
 		       unsigned int port, common_info_st * cinfo)
 {
@@ -193,6 +195,9 @@ static void dane_check(const char *host, const char *proto,
 	unsigned del = 0;
 	unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
 	const char *str;
+	gnutls_x509_crt_t *clist = NULL;
+	unsigned int clist_size = 0;
+	gnutls_datum_t certs[MAX_CLIST_SIZE];
 
 	if (ENABLED_OPT(LOCAL_DNS))
 		flags = 0;
@@ -206,7 +211,17 @@ static void dane_check(const char *host, const char *proto,
 	if (HAVE_OPT(CHECK_CA))
 		vflags |= DANE_VFLAG_ONLY_CHECK_CA_USAGE;
 
-	printf("Querying %s (%s:%d)...\n", host, proto, port);
+	if (!cinfo->cert) {
+		const char *app_proto = NULL;
+		if (HAVE_OPT(APP_PROTO))
+			app_proto = OPT_ARG(APP_PROTO);
+
+		cinfo->cert = obtain_cert(host, proto, port, app_proto, HAVE_OPT(QUIET));
+		del = 1;
+	}
+
+	if (!HAVE_OPT(QUIET))
+		fprintf(stderr, "Querying DNS for %s (%s:%d)...\n", host, proto, port);
 	ret = dane_state_init(&s, flags);
 	if (ret < 0) {
 		fprintf(stderr, "dane_state_init: %s\n",
@@ -267,6 +282,46 @@ static void dane_check(const char *host, const char *proto,
 		fprintf(outfile, "\n");
 	}
 
+	if (cinfo->cert) {
+		ret = gnutls_load_file(cinfo->cert, &file);
+		if (ret < 0) {
+			fprintf(stderr, "gnutls_load_file: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		ret =
+		    gnutls_x509_crt_list_import2(&clist,
+						 &clist_size,
+						 &file,
+						 cinfo->
+						 incert_format, 0);
+		if (ret < 0) {
+			fprintf(stderr,
+				"gnutls_x509_crt_list_import2: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		if (clist_size > 0) {
+			for (i = 0; i < MIN(MAX_CLIST_SIZE,clist_size); i++) {
+				ret =
+				    gnutls_x509_crt_export2(clist
+							    [i],
+							    GNUTLS_X509_FMT_DER,
+							    &certs
+							    [i]);
+				if (ret < 0) {
+					fprintf(stderr,
+						"gnutls_x509_crt_export2: %s\n",
+						gnutls_strerror
+						(ret));
+					exit(1);
+				}
+			}
+		}
+	}
+
 	entries = dane_query_entries(q);
 	for (i = 0; i < entries; i++) {
 		del = 0;
@@ -277,7 +332,6 @@ static void dane_check(const char *host, const char *proto,
 				dane_strerror(ret));
 			exit(1);
 		}
-
 
 		size = lbuffer_size;
 		ret = gnutls_hex_encode(&data, (void *) lbuffer, &size);
@@ -306,110 +360,60 @@ static void dane_check(const char *host, const char *proto,
 			str = dane_match_type_name(match);
 			if (str == NULL) str= "Unknown";
 			fprintf(outfile, "Contents:          %s (%.2x)\n", str, match);
-			fprintf(outfile, "Data:              %s\n\n", lbuffer);
-		}
-
-		if (!cinfo->cert) {
-			const char *app_proto = NULL;
-			if (HAVE_OPT(APP_PROTO))
-				app_proto = OPT_ARG(APP_PROTO);
-
-			cinfo->cert = obtain_cert(host, proto, port, app_proto, HAVE_OPT(QUIET));
-			del = 1;
+			fprintf(outfile, "Data:              %s\n", lbuffer);
 		}
 
 		/* Verify the DANE data */
 		if (cinfo->cert) {
-			gnutls_x509_crt_t *clist;
-			unsigned int clist_size, status;
+			unsigned int status;
+			gnutls_datum_t out;
 
-			ret = gnutls_load_file(cinfo->cert, &file);
+			ret =
+			    dane_verify_crt(s, certs, clist_size,
+					    GNUTLS_CRT_X509, host,
+					    proto, port, 0, vflags,
+					    &status);
 			if (ret < 0) {
-				fprintf(stderr, "gnutls_load_file: %s\n",
-					gnutls_strerror(ret));
+				fprintf(stderr,
+					"dane_verify_crt: %s\n",
+					dane_strerror(ret));
 				exit(1);
 			}
 
 			ret =
-			    gnutls_x509_crt_list_import2(&clist,
-							 &clist_size,
-							 &file,
-							 cinfo->
-							 incert_format, 0);
+			    dane_verification_status_print(status,
+							   &out,
+							   0);
 			if (ret < 0) {
 				fprintf(stderr,
-					"gnutls_x509_crt_list_import2: %s\n",
-					gnutls_strerror(ret));
+					"dane_verification_status_print: %s\n",
+					dane_strerror(ret));
 				exit(1);
 			}
 
-			if (clist_size > 0) {
-				gnutls_datum_t certs[clist_size];
-				gnutls_datum_t out;
-				unsigned int i;
+			if (!HAVE_OPT(QUIET))
+				fprintf(outfile, "\nVerification: %s\n", out.data);
+			gnutls_free(out.data);
 
-				for (i = 0; i < clist_size; i++) {
-					ret =
-					    gnutls_x509_crt_export2(clist
-								    [i],
-								    GNUTLS_X509_FMT_DER,
-								    &certs
-								    [i]);
-					if (ret < 0) {
-						fprintf(stderr,
-							"gnutls_x509_crt_export2: %s\n",
-							gnutls_strerror
-							(ret));
-						exit(1);
-					}
-				}
-
-				ret =
-				    dane_verify_crt(s, certs, clist_size,
-						    GNUTLS_CRT_X509, host,
-						    proto, port, 0, vflags,
-						    &status);
-				if (ret < 0) {
-					fprintf(stderr,
-						"dane_verify_crt: %s\n",
-						dane_strerror(ret));
-					exit(1);
-				}
-
-				ret =
-				    dane_verification_status_print(status,
-								   &out,
-								   0);
-				if (ret < 0) {
-					fprintf(stderr,
-						"dane_verification_status_print: %s\n",
-						dane_strerror(ret));
-					exit(1);
-				}
-
-				if (!HAVE_OPT(QUIET))
-					fprintf(outfile, "\nVerification: %s\n", out.data);
-				gnutls_free(out.data);
-
-				/* if there is at least one correct accept */
-				if (status == 0)
-					retcode = 0;
-
-				for (i = 0; i < clist_size; i++) {
-					gnutls_free(certs[i].data);
-					gnutls_x509_crt_deinit(clist[i]);
-				}
-				gnutls_free(clist);
-			}
-
-			if (del != 0) {
-				remove(cinfo->cert);
-				cinfo->cert = NULL;
-			}
+			/* if there is at least one correct accept */
+			if (status == 0)
+				retcode = 0;
 		} else {
 			fprintf(stderr,
 				"\nCertificate could not be obtained. You can explicitly load the certificate using --load-certificate.\n");
 		}
+	}
+
+	if (clist_size > 0) {
+		for (i = 0; i < clist_size; i++) {
+			gnutls_free(certs[i].data);
+			gnutls_x509_crt_deinit(clist[i]);
+		}
+		gnutls_free(clist);
+	}
+
+	if (del != 0 && cinfo->cert) {
+		remove(cinfo->cert);
 	}
 
 
@@ -419,7 +423,7 @@ static void dane_check(const char *host, const char *proto,
 	exit(retcode);
 #else
 	fprintf(stderr,
-		"This functionality was disabled (GnuTLS was not compiled with support for DANE).\n");
+		"This functionality is disabled (GnuTLS was not compiled with support for DANE).\n");
 	return;
 #endif
 }
