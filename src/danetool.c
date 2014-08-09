@@ -51,7 +51,7 @@
 #include "certtool-common.h"
 #include "socket.h"
 
-static const char* obtain_cert(const char *hostname, const char *proto, unsigned int port);
+static const char* obtain_cert(const char *hostname, const char *proto, unsigned int port, unsigned quiet);
 static void cmd_parser(int argc, char **argv);
 static void dane_info(const char *host, const char *proto,
 		      unsigned int port, unsigned int ca,
@@ -183,7 +183,7 @@ static void dane_check(const char *host, const char *proto,
 #ifdef HAVE_DANE
 	dane_state_t s;
 	dane_query_t q;
-	int ret, retcode = 0;
+	int ret, retcode = 1;
 	unsigned entries;
 	unsigned int flags = DANE_F_IGNORE_LOCAL_RESOLVER, i;
 	unsigned int usage, type, match;
@@ -191,6 +191,7 @@ static void dane_check(const char *host, const char *proto,
 	size_t size;
 	unsigned del = 0;
 	unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
+	const char *str;
 
 	if (ENABLED_OPT(LOCAL_DNS))
 		flags = 0;
@@ -285,22 +286,30 @@ static void dane_check(const char *host, const char *proto,
 			exit(1);
 		}
 
-		if (entries > 1)
-			printf("\nEntry %d:\n", i + 1);
+		if (entries > 1 && !HAVE_OPT(QUIET))
+			fprintf(outfile, "\n==== Entry %d ====\n", i + 1);
 
 		fprintf(outfile,
 			"_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n",
 			port, proto, host, usage, type, match, lbuffer);
-		printf("Certificate usage: %s (%.2x)\n",
-		       dane_cert_usage_name(usage), usage);
-		printf("Certificate type:  %s (%.2x)\n",
-		       dane_cert_type_name(type), type);
-		printf("Contents:          %s (%.2x)\n",
-		       dane_match_type_name(match), match);
-		printf("Data:              %s\n\n", lbuffer);
+		
+		if (!HAVE_OPT(QUIET)) {
+			str = dane_cert_usage_name(usage);
+			if (str == NULL) str= "Unknown";
+			fprintf(outfile, "Certificate usage: %s (%.2x)\n", str, usage);
+
+			str = dane_cert_type_name(type);
+			if (str == NULL) str= "Unknown";
+			fprintf(outfile, "Certificate type:  %s (%.2x)\n", str, type);
+
+			str = dane_match_type_name(match);
+			if (str == NULL) str= "Unknown";
+			fprintf(outfile, "Contents:          %s (%.2x)\n", str, match);
+			fprintf(outfile, "Data:              %s\n\n", lbuffer);
+		}
 
 		if (!cinfo->cert) {
-			cinfo->cert = obtain_cert(host, proto, port);
+			cinfo->cert = obtain_cert(host, proto, port, HAVE_OPT(QUIET));
 			del = 1;
 		}
 
@@ -373,11 +382,13 @@ static void dane_check(const char *host, const char *proto,
 					exit(1);
 				}
 
-				printf("\nVerification: %s\n", out.data);
+				if (!HAVE_OPT(QUIET))
+					fprintf(outfile, "\nVerification: %s\n", out.data);
 				gnutls_free(out.data);
 
-				if (status != 0)
-					retcode = 1;
+				/* if there is at least one correct accept */
+				if (status == 0)
+					retcode = 0;
 
 				for (i = 0; i < clist_size; i++) {
 					gnutls_free(certs[i].data);
@@ -388,6 +399,7 @@ static void dane_check(const char *host, const char *proto,
 
 			if (del != 0) {
 				remove(cinfo->cert);
+				cinfo->cert = NULL;
 			}
 		} else {
 			fprintf(stderr,
@@ -621,20 +633,30 @@ static int get_cert(socket_st *hd, const char *hostname, unsigned udp, int fd)
 	return 0;
 }
 
-static const char *obtain_cert(const char *hostname, const char *proto, unsigned int port)
+static const char *obtain_cert(const char *hostname, const char *proto, unsigned port, unsigned quiet)
 {
 	socket_st hd;
 	char txt_port[16];
 	unsigned udp = 0;
-	static char tmpfile[32] = "danetool-certXXXXXX";
+	static char tmpfile[32];
 	int fd, ret;
+	const char *str = "Obtaining certificate from";
 
 	if (strcmp(proto, "udp") == 0)
 		udp = 1;
+	else if (strcmp(proto, "tcp") != 0) {
+		/* we cannot handle this protocol */
+		return NULL;
+	}
+
+	strcpy(tmpfile, "danetool-certXXXXXX");
 
 	sockets_init();
 	snprintf(txt_port, sizeof(txt_port), "%u", port);
-	socket_open(&hd, hostname, port_to_service(txt_port, proto), udp, "Obtaining certificate from");
+
+	if (quiet)
+		str = NULL;
+	socket_open(&hd, hostname, port_to_service(txt_port, proto), udp, str);
 
 	fd = mkstemp(tmpfile);
 	if (fd == -1) {
