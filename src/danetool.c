@@ -51,7 +51,8 @@
 #include "certtool-common.h"
 #include "socket.h"
 
-static const char* obtain_cert(const char *hostname, const char *proto, unsigned int port, unsigned quiet);
+static const char* obtain_cert(const char *hostname, const char *proto, unsigned int port,
+				const char *app_proto, unsigned quiet);
 static void cmd_parser(int argc, char **argv);
 static void dane_info(const char *host, const char *proto,
 		      unsigned int port, unsigned int ca,
@@ -236,7 +237,7 @@ static void dane_check(const char *host, const char *proto,
 		int *dane_data_len;
 		int secure;
 		int bogus;
-		
+
 		ret = dane_query_to_raw_tlsa(q, &entries, &dane_data,
 			&dane_data_len, &secure, &bogus);
 		if (ret < 0) {
@@ -292,7 +293,7 @@ static void dane_check(const char *host, const char *proto,
 		fprintf(outfile,
 			"_%u._%s.%s. IN TLSA ( %.2x %.2x %.2x %s )\n",
 			port, proto, host, usage, type, match, lbuffer);
-		
+
 		if (!HAVE_OPT(QUIET)) {
 			str = dane_cert_usage_name(usage);
 			if (str == NULL) str= "Unknown";
@@ -309,7 +310,11 @@ static void dane_check(const char *host, const char *proto,
 		}
 
 		if (!cinfo->cert) {
-			cinfo->cert = obtain_cert(host, proto, port, HAVE_OPT(QUIET));
+			const char *app_proto = NULL;
+			if (HAVE_OPT(APP_PROTO))
+				app_proto = OPT_ARG(APP_PROTO);
+
+			cinfo->cert = obtain_cert(host, proto, port, app_proto, HAVE_OPT(QUIET));
 			del = 1;
 		}
 
@@ -616,7 +621,9 @@ static int get_cert(socket_st *hd, const char *hostname, unsigned udp, int fd)
 	gnutls_transport_set_int(session, hd->fd);
 
 	gnutls_set_default_priority(session);
-	gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
+	if (hostname && !isdigit(hostname[0])) {
+		gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
+	}
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	do {
@@ -633,7 +640,8 @@ static int get_cert(socket_st *hd, const char *hostname, unsigned udp, int fd)
 	return 0;
 }
 
-static const char *obtain_cert(const char *hostname, const char *proto, unsigned port, unsigned quiet)
+static const char *obtain_cert(const char *hostname, const char *proto, unsigned port,
+				const char *app_proto, unsigned quiet)
 {
 	socket_st hd;
 	char txt_port[16];
@@ -641,6 +649,7 @@ static const char *obtain_cert(const char *hostname, const char *proto, unsigned
 	static char tmpfile[32];
 	int fd, ret;
 	const char *str = "Obtaining certificate from";
+	const char *service;
 
 	if (strcmp(proto, "udp") == 0)
 		udp = 1;
@@ -656,7 +665,11 @@ static const char *obtain_cert(const char *hostname, const char *proto, unsigned
 
 	if (quiet)
 		str = NULL;
-	socket_open(&hd, hostname, port_to_service(txt_port, proto), udp, str);
+	service = port_to_service(txt_port, proto);
+	socket_open(&hd, hostname, service, udp, str);
+
+	if (app_proto == NULL) app_proto = service;
+	socket_starttls(&hd, app_proto);
 
 	fd = mkstemp(tmpfile);
 	if (fd == -1) {
