@@ -112,6 +112,63 @@ socket_send_range(const socket_st * socket, const void *buffer,
 	return ret;
 }
 
+static
+ssize_t send_line(int fd, const char *txt)
+{
+	int len = strlen(txt);
+	int ret;
+
+	ret = send(fd, txt, len, 0);
+
+	if (ret == -1) {
+		fprintf(stderr, "error sending %s\n", txt);
+		exit(1);
+	}
+
+	return ret;
+}
+
+static
+ssize_t wait_for_text(int fd, const char *txt, unsigned txt_size)
+{
+	char buf[256];
+	int ret;
+
+	alarm(10);
+	do {
+		ret = recv(fd, buf, sizeof(buf), 0);
+		if (ret == -1) {
+			fprintf(stderr, "error receiving %s\n", txt);
+			exit(1);
+		}
+	} while(ret < (int)txt_size || strncmp(buf, txt, txt_size) != 0);
+
+	alarm(0);
+
+	return ret;
+}
+
+void
+socket_starttls(socket_st * socket, const char *app_proto)
+{
+	if (socket->secure)
+		return;
+
+	if (app_proto == NULL || strcasecmp(app_proto, "https") == 0)
+		return;
+
+	if (strcasecmp(app_proto, "smtp") == 0) {
+		send_line(socket->fd, "EHLO mail.example.com\n");
+		wait_for_text(socket->fd, "220 ", 4);
+		send_line(socket->fd, "STARTTLS\n");
+		wait_for_text(socket->fd, "220 ", 4);
+	} else {
+		fprintf(stderr, "unknown protocol %s\n", app_proto);
+	}
+
+	return;
+}
+
 void socket_bye(socket_st * socket)
 {
 	int ret;
