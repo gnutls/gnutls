@@ -876,7 +876,7 @@ _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, 
 	return ret;
 }
 
-/*
+/**
  * gnutls_pkcs11_privkey_export_pubkey
  * @pkey: The private key
  * @fmt: the format of output params. PEM or DER.
@@ -894,7 +894,7 @@ _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, 
  * Since: 3.3.7
  **/
 int
-gnutls_pkcs11_privkey_export_pubkey (gnutls_pkcs11_privkey_t pkey,
+gnutls_pkcs11_privkey_export_pubkey(gnutls_pkcs11_privkey_t pkey,
                                      gnutls_x509_crt_fmt_t fmt,
                                      gnutls_datum_t * data,
 				     unsigned int flags)
