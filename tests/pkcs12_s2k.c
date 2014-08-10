@@ -118,7 +118,7 @@ void doit(void)
 	x = 0;
 	for (i = 1; i < 4; i++) {
 		for (j = 0; j < 3; j++) {
-			rc = _gnutls_pkcs12_string_to_key(i, salt[j],
+			rc = _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1), i, salt[j],
 							  strlen((char *)
 								 salt[j]),
 							  j + i + 15,
@@ -145,7 +145,7 @@ void doit(void)
 		printf("\n");
 
 	for (i = 0; i < sizeof(tv) / sizeof(tv[0]); i++) {
-		rc = _gnutls_pkcs12_string_to_key(tv[i].id, tv[i].salt, 8,
+		rc = _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1), tv[i].id, tv[i].salt, 8,
 						  tv[i].iter,
 						  tv[i].password,
 						  tv[i].keylen, key);

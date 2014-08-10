@@ -969,6 +969,7 @@ GNUTLS_PRIVATE {
     _gnutls_mpi_release;
     # Internal symbols needed by tests/pkcs12_s2k:
     _gnutls_pkcs12_string_to_key;
+    mac_to_entry;
     _gnutls_bin2hex;
   local:
     *;
