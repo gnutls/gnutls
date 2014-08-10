@@ -65,6 +65,9 @@ int gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag_t bag,
 int
 gnutls_pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, unsigned int *schema, unsigned int *cipher,
 	void *salt, unsigned int *salt_size, unsigned int *iter_count, char **oid);
+int
+gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
+	void *salt, unsigned int *salt_size, unsigned int *iter_count, char **oid);
 
 #define GNUTLS_PKCS12_SP_INCLUDE_SELF_SIGNED 1
 int gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,

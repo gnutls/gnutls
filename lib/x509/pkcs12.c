@@ -1780,3 +1780,104 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 
 	return ret;
 }
+
+
+/**
+ * gnutls_pkcs12_mac_info:
+ * @pkcs12: The PKCS #12 structure
+ * @mac: the MAC algorithm used as %gnutls_mac_algorithm_t
+ * @salt: the salt used for string to key (if non-NULL then @salt_size initially holds its size)
+ * @salt_size: string to key salt size
+ * @iter_count: string to key iteration count
+ * @oid: if non-NULL it will contain an allocated null-terminated variable with the OID
+ *
+ * This function will provide information on the MAC algorithm used
+ * in a PKCS #12 structure. If the structure algorithms
+ * are unknown the code %GNUTLS_E_UNKNOWN_HASH_ALGORITHM will be returned,
+ * and only @oid, will be set. That is, @oid will be set on structures
+ * with a MAC whether supported or not. It must be deinitialized using gnutls_free().
+ * The other variables are only set on supported structures.
+ *
+ * Returns: %GNUTLS_E_INVALID_REQUEST if the provided structure doesn't contain a MAC,
+ *  %GNUTLS_E_UNKNOWN_HASH_ALGORITHM if the structure's MAC isn't supported, or
+ *  another negative error code in case of a failure. Zero on success.
+ **/
+int
+gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
+	void *salt, unsigned int *salt_size, unsigned int *iter_count, char **oid)
+{
+	int ret;
+	gnutls_datum_t tmp = { NULL, 0 }, dsalt = {
+	NULL, 0};
+	gnutls_mac_algorithm_t algo;
+
+	if (oid)
+		*oid = NULL;
+
+	if (pkcs12 == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret =
+	    _gnutls_x509_read_value(pkcs12->pkcs12, "macData.mac.digestAlgorithm.algorithm",
+				    &tmp);
+	if (ret < 0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (oid) {
+		*oid = (char*)tmp.data;
+	}
+
+	algo = _gnutls_x509_oid_to_mac((char*)tmp.data);
+	if (algo == GNUTLS_MAC_UNKNOWN || mac_to_entry(algo) == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
+	}
+
+	if (oid) {
+		tmp.data = NULL;
+	}
+
+	if (mac) {
+		*mac = algo;
+	}
+
+	if (iter_count) {
+		ret =
+		    _gnutls_x509_read_uint(pkcs12->pkcs12, "macData.iterations",
+				   iter_count);
+		if (ret < 0) {
+			*iter_count = 1;	/* the default */
+		}
+	}
+
+	if (salt) {
+		/* Read the salt from the structure.
+		 */
+		ret =
+		    _gnutls_x509_read_value(pkcs12->pkcs12, "macData.macSalt",
+					    &dsalt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		if (*salt_size >= (unsigned)dsalt.size) {
+			memcpy(salt, dsalt.data, dsalt.size);
+		} else {
+			*salt_size = dsalt.size;
+			return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+		}
+	}
+
+	ret = 0;
+      cleanup:
+	_gnutls_free_datum(&tmp);
+	_gnutls_free_datum(&dsalt);
+	return ret;
+
+}
+
