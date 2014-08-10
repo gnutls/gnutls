@@ -136,13 +136,13 @@ void doit(void)
 	for (i = 0; i < tests; i++) {
 		ret = gnutls_pkcs12_bag_init(&bag);
 		if (ret < 0) {
-			fprintf(stderr, "bag_init: %d", ret);
+			fprintf(stderr, "bag_init: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
 		ret = gnutls_pkcs12_bag_set_crt(bag, i == 0 ? client : ca);
 		if (ret < 0) {
-			fprintf(stderr, "set_crt: %d", ret);
+			fprintf(stderr, "set_crt: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
@@ -153,7 +153,7 @@ void doit(void)
 							  0 ? "client" :
 							  "ca");
 		if (ret < 0) {
-			fprintf(stderr, "set_friendly_name: %d", ret);
+			fprintf(stderr, "set_friendly_name: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
@@ -161,7 +161,7 @@ void doit(void)
 		ret = gnutls_x509_crt_get_key_id(i == 0 ? client : ca, 0,
 						 key_id_buf, &size);
 		if (ret < 0) {
-			fprintf(stderr, "get_key_id: %d", ret);
+			fprintf(stderr, "get_key_id: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
@@ -170,7 +170,7 @@ void doit(void)
 
 		ret = gnutls_pkcs12_bag_set_key_id(bag, indx, &key_id);
 		if (ret < 0) {
-			fprintf(stderr, "bag_set_key_id: %d", ret);
+			fprintf(stderr, "bag_set_key_id: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
@@ -188,7 +188,7 @@ void doit(void)
 
 		ret = gnutls_pkcs12_set_bag(pkcs12, bag);
 		if (ret < 0) {
-			fprintf(stderr, "set_bag: %d", ret);
+			fprintf(stderr, "set_bag: %s (%d)\n", gnutls_strerror(ret), ret);
 			exit(1);
 		}
 
@@ -196,9 +196,39 @@ void doit(void)
 	}
 
 	/* MAC the structure, export and print. */
-	ret = gnutls_pkcs12_generate_mac(pkcs12, "pass");
+	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA1, "pass");
 	if (ret < 0) {
-		fprintf(stderr, "generate_mac: %d", ret);
+		fprintf(stderr, "generate_mac: %s (%d)\n", gnutls_strerror(ret), ret);
+		exit(1);
+	}
+
+	ret = gnutls_pkcs12_verify_mac(pkcs12, "pass");
+	if (ret < 0) {
+		fprintf(stderr, "verify_mac: %s (%d)\n", gnutls_strerror(ret), ret);
+		exit(1);
+	}
+
+	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA256, "passwd");
+	if (ret < 0) {
+		fprintf(stderr, "generate_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
+		exit(1);
+	}
+
+	ret = gnutls_pkcs12_verify_mac(pkcs12, "passwd");
+	if (ret < 0) {
+		fprintf(stderr, "verify_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
+		exit(1);
+	}
+
+	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA512, "passwd1");
+	if (ret < 0) {
+		fprintf(stderr, "generate_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
+		exit(1);
+	}
+
+	ret = gnutls_pkcs12_verify_mac(pkcs12, "passwd1");
+	if (ret < 0) {
+		fprintf(stderr, "verify_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);
 	}
 
@@ -207,7 +237,7 @@ void doit(void)
 	    gnutls_pkcs12_export(pkcs12, GNUTLS_X509_FMT_PEM, outbuf,
 				 &size);
 	if (ret < 0) {
-		fprintf(stderr, "pkcs12_export: %d", ret);
+		fprintf(stderr, "pkcs12_export: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);
 	}
 
