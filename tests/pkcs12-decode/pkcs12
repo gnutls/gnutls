@@ -57,5 +57,13 @@ if test $rc != 0; then
 	ret=1
 fi
 
+file=sha256.p12
+$CERTTOOL --p12-info --inder --password 1234 --infile $srcdir/$file >/dev/null 2>&1
+rc=$?
+if test $rc != 0; then
+	echo "PKCS12 FATAL $file"
+	ret=1
+fi
+
 #echo "NEON PKCS12 DONE (rc $ret)"
 exit $ret
