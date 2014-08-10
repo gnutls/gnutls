@@ -1325,19 +1325,19 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
 
 /**
  * gnutls_pkcs12_simple_parse:
- * @p12: the PKCS12 blob.
- * @password: optional password used to decrypt PKCS12 blob, bags and keys.
+ * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @password: optional password used to decrypt the structure, bags and keys.
  * @key: a structure to store the parsed private key.
  * @chain: the corresponding to key certificate chain (may be %NULL)
  * @chain_len: will be updated with the number of additional (may be %NULL)
  * @extra_certs: optional pointer to receive an array of additional
- *               certificates found in the PKCS12 blob (may be %NULL).
+ *               certificates found in the PKCS12 structure (may be %NULL).
  * @extra_certs_len: will be updated with the number of additional
  *                   certs (may be %NULL).
  * @crl: an optional structure to store the parsed CRL (may be %NULL).
  * @flags: should be zero or one of GNUTLS_PKCS12_SP_*
  *
- * This function parses a PKCS12 blob in @p12blob and extracts the
+ * This function parses a PKCS12 structure in @pkcs12 and extracts the
  * private key, the corresponding certificate chain, any additional
  * certificates and a CRL.
  *
@@ -1350,7 +1350,7 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
  * only with password based security and the same password for all
  * operations.
  *
- * Note that a PKCS12 file may contain many keys and/or certificates,
+ * Note that a PKCS12 structure may contain many keys and/or certificates,
  * and there is no way to identify which key/certificate pair you want.
  * For this reason this function is useful for PKCS12 files that contain 
  * only one key/certificate pair and/or one CRL.
@@ -1362,6 +1362,9 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
  * certificates, to comply with TLS' requirements. If, however, the flag 
  * %GNUTLS_PKCS12_SP_INCLUDE_SELF_SIGNED is specified then
  * self signed certificates will be included in the chain.
+ *
+ * Prior to using this function the PKCS #12 structure integrity must
+ * be verified using gnutls_pkcs12_verify_mac().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
