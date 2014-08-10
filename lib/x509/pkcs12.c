@@ -840,6 +840,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	mac_hd_st td1;
 	gnutls_datum_t tmp = { NULL, 0 };
 	uint8_t sha_mac[20];
+	const mac_entry_st *me = mac_to_entry(GNUTLS_MAC_SHA1);
 
 	if (pkcs12 == NULL) {
 		gnutls_assert();
@@ -881,7 +882,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	/* Generate the key.
 	 */
 	result =
-	    _gnutls_pkcs12_string_to_key(3 /*MAC*/, salt, sizeof(salt),
+	    _gnutls_pkcs12_string_to_key(me, 3 /*MAC*/, salt, sizeof(salt),
 					 iter, pass, sizeof(key), key);
 	if (result < 0) {
 		gnutls_assert();
@@ -898,7 +899,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 	/* MAC the data
 	 */
-	result = _gnutls_mac_init(&td1, mac_to_entry(GNUTLS_MAC_SHA1),
+	result = _gnutls_mac_init(&td1, me,
 				  key, sizeof(key));
 	if (result < 0) {
 		gnutls_assert();
@@ -959,15 +960,19 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
  **/
 int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 {
-	uint8_t key[20];
+	uint8_t key[MAX_HASH_SIZE];
+	char oid[MAX_OID_SIZE];
 	int result;
 	unsigned int iter;
 	int len;
 	mac_hd_st td1;
 	gnutls_datum_t tmp = { NULL, 0 }, salt = {
 	NULL, 0};
-	uint8_t sha_mac[20];
-	uint8_t sha_mac_orig[20];
+	uint8_t mac_output[MAX_HASH_SIZE];
+	uint8_t mac_output_orig[MAX_HASH_SIZE];
+	gnutls_mac_algorithm_t algo;
+	unsigned mac_len, key_len;
+	const mac_entry_st *entry;
 
 	if (pkcs12 == NULL) {
 		gnutls_assert();
@@ -976,7 +981,6 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 	/* read the iterations
 	 */
-
 	result =
 	    _gnutls_x509_read_uint(pkcs12->pkcs12, "macData.iterations",
 				   &iter);
@@ -984,23 +988,44 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 		iter = 1;	/* the default */
 	}
 
+	len = sizeof(oid);
+	result =
+	    asn1_read_value(pkcs12->pkcs12, "macData.mac.digestAlgorithm.algorithm",
+			    oid, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	algo = _gnutls_x509_oid_to_mac(oid);
+	if (algo == GNUTLS_MAC_UNKNOWN) {
+ unknown_mac:
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
+	}
+
+	entry = mac_to_entry(algo);
+	if (entry == NULL)
+		goto unknown_mac;
+
+	mac_len = _gnutls_mac_get_algo_len(entry);
+	key_len = mac_len;
 
 	/* Read the salt from the structure.
 	 */
 	result =
 	    _gnutls_x509_read_value(pkcs12->pkcs12, "macData.macSalt",
 				    &salt);
-	if (result != ASN1_SUCCESS) {
+	if (result < 0) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
 	/* Generate the key.
 	 */
 	result =
-	    _gnutls_pkcs12_string_to_key(3 /*MAC*/, salt.data, salt.size,
-					 iter, pass, sizeof(key), key);
+	    _gnutls_pkcs12_string_to_key(entry, 3 /*MAC*/, salt.data, salt.size,
+					 iter, pass, key_len, key);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1018,8 +1043,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 	/* MAC the data
 	 */
-	result = _gnutls_mac_init(&td1, mac_to_entry(GNUTLS_MAC_SHA1),
-				  key, sizeof(key));
+	result = _gnutls_mac_init(&td1, entry, key, key_len);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1028,19 +1052,20 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 	_gnutls_mac(&td1, tmp.data, tmp.size);
 	_gnutls_free_datum(&tmp);
 
-	_gnutls_mac_deinit(&td1, sha_mac);
+	_gnutls_mac_deinit(&td1, mac_output);
 
-	len = sizeof(sha_mac_orig);
+	len = sizeof(mac_output_orig);
 	result =
 	    asn1_read_value(pkcs12->pkcs12, "macData.mac.digest",
-			    sha_mac_orig, &len);
+			    mac_output_orig, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	if (memcmp(sha_mac_orig, sha_mac, sizeof(sha_mac)) != 0) {
+	if ((unsigned)len != mac_len ||
+	    memcmp(mac_output_orig, mac_output, len) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MAC_VERIFY_FAILED;
 	}

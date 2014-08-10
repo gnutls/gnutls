@@ -810,7 +810,8 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 
 		if (enc_params->iv_size) {
 			result =
-			    _gnutls_pkcs12_string_to_key(2 /*IV*/,
+			    _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1),
+			    				 2 /*IV*/,
 							 kdf_params->salt,
 							 kdf_params->
 							 salt_size,
@@ -1686,7 +1687,8 @@ decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 		break;
 	default:
 		result =
-		    _gnutls_pkcs12_string_to_key(1 /*KEY*/,
+		    _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1),
+		    			         1 /*KEY*/,
 						 kdf_params->salt,
 						 kdf_params->salt_size,
 						 kdf_params->iter_count,
@@ -2018,7 +2020,8 @@ generate_key(schema_id schema,
 
 	default:
 		ret =
-		    _gnutls_pkcs12_string_to_key(1 /*KEY*/,
+		    _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1),
+		    				 1 /*KEY*/,
 						 kdf_params->salt,
 						 kdf_params->salt_size,
 						 kdf_params->iter_count,
@@ -2034,7 +2037,8 @@ generate_key(schema_id schema,
 		 */
 		if (enc_params->iv_size) {
 			ret =
-			    _gnutls_pkcs12_string_to_key(2 /*IV*/,
+			    _gnutls_pkcs12_string_to_key(mac_to_entry(GNUTLS_MAC_SHA1),
+							 2 /*IV*/,
 							 kdf_params->salt,
 							 kdf_params->
 							 salt_size,
