@@ -2997,6 +2997,13 @@ void pkcs12_info(common_info_st * cinfo)
 {
 	gnutls_pkcs12_t pkcs12;
 	gnutls_pkcs12_bag_t bag;
+	gnutls_mac_algorithm_t mac_algo;
+	char *mac_oid = NULL;
+	char hex[64+1];
+	size_t hex_size = sizeof(hex);
+	char salt[32];
+	unsigned int salt_size;
+	unsigned int mac_iter;
 	int result;
 	size_t size;
 	gnutls_datum_t data;
@@ -3017,6 +3024,32 @@ void pkcs12_info(common_info_st * cinfo)
 	if (result < 0) {
 		fprintf(stderr, "p12_import: %s\n", gnutls_strerror(result));
 		exit(1);
+	}
+
+	salt_size = sizeof(salt);
+	result = gnutls_pkcs12_mac_info(pkcs12, &mac_algo, salt, &salt_size, &mac_iter, &mac_oid);
+	if (result == GNUTLS_E_UNKNOWN_HASH_ALGORITHM) {
+		fprintf(outfile, "MAC info:\n");
+		if (mac_oid != NULL)
+			fprintf(outfile, "\tMAC: unknown (%s)\n", mac_oid);
+	} else if (result >= 0) {
+		gnutls_datum_t bin;
+
+		fprintf(outfile, "MAC info:\n");
+		fprintf(outfile, "\tMAC: %s (%s)\n", gnutls_mac_get_name(mac_algo), mac_oid);
+
+		bin.data = (void*)salt;
+		bin.size = salt_size;
+		result = gnutls_hex_encode(&bin, hex, &hex_size);
+		if (result < 0) {
+			fprintf(stderr, "hex encode error: %s\n",
+				gnutls_strerror(result));
+			exit(1);
+		}
+
+		fprintf(outfile, "\tSalt: %s\n", hex);
+		fprintf(outfile, "\tSalt size: %u\n", salt_size);
+		fprintf(outfile, "\tIteration count: %u\n\n", mac_iter);
 	}
 
 	pass = get_password(cinfo, NULL, 0);
