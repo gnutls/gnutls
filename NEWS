@@ -11,6 +11,9 @@ See the end for copying conditions.
 That improves compatibility with certain PKCS #11 modules. Contributed by
 Wolfgang Meyer zu Bergsten.
 
+** libgnutls: gnutls_pkcs12_verify_mac() will not fail in other than SHA1
+algorithms.
+
 ** API and ABI modifications:
 No changes since last version.
 
