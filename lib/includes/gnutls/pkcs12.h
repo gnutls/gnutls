@@ -56,6 +56,7 @@ int gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
 int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag);
 
 int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass);
+int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t mac, const char *pass);
 int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass);
 
 int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag_t bag, const char *pass);
