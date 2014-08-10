@@ -22,6 +22,7 @@ when available.
 when available.
 
 ** API and ABI modifications:
+gnutls_pkcs12_generate_mac2: Added
 gnutls_pkcs12_mac_info: Added
 gnutls_pkcs12_bag_enc_info: Added
 gnutls_pkcs8_info: Added
