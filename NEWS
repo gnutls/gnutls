@@ -18,10 +18,11 @@ even if the password is not available.
 ** certtool: --key-info option will print PKCS #8 encryption information
 when available.
 
-** certtool: --p12-info option will print PKCS #12 encryption information
+** certtool: --p12-info option will print PKCS #12 MAC and cipher information
 when available.
 
 ** API and ABI modifications:
+gnutls_pkcs12_mac_info: Added
 gnutls_pkcs12_bag_enc_info: Added
 gnutls_pkcs8_info: Added
 gnutls_pkcs_schema_get_name: Added
