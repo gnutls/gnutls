@@ -30,7 +30,6 @@
 
 #include "../lib/gnutls_int.h"
 #include "../lib/gnutls_hash_int.h"
-#include <nettle/pbkdf2.h>
 #include "../lib/debug.h"
 
 static void tls_log_func(int level, const char *str)
@@ -80,17 +79,6 @@ void doit(void)
 			hexprint(digest, 20);
 			fail("gnutls_hmac_fast(SHA1) failure\n");
 		}
-	}
-
-	pbkdf2_hmac_sha1(8, (unsigned char*)"password", 4711, 4, (unsigned char *)"salt", 16, digest);
-	if (memcmp(digest, "\x09\xb7\x85\x57\xdd\xf6\x07\x15"
-		   "\x1c\x52\x34\xde\xba\x5c\xdc\x59", 16) == 0) {
-		if (debug)
-			success
-			    ("_gnutls_pkcs5_pbkdf2_sha1() OK\n");
-	} else {
-		hexprint(digest, 16);
-		fail("_gnutls_pkcs5_pbkdf2_sha1() failure\n");
 	}
 
 	gnutls_global_deinit();
