@@ -844,10 +844,11 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 	uint8_t mac_out[MAX_HASH_SIZE];
 	const mac_entry_st *me = mac_to_entry(mac);
 
-	if (pkcs12 == NULL || me == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
+	if (pkcs12 == NULL || me == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (me->oid == NULL)
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
 	mac_size = _gnutls_mac_get_algo_len(me);
 
