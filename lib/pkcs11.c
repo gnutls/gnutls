@@ -3519,7 +3519,7 @@ char *gnutls_pkcs11_obj_flags_get_str(unsigned int flags)
 
 	_gnutls_buffer_init(&str);
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP)
-		_gnutls_buffer_append_str(&str, "CKA_WRAP; ");
+		_gnutls_buffer_append_str(&str, "CKA_WRAP/UNWRAP; ");
 
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_CA)
 		_gnutls_buffer_append_str(&str, "CKA_CERTIFICATE_CATEGORY=CA; ");
