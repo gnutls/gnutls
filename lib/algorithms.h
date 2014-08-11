@@ -75,7 +75,8 @@ int _gnutls_version_has_explicit_iv(const version_entry_st * ver)
 }
 
 /* Functions for MACs. */
-const mac_entry_st *mac_to_entry(gnutls_mac_algorithm_t c);
+const mac_entry_st *_gnutls_mac_to_entry(gnutls_mac_algorithm_t c);
+#define mac_to_entry(x) _gnutls_mac_to_entry(x)
 #define hash_to_entry(x) mac_to_entry((gnutls_mac_algorithm_t)(x))
 
 inline static int _gnutls_mac_is_ok(const mac_entry_st * e)
