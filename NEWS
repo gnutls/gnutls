@@ -14,6 +14,9 @@ X520countryName element.
 
 ** libgnutls: initialize parameters variable on PKCS #8 decryption.
 
+** libgnutls: gnutls_pkcs12_verify_mac() will not fail in other than SHA1
+algorithms.
+
 ** p11tool: will not implicitly enable so-login for certain types of
 objects. That avoids issues with tokens that require different login
 types.
