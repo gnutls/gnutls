@@ -23,6 +23,9 @@ available.
 
 ** libgnutls: initialize parameters variable on PKCS #8 decryption.
 
+** libgnutls: gnutls_pkcs12_verify_mac() will not fail in other than SHA1
+algorithms.
+
 ** p11tool: Added --info parameter.
 
 ** certtool: Added --mark-wrap parameter.
