@@ -54,7 +54,7 @@ static const mac_entry_st hash_algorithms[] = {
 #define GNUTLS_HASH_ALG_LOOP(a) \
                         GNUTLS_HASH_LOOP( if(p->id == algorithm) { a; break; } )
 
-const mac_entry_st *mac_to_entry(gnutls_mac_algorithm_t c)
+const mac_entry_st *_gnutls_mac_to_entry(gnutls_mac_algorithm_t c)
 {
 	GNUTLS_HASH_LOOP(if (c == p->id) return p);
 
