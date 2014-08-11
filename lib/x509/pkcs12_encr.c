@@ -88,10 +88,11 @@ _gnutls_pkcs12_string_to_key(const mac_entry_st * me,
 	else
 		pwlen = strlen(pw);
 
-	if (pwlen > MAX_PASS_LEN) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
+	if (pwlen > MAX_PASS_LEN)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (me->block_size != 64)
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
 	if ((rc = _pkcs12_check_pass(pw, pwlen)) < 0) {
 		gnutls_assert();
