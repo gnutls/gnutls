@@ -55,7 +55,8 @@ _pkcs12_check_pass (const char *pass, size_t plen)
  * NULL password, and for the password with zero length.
  */
 int
-_gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
+_gnutls_pkcs12_string_to_key (gnutls_mac_algorithm_t algo,
+                              unsigned int id, const uint8_t * salt,
                               unsigned int salt_size, unsigned int iter,
                               const char *pw, unsigned int req_keylen,
                               uint8_t * keybuf)
@@ -66,10 +67,11 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
   bigint_t num_b1 = NULL, num_ij = NULL;
   bigint_t mpi512 = NULL;
   unsigned int pwlen;
-  uint8_t hash[20], buf_b[64], buf_i[MAX_PASS_LEN*2+64], *p;
+  uint8_t hash[MAX_HASH_SIZE], buf_b[64], buf_i[MAX_PASS_LEN*2+64], *p;
   uint8_t d[64];
   size_t cur_keylen;
   size_t n, m, p_size, i_size;
+  unsigned mac_len;
   const uint8_t buf_512[] =      /* 2^64 */
   { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -129,10 +131,11 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
     memset (p, 0, p_size);
 
   i_size = 64+p_size;
+  mac_len = _gnutls_hmac_get_algo_len(algo);
 
   for (;;)
     {
-      rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
+      rc = _gnutls_hash_init (&md, algo);
       if (rc < 0)
         {
           gnutls_assert ();
@@ -144,14 +147,14 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
       _gnutls_hash_deinit (&md, hash);
       for (i = 1; i < iter; i++)
         {
-          rc = _gnutls_hash_fast (GNUTLS_MAC_SHA1, hash, 20, hash);
+          rc = _gnutls_hash_fast (algo, hash, mac_len, hash);
           if (rc < 0)
             {
               gnutls_assert ();
               goto cleanup;
             }
         }
-      for (i = 0; i < 20 && cur_keylen < req_keylen; i++)
+      for (i = 0; i < mac_len && cur_keylen < req_keylen; i++)
         keybuf[cur_keylen++] = hash[i];
       if (cur_keylen == req_keylen)
         {
@@ -161,7 +164,7 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
 
       /* need more bytes. */
       for (i = 0; i < 64; i++)
-        buf_b[i] = hash[i % 20];
+        buf_b[i] = hash[i % mac_len];
       n = 64;
       rc = _gnutls_mpi_scan (&num_b1, buf_b, n);
       if (rc < 0)
