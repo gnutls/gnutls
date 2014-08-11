@@ -127,7 +127,7 @@ doit (void)
       for (j = 0; j < 3; j++)
         {
           rc =
-            _gnutls_pkcs12_string_to_key (i, salt[j], strlen ((char*)salt[j]),
+            _gnutls_pkcs12_string_to_key (GNUTLS_MAC_SHA1, i, salt[j], strlen ((char*)salt[j]),
                                           j + i + 15, pw[j], sizeof (key),
                                           key);
           if (rc < 0)
@@ -150,7 +150,7 @@ doit (void)
 
   for (i = 0; i < sizeof (tv) / sizeof (tv[0]); i++)
     {
-      rc = _gnutls_pkcs12_string_to_key (tv[i].id, tv[i].salt, 8,
+      rc = _gnutls_pkcs12_string_to_key (GNUTLS_MAC_SHA1, tv[i].id, tv[i].salt, 8,
                                          tv[i].iter, tv[i].password,
                                          tv[i].keylen, key);
       if (rc < 0)
