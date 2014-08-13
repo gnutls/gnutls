@@ -1089,8 +1089,8 @@ void doit(void)
 		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 	ret = gnutls_x509_crt_check_hostname(x509, "www.example3.com");
-	if (!ret)
-		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
+	if (ret)
+		fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
 
 #ifdef ENABLE_OPENPGP
 	if (debug)
