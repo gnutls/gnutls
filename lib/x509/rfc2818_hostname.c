@@ -156,7 +156,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	 *  either of these may be of the form: *.domain.tld
 	 *
 	 *  only try (2) if there is no subjectAltName extension of
-	 *  type dNSName
+	 *  type dNSName, and there is a single CN.
 	 */
 
 	/* Check through all included subjectAltName extensions, comparing
@@ -180,22 +180,22 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	}
 
 	if (!found_dnsname) {
-		unsigned prev_size = 0;
 		/* not got the necessary extension, use CN instead
 		 */
-		for (i=0;;i++) {
-			dnsnamesize = sizeof(dnsname);
-			ret = gnutls_x509_crt_get_dn_by_oid
-				(cert, OID_X520_COMMON_NAME, i, 0, dnsname,
-				 &dnsnamesize);
-			if (ret < 0) {
-				if (i == 0 || ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-					return 0;
-				dnsnamesize = prev_size;
-				break;
-			}
-			prev_size = dnsnamesize;
-		}
+		dnsnamesize = sizeof(dnsname);
+		ret = gnutls_x509_crt_get_dn_by_oid
+			(cert, OID_X520_COMMON_NAME, 0, 0, dnsname,
+			 &dnsnamesize);
+		if (ret < 0)
+			return 0;
+
+		/* enforce the RFC6125 (§1.8) requirement that only
+		 * a single CN must be present */
+		ret = gnutls_x509_crt_get_dn_by_oid
+			(cert, OID_X520_COMMON_NAME, 1, 0, dnsname,
+			 &dnsnamesize);
+		if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			return 0;
 
 		if (_gnutls_hostname_compare
 		    (dnsname, dnsnamesize, hostname, flags)) {
