@@ -26,6 +26,10 @@ available.
 ** libgnutls: gnutls_pkcs12_verify_mac() will not fail in other than SHA1
 algorithms.
 
+** libgnutls: gnutls_x509_crt_check_hostname() will follow the RFC6125
+requirement of checking the Common Name (CN) part of DN only if there is
+a single CN present in the certificate.
+
 ** p11tool: Added --info parameter.
 
 ** certtool: Added --mark-wrap parameter.
