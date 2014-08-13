@@ -625,7 +625,7 @@ static int get_cert(socket_st *hd, const char *hostname, unsigned udp, int fd)
 	gnutls_transport_set_int(session, hd->fd);
 
 	gnutls_set_default_priority(session);
-	if (hostname && !isdigit(hostname[0])) {
+	if (hostname && is_ip(hostname)==0) {
 		gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
 	}
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);

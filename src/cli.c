@@ -631,7 +631,7 @@ static gnutls_session_t init_tls_session(const char *hostname)
 	/* allow the use of private ciphersuites.
 	 */
 	if (disable_extensions == 0 && disable_sni == 0) {
-		if (!isdigit(hostname[0]) && strchr(hostname, ':') == 0)
+		if (hostname != NULL && is_ip(hostname) == 0)
 			gnutls_server_name_set(session, GNUTLS_NAME_DNS,
 					       hostname, strlen(hostname));
 	}
