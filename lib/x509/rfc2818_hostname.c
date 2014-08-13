@@ -180,21 +180,23 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	}
 
 	if (!found_dnsname) {
-		/* not got the necessary extension, use CN instead
+		/* did not get the necessary extension, use CN instead
 		 */
+
+		/* enforce the RFC6125 (§1.8) requirement that only
+		 * a single CN must be present */
+		dnsnamesize = sizeof(dnsname);
+		ret = gnutls_x509_crt_get_dn_by_oid
+			(cert, OID_X520_COMMON_NAME, 1, 0, dnsname,
+			 &dnsnamesize);
+		if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			return 0;
+
 		dnsnamesize = sizeof(dnsname);
 		ret = gnutls_x509_crt_get_dn_by_oid
 			(cert, OID_X520_COMMON_NAME, 0, 0, dnsname,
 			 &dnsnamesize);
 		if (ret < 0)
-			return 0;
-
-		/* enforce the RFC6125 (§1.8) requirement that only
-		 * a single CN must be present */
-		ret = gnutls_x509_crt_get_dn_by_oid
-			(cert, OID_X520_COMMON_NAME, 1, 0, dnsname,
-			 &dnsnamesize);
-		if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			return 0;
 
 		if (_gnutls_hostname_compare
