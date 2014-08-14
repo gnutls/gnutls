@@ -1303,6 +1303,16 @@ static void cmd_parser(int argc, char **argv)
 	if (rest == NULL && argc > 0)
 		rest = argv[0];
 
+
+	if (HAVE_OPT(FIPS140_MODE)) {
+		if (gnutls_fips140_mode_enabled() != 0) {
+			fprintf(stderr, "library is in FIPS140-2 mode\n");
+			exit(0);
+		}
+		fprintf(stderr, "library is NOT in FIPS140-2 mode\n");
+		exit(1);
+	}
+
 	if (HAVE_OPT(BENCHMARK_CIPHERS)) {
 		benchmark_cipher(OPT_VALUE_DEBUG);
 		exit(0);

@@ -343,13 +343,18 @@ flag = {
     doc       = "Change the default (^) delimiter used for inline commands. The delimiter is expected to be a single US-ASCII character (octets 0 - 127). This option is only relevant if inline commands are enabled via the inline-commands option";
 };
 
-
 flag = {
     name      = provider;
     arg-type  = file;
     file-exists = yes;
     descrip   = "Specify the PKCS #11 provider library";
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
+};
+
+flag = {
+    name      = fips140-mode;
+    descrip   = "Reports the status of the FIPS140-2 mode in gnutls library";
+    doc      = "";
 };
 
 doc-section = {
