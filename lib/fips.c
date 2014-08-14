@@ -47,10 +47,22 @@ unsigned _gnutls_fips_mode_enabled(void)
 unsigned f1p = 0, f2p;
 FILE* fd;
 static int fips_mode = -1;
+const char *p;
 
 	if (fips_mode != -1)
 		return fips_mode;
-		
+
+	p = getenv("GNUTLS_FORCE_FIPS_MODE");
+	if (p) {
+		if (p[0] == '1')
+			fips_mode = 1;
+		else if (p[0] == '2')
+			fips_mode = 2;
+		else
+			fips_mode = 0;
+		return fips_mode;
+	}
+
 	fd = fopen(FIPS_KERNEL_FILE, "r");
 	if (fd != NULL) {
 		f1p = fgetc(fd);
