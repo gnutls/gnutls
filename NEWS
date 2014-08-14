@@ -30,6 +30,9 @@ algorithms.
 requirement of checking the Common Name (CN) part of DN only if there is
 a single CN present in the certificate.
 
+** libgnutls: The environment variable GNUTLS_FORCE_FIPS_MODE can be used
+to force the FIPS mode, when set to 1.
+
 ** p11tool: Added --info parameter.
 
 ** certtool: Added --mark-wrap parameter.
