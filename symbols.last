@@ -28,6 +28,7 @@ _gnutls_get_cred@GNUTLS_PRIVATE
 _gnutls_lib_simulate_error@GNUTLS_PRIVATE
 _gnutls_log@GNUTLS_PRIVATE
 _gnutls_log_level@GNUTLS_PRIVATE
+_gnutls_mac_to_entry@GNUTLS_PRIVATE
 _gnutls_mpi_log@GNUTLS_PRIVATE
 _gnutls_mpi_ops@GNUTLS_PRIVATE
 _gnutls_pbkdf2_sha1@GNUTLS_PRIVATE
