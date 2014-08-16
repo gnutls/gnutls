@@ -118,6 +118,24 @@ _decode_pkcs12_auth_safe(ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
 	return result;
 }
 
+static int pkcs12_reinit(gnutls_pkcs12_t pkcs12)
+{
+int result;
+
+	if (pkcs12->pkcs12)
+		asn1_delete_structure(&pkcs12->pkcs12);
+
+	result = asn1_create_element(_gnutls_get_pkix(),
+					 "PKIX1.pkcs-12-PFX",
+					 &pkcs12->pkcs12);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
 /**
  * gnutls_pkcs12_init:
  * @pkcs12: The structure to be initialized
@@ -134,13 +152,11 @@ int gnutls_pkcs12_init(gnutls_pkcs12_t * pkcs12)
 	*pkcs12 = gnutls_calloc(1, sizeof(gnutls_pkcs12_int));
 
 	if (*pkcs12) {
-		int result = asn1_create_element(_gnutls_get_pkix(),
-						 "PKIX1.pkcs-12-PFX",
-						 &(*pkcs12)->pkcs12);
-		if (result != ASN1_SUCCESS) {
+		int result = pkcs12_reinit(*pkcs12);
+		if (result < 0) {
 			gnutls_assert();
 			gnutls_free(*pkcs12);
-			return _gnutls_asn2err(result);
+			return result;
 		}
 		return 0;	/* success */
 	}
@@ -210,6 +226,15 @@ gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12,
 
 		need_free = 1;
 	}
+
+	if (pkcs12->expanded) {
+		result = pkcs12_reinit(pkcs12);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+	pkcs12->expanded = 1;
 
 	result =
 	    asn1_der_decoding(&pkcs12->pkcs12, _data.data, _data.size,

@@ -57,6 +57,12 @@ int gnutls_x509_privkey_init(gnutls_x509_privkey_t * key)
 	return GNUTLS_E_MEMORY_ERROR;
 }
 
+void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key)
+{
+	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
+	key->key = ASN1_TYPE_EMPTY;
+}
+
 /**
  * gnutls_x509_privkey_deinit:
  * @key: The structure to be deinitialized
@@ -500,6 +506,11 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 
 		need_free = 1;
 	}
+
+	if (key->expanded) {
+		_gnutls_x509_privkey_reinit(key);
+	}
+	key->expanded = 1;
 
 	if (key->pk_algorithm == GNUTLS_PK_RSA) {
 		key->key =

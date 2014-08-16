@@ -218,6 +218,8 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		}
 	}
 
+	cert->expanded = 1;
+
 	result =
 	    asn1_der_decoding(&cert->cert, _data.data, _data.size, NULL);
 	if (result != ASN1_SUCCESS) {
@@ -241,8 +243,6 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		gnutls_assert();
 		goto cleanup;
 	}
-
-	cert->expanded = 1;
 
 	/* Since we do not want to disable any extension
 	 */

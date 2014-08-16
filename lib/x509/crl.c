@@ -31,6 +31,24 @@
 #include <x509_int.h>
 #include <gnutls_x509.h>
 
+static int crl_reinit(gnutls_x509_crl_t crl)
+{
+int result;
+
+	if (crl->crl)
+		asn1_delete_structure(&crl->crl);
+
+	result = asn1_create_element(_gnutls_get_pkix(),
+				 "PKIX1.CertificateList",
+				 &crl->crl);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
 /**
  * gnutls_x509_crl_init:
  * @crl: The structure to be initialized
@@ -51,13 +69,11 @@ int gnutls_x509_crl_init(gnutls_x509_crl_t * crl)
 	*crl = gnutls_calloc(1, sizeof(gnutls_x509_crl_int));
 
 	if (*crl) {
-		int result = asn1_create_element(_gnutls_get_pkix(),
-						 "PKIX1.CertificateList",
-						 &(*crl)->crl);
-		if (result != ASN1_SUCCESS) {
+		int result = crl_reinit(*crl);
+		if (result < 0) {
 			gnutls_assert();
 			gnutls_free(*crl);
-			return _gnutls_asn2err(result);
+			return result;
 		}
 		return 0;	/* success */
 	}
@@ -126,6 +142,15 @@ gnutls_x509_crl_import(gnutls_x509_crl_t crl,
 
 		need_free = 1;
 	}
+
+	if (crl->expanded) {
+		result = crl_reinit(crl);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+	crl->expanded = 1;
 
 	result =
 	    asn1_der_decoding(&crl->crl, _data.data, _data.size, NULL);

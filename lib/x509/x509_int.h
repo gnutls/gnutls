@@ -51,6 +51,7 @@ struct gnutls_x509_crl_iter {
 typedef struct gnutls_x509_crl_int {
 	ASN1_TYPE crl;
 
+	unsigned expanded;
 	/* This is used to optimize reads by gnutls_x509_crl_get_crt_serial2() */
 	ASN1_TYPE rcache;
 	unsigned rcache_idx;
@@ -86,6 +87,7 @@ typedef struct gnutls_x509_privkey_int {
 	gnutls_pk_params_st params;
 
 	gnutls_pk_algorithm_t pk_algorithm;
+	unsigned expanded;
 
 	ASN1_TYPE key;
 } gnutls_x509_privkey_int;
@@ -174,6 +176,8 @@ int _gnutls_x509_verify_data(const mac_entry_st * me,
 			     gnutls_x509_crt_t issuer);
 
 /* privkey.h */
+void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key);
+
 ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t *
 					       raw_key,
 					       gnutls_x509_privkey_t pkey);
@@ -294,6 +298,7 @@ int _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
 
 typedef struct gnutls_pkcs12_int {
 	ASN1_TYPE pkcs12;
+	unsigned expanded;
 } gnutls_pkcs12_int;
 
 #define MAX_BAG_ELEMENTS 32
