@@ -1481,6 +1481,11 @@ gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 		need_free = 1;
 	}
 
+	if (key->expanded) {
+		_gnutls_x509_privkey_reinit(key);
+	}
+	key->expanded = 1;
+
 	/* Here we don't check for password == NULL to maintain a backwards
 	 * compatibility behavior, with old versions that were encrypting using
 	 * a NULL password.
