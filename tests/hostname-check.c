@@ -654,6 +654,32 @@ char pem11[] =
   "=NkXV\n" "-----END PGP PUBLIC KEY BLOCK-----\n";
 #endif
 
+char multi_cns[] = "\n"
+       "Subject: CN=www.example.com,CN=www.example2.com,CN=www.example3.com\n"
+       "\n"
+       "-----BEGIN CERTIFICATE-----\n"
+       "MIIDXzCCAkegAwIBAgIMU+p6uAg2JlqRhAbAMA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
+       "BgNVBAMTBENBLTAwIhgPMjAxNDA4MTIyMDM2MDhaGA85OTk5MTIzMTIzNTk1OVow\n"
+       "UDEYMBYGA1UEAxMPd3d3LmV4YW1wbGUuY29tMRkwFwYDVQQDExB3d3cuZXhhbXBs\n"
+       "ZTIuY29tMRkwFwYDVQQDExB3d3cuZXhhbXBsZTMuY29tMIIBIjANBgkqhkiG9w0B\n"
+       "AQEFAAOCAQ8AMIIBCgKCAQEAqP5QQUqIS2lquM8hYbDHljqHBDWlGtr167DDPwix\n"
+       "oIlnq84Xr1zI5zpJ2t/3U5kGTbRJiVroQCh3cVhiQyGTPSJPK+CJGi3diw5Vc2rK\n"
+       "oAPxaFtaxvE36mLLH2SSuc49b6hhlRpXdWE0TgnsvJojL5V20/CZI23T27fl+DjT\n"
+       "MduU92qH8wdCgp7q3sHZvtvTZuFM+edYvKZjhUz8P7JwiamG0A2UH+NiyicdAOxc\n"
+       "+lfwfoyetJdTHLfwxdCXT4X91xGd9eOW9lIL5BqLuAArODTcmHDmiXpXEO/sEyHq\n"
+       "L96Eawjon0Gz4IRNq7/kwDjSPJOIN0GHq6DtNmXl6J0C5wIDAQABo3YwdDAMBgNV\n"
+       "HRMBAf8EAjAAMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdDwEB/wQFAwMHoAAw\n"
+       "HQYDVR0OBBYEFH6NTStc4XH/M74Meat1sT2o53fUMB8GA1UdIwQYMBaAFK8aMLKE\n"
+       "hAwWmkzQxRkQ1/efnumUMA0GCSqGSIb3DQEBCwUAA4IBAQBdHknM+rddB0ET+UI2\n"
+       "Or8qSNjkqBHwsZqb4hJozXFS35a1CJPQuxPzY13eHpiIfmdWL2EpKnLOU8vtAW9e\n"
+       "qpozMGDyrAuZhxsXUtInbF15C+Yuw9/sqCPK44b5DCtDf6J/N8m8FvdwqO803z1D\n"
+       "MGcSpES5I68+N3dwSRFYNpSLA1ul5MSlnmoffml959kx9hZNcI4N/UqkO1LMCKXX\n"
+       "Nf8kGFyLdPjANcIwL5sqP+Dp4HP3wdf7Ny+KFCZ6zDbpa53gb3G0naMdllK8BMfI\n"
+       "AQ4Y07zSA4K1QMdxeqaMgPIcCDLoKiMXAXNa42+K04F6SOkTjsVx9b5m0oynLt0u\n"
+       "MUjE\n"
+       "-----END CERTIFICATE-----\n";
+
+
 void
 doit (void)
 {
@@ -895,6 +921,31 @@ doit (void)
     fail
       ("%d: Hostname verification should have failed (too many wildcards)\n",
        __LINE__);
+
+  if (debug)
+    success("Testing multi-cns...\n");
+  data.data = (unsigned char *) multi_cns;
+  data.size = strlen(multi_cns);
+
+  ret = gnutls_x509_crt_import(x509, &data, GNUTLS_X509_FMT_PEM);
+  if (ret < 0)
+    fail("%d: gnutls_x509_crt_import: %d\n", __LINE__, ret);
+
+  ret = gnutls_x509_crt_check_hostname(x509, "example.com");
+  if (ret)
+    fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+  ret = gnutls_x509_crt_check_hostname(x509, "www.example.com");
+  if (ret)
+    fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+  ret = gnutls_x509_crt_check_hostname(x509, "www.example2.com");
+  if (ret)
+    fail("%d: Hostname incorrectly matches (%d)\n", __LINE__, ret);
+
+  ret = gnutls_x509_crt_check_hostname(x509, "www.example3.com");
+  if (!ret)
+    fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
 #ifdef ENABLE_OPENPGP
   if (debug)
