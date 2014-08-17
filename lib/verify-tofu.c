@@ -801,7 +801,7 @@ int gnutls_tdb_init(gnutls_tdb_t * tdb)
  * This function will associate a storage function with the
  * trust storage structure. The function is of the following form.
  *
- * gnutls_tdb_store_func(const char* db_name, const char* host,
+ * int gnutls_tdb_store_func(const char* db_name, const char* host,
  *                       const char* service, time_t expiration,
  *                       const gnutls_datum_t* pubkey);
  *
@@ -820,7 +820,7 @@ void gnutls_tdb_set_store_func(gnutls_tdb_t tdb,
  * This function will associate a commitment (hash) storage function with the
  * trust storage structure. The function is of the following form.
  *
- * gnutls_tdb_store_commitment_func(const char* db_name, const char* host,
+ * int gnutls_tdb_store_commitment_func(const char* db_name, const char* host,
  *                       const char* service, time_t expiration,
  *                       gnutls_digest_algorithm_t, const gnutls_datum_t* hash);
  *
@@ -840,7 +840,7 @@ void gnutls_tdb_set_store_commitment_func(gnutls_tdb_t tdb,
  * This function will associate a retrieval function with the
  * trust storage structure. The function is of the following form.
  *
- * gnutls_tdb_verify_func(const char* db_name, const char* host,
+ * int gnutls_tdb_verify_func(const char* db_name, const char* host,
  *                      const char* service, const gnutls_datum_t* pubkey);
  *
  **/
