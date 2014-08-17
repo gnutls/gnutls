@@ -805,6 +805,8 @@ int gnutls_tdb_init(gnutls_tdb_t * tdb)
  *                       const char* service, time_t expiration,
  *                       const gnutls_datum_t* pubkey);
  *
+ * The @db_name should be used to pass any private data to this function.
+ *
  **/
 void gnutls_tdb_set_store_func(gnutls_tdb_t tdb,
 			       gnutls_tdb_store_func store)
@@ -824,6 +826,8 @@ void gnutls_tdb_set_store_func(gnutls_tdb_t tdb,
  *                       const char* service, time_t expiration,
  *                       gnutls_digest_algorithm_t, const gnutls_datum_t* hash);
  *
+ * The @db_name should be used to pass any private data to this function.
+ *
  **/
 void gnutls_tdb_set_store_commitment_func(gnutls_tdb_t tdb,
 					  gnutls_tdb_store_commitment_func
@@ -842,6 +846,11 @@ void gnutls_tdb_set_store_commitment_func(gnutls_tdb_t tdb,
  *
  * int gnutls_tdb_verify_func(const char* db_name, const char* host,
  *                      const char* service, const gnutls_datum_t* pubkey);
+ *
+ * The verify function should return zero on a match, %GNUTLS_E_CERTIFICATE_KEY_MISMATCH
+ * if there is a mismatch and any other negative error code otherwise.
+ *
+ * The @db_name should be used to pass any private data to this function.
  *
  **/
 void gnutls_tdb_set_verify_func(gnutls_tdb_t tdb,
