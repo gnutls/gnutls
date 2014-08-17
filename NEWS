@@ -14,6 +14,9 @@ Wolfgang Meyer zu Bergsten.
 ** libgnutls: gnutls_pkcs12_verify_mac() will not fail in other than SHA1
 algorithms.
 
+** libgnutls: when checking the hostname of a certificate with multiple CNs
+ensure that the "most specific" CN is being used.
+
 ** API and ABI modifications:
 No changes since last version.
 
