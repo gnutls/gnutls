@@ -81,15 +81,21 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
 
   if (!found_dnsname)
     {
-      /* not got the necessary extension, use CN instead
+      unsigned prev_size = 0;
+      /* not got the necessary extension; use the last CN instead
        */
-      dnsnamesize = sizeof (dnsname);
-      if (gnutls_x509_crt_get_dn_by_oid (cert, OID_X520_COMMON_NAME, 0,
-                                         0, dnsname, &dnsnamesize) < 0)
+      for (i=0;;i++) 
         {
-          /* got an error, can't find a name
-           */
-          return 0;
+          dnsnamesize = sizeof (dnsname);
+          ret = gnutls_x509_crt_get_dn_by_oid(cert, OID_X520_COMMON_NAME, i, 0, dnsname, &dnsnamesize);
+          if (ret < 0)
+            {
+              if (i == 0 || ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+                return 0;
+              dnsnamesize = prev_size;
+              break;
+            }
+          prev_size = dnsnamesize;
         }
 
       if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname, 0))
