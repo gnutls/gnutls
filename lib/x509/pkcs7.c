@@ -124,6 +124,24 @@ _decode_pkcs7_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata,
 	return result;
 }
 
+static int pkcs7_reinit(gnutls_pkcs7_t pkcs7)
+{
+	int result;
+
+	asn1_delete_structure(&pkcs7->pkcs7);
+
+	result = asn1_create_element(_gnutls_get_pkix(),
+				     "PKIX1.pkcs-7-ContentInfo",
+				     &pkcs7->pkcs7);
+	if (result != ASN1_SUCCESS) {
+		result = _gnutls_asn2err(result);
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+}
+
 /**
  * gnutls_pkcs7_init:
  * @pkcs7: The structure to be initialized
@@ -140,13 +158,11 @@ int gnutls_pkcs7_init(gnutls_pkcs7_t * pkcs7)
 	*pkcs7 = gnutls_calloc(1, sizeof(gnutls_pkcs7_int));
 
 	if (*pkcs7) {
-		int result = asn1_create_element(_gnutls_get_pkix(),
-						 "PKIX1.pkcs-7-ContentInfo",
-						 &(*pkcs7)->pkcs7);
-		if (result != ASN1_SUCCESS) {
+		int result = pkcs7_reinit(*pkcs7);
+		if (result < 0) {
 			gnutls_assert();
 			gnutls_free(*pkcs7);
-			return _gnutls_asn2err(result);
+			return result;
 		}
 		return 0;	/* success */
 	}
@@ -213,6 +229,14 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 		need_free = 1;
 	}
 
+	if (pkcs7->expanded) {
+		result = pkcs7_reinit(pkcs7);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+	pkcs7->expanded = 1;
 
 	result =
 	    asn1_der_decoding(&pkcs7->pkcs7, _data.data, _data.size, NULL);

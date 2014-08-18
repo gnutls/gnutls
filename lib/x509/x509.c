@@ -34,6 +34,27 @@
 #include <libtasn1.h>
 #include <gnutls_pk.h>
 
+static int crt_reinit(gnutls_x509_crt_t crt)
+{
+	int result;
+
+	_gnutls_free_datum(&crt->raw_dn);
+	_gnutls_free_datum(&crt->raw_issuer_dn);
+
+	asn1_delete_structure(&crt->cert);
+
+	result = asn1_create_element(_gnutls_get_pkix(),
+				     "PKIX1.Certificate",
+				     &crt->cert);
+	if (result != ASN1_SUCCESS) {
+		result = _gnutls_asn2err(result);
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+}
+
 /**
  * gnutls_x509_crt_init:
  * @cert: The structure to be initialized
@@ -204,15 +225,8 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		/* Any earlier asn1_der_decoding will modify the ASN.1
 		   structure, so we need to replace it with a fresh
 		   structure. */
-		asn1_delete_structure(&cert->cert);
-		_gnutls_free_datum(&cert->raw_dn);
-		_gnutls_free_datum(&cert->raw_issuer_dn);
-
-		result = asn1_create_element(_gnutls_get_pkix(),
-					     "PKIX1.Certificate",
-					     &cert->cert);
-		if (result != ASN1_SUCCESS) {
-			result = _gnutls_asn2err(result);
+		result = crt_reinit(cert);
+		if (result < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
@@ -2965,7 +2979,7 @@ gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt_t cert,
 		gnutls_assert();
 		goto cleanup;
 	}
-	
+
 	ret = gnutls_x509_ext_import_key_purposes(&ext, p, 0);
 	if (ret < 0) {
 		gnutls_assert();
@@ -2977,7 +2991,7 @@ gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt_t cert,
 		gnutls_assert();
 		goto cleanup;
 	}
-	
+
 	ret = _gnutls_copy_data(&out, oid, oid_size);
 	if (ret < 0) {
 		gnutls_assert();
