@@ -59,6 +59,8 @@ int gnutls_x509_privkey_init(gnutls_x509_privkey_t * key)
 
 void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key)
 {
+	gnutls_pk_params_clear(&key->params);
+	gnutls_pk_params_release(&key->params);
 	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
 	key->key = ASN1_TYPE_EMPTY;
 }
@@ -74,9 +76,7 @@ void gnutls_x509_privkey_deinit(gnutls_x509_privkey_t key)
 	if (!key)
 		return;
 
-	gnutls_pk_params_clear(&key->params);
-	gnutls_pk_params_release(&key->params);
-	asn1_delete_structure2(&key->key, ASN1_DELETE_FLAG_ZEROIZE);
+	_gnutls_x509_privkey_reinit(key);
 	gnutls_free(key);
 }
 

@@ -45,6 +45,9 @@ int result;
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
+	crl->rcache = NULL;
+	crl->rcache_idx = 0;
+	_gnutls_free_datum(&crl->raw_issuer_dn);
 
 	return 0;
 }

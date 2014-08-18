@@ -78,6 +78,7 @@ typedef struct gnutls_x509_crq_int {
 
 typedef struct gnutls_pkcs7_int {
 	ASN1_TYPE pkcs7;
+	unsigned expanded;
 } gnutls_pkcs7_int;
 
 typedef struct gnutls_x509_privkey_int {
