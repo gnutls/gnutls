@@ -1155,7 +1155,15 @@ void doit(void)
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
+	ret = gnutls_x509_crt_check_hostname(x509, "γΓγ.τόΣτ.gr");
+	if (!ret)
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
+
 	ret = gnutls_x509_crt_check_hostname(x509, "τέστ.gr");
+	if (!ret)
+		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
+
+	ret = gnutls_x509_crt_check_hostname(x509, "ΤΈΣΤ.gr");
 	if (!ret)
 		fail("%d: Hostname incorrectly does not match (%d)\n", __LINE__, ret);
 
