@@ -904,6 +904,7 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
   asn1_node ptail = NULL;
   unsigned char class;
   unsigned long tag;
+  int tag_len;
   int indefinite, result, total_len = *max_ider_len, ider_len = *max_ider_len;
   const unsigned char *der = ider;
 
@@ -927,6 +928,7 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
   p = node;
   while (1)
     {
+      tag_len = 0;
       ris = ASN1_SUCCESS;
       if (move != UP)
 	{
@@ -1060,7 +1062,7 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 
 	  if (ris == ASN1_SUCCESS)
 	    ris =
-	      extract_tag_der_recursive (p, der + counter, ider_len, &len2);
+	      extract_tag_der_recursive (p, der + counter, ider_len, &tag_len);
 
 	  if (ris != ASN1_SUCCESS)
 	    {
@@ -1086,8 +1088,8 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 	    }
 	  else
 	    {
-	      DECR_LEN(ider_len, len2);
-	      counter += len2;
+	      DECR_LEN(ider_len, tag_len);
+	      counter += tag_len;
 	    }
 	}
 
@@ -1361,7 +1363,7 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 	      break;
 	    case ASN1_ETYPE_ANY:
 	      /* Check indefinite lenth method in an EXPLICIT TAG */
-	      if ((p->type & CONST_TAG) && (der[counter - 1] == 0x80))
+	      if ((p->type & CONST_TAG) && tag_len == 2 && (der[counter - 1] == 0x80))
 		indefinite = 1;
 	      else
 	        indefinite = 0;
