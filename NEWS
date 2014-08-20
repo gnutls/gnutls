@@ -12,6 +12,9 @@ structures.
 
 ** libgnutls: Use nettle's PBKDF2 implementation.
 
+** libgnutls: gnutls_x509_crt_check_hostname() and friends will use
+RFC6125 comparison of hostnames. That introduces a dependency on libidn.
+
 ** certtool: Added --p8-info option, which will print PKCS #8 information
 even if the password is not available.
 
@@ -20,6 +23,8 @@ when available.
 
 ** certtool: --p12-info option will print PKCS #12 MAC and cipher information
 when available.
+
+** certtool: it will print the A-label (ACE) names in addition to UTF-8.
 
 ** API and ABI modifications:
 gnutls_pkcs12_generate_mac2: Added
