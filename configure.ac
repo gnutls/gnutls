@@ -293,6 +293,24 @@ if [ test "$enable_fips" = "yes" ];then
   fi
 fi
 
+PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [with_libidn=yes], [with_libidn=no])
+if test "$with_libidn" != "no";then
+	AC_DEFINE([HAVE_LIBIDN], 1, [Build IDNA support])
+	if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+		GNUTLS_REQUIRES_PRIVATE="Requires.private: libidn"
+	else
+		GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libidn"
+	fi
+else
+        with_libidn=no
+        AC_MSG_WARN([[
+*** 
+*** libidn was not found. IDNA support will be disabled.
+*** ]])
+fi
+
+AM_CONDITIONAL(HAVE_LIBIDN, test "$with_libidn" != "no")
+
 AC_ARG_ENABLE(non-suiteb-curves,
   AS_HELP_STRING([--disable-non-suiteb-curves], [disable curves not in SuiteB]),
     enable_non_suiteb=$enableval, enable_non_suiteb=yes)
@@ -684,14 +702,12 @@ AC_CHECK_FUNCS([alarm atexit dup2 epoll_create kqueue memchr memset munmap \
 AC_ARG_ENABLE(crywrap,
 	AS_HELP_STRING([--disable-crywrap], [unconditionally disable the crywrap TLS proxy service]))
 
- libidn=no
 
  if test "x$enable_crywrap" != "xno" ; then
-	PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [libidn=yes], [libidn=no])
 	AC_CHECK_FUNCS([argp_usage],[ac_argp=yes],[ac_argp=no])
  fi
 
- if test "x$libidn" != "xno" && test "$ac_cv_func_daemon" != "no" && test "$ac_argp" != "no";then
+ if test "$ac_cv_func_daemon" != "no" && test "$ac_argp" != "no";then
   crywrap=yes
  fi
 
@@ -813,6 +829,7 @@ if features are disabled)
   RSA-EXPORT support:   $ac_enable_rsa_export
   Anon auth support:    $ac_enable_anon
   Heartbeat support:    $ac_enable_heartbeat
+  IDNA support:         $libidn
   Unicode support:      $ac_have_unicode
   Self checks:          $enable_self_checks
   Non-SuiteB curves:    $enable_non_suiteb
@@ -821,7 +838,7 @@ if features are disabled)
 
 AC_MSG_NOTICE([Optional applications:
 
-  crywrap app:          $libidn
+  crywrap app:          $crywrap
 ])
 
 AC_MSG_NOTICE([Optional libraries:

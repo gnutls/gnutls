@@ -26,6 +26,10 @@
 #include <gnutls_errors.h>
 #include <system.h>
 
+#ifdef HAVE_LIBIDN
+# include <idna.h>
+#endif
+
 /**
  * gnutls_x509_crt_check_hostname:
  * @cert: should contain an gnutls_x509_crt_t structure
@@ -83,6 +87,34 @@ check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size, unsigned flag
 	return 0;
 }
 
+#ifndef HAVE_LIBIDN
+#define IDNA_SUCCESS 0
+
+static inline
+int idna_to_ascii_8z(const char * input, char ** output, int flags)
+{
+	*output = input;
+	return 0;
+}
+
+#define idna_free(x)
+
+static inline
+const char *idna_strerror(int ret)
+{
+	return "";
+}
+#else
+# define idna_free(x) free(x)
+#endif
+
+static int has_embedded_null(const char *str, unsigned size)
+{
+	if (strlen(str) != size)
+		return 1;
+	return 0;
+}
+
 /**
  * gnutls_x509_crt_check_hostname:
  * @cert: should contain an gnutls_x509_crt_t structure
@@ -118,10 +150,12 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	char dnsname[MAX_CN];
 	size_t dnsnamesize;
 	int found_dnsname = 0;
-	int ret = 0;
+	int ret = 0, rc;
 	int i = 0;
 	struct in_addr ipv4;
 	char *p = NULL;
+	char *a_hostname;
+	char *a_dnsname;
 
 	/* check whether @hostname is an ip address */
 	if ((p=strchr(hostname, ':')) != NULL || inet_aton(hostname, &ipv4) != 0) {
@@ -148,6 +182,13 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	}
 
  hostname_fallback:
+	/* convert the provided hostname to ACE-Labels domain. */
+	rc = idna_to_ascii_8z (hostname, &a_hostname, 0);
+	if (rc != IDNA_SUCCESS) {
+		_gnutls_debug_log("unable to convert hostname %s to IDNA format: %s\n", hostname, idna_strerror (rc));
+		a_hostname = (char*)hostname;
+	}
+
 	/* try matching against:
 	 *  1) a DNS name as an alternative name (subjectAltName) extension
 	 *     in the certificate
@@ -172,9 +213,24 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 
 		if (ret == GNUTLS_SAN_DNSNAME) {
 			found_dnsname = 1;
-			if (_gnutls_hostname_compare
-			    (dnsname, dnsnamesize, hostname, flags)) {
-				return 1;
+
+			if (has_embedded_null(dnsname, dnsnamesize)) {
+				_gnutls_debug_log("certificate has %s with embedded null in name\n", dnsname);
+				continue;
+			}
+
+			rc = idna_to_ascii_8z (dnsname, &a_dnsname, 0);
+			if (rc != IDNA_SUCCESS) {
+				_gnutls_debug_log("unable to convert dnsname %s to IDNA format: %s\n", dnsname, idna_strerror (rc));
+				continue;
+			}
+
+			ret = _gnutls_hostname_compare(a_dnsname, strlen(a_dnsname), a_hostname, flags);
+			idna_free(a_dnsname);
+
+			if (ret != 0) {
+				ret = 1;
+				goto cleanup;
 			}
 		}
 	}
@@ -189,23 +245,49 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 		ret = gnutls_x509_crt_get_dn_by_oid
 			(cert, OID_X520_COMMON_NAME, 1, 0, dnsname,
 			 &dnsnamesize);
-		if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-			return 0;
+		if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			ret = 0;
+			goto cleanup;
+		}
 
 		dnsnamesize = sizeof(dnsname);
 		ret = gnutls_x509_crt_get_dn_by_oid
 			(cert, OID_X520_COMMON_NAME, 0, 0, dnsname,
 			 &dnsnamesize);
-		if (ret < 0)
-			return 0;
+		if (ret < 0) {
+			ret = 0;
+			goto cleanup;
+		}
 
-		if (_gnutls_hostname_compare
-		    (dnsname, dnsnamesize, hostname, flags)) {
-			return 1;
+		if (has_embedded_null(dnsname, dnsnamesize)) {
+			_gnutls_debug_log("certificate has CN %s with embedded null in name\n", dnsname);
+			ret = 0;
+			goto cleanup;
+		}
+
+		rc = idna_to_ascii_8z (dnsname, &a_dnsname, 0);
+		if (rc != IDNA_SUCCESS) {
+			_gnutls_debug_log("unable to convert CN %s to IDNA format: %s\n", dnsname, idna_strerror (rc));
+			ret = 0;
+			goto cleanup;
+		}
+
+		ret = _gnutls_hostname_compare(a_dnsname, strlen(a_dnsname), a_hostname, flags);
+
+		idna_free(a_dnsname);
+
+		if (ret != 0) {
+			ret = 1;
+			goto cleanup;
 		}
 	}
 
 	/* not found a matching name
 	 */
-	return 0;
+	ret = 0;
+ cleanup:
+ 	if (a_hostname != hostname) {
+ 		idna_free(a_hostname);
+	}
+ 	return ret;
 }

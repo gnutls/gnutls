@@ -132,6 +132,10 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 thirdparty_libadd = $(LTLIBZ) $(LTLIBINTL) $(LIBSOCKET) \
 	$(LTLIBICONV) $(P11_KIT_LIBS) $(LIB_SELECT) $(TSS_LIBS)
 
+if HAVE_LIBIDN
+thirdparty_libadd += $(LIBIDN_LIBS)
+endif
+
 if ENABLE_NETTLE
 libgnutls_la_LIBADD += accelerated/libaccelerated.la
 endif
