@@ -293,7 +293,7 @@ if [ test "$enable_fips" = "yes" ];then
   fi
 fi
 
-PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [with_libidn=yes], [with_libidn=no])
+PKG_CHECK_MODULES(LIBIDN, libidn >= 0.5.6, [with_libidn=yes], [with_libidn=no])
 if test "$with_libidn" != "no";then
 	AC_DEFINE([HAVE_LIBIDN], 1, [Build IDNA support])
 	if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
