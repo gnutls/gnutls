@@ -30,6 +30,8 @@
 #include <gnutls_num.h>
 #include <gnutls_errors.h>
 #include <extras/randomart.h>
+#include <c-ctype.h>
+#include <gnutls-idna.h>
 
 #ifdef HAVE_INET_NTOP
 # include <arpa/inet.h>
@@ -94,6 +96,7 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 char *sname = (char*)name->data;
 char str_ip[64];
 const char *p;
+unsigned non_ascii = 0, i;
 
 	if ((type == GNUTLS_SAN_DNSNAME
 	     || type == GNUTLS_SAN_RFC822NAME
@@ -107,7 +110,30 @@ const char *p;
 
 	switch (type) {
 	case GNUTLS_SAN_DNSNAME:
-		addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+#ifdef HAVE_LIBIDN
+		for (i=0;i<name->size;i++) {
+			if (c_isascii(name->data[i]) == 0) {
+				non_ascii = 1;
+				break;
+			}
+		}
+#endif
+
+		if (non_ascii != 0) {
+			char *s;
+			int rc;
+
+			rc = idna_to_ascii_8z((char*)name->data, &s, 0);
+			if (rc == IDNA_SUCCESS) {
+				addf(str,  _("%sDNSname: %.*s (%s)\n"), prefix, name->size, NON_NULL(name->data), s);
+				idna_free(s);
+			} else {
+				adds(str, _("note: DNSname is not in UTF-8.\n"));
+				addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+			}
+		} else {
+			addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+		}
 		break;
 
 	case GNUTLS_SAN_RFC822NAME:

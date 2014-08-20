@@ -25,10 +25,7 @@
 #include <common.h>
 #include <gnutls_errors.h>
 #include <system.h>
-
-#ifdef HAVE_LIBIDN
-# include <idna.h>
-#endif
+#include <gnutls-idna.h>
 
 /**
  * gnutls_x509_crt_check_hostname:
@@ -86,27 +83,6 @@ check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size, unsigned flag
 	 */
 	return 0;
 }
-
-#ifndef HAVE_LIBIDN
-#define IDNA_SUCCESS 0
-
-static inline
-int idna_to_ascii_8z(const char * input, char ** output, int flags)
-{
-	*output = input;
-	return 0;
-}
-
-#define idna_free(x)
-
-static inline
-const char *idna_strerror(int ret)
-{
-	return "";
-}
-#else
-# define idna_free(x) free(x)
-#endif
 
 static int has_embedded_null(const char *str, unsigned size)
 {
