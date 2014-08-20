@@ -65,10 +65,10 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
   AC_SUBST(DLL_VERSION)
 
-  PKG_CHECK_MODULES(NETTLE, [nettle >= 2.7], [cryptolib="nettle"], [
+  PKG_CHECK_MODULES(NETTLE, [nettle >= 2.7 nettle < 3.0], [cryptolib="nettle"], [
 AC_MSG_ERROR([[
   *** 
-  *** Libnettle 2.7 was not found. 
+  *** Libnettle 2.7.1 was not found. Note that this version of gnutls doesn't support nettle 3.0.
 ]])
   ])
   PKG_CHECK_MODULES(HOGWEED, [hogweed >= 2.7], [], [
