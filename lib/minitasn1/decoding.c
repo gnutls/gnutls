@@ -1360,6 +1360,12 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 	      move = RIGHT;
 	      break;
 	    case ASN1_ETYPE_ANY:
+	      /* Check indefinite lenth method in an EXPLICIT TAG */
+	      if ((p->type & CONST_TAG) && (der[counter - 1] == 0x80))
+		indefinite = 1;
+	      else
+	        indefinite = 0;
+
 	      if (asn1_get_tag_der
 		  (der + counter, ider_len, &class, &len2,
 		   &tag) != ASN1_SUCCESS)
@@ -1399,12 +1405,6 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 		      goto cleanup;
 		    }
 
-		  /* Check indefinite lenth method in an EXPLICIT TAG */
-		  if ((p->type & CONST_TAG) && (der[counter - 1] == 0x80))
-		    indefinite = 1;
-		  else
-		    indefinite = 0;
-
 		  result =
 		    _asn1_get_indefinite_length_string (der + counter, ider_len, &len2);
 		  if (result != ASN1_SUCCESS)
@@ -1417,23 +1417,25 @@ asn1_der_decoding2 (asn1_node *element, const void *ider, int *max_ider_len,
 		  _asn1_set_value_lv (p, der + counter, len2);
 		  counter += len2;
 
-		  /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
-		     an indefinite length method. */
-		  if (indefinite)
-		    {
-	              DECR_LEN(ider_len, 2);
-		      if (!der[counter] && !der[counter + 1])
-			{
-			  counter += 2;
-			}
-		      else
-			{
-			  result = ASN1_DER_ERROR;
-                          warn();
-			  goto cleanup;
-			}
-		    }
 		}
+
+	        /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
+	           an indefinite length method. */
+	        if (indefinite)
+		  {
+	            DECR_LEN(ider_len, 2);
+		    if (!der[counter] && !der[counter + 1])
+		      {
+		        counter += 2;
+		      }
+		    else
+		      {
+		        result = ASN1_DER_ERROR;
+                        warn();
+		        goto cleanup;
+		      }
+		  }
+
 	      move = RIGHT;
 	      break;
 	    default:
