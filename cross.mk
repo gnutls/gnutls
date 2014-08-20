@@ -1,14 +1,26 @@
 SMP=-j4
 
-GNUTLS_VERSION:=3.2.15
+GNUTLS_VERSION:=3.2.16
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
+
+OPENCONNECT_VERSION:=6.00
+OPENCONNECT_FILE:=openconnect-$(OPENCONNECT_VERSION).tar.gz
+OPENCONNECT_DIR:=openconnect-$(OPENCONNECT_VERSION)
 
 GMP_VERSION=6.0.0
 GMP_VERSIONA=6.0.0a
 GMP_FILE:=gmp-$(GMP_VERSIONA).tar.bz2
 GMP_SERV_DIR:=gmp-$(GMP_VERSIONA)
 GMP_DIR:=gmp-$(GMP_VERSION)
+
+XML2_VERSION=2.9.1
+XML2_FILE:=libxml2-$(XML2_VERSION).tar.gz
+XML2_DIR:=libxml2-$(XML2_VERSION)
+
+LIBZ_VERSION=1.2.8
+LIBZ_FILE:=zlib-$(LIBZ_VERSION).tar.gz
+LIBZ_DIR:=zlib-$(LIBZ_VERSION)
 
 P11_KIT_VERSION=0.20.2
 P11_KIT_FILE:=p11-kit-$(P11_KIT_VERSION).tar.gz
@@ -53,6 +65,8 @@ devpak: gnutls-$(GNUTLS_VERSION)-1gn.DevPak
 
 gnutls-w32: $(GNUTLS_DIR)-w32.zip
 
+openconnect-w32: $(OPENCONNECT_DIR)/.installed
+
 nettle: $(NETTLE_DIR)/.installed
 
 gmp: $(GMP_DIR)/.installed
@@ -65,8 +79,10 @@ $(LIB_DIR):
 
 CONFIG_ENV := PKG_CONFIG_PATH="$(PKG_CONFIG_DIR)"
 CONFIG_ENV += PKG_CONFIG_LIBDIR="$(PKG_CONFIG_DIR)"
-CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static \
-	--bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR) --enable-threads=win32 
+CONFIG_FLAGS1 := --prefix=$(CROSS_DIR) --enable-shared \
+	--libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR)
+CONFIG_FLAGS := --host=i686-w64-mingw32 $(CONFIG_FLAGS1) --disable-static --bindir=$(BIN_DIR) --sbindir=$(BIN_DIR) \
+	 --enable-threads=win32 
 
 $(P11_KIT_DIR)/.configured:
 	test -f $(P11_KIT_FILE) || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE)
@@ -144,9 +160,49 @@ $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 		--enable-gcc-warnings --disable-libdane --disable-openssl-compatibility --with-included-libtasn1 && cd ..
 	touch $@
 
+$(OPENCONNECT_DIR)/.installed: $(OPENCONNECT_DIR)/.configured
+	make -C $(OPENCONNECT_DIR) $(SMP)
+	make -C $(OPENCONNECT_DIR) install -i
+	touch $@
+
+$(OPENCONNECT_DIR)/.configured: $(GNUTLS_DIR)/.installed $(XML2_DIR)/.installed $(LIBZ_DIR)/.installed
+	test -f $(OPENCONNECT_FILE) || wget ftp://ftp.infradead.org/pub/openconnect/$(OPENCONNECT_FILE)
+	test -f $(OPENCONNECT_FILE).sig || wget ftp://ftp.infradead.org/pub/openconnect/$(OPENCONNECT_FILE).asc
+	gpg --verify $(OPENCONNECT_FILE).asc
+	test -d $(OPENCONNECT_DIR) || tar -xf $(OPENCONNECT_FILE)
+	cd $(OPENCONNECT_DIR) && \
+		$(CONFIG_ENV) LDFLAGS="$(LDFLAGS) -L$(LIB_DIR)" CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" \
+		./configure $(CONFIG_FLAGS) && cd ..
+	sed -i 's/-Werror-implicit-function-declaration//g' $(OPENCONNECT_DIR)/Makefile
+	touch $@
+
+$(XML2_DIR)/.configured: $(GMP_DIR)/.installed
+	test -f $(XML2_FILE) || wget ftp://xmlsoft.org/libxml2/$(XML2_FILE)
+	#test -f $(XML2_FILE).sig || wget ftp://xmlsoft.org/libxml2//$(XML2_FILE).sig
+	#gpg --verify $(XML2_FILE).sig
+	test -d $(XML2_DIR) || tar -xf $(XML2_FILE)
+	cd $(XML2_DIR) && CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" LDFLAGS="$(LDFLAGS)" $(CONFIG_ENV) ./configure $(CONFIG_FLAGS) --without-python --without-legacy --without-python --without-http --without-ftp --with-lib-path=$(LIB_DIR) && cd ..
+	touch $@
+
+$(XML2_DIR)/.installed: $(XML2_DIR)/.configured
+	make -C $(XML2_DIR) $(SMP)
+	make -C $(XML2_DIR) install
+	touch $@
+
+$(LIBZ_DIR)/.configured: $(GMP_DIR)/.installed
+	test -f $(LIBZ_FILE) || wget http://zlib.net/$(LIBZ_FILE)
+	test -d $(LIBZ_DIR) || tar -xf $(LIBZ_FILE)
+	cd $(LIBZ_DIR) && CC=i686-w64-mingw32-gcc CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" LDFLAGS="$(LDFLAGS)" $(CONFIG_ENV) ./configure $(CONFIG_FLAGS1) && cd ..
+	sed -i 's/-lc//g' $(LIBZ_DIR)/Makefile
+	touch $@
+
+$(LIBZ_DIR)/.installed: $(LIBZ_DIR)/.configured
+	make -C $(LIBZ_DIR) $(SMP)
+	cp $(LIBZ_DIR)/libz.a $(LIB_DIR)/
+	touch $@
 
 clean:
-	rm -rf $(CROSS_DIR) $(GNUTLS_DIR)/.installed $(NETTLE_DIR)/.installed $(GMP_DIR)/.installed $(P11_KIT_DIR)/.installed
+	rm -rf $(CROSS_DIR) $(XML2_DIR)/.installed $(LIBZ_DIR)/.installed $(GNUTLS_DIR)/.installed $(OPENCONNECT_DIR)/.installed $(NETTLE_DIR)/.installed $(GMP_DIR)/.installed $(P11_KIT_DIR)/.installed
 
 dirclean:
 	rm -rf $(CROSS_DIR) $(GNUTLS_DIR) $(NETTLE_DIR) $(GMP_DIR) $(P11_KIT_DIR)
