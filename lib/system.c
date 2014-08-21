@@ -563,59 +563,7 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
 	return add_system_trust(list, tl_flags, tl_vflags);
 }
 
-#if defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
-
-#include <iconv.h>
-
-int _gnutls_ucs2_to_utf8(const void *data, size_t size,
-			 gnutls_datum_t * output)
-{
-	iconv_t conv;
-	int ret;
-	size_t orig, dstlen = size * 2;
-	char *src = (void *) data;
-	char *dst = NULL, *pdst;
-
-	if (size == 0)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	conv = iconv_open("UTF-8", "UTF-16BE");
-	if (conv == (iconv_t) - 1)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	/* Note that dstlen has enough size for every possible input characters.
-	 * (remember the in UTF-16 the characters in data are at most size/2, 
-	 *  and we allocate 4 bytes per character).
-	 */
-	pdst = dst = gnutls_malloc(dstlen + 1);
-	if (dst == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto fail;
-	}
-
-	orig = dstlen;
-	ret = iconv(conv, &src, &size, &pdst, &dstlen);
-	if (ret == -1) {
-		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-		goto fail;
-	}
-
-	output->data = (void *) dst;
-	output->size = orig - dstlen;
-	output->data[output->size] = 0;
-
-	ret = 0;
-	goto cleanup;
-
-      fail:
-	gnutls_free(dst);
-
-      cleanup:
-	iconv_close(conv);
-
-	return ret;
-}
-#elif defined(_WIN32)
+#if defined(_WIN32)
 #include <winnls.h>
 
 /* Can convert only english */
@@ -676,6 +624,59 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 
       cleanup:
 	gnutls_free(src);
+	return ret;
+}
+
+#elif defined(HAVE_ICONV) || defined(HAVE_LIBICONV)
+
+#include <iconv.h>
+
+int _gnutls_ucs2_to_utf8(const void *data, size_t size,
+			 gnutls_datum_t * output)
+{
+	iconv_t conv;
+	int ret;
+	size_t orig, dstlen = size * 2;
+	char *src = (void *) data;
+	char *dst = NULL, *pdst;
+
+	if (size == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	conv = iconv_open("UTF-8", "UTF-16BE");
+	if (conv == (iconv_t) - 1)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	/* Note that dstlen has enough size for every possible input characters.
+	 * (remember the in UTF-16 the characters in data are at most size/2, 
+	 *  and we allocate 4 bytes per character).
+	 */
+	pdst = dst = gnutls_malloc(dstlen + 1);
+	if (dst == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto fail;
+	}
+
+	orig = dstlen;
+	ret = iconv(conv, &src, &size, &pdst, &dstlen);
+	if (ret == -1) {
+		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		goto fail;
+	}
+
+	output->data = (void *) dst;
+	output->size = orig - dstlen;
+	output->data[output->size] = 0;
+
+	ret = 0;
+	goto cleanup;
+
+      fail:
+	gnutls_free(dst);
+
+      cleanup:
+	iconv_close(conv);
+
 	return ret;
 }
 
