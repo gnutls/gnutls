@@ -40,6 +40,9 @@ unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits)
 {
 	switch (q_bits) {
 	case 160:
+		if (_gnutls_fips_mode_enabled() != 0)
+			return 0;
+
 		if (p_bits != 1024)
 			return 0;
 		break;
