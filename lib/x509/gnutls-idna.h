@@ -27,9 +27,10 @@
 
 #ifdef HAVE_LIBIDN
 # include <idna.h>
-#endif
+# include <idn-free.h>
 
-#ifndef HAVE_LIBIDN
+#else /* #ifndef HAVE_LIBIDN */
+
 #define IDNA_SUCCESS 0
 
 static inline
@@ -39,15 +40,13 @@ int idna_to_ascii_8z(const char * input, char ** output, int flags)
 	return 0;
 }
 
-#define idna_free(x)
+#define idn_free(x)
 
 static inline
 const char *idna_strerror(int ret)
 {
 	return "";
 }
-#else
-# define idna_free(x) free(x)
 #endif
 
 #endif

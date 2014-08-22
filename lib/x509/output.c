@@ -126,7 +126,7 @@ unsigned non_ascii = 0, i;
 			rc = idna_to_ascii_8z((char*)name->data, &s, 0);
 			if (rc == IDNA_SUCCESS) {
 				addf(str,  _("%sDNSname: %.*s (%s)\n"), prefix, name->size, NON_NULL(name->data), s);
-				idna_free(s);
+				idn_free(s);
 			} else {
 				adds(str, _("note: DNSname is not in UTF-8.\n"));
 				addf(str,  _("%sDNSname: %.*s\n"), prefix, name->size, NON_NULL(name->data));

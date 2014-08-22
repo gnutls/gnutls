@@ -202,7 +202,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 			}
 
 			ret = _gnutls_hostname_compare(a_dnsname, strlen(a_dnsname), a_hostname, flags);
-			idna_free(a_dnsname);
+			idn_free(a_dnsname);
 
 			if (ret != 0) {
 				ret = 1;
@@ -250,7 +250,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 
 		ret = _gnutls_hostname_compare(a_dnsname, strlen(a_dnsname), a_hostname, flags);
 
-		idna_free(a_dnsname);
+		idn_free(a_dnsname);
 
 		if (ret != 0) {
 			ret = 1;
@@ -263,7 +263,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	ret = 0;
  cleanup:
  	if (a_hostname != hostname) {
- 		idna_free(a_hostname);
+ 		idn_free(a_hostname);
 	}
  	return ret;
 }
