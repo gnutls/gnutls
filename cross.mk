@@ -149,7 +149,7 @@ $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	-cp $(GCC_DLLS) $(BIN_DIR)/
 	touch $@
 
-$(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
+$(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed #$(P11_KIT_DIR)/.installed
 	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/$(GNUTLS_FILE)
 	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/$(GNUTLS_FILE).sig
 	gpg --verify $(GNUTLS_FILE).sig
@@ -157,7 +157,7 @@ $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 	cd $(GNUTLS_DIR) && \
 		$(CONFIG_ENV) LDFLAGS="$(LDFLAGS) -L$(LIB_DIR)" CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" \
 		./configure $(CONFIG_FLAGS) --enable-local-libopts --disable-cxx \
-		--enable-gcc-warnings --disable-libdane --disable-openssl-compatibility --with-included-libtasn1 && cd ..
+		--disable-nls --without-p11-kit --enable-gcc-warnings --disable-libdane --disable-openssl-compatibility --with-included-libtasn1 && cd ..
 	touch $@
 
 $(OPENCONNECT_DIR)/.installed: $(OPENCONNECT_DIR)/.configured
@@ -165,7 +165,7 @@ $(OPENCONNECT_DIR)/.installed: $(OPENCONNECT_DIR)/.configured
 	make -C $(OPENCONNECT_DIR) install -i
 	touch $@
 
-$(OPENCONNECT_DIR)/.configured: $(GNUTLS_DIR)/.installed $(XML2_DIR)/.installed $(LIBZ_DIR)/.installed
+$(OPENCONNECT_DIR)/.configured: $(GNUTLS_DIR)/.installed $(XML2_DIR)/.installed
 	test -f $(OPENCONNECT_FILE) || wget ftp://ftp.infradead.org/pub/openconnect/$(OPENCONNECT_FILE)
 	test -f $(OPENCONNECT_FILE).sig || wget ftp://ftp.infradead.org/pub/openconnect/$(OPENCONNECT_FILE).asc
 	gpg --verify $(OPENCONNECT_FILE).asc
@@ -189,20 +189,8 @@ $(XML2_DIR)/.installed: $(XML2_DIR)/.configured
 	make -C $(XML2_DIR) install
 	touch $@
 
-$(LIBZ_DIR)/.configured: $(GMP_DIR)/.installed
-	test -f $(LIBZ_FILE) || wget http://zlib.net/$(LIBZ_FILE)
-	test -d $(LIBZ_DIR) || tar -xf $(LIBZ_FILE)
-	cd $(LIBZ_DIR) && CC=i686-w64-mingw32-gcc CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" LDFLAGS="$(LDFLAGS)" $(CONFIG_ENV) ./configure $(CONFIG_FLAGS1) && cd ..
-	sed -i 's/-lc//g' $(LIBZ_DIR)/Makefile
-	touch $@
-
-$(LIBZ_DIR)/.installed: $(LIBZ_DIR)/.configured
-	make -C $(LIBZ_DIR) $(SMP)
-	cp $(LIBZ_DIR)/libz.a $(LIB_DIR)/
-	touch $@
-
 clean:
-	rm -rf $(CROSS_DIR) $(XML2_DIR)/.installed $(LIBZ_DIR)/.installed $(GNUTLS_DIR)/.installed $(OPENCONNECT_DIR)/.installed $(NETTLE_DIR)/.installed $(GMP_DIR)/.installed $(P11_KIT_DIR)/.installed
+	rm -rf $(CROSS_DIR) $(XML2_DIR)/.installed $(GNUTLS_DIR)/.installed $(OPENCONNECT_DIR)/.installed $(NETTLE_DIR)/.installed $(GMP_DIR)/.installed $(P11_KIT_DIR)/.installed
 
 dirclean:
 	rm -rf $(CROSS_DIR) $(GNUTLS_DIR) $(NETTLE_DIR) $(GMP_DIR) $(P11_KIT_DIR)
