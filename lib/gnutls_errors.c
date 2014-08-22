@@ -425,8 +425,7 @@ static const gnutls_error_entry error_algorithms[] = {
  * functions that relate to a TLS session (e.g., record layer or handshake 
  * layer handling functions).
  *
- * Returns: zero on non fatal errors or positive @error values. Non-zero
- *    on fatal error codes.
+ * Returns: Non-zero value on fatal errors or zero on non-fatal.
  **/
 int gnutls_error_is_fatal(int error)
 {
