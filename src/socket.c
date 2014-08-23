@@ -38,6 +38,11 @@
 #include <socket.h>
 #include "sockets.h"
 
+#ifdef HAVE_LIBIDN
+#include <idna.h>
+#include <idn-free.h>
+#endif
+
 #define MAX_BUF 4096
 
 /* Functions to manipulate sockets
@@ -220,14 +225,24 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 	int sd, err;
 	char buffer[MAX_BUF + 1];
 	char portname[16] = { 0 };
+	char *a_hostname = (char*)hostname;
+
+#ifdef HAVE_LIBIDN
+	err = idna_to_ascii_8z(hostname, &a_hostname, IDNA_ALLOW_UNASSIGNED);
+	if (err != IDNA_SUCCESS) {
+		fprintf(stderr, "Cannot convert %s to IDNA: %s\n", hostname,
+			idna_strerror(err));
+		exit(1);
+	}
+#endif
 
 	if (msg != NULL)
-		printf("Resolving '%s'...\n", hostname);
+		printf("Resolving '%s'...\n", a_hostname);
 
 	/* get server name */
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_socktype = udp ? SOCK_DGRAM : SOCK_STREAM;
-	if ((err = getaddrinfo(hostname, service, &hints, &res))) {
+	if ((err = getaddrinfo(a_hostname, service, &hints, &res))) {
 		fprintf(stderr, "Cannot resolve %s:%s: %s\n", hostname,
 			service, gai_strerror(err));
 		exit(1);
@@ -294,7 +309,9 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 	hd->service = strdup(portname);
 	hd->ptr = ptr;
 	hd->addr_info = res;
-
+#ifdef HAVE_LIBIDN
+	idn_free(a_hostname);
+#endif
 	return;
 }
 
