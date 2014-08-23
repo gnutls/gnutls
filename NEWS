@@ -17,6 +17,9 @@ algorithms.
 ** libgnutls: when checking the hostname of a certificate with multiple CNs
 ensure that the "most specific" CN is being used.
 
+** libgnutls: In DTLS ignore only errors that relate to unexpected packets
+and decryption failures.
+
 ** API and ABI modifications:
 No changes since last version.
 
