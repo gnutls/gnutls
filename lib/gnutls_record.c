@@ -1286,6 +1286,7 @@ recv_error:
       ret == GNUTLS_E_UNSUPPORTED_VERSION_PACKET ||
       ret == GNUTLS_E_UNEXPECTED_PACKET_LENGTH ||
       ret == GNUTLS_E_UNEXPECTED_PACKET ||
+      ret == GNUTLS_E_ERROR_IN_FINISHED_PACKET ||
       ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET))
     {
       goto discard;
