@@ -1282,7 +1282,11 @@ recv_error:
       return 0;             
     }
 
-  if (IS_DTLS(session))
+  if (IS_DTLS(session) && (ret == GNUTLS_E_DECRYPTION_FAILED ||
+      ret == GNUTLS_E_UNSUPPORTED_VERSION_PACKET ||
+      ret == GNUTLS_E_UNEXPECTED_PACKET_LENGTH ||
+      ret == GNUTLS_E_UNEXPECTED_PACKET ||
+      ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET))
     {
       goto discard;
     }
