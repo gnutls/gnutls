@@ -20,6 +20,9 @@ algorithms.
 ** libgnutls: when checking the hostname of a certificate with multiple CNs
 ensure that the "most specific" CN is being used.
 
+** libgnutls: In DTLS ignore only errors that relate to unexpected packets
+and decryption failures.
+
 ** p11tool: will not implicitly enable so-login for certain types of
 objects. That avoids issues with tokens that require different login
 types.
