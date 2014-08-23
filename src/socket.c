@@ -240,6 +240,11 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 
 	/* get server name */
 	memset(&hints, 0, sizeof(hints));
+
+#ifdef AI_IDN
+	hints.ai_flags = AI_IDN|AI_IDN_ALLOW_UNASSIGNED;
+#endif
+
 	hints.ai_socktype = udp ? SOCK_DGRAM : SOCK_STREAM;
 	if ((err = getaddrinfo(hostname, service, &hints, &res))) {
 		fprintf(stderr, "Cannot resolve %s:%s: %s\n", hostname,
