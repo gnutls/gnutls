@@ -226,7 +226,8 @@ static void dane_check(const char *host, const char *proto,
 	if (ret < 0) {
 		fprintf(stderr, "dane_state_init: %s\n",
 			dane_strerror(ret));
-		exit(1);
+		retcode = 1;
+		goto error;
 	}
 
 	if (HAVE_OPT(DLV)) {
@@ -234,7 +235,8 @@ static void dane_check(const char *host, const char *proto,
 		if (ret < 0) {
 			fprintf(stderr, "dane_state_set_dlv_file: %s\n",
 				dane_strerror(ret));
-			exit(1);
+			retcode = 1;
+			goto error;
 		}
 	}
 
@@ -242,7 +244,8 @@ static void dane_check(const char *host, const char *proto,
 	if (ret < 0) {
 		fprintf(stderr, "dane_query_tlsa: %s\n",
 			dane_strerror(ret));
-		exit(1);
+		retcode = 1;
+		goto error;
 	}
 
 	if (ENABLED_OPT(PRINT_RAW)) {
@@ -258,7 +261,8 @@ static void dane_check(const char *host, const char *proto,
 		if (ret < 0) {
 			fprintf(stderr, "dane_query_to_raw_tlsa: %s\n",
 				dane_strerror(ret));
-			exit(1);
+			retcode = 1;
+			goto error;
 		}
 
 		for (i=0;i<entries;i++) {
@@ -274,7 +278,8 @@ static void dane_check(const char *host, const char *proto,
 			if (ret < 0) {
 				fprintf(stderr, "gnutls_hex_encode: %s\n",
 					dane_strerror(ret));
-				exit(1);
+				retcode = 1;
+				goto error;
 			}
 			fprintf(outfile, "[%u]: %s\n", i, str);
 			gnutls_free(str);
@@ -287,7 +292,8 @@ static void dane_check(const char *host, const char *proto,
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_load_file: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			retcode = 1;
+			goto error;
 		}
 
 		ret =
@@ -300,7 +306,8 @@ static void dane_check(const char *host, const char *proto,
 			fprintf(stderr,
 				"gnutls_x509_crt_list_import2: %s\n",
 				gnutls_strerror(ret));
-			exit(1);
+			retcode = 1;
+			goto error;
 		}
 
 		if (clist_size > 0) {
@@ -316,7 +323,8 @@ static void dane_check(const char *host, const char *proto,
 						"gnutls_x509_crt_export2: %s\n",
 						gnutls_strerror
 						(ret));
-					exit(1);
+					retcode = 1;
+					goto error;
 				}
 			}
 		}
@@ -324,13 +332,12 @@ static void dane_check(const char *host, const char *proto,
 
 	entries = dane_query_entries(q);
 	for (i = 0; i < entries; i++) {
-		del = 0;
-
 		ret = dane_query_data(q, i, &usage, &type, &match, &data);
 		if (ret < 0) {
 			fprintf(stderr, "dane_query_data: %s\n",
 				dane_strerror(ret));
-			exit(1);
+			retcode = 1;
+			goto error;
 		}
 
 		size = lbuffer_size;
@@ -338,7 +345,8 @@ static void dane_check(const char *host, const char *proto,
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_hex_encode: %s\n",
 				dane_strerror(ret));
-			exit(1);
+			retcode = 1;
+			goto error;
 		}
 
 		if (entries > 1 && !HAVE_OPT(QUIET))
@@ -377,7 +385,8 @@ static void dane_check(const char *host, const char *proto,
 				fprintf(stderr,
 					"dane_verify_crt: %s\n",
 					dane_strerror(ret));
-				exit(1);
+				retcode = 1;
+				goto error;
 			}
 
 			ret =
@@ -388,7 +397,8 @@ static void dane_check(const char *host, const char *proto,
 				fprintf(stderr,
 					"dane_verification_status_print: %s\n",
 					dane_strerror(ret));
-				exit(1);
+				retcode = 1;
+				goto error;
 			}
 
 			if (!HAVE_OPT(QUIET))
@@ -412,13 +422,15 @@ static void dane_check(const char *host, const char *proto,
 		gnutls_free(clist);
 	}
 
-	if (del != 0 && cinfo->cert) {
-		remove(cinfo->cert);
-	}
 
 
 	dane_query_deinit(q);
 	dane_state_deinit(s);
+
+ error:
+	if (del != 0 && cinfo->cert) {
+		remove(cinfo->cert);
+	}
 
 	exit(retcode);
 #else
