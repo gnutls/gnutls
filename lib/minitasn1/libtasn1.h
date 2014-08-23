@@ -44,7 +44,7 @@ extern "C"
 {
 #endif
 
-#define ASN1_VERSION "3.6"
+#define ASN1_VERSION "4.0"
 
 #if defined(__GNUC__) && !defined(ASN1_INTERNAL_BUILD)
 # define _ASN1_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
@@ -184,6 +184,9 @@ extern "C"
 /* makes sure the values are zeroized prior to deinitialization */
 #define ASN1_DELETE_FLAG_ZEROIZE 1
 
+/* Flags used by asn1_der_decoding2(). */
+#define ASN1_DECODE_FLAG_ALLOW_PADDING 1
+
 
   struct asn1_data_node_st
   {
@@ -259,6 +262,11 @@ extern "C"
 		     void *ider, int *len, char *ErrorDescription);
 
   extern ASN1_API int
+    asn1_der_decoding2 (asn1_node *element, const void *ider,
+			int *max_ider_len, unsigned int flags,
+			char *errorDescription);
+
+  extern ASN1_API int
     asn1_der_decoding (asn1_node * element, const void *ider,
 		       int len, char *errorDescription);
 
@@ -329,6 +337,8 @@ extern "C"
   extern ASN1_API int
     asn1_copy_node (asn1_node dst, const char *dst_name,
 		    asn1_node src, const char *src_name);
+  extern ASN1_API asn1_node
+    asn1_dup_node (asn1_node src, const char *src_name);
 
   /* Internal and low-level DER utility functions. */
 

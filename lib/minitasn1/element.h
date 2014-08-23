@@ -23,7 +23,7 @@
 #define _ELEMENT_H
 
 
-int _asn1_append_sequence_set (asn1_node node);
+int _asn1_append_sequence_set (asn1_node node, asn1_node *pcached);
 
 int _asn1_convert_integer (const unsigned char *value,
 			   unsigned char *value_out,

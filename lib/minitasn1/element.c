@@ -52,7 +52,7 @@ _asn1_hierarchical_name (asn1_node node, char *name, int name_size)
 	  _asn1_str_cat (name, name_size, ".");
 	  _asn1_str_cat (name, name_size, tmp_name);
 	}
-      p = _asn1_find_up (p);
+      p = _asn1_get_up (p);
     }
 
   if (name[0] == 0)
@@ -128,9 +128,18 @@ _asn1_convert_integer (const unsigned char *value, unsigned char *value_out,
   return ASN1_SUCCESS;
 }
 
-
+/* Appends a new element into the sequent (or set) defined by this
+ * node. The new element will have a name of '?number', where number
+ * is a monotonically increased serial number.
+ *
+ * The last element in the list may be provided in @ptail, to avoid
+ * traversing the list, an expensive operation in long lists.
+ *
+ * On success it returns in @ptail the added element (which is the 
+ * tail in the list of added elements).
+ */
 int
-_asn1_append_sequence_set (asn1_node node)
+_asn1_append_sequence_set (asn1_node node, asn1_node *ptail)
 {
   asn1_node p, p2;
   char temp[LTOSTR_MAX_SIZE];
@@ -144,9 +153,19 @@ _asn1_append_sequence_set (asn1_node node)
 	 || (type_field (p->type) == ASN1_ETYPE_SIZE))
     p = p->right;
   p2 = _asn1_copy_structure3 (p);
-  while (p->right)
-    p = p->right;
+
+  if (ptail == NULL || *ptail == NULL || (*ptail)->up != p->up)
+    while (p->right) {
+      p = p->right;
+    }
+  else
+    {
+      p = *ptail;
+    }
+
   _asn1_set_right (p, p2);
+  if (ptail)
+    *ptail = p2;
 
   if (p->name[0] == 0)
     _asn1_str_cpy (temp, sizeof (temp), "?1");
@@ -608,7 +627,7 @@ asn1_write_value (asn1_node node_root, const char *name,
     case ASN1_ETYPE_SET_OF:
       if (_asn1_strcmp (value, "NEW"))
 	return ASN1_VALUE_NOT_VALID;
-      _asn1_append_sequence_set (node);
+      _asn1_append_sequence_set (node, NULL);
       break;
     default:
       return ASN1_ELEMENT_NOT_FOUND;
@@ -676,7 +695,9 @@ asn1_write_value (asn1_node node_root, const char *name,
  * %ASN1_ELEMENT_NOT_FOUND, it means that this element wasn't present
  * in the der encoding that created the structure.  The first element
  * of a SEQUENCE_OF or SET_OF is named "?1". The second one "?2" and
- * so on.
+ * so on. If the @root provided is a node to specific sequence element,
+ * then the keyword "?CURRENT" is also acceptable and indicates the
+ * current sequence element of this node.
  *
  * Note that there can be valid values with length zero. In these case
  * this function will succeed and @len will be zero.
@@ -741,12 +762,14 @@ asn1_read_value (asn1_node root, const char *name, void *ivalue, int *len)
  *   holds the sizeof value.
  * @etype: The type of the value read (ASN1_ETYPE)
  *
- * Returns the value of one element inside a structure. 
+ * Returns the type and value of one element inside a structure. 
  * If an element is OPTIONAL and this returns
  * %ASN1_ELEMENT_NOT_FOUND, it means that this element wasn't present
  * in the der encoding that created the structure.  The first element
  * of a SEQUENCE_OF or SET_OF is named "?1". The second one "?2" and
- * so on.
+ * so on. If the @root provided is a node to specific sequence element,
+ * then the keyword "?CURRENT" is also acceptable and indicates the
+ * current sequence element of this node.
  *
  * Note that there can be valid values with length zero. In these case
  * this function will succeed and @len will be zero.
