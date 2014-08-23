@@ -33,6 +33,9 @@ a single CN present in the certificate.
 ** libgnutls: The environment variable GNUTLS_FORCE_FIPS_MODE can be used
 to force the FIPS mode, when set to 1.
 
+** libgnutls: In DTLS ignore only errors that relate to unexpected packets
+and decryption failures.
+
 ** p11tool: Added --info parameter.
 
 ** certtool: Added --mark-wrap parameter.
