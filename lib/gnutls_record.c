@@ -1334,6 +1334,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 		ret == GNUTLS_E_UNSUPPORTED_VERSION_PACKET ||
 		ret == GNUTLS_E_UNEXPECTED_PACKET_LENGTH ||
 		ret == GNUTLS_E_UNEXPECTED_PACKET ||
+		ret == GNUTLS_E_ERROR_IN_FINISHED_PACKET ||
 		ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET)) {
 		goto discard;
 	}
