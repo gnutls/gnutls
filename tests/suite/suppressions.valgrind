@@ -234,3 +234,12 @@
    fun:doit
    fun:main
 }
+
+{
+   libidn-2
+   Memcheck:Addr4
+   fun:idna_to_ascii_4z
+   fun:idna_to_ascii_8z
+   fun:socket_open
+   fun:main
+}
