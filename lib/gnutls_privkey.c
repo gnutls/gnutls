@@ -198,6 +198,7 @@ _gnutls_privkey_get_mpis(gnutls_privkey_t key, gnutls_pk_params_st * params)
 	case GNUTLS_PRIVKEY_X509:
 		ret = _gnutls_pk_params_copy(params, &key->key.x509->params);
 		break;
+#ifdef ENABLE_PKCS11
 	case GNUTLS_PRIVKEY_PKCS11: {
 		gnutls_pubkey_t pubkey;
 
@@ -210,6 +211,7 @@ _gnutls_privkey_get_mpis(gnutls_privkey_t key, gnutls_pk_params_st * params)
 
 		break;
 		}
+#endif
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
