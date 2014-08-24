@@ -128,6 +128,7 @@ TESTS_ENVIRONMENT =						\
 	PKCS12FILE_2=$(srcdir)/pkcs12-decode/pkcs12_2certs.p12	\
 	PKCS12PASSWORD_2=""					\
 	PKCS12PATH=$(srcdir)/pkcs12-decode/			\
+	X509CERTDIR=$(srcdir)/x509cert-dir/			\
 	EXEEXT=$(EXEEXT)					\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"

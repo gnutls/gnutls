@@ -189,6 +189,7 @@ static time_t mytime(time_t * t)
 void doit(void)
 {
 	int ret;
+	const char *path;
 	gnutls_datum_t data;
 	gnutls_x509_crt_t server_crt, ca_crt2;
 	gnutls_x509_trust_list_t tl;
@@ -209,7 +210,10 @@ void doit(void)
 	gnutls_x509_crt_init(&server_crt);
 	gnutls_x509_crt_init(&ca_crt2);
 
-	ret = gnutls_x509_trust_list_add_trust_dir(tl, "./x509cert-dir", NULL, GNUTLS_X509_FMT_PEM, 0, 0);
+	path = getenv("X509CERTDIR");
+	if (!path)
+		path = "./x509cert-dir";
+	ret = gnutls_x509_trust_list_add_trust_dir(tl, path, NULL, GNUTLS_X509_FMT_PEM, 0, 0);
 	if (ret != 1)
 		fail("gnutls_x509_trust_list_add_trust_dir: %d\n", ret);
 
