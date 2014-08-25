@@ -26,3 +26,6 @@ Simon Arlott <simon||arlott.org>
 	10 Jul 2014
 	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7572
 
+Alon Bar-Lev <alon.barlev||gmail.com
+	25 Aug 2014
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7615
