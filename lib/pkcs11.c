@@ -1561,21 +1561,34 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 	a[0].type = CKA_LABEL;
 	a[0].value = label_tmp;
 	a[0].value_len = sizeof(label_tmp);
-	a[1].type = CKA_ID;
-	a[1].value = id_tmp;
-	a[1].value_len = sizeof(id_tmp);
-
 	rv = pkcs11_get_attribute_value
-	    (sinfo->module, sinfo->pks, obj, a, 2);
+	    (sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		label.data = NULL;
+		label.size = 0;
+	} else {
+		label.data = a[0].value;
+		label.size = a[0].value_len;
 	}
 
-	id.data = a[1].value;
-	id.size = a[1].value_len;
-	label.data = a[0].value;
-	label.size = a[0].value_len;
+
+	a[0].type = CKA_ID;
+	a[0].value = id_tmp;
+	a[0].value_len = sizeof(id_tmp);
+	rv = pkcs11_get_attribute_value
+	    (sinfo->module, sinfo->pks, obj, a, 1);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		id.data = NULL;
+		id.size = 0;
+	} else {
+		id.data = a[0].value;
+		id.size = a[0].value_len;
+	}
+
+	if (label.data == NULL && id.data == NULL)
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 	cert_data = gnutls_malloc(MAX_CERT_SIZE);
 	if (cert_data == NULL) {
