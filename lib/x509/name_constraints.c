@@ -640,7 +640,6 @@ unsigned found_one;
 				return gnutls_assert_val(t);
 		} while(ret >= 0);
 
-
 		do {
 			/* ensure there is only a single EMAIL, similarly to CN handling (rfc6125) */
 			name_size = sizeof(name);
@@ -693,9 +692,10 @@ unsigned found_one;
 				return gnutls_assert_val(t);
 		} while(ret >= 0);
 
-
-		/* verify the name constraints against the CN as well */
+		/* verify the name constraints against the CN, if the certificate is
+		 * not a CA. */
 		do {
+
 			/* ensure there is only a single CN, according to rfc6125 */
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
