@@ -243,3 +243,18 @@
    fun:socket_open
    fun:main
 }
+
+{
+   libidn-3
+   Memcheck:Addr4
+   fun:idna_to_ascii_4z
+   fun:idna_to_ascii_8z
+   fun:gnutls_x509_crt_check_hostname2
+   fun:_gnutls_x509_cert_verify_peers
+   fun:cert_verify
+   fun:cert_verify_callback
+   fun:run_verify_callback
+   fun:gnutls_handshake
+   fun:do_handshake
+   fun:main
+}
