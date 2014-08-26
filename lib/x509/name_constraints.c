@@ -622,29 +622,36 @@ unsigned found_one;
 				return gnutls_assert_val(t);
 		} while(ret >= 0);
 
-		if (found_one != 0)
-			return 1;
 
-		idx = 0;
 		do {
+			/* ensure there is only a single EMAIL, similarly to CN handling (rfc6125) */
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_PKCS9_EMAIL,
-				idx++, 0, name, &name_size);
+							    1, 0, name, &name_size);
+			if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				return gnutls_assert_val(0);
+
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_PKCS9_EMAIL,
+							    0, 0, name, &name_size);
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				break;
 			else if (ret < 0)
 				return gnutls_assert_val(0);
 
+			found_one = 1;
 			n.data = (void*)name;
 			n.size = name_size;
-			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME,
-				&n);
+			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_RFC822NAME, &n);
 			if (t == 0)
 				return gnutls_assert_val(t);
-		} while(ret >= 0);
+		} while(0);
 
 		/* passed */
-		return 1;
+		if (found_one != 0)
+			return 1;
+		else /* nothing was found */
+			return 0;
 	} else if (type == GNUTLS_SAN_DNSNAME) {
 		idx = found_one = 0;
 		do {
@@ -668,29 +675,38 @@ unsigned found_one;
 				return gnutls_assert_val(t);
 		} while(ret >= 0);
 
-		if (found_one != 0)
-			return 1;
 
-		idx = 0;
+		/* verify the name constraints against the CN as well */
 		do {
+			/* ensure there is only a single CN, according to rfc6125 */
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
-				idx++, 0, name, &name_size);
+				 			    1, 0, name, &name_size);
+			if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				return gnutls_assert_val(0);
+
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
+							    0, 0, name, &name_size);
 			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 				break;
 			else if (ret < 0)
 				return gnutls_assert_val(0);
 
+			found_one = 1;
 			n.data = (void*)name;
 			n.size = name_size;
 			t = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME,
 				&n);
 			if (t == 0)
 				return gnutls_assert_val(t);
-		} while(ret >= 0);
+		} while(0);
 
 		/* passed */
-		return 1;
+		if (found_one != 0)
+			return 1;
+		else /* nothing was found */
+			return 0;
 	} else
 		return check_unsupported_constraint(nc, type);
 }
