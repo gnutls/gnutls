@@ -27,12 +27,11 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	template-overflow.tmpl template-overflow2.pem template-overflow2.tmpl \
 	template-date.tmpl template-date.pem template-dn-err.tmpl \
 	template-nc.tmpl template-nc.pem xmpp-othername.pem \
-	name-constraints-err.pem name-constraints-err.pem.out \
 	suppressions.valgrind
 
-dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane verify-test
+dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane
 
-TESTS = pathlen aki pem-decoding verify-test
+TESTS = pathlen aki pem-decoding
 
 if !WINDOWS
 TESTS += template-test
