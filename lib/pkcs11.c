@@ -2584,7 +2584,6 @@ find_objs(struct pkcs11_session_info *sinfo,
 			id.data = NULL;
 			id.size = 0;
 		}
-		tot_values++;
 
 		if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_ALL ||
 			find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_MATCH) {
@@ -2628,7 +2627,8 @@ find_objs(struct pkcs11_session_info *sinfo,
 					     find_data->p_list[find_data->current]);
 			if (ret < 0) {
 				gnutls_assert();
-				goto fail;
+				/* skip the failed object */
+				continue;
 			}
 
 		}
