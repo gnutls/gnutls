@@ -9,6 +9,13 @@ See the end for copying conditions.
 be checked even if a DNS name is found, and no name constraints will
 be checked for intermediate certificates.
 
+** libgnutls: Fixed issues in PKCS #11 object listing. Multiple object
+listing would fail completely if a single object could be exported.
+
+** libgnutls: Improved the performance of PKCS #11 object listing/retrieving,
+by retrieving them in large batches. Report and suggestion by David
+Woodhouse.
+
 ** API and ABI modifications:
 No changes since last version.
 
