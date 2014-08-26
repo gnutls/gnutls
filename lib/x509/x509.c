@@ -1654,9 +1654,11 @@ gnutls_x509_crt_get_basic_constraints(gnutls_x509_crt_t cert,
  * Use gnutls_x509_crt_get_basic_constraints() if you want to read the
  * pathLenConstraint field too.
  *
- * Returns: A negative error code may be returned in case of parsing error.
- * If the certificate does not contain the basicConstraints extension
- * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ * Returns: If the certificate is a CA a positive value will be
+ * returned, or (0) if the certificate does not have CA flag set.  A
+ * negative error code may be returned in case of errors.  If the
+ * certificate does not contain the basicConstraints extension
+ * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  **/
 int
 gnutls_x509_crt_get_ca_status(gnutls_x509_crt_t cert,
