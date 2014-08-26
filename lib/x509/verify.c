@@ -545,6 +545,7 @@ verify_crt(gnutls_x509_crt_t cert,
 			    gnutls_x509_crt_t * _issuer,
 			    time_t now,
 			    unsigned int *max_path,
+			    bool end_cert,
 			    gnutls_x509_name_constraints_t nc,
 			    gnutls_verify_output_function func)
 {
@@ -606,34 +607,37 @@ verify_crt(gnutls_x509_crt_t cert,
 			goto cleanup;
 		}
 
-		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DNSNAME, cert);
-		if (ret == 0) {
-			gnutls_assert();
-			goto nc_fail;
-		}
+		/* only check name constraints in server certificates, not CAs */
+		if (end_cert != 0) {
+			ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DNSNAME, cert);
+			if (ret == 0) {
+				gnutls_assert();
+				goto nc_fail;
+			}
 
-		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_RFC822NAME, cert);
-		if (ret == 0) {
-			gnutls_assert();
-			goto nc_fail;
-		}
+			ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_RFC822NAME, cert);
+			if (ret == 0) {
+				gnutls_assert();
+				goto nc_fail;
+			}
 
-		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DN, cert);
-		if (ret == 0) {
-			gnutls_assert();
-			goto nc_fail;
-		}
+			ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_DN, cert);
+			if (ret == 0) {
+				gnutls_assert();
+				goto nc_fail;
+			}
 
-		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_URI, cert);
-		if (ret == 0) {
-			gnutls_assert();
-			goto nc_fail;
-		}
+			ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_URI, cert);
+			if (ret == 0) {
+				gnutls_assert();
+				goto nc_fail;
+			}
 
-		ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_IPADDRESS, cert);
-		if (ret == 0) {
-			gnutls_assert();
-			goto nc_fail;
+			ret = gnutls_x509_name_constraints_check_crt(nc, GNUTLS_SAN_IPADDRESS, cert);
+			if (ret == 0) {
+				gnutls_assert();
+				goto nc_fail;
+			}
 		}
 	}
 
@@ -913,10 +917,11 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 	 */
 	output = 0;
 	max_path = MAX_VERIFY_DEPTH;
+
 	ret = verify_crt(certificate_list[clist_size - 1],
 					  trusted_cas, tcas_size, flags,
 					  &output, &issuer, now, &max_path,
-					  nc, func);
+					  clist_size==1?1:0, nc, func);
 	if (ret != 1) {
 		/* if the last certificate in the certificate
 		 * list is invalid, then the certificate is not
@@ -941,11 +946,12 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 		if (!(flags & GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT)) {
 			flags |= GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT;
 		}
+
 		if ((ret =
 		     verify_crt(certificate_list[i - 1],
 						 &certificate_list[i], 1,
 						 flags, &output, NULL, now,
-						 &max_path, nc, func)) != 1) {
+						 &max_path, i==1?1:0, nc, func)) != 1) {
 			gnutls_assert();
 			status |= output;
 			status |= GNUTLS_CERT_INVALID;
