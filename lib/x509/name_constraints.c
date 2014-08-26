@@ -35,11 +35,29 @@
 /* Name constraints is limited to DNS names.
  */
 
-static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc)
+static unsigned is_nc_empty(struct gnutls_name_constraints_st* nc, unsigned type)
 {
+	name_constraints_node_st *t;
+
 	if (nc->permitted == NULL && nc->excluded == NULL)
 		return 1;
-	return 0;
+
+	t = nc->permitted;
+	while (t != NULL) {
+		if (t->type == type)
+			return 0;
+		t = t->next;
+	}
+
+	t = nc->excluded;
+	while (t != NULL) {
+		if (t->type == type)
+			return 0;
+		t = t->next;
+	}
+
+	/* no constraint for that type exists */
+	return 1;
 }
 
 int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
@@ -596,7 +614,7 @@ unsigned idx, t, san_type;
 gnutls_datum_t n;
 unsigned found_one;
 
-	if (is_nc_empty(nc) != 0)
+	if (is_nc_empty(nc, type) != 0)
 		return 1; /* shortcut; no constraints to check */
 
 	if (type == GNUTLS_SAN_RFC822NAME) {
@@ -651,7 +669,7 @@ unsigned found_one;
 		if (found_one != 0)
 			return 1;
 		else /* nothing was found */
-			return 0;
+			return gnutls_assert_val(0);
 	} else if (type == GNUTLS_SAN_DNSNAME) {
 		idx = found_one = 0;
 		do {
@@ -706,7 +724,7 @@ unsigned found_one;
 		if (found_one != 0)
 			return 1;
 		else /* nothing was found */
-			return 0;
+			return gnutls_assert_val(0);
 	} else
 		return check_unsupported_constraint(nc, type);
 }
