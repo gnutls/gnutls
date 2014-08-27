@@ -949,8 +949,8 @@ gcm_ghash_clmul:
 	pxor	%xmm11,%xmm12
 .byte	102,68,15,58,68,222,0
 .byte	102,68,15,58,68,238,17
-	xorps	%xmm11,%xmm3
 .byte	102,68,15,58,68,231,16
+	xorps	%xmm11,%xmm3
 	xorps	%xmm13,%xmm5
 	movups	80(%rsi),%xmm7
 	xorps	%xmm12,%xmm4
@@ -968,8 +968,8 @@ gcm_ghash_clmul:
 	pshufd	$78,%xmm0,%xmm8
 	pxor	%xmm0,%xmm8
 .byte	102,69,15,58,68,238,17
-	xorps	%xmm11,%xmm3
 .byte	102,68,15,58,68,231,0
+	xorps	%xmm11,%xmm3
 	xorps	%xmm13,%xmm5
 
 	leaq	64(%rdx),%rdx
@@ -987,23 +987,23 @@ gcm_ghash_clmul:
 	xorps	%xmm3,%xmm0
 	movdqu	32(%rdx),%xmm3
 	movdqa	%xmm11,%xmm13
-	pshufd	$78,%xmm11,%xmm12
 .byte	102,68,15,58,68,199,16
+	pshufd	$78,%xmm11,%xmm12
 	xorps	%xmm5,%xmm1
 	pxor	%xmm11,%xmm12
 .byte	102,65,15,56,0,218
 	movups	32(%rsi),%xmm7
-.byte	102,68,15,58,68,218,0
 	xorps	%xmm4,%xmm8
-	movdqa	%xmm3,%xmm5
+.byte	102,68,15,58,68,218,0
 	pshufd	$78,%xmm3,%xmm4
 
 	pxor	%xmm0,%xmm8
-	pxor	%xmm3,%xmm4
+	movdqa	%xmm3,%xmm5
 	pxor	%xmm1,%xmm8
+	pxor	%xmm3,%xmm4
 	movdqa	%xmm8,%xmm9
-	pslldq	$8,%xmm8
 .byte	102,68,15,58,68,234,17
+	pslldq	$8,%xmm8
 	psrldq	$8,%xmm9
 	pxor	%xmm8,%xmm0
 	movdqa	.L7_mask(%rip),%xmm8
@@ -1012,8 +1012,8 @@ gcm_ghash_clmul:
 
 	pand	%xmm0,%xmm8
 .byte	102,69,15,56,0,200
-.byte	102,68,15,58,68,231,0
 	pxor	%xmm0,%xmm9
+.byte	102,68,15,58,68,231,0
 	psllq	$57,%xmm9
 	movdqa	%xmm9,%xmm8
 	pslldq	$8,%xmm9
@@ -1040,21 +1040,20 @@ gcm_ghash_clmul:
 	movdqa	%xmm11,%xmm13
 	pxor	%xmm12,%xmm4
 	pshufd	$78,%xmm11,%xmm12
-	pxor	%xmm11,%xmm12
-.byte	102,69,15,58,68,222,0
 	pxor	%xmm9,%xmm0
 	pxor	%xmm8,%xmm1
+	pxor	%xmm11,%xmm12
+.byte	102,69,15,58,68,222,0
 	psrlq	$1,%xmm0
+	pxor	%xmm1,%xmm0
+	movdqa	%xmm0,%xmm1
 .byte	102,69,15,58,68,238,17
 	xorps	%xmm11,%xmm3
-	pxor	%xmm1,%xmm0
+	pshufd	$78,%xmm0,%xmm8
+	pxor	%xmm0,%xmm8
 
 .byte	102,68,15,58,68,231,0
 	xorps	%xmm13,%xmm5
-
-	movdqa	%xmm0,%xmm1
-	pshufd	$78,%xmm0,%xmm8
-	pxor	%xmm0,%xmm8
 
 	leaq	64(%rdx),%rdx
 	subq	$64,%rcx
@@ -1062,10 +1061,10 @@ gcm_ghash_clmul:
 
 .Ltail4x:
 .byte	102,65,15,58,68,199,0
-	xorps	%xmm12,%xmm4
 .byte	102,65,15,58,68,207,17
-	xorps	%xmm3,%xmm0
 .byte	102,68,15,58,68,199,16
+	xorps	%xmm12,%xmm4
+	xorps	%xmm3,%xmm0
 	xorps	%xmm5,%xmm1
 	pxor	%xmm0,%xmm1
 	pxor	%xmm4,%xmm8
@@ -1145,13 +1144,13 @@ gcm_ghash_clmul:
 
 	pxor	%xmm3,%xmm0
 	pxor	%xmm5,%xmm1
-	movdqu	(%rdx),%xmm5
+	movdqu	(%rdx),%xmm9
 	pxor	%xmm0,%xmm8
-.byte	102,65,15,56,0,234
+.byte	102,69,15,56,0,202
 	movdqu	16(%rdx),%xmm3
 
 	pxor	%xmm1,%xmm8
-	pxor	%xmm5,%xmm1
+	pxor	%xmm9,%xmm1
 	pxor	%xmm8,%xmm4
 .byte	102,65,15,56,0,218
 	movdqa	%xmm4,%xmm8
@@ -1178,9 +1177,9 @@ gcm_ghash_clmul:
 	pxor	%xmm8,%xmm1
 	pxor	%xmm5,%xmm4
 
-.byte	102,15,58,68,234,17
 	movdqa	%xmm0,%xmm9
 	psrlq	$1,%xmm0
+.byte	102,15,58,68,234,17
 	pxor	%xmm9,%xmm1
 	pxor	%xmm0,%xmm9
 	psrlq	$5,%xmm0
@@ -1189,7 +1188,6 @@ gcm_ghash_clmul:
 	psrlq	$1,%xmm0
 .byte	102,15,58,68,231,0
 	pxor	%xmm1,%xmm0
-.byte	0x66,0x90
 
 	subq	$32,%rcx
 	ja	.Lmod_loop
