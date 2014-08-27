@@ -69,7 +69,6 @@ struct find_url_data_st {
 
 struct find_obj_data_st {
 	gnutls_pkcs11_obj_t *p_list;
-	unsigned int *n_list;
 	unsigned int current;
 	gnutls_pkcs11_obj_attr_t flags;
 	struct p11_kit_uri *info;
@@ -1616,7 +1615,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 	a[0].value_len = MAX_CERT_SIZE;
 
 	rv = pkcs11_get_attribute_value
-	    (sinfo->module, sinfo->pks, obj, a, 2);
+	    (sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK) {
 		data.data = a[0].value;
 		data.size = a[0].value_len;
@@ -1732,7 +1731,6 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
 
 	if (pkcs11_find_objects(sinfo->module, sinfo->pks, &obj, 1, &count) == CKR_OK &&
 	    count == 1) {
-
 		ret = pkcs11_import_object(obj, class, sinfo, info, lib_info, find_data->obj);
 		if (ret >= 0) {
 			found = 1;
@@ -2412,15 +2410,9 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 	struct find_pkey_list_st plist;	/* private key holder */
 	unsigned int i, tot_values = 0;
 
-	if (info == NULL) {	/* final call */
-		if (find_data->current <= *find_data->n_list)
-			ret = 0;
-		else
-			ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
-
-		*find_data->n_list = find_data->current;
-
-		return ret;
+	if (info == NULL) {
+		gnutls_assert();
+		return 0;
 	}
 
 	/* do not bother reading the token if basic fields do not match
@@ -2583,8 +2575,14 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 		return pkcs11_rv_to_err(rv);
 	}
 
-	objs = gnutls_malloc(OBJECTS_A_TIME*sizeof(*objs));
+	objs = gnutls_malloc(OBJECTS_A_TIME*sizeof(objs[0]));
 	if (objs == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+		goto fail;
+	}
+
+	find_data->p_list = gnutls_realloc_fast(find_data->p_list, (find_data->current+OBJECTS_A_TIME)*sizeof(find_data->p_list[0]));
+	if (find_data->p_list == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto fail;
 	}
@@ -2595,6 +2593,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 	        unsigned j;
 	        gnutls_datum_t id;
 
+		class = -1;
 	        for (j=0;j<count;j++) {
 			a[0].type = CKA_ID;
 			a[0].value = certid_tmp;
@@ -2637,23 +2636,22 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
  				}
  			}
 
-			if (find_data->current < *find_data->n_list) {
-				ret =
-				    gnutls_pkcs11_obj_init(&find_data->p_list
-							   [find_data->current]);
-				if (ret < 0) {
-					gnutls_assert();
-					goto fail;
-				}
+			ret =
+			    gnutls_pkcs11_obj_init(&find_data->p_list
+						   [find_data->current]);
+			if (ret < 0) {
+				gnutls_assert();
+				goto fail;
+			}
 
-				ret = pkcs11_import_object(objs[j], class, sinfo,
-						     info, lib_info,
-						     find_data->p_list[find_data->current]);
-				if (ret < 0) {
-					gnutls_assert();
-					goto fail;
-				}
- 			}
+			ret = pkcs11_import_object(objs[j], class, sinfo,
+					     info, lib_info,
+					     find_data->p_list[find_data->current]);
+			if (ret < 0) {
+				gnutls_assert();
+				/* skip the failed object */
+				continue;
+			}
 
 			find_data->current++;
  		}
@@ -2676,6 +2674,8 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 	for (i = 0; i < find_data->current; i++) {
 		gnutls_pkcs11_obj_deinit(find_data->p_list[i]);
 	}
+	gnutls_free(find_data->p_list);
+	find_data->p_list = NULL;
 	find_data->current = 0;
 
 	return ret;
@@ -2706,16 +2706,14 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
 {
 	int ret;
 	struct find_obj_data_st priv;
+	unsigned i;
 
 	PKCS11_CHECK_INIT;
 
 	memset(&priv, 0, sizeof(priv));
 
 	/* fill in the find data structure */
-	priv.p_list = p_list;
-	priv.n_list = n_list;
 	priv.flags = attrs;
-	priv.current = 0;
 
 	if (url == NULL || url[0] == 0) {
 		url = "pkcs11:";
@@ -2741,6 +2739,19 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
 		return ret;
 	}
 
+	if (priv.current > *n_list) {
+		*n_list = priv.current;
+		for (i=0;i<priv.current;i++) {
+			gnutls_pkcs11_obj_deinit(priv.p_list[i]);
+		}
+		gnutls_free(priv.p_list);
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+	}
+
+	*n_list = priv.current;
+	memcpy(p_list, priv.p_list, priv.current*sizeof(p_list[0]));
+	gnutls_free(priv.p_list);
+
 	return 0;
 }
 
@@ -2756,6 +2767,9 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
  * by using all objects identified by the PKCS 11 URL. The output
  * is stored in @p_list, which will be initialized.
  *
+ * All returned objects must be deinitialized using gnutls_pkcs11_obj_deinit(),
+ * and @p_list must be free'd using gnutls_free().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -2768,41 +2782,44 @@ gnutls_pkcs11_obj_list_import_url2(gnutls_pkcs11_obj_t ** p_list,
 				   gnutls_pkcs11_obj_attr_t attrs,
 				   unsigned int flags)
 {
-	unsigned int init = 128;
 	int ret;
+	struct find_obj_data_st priv;
 
-	*p_list = gnutls_malloc(sizeof(gnutls_pkcs11_obj_t) * init);
-	if (*p_list == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+	PKCS11_CHECK_INIT;
+
+	memset(&priv, 0, sizeof(priv));
+
+	/* fill in the find data structure */
+	priv.flags = attrs;
+
+	if (url == NULL || url[0] == 0) {
+		url = "pkcs11:";
 	}
 
-	ret =
-	    gnutls_pkcs11_obj_list_import_url(*p_list, &init, url, attrs,
-					      flags);
-	if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		*p_list =
-		    gnutls_realloc_fast(*p_list,
-					sizeof(gnutls_pkcs11_obj_t) *
-					init);
-		if (*p_list == NULL)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-		ret =
-		    gnutls_pkcs11_obj_list_import_url(*p_list, &init, url,
-						      attrs, flags);
-	}
-
+	ret = pkcs11_url_to_info(url, &priv.info);
 	if (ret < 0) {
 		gnutls_assert();
-		gnutls_free(*p_list);
-		*p_list = NULL;
 		return ret;
 	}
 
-	*n_list = init;
-	return 0;
+	ret =
+	    _pkcs11_traverse_tokens(find_objs_cb, &priv, priv.info,
+				    NULL, pkcs11_obj_flags_to_int(flags));
+	p11_kit_uri_free(priv.info);
 
+	if (ret < 0) {
+		gnutls_assert();
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			*n_list = 0;
+			ret = 0;
+		}
+		return ret;
+	}
+
+	*n_list = priv.current;
+	*p_list = priv.p_list;
+
+	return 0;
 }
 
 /**
