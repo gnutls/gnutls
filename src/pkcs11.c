@@ -359,6 +359,18 @@ char *get_single_token_url(common_info_st * info)
 	return url;
 }
 
+static
+const char *tflags_to_type(unsigned flags)
+{
+	if (flags & GNUTLS_PKCS11_TOKEN_TRUSTED) {
+		return "Trust module";
+	}
+	if (flags & GNUTLS_PKCS11_TOKEN_HW) {
+		return "Hardware token";
+	}
+	return "Generic token";
+}
+
 void
 pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		  common_info_st * info, unsigned brief)
@@ -368,6 +380,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 	char *url;
 	char buf[128];
 	size_t size;
+	unsigned flags;
 
 	pkcs11_common(info);
 
@@ -401,6 +414,14 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		}
 
 		fprintf(outfile, "\tLabel: %s\n", buf);
+
+		ret = gnutls_pkcs11_token_get_flags(url, &flags);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+				__LINE__, gnutls_strerror(ret));
+		} else {
+			fprintf(stderr, "\tType: %s\n", tflags_to_type(flags));
+		}
 
 		size = sizeof(buf);
 		ret =
