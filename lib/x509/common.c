@@ -1492,16 +1492,22 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
  * returns them into signed_data.
  */
 int
-_gnutls_x509_get_signed_data(ASN1_TYPE src, const char *src_name,
+_gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum *_der,
+			     const char *src_name,
 			     gnutls_datum_t * signed_data)
 {
-	gnutls_datum_t der;
 	int start, end, result;
+	gnutls_datum_t der;
 
-	result = _gnutls_x509_der_encode(src, "", &der, 0);
-	if (result < 0) {
-		gnutls_assert();
-		return result;
+	if (_der == NULL) {
+		result = _gnutls_x509_der_encode(src, "", &der, 0);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+	} else {
+		der.data = _der->data;
+		der.size = _der->size;
 	}
 
 	/* Get the signed data
@@ -1526,7 +1532,8 @@ _gnutls_x509_get_signed_data(ASN1_TYPE src, const char *src_name,
 	result = 0;
 
       cleanup:
-	_gnutls_free_datum(&der);
+	if (_der == NULL)
+		_gnutls_free_datum(&der);
 
 	return result;
 }

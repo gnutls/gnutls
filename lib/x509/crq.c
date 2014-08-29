@@ -2495,7 +2495,7 @@ int gnutls_x509_crq_verify(gnutls_x509_crq_t crq, unsigned int flags)
 	gnutls_pk_params_init(&params);
 
 	ret =
-	    _gnutls_x509_get_signed_data(crq->crq,
+	    _gnutls_x509_get_signed_data(crq->crq, NULL,
 					 "certificationRequestInfo",
 					 &data);
 	if (ret < 0) {

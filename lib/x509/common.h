@@ -148,7 +148,8 @@ int _gnutls_x509_encode_PKI_params(gnutls_datum_t * der,
 int _gnutls_asn1_copy_node(ASN1_TYPE * dst, const char *dst_name,
 			   ASN1_TYPE src, const char *src_name);
 
-int _gnutls_x509_get_signed_data(ASN1_TYPE src, const char *src_name,
+int _gnutls_x509_get_signed_data(ASN1_TYPE src, const gnutls_datum_t *der,
+				 const char *src_name,
 				 gnutls_datum_t * signed_data);
 int _gnutls_x509_get_signature(ASN1_TYPE src, const char *src_name,
 			       gnutls_datum_t * signature);

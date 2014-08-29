@@ -42,37 +42,18 @@ int
 _gnutls_check_if_same_cert(gnutls_x509_crt_t cert1,
 			   gnutls_x509_crt_t cert2)
 {
-	gnutls_datum_t cert1bin = { NULL, 0 }, cert2bin = {
-	NULL, 0};
 	int result;
 
 	result = _gnutls_is_same_dn(cert1, cert2);
 	if (result == 0)
 		return 0;
 
-	result = _gnutls_x509_der_encode(cert1->cert, "", &cert1bin, 0);
-	if (result < 0) {
-		result = 0;
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	result = _gnutls_x509_der_encode(cert2->cert, "", &cert2bin, 0);
-	if (result < 0) {
-		result = 0;
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	if ((cert1bin.size == cert2bin.size) &&
-	    (memcmp(cert1bin.data, cert2bin.data, cert1bin.size) == 0))
+	if ((cert1->der.size == cert2->der.size) &&
+	    (memcmp(cert1->der.data, cert2->der.data, cert1->der.size) == 0))
 		result = 1;
 	else
 		result = 0;
 
-      cleanup:
-	_gnutls_free_datum(&cert1bin);
-	_gnutls_free_datum(&cert2bin);
 	return result;
 }
 
@@ -80,24 +61,14 @@ int
 _gnutls_check_if_same_cert2(gnutls_x509_crt_t cert1,
 			    gnutls_datum_t * cert2bin)
 {
-	gnutls_datum_t cert1bin = { NULL, 0 };
 	int result;
 
-	result = _gnutls_x509_der_encode(cert1->cert, "", &cert1bin, 0);
-	if (result < 0) {
-		result = 0;
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	if ((cert1bin.size == cert2bin->size) &&
-	    (memcmp(cert1bin.data, cert2bin->data, cert1bin.size) == 0))
+	if ((cert1->der.size == cert2bin->size) &&
+	    (memcmp(cert1->der.data, cert2bin->data, cert1->der.size) == 0))
 		result = 1;
 	else
 		result = 0;
 
-      cleanup:
-	_gnutls_free_datum(&cert1bin);
 	return result;
 }
 
@@ -125,7 +96,7 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	 */
 
 	result =
-	    _gnutls_x509_get_signed_data(issuer->cert, "tbsCertificate",
+	    _gnutls_x509_get_signed_data(issuer->cert, &issuer->der, "tbsCertificate",
 					 &issuer_signed_data);
 	if (result < 0) {
 		gnutls_assert();
@@ -133,7 +104,7 @@ check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	}
 
 	result =
-	    _gnutls_x509_get_signed_data(cert->cert, "tbsCertificate",
+	    _gnutls_x509_get_signed_data(cert->cert, &cert->der, "tbsCertificate",
 					 &cert_signed_data);
 	if (result < 0) {
 		gnutls_assert();
@@ -466,7 +437,7 @@ _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	}
 
 	result =
-	    _gnutls_x509_get_signed_data(cert->cert, "tbsCertificate",
+	    _gnutls_x509_get_signed_data(cert->cert, &cert->der, "tbsCertificate",
 					 &cert_signed_data);
 	if (result < 0) {
 		gnutls_assert();
@@ -1123,7 +1094,7 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 	}
 
 	result =
-	    _gnutls_x509_get_signed_data(crl->crl, "tbsCertList",
+	    _gnutls_x509_get_signed_data(crl->crl, NULL, "tbsCertList",
 					 &crl_signed_data);
 	if (result < 0) {
 		gnutls_assert();
