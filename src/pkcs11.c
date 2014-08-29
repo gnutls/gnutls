@@ -219,7 +219,7 @@ pkcs11_export(FILE * outfile, const char *url, unsigned int flags,
 			gnutls_strerror(ret));
 		exit(1);
 	}
-	
+
 	ret = gnutls_pkcs11_obj_export3(obj, info->outcert_format, &t);
 	if (ret < 0) {
         	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
@@ -273,7 +273,7 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int flags,
 			gnutls_strerror(ret));
 		exit(1);
 	}
-	
+
 	ret = gnutls_x509_crt_import_pkcs11(xcrt, obj);
 	if (ret < 0) {
         	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
@@ -305,9 +305,9 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int flags,
                 
         	fwrite(t.data, 1, t.size, outfile);
                	fputs("\n\n", outfile);
-               	
+
                	gnutls_x509_crt_deinit(xcrt);
-               	
+
                	ret = gnutls_x509_crt_init(&xcrt);
         	if (ret < 0) {
                 	fprintf(stderr, "Error in %s:%d: %s\n", __func__,
@@ -360,15 +360,26 @@ char *get_single_token_url(common_info_st * info)
 }
 
 static
-const char *tflags_to_type(unsigned flags)
+void print_type(FILE *outfile, unsigned flags)
 {
-	if (flags & GNUTLS_PKCS11_TOKEN_TRUSTED) {
-		return "Trust module";
-	}
+	unsigned print = 0;
+
+	fputs("\tType: ", outfile);
 	if (flags & GNUTLS_PKCS11_TOKEN_HW) {
-		return "Hardware token";
+		fputs("Hardware token", outfile);
+		print++;
 	}
-	return "Generic token";
+
+	if (flags & GNUTLS_PKCS11_TOKEN_TRUSTED) {
+		if (print != 0)
+			fputs(", ", outfile);
+		fputs("Trust module", outfile);
+		print++;
+	}
+
+	if (print == 0)
+		fputs("Generic token", outfile);
+	fputc('\n', outfile);
 }
 
 void
@@ -420,7 +431,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__,
 				__LINE__, gnutls_strerror(ret));
 		} else {
-			fprintf(stderr, "\tType: %s\n", tflags_to_type(flags));
+			print_type(outfile, flags);
 		}
 
 		size = sizeof(buf);
