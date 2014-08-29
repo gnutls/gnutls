@@ -35,9 +35,13 @@ EXTRA_DIST = README license.txt files.mk
 
 noinst_LTLIBRARIES = libx86.la
 
-libx86_la_SOURCES = sha-padlock.c hmac-padlock.c x86-common.c aes-padlock.c aes-gcm-padlock.c \
-	aes-padlock.h aes-x86.h x86-common.h sha-padlock.h sha-x86-ssse3.c sha-x86.h hmac-x86-ssse3.c \
+libx86_la_SOURCES = x86-common.c aes-x86.h x86-common.h sha-x86-ssse3.c sha-x86.h hmac-x86-ssse3.c \
 	aes-gcm-x86-ssse3.c aes-gcm-x86-aesni.c aes-cbc-x86-ssse3.c aes-cbc-x86-aesni.c
+
+if ENABLE_PADLOCK
+libx86_la_SOURCES += sha-padlock.c hmac-padlock.c aes-padlock.c aes-gcm-padlock.c \
+	aes-padlock.h sha-padlock.h
+endif
 
 include files.mk
 
@@ -47,14 +51,23 @@ libx86_la_SOURCES += aes-gcm-x86-pclmul.c
 
 if WINDOWS
 libx86_la_SOURCES += $(X86_64_FILES_COFF)
+if ENABLE_PADLOCK
+libx86_la_SOURCES += $(X86_64_PADLOCK_FILES_COFF)
+endif
 endif
 
 if MACOSX
 libx86_la_SOURCES += $(X86_64_FILES_MACOSX)
+if ENABLE_PADLOCK
+libx86_la_SOURCES += $(X86_64_PADLOCK_FILES_MACOSX)
+endif
 endif
 
 if ELF
 libx86_la_SOURCES += $(X86_64_FILES_ELF)
+if ENABLE_PADLOCK
+libx86_la_SOURCES += $(X86_64_PADLOCK_FILES_ELF)
+endif
 endif
 
 else #ASM_X86_64
@@ -62,14 +75,23 @@ AM_CFLAGS += -DASM_X86_32 -DASM_X86
 
 if WINDOWS
 libx86_la_SOURCES += $(X86_FILES_COFF)
+if ENABLE_PADLOCK
+libx86_la_SOURCES += $(X86_PADLOCK_FILES_COFF)
+endif
 endif
 
 if MACOSX
 libx86_la_SOURCES += $(X86_FILES_MACOSX)
+if ENABLE_PADLOCK
+libx86_la_SOURCES += $(X86_PADLOCK_FILES_MACOSX)
+endif
 endif
 
 if ELF
 libx86_la_SOURCES += $(X86_FILES_ELF)
+if ENABLE_PADLOCK
+libx86_la_SOURCES += $(X86_PADLOCK_FILES_ELF)
+endif
 endif
 
 endif #ASM_X86_64
