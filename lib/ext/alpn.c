@@ -206,7 +206,7 @@ _gnutls_alpn_send_params(gnutls_session_t session,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  *
- * Since 3.1.11
+ * Since 3.2.0
  **/
 int
 gnutls_alpn_get_selected_protocol(gnutls_session_t session,
@@ -253,7 +253,7 @@ gnutls_alpn_get_selected_protocol(gnutls_session_t session,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  *
- * Since 3.1.11
+ * Since 3.2.0
  **/
 int
 gnutls_alpn_set_protocols(gnutls_session_t session,
