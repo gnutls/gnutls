@@ -1327,12 +1327,19 @@ char* gen_data = NULL;
 			goto cleanup;
 		}
 
+		if (ddata.size == sig.size && memcmp(ddata.data, sig.data, sig.size) == 0) {
+			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
+			gnutls_assert();
+			goto cleanup;
+		}
+
 		ret = _gnutls_pk_decrypt(algo, &tmp, &sig, params);
 		if (ret < 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			gnutls_assert();
 			goto cleanup;
 		}
+
 		if (tmp.size != ddata.size || memcmp(tmp.data, ddata.data, tmp.size) != 0) {
 			ret = gnutls_assert_val(GNUTLS_E_PK_GENERATION_ERROR);
 			gnutls_assert();
