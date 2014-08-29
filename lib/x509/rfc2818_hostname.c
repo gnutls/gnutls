@@ -33,7 +33,7 @@
  *
  * This function will check if the given certificate's subject matches
  * the given hostname.  This is a basic implementation of the matching
- * described in RFC2818 (HTTPS), which takes into account wildcards,
+ * described in RFC6125, and takes into account wildcards,
  * and the DNSName/IPAddress subject alternative name PKIX extension.
  *
  * For details see also gnutls_x509_crt_check_hostname2().
@@ -91,7 +91,7 @@ check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size, unsigned flag
  *
  * This function will check if the given certificate's subject matches
  * the given hostname.  This is a basic implementation of the matching
- * described in RFC2818 (HTTPS), which takes into account wildcards,
+ * described in RFC6125, and takes into account wildcards,
  * and the DNSName/IPAddress subject alternative name PKIX extension.
  *
  * IPv4 addresses are accepted by this function in the dotted-decimal
