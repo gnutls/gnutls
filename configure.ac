@@ -117,6 +117,15 @@ esac
 
 fi
 
+AC_ARG_ENABLE(padlock,
+  AS_HELP_STRING([--disable-padlock], [unconditionally disable padlock acceleration]),
+    use_padlock=$enableval, use_padlock=yes)
+
+if test "$use_padlock" != "no"; then
+    AC_DEFINE([ENABLE_PADLOCK], 1, [Enable padlock acceleration])
+    AC_SUBST([ENABLE_PADLOCK])
+fi
+AM_CONDITIONAL(ENABLE_PADLOCK, test "$use_padlock" = "yes")
 AM_CONDITIONAL(ASM_X86_64, test x"$hw_accel" = x"x86-64")
 AM_CONDITIONAL(ASM_X86_32, test x"$hw_accel" = x"x86")
 AM_CONDITIONAL(ASM_X86, test x"$hw_accel" = x"x86" || test x"$hw_accel" = x"x86-64")
@@ -791,6 +800,7 @@ AC_MSG_NOTICE([External hardware support:
 
   /dev/crypto:          $enable_cryptodev
   Hardware accel:       $hw_accel
+  Padlock accel:        $use_padlock
   PKCS#11 support:      $with_p11_kit
   TPM support:          $with_tpm
 ])

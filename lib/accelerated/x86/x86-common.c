@@ -89,6 +89,24 @@ static void capabilities_to_intel_cpuid(unsigned capabilities)
 	}
 }
 
+static unsigned check_optimized_aes(void)
+{
+	return (_gnutls_x86_cpuid_s[1] & bit_AES);
+}
+
+static unsigned check_ssse3(void)
+{
+	return (_gnutls_x86_cpuid_s[1] & bit_SSSE3);
+}
+
+#ifdef ASM_X86_64
+static unsigned check_pclmul(void)
+{
+	return (_gnutls_x86_cpuid_s[1] & bit_PCLMUL);
+}
+#endif
+
+#ifdef ENABLE_PADLOCK
 static unsigned capabilities_to_via_edx(unsigned capabilities)
 {
 	memset(_gnutls_x86_cpuid_s, 0, sizeof(_gnutls_x86_cpuid_s));
@@ -106,23 +124,6 @@ static unsigned capabilities_to_via_edx(unsigned capabilities)
 	}
 	return _gnutls_x86_cpuid_s[2];
 }
-
-static unsigned check_optimized_aes(void)
-{
-	return (_gnutls_x86_cpuid_s[1] & bit_AES);
-}
-
-static unsigned check_ssse3(void)
-{
-	return (_gnutls_x86_cpuid_s[1] & bit_SSSE3);
-}
-
-#ifdef ASM_X86_64
-static unsigned check_pclmul(void)
-{
-	return (_gnutls_x86_cpuid_s[1] & bit_PCLMUL);
-}
-#endif
 
 static int check_padlock(unsigned edx)
 {
@@ -170,6 +171,188 @@ static unsigned check_via(void)
 
 	return 0;
 }
+
+static
+void register_x86_padlock_crypto(unsigned capabilities)
+{
+	int ret, phe;
+	unsigned edx;
+
+	if (check_via() == 0)
+		return;
+
+	if (capabilities == 0)
+		edx = padlock_capability();
+	else
+		edx = capabilities_to_via_edx(capabilities);
+
+	if (check_padlock(edx)) {
+		_gnutls_debug_log
+		    ("Padlock AES accelerator was detected\n");
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aes_padlock);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		/* register GCM ciphers */
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_128_GCM, 80,
+		     &_gnutls_aes_gcm_padlock);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+#ifdef HAVE_LIBNETTLE
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aes_padlock);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aes_padlock);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_256_GCM, 80,
+		     &_gnutls_aes_gcm_padlock);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+#endif
+	}
+#ifdef HAVE_LIBNETTLE
+	phe = check_phe(edx);
+
+	if (phe && check_phe_partial()) {
+		_gnutls_debug_log
+		    ("Padlock SHA1 and SHA256 (partial) accelerator was detected\n");
+		if (check_phe_sha512(edx)) {
+			_gnutls_debug_log
+			    ("Padlock SHA512 (partial) accelerator was detected\n");
+			ret =
+			    gnutls_crypto_single_digest_register
+			    (GNUTLS_DIG_SHA384, 80,
+			     &_gnutls_sha_padlock_nano);
+			if (ret < 0) {
+				gnutls_assert();
+			}
+
+			ret =
+			    gnutls_crypto_single_digest_register
+			    (GNUTLS_DIG_SHA512, 80,
+			     &_gnutls_sha_padlock_nano);
+			if (ret < 0) {
+				gnutls_assert();
+			}
+
+			ret =
+			    gnutls_crypto_single_mac_register
+			    (GNUTLS_MAC_SHA384, 80,
+			     &_gnutls_hmac_sha_padlock_nano);
+			if (ret < 0) {
+				gnutls_assert();
+			}
+
+			ret =
+			    gnutls_crypto_single_mac_register
+			    (GNUTLS_MAC_SHA512, 80,
+			     &_gnutls_hmac_sha_padlock_nano);
+			if (ret < 0) {
+				gnutls_assert();
+			}
+		}
+
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
+							 80,
+							 &_gnutls_sha_padlock_nano);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
+							 80,
+							 &_gnutls_sha_padlock_nano);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
+							 80,
+							 &_gnutls_sha_padlock_nano);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
+						      80,
+						      &_gnutls_hmac_sha_padlock_nano);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		/* we don't register MAC_SHA224 because it is not used by TLS */
+
+		ret =
+		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
+						      80,
+						      &_gnutls_hmac_sha_padlock_nano);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+	} else if (phe) {
+		/* Original padlock PHE. Does not support incremental operations.
+		 */
+		_gnutls_debug_log
+		    ("Padlock SHA1 and SHA256 accelerator was detected\n");
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
+							 80,
+							 &_gnutls_sha_padlock);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
+							 80,
+							 &_gnutls_sha_padlock);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
+						      80,
+						      &_gnutls_hmac_sha_padlock);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
+						      80,
+						      &_gnutls_hmac_sha_padlock);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+	}
+#endif
+
+	return;
+}
+#endif
 
 static unsigned check_intel_or_amd(void)
 {
@@ -386,186 +569,6 @@ void register_x86_intel_crypto(unsigned capabilities)
 	return;
 }
 
-static
-void register_x86_padlock_crypto(unsigned capabilities)
-{
-	int ret, phe;
-	unsigned edx;
-
-	if (check_via() == 0)
-		return;
-
-	if (capabilities == 0)
-		edx = padlock_capability();
-	else
-		edx = capabilities_to_via_edx(capabilities);
-
-	if (check_padlock(edx)) {
-		_gnutls_debug_log
-		    ("Padlock AES accelerator was detected\n");
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aes_padlock);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		/* register GCM ciphers */
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_GCM, 80,
-		     &_gnutls_aes_gcm_padlock);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-#ifdef HAVE_LIBNETTLE
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aes_padlock);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aes_padlock);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		ret =
-		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_GCM, 80,
-		     &_gnutls_aes_gcm_padlock);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-#endif
-	}
-#ifdef HAVE_LIBNETTLE
-	phe = check_phe(edx);
-
-	if (phe && check_phe_partial()) {
-		_gnutls_debug_log
-		    ("Padlock SHA1 and SHA256 (partial) accelerator was detected\n");
-		if (check_phe_sha512(edx)) {
-			_gnutls_debug_log
-			    ("Padlock SHA512 (partial) accelerator was detected\n");
-			ret =
-			    gnutls_crypto_single_digest_register
-			    (GNUTLS_DIG_SHA384, 80,
-			     &_gnutls_sha_padlock_nano);
-			if (ret < 0) {
-				gnutls_assert();
-			}
-
-			ret =
-			    gnutls_crypto_single_digest_register
-			    (GNUTLS_DIG_SHA512, 80,
-			     &_gnutls_sha_padlock_nano);
-			if (ret < 0) {
-				gnutls_assert();
-			}
-
-			ret =
-			    gnutls_crypto_single_mac_register
-			    (GNUTLS_MAC_SHA384, 80,
-			     &_gnutls_hmac_sha_padlock_nano);
-			if (ret < 0) {
-				gnutls_assert();
-			}
-
-			ret =
-			    gnutls_crypto_single_mac_register
-			    (GNUTLS_MAC_SHA512, 80,
-			     &_gnutls_hmac_sha_padlock_nano);
-			if (ret < 0) {
-				gnutls_assert();
-			}
-		}
-
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
-							 80,
-							 &_gnutls_sha_padlock_nano);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA224,
-							 80,
-							 &_gnutls_sha_padlock_nano);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
-							 80,
-							 &_gnutls_sha_padlock_nano);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
-						      80,
-						      &_gnutls_hmac_sha_padlock_nano);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		/* we don't register MAC_SHA224 because it is not used by TLS */
-
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
-						      80,
-						      &_gnutls_hmac_sha_padlock_nano);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-	} else if (phe) {
-		/* Original padlock PHE. Does not support incremental operations.
-		 */
-		_gnutls_debug_log
-		    ("Padlock SHA1 and SHA256 accelerator was detected\n");
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA1,
-							 80,
-							 &_gnutls_sha_padlock);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		ret =
-		    gnutls_crypto_single_digest_register(GNUTLS_DIG_SHA256,
-							 80,
-							 &_gnutls_sha_padlock);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA1,
-						      80,
-						      &_gnutls_hmac_sha_padlock);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-
-		ret =
-		    gnutls_crypto_single_mac_register(GNUTLS_MAC_SHA256,
-						      80,
-						      &_gnutls_hmac_sha_padlock);
-		if (ret < 0) {
-			gnutls_assert();
-		}
-	}
-#endif
-
-	return;
-}
 
 void register_x86_crypto(void)
 {
@@ -577,6 +580,8 @@ void register_x86_crypto(void)
 	}
 	
 	register_x86_intel_crypto(capabilities);
+#ifdef ENABLE_PADLOCK
 	register_x86_padlock_crypto(capabilities);
+#endif
 }
 
