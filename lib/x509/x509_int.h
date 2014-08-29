@@ -43,6 +43,8 @@
 typedef struct gnutls_x509_crl_int {
 	ASN1_TYPE crl;
 	int use_extensions;
+
+	gnutls_datum_t der;
 	gnutls_datum_t raw_issuer_dn;
 } gnutls_x509_crl_int;
 

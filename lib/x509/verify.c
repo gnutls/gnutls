@@ -1094,7 +1094,7 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 	}
 
 	result =
-	    _gnutls_x509_get_signed_data(crl->crl, NULL, "tbsCertList",
+	    _gnutls_x509_get_signed_data(crl->crl, &crl->der, "tbsCertList",
 					 &crl_signed_data);
 	if (result < 0) {
 		gnutls_assert();
