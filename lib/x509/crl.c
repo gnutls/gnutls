@@ -97,6 +97,7 @@ void gnutls_x509_crl_deinit(gnutls_x509_crl_t crl)
 	if (crl->crl)
 		asn1_delete_structure(&crl->crl);
 	gnutls_free(crl->raw_issuer_dn.data);
+	gnutls_free(crl->der.data);
 
 	gnutls_free(crl);
 }
@@ -120,30 +121,32 @@ gnutls_x509_crl_import(gnutls_x509_crl_t crl,
 		       const gnutls_datum_t * data,
 		       gnutls_x509_crt_fmt_t format)
 {
-	int result = 0, need_free = 0;
-	gnutls_datum_t _data;
-
-	_data.data = data->data;
-	_data.size = data->size;
+	int result = 0;
 
 	if (crl == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	_gnutls_free_datum(&crl->der);
+
 	/* If the CRL is in PEM format then decode it
 	 */
 	if (format == GNUTLS_X509_FMT_PEM) {
 		result =
 		    _gnutls_fbase64_decode(PEM_CRL, data->data, data->size,
-					   &_data);
+					   &crl->der);
 
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
-
-		need_free = 1;
+	} else {
+		result = _gnutls_set_datum(&crl->der, data->data, data->size);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
 	}
 
 	if (crl->expanded) {
@@ -156,14 +159,14 @@ gnutls_x509_crl_import(gnutls_x509_crl_t crl,
 	crl->expanded = 1;
 
 	result =
-	    asn1_der_decoding(&crl->crl, _data.data, _data.size, NULL);
+	    asn1_der_decoding(&crl->crl, crl->der.data, crl->der.size, NULL);
 	if (result != ASN1_SUCCESS) {
 		result = _gnutls_asn2err(result);
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	result = _gnutls_x509_get_raw_dn2(crl->crl, &_data,
+	result = _gnutls_x509_get_raw_dn2(crl->crl, &crl->der,
 					  "tbsCertList.issuer.rdnSequence",
 					  &crl->raw_issuer_dn);
 	if (result < 0) {
@@ -171,14 +174,10 @@ gnutls_x509_crl_import(gnutls_x509_crl_t crl,
 		goto cleanup;
 	}
 
-	if (need_free)
-		_gnutls_free_datum(&_data);
-
 	return 0;
 
       cleanup:
-	if (need_free)
-		_gnutls_free_datum(&_data);
+	_gnutls_free_datum(&crl->der);
 	_gnutls_free_datum(&crl->raw_issuer_dn);
 	return result;
 }
