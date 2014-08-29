@@ -57,8 +57,6 @@ sha1_block_data_order:
 	movl	_gnutls_x86_cpuid_s+8(%rip),%r10d
 	testl	$512,%r8d
 	jz	.Lialu
-	testl	$536870912,%r10d
-	jnz	_shaext_shortcut
 	jmp	_ssse3_shortcut
 
 .p2align	4
@@ -1280,195 +1278,6 @@ sha1_block_data_order:
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
 .LSEH_end_sha1_block_data_order:
-.def	sha1_block_data_order_shaext;	.scl 3;	.type 32;	.endef
-.p2align	5
-sha1_block_data_order_shaext:
-	movq	%rdi,8(%rsp)
-	movq	%rsi,16(%rsp)
-	movq	%rsp,%rax
-.LSEH_begin_sha1_block_data_order_shaext:
-	movq	%rcx,%rdi
-	movq	%rdx,%rsi
-	movq	%r8,%rdx
-
-_shaext_shortcut:
-	leaq	-72(%rsp),%rsp
-	movaps	%xmm6,-8-64(%rax)
-	movaps	%xmm7,-8-48(%rax)
-	movaps	%xmm8,-8-32(%rax)
-	movaps	%xmm9,-8-16(%rax)
-.Lprologue_shaext:
-	movdqu	(%rdi),%xmm0
-	movd	16(%rdi),%xmm1
-	movdqa	K_XX_XX+160(%rip),%xmm3
-
-	movdqu	(%rsi),%xmm4
-	pshufd	$27,%xmm0,%xmm0
-	movdqu	16(%rsi),%xmm5
-	pshufd	$27,%xmm1,%xmm1
-	movdqu	32(%rsi),%xmm6
-.byte	102,15,56,0,227
-	movdqu	48(%rsi),%xmm7
-.byte	102,15,56,0,235
-.byte	102,15,56,0,243
-	movdqa	%xmm1,%xmm9
-.byte	102,15,56,0,251
-	jmp	.Loop_shaext
-
-.p2align	4
-.Loop_shaext:
-	decq	%rdx
-	leaq	64(%rsi),%rax
-	paddd	%xmm4,%xmm1
-	cmovneq	%rax,%rsi
-	movdqa	%xmm0,%xmm8
-.byte	15,56,201,229
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,0
-.byte	15,56,200,213
-	pxor	%xmm6,%xmm4
-.byte	15,56,201,238
-.byte	15,56,202,231
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,0
-.byte	15,56,200,206
-	pxor	%xmm7,%xmm5
-.byte	15,56,202,236
-.byte	15,56,201,247
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,0
-.byte	15,56,200,215
-	pxor	%xmm4,%xmm6
-.byte	15,56,201,252
-.byte	15,56,202,245
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,0
-.byte	15,56,200,204
-	pxor	%xmm5,%xmm7
-.byte	15,56,202,254
-.byte	15,56,201,229
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,0
-.byte	15,56,200,213
-	pxor	%xmm6,%xmm4
-.byte	15,56,201,238
-.byte	15,56,202,231
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,1
-.byte	15,56,200,206
-	pxor	%xmm7,%xmm5
-.byte	15,56,202,236
-.byte	15,56,201,247
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,1
-.byte	15,56,200,215
-	pxor	%xmm4,%xmm6
-.byte	15,56,201,252
-.byte	15,56,202,245
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,1
-.byte	15,56,200,204
-	pxor	%xmm5,%xmm7
-.byte	15,56,202,254
-.byte	15,56,201,229
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,1
-.byte	15,56,200,213
-	pxor	%xmm6,%xmm4
-.byte	15,56,201,238
-.byte	15,56,202,231
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,1
-.byte	15,56,200,206
-	pxor	%xmm7,%xmm5
-.byte	15,56,202,236
-.byte	15,56,201,247
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,2
-.byte	15,56,200,215
-	pxor	%xmm4,%xmm6
-.byte	15,56,201,252
-.byte	15,56,202,245
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,2
-.byte	15,56,200,204
-	pxor	%xmm5,%xmm7
-.byte	15,56,202,254
-.byte	15,56,201,229
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,2
-.byte	15,56,200,213
-	pxor	%xmm6,%xmm4
-.byte	15,56,201,238
-.byte	15,56,202,231
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,2
-.byte	15,56,200,206
-	pxor	%xmm7,%xmm5
-.byte	15,56,202,236
-.byte	15,56,201,247
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,2
-.byte	15,56,200,215
-	pxor	%xmm4,%xmm6
-.byte	15,56,201,252
-.byte	15,56,202,245
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,3
-.byte	15,56,200,204
-	pxor	%xmm5,%xmm7
-.byte	15,56,202,254
-	movdqu	(%rsi),%xmm4
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,3
-.byte	15,56,200,213
-	movdqu	16(%rsi),%xmm5
-.byte	102,15,56,0,227
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,3
-.byte	15,56,200,206
-	movdqu	32(%rsi),%xmm6
-.byte	102,15,56,0,235
-
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,3
-.byte	15,56,200,215
-	movdqu	48(%rsi),%xmm7
-.byte	102,15,56,0,243
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,3
-.byte	65,15,56,200,201
-.byte	102,15,56,0,251
-
-	paddd	%xmm8,%xmm0
-	movdqa	%xmm1,%xmm9
-
-	jnz	.Loop_shaext
-
-	pshufd	$27,%xmm0,%xmm0
-	pshufd	$27,%xmm1,%xmm1
-	movdqu	%xmm0,(%rdi)
-	movd	%xmm1,16(%rdi)
-	movaps	-8-64(%rax),%xmm6
-	movaps	-8-48(%rax),%xmm7
-	movaps	-8-32(%rax),%xmm8
-	movaps	-8-16(%rax),%xmm9
-	movq	%rax,%rsp
-.Lepilogue_shaext:
-	movq	8(%rsp),%rdi
-	movq	16(%rsp),%rsi
-	.byte	0xf3,0xc3
-.LSEH_end_sha1_block_data_order_shaext:
 .def	sha1_block_data_order_ssse3;	.scl 3;	.type 32;	.endef
 .p2align	4
 sha1_block_data_order_ssse3:
@@ -2680,7 +2489,6 @@ K_XX_XX:
 .long	0xca62c1d6,0xca62c1d6,0xca62c1d6,0xca62c1d6
 .long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f
 .long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f
-.byte	0xf,0xe,0xd,0xc,0xb,0xa,0x9,0x8,0x7,0x6,0x5,0x4,0x3,0x2,0x1,0x0
 .byte	83,72,65,49,32,98,108,111,99,107,32,116,114,97,110,115,102,111,114,109,32,102,111,114,32,120,56,54,95,54,52,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .p2align	6
 
@@ -2726,37 +2534,6 @@ se_handler:
 
 	jmp	.Lcommon_seh_tail
 
-.def	shaext_handler;	.scl 3;	.type 32;	.endef
-.p2align	4
-shaext_handler:
-	pushq	%rsi
-	pushq	%rdi
-	pushq	%rbx
-	pushq	%rbp
-	pushq	%r12
-	pushq	%r13
-	pushq	%r14
-	pushq	%r15
-	pushfq
-	subq	$64,%rsp
-
-	movq	120(%r8),%rax
-	movq	248(%r8),%rbx
-
-	leaq	.Lprologue_shaext(%rip),%r10
-	cmpq	%r10,%rbx
-	jb	.Lcommon_seh_tail
-
-	leaq	.Lepilogue_shaext(%rip),%r10
-	cmpq	%r10,%rbx
-	jae	.Lcommon_seh_tail
-
-	leaq	-8-64(%rax),%rsi
-	leaq	512(%r8),%rdi
-	movl	$8,%ecx
-.long	0xa548f3fc
-
-	jmp	.Lcommon_seh_tail
 
 .def	ssse3_handler;	.scl 3;	.type 32;	.endef
 .p2align	4
@@ -2853,9 +2630,6 @@ ssse3_handler:
 .rva	.LSEH_begin_sha1_block_data_order
 .rva	.LSEH_end_sha1_block_data_order
 .rva	.LSEH_info_sha1_block_data_order
-.rva	.LSEH_begin_sha1_block_data_order_shaext
-.rva	.LSEH_end_sha1_block_data_order_shaext
-.rva	.LSEH_info_sha1_block_data_order_shaext
 .rva	.LSEH_begin_sha1_block_data_order_ssse3
 .rva	.LSEH_end_sha1_block_data_order_ssse3
 .rva	.LSEH_info_sha1_block_data_order_ssse3
@@ -2864,9 +2638,6 @@ ssse3_handler:
 .LSEH_info_sha1_block_data_order:
 .byte	9,0,0,0
 .rva	se_handler
-.LSEH_info_sha1_block_data_order_shaext:
-.byte	9,0,0,0
-.rva	shaext_handler
 .LSEH_info_sha1_block_data_order_ssse3:
 .byte	9,0,0,0
 .rva	ssse3_handler

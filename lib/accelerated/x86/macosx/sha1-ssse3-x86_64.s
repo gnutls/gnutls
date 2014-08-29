@@ -49,8 +49,6 @@ _sha1_block_data_order:
 	movl	__gnutls_x86_cpuid_s+8(%rip),%r10d
 	testl	$512,%r8d
 	jz	L$ialu
-	testl	$536870912,%r10d
-	jnz	_shaext_shortcut
 	jmp	_ssse3_shortcut
 
 .p2align	4
@@ -1271,173 +1269,6 @@ L$epilogue:
 	.byte	0xf3,0xc3
 
 
-.p2align	5
-sha1_block_data_order_shaext:
-_shaext_shortcut:
-	movdqu	(%rdi),%xmm0
-	movd	16(%rdi),%xmm1
-	movdqa	K_XX_XX+160(%rip),%xmm3
-
-	movdqu	(%rsi),%xmm4
-	pshufd	$27,%xmm0,%xmm0
-	movdqu	16(%rsi),%xmm5
-	pshufd	$27,%xmm1,%xmm1
-	movdqu	32(%rsi),%xmm6
-.byte	102,15,56,0,227
-	movdqu	48(%rsi),%xmm7
-.byte	102,15,56,0,235
-.byte	102,15,56,0,243
-	movdqa	%xmm1,%xmm9
-.byte	102,15,56,0,251
-	jmp	L$oop_shaext
-
-.p2align	4
-L$oop_shaext:
-	decq	%rdx
-	leaq	64(%rsi),%rax
-	paddd	%xmm4,%xmm1
-	cmovneq	%rax,%rsi
-	movdqa	%xmm0,%xmm8
-.byte	15,56,201,229
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,0
-.byte	15,56,200,213
-	pxor	%xmm6,%xmm4
-.byte	15,56,201,238
-.byte	15,56,202,231
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,0
-.byte	15,56,200,206
-	pxor	%xmm7,%xmm5
-.byte	15,56,202,236
-.byte	15,56,201,247
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,0
-.byte	15,56,200,215
-	pxor	%xmm4,%xmm6
-.byte	15,56,201,252
-.byte	15,56,202,245
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,0
-.byte	15,56,200,204
-	pxor	%xmm5,%xmm7
-.byte	15,56,202,254
-.byte	15,56,201,229
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,0
-.byte	15,56,200,213
-	pxor	%xmm6,%xmm4
-.byte	15,56,201,238
-.byte	15,56,202,231
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,1
-.byte	15,56,200,206
-	pxor	%xmm7,%xmm5
-.byte	15,56,202,236
-.byte	15,56,201,247
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,1
-.byte	15,56,200,215
-	pxor	%xmm4,%xmm6
-.byte	15,56,201,252
-.byte	15,56,202,245
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,1
-.byte	15,56,200,204
-	pxor	%xmm5,%xmm7
-.byte	15,56,202,254
-.byte	15,56,201,229
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,1
-.byte	15,56,200,213
-	pxor	%xmm6,%xmm4
-.byte	15,56,201,238
-.byte	15,56,202,231
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,1
-.byte	15,56,200,206
-	pxor	%xmm7,%xmm5
-.byte	15,56,202,236
-.byte	15,56,201,247
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,2
-.byte	15,56,200,215
-	pxor	%xmm4,%xmm6
-.byte	15,56,201,252
-.byte	15,56,202,245
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,2
-.byte	15,56,200,204
-	pxor	%xmm5,%xmm7
-.byte	15,56,202,254
-.byte	15,56,201,229
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,2
-.byte	15,56,200,213
-	pxor	%xmm6,%xmm4
-.byte	15,56,201,238
-.byte	15,56,202,231
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,2
-.byte	15,56,200,206
-	pxor	%xmm7,%xmm5
-.byte	15,56,202,236
-.byte	15,56,201,247
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,2
-.byte	15,56,200,215
-	pxor	%xmm4,%xmm6
-.byte	15,56,201,252
-.byte	15,56,202,245
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,3
-.byte	15,56,200,204
-	pxor	%xmm5,%xmm7
-.byte	15,56,202,254
-	movdqu	(%rsi),%xmm4
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,3
-.byte	15,56,200,213
-	movdqu	16(%rsi),%xmm5
-.byte	102,15,56,0,227
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,3
-.byte	15,56,200,206
-	movdqu	32(%rsi),%xmm6
-.byte	102,15,56,0,235
-
-	movdqa	%xmm0,%xmm2
-.byte	15,58,204,193,3
-.byte	15,56,200,215
-	movdqu	48(%rsi),%xmm7
-.byte	102,15,56,0,243
-
-	movdqa	%xmm0,%xmm1
-.byte	15,58,204,194,3
-.byte	65,15,56,200,201
-.byte	102,15,56,0,251
-
-	paddd	%xmm8,%xmm0
-	movdqa	%xmm1,%xmm9
-
-	jnz	L$oop_shaext
-
-	pshufd	$27,%xmm0,%xmm0
-	pshufd	$27,%xmm1,%xmm1
-	movdqu	%xmm0,(%rdi)
-	movd	%xmm1,16(%rdi)
-	.byte	0xf3,0xc3
-
-
 .p2align	4
 sha1_block_data_order_ssse3:
 _ssse3_shortcut:
@@ -2625,7 +2456,6 @@ K_XX_XX:
 .long	0xca62c1d6,0xca62c1d6,0xca62c1d6,0xca62c1d6
 .long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f
 .long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f
-.byte	0xf,0xe,0xd,0xc,0xb,0xa,0x9,0x8,0x7,0x6,0x5,0x4,0x3,0x2,0x1,0x0
 .byte	83,72,65,49,32,98,108,111,99,107,32,116,114,97,110,115,102,111,114,109,32,102,111,114,32,120,56,54,95,54,52,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .p2align	6
 
