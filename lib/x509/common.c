@@ -1842,6 +1842,7 @@ int _gnutls_strdatum_to_buf(gnutls_datum_t * d, void *buf,
 	return ret;
 }
 
+/* returns a constant string in @dn pointing to @raw */
 int
 _gnutls_x509_get_raw_dn2(ASN1_TYPE c2, gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn)
@@ -1860,12 +1861,8 @@ _gnutls_x509_get_raw_dn2(ASN1_TYPE c2, gnutls_datum_t * raw,
 
 	len1 = end1 - start1 + 1;
 
-	result = _gnutls_set_datum(dn, &raw->data[start1], len1);
-	if (result < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
+	dn->data = &raw->data[start1];
+	dn->size = len1;
 	result = 0;
 
       cleanup:
