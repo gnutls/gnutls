@@ -109,9 +109,6 @@ static int has_embedded_null(const char *str, unsigned size)
  * The latter fallback exists due to misconfiguration of many servers
  * which place an IPAddress inside the DNSName extension.
  *
- * The comparison of dns names may have false-negatives as it is done byte 
- * by byte in non-ascii names.
- *
  * When the flag %GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS is specified no
  * wildcards are considered. Otherwise they are only considered if the
  * domain name consists of three components or more, and the wildcard
