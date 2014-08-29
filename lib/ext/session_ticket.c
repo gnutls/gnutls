@@ -97,7 +97,7 @@ decrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 	time_t timestamp = gnutls_time(0);
 	int ret;
 
-	/* Decrypt encrypted_state using 128-bit AES in CBC mode. */
+	/* Decrypt encrypted_state using 128-bit AES in GCM mode. */
 	key.data = (void *) &priv->key[KEY_POS];
 	key.size = KEY_SIZE;
 	IV.data = ticket->IV;
