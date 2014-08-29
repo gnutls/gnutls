@@ -134,8 +134,6 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert)
 
 	if (cert->cert)
 		asn1_delete_structure(&cert->cert);
-	gnutls_free(cert->raw_dn.data);
-	gnutls_free(cert->raw_issuer_dn.data);
 	gnutls_free(cert->der.data);
 	gnutls_free(cert);
 }
@@ -206,8 +204,6 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		   structure, so we need to replace it with a fresh
 		   structure. */
 		asn1_delete_structure(&cert->cert);
-		_gnutls_free_datum(&cert->raw_dn);
-		_gnutls_free_datum(&cert->raw_issuer_dn);
 
 		result = asn1_create_element(_gnutls_get_pkix(),
 					     "PKIX1.Certificate",
@@ -253,8 +249,6 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 
       cleanup:
 	_gnutls_free_datum(&cert->der);
-	_gnutls_free_datum(&cert->raw_dn);
-	_gnutls_free_datum(&cert->raw_issuer_dn);
 	return result;
 }
 
