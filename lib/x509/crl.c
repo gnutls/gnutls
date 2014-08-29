@@ -47,7 +47,7 @@ int result;
 	}
 	crl->rcache = NULL;
 	crl->rcache_idx = 0;
-	_gnutls_free_datum(&crl->raw_issuer_dn);
+	crl->raw_issuer_dn.size = 0;
 
 	return 0;
 }
@@ -96,7 +96,6 @@ void gnutls_x509_crl_deinit(gnutls_x509_crl_t crl)
 
 	if (crl->crl)
 		asn1_delete_structure(&crl->crl);
-	gnutls_free(crl->raw_issuer_dn.data);
 	gnutls_free(crl->der.data);
 
 	gnutls_free(crl);
@@ -178,7 +177,6 @@ gnutls_x509_crl_import(gnutls_x509_crl_t crl,
 
       cleanup:
 	_gnutls_free_datum(&crl->der);
-	_gnutls_free_datum(&crl->raw_issuer_dn);
 	return result;
 }
 

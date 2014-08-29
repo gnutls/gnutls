@@ -38,8 +38,8 @@ static int crt_reinit(gnutls_x509_crt_t crt)
 {
 	int result;
 
-	_gnutls_free_datum(&crt->raw_dn);
-	_gnutls_free_datum(&crt->raw_issuer_dn);
+	crt->raw_dn.size = 0;
+	crt->raw_issuer_dn.size = 0;
 
 	asn1_delete_structure(&crt->cert);
 
@@ -160,8 +160,6 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert)
 
 	if (cert->cert)
 		asn1_delete_structure(&cert->cert);
-	gnutls_free(cert->raw_dn.data);
-	gnutls_free(cert->raw_issuer_dn.data);
 	gnutls_free(cert->der.data);
 	gnutls_free(cert);
 }
@@ -272,8 +270,6 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 
       cleanup:
 	_gnutls_free_datum(&cert->der);
-	_gnutls_free_datum(&cert->raw_dn);
-	_gnutls_free_datum(&cert->raw_issuer_dn);
 	return result;
 }
 
