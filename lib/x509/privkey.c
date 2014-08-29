@@ -1368,6 +1368,9 @@ char* gen_data = NULL;
 
 	ret = 0;
 cleanup:
+	if (ret == GNUTLS_E_PK_GENERATION_ERROR) {
+		_gnutls_switch_lib_state(LIB_STATE_ERROR);
+	}
 	gnutls_free(gen_data);
 	gnutls_free(sig.data);
 	gnutls_free(tmp.data);
