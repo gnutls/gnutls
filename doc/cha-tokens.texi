@@ -216,7 +216,7 @@ storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}
 * Reading objects::
 * Writing objects::
 * Using a PKCS11 token with TLS::
-* p11tool Invocation::             Invoking p11tool
+* p11tool Invocation::
 @end menu
 
 @node PKCS11 Initialization
@@ -414,7 +414,7 @@ In GnuTLS the TPM functionality is available in @code{gnutls/tpm.h}.
 * Keys in TPM::
 * Key generation::
 * Using keys::
-* tpmtool Invocation::            Invoking tpmtool
+* tpmtool Invocation::
 @end menu
 
 @node Keys in TPM
