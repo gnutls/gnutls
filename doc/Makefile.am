@@ -117,7 +117,7 @@ invoke-p11tool.texi: $(top_srcdir)/src/p11tool-args.def invoke-psktool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	$(SED) -e 's/@subheading/@subsubheading/g' \
+	$(SED) -e 's/@subheading/@subsection/g' \
 	    -e 's/@section/@subsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
@@ -128,7 +128,7 @@ invoke-tpmtool.texi: $(top_srcdir)/src/tpmtool-args.def invoke-p11tool.texi
 	fi; \
 	$(srcdir)/scripts/cleanup-autogen.pl < $@ > $@.tmp && \
 	rm -f $@ && \
-	$(SED) -e 's/@subheading/@subsubheading/g' \
+	$(SED) -e 's/@subheading/@subsection/g' \
 	    -e 's/@section/@subsection/g' $@.tmp > $@ && \
 	rm -f $@.tmp
 
