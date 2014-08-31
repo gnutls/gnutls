@@ -25,7 +25,7 @@ stored in an HSM, as well as a key stored in the TPM chip are shown below. To di
 of the objects the @code{p11tool} (see @ref{p11tool Invocation}),
 or @code{tpmtool} (see @ref{tpmtool Invocation}) may be used.
 
-@example 
+@example
 pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315; \
 manufacturer=EnterSafe;object=test1;objecttype=cert
 
