@@ -640,6 +640,11 @@ unsigned found_one;
 				return gnutls_assert_val(t);
 		} while(ret >= 0);
 
+		/* there is at least a single e-mail. That means that the EMAIL field will
+		 * not be used for verifying the identity of the holder. */
+		if (found_one != 0)
+			return 1;
+
 		do {
 			/* ensure there is only a single EMAIL, similarly to CN handling (rfc6125) */
 			name_size = sizeof(name);
@@ -691,6 +696,11 @@ unsigned found_one;
 			if (t == 0)
 				return gnutls_assert_val(t);
 		} while(ret >= 0);
+
+		/* there is at least a single DNS name. That means that the CN will
+		 * not be used for verifying the identity of the holder. */
+		if (found_one != 0)
+			return 1;
 
 		/* verify the name constraints against the CN, if the certificate is
 		 * not a CA. */
