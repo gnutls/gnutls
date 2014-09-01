@@ -27,6 +27,7 @@
 #include <minmax.h>
 #include <string.h>
 #include <stdio.h>
+#include <fips.h>
 
 int
 drbg_aes_init(struct drbg_aes_ctx *ctx,
@@ -137,8 +138,10 @@ int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, dst, ctx->v);
 
 		/* if detected loop */
-		if (memcmp(dst, ctx->prev_block, AES_BLOCK_SIZE) == 0)
+		if (memcmp(dst, ctx->prev_block, AES_BLOCK_SIZE) == 0) {
+			_gnutls_switch_lib_state(LIB_STATE_ERROR);
 			return 0;
+		}
 
 		memcpy(ctx->prev_block, dst, AES_BLOCK_SIZE);
 	}
@@ -149,8 +152,10 @@ int drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length, uint8_t * dst,
 		aes_encrypt(&ctx->key, AES_BLOCK_SIZE, tmp, ctx->v);
 
 		/* if detected loop */
-		if (memcmp(tmp, ctx->prev_block, AES_BLOCK_SIZE) == 0)
+		if (memcmp(tmp, ctx->prev_block, AES_BLOCK_SIZE) == 0) {
+			_gnutls_switch_lib_state(LIB_STATE_ERROR);
 			return 0;
+		}
 
 		memcpy(ctx->prev_block, tmp, AES_BLOCK_SIZE);
 		memcpy(dst, tmp, left);
