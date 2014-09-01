@@ -271,7 +271,7 @@ static int test_cipher(gnutls_cipher_algorithm_t cipher,
 					   vectors[i].plaintext_size,
 					   tmp, sizeof(tmp));
 		if (ret < 0)
-			return 0;
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
 		gnutls_cipher_deinit(hd);
 
@@ -281,6 +281,7 @@ static int test_cipher(gnutls_cipher_algorithm_t cipher,
 			_gnutls_debug_log("%s test vector %d failed!\n",
 					  gnutls_cipher_get_name(cipher),
 					  i);
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 	}
 
