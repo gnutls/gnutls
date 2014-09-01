@@ -21,6 +21,7 @@
  */
 
 #include <config.h>
+#include <gnutls_errors.h>
 #include <drbg-aes.h>
 #include <string.h>
 #include <stdio.h>
@@ -101,12 +102,22 @@ int drbg_aes_self_test(void)
 	};
 	unsigned i, j;
 	struct drbg_aes_ctx test_ctx;
+	struct drbg_aes_ctx test_ctx2;
 	struct priv_st priv;
 	int ret;
 	unsigned char result[16];
 
 	memset(&priv, 0, sizeof(priv));
 	priv.ctx = &test_ctx;
+
+	/* Test the error handling of drbg_aes_init */
+	ret =
+	    drbg_aes_init(&test_ctx, DRBG_AES_SEED_SIZE, tv[0].entropy,
+			  DRBG_AES_SEED_SIZE*2, (void*)tv);
+	if (ret != 0) {
+		gnutls_assert();
+		return 0;
+	}
 
 	for (i = 0; i < sizeof(tv) / sizeof(tv[0]); i++) {
 		/* Setup the key.  */
@@ -141,6 +152,21 @@ int drbg_aes_self_test(void)
 			return 0;
 
 		if (memcmp(result, tv[i].res[3], 16) != 0) {
+			return 0;
+		}
+
+		/* test the error handling of drbg_aes_random() */
+		test_ctx.reseed_counter = DRBG_AES_RESEED_TIME+1;
+		if (drbg_aes_random(&test_ctx, 16, result) != 0) {
+			gnutls_assert();
+			return 0;
+		}
+
+		/* test deinit, which is zeroize_key() */
+		memcpy(&test_ctx2, &test_ctx, sizeof(test_ctx));
+		zeroize_key(&test_ctx, sizeof(test_ctx));
+		if (memcmp(&test_ctx, &test_ctx2, sizeof(test_ctx)) == 0) {
+			gnutls_assert();
 			return 0;
 		}
 	}

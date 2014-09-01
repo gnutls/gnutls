@@ -80,6 +80,8 @@ int
 drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length,
 		uint8_t * dst, unsigned add_size, const uint8_t* add);
 
+/* For deinitialization use zeroize_key() on the context */
+
 int drbg_aes_is_seeded(struct drbg_aes_ctx *ctx);
 
 int drbg_aes_self_test(void);
