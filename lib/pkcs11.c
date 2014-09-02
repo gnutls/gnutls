@@ -3278,6 +3278,18 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 					}
 				}
 
+				if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY) {
+					if (priv->crt == NULL) {
+						gnutls_assert();
+						break;
+					}
+
+					if (_gnutls_check_if_same_key2(priv->crt, &data) == 0) {
+						/* doesn't match */
+						break;
+					}
+				}
+
 				found = 1;
 				break;
 			} else {
@@ -3479,7 +3491,7 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 
 	/* when looking for a trusted certificate, we always fully compare
 	 * with the given */
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED)
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED && !(flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY))
 		flags |= GNUTLS_PKCS11_OBJ_FLAG_COMPARE;
 
 	priv.flags = flags;

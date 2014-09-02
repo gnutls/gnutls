@@ -101,9 +101,10 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE: marked as not private.
  * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY: When retrieving an object, do not set any requirements.
  * GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED: When retrieving an object, only retrieve the marked as trusted.
- *   In gnutls_pkcs11_crt_is_known() it implies GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_COMPARE.
+ *   In gnutls_pkcs11_crt_is_known() it implies %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_COMPARE if %GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY is not given.
  * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED: When retrieving an object, only retrieve the marked as distrusted.
- * @GNUTLS_PKCS11_OBJ_FLAG_COMPARE: When checking an object's presence, full compare it before returning any result.
+ * @GNUTLS_PKCS11_OBJ_FLAG_COMPARE: When checking an object's presence, fully compare it before returning any result.
+ * @GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY: When checking an object's presence, compare the key before returning any result.
  * @GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE: The object must be present in a marked as trusted module.
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_CA: Mark the object as a CA.
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP: Mark the generated key pair as wrapping and unwrapping keys.
@@ -123,7 +124,8 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_COMPARE = (1<<9),
 	GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE = (1<<10),
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_CA = (1<<11),
-	GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP = (1<<12)
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP = (1<<12),
+	GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY = (1<<13)
 } gnutls_pkcs11_obj_flags;
 
 /**

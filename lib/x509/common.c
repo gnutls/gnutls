@@ -1844,7 +1844,7 @@ int _gnutls_strdatum_to_buf(gnutls_datum_t * d, void *buf,
 
 /* returns a constant string in @dn pointing to @raw */
 int
-_gnutls_x509_get_raw_dn2(ASN1_TYPE c2, gnutls_datum_t * raw,
+_gnutls_x509_get_raw_field2(ASN1_TYPE c2, gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn)
 {
 	int result, len1;
