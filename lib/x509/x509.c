@@ -246,7 +246,7 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	result = _gnutls_x509_get_raw_dn2(cert->cert, &cert->der,
+	result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
 					  "tbsCertificate.issuer.rdnSequence",
 					  &cert->raw_issuer_dn);
 	if (result < 0) {
@@ -254,9 +254,17 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	result = _gnutls_x509_get_raw_dn2(cert->cert, &cert->der,
+	result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
 					  "tbsCertificate.subject.rdnSequence",
 					  &cert->raw_dn);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
+					  "tbsCertificate.subjectPublicKeyInfo",
+					  &cert->raw_spki);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;

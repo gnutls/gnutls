@@ -70,6 +70,7 @@ typedef struct gnutls_x509_crt_int {
 	 * get_raw_*_dn(). */
 	gnutls_datum_t raw_dn;
 	gnutls_datum_t raw_issuer_dn;
+	gnutls_datum_t raw_spki;
 
 	gnutls_datum_t der;
 	struct pin_info_st pin;

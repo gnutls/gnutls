@@ -165,7 +165,7 @@ gnutls_x509_crl_import(gnutls_x509_crl_t crl,
 		goto cleanup;
 	}
 
-	result = _gnutls_x509_get_raw_dn2(crl->crl, &crl->der,
+	result = _gnutls_x509_get_raw_field2(crl->crl, &crl->der,
 					  "tbsCertList.issuer.rdnSequence",
 					  &crl->raw_issuer_dn);
 	if (result < 0) {
