@@ -53,7 +53,8 @@ inline static gnutls_lib_state_t _gnutls_get_lib_state(void)
 	return _gnutls_lib_mode;
 }
 
-int _gnutls_fips_perform_self_checks(void);
+int _gnutls_fips_perform_self_checks1(void);
+int _gnutls_fips_perform_self_checks2(void);
 
 #ifdef ENABLE_FIPS140
 unsigned _gnutls_fips_mode_enabled(void);

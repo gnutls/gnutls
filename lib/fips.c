@@ -212,7 +212,34 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 	return 1;
 }
 
-int _gnutls_fips_perform_self_checks(void)
+int _gnutls_fips_perform_self_checks1(void)
+{
+	int ret;
+
+	_gnutls_switch_lib_state(LIB_STATE_SELFTEST);
+
+	/* Tests the FIPS algorithms used by nettle internally.
+	 * In our case we test AES-CBC since nettle's AES is used by
+	 * the DRBG-AES.
+	 */
+
+	/* ciphers - one test per cipher */
+	ret = gnutls_cipher_self_test(0, GNUTLS_CIPHER_AES_128_CBC);
+	if (ret < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	return 0;
+
+error:
+	_gnutls_switch_lib_state(LIB_STATE_ERROR);
+	_gnutls_audit_log(NULL, "FIPS140-2 self testing part1 failed\n");
+
+	return GNUTLS_E_SELF_TEST_ERROR;
+}
+
+int _gnutls_fips_perform_self_checks2(void)
 {
 	int ret;
 
@@ -322,7 +349,7 @@ int _gnutls_fips_perform_self_checks(void)
 
 error:
 	_gnutls_switch_lib_state(LIB_STATE_ERROR);
-	_gnutls_audit_log(NULL, "FIPS140-2 self testing failed\n");
+	_gnutls_audit_log(NULL, "FIPS140-2 self testing part 2 failed\n");
 
 	return GNUTLS_E_SELF_TEST_ERROR;
 }

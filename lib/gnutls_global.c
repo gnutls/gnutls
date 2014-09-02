@@ -290,12 +290,7 @@ int gnutls_global_init(void)
 		goto out;
 	}
 
-	_gnutls_register_accel_crypto();
-	_gnutls_cryptodev_init();
-
 #ifdef ENABLE_FIPS140
-	/* Perform FIPS140 checks last, so that all modules
-	 * have been loaded */
 	res = _gnutls_fips_mode_enabled();
 	/* res == 1 -> fips140-2 mode enabled
 	 * res == 2 -> only self checks performed - but no failure
@@ -304,7 +299,27 @@ int gnutls_global_init(void)
 	if (res != 0) {
 		_gnutls_priority_update_fips();
 
-		ret = _gnutls_fips_perform_self_checks();
+		/* first round of self checks, these are done on the
+		 * nettle algorithms which are used internally */
+		ret = _gnutls_fips_perform_self_checks1();
+		if (res != 2) {
+			if (ret < 0) {
+				gnutls_assert();
+				goto out;
+			}
+		}
+	}
+#endif
+
+	_gnutls_register_accel_crypto();
+	_gnutls_cryptodev_init();
+
+#ifdef ENABLE_FIPS140
+	/* These self tests are performed on the overriden algorithms
+	 * (e.g., AESNI overriden AES). They are after _gnutls_register_accel_crypto()
+	 * intentionally */
+	if (res != 0) {
+		ret = _gnutls_fips_perform_self_checks2();
 		if (res != 2) {
 			if (ret < 0) {
 				gnutls_assert();

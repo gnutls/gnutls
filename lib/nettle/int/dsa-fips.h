@@ -27,6 +27,7 @@
 #include <gmp.h>
 #include <nettle/dsa.h>
 #include <nettle/sha2.h>
+#include <fips.h>
 
 #define MAX_PVP_SEED_SIZE 256
 
