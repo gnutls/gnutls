@@ -95,6 +95,7 @@ const char *p;
 #define GNUTLS_LIBRARY_NAME "libgnutls.so.28"
 #define NETTLE_LIBRARY_NAME "libnettle.so.4"
 #define HOGWEED_LIBRARY_NAME "libhogweed.so.2"
+#define GMP_LIBRARY_NAME "libgmp.so.10"
 
 static const char fips_key[] = "I'd rather be skiing";
 
@@ -137,13 +138,23 @@ static void get_hmac_file(char *mac_file, size_t mac_file_size, const char* orig
 char* p;
 
 	p = strrchr(orig, '/');
-
 	if (p==NULL) {
 		snprintf(mac_file, mac_file_size, ".%s"HMAC_SUFFIX, orig);
 		return;
 	}
-
 	snprintf(mac_file, mac_file_size, "%.*s/.%s"HMAC_SUFFIX, (int)(p-orig), orig, p+1);
+}
+
+static void get_hmac_file2(char *mac_file, size_t mac_file_size, const char* orig)
+{
+char* p;
+
+	p = strrchr(orig, '/');
+	if (p==NULL) {
+		snprintf(mac_file, mac_file_size, "fipscheck/%s"HMAC_SUFFIX, orig);
+		return;
+	}
+	snprintf(mac_file, mac_file_size, "%.*s/fipscheck/%s"HMAC_SUFFIX, (int)(p-orig), orig, p+1);
 }
 
 /* Run an HMAC using the key above on the library binary data. 
@@ -186,11 +197,16 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 
 	/* now open the .hmac file and compare */
 	get_hmac_file(mac_file, sizeof(mac_file), file);
-	
+
 	ret = gnutls_load_file(mac_file, &data);
 	if (ret < 0) {
-		_gnutls_debug_log("Could not open %s"HMAC_SUFFIX" for MAC testing: %s\n", file, gnutls_strerror(ret));
-		return gnutls_assert_val(0);
+		_gnutls_debug_log("Could not open %s for MAC testing: %s\n", mac_file, gnutls_strerror(ret));
+		get_hmac_file2(mac_file, sizeof(mac_file), file);
+		ret = gnutls_load_file(mac_file, &data);
+		if (ret < 0) {
+			_gnutls_debug_log("Could not open %s for MAC testing: %s\n", mac_file, gnutls_strerror(ret));
+			return gnutls_assert_val(0);
+		}
 	}
 
 	hmac_size = sizeof(hmac);
@@ -340,6 +356,12 @@ int _gnutls_fips_perform_self_checks2(void)
 	}
 
 	ret = check_binary_integrity(HOGWEED_LIBRARY_NAME, "nettle_mpz_sizeinbase_256_u");
+	if (ret == 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	ret = check_binary_integrity(GMP_LIBRARY_NAME, "__gmpz_init");
 	if (ret == 0) {
 		gnutls_assert();
 		goto error;
