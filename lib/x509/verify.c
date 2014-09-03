@@ -39,13 +39,19 @@
 #include <gnutls_pk.h>
 #include <stdbool.h>
 
-/* Checks if two certs have the same name and the same key.  Return 1 on match. */
+/* Checks if two certs have the same name and the same key.  Return 1 on match. 
+ * If @is_ca is zero then this function is identical to _gnutls_check_if_same_cert()
+ */
 static bool
 _gnutls_check_if_same_key(gnutls_x509_crt_t cert1,
-			   gnutls_x509_crt_t cert2)
+			  gnutls_x509_crt_t cert2,
+			  unsigned is_ca)
 {
 	int ret;
 	bool result;
+
+	if (is_ca == 0)
+		return _gnutls_check_if_same_cert(cert1, cert2);
 
 	ret = _gnutls_is_same_dn(cert1, cert2);
 	if (ret == 0)
@@ -57,7 +63,6 @@ _gnutls_check_if_same_key(gnutls_x509_crt_t cert1,
 	else
 		result = 0;
 
- fail:
 	return result;
 }
 
@@ -78,7 +83,7 @@ _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
 		return gnutls_assert_val(0);
 	}
 
-	ret = _gnutls_check_if_same_key(cert1, cert2);
+	ret = _gnutls_check_if_same_key(cert1, cert2, 1);
 
 	gnutls_x509_crt_deinit(cert2);
 	return ret;
@@ -887,7 +892,7 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 			 * because it can happen that a CA certificate is upgraded from intermediate
 			 * CA to self-signed CA at some point. */
 			if (_gnutls_check_if_same_key
-			    (certificate_list[i], trusted_cas[j]) != 0) {
+			    (certificate_list[i], trusted_cas[j], i) != 0) {
 				/* explicit time check for trusted CA that we remove from
 				 * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
 				 */
@@ -1032,9 +1037,16 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 		i = 1;		/* do not replace the first one */
 
 	for (; i < clist_size; i++) {
-		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], 
-			GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
-			GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED) != 0) {
+		unsigned vflags;
+
+		if (i == 0) /* in the end certificate do full comparison */
+			vflags = GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
+				GNUTLS_PKCS11_OBJ_FLAG_COMPARE|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED;
+		else
+			vflags = GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|
+				GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY|GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED;
+
+		if (gnutls_pkcs11_crt_is_known (url, certificate_list[i], vflags) != 0) {
 
 			if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) &&
 				!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS)) {
