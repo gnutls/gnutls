@@ -177,7 +177,7 @@ _gnutls_x509_get_raw_field2(ASN1_TYPE c2, gnutls_datum_t * raw,
 
 bool
 _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
-			   gnutls_datum_t * cert2bin);
+			   gnutls_datum_t *cert2bin);
 
 bool
 _gnutls_check_if_same_cert(gnutls_x509_crt_t cert1,
