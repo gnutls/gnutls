@@ -24,6 +24,7 @@ int _gnutls_vasprintf(char **strp, const char *fmt, va_list ap)
 		ret = vsnprintf(buf, max, fmt, ap);
 	}
 	while (ret > max && max < NO_MORE_MAX);
+	*strp = buf;
 
 	return ret;
 }
