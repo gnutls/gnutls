@@ -15,6 +15,9 @@ object listing would fail completely if a single object could not be exported.
 by retrieving them in large batches. Report and suggestion by David
 Woodhouse.
 
+* Fixes in gnutls_x509_crt_set_dn() and friends to properly handle strings
+with embedded spaces and escaped commas.
+
 ** libgnutls: when comparing a CA certificate with the trusted list compare
 the name and key only instead of the whole certificate. That is to handle
 cases where a CA certificate was superceded by a different one with the same
