@@ -1513,29 +1513,19 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
  * returns them into signed_data.
  */
 int
-_gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum *_der,
+_gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum *der,
 			     const char *src_name,
 			     gnutls_datum_t * signed_data)
 {
 	int start, end, result;
-	gnutls_datum_t der;
-	unsigned need_free = 0;
 
-	if (_der == NULL || _der->size == 0) {
-		need_free = 1;
-		result = _gnutls_x509_der_encode(src, "", &der, 0);
-		if (result < 0) {
-			gnutls_assert();
-			return result;
-		}
-	} else {
-		der.data = _der->data;
-		der.size = _der->size;
+	if (der == NULL || der->size == 0) {
+		return _gnutls_x509_der_encode(src, src_name, signed_data, 0);
 	}
 
 	/* Get the signed data
 	 */
-	result = asn1_der_decoding_startEnd(src, der.data, der.size,
+	result = asn1_der_decoding_startEnd(src, der->data, der->size,
 					    src_name, &start, &end);
 	if (result != ASN1_SUCCESS) {
 		result = _gnutls_asn2err(result);
@@ -1544,7 +1534,7 @@ _gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum *_der,
 	}
 
 	result =
-	    _gnutls_set_datum(signed_data, &der.data[start],
+	    _gnutls_set_datum(signed_data, &der->data[start],
 			      end - start + 1);
 
 	if (result < 0) {
@@ -1555,9 +1545,6 @@ _gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum *_der,
 	result = 0;
 
       cleanup:
-	if (need_free != 0)
-		_gnutls_free_datum(&der);
-
 	return result;
 }
 
