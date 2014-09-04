@@ -245,6 +245,9 @@ gnutls_x509_crt_set_key(gnutls_x509_crt_t crt, gnutls_x509_privkey_t key)
  * the extensions from the given certificate request to the certificate. 
  * Only RSA keys are currently supported.
  *
+ * Note that this function will only set the @crq if it is self
+ * signed and the signature is correct. See gnutls_x509_crq_sign2().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
