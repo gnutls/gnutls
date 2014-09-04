@@ -42,7 +42,7 @@ int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
 	gnutls_datum_t tmp;
 	const char *oid;
 	int ret;
-	unsigned i;
+	unsigned i,j;
 
 	if (name->size == 0 || val->size == 0)
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
@@ -75,19 +75,22 @@ int dn_attr_crt_set(set_dn_func f, void *crt, const gnutls_datum_t * name,
 	if (val->data[0] == '#')
 		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-	ret = _gnutls_set_datum(&tmp, val->data, val->size);
-	if (ret < 0)
+	tmp.size = val->size;
+	tmp.data = gnutls_malloc(tmp.size+1);
+	if (tmp.data == NULL) {
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
 
-	if (val->size > 1) {
-		/* remove \\, */
-		for (i=1;i<tmp.size-1;i++) {
-			if (tmp.data[i] == '\\' && tmp.data[i+1] == ',') {
-				memmove(&tmp.data[i], &tmp.data[i+1], tmp.size-i-1);
-				tmp.size--;
-			}
+	for (j=i=0;i<tmp.size;i++) {
+		if (1+j!=val->size && val->data[j] == '\\' && val->data[j+1] == ',') {
+			tmp.data[i] = ',';
+			j+=2;
+			tmp.size--;
+		} else {
+			tmp.data[i] = val->data[j++];
 		}
 	}
+	tmp.data[tmp.size] = 0;
 
 	ret = f(crt, oid, 0, tmp.data, tmp.size);
 	gnutls_free(tmp.data);
