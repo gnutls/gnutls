@@ -107,6 +107,14 @@ transmit_message(gnutls_session_t session,
 		else
 			frag_len = mtu;
 
+		/* we normally allow fragments of zero length, to allow
+		 * the packets which have zero size. On the others don't
+		 * send such fragments */
+		if (frag_len == 0 && data_size > 0) {
+			ret = 0;
+			break;
+		}
+
 		/* Fragment offset */
 		_gnutls_write_uint24(offset, &mtu_data[6]);
 
