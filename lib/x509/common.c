@@ -1519,8 +1519,10 @@ _gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum *_der,
 {
 	int start, end, result;
 	gnutls_datum_t der;
+	unsigned need_free = 0;
 
-	if (_der == NULL) {
+	if (_der == NULL || _der->size == 0) {
+		need_free = 1;
 		result = _gnutls_x509_der_encode(src, "", &der, 0);
 		if (result < 0) {
 			gnutls_assert();
@@ -1553,7 +1555,7 @@ _gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum *_der,
 	result = 0;
 
       cleanup:
-	if (_der == NULL)
+	if (need_free != 0)
 		_gnutls_free_datum(&der);
 
 	return result;
@@ -1842,7 +1844,6 @@ int _gnutls_strdatum_to_buf(gnutls_datum_t * d, void *buf,
 	return ret;
 }
 
-/* returns a constant string in @dn pointing to @raw */
 int
 _gnutls_x509_get_raw_field2(ASN1_TYPE c2, gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn)
