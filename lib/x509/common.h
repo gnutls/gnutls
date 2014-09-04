@@ -171,6 +171,13 @@ int _gnutls_get_key_id(gnutls_pk_algorithm_t pk, gnutls_pk_params_st *,
 void _asnstr_append_name(char *name, size_t name_size, const char *part1,
 			 const char *part2);
 
+/* Given a @c2 which it returns an allocated DER encoding of @whom in @out */
+inline static int
+_gnutls_x509_get_raw_field(ASN1_TYPE c2, const char *whom, gnutls_datum_t *out)
+{
+	return _gnutls_x509_der_encode(c2, whom, out, 0);
+}
+
 int
 _gnutls_x509_get_raw_field2(ASN1_TYPE c2, gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn);
