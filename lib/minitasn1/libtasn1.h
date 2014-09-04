@@ -44,7 +44,7 @@ extern "C"
 {
 #endif
 
-#define ASN1_VERSION "4.0"
+#define ASN1_VERSION "4.1"
 
 #if defined(__GNUC__) && !defined(ASN1_INTERNAL_BUILD)
 # define _ASN1_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
@@ -185,7 +185,11 @@ extern "C"
 #define ASN1_DELETE_FLAG_ZEROIZE 1
 
 /* Flags used by asn1_der_decoding2(). */
+
+/* This flag would allow arbitrary data past the DER data */
 #define ASN1_DECODE_FLAG_ALLOW_PADDING 1
+/* This flag would ensure that no BER decoding takes place */
+#define ASN1_DECODE_FLAG_STRICT_DER (1<<1)
 
 
   struct asn1_data_node_st
