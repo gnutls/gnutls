@@ -20,6 +20,9 @@ the name and key only instead of the whole certificate. That is to handle
 cases where a CA certificate was superceded by a different one with the same
 name and the same key.
 
+** libgnutls: In DTLS prevent sending zero-size fragments in certain cases
+of MTU split. Reported by Manuel Pégourié-Gonnard.
+
 ** p11tool: p11tool: when listing tokens, list their type as well.
 
 ** API and ABI modifications:
