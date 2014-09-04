@@ -60,6 +60,7 @@ void doit(void)
 	gnutls_x509_privkey_t pkey;
 	gnutls_x509_crt_t crt;
 	gnutls_x509_crq_t crq;
+	const char *err = NULL;
 
 	gnutls_datum_t out;
 
@@ -118,6 +119,11 @@ void doit(void)
 	if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 		fail("%d: gnutls_x509_crq_get_challenge_password %d: %s\n",
 		     __LINE__, ret, gnutls_strerror(ret));
+
+	ret = gnutls_x509_crq_set_dn(crq, "cn = nikos, o = none to\\, mention", &err);
+	if (ret < 0) {
+		fail("gnutls_x509_crq_set_dn: %s, %s\n", gnutls_strerror(ret), err);
+	}
 
 	ret = gnutls_x509_crq_set_challenge_password(crq, "foo");
 	if (ret != 0)
@@ -196,6 +202,19 @@ void doit(void)
 		printf("crq: %.*s\n", out.size, out.data);
 	gnutls_free(out.data);
 
+	ret = gnutls_x509_crq_sign2(crq, pkey, GNUTLS_DIG_SHA256, 0);
+	if (ret < 0)
+		fail("gnutls_x509_crq_sign2: %s\n", gnutls_strerror(ret));
+
+	ret = gnutls_x509_crt_set_crq(crt, crq);
+	if (ret != 0)
+		fail("gnutls_x509_crt_set_crq: %s\n", gnutls_strerror(ret));
+
+	ret = gnutls_x509_crt_set_issuer_dn(crt, "cn = my CA, o = big\\, and one", &err);
+	if (ret < 0) {
+		fail("gnutls_x509_crt_set_issuer_dn: %s, %s\n", gnutls_strerror(ret), err);
+	}
+
 	ret = gnutls_x509_crt_set_version(crt, 3);
 	if (ret != 0)
 		fail("gnutls_x509_crt_set_version\n");
@@ -209,6 +228,26 @@ void doit(void)
 		fail("gnutls_x509_crt_print\n");
 	if (debug)
 		printf("crt: %.*s\n", out.size, out.data);
+	gnutls_free(out.data);
+
+	ret = gnutls_x509_crt_get_raw_issuer_dn(crt, &out);
+	if (ret < 0 || out.size == 0)
+		fail("gnutls_x509_crt_get_raw_issuer_dn: %s\n", gnutls_strerror(ret));
+
+	if (out.size != 41 ||
+	    memcmp(out.data, "\x30\x27\x31\x0e\x30\x0c\x06\x03\x55\x04\x03\x13\x05\x6d\x79\x20\x43\x41\x31\x15\x30\x13\x06\x03\x55\x04\x0a\x13\x0c\x62\x69\x67\x2c\x20\x61\x6e\x64\x20\x6f\x6e\x65", 41) != 0) {
+		fail("issuer DN comparison failed\n");
+	}
+	gnutls_free(out.data);
+
+	ret = gnutls_x509_crt_get_raw_dn(crt, &out);
+	if (ret < 0 || out.size == 0)
+		fail("gnutls_x509_crt_get_raw_dn: %s\n", gnutls_strerror(ret));
+
+	if (out.size != 45 ||
+	    memcmp(out.data, "\x30\x2b\x31\x0e\x30\x0c\x06\x03\x55\x04\x03\x13\x05\x6e\x69\x6b\x6f\x73\x31\x19\x30\x17\x06\x03\x55\x04\x0a\x13\x10\x6e\x6f\x6e\x65\x20\x74\x6f\x2c\x20\x6d\x65\x6e\x74\x69\x6f\x6e", 45) != 0) {
+		fail("DN comparison failed\n");
+	}
 	gnutls_free(out.data);
 
 	gnutls_x509_crq_deinit(crq);
