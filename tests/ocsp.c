@@ -33,10 +33,6 @@
 
 #include "utils.h"
 
-/* Tests the OCSP request and response parsing in gnutls.
- * If this test fails, you most probably need to update your
- * libtasn1 */
-
 static time_t mytime(time_t * t)
 {
 	time_t then = 1332548220;
