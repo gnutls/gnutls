@@ -622,7 +622,7 @@ cn = "Cindy Lauper"
 # jurisdictionOfIncorporationStateOrProvinceName,
 # jurisdictionOfIncorporationCountryName, XmppAddr, and numeric OIDs.
 
-#dn = "cn=Nik,st=Attiki,C=GR,surName=Mavrogiannopoulos,2.5.4.9=Arkadias"
+#dn = "cn = Nikos,st = New\, Something,C=GR,surName=Mavrogiannopoulos,2.5.4.9=Arkadias"
 
 # The serial number of the certificate
 # Comment the field for a time-based serial number.
