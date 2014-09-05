@@ -22,7 +22,6 @@
 
 srcdir="${srcdir:-.}"
 CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
-PORT="${PORT:-5568}"
 unset RETCODE
 if ! test -z "${VALGRIND}";then
 VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
@@ -33,6 +32,8 @@ if test "${WINDIR}" != "";then
 fi 
 
 . $srcdir/../scripts/common.sh
+
+PORT="${PORT:-$RPORT}"
 
 SERV=openssl
 OPENSSL_CLI="openssl"

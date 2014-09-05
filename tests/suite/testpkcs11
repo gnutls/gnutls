@@ -24,7 +24,6 @@ CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
 DIFF="${DIFF:-diff -b -B}"
 SERV="${SERV:-../../src/gnutls-serv$EXEEXT} -q"
 CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
-PORT="${PORT:-5561}"
 RETCODE=0
 
 TMPFILE=$srcdir/testpkcs11.debug
@@ -37,6 +36,8 @@ fi
 P11TOOL="$P11TOOL --batch"
 
 . $srcdir/../scripts/common.sh
+
+PORT="${PORT:-$RPORT}"
 
 rm -f $TMPFILE
 

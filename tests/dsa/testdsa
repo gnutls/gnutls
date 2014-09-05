@@ -23,7 +23,6 @@
 srcdir="${srcdir:-.}"
 SERV="${SERV:-../../src/gnutls-serv} -q"
 CLI="${CLI:-../../src/gnutls-cli}"
-PORT="${PORT:-5558}"
 DEBUG=""
 unset RETCODE
 
@@ -33,7 +32,9 @@ fi
 
 . $srcdir/../scripts/common.sh
 
-echo "Checking various DSA key sizes"
+PORT="${PORT:-$RPORT}"
+
+echo "Checking various DSA key sizes (port $PORT)"
 
 # DSA 1024 + TLS 1.0
 

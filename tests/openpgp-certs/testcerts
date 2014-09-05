@@ -23,7 +23,6 @@
 srcdir="${srcdir:-.}"
 SERV="${SERV:-../../src/gnutls-serv} -q"
 CLI="${CLI:-../../src/gnutls-cli}"
-PORT="${PORT:-5557}"
 DEBUG=""
 
 if test "${WINDIR}" != "";then
@@ -31,6 +30,8 @@ if test "${WINDIR}" != "";then
 fi 
 
 . $srcdir/../scripts/common.sh
+
+PORT="${PORT:-$RPORT}"
 
 echo "Checking OpenPGP certificate verification"
 

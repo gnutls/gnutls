@@ -23,7 +23,6 @@
 srcdir="${srcdir:-.}"
 SERV="${SERV:-../../src/gnutls-serv$EXEEXT} -q"
 CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
-PORT="${PORT:-5558}"
 unset RETCODE
 
 if test "${WINDIR}" != "";then
@@ -31,6 +30,8 @@ if test "${WINDIR}" != "";then
 fi 
 
 . $srcdir/../scripts/common.sh
+
+PORT="${PORT:-$RPORT}"
 
 echo "Checking Safe renegotiation"
 
