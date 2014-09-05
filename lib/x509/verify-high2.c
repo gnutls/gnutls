@@ -309,7 +309,7 @@ int load_dir_certs(const char *dirname,
 #else
 			struct dirent e;
 			ret = readdir_r(dirp, &e, &d);
-			if (ret == 0 && (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)) {
+			if (ret == 0 && d != NULL && (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)) {
 #endif
 				snprintf(path, sizeof(path), "%s/%s",
 					 dirname, d->d_name);
