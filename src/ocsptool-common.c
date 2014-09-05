@@ -330,8 +330,13 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 
 	ret = gnutls_ocsp_resp_check_crt(resp, 0, cert);
 	if (ret < 0) {
-		printf
-		    ("*** Got OCSP response on an unrelated certificate (ignoring)\n");
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			printf
+			    ("*** Got OCSP response with no data (ignoring)\n");
+		} else {
+			printf
+			    ("*** Got OCSP response on an unrelated certificate (ignoring)\n");
+		}
 		ret = -1;
 		goto cleanup;
 	}
