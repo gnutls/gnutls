@@ -6,7 +6,9 @@ See the end for copying conditions.
 * Version 3.3.8 (unreleased)
 
 ** libgnutls: Updates in the name constraints checks. No name constraints
-will be checked for intermediate certificates.
+will be checked for intermediate certificates. As our support for name
+constraints is limited to e-mail addresses in DNS names, it is pointless
+to check them on intermediate certificates.
 
 ** libgnutls: Fixed issues in PKCS #11 object listing. Previously multiple
 object listing would fail completely if a single object could not be exported.
