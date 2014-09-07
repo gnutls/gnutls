@@ -231,6 +231,5 @@
    fun:idna_to_ascii_4z
    fun:idna_to_ascii_8z
    fun:gnutls_x509_crt_check_hostname2
-   fun:doit
-   fun:main
+   ...
 }
