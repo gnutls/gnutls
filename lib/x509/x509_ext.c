@@ -2880,7 +2880,7 @@ int gnutls_x509_key_purpose_set(gnutls_x509_key_purposes_t p, const char *oid)
  * @oid: Will hold the object identifier of the key purpose (to be treated as constant)
  *
  * This function will retrieve the specified by the index key purpose in the
- * purposes structure.
+ * purposes structure. The object identifier will be a null terminated string.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * if the index is out of bounds, otherwise a negative error value.
