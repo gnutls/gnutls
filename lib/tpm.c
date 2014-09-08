@@ -1020,7 +1020,7 @@ import_tpm_pubkey_cb(gnutls_pubkey_t pkey,
 {
 	unsigned int attempts = 0;
 	char pin1[GNUTLS_PKCS11_MAX_PIN_LEN];
-	int ret;
+	int ret, sret;
 
 	do {
 		ret =
@@ -1031,10 +1031,10 @@ import_tpm_pubkey_cb(gnutls_pubkey_t pkey,
 			break;
 
 		if (ret == GNUTLS_E_TPM_SRK_PASSWORD_ERROR) {
-			ret =
+			sret =
 			    tpm_pin(&pkey->pin, &srk_uuid, storage, pin1,
 				    sizeof(pin1), attempts++);
-			if (ret < 0) {
+			if (sret < 0) {
 				gnutls_assert();
 				return GNUTLS_E_TPM_SRK_PASSWORD_ERROR;
 			}
