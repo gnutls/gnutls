@@ -236,7 +236,7 @@ int _cdk_filter_literal(void *data, int ctl, FILE * in, FILE * out)
 static void _cdk_trim_string(char *s)
 {
 	int len = strlen(s);
-	unsigned i;
+	int i;
 
 	for (i=len-1;i>=0;i--) {
 		if ((s[i] == '\t' || s[i] == '\r' || s[i] == '\n' || s[i] == ' ')) {
