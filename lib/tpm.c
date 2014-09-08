@@ -1220,6 +1220,10 @@ gnutls_tpm_privkey_generate(gnutls_pk_algorithm_t pk, unsigned int bits,
 	TSS_HTPM htpm;
 	uint8_t buf[32];
 
+	privkey->data = NULL;
+	if (pubkey != NULL)
+		pubkey->data = NULL;
+
 	if (flags & GNUTLS_TPM_KEY_SIGNING)
 		tpm_flags |= TSS_KEY_TYPE_SIGNING;
 	else
