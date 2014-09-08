@@ -1023,6 +1023,7 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs11_obj_get_flags;
 	gnutls_pkcs12_mac_info;
 	gnutls_pkcs12_generate_mac2;
+	gnutls_x509_trust_list_verify_purpose_crt;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {
