@@ -1923,6 +1923,63 @@ gnutls_x509_crq_get_extension_by_oid(gnutls_x509_crq_t crq,
 }
 
 /**
+ * gnutls_x509_crq_get_extension_by_oid2:
+ * @crq: should contain a #gnutls_x509_crq_t structure
+ * @oid: holds an Object Identifier in a null terminated string
+ * @indx: In case multiple same OIDs exist in the extensions, this
+ *   specifies which to get. Use (0) to get the first one.
+ * @output: will hold the allocated extension data
+ * @critical: will be non-zero if the extension is marked as critical
+ *
+ * This function will return the extension specified by the OID in
+ * the certificate.  The extensions will be returned as binary data
+ * DER encoded, in the provided buffer.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.  If the certificate does not
+ *   contain the specified extension
+ *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ * Since: 3.3.8
+ **/
+int
+gnutls_x509_crq_get_extension_by_oid2(gnutls_x509_crq_t crq,
+				     const char *oid, int indx,
+				     gnutls_datum_t *output,
+				     unsigned int *critical)
+{
+	int result;
+	unsigned int i;
+	char _oid[MAX_OID_SIZE];
+	size_t oid_size;
+
+	for (i = 0;; i++) {
+		oid_size = sizeof(_oid);
+		result =
+		    gnutls_x509_crq_get_extension_info(crq, i, _oid,
+						       &oid_size,
+						       critical);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		if (strcmp(oid, _oid) == 0) {	/* found */
+			if (indx == 0)
+				return
+				    gnutls_x509_crq_get_extension_data2(crq,
+								       i,
+								       output);
+			else
+				indx--;
+		}
+	}
+
+	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+
+}
+
+/**
  * gnutls_x509_crq_set_subject_alt_name:
  * @crq: a certificate request of type #gnutls_x509_crq_t
  * @nt: is one of the #gnutls_x509_subject_alt_name_t enumerations

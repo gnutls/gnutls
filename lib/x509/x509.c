@@ -1940,7 +1940,53 @@ gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt_t cert,
 	_gnutls_free_datum(&output);
 
 	return 0;
+}
 
+/**
+ * gnutls_x509_crt_get_extension_by_oid2:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @oid: holds an Object Identified in null terminated string
+ * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use (0) to get the first one.
+ * @output: will hold the allocated extension data
+ * @critical: will be non-zero if the extension is marked as critical
+ *
+ * This function will return the extension specified by the OID in the
+ * certificate.  The extensions will be returned as binary data DER
+ * encoded, in the provided buffer.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned. If the certificate does not
+ *   contain the specified extension
+ *   GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ * Since: 3.3.8
+ **/
+int
+gnutls_x509_crt_get_extension_by_oid2(gnutls_x509_crt_t cert,
+				     const char *oid, int indx,
+				     gnutls_datum_t *output,
+				     unsigned int *critical)
+{
+	int ret;
+	
+	if (cert == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if ((ret =
+	     _gnutls_x509_crt_get_extension(cert, oid, indx, output,
+					    critical)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	if (output->size == 0 || output->data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	return 0;
 }
 
 /**
