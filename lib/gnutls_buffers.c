@@ -163,7 +163,6 @@ _gnutls_record_buffer_get(content_type_t type,
 int
 _gnutls_record_buffer_get_packet(content_type_t type, gnutls_session_t session, gnutls_packet_t *packet)
 {
-	gnutls_datum_t msg;
 	mbuffer_st *bufel;
 
 	bufel =
@@ -181,7 +180,7 @@ _gnutls_record_buffer_get_packet(content_type_t type, gnutls_session_t session, 
 					  (int) bufel->type,
 					  _gnutls_packet2str(type));
 		_mbuffer_head_remove_bytes(&session->internals.
-					   record_buffer, msg.size);
+					   record_buffer, bufel->msg.size);
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 	}
 
