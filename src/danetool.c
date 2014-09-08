@@ -701,6 +701,7 @@ static const char *obtain_cert(const char *hostname, const char *proto, unsigned
 	if (app_proto == NULL) app_proto = service;
 	socket_starttls(&hd, app_proto);
 
+	umask(066);
 	fd = mkstemp(tmpfile);
 	if (fd == -1) {
 		int e = errno;
