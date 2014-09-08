@@ -963,6 +963,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			if (params->params[DSA_Q] != NULL)
 				have_q = 1;
 
+			/* This check is for the case !ENABLE_FIPS140 */
 			if (algo == GNUTLS_PK_DSA && have_q == 0)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
