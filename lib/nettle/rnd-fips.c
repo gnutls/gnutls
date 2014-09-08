@@ -194,10 +194,13 @@ static int _rngfips_rnd(void *_ctx, int level, void *buffer, size_t length)
 	switch (level) {
 	case GNUTLS_RND_RANDOM:
 		ret = get_random(&ctx->normal_context, ctx, buffer, length);
+		break;
 	case GNUTLS_RND_KEY:
 		ret = get_random(&ctx->strong_context, ctx, buffer, length);
+		break;
 	default:
 		ret = get_random(&ctx->nonce_context, ctx, buffer, length);
+		break;
 	}
 	RND_UNLOCK;
 
