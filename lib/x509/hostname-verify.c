@@ -54,7 +54,7 @@ check_ip(gnutls_x509_crt_t cert, const void *ip, unsigned ip_size, unsigned flag
 	char temp[16];
 	size_t temp_size;
 	unsigned i;
-	int ret;
+	int ret = 0;
 
 	/* try matching against:
 	 *  1) a IPaddress alternative name (subjectAltName) extension
