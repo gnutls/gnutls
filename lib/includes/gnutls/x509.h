@@ -460,6 +460,11 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt_t cert,
 					 void *buf,
 					 size_t * buf_size,
 					 unsigned int *critical);
+int
+gnutls_x509_crq_get_extension_by_oid2(gnutls_x509_crq_t crq,
+				     const char *oid, int indx,
+				     gnutls_datum_t *output,
+				     unsigned int *critical);
 
 	/* Read extensions by sequence number. */
 int gnutls_x509_crt_get_extension_info(gnutls_x509_crt_t cert,
@@ -1222,6 +1227,11 @@ int gnutls_x509_crq_get_extension_by_oid(gnutls_x509_crq_t crq,
 					 void *buf,
 					 size_t * sizeof_buf,
 					 unsigned int *critical);
+int
+gnutls_x509_crt_get_extension_by_oid2(gnutls_x509_crt_t cert,
+				     const char *oid, int indx,
+				     gnutls_datum_t *output,
+				     unsigned int *critical);
 
 typedef struct gnutls_x509_trust_list_st *gnutls_x509_trust_list_t;
 
