@@ -779,6 +779,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 	ret = check_if_in_blacklist(cert_list, cert_list_size,
 		list->blacklisted, list->blacklisted_size);
 	if (ret != 0) {
+		*voutput = 0;
 		*voutput |= GNUTLS_CERT_REVOKED;
 		*voutput |= GNUTLS_CERT_INVALID;
 		return 0;
@@ -904,6 +905,7 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 	unsigned int i;
 	uint32_t hash;
 
+
 	hash =
 	    hash_pjw_bare(cert->raw_issuer_dn.data,
 			  cert->raw_issuer_dn.size);
@@ -912,6 +914,7 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 	ret = check_if_in_blacklist(&cert, 1,
 		list->blacklisted, list->blacklisted_size);
 	if (ret != 0) {
+		*voutput = 0;
 		*voutput |= GNUTLS_CERT_REVOKED;
 		*voutput |= GNUTLS_CERT_INVALID;
 		return 0;
