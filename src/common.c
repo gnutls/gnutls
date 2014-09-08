@@ -1044,7 +1044,7 @@ pin_callback(void *user, int attempt, const char *token_url,
 	printf("requires %s PIN\n", desc);
 
 	password = getenv(env);
-	if (env == NULL) /* compatibility */
+	if (password == NULL) /* compatibility */
 		password = getenv("GNUTLS_PIN");
 
 	if (password == NULL && (info == NULL || info->batch == 0)) {
