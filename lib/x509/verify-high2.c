@@ -373,7 +373,7 @@ gnutls_x509_trust_list_add_trust_dir(gnutls_x509_trust_list_t list,
 
 	if (crl_dir) {
 		int r = 0;
-		r = load_dir_certs(ca_dir, list, tl_flags, tl_vflags, type, 1);
+		r = load_dir_certs(crl_dir, list, tl_flags, tl_vflags, type, 1);
 
 		if (r >= 0)
 			ret += r;
