@@ -874,7 +874,7 @@ void crt_constraints_set(gnutls_x509_crt_t crt)
 			}
 		}
 
-		if (cfg.permitted_nc_email) {
+		if (cfg.excluded_nc_email) {
 			for (i = 0; cfg.excluded_nc_email[i] != NULL; i++) {
 				name.data = (void*)cfg.excluded_nc_email[i];
 				name.size = strlen((char*)name.data);
