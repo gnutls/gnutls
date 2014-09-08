@@ -183,7 +183,7 @@ static void tpm_generate(FILE * outfile, unsigned int key_type,
 	if (!(flags & GNUTLS_TPM_REGISTER_KEY)) {
 		key_pass = getpass("Enter key password: ");
 		if (key_pass != NULL)
-			key_pass = strdup(srk_pass);
+			key_pass = strdup(key_pass);
 	}
 
 	ret =
