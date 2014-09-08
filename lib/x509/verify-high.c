@@ -31,6 +31,7 @@
 #include <hash-pjw-bare.h>
 #include "x509_int.h"
 #include <common.h>
+#include <gnutls/x509-ext.h>
 #include "verify-high.h"
 
 struct named_cert_st {
@@ -754,6 +755,91 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 				  unsigned int *voutput,
 				  gnutls_verify_output_function func)
 {
+	return gnutls_x509_trust_list_verify_purpose_crt(list, cert_list, cert_list_size,
+							 NULL, flags, voutput, func);
+}
+
+static
+int check_key_purpose(gnutls_x509_crt_t crt, const gnutls_datum_t *ext_data, unsigned *voutput, 
+		      const char *purpose)
+{
+	gnutls_datum_t coid = {NULL, 0};
+	gnutls_x509_key_purposes_t p = NULL;
+	unsigned i;
+	int ret;
+
+	ret = gnutls_x509_key_purpose_init(&p);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	ret = gnutls_x509_ext_import_key_purposes(ext_data, p, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	for (i=0;;i++) {
+		ret = gnutls_x509_key_purpose_get(p, i, &coid);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			if (i==0) {
+				break;
+			} else { /* no acceptable purpose was found */
+				gnutls_assert();
+				goto fail;
+			}
+		} else if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		if (strcmp((char*)coid.data, purpose) == 0 || strcmp((char*)coid.data, GNUTLS_KP_ANY) == 0)
+			break;
+	}
+
+	gnutls_x509_key_purpose_deinit(p);
+	return 0;
+ fail:
+	*voutput |= GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE|GNUTLS_CERT_INVALID;
+	if (p != NULL)
+		gnutls_x509_key_purpose_deinit(p);
+	return ret;
+}
+
+/**
+ * gnutls_x509_trust_list_verify_purpose_crt:
+ * @list: The structure of the list
+ * @cert_list: is the certificate list to be verified
+ * @cert_list_size: is the certificate list size
+ * @purpose: the purpose OID (GNUTLS_KP) for which the certificate must be valid (may be %NULL)
+ * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+ * @voutput: will hold the certificate verification output.
+ * @func: If non-null will be called on each chain element verification with the output.
+ *
+ * This function will try to verify the given certificate and return
+ * its status. The @verify parameter will hold an OR'ed sequence of
+ * %gnutls_certificate_status_t flags.
+ *
+ * Additionally a certificate verification profile can be specified
+ * from the ones in %gnutls_certificate_verification_profiles_t by
+ * ORing the result of GNUTLS_PROFILE_TO_VFLAGS() to the verification
+ * flags.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.3.8
+ **/
+int
+gnutls_x509_trust_list_verify_purpose_crt(gnutls_x509_trust_list_t list,
+				  gnutls_x509_crt_t * cert_list,
+				  unsigned int cert_list_size,
+				  const char *purpose,
+				  unsigned int flags,
+				  unsigned int *voutput,
+				  gnutls_verify_output_function func)
+{
 	int ret;
 	unsigned int i;
 	uint32_t hash;
@@ -863,6 +949,25 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 			return 0;
 		}
 	}
+
+	/* check the purpose if given */
+	if (purpose) do {
+		gnutls_datum_t ext_data = {NULL, 0};
+
+		ret = gnutls_x509_crt_get_extension_by_oid2(cert_list[0], "2.5.29.37", 0, &ext_data, NULL);
+		if (ret < 0) {
+			gnutls_assert();
+			break;
+		}
+
+		ret = check_key_purpose(cert_list[0], &ext_data, voutput, purpose);
+		gnutls_free(ext_data.data);
+
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+	} while(0);
 
 	return 0;
 }

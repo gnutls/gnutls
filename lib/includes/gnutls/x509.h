@@ -1260,6 +1260,15 @@ int gnutls_x509_trust_list_verify_named_crt
      unsigned int *verify, gnutls_verify_output_function func);
 
 int
+gnutls_x509_trust_list_verify_purpose_crt(gnutls_x509_trust_list_t list,
+				  gnutls_x509_crt_t * cert_list,
+				  unsigned int cert_list_size,
+				  const char *purpose,
+				  unsigned int flags,
+				  unsigned int *voutput,
+				  gnutls_verify_output_function func);
+
+int
 gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 				  gnutls_x509_crt_t * cert_list,
 				  unsigned int cert_list_size,
