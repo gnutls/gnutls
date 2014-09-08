@@ -2656,10 +2656,12 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 		}
 		gnutls_free(plist.key_ids);
 	}
-	for (i = 0; i < find_data->current; i++) {
-		gnutls_pkcs11_obj_deinit(find_data->p_list[i]);
+	if (find_data->p_list != NULL) {
+		for (i = 0; i < find_data->current; i++) {
+			gnutls_pkcs11_obj_deinit(find_data->p_list[i]);
+		}
+		gnutls_free(find_data->p_list);
 	}
-	gnutls_free(find_data->p_list);
 	find_data->p_list = NULL;
 	find_data->current = 0;
 
