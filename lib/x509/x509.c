@@ -1959,7 +1959,7 @@ gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt_t cert,
  *   contain the specified extension
  *   GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
- * Since: 3.3.8
+ * Since: 3.4.0
  **/
 int
 gnutls_x509_crt_get_extension_by_oid2(gnutls_x509_crt_t cert,

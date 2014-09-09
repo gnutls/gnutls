@@ -841,7 +841,7 @@ int check_key_purpose(gnutls_x509_crt_t crt, const gnutls_datum_t *ext_data, uns
  *   negative error value. Note that verification failure will not result to an
  *   error code, only @voutput will be updated.
  *
- * Since: 3.3.8
+ * Since: 3.4.0
  **/
 int
 gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
