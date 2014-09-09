@@ -755,8 +755,8 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 				  unsigned int *voutput,
 				  gnutls_verify_output_function func)
 {
-	return gnutls_x509_trust_list_verify_purpose_crt(list, cert_list, cert_list_size,
-							 NULL, flags, voutput, func);
+	return gnutls_x509_trust_list_verify_crt2(list, cert_list, cert_list_size,
+						  NULL, 0, flags, voutput, func);
 }
 
 static
@@ -808,11 +808,12 @@ int check_key_purpose(gnutls_x509_crt_t crt, const gnutls_datum_t *ext_data, uns
 }
 
 /**
- * gnutls_x509_trust_list_verify_purpose_crt:
+ * gnutls_x509_trust_list_verify_crt2:
  * @list: The structure of the list
  * @cert_list: is the certificate list to be verified
  * @cert_list_size: is the certificate list size
- * @purpose: the purpose OID (GNUTLS_KP) for which the certificate must be valid (may be %NULL)
+ * @data: an array of typed data
+ * @elements: the number of data elements
  * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
  * @voutput: will hold the certificate verification output.
  * @func: If non-null will be called on each chain element verification with the output.
@@ -826,16 +827,28 @@ int check_key_purpose(gnutls_x509_crt_t crt, const gnutls_datum_t *ext_data, uns
  * ORing the result of GNUTLS_PROFILE_TO_VFLAGS() to the verification
  * flags.
  *
+ * The acceptable @data types are %GNUTLS_DT_DNS_HOSTNAME and %GNUTLS_DT_KEY_PURPOSE_OID.
+ * The former accepts as data a null-terminated hostname, and the latter a null-terminated
+ * object identifier (e.g., %GNUTLS_KP_TLS_WWW_SERVER).
+ * If a DNS hostname is provided then this function will compare
+ * the hostname in the certificate against the given. If names do not match the 
+ * %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
+ * If a key purpose OID is provided and the end-certificate contains the extended key
+ * usage PKIX extension, it will be required to be have the provided key purpose 
+ * or be marked for any purpose, otherwise verification will fail with %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE status.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
+ *   negative error value. Note that verification failure will not result to an
+ *   error code, only @voutput will be updated.
  *
  * Since: 3.3.8
  **/
 int
-gnutls_x509_trust_list_verify_purpose_crt(gnutls_x509_trust_list_t list,
+gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 				  gnutls_x509_crt_t * cert_list,
 				  unsigned int cert_list_size,
-				  const char *purpose,
+				  gnutls_typed_vdata_st *data,
+				  unsigned int elements,
 				  unsigned int flags,
 				  unsigned int *voutput,
 				  gnutls_verify_output_function func)
@@ -844,6 +857,7 @@ gnutls_x509_trust_list_verify_purpose_crt(gnutls_x509_trust_list_t list,
 	unsigned int i;
 	uint32_t hash;
 	gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
+	const char *hostname = NULL, *purpose = NULL;
 
 	if (cert_list == NULL || cert_list_size < 1)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -950,6 +964,14 @@ gnutls_x509_trust_list_verify_purpose_crt(gnutls_x509_trust_list_t list,
 		}
 	}
 
+	for (i=0;i<elements;i++) {
+		if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
+			hostname = (void*)data[i].data;
+		} else if (data[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
+			purpose = (void*)data[i].data;
+		}
+	}
+
 	/* check the purpose if given */
 	if (purpose) do {
 		gnutls_datum_t ext_data = {NULL, 0};
@@ -968,6 +990,13 @@ gnutls_x509_trust_list_verify_purpose_crt(gnutls_x509_trust_list_t list,
 		}
 
 	} while(0);
+
+	if (hostname) {
+		ret =
+		    gnutls_x509_crt_check_hostname2(cert_list[0], hostname, flags);
+		if (ret == 0)
+			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+	}
 
 	return 0;
 }
