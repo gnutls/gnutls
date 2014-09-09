@@ -182,8 +182,8 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
  -*/
 int
 _gnutls_x509_cert_verify_peers(gnutls_session_t session,
-			       const char *hostname,
-			       const char *purpose,
+			       gnutls_typed_vdata_st * data,
+			       unsigned int elements,
 			       unsigned int *status)
 {
 	cert_auth_info_t info;
@@ -289,24 +289,16 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	/* Verify certificate 
 	 */
 	ret =
-	    gnutls_x509_trust_list_verify_purpose_crt(cred->tlist,
-					      peer_certificate_list,
-					      peer_certificate_list_size,
-					      purpose,
-					      verify_flags, status, NULL);
+	    gnutls_x509_trust_list_verify_crt2(cred->tlist,
+					       peer_certificate_list,
+					       peer_certificate_list_size,
+					       data, elements,
+					       verify_flags, status, NULL);
 
 	if (ret < 0) {
 		gnutls_assert();
 		CLEAR_CERTS;
 		return ret;
-	}
-
-	if (hostname) {
-		ret =
-		    gnutls_x509_crt_check_hostname2(peer_certificate_list
-						   [0], hostname, verify_flags);
-		if (ret == 0)
-			*status |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
 	}
 
 	CLEAR_CERTS;

@@ -1017,7 +1017,7 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs11_privkey_export_pubkey;
 	gnutls_pkcs11_obj_flags_get_str;
 	gnutls_pkcs11_obj_get_flags;
-	gnutls_x509_trust_list_verify_purpose_crt;
+	gnutls_x509_trust_list_verify_crt2;
 	gnutls_x509_crt_get_extension_by_oid2;
 	gnutls_x509_crq_get_extension_by_oid2;
 } GNUTLS_3_0_0;

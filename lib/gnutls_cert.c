@@ -716,16 +716,15 @@ gnutls_typed_vdata_st data;
  * using gnutls_certificate_set_verify_flags(). See the documentation
  * of gnutls_certificate_verify_peers2() for details in the verification process.
  *
- * The acceptable data types are %GNUTLS_DT_DNS_HOSTNAME and %GNUTLS_DT_KEY_PURPOSE_OID.
+ * The acceptable @data types are %GNUTLS_DT_DNS_HOSTNAME and %GNUTLS_DT_KEY_PURPOSE_OID.
+ * The former accepts as data a null-terminated hostname, and the latter a null-terminated
+ * object identifier (e.g., %GNUTLS_KP_TLS_WWW_SERVER).
  * If a DNS hostname is provided then this function will compare
- * the hostname in the certificate against the given. The comparison will
- * be accurate for ascii names; non-ascii names are compared byte-by-byte. 
- * If names do not match the %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
- *
+ * the hostname in the certificate against the given. If names do not match the 
+ * %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  * If a key purpose OID is provided and the end-certificate contains the extended key
  * usage PKIX extension, it will be required to be have the provided key purpose 
- * (e.g., %GNUTLS_KP_TLS_WWW_SERVER), or be marked for any purpose, otherwise 
- * verification will fail with %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE status.
+ * or be marked for any purpose, otherwise verification will fail with %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE status.
  *
  * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
  *
@@ -739,7 +738,6 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 {
 	cert_auth_info_t info;
 	const char *hostname = NULL;
-	const char *purpose = NULL;
 	unsigned i;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
@@ -752,23 +750,19 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
-	for (i=0;i<elements;i++) {
-		if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
-			hostname = (void*)data[i].data;
-		} else if (data[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
-			purpose = (void*)data[i].data;
-		} else {
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		}
-	}
 
 	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
-		return _gnutls_x509_cert_verify_peers(session, hostname,
-						      purpose,
+		return _gnutls_x509_cert_verify_peers(session, data, elements,
 						      status);
 #ifdef ENABLE_OPENPGP
 	case GNUTLS_CRT_OPENPGP:
+		for (i=0;i<elements;i++) {
+			if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
+				hostname = (void*)data[i].data;
+				break;
+			}
+		}
 		return _gnutls_openpgp_crt_verify_peers(session, hostname,
 							status);
 #endif
