@@ -978,6 +978,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 
 		ret = gnutls_x509_crt_get_extension_by_oid2(cert_list[0], "2.5.29.37", 0, &ext_data, NULL);
 		if (ret < 0) {
+			/* it's not a fatal error if the extended key usage extension isn't there */
 			gnutls_assert();
 			break;
 		}
@@ -988,7 +989,6 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		if (ret < 0) {
 			gnutls_assert();
 		}
-
 	} while(0);
 
 	if (hostname) {
