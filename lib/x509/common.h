@@ -196,11 +196,11 @@ _gnutls_check_if_same_cert2(gnutls_x509_crt_t cert1,
 
 time_t _gnutls_x509_generalTime2gtime(const char *ttime);
 
-int get_extension(ASN1_TYPE asn, const char *root,
+int _gnutls_get_extension(ASN1_TYPE asn, const char *root,
 		  const char *extension_id, int indx,
 		  gnutls_datum_t * ret, unsigned int *_critical);
 
-int set_extension(ASN1_TYPE asn, const char *root,
+int _gnutls_set_extension(ASN1_TYPE asn, const char *root,
 		  const char *ext_id,
 		  const gnutls_datum_t * ext_data, unsigned int critical);
 
@@ -213,5 +213,8 @@ int _gnutls_copy_string(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
 int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
 
 int _san_othername_to_virtual(const char *oid, size_t oid_size);
+
+int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert,
+			   gnutls_datum_t * rpubkey);
 
 #endif

@@ -832,7 +832,7 @@ gnutls_ocsp_req_set_extension(gnutls_ocsp_req_t req,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return set_extension(req->req, "tbsRequest.requestExtensions", oid,
+	return _gnutls_set_extension(req->req, "tbsRequest.requestExtensions", oid,
 			     data, critical);
 }
 
@@ -862,7 +862,7 @@ gnutls_ocsp_req_get_nonce(gnutls_ocsp_req_t req,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret = get_extension(req->req, "tbsRequest.requestExtensions",
+	ret = _gnutls_get_extension(req->req, "tbsRequest.requestExtensions",
 			    GNUTLS_OCSP_NONCE, 0, &tmp, critical);
 	if (ret != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
@@ -924,7 +924,7 @@ gnutls_ocsp_req_set_nonce(gnutls_ocsp_req_t req,
 	memcpy(dernonce.data + 1, temp, len);
 	memcpy(dernonce.data + 1 + len, nonce->data, nonce->size);
 
-	ret = set_extension(req->req, "tbsRequest.requestExtensions",
+	ret = _gnutls_set_extension(req->req, "tbsRequest.requestExtensions",
 			    GNUTLS_OCSP_NONCE, &dernonce, critical);
 	gnutls_free(dernonce.data);
 	if (ret != GNUTLS_E_SUCCESS) {
@@ -1598,7 +1598,7 @@ gnutls_ocsp_resp_get_nonce(gnutls_ocsp_resp_t resp,
 	gnutls_datum_t tmp;
 
 	ret =
-	    get_extension(resp->basicresp,
+	    _gnutls_get_extension(resp->basicresp,
 			  "tbsResponseData.responseExtensions",
 			  GNUTLS_OCSP_NONCE, 0, &tmp, critical);
 	if (ret != GNUTLS_E_SUCCESS) {
