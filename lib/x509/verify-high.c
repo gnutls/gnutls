@@ -862,6 +862,14 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	if (cert_list == NULL || cert_list_size < 1)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	for (i=0;i<elements;i++) {
+		if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
+			hostname = (void*)data[i].data;
+		} else if (data[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
+			purpose = (void*)data[i].data;
+		}
+	}
+
 	if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN))
 		cert_list = sort_clist(sorted, cert_list, &cert_list_size);
 
@@ -891,6 +899,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 
 		*voutput = _gnutls_pkcs11_verify_crt_status(list->pkcs11_token,
 								cert_list, cert_list_size,
+								purpose!=NULL?purpose:GNUTLS_KP_TLS_WWW_SERVER,
 								flags, func);
 	} else
 #endif
@@ -961,14 +970,6 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 			*voutput |= GNUTLS_CERT_REVOKED;
 			*voutput |= GNUTLS_CERT_INVALID;
 			return 0;
-		}
-	}
-
-	for (i=0;i<elements;i++) {
-		if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
-			hostname = (void*)data[i].data;
-		} else if (data[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
-			purpose = (void*)data[i].data;
 		}
 	}
 
