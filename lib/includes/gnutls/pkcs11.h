@@ -108,6 +108,7 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
  * @GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE: The object must be present in a marked as trusted module.
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_CA: Mark the object as a CA.
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP: Mark the generated key pair as wrapping and unwrapping keys.
+ * @GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT: When an issuer is requested, override its extensions with the ones present in the trust module.
  *
  * Enumeration of different PKCS #11 object flags.
  */
@@ -125,7 +126,8 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE = (1<<10),
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_CA = (1<<11),
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP = (1<<12),
-	GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY = (1<<13)
+	GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY = (1<<13),
+	GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT = (1<<14)
 } gnutls_pkcs11_obj_flags;
 
 /**
@@ -279,7 +281,8 @@ typedef enum {
 	GNUTLS_PKCS11_OBJ_PUBKEY,
 	GNUTLS_PKCS11_OBJ_PRIVKEY,
 	GNUTLS_PKCS11_OBJ_SECRET_KEY,
-	GNUTLS_PKCS11_OBJ_DATA
+	GNUTLS_PKCS11_OBJ_DATA,
+	GNUTLS_PKCS11_OBJ_X509_CRT_EXTENSION
 } gnutls_pkcs11_obj_type_t;
 
 int
@@ -331,6 +334,11 @@ int gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 gnutls_pkcs11_obj_type_t
 gnutls_pkcs11_obj_get_type(gnutls_pkcs11_obj_t obj);
 const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type);
+
+int
+gnutls_pkcs11_obj_get_exts(gnutls_pkcs11_obj_t obj,
+			   struct gnutls_x509_ext_st **exts, unsigned int *exts_size,
+			   unsigned int flags);
 
 int
 gnutls_pkcs11_obj_get_flags(gnutls_pkcs11_obj_t obj, unsigned int *oflags);

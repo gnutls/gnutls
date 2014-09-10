@@ -702,7 +702,7 @@ void gnutls_x509_aki_deinit(gnutls_x509_aki_t aki)
  * @id: Will hold the identifier
  *
  * This function will return the key identifier as stored in
- * the @aki structure.
+ * the @aki structure. The identifier should be treated as constant.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * if the index is out of bounds, otherwise a negative error value.
@@ -1400,6 +1400,7 @@ int gnutls_x509_ext_export_basic_constraints(unsigned int ca, int pathlen,
  *
  * This function will return the information from a proxy certificate
  * extension. It reads the ProxyCertInfo X.509 extension (1.3.6.1.5.5.7.1.14).
+ * The @policyLanguage and @policy values must be deinitialized using gnutls_free() after use.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1467,6 +1468,7 @@ int gnutls_x509_ext_import_proxy(const gnutls_datum_t * ext, int *pathlen,
 	} else {
 		if (policy) {
 			*policy = (char *)value.data;
+			value.data = NULL;
 		}
 		if (sizeof_policy)
 			*sizeof_policy = value.size;
@@ -3033,4 +3035,87 @@ int gnutls_x509_ext_export_key_purposes(gnutls_x509_key_purposes_t p,
  cleanup:
 	asn1_delete_structure(&c2);
 	return ret;
+}
+
+/**
+ * gnutls_ext_deinit:
+ * @ext: The extensions structure
+ *
+ * This function will deinitialize an extensions structure.
+ *
+ * Since: 3.3.8
+ **/
+void gnutls_x509_ext_deinit(gnutls_x509_ext_st *ext)
+{
+	gnutls_free(ext->oid);
+	gnutls_free(ext->data.data);
+}
+
+int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	char str_critical[10];
+	char oid[MAX_OID_SIZE];
+	int result, len, ret;
+
+	memset(out, 0, sizeof(*out));
+
+	/* decode der */
+	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.Extension", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, der->data, der->size, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	len = sizeof(oid)-1;
+	result = asn1_read_value(c2, "extnID", oid, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	len = sizeof(str_critical)-1;
+	result = asn1_read_value(c2, "critical", str_critical, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		ret = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if (str_critical[0] == 'T')
+		out->critical = 1;
+	else
+		out->critical = 0;
+
+	ret = _gnutls_x509_read_value(c2, "extnValue", &out->data);
+	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE || ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
+		out->data.data = NULL;
+		out->data.size = 0;
+	} else if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	out->oid = gnutls_strdup(oid);
+	if (out->oid == NULL) {
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto fail;
+	}
+
+	ret = 0;
+	goto cleanup;
+ fail:
+ 	memset(out, 0, sizeof(*out));
+ cleanup:
+	asn1_delete_structure(&c2);
+	return ret;
+	
 }

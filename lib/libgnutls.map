@@ -1020,6 +1020,9 @@ GNUTLS_3_1_0 {
 	gnutls_x509_trust_list_verify_crt2;
 	gnutls_x509_crt_get_extension_by_oid2;
 	gnutls_x509_crq_get_extension_by_oid2;
+	gnutls_pkcs11_obj_get_exts;
+	gnutls_x509_ext_deinit;
+	gnutls_x509_ext_print;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {
