@@ -94,6 +94,8 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 		       ck_session_handle_t pks, ck_object_handle_t obj,
 		       ck_key_type_t key_type, gnutls_datum_t * pubkey);
 
+int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t *spki, gnutls_datum_t *der);
+
 int pkcs11_get_info(struct p11_kit_uri *info,
 		    gnutls_pkcs11_obj_info_t itype, void *output,
 		    size_t * output_size);
@@ -230,6 +232,13 @@ pkcs11_get_attribute_value(struct ck_function_list *module,
 			   ck_object_handle_t object,
 			   struct ck_attribute *templ,
 			   unsigned long count);
+
+ck_rv_t
+pkcs11_get_attribute_avalue(struct ck_function_list * module,
+			   ck_session_handle_t sess,
+			   ck_object_handle_t object,
+			   ck_attribute_type_t type,
+			   gnutls_datum_t *res);
 
 ck_rv_t
 pkcs11_get_mechanism_list(struct ck_function_list *module,

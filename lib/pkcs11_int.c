@@ -33,6 +33,7 @@
 #include <pin.h>
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
+#include <p11-kit/pkcs11.h>
 #include <p11-kit/pin.h>
 
 ck_rv_t
@@ -102,6 +103,46 @@ pkcs11_get_attribute_value(struct ck_function_list * module,
 			   unsigned long count)
 {
 	return (module)->C_GetAttributeValue(sess, object, templ, count);
+}
+
+/* Returns only a single attribute value, but allocates its data 
+ * Only the type needs to be set.
+ */
+ck_rv_t
+pkcs11_get_attribute_avalue(struct ck_function_list * module,
+			   ck_session_handle_t sess,
+			   ck_object_handle_t object,
+			   ck_attribute_type_t type,
+			   gnutls_datum_t *res)
+{
+	ck_rv_t rv;
+	struct ck_attribute templ;
+	void *t;
+
+	res->data = NULL;
+	res->size = 0;
+
+	templ.type = type;
+	templ.value = NULL;
+	templ.value_len = 0;
+	rv = (module)->C_GetAttributeValue(sess, object, &templ, 1);
+	if (rv == CKR_OK) {
+		if (templ.value_len == 0)
+			return rv;
+
+		templ.type = type;
+		t = gnutls_malloc(templ.value_len);
+		if (t == NULL)
+			return gnutls_assert_val(CKR_HOST_MEMORY);
+		templ.value = t;
+		rv = (module)->C_GetAttributeValue(sess, object, &templ, 1);
+		if (rv != CKR_OK) {
+			gnutls_free(t);
+		}
+		res->data = t;
+		res->size = templ.value_len;
+	}
+	return rv;
 }
 
 ck_rv_t

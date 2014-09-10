@@ -89,7 +89,7 @@ COBJECTS += crypto-selftests.c crypto-selftests-pk.c
 endif
 
 if ENABLE_PKCS11
-COBJECTS += pkcs11.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \
+COBJECTS += pkcs11.c pkcs11x.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c \
 	pkcs11_int.c
 endif
 

@@ -36,13 +36,13 @@
 #include <pin.h>
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
+#include <p11-kit/pkcs11x.h>
 #include <p11-kit/pin.h>
+
 #include <atfork.h>
 
 #define MAX_PROVIDERS 16
 
-/* XXX: try to eliminate this */
-#define MAX_CERT_SIZE 32*1024
 #define MAX_SLOTS 48
 
 extern void *_gnutls_pkcs11_mutex;
@@ -1197,6 +1197,9 @@ pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
 	case CKO_CERTIFICATE:
 		obj->type = GNUTLS_PKCS11_OBJ_X509_CRT;
 		break;
+	case CKO_X_CERTIFICATE_EXTENSION:
+		obj->type = GNUTLS_PKCS11_OBJ_X509_CRT_EXTENSION;
+		break;
 	case CKO_PUBLIC_KEY:
 		obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
 		break;
@@ -1503,8 +1506,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 	unsigned long category = 0;
 	char label_tmp[PKCS11_LABEL_SIZE];
 	char id_tmp[PKCS11_ID_SIZE];
-	uint8_t *cert_data = NULL;
-	gnutls_datum_t id, label, data;
+	gnutls_datum_t id, label, data = {NULL, 0};
 
 	/* now figure out flags */
 	fobj->flags = 0;
@@ -1571,7 +1573,6 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 		label.size = a[0].value_len;
 	}
 
-
 	a[0].type = CKA_ID;
 	a[0].value = id_tmp;
 	a[0].value_len = sizeof(id_tmp);
@@ -1589,24 +1590,11 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 	if (label.data == NULL && id.data == NULL)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	cert_data = gnutls_malloc(MAX_CERT_SIZE);
-	if (cert_data == NULL) {
+	rv = pkcs11_get_attribute_avalue
+	    (sinfo->module, sinfo->pks, obj, CKA_VALUE, &data);
+	if (rv != CKR_OK) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	a[0].type = CKA_VALUE;
-	a[0].value = cert_data;
-	a[0].value_len = MAX_CERT_SIZE;
-
-	rv = pkcs11_get_attribute_value
-	    (sinfo->module, sinfo->pks, obj, a, 1);
-	if (rv == CKR_OK) {
-		data.data = a[0].value;
-		data.size = a[0].value_len;
-	} else {
-		data.data = NULL;
-		data.size = 0;
+		/* data will be null */
 	}
 
 	if (class == CKO_PUBLIC_KEY) {
@@ -1633,7 +1621,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 	ret = 0;
  cleanup:
- 	gnutls_free(cert_data);
+ 	gnutls_free(data.data);
  	return ret;
 }
 
@@ -2578,7 +2566,6 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 	        unsigned j;
 	        gnutls_datum_t id;
 
-		class = -1;
 	        for (j=0;j<count;j++) {
 			a[0].type = CKA_ID;
 			a[0].value = certid_tmp;
@@ -2592,7 +2579,6 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 				id.data = NULL;
 				id.size = 0;
 			}
-
 
 			if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_ALL ||
 			    find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_MATCH) {
@@ -3094,6 +3080,8 @@ const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type)
 		return "Secret key";
 	case GNUTLS_PKCS11_OBJ_DATA:
 		return "Data";
+	case GNUTLS_PKCS11_OBJ_X509_CRT_EXTENSION:
+		return "X.509 certificate extension";
 	case GNUTLS_PKCS11_OBJ_UNKNOWN:
 	default:
 		return "Unknown";
@@ -3116,10 +3104,10 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 	ck_object_handle_t obj;
 	unsigned long count, a_vals;
 	int found = 0, ret;
-	uint8_t *cert_data = NULL;
 	struct find_cert_st *priv = input;
 	char label_tmp[PKCS11_LABEL_SIZE];
 	char id_tmp[PKCS11_ID_SIZE];
+	gnutls_datum_t data = {NULL, 0};
 	unsigned tries, i, finalized;
 	ck_bool_t trusted = 1;
 
@@ -3139,14 +3127,6 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 	if (priv->dn.size == 0 && priv->key_id.size == 0 && priv->issuer_dn.size == 0 &&
 		priv->serial.size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	/* search the token for the key ID */
-
-	cert_data = gnutls_malloc(MAX_CERT_SIZE);
-	if (cert_data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
 
 	/* Find objects with given class and type */
 
@@ -3234,27 +3214,36 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 				break;
 			}
 
-			a[0].type = CKA_VALUE;
-			a[0].value = cert_data;
-			a[0].value_len = MAX_CERT_SIZE;
+			a[0].type = CKA_LABEL;
+			a[0].value = label_tmp;
+			a[0].value_len = sizeof(label_tmp);
 
-			a[1].type = CKA_LABEL;
-			a[1].value = label_tmp;
-			a[1].value_len = sizeof(label_tmp);
+			a[1].type = CKA_ID;
+			a[1].value = id_tmp;
+			a[1].value_len = sizeof(id_tmp);
 
-			a[2].type = CKA_ID;
-			a[2].value = id_tmp;
-			a[2].value_len = sizeof(id_tmp);
+			/* data will contain the certificate */
+			rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_VALUE, &data);
 
-			if (pkcs11_get_attribute_value
+			if (rv == CKR_OK && pkcs11_get_attribute_value
 			    (sinfo->module, sinfo->pks, obj, a,
-			     3) == CKR_OK) {
-				gnutls_datum_t id =
-				    { a[2].value, a[2].value_len };
-				gnutls_datum_t data =
-				    { a[0].value, a[0].value_len };
+			     2) == CKR_OK) {
 				gnutls_datum_t label =
+				    { a[0].value, a[0].value_len };
+				gnutls_datum_t id =
 				    { a[1].value, a[1].value_len };
+
+				if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT) {
+					gnutls_datum_t spki;
+					rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_PUBLIC_KEY_INFO, &spki);
+					if (rv == CKR_OK) {
+						ret = pkcs11_override_cert_exts(sinfo, &spki, &data);
+						if (ret < 0) {
+							gnutls_assert();
+							/* non fatal errors */
+						}
+					}
+				}
 
 				if (priv->need_import != 0) {
 					ret =
@@ -3315,7 +3304,7 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 	}
 
       cleanup:
-	gnutls_free(cert_data);
+	gnutls_free(data.data);
 	if (finalized == 0)
 		pkcs11_find_objects_final(sinfo);
 

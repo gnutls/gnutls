@@ -1354,6 +1354,19 @@ void gnutls_certificate_set_trust_list
     (gnutls_certificate_credentials_t res,
      gnutls_x509_trust_list_t tlist, unsigned flags);
 
+typedef struct gnutls_x509_ext_st {
+	char *oid;
+	unsigned int critical;
+	gnutls_datum_t data;
+} gnutls_x509_ext_st;
+
+void gnutls_x509_ext_deinit(gnutls_x509_ext_st *ext);
+
+int
+gnutls_x509_ext_print(gnutls_x509_ext_st *exts, unsigned int exts_size,
+		      gnutls_certificate_print_formats_t format,
+		      gnutls_datum_t * out);
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 }
