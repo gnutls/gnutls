@@ -989,9 +989,43 @@ cleanup:
 }
 
 #ifdef ENABLE_PKCS11
+static bool check_key_purpose(gnutls_x509_crt_t issuer, const char *purpose)
+{
+	char oid[MAX_OID_SIZE];
+	size_t oid_size;
+	int ret;
+	unsigned i;
+
+	for (i=0;;i++) {
+		oid_size = sizeof(oid);
+		ret = gnutls_x509_crt_get_key_purpose_oid(issuer, i, oid, &oid_size, NULL);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			if (i==0) {
+				/* no key purpose in certificate, assume ANY */
+				return 1;
+			} else {
+				gnutls_assert();
+				break;
+			}
+		} else if (ret < 0) {
+			gnutls_assert();
+			break;
+		}
+
+		if (strcmp(oid, purpose) == 0 || strcmp(oid, GNUTLS_KP_ANY) == 0) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
 /* Verify X.509 certificate chain using a PKCS #11 token.
  *
  * Note that the return value is an OR of GNUTLS_CERT_* elements.
+ *
+ * Unlike the non-PKCS#11 version, this function accepts a key purpose
+ * (from GNUTLS_KP_...). That is because in the p11-kit trust modules
+ * anchors are mixed and get assigned a purpose.
  *
  * This function verifies a X.509 certificate list. The certificate
  * list should lead to a trusted certificate in order to be trusted.
@@ -1000,6 +1034,7 @@ unsigned int
 _gnutls_pkcs11_verify_crt_status(const char* url,
 				const gnutls_x509_crt_t * certificate_list,
 				unsigned clist_size,
+				const char *purpose,
 				unsigned int flags,
 				gnutls_verify_output_function func)
 {
@@ -1089,7 +1124,8 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 
 	/* check against issuer */
 	ret = gnutls_pkcs11_get_raw_issuer(url, certificate_list[clist_size - 1],
-		&raw_issuer, GNUTLS_X509_FMT_DER, GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
+			 		   &raw_issuer, GNUTLS_X509_FMT_DER,
+			 		   GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT|GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 	if (ret < 0) {
 		gnutls_assert();
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE && clist_size > 2) {
@@ -1123,6 +1159,16 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 		status |= GNUTLS_CERT_INVALID;
 		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 		goto cleanup;
+	}
+
+	if (purpose != NULL) {
+		ret = check_key_purpose(issuer, purpose);
+		if (ret != 1) {
+			gnutls_assert();
+			status |= GNUTLS_CERT_INVALID;
+			status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+			goto cleanup;
+		}
 	}
 
 	status = _gnutls_verify_crt_status(certificate_list, clist_size,

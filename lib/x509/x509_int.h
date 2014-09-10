@@ -418,6 +418,7 @@ unsigned int
 _gnutls_pkcs11_verify_crt_status(const char* url,
 				const gnutls_x509_crt_t * certificate_list,
 				unsigned clist_size,
+				const char *purpose,
 				unsigned int flags,
 				gnutls_verify_output_function func);
 #endif
