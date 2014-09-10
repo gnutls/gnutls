@@ -43,8 +43,6 @@ struct gnutls_tdb_int {
 
 static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
 				gnutls_datum_t * b64);
-static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert,
-				  gnutls_datum_t * rpubkey);
 static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 				 gnutls_datum_t * rpubkey);
 static int verify_pubkey(const char *file, const char *host,
@@ -384,8 +382,9 @@ static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
 	return 0;
 }
 
-static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert,
-				  gnutls_datum_t * rpubkey)
+/* Converts an X.509 certificate to subjectPublicKeyInfo */
+int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert,
+			   gnutls_datum_t * rpubkey)
 {
 	gnutls_x509_crt_t crt = NULL;
 	gnutls_pubkey_t pubkey = NULL;

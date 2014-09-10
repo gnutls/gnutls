@@ -34,7 +34,7 @@
 #include <gnutls_datum.h>
 
 int
-get_extension(ASN1_TYPE asn, const char *root,
+_gnutls_get_extension(ASN1_TYPE asn, const char *root,
 	      const char *extension_id, int indx,
 	      gnutls_datum_t * ret, unsigned int *_critical)
 {
@@ -155,7 +155,7 @@ _gnutls_x509_crt_get_extension(gnutls_x509_crt_t cert,
 			       const char *extension_id, int indx,
 			       gnutls_datum_t * data, unsigned int *critical)
 {
-	return get_extension(cert->cert, "tbsCertificate.extensions",
+	return _gnutls_get_extension(cert->cert, "tbsCertificate.extensions",
 			     extension_id, indx, data, critical);
 }
 
@@ -191,7 +191,7 @@ _gnutls_x509_crl_get_extension(gnutls_x509_crl_t crl,
 			       gnutls_datum_t * data,
 			       unsigned int *critical)
 {
-	return get_extension(crl->crl, "tbsCertList.crlExtensions",
+	return _gnutls_get_extension(crl->crl, "tbsCertList.crlExtensions",
 			     extension_id, indx, data, critical);
 }
 
@@ -415,7 +415,7 @@ overwrite_extension(ASN1_TYPE asn, const char *root, unsigned int indx,
 }
 
 int
-set_extension(ASN1_TYPE asn, const char *root,
+_gnutls_set_extension(ASN1_TYPE asn, const char *root,
 	      const char *ext_id,
 	      const gnutls_datum_t * ext_data, unsigned int critical)
 {
@@ -500,7 +500,7 @@ _gnutls_x509_crt_set_extension(gnutls_x509_crt_t cert,
 			       const gnutls_datum_t * ext_data,
 			       unsigned int critical)
 {
-	return set_extension(cert->cert, "tbsCertificate.extensions",
+	return _gnutls_set_extension(cert->cert, "tbsCertificate.extensions",
 			     ext_id, ext_data, critical);
 }
 
@@ -510,7 +510,7 @@ _gnutls_x509_crl_set_extension(gnutls_x509_crl_t crl,
 			       const gnutls_datum_t * ext_data,
 			       unsigned int critical)
 {
-	return set_extension(crl->crl, "tbsCertList.crlExtensions", ext_id,
+	return _gnutls_set_extension(crl->crl, "tbsCertList.crlExtensions", ext_id,
 			     ext_data, critical);
 }
 
@@ -575,7 +575,7 @@ _gnutls_x509_crq_set_extension(gnutls_x509_crq_t crq,
 		}
 	}
 
-	result = set_extension(c2, "", ext_id, ext_data, critical);
+	result = _gnutls_set_extension(c2, "", ext_id, ext_data, critical);
 	if (result < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
