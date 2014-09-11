@@ -1180,28 +1180,8 @@ _gnutls_parse_general_name2(ASN1_TYPE src, const char *src_name,
 			}
 			if (len > 0) len--;
 
-			if (_san_othername_to_virtual(oid, len) == GNUTLS_SAN_OTHERNAME_XMPP) {
-				gnutls_datum_t out;
-
-				ret =
-				    _gnutls_x509_decode_string
-				    (ASN1_ETYPE_UTF8_STRING, tmp.data,
-				     tmp.size, &out);
-				if (ret < 0) {
-					gnutls_assert();
-					goto cleanup;
-				}
-
-				dname->data = out.data;
-				dname->size = out.size;
-
-				/* out is already null terminated */
-				ret = type;
-				goto cleanup;
-			} else {
-				dname->size = tmp.size;
-				dname->data = tmp.data;
-			}
+			dname->size = tmp.size;
+			dname->data = tmp.data;
 		}
 	} else if (type == GNUTLS_SAN_DN) {
 		_gnutls_str_cat(nptr, sizeof(nptr), ".directoryName");
@@ -1322,7 +1302,15 @@ get_alt_name(gnutls_x509_crt_t cert, const char *extension_id,
 	}
 
 	if (othername_oid && type == GNUTLS_SAN_OTHERNAME) {
-		type = _san_othername_to_virtual((char*)ooid.data, ooid.size);
+		unsigned vtype;
+		gnutls_datum_t virt;
+		ret = gnutls_x509_othername_to_virtual((char*)ooid.data, &res, &vtype, &virt);
+		if (ret >= 0) {
+			type = vtype;
+			gnutls_free(res.data);
+			res.data = virt.data;
+			res.size = virt.size;
+		}
 	}
 
 	if (alt_type)

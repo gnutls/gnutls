@@ -3119,3 +3119,47 @@ int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
 	return ret;
 	
 }
+
+/**
+ * gnutls_x509_othername_to_virtual:
+ * @oid: The othername object identifier
+ * @data: The othername data
+ * @virt_type: GNUTLS_SAN_OTHERNAME_XXX
+ * @virt: allocated printable data
+ *
+ * This function will parse and convert the othername data to a virtual
+ * type supported by gnutls.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
+ *
+ * Since: 3.3.8
+ **/
+int gnutls_x509_othername_to_virtual(const char *oid, 
+				     const gnutls_datum_t *othername,
+				     unsigned int *virt_type,
+				     gnutls_datum_t *virt)
+{
+	int ret;
+	unsigned type;
+
+	type = _san_othername_to_virtual(oid, strlen(oid));
+	if (type == GNUTLS_SAN_OTHERNAME)
+		return gnutls_assert_val(GNUTLS_E_X509_UNKNOWN_SAN);
+
+	if (virt_type)
+		*virt_type = type;
+
+	switch(type) {
+		case GNUTLS_SAN_OTHERNAME_XMPP:
+			ret = _gnutls_x509_decode_string
+				    (ASN1_ETYPE_UTF8_STRING, othername->data,
+				     othername->size, virt);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			return 0;
+		default:
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+}

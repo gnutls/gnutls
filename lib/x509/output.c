@@ -130,7 +130,7 @@ const char *p;
 		break;
 
 	case GNUTLS_SAN_OTHERNAME_XMPP:
-		addf(str,  _("%sXMPP: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+		addf(str,  _("%sXMPP Address: %.*s\n"), prefix, name->size, NON_NULL(name->data));
 		break;
 	default:
 		addf(str,  _("%sUnknown name: "), prefix);
@@ -335,24 +335,25 @@ static void print_aki(gnutls_buffer_st * str, gnutls_datum_t *der)
 	if (err < 0) {
 		addf(str, "error: gnutls_x509_ext_import_authority_key_id: %s\n",
 		     gnutls_strerror(err));
-		return;
+		goto cleanup;
 	}
 
 	err = gnutls_x509_aki_get_id(aki, &id);
-	if (err == GNUTLS_E_X509_UNSUPPORTED_EXTENSION) {
+	if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		/* Check if an alternative name is there */
 		print_aki_gn_serial(str, aki);
-		return;
+		goto cleanup;
 	} else if (err < 0) {
 		addf(str, "error: gnutls_x509_aki_get_id: %s\n",
 		     gnutls_strerror(err));
-		return;
+		goto cleanup;
 	}
 	
 	adds(str, "\t\t\t");
 	_gnutls_buffer_hexprint(str, id.data, id.size);
 	adds(str, "\n");
 
+ cleanup:
 	gnutls_x509_aki_deinit(aki);
 }
 
@@ -452,14 +453,14 @@ static void print_crldist(gnutls_buffer_st * str, gnutls_datum_t *der)
 	if (err < 0) {
 		addf(str, "error: gnutls_x509_ext_import_crl_dist_points: %s\n",
 		     gnutls_strerror(err));
-		return;
+		goto cleanup;
 	}
 
 	for (indx = 0;; indx++) {
 		err =
 		    gnutls_x509_crl_dist_points_get(dp, indx, &type, &dist, &flags);
 		if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-			return;
+			goto cleanup;
 		else if (err < 0) {
 			addf(str, "error: get_crl_dist_points: %s\n",
 			     gnutls_strerror(err));
@@ -468,6 +469,8 @@ static void print_crldist(gnutls_buffer_st * str, gnutls_datum_t *der)
 
 		print_name(str, "\t\t\t", type, &dist);
 	}
+ cleanup:
+ 	gnutls_x509_crl_dist_points_deinit(dp);
 }
 
 static void
@@ -490,17 +493,17 @@ print_key_purpose(gnutls_buffer_st * str, const char *prefix, gnutls_datum_t *de
 	if (err < 0) {
 		addf(str, "error: gnutls_x509_ext_import_key_purposes: %s\n",
 		     gnutls_strerror(err));
-		return;
+		goto cleanup;
 	}
 
 	for (indx = 0;; indx++) {
 		err = gnutls_x509_key_purpose_get(purposes, indx, &oid);
 		if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-			return;
-		else if (err < GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			goto cleanup;
+		else if (err < 0) {
 			addf(str, "error: gnutls_x509_key_purpose_get: %s\n",
 			     gnutls_strerror(err));
-			return;
+			goto cleanup;
 		}
 
 		p = (void*)oid.data;
@@ -524,6 +527,7 @@ print_key_purpose(gnutls_buffer_st * str, const char *prefix, gnutls_datum_t *de
 		else
 			addf(str, "%s\t\t\t%s\n", prefix, p);
 	}
+ cleanup:
 	gnutls_x509_key_purpose_deinit(purposes);
 }
 
@@ -562,6 +566,7 @@ print_altname(gnutls_buffer_st * str, const char *prefix, gnutls_datum_t *der)
 	unsigned int type;
 	gnutls_datum_t san;
 	gnutls_datum_t othername;
+	char pfx[16];
 	int err;
 
 	err = gnutls_subject_alt_names_init(&names);
@@ -587,10 +592,22 @@ print_altname(gnutls_buffer_st * str, const char *prefix, gnutls_datum_t *der)
 			addf(str,
 			     "error: gnutls_subject_alt_names_get: %s\n",
 			     gnutls_strerror(err));
-			return;
+			break;
 		}
 
+
 		if (type == GNUTLS_SAN_OTHERNAME) {
+			unsigned vtype;
+			gnutls_datum_t virt;
+
+			err = gnutls_x509_othername_to_virtual((char*)othername.data, &san, &vtype, &virt);
+			if (err >= 0) {
+				snprintf(pfx, sizeof(pfx), "%s\t\t\t", prefix);
+				print_name(str, pfx, vtype, &virt);
+				gnutls_free(virt.data);
+				continue;
+			}
+
 			addf(str,
 			     _("%s\t\t\totherName OID: %.*s\n"),
 			     prefix, (int)othername.size, (char*)othername.data);
@@ -602,7 +619,6 @@ print_altname(gnutls_buffer_st * str, const char *prefix, gnutls_datum_t *der)
 			_gnutls_buffer_asciiprint(str, (char*)san.data, san.size);
 				addf(str, "\n");
 		} else {
-			char pfx[16];
 
 			snprintf(pfx, sizeof(pfx), "%s\t\t\t", prefix);
 			print_name(str, pfx, type, &san);
@@ -692,7 +708,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	if (strcmp(oid, "2.5.29.19") == 0) {
 		if (idx->basic) {
 			addf(str,
-			     "error: more than one basic constraint\n");
+			     "warning: more than one basic constraint\n");
 		}
 
 		addf(str, _("%s\t\tBasic Constraints (%s):\n"),
@@ -705,7 +721,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	} else if (strcmp(oid, "2.5.29.14") == 0) {
 		if (idx->ski) {
 			addf(str,
-			     "error: more than one SKI extension\n");
+			     "warning: more than one SKI extension\n");
 		}
 
 		addf(str,
@@ -773,14 +789,13 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 				     prefix, name,
 				     policy.qualifier[j].data);
 			}
-			gnutls_x509_policy_release(&policy);
 		}
 		gnutls_x509_policies_deinit(policies);
 	} else if (strcmp(oid, "2.5.29.35") == 0) {
 
 		if (idx->aki) {
 			addf(str,
-			     "error: more than one AKI extension\n");
+			     "warning: more than one AKI extension\n");
 		}
 
 		addf(str,
@@ -794,7 +809,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	} else if (strcmp(oid, "2.5.29.15") == 0) {
 		if (idx->keyusage) {
 			addf(str,
-			     "error: more than one key usage extension\n");
+			     "warning: more than one key usage extension\n");
 		}
 
 		addf(str, _("%s\t\tKey Usage (%s):\n"), prefix,
@@ -807,7 +822,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	} else if (strcmp(oid, "2.5.29.16") == 0) {
 		if (idx->pkey_usage_period) {
 			addf(str,
-			     "error: more than one private key usage period extension\n");
+			     "warning: more than one private key usage period extension\n");
 		}
 
 		addf(str,
@@ -821,7 +836,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	} else if (strcmp(oid, "2.5.29.37") == 0) {
 		if (idx->keypurpose) {
 			addf(str,
-			     "error: more than one key purpose extension\n");
+			     "warning: more than one key purpose extension\n");
 		}
 
 		addf(str, _("%s\t\tKey Purpose (%s):\n"), prefix,
@@ -832,7 +847,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	} else if (strcmp(oid, "2.5.29.17") == 0) {
 		if (idx->san) {
 			addf(str,
-			     "error: more than one SKI extension\n");
+			     "warning: more than one SKI extension\n");
 		}
 
 		addf(str,
@@ -844,7 +859,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	} else if (strcmp(oid, "2.5.29.18") == 0) {
 		if (idx->ian) {
 			addf(str,
-			     "error: more than one Issuer AltName extension\n");
+			     "warning: more than one Issuer AltName extension\n");
 		}
 
 		addf(str,
@@ -858,7 +873,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	} else if (strcmp(oid, "2.5.29.31") == 0) {
 		if (idx->crldist) {
 			addf(str,
-			     "error: more than one CRL distribution point\n");
+			     "warning: more than one CRL distribution point\n");
 		}
 
 		addf(str,
@@ -871,7 +886,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	} else if (strcmp(oid, "1.3.6.1.5.5.7.1.14") == 0) {
 		if (idx->proxy) {
 			addf(str,
-			     "error: more than one proxy extension\n");
+			     "warning: more than one proxy extension\n");
 		}
 
 		addf(str,
@@ -892,7 +907,7 @@ static void print_extension(gnutls_buffer_st * str, const char *prefix,
 	} else if (strcmp(oid, "2.5.29.30") == 0) {
 		if (idx->nc) {
 			addf(str,
-			     "error: more than one name constraints extension\n");
+			     "warning: more than one name constraints extension\n");
 		}
 		idx->nc++;
 
@@ -971,6 +986,7 @@ print_extensions(gnutls_buffer_st * str, const char *prefix, int type,
 		}
 
 		print_extension(str, prefix, &idx, oid, critical, &der);
+		gnutls_free(der.data);
 	}
 }
 
@@ -1842,8 +1858,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 
 				if (crl_nr) {
 					addf(str,
-					     "error: more than one CRL number\n");
-					continue;
+					     "warning: more than one CRL number\n");
 				}
 
 				err =
@@ -1871,8 +1886,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 
 				if (aki_idx) {
 					addf(str,
-					     "error: more than one AKI extension\n");
-					continue;
+					     "warning: more than one AKI extension\n");
 				}
 
 				addf(str,
@@ -2185,8 +2199,7 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 
 				if (extensions) {
 					addf(str,
-					     "error: more than one extensionsRequest\n");
-					continue;
+					     "warning: more than one extensionsRequest\n");
 				}
 
 				ccert.crq = cert;
@@ -2201,8 +2214,7 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 
 				if (challenge) {
 					adds(str,
-					     "error: more than one Challenge password attribute\n");
-					continue;
+					     "warning: more than one Challenge password attribute\n");
 				}
 
 				err =
@@ -2477,7 +2489,7 @@ gnutls_x509_ext_print(gnutls_x509_ext_st *exts, unsigned int exts_size,
 	_gnutls_buffer_init(&str);
 
 	for (i=0;i<exts_size;i++)
-		print_extension(&str, "\t", &idx, (char*)exts[i].oid, exts[i].critical, &exts[i].data);
+		print_extension(&str, "", &idx, (char*)exts[i].oid, exts[i].critical, &exts[i].data);
 
 	_gnutls_buffer_append_data(&str, "\x00", 1);
 
