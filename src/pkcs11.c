@@ -104,13 +104,17 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 
 	FIX(url, outfile, detailed, info);
 
+	gnutls_pkcs11_token_get_flags(url, &flags);
+	if (flags & GNUTLS_PKCS11_TOKEN_TRUSTED)
+		print_exts = 1;
+
 	if (type == PKCS11_TYPE_TRUSTED) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED;
 	} else if (type == PKCS11_TYPE_PK) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY;
 	} else if (type == PKCS11_TYPE_CRT_ALL) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL;
-		print_exts = 1;
+		if (print_exts != 0) print_exts++;
 	} else if (type == PKCS11_TYPE_PRIVKEY) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY;
 	} else if (type == PKCS11_TYPE_INFO) {
@@ -192,12 +196,12 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		}
 		fprintf(outfile, "\tID: %s\n", buf);
 
-		if (otype == GNUTLS_PKCS11_OBJ_X509_CRT) {
+		if (otype == GNUTLS_PKCS11_OBJ_X509_CRT && print_exts > 0) {
 			ret = gnutls_pkcs11_obj_get_exts(crt_list[i], &exts, &exts_size, 0);
 			if (ret >= 0 && exts_size > 0) {
 				gnutls_datum_t txt;
 
-				if (print_exts != 0) {
+				if (print_exts > 1) {
 					fprintf(outfile, "\tExtensions:\n");
 					ret = gnutls_x509_ext_print(exts, exts_size, 0, &txt);
 					if (ret >= 0) {

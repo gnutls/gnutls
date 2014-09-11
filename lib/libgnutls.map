@@ -1029,6 +1029,7 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs11_obj_get_exts;
 	gnutls_x509_ext_deinit;
 	gnutls_x509_ext_print;
+	gnutls_x509_othername_to_virtual;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {
