@@ -92,10 +92,12 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 	    unsigned int detailed, common_info_st * info)
 {
 	gnutls_pkcs11_obj_t *crt_list;
-	unsigned int crt_list_size = 0, i;
+	unsigned int crt_list_size = 0, i, j;
 	int ret, otype;
 	char *output, *str;
-	int attrs;
+	int attrs, print_exts = 0;
+	gnutls_x509_ext_st *exts;
+	unsigned exts_size;
 	unsigned int obj_flags = flags;
 
 	pkcs11_common(info);
@@ -108,6 +110,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY;
 	} else if (type == PKCS11_TYPE_CRT_ALL) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL;
+		print_exts = 1;
 	} else if (type == PKCS11_TYPE_PRIVKEY) {
 		attrs = GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY;
 	} else if (type == PKCS11_TYPE_INFO) {
@@ -187,7 +190,35 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 				__LINE__, gnutls_strerror(ret));
 			exit(1);
 		}
-		fprintf(outfile, "\tID: %s\n\n", buf);
+		fprintf(outfile, "\tID: %s\n", buf);
+
+		if (otype == GNUTLS_PKCS11_OBJ_X509_CRT) {
+			ret = gnutls_pkcs11_obj_get_exts(crt_list[i], &exts, &exts_size, 0);
+			if (ret >= 0 && exts_size > 0) {
+				gnutls_datum_t txt;
+
+				if (print_exts != 0) {
+					fprintf(outfile, "\tExtensions:\n");
+					ret = gnutls_x509_ext_print(exts, exts_size, 0, &txt);
+					if (ret >= 0) {
+						fprintf(outfile, "%s", (char*)txt.data);
+						gnutls_free(txt.data);
+					}
+				} else {
+					fprintf(outfile, "\tExtensions:");
+					for (j=0;j<exts_size;j++) {
+						fprintf(outfile, "%s%s", exts[j].oid, (j!=exts_size-1)?",":" ");
+					}
+				}
+				for (j=0;j<exts_size;j++) {
+					gnutls_x509_ext_deinit(&exts[j]);
+				}
+				gnutls_free(exts);
+				fprintf(outfile, "\n");
+			}
+		}
+
+		fprintf(outfile, "\n");
 	}
 
 	return;
