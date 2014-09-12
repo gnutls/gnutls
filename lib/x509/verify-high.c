@@ -252,7 +252,8 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			}
 
 			if (exists != 0) {
-				gnutls_x509_crt_deinit(clist[i]);
+				gnutls_x509_crt_deinit(list->node[hash].trusted_cas[j]);
+				list->node[hash].trusted_cas[j] = clist[i];
 				continue;
 			}
 		}
