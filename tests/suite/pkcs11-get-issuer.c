@@ -31,6 +31,7 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <gnutls/x509-ext.h>
 
 #include "../utils.h"
 #include "../test-chains.h"
@@ -85,6 +86,7 @@ void doit(void)
 	gnutls_x509_crt_t certs[MAX_CHAIN];
 	gnutls_x509_crt_t ca;
 	gnutls_datum_t tmp;
+	int idx = -1;
 
 	unsetenv("SOFTHSM_CONF");
 	/* The overloading of time() seems to work in linux (ELF?)
@@ -93,6 +95,19 @@ void doit(void)
 #ifdef _WIN32
 	exit(77);
 #endif
+	for (j=0;;j++) {
+		if (chains[j].name == NULL)
+			break;
+		if (strcmp(chains[j].name, "verisign.com v1 ok") == 0) {
+			idx = j;
+			break;
+		}
+	}
+
+	if (idx == -1) {
+		fail("could not find proper chain\n");
+		exit(1);
+	}
 
 	if (access("/usr/bin/softhsm", X_OK) < 0) {
 		fprintf(stderr, "cannot find softhsm binary\n");
@@ -142,7 +157,7 @@ void doit(void)
 		exit(1);
 	}
 
-	for (j = 0; chains[3].chain[j]; j++) {
+	for (j = 0; chains[idx].chain[j]; j++) {
 		if (debug > 2)
 			printf("\tAdding certificate %d...",
 			       (int) j);
@@ -156,8 +171,8 @@ void doit(void)
 			exit(1);
 		}
 
-		tmp.data = (unsigned char *) chains[3].chain[j];
-		tmp.size = strlen(chains[3].chain[j]);
+		tmp.data = (unsigned char *) chains[idx].chain[j];
+		tmp.size = strlen(chains[idx].chain[j]);
 
 		ret =
 		    gnutls_x509_crt_import(certs[j], &tmp,
@@ -167,7 +182,7 @@ void doit(void)
 		if (ret < 0) {
 			fprintf(stderr,
 				"gnutls_x509_crt_import[%s,%d]: %s\n",
-				chains[3].name, (int) j,
+				chains[idx].name, (int) j,
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -191,8 +206,8 @@ void doit(void)
 		exit(1);
 	}
 
-	tmp.data = (unsigned char *) *chains[3].ca;
-	tmp.size = strlen(*chains[3].ca);
+	tmp.data = (unsigned char *) *chains[idx].ca;
+	tmp.size = strlen(*chains[idx].ca);
 
 	ret =
 	    gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
@@ -255,7 +270,7 @@ void doit(void)
 
 	gnutls_x509_trust_list_deinit(tl, 0);
 	gnutls_x509_crt_deinit(ca);
-	for (j = 0; chains[3].chain[j]; j++)
+	for (j = 0; chains[idx].chain[j]; j++)
 		gnutls_x509_crt_deinit(certs[j]);
 	if (debug)
 		printf("done\n\n\n");
