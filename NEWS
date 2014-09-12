@@ -32,6 +32,11 @@ extensions.
 ** libgnutls: In DTLS prevent sending zero-size fragments in certain cases
 of MTU split. Reported by Manuel Pégourié-Gonnard.
 
+** libgnutls: Added gnutls_x509_trust_list_verify_crt2() which allows
+verifying using a hostname and a purpose (extended key usage). That
+enhances PKCS #11 trust module verification, as it can now check the purpose
+when this function is used.
+
 ** libgnutls: Corrected gnutls_x509_crl_verify() which would always report
 a CRL signature as invalid. Reported by Armin Burgmeier.
 
@@ -41,7 +46,13 @@ a CRL signature as invalid. Reported by Armin Burgmeier.
 extensions on certificates.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crq_get_extension_by_oid2: Added
+gnutls_x509_crt_get_extension_by_oid2: Added
+gnutls_x509_trust_list_verify_crt2: Added
+gnutls_x509_ext_print: Added
+gnutls_x509_ext_deinit: Added
+gnutls_x509_othername_to_virtual: Added
+gnutls_pkcs11_obj_get_exts: Added
 
 
 * Version 3.3.7 (released 2014-08-24)
