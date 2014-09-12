@@ -202,14 +202,14 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 				gnutls_datum_t txt;
 
 				if (print_exts > 1) {
-					fprintf(outfile, "\tExtensions:\n");
+					fprintf(outfile, "\tAttached extensions:\n");
 					ret = gnutls_x509_ext_print(exts, exts_size, 0, &txt);
 					if (ret >= 0) {
 						fprintf(outfile, "%s", (char*)txt.data);
 						gnutls_free(txt.data);
 					}
 				} else {
-					fprintf(outfile, "\tExtensions:");
+					fprintf(outfile, "\tAttached extensions:");
 					for (j=0;j<exts_size;j++) {
 						fprintf(outfile, "%s%s", exts[j].oid, (j!=exts_size-1)?",":" ");
 					}
