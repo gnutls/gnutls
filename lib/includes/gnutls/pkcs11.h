@@ -179,7 +179,8 @@ int gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 				    /*GNUTLS_KEY_* */ ,
 				    unsigned int flags
 				    /* GNUTLS_PKCS11_OBJ_FLAG_* */
-    );
+);
+
 int gnutls_pkcs11_delete_url(const char *object_url, unsigned int flags
 			     /* GNUTLS_PKCS11_OBJ_FLAG_* */ );
 
@@ -394,6 +395,14 @@ gnutls_pkcs11_privkey_export_pubkey(gnutls_pkcs11_privkey_t pkey,
 int
 gnutls_pkcs11_token_get_random(const char *token_url,
 			       void *data, size_t len);
+
+int
+gnutls_pkcs11_copy_attached_extension(const char *token_url,
+				      gnutls_x509_crt_t crt,
+				      gnutls_datum_t *data,
+				      const char *label,
+				      unsigned int flags);
+
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

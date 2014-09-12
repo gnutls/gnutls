@@ -36,7 +36,7 @@
 #include <pin.h>
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
-#include <p11-kit/pkcs11x.h>
+#include "pkcs11x.h"
 #include <p11-kit/pin.h>
 
 #include <atfork.h>
@@ -1181,6 +1181,47 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 	return ret;
 }
 
+ck_object_class_t pkcs11_type_to_class(gnutls_pkcs11_obj_type_t type)
+{
+	switch (type) {
+	case GNUTLS_PKCS11_OBJ_X509_CRT:
+		return CKO_CERTIFICATE;
+	case GNUTLS_PKCS11_OBJ_X509_CRT_EXTENSION:
+		return CKO_X_CERTIFICATE_EXTENSION;
+	case GNUTLS_PKCS11_OBJ_PUBKEY:
+		return CKO_PUBLIC_KEY;
+	case GNUTLS_PKCS11_OBJ_PRIVKEY:
+		return CKO_PRIVATE_KEY;
+	case GNUTLS_PKCS11_OBJ_SECRET_KEY:
+		return CKO_SECRET_KEY;
+	case GNUTLS_PKCS11_OBJ_DATA:
+		return CKO_DATA;
+	default:
+		return -1;
+	}
+}
+
+static gnutls_pkcs11_obj_type_t pkcs11_class_to_type(ck_object_class_t class)
+{
+	switch (class) {
+	case CKO_CERTIFICATE:
+		return GNUTLS_PKCS11_OBJ_X509_CRT;
+	case CKO_X_CERTIFICATE_EXTENSION:
+		return GNUTLS_PKCS11_OBJ_X509_CRT_EXTENSION;
+	case CKO_PUBLIC_KEY:
+		return GNUTLS_PKCS11_OBJ_PUBKEY;
+	case CKO_PRIVATE_KEY:
+		return GNUTLS_PKCS11_OBJ_PRIVKEY;
+	case CKO_SECRET_KEY:
+		return GNUTLS_PKCS11_OBJ_SECRET_KEY;
+	case CKO_DATA:
+		return GNUTLS_PKCS11_OBJ_DATA;
+	default:
+		_gnutls_debug_log("unknown pkcs11 object class %x\n", (unsigned)class);
+		return GNUTLS_PKCS11_OBJ_UNKNOWN;
+	}
+}
+
 /* imports an object from a token to a pkcs11_obj_t structure.
  */
 static int
@@ -1193,29 +1234,7 @@ pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
 	struct ck_attribute attr;
 	int ret;
 
-	switch (class) {
-	case CKO_CERTIFICATE:
-		obj->type = GNUTLS_PKCS11_OBJ_X509_CRT;
-		break;
-	case CKO_X_CERTIFICATE_EXTENSION:
-		obj->type = GNUTLS_PKCS11_OBJ_X509_CRT_EXTENSION;
-		break;
-	case CKO_PUBLIC_KEY:
-		obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
-		break;
-	case CKO_PRIVATE_KEY:
-		obj->type = GNUTLS_PKCS11_OBJ_PRIVKEY;
-		break;
-	case CKO_SECRET_KEY:
-		obj->type = GNUTLS_PKCS11_OBJ_SECRET_KEY;
-		break;
-	case CKO_DATA:
-		obj->type = GNUTLS_PKCS11_OBJ_DATA;
-		break;
-	default:
-		_gnutls_debug_log("unknown pkcs11 object class %x\n", (unsigned)class);
-		obj->type = GNUTLS_PKCS11_OBJ_UNKNOWN;
-	}
+	obj->type = pkcs11_class_to_type(class);
 
 	attr.type = CKA_CLASS;
 	attr.value = &class;

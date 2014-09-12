@@ -25,9 +25,49 @@
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
+#include "pkcs11x.h"
+#include <x509/common.h>
 
 static const ck_bool_t tval = 1;
 static const ck_bool_t fval = 0;
+
+#define MAX_ASIZE 16
+
+static void mark_flags(unsigned flags, struct ck_attribute *a, unsigned *a_val)
+{
+	static const unsigned long category = 2;
+
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_CA) {
+		a[*a_val].type = CKA_CERTIFICATE_CATEGORY;
+		a[*a_val].value = (void *) &category;
+		a[*a_val].value_len = sizeof(category);
+		(*a_val)++;
+	}
+
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED) {
+		a[*a_val].type = CKA_TRUSTED;
+		a[*a_val].value = (void *) &tval;
+		a[*a_val].value_len = sizeof(tval);
+		(*a_val)++;
+
+		a[*a_val].type = CKA_PRIVATE;
+		a[*a_val].value = (void *) &fval;
+		a[*a_val].value_len = sizeof(fval);
+		(*a_val)++;
+	} else {
+		if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE) {
+			a[*a_val].type = CKA_PRIVATE;
+			a[*a_val].value = (void *) &tval;
+			a[*a_val].value_len = sizeof(tval);
+			(*a_val)++;
+		} else if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE) {
+			a[*a_val].type = CKA_PRIVATE;
+			a[*a_val].value = (void *) &fval;
+			a[*a_val].value_len = sizeof(fval);
+			(*a_val)++;
+		}
+	}
+}
 
 /**
  * gnutls_pkcs11_copy_x509_crt:
@@ -37,7 +77,9 @@ static const ck_bool_t fval = 0;
  * @flags: One of GNUTLS_PKCS11_OBJ_FLAG_*
  *
  * This function will copy a certificate into a PKCS #11 token specified by
- * a URL. The certificate can be marked as trusted or not.
+ * a URL. Valid flags to mark the certificate: %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED,
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE,
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -55,12 +97,11 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 	size_t der_size, id_size;
 	uint8_t *der = NULL;
 	uint8_t id[20];
-	struct ck_attribute a[16];
+	struct ck_attribute a[MAX_ASIZE];
 	ck_object_class_t class = CKO_CERTIFICATE;
 	ck_certificate_type_t type = CKC_X_509;
 	ck_object_handle_t obj;
-	int a_val;
-	unsigned long category;
+	unsigned a_val;
 	struct pkcs11_session_info sinfo;
 	
 	PKCS11_CHECK_INIT;
@@ -151,37 +192,7 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 		a_val++;
 	}
 
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_CA) {
-		category = 2;
-		a[a_val].type = CKA_CERTIFICATE_CATEGORY;
-		a[a_val].value = (void *) &category;
-		a[a_val].value_len = sizeof(category);
-		a_val++;
-	}
-
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED) {
-		a[a_val].type = CKA_TRUSTED;
-		a[a_val].value = (void *) &tval;
-		a[a_val].value_len = sizeof(tval);
-		a_val++;
-
-		a[a_val].type = CKA_PRIVATE;
-		a[a_val].value = (void *) &fval;
-		a[a_val].value_len = sizeof(fval);
-		a_val++;
-	} else {
-		if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE) {
-			a[a_val].type = CKA_PRIVATE;
-			a[a_val].value = (void *) &tval;
-			a[a_val].value_len = sizeof(tval);
-			a_val++;
-		} else if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE) {
-			a[a_val].type = CKA_PRIVATE;
-			a[a_val].value = (void *) &fval;
-			a[a_val].value_len = sizeof(fval);
-			a_val++;
-		}
-	}
+	mark_flags(flags, a, &a_val);
 
 	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &obj);
 	if (rv != CKR_OK) {
@@ -199,6 +210,107 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
       cleanup:
 	gnutls_free(der);
 	pkcs11_close_session(&sinfo);
+	return ret;
+
+}
+
+
+/**
+ * gnutls_pkcs11_copy_attached_extension:
+ * @token_url: A PKCS #11 URL specifying a token
+ * @obj: A pkcs11 object
+ * @label: A name to be used for the stored data
+ * @flags: One of GNUTLS_PKCS11_OBJ_FLAG_*
+ *
+ * This function will copy an object into a PKCS #11 token specified by
+ * a URL.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.3.8
+ **/
+int
+gnutls_pkcs11_copy_attached_extension(const char *token_url,
+		       gnutls_x509_crt_t crt,
+		       gnutls_datum_t *data,
+		       const char *label,
+		       unsigned int flags)
+{
+	int ret;
+	struct p11_kit_uri *info = NULL;
+	ck_rv_t rv;
+	struct ck_attribute a[MAX_ASIZE];
+	ck_object_handle_t hobj;
+	unsigned a_vals;
+	struct pkcs11_session_info sinfo;
+	ck_object_class_t class;
+	gnutls_datum_t spki = {NULL, 0};
+	
+	PKCS11_CHECK_INIT;
+
+	memset(&sinfo, 0, sizeof(sinfo));
+
+	ret = pkcs11_url_to_info(token_url, &info);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret =
+	    pkcs11_open_session(&sinfo, NULL, info,
+				SESSION_WRITE |
+				pkcs11_obj_flags_to_int(flags));
+	p11_kit_uri_free(info);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = x509_crt_to_raw_pubkey(crt, &spki);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	class = CKO_X_CERTIFICATE_EXTENSION;
+	a_vals = 0;
+	a[a_vals].type = CKA_CLASS;
+	a[a_vals].value = &class;
+	a[a_vals++].value_len = sizeof(class);
+
+	a[a_vals].type = CKA_PUBLIC_KEY_INFO;
+	a[a_vals].value = spki.data;
+	a[a_vals++].value_len = spki.size;
+
+	a[a_vals].type = CKA_VALUE;
+	a[a_vals].value = data->data;
+	a[a_vals++].value_len = data->size;
+
+	a[a_vals].type = CKA_TOKEN;
+	a[a_vals].value = (void *) &tval;
+	a[a_vals++].value_len = sizeof(tval);
+
+	if (label) {
+		a[a_vals].type = CKA_LABEL;
+		a[a_vals].value = (void *) label;
+		a[a_vals++].value_len = strlen(label);
+	}
+
+	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_vals, &hobj);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		_gnutls_debug_log("p11: %s\n", pkcs11_strerror(rv));
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
+
+	ret = 0;
+
+      cleanup:
+	pkcs11_close_session(&sinfo);
+	gnutls_free(spki.data);
 	return ret;
 
 }

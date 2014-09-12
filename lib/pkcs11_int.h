@@ -51,6 +51,8 @@ struct token_info {
 struct gnutls_pkcs11_obj_st {
 	gnutls_datum_t raw;
 	gnutls_pkcs11_obj_type_t type;
+	ck_object_class_t class;
+
 	unsigned int flags;
 	struct p11_kit_uri *info;
 
@@ -181,6 +183,8 @@ static inline int pk_to_genmech(gnutls_pk_algorithm_t pk, ck_key_type_t *type)
 		return CKM_RSA_PKCS_KEY_PAIR_GEN;
 	}
 }
+
+ck_object_class_t pkcs11_type_to_class(gnutls_pkcs11_obj_type_t type);
 
 ck_rv_t
 pkcs11_generate_key_pair(struct ck_function_list * module,
