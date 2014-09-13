@@ -39,7 +39,7 @@
 
 /**
  * gnutls_random_art:
- * @type: The type of the random art
+ * @type: The type of the random art (for now only %GNUTLS_RANDOM_ART_OPENSSH is supported)
  * @key_type: The type of the key (RSA, DSA etc.)
  * @key_size: The size of the key in bits
  * @fpr: The fingerprint of the key
@@ -47,7 +47,7 @@
  * @art: The returned random art
  *
  * This function will convert a given fingerprint to an "artistic"
- * image. The returned image is allocated using gnutls_malloc()
+ * image. The returned image is allocated using gnutls_malloc().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
