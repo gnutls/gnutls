@@ -19,8 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#define HAVE_PKCS11X_H
-
 #include <gnutls_int.h>
 #include <gnutls/pkcs11.h>
 #include <gnutls_global.h>
@@ -29,9 +27,7 @@
 
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
-#ifdef HAVE_PKCS11X_H
-# include "pkcs11x.h"
-#endif
+#include "pkcs11x.h"
 
 struct find_ext_data_st {
 	/* in */

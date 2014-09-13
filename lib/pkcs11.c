@@ -3107,11 +3107,6 @@ const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type)
 	}
 }
 
-#ifndef CKA_X_DISTRUSTED
-# define CKA_X_VENDOR (CKA_VENDOR_DEFINED | 0x58444700UL)
-# define CKA_X_DISTRUSTED (CKA_X_VENDOR + 100)
-#endif
-
 static int
 find_cert_cb(struct pkcs11_session_info *sinfo,
 	    struct token_info *info, struct ck_info *lib_info, void *input)

@@ -35,6 +35,7 @@ AC_MSG_RESULT([***
 ])
 
 dnl Checks for programs.
+PKG_PROG_PKG_CONFIG
 AC_PROG_CC
 gl_EARLY
 ggl_EARLY
@@ -411,6 +412,7 @@ system_priority_file="/etc/gnutls/default-priorities"
 AC_DEFINE_UNQUOTED([SYSTEM_PRIORITY_FILE],
   ["$system_priority_file"], [The system priority file])
 
+
 dnl Check for p11-kit
 P11_KIT_MINIMUM=0.20.0
 AC_ARG_WITH(p11-kit,
@@ -424,6 +426,9 @@ if test "$with_p11_kit" != "no"; then
 			GNUTLS_REQUIRES_PRIVATE="Requires.private: p11-kit-1"
 		else
 			GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, p11-kit-1"
+		fi
+		if $PKG_CONFIG --atleast-version=2.20.6 p11-kit; then
+			AC_DEFINE([HAVE_PKCS11X_H], 1, [There is p11-kit/pkcs11x.h])
 		fi
 	else
 	        with_p11_kit=no
