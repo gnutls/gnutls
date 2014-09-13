@@ -1505,7 +1505,7 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 
 
       cleanup:
-	if (verify && *verify != 0)
+	if (verify)
 		*verify |= GNUTLS_CERT_INVALID;
 
 	_gnutls_free_datum(&crl_signed_data);
