@@ -35,8 +35,14 @@ while test $counter -lt $NUM; do
 		echo "ca" >>$TEMPLATE
 		echo "expiration_days = -1" >>$TEMPLATE
 		echo "cert_signing_key" >>$TEMPLATE
+		echo "crl_signing_key" >>$TEMPLATE
 		$CERTTOOL --generate-self-signed --load-privkey $OUTPUT/$name.key --outfile \
 			$OUTPUT/$name.crt --template $TEMPLATE 2>/dev/null
+
+		echo "serial = $serial" >$TEMPLATE
+		echo "expiration_days = -1" >>$TEMPLATE
+		$CERTTOOL --generate-crl --load-ca-privkey $OUTPUT/$name.key --load-ca-certificate $OUTPUT/$name.crt --outfile \
+			$OUTPUT/$name.crl --template $TEMPLATE 2>/dev/null
 	else
 		if test $counter = $LAST;then
 		# END certificate
