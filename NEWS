@@ -25,10 +25,20 @@ the name and key only instead of the whole certificate. That is to handle
 cases where a CA certificate was superceded by a different one with the same
 name and the same key.
 
+** libgnutls: when verifying a certificate against a p11-kit trusted
+module, use the attached extensions in the module to override the CA's
+extensions.
+
 ** libgnutls: In DTLS prevent sending zero-size fragments in certain cases
 of MTU split. Reported by Manuel Pégourié-Gonnard.
 
-** p11tool: p11tool: when listing tokens, list their type as well.
+** libgnutls: Corrected gnutls_x509_crl_verify() which would always report
+a CRL signature as invalid. Reported by Armin Burgmeier.
+
+** p11tool: when listing tokens, list their type as well.
+
+** p11tool: when listing objects from a trust module print any attached
+extensions on certificates.
 
 ** API and ABI modifications:
 No changes since last version.
