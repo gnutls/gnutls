@@ -961,6 +961,8 @@ gnutls_x509_crl_verify (gnutls_x509_crl_t crl,
   if (result < 0)
     {
       gnutls_assert ();
+      if (verify)
+        *verify |= GNUTLS_CERT_INVALID;
       goto cleanup;
     }
 
@@ -968,6 +970,8 @@ gnutls_x509_crl_verify (gnutls_x509_crl_t crl,
   if (result < 0)
     {
       gnutls_assert ();
+      if (verify)
+        *verify |= GNUTLS_CERT_INVALID;
       goto cleanup;
     }
 
@@ -975,6 +979,8 @@ gnutls_x509_crl_verify (gnutls_x509_crl_t crl,
   if (result < 0)
     {
       gnutls_assert ();
+      if (verify)
+        *verify |= GNUTLS_CERT_INVALID;
       goto cleanup;
     }
 
@@ -994,6 +1000,8 @@ gnutls_x509_crl_verify (gnutls_x509_crl_t crl,
   else if (result < 0)
     {
       gnutls_assert ();
+      if (verify)
+        *verify |= GNUTLS_CERT_INVALID;
       goto cleanup;
     }
 
@@ -1021,7 +1029,7 @@ gnutls_x509_crl_verify (gnutls_x509_crl_t crl,
 
 
 cleanup:
-  if (verify) *verify |= GNUTLS_CERT_INVALID;
+  if (verify && *verify) *verify |= GNUTLS_CERT_INVALID;
 
   _gnutls_free_datum (&crl_signed_data);
   _gnutls_free_datum (&crl_signature);
