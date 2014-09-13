@@ -1446,6 +1446,8 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 					 &crl_signed_data);
 	if (result < 0) {
 		gnutls_assert();
+		if (verify)
+			*verify |= GNUTLS_CERT_INVALID;
 		goto cleanup;
 	}
 
@@ -1454,6 +1456,8 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 				       &crl_signature);
 	if (result < 0) {
 		gnutls_assert();
+		if (verify)
+			*verify |= GNUTLS_CERT_INVALID;
 		goto cleanup;
 	}
 
@@ -1462,6 +1466,8 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 						 "signatureAlgorithm.algorithm");
 	if (result < 0) {
 		gnutls_assert();
+		if (verify)
+			*verify |= GNUTLS_CERT_INVALID;
 		goto cleanup;
 	}
 
@@ -1479,6 +1485,8 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 		result = 0;
 	} else if (result < 0) {
 		gnutls_assert();
+		if (verify)
+			*verify |= GNUTLS_CERT_INVALID;
 		goto cleanup;
 	}
 
@@ -1505,7 +1513,7 @@ gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 
 
       cleanup:
-	if (verify)
+	if (verify && *verify != 0)
 		*verify |= GNUTLS_CERT_INVALID;
 
 	_gnutls_free_datum(&crl_signed_data);
