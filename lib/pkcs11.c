@@ -36,6 +36,7 @@
 #include <pin.h>
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
+#include "pkcs11x.h"
 #include <p11-kit/pin.h>
 #ifdef HAVE_GETPID
 # include <unistd.h>
