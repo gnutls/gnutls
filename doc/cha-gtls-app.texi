@@ -147,7 +147,38 @@ verbose information on the @acronym{GnuTLS} functions internal flow.
 
 Alternatively the environment variable @code{GNUTLS_DEBUG_LEVEL} can be
 set to a logging level and GnuTLS will output debugging output to standard
-error.
+error. Other available environment variables are shown in @ref{tab:environment}.
+
+@float Table,tab:environment
+@multitable @columnfractions .30 .70
+
+@headitem Variable @tab Purpose
+
+@item @code{GNUTLS_DEBUG_LEVEL}
+@tab When set to a numeric value, it sets the default debugging level for GnuTLS applications.
+
+@item @code{GNUTLS_CPUID_OVERRIDE}
+@tab That environment variable can be used to
+explicitly enable/disable the use of certain CPU capabilities. Note that CPU
+detection cannot be overriden, i.e., VIA options cannot be enabled on an Intel
+CPU. The currently available options are:
+@itemize
+@item 0x1: Disable all run-time detected optimizations
+@item 0x2: Enable AES-NI
+@item 0x4: Enable SSSE3
+@item 0x8: Enable PCLMUL
+@item 0x100000: Enable VIA padlock
+@item 0x200000: Enable VIA PHE
+@item 0x400000: Enable VIA PHE SHA512
+@end itemize
+
+@item @code{GNUTLS_FORCE_FIPS_MODE}
+@tab In setups where GnuTLS is compiled with support for FIPS140-2 (see --enable-fips140-mode in configure), that option if set to one enforces the FIPS140 mode.
+
+@end multitable
+@caption{Environment variables used by the library.}
+@end float
+
 
 When debugging is not required, important issues, such as detected
 attacks on the protocol still need to be logged. This is provided
