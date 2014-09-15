@@ -302,41 +302,43 @@ _asn1_get_time_der (unsigned type, const unsigned char *der, int der_len, int *r
       return ASN1_DER_ERROR;
     }
 
-  p = &der[len_len];
-  for (i=0;i<str_len-1;i++)
-     {
-       if (isdigit(p[i]) == 0)
-         {
-           if (type == ASN1_ETYPE_GENERALIZED_TIME)
-             {
-               /* tolerate lax encodings */
-               if (p[i] == '.' && dot_count == 0)
-                 {
-                   dot_count++;
-                   continue;
-                 }
-
-	       /* This is not really valid DER, but there are
-	        * structures using that */
-               if (!(flags & ASN1_DECODE_FLAG_STRICT_DER) &&
-                   (p[i] == '+' || p[i] == '-') && sign_count == 0)
-                 {
-                   sign_count++;
-                   continue;
-                 }
-             }
-
-           warn();
-  	   return ASN1_DER_ERROR;
-         }
-     }
-
-  if (sign_count == 0 && p[str_len-1] != 'Z')
+  if (flags & ASN1_DECODE_FLAG_STRICT_DER)
     {
-      warn();
-      return ASN1_DER_ERROR;
-    }
+      p = &der[len_len];
+      for (i=0;i<(unsigned)(str_len-1);i++)
+         {
+           if (isdigit(p[i]) == 0)
+             {
+               if (type == ASN1_ETYPE_GENERALIZED_TIME)
+                 {
+                   /* tolerate lax encodings */
+                   if (p[i] == '.' && dot_count == 0)
+                     {
+                       dot_count++;
+                       continue;
+                     }
 
+               /* This is not really valid DER, but there are
+                * structures using that */
+                   if (!(flags & ASN1_DECODE_FLAG_STRICT_DER) &&
+                       (p[i] == '+' || p[i] == '-') && sign_count == 0)
+                     {
+                       sign_count++;
+                       continue;
+                     }
+                 }
+
+               warn();
+           return ASN1_DER_ERROR;
+             }
+         }
+
+      if (sign_count == 0 && p[str_len-1] != 'Z')
+        {
+          warn();
+          return ASN1_DER_ERROR;
+        }
+    }
   memcpy (str, der + len_len, str_len);
   str[str_len] = 0;
   *ret_len = str_len + len_len;
