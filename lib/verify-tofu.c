@@ -133,7 +133,7 @@ gnutls_verify_stored_pubkey(const char *db_name,
 		tdb = &default_tdb;
 
 	if (cert_type == GNUTLS_CRT_X509)
-		ret = x509_crt_to_raw_pubkey(cert, &pubkey);
+		ret = x509_raw_crt_to_raw_pubkey(cert, &pubkey);
 	else
 		ret = pgp_crt_to_raw_pubkey(cert, &pubkey);
 
@@ -382,72 +382,6 @@ static int raw_pubkey_to_base64(const gnutls_datum_t * raw,
 	return 0;
 }
 
-/* Converts an X.509 certificate to subjectPublicKeyInfo */
-int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert,
-			   gnutls_datum_t * rpubkey)
-{
-	gnutls_x509_crt_t crt = NULL;
-	gnutls_pubkey_t pubkey = NULL;
-	size_t size;
-	int ret;
-
-	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = gnutls_pubkey_init(&pubkey);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_x509_crt_import(crt, cert, GNUTLS_X509_FMT_DER);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	size = 0;
-	ret =
-	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER, NULL, &size);
-	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	rpubkey->data = gnutls_malloc(size);
-	if (rpubkey->data == NULL)
-		if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			ret = GNUTLS_E_MEMORY_ERROR;
-			gnutls_assert();
-			goto cleanup;
-		}
-
-	ret =
-	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER,
-				 rpubkey->data, &size);
-	if (ret < 0) {
-		gnutls_free(rpubkey->data);
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	rpubkey->size = size;
-	ret = 0;
-
-      cleanup:
-	gnutls_x509_crt_deinit(crt);
-	gnutls_pubkey_deinit(pubkey);
-
-	return ret;
-}
-
 static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 				 gnutls_datum_t * rpubkey)
 {
@@ -654,7 +588,7 @@ gnutls_store_pubkey(const char *db_name,
 		tdb = &default_tdb;
 
 	if (cert_type == GNUTLS_CRT_X509)
-		ret = x509_crt_to_raw_pubkey(cert, &pubkey);
+		ret = x509_raw_crt_to_raw_pubkey(cert, &pubkey);
 	else
 		ret = pgp_crt_to_raw_pubkey(cert, &pubkey);
 	if (ret < 0) {
