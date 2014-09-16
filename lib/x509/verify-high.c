@@ -936,6 +936,34 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		}
 	}
 
+	/* End-certificate, key purpose and hostname checks. */
+	if (purpose) do {
+		gnutls_datum_t ext_data = {NULL, 0};
+
+		ret = gnutls_x509_crt_get_extension_by_oid2(cert_list[0], "2.5.29.37", 0, &ext_data, NULL);
+		if (ret < 0) {
+			/* it's not a fatal error if the extended key usage extension isn't there */
+			gnutls_assert();
+			break;
+		}
+
+		ret = check_key_purpose(cert_list[0], &ext_data, voutput, purpose);
+		gnutls_free(ext_data.data);
+
+		if (ret < 0) {
+			gnutls_assert();
+		}
+	} while(0);
+
+	if (hostname) {
+		ret =
+		    gnutls_x509_crt_check_hostname2(cert_list[0], hostname, flags);
+		if (ret == 0)
+			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+	}
+
+	/* CRL checks follow */
+
 	if (*voutput != 0 || (flags & GNUTLS_VERIFY_DISABLE_CRL_CHECKS))
 		return 0;
 
@@ -972,32 +1000,6 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 			*voutput |= GNUTLS_CERT_INVALID;
 			return 0;
 		}
-	}
-
-	/* check the purpose if given */
-	if (purpose) do {
-		gnutls_datum_t ext_data = {NULL, 0};
-
-		ret = gnutls_x509_crt_get_extension_by_oid2(cert_list[0], "2.5.29.37", 0, &ext_data, NULL);
-		if (ret < 0) {
-			/* it's not a fatal error if the extended key usage extension isn't there */
-			gnutls_assert();
-			break;
-		}
-
-		ret = check_key_purpose(cert_list[0], &ext_data, voutput, purpose);
-		gnutls_free(ext_data.data);
-
-		if (ret < 0) {
-			gnutls_assert();
-		}
-	} while(0);
-
-	if (hostname) {
-		ret =
-		    gnutls_x509_crt_check_hostname2(cert_list[0], hostname, flags);
-		if (ret == 0)
-			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
 	}
 
 	return 0;
