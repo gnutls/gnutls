@@ -795,13 +795,14 @@ int gnutls_x509_aki_set_cert_issuer(gnutls_x509_aki_t aki,
  * gnutls_x509_aki_get_cert_issuer:
  * @aki: The authority key ID structure
  * @seq: The index of the name to get
- * @san_type: Will hold the type of the name (of %gnutls_subject_alt_names_t), may be null
- * @san: The alternative name data (may be null and should be treated as constant)
- * @othername_oid: The object identifier if @san_type is %GNUTLS_SAN_OTHERNAME (should be treated as constant)
- * @serial: The authorityCertSerialNumber number (may be null)
+ * @san_type: Will hold the type of the name (of %gnutls_subject_alt_names_t)
+ * @san: The alternative name data
+ * @othername_oid: The object identifier if @san_type is %GNUTLS_SAN_OTHERNAME
+ * @serial: The authorityCertSerialNumber number
  *
  * This function will return a specific authorityCertIssuer name as stored in
- * the @aki structure, as well as the authorityCertSerialNumber.
+ * the @aki structure, as well as the authorityCertSerialNumber. All the returned
+ * values should be treated as constant, and may be set to %NULL when are not required.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * if the index is out of bounds, otherwise a negative error value.
@@ -810,9 +811,9 @@ int gnutls_x509_aki_set_cert_issuer(gnutls_x509_aki_t aki,
  **/
 int gnutls_x509_aki_get_cert_issuer(gnutls_x509_aki_t aki, unsigned int seq,
 				    unsigned int *san_type,
-				    gnutls_datum_t * san,
-				    gnutls_datum_t * othername_oid,
-				    gnutls_datum_t * serial)
+				    gnutls_datum_t *san,
+				    gnutls_datum_t *othername_oid,
+				    gnutls_datum_t *serial)
 {
 	if (seq >= aki->cert_issuer.size)
 		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
