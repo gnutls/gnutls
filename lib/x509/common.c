@@ -1522,12 +1522,12 @@ _gnutls_x509_get_signed_data(ASN1_TYPE src,  const gnutls_datum *_der,
 	unsigned need_free = 0;
 
 	if (_der == NULL || _der->size == 0) {
-		need_free = 1;
 		result = _gnutls_x509_der_encode(src, "", &der, 0);
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
+		need_free = 1;
 	} else {
 		der.data = _der->data;
 		der.size = _der->size;
