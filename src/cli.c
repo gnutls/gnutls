@@ -841,7 +841,9 @@ main (int argc, char **argv)
   int user_term = 0, retval = 0;
   socket_st hd;
   ssize_t bytes;
+#ifndef _WIN32
   struct sigaction new_action, old_action;
+#endif
 
   set_program_name (argv[0]);
   cmd_parser (argc, argv);
