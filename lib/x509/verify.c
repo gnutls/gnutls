@@ -988,8 +988,9 @@ cleanup:
 	return status;
 }
 
-#ifdef ENABLE_PKCS11
-static bool check_key_purpose(gnutls_x509_crt_t issuer, const char *purpose)
+/* Returns true if the provided purpose is in accordance with the certificate.
+ */
+bool _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose)
 {
 	char oid[MAX_OID_SIZE];
 	size_t oid_size;
@@ -998,7 +999,7 @@ static bool check_key_purpose(gnutls_x509_crt_t issuer, const char *purpose)
 
 	for (i=0;;i++) {
 		oid_size = sizeof(oid);
-		ret = gnutls_x509_crt_get_key_purpose_oid(issuer, i, oid, &oid_size, NULL);
+		ret = gnutls_x509_crt_get_key_purpose_oid(cert, i, oid, &oid_size, NULL);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			if (i==0) {
 				/* no key purpose in certificate, assume ANY */
@@ -1019,6 +1020,7 @@ static bool check_key_purpose(gnutls_x509_crt_t issuer, const char *purpose)
 	return 0;
 }
 
+#ifdef ENABLE_PKCS11
 /* Verify X.509 certificate chain using a PKCS #11 token.
  *
  * Note that the return value is an OR of GNUTLS_CERT_* elements.
@@ -1162,7 +1164,7 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 	}
 
 	if (purpose != NULL) {
-		ret = check_key_purpose(issuer, purpose);
+		ret = _gnutls_check_key_purpose(issuer, purpose);
 		if (ret != 1) {
 			gnutls_assert();
 			status |= GNUTLS_CERT_INVALID;
