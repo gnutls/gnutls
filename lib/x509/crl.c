@@ -693,7 +693,7 @@ gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl_t crl,
 		return _gnutls_set_datum(dn, crl->raw_issuer_dn.data,
 					 crl->raw_issuer_dn.size);
 	} else {
-		return _gnutls_x509_get_raw_field(crl->crl, "tbsCertList.issuer", dn);
+		return _gnutls_x509_get_raw_field(crl->crl, "tbsCertList.issuer.rdnSequence", dn);
 	}
 }
 
