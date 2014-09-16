@@ -243,9 +243,13 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 		hash %= list->size;
 
 		/* avoid duplicates */
-		if (flags & GNUTLS_TL_NO_DUPLICATES) {
+		if (flags & GNUTLS_TL_NO_DUPLICATES || flags & GNUTLS_TL_NO_DUPLICATE_KEY) {
 			for (j=0;j<list->node[hash].trusted_ca_size;j++) {
-				if (_gnutls_check_if_same_cert(list->node[hash].trusted_cas[j], clist[i]) != 0) {
+				if (flags & GNUTLS_TL_NO_DUPLICATES)
+					ret = _gnutls_check_if_same_cert(list->node[hash].trusted_cas[j], clist[i]);
+				else
+					ret = _gnutls_check_if_same_key(list->node[hash].trusted_cas[j], clist[i], 1);
+				if (ret != 0) {
 					exists = 1;
 					break;
 				}
@@ -694,7 +698,7 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 		 * persistent. It will be deallocated when the trust list is.
 		 */
 		ret = gnutls_x509_trust_list_add_trust_mem(list, &der, NULL,
-			GNUTLS_X509_FMT_DER, GNUTLS_TL_NO_DUPLICATES, 0);
+			GNUTLS_X509_FMT_DER, GNUTLS_TL_NO_DUPLICATE_KEY, 0);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
