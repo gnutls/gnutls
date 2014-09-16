@@ -183,6 +183,11 @@ _gnutls_x509_get_raw_field2(ASN1_TYPE c2, gnutls_datum_t * raw,
 			 const char *whom, gnutls_datum_t * dn);
 
 bool
+_gnutls_check_if_same_key(gnutls_x509_crt_t cert1,
+			  gnutls_x509_crt_t cert2,
+			  unsigned is_ca);
+
+bool
 _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
 			   gnutls_datum_t *cert2bin);
 

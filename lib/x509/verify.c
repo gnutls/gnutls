@@ -42,7 +42,7 @@
 /* Checks if two certs have the same name and the same key.  Return 1 on match. 
  * If @is_ca is zero then this function is identical to _gnutls_check_if_same_cert()
  */
-static bool
+bool
 _gnutls_check_if_same_key(gnutls_x509_crt_t cert1,
 			  gnutls_x509_crt_t cert2,
 			  unsigned is_ca)
