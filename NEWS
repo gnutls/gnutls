@@ -40,6 +40,9 @@ when this function is used.
 ** libgnutls: Corrected gnutls_x509_crl_verify() which would always report
 a CRL signature as invalid. Reported by Armin Burgmeier.
 
+** libgnutls: added option --disable-padlock to allow disabling the padlock
+CPU acceleration.
+
 ** p11tool: when listing tokens, list their type as well.
 
 ** p11tool: when listing objects from a trust module print any attached
