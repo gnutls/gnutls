@@ -199,6 +199,8 @@ bool
 _gnutls_check_if_same_cert2(gnutls_x509_crt_t cert1,
 			    gnutls_datum_t * cert2bin);
 
+bool _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose);
+
 time_t _gnutls_x509_generalTime2gtime(const char *ttime);
 
 int _gnutls_get_extension(ASN1_TYPE asn, const char *root,

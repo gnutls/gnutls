@@ -764,54 +764,6 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 						  NULL, 0, flags, voutput, func);
 }
 
-static
-int check_key_purpose(gnutls_x509_crt_t crt, const gnutls_datum_t *ext_data, unsigned *voutput, 
-		      const char *purpose)
-{
-	gnutls_datum_t coid = {NULL, 0};
-	gnutls_x509_key_purposes_t p = NULL;
-	unsigned i;
-	int ret;
-
-	ret = gnutls_x509_key_purpose_init(&p);
-	if (ret < 0) {
-		gnutls_assert();
-		goto fail;
-	}
-
-	ret = gnutls_x509_ext_import_key_purposes(ext_data, p, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto fail;
-	}
-
-	for (i=0;;i++) {
-		ret = gnutls_x509_key_purpose_get(p, i, &coid);
-		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			if (i==0) {
-				break;
-			} else { /* no acceptable purpose was found */
-				gnutls_assert();
-				goto fail;
-			}
-		} else if (ret < 0) {
-			gnutls_assert();
-			goto fail;
-		}
-
-		if (strcmp((char*)coid.data, purpose) == 0 || strcmp((char*)coid.data, GNUTLS_KP_ANY) == 0)
-			break;
-	}
-
-	gnutls_x509_key_purpose_deinit(p);
-	return 0;
- fail:
-	*voutput |= GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE|GNUTLS_CERT_INVALID;
-	if (p != NULL)
-		gnutls_x509_key_purpose_deinit(p);
-	return ret;
-}
-
 /**
  * gnutls_x509_trust_list_verify_crt2:
  * @list: The structure of the list
@@ -941,23 +893,13 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	}
 
 	/* End-certificate, key purpose and hostname checks. */
-	if (purpose) do {
-		gnutls_datum_t ext_data = {NULL, 0};
-
-		ret = gnutls_x509_crt_get_extension_by_oid2(cert_list[0], "2.5.29.37", 0, &ext_data, NULL);
-		if (ret < 0) {
-			/* it's not a fatal error if the extended key usage extension isn't there */
+	if (purpose) {
+		ret = _gnutls_check_key_purpose(cert_list[0], purpose);
+		if (ret != 1) {
 			gnutls_assert();
-			break;
+			*voutput |= GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE|GNUTLS_CERT_INVALID;
 		}
-
-		ret = check_key_purpose(cert_list[0], &ext_data, voutput, purpose);
-		gnutls_free(ext_data.data);
-
-		if (ret < 0) {
-			gnutls_assert();
-		}
-	} while(0);
+	}
 
 	if (hostname) {
 		ret =
