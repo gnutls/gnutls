@@ -419,6 +419,51 @@ int gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key, const char *url)
 	return ret;
 }
 
+/* This is currently disabled because there is no routine to copy a
+ * PKCS#11 private key. */
+#if 0
+/**
+ * gnutls_privkey_export_pkcs11:
+ * @pkey: The private key
+ * @key: Location for the key to be exported.
+ *
+ * Converts the given abstract private key to a #gnutls_pkcs11_privkey_t
+ * structure. The key must be of type %GNUTLS_PRIVKEY_PKCS11. The key
+ * returned in @key must be deinitialized with
+ * gnutls_pkcs11_privkey_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ */
+int
+gnutls_privkey_export_pkcs11(gnutls_privkey_t pkey,
+                             gnutls_pkcs11_privkey_t *key)
+{
+	int ret;
+
+	if (pkey->type != GNUTLS_PRIVKEY_PKCS11) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_pkcs11_privkey_init(key);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_pkcs11_privkey_cpy(*key, pkey->key.openpgp); /* TODO */
+	if (ret < 0) {
+		gnutls_pkcs11_privkey_deinit(*key);
+		*key = NULL;
+
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+#endif
+
 #endif				/* ENABLE_PKCS11 */
 
 /**
@@ -634,6 +679,46 @@ gnutls_privkey_import_x509(gnutls_privkey_t pkey,
 }
 
 /**
+ * gnutls_privkey_export_x509:
+ * @pkey: The private key
+ * @key: Location for the key to be exported.
+ *
+ * Converts the given abstract private key to a #gnutls_x509_privkey_t
+ * structure. The key must be of type %GNUTLS_PRIVKEY_X509. The key returned
+ * in @key must be deinitialized with gnutls_x509_privkey_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ */
+int
+gnutls_privkey_export_x509(gnutls_privkey_t pkey,
+                           gnutls_x509_privkey_t *key)
+{
+	int ret;
+
+	if (pkey->type != GNUTLS_PRIVKEY_X509) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_x509_privkey_init(key);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_x509_privkey_cpy(*key, pkey->key.x509);
+	if (ret < 0) {
+		gnutls_x509_privkey_deinit(*key);
+		*key = NULL;
+
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_privkey_generate:
  * @pkey: The private key
  * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
@@ -806,6 +891,47 @@ int gnutls_privkey_import_openpgp_raw(gnutls_privkey_t pkey,
 	gnutls_openpgp_privkey_deinit(xpriv);
 
 	return ret;
+}
+
+/**
+ * gnutls_privkey_export_openpgp:
+ * @pkey: The private key
+ * @key: Location for the key to be exported.
+ *
+ * Converts the given abstract private key to a #gnutls_openpgp_privkey_t
+ * structure. The key must be of type %GNUTLS_PRIVKEY_OPENPGP. The key
+ * returned in @key must be deinitialized with
+ * gnutls_openpgp_privkey_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ */
+int
+gnutls_privkey_export_openpgp(gnutls_privkey_t pkey,
+                              gnutls_openpgp_privkey_t *key)
+{
+	int ret;
+
+	if (pkey->type != GNUTLS_PRIVKEY_OPENPGP) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_openpgp_privkey_init(key);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_openpgp_privkey_cpy(*key, pkey->key.openpgp);
+	if (ret < 0) {
+		gnutls_openpgp_privkey_deinit(*key);
+		*key = NULL;
+
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
 }
 #endif
 
