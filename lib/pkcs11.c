@@ -2568,17 +2568,17 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 		goto fail;
 	}
 
-	find_data->p_list = gnutls_realloc_fast(find_data->p_list, (find_data->current+OBJECTS_A_TIME)*sizeof(find_data->p_list[0]));
-	if (find_data->p_list == NULL) {
-		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-		goto fail;
-	}
-
 	while (pkcs11_find_objects
 	       (sinfo->module, sinfo->pks, objs, OBJECTS_A_TIME, &count) == CKR_OK
 	       && count > 0) {
 	        unsigned j;
 	        gnutls_datum_t id;
+
+		find_data->p_list = gnutls_realloc_fast(find_data->p_list, (find_data->current+count)*sizeof(find_data->p_list[0]));
+		if (find_data->p_list == NULL) {
+			ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+			goto fail;
+		}
 
 	        for (j=0;j<count;j++) {
 			a[0].type = CKA_ID;
