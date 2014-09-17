@@ -1140,6 +1140,102 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 }
 
 /**
+ * gnutls_certificate_get_x509_key:
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @index: The index of the key to obtain.
+ * @key: Location to store the key.
+ *
+ * Obtains a X.509 private key that has been stored in @res with one of
+ * gnutls_certificate_set_x509_key(), gnutls_certificate_set_key(),
+ * gnutls_certificate_set_x509_key_file(),
+ * gnutls_certificate_set_x509_key_file2(),
+ * gnutls_certificate_set_x509_key_mem(), or
+ * gnutls_certificate_set_x509_key_mem2(). The returned key must be deallocated
+ * with gnutls_x509_privkey_deinit() when no longer needed.
+ *
+ * If there is no key with the given index,
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned. If the key with the
+ * given index is not a X.509 key, %GNUTLS_E_INVALID_REQUEST is returned.
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ *
+ * Since: 3.4.0
+ */
+int
+gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
+                                int index,
+                                gnutls_x509_privkey_t *key)
+{
+	if (index >= res->ncerts) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	return gnutls_privkey_export_x509(res->pkey[index], key);
+}
+
+/**
+ * gnutls_certificate_get_x509_crt:
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @index: The index of the certificate list to obtain.
+ * @crt_list: Where to store the certificate list.
+ * @key: Will hold the number of certificates.
+ *
+ * Obtains a X.509 certificate list that has been stored in @res with one of
+ * gnutls_certificate_set_x509_key(), gnutls_certificate_set_key(),
+ * gnutls_certificate_set_x509_key_file(),
+ * gnutls_certificate_set_x509_key_file2(),
+ * gnutls_certificate_set_x509_key_mem(), or
+ * gnutls_certificate_set_x509_key_mem2(). Each certificate in the returned
+ * certificate list must be deallocated with gnutls_x509_crt_deinit(), and the
+ * list itself must be freed with gnutls_free().
+ *
+ * If there is no certificate with the given index,
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned. If the certificate
+ * with the given index is not a X.509 certificate, %GNUTLS_E_INVALID_REQUEST
+ * is returned.
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ *
+ * Since: 3.4.0
+ */
+int
+gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
+                                int index,
+                                gnutls_x509_crt_t **crt_list,
+                                int *crt_list_size)
+{
+	int ret, i;
+
+	if (index >= res->ncerts) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	*crt_list_size = res->certs[index].cert_list_length;
+	*crt_list = gnutls_malloc(
+		res->certs[index].cert_list_length * sizeof (gnutls_x509_crt_t));
+	if (*crt_list == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	for (i = 0; i < res->certs[index].cert_list_length; ++i) {
+		ret = gnutls_pcert_export_x509(&res->certs[index].cert_list[i], crt_list[i]);
+		if (ret < 0) {
+			while (i--)
+				gnutls_x509_crt_deinit(*crt_list[i]);
+			gnutls_free(*crt_list);
+			*crt_list = NULL;
+
+			return gnutls_assert_val(ret);
+		}
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_certificate_set_key:
  * @res: is a #gnutls_certificate_credentials_t structure.
  * @names: is an array of DNS name of the certificate (NULL if none)
