@@ -484,7 +484,7 @@ const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
  * In case of OpenPGP keys a single key will be returned in raw
  * format.
  *
- * Returns: a pointer to a #gnutls_datum_t containing our
+ * Returns: a pointer to a #gnutls_datum_t containing the peer's
  *   certificates, or %NULL in case of an error or if no certificate
  *   was used.
  **/
