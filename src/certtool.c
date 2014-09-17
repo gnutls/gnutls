@@ -2885,7 +2885,7 @@ static void print_bag_data(gnutls_pkcs12_bag_t bag)
 		result = gnutls_pkcs12_bag_get_key_id(bag, i, &id);
 		if (result < 0) {
 			fprintf(stderr, "get_key_id: %s\n",
-				gnutls_strerror(type));
+				gnutls_strerror(result));
 			exit(1);
 		}
 
