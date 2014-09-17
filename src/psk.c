@@ -221,6 +221,7 @@ write_key(const char *username, const char *key, int key_size,
 	if (fd2 == NULL) {
 		fprintf(stderr, "Cannot open '%s' for read\n", tmpname);
 		remove(tmpname);
+		fclose(fd);
 		return -1;
 	}
 
