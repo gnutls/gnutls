@@ -1246,6 +1246,24 @@ gnutls_certificate_set_trust_list(gnutls_certificate_credentials_t res,
 	res->tlist = tlist;
 }
 
+/**
+ * gnutls_certificate_get_trust_list:
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @tlist: Location where to store the trust list.
+ *
+ * Obtains the list of trusted certificates stored in @res and writes a
+ * pointer to it to the location @tlist. The pointer will point to memory
+ * internal to @res, and must not be deinitialized. It will be automatically
+ * deallocated when the @res structure is deinitialized.
+ *
+ * Since: 3.4.0
+ */
+void
+gnutls_certificate_get_trust_list(gnutls_certificate_credentials_t res,
+                                  gnutls_x509_trust_list_t *tlist)
+{
+	*tlist = res->tlist;
+}
 
 /**
  * gnutls_certificate_set_x509_key_file:

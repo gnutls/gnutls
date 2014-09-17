@@ -1362,6 +1362,9 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t
 void gnutls_certificate_set_trust_list
     (gnutls_certificate_credentials_t res,
      gnutls_x509_trust_list_t tlist, unsigned flags);
+void gnutls_certificate_get_trust_list
+    (gnutls_certificate_credentials_t res,
+     gnutls_x509_trust_list_t *tlist);
 
 typedef struct gnutls_x509_ext_st {
 	char *oid;
