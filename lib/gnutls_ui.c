@@ -631,6 +631,23 @@ gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
 }
 
 /**
+ * gnutls_certificate_get_verify_flags:
+ * @res: is a gnutls_certificate_credentials_t structure
+ *
+ * Returns the verification flags set with
+ * gnutls_certificate_set_verify_flags().
+ *
+ * Returns: The certificate verification flags used by @res.
+ *
+ * Since: 3.4.0
+ */
+unsigned int
+gnutls_certificate_get_verify_flags(gnutls_certificate_credentials_t res)
+{
+	return res->verify_flags;
+}
+
+/**
  * gnutls_certificate_set_verify_limits:
  * @res: is a gnutls_certificate_credentials structure
  * @max_bits: is the number of bits of an acceptable certificate (default 8200)
