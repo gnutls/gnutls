@@ -982,7 +982,6 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 		}
 	}
 
-	status = 0;
 cleanup:
 	gnutls_x509_name_constraints_deinit(nc);
 	return status;
