@@ -542,9 +542,11 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 
       cleanup:
 	_gnutls_str_array_clear(&names);
-	for (i = 0; i < count; i++)
-		gnutls_pcert_deinit(&certs[i]);
-	gnutls_free(certs);
+	if (certs) {
+		for (i = 0; i < count; i++)
+			gnutls_pcert_deinit(&certs[i]);
+		gnutls_free(certs);
+	}
 	return ret;
 }
 
