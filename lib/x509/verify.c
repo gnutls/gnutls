@@ -1144,6 +1144,11 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 
 		status |= GNUTLS_CERT_INVALID;
 		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+		/* verify the certificate list against 0 trusted CAs in order
+		 * to get, any additional flags from the certificate list (e.g.,
+		 * insecure algorithms or expired */
+		status |= _gnutls_verify_crt_status(certificate_list, clist_size,
+						    NULL, 0, flags, func);
 		goto cleanup;
 	}
 
