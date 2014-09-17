@@ -557,7 +557,6 @@ gnutls_store_pubkey(const char *db_name,
 		    const gnutls_datum_t * cert,
 		    time_t expiration, unsigned int flags)
 {
-	FILE *fd = NULL;
 	gnutls_datum_t pubkey = { NULL, 0 };
 	int ret;
 	char local_file[MAX_FILENAME];
@@ -604,8 +603,6 @@ gnutls_store_pubkey(const char *db_name,
 
       cleanup:
 	gnutls_free(pubkey.data);
-	if (fd != NULL)
-		fclose(fd);
 
 	return ret;
 }
