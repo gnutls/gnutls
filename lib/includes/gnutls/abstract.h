@@ -437,6 +437,9 @@ typedef struct gnutls_pcert_st {
 int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,
 			     gnutls_x509_crt_t crt, unsigned int flags);
 
+int gnutls_pcert_export_x509(gnutls_pcert_st * pcert,
+                             gnutls_x509_crt_t * crt);
+
 int
 gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
 				  unsigned int *pcert_max,
@@ -459,6 +462,9 @@ int gnutls_pcert_import_openpgp_raw(gnutls_pcert_st * pcert,
 int gnutls_pcert_import_openpgp(gnutls_pcert_st * pcert,
 				gnutls_openpgp_crt_t crt,
 				unsigned int flags);
+
+int gnutls_pcert_export_openpgp(gnutls_pcert_st * pcert,
+                                gnutls_openpgp_crt_t * crt);
 
 void gnutls_pcert_deinit(gnutls_pcert_st * pcert);
 

@@ -339,6 +339,106 @@ int gnutls_pcert_import_openpgp_raw(gnutls_pcert_st * pcert,
 #endif
 
 /**
+ * gnutls_pcert_get_type:
+ * @pcert: The pcert structure.
+ *
+ * Returns the certificate type of @pcert, one of X.509 or OpenPGP.
+ *
+ * Returns: The certificate type.
+ *
+ * Since: 3.4.0
+ */
+gnutls_certificate_type_t
+gnutls_pcert_get_type(gnutls_pcert_st * pcert)
+{
+	return pcert->type;
+}
+
+/**
+ * gnutls_pcert_export_x509:
+ * @pcert: The pcert structure.
+ * @crt: An initialized #gnutls_x509_crt_t.
+ *
+ * Converts the given #gnutls_pcert_t structure into a #gnutls_x509_crt_t.
+ * This function only works if the type of @pcert is %GNUTLS_CRT_X509.
+ * When successful, the value written to @crt must be freed with
+ * gnutls_x509_crt_deinit() when no longer needed.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ * negative error value.
+ *
+ * Since: 3.4.0
+ */
+int gnutls_pcert_export_x509(gnutls_pcert_st * pcert,
+                             gnutls_x509_crt_t * crt)
+{
+	int ret;
+
+	if (pcert->type != GNUTLS_CRT_X509) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_x509_crt_init(crt);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_x509_crt_import(*crt, &pcert->cert, GNUTLS_X509_FMT_DER);
+	if (ret < 0) {
+		gnutls_x509_crt_deinit(*crt);
+		*crt = NULL;
+
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
+#ifdef ENABLE_OPENPGP
+
+/**
+ * gnutls_pcert_export_x509:
+ * @pcert: The pcert structure.
+ * @crt: An initialized #gnutls_openpgp_crt_t.
+ *
+ * Converts the given #gnutls_pcert_t structure into a #gnutls_openpgp_crt_t.
+ * This function only works if the type of @pcert is %GNUTLS_CRT_OPENPGP.
+ * When successful, the value written to @crt must be freed with
+ * gnutls_openpgp_crt_deinit() when no longer needed.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ * negative error value.
+ *
+ * Since: 3.4.0
+ */
+int gnutls_pcert_export_openpgp(gnutls_pcert_st * pcert,
+                                gnutls_openpgp_crt_t * crt)
+{
+	int ret;
+
+	if (pcert->type != GNUTLS_CRT_OPENPGP) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_openpgp_crt_init(crt);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_openpgp_crt_import(*crt, &pcert->cert, GNUTLS_OPENPGP_FMT_RAW);
+	if (ret < 0) {
+		gnutls_openpgp_crt_deinit(*crt);
+		*crt = NULL;
+
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
+#endif
+
+/**
  * gnutls_pcert_deinit:
  * @pcert: The structure to be deinitialized
  *
