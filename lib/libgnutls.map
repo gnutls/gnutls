@@ -1016,6 +1016,8 @@ GNUTLS_3_1_0 {
 	gnutls_certificate_get_verify_flags;
 	gnutls_certificate_get_x509_key;
 	gnutls_certificate_get_x509_crt;
+	gnutls_certificate_get_openpgp_key;
+	gnutls_certificate_get_openpgp_crt;
 	gnutls_credentials_get;
 	gnutls_x509_crl_iter_crt_serial;
 	gnutls_x509_crl_iter_deinit;

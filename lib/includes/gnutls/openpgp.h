@@ -333,6 +333,16 @@ int gnutls_certificate_set_openpgp_key
      gnutls_openpgp_crt_t crt, gnutls_openpgp_privkey_t pkey);
 
 int
+gnutls_certificate_get_openpgp_key(gnutls_certificate_credentials_t res,
+                                   int index,
+                                   gnutls_openpgp_privkey_t *key);
+int
+gnutls_certificate_get_openpgp_crt(gnutls_certificate_credentials_t res,
+                                   int index,
+                                   gnutls_openpgp_crt_t **crt_list,
+                                   int *crt_list_size);
+
+int
  gnutls_certificate_set_openpgp_key_file
     (gnutls_certificate_credentials_t res, const char *certfile,
      const char *keyfile, gnutls_openpgp_crt_fmt_t format);
