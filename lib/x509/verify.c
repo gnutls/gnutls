@@ -1240,13 +1240,12 @@ _gnutls_x509_verify_data(const mac_entry_st * me,
  * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
  * @verify: will hold the certificate verification output.
  *
- * This function will try to verify the given certificate list and
- * return its status.  If no flags are specified (0), this function
- * will use the basicConstraints (2.5.29.19) PKIX extension. This
- * means that only a certificate authority is allowed to sign a
- * certificate.
  *
- * You must also check the peer's name in order to check if the verified
+ * This function will try to verify the given certificate list and
+ * return its status. The details of the verification are the same
+ * as in gnutls_x509_trust_list_verify_crt2().
+ *
+ * You must check the peer's name in order to check if the verified
  * certificate belongs to the actual peer.
  *
  * The certificate verification output will be put in @verify and will
@@ -1304,6 +1303,9 @@ gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
  * This function will try to verify the given certificate and return
  * its status. Note that a verification error does not imply a negative
  * return status. In that case the @verify status is set.
+ *
+ * The details of the verification are the same
+ * as in gnutls_x509_trust_list_verify_crt2().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

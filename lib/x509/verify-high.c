@@ -739,13 +739,10 @@ unsigned i, j;
  * @func: If non-null will be called on each chain element verification with the output.
  *
  * This function will try to verify the given certificate and return
- * its status. The @verify parameter will hold an OR'ed sequence of
+ * its status. The @voutput parameter will hold an OR'ed sequence of
  * %gnutls_certificate_status_t flags.
  *
- * Additionally a certificate verification profile can be specified
- * from the ones in %gnutls_certificate_verification_profiles_t by
- * ORing the result of GNUTLS_PROFILE_TO_VFLAGS() to the verification
- * flags.
+ * The details of the verification are the same as in gnutls_x509_trust_list_verify_crt2().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -776,8 +773,12 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * @func: If non-null will be called on each chain element verification with the output.
  *
  * This function will try to verify the given certificate and return
- * its status. The @verify parameter will hold an OR'ed sequence of
- * %gnutls_certificate_status_t flags.
+ * its status. The @voutput parameter will hold an OR'ed sequence of
+ * %gnutls_certificate_status_t flags. When a chain of @cert_list_size with 
+ * more than one certificates is provided, the verification status will apply
+ * to the first certificate in the chain that failed verification. The
+ * verification process starts from the end of the chain (from CA to end
+ * certificate).
  *
  * Additionally a certificate verification profile can be specified
  * from the ones in %gnutls_certificate_verification_profiles_t by
