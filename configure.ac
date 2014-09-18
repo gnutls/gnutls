@@ -429,10 +429,11 @@ if test "$with_p11_kit" != "no"; then
 		fi
 	else
 	        with_p11_kit=no
-	        AC_MSG_WARN([[
+	        AC_MSG_ERROR([[
 *** 
-*** p11-kit >= $P11_KIT_MINIMUM was not found. PKCS #11 support will be disabled.
-*** You may get it from http://p11-glue.freedesktop.org/p11-kit.html
+*** p11-kit >= $P11_KIT_MINIMUM was not found. To disable PKCS #11 support 
+*** use --without-p11-kit, otherwise you may get p11-kit from
+*** http://p11-glue.freedesktop.org/p11-kit.html
 *** ]])
 	fi
 fi
