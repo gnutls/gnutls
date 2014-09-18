@@ -394,7 +394,7 @@ AC_DEFINE_UNQUOTED([SYSTEM_PRIORITY_FILE],
 
 
 dnl Check for p11-kit
-P11_KIT_MINIMUM=0.20.6
+P11_KIT_MINIMUM=0.20.7
 AC_ARG_WITH(p11-kit,
 	AS_HELP_STRING([--without-p11-kit],
 		[Build without p11-kit and PKCS#11 support]))
