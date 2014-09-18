@@ -3,7 +3,7 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.8 (unreleased)
+* Version 3.3.8 (released 2014-09-18)
 
 ** libgnutls: Updates in the name constraints checks. No name constraints
 will be checked for intermediate certificates. As our support for name
@@ -17,7 +17,13 @@ object listing would fail completely if a single object could not be exported.
 by retrieving them in large batches. Report and suggestion by David
 Woodhouse.
 
-* libgnutls: Fixes in gnutls_x509_crt_set_dn() and friends to properly handle
+** libgnutls: Fixed issue with certificates being sanitized by gnutls prior
+to signature verification. That resulted to certain non-DER compliant modifications
+of valid certificates, being corrected by libtasn1's parser and restructured as
+the original. Issue found and reported by Antti Karjalainen and Matti Kamunen from
+Codenomicon.
+
+** libgnutls: Fixes in gnutls_x509_crt_set_dn() and friends to properly handle
 strings with embedded spaces and escaped commas.
 
 ** libgnutls: when comparing a CA certificate with the trusted list compare
@@ -27,7 +33,7 @@ name and the same key.
 
 ** libgnutls: when verifying a certificate against a p11-kit trusted
 module, use the attached extensions in the module to override the CA's
-extensions.
+extensions (that requires p11-kit 0.20.7).
 
 ** libgnutls: In DTLS prevent sending zero-size fragments in certain cases
 of MTU split. Reported by Manuel Pégourié-Gonnard.
