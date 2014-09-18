@@ -5,8 +5,11 @@ See the end for copying conditions.
 
 * Version 3.2.18 (unreleased)
 
-* Fixes in gnutls_x509_crt_set_dn() and friends to properly handle strings
-  with embedded spaces and escaped commas.
+** libgnutls: Fixes in gnutls_x509_crt_set_dn() and friends to properly handle
+strings with embedded spaces and escaped commas.
+
+** libgnutls: Corrected gnutls_x509_crl_verify() which would always report
+a CRL signature as invalid. Reported by Armin Burgmeier.
 
 ** API and ABI modifications:
 No changes since last version.
