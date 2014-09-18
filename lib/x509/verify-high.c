@@ -302,6 +302,7 @@ int ret;
 
 	ret = _gnutls_x509_crt_cpy(dst, src);
 	if (ret < 0) {
+		gnutls_x509_crt_deinit(dst);
 		gnutls_assert();
 		return NULL;
 	}
