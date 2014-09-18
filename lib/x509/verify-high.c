@@ -54,6 +54,11 @@ struct node_st {
 
 };
 
+struct gnutls_x509_trust_list_iter {
+	unsigned int node_index;
+	unsigned int ca_index;
+};
+
 #define DEFAULT_SIZE 127
 
 /**
@@ -287,6 +292,89 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 	}
 
 	return i;
+}
+
+/**
+ * gnutls_x509_trust_list_iter_get_ca:
+ * @list: The structure of the list
+ * @iter: A pointer to an iterator (initially the iterator should be %NULL)
+ * @crt: where the certificate will be copied
+ *
+ * This function obtains a certificate in the trust list and advances the
+ * iterator to the next certificate. The certificate returned in @crt must be
+ * deallocated with gnutls_x509_crt_deinit().
+ *
+ * When past the last element is accessed %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * is returned and the iterator is reset.
+ *
+ * After use, the iterator must be deinitialized usin
+ *  gnutls_x509_trust_list_iter_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
+                                   gnutls_x509_trust_list_iter_t *iter,
+                                   gnutls_x509_crt_t *crt)
+{
+	int ret;
+
+	/* advance to next entry */
+	if (*iter == NULL) {
+		*iter = gnutls_malloc(sizeof (struct gnutls_x509_trust_list_iter));
+		if (*iter == NULL)
+			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+		(*iter)->node_index = 0;
+		(*iter)->ca_index = 0;
+	} else {
+		++(*iter)->ca_index;
+	}
+
+	/* skip empty nodes */
+	while ((*iter)->ca_index >= list->node[(*iter)->node_index].trusted_ca_size) {
+		++(*iter)->node_index;
+		(*iter)->ca_index = 0;
+
+		if ((*iter)->node_index >= list->size) {
+			gnutls_free(*iter);
+			*iter = NULL;
+
+			*crt = NULL;
+			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+		}
+	}
+
+	ret = gnutls_x509_crt_init(crt);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_x509_crt_cpy(*crt, list->node[(*iter)->node_index].trusted_cas[(*iter)->ca_index]);
+	if (ret < 0) {
+		gnutls_x509_crt_deinit(*crt);
+		return gnutls_assert_val(ret);
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_trust_list_iter_deinit:
+ * @iter: The iterator structure to be deinitialized
+ *
+ * This function will deinitialize an iterator structure.
+ *
+ * Since: 3.4.0
+ **/
+void gnutls_x509_trust_list_iter_deinit(gnutls_x509_trust_list_iter_t iter)
+{
+	if (!iter)
+		return;
+
+	gnutls_free(iter);
 }
 
 static gnutls_x509_crt_t crt_cpy(gnutls_x509_crt_t src)

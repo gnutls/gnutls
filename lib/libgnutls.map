@@ -788,6 +788,8 @@ GNUTLS_3_1_0 {
 	gnutls_x509_trust_list_add_system_trust;
 	gnutls_x509_trust_list_add_trust_file;
 	gnutls_x509_trust_list_add_trust_mem;
+	gnutls_x509_trust_list_iter_get_ca;
+	gnutls_x509_trust_list_iter_deinit;
 	gnutls_pkcs12_simple_parse;
 	gnutls_privkey_import_openpgp_raw;
 	gnutls_privkey_import_x509_raw;

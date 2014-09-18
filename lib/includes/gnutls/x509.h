@@ -1242,6 +1242,7 @@ gnutls_x509_crt_get_extension_by_oid2(gnutls_x509_crt_t cert,
 				     unsigned int *critical);
 
 typedef struct gnutls_x509_trust_list_st *gnutls_x509_trust_list_t;
+typedef struct gnutls_x509_trust_list_iter *gnutls_x509_trust_list_iter_t;
 
 int
 gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
@@ -1282,6 +1283,14 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 				crl_list, int crl_size,
 				unsigned int flags,
 				unsigned int verification_flags);
+
+
+int
+gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
+                                   gnutls_x509_trust_list_iter_t *iter,
+                                   gnutls_x509_crt_t *crt);
+
+void gnutls_x509_trust_list_iter_deinit(gnutls_x509_trust_list_iter_t iter);
 
 typedef int gnutls_verify_output_function(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,	/* The issuer if verification failed 
 												 * because of him. might be null.
