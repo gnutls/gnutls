@@ -3,7 +3,7 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.2.18 (unreleased)
+* Version 3.2.18 (released 2014-09-18)
 
 ** libgnutls: Fixes in gnutls_x509_crt_set_dn() and friends to properly handle
 strings with embedded spaces and escaped commas.
