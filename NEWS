@@ -11,6 +11,12 @@ strings with embedded spaces and escaped commas.
 ** libgnutls: Corrected gnutls_x509_crl_verify() which would always report
 a CRL signature as invalid. Reported by Armin Burgmeier.
 
+** libgnutls: Fixed issue with certificates being sanitized by gnutls prior
+to signature verification. That resulted to certain non-DER compliant modifications
+of valid certificates, being corrected by libtasn1's parser and restructured as
+the original. Issue found and reported by Antti Karjalainen and Matti Kamunen from
+Codenomicon.
+
 ** API and ABI modifications:
 No changes since last version.
 
