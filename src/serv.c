@@ -951,6 +951,22 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 #ifdef ENABLE_PKCS11
+	if (HAVE_OPT(PROVIDER)) {
+		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
+		if (ret < 0)
+			fprintf(stderr, "pkcs11_init: %s",
+				gnutls_strerror(ret));
+		else {
+			ret =
+			    gnutls_pkcs11_add_provider(OPT_ARG(PROVIDER),
+						       NULL);
+			if (ret < 0) {
+				fprintf(stderr, "pkcs11_add_provider: %s",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+	}
 	pkcs11_common(NULL);
 #endif
 
