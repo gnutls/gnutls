@@ -3,6 +3,15 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.9 (unreleased)
+
+** libgnutls: Fixes in the transporent import of PKCS #11 certificates.
+Reported by Joseph Peruski.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.8 (released 2014-09-18)
 
 ** libgnutls: Updates in the name constraints checks. No name constraints
