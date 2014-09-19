@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** libgnutls: Fixes in the transporent import of PKCS #11 certificates.
 Reported by Joseph Peruski.
 
+** libgnutls-dane: Do not require the CA on a ca match to be direct CA.
+
 ** API and ABI modifications:
 No changes since last version.
 
