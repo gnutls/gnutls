@@ -27,6 +27,10 @@ CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
 PORT="${PORT:-5561}"
 RETCODE=0
 
+if ! test -z "${VALGRIND}";then
+VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --leak-check=no"
+fi
+
 TMPFILE=$srcdir/testpkcs11.debug
 CERTTOOL_PARAM="--stdout-info"
 
@@ -34,7 +38,7 @@ if test "${WINDIR}" != "";then
   exit 77
 fi 
 
-P11TOOL="$P11TOOL --batch"
+P11TOOL="$VALGRIND $P11TOOL --batch"
 
 . $srcdir/../scripts/common.sh
 
@@ -65,6 +69,44 @@ write_privkey () {
 		echo failed
 		exit_error
 	fi
+}
+
+# $1: token
+# $2: PIN
+# $3: filename
+write_serv_privkey () {
+	export GNUTLS_PIN=$2
+
+	filename=$3
+	token=$1
+	echo -n "* Writing the server private key... "
+	$P11TOOL $ADDITIONAL_PARAM --login --write --label serv-key --load-privkey "$filename" "$token" >>$TMPFILE 2>&1
+	if test $? = 0;then
+		echo ok
+	else
+		echo failed
+		exit_error
+	fi
+
+}
+
+# $1: token
+# $2: PIN
+# $3: filename
+write_serv_cert () {
+	export GNUTLS_PIN=$2
+
+	filename=$3
+	token=$1
+	echo -n "* Writing the server certificate... "
+	$P11TOOL $ADDITIONAL_PARAM --login --write --no-mark-private --label serv-cert --load-certificate "$filename" "$token" >>$TMPFILE 2>&1
+	if test $? = 0;then
+		echo ok
+	else
+		echo failed
+		exit_error
+	fi
+
 }
 
 # $1: token
@@ -268,7 +310,7 @@ use_certificate_test () {
 
 	echo -n "* Using PKCS #11 with gnutls-cli... "
 	# start server
-	launch_server $$ --echo --priority NORMAL --x509certfile="$certfile" \
+	launch_pkcs11_server $$ "$ADDITIONAL_PARAM" --echo --priority NORMAL --x509certfile="$certfile" \
 		--x509keyfile="$keyfile" --x509cafile="$cafile" \
 		--require-client-cert >>$TMPFILE 2>&1 &
 
@@ -276,14 +318,14 @@ use_certificate_test () {
 	wait_server $PID
 
 	# connect to server using SC
-	$CLI $ADDITIONAL_PARAM  -p $PORT localhost --priority NORMAL --x509cafile="$cafile" </dev/null >>$TMPFILE 2>&1 && \
+	$VALGRIND $CLI $ADDITIONAL_PARAM  -p $PORT localhost --priority NORMAL --x509cafile="$cafile" </dev/null >>$TMPFILE 2>&1 && \
 		fail $PID "Connection should have failed!"
 
-	$CLI $ADDITIONAL_PARAM -p $PORT localhost --priority NORMAL --x509certfile="$certfile" \
+	$VALGRIND $CLI $ADDITIONAL_PARAM -p $PORT localhost --priority NORMAL --x509certfile="$certfile" \
 	--x509keyfile="$keyfile" --x509cafile="$cafile" </dev/null >>$TMPFILE 2>&1 || \
 		fail $PID "Connection (with files) should have succeeded!"
 
-	$CLI $ADDITIONAL_PARAM -p $PORT localhost --priority NORMAL --x509certfile="$token;object=gnutls-client;object-type=cert" \
+	$VALGRIND $CLI $ADDITIONAL_PARAM -p $PORT localhost --priority NORMAL --x509certfile="$token;object=gnutls-client;object-type=cert" \
 		--x509keyfile="$token;object=gnutls-client;object-type=private" \
 		--x509cafile="$cafile" </dev/null >>$TMPFILE 2>&1 || \
 		fail $PID "Connection (with SC) should have succeeded!"
@@ -348,7 +390,10 @@ generate_rsa_privkey $TOKEN $GNUTLS_PIN 1024
 
 write_certificate_test $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/ca.key" "$srcdir/pkcs11-certs/ca.crt" tmp-client.pub
 
-use_certificate_test $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/server.crt" "$srcdir/pkcs11-certs/server.key" "$srcdir/pkcs11-certs/ca.crt"
+write_serv_privkey $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/server.key"
+write_serv_cert $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/server.crt"
+
+use_certificate_test $TOKEN $GNUTLS_PIN "$TOKEN;object=serv-cert;object-type=cert" "$TOKEN;object=serv-key;object-type=private" "$srcdir/pkcs11-certs/ca.crt"
 
 if test $RETCODE = 0;then
 	echo "* All smart cards tests succeeded"
