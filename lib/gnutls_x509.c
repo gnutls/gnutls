@@ -815,11 +815,11 @@ static int
 read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 {
 	int ret;
-	gnutls_x509_crt_t crt;
+	gnutls_x509_crt_t crt = NULL;
 	gnutls_pcert_st *ccert;
 	gnutls_str_array_t names;
 	gnutls_datum_t t = {NULL, 0};
-	unsigned i;
+	unsigned i, count = 0;
 
 	_gnutls_str_array_init(&names);
 
@@ -847,13 +847,13 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 
 	if (ret < 0) {
 		gnutls_assert();
-		goto cleanup1;
+		goto cleanup;
 	}
 
 	ret = get_x509_name(crt, &names);
 	if (ret < 0) {
 		gnutls_assert();
-		goto cleanup1;
+		goto cleanup;
 	}
 
 	/* Try to load the whole certificate chain from the PKCS #11 token */
@@ -865,17 +865,18 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
                 }
 
 		ret = gnutls_pcert_import_x509(&ccert[i], crt, 0);
-		gnutls_x509_crt_deinit(crt);
-
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
+		count++;
 
 		ret = gnutls_pkcs11_get_raw_issuer(url, crt, &t, GNUTLS_X509_FMT_DER, 0);
 		if (ret < 0)
 			break;
-			
+
+		gnutls_x509_crt_deinit(crt);
+		crt = NULL;
 		ret = gnutls_x509_crt_init(&crt);
 		if (ret < 0) {
 			gnutls_assert();
@@ -885,23 +886,25 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 		ret = gnutls_x509_crt_import(crt, &t, GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			gnutls_assert();
-			goto cleanup1;
+			goto cleanup;
 		}
 		gnutls_free(t.data);
 		t.data = NULL;
 	}
 
-	ret = certificate_credential_append_crt_list(res, names, ccert, i+1);
+	ret = certificate_credential_append_crt_list(res, names, ccert, count);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	return 0;
-cleanup1:
-	gnutls_x509_crt_deinit(crt);
+	if (crt != NULL)
+		gnutls_x509_crt_deinit(crt);
 
+	return 0;
 cleanup:
+	if (crt != NULL)
+		gnutls_x509_crt_deinit(crt);
 	gnutls_free(t.data);
 	_gnutls_str_array_clear(&names);
 	gnutls_free(ccert);
@@ -1080,7 +1083,6 @@ static int check_if_sorted(gnutls_pcert_st * crt, int nr)
 			ret = gnutls_x509_crt_init(&x509);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
-
 			ret =
 			    gnutls_x509_crt_import(x509, &crt[i].cert,
 						   GNUTLS_X509_FMT_DER);
