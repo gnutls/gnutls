@@ -15,6 +15,9 @@ structures.
 ** libgnutls: gnutls_x509_crt_check_hostname() and friends will use
 RFC6125 comparison of hostnames. That introduces a dependency on libidn.
 
+** libgnutls: when printing a certificate request print the signature
+algorithm as well.
+
 ** certtool: Added --p8-info option, which will print PKCS #8 information
 even if the password is not available.
 
@@ -37,6 +40,7 @@ gnutls_pcert_get_type: Added
 gnutls_pcert_export_x509: Added
 gnutls_pcert_export_openpgp: Added
 gnutls_pkcs11_privkey_cpy: Added
+gnutls_x509_crq_get_signature_algorithm: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
