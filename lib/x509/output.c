@@ -2179,7 +2179,6 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 		}
 	}
 
-	/* SubjectPublicKeyInfo. */
 	{
 		int err;
 		unsigned int bits;
@@ -2190,6 +2189,18 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 			     gnutls_strerror(err));
 		else
 			print_crq_pubkey(str, cert, format);
+
+		err = gnutls_x509_crq_get_signature_algorithm(cert);
+		if (err < 0)
+			addf(str, "error: get_signature_algorithm: %s\n",
+			     gnutls_strerror(err));
+		else {
+			const char *name =
+			    gnutls_sign_algorithm_get_name(err);
+			if (name == NULL)
+				name = _("unknown");
+			addf(str, _("\tSignature Algorithm: %s\n"), name);
+		}
 	}
 
 	/* parse attributes */
