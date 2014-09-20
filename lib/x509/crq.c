@@ -160,6 +160,25 @@ gnutls_x509_crq_import(gnutls_x509_crq_t crq,
 }
 
 /**
+ * gnutls_x509_crq_get_signature_algorithm:
+ * @crq: should contain a #gnutls_x509_cr_t structure
+ *
+ * This function will return a value of the #gnutls_sign_algorithm_t
+ * enumeration that is the signature algorithm that has been used to
+ * sign this certificate request.
+ *
+ * Returns: a #gnutls_sign_algorithm_t value, or a negative error code on
+ *   error.
+ *
+ * Since: 3.4.0
+ **/
+int gnutls_x509_crq_get_signature_algorithm(gnutls_x509_crq_t crq)
+{
+	return _gnutls_x509_get_signature_algorithm(crq->crq,
+						    "signatureAlgorithm.algorithm");
+}
+
+/**
  * gnutls_x509_crq_get_private_key_usage_period:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @activation: The activation time

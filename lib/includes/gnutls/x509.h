@@ -460,6 +460,8 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt_t cert,
 					 void *buf,
 					 size_t * buf_size,
 					 unsigned int *critical);
+
+int gnutls_x509_crq_get_signature_algorithm(gnutls_x509_crq_t crq);
 int
 gnutls_x509_crq_get_extension_by_oid2(gnutls_x509_crq_t crq,
 				     const char *oid, int indx,
