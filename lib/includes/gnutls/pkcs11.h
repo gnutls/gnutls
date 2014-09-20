@@ -353,6 +353,11 @@ int gnutls_x509_crt_list_import_pkcs11(gnutls_x509_crt_t * certs,
 
 /* private key functions...*/
 int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key);
+
+int
+gnutls_pkcs11_privkey_cpy(gnutls_pkcs11_privkey_t dst,
+			  gnutls_pkcs11_privkey_t src);
+
 void gnutls_pkcs11_privkey_set_pin_function(gnutls_pkcs11_privkey_t
 					    key,
 					    gnutls_pin_callback_t

@@ -63,6 +63,7 @@ struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int flags;
 	struct p11_kit_uri *uinfo;
+	char *url;
 
 	struct pkcs11_session_info sinfo;
 	ck_object_handle_t ref;	/* the key in the session */
@@ -100,6 +101,26 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 }
 
 /**
+ * gnutls_pkcs11_privkey_cpy:
+ * @dst: The destination key, which should be initialized.
+ * @src: The source key
+ *
+ * This function will copy a private key from source to destination
+ * key. Destination has to be initialized.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_pkcs11_privkey_cpy(gnutls_pkcs11_privkey_t dst,
+			  gnutls_pkcs11_privkey_t src)
+{
+	return gnutls_pkcs11_privkey_import_url(dst, src->url, src->flags);
+}
+
+/**
  * gnutls_pkcs11_privkey_deinit:
  * @key: The structure to be initialized
  *
@@ -108,6 +129,7 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
 {
 	p11_kit_uri_free(key->uinfo);
+	gnutls_free(key->url);
 	if (key->sinfo.init != 0)
 		pkcs11_close_session(&key->sinfo);
 	gnutls_free(key);
@@ -365,6 +387,10 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	PKCS11_CHECK_INIT;
 
 	memset(&pkey->sinfo, 0, sizeof(pkey->sinfo));
+
+	pkey->url = gnutls_strdup(url);
+	if (pkey->url == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	ret = pkcs11_url_to_info(url, &pkey->uinfo);
 	if (ret < 0) {

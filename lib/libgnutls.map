@@ -1035,6 +1035,7 @@ GNUTLS_3_1_0 {
 	gnutls_x509_ext_print;
 	gnutls_x509_othername_to_virtual;
 	gnutls_pkcs11_copy_attached_extension;
+	gnutls_pkcs11_privkey_cpy;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {
