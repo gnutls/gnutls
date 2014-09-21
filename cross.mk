@@ -1,6 +1,6 @@
 SMP=-j4
 
-GNUTLS_VERSION:=3.2.16
+GNUTLS_VERSION:=3.2.18
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -22,7 +22,7 @@ LIBZ_VERSION=1.2.8
 LIBZ_FILE:=zlib-$(LIBZ_VERSION).tar.gz
 LIBZ_DIR:=zlib-$(LIBZ_VERSION)
 
-P11_KIT_VERSION=0.20.2
+P11_KIT_VERSION=0.20.7
 P11_KIT_FILE:=p11-kit-$(P11_KIT_VERSION).tar.gz
 P11_KIT_DIR:=p11-kit-$(P11_KIT_VERSION)
 
@@ -135,7 +135,7 @@ $(NETTLE_DIR)/.installed: $(NETTLE_DIR)/.configured
 	cp $(NETTLE_DIR)/libnettle*.dll $(NETTLE_DIR)/libhogweed*.dll $(BIN_DIR)/
 	touch $@
 
-GCC_DLLS=/usr/lib/gcc/i686-w64-mingw32/4.8/libgcc_s_sjlj-1.dll/libgcc_s_sjlj-1.dll /usr/i686-w64-mingw32/lib/libwinpthread-1.dll
+GCC_DLLS=/usr/lib/gcc/i686-w64-mingw32/4.9-win32/libgcc_s_sjlj-1.dll
 
 $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	make -C $(GNUTLS_DIR) $(SMP)
@@ -149,7 +149,7 @@ $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	-cp $(GCC_DLLS) $(BIN_DIR)/
 	touch $@
 
-$(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed #$(P11_KIT_DIR)/.installed
+$(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/$(GNUTLS_FILE)
 	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/$(GNUTLS_FILE).sig
 	gpg --verify $(GNUTLS_FILE).sig
@@ -157,7 +157,7 @@ $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed #$(P11_KIT_DIR)/.installed
 	cd $(GNUTLS_DIR) && \
 		$(CONFIG_ENV) LDFLAGS="$(LDFLAGS) -L$(LIB_DIR)" CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" \
 		./configure $(CONFIG_FLAGS) --enable-local-libopts --disable-cxx \
-		--disable-nls --without-p11-kit --enable-gcc-warnings --disable-libdane --disable-openssl-compatibility --with-included-libtasn1 && cd ..
+		--without-zlib --disable-nls --enable-gcc-warnings --disable-libdane --disable-openssl-compatibility --with-included-libtasn1 && cd ..
 	touch $@
 
 $(OPENCONNECT_DIR)/.installed: $(OPENCONNECT_DIR)/.configured
