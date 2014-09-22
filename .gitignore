@@ -711,3 +711,7 @@ tests/suite/softhsm*.config
 gl/errno.h
 tests/suite/pkcs11-get-issuer
 tests/long-session-id
+tests/crlverify
+tests/dane
+tests/mini-dtls-lowmtu
+tests/mini-x509-callbacks-intr
