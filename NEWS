@@ -18,6 +18,11 @@ RFC6125 comparison of hostnames. That introduces a dependency on libidn.
 ** libgnutls: when printing a certificate request print the signature
 algorithm as well.
 
+** libgnutls: the verification flag GNUTLS_REQUIRE_KEY_PURPOSE_ON_INTERMEDIATE
+is introduced, and forces the application of the desired key purpose (extended
+key usage) into intermediate certificates. The verification result
+GNUTLS_CERT_PURPOSE_MISMATCH is also introduced. 
+
 ** certtool: Added --p8-info option, which will print PKCS #8 information
 even if the password is not available.
 
