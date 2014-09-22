@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007-2013 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -694,6 +694,38 @@ SCM_DEFINE (scm_gnutls_set_session_credentials_x, "set-session-credentials!",
   return SCM_UNSPECIFIED;
 }
 
+#undef FUNC_NAME
+
+SCM_DEFINE (scm_gnutls_set_session_server_name_x, "set-session-server-name!",
+	    3, 0, 0,
+	    (SCM session, SCM type, SCM name),
+	    "For a client, this procedure provides a way to inform "
+	    "the server that it is known under @var{name}, @i{via} the "
+	    "@code{SERVER NAME} TLS extension.  @var{type} must be "
+	    "a @code{server-name-type} value, @var{server-name-type/dns} "
+	    "for DNS names.")
+#define FUNC_NAME s_scm_gnutls_set_session_server_name_x
+{
+  int err;
+  gnutls_session_t c_session;
+  gnutls_server_name_type_t c_type;
+  char *c_name;
+
+  c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
+  c_type = scm_to_gnutls_server_name_type (type, 2, FUNC_NAME);
+  SCM_VALIDATE_STRING (3, name);
+
+  c_name = scm_to_locale_string (name);
+
+  err = gnutls_server_name_set (c_session, c_type, c_name,
+				strlen (c_name) + 1);
+  free (c_name);
+
+  if (EXPECT_FALSE (err != GNUTLS_E_SUCCESS))
+    scm_gnutls_error (err, FUNC_NAME);
+
+  return SCM_UNSPECIFIED;
+}
 #undef FUNC_NAME
 
 

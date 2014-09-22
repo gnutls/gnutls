@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2014 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -34,6 +34,7 @@
            session-peer-certificate-chain session-our-certificate-chain
            set-session-transport-fd! set-session-transport-port!
            set-session-credentials! set-server-session-certificate-request!
+           set-session-server-name!
 
            ;; anonymous credentials
            anonymous-client-credentials? anonymous-server-credentials?
@@ -120,7 +121,7 @@
            x509-subject-alternative-name->string pk-algorithm->string
            sign-algorithm->string psk-key-format->string key-usage->string
            certificate-verify->string error->string
-           cipher-suite->string
+           cipher-suite->string server-name-type->string
 
            ;; enum values
            cipher/null
@@ -257,6 +258,7 @@
            certificate-verify/allow-any-x509-v1-ca-certificate
            certificate-verify/allow-sign-rsa-md2
            certificate-verify/allow-sign-rsa-md5
+           server-name-type/dns
 
            ;; FIXME: Automate this:
            ;; grep '^#define GNUTLS_E_' ../../lib/includes/gnutls/gnutls.h.in | \

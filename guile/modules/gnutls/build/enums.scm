@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2014 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -608,6 +608,11 @@ application-error-min
                   #f
                   "GNUTLS_OPENPGP_FMT_"))
 
+(define %server-name-type-enum
+  (make-enum-type 'server-name-type "gnutls_server_name_type_t"
+                  '(dns)
+                  #f
+                  "GNUTLS_NAME_"))
 
 (define %gnutls-enums
   ;; All enums.
@@ -617,7 +622,7 @@ application-error-min
         %certificate-status-enum %certificate-request-enum
         %close-request-enum %protocol-enum %certificate-type-enum
         %x509-certificate-format-enum %x509-subject-alternative-name-enum
-        %pk-algorithm-enum %sign-algorithm-enum
+        %pk-algorithm-enum %sign-algorithm-enum %server-name-type-enum
         %psk-key-format-enum %key-usage-enum %certificate-verify-enum
         %error-enum
 
