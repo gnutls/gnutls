@@ -60,7 +60,8 @@
             (let ((client (make-session connection-end/client)))
               ;; client-side (child process)
               (set-session-priorities! client priorities)
-
+              (set-session-server-name! client
+                                        server-name-type/dns (gethostname))
               (set-session-transport-fd! client (port->fdes (car socket-pair)))
               (set-session-credentials! client (make-anonymous-client-credentials))
               (set-session-dh-prime-bits! client 1024)
