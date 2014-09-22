@@ -457,9 +457,6 @@ int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,
 int gnutls_pcert_export_x509(gnutls_pcert_st * pcert,
                              gnutls_x509_crt_t * crt);
 
-gnutls_certificate_type_t
-gnutls_pcert_get_type(gnutls_pcert_st * pcert);
-
 int
 gnutls_pcert_list_import_x509_raw(gnutls_pcert_st * pcerts,
 				  unsigned int *pcert_max,

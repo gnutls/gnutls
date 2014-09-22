@@ -339,22 +339,6 @@ int gnutls_pcert_import_openpgp_raw(gnutls_pcert_st * pcert,
 #endif
 
 /**
- * gnutls_pcert_get_type:
- * @pcert: The pcert structure.
- *
- * Returns the certificate type of @pcert, one of X.509 or OpenPGP.
- *
- * Returns: The certificate type.
- *
- * Since: 3.4.0
- */
-gnutls_certificate_type_t
-gnutls_pcert_get_type(gnutls_pcert_st * pcert)
-{
-	return pcert->type;
-}
-
-/**
  * gnutls_pcert_export_x509:
  * @pcert: The pcert structure.
  * @crt: An initialized #gnutls_x509_crt_t.
