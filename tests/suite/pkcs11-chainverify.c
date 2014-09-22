@@ -78,6 +78,7 @@ void doit(void)
 	int ret;
 	FILE *fp;
 	const char *lib;
+	gnutls_typed_vdata_st vdata[2];
 
 	unsetenv("SOFTHSM_CONF");
 	/* The overloading of time() seems to work in linux (ELF?)
@@ -247,8 +248,14 @@ void doit(void)
 			exit(1);
 		}
 
+		vdata[0].type = GNUTLS_DT_KEY_PURPOSE_OID;
+		vdata[0].data = (void *)chains[i].purpose;
+
 		/* make sure that the two functions don't diverge */
-		ret = gnutls_x509_trust_list_verify_crt(tl, certs, j, chains[i].verify_flags,
+		ret = gnutls_x509_trust_list_verify_crt2(tl, certs, j,
+						vdata,
+						chains[i].purpose==NULL?0:1,
+						chains[i].verify_flags,
 						&verify_status, NULL);
 		if (ret < 0) {
 			fprintf(stderr,

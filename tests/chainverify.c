@@ -64,6 +64,7 @@ void doit(void)
 	gnutls_x509_crt_t ca;
 	gnutls_datum_t tmp;
 	size_t j;
+	gnutls_typed_vdata_st vdata[2];
 
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
@@ -86,24 +87,21 @@ void doit(void)
 	for (i = 0; chains[i].chain; i++) {
 
 		if (debug)
-			printf("Chain '%s' (%d)...\n", chains[i].name,
-			       (int) i);
+			printf("Chain '%s' (%d)...\n", chains[i].name, (int)i);
 
 		for (j = 0; chains[i].chain[j]; j++) {
 			if (debug > 2)
-				printf("\tAdding certificate %d...",
-				       (int) j);
+				printf("\tAdding certificate %d...", (int)j);
 
 			ret = gnutls_x509_crt_init(&certs[j]);
 			if (ret < 0) {
 				fprintf(stderr,
 					"gnutls_x509_crt_init[%d,%d]: %s\n",
-					(int) i, (int) j,
-					gnutls_strerror(ret));
+					(int)i, (int)j, gnutls_strerror(ret));
 				exit(1);
 			}
 
-			tmp.data = (unsigned char *) chains[i].chain[j];
+			tmp.data = (unsigned char *)chains[i].chain[j];
 			tmp.size = strlen(chains[i].chain[j]);
 
 			ret =
@@ -114,16 +112,15 @@ void doit(void)
 			if (ret < 0) {
 				fprintf(stderr,
 					"gnutls_x509_crt_import[%s,%d]: %s\n",
-					chains[i].name, (int) j,
+					chains[i].name, (int)j,
 					gnutls_strerror(ret));
 				exit(1);
 			}
 
 			gnutls_x509_crt_print(certs[j],
-					      GNUTLS_CRT_PRINT_ONELINE,
-					      &tmp);
+					      GNUTLS_CRT_PRINT_ONELINE, &tmp);
 			if (debug)
-				printf("\tCertificate %d: %.*s\n", (int) j,
+				printf("\tCertificate %d: %.*s\n", (int)j,
 				       tmp.size, tmp.data);
 			gnutls_free(tmp.data);
 		}
@@ -138,11 +135,10 @@ void doit(void)
 			exit(1);
 		}
 
-		tmp.data = (unsigned char *) *chains[i].ca;
+		tmp.data = (unsigned char *)*chains[i].ca;
 		tmp.size = strlen(*chains[i].ca);
 
-		ret =
-		    gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_crt_import(ca, &tmp, GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			fprintf(stderr, "gnutls_x509_crt_import: %s\n",
 				gnutls_strerror(ret));
@@ -154,82 +150,109 @@ void doit(void)
 
 		gnutls_x509_crt_print(ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
 		if (debug)
-			printf("\tCA Certificate: %.*s\n", tmp.size,
-			       tmp.data);
+			printf("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
 		gnutls_free(tmp.data);
 
 		if (debug)
 			printf("\tVerifying...");
 
-		ret = gnutls_x509_crt_list_verify(certs, j,
-						  &ca, 1, NULL, 0,
-						  chains[i].verify_flags,
-						  &verify_status);
-		if (ret < 0) {
-			fprintf(stderr,
-				"gnutls_x509_crt_list_verify[%d,%d]: %s\n",
-				(int) i, (int) j, gnutls_strerror(ret));
-			exit(1);
-		}
+		if (chains[i].purpose == NULL) {
+			ret = gnutls_x509_crt_list_verify(certs, j,
+							  &ca, 1, NULL, 0,
+							  chains
+							  [i].verify_flags,
+							  &verify_status);
+			if (ret < 0) {
+				fprintf(stderr,
+					"gnutls_x509_crt_list_verify[%d,%d]: %s\n",
+					(int)i, (int)j, gnutls_strerror(ret));
+				exit(1);
+			}
 
-		if (verify_status != chains[i].expected_verify_result) {
-			gnutls_datum_t out1, out2;
-			gnutls_certificate_verification_status_print
-			    (verify_status, GNUTLS_CRT_X509, &out1, 0);
-			gnutls_certificate_verification_status_print(chains
-								     [i].
-								     expected_verify_result,
-								     GNUTLS_CRT_X509,
-								     &out2,
-								     0);
-			fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status, out1.data, chains[i].expected_verify_result, out2.data);
-			gnutls_free(out1.data);
-			gnutls_free(out2.data);
+			if (verify_status != chains[i].expected_verify_result) {
+				gnutls_datum_t out1, out2;
+				gnutls_certificate_verification_status_print
+				    (verify_status, GNUTLS_CRT_X509, &out1, 0);
+				gnutls_certificate_verification_status_print
+				    (chains[i].expected_verify_result,
+				     GNUTLS_CRT_X509, &out2, 0);
+				fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status, out1.data, chains[i].expected_verify_result, out2.data);
+				gnutls_free(out1.data);
+				gnutls_free(out2.data);
 
 #if 0
-			j = 0;
-			do {
-				fprintf(stderr, "%s\n",
-					chains[i].chain[j]);
-			}
-			while (chains[i].chain[++j] != NULL);
+				j = 0;
+				do {
+					fprintf(stderr, "%s\n",
+						chains[i].chain[j]);
+				}
+				while (chains[i].chain[++j] != NULL);
 #endif
 
-			if (!debug)
-				exit(1);
-		} else if (debug)
-			printf("done\n");
+				if (!debug)
+					exit(1);
+			} else if (debug)
+				printf("done\n");
+
+		}
 
 		gnutls_x509_trust_list_init(&tl, 0);
 
-		ret =
-		    gnutls_x509_trust_list_add_cas(tl, &ca, 1, 0);
+		ret = gnutls_x509_trust_list_add_cas(tl, &ca, 1, 0);
 		if (ret != 1) {
 			fail("gnutls_x509_trust_list_add_trust_mem\n");
 			exit(1);
 		}
 
 		/* make sure that the two functions don't diverge */
-		ret = gnutls_x509_trust_list_verify_crt(tl, certs, j, chains[i].verify_flags,
-						&verify_status1, NULL);
+		if (chains[i].purpose != NULL) {
+			vdata[0].type = GNUTLS_DT_KEY_PURPOSE_OID;
+			vdata[0].data = (void *)chains[i].purpose;
+
+			ret =
+			    gnutls_x509_trust_list_verify_crt2(tl, certs, j,
+							       vdata, 1,
+							       chains
+							       [i].verify_flags,
+							       &verify_status1,
+							       NULL);
+		} else {
+			ret =
+			    gnutls_x509_trust_list_verify_crt(tl, certs, j,
+							      chains
+							      [i].verify_flags,
+							      &verify_status1,
+							      NULL);
+		}
 		if (ret < 0) {
 			fprintf(stderr,
 				"gnutls_x509_crt_list_verify[%d,%d]: %s\n",
-				(int) i, (int) j, gnutls_strerror(ret));
+				(int)i, (int)j, gnutls_strerror(ret));
 			exit(1);
 		}
 
-		if (verify_status != verify_status1) {
-			gnutls_datum_t out1, out2;
-			gnutls_certificate_verification_status_print
-			    (verify_status, GNUTLS_CRT_X509, &out1, 0);
-			gnutls_certificate_verification_status_print(verify_status1,
-								     GNUTLS_CRT_X509,
-								     &out2,
-								     0);
-			fail("chain[%s]:\nverify_status: %d: %s\ntrust list vstatus: %d: %s\n", chains[i].name, verify_status, out1.data, verify_status1, out2.data);
-			gnutls_free(out1.data);
-			gnutls_free(out2.data);
+		if (chains[i].purpose == NULL) {
+			if (verify_status != verify_status1) {
+				gnutls_datum_t out1, out2;
+				gnutls_certificate_verification_status_print
+				    (verify_status, GNUTLS_CRT_X509, &out1, 0);
+				gnutls_certificate_verification_status_print
+				    (verify_status1, GNUTLS_CRT_X509, &out2, 0);
+				fail("chain[%s]:\nverify_status: %d: %s\ntrust list vstatus: %d: %s\n", chains[i].name, verify_status, out1.data, verify_status1, out2.data);
+				gnutls_free(out1.data);
+				gnutls_free(out2.data);
+			}
+		} else {
+			if (verify_status1 != chains[i].expected_verify_result) {
+				gnutls_datum_t out1, out2;
+				gnutls_certificate_verification_status_print
+				    (verify_status1, GNUTLS_CRT_X509, &out1, 0);
+				gnutls_certificate_verification_status_print
+				    (chains[i].expected_verify_result, GNUTLS_CRT_X509, &out2, 0);
+				fail("chain[%s]:\nverify_status: %d: %s\nexpected: %d: %s\n", chains[i].name, verify_status1, out1.data, chains[i].expected_verify_result, out2.data);
+				gnutls_free(out1.data);
+				gnutls_free(out2.data);
+			}
 		}
 
 		if (debug)

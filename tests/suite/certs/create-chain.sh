@@ -35,6 +35,7 @@ while test $counter -lt $NUM; do
 		echo "ca" >>$TEMPLATE
 		echo "expiration_days = -1" >>$TEMPLATE
 		echo "cert_signing_key" >>$TEMPLATE
+		echo "ocsp_signing_key" >>$TEMPLATE
 		echo "crl_signing_key" >>$TEMPLATE
 		$CERTTOOL --generate-self-signed --load-privkey $OUTPUT/$name.key --outfile \
 			$OUTPUT/$name.crt --template $TEMPLATE 2>/dev/null
@@ -51,7 +52,7 @@ while test $counter -lt $NUM; do
 			echo "expiration_days = -1" >>$TEMPLATE
 			echo "signing_key" >>$TEMPLATE
 			echo "encryption_key" >>$TEMPLATE
-			echo "tls_www_server" >>$TEMPLATE
+			echo "ocsp_signing_key" >>$TEMPLATE
 			$CERTTOOL --generate-certificate --load-privkey $OUTPUT/$name.key \
 				--load-ca-certificate $OUTPUT/$prev_name.crt \
 				--load-ca-privkey $OUTPUT/$prev_name.key \
@@ -62,6 +63,7 @@ while test $counter -lt $NUM; do
 			echo "serial = $serial" >>$TEMPLATE
 			echo "ca" >>$TEMPLATE
 			echo "expiration_days = -1" >>$TEMPLATE
+			echo "ocsp_signing_key" >>$TEMPLATE
 			echo "cert_signing_key" >>$TEMPLATE
 			echo "signing_key" >>$TEMPLATE
 			$CERTTOOL --generate-certificate --load-privkey $OUTPUT/$name.key \
