@@ -1345,6 +1345,9 @@ void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
 				      gnutls_dh_params_t dh_params);
 void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
 					 res, unsigned int flags);
+unsigned int
+gnutls_certificate_get_verify_flags(gnutls_certificate_credentials_t res);
+
 void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t
 					  res, unsigned int max_bits,
 					  unsigned int max_depth);
