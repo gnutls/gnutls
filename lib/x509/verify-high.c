@@ -794,7 +794,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
  * If a key purpose OID is provided and the end-certificate contains the extended key
  * usage PKIX extension, it will be required to be have the provided key purpose 
- * or be marked for any purpose, otherwise verification will fail with %GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE status.
+ * or be marked for any purpose, otherwise verification will fail with %GNUTLS_CERT_PURPOSE_MISMATCH status.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. Note that verification failure will not result to an
@@ -858,7 +858,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 
 		*voutput = _gnutls_pkcs11_verify_crt_status(list->pkcs11_token,
 								cert_list, cert_list_size,
-								purpose!=NULL?purpose:GNUTLS_KP_TLS_WWW_SERVER,
+								purpose,
 								flags, func);
 	} else
 #endif
@@ -868,7 +868,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 						    list->node[hash].trusted_cas,
 						    list->
 						    node[hash].trusted_ca_size,
-						    flags, func);
+						    flags, purpose, func);
 
 #define LAST_DN cert_list[cert_list_size-1]->raw_dn
 #define LAST_IDN cert_list[cert_list_size-1]->raw_issuer_dn
@@ -890,16 +890,16 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 						    list->node[hash].trusted_cas,
 						    list->
 						    node[hash].trusted_ca_size,
-						    flags, func);
+						    flags, purpose, func);
 		}
 	}
 
 	/* End-certificate, key purpose and hostname checks. */
 	if (purpose) {
-		ret = _gnutls_check_key_purpose(cert_list[0], purpose);
+		ret = _gnutls_check_key_purpose(cert_list[0], purpose, 0);
 		if (ret != 1) {
 			gnutls_assert();
-			*voutput |= GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE|GNUTLS_CERT_INVALID;
+			*voutput |= GNUTLS_CERT_PURPOSE_MISMATCH|GNUTLS_CERT_INVALID;
 		}
 	}
 

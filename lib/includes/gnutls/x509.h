@@ -811,6 +811,10 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
  *   using certificate revocation lists or the available OCSP data.
  * @GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS: When including a hostname
  *   check in the verification, do not consider any wildcards.
+ * @GNUTLS_VERIFY_KEY_PURPOSE_ON_INTERMEDIATE: When verifying a certificate
+ *   and asking for a particular key purpose, require that any intermediate certificates
+ *   bear this key purpose as well. This is not enabled by default as this is not part
+ *   of RFC5280, but rather is an extension of CA Forum (baseline requirements 1.1.9).
  *
  * Enumeration of different certificate verify flags. Additional
  * verification profiles can be set using GNUTLS_PROFILE_TO_VFLAGS()
@@ -828,7 +832,9 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_DISABLE_CRL_CHECKS = 1 << 9,
 	GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN = 1 << 10,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN = 1 << 11,
-	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12
+	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12,
+	GNUTLS_VERIFY_KEY_PURPOSE_ON_INTERMEDIATE = 1 << 13
+	/* cannot exceed 2^24 due to GNUTLS_PROFILE_TO_VFLAGS() */
 } gnutls_certificate_verify_flags;
 
 /**

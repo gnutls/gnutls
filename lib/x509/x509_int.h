@@ -411,6 +411,7 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 				const gnutls_x509_crt_t * trusted_cas,
 				int tcas_size,
 				unsigned int flags,
+				const char *purpose,
 				gnutls_verify_output_function func);
 
 #ifdef ENABLE_PKCS11

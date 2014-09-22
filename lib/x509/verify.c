@@ -835,6 +835,7 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 				const gnutls_x509_crt_t * trusted_cas,
 				int tcas_size,
 				unsigned int flags,
+				const char *purpose,
 				gnutls_verify_output_function func)
 {
 	int i = 0, ret;
@@ -951,6 +952,20 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 		if (i - 1 < 0)
 			break;
 
+		if (purpose != NULL && (flags & GNUTLS_VERIFY_KEY_PURPOSE_ON_INTERMEDIATE)) {
+			ret = _gnutls_check_key_purpose(certificate_list[i], purpose, 1);
+			if (ret != 1) {
+				gnutls_assert();
+				status |= GNUTLS_CERT_INVALID;
+				status |= GNUTLS_CERT_PURPOSE_MISMATCH;
+
+				if (func)
+					func(certificate_list[i-1],
+					     certificate_list[i], NULL, status);
+				goto cleanup;
+			}
+		}
+
 		/* note that here we disable this V1 CA flag. So that no version 1
 		 * certificates can exist in a supplied chain.
 		 */
@@ -977,16 +992,17 @@ cleanup:
 
 /* Returns true if the provided purpose is in accordance with the certificate.
  */
-bool _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose)
+bool _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose, unsigned no_any)
 {
 	char oid[MAX_OID_SIZE];
 	size_t oid_size;
 	int ret;
+	unsigned critical = 0;
 	unsigned i;
 
 	for (i=0;;i++) {
 		oid_size = sizeof(oid);
-		ret = gnutls_x509_crt_get_key_purpose_oid(cert, i, oid, &oid_size, NULL);
+		ret = gnutls_x509_crt_get_key_purpose_oid(cert, i, oid, &oid_size, &critical);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			if (i==0) {
 				/* no key purpose in certificate, assume ANY */
@@ -1000,7 +1016,7 @@ bool _gnutls_check_key_purpose(gnutls_x509_crt_t cert, const char *purpose)
 			break;
 		}
 
-		if (strcmp(oid, purpose) == 0 || strcmp(oid, GNUTLS_KP_ANY) == 0) {
+		if (strcmp(oid, purpose) == 0 || (no_any == 0 && strcmp(oid, GNUTLS_KP_ANY) == 0)) {
 			return 1;
 		}
 	}
@@ -1125,7 +1141,8 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 			 	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_COMPARE);
 			if (ret != 0) {
 				return _gnutls_verify_crt_status(certificate_list, clist_size,
-					&certificate_list[clist_size - 1], 1, flags, func);
+					&certificate_list[clist_size - 1], 1, flags,
+					purpose, func);
 			}
 		}
 
@@ -1135,7 +1152,7 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 		 * to get, any additional flags from the certificate list (e.g.,
 		 * insecure algorithms or expired */
 		status |= _gnutls_verify_crt_status(certificate_list, clist_size,
-						    NULL, 0, flags, func);
+						    NULL, 0, flags, purpose, func);
 		goto cleanup;
 	}
 
@@ -1155,18 +1172,19 @@ _gnutls_pkcs11_verify_crt_status(const char* url,
 		goto cleanup;
 	}
 
-	if (purpose != NULL) {
-		ret = _gnutls_check_key_purpose(issuer, purpose);
-		if (ret != 1) {
-			gnutls_assert();
-			status |= GNUTLS_CERT_INVALID;
-			status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
-			goto cleanup;
-		}
+	/* security modules that provide trust, bundle all certificates (of all purposes)
+	 * together. In software that doesn't specify any purpose assume the default to
+	 * be www-server. */
+	ret = _gnutls_check_key_purpose(issuer, purpose==NULL?GNUTLS_KP_TLS_WWW_SERVER:purpose, 0);
+	if (ret != 1) {
+		gnutls_assert();
+		status |= GNUTLS_CERT_INVALID;
+		status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+		goto cleanup;
 	}
 
 	status = _gnutls_verify_crt_status(certificate_list, clist_size,
-				&issuer, 1, flags, func);
+				&issuer, 1, flags, purpose, func);
 
 cleanup:
 	gnutls_free(raw_issuer.data);
@@ -1275,7 +1293,7 @@ gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
 	*verify =
 	    _gnutls_verify_crt_status(cert_list, cert_list_length,
 					    CA_list, CA_list_length,
-					    flags, NULL);
+					    flags, NULL, NULL);
 
 	/* Check for revoked certificates in the chain. 
 	 */
@@ -1321,7 +1339,7 @@ gnutls_x509_crt_verify(gnutls_x509_crt_t cert,
 	*verify =
 	    _gnutls_verify_crt_status(&cert, 1,
 					    CA_list, CA_list_length,
-					    flags, NULL);
+					    flags, NULL, NULL);
 	return 0;
 }
 

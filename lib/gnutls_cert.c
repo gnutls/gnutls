@@ -1045,6 +1045,11 @@ gnutls_certificate_verification_status_print(unsigned int status,
 					  _
 					  ("The certificate chain violates the signer's constraints. "));
 
+	if (status & GNUTLS_CERT_PURPOSE_MISMATCH)
+		_gnutls_buffer_append_str(&str,
+					  _
+					  ("The certificate chain does not match the intended purpose. "));
+
 	if (status & GNUTLS_CERT_NOT_ACTIVATED)
 		_gnutls_buffer_append_str(&str,
 					  _
