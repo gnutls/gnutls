@@ -742,7 +742,7 @@ AC_ARG_ENABLE(crywrap,
 	AC_CHECK_FUNCS([argp_usage],[ac_argp=yes],[ac_argp=no])
  fi
 
- if test "$ac_cv_func_daemon" != "no" && test "$ac_argp" != "no";then
+ if test "$ac_cv_func_daemon" != "no" && test "$ac_argp" != "no" && test "$with_libidn" != "no";then
   crywrap=yes
  fi
 
