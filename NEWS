@@ -41,6 +41,7 @@ gnutls_pcert_export_x509: Added
 gnutls_pcert_export_openpgp: Added
 gnutls_pkcs11_privkey_cpy: Added
 gnutls_x509_crq_get_signature_algorithm: Added
+gnutls_privkey_import_ext3: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
