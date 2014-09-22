@@ -89,7 +89,10 @@ int gnutls_privkey_get_pk_algorithm(gnutls_privkey_t key, unsigned int *bits)
 	case GNUTLS_PRIVKEY_EXT:
 		if (bits)
 			*bits = 0;
-		return key->pk_algorithm;
+		if (key->key.ext.pk_func)
+			return key->key.ext.pk_func(key, key->key.ext.userdata);
+		else
+			return key->pk_algorithm;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -431,7 +434,7 @@ int gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key, const char *url)
  * #gnutls_privkey_t structure. At least one of the two callbacks
  * must be non-null.
  *
- * See also gnutls_privkey_import_ext2().
+ * See also gnutls_privkey_import_ext3().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -470,6 +473,8 @@ gnutls_privkey_import_ext(gnutls_privkey_t pkey,
  * will be provided, and the signing function is expected to do the PKCS #1
  * 1.5 padding and the exponentiation.
  *
+ * See also gnutls_privkey_import_ext3().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -498,6 +503,72 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
 	pkey->key.ext.sign_func = sign_func;
 	pkey->key.ext.decrypt_func = decrypt_func;
 	pkey->key.ext.deinit_func = deinit_func;
+	pkey->key.ext.userdata = userdata;
+	pkey->type = GNUTLS_PRIVKEY_EXT;
+	pkey->pk_algorithm = pk;
+	pkey->flags = flags;
+
+	/* Ensure gnutls_privkey_deinit() calls the deinit_func */
+	if (deinit_func)
+		pkey->flags |= GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE;
+
+	return 0;
+}
+
+/**
+ * gnutls_privkey_import_ext3:
+ * @pkey: The private key
+ * @pk: The public key algorithm, when @pk_func isn't provided
+ * @userdata: private data to be provided to the callbacks
+ * @sign_func: callback for signature operations
+ * @decrypt_func: callback for decryption operations
+ * @deinit_func: a deinitialization function
+ * @pk_func: returns the public key algorithm (may be %NULL; if set @pk will be ignored)
+ * @copy_func: copies a context
+ * @flags: Flags for the import
+ *
+ * This function will associate the given callbacks with the
+ * #gnutls_privkey_t structure. At least one of the two callbacks
+ * must be non-null. If a deinitialization function is provided
+ * then flags is assumed to contain %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE.
+ *
+ * Note that the signing function is supposed to "raw" sign data, i.e.,
+ * without any hashing or preprocessing. In case of RSA the DigestInfo
+ * will be provided, and the signing function is expected to do the PKCS #1
+ * 1.5 padding and the exponentiation.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
+			   gnutls_pk_algorithm_t pk,
+			   void *userdata,
+			   gnutls_privkey_sign_func sign_func,
+			   gnutls_privkey_decrypt_func decrypt_func,
+			   gnutls_privkey_deinit_func deinit_func,
+			   gnutls_privkey_pk_func pk_func,
+			   gnutls_privkey_copy_func copy_func,
+			   unsigned int flags)
+{
+	int ret;
+
+	ret = check_if_clean(pkey);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	if (sign_func == NULL && decrypt_func == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	pkey->key.ext.sign_func = sign_func;
+	pkey->key.ext.decrypt_func = decrypt_func;
+	pkey->key.ext.deinit_func = deinit_func;
+	pkey->key.ext.pk_func = pk_func;
+	pkey->key.ext.copy_func = copy_func;
 	pkey->key.ext.userdata = userdata;
 	pkey->type = GNUTLS_PRIVKEY_EXT;
 	pkey->pk_algorithm = pk;
