@@ -64,7 +64,7 @@ static unsigned char ca_pem[] =
     "njuu7kHq5peUgYn8Jd9zNzExBOEp1VOipGsf6G66oQAhDFp2o8zkz7ZH71zR4HEW\n"
     "KoX6n5Emn6DvcEH/9pAhnGxNHJAoS7czTKv/JDZJhkqHxyrE1fuLsg5Qv25DTw7+\n"
     "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
-const gnutls_datum_t ca = { ca_pem, sizeof(ca_pem) };
+const gnutls_datum_t ca = { ca_pem, sizeof(ca_pem) - 1};
 
 static unsigned char cert_pem[] =
     "-----BEGIN CERTIFICATE-----\n"
@@ -92,7 +92,7 @@ static unsigned char cert_pem[] =
     "njuu7kHq5peUgYn8Jd9zNzExBOEp1VOipGsf6G66oQAhDFp2o8zkz7ZH71zR4HEW\n"
     "KoX6n5Emn6DvcEH/9pAhnGxNHJAoS7czTKv/JDZJhkqHxyrE1fuLsg5Qv25DTw7+\n"
     "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
-const gnutls_datum_t cert = { cert_pem, sizeof(cert_pem) };
+const gnutls_datum_t cert = { cert_pem, sizeof(cert_pem) - 1};
 
 static unsigned char key_pem[] =
     "-----BEGIN RSA PRIVATE KEY-----\n"
@@ -110,7 +110,7 @@ static unsigned char key_pem[] =
     "/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
     "sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
     "-----END RSA PRIVATE KEY-----\n";
-const gnutls_datum_t key = { key_pem, sizeof(key_pem) };
+const gnutls_datum_t key = { key_pem, sizeof(key_pem) - 1};
 
 static unsigned char server_cert_pem[] =
     "-----BEGIN CERTIFICATE-----\n"
@@ -129,7 +129,7 @@ static unsigned char server_cert_pem[] =
     "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
-	sizeof(server_cert_pem)
+	sizeof(server_cert_pem) - 1
 };
 
 static unsigned char server_key_pem[] =
@@ -150,7 +150,7 @@ static unsigned char server_key_pem[] =
     "-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t server_key = { server_key_pem,
-	sizeof(server_key_pem)
+	sizeof(server_key_pem) - 1
 };
 
 #define LIST_SIZE 3
@@ -164,6 +164,15 @@ void doit(void)
 	char dn[128];
 	size_t dn_size;
 	unsigned int list_size;
+
+	gnutls_x509_privkey_t get_key;
+	gnutls_x509_crt_t *get_crts;
+	int n_get_crts;
+	gnutls_datum_t get_datum;
+	gnutls_x509_trust_list_t trust_list;
+	gnutls_x509_trust_list_iter_t trust_iter;
+	gnutls_x509_crt_t get_ca_crt;
+	int n_get_ca_crts;
 
 	/* this must be called once in the program
 	 */
@@ -203,6 +212,94 @@ void doit(void)
 
 	if (debug)
 		fprintf(stderr, "Issuer's DN: %s\n", dn);
+
+	/* test the getter functions of gnutls_certificate_credentials_t */
+
+	ret =
+	    gnutls_certificate_get_x509_key(x509_cred, 0, &get_key);
+	if (ret < 0)
+		fail("gnutls_certificate_get_x509_key");
+
+	ret =
+	    gnutls_x509_privkey_export2(get_key,
+	                                GNUTLS_X509_FMT_PEM,
+	                                &get_datum);
+	if (ret < 0)
+		fail("gnutls_x509_privkey_export2");
+
+	if (get_datum.size != server_key.size ||
+	    memcmp(get_datum.data, server_key.data, get_datum.size) != 0) {
+		fail(
+		    "exported key %u vs. %u\n\n%s\n\nvs.\n\n%s",
+		    get_datum.size, server_key.size,
+		    get_datum.data, server_key.data);
+	}
+
+	gnutls_free(get_datum.data);
+
+	ret =
+	    gnutls_certificate_get_x509_crt(x509_cred, 0, &get_crts, &n_get_crts);
+	if (ret < 0)
+		fail("gnutls_certificate_get_x509_crt");
+	if (n_get_crts != 1)
+		fail("gnutls_certificate_get_x509_crt: n_crts != 1");
+
+	ret =
+	    gnutls_x509_crt_export2(get_crts[0],
+	                            GNUTLS_X509_FMT_PEM,
+	                            &get_datum);
+	if (ret < 0)
+		fail("gnutls_x509_crt_export2");
+
+	if (get_datum.size != server_cert.size ||
+	    memcmp(get_datum.data, server_cert.data, get_datum.size) != 0) {
+		fail(
+		    "exported certificate %u vs. %u\n\n%s\n\nvs.\n\n%s",
+		    get_datum.size, server_cert.size,
+		    get_datum.data, server_cert.data);
+	}
+
+	gnutls_free(get_datum.data);
+
+	gnutls_certificate_get_trust_list(x509_cred, &trust_list);
+
+	n_get_ca_crts = 0;
+	trust_iter = NULL;
+	while (gnutls_x509_trust_list_iter_get_ca(trust_list,
+	                                          &trust_iter,
+	                                          &get_ca_crt) !=
+	       GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		ret =
+		    gnutls_x509_crt_export2(get_ca_crt,
+		                            GNUTLS_X509_FMT_PEM,
+		                            &get_datum);
+		if (ret < 0)
+			fail("gnutls_x509_crt_export2");
+
+		if (get_datum.size != ca.size ||
+		    memcmp(get_datum.data, ca.data, get_datum.size) != 0) {
+			fail(
+			    "exported CA certificate %u vs. %u\n\n%s\n\nvs.\n\n%s",
+			    get_datum.size, ca.size,
+			    get_datum.data, ca.data);
+		}
+
+		gnutls_x509_crt_deinit(get_ca_crt);
+		gnutls_free(get_datum.data);
+
+		++n_get_ca_crts;
+	}
+
+	if (n_get_ca_crts != 1)
+		fail("gnutls_x509_trust_list_iter_get_ca: n_cas != 1");
+	if (trust_iter != NULL)
+		fail("gnutls_x509_trust_list_iter_get_ca: iterator not NULL after iteration");
+
+	gnutls_x509_privkey_deinit(get_key);
+	for (i = 0; i < n_get_crts; i++)
+		gnutls_x509_crt_deinit(get_crts[i]);
+	gnutls_free(get_crts);
+
 	for (i = 0; i < list_size; i++)
 		gnutls_x509_crt_deinit(list[i]);
 	gnutls_certificate_free_credentials(x509_cred);

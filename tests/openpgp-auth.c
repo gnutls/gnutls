@@ -64,6 +64,49 @@ int key_recv_func(gnutls_session_t session, const unsigned char *keyfpr,
 	return 0;
 }
 
+void check_loaded_key(gnutls_certificate_credentials_t cred)
+{
+	int err;
+	gnutls_openpgp_privkey_t key;
+	gnutls_openpgp_crt_t *crts;
+	int n_crts;
+	gnutls_datum_t datum;
+	gnutls_openpgp_keyid_t keyid;
+	int i;
+
+	/* check that the getter functions for openpgp keys of
+	 * gnutls_certificate_credentials_t work and deliver the
+	 * expected key ID. */
+
+	err = gnutls_certificate_get_openpgp_key(cred, 0, &key);
+	if (err != 0)
+		fail("get openpgp key %s\n",
+		     gnutls_strerror(err));
+
+	gnutls_openpgp_privkey_get_subkey_id(key, 0, keyid);
+	if (keyid[0] != 0xf3 || keyid[1] != 0x0f || keyid[2] != 0xd4 || keyid[3] != 0x23 ||
+	    keyid[4] != 0xc1 || keyid[5] != 0x43 || keyid[6] != 0xe7 || keyid[7] != 0xba)
+		fail("incorrect key id (privkey)\n");
+
+	err = gnutls_certificate_get_openpgp_crt(cred, 0, &crts, &n_crts);
+	if (err != 0)
+		fail("get openpgp crts %s\n",
+		     gnutls_strerror(err));
+
+	if (n_crts != 1)
+		fail("openpgp n_crts != 1\n");
+
+	gnutls_openpgp_crt_get_subkey_id(crts[0], 0, keyid);
+	if (keyid[0] != 0xf3 || keyid[1] != 0x0f || keyid[2] != 0xd4 || keyid[3] != 0x23 ||
+	    keyid[4] != 0xc1 || keyid[5] != 0x43 || keyid[6] != 0xe7 || keyid[7] != 0xba)
+		fail("incorrect key id (pubkey)\n");
+
+	for (i = 0; i < n_crts; ++i)
+		gnutls_openpgp_crt_deinit(crts[i]);
+	gnutls_free(crts);
+	gnutls_openpgp_privkey_deinit(key);
+}
+
 void doit()
 {
 	int err, i;
@@ -151,6 +194,8 @@ void doit()
 				fail("client openpgp keys %s\n",
 				     gnutls_strerror(err));
 
+			check_loaded_key(cred);
+
 			err =
 			    gnutls_credentials_set(session,
 						   GNUTLS_CRD_CERTIFICATE,
@@ -229,6 +274,8 @@ void doit()
 			if (err != 0)
 				fail("server openpgp keys %s\n",
 				     gnutls_strerror(err));
+
+			check_loaded_key(cred);
 
 			err = gnutls_dh_params_init(&dh_params);
 			if (err)
