@@ -294,6 +294,9 @@ int gnutls_privkey_export_x509(gnutls_privkey_t pkey,
                                gnutls_x509_privkey_t * key);
 int gnutls_privkey_export_openpgp(gnutls_privkey_t pkey,
                                   gnutls_openpgp_privkey_t * key);
+int
+gnutls_privkey_export_pkcs11(gnutls_privkey_t pkey,
+                             gnutls_pkcs11_privkey_t *key);
 
 int gnutls_privkey_import_openpgp_raw(gnutls_privkey_t pkey,
 				      const gnutls_datum_t * data,

@@ -926,6 +926,7 @@ GNUTLS_3_1_0 {
 	gnutls_certificate_get_crt_raw;
 	gnutls_privkey_generate;
 	gnutls_privkey_export_x509;
+	gnutls_privkey_export_pkcs11;
 	gnutls_privkey_export_openpgp;
 	gnutls_fips140_mode_enabled;
 	gnutls_record_check_corked;

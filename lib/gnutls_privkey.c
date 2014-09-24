@@ -419,9 +419,6 @@ int gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key, const char *url)
 	return ret;
 }
 
-/* This is currently disabled because there is no routine to copy a
- * PKCS#11 private key. */
-#if 0
 /**
  * gnutls_privkey_export_pkcs11:
  * @pkey: The private key
@@ -452,7 +449,7 @@ gnutls_privkey_export_pkcs11(gnutls_privkey_t pkey,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = _gnutls_pkcs11_privkey_cpy(*key, pkey->key.openpgp); /* TODO */
+	ret = gnutls_pkcs11_privkey_cpy(*key, pkey->key.pkcs11);
 	if (ret < 0) {
 		gnutls_pkcs11_privkey_deinit(*key);
 		*key = NULL;
@@ -462,8 +459,6 @@ gnutls_privkey_export_pkcs11(gnutls_privkey_t pkey,
 
 	return 0;
 }
-#endif
-
 #endif				/* ENABLE_PKCS11 */
 
 /**
