@@ -231,14 +231,14 @@ ggl_INIT
 dnl GCC warnings to enable
 
 AC_ARG_ENABLE([gcc-warnings],
-  [AS_HELP_STRING([--enable-gcc-warnings],
-		  [turn on lots of GCC warnings (for developers)])],
+  [AS_HELP_STRING([--disable-gcc-warnings],
+		  [turn off lots of GCC warnings (for developers)])],
   [case $enableval in
      yes|no) ;;
      *)      AC_MSG_ERROR([bad value $enableval for gcc-warnings option]) ;;
    esac
    gl_gcc_warnings=$enableval],
-  [gl_gcc_warnings=no]
+  [gl_gcc_warnings=yes]
 )
 
 if test "$gl_gcc_warnings" = yes; then
