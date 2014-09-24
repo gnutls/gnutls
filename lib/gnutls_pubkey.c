@@ -1691,6 +1691,10 @@ gnutls_pubkey_encrypt_data(gnutls_pubkey_t key, unsigned int flags,
  * This function will read the certifcate and the signed data to
  * determine the hash algorithm used to generate the signature.
  *
+ * This function is only for informative purposes, as it does not
+ * return a cryptographically binding result. Modifications to the signature
+ * may cause this function to return an incorrect result.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
