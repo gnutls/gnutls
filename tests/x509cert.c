@@ -167,12 +167,12 @@ void doit(void)
 
 	gnutls_x509_privkey_t get_key;
 	gnutls_x509_crt_t *get_crts;
-	int n_get_crts;
+	unsigned n_get_crts;
 	gnutls_datum_t get_datum;
 	gnutls_x509_trust_list_t trust_list;
 	gnutls_x509_trust_list_iter_t trust_iter;
 	gnutls_x509_crt_t get_ca_crt;
-	int n_get_ca_crts;
+	unsigned n_get_ca_crts;
 
 	/* this must be called once in the program
 	 */

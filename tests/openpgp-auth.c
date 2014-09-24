@@ -64,15 +64,15 @@ int key_recv_func(gnutls_session_t session, const unsigned char *keyfpr,
 	return 0;
 }
 
+static
 void check_loaded_key(gnutls_certificate_credentials_t cred)
 {
 	int err;
 	gnutls_openpgp_privkey_t key;
 	gnutls_openpgp_crt_t *crts;
-	int n_crts;
-	gnutls_datum_t datum;
+	unsigned n_crts;
 	gnutls_openpgp_keyid_t keyid;
-	int i;
+	unsigned i;
 
 	/* check that the getter functions for openpgp keys of
 	 * gnutls_certificate_credentials_t work and deliver the

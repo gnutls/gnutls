@@ -1435,12 +1435,12 @@ int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
 				    int crl_list_size);
 
 int gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
-                                    int index,
+                                    unsigned index,
                                     gnutls_x509_privkey_t *key);
 int gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
-                                    int index,
+                                    unsigned index,
                                     gnutls_x509_crt_t **crt_list,
-                                    int *crt_list_size);
+                                    unsigned *crt_list_size);
 
   /* OCSP status request extension, RFC 6066 */
 typedef int (*gnutls_status_request_ocsp_func)

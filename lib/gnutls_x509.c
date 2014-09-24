@@ -1163,7 +1163,7 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
  */
 int
 gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
-                                int index,
+                                unsigned index,
                                 gnutls_x509_privkey_t *key)
 {
 	if (index >= res->ncerts) {
@@ -1201,11 +1201,12 @@ gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
  */
 int
 gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
-                                int index,
+                                unsigned index,
                                 gnutls_x509_crt_t **crt_list,
-                                int *crt_list_size)
+                                unsigned *crt_list_size)
 {
-	int ret, i;
+	int ret;
+	unsigned i;
 
 	if (index >= res->ncerts) {
 		gnutls_assert();
