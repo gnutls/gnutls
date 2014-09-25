@@ -55,6 +55,7 @@ dist-hook:
 	objdump -T $(srcdir)/lib/.libs/libgnutls.so.28  | grep -v ' \*UND\*' | awk '{print $$7 "@" $$6;}' | sort -u >symbols.last.tmp
 	diff -u symbols.last symbols.last.tmp >/dev/null 2>&1
 	rm -f symbols.last.tmp
+	abi-compliance-checker -abi -lib gnutls -old devel/abi3.2.xml -new devel/abi.xml
 	rm -f ChangeLog
 	make ChangeLog
 	cp -f ChangeLog $(distdir)/
