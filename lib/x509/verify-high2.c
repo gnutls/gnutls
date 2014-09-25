@@ -36,6 +36,12 @@
 
 #include <dirent.h>
 
+#ifndef _DIRENT_HAVE_D_TYPE
+# ifdef DT_UNKNOWN
+#  define _DIRENT_HAVE_D_TYPE
+# endif
+#endif
+
 /* Convenience functions for verify-high functionality 
  */
 
@@ -309,7 +315,11 @@ int load_dir_certs(const char *dirname,
 #else
 			struct dirent e;
 			ret = readdir_r(dirp, &e, &d);
-			if (ret == 0 && d != NULL && (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)) {
+			if (ret == 0 && d != NULL
+#ifdef _DIRENT_HAVE_D_TYPE
+				&& (d->d_type == DT_REG || d->d_type == DT_LNK || d->d_type == DT_UNKNOWN)
+#endif
+			) {
 #endif
 				snprintf(path, sizeof(path), "%s/%s",
 					 dirname, d->d_name);
