@@ -77,6 +77,9 @@ int gnutls_heartbeat_allowed(gnutls_session_t session, unsigned int type)
 {
 	extension_priv_data_t epriv;
 
+	if (session->internals.handshake_in_progress != 0)
+		return 0; /* not allowed */
+
 	if (_gnutls_ext_get_session_data
 	    (session, GNUTLS_EXTENSION_HEARTBEAT, &epriv) < 0)
 		return 0;	/* Not enabled */
