@@ -548,8 +548,10 @@ int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
  * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
  *
  * This function adds the system's default trusted certificate
- * authorities to the trusted list. Note that on unsupported system
+ * authorities to the trusted list. Note that on unsupported systems
  * this function returns %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * This function implies the flag %GNUTLS_TL_NO_DUPLICATES.
  *
  * Returns: The number of added elements or a negative error code on error.
  *
@@ -560,7 +562,7 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
 					unsigned int tl_flags,
 					unsigned int tl_vflags)
 {
-	return add_system_trust(list, tl_flags, tl_vflags);
+	return add_system_trust(list, tl_flags|GNUTLS_TL_NO_DUPLICATES, tl_vflags);
 }
 
 #if defined(_WIN32)
