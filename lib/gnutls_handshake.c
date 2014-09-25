@@ -2589,12 +2589,14 @@ gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 #define IMED_RET( str, ret, allow_alert) do { \
 	if (ret < 0) { \
 		/* EAGAIN and INTERRUPTED are always non-fatal */ \
-		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) \
+		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_LARGE_PACKET) \
 			return ret; \
                 /* a warning alert might interrupt handshake */ \
 		if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
+		if (gnutls_error_is_fatal(ret) == 0) ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); \
+		session_invalidate(session); \
 		_gnutls_handshake_hash_buffers_clear(session); \
 		return ret; \
 	} } while (0)

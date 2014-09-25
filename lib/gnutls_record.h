@@ -73,4 +73,9 @@ inline static unsigned max_decrypted_size(gnutls_session_t session)
 	return size;
 }
 
+inline static void session_invalidate(gnutls_session_t session)
+{
+	session->internals.invalid_connection = 1;
+}
+
 #endif
