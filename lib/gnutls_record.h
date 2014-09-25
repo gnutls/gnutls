@@ -47,4 +47,9 @@ ssize_t _gnutls_recv_int (gnutls_session_t session, content_type_t type,
                           size_t sizeofdata, void* seq, unsigned int ms);
 int _gnutls_get_max_decrypted_data(gnutls_session_t session);
 
+inline static void session_invalidate(gnutls_session_t session)
+{
+	session->internals.invalid_connection = 1;
+}
+
 #endif

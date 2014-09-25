@@ -354,13 +354,6 @@ gnutls_bye (gnutls_session_t session, gnutls_close_request_t how)
 }
 
 inline static void
-session_invalidate (gnutls_session_t session)
-{
-  session->internals.invalid_connection = 1;
-}
-
-
-inline static void
 session_unresumable (gnutls_session_t session)
 {
   session->internals.resumable = RESUME_FALSE;
