@@ -385,11 +385,6 @@ static const gnutls_error_entry non_fatal_error_entries[] = {
 	ERROR_ENTRY(N_("Function was interrupted."), GNUTLS_E_INTERRUPTED),
 	ERROR_ENTRY(N_("Rehandshake was requested by the peer."),
 		    GNUTLS_E_REHANDSHAKE),
-	ERROR_ENTRY(N_
-		    ("Received a TLS/IA Intermediate Phase Finished message"),
-		    GNUTLS_E_WARNING_IA_IPHF_RECEIVED),
-	ERROR_ENTRY(N_("Received a TLS/IA Final Phase Finished message"),
-		    GNUTLS_E_WARNING_IA_FPHF_RECEIVED),
 	{NULL, NULL, 0}
 };
 
