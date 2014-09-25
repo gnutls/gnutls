@@ -944,6 +944,9 @@ typedef struct {
 
 	/* DTLS session state */
 	dtls_st dtls;
+	/* In case of clients that don't handle GNUTLS_E_LARGE_PACKET, don't
+	 * force them into an infinite loop */
+	unsigned handshake_large_loops;
 
 	/* if set it means that the master key was set using
 	 * gnutls_session_set_master() rather than being negotiated. */
