@@ -102,6 +102,7 @@ AC_ARG_ENABLE(hardware-acceleration,
 hw_accel=none
 
 
+use_padlock=no
 if test "$use_accel" != "no"; then
 case $host_cpu in
   i?86 | x86_64 | amd64)
@@ -111,6 +112,7 @@ case $host_cpu in
       else
         hw_accel="x86"
       fi
+      use_padlock=yes
   ;;
   *)
   ;;
@@ -120,7 +122,7 @@ fi
 
 AC_ARG_ENABLE(padlock,
   AS_HELP_STRING([--disable-padlock], [unconditionally disable padlock acceleration]),
-    use_padlock=$enableval, use_padlock=yes)
+    use_padlock=$enableval)
 
 if test "$use_padlock" != "no"; then
     AC_DEFINE([ENABLE_PADLOCK], 1, [Enable padlock acceleration])
