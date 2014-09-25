@@ -2915,7 +2915,7 @@ gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt_t cert,
 {
 	int ret;
 	gnutls_datum_t dist_points = { NULL, 0 };
-	gnutls_x509_subject_alt_name_t type;
+	unsigned type;
 	gnutls_x509_crl_dist_points_t cdp = NULL;
 	gnutls_datum_t t_san;
 
