@@ -604,7 +604,7 @@ cert_callback(gnutls_session_t session,
 
 /* initializes a gnutls_session_t with some defaults.
  */
-static gnutls_session_t init_tls_session(const char *hostname)
+static gnutls_session_t init_tls_session(const char *host)
 {
 	const char *err;
 	int ret;
@@ -631,9 +631,9 @@ static gnutls_session_t init_tls_session(const char *hostname)
 	/* allow the use of private ciphersuites.
 	 */
 	if (disable_extensions == 0 && disable_sni == 0) {
-		if (hostname != NULL && is_ip(hostname) == 0)
+		if (host != NULL && is_ip(host) == 0)
 			gnutls_server_name_set(session, GNUTLS_NAME_DNS,
-					       hostname, strlen(hostname));
+					       host, strlen(host));
 	}
 
 	if (HAVE_OPT(DH_BITS))
@@ -1520,26 +1520,26 @@ psk_callback(gnutls_session_t session, char **username,
 	if (HAVE_OPT(PSKUSERNAME))
 		*username = gnutls_strdup(OPT_ARG(PSKUSERNAME));
 	else {
-		char *tmp = NULL;
+		char *p = NULL;
 		size_t n;
 
 		printf("Enter PSK identity: ");
 		fflush(stdout);
-		getline(&tmp, &n, stdin);
+		getline(&p, &n, stdin);
 
-		if (tmp == NULL) {
+		if (p == NULL) {
 			fprintf(stderr,
 				"No username given, aborting...\n");
 			return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 		}
 
-		if (tmp[strlen(tmp) - 1] == '\n')
-			tmp[strlen(tmp) - 1] = '\0';
-		if (tmp[strlen(tmp) - 1] == '\r')
-			tmp[strlen(tmp) - 1] = '\0';
+		if (p[strlen(p) - 1] == '\n')
+			p[strlen(p) - 1] = '\0';
+		if (p[strlen(p) - 1] == '\r')
+			p[strlen(p) - 1] = '\0';
 
-		*username = gnutls_strdup(tmp);
-		free(tmp);
+		*username = gnutls_strdup(p);
+		free(p);
 	}
 	if (!*username)
 		return GNUTLS_E_MEMORY_ERROR;

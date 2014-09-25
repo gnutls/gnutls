@@ -37,24 +37,24 @@ void _dtls_reset_hsk_state(gnutls_session_t session);
 
 
 #define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r) { \
-  struct timespec now; \
-  unsigned int diff; \
-  gettime(&now); \
+  struct timespec _now; \
+  unsigned int _diff; \
+  gettime(&_now); \
    \
-  diff = timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time); \
-  if (diff > session->internals.dtls.total_timeout_ms) \
+  _diff = timespec_sub_ms(&_now, &session->internals.dtls.handshake_start_time); \
+  if (_diff > session->internals.dtls.total_timeout_ms) \
     { \
-      _gnutls_dtls_log("Session timeout: %u ms\n", diff); \
+      _gnutls_dtls_log("Session timeout: %u ms\n", _diff); \
       return gnutls_assert_val(GNUTLS_E_TIMEDOUT); \
     } \
   else \
     { \
-      int rr; \
-      if (r != GNUTLS_E_INTERRUPTED) rr = GNUTLS_E_AGAIN; \
-      else rr = r; \
+      int _rr; \
+      if (r != GNUTLS_E_INTERRUPTED) _rr = GNUTLS_E_AGAIN; \
+      else _rr = r; \
       if (session->internals.dtls.blocking != 0) \
         millisleep(50); \
-      return gnutls_assert_val(rr); \
+      return gnutls_assert_val(_rr); \
     } \
   }
 
@@ -101,10 +101,10 @@ inline static void _dtls_async_timer_check(gnutls_session_t session)
 		return;
 
 	if (session->internals.dtls.async_term != 0) {
-		time_t now = time(0);
+		time_t _now = time(0);
 
 		/* check if we need to expire the queued handshake data */
-		if (now > session->internals.dtls.async_term) {
+		if (_now > session->internals.dtls.async_term) {
 			_dtls_async_timer_delete(session);
 		}
 	}

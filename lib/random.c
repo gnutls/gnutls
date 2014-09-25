@@ -94,7 +94,7 @@ int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len)
  *
  * Since: 3.1.7
  **/
-void gnutls_rnd_refresh()
+void gnutls_rnd_refresh(void)
 {
 	_gnutls_rnd_refresh();
 }

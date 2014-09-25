@@ -498,9 +498,9 @@ gnutls_privkey_import_ext(gnutls_privkey_t pkey,
  * @pkey: The private key
  * @pk: The public key algorithm
  * @userdata: private data to be provided to the callbacks
- * @sign_func: callback for signature operations
- * @decrypt_func: callback for decryption operations
- * @deinit_func: a deinitialization function
+ * @sign_fn: callback for signature operations
+ * @decrypt_fn: callback for decryption operations
+ * @deinit_fn: a deinitialization function
  * @flags: Flags for the import
  *
  * This function will associate the given callbacks with the
@@ -524,9 +524,9 @@ int
 gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
 			   gnutls_pk_algorithm_t pk,
 			   void *userdata,
-			   gnutls_privkey_sign_func sign_func,
-			   gnutls_privkey_decrypt_func decrypt_func,
-			   gnutls_privkey_deinit_func deinit_func,
+			   gnutls_privkey_sign_func sign_fn,
+			   gnutls_privkey_decrypt_func decrypt_fn,
+			   gnutls_privkey_deinit_func deinit_fn,
 			   unsigned int flags)
 {
 	int ret;
@@ -537,19 +537,19 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
 		return ret;
 	}
 
-	if (sign_func == NULL && decrypt_func == NULL)
+	if (sign_fn == NULL && decrypt_fn == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	pkey->key.ext.sign_func = sign_func;
-	pkey->key.ext.decrypt_func = decrypt_func;
-	pkey->key.ext.deinit_func = deinit_func;
+	pkey->key.ext.sign_func = sign_fn;
+	pkey->key.ext.decrypt_func = decrypt_fn;
+	pkey->key.ext.deinit_func = deinit_fn;
 	pkey->key.ext.userdata = userdata;
 	pkey->type = GNUTLS_PRIVKEY_EXT;
 	pkey->pk_algorithm = pk;
 	pkey->flags = flags;
 
 	/* Ensure gnutls_privkey_deinit() calls the deinit_func */
-	if (deinit_func)
+	if (deinit_fn)
 		pkey->flags |= GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE;
 
 	return 0;
@@ -560,11 +560,11 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
  * @pkey: The private key
  * @pk: The public key algorithm, when @pk_func isn't provided
  * @userdata: private data to be provided to the callbacks
- * @sign_func: callback for signature operations
- * @decrypt_func: callback for decryption operations
- * @deinit_func: a deinitialization function
- * @pk_func: returns the public key algorithm (may be %NULL; if set @pk will be ignored)
- * @copy_func: copies a context
+ * @sign_fn: callback for signature operations
+ * @decrypt_fn: callback for decryption operations
+ * @deinit_fn: a deinitialization function
+ * @pk_fn: returns the public key algorithm (may be %NULL; if set @pk will be ignored)
+ * @copy_fn: copies a context
  * @flags: Flags for the import
  *
  * This function will associate the given callbacks with the
@@ -586,11 +586,11 @@ int
 gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
 			   gnutls_pk_algorithm_t pk,
 			   void *userdata,
-			   gnutls_privkey_sign_func sign_func,
-			   gnutls_privkey_decrypt_func decrypt_func,
-			   gnutls_privkey_deinit_func deinit_func,
-			   gnutls_privkey_pk_func pk_func,
-			   gnutls_privkey_copy_func copy_func,
+			   gnutls_privkey_sign_func sign_fn,
+			   gnutls_privkey_decrypt_func decrypt_fn,
+			   gnutls_privkey_deinit_func deinit_fn,
+			   gnutls_privkey_pk_func pk_fn,
+			   gnutls_privkey_copy_func copy_fn,
 			   unsigned int flags)
 {
 	int ret;
@@ -601,21 +601,21 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
 		return ret;
 	}
 
-	if (sign_func == NULL && decrypt_func == NULL)
+	if (sign_fn == NULL && decrypt_fn == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	pkey->key.ext.sign_func = sign_func;
-	pkey->key.ext.decrypt_func = decrypt_func;
-	pkey->key.ext.deinit_func = deinit_func;
-	pkey->key.ext.pk_func = pk_func;
-	pkey->key.ext.copy_func = copy_func;
+	pkey->key.ext.sign_func = sign_fn;
+	pkey->key.ext.decrypt_func = decrypt_fn;
+	pkey->key.ext.deinit_func = deinit_fn;
+	pkey->key.ext.pk_func = pk_fn;
+	pkey->key.ext.copy_func = copy_fn;
 	pkey->key.ext.userdata = userdata;
 	pkey->type = GNUTLS_PRIVKEY_EXT;
 	pkey->pk_algorithm = pk;
 	pkey->flags = flags;
 
 	/* Ensure gnutls_privkey_deinit() calls the deinit_func */
-	if (deinit_func)
+	if (deinit_fn)
 		pkey->flags |= GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE;
 
 	return 0;

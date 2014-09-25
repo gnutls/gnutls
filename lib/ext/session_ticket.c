@@ -257,7 +257,6 @@ session_ticket_recv_params(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		struct ticket_st ticket;
 		const uint8_t *encrypted_state;
-		int ret;
 
 		/* The client requested a new session ticket. */
 		if (data_size == 0) {

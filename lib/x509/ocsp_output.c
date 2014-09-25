@@ -114,17 +114,17 @@ static void print_req(gnutls_buffer_st * str, gnutls_ocsp_req_t req)
 
 		if (memcmp(oid.data, GNUTLS_OCSP_NONCE, oid.size) == 0) {
 			gnutls_datum_t nonce;
-			unsigned int critical;
+			unsigned int ncrit;
 
 			ret =
-			    gnutls_ocsp_req_get_nonce(req, &critical,
+			    gnutls_ocsp_req_get_nonce(req, &ncrit,
 						      &nonce);
 			if (ret != GNUTLS_E_SUCCESS) {
 				addf(str, "error: get_nonce: %s\n",
 				     gnutls_strerror(ret));
 			} else {
 				addf(str, "\t\tNonce%s: ",
-				     critical ? " (critical)" : "");
+				     ncrit ? " (critical)" : "");
 				_gnutls_buffer_hexprint(str, nonce.data,
 							nonce.size);
 				adds(str, "\n");
@@ -471,17 +471,17 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 
 		if (memcmp(oid.data, GNUTLS_OCSP_NONCE, oid.size) == 0) {
 			gnutls_datum_t nonce;
-			unsigned int critical;
+			unsigned int ncrit;
 
 			ret =
-			    gnutls_ocsp_resp_get_nonce(resp, &critical,
+			    gnutls_ocsp_resp_get_nonce(resp, &ncrit,
 						       &nonce);
 			if (ret != GNUTLS_E_SUCCESS) {
 				addf(str, "error: get_nonce: %s\n",
 				     gnutls_strerror(ret));
 			} else {
 				addf(str, "\t\tNonce%s: ",
-				     critical ? " (critical)" : "");
+				     ncrit ? " (critical)" : "");
 				_gnutls_buffer_hexprint(str, nonce.data,
 							nonce.size);
 				adds(str, "\n");

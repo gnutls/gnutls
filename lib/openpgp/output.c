@@ -461,7 +461,6 @@ print_oneline(gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
 	{
 		char fpr[128];
 		size_t fpr_size = sizeof(fpr);
-		int err;
 
 		err =
 		    gnutls_openpgp_crt_get_fingerprint(cert, fpr,

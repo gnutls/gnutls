@@ -1464,6 +1464,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 	uint8_t key_id[20];
 	int privkey_ok = 0;
 	unsigned int i;
+	int elements_in_bag;
 
 	*key = NULL;
 
@@ -1472,8 +1473,6 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 
 	/* find the first private key */
 	for (;;) {
-		int elements_in_bag;
-		int i;
 
 		ret = gnutls_pkcs12_bag_init(&bag);
 		if (ret < 0) {
@@ -1517,7 +1516,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 			goto done;
 		}
 
-		for (i = 0; i < elements_in_bag; i++) {
+		for (i = 0; i < (unsigned)elements_in_bag; i++) {
 			int type;
 			gnutls_datum_t data;
 
@@ -1602,9 +1601,6 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 	idx = 0;
 	bag = NULL;
 	for (;;) {
-		int elements_in_bag;
-		int i;
-
 		ret = gnutls_pkcs12_bag_init(&bag);
 		if (ret < 0) {
 			bag = NULL;
@@ -1640,7 +1636,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 			goto done;
 		}
 
-		for (i = 0; i < elements_in_bag; i++) {
+		for (i = 0; i < (unsigned)elements_in_bag; i++) {
 			int type;
 			gnutls_datum_t data;
 			gnutls_x509_crt_t this_cert;

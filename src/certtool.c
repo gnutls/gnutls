@@ -2412,15 +2412,15 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 	return 0;
 }
 
-static void print_verification_res(FILE * outfile, unsigned int output)
+static void print_verification_res(FILE * out, unsigned int output)
 {
 	gnutls_datum_t pout;
 	int ret;
 
 	if (output) {
-		fprintf(outfile, "Not verified.");
+		fprintf(out, "Not verified.");
 	} else {
-		fprintf(outfile, "Verified.");
+		fprintf(out, "Verified.");
 	}
 
 	ret =
@@ -2432,7 +2432,7 @@ static void print_verification_res(FILE * outfile, unsigned int output)
 		exit(EXIT_FAILURE);
 	}
 
-	fprintf(outfile, " %s", pout.data);
+	fprintf(out, " %s", pout.data);
 	gnutls_free(pout.data);
 }
 

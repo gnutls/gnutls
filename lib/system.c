@@ -277,7 +277,7 @@ mutex_deinit_func gnutls_mutex_deinit = gnutls_system_mutex_deinit;
 mutex_lock_func gnutls_mutex_lock = gnutls_system_mutex_lock;
 mutex_unlock_func gnutls_mutex_unlock = gnutls_system_mutex_unlock;
 
-int gnutls_system_global_init()
+int gnutls_system_global_init(void)
 {
 #ifdef _WIN32
 #if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
@@ -301,7 +301,7 @@ int gnutls_system_global_init()
 	return 0;
 }
 
-void gnutls_system_global_deinit()
+void gnutls_system_global_deinit(void)
 {
 #ifdef _WIN32
 #if defined(__MINGW32__) && !defined(__MINGW64__) && __MINGW32_MAJOR_VERSION <= 3 && __MINGW32_MINOR_VERSION <= 20
