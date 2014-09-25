@@ -955,7 +955,11 @@ typedef struct
   recv_state_t recv_state; /* state of the receive function */
   
   unsigned int sc_random_set:1;
-  
+
+  /* In case of clients that don't handle GNUTLS_E_LARGE_PACKET, don't
+   * force them into an infinite loop */
+  unsigned handshake_large_loops;
+
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */
 } internals_st;

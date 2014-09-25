@@ -269,6 +269,7 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
   
   session->internals.dtls.hsk_read_seq = 0;
   session->internals.dtls.hsk_write_seq = 0;
+  session->internals.handshake_large_loops = 0;
 }
 
 void
