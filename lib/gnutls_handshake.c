@@ -2491,7 +2491,8 @@ static int _gnutls_recv_supplemental(gnutls_session_t session)
  * full handshake will be performed.
  *
  * The non-fatal errors expected by this function are:
- * %GNUTLS_E_INTERRUPTED, %GNUTLS_E_AGAIN, and %GNUTLS_E_WARNING_ALERT_RECEIVED.
+ * %GNUTLS_E_INTERRUPTED, %GNUTLS_E_AGAIN, 
+ * %GNUTLS_E_LARGE_PACKET and %GNUTLS_E_WARNING_ALERT_RECEIVED.
  * The former two interrupt the handshake procedure due to the lower
  * layer being interrupted, and the latter because of an alert that
  * may be sent by a server (it is always a good idea to check any
@@ -2600,12 +2601,15 @@ gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 #define IMED_RET( str, ret, allow_alert) do { \
 	if (ret < 0) { \
 		/* EAGAIN and INTERRUPTED are always non-fatal */ \
-		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) \
+		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_LARGE_PACKET) \
 			return ret; \
                 /* a warning alert might interrupt handshake */ \
 		if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
+		/* do not allow non-fatal errors at this point */ \
+		if (gnutls_error_is_fatal(ret) == 0) ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); \
+		session_invalidate(session); \
 		_gnutls_handshake_hash_buffers_clear(session); \
 		return ret; \
 	} } while (0)

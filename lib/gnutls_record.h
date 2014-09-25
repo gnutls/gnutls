@@ -101,4 +101,9 @@ unsigned int get_total_headers2(gnutls_session_t session, record_parameters_st *
 	return total + _gnutls_cipher_get_explicit_iv_size(params->cipher);
 }
 
+inline static void session_invalidate(gnutls_session_t session)
+{
+	session->internals.invalid_connection = 1;
+}
+
 #endif
