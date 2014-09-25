@@ -169,7 +169,7 @@ static void cmd_parser(int argc, char **argv)
 	gnutls_global_deinit();
 }
 
-static void tpm_generate(FILE * outfile, unsigned int key_type,
+static void tpm_generate(FILE * out, unsigned int key_type,
 			 unsigned int bits, unsigned int flags)
 {
 	int ret;
@@ -202,14 +202,14 @@ static void tpm_generate(FILE * outfile, unsigned int key_type,
 
 /*  fwrite (pubkey.data, 1, pubkey.size, outfile);
   fputs ("\n", outfile);*/
-	fwrite(privkey.data, 1, privkey.size, outfile);
-	fputs("\n", outfile);
+	fwrite(privkey.data, 1, privkey.size, out);
+	fputs("\n", out);
 
 	gnutls_free(privkey.data);
 	gnutls_free(pubkey.data);
 }
 
-static void tpm_delete(const char *url, FILE * outfile)
+static void tpm_delete(const char *url, FILE * out)
 {
 	int ret;
 	char *srk_pass;
@@ -223,10 +223,10 @@ static void tpm_delete(const char *url, FILE * outfile)
 		exit(1);
 	}
 
-	fprintf(outfile, "Key %s deleted\n", url);
+	fprintf(out, "Key %s deleted\n", url);
 }
 
-static void tpm_list(FILE * outfile)
+static void tpm_list(FILE * out)
 {
 	int ret;
 	gnutls_tpm_key_list_t list;
@@ -240,7 +240,7 @@ static void tpm_list(FILE * outfile)
 		exit(1);
 	}
 
-	fprintf(outfile, "Available keys:\n");
+	fprintf(out, "Available keys:\n");
 	for (i = 0;; i++) {
 		ret = gnutls_tpm_key_list_get_url(list, i, &url, 0);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
@@ -251,14 +251,14 @@ static void tpm_list(FILE * outfile)
 			exit(1);
 		}
 
-		fprintf(outfile, "\t%u: %s\n", i, url);
+		fprintf(out, "\t%u: %s\n", i, url);
 		gnutls_free(url);
 	}
 
-	fputs("\n", outfile);
+	fputs("\n", out);
 }
 
-static void tpm_pubkey(const char *url, FILE * outfile)
+static void tpm_pubkey(const char *url, FILE * out)
 {
 	int ret;
 	char *srk_pass;
@@ -280,7 +280,7 @@ static void tpm_pubkey(const char *url, FILE * outfile)
 		exit(1);
 	}
 
-	_pubkey_info(outfile, GNUTLS_CRT_PRINT_FULL, pubkey);
+	_pubkey_info(out, GNUTLS_CRT_PRINT_FULL, pubkey);
 
 	gnutls_pubkey_deinit(pubkey);
 }

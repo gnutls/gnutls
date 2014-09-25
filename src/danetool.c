@@ -194,7 +194,8 @@ static void dane_check(const char *host, const char *proto,
 	size_t size;
 	unsigned del = 0;
 	unsigned vflags = DANE_VFLAG_FAIL_IF_NOT_CHECKED;
-	const char *str;
+	const char *cstr;
+	char *str;
 	gnutls_x509_crt_t *clist = NULL;
 	unsigned int clist_size = 0;
 	gnutls_datum_t certs[MAX_CLIST_SIZE];
@@ -249,7 +250,6 @@ static void dane_check(const char *host, const char *proto,
 	}
 
 	if (ENABLED_OPT(PRINT_RAW)) {
-		unsigned entries;
 		gnutls_datum_t t;
 		char **dane_data;
 		int *dane_data_len;
@@ -266,7 +266,6 @@ static void dane_check(const char *host, const char *proto,
 		}
 
 		for (i=0;i<entries;i++) {
-			char *str;
 			size_t str_size;
 			t.data = (void*)dane_data[i];
 			t.size = dane_data_len[i];
@@ -357,17 +356,17 @@ static void dane_check(const char *host, const char *proto,
 			port, proto, host, usage, type, match, lbuffer);
 
 		if (!HAVE_OPT(QUIET)) {
-			str = dane_cert_usage_name(usage);
-			if (str == NULL) str= "Unknown";
-			fprintf(outfile, "Certificate usage: %s (%.2x)\n", str, usage);
+			cstr = dane_cert_usage_name(usage);
+			if (cstr == NULL) cstr= "Unknown";
+			fprintf(outfile, "Certificate usage: %s (%.2x)\n", cstr, usage);
 
-			str = dane_cert_type_name(type);
-			if (str == NULL) str= "Unknown";
-			fprintf(outfile, "Certificate type:  %s (%.2x)\n", str, type);
+			cstr = dane_cert_type_name(type);
+			if (cstr == NULL) cstr= "Unknown";
+			fprintf(outfile, "Certificate type:  %s (%.2x)\n", cstr, type);
 
-			str = dane_match_type_name(match);
-			if (str == NULL) str= "Unknown";
-			fprintf(outfile, "Contents:          %s (%.2x)\n", str, match);
+			cstr = dane_match_type_name(match);
+			if (cstr == NULL) cstr= "Unknown";
+			fprintf(outfile, "Contents:          %s (%.2x)\n", cstr, match);
 			fprintf(outfile, "Data:              %s\n", lbuffer);
 		}
 
