@@ -179,7 +179,7 @@ inline static int get_errno(gnutls_session_t session)
 }
 
 inline static
-int errno_to_gerr(int err)
+int errno_to_gerr(int err, unsigned dtls)
 {
 	switch (err) {
 	case EAGAIN:
@@ -187,7 +187,10 @@ int errno_to_gerr(int err)
 	case EINTR:
 		return GNUTLS_E_INTERRUPTED;
 	case EMSGSIZE:
-		return GNUTLS_E_LARGE_PACKET;
+		if (dtls != 0)
+			return GNUTLS_E_LARGE_PACKET;
+		else
+			return GNUTLS_E_PUSH_ERROR;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_PUSH_ERROR;
@@ -234,7 +237,7 @@ _gnutls_dgram_read(gnutls_session_t session, mbuffer_st ** bufel,
 		    ("READ: %d returned from %p, errno=%d gerrno=%d\n",
 		     (int) i, fd, errno, session->internals.errnum);
 
-		ret = errno_to_gerr(err);
+		ret = errno_to_gerr(err, 1);
 		goto cleanup;
 	} else {
 		_gnutls_read_log("READ: Got %d bytes from %p\n", (int) i,
@@ -327,7 +330,7 @@ _gnutls_stream_read(gnutls_session_t session, mbuffer_st ** bufel,
 					goto finish;
 				}
 
-				ret = errno_to_gerr(err);
+				ret = errno_to_gerr(err, 0);
 				goto cleanup;
 			} else {
 				gnutls_assert();
@@ -441,7 +444,7 @@ _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
 		int err = get_errno(session);
 		_gnutls_debug_log("errno: %d\n", err);
 
-		return errno_to_gerr(err);
+		return errno_to_gerr(err, IS_DTLS(session));
 	}
 	return i;
 }
@@ -684,7 +687,7 @@ int _gnutls_io_check_recv(gnutls_session_t session, unsigned int ms)
 		_gnutls_read_log
 		    ("READ_TIMEOUT: %d returned from %p, errno=%d (timeout: %u)\n",
 		     (int) ret, fd, err, ms);
-		return errno_to_gerr(err);
+		return errno_to_gerr(err, IS_DTLS(session));
 	}
 
 	if (ret > 0)
