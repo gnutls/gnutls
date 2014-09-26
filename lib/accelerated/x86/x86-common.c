@@ -41,8 +41,10 @@
 /* ebx, ecx, edx 
  * This is a format compatible with openssl's CPUID detection.
  */
-#ifdef __GNUC__
+#if defined(__GNUC__)
 __attribute__((visibility("hidden")))
+#elif defined(__SUNPRO_C)
+__hidden
 #endif
 unsigned int _gnutls_x86_cpuid_s[3];
 
