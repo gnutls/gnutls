@@ -3007,9 +3007,7 @@ static int recv_handshake_final(gnutls_session_t session, int init)
 		if (ret <= 0) {
 			ERR("recv ChangeCipherSpec", ret);
 			gnutls_assert();
-			return (ret <
-				0) ? ret :
-			    GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+			return (ret<0)?ret:GNUTLS_E_UNEXPECTED_PACKET;
 		}
 
 		if (vers->id == GNUTLS_DTLS0_9)
