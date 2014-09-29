@@ -555,6 +555,13 @@ int print_info(gnutls_session_t session, int verbose, int print_cert)
 	       (gnutls_compression_get(session)));
 	printf("- Compression: %s\n", tmp);
 
+	printf("- Options:");
+	if (gnutls_session_ext_master_secret_status(session)!=0)
+		printf(" extended master secret,");
+	if (gnutls_safe_renegotiation_status(session)!=0)
+		printf(" safe renegotiation");
+	printf("\n");
+
 #ifdef ENABLE_DTLS_SRTP
 	rc = gnutls_srtp_get_selected_profile(session, &srtp_profile);
 	if (rc == 0)
