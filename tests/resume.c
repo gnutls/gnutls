@@ -159,6 +159,12 @@ static void client(int sds[], struct params_res *params)
 		}
 
 		if (t == 0) {	/* the first time we connect */
+			/* check whether using NO_EXTENSIONS had any effect */
+			ret = gnutls_session_ext_master_secret_status(session);
+			if (ret != 0) {
+				fail("Extended master secret should have not been negotiated by default (ret: %d)\n", ret);
+			}
+
 			/* get the session data size */
 			ret =
 			    gnutls_session_get_data2(session,
