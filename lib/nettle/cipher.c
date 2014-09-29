@@ -41,8 +41,6 @@
 /* Functions that refer to the nettle library.
  */
 
-#define MAX_BLOCK_SIZE 32
-
 typedef void (*encrypt_func) (void *, nettle_crypt_func, unsigned,
 			      uint8_t *, unsigned, uint8_t *,
 			      const uint8_t *);
@@ -76,7 +74,7 @@ struct nettle_cipher_ctx {
 		struct salsa20_ctx salsa20;
 	} ctx;
 	void *ctx_ptr;
-	uint8_t iv[MAX_BLOCK_SIZE];
+	uint8_t iv[MAX_CIPHER_BLOCK_SIZE];
 	gnutls_cipher_algorithm_t algo;
 	size_t block_size;
 	nettle_crypt_func *i_encrypt;

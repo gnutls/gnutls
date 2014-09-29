@@ -514,7 +514,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 		if (explicit_iv
 		    && _gnutls_auth_cipher_is_aead(&params->read.
 						   cipher_state)) {
-			uint8_t nonce[blocksize];
+			uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
 			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
 			 */
 			if (unlikely
