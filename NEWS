@@ -34,6 +34,8 @@ when available.
 
 ** certtool: it will print the A-label (ACE) names in addition to UTF-8.
 
+** guile: new 'set-session-server-name!' procedure; see the manual for details.
+
 ** API and ABI modifications:
 gnutls_pkcs12_generate_mac2: Added
 gnutls_pkcs12_mac_info: Added
@@ -56,10 +58,6 @@ gnutls_certificate_get_x509_key: Added
 gnutls_certificate_get_x509_crt: Added
 gnutls_certificate_get_openpgp_key: Added
 gnutls_certificate_get_openpgp_crt: Added
-
-** guile: new 'set-session-server-name!' procedure
-
-See the manual for details.
 
 
 * Version 3.3.6 (released 2014-07-23)
