@@ -37,7 +37,7 @@ enum {
 };
 
 /* Type definition for the filter function. */
-typedef cdk_error_t(*filter_fnct_t) (void *uint8_t, int ctl, FILE * in,
+typedef int(*filter_fnct_t) (void *uint8_t, int ctl, FILE * in,
 				     FILE * out);
 
 /* The stream filter context structure. */
