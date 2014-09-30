@@ -51,12 +51,10 @@ Documentation License''.
 
 @contents
 
-@ifnottex
 @node Top
 @top GnuTLS-Guile
 
 @insertcopying
-@end ifnottex
 
 @menu
 * Preface::                     Preface.
