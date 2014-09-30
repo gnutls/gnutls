@@ -10,6 +10,9 @@ Reported by Joseph Peruski.
 
 ** libgnutls-dane: Do not require the CA on a ca match to be direct CA.
 
+** guile: new 'set-session-server-name!' procedure; see the manual for
+details.
+
 ** API and ABI modifications:
 No changes since last version.
 
