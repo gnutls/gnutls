@@ -205,10 +205,16 @@ void doit(void)
 	if (ret < 0)
 		fail("gnutls_certificate_get_isser");
 
+	ret =
+	    gnutls_certificate_get_issuer(x509_cred, list[0], &issuer, GNUTLS_TL_GET_COPY);
+	if (ret < 0)
+		fail("gnutls_certificate_get_isser");
+
 	dn_size = sizeof(dn);
 	ret = gnutls_x509_crt_get_dn(issuer, dn, &dn_size);
 	if (ret < 0)
 		fail("gnutls_certificate_get_isser");
+	gnutls_x509_crt_deinit(issuer);
 
 	if (debug)
 		fprintf(stderr, "Issuer's DN: %s\n", dn);
