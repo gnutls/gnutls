@@ -191,9 +191,10 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	gnutls_x509_crt_t *peer_certificate_list;
 	gnutls_datum_t resp;
 	int peer_certificate_list_size, i, x, ret;
-	gnutls_x509_crt_t issuer;
+	gnutls_x509_crt_t issuer = NULL;
 	unsigned int ocsp_status = 0;
 	unsigned int verify_flags;
+	unsigned issuer_deinit = 0;
 
 	/* No OCSP check so far */
 	session->internals.ocsp_check_ok = 0;
@@ -264,21 +265,25 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	if (ret < 0)
 		goto skip_ocsp;
 
-	if (peer_certificate_list_size > 1)
+	if (peer_certificate_list_size > 1) {
 		issuer = peer_certificate_list[1];
-	else {
+	} else {
 		ret =
 		    gnutls_x509_trust_list_get_issuer(cred->tlist,
 						      peer_certificate_list
-						      [0], &issuer, 0);
+						      [0], &issuer, GNUTLS_TL_GET_COPY);
 		if (ret < 0) {
 			goto skip_ocsp;
 		}
+		issuer_deinit = 1;
 	}
 
 	ret =
 	    check_ocsp_response(session, peer_certificate_list[0], issuer,
 				&resp, &ocsp_status);
+	if (issuer_deinit != 0)
+		gnutls_x509_crt_deinit(issuer);
+
 	if (ret < 0) {
 		CLEAR_CERTS;
 		return gnutls_assert_val(ret);
