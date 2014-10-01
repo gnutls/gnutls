@@ -8,6 +8,10 @@ See the end for copying conditions.
 ** libgnutls: Fixes in the transporent import of PKCS #11 certificates.
 Reported by Joseph Peruski.
 
+** libgnutls: added GNUTLS_TL_GET_COPY flag for
+gnutls_x509_trust_list_get_issuer(). That allows the function to be used
+in a thread safe way when PKCS #11 trust modules are in use.
+
 ** libgnutls-dane: Do not require the CA on a ca match to be direct CA.
 
 ** guile: new 'set-session-server-name!' procedure; see the manual for
