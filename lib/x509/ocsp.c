@@ -2082,6 +2082,7 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
 			unsigned int *verify, unsigned int flags)
 {
 	gnutls_x509_crt_t signercert = NULL;
+	gnutls_x509_crt_t issuer = NULL;
 	int rc;
 
 	/* Algorithm:
@@ -2109,14 +2110,13 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
 	rc = _gnutls_trustlist_inlist(trustlist, signercert);
 	if (rc == 0) {
 		/* not in trustlist, need to verify signature and bits */
-		gnutls_x509_crt_t issuer;
 		unsigned vtmp;
 
 		gnutls_assert();
 
 		rc = gnutls_x509_trust_list_get_issuer(trustlist,
 						       signercert, &issuer,
-						       0);
+						       GNUTLS_TL_GET_COPY);
 		if (rc != GNUTLS_E_SUCCESS) {
 			gnutls_assert();
 			*verify = GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER;
@@ -2151,6 +2151,8 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
 
       done:
 	gnutls_x509_crt_deinit(signercert);
+	if (issuer != NULL)
+		gnutls_x509_crt_deinit(issuer);
 
 	return rc;
 }

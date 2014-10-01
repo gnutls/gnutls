@@ -757,10 +757,13 @@ int trust_list_get_issuer(gnutls_x509_trust_list_t list,
  * @list: The structure of the list
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any. Should be treated as constant.
- * @flags: Use zero.
+ * @flags: Use zero or %GNUTLS_TL_GET_COPY
  *
- * This function will attempt to find the issuer of the
- * given certificate.
+ * This function will find the issuer of the given certificate.
+ * If the flag %GNUTLS_TL_GET_COPY is specified a copy of the issuer
+ * will be returned which must be freed using gnutls_x509_crt_deinit().
+ * Note that the flag %GNUTLS_TL_GET_COPY is required for this function
+ * to work with PKCS #11 trust lists in a thread-safe way.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -783,6 +786,24 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
+		if (flags & GNUTLS_TL_GET_COPY) {
+			gnutls_x509_crt_t crt;
+			ret = gnutls_x509_crt_init(&crt);
+			if (ret < 0) {
+				gnutls_free(der.data);
+				return gnutls_assert_val(ret);
+			}
+
+			ret = gnutls_x509_crt_import(crt, &der, GNUTLS_X509_FMT_DER);
+			if (ret < 0) {
+				gnutls_free(der.data);
+				gnutls_x509_crt_deinit(crt);
+				return gnutls_assert_val(ret);
+			}
+			*issuer = crt;
+			return 0;
+		}
+
 		/* we add this CA to the trusted list in order to make it
 		 * persistent. It will be deallocated when the trust list is.
 		 */
@@ -795,7 +816,11 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 	}
 #endif
 
-	return trust_list_get_issuer(list, cert, issuer, flags);
+	ret = trust_list_get_issuer(list, cert, issuer, flags);
+	if (flags & GNUTLS_TL_GET_COPY) {
+		*issuer = crt_cpy(*issuer);
+	}
+	return ret;
 }
 
 static
