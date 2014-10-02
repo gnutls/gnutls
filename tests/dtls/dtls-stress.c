@@ -26,6 +26,7 @@
  *	-nb                 enable nonblocking operations on sessions
  *	-batch              read test identifiers from stdin and run them
  *	-d                  increase debug level by one
+ *	-r                  replay messages (very crude replay mechanism)
  *	-d <n>              set debug level to <n>
  *	-die                don't start new tests after the first detected failure
  *	-timeout <n>        set handshake timeout to <n> seconds. Tests that don't make progress
@@ -329,6 +330,7 @@ enum role role;
 
 int debug;
 int nonblock;
+int replay;
 int full;
 int timeout_seconds;
 int retransmit_milliseconds;
@@ -493,6 +495,9 @@ static void filter_clear_state(void)
 	       sizeof(state_permute_ClientFinishedFull));
 }
 
+static int rbuffer[5*1024];
+unsigned rbuffer_size = 0;
+
 static void filter_run_next(gnutls_transport_ptr_t fd,
 			    const unsigned char *buffer, size_t len)
 {
@@ -504,6 +509,19 @@ static void filter_run_next(gnutls_transport_ptr_t fd,
 		send((int) (intptr_t) fd, buffer, len, 0);
 	}
 	filter_current_idx--;
+
+	if (replay != 0) {
+		if (rbuffer_size == 0 && len < sizeof(rbuffer)) {
+			memcpy(rbuffer, buffer, len);
+			rbuffer_size = len;
+		} else if (rbuffer_size != 0) {
+			send((int) (intptr_t) fd, rbuffer, rbuffer_size, 0);
+			if (len < sizeof(rbuffer) && len > rbuffer_size) {
+				memcpy(rbuffer, buffer, len);
+				rbuffer_size = len;
+			}
+		}
+	}
 }
 
 // }}}
@@ -1200,6 +1218,7 @@ int main(int argc, const char *argv[])
 	int arg;
 
 	nonblock = 0;
+	replay = 0;
 	debug = 0;
 	timeout_seconds = 120;
 	retransmit_milliseconds = 100;
@@ -1236,6 +1255,8 @@ int main(int argc, const char *argv[])
 			}
 		} else if (strcmp("-nb", argv[arg]) == 0) {
 			nonblock = 1;
+		} else if (strcmp("-r", argv[arg]) == 0) {
+			replay = 1;
 		} else if (strcmp("-timeout", argv[arg]) == 0) {
 			char *end;
 			int val;
