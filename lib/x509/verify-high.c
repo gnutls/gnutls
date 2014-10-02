@@ -687,9 +687,9 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 				      gnutls_x509_crt_t * issuer,
 				      unsigned int flags)
 {
-#ifdef ENABLE_PKCS11
 	int ret;
 
+#ifdef ENABLE_PKCS11
 	if (list->pkcs11_token) {
 		gnutls_datum_t der = {NULL, 0};
 		/* use the token for verification */
