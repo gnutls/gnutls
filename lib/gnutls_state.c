@@ -393,8 +393,10 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 
 		(*session)->internals.dtls.retrans_timeout_ms = 1000;
 		(*session)->internals.dtls.total_timeout_ms = 60000;
-	} else
+	} else {
+		(*session)->internals.handshake_timeout_ms = DEFAULT_HANDSHAKE_TIMEOUT_MS;
 		(*session)->internals.transport = GNUTLS_STREAM;
+	}
 
 	if (flags & GNUTLS_NONBLOCK)
 		(*session)->internals.dtls.blocking = 0;

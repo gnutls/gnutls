@@ -167,6 +167,7 @@ typedef enum {
 
 /* expire time for resuming sessions */
 #define DEFAULT_EXPIRE_TIME 3600
+#define DEFAULT_HANDSHAKE_TIMEOUT_MS 40*1000
 
 typedef enum transport_t {
 	GNUTLS_STREAM,

@@ -548,7 +548,7 @@ int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq)
  * handshake will be aborted with %GNUTLS_E_TIMEDOUT.
  *
  * The DTLS protocol recommends the values of 1 sec and 60 seconds
- * respectively.
+ * respectively, and these are the default values.
  *
  * If the retransmission timeout is zero then the handshake will operate
  * in a non-blocking way, i.e., return %GNUTLS_E_AGAIN.
