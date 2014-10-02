@@ -297,6 +297,7 @@ int gnutls_global_init(void)
 	 * res == not in fips140 mode
 	 */
 	if (res != 0) {
+		_gnutls_debug_log("FIPS140-2 mode: %d\n", res);
 		_gnutls_priority_update_fips();
 
 		/* first round of self checks, these are done on the
