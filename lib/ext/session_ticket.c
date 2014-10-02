@@ -33,6 +33,7 @@
 #include <gnutls_mbuffers.h>
 #include <gnutls_extensions.h>
 #include <gnutls_constate.h>
+#include <gnutls_dtls.h>
 
 #define KEY_NAME_SIZE SESSION_TICKET_KEY_NAME_SIZE
 #define KEY_SIZE SESSION_TICKET_KEY_SIZE
@@ -641,6 +642,17 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 
 	if (!priv->session_ticket_renew)
 		return 0;
+
+	/* This is the last flight and peer cannot be sure
+	 * we have received it unless we notify him. So we
+	 * wait for a message and retransmit if needed. */
+	if (IS_DTLS(session) && !_dtls_is_async(session) &&
+	    (gnutls_record_check_pending(session) +
+	     record_check_unprocessed(session)) == 0) {
+		ret = _dtls_wait_and_retransmit(session);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
 
 	ret = _gnutls_recv_handshake(session,
 				     GNUTLS_HANDSHAKE_NEW_SESSION_TICKET,
