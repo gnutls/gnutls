@@ -18,6 +18,9 @@ RFC6125 comparison of hostnames. That introduces a dependency on libidn.
 ** libgnutls: when printing a certificate request print the signature
 algorithm as well.
 
+** libgnutls: the gnutls_handshake() process will enforce a timeout by
+default.
+
 ** libgnutls: the verification flag GNUTLS_REQUIRE_KEY_PURPOSE_ON_INTERMEDIATE
 is introduced, and forces the application of the desired key purpose (extended
 key usage) into intermediate certificates. The verification result
