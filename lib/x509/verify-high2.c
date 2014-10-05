@@ -230,8 +230,11 @@ int remove_pkcs11_url(gnutls_x509_trust_list_t list, const char *ca_file)
  * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
  *
  * This function will add the given certificate authorities
- * to the trusted list. pkcs11 URLs are also accepted, instead
- * of files, by this function.
+ * to the trusted list. PKCS #11 URLs are also accepted, instead
+ * of files, by this function. A PKCS #11 URL implies a trust
+ * database (a specially marked module in p11-kit); the URL "pkcs11:"
+ * implies all trust databases in the system. Only a single URL specifying
+ * trust databases can be set; they cannot be stacked with multiple calls.
  *
  * Returns: The number of added elements is returned.
  *
