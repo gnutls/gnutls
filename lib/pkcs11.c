@@ -3476,7 +3476,8 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 	    gnutls_x509_crt_get_serial(cert, serial+sizeof(tag), &serial_size);
 	if (ret < 0) {
 		gnutls_assert();
-		return 0;
+		ret = 0;
+		goto cleanup;
 	}
 
 	/* PKCS#11 requires a DER encoded serial, wtf. $@(*$@ */
@@ -3485,7 +3486,8 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 		tag, &tag_size);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
-		return 0;
+		ret = 0;
+		goto cleanup;
 	}
 
 	memcpy(serial+sizeof(tag)-tag_size, tag, tag_size);
@@ -3509,6 +3511,7 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 				    NULL, pkcs11_obj_flags_to_int(flags));
 	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		/* attempt searching with the subject DN only */
+		gnutls_assert();
 		memset(&priv, 0, sizeof(priv));
 		priv.crt = cert;
 		priv.flags = flags;
