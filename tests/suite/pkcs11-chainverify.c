@@ -143,6 +143,11 @@ void doit(void)
 		gnutls_datum_t tmp;
 		size_t j;
 
+		gnutls_x509_trust_list_iter_t get_ca_iter;
+		gnutls_datum_t get_ca_datum_test;
+		gnutls_datum_t get_ca_datum;
+		gnutls_x509_crt_t get_ca_crt;
+
 		if (debug)
 			printf("Chain '%s' (%d)...\n", chains[i].name,
 			       (int) i);
@@ -246,6 +251,32 @@ void doit(void)
 		if (ret < 1) {
 			fail("gnutls_x509_trust_list_add_trust_file returned zero!\n");
 			exit(1);
+		}
+
+		/* test trust list iteration */
+		get_ca_iter = NULL;
+		while (gnutls_x509_trust_list_iter_get_ca(tl, &get_ca_iter, &get_ca_crt) == 0) {
+			ret = gnutls_x509_crt_export2(get_ca_crt, GNUTLS_X509_FMT_PEM, &get_ca_datum_test);
+			if (ret < 0) {
+				fail("gnutls_x509_crt_export2: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+
+			ret = gnutls_x509_crt_export2(ca, GNUTLS_X509_FMT_PEM, &get_ca_datum);
+			if (ret < 0) {
+				fail("gnutls_x509_crt_export2: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+
+			if (get_ca_datum_test.size != get_ca_datum.size ||
+			    memcmp(get_ca_datum_test.data, get_ca_datum.data, get_ca_datum.size) != 0) {
+				fail("gnutls_x509_trist_list_iter_get_ca: Unexpected certificate (%u != %u):\n\n%s\n\nvs.\n\n%s", get_ca_datum.size, get_ca_datum_test.size, get_ca_datum.data, get_ca_datum_test.data);
+				exit(1);
+			}
+
+			gnutls_free(get_ca_datum.data);
+			gnutls_free(get_ca_datum_test.data);
+			gnutls_x509_crt_deinit(get_ca_crt);
 		}
 
 		vdata[0].type = GNUTLS_DT_KEY_PURPOSE_OID;
