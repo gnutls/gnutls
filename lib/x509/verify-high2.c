@@ -169,53 +169,11 @@ gnutls_x509_trust_list_remove_trust_mem(gnutls_x509_trust_list_t list,
 static
 int remove_pkcs11_url(gnutls_x509_trust_list_t list, const char *ca_file)
 {
-	gnutls_x509_crt_t *xcrt_list = NULL;
-	gnutls_pkcs11_obj_t *pcrt_list = NULL;
-	unsigned int pcrt_list_size = 0, i;
-	int ret;
-
-	ret =
-	    gnutls_pkcs11_obj_list_import_url2(&pcrt_list, &pcrt_list_size,
-					       ca_file,
-					       GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA,
-					       0);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	if (pcrt_list_size == 0) {
-		ret = 0;
-		goto cleanup;
+	if (strcmp(ca_file, list->pkcs11_token) == 0) {
+		gnutls_free(list->pkcs11_token);
+		list->pkcs11_token = NULL;
 	}
-
-	xcrt_list =
-	    gnutls_malloc(sizeof(gnutls_x509_crt_t) * pcrt_list_size);
-	if (xcrt_list == NULL) {
-		ret = GNUTLS_E_MEMORY_ERROR;
-		goto cleanup;
-	}
-
-	ret =
-	    gnutls_x509_crt_list_import_pkcs11(xcrt_list, pcrt_list_size,
-					       pcrt_list, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret =
-	    gnutls_x509_trust_list_remove_cas(list, xcrt_list,
-					      pcrt_list_size);
-
-      cleanup:
-	for (i = 0; i < pcrt_list_size; i++) {
-		gnutls_pkcs11_obj_deinit(pcrt_list[i]);
-		if (xcrt_list)
-			gnutls_x509_crt_deinit(xcrt_list[i]);
-	}
-	gnutls_free(pcrt_list);
-	gnutls_free(xcrt_list);
-
-	return ret;
+	return 0;
 }
 #endif
 
