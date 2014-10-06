@@ -57,6 +57,12 @@ struct node_st {
 struct gnutls_x509_trust_list_iter {
 	unsigned int node_index;
 	unsigned int ca_index;
+
+#ifdef ENABLE_PKCS11
+	gnutls_pkcs11_obj_t* pkcs11_list;
+	unsigned int pkcs11_index;
+	unsigned int pkcs11_size;
+#endif
 };
 
 #define DEFAULT_SIZE 127
@@ -294,6 +300,47 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 	return i;
 }
 
+static int
+advance_iter(gnutls_x509_trust_list_t list,
+             gnutls_x509_trust_list_iter_t iter)
+{
+	int ret;
+
+	if (iter->node_index < list->size) {
+		++iter->ca_index;
+
+		/* skip entries */
+		while (iter->node_index < list->size &&
+		       iter->ca_index >= list->node[iter->node_index].trusted_ca_size) {
+			++iter->node_index;
+			iter->ca_index = 0;
+		}
+
+		if (iter->node_index < list->size)
+			return 0;
+	}
+
+#ifdef ENABLE_PKCS11
+	if (list->pkcs11_token != NULL) {
+		if (iter->pkcs11_list == NULL) {
+			ret = gnutls_pkcs11_obj_list_import_url2(&iter->pkcs11_list, &iter->pkcs11_size,
+			    list->pkcs11_token, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA, 0);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+
+			if (iter->pkcs11_size > 0)
+				return 0;
+		} else if (iter->pkcs11_index < iter->pkcs11_size) {
+			++iter->pkcs11_index;
+			if (iter->pkcs11_index < iter->pkcs11_size)
+				return 0;
+		}
+	}
+#endif
+
+	return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+}
+
 /**
  * gnutls_x509_trust_list_iter_get_ca:
  * @list: The structure of the list
@@ -322,7 +369,7 @@ gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
 {
 	int ret;
 
-	/* advance to next entry */
+	/* initialize iterator */
 	if (*iter == NULL) {
 		*iter = gnutls_malloc(sizeof (struct gnutls_x509_trust_list_iter));
 		if (*iter == NULL)
@@ -330,31 +377,71 @@ gnutls_x509_trust_list_iter_get_ca(gnutls_x509_trust_list_t list,
 
 		(*iter)->node_index = 0;
 		(*iter)->ca_index = 0;
-	} else {
-		++(*iter)->ca_index;
-	}
 
-	/* skip empty nodes */
-	while ((*iter)->ca_index >= list->node[(*iter)->node_index].trusted_ca_size) {
-		++(*iter)->node_index;
-		(*iter)->ca_index = 0;
+#ifdef ENABLE_PKCS11
+		(*iter)->pkcs11_list = NULL;
+		(*iter)->pkcs11_size = 0;
+		(*iter)->pkcs11_index = 0;
+#endif
 
-		if ((*iter)->node_index >= list->size) {
-			gnutls_free(*iter);
-			*iter = NULL;
+		/* Advance iterator to the first valid entry */
+		if (list->node[0].trusted_ca_size == 0) {
+			ret = advance_iter(list, *iter);
+			if (ret != 0) {
+				gnutls_x509_trust_list_iter_deinit(*iter);
+				*iter = NULL;
 
-			*crt = NULL;
-			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+				*crt = NULL;
+				return gnutls_assert_val(ret);
+			}
 		}
 	}
 
-	ret = gnutls_x509_crt_init(crt);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	/* obtain the certificate at the current iterator position */
+	if ((*iter)->node_index < list->size) {
+		ret = gnutls_x509_crt_init(crt);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 
-	ret = _gnutls_x509_crt_cpy(*crt, list->node[(*iter)->node_index].trusted_cas[(*iter)->ca_index]);
-	if (ret < 0) {
+		ret = _gnutls_x509_crt_cpy(*crt, list->node[(*iter)->node_index].trusted_cas[(*iter)->ca_index]);
+		if (ret < 0) {
+			gnutls_x509_crt_deinit(*crt);
+			return gnutls_assert_val(ret);
+		}
+	}
+#ifdef ENABLE_PKCS11
+	else if ( (*iter)->pkcs11_index < (*iter)->pkcs11_size) {
+		ret = gnutls_x509_crt_init(crt);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		ret = gnutls_x509_crt_import_pkcs11(*crt, (*iter)->pkcs11_list[(*iter)->pkcs11_index]);
+		if (ret < 0) {
+			gnutls_x509_crt_deinit(*crt);
+			return gnutls_assert_val(ret);
+		}
+	}
+#endif
+
+	else {
+		/* iterator is at end */
+		gnutls_x509_trust_list_iter_deinit(*iter);
+		*iter = NULL;
+
+		*crt = NULL;
+		return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+	}
+
+	/* Move iterator to the next position.
+	 * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned if the iterator
+	 * has been moved to the end position. That is okay, we return the
+	 * certificate that we read and when this function is called again we
+	 * report GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE to our caller. */
+	ret = advance_iter(list, *iter);
+	if (ret	< 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		gnutls_x509_crt_deinit(*crt);
+		*crt = NULL;
+
 		return gnutls_assert_val(ret);
 	}
 
@@ -373,6 +460,15 @@ void gnutls_x509_trust_list_iter_deinit(gnutls_x509_trust_list_iter_t iter)
 {
 	if (!iter)
 		return;
+
+#ifdef ENABLE_PKCS11
+	if (iter->pkcs11_size > 0) {
+		unsigned i;
+		for (i = 0; i < iter->pkcs11_size; ++i)
+			gnutls_pkcs11_obj_deinit(iter->pkcs11_list[i]);
+		gnutls_free(iter->pkcs11_list);
+	}
+#endif
 
 	gnutls_free(iter);
 }
