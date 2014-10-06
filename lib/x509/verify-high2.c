@@ -216,6 +216,8 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 		if (strncmp(ca_file, "pkcs11:", 7) == 0) {
 			unsigned pcrt_list_size = 0;
 
+			if (list->pkcs11_token != NULL)
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			list->pkcs11_token = gnutls_strdup(ca_file);
 
 			/* enumerate the certificates */
