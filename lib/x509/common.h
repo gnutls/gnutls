@@ -192,6 +192,10 @@ _gnutls_check_if_same_key2(gnutls_x509_crt_t cert1,
 			   gnutls_datum_t *cert2bin);
 
 bool
+_gnutls_check_subject_key_id2(gnutls_datum_t *key_id,
+			      gnutls_datum_t *certbin);
+
+bool
 _gnutls_check_if_same_cert(gnutls_x509_crt_t cert1,
 			   gnutls_x509_crt_t cert2);
 
