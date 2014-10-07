@@ -755,9 +755,6 @@ typedef struct gnutls_session_int *gnutls_session_t;
 struct gnutls_dh_params_int;
 typedef struct gnutls_dh_params_int *gnutls_dh_params_t;
 
-struct gnutls_ecdh_params_int;
-typedef struct gnutls_ecdh_params_int *gnutls_ecdh_params_t;
-
   /* XXX ugly. */
 struct gnutls_x509_privkey_int;
 typedef struct gnutls_x509_privkey_int *gnutls_rsa_params_t;
@@ -775,7 +772,6 @@ typedef struct gnutls_params_st {
 	gnutls_params_type_t type;
 	union params {
 		gnutls_dh_params_t dh;
-		gnutls_ecdh_params_t ecdh;
 		gnutls_rsa_params_t rsa_export;
 	} params;
 	int deinit;
