@@ -1963,3 +1963,35 @@ int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 
 	return ret;
 }
+
+bool
+_gnutls_check_subject_key_id2(gnutls_datum_t *key_id,
+                             gnutls_datum_t *certbin)
+{
+	uint8_t id[MAX_KEY_ID_SIZE];
+	size_t id_size;
+	gnutls_x509_crt_t cert;
+	bool result = 0;
+
+	if (gnutls_x509_crt_init(&cert) < 0) {
+		gnutls_assert();
+		return 0;
+	}
+
+	if (gnutls_x509_crt_import(cert, certbin, GNUTLS_X509_FMT_DER) < 0) {
+		gnutls_assert();
+		goto out;
+	}
+
+	if (gnutls_x509_crt_get_subject_key_id(cert, id, &id_size, NULL) < 0) {
+		gnutls_assert();
+		goto out;
+	}
+
+	if (id_size == key_id->size && !memcmp(id, key_id->data, id_size))
+		result = 1;
+
+ out:
+	gnutls_x509_crt_deinit(cert);
+	return result;
+}

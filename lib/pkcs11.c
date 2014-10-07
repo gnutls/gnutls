@@ -3242,6 +3242,12 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 				gnutls_datum_t id =
 				    { a[1].value, a[1].value_len };
 
+				if (i > 0 && priv->key_id.size > 0 &&
+				    !_gnutls_check_subject_key_id2(&priv->key_id, &data)) {
+					gnutls_assert();
+					continue;
+				}
+
 				if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE) {
 					if (priv->crt == NULL) {
 						gnutls_assert();
