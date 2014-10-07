@@ -1494,11 +1494,30 @@ void gnutls_packet_deinit(gnutls_packet_t packet)
 }
 
 /**
+ * gnutls_record_discard_queued:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function discards all queued to be sent packets in a DTLS session.
+ * These are the packets queued after an interrupted gnutls_record_send().
+ *
+ * Returns: The number of bytes discarded.
+ *
+ * Since: 3.4.0
+ **/
+size_t
+gnutls_record_discard_queued(gnutls_session_t session)
+{
+	size_t ret = session->internals.record_send_buffer.byte_length;
+	_mbuffer_head_clear(&session->internals.record_send_buffer);
+	return ret;
+}
+
+/**
  * gnutls_record_recv_packet:
  * @session: is a #gnutls_session_t structure.
  * @packet: the structure that will hold the packet data
  *
- * This is a lower-level function thatn gnutls_record_recv() and allows
+ * This is a lower-level function than gnutls_record_recv() and allows
  * to directly receive the whole decrypted packet. That avoids a
  * memory copy, and is mostly applicable to applications seeking high
  * performance.
