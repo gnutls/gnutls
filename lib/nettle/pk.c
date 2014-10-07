@@ -844,7 +844,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 #endif
 
 			params->params_nr = 0;
-			
+
 			ret = _gnutls_mpi_init_multi(&params->params[DSA_P], &params->params[DSA_Q],
 					&params->params[DSA_G], NULL);
 			if (ret < 0) {
@@ -890,6 +890,109 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	FAIL_IF_LIB_ERROR;
 	return ret;
 }
+
+#ifdef ENABLE_FIPS140
+int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
+			    gnutls_datum_t *priv_key, gnutls_datum_t *pub_key);
+
+int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
+			   const gnutls_datum_t *priv_key, const gnutls_datum_t *pub_key,
+			   const gnutls_datum_t *peer_key, gnutls_datum_t *Z);
+
+int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
+			    gnutls_datum_t *priv_key, gnutls_datum_t *pub_key)
+{
+	gnutls_pk_params_st params;
+	int ret;
+
+	gnutls_pk_params_init(&params);
+	params.params[DH_P] = _gnutls_mpi_copy(dh_params->params[0]);
+	params.params[DH_G] = _gnutls_mpi_copy(dh_params->params[1]);
+
+	params.params_nr = 3; /* include empty q */
+	params.algo = GNUTLS_PK_DH;
+
+	priv_key->data = NULL;
+	pub_key->data = NULL;
+
+	ret = _gnutls_pk_generate_keys(GNUTLS_PK_DH, 0, &params);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	ret =
+	    _gnutls_mpi_dprint_lz(params.params[DH_X], priv_key);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	ret =
+	    _gnutls_mpi_dprint_lz(params.params[DH_Y], pub_key);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	ret = 0;
+	goto cleanup;
+ fail:
+ 	gnutls_free(pub_key->data);
+ 	gnutls_free(priv_key->data);
+ cleanup:
+ 	gnutls_pk_params_clear(&params);
+ 	return ret;
+}
+
+int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
+			   const gnutls_datum_t *priv_key, const gnutls_datum_t *pub_key,
+			   const gnutls_datum_t *peer_key, gnutls_datum_t *Z)
+{
+	gnutls_pk_params_st pub, priv;
+	int ret;
+
+	gnutls_pk_params_init(&pub);
+	pub.algo = GNUTLS_PK_DH;
+
+	if (_gnutls_mpi_init_scan_nz
+		    (&pub.params[DH_Y], peer_key->data,
+		     peer_key->size) != 0) {
+		ret =
+		    gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto cleanup;
+	}
+
+	gnutls_pk_params_init(&priv);
+	priv.params[DH_P] = _gnutls_mpi_copy(dh_params->params[0]);
+	priv.params[DH_G] = _gnutls_mpi_copy(dh_params->params[1]);
+
+	if (_gnutls_mpi_init_scan_nz
+		    (&priv.params[DH_X], priv_key->data,
+		     priv_key->size) != 0) {
+		ret =
+		    gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto cleanup;
+	}
+
+	priv.params_nr = 3; /* include empty q */
+	priv.algo = GNUTLS_PK_DH;
+
+	Z->data = NULL;
+
+	ret = _gnutls_pk_derive(GNUTLS_PK_DH, Z, &priv, &pub);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = 0;
+ cleanup:
+ 	gnutls_pk_params_clear(&pub);
+ 	gnutls_pk_params_clear(&priv);
+ 	return ret;
+}
+#endif
+
 
 /* To generate a DH key either q must be set in the params or
  * level should be set to the number of required bits.
@@ -1398,12 +1501,12 @@ static int calc_rsa_exp(gnutls_pk_params_st * params)
 {
 	bigint_t tmp;
 	int ret;
-	
+
 	if (params->params_nr < RSA_PRIVATE_PARAMS - 2) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
-	
+
 	params->params[6] = params->params[7] = NULL;
 
 	ret = _gnutls_mpi_init_multi(&tmp, &params->params[6], &params->params[7], NULL);
