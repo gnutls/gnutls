@@ -573,13 +573,6 @@ generate_certificate(gnutls_privkey_t * ret_key,
 							       lbuffer,
 							       &size,
 							       NULL);
-			if (result < 0) {
-				size = lbuffer_size;
-				result =
-				    gnutls_x509_crt_get_key_id(ca_crt, 0,
-							       lbuffer,
-							       &size);
-			}
 			if (result >= 0) {
 				result =
 				    gnutls_x509_crt_set_authority_key_id
@@ -670,12 +663,6 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 		size = lbuffer_size;
 		result = gnutls_x509_crt_get_subject_key_id(ca_crt, lbuffer,
 							    &size, NULL);
-		if (result < 0) {
-			size = lbuffer_size;
-			result =
-			    gnutls_x509_crt_get_key_id(ca_crt, 0, lbuffer,
-						       &size);
-		}
 		if (result >= 0) {
 			result =
 			    gnutls_x509_crl_set_authority_key_id(crl,
