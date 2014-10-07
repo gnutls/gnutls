@@ -1045,6 +1045,8 @@ GNUTLS_FIPS140 {
 	_rsa_generate_fips186_4_keypair;
 	_gnutls_dh_compute_key;
 	_gnutls_dh_generate_key;
+	_gnutls_ecdh_generate_key;
+	_gnutls_ecdh_compute_key;
 };
 
 GNUTLS_PRIVATE {

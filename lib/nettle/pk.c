@@ -899,6 +899,17 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 			   const gnutls_datum_t *priv_key, const gnutls_datum_t *pub_key,
 			   const gnutls_datum_t *peer_key, gnutls_datum_t *Z);
 
+int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
+			   const gnutls_datum_t *x, const gnutls_datum_t *y,
+			   const gnutls_datum_t *k,
+			   const gnutls_datum_t *peer_x, const gnutls_datum_t *peer_y,
+			   gnutls_datum_t *Z);
+
+int _gnutls_ecdh_generate_key(gnutls_ecc_curve_t curve,
+			      gnutls_datum_t *x, gnutls_datum_t *y,
+			      gnutls_datum_t *k);
+
+
 int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
 			    gnutls_datum_t *priv_key, gnutls_datum_t *pub_key)
 {
@@ -952,6 +963,7 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 	int ret;
 
 	gnutls_pk_params_init(&pub);
+	gnutls_pk_params_init(&priv);
 	pub.algo = GNUTLS_PK_DH;
 
 	if (_gnutls_mpi_init_scan_nz
@@ -962,7 +974,6 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 		goto cleanup;
 	}
 
-	gnutls_pk_params_init(&priv);
 	priv.params[DH_P] = _gnutls_mpi_copy(dh_params->params[0]);
 	priv.params[DH_G] = _gnutls_mpi_copy(dh_params->params[1]);
 
@@ -980,6 +991,135 @@ int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 	Z->data = NULL;
 
 	ret = _gnutls_pk_derive(GNUTLS_PK_DH, Z, &priv, &pub);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = 0;
+ cleanup:
+ 	gnutls_pk_params_clear(&pub);
+ 	gnutls_pk_params_clear(&priv);
+ 	return ret;
+}
+
+int _gnutls_ecdh_generate_key(gnutls_ecc_curve_t curve,
+			      gnutls_datum_t *x, gnutls_datum_t *y,
+			      gnutls_datum_t *k)
+{
+	gnutls_pk_params_st params;
+	int ret;
+
+	gnutls_pk_params_init(&params);
+	params.flags = curve;
+	params.algo = GNUTLS_PK_EC;
+
+	x->data = NULL;
+	y->data = NULL;
+	k->data = NULL;
+
+	ret = _gnutls_pk_generate_keys(GNUTLS_PK_EC, curve, &params);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	ret =
+	    _gnutls_mpi_dprint_lz(params.params[ECC_X], x);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	ret =
+	    _gnutls_mpi_dprint_lz(params.params[ECC_Y], y);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	ret =
+	    _gnutls_mpi_dprint_lz(params.params[ECC_K], k);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	ret = 0;
+	goto cleanup;
+ fail:
+ 	gnutls_free(y->data);
+ 	gnutls_free(x->data);
+ 	gnutls_free(k->data);
+ cleanup:
+ 	gnutls_pk_params_clear(&params);
+ 	return ret;
+}
+
+int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
+			   const gnutls_datum_t *x, const gnutls_datum_t *y,
+			   const gnutls_datum_t *k,
+			   const gnutls_datum_t *peer_x, const gnutls_datum_t *peer_y,
+			   gnutls_datum_t *Z)
+{
+	gnutls_pk_params_st pub, priv;
+	int ret;
+
+	gnutls_pk_params_init(&pub);
+	gnutls_pk_params_init(&priv);
+
+	pub.algo = GNUTLS_PK_EC;
+	pub.flags = curve;
+
+	if (_gnutls_mpi_init_scan_nz
+		    (&pub.params[ECC_Y], peer_y->data,
+		     peer_y->size) != 0) {
+		ret =
+		    gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto cleanup;
+	}
+
+	if (_gnutls_mpi_init_scan_nz
+		    (&pub.params[ECC_X], peer_x->data,
+		     peer_x->size) != 0) {
+		ret =
+		    gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto cleanup;
+	}
+
+	priv.params_nr = 2;
+
+	if (_gnutls_mpi_init_scan_nz
+		    (&priv.params[ECC_Y], y->data,
+		     y->size) != 0) {
+		ret =
+		    gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto cleanup;
+	}
+
+	if (_gnutls_mpi_init_scan_nz
+		    (&priv.params[ECC_X], x->data,
+		     x->size) != 0) {
+		ret =
+		    gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto cleanup;
+	}
+
+	if (_gnutls_mpi_init_scan_nz
+		    (&priv.params[ECC_K], k->data,
+		     k->size) != 0) {
+		ret =
+		    gnutls_assert_val(GNUTLS_E_MPI_SCAN_FAILED);
+		goto cleanup;
+	}
+
+
+	priv.params_nr = 3;
+	priv.algo = GNUTLS_PK_EC;
+	priv.flags = curve;
+
+	Z->data = NULL;
+
+	ret = _gnutls_pk_derive(GNUTLS_PK_EC, Z, &priv, &pub);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
