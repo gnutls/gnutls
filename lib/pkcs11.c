@@ -3225,7 +3225,8 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 		       (sinfo->module, sinfo->pks, &obj, 1,
 			&count) == CKR_OK && count == 1) {
 
-			if (priv->need_import == 0 && !(priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE)) {
+			if (priv->need_import == 0 && !(priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE)
+			    && !(priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY)) {
 				found = 1;
 				break;
 			}
