@@ -3124,6 +3124,7 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 	gnutls_datum_t data = {NULL, 0};
 	unsigned tries, i, finalized;
 	ck_bool_t trusted = 1;
+	time_t now;
 
 	if (info == NULL) {
 		gnutls_assert();
@@ -3149,6 +3150,7 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 	else
 		tries = 1;
 
+	now = gnutls_time(0);
 	for (i = 0; i < tries; i++) {
 
 		a_vals = 0;
@@ -3247,8 +3249,8 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 				gnutls_datum_t id =
 				    { a[1].value, a[1].value_len };
 
-				if (i > 0 && priv->key_id.size > 0 &&
-				    !_gnutls_check_subject_key_id2(&priv->key_id, &data)) {
+				if (priv->key_id.size > 0 &&
+				    !_gnutls_check_valid_key_id(&priv->key_id, &data, now)) {
 					gnutls_assert();
 					continue;
 				}

@@ -1952,8 +1952,8 @@ int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 }
 
 bool
-_gnutls_check_subject_key_id2(gnutls_datum_t *key_id,
-                             gnutls_datum_t *certbin)
+_gnutls_check_valid_key_id(gnutls_datum_t *key_id,
+                           gnutls_datum_t *certbin, time_t now)
 {
 	uint8_t id[MAX_KEY_ID_SIZE];
 	size_t id_size;
@@ -1966,6 +1966,13 @@ _gnutls_check_subject_key_id2(gnutls_datum_t *key_id,
 	}
 
 	if (gnutls_x509_crt_import(cert, certbin, GNUTLS_X509_FMT_DER) < 0) {
+		gnutls_assert();
+		goto out;
+	}
+
+	if (now > gnutls_x509_crt_get_expiration_time(cert) &&
+	    now < gnutls_x509_crt_get_activation_time(cert)) {
+		/* don't bother, certificate is not yet activated or expired */
 		gnutls_assert();
 		goto out;
 	}
