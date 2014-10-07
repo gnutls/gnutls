@@ -17,6 +17,9 @@ in a thread safe way when PKCS #11 trust modules are in use.
 ** guile: new 'set-session-server-name!' procedure; see the manual for
 details.
 
+** certtool: The authority key identifier will be set in a certificate only
+if the CA's subject key identifier is set.
+
 ** API and ABI modifications:
 No changes since last version.
 
