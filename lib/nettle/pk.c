@@ -1086,7 +1086,7 @@ int _gnutls_ecdh_compute_key(gnutls_ecc_curve_t curve,
 		goto cleanup;
 	}
 
-	priv.params_nr = 2;
+	pub.params_nr = 2;
 
 	if (_gnutls_mpi_init_scan_nz
 		    (&priv.params[ECC_Y], y->data,
