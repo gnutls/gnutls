@@ -1032,7 +1032,7 @@ GNUTLS_FIPS140 {
 	gnutls_mac_self_test;
 	gnutls_digest_self_test;
 	#for FIPS140-2 validation
-	rbg_aes_reseed;
+	drbg_aes_reseed;
 	drbg_aes_init;
 	drbg_aes_generate;
 	_dsa_generate_dss_pq;
