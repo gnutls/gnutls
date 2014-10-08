@@ -26,6 +26,9 @@ is introduced, and forces the application of the desired key purpose (extended
 key usage) into intermediate certificates. The verification result
 GNUTLS_CERT_PURPOSE_MISMATCH is also introduced. 
 
+** libgnutls: Added support for the extended master secret
+(triple-handshake fix) following draft-ietf-tls-session-hash-02.
+
 ** certtool: Added --p8-info option, which will print PKCS #8 information
 even if the password is not available.
 
