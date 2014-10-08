@@ -1048,6 +1048,7 @@ GNUTLS_3_1_0 {
 	gnutls_x509_crq_get_signature_algorithm;
 	gnutls_privkey_import_ext3;
 	gnutls_record_discard_queued;
+	gnutls_session_ext_master_secret_status;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

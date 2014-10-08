@@ -39,6 +39,7 @@
 #include <ext/safe_renegotiation.h>
 #include <ext/ecc.h>
 #include <ext/status_request.h>
+#include <ext/ext_master_secret.h>
 #include <ext/srtp.h>
 #include <ext/alpn.h>
 #include <ext/dumbfw.h>
@@ -308,6 +309,10 @@ int _gnutls_ext_init(void)
 	int ret;
 
 	ret = _gnutls_ext_register(&ext_mod_max_record_size);
+	if (ret != GNUTLS_E_SUCCESS)
+		return ret;
+
+	ret = _gnutls_ext_register(&ext_mod_ext_master_secret);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 

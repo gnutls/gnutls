@@ -388,6 +388,7 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 	dst->cert_type = src->cert_type; \
 	dst->compression_method = src->compression_method; \
 	dst->timestamp = src->timestamp; \
+	dst->ext_master_secret = src->ext_master_secret; \
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size
 

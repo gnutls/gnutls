@@ -71,4 +71,6 @@ inline static int handshake_remaining_time(gnutls_session_t session)
 	return 0;
 }
 
+int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t *shash);
+
 #endif

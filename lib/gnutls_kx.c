@@ -70,6 +70,10 @@ send_handshake(gnutls_session_t session, uint8_t * data, size_t size,
 
 #define MASTER_SECRET "master secret"
 #define MASTER_SECRET_SIZE (sizeof(MASTER_SECRET)-1)
+
+#define EXT_MASTER_SECRET "extended master secret"
+#define EXT_MASTER_SECRET_SIZE (sizeof(EXT_MASTER_SECRET)-1)
+
 static int generate_normal_master(gnutls_session_t session,
 				  gnutls_datum_t *, int);
 
@@ -114,39 +118,55 @@ generate_normal_master(gnutls_session_t session,
 					 server_random, 32, buf,
 					 sizeof(buf), NULL));
 
-	if (get_num_version(session) == GNUTLS_SSL3) {
+	if (session->security_parameters.ext_master_secret == 0) {
 		uint8_t rnd[2 * GNUTLS_RANDOM_SIZE + 1];
-
 		memcpy(rnd, session->security_parameters.client_random,
 		       GNUTLS_RANDOM_SIZE);
 		memcpy(&rnd[GNUTLS_RANDOM_SIZE],
 		       session->security_parameters.server_random,
 		       GNUTLS_RANDOM_SIZE);
 
-		ret =
-		    _gnutls_ssl3_generate_random(premaster->data,
-						 premaster->size, rnd,
-						 2 * GNUTLS_RANDOM_SIZE,
-						 GNUTLS_MASTER_SIZE,
-						 session->security_parameters.
-						 master_secret);
-
+		if (get_num_version(session) == GNUTLS_SSL3) {
+			ret =
+			    _gnutls_ssl3_generate_random(premaster->data,
+							 premaster->size, rnd,
+							 2 * GNUTLS_RANDOM_SIZE,
+							 GNUTLS_MASTER_SIZE,
+							 session->security_parameters.
+							 master_secret);
+		} else {
+			ret =
+			    _gnutls_PRF(session, premaster->data, premaster->size,
+					MASTER_SECRET, MASTER_SECRET_SIZE,
+					rnd, 2 * GNUTLS_RANDOM_SIZE,
+					GNUTLS_MASTER_SIZE,
+					session->security_parameters.
+					master_secret);
+		}
 	} else {
-		uint8_t rnd[2 * GNUTLS_RANDOM_SIZE + 1];
+		gnutls_datum_t shash = {NULL, 0};
 
-		memcpy(rnd, session->security_parameters.client_random,
-		       GNUTLS_RANDOM_SIZE);
-		memcpy(&rnd[GNUTLS_RANDOM_SIZE],
-		       session->security_parameters.server_random,
-		       GNUTLS_RANDOM_SIZE);
-
-		ret =
-		    _gnutls_PRF(session, premaster->data, premaster->size,
-				MASTER_SECRET, MASTER_SECRET_SIZE,
-				rnd, 2 * GNUTLS_RANDOM_SIZE,
-				GNUTLS_MASTER_SIZE,
-				session->security_parameters.
-				master_secret);
+		/* draft-ietf-tls-session-hash-02 */
+		ret = _gnutls_handshake_get_session_hash(session, &shash);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+		if (get_num_version(session) == GNUTLS_SSL3) {
+			ret =
+			    _gnutls_ssl3_generate_random(premaster->data,
+							 premaster->size, shash.data, shash.size,
+							 GNUTLS_MASTER_SIZE,
+							 session->security_parameters.
+							 master_secret);
+		} else {
+			ret =
+			    _gnutls_PRF(session, premaster->data, premaster->size,
+					EXT_MASTER_SECRET, EXT_MASTER_SECRET_SIZE,
+					shash.data, shash.size,
+					GNUTLS_MASTER_SIZE,
+					session->security_parameters.
+					master_secret);
+		}
+		gnutls_free(shash.data);
 	}
 
 	if (!keep_premaster)

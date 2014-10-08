@@ -768,6 +768,8 @@ pack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 			  session->security_parameters.server_sign_algo);
 	BUFFER_APPEND_NUM(ps,
 			  session->security_parameters.client_sign_algo);
+	BUFFER_APPEND_NUM(ps,
+			  session->security_parameters.ext_master_secret);
 
 	_gnutls_write_uint32(ps->length - cur_size,
 			     ps->data + size_offset);
@@ -855,6 +857,9 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 	BUFFER_POP_NUM(ps,
 		       session->internals.resumed_security_parameters.
 		       client_sign_algo);
+	BUFFER_POP_NUM(ps,
+		       session->internals.resumed_security_parameters.
+		       ext_master_secret);
 
 	if (session->internals.resumed_security_parameters.
 	    max_record_recv_size == 0

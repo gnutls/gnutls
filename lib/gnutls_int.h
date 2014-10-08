@@ -285,8 +285,8 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_HEARTBEAT = 15,
 	GNUTLS_EXTENSION_ALPN = 16,
 	GNUTLS_EXTENSION_DUMBFW = 21,
+	GNUTLS_EXTENSION_EXT_MASTER_SECRET = 23,
 	GNUTLS_EXTENSION_SESSION_TICKET = 35,
-	GNUTLS_EXTENSION_NEW_RECORD_PADDING = 48015,	/* aka: 0xbeaf */
 	GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
 } extensions_t;
 
@@ -529,10 +529,6 @@ typedef struct {
  * session.
  */
 
-/* if you add anything in Security_Parameters struct, then
- * also modify CPY_COMMON in gnutls_constate.c. 
- */
-
 /* Note that the security parameters structure is set up after the
  * handshake has finished. The only value you may depend on while
  * the handshake is in progress is the cipher suite value.
@@ -576,9 +572,15 @@ typedef struct {
 	/* Holds the signature algorithm used in this session - If any */
 	gnutls_sign_algorithm_t server_sign_algo;
 	gnutls_sign_algorithm_t client_sign_algo;
-	
-	/* FIXME: The following are not saved in the session storage
-	 * for session resumption.
+
+	/* Whether the master secret negotiation will be according to
+	 * draft-ietf-tls-session-hash-01
+	 */
+	uint8_t ext_master_secret;
+
+	/* Note: if you add anything in Security_Parameters struct, then
+	 * also modify CPY_COMMON in gnutls_constate.c, and gnutls_session_pack.c,
+	 * in order to save it in the session storage.
 	 */
 
 	/* Used by extensions that enable supplemental data: Which ones
@@ -994,6 +996,7 @@ typedef struct {
 
 	bool sc_random_set;
 	bool no_replay_protection;	/* DTLS replay protection */
+	bool try_ext_master_secret;	/* whether to try negotiating the ext master secret */
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
