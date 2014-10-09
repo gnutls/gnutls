@@ -3323,7 +3323,7 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 						ret = pkcs11_override_cert_exts(sinfo, &spki, &data);
 						if (ret < 0) {
 							gnutls_assert();
-							/* non fatal error */
+							goto cleanup;
 						}
 					}
 				}
