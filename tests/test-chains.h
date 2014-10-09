@@ -1556,10 +1556,11 @@ static struct
   const char **ca;
   unsigned int verify_flags;
   unsigned int expected_verify_result;
+  time_t expected_time;
 } chains[] =
 {
   { "CVE-2014-0092", cve_2014_0092_check, &cve_2014_0092_check[1],
-    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
+    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID, 1412850586},
   { "CVE-2008-4989", cve_2008_4989_chain, &cve_2008_4989_chain[2],
     0, GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID },
   { "amazon.com ok", verisign_com_chain_g5, &verisign_com_chain_g5[4],
@@ -1651,12 +1652,12 @@ static struct
   	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID },
   { "ecc cert not ok (due to profile)", ecc_cert, &ecc_cert[1], GNUTLS_PROFILE_TO_VFLAGS(GNUTLS_PROFILE_SUITEB192), 
   	GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID },
-  { "name constraints chain ok1", nc_good1, &nc_good1[4], GNUTLS_VERIFY_DISABLE_TIME_CHECKS, 0 },
-  { "name constraints chain bad1", nc_bad1, &nc_bad1[2], GNUTLS_VERIFY_DISABLE_TIME_CHECKS, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE},
-  { "name constraints chain bad2", nc_bad2, &nc_bad2[4], GNUTLS_VERIFY_DISABLE_TIME_CHECKS, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE},
-  { "name constraints chain bad3", nc_bad3, &nc_bad3[2], GNUTLS_VERIFY_DISABLE_TIME_CHECKS, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE},
-  { "modified", modified1, &modified1[3], GNUTLS_VERIFY_DISABLE_TIME_CHECKS, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE},
-  { "not-modified", modified2, &modified2[3], GNUTLS_VERIFY_DISABLE_TIME_CHECKS, 0},
+  { "name constraints chain ok1", nc_good1, &nc_good1[4], 0, 0, 1412850586 },
+  { "name constraints chain bad1", nc_bad1, &nc_bad1[2], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, 1412850586},
+  { "name constraints chain bad2", nc_bad2, &nc_bad2[4], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, 1412850586},
+  { "name constraints chain bad3", nc_bad3, &nc_bad3[2], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE, 1412850586},
+  { "modified", modified1, &modified1[3], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE, 1412850586},
+  { "not-modified", modified2, &modified2[3], 0, 0, 1412850586},
   { NULL, NULL, NULL, 0, 0}
 };
 /* *INDENT-ON* */
