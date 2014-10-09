@@ -2535,6 +2535,7 @@ int gnutls_handshake(gnutls_session_t session)
             session->internals.handshake_timeout_ms = 0;
 		}
 
+		session->internals.handshake_in_progress = 1;
 		gettime(&session->internals.dtls.handshake_start_time);
 		if (session->internals.handshake_timeout_ms &&
 		    session->internals.handshake_endtime == 0)
