@@ -114,7 +114,7 @@ _generate_request(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	return;
 }
 
-static size_t get_data(void *buffer, size_t size, size_t nmemb,
+static size_t get_data(void *buf, size_t size, size_t nmemb,
 		       void *userp)
 {
 	gnutls_datum_t *ud = userp;
@@ -127,7 +127,7 @@ static size_t get_data(void *buffer, size_t size, size_t nmemb,
 		exit(1);
 	}
 
-	memcpy(&ud->data[ud->size], buffer, size);
+	memcpy(&ud->data[ud->size], buf, size);
 	ud->size += size;
 
 	return size;
