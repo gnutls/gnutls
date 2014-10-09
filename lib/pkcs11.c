@@ -3102,6 +3102,66 @@ const char *gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_type_t type)
 	}
 }
 
+static
+int check_found_cert(struct find_cert_st *priv, gnutls_datum_t *data, time_t now)
+{
+	gnutls_x509_crt_t tcrt = NULL;
+	int ret;
+
+	ret = gnutls_x509_crt_init(&tcrt);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = gnutls_x509_crt_import(tcrt, data, GNUTLS_X509_FMT_DER);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (priv->key_id.size > 0 &&
+	    !_gnutls_check_valid_key_id(&priv->key_id, tcrt, now)) {
+		gnutls_assert();
+		ret = -1;
+		goto cleanup;
+	}
+
+	if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE) {
+		if (priv->crt == NULL) {
+			gnutls_assert();
+			ret = -1;
+			goto cleanup;
+		}
+
+		if (_gnutls_check_if_same_cert(priv->crt, tcrt) == 0) {
+			/* doesn't match */
+			ret = -1;
+			goto cleanup;
+		}
+	}
+
+	if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY) {
+		if (priv->crt == NULL) {
+			gnutls_assert();
+			ret = -1;
+			goto cleanup;
+		}
+
+		if (_gnutls_check_if_same_key(priv->crt, tcrt, 1) == 0) {
+			/* doesn't match */
+			ret = -1;
+			goto cleanup;
+		}
+	}
+
+	ret = 0;
+cleanup:
+	if (tcrt != NULL)
+		gnutls_x509_crt_deinit(tcrt);
+	return ret;
+}
+
 static int
 find_cert_cb(struct pkcs11_session_info *sinfo,
 	    struct token_info *info, struct ck_info *lib_info, void *input)
@@ -3245,36 +3305,10 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 				gnutls_datum_t id =
 				    { a[1].value, a[1].value_len };
 
-				if (priv->key_id.size > 0 &&
-				    !_gnutls_check_valid_key_id(&priv->key_id, &data, now)) {
-					gnutls_assert();
+				ret = check_found_cert(priv, &data, now);
+				if (ret < 0) {
+					_gnutls_free_datum(&data);
 					continue;
-				}
-
-				if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE) {
-					if (priv->crt == NULL) {
-						gnutls_assert();
-						break;
-					}
-
-					if (_gnutls_check_if_same_cert2(priv->crt, &data) == 0) {
-						/* doesn't match */
-						_gnutls_free_datum(&data);
-						continue;
-					}
-				}
-
-				if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY) {
-					if (priv->crt == NULL) {
-						gnutls_assert();
-						break;
-					}
-
-					if (_gnutls_check_if_same_key2(priv->crt, &data) == 0) {
-						/* doesn't match */
-						_gnutls_free_datum(&data);
-						continue;
-					}
 				}
 
 				if (priv->flags & GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT) {
@@ -3284,7 +3318,7 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 						ret = pkcs11_override_cert_exts(sinfo, &spki, &data);
 						if (ret < 0) {
 							gnutls_assert();
-							/* non fatal errors */
+							/* non fatal error */
 						}
 					}
 				}
