@@ -1953,22 +1953,11 @@ int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 
 bool
 _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
-                           gnutls_datum_t *certbin, time_t now)
+                           gnutls_x509_crt_t cert, time_t now)
 {
 	uint8_t id[MAX_KEY_ID_SIZE];
 	size_t id_size;
-	gnutls_x509_crt_t cert;
 	bool result = 0;
-
-	if (gnutls_x509_crt_init(&cert) < 0) {
-		gnutls_assert();
-		return 0;
-	}
-
-	if (gnutls_x509_crt_import(cert, certbin, GNUTLS_X509_FMT_DER) < 0) {
-		gnutls_assert();
-		goto out;
-	}
 
 	if (now > gnutls_x509_crt_get_expiration_time(cert) &&
 	    now < gnutls_x509_crt_get_activation_time(cert)) {
@@ -1986,6 +1975,5 @@ _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
 		result = 1;
 
  out:
-	gnutls_x509_crt_deinit(cert);
 	return result;
 }
