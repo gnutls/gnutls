@@ -964,6 +964,8 @@ typedef struct {
 	/* In case of clients that don't handle GNUTLS_E_LARGE_PACKET, don't
 	 * force them into an infinite loop */
 	unsigned handshake_large_loops;
+	/* should be non-zero when a handshake is in progress */
+	bool handshake_in_progress;
 
 	/* if set it means that the master key was set using
 	 * gnutls_session_set_master() rather than being negotiated. */

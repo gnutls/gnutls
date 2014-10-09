@@ -2525,6 +2525,8 @@ int gnutls_handshake(gnutls_session_t session)
 		if (session->internals.priorities.protocol.algorithms == 0)
 			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
+		session->internals.handshake_in_progress = 1;
+
 		gettime(&session->internals.dtls.handshake_start_time);
 		if (session->internals.handshake_timeout_ms &&
 		    session->internals.handshake_endtime == 0)
