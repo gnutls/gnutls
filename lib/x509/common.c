@@ -1972,7 +1972,7 @@ _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
 	size_t id_size;
 	bool result = 0;
 
-	if (now > gnutls_x509_crt_get_expiration_time(cert) &&
+	if (now > gnutls_x509_crt_get_expiration_time(cert) ||
 	    now < gnutls_x509_crt_get_activation_time(cert)) {
 		/* don't bother, certificate is not yet activated or expired */
 		gnutls_assert();
