@@ -38,14 +38,15 @@
 #define URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
 #define CONFIG "softhsm.config"
 
+#define DEFAULT_THEN 1256803113
+static time_t then = DEFAULT_THEN;
+
 /* GnuTLS internally calls time() to find out the current time when
    verifying certificates.  To avoid a time bomb, we hard code the
    current time.  This should work fine on systems where the library
    call to time is resolved at run-time.  */
 static time_t mytime(time_t * t)
 {
-	time_t then = 1256803113;
-
 	if (t)
 		*t = then;
 
@@ -281,6 +282,11 @@ void doit(void)
 
 		vdata[0].type = GNUTLS_DT_KEY_PURPOSE_OID;
 		vdata[0].data = (void *)chains[i].purpose;
+
+		if (chains[i].expected_time != 0)
+			then = chains[i].expected_time;
+		else
+			then = DEFAULT_THEN;
 
 		/* make sure that the two functions don't diverge */
 		ret = gnutls_x509_trust_list_verify_crt2(tl, certs, j,
