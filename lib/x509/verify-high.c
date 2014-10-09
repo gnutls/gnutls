@@ -871,7 +871,11 @@ int trust_list_get_issuer(gnutls_x509_trust_list_t list,
 						 list->node[hash].
 						 trusted_cas[i]);
 		if (ret != 0) {
-			*issuer = list->node[hash].trusted_cas[i];
+			if (flags & GNUTLS_TL_GET_COPY) {
+				*issuer = crt_cpy(list->node[hash].trusted_cas[i]);
+			} else {
+				*issuer = list->node[hash].trusted_cas[i];
+			}
 			return 0;
 		}
 	}
@@ -903,16 +907,23 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 				      unsigned int flags)
 {
 	int ret;
-	gnutls_x509_crt_t crt;
+
+	ret = trust_list_get_issuer(list, cert, issuer, flags);
+	if (ret == 0) {
+		return 0;
+	}
 
 #ifdef ENABLE_PKCS11
-	if (list->pkcs11_token) {
+	if (ret < 0 && list->pkcs11_token) {
+		gnutls_x509_crt_t crt;
 		gnutls_datum_t der = {NULL, 0};
 		/* use the token for verification */
 		ret = gnutls_pkcs11_get_raw_issuer(list->pkcs11_token, cert, &der,
 			GNUTLS_X509_FMT_DER, 0);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 
 		ret = gnutls_x509_crt_init(&crt);
 		if (ret < 0) {
@@ -943,11 +954,6 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 		}
 	}
 #endif
-
-	ret = trust_list_get_issuer(list, cert, issuer, flags);
-	if (flags & GNUTLS_TL_GET_COPY) {
-		*issuer = crt_cpy(*issuer);
-	}
 	return ret;
 }
 
@@ -1093,47 +1099,49 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 		return 0;
 	}
 
+	*voutput =
+	    _gnutls_verify_crt_status(cert_list, cert_list_size,
+					    list->node[hash].trusted_cas,
+					    list->
+					    node[hash].trusted_ca_size,
+					    flags, purpose, func);
+
+#define LAST_DN cert_list[cert_list_size-1]->raw_dn
+#define LAST_IDN cert_list[cert_list_size-1]->raw_issuer_dn
+
+	if ((*voutput) & GNUTLS_CERT_SIGNER_NOT_FOUND &&
+		(LAST_DN.size != LAST_IDN.size ||
+		 memcmp(LAST_DN.data, LAST_IDN.data, LAST_IDN.size) != 0)) {
+
+		/* if we couldn't find the issuer, try to see if the last
+		 * certificate is in the trusted list and try to verify against
+		 * (if it is not self signed) */
+		hash =
+		    hash_pjw_bare(cert_list[cert_list_size - 1]->raw_dn.
+			  data, cert_list[cert_list_size - 1]->raw_dn.size);
+		hash %= list->size;
+
+		*voutput =
+		    _gnutls_verify_crt_status(cert_list, cert_list_size,
+					    list->node[hash].trusted_cas,
+					    list->
+					    node[hash].trusted_ca_size,
+					    flags, purpose, func);
+	}
+
 #ifdef ENABLE_PKCS11
-	if (list->pkcs11_token) {
+	if ((*voutput & GNUTLS_CERT_SIGNER_NOT_FOUND) && list->pkcs11_token) {
 		/* use the token for verification */
 
 		*voutput = _gnutls_pkcs11_verify_crt_status(list->pkcs11_token,
 								cert_list, cert_list_size,
 								purpose,
 								flags, func);
-	} else
-#endif
-	{
-		*voutput =
-		    _gnutls_verify_crt_status(cert_list, cert_list_size,
-						    list->node[hash].trusted_cas,
-						    list->
-						    node[hash].trusted_ca_size,
-						    flags, purpose, func);
-
-#define LAST_DN cert_list[cert_list_size-1]->raw_dn
-#define LAST_IDN cert_list[cert_list_size-1]->raw_issuer_dn
-
-		if ((*voutput) & GNUTLS_CERT_SIGNER_NOT_FOUND &&
-			(LAST_DN.size != LAST_IDN.size ||
-			 memcmp(LAST_DN.data, LAST_IDN.data, LAST_IDN.size) != 0)) {
-
-			/* if we couldn't find the issuer, try to see if the last
-			 * certificate is in the trusted list and try to verify against
-			 * (if it is not self signed) */
-			hash =
-			    hash_pjw_bare(cert_list[cert_list_size - 1]->raw_dn.
-				  data, cert_list[cert_list_size - 1]->raw_dn.size);
-			hash %= list->size;
-
-			*voutput =
-			    _gnutls_verify_crt_status(cert_list, cert_list_size,
-						    list->node[hash].trusted_cas,
-						    list->
-						    node[hash].trusted_ca_size,
-						    flags, purpose, func);
+		if (*voutput != 0) {
+			gnutls_assert();
 		}
 	}
+#endif
 
 	/* End-certificate, key purpose and hostname checks. */
 	if (purpose) {
