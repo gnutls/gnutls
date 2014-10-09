@@ -21,9 +21,8 @@ algorithm as well.
 ** libgnutls: the gnutls_handshake() process will enforce a timeout by
 default.
 
-** libgnutls: the verification flag GNUTLS_REQUIRE_KEY_PURPOSE_ON_INTERMEDIATE
-is introduced, and forces the application of the desired key purpose (extended
-key usage) into intermediate certificates. The verification result
+** libgnutls: if a key purpose (extended key usage) is specified for verification,
+it is applied into intermediate certificates. The verification result
 GNUTLS_CERT_PURPOSE_MISMATCH is also introduced. 
 
 ** libgnutls: Added support for the extended master secret

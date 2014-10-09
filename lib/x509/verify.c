@@ -952,7 +952,7 @@ _gnutls_verify_crt_status(const gnutls_x509_crt_t * certificate_list,
 		if (i - 1 < 0)
 			break;
 
-		if (purpose != NULL && (flags & GNUTLS_VERIFY_KEY_PURPOSE_ON_INTERMEDIATE)) {
+		if (purpose != NULL) {
 			ret = _gnutls_check_key_purpose(certificate_list[i], purpose, 1);
 			if (ret != 1) {
 				gnutls_assert();
