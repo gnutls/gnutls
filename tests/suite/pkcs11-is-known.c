@@ -223,7 +223,7 @@ static const char intermediate_str[] =
    call to time is resolved at run-time.  */
 static time_t mytime(time_t * t)
 {
-	time_t then = 1256803113;
+	time_t then = 1412850586;
 
 	if (t)
 		*t = then;
