@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: Fixes in the transparent import of PKCS #11 certificates.
 Reported by Joseph Peruski.
 
+** libgnutls: When both a trust module and additional CAs are present 
+account the latter as well; reported by David Woodhouse.
+
 ** libgnutls: added GNUTLS_TL_GET_COPY flag for
 gnutls_x509_trust_list_get_issuer(). That allows the function to be used
 in a thread safe way when PKCS #11 trust modules are in use.
