@@ -135,6 +135,11 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
 	}
 	gnutls_free(list->blacklisted);
 
+	for (j = 0; j < list->keep_certs_size; j++) {
+		gnutls_x509_crt_deinit(list->keep_certs[j]);
+	}
+	gnutls_free(list->keep_certs);
+
 	for (i = 0; i < list->size; i++) {
 		if (all) {
 			for (j = 0; j < list->node[i].trusted_ca_size; j++) {
@@ -216,6 +221,32 @@ add_new_ca_to_rdn_seq(gnutls_x509_trust_list_t list,
 
 	return 0;
 }
+
+#ifdef ENABLE_PKCS11
+/* Keeps the provided certificate in a structure that will be
+ * deallocated on deinit. This is to handle get_issuer() with 
+ * pkcs11 trust modules when the GNUTLS_TL_GET_COPY flag isn't
+ * given. It is not thread safe. */
+static int
+trust_list_add_compat(gnutls_x509_trust_list_t list,
+			       gnutls_x509_crt_t cert)
+{
+	list->keep_certs =
+		    gnutls_realloc_fast(list->keep_certs,
+					(list->keep_certs_size +
+					 1) *
+					sizeof(list->keep_certs[0]));
+	if (list->keep_certs == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	list->keep_certs[list->keep_certs_size] = cert;
+	list->keep_certs_size++;
+
+	return 0;
+}
+#endif
 
 /**
  * gnutls_x509_trust_list_add_cas:
@@ -872,6 +903,7 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 				      unsigned int flags)
 {
 	int ret;
+	gnutls_x509_crt_t crt;
 
 #ifdef ENABLE_PKCS11
 	if (list->pkcs11_token) {
@@ -882,33 +914,33 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		if (flags & GNUTLS_TL_GET_COPY) {
-			gnutls_x509_crt_t crt;
-			ret = gnutls_x509_crt_init(&crt);
-			if (ret < 0) {
-				gnutls_free(der.data);
-				return gnutls_assert_val(ret);
-			}
+		ret = gnutls_x509_crt_init(&crt);
+		if (ret < 0) {
+			gnutls_free(der.data);
+			return gnutls_assert_val(ret);
+		}
 
-			ret = gnutls_x509_crt_import(crt, &der, GNUTLS_X509_FMT_DER);
+		ret = gnutls_x509_crt_import(crt, &der, GNUTLS_X509_FMT_DER);
+		gnutls_free(der.data);
+		if (ret < 0) {
+			gnutls_x509_crt_deinit(crt);
+			return gnutls_assert_val(ret);
+		}
+
+		if (flags & GNUTLS_TL_GET_COPY) {
+			*issuer = crt;
+			return 0;
+		} else {
+			/* we add this CA to the keep_cert list in order to make it
+			 * persistent. It will be deallocated when the trust list is.
+			 */
+			ret = trust_list_add_compat(list, crt);
 			if (ret < 0) {
-				gnutls_free(der.data);
 				gnutls_x509_crt_deinit(crt);
 				return gnutls_assert_val(ret);
 			}
-			*issuer = crt;
-			return 0;
+			return ret;
 		}
-
-		/* we add this CA to the trusted list in order to make it
-		 * persistent. It will be deallocated when the trust list is.
-		 */
-		ret = gnutls_x509_trust_list_add_trust_mem(list, &der, NULL,
-			GNUTLS_X509_FMT_DER, GNUTLS_TL_NO_DUPLICATE_KEY, 0);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
-
-		gnutls_free(der.data);
 	}
 #endif
 
