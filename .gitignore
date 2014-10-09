@@ -715,3 +715,8 @@ tests/crlverify
 tests/dane
 tests/mini-dtls-lowmtu
 tests/mini-x509-callbacks-intr
+tests/suite/pkcs11-combo
+tests/mini-dtls-discard
+tests/suite/pkcs11-is-known
+tests/suite/pkcs11-multi
+tests/suite/testpkcs11.debug
