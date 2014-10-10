@@ -15,6 +15,9 @@ account the latter as well; reported by David Woodhouse.
 gnutls_x509_trust_list_get_issuer(). That allows the function to be used
 in a thread safe way when PKCS #11 trust modules are in use.
 
+** libgnutls: fix issue in DTLS retransmission when session tickets
+were in use; reported by Manuel Pégourié-Gonnard.
+
 ** libgnutls-dane: Do not require the CA on a ca match to be direct CA.
 
 ** guile: new 'set-session-server-name!' procedure; see the manual for
