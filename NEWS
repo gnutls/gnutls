@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: Fixes in the transporent import of PKCS #11 certificates.
 Reported by Joseph Peruski.
 
+** libgnutls: fix issue in DTLS retransmission when session tickets
+were in use; reported by Manuel Pégourié-Gonnard.
+
 ** guile: new 'set-session-server-name!' procedure; see the manual for
 details.
 
