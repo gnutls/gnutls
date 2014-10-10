@@ -256,7 +256,7 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 				/* Desired size of modulo, in bits */
 				unsigned n_size)
 {
-	mpz_t t, r, p1, q1, phi;
+	mpz_t t, r, p1, q1, lcm;
 	int ret;
 	struct dss_params_validation_seeds cert;
 	unsigned l = n_size / 2;
@@ -281,7 +281,7 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 
 	mpz_init(p1);
 	mpz_init(q1);
-	mpz_init(phi);
+	mpz_init(lcm);
 	mpz_init(t);
 	mpz_init(r);
 
@@ -337,9 +337,13 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 
 	mpz_sub_ui(p1, key->p, 1);
 	mpz_sub_ui(q1, key->q, 1);
-	mpz_mul(phi, p1, q1);
 
-	assert(mpz_invert(key->d, pub->e, phi) != 0);
+	mpz_lcm(lcm, p1, q1);
+
+	if (mpz_invert(key->d, pub->e, lcm) == 0) {
+		ret = 0;
+		goto cleanup;
+	}
 
 	/* Done! Almost, we must compute the auxillary private values. */
 	/* a = d % (p-1) */
@@ -357,7 +361,7 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
  cleanup:
 	mpz_clear(p1);
 	mpz_clear(q1);
-	mpz_clear(phi);
+	mpz_clear(lcm);
 	mpz_clear(t);
 	mpz_clear(r);
 	return ret;
