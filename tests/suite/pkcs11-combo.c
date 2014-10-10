@@ -41,7 +41,8 @@
 #include "../test-chains.h"
 
 #define URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
-#define CONFIG "softhsm-issuer2.config"
+#define NAME "softhsm-combo"
+#define CONFIG NAME".config"
 
 /* These CAs have the same DN */
 static const char *ca_list[MAX_CHAIN] = {
@@ -309,8 +310,8 @@ void doit(void)
 		fprintf(stderr, "error writing %s\n", CONFIG);
 		exit(1);
 	}
-	remove("./softhsm-issuer2.db");
-	fputs("0:./softhsm-issuer2.db\n", fp);
+	remove("./"NAME".db");
+	fputs("0:./"NAME".db\n", fp);
 	fclose(fp);
 
 	setenv("SOFTHSM_CONF", CONFIG, 0);
