@@ -85,6 +85,16 @@ __attribute__((packed))
 #endif
 ;
 
+#ifdef HAVE_GETRUSAGE
+# ifdef RUSAGE_THREAD
+#  define ARG_RUSAGE RUSAGE_THREAD
+# else
+#  define ARG_RUSAGE RUSAGE_SELF
+# endif
+#endif
+
+static int rusage_arg = ARG_RUSAGE;
+
 static void _rnd_get_event(struct event_st *e)
 {
 	static unsigned count = 0;
@@ -92,14 +102,11 @@ static void _rnd_get_event(struct event_st *e)
 	gettime(&e->now);
 
 #ifdef HAVE_GETRUSAGE
-# ifdef RUSAGE_THREAD
-	if (getrusage(RUSAGE_THREAD, &e->rusage) < 0) {
-# else
-	if (getrusage(RUSAGE_SELF, &e->rusage) < 0) {
-# endif
-		_gnutls_debug_log("getrusage failed: %s\n",
+	if (rusage_arg != -1) {
+		if (getrusage(rusage_arg, &e->rusage) < 0) {
+			_gnutls_debug_log("getrusage failed: %s\n",
 				  strerror(errno));
-		abort();
+		}
 	}
 #endif
 
@@ -401,6 +408,18 @@ static int wrap_nettle_rnd_init(void **ctx)
 		gnutls_assert();
 		return ret;
 	}
+
+#ifdef HAVE_GETRUSAGE
+	{
+		struct rusage usage;
+		if (getrusage(rusage_arg, &usage) < 0) {
+			rusage_arg = RUSAGE_SELF;
+			if (getrusage(rusage_arg, &usage) < 0) {
+				rusage_arg = -1;
+			}
+		}
+	}
+#endif
 
 	yarrow256_init(&yctx, SOURCES, ysources);
 
