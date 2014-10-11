@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 3.2.19 (unreleased)
 
-** libgnutls: Fixes in the transporent import of PKCS #11 certificates.
+** libgnutls: Fixes in the transparent import of PKCS #11 certificates.
 Reported by Joseph Peruski.
 
 ** libgnutls: fix issue in DTLS retransmission when session tickets
