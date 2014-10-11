@@ -91,9 +91,9 @@ __attribute__((packed))
 # else
 #  define ARG_RUSAGE RUSAGE_SELF
 # endif
-#endif
 
 static int rusage_arg = ARG_RUSAGE;
+#endif
 
 static void _rnd_get_event(struct event_st *e)
 {
