@@ -11,6 +11,9 @@ Reported by Joseph Peruski.
 ** libgnutls: fix issue in DTLS retransmission when session tickets
 were in use; reported by Manuel Pégourié-Gonnard.
 
+** libgnutls: Prevent abort() in library if getrusage() fails. Try to
+detect instead which of RUSAGE_THREAD and RUSAGE_SELF would work.
+
 ** guile: new 'set-session-server-name!' procedure; see the manual for
 details.
 
