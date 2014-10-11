@@ -46,9 +46,9 @@
 # else
 #  define ARG_RUSAGE RUSAGE_SELF
 # endif
-#endif
 
 static int rusage_arg = ARG_RUSAGE;
+#endif
 
 void _rnd_get_event(struct event_st *e)
 {
