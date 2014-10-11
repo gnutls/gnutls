@@ -20,6 +20,9 @@ were in use; reported by Manuel Pégourié-Gonnard.
 
 ** libgnutls-dane: Do not require the CA on a ca match to be direct CA.
 
+** libgnutls: Prevent abort() in library if getrusage() fails. Try to
+detect instead which of RUSAGE_THREAD and RUSAGE_SELF would work.
+
 ** guile: new 'set-session-server-name!' procedure; see the manual for
 details.
 
