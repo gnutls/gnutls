@@ -186,6 +186,7 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		       gnutls_x509_crt_fmt_t format)
 {
 	int result = 0;
+	int version;
 
 	if (cert == NULL) {
 		gnutls_assert();
@@ -268,6 +269,20 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
+	}
+
+	/* enforce the rule that only version 3 certificates carry extensions */
+	version = gnutls_x509_crt_get_version(cert);
+	if (version < 3) {
+		gnutls_datum_t exts;
+		result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
+			"tbsCertificate.extensions", &exts);
+		if (result >= 0 && exts.size > 0) {
+			gnutls_assert();
+			_gnutls_debug_log("error: extensions present in certificate with version %d\n", version);
+			result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+			goto cleanup;
+		}
 	}
 
 	/* Since we do not want to disable any extension
