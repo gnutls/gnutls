@@ -30,6 +30,27 @@
 #include <gnutls/x509-ext.h>
 #include "utils.h"
 
+static char invalid_cert[] = /* v1 certificate with extensions */
+"-----BEGIN CERTIFICATE-----\n"
+"MIIDHjCCAgYCDFQ7zlUDsihSxVF4mDANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQD\n"
+"EwRDQS0wMCIYDzIwMTQxMDEzMTMwNjI5WhgPOTk5OTEyMzEyMzU5NTlaMBMxETAP\n"
+"BgNVBAMTCHNlcnZlci0xMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\n"
+"zoG3/1YtwGHh/5u3ex6xAmwO0/H4gdIy/yiYLxqWcy+HzyMBBZHNXuV7W0z7x+Qo\n"
+"qCGtenWkzIQSgeYKyzdcpPDscZIYOgwHWUFczxgVGdLsBKPSczgqMHpSCLgMgnDM\n"
+"RaN6SNQeTQdftkLt5wdBSzNaxhhPYsCEbopSeZ8250FCLS3gRpoMtYCBiy7cjSJB\n"
+"zv6zmZStXNgTYr8pLwI0nyxPyRdB+TZyqAC6r9W154y51vsqUCGmC0I9hn1A5kkD\n"
+"5057x+Ho1kDwPxOfObdOR+AJSAw/FeGuStzViJY0I68B90sEo/HD+h7mB+CwJ2Yf\n"
+"64/xVdh+D8L65eYkM9z88wIDAQABo3cwdTAMBgNVHRMBAf8EAjAAMBQGA1UdEQQN\n"
+"MAuCCWxvY2FsaG9zdDAPBgNVHQ8BAf8EBQMDB6AAMB0GA1UdDgQWBBT7Gk/u95zI\n"
+"JTM89CXJ70IxxqhegDAfBgNVHSMEGDAWgBQ9X77/zddjG9ob2zrR/WuGmxwFGDAN\n"
+"BgkqhkiG9w0BAQsFAAOCAQEAaTrAcTkQ7yqf6afoTkFXZuZ+jJXYNGkubxs8Jo/z\n"
+"srJk/WWVGAKuxiBDumk88Gjm+WXGyIDA7Hq9fhGaklJV2PGRfNVx9No51HXeAToT\n"
+"sHs2XKhk9SdKKR4UJkuX3U2malMlCpmFMtm3EieDVZLxeukhODJQtRa3vGg8QWoz\n"
+"ODlewHSmQiXhnqq52fLCbdVUaBnaRGOIwNZ0FcBWv9n0ZCuhjg9908rUVH9/OjI3\n"
+"AGVZcbN9Jac2ZO8NTxP5vS1hrG2wT9+sVRh1sD5ISZSM4gWdq9sK8d7j+SwOPBWY\n"
+"3dcxQlfvWw2Dt876XYoyUZuKirmASVlMw+hkm1WXM7Svsw==\n"
+"-----END CERTIFICATE-----\n";
+
 static char pem[] =
     "-----BEGIN CERTIFICATE-----"
     "MIIFdDCCBN2gAwIBAgIBBzANBgkqhkiG9w0BAQsFADCBkzEVMBMGA1UEAxMMQ2lu"
@@ -670,7 +691,8 @@ struct ext_handler_st handlers[] = {
 void doit(void)
 {
 	int ret;
-	gnutls_datum_t derCert = { (void *)pem, sizeof(pem) };
+	gnutls_datum_t derCert = { (void *)pem, sizeof(pem)-1 };
+	gnutls_datum_t v1Cert = { (void *)invalid_cert, sizeof(invalid_cert)-1 };
 	gnutls_x509_crt_t cert;
 	size_t oid_len = MAX_DATA_SIZE;
 	gnutls_datum_t ext;
@@ -681,6 +703,15 @@ void doit(void)
 	ret = global_init();
 	if (ret < 0)
 		fail("init %d\n", ret);
+
+	ret = gnutls_x509_crt_init(&cert);
+	if (ret < 0)
+		fail("crt_init %d\n", ret);
+
+	ret = gnutls_x509_crt_import(cert, &v1Cert, GNUTLS_X509_FMT_PEM);
+	if (ret >= 0)
+		fail("crt_import of v1 cert with extensions should have failed: %d\n", ret);
+	gnutls_x509_crt_deinit(cert);
 
 	ret = gnutls_x509_crt_init(&cert);
 	if (ret < 0)
