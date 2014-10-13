@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.1.27 (unreleased)
+* Version 3.1.27 (released 2014-10-13)
 
 ** libgnutls: Fixed issue with unexpected non-fatal errors resetting the
 handshake's hash buffer, in applications using the heartbeat extension
