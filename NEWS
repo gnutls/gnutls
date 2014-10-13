@@ -3,7 +3,7 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.2.19 (unreleased)
+* Version 3.2.19 (released 2014-10-13)
 
 ** libgnutls: Fixes in the transparent import of PKCS #11 certificates.
 Reported by Joseph Peruski.
