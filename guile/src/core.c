@@ -719,7 +719,7 @@ SCM_DEFINE (scm_gnutls_set_session_server_name_x, "set-session-server-name!",
   c_name = scm_to_locale_string (name);
 
   err = gnutls_server_name_set (c_session, c_type, c_name,
-				strlen (c_name) + 1);
+				strlen (c_name));
   free (c_name);
 
   if (EXPECT_FALSE (err != GNUTLS_E_SUCCESS))
