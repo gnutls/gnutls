@@ -992,6 +992,18 @@ static unsigned small_prime_check(unsigned x)
 	return 1;
 }
 
+/* The seed in FIPS186-3 is used either as an integer or blob,
+ * but when used as an integer it must not be trunacated below
+ * the "nominal" seed size. This function returns the size
+ * that way. */
+unsigned mpz_seed_sizeinbase_256_u(mpz_t s, unsigned nominal)
+{
+	unsigned ret = nettle_mpz_sizeinbase_256_u(s);
+	if (ret < nominal)
+		return nominal;
+	return ret;
+}
+
 static int st_provable_prime_small(mpz_t p,
 				   unsigned *prime_seed_length,
 				   void *prime_seed,
@@ -1018,7 +1030,7 @@ static int st_provable_prime_small(mpz_t p,
 	nettle_mpz_set_str_256_u(s, seed_length, seed);
 
  retry:
-	tseed_length = nettle_mpz_sizeinbase_256_u(s);
+	tseed_length = mpz_seed_sizeinbase_256_u(s, seed_length);
 	if (tseed_length > sizeof(tseed)) {
 		goto fail;
 	}
@@ -1030,7 +1042,7 @@ static int st_provable_prime_small(mpz_t p,
 
 	mpz_add_ui(s, s, 1);
 
-	tseed_length = nettle_mpz_sizeinbase_256_u(s);
+	tseed_length = mpz_seed_sizeinbase_256_u(s, seed_length);
 	if (tseed_length > sizeof(tseed))
 		goto fail;
 
@@ -1071,7 +1083,7 @@ static int st_provable_prime_small(mpz_t p,
 	mpz_set_ui(p, c);
 
 	if (prime_seed != NULL) {
-		tseed_length = nettle_mpz_sizeinbase_256_u(s);
+		tseed_length = mpz_seed_sizeinbase_256_u(s, tseed_length);
 		if (*prime_seed_length < tseed_length)
 			goto fail;
 
@@ -1161,7 +1173,7 @@ st_provable_prime(mpz_t p,
 			goto fail;
 
 		for (i = 0; i < iterations; i++) {
-			tseed_length = nettle_mpz_sizeinbase_256_u(s);
+			tseed_length = mpz_seed_sizeinbase_256_u(s, pseed_length);
 			if (tseed_length > sizeof(tseed))
 				goto fail;
 			nettle_mpz_get_str_256(tseed_length, tseed, s);
@@ -1212,9 +1224,8 @@ st_provable_prime(mpz_t p,
 
 	mpz_set_ui(r, 0); /* a = 0 */
 	if (iterations > 0) {
-
 		for (i = 0; i < iterations; i++) {
-			tseed_length = nettle_mpz_sizeinbase_256_u(s);
+			tseed_length = mpz_seed_sizeinbase_256_u(s, pseed_length);
 			if (tseed_length > sizeof(tseed))
 				goto fail;
 
@@ -1249,7 +1260,7 @@ st_provable_prime(mpz_t p,
 			mpz_set(p, c);
 
 			if (prime_seed != NULL) {
-				tseed_length = nettle_mpz_sizeinbase_256_u(s);
+				tseed_length = mpz_seed_sizeinbase_256_u(s, pseed_length);
 				if (*prime_seed_length < tseed_length)
 					goto fail;
 
