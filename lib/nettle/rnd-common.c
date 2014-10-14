@@ -46,8 +46,6 @@
 # else
 #  define ARG_RUSAGE RUSAGE_SELF
 # endif
-
-static int rusage_arg = ARG_RUSAGE;
 #endif
 
 void _rnd_get_event(struct event_st *e)
@@ -57,11 +55,9 @@ void _rnd_get_event(struct event_st *e)
 	gettime(&e->now);
 
 #ifdef HAVE_GETRUSAGE
-	if (rusage_arg != -1) {
-		if (getrusage(rusage_arg, &e->rusage) < 0) {
-			_gnutls_debug_log("getrusage failed: %s\n",
-				  strerror(errno));
-		}
+	if (getrusage(ARG_RUSAGE, &e->rusage) < 0) {
+		_gnutls_debug_log("getrusage failed: %s\n",
+			  strerror(errno));
 	}
 #endif
 
@@ -192,18 +188,6 @@ get_entropy_func _rnd_get_system_entropy = NULL;
 int _rnd_system_entropy_init(void)
 {
 int old;
-
-#ifdef HAVE_GETRUSAGE
-	{
-		struct rusage usage;
-		if (getrusage(rusage_arg, &usage) < 0) {
-			rusage_arg = RUSAGE_SELF;
-			if (getrusage(rusage_arg, &usage) < 0) {
-				rusage_arg = -1;
-			}
-		}
-	}
-#endif
 
 	device_fd = open("/dev/urandom", O_RDONLY);
 	if (device_fd < 0) {
