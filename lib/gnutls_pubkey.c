@@ -1885,17 +1885,13 @@ dsa_verify_data(gnutls_pk_algorithm_t pk,
 	int ret;
 	uint8_t _digest[MAX_HASH_SIZE];
 	gnutls_datum_t digest;
-	digest_hd_st hd;
 
 	if (algo == NULL)
 		algo = _gnutls_dsa_q_to_hash(pk, params, NULL);
 
-	ret = _gnutls_hash_init(&hd, algo);
+	ret = _gnutls_hash_fast(algo->id, data->data, data->size, _digest);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
-
-	_gnutls_hash(&hd, data->data, data->size);
-	_gnutls_hash_deinit(&hd, _digest);
 
 	digest.data = _digest;
 	digest.size = _gnutls_hash_get_algo_len(algo);
