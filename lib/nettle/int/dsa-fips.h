@@ -115,4 +115,6 @@ hash (uint8_t digest[DIGEST_SIZE], unsigned length, void *data)
   return;
 }
 
+unsigned mpz_seed_sizeinbase_256_u(mpz_t s, unsigned nominal);
+
 #endif /* DSA_FIPS_H_INCLUDED */

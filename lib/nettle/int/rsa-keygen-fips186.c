@@ -53,7 +53,7 @@ unsigned iterations;
 unsigned storage_length = 0, i;
 uint8_t *storage = NULL;
 uint8_t pseed[MAX_PVP_SEED_SIZE+1];
-unsigned pseed_length = sizeof(pseed);
+unsigned pseed_length = sizeof(pseed), tseed_length;
 unsigned max = bits*5;
 
 	mpz_init(p0);
@@ -85,11 +85,13 @@ unsigned max = bits*5;
 
 		nettle_mpz_set_str_256_u(s, pseed_length, pseed);
 		for (i = 0; i < iterations; i++) {
-			pseed_length = nettle_mpz_sizeinbase_256_u(s);
-			nettle_mpz_get_str_256(pseed_length, pseed, s);
+			tseed_length = mpz_seed_sizeinbase_256_u(s, pseed_length);
+			if (tseed_length > sizeof(pseed))
+				goto fail;
+			nettle_mpz_get_str_256(tseed_length, pseed, s);
 
 			hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
-			     pseed_length, pseed);
+			     tseed_length, pseed);
 			mpz_add_ui(s, s, 1);
 		}
 
@@ -170,11 +172,13 @@ unsigned max = bits*5;
 		mpz_set_ui(x, 0); /* a = 0 */
 		if (iterations > 0) {
 			for (i = 0; i < iterations; i++) {
-				pseed_length = nettle_mpz_sizeinbase_256_u(s);
-				nettle_mpz_get_str_256(pseed_length, pseed, s);
+				tseed_length = mpz_seed_sizeinbase_256_u(s, pseed_length);
+				if (tseed_length > sizeof(pseed))
+					goto fail;
+				nettle_mpz_get_str_256(tseed_length, pseed, s);
 
 				hash(&storage[(iterations - i - 1) * DIGEST_SIZE],
-				     pseed_length, pseed);
+				     tseed_length, pseed);
 				mpz_add_ui(s, s, 1);
 			}
 
@@ -203,16 +207,19 @@ unsigned max = bits*5;
 			mpz_powm(r1, r2, p0, p);
 			if (mpz_cmp_ui(r1, 1) == 0) {
 				if (prime_seed_length != NULL) {
-					pseed_length = nettle_mpz_sizeinbase_256_u(s);
-					nettle_mpz_get_str_256(pseed_length, pseed, s);
+					tseed_length = mpz_seed_sizeinbase_256_u(s, pseed_length);
+					if (tseed_length > sizeof(pseed))
+						goto fail;
 
-					if (*prime_seed_length < pseed_length) {
-						*prime_seed_length = pseed_length;
+					nettle_mpz_get_str_256(tseed_length, pseed, s);
+
+					if (*prime_seed_length < tseed_length) {
+						*prime_seed_length = tseed_length;
 						goto fail;
 					}
-					*prime_seed_length = pseed_length;
+					*prime_seed_length = tseed_length;
 					if (prime_seed != NULL)
-						memcpy(prime_seed, pseed, pseed_length);
+						memcpy(prime_seed, pseed, tseed_length);
 				}
 				ret = 1;
 				goto cleanup;
