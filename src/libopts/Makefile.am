@@ -10,7 +10,7 @@ EXTRA_DIST		=
 BUILT_SOURCES		=
 MOSTLYCLEANFILES	=
 
-+_NORETURN_H=$(srcdir)/compat/_Noreturn.h
+_NORETURN_H=$(srcdir)/compat/_Noreturn.h
 EXTRA_DIST += $(srcdir)/compat/_Noreturn.h
 BUILT_SOURCES += $(STDNORETURN_H)
 if GL_GENERATE_STDNORETURN_H
