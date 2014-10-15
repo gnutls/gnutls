@@ -10,6 +10,10 @@ See the end for copying conditions.
 ** libgnutls: Added helper functions to obtain information on PKCS #8
 structures.
 
+** libgnutls: SSL 3.0 is no longer included in the default priorities
+list. It has to be explicitly enabled, e.g., with a string like
+"NORMAL:+VERS-SSL3.0".
+
 ** libgnutls: Use nettle's PBKDF2 implementation.
 
 ** libgnutls: gnutls_x509_crt_check_hostname() and friends will use
