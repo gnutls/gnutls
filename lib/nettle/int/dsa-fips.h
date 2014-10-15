@@ -80,7 +80,7 @@ int
 _dsa_validate_dss_g(struct dsa_public_key *pub,
 		    unsigned domain_seed_size, const uint8_t *domain_seed, unsigned index);
 
-unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits);
+unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits, unsigned generate);
 
 /* The following low-level functions can be used for DH key exchange as well 
  */
