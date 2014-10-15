@@ -36,11 +36,11 @@
 
 #include <nettle/bignum.h>
 
-unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits)
+unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits, unsigned generate)
 {
 	switch (q_bits) {
 	case 160:
-		if (_gnutls_fips_mode_enabled() != 0)
+		if (_gnutls_fips_mode_enabled() != 0 && generate != 0)
 			return 0;
 
 		if (p_bits != 1024)
@@ -77,7 +77,7 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 	uint8_t *storage = NULL;
 	unsigned storage_length = 0;
 
-	ret = _dsa_check_qp_sizes(q_bits, p_bits);
+	ret = _dsa_check_qp_sizes(q_bits, p_bits, 1);
 	if (ret == 0) {
 		return 0;
 	}
@@ -375,7 +375,7 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 	uint8_t domain_seed[MAX_PVP_SEED_SIZE*3];
 	unsigned domain_seed_size = 0;
 
-	ret = _dsa_check_qp_sizes(q_bits, p_bits);
+	ret = _dsa_check_qp_sizes(q_bits, p_bits, 1);
 	if (ret == 0)
 		return 0;
 
