@@ -43,6 +43,8 @@ when available.
 
 ** certtool: it will print the A-label (ACE) names in addition to UTF-8.
 
+** gnutls-cli: added option --priority-list.
+
 ** guile: new 'set-session-server-name!' procedure; see the manual for details.
 
 ** API and ABI modifications:
@@ -69,6 +71,7 @@ gnutls_certificate_get_openpgp_key: Added
 gnutls_certificate_get_openpgp_crt: Added
 gnutls_record_discard_queued: Added
 gnutls_session_ext_master_secret_status: Added
+gnutls_priority_string_list: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
