@@ -234,7 +234,7 @@ gnutls_certificate_type_set_priority(gnutls_session_t session,
 #endif
 }
 
-static const int supported_ecc_normal[] = {
+static const int _supported_ecc_normal[] = {
 #ifdef ENABLE_NON_SUITEB_CURVES
 	GNUTLS_ECC_CURVE_SECP192R1,
 	GNUTLS_ECC_CURVE_SECP224R1,
@@ -244,30 +244,35 @@ static const int supported_ecc_normal[] = {
 	GNUTLS_ECC_CURVE_SECP521R1,
 	0
 };
+static const int* supported_ecc_normal = _supported_ecc_normal;
 
-static const int supported_ecc_secure128[] = {
+static const int _supported_ecc_secure128[] = {
 	GNUTLS_ECC_CURVE_SECP256R1,
 	GNUTLS_ECC_CURVE_SECP384R1,
 	GNUTLS_ECC_CURVE_SECP521R1,
 	0
 };
+static const int* supported_ecc_secure128 = _supported_ecc_secure128;
 
-static const int supported_ecc_suiteb128[] = {
+static const int _supported_ecc_suiteb128[] = {
 	GNUTLS_ECC_CURVE_SECP256R1,
 	GNUTLS_ECC_CURVE_SECP384R1,
 	0
 };
+static const int* supported_ecc_suiteb128 = _supported_ecc_suiteb128;
 
-static const int supported_ecc_suiteb192[] = {
+static const int _supported_ecc_suiteb192[] = {
 	GNUTLS_ECC_CURVE_SECP384R1,
 	0
 };
+static const int* supported_ecc_suiteb192 = _supported_ecc_suiteb192;
 
-static const int supported_ecc_secure192[] = {
+static const int _supported_ecc_secure192[] = {
 	GNUTLS_ECC_CURVE_SECP384R1,
 	GNUTLS_ECC_CURVE_SECP521R1,
 	0
 };
+static const int* supported_ecc_secure192 = _supported_ecc_secure192;
 
 static const int protocol_priority[] = {
 	GNUTLS_TLS1_2,
@@ -284,12 +289,13 @@ static const int dtls_protocol_priority[] = {
 	0
 };
 
-static const int protocol_priority_suiteb[] = {
+static const int _protocol_priority_suiteb[] = {
 	GNUTLS_TLS1_2,
 	0
 };
+static const int* protocol_priority_suiteb = _protocol_priority_suiteb;
 
-static const int kx_priority_performance[] = {
+static const int _kx_priority_performance[] = {
 	GNUTLS_KX_RSA,
 #ifdef ENABLE_ECDHE
 	GNUTLS_KX_ECDHE_ECDSA,
@@ -301,8 +307,9 @@ static const int kx_priority_performance[] = {
 #endif
 	0
 };
+static const int* kx_priority_performance = _kx_priority_performance;
 
-static const int kx_priority_pfs[] = {
+static const int _kx_priority_pfs[] = {
 #ifdef ENABLE_ECDHE
 	GNUTLS_KX_ECDHE_ECDSA,
 	GNUTLS_KX_ECDHE_RSA,
@@ -313,13 +320,15 @@ static const int kx_priority_pfs[] = {
 #endif
 	0
 };
+static const int* kx_priority_pfs = _kx_priority_pfs;
 
-static const int kx_priority_suiteb[] = {
+static const int _kx_priority_suiteb[] = {
 	GNUTLS_KX_ECDHE_ECDSA,
 	0
 };
+static const int* kx_priority_suiteb = _kx_priority_suiteb;
 
-static const int kx_priority_secure[] = {
+static const int _kx_priority_secure[] = {
 	/* The ciphersuites that offer forward secrecy take
 	 * precedence
 	 */
@@ -340,8 +349,9 @@ static const int kx_priority_secure[] = {
 	 */
 	0
 };
+static const int* kx_priority_secure = _kx_priority_secure;
 
-static const int cipher_priority_performance_default[] = {
+static const int _cipher_priority_performance_default[] = {
 	GNUTLS_CIPHER_ARCFOUR_128,
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
@@ -358,7 +368,7 @@ static const int cipher_priority_performance_default[] = {
 /* If GCM and AES acceleration is available then prefer
  * them over anything else.
  */
-static const int cipher_priority_normal_default[] = {
+static const int _cipher_priority_normal_default[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_CAMELLIA_128_GCM,
@@ -391,19 +401,21 @@ static const int cipher_priority_normal_fips[] = {
 };
 
 
-static const int cipher_priority_suiteb128[] = {
+static const int _cipher_priority_suiteb128[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
 	0
 };
+static const int* cipher_priority_suiteb128 = _cipher_priority_suiteb128;
 
-static const int cipher_priority_suiteb192[] = {
+static const int _cipher_priority_suiteb192[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
 	0
 };
+static const int* cipher_priority_suiteb192 = _cipher_priority_suiteb192;
 
 
-static const int cipher_priority_secure128[] = {
+static const int _cipher_priority_secure128[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_CAMELLIA_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
@@ -415,15 +427,17 @@ static const int cipher_priority_secure128[] = {
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	0
 };
+static const int *cipher_priority_secure128 = _cipher_priority_secure128;
 
 
-static const int cipher_priority_secure192[] = {
+static const int _cipher_priority_secure192[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_CAMELLIA_256_GCM,
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	0
 };
+static const int* cipher_priority_secure192 = _cipher_priority_secure192;
 
 static const int comp_priority[] = {
 	/* compression should be explicitly requested to be enabled */
@@ -431,7 +445,7 @@ static const int comp_priority[] = {
 	0
 };
 
-static const int sign_priority_default[] = {
+static const int _sign_priority_default[] = {
 	GNUTLS_SIGN_RSA_SHA256,
 	GNUTLS_SIGN_DSA_SHA256,
 	GNUTLS_SIGN_ECDSA_SHA256,
@@ -451,19 +465,22 @@ static const int sign_priority_default[] = {
 	GNUTLS_SIGN_ECDSA_SHA1,
 	0
 };
+static const int* sign_priority_default = _sign_priority_default;
 
-static const int sign_priority_suiteb128[] = {
+static const int _sign_priority_suiteb128[] = {
 	GNUTLS_SIGN_ECDSA_SHA256,
 	GNUTLS_SIGN_ECDSA_SHA384,
 	0
 };
+static const int* sign_priority_suiteb128 = _sign_priority_suiteb128;
 
-static const int sign_priority_suiteb192[] = {
+static const int _sign_priority_suiteb192[] = {
 	GNUTLS_SIGN_ECDSA_SHA384,
 	0
 };
+static const int* sign_priority_suiteb192 = _sign_priority_suiteb192;
 
-static const int sign_priority_secure128[] = {
+static const int _sign_priority_secure128[] = {
 	GNUTLS_SIGN_RSA_SHA256,
 	GNUTLS_SIGN_DSA_SHA256,
 	GNUTLS_SIGN_ECDSA_SHA256,
@@ -473,14 +490,16 @@ static const int sign_priority_secure128[] = {
 	GNUTLS_SIGN_ECDSA_SHA512,
 	0
 };
+static const int* sign_priority_secure128 = _sign_priority_secure128;
 
-static const int sign_priority_secure192[] = {
+static const int _sign_priority_secure192[] = {
 	GNUTLS_SIGN_RSA_SHA384,
 	GNUTLS_SIGN_ECDSA_SHA384,
 	GNUTLS_SIGN_RSA_SHA512,
 	GNUTLS_SIGN_ECDSA_SHA512,
 	0
 };
+static const int* sign_priority_secure192 = _sign_priority_secure192;
 
 static const int mac_priority_normal_default[] = {
 	GNUTLS_MAC_SHA1,
@@ -499,9 +518,9 @@ static const int mac_priority_normal_fips[] = {
 	0
 };
 
-static const int * cipher_priority_performance = cipher_priority_performance_default;
-static const int * cipher_priority_normal = cipher_priority_normal_default;
-static const int * mac_priority_normal = mac_priority_normal_default;
+static const int *cipher_priority_performance = _cipher_priority_performance_default;
+static const int *cipher_priority_normal = _cipher_priority_normal_default;
+static const int *mac_priority_normal = mac_priority_normal_default;
 
 /* if called with replace the default priorities with the FIPS140 ones */
 void _gnutls_priority_update_fips(void)
@@ -511,30 +530,28 @@ void _gnutls_priority_update_fips(void)
 	mac_priority_normal = mac_priority_normal_fips;
 }
 
-static const int mac_priority_suiteb128[] = {
+static const int _mac_priority_suiteb[] = {
 	GNUTLS_MAC_AEAD,
 	0
 };
+static const int* mac_priority_suiteb = _mac_priority_suiteb;
 
-static const int mac_priority_suiteb192[] = {
-	GNUTLS_MAC_AEAD,
-	0
-};
-
-static const int mac_priority_secure128[] = {
+static const int _mac_priority_secure128[] = {
 	GNUTLS_MAC_SHA1,
 	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
 	0
 };
+static const int* mac_priority_secure128 = _mac_priority_secure128;
 
-static const int mac_priority_secure192[] = {
+static const int _mac_priority_secure192[] = {
 	GNUTLS_MAC_SHA256,
 	GNUTLS_MAC_SHA384,
 	GNUTLS_MAC_AEAD,
 	0
 };
+static const int* mac_priority_secure192 = _mac_priority_secure192;
 
 static const int cert_type_priority_default[] = {
 	GNUTLS_CRT_X509,
@@ -646,6 +663,112 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 #define LEVEL_EXPORT "EXPORT"
 #define LEVEL_LEGACY "LEGACY"
 
+struct priority_groups_st {
+	const char *name;
+	const char *alias;
+	const int **proto_list;
+	const int **cipher_list;
+	const int **mac_list;
+	const int **kx_list;
+	const int **sign_list;
+	const int **ecc_list;
+	unsigned profile;
+	int sec_param;
+};
+
+static const struct priority_groups_st pgroups[] = 
+{
+	{.name = LEVEL_NORMAL,
+	 .cipher_list = &cipher_priority_normal,
+	 .mac_list = &mac_priority_normal,
+	 .kx_list = &kx_priority_secure,
+	 .sign_list = &sign_priority_default,
+	 .ecc_list = &supported_ecc_normal,
+	 .profile = GNUTLS_PROFILE_LOW,
+	 .sec_param = GNUTLS_SEC_PARAM_WEAK
+	},
+	{.name = LEVEL_PFS,
+	 .cipher_list = &cipher_priority_normal,
+	 .mac_list = &mac_priority_secure128,
+	 .kx_list = &kx_priority_pfs,
+	 .sign_list = &sign_priority_default,
+	 .ecc_list = &supported_ecc_normal,
+	 .profile = GNUTLS_PROFILE_LOW,
+	 .sec_param = GNUTLS_SEC_PARAM_WEAK
+	},
+	{.name = LEVEL_SECURE128,
+	 .alias = "SECURE",
+	 .cipher_list = &cipher_priority_secure128,
+	 .mac_list = &mac_priority_secure128,
+	 .kx_list = &kx_priority_secure,
+	 .sign_list = &sign_priority_secure128,
+	 .ecc_list = &supported_ecc_secure128,
+		/* The profile should have been HIGH but if we don't allow
+		 * SHA-1 (80-bits) as signature algorithm we are not able
+		 * to connect anywhere with this level */
+	 .profile = GNUTLS_PROFILE_LOW,
+	 .sec_param = GNUTLS_SEC_PARAM_LOW
+	},
+	{.name = LEVEL_SECURE192,
+	 .alias = LEVEL_SECURE256,
+	 .cipher_list = &cipher_priority_secure192,
+	 .mac_list = &mac_priority_secure192,
+	 .kx_list = &kx_priority_secure,
+	 .sign_list = &sign_priority_secure192,
+	 .ecc_list = &supported_ecc_secure192,
+	 .profile = GNUTLS_PROFILE_HIGH,
+	 .sec_param = GNUTLS_SEC_PARAM_HIGH
+	},
+	{.name = LEVEL_SUITEB128,
+	 .proto_list = &protocol_priority_suiteb,
+	 .cipher_list = &cipher_priority_suiteb128,
+	 .mac_list = &mac_priority_suiteb,
+	 .kx_list = &kx_priority_suiteb,
+	 .sign_list = &sign_priority_suiteb128,
+	 .ecc_list = &supported_ecc_suiteb128,
+	 .profile = GNUTLS_PROFILE_SUITEB128,
+	 .sec_param = GNUTLS_SEC_PARAM_HIGH
+	},
+	{.name = LEVEL_SUITEB192,
+	 .proto_list = &protocol_priority_suiteb,
+	 .cipher_list = &cipher_priority_suiteb192,
+	 .mac_list = &mac_priority_suiteb,
+	 .kx_list = &kx_priority_suiteb,
+	 .sign_list = &sign_priority_suiteb192,
+	 .ecc_list = &supported_ecc_suiteb192,
+	 .profile = GNUTLS_PROFILE_SUITEB192,
+	 .sec_param = GNUTLS_SEC_PARAM_ULTRA
+	},
+	{.name = LEVEL_LEGACY,
+	 .cipher_list = &cipher_priority_normal,
+	 .mac_list = &mac_priority_normal,
+	 .kx_list = &kx_priority_secure,
+	 .sign_list = &sign_priority_default,
+	 .ecc_list = &supported_ecc_normal,
+	 .sec_param = GNUTLS_SEC_PARAM_VERY_WEAK
+	},
+	{.name = LEVEL_EXPORT,
+	 .cipher_list = &cipher_priority_performance,
+	 .mac_list = &mac_priority_normal,
+	 .kx_list = &kx_priority_performance,
+	 .sign_list = &sign_priority_default,
+	 .ecc_list = &supported_ecc_normal,
+	 .sec_param = GNUTLS_SEC_PARAM_EXPORT
+	},
+	{.name = LEVEL_PERFORMANCE,
+	 .cipher_list = &cipher_priority_performance,
+	 .mac_list = &mac_priority_normal,
+	 .kx_list = &kx_priority_performance,
+	 .sign_list = &sign_priority_default,
+	 .ecc_list = &supported_ecc_normal,
+	 .profile = GNUTLS_PROFILE_LOW,
+	 .sec_param = GNUTLS_SEC_PARAM_WEAK
+	},
+	{
+	 .name = NULL,
+	}
+};
+
 #define SET_PROFILE(to_set) \
 	profile = GNUTLS_VFLAGS_TO_PROFILE(priority_cache->additional_verify_flags); \
 	if (profile == 0 || profile > to_set) { \
@@ -663,113 +786,34 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 {
 	bulk_rmadd_func *func;
 	unsigned profile = 0;
+	unsigned i;
 
 	if (add)
 		func = _add_priority;
 	else
 		func = _set_priority;
 
-	if (strcasecmp(level, LEVEL_PERFORMANCE) == 0) {
-		func(&priority_cache->cipher, cipher_priority_performance);
-		func(&priority_cache->kx, kx_priority_performance);
-		func(&priority_cache->mac, mac_priority_normal);
-		func(&priority_cache->sign_algo, sign_priority_default);
-		func(&priority_cache->supported_ecc, supported_ecc_normal);
+	for (i=0;;i++) {
+		if (pgroups[i].name == NULL)
+			return gnutls_assert_val(0);
 
-		SET_PROFILE(GNUTLS_PROFILE_LOW); /* set certificate level */
-		SET_LEVEL(GNUTLS_SEC_PARAM_WEAK); /* set DH params level */
-		return 1;
-	} else if (strcasecmp(level, LEVEL_NORMAL) == 0) {
-		func(&priority_cache->cipher, cipher_priority_normal);
-		func(&priority_cache->kx, kx_priority_secure);
-		func(&priority_cache->mac, mac_priority_normal);
-		func(&priority_cache->sign_algo, sign_priority_default);
-		func(&priority_cache->supported_ecc, supported_ecc_normal);
+		if (strcasecmp(level, pgroups[i].name) == 0 ||
+			(pgroups[i].alias != NULL && strcasecmp(level, pgroups[i].alias) == 0)) {
+			if (pgroups[i].proto_list != NULL)
+				func(&priority_cache->protocol, *pgroups[i].proto_list);
+			func(&priority_cache->cipher, *pgroups[i].cipher_list);
+			func(&priority_cache->kx, *pgroups[i].kx_list);
+			func(&priority_cache->mac, *pgroups[i].mac_list);
+			func(&priority_cache->sign_algo, *pgroups[i].sign_list);
+			func(&priority_cache->supported_ecc, *pgroups[i].ecc_list);
 
-		SET_PROFILE(GNUTLS_PROFILE_LOW);
-		SET_LEVEL(GNUTLS_SEC_PARAM_WEAK);
-		return 1;
-	} else if (strcasecmp(level, LEVEL_PFS) == 0) {
-		func(&priority_cache->cipher, cipher_priority_normal);
-		func(&priority_cache->kx, kx_priority_pfs);
-		func(&priority_cache->mac, mac_priority_secure128);
-		func(&priority_cache->sign_algo, sign_priority_default);
-		func(&priority_cache->supported_ecc, supported_ecc_normal);
-
-		SET_PROFILE(GNUTLS_PROFILE_LOW);
-		SET_LEVEL(GNUTLS_SEC_PARAM_WEAK);
-		return 1;
-	} else if (strcasecmp(level, LEVEL_SECURE256) == 0
-		   || strcasecmp(level, LEVEL_SECURE192) == 0) {
-		func(&priority_cache->cipher, cipher_priority_secure192);
-		func(&priority_cache->kx, kx_priority_secure);
-		func(&priority_cache->mac, mac_priority_secure192);
-		func(&priority_cache->sign_algo, sign_priority_secure192);
-		func(&priority_cache->supported_ecc,
-		     supported_ecc_secure192);
-
-		SET_PROFILE(GNUTLS_PROFILE_HIGH);
-		SET_LEVEL(GNUTLS_SEC_PARAM_HIGH);
-		return 1;
-	} else if (strcasecmp(level, LEVEL_SECURE128) == 0
-		   || strcasecmp(level, "SECURE") == 0) {
-		func(&priority_cache->cipher, cipher_priority_secure128);
-		func(&priority_cache->kx, kx_priority_secure);
-		func(&priority_cache->mac, mac_priority_secure128);
-		func(&priority_cache->sign_algo, sign_priority_secure128);
-		func(&priority_cache->supported_ecc,
-		     supported_ecc_secure128);
-
-		/* The profile should have been HIGH but if we don't allow
-		 * SHA-1 (80-bits) as signature algorithm we are not able
-		 * to connect anywhere with this level */
-		SET_PROFILE(GNUTLS_PROFILE_LOW);
-		SET_LEVEL(GNUTLS_SEC_PARAM_LOW);
-		return 1;
-	} else if (strcasecmp(level, LEVEL_SUITEB128) == 0) {
-		func(&priority_cache->protocol, protocol_priority_suiteb);
-		func(&priority_cache->cipher, cipher_priority_suiteb128);
-		func(&priority_cache->kx, kx_priority_suiteb);
-		func(&priority_cache->mac, mac_priority_suiteb128);
-		func(&priority_cache->sign_algo, sign_priority_suiteb128);
-		func(&priority_cache->supported_ecc,
-		     supported_ecc_suiteb128);
-
-		SET_PROFILE(GNUTLS_PROFILE_SUITEB128);
-		SET_LEVEL(GNUTLS_SEC_PARAM_HIGH);
-		return 1;
-	} else if (strcasecmp(level, LEVEL_SUITEB192) == 0) {
-		func(&priority_cache->protocol, protocol_priority_suiteb);
-		func(&priority_cache->cipher, cipher_priority_suiteb192);
-		func(&priority_cache->kx, kx_priority_suiteb);
-		func(&priority_cache->mac, mac_priority_suiteb192);
-		func(&priority_cache->sign_algo, sign_priority_suiteb192);
-		func(&priority_cache->supported_ecc,
-		     supported_ecc_suiteb192);
-
-		SET_PROFILE(GNUTLS_PROFILE_SUITEB192);
-		SET_LEVEL(GNUTLS_SEC_PARAM_ULTRA);
-		return 1;
-	} else if (strcasecmp(level, LEVEL_LEGACY) == 0) {
-		func(&priority_cache->cipher, cipher_priority_normal);
-		func(&priority_cache->kx, kx_priority_secure);
-		func(&priority_cache->mac, mac_priority_normal);
-		func(&priority_cache->sign_algo, sign_priority_default);
-		func(&priority_cache->supported_ecc, supported_ecc_normal);
-
-		SET_LEVEL(GNUTLS_SEC_PARAM_VERY_WEAK);
-		return 1;
-	} else if (strcasecmp(level, LEVEL_EXPORT) == 0) {
-		func(&priority_cache->cipher, cipher_priority_performance);
-		func(&priority_cache->kx, kx_priority_performance);
-		func(&priority_cache->mac, mac_priority_secure128);
-		func(&priority_cache->sign_algo, sign_priority_default);
-		func(&priority_cache->supported_ecc, supported_ecc_normal);
-
-		SET_LEVEL(GNUTLS_SEC_PARAM_EXPORT);
-		return 1;
+			if (pgroups[i].profile != 0) {
+				SET_PROFILE(pgroups[i].profile); /* set certificate level */
+			}
+			SET_LEVEL(pgroups[i].sec_param); /* set DH params level */
+			return 1;
+		}
 	}
-	return 0;
 }
 
 static void enable_compat(gnutls_priority_t c)
