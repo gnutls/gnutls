@@ -1687,3 +1687,22 @@ gnutls_priority_certificate_type_list(gnutls_priority_t pcache,
 	*list = pcache->cert_type.priority;
 	return pcache->cert_type.algorithms;
 }
+
+/**
+ * gnutls_priority_string_list:
+ * @iter: an integer counter starting from zero
+ *
+ * Returns all available priority strings. When no strings
+ * are available it returns %NULL.
+ * structure. 
+ *
+ * Returns: a priority string
+ * Since: 3.4.0
+ **/
+const char *
+gnutls_priority_string_list(unsigned iter)
+{
+	if (iter >= (sizeof(pgroups)/sizeof(pgroups[0]))-1)
+		return NULL;
+	return pgroups[iter].name;
+}

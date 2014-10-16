@@ -1104,6 +1104,9 @@ int gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 					   unsigned int idx,
 					   unsigned int *sidx);
 
+const char *
+gnutls_priority_string_list(unsigned iter);
+
 int gnutls_priority_set(gnutls_session_t session,
 			gnutls_priority_t priority);
 int gnutls_priority_set_direct(gnutls_session_t session,
