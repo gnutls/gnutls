@@ -1292,6 +1292,24 @@ int main(int argc, char **argv)
 	return retval;
 }
 
+static
+void print_priority_list(void)
+{
+	unsigned int idx;
+	const char *str;
+
+	printf("Priority strings in GnuTLS %s:\n", gnutls_check_version(NULL));
+
+	for (idx=0;;idx++) {
+		str = gnutls_priority_string_list(idx);
+		if (str == NULL)
+			break;
+		printf("\t%s\n", str);
+	}
+
+	return;
+}
+
 static void cmd_parser(int argc, char **argv)
 {
 	const char *rest = NULL;
@@ -1339,6 +1357,11 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(LIST)) {
 		print_list(priorities, verbose);
+		exit(0);
+	}
+
+	if (HAVE_OPT(PRIORITY_LIST)) {
+		print_priority_list();
 		exit(0);
 	}
 

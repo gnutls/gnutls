@@ -281,6 +281,12 @@ flag = {
 };
 
 flag = {
+    name      = priority-list;
+    descrip   = "Print a list of the supported priority strings";
+    doc      = "Print a list of the supported priority strings. The ciphersuites corresponding to each priority string can be examined using -l -p.";
+};
+
+flag = {
     name      = noticket;
     descrip   = "Don't allow session tickets";
     doc      = "";
