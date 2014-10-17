@@ -889,6 +889,7 @@ typedef struct {
 	/* This holds the default version that our first
 	 * record packet will have. */
 	uint8_t default_record_version[2];
+	uint8_t default_hello_version[2];
 
 	void *user_ptr;
 

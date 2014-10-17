@@ -735,6 +735,25 @@ _gnutls_record_set_default_version(gnutls_session_t session,
 	session->internals.default_record_version[1] = minor;
 }
 
+/*-
+ * _gnutls_hello_set_default_version - Used to set the default version for the first record packet
+ * @session: is a #gnutls_session_t structure.
+ * @major: is a tls major version
+ * @minor: is a tls minor version
+ *
+ * This function sets the default version that we will use in the first
+ * record packet (client hello). This function is only useful to people
+ * that know TLS internals and want to debug other implementations.
+ -*/
+void
+_gnutls_hello_set_default_version(gnutls_session_t session,
+				   unsigned char major,
+				   unsigned char minor)
+{
+	session->internals.default_hello_version[0] = major;
+	session->internals.default_hello_version[1] = minor;
+}
+
 /**
  * gnutls_handshake_set_private_extensions:
  * @session: is a #gnutls_session_t structure.

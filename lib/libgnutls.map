@@ -1111,6 +1111,7 @@ GNUTLS_PRIVATE {
 	# Internal symbols needed by gnutls-cli-debug:
 	_gnutls_rsa_pms_set_version;
 	_gnutls_record_set_default_version;
+	_gnutls_hello_set_default_version;
 	# Internal symbols needed by tests/gc:
 	_gnutls_pbkdf2_sha1;
 	# Internal symbols needed by tests/mpi:

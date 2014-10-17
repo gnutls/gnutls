@@ -1963,8 +1963,13 @@ static int send_client_hello(gnutls_session_t session, int again)
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
-		tver[0] = hver->major;
-		tver[1] = hver->minor;
+		if (unlikely(session->internals.default_hello_version[0] != 0)) {
+			tver[0] = session->internals.default_hello_version[0];
+			tver[1] = session->internals.default_hello_version[1];
+		} else {
+			tver[0] = hver->major;
+			tver[1] = hver->minor;
+		}
 		ret = _gnutls_buffer_append_data(&extdata, tver, 2);
 		if (ret < 0) {
 			gnutls_assert();
