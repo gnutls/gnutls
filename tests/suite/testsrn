@@ -39,7 +39,7 @@ launch_server $$ --echo --priority NORMAL:+ANON-DH:%PARTIAL_RENEGOTIATION --dhpa
 PID=$!
 wait_server $PID
 
-$CLI -p $PORT 127.0.0.1 --rehandshake --priority NONE:+AES-128-CBC:+MD5:+SHA1:+VERS-SSL3.0:+ANON-DH:+COMP-NULL:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
+$CLI -p $PORT 127.0.0.1 --rehandshake --priority NONE:+AES-128-CBC:+MD5:+SHA1:+VERS-TLS1.0:+ANON-DH:+COMP-NULL:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
   fail $PID "0. Renegotiation should have succeeded!"
 
 $CLI -p $PORT 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
