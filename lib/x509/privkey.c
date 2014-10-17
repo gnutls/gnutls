@@ -1437,7 +1437,7 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 	ret = _gnutls_pk_generate_keys(algo, bits, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 #ifndef ENABLE_FIPS140
@@ -1447,7 +1447,7 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 #endif
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	ret = _gnutls_asn1_encode_privkey(algo, &key->key, &key->params);
