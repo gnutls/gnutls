@@ -35,12 +35,22 @@
 #include <common.h>
 #include <tests.h>
 
+void _gnutls_record_set_default_version(gnutls_session_t session,
+					unsigned char major,
+					unsigned char minor);
+
+void _gnutls_hello_set_default_version(gnutls_session_t session,
+					unsigned char major,
+					unsigned char minor);
+
+
 extern gnutls_srp_client_credentials_t srp_cred;
 extern gnutls_anon_client_credentials_t anon_cred;
 extern gnutls_certificate_credentials_t xcred;
 
 extern unsigned int verbose;
 
+const char *ext_text = "";
 int tls1_ok = 0;
 int ssl3_ok = 0;
 int tls1_1_ok = 0;
@@ -674,6 +684,27 @@ test_code_t test_tls1_1_fallback(gnutls_session_t session)
 
 }
 
+test_code_t test_tls1_6_fallback(gnutls_session_t session)
+{
+	int ret;
+
+	sprintf(prio_str,
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
+		":+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0:" ALL_MACS ":"
+		ALL_KX ":%s", rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	_gnutls_hello_set_default_version(session, 3, 7);
+
+	ret = do_handshake(session);
+	if (ret != TEST_SUCCEED)
+		return TEST_FAILED;
+
+	ext_text = gnutls_protocol_get_name(gnutls_protocol_get_version(session));
+	return TEST_SUCCEED;
+}
+
 /* Advertize both TLS 1.0 and SSL 3.0. If the connection fails,
  * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
  */
@@ -868,10 +899,6 @@ test_code_t test_small_records(gnutls_session_t session)
 	ret = do_handshake(session);
 	return ret;
 }
-
-void _gnutls_record_set_default_version(gnutls_session_t session,
-					unsigned char major,
-					unsigned char minor);
 
 test_code_t test_version_rollback(gnutls_session_t session)
 {

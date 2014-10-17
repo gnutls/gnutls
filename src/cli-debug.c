@@ -62,6 +62,7 @@ extern int tls1_ok;
 extern int tls1_1_ok;
 extern int tls1_2_ok;
 extern int ssl3_ok;
+extern const char *ext_text;
 
 static void tls_log_func(int level, const char *str)
 {
@@ -88,6 +89,8 @@ static const TLS_TEST tls_tests[] = {
 	 "failed",
 	 "SSL 3.0"},
 	{"for TLS 1.2 support", test_tls1_2, "yes", "no", "dunno"},
+	{"fallback from TLS 1.6 to", test_tls1_6_fallback, NULL,
+	 "failed", "dunno"},
 	/* The following tests will disable TLS 1.x if the server is
 	 * buggy */
 	{"whether we need to disable TLS 1.2", test_tls_disable2, "no",
@@ -271,9 +274,12 @@ int main(int argc, char **argv)
 
 			ret = tls_tests[i].func(state);
 
-			if (ret == TEST_SUCCEED)
-				printf(" %s\n", tls_tests[i].suc_str);
-			else if (ret == TEST_FAILED)
+			if (ret == TEST_SUCCEED) {
+				if (tls_tests[i].suc_str == NULL)
+					printf(" %s\n", ext_text);
+				else
+					printf(" %s\n", tls_tests[i].suc_str);
+			} else if (ret == TEST_FAILED)
 				printf(" %s\n", tls_tests[i].fail_str);
 			else if (ret == TEST_UNSURE)
 				printf(" %s\n", tls_tests[i].unsure_str);
