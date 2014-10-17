@@ -278,6 +278,7 @@ flag = {
     value     = l;
     descrip   = "Print a list of the supported algorithms and modes";
     doc      = "Print a list of the supported algorithms and modes. If a priority string is given then only the enabled ciphersuites are shown.";
+    flags-cant = port;
 };
 
 flag = {
