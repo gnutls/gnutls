@@ -495,22 +495,24 @@ static void filter_clear_state(void)
 	       sizeof(state_permute_ClientFinishedFull));
 }
 
+/* replay buffer */
 static int rbuffer[5*1024];
 unsigned rbuffer_size = 0;
 
 static void filter_run_next(gnutls_transport_ptr_t fd,
 			    const unsigned char *buffer, size_t len)
 {
+	int ret;
 	filter_fn fn = filter_chain[filter_current_idx];
 	filter_current_idx++;
 	if (fn) {
 		fn(fd, buffer, len);
 	} else {
-		send((int) (intptr_t) fd, buffer, len, 0);
+		ret = send((int) (intptr_t) fd, buffer, len, 0);
 	}
 	filter_current_idx--;
 
-	if (replay != 0) {
+	if (ret > 0 && replay != 0) {
 		if (rbuffer_size == 0 && len < sizeof(rbuffer)) {
 			memcpy(rbuffer, buffer, len);
 			rbuffer_size = len;
