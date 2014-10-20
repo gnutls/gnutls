@@ -135,112 +135,58 @@ static int permutations3[6][3]
 static const char *permutation_names3[]
 = { "012", "021", "102", "120", "201", "210", 0 };
 
-static int permutations5[120][5]
-= { {0, 1, 2, 3, 4}, {0, 2, 1, 3, 4}, {1, 0, 2, 3, 4}, {1, 2, 0, 3, 4}, {2,
-									 0,
-									 1,
-									 3,
-									 4},
-    {2, 1, 0, 3, 4},
-{0, 1, 3, 2, 4}, {0, 2, 3, 1, 4}, {1, 0, 3, 2, 4}, {1, 2, 3, 0, 4}, {2, 0,
-								     3, 1,
-								     4},
-    {2, 1, 3, 0, 4},
-{0, 3, 1, 2, 4}, {0, 3, 2, 1, 4}, {1, 3, 0, 2, 4}, {1, 3, 2, 0, 4}, {2, 3,
-								     0, 1,
-								     4},
-    {2, 3, 1, 0, 4},
-{3, 0, 1, 2, 4}, {3, 0, 2, 1, 4}, {3, 1, 0, 2, 4}, {3, 1, 2, 0, 4}, {3, 2,
-								     0, 1,
-								     4},
-    {3, 2, 1, 0, 4},
-{0, 1, 2, 4, 3}, {0, 2, 1, 4, 3}, {1, 0, 2, 4, 3}, {1, 2, 0, 4, 3}, {2, 0,
-								     1, 4,
-								     3},
-    {2, 1, 0, 4, 3},
-{0, 1, 3, 4, 2}, {0, 2, 3, 4, 1}, {1, 0, 3, 4, 2}, {1, 2, 3, 4, 0}, {2, 0,
-								     3, 4,
-								     1},
-    {2, 1, 3, 4, 0},
-{0, 3, 1, 4, 2}, {0, 3, 2, 4, 1}, {1, 3, 0, 4, 2}, {1, 3, 2, 4, 0}, {2, 3,
-								     0, 4,
-								     1},
-    {2, 3, 1, 4, 0},
-{3, 0, 1, 4, 2}, {3, 0, 2, 4, 1}, {3, 1, 0, 4, 2}, {3, 1, 2, 4, 0}, {3, 2,
-								     0, 4,
-								     1},
-    {3, 2, 1, 4, 0},
-{0, 1, 4, 2, 3}, {0, 2, 4, 1, 3}, {1, 0, 4, 2, 3}, {1, 2, 4, 0, 3}, {2, 0,
-								     4, 1,
-								     3},
-    {2, 1, 4, 0, 3},
-{0, 1, 4, 3, 2}, {0, 2, 4, 3, 1}, {1, 0, 4, 3, 2}, {1, 2, 4, 3, 0}, {2, 0,
-								     4, 3,
-								     1},
-    {2, 1, 4, 3, 0},
-{0, 3, 4, 1, 2}, {0, 3, 4, 2, 1}, {1, 3, 4, 0, 2}, {1, 3, 4, 2, 0}, {2, 3,
-								     4, 0,
-								     1},
-    {2, 3, 4, 1, 0},
-{3, 0, 4, 1, 2}, {3, 0, 4, 2, 1}, {3, 1, 4, 0, 2}, {3, 1, 4, 2, 0}, {3, 2,
-								     4, 0,
-								     1},
-    {3, 2, 4, 1, 0},
-{0, 4, 1, 2, 3}, {0, 4, 2, 1, 3}, {1, 4, 0, 2, 3}, {1, 4, 2, 0, 3}, {2, 4,
-								     0, 1,
-								     3},
-    {2, 4, 1, 0, 3},
-{0, 4, 1, 3, 2}, {0, 4, 2, 3, 1}, {1, 4, 0, 3, 2}, {1, 4, 2, 3, 0}, {2, 4,
-								     0, 3,
-								     1},
-    {2, 4, 1, 3, 0},
-{0, 4, 3, 1, 2}, {0, 4, 3, 2, 1}, {1, 4, 3, 0, 2}, {1, 4, 3, 2, 0}, {2, 4,
-								     3, 0,
-								     1},
-    {2, 4, 3, 1, 0},
-{3, 4, 0, 1, 2}, {3, 4, 0, 2, 1}, {3, 4, 1, 0, 2}, {3, 4, 1, 2, 0}, {3, 4,
-								     2, 0,
-								     1},
-    {3, 4, 2, 1, 0},
-{4, 0, 1, 2, 3}, {4, 0, 2, 1, 3}, {4, 1, 0, 2, 3}, {4, 1, 2, 0, 3}, {4, 2,
-								     0, 1,
-								     3},
-    {4, 2, 1, 0, 3},
-{4, 0, 1, 3, 2}, {4, 0, 2, 3, 1}, {4, 1, 0, 3, 2}, {4, 1, 2, 3, 0}, {4, 2,
-								     0, 3,
-								     1},
-    {4, 2, 1, 3, 0},
-{4, 0, 3, 1, 2}, {4, 0, 3, 2, 1}, {4, 1, 3, 0, 2}, {4, 1, 3, 2, 0}, {4, 2,
-								     3, 0,
-								     1},
-    {4, 2, 3, 1, 0},
-{4, 3, 0, 1, 2}, {4, 3, 0, 2, 1}, {4, 3, 1, 0, 2}, {4, 3, 1, 2, 0}, {4, 3,
-								     2, 0,
-								     1},
-    {4, 3, 2, 1, 0}
+static int permutations5[120][5] = { 
+	{0, 1, 2, 3, 4}, {0, 2, 1, 3, 4}, {1, 0, 2, 3, 4}, {1, 2, 0, 3, 4},
+	{2, 0, 1, 3, 4}, {2, 1, 0, 3, 4}, {0, 1, 3, 2, 4}, {0, 2, 3, 1, 4},
+	{1, 0, 3, 2, 4}, {1, 2, 3, 0, 4}, {2, 0, 3, 1, 4}, {2, 1, 3, 0, 4},
+	{0, 3, 1, 2, 4}, {0, 3, 2, 1, 4}, {1, 3, 0, 2, 4}, {1, 3, 2, 0, 4},
+	{2, 3, 0, 1, 4}, {2, 3, 1, 0, 4}, {3, 0, 1, 2, 4}, {3, 0, 2, 1, 4},
+	{3, 1, 0, 2, 4}, {3, 1, 2, 0, 4}, {3, 2, 0, 1, 4}, {3, 2, 1, 0, 4},
+	{0, 1, 2, 4, 3}, {0, 2, 1, 4, 3}, {1, 0, 2, 4, 3}, {1, 2, 0, 4, 3},
+	{2, 0, 1, 4, 3}, {2, 1, 0, 4, 3}, {0, 1, 3, 4, 2}, {0, 2, 3, 4, 1},
+	{1, 0, 3, 4, 2}, {1, 2, 3, 4, 0}, {2, 0, 3, 4, 1}, {2, 1, 3, 4, 0},
+	{0, 3, 1, 4, 2}, {0, 3, 2, 4, 1}, {1, 3, 0, 4, 2}, {1, 3, 2, 4, 0},
+	{2, 3, 0, 4, 1}, {2, 3, 1, 4, 0}, {3, 0, 1, 4, 2}, {3, 0, 2, 4, 1},
+	{3, 1, 0, 4, 2}, {3, 1, 2, 4, 0}, {3, 2, 0, 4, 1}, {3, 2, 1, 4, 0},
+	{0, 1, 4, 2, 3}, {0, 2, 4, 1, 3}, {1, 0, 4, 2, 3}, {1, 2, 4, 0, 3},
+	{2, 0, 4, 1, 3}, {2, 1, 4, 0, 3}, {0, 1, 4, 3, 2}, {0, 2, 4, 3, 1},
+	{1, 0, 4, 3, 2}, {1, 2, 4, 3, 0}, {2, 0, 4, 3, 1}, {2, 1, 4, 3, 0},
+	{0, 3, 4, 1, 2}, {0, 3, 4, 2, 1}, {1, 3, 4, 0, 2}, {1, 3, 4, 2, 0},
+	{2, 3, 4, 0, 1}, {2, 3, 4, 1, 0}, {3, 0, 4, 1, 2}, {3, 0, 4, 2, 1},
+	{3, 1, 4, 0, 2}, {3, 1, 4, 2, 0}, {3, 2, 4, 0, 1}, {3, 2, 4, 1, 0},
+	{0, 4, 1, 2, 3}, {0, 4, 2, 1, 3}, {1, 4, 0, 2, 3}, {1, 4, 2, 0, 3},
+	{2, 4, 0, 1, 3}, {2, 4, 1, 0, 3}, {0, 4, 1, 3, 2}, {0, 4, 2, 3, 1},
+	{1, 4, 0, 3, 2}, {1, 4, 2, 3, 0}, {2, 4, 0, 3, 1}, {2, 4, 1, 3, 0},
+	{0, 4, 3, 1, 2}, {0, 4, 3, 2, 1}, {1, 4, 3, 0, 2}, {1, 4, 3, 2, 0},
+	{2, 4, 3, 0, 1}, {2, 4, 3, 1, 0}, {3, 4, 0, 1, 2}, {3, 4, 0, 2, 1},
+	{3, 4, 1, 0, 2}, {3, 4, 1, 2, 0}, {3, 4, 2, 0, 1}, {3, 4, 2, 1, 0},
+	{4, 0, 1, 2, 3}, {4, 0, 2, 1, 3}, {4, 1, 0, 2, 3}, {4, 1, 2, 0, 3},
+	{4, 2, 0, 1, 3}, {4, 2, 1, 0, 3}, {4, 0, 1, 3, 2}, {4, 0, 2, 3, 1},
+	{4, 1, 0, 3, 2}, {4, 1, 2, 3, 0}, {4, 2, 0, 3, 1}, {4, 2, 1, 3, 0},
+	{4, 0, 3, 1, 2}, {4, 0, 3, 2, 1}, {4, 1, 3, 0, 2}, {4, 1, 3, 2, 0},
+	{4, 2, 3, 0, 1}, {4, 2, 3, 1, 0}, {4, 3, 0, 1, 2}, {4, 3, 0, 2, 1},
+	{4, 3, 1, 0, 2}, {4, 3, 1, 2, 0}, {4, 3, 2, 0, 1}, {4, 3, 2, 1, 0}
 };
 
 static const char *permutation_names5[]
     = { "01234", "02134", "10234", "12034", "20134", "21034", "01324",
-	    "02314", "10324", "12304", "20314", "21304",
-	"03124", "03214", "13024", "13204", "23014", "23104", "30124",
-	    "30214", "31024", "31204", "32014", "32104",
-	"01243", "02143", "10243", "12043", "20143", "21043", "01342",
-	    "02341", "10342", "12340", "20341", "21340",
-	"03142", "03241", "13042", "13240", "23041", "23140", "30142",
-	    "30241", "31042", "31240", "32041", "32140",
-	"01423", "02413", "10423", "12403", "20413", "21403", "01432",
-	    "02431", "10432", "12430", "20431", "21430",
-	"03412", "03421", "13402", "13420", "23401", "23410", "30412",
-	    "30421", "31402", "31420", "32401", "32410",
-	"04123", "04213", "14023", "14203", "24013", "24103", "04132",
-	    "04231", "14032", "14230", "24031", "24130",
+	"02314", "10324", "12304", "20314", "21304", "03124", "03214",
+	"13024", "13204", "23014", "23104", "30124", "30214", "31024",
+	"31204", "32014", "32104", "01243", "02143", "10243", "12043",
+	"20143", "21043", "01342", "02341", "10342", "12340", "20341",
+	"21340", "03142", "03241", "13042", "13240", "23041", "23140",
+	"30142", "30241", "31042", "31240", "32041", "32140", "01423",
+	"02413", "10423", "12403", "20413", "21403", "01432", "02431",
+	"10432", "12430", "20431", "21430", "03412", "03421", "13402",
+	"13420", "23401", "23410", "30412", "30421", "31402", "31420",
+	"32401", "32410", "04123", "04213", "14023", "14203", "24013",
+	"24103", "04132", "04231", "14032", "14230", "24031", "24130",
 	"04312", "04321", "14302", "14320", "24301", "24310", "34012",
-	    "34021", "34102", "34120", "34201", "34210",
-	"40123", "40213", "41023", "41203", "42013", "42103", "40132",
-	    "40231", "41032", "41230", "42031", "42130",
-	"40312", "40321", "41302", "41320", "42301", "42310", "43012",
-	    "43021", "43102", "43120", "43201", "43210", 0
+	"34021", "34102", "34120", "34201", "34210", "40123", "40213",
+	"41023", "41203", "42013", "42103", "40132", "40231", "41032",
+	"41230", "42031", "42130", "40312", "40321", "41302", "41320",
+	"42301", "42310", "43012", "43021", "43102", "43120", "43201",
+	"43210", 0
 };
 
 static const char *filter_names[8]
@@ -345,8 +291,7 @@ int run_id;
 static void logfn(int level, const char *s)
 {
 	if (debug) {
-		fprintf(stdout, "%i %s|<%i> %s", run_id, role_name, level,
-			s);
+		fprintf(stdout, "%i %s|<%i> %s", run_id, role_name, level, s);
 	}
 }
 
@@ -436,13 +381,11 @@ filter_permute_state_t state_permute_ClientFinishedFull =
 filter_fn filter_chain[32];
 int filter_current_idx;
 
-static void filter_permute_state_free_buffer(filter_permute_state_t *
-					     state)
+static void filter_permute_state_free_buffer(filter_permute_state_t * state)
 {
 	unsigned int i;
 
-	for (i = 0; i < sizeof(state->packets) / sizeof(state->packets[0]);
-	     i++) {
+	for (i = 0; i < sizeof(state->packets) / sizeof(state->packets[0]); i++) {
 		free(state->packets[i].data);
 		state->packets[i].data = NULL;
 	}
@@ -456,11 +399,9 @@ static void filter_clear_state(void)
 	filter_permute_state_free_buffer(&state_permute_ServerHelloFull);
 	filter_permute_state_free_buffer(&state_permute_ServerFinished);
 	filter_permute_state_free_buffer(&state_permute_ClientFinished);
-	filter_permute_state_free_buffer
-	    (&state_permute_ClientFinishedFull);
+	filter_permute_state_free_buffer(&state_permute_ClientFinishedFull);
 
-	memset(&state_packet_ServerHello, 0,
-	       sizeof(state_packet_ServerHello));
+	memset(&state_packet_ServerHello, 0, sizeof(state_packet_ServerHello));
 	memset(&state_packet_ServerCertificate, 0,
 	       sizeof(state_packet_ServerCertificate));
 	memset(&state_packet_ServerKeyExchange, 0,
@@ -496,7 +437,7 @@ static void filter_clear_state(void)
 }
 
 /* replay buffer */
-static int rbuffer[5*1024];
+static int rbuffer[5 * 1024];
 unsigned rbuffer_size = 0;
 
 static void filter_run_next(gnutls_transport_ptr_t fd,
@@ -508,7 +449,7 @@ static void filter_run_next(gnutls_transport_ptr_t fd,
 	if (fn) {
 		fn(fd, buffer, len);
 	} else {
-		ret = send((int) (intptr_t) fd, buffer, len, 0);
+		ret = send((int)(intptr_t) fd, buffer, len, 0);
 	}
 	filter_current_idx--;
 
@@ -517,7 +458,7 @@ static void filter_run_next(gnutls_transport_ptr_t fd,
 			memcpy(rbuffer, buffer, len);
 			rbuffer_size = len;
 		} else if (rbuffer_size != 0) {
-			send((int) (intptr_t) fd, rbuffer, rbuffer_size, 0);
+			send((int)(intptr_t) fd, rbuffer, rbuffer_size, 0);
 			if (len < sizeof(rbuffer) && len > rbuffer_size) {
 				memcpy(rbuffer, buffer, len);
 				rbuffer_size = len;
@@ -580,28 +521,24 @@ static int match_ClientCertificateVerify(const unsigned char *buffer,
 	    && buffer[13] == 15;
 }
 
-static int match_ClientChangeCipherSpec(const unsigned char *buffer,
-					size_t len)
+static int match_ClientChangeCipherSpec(const unsigned char *buffer, size_t len)
 {
 	return role == CLIENT && len >= 13 && buffer[0] == 20;
 }
 
 static int match_ClientFinished(const unsigned char *buffer, size_t len)
 {
-	return role == CLIENT && len >= 13 && buffer[0] == 22
-	    && buffer[4] == 1;
+	return role == CLIENT && len >= 13 && buffer[0] == 22 && buffer[4] == 1;
 }
 
-static int match_ServerChangeCipherSpec(const unsigned char *buffer,
-					size_t len)
+static int match_ServerChangeCipherSpec(const unsigned char *buffer, size_t len)
 {
 	return role == SERVER && len >= 13 && buffer[0] == 20;
 }
 
 static int match_ServerFinished(const unsigned char *buffer, size_t len)
 {
-	return role == SERVER && len >= 13 && buffer[0] == 22
-	    && buffer[4] == 1;
+	return role == SERVER && len >= 13 && buffer[0] == 22 && buffer[4] == 1;
 }
 
 // }}}
@@ -637,8 +574,7 @@ DECLARE_FILTER(ServerHello)
 static void filter_permute_state_run(filter_permute_state_t * state,
 				     int packetCount,
 				     gnutls_transport_ptr_t fd,
-				     const unsigned char *buffer,
-				     size_t len)
+				     const unsigned char *buffer, size_t len)
 {
 	unsigned char *data = malloc(len);
 	int packet = state->order[state->count];
@@ -683,11 +619,13 @@ static match_fn permute_match_ServerFinished[] =
     { match_ServerChangeCipherSpec, match_ServerFinished };
 static match_fn permute_match_ClientFinished[] =
     { match_ClientKeyExchange, match_ClientChangeCipherSpec,
-match_ClientFinished };
+	match_ClientFinished
+};
+
 static match_fn permute_match_ClientFinishedFull[] =
     { match_ClientCertificate, match_ClientKeyExchange,
 	match_ClientCertificateVerify, match_ClientChangeCipherSpec,
-	    match_ClientFinished
+	match_ClientFinished
 };
 
 DECLARE_PERMUTE(ServerHello)
@@ -729,7 +667,7 @@ gnutls_session_t session;
 static ssize_t writefn(gnutls_transport_ptr_t fd, const void *buffer,
 		       size_t len)
 {
-	filter_run_next(fd, (const unsigned char *) buffer, len);
+	filter_run_next(fd, (const unsigned char *)buffer, len);
 	return len;
 }
 
@@ -747,9 +685,8 @@ static void await(int fd, int timeout)
 
 static void cred_init(void)
 {
-	gnutls_datum_t key = { (unsigned char *) PUBKEY, sizeof(PUBKEY) };
-	gnutls_datum_t sec =
-	    { (unsigned char *) PRIVKEY, sizeof(PRIVKEY) };
+	gnutls_datum_t key = { (unsigned char *)PUBKEY, sizeof(PUBKEY) };
+	gnutls_datum_t sec = { (unsigned char *)PRIVKEY, sizeof(PRIVKEY) };
 
 	gnutls_certificate_allocate_credentials(&cred);
 
@@ -760,8 +697,7 @@ static void cred_init(void)
 static void session_init(int sock, int server)
 {
 	gnutls_init(&session,
-		    GNUTLS_DATAGRAM | (server ? GNUTLS_SERVER :
-				       GNUTLS_CLIENT)
+		    GNUTLS_DATAGRAM | (server ? GNUTLS_SERVER : GNUTLS_CLIENT)
 		    | GNUTLS_NONBLOCK * nonblock);
 	gnutls_priority_set_direct(session,
 				   "+CTYPE-OPENPGP:+CIPHER-ALL:+MAC-ALL:+ECDHE-RSA:+ANON-ECDH",
@@ -769,8 +705,7 @@ static void session_init(int sock, int server)
 	gnutls_transport_set_int(session, sock);
 
 	if (full) {
-		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
-				       cred);
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cred);
 		if (server) {
 			gnutls_certificate_server_set_request(session,
 							      GNUTLS_CERT_REQUIRE);
@@ -877,11 +812,11 @@ static void udp_sockpair(int *socks)
 	socks[0] = socket(AF_INET6, SOCK_DGRAM, 0);
 	socks[1] = socket(AF_INET6, SOCK_DGRAM, 0);
 
-	bind(socks[0], (struct sockaddr *) &sa, sizeof(sa));
-	bind(socks[1], (struct sockaddr *) &sb, sizeof(sb));
+	bind(socks[0], (struct sockaddr *)&sa, sizeof(sa));
+	bind(socks[1], (struct sockaddr *)&sb, sizeof(sb));
 
-	connect(socks[1], (struct sockaddr *) &sa, sizeof(sa));
-	connect(socks[0], (struct sockaddr *) &sb, sizeof(sb));
+	connect(socks[1], (struct sockaddr *)&sa, sizeof(sa));
+	connect(socks[0], (struct sockaddr *)&sb, sizeof(sb));
 }
 #endif
 
@@ -897,8 +832,8 @@ static int run_test(void)
 	}
 
 	if (nonblock) {
-		fcntl(fds[0], F_SETFL, (long) O_NONBLOCK);
-		fcntl(fds[1], F_SETFL, (long) O_NONBLOCK);
+		fcntl(fds[0], F_SETFL, (long)O_NONBLOCK);
+		fcntl(fds[1], F_SETFL, (long)O_NONBLOCK);
 	}
 
 	if (!(pid1 = fork())) {
@@ -915,9 +850,9 @@ static int run_test(void)
 		rperror("fork client");
 		exit(2);
 	}
-	while (waitpid(pid2, &status2, 0) < 0 && errno == EINTR);
+	while (waitpid(pid2, &status2, 0) < 0 && errno == EINTR) ;
 	kill(pid1, 15);
-	while (waitpid(pid1, 0, 0) < 0 && errno == EINTR);
+	while (waitpid(pid1, 0, 0) < 0 && errno == EINTR) ;
 
 	close(fds[0]);
 	close(fds[1]);
@@ -968,8 +903,7 @@ static int run_one_test(int dropMode, int serverFinishedPermute,
 	int filter_count = full ? 12 : 8;
 	run_id =
 	    ((dropMode * 2 + serverFinishedPermute) * (full ? 120 : 6) +
-	     serverHelloPermute) * (full ? 120 : 6) +
-	    clientFinishedPermute;
+	     serverHelloPermute) * (full ? 120 : 6) + clientFinishedPermute;
 
 	filter_clear_state();
 
@@ -1022,8 +956,7 @@ static int run_one_test(int dropMode, int serverFinishedPermute,
 		break;
 	}
 
-	fprintf(stdout, "SHello(%s), ",
-		permutation_namesX[serverHelloPermute]);
+	fprintf(stdout, "SHello(%s), ", permutation_namesX[serverHelloPermute]);
 	fprintf(stdout, "SFinished(%s), ",
 		permutation_names2[serverFinishedPermute]);
 	fprintf(stdout, "CFinished(%s) :- ",
@@ -1184,8 +1117,7 @@ static int run_all_tests(int childcount)
 					} else {
 						register_child(pid);
 						result |=
-						    wait_children
-						    (childcount);
+						    wait_children(childcount);
 					}
 				}
 
@@ -1348,8 +1280,7 @@ int main(int argc, const char *argv[])
 	if (dropMode || serverFinishedPermute || serverHelloPermute
 	    || clientFinishedPermute) {
 		return run_one_test(dropMode, serverFinishedPermute,
-				    serverHelloPermute,
-				    clientFinishedPermute);
+				    serverHelloPermute, clientFinishedPermute);
 	} else {
 		job_pids = calloc(sizeof(int), job_limit);
 		if (batch) {
