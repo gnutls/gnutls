@@ -1276,12 +1276,15 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			mpz_set_ui(pub.e, 65537);
 
+#ifdef ENABLE_FIPS140
 			if (_gnutls_fips_mode_enabled() != 0) {
 				ret =
 				    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
 						 rnd_func, NULL, NULL,
 						 level);
-			} else {
+			} else
+#endif
+			{
 				ret =
 				    rsa_generate_keypair(&pub, &priv, NULL,
 						 rnd_func, NULL, NULL,
