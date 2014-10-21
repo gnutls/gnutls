@@ -798,50 +798,53 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 				return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
 #ifdef ENABLE_FIPS140
-			if (algo==GNUTLS_PK_DSA)
-				index = 1;
-			else
-				index = 2;
+			if (_gnutls_fips_mode_enabled() != 0) {
+				if (algo==GNUTLS_PK_DSA)
+					index = 1;
+				else
+					index = 2;
 
-			ret =
-			    dsa_generate_dss_pqg(&pub, &cert,
+				ret =
+				    dsa_generate_dss_pqg(&pub, &cert,
 			    			 index,
 						 NULL, rnd_func, 
 						 NULL, NULL,
 						 level, q_bits);
-			if (ret != 1) {
-				gnutls_assert();
-				ret = GNUTLS_E_PK_GENERATION_ERROR;
-				goto dsa_fail;
-			}
+				if (ret != 1) {
+					gnutls_assert();
+					ret = GNUTLS_E_PK_GENERATION_ERROR;
+					goto dsa_fail;
+				}
 
-			/* verify the generated parameters */
-			ret = dsa_validate_dss_pqg(&pub, &cert, index);
-			if (ret != 1) {
-				gnutls_assert();
-				ret = GNUTLS_E_PK_GENERATION_ERROR;
-				goto dsa_fail;
-			}
-#else
-			/* unfortunately nettle only accepts 160 or 256
-			 * q_bits size. The check below makes sure we handle
-			 * cases in between by rounding up, but fail when
-			 * larger numbers are requested. */
-			if (q_bits < 160)
-				q_bits = 160;
-			else if (q_bits > 160 && q_bits <= 256)
-				q_bits = 256;
-			ret =
-			    dsa_generate_keypair(&pub, &priv,
+				/* verify the generated parameters */
+				ret = dsa_validate_dss_pqg(&pub, &cert, index);
+				if (ret != 1) {
+					gnutls_assert();
+					ret = GNUTLS_E_PK_GENERATION_ERROR;
+					goto dsa_fail;
+				}
+			} else 
+#endif
+			{
+				/* unfortunately nettle only accepts 160 or 256
+				 * q_bits size. The check below makes sure we handle
+				 * cases in between by rounding up, but fail when
+				 * larger numbers are requested. */
+				if (q_bits < 160)
+					q_bits = 160;
+				else if (q_bits > 160 && q_bits <= 256)
+					q_bits = 256;
+				ret =
+				    dsa_generate_keypair(&pub, &priv,
 						 NULL, rnd_func, 
 						 NULL, NULL,
 						 level, q_bits);
-			if (ret != 1) {
-				gnutls_assert();
-				ret = GNUTLS_E_PK_GENERATION_ERROR;
-				goto dsa_fail;
+				if (ret != 1) {
+					gnutls_assert();
+					ret = GNUTLS_E_PK_GENERATION_ERROR;
+					goto dsa_fail;
+				}
 			}
-#endif
 
 			params->params_nr = 0;
 
@@ -1148,7 +1151,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	switch (algo) {
 	case GNUTLS_PK_DSA:
 #ifdef ENABLE_FIPS140
-		{
+		if (_gnutls_fips_mode_enabled() != 0) {
 			struct dsa_public_key pub;
 			struct dsa_private_key priv;
 
@@ -1272,17 +1275,18 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			rsa_private_key_init(&priv);
 
 			mpz_set_ui(pub.e, 65537);
-#ifdef ENABLE_FIPS140
-			ret =
-			    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
+
+			if (_gnutls_fips_mode_enabled() != 0) {
+				ret =
+				    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
 						 rnd_func, NULL, NULL,
 						 level);
-#else
-			ret =
-			    rsa_generate_keypair(&pub, &priv, NULL,
+			} else {
+				ret =
+				    rsa_generate_keypair(&pub, &priv, NULL,
 						 rnd_func, NULL, NULL,
 						 level, 0);
-#endif
+			}
 			if (ret != 1) {
 				gnutls_assert();
 				ret = GNUTLS_E_PK_GENERATION_ERROR;
