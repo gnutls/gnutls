@@ -126,7 +126,7 @@ void _rnd_system_entropy_deinit(void)
 #include <locks.h>
 #include "egd.h"
 
-static int device_fd = -1;
+int _gnutls_urandom_fd = -1;
 
 static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 {
@@ -136,7 +136,7 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 	for (done = 0; done < size;) {
 		int res;
 		do {
-			res = read(device_fd, rnd + done, size - done);
+			res = read(_gnutls_urandom_fd, rnd + done, size - done);
 		} while (res < 0 && errno == EINTR);
 
 		if (res <= 0) {
@@ -167,7 +167,7 @@ int _rnd_get_system_entropy_egd(void* _rnd, size_t size)
 
 	for (done = 0; done < size;) {
 		res =
-		    _rndegd_read(&device_fd, rnd + done, size - done);
+		    _rndegd_read(&_gnutls_urandom_fd, rnd + done, size - done);
 		if (res <= 0) {
 			if (res < 0) {
 				_gnutls_debug_log("Failed to read egd.\n");
@@ -189,22 +189,22 @@ int _rnd_system_entropy_init(void)
 {
 int old;
 
-	device_fd = open("/dev/urandom", O_RDONLY);
-	if (device_fd < 0) {
+	_gnutls_urandom_fd = open("/dev/urandom", O_RDONLY);
+	if (_gnutls_urandom_fd < 0) {
 		_gnutls_debug_log("Cannot open urandom!\n");
 		goto fallback;
 	}
 
-	old = fcntl(device_fd, F_GETFD);
+	old = fcntl(_gnutls_urandom_fd, F_GETFD);
 	if (old != -1)
-		fcntl(device_fd, F_SETFD, old | FD_CLOEXEC);
+		fcntl(_gnutls_urandom_fd, F_SETFD, old | FD_CLOEXEC);
 
 	_rnd_get_system_entropy = _rnd_get_system_entropy_urandom;
 
 	return 0;
 fallback:
-	device_fd = _rndegd_connect_socket();
-	if (device_fd < 0) {
+	_gnutls_urandom_fd = _rndegd_connect_socket();
+	if (_gnutls_urandom_fd < 0) {
 		_gnutls_debug_log("Cannot open egd socket!\n");
 		return
 			gnutls_assert_val
@@ -217,9 +217,9 @@ fallback:
 
 void _rnd_system_entropy_deinit(void)
 {
-	if (device_fd >= 0) {
-		close(device_fd);
-		device_fd = -1;
+	if (_gnutls_urandom_fd >= 0) {
+		close(_gnutls_urandom_fd);
+		_gnutls_urandom_fd = -1;
 	}
 }
 #endif
