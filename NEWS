@@ -8,11 +8,13 @@ See the end for copying conditions.
 ** libgnutls: Refuse to import v1 or v2 certificates that contain
 extensions.
 
+** libgnutls: Fixes in usage of PKCS #11 token callback
+
 ** certtool: The default cipher for PKCS #12 structures is 3des-pkcs12.
 That option is more compatible than AES or RC4.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_fd_in_use: Added
 
 
 * Version 3.3.9 (released 2014-10-13)
