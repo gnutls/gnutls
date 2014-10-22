@@ -57,7 +57,8 @@
 		} else if (ret < 0) { \
                         return gnutls_assert_val(ret); \
                 } \
-	} while (0);
+                break; \
+	} while (1);
 
 struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
