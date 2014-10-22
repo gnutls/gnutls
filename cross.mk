@@ -1,6 +1,6 @@
 SMP=-j4
 
-GNUTLS_VERSION:=3.2.18
+GNUTLS_VERSION:=3.3.9
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -150,8 +150,8 @@ $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	touch $@
 
 $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
-	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/$(GNUTLS_FILE)
-	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/$(GNUTLS_FILE).sig
+	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/$(GNUTLS_FILE)
+	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/$(GNUTLS_FILE).sig
 	gpg --verify $(GNUTLS_FILE).sig
 	test -d $(GNUTLS_DIR) || tar -xf $(GNUTLS_FILE)
 	cd $(GNUTLS_DIR) && \
