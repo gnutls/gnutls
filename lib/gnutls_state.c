@@ -1149,6 +1149,8 @@ int gnutls_session_is_resumed(gnutls_session_t session)
  * all file descriptors on application startup.
  *
  * Returns: non zero if this fd is in use, or a zero otherwise.
+ *
+ * Since: 3.3.10
  **/
 unsigned gnutls_fd_in_use(int fd)
 {
