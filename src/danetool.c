@@ -590,6 +590,7 @@ struct priv_st {
 	int found;
 };
 
+#ifdef HAVE_DANE
 static int cert_callback(gnutls_session_t session)
 {
 	const gnutls_datum_t *cert_list;
@@ -720,3 +721,4 @@ static const char *obtain_cert(const char *hostname, const char *proto, unsigned
 	else
 		return tmpfile;
 }
+#endif
