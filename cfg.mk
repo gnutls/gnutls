@@ -239,7 +239,7 @@ lib/accelerated/x86/elf/%.s: devel/perlasm/%.pl .submodule.stamp
 	cat $<.license > $@
 	perl $< elf >> $@
 	echo "" >> $@
-	echo ".section .note.GNU-stack,\"\",%progbits" >> $@
+	echo -e "#if defined(__linux__)\n.section .note.GNU-stack,\"\",%progbits\n#endif\n" >> $@
 	sed -i 's/OPENSSL_ia32cap_P/_gnutls_x86_cpuid_s/g' $@
 
 lib/accelerated/x86/coff/%-x86.s: devel/perlasm/%-x86.pl .submodule.stamp 
