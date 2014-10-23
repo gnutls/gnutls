@@ -766,6 +766,7 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 				gnutls_x509_crt_deinit(crt);
 				return gnutls_assert_val(ret);
 			}
+			*issuer = crt;
 			return ret;
 		}
 	}
