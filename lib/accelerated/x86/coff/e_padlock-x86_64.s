@@ -135,7 +135,7 @@ padlock_aes_block:
 	movq	$1,%rcx
 	leaq	32(%rdx),%rbx
 	leaq	16(%rdx),%rdx
-.byte	0xf3,0x0f,0xa7,0xc8
+.byte	0xf3,0x0f,0xa7,0xc8	
 	movq	%r8,%rbx
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
@@ -154,7 +154,7 @@ padlock_xstore:
 	movq	%rdx,%rsi
 
 	movl	%esi,%edx
-.byte	0x0f,0xa7,0xc0
+.byte	0x0f,0xa7,0xc0		
 	movq	8(%rsp),%rdi
 	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
@@ -181,7 +181,7 @@ padlock_sha1_oneshot:
 	movq	%rsp,%rdi
 	movl	%eax,16(%rsp)
 	xorq	%rax,%rax
-.byte	0xf3,0x0f,0xa6,0xc8
+.byte	0xf3,0x0f,0xa6,0xc8	
 	movaps	(%rsp),%xmm0
 	movl	16(%rsp),%eax
 	addq	$128+8,%rsp
@@ -213,7 +213,7 @@ padlock_sha1_blocks:
 	movq	%rsp,%rdi
 	movl	%eax,16(%rsp)
 	movq	$-1,%rax
-.byte	0xf3,0x0f,0xa6,0xc8
+.byte	0xf3,0x0f,0xa6,0xc8	
 	movaps	(%rsp),%xmm0
 	movl	16(%rsp),%eax
 	addq	$128+8,%rsp
@@ -245,7 +245,7 @@ padlock_sha256_oneshot:
 	movq	%rsp,%rdi
 	movaps	%xmm1,16(%rsp)
 	xorq	%rax,%rax
-.byte	0xf3,0x0f,0xa6,0xd0
+.byte	0xf3,0x0f,0xa6,0xd0	
 	movaps	(%rsp),%xmm0
 	movaps	16(%rsp),%xmm1
 	addq	$128+8,%rsp
@@ -277,7 +277,7 @@ padlock_sha256_blocks:
 	movq	%rsp,%rdi
 	movaps	%xmm1,16(%rsp)
 	movq	$-1,%rax
-.byte	0xf3,0x0f,0xa6,0xd0
+.byte	0xf3,0x0f,0xa6,0xd0	
 	movaps	(%rsp),%xmm0
 	movaps	16(%rsp),%xmm1
 	addq	$128+8,%rsp
@@ -312,7 +312,7 @@ padlock_sha512_blocks:
 	movaps	%xmm1,16(%rsp)
 	movaps	%xmm2,32(%rsp)
 	movaps	%xmm3,48(%rsp)
-.byte	0xf3,0x0f,0xa6,0xe0
+.byte	0xf3,0x0f,0xa6,0xe0	
 	movaps	(%rsp),%xmm0
 	movaps	16(%rsp),%xmm1
 	movaps	32(%rsp),%xmm2
@@ -403,7 +403,7 @@ padlock_ecb_encrypt:
 	testq	$15,%rsi
 	jz	.Lecb_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -411,7 +411,7 @@ padlock_ecb_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,200
+.byte	0xf3,0x0f,0xa7,200	
 	movq	%r8,%rdi
 	movq	%r11,%rbx
 	testq	$15,%rdi
@@ -419,7 +419,7 @@ padlock_ecb_encrypt:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lecb_out_aligned:
 	movq	%r9,%rsi
@@ -440,7 +440,7 @@ padlock_ecb_encrypt:
 	subq	%rax,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	movq	%rsp,%rsi
 	movq	%r8,%rdi
 	movq	%rbx,%rcx
@@ -477,7 +477,7 @@ padlock_ecb_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,200
+.byte	0xf3,0x0f,0xa7,200	
 	testq	%rbp,%rbp
 	jz	.Lecb_exit
 
@@ -489,7 +489,7 @@ padlock_ecb_encrypt:
 	subq	%rcx,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	leaq	(%r8),%rdi
 	leaq	(%rsp),%rsi
 	movq	%rbx,%rcx
@@ -581,7 +581,7 @@ padlock_cbc_encrypt:
 	testq	$15,%rsi
 	jz	.Lcbc_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -589,7 +589,7 @@ padlock_cbc_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,208
+.byte	0xf3,0x0f,0xa7,208	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	movq	%r8,%rdi
@@ -599,7 +599,7 @@ padlock_cbc_encrypt:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lcbc_out_aligned:
 	movq	%r9,%rsi
@@ -620,7 +620,7 @@ padlock_cbc_encrypt:
 	subq	%rax,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	movq	%rsp,%rsi
 	movq	%r8,%rdi
 	movq	%rbx,%rcx
@@ -657,7 +657,7 @@ padlock_cbc_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,208
+.byte	0xf3,0x0f,0xa7,208	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	testq	%rbp,%rbp
@@ -671,7 +671,7 @@ padlock_cbc_encrypt:
 	subq	%rcx,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	leaq	(%r8),%rdi
 	leaq	(%rsp),%rsi
 	movq	%rbx,%rcx
@@ -750,7 +750,7 @@ padlock_cfb_encrypt:
 	testq	$15,%rsi
 	jz	.Lcfb_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -758,7 +758,7 @@ padlock_cfb_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,224
+.byte	0xf3,0x0f,0xa7,224	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	movq	%r8,%rdi
@@ -768,7 +768,7 @@ padlock_cfb_encrypt:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lcfb_out_aligned:
 	movq	%r9,%rsi
@@ -798,7 +798,7 @@ padlock_cfb_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,224
+.byte	0xf3,0x0f,0xa7,224	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 .Lcfb_exit:
@@ -875,7 +875,7 @@ padlock_ofb_encrypt:
 	testq	$15,%rsi
 	jz	.Lofb_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -883,7 +883,7 @@ padlock_ofb_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,232
+.byte	0xf3,0x0f,0xa7,232	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	movq	%r8,%rdi
@@ -893,7 +893,7 @@ padlock_ofb_encrypt:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lofb_out_aligned:
 	movq	%r9,%rsi
@@ -923,7 +923,7 @@ padlock_ofb_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,232
+.byte	0xf3,0x0f,0xa7,232	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 .Lofb_exit:
@@ -1024,7 +1024,7 @@ padlock_ctr32_encrypt:
 	testq	$15,%rsi
 	jz	.Lctr32_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -1032,7 +1032,7 @@ padlock_ctr32_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,216
+.byte	0xf3,0x0f,0xa7,216	
 	movl	-4(%rdx),%eax
 	testl	$4294901760,%eax
 	jnz	.Lctr32_no_carry
@@ -1048,7 +1048,7 @@ padlock_ctr32_encrypt:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 .Lctr32_out_aligned:
 	movq	%r9,%rsi
@@ -1081,7 +1081,7 @@ padlock_ctr32_encrypt:
 	subq	%rax,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	movq	%rsp,%rsi
 	movq	%r8,%rdi
 	movq	%rbx,%rcx
@@ -1125,7 +1125,7 @@ padlock_ctr32_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,216
+.byte	0xf3,0x0f,0xa7,216	
 
 	movl	-4(%rdx),%eax
 	bswapl	%eax
@@ -1154,7 +1154,7 @@ padlock_ctr32_encrypt:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,216
+.byte	0xf3,0x0f,0xa7,216	
 	testq	%rbp,%rbp
 	jz	.Lctr32_exit
 
@@ -1166,7 +1166,7 @@ padlock_ctr32_encrypt:
 	subq	%rcx,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	leaq	(%r8),%rdi
 	leaq	(%rsp),%rsi
 	movq	%rbx,%rcx

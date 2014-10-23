@@ -38,7 +38,6 @@
 # *** This file is auto-generated ***
 #
 .text	
-
 .globl	_aesni_encrypt
 
 .p2align	4
@@ -54,7 +53,7 @@ L$oop_enc1_1:
 	decl	%eax
 	movups	(%rdx),%xmm1
 	leaq	16(%rdx),%rdx
-	jnz	L$oop_enc1_1
+	jnz	L$oop_enc1_1	
 .byte	102,15,56,221,209
 	movups	%xmm2,(%rsi)
 	.byte	0xf3,0xc3
@@ -75,93 +74,34 @@ L$oop_dec1_2:
 	decl	%eax
 	movups	(%rdx),%xmm1
 	leaq	16(%rdx),%rdx
-	jnz	L$oop_dec1_2
+	jnz	L$oop_dec1_2	
 .byte	102,15,56,223,209
 	movups	%xmm2,(%rsi)
 	.byte	0xf3,0xc3
 
 
 .p2align	4
-_aesni_encrypt2:
-	movups	(%rcx),%xmm0
-	shll	$4,%eax
-	movups	16(%rcx),%xmm1
-	xorps	%xmm0,%xmm2
-	xorps	%xmm0,%xmm3
-	movups	32(%rcx),%xmm0
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
-	addq	$16,%rax
-
-L$enc_loop2:
-.byte	102,15,56,220,209
-.byte	102,15,56,220,217
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
-.byte	102,15,56,220,208
-.byte	102,15,56,220,216
-	movups	-16(%rcx,%rax,1),%xmm0
-	jnz	L$enc_loop2
-
-.byte	102,15,56,220,209
-.byte	102,15,56,220,217
-.byte	102,15,56,221,208
-.byte	102,15,56,221,216
-	.byte	0xf3,0xc3
-
-
-.p2align	4
-_aesni_decrypt2:
-	movups	(%rcx),%xmm0
-	shll	$4,%eax
-	movups	16(%rcx),%xmm1
-	xorps	%xmm0,%xmm2
-	xorps	%xmm0,%xmm3
-	movups	32(%rcx),%xmm0
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
-	addq	$16,%rax
-
-L$dec_loop2:
-.byte	102,15,56,222,209
-.byte	102,15,56,222,217
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
-.byte	102,15,56,222,208
-.byte	102,15,56,222,216
-	movups	-16(%rcx,%rax,1),%xmm0
-	jnz	L$dec_loop2
-
-.byte	102,15,56,222,209
-.byte	102,15,56,222,217
-.byte	102,15,56,223,208
-.byte	102,15,56,223,216
-	.byte	0xf3,0xc3
-
-
-.p2align	4
 _aesni_encrypt3:
 	movups	(%rcx),%xmm0
-	shll	$4,%eax
+	shrl	$1,%eax
 	movups	16(%rcx),%xmm1
+	leaq	32(%rcx),%rcx
 	xorps	%xmm0,%xmm2
 	xorps	%xmm0,%xmm3
 	xorps	%xmm0,%xmm4
-	movups	32(%rcx),%xmm0
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
-	addq	$16,%rax
+	movups	(%rcx),%xmm0
 
 L$enc_loop3:
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
+	decl	%eax
 .byte	102,15,56,220,225
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,220,208
 .byte	102,15,56,220,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,220,224
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$enc_loop3
 
 .byte	102,15,56,220,209
@@ -176,26 +116,25 @@ L$enc_loop3:
 .p2align	4
 _aesni_decrypt3:
 	movups	(%rcx),%xmm0
-	shll	$4,%eax
+	shrl	$1,%eax
 	movups	16(%rcx),%xmm1
+	leaq	32(%rcx),%rcx
 	xorps	%xmm0,%xmm2
 	xorps	%xmm0,%xmm3
 	xorps	%xmm0,%xmm4
-	movups	32(%rcx),%xmm0
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
-	addq	$16,%rax
+	movups	(%rcx),%xmm0
 
 L$dec_loop3:
 .byte	102,15,56,222,209
 .byte	102,15,56,222,217
+	decl	%eax
 .byte	102,15,56,222,225
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,222,224
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$dec_loop3
 
 .byte	102,15,56,222,209
@@ -210,30 +149,28 @@ L$dec_loop3:
 .p2align	4
 _aesni_encrypt4:
 	movups	(%rcx),%xmm0
-	shll	$4,%eax
+	shrl	$1,%eax
 	movups	16(%rcx),%xmm1
+	leaq	32(%rcx),%rcx
 	xorps	%xmm0,%xmm2
 	xorps	%xmm0,%xmm3
 	xorps	%xmm0,%xmm4
 	xorps	%xmm0,%xmm5
-	movups	32(%rcx),%xmm0
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
-.byte	0x0f,0x1f,0x00
-	addq	$16,%rax
+	movups	(%rcx),%xmm0
 
 L$enc_loop4:
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
+	decl	%eax
 .byte	102,15,56,220,225
 .byte	102,15,56,220,233
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,220,208
 .byte	102,15,56,220,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,220,224
 .byte	102,15,56,220,232
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$enc_loop4
 
 .byte	102,15,56,220,209
@@ -250,30 +187,28 @@ L$enc_loop4:
 .p2align	4
 _aesni_decrypt4:
 	movups	(%rcx),%xmm0
-	shll	$4,%eax
+	shrl	$1,%eax
 	movups	16(%rcx),%xmm1
+	leaq	32(%rcx),%rcx
 	xorps	%xmm0,%xmm2
 	xorps	%xmm0,%xmm3
 	xorps	%xmm0,%xmm4
 	xorps	%xmm0,%xmm5
-	movups	32(%rcx),%xmm0
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
-.byte	0x0f,0x1f,0x00
-	addq	$16,%rax
+	movups	(%rcx),%xmm0
 
 L$dec_loop4:
 .byte	102,15,56,222,209
 .byte	102,15,56,222,217
+	decl	%eax
 .byte	102,15,56,222,225
 .byte	102,15,56,222,233
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,222,224
 .byte	102,15,56,222,232
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$dec_loop4
 
 .byte	102,15,56,222,209
@@ -290,43 +225,43 @@ L$dec_loop4:
 .p2align	4
 _aesni_encrypt6:
 	movups	(%rcx),%xmm0
-	shll	$4,%eax
+	shrl	$1,%eax
 	movups	16(%rcx),%xmm1
+	leaq	32(%rcx),%rcx
 	xorps	%xmm0,%xmm2
 	pxor	%xmm0,%xmm3
-	pxor	%xmm0,%xmm4
 .byte	102,15,56,220,209
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
+	pxor	%xmm0,%xmm4
 .byte	102,15,56,220,217
 	pxor	%xmm0,%xmm5
-	pxor	%xmm0,%xmm6
 .byte	102,15,56,220,225
-	pxor	%xmm0,%xmm7
-	addq	$16,%rax
+	pxor	%xmm0,%xmm6
 .byte	102,15,56,220,233
+	pxor	%xmm0,%xmm7
+	decl	%eax
 .byte	102,15,56,220,241
+	movups	(%rcx),%xmm0
 .byte	102,15,56,220,249
-	movups	-16(%rcx,%rax,1),%xmm0
 	jmp	L$enc_loop6_enter
 .p2align	4
 L$enc_loop6:
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
+	decl	%eax
 .byte	102,15,56,220,225
 .byte	102,15,56,220,233
 .byte	102,15,56,220,241
 .byte	102,15,56,220,249
 L$enc_loop6_enter:
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,220,208
 .byte	102,15,56,220,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,220,224
 .byte	102,15,56,220,232
 .byte	102,15,56,220,240
 .byte	102,15,56,220,248
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$enc_loop6
 
 .byte	102,15,56,220,209
@@ -347,43 +282,43 @@ L$enc_loop6_enter:
 .p2align	4
 _aesni_decrypt6:
 	movups	(%rcx),%xmm0
-	shll	$4,%eax
+	shrl	$1,%eax
 	movups	16(%rcx),%xmm1
+	leaq	32(%rcx),%rcx
 	xorps	%xmm0,%xmm2
 	pxor	%xmm0,%xmm3
-	pxor	%xmm0,%xmm4
 .byte	102,15,56,222,209
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
+	pxor	%xmm0,%xmm4
 .byte	102,15,56,222,217
 	pxor	%xmm0,%xmm5
-	pxor	%xmm0,%xmm6
 .byte	102,15,56,222,225
-	pxor	%xmm0,%xmm7
-	addq	$16,%rax
+	pxor	%xmm0,%xmm6
 .byte	102,15,56,222,233
+	pxor	%xmm0,%xmm7
+	decl	%eax
 .byte	102,15,56,222,241
+	movups	(%rcx),%xmm0
 .byte	102,15,56,222,249
-	movups	-16(%rcx,%rax,1),%xmm0
 	jmp	L$dec_loop6_enter
 .p2align	4
 L$dec_loop6:
 .byte	102,15,56,222,209
 .byte	102,15,56,222,217
+	decl	%eax
 .byte	102,15,56,222,225
 .byte	102,15,56,222,233
 .byte	102,15,56,222,241
 .byte	102,15,56,222,249
 L$dec_loop6_enter:
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,222,224
 .byte	102,15,56,222,232
 .byte	102,15,56,222,240
 .byte	102,15,56,222,248
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$dec_loop6
 
 .byte	102,15,56,222,209
@@ -404,51 +339,52 @@ L$dec_loop6_enter:
 .p2align	4
 _aesni_encrypt8:
 	movups	(%rcx),%xmm0
-	shll	$4,%eax
+	shrl	$1,%eax
 	movups	16(%rcx),%xmm1
+	leaq	32(%rcx),%rcx
 	xorps	%xmm0,%xmm2
 	xorps	%xmm0,%xmm3
-	pxor	%xmm0,%xmm4
-	pxor	%xmm0,%xmm5
-	pxor	%xmm0,%xmm6
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
 .byte	102,15,56,220,209
-	addq	$16,%rax
-	pxor	%xmm0,%xmm7
+	pxor	%xmm0,%xmm4
 .byte	102,15,56,220,217
-	pxor	%xmm0,%xmm8
-	pxor	%xmm0,%xmm9
+	pxor	%xmm0,%xmm5
 .byte	102,15,56,220,225
+	pxor	%xmm0,%xmm6
 .byte	102,15,56,220,233
+	pxor	%xmm0,%xmm7
+	decl	%eax
 .byte	102,15,56,220,241
+	pxor	%xmm0,%xmm8
 .byte	102,15,56,220,249
+	pxor	%xmm0,%xmm9
+	movups	(%rcx),%xmm0
 .byte	102,68,15,56,220,193
 .byte	102,68,15,56,220,201
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	16(%rcx),%xmm1
 	jmp	L$enc_loop8_enter
 .p2align	4
 L$enc_loop8:
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
+	decl	%eax
 .byte	102,15,56,220,225
 .byte	102,15,56,220,233
 .byte	102,15,56,220,241
 .byte	102,15,56,220,249
 .byte	102,68,15,56,220,193
 .byte	102,68,15,56,220,201
+	movups	16(%rcx),%xmm1
 L$enc_loop8_enter:
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
 .byte	102,15,56,220,208
 .byte	102,15,56,220,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,220,224
 .byte	102,15,56,220,232
 .byte	102,15,56,220,240
 .byte	102,15,56,220,248
 .byte	102,68,15,56,220,192
 .byte	102,68,15,56,220,200
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$enc_loop8
 
 .byte	102,15,56,220,209
@@ -473,51 +409,52 @@ L$enc_loop8_enter:
 .p2align	4
 _aesni_decrypt8:
 	movups	(%rcx),%xmm0
-	shll	$4,%eax
+	shrl	$1,%eax
 	movups	16(%rcx),%xmm1
+	leaq	32(%rcx),%rcx
 	xorps	%xmm0,%xmm2
 	xorps	%xmm0,%xmm3
-	pxor	%xmm0,%xmm4
-	pxor	%xmm0,%xmm5
-	pxor	%xmm0,%xmm6
-	leaq	32(%rcx,%rax,1),%rcx
-	negq	%rax
 .byte	102,15,56,222,209
-	addq	$16,%rax
-	pxor	%xmm0,%xmm7
+	pxor	%xmm0,%xmm4
 .byte	102,15,56,222,217
-	pxor	%xmm0,%xmm8
-	pxor	%xmm0,%xmm9
+	pxor	%xmm0,%xmm5
 .byte	102,15,56,222,225
+	pxor	%xmm0,%xmm6
 .byte	102,15,56,222,233
+	pxor	%xmm0,%xmm7
+	decl	%eax
 .byte	102,15,56,222,241
+	pxor	%xmm0,%xmm8
 .byte	102,15,56,222,249
+	pxor	%xmm0,%xmm9
+	movups	(%rcx),%xmm0
 .byte	102,68,15,56,222,193
 .byte	102,68,15,56,222,201
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	16(%rcx),%xmm1
 	jmp	L$dec_loop8_enter
 .p2align	4
 L$dec_loop8:
 .byte	102,15,56,222,209
 .byte	102,15,56,222,217
+	decl	%eax
 .byte	102,15,56,222,225
 .byte	102,15,56,222,233
 .byte	102,15,56,222,241
 .byte	102,15,56,222,249
 .byte	102,68,15,56,222,193
 .byte	102,68,15,56,222,201
+	movups	16(%rcx),%xmm1
 L$dec_loop8_enter:
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,222,224
 .byte	102,15,56,222,232
 .byte	102,15,56,222,240
 .byte	102,15,56,222,248
 .byte	102,68,15,56,222,192
 .byte	102,68,15,56,222,200
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$dec_loop8
 
 .byte	102,15,56,222,209
@@ -646,13 +583,14 @@ L$oop_enc1_3:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_3
+	jnz	L$oop_enc1_3	
 .byte	102,15,56,221,209
 	movups	%xmm2,(%rsi)
 	jmp	L$ecb_ret
 .p2align	4
 L$ecb_enc_two:
-	call	_aesni_encrypt2
+	xorps	%xmm4,%xmm4
+	call	_aesni_encrypt3
 	movups	%xmm2,(%rsi)
 	movups	%xmm3,16(%rsi)
 	jmp	L$ecb_ret
@@ -790,13 +728,14 @@ L$oop_dec1_4:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_4
+	jnz	L$oop_dec1_4	
 .byte	102,15,56,223,209
 	movups	%xmm2,(%rsi)
 	jmp	L$ecb_ret
 .p2align	4
 L$ecb_dec_two:
-	call	_aesni_decrypt2
+	xorps	%xmm4,%xmm4
+	call	_aesni_decrypt3
 	movups	%xmm2,(%rsi)
 	movups	%xmm3,16(%rsi)
 	jmp	L$ecb_ret
@@ -843,53 +782,53 @@ L$ecb_ret:
 .p2align	4
 _aesni_ccm64_encrypt_blocks:
 	movl	240(%rcx),%eax
-	movdqu	(%r8),%xmm6
-	movdqa	L$increment64(%rip),%xmm9
+	movdqu	(%r8),%xmm9
+	movdqa	L$increment64(%rip),%xmm6
 	movdqa	L$bswap_mask(%rip),%xmm7
 
-	shll	$4,%eax
-	movl	$16,%r10d
+	shrl	$1,%eax
 	leaq	0(%rcx),%r11
 	movdqu	(%r9),%xmm3
-	movdqa	%xmm6,%xmm2
-	leaq	32(%rcx,%rax,1),%rcx
-.byte	102,15,56,0,247
-	subq	%rax,%r10
+	movdqa	%xmm9,%xmm2
+	movl	%eax,%r10d
+.byte	102,68,15,56,0,207
 	jmp	L$ccm64_enc_outer
 .p2align	4
 L$ccm64_enc_outer:
 	movups	(%r11),%xmm0
-	movq	%r10,%rax
+	movl	%r10d,%eax
 	movups	(%rdi),%xmm8
 
 	xorps	%xmm0,%xmm2
 	movups	16(%r11),%xmm1
 	xorps	%xmm8,%xmm0
+	leaq	32(%r11),%rcx
 	xorps	%xmm0,%xmm3
-	movups	32(%r11),%xmm0
+	movups	(%rcx),%xmm0
 
 L$ccm64_enc2_loop:
 .byte	102,15,56,220,209
+	decl	%eax
 .byte	102,15,56,220,217
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,220,208
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,220,216
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	0(%rcx),%xmm0
 	jnz	L$ccm64_enc2_loop
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
-	paddq	%xmm9,%xmm6
-	decq	%rdx
+	paddq	%xmm6,%xmm9
 .byte	102,15,56,221,208
 .byte	102,15,56,221,216
 
+	decq	%rdx
 	leaq	16(%rdi),%rdi
 	xorps	%xmm2,%xmm8
-	movdqa	%xmm6,%xmm2
+	movdqa	%xmm9,%xmm2
 	movups	%xmm8,(%rsi)
-.byte	102,15,56,0,215
 	leaq	16(%rsi),%rsi
+.byte	102,15,56,0,215
 	jnz	L$ccm64_enc_outer
 
 	movups	%xmm3,(%r9)
@@ -900,15 +839,15 @@ L$ccm64_enc2_loop:
 .p2align	4
 _aesni_ccm64_decrypt_blocks:
 	movl	240(%rcx),%eax
-	movups	(%r8),%xmm6
+	movups	(%r8),%xmm9
 	movdqu	(%r9),%xmm3
-	movdqa	L$increment64(%rip),%xmm9
+	movdqa	L$increment64(%rip),%xmm6
 	movdqa	L$bswap_mask(%rip),%xmm7
 
-	movaps	%xmm6,%xmm2
+	movaps	%xmm9,%xmm2
 	movl	%eax,%r10d
 	movq	%rcx,%r11
-.byte	102,15,56,0,247
+.byte	102,68,15,56,0,207
 	movups	(%rcx),%xmm0
 	movups	16(%rcx),%xmm1
 	leaq	32(%rcx),%rcx
@@ -918,21 +857,17 @@ L$oop_enc1_5:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_5
+	jnz	L$oop_enc1_5	
 .byte	102,15,56,221,209
-	shll	$4,%r10d
-	movl	$16,%eax
 	movups	(%rdi),%xmm8
-	paddq	%xmm9,%xmm6
+	paddq	%xmm6,%xmm9
 	leaq	16(%rdi),%rdi
-	subq	%r10,%rax
-	leaq	32(%r11,%r10,1),%rcx
-	movq	%rax,%r10
 	jmp	L$ccm64_dec_outer
 .p2align	4
 L$ccm64_dec_outer:
 	xorps	%xmm2,%xmm8
-	movdqa	%xmm6,%xmm2
+	movdqa	%xmm9,%xmm2
+	movl	%r10d,%eax
 	movups	%xmm8,(%rsi)
 	leaq	16(%rsi),%rsi
 .byte	102,15,56,0,215
@@ -941,36 +876,36 @@ L$ccm64_dec_outer:
 	jz	L$ccm64_dec_break
 
 	movups	(%r11),%xmm0
-	movq	%r10,%rax
+	shrl	$1,%eax
 	movups	16(%r11),%xmm1
 	xorps	%xmm0,%xmm8
+	leaq	32(%r11),%rcx
 	xorps	%xmm0,%xmm2
 	xorps	%xmm8,%xmm3
-	movups	32(%r11),%xmm0
-	jmp	L$ccm64_dec2_loop
-.p2align	4
+	movups	(%rcx),%xmm0
+
 L$ccm64_dec2_loop:
 .byte	102,15,56,220,209
+	decl	%eax
 .byte	102,15,56,220,217
-	movups	(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,220,208
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,220,216
-	movups	-16(%rcx,%rax,1),%xmm0
+	movups	0(%rcx),%xmm0
 	jnz	L$ccm64_dec2_loop
 	movups	(%rdi),%xmm8
-	paddq	%xmm9,%xmm6
+	paddq	%xmm6,%xmm9
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
+	leaq	16(%rdi),%rdi
 .byte	102,15,56,221,208
 .byte	102,15,56,221,216
-	leaq	16(%rdi),%rdi
 	jmp	L$ccm64_dec_outer
 
 .p2align	4
 L$ccm64_dec_break:
 
-	movl	240(%r11),%eax
 	movups	(%r11),%xmm0
 	movups	16(%r11),%xmm1
 	xorps	%xmm0,%xmm8
@@ -981,7 +916,7 @@ L$oop_enc1_6:
 	decl	%eax
 	movups	(%r11),%xmm1
 	leaq	16(%r11),%r11
-	jnz	L$oop_enc1_6
+	jnz	L$oop_enc1_6	
 .byte	102,15,56,221,217
 	movups	%xmm3,(%r9)
 	.byte	0xf3,0xc3
@@ -1012,33 +947,32 @@ _aesni_ctr32_encrypt_blocks:
 	movdqa	%xmm2,64(%rsp)
 	movdqa	%xmm2,80(%rsp)
 	movdqa	%xmm2,96(%rsp)
-	movq	%rdx,%r10
 	movdqa	%xmm2,112(%rsp)
 
-	leaq	1(%r8),%rax
-	leaq	2(%r8),%rdx
-	bswapl	%eax
-	bswapl	%edx
-	xorl	%r11d,%eax
-	xorl	%r11d,%edx
-.byte	102,15,58,34,216,3
-	leaq	3(%r8),%rax
+	movl	240(%rcx),%eax
+
+	leaq	1(%r8),%r9
+	leaq	2(%r8),%r10
+	bswapl	%r9d
+	bswapl	%r10d
+	xorl	%r11d,%r9d
+	xorl	%r11d,%r10d
+.byte	102,65,15,58,34,217,3
+	leaq	3(%r8),%r9
 	movdqa	%xmm3,16(%rsp)
-.byte	102,15,58,34,226,3
-	bswapl	%eax
-	movq	%r10,%rdx
+.byte	102,65,15,58,34,226,3
+	bswapl	%r9d
 	leaq	4(%r8),%r10
 	movdqa	%xmm4,32(%rsp)
-	xorl	%r11d,%eax
+	xorl	%r11d,%r9d
 	bswapl	%r10d
-.byte	102,15,58,34,232,3
+.byte	102,65,15,58,34,233,3
 	xorl	%r11d,%r10d
 	movdqa	%xmm5,48(%rsp)
 	leaq	5(%r8),%r9
 	movl	%r10d,64+12(%rsp)
 	bswapl	%r9d
 	leaq	6(%r8),%r10
-	movl	240(%rcx),%eax
 	xorl	%r11d,%r9d
 	bswapl	%r10d
 	movl	%r9d,80+12(%rsp)
@@ -1046,9 +980,7 @@ _aesni_ctr32_encrypt_blocks:
 	leaq	7(%r8),%r9
 	movl	%r10d,96+12(%rsp)
 	bswapl	%r9d
-	movl	__gnutls_x86_cpuid_s+4(%rip),%r10d
 	xorl	%r11d,%r9d
-	andl	$71303168,%r10d
 	movl	%r9d,112+12(%rsp)
 
 	movups	16(%rcx),%xmm1
@@ -1059,103 +991,9 @@ _aesni_ctr32_encrypt_blocks:
 	cmpq	$8,%rdx
 	jb	L$ctr32_tail
 
-	subq	$6,%rdx
-	cmpl	$4194304,%r10d
-	je	L$ctr32_6x
-
 	leaq	128(%rcx),%rcx
-	subq	$2,%rdx
+	subq	$8,%rdx
 	jmp	L$ctr32_loop8
-
-.p2align	4
-L$ctr32_6x:
-	shll	$4,%eax
-	movl	$48,%r10d
-	bswapl	%r11d
-	leaq	32(%rcx,%rax,1),%rcx
-	subq	%rax,%r10
-	jmp	L$ctr32_loop6
-
-.p2align	4
-L$ctr32_loop6:
-	addl	$6,%r8d
-	movups	-48(%rcx,%r10,1),%xmm0
-.byte	102,15,56,220,209
-	movl	%r8d,%eax
-	xorl	%r11d,%eax
-.byte	102,15,56,220,217
-.byte	0x0f,0x38,0xf1,0x44,0x24,12
-	leal	1(%r8),%eax
-.byte	102,15,56,220,225
-	xorl	%r11d,%eax
-.byte	0x0f,0x38,0xf1,0x44,0x24,28
-.byte	102,15,56,220,233
-	leal	2(%r8),%eax
-	xorl	%r11d,%eax
-.byte	102,15,56,220,241
-.byte	0x0f,0x38,0xf1,0x44,0x24,44
-	leal	3(%r8),%eax
-.byte	102,15,56,220,249
-	movups	-32(%rcx,%r10,1),%xmm1
-	xorl	%r11d,%eax
-
-.byte	102,15,56,220,208
-.byte	0x0f,0x38,0xf1,0x44,0x24,60
-	leal	4(%r8),%eax
-.byte	102,15,56,220,216
-	xorl	%r11d,%eax
-.byte	0x0f,0x38,0xf1,0x44,0x24,76
-.byte	102,15,56,220,224
-	leal	5(%r8),%eax
-	xorl	%r11d,%eax
-.byte	102,15,56,220,232
-.byte	0x0f,0x38,0xf1,0x44,0x24,92
-	movq	%r10,%rax
-.byte	102,15,56,220,240
-.byte	102,15,56,220,248
-	movups	-16(%rcx,%r10,1),%xmm0
-
-	call	L$enc_loop6
-
-	movdqu	(%rdi),%xmm8
-	movdqu	16(%rdi),%xmm9
-	movdqu	32(%rdi),%xmm10
-	movdqu	48(%rdi),%xmm11
-	movdqu	64(%rdi),%xmm12
-	movdqu	80(%rdi),%xmm13
-	leaq	96(%rdi),%rdi
-	movups	-64(%rcx,%r10,1),%xmm1
-	pxor	%xmm2,%xmm8
-	movaps	0(%rsp),%xmm2
-	pxor	%xmm3,%xmm9
-	movaps	16(%rsp),%xmm3
-	pxor	%xmm4,%xmm10
-	movaps	32(%rsp),%xmm4
-	pxor	%xmm5,%xmm11
-	movaps	48(%rsp),%xmm5
-	pxor	%xmm6,%xmm12
-	movaps	64(%rsp),%xmm6
-	pxor	%xmm7,%xmm13
-	movaps	80(%rsp),%xmm7
-	movdqu	%xmm8,(%rsi)
-	movdqu	%xmm9,16(%rsi)
-	movdqu	%xmm10,32(%rsi)
-	movdqu	%xmm11,48(%rsi)
-	movdqu	%xmm12,64(%rsi)
-	movdqu	%xmm13,80(%rsi)
-	leaq	96(%rsi),%rsi
-
-	subq	$6,%rdx
-	jnc	L$ctr32_loop6
-
-	addq	$6,%rdx
-	jz	L$ctr32_done
-
-	leal	-48(%r10),%eax
-	leaq	-80(%rcx,%r10,1),%rcx
-	negl	%eax
-	shrl	$4,%eax
-	jmp	L$ctr32_tail
 
 .p2align	5
 L$ctr32_loop8:
@@ -1169,7 +1007,6 @@ L$ctr32_loop8:
 	movups	32-128(%rcx),%xmm0
 .byte	102,15,56,220,225
 	xorl	%r11d,%r9d
-	nop
 .byte	102,15,56,220,233
 	movl	%r9d,0+12(%rsp)
 	leaq	1(%r8),%r9
@@ -1178,12 +1015,11 @@ L$ctr32_loop8:
 .byte	102,68,15,56,220,193
 .byte	102,68,15,56,220,201
 	movups	48-128(%rcx),%xmm1
-	bswapl	%r9d
 .byte	102,15,56,220,208
 .byte	102,15,56,220,216
-	xorl	%r11d,%r9d
-.byte	0x66,0x90
+	bswapl	%r9d
 .byte	102,15,56,220,224
+	xorl	%r11d,%r9d
 .byte	102,15,56,220,232
 	movl	%r9d,16+12(%rsp)
 	leaq	2(%r8),%r9
@@ -1192,12 +1028,11 @@ L$ctr32_loop8:
 .byte	102,68,15,56,220,192
 .byte	102,68,15,56,220,200
 	movups	64-128(%rcx),%xmm0
-	bswapl	%r9d
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
-	xorl	%r11d,%r9d
-.byte	0x66,0x90
+	bswapl	%r9d
 .byte	102,15,56,220,225
+	xorl	%r11d,%r9d
 .byte	102,15,56,220,233
 	movl	%r9d,32+12(%rsp)
 	leaq	3(%r8),%r9
@@ -1206,12 +1041,11 @@ L$ctr32_loop8:
 .byte	102,68,15,56,220,193
 .byte	102,68,15,56,220,201
 	movups	80-128(%rcx),%xmm1
-	bswapl	%r9d
 .byte	102,15,56,220,208
 .byte	102,15,56,220,216
-	xorl	%r11d,%r9d
-.byte	0x66,0x90
+	bswapl	%r9d
 .byte	102,15,56,220,224
+	xorl	%r11d,%r9d
 .byte	102,15,56,220,232
 	movl	%r9d,48+12(%rsp)
 	leaq	4(%r8),%r9
@@ -1220,12 +1054,11 @@ L$ctr32_loop8:
 .byte	102,68,15,56,220,192
 .byte	102,68,15,56,220,200
 	movups	96-128(%rcx),%xmm0
-	bswapl	%r9d
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
-	xorl	%r11d,%r9d
-.byte	0x66,0x90
+	bswapl	%r9d
 .byte	102,15,56,220,225
+	xorl	%r11d,%r9d
 .byte	102,15,56,220,233
 	movl	%r9d,64+12(%rsp)
 	leaq	5(%r8),%r9
@@ -1234,12 +1067,11 @@ L$ctr32_loop8:
 .byte	102,68,15,56,220,193
 .byte	102,68,15,56,220,201
 	movups	112-128(%rcx),%xmm1
-	bswapl	%r9d
 .byte	102,15,56,220,208
 .byte	102,15,56,220,216
-	xorl	%r11d,%r9d
-.byte	0x66,0x90
+	bswapl	%r9d
 .byte	102,15,56,220,224
+	xorl	%r11d,%r9d
 .byte	102,15,56,220,232
 	movl	%r9d,80+12(%rsp)
 	leaq	6(%r8),%r9
@@ -1248,12 +1080,11 @@ L$ctr32_loop8:
 .byte	102,68,15,56,220,192
 .byte	102,68,15,56,220,200
 	movups	128-128(%rcx),%xmm0
-	bswapl	%r9d
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
-	xorl	%r11d,%r9d
-.byte	0x66,0x90
+	bswapl	%r9d
 .byte	102,15,56,220,225
+	xorl	%r11d,%r9d
 .byte	102,15,56,220,233
 	movl	%r9d,96+12(%rsp)
 	leaq	7(%r8),%r9
@@ -1262,21 +1093,21 @@ L$ctr32_loop8:
 .byte	102,68,15,56,220,193
 .byte	102,68,15,56,220,201
 	movups	144-128(%rcx),%xmm1
-	bswapl	%r9d
 .byte	102,15,56,220,208
 .byte	102,15,56,220,216
+	bswapl	%r9d
 .byte	102,15,56,220,224
 	xorl	%r11d,%r9d
-	movdqu	0(%rdi),%xmm10
 .byte	102,15,56,220,232
 	movl	%r9d,112+12(%rsp)
-	cmpl	$11,%eax
 .byte	102,15,56,220,240
 .byte	102,15,56,220,248
 .byte	102,68,15,56,220,192
+	movdqu	0(%rdi),%xmm10
 .byte	102,68,15,56,220,200
 	movups	160-128(%rcx),%xmm0
 
+	cmpl	$11,%eax
 	jb	L$ctr32_enc_done
 
 .byte	102,15,56,220,209
@@ -1319,9 +1150,7 @@ L$ctr32_loop8:
 .byte	102,68,15,56,220,192
 .byte	102,68,15,56,220,200
 	movups	224-128(%rcx),%xmm0
-	jmp	L$ctr32_enc_done
 
-.p2align	4
 L$ctr32_enc_done:
 	movdqu	16(%rdi),%xmm11
 	pxor	%xmm0,%xmm10
@@ -1333,8 +1162,8 @@ L$ctr32_enc_done:
 	pxor	%xmm0,%xmm13
 	movdqu	80(%rdi),%xmm15
 	pxor	%xmm0,%xmm14
-	pxor	%xmm0,%xmm15
 .byte	102,15,56,220,209
+	pxor	%xmm0,%xmm15
 .byte	102,15,56,220,217
 .byte	102,15,56,220,225
 .byte	102,15,56,220,233
@@ -1343,26 +1172,26 @@ L$ctr32_enc_done:
 .byte	102,68,15,56,220,193
 .byte	102,68,15,56,220,201
 	movdqu	96(%rdi),%xmm1
-	leaq	128(%rdi),%rdi
 
 .byte	102,65,15,56,221,210
 	pxor	%xmm0,%xmm1
-	movdqu	112-128(%rdi),%xmm10
+	movdqu	112(%rdi),%xmm10
+	leaq	128(%rdi),%rdi
 .byte	102,65,15,56,221,219
 	pxor	%xmm0,%xmm10
 	movdqa	0(%rsp),%xmm11
 .byte	102,65,15,56,221,228
-.byte	102,65,15,56,221,237
 	movdqa	16(%rsp),%xmm12
+.byte	102,65,15,56,221,237
 	movdqa	32(%rsp),%xmm13
 .byte	102,65,15,56,221,246
-.byte	102,65,15,56,221,255
 	movdqa	48(%rsp),%xmm14
+.byte	102,65,15,56,221,255
 	movdqa	64(%rsp),%xmm15
 .byte	102,68,15,56,221,193
 	movdqa	80(%rsp),%xmm0
-	movups	16-128(%rcx),%xmm1
 .byte	102,69,15,56,221,202
+	movups	16-128(%rcx),%xmm1
 
 	movups	%xmm2,(%rsi)
 	movdqa	%xmm11,%xmm2
@@ -1393,24 +1222,24 @@ L$ctr32_tail:
 	jb	L$ctr32_loop3
 	je	L$ctr32_loop4
 
-	shll	$4,%eax
 	movdqa	96(%rsp),%xmm8
 	pxor	%xmm9,%xmm9
 
 	movups	16(%rcx),%xmm0
 .byte	102,15,56,220,209
+	leaq	16(%rcx),%rcx
 .byte	102,15,56,220,217
-	leaq	32-16(%rcx,%rax,1),%rcx
-	negq	%rax
+	shrl	$1,%eax
 .byte	102,15,56,220,225
-	addq	$16,%rax
-	movups	(%rdi),%xmm10
+	decl	%eax
 .byte	102,15,56,220,233
+	movups	(%rdi),%xmm10
 .byte	102,15,56,220,241
 	movups	16(%rdi),%xmm11
-	movups	32(%rdi),%xmm12
 .byte	102,15,56,220,249
+	movups	32(%rdi),%xmm12
 .byte	102,68,15,56,220,193
+	movups	16(%rcx),%xmm1
 
 	call	L$enc_loop8_enter
 
@@ -1443,19 +1272,19 @@ L$ctr32_tail:
 L$ctr32_loop4:
 .byte	102,15,56,220,209
 	leaq	16(%rcx),%rcx
-	decl	%eax
 .byte	102,15,56,220,217
 .byte	102,15,56,220,225
 .byte	102,15,56,220,233
 	movups	(%rcx),%xmm1
+	decl	%eax
 	jnz	L$ctr32_loop4
 .byte	102,15,56,221,209
-.byte	102,15,56,221,217
 	movups	(%rdi),%xmm10
+.byte	102,15,56,221,217
 	movups	16(%rdi),%xmm11
 .byte	102,15,56,221,225
-.byte	102,15,56,221,233
 	movups	32(%rdi),%xmm12
+.byte	102,15,56,221,233
 	movups	48(%rdi),%xmm13
 
 	xorps	%xmm10,%xmm2
@@ -1472,10 +1301,10 @@ L$ctr32_loop4:
 L$ctr32_loop3:
 .byte	102,15,56,220,209
 	leaq	16(%rcx),%rcx
-	decl	%eax
 .byte	102,15,56,220,217
 .byte	102,15,56,220,225
 	movups	(%rcx),%xmm1
+	decl	%eax
 	jnz	L$ctr32_loop3
 .byte	102,15,56,221,209
 .byte	102,15,56,221,217
@@ -1511,7 +1340,7 @@ L$oop_enc1_7:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_7
+	jnz	L$oop_enc1_7	
 .byte	102,15,56,221,209
 	xorps	%xmm10,%xmm2
 	movups	%xmm2,(%rsi)
@@ -1530,284 +1359,245 @@ L$ctr32_epilogue:
 _aesni_xts_encrypt:
 	leaq	(%rsp),%rax
 	pushq	%rbp
-	subq	$112,%rsp
+	subq	$96,%rsp
 	andq	$-16,%rsp
 	leaq	-8(%rax),%rbp
-	movups	(%r9),%xmm2
+	movups	(%r9),%xmm15
 	movl	240(%r8),%eax
 	movl	240(%rcx),%r10d
 	movups	(%r8),%xmm0
 	movups	16(%r8),%xmm1
 	leaq	32(%r8),%r8
-	xorps	%xmm0,%xmm2
+	xorps	%xmm0,%xmm15
 L$oop_enc1_8:
-.byte	102,15,56,220,209
+.byte	102,68,15,56,220,249
 	decl	%eax
 	movups	(%r8),%xmm1
 	leaq	16(%r8),%r8
-	jnz	L$oop_enc1_8
-.byte	102,15,56,221,209
-	movups	(%rcx),%xmm0
+	jnz	L$oop_enc1_8	
+.byte	102,68,15,56,221,249
 	movq	%rcx,%r11
 	movl	%r10d,%eax
-	shll	$4,%r10d
 	movq	%rdx,%r9
 	andq	$-16,%rdx
 
-	movups	16(%rcx,%r10,1),%xmm1
-
 	movdqa	L$xts_magic(%rip),%xmm8
-	movdqa	%xmm2,%xmm15
-	pshufd	$95,%xmm2,%xmm9
-	pxor	%xmm0,%xmm1
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
+	pxor	%xmm14,%xmm14
+	pcmpgtd	%xmm15,%xmm14
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
 	movdqa	%xmm15,%xmm10
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-	pxor	%xmm0,%xmm10
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
-	movdqa	%xmm15,%xmm11
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-	pxor	%xmm0,%xmm11
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
-	movdqa	%xmm15,%xmm12
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-	pxor	%xmm0,%xmm12
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
-	movdqa	%xmm15,%xmm13
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-	pxor	%xmm0,%xmm13
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm15,%xmm14
-	psrad	$31,%xmm9
 	paddq	%xmm15,%xmm15
 	pand	%xmm8,%xmm9
-	pxor	%xmm0,%xmm14
+	pcmpgtd	%xmm15,%xmm14
 	pxor	%xmm9,%xmm15
-	movaps	%xmm1,96(%rsp)
-
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm11
+	paddq	%xmm15,%xmm15
+	pand	%xmm8,%xmm9
+	pcmpgtd	%xmm15,%xmm14
+	pxor	%xmm9,%xmm15
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm12
+	paddq	%xmm15,%xmm15
+	pand	%xmm8,%xmm9
+	pcmpgtd	%xmm15,%xmm14
+	pxor	%xmm9,%xmm15
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm13
+	paddq	%xmm15,%xmm15
+	pand	%xmm8,%xmm9
+	pcmpgtd	%xmm15,%xmm14
+	pxor	%xmm9,%xmm15
 	subq	$96,%rdx
 	jc	L$xts_enc_short
 
-	movl	$16+96,%eax
-	leaq	32(%r11,%r10,1),%rcx
-	subq	%r10,%rax
-	movups	16(%r11),%xmm1
-	movq	%rax,%r10
-	leaq	L$xts_magic(%rip),%r8
+	shrl	$1,%eax
+	subl	$1,%eax
+	movl	%eax,%r10d
 	jmp	L$xts_enc_grandloop
 
-.p2align	5
+.p2align	4
 L$xts_enc_grandloop:
+	pshufd	$19,%xmm14,%xmm9
+	movdqa	%xmm15,%xmm14
+	paddq	%xmm15,%xmm15
 	movdqu	0(%rdi),%xmm2
-	movdqa	%xmm0,%xmm8
+	pand	%xmm8,%xmm9
 	movdqu	16(%rdi),%xmm3
-	pxor	%xmm10,%xmm2
+	pxor	%xmm9,%xmm15
+
 	movdqu	32(%rdi),%xmm4
-	pxor	%xmm11,%xmm3
-.byte	102,15,56,220,209
+	pxor	%xmm10,%xmm2
 	movdqu	48(%rdi),%xmm5
-	pxor	%xmm12,%xmm4
-.byte	102,15,56,220,217
+	pxor	%xmm11,%xmm3
 	movdqu	64(%rdi),%xmm6
-	pxor	%xmm13,%xmm5
-.byte	102,15,56,220,225
+	pxor	%xmm12,%xmm4
 	movdqu	80(%rdi),%xmm7
-	pxor	%xmm15,%xmm8
-	movdqa	96(%rsp),%xmm9
-	pxor	%xmm14,%xmm6
-.byte	102,15,56,220,233
-	movups	32(%r11),%xmm0
 	leaq	96(%rdi),%rdi
-	pxor	%xmm8,%xmm7
+	pxor	%xmm13,%xmm5
+	movups	(%r11),%xmm0
+	pxor	%xmm14,%xmm6
+	pxor	%xmm15,%xmm7
 
-	pxor	%xmm9,%xmm10
-.byte	102,15,56,220,241
-	pxor	%xmm9,%xmm11
+
+
+	movups	16(%r11),%xmm1
+	pxor	%xmm0,%xmm2
+	pxor	%xmm0,%xmm3
 	movdqa	%xmm10,0(%rsp)
-.byte	102,15,56,220,249
-	movups	48(%r11),%xmm1
-	pxor	%xmm9,%xmm12
-
-.byte	102,15,56,220,208
-	pxor	%xmm9,%xmm13
+.byte	102,15,56,220,209
+	leaq	32(%r11),%rcx
+	pxor	%xmm0,%xmm4
 	movdqa	%xmm11,16(%rsp)
-.byte	102,15,56,220,216
-	pxor	%xmm9,%xmm14
+.byte	102,15,56,220,217
+	pxor	%xmm0,%xmm5
 	movdqa	%xmm12,32(%rsp)
-.byte	102,15,56,220,224
-.byte	102,15,56,220,232
-	pxor	%xmm9,%xmm8
+.byte	102,15,56,220,225
+	pxor	%xmm0,%xmm6
+	movdqa	%xmm13,48(%rsp)
+.byte	102,15,56,220,233
+	pxor	%xmm0,%xmm7
+	movups	(%rcx),%xmm0
+	decl	%eax
 	movdqa	%xmm14,64(%rsp)
-.byte	102,15,56,220,240
-.byte	102,15,56,220,248
-	movups	64(%r11),%xmm0
-	movdqa	%xmm8,80(%rsp)
-	pshufd	$95,%xmm15,%xmm9
-	jmp	L$xts_enc_loop6
-.p2align	5
+.byte	102,15,56,220,241
+	movdqa	%xmm15,80(%rsp)
+.byte	102,15,56,220,249
+	pxor	%xmm14,%xmm14
+	pcmpgtd	%xmm15,%xmm14
+	jmp	L$xts_enc_loop6_enter
+
+.p2align	4
 L$xts_enc_loop6:
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
+	decl	%eax
 .byte	102,15,56,220,225
 .byte	102,15,56,220,233
 .byte	102,15,56,220,241
 .byte	102,15,56,220,249
-	movups	-64(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
-
+L$xts_enc_loop6_enter:
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,220,208
 .byte	102,15,56,220,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,220,224
 .byte	102,15,56,220,232
 .byte	102,15,56,220,240
 .byte	102,15,56,220,248
-	movups	-80(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$xts_enc_loop6
 
-	movdqa	(%r8),%xmm8
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	paddq	%xmm15,%xmm15
 .byte	102,15,56,220,209
-	paddq	%xmm15,%xmm15
-	psrad	$31,%xmm14
-.byte	102,15,56,220,217
-	pand	%xmm8,%xmm14
-	movups	(%r11),%xmm10
-.byte	102,15,56,220,225
-.byte	102,15,56,220,233
-.byte	102,15,56,220,241
-	pxor	%xmm14,%xmm15
-	movaps	%xmm10,%xmm11
-.byte	102,15,56,220,249
-	movups	-64(%rcx),%xmm1
-
-	movdqa	%xmm9,%xmm14
-.byte	102,15,56,220,208
-	paddd	%xmm9,%xmm9
-	pxor	%xmm15,%xmm10
-.byte	102,15,56,220,216
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-.byte	102,15,56,220,224
-.byte	102,15,56,220,232
-	pand	%xmm8,%xmm14
-	movaps	%xmm11,%xmm12
-.byte	102,15,56,220,240
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm9,%xmm14
-.byte	102,15,56,220,248
-	movups	-48(%rcx),%xmm0
-
-	paddd	%xmm9,%xmm9
-.byte	102,15,56,220,209
-	pxor	%xmm15,%xmm11
-	psrad	$31,%xmm14
-.byte	102,15,56,220,217
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-.byte	102,15,56,220,225
-.byte	102,15,56,220,233
-	movdqa	%xmm13,48(%rsp)
-	pxor	%xmm14,%xmm15
-.byte	102,15,56,220,241
-	movaps	%xmm12,%xmm13
-	movdqa	%xmm9,%xmm14
-.byte	102,15,56,220,249
-	movups	-32(%rcx),%xmm1
-
-	paddd	%xmm9,%xmm9
-.byte	102,15,56,220,208
-	pxor	%xmm15,%xmm12
-	psrad	$31,%xmm14
-.byte	102,15,56,220,216
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-.byte	102,15,56,220,224
-.byte	102,15,56,220,232
-.byte	102,15,56,220,240
-	pxor	%xmm14,%xmm15
-	movaps	%xmm13,%xmm14
-.byte	102,15,56,220,248
-
-	movdqa	%xmm9,%xmm0
-	paddd	%xmm9,%xmm9
-.byte	102,15,56,220,209
-	pxor	%xmm15,%xmm13
-	psrad	$31,%xmm0
-.byte	102,15,56,220,217
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm0
-.byte	102,15,56,220,225
-.byte	102,15,56,220,233
-	pxor	%xmm0,%xmm15
-	movups	(%r11),%xmm0
-.byte	102,15,56,220,241
-.byte	102,15,56,220,249
-	movups	16(%r11),%xmm1
-
-	pxor	%xmm15,%xmm14
-.byte	102,15,56,221,84,36,0
-	psrad	$31,%xmm9
-	paddq	%xmm15,%xmm15
-.byte	102,15,56,221,92,36,16
-.byte	102,15,56,221,100,36,32
 	pand	%xmm8,%xmm9
-	movq	%r10,%rax
-.byte	102,15,56,221,108,36,48
-.byte	102,15,56,221,116,36,64
-.byte	102,15,56,221,124,36,80
+.byte	102,15,56,220,217
+	pcmpgtd	%xmm15,%xmm14
+.byte	102,15,56,220,225
+	pxor	%xmm9,%xmm15
+.byte	102,15,56,220,233
+.byte	102,15,56,220,241
+.byte	102,15,56,220,249
+	movups	16(%rcx),%xmm1
+
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm10
+	paddq	%xmm15,%xmm15
+.byte	102,15,56,220,208
+	pand	%xmm8,%xmm9
+.byte	102,15,56,220,216
+	pcmpgtd	%xmm15,%xmm14
+.byte	102,15,56,220,224
+	pxor	%xmm9,%xmm15
+.byte	102,15,56,220,232
+.byte	102,15,56,220,240
+.byte	102,15,56,220,248
+	movups	32(%rcx),%xmm0
+
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm11
+	paddq	%xmm15,%xmm15
+.byte	102,15,56,220,209
+	pand	%xmm8,%xmm9
+.byte	102,15,56,220,217
+	pcmpgtd	%xmm15,%xmm14
+.byte	102,15,56,220,225
+	pxor	%xmm9,%xmm15
+.byte	102,15,56,220,233
+.byte	102,15,56,220,241
+.byte	102,15,56,220,249
+
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm12
+	paddq	%xmm15,%xmm15
+.byte	102,15,56,221,208
+	pand	%xmm8,%xmm9
+.byte	102,15,56,221,216
+	pcmpgtd	%xmm15,%xmm14
+.byte	102,15,56,221,224
+	pxor	%xmm9,%xmm15
+.byte	102,15,56,221,232
+.byte	102,15,56,221,240
+.byte	102,15,56,221,248
+
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm13
+	paddq	%xmm15,%xmm15
+	xorps	0(%rsp),%xmm2
+	pand	%xmm8,%xmm9
+	xorps	16(%rsp),%xmm3
+	pcmpgtd	%xmm15,%xmm14
 	pxor	%xmm9,%xmm15
 
+	xorps	32(%rsp),%xmm4
+	movups	%xmm2,0(%rsi)
+	xorps	48(%rsp),%xmm5
+	movups	%xmm3,16(%rsi)
+	xorps	64(%rsp),%xmm6
+	movups	%xmm4,32(%rsi)
+	xorps	80(%rsp),%xmm7
+	movups	%xmm5,48(%rsi)
+	movl	%r10d,%eax
+	movups	%xmm6,64(%rsi)
+	movups	%xmm7,80(%rsi)
 	leaq	96(%rsi),%rsi
-	movups	%xmm2,-96(%rsi)
-	movups	%xmm3,-80(%rsi)
-	movups	%xmm4,-64(%rsi)
-	movups	%xmm5,-48(%rsi)
-	movups	%xmm6,-32(%rsi)
-	movups	%xmm7,-16(%rsi)
 	subq	$96,%rdx
 	jnc	L$xts_enc_grandloop
 
-	movl	$16+96,%eax
-	subl	%r10d,%eax
+	leal	3(%rax,%rax,1),%eax
 	movq	%r11,%rcx
-	shrl	$4,%eax
+	movl	%eax,%r10d
 
 L$xts_enc_short:
-	movl	%eax,%r10d
-	pxor	%xmm0,%xmm10
 	addq	$96,%rdx
 	jz	L$xts_enc_done
 
-	pxor	%xmm0,%xmm11
 	cmpq	$32,%rdx
 	jb	L$xts_enc_one
-	pxor	%xmm0,%xmm12
 	je	L$xts_enc_two
 
-	pxor	%xmm0,%xmm13
 	cmpq	$64,%rdx
 	jb	L$xts_enc_three
-	pxor	%xmm0,%xmm14
 	je	L$xts_enc_four
 
+	pshufd	$19,%xmm14,%xmm9
+	movdqa	%xmm15,%xmm14
+	paddq	%xmm15,%xmm15
 	movdqu	(%rdi),%xmm2
+	pand	%xmm8,%xmm9
 	movdqu	16(%rdi),%xmm3
+	pxor	%xmm9,%xmm15
+
 	movdqu	32(%rdi),%xmm4
 	pxor	%xmm10,%xmm2
 	movdqu	48(%rdi),%xmm5
@@ -1848,7 +1638,7 @@ L$oop_enc1_9:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_9
+	jnz	L$oop_enc1_9	
 .byte	102,15,56,221,209
 	xorps	%xmm10,%xmm2
 	movdqa	%xmm11,%xmm10
@@ -1864,7 +1654,7 @@ L$xts_enc_two:
 	xorps	%xmm10,%xmm2
 	xorps	%xmm11,%xmm3
 
-	call	_aesni_encrypt2
+	call	_aesni_encrypt3
 
 	xorps	%xmm10,%xmm2
 	movdqa	%xmm12,%xmm10
@@ -1910,15 +1700,15 @@ L$xts_enc_four:
 
 	call	_aesni_encrypt4
 
-	pxor	%xmm10,%xmm2
-	movdqa	%xmm14,%xmm10
-	pxor	%xmm11,%xmm3
-	pxor	%xmm12,%xmm4
-	movdqu	%xmm2,(%rsi)
-	pxor	%xmm13,%xmm5
-	movdqu	%xmm3,16(%rsi)
-	movdqu	%xmm4,32(%rsi)
-	movdqu	%xmm5,48(%rsi)
+	xorps	%xmm10,%xmm2
+	movdqa	%xmm15,%xmm10
+	xorps	%xmm11,%xmm3
+	xorps	%xmm12,%xmm4
+	movups	%xmm2,(%rsi)
+	xorps	%xmm13,%xmm5
+	movups	%xmm3,16(%rsi)
+	movups	%xmm4,32(%rsi)
+	movups	%xmm5,48(%rsi)
 	leaq	64(%rsi),%rsi
 	jmp	L$xts_enc_done
 
@@ -1953,7 +1743,7 @@ L$oop_enc1_10:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_10
+	jnz	L$oop_enc1_10	
 .byte	102,15,56,221,209
 	xorps	%xmm10,%xmm2
 	movups	%xmm2,-16(%rsi)
@@ -1970,290 +1760,251 @@ L$xts_enc_epilogue:
 _aesni_xts_decrypt:
 	leaq	(%rsp),%rax
 	pushq	%rbp
-	subq	$112,%rsp
+	subq	$96,%rsp
 	andq	$-16,%rsp
 	leaq	-8(%rax),%rbp
-	movups	(%r9),%xmm2
+	movups	(%r9),%xmm15
 	movl	240(%r8),%eax
 	movl	240(%rcx),%r10d
 	movups	(%r8),%xmm0
 	movups	16(%r8),%xmm1
 	leaq	32(%r8),%r8
-	xorps	%xmm0,%xmm2
+	xorps	%xmm0,%xmm15
 L$oop_enc1_11:
-.byte	102,15,56,220,209
+.byte	102,68,15,56,220,249
 	decl	%eax
 	movups	(%r8),%xmm1
 	leaq	16(%r8),%r8
-	jnz	L$oop_enc1_11
-.byte	102,15,56,221,209
+	jnz	L$oop_enc1_11	
+.byte	102,68,15,56,221,249
 	xorl	%eax,%eax
 	testq	$15,%rdx
 	setnz	%al
 	shlq	$4,%rax
 	subq	%rax,%rdx
 
-	movups	(%rcx),%xmm0
 	movq	%rcx,%r11
 	movl	%r10d,%eax
-	shll	$4,%r10d
 	movq	%rdx,%r9
 	andq	$-16,%rdx
 
-	movups	16(%rcx,%r10,1),%xmm1
-
 	movdqa	L$xts_magic(%rip),%xmm8
-	movdqa	%xmm2,%xmm15
-	pshufd	$95,%xmm2,%xmm9
-	pxor	%xmm0,%xmm1
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
+	pxor	%xmm14,%xmm14
+	pcmpgtd	%xmm15,%xmm14
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
 	movdqa	%xmm15,%xmm10
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-	pxor	%xmm0,%xmm10
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
-	movdqa	%xmm15,%xmm11
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-	pxor	%xmm0,%xmm11
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
-	movdqa	%xmm15,%xmm12
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-	pxor	%xmm0,%xmm12
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
-	movdqa	%xmm15,%xmm13
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-	pxor	%xmm0,%xmm13
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm15,%xmm14
-	psrad	$31,%xmm9
 	paddq	%xmm15,%xmm15
 	pand	%xmm8,%xmm9
-	pxor	%xmm0,%xmm14
+	pcmpgtd	%xmm15,%xmm14
 	pxor	%xmm9,%xmm15
-	movaps	%xmm1,96(%rsp)
-
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm11
+	paddq	%xmm15,%xmm15
+	pand	%xmm8,%xmm9
+	pcmpgtd	%xmm15,%xmm14
+	pxor	%xmm9,%xmm15
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm12
+	paddq	%xmm15,%xmm15
+	pand	%xmm8,%xmm9
+	pcmpgtd	%xmm15,%xmm14
+	pxor	%xmm9,%xmm15
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm13
+	paddq	%xmm15,%xmm15
+	pand	%xmm8,%xmm9
+	pcmpgtd	%xmm15,%xmm14
+	pxor	%xmm9,%xmm15
 	subq	$96,%rdx
 	jc	L$xts_dec_short
 
-	movl	$16+96,%eax
-	leaq	32(%r11,%r10,1),%rcx
-	subq	%r10,%rax
-	movups	16(%r11),%xmm1
-	movq	%rax,%r10
-	leaq	L$xts_magic(%rip),%r8
+	shrl	$1,%eax
+	subl	$1,%eax
+	movl	%eax,%r10d
 	jmp	L$xts_dec_grandloop
 
-.p2align	5
+.p2align	4
 L$xts_dec_grandloop:
+	pshufd	$19,%xmm14,%xmm9
+	movdqa	%xmm15,%xmm14
+	paddq	%xmm15,%xmm15
 	movdqu	0(%rdi),%xmm2
-	movdqa	%xmm0,%xmm8
+	pand	%xmm8,%xmm9
 	movdqu	16(%rdi),%xmm3
-	pxor	%xmm10,%xmm2
+	pxor	%xmm9,%xmm15
+
 	movdqu	32(%rdi),%xmm4
-	pxor	%xmm11,%xmm3
-.byte	102,15,56,222,209
+	pxor	%xmm10,%xmm2
 	movdqu	48(%rdi),%xmm5
-	pxor	%xmm12,%xmm4
-.byte	102,15,56,222,217
+	pxor	%xmm11,%xmm3
 	movdqu	64(%rdi),%xmm6
-	pxor	%xmm13,%xmm5
-.byte	102,15,56,222,225
+	pxor	%xmm12,%xmm4
 	movdqu	80(%rdi),%xmm7
-	pxor	%xmm15,%xmm8
-	movdqa	96(%rsp),%xmm9
-	pxor	%xmm14,%xmm6
-.byte	102,15,56,222,233
-	movups	32(%r11),%xmm0
 	leaq	96(%rdi),%rdi
-	pxor	%xmm8,%xmm7
+	pxor	%xmm13,%xmm5
+	movups	(%r11),%xmm0
+	pxor	%xmm14,%xmm6
+	pxor	%xmm15,%xmm7
 
-	pxor	%xmm9,%xmm10
-.byte	102,15,56,222,241
-	pxor	%xmm9,%xmm11
+
+
+	movups	16(%r11),%xmm1
+	pxor	%xmm0,%xmm2
+	pxor	%xmm0,%xmm3
 	movdqa	%xmm10,0(%rsp)
-.byte	102,15,56,222,249
-	movups	48(%r11),%xmm1
-	pxor	%xmm9,%xmm12
-
-.byte	102,15,56,222,208
-	pxor	%xmm9,%xmm13
+.byte	102,15,56,222,209
+	leaq	32(%r11),%rcx
+	pxor	%xmm0,%xmm4
 	movdqa	%xmm11,16(%rsp)
-.byte	102,15,56,222,216
-	pxor	%xmm9,%xmm14
+.byte	102,15,56,222,217
+	pxor	%xmm0,%xmm5
 	movdqa	%xmm12,32(%rsp)
-.byte	102,15,56,222,224
-.byte	102,15,56,222,232
-	pxor	%xmm9,%xmm8
+.byte	102,15,56,222,225
+	pxor	%xmm0,%xmm6
+	movdqa	%xmm13,48(%rsp)
+.byte	102,15,56,222,233
+	pxor	%xmm0,%xmm7
+	movups	(%rcx),%xmm0
+	decl	%eax
 	movdqa	%xmm14,64(%rsp)
-.byte	102,15,56,222,240
-.byte	102,15,56,222,248
-	movups	64(%r11),%xmm0
-	movdqa	%xmm8,80(%rsp)
-	pshufd	$95,%xmm15,%xmm9
-	jmp	L$xts_dec_loop6
-.p2align	5
+.byte	102,15,56,222,241
+	movdqa	%xmm15,80(%rsp)
+.byte	102,15,56,222,249
+	pxor	%xmm14,%xmm14
+	pcmpgtd	%xmm15,%xmm14
+	jmp	L$xts_dec_loop6_enter
+
+.p2align	4
 L$xts_dec_loop6:
 .byte	102,15,56,222,209
 .byte	102,15,56,222,217
+	decl	%eax
 .byte	102,15,56,222,225
 .byte	102,15,56,222,233
 .byte	102,15,56,222,241
 .byte	102,15,56,222,249
-	movups	-64(%rcx,%rax,1),%xmm1
-	addq	$32,%rax
-
+L$xts_dec_loop6_enter:
+	movups	16(%rcx),%xmm1
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
+	leaq	32(%rcx),%rcx
 .byte	102,15,56,222,224
 .byte	102,15,56,222,232
 .byte	102,15,56,222,240
 .byte	102,15,56,222,248
-	movups	-80(%rcx,%rax,1),%xmm0
+	movups	(%rcx),%xmm0
 	jnz	L$xts_dec_loop6
 
-	movdqa	(%r8),%xmm8
-	movdqa	%xmm9,%xmm14
-	paddd	%xmm9,%xmm9
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	paddq	%xmm15,%xmm15
 .byte	102,15,56,222,209
-	paddq	%xmm15,%xmm15
-	psrad	$31,%xmm14
-.byte	102,15,56,222,217
-	pand	%xmm8,%xmm14
-	movups	(%r11),%xmm10
-.byte	102,15,56,222,225
-.byte	102,15,56,222,233
-.byte	102,15,56,222,241
-	pxor	%xmm14,%xmm15
-	movaps	%xmm10,%xmm11
-.byte	102,15,56,222,249
-	movups	-64(%rcx),%xmm1
-
-	movdqa	%xmm9,%xmm14
-.byte	102,15,56,222,208
-	paddd	%xmm9,%xmm9
-	pxor	%xmm15,%xmm10
-.byte	102,15,56,222,216
-	psrad	$31,%xmm14
-	paddq	%xmm15,%xmm15
-.byte	102,15,56,222,224
-.byte	102,15,56,222,232
-	pand	%xmm8,%xmm14
-	movaps	%xmm11,%xmm12
-.byte	102,15,56,222,240
-	pxor	%xmm14,%xmm15
-	movdqa	%xmm9,%xmm14
-.byte	102,15,56,222,248
-	movups	-48(%rcx),%xmm0
-
-	paddd	%xmm9,%xmm9
-.byte	102,15,56,222,209
-	pxor	%xmm15,%xmm11
-	psrad	$31,%xmm14
-.byte	102,15,56,222,217
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-.byte	102,15,56,222,225
-.byte	102,15,56,222,233
-	movdqa	%xmm13,48(%rsp)
-	pxor	%xmm14,%xmm15
-.byte	102,15,56,222,241
-	movaps	%xmm12,%xmm13
-	movdqa	%xmm9,%xmm14
-.byte	102,15,56,222,249
-	movups	-32(%rcx),%xmm1
-
-	paddd	%xmm9,%xmm9
-.byte	102,15,56,222,208
-	pxor	%xmm15,%xmm12
-	psrad	$31,%xmm14
-.byte	102,15,56,222,216
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm14
-.byte	102,15,56,222,224
-.byte	102,15,56,222,232
-.byte	102,15,56,222,240
-	pxor	%xmm14,%xmm15
-	movaps	%xmm13,%xmm14
-.byte	102,15,56,222,248
-
-	movdqa	%xmm9,%xmm0
-	paddd	%xmm9,%xmm9
-.byte	102,15,56,222,209
-	pxor	%xmm15,%xmm13
-	psrad	$31,%xmm0
-.byte	102,15,56,222,217
-	paddq	%xmm15,%xmm15
-	pand	%xmm8,%xmm0
-.byte	102,15,56,222,225
-.byte	102,15,56,222,233
-	pxor	%xmm0,%xmm15
-	movups	(%r11),%xmm0
-.byte	102,15,56,222,241
-.byte	102,15,56,222,249
-	movups	16(%r11),%xmm1
-
-	pxor	%xmm15,%xmm14
-.byte	102,15,56,223,84,36,0
-	psrad	$31,%xmm9
-	paddq	%xmm15,%xmm15
-.byte	102,15,56,223,92,36,16
-.byte	102,15,56,223,100,36,32
 	pand	%xmm8,%xmm9
-	movq	%r10,%rax
-.byte	102,15,56,223,108,36,48
-.byte	102,15,56,223,116,36,64
-.byte	102,15,56,223,124,36,80
+.byte	102,15,56,222,217
+	pcmpgtd	%xmm15,%xmm14
+.byte	102,15,56,222,225
+	pxor	%xmm9,%xmm15
+.byte	102,15,56,222,233
+.byte	102,15,56,222,241
+.byte	102,15,56,222,249
+	movups	16(%rcx),%xmm1
+
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm10
+	paddq	%xmm15,%xmm15
+.byte	102,15,56,222,208
+	pand	%xmm8,%xmm9
+.byte	102,15,56,222,216
+	pcmpgtd	%xmm15,%xmm14
+.byte	102,15,56,222,224
+	pxor	%xmm9,%xmm15
+.byte	102,15,56,222,232
+.byte	102,15,56,222,240
+.byte	102,15,56,222,248
+	movups	32(%rcx),%xmm0
+
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm11
+	paddq	%xmm15,%xmm15
+.byte	102,15,56,222,209
+	pand	%xmm8,%xmm9
+.byte	102,15,56,222,217
+	pcmpgtd	%xmm15,%xmm14
+.byte	102,15,56,222,225
+	pxor	%xmm9,%xmm15
+.byte	102,15,56,222,233
+.byte	102,15,56,222,241
+.byte	102,15,56,222,249
+
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm12
+	paddq	%xmm15,%xmm15
+.byte	102,15,56,223,208
+	pand	%xmm8,%xmm9
+.byte	102,15,56,223,216
+	pcmpgtd	%xmm15,%xmm14
+.byte	102,15,56,223,224
+	pxor	%xmm9,%xmm15
+.byte	102,15,56,223,232
+.byte	102,15,56,223,240
+.byte	102,15,56,223,248
+
+	pshufd	$19,%xmm14,%xmm9
+	pxor	%xmm14,%xmm14
+	movdqa	%xmm15,%xmm13
+	paddq	%xmm15,%xmm15
+	xorps	0(%rsp),%xmm2
+	pand	%xmm8,%xmm9
+	xorps	16(%rsp),%xmm3
+	pcmpgtd	%xmm15,%xmm14
 	pxor	%xmm9,%xmm15
 
+	xorps	32(%rsp),%xmm4
+	movups	%xmm2,0(%rsi)
+	xorps	48(%rsp),%xmm5
+	movups	%xmm3,16(%rsi)
+	xorps	64(%rsp),%xmm6
+	movups	%xmm4,32(%rsi)
+	xorps	80(%rsp),%xmm7
+	movups	%xmm5,48(%rsi)
+	movl	%r10d,%eax
+	movups	%xmm6,64(%rsi)
+	movups	%xmm7,80(%rsi)
 	leaq	96(%rsi),%rsi
-	movups	%xmm2,-96(%rsi)
-	movups	%xmm3,-80(%rsi)
-	movups	%xmm4,-64(%rsi)
-	movups	%xmm5,-48(%rsi)
-	movups	%xmm6,-32(%rsi)
-	movups	%xmm7,-16(%rsi)
 	subq	$96,%rdx
 	jnc	L$xts_dec_grandloop
 
-	movl	$16+96,%eax
-	subl	%r10d,%eax
+	leal	3(%rax,%rax,1),%eax
 	movq	%r11,%rcx
-	shrl	$4,%eax
+	movl	%eax,%r10d
 
 L$xts_dec_short:
-	movl	%eax,%r10d
-	pxor	%xmm0,%xmm10
-	pxor	%xmm0,%xmm11
 	addq	$96,%rdx
 	jz	L$xts_dec_done
 
-	pxor	%xmm0,%xmm12
 	cmpq	$32,%rdx
 	jb	L$xts_dec_one
-	pxor	%xmm0,%xmm13
 	je	L$xts_dec_two
 
-	pxor	%xmm0,%xmm14
 	cmpq	$64,%rdx
 	jb	L$xts_dec_three
 	je	L$xts_dec_four
 
+	pshufd	$19,%xmm14,%xmm9
+	movdqa	%xmm15,%xmm14
+	paddq	%xmm15,%xmm15
 	movdqu	(%rdi),%xmm2
+	pand	%xmm8,%xmm9
 	movdqu	16(%rdi),%xmm3
+	pxor	%xmm9,%xmm15
+
 	movdqu	32(%rdi),%xmm4
 	pxor	%xmm10,%xmm2
 	movdqu	48(%rdi),%xmm5
@@ -2303,7 +2054,7 @@ L$oop_dec1_12:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_12
+	jnz	L$oop_dec1_12	
 .byte	102,15,56,223,209
 	xorps	%xmm10,%xmm2
 	movdqa	%xmm11,%xmm10
@@ -2320,7 +2071,7 @@ L$xts_dec_two:
 	xorps	%xmm10,%xmm2
 	xorps	%xmm11,%xmm3
 
-	call	_aesni_decrypt2
+	call	_aesni_decrypt3
 
 	xorps	%xmm10,%xmm2
 	movdqa	%xmm12,%xmm10
@@ -2346,7 +2097,7 @@ L$xts_dec_three:
 	xorps	%xmm10,%xmm2
 	movdqa	%xmm13,%xmm10
 	xorps	%xmm11,%xmm3
-	movdqa	%xmm14,%xmm11
+	movdqa	%xmm15,%xmm11
 	xorps	%xmm12,%xmm4
 	movups	%xmm2,(%rsi)
 	movups	%xmm3,16(%rsi)
@@ -2356,8 +2107,14 @@ L$xts_dec_three:
 
 .p2align	4
 L$xts_dec_four:
+	pshufd	$19,%xmm14,%xmm9
+	movdqa	%xmm15,%xmm14
+	paddq	%xmm15,%xmm15
 	movups	(%rdi),%xmm2
+	pand	%xmm8,%xmm9
 	movups	16(%rdi),%xmm3
+	pxor	%xmm9,%xmm15
+
 	movups	32(%rdi),%xmm4
 	xorps	%xmm10,%xmm2
 	movups	48(%rdi),%xmm5
@@ -2368,16 +2125,16 @@ L$xts_dec_four:
 
 	call	_aesni_decrypt4
 
-	pxor	%xmm10,%xmm2
+	xorps	%xmm10,%xmm2
 	movdqa	%xmm14,%xmm10
-	pxor	%xmm11,%xmm3
+	xorps	%xmm11,%xmm3
 	movdqa	%xmm15,%xmm11
-	pxor	%xmm12,%xmm4
-	movdqu	%xmm2,(%rsi)
-	pxor	%xmm13,%xmm5
-	movdqu	%xmm3,16(%rsi)
-	movdqu	%xmm4,32(%rsi)
-	movdqu	%xmm5,48(%rsi)
+	xorps	%xmm12,%xmm4
+	movups	%xmm2,(%rsi)
+	xorps	%xmm13,%xmm5
+	movups	%xmm3,16(%rsi)
+	movups	%xmm4,32(%rsi)
+	movups	%xmm5,48(%rsi)
 	leaq	64(%rsi),%rsi
 	jmp	L$xts_dec_done
 
@@ -2401,7 +2158,7 @@ L$oop_dec1_13:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_13
+	jnz	L$oop_dec1_13	
 .byte	102,15,56,223,209
 	xorps	%xmm11,%xmm2
 	movups	%xmm2,(%rsi)
@@ -2431,7 +2188,7 @@ L$oop_dec1_14:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_14
+	jnz	L$oop_dec1_14	
 .byte	102,15,56,223,209
 	xorps	%xmm10,%xmm2
 	movups	%xmm2,(%rsi)
@@ -2475,7 +2232,7 @@ L$oop_enc1_15:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_enc1_15
+	jnz	L$oop_enc1_15	
 .byte	102,15,56,221,209
 	movl	%r10d,%eax
 	movq	%r11,%rcx
@@ -2491,17 +2248,17 @@ L$oop_enc1_15:
 L$cbc_enc_tail:
 	movq	%rdx,%rcx
 	xchgq	%rdi,%rsi
-.long	0x9066A4F3
+.long	0x9066A4F3	
 	movl	$16,%ecx
 	subq	%rdx,%rcx
 	xorl	%eax,%eax
-.long	0x9066AAF3
+.long	0x9066AAF3	
 	leaq	-16(%rdi),%rdi
 	movl	%r10d,%eax
 	movq	%rdi,%rsi
 	movq	%r11,%rcx
 	xorq	%rdx,%rdx
-	jmp	L$cbc_enc_loop
+	jmp	L$cbc_enc_loop	
 
 .p2align	4
 L$cbc_decrypt:
@@ -2527,15 +2284,10 @@ L$cbc_decrypt:
 	movdqa	%xmm5,%xmm14
 	movdqu	80(%rdi),%xmm7
 	movdqa	%xmm6,%xmm15
-	movl	__gnutls_x86_cpuid_s+4(%rip),%r9d
 	cmpq	$112,%rdx
 	jbe	L$cbc_dec_six_or_seven
 
-	andl	$71303168,%r9d
-	subq	$80,%rdx
-	cmpl	$4194304,%r9d
-	je	L$cbc_dec_loop6_enter
-	subq	$32,%rdx
+	subq	$112,%rdx
 	leaq	112(%rcx),%rcx
 	jmp	L$cbc_dec_loop8_enter
 .p2align	4
@@ -2564,8 +2316,8 @@ L$cbc_dec_loop8_enter:
 .byte	102,15,56,222,233
 .byte	102,15,56,222,241
 .byte	102,15,56,222,249
-.byte	102,68,15,56,222,193
 	setnc	%r11b
+.byte	102,68,15,56,222,193
 	shlq	$7,%r11
 .byte	102,68,15,56,222,201
 	addq	%rdi,%r11
@@ -2579,7 +2331,6 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,192
 .byte	102,68,15,56,222,200
 	movups	64-112(%rcx),%xmm0
-	nop
 .byte	102,15,56,222,209
 .byte	102,15,56,222,217
 .byte	102,15,56,222,225
@@ -2589,7 +2340,6 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,193
 .byte	102,68,15,56,222,201
 	movups	80-112(%rcx),%xmm1
-	nop
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
 .byte	102,15,56,222,224
@@ -2599,7 +2349,6 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,192
 .byte	102,68,15,56,222,200
 	movups	96-112(%rcx),%xmm0
-	nop
 .byte	102,15,56,222,209
 .byte	102,15,56,222,217
 .byte	102,15,56,222,225
@@ -2609,7 +2358,6 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,193
 .byte	102,68,15,56,222,201
 	movups	112-112(%rcx),%xmm1
-	nop
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
 .byte	102,15,56,222,224
@@ -2619,7 +2367,6 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,192
 .byte	102,68,15,56,222,200
 	movups	128-112(%rcx),%xmm0
-	nop
 .byte	102,15,56,222,209
 .byte	102,15,56,222,217
 .byte	102,15,56,222,225
@@ -2629,7 +2376,6 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,193
 .byte	102,68,15,56,222,201
 	movups	144-112(%rcx),%xmm1
-	cmpl	$11,%eax
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
 .byte	102,15,56,222,224
@@ -2639,6 +2385,7 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,192
 .byte	102,68,15,56,222,200
 	movups	160-112(%rcx),%xmm0
+	cmpl	$11,%eax
 	jb	L$cbc_dec_done
 .byte	102,15,56,222,209
 .byte	102,15,56,222,217
@@ -2649,7 +2396,6 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,193
 .byte	102,68,15,56,222,201
 	movups	176-112(%rcx),%xmm1
-	nop
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
 .byte	102,15,56,222,224
@@ -2669,7 +2415,6 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,193
 .byte	102,68,15,56,222,201
 	movups	208-112(%rcx),%xmm1
-	nop
 .byte	102,15,56,222,208
 .byte	102,15,56,222,216
 .byte	102,15,56,222,224
@@ -2679,20 +2424,18 @@ L$cbc_dec_loop8_enter:
 .byte	102,68,15,56,222,192
 .byte	102,68,15,56,222,200
 	movups	224-112(%rcx),%xmm0
-	jmp	L$cbc_dec_done
-.p2align	4
 L$cbc_dec_done:
 .byte	102,15,56,222,209
-.byte	102,15,56,222,217
 	pxor	%xmm0,%xmm10
+.byte	102,15,56,222,217
 	pxor	%xmm0,%xmm11
 .byte	102,15,56,222,225
-.byte	102,15,56,222,233
 	pxor	%xmm0,%xmm12
+.byte	102,15,56,222,233
 	pxor	%xmm0,%xmm13
 .byte	102,15,56,222,241
-.byte	102,15,56,222,249
 	pxor	%xmm0,%xmm14
+.byte	102,15,56,222,249
 	pxor	%xmm0,%xmm15
 .byte	102,68,15,56,222,193
 .byte	102,68,15,56,222,201
@@ -2704,16 +2447,16 @@ L$cbc_dec_done:
 .byte	102,65,15,56,223,219
 	pxor	%xmm0,%xmm10
 	movdqu	112(%rdi),%xmm0
-.byte	102,65,15,56,223,228
 	leaq	128(%rdi),%rdi
+.byte	102,65,15,56,223,228
 	movdqu	0(%r11),%xmm11
 .byte	102,65,15,56,223,237
-.byte	102,65,15,56,223,246
 	movdqu	16(%r11),%xmm12
+.byte	102,65,15,56,223,246
 	movdqu	32(%r11),%xmm13
 .byte	102,65,15,56,223,255
-.byte	102,68,15,56,223,193
 	movdqu	48(%r11),%xmm14
+.byte	102,68,15,56,223,193
 	movdqu	64(%r11),%xmm15
 .byte	102,69,15,56,223,202
 	movdqa	%xmm0,%xmm10
@@ -2794,51 +2537,6 @@ L$cbc_dec_seven:
 	movdqa	%xmm8,%xmm2
 	jmp	L$cbc_dec_tail_collected
 
-.p2align	4
-L$cbc_dec_loop6:
-	movups	%xmm7,(%rsi)
-	leaq	16(%rsi),%rsi
-	movdqu	0(%rdi),%xmm2
-	movdqu	16(%rdi),%xmm3
-	movdqa	%xmm2,%xmm11
-	movdqu	32(%rdi),%xmm4
-	movdqa	%xmm3,%xmm12
-	movdqu	48(%rdi),%xmm5
-	movdqa	%xmm4,%xmm13
-	movdqu	64(%rdi),%xmm6
-	movdqa	%xmm5,%xmm14
-	movdqu	80(%rdi),%xmm7
-	movdqa	%xmm6,%xmm15
-L$cbc_dec_loop6_enter:
-	leaq	96(%rdi),%rdi
-	movdqa	%xmm7,%xmm8
-
-	call	_aesni_decrypt6
-
-	pxor	%xmm10,%xmm2
-	movdqa	%xmm8,%xmm10
-	pxor	%xmm11,%xmm3
-	movdqu	%xmm2,(%rsi)
-	pxor	%xmm12,%xmm4
-	movdqu	%xmm3,16(%rsi)
-	pxor	%xmm13,%xmm5
-	movdqu	%xmm4,32(%rsi)
-	pxor	%xmm14,%xmm6
-	movq	%r11,%rcx
-	movdqu	%xmm5,48(%rsi)
-	pxor	%xmm15,%xmm7
-	movl	%r10d,%eax
-	movdqu	%xmm6,64(%rsi)
-	leaq	80(%rsi),%rsi
-	subq	$96,%rdx
-	ja	L$cbc_dec_loop6
-
-	movdqa	%xmm7,%xmm2
-	addq	$80,%rdx
-	jle	L$cbc_dec_tail_collected
-	movups	%xmm7,(%rsi)
-	leaq	16(%rsi),%rsi
-
 L$cbc_dec_tail:
 	movups	(%rdi),%xmm2
 	subq	$16,%rdx
@@ -2891,7 +2589,7 @@ L$oop_dec1_16:
 	decl	%eax
 	movups	(%rcx),%xmm1
 	leaq	16(%rcx),%rcx
-	jnz	L$oop_dec1_16
+	jnz	L$oop_dec1_16	
 .byte	102,15,56,223,209
 	xorps	%xmm10,%xmm2
 	movaps	%xmm11,%xmm10
@@ -2899,7 +2597,8 @@ L$oop_dec1_16:
 .p2align	4
 L$cbc_dec_two:
 	movaps	%xmm3,%xmm12
-	call	_aesni_decrypt2
+	xorps	%xmm4,%xmm4
+	call	_aesni_decrypt3
 	pxor	%xmm10,%xmm2
 	movaps	%xmm12,%xmm10
 	pxor	%xmm11,%xmm3
@@ -2950,7 +2649,7 @@ L$cbc_dec_tail_partial:
 	movq	%rsi,%rdi
 	subq	%rdx,%rcx
 	leaq	(%rsp),%rsi
-.long	0x9066A4F3
+.long	0x9066A4F3	
 
 L$cbc_dec_ret:
 	leaq	(%rbp),%rsp
@@ -2962,7 +2661,7 @@ L$cbc_ret:
 
 .p2align	4
 _aesni_set_decrypt_key:
-.byte	0x48,0x83,0xEC,0x08
+.byte	0x48,0x83,0xEC,0x08	
 	call	__aesni_set_encrypt_key
 	shll	$4,%esi
 	testl	%eax,%eax
@@ -3001,7 +2700,7 @@ L$SEH_end_set_decrypt_key:
 .p2align	4
 _aesni_set_encrypt_key:
 __aesni_set_encrypt_key:
-.byte	0x48,0x83,0xEC,0x08
+.byte	0x48,0x83,0xEC,0x08	
 	movq	$-1,%rax
 	testq	%rdi,%rdi
 	jz	L$enc_key_ret

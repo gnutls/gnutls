@@ -127,7 +127,7 @@ _padlock_aes_block:
 	movq	$1,%rcx
 	leaq	32(%rdx),%rbx
 	leaq	16(%rdx),%rdx
-.byte	0xf3,0x0f,0xa7,0xc8
+.byte	0xf3,0x0f,0xa7,0xc8	
 	movq	%r8,%rbx
 	.byte	0xf3,0xc3
 
@@ -137,7 +137,7 @@ _padlock_aes_block:
 .p2align	4
 _padlock_xstore:
 	movl	%esi,%edx
-.byte	0x0f,0xa7,0xc0
+.byte	0x0f,0xa7,0xc0		
 	.byte	0xf3,0xc3
 
 
@@ -154,7 +154,7 @@ _padlock_sha1_oneshot:
 	movq	%rsp,%rdi
 	movl	%eax,16(%rsp)
 	xorq	%rax,%rax
-.byte	0xf3,0x0f,0xa6,0xc8
+.byte	0xf3,0x0f,0xa6,0xc8	
 	movaps	(%rsp),%xmm0
 	movl	16(%rsp),%eax
 	addq	$128+8,%rsp
@@ -176,7 +176,7 @@ _padlock_sha1_blocks:
 	movq	%rsp,%rdi
 	movl	%eax,16(%rsp)
 	movq	$-1,%rax
-.byte	0xf3,0x0f,0xa6,0xc8
+.byte	0xf3,0x0f,0xa6,0xc8	
 	movaps	(%rsp),%xmm0
 	movl	16(%rsp),%eax
 	addq	$128+8,%rsp
@@ -198,7 +198,7 @@ _padlock_sha256_oneshot:
 	movq	%rsp,%rdi
 	movaps	%xmm1,16(%rsp)
 	xorq	%rax,%rax
-.byte	0xf3,0x0f,0xa6,0xd0
+.byte	0xf3,0x0f,0xa6,0xd0	
 	movaps	(%rsp),%xmm0
 	movaps	16(%rsp),%xmm1
 	addq	$128+8,%rsp
@@ -220,7 +220,7 @@ _padlock_sha256_blocks:
 	movq	%rsp,%rdi
 	movaps	%xmm1,16(%rsp)
 	movq	$-1,%rax
-.byte	0xf3,0x0f,0xa6,0xd0
+.byte	0xf3,0x0f,0xa6,0xd0	
 	movaps	(%rsp),%xmm0
 	movaps	16(%rsp),%xmm1
 	addq	$128+8,%rsp
@@ -245,7 +245,7 @@ _padlock_sha512_blocks:
 	movaps	%xmm1,16(%rsp)
 	movaps	%xmm2,32(%rsp)
 	movaps	%xmm3,48(%rsp)
-.byte	0xf3,0x0f,0xa6,0xe0
+.byte	0xf3,0x0f,0xa6,0xe0	
 	movaps	(%rsp),%xmm0
 	movaps	16(%rsp),%xmm1
 	movaps	32(%rsp),%xmm2
@@ -325,7 +325,7 @@ L$ecb_loop:
 	testq	$15,%rsi
 	jz	L$ecb_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -333,7 +333,7 @@ L$ecb_inp_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,200
+.byte	0xf3,0x0f,0xa7,200	
 	movq	%r8,%rdi
 	movq	%r11,%rbx
 	testq	$15,%rdi
@@ -341,7 +341,7 @@ L$ecb_inp_aligned:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 L$ecb_out_aligned:
 	movq	%r9,%rsi
@@ -362,7 +362,7 @@ L$ecb_unaligned_tail:
 	subq	%rax,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	movq	%rsp,%rsi
 	movq	%r8,%rdi
 	movq	%rbx,%rcx
@@ -399,7 +399,7 @@ L$ecb_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,200
+.byte	0xf3,0x0f,0xa7,200	
 	testq	%rbp,%rbp
 	jz	L$ecb_exit
 
@@ -411,7 +411,7 @@ L$ecb_aligned_tail:
 	subq	%rcx,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	leaq	(%r8),%rdi
 	leaq	(%rsp),%rsi
 	movq	%rbx,%rcx
@@ -492,7 +492,7 @@ L$cbc_loop:
 	testq	$15,%rsi
 	jz	L$cbc_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -500,7 +500,7 @@ L$cbc_inp_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,208
+.byte	0xf3,0x0f,0xa7,208	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	movq	%r8,%rdi
@@ -510,7 +510,7 @@ L$cbc_inp_aligned:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 L$cbc_out_aligned:
 	movq	%r9,%rsi
@@ -531,7 +531,7 @@ L$cbc_unaligned_tail:
 	subq	%rax,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	movq	%rsp,%rsi
 	movq	%r8,%rdi
 	movq	%rbx,%rcx
@@ -568,7 +568,7 @@ L$cbc_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,208
+.byte	0xf3,0x0f,0xa7,208	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	testq	%rbp,%rbp
@@ -582,7 +582,7 @@ L$cbc_aligned_tail:
 	subq	%rcx,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	leaq	(%r8),%rdi
 	leaq	(%rsp),%rsi
 	movq	%rbx,%rcx
@@ -650,7 +650,7 @@ L$cfb_loop:
 	testq	$15,%rsi
 	jz	L$cfb_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -658,7 +658,7 @@ L$cfb_inp_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,224
+.byte	0xf3,0x0f,0xa7,224	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	movq	%r8,%rdi
@@ -668,7 +668,7 @@ L$cfb_inp_aligned:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 L$cfb_out_aligned:
 	movq	%r9,%rsi
@@ -698,7 +698,7 @@ L$cfb_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,224
+.byte	0xf3,0x0f,0xa7,224	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 L$cfb_exit:
@@ -764,7 +764,7 @@ L$ofb_loop:
 	testq	$15,%rsi
 	jz	L$ofb_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -772,7 +772,7 @@ L$ofb_inp_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,232
+.byte	0xf3,0x0f,0xa7,232	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 	movq	%r8,%rdi
@@ -782,7 +782,7 @@ L$ofb_inp_aligned:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 L$ofb_out_aligned:
 	movq	%r9,%rsi
@@ -812,7 +812,7 @@ L$ofb_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,232
+.byte	0xf3,0x0f,0xa7,232	
 	movdqa	(%rax),%xmm0
 	movdqa	%xmm0,-16(%rdx)
 L$ofb_exit:
@@ -902,7 +902,7 @@ L$ctr32_loop:
 	testq	$15,%rsi
 	jz	L$ctr32_inp_aligned
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 	movq	%rbx,%rcx
 	movq	%rdi,%rsi
@@ -910,7 +910,7 @@ L$ctr32_inp_aligned:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,216
+.byte	0xf3,0x0f,0xa7,216	
 	movl	-4(%rdx),%eax
 	testl	$4294901760,%eax
 	jnz	L$ctr32_no_carry
@@ -926,7 +926,7 @@ L$ctr32_no_carry:
 	movq	%rbx,%rcx
 	leaq	(%rsp),%rsi
 	shrq	$3,%rcx
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	subq	%rbx,%rdi
 L$ctr32_out_aligned:
 	movq	%r9,%rsi
@@ -959,7 +959,7 @@ L$ctr32_unaligned_tail:
 	subq	%rax,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	movq	%rsp,%rsi
 	movq	%r8,%rdi
 	movq	%rbx,%rcx
@@ -1003,7 +1003,7 @@ L$ctr32_aligned_loop:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,216
+.byte	0xf3,0x0f,0xa7,216	
 
 	movl	-4(%rdx),%eax
 	bswapl	%eax
@@ -1032,7 +1032,7 @@ L$ctr32_aligned_skip:
 	leaq	-16(%rdx),%rax
 	leaq	16(%rdx),%rbx
 	shrq	$4,%rcx
-.byte	0xf3,0x0f,0xa7,216
+.byte	0xf3,0x0f,0xa7,216	
 	testq	%rbp,%rbp
 	jz	L$ctr32_exit
 
@@ -1044,7 +1044,7 @@ L$ctr32_aligned_tail:
 	subq	%rcx,%rsp
 	shrq	$3,%rcx
 	leaq	(%rsp),%rdi
-.byte	0xf3,0x48,0xa5
+.byte	0xf3,0x48,0xa5		
 	leaq	(%r8),%rdi
 	leaq	(%rsp),%rsi
 	movq	%rbx,%rcx

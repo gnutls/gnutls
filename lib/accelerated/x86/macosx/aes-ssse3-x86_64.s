@@ -231,7 +231,7 @@ _vpaes_schedule_core:
 
 
 
-	call	_vpaes_preheat
+	call	_vpaes_preheat		
 	movdqa	L$k_rcon(%rip),%xmm8
 	movdqu	(%rdi),%xmm0
 
@@ -277,7 +277,7 @@ L$oop_schedule_128:
 	call	_vpaes_schedule_round
 	decq	%rsi
 	jz	L$schedule_mangle_last
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	jmp	L$oop_schedule_128
 
 
@@ -298,7 +298,7 @@ L$oop_schedule_128:
 .p2align	4
 L$schedule_192:
 	movdqu	8(%rdi),%xmm0
-	call	_vpaes_schedule_transform
+	call	_vpaes_schedule_transform	
 	movdqa	%xmm0,%xmm6
 	pxor	%xmm4,%xmm4
 	movhlps	%xmm4,%xmm6
@@ -307,13 +307,13 @@ L$schedule_192:
 L$oop_schedule_192:
 	call	_vpaes_schedule_round
 .byte	102,15,58,15,198,8
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	call	_vpaes_schedule_192_smear
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	call	_vpaes_schedule_round
 	decq	%rsi
 	jz	L$schedule_mangle_last
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	call	_vpaes_schedule_192_smear
 	jmp	L$oop_schedule_192
 
@@ -330,18 +330,18 @@ L$oop_schedule_192:
 .p2align	4
 L$schedule_256:
 	movdqu	16(%rdi),%xmm0
-	call	_vpaes_schedule_transform
+	call	_vpaes_schedule_transform	
 	movl	$7,%esi
 
 L$oop_schedule_256:
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	movdqa	%xmm0,%xmm6
 
 
 	call	_vpaes_schedule_round
 	decq	%rsi
 	jz	L$schedule_mangle_last
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 
 
 	pshufd	$255,%xmm0,%xmm0
@@ -379,7 +379,7 @@ L$schedule_mangle_last:
 L$schedule_mangle_last_dec:
 	addq	$-16,%rdx
 	pxor	L$k_s63(%rip),%xmm0
-	call	_vpaes_schedule_transform
+	call	_vpaes_schedule_transform 
 	movdqu	%xmm0,(%rdx)
 
 
@@ -834,7 +834,7 @@ L$k_dsbe:
 L$k_dsbo:
 .quad	0x1387EA537EF94000, 0xC7AA6DB9D4943E2D
 .quad	0x12D7560F93441D00, 0xCA4B8159D8C58E9C
-.byte	86,101,99,116,111,114,32,80,101,114,109,117,116,97,116,105,111,110,32,65,69,83,32,102,111,114,32,120,56,54,95,54,52,47,83,83,83,69,51,44,32,77,105,107,101,32,72,97,109,98,117,114,103,32,40,83,116,97,110,102,111,114,100,32,85,110,105,118,101,114,115,105,116,121,41,0
+.byte	86,101,99,116,111,114,32,80,101,114,109,117,116,97,105,111,110,32,65,69,83,32,102,111,114,32,120,56,54,95,54,52,47,83,83,83,69,51,44,32,77,105,107,101,32,72,97,109,98,117,114,103,32,40,83,116,97,110,102,111,114,100,32,85,110,105,118,101,114,115,105,116,121,41,0
 .p2align	6
 
 

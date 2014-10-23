@@ -231,7 +231,7 @@ _vpaes_schedule_core:
 
 
 
-	call	_vpaes_preheat
+	call	_vpaes_preheat		
 	movdqa	.Lk_rcon(%rip),%xmm8
 	movdqu	(%rdi),%xmm0
 
@@ -277,7 +277,7 @@ _vpaes_schedule_core:
 	call	_vpaes_schedule_round
 	decq	%rsi
 	jz	.Lschedule_mangle_last
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	jmp	.Loop_schedule_128
 
 
@@ -298,7 +298,7 @@ _vpaes_schedule_core:
 .p2align	4
 .Lschedule_192:
 	movdqu	8(%rdi),%xmm0
-	call	_vpaes_schedule_transform
+	call	_vpaes_schedule_transform	
 	movdqa	%xmm0,%xmm6
 	pxor	%xmm4,%xmm4
 	movhlps	%xmm4,%xmm6
@@ -307,13 +307,13 @@ _vpaes_schedule_core:
 .Loop_schedule_192:
 	call	_vpaes_schedule_round
 .byte	102,15,58,15,198,8
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	call	_vpaes_schedule_192_smear
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	call	_vpaes_schedule_round
 	decq	%rsi
 	jz	.Lschedule_mangle_last
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	call	_vpaes_schedule_192_smear
 	jmp	.Loop_schedule_192
 
@@ -330,18 +330,18 @@ _vpaes_schedule_core:
 .p2align	4
 .Lschedule_256:
 	movdqu	16(%rdi),%xmm0
-	call	_vpaes_schedule_transform
+	call	_vpaes_schedule_transform	
 	movl	$7,%esi
 
 .Loop_schedule_256:
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 	movdqa	%xmm0,%xmm6
 
 
 	call	_vpaes_schedule_round
 	decq	%rsi
 	jz	.Lschedule_mangle_last
-	call	_vpaes_schedule_mangle
+	call	_vpaes_schedule_mangle	
 
 
 	pshufd	$255,%xmm0,%xmm0
@@ -379,7 +379,7 @@ _vpaes_schedule_core:
 .Lschedule_mangle_last_dec:
 	addq	$-16,%rdx
 	pxor	.Lk_s63(%rip),%xmm0
-	call	_vpaes_schedule_transform
+	call	_vpaes_schedule_transform 
 	movdqu	%xmm0,(%rdx)
 
 
@@ -1007,7 +1007,7 @@ _vpaes_consts:
 .Lk_dsbo:
 .quad	0x1387EA537EF94000, 0xC7AA6DB9D4943E2D
 .quad	0x12D7560F93441D00, 0xCA4B8159D8C58E9C
-.byte	86,101,99,116,111,114,32,80,101,114,109,117,116,97,116,105,111,110,32,65,69,83,32,102,111,114,32,120,56,54,95,54,52,47,83,83,83,69,51,44,32,77,105,107,101,32,72,97,109,98,117,114,103,32,40,83,116,97,110,102,111,114,100,32,85,110,105,118,101,114,115,105,116,121,41,0
+.byte	86,101,99,116,111,114,32,80,101,114,109,117,116,97,105,111,110,32,65,69,83,32,102,111,114,32,120,56,54,95,54,52,47,83,83,83,69,51,44,32,77,105,107,101,32,72,97,109,98,117,114,103,32,40,83,116,97,110,102,111,114,100,32,85,110,105,118,101,114,115,105,116,121,41,0
 .p2align	6
 
 
@@ -1046,7 +1046,7 @@ se_handler:
 	leaq	16(%rax),%rsi
 	leaq	512(%r8),%rdi
 	movl	$20,%ecx
-.long	0xa548f3fc
+.long	0xa548f3fc		
 	leaq	184(%rax),%rax
 
 .Lin_prologue:
@@ -1059,7 +1059,7 @@ se_handler:
 	movq	40(%r9),%rdi
 	movq	%r8,%rsi
 	movl	$154,%ecx
-.long	0xa548f3fc
+.long	0xa548f3fc		
 
 	movq	%r9,%rsi
 	xorq	%rcx,%rcx
@@ -1116,21 +1116,21 @@ se_handler:
 .LSEH_info_vpaes_set_encrypt_key:
 .byte	9,0,0,0
 .rva	se_handler
-.rva	.Lenc_key_body,.Lenc_key_epilogue
+.rva	.Lenc_key_body,.Lenc_key_epilogue	
 .LSEH_info_vpaes_set_decrypt_key:
 .byte	9,0,0,0
 .rva	se_handler
-.rva	.Ldec_key_body,.Ldec_key_epilogue
+.rva	.Ldec_key_body,.Ldec_key_epilogue	
 .LSEH_info_vpaes_encrypt:
 .byte	9,0,0,0
 .rva	se_handler
-.rva	.Lenc_body,.Lenc_epilogue
+.rva	.Lenc_body,.Lenc_epilogue		
 .LSEH_info_vpaes_decrypt:
 .byte	9,0,0,0
 .rva	se_handler
-.rva	.Ldec_body,.Ldec_epilogue
+.rva	.Ldec_body,.Ldec_epilogue		
 .LSEH_info_vpaes_cbc_encrypt:
 .byte	9,0,0,0
 .rva	se_handler
-.rva	.Lcbc_body,.Lcbc_epilogue
+.rva	.Lcbc_body,.Lcbc_epilogue		
 
