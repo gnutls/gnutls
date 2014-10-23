@@ -202,6 +202,10 @@ if test "$ac_cv_func_nanosleep" != "yes";then
   gnutls_needs_librt=yes
 fi
 
+if test "$ac_cv_func_inet_pton" != "yes";then
+  AC_LIB_HAVE_LINKFLAGS(nsl,, [#include <arpa/inet.h>], [inet_pton(0,0,0);])
+fi
+
 if test "$ac_cv_func_clock_gettime" != "yes";then
   AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>], [clock_gettime (0, 0);])
   gnutls_needs_librt=yes
