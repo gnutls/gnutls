@@ -3385,4 +3385,6 @@ sha256_block_data_order:
 	ret
 .size	sha256_block_data_order,.-.L_sha256_block_data_order_begin
 
+#if defined(__linux__)
 .section .note.GNU-stack,"",%progbits
+#endif
