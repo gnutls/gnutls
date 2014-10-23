@@ -2054,7 +2054,7 @@ static int send_client_hello(gnutls_session_t session, int again)
 		 */
 		if (!session->internals.initial_negotiation_completed &&
 		    session->security_parameters.entity == GNUTLS_CLIENT &&
-		    (hver->id == GNUTLS_SSL3 ||
+		    (hver->id == GNUTLS_SSL3 &&
 		     session->internals.priorities.no_extensions != 0)) {
 			ret =
 			    copy_ciphersuites(session, &extdata,
@@ -2082,14 +2082,10 @@ static int send_client_hello(gnutls_session_t session, int again)
 		/* Generate and copy TLS extensions.
 		 */
 		if (session->internals.priorities.no_extensions == 0) {
-			if (_gnutls_version_has_extensions(hver))
+			if (_gnutls_version_has_extensions(hver)) {
 				type = GNUTLS_EXT_ANY;
-			else {
-				if (session->internals.
-				    initial_negotiation_completed != 0)
-					type = GNUTLS_EXT_MANDATORY;
-				else
-					type = GNUTLS_EXT_NONE;
+			} else {
+				type = GNUTLS_EXT_MANDATORY;
 			}
 
 			ret =
