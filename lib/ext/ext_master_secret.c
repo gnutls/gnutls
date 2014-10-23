@@ -65,7 +65,18 @@ _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 	if (data_size != 0) {
 		return gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
 	}
-	session->security_parameters.ext_master_secret = 1;
+
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		const version_entry_st *ver = get_version(session);
+
+		if (likely(ver == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		if (ver->id != GNUTLS_SSL3)
+			session->security_parameters.ext_master_secret = 1;
+	} else {
+		session->security_parameters.ext_master_secret = 1;
+	}
 
 	return 0;
 }
@@ -82,9 +93,17 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 
 	/* this function sends the client extension data */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
+		if (session->internals.priorities.protocol.algorithms == 1 &&
+		    session->internals.priorities.protocol.priority[0] == GNUTLS_SSL3)
+		    return 0; /* this extension isn't available for SSL 3.0 */
+
 		return GNUTLS_E_INT_RET_0;
 	} else { /* server side */
-		if (session->security_parameters.ext_master_secret != 0)
+		const version_entry_st *ver = get_version(session);
+		if (likely(ver == NULL))
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		if (ver->id != GNUTLS_SSL3 && session->security_parameters.ext_master_secret != 0)
 			return GNUTLS_E_INT_RET_0;
 	}
 

@@ -150,22 +150,17 @@ generate_normal_master(gnutls_session_t session,
 		ret = _gnutls_handshake_get_session_hash(session, &shash);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
-		if (get_num_version(session) == GNUTLS_SSL3) {
-			ret =
-			    _gnutls_ssl3_generate_random(premaster->data,
-							 premaster->size, shash.data, shash.size,
-							 GNUTLS_MASTER_SIZE,
-							 session->security_parameters.
-							 master_secret);
-		} else {
-			ret =
-			    _gnutls_PRF(session, premaster->data, premaster->size,
-					EXT_MASTER_SECRET, EXT_MASTER_SECRET_SIZE,
-					shash.data, shash.size,
-					GNUTLS_MASTER_SIZE,
-					session->security_parameters.
-					master_secret);
-		}
+		if (get_num_version(session) == GNUTLS_SSL3)
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+		ret =
+		    _gnutls_PRF(session, premaster->data, premaster->size,
+				EXT_MASTER_SECRET, EXT_MASTER_SECRET_SIZE,
+				shash.data, shash.size,
+				GNUTLS_MASTER_SIZE,
+				session->security_parameters.
+				master_secret);
+
 		gnutls_free(shash.data);
 	}
 
