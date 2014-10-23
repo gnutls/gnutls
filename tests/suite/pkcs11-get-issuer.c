@@ -252,17 +252,27 @@ void doit(void)
 	}
 
 	/* extract the issuer of the certificate */
+	issuer = NULL;
 	ret = gnutls_x509_trust_list_get_issuer(tl, certs[2], &issuer, GNUTLS_TL_GET_COPY);
 	if (ret < 0) {
 		fail("error in gnutls_x509_trust_list_get_issuer\n");
 		exit(1);
 	}
+	if (issuer == NULL) {
+		fail("error in gnutls_x509_trust_list_get_issuer return value\n");
+		exit(1);
+	}
 	gnutls_x509_crt_deinit(issuer);
 
 	/* extract the issuer of the certificate using the non-thread-safe approach */
+	issuer = NULL;
 	ret = gnutls_x509_trust_list_get_issuer(tl, certs[2], &issuer, 0);
 	if (ret < 0) {
 		fail("error in gnutls_x509_trust_list_get_issuer\n");
+		exit(1);
+	}
+	if (issuer == NULL) {
+		fail("error in gnutls_x509_trust_list_get_issuer return value\n");
 		exit(1);
 	}
 
