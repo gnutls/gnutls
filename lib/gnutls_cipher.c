@@ -298,12 +298,11 @@ compressed_to_ciphertext(gnutls_session_t session,
 	int auth_cipher =
 	    _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
 	uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
-	unsigned iv_size, imp_iv_size, exp_iv_size;
+	unsigned imp_iv_size, exp_iv_size;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	iv_size = _gnutls_cipher_get_iv_size(params->cipher);
 	imp_iv_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
 	exp_iv_size = _gnutls_cipher_get_explicit_iv_size(params->cipher);
 
@@ -391,12 +390,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 
 			data_ptr += exp_iv_size;
 			cipher_data += exp_iv_size;
-		} else if (iv_size > 0)
-			_gnutls_auth_cipher_setiv(&params->write.
-						  cipher_state,
-						  UINT64DATA(params->write.
-							     sequence_number),
-						  8);
+		}
 	}
 
 	/* add the authenticate data */
@@ -479,14 +473,13 @@ ciphertext_to_compressed(gnutls_session_t session,
 	unsigned int tag_size =
 	    _gnutls_auth_cipher_tag_len(&params->read.cipher_state);
 	unsigned int explicit_iv = _gnutls_version_has_explicit_iv(ver);
-	unsigned imp_iv_size, iv_size, exp_iv_size;
+	unsigned imp_iv_size, exp_iv_size;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	imp_iv_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
 	exp_iv_size = _gnutls_cipher_get_explicit_iv_size(params->cipher);
-	iv_size = _gnutls_cipher_get_iv_size(params->cipher);
 	blocksize = _gnutls_cipher_get_block_size(params->cipher);
 
 	/* actual decryption (inplace)
