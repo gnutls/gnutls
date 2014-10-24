@@ -69,7 +69,7 @@ _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		const version_entry_st *ver = get_version(session);
 
-		if (likely(ver == NULL))
+		if (unlikely(ver == NULL))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		if (ver->id != GNUTLS_SSL3)
@@ -100,7 +100,7 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 		return GNUTLS_E_INT_RET_0;
 	} else { /* server side */
 		const version_entry_st *ver = get_version(session);
-		if (likely(ver == NULL))
+		if (unlikely(ver == NULL))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 		if (ver->id != GNUTLS_SSL3 && session->security_parameters.ext_master_secret != 0)
