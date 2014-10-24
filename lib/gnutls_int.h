@@ -664,6 +664,7 @@ struct gnutls_priority_st {
 	bool ssl3_record_version;
 	bool server_precedence;
 	bool allow_wrong_pms;
+	bool no_tickets;
 	/* Whether stateless compression will be used */
 	bool stateless_compression;
 	unsigned int additional_verify_flags;

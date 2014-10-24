@@ -1105,6 +1105,10 @@ will prevent the sending of any TLS extensions in client side. Note
 that TLS 1.2 requires extensions to be used, as well as safe
 renegotiation thus this option must be used with care.
 
+@item %NO_TICKETS @tab
+will prevent the sending of the TLS session ticket extension.
+This is implied by the PFS keyword.
+
 @item %SERVER_PRECEDENCE @tab
 The ciphersuite will be selected according to server priorities
 and not the client's.

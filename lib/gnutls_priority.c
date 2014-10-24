@@ -29,6 +29,7 @@
 #include <gnutls_num.h>
 #include <gnutls/x509.h>
 #include <c-ctype.h>
+#include <gnutls_extensions.h>
 
 #define MAX_ELEMENTS 64
 
@@ -640,6 +641,11 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 		}
 	}
 
+	if (priority->no_tickets != 0) {
+		/* when PFS is explicitly requested, disable session tickets */
+		_gnutls_ext_unset_session_data(session, GNUTLS_EXTENSION_SESSION_TICKET);
+	}
+
 	if (session->internals.priorities.protocol.algorithms == 0 ||
 	    session->internals.priorities.cipher.algorithms == 0 ||
 	    session->internals.priorities.mac.algorithms == 0 ||
@@ -674,6 +680,7 @@ struct priority_groups_st {
 	const int **ecc_list;
 	unsigned profile;
 	int sec_param;
+	bool no_tickets;
 };
 
 static const struct priority_groups_st pgroups[] = 
@@ -694,7 +701,8 @@ static const struct priority_groups_st pgroups[] =
 	 .sign_list = &sign_priority_default,
 	 .ecc_list = &supported_ecc_normal,
 	 .profile = GNUTLS_PROFILE_LOW,
-	 .sec_param = GNUTLS_SEC_PARAM_WEAK
+	 .sec_param = GNUTLS_SEC_PARAM_WEAK,
+	 .no_tickets = 1
 	},
 	{.name = LEVEL_SECURE128,
 	 .alias = "SECURE",
@@ -811,6 +819,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 				SET_PROFILE(pgroups[i].profile); /* set certificate level */
 			}
 			SET_LEVEL(pgroups[i].sec_param); /* set DH params level */
+			priority_cache->no_tickets = pgroups[i].no_tickets;
 			return 1;
 		}
 	}
@@ -827,6 +836,10 @@ static void enable_dumbfw(gnutls_priority_t c)
 static void enable_no_extensions(gnutls_priority_t c)
 {
 	c->no_extensions = 1;
+}
+static void enable_no_tickets(gnutls_priority_t c)
+{
+	c->no_tickets = 1;
 }
 static void enable_stateless_compression(gnutls_priority_t c)
 {

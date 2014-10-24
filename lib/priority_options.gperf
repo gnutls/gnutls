@@ -9,6 +9,7 @@ struct priority_options_st { const char *name; option_set_func func; };
 COMPAT, enable_compat
 DUMBFW, enable_dumbfw
 NO_EXTENSIONS, enable_no_extensions
+NO_TICKETS, enable_no_tickets
 STATELESS_COMPRESSION, enable_stateless_compression
 VERIFY_ALLOW_SIGN_RSA_MD5, enable_verify_allow_rsa_md5
 VERIFY_DISABLE_CRL_CHECKS, disable_crl_checks
