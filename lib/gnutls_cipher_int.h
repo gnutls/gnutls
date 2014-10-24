@@ -165,17 +165,6 @@ inline static void _gnutls_auth_cipher_setiv(const auth_cipher_hd_st *
 	_gnutls_cipher_setiv(&handle->cipher, iv, ivlen);
 }
 
-inline static
-int _gnutls_auth_cipher_set_mac_nonce(auth_cipher_hd_st * handle,
-				      const void *nonce, int nonce_len)
-{
-	if (handle->is_mac && !handle->ssl_hmac)
-		return _gnutls_mac_set_nonce(&handle->mac.mac, nonce,
-					     nonce_len);
-	else
-		return 0;
-}
-
 inline static size_t _gnutls_auth_cipher_tag_len(auth_cipher_hd_st *
 						 handle)
 {

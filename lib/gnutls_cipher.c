@@ -397,22 +397,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 						  UINT64DATA(params->write.
 							     sequence_number),
 						  8);
-	} else {
-		/* AEAD ciphers have an explicit IV. Shouldn't be used otherwise.
-		 */
-		if (auth_cipher)
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-		else if (block_algo == CIPHER_STREAM && iv_size > 0)
-			_gnutls_auth_cipher_setiv(&params->write.
-						  cipher_state,
-						  UINT64DATA(params->write.
-							     sequence_number),
-						  8);
 	}
-
-	_gnutls_auth_cipher_set_mac_nonce(&params->write.cipher_state,
-					  UINT64DATA(params->write.
-						     sequence_number), 8);
 
 	/* add the authenticate data */
 	ret =
@@ -547,14 +532,6 @@ ciphertext_to_compressed(gnutls_session_t session,
 			length = length_to_decrypt =
 			    ciphertext->size - tag_size;
 			tag_ptr = ciphertext->data + length_to_decrypt;
-		} else if (iv_size > 0) {	/* a stream cipher with explicit IV */
-			_gnutls_auth_cipher_setiv(&params->read.
-						  cipher_state,
-						  UINT64DATA(*sequence),
-						  8);
-			length_to_decrypt = ciphertext->size;
-			length = ciphertext->size - tag_size;
-			tag_ptr = compressed->data + length;
 		} else {
 			if (unlikely(ciphertext->size < tag_size))
 				return
@@ -566,7 +543,6 @@ ciphertext_to_compressed(gnutls_session_t session,
 			tag_ptr = compressed->data + length;
 		}
 
-
 		/* Pass the type, version, length and compressed through
 		 * MAC.
 		 */
@@ -574,10 +550,6 @@ ciphertext_to_compressed(gnutls_session_t session,
 		    make_preamble(UINT64DATA(*sequence), type,
 				  length, ver, preamble);
 
-		_gnutls_auth_cipher_set_mac_nonce(&params->read.
-						  cipher_state,
-						  UINT64DATA(*sequence),
-						  8);
 		ret =
 		    _gnutls_auth_cipher_add_auth(&params->read.
 						 cipher_state, preamble,
@@ -684,10 +656,6 @@ ciphertext_to_compressed(gnutls_session_t session,
 		    make_preamble(UINT64DATA(*sequence), type,
 				  length, ver, preamble);
 
-		_gnutls_auth_cipher_set_mac_nonce(&params->read.
-						  cipher_state,
-						  UINT64DATA(*sequence),
-						  8);
 		ret =
 		    _gnutls_auth_cipher_add_auth(&params->read.
 						 cipher_state, preamble,
