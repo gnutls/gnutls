@@ -26,10 +26,13 @@ They are listed in @ref{tab:ciphers}.
 
 @showfuncE{gnutls_cipher_init,gnutls_cipher_encrypt2,gnutls_cipher_decrypt2,gnutls_cipher_set_iv,gnutls_cipher_deinit}
 
-In order to support authenticated encryption with associated data (AEAD) algorithms the following
-functions are provided to set the associated data and retrieve the authentication tag.
-
 @showfuncB{gnutls_cipher_add_auth,gnutls_cipher_tag}
+While the latter two functions allow the same API can be used with authenticated encryption ciphers, 
+it is recommended to use the following functions which are solely for AEAD ciphers. The latter
+API is designed to be simple to use and also hard to misuse, by handling the tag verification
+and addition in transparent way.
+
+@showfuncE{gnutls_aead_cipher_init,gnutls_aead_cipher_encrypt,gnutls_aead_cipher_decrypt,gnutls_aead_cipher_set_nonce,gnutls_aead_cipher_deinit}
 
 @node Public key algorithms
 @section Public key algorithms
