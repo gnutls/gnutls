@@ -185,8 +185,8 @@ gnutls_cipher_encrypt(gnutls_cipher_hd_t handle, void *text,
 /**
  * gnutls_cipher_decrypt:
  * @handle: is a #gnutls_cipher_hd_t structure.
- * @ciphertext: the data to encrypt
- * @ciphertextlen: The length of data to encrypt
+ * @ciphertext: the data to decrypt
+ * @ciphertextlen: The length of data to decrypt
  *
  * This function will decrypt the given data using the algorithm
  * specified by the context.
@@ -241,8 +241,8 @@ gnutls_cipher_encrypt2(gnutls_cipher_hd_t handle, const void *text,
 /**
  * gnutls_cipher_decrypt2:
  * @handle: is a #gnutls_cipher_hd_t structure.
- * @ciphertext: the data to encrypt
- * @ciphertextlen: The length of data to encrypt
+ * @ciphertext: the data to decrypt
+ * @ciphertextlen: The length of data to decrypt
  * @text: the decrypted data
  * @textlen: The available length for decrypted data
  *
@@ -612,4 +612,221 @@ int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 	}
 
 	return 0;
+}
+
+/* AEAD API */
+typedef struct api_aead_cipher_hd_st {
+	cipher_hd_st ctx_enc;
+	unsigned tag_size;
+	unsigned nonce_set;
+} api_aead_cipher_hd_st;
+
+/**
+ * gnutls_aead_cipher_init:
+ * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @cipher: the authenticated-encryption algorithm to use
+ * @key: The key to be used for encryption
+ * @tag_size: The size of the tag to use (use zero for the default)
+ *
+ * This function will initialize an context that can be used for
+ * encryption/decryption of data. This will effectively use the
+ * current crypto backend in use by gnutls or the cryptographic
+ * accelerator in use.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.4.0
+ **/
+int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
+			    gnutls_cipher_algorithm_t cipher,
+			    const gnutls_datum_t * key,
+			    unsigned tag_size)
+{
+	api_aead_cipher_hd_st *h;
+	const cipher_entry_st* e;
+
+	e = cipher_to_entry(cipher);
+	if (e == NULL || e->aead == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (tag_size == 0)
+		tag_size = _gnutls_cipher_get_tag_size(e);
+	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(e))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	*handle = gnutls_calloc(1, sizeof(api_aead_cipher_hd_st));
+	if (*handle == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	h = *handle;
+	h->tag_size = tag_size;
+
+	return
+	    _gnutls_cipher_init(&h->ctx_enc, e, key,
+				NULL, 1);
+}
+
+/**
+ * gnutls_aead_cipher_decrypt:
+ * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @ciphertext: the data to decrypt
+ * @ciphertextlen: the length of data to decrypt
+ * @text: the decrypted data
+ * @textlen: the length of decrypted data (initially must hold the maximum available size)
+ *
+ * This function will decrypt the given data using the algorithm
+ * specified by the context. This function must be provided the whole
+ * data to be decrypted, including the tag, and will fail if the tag
+ * verification fails.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
+			   const void *ciphertext, size_t ciphertextlen,
+			   void *text, size_t *textlen)
+{
+	int ret;
+	api_aead_cipher_hd_st *h = handle;
+	uint8_t tag[MAX_HASH_SIZE];
+	const uint8_t *ptr;
+
+	if (ciphertextlen < h->tag_size)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+	ciphertextlen -= h->tag_size;
+
+	if (ciphertextlen > 0) {
+		ret = _gnutls_cipher_decrypt2(&h->ctx_enc, ciphertext,
+					      ciphertextlen, text, *textlen);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+	/* That assumes that AEAD ciphers are stream */
+	*textlen = ciphertextlen;
+
+	_gnutls_cipher_tag(&h->ctx_enc, tag, h->tag_size);
+
+	ptr = ciphertext;
+	ptr += ciphertextlen;
+	if (memcmp(ptr, tag, h->tag_size) != 0)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	return 0;
+}
+
+
+/**
+ * gnutls_aead_cipher_encrypt:
+ * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @text: the data to encrypt
+ * @textlen: The length of data to encrypt
+ * @ciphertext: the encrypted data
+ * @ciphertextlen: the length of encrypted data (initially must hold the maximum available size)
+ *
+ * This function will encrypt the given data using the algorithm
+ * specified by the context. The output data will contain the
+ * authentication tag.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
+			   const void *text, size_t textlen,
+			   void *ciphertext, size_t *ciphertextlen)
+{
+	api_aead_cipher_hd_st *h = handle;
+	uint8_t *ptr;
+	int ret;
+
+	if (*ciphertextlen < textlen + h->tag_size)
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+	if (h->nonce_set == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret = _gnutls_cipher_encrypt2(&h->ctx_enc, text, textlen,
+				       ciphertext, *ciphertextlen);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* That assumes that AEAD ciphers are stream */
+	*ciphertextlen = textlen + h->tag_size;
+
+	ptr = ciphertext;
+	ptr += textlen;
+	_gnutls_cipher_tag(&h->ctx_enc, ptr, h->tag_size);
+	h->nonce_set = 0;
+
+	return 0;
+}
+
+/**
+ * gnutls_aead_cipher_set_nonce:
+ * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @nonce: the nonce to set
+ * @nonce_len: The length of the nonce
+ *
+ * This function will set the nonce to be used for the next
+ * encryption block. The recommended size of the nonce is
+ * returned by gnutls_cipher_get_iv_size().
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_aead_cipher_set_nonce(gnutls_aead_cipher_hd_t handle, void *nonce, size_t nonce_len)
+{
+	api_aead_cipher_hd_st *h = handle;
+
+	h->nonce_set = 1;
+	return _gnutls_cipher_setiv(&h->ctx_enc, nonce, nonce_len);
+}
+
+
+/**
+ * gnutls_aead_cipher_add_auth:
+ * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @text: the data to be authenticated
+ * @text_size: The length of the data
+ *
+ * This function operates on authenticated encryption with
+ * associated data (AEAD) ciphers and authenticate the
+ * input data. This function can only be called once
+ * and before any encryption operations.
+ *
+ * Returns: Zero or a negative error code on error.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_aead_cipher_add_auth(gnutls_aead_cipher_hd_t handle, const void *text,
+		       	    size_t text_size)
+{
+	api_aead_cipher_hd_st *h = handle;
+
+	_gnutls_cipher_auth(&h->ctx_enc, text, text_size);
+	return 0;
+}
+
+/**
+ * gnutls_aead_cipher_deinit:
+ * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ *
+ * This function will deinitialize all resources occupied by the given
+ * authenticated-encryption context.
+ *
+ * Since: 3.4.0
+ **/
+void gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle)
+{
+	api_aead_cipher_hd_st *h = handle;
+
+	_gnutls_cipher_deinit(&h->ctx_enc);
+	gnutls_free(handle);
 }

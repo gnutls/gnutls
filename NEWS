@@ -50,6 +50,12 @@ when available.
 ** guile: new 'set-session-server-name!' procedure; see the manual for details.
 
 ** API and ABI modifications:
+gnutls_aead_cipher_init: Added
+gnutls_aead_cipher_decrypt: Added
+gnutls_aead_cipher_encrypt: Added
+gnutls_aead_cipher_set_nonce: Added
+gnutls_aead_cipher_add_auth: Added
+gnutls_aead_cipher_deinit: Added
 gnutls_pkcs12_generate_mac2: Added
 gnutls_pkcs12_mac_info: Added
 gnutls_pkcs12_bag_enc_info: Added

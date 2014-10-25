@@ -55,10 +55,10 @@ int _gnutls_cipher_init(cipher_hd_st *, const cipher_entry_st * e,
 			const gnutls_datum_t * key,
 			const gnutls_datum_t * iv, int enc);
 
-inline static void _gnutls_cipher_setiv(const cipher_hd_st * handle,
+inline static int _gnutls_cipher_setiv(const cipher_hd_st * handle,
 					const void *iv, size_t ivlen)
 {
-	handle->setiv(handle->handle, iv, ivlen);
+	return handle->setiv(handle->handle, iv, ivlen);
 }
 
 inline static int

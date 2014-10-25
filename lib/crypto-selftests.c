@@ -325,7 +325,6 @@ static int test_cipher(gnutls_cipher_algorithm_t cipher,
 	     gnutls_cipher_get_name(cipher));
 
 	return 0;
-
 }
 
 /* AEAD modes */
@@ -333,11 +332,14 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 			    const struct cipher_aead_vectors_st *vectors,
 			    size_t vectors_size)
 {
-	gnutls_cipher_hd_t hd;
+	gnutls_aead_cipher_hd_t hd;
 	int ret;
 	unsigned int i;
 	uint8_t tmp[128];
+	uint8_t tmp2[128];
 	gnutls_datum_t key, iv;
+	size_t s, s2;
+	unsigned tag_size;
 
 	for (i = 0; i < vectors_size; i++) {
 		memset(tmp, 0, sizeof(tmp));
@@ -346,20 +348,28 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 
 		iv.data = (void *) vectors[i].iv;
 		iv.size = gnutls_cipher_get_iv_size(cipher);
+		tag_size = gnutls_cipher_get_tag_size(cipher);
 
 		if (iv.size != vectors[i].iv_size)
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
-		ret = gnutls_cipher_init(&hd, cipher, &key, &iv);
+		ret = gnutls_aead_cipher_init(&hd, cipher, &key, 0);
 		if (ret < 0) {
 			_gnutls_debug_log("error initializing: %s\n",
 					  gnutls_cipher_get_name(cipher));
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 
+		ret = gnutls_aead_cipher_set_nonce(hd, iv.data, iv.size);
+		if (ret < 0) {
+			_gnutls_debug_log("error setting nonce to %s\n",
+					  gnutls_cipher_get_name(cipher));
+			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+		}
+
 		if (vectors[i].auth_size > 0) {
 			ret =
-			    gnutls_cipher_add_auth(hd,
+			    gnutls_aead_cipher_add_auth(hd,
 						   vectors[i].auth,
 						   vectors[i].auth_size);
 
@@ -369,19 +379,23 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 				    (GNUTLS_E_SELF_TEST_ERROR);
 		}
 
-		if (vectors[i].plaintext_size > 0) {
-			ret =
-			    gnutls_cipher_encrypt2(hd,
-						   vectors[i].plaintext,
-						   vectors
-						   [i].plaintext_size, tmp,
-						   sizeof(tmp));
-			if (ret < 0)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_SELF_TEST_ERROR);
-		}
+		s = sizeof(tmp);
+		ret =
+		    gnutls_aead_cipher_encrypt(hd,
+					   vectors[i].plaintext,
+					   vectors
+					   [i].plaintext_size,
+					   tmp, &s);
+		if (ret < 0)
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_SELF_TEST_ERROR);
 
+		if (s != vectors[i].plaintext_size + tag_size) {
+			return
+			    gnutls_assert_val
+			    (GNUTLS_E_SELF_TEST_ERROR);
+		}
 
 		if (vectors[i].plaintext_size > 0)
 			if (memcmp
@@ -395,15 +409,55 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 				    (GNUTLS_E_SELF_TEST_ERROR);
 			}
 
-		gnutls_cipher_tag(hd, tmp, 16);
-		if (memcmp(tmp, vectors[i].tag, 16) != 0) {
+		if (memcmp(tmp+vectors[i].plaintext_size, vectors[i].tag, tag_size) != 0) {
 			_gnutls_debug_log
 			    ("%s test vector %d failed (tag)!\n",
 			     gnutls_cipher_get_name(cipher), i);
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
 
-		gnutls_cipher_deinit(hd);
+		/* check decryption */
+		{
+			gnutls_aead_cipher_deinit(hd);
+
+			ret = gnutls_aead_cipher_init(&hd, cipher, &key, 0);
+			if (ret < 0) {
+				_gnutls_debug_log("error initializing: %s\n",
+						  gnutls_cipher_get_name(cipher));
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+
+			gnutls_aead_cipher_set_nonce(hd, iv.data, iv.size);
+
+			if (vectors[i].auth_size > 0) {
+				ret =
+				    gnutls_aead_cipher_add_auth(hd,
+							   vectors[i].auth,
+							   vectors[i].auth_size);
+				if (ret < 0)
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_SELF_TEST_ERROR);
+			}
+
+			s2 = sizeof(tmp2);
+			ret =
+			    gnutls_aead_cipher_decrypt(hd,
+						   tmp, s,
+						   tmp2, &s2);
+			if (ret < 0)
+				return
+				    gnutls_assert_val
+				    (GNUTLS_E_SELF_TEST_ERROR);
+
+			if (s2 != vectors[i].plaintext_size && memcmp(tmp, vectors[i].plaintext, vectors[i].plaintext_size) != 0) {
+				_gnutls_debug_log("%s test vector %d failed (decryption)!\n",
+					gnutls_cipher_get_name(cipher), i);
+				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+		}
+
+		gnutls_aead_cipher_deinit(hd);
 	}
 
 	_gnutls_debug_log
