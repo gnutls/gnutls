@@ -79,12 +79,21 @@ AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
 
 dnl Detect windows build
+use_accel=yes
 case "$host" in
   *mingw32* | *mingw64*)
     have_win=yes
   ;;
   *darwin*)
     have_macosx=yes
+  ;;
+  *solaris*)
+    use_accel=no
+    AC_MSG_WARN([[
+***
+*** In solaris hardware acceleration is disabled by default due to issues
+*** with the assembler. Use --enable-hardware-acceleration to enable it.
+*** ]])
   ;;
   *)
     have_elf=yes
@@ -98,7 +107,7 @@ AM_CONDITIONAL(ELF, test "$have_elf" = yes)
 dnl Hardware Acceleration
 AC_ARG_ENABLE(hardware-acceleration,
   AS_HELP_STRING([--disable-hardware-acceleration], [unconditionally disable hardware acceleration]),
-    use_accel=$enableval, use_accel=yes)
+    use_accel=$enableval)
 hw_accel=none
 
 
