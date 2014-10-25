@@ -32,6 +32,8 @@ GNUTLS_CERT_PURPOSE_MISMATCH is also introduced.
 ** libgnutls: Added support for the extended master secret
 (triple-handshake fix) following draft-ietf-tls-session-hash-02.
 
+** libgnutls: Added a new easy and hard to misuse AEAD API (crypto.h).
+
 ** libgnutls-openssl: it is no longer built by default.
 
 ** certtool: Added --p8-info option, which will print PKCS #8 information
