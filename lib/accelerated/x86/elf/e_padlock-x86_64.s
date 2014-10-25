@@ -1064,6 +1064,6 @@ padlock_ctr32_encrypt:
 .Lpadlock_saved_context:
 .quad	0
 
-#if defined(__linux__)
+
 .section .note.GNU-stack,"",%progbits
-#endif
+

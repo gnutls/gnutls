@@ -2611,6 +2611,6 @@ K256:
 .long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f	
 .long	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f	
 
-#if defined(__linux__)
+
 .section .note.GNU-stack,"",%progbits
-#endif
+

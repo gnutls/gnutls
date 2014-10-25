@@ -2878,6 +2878,6 @@ sha256_block_data_order_ssse3:
 	.byte	0xf3,0xc3
 .size	sha256_block_data_order_ssse3,.-sha256_block_data_order_ssse3
 
-#if defined(__linux__)
+
 .section .note.GNU-stack,"",%progbits
-#endif
+
