@@ -838,7 +838,7 @@ _vpaes_consts:
 .align	64
 .size	_vpaes_consts,.-_vpaes_consts
 
-#if defined(__linux__)
+
 .section .note.GNU-stack,"",%progbits
-#endif
+
 

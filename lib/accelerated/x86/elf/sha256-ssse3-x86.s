@@ -3400,7 +3400,7 @@ sha256_block_data_order:
 .byte	62,0
 .comm	_gnutls_x86_cpuid_s,16,4
 
-#if defined(__linux__)
+
 .section .note.GNU-stack,"",%progbits
-#endif
+
 
