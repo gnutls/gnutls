@@ -116,6 +116,7 @@ recv_hello_verify_request(gnutls_session_t session,
 void _gnutls_handshake_hash_buffers_clear(gnutls_session_t session)
 {
 	session->internals.handshake_hash_buffer_prev_len = 0;
+	session->internals.handshake_hash_buffer_client_kx_len = 0;
 	_gnutls_buffer_clear(&session->internals.handshake_hash_buffer);
 }
 
@@ -1355,6 +1356,13 @@ handshake_hash_add_recvd(gnutls_session_t session,
 			return gnutls_assert_val(ret);
 	}
 
+	/* save the size until client KX. That is because the TLS
+	 * session hash is calculated up to this message.
+	 */
+	if (recv_type == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE)
+		session->internals.handshake_hash_buffer_client_kx_len =
+			session->internals.handshake_hash_buffer.length;
+
 	return 0;
 }
 
@@ -1396,6 +1404,10 @@ handshake_hash_add_sent(gnutls_session_t session,
 					       dataptr, datalen);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+
+		if (type == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE)
+			session->internals.handshake_hash_buffer_client_kx_len =
+				session->internals.handshake_hash_buffer.length;
 
 		return 0;
 	}
@@ -3591,6 +3603,12 @@ int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+	if (session->internals.handshake_hash_buffer_client_kx_len == 0 ||
+	    (session->internals.handshake_hash_buffer.length <
+	    session->internals.handshake_hash_buffer_client_kx_len)) {
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+
 	if (_gnutls_version_has_selectable_prf(ver)) { /* TLS 1.2+ */
 		gnutls_mac_algorithm_t prf;
 
@@ -3604,8 +3622,8 @@ int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t 
 		    _gnutls_hash_fast((gnutls_digest_algorithm_t)me->id,
 				      session->internals.handshake_hash_buffer.
 				      data,
-				      session->internals.handshake_hash_buffer.
-				      length, concat);
+				      session->internals.handshake_hash_buffer_client_kx_len,
+				      concat);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
@@ -3619,7 +3637,7 @@ int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t 
 
 		_gnutls_hash(&td_sha,
 			     session->internals.handshake_hash_buffer.data,
-			     session->internals.handshake_hash_buffer.length);
+			     session->internals.handshake_hash_buffer_client_kx_len);
 
 		_gnutls_hash_deinit(&td_sha, &concat[16]);
 
@@ -3631,8 +3649,7 @@ int _gnutls_handshake_get_session_hash(gnutls_session_t session, gnutls_datum_t 
 
 		_gnutls_hash(&td_md5,
 			     session->internals.handshake_hash_buffer.data,
-			     session->internals.handshake_hash_buffer.
-			     length);
+			     session->internals.handshake_hash_buffer_client_kx_len);
 
 		_gnutls_hash_deinit(&td_md5, concat);
 
