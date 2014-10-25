@@ -27,7 +27,7 @@ if test "${WINDIR}" != "";then
 fi
 
 ./dtls-stress -full -shello 01234 -sfinished 01 -cfinished 01234 CCertificate CKeyExchange CCertificateVerify CChangeCipherSpec CFinished -d 6
-./dtls-stress -full -r -shello 42130 -sfinished 10 -cfinished 43210 SHello SKeyExchange SHelloDone CKeyExchange CChangeCipherSpec CFinished SChangeCipherSpec SCertificate SFinished
+#./dtls-stress -full -r -shello 42130 -sfinished 10 -cfinished 43210 SHello SKeyExchange SHelloDone CKeyExchange CChangeCipherSpec CFinished SChangeCipherSpec SCertificate SFinished
 
 ./dtls-stress -shello 021 -sfinished 01 -cfinished 012 SKeyExchange CKeyExchange CFinished
 ./dtls-stress -shello 012 -sfinished 10 -cfinished 210 SHello SKeyExchange SHelloDone
