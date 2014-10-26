@@ -695,14 +695,16 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
 	uint8_t tag[MAX_HASH_SIZE];
 	const uint8_t *ptr;
 
-	if (ctext_len < h->tag_size)
+	if (unlikely(h->nonce_set == 0))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (unlikely(ctext_len < h->tag_size))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 	ctext_len -= h->tag_size;
 
 	if (ctext_len > 0) {
 		ret = _gnutls_cipher_decrypt2(&h->ctx_enc, ctext,
 					      ctext_len, ptext, *ptext_len);
-		if (ret < 0)
+		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 	}
 	/* That assumes that AEAD ciphers are stream */
@@ -714,6 +716,7 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
 	ptr += ctext_len;
 	if (memcmp(ptr, tag, h->tag_size) != 0)
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+	h->nonce_set = 0;
 
 	return 0;
 }
@@ -729,9 +732,8 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
  *
  * This function will encrypt the given data using the algorithm
  * specified by the context. The output data will contain the
- * authentication tag. Each call of this function must be
- * preceded with a call to gnutls_aead_cipher_set_nonce() with
- * random nonce.
+ * authentication tag. This function requires that 
+ * gnutls_aead_cipher_set_nonce() is called before it.
  *
  * Returns: Zero or a negative error code on error.
  *
@@ -746,14 +748,14 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
 	uint8_t *ptr;
 	int ret;
 
-	if (*ctext_len < ptext_len + h->tag_size)
+	if (unlikely(*ctext_len < ptext_len + h->tag_size))
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
-	if (h->nonce_set == 0)
+	if (unlikely(h->nonce_set == 0))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	ret = _gnutls_cipher_encrypt2(&h->ctx_enc, ptext, ptext_len,
 				       ctext, *ctext_len);
-	if (ret < 0)
+	if (unlikely(ret < 0))
 		return gnutls_assert_val(ret);
 
 	/* That assumes that AEAD ciphers are stream */
@@ -776,6 +778,9 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
  * This function will set the nonce to be used for the next
  * encryption block. The recommended size of the nonce is
  * returned by gnutls_cipher_get_iv_size().
+ *
+ * Depending on the protocol the nonce may be generated
+ * randomly or using a counter.
  *
  * Returns: Zero or a negative error code on error.
  *
@@ -802,6 +807,9 @@ gnutls_aead_cipher_set_nonce(gnutls_aead_cipher_hd_t handle, void *nonce, size_t
  * input data. This function can only be called once
  * and before any encryption operations.
  *
+ * This function requires that gnutls_aead_cipher_set_nonce() 
+ * is called before it. 
+ *
  * Returns: Zero or a negative error code on error.
  *
  * Since: 3.4.0
@@ -811,6 +819,9 @@ gnutls_aead_cipher_add_auth(gnutls_aead_cipher_hd_t handle, const void *ptext,
 		       	    size_t ptext_len)
 {
 	api_aead_cipher_hd_st *h = handle;
+
+	if (h->nonce_set == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	_gnutls_cipher_auth(&h->ctx_enc, ptext, ptext_len);
 	return 0;
