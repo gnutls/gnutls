@@ -418,15 +418,6 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 
 		/* check decryption */
 		{
-			gnutls_aead_cipher_deinit(hd);
-
-			ret = gnutls_aead_cipher_init(&hd, cipher, &key, 0);
-			if (ret < 0) {
-				_gnutls_debug_log("error initializing: %s\n",
-						  gnutls_cipher_get_name(cipher));
-				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
-			}
-
 			gnutls_aead_cipher_set_nonce(hd, iv.data, iv.size);
 
 			if (vectors[i].auth_size > 0) {
@@ -454,6 +445,33 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 				_gnutls_debug_log("%s test vector %d failed (decryption)!\n",
 					gnutls_cipher_get_name(cipher), i);
 				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
+			}
+
+			/* test tag verification */
+			if (s > 0) {
+				gnutls_aead_cipher_set_nonce(hd, iv.data, iv.size);
+
+				if (vectors[i].auth_size > 0) {
+					ret =
+					    gnutls_aead_cipher_add_auth(hd,
+								   vectors[i].auth,
+								   vectors[i].auth_size);
+					if (ret < 0)
+						return
+						    gnutls_assert_val
+						    (GNUTLS_E_SELF_TEST_ERROR);
+				}
+				tmp[0]++;
+
+				s2 = sizeof(tmp2);
+				ret =
+				    gnutls_aead_cipher_decrypt(hd,
+							   tmp, s,
+							   tmp2, &s2);
+				if (ret >= 0)
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_SELF_TEST_ERROR);
 			}
 		}
 
