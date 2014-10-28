@@ -435,8 +435,6 @@ void gnutls_deinit(gnutls_session_t session)
 	if (session == NULL)
 		return;
 
-	_gnutls_rnd_refresh();
-
 	/* remove auth info firstly */
 	_gnutls_free_auth_info(session);
 
