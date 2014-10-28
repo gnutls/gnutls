@@ -162,6 +162,11 @@ static void wrap_nettle_rnd_deinit(void *ctx)
 	rnd_ctx.mutex = NULL;
 }
 
+/* Initializes the nonce level random generator.
+ *
+ * @init must be non zero on first initialization, and
+ * zero on any subsequent reinitializations.
+ */
 static int nonce_rng_init(struct nonce_ctx_st *ctx, unsigned init)
 {
 	uint8_t buffer[SALSA20_KEY_SIZE];
