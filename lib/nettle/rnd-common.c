@@ -37,6 +37,10 @@
 #include <rnd-common.h>
 #include <hash-pjw-bare.h>
 
+#ifdef HAVE_LINUX_GETRANDOM
+# include <linux/random.h>
+#endif
+
 /* gnulib wants to claim strerror even if it cannot provide it. WTF */
 #undef strerror
 
@@ -130,6 +134,15 @@ int _gnutls_urandom_fd = -1;
 
 static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 {
+#ifdef HAVE_LINUX_GETRANDOM
+	if (getrandom(_rnd, size, 0) < 0) {
+		gnutls_assert();
+		_gnutls_debug_log
+			("Failed to use getrandom: %s\n",
+					 strerror(errno));
+		return GNUTLS_E_RANDOM_DEVICE_ERROR;
+	}
+#else
 	uint8_t* rnd = _rnd;
 	uint32_t done;
 
@@ -154,10 +167,12 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 
 		done += res;
 	}
+#endif
 
 	return 0;
 }
 
+#ifndef HAVE_LINUX_GETRANDOM
 static
 int _rnd_get_system_entropy_egd(void* _rnd, size_t size)
 {
@@ -182,11 +197,15 @@ int _rnd_get_system_entropy_egd(void* _rnd, size_t size)
 
 	return 0;
 }
+#endif
 
 get_entropy_func _rnd_get_system_entropy = NULL;
 
 int _rnd_system_entropy_init(void)
 {
+#ifdef HAVE_LINUX_GETRANDOM
+	return 0;
+#else
 int old;
 
 	_gnutls_urandom_fd = open("/dev/urandom", O_RDONLY);
@@ -213,14 +232,18 @@ fallback:
 	_rnd_get_system_entropy = _rnd_get_system_entropy_egd;
 	
 	return 0;
+#endif
 }
 
 void _rnd_system_entropy_deinit(void)
 {
+#ifndef HAVE_LINUX_GETRANDOM
 	if (_gnutls_urandom_fd >= 0) {
 		close(_gnutls_urandom_fd);
 		_gnutls_urandom_fd = -1;
 	}
-}
 #endif
+}
+
+#endif /* _WIN32 */
 

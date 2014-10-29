@@ -144,6 +144,17 @@ AM_CONDITIONAL(ASM_X86, test x"$hw_accel" = x"x86" || test x"$hw_accel" = x"x86-
 AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
+dnl check for getrandom()
+enable_getrandom=no
+AC_LINK_IFELSE([AC_LANG_PROGRAM([
+	   #include <linux/random.h>],[
+		   getrandom(NULL, 0, 0);
+		  ])],
+		  [AC_MSG_RESULT(yes)
+		   AC_DEFINE([HAVE_LINUX_GETRANDOM], 1, [Enable the Linux getrandom function])
+		   enable_getrandom=yes],
+		  [AC_MSG_RESULT(no)
+		  enable_getrandom=no])
 
 dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
@@ -850,6 +861,7 @@ AC_MSG_NOTICE([External hardware support:
   /dev/crypto:          $enable_cryptodev
   Hardware accel:       $hw_accel
   Padlock accel:        $use_padlock
+  Linux getrandom:      $enable_getrandom
   PKCS#11 support:      $with_p11_kit
   TPM support:          $with_tpm
 ])
