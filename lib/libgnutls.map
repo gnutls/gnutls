@@ -1057,6 +1057,7 @@ GNUTLS_3_1_0 {
 	gnutls_aead_cipher_set_nonce;
 	gnutls_aead_cipher_add_auth;
 	gnutls_aead_cipher_deinit;
+	gnutls_dh_params_import_raw2;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

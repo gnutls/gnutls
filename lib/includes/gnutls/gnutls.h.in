@@ -1524,6 +1524,10 @@ void gnutls_dh_params_deinit(gnutls_dh_params_t dh_params);
 int gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
 				const gnutls_datum_t * prime,
 				const gnutls_datum_t * generator);
+int gnutls_dh_params_import_raw2(gnutls_dh_params_t dh_params,
+				 const gnutls_datum_t * prime,
+				 const gnutls_datum_t * generator,
+				 unsigned key_bits);
 int gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
 				  const gnutls_datum_t * pkcs3_params,
 				  gnutls_x509_crt_fmt_t format);

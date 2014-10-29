@@ -99,6 +99,29 @@ gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
 			    const gnutls_datum_t * prime,
 			    const gnutls_datum_t * generator)
 {
+	return gnutls_dh_params_import_raw2(dh_params, prime, generator, 0);
+}
+
+/**
+ * gnutls_dh_params_import_raw2:
+ * @dh_params: Is a structure that will hold the prime numbers
+ * @prime: holds the new prime
+ * @generator: holds the new generator
+ * @key_bits: the private key bits (set to zero when unknown)
+ *
+ * This function will replace the pair of prime and generator for use
+ * in the Diffie-Hellman key exchange.  The new parameters should be
+ * stored in the appropriate gnutls_datum.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ **/
+int
+gnutls_dh_params_import_raw2(gnutls_dh_params_t dh_params,
+			     const gnutls_datum_t * prime,
+			     const gnutls_datum_t * generator,
+			     unsigned key_bits)
+{
 	bigint_t tmp_prime, tmp_g;
 	size_t siz;
 
@@ -119,9 +142,9 @@ gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
 	 */
 	dh_params->params[0] = tmp_prime;
 	dh_params->params[1] = tmp_g;
+	dh_params->q_bits = key_bits;
 
 	return 0;
-
 }
 
 /**
