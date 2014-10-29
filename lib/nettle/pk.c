@@ -929,7 +929,7 @@ int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
 	priv_key->data = NULL;
 	pub_key->data = NULL;
 
-	ret = _gnutls_pk_generate_keys(GNUTLS_PK_DH, 0, &params);
+	ret = _gnutls_pk_generate_keys(GNUTLS_PK_DH, dh_params->q_bits, &params);
 	if (ret < 0) {
 		return gnutls_assert_val(ret);
 	}
