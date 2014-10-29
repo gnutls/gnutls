@@ -11,7 +11,8 @@ extensions.
 ** libgnutls: Fixes in usage of PKCS #11 token callback
 
 ** libgnutls: Fixed bug in gnutls_x509_trust_list_get_issuer() when used
-without the GNUTLS_TL_GET_COPY flag. Reported by David Woodhouse.
+with a PKCS #11 trust module and without the GNUTLS_TL_GET_COPY flag.
+Reported by David Woodhouse.
 
 ** libgnutls: Removed superfluous random generator refresh on every call
 of gnutls_deinit(). That reduces load and usage of /dev/urandom.
