@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 3.4.0 (unreleased)
 
+** libgnutls: Use getrandom() when available. That avoids the complexity
+of file descriptor handling and the issues with applications closing
+all open file descriptors.
+
 ** libgnutls: Use pthread_atfork() to detect fork.
 
 ** libgnutls: Added helper functions to obtain information on PKCS #8
