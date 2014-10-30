@@ -146,15 +146,25 @@ AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
 dnl check for getrandom()
 enable_getrandom=no
+AC_MSG_CHECKING([for getrandom])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([
 	   #include <linux/random.h>],[
-		   getrandom(NULL, 0, 0);
+		   getrandom(0, 0, 0);
 		  ])],
 		  [AC_MSG_RESULT(yes)
 		   AC_DEFINE([HAVE_LINUX_GETRANDOM], 1, [Enable the Linux getrandom function])
-		   enable_getrandom=yes],
-		  [AC_MSG_RESULT(no)
-		  enable_getrandom=no])
+		   enable_getrandom=getrandom],
+		  [AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for getentropy])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([
+	   #include <unistd.h>],[
+		   getentropy(0, 0);
+		  ])],
+		  [AC_MSG_RESULT(yes)
+		   AC_DEFINE([HAVE_GETENTROPY], 1, [Enable the OpenBSD getentropy function])
+		   enable_getrandom=getentropy],
+		  [AC_MSG_RESULT(no)])
 
 dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
@@ -861,7 +871,7 @@ AC_MSG_NOTICE([External hardware support:
   /dev/crypto:          $enable_cryptodev
   Hardware accel:       $hw_accel
   Padlock accel:        $use_padlock
-  Linux getrandom:      $enable_getrandom
+  getrandom variant:    $enable_getrandom
   PKCS#11 support:      $with_p11_kit
   TPM support:          $with_tpm
 ])

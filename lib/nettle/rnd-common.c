@@ -37,8 +37,10 @@
 #include <rnd-common.h>
 #include <hash-pjw-bare.h>
 
-#ifdef HAVE_LINUX_GETRANDOM
+#if defined(HAVE_LINUX_GETRANDOM)
 # include <linux/random.h>
+#elif defined(HAVE_GETENTROPY)
+# include <unistd.h>
 #endif
 
 /* gnulib wants to claim strerror even if it cannot provide it. WTF */
@@ -132,9 +134,14 @@ void _rnd_system_entropy_deinit(void)
 
 int _gnutls_urandom_fd = -1;
 
-static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
+
+get_entropy_func _rnd_get_system_entropy = NULL;
+
+#if defined(HAVE_LINUX_GETRANDOM) || defined(HAVE_GETENTROPY)
+
+static int _rnd_get_system_entropy_simple(void* _rnd, size_t size)
 {
-#ifdef HAVE_LINUX_GETRANDOM
+#if defined(HAVE_LINUX_GETRANDOM)
 	if (getrandom(_rnd, size, 0) < 0) {
 		gnutls_assert();
 		_gnutls_debug_log
@@ -142,7 +149,33 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 					 strerror(errno));
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}
-#else
+#elif defined(HAVE_GETENTROPY)
+	if (getentropy(_rnd, size) < 0) {
+		gnutls_assert();
+		_gnutls_debug_log
+			("Failed to use getentropy: %s\n",
+					 strerror(errno));
+		return GNUTLS_E_RANDOM_DEVICE_ERROR;
+	}
+#endif
+	return 0;
+}
+
+int _rnd_system_entropy_init(void)
+{
+	_rnd_get_system_entropy = _rnd_get_system_entropy_simple;
+	return 0;
+}
+
+void _rnd_system_entropy_deinit(void)
+{
+	return;
+}
+
+#else /* /dev/urandom - egd approach */
+
+static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
+{
 	uint8_t* rnd = _rnd;
 	uint32_t done;
 
@@ -167,12 +200,10 @@ static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
 
 		done += res;
 	}
-#endif
 
 	return 0;
 }
 
-#ifndef HAVE_LINUX_GETRANDOM
 static
 int _rnd_get_system_entropy_egd(void* _rnd, size_t size)
 {
@@ -197,15 +228,9 @@ int _rnd_get_system_entropy_egd(void* _rnd, size_t size)
 
 	return 0;
 }
-#endif
-
-get_entropy_func _rnd_get_system_entropy = NULL;
 
 int _rnd_system_entropy_init(void)
 {
-#ifdef HAVE_LINUX_GETRANDOM
-	return 0;
-#else
 int old;
 
 	_gnutls_urandom_fd = open("/dev/urandom", O_RDONLY);
@@ -232,18 +257,16 @@ fallback:
 	_rnd_get_system_entropy = _rnd_get_system_entropy_egd;
 	
 	return 0;
-#endif
 }
 
 void _rnd_system_entropy_deinit(void)
 {
-#ifndef HAVE_LINUX_GETRANDOM
 	if (_gnutls_urandom_fd >= 0) {
 		close(_gnutls_urandom_fd);
 		_gnutls_urandom_fd = -1;
 	}
-#endif
 }
+#endif /* GETRANDOM || GETENTROPY */
 
 #endif /* _WIN32 */
 
