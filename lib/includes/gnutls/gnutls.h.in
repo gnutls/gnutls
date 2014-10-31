@@ -2140,9 +2140,6 @@ void gnutls_certificate_set_pin_function(gnutls_certificate_credentials_t,
 					 gnutls_pin_callback_t fn,
 					 void *userdata);
 
-/* FD-related functions */
-unsigned gnutls_fd_in_use(int fd);
-
 /* FIPS140-2 related functions */
 int gnutls_fips140_mode_enabled(void);
 

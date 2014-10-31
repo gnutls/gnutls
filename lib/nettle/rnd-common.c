@@ -135,7 +135,7 @@ void _rnd_system_entropy_deinit(void)
 #include <locks.h>
 #include "egd.h"
 
-int _gnutls_urandom_fd = -1;
+static int _gnutls_urandom_fd = -1;
 static mode_t _gnutls_urandom_fd_mode = 0;
 
 static int _rnd_get_system_entropy_urandom(void* _rnd, size_t size)
