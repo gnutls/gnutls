@@ -443,7 +443,7 @@ unsigned rbuffer_size = 0;
 static void filter_run_next(gnutls_transport_ptr_t fd,
 			    const unsigned char *buffer, size_t len)
 {
-	int ret;
+	int ret = 0;
 	filter_fn fn = filter_chain[filter_current_idx];
 	filter_current_idx++;
 	if (fn) {
@@ -711,13 +711,13 @@ static void session_init(int sock, int server)
 							      GNUTLS_CERT_REQUIRE);
 		}
 	} else if (server) {
-		gnutls_anon_server_credentials_t cred;
-		gnutls_anon_allocate_server_credentials(&cred);
-		gnutls_credentials_set(session, GNUTLS_CRD_ANON, cred);
+		gnutls_anon_server_credentials_t acred;
+		gnutls_anon_allocate_server_credentials(&acred);
+		gnutls_credentials_set(session, GNUTLS_CRD_ANON, acred);
 	} else {
-		gnutls_anon_client_credentials_t cred;
-		gnutls_anon_allocate_client_credentials(&cred);
-		gnutls_credentials_set(session, GNUTLS_CRD_ANON, cred);
+		gnutls_anon_client_credentials_t acred;
+		gnutls_anon_allocate_client_credentials(&acred);
+		gnutls_credentials_set(session, GNUTLS_CRD_ANON, acred);
 	}
 
 	gnutls_transport_set_push_function(session, writefn);
