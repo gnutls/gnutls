@@ -17,6 +17,11 @@ Reported by David Woodhouse.
 ** libgnutls: Removed superfluous random generator refresh on every call
 of gnutls_deinit(). That reduces load and usage of /dev/urandom.
 
+** libgnutls: When gnutls_global_init() is called for a second time, it
+will check whether the /dev/urandom fd kept is still open and matches
+the original one. That behavior works around issues with servers that
+close all file descriptors.
+
 ** certtool: The default cipher for PKCS #12 structures is 3des-pkcs12.
 That option is more compatible than AES or RC4.
 
