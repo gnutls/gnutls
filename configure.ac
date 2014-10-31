@@ -376,6 +376,7 @@ AC_ARG_ENABLE(non-suiteb-curves,
 if [ test "$enable_non_suiteb" = "yes" ];then
   AC_DEFINE([ENABLE_NON_SUITEB_CURVES], 1, [Enable all curves])
 fi
+AM_CONDITIONAL(ENABLE_NON_SUITEB_CURVES, test "$enable_non_suiteb" = "yes")
 
 AM_CONDITIONAL(ENABLE_SELF_CHECKS, test "$enable_self_checks" = "yes")
 if [ test "$enable_self_checks" = "yes" ];then
