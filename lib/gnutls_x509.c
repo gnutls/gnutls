@@ -1394,6 +1394,8 @@ gnutls_certificate_get_trust_list(gnutls_certificate_credentials_t res,
  * present issuers in the token are are imported (i.e., the required trust chain).
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ *
+ * Since: 3.1.11
  **/
 int
 gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t res,
