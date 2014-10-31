@@ -213,8 +213,10 @@ int gnutls_global_init(void)
 			 * before calling gnutls_global_init(). in that
 			 * case reopen it */
 			ret = _gnutls_rnd_check();
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+			if (ret < 0) {
+				gnutls_assert();
+				goto out;
+			}
 		}
 		ret = _gnutls_init_ret;
 		goto out;
