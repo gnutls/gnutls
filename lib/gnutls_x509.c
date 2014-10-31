@@ -615,11 +615,11 @@ read_key_mem(gnutls_certificate_credentials_t res,
 			return ret;
 		}
 
-		if (res->pin.cb)
+		if (res->pin.cb) {
 			gnutls_privkey_set_pin_function(privkey,
 							res->pin.cb,
 							res->pin.data);
-		else if (pass != NULL) {
+		} else if (pass != NULL) {
 			snprintf(res->pin_tmp, sizeof(res->pin_tmp), "%s",
 				 pass);
 			gnutls_privkey_set_pin_function(privkey,
@@ -844,9 +844,16 @@ read_key_file(gnutls_certificate_credentials_t res,
 	char *data;
 
 	if (_gnutls_url_is_known(keyfile)) {
-		if (gnutls_url_is_supported(keyfile))
+		if (gnutls_url_is_supported(keyfile)) {
+			/* if no PIN function is specified, and we have a PIN,
+			 * specify one */
+			if (pass != NULL && res->pin.cb == NULL) {
+				snprintf(res->pin_tmp, sizeof(res->pin_tmp), "%s", pass);
+				gnutls_certificate_set_pin_function(res, tmp_pin_cb, res->pin_tmp);
+			}
+
 			return read_key_url(res, keyfile);
-		else
+		} else
 			return
 			    gnutls_assert_val
 			    (GNUTLS_E_UNIMPLEMENTED_FEATURE);
@@ -1432,6 +1439,8 @@ gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t res,
  * This function can also accept URLs at @keyfile and @certfile. In that case it
  * will import the private key and certificate indicated by the URLs. Note
  * that the supported URLs are the ones indicated by gnutls_url_is_supported().
+ * Before GnuTLS 3.4.0 when a URL was specified, the @pass part was ignored and a
+ * PIN callback had to be registered, this is no longer the case in current releases.
  *
  * In case the @certfile is provided as a PKCS #11 URL, then the certificate, and its
  * present issuers in the token are are imported (i.e., the required trust chain).
