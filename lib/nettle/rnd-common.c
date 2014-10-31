@@ -39,9 +39,10 @@
 
 #if defined(HAVE_LINUX_GETRANDOM)
 # include <linux/random.h>
-#elif defined(HAVE_GETENTROPY)
-# include <unistd.h>
 #endif
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* gnulib wants to claim strerror even if it cannot provide it. WTF */
 #undef strerror
@@ -99,6 +100,11 @@ int _rnd_get_system_entropy_win32(void* rnd, size_t size)
 
 get_entropy_func _rnd_get_system_entropy = _rnd_get_system_entropy_win32;
 
+int _rnd_system_entropy_check(void)
+{
+	return 0;
+}
+
 int _rnd_system_entropy_init(void)
 {
 	int old;
@@ -133,6 +139,7 @@ void _rnd_system_entropy_deinit(void)
 #include "egd.h"
 
 int _gnutls_urandom_fd = -1;
+static mode_t _gnutls_urandom_fd_mode = 0;
 
 
 get_entropy_func _rnd_get_system_entropy = NULL;
@@ -164,6 +171,11 @@ static int _rnd_get_system_entropy_simple(void* _rnd, size_t size)
 int _rnd_system_entropy_init(void)
 {
 	_rnd_get_system_entropy = _rnd_get_system_entropy_simple;
+	return 0;
+}
+
+int _rnd_system_entropy_check(void)
+{
 	return 0;
 }
 
@@ -229,9 +241,22 @@ int _rnd_get_system_entropy_egd(void* _rnd, size_t size)
 	return 0;
 }
 
+int _rnd_system_entropy_check(void)
+{
+	int ret;
+	struct stat st;
+
+	ret = fstat(_gnutls_urandom_fd, &st);
+	if (ret < 0 && st.st_mode != _gnutls_urandom_fd_mode) {
+		return _rnd_system_entropy_init();
+	}
+	return 0;
+}
+
 int _rnd_system_entropy_init(void)
 {
-int old;
+	int old;
+	struct stat st;
 
 	_gnutls_urandom_fd = open("/dev/urandom", O_RDONLY);
 	if (_gnutls_urandom_fd < 0) {
@@ -242,6 +267,10 @@ int old;
 	old = fcntl(_gnutls_urandom_fd, F_GETFD);
 	if (old != -1)
 		fcntl(_gnutls_urandom_fd, F_SETFD, old | FD_CLOEXEC);
+
+	if (fstat(_gnutls_urandom_fd, &st) >= 0) {
+		_gnutls_urandom_fd_mode = st.st_mode;
+	}
 
 	_rnd_get_system_entropy = _rnd_get_system_entropy_urandom;
 
@@ -254,6 +283,11 @@ fallback:
 			gnutls_assert_val
 			(GNUTLS_E_RANDOM_DEVICE_ERROR);
 	}
+
+	if (fstat(_gnutls_urandom_fd, &st) >= 0) {
+		_gnutls_urandom_fd_mode = st.st_mode;
+	}
+
 	_rnd_get_system_entropy = _rnd_get_system_entropy_egd;
 	
 	return 0;
