@@ -1161,30 +1161,6 @@ int gnutls_session_is_resumed(gnutls_session_t session)
 }
 
 /**
- * gnutls_fd_in_use:
- * @fd: is a file descriptor to check against
- *
- * Check whether the provided file descriptor is used by
- * gnutls internally. That is whether is used for /dev/urandom
- * etc. That function is to be used by applications that close()
- * all file descriptors on application startup.
- *
- * Returns: non zero if this fd is in use, or a zero otherwise.
- *
- * Since: 3.3.10
- **/
-unsigned gnutls_fd_in_use(int fd)
-{
-#ifdef _WIN32
-	return 0;
-#else
-	if (fd >= 0 && fd == _gnutls_urandom_fd)
-		return 1;
-	return 0;
-#endif
-}
-
-/**
  * gnutls_session_resumption_requested:
  * @session: is a #gnutls_session_t structure.
  *
