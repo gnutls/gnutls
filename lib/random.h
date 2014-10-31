@@ -47,6 +47,7 @@ inline static void _gnutls_rnd_refresh(void)
 
 void _gnutls_rnd_deinit(void);
 int _gnutls_rnd_init(void);
+int _gnutls_rnd_check(void);
 
 #ifndef _WIN32
 extern int _gnutls_urandom_fd;

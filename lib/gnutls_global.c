@@ -207,6 +207,14 @@ int gnutls_global_init(void)
 
 	_gnutls_init++;
 	if (_gnutls_init > 1) {
+		if (_gnutls_init == 1 && _gnutls_init_ret == 0) {
+			/* some applications may close the urandom fd 
+			 * before calling gnutls_global_init(). in that
+			 * case reopen it */
+			ret = _gnutls_rnd_check();
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
 		ret = _gnutls_init_ret;
 		goto out;
 	}
