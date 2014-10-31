@@ -201,7 +201,7 @@ int _rnd_system_entropy_check(void)
 	struct stat st;
 
 	ret = fstat(_gnutls_urandom_fd, &st);
-	if (ret < 0 && st.st_mode != _gnutls_urandom_fd_mode) {
+	if (ret < 0 || st.st_mode != _gnutls_urandom_fd_mode) {
 		return _rnd_system_entropy_init();
 	}
 	return 0;

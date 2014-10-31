@@ -207,7 +207,7 @@ int gnutls_global_init(void)
 
 	_gnutls_init++;
 	if (_gnutls_init > 1) {
-		if (_gnutls_init == 1 && _gnutls_init_ret == 0) {
+		if (_gnutls_init == 2 && _gnutls_init_ret == 0) {
 			/* some applications may close the urandom fd 
 			 * before calling gnutls_global_init(). in that
 			 * case reopen it */
