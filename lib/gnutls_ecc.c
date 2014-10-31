@@ -53,6 +53,11 @@ _gnutls_ecc_ansi_x963_export(gnutls_ecc_curve_t curve, bigint_t x,
 
 	/* pad and store x */
 	byte_size = (_gnutls_mpi_get_nbits(x) + 7) / 8;
+	if (numlen < byte_size) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
+
 	size = out->size - (1 + (numlen - byte_size));
 	ret =
 	    _gnutls_mpi_print(x, &out->data[1 + (numlen - byte_size)],
@@ -63,6 +68,11 @@ _gnutls_ecc_ansi_x963_export(gnutls_ecc_curve_t curve, bigint_t x,
 	}
 
 	byte_size = (_gnutls_mpi_get_nbits(y) + 7) / 8;
+	if (numlen < byte_size) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
+
 	size = out->size - (1 + (numlen + numlen - byte_size));
 	ret =
 	    _gnutls_mpi_print(y,
