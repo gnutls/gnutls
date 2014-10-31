@@ -280,9 +280,9 @@ The resources allocated by the initialization process will be released
 on library deinitialization, or explictly by calling @funcref{gnutls_global_deinit}.
 
 Note that during initialization file descriptors may be kept open by
-GnuTLS (e.g. /dev/urandom). The helper function @funcref{gnutls_fd_in_use}
-is given to assist applications closing all unknown file descriptors
-on initialization.
+GnuTLS (e.g. /dev/urandom) on library load. Applications closing all unknown file
+descriptors must immediately call @funcref{gnutls_global_init}, after that, to
+ensure they don't disrupt GnuTLS' operation.
 
 @c In order to take advantage of the internationalization features in
 @c GnuTLS, such as translated error messages, the application must set
