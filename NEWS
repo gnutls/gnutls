@@ -38,6 +38,11 @@ GNUTLS_CERT_PURPOSE_MISMATCH is also introduced.
 
 ** libgnutls: Added a new easy and hard to misuse AEAD API (crypto.h).
 
+** libgnutls: When gnutls_certificate_set_x509_key_file2() is used in
+combination with PKCS #11, or TPM URLs, it will utilize the provided
+password as PIN if required. That would remove the requirement for the
+application to set a callback for PINs.
+
 ** libgnutls-openssl: it is no longer built by default.
 
 ** certtool: Added --p8-info option, which will print PKCS #8 information
