@@ -3316,6 +3316,7 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 					rv = pkcs11_get_attribute_avalue(sinfo->module, sinfo->pks, obj, CKA_PUBLIC_KEY_INFO, &spki);
 					if (rv == CKR_OK) {
 						ret = pkcs11_override_cert_exts(sinfo, &spki, &data);
+						gnutls_free(spki.data);
 						if (ret < 0) {
 							gnutls_assert();
 							goto cleanup;
