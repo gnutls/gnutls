@@ -1966,6 +1966,7 @@ _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
 		goto out;
 	}
 
+	id_size = sizeof(id);
 	if (gnutls_x509_crt_get_subject_key_id(cert, id, &id_size, NULL) < 0) {
 		gnutls_assert();
 		goto out;
