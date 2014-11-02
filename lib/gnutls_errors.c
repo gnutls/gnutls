@@ -62,7 +62,7 @@ static const gnutls_error_entry error_entries[] = {
 	ERROR_ENTRY(N_("An algorithm that is not enabled was negotiated."),
 		    GNUTLS_E_UNWANTED_ALGORITHM),
 	ERROR_ENTRY(N_
-		    ("A record packet with illegal version was received."),
+		    ("A packet with illegal or unsupported version was received."),
 		    GNUTLS_E_UNSUPPORTED_VERSION_PACKET),
 	ERROR_ENTRY(N_
 		    ("The Diffie-Hellman prime sent by the server is not acceptable (not long enough)."),
