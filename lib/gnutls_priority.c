@@ -837,6 +837,10 @@ static void enable_no_extensions(gnutls_priority_t c)
 {
 	c->no_extensions = 1;
 }
+static void enable_no_etm(gnutls_priority_t c)
+{
+	c->no_etm = 1;
+}
 static void enable_no_tickets(gnutls_priority_t c)
 {
 	c->no_tickets = 1;

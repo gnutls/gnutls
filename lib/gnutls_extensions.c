@@ -43,6 +43,7 @@
 #include <ext/srtp.h>
 #include <ext/alpn.h>
 #include <ext/dumbfw.h>
+#include <ext/etm.h>
 #include <gnutls_num.h>
 
 
@@ -313,6 +314,10 @@ int _gnutls_ext_init(void)
 		return ret;
 
 	ret = _gnutls_ext_register(&ext_mod_ext_master_secret);
+	if (ret != GNUTLS_E_SUCCESS)
+		return ret;
+
+	ret = _gnutls_ext_register(&ext_mod_etm);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 

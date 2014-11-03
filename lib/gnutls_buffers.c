@@ -142,6 +142,10 @@ _gnutls_record_buffer_get(content_type_t type,
 					  (int) bufel->type,
 					  _gnutls_packet2str(type),
 					  (int) type);
+		else
+			_gnutls_debug_log("received unexpected packet: %s(%d)\n",
+						_gnutls_packet2str(bufel->type), (int)bufel->type);
+
 		_mbuffer_head_remove_bytes(&session->internals.
 					   record_buffer, msg.size);
 		return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);

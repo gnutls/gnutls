@@ -134,6 +134,7 @@ typedef struct {
 	unsigned int is_mac:1;
 	unsigned int ssl_hmac:1;
 	unsigned int non_null:1;
+	unsigned int etm:1;
 	size_t tag_size;
 } auth_cipher_hd_st;
 
@@ -142,7 +143,9 @@ int _gnutls_auth_cipher_init(auth_cipher_hd_st * handle,
 			     const gnutls_datum_t * cipher_key,
 			     const gnutls_datum_t * iv,
 			     const mac_entry_st * me,
-			     const gnutls_datum_t * mac_key, int ssl_hmac,
+			     const gnutls_datum_t * mac_key,
+			     unsigned etm,
+			     unsigned ssl_hmac,
 			     int enc);
 
 int _gnutls_auth_cipher_add_auth(auth_cipher_hd_st * handle,

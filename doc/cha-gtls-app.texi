@@ -1106,7 +1106,7 @@ that TLS 1.2 requires extensions to be used, as well as safe
 renegotiation thus this option must be used with care.
 
 @item %NO_TICKETS @tab
-will prevent the sending of the TLS session ticket extension.
+will prevent the advertizing of the TLS session ticket extension.
 This is implied by the PFS keyword.
 
 @item %SERVER_PRECEDENCE @tab
@@ -1138,6 +1138,10 @@ separate records.
 @item %DISABLE_WILDCARDS @tab
 will disable matching wildcards when comparing hostnames
 in certificates.
+
+@item %NO_ETM @tab
+will disable the encrypt-then-mac TLS extension (RFC7366). This is
+implied by the %COMPAT keyword.
 
 @item %DISABLE_SAFE_RENEGOTIATION @tab
 will completely disable safe renegotiation

@@ -207,6 +207,7 @@ _gnutls_init_record_state(record_parameters_st * params,
 	ret = _gnutls_auth_cipher_init(&state->cipher_state,
 				       params->cipher, &state->key, iv,
 				       params->mac, &state->mac_secret,
+				       params->etm,
 				       (ver->id == GNUTLS_SSL3) ? 1 : 0,
 				       1 - read /*1==encrypt */ );
 	if (ret < 0 && params->cipher->id != GNUTLS_CIPHER_NULL)
@@ -353,6 +354,7 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 
 	key_size = _gnutls_cipher_get_key_size(params->cipher);
 	hash_size = _gnutls_mac_get_key_size(params->mac);
+	params->etm = session->security_parameters.etm;
 
 	ret = _gnutls_set_keys
 	    (session, params, hash_size, IV_size, key_size);
@@ -389,6 +391,7 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 	dst->compression_method = src->compression_method; \
 	dst->timestamp = src->timestamp; \
 	dst->ext_master_secret = src->ext_master_secret; \
+	dst->etm = src->etm; \
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size
 

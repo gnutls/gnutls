@@ -1049,6 +1049,7 @@ GNUTLS_3_1_0 {
 	gnutls_privkey_import_ext3;
 	gnutls_record_discard_queued;
 	gnutls_session_ext_master_secret_status;
+	gnutls_session_etm_status;
 	gnutls_priority_string_list;
 	gnutls_aead_cipher_init;
 	gnutls_aead_cipher_decrypt;

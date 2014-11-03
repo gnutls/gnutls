@@ -559,7 +559,9 @@ int print_info(gnutls_session_t session, int verbose, int print_cert)
 	if (gnutls_session_ext_master_secret_status(session)!=0)
 		printf(" extended master secret,");
 	if (gnutls_safe_renegotiation_status(session)!=0)
-		printf(" safe renegotiation");
+		printf(" safe renegotiation,");
+	if (gnutls_session_etm_status(session)!=0)
+		printf(" EtM,");
 	printf("\n");
 
 #ifdef ENABLE_DTLS_SRTP
