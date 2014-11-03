@@ -49,37 +49,11 @@ fi
 $SERV version|grep -e 1\.0\.1 >/dev/null 2>&1
 SV2=$?
 
-DSA_CERT=$srcdir/../dsa/cert.dsa.1024.pem
-DSA_KEY=$srcdir/../dsa/dsa.1024.pem
+. ./testcompat-common
 
-RSA_CERT=$srcdir/../certs/cert-rsa-2432.pem
-RSA_KEY=$srcdir/../certs/rsa-2432.pem
-
-CA_CERT=$srcdir/../../doc/credentials/x509/ca.pem
-CLI_CERT=$srcdir/../../doc/credentials/x509/clicert.pem
-CLI_KEY=$srcdir/../../doc/credentials/x509/clikey.pem
-
-CA_ECC_CERT=$srcdir/../certs/ca-cert-ecc.pem
-ECC224_CERT=$srcdir/../certs/cert-ecc.pem
-ECC224_KEY=$srcdir/../certs/ecc.pem
-
-ECC256_CERT=$srcdir/../certs/cert-ecc256.pem
-ECC256_KEY=$srcdir/../certs/ecc256.pem
-
-ECC521_CERT=$srcdir/../certs/cert-ecc521.pem
-ECC521_KEY=$srcdir/../certs/ecc521.pem
-
-ECC384_CERT=$srcdir/../certs/cert-ecc384.pem
-ECC384_KEY=$srcdir/../certs/ecc384.pem
-
-SERV_CERT=$srcdir/../../doc/credentials/x509/cert-rsa.pem
-SERV_KEY=$srcdir/../../doc/credentials/x509/key-rsa.pem
-SERV_DSA_CERT=$srcdir/../../doc/credentials/x509/cert-dsa.pem
-SERV_DSA_KEY=$srcdir/../../doc/credentials/x509/key-dsa.pem
-
-echo "#####################"
-echo "# Client mode tests #"
-echo "#####################"
+echo "#################################################"
+echo "# Client mode tests (gnutls cli-openssl server) #"
+echo "#################################################"
 
 
 launch_bare_server $$ s_server -quiet -www -accept $PORT -keyform pem -certform pem -ssl3 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
@@ -302,11 +276,10 @@ wait
 
 echo "Client mode tests were successfully completed"
 echo ""
-echo "#####################"
-echo "# Server mode tests #"
-echo "#####################"
+echo "###############################################"
+echo "# Server mode tests (gnutls server-openssl cli#"
+echo "###############################################"
 SERV="../../src/gnutls-serv$EXEEXT -q"
-PORT="5559"
 
 # Note that openssl s_client does not return error code on failure
 
