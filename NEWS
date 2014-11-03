@@ -23,13 +23,17 @@ list. It has to be explicitly enabled, e.g., with a string like
 ** libgnutls: gnutls_x509_crt_check_hostname() and friends will use
 RFC6125 comparison of hostnames. That introduces a dependency on libidn.
 
-** libgnutls: when printing a certificate request print the signature
+** libgnutls: When printing a certificate request print the signature
 algorithm as well.
 
-** libgnutls: the gnutls_handshake() process will enforce a timeout by
+** libgnutls: Added support for RFC7366 (currently, in accordance
+to the existing implementations rather than strictly following the
+text). This is enabled by default.
+
+** libgnutls: The gnutls_handshake() process will enforce a timeout by
 default.
 
-** libgnutls: if a key purpose (extended key usage) is specified for verification,
+** libgnutls: If a key purpose (extended key usage) is specified for verification,
 it is applied into intermediate certificates. The verification result
 GNUTLS_CERT_PURPOSE_MISMATCH is also introduced. 
 
