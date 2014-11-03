@@ -45,7 +45,7 @@
  * @err: error value to store in session-specific errno variable.
  *
  * Store @err in the session-specific errno variable.  Useful values
- * for @err are EAGAIN and EINTR, other values are treated will be
+ * for @err are EINTR, EAGAIN and EMSGSIZE, other values are treated will be
  * treated as real errors in the push/pull function.
  *
  * This function is useful in replacement push and pull functions set by
