@@ -26,7 +26,7 @@ close all file descriptors.
 That option is more compatible than AES or RC4.
 
 ** API and ABI modifications:
-gnutls_fd_in_use: Added
+No changes since last version.
 
 
 * Version 3.3.9 (released 2014-10-13)
