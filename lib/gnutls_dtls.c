@@ -590,7 +590,7 @@ static int record_overhead(const cipher_entry_st * cipher,
 	int total = 0;
 	int t, ret;
 
-	if (_gnutls_cipher_is_block(cipher) == CIPHER_BLOCK) {
+	if (_gnutls_cipher_type(cipher) == CIPHER_BLOCK) {
 		t = _gnutls_cipher_get_explicit_iv_size(cipher);
 		total += t;
 

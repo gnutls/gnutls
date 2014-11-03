@@ -199,7 +199,7 @@ _gnutls_init_record_state(record_parameters_st * params,
 	gnutls_datum_t *iv = NULL;
 
 	if (!_gnutls_version_has_explicit_iv(ver)) {
-		if (_gnutls_cipher_is_block(params->cipher) !=
+		if (_gnutls_cipher_type(params->cipher) !=
 		    CIPHER_STREAM)
 			iv = &state->IV;
 	}
@@ -344,7 +344,7 @@ int _gnutls_epoch_set_keys(gnutls_session_t session, uint16_t epoch)
 		    (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
 
 	if (!_gnutls_version_has_explicit_iv(ver)) {
-		if (_gnutls_cipher_is_block(params->cipher) != CIPHER_STREAM) {
+		if (_gnutls_cipher_type(params->cipher) != CIPHER_STREAM) {
 			IV_size = _gnutls_cipher_get_iv_size(params->cipher);
 		} else
 			IV_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);

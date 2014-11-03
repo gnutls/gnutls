@@ -175,11 +175,11 @@ _gnutls_cipher_suite_get_id(gnutls_kx_algorithm_t kx_algorithm,
 /* Functions for ciphers. */
 const cipher_entry_st *cipher_to_entry(gnutls_cipher_algorithm_t c);
 
-inline static int _gnutls_cipher_is_block(const cipher_entry_st * e)
+inline static cipher_type_t _gnutls_cipher_type(const cipher_entry_st * e)
 {
 	if (unlikely(e == NULL))
 		return 0;
-	return e->block;
+	return e->type;
 }
 
 inline static int _gnutls_cipher_get_block_size(const cipher_entry_st * e)
@@ -232,7 +232,7 @@ inline static int _gnutls_cipher_algo_is_aead(const cipher_entry_st * e)
 {
 	if (unlikely(e == NULL))
 		return 0;
-	return e->aead;
+	return (e->type == CIPHER_AEAD)?1:0;
 }
 
 inline static int _gnutls_cipher_is_ok(const cipher_entry_st * e)
@@ -250,11 +250,8 @@ inline static int _gnutls_cipher_get_tag_size(const cipher_entry_st * e)
 	if (unlikely(e == NULL))
 		return ret;
 
-	if (e->aead)
-		ret = e->blocksize;	/* FIXME: happens to be the same for now */
-	else
-		ret = 0;
-	return ret;
+	/* non-AEAD have 0 as tag size */
+	return e->tagsize;
 }
 
 /* Functions for key exchange. */

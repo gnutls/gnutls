@@ -290,7 +290,7 @@ typedef enum extensions_t {
 	GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
 } extensions_t;
 
-typedef enum { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
+typedef enum { CIPHER_STREAM, CIPHER_BLOCK, CIPHER_AEAD } cipher_type_t;
 
 #define RESUME_TRUE 1
 #define RESUME_FALSE 0
@@ -463,11 +463,11 @@ typedef struct cipher_entry_st {
 	gnutls_cipher_algorithm_t id;
 	uint16_t blocksize;
 	uint16_t keysize;
-	bool block;
+	cipher_type_t type;
 	uint16_t implicit_iv;	/* the size of implicit IV - the IV generated but not sent */
 	uint16_t explicit_iv;	/* the size of explicit IV - the IV stored in record */
 	uint16_t cipher_iv;	/* the size of IV needed by the cipher */
-	bool aead;	/* Whether it is authenc cipher */
+	uint16_t tagsize;
 } cipher_entry_st;
 
 /* This structure is used both for MACs and digests
@@ -1080,7 +1080,7 @@ inline static size_t max_user_send_size(gnutls_session_t session,
 		max = session->security_parameters.max_record_send_size;
 		/* DTLS data MTU accounts for those */
 
-		if (_gnutls_cipher_is_block(record_params->cipher))
+		if (_gnutls_cipher_type(record_params->cipher) != CIPHER_STREAM)
 			max -=
 			    _gnutls_cipher_get_block_size(record_params->
 							  cipher);

@@ -75,7 +75,7 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 	    _gnutls_cipher_init(&h->ctx_enc, e, key,
 				iv, 1);
 
-	if (ret >= 0 && _gnutls_cipher_is_block(e) != 0)
+	if (ret >= 0 && _gnutls_cipher_type(e) == CIPHER_BLOCK)
 		ret =
 		    _gnutls_cipher_init(&h->ctx_dec, e, key, iv, 0);
 
@@ -156,7 +156,7 @@ gnutls_cipher_set_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
 
 	_gnutls_cipher_setiv(&h->ctx_enc, iv, ivlen);
 
-	if (_gnutls_cipher_is_block(h->ctx_enc.e) != 0)
+	if (_gnutls_cipher_type(h->ctx_enc.e) == CIPHER_BLOCK)
 		_gnutls_cipher_setiv(&h->ctx_dec, iv, ivlen);
 }
 
@@ -204,7 +204,7 @@ gnutls_cipher_decrypt(gnutls_cipher_hd_t handle, void *ctext,
 {
 	api_cipher_hd_st *h = handle;
 
-	if (_gnutls_cipher_is_block(h->ctx_enc.e) == 0)
+	if (_gnutls_cipher_type(h->ctx_enc.e) != CIPHER_BLOCK)
 		return _gnutls_cipher_decrypt(&h->ctx_enc, ctext,
 					      ctext_len);
 	else
@@ -262,7 +262,7 @@ gnutls_cipher_decrypt2(gnutls_cipher_hd_t handle, const void *ctext,
 {
 	api_cipher_hd_st *h = handle;
 
-	if (_gnutls_cipher_is_block(h->ctx_enc.e) == 0)
+	if (_gnutls_cipher_type(h->ctx_enc.e) != CIPHER_BLOCK)
 		return _gnutls_cipher_decrypt2(&h->ctx_enc, ctext,
 					       ctext_len, ptext,
 					       ptext_len);
@@ -286,7 +286,7 @@ void gnutls_cipher_deinit(gnutls_cipher_hd_t handle)
 	api_cipher_hd_st *h = handle;
 
 	_gnutls_cipher_deinit(&h->ctx_enc);
-	if (_gnutls_cipher_is_block(h->ctx_enc.e) != 0)
+	if (_gnutls_cipher_type(h->ctx_enc.e) == CIPHER_BLOCK)
 		_gnutls_cipher_deinit(&h->ctx_dec);
 	gnutls_free(handle);
 }
@@ -646,7 +646,7 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
 	const cipher_entry_st* e;
 
 	e = cipher_to_entry(cipher);
-	if (e == NULL || e->aead == 0)
+	if (e == NULL || e->type != CIPHER_AEAD)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	if (tag_size == 0)
