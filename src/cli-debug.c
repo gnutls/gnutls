@@ -77,6 +77,7 @@ typedef struct {
 	const char *suc_str;
 	const char *fail_str;
 	const char *unsure_str;
+	unsigned https_only;
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
@@ -111,7 +112,7 @@ static const TLS_TEST tls_tests[] = {
 	{"encrypt-then-MAC (RFC7366) support", test_etm, "yes", "no", "dunno"},
 	{"ext master secret (draft-ietf-tls-session-hash) support", test_ext_master_secret, "yes", "no", "dunno"},
 	{"for HTTPS server name", test_server, NULL, "failed",
-	 "not checked"},
+	 "not checked", 1},
 	{"for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes",
 	 "dunno"},
 	{"for version rollback bug in Client Hello", test_version_rollback,
@@ -272,6 +273,10 @@ int main(int argc, char **argv)
 					       hostname, strlen(hostname));
 
 		do {
+			if (strcmp(app_proto, "https") != 0 && tls_tests[i].https_only != 0) {
+				i++;
+				break;
+			}
 
 			ret = tls_tests[i].func(state);
 

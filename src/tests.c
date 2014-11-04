@@ -142,9 +142,6 @@ test_code_t test_server(gnutls_session_t session)
 	char *p;
 	const char snd_buf[] = "GET / HTTP/1.0\r\n\r\n";
 
-	if (verbose == 0)
-		return TEST_IGNORE;
-
 	buf[sizeof(buf) - 1] = 0;
 
 	sprintf(prio_str, INIT_STR
