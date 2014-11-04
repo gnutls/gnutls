@@ -245,7 +245,7 @@ gnutls_alpn_get_selected_protocol(gnutls_session_t session,
  * @flags: zero or %GNUTLS_ALPN_*
  *
  * This function is to be used by both clients and servers, to declare
- * the supported ALPN protocols, which are used during peer negotiation.
+ * the supported ALPN protocols, which are used during negotiation with peer.
  *
  * If %GNUTLS_ALPN_MAND is specified the connection will be aborted
  * if no matching ALPN protocol is found.
