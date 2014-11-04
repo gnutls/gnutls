@@ -3,7 +3,7 @@
 @cindex error codes
 
 The error codes used throughout the library are described below.  The
-return code @code{GNUTLS_E_SUCCESS} indicate successful operation, and
+return code @code{GNUTLS_E_SUCCESS} indicates a successful operation, and
 is guaranteed to have the value 0, so you can use it in logical
 expressions.
 
