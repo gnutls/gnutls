@@ -69,8 +69,16 @@ SERV="../../src/gnutls-serv$EXEEXT -q"
 
 rm -f $LOGFILE
 
+for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
+do
+
+if ! test -z "$ADD";then
+echo ""
+echo "** Modifier: $ADD"
+fi
+
 echo "Check SSL 3.0 with RSA ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
 wait_server $PID
 
 $POLARSSL_CLI server_port=$PORT server_name=localhost max_version=ssl3 crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
@@ -80,7 +88,7 @@ kill $PID
 wait
 
 echo "Check SSL 3.0 with DHE-RSA ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
 wait_server $PID
 
 $POLARSSL_CLI server_name=localhost server_port=$PORT max_version=ssl3 crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
@@ -103,7 +111,7 @@ wait
 #TLS 1.0
 
 echo "Check TLS 1.0 with DHE-RSA ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
 wait_server $PID
 
 $POLARSSL_CLI  server_name=localhost min_version=tls1 max_version=tls1 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
@@ -113,7 +121,7 @@ kill $PID
 wait
 
 #echo "Check TLS 1.0 with DHE-DSS ciphersuite"
-#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS" --x509certfile $SERV_DSA_CERT --x509keyfile $SERV_DSA_KEY --dhparams params.dh  & PID=$!
+#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS$ADD" --x509certfile $SERV_DSA_CERT --x509keyfile $SERV_DSA_KEY --dhparams params.dh  & PID=$!
 #wait_server $PID
 
 #$POLARSSL_CLI  server_name=localhost min_version=tls1 max_version=tls1 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
@@ -123,7 +131,7 @@ wait
 #wait
 
 echo "Check TLS 1.0 with ECDHE-RSA ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-RSA-AES128-SHA 
@@ -134,7 +142,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.0 with PSK ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+PSK:+CURVE-ALL$ADD" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher PSK-AES128-SHA 
@@ -145,7 +153,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.0 with DHE-PSK ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-PSK:+CURVE-ALL$ADD" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher PSK-AES128-SHA 
@@ -156,7 +164,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.0 with ECDHE-PSK ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-PSK:+CURVE-ALL$ADD" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher PSK-AES128-SHA 
@@ -167,7 +175,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.0 with RSA-PSK ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA-PSK:+CURVE-ALL$ADD" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher RSA-PSK-AES128-SHA 
@@ -179,7 +187,7 @@ wait
 
 if test $ALL_CURVES = 1;then
 	echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP224R1)"
-	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY --x509cafile $CA_ECC_CERT & PID=$!
+	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL$ADD" --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY --x509cafile $CA_ECC_CERT & PID=$!
 	wait_server $PID
 
 	#-cipher ECDHE-ECDSA-AES128-SHA 
@@ -191,7 +199,7 @@ if test $ALL_CURVES = 1;then
 fi
 
 echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP256R1)"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC256_CERT --x509keyfile $ECC256_KEY --x509cafile $CA_ECC_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL$ADD" --x509certfile $ECC256_CERT --x509keyfile $ECC256_KEY --x509cafile $CA_ECC_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-ECDSA-AES128-SHA 
@@ -202,7 +210,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP384R1)"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY --x509cafile $CA_ECC_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL$ADD" --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY --x509cafile $CA_ECC_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-ECDSA-AES128-SHA 
@@ -213,7 +221,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP521R1)"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY --x509cafile $CA_ECC_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL$ADD" --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY --x509cafile $CA_ECC_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-ECDSA-AES128-SHA 
@@ -224,7 +232,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.2 with DHE-RSA ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
 wait_server $PID
 
 $POLARSSL_CLI  server_name=localhost min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
@@ -234,7 +242,7 @@ kill $PID
 wait
 
 #echo "Check TLS 1.2 with DHE-DSS ciphersuite"
-#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS" --x509certfile $SERV_DSA_CERT --x509keyfile $SERV_DSA_KEY --dhparams params.dh  & PID=$!
+#launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS$ADD" --x509certfile $SERV_DSA_CERT --x509keyfile $SERV_DSA_KEY --dhparams params.dh  & PID=$!
 #wait_server $PID
 #
 #$POLARSSL_CLI  server_name=localhost min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
@@ -244,7 +252,7 @@ wait
 #wait
 
 echo "Check TLS 1.2 with ECDHE-RSA ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-RSA:+CURVE-ALL" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-RSA:+CURVE-ALL$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-RSA-AES128-SHA 
@@ -256,7 +264,7 @@ wait
 
 if test $ALL_CURVES = 1;then
 	echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP224R1)"
-	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY --x509cafile $CA_ECC_CERT & PID=$!
+	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL$ADD" --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY --x509cafile $CA_ECC_CERT & PID=$!
 	wait_server $PID
 
 	#-cipher ECDHE-ECDSA-AES128-SHA 
@@ -268,7 +276,7 @@ if test $ALL_CURVES = 1;then
 fi
 
 echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP256R1)"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC256_CERT --x509keyfile $ECC256_KEY --x509cafile $CA_ECC_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL$ADD" --x509certfile $ECC256_CERT --x509keyfile $ECC256_KEY --x509cafile $CA_ECC_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-ECDSA-AES128-SHA 
@@ -279,7 +287,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP384R1)"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY --x509cafile $CA_ECC_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL$ADD" --x509certfile $ECC384_CERT --x509keyfile $ECC384_KEY --x509cafile $CA_ECC_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-ECDSA-AES128-SHA 
@@ -290,7 +298,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.2 with ECDHE-ECDSA ciphersuite (SECP521R1)"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY --x509cafile $CA_ECC_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-ECDSA:+CURVE-ALL$ADD" --x509certfile $ECC521_CERT --x509keyfile $ECC521_KEY --x509cafile $CA_ECC_CERT & PID=$!
 wait_server $PID
 
 #-cipher ECDHE-ECDSA-AES128-SHA 
@@ -301,7 +309,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.2 with PSK ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+PSK:+CURVE-ALL$ADD" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher PSK-AES128-SHA 
@@ -312,7 +320,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.2 with DHE-PSK ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-PSK:+CURVE-ALL$ADD" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher PSK-AES128-SHA 
@@ -323,7 +331,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.2 with ECDHE-PSK ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-PSK:+CURVE-ALL$ADD" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher PSK-AES128-SHA 
@@ -334,7 +342,7 @@ kill $PID
 wait
 
 echo "Check TLS 1.2 with RSA-PSK ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA-PSK:+CURVE-ALL$ADD" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
 wait_server $PID
 
 #-cipher RSA-PSK-AES128-SHA 
@@ -344,6 +352,7 @@ $POLARSSL_CLI  server_name=localhost psk_identity=jas psk=9e32cf7786321a828ef766
 kill $PID
 wait
 
+done
 
 rm -f $LOGFILE
 
