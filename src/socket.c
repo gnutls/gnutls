@@ -222,7 +222,7 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 	    int udp, const char *msg)
 {
 	struct addrinfo hints, *res, *ptr;
-	int sd, err;
+	int sd, err = 0;
 	char buffer[MAX_BUF + 1];
 	char portname[16] = { 0 };
 	char *a_hostname = (char*)hostname;
@@ -286,16 +286,17 @@ socket_open(socket_st * hd, const char *hostname, const char *service,
 
 		err = connect(sd, ptr->ai_addr, ptr->ai_addrlen);
 		if (err < 0) {
-			int e = errno;
-			fprintf(stderr, "Cannot connect to %s:%s: %s\n",
-				buffer, portname, strerror(e));
 			continue;
 		}
 		break;
 	}
 
-	if (err != 0)
+	if (err != 0) {
+		int e = errno;
+		fprintf(stderr, "Could not connect to %s:%s: %s\n",
+				buffer, portname, strerror(e));
 		exit(1);
+	}
 
 	if (sd == -1) {
 		fprintf(stderr, "Could not find a supported socket\n");
