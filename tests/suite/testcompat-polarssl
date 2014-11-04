@@ -54,6 +54,11 @@ if test $SV != 0;then
   exit 77
 fi
 
+if ! test -x $POLARSSL;then
+  echo "PolarSSL is required for this test to run"
+  exit 77
+fi
+
 . ./testcompat-common
 
 echo ""
