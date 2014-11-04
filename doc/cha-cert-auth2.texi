@@ -146,14 +146,14 @@ revocation checking, however, several problems with CRLs have been
 identified @xcite{RIVESTCRL}.
 
 The Online Certificate Status Protocol, or @acronym{OCSP} @xcite{RFC2560}, 
-is a widely implemented protocol to perform certificate revocation status
+is a widely implemented protocol which performs certificate revocation status
 checking.  An application that wish to verify the
 identity of a peer will verify the certificate against a set of
 trusted certificates and then check whether the certificate is listed
 in a CRL and/or perform an OCSP check for the certificate.
 
 Note that in the context of a TLS session the server may provide an
-OCSP response that will used during the TLS certificate verification 
+OCSP response that will be used during the TLS certificate verification
 (see @funcref{gnutls_certificate_verify_peers2}).
 You may obtain this response using @funcref{gnutls_ocsp_status_request_get}.
 
@@ -169,8 +169,8 @@ extracts this information from a certificate.
 
 There are several functions in GnuTLS for creating and manipulating
 OCSP requests and responses.  The general idea is that a client
-application create an OCSP request object, store some information
-about the certificate to check in the request, and then export the
+application creates an OCSP request object, stores some information
+about the certificate to check in the request, and then exports the
 request in DER format.  The request will then need to be sent to the
 OCSP responder, which needs to be done by the application (GnuTLS does
 not send and receive OCSP packets).  Normally an OCSP response is

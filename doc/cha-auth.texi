@@ -33,7 +33,7 @@ methods in @acronym{GnuTLS} in various scenarios.
 
 @subsection Two peers with an out-of-band channel
 
-Let's consider two peers need to communicate over an untrusted channel
+Let's consider two peers who need to communicate over an untrusted channel
 (the Internet), but have an out-of-band channel available. The latter
 channel is considered safe from eavesdropping and message modification and thus
 can be used for an initial bootstrapping of the protocol. The options 
@@ -44,7 +44,7 @@ client communicate a shared randomly generated key over the trusted
 channel and use it to negotiate further sessions over the untrusted channel.
 
 @item Passwords (see @ref{SRP authentication}). The client communicates
-to the server his username and password of choice and uses it to
+to the server its username and password of choice and uses it to
 negotiate further sessions over the untrusted channel.
 
 @item Public keys (see @ref{Certificate authentication}). The client 
@@ -101,7 +101,7 @@ the client provided over the initial server-authenticated channel. The
 available options are:
 @itemize
 @item Passwords (see @ref{SRP authentication}). The client communicates
-to the server his username and password of choice on the initial
+to the server its username and password of choice on the initial
 server-authenticated connection and uses it to negotiate further sessions. 
 This is possible because the SRP protocol allows for the server to be 
 authenticated using a certificate and the client using the

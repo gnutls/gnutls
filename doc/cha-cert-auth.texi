@@ -654,7 +654,7 @@ used to preprocess the input to the signature algorithm. This works as
 long as it is difficult enough to generate two different messages with
 the same hash algorithm output. In that case the same signature could
 be used as a proof for both messages. Nobody wants to sign an innocent
-message of donating 1 euro to Greenpeace and find out that he
+message of donating 1 euro to Greenpeace and find out that they
 donated 1.000.000 euros to Bad Inc.
 
 For a hash algorithm to be called cryptographic the following three
