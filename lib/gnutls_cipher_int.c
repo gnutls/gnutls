@@ -253,7 +253,7 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 		} else {
 			uint8_t *orig_ciphertext = ciphertext;
 
-			if (handle->etm == 0) {
+			if (handle->etm == 0 || handle->cipher.e->type != CIPHER_BLOCK) {
 				MAC(handle, text, textlen);
 			}
 
@@ -277,7 +277,7 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 			if (ciphertext != text && textlen > 0)
 				memcpy(ciphertext, text, textlen);
 
-			if (handle->etm == 0) {
+			if (handle->etm == 0 || handle->cipher.e->type != CIPHER_BLOCK) {
 				ret =
 				    _gnutls_auth_cipher_tag(handle,
 							    ciphertext + textlen,
@@ -302,7 +302,7 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
-			if (handle->etm != 0) {
+			if (handle->etm != 0 && handle->cipher.e->type == CIPHER_BLOCK) {
 				MAC(handle, orig_ciphertext, l);
 				MAC(handle, ciphertext, textlen);
 
@@ -341,7 +341,7 @@ int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
 	if (unlikely(ciphertextlen > textlen))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	if (handle->is_mac && handle->etm != 0) {
+	if (handle->is_mac && (handle->etm != 0 && handle->cipher.e->type == CIPHER_BLOCK)) {
 		/* The MAC is not to be hashed */
 		ciphertextlen -= handle->tag_size;
 
@@ -357,7 +357,7 @@ int _gnutls_auth_cipher_decrypt2(auth_cipher_hd_st * handle,
 	} else if (handle->non_null == 0 && text != ciphertext)
 		memcpy(text, ciphertext, ciphertextlen);
 
-	if (handle->is_mac && handle->etm == 0) {
+	if (handle->is_mac && (handle->etm == 0 || handle->cipher.e->type != CIPHER_BLOCK)) {
 		/* The MAC is not to be hashed */
 		ciphertextlen -= handle->tag_size;
 

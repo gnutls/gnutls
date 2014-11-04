@@ -303,7 +303,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 	int auth_cipher =
 	    _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
 	uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
-	unsigned imp_iv_size, exp_iv_size;
+	unsigned imp_iv_size = 0, exp_iv_size = 0;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -396,7 +396,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 		cipher_data += exp_iv_size;
 	}
 
-	if (params->etm && algo_type != CIPHER_AEAD)
+	if (params->etm && algo_type == CIPHER_BLOCK)
 		ret = length-tag_size;
 	else
 		ret = compressed->size;
@@ -506,7 +506,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 	blocksize = _gnutls_cipher_get_block_size(params->cipher);
 
 	/* if EtM mode and not AEAD */
-	if (params->etm !=0 && cipher_type != CIPHER_AEAD) {
+	if (params->etm !=0 && cipher_type == CIPHER_BLOCK) {
 		if (unlikely(ciphertext->size < tag_size))
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
@@ -626,18 +626,16 @@ ciphertext_to_compressed(gnutls_session_t session,
 		/* Pass the type, version, length and compressed through
 		 * MAC.
 		 */
-		if (params->etm == 0) {
-			preamble_size =
-			    make_preamble(UINT64DATA(*sequence), type,
-					  length, ver, preamble);
+		preamble_size =
+		    make_preamble(UINT64DATA(*sequence), type,
+				  length, ver, preamble);
 
-			ret =
-			    _gnutls_auth_cipher_add_auth(&params->read.
-							 cipher_state, preamble,
-							 preamble_size);
-			if (unlikely(ret < 0))
-				return gnutls_assert_val(ret);
-		}
+		ret =
+		    _gnutls_auth_cipher_add_auth(&params->read.
+						 cipher_state, preamble,
+						 preamble_size);
+		if (unlikely(ret < 0))
+			return gnutls_assert_val(ret);
 
 		if (unlikely
 		    ((unsigned) length_to_decrypt > compressed->size)) {
@@ -780,7 +778,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-	if (params->etm ==0 && cipher_type != CIPHER_AEAD) {
+	if (params->etm == 0 || cipher_type != CIPHER_BLOCK) {
 		ret =
 		    _gnutls_auth_cipher_tag(&params->read.cipher_state, tag,
 					    tag_size);

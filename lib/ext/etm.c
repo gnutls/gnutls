@@ -79,7 +79,7 @@ _gnutls_ext_etm_recv_params(gnutls_session_t session,
 		const cipher_entry_st *c;
 
 		c = _gnutls_cipher_suite_get_cipher_algo(session->security_parameters.cipher_suite);
-		if (c == NULL || c->type == CIPHER_AEAD)
+		if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
 			return 0;
 
 		session->security_parameters.etm = 1;
@@ -106,7 +106,7 @@ _gnutls_ext_etm_send_params(gnutls_session_t session,
 		extension_priv_data_t epriv;
 
 		c = _gnutls_cipher_suite_get_cipher_algo(session->security_parameters.cipher_suite);
-		if (c == NULL || c->type == CIPHER_AEAD)
+		if (c == NULL || (c->type == CIPHER_AEAD || c->type == CIPHER_STREAM))
 			return 0;
 
 		ret = _gnutls_ext_get_session_data(session,
