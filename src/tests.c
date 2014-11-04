@@ -138,7 +138,7 @@ _gnutls_priority_set_direct(gnutls_session_t session, const char *str)
 test_code_t test_server(gnutls_session_t session)
 {
 	int ret, i = 0;
-	char buf[5 * 1024];
+	static char buf[5 * 1024];
 	char *p;
 	const char snd_buf[] = "GET / HTTP/1.0\r\n\r\n";
 
@@ -163,18 +163,19 @@ test_code_t test_server(gnutls_session_t session)
 	if (ret < 0)
 		return TEST_FAILED;
 
+	ext_text = "unknown";
 	p = strstr(buf, "Server:");
-	if (p != NULL)
-		p = strchr(p, ':');
 	if (p != NULL) {
-		p++;
+		p+=7;
+		if (*p == ' ') p++;
+		ext_text = p;
 		while (*p != 0 && *p != '\r' && *p != '\n') {
-			putc(*p, stdout);
 			p++;
 			i++;
 			if (i > 128)
 				break;
 		}
+		*p = 0;
 	}
 
 	return TEST_SUCCEED;
@@ -303,6 +304,9 @@ test_code_t test_dhe_group(gnutls_session_t session)
 	int ret, ret2;
 	gnutls_datum_t gen, prime, pubkey2;
 	const char *print;
+	FILE *fp;
+
+	remove("debug-dh.out");
 
 	if (verbose == 0 || pubkey.data == NULL)
 		return TEST_IGNORE;
@@ -318,29 +322,60 @@ test_code_t test_dhe_group(gnutls_session_t session)
 
 	ret2 = gnutls_dh_get_group(session, &gen, &prime);
 	if (ret2 >= 0) {
-		printf("\n");
+
+		fp = fopen("debug-dh.out", "w");
+		if (fp == NULL)
+			return TEST_FAILED;
+
+		ext_text = "saved in debug-dh.out";
 
 		print = raw_to_string(gen.data, gen.size);
-		if (print)
-			printf(" Generator [%d bits]: %s\n", gen.size * 8,
-			       print);
+		if (print) {
+			fprintf(fp, " Generator [%d bits]: %s\n", gen.size * 8,
+				print);
+		}
 
 		print = raw_to_string(prime.data, prime.size);
-		if (print)
-			printf(" Prime [%d bits]: %s\n", prime.size * 8,
-			       print);
+		if (print) {
+			fprintf(fp, " Prime [%d bits]: %s\n", prime.size * 8,
+		        	print);
+		}
 
 		gnutls_dh_get_pubkey(session, &pubkey2);
 		print = raw_to_string(pubkey2.data, pubkey2.size);
-		if (print)
-			printf(" Pubkey [%d bits]: %s\n", pubkey2.size * 8,
-			       print);
+		if (print) {
+			fprintf(fp, " Pubkey [%d bits]: %s\n", pubkey2.size * 8,
+				print);
+		}
 
 		if (pubkey2.data && pubkey2.size == pubkey.size &&
 		    memcmp(pubkey.data, pubkey2.data, pubkey.size) == 0) {
-			printf
-			    (" (public key seems to be static among sessions)\n");
+			fprintf
+			    (fp, " (public key seems to be static among sessions)\n");
 		}
+
+		{
+			/* save the PKCS #3 params */
+			gnutls_dh_params_t dhp;
+			gnutls_datum p3;
+			
+			ret2 = gnutls_dh_params_init(&dhp);
+			if (ret2 < 0)
+				return TEST_FAILED;
+
+			ret2 = gnutls_dh_params_import_raw(dhp, &prime, &gen);
+			if (ret2 < 0)
+				return TEST_FAILED;
+
+			ret2 = gnutls_dh_params_export2_pkcs3(dhp, GNUTLS_X509_FMT_PEM, &p3);
+			if (ret2 < 0)
+				return TEST_FAILED;
+
+			fprintf(fp, "\n%s\n", p3.data);
+			gnutls_free(p3.data);
+		}
+
+		fclose(fp);
 	}
 	return ret;
 }
@@ -1088,6 +1123,9 @@ extern char *hostname;
 test_code_t test_certificate(gnutls_session_t session)
 {
 	int ret;
+	FILE *fp;
+
+	remove("debug-certs.out");
 
 	if (verbose == 0)
 		return TEST_IGNORE;
@@ -1103,10 +1141,15 @@ test_code_t test_certificate(gnutls_session_t session)
 	if (ret == TEST_FAILED)
 		return ret;
 
-	printf("\n");
-	print_cert_info(session, GNUTLS_CRT_PRINT_FULL, verbose);
-
-	return TEST_SUCCEED;
+	fp = fopen("debug-certs.out", "w");
+	if (fp != NULL) {
+		fprintf(fp, "\n");
+		print_cert_info2(session, GNUTLS_CRT_PRINT_FULL, fp, verbose);
+		fclose(fp);
+		ext_text = "saved in debug-certs.out";
+		return TEST_SUCCEED;
+	}
+	return TEST_FAILED;
 }
 
 /* A callback function to be used at the certificate selection time.
@@ -1120,28 +1163,34 @@ cert_callback(gnutls_session_t session,
 	char issuer_dn[256];
 	int i, ret;
 	size_t len;
+	FILE *fp;
 
 	if (verbose == 0)
+		return -1;
+
+	fp = fopen("debug-cas.out", "w");
+	if (fp == NULL)
 		return -1;
 
 	/* Print the server's trusted CAs
 	 */
 	printf("\n");
 	if (nreqs > 0)
-		printf("- Server's trusted authorities:\n");
+		fprintf(fp, "- Server's trusted authorities:\n");
 	else
-		printf
-		    ("- Server did not send us any trusted authorities names.\n");
+		fprintf
+		    (fp, "- Server did not send us any trusted authorities names.\n");
 
 	/* print the names (if any) */
 	for (i = 0; i < nreqs; i++) {
 		len = sizeof(issuer_dn);
 		ret = gnutls_x509_rdn_get(&req_ca_rdn[i], issuer_dn, &len);
 		if (ret >= 0) {
-			printf("   [%d]: ", i);
-			printf("%s\n", issuer_dn);
+			fprintf(fp, "   [%d]: ", i);
+			fprintf(fp, "%s\n", issuer_dn);
 		}
 	}
+	fclose(fp);
 
 	return -1;
 
@@ -1154,6 +1203,7 @@ test_code_t test_server_cas(gnutls_session_t session)
 {
 	int ret;
 
+	remove("debug-cas.out");
 	if (verbose == 0)
 		return TEST_IGNORE;
 
@@ -1170,5 +1220,10 @@ test_code_t test_server_cas(gnutls_session_t session)
 
 	if (ret == TEST_FAILED)
 		return ret;
+
+	if (access("debug-cas.out", R_OK) == 0)
+		ext_text = "saved in debug-cas.out";
+	else
+		ext_text = "none";
 	return TEST_SUCCEED;
 }
