@@ -40,7 +40,7 @@ GNUTLS_CERT_PURPOSE_MISMATCH is also introduced.
 ** libgnutls: Added support for the extended master secret
 (triple-handshake fix) following draft-ietf-tls-session-hash-02.
 
-** libgnutls: Added a new easy and hard to misuse AEAD API (crypto.h).
+** libgnutls: Added a new simple and hard to misuse AEAD API (crypto.h).
 
 ** libgnutls: When gnutls_certificate_set_x509_key_file2() is used in
 combination with PKCS #11, or TPM URLs, it will utilize the provided
