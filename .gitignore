@@ -722,3 +722,4 @@ tests/suite/pkcs11-multi
 tests/suite/testpkcs11.debug
 tests/suite/pkcs11-get-issuer2
 tests/suite/pkcs11-privkey
+tests/mini-record-failure
