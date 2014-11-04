@@ -128,6 +128,50 @@ $POLARSSL_CLI  server_name=localhost min_version=tls1 max_version=tls1 server_po
 kill $PID
 wait
 
+echo "Check TLS 1.0 with PSK ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+wait_server $PID
+
+#-cipher PSK-AES128-SHA 
+$POLARSSL_CLI  server_name=localhost psk_identity=jas psk=9e32cf7786321a828ef7668f09fb35db min_version=tls1 max_version=tls1 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.0 with DHE-PSK ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+wait_server $PID
+
+#-cipher PSK-AES128-SHA 
+$POLARSSL_CLI  server_name=localhost psk_identity=jas psk=9e32cf7786321a828ef7668f09fb35db min_version=tls1 max_version=tls1 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.0 with ECDHE-PSK ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+wait_server $PID
+
+#-cipher PSK-AES128-SHA 
+$POLARSSL_CLI  server_name=localhost psk_identity=jas psk=9e32cf7786321a828ef7668f09fb35db min_version=tls1 max_version=tls1 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.0 with RSA-PSK ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+wait_server $PID
+
+#-cipher RSA-PSK-AES128-SHA 
+$POLARSSL_CLI  server_name=localhost psk_identity=jas psk=9e32cf7786321a828ef7668f09fb35db min_version=tls1 max_version=tls1 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
 if test $ALL_CURVES = 1;then
 	echo "Check TLS 1.0 with ECDHE-ECDSA ciphersuite (SECP224R1)"
 	launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-ECDSA:+CURVE-ALL" --x509certfile $ECC224_CERT --x509keyfile $ECC224_KEY --x509cafile $CA_ECC_CERT & PID=$!
@@ -250,6 +294,51 @@ $POLARSSL_CLI  server_name=localhost min_version=tls1_2 max_version=tls1_2 serve
 
 kill $PID
 wait
+
+echo "Check TLS 1.2 with PSK ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+wait_server $PID
+
+#-cipher PSK-AES128-SHA 
+$POLARSSL_CLI  server_name=localhost psk_identity=jas psk=9e32cf7786321a828ef7668f09fb35db min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.2 with DHE-PSK ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+wait_server $PID
+
+#-cipher PSK-AES128-SHA 
+$POLARSSL_CLI  server_name=localhost psk_identity=jas psk=9e32cf7786321a828ef7668f09fb35db min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.2 with ECDHE-PSK ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+ECDHE-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+wait_server $PID
+
+#-cipher PSK-AES128-SHA 
+$POLARSSL_CLI  server_name=localhost psk_identity=jas psk=9e32cf7786321a828ef7668f09fb35db min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.2 with RSA-PSK ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+RSA-PSK:+CURVE-ALL" --pskpasswd $SERV_PSK --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT & PID=$!
+wait_server $PID
+
+#-cipher RSA-PSK-AES128-SHA 
+$POLARSSL_CLI  server_name=localhost psk_identity=jas psk=9e32cf7786321a828ef7668f09fb35db min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
 
 rm -f $LOGFILE
 

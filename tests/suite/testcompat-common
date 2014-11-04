@@ -47,3 +47,6 @@ SERV_CERT=$srcdir/../../doc/credentials/x509/cert-rsa.pem
 SERV_KEY=$srcdir/../../doc/credentials/x509/key-rsa.pem
 SERV_DSA_CERT=$srcdir/../../doc/credentials/x509/cert-dsa.pem
 SERV_DSA_KEY=$srcdir/../../doc/credentials/x509/key-dsa.pem
+
+SERV_PSK=$srcdir/../../doc/credentials/psk-passwd.txt 
+
