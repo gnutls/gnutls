@@ -143,7 +143,7 @@ test_code_t test_server(gnutls_session_t session)
 	const char snd_buf[] = "GET / HTTP/1.0\r\n\r\n";
 
 	if (verbose == 0)
-		return TEST_UNSURE;
+		return TEST_IGNORE;
 
 	buf[sizeof(buf) - 1] = 0;
 
@@ -238,6 +238,50 @@ test_code_t test_safe_renegotiation(gnutls_session_t session)
 	return ret;
 }
 
+test_code_t test_etm(gnutls_session_t session)
+{
+	int ret;
+
+	sprintf(prio_str, INIT_STR
+		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+		":" ALL_KX, protocol_str);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+
+	if (ret < 0)
+		return TEST_FAILED;
+
+	if (gnutls_session_etm_status(session) != 0)
+		return TEST_SUCCEED;
+
+	return TEST_FAILED;
+}
+
+test_code_t test_ext_master_secret(gnutls_session_t session)
+{
+	int ret;
+
+	sprintf(prio_str, INIT_STR
+		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+		":" ALL_KX, protocol_str);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+
+	if (ret < 0)
+		return TEST_FAILED;
+
+	if (gnutls_session_ext_master_secret_status(session) != 0)
+		return TEST_SUCCEED;
+
+	return TEST_FAILED;
+}
+
 test_code_t test_safe_renegotiation_scsv(gnutls_session_t session)
 {
 	int ret;
@@ -306,8 +350,7 @@ test_code_t test_ecdhe_curve(gnutls_session_t session)
 	if (curve == GNUTLS_ECC_CURVE_INVALID)
 		return TEST_IGNORE;
 
-	printf("\n Curve %s", gnutls_ecc_curve_get_name(curve));
-
+	ext_text = gnutls_ecc_curve_get_name(curve);
 	return TEST_SUCCEED;
 }
 

@@ -39,6 +39,8 @@ test_code_t test_3des(gnutls_session_t state);
 test_code_t test_arcfour(gnutls_session_t state);
 test_code_t test_tls1(gnutls_session_t state);
 test_code_t test_safe_renegotiation(gnutls_session_t state);
+test_code_t test_ext_master_secret(gnutls_session_t state);
+test_code_t test_etm(gnutls_session_t state);
 test_code_t test_safe_renegotiation_scsv(gnutls_session_t state);
 test_code_t test_tls1_1(gnutls_session_t state);
 test_code_t test_tls1_2(gnutls_session_t state);
