@@ -117,7 +117,7 @@ static const TLS_TEST tls_tests[] = {
 	 "no", "yes", "dunno"},
 	{"whether the server ignores the RSA PMS version",
 	 test_rsa_pms_version_check, "yes", "no", "dunno"},
-	{"whether small records (512 bytes) are accepted",
+	{"whether small records (512 bytes) are tolerated on handshake",
 	 test_small_records, "yes", "no", "dunno"},
 	{"whether cipher suites not in SSL 3.0 spec are accepted",
 	 test_unknown_ciphersuites, "yes", "no", "dunno"},
