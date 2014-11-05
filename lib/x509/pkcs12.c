@@ -1543,7 +1543,6 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 				     GNUTLS_PKCS_PLAIN : 0);
 				if (ret < 0) {
 					gnutls_assert();
-					gnutls_x509_privkey_deinit(*key);
 					goto done;
 				}
 
@@ -1554,7 +1553,6 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 								   &key_id_size);
 				if (ret < 0) {
 					gnutls_assert();
-					gnutls_x509_privkey_deinit(*key);
 					goto done;
 				}
 
