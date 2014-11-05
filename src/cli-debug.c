@@ -62,6 +62,7 @@ extern int tls1_ok;
 extern int tls1_1_ok;
 extern int tls1_2_ok;
 extern int ssl3_ok;
+extern const char *ext_text;
 
 static void tls_log_func(int level, const char *str)
 {
@@ -76,59 +77,51 @@ typedef struct {
 	const char *suc_str;
 	const char *fail_str;
 	const char *unsure_str;
+	unsigned https_only;
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
-	{"for SSL 3.0 support", test_ssl3, "yes", "no", "dunno"},
+	{"for SSL 3.0 (RFC6101) support", test_ssl3, "yes", "no", "dunno"},
 	{"whether \%COMPAT is required", test_record_padding, "no", "yes",
 	 "dunno"},
-	{"for TLS 1.0 support", test_tls1, "yes", "no", "dunno"},
-	{"for TLS 1.1 support", test_tls1_1, "yes", "no", "dunno"},
+	{"for TLS 1.0 (RFC2246) support", test_tls1, "yes", "no", "dunno"},
+	{"for TLS 1.1 (RFC4346) support", test_tls1_1, "yes", "no", "dunno"},
 	{"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0",
 	 "failed",
 	 "SSL 3.0"},
-	{"for TLS 1.2 support", test_tls1_2, "yes", "no", "dunno"},
+	{"for TLS 1.2 (RFC5246) support", test_tls1_2, "yes", "no", "dunno"},
 	/* The following tests will disable TLS 1.x if the server is
 	 * buggy */
 	{"whether we need to disable TLS 1.2", test_tls_disable2, "no",
-	 "yes",
-	 "dunno"},
+	 "yes", "dunno"},
 	{"whether we need to disable TLS 1.1", test_tls_disable1, "no",
-	 "yes",
-	 "dunno"},
+	 "yes", "dunno"},
 	{"whether we need to disable TLS 1.0", test_tls_disable0, "no",
-	 "yes",
-	 "dunno"},
-	{"for Safe renegotiation support", test_safe_renegotiation, "yes",
-	 "no",
-	 "dunno"},
+	 "yes", "dunno"},
+	{"for HTTPS server name", test_server, NULL, "failed", "not checked", 1},
+	{"whether Hello Extensions are accepted",
+	 test_hello_extension, "yes", "no", "dunno"},
+	{"for safe renegotiation (RFC5746) support", test_safe_renegotiation, "yes",
+	 "no", "dunno"},
 	{"for Safe renegotiation support (SCSV)",
 	 test_safe_renegotiation_scsv,
 	 "yes", "no", "dunno"},
-	{"for HTTPS server name", test_server, "", "failed",
-	 "not checked"},
+	{"for heartbeat (RFC6520) support", test_heartbeat_extension, "yes", "no", "dunno"},
 	{"for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes",
 	 "dunno"},
 	{"for version rollback bug in Client Hello", test_version_rollback,
 	 "no", "yes", "dunno"},
-
-
 	{"whether the server ignores the RSA PMS version",
 	 test_rsa_pms_version_check, "yes", "no", "dunno"},
-	{"whether the server can accept Hello Extensions",
-	 test_hello_extension, "yes", "no", "dunno"},
-	{"whether the server can accept HeartBeat Extension",
-	 test_heartbeat_extension, "yes", "no", "dunno"},
-	{"whether the server can accept small records (512 bytes)",
+	{"whether small records (512 bytes) are accepted",
 	 test_small_records, "yes", "no", "dunno"},
-	{"whether the server can accept cipher suites not in SSL 3.0 spec",
+	{"whether cipher suites not in SSL 3.0 spec are accepted",
 	 test_unknown_ciphersuites, "yes", "no", "dunno"},
-	{"whether the server can accept a bogus TLS record version in the client hello", test_version_oob, "yes", "no", "dunno"},
-	{"for certificate information", test_certificate, "", "", ""},
-	{"for trusted CAs", test_server_cas, "", "", ""},
+	{"whether a bogus TLS record version in the client hello is accepted", test_version_oob, "yes", "no", "dunno"},
+	{"for certificate information", test_certificate, NULL, "", ""},
+	{"for trusted CAs", test_server_cas, NULL, "", ""},
 	{"whether the server understands TLS closure alerts", test_bye,
-	 "yes",
-	 "no", "partially"},
+	 "yes", "no", "partially"},
 	/* the fact that is after the closure alert test does matter.
 	 */
 	{"whether the server supports session resumption",
@@ -137,29 +130,29 @@ static const TLS_TEST tls_tests[] = {
 	{"for anonymous authentication support", test_anonymous, "yes",
 	 "no",
 	 "dunno"},
-	{"anonymous Diffie-Hellman group info", test_dhe_group, "", "N/A",
+	{"anonymous Diffie-Hellman group info", test_dhe_group, NULL, "N/A",
 	 "N/A"},
 #endif
 	{"for ephemeral Diffie-Hellman support", test_dhe, "yes", "no",
 	 "dunno"},
-	{"ephemeral Diffie-Hellman group info", test_dhe_group, "", "N/A",
+	{"ephemeral Diffie-Hellman group info", test_dhe_group, NULL, "N/A",
 	 "N/A"},
 	{"for ephemeral EC Diffie-Hellman support", test_ecdhe, "yes",
 	 "no",
 	 "dunno"},
-	{"ephemeral EC Diffie-Hellman group info", test_ecdhe_curve, "",
+	{"ephemeral EC Diffie-Hellman group info", test_ecdhe_curve, NULL,
 	 "N/A",
 	 "N/A"},
-	{"for AES-128-GCM cipher support", test_aes_gcm, "yes", "no",
+	{"for AES-128-GCM cipher (RFC5288) support", test_aes_gcm, "yes", "no",
 	 "dunno"},
-	{"for AES-128-CBC cipher support", test_aes, "yes", "no",
+	{"for AES-128-CBC cipher (RFC3268) support", test_aes, "yes", "no",
 	 "dunno"},
-	{"for CAMELLIA-128-GCM cipher support", test_camellia_gcm, "yes", "no",
+	{"for CAMELLIA-128-GCM cipher (RFC6367) support", test_camellia_gcm, "yes", "no",
 	 "dunno"},
-	{"for CAMELLIA-128-CBC cipher support", test_camellia_cbc, "yes", "no",
+	{"for CAMELLIA-128-CBC cipher (RFC5932) support", test_camellia_cbc, "yes", "no",
 	 "dunno"},
-	{"for 3DES-CBC cipher support", test_3des, "yes", "no", "dunno"},
-	{"for ARCFOUR 128 cipher support", test_arcfour, "yes", "no",
+	{"for 3DES-CBC cipher (RFC2246) support", test_3des, "yes", "no", "dunno"},
+	{"for ARCFOUR 128 cipher (RFC2246) support", test_arcfour, "yes", "no",
 	 "dunno"},
 	{"for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{"for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
@@ -168,9 +161,9 @@ static const TLS_TEST tls_tests[] = {
 	{"for ZLIB compression support", test_zlib, "yes",
 	 "no", "dunno"},
 #endif
-	{"for max record size", test_max_record_size, "yes",
+	{"for max record size (RFC6066) support", test_max_record_size, "yes",
 	 "no", "dunno"},
-	{"for OpenPGP authentication support", test_openpgp1,
+	{"for OpenPGP authentication (RFC6091) support", test_openpgp1,
 	 "yes", "no", "dunno"},
 	{NULL, NULL, NULL, NULL, NULL}
 };
@@ -239,6 +232,8 @@ int main(int argc, char **argv)
 
 	i = 0;
 
+	printf("GnuTLS debug client %s\n", gnutls_check_version(NULL));
+	printf("Checking %s:%s\n", hostname, portname);
 	do {
 
 		if (tls_tests[i].test_name == NULL)
@@ -266,19 +261,28 @@ int main(int argc, char **argv)
 					       hostname, strlen(hostname));
 
 		do {
-			printf("Checking %s...", tls_tests[i].test_name);
-			fflush(stdout);
+			if (strcmp(app_proto, "https") != 0 && tls_tests[i].https_only != 0) {
+				i++;
+				break;
+			}
 
 			ret = tls_tests[i].func(state);
 
-			if (ret == TEST_SUCCEED)
-				printf(" %s\n", tls_tests[i].suc_str);
-			else if (ret == TEST_FAILED)
+			if (ret != TEST_IGNORE) {
+				printf("%58s...", tls_tests[i].test_name);
+				fflush(stdout);
+			}
+
+			if (ret == TEST_SUCCEED) {
+				if (tls_tests[i].suc_str == NULL)
+					printf(" %s\n", ext_text);
+				else
+					printf(" %s\n", tls_tests[i].suc_str);
+			} else if (ret == TEST_FAILED)
 				printf(" %s\n", tls_tests[i].fail_str);
 			else if (ret == TEST_UNSURE)
 				printf(" %s\n", tls_tests[i].unsure_str);
 			else if (ret == TEST_IGNORE) {
-				printf(" N/A\n");
 				i++;
 			}
 		}

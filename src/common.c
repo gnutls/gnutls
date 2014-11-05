@@ -115,7 +115,7 @@ static void print_x509_info_compact(gnutls_session_t session)
 }
 
 static void
-print_x509_info(gnutls_session_t session, int flag, int print_cert)
+print_x509_info(gnutls_session_t session, FILE *out, int flag, int print_cert)
 {
 	gnutls_x509_crt_t crt;
 	const gnutls_datum_t *cert_list;
@@ -128,8 +128,8 @@ print_x509_info(gnutls_session_t session, int flag, int print_cert)
 		return;
 	}
 
-	printf("- Certificate type: X.509\n");
-	printf("- Got a certificate list of %d certificates.\n",
+	fprintf(out, "- Certificate type: X.509\n");
+	fprintf(out, "- Got a certificate list of %d certificates.\n",
 	       cert_list_size);
 
 	for (j = 0; j < cert_list_size; j++) {
@@ -145,13 +145,13 @@ print_x509_info(gnutls_session_t session, int flag, int print_cert)
 			return;
 		}
 
-		printf("- Certificate[%d] info:\n - ", j);
+		fprintf(out, "- Certificate[%d] info:\n - ", j);
 		if (flag == GNUTLS_CRT_PRINT_COMPACT && j > 0)
 			flag = GNUTLS_CRT_PRINT_ONELINE;
 
 		ret = gnutls_x509_crt_print(crt, flag, &cinfo);
 		if (ret == 0) {
-			printf("%s\n", cinfo.data);
+			fprintf(out, "%s\n", cinfo.data);
 			gnutls_free(cinfo.data);
 		}
 
@@ -182,9 +182,9 @@ print_x509_info(gnutls_session_t session, int flag, int print_cert)
 			}
 
 			p[size] = 0;
-			fputs("\n", stdout);
-			fputs(p, stdout);
-			fputs("\n", stdout);
+			fputs("\n", out);
+			fputs(p, out);
+			fputs("\n", out);
 
 			gnutls_free(p);
 		}
@@ -229,7 +229,7 @@ static void print_openpgp_info_compact(gnutls_session_t session)
 }
 
 static void
-print_openpgp_info(gnutls_session_t session, int flag, int print_cert)
+print_openpgp_info(gnutls_session_t session, FILE *out, int flag, int print_cert)
 {
 
 	gnutls_openpgp_crt_t crt;
@@ -237,7 +237,7 @@ print_openpgp_info(gnutls_session_t session, int flag, int print_cert)
 	unsigned int cert_list_size = 0;
 	int ret;
 
-	printf("- Certificate type: OpenPGP\n");
+	fprintf(out, "- Certificate type: OpenPGP\n");
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
@@ -255,7 +255,7 @@ print_openpgp_info(gnutls_session_t session, int flag, int print_cert)
 
 		ret = gnutls_openpgp_crt_print(crt, flag, &cinfo);
 		if (ret == 0) {
-			printf("- %s\n", cinfo.data);
+			fprintf(out, "- %s\n", cinfo.data);
 			gnutls_free(cinfo.data);
 		}
 
@@ -285,8 +285,8 @@ print_openpgp_info(gnutls_session_t session, int flag, int print_cert)
 				return;
 			}
 
-			fputs(p, stdout);
-			fputs("\n", stdout);
+			fputs(p, out);
+			fputs("\n", out);
 
 			gnutls_free(p);
 		}
@@ -569,6 +569,11 @@ int print_info(gnutls_session_t session, int verbose, int print_cert)
 	       (gnutls_compression_get(session)));
 	printf("- Compression: %s\n", tmp);
 
+	printf("- Options:");
+	if (gnutls_safe_renegotiation_status(session)!=0)
+		printf(" safe renegotiation");
+	printf("\n");
+
 #ifdef ENABLE_DTLS_SRTP
 	rc = gnutls_srtp_get_selected_profile(session, &srtp_profile);
 	if (rc == 0)
@@ -612,6 +617,11 @@ int print_info(gnutls_session_t session, int verbose, int print_cert)
 
 void print_cert_info(gnutls_session_t session, int verbose, int print_cert)
 {
+	return print_cert_info2(session, verbose, stdout, print_cert);
+}
+
+void print_cert_info2(gnutls_session_t session, int verbose, FILE *out, int print_cert)
+{
 	int flag;
 
 	if (verbose)
@@ -624,11 +634,11 @@ void print_cert_info(gnutls_session_t session, int verbose, int print_cert)
 
 	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
-		print_x509_info(session, flag, print_cert);
+		print_x509_info(session, out, flag, print_cert);
 		break;
 #ifdef ENABLE_OPENPGP
 	case GNUTLS_CRT_OPENPGP:
-		print_openpgp_info(session, flag, print_cert);
+		print_openpgp_info(session, out, flag, print_cert);
 		break;
 #endif
 	default:

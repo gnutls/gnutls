@@ -56,6 +56,8 @@ int print_info(gnutls_session_t state, int verbose, int print_cert);
 void print_cert_info(gnutls_session_t, int flag, int print_cert);
 void print_cert_info_compact(gnutls_session_t session);
 
+void print_cert_info2(gnutls_session_t, int flag, FILE *fp, int print_cert);
+
 void print_list(const char *priorities, int verbose);
 int cert_verify(gnutls_session_t session, const char *hostname, const char *purpose);
 
