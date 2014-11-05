@@ -140,6 +140,40 @@ static unsigned char server_key_pem[] =
 "Cl7KqL2x2ibGMtt4LtSntdzWqa87N7vCWMSTmvd8uLgflBs33xUIiQ==\n"
 "-----END RSA PRIVATE KEY-----\n";
 
+static unsigned char cert_pem[] =
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIICHjCCAYmgAwIBAgIERiYdNzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
+    "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTI3WhcNMDgwNDE3MTMyOTI3WjAdMRsw\n"
+    "GQYDVQQDExJHbnVUTFMgdGVzdCBjbGllbnQwgZwwCwYJKoZIhvcNAQEBA4GMADCB\n"
+    "iAKBgLtmQ/Xyxde2jMzF3/WIO7HJS2oOoa0gUEAIgKFPXKPQ+GzP5jz37AR2ExeL\n"
+    "ZIkiW8DdU3w77XwEu4C5KL6Om8aOoKUSy/VXHqLnu7czSZ/ju0quak1o/8kR4jKN\n"
+    "zj2AC41179gAgY8oBAOgIo1hBAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGjdjB0MAwG\n"
+    "A1UdEwEB/wQCMAAwEwYDVR0lBAwwCgYIKwYBBQUHAwIwDwYDVR0PAQH/BAUDAweg\n"
+    "ADAdBgNVHQ4EFgQUTLkKm/odNON+3svSBxX+odrLaJEwHwYDVR0jBBgwFoAU6Twc\n"
+    "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
+    "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
+    "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
+    "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
+const gnutls_datum_t cli_cert = { cert_pem, sizeof(cert_pem) - 1};
+
+static unsigned char key_pem[] =
+    "-----BEGIN RSA PRIVATE KEY-----\n"
+    "MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
+    "9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
+    "aP/JEeIyjc49gAuNde/YAIGPKAQDoCKNYQQH+rY3fSEHSdIJYWmYkKNYqQIDAQAB\n"
+    "AoGADpmARG5CQxS+AesNkGmpauepiCz1JBF/JwnyiX6vEzUh0Ypd39SZztwrDxvF\n"
+    "PJjQaKVljml1zkJpIDVsqvHdyVdse8M+Qn6hw4x2p5rogdvhhIL1mdWo7jWeVJTF\n"
+    "RKB7zLdMPs3ySdtcIQaF9nUAQ2KJEvldkO3m/bRJFEp54k0CQQDYy+RlTmwRD6hy\n"
+    "7UtMjR0H3CSZJeQ8svMCxHLmOluG9H1UKk55ZBYfRTsXniqUkJBZ5wuV1L+pR9EK\n"
+    "ca89a+1VAkEA3UmBelwEv2u9cAU1QjKjmwju1JgXbrjEohK+3B5y0ESEXPAwNQT9\n"
+    "TrDM1m9AyxYTWLxX93dI5QwNFJtmbtjeBQJARSCWXhsoaDRG8QZrCSjBxfzTCqZD\n"
+    "ZXtl807ymCipgJm60LiAt0JLr4LiucAsMZz6+j+quQbSakbFCACB8SLV1QJBAKZQ\n"
+    "YKf+EPNtnmta/rRKKvySsi3GQZZN+Dt3q0r094XgeTsAqrqujVNfPhTMeP4qEVBX\n"
+    "/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
+    "sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
+    "-----END RSA PRIVATE KEY-----\n";
+const gnutls_datum_t cli_key = { key_pem, sizeof(key_pem) - 1};
+
 const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
@@ -205,6 +239,7 @@ void doit(void)
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
 	gnutls_transport_set_ptr(server, server);
+	gnutls_certificate_server_set_request(server, GNUTLS_CERT_REQUEST);
 
 	/* Init client */
 	/* Init client */
@@ -215,6 +250,10 @@ void doit(void)
 	ret = gnutls_certificate_set_x509_trust_mem(clientx509cred, &ca_cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		exit(1);
+
+	ret = gnutls_certificate_set_x509_key_mem(clientx509cred,
+					    	  &cli_cert, &cli_key,
+					    	  GNUTLS_X509_FMT_PEM);
 
 	ret = gnutls_init(&client, GNUTLS_CLIENT);
 	if (ret < 0)
@@ -231,6 +270,72 @@ void doit(void)
 	gnutls_transport_set_ptr(client, client);
 
 	HANDSHAKE(client, server);
+
+	/* check gnutls_certificate_get_ours() - server side */
+	{
+		const gnutls_datum_t *mcert;
+		gnutls_datum_t scert;
+		gnutls_x509_crt_t crt;
+
+		mcert = gnutls_certificate_get_ours(server);
+		if (mcert == NULL) {
+			fail("gnutls_certificate_get_ours(): failed\n");
+			exit(1);
+		}
+
+		gnutls_x509_crt_init(&crt);
+		ret = gnutls_x509_crt_import(crt, &server_cert, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fail("gnutls_x509_crt_import: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+
+		ret = gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_DER, &scert);
+		if (ret < 0) {
+			fail("gnutls_x509_crt_export2: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		gnutls_x509_crt_deinit(crt);
+
+		if (scert.size != mcert->size || memcmp(scert.data, mcert->data, mcert->size) != 0) {
+			fail("gnutls_certificate_get_ours output doesn't match cert\n");
+			exit(1);
+		}
+		gnutls_free(scert.data);
+	}
+
+	/* check gnutls_certificate_get_ours() - client side */
+	{
+		const gnutls_datum_t *mcert;
+		gnutls_datum_t ccert;
+		gnutls_x509_crt_t crt;
+
+		mcert = gnutls_certificate_get_ours(client);
+		if (mcert == NULL) {
+			fail("gnutls_certificate_get_ours(): failed\n");
+			exit(1);
+		}
+
+		gnutls_x509_crt_init(&crt);
+		ret = gnutls_x509_crt_import(crt, &cli_cert, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fail("gnutls_x509_crt_import: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+
+		ret = gnutls_x509_crt_export2(crt, GNUTLS_X509_FMT_DER, &ccert);
+		if (ret < 0) {
+			fail("gnutls_x509_crt_export2: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		gnutls_x509_crt_deinit(crt);
+
+		if (ccert.size != mcert->size || memcmp(ccert.data, mcert->data, mcert->size) != 0) {
+			fail("gnutls_certificate_get_ours output doesn't match cert\n");
+			exit(1);
+		}
+		gnutls_free(ccert.data);
+	}
 
 	/* check the number of certificates received */
 	{
