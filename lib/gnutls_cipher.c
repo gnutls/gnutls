@@ -304,10 +304,13 @@ compressed_to_ciphertext(gnutls_session_t session,
 	    _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
 	uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
 	unsigned imp_iv_size = 0, exp_iv_size = 0;
+	bool etm = 0;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
+	if (algo_type == CIPHER_BLOCK && params->etm != 0)
+		etm = 1;
 
 	_gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
 			 session, _gnutls_cipher_get_name(params->cipher),
@@ -328,7 +331,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 		length =
 		    calc_enc_length_block(session, ver, compressed->size,
 					  tag_size, &pad, auth_cipher,
-					  blocksize, params->etm);
+					  blocksize, etm);
 	} else { /* AEAD + STREAM */
 		imp_iv_size = _gnutls_cipher_get_implicit_iv_size(params->cipher);
 		exp_iv_size = _gnutls_cipher_get_explicit_iv_size(params->cipher);
@@ -396,7 +399,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 		cipher_data += exp_iv_size;
 	}
 
-	if (params->etm && algo_type == CIPHER_BLOCK)
+	if (etm)
 		ret = length-tag_size;
 	else
 		ret = compressed->size;
@@ -412,7 +415,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	if (params->etm && explicit_iv && algo_type == CIPHER_BLOCK) {
+	if (etm && explicit_iv) {
 		/* In EtM we need to hash the IV as well */
 		ret =
 		    _gnutls_auth_cipher_add_auth(&params->write.cipher_state,
@@ -497,6 +500,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 	unsigned int explicit_iv = _gnutls_version_has_explicit_iv(ver);
 	unsigned imp_iv_size, exp_iv_size;
 	unsigned cipher_type = _gnutls_cipher_type(params->cipher);
+	bool etm = 0;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
@@ -505,8 +509,11 @@ ciphertext_to_compressed(gnutls_session_t session,
 	exp_iv_size = _gnutls_cipher_get_explicit_iv_size(params->cipher);
 	blocksize = _gnutls_cipher_get_block_size(params->cipher);
 
+	if (params->etm !=0 && cipher_type == CIPHER_BLOCK)
+		etm = 1;
+
 	/* if EtM mode and not AEAD */
-	if (params->etm !=0 && cipher_type == CIPHER_BLOCK) {
+	if (etm) {
 		if (unlikely(ciphertext->size < tag_size))
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
@@ -535,7 +542,6 @@ ciphertext_to_compressed(gnutls_session_t session,
 			/* HMAC was not the same. */
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 		}
-			 
 	}
 
 	/* actual decryption (inplace)
@@ -665,7 +671,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 			    gnutls_assert_val
 			    (GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-		if (params->etm == 0) {
+		if (etm == 0) {
 			if (unlikely(ciphertext->size % blocksize != 0))
 				return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 		} else {
@@ -699,7 +705,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 			return
 			    gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
-		if (params->etm == 0) {
+		if (etm == 0) {
 			ret =
 			    _gnutls_cipher_decrypt2(&params->read.cipher_state.
 						    cipher, ciphertext->data,
@@ -778,7 +784,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
-	if (params->etm == 0 || cipher_type != CIPHER_BLOCK) {
+	if (etm == 0) {
 		ret =
 		    _gnutls_auth_cipher_tag(&params->read.cipher_state, tag,
 					    tag_size);
