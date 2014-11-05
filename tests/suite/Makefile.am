@@ -85,12 +85,13 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 
-nodist_check_SCRIPTS = eagain testsrn testcompat chain invalid-cert testrandom \
+nodist_check_SCRIPTS = eagain testsrn chain invalid-cert testrandom \
 	testpkcs11 testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm \
-	testrng testcompat-polarssl testcompat-main testcompat-common
+	testrng testcompat-main-polarssl testcompat-main-openssl testcompat-common \
+	testcompat-polarssl testcompat-openssl
 
-TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn testcompat chain invalid-cert \
-	testpkcs11 testrng
+TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn chain invalid-cert \
+	testpkcs11 testrng testcompat-openssl testcompat-polarssl
 
 if ENABLE_PKCS11
 check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer pkcs11-is-known pkcs11-combo pkcs11-privkey

@@ -39,5 +39,4 @@ if test "$TSTAMP" != "1158969600"; then
     exit 77
 fi
 
-datefudge "2012-09-2" ./testcompat-polarssl
-datefudge "2012-09-2" ./testcompat-main
+datefudge "2012-09-2" ./testcompat-main-openssl
