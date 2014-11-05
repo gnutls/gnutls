@@ -284,6 +284,8 @@ typedef enum {
    * algorithms (ciphers, kx or macs).
    */
 #define GNUTLS_MAX_ALGORITHM_NUM 32
+#define GNUTLS_MAX_SESSION_ID_SIZE 32
+
 
 /**
  * gnutls_compression_method_t:

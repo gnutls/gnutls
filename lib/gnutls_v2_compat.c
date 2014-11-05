@@ -97,7 +97,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	uint8_t rnd[GNUTLS_RANDOM_SIZE];
 	int len = datalen;
 	uint16_t challenge;
-	uint8_t session_id[TLS_MAX_SESSION_ID_SIZE];
+	uint8_t session_id[GNUTLS_MAX_SESSION_ID_SIZE];
 
 	DECR_LEN(len, 2);
 
@@ -127,7 +127,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	session_id_len = _gnutls_read_uint16(&data[pos]);
 	pos += 2;
 
-	if (session_id_len > TLS_MAX_SESSION_ID_SIZE) {
+	if (session_id_len > GNUTLS_MAX_SESSION_ID_SIZE) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}

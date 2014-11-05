@@ -517,7 +517,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	/* RESUME SESSION 
 	 */
-	if (session_id_len > TLS_MAX_SESSION_ID_SIZE) {
+	if (session_id_len > GNUTLS_MAX_SESSION_ID_SIZE) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
@@ -1669,7 +1669,7 @@ static int
 client_check_if_resuming(gnutls_session_t session,
 				 uint8_t * session_id, int session_id_len)
 {
-	char buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
+	char buf[2 * GNUTLS_MAX_SESSION_ID_SIZE + 1];
 
 	_gnutls_handshake_log("HSK[%p]: SessionID length: %d\n", session,
 			      session_id_len);
@@ -1774,7 +1774,7 @@ read_server_hello(gnutls_session_t session,
 	DECR_LEN(len, 1);
 	session_id_len = data[pos++];
 
-	if (len < session_id_len || session_id_len > TLS_MAX_SESSION_ID_SIZE) {
+	if (len < session_id_len || session_id_len > GNUTLS_MAX_SESSION_ID_SIZE) {
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
@@ -2149,7 +2149,7 @@ static int send_server_hello(gnutls_session_t session, int again)
 	uint8_t comp;
 	uint8_t session_id_len =
 	    session->security_parameters.session_id_size;
-	char buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
+	char buf[2 * GNUTLS_MAX_SESSION_ID_SIZE + 1];
 	const version_entry_st *vers;
 
 	_gnutls_buffer_init(&extdata);
@@ -3266,11 +3266,11 @@ int _gnutls_generate_session_id(uint8_t * session_id, uint8_t * len)
 {
 	int ret;
 
-	*len = TLS_MAX_SESSION_ID_SIZE;
+	*len = GNUTLS_MAX_SESSION_ID_SIZE;
 
 	ret =
 	    _gnutls_rnd(GNUTLS_RND_NONCE, session_id,
-			TLS_MAX_SESSION_ID_SIZE);
+			GNUTLS_MAX_SESSION_ID_SIZE);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

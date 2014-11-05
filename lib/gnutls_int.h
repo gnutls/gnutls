@@ -113,8 +113,6 @@ typedef struct {
  */
 #define MAX_HANDSHAKE_PACKET_SIZE 48*1024
 
-#define TLS_MAX_SESSION_ID_SIZE 32
-
 /* The maximum digest size of hash algorithms. 
  */
 #define MAX_FILENAME 512
@@ -557,7 +555,7 @@ typedef struct {
 	uint8_t master_secret[GNUTLS_MASTER_SIZE];
 	uint8_t client_random[GNUTLS_RANDOM_SIZE];
 	uint8_t server_random[GNUTLS_RANDOM_SIZE];
-	uint8_t session_id[TLS_MAX_SESSION_ID_SIZE];
+	uint8_t session_id[GNUTLS_MAX_SESSION_ID_SIZE];
 	uint8_t session_id_size;
 	time_t timestamp;
 

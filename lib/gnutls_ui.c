@@ -913,7 +913,7 @@ int
 gnutls_session_set_id(gnutls_session_t session, const gnutls_datum_t * sid)
 {
 	if (session->security_parameters.entity == GNUTLS_SERVER ||
-	    sid->size > TLS_MAX_SESSION_ID_SIZE)
+	    sid->size > GNUTLS_MAX_SESSION_ID_SIZE)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	memset(&session->internals.resumed_security_parameters, 0,

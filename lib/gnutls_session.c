@@ -124,8 +124,8 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t * data)
  * with the original session.
  *
  * The session ID is selected by the server, that identify the
- * current session.  In TLS 1.0 and SSL 3.0 session id is always less
- * than 32 bytes.
+ * current session.  In all supported TLS protocols, the session id
+ * is less than %GNUTLS_MAX_SESSION_ID_SIZE.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
