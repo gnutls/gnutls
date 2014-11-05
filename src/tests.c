@@ -953,13 +953,11 @@ test_code_t test_heartbeat_extension(gnutls_session_t session)
 	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 	do_handshake(session);
 
-	switch (gnutls_heartbeat_allowed(session, 1)) {
-	case 1:
-		return TEST_SUCCEED;
+	switch (gnutls_heartbeat_allowed(session, GNUTLS_HB_LOCAL_ALLOWED_TO_SEND)) {
 	case 0:
 		return TEST_FAILED;
 	default:
-		return TEST_UNSURE;
+		return TEST_SUCCEED;
 	}
 }
 
