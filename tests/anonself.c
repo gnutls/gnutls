@@ -122,7 +122,11 @@ static void client(int sd)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	gnutls_record_send(session, MSG, strlen(MSG));
+	ret = gnutls_record_send(session, MSG, sizeof(MSG)-1);
+	if (ret != sizeof(MSG)-1) {
+		fail("return value of gnutls_record_send() is bogus\n");
+		exit(1);
+	}
 
 	ret = gnutls_record_recv(session, buffer, MAX_BUF);
 	if (ret == 0) {
@@ -135,7 +139,7 @@ static void client(int sd)
 		goto end;
 	}
 
-	if (ret != strlen(MSG) || memcmp(buffer, MSG, ret) != 0) {
+	if (ret != sizeof(MSG)-1 || memcmp(buffer, MSG, ret) != 0) {
 		fail("client: received data of different size! (expected: %d, have: %d)\n", 
 			(int)strlen(MSG), ret);
 		goto end;
