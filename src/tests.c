@@ -226,7 +226,7 @@ test_code_t test_safe_renegotiation(gnutls_session_t session)
 
 	sprintf(prio_str, INIT_STR
 		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
-		":" ALL_KX ":%%SAFE_RENEGOTIATION", protocol_str);
+		":" ALL_KX ":%s:%%SAFE_RENEGOTIATION", rest, protocol_str);
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
@@ -242,7 +242,7 @@ test_code_t test_etm(gnutls_session_t session)
 
 	sprintf(prio_str, INIT_STR
 		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
-		":" ALL_KX, protocol_str);
+		":%s:" ALL_KX, rest, protocol_str);
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
@@ -264,7 +264,7 @@ test_code_t test_ext_master_secret(gnutls_session_t session)
 
 	sprintf(prio_str, INIT_STR
 		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
-		":" ALL_KX, protocol_str);
+		":%s:" ALL_KX, rest, protocol_str);
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
@@ -283,6 +283,9 @@ test_code_t test_ext_master_secret(gnutls_session_t session)
 test_code_t test_safe_renegotiation_scsv(gnutls_session_t session)
 {
 	int ret;
+
+	if (ssl3_ok == 0)
+		return TEST_IGNORE;
 
 	sprintf(prio_str, INIT_STR
 		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":+VERS-SSL3.0:"
