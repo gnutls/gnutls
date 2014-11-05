@@ -162,9 +162,8 @@ static const cipher_entry_st algorithms[] = {
 	  .blocksize = 1,
 	  .keysize = 0,
 	  .type = CIPHER_STREAM
-	}
+	},
 #endif
-
 	{0, 0, 0, 0, 0, 0, 0}
 };
 
