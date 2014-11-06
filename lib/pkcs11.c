@@ -1066,12 +1066,13 @@ pkcs11_open_session(struct pkcs11_session_info *sinfo,
 	/* ok found */
 	sinfo->pks = pks;
 	sinfo->module = module;
+	sinfo->sid = slot;
 	sinfo->init = 1;
 	memcpy(&sinfo->tinfo, &tinfo.tinfo, sizeof(sinfo->tinfo));
 
 	if (flags & SESSION_LOGIN) {
 		ret =
-		    pkcs11_login(sinfo, pin_info, &tinfo, info,
+		    pkcs11_login(sinfo, pin_info, info,
 				 (flags & SESSION_SO) ? 1 : 0);
 		if (ret < 0) {
 			gnutls_assert();
@@ -1148,10 +1149,12 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 
 			sinfo.module = module;
 			sinfo.pks = pks;
+			sinfo.sid = tinfo.sid;
+			memcpy(&sinfo.tinfo, &tinfo.tinfo, sizeof(sinfo.tinfo));
 
 			if (flags & SESSION_LOGIN) {
 				ret =
-				    pkcs11_login(&sinfo, pin_info, &tinfo,
+				    pkcs11_login(&sinfo, pin_info,
 						 info, (flags & SESSION_SO) ? 1 :	 0);
 				if (ret < 0) {
 					gnutls_assert();
@@ -2178,7 +2181,7 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 int
 pkcs11_login(struct pkcs11_session_info *sinfo,
 	     struct pin_info_st *pin_info,
-	     const struct token_info *tokinfo, struct p11_kit_uri *info,
+	     struct p11_kit_uri *info,
 	     int so)
 {
 	struct ck_session_info session_info;
@@ -2187,7 +2190,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 	ck_rv_t rv;
 
 	user_type = (so == 0) ? CKU_USER : CKU_SO;
-	if (so == 0 && (tokinfo->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
+	if (so == 0 && (sinfo->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
 		gnutls_assert();
 		_gnutls_debug_log("p11: No login required.\n");
 		return 0;
@@ -2196,7 +2199,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 	/* For a token with a "protected" (out-of-band) authentication
 	 * path, calling login with a NULL username is all that is
 	 * required. */
-	if (tokinfo->tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH) {
+	if (sinfo->tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH) {
 		rv = (sinfo->module)->C_Login(sinfo->pks,
 					      (so ==
 					       0) ? CKU_USER : CKU_SO,
@@ -2216,7 +2219,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		struct p11_kit_pin *pin;
 		struct ck_token_info tinfo;
 
-		memcpy(&tinfo, &tokinfo->tinfo, sizeof(tinfo));
+		memcpy(&tinfo, &sinfo->tinfo, sizeof(tinfo));
 
 		/* Check whether the session is already logged in, and if so, just skip */
 		rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks,
@@ -2232,7 +2235,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		 * status again, the flags might change. */
 		if (attempt) {
 			if (pkcs11_get_token_info
-			    (tokinfo->prov->module, tokinfo->sid,
+			    (sinfo->module, sinfo->sid,
 			     &tinfo) != CKR_OK) {
 				gnutls_assert();
 				_gnutls_debug_log
