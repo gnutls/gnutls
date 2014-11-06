@@ -235,7 +235,7 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	if (key->reauth) {
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
-		    		 key->uinfo, 0);
+		    		 key->uinfo, 0, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
@@ -472,7 +472,7 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	if (key->reauth) {
 		ret =
 		    pkcs11_login(&key->sinfo, &key->pin,
-		    		 key->uinfo, 0);
+		    		 key->uinfo, 0, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
