@@ -68,6 +68,7 @@ struct gnutls_pkcs11_privkey_st {
 
 	struct pkcs11_session_info sinfo;
 	ck_object_handle_t ref;	/* the key in the session */
+	unsigned reauth; /* whether we need to login on each operation */
 
 	struct pin_info_st pin;
 };
@@ -253,6 +254,17 @@ _gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 
 	PKCS11_CHECK_INIT_PRIVKEY(key);
 
+	if (key->reauth) {
+		ret =
+		    pkcs11_login(&key->sinfo, &key->pin,
+		    		 key->uinfo, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
+			/* let's try the operation anyway */
+		}
+	}
+
 	sinfo = &key->sinfo;
 
 	mech.mechanism = pk_to_mech(key->pk_algorithm);
@@ -384,6 +396,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	struct ck_attribute *attr;
 	struct ck_attribute a[4];
 	ck_key_type_t key_type;
+	ck_bool_t reauth = 0;
 
 	PKCS11_CHECK_INIT;
 
@@ -434,6 +447,15 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 		}
 	}
 
+	a[0].type = CKA_ALWAYS_AUTHENTICATE;
+	a[0].value = &reauth;
+	a[0].value_len = sizeof(reauth);
+
+	if (pkcs11_get_attribute_value(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, a, 1)
+	    == CKR_OK) {
+		pkey->reauth = reauth;
+	}
+
 	ret = 0;
 
 	return ret;
@@ -472,6 +494,17 @@ _gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 
 	if (key->pk_algorithm != GNUTLS_PK_RSA)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (key->reauth) {
+		ret =
+		    pkcs11_login(&key->sinfo, &key->pin,
+		    		 key->uinfo, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_debug_log("PKCS #11 login failed, trying operation anyway\n");
+			/* let's try the operation anyway */
+		}
+	}
 
 	mech.mechanism = CKM_RSA_PKCS;
 	mech.parameter = NULL;

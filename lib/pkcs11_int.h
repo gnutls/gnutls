@@ -38,6 +38,7 @@ struct pkcs11_session_info {
 	struct ck_function_list *module;
 	struct ck_token_info tinfo;
 	ck_session_handle_t pks;
+	ck_slot_id_t sid;
 	unsigned int init;
 };
 
@@ -103,7 +104,6 @@ int pkcs11_get_info(struct p11_kit_uri *info,
 		    size_t * output_size);
 int pkcs11_login(struct pkcs11_session_info *sinfo,
 		 struct pin_info_st *pin_info,
-		 const struct token_info *tokinfo,
 		 struct p11_kit_uri *info, int so);
 
 int pkcs11_call_token_func(struct p11_kit_uri *info, const unsigned retry);
