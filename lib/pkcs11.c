@@ -1140,6 +1140,7 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			sinfo.pks = pks;
 			sinfo.sid = slots[z];
 			memcpy(&sinfo.tinfo, &l_tinfo, sizeof(sinfo.tinfo));
+			memcpy(&sinfo.slot_info, &l_sinfo, sizeof(sinfo.slot_info));
 
 			if (flags & SESSION_LOGIN) {
 				ret =
