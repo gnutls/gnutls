@@ -1063,7 +1063,7 @@ pkcs11_open_session(struct pkcs11_session_info *sinfo,
 	if (flags & SESSION_LOGIN) {
 		ret =
 		    pkcs11_login(sinfo, pin_info, info,
-				 (flags & SESSION_SO) ? 1 : 0);
+				 (flags & SESSION_SO) ? 1 : 0, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			pkcs11_close_session(sinfo);
@@ -1145,7 +1145,8 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			if (flags & SESSION_LOGIN) {
 				ret =
 				    pkcs11_login(&sinfo, pin_info,
-						 info, (flags & SESSION_SO) ? 1 :	 0);
+						 info, (flags & SESSION_SO) ? 1 : 0,
+						 0);
 				if (ret < 0) {
 					gnutls_assert();
 					return ret;
@@ -2191,7 +2192,8 @@ int
 pkcs11_login(struct pkcs11_session_info *sinfo,
 	     struct pin_info_st *pin_info,
 	     struct p11_kit_uri *info,
-	     int so)
+	     unsigned so,
+	     unsigned force)
 {
 	struct ck_session_info session_info;
 	int attempt = 0, ret;
@@ -2233,8 +2235,8 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		/* Check whether the session is already logged in, and if so, just skip */
 		rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks,
 						       &session_info);
-		if (rv == CKR_OK
-		    && (session_info.state == CKS_RO_USER_FUNCTIONS
+		if (rv == CKR_OK && force == 0 &&
+		    (session_info.state == CKS_RO_USER_FUNCTIONS
 			|| session_info.state == CKS_RW_USER_FUNCTIONS)) {
 			ret = 0;
 			goto cleanup;
