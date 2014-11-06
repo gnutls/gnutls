@@ -160,7 +160,7 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t 
 
 static int
 find_ext_cb(struct pkcs11_session_info *sinfo,
-	     struct token_info *info, struct ck_info *lib_info,
+	     struct ck_token_info *tinfo, struct ck_info *lib_info,
 	     void *input)
 {
 	struct find_ext_data_st *find_data = input;
@@ -172,7 +172,7 @@ find_ext_cb(struct pkcs11_session_info *sinfo,
 	int ret;
 	gnutls_datum_t ext;
 
-	if (info == NULL) {	/* we don't support multiple calls */
+	if (tinfo == NULL) {	/* we don't support multiple calls */
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
@@ -180,7 +180,7 @@ find_ext_cb(struct pkcs11_session_info *sinfo,
 	/* do not bother reading the token if basic fields do not match
 	 */
 	if (!p11_kit_uri_match_token_info
-	    (find_data->obj->info, &info->tinfo)
+	    (find_data->obj->info, tinfo)
 	    || !p11_kit_uri_match_module_info(find_data->obj->info,
 					      lib_info)) {
 		gnutls_assert();

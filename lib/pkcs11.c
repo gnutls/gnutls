@@ -965,7 +965,9 @@ gnutls_pkcs11_obj_export3(gnutls_pkcs11_obj_t obj,
 
 int
 pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
-		 struct p11_kit_uri *info, struct token_info *_tinfo)
+		 struct p11_kit_uri *info,
+		 struct ck_token_info *_tinfo,
+		 struct ck_slot_info *_slot_info)
 {
 	unsigned int x, z;
 	int ret;
@@ -984,24 +986,23 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 		}
 
 		for (z = 0; z < nslots; z++) {
-			struct token_info tinfo;
+			struct ck_token_info tinfo;
+			struct ck_slot_info sinfo;
 
 			if (pkcs11_get_token_info
 			    (providers[x].module, slots[z],
-			     &tinfo.tinfo) != CKR_OK) {
+			     &tinfo) != CKR_OK) {
 				continue;
 			}
-			tinfo.sid = slots[z];
-			tinfo.prov = &providers[x];
 
 			if (pkcs11_get_slot_info
 			    (providers[x].module, slots[z],
-			     &tinfo.sinfo) != CKR_OK) {
+			     &sinfo) != CKR_OK) {
 				continue;
 			}
 
 			if (!p11_kit_uri_match_token_info
-			    (info, &tinfo.tinfo)
+			    (info, &tinfo)
 			    || !p11_kit_uri_match_module_info(info,
 							      &providers
 							      [x].info)) {
@@ -1014,6 +1015,9 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 
 			if (_tinfo != NULL)
 				memcpy(_tinfo, &tinfo, sizeof(tinfo));
+
+			if (_slot_info != NULL)
+				memcpy(_slot_info, &sinfo, sizeof(sinfo));
 
 			return 0;
 		}
@@ -1033,9 +1037,9 @@ pkcs11_open_session(struct pkcs11_session_info *sinfo,
 	ck_session_handle_t pks = 0;
 	struct ck_function_list *module;
 	ck_slot_id_t slot;
-	struct token_info tinfo;
+	struct ck_token_info tinfo;
 
-	ret = pkcs11_find_slot(&module, &slot, info, &tinfo);
+	ret = pkcs11_find_slot(&module, &slot, info, &tinfo, &sinfo->slot_info);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1054,7 +1058,7 @@ pkcs11_open_session(struct pkcs11_session_info *sinfo,
 	sinfo->module = module;
 	sinfo->sid = slot;
 	sinfo->init = 1;
-	memcpy(&sinfo->tinfo, &tinfo.tinfo, sizeof(sinfo->tinfo));
+	memcpy(&sinfo->tinfo, &tinfo, sizeof(sinfo->tinfo));
 
 	if (flags & SESSION_LOGIN) {
 		ret =
@@ -1101,23 +1105,22 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 
 		module = providers[x].module;
 		for (z = 0; z < nslots; z++) {
-			struct token_info tinfo;
+			struct ck_token_info l_tinfo;
+			struct ck_slot_info l_sinfo;
 
 			if (pkcs11_get_token_info(module, slots[z],
-						  &tinfo.tinfo) != CKR_OK) {
+						  &l_tinfo) != CKR_OK) {
 				continue;
 			}
-			tinfo.sid = slots[z];
-			tinfo.prov = &providers[x];
 
 			if (pkcs11_get_slot_info(module, slots[z],
-						 &tinfo.sinfo) != CKR_OK) {
+						 &l_sinfo) != CKR_OK) {
 				continue;
 			}
 
 			if (info != NULL) {
     			    if (!p11_kit_uri_match_token_info
-	    		        (info, &tinfo.tinfo)
+	    		        (info, &l_tinfo)
 	    		        || !p11_kit_uri_match_module_info(info,
 							      &providers
 							      [x].info)) {
@@ -1135,8 +1138,8 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 
 			sinfo.module = module;
 			sinfo.pks = pks;
-			sinfo.sid = tinfo.sid;
-			memcpy(&sinfo.tinfo, &tinfo.tinfo, sizeof(sinfo.tinfo));
+			sinfo.sid = slots[z];
+			memcpy(&sinfo.tinfo, &l_tinfo, sizeof(sinfo.tinfo));
 
 			if (flags & SESSION_LOGIN) {
 				ret =
@@ -1149,7 +1152,7 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			}
 
 			ret =
-			    find_func(&sinfo, &tinfo, &providers[x].info, input);
+			    find_func(&sinfo, &l_tinfo, &providers[x].info, input);
 
 			if (ret == 0) {
 				found = 1;
@@ -1519,7 +1522,7 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 static int
 pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 		     struct pkcs11_session_info *sinfo,
-		     struct token_info *info, struct ck_info *lib_info,
+		     struct ck_token_info *tinfo, struct ck_info *lib_info,
 		     gnutls_pkcs11_obj_t fobj)
 {
 	ck_bool_t b;
@@ -1626,14 +1629,14 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 					     obj,
 					     fobj,
 					     &id, &label,
-					     &info->tinfo,
+					     tinfo,
 					     lib_info);
 	} else {
 		ret =
 		    pkcs11_obj_import(class,
 				      fobj,
 				      &data, &id, &label,
-				      &info->tinfo,
+				      tinfo,
 				      lib_info);
 	}
 	if (ret < 0) {
@@ -1649,7 +1652,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 static int
 find_obj_url_cb(struct pkcs11_session_info *sinfo,
-	     struct token_info *info, struct ck_info *lib_info,
+	     struct ck_token_info *tinfo, struct ck_info *lib_info,
 	     void *input)
 {
 	struct find_url_data_st *find_data = input;
@@ -1662,7 +1665,7 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
 	unsigned long count, a_vals;
 	int found = 0, ret;
 
-	if (info == NULL) {	/* we don't support multiple calls */
+	if (tinfo == NULL) {	/* we don't support multiple calls */
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
@@ -1670,7 +1673,7 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
 	/* do not bother reading the token if basic fields do not match
 	 */
 	if (!p11_kit_uri_match_token_info
-	    (find_data->obj->info, &info->tinfo)
+	    (find_data->obj->info, tinfo)
 	    || !p11_kit_uri_match_module_info(find_data->obj->info,
 					      lib_info)) {
 		gnutls_assert();
@@ -1726,7 +1729,7 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
 
 	if (pkcs11_find_objects(sinfo->module, sinfo->pks, &obj, 1, &count) == CKR_OK &&
 	    count == 1) {
-		ret = pkcs11_import_object(obj, class, sinfo, info, lib_info, find_data->obj);
+		ret = pkcs11_import_object(obj, class, sinfo, tinfo, lib_info, find_data->obj);
 		if (ret >= 0) {
 			found = 1;
 		}
@@ -1811,7 +1814,7 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 
 static int
 find_token_num_cb(struct pkcs11_session_info *sinfo,
-	       struct token_info *tinfo,
+	       struct ck_token_info *tinfo,
 	       struct ck_info *lib_info, void *input)
 {
 	struct find_token_num *find_data = input;
@@ -1823,7 +1826,7 @@ find_token_num_cb(struct pkcs11_session_info *sinfo,
 
 	if (find_data->current == find_data->seq) {
 		memcpy(p11_kit_uri_get_token_info(find_data->info),
-		       &tinfo->tinfo, sizeof(struct ck_token_info));
+		       tinfo, sizeof(struct ck_token_info));
 		memcpy(p11_kit_uri_get_module_info(find_data->info),
 		       lib_info, sizeof(struct ck_info));
 		return 0;
@@ -2296,7 +2299,7 @@ int pkcs11_call_token_func(struct p11_kit_uri *info, const unsigned retry)
 
 static int
 find_privkeys(struct pkcs11_session_info *sinfo,
-	      struct token_info *info, struct find_pkey_list_st *list)
+	      struct ck_token_info *tinfo, struct find_pkey_list_st *list)
 {
 	struct ck_attribute a[3];
 	ck_object_class_t class;
@@ -2388,7 +2391,7 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 
 static int
 find_objs_cb(struct pkcs11_session_info *sinfo,
-	  struct token_info *info, struct ck_info *lib_info, void *input)
+	  struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
 {
 	struct find_obj_data_st *find_data = input;
 	struct ck_attribute a[16];
@@ -2405,14 +2408,14 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 	struct find_pkey_list_st plist;	/* private key holder */
 	unsigned int i, tot_values = 0;
 
-	if (info == NULL) {
+	if (tinfo == NULL) {
 		gnutls_assert();
 		return 0;
 	}
 
 	/* do not bother reading the token if basic fields do not match
 	 */
-	if (!p11_kit_uri_match_token_info(find_data->info, &info->tinfo) ||
+	if (!p11_kit_uri_match_token_info(find_data->info, tinfo) ||
 	    !p11_kit_uri_match_module_info(find_data->info, lib_info)) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -2421,7 +2424,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 	memset(&plist, 0, sizeof(plist));
 
 	if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY) {
-		ret = find_privkeys(sinfo, info, &plist);
+		ret = find_privkeys(sinfo, tinfo, &plist);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -2638,7 +2641,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 			}
 
 			ret = pkcs11_import_object(objs[j], class, sinfo,
-					     info, lib_info,
+					     tinfo, lib_info,
 					     find_data->p_list[find_data->current]);
 			if (ret < 0) {
 				gnutls_assert();
@@ -2940,18 +2943,18 @@ gnutls_x509_crt_list_import_pkcs11(gnutls_x509_crt_t * certs,
 
 static int
 find_flags_cb(struct pkcs11_session_info *sinfo,
-	   struct token_info *info, struct ck_info *lib_info, void *input)
+	   struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
 {
 	struct find_flags_data_st *find_data = input;
 
-	if (info == NULL) {	/* we don't support multiple calls */
+	if (tinfo == NULL) {	/* we don't support multiple calls */
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
 	/* do not bother reading the token if basic fields do not match
 	 */
-	if (!p11_kit_uri_match_token_info(find_data->info, &info->tinfo) ||
+	if (!p11_kit_uri_match_token_info(find_data->info, tinfo) ||
 	    !p11_kit_uri_match_module_info(find_data->info, lib_info)) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -2962,7 +2965,7 @@ find_flags_cb(struct pkcs11_session_info *sinfo,
 		find_data->trusted = 1;
 	else
 		find_data->trusted = 0;
-	find_data->slot_flags = info->sinfo.flags;
+	find_data->slot_flags = sinfo->slot_info.flags;
 
 	return 0;
 }
@@ -3037,7 +3040,7 @@ gnutls_pkcs11_token_get_mechanism(const char *url, unsigned int idx,
 	ck_rv_t rv;
 	struct ck_function_list *module;
 	ck_slot_id_t slot;
-	struct token_info tinfo;
+	struct ck_token_info tinfo;
 	struct p11_kit_uri *info = NULL;
 	unsigned long count;
 	ck_mechanism_type_t mlist[400];
@@ -3050,7 +3053,7 @@ gnutls_pkcs11_token_get_mechanism(const char *url, unsigned int idx,
 		return ret;
 	}
 
-	ret = pkcs11_find_slot(&module, &slot, info, &tinfo);
+	ret = pkcs11_find_slot(&module, &slot, info, &tinfo, NULL);
 	p11_kit_uri_free(info);
 
 	if (ret < 0) {
@@ -3172,7 +3175,7 @@ cleanup:
 
 static int
 find_cert_cb(struct pkcs11_session_info *sinfo,
-	    struct token_info *info, struct ck_info *lib_info, void *input)
+	    struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
 {
 	struct ck_attribute a[10];
 	ck_object_class_t class = -1;
@@ -3189,7 +3192,7 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 	ck_bool_t trusted = 1;
 	time_t now;
 
-	if (info == NULL) {
+	if (tinfo == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
@@ -3336,7 +3339,7 @@ find_cert_cb(struct pkcs11_session_info *sinfo,
 					ret =
 					    pkcs11_obj_import(class, priv->obj,
 							      &data, &id, &label,
-							      &info->tinfo,
+							      tinfo,
 							      lib_info);
 					if (ret < 0) {
 						gnutls_assert();

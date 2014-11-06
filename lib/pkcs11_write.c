@@ -641,7 +641,7 @@ struct delete_data_st {
 
 static int
 delete_obj_url(struct pkcs11_session_info *sinfo,
-	       struct token_info *info,
+	       struct ck_token_info *tinfo,
 	       struct ck_info *lib_info, void *input)
 {
 	struct delete_data_st *find_data = input;
@@ -654,7 +654,7 @@ delete_obj_url(struct pkcs11_session_info *sinfo,
 	unsigned long count, a_vals;
 	int found = 0, ret;
 
-	if (info == NULL) {	/* we don't support multiple calls */
+	if (tinfo == NULL) {	/* we don't support multiple calls */
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
@@ -662,7 +662,7 @@ delete_obj_url(struct pkcs11_session_info *sinfo,
 	/* do not bother reading the token if basic fields do not match
 	 */
 	if (!p11_kit_uri_match_module_info(find_data->info, lib_info) ||
-	    !p11_kit_uri_match_token_info(find_data->info, &info->tinfo)) {
+	    !p11_kit_uri_match_token_info(find_data->info, tinfo)) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
@@ -818,7 +818,7 @@ gnutls_pkcs11_token_init(const char *token_url,
 		return ret;
 	}
 
-	ret = pkcs11_find_slot(&module, &slot, info, NULL);
+	ret = pkcs11_find_slot(&module, &slot, info, NULL, NULL);
 	p11_kit_uri_free(info);
 
 	if (ret < 0) {

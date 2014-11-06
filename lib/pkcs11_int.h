@@ -37,16 +37,10 @@ typedef unsigned char ck_bool_t;
 struct pkcs11_session_info {
 	struct ck_function_list *module;
 	struct ck_token_info tinfo;
+	struct ck_slot_info slot_info;
 	ck_session_handle_t pks;
 	ck_slot_id_t sid;
 	unsigned int init;
-};
-
-struct token_info {
-	struct ck_token_info tinfo;
-	struct ck_slot_info sinfo;
-	ck_slot_id_t sid;
-	struct gnutls_pkcs11_provider_st *prov;
 };
 
 struct gnutls_pkcs11_obj_st {
@@ -84,14 +78,15 @@ int _gnutls_pkcs11_check_init(void);
  * It should return 0 if found what it was looking for.
  */
 typedef int (*find_func_t) (struct pkcs11_session_info *,
-			    struct token_info * tinfo, struct ck_info *,
+			    struct ck_token_info * tinfo, struct ck_info *,
 			    void *input);
 
 int pkcs11_rv_to_err(ck_rv_t rv);
 int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info);
 int
 pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
-		 struct p11_kit_uri *info, struct token_info *_tinfo);
+		 struct p11_kit_uri *info, struct ck_token_info *_tinfo,
+		 struct ck_slot_info *_slot_info);
 
 int pkcs11_read_pubkey(struct ck_function_list *module,
 		       ck_session_handle_t pks, ck_object_handle_t obj,
