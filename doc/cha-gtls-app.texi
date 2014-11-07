@@ -1232,9 +1232,9 @@ authentication.
 
 @headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter (profile) @tab Description
 
-@item <72
-@tab <1008
-@tab <160
+@item <64
+@tab <768
+@tab <128
 @tab @code{INSECURE}
 @tab Considered to be insecure
 
