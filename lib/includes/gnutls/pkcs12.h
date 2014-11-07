@@ -121,6 +121,11 @@ int gnutls_pkcs12_bag_set_crl(gnutls_pkcs12_bag_t bag,
 int gnutls_pkcs12_bag_set_crt(gnutls_pkcs12_bag_t bag,
 			      gnutls_x509_crt_t crt);
 
+int
+gnutls_pkcs12_bag_set_privkey(gnutls_pkcs12_bag_t bag,
+			      gnutls_x509_privkey_t privkey,
+			      const char *password, unsigned flags);
+
 int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag_t * bag);
 void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag_t bag);
 int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag_t bag);

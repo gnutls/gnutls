@@ -854,3 +854,53 @@ gnutls_pkcs12_bag_enc_info(gnutls_pkcs12_bag_t bag, unsigned int *schema, unsign
 
 	return 0;
 }
+
+/**
+ * gnutls_pkcs12_bag_set_privkey:
+ * @bag: The bag
+ * @privkey: the private key to be copied.
+ * @password: the password to protect the key with (may be %NULL)
+ * @flags: should be one of #gnutls_pkcs_encrypt_flags_t elements bitwise or'd
+ *
+ * This function will insert the given private key into the
+ * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
+ *
+ * Returns: the index of the added bag on success, or a negative
+ * value on failure.
+ **/
+int
+gnutls_pkcs12_bag_set_privkey(gnutls_pkcs12_bag_t bag, gnutls_x509_privkey_t privkey,
+			      const char *password, unsigned flags)
+{
+	int ret;
+	gnutls_datum_t data = {NULL, 0};
+
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_x509_privkey_export2_pkcs8(privkey, GNUTLS_X509_FMT_DER,
+						password, flags, &data);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (password == NULL) {
+		ret = gnutls_pkcs12_bag_set_data(bag, GNUTLS_BAG_PKCS8_KEY, &data);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	} else {
+		ret = gnutls_pkcs12_bag_set_data(bag, GNUTLS_BAG_PKCS8_ENCRYPTED_KEY, &data);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+ cleanup:
+	_gnutls_free_datum(&data);
+
+	return ret;
+}
