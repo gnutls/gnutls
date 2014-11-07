@@ -100,7 +100,7 @@ int pkcs11_get_info(struct p11_kit_uri *info,
 int pkcs11_login(struct pkcs11_session_info *sinfo,
 		 struct pin_info_st *pin_info,
 		 struct p11_kit_uri *info, unsigned so,
-		 unsigned force);
+		 unsigned reauth);
 
 int pkcs11_call_token_func(struct p11_kit_uri *info, const unsigned retry);
 

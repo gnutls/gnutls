@@ -2193,14 +2193,21 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 	     struct pin_info_st *pin_info,
 	     struct p11_kit_uri *info,
 	     unsigned so,
-	     unsigned force)
+	     unsigned reauth)
 {
 	struct ck_session_info session_info;
 	int attempt = 0, ret;
 	ck_user_type_t user_type;
 	ck_rv_t rv;
 
-	user_type = (so == 0) ? CKU_USER : CKU_SO;
+	if (so == 0) {
+		if (reauth == 0)
+			user_type = CKU_USER;
+		else
+			user_type = CKU_CONTEXT_SPECIFIC;
+	} else
+		user_type = CKU_SO;
+
 	if (so == 0 && (sinfo->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
 		gnutls_assert();
 		_gnutls_debug_log("p11: No login required.\n");
@@ -2235,7 +2242,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		/* Check whether the session is already logged in, and if so, just skip */
 		rv = (sinfo->module)->C_GetSessionInfo(sinfo->pks,
 						       &session_info);
-		if (rv == CKR_OK && force == 0 &&
+		if (rv == CKR_OK && reauth == 0 &&
 		    (session_info.state == CKS_RO_USER_FUNCTIONS
 			|| session_info.state == CKS_RW_USER_FUNCTIONS)) {
 			ret = 0;
