@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #ifndef _WIN32
+#include <arpa/inet.h>
 #include <signal.h>
 #endif
 #include <socket.h>
