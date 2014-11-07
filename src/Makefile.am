@@ -69,6 +69,8 @@ if ENABLE_TROUSERS
 bin_PROGRAMS += tpmtool
 endif
 
+bin_PROGRAMS += systemkey-tool
+
 if ENABLE_PKCS11
 bin_PROGRAMS += p11tool
 endif
@@ -203,6 +205,17 @@ libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIM
 
 endif # ENABLE_TROUSERS
 
+systemkey_tool_SOURCES = systemkey-tool.c certtool-common.c
+systemkey_tool_LDADD = ../lib/libgnutls.la
+systemkey_tool_LDADD += libcmd-systemkey.la $(LIBOPTS) ../gl/libgnu.la gl/libgnu_gpl.la
+systemkey_tool_LDADD += $(LTLIBINTL)
+
+noinst_LTLIBRARIES += libcmd-systemkey.la
+libcmd_systemkey_la_SOURCES = systemkey-args.def systemkey-args.c systemkey-args.h \
+	certtool-cfg.h certtool-cfg.c
+libcmd_systemkey_la_LIBADD = ../lib/libgnutls.la gl/libgnu_gpl.la ../gl/libgnu.la 
+libcmd_systemkey_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIME)
+
 danetool-args.h: danetool-args.c
 danetool-args.c: $(srcdir)/danetool-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
@@ -232,4 +245,8 @@ srptool-args.c: $(srcdir)/srptool-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<
 certtool-args.h: certtool-args.c
 certtool-args.c: $(srcdir)/certtool-args.def $(srcdir)/args-std.def
+	-$(AUTOGEN) $<
+
+systemkey-args.h: systemkey-args.c
+systemkey-args.c: $(srcdir)/systemkey-args.def $(srcdir)/args-std.def
 	-$(AUTOGEN) $<

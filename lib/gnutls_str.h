@@ -86,8 +86,9 @@ int _gnutls_buffer_pop_datum_prefix(gnutls_buffer_st * buf,
 				    gnutls_datum_t * data);
 int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data);
 
-int _gnutls_buffer_escape(gnutls_buffer_st * dest, int all,
-			  const char *const invalid_chars);
+int
+_gnutls_buffer_append_escape(gnutls_buffer_st * dest, const void *data,
+			     size_t data_size, const char *invalid_chars);
 int _gnutls_buffer_unescape(gnutls_buffer_st * dest);
 
 #ifndef __attribute__

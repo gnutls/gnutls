@@ -34,6 +34,7 @@
 #include <accelerated/accelerated.h>
 #include <fips.h>
 #include <atfork.h>
+#include <system-keys.h>
 
 #include "gettext.h"
 
@@ -242,6 +243,11 @@ int gnutls_global_init(void)
 		goto out;
 	}
 
+	ret = _gnutls_system_key_init();
+	if (ret != 0) {
+		gnutls_assert();
+	}
+
 	/* initialize ASN.1 parser
 	 */
 	if (asn1_check_version(GNUTLS_MIN_LIBTASN1_VERSION) == NULL) {
@@ -371,6 +377,7 @@ static void _gnutls_global_deinit(unsigned destructor)
 			goto fail;
 		}
 
+		_gnutls_system_key_deinit();
 		gnutls_crypto_deinit();
 		_gnutls_rnd_deinit();
 		_gnutls_ext_deinit();

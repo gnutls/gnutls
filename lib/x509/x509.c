@@ -33,6 +33,8 @@
 #include <x509_int.h>
 #include <libtasn1.h>
 #include <gnutls_pk.h>
+#include <pkcs11_int.h>
+#include "system-keys.h"
 
 static int crt_reinit(gnutls_x509_crt_t crt)
 {
@@ -3784,4 +3786,37 @@ void gnutls_x509_crt_set_pin_function(gnutls_x509_crt_t crt,
 {
 	crt->pin.cb = fn;
 	crt->pin.data = userdata;
+}
+
+/**
+ * gnutls_x509_crt_import_pkcs11_url:
+ * @crt: A certificate of type #gnutls_x509_crt_t
+ * @url: A PKCS 11 url
+ * @flags: One of GNUTLS_PKCS11_OBJ_* flags
+ *
+ * This function will import a PKCS 11 certificate directly from a token
+ * without involving the #gnutls_pkcs11_obj_t structure. This function will
+ * fail if the certificate stored is not of X.509 type.
+ *
+ * Despite its name this function will attempt to import any kind of 
+ * URL to certificate. It is synonymous to gnutls_x509_crt_import_url().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 2.12.0
+ **/
+int
+gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
+				  const char *url, unsigned int flags)
+{
+	if (strncmp(url, "system:", 7) == 0) {
+		return _gnutls_x509_crt_import_system_url(crt, url);
+#ifdef ENABLE_PKCS11
+	} else if (strncmp(url, "pkcs11:", 7) == 0) {
+			return _gnutls_x509_crt_import_pkcs11_url(crt, url, flags);
+#endif
+	} else {
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 }

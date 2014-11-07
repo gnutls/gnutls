@@ -44,6 +44,7 @@
 #include <gnutls_str_array.h>
 #include <gnutls/x509.h>
 #include "read-file.h"
+#include "system-keys.h"
 #ifdef _WIN32
 #include <wincrypt.h>
 #endif
@@ -693,7 +694,6 @@ read_key_url(gnutls_certificate_credentials_t res, const char *url)
 	return ret;
 }
 
-#ifdef ENABLE_PKCS11
 
 #define MAX_PKCS11_CERT_CHAIN 8
 /* Reads a certificate key from a token.
@@ -703,7 +703,7 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 {
 	int ret;
 	gnutls_x509_crt_t crt = NULL;
-	gnutls_pcert_st *ccert;
+	gnutls_pcert_st *ccert = NULL;
 	gnutls_str_array_t names;
 	gnutls_datum_t t = {NULL, 0};
 	unsigned i, count = 0;
@@ -726,12 +726,11 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 		gnutls_x509_crt_set_pin_function(crt, res->pin.cb,
 						 res->pin.data);
 
-	ret = gnutls_x509_crt_import_pkcs11_url(crt, url, 0);
+	ret = gnutls_x509_crt_import_url(crt, url, 0);
 	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 		ret =
-		    gnutls_x509_crt_import_pkcs11_url(crt, url,
-						      GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
-
+		    gnutls_x509_crt_import_url(crt, url,
+					       GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -745,10 +744,10 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 
 	/* Try to load the whole certificate chain from the PKCS #11 token */
 	for (i=0;i<MAX_PKCS11_CERT_CHAIN;i++) {
-                ret = gnutls_x509_crt_check_issuer(crt, crt);
+       	        ret = gnutls_x509_crt_check_issuer(crt, crt);
                 if (i > 0 && ret != 0) {
-                        /* self signed */
-                        break;
+                	/* self signed */
+       	                break;
                 }
 
 		ret = gnutls_pcert_import_x509(&ccert[i], crt, 0);
@@ -758,25 +757,31 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 		}
 		count++;
 
-		ret = gnutls_pkcs11_get_raw_issuer(url, crt, &t, GNUTLS_X509_FMT_DER, 0);
-		if (ret < 0)
-			break;
+#ifdef ENABLE_PKCS11
+		if (strncmp(certfile, "pkcs11:", 7) == 0) {
+			ret = gnutls_pkcs11_get_raw_issuer(url, crt, &t, GNUTLS_X509_FMT_DER, 0);
+			if (ret < 0)
+				break;
 
-		gnutls_x509_crt_deinit(crt);
-		crt = NULL;
-		ret = gnutls_x509_crt_init(&crt);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
+			gnutls_x509_crt_deinit(crt);
+			crt = NULL;
+			ret = gnutls_x509_crt_init(&crt);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
 		
-		ret = gnutls_x509_crt_import(crt, &t, GNUTLS_X509_FMT_DER);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
+			ret = gnutls_x509_crt_import(crt, &t, GNUTLS_X509_FMT_DER);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			gnutls_free(t.data);
+			t.data = NULL;
 		}
-		gnutls_free(t.data);
-		t.data = NULL;
+#else
+		break;
+#endif
 	}
 
 	ret = certificate_credential_append_crt_list(res, names, ccert, count);
@@ -797,9 +802,6 @@ cleanup:
 	gnutls_free(ccert);
 	return ret;
 }
-#else
-#define read_cert_url(x,y) gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE)
-#endif
 
 /* Reads a certificate file
  */
@@ -811,7 +813,7 @@ read_cert_file(gnutls_certificate_credentials_t res,
 	size_t size;
 	char *data;
 
-	if (strncmp(certfile, "pkcs11:", 7) == 0) {
+	if (gnutls_url_is_supported(certfile)) {
 		return read_cert_url(res, certfile);
 	}
 
@@ -2063,6 +2065,9 @@ int gnutls_url_is_supported(const char *url)
 	if (strstr(url, "tpmkey:") != NULL)
 		return 1;
 #endif
+	if (strstr(url, "system:") != NULL)
+		return _gnutls_system_url_is_supported(url);
+
 	return 0;
 }
 
@@ -2071,6 +2076,8 @@ int _gnutls_url_is_known(const char *url)
 	if (strstr(url, "pkcs11:") != NULL)
 		return 1;
 	else if (strstr(url, "tpmkey:") != NULL)
+		return 1;
+	else if (strstr(url, "system:") != NULL)
 		return 1;
 	else
 		return 0;

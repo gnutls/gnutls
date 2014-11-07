@@ -338,10 +338,6 @@ gnutls_pkcs11_obj_list_import_url2(gnutls_pkcs11_obj_t ** p_list,
 
 int gnutls_x509_crt_import_pkcs11(gnutls_x509_crt_t crt,
 				  gnutls_pkcs11_obj_t pkcs11_crt);
-int gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
-				      const char *url, unsigned int flags
-				      /* GNUTLS_PKCS11_OBJ_FLAG_* */
-    );
 
 gnutls_pkcs11_obj_type_t
 gnutls_pkcs11_obj_get_type(gnutls_pkcs11_obj_t obj);

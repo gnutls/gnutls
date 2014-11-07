@@ -354,7 +354,6 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
 
 int
 gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
-                           gnutls_pk_algorithm_t pk,
                            void *userdata,
                            gnutls_privkey_sign_func sign_func,
                            gnutls_privkey_decrypt_func decrypt_func,

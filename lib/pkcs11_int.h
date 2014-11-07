@@ -111,6 +111,10 @@ void pkcs11_rescan_slots(void);
 int pkcs11_info_to_url(struct p11_kit_uri *info,
 		       gnutls_pkcs11_url_type_t detailed, char **url);
 
+int
+_gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
+				  const char *url, unsigned int flags);
+
 #define SESSION_WRITE (1<<0)
 #define SESSION_LOGIN (1<<1)
 #define SESSION_SO (1<<2)	/* security officer session */

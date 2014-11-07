@@ -83,6 +83,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_FATAL_ALERT_RECEIVED),
 	ERROR_ENTRY(N_("An unexpected TLS packet was received."),
 		    GNUTLS_E_UNEXPECTED_PACKET),
+	ERROR_ENTRY(N_("Failed to import the key into store."),
+		    GNUTLS_E_KEY_IMPORT_FAILED),
 	ERROR_ENTRY(N_
 		    ("An error was encountered at the TLS Finished packet calculation."),
 		    GNUTLS_E_ERROR_IN_FINISHED_PACKET),

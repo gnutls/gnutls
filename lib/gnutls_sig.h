@@ -25,6 +25,13 @@
 
 #include <gnutls/abstract.h>
 
+/* While this is currently equal to the length of RSA/SHA512
+ * signature, it should also be sufficient for DSS signature and any
+ * other RSA signatures including one with the old MD5/SHA1-combined
+ * format.
+ */
+#define MAX_SIG_SIZE (19 + MAX_HASH_SIZE)
+
 int _gnutls_handshake_sign_crt_vrfy(gnutls_session_t session,
 				    gnutls_pcert_st * cert,
 				    gnutls_privkey_t pkey,

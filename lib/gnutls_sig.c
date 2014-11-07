@@ -46,13 +46,6 @@ sign_tls_hash(gnutls_session_t session, const mac_entry_st * hash_algo,
 	      gnutls_datum_t * signature);
 
 
-/* While this is currently equal to the length of RSA/SHA512
- * signature, it should also be sufficient for DSS signature and any
- * other RSA signatures including one with the old MD5/SHA1-combined
- * format.
- */
-#define MAX_SIG_SIZE 19 + MAX_HASH_SIZE
-
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */

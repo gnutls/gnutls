@@ -34,6 +34,7 @@
 #include <gnutls_sig.h>
 #include <algorithms.h>
 #include <fips.h>
+#include <system-keys.h>
 #include <abstract_int.h>
 
 /**
@@ -89,10 +90,7 @@ int gnutls_privkey_get_pk_algorithm(gnutls_privkey_t key, unsigned int *bits)
 	case GNUTLS_PRIVKEY_EXT:
 		if (bits)
 			*bits = 0;
-		if (key->key.ext.info_func)
-			return key->key.ext.info_func(key, GNUTLS_PRIVKEY_INFO_PK_ALGO, key->key.ext.userdata);
-		else
-			return key->pk_algorithm;
+		return key->pk_algorithm;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -585,7 +583,6 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
  **/
 int
 gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
-			   gnutls_pk_algorithm_t pk,
 			   void *userdata,
 			   gnutls_privkey_sign_func sign_fn,
 			   gnutls_privkey_decrypt_func decrypt_fn,
@@ -614,6 +611,8 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
 	pkey->key.ext.userdata = userdata;
 	pkey->type = GNUTLS_PRIVKEY_EXT;
 	pkey->flags = flags;
+
+	pkey->pk_algorithm = pkey->key.ext.info_func(pkey, GNUTLS_PRIVKEY_INFO_PK_ALGO, pkey->key.ext.userdata);
 
 	/* Ensure gnutls_privkey_deinit() calls the deinit_func */
 	if (deinit_fn)
@@ -1253,6 +1252,9 @@ gnutls_privkey_import_url(gnutls_privkey_t key, const char *url,
 #else
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
+
+	if (strncmp(url, "system:", 7) == 0)
+		return _gnutls_privkey_import_system_url(key, url);
 
 	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 }

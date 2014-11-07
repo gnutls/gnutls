@@ -1063,6 +1063,10 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs12_bag_set_privkey;
 	gnutls_x509_privkey_set_pin_function;
 	gnutls_ocsp_resp_get_responder_raw_id;
+	gnutls_system_key_iter_deinit;
+	gnutls_system_key_iter_get_info;
+	gnutls_system_key_delete;
+	gnutls_system_key_add_x509;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

@@ -341,27 +341,29 @@ _gnutls_buffer_delete_data(gnutls_buffer_st * dest, int pos,
 
 
 int
-_gnutls_buffer_escape(gnutls_buffer_st * dest, int all,
-		      const char *const invalid_chars)
+_gnutls_buffer_append_escape(gnutls_buffer_st * dest, const void *data,
+			     size_t data_size, const char *invalid_chars)
 {
 	int rv = -1;
 	char t[5];
-	unsigned int pos = 0;
+	unsigned int pos = dest->length;
+
+	rv = _gnutls_buffer_append_data(dest, data, data_size);
+	if (rv < 0)
+		return gnutls_assert_val(rv);
 
 	while (pos < dest->length) {
 
-		if (all != 0
-		    || (dest->data[pos] == '\\'
+		if (dest->data[pos] == '\\'
 			|| strchr(invalid_chars, dest->data[pos])
-			|| !c_isgraph(dest->data[pos]))) {
+			|| !c_isgraph(dest->data[pos])) {
 
 			snprintf(t, sizeof(t), "%%%.2X",
 				 (unsigned int) dest->data[pos]);
 
 			_gnutls_buffer_delete_data(dest, pos, 1);
 
-			if (_gnutls_buffer_insert_data(dest, pos, t, 3) <
-			    0) {
+			if (_gnutls_buffer_insert_data(dest, pos, t, 3) < 0) {
 				rv = -1;
 				goto cleanup;
 			}
@@ -373,7 +375,6 @@ _gnutls_buffer_escape(gnutls_buffer_st * dest, int all,
 	rv = 0;
 
       cleanup:
-
 	return rv;
 }
 

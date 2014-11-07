@@ -38,6 +38,7 @@
 #include <p11-kit/p11-kit.h>
 #include "pkcs11x.h"
 #include <p11-kit/pin.h>
+#include <system-keys.h>
 
 #include <atfork.h>
 
@@ -2859,7 +2860,28 @@ gnutls_pkcs11_obj_list_import_url2(gnutls_pkcs11_obj_t ** p_list,
 }
 
 /**
- * gnutls_x509_crt_import_pkcs11_url:
+ * gnutls_x509_crt_import_pkcs11:
+ * @crt: A certificate of type #gnutls_x509_crt_t
+ * @pkcs11_crt: A PKCS 11 object that contains a certificate
+ *
+ * This function will import a PKCS 11 certificate to a #gnutls_x509_crt_t
+ * structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 2.12.0
+ **/
+int
+gnutls_x509_crt_import_pkcs11(gnutls_x509_crt_t crt,
+			      gnutls_pkcs11_obj_t pkcs11_crt)
+{
+	return gnutls_x509_crt_import(crt, &pkcs11_crt->raw,
+				      GNUTLS_X509_FMT_DER);
+}
+
+/*-
+ * _gnutls_x509_crt_import_pkcs11_url:
  * @crt: A certificate of type #gnutls_x509_crt_t
  * @url: A PKCS 11 url
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
@@ -2872,9 +2894,9 @@ gnutls_pkcs11_obj_list_import_url2(gnutls_pkcs11_obj_t ** p_list,
  *   negative error value.
  *
  * Since: 2.12.0
- **/
+ -*/
 int
-gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
+_gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 				  const char *url, unsigned int flags)
 {
 	gnutls_pkcs11_obj_t pcrt;
@@ -2901,34 +2923,13 @@ gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 		gnutls_assert();
 		goto cleanup;
 	}
+	
 
 	ret = 0;
-      cleanup:
+ cleanup:
 
 	gnutls_pkcs11_obj_deinit(pcrt);
-
 	return ret;
-}
-
-/**
- * gnutls_x509_crt_import_pkcs11:
- * @crt: A certificate of type #gnutls_x509_crt_t
- * @pkcs11_crt: A PKCS 11 object that contains a certificate
- *
- * This function will import a PKCS 11 certificate to a #gnutls_x509_crt_t
- * structure.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- *
- * Since: 2.12.0
- **/
-int
-gnutls_x509_crt_import_pkcs11(gnutls_x509_crt_t crt,
-			      gnutls_pkcs11_obj_t pkcs11_crt)
-{
-	return gnutls_x509_crt_import(crt, &pkcs11_crt->raw,
-				      GNUTLS_X509_FMT_DER);
 }
 
 /**
