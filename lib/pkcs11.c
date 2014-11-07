@@ -2131,7 +2131,7 @@ retrieve_pin_from_callback(const struct pin_info_st *pin_info,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (user_type == CKU_USER) {
+	if (user_type == CKU_USER || user_type == CKU_CONTEXT_SPECIFIC) {
 		flags |= GNUTLS_PIN_USER;
 		if (token_info->flags & CKF_USER_PIN_COUNT_LOW)
 			flags |= GNUTLS_PIN_COUNT_LOW;
@@ -2243,8 +2243,7 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 	 * required. */
 	if (sinfo->tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH) {
 		rv = (sinfo->module)->C_Login(sinfo->pks,
-					      (so ==
-					       0) ? CKU_USER : CKU_SO,
+					      user_type,
 					      NULL, 0);
 		if (rv == CKR_OK || rv == CKR_USER_ALREADY_LOGGED_IN) {
 			return 0;
