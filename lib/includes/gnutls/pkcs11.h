@@ -110,6 +110,8 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP: Mark the generated key pair as wrapping and unwrapping keys.
  * @GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT: When an issuer is requested, override its extensions with the ones present in the trust module.
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH: Mark the key pair as requiring authentication (pin entry) before every operation.
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE: Mark the key pair as being extractable (insecure).
+ * @GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE: If set, the object was never marked as extractable.
  *
  * Enumeration of different PKCS #11 object flags.
  */
@@ -129,7 +131,9 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP = (1<<12),
 	GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY = (1<<13),
 	GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT = (1<<14),
-	GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH = (1<<15)
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH = (1<<15),
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE = (1<<16),
+	GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE = (1<<17)
 } gnutls_pkcs11_obj_flags;
 
 /**

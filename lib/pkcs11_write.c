@@ -438,6 +438,18 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 		a_val++;
 	}
 
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE) {
+		a[a_val].type = CKA_EXTRACTABLE;
+		a[a_val].value = (void *) &tval;
+		a[a_val].value_len = sizeof(tval);
+		(a_val)++;
+	} else {
+		a[a_val].type = CKA_EXTRACTABLE;
+		a[a_val].value = (void *) &fval;
+		a[a_val].value_len = sizeof(fval);
+		(a_val)++;
+	}
+
 	if (label) {
 		a[a_val].type = CKA_LABEL;
 		a[a_val].value = (void *) label;
