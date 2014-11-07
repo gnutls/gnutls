@@ -1585,6 +1585,14 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 	if (rv == CKR_OK && category == 2)
     		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_CA;
 
+	a[0].type = CKA_ALWAYS_AUTHENTICATE;
+	a[0].value = &b;
+	a[0].value_len = sizeof(b);
+
+	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
+	if (rv == CKR_OK && b != 0)
+    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH;
+
 	/* now recover the object label/id */
 	a[0].type = CKA_LABEL;
 	a[0].value = label_tmp;
@@ -3649,6 +3657,9 @@ char *gnutls_pkcs11_obj_flags_get_str(unsigned int flags)
 
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE)
 		_gnutls_buffer_append_str(&str, "CKA_PRIVATE; ");
+
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH)
+		_gnutls_buffer_append_str(&str, "CKA_ALWAYS_AUTH; ");
 
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED)
 		_gnutls_buffer_append_str(&str, "CKA_TRUSTED; ");

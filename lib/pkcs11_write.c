@@ -79,7 +79,7 @@ static void mark_flags(unsigned flags, struct ck_attribute *a, unsigned *a_val)
  * This function will copy a certificate into a PKCS #11 token specified by
  * a URL. Valid flags to mark the certificate: %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED,
  * %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE, %GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE,
- * %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA.
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA, %GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -426,6 +426,13 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 		a_val++;
 	} else {
 		a[a_val].type = CKA_PRIVATE;
+		a[a_val].value = (void *) &tval;
+		a[a_val].value_len = sizeof(tval);
+		a_val++;
+	}
+
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH) {
+		a[a_val].type = CKA_ALWAYS_AUTHENTICATE;
 		a[a_val].value = (void *) &tval;
 		a[a_val].value_len = sizeof(tval);
 		a_val++;
