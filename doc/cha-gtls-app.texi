@@ -1372,7 +1372,9 @@ for expiration.
 A server utilizing tickets should generate ticket encryption
 and authentication keys using @funcref{gnutls_session_ticket_key_generate}.
 Those keys should be associated with the GnuTLS session using
-@funcref{gnutls_session_ticket_enable_server}.
+@funcref{gnutls_session_ticket_enable_server}, and should be rotated regularly
+(e.g., every few hours), to prevent them from becoming long-term keys which
+if revealed could be used to decrypt all previous sessions.
 
 @showfuncdesc{gnutls_session_ticket_enable_server}
 @showfuncdesc{gnutls_session_ticket_key_generate}
