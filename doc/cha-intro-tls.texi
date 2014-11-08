@@ -443,8 +443,7 @@ the secrecy of all sessions on a server using tickets depends on the ticket
 key being kept secret. For that reason server keys should be rotated and discarded
 regularly.
 
-Since version 3.1.3 GnuTLS clients transparently support session tickets,
-unless the PFS session string is specified.
+Since version 3.1.3 GnuTLS clients transparently support session tickets.
 
 @node HeartBeat
 @subsection HeartBeat
