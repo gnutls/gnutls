@@ -492,7 +492,8 @@ int gnutls_session_ticket_enable_client(gnutls_session_t session)
  *
  * Request that the server should attempt session resumption using
  * SessionTicket.  @key must be initialized with
- * gnutls_session_ticket_key_generate().
+ * gnutls_session_ticket_key_generate(), and should be overwritten
+ * using gnutls_memset() before being released.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  * error code.

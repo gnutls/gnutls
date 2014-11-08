@@ -1514,6 +1514,9 @@ extern _SYM_EXPORT gnutls_free_function gnutls_free;
 
 extern _SYM_EXPORT char *(*gnutls_strdup) (const char *);
 
+/* a variant of memset that doesn't get optimized out */
+void gnutls_memset(void *data, int c, size_t size);
+
 typedef void (*gnutls_log_func) (int, const char *);
 typedef void (*gnutls_audit_log_func) (gnutls_session_t, const char *);
 void gnutls_global_set_log_function(gnutls_log_func log_func);

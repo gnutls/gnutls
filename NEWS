@@ -96,6 +96,7 @@ gnutls_record_discard_queued: Added
 gnutls_session_ext_master_secret_status: Added
 gnutls_priority_string_list: Added
 gnutls_dh_params_import_raw2: Added
+gnutls_memset: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
