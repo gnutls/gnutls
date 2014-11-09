@@ -3,7 +3,7 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.10 (unreleased)
+* Version 3.3.10 (released 2014-11-10)
 
 ** libgnutls: Refuse to import v1 or v2 certificates that contain
 extensions.
@@ -16,6 +16,9 @@ Reported by David Woodhouse.
 
 ** libgnutls: Removed superfluous random generator refresh on every call
 of gnutls_deinit(). That reduces load and usage of /dev/urandom.
+
+** libgnutls: Corrected issue in export of ECC parameters to X9.63 format.
+Reported by Sean Burford [GNUTLS-SA-2014-5].
 
 ** libgnutls: When gnutls_global_init() is called for a second time, it
 will check whether the /dev/urandom fd kept is still open and matches
