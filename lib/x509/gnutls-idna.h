@@ -36,7 +36,7 @@
 static inline
 int idna_to_ascii_8z(const char * input, char ** output, int flags)
 {
-	*output = input;
+	*output = (char*)input;
 	return 0;
 }
 
