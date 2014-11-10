@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# Copyright (C) 2014 Red Hat, Inc.
+#
+# Author: Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+DSA_CERT=$srcdir/../dsa/cert.dsa.1024.pem
+DSA_KEY=$srcdir/../dsa/dsa.1024.pem
+
+RSA_CERT=$srcdir/../certs/cert-rsa-2432.pem
+RSA_KEY=$srcdir/../certs/rsa-2432.pem
+
+CA_CERT=$srcdir/../../doc/credentials/x509/ca.pem
+CLI_CERT=$srcdir/../../doc/credentials/x509/clicert.pem
+CLI_KEY=$srcdir/../../doc/credentials/x509/clikey.pem
+
+CA_ECC_CERT=$srcdir/../certs/ca-cert-ecc.pem
+ECC224_CERT=$srcdir/../certs/cert-ecc.pem
+ECC224_KEY=$srcdir/../certs/ecc.pem
+
+ECC256_CERT=$srcdir/../certs/cert-ecc256.pem
+ECC256_KEY=$srcdir/../certs/ecc256.pem
+
+ECC521_CERT=$srcdir/../certs/cert-ecc521.pem
+ECC521_KEY=$srcdir/../certs/ecc521.pem
+
+ECC384_CERT=$srcdir/../certs/cert-ecc384.pem
+ECC384_KEY=$srcdir/../certs/ecc384.pem
+
+SERV_CERT=$srcdir/../../doc/credentials/x509/cert-rsa.pem
+SERV_KEY=$srcdir/../../doc/credentials/x509/key-rsa.pem
+SERV_DSA_CERT=$srcdir/../../doc/credentials/x509/cert-dsa.pem
+SERV_DSA_KEY=$srcdir/../../doc/credentials/x509/key-dsa.pem
+
+SERV_PSK=$srcdir/../../doc/credentials/psk-passwd.txt 
+
