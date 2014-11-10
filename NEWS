@@ -3,7 +3,7 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.2.20 (unreleased)
+* Version 3.2.20 (released 2014-11-10)
 
 ** libgnutls: Removed superfluous random generator refresh on every call
 of gnutls_deinit(). That reduces load and usage of /dev/urandom.
