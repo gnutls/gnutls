@@ -68,9 +68,6 @@ typedef int (*gnutls_privkey_decrypt_func) (gnutls_privkey_t key,
 typedef void (*gnutls_privkey_deinit_func) (gnutls_privkey_t key,
 					    void *userdata);
 
-/* returns a copy of userdata. Returns zero on success. */
-typedef int (*gnutls_privkey_copy_func) (gnutls_privkey_t key, void *userdata);
-
 /* returns the public key algorithm associated with userdata */
 typedef gnutls_pk_algorithm_t (*gnutls_privkey_pk_func) (gnutls_privkey_t key, void *userdata);
 
@@ -358,7 +355,6 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
                            gnutls_privkey_decrypt_func decrypt_func,
                            gnutls_privkey_deinit_func deinit_func,
                            gnutls_privkey_pk_func pk_func,
-                           gnutls_privkey_copy_func copy_func,
                            unsigned int flags);
 
 int gnutls_privkey_import_dsa_raw(gnutls_privkey_t key,

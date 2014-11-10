@@ -564,7 +564,6 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
  * @decrypt_fn: callback for decryption operations
  * @deinit_fn: a deinitialization function
  * @pk_fn: returns the public key algorithm (may be %NULL; if set @pk will be ignored)
- * @copy_fn: copies a context
  * @flags: Flags for the import
  *
  * This function will associate the given callbacks with the
@@ -590,7 +589,6 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
 			   gnutls_privkey_decrypt_func decrypt_fn,
 			   gnutls_privkey_deinit_func deinit_fn,
 			   gnutls_privkey_pk_func pk_fn,
-			   gnutls_privkey_copy_func copy_fn,
 			   unsigned int flags)
 {
 	int ret;
@@ -608,7 +606,6 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
 	pkey->key.ext.decrypt_func = decrypt_fn;
 	pkey->key.ext.deinit_func = deinit_fn;
 	pkey->key.ext.pk_func = pk_fn;
-	pkey->key.ext.copy_func = copy_fn;
 	pkey->key.ext.userdata = userdata;
 	pkey->type = GNUTLS_PRIVKEY_EXT;
 	pkey->pk_algorithm = pk;
