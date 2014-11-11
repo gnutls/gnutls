@@ -97,6 +97,7 @@ gnutls_session_ext_master_secret_status: Added
 gnutls_priority_string_list: Added
 gnutls_dh_params_import_raw2: Added
 gnutls_memset: Added
+gnutls_pkcs12_bag_set_privkey: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
