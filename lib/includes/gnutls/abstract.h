@@ -495,19 +495,13 @@ void gnutls_pcert_deinit(gnutls_pcert_st * pcert);
 	 * within the library.
 	 */
 typedef int gnutls_certificate_retrieve_function2(gnutls_session_t,
-						  const
-						  gnutls_datum_t *
-						  req_ca_rdn,
-						  int nreqs, const
-						  gnutls_pk_algorithm_t
-						  * pk_algos,
-						  int
-						  pk_algos_length,
-						  gnutls_pcert_st
-						  **, unsigned int
-						  *pcert_length,
-						  gnutls_privkey_t
-						  * privkey);
+				  const gnutls_datum_t *req_ca_rdn,
+				  int nreqs,
+				  const gnutls_pk_algorithm_t *pk_algos,
+				  int pk_algos_length,
+				  gnutls_pcert_st**,
+				  unsigned int *pcert_length,
+				  gnutls_privkey_t *privkey);
 
 
 void gnutls_certificate_set_retrieve_function2
