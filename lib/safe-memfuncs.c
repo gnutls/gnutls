@@ -24,7 +24,7 @@
 # include <gnutls_int.h>
 #endif
 
-/*-
+/**
  * gnutls_memset:
  * @data: the memory to set
  * @c: the constant byte to fill the memory with
@@ -35,8 +35,8 @@
  *
  * Returns: void.
  *
- * Since: 3.3.3
- -*/
+ * Since: 3.4.0
+ **/
 void gnutls_memset(void *data, int c, size_t size)
 {
 	volatile unsigned volatile_zero = 0;
@@ -51,6 +51,34 @@ void gnutls_memset(void *data, int c, size_t size)
 			memset(data, c, size);
 		} while(vdata[volatile_zero] != c);
 	}
+}
+
+/**
+ * gnutls_memcmp:
+ * @s1: the first address to compare
+ * @s2: the second address to compare
+ * @n: the size of memory to compare
+ *
+ * This function will operate similarly to memcmp(), but instead
+ * of comparing it will return 0 on memory match and non-zero
+ * on difference.
+ *
+ * Returns: void.
+ *
+ * Since: 3.4.0
+ **/
+int gnutls_memcmp(const void *s1, const void *s2, size_t n)
+{
+	unsigned i;
+	unsigned status = 0;
+	const uint8_t *_s1 = s1;
+	const uint8_t *_s2 = s2;
+
+	for (i=0;i<n;i++) {
+		status |= (_s1[i] ^ _s2[i]);
+	}
+
+	return status;
 }
 
 #ifdef TEST_SAFE_MEMSET

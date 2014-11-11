@@ -119,7 +119,7 @@ decrypt_ticket(gnutls_session_t session, session_ticket_ext_st * priv,
 	}
 	
 	_gnutls_cipher_tag(&cipher_hd, final, TAG_SIZE);
-	if (memcmp(ticket->tag, final, TAG_SIZE) != 0) {
+	if (gnutls_memcmp(ticket->tag, final, TAG_SIZE) != 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_DECRYPTION_FAILED;
 		goto cleanup;

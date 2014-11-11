@@ -1059,6 +1059,7 @@ GNUTLS_3_1_0 {
 	gnutls_aead_cipher_deinit;
 	gnutls_dh_params_import_raw2;
 	gnutls_memset;
+	gnutls_memcmp;
 	gnutls_pkcs12_bag_set_privkey;
 } GNUTLS_3_0_0;
 

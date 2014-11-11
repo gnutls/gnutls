@@ -714,7 +714,7 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
 
 	ptr = ctext;
 	ptr += ctext_len;
-	if (memcmp(ptr, tag, h->tag_size) != 0)
+	if (gnutls_memcmp(ptr, tag, h->tag_size) != 0)
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 	h->nonce_set = 0;
 

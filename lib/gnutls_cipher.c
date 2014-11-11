@@ -538,7 +538,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 		
-		if (unlikely(memcmp(tag, &ciphertext->data[ciphertext->size-tag_size], tag_size) != 0)) {
+		if (unlikely(gnutls_memcmp(tag, &ciphertext->data[ciphertext->size-tag_size], tag_size) != 0)) {
 			/* HMAC was not the same. */
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 		}
@@ -798,7 +798,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 		 * a memcmp comparison is negligible over the crypto operations.
 		 */
 		if (unlikely
-		    (memcmp(tag, tag_ptr, tag_size) != 0 || pad_failed != 0)) {
+		    (gnutls_memcmp(tag, tag_ptr, tag_size) != 0 || pad_failed != 0)) {
 			/* HMAC was not the same. */
 			dummy_wait(params, compressed, pad_failed, pad,
 				   length + preamble_size);
