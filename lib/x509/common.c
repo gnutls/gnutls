@@ -297,7 +297,7 @@ make_printable_string(unsigned etype, const gnutls_datum_t * input,
 	size_t size;
 
 	if (etype == ASN1_ETYPE_BMP_STRING) {
-		ret = _gnutls_ucs2_to_utf8(input->data, input->size, out);
+		ret = _gnutls_ucs2_to_utf8(input->data, input->size, out, 1);
 		if (ret < 0) {
 			/* could not convert. Handle it as non-printable */
 			printable = 0;

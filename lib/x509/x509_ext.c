@@ -1613,7 +1613,7 @@ static int decode_user_notice(const void *data, size_t size,
 	}
 
 	if (strcmp(choice_type, "bmpString") == 0) {	/* convert to UTF-8 */
-		ret = _gnutls_ucs2_to_utf8(td.data, td.size, &utd);
+		ret = _gnutls_ucs2_to_utf8(td.data, td.size, &utd, 1);
 		_gnutls_free_datum(&td);
 		if (ret < 0) {
 			gnutls_assert();
