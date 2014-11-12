@@ -102,6 +102,7 @@ typedef struct gnutls_x509_privkey_int {
 	unsigned expanded;
 
 	ASN1_TYPE key;
+	struct pin_info_st pin;
 } gnutls_x509_privkey_int;
 
 int _gnutls_x509_crt_cpy(gnutls_x509_crt_t dest, gnutls_x509_crt_t src);

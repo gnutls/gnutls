@@ -207,17 +207,7 @@ static int tpm_pin(struct pin_info_st *pin_info, const TSS_UUID * uuid,
 	} else
 		label = "unknown";
 
-	if (pin_info && pin_info->cb)
-		ret =
-		    pin_info->cb(pin_info->data, attempts, url, label,
-				 flags, pin, pin_size);
-	else if (_gnutls_pin_func)
-		ret =
-		    _gnutls_pin_func(_gnutls_pin_data, attempts, url,
-				     label, flags, pin, pin_size);
-	else
-		ret = gnutls_assert_val(GNUTLS_E_TPM_KEY_PASSWORD_ERROR);	/* doesn't really matter */
-
+	ret = _gnutls_retrieve_pin(pin_info, url, label, flags, pin, pin_size);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

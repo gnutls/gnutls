@@ -1190,6 +1190,11 @@ int gnutls_privkey_import_x509_raw(gnutls_privkey_t pkey,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
+	if (pkey->pin.cb) {
+		gnutls_x509_privkey_set_pin_function(xpriv, pkey->pin.cb,
+						     pkey->pin.data);
+	}
+
 	ret = gnutls_x509_privkey_import2(xpriv, data, format, password, flags);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1331,3 +1336,4 @@ int gnutls_privkey_verify_params(gnutls_privkey_t key)
 
 	return 0;
 }
+

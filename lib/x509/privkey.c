@@ -32,6 +32,7 @@
 #include <gnutls_pk.h>
 #include <gnutls_mpi.h>
 #include <gnutls_ecc.h>
+#include <pin.h>
 
 /**
  * gnutls_x509_privkey_init:
@@ -639,7 +640,8 @@ static int import_pkcs12_privkey(gnutls_x509_privkey_t key,
  * and the openssl format.
  *
  * If the provided key is encrypted but no password was given, then
- * %GNUTLS_E_DECRYPTION_FAILED is returned.
+ * %GNUTLS_E_DECRYPTION_FAILED is returned. Since GnuTLS 3.4.0 this
+ * function will utilize the PIN callbacks if any.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -651,6 +653,7 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 			    const char *password, unsigned int flags)
 {
 	int ret = 0;
+	char pin[GNUTLS_PKCS11_MAX_PIN_LEN];
 
 	if (password == NULL && !(flags & GNUTLS_PKCS_NULL_PASSWORD)) {
 		ret = gnutls_x509_privkey_import(key, data, format);
@@ -661,9 +664,24 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 
 	if ((password != NULL || (flags & GNUTLS_PKCS_NULL_PASSWORD))
 	    || ret < 0) {
+
 		ret =
 		    gnutls_x509_privkey_import_pkcs8(key, data, format,
 						     password, flags);
+
+		if (ret == GNUTLS_E_DECRYPTION_FAILED &&
+		    password == NULL) {
+		    /* use the callback if any */
+			ret = _gnutls_retrieve_pin(&key->pin, "key:", "", 0, pin, sizeof(pin));
+			if (ret == 0) {
+		    		password = pin;
+			}
+
+			ret =
+			    gnutls_x509_privkey_import_pkcs8(key, data, format,
+						     password, flags);
+		}
+
 		if (ret < 0) {
 			if (ret == GNUTLS_E_DECRYPTION_FAILED)
 				goto cleanup;
@@ -1741,4 +1759,27 @@ int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key)
 	}
 
 	return 0;
+}
+
+/**
+ * gnutls_x509_privkey_set_pin_function:
+ * @privkey: The certificate structure
+ * @fn: the callback
+ * @userdata: data associated with the callback
+ *
+ * This function will set a callback function to be used when
+ * it is required to access a protected object. This function overrides 
+ * the global function set using gnutls_pkcs11_set_pin_function().
+ *
+ * Note that this callback is used when decrypting a key.
+ *
+ * Since: 3.4.0
+ *
+ **/
+void gnutls_x509_privkey_set_pin_function(gnutls_x509_privkey_t privkey,
+				      gnutls_pin_callback_t fn,
+				      void *userdata)
+{
+	privkey->pin.cb = fn;
+	privkey->pin.data = userdata;
 }

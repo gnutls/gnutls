@@ -2183,15 +2183,17 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 	const char *pinfile;
 	int ret = GNUTLS_E_PKCS11_PIN_ERROR;
 
-	*pin = NULL;
+	if (pin) {
+		*pin = NULL;
 
-	/* Check if a pinfile is specified, and use that if possible */
-	pinfile = p11_kit_uri_get_pinfile(info);
-	if (pinfile != NULL) {
-		_gnutls_debug_log("p11: Using pinfile to retrieve PIN\n");
-		ret =
-		    retrieve_pin_from_source(pinfile, token_info, attempts,
-					     user_type, pin);
+		/* Check if a pinfile is specified, and use that if possible */
+		pinfile = p11_kit_uri_get_pinfile(info);
+		if (pinfile != NULL) {
+			_gnutls_debug_log("p11: Using pinfile to retrieve PIN\n");
+			ret =
+			    retrieve_pin_from_source(pinfile, token_info, attempts,
+						     user_type, pin);
+		}
 	}
 
 	/* The global gnutls pin callback */
