@@ -1191,7 +1191,7 @@ gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
  * @res: is a #gnutls_certificate_credentials_t structure.
  * @index: The index of the certificate list to obtain.
  * @crt_list: Where to store the certificate list.
- * @key: Will hold the number of certificates.
+ * @crt_list_size: Will hold the number of certificates.
  *
  * Obtains a X.509 certificate list that has been stored in @res with one of
  * gnutls_certificate_set_x509_key(), gnutls_certificate_set_key(),
@@ -1205,7 +1205,8 @@ gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
  * If there is no certificate with the given index,
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned. If the certificate
  * with the given index is not a X.509 certificate, %GNUTLS_E_INVALID_REQUEST
- * is returned.
+ * is returned. The returned certificates must be deinitialized after
+ * use, and the @crt_list pointer must be freed using gnutls_free().
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
