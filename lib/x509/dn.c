@@ -30,7 +30,7 @@
 #include <gnutls_num.h>
 
 /* This file includes all the required to parse an X.509 Distriguished
- * Name (you need a parser just to read a name in the X.509 protoocols!!!)
+ * Name (you need a parser just to read a name in the X.509 protocols!!!)
  */
 
 int
@@ -68,6 +68,11 @@ _gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
 		    asn1_read_value(asn1_struct, tmpbuffer1, value, &len);
 
 		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			if (k1 == 1) {
+				gnutls_assert();
+				result = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+				goto cleanup;
+			}
 			break;
 		}
 
@@ -225,7 +230,7 @@ _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 		      size_t * buf_size)
 {
 	int ret;
-	gnutls_datum_t dn;
+	gnutls_datum_t dn = {NULL, 0};
 
 	if (buf_size == NULL) {
 		gnutls_assert();
