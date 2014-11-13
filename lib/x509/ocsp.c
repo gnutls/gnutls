@@ -1115,7 +1115,7 @@ int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_t resp)
  * will be ASCII or UTF-8 encoded, depending on the certificate data.
  *
  * If the responder ID is not a name but a hash, this function
- * will return %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
+ * will return zero and the @dn elements will be set to %NULL.
  *
  * The caller needs to deallocate memory by calling gnutls_free() on
  * @dn->data.
@@ -1142,6 +1142,8 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 	    (resp->basicresp, "tbsResponseData.responderID.byName",
 	     NULL, &l);
 	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			return 0; /* for backwards compatibility */
 		gnutls_assert();
 		return ret;
 	}
@@ -1168,9 +1170,10 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 /**
  * gnutls_ocsp_resp_get_responder_by_key:
  * @resp: should contain a #gnutls_ocsp_resp_t structure
- * @id: newly allocated buffer with ID
+ * @type: should be %GNUTLS_OCSP_RESP_ID_KEY or %GNUTLS_OCSP_RESP_ID_DN
+ * @raw: newly allocated buffer with the raw ID
  *
- * This function will extract the key ID of the Basic OCSP Response in
+ * This function will extract the raw key (or DN) ID of the Basic OCSP Response in
  * the provided buffer. If the responder ID is not a key ID then
  * this function will return %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
  *
@@ -1181,18 +1184,22 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
  *   negative error code is returned.
  **/
 int
-gnutls_ocsp_resp_get_responder_by_key(gnutls_ocsp_resp_t resp,
-				      gnutls_datum_t * id)
+gnutls_ocsp_resp_get_responder_raw_id(gnutls_ocsp_resp_t resp,
+				      unsigned type,
+				      gnutls_datum_t * raw)
 {
 	int ret;
 
-	if (resp == NULL || id == NULL) {
+	if (resp == NULL || raw == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret = _gnutls_x509_read_value(resp->basicresp, "tbsResponseData.responderID.byKey", id);
-	if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+	if (type == GNUTLS_OCSP_RESP_ID_KEY)
+		ret = _gnutls_x509_read_value(resp->basicresp, "tbsResponseData.responderID.byKey", raw);
+	else
+		ret = _gnutls_x509_read_value(resp->basicresp, "tbsResponseData.responderID.byName", raw);
+	if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND || ret == GNUTLS_E_ASN1_VALUE_NOT_FOUND)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	return ret;
 }

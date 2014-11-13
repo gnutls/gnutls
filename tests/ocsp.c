@@ -645,8 +645,14 @@ static void ocsp_invalid_calls(void)
 	}
 
 	rc = gnutls_ocsp_resp_get_responder(resp, &dat);
-	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	if (rc != 0 && dat.data != NULL) {
 		fail("gnutls_ocsp_resp_get_responder %d\n", rc);
+		exit(1);
+	}
+
+	rc = gnutls_ocsp_resp_get_responder_raw_id(resp, GNUTLS_OCSP_RESP_ID_KEY, &dat);
+	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		fail("gnutls_ocsp_resp_get_responder_raw_id %s\n", gnutls_strerror(rc));
 		exit(1);
 	}
 

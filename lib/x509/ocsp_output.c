@@ -285,9 +285,9 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 		gnutls_datum_t dn;
 
 		ret = gnutls_ocsp_resp_get_responder(resp, &dn);
-		if (ret < 0) {
-			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-				ret = gnutls_ocsp_resp_get_responder_by_key(resp, &dn);
+		if (ret < 0 || dn.data == NULL) {
+			if (dn.data == 0) {
+				ret = gnutls_ocsp_resp_get_responder_raw_id(resp, GNUTLS_OCSP_RESP_ID_KEY, &dn);
 
 				if (ret >= 0) {
 					addf(str, _("\tResponder Key ID: "));
