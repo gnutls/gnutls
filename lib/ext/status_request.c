@@ -595,7 +595,7 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 
 	ret = _gnutls_recv_handshake(session,
 				     GNUTLS_HANDSHAKE_CERTIFICATE_STATUS,
-				     0, &buf);
+				     1, &buf);
 	if (ret < 0)
 		return gnutls_assert_val_fatal(ret);
 
