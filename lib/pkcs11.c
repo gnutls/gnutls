@@ -2133,6 +2133,9 @@ retrieve_pin_from_callback(const struct pin_info_st *pin_info,
 
 	if (user_type == CKU_USER || user_type == CKU_CONTEXT_SPECIFIC) {
 		flags |= GNUTLS_PIN_USER;
+
+		if (user_type == CKU_CONTEXT_SPECIFIC)
+			flags |= GNUTLS_PIN_CONTEXT_SPECIFIC;
 		if (token_info->flags & CKF_USER_PIN_COUNT_LOW)
 			flags |= GNUTLS_PIN_COUNT_LOW;
 		if (token_info->flags & CKF_USER_PIN_FINAL_TRY)
