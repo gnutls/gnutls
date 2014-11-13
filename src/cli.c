@@ -1040,6 +1040,24 @@ int do_inline_command_processing(char *buffer_ptr, size_t curr_bytes,
 	}
 }
 
+static void
+print_other_info(gnutls_session_t session)
+{
+	int ret;
+	gnutls_datum_t data;
+
+	if (HAVE_OPT(SAVE_OCSP)) {
+		FILE *fp = fopen(OPT_ARG(SAVE_OCSP), "w");
+
+		if (fp != NULL) {
+			ret = gnutls_ocsp_status_request_get(session, &data);
+			if (ret >= 0)
+				fwrite(data.data, 1, data.size, fp);
+			fclose(fp);
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
 	int ret;
@@ -1093,6 +1111,8 @@ int main(int argc, char **argv)
 	if (resume != 0)
 		if (try_resume(&hd))
 			return 1;
+
+	print_other_info(hd.session);
 
       after_handshake:
 

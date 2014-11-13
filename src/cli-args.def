@@ -128,6 +128,13 @@ flag = {
 };
 
 flag = {
+    name      = save-ocsp;
+    arg-type  = string;
+    descrip   = "Save the peer's OCSP status response in the provided file";
+    doc      = "";
+};
+
+flag = {
     name      = dh-bits;
     arg-type  = number;
     descrip   = "The minimum number of bits allowed for DH";
