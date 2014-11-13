@@ -3,6 +3,16 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.11 (unreleased)
+
+** libgnutls: The priority modifier %LATEST_RECORD_VERSION is now the
+default. This works around issue with servers that prohibit the SSL 3.0
+from being present in the first TLS record.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.10 (released 2014-11-10)
 
 ** libgnutls: Refuse to import v1 or v2 certificates that contain
