@@ -620,7 +620,7 @@ test_code_t test_tls1(gnutls_session_t session)
 
 	sprintf(prio_str,
 		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
-		":+VERS-TLS1.0:" ALL_MACS ":" ALL_KX ":%s", rest);
+		":+VERS-TLS1.0:%%SSL3_RECORD_VERSION:" ALL_MACS ":" ALL_KX ":%s", rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
@@ -628,6 +628,30 @@ test_code_t test_tls1(gnutls_session_t session)
 	ret = do_handshake(session);
 	if (ret == TEST_SUCCEED)
 		tls1_ok = 1;
+
+	return ret;
+
+}
+
+test_code_t test_tls1_nossl3(gnutls_session_t session)
+{
+	int ret;
+
+	if (tls1_ok != 0)
+		return TEST_IGNORE;
+
+	sprintf(prio_str,
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
+		":+VERS-TLS1.0:%%LATEST_RECORD_VERSION:" ALL_MACS ":" ALL_KX ":%s", rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+	if (ret == TEST_SUCCEED) {
+		strcat(rest, ":%LATEST_RECORD_VERSION");
+		tls1_ok = 1;
+	}
 
 	return ret;
 

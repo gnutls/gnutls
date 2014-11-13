@@ -85,6 +85,7 @@ static const TLS_TEST tls_tests[] = {
 	{"whether \%COMPAT is required", test_record_padding, "no", "yes",
 	 "dunno"},
 	{"for TLS 1.0 (RFC2246) support", test_tls1, "yes", "no", "dunno"},
+	{"for TLS 1.0 (RFC2246) support with TLS 1.0 record version", test_tls1_nossl3, "yes", "no", "dunno"},
 	{"for TLS 1.1 (RFC4346) support", test_tls1_1, "yes", "no", "dunno"},
 	{"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0",
 	 "failed",
