@@ -68,8 +68,13 @@ typedef int (*gnutls_privkey_decrypt_func) (gnutls_privkey_t key,
 typedef void (*gnutls_privkey_deinit_func) (gnutls_privkey_t key,
 					    void *userdata);
 
-/* returns the public key algorithm associated with userdata */
-typedef gnutls_pk_algorithm_t (*gnutls_privkey_pk_func) (gnutls_privkey_t key, void *userdata);
+/* Should return the public key algorithm (gnutls_pk_algorithm_t) */
+#define GNUTLS_PRIVKEY_INFO_PK_ALGO 1
+
+/* Should return the preferred signature algorithm (gnutls_sign_algorithm_t) or 0. */
+#define GNUTLS_PRIVKEY_INFO_SIGN_ALGO (1<<1)
+/* returns information on the public key associated with userdata */
+typedef int (*gnutls_privkey_info_func) (gnutls_privkey_t key, unsigned int flags, void *userdata);
 
 int gnutls_pubkey_init(gnutls_pubkey_t * key);
 void gnutls_pubkey_deinit(gnutls_pubkey_t key);
@@ -354,7 +359,7 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
                            gnutls_privkey_sign_func sign_func,
                            gnutls_privkey_decrypt_func decrypt_func,
                            gnutls_privkey_deinit_func deinit_func,
-                           gnutls_privkey_pk_func pk_func,
+                           gnutls_privkey_info_func info_func,
                            unsigned int flags);
 
 int gnutls_privkey_import_dsa_raw(gnutls_privkey_t key,

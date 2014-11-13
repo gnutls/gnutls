@@ -89,8 +89,8 @@ int gnutls_privkey_get_pk_algorithm(gnutls_privkey_t key, unsigned int *bits)
 	case GNUTLS_PRIVKEY_EXT:
 		if (bits)
 			*bits = 0;
-		if (key->key.ext.pk_func)
-			return key->key.ext.pk_func(key, key->key.ext.userdata);
+		if (key->key.ext.info_func)
+			return key->key.ext.info_func(key, GNUTLS_PRIVKEY_INFO_PK_ALGO, key->key.ext.userdata);
 		else
 			return key->pk_algorithm;
 	default:
@@ -558,12 +558,11 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
 /**
  * gnutls_privkey_import_ext3:
  * @pkey: The private key
- * @pk: The public key algorithm, when @pk_func isn't provided
  * @userdata: private data to be provided to the callbacks
  * @sign_fn: callback for signature operations
  * @decrypt_fn: callback for decryption operations
  * @deinit_fn: a deinitialization function
- * @pk_fn: returns the public key algorithm (may be %NULL; if set @pk will be ignored)
+ * @info_fn: returns info about the public key algorithm (should not be %NULL)
  * @flags: Flags for the import
  *
  * This function will associate the given callbacks with the
@@ -575,6 +574,9 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
  * without any hashing or preprocessing. In case of RSA the DigestInfo
  * will be provided, and the signing function is expected to do the PKCS #1
  * 1.5 padding and the exponentiation.
+ *
+ * The @info_fn must provide information on %GNUTLS_PRIVKEY_INFO_PK_ALGO and
+ * %GNUTLS_PRIVKEY_INFO_PK_ALGO, and should return -1 on unknown flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -588,7 +590,7 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
 			   gnutls_privkey_sign_func sign_fn,
 			   gnutls_privkey_decrypt_func decrypt_fn,
 			   gnutls_privkey_deinit_func deinit_fn,
-			   gnutls_privkey_pk_func pk_fn,
+			   gnutls_privkey_info_func info_fn,
 			   unsigned int flags)
 {
 	int ret;
@@ -602,13 +604,15 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
 	if (sign_fn == NULL && decrypt_fn == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
+	if (info_fn == NULL)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	pkey->key.ext.sign_func = sign_fn;
 	pkey->key.ext.decrypt_func = decrypt_fn;
 	pkey->key.ext.deinit_func = deinit_fn;
-	pkey->key.ext.pk_func = pk_fn;
+	pkey->key.ext.info_func = info_fn;
 	pkey->key.ext.userdata = userdata;
 	pkey->type = GNUTLS_PRIVKEY_EXT;
-	pkey->pk_algorithm = pk;
 	pkey->flags = flags;
 
 	/* Ensure gnutls_privkey_deinit() calls the deinit_func */
@@ -1337,3 +1341,24 @@ int gnutls_privkey_verify_params(gnutls_privkey_t key)
 	return 0;
 }
 
+/*-
+ * _gnutls_privkey_get_preferred_sign_algo:
+ * @key: should contain a #gnutls_privkey_t structure
+ *
+ * This function returns the preferred signature algorithm for this
+ * private key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ -*/
+gnutls_sign_algorithm_t
+_gnutls_privkey_get_preferred_sign_algo(gnutls_privkey_t key)
+{
+	if (key->type == GNUTLS_PRIVKEY_EXT) {
+		if (key->key.ext.info_func)
+			return key->key.ext.info_func(key, GNUTLS_PRIVKEY_INFO_SIGN_ALGO, key->key.ext.userdata);
+	}
+	return key->preferred_sign_algo;
+}

@@ -41,12 +41,13 @@ struct gnutls_privkey_st {
 			gnutls_privkey_sign_func sign_func;
 			gnutls_privkey_decrypt_func decrypt_func;
 			gnutls_privkey_deinit_func deinit_func;
-			gnutls_privkey_pk_func pk_func;
+			gnutls_privkey_info_func info_func;
 			void *userdata;
 		} ext;
 	} key;
 
 	unsigned int flags;
+	gnutls_sign_algorithm_t preferred_sign_algo;
 	struct pin_info_st pin;
 };
 
@@ -110,5 +111,8 @@ const mac_entry_st *_gnutls_dsa_q_to_hash(gnutls_pk_algorithm_t algo,
 
 int
 _gnutls_privkey_get_mpis(gnutls_privkey_t key, gnutls_pk_params_st * params);
+
+gnutls_sign_algorithm_t
+_gnutls_privkey_get_preferred_sign_algo(gnutls_privkey_t key);
 
 #endif

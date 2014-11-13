@@ -570,10 +570,15 @@ _gnutls_handshake_sign_crt_vrfy12(gnutls_session_t session,
 	gnutls_sign_algorithm_t sign_algo;
 	const mac_entry_st *me;
 
-	sign_algo = _gnutls_session_get_sign_algo(session, cert);
-	if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+	sign_algo = _gnutls_privkey_get_preferred_sign_algo(pkey);
+	if (sign_algo == GNUTLS_SIGN_UNKNOWN || 
+	    _gnutls_session_sign_algo_enabled(session, sign_algo) < 0) {
+
+		sign_algo = _gnutls_session_get_sign_algo(session, cert);
+		if (sign_algo == GNUTLS_SIGN_UNKNOWN) {
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+		}
 	}
 
 	gnutls_sign_algorithm_set_client(session, sign_algo);
