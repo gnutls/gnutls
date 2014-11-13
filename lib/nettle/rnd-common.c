@@ -56,6 +56,7 @@ void _rnd_get_event(struct event_st *e)
 {
 	static unsigned count = 0;
 
+	memset(e, 0, sizeof(*e));
 	gettime(&e->now);
 
 #ifdef HAVE_GETRUSAGE
