@@ -2009,7 +2009,7 @@ static int check_ocsp_purpose(gnutls_x509_crt_t signercert)
  * gnutls_ocsp_resp_verify_direct:
  * @resp: should contain a #gnutls_ocsp_resp_t structure
  * @issuer: certificate believed to have signed the response
- * @verify: output variable with verification status, an #gnutls_ocsp_cert_status_t
+ * @verify: output variable with verification status, an #gnutls_ocsp_verify_reason_t
  * @flags: verification flags, 0 for now.
  *
  * Verify signature of the Basic OCSP Response against the public key
@@ -2085,7 +2085,7 @@ gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
  * gnutls_ocsp_resp_verify:
  * @resp: should contain a #gnutls_ocsp_resp_t structure
  * @trustlist: trust anchors as a #gnutls_x509_trust_list_t structure
- * @verify: output variable with verification status, an #gnutls_ocsp_cert_status_t
+ * @verify: output variable with verification status, an #gnutls_ocsp_verify_reason_t
  * @flags: verification flags, 0 for now.
  *
  * Verify signature of the Basic OCSP Response against the public key
