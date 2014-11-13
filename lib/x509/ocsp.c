@@ -1115,7 +1115,7 @@ int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_t resp)
  * will be ASCII or UTF-8 encoded, depending on the certificate data.
  *
  * If the responder ID is not a name but a hash, this function
- * will return a @dn that has %NULL data.
+ * will return %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
  *
  * The caller needs to deallocate memory by calling gnutls_free() on
  * @dn->data.
@@ -1134,6 +1134,9 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	dn->data = NULL;
+	dn->size = 0;
 
 	ret = _gnutls_x509_parse_dn
 	    (resp->basicresp, "tbsResponseData.responderID.byName",
