@@ -137,7 +137,7 @@ static const gnutls_datum_t resp2 =
 "	Response Status: Successful\n" \
 "	Response Type: Basic OCSP Response\n" \
 "	Version: 1\n" \
-"	Responder ID: \n" \
+"	Responder Key ID: 50ea7389db29fb108f9ee50120d4de79994883f7\n" \
 "	Produced At: Thu Sep 04 05:49:00 UTC 2014\n" \
 "	Responses:\n" \
 "		Certificate ID:\n" \
@@ -645,7 +645,7 @@ static void ocsp_invalid_calls(void)
 	}
 
 	rc = gnutls_ocsp_resp_get_responder(resp, &dat);
-	if (rc != GNUTLS_E_SUCCESS || dat.size != 0) {
+	if (rc != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		fail("gnutls_ocsp_resp_get_responder %d\n", rc);
 		exit(1);
 	}
