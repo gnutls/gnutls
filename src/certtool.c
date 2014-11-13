@@ -1894,7 +1894,7 @@ void privkey_info(common_info_st * cinfo)
 	pem.size = size;
 
 	ret =
-	    gnutls_x509_privkey_import2(key, &pem, incert_format, NULL, 0);
+	    gnutls_x509_privkey_import2(key, &pem, incert_format, NULL, GNUTLS_PKCS_PLAIN);
 
 	/* If we failed to import the certificate previously try PKCS #8 */
 	if (ret == GNUTLS_E_DECRYPTION_FAILED) {
