@@ -1044,15 +1044,44 @@ static void
 print_other_info(gnutls_session_t session)
 {
 	int ret;
-	gnutls_datum_t data;
+	gnutls_datum_t oresp;
 
-	if (HAVE_OPT(SAVE_OCSP)) {
+	ret = gnutls_ocsp_status_request_get(session, &oresp);
+	if (ret < 0) {
+		oresp.data = NULL;
+		oresp.size = 0;
+	}
+
+	if (ENABLED_OPT(VERBOSE) && oresp.data) {
+		gnutls_ocsp_resp_t r;
+		gnutls_datum_t p;
+
+		ret = gnutls_ocsp_resp_init(&r);
+		if (ret < 0) {
+			fprintf(stderr, "ocsp_resp_init: %s\n",
+				gnutls_strerror(ret));
+			return;
+		}
+
+		ret = gnutls_ocsp_resp_import(r, &oresp);
+		if (ret < 0) {
+			fprintf(stderr, "importing response: %s\n",
+				gnutls_strerror(ret));
+			return;
+		}
+
+		ret =
+		    gnutls_ocsp_resp_print(r, GNUTLS_OCSP_PRINT_COMPACT,
+					   &p);
+		gnutls_ocsp_resp_deinit(r);
+		fputs((char*)p.data, stdout);
+	}
+
+	if (HAVE_OPT(SAVE_OCSP) && oresp.data) {
 		FILE *fp = fopen(OPT_ARG(SAVE_OCSP), "w");
 
 		if (fp != NULL) {
-			ret = gnutls_ocsp_status_request_get(session, &data);
-			if (ret >= 0)
-				fwrite(data.data, 1, data.size, fp);
+			fwrite(oresp.data, 1, oresp.size, fp);
 			fclose(fp);
 		}
 	}
