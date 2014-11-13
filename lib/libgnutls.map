@@ -1062,6 +1062,7 @@ GNUTLS_3_1_0 {
 	gnutls_memcmp;
 	gnutls_pkcs12_bag_set_privkey;
 	gnutls_x509_privkey_set_pin_function;
+	gnutls_ocsp_resp_get_responder_by_key;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

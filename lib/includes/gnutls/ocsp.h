@@ -211,6 +211,10 @@ int gnutls_ocsp_resp_get_response(gnutls_ocsp_resp_t resp,
 int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_t resp);
 int gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 				   gnutls_datum_t * dn);
+int
+gnutls_ocsp_resp_get_responder_by_key(gnutls_ocsp_resp_t resp,
+				      gnutls_datum_t * id);
+
 time_t gnutls_ocsp_resp_get_produced(gnutls_ocsp_resp_t resp);
 int gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 				unsigned indx,

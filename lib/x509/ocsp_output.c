@@ -284,16 +284,27 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 	{
 		gnutls_datum_t dn;
 
-		/* XXX byKey */
-
 		ret = gnutls_ocsp_resp_get_responder(resp, &dn);
-		if (ret < 0)
-			addf(str, "error: get_dn: %s\n",
-			     gnutls_strerror(ret));
-		else {
-			addf(str, _("\tResponder ID: %.*s\n"), dn.size,
-			     dn.data);
-			gnutls_free(dn.data);
+		if (ret < 0) {
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+				ret = gnutls_ocsp_resp_get_responder_by_key(resp, &dn);
+
+				if (ret >= 0) {
+					addf(str, _("\tResponder Key ID: "));
+					_gnutls_buffer_hexprint(str, dn.data, dn.size);
+					adds(str, "\n");
+				}
+				gnutls_free(dn.data);
+			} else {
+				addf(str, "error: get_dn: %s\n",
+				     gnutls_strerror(ret));
+			}
+		} else {
+			if (dn.data != NULL) {
+				addf(str, _("\tResponder ID: %.*s\n"), dn.size,
+				     dn.data);
+				gnutls_free(dn.data);
+			}
 		}
 	}
 

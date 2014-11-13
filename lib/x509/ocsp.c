@@ -1114,6 +1114,9 @@ int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_t resp)
  * "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output string
  * will be ASCII or UTF-8 encoded, depending on the certificate data.
  *
+ * If the responder ID is not a name but a hash, this function
+ * will return a @dn that has %NULL data.
+ *
  * The caller needs to deallocate memory by calling gnutls_free() on
  * @dn->data.
  *
@@ -1157,6 +1160,38 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 	dn->size = l;
 
 	return GNUTLS_E_SUCCESS;
+}
+
+/**
+ * gnutls_ocsp_resp_get_responder_by_key:
+ * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @id: newly allocated buffer with ID
+ *
+ * This function will extract the key ID of the Basic OCSP Response in
+ * the provided buffer. If the responder ID is not a key ID then
+ * this function will return %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
+ *
+ * The caller needs to deallocate memory by calling gnutls_free() on
+ * @dn->data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code is returned.
+ **/
+int
+gnutls_ocsp_resp_get_responder_by_key(gnutls_ocsp_resp_t resp,
+				      gnutls_datum_t * id)
+{
+	int ret;
+
+	if (resp == NULL || id == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = _gnutls_x509_read_value(resp->basicresp, "tbsResponseData.responderID.byKey", id);
+	if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	return ret;
 }
 
 /**
