@@ -670,7 +670,7 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 						     password, flags);
 
 		if (ret == GNUTLS_E_DECRYPTION_FAILED &&
-		    password == NULL) {
+		    password == NULL && (!(flags & GNUTLS_PKCS_PLAIN))) {
 		    /* use the callback if any */
 			ret = _gnutls_retrieve_pin(&key->pin, "key:", "", 0, pin, sizeof(pin));
 			if (ret == 0) {
