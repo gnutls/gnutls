@@ -659,6 +659,7 @@ struct gnutls_priority_st {
 
 	/* to disable record padding */
 	bool no_extensions;
+	bool no_ext_master_secret;
 	bool allow_large_records;
 	unsigned int max_empty_records;
 	unsigned int dumbfw;
@@ -688,6 +689,7 @@ struct gnutls_priority_st {
 #define ENABLE_COMPAT(x) \
               (x)->allow_large_records = 1; \
               (x)->no_etm = 1; \
+              (x)->no_ext_master_secret = 1; \
               (x)->allow_wrong_pms = 1; \
               (x)->dumbfw = 1
 

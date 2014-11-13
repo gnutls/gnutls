@@ -1109,6 +1109,10 @@ renegotiation thus this option must be used with care.
 will prevent the advertizing of the TLS session ticket extension.
 This is implied by the PFS keyword.
 
+@item %NO_SESSION_HASH @tab
+will prevent the advertizing the TLS extended master secret (session hash)
+extension.
+
 @item %SERVER_PRECEDENCE @tab
 The ciphersuite will be selected according to server priorities
 and not the client's.
