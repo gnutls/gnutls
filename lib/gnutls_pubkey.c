@@ -1797,7 +1797,6 @@ _pkcs1_rsa_verify_sig(const mac_entry_st * me,
 	uint8_t md[MAX_HASH_SIZE], *cmp;
 	unsigned int digest_size;
 	gnutls_datum_t d, di;
-	digest_hd_st hd;
 
 	digest_size = _gnutls_hash_get_algo_len(me);
 	if (prehash) {
@@ -1811,14 +1810,11 @@ _pkcs1_rsa_verify_sig(const mac_entry_st * me,
 			return GNUTLS_E_INVALID_REQUEST;
 		}
 
-		ret = _gnutls_hash_init(&hd, me);
+		ret = _gnutls_hash_fast(me->id, text->data, text->size, md);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
-
-		_gnutls_hash(&hd, text->data, text->size);
-		_gnutls_hash_deinit(&hd, md);
 
 		cmp = md;
 	}
