@@ -577,24 +577,43 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 	int len = 0, src_len;
 	char *dst = NULL;
 	char *src = NULL;
+	static unsigned flags = 0;
+	static int checked = 0;
 
-	src_len = size / 2;
+	if (checked == 0) {
+		/* Not all windows versions support MB_ERR_INVALID_CHARS */
+		ret =
+		    WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS,
+				L"hello", -1, NULL, 0, NULL, NULL);
+		if (ret > 0)
+			flags = MB_ERR_INVALID_CHARS;
+		checked = 1;
+	}
 
-	src = gnutls_malloc(size);
+	if (((uint8_t *) data)[size] == 0 && ((uint8_t *) data)[size+1] == 0) {
+		size -= 2;
+	}
+
+	src_len = wcslen(data);
+
+	src = gnutls_malloc(size+2);
 	if (src == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	/* convert to LE */
 	for (i = 0; i < size; i += 2) {
-		src[i] = ((char *) data)[1 + i];
-		src[1 + i] = ((char *) data)[i];
+		src[i] = ((uint8_t *) data)[1 + i];
+		src[1 + i] = ((uint8_t *) data)[i];
 	}
+	src[size] = 0;
+	src[size+1] = 0;
 
 	ret =
-	    WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS,
-				(void *) src, src_len, NULL, 0, NULL,
-				NULL);
+	    WideCharToMultiByte(CP_UTF8, flags,
+				(void *) src, src_len, NULL, 0,
+				NULL, NULL);
 	if (ret == 0) {
+		_gnutls_debug_log("WideCharToMultiByte: %d\n", (int)GetLastError());
 		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 		goto fail;
 	}
@@ -605,19 +624,21 @@ int _gnutls_ucs2_to_utf8(const void *data, size_t size,
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto fail;
 	}
+	dst[0] = 0;
 
 	ret =
-	    WideCharToMultiByte(CP_UTF8, MB_ERR_INVALID_CHARS,
-				(void *) src, src_len, dst, len, NULL,
+	    WideCharToMultiByte(CP_UTF8, flags,
+				(void *) src, src_len, dst, len-1, NULL,
 				NULL);
 	if (ret == 0) {
 		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 		goto fail;
 	}
-
 	dst[len - 1] = 0;
+
 	output->data = dst;
 	output->size = ret;
+
 	ret = 0;
 	goto cleanup;
 
