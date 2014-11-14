@@ -553,6 +553,7 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 	}
 
 	/* certs */
+	addf(str, "\tAdditional certificates:\n");
 	if (format == GNUTLS_OCSP_PRINT_FULL) {
 		gnutls_x509_crt_t *certs;
 		size_t ncerts, i;
