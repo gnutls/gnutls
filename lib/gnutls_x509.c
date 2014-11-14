@@ -62,7 +62,7 @@
  */
 static int
 check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
-		    gnutls_x509_crt_t issuer,
+		    gnutls_certificate_credentials_t cred,
 		    gnutls_datum_t * data, unsigned int *ostatus)
 {
 	gnutls_ocsp_resp_t resp;
@@ -96,7 +96,7 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 		goto cleanup;
 	}
 
-	ret = gnutls_ocsp_resp_verify_direct(resp, issuer, &status, 0);
+	ret = gnutls_ocsp_resp_verify(resp, cred->tlist, &status, 0);
 	if (ret < 0) {
 		ret = gnutls_assert_val(0);
 		gnutls_assert();
@@ -279,7 +279,7 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	}
 
 	ret =
-	    check_ocsp_response(session, peer_certificate_list[0], issuer,
+	    check_ocsp_response(session, peer_certificate_list[0], cred,
 				&resp, &ocsp_status);
 	if (issuer_deinit != 0)
 		gnutls_x509_crt_deinit(issuer);

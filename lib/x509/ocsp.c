@@ -1838,10 +1838,16 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 	int rc;
 	gnutls_x509_crt_t *certs;
 	size_t ncerts = 0, i;
-	gnutls_datum_t riddn;
+	gnutls_datum_t riddn = {NULL, 0};
+	gnutls_datum_t keyid = {NULL, 0};
 	gnutls_x509_crt_t signercert = NULL;
 
-	rc = gnutls_ocsp_resp_get_responder(resp, &riddn);
+	rc = gnutls_ocsp_resp_get_responder_raw_id(resp, GNUTLS_OCSP_RESP_ID_DN, &riddn);
+	if (rc == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		gnutls_assert();
+		rc = gnutls_ocsp_resp_get_responder_raw_id(resp, GNUTLS_OCSP_RESP_ID_KEY, &keyid);
+	
+	}
 	if (rc != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
 		return NULL;
@@ -1850,42 +1856,47 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 	rc = gnutls_ocsp_resp_get_certs(resp, &certs, &ncerts);
 	if (rc != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
-		gnutls_free(riddn.data);
-		return NULL;
+		signercert = NULL;
+		goto quit;
 	}
 
 	for (i = 0; i < ncerts; i++) {
-		char *crtdn;
-		size_t crtdnsize = 0;
-		int cmpok;
+		if (keyid.data != NULL) {
+			uint8_t digest[20];
+			gnutls_datum_t spki;
 
-		rc = gnutls_x509_crt_get_dn(certs[i], NULL, &crtdnsize);
-		if (rc != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			gnutls_assert();
-			goto quit;
-		}
+			rc = _gnutls_x509_get_raw_field2(certs[i]->cert, &certs[i]->der,
+					  "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
+					  &spki);
+			if (rc < 0 || spki.size < 6) {
+				signercert = NULL;
+				goto quit;
+			}
 
-		crtdn = gnutls_malloc(crtdnsize);
-		if (crtdn == NULL) {
-			gnutls_assert();
-			goto quit;
-		}
+			/* For some reason the protocol requires we skip the
+			 * tag, length and number of unused bits.
+			 */
+			spki.data += 5;
+			spki.size -= 5;
+			rc = gnutls_hash_fast(GNUTLS_DIG_SHA1, spki.data, spki.size, digest);
+			if (rc < 0) {
+				gnutls_assert();
+				signercert = NULL;
+				goto quit;
+			}
 
-		rc = gnutls_x509_crt_get_dn(certs[i], crtdn, &crtdnsize);
-		if (rc != GNUTLS_E_SUCCESS) {
-			gnutls_assert();
-			gnutls_free(crtdn);
-			goto quit;
-		}
-
-		cmpok = (crtdnsize == riddn.size)
-		    && memcmp(riddn.data, crtdn, crtdnsize);
-
-		gnutls_free(crtdn);
-
-		if (cmpok == 0) {
-			signercert = certs[i];
-			goto quit;
+			if ((20 == keyid.size) &&
+				memcmp(keyid.data, digest, 20) == 0) {
+				gnutls_assert();
+				signercert = certs[i];
+				goto quit;
+			}
+		} else {
+			if ((certs[i]->raw_dn.size == riddn.size)
+			    && memcmp(riddn.data, certs[i]->raw_dn.data, riddn.size) == 0) {
+				signercert = certs[i];
+				goto quit;
+			}
 		}
 	}
 
@@ -1894,6 +1905,7 @@ static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 
       quit:
 	gnutls_free(riddn.data);
+	gnutls_free(keyid.data);
 	for (i = 0; i < ncerts; i++)
 		if (certs[i] != signercert)
 			gnutls_x509_crt_deinit(certs[i]);
@@ -2127,7 +2139,6 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
 			unsigned int *verify, unsigned int flags)
 {
 	gnutls_x509_crt_t signercert = NULL;
-	gnutls_x509_crt_t issuer = NULL;
 	int rc;
 
 	/* Algorithm:
@@ -2141,63 +2152,71 @@ gnutls_ocsp_resp_verify(gnutls_ocsp_resp_t resp,
 
 	signercert = find_signercert(resp);
 	if (!signercert) {
-		/* XXX Search in trustlist for certificate matching
-		   responderId as well? */
-		gnutls_assert();
-		*verify = GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND;
-		rc = GNUTLS_E_SUCCESS;
-		goto done;
-	}
+		gnutls_datum_t dn;
 
-	/* Either the signer is directly trusted (i.e., in trustlist) or it
-	   is directly signed by something in trustlist and has proper OCSP
-	   extkeyusage. */
-	rc = _gnutls_trustlist_inlist(trustlist, signercert);
-	if (rc == 0) {
-		/* not in trustlist, need to verify signature and bits */
-		unsigned vtmp;
-
-		gnutls_assert();
-
-		rc = gnutls_x509_trust_list_get_issuer(trustlist,
-						       signercert, &issuer,
-						       GNUTLS_TL_GET_COPY);
-		if (rc != GNUTLS_E_SUCCESS) {
-			gnutls_assert();
-			*verify = GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER;
-			rc = GNUTLS_E_SUCCESS;
-			goto done;
-		}
-
-		rc = gnutls_x509_crt_verify(signercert, &issuer, 1, 0,
-					    &vtmp);
-		if (rc != GNUTLS_E_SUCCESS) {
-			gnutls_assert();
-			goto done;
-		}
-
-		if (vtmp != 0) {
-			*verify = vstatus_to_ocsp_status(vtmp);
-			gnutls_assert();
-			rc = GNUTLS_E_SUCCESS;
-			goto done;
-		}
-
-		rc = check_ocsp_purpose(signercert);
+		rc = gnutls_ocsp_resp_get_responder_raw_id(resp, GNUTLS_OCSP_RESP_ID_DN, &dn);
 		if (rc < 0) {
 			gnutls_assert();
-			*verify = GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR;
+			*verify = GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND;
 			rc = GNUTLS_E_SUCCESS;
 			goto done;
 		}
+
+		rc = gnutls_x509_trust_list_get_issuer_by_dn(trustlist, &dn, &signercert, 0);
+		gnutls_free(dn.data);
+
+		if (rc < 0) {
+			gnutls_assert();
+			*verify = GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND;
+			rc = GNUTLS_E_SUCCESS;
+			goto done;
+		}
+	} else {
+		/* Either the signer is directly trusted (i.e., in trustlist) or it
+		   is directly signed by something in trustlist and has proper OCSP
+		   extkeyusage. */
+		rc = _gnutls_trustlist_inlist(trustlist, signercert);
+		if (rc == 0) {
+			/* not in trustlist, need to verify signature and bits */
+			unsigned vtmp;
+			gnutls_typed_vdata_st vdata;
+
+			vdata.type = GNUTLS_DT_KEY_PURPOSE_OID;
+			vdata.data = (void*)GNUTLS_KP_OCSP_SIGNING;
+			vdata.size = 0;
+
+			gnutls_assert();
+
+			rc = gnutls_x509_trust_list_verify_crt2(trustlist,
+								&signercert, 1,
+								&vdata, 1,
+								0, &vtmp, NULL);
+			if (rc != GNUTLS_E_SUCCESS) {
+				gnutls_assert();
+				goto done;
+			}
+
+			if (vtmp != 0) {
+				*verify = vstatus_to_ocsp_status(vtmp);
+				gnutls_assert();
+				rc = GNUTLS_E_SUCCESS;
+				goto done;
+			}
+		}
+	}
+
+	rc = check_ocsp_purpose(signercert);
+	if (rc < 0) {
+		gnutls_assert();
+		*verify = GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR;
+		rc = GNUTLS_E_SUCCESS;
+		goto done;
 	}
 
 	rc = _ocsp_resp_verify_direct(resp, signercert, verify, flags);
 
       done:
 	gnutls_x509_crt_deinit(signercert);
-	if (issuer != NULL)
-		gnutls_x509_crt_deinit(issuer);
 
 	return rc;
 }
