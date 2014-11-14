@@ -453,7 +453,7 @@ int print_info(gnutls_session_t session, int verbose, int print_cert)
 	unsigned char session_id[33];
 	size_t session_id_size = sizeof(session_id);
 	gnutls_srtp_profile_t srtp_profile;
-	gnutls_datum_t p;
+	gnutls_datum_t p, resp;
 	char *desc;
 	int rc;
 
@@ -571,7 +571,10 @@ int print_info(gnutls_session_t session, int verbose, int print_cert)
 
 	printf("- Options:");
 	if (gnutls_safe_renegotiation_status(session)!=0)
-		printf(" safe renegotiation");
+		printf(" safe renegotiation,");
+	if (gnutls_ocsp_status_request_get(session, &resp)==0) {
+		printf(" OCSP status request%s,", gnutls_ocsp_status_request_is_checked(session,0)!=0?"":"[ignored]");
+	}
 	printf("\n");
 
 #ifdef ENABLE_DTLS_SRTP
