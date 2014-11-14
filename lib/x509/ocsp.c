@@ -302,29 +302,6 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 	return GNUTLS_E_SUCCESS;
 }
 
-static int export(ASN1_TYPE node, const char *name, gnutls_datum_t * data)
-{
-	int ret;
-	int len = 0;
-
-	ret = asn1_der_coding(node, name, NULL, &len, NULL);
-	if (ret != ASN1_MEM_ERROR) {
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-	data->size = len;
-	data->data = gnutls_malloc(len);
-	if (data->data == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-	ret = asn1_der_coding(node, name, data->data, &len, NULL);
-	if (ret != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(ret);
-	}
-
-	return GNUTLS_E_SUCCESS;
-}
-
 /**
  * gnutls_ocsp_req_export:
  * @req: Holds the OCSP request
@@ -354,7 +331,7 @@ int gnutls_ocsp_req_export(gnutls_ocsp_req_t req, gnutls_datum_t * data)
 		asn1_write_value(req->req, "tbsRequest.requestExtensions",
 				 NULL, 0);
 
-	return export(req->req, "", data);
+	return _gnutls_x509_get_raw_field(req->req, "", data);
 }
 
 /**
@@ -374,7 +351,7 @@ int gnutls_ocsp_resp_export(gnutls_ocsp_resp_t resp, gnutls_datum_t * data)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return export(resp->resp, "", data);
+	return _gnutls_x509_get_raw_field(resp->resp, "", data);
 }
 
 /**
@@ -1936,7 +1913,7 @@ _ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 	}
 	sigalg = rc;
 
-	rc = export(resp->basicresp, "tbsResponseData", &data);
+	rc = _gnutls_x509_get_raw_field(resp->basicresp, "tbsResponseData", &data);
 	if (rc != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
 		goto done;
