@@ -2281,6 +2281,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 				gnutls_strerror(ret));
 			exit(1);
 		}
+		fprintf(stderr, "Loaded system trust (%d CAs available)\n", ret);
 
 		x509_ncas = ret;
 
