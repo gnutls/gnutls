@@ -1055,6 +1055,7 @@ print_other_info(gnutls_session_t session)
 	if (ENABLED_OPT(VERBOSE) && oresp.data) {
 		gnutls_ocsp_resp_t r;
 		gnutls_datum_t p;
+		unsigned flag;
 
 		ret = gnutls_ocsp_resp_init(&r);
 		if (ret < 0) {
@@ -1070,9 +1071,12 @@ print_other_info(gnutls_session_t session)
 			return;
 		}
 
+		if (print_cert != 0)
+			flag = GNUTLS_OCSP_PRINT_FULL;
+		else
+			flag = GNUTLS_OCSP_PRINT_COMPACT;
 		ret =
-		    gnutls_ocsp_resp_print(r, GNUTLS_OCSP_PRINT_COMPACT,
-					   &p);
+		    gnutls_ocsp_resp_print(r, flag, &p);
 		gnutls_ocsp_resp_deinit(r);
 		fputs((char*)p.data, stdout);
 	}
