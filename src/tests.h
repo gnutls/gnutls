@@ -47,6 +47,7 @@ test_code_t test_tls1_1_fallback(gnutls_session_t state);
 test_code_t test_tls_disable0(gnutls_session_t state);
 test_code_t test_tls_disable1(gnutls_session_t state);
 test_code_t test_tls_disable2(gnutls_session_t state);
+test_code_t test_ocsp_status(gnutls_session_t state);
 test_code_t test_rsa_pms(gnutls_session_t state);
 test_code_t test_max_record_size(gnutls_session_t state);
 test_code_t test_version_rollback(gnutls_session_t state);

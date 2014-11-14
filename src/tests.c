@@ -214,6 +214,9 @@ test_code_t test_ecdhe(gnutls_session_t session)
 
 	ret = do_handshake(session);
 
+	if (ret < 0)
+		return TEST_FAILED;
+
 	curve = gnutls_ecc_curve_get(session);
 
 	return ret;
@@ -234,6 +237,33 @@ test_code_t test_safe_renegotiation(gnutls_session_t session)
 	ret = do_handshake(session);
 
 	return ret;
+}
+
+test_code_t test_ocsp_status(gnutls_session_t session)
+{
+	int ret;
+	gnutls_datum_t resp;
+
+	sprintf(prio_str, INIT_STR
+		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+		":" ALL_KX":%s", protocol_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_ocsp_status_request_enable_client(session, NULL, 0, NULL);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+
+	if (ret < 0)
+		return TEST_FAILED;
+
+	ret = gnutls_ocsp_status_request_get(session, &resp);
+	if (ret == 0)
+		return TEST_SUCCEED;
+
+
+	return TEST_FAILED;
 }
 
 test_code_t test_safe_renegotiation_scsv(gnutls_session_t session)
