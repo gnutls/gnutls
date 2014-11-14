@@ -149,7 +149,25 @@ static const gnutls_datum_t resp2 =
 "		Certificate Status: good\n" \
 "		This Update: Thu Sep 04 05:49:00 UTC 2014\n" \
 "		Next Update: Thu Sep 11 06:04:00 UTC 2014\n" \
-"	Extensions:\n"
+"	Extensions:\n" \
+"	Signature Algorithm: RSA-SHA1\n" \
+"	Signature:\n" \
+"		6e:5e:5e:81:ff:3f:4d:c7:53:c7:1b:f3:d3:1d:dc:9a\n" \
+"		c7:ce:77:2c:67:56:13:98:91:02:01:76:dc:48:b2:1f\n" \
+"		9b:17:ea:bf:2c:0a:f5:1d:98:90:3c:5f:55:c2:ff:4b\n" \
+"		9a:bc:a6:83:9e:ab:2b:eb:9d:01:ea:3b:5f:be:03:29\n" \
+"		70:63:2a:a4:1d:a8:ab:69:b2:64:ba:5d:73:91:5c:92\n" \
+"		f3:69:d4:c9:39:9c:7c:7d:a2:47:92:c2:56:fe:a1:0d\n" \
+"		4a:69:ff:da:48:c5:5e:d8:ab:39:88:6a:06:fa:07:57\n" \
+"		d6:48:b5:ce:c9:5f:a5:96:fe:37:18:5e:7f:35:51:c1\n" \
+"		9e:79:5a:26:ba:67:67:38:2a:80:75:42:99:68:3e:ec\n" \
+"		2f:7e:2d:a1:a6:be:9f:01:51:22:88:3a:c9:9c:ed:51\n" \
+"		ef:21:66:7e:a9:d0:3f:13:9c:bb:d2:94:14:6f:4b:d9\n" \
+"		c4:f5:2c:f5:7d:07:68:f3:51:ac:da:c2:09:66:a9:3d\n" \
+"		ed:ad:02:4d:9c:11:29:1a:54:fb:1e:7e:36:f4:bb:0d\n" \
+"		08:8c:6a:42:08:10:29:08:7c:56:0b:18:47:ff:87:11\n" \
+"		fd:b2:fb:c9:22:7f:e3:1f:7b:f9:98:aa:3a:32:b6:2f\n" \
+"		02:ba:b6:c1:dc:c3:5d:b5:4b:ae:5d:29:6a:31:de:cd\n"
 
 static const gnutls_datum_t resp3 =
     { (unsigned char *) RESP3, sizeof(RESP3) - 1 };
