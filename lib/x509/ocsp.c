@@ -41,6 +41,7 @@ typedef struct gnutls_ocsp_resp_int {
 	ASN1_TYPE resp;
 	gnutls_datum_t response_type_oid;
 	ASN1_TYPE basicresp;
+	gnutls_datum_t der;
 } gnutls_ocsp_resp_int;
 
 #define MAX_TIME 64
@@ -266,8 +267,6 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 	if (resp->response_type_oid.size == sizeof(OCSP_BASIC)
 	    && memcmp(resp->response_type_oid.data, OCSP_BASIC,
 		      resp->response_type_oid.size) == 0) {
-		gnutls_datum_t d;
-
 		if (resp->basicresp) {
 			asn1_delete_structure(&resp->basicresp);
 
@@ -282,16 +281,15 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 
 		ret =
 		    _gnutls_x509_read_value(resp->resp,
-					    "responseBytes.response", &d);
+					    "responseBytes.response", &resp->der);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
 
 		ret =
-		    asn1_der_decoding(&resp->basicresp, d.data, d.size,
+		    asn1_der_decoding(&resp->basicresp, resp->der.data, resp->der.size,
 				      NULL);
-		gnutls_free(d.data);
 		if (ret != ASN1_SUCCESS) {
 			gnutls_assert();
 			return _gnutls_asn2err(ret);
@@ -1879,7 +1877,7 @@ _ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 	}
 	sigalg = rc;
 
-	rc = export(resp->basicresp, "tbsResponseData", &data);
+	rc = _gnutls_x509_get_raw_field2(resp->basicresp, &resp->der, "tbsResponseData", &data);
 	if (rc != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
 		goto done;
@@ -1916,7 +1914,6 @@ _ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 	rc = GNUTLS_E_SUCCESS;
 
       done:
-	gnutls_free(data.data);
 	gnutls_free(sig.data);
 	gnutls_pubkey_deinit(pubkey);
 
