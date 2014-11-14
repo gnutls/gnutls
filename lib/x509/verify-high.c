@@ -883,6 +883,32 @@ int trust_list_get_issuer(gnutls_x509_trust_list_t list,
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
 
+static
+int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
+				      const gnutls_datum_t *dn,
+				      gnutls_x509_crt_t * issuer,
+				      unsigned int flags)
+{
+	int ret;
+	unsigned int i;
+	uint32_t hash;
+
+	hash =
+	    hash_pjw_bare(dn->data,
+			  dn->size);
+	hash %= list->size;
+
+	for (i = 0; i < list->node[hash].trusted_ca_size; i++) {
+		ret = _gnutls_x509_compare_raw_dn(dn, &list->node[hash].trusted_cas[i]->raw_dn);
+		if (ret != 0) {
+			*issuer = crt_cpy(list->node[hash].trusted_cas[i]);
+			return 0;
+		}
+	}
+
+	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+}
+
 /**
  * gnutls_x509_trust_list_get_issuer:
  * @list: The structure of the list
@@ -953,6 +979,65 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 			*issuer = crt;
 			return ret;
 		}
+	}
+#endif
+	return ret;
+}
+
+/**
+ * gnutls_x509_trust_list_get_issuer_by_dn:
+ * @list: The structure of the list
+ * @dn: is the issuer's DN
+ * @issuer: Will hold the issuer if any. Should be treated as constant.
+ * @flags: Use zero
+ *
+ * This function will find the issuer of the given certificate, and
+ * return a copy of the issuer, which must be freed using gnutls_x509_crt_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ **/
+int gnutls_x509_trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
+				      const gnutls_datum_t *dn,
+				      gnutls_x509_crt_t *issuer,
+				      unsigned int flags)
+{
+	int ret;
+
+	ret = trust_list_get_issuer_by_dn(list, dn, issuer, flags);
+	if (ret == 0) {
+		return 0;
+	}
+
+#ifdef ENABLE_PKCS11
+	if (ret < 0 && list->pkcs11_token) {
+		gnutls_x509_crt_t crt;
+		gnutls_datum_t der = {NULL, 0};
+		/* use the token for verification */
+		ret = gnutls_pkcs11_get_raw_issuer_by_dn(list->pkcs11_token, dn, &der,
+			GNUTLS_X509_FMT_DER, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		ret = gnutls_x509_crt_init(&crt);
+		if (ret < 0) {
+			gnutls_free(der.data);
+			return gnutls_assert_val(ret);
+		}
+
+		ret = gnutls_x509_crt_import(crt, &der, GNUTLS_X509_FMT_DER);
+		gnutls_free(der.data);
+		if (ret < 0) {
+			gnutls_x509_crt_deinit(crt);
+			return gnutls_assert_val(ret);
+		}
+
+		*issuer = crt;
+		return 0;
 	}
 #endif
 	return ret;

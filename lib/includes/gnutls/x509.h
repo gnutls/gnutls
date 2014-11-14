@@ -1257,6 +1257,11 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t
 				      gnutls_x509_crt_t * issuer,
 				      unsigned int flags);
 
+int gnutls_x509_trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
+				      const gnutls_datum_t *dn,
+				      gnutls_x509_crt_t *issuer,
+				      unsigned int flags);
+
 #define GNUTLS_TL_VERIFY_CRL 1
 #define GNUTLS_TL_USE_IN_TLS (1<<1)
 #define GNUTLS_TL_NO_DUPLICATES (1<<2)
