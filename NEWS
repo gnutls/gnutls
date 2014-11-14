@@ -83,6 +83,8 @@ gnutls_pkcs11_privkey_cpy: Added
 gnutls_x509_crq_get_signature_algorithm: Added
 gnutls_x509_trust_list_iter_get_ca: Added
 gnutls_x509_trust_list_iter_deinit: Added
+gnutls_x509_trust_list_get_issuer_by_dn: Added
+gnutls_pkcs11_get_raw_issuer_by_dn: Added
 gnutls_certificate_get_trust_list: Added
 gnutls_privkey_export_x509: Added
 gnutls_privkey_export_pkcs11: Added
@@ -99,6 +101,7 @@ gnutls_dh_params_import_raw2: Added
 gnutls_memset: Added
 gnutls_memcmp: Added
 gnutls_pkcs12_bag_set_privkey: Added
+gnutls_ocsp_resp_get_responder_raw_id: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
