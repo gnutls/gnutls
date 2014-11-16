@@ -337,6 +337,7 @@ int gnutls_global_init(void)
 				goto out;
 			}
 		}
+		_gnutls_fips_mode_reset_zombie();
 	}
 #endif
 	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);

@@ -92,6 +92,15 @@ const char *p;
 	return fips_mode;
 }
 
+/* This _fips_mode == 2 is a strange mode where checks are being
+ * performed, but its output is ignored. */
+void _gnutls_fips_mode_reset_zombie(void)
+{
+	if (_fips_mode == 2) {
+		_fips_mode = 0;
+	}
+}
+
 #define GNUTLS_LIBRARY_NAME "libgnutls.so.28"
 #define NETTLE_LIBRARY_NAME "libnettle.so.4"
 #define HOGWEED_LIBRARY_NAME "libhogweed.so.2"
