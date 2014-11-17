@@ -79,6 +79,10 @@ void get_dc_set(int type, void *crt);
 void get_ca_issuers_set(gnutls_x509_crt_t crt);
 void get_ocsp_issuer_set(gnutls_x509_crt_t crt);
 
+int get_key_agreement_status(void);
+int get_non_repudiation_status(void);
+int get_data_encipherment_status(void);
+
 void get_cn_crq_set(gnutls_x509_crq_t crq);
 void get_uid_crq_set(gnutls_x509_crq_t crq);
 void get_locality_crq_set(gnutls_x509_crq_t crq);

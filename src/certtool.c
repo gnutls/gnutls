@@ -484,6 +484,17 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			}
 		}
 
+		result = get_key_agreement_status();
+		if (result)
+			usage |= GNUTLS_KEY_KEY_AGREEMENT;
+
+		result = get_data_encipherment_status();
+		if (result)
+			usage |= GNUTLS_KEY_DATA_ENCIPHERMENT;
+
+		result = get_non_repudiation_status();
+		if (result)
+			usage |= GNUTLS_KEY_NON_REPUDIATION;
 
 		if (ca_status) {
 			result = get_cert_sign_status();

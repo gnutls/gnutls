@@ -117,6 +117,9 @@ static struct cfg_options available_options[] = {
 	{ .name = "ocsp_signing_key", .type = OPTION_BOOLEAN },
 	{ .name = "time_stamping_key", .type = OPTION_BOOLEAN },
 	{ .name = "ipsec_ike_key", .type = OPTION_BOOLEAN },
+	{ .name = "key_agreement", .type = OPTION_BOOLEAN },
+	{ .name = "data_encipherment", .type = OPTION_BOOLEAN },
+	{ .name = "non_repudiation", .type = OPTION_BOOLEAN },
 };
 
 typedef struct _cfg_ctx {
@@ -158,6 +161,9 @@ typedef struct _cfg_ctx {
 	int encryption_key;
 	int cert_sign_key;
 	int crl_sign_key;
+	int non_repudiation;
+	int data_encipherment;
+	int key_agreement;
 	int code_sign_key;
 	int ocsp_sign_key;
 	int time_stamping_key;
@@ -428,6 +434,10 @@ int template_parse(const char *template)
 	READ_BOOLEAN("ocsp_signing_key", cfg.ocsp_sign_key);
 	READ_BOOLEAN("time_stamping_key", cfg.time_stamping_key);
 	READ_BOOLEAN("ipsec_ike_key", cfg.ipsec_ike_key);
+
+	READ_BOOLEAN("data_encipherment", cfg.data_encipherment);
+	READ_BOOLEAN("key_agreement", cfg.key_agreement);
+	READ_BOOLEAN("non_repudiation", cfg.non_repudiation);
 
 	optionUnloadNested(pov);
 
@@ -1718,6 +1728,36 @@ int get_crl_sign_status(void)
 		    read_yesno
 		    ("Will the certificate be used to sign CRLs? (y/N): ",
 		     0);
+	}
+}
+
+int get_key_agreement_status(void)
+{
+	if (batch) {
+		return cfg.key_agreement;
+	} else {
+		/* this option is not asked in interactive mode */
+		return 0;
+	}
+}
+
+int get_non_repudiation_status(void)
+{
+	if (batch) {
+		return cfg.non_repudiation;
+	} else {
+		/* this option is not asked in interactive mode */
+		return 0;
+	}
+}
+
+int get_data_encipherment_status(void)
+{
+	if (batch) {
+		return cfg.data_encipherment;
+	} else {
+		/* this option is not asked in interactive mode */
+		return 0;
 	}
 }
 
