@@ -349,8 +349,9 @@ use_certificate_test () {
 	certfile=$3
 	keyfile=$4
 	cafile=$5
+	txt=$6
 
-	echo -n "* Using PKCS #11 with gnutls-cli... "
+	echo -n "* Using PKCS #11 with gnutls-cli ($txt)... "
 	# start server
 	launch_pkcs11_server $$ "$ADDITIONAL_PARAM" --echo --priority NORMAL --x509certfile="$certfile" \
 		--x509keyfile="$keyfile" --x509cafile="$cafile" \
@@ -360,7 +361,7 @@ use_certificate_test () {
 	wait_server $PID
 
 	# connect to server using SC
-	$VALGRIND $CLI $ADDITIONAL_PARAM  -p $PORT localhost --priority NORMAL --x509cafile="$cafile" </dev/null >>$TMPFILE 2>&1 && \
+	$VALGRIND $CLI $ADDITIONAL_PARAM -p $PORT localhost --priority NORMAL --x509cafile="$cafile" </dev/null >>$TMPFILE 2>&1 && \
 		fail $PID "Connection should have failed!"
 
 	$VALGRIND $CLI $ADDITIONAL_PARAM -p $PORT localhost --priority NORMAL --x509certfile="$certfile" \
@@ -434,7 +435,9 @@ write_certificate_test $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/ca.key" "$srcdir
 write_serv_privkey $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/server.key"
 write_serv_cert $TOKEN $GNUTLS_PIN "$srcdir/pkcs11-certs/server.crt"
 
-use_certificate_test $TOKEN $GNUTLS_PIN "$TOKEN;object=serv-cert;object-type=cert" "$TOKEN;object=serv-key;object-type=private" "$srcdir/pkcs11-certs/ca.crt"
+use_certificate_test $TOKEN $GNUTLS_PIN "$TOKEN;object=serv-cert;object-type=cert" "$TOKEN;object=serv-key;object-type=private" "$srcdir/pkcs11-certs/ca.crt" "full URLs"
+
+use_certificate_test $TOKEN $GNUTLS_PIN "$TOKEN;object=serv-cert" "$TOKEN;object=serv-key" "$srcdir/pkcs11-certs/ca.crt" "abbrv URLs"
 
 if test $RETCODE = 0;then
 	echo "* All smart cards tests succeeded"
