@@ -696,7 +696,7 @@ int get_win_urls(const CERT_CONTEXT *cert, char **cert_url, char **key_url,
 }
 
 /**
- * gnutls_system_key_iter_get_url:
+ * gnutls_system_key_iter_get_info:
  * @iter: an iterator of the system keys (must be set to %NULL initially)
  * @cert_url: The certificate URL of the pair (may be %NULL)
  * @key_url: The key URL of the pair (may be %NULL)
@@ -1085,13 +1085,14 @@ void gnutls_system_key_iter_deinit(gnutls_system_key_iter_t iter)
 }
 
 int
-gnutls_system_key_iter_get_url(gnutls_system_key_iter_t *iter,
-			       char **cert_url,
-			       char **key_url,
-			       char **label,
-			       unsigned int flags);
+gnutls_system_key_iter_get_info(gnutls_system_key_iter_t *iter,
+			        char **cert_url,
+			        char **key_url,
+			        char **label,
+			        gnutls_datum_t *der,
+			        unsigned int flags)
 {
-	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 int gnutls_system_key_delete(const char *cert_url, const char *key_url)
@@ -1100,7 +1101,7 @@ int gnutls_system_key_delete(const char *cert_url, const char *key_url)
 }
 
 int gnutls_system_key_add_x509(gnutls_x509_crt_t crt, gnutls_x509_privkey_t privkey,
-				const char *label)
+				const char *label, char **cert_url, char **key_url)
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
