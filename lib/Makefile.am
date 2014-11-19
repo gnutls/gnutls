@@ -83,7 +83,7 @@ COBJECTS = gnutls_range.c gnutls_record.c \
 	gnutls_pubkey.c locks.c gnutls_dtls.c system_override.c	\
 	crypto-backend.c verify-tofu.c pin.c tpm.c fips.c \
 	safe-memfuncs.c inet_pton.c atfork.c atfork.h system-keys.c \
-	system-keys.h
+	system-keys.h urls.c urls.h
 
 if ENABLE_SELF_CHECKS
 COBJECTS += crypto-selftests.c crypto-selftests-pk.c

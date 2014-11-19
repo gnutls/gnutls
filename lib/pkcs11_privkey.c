@@ -28,6 +28,7 @@
 #include <gnutls_sig.h>
 #include <gnutls_pk.h>
 #include <fips.h>
+#include "urls.h"
 #include <p11-kit/uri.h>
 
 /* In case of a fork, it will invalidate the open session
@@ -402,11 +403,11 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 	memset(&pkey->sinfo, 0, sizeof(pkey->sinfo));
 
-	pkey->url = gnutls_strdup(url);
+	pkey->url = _gnutls_sanitize_url(url, 1);
 	if (pkey->url == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	ret = pkcs11_url_to_info(url, &pkey->uinfo);
+	ret = pkcs11_url_to_info(pkey->url, &pkey->uinfo);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
