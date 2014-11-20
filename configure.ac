@@ -81,6 +81,9 @@ AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
 dnl Detect windows build
 use_accel=yes
 case "$host" in
+  *android*)
+    have_android=yes
+  ;;
   *mingw32* | *mingw64*)
     have_win=yes
   ;;
@@ -100,6 +103,7 @@ case "$host" in
   ;;
 esac
 
+AM_CONDITIONAL(ANDROID, test "$have_android" = yes)
 AM_CONDITIONAL(WINDOWS, test "$have_win" = yes)
 AM_CONDITIONAL(MACOSX, test "$have_macosx" = yes)
 AM_CONDITIONAL(ELF, test "$have_elf" = yes)
