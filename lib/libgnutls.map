@@ -496,9 +496,6 @@ GNUTLS_1_4
 	gnutls_x509_rdn_get;
 	gnutls_x509_rdn_get_by_oid;
 	gnutls_x509_rdn_get_oid;
-
-  local:
-	*;
 };
 
 GNUTLS_2_8
