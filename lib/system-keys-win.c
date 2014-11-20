@@ -28,18 +28,21 @@
 #include <gnutls_sig.h>
 #include <gnutls_pk.h>
 
-#if defined(_WIN32)
-# include <wincrypt.h>
-# include <winbase.h>
+#if !defined(_WIN32)
+# error shouldn't be included
+#endif
 
-# define DYN_NCRYPT
+#include <wincrypt.h>
+#include <winbase.h>
+
+#define DYN_NCRYPT
 
 #ifndef DYN_NCRYPT
 # include <ncrypt.h>
 #endif
 /* ncrypt.h and shlwapi.h not included to allow compilation in windows XP */
 
-# define MAX_WID_SIZE 48
+#define MAX_WID_SIZE 48
 
 struct system_key_iter_st {
 	HCERTSTORE store;
@@ -1076,56 +1079,3 @@ void _gnutls_system_key_deinit(void)
 		FreeLibrary(ncrypt_lib);
 	}
 }
-
-#else /* Non-win32 */
-
-void gnutls_system_key_iter_deinit(gnutls_system_key_iter_t iter)
-{
-	return;
-}
-
-int
-gnutls_system_key_iter_get_info(gnutls_system_key_iter_t *iter,
-			        char **cert_url,
-			        char **key_url,
-			        char **label,
-			        gnutls_datum_t *der,
-			        unsigned int flags)
-{
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int gnutls_system_key_delete(const char *cert_url, const char *key_url)
-{
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int gnutls_system_key_add_x509(gnutls_x509_crt_t crt, gnutls_x509_privkey_t privkey,
-				const char *label, char **cert_url, char **key_url)
-{
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int
-_gnutls_privkey_import_system_url(gnutls_privkey_t pkey,
-			          const char *url)
-{
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int
-_gnutls_x509_crt_import_system_url(gnutls_x509_crt_t crt, const char *url)
-{
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int _gnutls_system_key_init(void)
-{
-	return 0;
-}
-
-void _gnutls_system_key_deinit(void)
-{
-	return;
-}
-#endif
