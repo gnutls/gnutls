@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.3.11 (unreleased)
 
+** libgnutls: Corrected regression introduced in 3.3.9 related to
+session renegotiation. Reported by Dan Winship.
+
 ** libgnutls: Corrected parsing issue with OCSP responses.
 
 ** API and ABI modifications:
