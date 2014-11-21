@@ -807,7 +807,7 @@ record_add_to_buffers(gnutls_session_t session,
 			 * reasons). Otherwise it is an unexpected packet
 			 */
 			if (type == GNUTLS_ALERT
-			    || (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO
+			    || ((htype == GNUTLS_HANDSHAKE_SERVER_HELLO || htype == GNUTLS_HANDSHAKE_CLIENT_HELLO)
 				&& type == GNUTLS_HANDSHAKE)) {
 				/* even if data is unexpected put it into the buffer */
 				_gnutls_record_buffer_put(session, recv->type,
