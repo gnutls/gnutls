@@ -2546,6 +2546,8 @@ gnutls_handshake_set_timeout (gnutls_session_t session, unsigned int ms)
 		/* EAGAIN and INTERRUPTED are always non-fatal */ \
 		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) \
 			return ret; \
+		if (ret == GNUTLS_E_GOT_APPLICATION_DATA && session->internals.initial_negotiation_completed != 0) \
+			return ret; \
 		if (ret == GNUTLS_E_LARGE_PACKET && session->internals.handshake_large_loops < 16) { \
 			session->internals.handshake_large_loops++; \
 			return ret; \
