@@ -66,8 +66,6 @@ when available.
 
 ** gnutls-cli: added option --priority-list.
 
-** guile: new 'set-session-server-name!' procedure; see the manual for details.
-
 ** API and ABI modifications:
 gnutls_aead_cipher_init: Added
 gnutls_aead_cipher_decrypt: Added
