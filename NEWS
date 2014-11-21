@@ -5,10 +5,6 @@ See the end for copying conditions.
 
 * Version 3.3.11 (unreleased)
 
-** libgnutls: The priority modifier %LATEST_RECORD_VERSION is now the
-default. This works around issue with servers that prohibit the SSL 3.0
-from being present in the first TLS record.
-
 ** libgnutls: Corrected parsing issue with OCSP responses.
 
 ** API and ABI modifications:
