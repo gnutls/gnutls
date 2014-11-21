@@ -2504,7 +2504,9 @@ static int _gnutls_recv_supplemental(gnutls_session_t session)
  *
  * The non-fatal errors expected by this function are:
  * %GNUTLS_E_INTERRUPTED, %GNUTLS_E_AGAIN, 
- * and %GNUTLS_E_WARNING_ALERT_RECEIVED.
+ * %GNUTLS_E_WARNING_ALERT_RECEIVED, and %GNUTLS_GOT_APPLICATION_DATA,
+ * the latter only in a case of rehandshake.
+ *
  * The former two interrupt the handshake procedure due to the lower
  * layer being interrupted, and the latter because of an alert that
  * may be sent by a server (it is always a good idea to check any
@@ -2519,8 +2521,9 @@ static int _gnutls_recv_supplemental(gnutls_session_t session)
  * %GNUTLS_E_WARNING_ALERT_RECEIVED may be returned.  Note that these
  * are non fatal errors, only in the specific case of a rehandshake.
  * Their meaning is that the client rejected the rehandshake request or
- * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it might also mean that
- * some data were pending.
+ * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it could also mean that
+ * some data were pending. A client may receive that error code if
+ * it initiates the handshake and the server doesn't agreed.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
@@ -2631,6 +2634,8 @@ gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 	if (ret < 0) { \
 		/* EAGAIN and INTERRUPTED are always non-fatal */ \
 		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) \
+			return ret; \
+		if (ret == GNUTLS_E_GOT_APPLICATION_DATA && session->internals.initial_negotiation_completed != 0) \
 			return ret; \
 		if (ret == GNUTLS_E_LARGE_PACKET && session->internals.handshake_large_loops < 16) { \
 			session->internals.handshake_large_loops++; \
