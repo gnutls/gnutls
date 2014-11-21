@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.1.29 (unreleased)
+
+** libgnutls: Corrected regression introduced in 3.1.27 related to
+session renegotiation. Reported by Dan Winship.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.1.28 (released 2014-11-10)
 
 ** libgnutls: Corrected issue in export of ECC parameters to X9.63 format.
