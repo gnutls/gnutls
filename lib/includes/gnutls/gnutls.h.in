@@ -1107,8 +1107,10 @@ int gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
 					   unsigned int idx,
 					   unsigned int *sidx);
 
+#define GNUTLS_PRIORITY_LIST_INIT_KEYWORDS 1
+#define GNUTLS_PRIORITY_LIST_SPECIAL 2
 const char *
-gnutls_priority_string_list(unsigned iter);
+gnutls_priority_string_list(unsigned iter, unsigned int flags);
 
 int gnutls_priority_set(gnutls_session_t session,
 			gnutls_priority_t priority);

@@ -222,5 +222,5 @@ gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
 	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
 
 priority_options.h: $(srcdir)/priority_options.gperf
-	-gperf -t $^ > $@-tmp && mv $@-tmp $@
+	-gperf --global-table -t $^ > $@-tmp && mv $@-tmp $@
 

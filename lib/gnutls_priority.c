@@ -1711,18 +1711,27 @@ gnutls_priority_certificate_type_list(gnutls_priority_t pcache,
 /**
  * gnutls_priority_string_list:
  * @iter: an integer counter starting from zero
+ * @flags: one of %GNUTLS_PRIORITY_LIST_INIT_KEYWORDS, %GNUTLS_PRIORITY_LIST_SPECIAL
  *
- * Returns all available priority strings. When no strings
- * are available it returns %NULL.
- * structure. 
+ * Can be used to iterate all available priority strings.
+ * Due to internal implementation details, there are cases where this
+ * function can return the empty string. In that case that string should be ignored.
+ * When no strings are available it returns %NULL.
  *
  * Returns: a priority string
  * Since: 3.4.0
  **/
 const char *
-gnutls_priority_string_list(unsigned iter)
+gnutls_priority_string_list(unsigned iter, unsigned int flags)
 {
-	if (iter >= (sizeof(pgroups)/sizeof(pgroups[0]))-1)
-		return NULL;
-	return pgroups[iter].name;
+	if (flags & GNUTLS_PRIORITY_LIST_INIT_KEYWORDS) {
+		if (iter >= (sizeof(pgroups)/sizeof(pgroups[0]))-1)
+			return NULL;
+		return pgroups[iter].name;
+	} else if (flags & GNUTLS_PRIORITY_LIST_SPECIAL) {
+		if (iter >= (sizeof(wordlist)/sizeof(wordlist[0]))-1)
+			return NULL;
+		return wordlist[iter].name;
+	}
+	return NULL;
 }

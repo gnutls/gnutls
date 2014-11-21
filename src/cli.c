@@ -1354,15 +1354,38 @@ void print_priority_list(void)
 {
 	unsigned int idx;
 	const char *str;
+	unsigned int lineb = 0;
 
 	printf("Priority strings in GnuTLS %s:\n", gnutls_check_version(NULL));
 
+	fputs("\t", stdout);
 	for (idx=0;;idx++) {
-		str = gnutls_priority_string_list(idx);
+		str = gnutls_priority_string_list(idx, GNUTLS_PRIORITY_LIST_INIT_KEYWORDS);
 		if (str == NULL)
 			break;
-		printf("\t%s\n", str);
+		lineb += printf("%s ", str);
+		if (lineb > 64) {
+			lineb = 0;
+			printf("\n\t");
+		}
 	}
+
+	printf("\n\nSpecial strings:\n");
+	lineb = 0;
+	fputs("\t", stdout);
+	for (idx=0;;idx++) {
+		str = gnutls_priority_string_list(idx, GNUTLS_PRIORITY_LIST_SPECIAL);
+		if (str == NULL)
+			break;
+		if (str[0] == 0)
+			continue;
+		lineb += printf("%%%s ", str);
+		if (lineb > 64) {
+			lineb = 0;
+			printf("\n\t");
+		}
+	}
+	printf("\n");
 
 	return;
 }
