@@ -27,13 +27,13 @@
 
 /* TLS Versions */
 static const version_entry_st sup_versions[] = {
-	{"SSL3.0", GNUTLS_SSL3, 3, 0, GNUTLS_STREAM, 1, 0, 0, 0, 0},
-	{"TLS1.0", GNUTLS_TLS1, 3, 1, GNUTLS_STREAM, 1, 0, 1, 0, 0},
-	{"TLS1.1", GNUTLS_TLS1_1, 3, 2, GNUTLS_STREAM, 1, 1, 1, 0, 0},
-	{"TLS1.2", GNUTLS_TLS1_2, 3, 3, GNUTLS_STREAM, 1, 1, 1, 1, 1},
-	{"DTLS0.9", GNUTLS_DTLS0_9, 1, 0, GNUTLS_DGRAM, 1, 1, 1, 0, 0},	/* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
-	{"DTLS1.0", GNUTLS_DTLS1_0, 254, 255, GNUTLS_DGRAM, 1, 1, 1, 0, 0},	/* 1.1 over datagram */
-	{"DTLS1.2", GNUTLS_DTLS1_2, 254, 253, GNUTLS_DGRAM, 1, 1, 1, 1, 1},	/* 1.2 over datagram */
+	{"SSL3.0", GNUTLS_SSL3, 0, 3, 0, GNUTLS_STREAM, 1, 0, 0, 0, 0},
+	{"TLS1.0", GNUTLS_TLS1, 1, 3, 1, GNUTLS_STREAM, 1, 0, 1, 0, 0},
+	{"TLS1.1", GNUTLS_TLS1_1, 2, 3, 2, GNUTLS_STREAM, 1, 1, 1, 0, 0},
+	{"TLS1.2", GNUTLS_TLS1_2, 3, 3, 3, GNUTLS_STREAM, 1, 1, 1, 1, 1},
+	{"DTLS0.9", GNUTLS_DTLS0_9, 200, 1, 0, GNUTLS_DGRAM, 1, 1, 1, 0, 0},	/* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
+	{"DTLS1.0", GNUTLS_DTLS1_0, 201, 254, 255, GNUTLS_DGRAM, 1, 1, 1, 0, 0},	/* 1.1 over datagram */
+	{"DTLS1.2", GNUTLS_DTLS1_2, 202, 254, 253, GNUTLS_DGRAM, 1, 1, 1, 1, 1},	/* 1.2 over datagram */
 	{0, 0, 0, 0, 0}
 };
 
@@ -48,6 +48,16 @@ const version_entry_st *version_to_entry(gnutls_protocol_t version)
 {
 	GNUTLS_VERSION_ALG_LOOP(return p);
 	return NULL;
+}
+
+static int
+version_is_valid_for_session(gnutls_session_t session,
+		     const version_entry_st *v)
+{
+	if (v->supported && v->transport == session->internals.transport) {
+		return 1;
+	}
+	return 0;
 }
 
 /* Return the priority of the provided version number */
@@ -68,24 +78,28 @@ _gnutls_version_priority(gnutls_session_t session,
 
 /* Returns the lowest TLS version number in the priorities.
  */
-gnutls_protocol_t _gnutls_version_lowest(gnutls_session_t session)
+const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 {
-	unsigned int i, min = 0xff;
+	unsigned int i;
 	gnutls_protocol_t cur_prot;
+	const version_entry_st *v, *min_v = NULL;
 
-	for (i=0;i< session->internals.priorities.protocol.algorithms;i++) {
+	for (i=0;i < session->internals.priorities.protocol.algorithms;i++) {
 		cur_prot =
 		    session->internals.priorities.protocol.priority[i];
+		v = version_to_entry(cur_prot);
 
-		if (cur_prot < min
-		    && _gnutls_version_is_supported(session, cur_prot))
-			min = cur_prot;
+		if (v != NULL) {
+			if (min_v == NULL) {
+				min_v = v;
+			} else if (v->age < min_v->age
+			    && version_is_valid_for_session(session, v)) {
+				min_v = v;
+			}
+		}
 	}
 
-	if (min == 0xff)
-		return GNUTLS_VERSION_UNKNOWN;	/* unknown version */
-
-	return min;
+	return min_v;
 }
 
 /* Returns the maximum version in the priorities 
@@ -211,3 +225,4 @@ _gnutls_version_is_supported(gnutls_session_t session,
 	else
 		return 1;
 }
+

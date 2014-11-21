@@ -860,11 +860,11 @@ static void disable_safe_renegotiation(gnutls_priority_t c)
 }
 static void enable_latest_record_version(gnutls_priority_t c)
 {
-	c->ssl3_record_version = 0;
+	c->min_record_version = 0;
 }
 static void enable_ssl3_record_version(gnutls_priority_t c)
 {
-	c->ssl3_record_version = 1;
+	c->min_record_version = 1;
 }
 static void enable_verify_allow_rsa_md5(gnutls_priority_t c)
 {
@@ -1125,7 +1125,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	 * when we make it the default.
 	 */
 	(*priority_cache)->sr = SR_PARTIAL;
-	(*priority_cache)->ssl3_record_version = 1;
+	(*priority_cache)->min_record_version = 1;
 
 	(*priority_cache)->max_empty_records = DEFAULT_MAX_EMPTY_RECORDS;
 

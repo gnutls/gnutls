@@ -1978,23 +1978,22 @@ static int send_client_hello(gnutls_session_t session, int again)
 		if (_gnutls_set_current_version(session, hver->id) < 0)
 			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
 
-		if (session->internals.priorities.ssl3_record_version != 0) {
+		if (session->internals.priorities.min_record_version != 0) {
 			/* Advertize the SSL 3.0 record packet version in
 			 * record packets during the handshake.
 			 * That is to avoid confusing implementations
 			 * that do not support TLS 1.2 and don't know
 			 * how 3,3 version of record packets look like.
 			 */
-			if (!IS_DTLS(session))
+			const version_entry_st *v = _gnutls_version_lowest(session);
+
+			if (v == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_INTERNAL_ERROR;
+			} else {
 				_gnutls_record_set_default_version(session,
-								   3, 0);
-			else if (hver->id == GNUTLS_DTLS0_9)
-				_gnutls_record_set_default_version(session,
-								   1, 0);
-			else
-				_gnutls_record_set_default_version(session,
-								   254,
-								   255);
+								   v->major, v->minor);
+			}
 		}
 
 		/* In order to know when this session was initiated.

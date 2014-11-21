@@ -486,6 +486,7 @@ typedef struct mac_entry_st {
 typedef struct {
 	const char *name;
 	gnutls_protocol_t id;	/* gnutls internal version number */
+	unsigned age;		/* internal ordering by protocol age */
 	uint8_t major;		/* defined by the protocol */
 	uint8_t minor;		/* defined by the protocol */
 	transport_t transport;	/* Type of transport, stream or datagram */
@@ -658,7 +659,7 @@ struct gnutls_priority_st {
 	unsigned int max_empty_records;
 	unsigned int dumbfw;
 	safe_renegotiation_t sr;
-	bool ssl3_record_version;
+	bool min_record_version;
 	bool server_precedence;
 	bool allow_wrong_pms;
 	/* Whether stateless compression will be used */
