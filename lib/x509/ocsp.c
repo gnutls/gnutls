@@ -35,6 +35,7 @@
 
 typedef struct gnutls_ocsp_req_int {
 	ASN1_TYPE req;
+	unsigned init;
 } gnutls_ocsp_req_int;
 
 typedef struct gnutls_ocsp_resp_int {
@@ -42,6 +43,7 @@ typedef struct gnutls_ocsp_resp_int {
 	gnutls_datum_t response_type_oid;
 	ASN1_TYPE basicresp;
 	gnutls_datum_t der;
+	unsigned init;
 } gnutls_ocsp_resp_int;
 
 #define MAX_TIME 64
@@ -92,7 +94,6 @@ void gnutls_ocsp_req_deinit(gnutls_ocsp_req_t req)
 		asn1_delete_structure(&req->req);
 
 	req->req = NULL;
-
 	gnutls_free(req);
 }
 
@@ -158,6 +159,7 @@ void gnutls_ocsp_resp_deinit(gnutls_ocsp_resp_t resp)
 	resp->response_type_oid.data = NULL;
 	resp->basicresp = NULL;
 
+	gnutls_free(resp->der.data);
 	gnutls_free(resp);
 }
 
@@ -183,7 +185,7 @@ gnutls_ocsp_req_import(gnutls_ocsp_req_t req, const gnutls_datum_t * data)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (req->req) {
+	if (req->init) {
 		/* Any earlier asn1_der_decoding will modify the ASN.1
 		   structure, so we need to replace it with a fresh
 		   structure. */
@@ -196,6 +198,7 @@ gnutls_ocsp_req_import(gnutls_ocsp_req_t req, const gnutls_datum_t * data)
 			return _gnutls_asn2err(ret);
 		}
 	}
+	req->init = 1;
 
 	ret = asn1_der_decoding(&req->req, data->data, data->size, NULL);
 	if (ret != ASN1_SUCCESS) {
@@ -229,11 +232,13 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (resp->resp) {
+	if (resp->init != 0) {
 		/* Any earlier asn1_der_decoding will modify the ASN.1
 		   structure, so we need to replace it with a fresh
 		   structure. */
 		asn1_delete_structure(&resp->resp);
+		if (resp->basicresp)
+			asn1_delete_structure(&resp->basicresp);
 
 		ret = asn1_create_element(_gnutls_get_pkix(),
 					  "PKIX1.OCSPResponse",
@@ -242,8 +247,20 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 			gnutls_assert();
 			return _gnutls_asn2err(ret);
 		}
+
+		ret = asn1_create_element(_gnutls_get_pkix(),
+					  "PKIX1.BasicOCSPResponse",
+					  &resp->basicresp);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(ret);
+		}
+
+		gnutls_free(resp->der.data);
+		resp->der.data = NULL;
 	}
 
+	resp->init = 1;
 	ret = asn1_der_decoding(&resp->resp, data->data, data->size, NULL);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -267,17 +284,6 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 	if (resp->response_type_oid.size == sizeof(OCSP_BASIC)
 	    && memcmp(resp->response_type_oid.data, OCSP_BASIC,
 		      resp->response_type_oid.size) == 0) {
-		if (resp->basicresp) {
-			asn1_delete_structure(&resp->basicresp);
-
-			ret = asn1_create_element(_gnutls_get_pkix(),
-						  "PKIX1.BasicOCSPResponse",
-						  &resp->basicresp);
-			if (ret != ASN1_SUCCESS) {
-				gnutls_assert();
-				return _gnutls_asn2err(ret);
-			}
-		}
 
 		ret =
 		    _gnutls_x509_read_value(resp->resp,
@@ -294,8 +300,10 @@ gnutls_ocsp_resp_import(gnutls_ocsp_resp_t resp,
 			gnutls_assert();
 			return _gnutls_asn2err(ret);
 		}
-	} else
+	} else {
+		asn1_delete_structure(&resp->basicresp);
 		resp->basicresp = NULL;
+	}
 
 	return GNUTLS_E_SUCCESS;
 }
