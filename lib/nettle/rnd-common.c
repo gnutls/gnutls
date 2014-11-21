@@ -39,6 +39,8 @@
 
 #if defined(HAVE_LINUX_GETRANDOM)
 # include <linux/random.h>
+# define getentropy(x, size) getrandom(x, size, 0)
+# define HAVE_GETENTROPY
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -145,19 +147,9 @@ static mode_t _gnutls_urandom_fd_mode = 0;
 
 get_entropy_func _rnd_get_system_entropy = NULL;
 
-#if defined(HAVE_LINUX_GETRANDOM) || defined(HAVE_GETENTROPY)
-
+#if defined(HAVE_GETENTROPY)
 static int _rnd_get_system_entropy_simple(void* _rnd, size_t size)
 {
-#if defined(HAVE_LINUX_GETRANDOM)
-	if (getrandom(_rnd, size, 0) < 0) {
-		gnutls_assert();
-		_gnutls_debug_log
-			("Failed to use getrandom: %s\n",
-					 strerror(errno));
-		return GNUTLS_E_RANDOM_DEVICE_ERROR;
-	}
-#elif defined(HAVE_GETENTROPY)
 	if (getentropy(_rnd, size) < 0) {
 		gnutls_assert();
 		_gnutls_debug_log
@@ -165,7 +157,6 @@ static int _rnd_get_system_entropy_simple(void* _rnd, size_t size)
 					 strerror(errno));
 		return GNUTLS_E_RANDOM_DEVICE_ERROR;
 	}
-#endif
 	return 0;
 }
 
@@ -301,7 +292,7 @@ void _rnd_system_entropy_deinit(void)
 		_gnutls_urandom_fd = -1;
 	}
 }
-#endif /* GETRANDOM || GETENTROPY */
+#endif /* GETENTROPY */
 
 #endif /* _WIN32 */
 
