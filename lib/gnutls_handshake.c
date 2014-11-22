@@ -2510,8 +2510,7 @@ static int _gnutls_recv_supplemental(gnutls_session_t session)
  * are non fatal errors, only in the specific case of a rehandshake.
  * Their meaning is that the client rejected the rehandshake request or
  * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it could also mean that
- * some data were pending. A client may receive that error code if
- * it initiates the handshake and the server doesn't agreed.
+ * some data were pending.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
