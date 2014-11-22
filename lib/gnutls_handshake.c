@@ -2372,8 +2372,8 @@ recv_hello_verify_request(gnutls_session_t session,
  * Since TLS is full duplex some application data might have been
  * sent during peer's processing of this message. In that case
  * one should call gnutls_record_recv() until GNUTLS_E_REHANDSHAKE
- * is returned to clear any pending data. Care must be taken if
- * rehandshake is mandatory to terminate if it does not start after
+ * is returned to clear any pending data. Care must be taken, if
+ * rehandshake is mandatory, to terminate if it does not start after
  * some threshold.
  *
  * If the client does not wish to renegotiate parameters he 
