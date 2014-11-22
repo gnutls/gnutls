@@ -452,7 +452,6 @@ void doit(void)
 	signal(SIGPIPE, SIG_IGN);
 
 	start(0);
-	start(1);
 }
 
 #endif				/* _WIN32 */
