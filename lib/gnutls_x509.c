@@ -797,6 +797,8 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *_url)
 			}
 			gnutls_free(t.data);
 			t.data = NULL;
+		} else {
+			break;
 		}
 #else
 		break;
