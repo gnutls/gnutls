@@ -116,6 +116,9 @@ static NCryptSignHashFunc pNCryptSignHash;
 static unsigned ncrypt_init = 0;
 static HMODULE ncrypt_lib;
 
+#define WIN_URL "system:win:"
+#define WIN_URL_SIZE 11
+
 static int
 get_id(const char *url, uint8_t *bin, size_t *bin_size, unsigned cert)
 {
@@ -124,14 +127,14 @@ get_id(const char *url, uint8_t *bin, size_t *bin_size, unsigned cert)
 	const char *p = url, *p2;
 
 	if (cert != 0) {
-		if (url_size < sizeof("system:win:") || strncmp(url, "system:win:", 11) != 0)
+		if (url_size < sizeof(WIN_URL) || strncmp(url, WIN_URL, WIN_URL_SIZE) != 0)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	} else {
-		if (url_size < sizeof("system:win:") || strncmp(url, "system:win:", 11) != 0)
+		if (url_size < sizeof(WIN_URL) || strncmp(url, WIN_URL, WIN_URL_SIZE) != 0)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 
-	p += sizeof("system:win:") - 1;
+	p += sizeof(WIN_URL) - 1;
 
 	p = strstr(p, "id=");
 	if (p == NULL)
