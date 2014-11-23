@@ -60,11 +60,6 @@ static void server_log_func(int level, const char *str)
 	fprintf(stderr, "server|<%d>| %s", level, str);
 }
 
-static void client_log_func(int level, const char *str)
-{
-	fprintf(stderr, "client|<%d>| %s", level, str);
-}
-
 static unsigned char server_cert_pem[] =
     "-----BEGIN CERTIFICATE-----\n"
     "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
@@ -108,18 +103,25 @@ const gnutls_datum_t server_key = { server_key_pem,
 
 static int url_import_key(gnutls_privkey_t pkey, const char *url, unsigned flags)
 {
+	if (strcmp(url, "myurl:key") != 0) {
+		fail("unexpected key url: %s\n", url);
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
 	return gnutls_privkey_import_x509_raw(pkey, &server_key, GNUTLS_X509_FMT_PEM, NULL, 0);
 }
 
 static int url_import_crt(gnutls_x509_crt_t crt, const char *url, unsigned flags)
 {
+	if (strcmp(url, "myurl:cert") != 0) {
+		abort();
+		fail("unexpected cert url: %s\n", url);
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
 	return gnutls_x509_crt_import(crt, &server_cert, GNUTLS_X509_FMT_PEM);
 }
 
 /* A very basic TLS client, with anonymous authentication.
  */
-
-#define MAX_BUF 1024
 
 static void client(int fd)
 {
@@ -198,7 +200,15 @@ static void server(int fd)
 	/* this must be called once in the program
 	 */
 	gnutls_certificate_allocate_credentials(&x509_cred);
-	ret = gnutls_certificate_set_x509_key_file(x509_cred, "myurl:", "myurl:",
+	ret = gnutls_certificate_set_x509_key_file(x509_cred, "nomyurl:cert", "nomyurl:key",
+					     	  GNUTLS_X509_FMT_PEM);
+	if (ret != GNUTLS_E_FILE_ERROR) {
+		fail("server: gnutls_certificate_set_x509_key_file unexpected error (%s)\n\n",
+		     gnutls_strerror(ret));
+		terminate();
+	}
+
+	ret = gnutls_certificate_set_x509_key_file(x509_cred, "myurl:cert", "myurl:key",
 					     	  GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fail("server: gnutls_certificate_set_x509_key_file (%s)\n\n",
@@ -299,7 +309,6 @@ static void start(void)
 		client(fd[1]);
 		kill(child, SIGTERM);
 	} else {
-
 		close(fd[1]);
 		server(fd[0]);
 		exit(0);
