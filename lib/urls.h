@@ -34,3 +34,7 @@ extern gnutls_custom_url_st _gnutls_custom_urls[];
 extern unsigned _gnutls_custom_urls_size;
 
 int _gnutls_url_is_known(const char *url);
+
+int _gnutls_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
+				 gnutls_datum_t * issuer,
+				 unsigned int flags);

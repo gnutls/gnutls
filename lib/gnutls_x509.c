@@ -715,16 +715,11 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *_url)
 	gnutls_str_array_t names;
 	gnutls_datum_t t = {NULL, 0};
 	unsigned i, count = 0;
-	unsigned is_pkcs11 = 0;
 	char *url;
 
 	url = _gnutls_sanitize_url(_url, 0);
 	if (url == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
-		is_pkcs11 = 1;
-	}
 
 	_gnutls_str_array_init(&names);
 
@@ -776,33 +771,25 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *_url)
 		}
 		count++;
 
-#ifdef ENABLE_PKCS11
-		if (is_pkcs11 != 0) {
-			ret = gnutls_pkcs11_get_raw_issuer(url, crt, &t, GNUTLS_X509_FMT_DER, 0);
-			if (ret < 0)
-				break;
-
-			gnutls_x509_crt_deinit(crt);
-			crt = NULL;
-			ret = gnutls_x509_crt_init(&crt);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-			}
-		
-			ret = gnutls_x509_crt_import(crt, &t, GNUTLS_X509_FMT_DER);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-			}
-			gnutls_free(t.data);
-			t.data = NULL;
-		} else {
+		ret = _gnutls_get_raw_issuer(url, crt, &t, 0);
+		if (ret < 0)
 			break;
+
+		gnutls_x509_crt_deinit(crt);
+		crt = NULL;
+		ret = gnutls_x509_crt_init(&crt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
 		}
-#else
-		break;
-#endif
+		
+		ret = gnutls_x509_crt_import(crt, &t, GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		gnutls_free(t.data);
+		t.data = NULL;
 	}
 
 	ret = certificate_credential_append_crt_list(res, names, ccert, count);

@@ -190,3 +190,41 @@ int gnutls_register_custom_url(const gnutls_custom_url_st *st)
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 	}
 }
+
+/*-
+ * _gnutls_get_raw_issuer:
+ * @url: A PKCS 11 url identifying a token
+ * @cert: is the certificate to find issuer for
+ * @issuer: Will hold the issuer if any in an allocated buffer.
+ * @flags: Use zero or flags from %GNUTLS_PKCS11_OBJ_FLAG.
+ *
+ * This function will return the issuer of a given certificate in
+ * DER format.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ -*/
+int _gnutls_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
+				 gnutls_datum_t * issuer,
+				 unsigned int flags)
+{
+	unsigned i;
+
+#ifdef ENABLE_PKCS11
+	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
+		return gnutls_pkcs11_get_raw_issuer(url, cert, issuer, GNUTLS_X509_FMT_DER, 0);
+	}
+#endif
+	for (i=0;i<_gnutls_custom_urls_size;i++) {
+		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
+			if (_gnutls_custom_urls[i].get_issuer) {
+				return _gnutls_custom_urls[i].get_issuer(url, cert, issuer, flags);
+			}
+			break;
+		}
+	}
+
+	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+}

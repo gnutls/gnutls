@@ -43,9 +43,17 @@ typedef int (*gnutls_privkey_import_url_func)(gnutls_privkey_t pkey,
 typedef int (*gnutls_x509_crt_import_url_func)(gnutls_x509_crt_t pkey,
 					        const char *url, unsigned flags);
 
-/* This callback is optional */
+/* The following callbacks are optional */
+
+/* This is to enable gnutls_pubkey_import_url() */
 typedef int (*gnutls_pubkey_import_url_func)(gnutls_pubkey_t pkey,
-					          const char *url, unsigned flags);
+					     const char *url, unsigned flags);
+
+/* This is to allow constructing a certificate chain. It will be provided
+ * the initial certificate URL and the certificate to find its issuer, and must
+ * return the DER encoding of the issuer's certificate. */
+typedef int (*gnutls_get_raw_issuer_func)(const char *url, gnutls_x509_crt_t crt,
+					  gnutls_datum_t *issuer_der, unsigned flags);
 
 typedef struct gnutls_custom_url_st {
 	const char *name;
@@ -53,6 +61,9 @@ typedef struct gnutls_custom_url_st {
 	gnutls_privkey_import_url_func import_key;
 	gnutls_x509_crt_import_url_func import_crt;
 	gnutls_pubkey_import_url_func import_pubkey;
+	gnutls_get_raw_issuer_func get_issuer;
+	void *future1; /* replace in a future extension */
+	void *future2; /* replace in a future extension */
 } gnutls_custom_url_st;
 
 int gnutls_register_custom_url(const gnutls_custom_url_st *st);
