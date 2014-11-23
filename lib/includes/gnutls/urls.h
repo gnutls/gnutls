@@ -51,7 +51,8 @@ typedef int (*gnutls_pubkey_import_url_func)(gnutls_pubkey_t pkey,
 
 /* This is to allow constructing a certificate chain. It will be provided
  * the initial certificate URL and the certificate to find its issuer, and must
- * return the DER encoding of the issuer's certificate. */
+ * return zero and the DER encoding of the issuer's certificate. If not available,
+ * it should return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE. */
 typedef int (*gnutls_get_raw_issuer_func)(const char *url, gnutls_x509_crt_t crt,
 					  gnutls_datum_t *issuer_der, unsigned flags);
 
