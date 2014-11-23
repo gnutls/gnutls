@@ -725,7 +725,8 @@ tests/suite/pkcs11-privkey
 tests/mini-record-failure
 src/systemkey-args.c
 src/systemkey-args.h
-src/systemkey-tool
+src/systemkey
 src/libcmd-systemkey.la
 tests/mini-rehandshake-2
 tests/init_fds
+tests/custom-urls
