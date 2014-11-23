@@ -1064,6 +1064,7 @@ GNUTLS_3_1_0 {
 	gnutls_system_key_iter_get_info;
 	gnutls_system_key_delete;
 	gnutls_system_key_add_x509;
+	gnutls_register_custom_url;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

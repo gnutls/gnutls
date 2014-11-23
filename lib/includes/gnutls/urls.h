@@ -47,7 +47,7 @@ typedef int (*gnutls_x509_crt_import_url_func)(gnutls_x509_crt_t pkey,
 typedef int (*gnutls_pubkey_import_url_func)(gnutls_pubkey_t pkey,
 					          const char *url, unsigned flags);
 
-typedef struct custom_url_st {
+typedef struct gnutls_custom_url_st {
 	const char *name;
 	unsigned name_size;
 	gnutls_privkey_import_url_func import_key;

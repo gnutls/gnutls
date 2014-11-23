@@ -146,6 +146,7 @@ int _gnutls_url_is_known(const char *url)
 			if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0)
 				return 1;
 		}
+
 		return 0;
 	}
 }
