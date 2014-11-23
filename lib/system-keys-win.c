@@ -116,7 +116,7 @@ static NCryptSignHashFunc pNCryptSignHash;
 static unsigned ncrypt_init = 0;
 static HMODULE ncrypt_lib;
 
-#define WIN_URL "system:win:"
+#define WIN_URL SYSTEM_URL"win:"
 #define WIN_URL_SIZE 11
 
 static int
@@ -624,7 +624,7 @@ int get_win_urls(const CERT_CONTEXT *cert, char **cert_url, char **key_url,
 		goto fail;
 	}
 
-	ret = _gnutls_buffer_append_printf(&str, "system:win:id=%s;object-type=cert", hex);
+	ret = _gnutls_buffer_append_printf(&str, WIN_URL"id=%s;object-type=cert", hex);
 	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
@@ -654,7 +654,7 @@ int get_win_urls(const CERT_CONTEXT *cert, char **cert_url, char **key_url,
 		*cert_url = (char*)str.data;
 	_gnutls_buffer_init(&str);
 
-	ret = _gnutls_buffer_append_printf(&str, "system:win:id=%s;object-type=key", hex);
+	ret = _gnutls_buffer_append_printf(&str, WIN_URL"id=%s;object-type=key", hex);
 	if (ret < 0) {
 		gnutls_assert();
 		goto fail;

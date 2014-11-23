@@ -293,15 +293,17 @@ tpm-api.texi: $(top_srcdir)/lib/includes/gnutls/tpm.h
 	done
 	mv -f $@-tmp $@
 
-abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h
+abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h $(top_srcdir)/lib/includes/gnutls/urls.h $(top_srcdir)/lib/includes/gnutls/system-keys.h
 	echo "" > $@-tmp
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $< |sort|uniq`; do \
+	cat $^ >$@-headers-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl < $@-headers-tmp |sort|uniq`; do \
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
+	rm -f $@-headers-tmp
 	mv -f $@-tmp $@
 
 compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h

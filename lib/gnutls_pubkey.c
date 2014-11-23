@@ -35,6 +35,7 @@
 #include <x509_b64.h>
 #include <abstract_int.h>
 #include <fips.h>
+#include "urls.h"
 #include <gnutls_ecc.h>
 
 
@@ -1223,8 +1224,7 @@ gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key, const char *url,
  * @url: A PKCS 11 url
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
- * This function will import a PKCS11 certificate or a TPM key 
- * as a public key.
+ * This function will import a public key from the provided URL.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1235,19 +1235,28 @@ int
 gnutls_pubkey_import_url(gnutls_pubkey_t key, const char *url,
 			 unsigned int flags)
 {
-	if (strncmp(url, "pkcs11:", 7) == 0)
+	unsigned i;
+
+	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0)
 #ifdef ENABLE_PKCS11
 		return gnutls_pubkey_import_pkcs11_url(key, url, flags);
 #else
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
 
-	if (strncmp(url, "tpmkey:", 7) == 0)
+	if (strncmp(url, TPMKEY_URL, TPMKEY_URL_SIZE) == 0)
 #ifdef HAVE_TROUSERS
 		return gnutls_pubkey_import_tpm_url(key, url, NULL, 0);
 #else
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
+
+	for (i=0;i<_gnutls_custom_urls_size;i++) {
+		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
+			if (_gnutls_custom_urls[i].import_pubkey)
+				return _gnutls_custom_urls[i].import_pubkey(key, url, flags);
+		}
+	}
 
 	return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 }

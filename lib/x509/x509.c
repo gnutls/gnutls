@@ -3818,13 +3818,22 @@ gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 	if (xurl == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	if (strncmp(xurl, "system:", 7) == 0) {
+	if (strncmp(xurl, SYSTEM_URL, SYSTEM_URL_SIZE) == 0) {
 		ret = _gnutls_x509_crt_import_system_url(crt, xurl);
 #ifdef ENABLE_PKCS11
-	} else if (strncmp(xurl, "pkcs11:", 7) == 0) {
+	} else if (strncmp(xurl, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
 			ret = _gnutls_x509_crt_import_pkcs11_url(crt, xurl, flags);
 #endif
 	} else {
+		unsigned i;
+		for (i=0;i<_gnutls_custom_urls_size;i++) {
+			if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
+				if (_gnutls_custom_urls[i].import_crt) {
+					gnutls_free(xurl);
+					return _gnutls_custom_urls[i].import_crt(crt, xurl, flags);
+				}
+			}
+		}
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
 	gnutls_free(xurl);
