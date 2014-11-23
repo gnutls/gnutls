@@ -657,15 +657,10 @@ read_key_mem(gnutls_certificate_credentials_t res,
 /* Reads a private key from a token.
  */
 static int
-read_key_url(gnutls_certificate_credentials_t res, const char *_url)
+read_key_url(gnutls_certificate_credentials_t res, const char *url)
 {
 	int ret;
 	gnutls_privkey_t pkey = NULL;
-	char *url;
-
-	url = _gnutls_sanitize_url(_url, 1);
-	if (url == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	/* allocate space for the pkey list
 	 */
@@ -691,11 +686,9 @@ read_key_url(gnutls_certificate_credentials_t res, const char *_url)
 		goto cleanup;
 	}
 
-	gnutls_free(url);
 	return 0;
 
       cleanup:
-	gnutls_free(url);
 	if (pkey)
 		gnutls_privkey_deinit(pkey);
 
@@ -707,7 +700,7 @@ read_key_url(gnutls_certificate_credentials_t res, const char *_url)
 /* Reads a certificate key from a token.
  */
 static int
-read_cert_url(gnutls_certificate_credentials_t res, const char *_url)
+read_cert_url(gnutls_certificate_credentials_t res, const char *url)
 {
 	int ret;
 	gnutls_x509_crt_t crt = NULL;
@@ -715,11 +708,6 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *_url)
 	gnutls_str_array_t names;
 	gnutls_datum_t t = {NULL, 0};
 	unsigned i, count = 0;
-	char *url;
-
-	url = _gnutls_sanitize_url(_url, 0);
-	if (url == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	_gnutls_str_array_init(&names);
 
@@ -801,12 +789,10 @@ read_cert_url(gnutls_certificate_credentials_t res, const char *_url)
 	if (crt != NULL)
 		gnutls_x509_crt_deinit(crt);
 
-	gnutls_free(url);
 	return 0;
 cleanup:
 	if (crt != NULL)
 		gnutls_x509_crt_deinit(crt);
-	gnutls_free(url);
 	gnutls_free(t.data);
 	_gnutls_str_array_clear(&names);
 	gnutls_free(ccert);
