@@ -51,6 +51,9 @@ combination with PKCS #11, or TPM URLs, it will utilize the provided
 password as PIN if required. That removes the requirement for the
 application to set a callback for PINs in that case.
 
+** libgnutls: Added the ability to register application specific URL
+types, which express certificates and keys using gnutls_register_custom_url().
+
 ** libgnutls-openssl: it is no longer built by default.
 
 ** certtool: Added --p8-info option, which will print PKCS #8 information
@@ -108,6 +111,7 @@ gnutls_system_key_iter_deinit: Added
 gnutls_system_key_iter_get_info: Added
 gnutls_system_key_delete: Added
 gnutls_system_key_add_x509: Added
+gnutls_register_custom_url: Added
 
 
 * Version 3.3.6 (released 2014-07-23)
