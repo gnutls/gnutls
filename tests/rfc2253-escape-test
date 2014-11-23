@@ -24,9 +24,12 @@ set -e
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../src/certtool$EXEEXT}
+if ! test -z "${VALGRIND}";then
+VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=1"
+fi
 
 if cat<<EOF \
-    | $CERTTOOL --certificate-info \
+    | $VALGRIND $CERTTOOL --certificate-info \
     | grep 'Issuer: O=RFC 2253 escape test,OU=Plus \\+ Comma \\,' > /dev/null
 -----BEGIN CERTIFICATE-----
 MIICETCCAXygAwIBAgIESnlIMTALBgkqhkiG9w0BAQUwODEdMBsGA1UEChMUUkZD
