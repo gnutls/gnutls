@@ -3829,13 +3829,15 @@ gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 		for (i=0;i<_gnutls_custom_urls_size;i++) {
 			if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
 				if (_gnutls_custom_urls[i].import_crt) {
-					gnutls_free(xurl);
-					return _gnutls_custom_urls[i].import_crt(crt, xurl, flags);
+					ret = _gnutls_custom_urls[i].import_crt(crt, xurl, flags);
+					goto cleanup;
 				}
 			}
 		}
 		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	}
+
+ cleanup:
 	gnutls_free(xurl);
 	return ret;
 }
