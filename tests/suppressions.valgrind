@@ -226,6 +226,13 @@
 }
 
 {
+   memxor_different_alignment
+   Memcheck:Addr8
+   fun:memxor_different_alignment
+   obj:*
+}
+
+{
    libidn-strlen
    Memcheck:Addr4
    fun:idna_to_ascii_4z
