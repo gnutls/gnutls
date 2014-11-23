@@ -94,7 +94,7 @@ padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 			aes_set_decrypt_key(&nc, keysize, userkey);
 
 		memcpy(pce->ks.rd_key, nc.keys, sizeof(nc.keys));
-		pce->ks.rounds = nc.nrounds;
+		pce->ks.rounds = nc.rounds;
 
 		pce->cword.b.keygen = 1;
 		break;

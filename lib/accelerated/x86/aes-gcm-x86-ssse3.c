@@ -51,13 +51,20 @@ static void x86_aes_encrypt(void *_ctx,
 	vpaes_encrypt(src, dst, ctx);
 }
 
-static void x86_aes_set_encrypt_key(void *_ctx,
-					unsigned length,
-					const uint8_t * key)
+static void x86_aes_128_set_encrypt_key(void *_ctx,
+				    const uint8_t * key)
 {
 	AES_KEY *ctx = _ctx;
 
-	vpaes_set_encrypt_key(key, length*8, ctx);
+	vpaes_set_encrypt_key(key, 16*8, ctx);
+}
+
+static void x86_aes_256_set_encrypt_key(void *_ctx,
+				    const uint8_t * key)
+{
+	AES_KEY *ctx = _ctx;
+
+	vpaes_set_encrypt_key(key, 32*8, ctx);
 }
 
 static int
@@ -79,12 +86,17 @@ aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
 }
 
 static int
-aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
+aes_gcm_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 {
 	struct gcm_x86_aes_ctx *ctx = _ctx;
 
-	GCM_SET_KEY(ctx, x86_aes_set_encrypt_key, x86_aes_encrypt,
-		    keysize, userkey);
+	if (keysize == 16) {
+		GCM_SET_KEY(ctx, x86_aes_128_set_encrypt_key, x86_aes_encrypt,
+			    key);
+	} else if (keysize == 32) {
+		GCM_SET_KEY(ctx, x86_aes_256_set_encrypt_key, x86_aes_encrypt,
+			    key);
+	} else abort();
 
 	return 0;
 }

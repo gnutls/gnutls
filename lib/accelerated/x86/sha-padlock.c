@@ -70,6 +70,7 @@ static void wrap_padlock_hash_deinit(void *hd)
 	gnutls_free(hd);
 }
 
+#define MD1_INCR(c) (c->count++)
 #define SHA1_COMPRESS(ctx, data) (padlock_sha1_blocks((void*)(ctx)->state, data, 1))
 #define SHA256_COMPRESS(ctx, data) (padlock_sha256_blocks((void*)(ctx)->state, data, 1))
 #define SHA512_COMPRESS(ctx, data) (padlock_sha512_blocks((void*)(ctx)->state, data, 1))
@@ -78,14 +79,14 @@ void
 padlock_sha1_update(struct sha1_ctx *ctx,
 		    unsigned length, const uint8_t * data)
 {
-	MD_UPDATE(ctx, length, data, SHA1_COMPRESS, MD_INCR(ctx));
+	MD_UPDATE(ctx, length, data, SHA1_COMPRESS, MD1_INCR(ctx));
 }
 
 void
 padlock_sha256_update(struct sha256_ctx *ctx,
 		      unsigned length, const uint8_t * data)
 {
-	MD_UPDATE(ctx, length, data, SHA256_COMPRESS, MD_INCR(ctx));
+	MD_UPDATE(ctx, length, data, SHA256_COMPRESS, MD1_INCR(ctx));
 }
 
 void
@@ -133,19 +134,17 @@ static void
 padlock_sha1_digest(struct sha1_ctx *ctx,
 		    unsigned length, uint8_t * digest)
 {
-	uint32_t high, low;
+	uint64_t bit_count;
 
 	assert(length <= SHA1_DIGEST_SIZE);
 
 	MD_PAD(ctx, 8, SHA1_COMPRESS);
 
 	/* There are 512 = 2^9 bits in one block */
-	high = (ctx->count_high << 9) | (ctx->count_low >> 23);
-	low = (ctx->count_low << 9) | (ctx->index << 3);
+	bit_count = (ctx->count << 9) | (ctx->index << 3);
 
 	/* append the 64 bit count */
-	WRITE_UINT32(ctx->block + (SHA1_DATA_SIZE - 8), high);
-	WRITE_UINT32(ctx->block + (SHA1_DATA_SIZE - 4), low);
+	WRITE_UINT64(ctx->block + (SHA1_BLOCK_SIZE - 8), bit_count);
 	SHA1_COMPRESS(ctx, ctx->block);
 
 	_nettle_write_be32(length, digest, ctx->state);
@@ -155,21 +154,19 @@ static void
 padlock_sha256_digest(struct sha256_ctx *ctx,
 		      unsigned length, uint8_t * digest)
 {
-	uint32_t high, low;
+	uint64_t bit_count;
 
 	assert(length <= SHA256_DIGEST_SIZE);
 
 	MD_PAD(ctx, 8, SHA256_COMPRESS);
 
 	/* There are 512 = 2^9 bits in one block */
-	high = (ctx->count_high << 9) | (ctx->count_low >> 23);
-	low = (ctx->count_low << 9) | (ctx->index << 3);
+	bit_count = (ctx->count << 9) | (ctx->index << 3);
 
 	/* This is slightly inefficient, as the numbers are converted to
 	   big-endian format, and will be converted back by the compression
 	   function. It's probably not worth the effort to fix this. */
-	WRITE_UINT32(ctx->block + (SHA256_DATA_SIZE - 8), high);
-	WRITE_UINT32(ctx->block + (SHA256_DATA_SIZE - 4), low);
+	WRITE_UINT64(ctx->block + (SHA256_BLOCK_SIZE - 8), bit_count);
 	SHA256_COMPRESS(ctx, ctx->block);
 
 	_nettle_write_be32(length, digest, ctx->state);

@@ -65,13 +65,13 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
   AC_SUBST(DLL_VERSION)
 
-  PKG_CHECK_MODULES(NETTLE, [nettle >= 2.7], [cryptolib="nettle"], [
+  PKG_CHECK_MODULES(NETTLE, [nettle >= 3.0], [cryptolib="nettle"], [
 AC_MSG_ERROR([[
   *** 
-  *** Libnettle 2.7 was not found. 
+  *** Libnettle 3.0 was not found. 
 ]])
   ])
-  PKG_CHECK_MODULES(HOGWEED, [hogweed >= 2.7], [], [
+  PKG_CHECK_MODULES(HOGWEED, [hogweed >= 3.0], [], [
 AC_MSG_ERROR([[
   *** 
   *** Libhogweed (nettle's companion library) was not found. Note that you must compile nettle with gmp support.

@@ -53,7 +53,7 @@
 
 static inline const struct ecc_curve *get_supported_curve(int curve);
 
-static void rnd_func(void *_ctx, unsigned length, uint8_t * data)
+static void rnd_func(void *_ctx, size_t length, uint8_t * data)
 {
 	if (_gnutls_rnd(GNUTLS_RND_RANDOM, data, length) < 0) {
 #ifdef ENABLE_FIPS140
@@ -81,23 +81,28 @@ ecc_point_zclear (struct ecc_point *p)
 
 static void
 _dsa_params_to_pubkey(const gnutls_pk_params_st * pk_params,
-		      struct dsa_public_key *pub)
+		      mpz_t *y)
+{
+	if (pk_params->params[DSA_Y] != NULL)
+		memcpy(y, pk_params->params[DSA_Y], SIZEOF_MPZT);
+}
+
+static void
+_dsa_params_get(const gnutls_pk_params_st * pk_params,
+		struct dsa_params *pub)
 {
 	memcpy(pub->p, pk_params->params[DSA_P], SIZEOF_MPZT);
 
 	if (pk_params->params[DSA_Q])
 		memcpy(&pub->q, pk_params->params[DSA_Q], sizeof(mpz_t));
 	memcpy(pub->g, pk_params->params[DSA_G], SIZEOF_MPZT);
-
-	if (pk_params->params[DSA_Y] != NULL)
-		memcpy(pub->y, pk_params->params[DSA_Y], SIZEOF_MPZT);
 }
 
 static void
 _dsa_params_to_privkey(const gnutls_pk_params_st * pk_params,
-		       struct dsa_private_key *pub)
+		       mpz_t *x)
 {
-	memcpy(pub->x, pk_params->params[4], SIZEOF_MPZT);
+	memcpy(x, pk_params->params[4], SIZEOF_MPZT);
 }
 
 static void
@@ -384,7 +389,7 @@ _wrap_nettle_pk_decrypt(gnutls_pk_algorithm_t algo,
 		{
 			struct rsa_private_key priv;
 			struct rsa_public_key pub;
-			unsigned length;
+			size_t length;
 			bigint_t c;
 
 			_rsa_params_to_privkey(pk_params, &priv);
@@ -508,13 +513,15 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		}
 	case GNUTLS_PK_DSA:
 		{
-			struct dsa_public_key pub;
-			struct dsa_private_key priv;
+			struct dsa_params pub;
+			mpz_t y;
+			mpz_t priv;
 			struct dsa_signature sig;
 
 			memset(&priv, 0, sizeof(priv));
 			memset(&pub, 0, sizeof(pub));
-			_dsa_params_to_pubkey(pk_params, &pub);
+			_dsa_params_get(pk_params, &pub);
+			_dsa_params_to_pubkey(pk_params, &y);
 			_dsa_params_to_privkey(pk_params, &priv);
 
 			dsa_signature_init(&sig);
@@ -531,8 +538,8 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			}
 
 			ret =
-			    _dsa_sign(&pub, &priv, NULL, rnd_func,
-				      hash_len, vdata->data, &sig);
+			    dsa_sign(&pub, priv, NULL, rnd_func,
+				     hash_len, vdata->data, &sig);
 			if (ret == 0) {
 				gnutls_assert();
 				ret = GNUTLS_E_PK_SIGN_FAILED;
@@ -659,7 +666,8 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		}
 	case GNUTLS_PK_DSA:
 		{
-			struct dsa_public_key pub;
+			struct dsa_params pub;
+			mpz_t y;
 			struct dsa_signature sig;
 
 			ret =
@@ -670,7 +678,8 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 				goto cleanup;
 			}
 			memset(&pub, 0, sizeof(pub));
-			_dsa_params_to_pubkey(pk_params, &pub);
+			_dsa_params_get(pk_params, &pub);
+			_dsa_params_to_pubkey(pk_params, &y);
 			memcpy(sig.r, tmp[0], SIZEOF_MPZT);
 			memcpy(sig.s, tmp[1], SIZEOF_MPZT);
 
@@ -680,7 +689,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 				hash_len = vdata->size;
 
 			ret =
-			    _dsa_verify(&pub, hash_len, vdata->data, &sig);
+			    dsa_verify(&pub, y, hash_len, vdata->data, &sig);
 			if (ret == 0) {
 				gnutls_assert();
 				ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -777,15 +786,13 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_DSA:
 	case GNUTLS_PK_DH:
 		{
-			struct dsa_public_key pub;
-			struct dsa_private_key priv;
+			struct dsa_params pub;
 #ifdef ENABLE_FIPS140
 			struct dss_params_validation_seeds cert;
 			unsigned index;
 #endif
 
-			dsa_public_key_init(&pub);
-			dsa_private_key_init(&priv);
+			dsa_params_init(&pub);
 
 			if (GNUTLS_BITS_HAVE_SUBGROUP(level)) {
 				q_bits = GNUTLS_BITS_TO_SUBGROUP(level);
@@ -826,19 +833,11 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 			} else 
 #endif
 			{
-				/* unfortunately nettle only accepts 160 or 256
-				 * q_bits size. The check below makes sure we handle
-				 * cases in between by rounding up, but fail when
-				 * larger numbers are requested. */
 				if (q_bits < 160)
 					q_bits = 160;
-				else if (q_bits > 160 && q_bits <= 256)
-					q_bits = 256;
-				ret =
-				    dsa_generate_keypair(&pub, &priv,
-						 NULL, rnd_func, 
-						 NULL, NULL,
-						 level, q_bits);
+
+				ret = dsa_generate_params(&pub, NULL, rnd_func,
+							  NULL, NULL, level, q_bits);
 				if (ret != 1) {
 					gnutls_assert();
 					ret = GNUTLS_E_PK_GENERATION_ERROR;
@@ -863,8 +862,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 			ret = 0;
 
 		      dsa_fail:
-			dsa_private_key_clear(&priv);
-			dsa_public_key_clear(&pub);
+			dsa_params_clear(&pub);
 
 			if (ret < 0)
 				goto fail;
@@ -1152,13 +1150,15 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_DSA:
 #ifdef ENABLE_FIPS140
 		if (_gnutls_fips_mode_enabled() != 0) {
-			struct dsa_public_key pub;
-			struct dsa_private_key priv;
+			struct dsa_params pub;
+			mpz_t y;
+			mpz_t priv;
 
 			if (params->params[DSA_Q] == NULL)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-			_dsa_params_to_pubkey(params, &pub);
+			_dsa_params_get(params, &pub);
+			_dsa_params_to_pubkey(params, &y);
 
 			dsa_private_key_init(&priv);
 			mpz_init(pub.y);
@@ -1195,7 +1195,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 #endif
 	case GNUTLS_PK_DH:
 		{
-			struct dsa_public_key pub;
+			struct dsa_params pub;
 			mpz_t r;
 			mpz_t x, y;
 			int max_tries;
@@ -1204,7 +1204,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			if (algo != params->algo)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-			_dsa_params_to_pubkey(params, &pub);
+			_dsa_params_get(params, &pub);
 
 			if (params->params[DSA_Q] != NULL)
 				have_q = 1;
