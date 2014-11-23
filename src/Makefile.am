@@ -69,7 +69,7 @@ if ENABLE_TROUSERS
 bin_PROGRAMS += tpmtool
 endif
 
-bin_PROGRAMS += systemkey-tool
+noinst_PROGRAMS = systemkey
 
 if ENABLE_PKCS11
 bin_PROGRAMS += p11tool
@@ -205,10 +205,10 @@ libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIM
 
 endif # ENABLE_TROUSERS
 
-systemkey_tool_SOURCES = systemkey-tool.c certtool-common.c
-systemkey_tool_LDADD = ../lib/libgnutls.la
-systemkey_tool_LDADD += libcmd-systemkey.la $(LIBOPTS) ../gl/libgnu.la gl/libgnu_gpl.la
-systemkey_tool_LDADD += $(LTLIBINTL)
+systemkey_SOURCES = systemkey.c certtool-common.c
+systemkey_LDADD = ../lib/libgnutls.la
+systemkey_LDADD += libcmd-systemkey.la $(LIBOPTS) ../gl/libgnu.la gl/libgnu_gpl.la
+systemkey_LDADD += $(LTLIBINTL)
 
 noinst_LTLIBRARIES += libcmd-systemkey.la
 libcmd_systemkey_la_SOURCES = systemkey-args.def systemkey-args.c systemkey-args.h \
