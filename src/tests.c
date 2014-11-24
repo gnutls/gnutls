@@ -1204,6 +1204,75 @@ test_code_t test_certificate(gnutls_session_t session)
 	return TEST_FAILED;
 }
 
+test_code_t test_chain_order(gnutls_session_t session)
+{
+	int ret;
+	const gnutls_datum_t *cert_list;
+	unsigned int cert_list_size = 0;
+	unsigned int i;
+	unsigned p_size;
+	gnutls_datum_t t;
+	gnutls_x509_crt_t *certs;
+	char *p, *pos;
+
+	sprintf(prio_str,
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:"
+		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake(session);
+	if (ret == TEST_FAILED)
+		return ret;
+
+	if (gnutls_certificate_type_get(session) != GNUTLS_CRT_X509)
+		return TEST_IGNORE;
+
+	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
+	if (cert_list_size == 0) {
+		ext_text = "No certificates found!";
+		return TEST_IGNORE;
+	}
+
+	p = 0;
+	p_size = 0;
+	pos = NULL;
+	for (i=0;i<cert_list_size;i++) {
+		t.data = NULL;
+		ret = gnutls_pem_base64_encode_alloc("CERTIFICATE", &cert_list[i], &t);
+		if (ret < 0) {
+			return TEST_FAILED;
+		}
+
+		p = realloc(p, p_size+t.size+1);
+		pos = p + p_size;
+
+		memcpy(pos, t.data, t.size);
+		p_size += t.size;
+
+		gnutls_free(t.data);
+	}
+	*pos = 0;
+
+	t.size = p_size;
+	t.data = (void*)p;
+
+	p_size = 0;
+	ret = gnutls_x509_crt_list_import2(&certs, &p_size, &t, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
+	if (ret < 0) {
+		return TEST_FAILED;
+	}
+
+	for (i=0;i<p_size;i++) {
+		gnutls_x509_crt_deinit(certs[i]);
+	}
+	gnutls_free(certs);
+	free(p);
+
+	return TEST_SUCCEED;
+}
+
 /* A callback function to be used at the certificate selection time.
  */
 static int

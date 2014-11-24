@@ -102,6 +102,9 @@ static const TLS_TEST tls_tests[] = {
 	{"whether we need to disable TLS 1.0", test_tls_disable0, "no",
 	 "yes", "dunno"},
 	{"for HTTPS server name", test_server, NULL, "failed", "not checked", 1},
+	{"for certificate information", test_certificate, NULL, "", ""},
+	{"for certificate chain order", test_chain_order, "sorted", "unsorted", "unknown"},
+	{"for trusted CAs", test_server_cas, NULL, "", ""},
 	{"whether Hello Extensions are accepted",
 	 test_hello_extension, "yes", "no", "dunno"},
 	{"for safe renegotiation (RFC5746) support", test_safe_renegotiation, "yes",
@@ -123,8 +126,6 @@ static const TLS_TEST tls_tests[] = {
 	{"whether cipher suites not in SSL 3.0 spec are accepted",
 	 test_unknown_ciphersuites, "yes", "no", "dunno"},
 	{"whether a bogus TLS record version in the client hello is accepted", test_version_oob, "yes", "no", "dunno"},
-	{"for certificate information", test_certificate, NULL, "", ""},
-	{"for trusted CAs", test_server_cas, NULL, "", ""},
 	{"whether the server understands TLS closure alerts", test_bye,
 	 "yes", "no", "partially"},
 	/* the fact that is after the closure alert test does matter.
