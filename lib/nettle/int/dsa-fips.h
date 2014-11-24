@@ -54,7 +54,7 @@ st_provable_prime (mpz_t p,
 			  void *progress_ctx, nettle_progress_func * progress);
 
 int
-dsa_generate_dss_pqg(struct dsa_public_key *pub,
+dsa_generate_dss_pqg(struct dsa_params *params,
 		     struct dss_params_validation_seeds* cert,
 		     unsigned index,
 		     void *random_ctx, nettle_random_func *random,
@@ -62,22 +62,23 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 		     unsigned p_bits /* = L */, unsigned q_bits /* = N */);
 
 int
-dsa_generate_dss_keypair(struct dsa_public_key *pub,
-		     struct dsa_private_key *key,
+dsa_generate_dss_keypair(struct dsa_params *params,
+		     mpz_t y,
+		     mpz_t x,
 		     void *random_ctx, nettle_random_func *random,
 		     void *progress_ctx, nettle_progress_func *progress);
 
 int
-dsa_validate_dss_pqg(struct dsa_public_key *pub,
+dsa_validate_dss_pqg(struct dsa_params *pub,
 		     struct dss_params_validation_seeds* cert,
 		     unsigned index);
 
 int
-_dsa_validate_dss_pq(struct dsa_public_key *pub,
+_dsa_validate_dss_pq(struct dsa_params *pub,
 		     struct dss_params_validation_seeds* cert);
 
 int
-_dsa_validate_dss_g(struct dsa_public_key *pub,
+_dsa_validate_dss_g(struct dsa_params *pub,
 		    unsigned domain_seed_size, const uint8_t *domain_seed, unsigned index);
 
 unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits, unsigned generate);
@@ -85,21 +86,22 @@ unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits, unsigned generate
 /* The following low-level functions can be used for DH key exchange as well 
  */
 int
-_dsa_generate_dss_pq(struct dsa_public_key *pub,
+_dsa_generate_dss_pq(struct dsa_params *pub,
 		     struct dss_params_validation_seeds* cert,
 		     unsigned seed_length, void* seed,
 		     void *progress_ctx, nettle_progress_func *progress,
 		     unsigned p_bits, unsigned q_bits);
 
 int
-_dsa_generate_dss_g(struct dsa_public_key *pub,
+_dsa_generate_dss_g(struct dsa_params *pub,
 		    unsigned domain_seed_size, const uint8_t* domain_seed,
 		    void *progress_ctx, nettle_progress_func * progress,
 		    unsigned index);
 
 void
-_dsa_generate_dss_xy(struct dsa_public_key *pub,
-		     struct dsa_private_key *key,
+_dsa_generate_dss_xy(struct dsa_params *pub,
+		     mpz_t y,
+		     mpz_t x,
 		     void *random_ctx, nettle_random_func *random);
 
 #define DIGEST_SIZE SHA384_DIGEST_SIZE

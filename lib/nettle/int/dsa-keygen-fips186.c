@@ -65,7 +65,7 @@ unsigned _dsa_check_qp_sizes(unsigned q_bits, unsigned p_bits, unsigned generate
  * The hash function used is SHA384.
  */
 int
-_dsa_generate_dss_pq(struct dsa_public_key *pub,
+_dsa_generate_dss_pq(struct dsa_params *params,
 		     struct dss_params_validation_seeds *cert,
 		     unsigned seed_length, void *seed,
 		     void *progress_ctx, nettle_progress_func * progress,
@@ -106,7 +106,7 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 	cert->qseed_length = sizeof(cert->qseed);
 	cert->pseed_length = sizeof(cert->pseed);
 
-	ret = st_provable_prime(pub->q,
+	ret = st_provable_prime(params->q,
 				&cert->qseed_length, cert->qseed,
 				&cert->qgen_counter,
 				q_bits,
@@ -162,24 +162,24 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 
 	/* t = u[x/2c0] */
 	mpz_mul_2exp(dp0, p0, 1);	/* dp0 = 2*p0 */
-	mpz_mul(dp0, dp0, pub->q);	/* dp0 = 2*p0*q */
+	mpz_mul(dp0, dp0, params->q);	/* dp0 = 2*p0*q */
 
 	mpz_cdiv_q(t, tmp, dp0);
 
  retry:
 	/* c = 2p0*q*t + 1 */
-	mpz_mul(pub->p, dp0, t);
-	mpz_add_ui(pub->p, pub->p, 1);
+	mpz_mul(params->p, dp0, t);
+	mpz_add_ui(params->p, params->p, 1);
 
-	if (mpz_sizeinbase(pub->p, 2) > p_bits) {
+	if (mpz_sizeinbase(params->p, 2) > p_bits) {
 		/* t = 2^(bits-1)/2qp0 */
 		mpz_set_ui(tmp, 1);
 		mpz_mul_2exp(tmp, tmp, p_bits - 1);
 		mpz_cdiv_q(t, tmp, dp0);
 
 		/* p = t* 2tq p0 + 1 */
-		mpz_mul(pub->p, dp0, t);
-		mpz_add_ui(pub->p, pub->p, 1);
+		mpz_mul(params->p, dp0, t);
+		mpz_add_ui(params->p, params->p, 1);
 	}
 
 	cert->pgen_counter++;
@@ -204,20 +204,20 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 	nettle_mpz_get_str_256(cert->pseed_length, cert->pseed, s);
 
 	/* a = 2 + (a mod (p-3)) */
-	mpz_sub_ui(tmp, pub->p, 3);	/* c is too large to worry about negatives */
+	mpz_sub_ui(tmp, params->p, 3);	/* c is too large to worry about negatives */
 	mpz_mod(r, r, tmp);
 	mpz_add_ui(r, r, 2);
 
 	/* z = a^(2tq) mod p */
 	mpz_mul_2exp(tmp, t, 1);	/* tmp = 2t */
-	mpz_mul(tmp, tmp, pub->q);	/* tmp = 2tq */
-	mpz_powm(z, r, tmp, pub->p);
+	mpz_mul(tmp, tmp, params->q);	/* tmp = 2tq */
+	mpz_powm(z, r, tmp, params->p);
 
 	mpz_sub_ui(tmp, z, 1);
 
-	mpz_gcd(tmp, tmp, pub->p);
+	mpz_gcd(tmp, tmp, params->p);
 	if (mpz_cmp_ui(tmp, 1) == 0) {
-		mpz_powm(tmp, z, p0, pub->p);
+		mpz_powm(tmp, z, p0, params->p);
 		if (mpz_cmp_ui(tmp, 1) == 0) {
 			goto success;
 		}
@@ -255,7 +255,7 @@ _dsa_generate_dss_pq(struct dsa_public_key *pub,
 }
 
 int
-_dsa_generate_dss_g(struct dsa_public_key *pub,
+_dsa_generate_dss_g(struct dsa_params *params,
 		    unsigned domain_seed_size, const uint8_t* domain_seed,
 		    void *progress_ctx, nettle_progress_func * progress,
 		    unsigned index)
@@ -288,8 +288,8 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 	*(dseed + pos) = (uint8_t) index;
 	pos += 1;
 
-	mpz_sub_ui(e, pub->p, 1);
-	mpz_fdiv_q(e, e, pub->q);
+	mpz_sub_ui(e, params->p, 1);
+	mpz_fdiv_q(e, e, params->q);
 
 	for (count = 1; count < 65535; count++) {
 		*(dseed + pos) = (count >> 8) & 0xff;
@@ -299,9 +299,9 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 
 		nettle_mpz_set_str_256_u(w, DIGEST_SIZE, digest);
 
-		mpz_powm(pub->g, w, e, pub->p);
+		mpz_powm(params->g, w, e, params->p);
 
-		if (mpz_cmp_ui(pub->g, 2) >= 0) {
+		if (mpz_cmp_ui(params->g, 2) >= 0) {
 			/* found */
 			goto success;
 		}
@@ -332,19 +332,19 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 /* Generates the public and private DSA (or DH) keys
  */
 void
-_dsa_generate_dss_xy(struct dsa_public_key *pub,
-		     struct dsa_private_key *key,
+_dsa_generate_dss_xy(struct dsa_params *params,
+		     mpz_t y, mpz_t x,
 		     void *random_ctx, nettle_random_func * random)
 {
 	mpz_t r;
 
 	mpz_init(r);
-	mpz_set(r, pub->q);
+	mpz_set(r, params->q);
 	mpz_sub_ui(r, r, 2);
-	nettle_mpz_random(key->x, random_ctx, random, r);
-	mpz_add_ui(key->x, key->x, 1);
+	nettle_mpz_random(x, random_ctx, random, r);
+	mpz_add_ui(x, x, 1);
 
-	mpz_powm(pub->y, pub->g, key->x, pub->p);
+	mpz_powm(y, params->g, x, params->p);
 
 	mpz_clear(r);
 }
@@ -364,7 +364,7 @@ _dsa_generate_dss_xy(struct dsa_public_key *pub,
  * 
  */
 int
-dsa_generate_dss_pqg(struct dsa_public_key *pub,
+dsa_generate_dss_pqg(struct dsa_params *params,
 			 struct dss_params_validation_seeds *cert,
 			 unsigned index,
 			 void *random_ctx, nettle_random_func * random,
@@ -386,7 +386,7 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 
 	random(random_ctx, cert->seed_length, cert->seed);
 
-	ret = _dsa_generate_dss_pq(pub, cert, cert->seed_length, cert->seed,
+	ret = _dsa_generate_dss_pq(params, cert, cert->seed_length, cert->seed,
 				   progress_ctx, progress, p_bits, q_bits);
 	if (ret == 0)
 		return 0;
@@ -395,7 +395,7 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 	memcpy(domain_seed, cert->seed, cert->seed_length);
 	memcpy(&domain_seed[cert->seed_length], cert->pseed, cert->pseed_length);
 	memcpy(&domain_seed[cert->seed_length+cert->pseed_length], cert->qseed, cert->qseed_length);
-	ret = _dsa_generate_dss_g(pub, domain_seed_size, domain_seed,
+	ret = _dsa_generate_dss_g(params, domain_seed_size, domain_seed,
 				  progress_ctx, progress, index);
 	if (ret == 0)
 		return 0;
@@ -405,12 +405,13 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 }
 
 int
-dsa_generate_dss_keypair(struct dsa_public_key *pub,
-			 struct dsa_private_key *key,
+dsa_generate_dss_keypair(struct dsa_params *params,
+			 mpz_t y,
+			 mpz_t x,
 			 void *random_ctx, nettle_random_func * random,
 			 void *progress_ctx, nettle_progress_func * progress)
 {
-	_dsa_generate_dss_xy(pub, key, random_ctx, random);
+	_dsa_generate_dss_xy(params, y, x, random_ctx, random);
 
 	if (progress)
 		progress(progress_ctx, '\n');

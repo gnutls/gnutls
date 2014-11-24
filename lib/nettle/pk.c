@@ -78,15 +78,6 @@ ecc_point_zclear (struct ecc_point *p)
         ecc_point_clear(p);
 }
   
-
-static void
-_dsa_params_to_pubkey(const gnutls_pk_params_st * pk_params,
-		      mpz_t *y)
-{
-	if (pk_params->params[DSA_Y] != NULL)
-		memcpy(y, pk_params->params[DSA_Y], SIZEOF_MPZT);
-}
-
 static void
 _dsa_params_get(const gnutls_pk_params_st * pk_params,
 		struct dsa_params *pub)
@@ -96,13 +87,6 @@ _dsa_params_get(const gnutls_pk_params_st * pk_params,
 	if (pk_params->params[DSA_Q])
 		memcpy(&pub->q, pk_params->params[DSA_Q], sizeof(mpz_t));
 	memcpy(pub->g, pk_params->params[DSA_G], SIZEOF_MPZT);
-}
-
-static void
-_dsa_params_to_privkey(const gnutls_pk_params_st * pk_params,
-		       mpz_t *x)
-{
-	memcpy(x, pk_params->params[4], SIZEOF_MPZT);
 }
 
 static void
@@ -514,15 +498,14 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_DSA:
 		{
 			struct dsa_params pub;
-			mpz_t y;
-			mpz_t priv;
+			bigint_t priv;
 			struct dsa_signature sig;
 
 			memset(&priv, 0, sizeof(priv));
 			memset(&pub, 0, sizeof(pub));
 			_dsa_params_get(pk_params, &pub);
-			_dsa_params_to_pubkey(pk_params, &y);
-			_dsa_params_to_privkey(pk_params, &priv);
+
+			priv = pk_params->params[DSA_X];
 
 			dsa_signature_init(&sig);
 
@@ -538,7 +521,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 			}
 
 			ret =
-			    dsa_sign(&pub, priv, NULL, rnd_func,
+			    dsa_sign(&pub, TOMPZ(priv), NULL, rnd_func,
 				     hash_len, vdata->data, &sig);
 			if (ret == 0) {
 				gnutls_assert();
@@ -667,8 +650,8 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_DSA:
 		{
 			struct dsa_params pub;
-			mpz_t y;
 			struct dsa_signature sig;
+			bigint_t y;
 
 			ret =
 			    _gnutls_decode_ber_rs(signature, &tmp[0],
@@ -679,7 +662,8 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 			}
 			memset(&pub, 0, sizeof(pub));
 			_dsa_params_get(pk_params, &pub);
-			_dsa_params_to_pubkey(pk_params, &y);
+			y = pk_params->params[DSA_Y];
+
 			memcpy(sig.r, tmp[0], SIZEOF_MPZT);
 			memcpy(sig.s, tmp[1], SIZEOF_MPZT);
 
@@ -689,7 +673,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 				hash_len = vdata->size;
 
 			ret =
-			    dsa_verify(&pub, y, hash_len, vdata->data, &sig);
+			    dsa_verify(&pub, TOMPZ(y), hash_len, vdata->data, &sig);
 			if (ret == 0) {
 				gnutls_assert();
 				ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -1151,20 +1135,18 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 #ifdef ENABLE_FIPS140
 		if (_gnutls_fips_mode_enabled() != 0) {
 			struct dsa_params pub;
-			mpz_t y;
-			mpz_t priv;
+			mpz_t x, y;
 
 			if (params->params[DSA_Q] == NULL)
 				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 			_dsa_params_get(params, &pub);
-			_dsa_params_to_pubkey(params, &y);
 
-			dsa_private_key_init(&priv);
-			mpz_init(pub.y);
+			mpz_init(x);
+			mpz_init(y);
 
 			ret =
-			    dsa_generate_dss_keypair(&pub, &priv, 
+			    dsa_generate_dss_keypair(&pub, y, x,
 						 NULL, rnd_func, 
 						 NULL, NULL);
 			if (ret != 1) {
@@ -1179,13 +1161,13 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 				goto dsa_fail;
 			}
 
-			mpz_set(TOMPZ(params->params[DSA_Y]), pub.y);
-			mpz_set(TOMPZ(params->params[DSA_X]), priv.x);
+			mpz_set(TOMPZ(params->params[DSA_Y]), y);
+			mpz_set(TOMPZ(params->params[DSA_X]), x);
 			params->params_nr += 2;
 
 		      dsa_fail:
-			dsa_private_key_clear(&priv);
-			mpz_clear(pub.y);
+			mpz_clear(x);
+			mpz_clear(y);
 
 			if (ret < 0)
 				goto fail;
