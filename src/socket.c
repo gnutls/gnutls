@@ -192,7 +192,7 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		send_line(socket->fd, "a STARTTLS\r\n");
 		wait_for_text(socket->fd, "a OK", 4);
 	} else {
-		fprintf(stderr, "unknown protocol %s\n", app_proto);
+		/*fprintf(stderr, "unknown protocol %s\n", app_proto);*/
 	}
 
 	return;
