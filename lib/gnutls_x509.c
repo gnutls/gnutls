@@ -676,6 +676,7 @@ read_key_mem(gnutls_certificate_credentials_t res,
 						   pass, flags);
 		if (ret < 0) {
 			gnutls_assert();
+			gnutls_privkey_deinit(privkey);
 			return ret;
 		}
 
