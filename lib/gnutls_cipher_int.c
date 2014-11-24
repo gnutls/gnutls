@@ -62,7 +62,7 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 
 	if (unlikely(e == NULL || e->id == GNUTLS_CIPHER_NULL))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		
+
         FAIL_IF_LIB_ERROR;
 
 	handle->e = e;
@@ -73,6 +73,8 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 	if (cc != NULL) {
 		handle->encrypt = cc->encrypt;
 		handle->decrypt = cc->decrypt;
+		handle->aead_encrypt = cc->aead_encrypt;
+		handle->aead_decrypt = cc->aead_decrypt;
 		handle->deinit = cc->deinit;
 		handle->auth = cc->auth;
 		handle->tag = cc->tag;
@@ -91,6 +93,8 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 
 	handle->encrypt = _gnutls_cipher_ops.encrypt;
 	handle->decrypt = _gnutls_cipher_ops.decrypt;
+	handle->aead_encrypt = _gnutls_cipher_ops.aead_encrypt;
+	handle->aead_decrypt = _gnutls_cipher_ops.aead_decrypt;
 	handle->deinit = _gnutls_cipher_ops.deinit;
 	handle->auth = _gnutls_cipher_ops.auth;
 	handle->tag = _gnutls_cipher_ops.tag;

@@ -37,6 +37,18 @@ typedef struct {
 			void *encr, size_t encrsize);
 	int (*decrypt) (void *ctx, const void *encr, size_t encrsize,
 			void *plain, size_t plainsize);
+	int (*aead_encrypt) (void *ctx,
+ 			     const void *nonce, size_t noncesize,
+			     const void *auth, size_t authsize,
+			     size_t tag_size,
+			     const void *plain, size_t plainsize,
+			     void *encr, size_t encrsize);
+	int (*aead_decrypt) (void *ctx,
+ 			     const void *nonce, size_t noncesize,
+			     const void *auth, size_t authsize,
+			     size_t tag_size,
+			     const void *encr, size_t encrsize,
+			     void *plain, size_t plainsize);
 	int (*auth) (void *ctx, const void *data, size_t datasize);
 	void (*tag) (void *ctx, void *tag, size_t tagsize);
 	void (*deinit) (void *ctx);

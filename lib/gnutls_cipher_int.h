@@ -24,6 +24,7 @@
 #define GNUTLS_CIPHER_INT
 
 #include <gnutls/crypto.h>
+#include <gnutls_errors.h>
 #include <crypto-backend.h>
 
 extern int crypto_cipher_prio;
@@ -33,6 +34,18 @@ typedef int (*cipher_encrypt_func) (void *hd, const void *plaintext,
 				    size_t, void *ciphertext, size_t);
 typedef int (*cipher_decrypt_func) (void *hd, const void *ciphertext,
 				    size_t, void *plaintext, size_t);
+typedef int (*aead_cipher_encrypt_func) (void *hd,
+					 const void *nonce, size_t,
+					 const void *auth, size_t,
+					 size_t tag,
+					 const void *plaintext, size_t,
+					 void *ciphertext, size_t);
+typedef int (*aead_cipher_decrypt_func) (void *hd,
+					 const void *nonce, size_t,
+					 const void *auth, size_t,
+					 size_t tag,
+					 const void *ciphertext, size_t, 
+					 void *plaintext, size_t);
 typedef void (*cipher_deinit_func) (void *hd);
 
 typedef int (*cipher_auth_func) (void *hd, const void *data, size_t);
@@ -45,6 +58,8 @@ typedef struct {
 	const cipher_entry_st *e;
 	cipher_encrypt_func encrypt;
 	cipher_decrypt_func decrypt;
+	aead_cipher_encrypt_func aead_encrypt;
+	aead_cipher_decrypt_func aead_decrypt;
 	cipher_auth_func auth;
 	cipher_tag_func tag;
 	cipher_setiv_func setiv;
@@ -67,6 +82,9 @@ _gnutls_cipher_encrypt2(const cipher_hd_st * handle, const void *text,
 			size_t ciphertextlen)
 {
 	if (likely(handle != NULL && handle->handle != NULL)) {
+		if (handle->encrypt == NULL) {
+			return (GNUTLS_E_INVALID_REQUEST);
+		}
 		return handle->encrypt(handle->handle, text, textlen,
 				       ciphertext, ciphertextlen);
 	}
@@ -80,11 +98,54 @@ _gnutls_cipher_decrypt2(const cipher_hd_st * handle,
 			void *text, size_t textlen)
 {
 	if (likely(handle != NULL && handle->handle != NULL)) {
+		if (handle->decrypt == NULL) {
+			return (GNUTLS_E_INVALID_REQUEST);
+		}
 		return handle->decrypt(handle->handle, ciphertext,
 				       ciphertextlen, text, textlen);
 	}
 
 	return 0;
+}
+
+inline static int
+_gnutls_aead_cipher_encrypt(const cipher_hd_st * handle,
+			    const void *nonce, size_t nonce_len,
+			    const void *auth, size_t auth_len,
+			    size_t tag,
+			    const void *text, size_t textlen,
+			    void *ciphertext, size_t ciphertextlen)
+{
+	if (likely(handle != NULL && handle->handle != NULL && handle->aead_encrypt != NULL)) {
+		return handle->aead_encrypt(handle->handle,
+					    nonce, nonce_len,
+					    auth, auth_len,
+					    tag,
+					    text, textlen,
+					    ciphertext, ciphertextlen);
+	}
+
+	return GNUTLS_E_INVALID_REQUEST;
+}
+
+inline static int
+_gnutls_aead_cipher_decrypt(const cipher_hd_st * handle,
+			    const void *nonce, size_t nonce_len,
+			    const void *auth, size_t auth_len,
+			    size_t tag,
+			    const void *ciphertext, size_t ciphertextlen,
+			    void *text, size_t textlen)
+{
+	if (likely(handle != NULL && handle->handle != NULL && handle->aead_decrypt != NULL)) {
+		return handle->aead_decrypt(handle->handle,
+					    nonce, nonce_len,
+					    auth, auth_len,
+					    tag,
+					    ciphertext, ciphertextlen,
+					    text, textlen);
+	}
+
+	return GNUTLS_E_INVALID_REQUEST;
 }
 
 inline static void _gnutls_cipher_deinit(cipher_hd_st * handle)

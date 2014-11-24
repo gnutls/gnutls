@@ -32,7 +32,7 @@ it is recommended to use the following functions which are solely for AEAD ciphe
 API is designed to be simple to use and also hard to misuse, by handling the tag verification
 and addition in transparent way.
 
-@showfuncE{gnutls_aead_cipher_init,gnutls_aead_cipher_encrypt,gnutls_aead_cipher_decrypt,gnutls_aead_cipher_set_nonce,gnutls_aead_cipher_deinit}
+@showfuncD{gnutls_aead_cipher_init,gnutls_aead_cipher_encrypt,gnutls_aead_cipher_decrypt,gnutls_aead_cipher_deinit}
 
 @node Public key algorithms
 @section Public key algorithms

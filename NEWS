@@ -76,8 +76,6 @@ when available.
 gnutls_aead_cipher_init: Added
 gnutls_aead_cipher_decrypt: Added
 gnutls_aead_cipher_encrypt: Added
-gnutls_aead_cipher_set_nonce: Added
-gnutls_aead_cipher_add_auth: Added
 gnutls_aead_cipher_deinit: Added
 gnutls_pkcs12_generate_mac2: Added
 gnutls_pkcs12_mac_info: Added

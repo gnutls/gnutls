@@ -617,8 +617,6 @@ int gnutls_key_generate(gnutls_datum_t * key, unsigned int key_size)
 /* AEAD API */
 typedef struct api_aead_cipher_hd_st {
 	cipher_hd_st ctx_enc;
-	unsigned tag_size;
-	unsigned nonce_set;
 } api_aead_cipher_hd_st;
 
 /**
@@ -626,7 +624,6 @@ typedef struct api_aead_cipher_hd_st {
  * @handle: is a #gnutls_aead_cipher_hd_t structure.
  * @cipher: the authenticated-encryption algorithm to use
  * @key: The key to be used for encryption
- * @tag_size: The size of the tag to use (use zero for the default)
  *
  * This function will initialize an context that can be used for
  * encryption/decryption of data. This will effectively use the
@@ -639,19 +636,13 @@ typedef struct api_aead_cipher_hd_st {
  **/
 int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
 			    gnutls_cipher_algorithm_t cipher,
-			    const gnutls_datum_t * key,
-			    unsigned tag_size)
+			    const gnutls_datum_t * key)
 {
 	api_aead_cipher_hd_st *h;
 	const cipher_entry_st* e;
 
 	e = cipher_to_entry(cipher);
 	if (e == NULL || e->type != CIPHER_AEAD)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	if (tag_size == 0)
-		tag_size = _gnutls_cipher_get_tag_size(e);
-	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(e))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	*handle = gnutls_calloc(1, sizeof(api_aead_cipher_hd_st));
@@ -661,7 +652,6 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
 	}
 
 	h = *handle;
-	h->tag_size = tag_size;
 
 	return
 	    _gnutls_cipher_init(&h->ctx_enc, e, key,
@@ -671,6 +661,11 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
 /**
  * gnutls_aead_cipher_decrypt:
  * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @nonce: the nonce to set
+ * @nonce_len: The length of the nonce
+ * @auth: the data to be authenticated
+ * @auth_len: The length of the data
+ * @tag_size: The size of the tag to use (use zero for the default)
  * @ctext: the data to decrypt
  * @ctext_len: the length of data to decrypt
  * @ptext: the decrypted data
@@ -687,36 +682,34 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
  **/
 int
 gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
+			   const void *nonce, size_t nonce_len,
+			   const void *auth, size_t auth_len,
+			   size_t tag_size,
 			   const void *ctext, size_t ctext_len,
 			   void *ptext, size_t *ptext_len)
 {
 	int ret;
 	api_aead_cipher_hd_st *h = handle;
-	uint8_t tag[MAX_HASH_SIZE];
-	const uint8_t *ptr;
 
-	if (unlikely(h->nonce_set == 0))
+	if (tag_size == 0)
+		tag_size = _gnutls_cipher_get_tag_size(h->ctx_enc.e);
+	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(h->ctx_enc.e))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	if (unlikely(ctext_len < h->tag_size))
-		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
-	ctext_len -= h->tag_size;
 
-	if (ctext_len > 0) {
-		ret = _gnutls_cipher_decrypt2(&h->ctx_enc, ctext,
-					      ctext_len, ptext, *ptext_len);
-		if (unlikely(ret < 0))
-			return gnutls_assert_val(ret);
-	}
+	if (unlikely(ctext_len < tag_size))
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	ret = _gnutls_aead_cipher_decrypt(&h->ctx_enc,
+					  nonce, nonce_len,
+					  auth, auth_len,
+					  tag_size,
+					  ctext, ctext_len,
+					  ptext, *ptext_len);
+	if (unlikely(ret < 0))
+		return gnutls_assert_val(ret);
+
 	/* That assumes that AEAD ciphers are stream */
 	*ptext_len = ctext_len;
-
-	_gnutls_cipher_tag(&h->ctx_enc, tag, h->tag_size);
-
-	ptr = ctext;
-	ptr += ctext_len;
-	if (gnutls_memcmp(ptr, tag, h->tag_size) != 0)
-		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
-	h->nonce_set = 0;
 
 	return 0;
 }
@@ -725,6 +718,11 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
 /**
  * gnutls_aead_cipher_encrypt:
  * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @nonce: the nonce to set
+ * @nonce_len: The length of the nonce
+ * @auth: the data to be authenticated
+ * @auth_len: The length of the data
+ * @tag_size: The size of the tag to use (use zero for the default)
  * @ptext: the data to encrypt
  * @ptext_len: The length of data to encrypt
  * @ctext: the encrypted data
@@ -741,89 +739,35 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
  **/
 int
 gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
+			   const void *nonce, size_t nonce_len,
+			   const void *auth, size_t auth_len,
+			   size_t tag_size,
 			   const void *ptext, size_t ptext_len,
 			   void *ctext, size_t *ctext_len)
 {
 	api_aead_cipher_hd_st *h = handle;
-	uint8_t *ptr;
 	int ret;
 
-	if (unlikely(*ctext_len < ptext_len + h->tag_size))
-		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
-	if (unlikely(h->nonce_set == 0))
+	if (tag_size == 0)
+		tag_size = _gnutls_cipher_get_tag_size(h->ctx_enc.e);
+	else if (tag_size > (unsigned)_gnutls_cipher_get_tag_size(h->ctx_enc.e))
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = _gnutls_cipher_encrypt2(&h->ctx_enc, ptext, ptext_len,
-				       ctext, *ctext_len);
+	if (unlikely(*ctext_len < ptext_len + tag_size))
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
+	ret = _gnutls_aead_cipher_encrypt(&h->ctx_enc,
+				     	  nonce, nonce_len,
+				     	  auth, auth_len,
+				     	  tag_size,
+				     	  ptext, ptext_len,
+				     	  ctext, *ctext_len);
 	if (unlikely(ret < 0))
 		return gnutls_assert_val(ret);
 
 	/* That assumes that AEAD ciphers are stream */
-	*ctext_len = ptext_len + h->tag_size;
+	*ctext_len = ptext_len + tag_size;
 
-	ptr = ctext;
-	ptr += ptext_len;
-	_gnutls_cipher_tag(&h->ctx_enc, ptr, h->tag_size);
-	h->nonce_set = 0;
-
-	return 0;
-}
-
-/**
- * gnutls_aead_cipher_set_nonce:
- * @handle: is a #gnutls_aead_cipher_hd_t structure.
- * @nonce: the nonce to set
- * @nonce_len: The length of the nonce
- *
- * This function will set the nonce to be used for the next
- * encryption block. The recommended size of the nonce is
- * returned by gnutls_cipher_get_iv_size().
- *
- * Depending on the protocol the nonce may be generated
- * randomly or using a counter.
- *
- * Returns: Zero or a negative error code on error.
- *
- * Since: 3.4.0
- **/
-int
-gnutls_aead_cipher_set_nonce(gnutls_aead_cipher_hd_t handle, void *nonce, size_t nonce_len)
-{
-	api_aead_cipher_hd_st *h = handle;
-
-	h->nonce_set = 1;
-	return _gnutls_cipher_setiv(&h->ctx_enc, nonce, nonce_len);
-}
-
-
-/**
- * gnutls_aead_cipher_add_auth:
- * @handle: is a #gnutls_aead_cipher_hd_t structure.
- * @ptext: the data to be authenticated
- * @ptext_len: The length of the data
- *
- * This function operates on authenticated encryption with
- * associated data (AEAD) ciphers and authenticate the
- * input data. This function can only be called once
- * and before any encryption operations.
- *
- * This function requires that gnutls_aead_cipher_set_nonce() 
- * is called before it. 
- *
- * Returns: Zero or a negative error code on error.
- *
- * Since: 3.4.0
- **/
-int
-gnutls_aead_cipher_add_auth(gnutls_aead_cipher_hd_t handle, const void *ptext,
-		       	    size_t ptext_len)
-{
-	api_aead_cipher_hd_st *h = handle;
-
-	if (h->nonce_set == 0)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	_gnutls_cipher_auth(&h->ctx_enc, ptext, ptext_len);
 	return 0;
 }
 

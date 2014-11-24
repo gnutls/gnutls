@@ -68,6 +68,7 @@ struct cipher_aead_vectors_st {
 	unsigned int iv_size;
 	const uint8_t *iv;
 	const uint8_t *tag;
+	unsigned tag_size;
 };
 
 const struct cipher_aead_vectors_st aes128_gcm_vectors[] = {
@@ -81,6 +82,7 @@ const struct cipher_aead_vectors_st aes128_gcm_vectors[] = {
 	 .ciphertext = NULL,
 	 STR(iv, iv_size,
 	     "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"),
+	 .tag_size = 16,
 	 .tag = (void *)
 	 "\x58\xe2\xfc\xce\xfa\x7e\x30\x61\x36\x7f\x1d\x57\xa4\xe7\x45\x5a"},
 	{
@@ -94,6 +96,7 @@ const struct cipher_aead_vectors_st aes128_gcm_vectors[] = {
 	 "\x03\x88\xda\xce\x60\xb6\xa3\x92\xf3\x28\xc2\xb9\x71\xb2\xfe\x78",
 	 STR(iv, iv_size,
 	     "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"),
+	 .tag_size = 16,
 	 .tag = (void *)
 	 "\xab\x6e\x47\xd4\x2c\xec\x13\xbd\xf5\x3a\x67\xb2\x12\x57\xbd\xdf"},
 	{
@@ -108,6 +111,7 @@ const struct cipher_aead_vectors_st aes128_gcm_vectors[] = {
 	 "\x42\x83\x1e\xc2\x21\x77\x74\x24\x4b\x72\x21\xb7\x84\xd0\xd4\x9c\xe3\xaa\x21\x2f\x2c\x02\xa4\xe0\x35\xc1\x7e\x23\x29\xac\xa1\x2e\x21\xd5\x14\xb2\x54\x66\x93\x1c\x7d\x8f\x6a\x5a\xac\x84\xaa\x05\x1b\xa3\x0b\x39\x6a\x0a\xac\x97\x3d\x58\xe0\x91",
 	 STR(iv, iv_size,
 	     "\xca\xfe\xba\xbe\xfa\xce\xdb\xad\xde\xca\xf8\x88"),
+	 .tag_size = 16,
 	 .tag = (void *)
 	 "\x5b\xc9\x4f\xbc\x32\x21\xa5\xdb\x94\xfa\xe9\x5a\xe7\x12\x1a\x47"}
 };
@@ -125,6 +129,7 @@ const struct cipher_aead_vectors_st aes256_gcm_vectors[] = {
 	 "\x52\x2d\xc1\xf0\x99\x56\x7d\x07\xf4\x7f\x37\xa3\x2a\x84\x42\x7d\x64\x3a\x8c\xdc\xbf\xe5\xc0\xc9\x75\x98\xa2\xbd\x25\x55\xd1\xaa\x8c\xb0\x8e\x48\x59\x0d\xbb\x3d\xa7\xb0\x8b\x10\x56\x82\x88\x38\xc5\xf6\x1e\x63\x93\xba\x7a\x0a\xbc\xc9\xf6\x62\x89\x80\x15\xad",
 	 STR(iv, iv_size,
 	     "\xca\xfe\xba\xbe\xfa\xce\xdb\xad\xde\xca\xf8\x88"),
+	 .tag_size = 16,
 	 .tag =
 	 (void *)
 	 "\xb0\x94\xda\xc5\xd9\x34\x71\xbd\xec\x1a\x50\x22\x70\xe3\xcc\x6c"},
@@ -353,38 +358,23 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 		if (iv.size != vectors[i].iv_size)
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 
-		ret = gnutls_aead_cipher_init(&hd, cipher, &key, 0);
+		ret = gnutls_aead_cipher_init(&hd, cipher, &key);
 		if (ret < 0) {
 			_gnutls_debug_log("error initializing: %s\n",
 					  gnutls_cipher_get_name(cipher));
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
 		}
-
-		ret = gnutls_aead_cipher_set_nonce(hd, iv.data, iv.size);
-		if (ret < 0) {
-			_gnutls_debug_log("error setting nonce to %s\n",
+		_gnutls_debug_log("initialized: %s\n",
 					  gnutls_cipher_get_name(cipher));
-			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
-		}
-
-		if (vectors[i].auth_size > 0) {
-			ret =
-			    gnutls_aead_cipher_add_auth(hd,
-						   vectors[i].auth,
-						   vectors[i].auth_size);
-
-			if (ret < 0)
-				return
-				    gnutls_assert_val
-				    (GNUTLS_E_SELF_TEST_ERROR);
-		}
 
 		s = sizeof(tmp);
 		ret =
 		    gnutls_aead_cipher_encrypt(hd,
+					   iv.data, iv.size,
+					   vectors[i].auth, vectors[i].auth_size,
+					   vectors[i].tag_size,
 					   vectors[i].plaintext,
-					   vectors
-					   [i].plaintext_size,
+					   vectors[i].plaintext_size,
 					   tmp, &s);
 		if (ret < 0)
 			return
@@ -418,22 +408,12 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 
 		/* check decryption */
 		{
-			gnutls_aead_cipher_set_nonce(hd, iv.data, iv.size);
-
-			if (vectors[i].auth_size > 0) {
-				ret =
-				    gnutls_aead_cipher_add_auth(hd,
-							   vectors[i].auth,
-							   vectors[i].auth_size);
-				if (ret < 0)
-					return
-					    gnutls_assert_val
-					    (GNUTLS_E_SELF_TEST_ERROR);
-			}
-
 			s2 = sizeof(tmp2);
 			ret =
 			    gnutls_aead_cipher_decrypt(hd,
+						   iv.data, iv.size,
+						   vectors[i].auth, vectors[i].auth_size,
+						   vectors[i].tag_size,
 						   tmp, s,
 						   tmp2, &s2);
 			if (ret < 0)
@@ -441,7 +421,7 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 				    gnutls_assert_val
 				    (GNUTLS_E_SELF_TEST_ERROR);
 
-			if (s2 != vectors[i].plaintext_size && memcmp(tmp, vectors[i].plaintext, vectors[i].plaintext_size) != 0) {
+			if (s2 != vectors[i].tag_size+vectors[i].plaintext_size && memcmp(tmp, vectors[i].plaintext, vectors[i].plaintext_size) != 0) {
 				_gnutls_debug_log("%s test vector %d failed (decryption)!\n",
 					gnutls_cipher_get_name(cipher), i);
 				return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
@@ -449,23 +429,14 @@ static int test_cipher_aead(gnutls_cipher_algorithm_t cipher,
 
 			/* test tag verification */
 			if (s > 0) {
-				gnutls_aead_cipher_set_nonce(hd, iv.data, iv.size);
-
-				if (vectors[i].auth_size > 0) {
-					ret =
-					    gnutls_aead_cipher_add_auth(hd,
-								   vectors[i].auth,
-								   vectors[i].auth_size);
-					if (ret < 0)
-						return
-						    gnutls_assert_val
-						    (GNUTLS_E_SELF_TEST_ERROR);
-				}
 				tmp[0]++;
 
 				s2 = sizeof(tmp2);
 				ret =
 				    gnutls_aead_cipher_decrypt(hd,
+							   iv.data, iv.size,
+							   vectors[i].auth, vectors[i].auth_size,
+							   vectors[i].tag_size,
 							   tmp, s,
 							   tmp2, &s2);
 				if (ret >= 0)

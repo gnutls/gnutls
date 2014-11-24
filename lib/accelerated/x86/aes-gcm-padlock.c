@@ -166,12 +166,16 @@ static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 	GCM_DIGEST(ctx, padlock_aes_encrypt, tagsize, tag);
 }
 
+#include "aes-gcm-aead.h"
+
 const gnutls_crypto_cipher_st _gnutls_aes_gcm_padlock = {
 	.init = aes_gcm_cipher_init,
 	.setkey = aes_gcm_cipher_setkey,
 	.setiv = aes_gcm_setiv,
 	.encrypt = aes_gcm_encrypt,
 	.decrypt = aes_gcm_decrypt,
+	.aead_encrypt = aes_gcm_aead_encrypt,
+	.aead_decrypt = aes_gcm_aead_decrypt,
 	.deinit = aes_gcm_deinit,
 	.tag = aes_gcm_tag,
 	.auth = aes_gcm_auth,

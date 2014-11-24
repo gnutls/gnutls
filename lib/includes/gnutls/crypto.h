@@ -66,21 +66,21 @@ typedef struct api_aead_cipher_hd_st *gnutls_aead_cipher_hd_t;
 
 int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
 			    gnutls_cipher_algorithm_t cipher,
-			    const gnutls_datum_t * key,
-			    unsigned tag_size);
-int gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
-			       const void *ciphertext,
-			       size_t ciphertextlen, void *text,
-			       size_t *textlen);
-int gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
-			       const void *text, size_t textlen,
-			       void *ciphertext, size_t *ciphertextlen);
-
+			    const gnutls_datum_t * key);
 int
-gnutls_aead_cipher_set_nonce(gnutls_aead_cipher_hd_t handle, void *nonce, size_t nonce_len);
-
-int gnutls_aead_cipher_add_auth(gnutls_aead_cipher_hd_t handle,
-			   	const void *text, size_t text_size);
+gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
+			   const void *nonce, size_t nonce_len,
+			   const void *auth, size_t auth_len,
+			   size_t tag_size,
+			   const void *ctext, size_t ctext_len,
+			   void *ptext, size_t *ptext_len);
+int
+gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
+			   const void *nonce, size_t nonce_len,
+			   const void *auth, size_t auth_len,
+			   size_t tag_size,
+			   const void *ptext, size_t ptext_len,
+			   void *ctext, size_t *ctext_len);
 
 void gnutls_aead_cipher_deinit(gnutls_aead_cipher_hd_t handle);
 
