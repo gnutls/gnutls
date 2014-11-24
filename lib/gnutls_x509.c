@@ -1060,6 +1060,9 @@ certificate_credentials_append_pkey(gnutls_certificate_credentials_t res,
  * Note that the certificates and keys provided, can be safely deinitialized
  * after this function is called.
  *
+ * If that function fails to load the @res structure is at an undefined state, it must
+ * not be reused to load other keys or certificates.
+ *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
  * Since: 2.4.0
@@ -1164,6 +1167,9 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
  * Note that the @pcert_list and @key will become part of the credentials 
  * structure and must not be deallocated. They will be automatically deallocated 
  * when the @res structure is deinitialized.
+ *
+ * If that function fails to load the @res structure is at an undefined state, it must
+ * not be reused to load other keys or certificates.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
@@ -1279,6 +1285,9 @@ gnutls_certificate_set_trust_list(gnutls_certificate_credentials_t res,
  * In case the @certfile is provided as a PKCS #11 URL, then the certificate, and its
  * present issuers in the token are are imported (i.e., the required trust chain).
  *
+ * If that function fails to load the @res structure is at an undefined state, it must
+ * not be reused to load other keys or certificates.
+ *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  **/
 int
@@ -1319,6 +1328,9 @@ gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t res,
  *
  * In case the @certfile is provided as a PKCS #11 URL, then the certificate, and its
  * present issuers in the token are are imported (i.e., the required trust chain).
+ *
+ * If that function fails to load the @res structure is at an undefined state, it must
+ * not be reused to load other keys or certificates.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  **/
