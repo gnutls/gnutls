@@ -51,6 +51,7 @@ extern gnutls_certificate_credentials_t xcred;
 extern unsigned int verbose;
 
 const char *ext_text = "";
+int tls_ext_ok = 1;
 int tls1_ok = 0;
 int ssl3_ok = 0;
 int tls1_1_ok = 0;
@@ -204,6 +205,9 @@ test_code_t test_ecdhe(gnutls_session_t session)
 {
 	int ret;
 
+	if (tls_ext_ok == 0)
+		return TEST_IGNORE;
+
 	sprintf(prio_str, INIT_STR
 		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
 		":+ECDHE-RSA:+ECDHE-ECDSA:+CURVE-ALL:%s", protocol_all_str,
@@ -227,6 +231,9 @@ test_code_t test_safe_renegotiation(gnutls_session_t session)
 {
 	int ret;
 
+	if (tls_ext_ok == 0)
+		return TEST_IGNORE;
+
 	sprintf(prio_str, INIT_STR
 		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
 		":" ALL_KX ":%s:%%SAFE_RENEGOTIATION", rest, protocol_str);
@@ -243,6 +250,9 @@ test_code_t test_ocsp_status(gnutls_session_t session)
 {
 	int ret;
 	gnutls_datum_t resp;
+
+	if (tls_ext_ok == 0)
+		return TEST_IGNORE;
 
 	sprintf(prio_str, INIT_STR
 		ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
@@ -707,6 +717,28 @@ test_code_t test_record_padding(gnutls_session_t session)
 	return ret;
 }
 
+test_code_t test_no_extensions(gnutls_session_t session)
+{
+	int ret;
+
+	sprintf(prio_str,
+		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:"
+		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
+	_gnutls_priority_set_direct(session, prio_str);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_record_set_max_size(session, 4096);
+
+	ret = do_handshake(session);
+	if (ret == TEST_SUCCEED) {
+		tls_ext_ok = 1;
+	} else {
+		tls_ext_ok = 0;
+		strcat(rest, ":%NO_EXTENSIONS");
+	}
+
+	return ret;
+}
+
 test_code_t test_tls1_2(gnutls_session_t session)
 {
 	int ret;
@@ -895,6 +927,10 @@ test_code_t test_rsa_pms(gnutls_session_t session)
 test_code_t test_max_record_size(gnutls_session_t session)
 {
 	int ret;
+
+	if (tls_ext_ok == 0)
+		return TEST_IGNORE;
+
 	sprintf(prio_str,
 		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:"
 		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
@@ -913,25 +949,11 @@ test_code_t test_max_record_size(gnutls_session_t session)
 	return TEST_FAILED;
 }
 
-test_code_t test_hello_extension(gnutls_session_t session)
-{
-	int ret;
-
-	sprintf(prio_str,
-		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:"
-		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
-	_gnutls_priority_set_direct(session, prio_str);
-	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-	gnutls_record_set_max_size(session, 4096);
-
-	ret = do_handshake(session);
-
-
-	return ret;
-}
-
 test_code_t test_heartbeat_extension(gnutls_session_t session)
 {
+	if (tls_ext_ok == 0)
+		return TEST_IGNORE;
+
 	sprintf(prio_str,
 		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:"
 		ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
