@@ -25,7 +25,7 @@ typedef enum {
 test_code_t test_chain_order(gnutls_session_t session);
 test_code_t test_server(gnutls_session_t state);
 test_code_t test_record_padding(gnutls_session_t state);
-test_code_t test_hello_extension(gnutls_session_t state);
+test_code_t test_no_extensions(gnutls_session_t state);
 test_code_t test_heartbeat_extension(gnutls_session_t state);
 test_code_t test_small_records(gnutls_session_t state);
 test_code_t test_dhe(gnutls_session_t state);

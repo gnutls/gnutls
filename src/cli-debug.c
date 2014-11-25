@@ -82,6 +82,8 @@ typedef struct {
 
 static const TLS_TEST tls_tests[] = {
 	{"for SSL 3.0 (RFC6101) support", test_ssl3, "yes", "no", "dunno"},
+	{"whether \%NO_EXTENSIONS is required", test_no_extensions, "no", "yes",
+	 "dunno"},
 	{"whether \%COMPAT is required", test_record_padding, "no", "yes",
 	 "dunno"},
 	{"for TLS 1.0 (RFC2246) support", test_tls1, "yes", "no", "dunno"},
@@ -105,8 +107,6 @@ static const TLS_TEST tls_tests[] = {
 	{"for certificate information", test_certificate, NULL, "", ""},
 	{"for certificate chain order", test_chain_order, "sorted", "unsorted", "unknown"},
 	{"for trusted CAs", test_server_cas, NULL, "", ""},
-	{"whether Hello Extensions are accepted",
-	 test_hello_extension, "yes", "no", "dunno"},
 	{"for safe renegotiation (RFC5746) support", test_safe_renegotiation, "yes",
 	 "no", "dunno"},
 	{"for Safe renegotiation support (SCSV)",
