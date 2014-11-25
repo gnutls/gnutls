@@ -386,11 +386,6 @@ compressed_to_ciphertext(gnutls_session_t session,
 		       UINT64DATA(params->write.sequence_number),
 		       8);
 
-		_gnutls_auth_cipher_setiv(&params->write.
-					  cipher_state, nonce,
-					  imp_iv_size +
-					  exp_iv_size);
-
 		/* copy the explicit part */
 		memcpy(data_ptr, &nonce[imp_iv_size],
 		       exp_iv_size);
@@ -408,31 +403,42 @@ compressed_to_ciphertext(gnutls_session_t session,
 	    make_preamble(UINT64DATA(params->write.sequence_number),
 			  type, ret, ver, preamble);
 
-	/* add the authenticate data */
-	ret =
-	    _gnutls_auth_cipher_add_auth(&params->write.cipher_state,
-					 preamble, preamble_size);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	if (etm && explicit_iv) {
-		/* In EtM we need to hash the IV as well */
+	if (algo_type == CIPHER_BLOCK || algo_type == CIPHER_STREAM) {
+		/* add the authenticated data */
 		ret =
 		    _gnutls_auth_cipher_add_auth(&params->write.cipher_state,
+					 preamble, preamble_size);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		if (etm && explicit_iv) {
+			/* In EtM we need to hash the IV as well */
+			ret =
+			    _gnutls_auth_cipher_add_auth(&params->write.cipher_state,
 						 full_cipher_ptr, blocksize);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
+		}
+
+		/* Actual encryption.
+		 */
+		ret =
+		    _gnutls_auth_cipher_encrypt2_tag(&params->write.cipher_state,
+						     compressed->data,
+						     compressed->size, cipher_data,
+						     cipher_size, pad);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	} else { /* AEAD */
+		ret = _gnutls_aead_cipher_encrypt(&params->write.cipher_state.cipher,
+						  nonce, imp_iv_size + exp_iv_size,
+						  preamble, preamble_size,
+						  tag_size,
+						  compressed->data, compressed->size,
+						  cipher_data, cipher_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
-
-	/* Actual encryption.
-	 */
-	ret =
-	    _gnutls_auth_cipher_encrypt2_tag(&params->write.cipher_state,
-					     compressed->data,
-					     compressed->size, cipher_data,
-					     cipher_size, pad);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
 
 	return length;
 }
@@ -571,17 +577,14 @@ ciphertext_to_compressed(gnutls_session_t session,
 		memcpy(&nonce[imp_iv_size],
 		       ciphertext->data, exp_iv_size);
 
-		_gnutls_auth_cipher_setiv(&params->read.
-					  cipher_state, nonce,
-					  exp_iv_size +
-					  imp_iv_size);
 
 		ciphertext->data += exp_iv_size;
 		ciphertext->size -= exp_iv_size;
 
-		length = length_to_decrypt =
+		length =
 		    ciphertext->size - tag_size;
-		tag_ptr = ciphertext->data + length_to_decrypt;
+
+		length_to_decrypt = ciphertext->size;
 
 		/* Pass the type, version, length and compressed through
 		 * MAC.
@@ -590,12 +593,6 @@ ciphertext_to_compressed(gnutls_session_t session,
 		    make_preamble(UINT64DATA(*sequence), type,
 				  length, ver, preamble);
 
-		ret =
-		    _gnutls_auth_cipher_add_auth(&params->read.
-						 cipher_state, preamble,
-						 preamble_size);
-		if (unlikely(ret < 0))
-			return gnutls_assert_val(ret);
 
 		if (unlikely
 		    ((unsigned) length_to_decrypt > compressed->size)) {
@@ -607,16 +604,16 @@ ciphertext_to_compressed(gnutls_session_t session,
 			    gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 		}
 
-		ret =
-		    _gnutls_auth_cipher_decrypt2(&params->read.
-						 cipher_state,
-						 ciphertext->data,
-						 length_to_decrypt,
-						 compressed->data,
-						 compressed->size);
-
+		ret = _gnutls_aead_cipher_decrypt(&params->read.cipher_state.cipher,
+						  nonce, exp_iv_size + imp_iv_size,
+						  preamble, preamble_size,
+						  tag_size,
+						  ciphertext->data, length_to_decrypt,
+						  compressed->data, compressed->size);
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
+
+		return length;
 
 		break;
 	case CIPHER_STREAM:
@@ -784,6 +781,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
+	/* STREAM or BLOCK arrive here */
 	if (etm == 0) {
 		ret =
 		    _gnutls_auth_cipher_tag(&params->read.cipher_state, tag,
