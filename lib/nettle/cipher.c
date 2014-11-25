@@ -36,6 +36,7 @@
 #include <nettle/nettle-meta.h>
 #include <nettle/cbc.h>
 #include <nettle/gcm.h>
+#include <nettle/ccm.h>
 #include <fips.h>
 
 struct nettle_cipher_ctx;
@@ -120,6 +121,38 @@ _cbc_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 	cbc_decrypt(ctx->ctx_ptr, ctx->cipher->decrypt_block,
 		    ctx->iv_size, ctx->iv,
 		    length, dst, src);
+}
+
+static void
+_ccm_aes_encrypt(struct nettle_cipher_ctx *ctx,
+	      size_t nonce_size, const void *nonce,
+	      size_t auth_size, const void *auth,
+	      size_t tag_size,
+	      size_t length, uint8_t * dst,
+	      const uint8_t * src)
+{
+	ccm_encrypt_message((void*)ctx->ctx_ptr, ctx->cipher->encrypt_block,
+			    nonce_size, nonce,
+			    auth_size, auth,
+			    tag_size, length, dst, src);
+}
+
+static int
+_ccm_aes_decrypt(struct nettle_cipher_ctx *ctx,
+	      size_t nonce_size, const void *nonce,
+	      size_t auth_size, const void *auth,
+	      size_t tag_size,
+	      size_t length, uint8_t * dst,
+	      const uint8_t * src)
+{
+	int ret;
+	ret = ccm_decrypt_message((void*)ctx->ctx_ptr, ctx->cipher->encrypt_block,
+				    nonce_size, nonce,
+				    auth_size, auth,
+				    tag_size, length, dst, src);
+	if (ret == 0)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+	return 0;
 }
 
 static void
@@ -211,6 +244,34 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .tag = (tag_func)gcm_aes256_digest,
 	   .auth = (auth_func)gcm_aes256_update,
 	   .set_iv = (setiv_func)gcm_aes256_set_iv,
+	   .fips_allowed = 1
+	},
+	{  .algo = GNUTLS_CIPHER_AES_128_CCM,
+	   .block_size = AES_BLOCK_SIZE,
+	   .key_size = AES128_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)aes128_encrypt,
+	   .decrypt_block = (nettle_cipher_func*)aes128_decrypt,
+
+	   .ctx_size = sizeof(struct aes128_ctx),
+	   .aead_encrypt = _ccm_aes_encrypt,
+	   .aead_decrypt = _ccm_aes_decrypt,
+	   .set_encrypt_key = (setkey_func)aes128_set_encrypt_key,
+	   .set_decrypt_key = (setkey_func)aes128_set_encrypt_key,
+
+	   .fips_allowed = 1
+	},
+	{  .algo = GNUTLS_CIPHER_AES_256_CCM,
+	   .block_size = AES_BLOCK_SIZE,
+	   .key_size = AES256_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)aes256_encrypt,
+	   .decrypt_block = (nettle_cipher_func*)aes256_decrypt,
+
+	   .ctx_size = sizeof(struct aes256_ctx),
+	   .aead_encrypt = _ccm_aes_encrypt,
+	   .aead_decrypt = _ccm_aes_decrypt,
+	   .set_encrypt_key = (setkey_func)aes256_set_encrypt_key,
+	   .set_decrypt_key = (setkey_func)aes256_set_encrypt_key,
+
 	   .fips_allowed = 1
 	},
 	{  .algo = GNUTLS_CIPHER_CAMELLIA_128_GCM,

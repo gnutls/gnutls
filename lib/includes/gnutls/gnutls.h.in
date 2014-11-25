@@ -90,6 +90,8 @@ extern "C" {
  * @GNUTLS_CIPHER_DES_CBC: DES in CBC mode (56-bit keys).
  * @GNUTLS_CIPHER_AES_128_GCM: AES in GCM mode with 128-bit keys.
  * @GNUTLS_CIPHER_AES_256_GCM: AES in GCM mode with 256-bit keys.
+ * @GNUTLS_CIPHER_AES_128_CCM: AES in CCM mode with 128-bit keys.
+ * @GNUTLS_CIPHER_AES_256_CCM: AES in CCM mode with 256-bit keys.
  * @GNUTLS_CIPHER_CAMELLIA_128_GCM: CAMELLIA in GCM mode with 128-bit keys.
  * @GNUTLS_CIPHER_CAMELLIA_256_GCM: CAMELLIA in GCM mode with 256-bit keys.
  * @GNUTLS_CIPHER_SALSA20_256: Salsa20 with 256-bit keys.
@@ -126,6 +128,8 @@ typedef enum gnutls_cipher_algorithm {
 	GNUTLS_CIPHER_CAMELLIA_256_GCM = 16,
 	GNUTLS_CIPHER_RC2_40_CBC = 17,
 	GNUTLS_CIPHER_DES_CBC = 18,
+	GNUTLS_CIPHER_AES_128_CCM = 19,
+	GNUTLS_CIPHER_AES_256_CCM = 20,
 
 	/* used only for PGP internals. Ignored in TLS/SSL
 	 */
