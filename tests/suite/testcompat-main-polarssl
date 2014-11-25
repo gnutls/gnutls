@@ -245,6 +245,16 @@ $POLARSSL_CLI  server_name=localhost min_version=tls1_2 max_version=tls1_2 serve
 kill $PID
 wait
 
+echo "Check TLS 1.2 with AES-128-CCM-DHE-RSA ciphersuite"
+launch_server $$  --priority "NONE:-CIPHER-ALL:+AES-128-CCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$POLARSSL_CLI  server_name=localhost min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
 #echo "Check TLS 1.2 with DHE-DSS ciphersuite"
 #launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-DSS$ADD" --x509certfile $SERV_DSA_CERT --x509keyfile $SERV_DSA_KEY --dhparams params.dh  & PID=$!
 #wait_server $PID
