@@ -1,13 +1,11 @@
 static int
-aes_gcm_aead_encrypt(void *_ctx,
+aes_gcm_aead_encrypt(void *ctx,
 			const void *nonce, size_t nonce_size,
 			const void *auth, size_t auth_size,
 			size_t tag_size,
 			const void *plain, size_t plain_size,
 		   	void *encr, size_t encr_size)
 {
-	struct gcm_padlock_aes_ctx *ctx = _ctx;
-
 	/* proper AEAD cipher */
 	if (encr_size < plain_size + tag_size)
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
@@ -22,14 +20,13 @@ aes_gcm_aead_encrypt(void *_ctx,
 }
 
 static int
-aes_gcm_aead_decrypt(void *_ctx,
+aes_gcm_aead_decrypt(void *ctx,
 			const void *nonce, size_t nonce_size,
 			const void *auth, size_t auth_size,
 			size_t tag_size,
 		   	const void *encr, size_t encr_size,
 			void *plain, size_t plain_size)
 {
-	struct gcm_padlock_aes_ctx *ctx = _ctx;
 	uint8_t tag[MAX_HASH_SIZE];
 
 	if (encr_size < tag_size)
