@@ -947,8 +947,10 @@ gnutls_certificate_set_x509_key_mem2(gnutls_certificate_credentials_t res,
 				flags)) < 0)
 		return ret;
 
-	if ((ret = read_cert_mem(res, cert->data, cert->size, type)) < 0)
+	if ((ret = read_cert_mem(res, cert->data, cert->size, type)) < 0) {
+		gnutls_privkey_deinit(res->pkey[res->ncerts]);
 		return ret;
+	}
 
 	res->ncerts++;
 
@@ -1472,9 +1474,12 @@ gnutls_certificate_set_x509_key_file2(gnutls_certificate_credentials_t res,
 	 */
 	if ((ret = read_key_file(res, keyfile, type, pass, flags)) < 0)
 		return ret;
+	
 
-	if ((ret = read_cert_file(res, certfile, type)) < 0)
+	if ((ret = read_cert_file(res, certfile, type)) < 0) {
+		gnutls_privkey_deinit(res->pkey[res->ncerts]);
 		return ret;
+	}
 
 	res->ncerts++;
 
