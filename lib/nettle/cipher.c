@@ -198,7 +198,7 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .ctx_size = sizeof(struct gcm_aes256_ctx),
 	   .encrypt = _gcm_encrypt,
 	   .decrypt = _gcm_decrypt,
-	   .set_encrypt_key = (nettle_set_key_func*)gcm_aes128_set_key,
+	   .set_encrypt_key = (nettle_set_key_func*)gcm_aes256_set_key,
 	   .set_decrypt_key = (nettle_set_key_func*)gcm_aes256_set_key,
 	   
 	   .tag = (nettle_hash_digest_func*)gcm_aes256_digest,
