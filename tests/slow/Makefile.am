@@ -38,10 +38,10 @@ else
 cipher_test_CPPFLAGS = $(AM_CPPFLAGS)
 endif
 
-ctests = gendh keygen cipher-test
+ctests = gendh keygen
 
-check_PROGRAMS = $(ctests)
-TESTS = $(ctests)
+check_PROGRAMS = $(ctests) cipher-test
+TESTS = $(ctests) test-ciphers
 
 EXTRA_DIST = README
 
