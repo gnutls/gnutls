@@ -145,14 +145,10 @@ _ccm_aes_decrypt(struct nettle_cipher_ctx *ctx,
 	      size_t length, uint8_t * dst,
 	      const uint8_t * src)
 {
-	int ret;
-	ret = ccm_decrypt_message((void*)ctx->ctx_ptr, ctx->cipher->encrypt_block,
+	return ccm_decrypt_message((void*)ctx->ctx_ptr, ctx->cipher->encrypt_block,
 				    nonce_size, nonce,
 				    auth_size, auth,
 				    tag_size, length, dst, src);
-	if (ret == 0)
-		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
-	return 0;
 }
 
 static void
@@ -634,12 +630,12 @@ wrap_nettle_cipher_aead_decrypt(void *_ctx,
 	struct nettle_cipher_ctx *ctx = _ctx;
 	int ret;
 
+	if (unlikely(encr_size < tag_size))
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
 	if (ctx->cipher->aead_decrypt == NULL) {
 		/* proper AEAD cipher */
 		uint8_t tag[MAX_HASH_SIZE];
-
-		if (encr_size < tag_size)
-			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 		ctx->cipher->set_iv(ctx->ctx_ptr, nonce_size, nonce);
 		ctx->cipher->auth(ctx->ctx_ptr, auth_size, auth);
@@ -653,6 +649,7 @@ wrap_nettle_cipher_aead_decrypt(void *_ctx,
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 	} else {
 		/* CCM-style cipher */
+		encr_size -= tag_size;
 		ret = ctx->cipher->aead_decrypt(ctx,
 						nonce_size, nonce,
 						auth_size, auth,
