@@ -667,7 +667,7 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
  * @auth_len: The length of the data
  * @tag_size: The size of the tag to use (use zero for the default)
  * @ctext: the data to decrypt
- * @ctext_len: the length of data to decrypt
+ * @ctext_len: the length of data to decrypt (includes tag size)
  * @ptext: the decrypted data
  * @ptext_len: the length of decrypted data (initially must hold the maximum available size)
  *
@@ -726,7 +726,7 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
  * @ptext: the data to encrypt
  * @ptext_len: The length of data to encrypt
  * @ctext: the encrypted data
- * @ctext_len: the length of encrypted data (initially must hold the maximum available size)
+ * @ctext_len: the length of encrypted data (initially must hold the maximum available size, including space for tag)
  *
  * This function will encrypt the given data using the algorithm
  * specified by the context. The output data will contain the
