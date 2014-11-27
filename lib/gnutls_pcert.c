@@ -96,6 +96,11 @@ int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,
  * #gnutls_pcert_st structure. The structure must be deinitialized
  * afterwards using gnutls_pcert_deinit();
  *
+ * In the case %GNUTLS_X509_CRT_LIST_SORT is specified and that
+ * function cannot sort the list, %GNUTLS_E_CERTIFICATE_LIST_UNSORTED
+ * will be returned. Currently sorting can fail if the list size
+ * exceeds an internal constraint (16).
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
@@ -112,11 +117,20 @@ int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert,
 	gnutls_x509_crt_t *s;
 
 	s = crt;
-	if (flags & GNUTLS_X509_CRT_LIST_SORT && *ncrt > 1 && *ncrt < DEFAULT_MAX_VERIFY_DEPTH) {
-		s = _gnutls_sort_clist(sorted, crt, ncrt, NULL);
-		if (s == crt) {
-			gnutls_assert();
-			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
+	if (flags & GNUTLS_X509_CRT_LIST_SORT && *ncrt > 1) {
+		if (*ncrt > DEFAULT_MAX_VERIFY_DEPTH) {
+			ret = _gnutls_check_if_sorted(crt, *ncrt);
+			if (ret < 0) {
+				gnutls_assert();
+				return GNUTLS_E_CERTIFICATE_LIST_UNSORTED;
+			}
+		} else {
+			s = _gnutls_sort_clist(sorted, crt, ncrt, NULL);
+			if (s == crt) {
+				gnutls_assert();
+				return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+			}
 		}
 	}
 

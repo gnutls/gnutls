@@ -240,4 +240,6 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 				     unsigned int *clist_size,
 				     gnutls_cert_vfunc func);
 
+int _gnutls_check_if_sorted(gnutls_x509_crt_t * crt, int nr);
+
 #endif
