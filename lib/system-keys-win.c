@@ -27,6 +27,7 @@
 #include "system-keys.h"
 #include <gnutls_sig.h>
 #include <gnutls_pk.h>
+#include <urls.h>
 
 #if !defined(_WIN32)
 # error shouldn't be included
