@@ -335,13 +335,13 @@ static void start(void)
 
 	if (child) {
 		/* parent */
-		close(fd[1]);
-		server(fd[0]);
+		close(fd[0]);
+		client(fd[1]);
 		waitpid(-1, NULL, 0);
 		//kill(child, SIGTERM);
 	} else {
-		close(fd[0]);
-		client(fd[1]);
+		close(fd[1]);
+		server(fd[0]);
 		exit(0);
 	}
 }
