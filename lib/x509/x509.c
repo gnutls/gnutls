@@ -3445,6 +3445,23 @@ gnutls_x509_crt_list_import(gnutls_x509_crt_t * certs,
 
 	*cert_max = count;
 
+	if (flags & GNUTLS_X509_CRT_LIST_SORT && *cert_max > 1) {
+		gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
+		gnutls_x509_crt_t *s;
+
+		s = _gnutls_sort_clist(sorted, certs, cert_max, gnutls_x509_crt_deinit);
+		if (s == certs) {
+			gnutls_assert();
+			ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+			goto error;
+		}
+
+		count = *cert_max;
+		if (s == sorted) {
+			memcpy(certs, s, (*cert_max)*sizeof(gnutls_x509_crt_t));
+		}
+	}
+
 	if (flags & GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED) {
 		ret = check_if_sorted(certs, *cert_max);
 		if (ret < 0) {

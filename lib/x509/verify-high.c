@@ -790,66 +790,6 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
 	return clist_size;
 }
 
-/* Takes a certificate list and orders it with subject, issuer order.
- *
- * *clist_size contains the size of the ordered list (which is always less or
- * equal to the original).
- *
- * Returns the sorted list which may be the original clist.
- */
-static gnutls_x509_crt_t *sort_clist(gnutls_x509_crt_t
-				     sorted[DEFAULT_MAX_VERIFY_DEPTH],
-				     gnutls_x509_crt_t * clist,
-				     unsigned int *clist_size)
-{
-	int prev;
-	unsigned int j, i;
-	int issuer[DEFAULT_MAX_VERIFY_DEPTH];	/* contain the index of the issuers */
-
-	/* Do not bother sorting if too many certificates are given.
-	 * Prevent any DoS attacks.
-	 */
-	if (*clist_size > DEFAULT_MAX_VERIFY_DEPTH)
-		return clist;
-
-	for (i = 0; i < DEFAULT_MAX_VERIFY_DEPTH; i++)
-		issuer[i] = -1;
-
-	/* Find the issuer of each certificate and store it
-	 * in issuer array.
-	 */
-	for (i = 0; i < *clist_size; i++) {
-		for (j = 1; j < *clist_size; j++) {
-			if (i == j)
-				continue;
-
-			if (gnutls_x509_crt_check_issuer(clist[i],
-							 clist[j]) != 0) {
-				issuer[i] = j;
-				break;
-			}
-		}
-	}
-
-	if (issuer[0] == -1) {
-		*clist_size = 1;
-		return clist;
-	}
-
-	prev = 0;
-	sorted[0] = clist[0];
-	for (i = 1; i < *clist_size; i++) {
-		prev = issuer[prev];
-		if (prev == -1) {	/* no issuer */
-			*clist_size = i;
-			break;
-		}
-		sorted[i] = clist[prev];
-	}
-
-	return sorted;
-}
-
 static
 int trust_list_get_issuer(gnutls_x509_trust_list_t list,
 				      gnutls_x509_crt_t cert,
@@ -1163,7 +1103,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	}
 
 	if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN))
-		cert_list = sort_clist(sorted, cert_list, &cert_list_size);
+		cert_list = _gnutls_sort_clist(sorted, cert_list, &cert_list_size, NULL);
 
 	cert_list_size = shorten_clist(list, cert_list, cert_list_size);
 	if (cert_list_size <= 0)

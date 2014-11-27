@@ -355,31 +355,6 @@ static int get_x509_name(gnutls_x509_crt_t crt, gnutls_str_array_t * names)
 	return 0;
 }
 
-static int get_x509_name_raw(gnutls_datum_t * raw,
-			     gnutls_x509_crt_fmt_t type,
-			     gnutls_str_array_t * names)
-{
-	int ret;
-	gnutls_x509_crt_t crt;
-
-	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = gnutls_x509_crt_import(crt, raw, type);
-	if (ret < 0) {
-		gnutls_assert();
-		gnutls_x509_crt_deinit(crt);
-		return ret;
-	}
-
-	ret = get_x509_name(crt, names);
-	gnutls_x509_crt_deinit(crt);
-	return ret;
-}
-
 /* Reads a DER encoded certificate list from memory and stores it to a
  * gnutls_cert structure. Returns the number of certificates parsed.
  */
@@ -457,8 +432,10 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 	const char *ptr;
 	gnutls_datum_t tmp;
 	int ret, count, i;
-	gnutls_pcert_st *certs = NULL;
+	unsigned ncerts = 0;
+	gnutls_pcert_st *pcerts = NULL;
 	gnutls_str_array_t names;
+	gnutls_x509_crt_t unsorted[DEFAULT_MAX_VERIFY_DEPTH];
 
 	_gnutls_str_array_init(&names);
 
@@ -479,37 +456,21 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 	count = 0;
 
 	do {
-		certs =
-		    gnutls_realloc_fast(certs,
-					(count +
-					 1) * sizeof(gnutls_pcert_st));
-
-		if (certs == NULL) {
-			gnutls_assert();
-			ret = GNUTLS_E_MEMORY_ERROR;
-			goto cleanup;
-		}
-
 		tmp.data = (void *) ptr;
 		tmp.size = size;
 
-		if (count == 0) {
-			ret =
-			    get_x509_name_raw(&tmp, GNUTLS_X509_FMT_PEM,
-					      &names);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
-			}
-		}
-
-		ret =
-		    gnutls_pcert_import_x509_raw(&certs[count], &tmp,
-						 GNUTLS_X509_FMT_PEM, 0);
+		ret = gnutls_x509_crt_init(&unsorted[count]);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
+
+		ret = gnutls_x509_crt_import(unsorted[count], &tmp, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		count++;
 
 		/* now we move ptr after the pem header 
 		 */
@@ -532,27 +493,53 @@ parse_pem_cert_mem(gnutls_certificate_credentials_t res,
 		} else
 			ptr = NULL;
 
-		count++;
-
 	}
-	while (ptr != NULL);
+	while (ptr != NULL && count < DEFAULT_MAX_VERIFY_DEPTH);
 
 	ret =
-	    certificate_credential_append_crt_list(res, names, certs,
-						   count);
+	    get_x509_name(unsorted[0], &names);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	return count;
+	pcerts = gnutls_malloc(sizeof(gnutls_pcert_st) * count);
+	if (pcerts == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ncerts = count;
+	ret =
+	    gnutls_pcert_import_x509_list(pcerts, unsorted, &ncerts, GNUTLS_X509_CRT_LIST_SORT);
+	if (ret < 0) {
+		gnutls_free(pcerts);
+		pcerts = NULL;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret =
+	    certificate_credential_append_crt_list(res, names, pcerts,
+						   ncerts);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	for (i = 0; i < count; i++)
+		gnutls_x509_crt_deinit(unsorted[i]);
+
+	return ncerts;
 
       cleanup:
 	_gnutls_str_array_clear(&names);
-	if (certs) {
+	for (i = 0; i < count; i++)
+		gnutls_x509_crt_deinit(unsorted[i]);
+	if (pcerts) {
 		for (i = 0; i < count; i++)
-			gnutls_pcert_deinit(&certs[i]);
-		gnutls_free(certs);
+			gnutls_pcert_deinit(&pcerts[i]);
+		gnutls_free(pcerts);
 	}
 	return ret;
 }
@@ -1080,7 +1067,7 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 				int cert_list_size,
 				gnutls_x509_privkey_t key)
 {
-	int ret, i;
+	int ret;
 	gnutls_privkey_t pkey;
 	gnutls_pcert_st *pcerts = NULL;
 	gnutls_str_array_t names;
@@ -1121,16 +1108,17 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 	}
 
 	ret = get_x509_name(cert_list[0], &names);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-	for (i = 0; i < cert_list_size; i++) {
-		ret =
-		    gnutls_pcert_import_x509(&pcerts[i], cert_list[i], 0);
-		if (ret < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
+	ret =
+	    gnutls_pcert_import_x509_list(pcerts, cert_list, (unsigned int*)&cert_list_size,
+	    				  GNUTLS_X509_CRT_LIST_SORT);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
 	}
 
 	ret =
@@ -1145,12 +1133,13 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 
 	if ((ret = _gnutls_check_key_cert_match(res)) < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	return 0;
 
       cleanup:
+        gnutls_free(pcerts);
 	_gnutls_str_array_clear(&names);
 	return ret;
 }

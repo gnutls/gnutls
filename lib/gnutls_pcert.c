@@ -23,6 +23,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <auth/cert.h>
+#include <x509/common.h>
 #include <gnutls_x509.h>
 #include "x509/x509_int.h"
 #ifdef ENABLE_OPENPGP
@@ -32,7 +33,7 @@
 /**
  * gnutls_pcert_import_x509:
  * @pcert: The pcert structure
- * @crt: The raw certificate to be imported
+ * @crt: The certificate to be imported
  * @flags: zero for now
  *
  * This convenience function will import the given certificate to a
@@ -82,6 +83,59 @@ int gnutls_pcert_import_x509(gnutls_pcert_st * pcert,
 	_gnutls_free_datum(&pcert->cert);
 
 	return ret;
+}
+
+/**
+ * gnutls_pcert_import_x509_list:
+ * @pcert: The pcert structure
+ * @crt: The certificates to be imported
+ * @ncrt: The number of certificates
+ * @flags: zero or %GNUTLS_X509_CRT_LIST_SORT
+ *
+ * This convenience function will import the given certificate to a
+ * #gnutls_pcert_st structure. The structure must be deinitialized
+ * afterwards using gnutls_pcert_deinit();
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.0
+ **/
+int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert,
+			     	  gnutls_x509_crt_t *crt, unsigned *ncrt,
+			     	  unsigned int flags)
+{
+	int ret;
+	unsigned i;
+	unsigned current = 0;
+	gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
+	gnutls_x509_crt_t *s;
+
+	s = crt;
+	if (flags & GNUTLS_X509_CRT_LIST_SORT && *ncrt > 1) {
+		s = _gnutls_sort_clist(sorted, crt, ncrt, NULL);
+		if (s == crt) {
+			gnutls_assert();
+			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		}
+	}
+
+	for (i=0;i<*ncrt;i++) {
+		ret = gnutls_pcert_import_x509(&pcert[i], s[i], 0);
+		if (ret < 0) {
+			current = i;
+			goto cleanup;
+		}
+	}
+
+	return 0;
+
+ cleanup:
+ 	for (i=0;i<current;i++) {
+ 		gnutls_pcert_deinit(&pcert[i]);
+ 	}
+ 	return ret;
+
 }
 
 /**

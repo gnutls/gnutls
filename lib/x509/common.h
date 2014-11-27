@@ -231,4 +231,13 @@ int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 
 int x509_crt_to_raw_pubkey(gnutls_x509_crt_t crt,
                            gnutls_datum_t * rpubkey);
+
+typedef void (*gnutls_cert_vfunc)(gnutls_x509_crt_t);
+
+gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
+				     sorted[DEFAULT_MAX_VERIFY_DEPTH],
+				     gnutls_x509_crt_t * clist,
+				     unsigned int *clist_size,
+				     gnutls_cert_vfunc func);
+
 #endif

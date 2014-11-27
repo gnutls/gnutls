@@ -112,12 +112,14 @@ extern "C" {
  * @GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED: Fail if the certificates
  *   in the buffer are not ordered starting from subject to issuer.
  *   The error code will be %GNUTLS_E_CERTIFICATE_LIST_UNSORTED.
+ * @GNUTLS_X509_CRT_LIST_SORT: Sort the certificate chain if unsorted.
  *
  * Enumeration of different certificate import flags.
  */
 typedef enum gnutls_certificate_import_flags {
 	GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED = 1,
-	GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED = 2
+	GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED = 1<<1,
+	GNUTLS_X509_CRT_LIST_SORT = 1<<2
 } gnutls_certificate_import_flags;
 
 int gnutls_x509_crt_init(gnutls_x509_crt_t * cert);

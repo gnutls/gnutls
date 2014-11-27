@@ -1978,3 +1978,73 @@ _gnutls_check_valid_key_id(gnutls_datum_t *key_id,
  out:
 	return result;
 }
+
+/* Takes a certificate list and orders it with subject, issuer order.
+ *
+ * *clist_size contains the size of the ordered list (which is always less or
+ * equal to the original).
+ * @func: the function to call to elements outside the sort.
+ *
+ * Returns the sorted list which may be the original clist.
+ */
+gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
+				     sorted[DEFAULT_MAX_VERIFY_DEPTH],
+				     gnutls_x509_crt_t *clist,
+				     unsigned int *clist_size,
+				     gnutls_cert_vfunc func)
+{
+	int prev;
+	unsigned int j, i;
+	int issuer[DEFAULT_MAX_VERIFY_DEPTH];	/* contain the index of the issuers */
+
+	/* Do not bother sorting if too many certificates are given.
+	 * Prevent any DoS attacks.
+	 */
+	if (*clist_size > DEFAULT_MAX_VERIFY_DEPTH)
+		return clist;
+
+	for (i = 0; i < DEFAULT_MAX_VERIFY_DEPTH; i++)
+		issuer[i] = -1;
+
+	/* Find the issuer of each certificate and store it
+	 * in issuer array.
+	 */
+	for (i = 0; i < *clist_size; i++) {
+		for (j = 1; j < *clist_size; j++) {
+			if (i == j)
+				continue;
+
+			if (gnutls_x509_crt_check_issuer(clist[i],
+							 clist[j]) != 0) {
+				issuer[i] = j;
+				break;
+			}
+		}
+	}
+
+	if (issuer[0] == -1) {
+		*clist_size = 1;
+		return clist;
+	}
+
+	prev = 0;
+	sorted[0] = clist[0];
+	for (i = 1; i < *clist_size; i++) {
+		prev = issuer[prev];
+		if (prev == -1) {	/* no issuer */
+			*clist_size = i;
+			break;
+		}
+		sorted[i] = clist[prev];
+	}
+
+	if (func) {
+		for (i = 1; i < *clist_size; i++) {
+			if (issuer[i] == -1) {
+				func(clist[i]);
+			}
+		}
+	}
+
+	return sorted;
+}
