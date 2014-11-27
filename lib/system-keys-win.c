@@ -625,7 +625,7 @@ int get_win_urls(const CERT_CONTEXT *cert, char **cert_url, char **key_url,
 		goto fail;
 	}
 
-	ret = _gnutls_buffer_append_printf(&str, WIN_URL"id=%s;object-type=cert", hex);
+	ret = _gnutls_buffer_append_printf(&str, WIN_URL"id=%s;type=cert", hex);
 	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
@@ -655,7 +655,7 @@ int get_win_urls(const CERT_CONTEXT *cert, char **cert_url, char **key_url,
 		*cert_url = (char*)str.data;
 	_gnutls_buffer_init(&str);
 
-	ret = _gnutls_buffer_append_printf(&str, WIN_URL"id=%s;object-type=key", hex);
+	ret = _gnutls_buffer_append_printf(&str, WIN_URL"id=%s;type=privkey", hex);
 	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
