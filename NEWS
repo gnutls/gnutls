@@ -84,6 +84,7 @@ gnutls_pkcs_schema_get_name: Added
 gnutls_pkcs_schema_get_oid: Added
 gnutls_pcert_export_x509: Added
 gnutls_pcert_export_openpgp: Added
+gnutls_pcert_import_x509_list: Added
 gnutls_pkcs11_privkey_cpy: Added
 gnutls_x509_crq_get_signature_algorithm: Added
 gnutls_x509_trust_list_iter_get_ca: Added
