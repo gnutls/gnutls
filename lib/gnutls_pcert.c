@@ -112,7 +112,7 @@ int gnutls_pcert_import_x509_list(gnutls_pcert_st * pcert,
 	gnutls_x509_crt_t *s;
 
 	s = crt;
-	if (flags & GNUTLS_X509_CRT_LIST_SORT && *ncrt > 1) {
+	if (flags & GNUTLS_X509_CRT_LIST_SORT && *ncrt > 1 && *ncrt < DEFAULT_MAX_VERIFY_DEPTH) {
 		s = _gnutls_sort_clist(sorted, crt, ncrt, NULL);
 		if (s == crt) {
 			gnutls_assert();
