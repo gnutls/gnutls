@@ -51,6 +51,9 @@ combination with PKCS #11, or TPM URLs, it will utilize the provided
 password as PIN if required. That removes the requirement for the
 application to set a callback for PINs in that case.
 
+** libgnutls: Certificate chains which are provided to gnutls_certificate_credentials_t
+will automatically be sorted instead of failing with GNUTLS_E_CERTIFICATE_LIST_UNSORTED.
+
 ** libgnutls: Added the ability to register application specific URL
 types, which express certificates and keys using gnutls_register_custom_url().
 
