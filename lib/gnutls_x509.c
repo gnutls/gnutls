@@ -954,8 +954,6 @@ certificate_credential_append_crt_list(gnutls_certificate_credentials_t
 				       res, gnutls_str_array_t names,
 				       gnutls_pcert_st * crt, int nr)
 {
-	int ret;
-
 	res->certs = gnutls_realloc_fast(res->certs,
 					 (1 + res->ncerts) *
 					 sizeof(certs_st));
