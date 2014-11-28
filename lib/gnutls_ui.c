@@ -849,6 +849,7 @@ gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials_t
 char *gnutls_session_get_desc(gnutls_session_t session)
 {
 	gnutls_kx_algorithm_t kx;
+	const char *kx_str;
 	unsigned type;
 	char kx_name[32];
 	char proto_name[32];
@@ -872,15 +873,20 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 		dh_bits = gnutls_dh_get_prime_bits(session);
 	}
 
-	if (curve_name != NULL)
-		snprintf(kx_name, sizeof(kx_name), "%s-%s",
-			 gnutls_kx_get_name(kx), curve_name);
-	else if (dh_bits != 0)
-		snprintf(kx_name, sizeof(kx_name), "%s-%u",
-			 gnutls_kx_get_name(kx), dh_bits);
-	else
-		snprintf(kx_name, sizeof(kx_name), "%s",
-			 gnutls_kx_get_name(kx));
+	kx_str = gnutls_kx_get_name(kx);
+	if (kx_str) {
+		if (curve_name != NULL)
+			snprintf(kx_name, sizeof(kx_name), "%s-%s",
+				 kx_str, curve_name);
+		else if (dh_bits != 0)
+			snprintf(kx_name, sizeof(kx_name), "%s-%u",
+				 kx_str, dh_bits);
+		else
+			snprintf(kx_name, sizeof(kx_name), "%s",
+				 kx_str);
+	} else {
+		strcpy(kx_name, "NULL");
+	}
 
 	type = gnutls_certificate_type_get(session);
 	if (type == GNUTLS_CRT_X509)
