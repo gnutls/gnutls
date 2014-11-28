@@ -1148,7 +1148,7 @@ time_t get_date(const char* date)
         return r.tv_sec;
 }
 
-time_t get_activation_date()
+time_t get_activation_date(void)
 {
 
 	if (batch && cfg.activation_date != NULL) {
@@ -1212,7 +1212,7 @@ time_t get_int_date(const char *txt_val, int int_val, const char *msg)
 	}
 }
 
-time_t get_expiration_date()
+time_t get_expiration_date(void)
 {
 	return get_int_date(cfg.expiration_date, cfg.expiration_days, "The certificate will expire in (days): ");
 }
@@ -1809,7 +1809,7 @@ int get_ipsec_ike_status(void)
 	}
 }
 
-time_t get_crl_next_update()
+time_t get_crl_next_update(void)
 {
 	return get_int_date(NULL, cfg.crl_next_update, "The next CRL will be issued in (days): ");
 }
