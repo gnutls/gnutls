@@ -839,6 +839,9 @@ gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials_t
  * This function returns a string describing the current session.
  * The string is null terminated and allocated using gnutls_malloc().
  *
+ * If initial negotiation is not complete when this function is called,
+ * %NULL will be returned.
+ *
  * Returns: a description of the protocols and algorithms in the current session.
  *
  * Since: 3.1.10
@@ -853,6 +856,9 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 	unsigned dh_bits = 0;
 	unsigned mac_id;
 	char *desc;
+
+	if (session->internals.initial_negotiation_completed == 0)
+		return NULL;
 
 	kx = session->security_parameters.kx_algorithm;
 
