@@ -86,6 +86,8 @@ extern "C" {
  * @GNUTLS_CIPHER_AES_256_GCM: AES in GCM mode with 256-bit keys.
  * @GNUTLS_CIPHER_CAMELLIA_128_GCM: CAMELLIA in GCM mode with 128-bit keys.
  * @GNUTLS_CIPHER_CAMELLIA_256_GCM: CAMELLIA in GCM mode with 256-bit keys.
+ * @GNUTLS_CIPHER_SALSA20_256: Salsa20 with 256-bit keys.
+ * @GNUTLS_CIPHER_ESTREAM_SALSA20_256: Estream's Salsa20 variant with 256-bit keys.
  * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode.
  * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode.
  * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode.
@@ -359,6 +361,8 @@ typedef enum {
  *   recognized.
  * @GNUTLS_A_UNKNOWN_PSK_IDENTITY: The SRP/PSK username is missing
  *   or not known.
+ * @GNUTLS_A_NO_APPLICATION_PROTOCOL: The ALPN protocol requested is
+ *   not supported by the peer.
  *
  * Enumeration of different TLS alerts.
  */
@@ -628,6 +632,8 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm);
  * @GNUTLS_SIGN_DSA_SHA1: Digital signature algorithm DSA with SHA-1
  * @GNUTLS_SIGN_DSA_SHA224: Digital signature algorithm DSA with SHA-224
  * @GNUTLS_SIGN_DSA_SHA256: Digital signature algorithm DSA with SHA-256
+ * @GNUTLS_SIGN_DSA_SHA384: Digital signature algorithm DSA with SHA-384
+ * @GNUTLS_SIGN_DSA_SHA512: Digital signature algorithm DSA with SHA-512
  * @GNUTLS_SIGN_DSA_SHA: Same as %GNUTLS_SIGN_DSA_SHA1.
  * @GNUTLS_SIGN_RSA_MD5: Digital signature algorithm RSA with MD5.
  * @GNUTLS_SIGN_RSA_MD2: Digital signature algorithm RSA with MD2.
