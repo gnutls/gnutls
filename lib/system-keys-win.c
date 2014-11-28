@@ -705,6 +705,7 @@ int get_win_urls(const CERT_CONTEXT *cert, char **cert_url, char **key_url,
 /**
  * gnutls_system_key_iter_get_info:
  * @iter: an iterator of the system keys (must be set to %NULL initially)
+ * @cert_type: A value of gnutls_certificate_type_t which indicates the type of certificate to look for
  * @cert_url: The certificate URL of the pair (may be %NULL)
  * @key_url: The key URL of the pair (may be %NULL)
  * @label: The friendly name (if any) of the pair (may be %NULL)
@@ -716,6 +717,8 @@ int get_win_urls(const CERT_CONTEXT *cert, char **cert_url, char **key_url,
  * and the DER-encoded certificate. When the iteration is complete it will
  * return %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
  *
+ * Typically @cert_type should be %GNUTLS_CRT_X509.
+ *
  * All values set are allocated and must be cleared using gnutls_free(),
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -725,6 +728,7 @@ int get_win_urls(const CERT_CONTEXT *cert, char **cert_url, char **key_url,
  **/
 int
 gnutls_system_key_iter_get_info(gnutls_system_key_iter_t *iter,
+			        unsigned cert_type,
 			        char **cert_url,
 			        char **key_url,
 			        char **label,
@@ -732,6 +736,8 @@ gnutls_system_key_iter_get_info(gnutls_system_key_iter_t *iter,
 			        unsigned int flags)
 {
 	if (ncrypt_init == 0)
+		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+	if (cert_type != GNUTLS_CRT_X509)
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
 	if (*iter == NULL) {

@@ -35,6 +35,7 @@ void gnutls_system_key_iter_deinit(gnutls_system_key_iter_t iter)
 
 int
 gnutls_system_key_iter_get_info(gnutls_system_key_iter_t *iter,
+			        unsigned cert_type,
 			        char **cert_url,
 			        char **key_url,
 			        char **label,

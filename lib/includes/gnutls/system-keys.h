@@ -43,6 +43,7 @@ typedef struct system_key_iter_st *gnutls_system_key_iter_t;
 void gnutls_system_key_iter_deinit(gnutls_system_key_iter_t iter);
 int
 gnutls_system_key_iter_get_info(gnutls_system_key_iter_t *iter,
+			       unsigned cert_type /* gnutls_certificate_type_t */,
 			       char **cert_url,
 			       char **key_url,
 			       char **label,
