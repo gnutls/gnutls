@@ -148,7 +148,7 @@ _ccm_decrypt(struct nettle_cipher_ctx *ctx,
 				    tag_size, length, dst, src);
 }
 
-struct gcm_cast_st { struct gcm_key key; struct gcm_ctx gcm; char xx[1]; };
+struct gcm_cast_st { struct gcm_key key; struct gcm_ctx gcm; unsigned long xx[1]; };
 #define GCM_CTX_GET_KEY(ptr) (&((struct gcm_cast_st*)ptr)->key)
 #define GCM_CTX_GET_CTX(ptr) (&((struct gcm_cast_st*)ptr)->gcm)
 #define GCM_CTX_GET_CIPHER(ptr) ((void*)&((struct gcm_cast_st*)ptr)->xx)
