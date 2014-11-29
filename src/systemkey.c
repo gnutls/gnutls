@@ -155,7 +155,7 @@ static void systemkey_list(FILE * out)
 	char *cert_url, *key_url, *label;
 
 	do {
-		ret = gnutls_system_key_iter_get_info(&iter, &cert_url, &key_url, &label, NULL, 0);
+		ret = gnutls_system_key_iter_get_info(&iter, GNUTLS_CRT_X509, &cert_url, &key_url, &label, NULL, 0);
 		if (ret >= 0) {
 			fprintf(out, "Label:\t%s\nCert:\t%s\nKey:\t%s\n\n", label, cert_url, key_url);
 		}
