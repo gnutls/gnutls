@@ -2610,7 +2610,7 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 	uint8_t serial[128];
 	uint8_t cert_serial[128];
 	size_t serial_size, cert_serial_size;
-	int ncerts, ret, i, j;
+	int ret, j;
 	gnutls_x509_crl_iter_t iter = NULL;
 
 	if (cert == NULL) {
@@ -2646,13 +2646,8 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 		 *   certificate serial we have.
 		 */
 
-		ncerts = gnutls_x509_crl_get_crt_count(crl_list[j]);
-		if (ncerts < 0) {
-			gnutls_assert();
-			return ncerts;
-		}
-
-		for (i = 0; i < ncerts; i++) {
+		iter = NULL;
+		do {
 			serial_size = sizeof(serial);
 			ret =
 			    gnutls_x509_crl_iter_crt_serial(crl_list[j],
@@ -2660,10 +2655,11 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 							    serial,
 							    &serial_size,
 							    NULL);
-
-			if (ret < 0) {
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+				break;
+			} else if (ret < 0) {
 				gnutls_assert();
-				return ret;
+				goto fail;
 			}
 
 			if (serial_size == cert_serial_size) {
@@ -2676,10 +2672,12 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 						     crl_list[j],
 						     GNUTLS_CERT_REVOKED |
 						     GNUTLS_CERT_INVALID);
-					return 1;	/* revoked! */
+					ret = 1;	/* revoked! */
+					goto fail;
 				}
 			}
-		}
+		} while(1);
+
 		gnutls_x509_crl_iter_deinit(iter);
 		iter = NULL;
 
@@ -2688,6 +2686,10 @@ _gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 
 	}
 	return 0;		/* not revoked. */
+
+ fail:
+ 	gnutls_x509_crl_iter_deinit(iter);
+ 	return ret;
 }
 
 
