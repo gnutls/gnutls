@@ -50,7 +50,10 @@ int _gnutls_rnd_init(void);
 
 inline static int _gnutls_rnd_check(void)
 {
-	return _gnutls_rnd_ops.check(gnutls_rnd_ctx);
+	if (_gnutls_rnd_ops.check)
+		return _gnutls_rnd_ops.check(gnutls_rnd_ctx);
+	else
+		return 0;
 }
 
 #ifndef _WIN32
