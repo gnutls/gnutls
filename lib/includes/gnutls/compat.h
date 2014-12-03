@@ -265,25 +265,6 @@ int gnutls_x509_crl_sign(gnutls_x509_crl_t crl,
 			 gnutls_x509_privkey_t issuer_key)
     _GNUTLS_GCC_ATTR_DEPRECATED;
 
-	/* functions to set priority of cipher suites
-	 */
-int gnutls_cipher_set_priority(gnutls_session_t session,
-			       const int *list)
-    _GNUTLS_GCC_ATTR_DEPRECATED;
-int gnutls_mac_set_priority(gnutls_session_t session,
-			    const int *list) _GNUTLS_GCC_ATTR_DEPRECATED;
-int gnutls_compression_set_priority(gnutls_session_t session,
-				    const int *list)
-    _GNUTLS_GCC_ATTR_DEPRECATED;
-int gnutls_kx_set_priority(gnutls_session_t session,
-			   const int *list) _GNUTLS_GCC_ATTR_DEPRECATED;
-int gnutls_protocol_set_priority(gnutls_session_t session,
-				 const int *list)
-    _GNUTLS_GCC_ATTR_DEPRECATED;
-int gnutls_certificate_type_set_priority(gnutls_session_t session,
-					 const int *list)
-    _GNUTLS_GCC_ATTR_DEPRECATED;
-
 /* RSA params 
  */
 int gnutls_rsa_params_init(gnutls_rsa_params_t *
