@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-GNUTLS_1_4
+GNUTLS_3_4
 {
   global:
 	gnutls_alert_get;
@@ -496,11 +496,6 @@ GNUTLS_1_4
 	gnutls_x509_rdn_get;
 	gnutls_x509_rdn_get_by_oid;
 	gnutls_x509_rdn_get_oid;
-};
-
-GNUTLS_2_8
-{
-  global:
 	gnutls_certificate_set_x509_simple_pkcs12_mem;
 	gnutls_x509_crl_get_authority_key_id;
 	gnutls_x509_crl_get_extension_data;
@@ -532,11 +527,6 @@ GNUTLS_2_8
 	gnutls_session_ticket_key_generate;
 	gnutls_session_ticket_enable_client;
 	gnutls_session_ticket_enable_server;
-} GNUTLS_1_4;
-
-GNUTLS_2_10
-{
-  global:
 	gnutls_x509_crt_get_issuer_alt_name2;
 	gnutls_x509_crt_get_issuer_alt_name;
 	gnutls_x509_crt_get_issuer_alt_othername_oid;
@@ -560,11 +550,6 @@ GNUTLS_2_10
 	gnutls_hmac_output;
 	gnutls_certificate_set_verify_function;
 	gnutls_safe_renegotiation_status;
-} GNUTLS_2_8;
-
-GNUTLS_2_12
-{
-  global:
 	gnutls_certificate_set_retrieve_function;
 	gnutls_pkcs11_init;
 	gnutls_pkcs11_deinit;
@@ -650,10 +635,6 @@ GNUTLS_2_12
 	gnutls_certificate_get_issuer;
 	gnutls_x509_crq_verify;
 	gnutls_global_set_time_function;
-} GNUTLS_2_10;
-
-GNUTLS_3_0_0 {
-  global:
 	gnutls_x509_trust_list_verify_crt;
 	gnutls_x509_trust_list_add_crls;
 	gnutls_x509_trust_list_add_cas;
@@ -775,10 +756,6 @@ GNUTLS_3_0_0 {
 	gnutls_certificate_set_x509_system_trust;
 	gnutls_session_set_premaster;
 	gnutls_ocsp_resp_check_crt;
-} GNUTLS_2_12;
-
-GNUTLS_3_1_0 {
-  global:
 	gnutls_pkcs11_get_pin_function;
 	gnutls_pkcs11_obj_list_import_url2;
 	gnutls_x509_trust_list_add_system_trust;
@@ -1066,9 +1043,11 @@ GNUTLS_3_1_0 {
 	gnutls_system_key_add_x509;
 	gnutls_register_custom_url;
 	gnutls_pcert_import_x509_list;
-} GNUTLS_3_0_0;
+  local:
+	*;
+};
 
-GNUTLS_FIPS140 {
+GNUTLS_FIPS140_3_4 {
 	gnutls_cipher_self_test;
 	gnutls_pk_self_test;
 	gnutls_mac_self_test;
@@ -1138,6 +1117,4 @@ GNUTLS_PRIVATE {
 	_gnutls_pkcs12_string_to_key;
 	_gnutls_mac_to_entry;
 	_gnutls_bin2hex;
-  local:
-	*;
 };
