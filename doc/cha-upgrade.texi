@@ -129,7 +129,7 @@ however, several deprecated functions were removed, and are listed below.
 @headitem Old function @tab Replacement
 
 @item @funcintref{gnutls_certificate_client_set_retrieve_function},
-@funcintref{gnutls_certificate_server_set_retrieve_function
+@funcintref{gnutls_certificate_server_set_retrieve_function}
 @tab @funcref{gnutls_certificate_set_retrieve_function}
 
 @item @funcintref{gnutls_certificate_set_rsa_export_params},
