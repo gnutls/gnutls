@@ -213,14 +213,6 @@ typedef int (*gnutls_sign_func) (gnutls_session_t session,
 				 const gnutls_datum_t * hash,
 				 gnutls_datum_t * signature);
 
-void
-gnutls_sign_callback_set(gnutls_session_t session,
-			 gnutls_sign_func sign_func,
-			 void *userdata) _GNUTLS_GCC_ATTR_DEPRECATED;
-gnutls_sign_func
-gnutls_sign_callback_get(gnutls_session_t session,
-			 void **userdata) _GNUTLS_GCC_ATTR_DEPRECATED;
-
 /* This is a very dangerous and error-prone function.
  * Use gnutls_privkey_sign_hash() instead.
  */
