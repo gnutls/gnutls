@@ -78,7 +78,7 @@ COBJECTS = gnutls_range.c gnutls_record.c \
 	gnutls_mem.c gnutls_ui.c vasprintf.c vasprintf.h		\
 	gnutls_sig.c gnutls_ecc.c gnutls_alert.c gnutls_privkey_raw.c	\
 	system.c gnutls_str.c gnutls_state.c gnutls_x509.c		\
-	gnutls_rsa_export.c gnutls_helper.c gnutls_supplemental.c	\
+	gnutls_helper.c gnutls_supplemental.c	\
 	random.c crypto-api.c gnutls_privkey.c gnutls_pcert.c		\
 	gnutls_pubkey.c locks.c gnutls_dtls.c system_override.c	\
 	crypto-backend.c verify-tofu.c pin.c tpm.c fips.c \

@@ -775,61 +775,6 @@ gnutls_ocsp_status_request_is_checked(gnutls_session_t session,
 	return session->internals.ocsp_check_ok;
 }
 
-#ifdef ENABLE_RSA_EXPORT
-
-/**
- * gnutls_rsa_export_get_pubkey:
- * @session: is a gnutls session
- * @exponent: will hold the exponent.
- * @modulus: will hold the modulus.
- *
- * This function will return the peer's public key exponent and
- * modulus used in the last RSA-EXPORT authentication.  The output
- * parameters must be freed with gnutls_free().
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
- *   an error code is returned.
- **/
-int
-gnutls_rsa_export_get_pubkey(gnutls_session_t session,
-			     gnutls_datum_t * exponent,
-			     gnutls_datum_t * modulus)
-{
-	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-}
-
-/**
- * gnutls_rsa_export_get_modulus_bits:
- * @session: is a gnutls session
- *
- * Get the export RSA parameter's modulus size.
- *
- * Returns: The bits used in the last RSA-EXPORT key exchange with the
- *   peer, or a negative error code in case of error.
- **/
-int gnutls_rsa_export_get_modulus_bits(gnutls_session_t session)
-{
-	return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-}
-
-/**
- * gnutls_certificate_set_rsa_export_params:
- * @res: is a gnutls_certificate_credentials_t structure
- * @rsa_params: is a structure that holds temporary RSA parameters.
- *
- * This function will set the temporary RSA parameters for a
- * certificate server to use.  These parameters will be used in
- * RSA-EXPORT cipher suites.
- **/
-void
-gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials_t
-					 res,
-					 gnutls_rsa_params_t rsa_params)
-{
-	return;
-}
-#endif
-
 #define DESC_SIZE 64
 
 /**
