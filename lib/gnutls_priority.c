@@ -637,7 +637,7 @@ static const struct priority_groups_st pgroups[] =
 	}
 
 #define SET_LEVEL(to_set) \
-		if (priority_cache->level == 0 || priority_cache->level > to_set) \
+		if (priority_cache->level == 0 || (unsigned)priority_cache->level > (unsigned)to_set) \
 			priority_cache->level = to_set
 
 static
