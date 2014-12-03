@@ -40,7 +40,6 @@ GNUTLS_3_4
 	gnutls_certificate_activation_time_peers;
 	gnutls_certificate_allocate_credentials;
 	gnutls_certificate_client_get_request_status;
-	gnutls_certificate_client_set_retrieve_function;
 	gnutls_certificate_expiration_time_peers;
 	gnutls_certificate_free_ca_names;
 	gnutls_certificate_free_cas;
@@ -51,7 +50,6 @@ GNUTLS_3_4
 	gnutls_certificate_get_peers;
 	gnutls_certificate_send_x509_rdn_sequence;
 	gnutls_certificate_server_set_request;
-	gnutls_certificate_server_set_retrieve_function;
 	gnutls_certificate_set_dh_params;
 	gnutls_certificate_set_openpgp_key;
 	gnutls_certificate_set_openpgp_key_file2;
@@ -61,7 +59,6 @@ GNUTLS_3_4
 	gnutls_certificate_set_openpgp_keyring_file;
 	gnutls_certificate_set_openpgp_keyring_mem;
 	gnutls_certificate_set_params_function;
-	gnutls_certificate_set_rsa_export_params;
 	gnutls_certificate_set_verify_flags;
 	gnutls_certificate_set_verify_limits;
 	gnutls_certificate_set_x509_crl;
@@ -78,7 +75,6 @@ GNUTLS_3_4
 	gnutls_certificate_type_get_id;
 	gnutls_certificate_type_get_name;
 	gnutls_certificate_type_list;
-	gnutls_certificate_type_set_priority;
 	gnutls_certificate_verify_peers2;
 	gnutls_check_version;
 	gnutls_cipher_get;
@@ -86,14 +82,12 @@ GNUTLS_3_4
 	gnutls_cipher_get_key_size;
 	gnutls_cipher_get_name;
 	gnutls_cipher_list;
-	gnutls_cipher_set_priority;
 	gnutls_cipher_suite_get_name;
 	gnutls_cipher_suite_info;
 	gnutls_compression_get;
 	gnutls_compression_get_id;
 	gnutls_compression_get_name;
 	gnutls_compression_list;
-	gnutls_compression_set_priority;
 	gnutls_credentials_clear;
 	gnutls_credentials_set;
 	gnutls_db_check_entry;
@@ -142,13 +136,11 @@ GNUTLS_3_4
 	gnutls_kx_get_id;
 	gnutls_kx_get_name;
 	gnutls_kx_list;
-	gnutls_kx_set_priority;
 	gnutls_mac_get;
 	gnutls_mac_get_id;
 	gnutls_mac_get_key_size;
 	gnutls_mac_get_name;
 	gnutls_mac_list;
-	gnutls_mac_set_priority;
 	gnutls_malloc;
 	gnutls_openpgp_crt_check_hostname;
 	gnutls_openpgp_crt_deinit;
@@ -269,7 +261,6 @@ GNUTLS_3_4
 	gnutls_protocol_get_name;
 	gnutls_protocol_get_version;
 	gnutls_protocol_list;
-	gnutls_protocol_set_priority;
 	gnutls_psk_allocate_client_credentials;
 	gnutls_psk_allocate_server_credentials;
 	gnutls_psk_client_get_hint;
@@ -293,16 +284,6 @@ GNUTLS_3_4
 	gnutls_record_send;
 	gnutls_record_set_max_size;
 	gnutls_rehandshake;
-	gnutls_rsa_export_get_modulus_bits;
-	gnutls_rsa_export_get_pubkey;
-	gnutls_rsa_params_cpy;
-	gnutls_rsa_params_deinit;
-	gnutls_rsa_params_export_pkcs1;
-	gnutls_rsa_params_export_raw;
-	gnutls_rsa_params_generate2;
-	gnutls_rsa_params_import_pkcs1;
-	gnutls_rsa_params_import_raw;
-	gnutls_rsa_params_init;
 	gnutls_secure_malloc;
 	gnutls_server_name_get;
 	gnutls_server_name_set;
@@ -316,8 +297,6 @@ GNUTLS_3_4
 	gnutls_session_set_ptr;
 	gnutls_set_default_export_priority;
 	gnutls_set_default_priority;
-	gnutls_sign_callback_get;
-	gnutls_sign_callback_set;
 	gnutls_sign_get_id;
 	gnutls_sign_get_name;
 	gnutls_sign_list;
@@ -469,7 +448,6 @@ GNUTLS_3_4
 	gnutls_x509_crt_sign2;
 	gnutls_x509_crt_sign;
 	gnutls_x509_crt_verify;
-	gnutls_x509_crt_verify_data;
 	gnutls_x509_dn_deinit;
 	gnutls_x509_dn_export;
 	gnutls_x509_dn_get_rdn_ava;
@@ -523,7 +501,6 @@ GNUTLS_3_4
 	gnutls_x509_crq_set_subject_alt_name;
 	gnutls_x509_crt_get_verify_algorithm;
 	gnutls_x509_crt_set_crq_extensions;
-	gnutls_x509_crt_verify_hash;
 	gnutls_session_ticket_key_generate;
 	gnutls_session_ticket_enable_client;
 	gnutls_session_ticket_enable_server;

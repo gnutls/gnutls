@@ -120,3 +120,47 @@ however there few changes in semantics which are listed below.
 
 @end multitable
 
+@heading Upgrading to 3.4.x from 3.3.x
+
+GnuTLS 3.4.x is source compatible with GnuTLS 3.3.x releases;
+however, several deprecated functions were removed, and are listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item @funcintref{gnutls_certificate_client_set_retrieve_function},
+@funcintref{gnutls_certificate_server_set_retrieve_function
+@tab @funcref{gnutls_certificate_set_retrieve_function}
+
+@item @funcintref{gnutls_certificate_set_rsa_export_params},
+@funcintref{gnutls_rsa_export_get_modulus_bits},
+@funcintref{gnutls_rsa_export_get_pubkey},
+@funcintref{gnutls_rsa_params_cpy},
+@funcintref{gnutls_rsa_params_deinit},
+@funcintref{gnutls_rsa_params_export_pkcs1},
+@funcintref{gnutls_rsa_params_export_raw},
+@funcintref{gnutls_rsa_params_generate2},
+@funcintref{gnutls_rsa_params_import_pkcs1},
+@funcintref{gnutls_rsa_params_import_raw},
+@funcintref{gnutls_rsa_params_init}
+@tab No replacement; the library does not support the RSA-EXPORT ciphersuites.
+
+@item @funcintref{gnutls_certificate_type_set_priority},
+@funcintref{gnutls_cipher_set_priority},
+@funcintref{gnutls_compression_set_priority},
+@funcintref{gnutls_kx_set_priority},
+@funcintref{gnutls_mac_set_priority},
+@funcintref{gnutls_protocol_set_priority}
+@tab @funcref{gnutls_priority_set_direct}.
+
+@item @funcintref{gnutls_sign_callback_get},
+@funcintref{gnutls_sign_callback_set}
+@tab @funcref{gnutls_privkey_import_ext3}
+
+@item @funcintref{gnutls_x509_crt_verify_hash}
+@tab @funcref{gnutls_pubkey_verify_hash2}
+
+@item @funcintref{gnutls_x509_crt_verify_data}
+@tab @funcref{gnutls_pubkey_verify_data2}
+
+@end multitable

@@ -116,6 +116,29 @@ gnutls_system_key_iter_get_info: Added
 gnutls_system_key_delete: Added
 gnutls_system_key_add_x509: Added
 gnutls_register_custom_url: Added
+gnutls_certificate_client_set_retrieve_function: Removed
+gnutls_certificate_server_set_retrieve_function: Removed
+gnutls_certificate_set_rsa_export_params: Removed
+gnutls_certificate_type_set_priority: Removed
+gnutls_cipher_set_priority: Removed
+gnutls_compression_set_priority: Removed
+gnutls_kx_set_priority: Removed
+gnutls_mac_set_priority: Removed
+gnutls_protocol_set_priority: Removed
+gnutls_rsa_export_get_modulus_bits: Removed
+gnutls_rsa_export_get_pubkey: Removed
+gnutls_rsa_params_cpy: Removed
+gnutls_rsa_params_deinit: Removed
+gnutls_rsa_params_export_pkcs1: Removed
+gnutls_rsa_params_export_raw: Removed
+gnutls_rsa_params_generate2: Removed
+gnutls_rsa_params_import_pkcs1: Removed
+gnutls_rsa_params_import_raw: Removed
+gnutls_rsa_params_init: Removed
+gnutls_sign_callback_get: Removed
+gnutls_sign_callback_set: Removed
+gnutls_x509_crt_verify_data: Removed
+gnutls_x509_crt_verify_hash: Removed
 
 
 * Version 3.3.6 (released 2014-07-23)
