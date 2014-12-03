@@ -404,32 +404,6 @@ get_issuers(gnutls_session_t session,
 	return 0;
 }
 
-static void st_to_st2(gnutls_retr2_st * st2, gnutls_retr_st * st)
-{
-	st2->cert_type = st->type;
-	if (st->type == GNUTLS_CRT_OPENPGP) {
-		st2->key_type = GNUTLS_PRIVKEY_OPENPGP;
-	} else {
-		st2->key_type = GNUTLS_PRIVKEY_X509;
-	}
-	st2->ncerts = st->ncerts;
-	st2->deinit_all = st->deinit_all;
-
-	switch (st2->cert_type) {
-	case GNUTLS_CRT_OPENPGP:
-		st2->cert.pgp = st->cert.pgp;
-		st2->key.pgp = st->key.pgp;
-		break;
-	case GNUTLS_CRT_X509:
-		st2->cert.x509 = st->cert.x509;
-		st2->key.x509 = st->key.x509;
-		break;
-	default:
-		return;
-	}
-
-}
-
 /* Calls the client get callback.
  */
 static int
@@ -486,31 +460,8 @@ call_get_cert_callback(gnutls_session_t session,
 					    pk_algos_length, &st2);
 
 	} else {		/* compatibility mode */
-		gnutls_retr_st st;
-		memset(&st, 0, sizeof(st));
-		if (session->security_parameters.entity == GNUTLS_SERVER) {
-			if (cred->server_get_cert_callback == NULL) {
-				gnutls_assert();
-				return GNUTLS_E_INTERNAL_ERROR;
-			}
-			ret = cred->server_get_cert_callback(session, &st);
-			if (ret >= 0)
-				st_to_st2(&st2, &st);
-		} else {	/* CLIENT */
-
-			if (cred->client_get_cert_callback == NULL) {
-				gnutls_assert();
-				return GNUTLS_E_INTERNAL_ERROR;
-			}
-			ret = cred->client_get_cert_callback(session,
-							     issuers_dn,
-							     issuers_dn_length,
-							     pk_algos,
-							     pk_algos_length,
-							     &st);
-			if (ret >= 0)
-				st_to_st2(&st2, &st);
-		}
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (ret < 0) {
@@ -655,8 +606,7 @@ select_client_cert(gnutls_session_t session,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if (cred->client_get_cert_callback != NULL
-	    || cred->get_cert_callback != NULL
+	if (cred->get_cert_callback != NULL
 	    || cred->get_cert_callback2 != NULL) {
 
 		/* use a callback to get certificate 
@@ -2010,7 +1960,7 @@ _gnutls_server_select_cert(gnutls_session_t session,
 	/* If the callback which retrieves certificate has been set,
 	 * use it and leave.
 	 */
-	if (cred->server_get_cert_callback || cred->get_cert_callback
+	if (cred->get_cert_callback
 	    || cred->get_cert_callback2) {
 		ret = call_get_cert_callback(session, NULL, 0, NULL, 0);
 		if (ret < 0)

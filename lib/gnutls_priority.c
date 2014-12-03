@@ -1362,30 +1362,6 @@ int gnutls_set_default_priority(gnutls_session_t session)
 }
 
 /**
- * gnutls_set_default_export_priority:
- * @session: is a #gnutls_session_t structure.
- *
- * Sets some default priority on the ciphers, key exchange methods, macs
- * and compression methods.  This function also includes weak algorithms.
- *
- * This is the same as calling:
- *
- * gnutls_priority_set_direct (session, "EXPORT", NULL);
- *
- * This function is kept around for backwards compatibility, but
- * because of its wide use it is still fully supported.  If you wish
- * to allow users to provide a string that specify which ciphers to
- * use (which is recommended), you should use
- * gnutls_priority_set_direct() or gnutls_priority_set() instead.
- *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
- **/
-int gnutls_set_default_export_priority(gnutls_session_t session)
-{
-	return gnutls_priority_set_direct(session, "EXPORT", NULL);
-}
-
-/**
  * gnutls_priority_ecc_curve_list:
  * @pcache: is a #gnutls_prioritity_t structure.
  * @list: will point to an integer list

@@ -160,59 +160,6 @@ typedef gnutls_openpgp_crt_t gnutls_openpgp_key_t
 #define LIBGNUTLS_VERSION_NUMBER GNUTLS_VERSION_NUMBER
 #define LIBGNUTLS_EXTRA_VERSION GNUTLS_VERSION
 
-/* The gnutls_retr_st was deprecated by gnutls_certificate_retrieve_function()
- * and gnutls_retr2_st.
- */
-typedef struct gnutls_retr_st {
-	gnutls_certificate_type_t type;
-	union {
-		gnutls_x509_crt_t *x509;
-		gnutls_openpgp_crt_t pgp;
-	} cert;
-	unsigned int ncerts;	/* one for pgp keys */
-
-	union {
-		gnutls_x509_privkey_t x509;
-		gnutls_openpgp_privkey_t pgp;
-	} key;
-
-	unsigned int deinit_all;	/* if non zero all keys will be deinited */
-} gnutls_retr_st;
-
-typedef int
-gnutls_certificate_client_retrieve_function(gnutls_session_t,
-					    const
-					    gnutls_datum_t *
-					    req_ca_rdn,
-					    int nreqs, const
-					    gnutls_pk_algorithm_t
-					    * pk_algos, int
-					    pk_algos_length,
-					    gnutls_retr_st *);
-typedef int
-gnutls_certificate_server_retrieve_function(gnutls_session_t,
-					    gnutls_retr_st *);
-
-void gnutls_certificate_client_set_retrieve_function
-    (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_client_retrieve_function *
-     func) _GNUTLS_GCC_ATTR_DEPRECATED;
-void
- gnutls_certificate_server_set_retrieve_function
-    (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_server_retrieve_function *
-     func) _GNUTLS_GCC_ATTR_DEPRECATED;
-
-	/* External signing callback.  No longer supported because it
-	 * was deprecated by the PKCS #11 API or gnutls_privkey_import_ext. */
-typedef int (*gnutls_sign_func) (gnutls_session_t session,
-				 void *userdata,
-				 gnutls_certificate_type_t
-				 cert_type,
-				 const gnutls_datum_t * cert,
-				 const gnutls_datum_t * hash,
-				 gnutls_datum_t * signature);
-
 /* This is a very dangerous and error-prone function.
  * Use gnutls_privkey_sign_hash() instead.
  */
