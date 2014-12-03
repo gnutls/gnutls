@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 3.4.0 (unreleased)
 
+** libgnutls: Depend on nettle 3.0.
+
 ** libgnutls: Use getrandom() or getentropy() when available. That
 avoids the complexity of file descriptor handling and the issues with
 applications closing all open file descriptors.
@@ -43,6 +45,8 @@ GNUTLS_CERT_PURPOSE_MISMATCH is also introduced.
 
 ** libgnutls: Added support for the extended master secret
 (triple-handshake fix) following draft-ietf-tls-session-hash-02.
+
+** libgnutls: Added support for AES-CCM.
 
 ** libgnutls: Added a new simple and hard to misuse AEAD API (crypto.h).
 
