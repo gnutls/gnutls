@@ -72,13 +72,7 @@
 
            ;; priorities
            set-session-priorities!
-
-           ;; priority functions (deprecated)
-           set-session-cipher-priority! set-session-mac-priority!
-           set-session-compression-method-priority!
-           set-session-kx-priority! set-session-protocol-priority!
-           set-session-certificate-type-priority!
-           set-session-default-priority! set-session-default-export-priority!
+           set-session-default-priority!
 
            ;; DH
            set-session-dh-prime-bits!
