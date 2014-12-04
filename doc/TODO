@@ -3,19 +3,15 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* Check https://github.com/yymax/x509test and evaluate whether it makes
+  sense to include it in our self tests.
 * Handle openconnect's TSS files in gnutls_certificate_set_x509_key_file().
-* Deprecate GNUTLS_E_CERTIFICATE_LIST_UNSORTED, and automatically sort
-  input chains in gnutls_certificate_set_x509_key_*.
 * gnutls-cli: Allow separation of the connecting IP and the hostname to
   advertize or check. That is, allow specifying an IP to connect to and
   a hostname to check.
 * Allow setting a fixed key on the anonymous key exchange methods (to allow
   it being used with the tofu API).
 * Allow the manipulation of certificates, i.e., allow to remove fields.
-* Add an authenticated-encryption API.
-* Think about supporting the groups in RFC3526 and RFC5114. If other
-  implementations use them too we may be able to achieve some speedups
-  in DH (by knowing q).
 * Handle the following X.509 extensions:
    2.5.29.36: Policy Constraints
    2.5.29.33: Policy Mappings
