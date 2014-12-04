@@ -1,5 +1,5 @@
 ;;; GnuTLS-extra --- Guile bindings for GnuTLS-EXTRA.
-;;; Copyright (C) 2007-2013 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2014 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS-extra is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -46,10 +46,6 @@
 (define (import-key import-proc file)
   (import-something import-proc file openpgp-certificate-format/base64))
 
-(define (import-rsa-params file)
-  (import-something pkcs1-import-rsa-parameters file
-                    x509-certificate-format/pem))
-
 (define (import-dh-params file)
   (import-something pkcs3-import-dh-parameters file
                     x509-certificate-format/pem))
@@ -87,7 +83,6 @@
                 (primitive-exit))
 
               (let ((server (make-session connection-end/server))
-                    (rsa    (import-rsa-params "rsa-parameters.pem"))
                     (dh     (import-dh-params "dh-parameters.pem")))
                 ;; server-side
                 (set-session-priorities! server priorities)
@@ -97,7 +92,6 @@
                 (set-session-transport-fd! server (port->fdes (cdr socket-pair)))
                 (let ((cred (make-certificate-credentials)))
                   (set-certificate-credentials-dh-parameters! cred dh)
-                  (set-certificate-credentials-rsa-export-parameters! cred rsa)
                   (set-certificate-credentials-openpgp-keys! cred pub sec)
                   (set-session-credentials! server cred))
                 (set-session-dh-prime-bits! server 1024)

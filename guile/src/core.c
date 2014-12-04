@@ -1345,107 +1345,7 @@ SCM_DEFINE (scm_gnutls_set_anonymous_server_dh_parameters_x,
 }
 
 #undef FUNC_NAME
-
 
-/* RSA parameters.  */
-
-SCM_DEFINE (scm_gnutls_make_rsa_parameters, "make-rsa-parameters", 1, 0, 0,
-            (SCM bits), "Return new RSA parameters.")
-#define FUNC_NAME s_scm_gnutls_make_rsa_parameters
-{
-  int err;
-  unsigned c_bits;
-  gnutls_rsa_params_t c_rsa_params;
-
-  c_bits = scm_to_uint (bits);
-
-  err = gnutls_rsa_params_init (&c_rsa_params);
-  if (EXPECT_FALSE (err))
-    scm_gnutls_error (err, FUNC_NAME);
-
-  err = gnutls_rsa_params_generate2 (c_rsa_params, c_bits);
-  if (EXPECT_FALSE (err))
-    {
-      gnutls_rsa_params_deinit (c_rsa_params);
-      scm_gnutls_error (err, FUNC_NAME);
-    }
-
-  return (scm_from_gnutls_rsa_parameters (c_rsa_params));
-}
-
-#undef FUNC_NAME
-
-SCM_DEFINE (scm_gnutls_pkcs1_import_rsa_parameters,
-            "pkcs1-import-rsa-parameters",
-            2, 0, 0,
-            (SCM array, SCM format),
-            "Import Diffie-Hellman parameters in PKCS1 format (further "
-            "specified by @var{format}, an @code{x509-certificate-format} "
-            "value) from @var{array} (a homogeneous array) and return a "
-            "new @code{rsa-params} object.")
-#define FUNC_NAME s_scm_gnutls_pkcs1_import_rsa_parameters
-{
-  int err;
-  gnutls_x509_crt_fmt_t c_format;
-  gnutls_rsa_params_t c_rsa_params;
-  scm_t_array_handle c_handle;
-  const char *c_array;
-  size_t c_len;
-  gnutls_datum_t c_datum;
-
-  c_format = scm_to_gnutls_x509_certificate_format (format, 2, FUNC_NAME);
-
-  c_array = scm_gnutls_get_array (array, &c_handle, &c_len, FUNC_NAME);
-  c_datum.data = (unsigned char *) c_array;
-  c_datum.size = c_len;
-
-  err = gnutls_rsa_params_init (&c_rsa_params);
-  if (EXPECT_FALSE (err))
-    {
-      scm_gnutls_release_array (&c_handle);
-      scm_gnutls_error (err, FUNC_NAME);
-    }
-
-  err = gnutls_rsa_params_import_pkcs1 (c_rsa_params, &c_datum, c_format);
-  scm_gnutls_release_array (&c_handle);
-
-  if (EXPECT_FALSE (err))
-    {
-      gnutls_rsa_params_deinit (c_rsa_params);
-      scm_gnutls_error (err, FUNC_NAME);
-    }
-
-  return (scm_from_gnutls_rsa_parameters (c_rsa_params));
-}
-
-#undef FUNC_NAME
-
-SCM_DEFINE (scm_gnutls_pkcs1_export_rsa_parameters,
-            "pkcs1-export-rsa-parameters",
-            2, 0, 0,
-            (SCM rsa_params, SCM format),
-            "Export Diffie-Hellman parameters @var{rsa_params} in PKCS1 "
-            "format according for @var{format} (an "
-            "@code{x509-certificate-format} value).  Return a "
-            "@code{u8vector} containing the result.")
-#define FUNC_NAME s_scm_gnutls_pkcs1_export_rsa_parameters
-{
-  SCM result;
-  gnutls_rsa_params_t c_rsa_params;
-  gnutls_x509_crt_fmt_t c_format;
-
-  c_rsa_params = scm_to_gnutls_rsa_parameters (rsa_params, 1, FUNC_NAME);
-  c_format = scm_to_gnutls_x509_certificate_format (format, 2, FUNC_NAME);
-
-  result = pkcs_export_parameters ((pkcs_export_function_t)
-                                   gnutls_rsa_params_export_pkcs1,
-                                   (void *) c_rsa_params,
-                                   c_format, FUNC_NAME);
-
-  return (result);
-}
-
-#undef FUNC_NAME
 
 
 /* Certificate credentials.  */
@@ -1564,28 +1464,6 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_dh_params_x,
 
   gnutls_certificate_set_dh_params (c_cred, c_dh_params);
   register_weak_reference (cred, dh_params);
-
-  return SCM_UNSPECIFIED;
-}
-
-#undef FUNC_NAME
-
-SCM_DEFINE (scm_gnutls_set_certificate_credentials_rsa_export_params_x,
-            "set-certificate-credentials-rsa-export-parameters!",
-            2, 0, 0,
-            (SCM cred, SCM rsa_params),
-            "Use RSA parameters @var{rsa_params} for certificate "
-            "credentials @var{cred}.")
-#define FUNC_NAME s_scm_gnutls_set_certificate_credentials_rsa_export_params_x
-{
-  gnutls_rsa_params_t c_rsa_params;
-  gnutls_certificate_credentials_t c_cred;
-
-  c_cred = scm_to_gnutls_certificate_credentials (cred, 1, FUNC_NAME);
-  c_rsa_params = scm_to_gnutls_rsa_parameters (rsa_params, 2, FUNC_NAME);
-
-  gnutls_certificate_set_rsa_export_params (c_cred, c_rsa_params);
-  register_weak_reference (cred, rsa_params);
 
   return SCM_UNSPECIFIED;
 }

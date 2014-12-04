@@ -1,7 +1,7 @@
 ;;; Help produce Guile wrappers for GnuTLS types.
 ;;;
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2014 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -169,10 +169,6 @@
   (make-smob-type "gnutls_dh_params_t" 'dh-parameters
                   "gnutls_dh_params_deinit"))
 
-(define %rsa-parameters-smob
-  (make-smob-type "gnutls_rsa_params_t" 'rsa-parameters
-                  "gnutls_rsa_params_deinit"))
-
 (define %certificate-credentials-smob
   (make-smob-type "gnutls_certificate_credentials_t" 'certificate-credentials
                   "gnutls_certificate_free_credentials"))
@@ -218,7 +214,6 @@
   ;; All SMOB types.
   (list %session-smob %anonymous-client-credentials-smob
         %anonymous-server-credentials-smob %dh-parameters-smob
-        %rsa-parameters-smob
         %certificate-credentials-smob
         %srp-server-credentials-smob %srp-client-credentials-smob
         %psk-server-credentials-smob %psk-client-credentials-smob
