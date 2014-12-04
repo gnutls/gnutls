@@ -61,10 +61,16 @@ AM_CPPFLAGS = \
 
 if HAVE_GCC
 
+AM_CFLAGS = -Wall -Wextra
+
 # Generated `.x' files and Guile's `scm_c_define_gsubr ()' require
 # `-Wno-strict-prototypes'.  This trick makes sure `-Wno-s-p' appears
 # after `-Ws-p'.
-AM_CFLAGS = -Wno-strict-prototypes
+AM_CFLAGS += -Wno-strict-prototypes
+
+# Functions generated from 'SCM_SMOB_PRINT' & co. typically have
+# unused parameters.
+AM_CFLAGS += -Wno-unused-parameter
 
 # The `-fgnu89-inline' option appeared in GCC 4.1.3.
 if HAVE_GCC_GNU89_INLINE_OPTION
