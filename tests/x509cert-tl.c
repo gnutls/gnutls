@@ -194,6 +194,7 @@ void doit(void)
 	gnutls_x509_crt_t server_crt, ca_crt2;
 	gnutls_x509_trust_list_t tl;
 	unsigned int status;
+	gnutls_typed_vdata_st vdata;
 
 	/* this must be called once in the program
 	 */
@@ -213,9 +214,6 @@ void doit(void)
 	path = getenv("X509CERTDIR");
 	if (!path)
 		path = "./x509cert-dir";
-	ret = gnutls_x509_trust_list_add_trust_dir(tl, path, NULL, GNUTLS_X509_FMT_PEM, 0, 0);
-	if (ret != 1)
-		fail("gnutls_x509_trust_list_add_trust_dir: %d\n", ret);
 
 	ret =
 	    gnutls_x509_crt_import(server_crt, &cert, GNUTLS_X509_FMT_PEM);
@@ -231,12 +229,6 @@ void doit(void)
 						 NAME_SIZE, 0);
 	if (ret < 0)
 		fail("gnutls_x509_trust_list_add_named_crt");
-
-	ret =
-	    gnutls_x509_trust_list_verify_crt(tl, &server_crt, 1, 0,
-					      &status, NULL);
-	if (ret < 0 || status != 0)
-		fail("gnutls_x509_trust_list_verify_crt\n");
 
 	ret =
 	    gnutls_x509_trust_list_verify_named_crt(tl, server_crt, NAME,
@@ -261,6 +253,39 @@ void doit(void)
 	if (ret < 0 || status == 0)
 		fail("gnutls_x509_trust_list_verify_named_crt: %d\n",
 		     __LINE__);
+
+	/* check whether the name-only verification works */
+	vdata.type = GNUTLS_DT_DNS_HOSTNAME;
+	vdata.data = (void*)NAME;
+	vdata.size = NAME_SIZE;
+	ret =
+	    gnutls_x509_trust_list_verify_crt2(tl, &server_crt, 1, &vdata, 1,
+					       0, &status, NULL);
+	if (ret < 0 || status != 0)
+		fail("gnutls_x509_trust_list_verify_crt2 - 1: status: %x\n", status);
+
+	vdata.type = GNUTLS_DT_DNS_HOSTNAME;
+	vdata.data = (void*)NAME;
+	vdata.size = NAME_SIZE-2;
+	ret =
+	    gnutls_x509_trust_list_verify_crt2(tl, &server_crt, 1, &vdata, 1,
+					       0, &status, NULL);
+	if (ret < 0 || status == 0)
+		fail("gnutls_x509_trust_list_verify_crt2 - 2: status: %x\n", status);
+
+
+	/* check whether the key verification works */
+	ret = gnutls_x509_trust_list_add_trust_dir(tl, path, NULL, GNUTLS_X509_FMT_PEM, 0, 0);
+	if (ret != 1)
+		fail("gnutls_x509_trust_list_add_trust_dir: %d\n", ret);
+
+	ret =
+	    gnutls_x509_trust_list_verify_crt(tl, &server_crt, 1, 0,
+					      &status, NULL);
+	if (ret < 0 || status != 0)
+		fail("gnutls_x509_trust_list_verify_crt\n");
+
+
 
 	/* test convenience functions in verify-high2.c */
 	data.data = cert_pem;
