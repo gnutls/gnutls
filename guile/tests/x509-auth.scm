@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2013 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2014 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -50,10 +50,6 @@
 (define (import-key import-proc file)
   (import-something import-proc file x509-certificate-format/pem))
 
-(define (import-rsa-params file)
-  (import-something pkcs1-import-rsa-parameters file
-                    x509-certificate-format/pem))
-
 (define (import-dh-params file)
   (import-something pkcs3-import-dh-parameters file
                     x509-certificate-format/pem))
@@ -96,7 +92,6 @@
                 (primitive-exit))
 
               (let ((server (make-session connection-end/server))
-                    (rsa    (import-rsa-params "rsa-parameters.pem"))
                     (dh     (import-dh-params "dh-parameters.pem")))
                 ;; server-side
                 (set-session-default-priority! server)
@@ -114,7 +109,6 @@
                                                "x509-certificate.pem"))
                       (trust-fmt  x509-certificate-format/pem))
                   (set-certificate-credentials-dh-parameters! cred dh)
-                  (set-certificate-credentials-rsa-export-parameters! cred rsa)
                   (set-certificate-credentials-x509-keys! cred (list pub) sec)
                   (set-certificate-credentials-x509-trust-file! cred
                                                                 trust-file

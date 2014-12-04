@@ -286,9 +286,7 @@ procedure applies to session.
 @section Representation of Binary Data
 
 Many procedures operate on binary data.  For instance,
-@code{pkcs3-import-dh-parameters} expects binary data as input and,
-similarly, procedures like @code{pkcs1-export-rsa-parameters} return
-binary data.
+@code{pkcs3-import-dh-parameters} expects binary data as input.
 
 @cindex SRFI-4
 @cindex homogeneous vector
@@ -298,19 +296,20 @@ vectors (@pxref{SRFI-4,,, guile, The GNU Guile Reference Manual}).
 Although any type of homogeneous vector may be used, @code{u8vector}s
 (i.e., vectors of bytes) are highly recommended.
 
-As an example, generating and then exporting RSA parameters in the PEM
-format can be done as follows:
+As an example, generating and then exporting Diffie-Hellman parameters
+in the PEM format can be done as follows:
 
-@findex make-rsa-parameters
-@findex pkcs1-export-rsa-parameters
+@findex make-dh-parameters
+@findex pkcs3-export-dh-parameters
 @vindex x509-certificate-format/pem
 
 @example
-(let* ((rsa-params (make-rsa-parameters 1024))
-       (raw-data
-        (pkcs1-export-rsa-parameters rsa-params
-                                     x509-certificate-format/pem)))
-  (uniform-vector-write raw-data (open-output-file "some-file.pem")))
+(let* ((dh  (make-dh-parameters 1024))
+       (pem (pkcs3-export-dh-parameters dh 
+                                        x509-certificate-format/pem)))
+  (call-with-output-file "some-file.pem"
+    (lambda (port)
+      (uniform-vector-write pem port))))
 @end example
 
 For an example of OpenPGP key import from a file, see @ref{Importing
@@ -579,7 +578,6 @@ Similarly, server-side code would be along these lines:
 (define %certs (list certificate-type/openpgp))
 
 (let ((server (make-session connection-end/server))
-      (rsa    (make-rsa-parameters 1024))
       (dh     (make-dh-parameters 1024)))
   (set-session-default-priority! server)
 
@@ -587,9 +585,8 @@ Similarly, server-side code would be along these lines:
   (set-session-certificate-type-priority! server %certs)
 
   (let ((cred (make-certificate-credentials)))
-    ;; Prepare credentials with RSA and Diffie-Hellman parameters.
+    ;; Prepare credentials with Diffie-Hellman parameters.
     (set-certificate-credentials-dh-parameters! cred dh)
-    (set-certificate-credentials-rsa-export-parameters! cred rsa)
     (set-certificate-credentials-openpgp-keys! cred pub sec)
     (set-session-credentials! server cred))
 
@@ -602,10 +599,6 @@ Similarly, server-side code would be along these lines:
     (bye server close-request/rdwr)))
 @end example
 
-In practice, generating RSA parameters (and Diffie-Hellman parameters)
-can time a long time.  Thus, you may want to generate them once and
-store them in a file for future re-use (@pxref{Guile Reference,
-@code{pkcs1-export-rsa-parameters} and @code{pkcs1-import-rsa-parameters}}).
 
 @node Importing OpenPGP Keys Guile Example
 @section Importing OpenPGP Keys Guile Example
