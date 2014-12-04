@@ -1,5 +1,5 @@
 #  GnuTLS --- Guile bindings for GnuTLS.
-#  Copyright (C) 2007-2012 Free Software Foundation, Inc.
+#  Copyright (C) 2007-2012, 2014 Free Software Foundation, Inc.
 #
 #  GnuTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ documentation_modules = system/documentation/README		\
                         system/documentation/output.scm
 
 EXTRA_DIST = gnutls/build/enums.scm gnutls/build/smobs.scm	\
-	     gnutls/build/utils.scm gnutls/build/priorities.scm	\
+	     gnutls/build/utils.scm				\
 	     gnutls/build/tests.scm				\
 	     gnutls.in						\
              $(documentation_modules)
