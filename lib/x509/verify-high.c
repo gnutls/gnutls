@@ -620,7 +620,9 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
  * This function will add the given certificate to the trusted
  * list and associate it with a name. The certificate will not be
  * be used for verification with gnutls_x509_trust_list_verify_crt()
- * but only with gnutls_x509_trust_list_verify_named_crt().
+ * but with gnutls_x509_trust_list_verify_named_crt() or
+ * gnutls_x509_trust_list_verify_crt2() - the latter only since
+ * GnuTLS 3.4.0 and if a hostname is provided.
  *
  * In principle this function can be used to set individual "server"
  * certificates that are trusted by the user for that specific server
@@ -1058,7 +1060,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * @voutput: will hold the certificate verification output.
  * @func: If non-null will be called on each chain element verification with the output.
  *
- * This function will try to verify the given certificate and return
+ * This function will attempt to verify the given certificate and return
  * its status. The @voutput parameter will hold an OR'ed sequence of
  * %gnutls_certificate_status_t flags. When a chain of @cert_list_size with 
  * more than one certificates is provided, the verification status will apply
@@ -1076,10 +1078,13 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * object identifier (e.g., %GNUTLS_KP_TLS_WWW_SERVER).
  * If a DNS hostname is provided then this function will compare
  * the hostname in the certificate against the given. If names do not match the 
- * %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set.
+ * %GNUTLS_CERT_UNEXPECTED_OWNER status flag will be set. In addition it
+ * will consider certificates provided with gnutls_x509_trust_list_add_named_crt().
+ *
  * If a key purpose OID is provided and the end-certificate contains the extended key
- * usage PKIX extension, it will be required to be have the provided key purpose 
- * or be marked for any purpose, otherwise verification will fail with %GNUTLS_CERT_PURPOSE_MISMATCH status.
+ * usage PKIX extension, it will be required to match the provided OID
+ * or be marked for any purpose, otherwise verification will fail with 
+ * %GNUTLS_CERT_PURPOSE_MISMATCH status.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. Note that verification failure will not result to an
@@ -1102,6 +1107,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	uint32_t hash;
 	gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
 	const char *hostname = NULL, *purpose = NULL;
+	unsigned hostname_size = 0;
 
 	if (cert_list == NULL || cert_list_size < 1)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -1109,8 +1115,25 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	for (i=0;i<elements;i++) {
 		if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
 			hostname = (void*)data[i].data;
+			if (data[i].size > 0) {
+				hostname_size = data[i].size;
+			}
 		} else if (data[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
 			purpose = (void*)data[i].data;
+		}
+	}
+
+	if (hostname) { /* shortcut using the named certs - if any */
+		unsigned vtmp = 0;
+		if (hostname_size == 0)
+			hostname_size = strlen(hostname);
+
+		ret = gnutls_x509_trust_list_verify_named_crt(list,
+					cert_list[0], hostname, hostname_size,
+					flags, &vtmp, func);
+		if (ret == 0 && vtmp == 0) {
+			*voutput = vtmp;
+			return 0;
 		}
 	}
 
@@ -1251,9 +1274,10 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
  * @func: If non-null will be called on each chain element verification with the output.
  *
  * This function will try to find a certificate that is associated with the provided
- * name --see gnutls_x509_trust_list_add_named_crt(). If a match is found the certificate is considered valid. 
- * In addition to that this function will also check CRLs. 
- * The @voutput parameter will hold an OR'ed sequence of %gnutls_certificate_status_t flags.
+ * name --see gnutls_x509_trust_list_add_named_crt(). If a match is found the
+ * certificate is considered valid. In addition to that this function will also 
+ * check CRLs. The @voutput parameter will hold an OR'ed sequence of 
+ * %gnutls_certificate_status_t flags.
  *
  * Additionally a certificate verification profile can be specified
  * from the ones in %gnutls_certificate_verification_profiles_t by
