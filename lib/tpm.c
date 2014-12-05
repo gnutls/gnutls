@@ -722,7 +722,7 @@ static int encode_tpmkey_url(char **url, const TSS_UUID * uuid,
 		goto cleanup;
 	}
 
-	ret = _gnutls_buffer_to_datum(&buf, &dret);
+	ret = _gnutls_buffer_to_datum(&buf, &dret, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

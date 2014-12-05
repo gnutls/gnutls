@@ -155,7 +155,7 @@ _gnutls_session_pack(gnutls_session_t session,
 		goto fail;
 	}
 
-	return _gnutls_buffer_to_datum(&sb, packed_session);
+	return _gnutls_buffer_to_datum(&sb, packed_session, 0);
 
       fail:
 	_gnutls_buffer_clear(&sb);

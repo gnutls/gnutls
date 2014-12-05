@@ -1705,7 +1705,6 @@ gnutls_x509_crt_print(gnutls_x509_crt_t cert,
 		      gnutls_datum_t * out)
 {
 	gnutls_buffer_st str;
-	int ret;
 
 	if (format == GNUTLS_CRT_PRINT_COMPACT) {
 		_gnutls_buffer_init(&str);
@@ -1715,25 +1714,13 @@ gnutls_x509_crt_print(gnutls_x509_crt_t cert,
 		_gnutls_buffer_append_data(&str, "\n", 1);
 		print_keyid(&str, cert);
 
-		_gnutls_buffer_append_data(&str, "\0", 1);
-
-		ret = _gnutls_buffer_to_datum(&str, out);
-		if (out->size > 0)
-			out->size--;
-
-		return ret;
+		return _gnutls_buffer_to_datum(&str, out, 1);
 	} else if (format == GNUTLS_CRT_PRINT_ONELINE) {
 		_gnutls_buffer_init(&str);
 
 		print_oneline(&str, cert);
 
-		_gnutls_buffer_append_data(&str, "\0", 1);
-
-		ret = _gnutls_buffer_to_datum(&str, out);
-		if (out->size > 0)
-			out->size--;
-
-		return ret;
+		return _gnutls_buffer_to_datum(&str, out, 1);
 	} else {
 		_gnutls_buffer_init(&str);
 
@@ -1747,13 +1734,7 @@ gnutls_x509_crt_print(gnutls_x509_crt_t cert,
 
 		print_other(&str, cert, format);
 
-		_gnutls_buffer_append_data(&str, "\0", 1);
-
-		ret = _gnutls_buffer_to_datum(&str, out);
-		if (out->size > 0)
-			out->size--;
-
-		return ret;
+		return _gnutls_buffer_to_datum(&str, out, 1);
 	}
 }
 
@@ -2093,7 +2074,6 @@ gnutls_x509_crl_print(gnutls_x509_crl_t crl,
 		      gnutls_datum_t * out)
 {
 	gnutls_buffer_st str;
-	int ret;
 
 	_gnutls_buffer_init(&str);
 
@@ -2102,13 +2082,7 @@ gnutls_x509_crl_print(gnutls_x509_crl_t crl,
 
 	print_crl(&str, crl, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
-	_gnutls_buffer_append_data(&str, "\0", 1);
-
-	ret = _gnutls_buffer_to_datum(&str, out);
-	if (out->size > 0)
-		out->size--;
-
-	return ret;
+	return _gnutls_buffer_to_datum(&str, out, 1);
 }
 
 static void
@@ -2400,7 +2374,6 @@ gnutls_x509_crq_print(gnutls_x509_crq_t crq,
 		      gnutls_datum_t * out)
 {
 	gnutls_buffer_st str;
-	int ret;
 
 	_gnutls_buffer_init(&str);
 
@@ -2413,13 +2386,7 @@ gnutls_x509_crq_print(gnutls_x509_crq_t crq,
 
 	print_crq_other(&str, crq);
 
-	_gnutls_buffer_append_data(&str, "\0", 1);
-
-	ret = _gnutls_buffer_to_datum(&str, out);
-	if (out->size > 0)
-		out->size--;
-
-	return ret;
+	return _gnutls_buffer_to_datum(&str, out, 1);
 }
 
 static void
@@ -2479,7 +2446,6 @@ gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 		    gnutls_datum_t * out)
 {
 	gnutls_buffer_st str;
-	int ret;
 
 	_gnutls_buffer_init(&str);
 
@@ -2488,13 +2454,7 @@ gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 	print_pubkey(&str, "", pubkey, format);
 	print_pubkey_other(&str, pubkey, format);
 
-	_gnutls_buffer_append_data(&str, "\0", 1);
-
-	ret = _gnutls_buffer_to_datum(&str, out);
-	if (out->size > 0)
-		out->size--;
-
-	return ret;
+	return _gnutls_buffer_to_datum(&str, out, 1);
 }
 
 /**
@@ -2519,7 +2479,6 @@ gnutls_x509_ext_print(gnutls_x509_ext_st *exts, unsigned int exts_size,
 {
 	gnutls_buffer_st str;
 	struct ext_indexes_st idx;
-	int ret;
 	unsigned i;
 
 	memset(&idx, 0, sizeof(idx));
@@ -2528,10 +2487,5 @@ gnutls_x509_ext_print(gnutls_x509_ext_st *exts, unsigned int exts_size,
 	for (i=0;i<exts_size;i++)
 		print_extension(&str, "", &idx, (char*)exts[i].oid, exts[i].critical, &exts[i].data);
 
-	_gnutls_buffer_append_data(&str, "\x00", 1);
-
-	ret = _gnutls_buffer_to_datum(&str, out);
-	if (out->size > 0)
-		out->size--;
-	return ret;
+	return _gnutls_buffer_to_datum(&str, out, 1);
 }

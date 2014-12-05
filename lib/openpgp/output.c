@@ -556,7 +556,6 @@ gnutls_openpgp_crt_print(gnutls_openpgp_crt_t cert,
 			 gnutls_datum_t * out)
 {
 	gnutls_buffer_st str;
-	int ret;
 
 	_gnutls_buffer_init(&str);
 
@@ -574,11 +573,5 @@ gnutls_openpgp_crt_print(gnutls_openpgp_crt_t cert,
 		print_cert(&str, cert);
 	}
 
-	_gnutls_buffer_append_data(&str, "\0", 1);
-
-	ret = _gnutls_buffer_to_datum(&str, out);
-	if (out->size > 0)
-		out->size--;
-
-	return ret;
+	return _gnutls_buffer_to_datum(&str, out, 1);
 }

@@ -189,9 +189,7 @@ gnutls_ocsp_req_print(gnutls_ocsp_req_t req,
 
 	print_req(&str, req);
 
-	_gnutls_buffer_append_data(&str, "\0", 1);
-
-	rc = _gnutls_buffer_to_datum(&str, out);
+	rc = _gnutls_buffer_to_datum(&str, out, 1);
 	if (rc != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
 		return rc;
@@ -656,9 +654,7 @@ gnutls_ocsp_resp_print(gnutls_ocsp_resp_t resp,
 
 	print_resp(&str, resp, format);
 
-	_gnutls_buffer_append_data(&str, "\0", 1);
-
-	rc = _gnutls_buffer_to_datum(&str, out);
+	rc = _gnutls_buffer_to_datum(&str, out, 1);
 	if (rc != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
 		return rc;

@@ -866,7 +866,6 @@ gnutls_certificate_verification_status_print(unsigned int status,
 					     unsigned int flags)
 {
 	gnutls_buffer_st str;
-	int ret;
 
 	_gnutls_buffer_init(&str);
 
@@ -956,9 +955,5 @@ gnutls_certificate_verification_status_print(unsigned int status,
 					  _
 					  ("The name in the certificate does not match the expected. "));
 
-	ret = _gnutls_buffer_to_datum(&str, out);
-	if (out->size > 0)
-		out->size--;
-
-	return ret;
+	return _gnutls_buffer_to_datum(&str, out, 1);
 }

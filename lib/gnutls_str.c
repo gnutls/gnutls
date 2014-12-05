@@ -237,14 +237,22 @@ _gnutls_buffer_pop_datum(gnutls_buffer_st * str, gnutls_datum_t * data,
 /* converts the buffer to a datum if possible. After this call 
  * (failed or not) the buffer should be considered deinitialized.
  */
-int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data)
+int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsigned is_str)
 {
+	int ret;
 
 	if (str->length == 0) {
 		data->data = NULL;
 		data->size = 0;
 		_gnutls_buffer_clear(str);
 		return 0;
+	}
+
+	if (is_str) {
+		ret = _gnutls_buffer_append_data(str, "\x00", 1);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
 	}
 
 	if (str->allocd != str->data) {
@@ -261,6 +269,10 @@ int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data)
 		data->data = str->data;
 		data->size = str->length;
 		_gnutls_buffer_init(str);
+	}
+
+	if (is_str) {
+		data->size--;
 	}
 
 	return 0;

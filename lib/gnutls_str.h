@@ -84,7 +84,7 @@ int _gnutls_buffer_pop_data_prefix(gnutls_buffer_st * buf, void *data,
 
 int _gnutls_buffer_pop_datum_prefix(gnutls_buffer_st * buf,
 				    gnutls_datum_t * data);
-int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data);
+int _gnutls_buffer_to_datum(gnutls_buffer_st * str, gnutls_datum_t * data, unsigned is_str);
 
 int
 _gnutls_buffer_append_escape(gnutls_buffer_st * dest, const void *data,

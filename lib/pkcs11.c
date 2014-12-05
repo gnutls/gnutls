@@ -3778,7 +3778,7 @@ char *gnutls_pkcs11_obj_flags_get_str(unsigned int flags)
 	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
 		_gnutls_buffer_append_str(&str, "CKA_SENSITIVE; ");
 
-	ret = _gnutls_buffer_to_datum(&str, &out);
+	ret = _gnutls_buffer_to_datum(&str, &out, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto fail;
