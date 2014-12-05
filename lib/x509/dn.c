@@ -197,9 +197,13 @@ _gnutls_x509_get_dn(ASN1_TYPE asn1_struct,
 	}
 	while (1);
 
+	DATA_APPEND("\x00", 1);
 	result = _gnutls_buffer_to_datum(&out_str, dn);
 	if (result < 0)
 		gnutls_assert();
+	if (dn->size > 0) {
+		dn->size--;
+	}
 
 	goto cleanup1;
 
