@@ -26,8 +26,17 @@ include('./registry-ciphers.js');
     mac = mac.replace("UMAC-", "UMAC");
     var cipher = cs.cipher.replace("3DES-CBC", "3DES-EDE-CBC");
     var kx = cs.kx.replace("ANON-DH", "DH-ANON").replace("ANON-ECDH", "ECDH-ANON").replace("SRP", "SRP-SHA");
-    if (kx + "-" + cipher + "-" + mac != cs.gnutlsname) {
-      console.log("Broken: ", kx + "-" + cipher + "-" + mac, " ", cs.gnutlsname);
+
+    if (cs.mac == "AEAD" && cipher.indexOf("GCM") == -1) {
+      if (kx + "-" + cipher != cs.gnutlsname) {
+        console.log("Broken AEAD ciphersuite: ", kx + "-" + cipher, " ", cs.gnutlsname);
+        process.exit(1);
+      }
+    } else {
+      if (kx + "-" + cipher + "-" + mac != cs.gnutlsname) {
+        console.log("Broken ciphersuite: ", kx + "-" + cipher + "-" + mac, " ", cs.gnutlsname);
+        process.exit(1);
+      }
     }
     if (cs.name !== i) {
       console.log("Name doesn't match index:", cs.name, i);

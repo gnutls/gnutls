@@ -13,7 +13,8 @@ cd ../../../lib/algorithms/ && gcc -E ciphersuites.c -I.. -I../../ -DHAVE_CONFIG
   | gawk --non-decimal-data '{ if ($5 == "AEAD") { mac = $8; } else { mac = $5; }; sub("UMAC-", "UMAC", mac); sub("DIG-", "", mac); if (mac == "SHA1") { mac = "SHA"; } \
         cipher = $3; sub("ARCFOUR", "RC4", cipher); sub("3DES-CBC", "3DES-EDE-CBC", cipher); \
         kx = $4; if (sub("ANON-", "", kx)) { kx = kx "-anon"; }; sub("SRP", "SRP-SHA", kx); \
-        name = "TLS_" kx "_WITH_" cipher "_" mac; gsub("-", "_", name); printf ("%d#  \"%s\": { id: %s, name: \"%s\", gnutlsname: %s, cipher: \"%s\", kx: \"%s\", mac: \"%s\", min_version: \"%s\", min_dtls_version: \"%s\", prf: \"%s\" },\n", $2, name, $2, name, $1, $3, $4, $5, $6, $7, $8) }' \
+        if ($5 != "AEAD" || cipher ~ /GCM/) { name = "TLS_" kx "_WITH_" cipher "_" mac; } else { name = "TLS_" kx "_WITH_" cipher }; \
+        gsub("-", "_", name); printf ("%d#  \"%s\": { id: %s, name: \"%s\", gnutlsname: %s, cipher: \"%s\", kx: \"%s\", mac: \"%s\", min_version: \"%s\", min_dtls_version: \"%s\", prf: \"%s\" },\n", $2, name, $2, name, $1, $3, $4, $5, $6, $7, $8) }' \
   | sort -n \
   | cut -d'#' -f2- \
   | column -t \
