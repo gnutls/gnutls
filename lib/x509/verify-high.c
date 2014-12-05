@@ -315,6 +315,18 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
 			return i;
 		}
 
+		if (gnutls_x509_crt_get_version(clist[i]) >= 3 &&
+		    gnutls_x509_crt_get_ca_status(clist[i], NULL) <= 0) {
+			gnutls_datum_t dn;
+			gnutls_assert();
+			if (gnutls_x509_crt_get_dn2(clist[i], &dn) >= 0) {
+				_gnutls_audit_log(NULL,
+					  "There was a non-CA certificate in the trusted list: %s.\n",
+					  dn.data);
+				gnutls_free(dn.data);
+			}
+		}
+
 		list->node[hash].trusted_cas[list->node[hash].
 					     trusted_ca_size] = clist[i];
 		list->node[hash].trusted_ca_size++;
