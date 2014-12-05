@@ -3,7 +3,7 @@
 
 echo 'var gnutls_ciphersuites = {'
 
-cd ../../../lib/algorithms/ && gcc -E ciphersuites.c -I.. -DHAVE_LIBNETTLE -I../../gl -DENABLE_DHE -DENABLE_ECDHE -DENABLE_PSK -DENABLE_ANON -DENABLE_SRP \
+cd ../../../lib/algorithms/ && gcc -E ciphersuites.c -I.. -I../../ -DHAVE_CONFIG_H -DHAVE_LIBNETTLE -I../../gl -DENABLE_DHE -DENABLE_ECDHE -DENABLE_PSK -DENABLE_ANON -DENABLE_SRP \
   | awk '/^static const gnutls_cipher_suite_entry cs_algorithms/, /;/ { print; }' \
   | grep '{' | head -n-1 | tail -n+2 \
   | sed -r -e 's#\{ *0x(..), *0x(..) *\}#0x\1\2#;s# *\{ *"#"#;s#\}##;s#, +# #g' \
