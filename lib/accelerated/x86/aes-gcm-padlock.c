@@ -49,7 +49,7 @@ static void padlock_aes_encrypt(const void *_ctx,
 				size_t length, uint8_t * dst,
 				const uint8_t * src)
 {
-	struct padlock_ctx *ctx = _ctx;
+	struct padlock_ctx *ctx = (void*)_ctx;
 	struct padlock_cipher_data *pce;
 
 	pce = ALIGN16(&ctx->expanded_key);

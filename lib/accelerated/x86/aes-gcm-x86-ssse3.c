@@ -46,7 +46,7 @@ static void x86_aes_encrypt(const void *_ctx,
 				size_t length, uint8_t * dst,
 				const uint8_t * src)
 {
-	AES_KEY *ctx = _ctx;
+	AES_KEY *ctx = (void*)_ctx;
 
 	vpaes_encrypt(src, dst, ctx);
 }
