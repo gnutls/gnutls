@@ -39,6 +39,8 @@ text). This is enabled by default.
 ** libgnutls: The gnutls_handshake() process will enforce a timeout by
 default.
 
+** libgnutls: The priority string EXPORT was removed.
+
 ** libgnutls: If a key purpose (extended key usage) is specified for verification,
 it is applied into intermediate certificates. The verification result
 GNUTLS_CERT_PURPOSE_MISMATCH is also introduced. 
