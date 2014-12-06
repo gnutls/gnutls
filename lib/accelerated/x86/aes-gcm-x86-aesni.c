@@ -43,8 +43,8 @@
  */
 struct gcm_x86_aes_ctx GCM_CTX(AES_KEY);
 
-static void x86_aes_encrypt(void *_ctx,
-				unsigned length, uint8_t * dst,
+static void x86_aes_encrypt(const void *_ctx,
+				size_t length, uint8_t * dst,
 				const uint8_t * src)
 {
 	AES_KEY *ctx = _ctx;

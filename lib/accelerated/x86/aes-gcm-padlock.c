@@ -45,8 +45,8 @@
  */
 struct gcm_padlock_aes_ctx GCM_CTX(struct padlock_ctx);
 
-static void padlock_aes_encrypt(void *_ctx,
-				unsigned length, uint8_t * dst,
+static void padlock_aes_encrypt(const void *_ctx,
+				size_t length, uint8_t * dst,
 				const uint8_t * src)
 {
 	struct padlock_ctx *ctx = _ctx;
