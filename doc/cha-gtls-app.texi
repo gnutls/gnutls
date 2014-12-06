@@ -979,10 +979,6 @@ Means all the NSA Suite B cryptography (RFC5430) ciphersuites
 with an 192 bit security level, as well as the enabling of the corresponding
 verification profile.
 
-@item EXPORT @tab
-This priority string should be treated as deprecated. 
-GnuTLS no longer negotiates 40-bit ciphers.
-
 @item NONE @tab
 Means nothing is enabled.  This disables even protocols and
 compression methods. It should be followed by the

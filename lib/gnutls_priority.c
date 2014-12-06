@@ -531,7 +531,6 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 #define LEVEL_SECURE256 "SECURE256"
 #define LEVEL_SUITEB128 "SUITEB128"
 #define LEVEL_SUITEB192 "SUITEB192"
-#define LEVEL_EXPORT "EXPORT"
 #define LEVEL_LEGACY "LEGACY"
 
 struct priority_groups_st {
@@ -619,14 +618,6 @@ static const struct priority_groups_st pgroups[] =
 	 .sign_list = &sign_priority_default,
 	 .ecc_list = &supported_ecc_normal,
 	 .sec_param = GNUTLS_SEC_PARAM_VERY_WEAK
-	},
-	{.name = LEVEL_EXPORT,
-	 .cipher_list = &cipher_priority_performance,
-	 .mac_list = &mac_priority_normal,
-	 .kx_list = &kx_priority_performance,
-	 .sign_list = &sign_priority_default,
-	 .ecc_list = &supported_ecc_normal,
-	 .sec_param = GNUTLS_SEC_PARAM_EXPORT
 	},
 	{.name = LEVEL_PERFORMANCE,
 	 .cipher_list = &cipher_priority_performance,
@@ -987,9 +978,6 @@ finish:
  *
  * "SUITEB192" means all the NSA SuiteB ciphersuites with security level
  * of 192.
- *
- * "EXPORT" means all ciphersuites are enabled, including the
- * low-security 40 bit ciphers.
  *
  * "NONE" means nothing is enabled.  This disables even protocols and
  * compression methods.
