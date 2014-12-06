@@ -356,6 +356,12 @@ if [ test "$enable_fips" = "yes" ];then
   fi
 fi
 
+AC_ARG_WITH(idn, AS_HELP_STRING([--without-idn],
+                                 [disable support for libidn]),
+            try_libidn="$withval", 
+            try_libidn=yes)
+
+if test "$try_libidn" = yes;then
 PKG_CHECK_MODULES(LIBIDN, libidn >= 0.5.6, [with_libidn=yes], [with_libidn=no])
 if test "$with_libidn" != "no";then
 	AC_DEFINE([HAVE_LIBIDN], 1, [Build IDNA support])
@@ -370,6 +376,9 @@ else
 *** 
 *** libidn was not found. IDNA support will be disabled.
 *** ]])
+fi
+else
+	with_libidn=no
 fi
 
 AM_CONDITIONAL(HAVE_LIBIDN, test "$with_libidn" != "no")
@@ -896,7 +905,7 @@ if features are disabled)
   ECDHE support:        $ac_enable_ecdhe
   Anon auth support:    $ac_enable_anon
   Heartbeat support:    $ac_enable_heartbeat
-  IDNA support:         $libidn
+  IDNA support:         $with_libidn
   Unicode support:      $ac_have_unicode
   Self checks:          $enable_self_checks
   Non-SuiteB curves:    $enable_non_suiteb
