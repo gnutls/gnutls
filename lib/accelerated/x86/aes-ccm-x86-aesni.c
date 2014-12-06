@@ -40,8 +40,6 @@
 
 typedef struct ccm_x86_aes_ctx {
 	AES_KEY key;
-	uint8_t iv[CCM_MAX_NONCE_SIZE];
-	unsigned iv_size;
 } ccm_x86_aes_ctx;
 
 /* CCM mode 
