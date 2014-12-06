@@ -1,0 +1,171 @@
+/*
+ * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ *
+ * Author: Nikos Mavrogiannopoulos
+ *
+ * This file is part of GnuTLS.
+ *
+ * The GnuTLS is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ */
+
+/*
+ * The following code is an implementation of the AES-128-CCM cipher
+ * using AESNI (without PCLMUL)
+ */
+
+#include <gnutls_errors.h>
+#include <gnutls_int.h>
+
+#ifdef HAVE_LIBNETTLE
+
+#include <gnutls/crypto.h>
+#include <gnutls_errors.h>
+#include <aes-x86.h>
+#include <x86-common.h>
+#include <byteswap.h>
+#include <nettle/ccm.h>
+#include <aes-x86.h>
+
+typedef struct ccm_x86_aes_ctx {
+	AES_KEY key;
+	uint8_t iv[CCM_MAX_NONCE_SIZE];
+	unsigned iv_size;
+} ccm_x86_aes_ctx;
+
+/* CCM mode 
+ */
+static void x86_aes_encrypt(const void *_ctx,
+				size_t length, uint8_t * dst,
+				const uint8_t * src)
+{
+	AES_KEY *ctx = (void*)_ctx;
+
+	aesni_ecb_encrypt(src, dst, 16, ctx, 1);
+}
+
+static void x86_aes128_set_encrypt_key(void *_ctx,
+					const uint8_t * key)
+{
+	AES_KEY *ctx = _ctx;
+
+	aesni_set_encrypt_key(key, 16*8, ctx);
+}
+
+static void x86_aes256_set_encrypt_key(void *_ctx,
+					const uint8_t * key)
+{
+	AES_KEY *ctx = _ctx;
+
+	aesni_set_encrypt_key(key, 32*8, ctx);
+}
+
+static int
+aes_ccm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
+		    int enc)
+{
+	/* we use key size to distinguish */
+	if (algorithm != GNUTLS_CIPHER_AES_128_CCM &&
+	    algorithm != GNUTLS_CIPHER_AES_256_CCM)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	*_ctx = gnutls_calloc(1, sizeof(ccm_x86_aes_ctx));
+	if (*_ctx == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	return 0;
+}
+
+static int
+aes_ccm_cipher_setkey(void *_ctx, const void *key, size_t length)
+{
+	struct ccm_x86_aes_ctx *ctx = _ctx;
+
+	if (length == 16) {
+		x86_aes128_set_encrypt_key(&ctx->key, key);
+	} else if (length == 32) {
+		x86_aes256_set_encrypt_key(&ctx->key, key);
+	} else abort();
+
+	return 0;
+}
+
+static int
+aes_ccm_aead_encrypt(void *_ctx,
+			const void *nonce, size_t nonce_size,
+			const void *auth, size_t auth_size,
+			size_t tag_size,
+			const void *plain, size_t plain_size,
+		   	void *encr, size_t encr_size)
+{
+	struct ccm_x86_aes_ctx *ctx = _ctx;
+	/* proper AEAD cipher */
+	if (encr_size < plain_size + tag_size)
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
+	ccm_encrypt_message(&ctx->key, x86_aes_encrypt,
+			    nonce_size, nonce,
+			    auth_size, auth,
+			    tag_size,
+			    tag_size+plain_size, encr,
+			    plain);
+	return 0;
+}
+
+static int
+aes_ccm_aead_decrypt(void *_ctx,
+			const void *nonce, size_t nonce_size,
+			const void *auth, size_t auth_size,
+			size_t tag_size,
+		   	const void *encr, size_t encr_size,
+			void *plain, size_t plain_size)
+{
+	struct ccm_x86_aes_ctx *ctx = _ctx;
+	int ret;
+
+	if (encr_size < tag_size)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	ret = ccm_decrypt_message(&ctx->key, x86_aes_encrypt,
+				  nonce_size, nonce,
+				  auth_size, auth,
+				  tag_size,
+				  encr_size-tag_size, plain,
+				  encr);
+	if (ret == 0)
+		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
+
+	return 0;
+}
+
+
+static void aes_ccm_deinit(void *_ctx)
+{
+	struct ccm_x86_aes_ctx *ctx = _ctx;
+
+	zeroize_temp_key(ctx, sizeof(*ctx));
+	gnutls_free(ctx);
+}
+
+const gnutls_crypto_cipher_st _gnutls_aes_ccm_x86_aesni = {
+	.init = aes_ccm_cipher_init,
+	.setkey = aes_ccm_cipher_setkey,
+	.aead_encrypt = aes_ccm_aead_encrypt,
+	.aead_decrypt = aes_ccm_aead_decrypt,
+	.deinit = aes_ccm_deinit,
+};
+
+#endif

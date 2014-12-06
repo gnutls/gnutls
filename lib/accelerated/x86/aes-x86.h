@@ -44,6 +44,7 @@ void vpaes_decrypt(const unsigned char *in, unsigned char *out, const AES_KEY *k
 
 extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_pclmul;
 extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_x86_aesni;
+extern const gnutls_crypto_cipher_st _gnutls_aes_ccm_x86_aesni;
 extern const gnutls_crypto_cipher_st _gnutls_aes_gcm_x86_ssse3;
 
 extern const gnutls_crypto_cipher_st _gnutls_aes_ssse3;

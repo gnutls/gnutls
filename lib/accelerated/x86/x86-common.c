@@ -526,6 +526,23 @@ void register_x86_intel_crypto(unsigned capabilities)
 		if (ret < 0) {
 			gnutls_assert();
 		}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_128_CCM, 80,
+		     &_gnutls_aes_ccm_x86_aesni);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
+		ret =
+		    gnutls_crypto_single_cipher_register
+		    (GNUTLS_CIPHER_AES_256_CCM, 80,
+		     &_gnutls_aes_ccm_x86_aesni);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+
 #ifdef ASM_X86_64
 		if (check_pclmul()) {
 			/* register GCM ciphers */
@@ -562,8 +579,6 @@ void register_x86_intel_crypto(unsigned capabilities)
 			if (ret < 0) {
 				gnutls_assert();
 			}
-
-
 		}
 #endif
 	}
