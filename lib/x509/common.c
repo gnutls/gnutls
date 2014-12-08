@@ -549,7 +549,7 @@ data2hex(const void *data, size_t data_size,
  *
  */
 
-/* This is an emulations of the struct tm.
+/* This is an emulation of the struct tm.
  * Since we do not use libc's functions, we don't need to
  * depend on the libc structure.
  */
