@@ -3,7 +3,7 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.11 (unreleased)
+* Version 3.3.11 (released 2014-12-11)
 
 ** libgnutls: Corrected regression introduced in 3.3.9 related to
 session renegotiation. Reported by Dan Winship.
