@@ -1090,7 +1090,7 @@ void get_rand_int_value(unsigned char* serial, size_t * size, int64_t cfg_val, c
 		default_serial[0] = cfg_val >> 32;
 		default_serial[1] = cfg_val;
 	} else {
-		unsigned long default_serial_int;
+		uint64_t default_serial_int;
 		char tmsg[256];
 
 #if SIZEOF_LONG < 8
