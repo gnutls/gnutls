@@ -93,7 +93,7 @@ fi
 
 if test "$FIPS" != 1;then
 #-cipher RSA-NULL
-launch_bare_server $$ s_server -cipher NULL -quiet -www -accept $PORT -keyform pem -certform pem -tls1 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -Verify 1 -CAfile $CA_CERT &
+launch_bare_server $$ s_server -cipher NULL-SHA -quiet -www -accept $PORT -keyform pem -certform pem -tls1 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -Verify 1 -CAfile $CA_CERT &
 PID=$!
 wait_server $PID
 
