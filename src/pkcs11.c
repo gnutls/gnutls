@@ -34,6 +34,10 @@
 #include <stdint.h>
 #include <common.h>
 
+#ifdef _WIN32
+# define sleep(x) Sleep(x*1000)
+#endif
+
 static
 char *get_single_token_url(common_info_st * info);
 
