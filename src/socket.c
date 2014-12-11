@@ -149,10 +149,19 @@ ssize_t wait_for_text(int fd, const char *txt, unsigned txt_size)
 	char buf[512];
 	char *p;
 	int ret;
+	fd_set read_fds;
+	struct timeval tv;
 
-	alarm(10);
 	do {
-		ret = recv(fd, buf, sizeof(buf)-1, 0);
+		FD_ZERO(&read_fds);
+		FD_SET(fd, &read_fds);
+		tv.tv_sec = 10;
+		tv.tv_usec = 0;
+		ret = select(fd + 1, &read_fds, NULL, NULL, &tv);
+		if (ret <= 0)
+			ret = -1;
+		else
+			ret = recv(fd, buf, sizeof(buf)-1, 0);
 		if (ret == -1) {
 			fprintf(stderr, "error receiving %s\n", txt);
 			exit(1);
@@ -166,8 +175,6 @@ ssize_t wait_for_text(int fd, const char *txt, unsigned txt_size)
 				break;
 		}
 	} while(ret < (int)txt_size || strncmp(buf, txt, txt_size) != 0);
-
-	alarm(0);
 
 	return ret;
 }
