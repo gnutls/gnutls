@@ -35,7 +35,11 @@ BUILT_SOURCES =					\
 CLEANFILES = $(BUILT_SOURCES)
 
 guileextension_LTLIBRARIES  = guile-gnutls-v-2.la
-guile_gnutls_v_2_la_LDFLAGS = -module
+
+# Use '-module' to build a "dlopenable module", in Libtool terms.
+# Use '-undefined' to placate Libtool on Windows; see
+# <http://lists.gnutls.org/pipermail/gnutls-devel/2014-December/007294.html>.
+guile_gnutls_v_2_la_LDFLAGS = -module -no-undefined
 
 # Linking against GnuTLS.
 GNUTLS_CORE_LIBS  = $(top_builddir)/lib/libgnutls.la
