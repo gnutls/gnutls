@@ -193,7 +193,7 @@ const gnutls_crypto_cipher_st
 int
 gnutls_crypto_rnd_register(int priority, const gnutls_crypto_rnd_st * s)
 {
-	if (crypto_rnd_prio > priority) {
+	if (crypto_rnd_prio >= priority) {
 		memcpy(&_gnutls_rnd_ops, s, sizeof(*s));
 		crypto_rnd_prio = priority;
 		return 0;
