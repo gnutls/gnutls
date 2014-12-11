@@ -1,5 +1,5 @@
 ;;; GnuTLS-extra --- Guile bindings for GnuTLS-EXTRA.
-;;; Copyright (C) 2007-2012 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2014 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS-extra is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@
   ;; Return true if FILE contains a valid keyring encoded in FORMAT.
   (let ((raw-keyring (make-u8vector (file-size file))))
 
-    (uniform-vector-read! raw-keyring (open-input-file file))
+    (uniform-vector-read! raw-keyring (open-file file "rb"))
 
     (let ((keyring (import-openpgp-keyring raw-keyring format))
           (null-id (make-u8vector 8 0)))
