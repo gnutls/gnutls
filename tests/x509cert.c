@@ -213,8 +213,13 @@ void doit(void)
 	dn_size = sizeof(dn);
 	ret = gnutls_x509_crt_get_dn(issuer, dn, &dn_size);
 	if (ret < 0)
-		fail("gnutls_certificate_get_isser");
+		fail("gnutls_certificate_get_dn");
 	gnutls_x509_crt_deinit(issuer);
+
+	if (dn_size != strlen(dn)) {
+		fail("gnutls_x509_crt_get_dn: lengths don't match\n");
+		exit(1);
+	}
 
 	if (debug)
 		fprintf(stderr, "Issuer's DN: %s\n", dn);
