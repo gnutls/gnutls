@@ -1885,7 +1885,7 @@ _ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 	}
 	sigalg = rc;
 
-	rc = _gnutls_x509_get_raw_field2(resp->basicresp, &resp->der, "tbsResponseData", &data);
+	rc = _gnutls_x509_get_raw_dn2(resp->basicresp, &resp->der, "tbsResponseData", &data);
 	if (rc != GNUTLS_E_SUCCESS) {
 		gnutls_assert();
 		goto done;
