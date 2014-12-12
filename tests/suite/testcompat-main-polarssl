@@ -81,6 +81,8 @@ echo ""
 echo "** Modifier: $ADD"
 fi
 
+# SSL 3.0 is disabled in debian's polarssl
+if test 0 = 1;then
 echo "Check SSL 3.0 with RSA ciphersuite"
 launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
 wait_server $PID
@@ -111,6 +113,7 @@ wait
 #
 #kill $PID
 #wait
+fi
 
 #TLS 1.0
 
