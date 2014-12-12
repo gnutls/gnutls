@@ -1395,7 +1395,7 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
 
 /**
  * gnutls_pkcs12_simple_parse:
- * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @p12: should contain a gnutls_pkcs12_t structure
  * @password: optional password used to decrypt the structure, bags and keys.
  * @key: a structure to store the parsed private key.
  * @chain: the corresponding to key certificate chain (may be %NULL)
