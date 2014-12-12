@@ -19,17 +19,6 @@ set-session-certificate-type-priority!
 set-session-default-priority!
 set-session-default-export-priority!
 
-** guile: Remove RSA parameters and related procedures.
-
-This API had been deprecated.  Note that the Guile bindings in GnuTLS
-3.3.11 would fail to build because of this.  Procedures removed:
-
-make-rsa-parameters
-rsa-parameters?
-set-certificate-credentials-rsa-export-parameters!
-pkcs1-import-rsa-parameters
-pkcs1-export-rsa-parameters
-
 ** guile: Fix compilation on MinGW.
 
 Previously only the static version of the 'guile-gnutls-v-2' library
