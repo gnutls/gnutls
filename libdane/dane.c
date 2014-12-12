@@ -744,13 +744,16 @@ verify_ee(const gnutls_datum_t * raw_crt,
  * is set. If a DNSSEC signature is not available for the DANE
  * record then the verify flag %DANE_VERIFY_NO_DNSSEC_DATA is set.
  *
- * Note that the CA constraint only applies for the directly certifying CA
- * and does not account for long CA chains.
- *
  * Due to the many possible options of DANE, there is no single threat
  * model countered. When notifying the user about DANE verification results
  * it may be better to mention: DANE verification did not reject the certificate,
  * rather than mentioning a successful DANE verication.
+ *
+ * Note that this function is designed to be run in addition to
+ * PKIX - certificate chain - verification. To be run independently
+ * the %DANE_VFLAG_ONLY_CHECK_EE_USAGE flag should be specified; 
+ * then the function will check whether the key of the peer matches the
+ * key advertized in the DANE entry.
  *
  * If the @q parameter is provided it will be used for caching entries.
  *
@@ -845,14 +848,16 @@ dane_verify_crt_raw(dane_state_t s,
  * is set. If a DNSSEC signature is not available for the DANE
  * record then the verify flag %DANE_VERIFY_NO_DNSSEC_DATA is set.
  *
- * Note that the CA constraint only applies for the directly certifying CA
- * and does not account for long CA chains. Moreover this function does not
- * validate the provided chain.
- *
  * Due to the many possible options of DANE, there is no single threat
  * model countered. When notifying the user about DANE verification results
  * it may be better to mention: DANE verification did not reject the certificate,
  * rather than mentioning a successful DANE verication.
+ *
+ * Note that this function is designed to be run in addition to
+ * PKIX - certificate chain - verification. To be run independently
+ * the %DANE_VFLAG_ONLY_CHECK_EE_USAGE flag should be specified; 
+ * then the function will check whether the key of the peer matches the
+ * key advertized in the DANE entry.
  *
  * If the @q parameter is provided it will be used for caching entries.
  *
@@ -913,7 +918,7 @@ dane_verify_crt(dane_state_t s,
  * See dane_verify_crt() for more information.
  *
  * This will not verify the chain for validity; unless the DANE
- * verification is restricted to end certificates, this has to
+ * verification is restricted to end certificates, this must be
  * be performed separately using gnutls_certificate_verify_peers3().
  *
  * Returns: On success, %DANE_E_SUCCESS (0) is returned, otherwise a
