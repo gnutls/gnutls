@@ -3,6 +3,14 @@ Copyright (C) 2000-2014 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.2.22 (not released yet!)
+
+** guile: Fix compilation on MinGW.
+
+Previously only the static version of the 'guile-gnutls-v-2' library
+would be built, preventing dynamic loading from Guile.
+
+
 * Version 3.2.21 (released 2014-12-11)
 
 ** libgnutls: Corrected regression introduced in 3.2.19 related to
