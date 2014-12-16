@@ -125,10 +125,6 @@ _gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
 
 			dest->data = dest->allocd;
 		}
-		memmove(&dest->data[dest->length], data, data_size);
-		dest->length = tot_len;
-
-		return tot_len;
 	} else {
 		size_t unused = MEMSUB(dest->data, dest->allocd);
 		size_t new_len =
@@ -146,12 +142,12 @@ _gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
 		if (dest->length && dest->data)
 			memmove(dest->allocd, dest->data, dest->length);
 		dest->data = dest->allocd;
-
-		memcpy(&dest->data[dest->length], data, data_size);
-		dest->length = tot_len;
-
-		return tot_len;
 	}
+
+	memcpy(&dest->data[dest->length], data, data_size);
+	dest->length = tot_len;
+
+	return tot_len;
 }
 
 int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
