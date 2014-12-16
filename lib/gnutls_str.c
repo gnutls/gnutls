@@ -106,6 +106,13 @@ void _gnutls_buffer_clear(gnutls_buffer_st * str)
 
 #define MIN_CHUNK 1024
 
+static void align_allocd_with_data(gnutls_buffer_st * dest)
+{
+	if (dest->length && dest->data)
+		memmove(dest->allocd, dest->data, dest->length);
+	dest->data = dest->allocd;
+}
+
 int
 _gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
 			   size_t data_size)
@@ -119,11 +126,7 @@ _gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
 		size_t unused = MEMSUB(dest->data, dest->allocd);
 
 		if (dest->max_length - unused <= tot_len) {
-			if (dest->length && dest->data)
-				memmove(dest->allocd, dest->data,
-					dest->length);
-
-			dest->data = dest->allocd;
+			align_allocd_with_data(dest);
 		}
 	} else {
 		size_t unused = MEMSUB(dest->data, dest->allocd);
@@ -155,10 +158,7 @@ int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 	if (dest->max_length >= new_size) {
 		size_t unused = MEMSUB(dest->data, dest->allocd);
 		if (dest->max_length - unused <= new_size) {
-			if (dest->length && dest->data)
-				memmove(dest->allocd, dest->data,
-					dest->length);
-			dest->data = dest->allocd;
+			align_allocd_with_data(dest);
 		}
 
 		return 0;
@@ -177,9 +177,7 @@ int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
 		dest->max_length = alloc_len;
 		dest->data = dest->allocd + unused;
 
-		if (dest->length && dest->data)
-			memmove(dest->allocd, dest->data, dest->length);
-		dest->data = dest->allocd;
+		align_allocd_with_data(dest);
 
 		return 0;
 	}
