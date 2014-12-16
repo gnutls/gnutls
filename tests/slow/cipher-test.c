@@ -7,11 +7,17 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include <gnutls/self-test.h>
+#include <signal.h>
 
 /* This does check the AES and SHA implementation against test vectors.
  * This should not run under valgrind in order to use the native
  * cpu instructions (AES-NI or padlock).
  */
+
+static void handle_sigill(int sig)
+{
+	exit(0);
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -31,6 +37,7 @@ int main(int argc, char **argv)
 		gnutls_global_set_log_level(4711);
 
 	global_init();
+	signal(SIGILL, handle_sigill);
 
 	/* ciphers */
 	if (gnutls_cipher_self_test(1, 0) < 0)
