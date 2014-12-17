@@ -26,6 +26,7 @@
 #include <gnutls_str.h>
 #include <stdarg.h>
 #include <c-ctype.h>
+#include <intprops.h>
 #include "vasprintf.h"
 
 /* These functions are like strcat, strcpy. They only
@@ -122,6 +123,11 @@ _gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
 
 	if (data_size == 0)
 		return 0;
+
+	if (unlikely(sizeof(size_t) == 4 &&
+	    INT_ADD_OVERFLOW (((ssize_t)MAX(data_size, MIN_CHUNK)), ((ssize_t)dest->length)))) {
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	}
 
 	if (dest->max_length >= tot_len) {
 
