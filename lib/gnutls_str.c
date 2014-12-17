@@ -118,18 +118,17 @@ _gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
 			   size_t data_size)
 {
 	size_t const tot_len = data_size + dest->length;
+	size_t const unused = MEMSUB(dest->data, dest->allocd);
 
 	if (data_size == 0)
 		return 0;
 
 	if (dest->max_length >= tot_len) {
-		size_t const unused = MEMSUB(dest->data, dest->allocd);
 
 		if (dest->max_length - unused <= tot_len) {
 			align_allocd_with_data(dest);
 		}
 	} else {
-		size_t const unused = MEMSUB(dest->data, dest->allocd);
 		size_t const new_len =
 		    MAX(data_size, MIN_CHUNK) + MAX(dest->max_length,
 						    MIN_CHUNK);
@@ -142,9 +141,7 @@ _gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
 		dest->max_length = new_len;
 		dest->data = dest->allocd + unused;
 
-		if (dest->length && dest->data)
-			memmove(dest->allocd, dest->data, dest->length);
-		dest->data = dest->allocd;
+		align_allocd_with_data(dest);
 	}
 
 	memcpy(&dest->data[dest->length], data, data_size);
