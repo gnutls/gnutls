@@ -33,3 +33,7 @@ Alon Bar-Lev <alon.barlev||gmail.com>
 Armin Burgmeier <armin||arbur.net>
 	16 Sep 2014
 	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7657
+
+Jaak Ristioja <jaak.ristioja||cyber.ee>
+	17 Dec 2014
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7885
