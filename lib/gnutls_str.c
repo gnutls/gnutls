@@ -108,7 +108,7 @@ void _gnutls_buffer_clear(gnutls_buffer_st * str)
 
 static void align_allocd_with_data(gnutls_buffer_st * dest)
 {
-	if (dest->length && dest->data)
+	if (dest->length)
 		memmove(dest->allocd, dest->data, dest->length);
 	dest->data = dest->allocd;
 }
