@@ -1590,9 +1590,8 @@ gnutls_record_send(gnutls_session_t session, const void *data,
  * gnutls_cork:
  * @session: is a #gnutls_session_t structure.
  *
- * If called gnutls_record_send() will no longer send partial records.
- * All queued records will be sent when gnutls_uncork() is called, or
- * when the maximum record size is reached.
+ * If called, gnutls_record_send() will no longer send partial records.
+ * All queued records will be sent when gnutls_uncork() is called.
  *
  * This function is safe to use with DTLS after GnuTLS 3.3.0.
  *
