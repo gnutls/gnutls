@@ -5,24 +5,17 @@ See the end for copying conditions.
 
 * Version 3.3.12 (not released yet!)
 
-** guile: Deprecated priority API has been removed.
+** libgnutls: When negotiating TLS use the lowest enabled version in
+the client hello, rather than the lowest supported. That addresses an
+issue with servers that drop the connections when the encounter SSL 3.0
+as the record version number. See:
+http://lists.gnutls.org/pipermail/gnutls-help/2014-November/003673.html
 
-The old priority API, which had been deprecated for some time, is now
-gone; use 'set-session-priorities!' instead.  Procedures removed:
+** guile: Fix compilation on MinGW. Previously only the static version of the 
+'guile-gnutls-v-2' library would be built, preventing dynamic loading from Guile.
 
-set-session-cipher-priority!
-set-session-mac-priority!
-set-session-compression-method-priority!
-set-session-kx-priority!
-set-session-protocol-priority!
-set-session-certificate-type-priority!
-set-session-default-priority!
-set-session-default-export-priority!
-
-** guile: Fix compilation on MinGW.
-
-Previously only the static version of the 'guile-gnutls-v-2' library
-would be built, preventing dynamic loading from Guile.
+** API and ABI modifications:
+No changes since last version.
 
 
 * Version 3.3.11 (released 2014-12-11)
