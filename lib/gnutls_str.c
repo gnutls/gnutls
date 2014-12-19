@@ -153,7 +153,7 @@ _gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
 	memcpy(&dest->data[dest->length], data, data_size);
 	dest->length = tot_len;
 
-	return tot_len;
+	return 0;
 }
 
 int _gnutls_buffer_resize(gnutls_buffer_st * dest, size_t new_size)
