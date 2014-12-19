@@ -89,11 +89,10 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 		    session->internals.priorities.protocol.priority[i];
 		v = version_to_entry(cur_prot);
 
-		if (v != NULL) {
+		if (v != NULL && version_is_valid_for_session(session, v)) {
 			if (min_v == NULL) {
 				min_v = v;
-			} else if (v->age < min_v->age
-			    && version_is_valid_for_session(session, v)) {
+			} else if (v->age < min_v->age) {
 				min_v = v;
 			}
 		}
