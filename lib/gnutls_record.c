@@ -1606,11 +1606,11 @@ gnutls_record_send(gnutls_session_t session, const void *data,
 }
 
 /**
- * gnutls_cork:
+ * gnutls_record_cork:
  * @session: is a #gnutls_session_t structure.
  *
  * If called, gnutls_record_send() will no longer send any records.
- * Any sent records will be cached until gnutls_uncork() is called.
+ * Any sent records will be cached until gnutls_record_uncork() is called.
  *
  * This function is safe to use with DTLS after GnuTLS 3.3.0.
  *
@@ -1622,11 +1622,11 @@ void gnutls_record_cork(gnutls_session_t session)
 }
 
 /**
- * gnutls_uncork:
+ * gnutls_record_uncork:
  * @session: is a #gnutls_session_t structure.
  * @flags: Could be zero or %GNUTLS_RECORD_WAIT
  *
- * This resets the effect of gnutls_cork(), and flushes any pending
+ * This resets the effect of gnutls_record_cork(), and flushes any pending
  * data. If the %GNUTLS_RECORD_WAIT flag is specified then this
  * function will block until the data is sent or a fatal error
  * occurs (i.e., the function will retry on %GNUTLS_E_AGAIN and
