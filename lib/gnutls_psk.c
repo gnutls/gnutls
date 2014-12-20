@@ -127,16 +127,23 @@ gnutls_psk_set_client_credentials(gnutls_psk_client_credentials_t res,
 		    gnutls_hex_decode(key, (char *) res->key.data, &size);
 		res->key.size = (unsigned int) size;
 		if (ret < 0) {
+			
 			gnutls_assert();
 			goto error;
 		}
 
+		if (size < 4) {
+			gnutls_assert();
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto error;
+		}
 	}
 
 	return 0;
 
       error:
 	_gnutls_free_datum(&res->username);
+	_gnutls_free_datum(&res->key);
 
 	return ret;
 }
