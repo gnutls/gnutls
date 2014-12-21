@@ -33,6 +33,7 @@
 #include <common.h>
 #include "verify-high.h"
 #include "read-file.h"
+#include <pkcs11_int.h>
 
 #include <dirent.h>
 
@@ -175,6 +176,107 @@ int remove_pkcs11_url(gnutls_x509_trust_list_t list, const char *ca_file)
 	}
 	return 0;
 }
+
+/* This function does add a PKCS #11 object URL into trust list. The
+ * CA certificates are imported directly, rather than using it as a
+ * trusted PKCS#11 token.
+ */
+static
+int add_trust_list_pkcs11_object_url(gnutls_x509_trust_list_t list, const char *url, unsigned flags)
+{
+	gnutls_x509_crt_t *xcrt_list = NULL;
+	gnutls_pkcs11_obj_t *pcrt_list = NULL;
+	unsigned int pcrt_list_size = 0, i;
+	int ret;
+	ret =
+	    gnutls_pkcs11_obj_list_import_url2(&pcrt_list, &pcrt_list_size,
+					       url,
+					       GNUTLS_PKCS11_OBJ_ATTR_MATCH,
+					       0);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (pcrt_list_size == 0) {
+		ret = 0;
+		goto cleanup;
+	}
+
+	xcrt_list = gnutls_malloc(sizeof(gnutls_x509_crt_t) * pcrt_list_size);
+	if (xcrt_list == NULL) {
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	ret =
+	    gnutls_x509_crt_list_import_pkcs11(xcrt_list, pcrt_list_size,
+					       pcrt_list, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret =
+	    gnutls_x509_trust_list_add_cas(list, xcrt_list, pcrt_list_size,
+					   flags);
+
+ cleanup:
+	for (i = 0; i < pcrt_list_size; i++)
+		gnutls_pkcs11_obj_deinit(pcrt_list[i]);
+	gnutls_free(pcrt_list);
+	gnutls_free(xcrt_list);
+
+	return ret;
+}
+
+static
+int remove_pkcs11_object_url(gnutls_x509_trust_list_t list, const char *url)
+{
+	gnutls_x509_crt_t *xcrt_list = NULL;
+	gnutls_pkcs11_obj_t *pcrt_list = NULL;
+	unsigned int pcrt_list_size = 0, i;
+	int ret;
+
+	ret =
+	    gnutls_pkcs11_obj_list_import_url2(&pcrt_list, &pcrt_list_size,
+					       url,
+					       GNUTLS_PKCS11_OBJ_ATTR_MATCH,
+					       0);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (pcrt_list_size == 0) {
+		ret = 0;
+		goto cleanup;
+	}
+
+	xcrt_list = gnutls_malloc(sizeof(gnutls_x509_crt_t) * pcrt_list_size);
+	if (xcrt_list == NULL) {
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	ret =
+	    gnutls_x509_crt_list_import_pkcs11(xcrt_list, pcrt_list_size,
+					       pcrt_list, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret =
+	    gnutls_x509_trust_list_remove_cas(list, xcrt_list, pcrt_list_size);
+
+ cleanup:
+	for (i = 0; i < pcrt_list_size; i++) {
+		gnutls_pkcs11_obj_deinit(pcrt_list[i]);
+		if (xcrt_list)
+			gnutls_x509_crt_deinit(xcrt_list[i]);
+	}
+	gnutls_free(pcrt_list);
+	gnutls_free(xcrt_list);
+
+	return ret;
+}
 #endif
 
 
@@ -216,17 +318,24 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 		if (strncmp(ca_file, "pkcs11:", 7) == 0) {
 			unsigned pcrt_list_size = 0;
 
-			if (list->pkcs11_token != NULL)
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-			list->pkcs11_token = gnutls_strdup(ca_file);
+			/* in case of a token URL import it as a PKCS #11 token,
+			 * otherwise import the individual certificates.
+			 */
+			if (is_object_pkcs11_url(ca_file) != 0) {
+				return add_trust_list_pkcs11_object_url(list, ca_file, tl_flags);
+			} else { /* token */
+				if (list->pkcs11_token != NULL)
+					return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+				list->pkcs11_token = gnutls_strdup(ca_file);
 
-			/* enumerate the certificates */
-			ret = gnutls_pkcs11_obj_list_import_url(NULL, &pcrt_list_size,
-				ca_file, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA, 0);
-			if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-				return gnutls_assert_val(ret);
+				/* enumerate the certificates */
+				ret = gnutls_pkcs11_obj_list_import_url(NULL, &pcrt_list_size,
+					ca_file, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA, 0);
+				if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+					return gnutls_assert_val(ret);
 
-			return pcrt_list_size;
+				return pcrt_list_size;
+			}
 		} else
 #endif
 		{
@@ -385,9 +494,11 @@ gnutls_x509_trust_list_remove_trust_file(gnutls_x509_trust_list_t list,
 
 #ifdef ENABLE_PKCS11
 	if (strncmp(ca_file, "pkcs11:", 7) == 0) {
-		ret = remove_pkcs11_url(list, ca_file);
-		if (ret < 0)
-			return gnutls_assert_val(ret);
+		if (is_object_pkcs11_url(ca_file) != 0) {
+			return remove_pkcs11_object_url(list, ca_file);
+		} else { /* token */
+			return remove_pkcs11_url(list, ca_file);
+		}
 	} else
 #endif
 	{
