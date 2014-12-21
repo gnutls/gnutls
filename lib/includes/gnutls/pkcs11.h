@@ -237,27 +237,30 @@ int gnutls_pkcs11_obj_get_info(gnutls_pkcs11_obj_t crt,
 
 /**
  * gnutls_pkcs11_obj_attr_t:
- * @GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL: Specify all certificates in the specified token.
- * @GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED: Specify all certificates marked as trusted in the specified token.
- * @GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA: Specify all certificates marked as trusted and are CAs in the specified token.
- * @GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY: Specify all certificates with a corresponding private key in the specified token.
+ * @GNUTLS_PKCS11_OBJ_ATTR_CRT: Specify all certificates in the specified token.
  * @GNUTLS_PKCS11_OBJ_ATTR_PUBKEY: Specify all public keys in the specified token.
- * @GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY: Specify all private keys in the specified token.
- * @GNUTLS_PKCS11_OBJ_ATTR_ALL: Specify all objects in the specified token.
- * @GNUTLS_PKCS11_OBJ_ATTR_MATCH: Only the objects that match the URL.
+ * @GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED: Restrict to objects which are marked as trusted
+ * @GNUTLS_PKCS11_OBJ_ATTR_MARKED_CA: Restrict to certificates which are marked as CA
+ * @GNUTLS_PKCS11_OBJ_ATTR_WITH_PRIVKEY: Restrict to objects which have a corresponding private key
  *
- * Enumeration of several attributes for object enumeration.
+ * This a list of flags to be used in combination with each other (since GnuTLS 3.4.0). They
+ * are used for matching and obtaining a list of objects.
  */
 typedef enum {
-	GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL = 1,	/* all certificates */
-	GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED,	/* certificates marked as trusted */
-	GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY,	/* certificates with corresponding private key */
-	GNUTLS_PKCS11_OBJ_ATTR_PUBKEY,	/* public keys */
-	GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY,	/* private keys */
-	GNUTLS_PKCS11_OBJ_ATTR_ALL,	/* everything! */
-	GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA,	/* CAs */
-	GNUTLS_PKCS11_OBJ_ATTR_MATCH
+	GNUTLS_PKCS11_OBJ_ATTR_CRT = 1,	/* all certificates */
+	GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED = 1<<1,	/* certificates marked as trusted */
+	GNUTLS_PKCS11_OBJ_ATTR_WITH_PRIVKEY = 1<<2,	/* certificates with corresponding private key */
+	GNUTLS_PKCS11_OBJ_ATTR_PUBKEY = 1<<3,	/* public keys */
+	GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY = 1<<4,	/* private keys */
+	GNUTLS_PKCS11_OBJ_ATTR_MARKED_CA = 1<<5,	/* CAs */
 } gnutls_pkcs11_obj_attr_t;
+
+#define GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL GNUTLS_PKCS11_OBJ_ATTR_CRT
+#define GNUTLS_PKCS11_OBJ_ATTR_MATCH 0 /* always match the given URL */
+#define GNUTLS_PKCS11_OBJ_ATTR_ALL 0 /* match everything! */
+#define GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED (GNUTLS_PKCS11_OBJ_ATTR_CRT|GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED)
+#define GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY (GNUTLS_PKCS11_OBJ_ATTR_CRT|GNUTLS_PKCS11_OBJ_ATTR_WITH_PRIVKEY)
+#define GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA (GNUTLS_PKCS11_OBJ_ATTR_CRT|GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED|GNUTLS_PKCS11_OBJ_ATTR_MARKED_CA)
 
 /**
  * gnutls_pkcs11_token_info_t:

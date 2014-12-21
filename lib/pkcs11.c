@@ -2445,7 +2445,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 	char certid_tmp[PKCS11_ID_SIZE];
 	int ret;
 	struct find_pkey_list_st plist;	/* private key holder */
-	unsigned int i, tot_values = 0;
+	unsigned int i, tot_values = 0, class_set = 0;
 
 	if (tinfo == NULL) {
 		gnutls_assert();
@@ -2462,7 +2462,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 
 	memset(&plist, 0, sizeof(plist));
 
-	if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY) {
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_WITH_PRIVKEY) {
 		ret = find_privkeys(sinfo, tinfo, &plist);
 		if (ret < 0) {
 			gnutls_assert();
@@ -2485,123 +2485,89 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 			type = CKC_X_509;
 	}
 
-	/* Find objects with cert class and X.509 cert type. */
 
-	tot_values = 0;
-
-	if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL
-	    || find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY)
-	{
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_CRT) {
 		class = CKO_CERTIFICATE;
-		type = CKC_X_509;
-		trusted = 1;
 
 		a[tot_values].type = CKA_CLASS;
 		a[tot_values].value = &class;
 		a[tot_values].value_len = sizeof class;
 		tot_values++;
+		class_set = 1;
 
+		type = CKC_X_509;
 		a[tot_values].type = CKA_CERTIFICATE_TYPE;
 		a[tot_values].value = &type;
 		a[tot_values].value_len = sizeof type;
 		tot_values++;
+		_gnutls_assert_log("p11 attrs: CKA_CLASS (CERT), CKA_CERTIFICATE_TYPE\n");
+	}
 
-	} else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_MATCH) {
-		if (class != (ck_object_class_t)-1) {
-			a[tot_values].type = CKA_CLASS;
-			a[tot_values].value = &class;
-			a[tot_values].value_len = sizeof class;
-			tot_values++;
-		}
-
-		attr = p11_kit_uri_get_attribute(find_data->info, CKA_ID);
-		if (attr) {
-			a[tot_values].type = CKA_ID;
-			a[tot_values].value = attr->value;
-			a[tot_values].value_len = attr->value_len;
-			tot_values++;
-		}
-
-		attr = p11_kit_uri_get_attribute(find_data->info, CKA_LABEL);
-		if (attr) {
-			a[tot_values].type = CKA_LABEL;
-			a[tot_values].value = attr->value;
-			a[tot_values].value_len = attr->value_len;
-			tot_values++;
-		}
-	} else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED) {
-		class = CKO_CERTIFICATE;
-		type = CKC_X_509;
-		trusted = 1;
-
-		a[tot_values].type = CKA_CLASS;
-		a[tot_values].value = &class;
-		a[tot_values].value_len = sizeof class;
-		tot_values++;
-
-		a[tot_values].type = CKA_TRUSTED;
-		a[tot_values].value = &trusted;
-		a[tot_values].value_len = sizeof trusted;
-		tot_values++;
-
-	} else if (find_data->flags ==
-		   GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA) {
-		class = CKO_CERTIFICATE;
-		type = CKC_X_509;
-		trusted = 1;
-
-		a[tot_values].type = CKA_CLASS;
-		a[tot_values].value = &class;
-		a[tot_values].value_len = sizeof class;
-		tot_values++;
-
-		a[tot_values].type = CKA_TRUSTED;
-		a[tot_values].value = &trusted;
-		a[tot_values].value_len = sizeof trusted;
-		tot_values++;
-
-		category = 2;
-		a[tot_values].type = CKA_CERTIFICATE_CATEGORY;
-		a[tot_values].value = &category;
-		a[tot_values].value_len = sizeof category;
-		tot_values++;
-	} else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_PUBKEY) {
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_PUBKEY) {
 		class = CKO_PUBLIC_KEY;
 
 		a[tot_values].type = CKA_CLASS;
 		a[tot_values].value = &class;
 		a[tot_values].value_len = sizeof class;
 		tot_values++;
-	} else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY) {
+		class_set = 1;
+		_gnutls_assert_log("p11 attrs: CKA_CLASS (PUBLIC KEY)\n");
+	}
+
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY) {
 		class = CKO_PRIVATE_KEY;
 
 		a[tot_values].type = CKA_CLASS;
 		a[tot_values].value = &class;
 		a[tot_values].value_len = sizeof class;
 		tot_values++;
-	} else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_ALL) {
-		if (class != (ck_object_class_t) - 1) {
-			a[tot_values].type = CKA_CLASS;
-			a[tot_values].value = &class;
-			a[tot_values].value_len = sizeof class;
-			tot_values++;
-		}
-		if (type != (ck_certificate_type_t) - 1) {
-			a[tot_values].type = CKA_CERTIFICATE_TYPE;
-			a[tot_values].value = &type;
-			a[tot_values].value_len = sizeof type;
-			tot_values++;
-		}
-	} else {
-		gnutls_assert();
-		ret = GNUTLS_E_INVALID_REQUEST;
-		goto fail;
+		class_set = 1;
+		_gnutls_assert_log("p11 attrs: CKA_CLASS (PRIVATE KEY)\n");
+	}
+
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED) {
+		trusted = 1;
+		a[tot_values].type = CKA_TRUSTED;
+		a[tot_values].value = &trusted;
+		a[tot_values].value_len = sizeof trusted;
+		tot_values++;
+		_gnutls_assert_log("p11 attrs: CKA_TRUSTED\n");
+	}
+
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_MARKED_CA) {
+		category = 2;
+		a[tot_values].type = CKA_CERTIFICATE_CATEGORY;
+		a[tot_values].value = &category;
+		a[tot_values].value_len = sizeof category;
+		tot_values++;
+		_gnutls_assert_log("p11 attrs: CKA_CERTIFICATE_CATEGORY=CA\n");
+	}
+
+	if (class_set == 0 && class != (ck_object_class_t)-1) {
+		a[tot_values].type = CKA_CLASS;
+		a[tot_values].value = &class;
+		a[tot_values].value_len = sizeof class;
+		tot_values++;
+		class_set = 1;
+		_gnutls_assert_log("p11 attrs: CKA_CLASS\n");
 	}
 
 	attr = p11_kit_uri_get_attribute(find_data->info, CKA_ID);
-	if (attr != NULL) {
-		memcpy(a + tot_values, attr, sizeof(struct ck_attribute));
+	if (attr) {
+		a[tot_values].type = CKA_ID;
+		a[tot_values].value = attr->value;
+		a[tot_values].value_len = attr->value_len;
 		tot_values++;
+		_gnutls_assert_log("p11 attrs: CKA_ID\n");
+	}
+
+	attr = p11_kit_uri_get_attribute(find_data->info, CKA_LABEL);
+	if (attr) {
+		a[tot_values].type = CKA_LABEL;
+		a[tot_values].value = attr->value;
+		a[tot_values].value_len = attr->value_len;
+		tot_values++;
+		_gnutls_assert_log("p11 attrs: CKA_LABEL\n");
 	}
 
 	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a,
@@ -2644,8 +2610,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 				id.size = 0;
 			}
 
-			if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_ALL ||
-			    find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_MATCH) {
+			if (class_set == 0) {
 				a[0].type = CKA_CLASS;
 				a[0].value = &class;
 				a[0].value_len = sizeof class;
@@ -2657,8 +2622,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 				}
 			}
 
-			if (find_data->flags ==
-			    GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY) {
+			if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY) {
 				for (i = 0; i < plist.key_ids_size; i++) {
 					if (plist.key_ids[i].length !=
 					    id.size
