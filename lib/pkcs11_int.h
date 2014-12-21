@@ -309,6 +309,13 @@ _gnutls_pkcs11_get_random(struct ck_function_list *module,
 
 const char *pkcs11_strerror(ck_rv_t rv);
 
+inline static bool is_object_pkcs11_url(const char *url)
+{
+	if (strstr(url, "id=") != 0 || strstr(url, "object=") != 0)
+		return 1;
+	return 0;
+}
+
 #endif				/* ENABLE_PKCS11 */
 
 #endif
