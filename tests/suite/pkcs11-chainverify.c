@@ -33,6 +33,7 @@
 #include <gnutls/x509.h>
 
 #include "../utils.h"
+#include "softhsm.h"
 #include "../test-chains.h"
 
 #define URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
@@ -69,17 +70,15 @@ int pin_func(void* userdata, int attempt, const char* url, const char *label,
 	return -1;
 }
 
-#define LIB1 "/usr/lib64/softhsm/libsofthsm.so"
-#define LIB2 "/usr/lib/softhsm/libsofthsm.so"
-
 void doit(void)
 {
 	int exit_val = 0;
 	size_t i;
 	int ret;
 	FILE *fp;
-	const char *lib;
+	const char *lib, *bin;
 	gnutls_typed_vdata_st vdata[2];
+	char buf[128];
 
 	unsetenv("SOFTHSM_CONF");
 	/* The overloading of time() seems to work in linux (ELF?)
@@ -89,20 +88,9 @@ void doit(void)
 	exit(77);
 #endif
 
-	if (access("/usr/bin/softhsm", X_OK) < 0) {
-		fprintf(stderr, "cannot find softhsm binary\n");
-		exit(77);
-	}
+	bin = softhsm_bin();
 
-	if (access(LIB1, R_OK) == 0) {
-		lib = LIB1;
-	} else if (access(LIB2, R_OK) == 0) {
-		lib = LIB2;
-	} else {
-		fprintf(stderr, "cannot find softhsm module\n");
-		exit(77);
-	}
-
+	lib = softhsm_lib();
 
 	ret = global_init();
 	if (ret != 0) {
@@ -127,7 +115,8 @@ void doit(void)
 
 	setenv("SOFTHSM_CONF", CONFIG, 0);
 
-	system("softhsm --init-token --slot 0 --label test --so-pin 1234 --pin 1234");
+	snprintf(buf, sizeof(buf), "%s --init-token --slot 0 --label test --so-pin 1234 --pin 1234", bin);
+	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
 	if (ret < 0) {

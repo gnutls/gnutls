@@ -34,6 +34,7 @@
 #include <gnutls/x509-ext.h>
 
 #include "../utils.h"
+#include "softhsm.h"
 
 /* Tests whether gnutls_certificate_set_x509_key_file2() will utilize
  * the provided password as PIN when PKCS #11 keys are imported */
@@ -118,15 +119,13 @@ int pin_func(void* userdata, int attempt, const char* url, const char *label,
 	return -1;
 }
 
-#define LIB1 "/usr/lib64/softhsm/libsofthsm.so"
-#define LIB2 "/usr/lib/softhsm/libsofthsm.so"
-
 void doit(void)
 {
+	char buf[128];
 	int exit_val = 0;
 	int ret;
 	FILE *fp;
-	const char *lib;
+	const char *lib, *bin;
 	gnutls_x509_crt_t crt;
 	gnutls_x509_privkey_t key;
 	gnutls_certificate_credentials_t cred;
@@ -139,20 +138,9 @@ void doit(void)
 #ifdef _WIN32
 	exit(77);
 #endif
-	if (access("/usr/bin/softhsm", X_OK) < 0) {
-		fprintf(stderr, "cannot find softhsm binary\n");
-		exit(77);
-	}
+	bin = softhsm_bin();
 
-	if (access(LIB1, R_OK) == 0) {
-		lib = LIB1;
-	} else if (access(LIB2, R_OK) == 0) {
-		lib = LIB2;
-	} else {
-		fprintf(stderr, "cannot find softhsm module\n");
-		exit(77);
-	}
-
+	lib = softhsm_lib();
 
 	ret = global_init();
 	if (ret != 0) {
@@ -178,7 +166,8 @@ void doit(void)
 
 	setenv("SOFTHSM_CONF", CONFIG, 0);
 
-	system("/usr/bin/softhsm --init-token --slot 0 --label test --so-pin "PIN" --pin "PIN);
+	snprintf(buf, sizeof(buf), "%s --init-token --slot 0 --label test --so-pin "PIN" --pin "PIN, bin);
+	system(buf);
 
 	ret = gnutls_pkcs11_add_provider(lib, "trusted");
 	if (ret < 0) {
