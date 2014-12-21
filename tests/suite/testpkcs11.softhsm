@@ -20,10 +20,14 @@
 
 export SOFTHSM_CONF="softhsm-testpkcs11.config"
 
-if test -f /usr/lib/softhsm/libsofthsm.so;then
-	ADDITIONAL_PARAM="--provider /usr/lib/softhsm/libsofthsm.so"
+if test -f /usr/local/lib/softhsm/libsofthsm.so;then
+	ADDITIONAL_PARAM="--provider /usr/local/lib/softhsm/libsofthsm.so"
 else
-	ADDITIONAL_PARAM="--provider /usr/lib64/softhsm/libsofthsm.so"
+	if test -f /usr/lib/softhsm/libsofthsm.so;then
+		ADDITIONAL_PARAM="--provider /usr/lib/softhsm/libsofthsm.so"
+	else
+		ADDITIONAL_PARAM="--provider /usr/lib64/softhsm/libsofthsm.so"
+	fi
 fi
 
 init_card () {
