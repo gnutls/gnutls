@@ -39,6 +39,7 @@
 #define MAX_CHAIN 16
 
 #define URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
+#define OBJ_URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test;object=test-ca0;object-type=cert"
 #define CONFIG "softhsm-issuer2.config"
 
 /* These CAs have the same DN */
@@ -392,13 +393,38 @@ void doit(void)
 	for (j = 0; ca_list[j]; j++) {
 		char name[64];
 		snprintf(name, sizeof(name), "test-ca%d", j);
-		ret = gnutls_pkcs11_copy_x509_crt(URL, certs[j], name, GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
+		ret = gnutls_pkcs11_copy_x509_crt(URL, certs[j], name, GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO);
 		if (ret < 0) {
 			fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
 	}
 
+
+	/* try to extract an issuer when using an object URL 
+	 */
+	gnutls_x509_trust_list_init(&tl, 0);
+
+	ret = gnutls_x509_trust_list_add_trust_file(tl, OBJ_URL, NULL, 0, 0, 0);
+	if (ret != 1) {
+		fail("gnutls_x509_trust_list_add_trust_file (with expl. object 0): %d\n", ret);
+		exit(1);
+	}
+
+	/* extract the issuer of the certificate */
+	ret = gnutls_x509_trust_list_get_issuer(tl, intermediate, &issuer, GNUTLS_TL_GET_COPY);
+	if (ret < 0) {
+		fail("gnutls_x509_trust_list_get_issuer (with expl. object) should have succeeded\n");
+		exit(1);
+	}
+	gnutls_x509_crt_deinit(issuer);
+
+	gnutls_x509_trust_list_deinit(tl, 0);
+
+
+
+	/* Try to extract issuers using PKCS #11 token URL
+	 */
 	gnutls_x509_trust_list_init(&tl, 0);
 
 	ret = gnutls_x509_trust_list_add_trust_file(tl, URL, NULL, 0, 0, 0);
@@ -433,10 +459,13 @@ void doit(void)
 		exit(1);
 	}
 
+
+	gnutls_x509_trust_list_deinit(tl, 0);
+
+	/* deinit */
 	if (debug)
 		printf("\tCleanup...");
 
-	gnutls_x509_trust_list_deinit(tl, 0);
 	gnutls_x509_crt_deinit(intermediate);
 	for (j = 0; ca_list[j]; j++) {
 		gnutls_x509_crt_deinit(certs[j]);
