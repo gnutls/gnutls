@@ -76,6 +76,7 @@ void doit(void)
 	size_t i;
 	int ret;
 	FILE *fp;
+	char buf[128];
 	const char *lib, *bin;
 
 	unsetenv("SOFTHSM_CONF");
