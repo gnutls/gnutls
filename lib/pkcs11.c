@@ -2478,21 +2478,6 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 			tot_values++;
 		}
 
-		attr = p11_kit_uri_get_attribute(find_data->info, CKA_ID);
-		if (attr) {
-			a[tot_values].type = CKA_ID;
-			a[tot_values].value = attr->value;
-			a[tot_values].value_len = attr->value_len;
-			tot_values++;
-		}
-
-		attr = p11_kit_uri_get_attribute(find_data->info, CKA_LABEL);
-		if (attr) {
-			a[tot_values].type = CKA_LABEL;
-			a[tot_values].value = attr->value;
-			a[tot_values].value_len = attr->value_len;
-			tot_values++;
-		}
 	} else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED) {
 		class = CKO_CERTIFICATE;
 		type = CKC_X_509;
@@ -2564,7 +2549,17 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 
 	attr = p11_kit_uri_get_attribute(find_data->info, CKA_ID);
 	if (attr != NULL) {
-		memcpy(a + tot_values, attr, sizeof(struct ck_attribute));
+		a[tot_values].type = CKA_ID;
+		a[tot_values].value = attr->value;
+		a[tot_values].value_len = attr->value_len;
+		tot_values++;
+	}
+
+	attr = p11_kit_uri_get_attribute(find_data->info, CKA_LABEL);
+	if (attr) {
+		a[tot_values].type = CKA_LABEL;
+		a[tot_values].value = attr->value;
+		a[tot_values].value_len = attr->value_len;
 		tot_values++;
 	}
 
