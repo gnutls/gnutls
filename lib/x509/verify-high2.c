@@ -191,7 +191,7 @@ int add_trust_list_pkcs11_object_url(gnutls_x509_trust_list_t list, const char *
 	ret =
 	    gnutls_pkcs11_obj_list_import_url2(&pcrt_list, &pcrt_list_size,
 					       url,
-					       GNUTLS_PKCS11_OBJ_ATTR_MATCH,
+					       GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED,
 					       0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
@@ -239,7 +239,7 @@ int remove_pkcs11_object_url(gnutls_x509_trust_list_t list, const char *url)
 	ret =
 	    gnutls_pkcs11_obj_list_import_url2(&pcrt_list, &pcrt_list_size,
 					       url,
-					       GNUTLS_PKCS11_OBJ_ATTR_MATCH,
+					       GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED,
 					       0);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
