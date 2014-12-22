@@ -120,6 +120,10 @@ gnutls_system_key_iter_get_info: Added
 gnutls_system_key_delete: Added
 gnutls_system_key_add_x509: Added
 gnutls_register_custom_url: Added
+gnutls_pkcs11_obj_list_import_url3: Added
+gnutls_pkcs11_obj_list_import_url4: Added
+gnutls_pkcs11_obj_list_import_url: Removed
+gnutls_pkcs11_obj_list_import_url2: Removed
 gnutls_certificate_client_set_retrieve_function: Removed
 gnutls_certificate_server_set_retrieve_function: Removed
 gnutls_certificate_set_rsa_export_params: Removed
