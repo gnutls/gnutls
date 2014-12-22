@@ -17,21 +17,13 @@ int main(int argc, char **argv)
         int ret;
         unsigned int i;
 
-        obj_list_size = 0;
-        ret = gnutls_pkcs11_obj_list_import_url(NULL, &obj_list_size, URL,
-                                                GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY,
-                                                0);
-        if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+        ret = gnutls_pkcs11_obj_list_import_url4(&obj_list, &obj_list_size, URL,
+                                                GNUTLS_PKCS11_OBJ_FLAG_CRT|
+                                                GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY);
+        if (ret < 0)
                 return -1;
 
-/* no error checking from now on */
-        obj_list = malloc(sizeof(*obj_list) * obj_list_size);
-
-        gnutls_pkcs11_obj_list_import_url(obj_list, &obj_list_size, URL,
-                                          GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY,
-                                          0);
-
-/* now all certificates are in obj_list */
+        /* now all certificates are in obj_list */
         for (i = 0; i < obj_list_size; i++) {
 
                 gnutls_x509_crt_init(&xcrt);
@@ -45,6 +37,10 @@ int main(int argc, char **argv)
                 gnutls_free(cinfo.data);
                 gnutls_x509_crt_deinit(xcrt);
         }
+
+        for (i = 0; i < obj_list_size; i++)
+        	gnutls_pkcs11_obj_deinit(obj_list[i]);
+	gnutls_free(obj_list);
 
         return 0;
 }
