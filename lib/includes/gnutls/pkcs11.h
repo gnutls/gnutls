@@ -93,27 +93,33 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
 
 /**
  * gnutls_pkcs11_obj_flags:
- * @GNUTLS_PKCS11_OBJ_FLAG_LOGIN: Force login in the token for the operation.
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED: object marked as trusted.
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE: object marked as sensitive (unexportable).
- * @GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO: force login as a security officer in the token for the operation.
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE: marked as private (requires PIN to access).
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE: marked as not private.
- * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY: When retrieving an object, do not set any requirements.
- * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED: When retrieving an object, only retrieve the marked as trusted.
+ * @GNUTLS_PKCS11_OBJ_FLAG_LOGIN: Force login in the token for the operation (seek+store). 
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED: object marked as trusted (seek+store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE: object marked as sensitive -unexportable (store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO: force login as a security officer in the token for the operation (seek+store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE: marked as private -requires PIN to access (store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE: marked as not private (store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY: When retrieving an object, do not set any requirements (store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED: When retrieving an object, only retrieve the marked as trusted (alias to %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED).
  *   In gnutls_pkcs11_crt_is_known() it implies %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_COMPARE if %GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY is not given.
- * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED: When retrieving an object, only retrieve the marked as distrusted.
- * @GNUTLS_PKCS11_OBJ_FLAG_COMPARE: When checking an object's presence, fully compare it before returning any result.
- * @GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY: When checking an object's presence, compare the key before returning any result.
- * @GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE: The object must be present in a marked as trusted module.
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_CA: Mark the object as a CA.
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP: Mark the generated key pair as wrapping and unwrapping keys.
- * @GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT: When an issuer is requested, override its extensions with the ones present in the trust module.
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH: Mark the key pair as requiring authentication (pin entry) before every operation.
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE: Mark the key pair as being extractable (insecure).
- * @GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE: If set, the object was never marked as extractable.
+ * @GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED: When retrieving an object, only retrieve the marked as distrusted (seek).
+ * @GNUTLS_PKCS11_OBJ_FLAG_COMPARE: When checking an object's presence, fully compare it before returning any result (seek).
+ * @GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY: When checking an object's presence, compare the key before returning any result (seek).
+ * @GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE: The object must be present in a marked as trusted module (seek).
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_CA: Mark the object as a CA (seek+store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP: Mark the generated key pair as wrapping and unwrapping keys (store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT: When an issuer is requested, override its extensions with the ones present in the trust module (seek).
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH: Mark the key pair as requiring authentication (pin entry) before every operation (seek+store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE: Mark the key pair as being extractable (store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE: If set, the object was never marked as extractable (store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_CRT: When searching, restrict to certificates only (seek).
+ * @GNUTLS_PKCS11_OBJ_FLAG_PUBKEY: When searching, restrict to public key objects only (seek).
+ * @GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY: When searching, restrict to private key objects only (seek).
+ * @GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY: When searching, restrict to objects which have a corresponding private key (seek).
  *
- * Enumeration of different PKCS #11 object flags.
+ * Enumeration of different PKCS #11 object flags. Some flags are used
+ * to mark objects when storing, while others are also used while seeking
+ * or retrieving objects.
  */
 typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_LOGIN = (1<<0),
@@ -123,7 +129,7 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE = (1<<4),
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE = (1<<5),
 	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY = (1<<6),
-	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED = (1<<7),
+	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED = GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED,
 	GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED = (1<<8),
 	GNUTLS_PKCS11_OBJ_FLAG_COMPARE = (1<<9),
 	GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE = (1<<10),
@@ -133,8 +139,14 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT = (1<<14),
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH = (1<<15),
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE = (1<<16),
-	GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE = (1<<17)
+	GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE = (1<<17),
+	GNUTLS_PKCS11_OBJ_FLAG_CRT = (1<<18),
+	GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY = (1<<19),
+	GNUTLS_PKCS11_OBJ_FLAG_PUBKEY = (1<<20),
+	GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY = (1<<21),
 } gnutls_pkcs11_obj_flags;
+
+#define gnutls_pkcs11_obj_attr_t gnutls_pkcs11_obj_flags
 
 /**
  * gnutls_pkcs11_url_type_t:
@@ -235,32 +247,14 @@ int gnutls_pkcs11_obj_get_info(gnutls_pkcs11_obj_t crt,
 			       gnutls_pkcs11_obj_info_t itype,
 			       void *output, size_t * output_size);
 
-/**
- * gnutls_pkcs11_obj_attr_t:
- * @GNUTLS_PKCS11_OBJ_ATTR_CRT: Specify all certificates in the specified token.
- * @GNUTLS_PKCS11_OBJ_ATTR_PUBKEY: Specify all public keys in the specified token.
- * @GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED: Restrict to objects which are marked as trusted
- * @GNUTLS_PKCS11_OBJ_ATTR_MARKED_CA: Restrict to certificates which are marked as CA
- * @GNUTLS_PKCS11_OBJ_ATTR_WITH_PRIVKEY: Restrict to objects which have a corresponding private key
- *
- * This a list of flags to be used in combination with each other (since GnuTLS 3.4.0). They
- * are used for matching and obtaining a list of objects.
- */
-typedef enum {
-	GNUTLS_PKCS11_OBJ_ATTR_CRT = 1,	/* all certificates */
-	GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED = 1<<1,	/* certificates marked as trusted */
-	GNUTLS_PKCS11_OBJ_ATTR_WITH_PRIVKEY = 1<<2,	/* certificates with corresponding private key */
-	GNUTLS_PKCS11_OBJ_ATTR_PUBKEY = 1<<3,	/* public keys */
-	GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY = 1<<4,	/* private keys */
-	GNUTLS_PKCS11_OBJ_ATTR_MARKED_CA = 1<<5,	/* CAs */
-} gnutls_pkcs11_obj_attr_t;
-
-#define GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL GNUTLS_PKCS11_OBJ_ATTR_CRT
+#define GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL GNUTLS_PKCS11_OBJ_FLAG_CRT
 #define GNUTLS_PKCS11_OBJ_ATTR_MATCH 0 /* always match the given URL */
 #define GNUTLS_PKCS11_OBJ_ATTR_ALL 0 /* match everything! */
-#define GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED (GNUTLS_PKCS11_OBJ_ATTR_CRT|GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED)
-#define GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY (GNUTLS_PKCS11_OBJ_ATTR_CRT|GNUTLS_PKCS11_OBJ_ATTR_WITH_PRIVKEY)
-#define GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA (GNUTLS_PKCS11_OBJ_ATTR_CRT|GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED|GNUTLS_PKCS11_OBJ_ATTR_MARKED_CA)
+#define GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED (GNUTLS_PKCS11_OBJ_FLAG_CRT|GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED)
+#define GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY (GNUTLS_PKCS11_OBJ_FLAG_CRT|GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY)
+#define GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA (GNUTLS_PKCS11_OBJ_FLAG_CRT|GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED)
+#define GNUTLS_PKCS11_OBJ_ATTR_PUBKEY GNUTLS_PKCS11_OBJ_FLAG_PUBKEY
+#define GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY
 
 /**
  * gnutls_pkcs11_token_info_t:
@@ -323,19 +317,20 @@ int gnutls_pkcs11_token_get_info(const char *url,
 #define GNUTLS_PKCS11_TOKEN_TRUSTED (1<<1) /* p11-kit trusted */
 int gnutls_pkcs11_token_get_flags(const char *url, unsigned int *flags);
 
-int gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
+#define gnutls_pkcs11_obj_list_import_url(p_list, n_list, url, attrs, flags) gnutls_pkcs11_obj_list_import_url3(p_list, n_list, url, attrs|flags)
+#define gnutls_pkcs11_obj_list_import_url2(p_list, n_list, url, attrs, flags) gnutls_pkcs11_obj_list_import_url4(p_list, n_list, url, attrs|flags)
+
+int gnutls_pkcs11_obj_list_import_url3(gnutls_pkcs11_obj_t * p_list,
 				      unsigned int *const n_list,
 				      const char *url,
-				      gnutls_pkcs11_obj_attr_t
-				      attrs, unsigned int flags
+				      unsigned int flags
 				      /* GNUTLS_PKCS11_OBJ_FLAG_* */
     );
 
 int
-gnutls_pkcs11_obj_list_import_url2(gnutls_pkcs11_obj_t ** p_list,
+gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 				   unsigned int *n_list,
 				   const char *url,
-				   gnutls_pkcs11_obj_attr_t attrs,
 				   unsigned int flags
 				   /* GNUTLS_PKCS11_OBJ_FLAG_* */
     );

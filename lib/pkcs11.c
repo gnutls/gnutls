@@ -69,7 +69,7 @@ struct find_url_data_st {
 struct find_obj_data_st {
 	gnutls_pkcs11_obj_t *p_list;
 	unsigned int current;
-	gnutls_pkcs11_obj_attr_t flags;
+	unsigned int flags;
 	struct p11_kit_uri *info;
 };
 
@@ -2462,7 +2462,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 
 	memset(&plist, 0, sizeof(plist));
 
-	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_WITH_PRIVKEY) {
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY) {
 		ret = find_privkeys(sinfo, tinfo, &plist);
 		if (ret < 0) {
 			gnutls_assert();
@@ -2486,7 +2486,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 	}
 
 
-	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_CRT) {
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_CRT) {
 		class = CKO_CERTIFICATE;
 
 		a[tot_values].type = CKA_CLASS;
@@ -2503,7 +2503,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 		_gnutls_assert_log("p11 attrs: CKA_CLASS (CERT), CKA_CERTIFICATE_TYPE\n");
 	}
 
-	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_PUBKEY) {
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_PUBKEY) {
 		class = CKO_PUBLIC_KEY;
 
 		a[tot_values].type = CKA_CLASS;
@@ -2514,7 +2514,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 		_gnutls_assert_log("p11 attrs: CKA_CLASS (PUBLIC KEY)\n");
 	}
 
-	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY) {
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY) {
 		class = CKO_PRIVATE_KEY;
 
 		a[tot_values].type = CKA_CLASS;
@@ -2525,7 +2525,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 		_gnutls_assert_log("p11 attrs: CKA_CLASS (PRIVATE KEY)\n");
 	}
 
-	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_MARKED_TRUSTED) {
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED) {
 		trusted = 1;
 		a[tot_values].type = CKA_TRUSTED;
 		a[tot_values].value = &trusted;
@@ -2534,7 +2534,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 		_gnutls_assert_log("p11 attrs: CKA_TRUSTED\n");
 	}
 
-	if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_MARKED_CA) {
+	if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_CA) {
 		category = 2;
 		a[tot_values].type = CKA_CERTIFICATE_CATEGORY;
 		a[tot_values].value = &category;
@@ -2622,7 +2622,7 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 				}
 			}
 
-			if (find_data->flags & GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY) {
+			if (find_data->flags & GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY) {
 				for (i = 0; i < plist.key_ids_size; i++) {
 					if (plist.key_ids[i].length !=
 					    id.size
@@ -2683,26 +2683,30 @@ find_objs_cb(struct pkcs11_session_info *sinfo,
 }
 
 /**
- * gnutls_pkcs11_obj_list_import_url:
+ * gnutls_pkcs11_obj_list_import_url3:
  * @p_list: An uninitialized object list (may be NULL)
  * @n_list: initially should hold the maximum size of the list. Will contain the actual size.
  * @url: A PKCS 11 url identifying a set of objects
- * @attrs: Attributes of type #gnutls_pkcs11_obj_attr_t that can be used to limit output
  * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will initialize and set values to an object list
  * by using all objects identified by a PKCS 11 URL.
  *
+ * The supported in this function @flags are %GNUTLS_PKCS11_OBJ_FLAG_LOGIN,
+ * %GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO, %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE,
+ * %GNUTLS_PKCS11_OBJ_FLAG_CRT, %GNUTLS_PKCS11_OBJ_FLAG_PUBKEY, %GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY,
+ * %GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 2.12.0
+ * Since: 3.4.0
  **/
 int
-gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
+gnutls_pkcs11_obj_list_import_url3(gnutls_pkcs11_obj_t * p_list,
 				  unsigned int *n_list,
 				  const char *url,
-				  gnutls_pkcs11_obj_attr_t attrs,
 				  unsigned int flags)
 {
 	int ret;
@@ -2714,7 +2718,7 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
 	memset(&priv, 0, sizeof(priv));
 
 	/* fill in the find data structure */
-	priv.flags = attrs;
+	priv.flags = flags;
 
 	if (url == NULL || url[0] == 0) {
 		url = "pkcs11:";
@@ -2757,11 +2761,10 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
 }
 
 /**
- * gnutls_pkcs11_obj_list_import_url2:
+ * gnutls_pkcs11_obj_list_import_url4:
  * @p_list: An uninitialized object list (may be NULL)
  * @n_list: It will contain the size of the list.
  * @url: A PKCS 11 url identifying a set of objects
- * @attrs: Attributes of type #gnutls_pkcs11_obj_attr_t that can be used to limit output
  * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will initialize and set values to an object list
@@ -2771,16 +2774,21 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
  * All returned objects must be deinitialized using gnutls_pkcs11_obj_deinit(),
  * and @p_list must be free'd using gnutls_free().
  *
+ * The supported in this function @flags are %GNUTLS_PKCS11_OBJ_FLAG_LOGIN,
+ * %GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO, %GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE,
+ * %GNUTLS_PKCS11_OBJ_FLAG_CRT, %GNUTLS_PKCS11_OBJ_FLAG_PUBKEY, %GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY,
+ * %GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY, %GNUTLS_PKCS11_OBJ_FLAG_MARK_CA,
+ * %GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.1.0
+ * Since: 3.4.0
  **/
 int
-gnutls_pkcs11_obj_list_import_url2(gnutls_pkcs11_obj_t ** p_list,
+gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 				   unsigned int *n_list,
 				   const char *url,
-				   gnutls_pkcs11_obj_attr_t attrs,
 				   unsigned int flags)
 {
 	int ret;
@@ -2791,7 +2799,7 @@ gnutls_pkcs11_obj_list_import_url2(gnutls_pkcs11_obj_t ** p_list,
 	memset(&priv, 0, sizeof(priv));
 
 	/* fill in the find data structure */
-	priv.flags = attrs;
+	priv.flags = flags;
 
 	if (url == NULL || url[0] == 0) {
 		url = "pkcs11:";

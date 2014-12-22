@@ -367,7 +367,7 @@ advance_iter(gnutls_x509_trust_list_t list,
 	if (list->pkcs11_token != NULL) {
 		if (iter->pkcs11_list == NULL) {
 			ret = gnutls_pkcs11_obj_list_import_url2(&iter->pkcs11_list, &iter->pkcs11_size,
-			    list->pkcs11_token, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED_CA, 0);
+			    list->pkcs11_token, (GNUTLS_PKCS11_OBJ_FLAG_CRT|GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED), 0);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
