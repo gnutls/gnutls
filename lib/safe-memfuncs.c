@@ -59,11 +59,11 @@ void gnutls_memset(void *data, int c, size_t size)
  * @s2: the second address to compare
  * @n: the size of memory to compare
  *
- * This function will operate similarly to memcmp(), but instead
- * of comparing it will return 0 on memory match and non-zero
- * on difference.
+ * This function will operate similarly to memcmp(), but will operate
+ * on time that depends only on the size of the string. That is will
+ * not return early if the strings don't match on the first byte.
  *
- * Returns: void.
+ * Returns: non zero on difference and zero if the buffers are identical.
  *
  * Since: 3.4.0
  **/
