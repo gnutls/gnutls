@@ -2191,7 +2191,7 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 		*pin = NULL;
 
 		/* Check if a pinfile is specified, and use that if possible */
-		pinfile = p11_kit_uri_get_pinfile(info);
+		pinfile = p11_kit_uri_get_pin_source(info);
 		if (pinfile != NULL) {
 			_gnutls_debug_log("p11: Using pinfile to retrieve PIN\n");
 			ret =
