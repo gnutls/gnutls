@@ -15,6 +15,9 @@ http://lists.gnutls.org/pipermail/gnutls-help/2014-November/003673.html
 import the certificates, if the URL specifies objects, rather than
 treating it as trust module.
 
+** libgnutls: When importing a PKCS #11 URL and we know the type of
+object we are importing, don't require the object type in the URL.
+
 ** guile: Fix compilation on MinGW. Previously only the static version of the 
 'guile-gnutls-v-2' library would be built, preventing dynamic loading from Guile.
 
