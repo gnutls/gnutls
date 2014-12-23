@@ -3700,25 +3700,20 @@ int
 gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
 				  const char *url, unsigned int flags)
 {
-	char *xurl;
 	int ret;
 
-	xurl = _gnutls_sanitize_url(url, 0);
-	if (xurl == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	if (strncmp(xurl, SYSTEM_URL, SYSTEM_URL_SIZE) == 0) {
-		ret = _gnutls_x509_crt_import_system_url(crt, xurl);
+	if (strncmp(url, SYSTEM_URL, SYSTEM_URL_SIZE) == 0) {
+		ret = _gnutls_x509_crt_import_system_url(crt, url);
 #ifdef ENABLE_PKCS11
-	} else if (strncmp(xurl, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
-			ret = _gnutls_x509_crt_import_pkcs11_url(crt, xurl, flags);
+	} else if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
+			ret = _gnutls_x509_crt_import_pkcs11_url(crt, url, flags);
 #endif
 	} else {
 		unsigned i;
 		for (i=0;i<_gnutls_custom_urls_size;i++) {
 			if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
 				if (_gnutls_custom_urls[i].import_crt) {
-					ret = _gnutls_custom_urls[i].import_crt(crt, xurl, flags);
+					ret = _gnutls_custom_urls[i].import_crt(crt, url, flags);
 					goto cleanup;
 				}
 			}
@@ -3727,6 +3722,5 @@ gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
 	}
 
  cleanup:
-	gnutls_free(xurl);
 	return ret;
 }

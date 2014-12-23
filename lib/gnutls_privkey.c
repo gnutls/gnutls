@@ -1241,40 +1241,35 @@ gnutls_privkey_import_url(gnutls_privkey_t key, const char *url,
 			  unsigned int flags)
 {
 	unsigned i;
-	char *xurl = NULL;
 	int ret;
-
-	xurl = _gnutls_sanitize_url(url, 1);
-	if (xurl == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
 #ifdef ENABLE_PKCS11
-		ret = gnutls_privkey_import_pkcs11_url(key, xurl);
+		ret = gnutls_privkey_import_pkcs11_url(key, url);
 #else
 		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
 		goto cleanup;
 	}
 
-	if (strncmp(xurl, TPMKEY_URL, TPMKEY_URL_SIZE) == 0) {
+	if (strncmp(url, TPMKEY_URL, TPMKEY_URL_SIZE) == 0) {
 #ifdef HAVE_TROUSERS
-		ret = gnutls_privkey_import_tpm_url(key, xurl, NULL, NULL, 0);
+		ret = gnutls_privkey_import_tpm_url(key, url, NULL, NULL, 0);
 #else
 		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
 		goto cleanup;
 	}
 
-	if (strncmp(xurl, SYSTEM_URL, SYSTEM_URL_SIZE) == 0) {
-		ret = _gnutls_privkey_import_system_url(key, xurl);
+	if (strncmp(url, SYSTEM_URL, SYSTEM_URL_SIZE) == 0) {
+		ret = _gnutls_privkey_import_system_url(key, url);
 		goto cleanup;
 	}
 
 	for (i=0;i<_gnutls_custom_urls_size;i++) {
 		if (strncmp(url, _gnutls_custom_urls[i].name, _gnutls_custom_urls[i].name_size) == 0) {
 			if (_gnutls_custom_urls[i].import_key) {
-				ret = _gnutls_custom_urls[i].import_key(key, xurl, flags);
+				ret = _gnutls_custom_urls[i].import_key(key, url, flags);
 				goto cleanup;
 			}
 			break;
@@ -1283,7 +1278,6 @@ gnutls_privkey_import_url(gnutls_privkey_t key, const char *url,
 
 	ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
  cleanup:
- 	gnutls_free(xurl);
  	return ret;
 }
 

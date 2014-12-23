@@ -18,8 +18,6 @@
  *
  */
 
-char *_gnutls_sanitize_url(const char *url, unsigned type);
-
 #define PKCS11_URL "pkcs11:"
 #define SYSTEM_URL "system:"
 #define TPMKEY_URL "tpmkey:"

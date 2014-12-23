@@ -403,7 +403,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 	memset(&pkey->sinfo, 0, sizeof(pkey->sinfo));
 
-	pkey->url = _gnutls_sanitize_url(url, 1);
+	pkey->url = gnutls_strdup(url);
 	if (pkey->url == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
