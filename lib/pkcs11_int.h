@@ -82,7 +82,7 @@ typedef int (*find_func_t) (struct pkcs11_session_info *,
 			    void *input);
 
 int pkcs11_rv_to_err(ck_rv_t rv);
-int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info);
+int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info, unsigned flags);
 int
 pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 		 struct p11_kit_uri *info, struct ck_token_info *_tinfo,
@@ -127,6 +127,12 @@ int _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			    struct pin_info_st *pin_info,
 			    unsigned int flags);
 ck_object_class_t pkcs11_strtype_to_class(const char *type);
+
+/* Additional internal flags for gnutls_pkcs11_obj_flags */
+/* @GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT: When importing an object, provide a hint on the type, to allow incomplete URLs
+ * @GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY: Hint for private key */
+#define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT (1<<29)
+#define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY (1<<30)
 
 int pkcs11_token_matches_info(struct p11_kit_uri *info,
 			      struct ck_token_info *tinfo,

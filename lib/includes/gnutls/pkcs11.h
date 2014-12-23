@@ -143,7 +143,8 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_CRT = (1<<18),
 	GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY = (1<<19),
 	GNUTLS_PKCS11_OBJ_FLAG_PUBKEY = (1<<20),
-	GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY = (1<<21),
+	GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY = (1<<21)
+	/* flags 1<<29 and later are reserved - see pkcs11_int.h */
 } gnutls_pkcs11_obj_flags;
 
 #define gnutls_pkcs11_obj_attr_t gnutls_pkcs11_obj_flags

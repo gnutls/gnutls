@@ -108,7 +108,7 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
-	ret = pkcs11_url_to_info(token_url, &info);
+	ret = pkcs11_url_to_info(token_url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -251,7 +251,7 @@ gnutls_pkcs11_copy_attached_extension(const char *token_url,
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
-	ret = pkcs11_url_to_info(token_url, &info);
+	ret = pkcs11_url_to_info(token_url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -369,7 +369,7 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	memset(&exp1, 0, sizeof(exp1));
 	memset(&exp2, 0, sizeof(exp2));
 
-	ret = pkcs11_url_to_info(token_url, &info);
+	ret = pkcs11_url_to_info(token_url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -783,7 +783,7 @@ int gnutls_pkcs11_delete_url(const char *object_url, unsigned int flags)
 
 	memset(&find_data, 0, sizeof(find_data));
 
-	ret = pkcs11_url_to_info(object_url, &find_data.info);
+	ret = pkcs11_url_to_info(object_url, &find_data.info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -831,7 +831,7 @@ gnutls_pkcs11_token_init(const char *token_url,
 
 	PKCS11_CHECK_INIT;
 
-	ret = pkcs11_url_to_info(token_url, &info);
+	ret = pkcs11_url_to_info(token_url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -891,7 +891,7 @@ gnutls_pkcs11_token_set_pin(const char *token_url,
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
-	ret = pkcs11_url_to_info(token_url, &info);
+	ret = pkcs11_url_to_info(token_url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -968,7 +968,7 @@ gnutls_pkcs11_token_get_random(const char *token_url,
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
-	ret = pkcs11_url_to_info(token_url, &info);
+	ret = pkcs11_url_to_info(token_url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
