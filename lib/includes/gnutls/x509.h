@@ -138,11 +138,11 @@ int gnutls_x509_crt_list_import(gnutls_x509_crt_t * certs,
 				gnutls_x509_crt_fmt_t format,
 				unsigned int flags);
 
-int gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
+#define gnutls_x509_crt_import_pkcs11_url gnutls_x509_crt_import_url
+int gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
 				      const char *url, unsigned int flags
 				      /* GNUTLS_PKCS11_OBJ_FLAG_* */
     );
-#define gnutls_x509_crt_import_url gnutls_x509_crt_import_pkcs11_url
 
 int gnutls_x509_crt_export(gnutls_x509_crt_t cert,
 			   gnutls_x509_crt_fmt_t format,

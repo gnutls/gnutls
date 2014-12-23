@@ -541,7 +541,7 @@ GNUTLS_3_4
 	gnutls_x509_crt_import_pkcs11;
 	gnutls_pkcs11_obj_get_type;
 	gnutls_x509_crt_list_import_pkcs11;
-	gnutls_x509_crt_import_pkcs11_url;
+	gnutls_x509_crt_import_url;
 	gnutls_pkcs11_obj_get_info;
 	gnutls_pkcs11_token_get_info;
 	gnutls_pkcs11_token_get_url;

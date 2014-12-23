@@ -3679,7 +3679,7 @@ void gnutls_x509_crt_set_pin_function(gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_import_pkcs11_url:
+ * gnutls_x509_crt_import_url:
  * @crt: A certificate of type #gnutls_x509_crt_t
  * @url: A PKCS 11 url
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
@@ -3689,15 +3689,15 @@ void gnutls_x509_crt_set_pin_function(gnutls_x509_crt_t crt,
  * fail if the certificate stored is not of X.509 type.
  *
  * Despite its name this function will attempt to import any kind of 
- * URL to certificate. It is synonymous to gnutls_x509_crt_import_url().
+ * URL to certificate. It is synonymous to gnutls_x509_crt_import_pkcs11_url().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 2.12.0
+ * Since: 3.4.0
  **/
 int
-gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
+gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
 				  const char *url, unsigned int flags)
 {
 	char *xurl;
