@@ -403,6 +403,16 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 	memset(&pkey->sinfo, 0, sizeof(pkey->sinfo));
 
+	if (pkey->url) {
+		gnutls_free(pkey->url);
+		pkey->url = NULL;
+	}
+
+	if (pkey->uinfo) {
+		p11_kit_uri_free(pkey->uinfo);
+		pkey->uinfo = NULL;
+	}
+
 	pkey->url = gnutls_strdup(url);
 	if (pkey->url == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -410,7 +420,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	ret = pkcs11_url_to_info(pkey->url, &pkey->uinfo, flags|GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	pkey->flags = flags;
@@ -419,7 +429,8 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	if (!attr || attr->value_len != sizeof(ck_object_class_t) ||
 	    *(ck_object_class_t *) attr->value != CKO_PRIVATE_KEY) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
 	}
 
 	attr = p11_kit_uri_get_attribute(pkey->uinfo, CKA_ID);
@@ -427,7 +438,8 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 		attr = p11_kit_uri_get_attribute(pkey->uinfo, CKA_LABEL);
 		if (!attr) {
 			gnutls_assert();
-			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+			ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+			goto cleanup;
 		}
 	}
 
@@ -462,7 +474,12 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	return ret;
 
       cleanup:
-	pkcs11_close_session(&pkey->sinfo);
+	if (pkey->uinfo != NULL) {
+		p11_kit_uri_free(pkey->uinfo);
+		pkey->uinfo = NULL;
+	}
+      	gnutls_free(pkey->url);
+      	pkey->url = NULL;
 
 	return ret;
 }
