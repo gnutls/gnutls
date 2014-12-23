@@ -380,7 +380,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 	memset(&pkey->sinfo, 0, sizeof(pkey->sinfo));
 
-	ret = pkcs11_url_to_info(url, &pkey->uinfo);
+	ret = pkcs11_url_to_info(url, &pkey->uinfo, flags|GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -629,7 +629,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
-	ret = pkcs11_url_to_info(url, &info);
+	ret = pkcs11_url_to_info(url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

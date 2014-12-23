@@ -65,7 +65,7 @@ gnutls_pkcs11_copy_secret_key(const char *token_url, gnutls_datum_t * key,
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
-	ret = pkcs11_url_to_info(token_url, &info);
+	ret = pkcs11_url_to_info(token_url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

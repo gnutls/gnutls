@@ -715,7 +715,7 @@ gnutls_pkcs11_set_token_function(gnutls_pkcs11_token_callback_t fn,
 	_gnutls_token_data = userdata;
 }
 
-int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info)
+int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info, unsigned flags)
 {
 	int allocated = 0;
 	int ret;
@@ -738,6 +738,26 @@ int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info)
 		gnutls_assert();
 		return ret == P11_KIT_URI_NO_MEMORY ?
 		    GNUTLS_E_MEMORY_ERROR : GNUTLS_E_PARSING_ERROR;
+	}
+
+	/* check for incomplete URIs */
+	if (p11_kit_uri_get_attribute (*info, CKA_CLASS) == NULL) {
+		struct ck_attribute at;
+		ck_object_class_t klass;
+
+		if (flags & GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT) {
+			klass = CKO_CERTIFICATE;
+			at.type = CKA_CLASS;
+			at.value = &klass;
+			at.value_len = sizeof (klass);
+			p11_kit_uri_set_attribute (*info, &at);
+		} else if (flags & GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY) {
+			klass = CKO_PRIVATE_KEY;
+			at.type = CKA_CLASS;
+			at.value = &klass;
+			at.value_len = sizeof (klass);
+			p11_kit_uri_set_attribute (*info, &at);
+		}
 	}
 
 	return 0;
@@ -1787,7 +1807,7 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 	/* fill in the find data structure */
 	find_data.obj = obj;
 
-	ret = pkcs11_url_to_info(url, &obj->info);
+	ret = pkcs11_url_to_info(url, &obj->info, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -1907,7 +1927,7 @@ gnutls_pkcs11_token_get_info(const char *url,
 
 	PKCS11_CHECK_INIT;
 
-	ret = pkcs11_url_to_info(url, &info);
+	ret = pkcs11_url_to_info(url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -2715,7 +2735,7 @@ gnutls_pkcs11_obj_list_import_url(gnutls_pkcs11_obj_t * p_list,
 		url = "pkcs11:";
 	}
 
-	ret = pkcs11_url_to_info(url, &priv.info);
+	ret = pkcs11_url_to_info(url, &priv.info, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -2792,7 +2812,7 @@ gnutls_pkcs11_obj_list_import_url2(gnutls_pkcs11_obj_t ** p_list,
 		url = "pkcs11:";
 	}
 
-	ret = pkcs11_url_to_info(url, &priv.info);
+	ret = pkcs11_url_to_info(url, &priv.info, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -2850,7 +2870,7 @@ gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
 		gnutls_pkcs11_obj_set_pin_function(pcrt, crt->pin.cb,
 						   crt->pin.data);
 
-	ret = gnutls_pkcs11_obj_import_url(pcrt, url, flags);
+	ret = gnutls_pkcs11_obj_import_url(pcrt, url, flags|GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -2989,7 +3009,7 @@ int gnutls_pkcs11_token_get_flags(const char *url, unsigned int *flags)
 	PKCS11_CHECK_INIT;
 
 	memset(&find_data, 0, sizeof(find_data));
-	ret = pkcs11_url_to_info(url, &find_data.info);
+	ret = pkcs11_url_to_info(url, &find_data.info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -3045,7 +3065,7 @@ gnutls_pkcs11_token_get_mechanism(const char *url, unsigned int idx,
 
 	PKCS11_CHECK_INIT;
 
-	ret = pkcs11_url_to_info(url, &info);
+	ret = pkcs11_url_to_info(url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -3413,7 +3433,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 		url = "pkcs11:";
 	}
 
-	ret = pkcs11_url_to_info(url, &info);
+	ret = pkcs11_url_to_info(url, &info, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -3512,7 +3532,7 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 		url = "pkcs11:";
 	}
 
-	ret = pkcs11_url_to_info(url, &info);
+	ret = pkcs11_url_to_info(url, &info, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return 0;

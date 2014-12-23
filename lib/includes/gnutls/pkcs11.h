@@ -128,6 +128,7 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP = (1<<12),
 	GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY = (1<<13),
 	GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT = (1<<14)
+	/* flags 1<<29 and later are reserved - see pkcs11_int.h */
 } gnutls_pkcs11_obj_flags;
 
 /**
