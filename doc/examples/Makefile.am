@@ -24,9 +24,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
 	-I$(top_srcdir)/extra/includes \
 	-I$(top_srcdir)/src/gl \
-	-I$(top_builddir)/src/gl \
-	-I$(top_srcdir)/gl \
-	-I$(top_builddir)/gl
+	-I$(top_builddir)/src/gl
 
 # Gnulib warns and suggests use of fseeko instead of fseek, which is
 # used in ex-cert-select.c, but certificate files will not be > 4 GB,

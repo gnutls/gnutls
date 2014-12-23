@@ -42,9 +42,7 @@ EXTRA_DIST = args-std.def
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(srcdir)/gl				\
-	-I$(srcdir)/../gl			\
 	-I$(builddir)/gl			\
-	-I$(builddir)/../gl			\
 	-I$(builddir)/../lib/includes		\
 	-I$(srcdir)/../lib/includes		\
 	-I$(srcdir)/../libdane/includes		\
