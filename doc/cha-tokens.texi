@@ -67,7 +67,7 @@ gnutls_privkey_t abs_key;
   gnutls_privkey_import_url(abs_key, key_url);
 
   gnutls_x509_crt_init(&ca_cert);
-  gnutls_x509_crt_import_pkcs11_url(&ca_cert, cert_url);
+  gnutls_x509_crt_import_url(&ca_cert, cert_url);
 
   /* sign the certificate to be signed */
   gnutls_x509_crt_privkey_sign(to_be_signed, ca_cert, abs_key, 
@@ -390,7 +390,7 @@ are shown below.
 
 @showfuncdesc{gnutls_pkcs11_obj_get_info}
 
-@showfuncC{gnutls_x509_crt_import_pkcs11,gnutls_x509_crt_import_pkcs11_url,gnutls_x509_crt_list_import_pkcs11}
+@showfuncC{gnutls_x509_crt_import_pkcs11,gnutls_x509_crt_import_url,gnutls_x509_crt_list_import_pkcs11}
 
 Properties of the physical token can also be accessed and altered with @acronym{GnuTLS}.
 For example data in a token can be erased (initialized), PIN can be altered, etc.

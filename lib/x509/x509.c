@@ -3665,7 +3665,7 @@ gnutls_x509_crt_get_authority_info_access(gnutls_x509_crt_t crt,
  * the global function set using gnutls_pkcs11_set_pin_function().
  *
  * Note that this callback is currently used only during the import
- * of a PKCS #11 certificate with gnutls_x509_crt_import_pkcs11_url().
+ * of a PKCS #11 certificate with gnutls_x509_crt_import_url().
  *
  * Since: 3.1.0
  *
@@ -3689,7 +3689,9 @@ void gnutls_x509_crt_set_pin_function(gnutls_x509_crt_t crt,
  * fail if the certificate stored is not of X.509 type.
  *
  * Despite its name this function will attempt to import any kind of 
- * URL to certificate. It is synonymous to gnutls_x509_crt_import_pkcs11_url().
+ * URL to certificate. In previous versions of gnutls this function
+ * was named gnutls_x509_crt_import_pkcs11_url, and the old name is
+ * an alias to this one.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
