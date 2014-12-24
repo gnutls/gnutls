@@ -562,9 +562,11 @@ int print_info(gnutls_session_t session, int verbose, int print_cert)
 		printf(" safe renegotiation,");
 	if (gnutls_session_etm_status(session)!=0)
 		printf(" EtM,");
+#ifdef ENABLE_OCSP
 	if (gnutls_ocsp_status_request_is_checked(session, GNUTLS_OCSP_SR_IS_AVAIL)!=0) {
 		printf(" OCSP status request%s,", gnutls_ocsp_status_request_is_checked(session,0)!=0?"":"[ignored]");
 	}
+#endif
 	printf("\n");
 
 #ifdef ENABLE_DTLS_SRTP
