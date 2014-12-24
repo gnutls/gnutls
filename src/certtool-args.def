@@ -363,7 +363,7 @@ flag = {
     name      = curve;
     arg-type  = string;
     descrip   = "Specify the curve used for EC key generation";
-    doc      = "";
+    doc      = "Supported values are secp192r1, secp224r1, secp256r1, secp384r1 and secp521r1.";
 };
 
 flag = {
