@@ -957,21 +957,33 @@ int gnutls_pubkey_get_pk_ecc_x962(gnutls_pubkey_t key,
 				  gnutls_datum_t * ecpoint)
 {
 	int ret;
+	gnutls_datum_t raw_point = {NULL,0};
 
 	if (key == NULL || key->pk_algorithm != GNUTLS_PK_EC)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	ret = _gnutls_x509_write_ecc_pubkey(&key->params, ecpoint);
+	ret = _gnutls_x509_write_ecc_pubkey(&key->params, &raw_point);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
+					 raw_point.data, raw_point.size, ecpoint);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	ret = _gnutls_x509_write_ecc_params(key->params.flags, parameters);
 	if (ret < 0) {
 		_gnutls_free_datum(ecpoint);
-		return gnutls_assert_val(ret);
+		gnutls_assert();
+		goto cleanup;
 	}
 
-	return 0;
+	ret = 0;
+ cleanup:
+	gnutls_free(raw_point.data);
+	return ret;
 }
 
 /**
@@ -1370,6 +1382,7 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
 			      const gnutls_datum_t * ecpoint)
 {
 	int ret;
+	gnutls_datum_t raw_point = {NULL,0};
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -1386,7 +1399,14 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
 		goto cleanup;
 	}
 
-	ret = _gnutls_ecc_ansi_x963_import(ecpoint->data, ecpoint->size,
+	ret = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING,
+					 ecpoint->data, ecpoint->size, &raw_point);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_ecc_ansi_x963_import(raw_point.data, raw_point.size,
 					   &key->params.params[ECC_X],
 					   &key->params.params[ECC_Y]);
 	if (ret < 0) {
@@ -1396,10 +1416,12 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
 	key->params.params_nr += 2;
 	key->pk_algorithm = GNUTLS_PK_EC;
 
+	gnutls_free(raw_point.data);
 	return 0;
 
       cleanup:
 	gnutls_pk_params_release(&key->params);
+	gnutls_free(raw_point.data);
 	return ret;
 }
 
