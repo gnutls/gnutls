@@ -39,7 +39,6 @@
 /* Tests whether gnutls_certificate_set_x509_key_file2() will utilize
  * the provided password as PIN when PKCS #11 keys are imported */
 
-#define URL "pkcs11:model=SoftHSM;manufacturer=SoftHSM;serial=1;token=test"
 #define CONFIG_NAME "softhsm-privkey"
 #define CONFIG CONFIG_NAME".config"
 
@@ -124,14 +123,12 @@ void doit(void)
 	char buf[128];
 	int exit_val = 0;
 	int ret;
-	FILE *fp;
 	const char *lib, *bin;
 	gnutls_x509_crt_t crt;
 	gnutls_x509_privkey_t key;
 	gnutls_certificate_credentials_t cred;
 	gnutls_datum_t tmp;
 
-	unsetenv("SOFTHSM_CONF");
 	/* The overloading of time() seems to work in linux (ELF?)
 	 * systems only. Disable it on windows.
 	 */
@@ -154,18 +151,7 @@ void doit(void)
 	if (debug)
 		gnutls_global_set_log_level(4711);
 
-	/* write softhsm.config */
-	fp = fopen(CONFIG, "w");
-	if (fp == NULL) {
-		fprintf(stderr, "error writing %s\n", CONFIG);
-		exit(1);
-	}
-	remove(CONFIG_NAME".db");
-	fputs("0:"CONFIG_NAME".db\n", fp);
-	fclose(fp);
-
-	setenv("SOFTHSM_CONF", CONFIG, 0);
-
+	set_softhsm_conf(CONFIG);
 	snprintf(buf, sizeof(buf), "%s --init-token --slot 0 --label test --so-pin "PIN" --pin "PIN, bin);
 	system(buf);
 
@@ -223,26 +209,26 @@ void doit(void)
 	}
 
 	/* initialize softhsm token */
-	ret = gnutls_pkcs11_token_init(URL, PIN, "test");
+	ret = gnutls_pkcs11_token_init(SOFTHSM_URL, PIN, "test");
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_token_set_pin(URL, NULL, PIN, GNUTLS_PIN_USER);
+	ret = gnutls_pkcs11_token_set_pin(SOFTHSM_URL, NULL, PIN, GNUTLS_PIN_USER);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_token_set_pin: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_copy_x509_crt(URL, crt, "cert",
+	ret = gnutls_pkcs11_copy_x509_crt(SOFTHSM_URL, crt, "cert",
 					  GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE|GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_crt: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_copy_x509_privkey(URL, key, "cert", GNUTLS_KEY_DIGITAL_SIGNATURE|GNUTLS_KEY_KEY_ENCIPHERMENT,
+	ret = gnutls_pkcs11_copy_x509_privkey(SOFTHSM_URL, key, "cert", GNUTLS_KEY_DIGITAL_SIGNATURE|GNUTLS_KEY_KEY_ENCIPHERMENT,
 					      GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE|GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE|GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 	if (ret < 0) {
 		fail("gnutls_pkcs11_copy_x509_privkey: %s\n", gnutls_strerror(ret));
@@ -262,7 +248,7 @@ void doit(void)
 		exit(1);
 	}
 
-	ret = gnutls_certificate_set_x509_key_file2(cred, URL";object=cert;object-type=cert", URL";object=cert;object-type=private", 0, PIN, 0);
+	ret = gnutls_certificate_set_x509_key_file2(cred, SOFTHSM_URL";object=cert;object-type=cert", SOFTHSM_URL";object=cert;object-type=private", 0, PIN, 0);
 	if (ret < 0) {
 		fail("gnutls_certificate_set_x509_key_file2: %s\n", gnutls_strerror(ret));
 		exit(1);
