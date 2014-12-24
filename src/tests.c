@@ -246,6 +246,7 @@ test_code_t test_safe_renegotiation(gnutls_session_t session)
 	return ret;
 }
 
+#ifdef ENABLE_OCSP
 test_code_t test_ocsp_status(gnutls_session_t session)
 {
 	int ret;
@@ -275,6 +276,7 @@ test_code_t test_ocsp_status(gnutls_session_t session)
 
 	return TEST_FAILED;
 }
+#endif
 
 test_code_t test_safe_renegotiation_scsv(gnutls_session_t session)
 {

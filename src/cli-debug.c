@@ -165,8 +165,10 @@ static const TLS_TEST tls_tests[] = {
 #endif
 	{"for max record size (RFC6066) support", test_max_record_size, "yes",
 	 "no", "dunno"},
+#ifdef ENABLE_OCSP
 	{"for OCSP status response (RFC6066) support", test_ocsp_status, "yes",
 	 "no", "dunno"},
+#endif
 	{"for OpenPGP authentication (RFC6091) support", test_openpgp1,
 	 "yes", "no", "dunno"},
 	{NULL, NULL, NULL, NULL, NULL}
