@@ -78,6 +78,16 @@ when available.
 
 ** gnutls-cli: added option --priority-list.
 
+** guile: Deprecated priority API has been removed. The old priority API, 
+which had been deprecated for some time, is now gone; use 'set-session-priorities!'
+instead.
+
+** guile: Remove RSA parameters and related procedures. This API had been 
+deprecated.  
+
+** guile: Fix compilation on MinGW. Previously only the static version of the 
+'guile-gnutls-v-2' library would be built, preventing dynamic loading from Guile.
+
 ** API and ABI modifications:
 gnutls_aead_cipher_init: Added
 gnutls_aead_cipher_decrypt: Added
@@ -148,35 +158,21 @@ gnutls_sign_callback_set: Removed
 gnutls_x509_crt_verify_data: Removed
 gnutls_x509_crt_verify_hash: Removed
 
-** guile: Deprecated priority API has been removed.
+guile:
+set-session-cipher-priority!: Removed
+set-session-mac-priority!: Removed
+set-session-compression-method-priority!: Removed
+set-session-kx-priority!: Removed
+set-session-protocol-priority!: Removed
+set-session-certificate-type-priority!: Removed
+set-session-default-priority!: Removed
+set-session-default-export-priority!: Removed
+make-rsa-parameters: Removed
+rsa-parameters?: Removed
+set-certificate-credentials-rsa-export-parameters!: Removed
+pkcs1-import-rsa-parameters: Removed
+pkcs1-export-rsa-parameters: Removed
 
-The old priority API, which had been deprecated for some time, is now
-gone; use 'set-session-priorities!' instead.  Procedures removed:
-
-set-session-cipher-priority!
-set-session-mac-priority!
-set-session-compression-method-priority!
-set-session-kx-priority!
-set-session-protocol-priority!
-set-session-certificate-type-priority!
-set-session-default-priority!
-set-session-default-export-priority!
-
-** guile: Remove RSA parameters and related procedures.
-
-This API had been deprecated.  Note that the Guile bindings in GnuTLS
-3.3.11 would fail to build because of this.  Procedures removed:
-
-make-rsa-parameters
-rsa-parameters?
-set-certificate-credentials-rsa-export-parameters!
-pkcs1-import-rsa-parameters
-pkcs1-export-rsa-parameters
-
-** guile: Fix compilation on MinGW.
-
-Previously only the static version of the 'guile-gnutls-v-2' library
-would be built, preventing dynamic loading from Guile.
 
 
 * Version 3.3.6 (released 2014-07-23)
