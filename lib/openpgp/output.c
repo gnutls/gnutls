@@ -351,6 +351,9 @@ static void print_cert(gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
 		size_t dn_size = 0;
 
 		err = gnutls_openpgp_crt_get_name(cert, i, NULL, &dn_size);
+		if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+
 		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 			addf(str, "error: get_name: %s\n",
 			     gnutls_strerror(err));
