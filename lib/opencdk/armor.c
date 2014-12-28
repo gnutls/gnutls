@@ -313,14 +313,14 @@ static cdk_error_t armor_decode(void *data, FILE * in, FILE * out)
 	/* Search the tail of the message */
 	s = fgets(buf, DIM(buf) - 1, in);
 	if (s) {
-		int len = strlen(buf);
-		if (buf[len - 1] == '\n') {
-			len--;
-			buf[len] = '\0';
+		int buf_len = strlen(buf);
+		if (buf[buf_len - 1] == '\n') {
+			buf_len--;
+			buf[buf_len] = '\0';
 		}
-		if (buf[len - 1] == '\r') {
-			len--;
-			buf[len] = '\0';
+		if (buf[buf_len - 1] == '\r') {
+			buf_len--;
+			buf[buf_len] = '\0';
 		}
 		rc = CDK_General_Error;
 		afx->idx2 = search_header(buf, armor_end);
