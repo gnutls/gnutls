@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-AM_CFLAGS = $(NETTLE_CFLAGS)
+AM_CFLAGS = $(WERROR_CFLAGS) $(WSTACK_CFLAGS) $(WARN_CFLAGS) $(NETTLE_CFLAGS)
 
 AM_CPPFLAGS = \
 	-I$(srcdir)/../../gl		\
