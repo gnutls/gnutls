@@ -331,7 +331,7 @@ int _gnutls_find_config_path(char *path, size_t max_size)
 		const char *home_path = getenv("HOMEPATH");
 
 		if (home_drive != NULL && home_path != NULL) {
-			snprintf(path, max_size, "%s%s/" CONFIG_PATH, home_drive, home_path);
+			snprintf(path, max_size, "%s%s\\" CONFIG_PATH, home_drive, home_path);
 		} else {
 			path[0] = 0;
 		}
