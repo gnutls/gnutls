@@ -313,7 +313,9 @@ static void tls_log_func(int level, const char *str)
 void doit(void)
 {
 	gnutls_openpgp_keyring_t keyring;
+	gnutls_openpgp_crt_t crt;
 	gnutls_datum_t data;
+	gnutls_datum_t txt;
 	int ret;
 
 	ret = global_init();
@@ -335,6 +337,11 @@ void doit(void)
 	if (ret < 0)
 		fail("keyring-import %d\n", ret);
 
+	ret = gnutls_openpgp_keyring_get_crt_count(keyring);
+	if (ret != 2) {
+		fail("gnutls_openpgp_keyring_get_crt_count: %d\n", ret);
+	}
+
 	ret =
 	    gnutls_openpgp_keyring_check_id(keyring, id_not_in_keyring, 0);
 	if (ret == 0)
@@ -348,6 +355,34 @@ void doit(void)
 	if (ret != 0)
 		fail("keyring-check-id second key %d\n", ret);
 
+	ret = gnutls_openpgp_keyring_get_crt(keyring, 0, &crt);
+	if (ret != 0) {
+		fail("gnutls_openpgp_keyring_get_crt1: %d\n", ret);
+	}
+
+	ret = gnutls_openpgp_crt_print(crt, GNUTLS_CRT_PRINT_ONELINE, &txt);
+	if (ret != 0) {
+		fail("gnutls_openpgp_crt_print1: %d\n", ret);
+	} else if (debug) {
+		success("%s\n", (char*)txt.data);
+	}
+	gnutls_free(txt.data);
+	gnutls_openpgp_crt_deinit(crt);
+
+	/* second cert */
+	ret = gnutls_openpgp_keyring_get_crt(keyring, 1, &crt);
+	if (ret != 0) {
+		fail("gnutls_openpgp_keyring_get_crt2: %d\n", ret);
+	}
+
+	ret = gnutls_openpgp_crt_print(crt, GNUTLS_CRT_PRINT_ONELINE, &txt);
+	if (ret != 0) {
+		fail("gnutls_openpgp_crt_print2: %d\n", ret);
+	} else if (debug) {
+		success("%s\n", (char*)txt.data);
+	}
+	gnutls_free(txt.data);
+	gnutls_openpgp_crt_deinit(crt);
 	if (debug)
 		success("done\n");
 
