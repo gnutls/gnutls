@@ -132,7 +132,8 @@ padlock_aes_cbc_encrypt(void *_ctx, const void *src, size_t src_size,
 
 	pce = ALIGN16(&ctx->expanded_key);
 
-	padlock_cbc_encrypt(dst, src, pce, src_size);
+	if (src_size > 0)
+		padlock_cbc_encrypt(dst, src, pce, src_size);
 
 	return 0;
 }
@@ -147,7 +148,8 @@ padlock_aes_cbc_decrypt(void *_ctx, const void *src, size_t src_size,
 
 	pcd = ALIGN16(&ctx->expanded_key);
 
-	padlock_cbc_encrypt(dst, src, pcd, src_size);
+	if (src_size > 0)
+		padlock_cbc_encrypt(dst, src, pcd, src_size);
 
 	return 0;
 }

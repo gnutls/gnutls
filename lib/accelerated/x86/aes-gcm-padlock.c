@@ -54,7 +54,8 @@ static void padlock_aes_encrypt(void *_ctx,
 
 	pce = ALIGN16(&ctx->expanded_key);
 
-	padlock_ecb_encrypt(dst, src, pce, length);
+	if (length > 0)
+		padlock_ecb_encrypt(dst, src, pce, length);
 }
 
 static void padlock_aes_set_encrypt_key(struct padlock_ctx *_ctx,
