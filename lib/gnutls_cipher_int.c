@@ -239,17 +239,19 @@ int _gnutls_auth_cipher_encrypt2_tag(auth_cipher_hd_st * handle,
 
 		if (handle->non_null != 0) {
 			l = (textlen / blocksize) * blocksize;
-			ret =
-			    _gnutls_cipher_encrypt2(&handle->cipher, text,
+			if (l > 0) {
+				ret =
+			    	_gnutls_cipher_encrypt2(&handle->cipher, text,
 						    l, ciphertext,
 						    ciphertextlen);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
 
-			textlen -= l;
-			text += l;
-			ciphertext += l;
-			ciphertextlen -= l;
+				textlen -= l;
+				text += l;
+				ciphertext += l;
+				ciphertextlen -= l;
+			}
 
 			if (ciphertext != text && textlen > 0)
 				memcpy(ciphertext, text, textlen);
