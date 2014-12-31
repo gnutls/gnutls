@@ -1,0 +1,3 @@
+<version>3.4</version>
+<headers>../gnutls3.4/lib/includes/gnutls/</headers>
+<libs>../gnutls3.4/lib/.libs/</libs>
