@@ -74,15 +74,20 @@ char *ip_to_string(void *_ip, int ip_size, char *string,
 		ip = _ip;
 		switch (ip_size) {
 		case 4:
-			snprintf(string, string_size, "%u.%u.%u.%u", ip[0], ip[1],
-				 ip[2], ip[3]);
+			snprintf(string, string_size, "%u.%u.%u.%u",
+				 (unsigned)ip[0], (unsigned)ip[1],
+				 (unsigned)ip[2], (unsigned)ip[3]);
 			break;
 		case 16:
 			snprintf(string, string_size, "%x:%x:%x:%x:%x:%x:%x:%x",
-				 (ip[0] << 8) | ip[1], (ip[2] << 8) | ip[3],
-				 (ip[4] << 8) | ip[5], (ip[6] << 8) | ip[7],
-				 (ip[8] << 8) | ip[9], (ip[10] << 8) | ip[11],
-				 (ip[12] << 8) | ip[13], (ip[14] << 8) | ip[15]);
+				 (unsigned)((ip[0] << 8) | ip[1]), 
+				 (unsigned)((ip[2] << 8) | ip[3]),
+				 (unsigned)((ip[4] << 8) | ip[5]), 
+				 (unsigned)((ip[6] << 8) | ip[7]),
+				 (unsigned)((ip[8] << 8) | ip[9]),
+				 (unsigned)((ip[10] << 8) | ip[11]),
+				 (unsigned)((ip[12] << 8) | ip[13]),
+				 (unsigned)((ip[14] << 8) | ip[15]));
 			break;
 		}
 		return string;
