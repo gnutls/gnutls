@@ -230,7 +230,6 @@ static const int _kx_priority_secure[] = {
 static const int* kx_priority_secure = _kx_priority_secure;
 
 static const int _cipher_priority_performance_default[] = {
-	GNUTLS_CIPHER_ARCFOUR_128,
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_CAMELLIA_128_GCM,
@@ -260,7 +259,6 @@ static const int _cipher_priority_normal_default[] = {
 	GNUTLS_CIPHER_AES_128_CCM,
 	GNUTLS_CIPHER_AES_256_CCM,
 	GNUTLS_CIPHER_3DES_CBC,
-	GNUTLS_CIPHER_ARCFOUR_128,
 	0
 };
 
@@ -1012,7 +1010,7 @@ finish:
  * /etc/gnutls/default-priorities. Any keywords that follow it, will 
  * be appended to the expanded string. If there is no system string,
  * then the function will fail. The system file should be formatted
- * as "KEYWORD=VALUE", e.g., "SYSTEM=NORMAL:-ARCFOUR-128".
+ * as "KEYWORD=VALUE", e.g., "SYSTEM=NORMAL:+ARCFOUR-128".
  *
  * Special keywords are "!", "-" and "+".
  * "!" or "-" appended with an algorithm will remove this algorithm.
@@ -1025,7 +1023,7 @@ finish:
  *
  * "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
  *
- * "NORMAL:-ARCFOUR-128" means normal ciphers except for ARCFOUR-128.
+ * "NORMAL:+ARCFOUR-128" means normal ciphers plus ARCFOUR-128.
  *
  * "SECURE128:-VERS-SSL3.0:+COMP-DEFLATE" means that only secure ciphers are
  * enabled, SSL3.0 is disabled, and libz compression enabled.

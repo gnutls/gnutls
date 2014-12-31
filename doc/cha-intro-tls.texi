@@ -122,7 +122,7 @@ encryption (EDE). Has 64 bits block size and is used in CBC mode.
 
 @item ARCFOUR_@-128 @tab
 ARCFOUR_128 is a compatible algorithm with RSA's RC4 algorithm, which is considered to be a trade
-secret. It is a fast cipher but considered weak today.
+secret. It is a fast cipher but considered weak today, and thus it is not enabled by default.
 
 @item AES_@-CBC @tab
 AES or RIJNDAEL is the block cipher algorithm that replaces the old

@@ -922,7 +922,7 @@ Means that a compile-time specified system configuration file@footnote{The defau
 will be used to expand the provided keyword. That is used to impose system-specific policies.
 It may be followed by additional options that will be appended to the
 system string (e.g., "@@SYSTEM:+SRP"). The system file should have the
-format 'KEYWORD=VALUE', e.g., 'SYSTEM=NORMAL:-ARCFOUR-128'.
+format 'KEYWORD=VALUE', e.g., 'SYSTEM=NORMAL:+ARCFOUR-128'.
 
 @item PERFORMANCE @tab
 All the known to be secure ciphersuites are enabled,
@@ -1031,7 +1031,7 @@ appended with an algorithm will add this algorithm.
 @headitem Type @tab Keywords
 @item Ciphers @tab
 AES-128-CBC, AES-256-CBC, AES-128-GCM, CAMELLIA-128-CBC,
-CAMELLIA-256-CBC, ARCFOUR-128, 3DES-CBC ARCFOUR-40. Catch all
+CAMELLIA-256-CBC, ARCFOUR-128, 3DES-CBC. Catch all
 name is CIPHER-ALL which will add all the algorithms from NORMAL
 priority.
 
@@ -1205,8 +1205,8 @@ The default priority without the HMAC-MD5:
 Specifying RSA with AES-128-CBC:
     "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
 
-Specifying the defaults except ARCFOUR-128:
-    "NORMAL:-ARCFOUR-128"
+Specifying the defaults plus ARCFOUR-128:
+    "NORMAL:+ARCFOUR-128"
 
 Enabling the 128-bit secure ciphers, while disabling TLS 1.0 and enabling compression:
     "SECURE128:-VERS-TLS1.0:+COMP-DEFLATE"
