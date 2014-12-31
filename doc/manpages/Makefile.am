@@ -1275,6 +1275,34 @@ stamp_mans: $(HEADER_FILES)
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
+	@echo $(ECHO_N) "Creating man pages for urls.h..." && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/urls.h`; do \
+		$(top_srcdir)/doc/scripts/gdoc -man \
+			-module $(PACKAGE) -sourceversion $(VERSION) \
+			-bugsto $(PACKAGE_BUGREPORT) \
+			-pkg-site "http://www.gnutls.org" \
+			-include "gnutls/urls.h" \
+			-seeinfo $(PACKAGE) -verbatimcopying \
+			-copyright "2014 Free Software Foundation, Inc." \
+			-function $$i \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+		echo $(ECHO_N) "."; \
+	done
+	@echo ""
+	@echo $(ECHO_N) "Creating man pages for system-keys.h..." && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/system-keys.h`; do \
+		$(top_srcdir)/doc/scripts/gdoc -man \
+			-module $(PACKAGE) -sourceversion $(VERSION) \
+			-bugsto $(PACKAGE_BUGREPORT) \
+			-pkg-site "http://www.gnutls.org" \
+			-include "gnutls/system-keys.h" \
+			-seeinfo $(PACKAGE) -verbatimcopying \
+			-copyright "2014 Free Software Foundation, Inc." \
+			-function $$i \
+			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+		echo $(ECHO_N) "."; \
+	done
+	@echo ""
 	echo $@ > $@
 
 .PHONY: update-makefile
