@@ -3389,7 +3389,31 @@ void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
 			}
 		} else {
 			gnutls_pubkey_deinit(pubkey);
-			pubkey = load_pubkey(1, cinfo);
+			pubkey = load_pubkey(0, cinfo);
+
+			if (pubkey == NULL) { /* load from stdin */
+				gnutls_datum_t pem;
+
+				pem.data = (void *) fread_file(infile, &size);
+				pem.size = size;
+
+				ret = gnutls_pubkey_init(&pubkey);
+				if (ret < 0) {
+					fprintf(stderr,
+						"pubkey_init: %s\n",
+						gnutls_strerror(ret));
+					exit(1);
+				}
+
+				ret = gnutls_pubkey_import(pubkey, &pem, GNUTLS_X509_FMT_PEM);
+				if (ret < 0) {
+					fprintf(stderr,
+						"pubkey_import: %s\n",
+						gnutls_strerror(ret));
+					exit(1);
+				}
+			}
+
 		}
 	}
 
