@@ -1028,7 +1028,7 @@ int _gnutls_system_key_init(void)
 	int ret;
 
 #ifdef DYN_NCRYPT
-	ncrypt_lib = LoadLibrary("ncrypt.dll");
+	ncrypt_lib = LoadLibraryA("ncrypt.dll");
 	if (ncrypt_lib == NULL) {
 		return gnutls_assert_val(GNUTLS_E_CRYPTO_INIT_FAILED);
 	}
