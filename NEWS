@@ -20,6 +20,10 @@ structures.
 "gnutls/system-keys.h". It is currently restricted to windows CNG
 keys.
 
+** libgnutls: priority strings VERS-TLS-ALL and VERS-DTLS-ALL are 
+restricted to the corresponding protocols only, and the VERS-ALL
+string is introduced to catch all possible protocols.
+
 ** libgnutls: SSL 3.0 is no longer included in the default priorities
 list. It has to be explicitly enabled, e.g., with a string like
 "NORMAL:+VERS-SSL3.0".
