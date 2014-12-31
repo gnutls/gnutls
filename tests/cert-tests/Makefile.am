@@ -29,9 +29,9 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	template-nc.tmpl template-nc.pem xmpp-othername.pem \
 	suppressions.valgrind csr-invalid.der
 
-dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane crq
+dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane crq certtool
 
-TESTS = pathlen aki pem-decoding
+TESTS = pathlen aki pem-decoding certtool
 
 if ENABLE_NON_SUITEB_CURVES
 TESTS += crq
