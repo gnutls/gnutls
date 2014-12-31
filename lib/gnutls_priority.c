@@ -33,6 +33,8 @@
 
 #define MAX_ELEMENTS 64
 
+static void prio_remove(priority_st * priority_list, unsigned int algo);
+static void prio_add(priority_st * priority_list, unsigned int algo);
 static void
 break_list(char *etag,
 		 char *broken_etag[MAX_ELEMENTS], int *size);
@@ -87,6 +89,15 @@ static void _clear_priorities(priority_st * st, const int *list)
 	memset(st, 0, sizeof(*st));
 }
 
+static void _clear_given_priorities(priority_st * st, const int *list)
+{
+	unsigned i;
+
+	for (i=0;list[i]!=0;i++) {
+		prio_remove(st, list[i]);
+	}
+}
+
 static const int _supported_ecc_normal[] = {
 	GNUTLS_ECC_CURVE_SECP256R1,
 	GNUTLS_ECC_CURVE_SECP384R1,
@@ -133,6 +144,20 @@ static const int protocol_priority[] = {
 	GNUTLS_TLS1_0,
 	GNUTLS_DTLS1_2,
 	GNUTLS_DTLS1_0,
+	0
+};
+
+static const int stream_protocol_priority[] = {
+	GNUTLS_TLS1_2,
+	GNUTLS_TLS1_1,
+	GNUTLS_TLS1_0,
+	0
+};
+
+static const int dgram_protocol_priority[] = {
+	GNUTLS_DTLS1_2,
+	GNUTLS_DTLS1_0,
+	GNUTLS_DTLS0_9,
 	0
 };
 
@@ -1027,6 +1052,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	int algo;
 	rmadd_func *fn;
 	bulk_rmadd_func *bulk_fn;
+	bulk_rmadd_func *bulk_given_fn;
 
 	if (err_pos)
 		*err_pos = priorities;
@@ -1086,9 +1112,11 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 			if (broken_list[i][0] == '+') {
 				fn = prio_add;
 				bulk_fn = _add_priority;
+				bulk_given_fn = _add_priority;
 			} else {
 				fn = prio_remove;
 				bulk_fn = _clear_priorities;
+				bulk_given_fn = _clear_given_priorities;
 			}
 
 			if (broken_list[i][0] == '+'
@@ -1112,13 +1140,18 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 				if (strncasecmp
 				    (&broken_list[i][1], "VERS-TLS-ALL",
 				     12) == 0) {
-					bulk_fn(&(*priority_cache)->
+					bulk_given_fn(&(*priority_cache)->
 						protocol,
-						protocol_priority);
-				} else
-				    if (strncasecmp
+						stream_protocol_priority);
+				} else if (strncasecmp
 					(&broken_list[i][1],
 					 "VERS-DTLS-ALL", 13) == 0) {
+					bulk_given_fn(&(*priority_cache)->
+						protocol,
+						(bulk_given_fn==_add_priority)?dtls_protocol_priority:dgram_protocol_priority);
+				} else if (strncasecmp
+					(&broken_list[i][1],
+					 "VERS-ALL", 8) == 0) {
 					bulk_fn(&(*priority_cache)->
 						protocol,
 						dtls_protocol_priority);
