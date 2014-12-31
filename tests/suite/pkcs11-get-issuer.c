@@ -260,6 +260,25 @@ void doit(void)
 		exit(1);
 	}
 
+	/* Check gnutls_x509_trust_list_get_raw_issuer_by_dn */
+	ret = gnutls_x509_crt_get_raw_issuer_dn(certs[2], &tmp);
+	if (ret < 0) {
+		fail("error in gnutls_x509_crt_get_raw_issuer_dn: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	ret = gnutls_x509_trust_list_get_issuer_by_dn(tl, &tmp, &issuer, 0);
+	gnutls_free(tmp.data);
+	if (ret < 0) {
+		fail("error in gnutls_x509_trust_list_get_issuer\n");
+		exit(1);
+	}
+	if (issuer == NULL) {
+		fail("error in gnutls_x509_trust_list_get_issuer_by_dn return value\n");
+		exit(1);
+	}
+	gnutls_x509_crt_deinit(issuer);
+
 	if (debug)
 		printf("\tCleanup...");
 
