@@ -1154,7 +1154,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 					 "VERS-ALL", 8) == 0) {
 					bulk_fn(&(*priority_cache)->
 						protocol,
-						dtls_protocol_priority);
+						protocol_priority);
 				} else {
 					if ((algo =
 					     gnutls_protocol_get_id
