@@ -28,6 +28,10 @@ string is introduced to catch all possible protocols.
 list. It has to be explicitly enabled, e.g., with a string like
 "NORMAL:+VERS-SSL3.0".
 
+** libgnutls: ARCFOUR (RC4) is no longer included in the default priorities
+list. It has to be explicitly enabled, e.g., with a string like
+"NORMAL:+ARCFOUR-128".
+
 ** libgnutls: Use nettle's PBKDF2 implementation.
 
 ** libgnutls: gnutls_x509_crt_check_hostname() and friends will use
