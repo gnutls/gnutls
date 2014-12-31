@@ -21,6 +21,9 @@ object we are importing, don't require the object type in the URL.
 ** guile: Fix compilation on MinGW. Previously only the static version of the 
 'guile-gnutls-v-2' library would be built, preventing dynamic loading from Guile.
 
+** certtool: --load-pubkey will also attempt to load a public key
+from stdin.
+
 ** API and ABI modifications:
 No changes since last version.
 
