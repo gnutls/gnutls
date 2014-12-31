@@ -189,6 +189,18 @@ flag = {
 };
 
 flag = {
+    name      = fingerprint;
+    descrip   = "Print the fingerprint of the given certificate";
+    doc       = "This is a simple hash of the DER encoding of the certificate. It is always better to use the key-id.";
+};
+
+flag = {
+    name      = key-id;
+    descrip   = "Print the key ID of the given certificate";
+    doc       = "This is a hash of the public key of the given certificate. It identifies the key uniquely, remains the same on a certificate renewal and depends only on signed fields of the certificate.";
+};
+
+flag = {
     name      = certificate-pubkey;
     descrip   = "Print certificate's public key";
     doc       = "";

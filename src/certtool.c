@@ -76,6 +76,9 @@ static void print_certificate_info(gnutls_x509_crt_t crt, FILE * out,
 				   unsigned int all);
 static void verify_certificate(common_info_st * cinfo);
 
+static void pubkey_keyid(common_info_st * cinfo);
+static void certificate_fpr(common_info_st * cinfo);
+
 FILE *outfile;
 FILE *infile;
 static gnutls_digest_algorithm_t default_dig;
@@ -1199,6 +1202,10 @@ static void cmd_parser(int argc, char **argv)
 		privkey_info(&cinfo);
 	else if (HAVE_OPT(PUBKEY_INFO))
 		pubkey_info(NULL, &cinfo);
+	else if (HAVE_OPT(FINGERPRINT))
+		certificate_fpr(&cinfo);
+	else if (HAVE_OPT(KEY_ID))
+		pubkey_keyid(&cinfo);
 	else if (HAVE_OPT(TO_P12))
 		generate_pkcs12(&cinfo);
 	else if (HAVE_OPT(P12_INFO))
@@ -3337,14 +3344,16 @@ void smime_to_pkcs7(void)
 	free(lineptr);
 }
 
-
-void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
+/* Tries to find a public key in the provided options or stdin */
+static
+gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 {
-	gnutls_pubkey_t pubkey;
+	gnutls_pubkey_t pubkey = NULL;
 	gnutls_privkey_t privkey = NULL;
 	gnutls_x509_crq_t crq = NULL;
 	int ret;
 	size_t size;
+	gnutls_datum_t pem;
 
 	ret = gnutls_pubkey_init(&pubkey);
 	if (ret < 0) {
@@ -3392,8 +3401,6 @@ void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
 			pubkey = load_pubkey(0, cinfo);
 
 			if (pubkey == NULL) { /* load from stdin */
-				gnutls_datum_t pem;
-
 				pem.data = (void *) fread_file(infile, &size);
 				pem.size = size;
 
@@ -3405,16 +3412,57 @@ void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
 					exit(1);
 				}
 
-				ret = gnutls_pubkey_import(pubkey, &pem, GNUTLS_X509_FMT_PEM);
-				if (ret < 0) {
-					fprintf(stderr,
-						"pubkey_import: %s\n",
+				if (memmem(pem.data, pem.size, "BEGIN PUBLIC KEY", 16) != 0) {
+
+					ret = gnutls_pubkey_import(pubkey, &pem, GNUTLS_X509_FMT_PEM);
+					if (ret < 0) {
+						fprintf(stderr,
+							"pubkey_import: %s\n",
+							gnutls_strerror(ret));
+						exit(1);
+					}
+				} else {
+					ret = gnutls_x509_crt_init(&crt);
+					if (ret < 0) {
+						fprintf(stderr,
+							"crt_init: %s\n",
+							gnutls_strerror(ret));
+						exit(1);
+					}
+
+					ret = gnutls_x509_crt_import(crt, &pem, GNUTLS_X509_FMT_PEM);
+					if (ret < 0) {
+						fprintf(stderr,
+							"crt_import: %s\n",
+							gnutls_strerror(ret));
+						exit(1);
+					}
+
+					ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
+					if (ret < 0) {
+						fprintf(stderr, "pubkey_import_x509: %s\n",
 						gnutls_strerror(ret));
-					exit(1);
+						exit(1);
+					}
 				}
 			}
 
 		}
+	}
+
+	return pubkey;
+}
+
+void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
+{
+	gnutls_pubkey_t pubkey;
+	int ret;
+	size_t size;
+
+	pubkey = find_pubkey(crt, cinfo);
+	if (pubkey == 0) {
+		fprintf(stderr, "find public key error\n");
+		exit(1);
 	}
 
 	if (outcert_format == GNUTLS_X509_FMT_DER) {
@@ -3439,4 +3487,117 @@ void pubkey_info(gnutls_x509_crt_t crt, common_info_st * cinfo)
 
 	_pubkey_info(outfile, full_format, pubkey);
 	gnutls_pubkey_deinit(pubkey);
+}
+
+static
+void pubkey_keyid(common_info_st * cinfo)
+{
+	gnutls_pubkey_t pubkey;
+	uint8_t fpr[32];
+	char txt[128];
+	int ret;
+	size_t size, fpr_size;
+	gnutls_datum_t tmp;
+
+	pubkey = find_pubkey(NULL, cinfo);
+	if (pubkey == 0) {
+		fprintf(stderr, "find public key error\n");
+		exit(1);
+	}
+
+	fpr_size = sizeof(fpr);
+	ret = gnutls_pubkey_get_key_id(pubkey, 0, fpr, &fpr_size);
+	if (ret < 0) {
+		fprintf(stderr,
+			"get_key_id: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	tmp.data = fpr;
+	tmp.size = fpr_size;
+
+	size = sizeof(txt);
+	ret = gnutls_hex_encode(&tmp, txt, &size);
+	if (ret < 0) {
+		fprintf(stderr,
+			"hex_encode: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fputs(txt, outfile);
+	fputs("\n", outfile);
+
+	gnutls_pubkey_deinit(pubkey);
+	return;
+}
+
+static
+void certificate_fpr(common_info_st * cinfo)
+{
+	gnutls_x509_crt_t crt;
+	size_t size;
+	int ret = 0;
+	gnutls_datum_t pem, tmp;
+	unsigned int crt_num;
+	uint8_t fpr[32];
+	char txt[128];
+	size_t fpr_size;
+
+	crt = load_cert(0, cinfo);
+
+	if (crt == NULL) {
+		pem.data = (void *) fread_file(infile, &size);
+		pem.size = size;
+
+		crt_num = 1;
+		ret =
+		    gnutls_x509_crt_list_import(&crt, &crt_num, &pem, incert_format,
+						GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+		if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			fprintf(stderr, "too many certificates (%d).",
+				crt_num);
+		} else if (ret >= 0 && crt_num == 0) {
+			fprintf(stderr, "no certificates were found.\n");
+		}
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	free(pem.data);
+
+	fpr_size = sizeof(fpr);
+
+	if (default_dig == GNUTLS_DIG_UNKNOWN)
+		default_dig = GNUTLS_DIG_SHA1;
+
+	ret = gnutls_x509_crt_get_fingerprint(crt, default_dig, fpr, &fpr_size);
+	if (ret < 0) {
+		fprintf(stderr,
+			"get_key_id: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	tmp.data = fpr;
+	tmp.size = fpr_size;
+
+	size = sizeof(txt);
+	ret = gnutls_hex_encode(&tmp, txt, &size);
+	if (ret < 0) {
+		fprintf(stderr,
+			"hex_encode: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fputs(txt, outfile);
+	fputs("\n", outfile);
+
+	gnutls_x509_crt_deinit(crt);
+	return;
 }
