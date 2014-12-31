@@ -99,6 +99,9 @@ int gnutls_system_global_init(void);
 void gnutls_system_global_deinit(void);
 
 #ifndef _WIN32
+# if defined(HAVE_NETINET_IN_H)
+#  include <netinet/in.h>
+# endif
 # include <arpa/inet.h>
 #else
 # define inet_aton _gnutls_inet_aton
