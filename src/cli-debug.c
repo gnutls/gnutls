@@ -289,7 +289,10 @@ int main(int argc, char **argv)
 			else if (ret == TEST_UNSURE)
 				printf(" %s\n", tls_tests[i].unsure_str);
 			else if (ret == TEST_IGNORE) {
-				i++;
+				if (tls_tests[i+1].test_name)
+					i++;
+				else
+					break;
 			}
 		}
 		while (ret == TEST_IGNORE
