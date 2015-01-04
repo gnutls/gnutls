@@ -180,8 +180,9 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		return;
 
 	if (strcasecmp(app_proto, "smtp") == 0 || strcasecmp(app_proto, "submission") == 0) {
-		send_line(socket->fd, "EHLO mail.example.com\n");
 		wait_for_text(socket->fd, "220 ", 4);
+		send_line(socket->fd, "EHLO mail.example.com\n");
+		wait_for_text(socket->fd, "250 ", 4);
 		send_line(socket->fd, "STARTTLS\n");
 		wait_for_text(socket->fd, "220 ", 4);
 	} else if (strcasecmp(app_proto, "imap") == 0 || strcasecmp(app_proto, "imap2") == 0) {
