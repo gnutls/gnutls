@@ -492,10 +492,10 @@ read_crq_set(gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 
 /* The input_str should contain %d or %u to print the default.
  */
-static long read_int_with_default(const char *input_str, long def)
+static int64_t read_int_with_default(const char *input_str, long def)
 {
 	char *endptr;
-	long l;
+	int64_t l;
 	static char input[128];
 
 	fprintf(stderr, input_str, def);
@@ -505,18 +505,39 @@ static long read_int_with_default(const char *input_str, long def)
 	if (IS_NEWLINE(input))
 		return def;
 
+#if SIZEOF_LONG < 8
+	l = strtoll(input, &endptr, 0);
+
+	if (*endptr != '\0' && *endptr != '\r' && *endptr != '\n') {
+		fprintf(stderr, "Trailing garbage ignored: `%s'\n",
+			endptr);
+		return 0;
+	} else {
+		*endptr = 0;
+	}
+
+	if (l <= LLONG_MIN || l >= LLONG_MAX) {
+		fprintf(stderr, "Integer out of range: `%s' (max: %llu)\n", input, LLONG_MAX-1);
+		return 0;
+	}
+#else
 	l = strtol(input, &endptr, 0);
 
 	if (*endptr != '\0' && *endptr != '\r' && *endptr != '\n') {
 		fprintf(stderr, "Trailing garbage ignored: `%s'\n",
 			endptr);
 		return 0;
+	} else {
+		*endptr = 0;
 	}
 
-	if (l <= INT_MIN || l >= INT_MAX) {
-		fprintf(stderr, "Integer out of range: `%s'\n", input);
+	if (l <= LONG_MIN || l >= LONG_MAX) {
+		fprintf(stderr, "Integer out of range: `%s' (max: %lu)\n", input, LONG_MAX-1);
 		return 0;
 	}
+#endif
+
+
 
 	if (input == endptr)
 		l = def;
@@ -524,7 +545,7 @@ static long read_int_with_default(const char *input_str, long def)
 	return l;
 }
 
-long read_int(const char *input_str)
+int64_t read_int(const char *input_str)
 {
 	return read_int_with_default(input_str, 0);
 }

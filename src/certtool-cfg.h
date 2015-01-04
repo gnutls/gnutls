@@ -21,6 +21,7 @@
  */
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <gnutls/x509.h>
 
 void cfg_init(void);
@@ -30,7 +31,7 @@ void read_crt_set(gnutls_x509_crt_t crt, const char *input_str,
 		  const char *oid);
 void read_crq_set(gnutls_x509_crq_t crq, const char *input_str,
 		  const char *oid);
-long read_int(const char *input_str);
+int64_t read_int(const char *input_str);
 const char *read_str(const char *input_str);
 int read_yesno(const char *input_str, int def);
 
