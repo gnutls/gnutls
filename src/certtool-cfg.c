@@ -248,6 +248,20 @@ void cfg_init(void)
       s_name = 1; \
     }
 
+#if SIZEOF_LONG == 8
+# define CHECK_INT64_OVERFLOW(x) \
+      if (x == LONG_MAX) { \
+      	fprintf(stderr, "overflow in number\n"); \
+      	exit(1); \
+      }
+#else
+# define CHECK_INT64_OVERFLOW(x) \
+      if (x == LLONG_MAX) { \
+      	fprintf(stderr, "overflow in number\n"); \
+      	exit(1); \
+      }
+#endif
+
 #define READ_NUMERIC(name, s_name) \
   val = optionGetValue(pov, name); \
   if (val != NULL) \
@@ -410,6 +424,8 @@ int template_parse(const char *template)
 
 
 	READ_NUMERIC("serial", cfg.serial);
+	CHECK_INT64_OVERFLOW(cfg.serial);
+
 	READ_NUMERIC("expiration_days", cfg.expiration_days);
 	READ_NUMERIC("crl_next_update", cfg.crl_next_update);
 	READ_NUMERIC("crl_number", cfg.crl_number);
