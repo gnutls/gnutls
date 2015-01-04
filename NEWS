@@ -5,10 +5,14 @@ See the end for copying conditions.
 
 * Version 3.2.22 (not released yet!)
 
-** guile: Fix compilation on MinGW.
+** libgnutls: corrected encoding and decoding of ANSI X9.62 parameters.
 
-Previously only the static version of the 'guile-gnutls-v-2' library
-would be built, preventing dynamic loading from Guile.
+** libgnutls: Handle zero length plaintext for VIA PadLock functions.
+Patch by Matthias-Christian Ott.
+
+** guile: Fix compilation on MinGW. Previously only the static version 
+of the 'guile-gnutls-v-2' library would be built, preventing dynamic loading
+from Guile.
 
 
 * Version 3.2.21 (released 2014-12-11)
