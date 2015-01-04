@@ -170,7 +170,7 @@ typedef struct _cfg_ctx {
 	int ipsec_ike_key;
 	char **key_purpose_oids;
 	int crl_next_update;
-	int crl_number;
+	int64_t crl_number;
 	int crq_extensions;
 	char *proxy_policy_language;
 	char **ocsp_uris;
@@ -429,6 +429,8 @@ int template_parse(const char *template)
 	READ_NUMERIC("expiration_days", cfg.expiration_days);
 	READ_NUMERIC("crl_next_update", cfg.crl_next_update);
 	READ_NUMERIC("crl_number", cfg.crl_number);
+	CHECK_INT64_OVERFLOW(cfg.crl_number);
+
 	READ_NUMERIC("path_len", cfg.path_len);
 
 	val = optionGetValue(pov, "proxy_policy_language");
