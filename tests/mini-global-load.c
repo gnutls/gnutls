@@ -109,11 +109,7 @@ void doit(void)
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 			       serverx509cred);
 	gnutls_priority_set_direct(server,
-#ifndef ENABLE_FIPS140
-				   "NORMAL:-CIPHER-ALL:+ARCFOUR-128",
-#else
 				   "NORMAL:-CIPHER-ALL:+AES-128-CBC",
-#endif
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);

@@ -157,7 +157,7 @@ void doit(void)
 	global_init();
 	gnutls_global_set_log_function(tls_log_func);
 	if (debug)
-		gnutls_global_set_log_level(2);
+		gnutls_global_set_log_level(6);
 
 	/* Init server */
 	gnutls_certificate_allocate_credentials(&serverx509cred);
@@ -197,7 +197,7 @@ void doit(void)
 	if (ret < 0)
 		exit(1);
 
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set_direct(client, "NORMAL:+ARCFOUR-128", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);

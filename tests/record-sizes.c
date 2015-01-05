@@ -90,7 +90,7 @@ void doit(void)
 	gnutls_anon_allocate_client_credentials(&c_anoncred);
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_priority_set_direct(client,
-				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
+				   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+ARCFOUR-128:+MAC-ALL:+SIGN-ALL:+COMP-NULL:+ANON-DH",
 				   NULL);
 	gnutls_credentials_set(client, GNUTLS_CRD_ANON, c_anoncred);
 	gnutls_transport_set_push_function(client, client_push);
