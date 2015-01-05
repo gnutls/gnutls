@@ -250,7 +250,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 	int result, ca_status = 0, is_ike = 0, path_len;
 	time_t secs;
 	int vers;
-	unsigned int usage = 0, server;
+	unsigned int usage = 0, server, ask;
 	gnutls_x509_crq_t crq;	/* request */
 
 	ret = gnutls_x509_crt_init(&crt);
@@ -352,7 +352,19 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		exit(1);
 	}
 
-	secs = get_expiration_date();
+	do {
+		ask = 0;
+		secs = get_expiration_date();
+
+		if (ca_crt && (secs > gnutls_x509_crt_get_expiration_time(ca_crt))) {
+			time_t exp = gnutls_x509_crt_get_expiration_time(ca_crt);
+			fprintf(stderr, "\nExpiration time: %s", ctime(&secs));
+			fprintf(stderr, "CA expiration time: %s", ctime(&exp));
+			fprintf(stderr, "Warning: The time set exceeds the CA's expiration time\n");
+			ask = 1;
+		}
+	} while(batch == 0 && ask != 0 && read_yesno("Is it ok to proceed? (y/N): ", 0) == 0);
+
 
 	result = gnutls_x509_crt_set_expiration_time(crt, secs);
 	if (result < 0) {
