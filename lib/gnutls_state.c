@@ -376,9 +376,8 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 
 #ifdef HAVE_WRITEV
 	gnutls_transport_set_vec_push_function(*session, system_writev);
-#else
-	gnutls_transport_set_push_function(*session, system_write);
 #endif
+	gnutls_transport_set_push_function(*session, system_write);
 	(*session)->internals.pull_timeout_func = system_recv_timeout;
 	(*session)->internals.pull_func = system_read;
 	(*session)->internals.errno_func = system_errno;

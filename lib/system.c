@@ -60,6 +60,12 @@ static HMODULE Crypt32_dll;
 /* System specific function wrappers.
  */
 
+ssize_t
+system_write(gnutls_transport_ptr ptr, const void *data, size_t data_size)
+{
+	return send(GNUTLS_POINTER_TO_INT(ptr), data, data_size, 0);
+}
+
 #ifdef _WIN32
 /* Do not use the gnulib functions for sending and receiving data.
  * Using them makes gnutls only working with gnulib applications.
@@ -94,11 +100,6 @@ int system_errno(gnutls_transport_ptr p)
 	return ret;
 }
 
-ssize_t
-system_write(gnutls_transport_ptr ptr, const void *data, size_t data_size)
-{
-	return send(GNUTLS_POINTER_TO_INT(ptr), data, data_size, 0);
-}
 #else				/* POSIX */
 int system_errno(gnutls_transport_ptr_t ptr)
 {

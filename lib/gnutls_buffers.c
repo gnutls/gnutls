@@ -460,14 +460,30 @@ _gnutls_writev_emu(gnutls_session_t session, gnutls_transport_ptr_t fd,
 
 static ssize_t
 _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
-	       int giovec_cnt)
+	       unsigned giovec_cnt)
 {
 	int i;
+	bool is_dtls = IS_DTLS(session);
+	bool no_writev = 0;
 	gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
 
 	reset_errno(session);
 
-	if (session->internals.push_func != NULL)
+	/* In DTLS we use writev() only when the total sum is less than
+	 * the MTU. */
+
+	if (is_dtls && giovec_cnt > 1) {
+		unsigned sum = 0, j;
+		for (j = 0; j < giovec_cnt; j++) {
+			sum += giovec[j].iov_len;
+		}
+
+		if (sum > session->internals.dtls.mtu) {
+			no_writev = 1;
+		}
+	}
+
+	if (session->internals.push_func != NULL || no_writev != 0)
 		i = _gnutls_writev_emu(session, fd, giovec, giovec_cnt);
 	else
 		i = session->internals.vec_push_func(fd, giovec,
@@ -477,7 +493,7 @@ _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
 		int err = get_errno(session);
 		_gnutls_debug_log("errno: %d\n", err);
 
-		return errno_to_gerr(err, IS_DTLS(session));
+		return errno_to_gerr(err, is_dtls);
 	}
 	return i;
 }
