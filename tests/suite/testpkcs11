@@ -389,7 +389,7 @@ type=$1
 
 if test -z "$type";then
 	echo "usage: $0: [pkcs15|softhsm|sc-hsm]"
-	if test -x "/usr/bin/softhsm";then
+	if test -x "/usr/bin/softhsm" || test -x "/usr/bin/softhsm2-util";then
 		echo "assuming 'softhsm'"
 		echo ""
 		type=softhsm
