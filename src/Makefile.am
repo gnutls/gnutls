@@ -61,7 +61,9 @@ bin_PROGRAMS += gnutls-cli
 endif
 endif
 
+if ENABLE_DANE
 bin_PROGRAMS += danetool
+endif
 
 if ENABLE_TROUSERS
 bin_PROGRAMS += tpmtool
