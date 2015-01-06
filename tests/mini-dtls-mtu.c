@@ -279,56 +279,7 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
-static int udp_socket(void)
-{
-        int on = 1;
-	struct sockaddr_in addr = {
-		.sin_family = AF_INET,
-		.sin_addr = {htonl(INADDR_LOOPBACK)},
-		.sin_port = 0
-	};
-	int fd;
 
-	fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-        setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on));
-#if defined(SO_REUSEPORT)
-        setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, (char*)&on, sizeof(on));
-#endif
-
-	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-                perror("bind");
-                exit(EXIT_FAILURE);
-	}
-
-	return fd;
-}
-
-static void udp_connect(int fd1, int fd2)
-{
-	struct sockaddr_in addr;
-	socklen_t addrlen = sizeof(addr);
-
-	if (getsockname(fd1, &addr, &addrlen) < 0) {
-                perror("getsockname");
-                exit(EXIT_FAILURE);
-	}
-
-	if (connect(fd2, &addr, addrlen) < 0) {
-                perror("connect");
-                exit(EXIT_FAILURE);
-	}
-}
-
-static int udp_socketpair(int *fd)
-{
-	fd[0] = udp_socket();
-	fd[1] = udp_socket();
-
-	udp_connect(fd[0], fd[1]);
-	udp_connect(fd[1], fd[0]);
-
-	return 0;
-}
 
 void doit(void)
 {

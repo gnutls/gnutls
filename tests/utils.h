@@ -57,6 +57,8 @@ extern void escapeprint(const char *str, size_t len);
 extern void hexprint(const void *str, size_t len);
 extern void binprint(const void *str, size_t len);
 
+int udp_socketpair(int *fd);
+
 /* This must be implemented elsewhere. */
 extern void doit(void);
 
