@@ -467,11 +467,13 @@ _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
 
 	reset_errno(session);
 
-	if (session->internals.push_func != NULL)
-		i = _gnutls_writev_emu(session, fd, giovec, giovec_cnt);
-	else
+	if (session->internals.vec_push_func != NULL)
 		i = session->internals.vec_push_func(fd, giovec,
 						     giovec_cnt);
+	else if (session->internals.push_func != NULL)
+		i = _gnutls_writev_emu(session, fd, giovec, giovec_cnt);
+	else
+		return gnutls_assert_val(GNUTLS_E_PUSH_ERROR);
 
 	if (i == -1) {
 		int err = get_errno(session);
