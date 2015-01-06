@@ -33,6 +33,7 @@
 #include <gnutls/dtls.h>
 #include <signal.h>
 #include <unistd.h>
+#include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
@@ -56,6 +57,51 @@ const char *side = "";
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "%s|<%d>| %s", side, level, str);
+}
+
+static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
+{
+	static uint8_t buffer[6 * 1024];
+	static unsigned buffer_size = 0;
+	const uint8_t *d = data;
+	int fd = (long int)tr;
+	int ret;
+
+	if (buffer_size + len > sizeof(buffer)) {
+		abort();
+	}
+
+	memcpy(&buffer[buffer_size], data, len);
+	buffer_size += len;
+//fprintf(stderr, "type: %d, %d, %s\n", (int)d[0], (int)d[13], gnutls_handshake_description_get_name(d[13]));
+	if (d[0] == 22) {	/* handshake */
+		if (d[13] == GNUTLS_HANDSHAKE_CERTIFICATE_PKT ||
+		    d[13] == GNUTLS_HANDSHAKE_CERTIFICATE_STATUS ||
+		    d[13] == GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE ||
+		    d[13] == GNUTLS_HANDSHAKE_SERVER_HELLO ||
+		    d[13] == GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST ||
+		    d[13] == GNUTLS_HANDSHAKE_NEW_SESSION_TICKET ||
+		    d[13] == GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY ||
+		    d[13] == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE) {
+
+			fprintf(stderr, "caching: %s (buffer: %d)\n",
+				gnutls_handshake_description_get_name(d[13]),
+				buffer_size);
+			return len;
+		} else {
+			fprintf(stderr, "sending: %s\n",
+				gnutls_handshake_description_get_name(d[13]));
+
+		}
+	}
+
+	fprintf(stderr, "sending %d bytes\n", (int)buffer_size);
+	ret = send(fd, buffer, buffer_size, 0);
+	if (ret >= 0) {
+		fprintf(stderr, "reset cache\n");
+		buffer_size = 0;
+	}
+	return len;
 }
 
 static unsigned char server_cert_pem[] =
@@ -127,24 +173,24 @@ static void client(int fd)
 
 	gnutls_transport_set_int(session, fd);
 
-	FD_ZERO(&rfds);
-	FD_SET(fd, &rfds);
-
-	/* Wait one second. */
-	tv.tv_sec = 1;
-	tv.tv_usec = 0;
-
 	/* Perform the TLS handshake
 	 */
 	do {
 		ret = gnutls_handshake(session);
 
 		if (ret == GNUTLS_E_AGAIN && gnutls_record_get_direction(session) == 0) {
-			ret = select(1, &rfds, NULL, NULL, &tv);
-			if (ret == -1)
+			int rv;
+			FD_ZERO(&rfds);
+			FD_SET(fd, &rfds);
+
+			tv.tv_sec = 2;
+			tv.tv_usec = 0;
+
+			rv = select(fd+1, &rfds, NULL, NULL, &tv);
+			if (rv == -1)
 				perror("select()");
-			else if (!ret)
-				fail("No data within one second.\n");
+			else if (!rv)
+				fail("No data were received.\n");
 		}
 	}
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -186,7 +232,7 @@ static void terminate(void)
 	exit(1);
 }
 
-static void server(int fd)
+static void server(int fd, unsigned cache)
 {
 	int ret;
 	gnutls_certificate_credentials_t x509_cred;
@@ -196,11 +242,13 @@ static void server(int fd)
 	 */
 	global_init();
 
+#if 0
 	if (debug) {
 		side = "server";
 		gnutls_global_set_log_function(tls_log_func);
 		gnutls_global_set_log_level(4711);
 	}
+#endif
 
 	gnutls_certificate_allocate_credentials(&x509_cred);
 	gnutls_certificate_set_x509_key_mem(x509_cred, &server_cert,
@@ -210,7 +258,8 @@ static void server(int fd)
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
 	gnutls_handshake_set_timeout(session, 20 * 1000);
 	gnutls_dtls_set_mtu(session, 400);
-//	gnutls_transport_set_push_function(session, push);
+	if (cache != 0)
+		gnutls_transport_set_push_function(session, push);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
@@ -225,8 +274,7 @@ static void server(int fd)
 
 	do {
 		ret = gnutls_handshake(session);
-	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
 		close(fd);
 		gnutls_deinit(session);
@@ -257,7 +305,8 @@ static void server(int fd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static
+void run(unsigned cache)
 {
 	int fd[2];
 	int ret;
@@ -287,9 +336,14 @@ void doit(void)
 			     WEXITSTATUS(status));
 	} else {
 		close(fd[0]);
-		server(fd[1]);
+		server(fd[1], cache);
 		exit(0);
 	}
 }
 
+void doit(void)
+{
+	run(0);
+	run(1);
+}
 #endif				/* _WIN32 */
