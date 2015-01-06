@@ -11,10 +11,13 @@ issue with servers that drop the connections when the encounter SSL 3.0
 as the record version number. See:
 http://lists.gnutls.org/pipermail/gnutls-help/2014-November/003673.html
 
-** libgnutls: corrected encoding and decoding of ANSI X9.62 parameters.
+** libgnutls: Corrected encoding and decoding of ANSI X9.62 parameters.
 
 ** libgnutls: Handle zero length plaintext for VIA PadLock functions.
 Patch by Matthias-Christian Ott.
+
+** libgnutls: In DTLS don't combine multiple packets which exceed MTU.
+Reported by Andreas Schultz.
 
 ** libgnutls: When importing a CA file with a PKCS #11 URL, simply
 import the certificates, if the URL specifies objects, rather than
