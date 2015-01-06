@@ -425,16 +425,20 @@ _gnutls_read(gnutls_session_t session, mbuffer_st ** bufel,
 
 static ssize_t
 _gnutls_writev_emu(gnutls_session_t session, gnutls_transport_ptr_t fd,
-		   const giovec_t * giovec, unsigned int giovec_cnt)
+		   const giovec_t * giovec, unsigned int giovec_cnt, unsigned vec)
 {
 	unsigned int j = 0;
 	size_t total = 0;
 	ssize_t ret = 0;
 
 	for (j = 0; j < giovec_cnt; j++) {
-		ret =
-		    session->internals.push_func(fd, giovec[j].iov_base,
-						 giovec[j].iov_len);
+		if (vec) {
+			ret = session->internals.vec_push_func(fd, &giovec[j], 1);
+		} else {
+			ret =
+			    session->internals.push_func(fd, giovec[j].iov_base,
+							 giovec[j].iov_len);
+		}
 
 		if (ret == -1) {
 		        gnutls_assert();
@@ -456,26 +460,44 @@ _gnutls_writev_emu(gnutls_session_t session, gnutls_transport_ptr_t fd,
 
 static ssize_t
 _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
-	       int giovec_cnt)
+	       unsigned giovec_cnt)
 {
 	int i;
+	bool is_dtls = IS_DTLS(session);
+	unsigned j, no_writev = 0;
 	gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
 
 	reset_errno(session);
 
-	if (session->internals.vec_push_func != NULL)
-		i = session->internals.vec_push_func(fd, giovec,
-						     giovec_cnt);
-	else if (session->internals.push_func != NULL)
-		i = _gnutls_writev_emu(session, fd, giovec, giovec_cnt);
-	else
+	if (session->internals.vec_push_func != NULL) {
+
+		if (is_dtls && giovec_cnt > 1) {
+			unsigned sum = 0;
+			for (j = 0; j < giovec_cnt; j++) {
+				sum += giovec[j].iov_len;
+			}
+
+			if (sum > session->internals.dtls.mtu) {
+				no_writev = 1;
+			}
+		}
+
+		if (no_writev == 0) {
+			i = session->internals.vec_push_func(fd, giovec,
+							     giovec_cnt);
+		} else {
+			i = _gnutls_writev_emu(session, fd, giovec, giovec_cnt, 1);
+		}
+	} else if (session->internals.push_func != NULL) {
+		i = _gnutls_writev_emu(session, fd, giovec, giovec_cnt, 0);
+	} else
 		return gnutls_assert_val(GNUTLS_E_PUSH_ERROR);
 
 	if (i == -1) {
 		int err = get_errno(session);
 		_gnutls_debug_log("errno: %d\n", err);
 
-		return errno_to_gerr(err, IS_DTLS(session));
+		return errno_to_gerr(err, is_dtls);
 	}
 	return i;
 }
