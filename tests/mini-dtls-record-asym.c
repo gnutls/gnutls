@@ -49,7 +49,8 @@ void doit(void)
 #else
 
 /* Tests whether packing multiple DTLS records in a single UDP packet
- * will be handled correctly.
+ * will be handled correctly, as well as an asymmetry in MTU sizes
+ * between server and client.
  */
 
 const char *side = "";
@@ -73,7 +74,7 @@ static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 
 	memcpy(&buffer[buffer_size], data, len);
 	buffer_size += len;
-//fprintf(stderr, "type: %d, %d, %s\n", (int)d[0], (int)d[13], gnutls_handshake_description_get_name(d[13]));
+
 	if (d[0] == 22) {	/* handshake */
 		if (d[13] == GNUTLS_HANDSHAKE_CERTIFICATE_PKT ||
 		    d[13] == GNUTLS_HANDSHAKE_CERTIFICATE_STATUS ||
@@ -84,21 +85,24 @@ static ssize_t push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		    d[13] == GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY ||
 		    d[13] == GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE) {
 
-			fprintf(stderr, "caching: %s (buffer: %d)\n",
-				gnutls_handshake_description_get_name(d[13]),
-				buffer_size);
+			if (debug)
+				fprintf(stderr, "caching: %s (buffer: %d)\n",
+					gnutls_handshake_description_get_name(d[13]),
+					buffer_size);
 			return len;
-		} else {
+		} else if (debug) {
 			fprintf(stderr, "sending: %s\n",
 				gnutls_handshake_description_get_name(d[13]));
 
 		}
 	}
 
-	fprintf(stderr, "sending %d bytes\n", (int)buffer_size);
+	if (debug)
+		fprintf(stderr, "sending %d bytes\n", (int)buffer_size);
 	ret = send(fd, buffer, buffer_size, 0);
 	if (ret >= 0) {
-		fprintf(stderr, "reset cache\n");
+		if (debug)
+			fprintf(stderr, "reset cache\n");
 		buffer_size = 0;
 	}
 	return len;
