@@ -42,9 +42,10 @@
 int system_errno(gnutls_transport_ptr_t);
 int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms);
 
+#ifdef _WIN32
 ssize_t system_write(gnutls_transport_ptr_t ptr, const void *data,
 		     size_t data_size);
-#ifndef _WIN32
+#else
 #define HAVE_WRITEV
 ssize_t system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 		      int iovec_cnt);
