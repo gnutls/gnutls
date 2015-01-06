@@ -237,13 +237,12 @@ _gnutls_dgram_read(gnutls_session_t session, mbuffer_st ** bufel,
 	ssize_t i, ret;
 	uint8_t *ptr;
 	struct timespec t1, t2;
-	size_t max_size = max_record_recv_size(session);
-	size_t recv_size = max_record_recv_size(session);
+	size_t max_size, recv_size;
 	gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 	unsigned int diff;
 
-	if (recv_size > max_size)
-		recv_size = max_size;
+	max_size = max_record_recv_size(session);
+	recv_size = max_size;
 
 	session->internals.direction = 0;
 
