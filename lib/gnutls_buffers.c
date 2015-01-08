@@ -1110,8 +1110,16 @@ static int get_last_packet(gnutls_session_t session,
 						      [LAST_ELEMENT]);
 			session->internals.handshake_recv_buffer_size--;
 			return 0;
-		} else
-			goto timeout;
+		} else {
+			/* if we don't have a complete handshake message, but we
+			 * have queued data waiting, try again to reconstruct the
+			 * handshake packet, using the queued */
+			if (recv_buf[LAST_ELEMENT].end_offset != recv_buf[LAST_ELEMENT].length - 1 &&
+			    record_check_unprocessed(session) > 0)
+				return gnutls_assert_val(GNUTLS_E_INT_CHECK_AGAIN);
+			else
+				goto timeout;
+		}
 	} else {		/* TLS */
 
 		if (session->internals.handshake_recv_buffer_size > 0
@@ -1342,6 +1350,7 @@ _gnutls_handshake_io_recv_int(gnutls_session_t session,
 {
 	int ret;
 	unsigned int tleft = 0;
+	int retries = 7;
 
 	ret = get_last_packet(session, htype, hsk, optional);
 	if (ret != GNUTLS_E_AGAIN && ret != GNUTLS_E_INTERRUPTED
@@ -1373,17 +1382,26 @@ _gnutls_handshake_io_recv_int(gnutls_session_t session,
 		tleft = ret;
 	}
 
-	/* if we don't have a complete message waiting for us, try 
-	 * receiving more */
-	ret =
-	    _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, htype,
-				    tleft);
-	if (ret < 0)
-		return gnutls_assert_val_fatal(ret);
+	do {
+		/* if we don't have a complete message waiting for us, try 
+		 * receiving more */
+		ret =
+		    _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, htype,
+					    tleft);
+		if (ret < 0)
+			return gnutls_assert_val_fatal(ret);
 
-	ret = _gnutls_parse_record_buffered_msgs(session);
-	if (ret == 0)
-		ret = get_last_packet(session, htype, hsk, optional);
+		ret = _gnutls_parse_record_buffered_msgs(session);
+		if (ret == 0) {
+			ret = get_last_packet(session, htype, hsk, optional);
+		}
+		/* we put an upper limit (retries) to the number of partial handshake
+		 * messages in a record packet. */
+	} while(IS_DTLS(session) && ret == GNUTLS_E_INT_CHECK_AGAIN && retries-- > 0);
+
+	if (unlikely(IS_DTLS(session) && ret == GNUTLS_E_INT_CHECK_AGAIN)) {
+		ret = gnutls_assert_val(GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS);
+	}
 
 	return ret;
 }
