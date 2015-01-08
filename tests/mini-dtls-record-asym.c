@@ -139,7 +139,7 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-static void client(int fd)
+static void client(int fd, unsigned cache)
 {
 	int ret;
 	gnutls_certificate_credentials_t x509_cred;
@@ -163,7 +163,7 @@ static void client(int fd)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_dtls_set_timeouts(session, 6 * 1000, 60 * 1000);
 	//gnutls_transport_set_push_function(session, push);
 
 	/* Use default priorities */
@@ -194,7 +194,7 @@ static void client(int fd)
 			if (rv == -1)
 				perror("select()");
 			else if (!rv)
-				fail("No data were received.\n");
+				fail("test %d: No data were received.\n", cache);
 		}
 	}
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -260,7 +260,7 @@ static void server(int fd, unsigned cache)
 					    GNUTLS_X509_FMT_PEM);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_handshake_set_timeout(session, 20 * 1000);
+	gnutls_dtls_set_timeouts(session, 5 * 1000, 60 * 1000);
 	gnutls_dtls_set_mtu(session, 400);
 	if (cache != 0)
 		gnutls_transport_set_push_function(session, push);
@@ -315,7 +315,7 @@ void run(unsigned cache)
 	int fd[2];
 	int ret;
 
-	ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
+	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	if (ret < 0) {
 		perror("socketpair");
 		exit(1);
@@ -333,7 +333,7 @@ void run(unsigned cache)
 		/* parent */
 
 		close(fd[1]);
-		client(fd[0]);
+		client(fd[0], cache);
 		wait(&status);
 		if (WEXITSTATUS(status) != 0)
 			fail("Child died with status %d\n",
@@ -347,6 +347,7 @@ void run(unsigned cache)
 
 void doit(void)
 {
+	signal(SIGPIPE, SIG_IGN);
 	run(0);
 	run(1);
 }
