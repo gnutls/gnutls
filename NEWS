@@ -19,6 +19,9 @@ Patch by Matthias-Christian Ott.
 ** libgnutls: In DTLS don't combine multiple packets which exceed MTU.
 Reported by Andreas Schultz.
 
+** libgnutls: In DTLS decode all handshake packets present in a record
+packet, in a single pass. Reported by Andreas Schultz.
+
 ** libgnutls: When importing a CA file with a PKCS #11 URL, simply
 import the certificates, if the URL specifies objects, rather than
 treating it as trust module.
