@@ -27,6 +27,7 @@
 #include <gnutls_global.h>
 
 #define GNUTLS_E_INT_RET_0 -1251
+#define GNUTLS_E_INT_CHECK_AGAIN -1252
 
 #ifdef __FILE__
 #ifdef __LINE__
