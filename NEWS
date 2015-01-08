@@ -1,5 +1,5 @@
 GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
-Copyright (C) 2000-2014 Free Software Foundation, Inc.
+Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
@@ -28,6 +28,9 @@ object we are importing, don't require the object type in the URL.
 
 ** guile: Fix compilation on MinGW. Previously only the static version of the 
 'guile-gnutls-v-2' library would be built, preventing dynamic loading from Guile.
+
+** guile: Fix harmless warning during compilation of gnutls.scm
+Initially reported at <https://bugzilla.redhat.com/show_bug.cgi?id=1177847>.
 
 ** certtool: --pubkey-info will also attempt to load a public key
 from stdin.
