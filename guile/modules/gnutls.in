@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2012, 2014 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2012, 2014, 2015 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -412,12 +412,13 @@
            openpgp-certificate-format/raw
            openpgp-certificate-format/base64))
 
-(define %libdir
-  (or (getenv "GNUTLS_GUILE_EXTENSION_DIR")
-      "@guileextensiondir@"))
+(eval-when (expand load eval)
+  (define %libdir
+    (or (getenv "GNUTLS_GUILE_EXTENSION_DIR")
+        "@guileextensiondir@"))
 
-(load-extension (string-append %libdir "/guile-gnutls-v-2")
-                "scm_init_gnutls")
+  (load-extension (string-append %libdir "/guile-gnutls-v-2")
+                  "scm_init_gnutls"))
 
 ;; Renaming.
 (define protocol/ssl-3 protocol/ssl3)
