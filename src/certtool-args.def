@@ -241,7 +241,7 @@ flag = {
 flag = {
     name      = p12-info;
     descrip   = "Print information on a PKCS #12 structure";
-    doc       = "";
+    doc       = "This option will dump the contents and print the metadata of the provided PKCS #12 structure.";
 };
 
 flag = {
