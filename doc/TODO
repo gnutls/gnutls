@@ -3,6 +3,9 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* Add API to allow multiplexing multiple streams under DTLS. The streams
+  should be identified by the application using the raw packet, via a
+  callback.
 * Check https://github.com/yymax/x509test and evaluate whether it makes
   sense to include it in our self tests.
 * Handle openconnect's TSS files in gnutls_certificate_set_x509_key_file().
