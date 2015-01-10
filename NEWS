@@ -29,6 +29,9 @@ treating it as trust module.
 ** libgnutls: When importing a PKCS #11 URL and we know the type of
 object we are importing, don't require the object type in the URL.
 
+** libgnutls: fixed openpgp authentication when gnutls_certificate_set_retrieve_function2
+was used by the server.
+
 ** guile: Fix compilation on MinGW. Previously only the static version of the 
 'guile-gnutls-v-2' library would be built, preventing dynamic loading from Guile.
 
