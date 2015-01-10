@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** libgnutls: corrected encoding and decoding of ANSI X9.62 parameters.
 
+** libgnutls: fixed openpgp authentication when gnutls_certificate_set_retrieve_function2
+was used by the server.
+
 ** libgnutls: Handle zero length plaintext for VIA PadLock functions.
 Patch by Matthias-Christian Ott.
 
