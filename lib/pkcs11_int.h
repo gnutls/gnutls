@@ -215,6 +215,13 @@ pkcs11_get_attribute_value(struct ck_function_list *module,
 			   unsigned long count);
 
 ck_rv_t
+pkcs11_get_attribute_avalue(struct ck_function_list * module,
+			   ck_session_handle_t sess,
+			   ck_object_handle_t object,
+			   ck_attribute_type_t type,
+			   gnutls_datum_t *res);
+
+ck_rv_t
 pkcs11_get_mechanism_list(struct ck_function_list *module,
 			  ck_slot_id_t slot_id,
 			  ck_mechanism_type_t * mechanism_list,
