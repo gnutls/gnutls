@@ -308,6 +308,9 @@ static unsigned char server_key_txt[] =
 const gnutls_datum_t server_key =
     { server_key_txt, sizeof(server_key_txt) };
 
+static gnutls_privkey_t g_pkey = NULL;
+static gnutls_pcert_st *g_pcert = NULL;
+
 static int
 cert_callback(gnutls_session_t session,
 	      const gnutls_datum_t * req_ca_rdn, int nreqs,
@@ -323,22 +326,31 @@ cert_callback(gnutls_session_t session,
 	if (p==NULL)
 		return -1;
 
-	ret = gnutls_pcert_import_openpgp_raw(p, &server_crt, GNUTLS_OPENPGP_FMT_BASE64, NULL, 0);
-	if (ret < 0)
-		return -1;
+	if (g_pkey == NULL) {
+		ret = gnutls_pcert_import_openpgp_raw(p, &server_crt, GNUTLS_OPENPGP_FMT_BASE64, NULL, 0);
+		if (ret < 0)
+			return -1;
 
-	ret = gnutls_privkey_init(&lkey);
-	if (ret < 0)
-		return -1;
+		ret = gnutls_privkey_init(&lkey);
+		if (ret < 0)
+			return -1;
 
-	ret = gnutls_privkey_import_openpgp_raw(lkey, &server_key, GNUTLS_OPENPGP_FMT_BASE64, NULL, NULL);
-	if (ret < 0)
-		return -1;
+		ret = gnutls_privkey_import_openpgp_raw(lkey, &server_key, GNUTLS_OPENPGP_FMT_BASE64, NULL, NULL);
+		if (ret < 0)
+			return -1;
 
-	*pcert = p;
-	*pcert_length = 1;
-	*pkey = lkey;
-	
+		g_pcert = p;
+		g_pkey = lkey;
+
+		*pcert = p;
+		*pcert_length = 1;
+		*pkey = lkey;
+	} else {
+		*pcert = g_pcert;
+		*pcert_length = 1;
+		*pkey = g_pkey;
+	}
+
 	return 0;
 }
 
@@ -415,7 +427,10 @@ const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
 	gnutls_deinit(session);
 
 	gnutls_certificate_free_credentials(pgp_cred);
+	gnutls_pcert_deinit(&g_pcert[0]);
+	gnutls_privkey_deinit(g_pkey);
 
+	gnutls_dh_params_deinit(dh_params);
 	gnutls_global_deinit();
 
 	if (debug)
