@@ -382,6 +382,8 @@ void gnutls_certificate_set_retrieve_function
  *
  * If the callback function is provided then gnutls will call it, in the
  * handshake, after the certificate request message has been received.
+ * All the provided by the callback values will not be released or
+ * modified by gnutls.
  *
  * In server side pk_algos and req_ca_dn are NULL.
  *
