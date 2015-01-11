@@ -1466,6 +1466,7 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 {
 	struct ck_attribute a[4];
 	ck_key_type_t key_type;
+	gnutls_datum_t data = {NULL,0};
 	int ret;
 	ck_bool_t tval;
 
@@ -1538,8 +1539,15 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 		}
 	}
 
-	return pkcs11_obj_import(CKO_PUBLIC_KEY, crt, NULL, id, label,
+	ret = pkcs11_get_attribute_avalue(module, pks, obj, CKA_VALUE, &data);
+	if (ret != CKR_OK) {
+		gnutls_assert();
+	}
+
+	ret = pkcs11_obj_import(CKO_PUBLIC_KEY, crt, &data, id, label,
 				 tinfo, lib_info);
+	gnutls_free(data.data);
+	return ret;
 }
 
 static int
