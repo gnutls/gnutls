@@ -7,6 +7,14 @@ See the end for copying conditions.
 ** libgnutls: Corrected regression introduced in 3.1.27 related to
 session renegotiation. Reported by Dan Winship.
 
+** libgnutls: corrected encoding and decoding of ANSI X9.62 parameters.
+
+** libgnutls: Handle zero length plaintext for VIA PadLock functions.
+Patch by Matthias-Christian Ott.
+
+** libgnutls: fixed openpgp authentication when gnutls_certificate_set_retrieve_function2
+was used by the server.
+
 ** API and ABI modifications:
 No changes since last version.
 
