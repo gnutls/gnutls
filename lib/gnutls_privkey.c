@@ -680,8 +680,8 @@ int gnutls_privkey_import_openpgp_raw (gnutls_privkey_t pkey,
       goto cleanup;
     }
     
-  ret = 0;
-  
+  return 0;
+
 cleanup:
   gnutls_openpgp_privkey_deinit(xpriv);
   
