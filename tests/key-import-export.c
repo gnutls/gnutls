@@ -109,6 +109,9 @@ unsigned char ecc_x[] = "\x37\xcc\x56\xd9\x76\x09\x1e\x5a\x72\x3e\xc7\x59\x2d\xf
 unsigned char ecc_y[] = "\x4e\xe5\x00\xd8\x23\x11\xff\xea\x2f\xd2\x34\x5d\x5d\x16\xbd\x8a\x88\xc2\x6b\x77\x0d\x55\xcd\x8a\x2a\x0e\xfa\x01\xc8\xb4\xed\xff";
 unsigned char ecc_k[] = "\x00\xf1\x2a\x13\x20\x76\x02\x70\xa8\x3c\xbf\xfd\x53\xf6\x03\x1e\xf7\x6a\x5d\x86\xc8\xa2\x04\xf2\xc3\x0c\xa9\xeb\xf5\x1f\x0f\x0e\xa7";
 
+unsigned char ecc_params[] = "\x06\x08\x2a\x86\x48\xce\x3d\x03\x01\x07";
+unsigned char ecc_point[] = "\x04\x41\x04\x37\xcc\x56\xd9\x76\x09\x1e\x5a\x72\x3e\xc7\x59\x2d\xff\x20\x6e\xee\x7c\xf9\x06\x91\x74\xd0\xad\x14\xb5\xf7\x68\x22\x59\x62\x92\x4e\xe5\x00\xd8\x23\x11\xff\xea\x2f\xd2\x34\x5d\x5d\x16\xbd\x8a\x88\xc2\x6b\x77\x0d\x55\xcd\x8a\x2a\x0e\xfa\x01\xc8\xb4\xed\xff";
+
 #define CMP(name, dat, v) cmp(name, __LINE__, dat, v, sizeof(v)-1)
 static int cmp(const char *name, int line, gnutls_datum_t *v1, unsigned char *v2, unsigned size)
 {
@@ -323,7 +326,42 @@ int check_pubkey(void)
 	CMP("y", &y, ecc_y);
 	gnutls_free(x.data);
 	gnutls_free(y.data);
+
+	ret = gnutls_pubkey_export_ecc_x962(pub, &x, &y);
+	if (ret < 0)
+		return 1;
+
+	CMP("parameters", &x, ecc_params);
+	CMP("ecpoint", &y, ecc_point);
+
 	gnutls_privkey_deinit(key);
+#if 0
+	gnutls_pubkey_deinit(pub);
+	ret = gnutls_pubkey_init(&pub);
+	if (ret < 0)
+		return 1;
+#endif
+
+	ret = gnutls_pubkey_import_ecc_x962(pub, &x, &y);
+	if (ret < 0)
+		return 1;
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+
+	/* check again */
+	ret = gnutls_pubkey_export_ecc_raw(pub, &curve, &x, &y);
+	if (ret < 0)
+		return 1;
+
+	if (curve != 2) {
+		fprintf(stderr, "unexpected curve value: %d\n", (int)curve);
+		exit(1);
+	}
+	CMP("x", &x, ecc_x);
+	CMP("y", &y, ecc_y);
+	gnutls_free(x.data);
+	gnutls_free(y.data);
+
 	gnutls_pubkey_deinit(pub);
 
 	return 0;
