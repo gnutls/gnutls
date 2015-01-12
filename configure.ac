@@ -45,14 +45,27 @@ AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_YACC
 AC_PROG_SED
-AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [/bin/true])
 
-if test x"$AUTOGEN" = "x/bin/true"; then
-  AC_MSG_WARN([[
+AC_ARG_ENABLE(doc,
+  AS_HELP_STRING([--disable-doc], [don't generate any documentation]),
+    enable_doc=$enableval, enable_doc=yes)
+AM_CONDITIONAL(ENABLE_DOC, test "$enable_doc" != "no")
+
+AC_ARG_ENABLE(tools,
+  AS_HELP_STRING([--disable-tools], [don't compile any tools]),
+    enable_tools=$enableval, enable_tools=yes)
+AM_CONDITIONAL(ENABLE_TOOLS, test "$enable_tools" != "no")
+
+if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
+  AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [/bin/true])
+
+  if test x"$AUTOGEN" = "x/bin/true"; then
+    AC_MSG_WARN([[
 ***
 *** autogen not found. Will not link against libopts.
 *** ]])
-enable_local_libopts=yes
+    enable_local_libopts=yes
+  fi
 fi
 
 # For includes/gnutls/gnutls.h.in.
@@ -174,14 +187,12 @@ dnl Try the hooks.m4
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
 
-AC_ARG_ENABLE(doc,
-  AS_HELP_STRING([--disable-doc], [don't generate any documentation]),
-    enable_doc=$enableval, enable_doc=yes)
-AM_CONDITIONAL(ENABLE_DOC, test "$enable_doc" != "no")
-
 AC_ARG_ENABLE(tests,
   AS_HELP_STRING([--disable-tests], [don't compile or run any tests]),
-    enable_tests=$enableval, enable_tests=yes)
+    enable_tests=$enableval, enable_tests=$enable_tools)
+if test "$enable_tests" = "yes" && test "$enable_tools" = "no"; then
+  true #AC_MSG_ERROR([Cannot enable tests while disabling tools])
+fi
 AM_CONDITIONAL(ENABLE_TESTS, test "$enable_tests" != "no")
 
 GTK_DOC_CHECK(1.1)
@@ -508,24 +519,30 @@ fi
 
 AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 
-LIBOPTS_CHECK([src/libopts])
-if test "$NEED_LIBOPTS_DIR" = "true";then
-	dnl replace libopts-generated files with distributed backups, if present
-	missing_baks=
-	for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
-		nam=`echo $i|sed 's/.bak//g'`
-		if test -f $i;then
-			cp -f $i $nam
-		else
-			missing_baks=true
+enable_local_libopts=no
+if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
+	LIBOPTS_CHECK([src/libopts])
+	if test "$NEED_LIBOPTS_DIR" = "true";then
+		dnl replace libopts-generated files with distributed backups, if present
+		missing_baks=
+		for i in ${srcdir}/src/*-args.c.bak ${srcdir}/src/*-args.h.bak; do
+			nam=`echo $i|sed 's/.bak//g'`
+			if test -f $i;then
+				cp -f $i $nam
+			else
+				missing_baks=true
+			fi
+		done
+		if test -z "$missing_baks"; then
+			AC_SUBST([AUTOGEN], [/bin/true])
 		fi
-	done
-	if test -z "$missing_baks"; then
-		AC_SUBST([AUTOGEN], [/bin/true])
+		enable_local_libopts=yes
 	fi
-	enable_local_libopts=yes
 else
-	enable_local_libopts=no
+	# Need to ensure the relevant conditionals get set
+	gl_STDNORETURN_H
+	AM_CONDITIONAL([INSTALL_LIBOPTS],[false])
+	AM_CONDITIONAL([NEED_LIBOPTS], [false])
 fi
 AM_CONDITIONAL(NEED_LIBOPTS, test "$enable_local_libopts" = "yes")
 

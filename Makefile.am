@@ -27,9 +27,14 @@ if ENABLE_DANE
 SUBDIRS += libdane
 endif
 
-SUBDIRS += po src
+SUBDIRS += po
 if ENABLE_DOC
 SUBDIRS += doc
+endif
+if ENABLE_TOOLS
+SUBDIRS += src
+else
+SUBDIRS += src/gl
 endif
 if ENABLE_TESTS
 SUBDIRS += tests

@@ -21,16 +21,19 @@
 
 EXTRA_DIST = stamp_mans
 
-dist_man_MANS = gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
-	certtool.1 psktool.1 p11tool.1 ocsptool.1 tpmtool.1
+dist_man_MANS =
 
 -include $(top_srcdir)/doc/doc.mk
 
+if ENABLE_TOOLS
+dist_man_MANS += gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
+	certtool.1 psktool.1 p11tool.1 ocsptool.1 tpmtool.1
 if ENABLE_SRP
 dist_man_MANS += srptool.1
 endif
 if ENABLE_DANE
 dist_man_MANS += danetool.1
+endif
 endif
 
 # Note that our .def files depend on autogen
