@@ -856,6 +856,9 @@ static int try_resume(socket_st * hd)
 	    ("\n\n- Connecting again- trying to resume previous session\n");
 	socket_open(hd, hostname, service, udp, CONNECT_MSG);
 
+	if (HAVE_OPT(STARTTLS_PROTO))
+	        socket_starttls(hd, OPT_ARG(STARTTLS_PROTO));
+
 	hd->session = init_tls_session(hostname);
 	gnutls_session_set_data(hd->session, session_data,
 				session_data_size);
@@ -1130,6 +1133,9 @@ int main(int argc, char **argv)
 
 	socket_open(&hd, hostname, service, udp, CONNECT_MSG);
 	hd.verbose = verbose;
+
+	if (HAVE_OPT(STARTTLS_PROTO))
+	        socket_starttls(&hd, OPT_ARG(STARTTLS_PROTO));
 
 	hd.session = init_tls_session(hostname);
 	if (starttls)

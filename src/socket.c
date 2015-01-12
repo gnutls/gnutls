@@ -180,18 +180,25 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		return;
 
 	if (strcasecmp(app_proto, "smtp") == 0 || strcasecmp(app_proto, "submission") == 0) {
+		if (socket->verbose)
+			printf("Negotiating SMTP STARTTLS\n");
+
 		wait_for_text(socket->fd, "220 ", 4);
 		send_line(socket->fd, "EHLO mail.example.com\n");
 		wait_for_text(socket->fd, "250 ", 4);
 		send_line(socket->fd, "STARTTLS\n");
 		wait_for_text(socket->fd, "220 ", 4);
 	} else if (strcasecmp(app_proto, "imap") == 0 || strcasecmp(app_proto, "imap2") == 0) {
+		if (socket->verbose)
+			printf("Negotiating IMAP STARTTLS\n");
+
 		send_line(socket->fd, "a CAPABILITY\r\n");
 		wait_for_text(socket->fd, "a OK", 4);
 		send_line(socket->fd, "a STARTTLS\r\n");
 		wait_for_text(socket->fd, "a OK", 4);
 	} else {
-		/*fprintf(stderr, "unknown protocol %s\n", app_proto);*/
+		if (socket->verbose)
+			fprintf(stderr, "unknown protocol %s\n", app_proto);
 	}
 
 	return;
