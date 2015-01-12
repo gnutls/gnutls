@@ -277,7 +277,7 @@ write_certificate_test () {
 		echo ok
 	else
 		echo failed
-		return
+		exit_error
 	fi
 
 	echo -n "* Testing certificate flags... "
