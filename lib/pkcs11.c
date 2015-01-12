@@ -1457,8 +1457,8 @@ cleanup:
 static int
 pkcs11_obj_import_pubkey(struct ck_function_list *module,
 			 ck_session_handle_t pks,
-			 ck_object_handle_t obj,
-			 gnutls_pkcs11_obj_t crt,
+			 ck_object_handle_t ctx,
+			 gnutls_pkcs11_obj_t pobj,
 			 gnutls_datum_t *data,
 			 const gnutls_datum_t *id,
 			 const gnutls_datum_t *label,
@@ -1474,12 +1474,12 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 	a[0].value = &key_type;
 	a[0].value_len = sizeof(key_type);
 
-	if (pkcs11_get_attribute_value(module, pks, obj, a, 1) == CKR_OK) {
-		crt->pk_algorithm = mech_to_pk(key_type);
+	if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) == CKR_OK) {
+		pobj->pk_algorithm = mech_to_pk(key_type);
 
 		ret =
-		    pkcs11_read_pubkey(module, pks, obj, key_type,
-				       crt->pubkey);
+		    pkcs11_read_pubkey(module, pks, ctx, key_type,
+				       pobj->pubkey);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
@@ -1489,9 +1489,9 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 	a[0].value = &tval;
 	a[0].value_len = sizeof(tval);
 
-	if (pkcs11_get_attribute_value(module, pks, obj, a, 1) == CKR_OK) {
+	if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) == CKR_OK) {
 		if (tval != 0) {
-			crt->key_usage |= GNUTLS_KEY_DATA_ENCIPHERMENT;
+			pobj->key_usage |= GNUTLS_KEY_DATA_ENCIPHERMENT;
 		}
 	}
 
@@ -1499,9 +1499,9 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 	a[0].value = &tval;
 	a[0].value_len = sizeof(tval);
 
-	if (pkcs11_get_attribute_value(module, pks, obj, a, 1) == CKR_OK) {
+	if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) == CKR_OK) {
 		if (tval != 0) {
-			crt->key_usage |= GNUTLS_KEY_DIGITAL_SIGNATURE |
+			pobj->key_usage |= GNUTLS_KEY_DIGITAL_SIGNATURE |
 			    GNUTLS_KEY_KEY_CERT_SIGN | GNUTLS_KEY_CRL_SIGN
 			    | GNUTLS_KEY_NON_REPUDIATION;
 		}
@@ -1511,9 +1511,9 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 	a[0].value = &tval;
 	a[0].value_len = sizeof(tval);
 
-	if (pkcs11_get_attribute_value(module, pks, obj, a, 1) == CKR_OK) {
+	if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) == CKR_OK) {
 		if (tval != 0) {
-			crt->key_usage |= GNUTLS_KEY_DIGITAL_SIGNATURE |
+			pobj->key_usage |= GNUTLS_KEY_DIGITAL_SIGNATURE |
 			    GNUTLS_KEY_KEY_CERT_SIGN | GNUTLS_KEY_CRL_SIGN
 			    | GNUTLS_KEY_NON_REPUDIATION;
 		}
@@ -1523,9 +1523,9 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 	a[0].value = &tval;
 	a[0].value_len = sizeof(tval);
 
-	if (pkcs11_get_attribute_value(module, pks, obj, a, 1) == CKR_OK) {
+	if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) == CKR_OK) {
 		if (tval != 0) {
-			crt->key_usage |= GNUTLS_KEY_KEY_AGREEMENT;
+			pobj->key_usage |= GNUTLS_KEY_KEY_AGREEMENT;
 		}
 	}
 
@@ -1533,13 +1533,13 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 	a[0].value = &tval;
 	a[0].value_len = sizeof(tval);
 
-	if (pkcs11_get_attribute_value(module, pks, obj, a, 1) == CKR_OK) {
+	if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) == CKR_OK) {
 		if (tval != 0) {
-			crt->key_usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
+			pobj->key_usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
 		}
 	}
 
-	ret = pkcs11_obj_import(CKO_PUBLIC_KEY, crt, data, id, label,
+	ret = pkcs11_obj_import(CKO_PUBLIC_KEY, pobj, data, id, label,
 				 tinfo, lib_info);
 	return ret;
 }
@@ -1548,7 +1548,7 @@ static int
 pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 		     struct pkcs11_session_info *sinfo,
 		     struct ck_token_info *tinfo, struct ck_info *lib_info,
-		     gnutls_pkcs11_obj_t fobj)
+		     gnutls_pkcs11_obj_t pobj)
 {
 	ck_bool_t b;
 	int rv, ret;
@@ -1559,14 +1559,14 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 	gnutls_datum_t id, label, data = {NULL, 0};
 
 	/* now figure out flags */
-	fobj->flags = 0;
+	pobj->flags = 0;
 	a[0].type = CKA_WRAP;
 	a[0].value = &b;
 	a[0].value_len = sizeof(b);
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
+    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
 
 	a[0].type = CKA_UNWRAP;
 	a[0].value = &b;
@@ -1574,7 +1574,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
+    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_KEY_WRAP;
 
 	a[0].type = CKA_PRIVATE;
 	a[0].value = &b;
@@ -1582,7 +1582,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
+    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
 
 	a[0].type = CKA_TRUSTED;
 	a[0].value = &b;
@@ -1590,7 +1590,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
+    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
 
 	a[0].type = CKA_SENSITIVE;
 	a[0].value = &b;
@@ -1598,7 +1598,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE;
+    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE;
 
 	a[0].type = CKA_EXTRACTABLE;
 	a[0].value = &b;
@@ -1606,7 +1606,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE;
+    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE;
 
 	a[0].type = CKA_NEVER_EXTRACTABLE;
 	a[0].value = &b;
@@ -1614,7 +1614,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE;
+    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE;
 
 	a[0].type = CKA_CERTIFICATE_CATEGORY;
 	a[0].value = &category;
@@ -1622,7 +1622,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK && category == 2)
-    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_CA;
+    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_CA;
 
 	a[0].type = CKA_ALWAYS_AUTHENTICATE;
 	a[0].value = &b;
@@ -1630,7 +1630,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 
 	rv = pkcs11_get_attribute_value(sinfo->module, sinfo->pks, obj, a, 1);
 	if (rv == CKR_OK && b != 0)
-    		fobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH;
+    		pobj->flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH;
 
 	/* now recover the object label/id */
 	a[0].type = CKA_LABEL;
@@ -1676,7 +1676,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 		    pkcs11_obj_import_pubkey(sinfo->module,
 					     sinfo->pks,
 					     obj,
-					     fobj,
+					     pobj,
 					     &data,
 					     &id, &label,
 					     tinfo,
@@ -1684,7 +1684,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 	} else {
 		ret =
 		    pkcs11_obj_import(class,
-				      fobj,
+				      pobj,
 				      &data, &id, &label,
 				      tinfo,
 				      lib_info);
