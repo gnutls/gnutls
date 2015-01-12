@@ -17,10 +17,11 @@ http://lists.gnutls.org/pipermail/gnutls-help/2014-November/003673.html
 Patch by Matthias-Christian Ott.
 
 ** libgnutls: In DTLS don't combine multiple packets which exceed MTU.
-Reported by Andreas Schultz.
+Reported by Andreas Schultz. https://savannah.gnu.org/support/?108715
 
 ** libgnutls: In DTLS decode all handshake packets present in a record
 packet, in a single pass. Reported by Andreas Schultz.
+https://savannah.gnu.org/support/?108712
 
 ** libgnutls: When importing a CA file with a PKCS #11 URL, simply
 import the certificates, if the URL specifies objects, rather than
