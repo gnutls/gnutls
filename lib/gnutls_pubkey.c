@@ -159,6 +159,9 @@ gnutls_pubkey_import_x509(gnutls_pubkey_t key, gnutls_x509_crt_t crt,
 {
 	int ret;
 
+	gnutls_pk_params_release(&key->params);
+	/* params initialized in _gnutls_x509_crt_get_mpis */
+
 	key->pk_algorithm =
 	    gnutls_x509_crt_get_pk_algorithm(crt, &key->bits);
 
@@ -195,6 +198,9 @@ gnutls_pubkey_import_x509_crq(gnutls_pubkey_t key, gnutls_x509_crq_t crq,
 {
 	int ret;
 
+	gnutls_pk_params_release(&key->params);
+	/* params initialized in _gnutls_x509_crq_get_mpis */
+
 	key->pk_algorithm =
 	    gnutls_x509_crq_get_pk_algorithm(crq, &key->bits);
 
@@ -230,6 +236,9 @@ int
 gnutls_pubkey_import_privkey(gnutls_pubkey_t key, gnutls_privkey_t pkey,
 			     unsigned int usage, unsigned int flags)
 {
+	gnutls_pk_params_release(&key->params);
+	gnutls_pk_params_init(&key->params);
+
 	key->pk_algorithm =
 	    gnutls_privkey_get_pk_algorithm(pkey, &key->bits);
 
@@ -1299,6 +1308,7 @@ gnutls_pubkey_import_rsa_raw(gnutls_pubkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
 	siz = m->size;
@@ -1348,6 +1358,9 @@ gnutls_pubkey_import_ecc_raw(gnutls_pubkey_t key,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	gnutls_pk_params_release(&key->params);
+	gnutls_pk_params_init(&key->params);
 
 	key->params.flags = curve;
 
@@ -1401,6 +1414,9 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	gnutls_pk_params_release(&key->params);
+	gnutls_pk_params_init(&key->params);
 
 	key->params.params_nr = 0;
 
@@ -1469,6 +1485,7 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
 	siz = p->size;
