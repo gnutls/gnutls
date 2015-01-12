@@ -30,6 +30,7 @@
 # define LIB1 "/usr/lib64/pkcs11/libsofthsm.so"
 # define LIB2 "/usr/lib/pkcs11/libsofthsm.so"
 # define LIB3 "/usr/local/lib/softhsm/libsofthsm.so"
+# define LIB4 "/usr/lib64/softhsm/libsofthsm.so"
 # define SOFTHSM_BIN1 "/usr/bin/softhsm"
 # define SOFTHSM_BIN2 "/usr/local/bin/softhsm"
 # define SOFTHSM_ENV "SOFTHSM_CONF"
@@ -38,6 +39,7 @@
 # define LIB1 "/usr/lib64/pkcs11/libsofthsm2.so"
 # define LIB2 "/usr/lib/pkcs11/libsofthsm2.so"
 # define LIB3 "/usr/lib/softhsm/libsofthsm.so"
+# define LIB4 "/usr/lib64/softhsm/libsofthsm.so"
 # define SOFTHSM_BIN1 "/usr/bin/softhsm2-util"
 # define SOFTHSM_BIN2 "/usr/local/bin/softhsm2-util"
 # define SOFTHSM_ENV "SOFTHSM2_CONF"
@@ -54,6 +56,8 @@ inline static const char *softhsm_lib(void)
 		lib = LIB2;
 	} else if (access(LIB3, R_OK) == 0) {
 		lib = LIB3;
+	} else if (access(LIB4, R_OK) == 0) {
+		lib = LIB4;
 	} else {
 		fprintf(stderr, "cannot find softhsm module\n");
 		exit(77);
@@ -71,7 +75,7 @@ inline static const char *softhsm_bin(void)
 	} else if (access(SOFTHSM_BIN2, X_OK) == 0) {
 		bin = SOFTHSM_BIN2;
 	} else {
-		fprintf(stderr, "cannot find softhsm module\n");
+		fprintf(stderr, "cannot find softhsm bin\n");
 		exit(77);
 	}
 
@@ -104,7 +108,6 @@ void set_softhsm_conf(const char *config)
 	fputs(db_dir, fp);
 	fputs("\n", fp);
 	fputs("objectstore.backend = file\n", fp);
-	fclose(fp);
 
 	if (strlen(db_dir) < 6) {
 		fprintf(stderr, "too short name for db: %s\n", db_dir);
