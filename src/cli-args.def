@@ -88,6 +88,18 @@ flag = {
 };
 
 flag = {
+    name      = app-proto;
+    aliases   = starttls-proto;
+};
+
+flag = {
+    name      = starttls-proto;
+    descrip   = "The application protocol to be used to obtain the server's certificate (https, smtp, imap)";
+    arg-type  = string;
+    doc       = "Specify the application layer protocol for STARTTLS. If the protocol is supported, gnutls-cli will proceed to the TLS negotiation.";
+};
+
+flag = {
     name      = udp;
     value     = u;
     descrip   = "Use DTLS (datagram TLS) over UDP";
