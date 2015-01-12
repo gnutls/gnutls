@@ -824,6 +824,9 @@ verify_crt(gnutls_x509_crt_t cert,
  * given issuer. It checks the DN fields and the authority
  * key identifier and subject key identifier fields match.
  *
+ * If the same certificate is provided at the @cert and @issuer fields,
+ * it will check whether the certificate is self-signed.
+ *
  * Returns: It will return true (1) if the given certificate is issued
  *   by the given issuer, and false (0) if not.  
  **/
