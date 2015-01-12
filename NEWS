@@ -41,6 +41,9 @@ Initially reported at <https://bugzilla.redhat.com/show_bug.cgi?id=1177847>.
 ** certtool: --pubkey-info will also attempt to load a public key
 from stdin.
 
+** gnutls-cli: Added --starttls-proto option. That allows to specify a
+protocol for starttls negotiation.
+
 ** API and ABI modifications:
 No changes since last version.
 
