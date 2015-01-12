@@ -568,8 +568,6 @@ GNUTLS_3_4
 	gnutls_pubkey_get_pk_algorithm;
 	gnutls_pubkey_import_x509;
 	gnutls_pubkey_import_openpgp;
-	gnutls_pubkey_get_pk_rsa_raw;
-	gnutls_pubkey_get_pk_dsa_raw;
 	gnutls_pubkey_export;
 	gnutls_pubkey_get_key_id;
 	gnutls_pubkey_get_key_usage;
@@ -647,7 +645,6 @@ GNUTLS_3_4
 	gnutls_ecc_curve_get_name;
 	gnutls_ecc_curve_get_size;
 	gnutls_ecc_curve_get;
-	gnutls_pubkey_get_pk_ecc_raw;
 	gnutls_x509_privkey_export_ecc_raw;
 	gnutls_x509_privkey_import_ecc_raw;
 	gnutls_pubkey_verify_data2;
@@ -869,7 +866,6 @@ GNUTLS_3_4
 	gnutls_pubkey_set_key_usage;
 	gnutls_x509_privkey_import_rsa_raw2;
 	gnutls_pkcs11_token_get_flags;
-	gnutls_pubkey_get_pk_ecc_x962;
 	gnutls_pubkey_import_ecc_x962;
 	gnutls_rnd_refresh;
 	gnutls_mac_get_nonce_size;
