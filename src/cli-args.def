@@ -351,9 +351,8 @@ flag = {
 flag = {
     name      = inline-commands-prefix;
     arg-type  = string;
-    descrip   = "Change the default (^) used as a delimiter for inline commands.
-\t\t\t\tThe value is a single US-ASCII character (octets 0 - 127).";
-    doc       = "Change the default (^) delimiter used for inline commands. The delimiter is expected to be a single US-ASCII character (octets 0 - 127). This option is only relevant if inline commands are enabled via the inline-commands option";
+    descrip   = "Change the default delimiter for inline commands.";
+    doc       = "Change the default delimiter (^) used for inline commands. The delimiter is expected to be a single US-ASCII character (octets 0 - 127). This option is only relevant if inline commands are enabled via the inline-commands option";
 };
 
 flag = {
