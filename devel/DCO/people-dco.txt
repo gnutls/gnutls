@@ -37,3 +37,7 @@ Armin Burgmeier <armin||arbur.net>
 Jaak Ristioja <jaak.ristioja||cyber.ee>
 	17 Dec 2014
 	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7885
+
+Luke Dashjr <luke-jr+git||utopios.org>
+	13 Jan 2015
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/7949
