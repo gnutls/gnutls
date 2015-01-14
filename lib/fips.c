@@ -107,7 +107,7 @@ void _gnutls_fips_mode_reset_zombie(void)
 #define HOGWEED_LIBRARY_NAME "libhogweed.so.2"
 #define GMP_LIBRARY_NAME "libgmp.so.10"
 
-static const char fips_key[] = "I'd rather be skiing";
+static const char fips_key[] = "orboDeJITITejsirpADONivirpUkvarP";
 
 #define HMAC_SUFFIX ".hmac"
 #define HMAC_SIZE 32
