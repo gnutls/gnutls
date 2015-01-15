@@ -147,6 +147,7 @@ int send_ocsp_request(const char *server,
 	unsigned char *p;
 	const char *hostname;
 	const char *path = "";
+	unsigned i;
 	unsigned int headers_size = 0, port;
 	socket_st hd;
 
@@ -156,15 +157,23 @@ int send_ocsp_request(const char *server,
 		/* try to read URL from issuer certificate */
 		gnutls_datum_t data;
 
-		ret = gnutls_x509_crt_get_authority_info_access(cert, 0,
-								GNUTLS_IA_OCSP_URI,
-								&data,
-								NULL);
+		i = 0;
+		do {
+			ret = gnutls_x509_crt_get_authority_info_access(cert, i++,
+									GNUTLS_IA_OCSP_URI,
+									&data,
+									NULL);
+		} while(ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-		if (ret < 0)
-			ret =
-			    gnutls_x509_crt_get_authority_info_access
-			    (issuer, 0, GNUTLS_IA_OCSP_URI, &data, NULL);
+		if (ret < 0) {
+			i = 0;
+			do {
+				ret =
+				    gnutls_x509_crt_get_authority_info_access
+				    (issuer, i++, GNUTLS_IA_OCSP_URI, &data, NULL);
+			} while(ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+		}
+
 		if (ret < 0) {
 			fprintf(stderr,
 				"Cannot find URL from issuer: %s\n",
