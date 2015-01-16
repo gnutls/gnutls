@@ -3678,17 +3678,20 @@ legacy_parse_aia(ASN1_TYPE src,
  *
  * If @what is %GNUTLS_IA_URI, @data will hold the accessLocation URI
  * data.  Requesting this @what value leads to an error if the
- * accessLocation is not of the "uniformResourceIdentifier" type.
+ * accessLocation is not of the "uniformResourceIdentifier" type. 
  *
  * If @what is %GNUTLS_IA_OCSP_URI, @data will hold the OCSP URI.
  * Requesting this @what value leads to an error if the accessMethod
  * is not 1.3.6.1.5.5.7.48.1 aka OSCP, or if accessLocation is not of
- * the "uniformResourceIdentifier" type.
+ * the "uniformResourceIdentifier" type. In that case %GNUTLS_E_UNKNOWN_ALGORITHM
+ * will be returned, and @seq should be increased and this function
+ * called again.
  *
  * If @what is %GNUTLS_IA_CAISSUERS_URI, @data will hold the caIssuers
  * URI.  Requesting this @what value leads to an error if the
  * accessMethod is not 1.3.6.1.5.5.7.48.2 aka caIssuers, or if
  * accessLocation is not of the "uniformResourceIdentifier" type.
+ * In that case handle as in %GNUTLS_IA_OCSP_URI.
  *
  * More @what values may be allocated in the future as needed.
  *
