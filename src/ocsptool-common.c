@@ -163,7 +163,7 @@ int send_ocsp_request(const char *server,
 									GNUTLS_IA_OCSP_URI,
 									&data,
 									NULL);
-		} while(ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+		} while(ret == GNUTLS_E_UNKNOWN_ALGORITHM);
 
 		if (ret < 0) {
 			i = 0;
@@ -171,7 +171,7 @@ int send_ocsp_request(const char *server,
 				ret =
 				    gnutls_x509_crt_get_authority_info_access
 				    (issuer, i++, GNUTLS_IA_OCSP_URI, &data, NULL);
-			} while(ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+			} while(ret == GNUTLS_E_UNKNOWN_ALGORITHM);
 		}
 
 		if (ret < 0) {
