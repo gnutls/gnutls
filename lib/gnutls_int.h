@@ -495,6 +495,7 @@ typedef struct {
 	bool extensions;	/* whether it supports extensions */
 	bool selectable_sighash;	/* whether signatures can be selected */
 	bool selectable_prf;	/* whether the PRF is ciphersuite-defined */
+	bool obsolete;		/* Do not use this protocol version as record version */
 } version_entry_st;
 
 
