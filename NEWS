@@ -16,6 +16,7 @@ http://lists.gnutls.org/pipermail/gnutls-help/2014-November/003673.html
 ** libgnutls: Corrected encoding and decoding of ANSI X9.62 parameters.
 
 ** libgnutls: Handle zero length plaintext for VIA PadLock functions.
+This solves a potential crash on AES encryption for small size plaintext.
 Patch by Matthias-Christian Ott.
 
 ** libgnutls: In DTLS don't combine multiple packets which exceed MTU.
