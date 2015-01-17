@@ -176,9 +176,9 @@ int send_ocsp_request(const char *server,
 
 		if (ret < 0) {
 			fprintf(stderr,
-				"Cannot find URL from issuer: %s\n",
+				"*** Cannot find OCSP server URI in certificate: %s\n",
 				gnutls_strerror(ret));
-			return -1;
+			return ret;
 		}
 
 		url = malloc(data.size + 1);
