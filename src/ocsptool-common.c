@@ -314,7 +314,7 @@ void print_ocsp_verify_res(unsigned int output)
 int
 check_ocsp_response(gnutls_x509_crt_t cert,
 		    gnutls_x509_crt_t issuer, gnutls_datum_t * data,
-		    gnutls_datum_t * nonce)
+		    gnutls_datum_t * nonce, int verbose)
 {
 	gnutls_ocsp_resp_t resp;
 	int ret;
@@ -409,7 +409,8 @@ check_ocsp_response(gnutls_x509_crt_t cert,
 
 		ret = gnutls_ocsp_resp_get_nonce(resp, NULL, &rnonce);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			fprintf(stderr, "*** The OCSP reply did not include the requested nonce.\n");
+			if (verbose)
+				fprintf(stderr, "*** The OCSP reply did not include the requested nonce.\n");
 			goto finish_ok;
 		}
 
