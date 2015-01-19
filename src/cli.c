@@ -1781,7 +1781,7 @@ static int cert_verify_ocsp(gnutls_session_t session)
 		}
 
 		/* verify and check the response for revoked cert */
-		ret = check_ocsp_response(cert, issuer, &resp, &nonce);
+		ret = check_ocsp_response(cert, issuer, &resp, &nonce, verbose);
 		if (ret == 1)
 			ok++;
 		else

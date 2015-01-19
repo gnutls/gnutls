@@ -42,6 +42,7 @@ void print_ocsp_verify_res(unsigned int output);
 
 int
 check_ocsp_response(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
-		    gnutls_datum_t * data, gnutls_datum_t *nonce);
+		    gnutls_datum_t * data, gnutls_datum_t *nonce,
+		    int verbose);
 
 #endif
