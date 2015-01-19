@@ -753,7 +753,7 @@ int gnutls_load_file(const char *filename, gnutls_datum_t * data)
  * value of the function indicates whether an OCSP status response have
  * been received (even if invalid).
  *
- * Returns: non zero it was valid, or a zero if it wasn't sent,
+ * Returns: non zero if the response was valid, or a zero if it wasn't sent,
  * or sent and was invalid.
  **/
 int
