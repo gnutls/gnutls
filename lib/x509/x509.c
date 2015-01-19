@@ -186,7 +186,7 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 		       gnutls_x509_crt_fmt_t format)
 {
 	int result = 0;
-	int version;
+	int version, s2;
 
 	if (cert == NULL) {
 		gnutls_assert();
@@ -244,6 +244,23 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 	if (result != ASN1_SUCCESS) {
 		result = _gnutls_asn2err(result);
 		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_get_signature_algorithm(cert->cert,
+						      "signatureAlgorithm.algorithm");
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	s2 = _gnutls_x509_get_signature_algorithm(cert->cert,
+						  "tbsCertificate.signature.algorithm");
+	if (result != s2) {
+		_gnutls_debug_log("signatureAlgorithm.algorithm differs from tbsCertificate.signature.algorithm: %s, %s\n",
+			gnutls_sign_get_name(result), gnutls_sign_get_name(s2));
+		gnutls_assert();
+		result = GNUTLS_E_CERTIFICATE_ERROR;
 		goto cleanup;
 	}
 
