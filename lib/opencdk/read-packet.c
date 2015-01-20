@@ -37,7 +37,6 @@
 #include <minmax.h>
 
 /* The version of the MDC packet considering the lastest OpenPGP draft. */
-#define MDC_PKT_VER 1
 
 static int
 stream_read(cdk_stream_t s, void *buf, size_t buflen, size_t * r_nread)
