@@ -426,6 +426,9 @@ _gnutls_read(gnutls_session_t session, mbuffer_st ** bufel,
 					   ms);
 }
 
+/* @vec: if non-zero then the vector function will be used to
+ *       push the data.
+ */
 static ssize_t
 _gnutls_writev_emu(gnutls_session_t session, gnutls_transport_ptr_t fd,
 		   const giovec_t * giovec, unsigned int giovec_cnt, unsigned vec)
@@ -460,27 +463,22 @@ _gnutls_writev_emu(gnutls_session_t session, gnutls_transport_ptr_t fd,
 	return ret;
 }
 
-
+/* @total: The sum of the data in giovec
+ */
 static ssize_t
 _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
-	       unsigned giovec_cnt)
+	       unsigned giovec_cnt, unsigned total)
 {
 	int i;
 	bool is_dtls = IS_DTLS(session);
-	unsigned j, no_writev = 0;
+	unsigned no_writev = 0;
 	gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
 
 	reset_errno(session);
 
 	if (session->internals.vec_push_func != NULL) {
-
 		if (is_dtls && giovec_cnt > 1) {
-			unsigned sum = 0;
-			for (j = 0; j < giovec_cnt; j++) {
-				sum += giovec[j].iov_len;
-			}
-
-			if (sum > session->internals.dtls.mtu) {
+			if (total > session->internals.dtls.mtu) {
 				no_writev = 1;
 			}
 		}
@@ -684,7 +682,7 @@ ssize_t _gnutls_io_write_flush(gnutls_session_t session)
 		return 0;
 	}
 
-	ret = _gnutls_writev(session, iovec, i);
+	ret = _gnutls_writev(session, iovec, i, tosend);
 	if (ret >= 0) {
 		_mbuffer_head_remove_bytes(send_buffer, ret);
 		_gnutls_write_log
