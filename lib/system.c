@@ -132,10 +132,11 @@ system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
  * @ms: The number of milliseconds to wait.
  *
  * Wait for data to be received from the provided socket (@ptr) within a
- * timeout period in milliseconds.
+ * timeout period in milliseconds, using select() on the provided @ptr.
  *
  * This function is provided as a helper for constructing custom
- * callbacks for gnutls_transport_set_pull_timeout_function().
+ * callbacks for gnutls_transport_set_pull_timeout_function(),
+ * which can be used if you rely on socket file descriptors.
  *
  * Returns -1 on error, 0 on timeout, positive value if data are available for reading.
  *

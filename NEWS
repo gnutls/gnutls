@@ -138,6 +138,7 @@ gnutls_system_key_iter_deinit: Added
 gnutls_system_key_iter_get_info: Added
 gnutls_system_key_delete: Added
 gnutls_system_key_add_x509: Added
+gnutls_system_recv_timeout: Added
 gnutls_register_custom_url: Added
 gnutls_pkcs11_obj_list_import_url3: Added
 gnutls_pkcs11_obj_list_import_url4: Added
