@@ -265,9 +265,8 @@ _gnutls_dgram_read(gnutls_session_t session, mbuffer_st ** bufel,
 	if (i < 0) {
 		int err = get_errno(session);
 
-		_gnutls_read_log
-		    ("READ: %d returned from %p, errno=%d gerrno=%d\n",
-		     (int) i, fd, errno, session->internals.errnum);
+		_gnutls_read_log("READ: %d returned from %p, errno=%d\n",
+		     		 (int) i, fd, err);
 
 		ret = errno_to_gerr(err, 1);
 		goto cleanup;
@@ -496,7 +495,8 @@ _gnutls_writev(gnutls_session_t session, const giovec_t * giovec,
 
 	if (i == -1) {
 		int err = get_errno(session);
-		_gnutls_debug_log("errno: %d\n", err);
+		_gnutls_debug_log("WRITE: %d returned from %p, errno: %d\n",
+				  i, fd, err);
 
 		return errno_to_gerr(err, is_dtls);
 	}
