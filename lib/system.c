@@ -126,13 +126,22 @@ system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 	return recv(GNUTLS_POINTER_TO_INT(ptr), data, data_size, 0);
 }
 
-/* Wait for data to be received within a timeout period in milliseconds.
- * To catch a termination it will also try to receive 0 bytes from the
- * socket if select reports to proceed.
+/**
+ * gnutls_system_recv_timeout:
+ * @ptr: A gnutls_transport_ptr_t pointer
+ * @ms: The number of milliseconds to wait.
+ *
+ * Wait for data to be received from the provided socket (@ptr) within a
+ * timeout period in milliseconds.
+ *
+ * This function is provided as a helper for constructing custom
+ * callbacks for gnutls_transport_set_pull_timeout_function().
  *
  * Returns -1 on error, 0 on timeout, positive value if data are available for reading.
- */
-int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
+ *
+ * Since: 3.4.0
+ **/
+int gnutls_system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 	fd_set rfds;
 	struct timeval tv;

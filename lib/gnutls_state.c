@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2002-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2014-2015 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -379,7 +380,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 #else
 	gnutls_transport_set_push_function(*session, system_write);
 #endif
-	(*session)->internals.pull_timeout_func = system_recv_timeout;
+	(*session)->internals.pull_timeout_func = gnutls_system_recv_timeout;
 	(*session)->internals.pull_func = system_read;
 	(*session)->internals.errno_func = system_errno;
 

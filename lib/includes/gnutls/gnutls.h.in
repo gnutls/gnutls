@@ -1583,6 +1583,7 @@ typedef ssize_t(*gnutls_pull_func) (gnutls_transport_ptr_t, void *,
 typedef ssize_t(*gnutls_push_func) (gnutls_transport_ptr_t, const void *,
 				    size_t);
 
+int gnutls_system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms);
 typedef int (*gnutls_pull_timeout_func) (gnutls_transport_ptr_t,
 					 unsigned int ms);
 

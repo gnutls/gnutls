@@ -1015,6 +1015,7 @@ GNUTLS_3_4
 	gnutls_pcert_import_x509_list;
 	gnutls_pkcs11_get_raw_issuer_by_dn;
 	gnutls_x509_trust_list_get_issuer_by_dn;
+	gnutls_system_recv_timeout;
   local:
 	*;
 };
