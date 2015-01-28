@@ -127,7 +127,6 @@ gnutls_certificate_get_x509_crt: Added
 gnutls_certificate_get_openpgp_key: Added
 gnutls_certificate_get_openpgp_crt: Added
 gnutls_record_discard_queued: Added
-gnutls_record_is_async: Added
 gnutls_session_ext_master_secret_status: Added
 gnutls_priority_string_list: Added
 gnutls_dh_params_import_raw2: Added
