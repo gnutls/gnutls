@@ -1513,29 +1513,6 @@ gnutls_record_discard_queued(gnutls_session_t session)
 }
 
 /**
- * gnutls_record_is_async:
- * @session: is a #gnutls_session_t structure.
- *
- * This will indicate whether the DTLS session is in asynchronous mode,
- * i.e., handshake data may still be received and retransmitted. During
- * that time gnutls_record_send() and gnutls_record_recv() must be only be
- * used in the same process or thread (see gnutls_record_send() for more information).
- *
- * In a TLS session this function always returns zero.
- *
- * Returns: Non-zero if the session is in async mode, or zero otherwise.
- *
- * Since: 3.4.0
- **/
-unsigned
-gnutls_record_is_async(gnutls_session_t session)
-{
-	if (IS_DTLS(session) && _dtls_is_async(session) && _dtls_async_timer_active(session))
-		return 1;
-	return 0;
-}
-
-/**
  * gnutls_record_recv_packet:
  * @session: is a #gnutls_session_t structure.
  * @packet: the structure that will hold the packet data
@@ -1592,12 +1569,6 @@ gnutls_record_recv_packet(gnutls_session_t session,
  * Note that since 3.2.13 this function can be called under cork in DTLS
  * mode, and will refuse to send data over the MTU size by returning
  * %GNUTLS_E_LARGE_PACKET.
- *
- * This function can be used in parallel with gnutls_record_recv() in a
- * multi-thread or multi-process scenario if TLS is in use, or in DTLS
- * when gnutls_record_is_async() returns zero (that will happen few seconds after
- * the handshake is terminated). In all cases, each process or thread must
- * be restricted to use one of the send or recv functions.
  *
  * Returns: The number of bytes sent, or a negative error code.  The
  *   number of bytes sent might be less than @data_size.  The maximum

@@ -933,7 +933,6 @@ void gnutls_record_cork(gnutls_session_t session);
 #define GNUTLS_RECORD_WAIT 1
 int gnutls_record_uncork(gnutls_session_t session, unsigned int flags);
 size_t gnutls_record_discard_queued(gnutls_session_t session);
-unsigned gnutls_record_is_async(gnutls_session_t session);
 
 typedef struct {
 	size_t low;
