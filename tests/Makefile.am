@@ -87,7 +87,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 crlverify mini-dtls-discard init_fds mini-record-failure \
 	 mini-rehandshake-2 custom-urls set_x509_key_mem set_x509_key_file \
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu \
-	 mini-dtls-record-asym openpgp-callback key-import-export
+	 mini-dtls-record-asym openpgp-callback key-import-export \
+	 mini-dtls-fork
 
 if ENABLE_OCSP
 ctests += ocsp
