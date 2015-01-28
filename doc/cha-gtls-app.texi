@@ -30,6 +30,7 @@ and the manpages is recommended.
 * Common types::
 * Debugging and auditing::
 * Thread safety::
+* Sessions and fork::
 * Callback functions::
 @end menu
 
@@ -61,8 +62,8 @@ and/or verify the indentity of the peer. The information stored in
 the credentials structures is initialized once and then can be 
 shared by many @acronym{TLS} sessions.
 
-A @acronym{GnuTLS} session contains all the required information
-to handle one secure connection. The session communicates with the
+A @acronym{GnuTLS} session contains all the required state and 
+information to handle one secure connection. The session communicates with the
 peers using the provided functions of the transport layer.
 Every session has a unique session ID shared with the peer.
 
@@ -202,6 +203,13 @@ If, however, an object needs to be shared across threads then access must be
 protected with a mutex. Read-only access to objects, for example the
 credentials holding structures, is also thread-safe. 
 
+A @code{gnutls_session_t} object can be shared by two threads, one sending,
+the other receiving. In that case rehandshakes, if required,
+must only be handled by a single thread being active. The termination of a session 
+should be handled, either by a single thread being active, or by the sender thread 
+using @funcref{gnutls_bye} with @code{GNUTLS_SHUT_WR} and the receiving thread 
+waiting for a return value of zero.
+
 The random generator of the cryptographic back-end, utilizes mutex locks (e.g., pthreads on GNU/Linux and CriticalSection on Windows)
 which are setup by @acronym{GnuTLS} on library initialization. Prior to version 3.3.0
 they were setup by calling @funcref{gnutls_global_init}. On special systems
@@ -224,6 +232,17 @@ int main()
 @end example
 
 @showfuncdesc{gnutls_global_set_mutex}
+
+@node Sessions and fork
+@subsection Sessions and fork
+@cindex fork
+
+A @code{gnutls_session_t} object can be shared by two processes after a fork,
+one sending, the other receiving. In that case rehandshakes, 
+cannot and must not be performed. As with threads, the termination of a session should be
+handled by the sender process using @funcref{gnutls_bye} with @code{GNUTLS_SHUT_WR}
+and the receiving process waiting for a return value of zero.
+
 
 @node Callback functions
 @subsection Callback functions
