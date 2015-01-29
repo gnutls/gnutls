@@ -661,6 +661,7 @@ ssize_t _gnutls_io_write_flush(gnutls_session_t session)
 	int i = 0;
 	mbuffer_st *cur;
 
+	session->internals.direction = 1;
 	_gnutls_write_log("WRITE FLUSH: %d bytes in buffer.\n",
 			  (int) send_buffer->byte_length);
 
