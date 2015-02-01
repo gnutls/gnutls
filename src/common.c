@@ -622,7 +622,7 @@ int print_info(gnutls_session_t session, int verbose, int print_cert)
 
 void print_cert_info(gnutls_session_t session, int verbose, int print_cert)
 {
-	return print_cert_info2(session, verbose, stdout, print_cert);
+	print_cert_info2(session, verbose, stdout, print_cert);
 }
 
 void print_cert_info2(gnutls_session_t session, int verbose, FILE *out, int print_cert)
