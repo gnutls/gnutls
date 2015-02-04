@@ -1820,6 +1820,7 @@ static int cert_verify_ocsp(gnutls_session_t session)
 	gnutls_x509_crt_t cert, issuer;
 	const gnutls_datum_t *cert_list;
 	unsigned int cert_list_size = 0, ok = 0;
+	unsigned failed = 0;
 	int deinit_issuer = 0, deinit_cert;
 	gnutls_datum_t resp;
 	unsigned char noncebuf[23];
@@ -1883,8 +1884,10 @@ static int cert_verify_ocsp(gnutls_session_t session)
 		ret = check_ocsp_response(cert, issuer, &resp, &nonce, verbose);
 		if (ret == 1)
 			ok++;
-		else
+		else if (ret == 0) {
+			failed++;
 			break;
+		}
 	}
 
 cleanup:
@@ -1893,5 +1896,7 @@ cleanup:
 	if (deinit_cert)
 		gnutls_x509_crt_deinit(cert);
 
+	if (failed > 0)
+		return -1;
 	return ok > 1 ? (int) ok : -1;
 }
