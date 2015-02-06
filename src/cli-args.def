@@ -140,6 +140,13 @@ flag = {
 };
 
 flag = {
+    name      = save-cert;
+    arg-type  = string;
+    descrip   = "Save the peer's certificate chain in the specified file in PEM format";
+    doc      = "";
+};
+
+flag = {
     name      = save-ocsp;
     arg-type  = string;
     descrip   = "Save the peer's OCSP status response in the provided file";

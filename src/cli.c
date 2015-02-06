@@ -374,6 +374,43 @@ static int read_yesno(const char *input_str)
 	return 0;
 }
 
+static void try_save_cert(gnutls_session_t session)
+{
+	const gnutls_datum_t *cert_list;
+	unsigned int cert_list_size = 0;
+	int ret;
+	unsigned i;
+	gnutls_datum_t t;
+	FILE *fp;
+
+	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
+	if (cert_list_size == 0) {
+		fprintf(stderr, "no certificates sent by server!\n");
+		exit(1);
+	}
+
+	fp = fopen(OPT_ARG(SAVE_CERT), "w");
+	if (fp == NULL) {
+		fprintf(stderr, "could not open %s\n", OPT_ARG(SAVE_CERT));
+		exit(1);
+	}
+
+	for (i=0;i<cert_list_size;i++) {
+		ret = gnutls_pem_base64_encode_alloc("CERTIFICATE", &cert_list[i], &t);
+		if (ret < 0) {
+			fprintf(stderr, "error[%d]: %s\n", __LINE__,
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fwrite(t.data, t.size, 1, fp);
+		gnutls_free(t.data);
+	}
+	fclose(fp);
+
+	return;
+}
+
 static int cert_verify_callback(gnutls_session_t session)
 {
 	int rc;
@@ -392,6 +429,10 @@ static int cert_verify_callback(gnutls_session_t session)
 
 	if (strictssh) {
 		ssh = strictssh;
+	}
+
+	if (HAVE_OPT(SAVE_CERT)) {
+		try_save_cert(session);
 	}
 
 	print_cert_info(session, verbose, print_cert);
