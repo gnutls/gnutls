@@ -563,7 +563,9 @@ void register_x86_intel_crypto(unsigned capabilities)
 			if (ret < 0) {
 				gnutls_assert();
 			}
-		} else {
+		} else
+#endif
+		{
 			ret =
 			    gnutls_crypto_single_cipher_register
 			    (GNUTLS_CIPHER_AES_128_GCM, 80,
@@ -580,7 +582,6 @@ void register_x86_intel_crypto(unsigned capabilities)
 				gnutls_assert();
 			}
 		}
-#endif
 	}
 
 	return;
