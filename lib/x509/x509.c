@@ -138,6 +138,71 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert)
 	gnutls_free(cert);
 }
 
+static int compare_sig_algorithm(gnutls_x509_crt_t cert)
+{
+	int ret, s2;
+	gnutls_datum_t sp1 = {NULL, 0};
+	gnutls_datum_t sp2 = {NULL, 0};
+	unsigned empty1 = 0, empty2 = 0;
+
+	ret = _gnutls_x509_get_signature_algorithm(cert->cert,
+						      "signatureAlgorithm.algorithm");
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	s2 = _gnutls_x509_get_signature_algorithm(cert->cert,
+						  "tbsCertificate.signature.algorithm");
+	if (ret != s2) {
+		_gnutls_debug_log("signatureAlgorithm.algorithm differs from tbsCertificate.signature.algorithm: %s, %s\n",
+			gnutls_sign_get_name(ret), gnutls_sign_get_name(s2));
+		gnutls_assert();
+		return GNUTLS_E_CERTIFICATE_ERROR;
+	}
+
+	/* compare the parameters */
+	ret = _gnutls_x509_read_value(cert->cert, "signatureAlgorithm.parameters", &sp1);
+	if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
+		empty1 = 1;
+	} else if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = _gnutls_x509_read_value(cert->cert, "signatureAlgorithm.parameters", &sp2);
+	if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
+		empty2 = 1;
+	} else if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	/* handle equally empty parameters with missing parameters */
+	if (sp1.size == 2 && memcmp(sp1.data, "\x05\x00", 2) == 0) {
+		empty1 = 1;
+	 	_gnutls_free_datum(&sp1);
+	}
+
+	if (sp2.size == 2 && memcmp(sp2.data, "\x05\x00", 2) == 0) {
+		empty2 = 1;
+	 	_gnutls_free_datum(&sp2);
+	}
+
+	if (empty1 != empty2 || 
+	    sp1.size != sp2.size || memcmp(sp1.data, sp2.data, sp1.size) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_CERTIFICATE_ERROR;
+		goto cleanup;
+	}
+
+	ret = 0;
+ cleanup:
+ 	_gnutls_free_datum(&sp1);
+ 	_gnutls_free_datum(&sp2);
+ 	return ret;
+}
+
 /**
  * gnutls_x509_crt_import:
  * @cert: The structure to store the parsed certificate.
@@ -219,6 +284,12 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 	    asn1_der_decoding(&cert->cert, cert->der.data, cert->der.size, NULL);
 	if (result != ASN1_SUCCESS) {
 		result = _gnutls_asn2err(result);
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = compare_sig_algorithm(cert);
+	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
