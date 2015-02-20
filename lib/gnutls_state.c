@@ -1552,7 +1552,8 @@ gnutls_record_get_state(gnutls_session_t session,
 {
 	record_parameters_st *record_params;
 	record_state_st *record_state;
-	int epoch, ret;
+	unsigned int epoch;
+	int ret;
 
 	if (read)
 		epoch = EPOCH_READ_CURRENT;
@@ -1571,9 +1572,9 @@ gnutls_record_get_state(gnutls_session_t session,
 	else
 		record_state = &record_params->write;
 
-	memcpy(&mac_key, &record_state->mac_secret, sizeof(gnutls_datum_t));
-	memcpy(&IV, &record_state->IV, sizeof(gnutls_datum_t));
-	memcpy(&cipher_key, &record_state->key, sizeof(gnutls_datum_t));
+	memcpy(mac_key, &record_state->mac_secret, sizeof(gnutls_datum_t));
+	memcpy(IV, &record_state->IV, sizeof(gnutls_datum_t));
+	memcpy(cipher_key, &record_state->key, sizeof(gnutls_datum_t));
 	memcpy(seq_number, UINT64DATA(record_state->sequence_number), 8);
 	return 0;
 }
