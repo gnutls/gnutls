@@ -41,15 +41,6 @@ _gnutls_set_kx(gnutls_session_t session, gnutls_kx_algorithm_t algo);
 static const char keyexp[] = "key expansion";
 static const int keyexp_length = sizeof(keyexp) - 1;
 
-static const char ivblock[] = "IV block";
-static const int ivblock_length = sizeof(ivblock) - 1;
-
-static const char cliwrite[] = "client write key";
-static const int cliwrite_length = sizeof(cliwrite) - 1;
-
-static const char servwrite[] = "server write key";
-static const int servwrite_length = sizeof(servwrite) - 1;
-
 /* This function is to be called after handshake, when master_secret,
  *  client_random and server_random have been initialized. 
  * This function creates the keys and stores them into pending session.
