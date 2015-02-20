@@ -142,6 +142,7 @@ gnutls_system_recv_timeout: Added
 gnutls_register_custom_url: Added
 gnutls_pkcs11_obj_list_import_url3: Added
 gnutls_pkcs11_obj_list_import_url4: Added
+gnutls_handshake_set_hook_function: Modified
 gnutls_pkcs11_obj_list_import_url: Removed
 gnutls_pkcs11_obj_list_import_url2: Removed
 gnutls_certificate_client_set_retrieve_function: Removed
