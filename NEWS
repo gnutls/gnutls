@@ -70,6 +70,10 @@ will automatically be sorted instead of failing with GNUTLS_E_CERTIFICATE_LIST_U
 ** libgnutls: Added the ability to register application specific URL
 types, which express certificates and keys using gnutls_register_custom_url().
 
+** libgnutls: Added functions to export and set the record state. That
+allows for gnutls_record_send() and recv() to be offloaded (to kernel,
+hardware or any other subsystem).
+
 ** libgnutls-openssl: it is no longer built by default.
 
 ** certtool: Added --p8-info option, which will print PKCS #8 information
@@ -98,6 +102,8 @@ deprecated.
 'guile-gnutls-v-2' library would be built, preventing dynamic loading from Guile.
 
 ** API and ABI modifications:
+gnutls_record_get_state: Added
+gnutls_record_set_state: Added
 gnutls_aead_cipher_init: Added
 gnutls_aead_cipher_decrypt: Added
 gnutls_aead_cipher_encrypt: Added
