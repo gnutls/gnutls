@@ -1522,3 +1522,102 @@ gnutls_handshake_set_hook_function(gnutls_session_t session,
 	session->internals.h_type = htype;
 	session->internals.h_post = post;
 }
+
+/**
+ * gnutls_record_get_state:
+ * @session: is a #gnutls_session_t structure
+ * @read: if non-zero the read parameters are returned, otherwise the write
+ * @mac_key: the key used for MAC (if a MAC is used)
+ * @IV: the initialization vector or nonce used
+ * @cipher_key: the cipher key
+ * @seq_number: A 64-bit sequence number
+ *
+ * This function will return the parameters of the current record state.
+ * These are only useful to be provided to an external off-loading device
+ * or subsystem.
+ *
+ * In that case, to sync the state you must call gnutls_record_set_state().
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since 3.4.0
+ **/
+int
+gnutls_record_get_state(gnutls_session_t session,
+			unsigned read,
+			gnutls_datum_t *mac_key,
+			gnutls_datum_t *IV,
+			gnutls_datum_t *cipher_key,
+			unsigned char seq_number[8])
+{
+	record_parameters_st *record_params;
+	record_state_st *record_state;
+	int epoch, ret;
+
+	if (read)
+		epoch = EPOCH_READ_CURRENT;
+	else
+		epoch = EPOCH_WRITE_CURRENT;
+
+	ret = _gnutls_epoch_get(session, epoch, &record_params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (!record_params->initialized)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (read)
+		record_state = &record_params->read;
+	else
+		record_state = &record_params->write;
+
+	memcpy(&mac_key, &record_state->mac_secret, sizeof(gnutls_datum_t));
+	memcpy(&IV, &record_state->IV, sizeof(gnutls_datum_t));
+	memcpy(&cipher_key, &record_state->key, sizeof(gnutls_datum_t));
+	memcpy(seq_number, UINT64DATA(record_state->sequence_number), 8);
+	return 0;
+}
+
+/**
+ * gnutls_record_set_state:
+ * @session: is a #gnutls_session_t structure
+ * @read: if non-zero the read parameters are returned, otherwise the write
+ * @seq_number: A 64-bit sequence number
+ *
+ * This function will set the sequence number in the current record state.
+ * This function is useful if sending and receiving are offloaded from
+ * gnutls. That is, if gnutls_record_get_state() was used.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since 3.4.0
+ **/
+int
+gnutls_record_set_state(gnutls_session_t session,
+			unsigned read,
+			unsigned char seq_number[8])
+{
+	record_parameters_st *record_params;
+	record_state_st *record_state;
+	int epoch, ret;
+
+	if (read)
+		epoch = EPOCH_READ_CURRENT;
+	else
+		epoch = EPOCH_WRITE_CURRENT;
+
+	ret = _gnutls_epoch_get(session, epoch, &record_params);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (!record_params->initialized)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (read)
+		record_state = &record_params->read;
+	else
+		record_state = &record_params->write;
+
+	memcpy(UINT64DATA(record_state->sequence_number), seq_number, 8);
+	return 0;
+}

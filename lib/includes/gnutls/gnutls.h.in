@@ -934,6 +934,19 @@ void gnutls_record_cork(gnutls_session_t session);
 int gnutls_record_uncork(gnutls_session_t session, unsigned int flags);
 size_t gnutls_record_discard_queued(gnutls_session_t session);
 
+int
+gnutls_record_get_state(gnutls_session_t session,
+			unsigned read,
+			gnutls_datum_t *mac_key,
+			gnutls_datum_t *IV,
+			gnutls_datum_t *cipher_key,
+			unsigned char seq_number[8]);
+
+int
+gnutls_record_set_state(gnutls_session_t session,
+			unsigned read,
+			unsigned char seq_number[8]);
+
 typedef struct {
 	size_t low;
 	size_t high;
