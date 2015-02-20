@@ -509,7 +509,7 @@ _gnutls_send_tlen_int(gnutls_session_t session, content_type_t type,
 		/* Adjust header length and add sequence for DTLS */
 		if (IS_DTLS(session))
 			memcpy(&headers[3],
-			       &record_state->sequence_number.i, 8);
+			       record_state->sequence_number.i, 8);
 
 		_gnutls_record_log
 		    ("REC[%p]: Preparing Packet %s(%d) with length: %d and min pad: %d\n",
