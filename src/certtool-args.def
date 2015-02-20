@@ -69,7 +69,7 @@ flag = {
     name      = verify-chain;
     value     = e;
     descrip   = "Verify a PEM encoded certificate chain";
-    doc = "The last certificate in the chain must be a self signed one.";
+    doc = "The last certificate in the chain must be a self signed one. It can be combined with --purpose or --hostname.";
 };
 
 flag = {
@@ -78,7 +78,7 @@ flag = {
     doc = "The trusted certificate list can be loaded with --load-ca-certificate. If no
 certificate list is provided, then the system's certificate list is used. Note that
 during verification multiple paths may be explored. On a successful verification
-the successful path will be the last one.";
+the successful path will be the last one. It can be combined with --purpose or --hostname.";
 };
 
 flag = {
@@ -87,6 +87,21 @@ flag = {
     doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
     flags-must = load-ca-certificate;
 };
+
+flag = {
+    name      = hostname;
+    descrip   = "Specify a hostname to be used for certificate chain verification";
+    arg-type  = string;
+    doc = "This is to be combined with one of the verify certificate options.";
+};
+
+flag = {
+    name      = purpose;
+    descrip   = "Specify a purpose OID to be used for certificate chain verification";
+    arg-type  = string;
+    doc = "This object identifier restricts the purpose of the certificates to be verified. Example purposes are 1.3.6.1.5.5.7.3.1 (TLS WWW), 1.3.6.1.5.5.7.3.4 (EMAIL) etc. Note that a CA certificate without a purpose set (extended key usage) is valid for any purpose.";
+};
+
 
 flag = {
     name      = generate-dh-params;
