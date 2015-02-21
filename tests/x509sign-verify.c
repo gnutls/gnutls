@@ -152,7 +152,6 @@ void doit(void)
 	gnutls_x509_crt_t crt;
 	gnutls_pubkey_t pubkey;
 	gnutls_privkey_t privkey;
-	gnutls_digest_algorithm_t hash_algo;
 	gnutls_sign_algorithm_t sign_algo;
 	gnutls_datum_t signature;
 	gnutls_datum_t signature2;
@@ -216,32 +215,25 @@ void doit(void)
 			fail("gnutls_x509_pubkey_import\n");
 
 		ret =
-		    gnutls_pubkey_get_verify_algorithm(pubkey, &signature,
-						       &hash_algo);
-		if (ret < 0 || hash_algo != GNUTLS_DIG_SHA1)
-			fail("gnutls_x509_crt_get_verify_algorithm\n");
+		    gnutls_x509_crt_get_signature_algorithm(crt);
+		if (ret != GNUTLS_SIGN_RSA_SHA1)
+			fail("gnutls_crt_get_signature_algorithm\n");
 
 		ret =
-		    gnutls_pubkey_verify_hash(pubkey, 0, &hash_data,
+		    gnutls_pubkey_verify_hash2(pubkey, GNUTLS_SIGN_RSA_SHA1, 0, &hash_data,
 					      &signature);
 		if (ret < 0)
-			fail("gnutls_x509_pubkey_verify_hash\n");
+			fail("gnutls_x509_pubkey_verify_hash2\n");
 
 		ret =
-		    gnutls_pubkey_get_verify_algorithm(pubkey, &signature2,
-						       &hash_algo);
-		if (ret < 0 || hash_algo != GNUTLS_DIG_SHA1)
-			fail("gnutls_x509_crt_get_verify_algorithm (hashed data)\n");
-
-		ret =
-		    gnutls_pubkey_verify_hash(pubkey, 0, &hash_data,
+		    gnutls_pubkey_verify_hash2(pubkey, GNUTLS_SIGN_RSA_SHA1, 0, &hash_data,
 					      &signature2);
 		if (ret < 0)
 			fail("gnutls_x509_pubkey_verify_hash-1 (hashed data)\n");
 
 		/* should fail */
 		ret =
-		    gnutls_pubkey_verify_hash(pubkey, 0,
+		    gnutls_pubkey_verify_hash2(pubkey, GNUTLS_SIGN_RSA_SHA1, 0,
 					      &invalid_hash_data,
 					      &signature2);
 		if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
