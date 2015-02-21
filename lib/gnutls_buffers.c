@@ -1352,8 +1352,9 @@ _gnutls_handshake_io_recv_int(gnutls_session_t session,
 	int retries = 7;
 
 	ret = get_last_packet(session, htype, hsk, optional);
-	if (ret != GNUTLS_E_AGAIN && ret != GNUTLS_E_INTERRUPTED
-	    && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	if (ret != GNUTLS_E_AGAIN && ret != GNUTLS_E_INTERRUPTED &&
+	    ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
+	    ret != GNUTLS_E_INT_CHECK_AGAIN) {
 		return gnutls_assert_val(ret);
 	}
 
