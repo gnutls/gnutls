@@ -47,7 +47,7 @@ They are replaced by the safer function @funcref{gnutls_session_get_random}
 @tab Replaced by using the system's errno fascility or @funcref{gnutls_transport_set_errno}.
 
 @item @funcintref{gnutls_x509_privkey_verify_data}
-@tab Replaced by @funcref{gnutls_pubkey_verify_data}.
+@tab Replaced by @funcref{gnutls_pubkey_verify_data2}.
 
 @item @funcintref{gnutls_certificate_verify_peers}
 @tab Replaced by @funcref{gnutls_certificate_verify_peers2}.
