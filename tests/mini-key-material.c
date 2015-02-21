@@ -316,6 +316,7 @@ static void server(int fd)
 	gnutls_deinit(session);
 
 	gnutls_anon_free_server_credentials(anoncred);
+	gnutls_dh_params_deinit(dh_params);
 
 	gnutls_global_deinit();
 
