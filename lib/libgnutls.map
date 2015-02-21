@@ -574,7 +574,6 @@ GNUTLS_3_4
 	gnutls_pubkey_import_dsa_raw;
 	gnutls_pubkey_import_rsa_raw;
 	gnutls_pubkey_import_pkcs11_url;
-	gnutls_pubkey_get_verify_algorithm;
 	gnutls_pubkey_import;
 	gnutls_x509_crt_set_pubkey;
 	gnutls_x509_crq_set_pubkey;

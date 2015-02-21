@@ -2808,28 +2808,32 @@ gnutls_x509_crt_get_preferred_hash_algorithm(gnutls_x509_crt_t crt,
 					     gnutls_digest_algorithm_t *
 					     hash, unsigned int *mand)
 {
-	gnutls_pk_params_st issuer_params;
 	int ret;
+	gnutls_pubkey_t pubkey;
 
 	if (crt == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret = _gnutls_x509_crt_get_mpis(crt, &issuer_params);
-	if (ret < 0) {
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
+	if (ret < 0) {  
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
-	ret =
-	    _gnutls_pk_get_hash_algorithm(gnutls_x509_crt_get_pk_algorithm
-					  (crt, NULL), &issuer_params,
-					  hash, mand);
+	ret = gnutls_pubkey_get_preferred_hash_algorithm(pubkey, hash, mand);
+	if (ret < 0) {  
+		gnutls_assert();
+		goto cleanup;
+	}
 
-	/* release allocated mpis */
-	gnutls_pk_params_release(&issuer_params);
-
+ cleanup:
+ 	gnutls_pubkey_deinit(pubkey);
 	return ret;
 }
 

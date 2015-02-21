@@ -74,11 +74,6 @@ decode_ber_digest_info(const gnutls_datum_t * info,
 		       gnutls_digest_algorithm_t * hash,
 		       uint8_t * digest, unsigned int *digest_size);
 
-int _gnutls_pk_get_hash_algorithm(gnutls_pk_algorithm_t pk,
-				  gnutls_pk_params_st *,
-				  gnutls_digest_algorithm_t * dig,
-				  unsigned int *mand);
-
 int
 _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
 				    gnutls_datum_t * m, gnutls_datum_t * e,

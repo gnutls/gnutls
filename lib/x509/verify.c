@@ -1198,20 +1198,6 @@ cleanup:
 }
 #endif
 
-/* This will return the appropriate hash to verify the given signature.
- * If signature is NULL it will return an (or the) appropriate hash for
- * the given parameters.
- */
-int
-_gnutls_x509_verify_algorithm(gnutls_digest_algorithm_t * hash,
-			      const gnutls_datum_t * signature,
-			      gnutls_pk_algorithm_t pk,
-			      gnutls_pk_params_st * issuer_params)
-{
-	return _gnutls_pk_hash_algorithm(pk, signature, issuer_params,
-					 hash);
-}
-
 /* verifies if the certificate is properly signed.
  * returns GNUTLS_E_PK_VERIFY_SIG_FAILED on failure and 1 on success.
  * 

@@ -1762,94 +1762,9 @@ cleanup:
 	return ret;
 }
 
-/* Given a signature and parameters, it should return
- * the hash algorithm used in the signature. This is a kludge
- * but until we deprecate gnutls_pubkey_get_verify_algorithm()
- * we depend on it.
- */
-static int wrap_nettle_hash_algorithm(gnutls_pk_algorithm_t pk,
-				      const gnutls_datum_t * sig,
-				      gnutls_pk_params_st * issuer_params,
-				      gnutls_digest_algorithm_t *
-				      hash_algo)
-{
-	uint8_t digest[MAX_HASH_SIZE];
-	uint8_t *rdi = NULL;
-	gnutls_datum_t di;
-	unsigned digest_size;
-	mpz_t s;
-	struct rsa_public_key pub;
-	const mac_entry_st *me;
-	int ret;
-
-	mpz_init(s);
-
-	switch (pk) {
-	case GNUTLS_PK_DSA:
-	case GNUTLS_PK_EC:
-
-		me = _gnutls_dsa_q_to_hash(pk, issuer_params, NULL);
-		if (hash_algo)
-			*hash_algo = (gnutls_digest_algorithm_t)me->id;
-
-		ret = 0;
-		break;
-	case GNUTLS_PK_RSA:
-		if (sig == NULL) {	/* return a sensible algorithm */
-			if (hash_algo)
-				*hash_algo = GNUTLS_DIG_SHA256;
-			return 0;
-		}
-
-		_rsa_params_to_pubkey(issuer_params, &pub);
-
-		digest_size = sizeof(digest);
-
-		nettle_mpz_set_str_256_u(s, sig->size, sig->data);
-
-		ret = extract_digest_info(&pub, &di, &rdi, s);
-		if (ret == 0) {
-			ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		digest_size = sizeof(digest);
-		if ((ret =
-		     decode_ber_digest_info(&di, hash_algo, digest,
-					    &digest_size)) < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		if (digest_size !=
-		    _gnutls_hash_get_algo_len(mac_to_entry(
-		    	(gnutls_mac_algorithm_t)*hash_algo))) {
-			gnutls_assert();
-			ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
-			goto cleanup;
-		}
-
-		ret = 0;
-		break;
-
-	default:
-		gnutls_assert();
-		ret = GNUTLS_E_INTERNAL_ERROR;
-	}
-
-      cleanup:
-	mpz_clear(s);
-	gnutls_free(rdi);
-	return ret;
-
-}
-
-
 int crypto_pk_prio = INT_MAX;
 
 gnutls_crypto_pk_st _gnutls_pk_ops = {
-	.hash_algorithm = wrap_nettle_hash_algorithm,
 	.encrypt = _wrap_nettle_pk_encrypt,
 	.decrypt = _wrap_nettle_pk_decrypt,
 	.sign = _wrap_nettle_pk_sign,

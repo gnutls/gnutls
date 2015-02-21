@@ -271,14 +271,38 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
 					   hash, unsigned int *mand)
 {
 	int ret;
+	const mac_entry_st *me;
 
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret = _gnutls_pk_get_hash_algorithm(key->pk_algorithm,
-					    &key->params, hash, mand);
+	if (mand)
+		*mand = 0;
+
+	switch (key->pk_algorithm) {
+	case GNUTLS_PK_DSA:
+		if (mand)
+			*mand = 1;
+	case GNUTLS_PK_EC:
+
+		me = _gnutls_dsa_q_to_hash(key->pk_algorithm, &key->params, NULL);
+		if (hash)
+			*hash = (gnutls_digest_algorithm_t)me->id;
+
+		ret = 0;
+		break;
+	case GNUTLS_PK_RSA:
+		if (hash)
+			*hash = GNUTLS_DIG_SHA256;
+		ret = 0;
+		break;
+
+	default:
+		gnutls_assert();
+		ret = GNUTLS_E_INTERNAL_ERROR;
+	}
 
 	return ret;
 }
@@ -1643,40 +1667,6 @@ gnutls_pubkey_encrypt_data(gnutls_pubkey_t key, unsigned int flags,
 
 	return _gnutls_pk_encrypt(key->pk_algorithm, ciphertext,
 				  plaintext, &key->params);
-}
-
-/**
- * gnutls_pubkey_get_verify_algorithm:
- * @key: Holds the certificate
- * @signature: contains the signature
- * @hash: The result of the call with the hash algorithm used for signature
- *
- * This function will read the certifcate and the signed data to
- * determine the hash algorithm used to generate the signature.
- *
- * This function is only for informative purposes, as it does not
- * return a cryptographically binding result. Modifications to the signature
- * may cause this function to return an incorrect result.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- *
- * Since: 2.12.0
- **/
-int
-gnutls_pubkey_get_verify_algorithm(gnutls_pubkey_t key,
-				   const gnutls_datum_t * signature,
-				   gnutls_digest_algorithm_t * hash)
-{
-	if (key == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	return _gnutls_x509_verify_algorithm(hash, signature,
-					     key->pk_algorithm,
-					     &key->params);
-
 }
 
 /* Checks whether the public key given is compatible with the

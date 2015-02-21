@@ -217,23 +217,6 @@ void gnutls_pk_params_clear(gnutls_pk_params_st * p)
 	}
 }
 
-int
-_gnutls_pk_get_hash_algorithm(gnutls_pk_algorithm_t pk,
-			      gnutls_pk_params_st * params,
-			      gnutls_digest_algorithm_t * dig,
-			      unsigned int *mand)
-{
-	if (mand) {
-		if (pk == GNUTLS_PK_DSA)
-			*mand = 1;
-		else
-			*mand = 0;
-	}
-
-	return _gnutls_x509_verify_algorithm(dig, NULL, pk, params);
-
-}
-
 /* Writes the digest information and the digest in a DER encoded
  * structure. The digest info is allocated and stored into the info structure.
  */
