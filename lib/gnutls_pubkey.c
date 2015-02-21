@@ -1527,53 +1527,6 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 }
 
 /**
- * gnutls_pubkey_verify_data:
- * @pubkey: Holds the public key
- * @flags: Zero or one of %gnutls_pubkey_flags_t
- * @data: holds the signed data
- * @signature: contains the signature
- *
- * This function will verify the given signed data, using the
- * parameters from the certificate.
- *
- * Deprecated. This function cannot be easily used securely. 
- * Use gnutls_pubkey_verify_data2() instead.
- *
- * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and zero or positive code on success. 
- *
- * Since: 2.12.0
- **/
-int
-gnutls_pubkey_verify_data(gnutls_pubkey_t pubkey, unsigned int flags,
-			  const gnutls_datum_t * data,
-			  const gnutls_datum_t * signature)
-{
-	int ret;
-	gnutls_digest_algorithm_t hash;
-
-	if (pubkey == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	ret = gnutls_pubkey_get_verify_algorithm(pubkey, signature, &hash);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = pubkey_verify_data(pubkey->pk_algorithm, hash_to_entry(hash),
-				 data, signature, &pubkey->params);
-	if (ret < 0) {
-		gnutls_assert();
-	}
-
-	return ret;
-}
-
-/**
  * gnutls_pubkey_verify_data2:
  * @pubkey: Holds the public key
  * @algo: The signature algorithm used
@@ -1618,44 +1571,6 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 	}
 
 	return ret;
-}
-
-
-/**
- * gnutls_pubkey_verify_hash:
- * @key: Holds the public key
- * @flags: Zero or one of %gnutls_pubkey_flags_t
- * @hash: holds the hash digest to be verified
- * @signature: contains the signature
- *
- * This function will verify the given signed digest, using the
- * parameters from the public key. 
- *
- * Deprecated. This function cannot be easily used securely. 
- * Use gnutls_pubkey_verify_hash2() instead.
- *
- * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and zero or positive code on success.
- *
- * Since: 2.12.0
- **/
-int
-gnutls_pubkey_verify_hash(gnutls_pubkey_t key, unsigned int flags,
-			  const gnutls_datum_t * hash,
-			  const gnutls_datum_t * signature)
-{
-	gnutls_digest_algorithm_t algo;
-	int ret;
-
-	ret = gnutls_pubkey_get_verify_algorithm(key, signature, &algo);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	return gnutls_pubkey_verify_hash2(key,
-					  gnutls_pk_to_sign(key->
-							    pk_algorithm,
-							    algo), flags,
-					  hash, signature);
 }
 
 /**

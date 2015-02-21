@@ -523,20 +523,6 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 			   gnutls_pcert_st * pcert_list,
 			   int pcert_list_size, gnutls_privkey_t key);
 
-#include <gnutls/compat.h>
-
-int gnutls_pubkey_verify_data(gnutls_pubkey_t pubkey,
-			      unsigned int flags,
-			      const gnutls_datum_t * data,
-			      const gnutls_datum_t *
-			      signature) _GNUTLS_GCC_ATTR_DEPRECATED;
-
-int gnutls_pubkey_verify_hash(gnutls_pubkey_t key,
-			      unsigned int flags,
-			      const gnutls_datum_t * hash,
-			      const gnutls_datum_t *
-			      signature) _GNUTLS_GCC_ATTR_DEPRECATED;
-
 int
 gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 		    gnutls_certificate_print_formats_t format,
