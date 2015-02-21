@@ -682,7 +682,7 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 
 	for (i=0;;i++) {
 		if (pgroups[i].name == NULL)
-			return gnutls_assert_val(0);
+			return 0;
 
 		if (strcasecmp(level, pgroups[i].name) == 0 ||
 			(pgroups[i].alias != NULL && strcasecmp(level, pgroups[i].alias) == 0)) {
