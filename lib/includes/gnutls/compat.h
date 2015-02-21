@@ -183,14 +183,6 @@ int gnutls_x509_privkey_sign_data(gnutls_x509_privkey_t key,
 				  size_t * signature_size)
     _GNUTLS_GCC_ATTR_DEPRECATED;
 
-	/* gnutls_pubkey_get_verify_algorithm() */
-int gnutls_x509_crt_get_verify_algorithm(gnutls_x509_crt_t crt,
-					 const gnutls_datum_t *
-					 signature,
-					 gnutls_digest_algorithm_t
-					 * hash)
-    _GNUTLS_GCC_ATTR_DEPRECATED;
-
 	/* gnutls_pubkey_get_preferred_hash_algorithm() */
 int gnutls_x509_crt_get_preferred_hash_algorithm(gnutls_x509_crt_t
 						 crt,

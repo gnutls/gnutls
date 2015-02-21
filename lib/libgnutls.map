@@ -498,7 +498,6 @@ GNUTLS_3_4
 	gnutls_x509_crq_set_key_purpose_oid;
 	gnutls_x509_crq_set_key_usage;
 	gnutls_x509_crq_set_subject_alt_name;
-	gnutls_x509_crt_get_verify_algorithm;
 	gnutls_x509_crt_set_crq_extensions;
 	gnutls_session_ticket_key_generate;
 	gnutls_session_ticket_enable_client;
