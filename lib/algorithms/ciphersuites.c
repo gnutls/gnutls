@@ -1228,19 +1228,10 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 	    session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
 	gnutls_kx_algorithm_t alg[MAX_ALGOS];
 	int alg_size = MAX_ALGOS;
-	gnutls_protocol_t proto_version;
 	uint8_t new_list[cipher_suites_size];
 	int i, new_list_size = 0;
-	const version_entry_st *ve;
 	const gnutls_cipher_suite_entry *entry;
 	const uint8_t *cp;
-
-	ve = get_version(session);
-	if (ve == NULL) {
-		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-	}
-
-	proto_version = ve->id;
 
 	/* if we should use a specific certificate, 
 	 * we should remove all algorithms that are not supported
@@ -1288,18 +1279,10 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 		if (entry == NULL)
 			continue;
 		
-		if (IS_DTLS(session)) {
-			if (proto_version < entry->min_dtls_version)
-				continue;
-		} else {
-			if (proto_version < entry->min_version)
-				continue;
-		}
-
 		/* finds the key exchange algorithm in
 		 * the ciphersuite
 		 */
-		kx = _gnutls_cipher_suite_get_kx_algo(&cipher_suites[i]);
+		kx = entry->kx_algorithm;
 
 		/* if it is defined but had no credentials 
 		 */
@@ -1335,11 +1318,11 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 
 		_gnutls_handshake_log
 			    ("HSK[%p]: Keeping ciphersuite: %s (%.2X.%.2X)\n",
-			     session, _gnutls_cipher_suite_get_name(&cipher_suites[i]),
+			     session, entry->name,
 			     cipher_suites[i], cipher_suites[i + 1]);
 
-			memcpy(&new_list[new_list_size], &cipher_suites[i], 2);
-			new_list_size += 2;
+		memcpy(&new_list[new_list_size], &cipher_suites[i], 2);
+		new_list_size += 2;
 	}
 
 	if (new_list_size == 0) {
