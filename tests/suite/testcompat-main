@@ -91,6 +91,10 @@ wait
 
 fi
 
+if test 0 = 1;then
+
+# It seems debian disabled NULL ciphersuites completely on openssl
+
 if test "$FIPS" != 1;then
 #-cipher RSA-NULL
 launch_bare_server $$ s_server -cipher NULL-SHA -quiet -www -accept $PORT -keyform pem -certform pem -tls1 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -Verify 1 -CAfile $CA_CERT &
@@ -104,6 +108,8 @@ $VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+NULL:+SIGN-ALL:+COMP-
 
 kill $PID
 wait
+fi
+
 fi
 
 #-cipher RSA-AES128-SHA:DHE-DSS-AES128-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-AES128-SHA 
@@ -374,6 +380,10 @@ fi
 #kill $PID
 #wait
 
+if test 0 = 1;then
+
+# It seems debian disabled NULL ciphersuites completely on openssl
+
 if test "$FIPS" != 1;then
 echo "Check TLS 1.0 with RSA-NULL ciphersuite"
 launch_server $$  --priority "NONE:+NULL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA:+DHE-RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
@@ -384,6 +394,8 @@ $OPENSSL_CLI s_client -cipher NULL-SHA -host localhost -tls1 -port $PORT -cert $
 
 kill $PID
 wait
+fi
+
 fi
 
 echo "Check TLS 1.0 with DHE-RSA ciphersuite"
