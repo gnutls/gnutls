@@ -148,8 +148,7 @@ static void client(int fd, const char *prio)
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
-		fail("client: Handshake failed\n");
-		gnutls_perror(ret);
+		fail("client: Handshake failed: %s (%d)\n", gnutls_strerror(ret), ret);
 		exit(1);
 	} else {
 		if (debug)
@@ -320,7 +319,7 @@ static void start(const char *prio)
 	}
 }
 
-#define AES_GCM "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+ECDHE-ECDSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_GCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+ECDHE-ECDSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 
 static void ch_handler(int sig)
 {
