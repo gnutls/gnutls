@@ -1515,17 +1515,18 @@ _gnutls_supported_ciphersuites(gnutls_session_t session,
 				if (ce == NULL)
 					continue;
 
-				if (is_dtls == 0
-				    && !(version->id >= ce->min_version))
-					continue;
-				else if (is_dtls != 0
-					 && !(version->id >=
-					      ce->min_dtls_version))
+				if (is_dtls) {
+					if (version->id < ce->min_dtls_version)
+						continue;
+				} else {
+					if (version->id < ce->min_version)
+						continue;
+				}
 
-					if (k + 2 > max_cipher_suite_size)
-						return
-						    gnutls_assert_val
-						    (GNUTLS_E_INTERNAL_ERROR);
+				if (k + 2 > max_cipher_suite_size)
+					return
+					    gnutls_assert_val
+					    (GNUTLS_E_INTERNAL_ERROR);
 
 				memcpy(&cipher_suites[k], ce->id, 2);
 				k += 2;
