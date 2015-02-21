@@ -333,7 +333,7 @@ void doit(void)
 	     65);
 	/* 13 + 16(tag) + 4(iv) */
 	start
-	    ("NONE:+VERS-DTLS1.0:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA",
+	    ("NONE:+VERS-DTLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+RSA",
 	     37);
 #ifndef ENABLE_FIPS140
 	/* 13 + 20(tag) */
