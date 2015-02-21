@@ -195,6 +195,8 @@ void doit(void)
 	gnutls_x509_trust_list_t tl;
 	unsigned int status;
 	gnutls_typed_vdata_st vdata;
+	gnutls_digest_algorithm_t hash;
+	unsigned int mand;
 
 	/* this must be called once in the program
 	 */
@@ -219,6 +221,23 @@ void doit(void)
 	    gnutls_x509_crt_import(server_crt, &cert, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
 		fail("gnutls_x509_crt_import");
+
+	ret = gnutls_x509_crt_get_signature_algorithm(server_crt);
+	if (ret != GNUTLS_SIGN_RSA_SHA1) {
+		fail("detected wrong algorithm: %s\n", gnutls_sign_get_name(ret));
+		exit(1);
+	}
+
+	ret = gnutls_x509_crt_get_preferred_hash_algorithm(server_crt, &hash, &mand);
+	if (ret < 0) {
+		fail("error in gnutls_x509_crt_get_preferred_hash_algorithm: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (mand != 0 || hash != GNUTLS_DIG_SHA256) {
+		fail("gnutls_x509_crt_get_preferred_hash_algorithm returned: %s/%d\n", gnutls_digest_get_name(hash), mand);
+		exit(1);
+	}
 
 	ret = gnutls_x509_crt_import(ca_crt2, &ca, GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
