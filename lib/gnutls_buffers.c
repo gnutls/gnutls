@@ -1355,6 +1355,8 @@ _gnutls_handshake_io_recv_int(gnutls_session_t session,
 	int retries = 7;
 
 	ret = get_last_packet(session, htype, hsk, optional);
+	if (ret == GNUTLS_E_INT_CHECK_AGAIN)
+		goto recv;
 	if (ret != GNUTLS_E_AGAIN && ret != GNUTLS_E_INTERRUPTED
 	    && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		return gnutls_assert_val(ret);
@@ -1384,6 +1386,7 @@ _gnutls_handshake_io_recv_int(gnutls_session_t session,
 		tleft = ret;
 	}
 
+ recv:
 	do {
 		/* if we don't have a complete message waiting for us, try 
 		 * receiving more */
