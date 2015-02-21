@@ -156,6 +156,13 @@ inline static int _gnutls_digest_is_secure(const mac_entry_st * e)
 int _gnutls_supported_ciphersuites(gnutls_session_t session,
 				   uint8_t * cipher_suites,
 				   unsigned int max_cipher_suite_size);
+int
+_gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
+			     uint8_t * cipher_suites,
+			     int cipher_suites_size,
+			     gnutls_pk_algorithm_t * pk_algos,
+			     size_t pk_algos_size);
+
 const char *_gnutls_cipher_suite_get_name(const uint8_t suite[2]);
 gnutls_mac_algorithm_t _gnutls_cipher_suite_get_prf(const uint8_t
 						    suite[2]);

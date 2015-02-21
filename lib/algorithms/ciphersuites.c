@@ -23,7 +23,12 @@
 #include <gnutls_int.h>
 #include <algorithms.h>
 #include <gnutls_errors.h>
+#include <gnutls_dh.h>
+#include <gnutls_state.h>
 #include <x509/common.h>
+#include <auth/cert.h>
+#include <auth/anon.h>
+#include <auth/psk.h>
 
 /* Cipher SUITES */
 #define ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version ) \
@@ -1040,11 +1045,11 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 	{0, {0, 0}, 0, 0, 0, 0, 0, 0}
 };
 
-#define CIPHER_SUITE_LOOP(b) \
+#define CIPHER_SUITE_LOOP(b) { \
         const gnutls_cipher_suite_entry *p; \
-                for(p = cs_algorithms; p->name != NULL; p++) { b ; }
+                for(p = cs_algorithms; p->name != NULL; p++) { b ; } }
 
-#define CIPHER_SUITE_ALG_LOOP(a) \
+#define CIPHER_SUITE_ALG_LOOP(a, suite) \
         CIPHER_SUITE_LOOP( if( (p->id[0] == suite[0]) && (p->id[1] == suite[1])) { a; break; } )
 
 
@@ -1053,7 +1058,7 @@ const cipher_entry_st *_gnutls_cipher_suite_get_cipher_algo(const uint8_t
 							    suite[2])
 {
 	int ret = 0;
-	CIPHER_SUITE_ALG_LOOP(ret = p->block_algorithm);
+	CIPHER_SUITE_ALG_LOOP(ret = p->block_algorithm, suite);
 	return cipher_to_entry(ret);
 }
 
@@ -1062,7 +1067,7 @@ _gnutls_cipher_suite_get_kx_algo(const uint8_t suite[2])
 {
 	int ret = 0;
 
-	CIPHER_SUITE_ALG_LOOP(ret = p->kx_algorithm);
+	CIPHER_SUITE_ALG_LOOP(ret = p->kx_algorithm, suite);
 	return ret;
 
 }
@@ -1071,7 +1076,7 @@ gnutls_mac_algorithm_t _gnutls_cipher_suite_get_prf(const uint8_t suite[2])
 {
 	int ret = 0;
 
-	CIPHER_SUITE_ALG_LOOP(ret = p->prf);
+	CIPHER_SUITE_ALG_LOOP(ret = p->prf, suite);
 	return ret;
 
 }
@@ -1080,7 +1085,7 @@ const mac_entry_st *_gnutls_cipher_suite_get_mac_algo(const uint8_t
 						      suite[2])
 {				/* In bytes */
 	int ret = 0;
-	CIPHER_SUITE_ALG_LOOP(ret = p->mac_algorithm);
+	CIPHER_SUITE_ALG_LOOP(ret = p->mac_algorithm, suite);
 	return mac_to_entry(ret);
 
 }
@@ -1090,7 +1095,7 @@ const char *_gnutls_cipher_suite_get_name(const uint8_t suite[2])
 	const char *ret = NULL;
 
 	/* avoid prefix */
-	CIPHER_SUITE_ALG_LOOP(ret = p->name + sizeof("GNUTLS_") - 1);
+	CIPHER_SUITE_ALG_LOOP(ret = p->name + sizeof("GNUTLS_") - 1, suite);
 
 	return ret;
 }
@@ -1113,6 +1118,237 @@ static const gnutls_cipher_suite_entry
 	);
 
 	return ret;
+}
+
+/* Returns 1 if the given KX has not the corresponding parameters
+ * (DH or RSA) set up. Otherwise returns 0.
+ */
+inline static int
+check_server_params(gnutls_session_t session,
+		    gnutls_kx_algorithm_t kx,
+		    gnutls_kx_algorithm_t * alg, int alg_size)
+{
+	int cred_type;
+	gnutls_dh_params_t dh_params = NULL;
+	int j;
+
+	cred_type = _gnutls_map_kx_get_cred(kx, 1);
+
+	/* Read the Diffie-Hellman parameters, if any.
+	 */
+	if (cred_type == GNUTLS_CRD_CERTIFICATE) {
+		int delete;
+		gnutls_certificate_credentials_t x509_cred =
+		    (gnutls_certificate_credentials_t)
+		    _gnutls_get_cred(session, cred_type);
+
+		if (x509_cred != NULL) {
+			dh_params =
+			    _gnutls_get_dh_params(x509_cred->dh_params,
+						  x509_cred->params_func,
+						  session);
+		}
+
+		/* Check also if the certificate supports the
+		 * KX method.
+		 */
+		delete = 1;
+		for (j = 0; j < alg_size; j++) {
+			if (alg[j] == kx) {
+				delete = 0;
+				break;
+			}
+		}
+
+		if (delete == 1)
+			return 1;
+
+#ifdef ENABLE_ANON
+	} else if (cred_type == GNUTLS_CRD_ANON) {
+		gnutls_anon_server_credentials_t anon_cred =
+		    (gnutls_anon_server_credentials_t)
+		    _gnutls_get_cred(session, cred_type);
+
+		if (anon_cred != NULL) {
+			dh_params =
+			    _gnutls_get_dh_params(anon_cred->dh_params,
+						  anon_cred->params_func,
+						  session);
+		}
+#endif
+#ifdef ENABLE_PSK
+	} else if (cred_type == GNUTLS_CRD_PSK) {
+		gnutls_psk_server_credentials_t psk_cred =
+		    (gnutls_psk_server_credentials_t)
+		    _gnutls_get_cred(session, cred_type);
+
+		if (psk_cred != NULL) {
+			dh_params =
+			    _gnutls_get_dh_params(psk_cred->dh_params,
+						  psk_cred->params_func,
+						  session);
+		}
+#endif
+	} else
+		return 0;	/* no need for params */
+
+	/* If the key exchange method needs DH params,
+	 * but they are not set then remove it.
+	 */
+	if (_gnutls_kx_needs_dh_params(kx) != 0) {
+		/* needs DH params. */
+		if (_gnutls_dh_params_to_mpi(dh_params) == NULL) {
+			gnutls_assert();
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+/* This function will remove algorithms that are not supported by
+ * the requested authentication method. We remove an algorithm if
+ * we have a certificate with keyUsage bits set.
+ *
+ * This does a more elaborate check than gnutls_supported_ciphersuites(),
+ * by checking certificates etc.
+ */
+int
+_gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
+			     uint8_t * cipher_suites,
+			     int cipher_suites_size,
+			     gnutls_pk_algorithm_t * pk_algos,
+			     size_t pk_algos_size)
+{
+
+	int ret = 0;
+	gnutls_certificate_credentials_t cert_cred;
+	gnutls_kx_algorithm_t kx;
+	int server =
+	    session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
+	gnutls_kx_algorithm_t alg[MAX_ALGOS];
+	int alg_size = MAX_ALGOS;
+	gnutls_protocol_t proto_version;
+	uint8_t new_list[cipher_suites_size];
+	int i, new_list_size = 0;
+	const version_entry_st *ve;
+	const gnutls_cipher_suite_entry *entry;
+	const uint8_t *cp;
+
+	ve = get_version(session);
+	if (ve == NULL) {
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+
+	proto_version = ve->id;
+
+	/* if we should use a specific certificate, 
+	 * we should remove all algorithms that are not supported
+	 * by that certificate and are on the same authentication
+	 * method (CERTIFICATE).
+	 */
+	cert_cred =
+	    (gnutls_certificate_credentials_t) _gnutls_get_cred(session,
+								GNUTLS_CRD_CERTIFICATE);
+
+	/* If there are certificate credentials, find an appropriate certificate
+	 * or disable them;
+	 */
+	if (session->security_parameters.entity == GNUTLS_SERVER
+	    && cert_cred != NULL && pk_algos_size > 0) {
+		ret =
+		    _gnutls_server_select_cert(session, pk_algos,
+					       pk_algos_size);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_debug_log
+			    ("Could not find an appropriate certificate: %s\n",
+			     gnutls_strerror(ret));
+		}
+	}
+
+	/* get all the key exchange algorithms that are 
+	 * supported by the X509 certificate parameters.
+	 */
+	if ((ret =
+	     _gnutls_selected_cert_supported_kx(session, alg,
+						&alg_size)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	/* now remove ciphersuites based on the KX algorithm
+	 */
+	for (i = 0; i < cipher_suites_size; i += 2) {
+		entry = NULL;
+		cp = &cipher_suites[i];
+
+		CIPHER_SUITE_ALG_LOOP(entry = p, cp);
+
+		if (entry == NULL)
+			continue;
+		
+		if (IS_DTLS(session)) {
+			if (proto_version < entry->min_dtls_version)
+				continue;
+		} else {
+			if (proto_version < entry->min_version)
+				continue;
+		}
+
+		/* finds the key exchange algorithm in
+		 * the ciphersuite
+		 */
+		kx = _gnutls_cipher_suite_get_kx_algo(&cipher_suites[i]);
+
+		/* if it is defined but had no credentials 
+		 */
+		if (!session->internals.premaster_set &&
+		    _gnutls_get_kx_cred(session, kx) == NULL) {
+			continue;
+		} else {
+			if (server && check_server_params(session, kx, alg,
+							  alg_size) != 0)
+				continue;
+		}
+
+		/* If we have not agreed to a common curve with the peer don't bother
+		 * negotiating ECDH.
+		 */
+		if (server != 0 && _gnutls_kx_is_ecc(kx)) {
+			if (_gnutls_session_ecc_curve_get(session) ==
+			    GNUTLS_ECC_CURVE_INVALID) {
+				continue;
+			}
+		}
+
+		/* These two SRP kx's are marked to require a CRD_CERTIFICATE,
+		   (see cred_mappings in gnutls_algorithms.c), but it also
+		   requires a SRP credential.  Don't use SRP kx unless we have a
+		   SRP credential too.  */
+		if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS) {
+			if (!_gnutls_get_cred
+			    (session, GNUTLS_CRD_SRP)) {
+				continue;
+			}
+		}
+
+		_gnutls_handshake_log
+			    ("HSK[%p]: Keeping ciphersuite: %s (%.2X.%.2X)\n",
+			     session, _gnutls_cipher_suite_get_name(&cipher_suites[i]),
+			     cipher_suites[i], cipher_suites[i + 1]);
+
+			memcpy(&new_list[new_list_size], &cipher_suites[i], 2);
+			new_list_size += 2;
+	}
+
+	if (new_list_size == 0) {
+		return gnutls_assert_val(GNUTLS_E_NO_CIPHER_SUITES);
+	}
+
+	memcpy(cipher_suites, new_list, new_list_size);
+
+	return new_list_size;
 }
 
 
@@ -1223,7 +1459,7 @@ static inline int _gnutls_cipher_suite_is_ok(const uint8_t suite[2])
 	size_t ret;
 	const char *name = NULL;
 
-	CIPHER_SUITE_ALG_LOOP(name = p->name);
+	CIPHER_SUITE_ALG_LOOP(name = p->name, suite);
 	if (name != NULL)
 		ret = 0;
 	else
