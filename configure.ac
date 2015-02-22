@@ -478,6 +478,9 @@ if test "$with_p11_kit" != "no"; then
 		else
 			GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, p11-kit-1"
 		fi
+		if $PKG_CONFIG --atleast-version=0.23.1 p11-kit; then
+			AC_DEFINE([P11_KIT_HAS_PIN_VALUE], 1, [p11-kit supports p11_kit_uri_get_pin_value()])
+		fi
 	else
 	        with_p11_kit=no
 	        AC_MSG_ERROR([[
