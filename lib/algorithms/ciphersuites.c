@@ -1228,7 +1228,7 @@ _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 	    session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
 	gnutls_kx_algorithm_t alg[MAX_ALGOS];
 	int alg_size = MAX_ALGOS;
-	uint8_t new_list[cipher_suites_size];
+	uint8_t new_list[cipher_suites_size]; /* it's safe to use that size because it's provided by _gnutls_supported_ciphersuites() */
 	int i, new_list_size = 0;
 	const gnutls_cipher_suite_entry *entry;
 	const uint8_t *cp;

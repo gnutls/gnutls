@@ -1847,7 +1847,7 @@ copy_ciphersuites(gnutls_session_t session,
 		  gnutls_buffer_st * cdata, int add_scsv)
 {
 	int ret;
-	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE + 2];
+	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE + 2]; /* allow space for SCSV */
 	int cipher_suites_size;
 	size_t init_length = cdata->length;
 
