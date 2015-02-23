@@ -165,7 +165,7 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
                         gnutls_x509_crt_fmt_t format)
 {
   int result = 0, need_free = 0;
-  gnutls_datum_t _data;
+  gnutls_datum_t _data, sa1 = {NULL, 0}, sa2 = {NULL, 0};
 
   if (cert == NULL)
     {
@@ -233,6 +233,36 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
       goto cleanup;
     }
 
+  result =
+    _gnutls_x509_read_value (cert->cert, "tbsCertificate.signature.algorithm",
+			     &sa1, 0);
+  if (result != ASN1_SUCCESS)
+    {
+      result = _gnutls_asn2err (result);
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  result =
+    _gnutls_x509_read_value (cert->cert, "signatureAlgorithm.algorithm",
+			     &sa2, 0);
+  if (result != ASN1_SUCCESS)
+    {
+      result = _gnutls_asn2err (result);
+      gnutls_assert ();
+      goto cleanup;
+    }
+  
+  if (sa1.size != sa2.size || sa1.size == 0 || strcmp(sa1.data, sa2.data) != 0)
+    {
+      result = GNUTLS_E_CERTIFICATE_ERROR;
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  _gnutls_free_datum (&sa1);
+  _gnutls_free_datum (&sa2);
+
   /* Since we do not want to disable any extension
    */
   cert->use_extensions = 1;
@@ -242,6 +272,8 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
   return 0;
 
 cleanup:
+  _gnutls_free_datum (&sa1);
+  _gnutls_free_datum (&sa2);
   if (need_free)
     _gnutls_free_datum (&_data);
   return result;
