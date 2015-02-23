@@ -1828,7 +1828,8 @@ gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_x509_privkey_verify_signature (data, signature, key);
+  result = _gnutls_x509_privkey_verify_signature (GNUTLS_MAC_UNKNOWN, data, signature, key);
+
   if (result < 0)
     {
       gnutls_assert ();

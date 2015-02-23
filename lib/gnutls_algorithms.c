@@ -2056,6 +2056,14 @@ gnutls_sign_get_name (gnutls_sign_algorithm_t algorithm)
   return ret;
 }
 
+int
+_gnutls_sign_get_hash (gnutls_sign_algorithm_t algorithm)
+{
+  GNUTLS_SIGN_LOOP (if (p->id == algorithm) return p->mac);
+
+  return GNUTLS_MAC_UNKNOWN;
+}
+
 gnutls_sign_algorithm_t
 _gnutls_x509_oid2sign_algorithm (const char *oid)
 {

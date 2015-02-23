@@ -2714,7 +2714,7 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_x509_verify_signature (data, NULL, signature, crt);
+  result = _gnutls_x509_verify_signature (GNUTLS_MAC_UNKNOWN, data, NULL, signature, crt);
   if (result < 0)
     {
       gnutls_assert ();
@@ -2752,7 +2752,7 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_x509_verify_signature (NULL, hash, signature, crt);
+  result = _gnutls_x509_verify_signature (GNUTLS_MAC_UNKNOWN, NULL, hash, signature, crt);
   if (result < 0)
     {
       gnutls_assert ();

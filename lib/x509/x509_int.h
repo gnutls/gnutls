@@ -187,11 +187,11 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
                                bigint_t * issuer_params,
                                unsigned int issuer_params_size);
 
-int _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
+int _gnutls_x509_verify_signature (int sigalg, const gnutls_datum_t * tbs,
                                    const gnutls_datum_t * hash,
                                    const gnutls_datum_t * signature,
                                    gnutls_x509_crt_t issuer);
-int _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
+int _gnutls_x509_privkey_verify_signature (int sigalg, const gnutls_datum_t * tbs,
                                            const gnutls_datum_t * signature,
                                            gnutls_x509_privkey_t issuer);
 
@@ -390,5 +390,6 @@ int _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
                                     const char *ext_id,
                                     const gnutls_datum_t * ext_data,
                                     unsigned int critical);
-
+int
+gnutls_x509_crq_get_signature_algorithm (gnutls_x509_crq_t crq);
 #endif

@@ -2540,6 +2540,7 @@ gnutls_datum data = { NULL, 0 };
 gnutls_datum signature = { NULL, 0 };
 bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
 int ret, params_size = 0, i;
+int hashalg, sigalg;
 
   ret =
     _gnutls_x509_get_signed_data (crq->crq, "certificationRequestInfo", &data);
@@ -2565,7 +2566,10 @@ int ret, params_size = 0, i;
       goto cleanup;
     }
 
-  ret = pubkey_verify_sig(&data, NULL, &signature,
+  sigalg = gnutls_x509_crq_get_signature_algorithm (crq);
+  hashalg = _gnutls_sign_get_hash(sigalg);
+
+  ret = pubkey_verify_sig(hashalg, &data, NULL, &signature,
                           gnutls_x509_crq_get_pk_algorithm (crq, NULL),
     params, params_size);
   if (ret < 0)
@@ -2586,6 +2590,49 @@ cleanup:
       }
 
   return ret;
+}
+
+/**
+ * gnutls_x509_crq_get_signature_algorithm:
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ *
+ * This function will return a value of the #gnutls_sign_algorithm_t
+ * enumeration that is the signature algorithm.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crq_get_signature_algorithm (gnutls_x509_crq_t crq)
+{
+  int result;
+  gnutls_datum_t sa;
+
+  if (crq == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* Read the signature algorithm. Note that parameters are not
+   * read. They will be read from the issuer's certificate if needed.
+   */
+
+  result =
+    _gnutls_x509_read_value (crq->crq, "signatureAlgorithm.algorithm",
+                             &sa, 0);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  result = _gnutls_x509_oid2sign_algorithm ((const char *) sa.data);
+
+  _gnutls_free_datum (&sa);
+
+  return result;
 }
 
 #endif /* ENABLE_PKI */

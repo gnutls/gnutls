@@ -1048,7 +1048,7 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = pubkey_verify_sig( data, NULL, signature, pubkey->pk_algorithm, 
+  ret = pubkey_verify_sig(GNUTLS_MAC_UNKNOWN, data, NULL, signature, pubkey->pk_algorithm, 
     pubkey->params, pubkey->params_size);
   if (ret < 0)
     {
@@ -1086,7 +1086,7 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
     }
 
   ret =
-    pubkey_verify_sig (NULL, hash, signature, key->pk_algorithm,
+    pubkey_verify_sig (GNUTLS_MAC_UNKNOWN, NULL, hash, signature, key->pk_algorithm,
                        key->params, key->params_size);
 
   return ret;

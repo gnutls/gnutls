@@ -332,6 +332,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   gnutls_datum_t cert_signature = { NULL, 0 };
   gnutls_x509_crt_t issuer = NULL;
   int issuer_version, result = 0;
+  int sigalg, hashalg;
 
   if (output)
     *output = 0;
@@ -399,8 +400,18 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
       goto cleanup;
     }
 
+  sigalg = gnutls_x509_crt_get_signature_algorithm (cert);
+  hashalg = _gnutls_sign_get_hash(sigalg);
+
+  if (hashalg == GNUTLS_MAC_UNKNOWN)
+    {
+      gnutls_assert();
+      result = 0;
+      goto cleanup;
+    }
+
   result =
-    _gnutls_x509_verify_signature (&cert_signed_data, NULL, &cert_signature,
+    _gnutls_x509_verify_signature (hashalg, &cert_signed_data, NULL, &cert_signature,
                                    issuer);
   if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED)
     {
@@ -423,10 +434,6 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
    */
   if (is_issuer (cert, cert) == 0)
     {
-      int sigalg;
-
-      sigalg = gnutls_x509_crt_get_signature_algorithm (cert);
-
       if (((sigalg == GNUTLS_SIGN_RSA_MD2) &&
            !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2)) ||
           ((sigalg == GNUTLS_SIGN_RSA_MD5) &&
@@ -750,12 +757,12 @@ decode_ber_digest_info (const gnutls_datum_t * info,
  * params[1] is public key
  */
 static int
-_pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
-                       const gnutls_datum_t * prehash,
-                       const gnutls_datum_t * signature, bigint_t * params,
-                       int params_len)
+_pkcs1_rsa_verify_sig (gnutls_mac_algorithm_t hash, const gnutls_datum_t * text,
+		       const gnutls_datum_t * prehash,
+		       const gnutls_datum_t * signature, bigint_t * params,
+		       int params_len)
 {
-  gnutls_mac_algorithm_t hash = GNUTLS_MAC_UNKNOWN;
+  gnutls_mac_algorithm_t phash = GNUTLS_MAC_UNKNOWN;
   int ret;
   opaque digest[MAX_HASH_SIZE], md[MAX_HASH_SIZE], *cmp;
   int digest_size;
@@ -775,7 +782,7 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
 
   digest_size = sizeof (digest);
   if ((ret =
-       decode_ber_digest_info (&decrypted, &hash, digest, &digest_size)) != 0)
+       decode_ber_digest_info (&decrypted, &phash, digest, &digest_size)) != 0)
     {
       gnutls_assert ();
       _gnutls_free_datum (&decrypted);
@@ -783,6 +790,15 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
     }
 
   _gnutls_free_datum (&decrypted);
+
+  if (hash != GNUTLS_MAC_UNKNOWN && hash != phash)
+    {
+      gnutls_assert();
+      return GNUTLS_E_PK_SIG_VERIFY_FAILED;
+    }
+  else
+    hash = phash;
+  
 
   if (digest_size != _gnutls_hash_get_algo_len (hash))
     {
@@ -879,11 +895,11 @@ dsa_verify_sig (const gnutls_datum_t * text,
  * not verified, or 1 otherwise.
  */
 int
-pubkey_verify_sig (const gnutls_datum_t * tbs,
-                   const gnutls_datum_t * hash,
-                   const gnutls_datum_t * signature,
-                   gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
-                   int issuer_params_size)
+pubkey_verify_sig (int hashalg, const gnutls_datum_t * tbs,
+	    const gnutls_datum_t * hash,
+	    const gnutls_datum_t * signature,
+	    gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
+	    int issuer_params_size)
 {
 
   switch (pk)
@@ -891,7 +907,7 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
     case GNUTLS_PK_RSA:
 
       if (_pkcs1_rsa_verify_sig
-          (tbs, hash, signature, issuer_params, issuer_params_size) != 0)
+          (hashalg, tbs, hash, signature, issuer_params, issuer_params_size) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -1022,7 +1038,7 @@ cleanup:
  * 'signature' is the signature!
  */
 int
-_gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
+_gnutls_x509_verify_signature (int hashalg, const gnutls_datum_t * tbs,
                                const gnutls_datum_t * hash,
                                const gnutls_datum_t * signature,
                                gnutls_x509_crt_t issuer)
@@ -1042,7 +1058,7 @@ _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
     }
 
   ret =
-    pubkey_verify_sig (tbs, hash, signature,
+    pubkey_verify_sig (hashalg, tbs, hash, signature,
                        gnutls_x509_crt_get_pk_algorithm (issuer, NULL),
                        issuer_params, issuer_params_size);
   if (ret < 0)
@@ -1067,13 +1083,13 @@ _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
  * 'signature' is the signature!
  */
 int
-_gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
+_gnutls_x509_privkey_verify_signature (int hashalg, const gnutls_datum_t * tbs,
                                        const gnutls_datum_t * signature,
                                        gnutls_x509_privkey_t issuer)
 {
   int ret;
 
-  ret = pubkey_verify_sig (tbs, NULL, signature, issuer->pk_algorithm,
+  ret = pubkey_verify_sig (hashalg, tbs, NULL, signature, issuer->pk_algorithm,
                            issuer->params, issuer->params_size);
   if (ret < 0)
     {
@@ -1294,6 +1310,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
   gnutls_datum_t crl_signature = { NULL, 0 };
   gnutls_x509_crt_t issuer;
   int result;
+  int sigalg, hashalg;
 
   if (output)
     *output = 0;
@@ -1335,6 +1352,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
   if (result < 0)
     {
       gnutls_assert ();
+      result = 0;
       goto cleanup;
     }
 
@@ -1342,11 +1360,21 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
   if (result < 0)
     {
       gnutls_assert ();
+      result = 0;
+      goto cleanup;
+    }
+
+  sigalg = gnutls_x509_crl_get_signature_algorithm (crl);
+  hashalg = _gnutls_sign_get_hash(sigalg);
+  if (hashalg == GNUTLS_MAC_UNKNOWN)
+    {
+      gnutls_assert();
+      result = 0;
       goto cleanup;
     }
 
   result =
-    _gnutls_x509_verify_signature (&crl_signed_data, NULL, &crl_signature,
+    _gnutls_x509_verify_signature (hashalg, &crl_signed_data, NULL, &crl_signature,
                                    issuer);
   if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED)
     {
@@ -1359,14 +1387,11 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
   else if (result < 0)
     {
       gnutls_assert ();
+      result = 0;
       goto cleanup;
     }
 
   {
-    int sigalg;
-
-    sigalg = gnutls_x509_crl_get_signature_algorithm (crl);
-
     if (((sigalg == GNUTLS_SIGN_RSA_MD2) &&
          !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2)) ||
         ((sigalg == GNUTLS_SIGN_RSA_MD5) &&

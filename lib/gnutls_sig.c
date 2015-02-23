@@ -273,7 +273,8 @@ static int
 verify_tls_hash (gnutls_session_t session, gnutls_protocol_t ver, gnutls_cert * cert,
                     const gnutls_datum_t * hash_concat,
                     gnutls_datum_t * signature, size_t sha1pos,
-                    gnutls_pk_algorithm_t pk_algo)
+                    gnutls_pk_algorithm_t pk_algo,
+                    int hashalg)
 {
   int ret;
   gnutls_datum_t vdata;
@@ -309,7 +310,7 @@ verify_tls_hash (gnutls_session_t session, gnutls_protocol_t ver, gnutls_cert * 
         ret = _gnutls_rsa_verify (&vdata, signature, cert->params,
                                      cert->params_size, 1);
       else
-        ret = pubkey_verify_sig( NULL, &vdata, signature, pk_algo, 
+        ret = pubkey_verify_sig(hashalg, NULL, &vdata, signature, pk_algo, 
           cert->params, cert->params_size);
 
       if (ret < 0)
@@ -324,7 +325,7 @@ verify_tls_hash (gnutls_session_t session, gnutls_protocol_t ver, gnutls_cert * 
       vdata.data = &hash_concat->data[sha1pos];
       vdata.size = hash_concat->size - sha1pos;
 
-      ret = pubkey_verify_sig( NULL, &vdata, signature, pk_algo, 
+      ret = pubkey_verify_sig(hashalg, NULL, &vdata, signature, pk_algo, 
         cert->params, cert->params_size);
       /* verify signature */
       if (ret < 0)
@@ -428,7 +429,8 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
   ret = verify_tls_hash (session, ver, cert, &dconcat, signature,
                             dconcat.size -
                             _gnutls_hash_get_algo_len (hash_algo),
-                            _gnutls_sign_get_pk_algorithm (algo));
+                            _gnutls_sign_get_pk_algorithm (algo),
+                            hash_algo);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -491,7 +493,7 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
 
   ret =
     verify_tls_hash (session, ver, cert, &dconcat, signature, 0,
-                        cert->subject_pk_algorithm);
+                        cert->subject_pk_algorithm, hash_algo);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -582,7 +584,7 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
 
   ret =
     verify_tls_hash (session, ver, cert, &dconcat, signature, 16,
-                        cert->subject_pk_algorithm);
+                        cert->subject_pk_algorithm, GNUTLS_MAC_UNKNOWN);
   if (ret < 0)
     {
       gnutls_assert ();

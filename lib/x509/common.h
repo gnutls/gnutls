@@ -151,7 +151,7 @@ int _gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t * params,
 void _asnstr_append_name (char *name, size_t name_size, const char *part1,
                           const char *part2);
 
-int pubkey_verify_sig (const gnutls_datum_t * tbs,
+int pubkey_verify_sig (int hashalg, const gnutls_datum_t * tbs,
                        const gnutls_datum_t * hash,
                        const gnutls_datum_t * signature,
                        gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
