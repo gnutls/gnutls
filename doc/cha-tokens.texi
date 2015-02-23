@@ -182,7 +182,7 @@ key abstractions.
 In several systems there are keystores which allow to read, store and use certificates
 and private keys. For these systems GnuTLS provides the system-key API in @code{gnutls/system-keys.h}.
 That API provides the ability to iterate through all stored keys, add and delete keys as well
-as use these keys using a URL which starts with "system:".
+as use these keys using a URL which starts with "system:". The format of the URLs is system-specific.
 
 @showfuncdesc{gnutls_system_key_iter_get_info}
 
