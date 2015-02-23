@@ -37,6 +37,8 @@ AC_MSG_RESULT([***
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_LN_S
+AM_PROG_AR
+
 GTK_DOC_CHECK(1.1)
 AC_PATH_PROG([GAA], [gaa])
 if test "x$GAA" = "x"; then
