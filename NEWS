@@ -3,11 +3,15 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.3.13 (unreleased)
+* Version 3.3.13 (released 2015-02-25)
 
-** libgnutls: enable AESNI in GCM on x86
+** libgnutls: Enable AESNI in GCM on x86
 
-** libgnutls: fixes in DTLS message handling
+** libgnutls: Fixes in DTLS message handling
+
+** libgnutls: Check certificate algorithm consistency, i.e.,
+check whether the signatureAlgorithm field matches the signature
+field inside TBSCertificate.
 
 ** gnutls-cli: Fixes in OCSP verification.
 
