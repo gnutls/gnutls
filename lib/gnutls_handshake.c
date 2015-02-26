@@ -2491,7 +2491,7 @@ static int _gnutls_recv_supplemental(gnutls_session_t session)
  *
  * The non-fatal errors expected by this function are:
  * %GNUTLS_E_INTERRUPTED, %GNUTLS_E_AGAIN, 
- * %GNUTLS_E_WARNING_ALERT_RECEIVED, and %GNUTLS_GOT_APPLICATION_DATA,
+ * %GNUTLS_E_WARNING_ALERT_RECEIVED, and %GNUTLS_E_GOT_APPLICATION_DATA,
  * the latter only in a case of rehandshake.
  *
  * The former two interrupt the handshake procedure due to the lower
