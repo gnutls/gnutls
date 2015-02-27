@@ -551,10 +551,6 @@ gnutls_pubkey_get_key_id@GNUTLS_3_4
 gnutls_pubkey_get_key_usage@GNUTLS_3_4
 gnutls_pubkey_get_openpgp_key_id@GNUTLS_3_4
 gnutls_pubkey_get_pk_algorithm@GNUTLS_3_4
-gnutls_pubkey_get_pk_dsa_raw@GNUTLS_3_4
-gnutls_pubkey_get_pk_ecc_raw@GNUTLS_3_4
-gnutls_pubkey_get_pk_ecc_x962@GNUTLS_3_4
-gnutls_pubkey_get_pk_rsa_raw@GNUTLS_3_4
 gnutls_pubkey_get_preferred_hash_algorithm@GNUTLS_3_4
 gnutls_pubkey_get_verify_algorithm@GNUTLS_3_4
 gnutls_pubkey_import@GNUTLS_3_4
@@ -594,6 +590,7 @@ gnutls_record_discard_queued@GNUTLS_3_4
 gnutls_record_get_direction@GNUTLS_3_4
 gnutls_record_get_discarded@GNUTLS_3_4
 gnutls_record_get_max_size@GNUTLS_3_4
+gnutls_record_get_state@GNUTLS_3_4
 gnutls_record_overhead_size@GNUTLS_3_4
 gnutls_record_recv@GNUTLS_3_4
 gnutls_record_recv_packet@GNUTLS_3_4
@@ -602,6 +599,7 @@ gnutls_record_send@GNUTLS_3_4
 gnutls_record_send_range@GNUTLS_3_4
 gnutls_record_set_max_empty_records@GNUTLS_3_4
 gnutls_record_set_max_size@GNUTLS_3_4
+gnutls_record_set_state@GNUTLS_3_4
 gnutls_record_set_timeout@GNUTLS_3_4
 gnutls_record_uncork@GNUTLS_3_4
 gnutls_register_custom_url@GNUTLS_3_4
@@ -694,6 +692,7 @@ gnutls_system_key_add_x509@GNUTLS_3_4
 gnutls_system_key_delete@GNUTLS_3_4
 gnutls_system_key_iter_deinit@GNUTLS_3_4
 gnutls_system_key_iter_get_info@GNUTLS_3_4
+gnutls_system_recv_timeout@GNUTLS_3_4
 gnutls_tdb_deinit@GNUTLS_3_4
 gnutls_tdb_init@GNUTLS_3_4
 gnutls_tdb_set_store_commitment_func@GNUTLS_3_4
