@@ -35,7 +35,7 @@
  * The client should call this, and store the returned session data. A session
  * may be resumed later by calling gnutls_session_set_data().  
  * This function must be called after a successful (full) handshake. It should
- * not be used in resumed sessions --see gnutls_session_is_resumed().
+ * not be used in already resumed sessions --see gnutls_session_is_resumed().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -85,7 +85,7 @@ gnutls_session_get_data(gnutls_session_t session,
  * The client should call this, and store the returned session data. A session
  * may be resumed later by calling gnutls_session_set_data().  
  * This function must be called after a successful (full) handshake. It should
- * not be used in resumed sessions --see gnutls_session_is_resumed().
+ * not be used in already resumed sessions --see gnutls_session_is_resumed().
  *
  * The returned @data are allocated and must be released using gnutls_free().
  *
