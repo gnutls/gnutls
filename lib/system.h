@@ -112,4 +112,10 @@ int inet_aton(const char *cp, struct in_addr *inp);
 int inet_pton(int af, const char *src, void *dst);
 #endif
 
+#ifndef HAVE_INET_NTOP
+# define inet_ntop _gnutls_inet_ntop
+const char *inet_ntop(int af, const void *src,
+		      char *dst, socklen_t size);
+#endif
+
 #endif				/* SYSTEM_H */
