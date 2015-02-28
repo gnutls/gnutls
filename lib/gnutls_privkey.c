@@ -574,8 +574,9 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
  * will be provided, and the signing function is expected to do the PKCS #1
  * 1.5 padding and the exponentiation.
  *
- * The @info_fn must provide information on %GNUTLS_PRIVKEY_INFO_PK_ALGO and
- * %GNUTLS_PRIVKEY_INFO_PK_ALGO, and should return -1 on unknown flags.
+ * The @info_fn must provide information on the algorithms supported by
+ * this private key, and should support the flags %GNUTLS_PRIVKEY_INFO_PK_ALGO and
+ * %GNUTLS_PRIVKEY_INFO_SIGN_ALGO. It must return -1 on unknown flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
