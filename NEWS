@@ -93,7 +93,7 @@ when available.
 
 ** certtool: it will print the A-label (ACE) names in addition to UTF-8.
 
-** gnutls-cli: added option --priority-list.
+** gnutls-cli: added options --priority-list and --save-cert.
 
 ** guile: Deprecated priority API has been removed. The old priority API, 
 which had been deprecated for some time, is now gone; use 'set-session-priorities!'
