@@ -204,6 +204,7 @@ void benchmark_cipher(int debug_level)
 	cipher_mac_bench(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, size);
 	cipher_mac_bench(GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256,
 			 size);
+	cipher_bench(GNUTLS_CIPHER_AES_128_CCM, size, 1);
 	cipher_bench(GNUTLS_CIPHER_AES_128_GCM, size, 1);
 
 	printf("\nChecking MAC algorithms, payload size: %u\n", size * 1024);
@@ -213,11 +214,8 @@ void benchmark_cipher(int debug_level)
 
 	printf("\nChecking ciphers, payload size: %u\n", size * 1024);
 	cipher_bench(GNUTLS_CIPHER_3DES_CBC, size, 0);
-
 	cipher_bench(GNUTLS_CIPHER_AES_128_CBC, size, 0);
-
 	cipher_bench(GNUTLS_CIPHER_ARCFOUR, size, 0);
-
 	cipher_bench(GNUTLS_CIPHER_SALSA20_256, size, 0);
 
 	gnutls_global_deinit();
