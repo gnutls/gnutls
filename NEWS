@@ -34,7 +34,8 @@ list. It has to be explicitly enabled, e.g., with a string like
 
 ** libgnutls: DSA signatures and DHE-DSS are no longer included in the
 default priorities list. They have to be explicitly enabled, e.g., with
-a string like "NORMAL:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256".
+a string like "NORMAL:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1". This
+string will be needed when using the OpenPGP ciphersuites.
 
 ** libgnutls: Use nettle's PBKDF2 implementation.
 
