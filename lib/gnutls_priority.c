@@ -181,7 +181,6 @@ static const int _kx_priority_performance[] = {
 #endif
 #ifdef ENABLE_DHE
 	GNUTLS_KX_DHE_RSA,
-	GNUTLS_KX_DHE_DSS,
 #endif
 	0
 };
@@ -194,7 +193,6 @@ static const int _kx_priority_pfs[] = {
 #endif
 #ifdef ENABLE_DHE
 	GNUTLS_KX_DHE_RSA,
-	GNUTLS_KX_DHE_DSS,
 #endif
 	0
 };
@@ -221,7 +219,6 @@ static const int _kx_priority_secure[] = {
 	 */
 #ifdef ENABLE_DHE
 	GNUTLS_KX_DHE_RSA,
-	GNUTLS_KX_DHE_DSS,
 #endif
 	/* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
 	 */
@@ -336,7 +333,6 @@ static const int comp_priority[] = {
 
 static const int _sign_priority_default[] = {
 	GNUTLS_SIGN_RSA_SHA256,
-	GNUTLS_SIGN_DSA_SHA256,
 	GNUTLS_SIGN_ECDSA_SHA256,
 
 	GNUTLS_SIGN_RSA_SHA384,
@@ -346,11 +342,9 @@ static const int _sign_priority_default[] = {
 	GNUTLS_SIGN_ECDSA_SHA512,
 
 	GNUTLS_SIGN_RSA_SHA224,
-	GNUTLS_SIGN_DSA_SHA224,
 	GNUTLS_SIGN_ECDSA_SHA224,
 
 	GNUTLS_SIGN_RSA_SHA1,
-	GNUTLS_SIGN_DSA_SHA1,
 	GNUTLS_SIGN_ECDSA_SHA1,
 	0
 };
@@ -371,7 +365,6 @@ static const int* sign_priority_suiteb192 = _sign_priority_suiteb192;
 
 static const int _sign_priority_secure128[] = {
 	GNUTLS_SIGN_RSA_SHA256,
-	GNUTLS_SIGN_DSA_SHA256,
 	GNUTLS_SIGN_ECDSA_SHA256,
 	GNUTLS_SIGN_RSA_SHA384,
 	GNUTLS_SIGN_ECDSA_SHA384,
