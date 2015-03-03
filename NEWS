@@ -32,6 +32,10 @@ list. It has to be explicitly enabled, e.g., with a string like
 list. It has to be explicitly enabled, e.g., with a string like
 "NORMAL:+ARCFOUR-128".
 
+** libgnutls: DSA signatures and DHE-DSS are no longer included in the
+default priorities list. They have to be explicitly enabled, e.g., with
+a string like "NORMAL:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256".
+
 ** libgnutls: Use nettle's PBKDF2 implementation.
 
 ** libgnutls: gnutls_x509_crt_check_hostname() and friends will use
