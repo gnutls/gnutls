@@ -174,7 +174,7 @@ static void client(int sds[])
 
 		/* Use default priorities */
 		gnutls_priority_set_direct(session,
-					   "NORMAL:+CTYPE-OPENPGP", NULL);
+					   "NORMAL:+CTYPE-OPENPGP:+DHE-DSS:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256", NULL);
 
 		/* put the x509 credentials to the current session
 		 */
@@ -258,7 +258,7 @@ static gnutls_session_t initialize_tls_session(void)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:+CTYPE-OPENPGP", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:+CTYPE-OPENPGP:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256", NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, pgp_cred);
 

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2015 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -100,18 +101,18 @@ try_prio(const char *prio, unsigned expected_cs, unsigned expected_ciphers, unsi
 
 void doit(void)
 {
-	const int normal = 67;
+	const int normal = 54;
 	const int null = 5;
-	const int sec128 = 62;
+	const int sec128 = 50;
 
 	try_prio("NORMAL", normal, 11, __LINE__);
 	try_prio("NORMAL:-MAC-ALL:+MD5:+MAC-ALL", normal, 11, __LINE__);
 	try_prio("NORMAL:+CIPHER-ALL", normal, 11, __LINE__);	/* all (except null) */
 	try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1, __LINE__);	/* null */
 	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal + null, 12, __LINE__);	/* should be null + all */
-	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 10, 1, __LINE__);	/* should be null + all */
+	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 8, 1, __LINE__);	/* should be null + all */
 	try_prio("PERFORMANCE", normal, 11, __LINE__);
-	try_prio("SECURE256", 23, 5, __LINE__);
+	try_prio("SECURE256", 19, 5, __LINE__);
 	try_prio("SECURE128", sec128, 10, __LINE__);
 	try_prio("SECURE128:+SECURE256", sec128, 10, __LINE__);	/* should be the same as SECURE128 */
 	try_prio("SECURE128:+SECURE256:+NORMAL", normal, 11, __LINE__);	/* should be the same as NORMAL */

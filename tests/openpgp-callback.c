@@ -162,7 +162,7 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:+CTYPE-OPENPGP", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:+CTYPE-OPENPGP:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1", NULL);
 
 	/* put the x509 credentials to the current session
 	 */
@@ -385,7 +385,7 @@ const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, "NORMAL:+CTYPE-OPENPGP:-CTYPE-X509:-RSA", NULL);
+	gnutls_priority_set_direct(session, "NORMAL:+CTYPE-OPENPGP:-CTYPE-X509:-RSA:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1", NULL);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, pgp_cred);
 
