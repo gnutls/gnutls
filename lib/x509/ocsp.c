@@ -877,7 +877,7 @@ gnutls_ocsp_req_get_nonce(gnutls_ocsp_req_t req,
 
 	ret =
 	    _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING, tmp.data,
-				       (size_t) tmp.size, nonce);
+				       (size_t) tmp.size, nonce, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		gnutls_free(tmp.data);
@@ -1614,7 +1614,7 @@ gnutls_ocsp_resp_get_nonce(gnutls_ocsp_resp_t resp,
 
 	ret =
 	    _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING, tmp.data,
-				       (size_t) tmp.size, nonce);
+				       (size_t) tmp.size, nonce, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		gnutls_free(tmp.data);

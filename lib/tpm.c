@@ -390,7 +390,7 @@ static int load_key(TSS_HCONTEXT tpm_ctx, TSS_HKEY srk,
 
 		ret =
 		    _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING,
-					       asn1.data, asn1.size, &td);
+					       asn1.data, asn1.size, &td, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
