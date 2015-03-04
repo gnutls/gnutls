@@ -42,6 +42,7 @@ and gmplib libraries.
 
 @menu
 * Downloading and installing::
+* Installing for a software distribution::
 * Document overview::
 @end menu
 
@@ -111,6 +112,38 @@ options are given.
 @end verbatim
 
 For the complete list, refer to the output from @code{configure --help}.
+
+@node Installing for a software distribution
+@section Installing for a software distribution
+@cindex installation
+
+When installing for a software distribution, it is often desirable to preconfigure
+GnuTLS with the system-wide paths and files. There two important configuration
+options, one sets the trust store in system, which are the CA certificates
+to be used by programs by default (if they don't override it), and the other sets
+to DNSSEC root key file used by unbound for DNSSEC verification.
+
+For the latter the following configuration option is available, and if not specified
+GnuTLS will try to auto-detect the location of that file.
+@verbatim
+--with-unbound-root-key-file
+
+@end verbatim
+
+To set the trust store the following options are available.
+@verbatim
+--with-default-trust-store-file
+--with-default-trust-store-dir
+--with-default-trust-store-pkcs11
+
+@end verbatim
+The first option is used to set a PEM file which contains a list of trusted certificates,
+while the second will read all certificates in the given path. The recommended option is
+the last, which allows to use a PKCS #11 trust policy module. That module not only
+provides the trusted certificates, but allows the categorization of them using purpose,
+e.g., CAs can be restricted for e-mail usage only, or administrative restrictions of CAs, for
+examples by restricting a CA to only issue certificates for a given DNS domain using NameConstraints.
+A publicly available PKCS #11 trust module is p11-kit's trust module@footnote{@url{http://p11-glue.freedesktop.org/doc/p11-kit/trust-module.html}}.
 
 @node Document overview
 @section Overview
