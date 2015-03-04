@@ -186,7 +186,7 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 
 		ret =
 		    _gnutls_x509_read_string(c2, "certValue", out,
-					     ASN1_ETYPE_OCTET_STRING);
+					     ASN1_ETYPE_OCTET_STRING, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -211,7 +211,7 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 
 		ret =
 		    _gnutls_x509_read_string(c2, "crlValue", out,
-					     ASN1_ETYPE_OCTET_STRING);
+					     ASN1_ETYPE_OCTET_STRING, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -236,7 +236,7 @@ _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 
 		ret =
 		    _gnutls_x509_read_string(c2, "secretValue", out,
-					     ASN1_ETYPE_OCTET_STRING);
+					     ASN1_ETYPE_OCTET_STRING, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;

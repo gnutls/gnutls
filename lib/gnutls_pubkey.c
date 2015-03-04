@@ -1453,7 +1453,7 @@ gnutls_pubkey_import_ecc_x962(gnutls_pubkey_t key,
 	}
 
 	ret = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING,
-					 ecpoint->data, ecpoint->size, &raw_point);
+					 ecpoint->data, ecpoint->size, &raw_point, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

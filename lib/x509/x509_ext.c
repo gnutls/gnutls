@@ -1853,7 +1853,7 @@ int gnutls_x509_ext_import_policies(const gnutls_datum_t * ext,
 
 				ret =
 				    _gnutls_x509_read_string(c2, tmpstr, &td,
-							     ASN1_ETYPE_IA5_STRING);
+							     ASN1_ETYPE_IA5_STRING, 0);
 				if (ret < 0) {
 					gnutls_assert();
 					goto full_cleanup;
@@ -3154,7 +3154,7 @@ int gnutls_x509_othername_to_virtual(const char *oid,
 		case GNUTLS_SAN_OTHERNAME_XMPP:
 			ret = _gnutls_x509_decode_string
 				    (ASN1_ETYPE_UTF8_STRING, othername->data,
-				     othername->size, virt);
+				     othername->size, virt, 0);
 			if (ret < 0) {
 				gnutls_assert();
 				return ret;

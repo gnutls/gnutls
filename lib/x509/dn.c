@@ -645,7 +645,7 @@ _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct,
 	if (octet_string)
 		result =
 		    _gnutls_x509_read_string(asn1_struct, tmpbuffer, value,
-					     ASN1_ETYPE_OCTET_STRING);
+					     ASN1_ETYPE_OCTET_STRING, 0);
 	else
 		result =
 		    _gnutls_x509_read_value(asn1_struct, tmpbuffer, value);

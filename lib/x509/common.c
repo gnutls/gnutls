@@ -485,7 +485,7 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
 	} else {
 		ret =
 		    _gnutls_x509_decode_string(oentry->etype, value,
-					       value_size, &tmp);
+					       value_size, &tmp, 0);
 		if (ret < 0) {
 			/* we failed decoding -> handle it as unknown OID */
 			goto unknown_oid;
@@ -968,15 +968,21 @@ _gnutls_x509_export_int_named2(ASN1_TYPE asn1_data, const char *name,
 int
 _gnutls_x509_decode_string(unsigned int etype,
 			   const uint8_t * der, size_t der_size,
-			   gnutls_datum_t * output)
+			   gnutls_datum_t * output, unsigned allow_ber)
 {
 	int ret;
-	const uint8_t *str;
+	uint8_t *str;
 	unsigned int str_size, len;
 	gnutls_datum_t td;
 
-	ret =
-	    asn1_decode_simple_der(etype, der, der_size, &str, &str_size);
+#ifdef HAVE_ASN1_DECODE_SIMPLE_BER
+	if (allow_ber)
+		ret =
+		    asn1_decode_simple_ber(etype, der, der_size, &str, &str_size, NULL);
+	else
+#endif
+		ret =
+		    asn1_decode_simple_der(etype, der, der_size, (const uint8_t**)&str, &str_size);
 	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
 		ret = _gnutls_asn2err(ret);
@@ -990,6 +996,11 @@ _gnutls_x509_decode_string(unsigned int etype,
 
 	memcpy(td.data, str, str_size);
 	td.data[str_size] = 0;
+
+#ifdef HAVE_ASN1_DECODE_SIMPLE_BER
+	if (allow_ber)
+		free(str);
+#endif
 
 	ret = make_printable_string(etype, &td, output);
 	if (ret == GNUTLS_E_INVALID_REQUEST) {	/* unsupported etype */
@@ -1085,7 +1096,7 @@ _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
  */
 int
 _gnutls_x509_read_string(ASN1_TYPE c, const char *root,
-			 gnutls_datum_t * ret, unsigned int etype)
+			 gnutls_datum_t * ret, unsigned int etype, unsigned int allow_ber)
 {
 	int len = 0, result;
 	size_t slen;
@@ -1123,7 +1134,7 @@ _gnutls_x509_read_string(ASN1_TYPE c, const char *root,
 	 */
 	slen = (size_t) len;
 
-	result = _gnutls_x509_decode_string(etype, tmp, slen, ret);
+	result = _gnutls_x509_decode_string(etype, tmp, slen, ret, allow_ber);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;

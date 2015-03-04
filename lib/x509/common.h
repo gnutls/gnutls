@@ -79,7 +79,8 @@ int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 
 int _gnutls_x509_decode_string(unsigned int etype,
 			       const uint8_t * der, size_t der_size,
-			       gnutls_datum_t * output);
+			       gnutls_datum_t * output,
+			       unsigned allow_ber);
 
 int _gnutls_x509_encode_string(unsigned int etype,
 			       const void *input_data, size_t input_size,
@@ -118,7 +119,8 @@ int _gnutls_x509_export_int_named2(ASN1_TYPE asn1_data, const char *name,
 int _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
 			    gnutls_datum_t * ret);
 int _gnutls_x509_read_string(ASN1_TYPE c, const char *root,
-			     gnutls_datum_t * ret, unsigned int etype);
+			     gnutls_datum_t * ret, unsigned int etype,
+			     unsigned allow_ber);
 int _gnutls_x509_write_value(ASN1_TYPE c, const char *root,
 			     const gnutls_datum_t * data);
 

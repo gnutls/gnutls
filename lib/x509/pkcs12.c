@@ -70,7 +70,7 @@ _decode_pkcs12_auth_safe(ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
 
 	result =
 	    _gnutls_x509_read_string(pkcs12, "authSafe.content",
-				     &auth_safe, ASN1_ETYPE_OCTET_STRING);
+				     &auth_safe, ASN1_ETYPE_OCTET_STRING, 1);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -488,7 +488,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 					    _gnutls_x509_decode_string
 					    (ASN1_ETYPE_OCTET_STRING,
 					     attr_val.data, attr_val.size,
-					     &t);
+					     &t, 1);
 					_gnutls_free_datum(&attr_val);
 					if (result < 0) {
 						gnutls_assert();
@@ -509,7 +509,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 					    _gnutls_x509_decode_string
 					    (ASN1_ETYPE_BMP_STRING,
 					     attr_val.data, attr_val.size,
-					     &t);
+					     &t, 1);
 					_gnutls_free_datum(&attr_val);
 					if (result < 0) {
 						gnutls_assert();
@@ -562,7 +562,7 @@ _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
 
 	result =
 	    _gnutls_x509_read_string(sc, sc_name, &content,
-				     ASN1_ETYPE_OCTET_STRING);
+				     ASN1_ETYPE_OCTET_STRING, 1);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
