@@ -28,14 +28,12 @@ SUBDIRS += libdane
 endif
 
 SUBDIRS += po
-if ENABLE_DOC
-SUBDIRS += doc
-endif
 if ENABLE_TOOLS
 SUBDIRS += src
 else
 SUBDIRS += src/gl
 endif
+
 if ENABLE_TESTS
 SUBDIRS += tests
 endif
@@ -43,6 +41,11 @@ endif
 if HAVE_GUILE
 SUBDIRS += guile
 endif
+
+if ENABLE_DOC
+SUBDIRS += doc
+endif
+
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4 -I src/gl/m4
 
