@@ -128,6 +128,9 @@ however, several deprecated functions were removed, and are listed below.
 @multitable @columnfractions .30 .60
 @headitem Old function @tab Replacement
 
+@item Priority string "NORMAL" has been modified
+@tab The following string emulates the 3.3.x behavior "NORMAL:+VERS-SSL3.0:+ARCFOUR-128:+DHE-DSS:+SIGN-DSA-SHA512:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1"
+
 @item @funcintref{gnutls_certificate_client_set_retrieve_function},
 @funcintref{gnutls_certificate_server_set_retrieve_function}
 @tab @funcref{gnutls_certificate_set_retrieve_function}
