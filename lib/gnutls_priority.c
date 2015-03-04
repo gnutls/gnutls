@@ -957,7 +957,8 @@ finish:
  * @err_pos: In case of an error this will have the position in the string the error occurred
  *
  * Sets priorities for the ciphers, key exchange methods, macs and
- * compression methods.
+ * compression methods. The @priority_cache should be deinitialized
+ * using gnutls_priority_deinit().
  *
  * The #priorities option allows you to specify a colon
  * separated list of the cipher priorities to enable.
