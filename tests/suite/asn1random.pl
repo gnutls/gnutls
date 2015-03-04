@@ -54,7 +54,14 @@ sub emit_asn1_hdr($$)
 	$l = 0x84;
     }
 
-    $output .= pack("CC", $tag == -1 ? int(rand(255)) & ~0x20 : $tag, $l);
+    # autogenerate tag, if it is not passed
+    if ($tag == -1) { $tag = int(rand(255)) & ~0x20; }
+
+    # don't emit tag numbers >= 31 (X.690-0207 -- 8.1.2.4)
+    if (($tag & 0x1f) == 0x1f) { $tag &= ~1; }
+
+    $output .= pack("CC", $tag, $l);
+
     if ($len < 0x80) {
     } elsif ($len <= 0xff) {
 	$output .= pack("C", $len);
