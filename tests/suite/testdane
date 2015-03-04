@@ -50,7 +50,8 @@ done
 
 echo ""
 echo "*** Testing good SMTP hosts ***"
-HOSTS="dougbarton.us nlnetlabs.nl"
+#HOSTS="dougbarton.us nlnetlabs.nl"
+HOSTS="nlnetlabs.nl"
 for i in $HOSTS;do
 echo -n "$i: "
 
@@ -62,6 +63,7 @@ fi
 echo "ok"
 done
 
+echo ""
 echo "*** Testing bad HTTPS hosts ***"
 # Not ok
 # used to work: dane-broken.rd.nic.fr 
