@@ -33,6 +33,7 @@ We require several tools to check out and build the software, including:
 - git2cl <http://savannah.nongnu.org/projects/git2cl/> (for make dist, ChangeLog)
 - softhsm <http://www.opendnssec.org/softhsm/> (for testing smart card support)
 - dieharder <http://www.phy.duke.edu/~rgb/General/dieharder.php> (for testing PRNG)
+- bison <http://www.gnu.org/software/bison> (for datetime parser in certtool)
 - libunbound <https://unbound.net/> (for DANE support)
 - abi-compliance-checker <http://ispras.linuxbase.org/index.php/ABI_compliance_checker> (for make dist)
 
@@ -46,7 +47,7 @@ apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
 apt-get install help2man gtk-doc-tools valgrind
 apt-get install guile-2.0-dev libtasn1-6-dev
 apt-get install datefudge libidn11-dev gawk gperf
-apt-get install softhsm libunbound-dev
+apt-get install softhsm libunbound-dev bison
 
 You will sometimes need to install more recent versions of Automake,
 Nettle, P11-kit and Autogen, which you will need to build from
