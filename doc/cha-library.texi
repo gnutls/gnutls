@@ -81,7 +81,7 @@ libtasn1 in other programs), you can get it from
 @url{http://www.gnu.org/software/libtasn1/}.
 
 The compression library, @code{libz}, the PKCS #11 helper library @code{p11-kit},
-the TPM library @code{trousers}, as well as the IDN library @{libidn}@footnote{Needed
+the TPM library @code{trousers}, as well as the IDN library @code{libidn}@footnote{Needed
 to use RFC6125 name comparison in internationalized domains.} are 
 optional dependencies. Check the README file in the distribution on how
 to obtain these libraries.
