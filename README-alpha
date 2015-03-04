@@ -43,7 +43,7 @@ gNewSense/Debian/Ubuntu:
 apt-get install git-core autoconf libtool gettext autopoint
 apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
 apt-get install help2man gtk-doc-tools valgrind
-apt-get install guile-1.8-dev libtasn1-3-dev
+apt-get install guile-2.0-dev libtasn1-6-dev
 apt-get install datefudge libidn11-dev gawk gperf
 apt-get install softhsm
 
