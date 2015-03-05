@@ -47,7 +47,7 @@ apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
 apt-get install help2man gtk-doc-tools valgrind
 apt-get install guile-2.0-dev libtasn1-6-dev
 apt-get install datefudge libidn11-dev gawk gperf
-apt-get install softhsm libunbound-dev bison
+apt-get install softhsm libunbound-dev dns-root-data bison
 
 
 You will sometimes need to install more recent versions of Automake,
