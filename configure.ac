@@ -446,7 +446,11 @@ else
     if test -f /var/lib/unbound/root.key;then
     	unbound_root_key_file="/var/lib/unbound/root.key"
     else
-        unbound_root_key_file="/etc/unbound/root.key"
+        if test -f /usr/share/dns/root.key;then
+	    unbound_root_key_file="/usr/share/dns/root.key"
+        else
+            unbound_root_key_file="/etc/unbound/root.key"
+        fi
     fi
 fi
 )
