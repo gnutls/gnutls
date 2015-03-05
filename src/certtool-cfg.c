@@ -52,6 +52,12 @@
 #include <getpass.h>
 #include "certtool-common.h"
 
+/* to print uint64_t */
+#if SIZEOF_LONG < 8
+# define __STDC_FORMAT_MACROS
+# include <inttypes.h>
+#endif
+
 extern int batch;
 extern int ask_pass;
 
@@ -1137,10 +1143,11 @@ void get_rand_int_value(unsigned char* serial, size_t * size, int64_t cfg_val, c
 
 #if SIZEOF_LONG < 8
 		default_serial_int = ts.tv_sec;
+		snprintf(tmsg, sizeof(tmsg), "%s (default: %" PRIu64"): ", msg, default_serial_int);
 #else
 		default_serial_int = (ts.tv_sec << 32) | ts.tv_nsec;
-#endif
 		snprintf(tmsg, sizeof(tmsg), "%s (default: %lu): ", msg, default_serial_int);
+#endif
 		default_serial_int = read_int_with_default(tmsg, (long)default_serial_int);
 
 		default_serial[0] = default_serial_int >> 32;
