@@ -83,7 +83,7 @@ SERV="../../src/gnutls-serv$EXEEXT -q"
 
 rm -f $LOGFILE
 
-for ADD in "" ":%COMPAT" ":%NO_ETM" ":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
+for ADD in "" ":%COMPAT" ":%NO_ETM" #":%NO_TICKETS" ":%DISABLE_SAFE_RENEGOTIATION"
 do
 
 if ! test -z "$ADD";then
