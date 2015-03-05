@@ -37,35 +37,9 @@ fi
 rc=1
 counter=1
 
-while [ "$rc" != "0" -a $counter -le 10 ]
+while [ "$rc" != "0" -a $counter -le 3 ]
 do
-
-datefudge "2007-04-22" \
-    $CERTTOOL --generate-self-signed \
-    --load-privkey $srcdir/template-test.key \
-    --template $srcdir/template-basic.tmpl \
-    --outfile tmp-tt.pem 2>/dev/null
-
-diff $srcdir/template-basic.pem tmp-tt.pem >/dev/null 2>&1
-rc=$?
-counter=`expr $counter + 1` 
-test "$rc" != 0 && sleep 1
-done
-
-# We're done.
-if test "$rc" != "0"; then
-  echo "Baseline test failed, is system slow?"
-  exit 77
-fi
-
-rm -f tmp-tt.pem
-
-rc=1
-counter=1
-
-while [ "$rc" != "0" -a $counter -le 10 ]
-do
-
+      
 datefudge "2007-04-22" \
     $CERTTOOL --generate-self-signed \
     --load-privkey $srcdir/template-test.key \
@@ -75,7 +49,6 @@ datefudge "2007-04-22" \
 diff $srcdir/template-test.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
 counter=`expr $counter + 1` 
-test "$rc" != 0 && sleep 1
 done
 
 # We're done.
@@ -89,7 +62,7 @@ rm -f tmp-tt.pem
 rc=1
 counter=1
 
-while [ "$rc" != "0" -a $counter -le 10 ]
+while [ "$rc" != "0" -a $counter -le 3 ]
 do
 datefudge "2007-04-22" \
     $CERTTOOL --generate-self-signed \
@@ -100,7 +73,6 @@ datefudge "2007-04-22" \
 diff $srcdir/template-utf8.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
 counter=`expr $counter + 1` 
-test "$rc" != 0 && sleep 1
 done
 
 # We're done.
@@ -114,7 +86,7 @@ rm -f tmp-tt.pem
 rc=1
 counter=1
 
-while [ "$rc" != "0" -a $counter -le 10 ]
+while [ "$rc" != "0" -a $counter -le 3 ]
 do
 datefudge "2007-04-22" \
     $CERTTOOL --generate-self-signed \
@@ -125,7 +97,6 @@ datefudge "2007-04-22" \
 diff $srcdir/template-dn.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
 counter=`expr $counter + 1` 
-test "$rc" != 0 && sleep 1
 done
 
 # We're done.
@@ -156,7 +127,7 @@ if echo __SIZEOF_POINTER__ | cpp -E - - | grep '^8$' >/dev/null; then
 rc=1
 counter=1
 
-while [ "$rc" != "0" -a $counter -le 10 ]
+while [ "$rc" != "0" -a $counter -le 3 ]
 do
 datefudge "2007-04-22" \
     $CERTTOOL --generate-self-signed \
@@ -167,7 +138,6 @@ datefudge "2007-04-22" \
 diff $srcdir/template-overflow.pem tmp-tt.pem >/dev/null 2>&1 
 rc=$?
 counter=`expr $counter + 1` 
-test "$rc" != 0 && sleep 1
 done
 
 # We're done.
@@ -182,7 +152,7 @@ fi
 rc=1
 counter=1
 
-while [ "$rc" != "0" -a $counter -le 10 ]
+while [ "$rc" != "0" -a $counter -le 3 ]
 do
 datefudge "2007-04-22" \
     $CERTTOOL --generate-self-signed \
@@ -193,7 +163,6 @@ datefudge "2007-04-22" \
 diff $srcdir/template-overflow2.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
 counter=`expr $counter + 1` 
-test "$rc" != 0 && sleep 1
 done
 
 # We're done.
@@ -207,7 +176,7 @@ rm -f tmp-tt.pem
 rc=1
 counter=1
 
-while [ "$rc" != "0" -a $counter -le 10 ]
+while [ "$rc" != "0" -a $counter -le 3 ]
 do
 datefudge "2007-04-22" \
     $CERTTOOL --generate-self-signed \
@@ -218,7 +187,6 @@ datefudge "2007-04-22" \
 diff $srcdir/template-date.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
 counter=`expr $counter + 1` 
-test "$rc" != 0 && sleep 1
 done
 
 # We're done.
@@ -234,7 +202,7 @@ rm -f tmp-tt.pem
 rc=1
 counter=1
 
-while [ "$rc" != "0" -a $counter -le 10 ]
+while [ "$rc" != "0" -a $counter -le 3 ]
 do
 datefudge "2007-04-22" \
     $CERTTOOL --generate-self-signed \
@@ -245,7 +213,6 @@ datefudge "2007-04-22" \
 diff $srcdir/template-nc.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
 counter=`expr $counter + 1` 
-test "$rc" != 0 && sleep 1
 done
 
 # We're done.
