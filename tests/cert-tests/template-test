@@ -150,6 +150,9 @@ fi
 
 rm -f tmp-tt.pem
 
+# The following test works in 64-bit systems
+if echo __SIZEOF_POINTER__ | cpp -E - - | grep '^8$' >/dev/null; then
+
 rc=1
 counter=1
 
@@ -174,6 +177,7 @@ if test "$rc" != "0"; then
 fi
 
 rm -f tmp-tt.pem
+fi
 
 rc=1
 counter=1
