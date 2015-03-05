@@ -1198,7 +1198,7 @@ time_t now = time(NULL);
 
        	if (secs != (time_t)-1) {
       	        if (INT_MULTIPLY_OVERFLOW(secs, 24*60*60)) {
-       	                secs = -1;
+                        goto overflow;
 	        } else {
     	                secs *= 24*60*60;
       	        }
@@ -1206,13 +1206,16 @@ time_t now = time(NULL);
                                 
         if (secs != (time_t)-1) {
                 if (INT_ADD_OVERFLOW(secs, now)) {
-                        secs = -1;
+                        goto overflow;
                 } else {
                         secs += now;
                 }
         }
         
         return secs;
+ overflow:
+ 	fprintf(stderr, "Overflow while parsing days\n");
+ 	exit(1);
 }
 
 static
