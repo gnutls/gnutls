@@ -49,11 +49,19 @@ apt-get install guile-2.0-dev libtasn1-6-dev
 apt-get install datefudge libidn11-dev gawk gperf
 apt-get install softhsm libunbound-dev bison
 
+
 You will sometimes need to install more recent versions of Automake,
 Nettle, P11-kit and Autogen, which you will need to build from
 sources.  If your system has the recent versions, you could do:
 
 apt-get install automake autogen nettle-dev libp11-kit-dev
+
+
+For basic interoperability testing you may want to install openssl
+and polarssl. The interoperability tests are run during make check.
+
+apt-get install libpolarssl-runtime openssl
+
 
 To download the version controlled sources:
 
