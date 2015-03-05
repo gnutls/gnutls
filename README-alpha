@@ -35,6 +35,7 @@ We require several tools to check out and build the software, including:
 - dieharder <http://www.phy.duke.edu/~rgb/General/dieharder.php> (for testing PRNG)
 - bison <http://www.gnu.org/software/bison> (for datetime parser in certtool)
 - libunbound <https://unbound.net/> (for DANE support)
+- nodejs <http://nodejs.org/> (needed for certain test cases)
 - abi-compliance-checker <http://ispras.linuxbase.org/index.php/ABI_compliance_checker> (for make dist)
 
 The required software is typically distributed with your operating
@@ -46,9 +47,8 @@ apt-get install git-core autoconf libtool gettext autopoint
 apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
 apt-get install help2man gtk-doc-tools valgrind
 apt-get install guile-2.0-dev libtasn1-6-dev
-apt-get install datefudge libidn11-dev gawk gperf
-apt-get install softhsm libunbound-dev dns-root-data bison
-
+apt-get install libidn11-dev gawk gperf
+apt-get install libunbound-dev dns-root-data bison
 
 You will sometimes need to install more recent versions of Automake,
 Nettle, P11-kit and Autogen, which you will need to build from
@@ -58,9 +58,10 @@ apt-get install automake autogen nettle-dev libp11-kit-dev
 
 
 For basic interoperability testing you may want to install openssl
-and polarssl. The interoperability tests are run during make check.
+and polarssl. The packages below are used during make check.
 
 apt-get install libpolarssl-runtime openssl
+apt-get install nodejs softhsm datefudge
 
 
 To download the version controlled sources:
