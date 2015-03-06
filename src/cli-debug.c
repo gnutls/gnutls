@@ -82,6 +82,14 @@ typedef struct {
 
 static const TLS_TEST tls_tests[] = {
 	{"for SSL 3.0 (RFC6101) support", test_ssl3, "yes", "no", "dunno"},
+	/* The following tests will disable TLS 1.x if the server is
+	 * buggy */
+	{"whether we need to disable TLS 1.2", test_tls_disable2, "no",
+	 "yes", "dunno"},
+	{"whether we need to disable TLS 1.1", test_tls_disable1, "no",
+	 "yes", "dunno"},
+	{"whether we need to disable TLS 1.0", test_tls_disable0, "no",
+	 "yes", "dunno"},
 	{"whether \%NO_EXTENSIONS is required", test_no_extensions, "no", "yes",
 	 "dunno"},
 	{"whether \%COMPAT is required", test_record_padding, "no", "yes",
@@ -95,14 +103,6 @@ static const TLS_TEST tls_tests[] = {
 	{"for TLS 1.2 (RFC5246) support", test_tls1_2, "yes", "no", "dunno"},
 	{"fallback from TLS 1.6 to", test_tls1_6_fallback, NULL,
 	 "failed (server requires fallback dance)", "dunno"},
-	/* The following tests will disable TLS 1.x if the server is
-	 * buggy */
-	{"whether we need to disable TLS 1.2", test_tls_disable2, "no",
-	 "yes", "dunno"},
-	{"whether we need to disable TLS 1.1", test_tls_disable1, "no",
-	 "yes", "dunno"},
-	{"whether we need to disable TLS 1.0", test_tls_disable0, "no",
-	 "yes", "dunno"},
 	{"for HTTPS server name", test_server, NULL, "failed", "not checked", 1},
 	{"for certificate information", test_certificate, NULL, "", ""},
 	{"for certificate chain order", test_chain_order, "sorted", "unsorted", "unknown"},
