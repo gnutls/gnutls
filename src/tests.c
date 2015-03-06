@@ -1193,6 +1193,9 @@ test_code_t test_chain_order(gnutls_session_t session)
 		return TEST_IGNORE;
 	}
 
+	if (cert_list_size == 1)
+		return TEST_SUCCEED;
+
 	p = 0;
 	p_size = 0;
 	pos = NULL;
