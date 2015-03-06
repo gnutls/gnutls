@@ -168,5 +168,5 @@ specific product using the library, and typically in the case of software they a
 @end itemize
 
 Obtaining such a certification is an expensive and elaborate job that has no immediate value for a continuously developed free software library (as the certification is tied to the
-particular version tested), and in the case of algorithm verification of FIPS 140-2 it doesn't make much sense as the library is freely available and anyone can verify the correctness
-of algorithm implementation. As such we are not actively pursuing this kind of certification. If you are, nevertheless, interested, see @ref{Commercial Support}.
+particular version tested). While, as a free software project, we are not actively pursuing this kind of certification, GnuTLS has been FIPS-140-2 certified in several systems by
+third parties. If you are, interested, see @ref{Commercial Support}.
