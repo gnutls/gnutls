@@ -183,6 +183,17 @@ void doit(void)
 
 	/* test for gnutls_certificate_get_issuer() */
 
+	/* check whether gnutls_x509_crt_list_import will fail if given a single
+	 * certificate */
+	list_size = LIST_SIZE;
+	ret =
+	    gnutls_x509_crt_list_import(list, &list_size, &ca,
+					GNUTLS_X509_FMT_PEM,
+					GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
+	if (ret < 0)
+		fail("gnutls_x509_crt_list_import (failed with a single cert)");
+	gnutls_x509_crt_deinit(list[0]);
+
 	list_size = LIST_SIZE;
 	ret =
 	    gnutls_x509_crt_list_import(list, &list_size, &cert,
