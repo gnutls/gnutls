@@ -1187,6 +1187,7 @@ test_code_t test_chain_order(gnutls_session_t session)
 
 		memcpy(pos, t.data, t.size);
 		p_size += t.size;
+		pos += t.size;
 
 		gnutls_free(t.data);
 	}
