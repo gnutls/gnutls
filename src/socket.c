@@ -51,6 +51,7 @@
 #include <signal.h>
 #endif
 #include <socket.h>
+#include <c-ctype.h>
 #include "sockets.h"
 
 #define MAX_BUF 4096
@@ -206,8 +207,13 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		send_line(socket->fd, "a STARTTLS\r\n");
 		wait_for_text(socket->fd, "a OK", 4);
 	} else {
-		if (socket->verbose)
-			fprintf(stderr, "unknown protocol %s\n", app_proto);
+		if (socket->verbose && !c_isdigit(app_proto[0])) {
+			static int warned = 0;
+			if (warned == 0) {
+				fprintf(stderr, "unknown protocol %s\n", app_proto);
+				warned = 1;
+			}
+		}
 	}
 
 	return;
