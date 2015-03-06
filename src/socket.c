@@ -363,6 +363,9 @@ const char *port_to_service(const char *sport, const char *proto)
 	unsigned int port;
 	struct servent *sr;
 
+	if (!c_isdigit(sport[0]))
+		return sport;
+
 	port = atoi(sport);
 	if (port == 0)
 		return sport;
@@ -372,7 +375,7 @@ const char *port_to_service(const char *sport, const char *proto)
 	sr = getservbyport(port, proto);
 	if (sr == NULL) {
 		fprintf(stderr,
-			"Warning: getservbyport() failed. Using port number as service.\n");
+			"Warning: getservbyport(%s) failed. Using port number as service.\n", sport);
 		return sport;
 	}
 
