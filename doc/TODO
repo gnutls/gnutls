@@ -8,12 +8,9 @@ Current list:
   callback.
 * Check https://github.com/yymax/x509test and evaluate whether it makes
   sense to include it in our self tests.
-* Handle openconnect's TSS files in gnutls_certificate_set_x509_key_file().
 * gnutls-cli: Allow separation of the connecting IP and the hostname to
   advertize or check. That is, allow specifying an IP to connect to and
   a hostname to check.
-* Allow setting a fixed key on the anonymous key exchange methods (to allow
-  it being used with the tofu API).
 * Allow the manipulation of certificates, i.e., allow to remove fields.
 * Handle the following X.509 extensions:
    2.5.29.36: Policy Constraints
@@ -22,6 +19,9 @@ Current list:
    2.5.29.46: Freshest CRL
 * Add support for RSA-PSS. This signature algorithm is seen in some
   passport CAs. Should be added in nettle and then in gnutls.
+- Handle openconnect's TSS files in gnutls_certificate_set_x509_key_file().
+- Allow setting a fixed key on the anonymous key exchange methods (to allow
+  it being used with the tofu API).
 - Add certificate image support (see RFC3709, RFC6170)
 - RFC 3280 compliant certificate path validation.
   - Reject extensions in v1 certificates.
@@ -30,11 +30,8 @@ Current list:
   That will allow the usage of tokens that do not allow plain RSA.
 - Support PKCS#8 DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
   (openssl seems to use DES-MD5 to encrypt keys by default)
-- Add support for generating empty CRLs
 - Document the format for the supported DN attributes.
 - Audit the code
-- Support replacing individual algorithms via a PKCS #11 module -
-  maybe use p11-kit for that.
 - Add function to extract the signers of an openpgp key. Should
   be similar to gnutls_x509_crt_get_dn_oid().
 - Add function to verify an openpgp key against a plain key.
