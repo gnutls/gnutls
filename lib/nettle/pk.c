@@ -1707,61 +1707,6 @@ wrap_nettle_pk_fixup(gnutls_pk_algorithm_t algo,
 	return 0;
 }
 
-static int
-extract_digest_info(const struct rsa_public_key *key,
-		    gnutls_datum_t * di, uint8_t ** rdi,
-		    const mpz_t signature)
-{
-	unsigned i;
-	int ret;
-	mpz_t m;
-	uint8_t *em;
-
-	if (key->size == 0)
-		return 0;
-
-	em = gnutls_malloc(key->size);
-	if (em == NULL)
-		return 0;
-
-	mpz_init(m);
-
-	mpz_powm(m, signature, key->e, key->n);
-
-	nettle_mpz_get_str_256(key->size, em, m);
-	mpz_clear(m);
-
-	if (em[0] != 0 || em[1] != 1) {
-		ret = 0;
-		goto cleanup;
-	}
-
-	for (i = 2; i < key->size; i++) {
-		if (em[i] == 0 && i > 2)
-			break;
-
-		if (em[i] != 0xff) {
-			ret = 0;
-			goto cleanup;
-		}
-	}
-
-	i++;
-
-	*rdi = em;
-
-	di->data = &em[i];
-	di->size = key->size - i;
-
-	return 1;
-
-cleanup:
-        memset(em, 0, sizeof(key->size));
-	gnutls_free(em);
-
-	return ret;
-}
-
 int crypto_pk_prio = INT_MAX;
 
 gnutls_crypto_pk_st _gnutls_pk_ops = {
