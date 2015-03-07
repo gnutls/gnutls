@@ -37,4 +37,10 @@ if test "$TSTAMP" != "1158969600"; then
     exit 77
 fi
 
+cat /proc/cpuinfo|grep "model name"|grep "VIA Esther" >/dev/null 2>&1
+if test $? = 0;then
+    echo "PolarSSL is broken on VIA processors"
+    exit 77
+fi
+
 datefudge "2012-09-2" ./testcompat-main-polarssl
