@@ -986,7 +986,9 @@ The message authenticity security level is of 128 bits or more,
 and the certificate verification profile is set to GNUTLS_PROFILE_HIGH (128-bits).
 
 @item SECURE256 @tab
-Currently alias for SECURE192.
+Currently alias for SECURE192. This option, will enable ciphers which use a
+256-bit key but, due to limitations of the TLS protocol, the overall security
+level will be 192-bits (the security level depends on more factors than cipher key size).
 
 @item SUITEB128 @tab
 Means all the NSA Suite B cryptography (RFC5430) ciphersuites
