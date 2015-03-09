@@ -701,9 +701,12 @@ _asn1_expand_object_id (asn1_node node)
 			      p5 =
 				_asn1_add_single_node (ASN1_ETYPE_CONSTANT);
 			      _asn1_set_name (p5, p4->name);
-			      tlen = _asn1_strlen (p4->value);
-			      if (tlen > 0)
-				_asn1_set_value (p5, p4->value, tlen + 1);
+			      if (p4->value)
+			        {
+			          tlen = _asn1_strlen (p4->value);
+			          if (tlen > 0)
+			            _asn1_set_value (p5, p4->value, tlen + 1);
+			        }
 			      if (p2 == p)
 				{
 				  _asn1_set_right (p5, p->down);

@@ -2085,7 +2085,7 @@ asn1_expand_octet_string (asn1_node definitions, asn1_node * element,
  * asn1_decode_simple_der:
  * @etype: The type of the string to be encoded (ASN1_ETYPE_)
  * @der: the encoded string
- * @der_len: the bytes of the encoded string
+ * @_der_len: the bytes of the encoded string
  * @str: a pointer to the data
  * @str_len: the length of the data
  *
@@ -2096,11 +2096,12 @@ asn1_expand_octet_string (asn1_node definitions, asn1_node * element,
  **/
 int
 asn1_decode_simple_der (unsigned int etype, const unsigned char *der,
-			unsigned int der_len, const unsigned char **str,
+			unsigned int _der_len, const unsigned char **str,
 			unsigned int *str_len)
 {
   int tag_len, len_len;
   const unsigned char *p;
+  int der_len = _der_len;
   unsigned char class;
   unsigned long tag;
   long ret;
@@ -2125,6 +2126,8 @@ asn1_decode_simple_der (unsigned int etype, const unsigned char *der,
 
   p += tag_len;
   der_len -= tag_len;
+  if (der_len <= 0)
+    return ASN1_DER_ERROR;
 
   ret = asn1_get_length_der (p, der_len, &len_len);
   if (ret < 0)
@@ -2132,9 +2135,187 @@ asn1_decode_simple_der (unsigned int etype, const unsigned char *der,
 
   p += len_len;
   der_len -= len_len;
+  if (der_len <= 0)
+    return ASN1_DER_ERROR;
 
   *str_len = ret;
   *str = p;
+
+  return ASN1_SUCCESS;
+}
+
+static int append(uint8_t **dst, unsigned *dst_size, const unsigned char *src, unsigned src_size)
+{
+  *dst = realloc(*dst, *dst_size+src_size);
+  if (*dst == NULL)
+    return ASN1_MEM_ERROR;
+  memcpy(*dst + *dst_size, src, src_size);
+  *dst_size += src_size;
+  return ASN1_SUCCESS;
+}
+
+/**
+ * asn1_decode_simple_ber:
+ * @etype: The type of the string to be encoded (ASN1_ETYPE_)
+ * @der: the encoded string
+ * @_der_len: the bytes of the encoded string
+ * @str: a pointer to the data
+ * @str_len: the length of the data
+ * @ber_len: the total length occupied by BER (may be %NULL)
+ *
+ * Decodes a BER encoded type. The output is an allocated value 
+ * of the data. This decodes BER STRINGS only. Other types are
+ * decoded as DER.
+ *
+ * Returns: %ASN1_SUCCESS if successful or an error value.
+ **/
+int
+asn1_decode_simple_ber (unsigned int etype, const unsigned char *der,
+			unsigned int _der_len, unsigned char **str,
+			unsigned int *str_len, unsigned int *ber_len)
+{
+  int tag_len, len_len;
+  const unsigned char *p;
+  int der_len = _der_len;
+  uint8_t *total = NULL;
+  unsigned total_size = 0;
+  unsigned char class;
+  unsigned long tag;
+  unsigned char *out = NULL;
+  unsigned out_len;
+  long ret;
+
+  if (ber_len) *ber_len = 0;
+
+  if (der == NULL || der_len == 0)
+    {
+      warn();
+      return ASN1_VALUE_NOT_VALID;
+    }
+
+  if (ETYPE_OK (etype) == 0)
+    {
+      warn();
+      return ASN1_VALUE_NOT_VALID;
+    }
+
+  /* doesn't handle constructed classes */
+  if (ETYPE_CLASS (etype) != ASN1_CLASS_UNIVERSAL)
+    {
+      warn();
+      return ASN1_VALUE_NOT_VALID;
+    }
+
+  p = der;
+  ret = asn1_get_tag_der (p, der_len, &class, &tag_len, &tag);
+  if (ret != ASN1_SUCCESS)
+    {
+      warn();
+      return ret;
+    }
+
+  if (ber_len) *ber_len += tag_len;
+
+  if (tag != ETYPE_TAG (etype))
+    {
+      warn();
+      return ASN1_DER_ERROR;
+    }
+
+  p += tag_len;
+  der_len -= tag_len;
+  if (der_len <= 0)
+    return ASN1_DER_ERROR;
+
+  if (class == ASN1_CLASS_STRUCTURED && (etype == ASN1_ETYPE_GENERALSTRING ||
+      etype == ASN1_ETYPE_NUMERIC_STRING || etype == ASN1_ETYPE_IA5_STRING ||
+      etype == ASN1_ETYPE_TELETEX_STRING || etype == ASN1_ETYPE_PRINTABLE_STRING ||
+      etype == ASN1_ETYPE_UNIVERSAL_STRING || etype == ASN1_ETYPE_BMP_STRING ||
+      etype == ASN1_ETYPE_UTF8_STRING || etype == ASN1_ETYPE_VISIBLE_STRING ||
+      etype == ASN1_ETYPE_OCTET_STRING))
+    {
+
+      len_len = 1;
+      if (p[0] != 0x80)
+        {
+          warn();
+          return ASN1_DER_ERROR;
+        }
+
+      p += len_len;
+      der_len -= len_len;
+      if (der_len <= 0)
+        return ASN1_DER_ERROR;
+
+      if (ber_len) *ber_len += len_len;
+
+      /* decode the available octet strings */
+      do
+        {
+          unsigned tmp_len;
+
+          ret = asn1_decode_simple_ber(etype, p, der_len, &out, &out_len, &tmp_len);
+          if (ret != ASN1_SUCCESS)
+            {
+              free(total);
+              return ret;
+            }
+          p += tmp_len;
+          der_len -= tmp_len;
+          if (ber_len) *ber_len += tmp_len;
+
+          if (der_len < 2) /* we need the EOC */
+            {
+              free(total);
+              return ASN1_DER_ERROR;
+            }
+
+	  if (out_len > 0)
+	    {
+              ret = append(&total, &total_size, out, out_len);
+              free(out);
+              if (ret != ASN1_SUCCESS)
+                {
+                  free(total);
+                  return ret;
+                }
+	    }
+
+	  if (p[0] == 0 && p[1] == 0) /* EOC */
+	    {
+              if (ber_len) *ber_len += 2;
+  	      break;
+  	    }
+        }
+      while(1);
+    }
+  else if (class == ETYPE_CLASS(etype))
+    {
+      if (ber_len)
+        {
+          ret = asn1_get_length_der (p, der_len, &len_len);
+          if (ret < 0)
+            {
+              warn();
+              return ASN1_DER_ERROR;
+            }
+          *ber_len += ret + len_len;
+        }
+
+      /* non-string values are decoded as DER */
+      ret = asn1_decode_simple_der(etype, der, _der_len, (const unsigned char**)&out, &out_len);
+      if (ret != ASN1_SUCCESS)
+        return ret;
+
+      ret = append(&total, &total_size, out, out_len);
+      if (ret != ASN1_SUCCESS)
+        return ret;
+    }
+  else
+    return ASN1_DER_ERROR;
+
+  *str = total;
+  *str_len = total_size;
 
   return ASN1_SUCCESS;
 }
