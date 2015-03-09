@@ -118,14 +118,16 @@ AC_MSG_ERROR([[
 
   if test "$included_libtasn1" = "no"; then
     GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libtasn1"
-  fi
-
-  oldlibs="$LIBS"
-  LIBS="$LIBS $LIBTASN1_LIBS"
-  oldcflags="$CFLAGS"
-  CFLAGS="$CFLAGS $LIBTASN1_CFLAGS"
-  AC_CHECK_FUNC(asn1_decode_simple_ber,
+    oldlibs="$LIBS"
+    LIBS="$LIBS $LIBTASN1_LIBS"
+    oldcflags="$CFLAGS"
+    CFLAGS="$CFLAGS $LIBTASN1_CFLAGS"
+    AC_CHECK_FUNC(asn1_decode_simple_ber,
                 [AC_DEFINE(HAVE_ASN1_DECODE_SIMPLE_BER, 1, [Have this function])], [])
+    LIBS="$oldlibs"
+  else
+                AC_DEFINE(HAVE_ASN1_DECODE_SIMPLE_BER, 1, [Have this function])
+  fi
 
   AC_MSG_CHECKING([whether C99 macros are supported])
   AC_TRY_COMPILE(,
