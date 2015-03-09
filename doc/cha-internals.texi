@@ -321,6 +321,33 @@ When writing GTK-DOC style documentation for your new APIs, don't
 forget to add @code{Since:} tags to indicate the GnuTLS version the
 API was introduced in.
 
+@subsubheading Heartbeat extension.
+
+One such extension is HeartBeat protocol (RFC6520:
+@url{https://tools.ietf.org/html/rfc6520}) implementation. To enable
+it use option --heartbeat with example client and server supplied with
+gnutls:
+
+@example
+./doc/credentials/gnutls-http-serv --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 \
+    --heartbeat --echo
+./src/gnutls-cli --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 localhost -p 5556 \
+    --insecure --heartbeat
+@end example
+
+After that pasting
+@example
+**HEARTBEAT**
+@end example
+command into gnutls-cli will trigger corresponding command on the server and it will send HeartBeat Request with random length to client.
+
+Another way is to run capabilities check with:
+
+@example
+./doc/credentials/gnutls-http-serv -d 100 --heartbeat
+./src/gnutls-cli-debug localhost -p 5556
+@end example
+
 @subheading Adding a new Supplemental Data Handshake Message
 
 TLS handshake extensions allow to send so called supplemental data
@@ -421,32 +448,6 @@ typedef enum
 @} gnutls_supplemental_data_format_type_t;
 @end example
 
-@subsubheading Heartbeat extension.
-
-One such extension is HeartBeat protocol (RFC6520:
-@url{https://tools.ietf.org/html/rfc6520}) implementation. To enable
-it use option --heartbeat with example client and server supplied with
-gnutls:
-
-@example
-./doc/credentials/gnutls-http-serv --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 \
-    --heartbeat --echo
-./src/gnutls-cli --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 localhost -p 5556 \
-    --insecure --heartbeat
-@end example
-
-After that pasting
-@example
-**HEARTBEAT**
-@end example
-command into gnutls-cli will trigger corresponding command on the server and it will send HeartBeat Request with random length to client.
-
-Another way is to run capabilities check with:
-
-@example
-./doc/credentials/gnutls-http-serv -d 100 --heartbeat
-./src/gnutls-cli-debug localhost -p 5556
-@end example
 
 @node Cryptographic Backend
 @section Cryptographic Backend
