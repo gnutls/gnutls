@@ -108,7 +108,7 @@ AC_MSG_ERROR([[
       included_libtasn1=$withval,
       included_libtasn1=no)
   if test "$included_libtasn1" = "no"; then
-    PKG_CHECK_MODULES(LIBTASN1, [libtasn1 >= 3.9], [], [included_libtasn1=yes])
+    PKG_CHECK_MODULES(LIBTASN1, [libtasn1 >= 4.3], [], [included_libtasn1=yes])
     if test "$included_libtasn1" = yes; then
       AC_MSG_WARN([[
   *** 
@@ -123,13 +123,6 @@ AC_MSG_ERROR([[
   if test "$included_libtasn1" = "no"; then
     GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, libtasn1"
   fi
-
-  oldlibs="$LIBS"
-  LIBS="$LIBS $LIBTASN1_LIBS"
-  oldcflags="$CFLAGS"
-  CFLAGS="$CFLAGS $LIBTASN1_CFLAGS"
-  AC_CHECK_FUNC(asn1_decode_simple_ber,
-                [AC_DEFINE(HAVE_ASN1_DECODE_SIMPLE_BER, 1, [Have this function])], [])
 
   AC_MSG_CHECKING([whether C99 macros are supported])
   AC_TRY_COMPILE(,

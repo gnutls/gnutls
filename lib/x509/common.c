@@ -975,12 +975,10 @@ _gnutls_x509_decode_string(unsigned int etype,
 	unsigned int str_size, len;
 	gnutls_datum_t td;
 
-#ifdef HAVE_ASN1_DECODE_SIMPLE_BER
 	if (allow_ber)
 		ret =
 		    asn1_decode_simple_ber(etype, der, der_size, &str, &str_size, NULL);
 	else
-#endif
 		ret =
 		    asn1_decode_simple_der(etype, der, der_size, (const uint8_t**)&str, &str_size);
 	if (ret != ASN1_SUCCESS) {
@@ -997,10 +995,8 @@ _gnutls_x509_decode_string(unsigned int etype,
 	memcpy(td.data, str, str_size);
 	td.data[str_size] = 0;
 
-#ifdef HAVE_ASN1_DECODE_SIMPLE_BER
 	if (allow_ber)
 		free(str);
-#endif
 
 	ret = make_printable_string(etype, &td, output);
 	if (ret == GNUTLS_E_INVALID_REQUEST) {	/* unsupported etype */
