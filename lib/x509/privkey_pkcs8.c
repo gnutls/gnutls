@@ -852,7 +852,7 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 		/* Decode the parameters.
 		 */
 		result =
-		    asn1_der_decoding(&pbes2_asn, data, data_size, NULL);
+		    _asn1_strict_der_decode(&pbes2_asn, data, data_size, NULL);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			result = _gnutls_asn2err(result);
@@ -911,7 +911,7 @@ read_pkcs_schema_params(schema_id * schema, const char *password,
 		/* Decode the parameters.
 		 */
 		result =
-		    asn1_der_decoding(&pbes2_asn, data, data_size, NULL);
+		    _asn1_strict_der_decode(&pbes2_asn, data, data_size, NULL);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			result = _gnutls_asn2err(result);
@@ -1078,7 +1078,7 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 	}
 
 	result =
-	    asn1_der_decoding(&pkcs8_asn, raw_key->data, raw_key->size,
+	    _asn1_strict_der_decode(&pkcs8_asn, raw_key->data, raw_key->size,
 			      NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -1168,7 +1168,7 @@ pkcs8_key_decode(const gnutls_datum_t * raw_key,
 	}
 
 	result =
-	    asn1_der_decoding(&pkcs8_asn, raw_key->data, raw_key->size,
+	    _asn1_strict_der_decode(&pkcs8_asn, raw_key->data, raw_key->size,
 			      NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -1351,7 +1351,7 @@ decode_private_key_info(const gnutls_datum_t * der,
 		goto error;
 	}
 
-	result = asn1_der_decoding(&pkcs8_asn, der->data, der->size, NULL);
+	result = _asn1_strict_der_decode(&pkcs8_asn, der->data, der->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -1576,7 +1576,7 @@ read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 	}
 
 	result =
-	    asn1_der_decoding(&pbkdf2_asn, &der->data[params_start],
+	    _asn1_strict_der_decode(&pbkdf2_asn, &der->data[params_start],
 			      params_len, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -1764,7 +1764,7 @@ read_pbe_enc_params(ASN1_TYPE pbes2_asn,
 	}
 
 	result =
-	    asn1_der_decoding(&pbe_asn, &der->data[params_start],
+	    _asn1_strict_der_decode(&pbe_asn, &der->data[params_start],
 			      params_len, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();

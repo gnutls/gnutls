@@ -565,7 +565,7 @@ _gnutls_x509_crq_set_extension(gnutls_x509_crq_t crq,
 
 	if (extensions_size > 0) {
 		result =
-		    asn1_der_decoding(&c2, extensions, extensions_size,
+		    _asn1_strict_der_decode(&c2, extensions, extensions_size,
 				      NULL);
 		gnutls_free(extensions);
 		if (result != ASN1_SUCCESS) {
@@ -626,7 +626,7 @@ _gnutls_x509_ext_extract_number(uint8_t * number,
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&ext, extnValue, extnValueLen, NULL);
+	result = _asn1_strict_der_decode(&ext, extnValue, extnValueLen, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&ext);

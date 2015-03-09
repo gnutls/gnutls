@@ -375,10 +375,10 @@ decode_complex_string(const struct oid_to_string *oentry, void *value,
 	}
 
 	if ((result =
-	     asn1_der_decoding(&tmpasn, value, value_size,
+	     _asn1_strict_der_decode(&tmpasn, value, value_size,
 			       asn1_err)) != ASN1_SUCCESS) {
 		gnutls_assert();
-		_gnutls_debug_log("asn1_der_decoding: %s\n", asn1_err);
+		_gnutls_debug_log("_asn1_strict_der_decode: %s\n", asn1_err);
 		asn1_delete_structure(&tmpasn);
 		return _gnutls_asn2err(result);
 	}

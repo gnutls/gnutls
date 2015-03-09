@@ -45,7 +45,7 @@ int _gnutls_x509_read_der_int(uint8_t * der, int dersize, bigint_t * out)
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&spk, der, dersize, NULL);
+	result = _asn1_strict_der_decode(&spk, der, dersize, NULL);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();

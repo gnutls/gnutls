@@ -788,7 +788,7 @@ int gnutls_x509_dn_import(gnutls_x509_dn_t dn, const gnutls_datum_t * data)
 	int result;
 	char err[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
 
-	result = asn1_der_decoding((ASN1_TYPE *) & dn,
+	result = _asn1_strict_der_decode((ASN1_TYPE *) & dn,
 				   data->data, data->size, err);
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
@@ -852,7 +852,7 @@ gnutls_x509_rdn_get(const gnutls_datum_t * idn,
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&dn, idn->data, idn->size, NULL);
+	result = _asn1_strict_der_decode(&dn, idn->data, idn->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 		gnutls_assert();
@@ -906,7 +906,7 @@ gnutls_x509_rdn_get_by_oid(const gnutls_datum_t * idn, const char *oid,
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&dn, idn->data, idn->size, NULL);
+	result = _asn1_strict_der_decode(&dn, idn->data, idn->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 		gnutls_assert();
@@ -960,7 +960,7 @@ gnutls_x509_rdn_get_oid(const gnutls_datum_t * idn,
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&dn, idn->data, idn->size, NULL);
+	result = _asn1_strict_der_decode(&dn, idn->data, idn->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 		gnutls_assert();

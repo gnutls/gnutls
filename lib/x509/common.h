@@ -244,4 +244,10 @@ gnutls_x509_crt_t *_gnutls_sort_clist(gnutls_x509_crt_t
 
 int _gnutls_check_if_sorted(gnutls_x509_crt_t * crt, int nr);
 
+inline static int _asn1_strict_der_decode (asn1_node * element, const void *ider,
+		       int len, char *errorDescription)
+{
+	return asn1_der_decoding2(element, ider, &len, ASN1_DECODE_FLAG_STRICT_DER, errorDescription);
+}
+
 #endif
