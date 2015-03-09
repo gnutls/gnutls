@@ -92,7 +92,7 @@ flag = {
 
 flag = {
     name      = app-proto;
-    descrip   = "The application protocol to be used to obtain the server's certificate (https, smtp, imap)";
+    descrip   = "The application protocol to be used to obtain the server's certificate (https, ftp, smtp, imap)";
     arg-type  = string;
     doc = "When the server's certificate isn't provided danetool will connect to the server to obtain the certificate. In that case it is required to known the protocol to talk with the server prior to initiating the TLS handshake.";
 };

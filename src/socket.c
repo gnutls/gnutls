@@ -206,8 +206,16 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		wait_for_text(socket->fd, "a OK", 4);
 		send_line(socket->fd, "a STARTTLS\r\n");
 		wait_for_text(socket->fd, "a OK", 4);
+	} else if (strcasecmp(app_proto, "ftp") == 0 || strcasecmp(app_proto, "ftps") == 0) {
+		if (socket->verbose)
+			printf("Negotiating FTP STARTTLS\n");
+
+		send_line(socket->fd, "FEAT\n");
+		wait_for_text(socket->fd, "211 End", 7);
+		send_line(socket->fd, "AUTH TLS\n");
+		wait_for_text(socket->fd, "234", 3);
 	} else {
-		if (socket->verbose && !c_isdigit(app_proto[0])) {
+		if (!c_isdigit(app_proto[0])) {
 			static int warned = 0;
 			if (warned == 0) {
 				fprintf(stderr, "unknown protocol %s\n", app_proto);
