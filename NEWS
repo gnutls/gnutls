@@ -98,6 +98,8 @@ when available.
 
 ** certtool: it will print the A-label (ACE) names in addition to UTF-8.
 
+** p11tool: added options --set-id and --set-label.
+
 ** gnutls-cli: added options --priority-list and --save-cert.
 
 ** guile: Deprecated priority API has been removed. The old priority API, 
