@@ -348,6 +348,167 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 
 
 /**
+ * gnutls_pkcs11_obj_set_info:
+ * @obj: should contain a #gnutls_pkcs11_obj_t structure
+ * @itype: Denotes the type of information to be set
+ * @data: the data to set
+ * @data_size: the size of data
+ * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
+ *
+ * This function will set attributes on the provided object.
+ * Available options for @itype are %GNUTLS_PKCS11_OBJ_LABEL,
+ * %GNUTLS_PKCS11_OBJ_ID_HEX, and %GNUTLS_PKCS11_OBJ_ID.
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
+ *
+ * Since: 3.3.26
+ **/
+int
+gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
+			   gnutls_pkcs11_obj_info_t itype,
+			   const void *data, size_t data_size,
+			   unsigned flags)
+{
+	struct p11_kit_uri *info = obj->info;
+	struct pkcs11_session_info sinfo;
+	struct ck_attribute *attr;
+	struct ck_attribute a[4];
+	ck_certificate_type_t type = -1;
+	ck_object_class_t class = CKO_CERTIFICATE;
+	ck_object_handle_t pkobj[2];
+	unsigned long count;
+	size_t size;
+	unsigned a_vals;
+	char tmp[128];
+	ck_rv_t rv;
+	int ret;
+
+	PKCS11_CHECK_INIT;
+
+	ret =
+	    pkcs11_open_session(&sinfo, NULL, info,
+				SESSION_WRITE |
+				pkcs11_obj_flags_to_int(flags));
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	/* find the object that matches the URL */
+	a_vals = 0;
+	attr = p11_kit_uri_get_attribute(info, CKA_ID);
+	if (attr) {
+		memcpy(a + a_vals, attr, sizeof(struct ck_attribute));
+		a_vals++;
+	}
+
+	attr = p11_kit_uri_get_attribute(info, CKA_LABEL);
+	if (attr) {
+		memcpy(a + a_vals, attr, sizeof(struct ck_attribute));
+		a_vals++;
+	}
+
+	if (!a_vals) {
+		gnutls_assert();
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
+
+	/* Find objects with given class and type */
+	attr = p11_kit_uri_get_attribute(info, CKA_CLASS);
+	if (attr) {
+		if (attr->value
+		    && attr->value_len == sizeof(ck_object_class_t))
+			class = *((ck_object_class_t *) attr->value);
+		if (class == CKO_CERTIFICATE)
+			type = CKC_X_509;
+		memcpy(a + a_vals, attr, sizeof(struct ck_attribute));
+		a_vals++;
+	}
+
+	if (type != (ck_certificate_type_t) - 1) {
+		a[a_vals].type = CKA_CERTIFICATE_TYPE;
+		a[a_vals].value = &type;
+		a[a_vals].value_len = sizeof type;
+		a_vals++;
+	}
+
+	rv = pkcs11_find_objects_init(sinfo.module, sinfo.pks, a,
+				      a_vals);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		_gnutls_debug_log("p11: FindObjectsInit failed.\n");
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
+
+	rv = pkcs11_find_objects(sinfo.module, sinfo.pks, pkobj, 2, &count);
+	if (rv != CKR_OK) {
+		gnutls_assert();
+		_gnutls_debug_log("p11: FindObjects failed.\n");
+		ret = pkcs11_rv_to_err(rv);
+		goto cleanup;
+	}
+
+	if (count > 1 || count == 0) {
+		gnutls_assert();
+		if (count > 1)
+			_gnutls_debug_log("p11: More than one objects match (%d)\n", (int)count);
+		ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		goto cleanup;
+	}
+
+	switch (itype) {
+	case GNUTLS_PKCS11_OBJ_ID_HEX:
+		size = sizeof(tmp);
+		ret = _gnutls_hex2bin(data, data_size, (uint8_t*)tmp, &size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		data = tmp;
+		data_size = size;
+		/* fallthrough */
+	case GNUTLS_PKCS11_OBJ_ID:
+		a[0].type = CKA_ID;
+		a[0].value = (void*)data;
+		a[0].value_len = data_size;
+
+		rv = pkcs11_set_attribute_value(sinfo.module, sinfo.pks, pkobj[0], a, 1);
+		if (rv != CKR_OK) {
+			gnutls_assert();
+			_gnutls_debug_log("p11: set_attribute_value failed.\n");
+			ret = pkcs11_rv_to_err(rv);
+			goto cleanup;
+		}
+
+		break;
+	case GNUTLS_PKCS11_OBJ_LABEL:
+		a[0].type = CKA_LABEL;
+		a[0].value = (void*)data;
+		a[0].value_len = data_size;
+
+		rv = pkcs11_set_attribute_value(sinfo.module, sinfo.pks, pkobj[0], a, 1);
+		if (rv != CKR_OK) {
+			gnutls_assert();
+			_gnutls_debug_log("p11: set_attribute_value failed.\n");
+			ret = pkcs11_rv_to_err(rv);
+			goto cleanup;
+		}
+
+		break;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = 0;
+ cleanup:
+ 	pkcs11_close_session(&sinfo);
+ 	return ret;
+}
+
+/**
  * gnutls_pkcs11_obj_get_info:
  * @obj: should contain a #gnutls_pkcs11_obj_t structure
  * @itype: Denotes the type of information requested

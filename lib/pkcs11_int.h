@@ -235,6 +235,13 @@ ck_rv_t pkcs11_find_objects_final(struct pkcs11_session_info *);
 ck_rv_t pkcs11_close_session(struct pkcs11_session_info *);
 
 ck_rv_t
+pkcs11_set_attribute_value(struct ck_function_list * module,
+			   ck_session_handle_t sess,
+			   ck_object_handle_t object,
+			   struct ck_attribute * templ,
+			   unsigned long count);
+
+ck_rv_t
 pkcs11_get_attribute_value(struct ck_function_list *module,
 			   ck_session_handle_t sess,
 			   ck_object_handle_t object,

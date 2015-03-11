@@ -1030,6 +1030,7 @@ GNUTLS_3_1_0 {
 	gnutls_pkcs11_copy_x509_crt2;
 	gnutls_pkcs11_copy_x509_privkey2;
 	gnutls_pkcs11_privkey_generate3;
+	gnutls_pkcs11_obj_set_info;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {
