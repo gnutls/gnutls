@@ -140,7 +140,7 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 
 	if (crt_list_size == 0) {
 		fprintf(stderr, "No matching objects found\n");
-		exit(0);
+		exit(2);
 	}
 
 	for (i = 0; i < crt_list_size; i++) {
