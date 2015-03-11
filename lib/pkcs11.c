@@ -333,6 +333,54 @@ int gnutls_pkcs11_add_provider(const char *name, const char *params)
 	return ret;
 }
 
+static
+int add_obj_attrs(struct p11_kit_uri *info, struct ck_attribute a[4], unsigned *a_vals, ck_object_class_t *class, ck_certificate_type_t *type)
+{
+	struct ck_attribute *attr;
+
+	*type = -1;
+	*class = CKO_CERTIFICATE;
+
+	/* find the object that matches the URL */
+	*a_vals = 0;
+	attr = p11_kit_uri_get_attribute(info, CKA_ID);
+	if (attr) {
+		memcpy(a + (*a_vals), attr, sizeof(struct ck_attribute));
+		(*a_vals)++;
+	}
+
+	attr = p11_kit_uri_get_attribute(info, CKA_LABEL);
+	if (attr) {
+		memcpy(a + (*a_vals), attr, sizeof(struct ck_attribute));
+		(*a_vals)++;
+	}
+
+	if (!(*a_vals)) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Find objects with given class and type */
+	attr = p11_kit_uri_get_attribute(info, CKA_CLASS);
+	if (attr) {
+		if (attr->value
+		    && attr->value_len == sizeof(ck_object_class_t))
+			*class = *((ck_object_class_t *) attr->value);
+		if (*class == CKO_CERTIFICATE)
+			*type = CKC_X_509;
+		memcpy(a + (*a_vals), attr, sizeof(struct ck_attribute));
+		(*a_vals)++;
+	}
+
+	if (*type != (ck_certificate_type_t) - 1) {
+		a[(*a_vals)].type = CKA_CERTIFICATE_TYPE;
+		a[(*a_vals)].value = type;
+		a[(*a_vals)].value_len = sizeof type;
+		(*a_vals)++;
+	}
+
+	return 0;
+}
 
 /**
  * gnutls_pkcs11_obj_set_info:
@@ -358,11 +406,10 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
 {
 	struct p11_kit_uri *info = obj->info;
 	struct pkcs11_session_info sinfo;
-	struct ck_attribute *attr;
 	struct ck_attribute a[4];
-	ck_certificate_type_t type = -1;
-	ck_object_class_t class = CKO_CERTIFICATE;
 	ck_object_handle_t pkobj[2];
+	ck_certificate_type_t type;
+	ck_object_class_t class;
 	unsigned long count;
 	size_t size;
 	unsigned a_vals;
@@ -381,43 +428,10 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
 		return ret;
 	}
 
-	/* find the object that matches the URL */
-	a_vals = 0;
-	attr = p11_kit_uri_get_attribute(info, CKA_ID);
-	if (attr) {
-		memcpy(a + a_vals, attr, sizeof(struct ck_attribute));
-		a_vals++;
-	}
-
-	attr = p11_kit_uri_get_attribute(info, CKA_LABEL);
-	if (attr) {
-		memcpy(a + a_vals, attr, sizeof(struct ck_attribute));
-		a_vals++;
-	}
-
-	if (!a_vals) {
+	ret = add_obj_attrs(info, a, &a_vals, &class, &type);
+	if (ret < 0) {
 		gnutls_assert();
-		ret = GNUTLS_E_INVALID_REQUEST;
 		goto cleanup;
-	}
-
-	/* Find objects with given class and type */
-	attr = p11_kit_uri_get_attribute(info, CKA_CLASS);
-	if (attr) {
-		if (attr->value
-		    && attr->value_len == sizeof(ck_object_class_t))
-			class = *((ck_object_class_t *) attr->value);
-		if (class == CKO_CERTIFICATE)
-			type = CKC_X_509;
-		memcpy(a + a_vals, attr, sizeof(struct ck_attribute));
-		a_vals++;
-	}
-
-	if (type != (ck_certificate_type_t) - 1) {
-		a[a_vals].type = CKA_CERTIFICATE_TYPE;
-		a[a_vals].value = &type;
-		a[a_vals].value_len = sizeof type;
-		a_vals++;
 	}
 
 	rv = pkcs11_find_objects_init(sinfo.module, sinfo.pks, a,
@@ -1868,12 +1882,12 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
 {
 	struct find_url_data_st *find_data = input;
 	struct ck_attribute a[4];
-	struct ck_attribute *attr;
-	ck_object_class_t class = -1;
-	ck_certificate_type_t type = (ck_certificate_type_t) - 1;
+	ck_certificate_type_t type;
+	ck_object_class_t class;
 	ck_rv_t rv;
 	ck_object_handle_t obj;
-	unsigned long count, a_vals;
+	unsigned long count;
+	unsigned a_vals;
 	int found = 0, ret;
 
 	if (tinfo == NULL) {	/* we don't support multiple calls */
@@ -1891,43 +1905,11 @@ find_obj_url_cb(struct pkcs11_session_info *sinfo,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	a_vals = 0;
-	attr = p11_kit_uri_get_attribute(find_data->obj->info, CKA_ID);
-	if (attr) {
-		memcpy(a + a_vals, attr, sizeof(struct ck_attribute));
-		a_vals++;
-	}
-
-	attr = p11_kit_uri_get_attribute(find_data->obj->info, CKA_LABEL);
-	if (attr) {
-		memcpy(a + a_vals, attr, sizeof(struct ck_attribute));
-		a_vals++;
-	}
-
-	if (!a_vals) {
+	ret = add_obj_attrs(find_data->obj->info, a, &a_vals, &class, &type);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		return ret;
 	}
-
-	/* Find objects with given class and type */
-	attr = p11_kit_uri_get_attribute(find_data->obj->info, CKA_CLASS);
-	if (attr) {
-		if (attr->value
-		    && attr->value_len == sizeof(ck_object_class_t))
-			class = *((ck_object_class_t *) attr->value);
-		if (class == CKO_CERTIFICATE)
-			type = CKC_X_509;
-		memcpy(a + a_vals, attr, sizeof(struct ck_attribute));
-		a_vals++;
-	}
-
-	if (type != (ck_certificate_type_t) - 1) {
-		a[a_vals].type = CKA_CERTIFICATE_TYPE;
-		a[a_vals].value = &type;
-		a[a_vals].value_len = sizeof type;
-		a_vals++;
-	}
-
 
 	rv = pkcs11_find_objects_init(sinfo->module, sinfo->pks, a,
 				      a_vals);
