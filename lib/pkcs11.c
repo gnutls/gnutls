@@ -1264,7 +1264,7 @@ pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (data && data->data) {
+	if (data && data->data && data->size) {
 		ret = _gnutls_set_datum(&obj->raw, data->data, data->size);
 		if (ret < 0) {
 			gnutls_assert();
@@ -1278,7 +1278,7 @@ pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
 	memcpy(p11_kit_uri_get_module_info(obj->info), lib_info,
 	       sizeof(struct ck_info));
 
-	if (label && label->data) {
+	if (label && label->data && label->size) {
 		attr.type = CKA_LABEL;
 		attr.value = label->data;
 		attr.value_len = label->size;
@@ -1289,7 +1289,7 @@ pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
 		}
 	}
 
-	if (id && id->data) {
+	if (id && id->data && id->size) {
 		attr.type = CKA_ID;
 		attr.value = id->data;
 		attr.value_len = id->size;
