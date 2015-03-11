@@ -1057,3 +1057,56 @@ pkcs11_get_random(FILE * outfile, const char *url, unsigned bytes,
 
 	return;
 }
+
+static
+void pkcs11_set_val(FILE * outfile, const char *url, int detailed,
+		   unsigned int flags, common_info_st * info,
+		   gnutls_pkcs11_obj_info_t val_type, const char *val)
+{
+	int ret;
+	gnutls_pkcs11_obj_t obj;
+
+	pkcs11_common(info);
+
+	FIX(url, outfile, detailed, info);
+	CHECK_LOGIN_FLAG(flags);
+
+	ret = gnutls_pkcs11_obj_init(&obj);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_pkcs11_obj_import_url(obj, url, flags);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret =
+	    gnutls_pkcs11_obj_set_info(obj, val_type, val, strlen(val), flags);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+			gnutls_strerror(ret));
+		exit(1);
+	}
+	gnutls_pkcs11_obj_deinit(obj);
+
+	return;
+}
+
+void pkcs11_set_id(FILE * outfile, const char *url, int detailed,
+		   unsigned int flags, common_info_st * info,
+		   const char *id)
+{
+	return pkcs11_set_val(outfile, url, detailed, flags, info, GNUTLS_PKCS11_OBJ_ID_HEX, id);
+}
+
+void pkcs11_set_label(FILE * outfile, const char *url, int detailed,
+		   unsigned int flags, common_info_st * info,
+		   const char *label)
+{
+	return pkcs11_set_val(outfile, url, detailed, flags, info, GNUTLS_PKCS11_OBJ_LABEL, label);
+}

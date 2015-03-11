@@ -136,6 +136,20 @@ flag = {
 };
 
 flag = {
+    name      = set-id;
+    descrip   = "Set the CKA_ID (in hex) for the specified by the URL object";
+    doc = "Sets the CKA_ID in the specified by the URL object. The ID should be specified in hexadecimal format without a '0x' prefix.";
+    arg-type  = string;
+};
+
+flag = {
+    name      = set-label;
+    descrip   = "Set the CKA_LABEL for the specified by the URL object";
+    doc = "Sets the CKA_LABEL in the specified by the URL object";
+    arg-type  = string;
+};
+
+flag = {
     name      = label;
     arg-type  = string;
     descrip   = "Sets a label for the write operation";

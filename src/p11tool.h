@@ -54,6 +54,14 @@ void pkcs11_generate(FILE * outfile, const char *url,
 void pkcs11_export_pubkey(FILE * outfile, const char *url, int detailed,
 		     unsigned int flags, common_info_st * info);
 
+void pkcs11_set_id(FILE * outfile, const char *url, int detailed,
+		   unsigned int flags, common_info_st * info,
+		   const char *id);
+
+void pkcs11_set_label(FILE * outfile, const char *url, int detailed,
+		   unsigned int flags, common_info_st * info,
+		   const char *label);
+
 #define PKCS11_TYPE_CRT_ALL 1
 #define PKCS11_TYPE_TRUSTED 2
 #define PKCS11_TYPE_PK 3

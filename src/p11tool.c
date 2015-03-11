@@ -310,6 +310,10 @@ static void cmd_parser(int argc, char **argv)
 				flags, &cinfo);
 	} else if (HAVE_OPT(EXPORT_PUBKEY)) {
 		pkcs11_export_pubkey(outfile, url, detailed_url, flags, &cinfo);
+	} else if (HAVE_OPT(SET_ID)) {
+		pkcs11_set_id(outfile, url, detailed_url, flags, &cinfo, OPT_ARG(SET_ID));
+	} else if (HAVE_OPT(SET_LABEL)) {
+		pkcs11_set_label(outfile, url, detailed_url, flags, &cinfo, OPT_ARG(SET_LABEL));
 	} else {
 		USAGE(1);
 	}
