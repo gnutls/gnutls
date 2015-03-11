@@ -1014,6 +1014,7 @@ GNUTLS_3_4
 	gnutls_system_recv_timeout;
 	gnutls_record_set_state;
 	gnutls_record_get_state;
+	gnutls_pkcs11_obj_set_info;
   local:
 	*;
 };

@@ -247,6 +247,10 @@ typedef enum {
 int gnutls_pkcs11_obj_get_info(gnutls_pkcs11_obj_t crt,
 			       gnutls_pkcs11_obj_info_t itype,
 			       void *output, size_t * output_size);
+int gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t crt,
+			       gnutls_pkcs11_obj_info_t itype,
+			       const void *data, size_t data_size,
+			       unsigned flags);
 
 #define GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL GNUTLS_PKCS11_OBJ_FLAG_CRT
 #define GNUTLS_PKCS11_OBJ_ATTR_MATCH 0 /* always match the given URL */
