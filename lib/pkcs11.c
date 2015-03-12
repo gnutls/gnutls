@@ -375,7 +375,7 @@ int add_obj_attrs(struct p11_kit_uri *info, struct ck_attribute a[4], unsigned *
 	if (*type != (ck_certificate_type_t) - 1) {
 		a[(*a_vals)].type = CKA_CERTIFICATE_TYPE;
 		a[(*a_vals)].value = type;
-		a[(*a_vals)].value_len = sizeof type;
+		a[(*a_vals)].value_len = sizeof *type;
 		(*a_vals)++;
 	}
 
