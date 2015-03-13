@@ -1097,7 +1097,7 @@ finish:
  * Note that "NORMAL:%COMPAT" is the most compatible mode.
  *
  * A %NULL @priorities string indicates the default priorities to be
- * used.
+ * used (this is available since GnuTLS 3.3.0).
  *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
  * %GNUTLS_E_SUCCESS on success, or an error code.
