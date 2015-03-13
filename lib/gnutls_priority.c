@@ -1017,7 +1017,7 @@ finish:
 /**
  * gnutls_priority_init:
  * @priority_cache: is a #gnutls_prioritity_t structure.
- * @priorities: is a string describing priorities
+ * @priorities: is a string describing priorities (may be %NULL)
  * @err_pos: In case of an error this will have the position in the string the error occurred
  *
  * Sets priorities for the ciphers, key exchange methods, macs and
@@ -1095,6 +1095,9 @@ finish:
  * "SECURE256:+SECURE128",
  *
  * Note that "NORMAL:%COMPAT" is the most compatible mode.
+ *
+ * A %NULL @priorities string indicates the default priorities to be
+ * used.
  *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
  * %GNUTLS_E_SUCCESS on success, or an error code.
@@ -1426,17 +1429,9 @@ break_list(char *list,
  * gnutls_set_default_priority:
  * @session: is a #gnutls_session_t structure.
  *
- * Sets some default priority on the ciphers, key exchange methods,
- * macs and compression methods.
- *
- * This typically sets a default priority that is considered
- * sufficiently secure to establish encrypted sessions.
- *
- * This function is kept around for backwards compatibility, but
- * because of its wide use it is still fully supported.  If you wish
- * to allow users to provide a string that specify which ciphers to
- * use (which is recommended), you should use
- * gnutls_priority_set_direct() or gnutls_priority_set() instead.
+ * Sets the default priority on the ciphers, key exchange methods,
+ * macs and compression methods. For more fine-tuning you could
+ * use gnutls_priority_set_direct() or gnutls_priority_set() instead.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
