@@ -131,8 +131,8 @@ _gnutls_gen_supplemental(gnutls_session_t session, gnutls_buffer_st * buf)
 
 		/* If data were added, store type+length, otherwise reset. */
 		if (buf->length > sizepos + 4) {
-			buf->data[sizepos] = 0;
-			buf->data[sizepos + 1] = p->type;
+			buf->data[sizepos] = (p->type >> 8) & 0xFF;
+			buf->data[sizepos + 1] = p->type & 0xFF;
 			buf->data[sizepos + 2] =
 			    ((buf->length - sizepos - 4) >> 8) & 0xFF;
 			buf->data[sizepos + 3] =
