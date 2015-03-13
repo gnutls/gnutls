@@ -20,7 +20,6 @@ We require several tools to check out and build the software, including:
 * GTK-DOC <http://www.gtk.org/gtk-doc/> (for API manual)
 * Git <http://git-scm.com/>
 * Perl <http://www.cpan.org/>
-* Valgrind <http://valgrind.org/> (optional)
 * Nettle <http://www.lysator.liu.se/~nisse/nettle/>
 * Guile <http://www.gnu.org/software/guile/>
 * p11-kit <http://p11-glue.freedesktop.org/p11-kit.html>
@@ -49,14 +48,18 @@ apt-get install help2man gtk-doc-tools valgrind
 apt-get install guile-2.0-dev libtasn1-6-dev
 apt-get install libidn11-dev gawk gperf
 apt-get install libunbound-dev dns-root-data bison
-```
-
-You will sometimes need to install more recent versions of Automake,
-Nettle, P11-kit and Autogen, which you will need to build from
-sources.  If your system has the recent versions, you could do:
-
-```
 apt-get install automake autogen nettle-dev libp11-kit-dev
+```
+
+Sometimes, you may need to install more recent versions of Automake,
+Nettle, P11-kit and Autogen, which you will need to build from sources. 
+
+Dependencies that are used during make check:
+* Valgrind <http://valgrind.org/> (optional)
+* Libasan <https://gcc.gnu.org//> (optional)
+
+```
+apt-get install valgrind libasan1
 ```
 
 For basic interoperability testing you may want to install openssl
