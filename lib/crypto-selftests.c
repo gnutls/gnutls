@@ -299,7 +299,8 @@ static int test_cipher(gnutls_cipher_algorithm_t cipher,
 
 		ret =
 		    gnutls_cipher_decrypt2(hd,
-					   vectors[i].ciphertext, 16, tmp,
+					   vectors[i].ciphertext, 
+					   vectors[i].plaintext_size, tmp,
 					   sizeof(tmp));
 		if (ret < 0) {
 			_gnutls_debug_log
