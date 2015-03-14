@@ -38,12 +38,12 @@ some hints:
 gNewSense/Debian/Ubuntu:
 ```
 apt-get install git-core autoconf libtool gettext autopoint
-apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
-apt-get install help2man gtk-doc-tools valgrind
 apt-get install guile-2.0-dev libtasn1-6-dev
 apt-get install libidn11-dev gawk gperf git2cl
 apt-get install libunbound-dev dns-root-data bison
 apt-get install automake autogen nettle-dev libp11-kit-dev
+apt-get install help2man gtk-doc-tools
+apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
 ```
 
 Sometimes, you may need to install more recent versions of Automake,
