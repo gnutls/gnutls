@@ -16,7 +16,6 @@ We require several tools to check out and build the software, including:
 * Tar <http://www.gnu.org/software/tar/>
 * Gzip <http://www.gnu.org/software/gzip/>
 * Texlive & epsf <http://www.tug.org/texlive/> (for PDF manual)
-* CVS <http://www.gnu.org/software/cvs/> (for gettext autopoint)
 * GTK-DOC <http://www.gtk.org/gtk-doc/> (for API manual)
 * Git <http://git-scm.com/>
 * Perl <http://www.cpan.org/>
@@ -25,15 +24,11 @@ We require several tools to check out and build the software, including:
 * p11-kit <http://p11-glue.freedesktop.org/p11-kit.html>
 * gperf <http://www.gnu.org/software/gperf/>
 * libtasn1 <http://josefsson.org/libtasn1/> (optional)
-* datefudge <http://packages.debian.org/datefudge> (optional)
 * Libidn <http://www.gnu.org/software/libidn/> (optional, for internationalization of DNS)
 * AWK <http://www.gnu.org/software/awk/> (for make dist, pmccabe2html)
 * git2cl <http://savannah.nongnu.org/projects/git2cl/> (for make dist, ChangeLog)
-* softhsm <http://www.opendnssec.org/softhsm/> (for testing smart card support)
-* dieharder <http://www.phy.duke.edu/~rgb/General/dieharder.php> (for testing PRNG)
 * bison <http://www.gnu.org/software/bison> (for datetime parser in certtool)
 * libunbound <https://unbound.net/> (for DANE support)
-* nodejs <http://nodejs.org/> (needed for certain test cases)
 * abi-compliance-checker <http://ispras.linuxbase.org/index.php/ABI_compliance_checker> (for make dist)
 
 The required software is typically distributed with your operating
@@ -46,7 +41,7 @@ apt-get install git-core autoconf libtool gettext autopoint
 apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
 apt-get install help2man gtk-doc-tools valgrind
 apt-get install guile-2.0-dev libtasn1-6-dev
-apt-get install libidn11-dev gawk gperf
+apt-get install libidn11-dev gawk gperf git2cl
 apt-get install libunbound-dev dns-root-data bison
 apt-get install automake autogen nettle-dev libp11-kit-dev
 ```
@@ -54,21 +49,23 @@ apt-get install automake autogen nettle-dev libp11-kit-dev
 Sometimes, you may need to install more recent versions of Automake,
 Nettle, P11-kit and Autogen, which you will need to build from sources. 
 
-Dependencies that are used during make check:
+Dependencies that are used during make check are listed below. Moreover,
+for basic interoperability testing you may want to install openssl
+and polarssl.
+
 * Valgrind <http://valgrind.org/> (optional)
 * Libasan <https://gcc.gnu.org//> (optional)
+* datefudge <http://packages.debian.org/datefudge> (optional)
+* nodejs <http://nodejs.org/> (needed for certain test cases)
+* softhsm <http://www.opendnssec.org/softhsm/> (for testing smart card support)
+* dieharder <http://www.phy.duke.edu/~rgb/General/dieharder.php> (for testing PRNG)
 
 ```
 apt-get install valgrind libasan1
-```
-
-For basic interoperability testing you may want to install openssl
-and polarssl. The packages below are used during make check.
-
-```
+apt-get install nodejs softhsm datefudge dieharder
 apt-get install libpolarssl-runtime openssl
-apt-get install nodejs softhsm datefudge
 ```
+
 
 To download the version controlled sources:
 
