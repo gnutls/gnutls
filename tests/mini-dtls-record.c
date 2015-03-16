@@ -177,7 +177,6 @@ static void client(int fd)
 	gnutls_anon_client_credentials_t anoncred;
 	unsigned char seq[8];
 	uint64_t useq;
-	unsigned current = 0;
 
 	memset(buffer, 0, sizeof(buffer));
 
@@ -252,7 +251,8 @@ static void client(int fd)
 			}
 
 			if ((uint32_t) recv_msg_seq[current] != (uint32_t) useq) {
-				fail("received message sequence differs (got: %u, expected: %u)\n", (unsigned)useq, (unsigned)recv_msg_seq[current]);
+				fail("received message sequence differs (current: %u, got: %u, expected: %u)\n",
+				     (unsigned)current, (unsigned)useq, (unsigned)recv_msg_seq[current]);
 				terminate();
 			}
 
