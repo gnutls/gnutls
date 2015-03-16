@@ -208,7 +208,7 @@ static void server(int fd, const char *prio)
 	if (ret < 0) {
 		return;
 	}
-	sleep(3);
+	sec_sleep(3);
 
 	return;
 }

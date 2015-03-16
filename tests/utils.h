@@ -58,6 +58,7 @@ extern void hexprint(const void *str, size_t len);
 extern void binprint(const void *str, size_t len);
 
 int udp_socketpair(int *fd);
+void sec_sleep(int sec);
 
 /* This must be implemented elsewhere. */
 extern void doit(void);

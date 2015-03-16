@@ -159,9 +159,9 @@ static void server(int fd, int wait)
 
 	gnutls_transport_set_int(session, fd);
 
-	if (wait)
-		sleep(25);
-	else {
+	if (wait) {
+		sec_sleep(25);
+	} else {
 		do {
 			ret = gnutls_handshake(session);
 		}

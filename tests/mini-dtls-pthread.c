@@ -117,7 +117,7 @@ static void *start_thread(void *arg)
 		success("client: TLS version is: %s\n",
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
-	sleep(1);
+	sec_sleep(1);
 	/* the server should reflect our messages */
 	ret = gnutls_record_recv(session, buf, sizeof(buf));
 	if (ret != sizeof(MSG)-1 || memcmp(buf, MSG, sizeof(MSG)-1) != 0) {
@@ -171,7 +171,7 @@ void do_thread_stuff(gnutls_session_t session)
 		fail("client: send2 failed: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
-	sleep(2);
+	sec_sleep(2);
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 }
 
