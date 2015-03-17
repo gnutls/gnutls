@@ -469,7 +469,7 @@ AC_DEFINE_UNQUOTED([SYSTEM_PRIORITY_FILE],
 
 
 dnl Check for p11-kit
-P11_KIT_MINIMUM=0.20.7
+P11_KIT_MINIMUM=0.23.1
 AC_ARG_WITH(p11-kit,
 	AS_HELP_STRING([--without-p11-kit],
 		[Build without p11-kit and PKCS#11 support]))
@@ -481,9 +481,6 @@ if test "$with_p11_kit" != "no"; then
 			GNUTLS_REQUIRES_PRIVATE="Requires.private: p11-kit-1"
 		else
 			GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, p11-kit-1"
-		fi
-		if $PKG_CONFIG --atleast-version=0.23.1 p11-kit; then
-			AC_DEFINE([P11_KIT_HAS_PIN_VALUE], 1, [p11-kit supports p11_kit_uri_get_pin_value()])
 		fi
 	else
 	        with_p11_kit=no

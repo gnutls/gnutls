@@ -2357,11 +2357,7 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 		*pin = NULL;
 
 		/* First check for pin-value field */
-#ifdef P11_KIT_HAS_PIN_VALUE
 		pinfile = p11_kit_uri_get_pin_value(info);
-#else
-		pinfile = NULL;
-#endif
 		if (pinfile != NULL) {
 			_gnutls_debug_log("p11: Using pin-value to retrieve PIN\n");
 			*pin = p11_kit_pin_new_for_string(pinfile);
