@@ -103,16 +103,17 @@ AC_MSG_ERROR([[
   AC_SUBST(GMP_CFLAGS)
   AC_SUBST(GMP_LIBS)
 
+LIBTASN1_MINIMUM=4.3
   AC_ARG_WITH(included-libtasn1,
     AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),
       included_libtasn1=$withval,
       included_libtasn1=no)
   if test "$included_libtasn1" = "no"; then
-    PKG_CHECK_MODULES(LIBTASN1, [libtasn1 >= 4.3], [], [included_libtasn1=yes])
+    PKG_CHECK_MODULES(LIBTASN1, [libtasn1 >= $LIBTASN1_MINIMUM], [], [included_libtasn1=yes])
     if test "$included_libtasn1" = yes; then
-      AC_MSG_WARN([[
+      AC_MSG_ERROR([[
   *** 
-  *** Libtasn1 was not found. Will use the included one.
+  *** Libtasn1 $LIBTASN1_MINIMUM was not found. To use the included on use --with-included-libtasn1
   ]])
     fi
   fi
