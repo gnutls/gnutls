@@ -20,8 +20,8 @@ applications closing all open file descriptors.
 structures.
 
 ** libgnutls: Added API to utilize system specific private keys in
-"gnutls/system-keys.h". It is currently restricted to windows CNG
-keys.
+"gnutls/system-keys.h". It is currently provided as technology preview
+and is restricted to windows CNG keys.
 
 ** libgnutls: priority strings VERS-TLS-ALL and VERS-DTLS-ALL are 
 restricted to the corresponding protocols only, and the VERS-ALL
