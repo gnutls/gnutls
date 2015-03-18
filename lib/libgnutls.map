@@ -1017,6 +1017,8 @@ GNUTLS_3_4
 	gnutls_pkcs11_obj_set_info;
 	gnutls_crypto_register_cipher;
 	gnutls_crypto_register_aead_cipher;
+	gnutls_crypto_register_mac;
+	gnutls_crypto_register_digest;
  local:
 	*;
 };

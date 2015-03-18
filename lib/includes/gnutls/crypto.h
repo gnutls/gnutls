@@ -135,6 +135,10 @@ int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len);
 
 void gnutls_rnd_refresh(void);
 
+
+/* API to override ciphers and MAC algorithms 
+ */
+
 typedef int (*gnutls_cipher_init_func) (gnutls_cipher_algorithm_t, void **ctx, int enc);
 typedef int (*gnutls_cipher_setkey_func) (void *ctx, const void *key, size_t keysize);
 /* old style ciphers */
@@ -180,6 +184,43 @@ gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
 			      gnutls_cipher_aead_encrypt_func aead_encrypt,
 			      gnutls_cipher_aead_decrypt_func aead_decrypt,
 			      gnutls_cipher_deinit_func deinit);
+
+typedef int (*gnutls_mac_init_func) (gnutls_mac_algorithm_t, void **ctx);
+typedef int (*gnutls_mac_setkey_func) (void *ctx, const void *key, size_t keysize);
+typedef int (*gnutls_mac_setnonce_func) (void *ctx, const void *nonce, size_t noncesize);
+typedef int (*gnutls_mac_hash_func) (void *ctx, const void *text, size_t textsize);
+typedef int (*gnutls_mac_output_func) (void *src_ctx, void *digest, size_t digestsize);
+typedef void (*gnutls_mac_deinit_func) (void *ctx);
+typedef int (*gnutls_mac_fast_func) (gnutls_mac_algorithm_t, const void *nonce,
+		     size_t nonce_size, const void *key, size_t keysize,
+		     const void *text, size_t textsize, void *digest);
+
+int
+gnutls_crypto_register_mac(gnutls_mac_algorithm_t mac,
+			   int priority,
+			   gnutls_mac_init_func init,
+			   gnutls_mac_setkey_func setkey,
+			   gnutls_mac_setnonce_func setnonce,
+			   gnutls_mac_hash_func hash,
+			   gnutls_mac_output_func output,
+			   gnutls_mac_deinit_func deinit,
+			   gnutls_mac_fast_func hash_fast);
+
+typedef int (*gnutls_digest_init_func) (gnutls_digest_algorithm_t, void **ctx);
+typedef int (*gnutls_digest_hash_func) (void *ctx, const void *text, size_t textsize);
+typedef int (*gnutls_digest_output_func) (void *src_ctx, void *digest, size_t digestsize);
+typedef void (*gnutls_digest_deinit_func) (void *ctx);
+typedef int (*gnutls_digest_fast_func) (gnutls_digest_algorithm_t,
+		     const void *text, size_t textsize, void *digest);
+
+int
+gnutls_crypto_register_digest(gnutls_digest_algorithm_t digest,
+			   int priority,
+			   gnutls_digest_init_func init,
+			   gnutls_digest_hash_func hash,
+			   gnutls_digest_output_func output,
+			   gnutls_digest_deinit_func deinit,
+			   gnutls_digest_fast_func hash_fast);
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

@@ -111,9 +111,9 @@ static const void *_get_algo(algo_list * al, int algo)
 	return NULL;
 }
 
-static cipher_list glob_cl = { GNUTLS_CIPHER_NULL, 0, NULL, NULL };
-static mac_list glob_ml = { GNUTLS_MAC_NULL, 0, NULL, NULL };
-static digest_list glob_dl = { GNUTLS_MAC_NULL, 0, NULL, NULL };
+static cipher_list glob_cl = { GNUTLS_CIPHER_NULL, 0, NULL, 0, NULL };
+static mac_list glob_ml = { GNUTLS_MAC_NULL, 0, NULL, 0, NULL };
+static digest_list glob_dl = { GNUTLS_MAC_NULL, 0, NULL, 0, NULL };
 
 static void _deregister(algo_list * cl)
 {
@@ -326,9 +326,10 @@ gnutls_crypto_rnd_register(int priority, const gnutls_crypto_rnd_st * s)
 int
 gnutls_crypto_single_mac_register(gnutls_mac_algorithm_t algorithm,
 				  int priority,
-				  const gnutls_crypto_mac_st * s)
+				  const gnutls_crypto_mac_st * s,
+				  int free_s)
 {
-	return _algo_register(&glob_ml, algorithm, priority, s, 0);
+	return _algo_register(&glob_ml, algorithm, priority, (void*)s, free_s);
 }
 
 const gnutls_crypto_mac_st *_gnutls_get_crypto_mac(gnutls_mac_algorithm_t
@@ -361,9 +362,10 @@ const gnutls_crypto_mac_st *_gnutls_get_crypto_mac(gnutls_mac_algorithm_t
 int
 gnutls_crypto_single_digest_register(gnutls_digest_algorithm_t algorithm,
 				     int priority,
-				     const gnutls_crypto_digest_st * s)
+				     const gnutls_crypto_digest_st * s,
+				     int free_s)
 {
-	return _algo_register(&glob_dl, algorithm, priority, s, 0);
+	return _algo_register(&glob_dl, algorithm, priority, (void*)s, free_s);
 }
 
 const gnutls_crypto_digest_st
@@ -442,3 +444,92 @@ int gnutls_crypto_pk_register(int priority, const gnutls_crypto_pk_st * s)
 	return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
+/**
+ * gnutls_crypto_register_mac:
+ * @algorithm: is the gnutls MAC identifier
+ * @priority: is the priority of the algorithm
+ * @init: A function which initializes the MAC
+ * @setkey: A function which sets the key of the MAC
+ * @setnonce: A function which sets the nonce for the mac (may be %NULL for common MAC algorithms)
+ * @hash: Perform the hash operation
+ * @output: Provide the output of the MAC
+ * @deinit: A function which deinitializes the MAC
+ * @hash_fast: Perform the MAC operation in one go
+ *
+ * This function will register a MAC algorithm to be used by gnutls.
+ * Any algorithm registered will override the included algorithms and
+ * by convention kernel implemented algorithms have priority of 90
+ *  and CPU-assisted of 80.
+ * The algorithm with the lowest priority will be used by gnutls.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_crypto_register_mac(gnutls_mac_algorithm_t algorithm,
+			   int priority,
+			   gnutls_mac_init_func init,
+			   gnutls_mac_setkey_func setkey,
+			   gnutls_mac_setnonce_func setnonce,
+			   gnutls_mac_hash_func hash,
+			   gnutls_mac_output_func output,
+			   gnutls_mac_deinit_func deinit,
+			   gnutls_mac_fast_func hash_fast)
+{
+	gnutls_crypto_mac_st *s = gnutls_calloc(1, sizeof(gnutls_crypto_mac_st));
+	if (s == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	s->init = init;
+	s->setkey = setkey;
+	s->setnonce = setnonce;
+	s->hash = hash;
+	s->output = output;
+	s->fast = hash_fast;
+	s->deinit = deinit;
+
+	return gnutls_crypto_single_mac_register(algorithm, priority, s, 1);
+}
+
+/**
+ * gnutls_crypto_register_digest:
+ * @algorithm: is the gnutls digest identifier
+ * @priority: is the priority of the algorithm
+ * @init: A function which initializes the digest
+ * @hash: Perform the hash operation
+ * @output: Provide the output of the digest
+ * @deinit: A function which deinitializes the digest
+ * @hash_fast: Perform the digest operation in one go
+ *
+ * This function will register a digest algorithm to be used by gnutls.
+ * Any algorithm registered will override the included algorithms and
+ * by convention kernel implemented algorithms have priority of 90
+ *  and CPU-assisted of 80.
+ * The algorithm with the lowest priority will be used by gnutls.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_crypto_register_digest(gnutls_digest_algorithm_t algorithm,
+			   int priority,
+			   gnutls_digest_init_func init,
+			   gnutls_digest_hash_func hash,
+			   gnutls_digest_output_func output,
+			   gnutls_digest_deinit_func deinit,
+			   gnutls_digest_fast_func hash_fast)
+{
+	gnutls_crypto_digest_st *s = gnutls_calloc(1, sizeof(gnutls_crypto_digest_st));
+	if (s == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	s->init = init;
+	s->hash = hash;
+	s->output = output;
+	s->fast = hash_fast;
+	s->deinit = deinit;
+
+	return gnutls_crypto_single_digest_register(algorithm, priority, s, 1);
+}

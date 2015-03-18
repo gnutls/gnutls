@@ -430,7 +430,7 @@ static int register_mac_digest(int cfd)
 		ioctl(cfd, CIOCFSESSION, &sess.ses);
 
 		ret =
-		    gnutls_crypto_single_mac_register(i, 90, &mac_struct);
+		    gnutls_crypto_single_mac_register(i, 90, &mac_struct, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -467,7 +467,7 @@ static int register_mac_digest(int cfd)
 				  gnutls_mac_get_name(i));
 		ret =
 		    gnutls_crypto_single_digest_register(i, 90,
-							 &digest_struct);
+							 &digest_struct, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

@@ -47,15 +47,13 @@ typedef struct {
 } gnutls_crypto_cipher_st;
 
 typedef struct {
-	int (*init) (gnutls_mac_algorithm_t, void **ctx);
-	int (*setkey) (void *ctx, const void *key, size_t keysize);
-	int (*setnonce) (void *ctx, const void *nonce, size_t noncesize);
-	int (*hash) (void *ctx, const void *text, size_t textsize);
-	int (*output) (void *src_ctx, void *digest, size_t digestsize);
-	void (*deinit) (void *ctx);
-	int (*fast) (gnutls_mac_algorithm_t, const void *nonce,
-		     size_t nonce_size, const void *key, size_t keysize,
-		     const void *text, size_t textsize, void *digest);
+	gnutls_mac_init_func init;
+	gnutls_mac_setkey_func setkey;
+	gnutls_mac_setnonce_func setnonce;
+	gnutls_mac_hash_func hash;
+	gnutls_mac_output_func output;
+	gnutls_mac_deinit_func deinit;
+	gnutls_mac_fast_func fast;
 
 	/* Not needed for registered on run-time. Only included
 	 * should define it. */
@@ -63,12 +61,11 @@ typedef struct {
 } gnutls_crypto_mac_st;
 
 typedef struct {
-	int (*init) (gnutls_digest_algorithm_t, void **ctx);
-	int (*hash) (void *ctx, const void *src, size_t srcsize);
-	int (*output) (void *src_ctx, void *digest, size_t digestsize);
-	void (*deinit) (void *ctx);
-	int (*fast) (gnutls_digest_algorithm_t, const void *src,
-		     size_t srcsize, void *digest);
+	gnutls_digest_init_func init;
+	gnutls_digest_hash_func hash;
+	gnutls_digest_output_func output;
+	gnutls_digest_deinit_func deinit;
+	gnutls_digest_fast_func fast;
 
 	/* Not needed for registered on run-time. Only included
 	 * should define it. */
@@ -346,12 +343,12 @@ int gnutls_crypto_single_cipher_register(gnutls_cipher_algorithm_t
 int gnutls_crypto_single_mac_register(gnutls_mac_algorithm_t algorithm,
 				      int priority,
 				      const gnutls_crypto_single_mac_st *
-				      s);
+				      s, int free_s);
 int gnutls_crypto_single_digest_register(gnutls_digest_algorithm_t
 					 algorithm, int priority,
 					 const
 					 gnutls_crypto_single_digest_st *
-					 s);
+					 s, int free_s);
 
 int gnutls_crypto_rnd_register(int priority,
 			       const gnutls_crypto_rnd_st * s);
