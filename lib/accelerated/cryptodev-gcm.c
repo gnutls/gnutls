@@ -218,10 +218,14 @@ static void aes_gcm_tag(void *_ctx, void *tag, size_t tagsize)
 	ctx->op = 0;
 }
 
+#include "x86/aes-gcm-aead.h"
+
 static const gnutls_crypto_cipher_st cipher_struct = {
 	.init = aes_gcm_cipher_init,
 	.setkey = aes_gcm_cipher_setkey,
 	.setiv = aes_gcm_setiv,
+	.aead_encrypt = aes_gcm_aead_encrypt,
+	.aead_decrypt = aes_gcm_aead_decrypt,
 	.encrypt = aes_gcm_encrypt,
 	.decrypt = aes_gcm_decrypt,
 	.deinit = aes_gcm_deinit,
