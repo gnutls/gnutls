@@ -117,14 +117,13 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		for (i = pos; i <= current; i++) {
 			if (stored_messages[msg_seq[i]] != NULL) {
 				do {
-
 					ret =
 					    send((long int)tr,
 						 stored_messages[msg_seq
 								 [i]],
 						 stored_sizes[msg_seq[i]], 0);
 				}
-				while (ret == -1 && errno == EAGAIN);
+				while (ret == -1 && (errno == EAGAIN || errno == EINTR));
 				pos++;
 			} else
 				break;
@@ -133,7 +132,7 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		do {
 			ret = send((long int)tr, data, len, 0);
 		}
-		while (ret == -1 && errno == EAGAIN);
+		while (ret == -1 && (errno == EAGAIN || errno == EINTR));
 
 		current++;
 		pos++;
@@ -146,7 +145,7 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 				 stored_messages[msg_seq[current]],
 				 stored_sizes[msg_seq[current]], 0);
 		}
-		while (ret == -1 && errno == EAGAIN);
+		while (ret == -1 && (errno == EAGAIN || errno == EINTR));
 		current++;
 		pos++;
 		return ret;
@@ -195,6 +194,7 @@ static void client(int fd)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
+	gnutls_dtls_set_timeouts(session, 50 * 1000, 600 * 1000);
 	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 	gnutls_dtls_set_mtu(session, 1500);
 
@@ -298,6 +298,7 @@ static void server(int fd)
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
+	gnutls_dtls_set_timeouts(session, 50 * 1000, 600 * 1000);
 	gnutls_transport_set_push_function(session, odd_push);
 	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 	gnutls_dtls_set_mtu(session, 1500);
