@@ -13,6 +13,7 @@ to the random number generation. For a low-level crypto API the usage of nettle
 * Public key algorithms::
 * Hash and HMAC functions::
 * Random number generation::
+* Overriding algorithms::
 @end menu
 
 @node Symmetric algorithms
@@ -68,3 +69,19 @@ function. It allows obtaining random data of various levels.
 
 @showenumdesc{gnutls_rnd_level_t,The random number levels.}
 @showfuncdesc{gnutls_rnd}
+
+@node Overriding algorithms
+@section Overriding algorithms
+@cindex overriding algorithms
+
+In systems which provide a hardware accelerated cipher implementation
+that is not directly supported by GnuTLS, it is possible to utilize it.
+There are functions which allow overriding the default cipher, digest and MAC
+implementations. Those are described below.
+
+To override public key operations see @ref{Abstract private keys}.
+
+@showfuncdesc{gnutls_crypto_register_cipher}
+@showfuncdesc{gnutls_crypto_register_aead_cipher}
+@showfuncdesc{gnutls_crypto_register_mac}
+@showfuncdesc{gnutls_crypto_register_digest}
