@@ -30,7 +30,7 @@ endif
 
 AM_LDFLAGS = -no-install
 LDADD = ../libutils.la \
-	$(top_builddir)/lib/libgnutls.la $(LTLIBGCRYPT) $(LIBSOCKET)
+	$(top_builddir)/lib/libgnutls.la $(LIBSOCKET)
 
 if !ENABLE_SELF_CHECKS
 cipher_test_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_builddir)/lib/ -I$(top_builddir)/gl/
@@ -39,6 +39,11 @@ cipher_test_CPPFLAGS = $(AM_CPPFLAGS)
 endif
 
 ctests = gendh keygen
+
+if ENABLE_NETTLE
+cipher_override_LDFLAGS = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS) $(LDADD)
+mac_override_LDFLAGS = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS) $(LDADD)
+endif
 
 check_PROGRAMS = $(ctests) cipher-test cipher-override mac-override
 TESTS = $(ctests) test-ciphers override-ciphers
