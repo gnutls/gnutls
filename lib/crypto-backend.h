@@ -30,28 +30,16 @@
 #define gnutls_crypto_single_digest_st gnutls_crypto_digest_st
 
 typedef struct {
-	int (*init) (gnutls_cipher_algorithm_t, void **ctx, int enc);
-	int (*setkey) (void *ctx, const void *key, size_t keysize);
-	int (*setiv) (void *ctx, const void *iv, size_t ivsize);
-	int (*encrypt) (void *ctx, const void *plain, size_t plainsize,
-			void *encr, size_t encrsize);
-	int (*decrypt) (void *ctx, const void *encr, size_t encrsize,
-			void *plain, size_t plainsize);
-	int (*aead_encrypt) (void *ctx,
- 			     const void *nonce, size_t noncesize,
-			     const void *auth, size_t authsize,
-			     size_t tag_size,
-			     const void *plain, size_t plainsize,
-			     void *encr, size_t encrsize);
-	int (*aead_decrypt) (void *ctx,
- 			     const void *nonce, size_t noncesize,
-			     const void *auth, size_t authsize,
-			     size_t tag_size,
-			     const void *encr, size_t encrsize,
-			     void *plain, size_t plainsize);
-	int (*auth) (void *ctx, const void *data, size_t datasize);
-	void (*tag) (void *ctx, void *tag, size_t tagsize);
-	void (*deinit) (void *ctx);
+	gnutls_cipher_init_func init;
+	gnutls_cipher_setkey_func setkey;
+	gnutls_cipher_setiv_func setiv;
+	gnutls_cipher_encrypt_func encrypt;
+	gnutls_cipher_decrypt_func decrypt;
+	gnutls_cipher_aead_encrypt_func aead_encrypt;
+	gnutls_cipher_aead_decrypt_func aead_decrypt;
+	gnutls_cipher_deinit_func deinit;
+	gnutls_cipher_auth_func auth;
+	gnutls_cipher_tag_func tag;
 
 	/* Not needed for registered on run-time. Only included
 	 * should define it. */
@@ -353,9 +341,8 @@ typedef struct gnutls_crypto_pk {
  */
 int gnutls_crypto_single_cipher_register(gnutls_cipher_algorithm_t
 					 algorithm, int priority,
-					 const
-					 gnutls_crypto_single_cipher_st *
-					 s);
+					 const gnutls_crypto_single_cipher_st *s,
+					 int free_s);
 int gnutls_crypto_single_mac_register(gnutls_mac_algorithm_t algorithm,
 				      int priority,
 				      const gnutls_crypto_single_mac_st *

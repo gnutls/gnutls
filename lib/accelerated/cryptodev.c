@@ -211,7 +211,7 @@ static int register_crypto(int cfd)
 				  gnutls_cipher_get_name(i));
 		ret =
 		    gnutls_crypto_single_cipher_register(i, 90,
-							 &cipher_struct);
+							 &cipher_struct, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

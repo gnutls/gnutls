@@ -38,7 +38,8 @@ int crypto_cipher_prio = INT_MAX;
 typedef struct algo_list {
 	int algorithm;
 	int priority;
-	const void *alg_data;
+	void *alg_data;
+	int free_alg_data;
 	struct algo_list *next;
 } algo_list;
 
@@ -47,7 +48,7 @@ typedef struct algo_list {
 #define digest_list algo_list
 
 static int
-_algo_register(algo_list * al, int algorithm, int priority, const void *s)
+_algo_register(algo_list * al, int algorithm, int priority, void *s, int free_s)
 {
 	algo_list *cl;
 	algo_list *last_cl = al;
@@ -68,6 +69,7 @@ _algo_register(algo_list * al, int algorithm, int priority, const void *s)
 				cl->algorithm = algorithm;
 				cl->priority = priority;
 				cl->alg_data = s;
+				cl->free_alg_data = free_s;
 				return 0;
 			}
 		}
@@ -123,6 +125,8 @@ static void _deregister(algo_list * cl)
 
 	while (cl) {
 		next = cl->next;
+		if (cl->free_alg_data)
+			gnutls_free(cl->alg_data);
 		gnutls_free(cl);
 		cl = next;
 	}
@@ -159,15 +163,111 @@ void _gnutls_crypto_deregister(void)
 int
 gnutls_crypto_single_cipher_register(gnutls_cipher_algorithm_t algorithm,
 				     int priority,
-				     const gnutls_crypto_cipher_st * s)
+				     const gnutls_crypto_cipher_st * s,
+				     int free_s)
 {
-	return _algo_register(&glob_cl, algorithm, priority, s);
+	/* we override const in case free_s is set */
+	return _algo_register(&glob_cl, algorithm, priority, (void*)s, free_s);
 }
 
 const gnutls_crypto_cipher_st
     *_gnutls_get_crypto_cipher(gnutls_cipher_algorithm_t algo)
 {
 	return _get_algo(&glob_cl, algo);
+}
+
+/**
+ * gnutls_crypto_register_cipher:
+ * @algorithm: is the gnutls algorithm identifier
+ * @priority: is the priority of the algorithm
+ * @init: A function which initializes the cipher
+ * @setkey: A function which sets the key of the cipher
+ * @setiv: A function which sets the nonce/IV of the cipher (non-AEAD)
+ * @encrypt: A function which performs encryption (non-AEAD)
+ * @decrypt: A function which performs decryption (non-AEAD)
+ * @deinit: A function which deinitializes the cipher
+ *
+ * This function will register a cipher algorithm to be used by
+ * gnutls.  Any algorithm registered will override the included
+ * algorithms and by convention kernel implemented algorithms have
+ * priority of 90 and CPU-assisted of 80.  The algorithm with the lowest priority will be
+ * used by gnutls.
+ *
+ * The functions which are marked as non-AEAD they are not required when
+ * registering a cipher to be used with the new AEAD API introduced in
+ * GnuTLS 3.4.0. Internally GnuTLS uses the new AEAD API.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
+			      int priority,
+			      gnutls_cipher_init_func init,
+			      gnutls_cipher_setkey_func setkey,
+			      gnutls_cipher_setiv_func setiv,
+			      gnutls_cipher_encrypt_func encrypt,
+			      gnutls_cipher_decrypt_func decrypt,
+			      gnutls_cipher_deinit_func deinit)
+{
+	gnutls_crypto_cipher_st *s = gnutls_calloc(1, sizeof(gnutls_crypto_cipher_st));
+	if (s == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	s->init = init;
+	s->setkey = setkey;
+	s->setiv = setiv;
+	s->encrypt = encrypt;
+	s->decrypt = decrypt;
+	s->deinit = deinit;
+
+	return gnutls_crypto_single_cipher_register(algorithm, priority, s, 1);
+}
+
+/**
+ * gnutls_crypto_register_aead_cipher:
+ * @algorithm: is the gnutls AEAD cipher identifier
+ * @priority: is the priority of the algorithm
+ * @init: A function which initializes the cipher
+ * @setkey: A function which sets the key of the cipher
+ * @aead_encrypt: Perform the AEAD encryption
+ * @aead_decrypt: Perform the AEAD decryption
+ * @deinit: A function which deinitializes the cipher
+ *
+ * This function will register a cipher algorithm to be used by
+ * gnutls.  Any algorithm registered will override the included
+ * algorithms and by convention kernel implemented algorithms have
+ * priority of 90 and CPU-assisted of 80.  The algorithm with the lowest priority will be
+ * used by gnutls.
+ *
+ * The functions registered will be used with the new AEAD API introduced in
+ * GnuTLS 3.4.0. Internally GnuTLS uses the new AEAD API.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
+			      int priority,
+			      gnutls_cipher_init_func init,
+			      gnutls_cipher_setkey_func setkey,
+			      gnutls_cipher_aead_encrypt_func aead_encrypt,
+			      gnutls_cipher_aead_decrypt_func aead_decrypt,
+			      gnutls_cipher_deinit_func deinit)
+{
+	gnutls_crypto_cipher_st *s = gnutls_calloc(1, sizeof(gnutls_crypto_cipher_st));
+	if (s == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	s->init = init;
+	s->setkey = setkey;
+	s->aead_encrypt = aead_encrypt;
+	s->aead_decrypt = aead_decrypt;
+	s->deinit = deinit;
+
+	return gnutls_crypto_single_cipher_register(algorithm, priority, s, 1);
 }
 
 /*-
@@ -228,7 +328,7 @@ gnutls_crypto_single_mac_register(gnutls_mac_algorithm_t algorithm,
 				  int priority,
 				  const gnutls_crypto_mac_st * s)
 {
-	return _algo_register(&glob_ml, algorithm, priority, s);
+	return _algo_register(&glob_ml, algorithm, priority, s, 0);
 }
 
 const gnutls_crypto_mac_st *_gnutls_get_crypto_mac(gnutls_mac_algorithm_t
@@ -263,7 +363,7 @@ gnutls_crypto_single_digest_register(gnutls_digest_algorithm_t algorithm,
 				     int priority,
 				     const gnutls_crypto_digest_st * s)
 {
-	return _algo_register(&glob_dl, algorithm, priority, s);
+	return _algo_register(&glob_dl, algorithm, priority, s, 0);
 }
 
 const gnutls_crypto_digest_st

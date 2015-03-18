@@ -135,6 +135,52 @@ int gnutls_rnd(gnutls_rnd_level_t level, void *data, size_t len);
 
 void gnutls_rnd_refresh(void);
 
+typedef int (*gnutls_cipher_init_func) (gnutls_cipher_algorithm_t, void **ctx, int enc);
+typedef int (*gnutls_cipher_setkey_func) (void *ctx, const void *key, size_t keysize);
+/* old style ciphers */
+typedef int (*gnutls_cipher_setiv_func) (void *ctx, const void *iv, size_t ivsize);
+typedef int (*gnutls_cipher_encrypt_func) (void *ctx, const void *plain, size_t plainsize,
+				void *encr, size_t encrsize);
+typedef int (*gnutls_cipher_decrypt_func) (void *ctx, const void *encr, size_t encrsize,
+			void *plain, size_t plainsize);
+
+/* aead ciphers */
+typedef int (*gnutls_cipher_auth_func) (void *ctx, const void *data, size_t datasize);
+typedef void (*gnutls_cipher_tag_func) (void *ctx, void *tag, size_t tagsize);
+
+typedef int (*gnutls_cipher_aead_encrypt_func) (void *ctx,
+ 			     const void *nonce, size_t noncesize,
+			     const void *auth, size_t authsize,
+			     size_t tag_size,
+			     const void *plain, size_t plainsize,
+			     void *encr, size_t encrsize);
+typedef int (*gnutls_cipher_aead_decrypt_func) (void *ctx,
+ 			     const void *nonce, size_t noncesize,
+			     const void *auth, size_t authsize,
+			     size_t tag_size,
+			     const void *encr, size_t encrsize,
+			     void *plain, size_t plainsize);
+typedef void (*gnutls_cipher_deinit_func) (void *ctx);
+
+int
+gnutls_crypto_register_cipher(gnutls_cipher_algorithm_t algorithm,
+			      int priority,
+			      gnutls_cipher_init_func init,
+			      gnutls_cipher_setkey_func setkey,
+			      gnutls_cipher_setiv_func setiv,
+			      gnutls_cipher_encrypt_func encrypt,
+			      gnutls_cipher_decrypt_func decrypt,
+			      gnutls_cipher_deinit_func deinit);
+
+int
+gnutls_crypto_register_aead_cipher(gnutls_cipher_algorithm_t algorithm,
+			      int priority,
+			      gnutls_cipher_init_func init,
+			      gnutls_cipher_setkey_func setkey,
+			      gnutls_cipher_aead_encrypt_func aead_encrypt,
+			      gnutls_cipher_aead_decrypt_func aead_decrypt,
+			      gnutls_cipher_deinit_func deinit);
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 }

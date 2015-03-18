@@ -1015,7 +1015,9 @@ GNUTLS_3_4
 	gnutls_record_set_state;
 	gnutls_record_get_state;
 	gnutls_pkcs11_obj_set_info;
-  local:
+	gnutls_crypto_register_cipher;
+	gnutls_crypto_register_aead_cipher;
+ local:
 	*;
 };
 

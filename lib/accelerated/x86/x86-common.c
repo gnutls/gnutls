@@ -193,7 +193,7 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		    ("Padlock AES accelerator was detected\n");
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aes_padlock);
+		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aes_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -202,21 +202,21 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_128_GCM, 80,
-		     &_gnutls_aes_gcm_padlock);
+		     &_gnutls_aes_gcm_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 #ifdef HAVE_LIBNETTLE
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aes_padlock);
+		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aes_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aes_padlock);
+		    (GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aes_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -224,7 +224,7 @@ void register_x86_padlock_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_256_GCM, 80,
-		     &_gnutls_aes_gcm_padlock);
+		     &_gnutls_aes_gcm_padlock, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -394,7 +394,7 @@ void register_x86_intel_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_128_GCM, 90,
-		     &_gnutls_aes_gcm_x86_ssse3);
+		     &_gnutls_aes_gcm_x86_ssse3, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
@@ -402,28 +402,28 @@ void register_x86_intel_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_256_GCM, 90,
-		     &_gnutls_aes_gcm_x86_ssse3);
+		     &_gnutls_aes_gcm_x86_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 90, &_gnutls_aes_ssse3);
+		    (GNUTLS_CIPHER_AES_128_CBC, 90, &_gnutls_aes_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 90, &_gnutls_aes_ssse3);
+		    (GNUTLS_CIPHER_AES_192_CBC, 90, &_gnutls_aes_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 90, &_gnutls_aes_ssse3);
+		    (GNUTLS_CIPHER_AES_256_CBC, 90, &_gnutls_aes_ssse3, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -508,21 +508,21 @@ void register_x86_intel_crypto(unsigned capabilities)
 		_gnutls_debug_log("Intel AES accelerator was detected\n");
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aesni_x86);
+		    (GNUTLS_CIPHER_AES_128_CBC, 80, &_gnutls_aesni_x86, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aesni_x86);
+		    (GNUTLS_CIPHER_AES_192_CBC, 80, &_gnutls_aesni_x86, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
 
 		ret =
 		    gnutls_crypto_single_cipher_register
-		    (GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aesni_x86);
+		    (GNUTLS_CIPHER_AES_256_CBC, 80, &_gnutls_aesni_x86, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -530,7 +530,7 @@ void register_x86_intel_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_128_CCM, 80,
-		     &_gnutls_aes_ccm_x86_aesni);
+		     &_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -538,7 +538,7 @@ void register_x86_intel_crypto(unsigned capabilities)
 		ret =
 		    gnutls_crypto_single_cipher_register
 		    (GNUTLS_CIPHER_AES_256_CCM, 80,
-		     &_gnutls_aes_ccm_x86_aesni);
+		     &_gnutls_aes_ccm_x86_aesni, 0);
 		if (ret < 0) {
 			gnutls_assert();
 		}
@@ -551,7 +551,7 @@ void register_x86_intel_crypto(unsigned capabilities)
 			ret =
 			    gnutls_crypto_single_cipher_register
 			    (GNUTLS_CIPHER_AES_128_GCM, 80,
-			     &_gnutls_aes_gcm_pclmul);
+			     &_gnutls_aes_gcm_pclmul, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
@@ -559,7 +559,7 @@ void register_x86_intel_crypto(unsigned capabilities)
 			ret =
 			    gnutls_crypto_single_cipher_register
 			    (GNUTLS_CIPHER_AES_256_GCM, 80,
-			     &_gnutls_aes_gcm_pclmul);
+			     &_gnutls_aes_gcm_pclmul, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
@@ -569,7 +569,7 @@ void register_x86_intel_crypto(unsigned capabilities)
 			ret =
 			    gnutls_crypto_single_cipher_register
 			    (GNUTLS_CIPHER_AES_128_GCM, 80,
-			     &_gnutls_aes_gcm_x86_aesni);
+			     &_gnutls_aes_gcm_x86_aesni, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
@@ -577,7 +577,7 @@ void register_x86_intel_crypto(unsigned capabilities)
 			ret =
 			    gnutls_crypto_single_cipher_register
 			    (GNUTLS_CIPHER_AES_256_GCM, 80,
-			     &_gnutls_aes_gcm_x86_aesni);
+			     &_gnutls_aes_gcm_x86_aesni, 0);
 			if (ret < 0) {
 				gnutls_assert();
 			}
