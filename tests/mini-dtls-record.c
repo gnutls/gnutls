@@ -245,12 +245,15 @@ static void client(int fd)
 			    seq[7] | (seq[6] << 8) | (seq[5] << 16) |
 			    (seq[4] << 24);
 
+			if (debug)
+				success("received %u\n", (unsigned int)useq);
+
 			if (recv_msg_seq[current] == -1) {
 				fail("received message sequence differs\n");
 				terminate();
 			}
 
-			if ((uint32_t) recv_msg_seq[current] != (uint32_t) useq) {
+			if (((uint32_t)recv_msg_seq[current]) != ((uint32_t)useq)) {
 				fail("received message sequence differs (current: %u, got: %u, expected: %u)\n",
 				     (unsigned)current, (unsigned)useq, (unsigned)recv_msg_seq[current]);
 				terminate();
