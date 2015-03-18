@@ -40,7 +40,7 @@ endif
 
 ctests = gendh keygen
 
-check_PROGRAMS = $(ctests) cipher-test cipher-override
+check_PROGRAMS = $(ctests) cipher-test cipher-override mac-override
 TESTS = $(ctests) test-ciphers override-ciphers
 
 EXTRA_DIST = README
