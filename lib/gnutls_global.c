@@ -189,9 +189,10 @@ static int _gnutls_init_ret = 0;
  * function can be called many times, but will only do something the
  * first time.
  *
- * Since GnuTLS 3.3.0 this function is only required in systems that
- * do not support library constructors and static linking. This
- * function also became thread safe.
+ * Since GnuTLS 3.3.0 this function is automatically called on library
+ * constructor. Since the same version this function is also thread safe.
+ * The automatic initialization can be avoided if the environment variable
+ * %GNUTLS_NO_EXPLICIT_INIT is set to be 1.
  *
  * A subsequent call of this function if the initial has failed will
  * return the same error code.
@@ -446,6 +447,14 @@ const char *gnutls_check_version(const char *req_version)
 static void _CONSTRUCTOR lib_init(void)
 {
 int ret;
+const char *e;
+
+	e = getenv("GNUTLS_NO_EXPLICIT_INIT");
+	if (e != NULL) {
+		ret = atoi(e);
+		if (ret == 1)
+			return;
+	}
 
 	ret = gnutls_global_init();
 	if (ret < 0) {
@@ -456,5 +465,14 @@ int ret;
 
 static void _DESTRUCTOR lib_deinit(void)
 {
+	const char *e;
+
+	e = getenv("GNUTLS_NO_EXPLICIT_INIT");
+	if (e != NULL) {
+		int ret = atoi(e);
+		if (ret == 1)
+			return;
+	}
+
 	_gnutls_global_deinit(1);
 }
