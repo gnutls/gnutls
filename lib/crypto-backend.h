@@ -366,13 +366,6 @@ int gnutls_crypto_single_digest_register(gnutls_digest_algorithm_t
 					 gnutls_crypto_single_digest_st *
 					 s);
 
-int gnutls_crypto_cipher_register(int priority,
-				  const gnutls_crypto_cipher_st * s);
-int gnutls_crypto_mac_register(int priority,
-			       const gnutls_crypto_mac_st * s);
-int gnutls_crypto_digest_register(int priority,
-				  const gnutls_crypto_digest_st * s);
-
 int gnutls_crypto_rnd_register(int priority,
 			       const gnutls_crypto_rnd_st * s);
 int gnutls_crypto_pk_register(int priority, const gnutls_crypto_pk_st * s);
