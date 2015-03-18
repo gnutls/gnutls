@@ -82,6 +82,9 @@ types, which express certificates and keys using gnutls_register_custom_url().
 allows for gnutls_record_send() and recv() to be offloaded (to kernel,
 hardware or any other subsystem).
 
+** libgnutls: Added API to override existing ciphers, digests and MACs, e.g.,
+to override AES-GCM using a system-specific accelerator (crypto.h).
+
 ** libgnutls-openssl: it is no longer built by default.
 
 ** certtool: Added --p8-info option, which will print PKCS #8 information
@@ -163,6 +166,10 @@ gnutls_register_custom_url: Added
 gnutls_pkcs11_obj_list_import_url3: Added
 gnutls_pkcs11_obj_list_import_url4: Added
 gnutls_pkcs11_obj_set_info: Added
+gnutls_crypto_register_cipher: Added
+gnutls_crypto_register_aead_cipher: Added
+gnutls_crypto_register_mac: Added
+gnutls_crypto_register_digest: Added
 gnutls_handshake_set_hook_function: Modified
 gnutls_pkcs11_obj_list_import_url: Removed
 gnutls_pkcs11_obj_list_import_url2: Removed
