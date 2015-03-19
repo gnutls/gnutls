@@ -205,7 +205,7 @@ _gnutls_parse_supplemental(gnutls_session_t session,
 	return 0;
 }
 
-int
+static int
 _gnutls_supplemental_register(gnutls_supplemental_entry *entry)
 {
 	gnutls_supplemental_entry *p;

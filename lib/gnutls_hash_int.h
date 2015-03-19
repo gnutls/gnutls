@@ -40,13 +40,13 @@ typedef int (*hash_func) (void *handle, const void *text, size_t size);
 typedef int (*nonce_func) (void *handle, const void *text, size_t size);
 typedef int (*output_func) (void *src_ctx, void *digest,
 			    size_t digestsize);
-typedef void (*deinit_func) (void *handle);
+typedef void (*hash_deinit_func) (void *handle);
 
 typedef struct {
 	const mac_entry_st *e;
 	hash_func hash;
 	output_func output;
-	deinit_func deinit;
+	hash_deinit_func deinit;
 
 	const void *key;	/* esoteric use by SSL3 MAC functions */
 	int keysize;
@@ -61,7 +61,7 @@ typedef struct {
 	hash_func hash;
 	nonce_func setnonce;
 	output_func output;
-	deinit_func deinit;
+	hash_deinit_func deinit;
 
 	void *handle;
 } mac_hd_st;
