@@ -143,7 +143,7 @@ static void client(int sd)
 
 	gnutls_transport_set_int(session, sd);
 
-	gnutls_ext_register("ext_client", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL, NULL);
+	gnutls_ext_register("ext_client", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_client_params, ext_send_client_params, NULL, NULL, NULL);
 
 	/* Perform the TLS handshake
 	 */
@@ -251,7 +251,7 @@ static void server(int sd)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 			       serverx509cred);
 
-	gnutls_ext_register("ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL, NULL);
+	gnutls_ext_register("ext_server", TLSEXT_TYPE_SAMPLE, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
 
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
