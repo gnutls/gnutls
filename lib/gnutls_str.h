@@ -33,7 +33,7 @@ void _gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,
 		     size_t src_size);
 void _gnutls_str_cat(char *dest, size_t dest_tot_size, const char *src);
 
-typedef struct gnutls_buffer{
+typedef struct gnutls_buffer_st {
 	uint8_t *allocd;	/* pointer to allocated data */
 	uint8_t *data;		/* API: pointer to data to copy from */
 	size_t max_length;

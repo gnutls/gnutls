@@ -89,7 +89,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu \
 	 mini-dtls-record-asym openpgp-callback key-import-export \
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
-	 strict-der
+	 strict-der mini-extension
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 

@@ -86,7 +86,7 @@ static int ext_recv_client_params(gnutls_session_t session, const unsigned char 
 	return 0; //Success
 }
 
-static int ext_send_client_params(gnutls_session_t session, gnutls_buffer_st * extdata)
+static int ext_send_client_params(gnutls_session_t session, gnutls_buffer_t extdata)
 {
 	TLSEXT_TYPE_client_sent = 1;
 	gnutls_buffer_append_data(extdata, ext_data, sizeof(ext_data));
@@ -106,7 +106,7 @@ static int ext_recv_server_params(gnutls_session_t session, const unsigned char 
 	return 0; //Success
 }
 
-static int ext_send_server_params(gnutls_session_t session, gnutls_buffer_st * extdata)
+static int ext_send_server_params(gnutls_session_t session, gnutls_buffer_t extdata)
 {
 	TLSEXT_TYPE_server_sent = 1;
 	gnutls_buffer_append_data(extdata, ext_data, sizeof(ext_data));

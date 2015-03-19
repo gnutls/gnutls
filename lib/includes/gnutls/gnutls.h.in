@@ -2218,9 +2218,9 @@ void gnutls_certificate_set_pin_function(gnutls_certificate_credentials_t,
 					 void *userdata);
 
 /* Public string related functions */
-typedef struct gnutls_buffer gnutls_buffer_st;
+typedef struct gnutls_buffer_st *gnutls_buffer_t;
 
-int gnutls_buffer_append_data(gnutls_buffer_st *, const void *data, size_t data_size);
+int gnutls_buffer_append_data(gnutls_buffer_t, const void *data, size_t data_size);
 
 /* Public extensions related functions */
 
@@ -2234,14 +2234,14 @@ typedef int (*gnutls_ext_recv_func) (gnutls_session_t session,
 					 size_t len);
 
 typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
-					 gnutls_buffer_st * extdata);
+					 gnutls_buffer_t extdata);
 
 typedef void (*gnutls_ext_deinit_data_func) (extension_priv_data_t data);
 
 typedef int (*gnutls_ext_pack_func) (extension_priv_data_t data,
-					 gnutls_buffer_st * packed_data);
+					 gnutls_buffer_t packed_data);
 
-typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_st * packed_data,
+typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_t packed_data,
 					   extension_priv_data_t * data);
 
 typedef int (*gnutls_ext_epoch_func) (gnutls_session_t session);
