@@ -248,7 +248,7 @@ _gnutls_supplemental_register(gnutls_supplemental_entry *entry)
  *
  * This function will register a new supplemental data type (rfc4680).
  * The registered data will remain until gnutls_global_deinit()
- * is called.
+ * is called. This function is not thread safe.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *

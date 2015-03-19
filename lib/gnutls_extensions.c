@@ -732,7 +732,8 @@ _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
  * @unpack_func: a function which will deserialize the extension's private data
  *
  * This function will register a new extension type. The extension will remain
- * registered until gnutls_global_deinit() is called.
+ * registered until gnutls_global_deinit() is called. This function is not
+ * thread safe.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
