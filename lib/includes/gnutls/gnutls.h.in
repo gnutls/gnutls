@@ -1057,9 +1057,7 @@ unsigned gnutls_session_etm_status(gnutls_session_t session);
  *
  * Enumeration of different supplemental data types (RFC 4680).
  */
-typedef enum {
-	GNUTLS_SUPPLEMENTAL_USER_MAPPING_DATA = 0
-} gnutls_supplemental_data_format_type_t;
+typedef int gnutls_supplemental_data_format_type_t;
 
 const char
 *gnutls_supplemental_get_name(gnutls_supplemental_data_format_type_t type);
@@ -2274,6 +2272,21 @@ int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t pars
 				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
 				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
 				gnutls_ext_unpack_func unpack_func, gnutls_ext_epoch_func epoch_func);
+
+/* Public supplemental data related functions */
+
+typedef int (*supp_recv_func) (gnutls_session_t session,
+			       const unsigned char * data, size_t data_size);
+typedef int (*supp_send_func) (gnutls_session_t session,
+			       gnutls_buffer_st * buf);
+
+int gnutls_supplemental_register(const char *name, 
+				gnutls_supplemental_data_format_type_t type, 
+				supp_recv_func supp_recv_func, supp_send_func supp_send_func);
+
+void gnutls_do_recv_supplemental(gnutls_session_t session, int do_recv_supplemental);
+
+void gnutls_do_send_supplemental(gnutls_session_t session, int do_send_supplemental);
 
 /* FIPS140-2 related functions */
 int gnutls_fips140_mode_enabled(void);

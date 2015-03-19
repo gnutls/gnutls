@@ -43,15 +43,11 @@
  * want to send any data, it is fine to return without doing anything.
  */
 
+#include <gnutls/gnutls.h>
 #include "gnutls_int.h"
 #include "gnutls_supplemental.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
-
-typedef int (*supp_recv_func) (gnutls_session_t session,
-			       const uint8_t * data, size_t data_size);
-typedef int (*supp_send_func) (gnutls_session_t session,
-			       gnutls_buffer_st * buf);
 
 typedef struct {
 	const char *name;
@@ -60,9 +56,8 @@ typedef struct {
 	supp_send_func supp_send_func;
 } gnutls_supplemental_entry;
 
-gnutls_supplemental_entry _gnutls_supplemental[] = {
-	{0, 0, 0, 0}
-};
+static size_t suppfunc_size = 0;
+static gnutls_supplemental_entry *suppfunc = NULL;
 
 /**
  * gnutls_supplemental_get_name:
@@ -78,11 +73,12 @@ const char
     *gnutls_supplemental_get_name(gnutls_supplemental_data_format_type_t
 				  type)
 {
-	gnutls_supplemental_entry *p;
+	size_t i;
 
-	for (p = _gnutls_supplemental; p->name != NULL; p++)
-		if (p->type == type)
-			return p->name;
+	for (i = 0; i < suppfunc_size; i++) {
+		if (suppfunc[i].type == type)
+			return suppfunc[i].name;
+	}
 
 	return NULL;
 }
@@ -90,11 +86,12 @@ const char
 static supp_recv_func
 get_supp_func_recv(gnutls_supplemental_data_format_type_t type)
 {
-	gnutls_supplemental_entry *p;
+	size_t i;
 
-	for (p = _gnutls_supplemental; p->name != NULL; p++)
-		if (p->type == type)
-			return p->supp_recv_func;
+	for (i = 0; i < suppfunc_size; i++) {
+		if (suppfunc[i].type == type)
+			return suppfunc[i].supp_recv_func;
+	}
 
 	return NULL;
 }
@@ -102,6 +99,7 @@ get_supp_func_recv(gnutls_supplemental_data_format_type_t type)
 int
 _gnutls_gen_supplemental(gnutls_session_t session, gnutls_buffer_st * buf)
 {
+	size_t i;
 	gnutls_supplemental_entry *p;
 	int ret;
 
@@ -112,7 +110,8 @@ _gnutls_gen_supplemental(gnutls_session_t session, gnutls_buffer_st * buf)
 		return ret;
 	}
 
-	for (p = _gnutls_supplemental; p->name; p++) {
+	for (i = 0; i < suppfunc_size; i++) {
+		p = &suppfunc[i];
 		supp_send_func supp_send = p->supp_send_func;
 		size_t sizepos = buf->length;
 
@@ -204,4 +203,50 @@ _gnutls_parse_supplemental(gnutls_session_t session,
 	while (dsize > 0);
 
 	return 0;
+}
+
+int
+_gnutls_supplemental_register(gnutls_supplemental_entry *entry)
+{
+	gnutls_supplemental_entry *p;
+
+	p = gnutls_realloc_fast(suppfunc,
+				sizeof(*suppfunc) * (suppfunc_size + 1));
+	if (!p) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	suppfunc = p;
+
+	memcpy(&suppfunc[suppfunc_size], entry, sizeof(*entry));
+
+	suppfunc_size++;
+
+	return GNUTLS_E_SUCCESS;
+}
+
+int
+gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_type_t type, supp_recv_func recv_func, supp_send_func send_func)
+{
+	gnutls_supplemental_entry tmp_entry;
+
+	tmp_entry.name = name;
+	tmp_entry.type = type;
+	tmp_entry.supp_recv_func = recv_func;
+	tmp_entry.supp_send_func = send_func;
+	
+	return _gnutls_supplemental_register(&tmp_entry);
+}
+
+void
+gnutls_do_recv_supplemental(gnutls_session_t session, int do_recv_supplemental)
+{
+	session->security_parameters.do_recv_supplemental = do_recv_supplemental;
+}
+
+void
+gnutls_do_send_supplemental(gnutls_session_t session, int do_send_supplemental)
+{
+	session->security_parameters.do_send_supplemental = do_send_supplemental;
 }

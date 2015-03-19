@@ -1021,6 +1021,9 @@ GNUTLS_3_4
 	gnutls_crypto_register_digest;
 	gnutls_ext_register;
 	gnutls_buffer_append_data;
+	gnutls_supplemental_register;
+	gnutls_do_recv_supplemental;
+	gnutls_do_send_supplemental;
  local:
 	*;
 };
