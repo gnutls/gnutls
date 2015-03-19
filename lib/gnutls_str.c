@@ -114,14 +114,20 @@ static void align_allocd_with_data(gnutls_buffer_st * dest)
 	dest->data = dest->allocd;
 }
 
+/**
+ * gnutls_buffer_append_data:
+ * @dest: the buffer to append to
+ * @data: the data
+ * @data_size: the size of @data
+ *
+ * Appends the provided @data to the destination buffer.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.0
+ **/
 int
-gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data, size_t data_size)
-{
-	return _gnutls_buffer_append_data(dest, data, data_size);
-}
-
-int
-_gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
+gnutls_buffer_append_data(gnutls_buffer_t dest, const void *data,
 			   size_t data_size)
 {
 	size_t const tot_len = data_size + dest->length;

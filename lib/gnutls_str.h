@@ -56,8 +56,8 @@ inline static void _gnutls_buffer_reset(gnutls_buffer_st * buf)
 int _gnutls_buffer_resize(gnutls_buffer_st *, size_t new_size);
 
 int _gnutls_buffer_append_str(gnutls_buffer_st *, const char *str);
-int _gnutls_buffer_append_data(gnutls_buffer_st *, const void *data,
-			       size_t data_size);
+
+#define _gnutls_buffer_append_data gnutls_buffer_append_data
 
 #include <gnutls_num.h>
 

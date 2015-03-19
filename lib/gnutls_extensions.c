@@ -731,11 +731,28 @@ _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
 	return GNUTLS_E_INVALID_REQUEST;
 }
 
+/**
+ * gnutls_ext_register:
+ * @name: the name of the extension to register
+ * @type: the numeric id of the extension
+ * @parse_type: the parse type of the extension (see gnutls_ext_parse_type_t)
+ * @recv_func: a function to receive the data
+ * @send_func: a function to send the data
+ * @deinit_func: a function deinitialize any private data
+ * @pack_func: a function which serializes the extension's private data (used on session packing for resumption)
+ * @unpack_func: a function which will deserialize the extension's private data
+ *
+ * This function will register a new extension type.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.0
+ **/
 int 
 gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_type,
-				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
-				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
-				gnutls_ext_unpack_func unpack_func, gnutls_ext_epoch_func epoch_func)
+		    gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
+		    gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
+		    gnutls_ext_unpack_func unpack_func, gnutls_ext_epoch_func epoch_func)
 {
 	extension_entry_st tmp_mod;
 

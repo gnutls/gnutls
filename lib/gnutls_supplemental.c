@@ -226,8 +226,22 @@ _gnutls_supplemental_register(gnutls_supplemental_entry *entry)
 	return GNUTLS_E_SUCCESS;
 }
 
+/**
+ * gnutls_supplemental_register:
+ * @name: the name of the supplemental data to register
+ * @type: the type of the supplemental data format
+ * @recv_func: the function to receive the data
+ * @send_func: the function to send the data
+ *
+ * This function will register a new supplemental data type (rfc4680).
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.0
+ **/
 int
-gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_type_t type, supp_recv_func recv_func, supp_send_func send_func)
+gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_type_t type,
+                             supp_recv_func recv_func, supp_send_func send_func)
 {
 	gnutls_supplemental_entry tmp_entry;
 
