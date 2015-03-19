@@ -81,14 +81,8 @@ typedef struct {
 							 */
 	gnutls_ext_pack_func pack_func;	/* packs internal data to machine independent format */
 	gnutls_ext_unpack_func unpack_func;	/* unpacks internal data */
-	gnutls_ext_epoch_func epoch_func;	/* called after the handshake is finished */
 } extension_entry_st;
 
 int _gnutls_ext_register(extension_entry_st *);
-
-int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_type,
-				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
-				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
-				gnutls_ext_unpack_func unpack_func, gnutls_ext_epoch_func epoch_func);
 
 #endif

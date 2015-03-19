@@ -419,23 +419,6 @@ int _gnutls_ext_register(extension_entry_st * mod)
 	return GNUTLS_E_SUCCESS;
 }
 
-int _gnutls_ext_before_epoch_change(gnutls_session_t session)
-{
-	unsigned int i;
-	int ret;
-
-	for (i = 0; i < extfunc_size; i++) {
-		if (extfunc[i].epoch_func != NULL) {
-			ret = extfunc[i].epoch_func(session);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-		}
-	}
-
-	return 0;
-}
-
-
 int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st * packed)
 {
 	unsigned int i;
@@ -752,7 +735,7 @@ int
 gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_type,
 		    gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
 		    gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
-		    gnutls_ext_unpack_func unpack_func, gnutls_ext_epoch_func epoch_func)
+		    gnutls_ext_unpack_func unpack_func)
 {
 	extension_entry_st tmp_mod;
 
@@ -764,7 +747,6 @@ gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_ty
 	tmp_mod.deinit_func = deinit_func;
 	tmp_mod.pack_func = pack_func;
 	tmp_mod.unpack_func = unpack_func;
-	tmp_mod.epoch_func = epoch_func;
 
 	return _gnutls_ext_register(&tmp_mod);
 }

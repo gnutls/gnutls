@@ -2959,10 +2959,6 @@ static int send_handshake_final(gnutls_session_t session, int init)
 		/* Initialize the connection session (start encryption) - in case of client 
 		 */
 		if (init == TRUE) {
-			ret = _gnutls_ext_before_epoch_change(session);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-
 			ret = _gnutls_connection_state_init(session);
 			if (ret < 0) {
 				gnutls_assert();
@@ -3049,10 +3045,6 @@ static int recv_handshake_final(gnutls_session_t session, int init)
 
 		/* Initialize the connection session (start encryption) - in case of server */
 		if (init == TRUE) {
-			ret = _gnutls_ext_before_epoch_change(session);
-			if (ret < 0)
-				return gnutls_assert_val(ret);
-
 			ret = _gnutls_connection_state_init(session);
 			if (ret < 0) {
 				gnutls_assert();
