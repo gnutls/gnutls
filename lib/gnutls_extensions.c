@@ -50,7 +50,6 @@
 static void _gnutls_ext_unset_resumed_session_data(gnutls_session_t
 						   session, uint16_t type);
 
-
 static size_t extfunc_size = 0;
 static extension_entry_st *extfunc = NULL;
 
@@ -394,6 +393,13 @@ int _gnutls_ext_init(void)
 
 void _gnutls_ext_deinit(void)
 {
+	unsigned i;
+	for (i = 0; i < extfunc_size; i++) {
+		if (extfunc[i].free_name != 0) {
+			gnutls_free((void*)extfunc[i].name);
+		}
+	}
+
 	gnutls_free(extfunc);
 	extfunc = NULL;
 	extfunc_size = 0;
@@ -725,7 +731,8 @@ _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
  * @pack_func: a function which serializes the extension's private data (used on session packing for resumption)
  * @unpack_func: a function which will deserialize the extension's private data
  *
- * This function will register a new extension type.
+ * This function will register a new extension type. The extension will remain
+ * registered until gnutls_global_deinit() is called.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -739,7 +746,10 @@ gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_ty
 {
 	extension_entry_st tmp_mod;
 
-	tmp_mod.name = name;
+	memset(&tmp_mod, 0, sizeof(tmp_mod));
+
+	tmp_mod.name = gnutls_strdup(name);
+	tmp_mod.free_name = 1;
 	tmp_mod.type = type;
 	tmp_mod.parse_type = parse_type;
 	tmp_mod.recv_func = recv_func;
