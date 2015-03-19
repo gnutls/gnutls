@@ -419,6 +419,7 @@ gnutls_pkcs11_copy_attached_extension(const char *token_url,
 				      const char *label,
 				      unsigned int flags);
 
+#define gnutls_x509_crt_import_pkcs11_url gnutls_x509_crt_import_url
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
