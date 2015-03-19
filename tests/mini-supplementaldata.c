@@ -86,7 +86,7 @@ int supp_client_recv_func(gnutls_session_t session, const unsigned char *buf, si
 	return GNUTLS_E_SUCCESS;
 }
 
-int supp_client_send_func(gnutls_session_t session, gnutls_buffer_st * buf)
+int supp_client_send_func(gnutls_session_t session, gnutls_buffer_t buf)
 {
 	TLS_SUPPLEMENTALDATA_client_sent = 1;
 	gnutls_buffer_append_data(buf, supp_data, sizeof(supp_data));
@@ -106,7 +106,7 @@ int supp_server_recv_func(gnutls_session_t session, const unsigned char *buf, si
 	return GNUTLS_E_SUCCESS;
 }
 
-int supp_server_send_func(gnutls_session_t session, gnutls_buffer_st * buf)
+int supp_server_send_func(gnutls_session_t session, gnutls_buffer_t buf)
 {
 	TLS_SUPPLEMENTALDATA_server_sent = 1;
 	gnutls_buffer_append_data(buf, supp_data, sizeof(supp_data));

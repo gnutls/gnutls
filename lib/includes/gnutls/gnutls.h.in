@@ -2278,7 +2278,7 @@ int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t pars
 typedef int (*supp_recv_func) (gnutls_session_t session,
 			       const unsigned char * data, size_t data_size);
 typedef int (*supp_send_func) (gnutls_session_t session,
-			       gnutls_buffer_st * buf);
+			       gnutls_buffer_t buf);
 
 int gnutls_supplemental_register(const char *name, 
 				gnutls_supplemental_data_format_type_t type, 
