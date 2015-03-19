@@ -158,7 +158,7 @@ static void client(int sd)
 			success("client: Handshake was completed\n");
 	}
 
-	if (TLSEXT_TYPE_client_sent != 1 && TLSEXT_TYPE_client_received != 1)
+	if (TLSEXT_TYPE_client_sent != 1 || TLSEXT_TYPE_client_received != 1)
 		fail("client: extension not properly sent/received\n");
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
@@ -265,7 +265,7 @@ static void server(int sd)
 	if (debug)
 		success("server: Handshake was completed\n");
 
-	if (TLSEXT_TYPE_server_sent != 1 && TLSEXT_TYPE_server_received != 1)
+	if (TLSEXT_TYPE_server_sent != 1 || TLSEXT_TYPE_server_received != 1)
 		fail("server: extension not properly sent/received\n");
 
 	/* do not wait for the peer to close the connection.
