@@ -389,6 +389,8 @@ static void _gnutls_global_deinit(unsigned destructor)
 		gnutls_system_global_deinit();
 		_gnutls_cryptodev_deinit();
 
+		_gnutls_supplemental_deinit();
+
 #ifdef ENABLE_PKCS11
 		/* Do not try to deinitialize the PKCS #11 libraries
 		 * from the destructor. If we do and the PKCS #11 modules

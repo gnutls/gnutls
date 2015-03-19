@@ -50,7 +50,7 @@
 #include "gnutls_num.h"
 
 typedef struct {
-	const char *name;
+	char *name;
 	gnutls_supplemental_data_format_type_t type;
 	supp_recv_func supp_recv_func;
 	supp_send_func supp_send_func;
@@ -81,6 +81,19 @@ const char
 	}
 
 	return NULL;
+}
+
+void _gnutls_supplemental_deinit(void)
+{
+	unsigned i;
+
+	for (i = 0; i < suppfunc_size; i++) {
+		gnutls_free(suppfunc[i].name);
+	}
+	gnutls_free(suppfunc);
+
+	suppfunc = NULL;
+	suppfunc_size = 0;
 }
 
 static supp_recv_func
@@ -234,6 +247,8 @@ _gnutls_supplemental_register(gnutls_supplemental_entry *entry)
  * @send_func: the function to send the data
  *
  * This function will register a new supplemental data type (rfc4680).
+ * The registered data will remain until gnutls_global_deinit()
+ * is called.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -245,7 +260,7 @@ gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_t
 {
 	gnutls_supplemental_entry tmp_entry;
 
-	tmp_entry.name = name;
+	tmp_entry.name = strdup(name);
 	tmp_entry.type = type;
 	tmp_entry.supp_recv_func = recv_func;
 	tmp_entry.supp_send_func = send_func;
