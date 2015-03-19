@@ -57,9 +57,9 @@
  */
 typedef int verify_int_size[4 <= sizeof (int) ? 1 : -1];
 
-static const char *inet_ntop4 (const unsigned char *src, char *dst, socklen_t size);
+static const char *inet_ntop4 (const unsigned char *src, char *dst, unsigned size);
 # if HAVE_IPV6
-static const char *inet_ntop6 (const unsigned char *src, char *dst, socklen_t size);
+static const char *inet_ntop6 (const unsigned char *src, char *dst, unsigned size);
 # endif
 
 
@@ -73,7 +73,7 @@ static const char *inet_ntop6 (const unsigned char *src, char *dst, socklen_t si
  */
 const char *
 inet_ntop (int af, const void *restrict src,
-           char *restrict dst, socklen_t cnt)
+           char *restrict dst, unsigned cnt)
 {
   switch (af)
     {
@@ -106,7 +106,7 @@ inet_ntop (int af, const void *restrict src,
  *      Paul Vixie, 1996.
  */
 static const char *
-inet_ntop4 (const unsigned char *src, char *dst, socklen_t size)
+inet_ntop4 (const unsigned char *src, char *dst, unsigned size)
 {
   char tmp[sizeof "255.255.255.255"];
   int len;
@@ -133,7 +133,7 @@ inet_ntop4 (const unsigned char *src, char *dst, socklen_t size)
  *      Paul Vixie, 1996.
  */
 static const char *
-inet_ntop6 (const unsigned char *src, char *dst, socklen_t size)
+inet_ntop6 (const unsigned char *src, char *dst, unsigned size)
 {
   /*
    * Note that int32_t and int16_t need only be "at least" large enough
@@ -230,7 +230,7 @@ inet_ntop6 (const unsigned char *src, char *dst, socklen_t size)
   /*
    * Check for overflow, copy, and we're done.
    */
-  if ((socklen_t) (tp - tmp) > size)
+  if ((unsigned) (tp - tmp) > size)
     {
       errno = ENOSPC;
       return NULL;

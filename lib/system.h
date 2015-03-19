@@ -115,7 +115,7 @@ int inet_pton(int af, const char *src, void *dst);
 #ifndef HAVE_INET_NTOP
 # define inet_ntop _gnutls_inet_ntop
 const char *inet_ntop(int af, const void *src,
-		      char *dst, socklen_t size);
+		      char *dst, unsigned size);
 #endif
 
 #endif				/* SYSTEM_H */
