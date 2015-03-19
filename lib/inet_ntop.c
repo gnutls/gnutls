@@ -39,6 +39,12 @@
 # include <stdio.h>
 # include <string.h>
 # include <errno.h>
+# include <sys/socket.h>
+# include "system.h"
+
+# ifndef IF_LINT
+#  define IF_LINT
+#endif
 
 # ifndef HAVE_IPV6
 #  define HAVE_IPV6 1
