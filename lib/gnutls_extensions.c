@@ -730,3 +730,24 @@ _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
 	}
 	return GNUTLS_E_INVALID_REQUEST;
 }
+
+int 
+gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_type,
+				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
+				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
+				gnutls_ext_unpack_func unpack_func, gnutls_ext_epoch_func epoch_func)
+{
+	extension_entry_st tmp_mod;
+
+	tmp_mod.name = name;
+	tmp_mod.type = type;
+	tmp_mod.parse_type = parse_type;
+	tmp_mod.recv_func = recv_func;
+	tmp_mod.send_func = send_func;
+	tmp_mod.deinit_func = deinit_func;
+	tmp_mod.pack_func = pack_func;
+	tmp_mod.unpack_func = unpack_func;
+	tmp_mod.epoch_func = epoch_func;
+
+	return _gnutls_ext_register(&tmp_mod);
+}

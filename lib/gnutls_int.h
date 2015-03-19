@@ -140,29 +140,6 @@ typedef struct {
  */
 #define MAX_EXT_TYPES 32
 
-  /**
-   * gnutls_ext_parse_type_t:
-   * @GNUTLS_EXT_NONE: Never parsed
-   * @GNUTLS_EXT_ANY: Any extension type.
-   * @GNUTLS_EXT_APPLICATION: Application extension.
-   * @GNUTLS_EXT_TLS: TLS-internal extension.
-   * @GNUTLS_EXT_MANDATORY: Extension parsed even if resuming (or extensions are disabled).
-   *
-   * Enumeration of different TLS extension types.  This flag
-   * indicates for an extension whether it is useful to application
-   * level or TLS level only.  This is (only) used to parse the
-   * application level extensions before the "client_hello" callback
-   * is called.
-   */
-typedef enum {
-	GNUTLS_EXT_ANY = 0,
-	GNUTLS_EXT_APPLICATION = 1,
-	GNUTLS_EXT_TLS = 2,
-	GNUTLS_EXT_MANDATORY = 3,
-	GNUTLS_EXT_NONE = 4
-} gnutls_ext_parse_type_t;
-
-
 /* expire time for resuming sessions */
 #define DEFAULT_EXPIRE_TIME 3600
 #define DEFAULT_HANDSHAKE_TIMEOUT_MS 40*1000
@@ -753,11 +730,6 @@ typedef struct {
 	struct timespec last_retransmit;
 	unsigned int packets_dropped;
 } dtls_st;
-
-typedef union {
-	void *ptr;
-	uint32_t num;
-} extension_priv_data_t;
 
 typedef struct {
 	/* holds all the parsed data received by the record layer */

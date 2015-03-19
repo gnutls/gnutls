@@ -2217,6 +2217,64 @@ void gnutls_certificate_set_pin_function(gnutls_certificate_credentials_t,
 					 gnutls_pin_callback_t fn,
 					 void *userdata);
 
+/* Public string related functions */
+typedef struct gnutls_buffer gnutls_buffer_st;
+
+int gnutls_buffer_append_data(gnutls_buffer_st *, const void *data, size_t data_size);
+
+/* Public extensions related functions */
+
+typedef union {
+	void *ptr;
+	int num;
+} extension_priv_data_t;
+
+typedef int (*gnutls_ext_recv_func) (gnutls_session_t session,
+					 const unsigned char *data,
+					 size_t len);
+
+typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
+					 gnutls_buffer_st * extdata);
+
+typedef void (*gnutls_ext_deinit_data_func) (extension_priv_data_t data);
+
+typedef int (*gnutls_ext_pack_func) (extension_priv_data_t data,
+					 gnutls_buffer_st * packed_data);
+
+typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_st * packed_data,
+					   extension_priv_data_t * data);
+
+typedef int (*gnutls_ext_epoch_func) (gnutls_session_t session);
+
+/**
+ * gnutls_ext_parse_type_t:
+ * @GNUTLS_EXT_NONE: Never parsed
+ * @GNUTLS_EXT_ANY: Any extension type.
+ * @GNUTLS_EXT_APPLICATION: Application extension.
+ * @GNUTLS_EXT_TLS: TLS-internal extension.
+ * @GNUTLS_EXT_MANDATORY: Extension parsed even if resuming (or extensions are disabled).
+ *
+ * Enumeration of different TLS extension types.  This flag
+ * indicates for an extension whether it is useful to application
+ * level or TLS level only.  This is (only) used to parse the
+ * application level extensions before the "client_hello" callback
+ * is called.
+ */
+typedef enum {
+  GNUTLS_EXT_ANY = 0,
+  GNUTLS_EXT_APPLICATION = 1,
+  GNUTLS_EXT_TLS = 2,
+  GNUTLS_EXT_MANDATORY = 3,
+  GNUTLS_EXT_NONE = 4
+} gnutls_ext_parse_type_t;
+
+	/* Register a custom tls extension
+	 */
+int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_type,
+				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
+				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
+				gnutls_ext_unpack_func unpack_func, gnutls_ext_epoch_func epoch_func);
+
 /* FIPS140-2 related functions */
 int gnutls_fips140_mode_enabled(void);
 

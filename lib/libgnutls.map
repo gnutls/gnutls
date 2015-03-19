@@ -1019,6 +1019,8 @@ GNUTLS_3_4
 	gnutls_crypto_register_aead_cipher;
 	gnutls_crypto_register_mac;
 	gnutls_crypto_register_digest;
+	gnutls_ext_register;
+	gnutls_buffer_append_data;
  local:
 	*;
 };

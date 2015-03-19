@@ -23,13 +23,7 @@
 #ifndef GNUTLS_EXTENSIONS_H
 #define GNUTLS_EXTENSIONS_H
 
-#include <gnutls_str.h>
-
-typedef int (*gnutls_ext_recv_func) (gnutls_session_t session,
-				     const unsigned char *data,
-				     size_t len);
-typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
-				     gnutls_buffer_st * extdata);
+#include <gnutls/gnutls.h>
 
 int _gnutls_parse_extensions(gnutls_session_t session,
 			     gnutls_ext_parse_type_t parse_type,
@@ -41,13 +35,6 @@ int _gnutls_ext_init(void);
 void _gnutls_ext_deinit(void);
 
 void _gnutls_extension_list_add(gnutls_session_t session, uint16_t type);
-
-typedef void (*gnutls_ext_deinit_data_func) (extension_priv_data_t data);
-typedef int (*gnutls_ext_pack_func) (extension_priv_data_t data,
-				     gnutls_buffer_st * packed_data);
-typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_st * packed_data,
-				       extension_priv_data_t * data);
-typedef int (*gnutls_ext_epoch_func) (gnutls_session_t session);
 
 void _gnutls_ext_free_session_data(gnutls_session_t session);
 
@@ -98,5 +85,10 @@ typedef struct {
 } extension_entry_st;
 
 int _gnutls_ext_register(extension_entry_st *);
+
+int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_type,
+				gnutls_ext_recv_func recv_func, gnutls_ext_send_func send_func, 
+				gnutls_ext_deinit_data_func deinit_func, gnutls_ext_pack_func pack_func,
+				gnutls_ext_unpack_func unpack_func, gnutls_ext_epoch_func epoch_func);
 
 #endif

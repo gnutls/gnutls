@@ -115,6 +115,12 @@ static void align_allocd_with_data(gnutls_buffer_st * dest)
 }
 
 int
+gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data, size_t data_size)
+{
+	return _gnutls_buffer_append_data(dest, data, data_size);
+}
+
+int
 _gnutls_buffer_append_data(gnutls_buffer_st * dest, const void *data,
 			   size_t data_size)
 {
