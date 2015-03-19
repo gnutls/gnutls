@@ -749,3 +749,4 @@ tests/mini-dtls-record-asym
 tests/set_x509_key_file
 tests/set_x509_key_mem
 tests/strict-der
+tests/mini-extension tests/mini-supplementaldata
