@@ -85,6 +85,12 @@ hardware or any other subsystem).
 ** libgnutls: Added API to override existing ciphers, digests and MACs, e.g.,
 to override AES-GCM using a system-specific accelerator (crypto.h).
 
+** libgnutls: Added gnutls_ext_register() to register custom extensions.
+Contributed by Thierry Quemerais.
+
+** libgnutls: Added gnutls_supplemental_register() to register custom
+supplemental data handshake messages. Contributed by Thierry Quemerais.
+
 ** libgnutls-openssl: it is no longer built by default.
 
 ** certtool: Added --p8-info option, which will print PKCS #8 information
@@ -170,6 +176,8 @@ gnutls_crypto_register_cipher: Added
 gnutls_crypto_register_aead_cipher: Added
 gnutls_crypto_register_mac: Added
 gnutls_crypto_register_digest: Added
+gnutls_ext_register: Added
+gnutls_supplemental_register: Added
 gnutls_handshake_set_hook_function: Modified
 gnutls_pkcs11_obj_list_import_url: Removed
 gnutls_pkcs11_obj_list_import_url2: Removed
