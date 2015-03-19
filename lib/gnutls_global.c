@@ -28,6 +28,7 @@
 #include <gnutls/pkcs11.h>
 
 #include <gnutls_extensions.h>	/* for _gnutls_ext_init */
+#include <gnutls_supplemental.h> /* for _gnutls_supplemental_deinit */
 #include <locks.h>
 #include <system.h>
 #include <accelerated/cryptodev.h>
