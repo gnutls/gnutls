@@ -73,6 +73,7 @@ static const unsigned char supp_data[] =
 	0xED
 };
 
+static
 int supp_client_recv_func(gnutls_session_t session, const unsigned char *buf, size_t buflen)
 {
 	TLS_SUPPLEMENTALDATA_client_received = 1;
@@ -86,6 +87,7 @@ int supp_client_recv_func(gnutls_session_t session, const unsigned char *buf, si
 	return GNUTLS_E_SUCCESS;
 }
 
+static
 int supp_client_send_func(gnutls_session_t session, gnutls_buffer_t buf)
 {
 	TLS_SUPPLEMENTALDATA_client_sent = 1;
@@ -93,6 +95,7 @@ int supp_client_send_func(gnutls_session_t session, gnutls_buffer_t buf)
 	return GNUTLS_E_SUCCESS;
 }
 
+static
 int supp_server_recv_func(gnutls_session_t session, const unsigned char *buf, size_t buflen)
 {
 	TLS_SUPPLEMENTALDATA_server_received = 1;
@@ -106,6 +109,7 @@ int supp_server_recv_func(gnutls_session_t session, const unsigned char *buf, si
 	return GNUTLS_E_SUCCESS;
 }
 
+static
 int supp_server_send_func(gnutls_session_t session, gnutls_buffer_t buf)
 {
 	TLS_SUPPLEMENTALDATA_server_sent = 1;
