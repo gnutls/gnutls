@@ -123,7 +123,9 @@ Adding support for a new TLS extension is done from time to time, and
 the process to do so is not difficult.  Here are the steps you need to
 follow if you wish to do this yourself.  For sake of discussion, let's
 consider adding support for the hypothetical TLS extension
-@code{foobar}.
+@code{foobar}. The following section is about adding an extension to GnuTLS,
+for custom application extensions you should check the exported function
+@funcref{gnutls_ext_register}.
 
 @subsubheading Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
 
@@ -353,6 +355,8 @@ Another way is to run capabilities check with:
 TLS handshake extensions allow to send so called supplemental data
 handshake messages @xcite{RFC4680}. This short section explains how to 
 implement a supplemental data handshake message for a given TLS extension.
+Note that the rest of the section is about enhancing the GnuTLS library, to
+add support for supplemental data in your application check @funcref{gnutls_supplemental_register}.
 
 First of all, modify your extension @code{foobar} in the way, the that
 flags
