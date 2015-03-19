@@ -89,8 +89,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-chain-unsorted x509-verify-with-crl mini-dtls-mtu \
 	 mini-dtls-record-asym openpgp-callback key-import-export \
 	 mini-dtls-fork mini-dtls-pthread mini-key-material x509cert-invalid \
-	 strict-der mini-extension mini-supplementaldata
-
+	 strict-der mini-extension mini-supplementaldata mini-dtls0-9
+ 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 
 if ENABLE_OCSP
