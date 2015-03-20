@@ -63,7 +63,7 @@ static void client_log_func(int level, const char *str)
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
 
-/* A very basic TLS client, with anonymous authentication.
+/* A very basic DTLS client handling DTLS 0.9 which sets premaster secret.
  */
 
 #define MAX_BUF 1024
@@ -77,7 +77,7 @@ push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 }
 
 static gnutls_datum_t master =
-    { (void*)"\x44\x66\x44\xa9\xb6\x29\xed\x6e\xd6\x93\x15\xdb\xf0\x7d\x4b\x2e\x18\xb1\x9d\xed\xff\x6a\x86\x76\xc9\x0e\x16\xab\xc2\x10\xbb\x17\x99\x24\xb1\xd9\xb9\x95\xe7\xea", 48};
+    { (void*)"\x44\x66\x44\xa9\xb6\x29\xed\x6e\xd6\x93\x15\xdb\xf0\x7d\x4b\x2e\x18\xb1\x9d\xed\xff\x6a\x86\x76\xc9\x0e\x16\xab\xc2\x10\xbb\x17\x99\x24\xb1\xd9\xb9\x95\xe7\xea\xea\xea\xea\xea\xff\xaa\xac", 48};
 static gnutls_datum_t sess_id =
     { (void*)"\xd9\xb9\x95\xe7\xea", 5};
 
@@ -87,7 +87,6 @@ static void client(int fd)
 	char buffer[MAX_BUF + 1];
 	gnutls_certificate_credentials_t xcred;
 	gnutls_session_t session;
-	/* Need to enable anonymous KX specifically. */
 
 	global_init();
 
@@ -118,8 +117,6 @@ static void client(int fd)
 		exit(1);
 	}
 
-	/* put the anonymous credentials to the current session
-	 */
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	gnutls_transport_set_int(session, fd);
@@ -147,7 +144,7 @@ static void client(int fd)
 			(gnutls_protocol_get_version(session)));
 
 	do {
-		ret = gnutls_record_recv(session, buffer, MAX_BUF);
+		ret = gnutls_record_recv(session, buffer, sizeof(buffer)-1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret == 0) {
@@ -251,8 +248,9 @@ static void server(int fd)
 	/* see the Getting peer's information example */
 	/* print_info(session); */
 
+	memset(buffer, 1, sizeof(buffer));
 	do {
-		ret = gnutls_record_send(session, buffer, sizeof(buffer));
+		ret = gnutls_record_send(session, buffer, sizeof(buffer)-1);
 	} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
 	if (ret < 0) {
