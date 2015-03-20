@@ -776,15 +776,13 @@ gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_ty
  * and retrieve them later on. The set data will be deallocated using
  * the gnutls_ext_deinit_data_func.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
- *
  * Since: 3.4.0
  **/
 void
 gnutls_ext_set_data(gnutls_session_t session, unsigned type,
 		    gnutls_ext_priv_data_t data)
 {
-	return _gnutls_ext_set_session_data(session, type, data);
+	_gnutls_ext_set_session_data(session, type, data);
 }
 
 /**
