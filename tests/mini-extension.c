@@ -82,7 +82,9 @@ static int ext_recv_client_params(gnutls_session_t session, const unsigned char 
 		fail("ext_recv_client_params: Invalid input buffer data\n");
 
 	TLSEXT_TYPE_client_received = 1;
-	
+
+	gnutls_ext_set_data(session, TLSEXT_TYPE_SAMPLE, session);
+
 	return 0; //Success
 }
 
@@ -118,6 +120,7 @@ static void client(int sd)
 	int ret;
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t clientx509cred;
+	void *p;
 
 	global_init();
 	gnutls_global_set_log_function(tls_log_func);
@@ -160,6 +163,15 @@ static void client(int sd)
 
 	if (TLSEXT_TYPE_client_sent != 1 || TLSEXT_TYPE_client_received != 1)
 		fail("client: extension not properly sent/received\n");
+
+	ret = gnutls_ext_get_data(session, TLSEXT_TYPE_SAMPLE, &p);
+	if (ret < 0) {
+		fail("gnutls_ext_get_data: %s\n", gnutls_strerror(ret));
+	}
+
+	if (p != session) {
+		fail("client: gnutls_ext_get_data failed\n");
+	}
 
 	gnutls_bye(session, GNUTLS_SHUT_RDWR);
 
