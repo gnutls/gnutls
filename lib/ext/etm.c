@@ -68,7 +68,7 @@ _gnutls_ext_etm_recv_params(gnutls_session_t session,
 		if (session->internals.priorities.no_etm != 0)
 			return 0;
 
-		epriv.num = 1;
+		epriv = (void*)(intptr_t)1;
 		_gnutls_ext_set_session_data(session,
 						   GNUTLS_EXTENSION_ETM,
 						   epriv);
@@ -112,7 +112,7 @@ _gnutls_ext_etm_send_params(gnutls_session_t session,
 		ret = _gnutls_ext_get_session_data(session,
 						   GNUTLS_EXTENSION_ETM,
 						   &epriv);
-		if (ret < 0 || epriv.num == 0)
+		if (ret < 0 || ((intptr_t)epriv) == 0)
 			return 0;
 
 		session->security_parameters.etm = 1;

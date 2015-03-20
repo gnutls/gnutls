@@ -429,7 +429,7 @@ int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st * packed)
 {
 	unsigned int i;
 	int ret;
-	extension_priv_data_t data;
+	gnutls_ext_priv_data_t data;
 	int cur_size;
 	int size_offset;
 	int total_exts_pos;
@@ -512,7 +512,7 @@ void _gnutls_ext_restore_resumed_session(gnutls_session_t session)
 static void
 _gnutls_ext_set_resumed_session_data(gnutls_session_t session,
 				     uint16_t type,
-				     extension_priv_data_t data)
+				     gnutls_ext_priv_data_t data)
 {
 	int i;
 
@@ -541,7 +541,7 @@ _gnutls_ext_set_resumed_session_data(gnutls_session_t session,
 int _gnutls_ext_unpack(gnutls_session_t session, gnutls_buffer_st * packed)
 {
 	int i, ret;
-	extension_priv_data_t data;
+	gnutls_ext_priv_data_t data;
 	gnutls_ext_unpack_func unpack;
 	int max_exts = 0;
 	uint16_t type;
@@ -587,7 +587,7 @@ void
 _gnutls_ext_unset_session_data(gnutls_session_t session, uint16_t type)
 {
 	gnutls_ext_deinit_data_func deinit;
-	extension_priv_data_t data;
+	gnutls_ext_priv_data_t data;
 	int ret, i;
 
 	deinit = _gnutls_ext_func_deinit(type);
@@ -611,7 +611,7 @@ _gnutls_ext_unset_resumed_session_data(gnutls_session_t session,
 				       uint16_t type)
 {
 	gnutls_ext_deinit_data_func deinit;
-	extension_priv_data_t data;
+	gnutls_ext_priv_data_t data;
 	int ret, i;
 
 	deinit = _gnutls_ext_func_deinit(type);
@@ -649,13 +649,13 @@ void _gnutls_ext_free_session_data(gnutls_session_t session)
 
 }
 
-/* This function allows and extension to store data in the current session
+/* This function allows an extension to store data in the current session
  * and retrieve them later on. We use functions instead of a pointer to a
  * private pointer, to allow API additions by individual extensions.
  */
 void
 _gnutls_ext_set_session_data(gnutls_session_t session, uint16_t type,
-			     extension_priv_data_t data)
+			     gnutls_ext_priv_data_t data)
 {
 	unsigned int i;
 	gnutls_ext_deinit_data_func deinit;
@@ -683,7 +683,7 @@ _gnutls_ext_set_session_data(gnutls_session_t session, uint16_t type,
 
 int
 _gnutls_ext_get_session_data(gnutls_session_t session,
-			     uint16_t type, extension_priv_data_t * data)
+			     uint16_t type, gnutls_ext_priv_data_t * data)
 {
 	int i;
 
@@ -702,7 +702,7 @@ _gnutls_ext_get_session_data(gnutls_session_t session,
 int
 _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
 				     uint16_t type,
-				     extension_priv_data_t * data)
+				     gnutls_ext_priv_data_t * data)
 {
 	int i;
 
@@ -735,6 +735,10 @@ _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
  * registered until gnutls_global_deinit() is called. This function is not
  * thread safe.
  *
+ * Each registered extension can store temporary data into the gnutls_session_t
+ * structure using gnutls_ext_set_data(), and they can be retrieved using
+ * gnutls_ext_get_data().
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.4.0
@@ -760,4 +764,44 @@ gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_ty
 	tmp_mod.unpack_func = unpack_func;
 
 	return _gnutls_ext_register(&tmp_mod);
+}
+
+/**
+ * gnutls_ext_set_data:
+ * @session: a #gnutls_session_t opaque pointer
+ * @type: the numeric id of the extension
+ * @data: the private data to set
+ *
+ * This function allows an extension handler to store data in the current session
+ * and retrieve them later on. The set data will be deallocated using
+ * the gnutls_ext_deinit_data_func.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.0
+ **/
+void
+gnutls_ext_set_data(gnutls_session_t session, unsigned type,
+		    gnutls_ext_priv_data_t data)
+{
+	return _gnutls_ext_set_session_data(session, type, data);
+}
+
+/**
+ * gnutls_ext_get_data:
+ * @session: a #gnutls_session_t opaque pointer
+ * @type: the numeric id of the extension
+ * @data: a pointer to the private data to retrieve
+ *
+ * This function retrieves any data previously stored with gnutls_ext_set_data().
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_ext_get_data(gnutls_session_t session,
+		    unsigned type, gnutls_ext_priv_data_t *data)
+{
+	return _gnutls_ext_get_session_data(session, type, data);
 }

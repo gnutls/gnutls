@@ -928,13 +928,13 @@ typedef struct {
 
 	struct {
 		uint16_t type;
-		extension_priv_data_t priv;
+		gnutls_ext_priv_data_t priv;
 		bool set;
 	} extension_int_data[MAX_EXT_TYPES];
 
 	struct {
 		uint16_t type;
-		extension_priv_data_t priv;
+		gnutls_ext_priv_data_t priv;
 		bool set;
 	} resumed_extension_int_data[MAX_EXT_TYPES];
 	/* The type of transport protocol; stream or datagram */

@@ -176,7 +176,7 @@ _gnutls_srtp_recv_params(gnutls_session_t session,
 	if (ret < 0)
 		return 0;
 
-	priv = epriv.ptr;
+	priv = epriv;
 
 	DECR_LENGTH_RET(data_size, 2, 0);
 	len = _gnutls_read_uint16(p);
@@ -242,7 +242,7 @@ _gnutls_srtp_send_params(gnutls_session_t session,
 	if (ret < 0)
 		return 0;
 
-	priv = epriv.ptr;
+	priv = epriv;
 
 	if (priv->profiles_size == 0)
 		return 0;
@@ -318,7 +318,7 @@ gnutls_srtp_get_selected_profile(gnutls_session_t session,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	priv = epriv.ptr;
+	priv = epriv;
 
 	if (priv->selected_profile == 0) {
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -357,7 +357,7 @@ int gnutls_srtp_get_mki(gnutls_session_t session, gnutls_datum_t * mki)
 		    gnutls_assert_val
 		    (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
-	priv = epriv.ptr;
+	priv = epriv;
 
 	if (priv->mki_received == 0)
 		return
@@ -399,11 +399,11 @@ gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		epriv.ptr = priv;
+		epriv = priv;
 		_gnutls_ext_set_session_data(session,
 					     GNUTLS_EXTENSION_SRTP, epriv);
 	} else
-		priv = epriv.ptr;
+		priv = epriv;
 
 	if (mki->size > 0 && mki->size <= sizeof(priv->mki)) {
 		priv->mki_size = mki->size;
@@ -444,11 +444,11 @@ gnutls_srtp_set_profile(gnutls_session_t session,
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		epriv.ptr = priv;
+		epriv = priv;
 		_gnutls_ext_set_session_data(session,
 					     GNUTLS_EXTENSION_SRTP, epriv);
 	} else
-		priv = epriv.ptr;
+		priv = epriv;
 
 	if (priv->profiles_size < MAX_SRTP_PROFILES)
 		priv->profiles_size++;
@@ -495,9 +495,9 @@ gnutls_srtp_set_profile_direct(gnutls_session_t session,
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		epriv.ptr = priv;
+		epriv = priv;
 	} else
-		priv = epriv.ptr;
+		priv = epriv;
 
 	do {
 		col = strchr(profiles, ':');
@@ -609,13 +609,13 @@ gnutls_srtp_get_keys(gnutls_session_t session,
 
 static void _gnutls_srtp_deinit_data(extension_priv_data_t priv)
 {
-	gnutls_free(priv.ptr);
+	gnutls_free(priv);
 }
 
 static int
 _gnutls_srtp_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 {
-	srtp_ext_st *priv = epriv.ptr;
+	srtp_ext_st *priv = epriv;
 	unsigned int i;
 	int ret;
 
@@ -658,7 +658,7 @@ _gnutls_srtp_unpack(gnutls_buffer_st * ps, extension_priv_data_t * _priv)
 		BUFFER_POP(ps, priv->mki, priv->mki_size);
 	}
 
-	epriv.ptr = priv;
+	epriv = priv;
 	*_priv = epriv;
 
 	return 0;

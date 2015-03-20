@@ -1024,6 +1024,8 @@ GNUTLS_3_4
 	gnutls_supplemental_register;
 	gnutls_do_recv_supplemental;
 	gnutls_do_send_supplemental;
+	gnutls_ext_get_data;
+	gnutls_ext_set_data;
  local:
 	*;
 };

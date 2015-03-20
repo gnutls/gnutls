@@ -25,6 +25,7 @@
 
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
+
 #include "gettext.h"
 #define _(String) dgettext (PACKAGE, String)
 
@@ -198,6 +199,16 @@ int _gnutls_hostname_compare(const char *certname, size_t certnamesize,
             goto error; \
         } \
         o = s; \
+    }
+
+#define BUFFER_POP_CAST_NUM(b, o) { \
+        size_t s; \
+        ret = _gnutls_buffer_pop_prefix(b, &s, 0); \
+        if (ret < 0) { \
+            gnutls_assert(); \
+            goto error; \
+        } \
+        o = (void *) (intptr_t)(s); \
     }
 
 #endif

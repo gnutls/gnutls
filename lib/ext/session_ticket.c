@@ -250,7 +250,7 @@ session_ticket_recv_params(gnutls_session_t session,
 	if (ret < 0) {
 		return 0;
 	}
-	priv = epriv.ptr;
+	priv = epriv;
 
 	if (!priv->session_ticket_enable)
 		return 0;
@@ -336,7 +336,7 @@ session_ticket_send_params(gnutls_session_t session,
 					 GNUTLS_EXTENSION_SESSION_TICKET,
 					 &epriv);
 	if (ret >= 0)
-		priv = epriv.ptr;
+		priv = epriv;
 
 	if (priv == NULL || !priv->session_ticket_enable)
 		return 0;
@@ -351,7 +351,7 @@ session_ticket_send_params(gnutls_session_t session,
 							 GNUTLS_EXTENSION_SESSION_TICKET,
 							 &epriv);
 		if (ret >= 0)
-			priv = epriv.ptr;
+			priv = epriv;
 
 		/* no previous data. Just advertize it */
 		if (ret < 0)
@@ -380,7 +380,7 @@ session_ticket_send_params(gnutls_session_t session,
 
 static void session_ticket_deinit_data(extension_priv_data_t epriv)
 {
-	session_ticket_ext_st *priv = epriv.ptr;
+	session_ticket_ext_st *priv = epriv;
 
 	gnutls_free(priv->session_ticket);
 	gnutls_free(priv);
@@ -389,7 +389,7 @@ static void session_ticket_deinit_data(extension_priv_data_t epriv)
 static int
 session_ticket_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 {
-	session_ticket_ext_st *priv = epriv.ptr;
+	session_ticket_ext_st *priv = epriv;
 	int ret;
 
 	BUFFER_APPEND_PFX4(ps, priv->session_ticket,
@@ -418,7 +418,7 @@ session_ticket_unpack(gnutls_buffer_st * ps, extension_priv_data_t * _priv)
 	priv->session_ticket_len = ticket.size;
 	BUFFER_POP_NUM(ps, priv->session_ticket_enable);
 
-	epriv.ptr = priv;
+	epriv = priv;
 	*_priv = epriv;
 
 	return 0;
@@ -476,7 +476,7 @@ int gnutls_session_ticket_enable_client(gnutls_session_t session)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	priv->session_ticket_enable = 1;
-	epriv.ptr = priv;
+	epriv = priv;
 
 	_gnutls_ext_set_session_data(session,
 				     GNUTLS_EXTENSION_SESSION_TICKET,
@@ -517,7 +517,7 @@ gnutls_session_ticket_enable_server(gnutls_session_t session,
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	epriv.ptr = priv;
+	epriv = priv;
 
 	memcpy(&priv->key, key->data, key->size);
 	priv->session_ticket_enable = 1;
@@ -548,7 +548,7 @@ int _gnutls_send_new_session_ticket(gnutls_session_t session, int again)
 						 &epriv);
 		if (ret < 0)
 			return 0;
-		priv = epriv.ptr;
+		priv = epriv;
 
 		if (!priv->session_ticket_renew)
 			return 0;
@@ -640,7 +640,7 @@ int _gnutls_recv_new_session_ticket(gnutls_session_t session)
 		gnutls_assert();
 		return 0;
 	}
-	priv = epriv.ptr;
+	priv = epriv;
 
 	if (!priv->session_ticket_renew)
 		return 0;

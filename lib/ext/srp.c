@@ -89,7 +89,7 @@ _gnutls_srp_recv_params(gnutls_session_t session, const uint8_t * data,
 				priv->username[len] = 0;
 			}
 
-			epriv.ptr = priv;
+			epriv = priv;
 			_gnutls_ext_set_session_data(session,
 						     GNUTLS_EXTENSION_SRP,
 						     epriv);
@@ -157,7 +157,7 @@ _gnutls_srp_send_params(gnutls_session_t session,
 				goto cleanup;
 			}
 
-			epriv.ptr = priv;
+			epriv = priv;
 			_gnutls_ext_set_session_data(session,
 						     GNUTLS_EXTENSION_SRP,
 						     epriv);
@@ -188,7 +188,7 @@ _gnutls_srp_send_params(gnutls_session_t session,
 				goto cleanup;
 			}
 
-			epriv.ptr = priv;
+			epriv = priv;
 			_gnutls_ext_set_session_data(session,
 						     GNUTLS_EXTENSION_SRP,
 						     epriv);
@@ -208,7 +208,7 @@ _gnutls_srp_send_params(gnutls_session_t session,
 
 static void _gnutls_srp_deinit_data(extension_priv_data_t epriv)
 {
-	srp_ext_st *priv = epriv.ptr;
+	srp_ext_st *priv = epriv;
 
 	gnutls_free(priv->username);
 	gnutls_free(priv->password);
@@ -218,7 +218,7 @@ static void _gnutls_srp_deinit_data(extension_priv_data_t epriv)
 static int
 _gnutls_srp_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 {
-	srp_ext_st *priv = epriv.ptr;
+	srp_ext_st *priv = epriv;
 	int ret;
 	int password_len = 0, username_len = 0;
 
@@ -255,7 +255,7 @@ _gnutls_srp_unpack(gnutls_buffer_st * ps, extension_priv_data_t * _priv)
 	priv->username = (char *) username.data;
 	priv->password = (char *) password.data;
 
-	epriv.ptr = priv;
+	epriv = priv;
 	*_priv = epriv;
 
 	return 0;

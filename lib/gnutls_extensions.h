@@ -43,20 +43,21 @@ void _gnutls_ext_free_session_data(gnutls_session_t session);
 void _gnutls_ext_unset_session_data(gnutls_session_t session,
 				    uint16_t type);
 void _gnutls_ext_set_session_data(gnutls_session_t session, uint16_t type,
-				  extension_priv_data_t);
+				  gnutls_ext_priv_data_t);
 int _gnutls_ext_get_session_data(gnutls_session_t session, uint16_t type,
-				 extension_priv_data_t *);
+				 gnutls_ext_priv_data_t *);
 int _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
 					 uint16_t type,
-					 extension_priv_data_t * data);
+					 gnutls_ext_priv_data_t * data);
 
 void _gnutls_ext_restore_resumed_session(gnutls_session_t session);
-int _gnutls_ext_before_epoch_change(gnutls_session_t session);
 
 /* for session packing */
 int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st * packed);
 int _gnutls_ext_unpack(gnutls_session_t session,
 		       gnutls_buffer_st * packed);
+
+typedef gnutls_ext_priv_data_t extension_priv_data_t;
 
 typedef struct {
 	const char *name; /* const overriden when free_name is set */

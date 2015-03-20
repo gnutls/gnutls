@@ -134,7 +134,7 @@ _gnutls_gen_srp_server_kx(gnutls_session_t session,
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_SRP_USERNAME;
 	}
-	priv = epriv.ptr;
+	priv = epriv;
 
 	if ((ret =
 	     _gnutls_auth_info_set(session, GNUTLS_CRD_SRP,
@@ -257,7 +257,7 @@ _gnutls_gen_srp_client_kx(gnutls_session_t session,
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_SRP_USERNAME;
 	}
-	priv = epriv.ptr;
+	priv = epriv;
 
 	cred = (gnutls_srp_client_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_SRP);
@@ -844,7 +844,7 @@ _gnutls_proc_srp_server_kx(gnutls_session_t session, uint8_t * data,
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_SRP_USERNAME;
 	}
-	priv = epriv.ptr;
+	priv = epriv;
 
 	cred = (gnutls_srp_client_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_SRP);

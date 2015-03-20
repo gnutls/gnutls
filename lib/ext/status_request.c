@@ -254,13 +254,13 @@ _gnutls_status_request_send_params(gnutls_session_t session,
 					   &epriv);
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		if (ret < 0 || epriv.ptr == NULL)	/* it is ok not to have it */
+		if (ret < 0 || epriv == NULL)	/* it is ok not to have it */
 			return 0;
-		priv = epriv.ptr;
+		priv = epriv;
 
 		return client_send(session, extdata, priv);
 	} else {
-		epriv.ptr = priv = gnutls_calloc(1, sizeof(*priv));
+		epriv = priv = gnutls_calloc(1, sizeof(*priv));
 		if (priv == NULL)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -283,10 +283,10 @@ _gnutls_status_request_recv_params(gnutls_session_t session,
 	ret = _gnutls_ext_get_session_data(session,
 					   GNUTLS_EXTENSION_STATUS_REQUEST,
 					   &epriv);
-	if (ret < 0 || epriv.ptr == NULL)	/* it is ok not to have it */
+	if (ret < 0 || epriv == NULL)	/* it is ok not to have it */
 		return 0;
 
-	priv = epriv.ptr;
+	priv = epriv;
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT)
 		return client_recv(session, priv, data, size);
@@ -324,7 +324,7 @@ gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	epriv.ptr = priv = gnutls_calloc(1, sizeof(*priv));
+	epriv = priv = gnutls_calloc(1, sizeof(*priv));
 	if (priv == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -374,7 +374,7 @@ gnutls_ocsp_status_request_get(gnutls_session_t session,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	priv = epriv.ptr;
+	priv = epriv;
 
 	if (priv == NULL || priv->response.data == NULL)
 		return
@@ -471,7 +471,7 @@ gnutls_certificate_set_ocsp_status_request_file
 
 static void _gnutls_status_request_deinit_data(extension_priv_data_t epriv)
 {
-	status_request_ext_st *priv = epriv.ptr;
+	status_request_ext_st *priv = epriv;
 
 	if (priv == NULL)
 		return;
@@ -486,7 +486,7 @@ static int
 _gnutls_status_request_pack(extension_priv_data_t epriv,
 			    gnutls_buffer_st * ps)
 {
-	status_request_ext_st *priv = epriv.ptr;
+	status_request_ext_st *priv = epriv;
 	int ret;
 
 	BUFFER_APPEND_PFX4(ps, priv->response.data, priv->response.size);
@@ -510,7 +510,7 @@ _gnutls_status_request_unpack(gnutls_buffer_st * ps,
 
 	BUFFER_POP_DATUM(ps, &priv->response);
 
-	epriv->ptr = priv;
+	*epriv = priv;
 
 	return 0;
 
@@ -548,7 +548,7 @@ _gnutls_send_server_certificate_status(gnutls_session_t session, int again)
 						 &epriv);
 		if (ret < 0)
 			return 0;
-		priv = epriv.ptr;
+		priv = epriv;
 
 		if (!priv->response.size)
 			return 0;
@@ -588,7 +588,7 @@ int _gnutls_recv_server_certificate_status(gnutls_session_t session)
 	if (ret < 0)
 		return 0;
 
-	priv = epriv.ptr;
+	priv = epriv;
 
 	if (!priv->expect_cstatus)
 		return 0;

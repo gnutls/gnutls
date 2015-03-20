@@ -62,7 +62,7 @@ _gnutls_ext_sr_finished(gnutls_session_t session, void *vdata,
 		gnutls_assert();
 		return ret;
 	}
-	priv = epriv.ptr;
+	priv = epriv;
 
 	/* Save data for safe renegotiation. 
 	 */
@@ -100,7 +100,7 @@ int _gnutls_ext_sr_verify(gnutls_session_t session)
 					   GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					   &epriv);
 	if (ret >= 0)
-		priv = epriv.ptr;
+		priv = epriv;
 
 	/* Safe renegotiation */
 
@@ -209,9 +209,9 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session)
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		epriv.ptr = priv;
+		epriv = priv;
 	} else
-		priv = epriv.ptr;
+		priv = epriv;
 
 	priv->safe_renegotiation_received = 1;
 	priv->connection_using_safe_renegotiation = 1;
@@ -243,7 +243,7 @@ int _gnutls_ext_sr_send_cs(gnutls_session_t session)
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		epriv.ptr = priv;
+		epriv = priv;
 	}
 
 	if (set != 0)
@@ -293,13 +293,13 @@ _gnutls_sr_recv_params(gnutls_session_t session,
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		epriv.ptr = priv;
+		epriv = priv;
 
 		_gnutls_ext_set_session_data(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 	} else {
-		priv = epriv.ptr;
+		priv = epriv;
 	}
 
 	/* It is not legal to receive this extension on a renegotiation and
@@ -362,13 +362,13 @@ _gnutls_sr_send_params(gnutls_session_t session,
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		epriv.ptr = priv;
+		epriv = priv;
 
 		_gnutls_ext_set_session_data(session,
 					     GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 					     epriv);
 	} else
-		priv = epriv.ptr;
+		priv = epriv;
 
 	/* Always offer the extension if we're a client */
 	if (priv->connection_using_safe_renegotiation ||
@@ -407,7 +407,7 @@ _gnutls_sr_send_params(gnutls_session_t session,
 
 static void _gnutls_sr_deinit_data(extension_priv_data_t priv)
 {
-	gnutls_free(priv.ptr);
+	gnutls_free(priv);
 }
 
 /**
@@ -435,7 +435,7 @@ int gnutls_safe_renegotiation_status(gnutls_session_t session)
 		gnutls_assert();
 		return 0;
 	}
-	priv = epriv.ptr;
+	priv = epriv;
 
 	return priv->connection_using_safe_renegotiation;
 }

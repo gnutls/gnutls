@@ -113,12 +113,12 @@ _gnutls_max_record_recv_params(gnutls_session_t session,
 			new_size = _gnutls_mre_num2record(data[0]);
 
 			if (new_size < 0
-			    || new_size != (ssize_t) epriv.num) {
+			    || new_size != (intptr_t) epriv) {
 				gnutls_assert();
 				return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 			} else {
 				session->security_parameters.
-				    max_record_recv_size = epriv.num;
+				    max_record_recv_size = (intptr_t)epriv;
 			}
 
 		}
@@ -149,8 +149,8 @@ _gnutls_max_record_send_params(gnutls_session_t session,
 			return 0;
 		}
 
-		if (epriv.num != DEFAULT_MAX_RECORD_SIZE) {
-			p = (uint8_t) _gnutls_mre_record2num(epriv.num);
+		if ((intptr_t)epriv != DEFAULT_MAX_RECORD_SIZE) {
+			p = (uint8_t) _gnutls_mre_record2num((intptr_t)epriv);
 			ret = _gnutls_buffer_append_data(extdata, &p, 1);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
@@ -184,7 +184,7 @@ _gnutls_max_record_pack(extension_priv_data_t epriv, gnutls_buffer_st * ps)
 {
 	int ret;
 
-	BUFFER_APPEND_NUM(ps, epriv.num);
+	BUFFER_APPEND_NUM(ps, (intptr_t)epriv);
 
 	return 0;
 
@@ -197,7 +197,7 @@ _gnutls_max_record_unpack(gnutls_buffer_st * ps,
 	extension_priv_data_t epriv;
 	int ret;
 
-	BUFFER_POP_NUM(ps, epriv.num);
+	BUFFER_POP_CAST_NUM(ps, epriv);
 
 	*_priv = epriv;
 
@@ -300,7 +300,7 @@ ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size)
 	}
 
 	session->security_parameters.max_record_send_size = size;
-	epriv.num = size;
+	epriv = (void *)(intptr_t)size;
 
 	_gnutls_ext_set_session_data(session,
 				     GNUTLS_EXTENSION_MAX_RECORD_SIZE,
