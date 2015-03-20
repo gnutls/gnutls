@@ -401,7 +401,7 @@ signature_algorithms_unpack(gnutls_buffer_st * ps,
 
 /**
  * gnutls_sign_algorithm_get_requested:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @indx: is an index of the signature algorithm to return
  * @algo: the returned certificate type will be stored there
  *
@@ -457,7 +457,7 @@ gnutls_sign_algorithm_get_requested(gnutls_session_t session,
 
 /**
  * gnutls_sign_algorithm_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Returns the signature algorithm that is (or will be) used in this 
  * session by the server to sign data.
@@ -473,7 +473,7 @@ int gnutls_sign_algorithm_get(gnutls_session_t session)
 
 /**
  * gnutls_sign_algorithm_get_client:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Returns the signature algorithm that is (or will be) used in this 
  * session by the client to sign data.

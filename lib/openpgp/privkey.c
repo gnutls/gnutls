@@ -35,7 +35,7 @@
 
 /**
  * gnutls_openpgp_privkey_init:
- * @key: The structure to be initialized
+ * @key: A pointer to the type to be initialized
  *
  * This function will initialize an OpenPGP key structure.
  *
@@ -52,7 +52,7 @@ int gnutls_openpgp_privkey_init(gnutls_openpgp_privkey_t * key)
 
 /**
  * gnutls_openpgp_privkey_deinit:
- * @key: The structure to be initialized
+ * @key: A pointer to the type to be initialized
  *
  * This function will deinitialize a key structure.
  **/
@@ -70,7 +70,7 @@ void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey_t key)
 }
 
 /*-
- * _gnutls_openpgp_privkey_cpy - This function copies a gnutls_openpgp_privkey_t structure
+ * _gnutls_openpgp_privkey_cpy - This function copies a gnutls_openpgp_privkey_t type
  * @dest: The structure where to copy
  * @src: The structure to be copied
  *

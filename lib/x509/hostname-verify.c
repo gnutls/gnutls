@@ -29,7 +29,7 @@
 
 /**
  * gnutls_x509_crt_check_hostname:
- * @cert: should contain an gnutls_x509_crt_t structure
+ * @cert: should contain an gnutls_x509_crt_t type
  * @hostname: A null terminated string that contains a DNS name
  *
  * This function will check if the given certificate's subject matches
@@ -93,7 +93,7 @@ static int has_embedded_null(const char *str, unsigned size)
 
 /**
  * gnutls_x509_crt_check_hostname:
- * @cert: should contain an gnutls_x509_crt_t structure
+ * @cert: should contain an gnutls_x509_crt_t type
  * @hostname: A null terminated string that contains a DNS name
  * @flags: gnutls_certificate_verify_flags
  *

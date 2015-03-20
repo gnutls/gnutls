@@ -138,9 +138,9 @@ int result;
 
 /**
  * gnutls_pkcs12_init:
- * @pkcs12: The structure to be initialized
+ * @pkcs12: A pointer to the type to be initialized
  *
- * This function will initialize a PKCS12 structure. PKCS12 structures
+ * This function will initialize a PKCS12 type. PKCS12 structures
  * usually contain lists of X.509 Certificates and X.509 Certificate
  * revocation lists.
  *
@@ -165,9 +165,9 @@ int gnutls_pkcs12_init(gnutls_pkcs12_t * pkcs12)
 
 /**
  * gnutls_pkcs12_deinit:
- * @pkcs12: The structure to be initialized
+ * @pkcs12: The type to be initialized
  *
- * This function will deinitialize a PKCS12 structure.
+ * This function will deinitialize a PKCS12 type.
  **/
 void gnutls_pkcs12_deinit(gnutls_pkcs12_t pkcs12)
 {
@@ -182,7 +182,7 @@ void gnutls_pkcs12_deinit(gnutls_pkcs12_t pkcs12)
 
 /**
  * gnutls_pkcs12_import:
- * @pkcs12: The structure to store the parsed PKCS12.
+ * @pkcs12: The data to store the parsed PKCS12.
  * @data: The DER or PEM encoded PKCS12.
  * @format: One of DER or PEM
  * @flags: an ORed sequence of gnutls_privkey_pkcs8_flags
@@ -260,7 +260,7 @@ gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12,
 
 /**
  * gnutls_pkcs12_export:
- * @pkcs12: Holds the pkcs12 structure
+ * @pkcs12: A pkcs12 type
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a structure PEM or DER encoded
  * @output_data_size: holds the size of output_data (and will be
@@ -294,7 +294,7 @@ gnutls_pkcs12_export(gnutls_pkcs12_t pkcs12,
 
 /**
  * gnutls_pkcs12_export2:
- * @pkcs12: Holds the pkcs12 structure
+ * @pkcs12: A pkcs12 type
  * @format: the format of output params. One of PEM or DER.
  * @out: will contain a structure PEM or DER encoded
  *
@@ -586,7 +586,7 @@ _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
 
 /**
  * gnutls_pkcs12_get_bag:
- * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @pkcs12: A pkcs12 type
  * @indx: contains the index of the bag to extract
  * @bag: An initialized bag, where the contents of the bag will be copied
  *
@@ -726,7 +726,7 @@ static int create_empty_pfx(ASN1_TYPE pkcs12)
 
 /**
  * gnutls_pkcs12_set_bag:
- * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @pkcs12: should contain a gnutls_pkcs12_t type
  * @bag: An initialized bag
  *
  * This function will insert a Bag into the PKCS12 structure.
@@ -849,7 +849,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 
 /**
  * gnutls_pkcs12_generate_mac2:
- * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @pkcs12: A pkcs12 type
  * @mac: the MAC algorithm to use
  * @pass: The password for the MAC
  *
@@ -980,7 +980,7 @@ int gnutls_pkcs12_generate_mac2(gnutls_pkcs12_t pkcs12, gnutls_mac_algorithm_t m
 
 /**
  * gnutls_pkcs12_generate_mac:
- * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @pkcs12: A pkcs12 type
  * @pass: The password for the MAC
  *
  * This function will generate a MAC for the PKCS12 structure.
@@ -995,7 +995,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 /**
  * gnutls_pkcs12_verify_mac:
- * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @pkcs12: should contain a gnutls_pkcs12_t type
  * @pass: The password for the MAC
  *
  * This function will verify the MAC for the PKCS12 structure.
@@ -1395,7 +1395,7 @@ static int make_chain(gnutls_x509_crt_t ** chain, unsigned int *chain_len,
 
 /**
  * gnutls_pkcs12_simple_parse:
- * @p12: should contain a gnutls_pkcs12_t structure
+ * @p12: A pkcs12 type
  * @password: optional password used to decrypt the structure, bags and keys.
  * @key: a structure to store the parsed private key.
  * @chain: the corresponding to key certificate chain (may be %NULL)
@@ -1823,7 +1823,7 @@ gnutls_pkcs12_simple_parse(gnutls_pkcs12_t p12,
 
 /**
  * gnutls_pkcs12_mac_info:
- * @pkcs12: The PKCS #12 structure
+ * @pkcs12: A pkcs12 type
  * @mac: the MAC algorithm used as %gnutls_mac_algorithm_t
  * @salt: the salt used for string to key (if non-NULL then @salt_size initially holds its size)
  * @salt_size: string to key salt size

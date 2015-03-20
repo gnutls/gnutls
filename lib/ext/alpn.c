@@ -196,7 +196,7 @@ _gnutls_alpn_send_params(gnutls_session_t session,
 
 /**
  * gnutls_alpn_get_selected_protocol:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @protocol: will hold the protocol name
  *
  * This function allows you to get the negotiated protocol name. The
@@ -239,7 +239,7 @@ gnutls_alpn_get_selected_protocol(gnutls_session_t session,
 
 /**
  * gnutls_alpn_set_protocols:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @protocols: is the protocol names to add.
  * @protocols_size: the number of protocols to add.
  * @flags: zero or %GNUTLS_ALPN_*

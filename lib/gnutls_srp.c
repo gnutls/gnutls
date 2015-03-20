@@ -406,7 +406,7 @@ _gnutls_calc_srp_S2(bigint_t B, bigint_t g, bigint_t x, bigint_t a,
 
 /**
  * gnutls_srp_free_client_credentials:
- * @sc: is a #gnutls_srp_client_credentials_t structure.
+ * @sc: is a #gnutls_srp_client_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus
  * this helper function is provided in order to free (deallocate) it.
@@ -420,7 +420,7 @@ void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc)
 
 /**
  * gnutls_srp_allocate_client_credentials:
- * @sc: is a pointer to a #gnutls_srp_server_credentials_t structure.
+ * @sc: is a pointer to a #gnutls_srp_server_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus
  * this helper function is provided in order to allocate it.
@@ -442,12 +442,12 @@ gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t *
 
 /**
  * gnutls_srp_set_client_credentials:
- * @res: is a #gnutls_srp_client_credentials_t structure.
+ * @res: is a #gnutls_srp_client_credentials_t type.
  * @username: is the user's userid
  * @password: is the user's password
  *
  * This function sets the username and password, in a
- * #gnutls_srp_client_credentials_t structure.  Those will be used in
+ * #gnutls_srp_client_credentials_t type.  Those will be used in
  * SRP authentication.  @username and @password should be ASCII
  * strings or UTF-8 strings prepared using the "SASLprep" profile of
  * "stringprep".
@@ -481,7 +481,7 @@ gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res,
 
 /**
  * gnutls_srp_free_server_credentials:
- * @sc: is a #gnutls_srp_server_credentials_t structure.
+ * @sc: is a #gnutls_srp_server_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus
  * this helper function is provided in order to free (deallocate) it.
@@ -509,7 +509,7 @@ void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
 
 /**
  * gnutls_srp_allocate_server_credentials:
- * @sc: is a pointer to a #gnutls_srp_server_credentials_t structure.
+ * @sc: is a pointer to a #gnutls_srp_server_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to allocate it.
@@ -555,12 +555,12 @@ cleanup:
 
 /**
  * gnutls_srp_set_server_credentials_file:
- * @res: is a #gnutls_srp_server_credentials_t structure.
+ * @res: is a #gnutls_srp_server_credentials_t type.
  * @password_file: is the SRP password file (tpasswd)
  * @password_conf_file: is the SRP password conf file (tpasswd.conf)
  *
  * This function sets the password files, in a
- * #gnutls_srp_server_credentials_t structure.  Those password files
+ * #gnutls_srp_server_credentials_t type.  Those password files
  * hold usernames and verifiers and will be used for SRP
  * authentication.
  *
@@ -609,7 +609,7 @@ gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t res,
 
 /**
  * gnutls_srp_set_server_credentials_function:
- * @cred: is a #gnutls_srp_server_credentials_t structure.
+ * @cred: is a #gnutls_srp_server_credentials_t type.
  * @func: is the callback function
  *
  * This function can be used to set a callback to retrieve the user's
@@ -652,7 +652,7 @@ gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t
 
 /**
  * gnutls_srp_set_client_credentials_function:
- * @cred: is a #gnutls_srp_server_credentials_t structure.
+ * @cred: is a #gnutls_srp_server_credentials_t type.
  * @func: is the callback function
  *
  * This function can be used to set a callback to retrieve the
@@ -768,7 +768,7 @@ gnutls_srp_verifier(const char *username, const char *password,
 
 /**
  * gnutls_srp_set_prime_bits:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @bits: is the number of bits
  *
  * This function sets the minimum accepted number of bits, for use in
@@ -790,7 +790,7 @@ void gnutls_srp_set_prime_bits(gnutls_session_t session, unsigned int bits)
 
 /**
  * gnutls_srp_set_server_fake_salt_seed:
- * @cred: is a #gnutls_srp_server_credentials_t structure
+ * @cred: is a #gnutls_srp_server_credentials_t type
  * @seed: is the seed data, only needs to be valid until the function
  * returns; size of the seed must be greater than zero
  * @salt_length: is the length of the generated fake salts

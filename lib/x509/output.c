@@ -1661,7 +1661,7 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 
 /**
  * gnutls_x509_crt_print:
- * @cert: The structure to be printed
+ * @cert: The data to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with null terminated string.
  *
@@ -2035,7 +2035,7 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 
 /**
  * gnutls_x509_crl_print:
- * @crl: The structure to be printed
+ * @crl: The data to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with null terminated string.
  *
@@ -2333,7 +2333,7 @@ static void print_crq_other(gnutls_buffer_st * str, gnutls_x509_crq_t crq)
 
 /**
  * gnutls_x509_crq_print:
- * @crq: The structure to be printed
+ * @crq: The data to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with null terminated string.
  *
@@ -2402,7 +2402,7 @@ print_pubkey_other(gnutls_buffer_st * str, gnutls_pubkey_t pubkey,
 
 /**
  * gnutls_pubkey_print:
- * @pubkey: The structure to be printed
+ * @pubkey: The data to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with null terminated string.
  *
@@ -2438,7 +2438,7 @@ gnutls_pubkey_print(gnutls_pubkey_t pubkey,
 
 /**
  * gnutls_x509_ext_print:
- * @exts: The structures to be printed
+ * @exts: The data to be printed
  * @exts_size: the number of available structures
  * @format: Indicate the format to use
  * @out: Newly allocated datum with null terminated string.

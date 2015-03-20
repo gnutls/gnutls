@@ -83,7 +83,7 @@ _gnutls_record_buffer_put(gnutls_session_t session,
 
 /**
  * gnutls_record_check_pending:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function checks if there are unread data
  * in the gnutls buffers. If the return value is
@@ -99,7 +99,7 @@ size_t gnutls_record_check_pending(gnutls_session_t session)
 
 /**
  * gnutls_record_check_corked:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function checks if there pending corked
  * data in the gnutls buffers --see gnutls_record_cork(). 

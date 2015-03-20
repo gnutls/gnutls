@@ -2359,7 +2359,7 @@ recv_hello_verify_request(gnutls_session_t session,
 
 /**
  * gnutls_rehandshake:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function will renegotiate security parameters with the
  * client.  This should only be called in case of a server.
@@ -2494,7 +2494,7 @@ static int _gnutls_recv_supplemental(gnutls_session_t session)
 
 /**
  * gnutls_handshake:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function does the handshake of the TLS/SSL protocol, and
  * initializes the TLS connection.
@@ -2609,7 +2609,7 @@ int gnutls_handshake(gnutls_session_t session)
 
 /**
  * gnutls_handshake_set_timeout:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @ms: is a timeout value in milliseconds
  *
  * This function sets the timeout for the TLS handshake process
@@ -3304,7 +3304,7 @@ _gnutls_recv_hello_request(gnutls_session_t session, void *data,
 
 /**
  * gnutls_handshake_set_max_packet_length:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @max: is the maximum number.
  *
  * This function will set the maximum size of all handshake messages.
@@ -3325,7 +3325,7 @@ gnutls_handshake_set_max_packet_length(gnutls_session_t session,
 
 /**
  * gnutls_handshake_get_last_in:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function is only useful to check where the last performed
  * handshake failed.  If the previous handshake succeed or was not
@@ -3345,7 +3345,7 @@ gnutls_handshake_get_last_in(gnutls_session_t session)
 
 /**
  * gnutls_handshake_get_last_out:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function is only useful to check where the last performed
  * handshake failed.  If the previous handshake succeed or was not

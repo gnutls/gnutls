@@ -130,7 +130,7 @@ const char *gnutls_alert_get_strname(gnutls_alert_description_t alert)
 
 /**
  * gnutls_alert_send:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @level: is the level of the alert
  * @desc: is the alert description
  *
@@ -306,7 +306,7 @@ int gnutls_error_to_alert(int err, int *level)
 
 /**
  * gnutls_alert_send_appropriate:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @err: is an integer
  *
  * Sends an alert to the peer depending on the error code returned by
@@ -337,7 +337,7 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 
 /**
  * gnutls_alert_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function will return the last alert number received.  This
  * function should be called when %GNUTLS_E_WARNING_ALERT_RECEIVED or

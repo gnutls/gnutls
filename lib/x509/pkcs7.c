@@ -144,7 +144,7 @@ static int pkcs7_reinit(gnutls_pkcs7_t pkcs7)
 
 /**
  * gnutls_pkcs7_init:
- * @pkcs7: The structure to be initialized
+ * @pkcs7: A pointer to the type to be initialized
  *
  * This function will initialize a PKCS7 structure. PKCS7 structures
  * usually contain lists of X.509 Certificates and X.509 Certificate
@@ -171,9 +171,9 @@ int gnutls_pkcs7_init(gnutls_pkcs7_t * pkcs7)
 
 /**
  * gnutls_pkcs7_deinit:
- * @pkcs7: The structure to be initialized
+ * @pkcs7: A pointer to the type to be initialized
  *
- * This function will deinitialize a PKCS7 structure.
+ * This function will deinitialize a PKCS7 type.
  **/
 void gnutls_pkcs7_deinit(gnutls_pkcs7_t pkcs7)
 {
@@ -188,7 +188,7 @@ void gnutls_pkcs7_deinit(gnutls_pkcs7_t pkcs7)
 
 /**
  * gnutls_pkcs7_import:
- * @pkcs7: The structure to store the parsed PKCS7.
+ * @pkcs7: The data to store the parsed PKCS7.
  * @data: The DER or PEM encoded PKCS7.
  * @format: One of DER or PEM
  *
@@ -259,7 +259,7 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 
 /**
  * gnutls_pkcs7_get_crt_raw:
- * @pkcs7: should contain a gnutls_pkcs7_t structure
+ * @pkcs7: should contain a gnutls_pkcs7_t type
  * @indx: contains the index of the certificate to extract
  * @certificate: the contents of the certificate will be copied
  *   there (may be null)
@@ -360,7 +360,7 @@ gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7,
 
 /**
  * gnutls_pkcs7_get_crt_count:
- * @pkcs7: should contain a #gnutls_pkcs7_t structure
+ * @pkcs7: should contain a #gnutls_pkcs7_t type
  *
  * This function will return the number of certifcates in the PKCS7
  * or RFC2630 certificate set.
@@ -401,7 +401,7 @@ int gnutls_pkcs7_get_crt_count(gnutls_pkcs7_t pkcs7)
 
 /**
  * gnutls_pkcs7_export:
- * @pkcs7: Holds the pkcs7 structure
+ * @pkcs7: The pkcs7 type
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a structure PEM or DER encoded
  * @output_data_size: holds the size of output_data (and will be
@@ -433,7 +433,7 @@ gnutls_pkcs7_export(gnutls_pkcs7_t pkcs7,
 
 /**
  * gnutls_pkcs7_export2:
- * @pkcs7: Holds the pkcs7 structure
+ * @pkcs7: The pkcs7 type
  * @format: the format of output params. One of PEM or DER.
  * @out: will contain a structure PEM or DER encoded
  *
@@ -537,7 +537,7 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 
 /**
  * gnutls_pkcs7_set_crt_raw:
- * @pkcs7: should contain a #gnutls_pkcs7_t structure
+ * @pkcs7: The pkcs7 type
  * @crt: the DER encoded certificate to be added
  *
  * This function will add a certificate to the PKCS7 or RFC2630
@@ -626,7 +626,7 @@ gnutls_pkcs7_set_crt_raw(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crt)
 
 /**
  * gnutls_pkcs7_set_crt:
- * @pkcs7: should contain a #gnutls_pkcs7_t structure
+ * @pkcs7: The pkcs7 type
  * @crt: the certificate to be copied.
  *
  * This function will add a parsed certificate to the PKCS7 or
@@ -665,7 +665,7 @@ int gnutls_pkcs7_set_crt(gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt)
 
 /**
  * gnutls_pkcs7_delete_crt:
- * @pkcs7: should contain a gnutls_pkcs7_t structure
+ * @pkcs7: The pkcs7 type
  * @indx: the index of the certificate to delete
  *
  * This function will delete a certificate from a PKCS7 or RFC2630
@@ -728,7 +728,7 @@ int gnutls_pkcs7_delete_crt(gnutls_pkcs7_t pkcs7, int indx)
 
 /**
  * gnutls_pkcs7_get_crl_raw:
- * @pkcs7: should contain a #gnutls_pkcs7_t structure
+ * @pkcs7: The pkcs7 type
  * @indx: contains the index of the crl to extract
  * @crl: the contents of the crl will be copied there (may be null)
  * @crl_size: should hold the size of the crl
@@ -802,7 +802,7 @@ gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
 
 /**
  * gnutls_pkcs7_get_crl_count:
- * @pkcs7: should contain a gnutls_pkcs7_t structure
+ * @pkcs7: The pkcs7 type
  *
  * This function will return the number of certifcates in the PKCS7
  * or RFC2630 crl set.
@@ -843,7 +843,7 @@ int gnutls_pkcs7_get_crl_count(gnutls_pkcs7_t pkcs7)
 
 /**
  * gnutls_pkcs7_set_crl_raw:
- * @pkcs7: should contain a #gnutls_pkcs7_t structure
+ * @pkcs7: The pkcs7 type
  * @crl: the DER encoded crl to be added
  *
  * This function will add a crl to the PKCS7 or RFC2630 crl set.
@@ -921,7 +921,7 @@ gnutls_pkcs7_set_crl_raw(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crl)
 
 /**
  * gnutls_pkcs7_set_crl:
- * @pkcs7: should contain a #gnutls_pkcs7_t structure
+ * @pkcs7: The pkcs7 type
  * @crl: the DER encoded crl to be added
  *
  * This function will add a parsed CRL to the PKCS7 or RFC2630 crl
@@ -958,7 +958,7 @@ int gnutls_pkcs7_set_crl(gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl)
 
 /**
  * gnutls_pkcs7_delete_crl:
- * @pkcs7: should contain a #gnutls_pkcs7_t structure
+ * @pkcs7: The pkcs7 type
  * @indx: the index of the crl to delete
  *
  * This function will delete a crl from a PKCS7 or RFC2630 crl set.

@@ -1529,7 +1529,7 @@ _gnutls_supported_ciphersuites(gnutls_session_t session,
 
 /**
  * gnutls_priority_get_cipher_suite:
- * @pcache: is a #gnutls_prioritity_t structure.
+ * @pcache: is a #gnutls_prioritity_t type.
  * @idx: is an index number.
  * @sidx: internal index of cipher suite to get information about.
  *

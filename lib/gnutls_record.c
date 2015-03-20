@@ -67,7 +67,7 @@ struct tls_record_st {
 
 /**
  * gnutls_record_disable_padding:  
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Used to disabled padding in TLS 1.0 and above.  Normally you do not
  * need to use this function, but there are buggy clients that
@@ -85,7 +85,7 @@ void gnutls_record_disable_padding(gnutls_session_t session)
 
 /**
  * gnutls_record_set_max_empty_records:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @i: is the desired value of maximum empty records that can be accepted in a row.
  *
  * Used to set the maximum number of empty fragments that can be accepted
@@ -105,7 +105,7 @@ gnutls_record_set_max_empty_records(gnutls_session_t session,
 
 /**
  * gnutls_transport_set_ptr:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @ptr: is the value.
  *
  * Used to set the first argument of the transport function (for push
@@ -123,7 +123,7 @@ gnutls_transport_set_ptr(gnutls_session_t session,
 
 /**
  * gnutls_transport_set_ptr2:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @recv_ptr: is the value for the pull function
  * @send_ptr: is the value for the push function
  *
@@ -143,7 +143,7 @@ gnutls_transport_set_ptr2(gnutls_session_t session,
 
 /**
  * gnutls_transport_set_int2:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @recv_int: is the value for the pull function
  * @send_int: is the value for the push function
  *
@@ -168,7 +168,7 @@ gnutls_transport_set_int2(gnutls_session_t session,
 /* this will be a macro */
 /**
  * gnutls_transport_set_int:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @i: is the value.
  *
  * Used to set the first argument of the transport function (for push
@@ -188,7 +188,7 @@ void gnutls_transport_set_int(gnutls_session_t session, int i)
 
 /**
  * gnutls_transport_get_ptr:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Used to get the first argument of the transport function (like
  * PUSH and PULL).  This must have been set using
@@ -203,7 +203,7 @@ gnutls_transport_ptr_t gnutls_transport_get_ptr(gnutls_session_t session)
 
 /**
  * gnutls_transport_get_ptr2:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @recv_ptr: will hold the value for the pull function
  * @send_ptr: will hold the value for the push function
  *
@@ -223,7 +223,7 @@ gnutls_transport_get_ptr2(gnutls_session_t session,
 
 /**
  * gnutls_transport_get_int2:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @recv_int: will hold the value for the pull function
  * @send_int: will hold the value for the push function
  *
@@ -244,7 +244,7 @@ gnutls_transport_get_int2(gnutls_session_t session,
 
 /**
  * gnutls_transport_get_int:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Used to get the first argument of the transport function (like
  * PUSH and PULL).  This must have been set using
@@ -261,7 +261,7 @@ int gnutls_transport_get_int(gnutls_session_t session)
 
 /**
  * gnutls_bye:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @how: is an integer
  *
  * Terminates the current TLS/SSL connection. The connection should
@@ -1449,7 +1449,7 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 
 /**
  * gnutls_packet_get:
- * @packet: is a #gnutls_packet_t structure.
+ * @packet: is a #gnutls_packet_t type.
  * @data: will contain the data present in the @packet structure (may be %NULL)
  * @sequence: the 8-bytes of the packet sequence number (may be %NULL)
  *
@@ -1495,7 +1495,7 @@ void gnutls_packet_deinit(gnutls_packet_t packet)
 
 /**
  * gnutls_record_discard_queued:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function discards all queued to be sent packets in a DTLS session.
  * These are the packets queued after an interrupted gnutls_record_send().
@@ -1514,7 +1514,7 @@ gnutls_record_discard_queued(gnutls_session_t session)
 
 /**
  * gnutls_record_recv_packet:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @packet: the structure that will hold the packet data
  *
  * This is a lower-level function than gnutls_record_recv() and allows
@@ -1542,7 +1542,7 @@ gnutls_record_recv_packet(gnutls_session_t session,
 
 /**
  * gnutls_record_send:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @data: contains the data to send
  * @data_size: is the length of the data
  *
@@ -1607,7 +1607,7 @@ gnutls_record_send(gnutls_session_t session, const void *data,
 
 /**
  * gnutls_record_cork:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * If called, gnutls_record_send() will no longer send any records.
  * Any sent records will be cached until gnutls_record_uncork() is called.
@@ -1623,7 +1623,7 @@ void gnutls_record_cork(gnutls_session_t session)
 
 /**
  * gnutls_record_uncork:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @flags: Could be zero or %GNUTLS_RECORD_WAIT
  *
  * This resets the effect of gnutls_record_cork(), and flushes any pending
@@ -1691,7 +1691,7 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
 
 /**
  * gnutls_record_recv:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @data: the buffer that the data will be read into
  * @data_size: the number of requested bytes
  *
@@ -1726,7 +1726,7 @@ gnutls_record_recv(gnutls_session_t session, void *data, size_t data_size)
 
 /**
  * gnutls_record_recv_seq:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @data: the buffer that the data will be read into
  * @data_size: the number of requested bytes
  * @seq: is the packet's 64-bit sequence number. Should have space for 8 bytes.
@@ -1755,7 +1755,7 @@ gnutls_record_recv_seq(gnutls_session_t session, void *data,
 
 /**
  * gnutls_record_set_timeout:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @ms: is a timeout value in milliseconds
  *
  * This function sets the receive timeout for the record layer

@@ -36,9 +36,9 @@
 
 /**
  * gnutls_x509_privkey_init:
- * @key: The structure to be initialized
+ * @key: A pointer to the type to be initialized
  *
- * This function will initialize an private key structure.
+ * This function will initialize a private key type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -68,7 +68,7 @@ void _gnutls_x509_privkey_reinit(gnutls_x509_privkey_t key)
 
 /**
  * gnutls_x509_privkey_deinit:
- * @key: The structure to be deinitialized
+ * @key: The key to be deinitialized
  *
  * This function will deinitialize a private key structure.
  **/
@@ -434,7 +434,7 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 
 /**
  * gnutls_x509_privkey_import:
- * @key: The structure to store the parsed key
+ * @key: The data to store the parsed key
  * @data: The DER or PEM encoded certificate.
  * @format: One of DER or PEM
  *
@@ -626,7 +626,7 @@ static int import_pkcs12_privkey(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_import2:
- * @key: The structure to store the parsed key
+ * @key: The data to store the parsed key
  * @data: The DER or PEM encoded key.
  * @format: One of DER or PEM
  * @password: A password (optional)
@@ -716,7 +716,7 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_import_rsa_raw:
- * @key: The structure to store the parsed key
+ * @key: The data to store the parsed key
  * @m: holds the modulus
  * @e: holds the public exponent
  * @d: holds the private exponent
@@ -746,7 +746,7 @@ gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_import_rsa_raw2:
- * @key: The structure to store the parsed key
+ * @key: The data to store the parsed key
  * @m: holds the modulus
  * @e: holds the public exponent
  * @d: holds the private exponent
@@ -882,7 +882,7 @@ gnutls_x509_privkey_import_rsa_raw2(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_import_dsa_raw:
- * @key: The structure to store the parsed key
+ * @key: The data to store the parsed key
  * @p: holds the p
  * @q: holds the q
  * @g: holds the g
@@ -969,7 +969,7 @@ gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_import_ecc_raw:
- * @key: The structure to store the parsed key
+ * @key: The data to store the parsed key
  * @curve: holds the curve
  * @x: holds the x
  * @y: holds the y
@@ -1038,7 +1038,7 @@ gnutls_x509_privkey_import_ecc_raw(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_get_pk_algorithm:
- * @key: should contain a #gnutls_x509_privkey_t structure
+ * @key: should contain a #gnutls_x509_privkey_t type
  *
  * This function will return the public key algorithm of a private
  * key.
@@ -1058,7 +1058,7 @@ int gnutls_x509_privkey_get_pk_algorithm(gnutls_x509_privkey_t key)
 
 /**
  * gnutls_x509_privkey_get_pk_algorithm2:
- * @key: should contain a #gnutls_x509_privkey_t structure
+ * @key: should contain a #gnutls_x509_privkey_t type
  * @bits: The number of bits in the public key algorithm
  *
  * This function will return the public key algorithm of a private
@@ -1179,7 +1179,7 @@ gnutls_x509_privkey_export2(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_sec_param:
- * @key: a key structure
+ * @key: a key
  *
  * This function will return the security parameter appropriate with
  * this private key.
@@ -1202,7 +1202,7 @@ gnutls_sec_param_t gnutls_x509_privkey_sec_param(gnutls_x509_privkey_t key)
 
 /**
  * gnutls_x509_privkey_export_ecc_raw:
- * @key: a structure that holds the rsa parameters
+ * @key: a key
  * @curve: will hold the curve
  * @x: will hold the x coordinate
  * @y: will hold the y coordinate
@@ -1233,7 +1233,7 @@ int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_export_rsa_raw:
- * @key: a structure that holds the rsa parameters
+ * @key: a key
  * @m: will hold the modulus
  * @e: will hold the public exponent
  * @d: will hold the private exponent
@@ -1259,7 +1259,7 @@ gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_export_rsa_raw2:
- * @key: a structure that holds the rsa parameters
+ * @key: a key
  * @m: will hold the modulus
  * @e: will hold the public exponent
  * @d: will hold the private exponent
@@ -1291,7 +1291,7 @@ gnutls_x509_privkey_export_rsa_raw2(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_export_dsa_raw:
- * @key: a structure that holds the DSA parameters
+ * @key: a key
  * @p: will hold the p
  * @q: will hold the q
  * @g: will hold the g
@@ -1405,7 +1405,7 @@ cleanup:
 
 /**
  * gnutls_x509_privkey_generate:
- * @key: should contain a #gnutls_x509_privkey_t structure
+ * @key: a key
  * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
  * @bits: the size of the modulus
  * @flags: unused for now.  Must be 0.
@@ -1487,7 +1487,7 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_verify_params:
- * @key: should contain a #gnutls_x509_privkey_t structure
+ * @key: a key
  *
  * This function will verify the private key parameters.
  *
@@ -1509,7 +1509,7 @@ int gnutls_x509_privkey_verify_params(gnutls_x509_privkey_t key)
 
 /**
  * gnutls_x509_privkey_get_key_id:
- * @key: Holds the key
+ * @key: a key
  * @flags: should be 0 for now
  * @output_data: will contain the key ID
  * @output_data_size: holds the size of output_data (and will be
@@ -1615,7 +1615,7 @@ _gnutls_x509_privkey_sign_hash2(gnutls_x509_privkey_t signer,
 
 /**
  * gnutls_x509_privkey_sign_hash:
- * @key: Holds the key
+ * @key: a key
  * @hash: holds the data to be signed
  * @signature: will contain newly allocated signature
  *
@@ -1655,7 +1655,7 @@ gnutls_x509_privkey_sign_hash(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_sign_data:
- * @key: Holds the key
+ * @key: a key
  * @digest: should be MD5 or SHA1
  * @flags: should be 0 for now
  * @data: holds the data to be signed
@@ -1731,7 +1731,7 @@ gnutls_x509_privkey_sign_data(gnutls_x509_privkey_t key,
 
 /**
  * gnutls_x509_privkey_fix:
- * @key: Holds the key
+ * @key: a key
  *
  * This function will recalculate the secondary parameters in a key.
  * In RSA keys, this can be the coefficient and exponent1,2.

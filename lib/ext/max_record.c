@@ -248,7 +248,7 @@ static int _gnutls_mre_record2num(uint16_t record_size)
 
 /**
  * gnutls_record_get_max_size:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Get the record size.  The maximum record size is negotiated by the
  * client after the first handshake message.
@@ -266,7 +266,7 @@ size_t gnutls_record_get_max_size(gnutls_session_t session)
 
 /**
  * gnutls_record_set_max_size:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @size: is the new size
  *
  * This function sets the maximum record packet size in this

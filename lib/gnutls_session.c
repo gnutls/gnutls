@@ -27,7 +27,7 @@
 
 /**
  * gnutls_session_get_data:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @session_data: is a pointer to space to hold the session.
  * @session_data_size: is the session_data's size, or it will be set by the function.
  *
@@ -78,7 +78,7 @@ gnutls_session_get_data(gnutls_session_t session,
 
 /**
  * gnutls_session_get_data2:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @data: is a pointer to a datum that will hold the session.
  *
  * Returns all session parameters needed to be stored to support resumption.
@@ -117,7 +117,7 @@ gnutls_session_get_data2(gnutls_session_t session, gnutls_datum_t * data)
 
 /**
  * gnutls_session_get_id:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @session_id: is a pointer to space to hold the session id.
  * @session_id_size: initially should contain the maximum @session_id size and will be updated.
  *
@@ -159,7 +159,7 @@ gnutls_session_get_id(gnutls_session_t session,
 
 /**
  * gnutls_session_get_id2:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @session_id: will point to the session ID.
  *
  * Returns the current session ID. The returned data should be
@@ -182,7 +182,7 @@ gnutls_session_get_id2(gnutls_session_t session,
 
 /**
  * gnutls_session_set_data:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @session_data: is a pointer to space to hold the session.
  * @session_data_size: is the session's size
  *
@@ -225,7 +225,7 @@ gnutls_session_set_data(gnutls_session_t session,
 
 /**
  * gnutls_session_force_valid:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Clears the invalid flag in a session. That means
  * that sessions were corrupt or invalid data were received 

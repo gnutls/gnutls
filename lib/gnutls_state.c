@@ -76,7 +76,7 @@ _gnutls_session_ecc_curve_set(gnutls_session_t session,
 
 /**
  * gnutls_cipher_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Get currently used cipher.
  *
@@ -98,7 +98,7 @@ gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session)
 
 /**
  * gnutls_certificate_type_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * The certificate type is by default X.509, unless it is negotiated
  * as a TLS extension.
@@ -114,7 +114,7 @@ gnutls_certificate_type_get(gnutls_session_t session)
 
 /**
  * gnutls_kx_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Get currently used key exchange algorithm.
  *
@@ -128,7 +128,7 @@ gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
 
 /**
  * gnutls_mac_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Get currently used MAC algorithm.
  *
@@ -150,7 +150,7 @@ gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session)
 
 /**
  * gnutls_compression_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Get currently used compression algorithm.
  *
@@ -280,7 +280,7 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 
 /**
  * gnutls_init:
- * @session: is a pointer to a #gnutls_session_t structure.
+ * @session: is a pointer to a #gnutls_session_t type.
  * @flags: indicate if this session is to be used for server or client.
  *
  * This function initializes the current session to null. Every
@@ -433,7 +433,7 @@ int _gnutls_session_is_resumable(gnutls_session_t session)
 
 /**
  * gnutls_deinit:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function clears all buffers associated with the @session.
  * This function will also remove session data from the session
@@ -670,7 +670,7 @@ _gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
 #ifdef ENABLE_OPENPGP
 /**
  * gnutls_openpgp_send_cert:
- * @session: is a pointer to a #gnutls_session_t structure.
+ * @session: is a pointer to a #gnutls_session_t type.
  * @status: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
  *
  * This function will order gnutls to send the key fingerprint
@@ -688,7 +688,7 @@ gnutls_openpgp_send_cert(gnutls_session_t session,
 
 /**
  * gnutls_certificate_send_x509_rdn_sequence:
- * @session: is a pointer to a #gnutls_session_t structure.
+ * @session: is a pointer to a #gnutls_session_t type.
  * @status: is 0 or 1
  *
  * If status is non zero, this function will order gnutls not to send
@@ -716,7 +716,7 @@ int _gnutls_openpgp_send_fingerprint(gnutls_session_t session)
 
 /*-
  * _gnutls_record_set_default_version - Used to set the default version for the first record packet
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @major: is a tls major version
  * @minor: is a tls minor version
  *
@@ -735,7 +735,7 @@ _gnutls_record_set_default_version(gnutls_session_t session,
 
 /*-
  * _gnutls_hello_set_default_version - Used to set the default version for the first record packet
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @major: is a tls major version
  * @minor: is a tls minor version
  *
@@ -754,7 +754,7 @@ _gnutls_hello_set_default_version(gnutls_session_t session,
 
 /**
  * gnutls_handshake_set_private_extensions:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @allow: is an integer (0 or 1)
  *
  * This function will enable or disable the use of private cipher
@@ -1014,7 +1014,7 @@ _gnutls_prf_raw(gnutls_mac_algorithm_t mac,
 
 /**
  * gnutls_prf_raw:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @label_size: length of the @label variable.
  * @label: label used in PRF computation, typically a short string.
  * @seed_size: length of the @seed variable.
@@ -1062,7 +1062,7 @@ gnutls_prf_raw(gnutls_session_t session,
 
 /**
  * gnutls_prf:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @label_size: length of the @label variable.
  * @label: label used in PRF computation, typically a short string.
  * @server_random_first: non-zero if server random field should be first in seed
@@ -1131,7 +1131,7 @@ gnutls_prf(gnutls_session_t session,
 
 /**
  * gnutls_session_is_resumed:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Check whether session is resumed or not.
  *
@@ -1162,7 +1162,7 @@ int gnutls_session_is_resumed(gnutls_session_t session)
 
 /**
  * gnutls_session_resumption_requested:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Check whether the client has asked for session resumption.
  * This function is valid only on server side.
@@ -1180,7 +1180,7 @@ int gnutls_session_resumption_requested(gnutls_session_t session)
 
 /*-
  * _gnutls_session_is_psk - Used to check whether this session uses PSK kx
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function will return non zero if this session uses a PSK key
  * exchange algorithm.
@@ -1200,7 +1200,7 @@ int _gnutls_session_is_psk(gnutls_session_t session)
 
 /*-
  * _gnutls_session_is_ecc - Used to check whether this session uses ECC kx
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function will return non zero if this session uses an elliptic
  * curves key exchange exchange algorithm.
@@ -1220,7 +1220,7 @@ int _gnutls_session_is_ecc(gnutls_session_t session)
 
 /**
  * gnutls_session_get_ptr:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Get user pointer for session.  Useful in callbacks.  This is the
  *   pointer set with gnutls_session_set_ptr().
@@ -1235,7 +1235,7 @@ void *gnutls_session_get_ptr(gnutls_session_t session)
 
 /**
  * gnutls_session_set_ptr:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @ptr: is the user pointer
  *
  * This function will set (associate) the user given pointer @ptr to
@@ -1250,7 +1250,7 @@ void gnutls_session_set_ptr(gnutls_session_t session, void *ptr)
 
 /**
  * gnutls_record_get_direction:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function provides information about the internals of the
  * record protocol and is only useful if a prior gnutls function call
@@ -1275,7 +1275,7 @@ int gnutls_record_get_direction(gnutls_session_t session)
 
 /*-
  * _gnutls_rsa_pms_set_version - Sets a version to be used at the RSA PMS
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @major: is the major version to use
  * @minor: is the minor version to use
  *
@@ -1293,7 +1293,7 @@ _gnutls_rsa_pms_set_version(gnutls_session_t session,
 
 /**
  * gnutls_handshake_set_post_client_hello_function:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @func: is the function to be called
  *
  * This function will set a callback to be called after the client
@@ -1328,7 +1328,7 @@ gnutls_handshake_set_post_client_hello_function(gnutls_session_t session,
 
 /**
  * gnutls_session_enable_compatibility_mode:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function can be used to disable certain (security) features in
  * TLS in order to maintain maximum compatibility with buggy
@@ -1348,7 +1348,7 @@ void gnutls_session_enable_compatibility_mode(gnutls_session_t session)
 
 /**
  * gnutls_session_channel_binding:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @cbtype: an #gnutls_channel_binding_t enumeration type
  * @cb: output buffer array with data
  *
@@ -1385,7 +1385,7 @@ gnutls_session_channel_binding(gnutls_session_t session,
 
 /**
  * gnutls_ecc_curve_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Returns the currently used elliptic curve. Only valid
  * when using an elliptic curve ciphersuite.
@@ -1402,7 +1402,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
 
 /**
  * gnutls_protocol_get_version:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Get TLS version, a #gnutls_protocol_t value.
  *
@@ -1415,7 +1415,7 @@ gnutls_protocol_t gnutls_protocol_get_version(gnutls_session_t session)
 
 /**
  * gnutls_session_get_random:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @client: the client part of the random
  * @server: the server part of the random
  *
@@ -1453,7 +1453,7 @@ unsigned int timespec_sub_ms(struct timespec *a, struct timespec *b)
 
 /**
  * gnutls_handshake_set_random:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @random: a random value of 32-bytes
  *
  * This function will explicitly set the server or client hello 
@@ -1489,7 +1489,7 @@ gnutls_handshake_set_random(gnutls_session_t session,
 
 /**
  * gnutls_handshake_set_hook_function:
- * @session: is a #gnutls_session_t structure
+ * @session: is a #gnutls_session_t type
  * @htype: the %gnutls_handshake_description_t of the message to hook at
  * @post: %GNUTLS_HOOK_* depending on when the hook function should be called
  * @func: is the function to be called
@@ -1525,7 +1525,7 @@ gnutls_handshake_set_hook_function(gnutls_session_t session,
 
 /**
  * gnutls_record_get_state:
- * @session: is a #gnutls_session_t structure
+ * @session: is a #gnutls_session_t type
  * @read: if non-zero the read parameters are returned, otherwise the write
  * @mac_key: the key used for MAC (if a MAC is used)
  * @IV: the initialization vector or nonce used
@@ -1581,7 +1581,7 @@ gnutls_record_get_state(gnutls_session_t session,
 
 /**
  * gnutls_record_set_state:
- * @session: is a #gnutls_session_t structure
+ * @session: is a #gnutls_session_t type
  * @read: if non-zero the read parameters are returned, otherwise the write
  * @seq_number: A 64-bit sequence number
  *

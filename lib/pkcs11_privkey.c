@@ -76,7 +76,7 @@ struct gnutls_pkcs11_privkey_st {
 
 /**
  * gnutls_pkcs11_privkey_init:
- * @key: The structure to be initialized
+ * @key: A pointer to the type to be initialized
  *
  * This function will initialize an private key structure.
  *
@@ -125,7 +125,7 @@ gnutls_pkcs11_privkey_cpy(gnutls_pkcs11_privkey_t dst,
 
 /**
  * gnutls_pkcs11_privkey_deinit:
- * @key: The structure to be initialized
+ * @key: A pointer to the type to be initialized
  *
  * This function will deinitialize a private key structure.
  **/
@@ -140,7 +140,7 @@ void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
 
 /**
  * gnutls_pkcs11_privkey_get_pk_algorithm:
- * @key: should contain a #gnutls_pkcs11_privkey_t structure
+ * @key: should contain a #gnutls_pkcs11_privkey_t type
  * @bits: if bits is non null it will hold the size of the parameters' in bits
  *
  * This function will return the public key algorithm of a private
@@ -160,7 +160,7 @@ gnutls_pkcs11_privkey_get_pk_algorithm(gnutls_pkcs11_privkey_t key,
 
 /**
  * gnutls_pkcs11_privkey_get_info:
- * @pkey: should contain a #gnutls_pkcs11_privkey_t structure
+ * @pkey: should contain a #gnutls_pkcs11_privkey_t type
  * @itype: Denotes the type of information requested
  * @output: where output will be stored
  * @output_size: contains the maximum size of the output and will be overwritten with actual
@@ -377,12 +377,12 @@ int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key)
 
 /**
  * gnutls_pkcs11_privkey_import_url:
- * @pkey: The structure to store the parsed key
+ * @pkey: The private key
  * @url: a PKCS 11 url identifying the key
  * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will "import" a PKCS 11 URL identifying a private
- * key to the #gnutls_pkcs11_privkey_t structure. In reality since
+ * key to the #gnutls_pkcs11_privkey_t type. In reality since
  * in most cases keys cannot be exported, the private key structure
  * is being associated with the available operations on the token.
  *

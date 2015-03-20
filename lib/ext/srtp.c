@@ -292,7 +292,7 @@ _gnutls_srtp_send_params(gnutls_session_t session,
 
 /**
  * gnutls_srtp_get_selected_profile:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @profile: will hold the profile
  *
  * This function allows you to get the negotiated SRTP profile.
@@ -331,7 +331,7 @@ gnutls_srtp_get_selected_profile(gnutls_session_t session,
 
 /**
  * gnutls_srtp_get_mki:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @mki: will hold the MKI
  *
  * This function exports the negotiated Master Key Identifier,
@@ -372,7 +372,7 @@ int gnutls_srtp_get_mki(gnutls_session_t session, gnutls_datum_t * mki)
 
 /**
  * gnutls_srtp_set_mki:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @mki: holds the MKI
  *
  * This function sets the Master Key Identifier, to be
@@ -416,7 +416,7 @@ gnutls_srtp_set_mki(gnutls_session_t session, const gnutls_datum_t * mki)
 
 /**
  * gnutls_srtp_set_profile:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @profile: is the profile id to add.
  *
  * This function is to be used by both clients and servers, to declare
@@ -459,7 +459,7 @@ gnutls_srtp_set_profile(gnutls_session_t session,
 
 /**
  * gnutls_srtp_set_profile_direct:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @profiles: is a string that contains the supported SRTP profiles,
  *   separated by colons.
  * @err_pos: In case of an error this will have the position in the string the error occured, may be NULL.
@@ -526,7 +526,7 @@ gnutls_srtp_set_profile_direct(gnutls_session_t session,
 
 /**
  * gnutls_srtp_get_keys:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @key_material: Space to hold the generated key material
  * @key_material_size: The maximum size of the key material
  * @client_key: The master client write key, pointing inside the key material

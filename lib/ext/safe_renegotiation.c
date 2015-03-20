@@ -412,7 +412,7 @@ static void _gnutls_sr_deinit_data(extension_priv_data_t priv)
 
 /**
  * gnutls_safe_renegotiation_status:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Can be used to check whether safe renegotiation is being used
  * in the current session.

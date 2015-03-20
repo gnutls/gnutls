@@ -706,7 +706,7 @@ static int find_config_file(char *file, size_t max_size)
 
 /**
  * gnutls_tdb_init:
- * @tdb: The structure to be initialized
+ * @tdb: A pointer to the type to be initialized
  *
  * This function will initialize a public key trust storage structure.
  *

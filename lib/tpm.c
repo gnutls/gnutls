@@ -552,7 +552,7 @@ import_tpm_key(gnutls_privkey_t pkey,
  * @flags: should be zero
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. 
+ * #gnutls_privkey_t type. 
  *
  * With respect to passwords the same as in gnutls_privkey_import_tpm_url() apply.
  *
@@ -819,7 +819,7 @@ static int decode_tpmkey_url(const char *url, struct tpmkey_url_st *s)
  * @flags: One of the GNUTLS_PRIVKEY_* flags
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure.
+ * #gnutls_privkey_t type.
  *
  * Note that unless %GNUTLS_PRIVKEY_DISABLE_CALLBACKS
  * is specified, if incorrect (or NULL) passwords are given
@@ -1080,7 +1080,7 @@ gnutls_pubkey_import_tpm_raw(gnutls_pubkey_t pkey,
  * @flags: should be zero
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. 
+ * #gnutls_privkey_t type. 
  *
  * Note that unless %GNUTLS_PUBKEY_DISABLE_CALLBACKS
  * is specified, if incorrect (or NULL) passwords are given

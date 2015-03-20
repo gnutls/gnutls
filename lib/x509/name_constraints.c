@@ -130,12 +130,12 @@ int _gnutls_extract_name_constraints(ASN1_TYPE c2, const char *vstr,
 
 /**
  * gnutls_x509_crt_get_name_constraints:
- * @crt: should contain a #gnutls_x509_crt_t structure
- * @nc: The nameconstraints intermediate structure
+ * @crt: should contain a #gnutls_x509_crt_t type
+ * @nc: The nameconstraints intermediate type
  * @flags: zero or %GNUTLS_NAME_CONSTRAINTS_FLAG_APPEND
  * @critical: the extension status
  *
- * This function will return an intermediate structure containing
+ * This function will return an intermediate type containing
  * the name constraints of the provided CA certificate. That
  * structure can be used in combination with gnutls_x509_name_constraints_check()
  * to verify whether a server's name is in accordance with the constraints.
@@ -192,9 +192,9 @@ int gnutls_x509_crt_get_name_constraints(gnutls_x509_crt_t crt,
 
 /**
  * gnutls_x509_name_constraints_deinit:
- * @nc: The nameconstraints structure
+ * @nc: The nameconstraints
  *
- * This function will deinitialize a name constraints structure.
+ * This function will deinitialize a name constraints type.
  *
  * Since: 3.3.0
  **/
@@ -222,9 +222,9 @@ void gnutls_x509_name_constraints_deinit(gnutls_x509_name_constraints_t nc)
 
 /**
  * gnutls_x509_name_constraints_init:
- * @nc: The nameconstraints structure
+ * @nc: The nameconstraints
  *
- * This function will initialize a name constraints structure.
+ * This function will initialize a name constraints type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
  *
@@ -296,7 +296,7 @@ int name_constraints_add(gnutls_x509_name_constraints_t nc,
 
 /**
  * gnutls_x509_name_constraints_add_permitted:
- * @nc: The nameconstraints structure
+ * @nc: The nameconstraints
  * @type: The type of the constraints
  * @name: The data of the constraints
  *
@@ -316,7 +316,7 @@ int gnutls_x509_name_constraints_add_permitted(gnutls_x509_name_constraints_t nc
 
 /**
  * gnutls_x509_name_constraints_add_excluded:
- * @nc: The nameconstraints structure
+ * @nc: The nameconstraints
  * @type: The type of the constraints
  * @name: The data of the constraints
  *
@@ -336,7 +336,7 @@ int gnutls_x509_name_constraints_add_excluded(gnutls_x509_name_constraints_t nc,
 
 /**
  * gnutls_x509_crt_set_name_constraints:
- * @crt: The certificate structure
+ * @crt: The certificate
  * @nc: The nameconstraints structure
  * @critical: whether this extension will be critical
  *
@@ -561,7 +561,7 @@ gnutls_datum_t rname;
 
 /**
  * gnutls_x509_name_constraints_check:
- * @nc: the extracted name constraints structure
+ * @nc: the extracted name constraints
  * @type: the type of the constraint to check (of type gnutls_x509_subject_alt_name_t)
  * @name: the name to be checked
  *
@@ -588,7 +588,7 @@ unsigned gnutls_x509_name_constraints_check(gnutls_x509_name_constraints_t nc,
 
 /**
  * gnutls_x509_name_constraints_check_crt:
- * @nc: the extracted name constraints structure
+ * @nc: the extracted name constraints
  * @type: the type of the constraint to check (of type gnutls_x509_subject_alt_name_t)
  * @cert: the certificate to be checked
  *
@@ -741,12 +741,12 @@ unsigned found_one;
 
 /**
  * gnutls_x509_name_constraints_get_permitted:
- * @nc: the extracted name constraints structure
+ * @nc: the extracted name constraints
  * @idx: the index of the constraint
  * @type: the type of the constraint (of type gnutls_x509_subject_alt_name_t)
  * @name: the name in the constraint (of the specific type)
  *
- * This function will return an intermediate structure containing
+ * This function will return an intermediate type containing
  * the name constraints of the provided CA certificate. That
  * structure can be used in combination with gnutls_x509_name_constraints_check()
  * to verify whether a server's name is in accordance with the constraints.
@@ -785,12 +785,12 @@ int gnutls_x509_name_constraints_get_permitted(gnutls_x509_name_constraints_t nc
 
 /**
  * gnutls_x509_name_constraints_get_excluded:
- * @nc: the extracted name constraints structure
+ * @nc: the extracted name constraints
  * @idx: the index of the constraint
  * @type: the type of the constraint (of type gnutls_x509_subject_alt_name_t)
  * @name: the name in the constraint (of the specific type)
  *
- * This function will return an intermediate structure containing
+ * This function will return an intermediate type containing
  * the name constraints of the provided CA certificate. That
  * structure can be used in combination with gnutls_x509_name_constraints_check()
  * to verify whether a server's name is in accordance with the constraints.

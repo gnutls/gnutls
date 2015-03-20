@@ -63,12 +63,12 @@ int _gnutls_map_cdk_rc(int rc)
 
 /**
  * gnutls_certificate_set_openpgp_key:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @crt: contains an openpgp public key
  * @pkey: is an openpgp private key
  *
  * This function sets a certificate/private key pair in the
- * gnutls_certificate_credentials_t structure.  This function may be
+ * gnutls_certificate_credentials_t type.  This function may be
  * called more than once (in case multiple keys/certificates exist
  * for the server).
  *
@@ -168,7 +168,7 @@ gnutls_certificate_set_openpgp_key(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_get_openpgp_key:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @index: The index of the key to obtain.
  * @key: Location to store the key.
  *
@@ -204,7 +204,7 @@ gnutls_certificate_get_openpgp_key(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_get_openpgp_crt:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @index: The index of the certificate list to obtain.
  * @crt_list: Where to store the certificate list.
  * @key: Will hold the number of certificates.
@@ -690,8 +690,8 @@ gnutls_certificate_set_openpgp_keyring_mem(gnutls_certificate_credentials_t
 
 /*-
  * _gnutls_openpgp_request_key - Receives a key from a database, key server etc
- * @ret - a pointer to gnutls_datum_t structure.
- * @cred - a gnutls_certificate_credentials_t structure.
+ * @ret - a pointer to gnutls_datum_t type.
+ * @cred - a gnutls_certificate_credentials_t type.
  * @key_fingerprint - The keyFingerprint
  * @key_fingerprint_size - the size of the fingerprint
  *

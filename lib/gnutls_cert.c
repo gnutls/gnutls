@@ -47,7 +47,7 @@
 
 /**
  * gnutls_certificate_free_keys:
- * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @sc: is a #gnutls_certificate_credentials_t type.
  *
  * This function will delete all the keys and the certificates associated
  * with the given credentials. This function must not be called when a
@@ -81,7 +81,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc)
 
 /**
  * gnutls_certificate_free_cas:
- * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @sc: is a #gnutls_certificate_credentials_t type.
  *
  * This function will delete all the CAs associated with the given
  * credentials. Servers that do not use
@@ -96,7 +96,7 @@ void gnutls_certificate_free_cas(gnutls_certificate_credentials_t sc)
 
 /**
  * gnutls_certificate_get_issuer:
- * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @sc: is a #gnutls_certificate_credentials_t type.
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any. Should be treated as constant.
  * @flags: Use zero or %GNUTLS_TL_GET_COPY
@@ -123,7 +123,7 @@ gnutls_certificate_get_issuer(gnutls_certificate_credentials_t sc,
 
 /**
  * gnutls_certificate_get_crt_raw:
- * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @sc: is a #gnutls_certificate_credentials_t type.
  * @idx1: the index of the certificate if multiple are present
  * @idx2: the index in the certificate list. Zero gives the server's certificate.
  * @cert: Will hold the DER encoded certificate.
@@ -162,7 +162,7 @@ gnutls_certificate_get_crt_raw(gnutls_certificate_credentials_t sc,
 
 /**
  * gnutls_certificate_free_ca_names:
- * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @sc: is a #gnutls_certificate_credentials_t type.
  *
  * This function will delete all the CA name in the given
  * credentials. Clients may call this to save some memory since in
@@ -182,7 +182,7 @@ void gnutls_certificate_free_ca_names(gnutls_certificate_credentials_t sc)
 
 /**
  * gnutls_certificate_free_credentials:
- * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @sc: is a #gnutls_certificate_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to free (deallocate) it.
@@ -208,7 +208,7 @@ gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
 
 /**
  * gnutls_certificate_allocate_credentials:
- * @res: is a pointer to a #gnutls_certificate_credentials_t structure.
+ * @res: is a pointer to a #gnutls_certificate_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to allocate it.
@@ -293,7 +293,7 @@ _gnutls_selected_cert_supported_kx(gnutls_session_t session,
 
 /**
  * gnutls_certificate_server_set_request:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
  *
  * This function specifies if we (in case of a server) are going to
@@ -311,7 +311,7 @@ gnutls_certificate_server_set_request(gnutls_session_t session,
 
 /**
  * gnutls_certificate_set_retrieve_function:
- * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @cred: is a #gnutls_certificate_credentials_t type.
  * @func: is the callback function
  *
  * This function sets a callback to be called in order to retrieve the
@@ -354,7 +354,7 @@ void gnutls_certificate_set_retrieve_function
 
 /**
  * gnutls_certificate_set_retrieve_function2:
- * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @cred: is a #gnutls_certificate_credentials_t type.
  * @func: is the callback function
  *
  * This function sets a callback to be called in order to retrieve the
@@ -402,7 +402,7 @@ void gnutls_certificate_set_retrieve_function2
 
 /**
  * gnutls_certificate_set_verify_function:
- * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @cred: is a #gnutls_certificate_credentials_t type.
  * @func: is the callback function
  *
  * This function sets a callback to be called when peer's certificate

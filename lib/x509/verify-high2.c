@@ -48,7 +48,7 @@
 
 /**
  * gnutls_x509_trust_list_add_trust_mem:
- * @list: The structure of the list
+ * @list: The list
  * @cas: A buffer containing a list of CAs (optional)
  * @crls: A buffer containing a list of CRLs (optional)
  * @type: The format of the certificates
@@ -119,7 +119,7 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_remove_trust_mem:
- * @list: The structure of the list
+ * @list: The list
  * @cas: A buffer containing a list of CAs (optional)
  * @type: The format of the certificates
  *
@@ -282,7 +282,7 @@ int remove_pkcs11_object_url(gnutls_x509_trust_list_t list, const char *url)
 
 /**
  * gnutls_x509_trust_list_add_trust_file:
- * @list: The structure of the list
+ * @list: The list
  * @ca_file: A file containing a list of CAs (optional)
  * @crl_file: A file containing a list of CRLs (optional)
  * @type: The format of the certificates
@@ -424,7 +424,7 @@ int load_dir_certs(const char *dirname,
 
 /**
  * gnutls_x509_trust_list_add_trust_dir:
- * @list: The structure of the list
+ * @list: The list
  * @ca_dir: A directory containing the CAs (optional)
  * @crl_dir: A directory containing a list of CRLs (optional)
  * @type: The format of the certificates
@@ -470,7 +470,7 @@ gnutls_x509_trust_list_add_trust_dir(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_remove_trust_file:
- * @list: The structure of the list
+ * @list: The list
  * @ca_file: A file containing a list of CAs
  * @type: The format of the certificates
  *

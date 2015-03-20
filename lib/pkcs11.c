@@ -384,7 +384,7 @@ int add_obj_attrs(struct p11_kit_uri *info, struct ck_attribute a[4], unsigned *
 
 /**
  * gnutls_pkcs11_obj_set_info:
- * @obj: should contain a #gnutls_pkcs11_obj_t structure
+ * @obj: should contain a #gnutls_pkcs11_obj_t type
  * @itype: Denotes the type of information to be set
  * @data: the data to set
  * @data_size: the size of data
@@ -511,7 +511,7 @@ gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t obj,
 
 /**
  * gnutls_pkcs11_obj_get_info:
- * @obj: should contain a #gnutls_pkcs11_obj_t structure
+ * @obj: should contain a #gnutls_pkcs11_obj_t type
  * @itype: Denotes the type of information requested
  * @output: where output will be stored
  * @output_size: contains the maximum size of the output and will be overwritten with actual
@@ -958,7 +958,7 @@ pkcs11_info_to_url(struct p11_kit_uri *info,
 
 /**
  * gnutls_pkcs11_obj_init:
- * @obj: The structure to be initialized
+ * @obj: A pointer to the type to be initialized
  *
  * This function will initialize a pkcs11 certificate structure.
  *
@@ -1009,7 +1009,7 @@ gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
 
 /**
  * gnutls_pkcs11_obj_deinit:
- * @obj: The structure to be initialized
+ * @obj: A pointer to the type to be initialized
  *
  * This function will deinitialize a certificate structure.
  *
@@ -1426,7 +1426,7 @@ static gnutls_pkcs11_obj_type_t pkcs11_class_to_type(ck_object_class_t class)
 	}
 }
 
-/* imports an object from a token to a pkcs11_obj_t structure.
+/* imports an object from a token to a pkcs11_obj_t type.
  */
 static int
 pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
@@ -1965,7 +1965,7 @@ unsigned int pkcs11_obj_flags_to_int(unsigned int flags)
  * @flags: Or sequence of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will "import" a PKCS 11 URL identifying an object (e.g. certificate)
- * to the #gnutls_pkcs11_obj_t structure. This does not involve any
+ * to the #gnutls_pkcs11_obj_t type. This does not involve any
  * parsing (such as X.509 or OpenPGP) since the #gnutls_pkcs11_obj_t is
  * format agnostic. Only data are transferred.
  *
@@ -3034,7 +3034,7 @@ gnutls_x509_crt_import_pkcs11(gnutls_x509_crt_t crt,
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will import a PKCS 11 certificate directly from a token
- * without involving the #gnutls_pkcs11_obj_t structure. This function will
+ * without involving the #gnutls_pkcs11_obj_t type. This function will
  * fail if the certificate stored is not of X.509 type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -3087,7 +3087,7 @@ _gnutls_x509_crt_import_pkcs11_url(gnutls_x509_crt_t crt,
  * @flags: 0 for now
  *
  * This function will import a PKCS 11 certificate list to a list of 
- * #gnutls_x509_crt_t structure. These must not be initialized.
+ * #gnutls_x509_crt_t type. These must not be initialized.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -3859,12 +3859,12 @@ int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 
 /**
  * gnutls_pkcs11_obj_get_flags:
- * @obj: The structure that holds the object
+ * @obj: The pkcs11 object
  * @oflags: Will hold the output flags
  *
- * This function will return the flags of the object being
- * stored in the structure. The @oflags are the %GNUTLS_PKCS11_OBJ_FLAG_MARK
- * flags.
+ * This function will return the flags of the object.
+ * The @oflags will be flags from %gnutls_pkcs11_obj_flags. That is,
+ * the %GNUTLS_PKCS11_OBJ_FLAG_MARK_* flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

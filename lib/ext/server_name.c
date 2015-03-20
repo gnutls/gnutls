@@ -253,7 +253,7 @@ _gnutls_server_name_send_params(gnutls_session_t session,
 
 /**
  * gnutls_server_name_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @data: will hold the data
  * @data_length: will hold the data length. Must hold the maximum size of data.
  * @type: will hold the server name indicator type
@@ -350,7 +350,7 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 
 /**
  * gnutls_server_name_set:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @type: specifies the indicator type
  * @name: is a string that contains the server name.
  * @name_length: holds the length of name

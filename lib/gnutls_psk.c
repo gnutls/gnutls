@@ -37,7 +37,7 @@
 
 /**
  * gnutls_psk_free_client_credentials:
- * @sc: is a #gnutls_psk_client_credentials_t structure.
+ * @sc: is a #gnutls_psk_client_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to free (deallocate) it.
@@ -51,7 +51,7 @@ void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc)
 
 /**
  * gnutls_psk_allocate_client_credentials:
- * @sc: is a pointer to a #gnutls_psk_server_credentials_t structure.
+ * @sc: is a pointer to a #gnutls_psk_server_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to allocate it.
@@ -73,14 +73,14 @@ gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t *
 
 /**
  * gnutls_psk_set_client_credentials:
- * @res: is a #gnutls_psk_client_credentials_t structure.
+ * @res: is a #gnutls_psk_client_credentials_t type.
  * @username: is the user's zero-terminated userid
  * @key: is the user's key
  * @flags: indicate the format of the key, either
  *   %GNUTLS_PSK_KEY_RAW or %GNUTLS_PSK_KEY_HEX.
  *
  * This function sets the username and password, in a
- * gnutls_psk_client_credentials_t structure.  Those will be used in
+ * gnutls_psk_client_credentials_t type.  Those will be used in
  * PSK authentication.  @username should be an ASCII string or UTF-8
  * strings prepared using the "SASLprep" profile of "stringprep".  The
  * key can be either in raw byte format or in Hex format (without the
@@ -150,7 +150,7 @@ gnutls_psk_set_client_credentials(gnutls_psk_client_credentials_t res,
 
 /**
  * gnutls_psk_free_server_credentials:
- * @sc: is a #gnutls_psk_server_credentials_t structure.
+ * @sc: is a #gnutls_psk_server_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to free (deallocate) it.
@@ -164,7 +164,7 @@ void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc)
 
 /**
  * gnutls_psk_allocate_server_credentials:
- * @sc: is a pointer to a #gnutls_psk_server_credentials_t structure.
+ * @sc: is a pointer to a #gnutls_psk_server_credentials_t type.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to allocate it.
@@ -187,11 +187,11 @@ gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t *
 
 /**
  * gnutls_psk_set_server_credentials_file:
- * @res: is a #gnutls_psk_server_credentials_t structure.
+ * @res: is a #gnutls_psk_server_credentials_t type.
  * @password_file: is the PSK password file (passwd.psk)
  *
  * This function sets the password file, in a
- * #gnutls_psk_server_credentials_t structure.  This password file
+ * #gnutls_psk_server_credentials_t type.  This password file
  * holds usernames and keys and will be used for PSK authentication.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
@@ -224,11 +224,11 @@ gnutls_psk_set_server_credentials_file(gnutls_psk_server_credentials_t
 
 /**
  * gnutls_psk_set_server_credentials_hint:
- * @res: is a #gnutls_psk_server_credentials_t structure.
+ * @res: is a #gnutls_psk_server_credentials_t type.
  * @hint: is the PSK identity hint string
  *
  * This function sets the identity hint, in a
- * #gnutls_psk_server_credentials_t structure.  This hint is sent to
+ * #gnutls_psk_server_credentials_t type.  This hint is sent to
  * the client to help it chose a good PSK credential (i.e., username
  * and password).
  *
@@ -252,7 +252,7 @@ gnutls_psk_set_server_credentials_hint(gnutls_psk_server_credentials_t res,
 
 /**
  * gnutls_psk_set_server_credentials_function:
- * @cred: is a #gnutls_psk_server_credentials_t structure.
+ * @cred: is a #gnutls_psk_server_credentials_t type.
  * @func: is the callback function
  *
  * This function can be used to set a callback to retrieve the user's PSK credentials.
@@ -281,7 +281,7 @@ gnutls_psk_set_server_credentials_function(gnutls_psk_server_credentials_t
 
 /**
  * gnutls_psk_set_client_credentials_function:
- * @cred: is a #gnutls_psk_server_credentials_t structure.
+ * @cred: is a #gnutls_psk_server_credentials_t type.
  * @func: is the callback function
  *
  * This function can be used to set a callback to retrieve the username and
@@ -364,7 +364,7 @@ const char *gnutls_psk_client_get_hint(gnutls_session_t session)
 
 /**
  * gnutls_psk_set_server_dh_params:
- * @res: is a gnutls_psk_server_credentials_t structure
+ * @res: is a gnutls_psk_server_credentials_t type
  * @dh_params: is a structure that holds Diffie-Hellman parameters.
  *
  * This function will set the Diffie-Hellman parameters for an
@@ -380,7 +380,7 @@ gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
 
 /**
  * gnutls_psk_set_server_params_function:
- * @res: is a #gnutls_certificate_credentials_t structure
+ * @res: is a #gnutls_certificate_credentials_t type
  * @func: is the function to be called
  *
  * This function will set a callback in order for the server to get

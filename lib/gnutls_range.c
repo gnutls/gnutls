@@ -88,7 +88,7 @@ _gnutls_range_max_lh_pad(gnutls_session_t session, ssize_t data_length,
 
 /**
  * gnutls_record_can_use_length_hiding:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * If the session supports length-hiding padding, you can
  * invoke gnutls_range_send_message() to send a message whose
@@ -128,7 +128,7 @@ int gnutls_record_can_use_length_hiding(gnutls_session_t session)
 
 /**
  * gnutls_range_split:
- * @session: is a #gnutls_session_t structure
+ * @session: is a #gnutls_session_t type
  * @orig: is the original range provided by the user
  * @next: is the returned range that can be conveyed in a TLS record
  * @remainder: is the returned remaining range
@@ -204,7 +204,7 @@ _gnutls_range_fragment(size_t data_size, gnutls_range_st cur,
 
 /**
  * gnutls_record_send_range:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @data: contains the data to send.
  * @data_size: is the length of the data.
  * @range: is the range of lengths in which the real data length must be hidden.

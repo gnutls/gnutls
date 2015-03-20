@@ -32,7 +32,7 @@
 
 /**
  * gnutls_db_set_retrieve_function:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @retr_func: is the function.
  *
  * Sets the function that will be used to retrieve data from the
@@ -55,7 +55,7 @@ gnutls_db_set_retrieve_function(gnutls_session_t session,
 
 /**
  * gnutls_db_set_remove_function:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @rem_func: is the function.
  *
  * Sets the function that will be used to remove data from the
@@ -73,7 +73,7 @@ gnutls_db_set_remove_function(gnutls_session_t session,
 
 /**
  * gnutls_db_set_store_function:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @store_func: is the function
  *
  * Sets the function that will be used to store data in the resumed
@@ -91,7 +91,7 @@ gnutls_db_set_store_function(gnutls_session_t session,
 
 /**
  * gnutls_db_set_ptr:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @ptr: is the pointer
  *
  * Sets the pointer that will be provided to db store, retrieve and
@@ -104,7 +104,7 @@ void gnutls_db_set_ptr(gnutls_session_t session, void *ptr)
 
 /**
  * gnutls_db_get_ptr:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Get db function pointer.
  *
@@ -118,7 +118,7 @@ void *gnutls_db_get_ptr(gnutls_session_t session)
 
 /**
  * gnutls_db_set_cache_expiration:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @seconds: is the number of seconds.
  *
  * Set the expiration time for resumed sessions. The default is 3600
@@ -141,7 +141,7 @@ unsigned gnutls_db_get_default_cache_expiration(void)
 
 /**
  * gnutls_db_check_entry:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @session_entry: is the session data (not key)
  *
  * This function has no effect. 
@@ -158,7 +158,7 @@ gnutls_db_check_entry(gnutls_session_t session,
 
 /**
  * gnutls_db_check_entry_time:
- * @entry: is a pointer to a #gnutls_datum_t structure.
+ * @entry: is a pointer to a #gnutls_datum_t type.
  * @t: is the time of the session handshake
  *
  * This function returns the time that this entry was active.
@@ -312,7 +312,7 @@ _gnutls_server_restore_session(gnutls_session_t session,
 
 /**
  * gnutls_db_remove_session:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function will remove the current session data from the
  * session database.  This will prevent future handshakes reusing

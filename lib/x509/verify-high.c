@@ -69,7 +69,7 @@ struct gnutls_x509_trust_list_iter {
 
 /**
  * gnutls_x509_trust_list_init:
- * @list: The structure to be initialized
+ * @list: A pointer to the type to be initialized
  * @size: The size of the internal hash table. Use (0) for default size.
  *
  * This function will initialize an X.509 trust list structure.
@@ -111,7 +111,7 @@ gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
 
 /**
  * gnutls_x509_trust_list_deinit:
- * @list: The structure to be deinitialized
+ * @list: The list to be deinitialized
  * @all: if non-zero it will deinitialize all the certificates and CRLs contained in the structure.
  *
  * This function will deinitialize a trust list. Note that the
@@ -250,7 +250,7 @@ trust_list_add_compat(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_add_cas:
- * @list: The structure of the list
+ * @list: The list
  * @clist: A list of CAs
  * @clist_size: The length of the CA list
  * @flags: should be 0 or an or'ed sequence of %GNUTLS_TL options.
@@ -386,7 +386,7 @@ advance_iter(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_iter_get_ca:
- * @list: The structure of the list
+ * @list: The list
  * @iter: A pointer to an iterator (initially the iterator should be %NULL)
  * @crt: where the certificate will be copied
  *
@@ -539,7 +539,7 @@ int ret;
 
 /**
  * gnutls_x509_trust_list_remove_cas:
- * @list: The structure of the list
+ * @list: The list
  * @clist: A list of CAs
  * @clist_size: The length of the CA list
  *
@@ -611,7 +611,7 @@ gnutls_x509_trust_list_remove_cas(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_add_named_crt:
- * @list: The structure of the list
+ * @list: The list
  * @cert: A certificate
  * @name: An identifier for the certificate
  * @name_size: The size of the identifier
@@ -676,7 +676,7 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_add_crls:
- * @list: The structure of the list
+ * @list: The list
  * @crl_list: A list of CRLs
  * @crl_size: The length of the CRL list
  * @flags: if GNUTLS_TL_VERIFY_CRL is given the CRLs will be verified before being added.
@@ -865,7 +865,7 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_get_issuer:
- * @list: The structure of the list
+ * @list: The list
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any. Should be treated as constant.
  * @flags: Use zero or %GNUTLS_TL_GET_COPY
@@ -940,7 +940,7 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_get_issuer_by_dn:
- * @list: The structure of the list
+ * @list: The list
  * @dn: is the issuer's DN
  * @issuer: Will hold the issuer if any. Should be treated as constant.
  * @flags: Use zero
@@ -1019,7 +1019,7 @@ unsigned i, j;
 
 /**
  * gnutls_x509_trust_list_verify_crt:
- * @list: The structure of the list
+ * @list: The list
  * @cert_list: is the certificate list to be verified
  * @cert_list_size: is the certificate list size
  * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
@@ -1051,7 +1051,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_verify_crt2:
- * @list: The structure of the list
+ * @list: The list
  * @cert_list: is the certificate list to be verified
  * @cert_list_size: is the certificate list size
  * @data: an array of typed data
@@ -1265,7 +1265,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 
 /**
  * gnutls_x509_trust_list_verify_named_crt:
- * @list: The structure of the list
+ * @list: The list
  * @cert: is the certificate to be verified
  * @name: is the certificate's name
  * @name_size: is the certificate's name size

@@ -35,7 +35,7 @@
 
 /*-
  * _gnutls_get_dh_params - Returns the DH parameters pointer
- * @dh_params: is an DH parameters structure, or NULL.
+ * @dh_params: is an DH parameters type, or NULL.
  * @func: is a callback function to receive the parameters or NULL.
  * @session: a gnutls session.
  *
@@ -83,7 +83,7 @@ const bigint_t *_gnutls_dh_params_to_mpi(gnutls_dh_params_t dh_primes)
 
 /**
  * gnutls_dh_params_import_raw:
- * @dh_params: Is a structure that will hold the prime numbers
+ * @dh_params: The parameters
  * @prime: holds the new prime
  * @generator: holds the new generator
  *
@@ -104,7 +104,7 @@ gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
 
 /**
  * gnutls_dh_params_import_raw2:
- * @dh_params: Is a structure that will hold the prime numbers
+ * @dh_params: The parameters
  * @prime: holds the new prime
  * @generator: holds the new generator
  * @key_bits: the private key bits (set to zero when unknown)
@@ -149,9 +149,9 @@ gnutls_dh_params_import_raw2(gnutls_dh_params_t dh_params,
 
 /**
  * gnutls_dh_params_init:
- * @dh_params: Is a structure that will hold the prime numbers
+ * @dh_params: The parameters
  *
- * This function will initialize the DH parameters structure.
+ * This function will initialize the DH parameters type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
@@ -171,9 +171,9 @@ int gnutls_dh_params_init(gnutls_dh_params_t * dh_params)
 
 /**
  * gnutls_dh_params_deinit:
- * @dh_params: Is a structure that holds the prime numbers
+ * @dh_params: The parameters
  *
- * This function will deinitialize the DH parameters structure.
+ * This function will deinitialize the DH parameters type.
  **/
 void gnutls_dh_params_deinit(gnutls_dh_params_t dh_params)
 {
@@ -189,8 +189,8 @@ void gnutls_dh_params_deinit(gnutls_dh_params_t dh_params)
 
 /**
  * gnutls_dh_params_cpy:
- * @dst: Is the destination structure, which should be initialized.
- * @src: Is the source structure
+ * @dst: Is the destination parameters, which should be initialized.
+ * @src: Is the source parameters
  *
  * This function will copy the DH parameters structure from source
  * to destination.
@@ -216,7 +216,7 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src)
 
 /**
  * gnutls_dh_params_generate2:
- * @dparams: Is the structure that the DH parameters will be stored
+ * @dparams: The parameters
  * @bits: is the prime's number of bits
  *
  * This function will generate a new pair of prime and generator for use in
@@ -256,7 +256,7 @@ gnutls_dh_params_generate2(gnutls_dh_params_t dparams, unsigned int bits)
 
 /**
  * gnutls_dh_params_import_pkcs3:
- * @params: A structure where the parameters will be copied to
+ * @params: The parameters
  * @pkcs3_params: should contain a PKCS3 DHParams structure PEM or DER encoded
  * @format: the format of params. PEM or DER.
  *

@@ -450,7 +450,7 @@ int gnutls_session_ticket_key_generate(gnutls_datum_t * key)
 
 /**
  * gnutls_session_ticket_enable_client:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Request that the client should attempt session resumption using
  * SessionTicket.
@@ -487,7 +487,7 @@ int gnutls_session_ticket_enable_client(gnutls_session_t session)
 
 /**
  * gnutls_session_ticket_enable_server:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @key: key to encrypt session parameters.
  *
  * Request that the server should attempt session resumption using

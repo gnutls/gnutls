@@ -59,7 +59,7 @@ int pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params)
 
 /**
  * gnutls_pubkey_get_pk_algorithm:
- * @key: should contain a #gnutls_pubkey_t structure
+ * @key: should contain a #gnutls_pubkey_t type
  * @bits: If set will return the number of bits of the parameters (may be NULL)
  *
  * This function will return the public key algorithm of a public
@@ -81,7 +81,7 @@ int gnutls_pubkey_get_pk_algorithm(gnutls_pubkey_t key, unsigned int *bits)
 
 /**
  * gnutls_pubkey_get_key_usage:
- * @key: should contain a #gnutls_pubkey_t structure
+ * @key: should contain a #gnutls_pubkey_t type
  * @usage: If set will return the number of bits of the parameters (may be NULL)
  *
  * This function will return the key usage of the public key.
@@ -101,9 +101,9 @@ int gnutls_pubkey_get_key_usage(gnutls_pubkey_t key, unsigned int *usage)
 
 /**
  * gnutls_pubkey_init:
- * @key: The structure to be initialized
+ * @key: A pointer to the type to be initialized
  *
- * This function will initialize an public key structure.
+ * This function will initialize a public key.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -125,7 +125,7 @@ int gnutls_pubkey_init(gnutls_pubkey_t * key)
 
 /**
  * gnutls_pubkey_deinit:
- * @key: The structure to be deinitialized
+ * @key: The key to be deinitialized
  *
  * This function will deinitialize a public key structure.
  *
@@ -146,7 +146,7 @@ void gnutls_pubkey_deinit(gnutls_pubkey_t key)
  * @flags: should be zero
  *
  * This function will import the given public key to the abstract
- * #gnutls_pubkey_t structure.
+ * #gnutls_pubkey_t type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -185,7 +185,7 @@ gnutls_pubkey_import_x509(gnutls_pubkey_t key, gnutls_x509_crt_t crt,
  * @flags: should be zero
  *
  * This function will import the given public key to the abstract
- * #gnutls_pubkey_t structure.
+ * #gnutls_pubkey_t type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -225,7 +225,7 @@ gnutls_pubkey_import_x509_crq(gnutls_pubkey_t key, gnutls_x509_crq_t crq,
  * @flags: should be zero
  *
  * Imports the public key from a private.  This function will import
- * the given public key to the abstract #gnutls_pubkey_t structure.
+ * the given public key to the abstract #gnutls_pubkey_t type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -316,7 +316,7 @@ gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
  * @flags: should be zero
  *
  * Imports a public key from a pkcs11 key. This function will import
- * the given public key to the abstract #gnutls_pubkey_t structure.
+ * the given public key to the abstract #gnutls_pubkey_t type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -407,7 +407,7 @@ gnutls_pubkey_import_pkcs11(gnutls_pubkey_t key,
  *
  * Imports a public key from an openpgp key. This function will import
  * the given public key to the abstract #gnutls_pubkey_t
- * structure. The subkey set as preferred will be imported or the
+ * type. The subkey set as preferred will be imported or the
  * master key otherwise.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -575,7 +575,7 @@ gnutls_pubkey_get_openpgp_key_id(gnutls_pubkey_t key, unsigned int flags,
  * @flags: Should be zero
  *
  * This function will import the given public key to the abstract
- * #gnutls_pubkey_t structure. 
+ * #gnutls_pubkey_t type. 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1026,13 +1026,13 @@ int gnutls_pubkey_export_ecc_x962(gnutls_pubkey_t key,
 
 /**
  * gnutls_pubkey_import:
- * @key: The structure to store the parsed public key. 
+ * @key: The public key. 
  * @data: The DER or PEM encoded certificate. 
  * @format: One of DER or PEM 
  * 
  * This function will import the provided public key in
  * a SubjectPublicKeyInfo X.509 structure to a native
- * %gnutls_pubkey_t structure. The output will be stored 
+ * %gnutls_pubkey_t type. The output will be stored 
  * in @key. If the public key is PEM encoded it should have a header 
  * of "PUBLIC KEY". 
  * 
@@ -1113,7 +1113,7 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
 
 /**
  * gnutls_x509_crt_set_pubkey:
- * @crt: should contain a #gnutls_x509_crt_t structure
+ * @crt: should contain a #gnutls_x509_crt_t type
  * @key: holds a public key
  *
  * This function will set the public parameters from the given public
@@ -1151,7 +1151,7 @@ int gnutls_x509_crt_set_pubkey(gnutls_x509_crt_t crt, gnutls_pubkey_t key)
 
 /**
  * gnutls_x509_crq_set_pubkey:
- * @crq: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t type
  * @key: holds a public key
  *
  * This function will set the public parameters from the given public
@@ -1308,7 +1308,7 @@ gnutls_pubkey_import_url(gnutls_pubkey_t key, const char *url,
 
 /**
  * gnutls_pubkey_import_rsa_raw:
- * @key: Is a structure will hold the parameters
+ * @key: The key
  * @m: holds the modulus
  * @e: holds the public exponent
  *
@@ -2002,7 +2002,7 @@ void gnutls_pubkey_set_pin_function(gnutls_pubkey_t key,
  * @flags: should be zero
  *
  * This function will import the given public key to the abstract
- * #gnutls_pubkey_t structure. 
+ * #gnutls_pubkey_t type. 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -2043,7 +2043,7 @@ int gnutls_pubkey_import_x509_raw(gnutls_pubkey_t pkey,
 
 /**
  * gnutls_pubkey_verify_params:
- * @key: should contain a #gnutls_pubkey_t structure
+ * @key: should contain a #gnutls_pubkey_t type
  *
  * This function will verify the private key parameters.
  *

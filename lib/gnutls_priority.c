@@ -492,8 +492,8 @@ static void prio_add(priority_st * priority_list, unsigned int algo)
 
 /**
  * gnutls_priority_set:
- * @session: is a #gnutls_session_t structure.
- * @priority: is a #gnutls_priority_t structure.
+ * @session: is a #gnutls_session_t type.
+ * @priority: is a #gnutls_priority_t type.
  *
  * Sets the priorities to use on the ciphers, key exchange methods,
  * macs and compression methods.
@@ -952,7 +952,7 @@ finish:
 
 /**
  * gnutls_priority_init:
- * @priority_cache: is a #gnutls_prioritity_t structure.
+ * @priority_cache: is a #gnutls_prioritity_t type.
  * @priorities: is a string describing priorities (may be %NULL)
  * @err_pos: In case of an error this will have the position in the string the error occurred
  *
@@ -1288,7 +1288,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 
 /**
  * gnutls_priority_deinit:
- * @priority_cache: is a #gnutls_prioritity_t structure.
+ * @priority_cache: is a #gnutls_prioritity_t type.
  *
  * Deinitializes the priority cache.
  **/
@@ -1300,7 +1300,7 @@ void gnutls_priority_deinit(gnutls_priority_t priority_cache)
 
 /**
  * gnutls_priority_set_direct:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @priorities: is a string describing priorities
  * @err_pos: In case of an error this will have the position in the string the error occured
  *
@@ -1369,7 +1369,7 @@ break_list(char *list,
 
 /**
  * gnutls_set_default_priority:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Sets the default priority on the ciphers, key exchange methods,
  * macs and compression methods. For more fine-tuning you could
@@ -1384,7 +1384,7 @@ int gnutls_set_default_priority(gnutls_session_t session)
 
 /**
  * gnutls_priority_ecc_curve_list:
- * @pcache: is a #gnutls_prioritity_t structure.
+ * @pcache: is a #gnutls_prioritity_t type.
  * @list: will point to an integer list
  *
  * Get a list of available elliptic curves in the priority
@@ -1406,7 +1406,7 @@ gnutls_priority_ecc_curve_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_kx_list:
- * @pcache: is a #gnutls_prioritity_t structure.
+ * @pcache: is a #gnutls_prioritity_t type.
  * @list: will point to an integer list
  *
  * Get a list of available key exchange methods in the priority
@@ -1428,7 +1428,7 @@ gnutls_priority_kx_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_cipher_list:
- * @pcache: is a #gnutls_prioritity_t structure.
+ * @pcache: is a #gnutls_prioritity_t type.
  * @list: will point to an integer list
  *
  * Get a list of available ciphers in the priority
@@ -1450,7 +1450,7 @@ gnutls_priority_cipher_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_mac_list:
- * @pcache: is a #gnutls_prioritity_t structure.
+ * @pcache: is a #gnutls_prioritity_t type.
  * @list: will point to an integer list
  *
  * Get a list of available MAC algorithms in the priority
@@ -1472,7 +1472,7 @@ gnutls_priority_mac_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_compression_list:
- * @pcache: is a #gnutls_prioritity_t structure.
+ * @pcache: is a #gnutls_prioritity_t type.
  * @list: will point to an integer list
  *
  * Get a list of available compression method in the priority
@@ -1494,7 +1494,7 @@ gnutls_priority_compression_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_protocol_list:
- * @pcache: is a #gnutls_prioritity_t structure.
+ * @pcache: is a #gnutls_prioritity_t type.
  * @list: will point to an integer list
  *
  * Get a list of available TLS version numbers in the priority
@@ -1516,7 +1516,7 @@ gnutls_priority_protocol_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_sign_list:
- * @pcache: is a #gnutls_prioritity_t structure.
+ * @pcache: is a #gnutls_prioritity_t type.
  * @list: will point to an integer list
  *
  * Get a list of available signature algorithms in the priority
@@ -1538,7 +1538,7 @@ gnutls_priority_sign_list(gnutls_priority_t pcache,
 
 /**
  * gnutls_priority_certificate_type_list:
- * @pcache: is a #gnutls_prioritity_t structure.
+ * @pcache: is a #gnutls_prioritity_t type.
  * @list: will point to an integer list
  *
  * Get a list of available certificate types in the priority

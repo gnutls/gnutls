@@ -411,7 +411,7 @@ int gnutls_pcert_import_openpgp_raw(gnutls_pcert_st * pcert,
  * @pcert: The pcert structure.
  * @crt: An initialized #gnutls_x509_crt_t.
  *
- * Converts the given #gnutls_pcert_t structure into a #gnutls_x509_crt_t.
+ * Converts the given #gnutls_pcert_t type into a #gnutls_x509_crt_t.
  * This function only works if the type of @pcert is %GNUTLS_CRT_X509.
  * When successful, the value written to @crt must be freed with
  * gnutls_x509_crt_deinit() when no longer needed.
@@ -453,7 +453,7 @@ int gnutls_pcert_export_x509(gnutls_pcert_st * pcert,
  * @pcert: The pcert structure.
  * @crt: An initialized #gnutls_openpgp_crt_t.
  *
- * Converts the given #gnutls_pcert_t structure into a #gnutls_openpgp_crt_t.
+ * Converts the given #gnutls_pcert_t type into a #gnutls_openpgp_crt_t.
  * This function only works if the type of @pcert is %GNUTLS_CRT_OPENPGP.
  * When successful, the value written to @crt must be freed with
  * gnutls_openpgp_crt_deinit() when no longer needed.

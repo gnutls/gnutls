@@ -37,7 +37,7 @@
 #ifdef ENABLE_HEARTBEAT
 /**
   * gnutls_heartbeat_enable:
-  * @session: is a #gnutls_session_t structure.
+  * @session: is a #gnutls_session_t type.
   * @type: one of the GNUTLS_HB_* flags
   *
   * If this function is called with the %GNUTLS_HB_PEER_ALLOWED_TO_SEND
@@ -63,7 +63,7 @@ void gnutls_heartbeat_enable(gnutls_session_t session, unsigned int type)
 
 /**
   * gnutls_heartbeat_allowed:
-  * @session: is a #gnutls_session_t structure.
+  * @session: is a #gnutls_session_t type.
   * @type: one of %GNUTLS_HB_LOCAL_ALLOWED_TO_SEND and %GNUTLS_HB_PEER_ALLOWED_TO_SEND
   *
   * This function will check whether heartbeats are allowed
@@ -139,7 +139,7 @@ heartbeat_send_data(gnutls_session_t session, const void *data,
 
 /**
  * gnutls_heartbeat_ping:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @data_size: is the length of the ping payload.
  * @max_tries: if flags is %GNUTLS_HEARTBEAT_WAIT then this sets the number of retransmissions. Use zero for indefinite (until timeout).
  * @flags: if %GNUTLS_HEARTBEAT_WAIT then wait for pong or timeout instead of returning immediately.
@@ -272,7 +272,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 
 /**
  * gnutls_heartbeat_pong:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @flags: should be zero
  *
  * This function replies to a ping by sending a pong to the peer.
@@ -385,7 +385,7 @@ int _gnutls_heartbeat_handle(gnutls_session_t session, mbuffer_st * bufel)
 
 /**
  * gnutls_heartbeat_get_timeout:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function will return the milliseconds remaining
  * for a retransmission of the previously sent ping
@@ -413,7 +413,7 @@ unsigned int gnutls_heartbeat_get_timeout(gnutls_session_t session)
 
 /**
  * gnutls_heartbeat_set_timeouts:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @retrans_timeout: The time at which a retransmission will occur in milliseconds
  * @total_timeout: The time at which the connection will be aborted, in milliseconds.
  *

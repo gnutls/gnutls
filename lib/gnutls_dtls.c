@@ -537,7 +537,7 @@ int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq)
 
 /**
  * gnutls_dtls_set_timeouts:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @retrans_timeout: The time at which a retransmission will occur in milliseconds
  * @total_timeout: The time at which the connection will be aborted, in milliseconds.
  *
@@ -567,7 +567,7 @@ void gnutls_dtls_set_timeouts(gnutls_session_t session,
 
 /**
  * gnutls_dtls_set_mtu:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @mtu: The maximum transfer unit of the transport
  *
  * This function will set the maximum transfer unit of the transport
@@ -721,7 +721,7 @@ size_t gnutls_record_overhead_size(gnutls_session_t session)
 
 /**
  * gnutls_dtls_get_data_mtu:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function will return the actual maximum transfer unit for
  * application data. I.e. DTLS headers are subtracted from the
@@ -747,7 +747,7 @@ unsigned int gnutls_dtls_get_data_mtu(gnutls_session_t session)
 
 /**
  * gnutls_dtls_set_data_mtu:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @mtu: The maximum unencrypted transfer unit of the session
  *
  * This function will set the maximum size of the *unencrypted* records
@@ -785,7 +785,7 @@ int gnutls_dtls_set_data_mtu(gnutls_session_t session, unsigned int mtu)
 
 /**
  * gnutls_dtls_get_mtu:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function will return the MTU size as set with
  * gnutls_dtls_set_mtu(). This is not the actual MTU
@@ -803,7 +803,7 @@ unsigned int gnutls_dtls_get_mtu(gnutls_session_t session)
 
 /**
  * gnutls_dtls_get_timeout:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function will return the milliseconds remaining
  * for a retransmission of the previously sent handshake
@@ -1080,7 +1080,7 @@ void gnutls_dtls_prestate_set(gnutls_session_t session,
 
 /**
  * gnutls_record_get_discarded:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Returns the number of discarded packets in a
  * DTLS connection.

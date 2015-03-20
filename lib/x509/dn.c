@@ -741,7 +741,7 @@ _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
  * gnutls_x509_dn_init:
  * @dn: the object to be initialized
  *
- * This function initializes a #gnutls_x509_dn_t structure.
+ * This function initializes a #gnutls_x509_dn_t type.
  *
  * The object returned must be deallocated using
  * gnutls_x509_dn_deinit().
@@ -774,7 +774,7 @@ int gnutls_x509_dn_init(gnutls_x509_dn_t * dn)
  * @data: should contain a DER encoded RDN sequence
  *
  * This function parses an RDN sequence and stores the result to a
- * #gnutls_x509_dn_t structure. The structure must have been initialized
+ * #gnutls_x509_dn_t type. The data must have been initialized
  * with gnutls_x509_dn_init(). You may use gnutls_x509_dn_get_rdn_ava() to
  * decode the DN.
  *

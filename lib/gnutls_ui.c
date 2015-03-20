@@ -77,7 +77,7 @@ int gnutls_random_art(gnutls_random_art_t type,
 #if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 /**
  * gnutls_dh_set_prime_bits:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @bits: is the number of bits
  *
  * This function sets the number of bits, for use in a Diffie-Hellman
@@ -418,8 +418,8 @@ int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
 
 /**
  * gnutls_certificate_set_dh_params:
- * @res: is a gnutls_certificate_credentials_t structure
- * @dh_params: is a structure that holds Diffie-Hellman parameters.
+ * @res: is a gnutls_certificate_credentials_t type
+ * @dh_params: the Diffie-Hellman parameters.
  *
  * This function will set the Diffie-Hellman parameters for a
  * certificate server to use. These parameters will be used in
@@ -599,7 +599,7 @@ gnutls_fingerprint(gnutls_digest_algorithm_t algo,
 
 /**
  * gnutls_certificate_set_params_function:
- * @res: is a gnutls_certificate_credentials_t structure
+ * @res: is a gnutls_certificate_credentials_t type
  * @func: is the function to be called
  *
  * This function will set a callback in order for the server to get
@@ -615,7 +615,7 @@ gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
 
 /**
  * gnutls_certificate_set_verify_flags:
- * @res: is a gnutls_certificate_credentials_t structure
+ * @res: is a gnutls_certificate_credentials_t type
  * @flags: are the flags
  *
  * This function will set the flags to be used for verification 
@@ -632,7 +632,7 @@ gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
 
 /**
  * gnutls_certificate_get_verify_flags:
- * @res: is a gnutls_certificate_credentials_t structure
+ * @res: is a gnutls_certificate_credentials_t type
  *
  * Returns the verification flags set with
  * gnutls_certificate_set_verify_flags().
@@ -649,7 +649,7 @@ gnutls_certificate_get_verify_flags(gnutls_certificate_credentials_t res)
 
 /**
  * gnutls_certificate_set_verify_limits:
- * @res: is a gnutls_certificate_credentials structure
+ * @res: is a gnutls_certificate_credentials type
  * @max_bits: is the number of bits of an acceptable certificate (default 8200)
  * @max_depth: is maximum depth of the verification of a certificate chain (default 5)
  *
@@ -670,7 +670,7 @@ gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t res,
 #ifdef ENABLE_PSK
 /**
  * gnutls_psk_set_params_function:
- * @res: is a gnutls_psk_server_credentials_t structure
+ * @res: is a gnutls_psk_server_credentials_t type
  * @func: is the function to be called
  *
  * This function will set a callback in order for the server to get
@@ -688,7 +688,7 @@ gnutls_psk_set_params_function(gnutls_psk_server_credentials_t res,
 #ifdef ENABLE_ANON
 /**
  * gnutls_anon_set_params_function:
- * @res: is a gnutls_anon_server_credentials_t structure
+ * @res: is a gnutls_anon_server_credentials_t type
  * @func: is the function to be called
  *
  * This function will set a callback in order for the server to get
@@ -870,7 +870,7 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 
 /**
  * gnutls_session_set_id:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @sid: the session identifier
  *
  * This function sets the session ID to be used in a client hello.

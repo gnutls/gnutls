@@ -34,7 +34,7 @@
 
 /**
  * gnutls_pkcs12_bag_init:
- * @bag: The structure to be initialized
+ * @bag: A pointer to the type to be initialized
  *
  * This function will initialize a PKCS12 bag structure. PKCS12 Bags
  * usually contain private keys, lists of X.509 Certificates and X.509
@@ -70,7 +70,7 @@ static inline void _pkcs12_bag_free_data(gnutls_pkcs12_bag_t bag)
 
 /**
  * gnutls_pkcs12_bag_deinit:
- * @bag: The structure to be initialized
+ * @bag: A pointer to the type to be initialized
  *
  * This function will deinitialize a PKCS12 Bag structure.
  **/

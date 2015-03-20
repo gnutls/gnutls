@@ -860,13 +860,13 @@ read_key_file(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_set_x509_key_mem:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @cert: contains a certificate list (path) for the specified private key
  * @key: is the private key, or %NULL
  * @type: is PEM or DER
  *
  * This function sets a certificate/private key pair in the
- * gnutls_certificate_credentials_t structure. This function may be called
+ * gnutls_certificate_credentials_t type. This function may be called
  * more than once, in case multiple keys/certificates exist for the
  * server.
  *
@@ -894,7 +894,7 @@ gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_set_x509_key_mem2:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @cert: contains a certificate list (path) for the specified private key
  * @key: is the private key, or %NULL
  * @type: is PEM or DER
@@ -902,7 +902,7 @@ gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials_t res,
  * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
  *
  * This function sets a certificate/private key pair in the
- * gnutls_certificate_credentials_t structure. This function may be called
+ * gnutls_certificate_credentials_t type. This function may be called
  * more than once, in case multiple keys/certificates exist for the
  * server.
  *
@@ -988,13 +988,13 @@ certificate_credentials_append_pkey(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_set_x509_key:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @cert_list: contains a certificate list (path) for the specified private key
  * @cert_list_size: holds the size of the certificate list
  * @key: is a #gnutls_x509_privkey_t key
  *
  * This function sets a certificate/private key pair in the
- * gnutls_certificate_credentials_t structure.  This function may be
+ * gnutls_certificate_credentials_t type.  This function may be
  * called more than once, in case multiple keys/certificates exist for
  * the server.  For clients that wants to send more than their own end
  * entity certificate (e.g., also an intermediate CA cert) then put
@@ -1003,7 +1003,7 @@ certificate_credentials_append_pkey(gnutls_certificate_credentials_t res,
  * Note that the certificates and keys provided, can be safely deinitialized
  * after this function is called.
  *
- * If that function fails to load the @res structure is at an undefined state, it must
+ * If that function fails to load the @res type is at an undefined state, it must
  * not be reused to load other keys or certificates.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
@@ -1095,7 +1095,7 @@ gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_get_x509_key:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @index: The index of the key to obtain.
  * @key: Location to store the key.
  *
@@ -1130,7 +1130,7 @@ gnutls_certificate_get_x509_key(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_get_x509_crt:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @index: The index of the certificate list to obtain.
  * @crt_list: Where to store the certificate list.
  * @crt_list_size: Will hold the number of certificates.
@@ -1193,7 +1193,7 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_set_key:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @names: is an array of DNS name of the certificate (NULL if none)
  * @names_size: holds the size of the names list
  * @pcert_list: contains a certificate list (path) for the specified private key
@@ -1201,7 +1201,7 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
  * @key: is a #gnutls_privkey_t key
  *
  * This function sets a certificate/private key pair in the
- * gnutls_certificate_credentials_t structure.  This function may be
+ * gnutls_certificate_credentials_t type.  This function may be
  * called more than once, in case multiple keys/certificates exist for
  * the server.  For clients that wants to send more than its own end
  * entity certificate (e.g., also an intermediate CA cert) then put
@@ -1209,7 +1209,7 @@ gnutls_certificate_get_x509_crt(gnutls_certificate_credentials_t res,
  *
  * Note that the @pcert_list and @key will become part of the credentials 
  * structure and must not be deallocated. They will be automatically deallocated 
- * when the @res structure is deinitialized.
+ * when the @res type is deinitialized.
  *
  * If that function fails to load the @res structure is at an undefined state, it must
  * not be reused to load other keys or certificates.
@@ -1277,11 +1277,11 @@ gnutls_certificate_set_key(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_set_trust_list:
- * @res: is a #gnutls_certificate_credentials_t structure.
- * @tlist: is a #gnutls_x509_trust_list_t structure
+ * @res: is a #gnutls_certificate_credentials_t type.
+ * @tlist: is a #gnutls_x509_trust_list_t type
  * @flags: must be zero
  *
- * This function sets a trust list in the gnutls_certificate_credentials_t structure. 
+ * This function sets a trust list in the gnutls_certificate_credentials_t type. 
  *
  * Note that the @tlist will become part of the credentials 
  * structure and must not be deallocated. It will be automatically deallocated 
@@ -1303,7 +1303,7 @@ gnutls_certificate_set_trust_list(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_get_trust_list:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @tlist: Location where to store the trust list.
  *
  * Obtains the list of trusted certificates stored in @res and writes a
@@ -1322,14 +1322,14 @@ gnutls_certificate_get_trust_list(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_set_x509_key_file:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @certfile: is a file that containing the certificate list (path) for
  *   the specified private key, in PKCS7 format, or a list of certificates
  * @keyfile: is a file that contains the private key
  * @type: is PEM or DER
  *
  * This function sets a certificate/private key pair in the
- * gnutls_certificate_credentials_t structure.  This function may be
+ * gnutls_certificate_credentials_t type.  This function may be
  * called more than once, in case multiple keys/certificates exist for
  * the server.  For clients that need to send more than its own end
  * entity certificate, e.g., also an intermediate CA cert, then the
@@ -1366,7 +1366,7 @@ gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_set_x509_key_file2:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @certfile: is a file that containing the certificate list (path) for
  *   the specified private key, in PKCS7 format, or a list of certificates
  * @keyfile: is a file that contains the private key
@@ -1375,7 +1375,7 @@ gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t res,
  * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
  *
  * This function sets a certificate/private key pair in the
- * gnutls_certificate_credentials_t structure.  This function may be
+ * gnutls_certificate_credentials_t type.  This function may be
  * called more than once, in case multiple keys/certificates exist for
  * the server.  For clients that need to send more than its own end
  * entity certificate, e.g., also an intermediate CA cert, then the
@@ -1487,7 +1487,7 @@ _gnutls_check_key_usage(const gnutls_pcert_st * cert,
 
 /**
  * gnutls_certificate_set_x509_trust_mem:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @ca: is a list of trusted CAs or a DER certificate
  * @type: is DER or PEM
  *
@@ -1521,7 +1521,7 @@ int ret;
 
 /**
  * gnutls_certificate_set_x509_trust:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @ca_list: is a list of trusted CAs
  * @ca_list_size: holds the size of the CA list
  *
@@ -1582,7 +1582,7 @@ gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_set_x509_trust_file:
- * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @cred: is a #gnutls_certificate_credentials_t type.
  * @cafile: is a file containing the list of trusted CAs (DER or PEM list)
  * @type: is PEM or DER
  *
@@ -1619,7 +1619,7 @@ int ret;
 
 /**
  * gnutls_certificate_set_x509_trust_dir:
- * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @cred: is a #gnutls_certificate_credentials_t type.
  * @ca_dir: is a directory containing the list of trusted CAs (DER or PEM list)
  * @type: is PEM or DER
  *
@@ -1650,7 +1650,7 @@ int ret;
 
 /**
  * gnutls_certificate_set_x509_system_trust:
- * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @cred: is a #gnutls_certificate_credentials_t type.
  *
  * This function adds the system's default trusted CAs in order to
  * verify client or server certificates.
@@ -1673,7 +1673,7 @@ gnutls_certificate_set_x509_system_trust(gnutls_certificate_credentials_t
 
 /**
  * gnutls_certificate_set_x509_crl_mem:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @CRL: is a list of trusted CRLs. They should have been verified before.
  * @type: is DER or PEM
  *
@@ -1702,7 +1702,7 @@ int ret;
 
 /**
  * gnutls_certificate_set_x509_crl:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @crl_list: is a list of trusted CRLs. They should have been verified before.
  * @crl_list_size: holds the size of the crl_list
  *
@@ -1757,7 +1757,7 @@ gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
 
 /**
  * gnutls_certificate_set_x509_crl_file:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @crlfile: is a file containing the list of verified CRLs (DER or PEM list)
  * @type: is PEM or DER
  *
@@ -1789,13 +1789,13 @@ int ret;
 
 /**
  * gnutls_certificate_set_x509_simple_pkcs12_file:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @pkcs12file: filename of file containing PKCS#12 blob.
  * @type: is PEM or DER of the @pkcs12file.
  * @password: optional password used to decrypt PKCS#12 file, bags and keys.
  *
  * This function sets a certificate/private key pair and/or a CRL in
- * the gnutls_certificate_credentials_t structure.  This function may
+ * the gnutls_certificate_credentials_t type.  This function may
  * be called more than once (in case multiple keys/certificates exist
  * for the server).
  *
@@ -1845,13 +1845,13 @@ int
 
 /**
  * gnutls_certificate_set_x509_simple_pkcs12_mem:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @res: is a #gnutls_certificate_credentials_t type.
  * @p12blob: the PKCS#12 blob.
  * @type: is PEM or DER of the @pkcs12file.
  * @password: optional password used to decrypt PKCS#12 file, bags and keys.
  *
  * This function sets a certificate/private key pair and/or a CRL in
- * the gnutls_certificate_credentials_t structure.  This function may
+ * the gnutls_certificate_credentials_t type.  This function may
  * be called more than once (in case multiple keys/certificates exist
  * for the server).
  *
@@ -1961,7 +1961,7 @@ int
 
 /**
  * gnutls_certificate_free_crls:
- * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @sc: is a #gnutls_certificate_credentials_t type.
  *
  * This function will delete all the CRLs associated
  * with the given credentials.
@@ -1974,7 +1974,7 @@ void gnutls_certificate_free_crls(gnutls_certificate_credentials_t sc)
 
 /**
  * gnutls_certificate_credentials_t:
- * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @cred: is a #gnutls_certificate_credentials_t type.
  * @fn: A PIN callback
  * @userdata: Data to be passed in the callback
  *

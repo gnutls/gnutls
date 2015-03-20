@@ -38,7 +38,7 @@ static void disable_optional_stuff(gnutls_x509_crl_t crl);
 
 /**
  * gnutls_x509_crl_set_version:
- * @crl: should contain a gnutls_x509_crl_t structure
+ * @crl: should contain a gnutls_x509_crl_t type
  * @version: holds the version number. For CRLv1 crls must be 1.
  *
  * This function will set the version of the CRL. This
@@ -74,7 +74,7 @@ gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version)
 
 /**
  * gnutls_x509_crl_sign2:
- * @crl: should contain a gnutls_x509_crl_t structure
+ * @crl: should contain a gnutls_x509_crl_t type
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
  * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
@@ -132,7 +132,7 @@ gnutls_x509_crl_sign2(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 
 /**
  * gnutls_x509_crl_sign:
- * @crl: should contain a gnutls_x509_crl_t structure
+ * @crl: should contain a gnutls_x509_crl_t type
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
  *
@@ -154,7 +154,7 @@ gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 
 /**
  * gnutls_x509_crl_set_this_update:
- * @crl: should contain a gnutls_x509_crl_t structure
+ * @crl: should contain a gnutls_x509_crl_t type
  * @act_time: The actual time
  *
  * This function will set the time this CRL was issued.
@@ -175,7 +175,7 @@ int gnutls_x509_crl_set_this_update(gnutls_x509_crl_t crl, time_t act_time)
 
 /**
  * gnutls_x509_crl_set_next_update:
- * @crl: should contain a gnutls_x509_crl_t structure
+ * @crl: should contain a gnutls_x509_crl_t type
  * @exp_time: The actual time
  *
  * This function will set the time this CRL will be updated.
@@ -195,7 +195,7 @@ int gnutls_x509_crl_set_next_update(gnutls_x509_crl_t crl, time_t exp_time)
 
 /**
  * gnutls_x509_crl_set_crt_serial:
- * @crl: should contain a gnutls_x509_crl_t structure
+ * @crl: should contain a gnutls_x509_crl_t type
  * @serial: The revoked certificate's serial number
  * @serial_size: Holds the size of the serial field.
  * @revocation_time: The time this certificate was revoked
@@ -257,7 +257,7 @@ gnutls_x509_crl_set_crt_serial(gnutls_x509_crl_t crl,
 
 /**
  * gnutls_x509_crl_set_crt:
- * @crl: should contain a gnutls_x509_crl_t structure
+ * @crl: should contain a gnutls_x509_crl_t type
  * @crt: a certificate of type #gnutls_x509_crt_t with the revoked certificate
  * @revocation_time: The time this certificate was revoked
  *
@@ -443,7 +443,7 @@ gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
 
 /**
  * gnutls_x509_crl_privkey_sign:
- * @crl: should contain a gnutls_x509_crl_t structure
+ * @crl: should contain a gnutls_x509_crl_t type
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
  * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.

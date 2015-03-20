@@ -40,7 +40,7 @@
 
 /**
  * gnutls_privkey_get_type:
- * @key: should contain a #gnutls_privkey_t structure
+ * @key: should contain a #gnutls_privkey_t type
  *
  * This function will return the type of the private key. This is
  * actually the type of the subsystem used to set this private key.
@@ -57,7 +57,7 @@ gnutls_privkey_type_t gnutls_privkey_get_type(gnutls_privkey_t key)
 
 /**
  * gnutls_privkey_get_pk_algorithm:
- * @key: should contain a #gnutls_privkey_t structure
+ * @key: should contain a #gnutls_privkey_t type
  * @bits: If set will return the number of bits of the parameters (may be NULL)
  *
  * This function will return the public key algorithm of a private
@@ -247,9 +247,9 @@ _gnutls_privkey_get_public_mpis(gnutls_privkey_t key,
 
 /**
  * gnutls_privkey_init:
- * @key: The structure to be initialized
+ * @key: A pointer to the type to be initialized
  *
- * This function will initialize an private key structure.
+ * This function will initialize a private key.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -271,7 +271,7 @@ int gnutls_privkey_init(gnutls_privkey_t * key)
 
 /**
  * gnutls_privkey_deinit:
- * @key: The structure to be deinitialized
+ * @key: The key to be deinitialized
  *
  * This function will deinitialize a private key structure.
  *
@@ -328,7 +328,7 @@ static int check_if_clean(gnutls_privkey_t key)
  * @flags: Flags for the import
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure.
+ * #gnutls_privkey_t type.
  *
  * The #gnutls_pkcs11_privkey_t object must not be deallocated
  * during the lifetime of this structure.
@@ -374,7 +374,7 @@ gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,
  * @url: A PKCS 11 url
  *
  * This function will import a PKCS 11 private key to a #gnutls_private_key_t
- * structure.
+ * type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -424,7 +424,7 @@ int gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key, const char *url)
  * @key: Location for the key to be exported.
  *
  * Converts the given abstract private key to a #gnutls_pkcs11_privkey_t
- * structure. The key must be of type %GNUTLS_PRIVKEY_PKCS11. The key
+ * type. The key must be of type %GNUTLS_PRIVKEY_PKCS11. The key
  * returned in @key must be deinitialized with
  * gnutls_pkcs11_privkey_deinit().
  *
@@ -470,7 +470,7 @@ gnutls_privkey_export_pkcs11(gnutls_privkey_t pkey,
  * @flags: Flags for the import
  *
  * This function will associate the given callbacks with the
- * #gnutls_privkey_t structure. At least one of the two callbacks
+ * #gnutls_privkey_t type. At least one of the two callbacks
  * must be non-null.
  *
  * See also gnutls_privkey_import_ext3().
@@ -503,7 +503,7 @@ gnutls_privkey_import_ext(gnutls_privkey_t pkey,
  * @flags: Flags for the import
  *
  * This function will associate the given callbacks with the
- * #gnutls_privkey_t structure. At least one of the two callbacks
+ * #gnutls_privkey_t type. At least one of the two callbacks
  * must be non-null. If a deinitialization function is provided
  * then flags is assumed to contain %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE.
  *
@@ -565,7 +565,7 @@ gnutls_privkey_import_ext2(gnutls_privkey_t pkey,
  * @flags: Flags for the import
  *
  * This function will associate the given callbacks with the
- * #gnutls_privkey_t structure. At least one of the two callbacks
+ * #gnutls_privkey_t type. At least one of the two callbacks
  * must be non-null. If a deinitialization function is provided
  * then flags is assumed to contain %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE.
  *
@@ -630,7 +630,7 @@ gnutls_privkey_import_ext3(gnutls_privkey_t pkey,
  * @flags: Flags for the import
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure.
+ * #gnutls_privkey_t type.
  *
  * The #gnutls_x509_privkey_t object must not be deallocated
  * during the lifetime of this structure.
@@ -681,7 +681,7 @@ gnutls_privkey_import_x509(gnutls_privkey_t pkey,
  * @key: Location for the key to be exported.
  *
  * Converts the given abstract private key to a #gnutls_x509_privkey_t
- * structure. The key must be of type %GNUTLS_PRIVKEY_X509. The key returned
+ * type. The key must be of type %GNUTLS_PRIVKEY_X509. The key returned
  * in @key must be deinitialized with gnutls_x509_privkey_deinit().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -769,7 +769,7 @@ gnutls_privkey_generate(gnutls_privkey_t pkey,
  * @flags: Flags for the import
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure.
+ * #gnutls_privkey_t type.
  *
  * The #gnutls_openpgp_privkey_t object must not be deallocated
  * during the lifetime of this structure. The subkey set as
@@ -840,7 +840,7 @@ gnutls_privkey_import_openpgp(gnutls_privkey_t pkey,
  * @password: A password (optional)
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. 
+ * #gnutls_privkey_t type. 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -896,7 +896,7 @@ int gnutls_privkey_import_openpgp_raw(gnutls_privkey_t pkey,
  * @key: Location for the key to be exported.
  *
  * Converts the given abstract private key to a #gnutls_openpgp_privkey_t
- * structure. The key must be of type %GNUTLS_PRIVKEY_OPENPGP. The key
+ * type. The key must be of type %GNUTLS_PRIVKEY_OPENPGP. The key
  * returned in @key must be deinitialized with
  * gnutls_openpgp_privkey_deinit().
  *
@@ -1173,7 +1173,7 @@ gnutls_privkey_decrypt_data(gnutls_privkey_t key,
  * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. 
+ * #gnutls_privkey_t type. 
  *
  * The supported formats are basic unencrypted key, PKCS8, PKCS12, 
  * and the openssl format.
@@ -1334,7 +1334,7 @@ int gnutls_privkey_status(gnutls_privkey_t key)
 
 /**
  * gnutls_privkey_verify_params:
- * @key: should contain a #gnutls_privkey_t structure
+ * @key: should contain a #gnutls_privkey_t type
  *
  * This function will verify the private key parameters.
  *
@@ -1368,7 +1368,7 @@ int gnutls_privkey_verify_params(gnutls_privkey_t key)
 
 /*-
  * _gnutls_privkey_get_preferred_sign_algo:
- * @key: should contain a #gnutls_privkey_t structure
+ * @key: should contain a #gnutls_privkey_t type
  *
  * This function returns the preferred signature algorithm for this
  * private key.

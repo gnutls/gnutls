@@ -890,7 +890,7 @@ unpack_security_parameters(gnutls_session_t session, gnutls_buffer_st * ps)
 
 /**
  * gnutls_session_set_premaster:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @entity: GNUTLS_SERVER or GNUTLS_CLIENT
  * @version: the TLS protocol version
  * @kx: the key exchange method

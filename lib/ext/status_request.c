@@ -296,7 +296,7 @@ _gnutls_status_request_recv_params(gnutls_session_t session,
 
 /**
  * gnutls_ocsp_status_request_enable_client:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @responder_id: array with #gnutls_datum_t with DER data of responder id
  * @responder_id_size: number of members in @responder_id array
  * @extensions: a #gnutls_datum_t with DER encoded OCSP extensions
@@ -344,7 +344,7 @@ gnutls_ocsp_status_request_enable_client(gnutls_session_t session,
 
 /**
  * gnutls_ocsp_status_request_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @response: a #gnutls_datum_t with DER encoded OCSP response
  *
  * This function returns the OCSP status response received
@@ -389,7 +389,7 @@ gnutls_ocsp_status_request_get(gnutls_session_t session,
 
 /**
  * gnutls_certificate_set_ocsp_status_request_function:
- * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @sc: is a #gnutls_certificate_credentials_t type.
  * @ocsp_func: function pointer to OCSP status request callback.
  * @ptr: opaque pointer passed to callback function
  *

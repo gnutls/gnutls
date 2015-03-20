@@ -50,7 +50,7 @@ typedef struct gnutls_ocsp_resp_int {
 
 /**
  * gnutls_ocsp_req_init:
- * @req: The structure to be initialized
+ * @req: A pointer to the type to be initialized
  *
  * This function will initialize an OCSP request structure.
  *
@@ -81,7 +81,7 @@ int gnutls_ocsp_req_init(gnutls_ocsp_req_t * req)
 
 /**
  * gnutls_ocsp_req_deinit:
- * @req: The structure to be deinitialized
+ * @req: The data to be deinitialized
  *
  * This function will deinitialize a OCSP request structure.
  **/
@@ -99,7 +99,7 @@ void gnutls_ocsp_req_deinit(gnutls_ocsp_req_t req)
 
 /**
  * gnutls_ocsp_resp_init:
- * @resp: The structure to be initialized
+ * @resp: A pointer to the type to be initialized
  *
  * This function will initialize an OCSP response structure.
  *
@@ -140,7 +140,7 @@ int gnutls_ocsp_resp_init(gnutls_ocsp_resp_t * resp)
 
 /**
  * gnutls_ocsp_resp_deinit:
- * @resp: The structure to be deinitialized
+ * @resp: The data to be deinitialized
  *
  * This function will deinitialize a OCSP response structure.
  **/
@@ -165,7 +165,7 @@ void gnutls_ocsp_resp_deinit(gnutls_ocsp_resp_t resp)
 
 /**
  * gnutls_ocsp_req_import:
- * @req: The structure to store the parsed request.
+ * @req: The data to store the parsed request.
  * @data: DER encoded OCSP request.
  *
  * This function will convert the given DER encoded OCSP request to
@@ -211,7 +211,7 @@ gnutls_ocsp_req_import(gnutls_ocsp_req_t req, const gnutls_datum_t * data)
 
 /**
  * gnutls_ocsp_resp_import:
- * @resp: The structure to store the parsed response.
+ * @resp: The data to store the parsed response.
  * @data: DER encoded OCSP response.
  *
  * This function will convert the given DER encoded OCSP response to
@@ -362,7 +362,7 @@ int gnutls_ocsp_resp_export(gnutls_ocsp_resp_t resp, gnutls_datum_t * data)
 
 /**
  * gnutls_ocsp_req_get_version:
- * @req: should contain a #gnutls_ocsp_req_t structure
+ * @req: should contain a #gnutls_ocsp_req_t type
  *
  * This function will return the version of the OCSP request.
  * Typically this is always 1 indicating version 1.
@@ -394,7 +394,7 @@ int gnutls_ocsp_req_get_version(gnutls_ocsp_req_t req)
 
 /**
  * gnutls_ocsp_req_get_cert_id:
- * @req: should contain a #gnutls_ocsp_req_t structure
+ * @req: should contain a #gnutls_ocsp_req_t type
  * @indx: Specifies which extension OID to get. Use (0) to get the first one.
  * @digest: output variable with #gnutls_digest_algorithm_t hash algorithm
  * @issuer_name_hash: output buffer with hash of issuer's DN
@@ -508,7 +508,7 @@ gnutls_ocsp_req_get_cert_id(gnutls_ocsp_req_t req,
 
 /**
  * gnutls_ocsp_req_add_cert_id:
- * @req: should contain a #gnutls_ocsp_req_t structure
+ * @req: should contain a #gnutls_ocsp_req_t type
  * @digest: hash algorithm, a #gnutls_digest_algorithm_t value
  * @issuer_name_hash: hash of issuer's DN
  * @issuer_key_hash: hash of issuer's public key
@@ -621,7 +621,7 @@ gnutls_ocsp_req_add_cert_id(gnutls_ocsp_req_t req,
 
 /**
  * gnutls_ocsp_req_add_cert:
- * @req: should contain a #gnutls_ocsp_req_t structure
+ * @req: should contain a #gnutls_ocsp_req_t type
  * @digest: hash algorithm, a #gnutls_digest_algorithm_t value
  * @issuer: issuer of @subject certificate
  * @cert: certificate to request status for
@@ -707,7 +707,7 @@ gnutls_ocsp_req_add_cert(gnutls_ocsp_req_t req,
 
 /**
  * gnutls_ocsp_req_get_extension:
- * @req: should contain a #gnutls_ocsp_req_t structure
+ * @req: should contain a #gnutls_ocsp_req_t type
  * @indx: Specifies which extension OID to get. Use (0) to get the first one.
  * @oid: will hold newly allocated buffer with OID of extension, may be NULL
  * @critical: output variable with critical flag, may be NULL.
@@ -792,7 +792,7 @@ gnutls_ocsp_req_get_extension(gnutls_ocsp_req_t req,
 
 /**
  * gnutls_ocsp_req_set_extension:
- * @req: should contain a #gnutls_ocsp_req_t structure
+ * @req: should contain a #gnutls_ocsp_req_t type
  * @oid: buffer with OID of extension as a string.
  * @critical: critical flag, normally false.
  * @data: the extension data
@@ -821,7 +821,7 @@ gnutls_ocsp_req_set_extension(gnutls_ocsp_req_t req,
 
 /**
  * gnutls_ocsp_req_get_nonce:
- * @req: should contain a #gnutls_ocsp_req_t structure
+ * @req: should contain a #gnutls_ocsp_req_t type
  * @critical: whether nonce extension is marked critical, or NULL
  * @nonce: will hold newly allocated buffer with nonce data
  *
@@ -868,7 +868,7 @@ gnutls_ocsp_req_get_nonce(gnutls_ocsp_req_t req,
 
 /**
  * gnutls_ocsp_req_set_nonce:
- * @req: should contain a #gnutls_ocsp_req_t structure
+ * @req: should contain a #gnutls_ocsp_req_t type
  * @critical: critical flag, normally false.
  * @nonce: the nonce data
  *
@@ -920,7 +920,7 @@ gnutls_ocsp_req_set_nonce(gnutls_ocsp_req_t req,
 
 /**
  * gnutls_ocsp_req_randomize_nonce:
- * @req: should contain a #gnutls_ocsp_req_t structure
+ * @req: should contain a #gnutls_ocsp_req_t type
  *
  * This function will add or update an nonce extension to the OCSP
  * request with a newly generated random value.
@@ -956,7 +956,7 @@ int gnutls_ocsp_req_randomize_nonce(gnutls_ocsp_req_t req)
 
 /**
  * gnutls_ocsp_resp_get_status:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  *
  * This function will return the status of a OCSP response, an
  * #gnutls_ocsp_resp_status_t enumeration.
@@ -998,7 +998,7 @@ int gnutls_ocsp_resp_get_status(gnutls_ocsp_resp_t resp)
 
 /**
  * gnutls_ocsp_resp_get_response:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @response_type_oid: newly allocated output buffer with response type OID
  * @response: newly allocated output buffer with DER encoded response
  *
@@ -1055,7 +1055,7 @@ gnutls_ocsp_resp_get_response(gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_get_version:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  *
  * This function will return the version of the Basic OCSP Response.
  * Typically this is always 1 indicating version 1.
@@ -1089,7 +1089,7 @@ int gnutls_ocsp_resp_get_version(gnutls_ocsp_resp_t resp)
 
 /**
  * gnutls_ocsp_resp_get_responder:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @dn: newly allocated buffer with name
  *
  * This function will extract the name of the Basic OCSP Response in
@@ -1152,7 +1152,7 @@ gnutls_ocsp_resp_get_responder(gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_get_responder_by_key:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @type: should be %GNUTLS_OCSP_RESP_ID_KEY or %GNUTLS_OCSP_RESP_ID_DN
  * @raw: newly allocated buffer with the raw ID
  *
@@ -1228,7 +1228,7 @@ gnutls_ocsp_resp_get_responder_raw_id(gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_get_produced:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  *
  * This function will return the time when the OCSP response was
  * signed.
@@ -1262,7 +1262,7 @@ time_t gnutls_ocsp_resp_get_produced(gnutls_ocsp_resp_t resp)
 
 /**
  * gnutls_ocsp_resp_check_crt:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @indx: Specifies response number to get. Use (0) to get the first one.
  * @crt: The certificate to check
  *
@@ -1357,7 +1357,7 @@ gnutls_ocsp_resp_check_crt(gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_get_single:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @indx: Specifies response number to get. Use (0) to get the first one.
  * @digest: output variable with #gnutls_digest_algorithm_t hash algorithm
  * @issuer_name_hash: output buffer with hash of issuer's DN
@@ -1558,7 +1558,7 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_get_extension:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @indx: Specifies which extension OID to get. Use (0) to get the first one.
  * @oid: will hold newly allocated buffer with OID of extension, may be NULL
  * @critical: output variable with critical flag, may be NULL.
@@ -1644,7 +1644,7 @@ gnutls_ocsp_resp_get_extension(gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_get_nonce:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @critical: whether nonce extension is marked critical
  * @nonce: will hold newly allocated buffer with nonce data
  *
@@ -1689,7 +1689,7 @@ gnutls_ocsp_resp_get_nonce(gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_get_signature_algorithm:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  *
  * This function will return a value of the #gnutls_sign_algorithm_t
  * enumeration that is the signature algorithm that has been used to
@@ -1719,7 +1719,7 @@ int gnutls_ocsp_resp_get_signature_algorithm(gnutls_ocsp_resp_t resp)
 
 /**
  * gnutls_ocsp_resp_get_signature:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @sig: newly allocated output buffer with signature data
  *
  * This function will extract the signature field of a OCSP response.
@@ -1749,7 +1749,7 @@ gnutls_ocsp_resp_get_signature(gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_get_certs:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @certs: newly allocated array with #gnutls_x509_crt_t certificates
  * @ncerts: output variable with number of allocated certs.
  *
@@ -2048,7 +2048,7 @@ static int check_ocsp_purpose(gnutls_x509_crt_t signercert)
 
 /**
  * gnutls_ocsp_resp_verify_direct:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
  * @issuer: certificate believed to have signed the response
  * @verify: output variable with verification status, an #gnutls_ocsp_verify_reason_t
  * @flags: verification flags, 0 for now.
@@ -2124,8 +2124,8 @@ gnutls_ocsp_resp_verify_direct(gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_verify:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
- * @trustlist: trust anchors as a #gnutls_x509_trust_list_t structure
+ * @resp: should contain a #gnutls_ocsp_resp_t type
+ * @trustlist: trust anchors as a #gnutls_x509_trust_list_t type
  * @verify: output variable with verification status, an #gnutls_ocsp_verify_reason_t
  * @flags: verification flags, 0 for now.
  *

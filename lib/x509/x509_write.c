@@ -113,7 +113,7 @@ gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt_t crt,
 
 /**
  * gnutls_x509_crt_set_proxy_dn:
- * @crt: a gnutls_x509_crt_t structure with the new proxy cert
+ * @crt: a gnutls_x509_crt_t type with the new proxy cert
  * @eecrt: the end entity certificate that will be issuing the proxy
  * @raw_flag: must be 0, or 1 if the CN is DER encoded
  * @name: a pointer to the CN name, may be NULL (but MUST then be added later)
@@ -1530,8 +1530,8 @@ gnutls_x509_crt_set_authority_info_access(gnutls_x509_crt_t crt,
 
 /**
  * gnutls_x509_crt_set_policy:
- * @crt: should contain a #gnutls_x509_crt_t structure
- * @policy: A pointer to a policy structure.
+ * @crt: should contain a #gnutls_x509_crt_t type
+ * @policy: A pointer to a policy
  * @critical: use non-zero if the extension is marked as critical
  *
  * This function will set the certificate policy extension (2.5.29.32).

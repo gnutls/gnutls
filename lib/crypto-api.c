@@ -37,7 +37,7 @@ typedef struct api_cipher_hd_st {
 
 /**
  * gnutls_cipher_init:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @cipher: the encryption algorithm to use
  * @key: The key to be used for encryption
  * @iv: The IV to use (if not applicable set NULL)
@@ -84,7 +84,7 @@ gnutls_cipher_init(gnutls_cipher_hd_t * handle,
 
 /**
  * gnutls_cipher_tag:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @tag: will hold the tag
  * @tag_size: The length of the tag to return
  *
@@ -111,7 +111,7 @@ gnutls_cipher_tag(gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
 
 /**
  * gnutls_cipher_add_auth:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @ptext: the data to be authenticated
  * @ptext_size: The length of the data
  *
@@ -140,7 +140,7 @@ gnutls_cipher_add_auth(gnutls_cipher_hd_t handle, const void *ptext,
 
 /**
  * gnutls_cipher_set_iv:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @iv: the IV to set
  * @ivlen: The length of the IV
  *
@@ -162,7 +162,7 @@ gnutls_cipher_set_iv(gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
 
 /**
  * gnutls_cipher_encrypt:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @ptext: the data to encrypt
  * @ptext_len: The length of data to encrypt
  *
@@ -184,7 +184,7 @@ gnutls_cipher_encrypt(gnutls_cipher_hd_t handle, void *ptext,
 
 /**
  * gnutls_cipher_decrypt:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @ctext: the data to decrypt
  * @ctext_len: The length of data to decrypt
  *
@@ -214,7 +214,7 @@ gnutls_cipher_decrypt(gnutls_cipher_hd_t handle, void *ctext,
 
 /**
  * gnutls_cipher_encrypt2:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @ptext: the data to encrypt
  * @ptextlen: The length of data to encrypt
  * @ctext: the encrypted data
@@ -240,7 +240,7 @@ gnutls_cipher_encrypt2(gnutls_cipher_hd_t handle, const void *ptext,
 
 /**
  * gnutls_cipher_decrypt2:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @ctext: the data to decrypt
  * @ctext_len: The length of data to decrypt
  * @ptext: the decrypted data
@@ -274,7 +274,7 @@ gnutls_cipher_decrypt2(gnutls_cipher_hd_t handle, const void *ctext,
 
 /**
  * gnutls_cipher_deinit:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  *
  * This function will deinitialize all resources occupied by the given
  * encryption context.
@@ -296,7 +296,7 @@ void gnutls_cipher_deinit(gnutls_cipher_hd_t handle)
 
 /**
  * gnutls_hmac_init:
- * @dig: is a #gnutls_hmac_hd_t structure.
+ * @dig: is a #gnutls_hmac_hd_t type.
  * @algorithm: the HMAC algorithm to use
  * @key: The key to be used for encryption
  * @keylen: The length of the key
@@ -340,7 +340,7 @@ gnutls_hmac_init(gnutls_hmac_hd_t * dig,
 
 /**
  * gnutls_hmac_set_nonce:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @nonce: the data to set as nonce
  * @nonce_len: The length of data
  *
@@ -357,7 +357,7 @@ gnutls_hmac_set_nonce(gnutls_hmac_hd_t handle, const void *nonce,
 
 /**
  * gnutls_hmac:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @ptext: the data to hash
  * @ptext_len: The length of data to hash
  *
@@ -375,7 +375,7 @@ int gnutls_hmac(gnutls_hmac_hd_t handle, const void *ptext, size_t ptext_len)
 
 /**
  * gnutls_hmac_output:
- * @handle: is a #gnutls_hmac_hd_t structure.
+ * @handle: is a #gnutls_hmac_hd_t type.
  * @digest: is the output value of the MAC
  *
  * This function will output the current MAC value
@@ -390,7 +390,7 @@ void gnutls_hmac_output(gnutls_hmac_hd_t handle, void *digest)
 
 /**
  * gnutls_hmac_deinit:
- * @handle: is a #gnutls_hmac_hd_t structure.
+ * @handle: is a #gnutls_hmac_hd_t type.
  * @digest: is the output value of the MAC
  *
  * This function will deinitialize all resources occupied by
@@ -449,7 +449,7 @@ gnutls_hmac_fast(gnutls_mac_algorithm_t algorithm,
 
 /**
  * gnutls_hash_init:
- * @dig: is a #gnutls_hash_hd_t structure.
+ * @dig: is a #gnutls_hash_hd_t type.
  * @algorithm: the hash algorithm to use
  *
  * This function will initialize an context that can be used to
@@ -487,7 +487,7 @@ gnutls_hash_init(gnutls_hash_hd_t * dig,
 
 /**
  * gnutls_hash:
- * @handle: is a #gnutls_cipher_hd_t structure.
+ * @handle: is a #gnutls_cipher_hd_t type.
  * @ptext: the data to hash
  * @ptext_len: The length of data to hash
  *
@@ -505,7 +505,7 @@ int gnutls_hash(gnutls_hash_hd_t handle, const void *ptext, size_t ptext_len)
 
 /**
  * gnutls_hash_output:
- * @handle: is a #gnutls_hash_hd_t structure.
+ * @handle: is a #gnutls_hash_hd_t type.
  * @digest: is the output value of the hash
  *
  * This function will output the current hash value
@@ -520,7 +520,7 @@ void gnutls_hash_output(gnutls_hash_hd_t handle, void *digest)
 
 /**
  * gnutls_hash_deinit:
- * @handle: is a #gnutls_hash_hd_t structure.
+ * @handle: is a #gnutls_hash_hd_t type.
  * @digest: is the output value of the hash
  *
  * This function will deinitialize all resources occupied by
@@ -621,7 +621,7 @@ typedef struct api_aead_cipher_hd_st {
 
 /**
  * gnutls_aead_cipher_init:
- * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @cipher: the authenticated-encryption algorithm to use
  * @key: The key to be used for encryption
  *
@@ -660,7 +660,7 @@ int gnutls_aead_cipher_init(gnutls_aead_cipher_hd_t * handle,
 
 /**
  * gnutls_aead_cipher_decrypt:
- * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @nonce: the nonce to set
  * @nonce_len: The length of the nonce
  * @auth: the data to be authenticated
@@ -717,7 +717,7 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
 
 /**
  * gnutls_aead_cipher_encrypt:
- * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @handle: is a #gnutls_aead_cipher_hd_t type.
  * @nonce: the nonce to set
  * @nonce_len: The length of the nonce
  * @auth: the data to be authenticated
@@ -773,7 +773,7 @@ gnutls_aead_cipher_encrypt(gnutls_aead_cipher_hd_t handle,
 
 /**
  * gnutls_aead_cipher_deinit:
- * @handle: is a #gnutls_aead_cipher_hd_t structure.
+ * @handle: is a #gnutls_aead_cipher_hd_t type.
  *
  * This function will deinitialize all resources occupied by the given
  * authenticated-encryption context.

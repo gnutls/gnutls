@@ -320,7 +320,7 @@ static int cng_info(gnutls_privkey_t key, unsigned int flags, void *userdata)
  * @url: The URL of the key
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. 
+ * #gnutls_privkey_t type. 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

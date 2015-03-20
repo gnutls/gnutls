@@ -34,7 +34,7 @@
 
 /**
  * gnutls_openpgp_crt_init:
- * @key: The structure to be initialized
+ * @key: A pointer to the type to be initialized
  *
  * This function will initialize an OpenPGP key structure.
  *
@@ -51,7 +51,7 @@ int gnutls_openpgp_crt_init(gnutls_openpgp_crt_t * key)
 
 /**
  * gnutls_openpgp_crt_deinit:
- * @key: The structure to be initialized
+ * @key: A pointer to the type to be initialized
  *
  * This function will deinitialize a key structure.
  **/
@@ -583,7 +583,7 @@ int gnutls_openpgp_crt_get_revoked_status(gnutls_openpgp_crt_t key)
 
 /**
  * gnutls_openpgp_crt_check_hostname:
- * @key: should contain a #gnutls_openpgp_crt_t structure
+ * @key: should contain a #gnutls_openpgp_crt_t type
  * @hostname: A null terminated string that contains a DNS name
  *
  * This function will check if the given key's owner matches the
@@ -601,7 +601,7 @@ gnutls_openpgp_crt_check_hostname(gnutls_openpgp_crt_t key,
 
 /**
  * gnutls_openpgp_crt_check_hostname2:
- * @key: should contain a #gnutls_openpgp_crt_t structure
+ * @key: should contain a #gnutls_openpgp_crt_t type
  * @hostname: A null terminated string that contains a DNS name
  * @flags: gnutls_certificate_verify_flags
  *
@@ -665,7 +665,7 @@ unsigned int _gnutls_get_pgp_key_usage(unsigned int cdk_usage)
 
 /**
  * gnutls_openpgp_crt_get_key_usage:
- * @key: should contain a gnutls_openpgp_crt_t structure
+ * @key: should contain a gnutls_openpgp_crt_t type
  * @key_usage: where the key usage bits will be stored
  *
  * This function will return certificate's key usage, by checking the
@@ -1116,7 +1116,7 @@ gnutls_openpgp_crt_get_subkey_idx(gnutls_openpgp_crt_t key,
 
 /**
  * gnutls_openpgp_crt_get_subkey_usage:
- * @key: should contain a gnutls_openpgp_crt_t structure
+ * @key: should contain a gnutls_openpgp_crt_t type
  * @idx: the subkey index
  * @key_usage: where the key usage bits will be stored
  *

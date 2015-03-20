@@ -114,7 +114,7 @@ _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 
 /**
  * gnutls_session_ext_master_secret_status:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Get the status of the extended master secret extension negotiation.
  * This is in accordance to draft-ietf-tls-session-hash-01

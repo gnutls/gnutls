@@ -280,7 +280,7 @@ error:
 
 /**
  * gnutls_privkey_import_ecc_raw:
- * @key: The structure to store the parsed key
+ * @key: The key
  * @curve: holds the curve
  * @x: holds the x
  * @y: holds the y

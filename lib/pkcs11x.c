@@ -230,7 +230,7 @@ find_ext_cb(struct pkcs11_session_info *sinfo,
 
 /**
  * gnutls_pkcs11_obj_get_ext:
- * @obj: should contain a #gnutls_pkcs11_obj_t structure
+ * @obj: should contain a #gnutls_pkcs11_obj_t type
  * @exts: an allocated list of pointers to %gnutls_x509_ext_st
  * @exts_size: the number of @exts
  * @flags: Or sequence of %GNUTLS_PKCS11_OBJ_* flags 

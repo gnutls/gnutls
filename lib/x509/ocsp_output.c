@@ -155,7 +155,7 @@ static void print_req(gnutls_buffer_st * str, gnutls_ocsp_req_t req)
 
 /**
  * gnutls_ocsp_req_print:
- * @req: The structure to be printed
+ * @req: The data to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with (0) terminated string.
  *
@@ -625,7 +625,7 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 
 /**
  * gnutls_ocsp_resp_print:
- * @resp: The structure to be printed
+ * @resp: The data to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with (0) terminated string.
  *

@@ -37,7 +37,7 @@
 
 /**
  * gnutls_credentials_clear:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Clears all the credentials previously set in this session.
  **/
@@ -61,7 +61,7 @@ void gnutls_credentials_clear(gnutls_session_t session)
  */
 /**
  * gnutls_credentials_set:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @type: is the type of the credentials
  * @cred: is a pointer to a structure.
  *
@@ -142,7 +142,7 @@ gnutls_credentials_set(gnutls_session_t session,
 
 /**
  * gnutls_credentials_get:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  * @type: is the type of the credentials to return
  * @cred: will contain the pointer to the credentials structure.
  *
@@ -180,7 +180,7 @@ const void *_cred;
 
 /**
  * gnutls_auth_get_type:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Returns type of credentials for the current authentication schema.
  * The returned information is to be used to distinguish the function used
@@ -209,7 +209,7 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 
 /**
  * gnutls_auth_server_get_type:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Returns the type of credentials that were used for server authentication.
  * The returned information is to be used to distinguish the function used
@@ -229,7 +229,7 @@ gnutls_auth_server_get_type(gnutls_session_t session)
 
 /**
  * gnutls_auth_client_get_type:
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * Returns the type of credentials that were used for client authentication.
  * The returned information is to be used to distinguish the function used
@@ -283,7 +283,7 @@ const void *_gnutls_get_cred(gnutls_session_t session,
 
 /*-
  * _gnutls_free_auth_info - Frees the auth info structure
- * @session: is a #gnutls_session_t structure.
+ * @session: is a #gnutls_session_t type.
  *
  * This function frees the auth info structure and sets it to
  * null. It must be called since some structures contain malloced
