@@ -71,7 +71,7 @@ int gnutls_x509_crq_init(gnutls_x509_crq_t * crq)
 
 /**
  * gnutls_x509_crq_deinit:
- * @crq: A pointer to the type to be initialized
+ * @crq: the type to be deinitialized
  *
  * This function will deinitialize a PKCS#10 certificate request
  * structure.
@@ -1352,7 +1352,7 @@ gnutls_x509_crq_get_attribute_data(gnutls_x509_crq_t crq, int indx,
  * gnutls_x509_crq_get_extension_info:
  * @crq: should contain a #gnutls_x509_crq_t type
  * @indx: Specifies which extension number to get. Use (0) to get the first one.
- * @oid: a pointer to a structure to hold the OID
+ * @oid: a pointer to store the OID
  * @sizeof_oid: initially holds the maximum size of @oid, on return
  *   holds actual size of @oid.
  * @critical: output variable with critical flag, may be NULL.
@@ -2213,7 +2213,7 @@ gnutls_x509_crq_set_key_usage(gnutls_x509_crq_t crq, unsigned int usage)
  * gnutls_x509_crq_get_key_purpose_oid:
  * @crq: should contain a #gnutls_x509_crq_t type
  * @indx: This specifies which OID to return, use (0) to get the first one
- * @oid: a pointer to a buffer to hold the OID (may be %NULL)
+ * @oid: a pointer to store the OID (may be %NULL)
  * @sizeof_oid: initially holds the size of @oid
  * @critical: output variable with critical flag, may be %NULL.
  *
@@ -2317,7 +2317,7 @@ gnutls_x509_crq_get_key_purpose_oid(gnutls_x509_crq_t crq,
 /**
  * gnutls_x509_crq_set_key_purpose_oid:
  * @crq: a certificate of type #gnutls_x509_crq_t
- * @oid: a pointer to a (0)-terminated string that holds the OID
+ * @oid: a pointer to a null-terminated string that holds the OID
  * @critical: Whether this extension will be critical or not
  *
  * This function will set the key purpose OIDs of the Certificate.

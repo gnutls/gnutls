@@ -171,7 +171,7 @@ int gnutls_pkcs7_init(gnutls_pkcs7_t * pkcs7)
 
 /**
  * gnutls_pkcs7_deinit:
- * @pkcs7: A pointer to the type to be initialized
+ * @pkcs7: the type to be deinitialized
  *
  * This function will deinitialize a PKCS7 type.
  **/

@@ -63,7 +63,7 @@ void gnutls_credentials_clear(gnutls_session_t session)
  * gnutls_credentials_set:
  * @session: is a #gnutls_session_t type.
  * @type: is the type of the credentials
- * @cred: is a pointer to a structure.
+ * @cred: the credentials to set
  *
  * Sets the needed credentials for the specified type.  Eg username,
  * password - or public and private keys etc.  The @cred parameter is
@@ -144,7 +144,7 @@ gnutls_credentials_set(gnutls_session_t session,
  * gnutls_credentials_get:
  * @session: is a #gnutls_session_t type.
  * @type: is the type of the credentials to return
- * @cred: will contain the pointer to the credentials structure.
+ * @cred: will contain the credentials.
  *
  * Returns the previously provided credentials structures.
  *

@@ -1009,7 +1009,7 @@ gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
 
 /**
  * gnutls_pkcs11_obj_deinit:
- * @obj: A pointer to the type to be initialized
+ * @obj: The type to be deinitialized
  *
  * This function will deinitialize a certificate structure.
  *

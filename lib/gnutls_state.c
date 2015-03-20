@@ -670,7 +670,7 @@ _gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
 #ifdef ENABLE_OPENPGP
 /**
  * gnutls_openpgp_send_cert:
- * @session: is a pointer to a #gnutls_session_t type.
+ * @session: a #gnutls_session_t type.
  * @status: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
  *
  * This function will order gnutls to send the key fingerprint
@@ -688,7 +688,7 @@ gnutls_openpgp_send_cert(gnutls_session_t session,
 
 /**
  * gnutls_certificate_send_x509_rdn_sequence:
- * @session: is a pointer to a #gnutls_session_t type.
+ * @session: a #gnutls_session_t type.
  * @status: is 0 or 1
  *
  * If status is non zero, this function will order gnutls not to send

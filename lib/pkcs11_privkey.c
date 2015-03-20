@@ -125,7 +125,7 @@ gnutls_pkcs11_privkey_cpy(gnutls_pkcs11_privkey_t dst,
 
 /**
  * gnutls_pkcs11_privkey_deinit:
- * @key: A pointer to the type to be initialized
+ * @key: the key to be deinitialized
  *
  * This function will deinitialize a private key structure.
  **/
