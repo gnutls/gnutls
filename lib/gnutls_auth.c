@@ -301,6 +301,7 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 	switch (session->key.auth_info_type) {
 	case GNUTLS_CRD_SRP:
 		break;
+#ifdef ENABLE_ANON
 	case GNUTLS_CRD_ANON:
 		{
 			anon_auth_info_t info =
@@ -313,6 +314,7 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 			_gnutls_free_dh_info(dh_info);
 		}
 		break;
+#endif
 	case GNUTLS_CRD_PSK:
 		{
 			psk_auth_info_t info =
@@ -321,8 +323,10 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 			if (info == NULL)
 				break;
 
+#ifdef ENABLE_DHE
 			dh_info = &info->dh;
 			_gnutls_free_dh_info(dh_info);
+#endif
 		}
 		break;
 	case GNUTLS_CRD_CERTIFICATE:
@@ -345,7 +349,9 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 			info->raw_certificate_list = NULL;
 			info->ncerts = 0;
 
+#ifdef ENABLE_DHE
 			_gnutls_free_dh_info(dh_info);
+#endif
 		}
 
 

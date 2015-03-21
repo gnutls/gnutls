@@ -738,6 +738,7 @@ int gnutls_load_file(const char *filename, gnutls_datum_t * data)
 	return 0;
 }
 
+#ifdef ENABLE_OCSP
 /**
  * gnutls_ocsp_status_request_is_checked:
  * @session: is a gnutls session
@@ -774,6 +775,7 @@ gnutls_ocsp_status_request_is_checked(gnutls_session_t session,
 	}
 	return session->internals.ocsp_check_ok;
 }
+#endif
 
 #define DESC_SIZE 64
 
@@ -813,9 +815,11 @@ char *gnutls_session_get_desc(gnutls_session_t session)
 		curve_name =
 		    gnutls_ecc_curve_get_name(gnutls_ecc_curve_get
 					      (session));
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 	} else if (kx == GNUTLS_KX_ANON_DH || kx == GNUTLS_KX_DHE_PSK
 		   || kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
 		dh_bits = gnutls_dh_get_prime_bits(session);
+#endif
 	}
 
 	kx_str = gnutls_kx_get_name(kx);
