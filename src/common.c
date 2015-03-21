@@ -342,6 +342,7 @@ int cert_verify(gnutls_session_t session, const char *hostname, const char *purp
 static void
 print_dh_info(gnutls_session_t session, const char *str, int print)
 {
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
 	printf("- %sDiffie-Hellman parameters\n", str);
 	printf(" - Using prime: %d bits\n",
 	       gnutls_dh_get_prime_bits(session));
@@ -415,6 +416,7 @@ print_dh_info(gnutls_session_t session, const char *str, int print)
 		gnutls_free(raw_gen.data);
 		gnutls_dh_params_deinit(dh_params);
 	}
+#endif
 }
 
 static void print_ecdh_info(gnutls_session_t session, const char *str)

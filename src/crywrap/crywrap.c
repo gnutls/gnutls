@@ -565,12 +565,13 @@ _crywrap_tls_session_create(const crywrap_config_t * config)
  */
 static void _crywrap_tls_init(void)
 {
-
+#ifdef ENABLE_DHE
 	gnutls_dh_params_init(&dh_params);
 	gnutls_dh_params_import_pkcs3(dh_params, &dh_file,
 				      GNUTLS_X509_FMT_PEM);
 
 	gnutls_certificate_set_dh_params(cred, dh_params);
+#endif
 }
 
 /** @} */
