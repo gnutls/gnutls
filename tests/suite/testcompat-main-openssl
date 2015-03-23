@@ -48,6 +48,10 @@ PORT="${PORT:-$RPORT}"
 SERV=openssl
 OPENSSL_CLI="openssl"
 
+if test -f /etc/debian_version;then
+        DEBIAN=1
+fi
+
 echo "Compatibility checks using "`$SERV version`
 $SERV version|grep -e 1\.0 >/dev/null 2>&1
 SV=$?
@@ -73,7 +77,7 @@ echo ""
 echo "** Modifier: $ADD"
 fi
 
-if test 0 = 1;then
+if test "$DEBIAN" != 1;then
 
 # It seems debian disabled SSL 3.0 completely on openssl
 
@@ -94,6 +98,17 @@ $VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:
 # Test SSL 3.0 with DHE-DSS ciphersuite
 echo "Checking SSL 3.0 with DHE-DSS..."
 $VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256$ADD" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+launch_bare_server $$ s_server -quiet -www -accept $PORT -keyform pem -certform pem -ssl3 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -cipher RC4-MD5 &
+PID=$!
+wait_server $PID
+
+echo "Checking SSL 3.0 with RSA-RC4-MD5..."
+$VALGRIND $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+VERS-SSL3.0:+RSA$ADD" --insecure </dev/null >/dev/null || \
   fail $PID "Failed"
 
 kill $PID
@@ -337,13 +352,17 @@ echo ""
 echo "** Modifier: $ADD"
 fi
 
-if test 0 = 1;then
+if test "$DEBIAN" != 1;then
 
 echo "Check SSL 3.0 with RSA ciphersuite"
-launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+launch_server $$  --priority "NONE:+MD5:+ARCFOUR-128:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
 wait_server $PID
 
 $OPENSSL_CLI s_client  -host localhost -port $PORT -ssl3 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail $PID "Failed"
+
+echo "Check SSL 3.0 with RSA-RC4-MD5 ciphersuite"
+$OPENSSL_CLI s_client  -host localhost -port $PORT -ssl3 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT -cipher RC4-MD5 </dev/null 2>&1 | grep "\:error\:" && \
   fail $PID "Failed"
 
 kill $PID
@@ -365,6 +384,7 @@ wait_server $PID
 
 $OPENSSL_CLI s_client  -host localhost -port $PORT -ssl3 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
   fail $PID "Failed"
+
 
 kill $PID
 wait
