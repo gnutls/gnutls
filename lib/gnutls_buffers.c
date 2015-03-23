@@ -440,9 +440,22 @@ _gnutls_writev_emu(gnutls_session_t session, gnutls_transport_ptr_t fd,
 		if (vec) {
 			ret = session->internals.vec_push_func(fd, &giovec[j], 1);
 		} else {
-			ret =
-			    session->internals.push_func(fd, giovec[j].iov_base,
-							 giovec[j].iov_len);
+			size_t sent = 0;
+			ssize_t left = giovec[j].iov_len;
+			char *p = giovec[j].iov_base;
+			do {
+				ret =
+				    session->internals.push_func(fd, p,
+								 left);
+				if (ret > 0) {
+					sent += ret;
+					left -= ret;
+					p += ret;
+				}
+			} while(ret > 0 && left > 0);
+
+			if (sent > 0)
+				ret = sent;
 		}
 
 		if (ret == -1) {
