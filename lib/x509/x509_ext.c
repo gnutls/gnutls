@@ -2359,7 +2359,6 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 
 	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		gnutls_assert();
-		gnutls_free(san.data);
 		goto cleanup;
 	}
 
