@@ -168,8 +168,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module time:
   # Code from module time-tests:
   # Code from module time_r:
-  # Code from module u64:
-  # Code from module u64-tests:
   # Code from module unistd:
   # Code from module unistd-tests:
   # Code from module useless-if-before-free:
@@ -644,8 +642,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/sys_uio.in.h
   lib/time.in.h
   lib/time_r.c
-  lib/u64.c
-  lib/u64.h
   lib/unistd.c
   lib/unistd.in.h
   lib/vasnprintf.c
@@ -824,7 +820,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-sys_uio.c
   tests/test-sys_wait.h
   tests/test-time.c
-  tests/test-u64.c
   tests/test-unistd.c
   tests/test-vasnprintf.c
   tests/test-vasprintf.c

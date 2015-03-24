@@ -622,14 +622,6 @@ EXTRA_DIST += test-time.c
 
 ## end   gnulib module time-tests
 
-## begin gnulib module u64-tests
-
-TESTS += test-u64
-check_PROGRAMS += test-u64
-EXTRA_DIST += test-u64.c
-
-## end   gnulib module u64-tests
-
 ## begin gnulib module unistd-tests
 
 TESTS += test-unistd
