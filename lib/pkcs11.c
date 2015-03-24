@@ -1107,14 +1107,16 @@ gnutls_pkcs11_obj_export3(gnutls_pkcs11_obj_t obj,
 {
 	int ret;
 
-	if (obj == NULL || obj->raw.data == NULL) {
+	if (obj == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-
 	switch (obj->type) {
 	case GNUTLS_PKCS11_OBJ_X509_CRT:
+		if (obj->raw.data == NULL)
+			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
 		if (fmt == GNUTLS_X509_FMT_PEM) {
 			return
 			    gnutls_pem_base64_encode_alloc(PEM_X509_CERT2,
@@ -1149,6 +1151,9 @@ gnutls_pkcs11_obj_export3(gnutls_pkcs11_obj_t obj,
 			return ret;
 		}
 	default:
+		if (obj->raw.data == NULL)
+			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
 		if (fmt == GNUTLS_X509_FMT_PEM) {
 			return gnutls_pem_base64_encode_alloc("DATA",
 							      &obj->raw,
