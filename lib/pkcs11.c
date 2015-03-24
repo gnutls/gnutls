@@ -1081,12 +1081,7 @@ gnutls_pkcs11_obj_export(gnutls_pkcs11_obj_t obj,
 int
 gnutls_pkcs11_obj_export2(gnutls_pkcs11_obj_t obj, gnutls_datum_t * out)
 {
-	if (obj == NULL || obj->raw.data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	return _gnutls_set_datum(out, obj->raw.data, obj->raw.size);
+	return gnutls_pkcs11_obj_export3(obj, GNUTLS_X509_FMT_DER, out);
 }
 
 /**
@@ -1117,45 +1112,52 @@ gnutls_pkcs11_obj_export3(gnutls_pkcs11_obj_t obj,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (fmt == GNUTLS_X509_FMT_DER)
-		return _gnutls_set_datum(out, obj->raw.data,
-					 obj->raw.size);
-	else if (fmt == GNUTLS_X509_FMT_PEM) {
-		switch (obj->type) {
-		case GNUTLS_PKCS11_OBJ_X509_CRT:
+
+	switch (obj->type) {
+	case GNUTLS_PKCS11_OBJ_X509_CRT:
+		if (fmt == GNUTLS_X509_FMT_PEM) {
 			return
 			    gnutls_pem_base64_encode_alloc(PEM_X509_CERT2,
 							   &obj->raw, out);
-		case GNUTLS_PKCS11_OBJ_PUBKEY:{
-				gnutls_pubkey_t pubkey;
-				/* more complex */
-				ret = gnutls_pubkey_init(&pubkey);
-				if (ret < 0)
-					return gnutls_assert_val(ret);
+		} else {
+			return _gnutls_set_datum(out, obj->raw.data,
+						 obj->raw.size);
+		}
+	case GNUTLS_PKCS11_OBJ_PUBKEY:{
+			/* that approach allows to return a public key even if
+			 * CKA_VALUE is not set */
+			gnutls_pubkey_t pubkey;
 
-				ret =
-				    gnutls_pubkey_import_pkcs11(pubkey,
-								obj, 0);
-				if (ret < 0) {
-					gnutls_assert();
-					goto pcleanup;
-				}
+			ret = gnutls_pubkey_init(&pubkey);
+			if (ret < 0)
+				return gnutls_assert_val(ret);
 
-				ret =
-				    gnutls_pubkey_export2(pubkey, fmt,
-							  out);
-
-			      pcleanup:
-				gnutls_pubkey_deinit(pubkey);
-				return ret;
+			ret =
+			    gnutls_pubkey_import_pkcs11(pubkey,
+							obj, 0);
+			if (ret < 0) {
+				gnutls_assert();
+				goto pcleanup;
 			}
-		default:
+
+			ret =
+			    gnutls_pubkey_export2(pubkey, fmt,
+						  out);
+
+		      pcleanup:
+			gnutls_pubkey_deinit(pubkey);
+			return ret;
+		}
+	default:
+		if (fmt == GNUTLS_X509_FMT_PEM) {
 			return gnutls_pem_base64_encode_alloc("DATA",
 							      &obj->raw,
 							      out);
+		} else {
+			return _gnutls_set_datum(out, obj->raw.data,
+						 obj->raw.size);
 		}
-	} else
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	}
 }
 
 
