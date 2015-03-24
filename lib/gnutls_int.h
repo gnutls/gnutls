@@ -56,7 +56,6 @@ typedef int ssize_t;
 #include <ws2tcpip.h>
 #endif
 #include <time.h>
-#include <u64.h>		/* gnulib for uint64_t */
 
 #ifdef HAVE_LIBNETTLE
 #include <nettle/memxor.h>

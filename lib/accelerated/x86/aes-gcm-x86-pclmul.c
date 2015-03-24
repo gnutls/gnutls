@@ -58,10 +58,10 @@ struct aes_gcm_ctx {
 	struct gcm128_context gcm;
 };
 
-void gcm_init_clmul(u128 Htable[16], const u64 Xi[2]);
+void gcm_init_clmul(u128 Htable[16], const uint64_t Xi[2]);
 void gcm_ghash_clmul(uint64_t Xi[2], const u128 Htable[16],
 		     const uint8_t * inp, size_t len);
-void gcm_gmult_clmul(u64 Xi[2], const u128 Htable[16]);
+void gcm_gmult_clmul(uint64_t Xi[2], const u128 Htable[16]);
 
 static void aes_gcm_deinit(void *_ctx)
 {
