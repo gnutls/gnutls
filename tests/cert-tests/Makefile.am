@@ -28,11 +28,12 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	template-date.tmpl template-date.pem template-dn-err.tmpl \
 	template-nc.tmpl template-nc.pem xmpp-othername.pem \
 	suppressions.valgrind csr-invalid.der invalid-sig2.pem invalid-sig3.pem \
-	invalid-sig.pem
+	invalid-sig.pem email-certs/chain.exclude.test.example.com email-certs/chain.test.example.com \
+	email-certs/chain.invalid.example.com email-certs/chain.test.example.com-2
 
-dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane crq certtool invalid-sig
+dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane crq certtool invalid-sig email
 
-TESTS = pathlen aki pem-decoding certtool invalid-sig
+TESTS = pathlen aki pem-decoding certtool invalid-sig email
 
 if ENABLE_NON_SUITEB_CURVES
 TESTS += crq
