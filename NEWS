@@ -9,6 +9,13 @@ See the end for copying conditions.
 structures use BER to decode them (requires libtasn1 4.3). That allows
 to decode some more complex structures.
 
+** libgnutls: When an end-certificate with no name is present and there
+are CA name constraints, don't reject the certificate. This follows RFC5280
+advice closely. Reported by Fotis Loukos.
+
+** libgnutls: Fixed handling of supplemental data with types > 255.
+Patch by Thierry Quemerais.
+
 ** API and ABI modifications:
 No changes since last version.
 
