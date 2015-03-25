@@ -180,6 +180,8 @@ gnutls_crypto_register_mac: Added
 gnutls_crypto_register_digest: Added
 gnutls_ext_register: Added
 gnutls_supplemental_register: Added
+gnutls_openpgp_crt_check_email: Added
+gnutls_x509_crt_check_email: Added
 gnutls_handshake_set_hook_function: Modified
 gnutls_pkcs11_obj_list_import_url: Removed
 gnutls_pkcs11_obj_list_import_url2: Removed
