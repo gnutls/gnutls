@@ -1106,7 +1106,7 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	unsigned int i;
 	uint32_t hash;
 	gnutls_x509_crt_t sorted[DEFAULT_MAX_VERIFY_DEPTH];
-	const char *hostname = NULL, *purpose = NULL;
+	const char *hostname = NULL, *purpose = NULL, *email = NULL;
 	unsigned hostname_size = 0;
 
 	if (cert_list == NULL || cert_list_size < 1)
@@ -1118,6 +1118,10 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 			if (data[i].size > 0) {
 				hostname_size = data[i].size;
 			}
+			if (email != NULL) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		} else if (data[i].type == GNUTLS_DT_RFC822NAME) {
+			email = (void*)data[i].data;
+			if (hostname != NULL) return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		} else if (data[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
 			purpose = (void*)data[i].data;
 		}
@@ -1216,6 +1220,13 @@ gnutls_x509_trust_list_verify_crt2(gnutls_x509_trust_list_t list,
 	if (hostname) {
 		ret =
 		    gnutls_x509_crt_check_hostname2(cert_list[0], hostname, flags);
+		if (ret == 0)
+			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
+	}
+
+	if (email) {
+		ret =
+		    gnutls_x509_crt_check_email(cert_list[0], email, 0);
 		if (ret == 0)
 			*voutput |= GNUTLS_CERT_UNEXPECTED_OWNER|GNUTLS_CERT_INVALID;
 	}

@@ -506,6 +506,7 @@ _gnutls_x509_get_raw_crt_expiration_time(const gnutls_datum_t * cert)
  -*/
 static int
 _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
+				 gnutls_x509_subject_alt_name_t type,
 				 const char *hostname,
 				 unsigned int *status)
 {
@@ -547,7 +548,7 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
 	/* Verify certificate 
 	 */
 	ret =
-	    _gnutls_openpgp_verify_key(cred, hostname,
+	    _gnutls_openpgp_verify_key(cred, type, hostname,
 				       &info->raw_certificate_list[0],
 				       peer_certificate_list_size,
 				       verify_flags,
@@ -653,8 +654,8 @@ gnutls_typed_vdata_st data;
  * using gnutls_certificate_set_verify_flags(). See the documentation
  * of gnutls_certificate_verify_peers2() for details in the verification process.
  *
- * The acceptable @data types are %GNUTLS_DT_DNS_HOSTNAME and %GNUTLS_DT_KEY_PURPOSE_OID.
- * The former accepts as data a null-terminated hostname, and the latter a null-terminated
+ * The acceptable @data types are %GNUTLS_DT_DNS_HOSTNAME, %GNUTLS_DT_RFC822NAME and %GNUTLS_DT_KEY_PURPOSE_OID.
+ * The former two accept as data a null-terminated hostname or email address, and the latter a null-terminated
  * object identifier (e.g., %GNUTLS_KP_TLS_WWW_SERVER).
  * If a DNS hostname is provided then this function will compare
  * the hostname in the certificate against the given. If names do not match the 
@@ -675,7 +676,7 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 {
 	cert_auth_info_t info;
 	const char *hostname = NULL;
-	unsigned i;
+	unsigned i, type = 0;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
@@ -696,11 +697,18 @@ gnutls_certificate_verify_peers(gnutls_session_t session,
 	case GNUTLS_CRT_OPENPGP:
 		for (i=0;i<elements;i++) {
 			if (data[i].type == GNUTLS_DT_DNS_HOSTNAME) {
-				hostname = (void*)data[i].data;
+				hostname = (char*)data[i].data;
+				type = GNUTLS_SAN_DNSNAME;
+				break;
+			} else if (data[i].type == GNUTLS_DT_RFC822NAME) {
+				hostname = (char*)data[i].data;
+				type = GNUTLS_SAN_RFC822NAME;
 				break;
 			}
 		}
-		return _gnutls_openpgp_crt_verify_peers(session, hostname,
+		return _gnutls_openpgp_crt_verify_peers(session,
+							type,
+							hostname,
 							status);
 #endif
 	default:

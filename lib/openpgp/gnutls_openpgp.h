@@ -56,12 +56,14 @@ _gnutls_openpgp_request_key(gnutls_session_t,
 			    const gnutls_certificate_credentials_t cred,
 			    uint8_t * key_fpr, int key_fpr_size);
 
-int _gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t,
-			       const char *hostname,
-			       const gnutls_datum_t * cert_list,
-			       int cert_list_length,
-			       unsigned int verify_flags,
-			       unsigned int *status);
+int
+_gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t cred,
+			   gnutls_x509_subject_alt_name_t type,
+			   const char *hostname,
+			   const gnutls_datum_t * cert_list,
+			   int cert_list_length,
+			   unsigned int verify_flags,
+			   unsigned int *status);
 int _gnutls_openpgp_fingerprint(const gnutls_datum_t * cert,
 				unsigned char *fpr, size_t * fprlen);
 time_t _gnutls_openpgp_get_raw_key_creation_time(const gnutls_datum_t *

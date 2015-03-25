@@ -1026,6 +1026,8 @@ GNUTLS_3_4
 	gnutls_do_send_supplemental;
 	gnutls_ext_get_data;
 	gnutls_ext_set_data;
+	gnutls_openpgp_crt_check_email;
+	gnutls_x509_crt_check_email;
  local:
 	*;
 };

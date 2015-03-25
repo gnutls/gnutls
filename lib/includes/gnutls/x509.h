@@ -181,6 +181,9 @@ int gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 				   const char *hostname);
 int gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	 			    const char *hostname, unsigned int flags);
+int
+gnutls_x509_crt_check_email(gnutls_x509_crt_t cert,
+			    const char *email, unsigned int flags);
 
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert);
 int gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,

@@ -645,6 +645,48 @@ gnutls_openpgp_crt_check_hostname2(gnutls_openpgp_crt_t key,
 	return 0;
 }
 
+/**
+ * gnutls_openpgp_crt_check_email:
+ * @key: should contain a #gnutls_openpgp_crt_t type
+ * @email: A null terminated string that contains an RFC822 address (email)
+ * @flags: gnutls_certificate_verify_flags
+ *
+ * This function will check if the given key's owner matches the
+ * given email address. 
+ *
+ * Returns: non-zero for a successful match, and zero on failure.
+ **/
+int
+gnutls_openpgp_crt_check_email(gnutls_openpgp_crt_t key,
+				  const char *email, unsigned flags)
+{
+	char rfc822name[MAX_CN];
+	size_t rfc822name_size;
+	int ret = 0;
+	int i;
+
+	/* Check through all included names. */
+	for (i = 0; !(ret < 0); i++) {
+		rfc822name_size = sizeof(rfc822name);
+		ret =
+		    gnutls_openpgp_crt_get_name(key, i, rfc822name,
+						&rfc822name_size);
+
+		if (ret == 0) {
+			/* Length returned by gnutls_openpgp_crt_get_name includes
+			   the terminating (0). */
+			rfc822name_size--;
+
+			if (_gnutls_hostname_compare
+			    (rfc822name, rfc822name_size, email, GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS))
+				return 1;
+		}
+	}
+
+	/* not found a matching name */
+	return 0;
+}
+
 unsigned int _gnutls_get_pgp_key_usage(unsigned int cdk_usage)
 {
 	unsigned int usage = 0;

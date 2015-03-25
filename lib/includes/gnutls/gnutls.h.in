@@ -2007,6 +2007,7 @@ int gnutls_certificate_verify_peers3(gnutls_session_t session,
  * gnutls_vdata_types_t:
  * @GNUTLS_DT_UNKNOWN: Unknown data type.
  * @GNUTLS_DT_DNS_HOSTNAME: The data contain a null-terminated DNS hostname.
+ * @GNUTLS_DT_RFC822NAME: The data contain a null-terminated email address.
  * @GNUTLS_DT_KEY_PURPOSE_OID: The data contain a null-terminated key purpose OID.
  *
  * Enumeration of different key exchange algorithms.
@@ -2014,7 +2015,8 @@ int gnutls_certificate_verify_peers3(gnutls_session_t session,
 typedef enum {
 	GNUTLS_DT_UNKNOWN = 0,
 	GNUTLS_DT_DNS_HOSTNAME = 1,
-	GNUTLS_DT_KEY_PURPOSE_OID = 2
+	GNUTLS_DT_KEY_PURPOSE_OID = 2,
+	GNUTLS_DT_RFC822NAME = 3
 } gnutls_vdata_types_t;
 
 typedef struct {

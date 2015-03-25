@@ -38,13 +38,14 @@
  * Verify all signatures in the certificate list. When the key
  * is not available, the signature is skipped.
  *
- * The return value is one of the CertificateStatus entries.
+ * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
  *
  * NOTE: this function does not verify using any "web of trust". You
  * may use GnuPG for that purpose, or any other external PGP application.
  -*/
 int
 _gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t cred,
+			   gnutls_x509_subject_alt_name_t type,
 			   const char *hostname,
 			   const gnutls_datum_t * cert_list,
 			   int cert_list_length,
