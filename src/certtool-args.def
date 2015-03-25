@@ -96,6 +96,14 @@ flag = {
 };
 
 flag = {
+    name      = email;
+    descrip   = "Specify a email to be used for certificate chain verification";
+    arg-type  = string;
+    doc = "This is to be combined with one of the verify certificate options.";
+    flags-cant = hostname;
+};
+
+flag = {
     name      = purpose;
     descrip   = "Specify a purpose OID to be used for certificate chain verification";
     arg-type  = string;

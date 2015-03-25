@@ -2288,7 +2288,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 static int
 _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 		 int ca_size, unsigned system, const char *purpose,
-		 const char *hostname)
+		 const char *hostname, const char *email)
 {
 	int ret;
 	gnutls_datum_t tmp;
@@ -2405,7 +2405,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 	fprintf(stdout, "Loaded %d certificates, %d CAs and %d CRLs\n\n",
 		x509_ncerts, x509_ncas, x509_ncrls);
 
-	if (purpose || hostname) {
+	if (purpose || hostname || email) {
 		gnutls_typed_vdata_st vdata[2];
 		unsigned vdata_size = 0;
 
@@ -2420,6 +2420,11 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 			vdata[vdata_size].type = GNUTLS_DT_DNS_HOSTNAME;
 			vdata[vdata_size].data = (void*)hostname;
 			vdata[vdata_size].size = strlen(hostname);
+			vdata_size++;
+		} else if (email) {
+			vdata[vdata_size].type = GNUTLS_DT_RFC822NAME;
+			vdata[vdata_size].data = (void*)email;
+			vdata[vdata_size].size = strlen(email);
 			vdata_size++;
 		}
 
@@ -2496,7 +2501,7 @@ static void verify_chain(void)
 
 	buf[size] = 0;
 
-	_verify_x509_mem(buf, size, NULL, 0, 0, OPT_ARG(PURPOSE), OPT_ARG(HOSTNAME));
+	_verify_x509_mem(buf, size, NULL, 0, 0, OPT_ARG(PURPOSE), OPT_ARG(HOSTNAME), OPT_ARG(EMAIL));
 
 }
 
@@ -2533,7 +2538,7 @@ static void verify_certificate(common_info_st * cinfo)
 	}
 
 	_verify_x509_mem(cert, cert_size, cas, ca_size,
-			 (cinfo->ca != NULL) ? 0 : 1, OPT_ARG(PURPOSE), OPT_ARG(HOSTNAME));
+			 (cinfo->ca != NULL) ? 0 : 1, OPT_ARG(PURPOSE), OPT_ARG(HOSTNAME), OPT_ARG(EMAIL));
 
 
 }
