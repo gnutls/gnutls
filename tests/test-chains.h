@@ -1635,6 +1635,53 @@ static const char *verisign_com_chain_g5[] = {
  NULL
 };
 
+/* This chain has name constraints on the CA but the end certificate
+ * has no name on CN or subjectAltname. */
+static const char *name_constraints_but_no_name[] = {
+    /* chain[0] */
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIDIjCCAgqgAwIBAgIMVRJquRMxIN9nRLG4MA0GCSqGSIb3DQEBCwUAMA8xDTAL\n"
+    "BgNVBAMTBENBLTAwIhgPMjAxNTAzMjUwNzU4NDlaGA85OTk5MTIzMTIzNTk1OVow\n"
+    "EzERMA8GA1UEChMIc2VydmVyLTEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK\n"
+    "AoIBAQDEiLbqiSgPhAlwQXdn6Z7EoYMRiNHX+6cnlI195lv5LPdupiZ7EPF6y8rs\n"
+    "H/PyRwLhOuhfyAbBibBTWKt1n100UqAcr0Z/l2+zBorc/APhKrysDlWyYUjs/Ly1\n"
+    "pNQ4V9POpuCqEcPsGWcSr3ULqdRH2PoguWoF0el59fOyioUV+PbKAHPxs342fqu0\n"
+    "Plk3Bru4kf4R0U3L1r0DogFUYmjhGyhxKAezEikQGgrwlo30LD/31uuzJWs5x1+l\n"
+    "sGOKHIfxiWlBS8781QKuIWHT8Z+qsnPXobQ4ss2jF4qHjwIesJr8vq0OP2mQ/Ilh\n"
+    "WwcNJJtWwHE6O6Vj1kWUQ9kDuWQ3AgMBAAGjdjB0MAwGA1UdEwEB/wQCMAAwEwYD\n"
+    "VR0lBAwwCgYIKwYBBQUHAwEwDwYDVR0PAQH/BAUDAwegADAdBgNVHQ4EFgQU8U1K\n"
+    "y6Tq/tczkOCK7CZhUAiuUcwwHwYDVR0jBBgwFoAUvSbAZPs2w5eQBjoLYPh+uKyj\n"
+    "ZzswDQYJKoZIhvcNAQELBQADggEBAG2H5HeItTKZVgNd2hFPfi0QUvheX8mjMniV\n"
+    "uaS/1zDSvAJOJue2GEpiYeTLvjd4WA5J09ZRSAuVWR9hg44m17TF2pod3YFBfGwx\n"
+    "8RkEp5W8LBdwPzcgbLVxkWmwZTo1v4Xv679uyVTeB306vfkTrsa0C82S5zJd1Wyt\n"
+    "/bFaNnxxb6KzVhFEctaVPVZdwrj7Q6XASH1oCfe/l50UcUkK853cXhV3CNJ8OUOY\n"
+    "h8O7FN/s5oZ23R9eX2D9mHJ/ccucv46ofAmQ9TjLZIACp89IfoMf61MOUG51BIlt\n"
+    "t494m704KMI2Y4hci5fHZ4UbcykjNpwkAMnCuk0K8K4gAFT6SZ8=\n"
+    "-----END CERTIFICATE-----\n",
+    NULL,
+    /* chain[1] */
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIC/zCCAeegAwIBAgIBADANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDEwRDQS0w\n"
+    "MCIYDzIwMTUwMzI1MDc1ODQ5WhgPOTk5OTEyMzEyMzU5NTlaMA8xDTALBgNVBAMT\n"
+    "BENBLTAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDUEBLGhjEj8pLO\n"
+    "cU3UVmC+FcN3OKXH5lqm4pdxP6rbk0C9WKgavGV9MfEali767BaLHaEzxdCpcbxr\n"
+    "YdBKFcij7ucF9YqpoDD5HnMLhOEHKnQD0nk5wWYw7Q9ULy0wqEy15nfDdunDbYK5\n"
+    "TG7K2nsKcyPkEs637bJPBSOVSpn7mT49OnpSNpZcD361SqRh+OY8Iorr1m9DsrfW\n"
+    "8J9JCf4VlaL821PzoA/EEReabPI9TM10QYpN4J0JQsQnmuU/0WdaEJtq4pFZIZfJ\n"
+    "WtGGS6GX5faOkyMj5SuunZIjLal/+GRSVk1m3vfmDUp4MVKAqfqQ068Ix/aLEipX\n"
+    "8mNnyp95AgMBAAGjYjBgMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0eAQH/BBMwEaAP\n"
+    "MA2CC2V4YW1wbGUuY29tMA8GA1UdDwEB/wQFAwMHBAAwHQYDVR0OBBYEFL0mwGT7\n"
+    "NsOXkAY6C2D4friso2c7MA0GCSqGSIb3DQEBCwUAA4IBAQBSfcTha0878cAy3Peg\n"
+    "V9z+5rNr7/3Awf5HRTRr2VAATloXJ7iyvuvWmPlIKek40W+Xh4aHjZLjdfuPWyeV\n"
+    "EXAcEEwhxY4t8NRATzgBy8WyP64LRQnFsmo4p5VbT0ddcqUqwDDYgbNPdLmfLUwV\n"
+    "JS5DNFSsDco5Ng1DoQCLoIkuLMwD7g7YfMyUq8HupEI9TuhcXC5FUZbt0KjkQk9c\n"
+    "fbBiEvZcxlmLQRiC0sWFmuBteMyrnw3Y68jpl12ORyB/oVpCvXlYm4ViCCh5uyx3\n"
+    "Ml+FbR8ws+dEvGKmer50Lfw6/WSyEb/zWlLUUqClbJChLVnGMjgvwUqrLSKUcUw6\n"
+    "DsYI\n"
+    "-----END CERTIFICATE-----\n",
+    NULL
+};
+
 static struct
 {
   const char *name;
@@ -1750,6 +1797,7 @@ static struct
   { "kp-interm", kp_fail1, &kp_fail1[3], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_PURPOSE_MISMATCH, GNUTLS_KP_TLS_WWW_SERVER, 1412850586},
   { "kp-fin", kp_fail2, &kp_fail2[3], 0, GNUTLS_CERT_INVALID | GNUTLS_CERT_PURPOSE_MISMATCH, GNUTLS_KP_TLS_WWW_SERVER, 1412850586},
   { "kp-ok", kp_ok, &kp_ok[3], 0, 0, GNUTLS_KP_OCSP_SIGNING, 1412850586},
+  { "name constraints no name", name_constraints_but_no_name, &name_constraints_but_no_name[2], 0, 0, 0, 1427270515},
   { NULL, NULL, NULL, 0, 0}
 };
 /* *INDENT-ON* */
