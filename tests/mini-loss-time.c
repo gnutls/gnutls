@@ -95,7 +95,6 @@ static void client_log_func(int level, const char *str)
 
 static int counter;
 static int packet_to_lose;
-gnutls_session_t session;
 
 static ssize_t
 push(gnutls_transport_ptr_t tr, const void *data, size_t len)
@@ -121,6 +120,7 @@ static void client(int fd, int packet)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
+	gnutls_session_t session;
 	/* Need to enable anonymous KX specifically. */
 
 	global_init();
@@ -136,6 +136,7 @@ static void client(int fd, int packet)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
+	gnutls_dtls_set_timeouts(session, 1 * 1000, 60 * 1000);
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session,
@@ -157,7 +158,7 @@ static void client(int fd, int packet)
 	do {
 		ret = gnutls_handshake(session);
 	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	while (ret < 0 && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	gnutls_deinit(session);
 	gnutls_global_deinit();
@@ -165,25 +166,33 @@ static void client(int fd, int packet)
 	if (ret < 0) {
 		if (ret == GNUTLS_E_TIMEDOUT)
 			return;
-		fail("client: Handshake failed\n");
-		gnutls_perror(ret);
-		exit(1);
-	} else {
 		if (debug)
-			success("client: Handshake was completed\n");
+			success("client: Handshake failed with unexpected reason: %s\n", gnutls_strerror(ret));
+	} else {
+		fail("client: Handshake was completed (unexpected)\n");
 	}
-
-	exit(1);
 }
 
 
 /* These are global */
-gnutls_anon_server_credentials_t anoncred;
 pid_t child;
 
-static gnutls_session_t initialize_tls_session(void)
+static void server(int fd, int packet)
 {
+	gnutls_anon_server_credentials_t anoncred;
 	gnutls_session_t session;
+	int ret;
+	/* this must be called once in the program
+	 */
+	global_init();
+
+	if (debug) {
+		gnutls_global_set_log_function(server_log_func);
+		gnutls_global_set_log_level(4711);
+	}
+
+	gnutls_anon_allocate_server_credentials(&anoncred);
+
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
@@ -197,25 +206,6 @@ static gnutls_session_t initialize_tls_session(void)
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
-	return session;
-}
-
-static void server(int fd, int packet)
-{
-	int ret;
-	/* this must be called once in the program
-	 */
-	global_init();
-
-	if (debug) {
-		gnutls_global_set_log_function(server_log_func);
-		gnutls_global_set_log_level(4711);
-	}
-
-	gnutls_anon_allocate_server_credentials(&anoncred);
-
-	session = initialize_tls_session();
-
 	counter = 0;
 	packet_to_lose = packet;
 
@@ -225,7 +215,7 @@ static void server(int fd, int packet)
 	do {
 		ret = gnutls_handshake(session);
 	}
-	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+	while (ret < 0 && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	gnutls_deinit(session);
 	gnutls_global_deinit();
@@ -261,14 +251,14 @@ static void start(int server_packet, int client_packet)
 
 	if (child) {
 		/* parent */
-		close(fd[1]);
-		server(fd[0], server_packet);
-		close(fd[0]);
-		kill(child, SIGTERM);
-	} else {
 		close(fd[0]);
 		client(fd[1], client_packet);
 		close(fd[1]);
+		kill(child, SIGTERM);
+	} else {
+		close(fd[1]);
+		server(fd[0], server_packet);
+		close(fd[0]);
 		exit(0);
 	}
 }
@@ -285,18 +275,26 @@ static void ch_handler(int sig)
 void doit(void)
 {
 	time_t tstart, tstop;
+	int tries = 5; /* we try multiple times because in very busy systems the suite may fail to finish on time */
 
 	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
 
-	tstart = time(0);
-	start(2, -1);
+	for (;tries>=0;tries--) {
+		tstart = time(0);
+		start(2, -1);
 
-	tstop = time(0);
+		tstop = time(0);
 
-	tstop = tstop - tstart;
+		tstop = tstop - tstart;
 
-	if (!(tstop < 70 && tstop > 55))
-		fail("Time difference: %u\n", (unsigned) tstop);
+		if (!(tstop < 70 && tstop > 55)) {
+			if (tries == 0)
+				fail("Time difference: %u\n", (unsigned) tstop);
+			else if (debug)
+				success("Time difference: %u\n", (unsigned) tstop);
+		} else break;
+	}
 }
 
 #endif				/* _WIN32 */
