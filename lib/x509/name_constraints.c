@@ -672,8 +672,12 @@ unsigned found_one;
 		/* passed */
 		if (found_one != 0)
 			return 1;
-		else /* nothing was found */
-			return gnutls_assert_val(0);
+		else {
+			/* no name was found. According to RFC5280: 
+			 * If no name of the type is in the certificate, the certificate is acceptable.
+			 */
+			return gnutls_assert_val(1);
+		}
 	} else if (type == GNUTLS_SAN_DNSNAME) {
 		idx = found_one = 0;
 		do {
@@ -733,8 +737,12 @@ unsigned found_one;
 		/* passed */
 		if (found_one != 0)
 			return 1;
-		else /* nothing was found */
-			return gnutls_assert_val(0);
+		else {
+			/* no name was found. According to RFC5280: 
+			 * If no name of the type is in the certificate, the certificate is acceptable.
+			 */
+			return gnutls_assert_val(1);
+		}
 	} else
 		return check_unsupported_constraint(nc, type);
 }
