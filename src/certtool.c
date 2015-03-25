@@ -2291,6 +2291,7 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 		 const char *hostname, const char *email)
 {
 	int ret;
+	unsigned i;
 	gnutls_datum_t tmp;
 	gnutls_x509_crt_t *x509_cert_list = NULL;
 	gnutls_x509_crt_t *x509_ca_list = NULL;
@@ -2455,8 +2456,10 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 
 	fprintf(outfile, "\n\n");
 
+	gnutls_x509_trust_list_deinit(list, 0);
+	for (i=0;i<x509_ncerts;i++)
+		gnutls_x509_crt_deinit(x509_cert_list[i]);
 	gnutls_free(x509_cert_list);
-	gnutls_x509_trust_list_deinit(list, 1);
 
 	if (output != 0)
 		exit(EXIT_FAILURE);
@@ -2502,7 +2505,7 @@ static void verify_chain(void)
 	buf[size] = 0;
 
 	_verify_x509_mem(buf, size, NULL, 0, 0, OPT_ARG(PURPOSE), OPT_ARG(HOSTNAME), OPT_ARG(EMAIL));
-
+	free(buf);
 }
 
 static void verify_certificate(common_info_st * cinfo)
