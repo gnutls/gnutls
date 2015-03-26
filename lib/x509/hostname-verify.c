@@ -165,7 +165,7 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 	/* try matching against:
 	 *  1) a DNS name as an alternative name (subjectAltName) extension
 	 *     in the certificate
-	 *  2) the common name (CN) in the certificate
+	 *  2) the common name (CN) in the certificate, if the certificate is acceptable for TLS_WWW_SERVER purpose
 	 *
 	 *  either of these may be of the form: *.domain.tld
 	 *
@@ -208,8 +208,11 @@ gnutls_x509_crt_check_hostname2(gnutls_x509_crt_t cert,
 		}
 	}
 
-	if (!found_dnsname) {
-		/* did not get the necessary extension, use CN instead
+	if (!found_dnsname && _gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0) != 0) {
+		/* did not get the necessary extension, use CN instead, if the
+		 * certificate would have been acceptable for a TLS WWW server purpose.
+		 * That is because only for that purpose the CN is a valid field to
+		 * store the hostname.
 		 */
 
 		/* enforce the RFC6125 (§1.8) requirement that only
