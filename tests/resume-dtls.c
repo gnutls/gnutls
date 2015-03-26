@@ -47,6 +47,7 @@ int main(int argc, char **argv)
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
 
 #include "utils.h"
 
@@ -143,7 +144,7 @@ static void client(int sds[], struct params_res *params)
 
 		/* Perform the TLS handshake
 		 */
-		gnutls_handshake_set_timeout(session, 50 * 1000);
+		gnutls_dtls_set_timeouts(session, 1*1000, 120 * 1000);
 		do {
 			ret = gnutls_handshake(session);
 		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -325,7 +326,7 @@ static void server(int sds[], struct params_res *params)
 		session = initialize_tls_session(params);
 
 		gnutls_transport_set_int(session, sd);
-		gnutls_handshake_set_timeout(session, 20 * 1000);
+		gnutls_dtls_set_timeouts(session, 1*1000, 120 * 1000);
 		
 		do {
 			ret = gnutls_handshake(session);
@@ -519,12 +520,11 @@ wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 {
 	gnutls_datum_t res = { NULL, 0 };
-	int i;
+	unsigned i;
 
 	if (debug)
 		success("resume db fetch... (%d)\n", key.size);
 	if (debug) {
-		unsigned int i;
 		printf("key:\n");
 		for (i = 0; i < key.size; i++) {
 			printf("%02x ", key.data[i] & 0xFF);
@@ -555,12 +555,12 @@ static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 			       res.size);
 
 			if (debug) {
-				unsigned int i;
+				unsigned j;
 				printf("data:\n");
-				for (i = 0; i < res.size; i++) {
+				for (j = 0; j < res.size; j++) {
 					printf("%02x ",
-					       res.data[i] & 0xFF);
-					if ((i + 1) % 16 == 0)
+					       res.data[j] & 0xFF);
+					if ((j + 1) % 16 == 0)
 						printf("\n");
 				}
 				printf("\n");
