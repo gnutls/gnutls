@@ -173,6 +173,22 @@ flag = {
 };
 
 flag = {
+    name      = mark-no-decrypt;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the object to be written for no decryption";
+    doc = "Marks the object to be generated/copied with the CKA_DECRYPT flag set to false.";
+};
+
+flag = {
+    name      = mark-no-sign;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the object to be written for no sign";
+    doc = "Marks the object to be generated/copied with the CKA_SIGN flag set to false.";
+};
+
+flag = {
     name      = mark-ca;
     disable   = "no";
     disabled;

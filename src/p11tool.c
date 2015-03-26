@@ -84,6 +84,14 @@ unsigned opt_to_flags(void)
 		flags |=
 		    GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
 
+	if (ENABLED_OPT(MARK_NO_SIGN))
+		flags |=
+		    GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN;
+
+	if (ENABLED_OPT(MARK_NO_DECRYPT))
+		flags |=
+		    GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT;
+
 	if (ENABLED_OPT(MARK_CA))
 		flags |=
 		    GNUTLS_PKCS11_OBJ_FLAG_MARK_CA;
