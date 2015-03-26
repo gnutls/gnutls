@@ -282,6 +282,8 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 		return ret;
 	}
 
+	pk = gnutls_x509_privkey_get_pk_algorithm(key);
+
 	/* FIXME: copy key usage flags */
 	a_val = 0;
 	a[a_val].type = CKA_CLASS;
@@ -293,6 +295,18 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	a[a_val].value = id;
 	a[a_val].value_len = id_size;
 	a_val++;
+
+	a[a_val].type = CKA_SIGN;
+	a[a_val].value = (void*)&tval;
+	a[a_val].value_len = sizeof(tval);
+	a_val++;
+
+	if (pk == GNUTLS_PK_RSA) {
+		a[a_val].type = CKA_DECRYPT;
+		a[a_val].value = (void*)&tval;
+		a[a_val].value_len = sizeof(tval);
+		a_val++;
+	}
 
 	a[a_val].type = CKA_KEY_TYPE;
 	a[a_val].value = &type;
@@ -338,7 +352,6 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 		a_val++;
 	}
 
-	pk = gnutls_x509_privkey_get_pk_algorithm(key);
 	switch (pk) {
 	case GNUTLS_PK_RSA:
 		{
