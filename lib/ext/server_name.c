@@ -400,6 +400,11 @@ gnutls_server_name_set(gnutls_session_t session,
 		goto cleanup;
 	}
 
+	if (name_length == 0) { /* unset extension */
+		_gnutls_ext_unset_session_data(session, GNUTLS_EXTENSION_SERVER_NAME);
+		return 0;
+	}
+
 	ret =
 	    _gnutls_ext_get_session_data(session,
 					 GNUTLS_EXTENSION_SERVER_NAME,
