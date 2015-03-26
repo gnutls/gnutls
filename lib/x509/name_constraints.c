@@ -707,9 +707,10 @@ unsigned found_one;
 			return 1;
 
 		/* verify the name constraints against the CN, if the certificate is
-		 * not a CA. */
+		 * not a CA. We do this check only on certificates marked as WWW server,
+		 * because that's where the CN check is only performed. */
+		if (_gnutls_check_key_purpose(cert, GNUTLS_KP_TLS_WWW_SERVER, 0) != 0)
 		do {
-
 			/* ensure there is only a single CN, according to rfc6125 */
 			name_size = sizeof(name);
 			ret = gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME,
