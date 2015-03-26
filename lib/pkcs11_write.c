@@ -409,14 +409,24 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	a_val++;
 
 	a[a_val].type = CKA_SIGN;
-	a[a_val].value = (void*)&tval;
-	a[a_val].value_len = sizeof(tval);
+	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN)) {
+		a[a_val].value = (void*)&tval;
+		a[a_val].value_len = sizeof(tval);
+	} else {
+		a[a_val].value = (void*)&fval;
+		a[a_val].value_len = sizeof(fval);
+	}
 	a_val++;
 
 	if (pk == GNUTLS_PK_RSA) {
 		a[a_val].type = CKA_DECRYPT;
-		a[a_val].value = (void*)&tval;
-		a[a_val].value_len = sizeof(tval);
+		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT)) {
+			a[a_val].value = (void*)&tval;
+			a[a_val].value_len = sizeof(tval);
+		} else {
+			a[a_val].value = (void*)&fval;
+			a[a_val].value_len = sizeof(fval);
+		}
 		a_val++;
 	}
 

@@ -111,6 +111,8 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
  * @GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT: When an issuer is requested, override its extensions with the ones present in the trust module (seek).
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH: Mark the key pair as requiring authentication (pin entry) before every operation (seek+store).
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE: Mark the key pair as being extractable (store).
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN: When writing/generating a private key do not mark the key for signing
+ * @GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT: When writing/generating a private key do not mark the key for decryption
  * @GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE: If set, the object was never marked as extractable (store).
  * @GNUTLS_PKCS11_OBJ_FLAG_CRT: When searching, restrict to certificates only (seek).
  * @GNUTLS_PKCS11_OBJ_FLAG_PUBKEY: When searching, restrict to public key objects only (seek).
@@ -143,7 +145,9 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_CRT = (1<<18),
 	GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY = (1<<19),
 	GNUTLS_PKCS11_OBJ_FLAG_PUBKEY = (1<<20),
-	GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY = (1<<21)
+	GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY = (1<<21),
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT = (1<<22),
+	GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN = (1<<23)
 	/* flags 1<<29 and later are reserved - see pkcs11_int.h */
 } gnutls_pkcs11_obj_flags;
 

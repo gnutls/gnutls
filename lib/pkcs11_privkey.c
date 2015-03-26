@@ -700,13 +700,23 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	switch (pk) {
 	case GNUTLS_PK_RSA:
 		p[p_val].type = CKA_DECRYPT;
-		p[p_val].value = (void *) &tval;
-		p[p_val].value_len = sizeof(tval);
+		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT)) {
+			p[p_val].value = (void *) &tval;
+			p[p_val].value_len = sizeof(tval);
+		} else {
+			p[p_val].value = (void *) &fval;
+			p[p_val].value_len = sizeof(fval);
+		}
 		p_val++;
 
 		p[p_val].type = CKA_SIGN;
-		p[p_val].value = (void *) &tval;
-		p[p_val].value_len = sizeof(tval);
+		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN)) {
+			p[p_val].value = (void *) &tval;
+			p[p_val].value_len = sizeof(tval);
+		} else {
+			p[p_val].value = (void *) &fval;
+			p[p_val].value_len = sizeof(fval);
+		}
 		p_val++;
 
 		a[a_val].type = CKA_ENCRYPT;
@@ -732,8 +742,13 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 		break;
 	case GNUTLS_PK_DSA:
 		p[p_val].type = CKA_SIGN;
-		p[p_val].value = (void *) &tval;
-		p[p_val].value_len = sizeof(tval);
+		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN)) {
+			p[p_val].value = (void *) &tval;
+			p[p_val].value_len = sizeof(tval);
+		} else {
+			p[p_val].value = (void *) &fval;
+			p[p_val].value_len = sizeof(fval);
+		}
 		p_val++;
 
 		a[a_val].type = CKA_VERIFY;
@@ -748,8 +763,13 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 		break;
 	case GNUTLS_PK_EC:
 		p[p_val].type = CKA_SIGN;
-		p[p_val].value = (void *) &tval;
-		p[p_val].value_len = sizeof(tval);
+		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN)) {
+			p[p_val].value = (void *) &tval;
+			p[p_val].value_len = sizeof(tval);
+		} else {
+			p[p_val].value = (void *) &fval;
+			p[p_val].value_len = sizeof(fval);
+		}
 		p_val++;
 
 		a[a_val].type = CKA_VERIFY;
