@@ -360,6 +360,11 @@ gnutls_server_name_set(gnutls_session_t session,
 	if (name_length > MAX_SERVER_NAME_SIZE)
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
+	if (name_length == 0) { /* unset extension */
+		_gnutls_ext_unset_session_data(session, GNUTLS_EXTENSION_SERVER_NAME);
+		return 0;
+	}
+
 	ret =
 	    _gnutls_ext_get_session_data(session,
 					 GNUTLS_EXTENSION_SERVER_NAME,
