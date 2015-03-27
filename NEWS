@@ -103,9 +103,9 @@ when available.
 
 ** certtool: Added the --key-id and --fingerprint options.
 
-** certtool: Added the --hostname, --email and --purpose options to be 
-used in certificate chain verification, to simulate verification for specific
-hostname and key purpose (extended key usage).
+** certtool: Added the --verify-hostname, --verify-email and --verify-purpose
+options to be used in certificate chain verification, to simulate verification
+for specific hostname and key purpose (extended key usage).
 
 ** certtool: --p12-info option will print PKCS #12 MAC and cipher information
 when available.
