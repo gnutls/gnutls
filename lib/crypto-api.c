@@ -38,8 +38,8 @@ typedef struct api_cipher_hd_st {
 /**
  * gnutls_cipher_init:
  * @handle: is a #gnutls_cipher_hd_t type.
- * @cipher: the encryption algorithm to use
- * @key: The key to be used for encryption
+ * @cipher: the cryptographic algorithm to use
+ * @key: The key to be used for encryption/decryption
  * @iv: The IV to use (if not applicable set NULL)
  *
  * This function will initialize an context that can be used for
@@ -340,7 +340,7 @@ gnutls_hmac_init(gnutls_hmac_hd_t * dig,
 
 /**
  * gnutls_hmac_set_nonce:
- * @handle: is a #gnutls_cipher_hd_t type.
+ * @handle: is a #gnutls_hmac_hd_t type.
  * @nonce: the data to set as nonce
  * @nonce_len: The length of data
  *
@@ -357,7 +357,7 @@ gnutls_hmac_set_nonce(gnutls_hmac_hd_t handle, const void *nonce,
 
 /**
  * gnutls_hmac:
- * @handle: is a #gnutls_cipher_hd_t type.
+ * @handle: is a #gnutls_hmac_hd_t type.
  * @ptext: the data to hash
  * @ptext_len: The length of data to hash
  *
@@ -487,7 +487,7 @@ gnutls_hash_init(gnutls_hash_hd_t * dig,
 
 /**
  * gnutls_hash:
- * @handle: is a #gnutls_cipher_hd_t type.
+ * @handle: is a #gnutls_hash_hd_t type.
  * @ptext: the data to hash
  * @ptext_len: The length of data to hash
  *
