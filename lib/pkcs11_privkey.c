@@ -654,7 +654,12 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	mech.parameter_len = 0;
 	mech.mechanism = pk_to_genmech(pk, &key_type);
 
-	gnutls_rnd(GNUTLS_RND_NONCE, id, sizeof(id));
+	ret = gnutls_rnd(GNUTLS_RND_NONCE, id, sizeof(id));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
 	a[a_val].type = CKA_ID;
 	a[a_val].value = (void *) id;
 	a[a_val].value_len = sizeof(id);
