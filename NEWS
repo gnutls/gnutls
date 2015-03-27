@@ -16,6 +16,13 @@ advice closely. Reported by Fotis Loukos.
 ** libgnutls: Fixed handling of supplemental data with types > 255.
 Patch by Thierry Quemerais.
 
+** libgnutls: When generating PKCS #11 keys, set CKA_ID, CKA_SIGN,
+and CKA_DECRYPT when needed.
+
+** libgnutls: Allow names with zero size to be set using
+gnutls_server_name_set(). That will disable the Server Name Indication.
+Resolves issue with wine: https://gitlab.com/gnutls/gnutls/issues/2
+
 ** API and ABI modifications:
 No changes since last version.
 
