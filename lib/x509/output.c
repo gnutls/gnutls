@@ -75,7 +75,10 @@ print_name(gnutls_buffer_st *str, const char *prefix, unsigned type, gnutls_datu
 char *sname = (char*)name->data;
 char str_ip[64];
 const char *p;
-unsigned non_ascii = 0, i;
+unsigned non_ascii = 0;
+#ifdef HAVE_LIBIDN
+unsigned i;
+#endif
 
 	if ((type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_OTHERNAME_XMPP
 	     || type == GNUTLS_SAN_RFC822NAME

@@ -29,7 +29,9 @@ int main(void)
         int ret, sd, ii;
         gnutls_session_t session;
         char buffer[MAX_BUF + 1];
+#if 0
         const char *err;
+#endif
         gnutls_certificate_credentials_t xcred;
 
         if (gnutls_check_version("3.1.4") == NULL) {

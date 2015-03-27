@@ -286,8 +286,11 @@ gnutls_server_name_get(gnutls_session_t session, void *data,
 {
 	char *_data = data;
 	server_name_ext_st *priv;
-	int ret, rc;
+	int ret;
+#ifdef HAVE_LIBIDN
+	int rc;
 	char *idn_name = NULL;
+#endif
 	extension_priv_data_t epriv;
 	gnutls_datum name;
 
