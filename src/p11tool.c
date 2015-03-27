@@ -231,25 +231,6 @@ static void cmd_parser(int argc, char **argv)
 		sec_param = OPT_ARG(SEC_PARAM);
 	}
 
-	if (debug > 4) {
-		if (HAVE_OPT(MARK_PRIVATE))
-			fprintf(stderr, "Private: %s\n",
-				ENABLED_OPT(MARK_PRIVATE) ? "yes" : "no");
-		fprintf(stderr, "Trusted: %s\n",
-			ENABLED_OPT(MARK_TRUSTED) ? "yes" : "no");
-		fprintf(stderr, "Wrap: %s\n",
-			ENABLED_OPT(MARK_WRAP) ? "yes" : "no");
-		fprintf(stderr, "CA: %s\n",
-			ENABLED_OPT(MARK_CA) ? "yes" : "no");
-		fprintf(stderr, "Login: %s\n",
-			ENABLED_OPT(LOGIN) ? "yes" : "no");
-		fprintf(stderr, "SO Login: %s\n",
-			ENABLED_OPT(SO_LOGIN) ? "yes" : "no");
-		fprintf(stderr, "Detailed URLs: %s\n",
-			ENABLED_OPT(DETAILED_URL) ? "yes" : "no");
-		fprintf(stderr, "\n");
-	}
-
 	/* handle actions 
 	 */
 	if (HAVE_OPT(LIST_TOKENS)) {
