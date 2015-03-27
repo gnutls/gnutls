@@ -2504,7 +2504,8 @@ static void verify_chain(void)
 
 	buf[size] = 0;
 
-	_verify_x509_mem(buf, size, NULL, 0, 0, OPT_ARG(PURPOSE), OPT_ARG(HOSTNAME), OPT_ARG(EMAIL));
+	_verify_x509_mem(buf, size, NULL, 0, 0, OPT_ARG(VERIFY_PURPOSE),
+	                 OPT_ARG(VERIFY_HOSTNAME), OPT_ARG(VERIFY_EMAIL));
 	free(buf);
 }
 
@@ -2541,7 +2542,8 @@ static void verify_certificate(common_info_st * cinfo)
 	}
 
 	_verify_x509_mem(cert, cert_size, cas, ca_size,
-			 (cinfo->ca != NULL) ? 0 : 1, OPT_ARG(PURPOSE), OPT_ARG(HOSTNAME), OPT_ARG(EMAIL));
+			 (cinfo->ca != NULL) ? 0 : 1, OPT_ARG(VERIFY_PURPOSE),
+			 OPT_ARG(VERIFY_HOSTNAME), OPT_ARG(VERIFY_EMAIL));
 
 
 }
