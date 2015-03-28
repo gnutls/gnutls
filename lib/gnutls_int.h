@@ -1072,12 +1072,6 @@ inline static size_t max_user_send_size(gnutls_session_t session,
 		max = gnutls_dtls_get_data_mtu(session);
 	else {
 		max = session->security_parameters.max_record_send_size;
-		/* DTLS data MTU accounts for those */
-
-		if (_gnutls_cipher_is_block(record_params->cipher))
-			max -=
-			    _gnutls_cipher_get_block_size(record_params->
-							  cipher);
 	}
 
 	return max;
