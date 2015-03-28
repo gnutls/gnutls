@@ -212,6 +212,7 @@ gnutls_pubkey_get_verify_algorithm: Removed
 gnutls_x509_crt_get_verify_algorithm: Removed
 gnutls_pubkey_verify_hash: Removed
 gnutls_pubkey_verify_data: Removed
+gnutls_record_set_max_empty_records: Removed
 
 guile:
 set-session-cipher-priority!: Removed
