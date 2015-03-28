@@ -206,6 +206,7 @@ void benchmark_cipher(int debug_level)
 			 size);
 	cipher_bench(GNUTLS_CIPHER_AES_128_CCM, size, 1);
 	cipher_bench(GNUTLS_CIPHER_AES_128_GCM, size, 1);
+	cipher_bench(GNUTLS_CIPHER_CHACHA20_POLY1305, size, 1);
 
 	printf("\nChecking MAC algorithms, payload size: %u\n", size * 1024);
 	mac_bench(GNUTLS_MAC_SHA1, size);
