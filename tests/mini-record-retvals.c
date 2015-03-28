@@ -453,7 +453,7 @@ void doit(void)
 {
 	signal(SIGCHLD, ch_handler);
 
-	/* checking stream ciphers, as block ciphers impose other restrictions on size as well */
+	start(AES_CBC_SHA256, 0);
 	start(AES_GCM, 0);
 
 #ifndef ENABLE_FIPS140
