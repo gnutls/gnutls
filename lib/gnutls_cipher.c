@@ -587,7 +587,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 			ciphertext->size -= exp_iv_size;
 		} else {
 			memcpy(&nonce[imp_iv_size],
-			       UINT64DATA(params->read.sequence_number), 8);
+			       UINT64DATA(*sequence), 8);
 		}
 
 		length =
