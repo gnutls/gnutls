@@ -184,7 +184,7 @@ int gnutls_subject_alt_names_set(gnutls_subject_alt_names_t sans,
 	gnutls_datum_t copy;
 	char *ooc;
 
-	ret = _gnutls_set_datum(&copy, san->data, san->size);
+	ret = _gnutls_set_strdatum(&copy, san->data, san->size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -766,7 +766,7 @@ int gnutls_x509_aki_set_cert_issuer(gnutls_x509_aki_t aki,
 
 	aki->cert_issuer.names[aki->cert_issuer.size].type = san_type;
 
-	ret = _gnutls_set_datum(&t_san, san->data, san->size);
+	ret = _gnutls_set_strdatum(&t_san, san->data, san->size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 

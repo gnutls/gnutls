@@ -49,6 +49,27 @@ _gnutls_set_datum(gnutls_datum_t * dat, const void *data, size_t data_size)
 	return 0;
 }
 
+/* ensures that the data set are null-terminated */
+int
+_gnutls_set_strdatum(gnutls_datum_t * dat, const void *data, size_t data_size)
+{
+	if (data_size == 0 || data == NULL) {
+		dat->data = NULL;
+		dat->size = 0;
+		return 0;
+	}
+
+	dat->data = gnutls_malloc(data_size+1);
+	if (dat->data == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+
+	dat->size = data_size;
+	memcpy(dat->data, data, data_size);
+	dat->data[data_size] = 0;
+
+	return 0;
+}
+
 int
 _gnutls_datum_append(gnutls_datum_t * dst, const void *data,
 		     size_t data_size)

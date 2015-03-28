@@ -28,6 +28,9 @@
 int _gnutls_set_datum(gnutls_datum_t * dat, const void *data,
 		      size_t data_size);
 
+int _gnutls_set_strdatum(gnutls_datum_t * dat, const void *data,
+		         size_t data_size);
+
 int _gnutls_datum_append(gnutls_datum_t * dat, const void *data,
 			 size_t data_size);
 
