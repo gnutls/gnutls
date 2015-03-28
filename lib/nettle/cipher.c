@@ -37,6 +37,7 @@
 #include <nettle/cbc.h>
 #include <nettle/gcm.h>
 #include <nettle/ccm.h>
+#include <nettle/chacha-poly1305.h>
 #include <fips.h>
 
 struct nettle_cipher_ctx;
@@ -103,6 +104,13 @@ _stream_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
 }
 
 static void
+_stream_decrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
+                const uint8_t * src)
+{
+	ctx->cipher->decrypt_block(ctx->ctx_ptr, length, dst, src);
+}
+
+static void
 _cbc_encrypt(struct nettle_cipher_ctx *ctx, size_t length, uint8_t * dst,
                 const uint8_t * src)
 {
@@ -148,6 +156,13 @@ _ccm_decrypt(struct nettle_cipher_ctx *ctx,
 				    tag_size, length, dst, src);
 }
 
+static void
+_chacha_poly1305_set_nonce (struct chacha_poly1305_ctx *ctx,
+                   size_t length, const uint8_t *nonce)
+{
+	chacha_poly1305_set_nonce(ctx, nonce);
+}
+                   
 struct gcm_cast_st { struct gcm_key key; struct gcm_ctx gcm; unsigned long xx[1]; };
 #define GCM_CTX_GET_KEY(ptr) (&((struct gcm_cast_st*)ptr)->key)
 #define GCM_CTX_GET_CTX(ptr) (&((struct gcm_cast_st*)ptr)->gcm)
@@ -413,6 +428,21 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .decrypt = _stream_encrypt,
 	   .set_encrypt_key = (nettle_set_key_func*)salsa20_256_set_key,
 	   .set_decrypt_key = (nettle_set_key_func*)salsa20_256_set_key,
+	},
+	{  .algo = GNUTLS_CIPHER_CHACHA20_POLY1305,
+	   .block_size = CHACHA_POLY1305_BLOCK_SIZE,
+	   .key_size = CHACHA_POLY1305_KEY_SIZE,
+
+	   .ctx_size = sizeof(struct chacha_poly1305_ctx),
+	   .encrypt_block = (nettle_cipher_func*)chacha_poly1305_encrypt,
+	   .decrypt_block = (nettle_cipher_func*)chacha_poly1305_decrypt,
+	   .encrypt = _stream_encrypt,
+	   .decrypt = _stream_decrypt,
+	   .auth = (nettle_hash_update_func*)chacha_poly1305_update,
+	   .tag = (nettle_hash_digest_func*)chacha_poly1305_digest,
+	   .set_encrypt_key = (nettle_set_key_func*)chacha_poly1305_set_key,
+	   .set_decrypt_key = (nettle_set_key_func*)chacha_poly1305_set_key,
+	   .set_iv = (setiv_func)_chacha_poly1305_set_nonce,
 	},
 };
 
