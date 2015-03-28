@@ -585,7 +585,8 @@ void gnutls_dtls_set_mtu(gnutls_session_t session, unsigned int mtu)
 
 static int record_overhead(const cipher_entry_st * cipher,
 			   const mac_entry_st * mac,
-			   gnutls_compression_method_t comp)
+			   gnutls_compression_method_t comp,
+			   unsigned send_nonce)
 {
 	int total = 0;
 	int t, ret;
@@ -600,7 +601,8 @@ static int record_overhead(const cipher_entry_st * cipher,
 	}
 
 	if (mac->id == GNUTLS_MAC_AEAD) {
-		total += AEAD_EXPLICIT_DATA_SIZE;
+		if (send_nonce != 0)
+			total += AEAD_EXPLICIT_DATA_SIZE;
 		total += _gnutls_cipher_get_tag_size(cipher);
 	} else {
 		ret = _gnutls_mac_get_algo_len(mac);
@@ -662,7 +664,7 @@ size_t gnutls_est_record_overhead_size(gnutls_protocol_t version,
 	else
 		total = DTLS_RECORD_HEADER_SIZE;
 
-	total += record_overhead(c, m, comp);
+	total += record_overhead(c, m, comp, 0);
 
 	return total;
 }
@@ -690,7 +692,8 @@ static int record_overhead_rt(gnutls_session_t session)
 
 	/* requires padding */
 	return record_overhead(params->cipher, params->mac,
-			       params->compression_algorithm);
+			       params->compression_algorithm,
+			       params->send_nonce);
 }
 
 /**
