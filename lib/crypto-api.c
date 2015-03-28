@@ -38,7 +38,7 @@ typedef struct api_cipher_hd_st {
 /**
  * gnutls_cipher_init:
  * @handle: is a #gnutls_cipher_hd_t type
- * @cipher: the cryptographic algorithm to use
+ * @cipher: the encryption algorithm to use
  * @key: the key to be used for encryption/decryption
  * @iv: the IV to use (if not applicable set NULL)
  *
