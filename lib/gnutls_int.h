@@ -639,7 +639,6 @@ struct gnutls_priority_st {
 	bool no_extensions;
 	bool no_ext_master_secret;
 	bool allow_large_records;
-	unsigned int max_empty_records;
 	unsigned int dumbfw;
 	safe_renegotiation_t sr;
 	bool min_record_version;

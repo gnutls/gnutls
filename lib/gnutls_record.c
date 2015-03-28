@@ -84,26 +84,6 @@ void gnutls_record_disable_padding(gnutls_session_t session)
 }
 
 /**
- * gnutls_record_set_max_empty_records:
- * @session: is a #gnutls_session_t type.
- * @i: is the desired value of maximum empty records that can be accepted in a row.
- *
- * Used to set the maximum number of empty fragments that can be accepted
- * in a row. Accepting many empty fragments is useful for receiving length-hidden
- * content, where empty fragments filled with pad are sent to hide the real
- * length of a message. However, a malicious peer could send empty fragments to
- * mount a DoS attack, so as a safety measure, a maximum number of empty fragments
- * is accepted by default. If you know your application must accept a given number
- * of empty fragments in a row, you can use this function to set the desired value.
- **/
-void
-gnutls_record_set_max_empty_records(gnutls_session_t session,
-				    const unsigned int i)
-{
-	session->internals.priorities.max_empty_records = i;
-}
-
-/**
  * gnutls_transport_set_ptr:
  * @session: is a #gnutls_session_t type.
  * @ptr: is the value.
@@ -1147,8 +1127,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 
       begin:
 
-	if (empty_fragments >
-	    session->internals.priorities.max_empty_records) {
+	if (empty_fragments > DEFAULT_MAX_EMPTY_RECORDS) {
 		gnutls_assert();
 		return GNUTLS_E_TOO_MANY_EMPTY_PACKETS;
 	}

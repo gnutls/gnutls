@@ -1065,8 +1065,6 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	(*priority_cache)->sr = SR_PARTIAL;
 	(*priority_cache)->min_record_version = 1;
 
-	(*priority_cache)->max_empty_records = DEFAULT_MAX_EMPTY_RECORDS;
-
 	if (priorities == NULL)
 		priorities = "NORMAL";
 
