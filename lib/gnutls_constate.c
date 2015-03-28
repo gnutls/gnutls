@@ -221,6 +221,7 @@ _gnutls_epoch_set_cipher_suite(gnutls_session_t session,
 	const cipher_entry_st *cipher_algo;
 	const mac_entry_st *mac_algo;
 	record_parameters_st *params;
+	const gnutls_cipher_suite_entry_st *cs;
 	int ret;
 
 	ret = _gnutls_epoch_get(session, epoch_rel, &params);
@@ -231,8 +232,12 @@ _gnutls_epoch_set_cipher_suite(gnutls_session_t session,
 	    || params->cipher != NULL || params->mac != NULL)
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	cipher_algo = _gnutls_cipher_suite_get_cipher_algo(suite);
-	mac_algo = _gnutls_cipher_suite_get_mac_algo(suite);
+	cs = ciphersuite_to_entry(suite);
+	if (cs == NULL)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	cipher_algo = cipher_to_entry(cs->block_algorithm);
+	mac_algo = mac_to_entry(cs->mac_algorithm);
 
 	if (_gnutls_cipher_is_ok(cipher_algo) == 0
 	    || _gnutls_mac_is_ok(mac_algo) == 0)
@@ -246,6 +251,10 @@ _gnutls_epoch_set_cipher_suite(gnutls_session_t session,
 
 	params->cipher = cipher_algo;
 	params->mac = mac_algo;
+	if (cs->nonce_type == NONCE_IS_SENT)
+		params->send_nonce = 1;
+	else
+		params->send_nonce = 0;
 
 	return 0;
 }

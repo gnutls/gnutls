@@ -445,6 +445,25 @@ typedef struct cipher_entry_st {
 	uint16_t tagsize;
 } cipher_entry_st;
 
+typedef enum nonce_type_t {
+	NONCE_IS_SENT,
+	NONCE_IS_COUNTER,
+} nonce_type_t;
+
+typedef struct gnutls_cipher_suite_entry_st {
+	const char *name;
+	const uint8_t id[2];
+	gnutls_cipher_algorithm_t block_algorithm;
+	gnutls_kx_algorithm_t kx_algorithm;
+	gnutls_mac_algorithm_t mac_algorithm;
+	gnutls_protocol_t min_version;	/* this cipher suite is supported
+					 * from 'version' and above;
+					 */
+	gnutls_protocol_t min_dtls_version;	/* DTLS min version */
+	gnutls_mac_algorithm_t prf;
+	nonce_type_t nonce_type;
+} gnutls_cipher_suite_entry_st;
+
 /* This structure is used both for MACs and digests
  */
 typedef struct mac_entry_st {
@@ -604,6 +623,7 @@ struct record_parameters_st {
 
 	record_state_st read;
 	record_state_st write;
+	unsigned send_nonce; /* whether explicit nonce is sent (in AEAD ciphers) */
 
 	/* Whether this state is in use, i.e., if there is
 	   a pending handshake message waiting to be encrypted

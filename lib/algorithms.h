@@ -179,6 +179,8 @@ _gnutls_cipher_suite_get_id(gnutls_kx_algorithm_t kx_algorithm,
 			    gnutls_mac_algorithm_t mac_algorithm,
 			    uint8_t suite[2]);
 
+const gnutls_cipher_suite_entry_st *ciphersuite_to_entry(const uint8_t suite[2]);
+
 /* Functions for ciphers. */
 const cipher_entry_st *cipher_to_entry(gnutls_cipher_algorithm_t c);
 

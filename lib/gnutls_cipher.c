@@ -236,12 +236,12 @@ calc_enc_length_block(gnutls_session_t session,
 inline static int
 calc_enc_length_stream(gnutls_session_t session, int data_size,
 		       int hash_size, unsigned auth_cipher,
-		       unsigned exp_iv_size)
+		       unsigned exp_iv_size, unsigned send_nonce)
 {
 	unsigned int length;
 
 	length = data_size + hash_size;
-	if (auth_cipher)
+	if (auth_cipher && send_nonce)
 		length += exp_iv_size;
 
 	return length;
@@ -302,6 +302,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 	int explicit_iv = _gnutls_version_has_explicit_iv(ver);
 	int auth_cipher =
 	    _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
+	unsigned send_nonce = params->send_nonce;
 	uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
 	unsigned imp_iv_size = 0, exp_iv_size = 0;
 	bool etm = 0;
@@ -339,7 +340,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 		pad = 0;
 		length =
 		    calc_enc_length_stream(session, compressed->size,
-					   tag_size, auth_cipher, exp_iv_size);
+					   tag_size, auth_cipher, exp_iv_size, send_nonce);
 	}
 
 	if (length < 0)
@@ -386,12 +387,14 @@ compressed_to_ciphertext(gnutls_session_t session,
 		       UINT64DATA(params->write.sequence_number),
 		       8);
 
-		/* copy the explicit part */
-		memcpy(data_ptr, &nonce[imp_iv_size],
-		       exp_iv_size);
+		if (send_nonce != 0) {
+			/* copy the explicit part */
+			memcpy(data_ptr, &nonce[imp_iv_size],
+			       exp_iv_size);
 
-		data_ptr += exp_iv_size;
-		cipher_data += exp_iv_size;
+			data_ptr += exp_iv_size;
+			cipher_data += exp_iv_size;
+		}
 	}
 
 	if (etm)
@@ -503,6 +506,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 	const version_entry_st *ver = get_version(session);
 	unsigned int tag_size =
 	    _gnutls_auth_cipher_tag_len(&params->read.cipher_state);
+	unsigned send_nonce = params->send_nonce;
 	unsigned int explicit_iv = _gnutls_version_has_explicit_iv(ver);
 	unsigned imp_iv_size, exp_iv_size;
 	unsigned cipher_type = _gnutls_cipher_type(params->cipher);
@@ -569,17 +573,22 @@ ciphertext_to_compressed(gnutls_session_t session,
 			return
 			    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		if (unlikely(ciphertext->size < tag_size + exp_iv_size))
+		if (unlikely(ciphertext->size < tag_size + (send_nonce!=0)?exp_iv_size:0))
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 		memcpy(nonce, params->read.IV.data,
 		       imp_iv_size);
-		memcpy(&nonce[imp_iv_size],
-		       ciphertext->data, exp_iv_size);
 
+		if (send_nonce != 0) {
+			memcpy(&nonce[imp_iv_size],
+			       ciphertext->data, exp_iv_size);
 
-		ciphertext->data += exp_iv_size;
-		ciphertext->size -= exp_iv_size;
+			ciphertext->data += exp_iv_size;
+			ciphertext->size -= exp_iv_size;
+		} else {
+			memcpy(&nonce[imp_iv_size],
+			       UINT64DATA(params->read.sequence_number), 8);
+		}
 
 		length =
 		    ciphertext->size - tag_size;
