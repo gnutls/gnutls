@@ -2286,7 +2286,7 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 	int len, ret;
 	uint8_t reasons[2];
 	unsigned i, type, rflags, j;
-	gnutls_datum_t san;
+	gnutls_datum_t san = {NULL, 0};
 
 	result = asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.CRLDistributionPoints", &c2);
@@ -2309,9 +2309,6 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 
 	i = 0;
 	do {
-		san.data = NULL;
-		san.size = 0;
-
 		snprintf(name, sizeof(name), "?%u.reasons", (unsigned)i + 1);
 
 		len = sizeof(reasons);
@@ -2336,6 +2333,9 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 
 		j = 0;
 		do {
+			san.data = NULL;
+			san.size = 0;
+
 			ret =
 			    _gnutls_parse_general_name2(c2, name, j, &san,
 							&type, 0);
@@ -2350,6 +2350,7 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 			ret = crl_dist_points_set(cdp, type, &san, rflags);
 			if (ret < 0)
 				break;
+			san.data = NULL; /* it is now in cdp */
 
 			j++;
 		} while (ret >= 0);
@@ -2359,6 +2360,7 @@ int gnutls_x509_ext_import_crl_dist_points(const gnutls_datum_t * ext,
 
 	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		gnutls_assert();
+		gnutls_free(san.data);
 		goto cleanup;
 	}
 
