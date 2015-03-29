@@ -16,6 +16,16 @@ advice closely. Reported by Fotis Loukos.
 ** libgnutls: Fixed handling of supplemental data with types > 255.
 Patch by Thierry Quemerais.
 
+** libgnutls: Fixed double free in the parsing of CRL distribution points certificate
+extension. Reported by Robert Święcki.
+
+** libgnutls: Fixed a two-byte stack overflow in DTLS 0.9 protocol. That
+protocol is not enabled by default (used by openconnect VPN).
+
+** libgnutls: The maximum user data send size is set to be the same for
+block and non-block ciphersuites. This addresses a regression with wine:
+https://bugs.winehq.org/show_bug.cgi?id=37500
+
 ** libgnutls: When generating PKCS #11 keys, set CKA_ID, CKA_SIGN,
 and CKA_DECRYPT when needed.
 
