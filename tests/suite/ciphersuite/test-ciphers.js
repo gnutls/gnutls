@@ -27,14 +27,14 @@ include('./registry-ciphers.js');
     var cipher = cs.cipher.replace("3DES-CBC", "3DES-EDE-CBC");
     var kx = cs.kx.replace("ANON-DH", "DH-ANON").replace("ANON-ECDH", "ECDH-ANON").replace("SRP", "SRP-SHA");
 
-    if (cs.mac == "AEAD" && cipher.indexOf("GCM") == -1) {
-      if (kx + "-" + cipher != cs.gnutlsname) {
+    if (cs.mac == "AEAD") {
+      if (kx + "-" + cipher != cs.gnutlsname && kx + "-" + cipher + "-SHA256" != cs.gnutlsname && kx + "-" + cipher + "-SHA384" != cs.gnutlsname) {
         console.log("Broken AEAD ciphersuite: ", kx + "-" + cipher, " ", cs.gnutlsname);
         process.exit(1);
       }
     } else {
       if (kx + "-" + cipher + "-" + mac != cs.gnutlsname) {
-        console.log("Broken ciphersuite: ", kx + "-" + cipher + "-" + mac, " ", cs.gnutlsname);
+        console.log("Broken ciphersuite name: ", kx + "-" + cipher + "-" + mac, " ", cs.gnutlsname);
         process.exit(1);
       }
     }
