@@ -20,6 +20,7 @@
  *
  */
 
+#include <config.h>
 #include <gnutls_int.h>
 #include <algorithms.h>
 #include <gnutls_errors.h>
