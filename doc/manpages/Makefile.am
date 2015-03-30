@@ -1105,7 +1105,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/gnutls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1119,7 +1119,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/compat.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1133,7 +1133,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/dane.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1147,7 +1147,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/x509.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1161,7 +1161,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/x509-ext.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1175,7 +1175,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/ocsp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1189,7 +1189,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/abstract.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1203,7 +1203,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/pkcs12.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1217,7 +1217,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/pkcs11.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1231,7 +1231,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/dtls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1245,7 +1245,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/openpgp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1259,7 +1259,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/crypto.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1273,7 +1273,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/tpm.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2001-2014 Free Software Foundation, Inc." \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1287,7 +1287,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/urls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2014 Free Software Foundation, Inc." \
+			-copyright "2014-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
@@ -1301,7 +1301,7 @@ stamp_mans: $(HEADER_FILES)
 			-pkg-site "http://www.gnutls.org" \
 			-include "gnutls/system-keys.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2014 Free Software Foundation, Inc." \
+			-copyright "2014-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
 			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
