@@ -32,8 +32,8 @@ static const ck_bool_t fval = 0;
 /**
  * gnutls_pkcs11_copy_x509_crt:
  * @token_url: A PKCS #11 URL specifying a token
- * @crt: A certificate
- * @label: A name to be used for the stored data
+ * @crt: The certificate to copy
+ * @label: The name to be used for the stored data
  * @flags: One of GNUTLS_PKCS11_OBJ_FLAG_*
  *
  * This function will copy a certificate into a PKCS #11 token specified by
@@ -47,6 +47,31 @@ static const ck_bool_t fval = 0;
 int
 gnutls_pkcs11_copy_x509_crt(const char *token_url,
 			    gnutls_x509_crt_t crt, const char *label,
+			    unsigned int flags)
+{
+	return gnutls_pkcs11_copy_x509_crt2(token_url, crt, label, NULL, flags);
+}
+
+/**
+ * gnutls_pkcs11_copy_x509_crt2:
+ * @token_url: A PKCS #11 URL specifying a token
+ * @crt: The certificate to copy
+ * @label: The name to be used for the stored data
+ * @cid: The CKA_ID to set for the object -if NULL, the ID will be derived from the public key
+ * @flags: One of GNUTLS_PKCS11_OBJ_FLAG_*
+ *
+ * This function will copy a certificate into a PKCS #11 token specified by
+ * a URL. The certificate can be marked as trusted or not.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.3.26
+ **/
+int
+gnutls_pkcs11_copy_x509_crt2(const char *token_url,
+			    gnutls_x509_crt_t crt, const char *label,
+			    const gnutls_datum_t *cid,
 			    unsigned int flags)
 {
 	int ret;
@@ -110,25 +135,30 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 		goto cleanup;
 	}
 
-	id_size = sizeof(id);
-	ret = gnutls_x509_crt_get_subject_key_id(crt, id, &id_size, NULL);
-	if (ret < 0) {
-	        id_size = sizeof(id);
-		ret = gnutls_x509_crt_get_key_id(crt, 0, id, &id_size);
-		if (ret < 0) {
-		  gnutls_assert();
-		  goto cleanup;
-                }
-	}
-
-	/* FIXME: copy key usage flags */
-
 	a[0].type = CKA_CLASS;
 	a[0].value = &class;
 	a[0].value_len = sizeof(class);
+
 	a[1].type = CKA_ID;
-	a[1].value = id;
-	a[1].value_len = id_size;
+	if (cid == NULL || cid->size == 0) {
+		id_size = sizeof(id);
+		ret = gnutls_x509_crt_get_subject_key_id(crt, id, &id_size, NULL);
+		if (ret < 0) {
+		        id_size = sizeof(id);
+			ret = gnutls_x509_crt_get_key_id(crt, 0, id, &id_size);
+			if (ret < 0) {
+			  gnutls_assert();
+			  goto cleanup;
+	                }
+		}
+
+		a[1].value = id;
+		a[1].value_len = id_size;
+	} else {
+		a[1].value = cid->data;
+		a[1].value_len = cid->size;
+	}
+
 	a[2].type = CKA_VALUE;
 	a[2].value = der;
 	a[2].value_len = der_size;
@@ -138,6 +168,7 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
 	a[4].type = CKA_CERTIFICATE_TYPE;
 	a[4].value = &type;
 	a[4].value_len = sizeof(type);
+	/* FIXME: copy key usage flags */
 
 	a_val = 5;
 
@@ -245,6 +276,34 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 				const char *label,
 				unsigned int key_usage, unsigned int flags)
 {
+	return gnutls_pkcs11_copy_x509_privkey2(token_url, key, label, NULL, key_usage, flags);
+}
+
+/**
+ * gnutls_pkcs11_copy_x509_privkey2:
+ * @token_url: A PKCS #11 URL specifying a token
+ * @key: A private key
+ * @label: A name to be used for the stored data
+ * @cid: The CKA_ID to set for the object -if NULL, the ID will be derived from the public key
+ * @key_usage: One of GNUTLS_KEY_*
+ * @flags: One of GNUTLS_PKCS11_OBJ_* flags
+ *
+ * This function will copy a private key into a PKCS #11 token specified by
+ * a URL. It is highly recommended flags to contain %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
+ * unless there is a strong reason not to.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.3.26
+ **/
+int
+gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
+				gnutls_x509_privkey_t key,
+				const char *label,
+				const gnutls_datum_t *cid,
+				unsigned int key_usage, unsigned int flags)
+{
 	int ret;
 	struct p11_kit_uri *info = NULL;
 	ck_rv_t rv;
@@ -282,14 +341,6 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 		return ret;
 	}
 
-	id_size = sizeof(id);
-	ret = gnutls_x509_privkey_get_key_id(key, 0, id, &id_size);
-	if (ret < 0) {
-		p11_kit_uri_free(info);
-		gnutls_assert();
-		return ret;
-	}
-
 	ret =
 	    pkcs11_open_session(&sinfo, NULL, info,
 				SESSION_WRITE |
@@ -311,8 +362,21 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	a_val++;
 
 	a[a_val].type = CKA_ID;
-	a[a_val].value = id;
-	a[a_val].value_len = id_size;
+	if (cid == NULL || cid->size == 0) {
+		id_size = sizeof(id);
+		ret = gnutls_x509_privkey_get_key_id(key, 0, id, &id_size);
+		if (ret < 0) {
+			p11_kit_uri_free(info);
+			gnutls_assert();
+			return ret;
+		}
+
+		a[a_val].value = id;
+		a[a_val].value_len = id_size;
+	} else {
+		a[a_val].value = cid->data;
+		a[a_val].value_len = cid->size;
+	}
 	a_val++;
 
 	a[a_val].type = CKA_SIGN;
