@@ -287,6 +287,7 @@ void doit(void)
 	time_t tstart, tstop;
 
 	signal(SIGCHLD, ch_handler);
+	signal(SIGPIPE, SIG_IGN);
 
 	tstart = time(0);
 	start(2, -1);
