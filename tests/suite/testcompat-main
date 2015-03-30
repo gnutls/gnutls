@@ -33,7 +33,7 @@ fi
 
 . $srcdir/../scripts/common.sh
 
-PORT="${PORT:-5558}"
+PORT="${PORT:-5458}"
 
 SERV=openssl
 OPENSSL_CLI="openssl"
