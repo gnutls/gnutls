@@ -196,13 +196,21 @@ int gnutls_pkcs11_get_raw_issuer_by_dn (const char *url, const gnutls_datum_t *d
 int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 			     unsigned int flags);
 
-int gnutls_pkcs11_copy_x509_crt(const char *token_url,
+#define gnutls_pkcs11_copy_x509_crt(url, crt, label, flags) \
+	gnutls_pkcs11_copy_x509_crt2(url, crt, label, NULL, flags)
+
+int gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 				gnutls_x509_crt_t crt,
-				const char *label, unsigned int flags
-				/* GNUTLS_PKCS11_OBJ_FLAG_* */ );
-int gnutls_pkcs11_copy_x509_privkey(const char *token_url,
+				const char *label,
+				const gnutls_datum_t *id,
+				unsigned int flags /* GNUTLS_PKCS11_OBJ_FLAG_* */);
+
+#define gnutls_pkcs11_copy_x509_privkey(url, key, label, usage, flags) \
+	gnutls_pkcs11_copy_x509_privkey2(url, key, label, NULL, usage, flags)
+int gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 				    gnutls_x509_privkey_t key,
 				    const char *label,
+				    const gnutls_datum_t *cid,
 				    unsigned int key_usage
 				    /*GNUTLS_KEY_* */ ,
 				    unsigned int flags
