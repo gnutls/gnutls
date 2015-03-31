@@ -400,16 +400,18 @@ int gnutls_pkcs11_privkey_export_url(gnutls_pkcs11_privkey_t key,
 				     detailed, char **url);
 int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key);
 
-int gnutls_pkcs11_privkey_generate(const char *url,
-				   gnutls_pk_algorithm_t pk,
-				   unsigned int bits,
-				   const char *label, unsigned int flags);
+#define gnutls_pkcs11_privkey_generate(url, pk, bits, label, flags) \
+	gnutls_pkcs11_privkey_generate3(url, pk, bits, label, NULL, 0, NULL, flags)
+
+#define gnutls_pkcs11_privkey_generate2(url, pk, bits, label, fmt, pubkey, flags) \
+	gnutls_pkcs11_privkey_generate3(url, pk, bits, label, NULL, fmt, pubkey, flags)
 
 int
-gnutls_pkcs11_privkey_generate2(const char *url,
+gnutls_pkcs11_privkey_generate3(const char *url,
 				gnutls_pk_algorithm_t pk,
 				unsigned int bits,
 				const char *label,
+				const gnutls_datum_t *cid,
 				gnutls_x509_crt_fmt_t fmt,
 				gnutls_datum_t * pubkey,
 				unsigned int flags);
