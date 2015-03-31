@@ -188,6 +188,9 @@ gnutls_supplemental_register: Added
 gnutls_openpgp_crt_check_email: Added
 gnutls_x509_crt_check_email: Added
 gnutls_handshake_set_hook_function: Modified
+gnutls_pkcs11_privkey_generate3: Added
+gnutls_pkcs11_copy_x509_crt2: Added
+gnutls_pkcs11_copy_x509_privkey2: Added
 gnutls_pkcs11_obj_list_import_url: Removed
 gnutls_pkcs11_obj_list_import_url2: Removed
 gnutls_certificate_client_set_retrieve_function: Removed
