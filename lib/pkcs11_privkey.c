@@ -560,7 +560,6 @@ gnutls_pkcs11_privkey_export_url(gnutls_pkcs11_privkey_t key,
 	return 0;
 }
 
-
 /**
  * gnutls_pkcs11_privkey_generate:
  * @url: a token URL
@@ -583,8 +582,7 @@ gnutls_pkcs11_privkey_generate(const char *url, gnutls_pk_algorithm_t pk,
 			       unsigned int bits, const char *label,
 			       unsigned int flags)
 {
-	return gnutls_pkcs11_privkey_generate2(url, pk, bits, label, 0,
-					       NULL, flags);
+	return gnutls_pkcs11_privkey_generate2(url, pk, bits, label, 0, NULL, flags);
 }
 
 /**
@@ -593,7 +591,7 @@ gnutls_pkcs11_privkey_generate(const char *url, gnutls_pk_algorithm_t pk,
  * @pk: the public key algorithm
  * @bits: the security bits
  * @label: a label
- * @fmt: the format of output params. PEM or DER.
+ * @fmt: the format of output params. PEM or DER
  * @pubkey: will hold the public key (may be %NULL)
  * @flags: zero or an OR'ed sequence of %GNUTLS_PKCS11_OBJ_FLAGs
  *
@@ -615,6 +613,43 @@ gnutls_pkcs11_privkey_generate(const char *url, gnutls_pk_algorithm_t pk,
 int
 gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 				unsigned int bits, const char *label,
+				gnutls_x509_crt_fmt_t fmt,
+				gnutls_datum_t * pubkey,
+				unsigned int flags)
+{
+	return gnutls_pkcs11_privkey_generate3(url, pk, bits, label, NULL, fmt, pubkey, flags);
+}
+
+/**
+ * gnutls_pkcs11_privkey_generate3:
+ * @url: a token URL
+ * @pk: the public key algorithm
+ * @bits: the security bits
+ * @label: a label
+ * @cid: The CKA_ID to use for the new object
+ * @fmt: the format of output params. PEM or DER
+ * @pubkey: will hold the public key (may be %NULL)
+ * @flags: zero or an OR'ed sequence of %GNUTLS_PKCS11_OBJ_FLAGs
+ *
+ * This function will generate a private key in the specified
+ * by the @url token. The private key will be generate within
+ * the token and will not be exportable. This function will
+ * store the DER-encoded public key in the SubjectPublicKeyInfo format 
+ * in @pubkey. The @pubkey should be deinitialized using gnutls_free().
+ *
+ * Note that when generating an elliptic curve key, the curve
+ * can be substituted in the place of the bits parameter using the
+ * GNUTLS_CURVE_TO_BITS() macro.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.3.26
+ **/
+int
+gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
+				unsigned int bits, const char *label,
+				const gnutls_datum_t *cid,
 				gnutls_x509_crt_fmt_t fmt,
 				gnutls_datum_t * pubkey,
 				unsigned int flags)
@@ -665,12 +700,6 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	mech.parameter_len = 0;
 	mech.mechanism = pk_to_genmech(pk, &key_type);
 
-	ret = gnutls_rnd(GNUTLS_RND_NONCE, id, sizeof(id));
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
 	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_NO_STORE_PUBKEY)) {
 		a[a_val].type = CKA_TOKEN;
 		a[a_val].value = (void *) &tval;
@@ -684,13 +713,24 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 	}
 
 	a[a_val].type = CKA_ID;
-	a[a_val].value = (void *) id;
-	a[a_val].value_len = sizeof(id);
-	a_val++;
+	if (cid == NULL || cid->size == 0) {
+		ret = gnutls_rnd(GNUTLS_RND_NONCE, id, sizeof(id));
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		a[a_val].value = (void *) id;
+		a[a_val].value_len = sizeof(id);
+	} else {
+		a[a_val].value = (void *) cid->data;
+		a[a_val].value_len = cid->size;
+	}
 
 	p[p_val].type = CKA_ID;
-	p[p_val].value = (void *) id;
-	p[p_val].value_len = sizeof(id);
+	p[p_val].value = a[a_val].value;
+	p[p_val].value_len = a[a_val].value_len;
+	a_val++;
 	p_val++;
 
 	switch (pk) {

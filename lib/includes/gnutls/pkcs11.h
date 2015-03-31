@@ -396,12 +396,21 @@ int gnutls_pkcs11_privkey_generate(const char *url,
 				   gnutls_pk_algorithm_t pk,
 				   unsigned int bits,
 				   const char *label, unsigned int flags);
-
 int
 gnutls_pkcs11_privkey_generate2(const char *url,
 				gnutls_pk_algorithm_t pk,
 				unsigned int bits,
 				const char *label,
+				gnutls_x509_crt_fmt_t fmt,
+				gnutls_datum_t * pubkey,
+				unsigned int flags);
+
+int
+gnutls_pkcs11_privkey_generate3(const char *url,
+				gnutls_pk_algorithm_t pk,
+				unsigned int bits,
+				const char *label,
+				const gnutls_datum_t *cid,
 				gnutls_x509_crt_fmt_t fmt,
 				gnutls_datum_t * pubkey,
 				unsigned int flags);
