@@ -365,7 +365,7 @@ int add_obj_attrs(struct p11_kit_uri *info, struct ck_attribute a[4], unsigned *
 	if (attr) {
 		if (attr->value
 		    && attr->value_len == sizeof(ck_object_class_t))
-			*class = *((ck_object_class_t *) attr->value);
+			memcpy(class, attr->value, sizeof(ck_object_class_t));
 		if (*class == CKO_CERTIFICATE)
 			*type = CKC_X_509;
 		memcpy(a + (*a_vals), attr, sizeof(struct ck_attribute));
@@ -881,6 +881,8 @@ int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info, unsigned flag
 {
 	int allocated = 0;
 	int ret;
+	struct ck_attribute at;
+	ck_object_class_t klass;
 
 	if (*info == NULL) {
 		*info = p11_kit_uri_new();
@@ -902,24 +904,25 @@ int pkcs11_url_to_info(const char *url, struct p11_kit_uri **info, unsigned flag
 		    GNUTLS_E_MEMORY_ERROR : GNUTLS_E_PARSING_ERROR;
 	}
 
-	/* check for incomplete URIs */
-	if (p11_kit_uri_get_attribute (*info, CKA_CLASS) == NULL) {
-		struct ck_attribute at;
-		ck_object_class_t klass;
-
-		if (flags & GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT) {
-			klass = CKO_CERTIFICATE;
-			at.type = CKA_CLASS;
-			at.value = &klass;
-			at.value_len = sizeof (klass);
-			p11_kit_uri_set_attribute (*info, &at);
-		} else if (flags & GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY) {
-			klass = CKO_PRIVATE_KEY;
-			at.type = CKA_CLASS;
-			at.value = &klass;
-			at.value_len = sizeof (klass);
-			p11_kit_uri_set_attribute (*info, &at);
-		}
+	/* check for incomplete/invalid URIs */
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT) {
+		klass = CKO_CERTIFICATE;
+		at.type = CKA_CLASS;
+		at.value = &klass;
+		at.value_len = sizeof (klass);
+		p11_kit_uri_set_attribute (*info, &at);
+	} else if (flags & GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY) {
+		klass = CKO_PRIVATE_KEY;
+		at.type = CKA_CLASS;
+		at.value = &klass;
+		at.value_len = sizeof (klass);
+		p11_kit_uri_set_attribute (*info, &at);
+	} else if (flags & GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PUBKEY) {
+		klass = CKO_PUBLIC_KEY;
+		at.type = CKA_CLASS;
+		at.value = &klass;
+		at.value_len = sizeof (klass);
+		p11_kit_uri_set_attribute (*info, &at);
 	}
 
 	return 0;
@@ -2457,6 +2460,8 @@ pkcs11_login(struct pkcs11_session_info *sinfo,
 		    (session_info.state == CKS_RO_USER_FUNCTIONS
 			|| session_info.state == CKS_RW_USER_FUNCTIONS)) {
 			ret = 0;
+			_gnutls_debug_log
+			    ("p11: Already logged in\n");
 			goto cleanup;
 		}
 

@@ -133,6 +133,7 @@ ck_object_class_t pkcs11_strtype_to_class(const char *type);
  * @GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY: Hint for private key */
 #define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_CERT (1<<29)
 #define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY (1<<30)
+#define GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PUBKEY (1<<31)
 
 int pkcs11_token_matches_info(struct p11_kit_uri *info,
 			      struct ck_token_info *tinfo,

@@ -1249,13 +1249,13 @@ _gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key, const char *url,
 		gnutls_pkcs11_obj_set_pin_function(pcrt, key->pin.cb,
 						   key->pin.data);
 
-	ret = gnutls_pkcs11_obj_import_url(pcrt, url, flags);
+	ret = gnutls_pkcs11_obj_import_url(pcrt, url, flags|GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PUBKEY);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
-	ret = gnutls_pubkey_import_pkcs11(key, pcrt, 0);
+	ret = gnutls_pubkey_import_pkcs11(key, pcrt, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
