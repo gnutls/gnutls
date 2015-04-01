@@ -288,7 +288,7 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 
 	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
 
-	fprintf(stderr, "Verifying against private key... ");
+	fprintf(stderr, "Verifying against private key parameters... ");
 	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1),
 		0, &data, &sig);
 	if (ret < 0) {
