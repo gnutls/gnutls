@@ -99,7 +99,10 @@ _gnutls_ext_etm_send_params(gnutls_session_t session,
 
 	/* this function sends the client extension data */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		return GNUTLS_E_INT_RET_0;
+		if (session->internals.priorities.have_cbc != 0)
+			return GNUTLS_E_INT_RET_0;
+		else
+			return 0;
 	} else { /* server side */
 		const cipher_entry_st *c;
 		int ret;

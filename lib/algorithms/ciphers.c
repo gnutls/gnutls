@@ -211,6 +211,19 @@ const cipher_entry_st *cipher_to_entry(gnutls_cipher_algorithm_t c)
 	return NULL;
 }
 
+const cipher_entry_st * cipher_name_to_entry(const char *name)
+{
+	GNUTLS_CIPHER_LOOP(
+		if (strcasecmp(p->name, name) == 0) {
+			if (p->id == GNUTLS_CIPHER_NULL || _gnutls_cipher_exists(p->id))
+				return p;
+			break;
+		}
+	);
+
+	return NULL;
+}
+
 /**
  * gnutls_cipher_get_block_size:
  * @algorithm: is an encryption algorithm

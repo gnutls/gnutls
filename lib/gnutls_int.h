@@ -666,6 +666,7 @@ struct gnutls_priority_st {
 	bool allow_wrong_pms;
 	bool no_tickets;
 	bool no_etm;
+	bool have_cbc;
 	/* Whether stateless compression will be used */
 	bool stateless_compression;
 	unsigned int additional_verify_flags;

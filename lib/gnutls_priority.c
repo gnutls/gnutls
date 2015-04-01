@@ -667,6 +667,8 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 	bulk_rmadd_func *func;
 	unsigned profile = 0;
 	unsigned i;
+	int j;
+	const cipher_entry_st *centry;
 
 	if (add)
 		func = _add_priority;
@@ -692,6 +694,15 @@ int check_level(const char *level, gnutls_priority_t priority_cache,
 			}
 			SET_LEVEL(pgroups[i].sec_param); /* set DH params level */
 			priority_cache->no_tickets = pgroups[i].no_tickets;
+			if (priority_cache->have_cbc == 0) {
+				for (j=0;(*pgroups[i].cipher_list)[j]!=0;j++) {
+					centry = cipher_to_entry((*pgroups[i].cipher_list)[j]);
+					if (centry != NULL && centry->type == CIPHER_BLOCK) {
+						priority_cache->have_cbc = 1;
+						break;
+					}
+				}
+			}
 			return 1;
 		}
 	}
@@ -1048,6 +1059,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	rmadd_func *fn;
 	bulk_rmadd_func *bulk_fn;
 	bulk_rmadd_func *bulk_given_fn;
+	const cipher_entry_st *centry;
 
 	if (err_pos)
 		*err_pos = priorities;
@@ -1120,11 +1132,11 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 				    gnutls_mac_get_id(&broken_list[i][1]))
 				   != GNUTLS_MAC_UNKNOWN)
 				fn(&(*priority_cache)->mac, algo);
-			else if ((algo =
-				  gnutls_cipher_get_id(&broken_list[i][1]))
-				 != GNUTLS_CIPHER_UNKNOWN)
-				fn(&(*priority_cache)->cipher, algo);
-			else if ((algo =
+			else if ((centry = cipher_name_to_entry(&broken_list[i][1])) != NULL) {
+				fn(&(*priority_cache)->cipher, centry->id);
+				if (centry->type == CIPHER_BLOCK)
+					(*priority_cache)->have_cbc = 1;
+			} else if ((algo =
 				  gnutls_kx_get_id(&broken_list[i][1])) !=
 				 GNUTLS_KX_UNKNOWN)
 				fn(&(*priority_cache)->kx, algo);
