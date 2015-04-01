@@ -183,10 +183,8 @@ int gnutls_pubkey_import(gnutls_pubkey_t key,
 			 gnutls_x509_crt_fmt_t format);
 
 
-int gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key,
-				    const char *url, unsigned int flags
-				    /* GNUTLS_PKCS11_OBJ_FLAG_* */
-    );
+#define gnutls_pubkey_import_pkcs11_url(key, url, flags) gnutls_pubkey_import_url(key, url, flags)
+
 int gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 				 const gnutls_datum_t * p,
 				 const gnutls_datum_t * q,
@@ -325,8 +323,7 @@ gnutls_privkey_import_tpm_url(gnutls_privkey_t pkey,
 int gnutls_privkey_import_url(gnutls_privkey_t key,
 			      const char *url, unsigned int flags);
 
-int gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key,
-				     const char *url);
+#define gnutls_privkey_import_pkcs11_url(key, url) gnutls_privkey_import_url(key, url, 0)
 
 int
 gnutls_privkey_import_ext(gnutls_privkey_t pkey,

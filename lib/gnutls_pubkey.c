@@ -1210,6 +1210,7 @@ int gnutls_pubkey_set_key_usage(gnutls_pubkey_t key, unsigned int usage)
 
 #ifdef ENABLE_PKCS11
 
+#if 0
 /**
  * gnutls_pubkey_import_pkcs11_url:
  * @key: A key of type #gnutls_pubkey_t
@@ -1226,6 +1227,13 @@ int gnutls_pubkey_set_key_usage(gnutls_pubkey_t key, unsigned int usage)
  **/
 int
 gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key, const char *url,
+				unsigned int flags)
+{
+}
+#endif
+
+static int
+_gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key, const char *url,
 				unsigned int flags)
 {
 	gnutls_pkcs11_obj_t pcrt;
@@ -1284,7 +1292,7 @@ gnutls_pubkey_import_url(gnutls_pubkey_t key, const char *url,
 
 	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0)
 #ifdef ENABLE_PKCS11
-		return gnutls_pubkey_import_pkcs11_url(key, url, flags);
+		return _gnutls_pubkey_import_pkcs11_url(key, url, flags);
 #else
 		return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif

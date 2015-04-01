@@ -374,6 +374,7 @@ gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,
 	return 0;
 }
 
+#if 0
 /**
  * gnutls_privkey_import_pkcs11_url:
  * @key: A key of type #gnutls_pubkey_t
@@ -387,7 +388,14 @@ gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,
  *
  * Since: 3.1.0
  **/
+
 int gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key, const char *url)
+{
+}
+#endif
+
+static
+int _gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key, const char *url, unsigned flags)
 {
 	gnutls_pkcs11_privkey_t pkey;
 	int ret;
@@ -402,7 +410,7 @@ int gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key, const char *url)
 		gnutls_pkcs11_privkey_set_pin_function(pkey, key->pin.cb,
 						       key->pin.data);
 
-	ret = gnutls_pkcs11_privkey_import_url(pkey, url, 0);
+	ret = gnutls_pkcs11_privkey_import_url(pkey, url, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1252,7 +1260,7 @@ gnutls_privkey_import_url(gnutls_privkey_t key, const char *url,
 
 	if (strncmp(url, PKCS11_URL, PKCS11_URL_SIZE) == 0) {
 #ifdef ENABLE_PKCS11
-		ret = gnutls_privkey_import_pkcs11_url(key, url);
+		ret = _gnutls_privkey_import_pkcs11_url(key, url, flags);
 #else
 		ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 #endif
