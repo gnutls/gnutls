@@ -434,9 +434,9 @@ to prevent its extraction. An object can be marked as private using the flag
 @code{GNUTLS_@-PKCS11_OBJ_@-FLAG_@-MARK_@-PRIVATE}, to require PIN to be
 entered before accessing the object (for operations or otherwise).
 
-@showfuncdesc{gnutls_pkcs11_copy_x509_privkey}
+@showfuncdesc{gnutls_pkcs11_copy_x509_privkey2}
 
-@showfuncdesc{gnutls_pkcs11_copy_x509_crt}
+@showfuncdesc{gnutls_pkcs11_copy_x509_crt2}
 @showfuncdesc{gnutls_pkcs11_delete_url}
 
 

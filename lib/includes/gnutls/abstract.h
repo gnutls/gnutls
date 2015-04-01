@@ -381,6 +381,9 @@ int gnutls_privkey_sign_data(gnutls_privkey_t signer,
 			     const gnutls_datum_t * data,
 			     gnutls_datum_t * signature);
 
+#define gnutls_privkey_sign_raw_data(key, flags, data, sig) \
+	gnutls_privkey_sign_hash ( key, 0, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA, data, sig)
+
 int gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 			     gnutls_digest_algorithm_t hash_algo,
 			     unsigned int flags,

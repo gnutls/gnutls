@@ -205,8 +205,6 @@ int gnutls_x509_crl_sign(gnutls_x509_crl_t crl,
     _GNUTLS_GCC_ATTR_DEPRECATED;
 
 	/* use gnutls_privkey_sign_hash() with the GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA flag */
-#define gnutls_privkey_sign_raw_data(key, flags, data, sig) \
-	gnutls_privkey_sign_hash(key, 0, GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA, data, sig)
 
 #ifdef _ISOC99_SOURCE
 /* we provide older functions for compatibility as inline functions that
