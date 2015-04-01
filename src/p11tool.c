@@ -275,6 +275,8 @@ static void cmd_parser(int argc, char **argv)
 	} else if (HAVE_OPT(WRITE)) {
 		pkcs11_write(outfile, url, label, id,
 			     flags, &cinfo);
+	} else if (HAVE_OPT(TEST_SIGN)) {
+		pkcs11_test_sign(outfile, url, flags, &cinfo);
 	} else if (HAVE_OPT(INITIALIZE))
 		pkcs11_init(outfile, url, label, &cinfo);
 	else if (HAVE_OPT(DELETE))

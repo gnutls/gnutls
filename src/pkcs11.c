@@ -232,6 +232,105 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 	return;
 }
 
+#define TEST_DATA "Test data to sign"
+
+void
+pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
+	    common_info_st * info)
+{
+	gnutls_privkey_t privkey;
+	gnutls_pubkey_t pubkey;
+	int ret;
+	gnutls_datum_t data, sig = {NULL, 0};
+	int pk;
+
+	pkcs11_common(info);
+
+	FIX(url, outfile, 0, info);
+
+	data.data = (void*)TEST_DATA;
+	data.size = sizeof(TEST_DATA)-1;
+
+	ret = gnutls_privkey_init(&privkey);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+			__LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+			__LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_privkey_import_url(privkey, url, flags);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot import private key: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_pubkey_import_privkey(pubkey, privkey, GNUTLS_KEY_DIGITAL_SIGNATURE, flags);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot import public key: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0, &data, &sig);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot sign data: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
+
+	fprintf(stderr, "Verifying against private key... ");
+	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1),
+		0, &data, &sig);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot verify signed data: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(stderr, "ok\n");
+
+	/* now try to verify against a public key within the token */
+	gnutls_pubkey_deinit(pubkey);
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+			__LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_pubkey_import_url(pubkey, url, flags);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot import public key: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(stderr, "Verifying against public key in the token... ");
+	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1),
+		0, &data, &sig);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot verify signed data: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(stderr, "ok\n");
+
+	gnutls_free(sig.data);
+	gnutls_pubkey_deinit(pubkey);
+	gnutls_privkey_deinit(privkey);
+}
+
 void
 pkcs11_export(FILE * outfile, const char *url, unsigned int flags,
 	      common_info_st * info)

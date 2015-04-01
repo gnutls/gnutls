@@ -93,6 +93,14 @@ flag = {
 };
 
 flag = {
+    name      = test-sign;
+    descrip   = "Tests the signature operation of the provided object";
+    doc = "It can be used to test the correct operation of the signature operation.
+If both a private and a public key are available this operation will sign and verify
+the signed data.";
+};
+
+flag = {
     name      = write;
     descrip   = "Writes the loaded objects to a PKCS #11 token";
     doc = "It can be used to write private keys, certificates or secret keys to a token.";

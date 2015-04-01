@@ -40,6 +40,8 @@ pkcs11_export_chain(FILE * outfile, const char *url, unsigned int flags,
 
 void pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		       common_info_st *, unsigned brief);
+void pkcs11_test_sign(FILE * outfile, const char *pkcs11_url,
+		  unsigned int flags, common_info_st *);
 void pkcs11_write(FILE * outfile, const char *pkcs11_url,
 		  const char *label, const char *id,
 		  unsigned int flags, common_info_st *);
