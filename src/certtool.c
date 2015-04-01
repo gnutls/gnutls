@@ -3463,16 +3463,8 @@ gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 					exit(1);
 				}
 
-				if (memmem(pem.data, pem.size, "BEGIN PUBLIC KEY", 16) != 0) {
-
-					ret = gnutls_pubkey_import(pubkey, &pem, GNUTLS_X509_FMT_PEM);
-					if (ret < 0) {
-						fprintf(stderr,
-							"pubkey_import: %s\n",
-							gnutls_strerror(ret));
-						exit(1);
-					}
-				} else {
+				if (memmem(pem.data, pem.size, "BEGIN CERTIFICATE", 16) != 0 ||
+				    memmem(pem.data, pem.size, "BEGIN X509", 10) != 0) {
 					ret = gnutls_x509_crt_init(&crt);
 					if (ret < 0) {
 						fprintf(stderr,
@@ -3493,6 +3485,14 @@ gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 					if (ret < 0) {
 						fprintf(stderr, "pubkey_import_x509: %s\n",
 						gnutls_strerror(ret));
+						exit(1);
+					}
+				} else {
+					ret = gnutls_pubkey_import(pubkey, &pem, incert_format);
+					if (ret < 0) {
+						fprintf(stderr,
+							"pubkey_import: %s\n",
+							gnutls_strerror(ret));
 						exit(1);
 					}
 				}
