@@ -285,6 +285,24 @@ void doit(void)
 						       &signature);
 			if (ret < 0)
 				fail("gnutls_pubkey_verify_hash-3 (raw hashed data)\n");
+
+			gnutls_free(signature.data);
+			/* test the legacy API */
+			ret =
+			    gnutls_privkey_sign_raw_data(privkey, 0,
+						         &hash_data,
+						         &signature);
+			if (ret < 0)
+				fail("gnutls_privkey_sign_raw_data: %s\n",
+				     gnutls_strerror(ret));
+
+			ret =
+			    gnutls_pubkey_verify_hash2(pubkey, sign_algo,
+						       GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA,
+						       &hash_data,
+						       &signature);
+			if (ret < 0)
+				fail("gnutls_pubkey_verify_hash-4 (legacy raw hashed data)\n");
 		}
 		gnutls_free(signature.data);
 		gnutls_free(signature2.data);
