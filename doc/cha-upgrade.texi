@@ -178,4 +178,7 @@ however, several deprecated functions were removed, and are listed below.
 @item @funcintref{gnutls_x509_crt_verify_data}
 @tab @funcref{gnutls_pubkey_verify_data2}
 
+@item @funcintref{gnutls_privkey_sign_raw_data}
+@tab @funcref{gnutls_privkey_sign_hash} with the flag GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA
+
 @end multitable
