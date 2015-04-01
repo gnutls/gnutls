@@ -38,6 +38,12 @@
 #include "urls.h"
 #include <abstract_int.h>
 
+static int
+_gnutls_privkey_sign_raw_data(gnutls_privkey_t key,
+			     unsigned flags,
+			     const gnutls_datum_t * data,
+			     gnutls_datum_t * signature);
+
 /**
  * gnutls_privkey_get_type:
  * @key: should contain a #gnutls_privkey_t type
@@ -979,7 +985,7 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 		goto cleanup;
 	}
 
-	ret = gnutls_privkey_sign_raw_data(signer, flags, &digest, signature);
+	ret = _gnutls_privkey_sign_raw_data(signer, flags, &digest, signature);
 	_gnutls_free_datum(&digest);
 
 	if (ret < 0) {
@@ -1029,7 +1035,7 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 	gnutls_datum_t digest;
 
 	if (flags & GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA)
-		return gnutls_privkey_sign_raw_data(signer, flags,
+		return _gnutls_privkey_sign_raw_data(signer, flags,
 						    hash_data, signature);
 
 	digest.data = gnutls_malloc(hash_data->size);
@@ -1048,7 +1054,7 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 		goto cleanup;
 	}
 
-	ret = gnutls_privkey_sign_raw_data(signer, flags, &digest, signature);
+	ret = _gnutls_privkey_sign_raw_data(signer, flags, &digest, signature);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1061,7 +1067,7 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
 	return ret;
 }
 
-/**
+/*-
  * gnutls_privkey_sign_raw_data:
  * @key: Holds the key
  * @flags: should be zero
@@ -1081,9 +1087,9 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
  * negative error value.
  *
  * Since: 3.1.10
- **/
-int
-gnutls_privkey_sign_raw_data(gnutls_privkey_t key,
+ -*/
+static int
+_gnutls_privkey_sign_raw_data(gnutls_privkey_t key,
 			     unsigned flags,
 			     const gnutls_datum_t * data,
 			     gnutls_datum_t * signature)

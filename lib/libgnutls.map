@@ -828,7 +828,6 @@ GNUTLS_3_4
 	gnutls_x509_trust_list_remove_trust_file;
 	gnutls_x509_trust_list_remove_cas;
 	gnutls_session_get_desc;
-	gnutls_privkey_sign_raw_data;
 	gnutls_privkey_status;
 	gnutls_cipher_get_iv_size;
 	gnutls_hmac_set_nonce;
