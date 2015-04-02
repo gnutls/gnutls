@@ -734,8 +734,6 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 
 	if (outfile == stderr || outfile == stdout) {
 		fprintf(stderr, "warning: no --outfile was specified and the generated public key will be printed on screen.\n");
-		fprintf(stderr, "note: in some tokens it is impossible to obtain the public key in any other way after generation.\n");
-		sleep(3);
 	}
 
 	if (label == NULL && info->batch == 0) {
