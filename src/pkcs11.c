@@ -310,7 +310,7 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 
 	ret = gnutls_pubkey_import_url(pubkey, url, flags);
 	if (ret < 0) {
-		fprintf(stderr, "Cannot import public key: %s\n",
+		fprintf(stderr, "Cannot find a corresponding public key object in token: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
