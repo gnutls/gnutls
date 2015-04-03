@@ -1032,18 +1032,23 @@ int generate_prime(FILE * outfile, int how, common_info_st * info)
 #endif
 	}
 
-	print_dh_info(outfile, &p, &g, q_bits, info->cprint);
+	if (info->outcert_format == GNUTLS_X509_FMT_PEM)
+		print_dh_info(outfile, &p, &g, q_bits, info->cprint);
 
 	if (!info->cprint) {	/* generate a PKCS#3 structure */
 		size_t len = lbuffer_size;
 
 		ret =
 		    gnutls_dh_params_export_pkcs3(dh_params,
-						  GNUTLS_X509_FMT_PEM,
+						  info->outcert_format,
 						  lbuffer, &len);
 
 		if (ret == 0) {
-			fprintf(outfile, "\n%s", lbuffer);
+			if (info->outcert_format == GNUTLS_X509_FMT_PEM)
+				fprintf(outfile, "\n%s", lbuffer);
+			else
+				fwrite(lbuffer, 1, len, outfile);
+
 		} else {
 			fprintf(stderr, "Error: %s\n",
 				gnutls_strerror(ret));
