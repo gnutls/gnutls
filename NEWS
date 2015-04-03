@@ -7,6 +7,25 @@ See the end for copying conditions.
 
 ** libgnutls: Depend on nettle 3.1.
 
+** libgnutls: Added support for AES-CCM (RFC6655 and RFC7251) ciphersuites.
+
+** libgnutls: Added support for Chacha20-Poly1305 ciphersuites following
+draft-mavrogiannopoulos-chacha-tls-04 and draft-irtf-cfrg-chacha20-poly1305-10.
+That is currently provided as technology preview and is not enabled by
+default, since there are no assigned ciphersuite points by IETF and there 
+is no guarrantee of compatibility between draft versions. The ciphersuite
+priority string to enable it is "+CHACHA20-POLY1305".
+
+** libgnutls: Added support for encrypt-then-authenticate in CBC
+ciphersuites (RFC7366 -taking into account its errata text). This is
+enabled by default and can be disabled using the %NO_ETM priority
+string.
+
+** libgnutls: Added support for the extended master secret
+(triple-handshake fix) following draft-ietf-tls-session-hash-02.
+
+** libgnutls: Added a new simple and hard to misuse AEAD API (crypto.h).
+
 ** libgnutls: SSL 3.0 is no longer included in the default priorities
 list. It has to be explicitly enabled, e.g., with a string like
 "NORMAL:+VERS-SSL3.0".
@@ -21,17 +40,16 @@ a string like "NORMAL:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1". The
 DSA ciphersuites were dropped because they had no deployment at all
 on the internet, to justify their inclusion.
 
+** libgnutls: The priority string EXPORT was completely removed. The string
+was already defunc as support for the EXPORT ciphersuites was removed in
+GnuTLS 3.2.0.
+
 ** libgnutls: Added API to utilize system specific private keys in
 "gnutls/system-keys.h". It is currently provided as technology preview
 and is restricted to windows CNG keys.
 
 ** libgnutls: gnutls_x509_crt_check_hostname() and friends will use
 RFC6125 comparison of hostnames. That introduces a dependency on libidn.
-
-** libgnutls: Added support for encrypt-then-authenticate in CBC
-ciphersuites (RFC7366 -taking into account its errata text). This is
-enabled by default and can be disabled using the %NO_ETM priority
-string.
 
 ** libgnutls: Depend on p11-kit 0.23.1 to comply with the final
 PKCS #11 URLs draft (draft-pechanec-pkcs11uri-21).
@@ -42,26 +60,8 @@ applications closing all open file descriptors on startup.
 
 ** libgnutls: Use pthread_atfork() to detect fork when available.
 
-** libgnutls: Added support for the extended master secret
-(triple-handshake fix) following draft-ietf-tls-session-hash-02.
-
-** libgnutls: Added support for AES-CCM (RFC6655 and RFC7251) ciphersuites.
-
-** libgnutls: Added support for Chacha20-Poly1305 ciphersuites following
-draft-mavrogiannopoulos-chacha-tls-04 and draft-irtf-cfrg-chacha20-poly1305-10.
-That is currently provided as technology preview and is not enabled by
-default, since there are no assigned ciphersuite points by IETF and there 
-is no guarrantee of compatibility between draft versions. The ciphersuite
-priority string to enable it is "+CHACHA20-POLY1305".
-
-** libgnutls: Added a new simple and hard to misuse AEAD API (crypto.h).
-
 ** libgnutls: The gnutls_handshake() process will enforce a timeout by
 default.
-
-** libgnutls: The priority string EXPORT was completely removed. The string
-was already defunc as support for the EXPORT ciphersuites was removed in
-GnuTLS 3.2.0.
 
 ** libgnutls: If a key purpose (extended key usage) is specified for verification,
 it is applied into intermediate certificates. The verification result
