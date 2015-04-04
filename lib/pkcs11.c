@@ -1122,8 +1122,8 @@ gnutls_pkcs11_obj_export3(gnutls_pkcs11_obj_t obj,
 
 		if (fmt == GNUTLS_X509_FMT_PEM) {
 			return
-			    gnutls_pem_base64_encode_alloc(PEM_X509_CERT2,
-							   &obj->raw, out);
+			    gnutls_pem_base64_encode2(PEM_X509_CERT2,
+						      &obj->raw, out);
 		} else {
 			return _gnutls_set_datum(out, obj->raw.data,
 						 obj->raw.size);
@@ -1158,9 +1158,9 @@ gnutls_pkcs11_obj_export3(gnutls_pkcs11_obj_t obj,
 			return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
 		if (fmt == GNUTLS_X509_FMT_PEM) {
-			return gnutls_pem_base64_encode_alloc("DATA",
-							      &obj->raw,
-							      out);
+			return gnutls_pem_base64_encode2("DATA",
+							 &obj->raw,
+							 out);
 		} else {
 			return _gnutls_set_datum(out, obj->raw.data,
 						 obj->raw.size);

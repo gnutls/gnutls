@@ -207,9 +207,9 @@ GNUTLS_3_4
 	gnutls_openpgp_send_cert;
 	gnutls_openpgp_set_recv_key_function;
 	gnutls_pem_base64_decode;
-	gnutls_pem_base64_decode_alloc;
+	gnutls_pem_base64_decode2;
 	gnutls_pem_base64_encode;
-	gnutls_pem_base64_encode_alloc;
+	gnutls_pem_base64_encode2;
 	gnutls_perror;
 	gnutls_pk_algorithm_get_name;
 	gnutls_pk_get_id;
@@ -308,9 +308,9 @@ GNUTLS_3_4
 	gnutls_srp_allocate_client_credentials;
 	gnutls_srp_allocate_server_credentials;
 	gnutls_srp_base64_decode;
-	gnutls_srp_base64_decode_alloc;
+	gnutls_srp_base64_decode2;
 	gnutls_srp_base64_encode;
-	gnutls_srp_base64_encode_alloc;
+	gnutls_srp_base64_encode2;
 	gnutls_srp_free_client_credentials;
 	gnutls_srp_free_server_credentials;
 	gnutls_srp_server_get_username;

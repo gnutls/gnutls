@@ -368,8 +368,8 @@ static int load_key(TSS_HCONTEXT tpm_ctx, TSS_HKEY srk,
 		gnutls_datum_t td;
 
 		ret =
-		    gnutls_pem_base64_decode_alloc("TSS KEY BLOB", fdata,
-						   &asn1);
+		    gnutls_pem_base64_decode2("TSS KEY BLOB", fdata,
+					      &asn1);
 		if (ret) {
 			gnutls_assert();
 			_gnutls_debug_log

@@ -331,7 +331,7 @@ gnutls_srp_base64_encode(const gnutls_datum_t * data, char *result,
 }
 
 /**
- * gnutls_srp_base64_encode_alloc:
+ * gnutls_srp_base64_encode2:
  * @data: contains the raw data
  * @result: will hold the newly allocated encoded data
  *
@@ -348,7 +348,7 @@ gnutls_srp_base64_encode(const gnutls_datum_t * data, char *result,
  * Returns: 0 on success, or an error code.
  **/
 int
-gnutls_srp_base64_encode_alloc(const gnutls_datum_t * data,
+gnutls_srp_base64_encode2(const gnutls_datum_t * data,
 			       gnutls_datum_t * result)
 {
 	char *res;
@@ -413,7 +413,7 @@ gnutls_srp_base64_decode(const gnutls_datum_t * b64_data, char *result,
 }
 
 /**
- * gnutls_srp_base64_decode_alloc:
+ * gnutls_srp_base64_decode2:
  * @b64_data: contains the encoded data
  * @result: the place where decoded data lie
  *
@@ -429,7 +429,7 @@ gnutls_srp_base64_decode(const gnutls_datum_t * b64_data, char *result,
  * Returns: 0 on success, or an error code.
  **/
 int
-gnutls_srp_base64_decode_alloc(const gnutls_datum_t * b64_data,
+gnutls_srp_base64_decode2(const gnutls_datum_t * b64_data,
 			       gnutls_datum_t * result)
 {
 	uint8_t *ret;

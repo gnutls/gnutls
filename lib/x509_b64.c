@@ -156,7 +156,7 @@ gnutls_pem_base64_encode(const char *msg, const gnutls_datum_t * data,
 }
 
 /**
- * gnutls_pem_base64_encode_alloc:
+ * gnutls_pem_base64_encode2:
  * @msg: is a message to be put in the encoded header
  * @data: contains the raw data
  * @result: will hold the newly allocated encoded data
@@ -172,7 +172,7 @@ gnutls_pem_base64_encode(const char *msg, const gnutls_datum_t * data,
  *   an error code is returned.
  **/
 int
-gnutls_pem_base64_encode_alloc(const char *msg,
+gnutls_pem_base64_encode2(const char *msg,
 			       const gnutls_datum_t * data,
 			       gnutls_datum_t * result)
 {
@@ -391,7 +391,7 @@ gnutls_pem_base64_decode(const char *header,
 }
 
 /**
- * gnutls_pem_base64_decode_alloc:
+ * gnutls_pem_base64_decode2:
  * @header: The PEM header (eg. CERTIFICATE)
  * @b64_data: contains the encoded data
  * @result: the place where decoded data lie
@@ -408,7 +408,7 @@ gnutls_pem_base64_decode(const char *header,
  *   an error code is returned.
  **/
 int
-gnutls_pem_base64_decode_alloc(const char *header,
+gnutls_pem_base64_decode2(const char *header,
 			       const gnutls_datum_t * b64_data,
 			       gnutls_datum_t * result)
 {

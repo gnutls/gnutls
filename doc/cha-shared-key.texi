@@ -73,7 +73,7 @@ authenticated using a certificate with RSA parameters.
 
 @showfuncdesc{gnutls_srp_verifier}
 
-@showfuncB{gnutls_srp_base64_encode_alloc,gnutls_srp_base64_decode_alloc}
+@showfuncB{gnutls_srp_base64_encode2,gnutls_srp_base64_decode2}
 
 @include invoke-srptool.texi
 
