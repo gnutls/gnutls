@@ -1015,8 +1015,8 @@ GNUTLS_3_4
 	gnutls_ext_register;
 	gnutls_buffer_append_data;
 	gnutls_supplemental_register;
-	gnutls_do_recv_supplemental;
-	gnutls_do_send_supplemental;
+	gnutls_supplemental_send;
+	gnutls_supplemental_recv;
 	gnutls_ext_get_data;
 	gnutls_ext_set_data;
 	gnutls_openpgp_crt_check_email;
