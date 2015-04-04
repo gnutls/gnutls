@@ -147,8 +147,8 @@ static void client(int sd)
 
 	gnutls_transport_set_int(session, sd);
 
-	gnutls_do_recv_supplemental(session, 1);
-	gnutls_do_send_supplemental(session, 1);
+	gnutls_supplemental_recv(session, 1);
+	gnutls_supplemental_send(session, 1);
 
 	gnutls_supplemental_register("supplemental_client", TLS_SUPPLEMENTALDATATYPE_SAMPLE, supp_client_recv_func, supp_client_send_func);
 
@@ -258,8 +258,8 @@ static void server(int sd)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE,
 			       serverx509cred);
 
-	gnutls_do_recv_supplemental(session, 1);
-	gnutls_do_send_supplemental(session, 1);
+	gnutls_supplemental_recv(session, 1);
+	gnutls_supplemental_send(session, 1);
 
 	gnutls_supplemental_register("supplemental_server", TLS_SUPPLEMENTALDATATYPE_SAMPLE, supp_server_recv_func, supp_server_send_func);
 
