@@ -538,10 +538,8 @@ wrap_nettle_cipher_setiv(void *_ctx, const void *iv, size_t iv_size)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 		break;
 	default:
-		if (iv_size > ctx->cipher->block_size)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		break;
 	}
-
 	if (ctx->cipher->set_iv) {
 		ctx->cipher->set_iv(ctx->ctx_ptr, iv_size, iv);
 	} else {
