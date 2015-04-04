@@ -248,7 +248,10 @@ _gnutls_supplemental_register(gnutls_supplemental_entry *entry)
  *
  * This function will register a new supplemental data type (rfc4680).
  * The registered data will remain until gnutls_global_deinit()
- * is called. This function is not thread safe.
+ * is called. The provided @type must be an unassigned type in
+ * %gnutls_supplemental_data_format_type_t.
+ *
+ * This function is not thread safe.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -260,7 +263,7 @@ gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_t
 {
 	gnutls_supplemental_entry tmp_entry;
 
-	tmp_entry.name = strdup(name);
+	tmp_entry.name = gnutls_strdup(name);
 	tmp_entry.type = type;
 	tmp_entry.supp_recv_func = recv_func;
 	tmp_entry.supp_send_func = send_func;
