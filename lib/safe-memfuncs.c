@@ -28,7 +28,7 @@
  * gnutls_memset:
  * @data: the memory to set
  * @c: the constant byte to fill the memory with
- * @n: the size of memory
+ * @size: the size of memory
  *
  * This function will operate similarly to memset(), but will
  * not be optimized out by the compiler.

@@ -1178,7 +1178,7 @@ gnutls_pubkey_import_tpm_url(gnutls_pubkey_t pkey,
  * Allowed flags are:
  *
  * %GNUTLS_TPM_KEY_SIGNING: Generate a signing key instead of a legacy,
-
+ *
  * %GNUTLS_TPM_REGISTER_KEY: Register the generate key in TPM. In that
  * case @privkey would contain a URL with the UUID.
  *

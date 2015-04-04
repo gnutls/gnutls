@@ -391,6 +391,7 @@ gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,
 
 int gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key, const char *url)
 {
+	int x;
 }
 #endif
 

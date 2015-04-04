@@ -226,12 +226,15 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 /**
  * gnutls_pkcs11_copy_attached_extension:
  * @token_url: A PKCS #11 URL specifying a token
- * @obj: A pkcs11 object
- * @label: A name to be used for the stored data
+ * @crt: An X.509 certificate object
+ * @data: the attached extension
+ * @label: A name to be used for the attached extension (may be %NULL)
  * @flags: One of GNUTLS_PKCS11_OBJ_FLAG_*
  *
- * This function will copy an object into a PKCS #11 token specified by
- * a URL.
+ * This function will copy an the attached extension in @data for
+ * the certificate provided in @crt in the PKCS #11 token specified
+ * by the URL (typically a trust module). The extension must be in
+ * RFC5280 Extension format.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1040,6 +1043,7 @@ gnutls_pkcs11_token_get_random(const char *token_url,
 #if 0
 /* For documentation purposes */
 
+
 /**
  * gnutls_pkcs11_copy_x509_crt:
  * @token_url: A PKCS #11 URL specifying a token
@@ -1055,10 +1059,11 @@ gnutls_pkcs11_token_get_random(const char *token_url,
  *
  * Since: 2.12.0
  **/
-gnutls_pkcs11_copy_x509_crt(const char *token_url,
+int gnutls_pkcs11_copy_x509_crt(const char *token_url,
 			    gnutls_x509_crt_t crt, const char *label,
 			    unsigned int flags)
 {
+	int x;
 }
 
 /**
@@ -1078,11 +1083,12 @@ gnutls_pkcs11_copy_x509_crt(const char *token_url,
  *
  * Since: 2.12.0
  **/
-int
-gnutls_pkcs11_copy_x509_privkey(const char *token_url,
+int gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 				gnutls_x509_privkey_t key,
 				const char *label,
 				unsigned int key_usage, unsigned int flags)
 {
+	int x;
 }
+
 #endif

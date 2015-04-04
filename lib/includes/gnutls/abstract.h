@@ -323,6 +323,11 @@ gnutls_privkey_import_tpm_url(gnutls_privkey_t pkey,
 int gnutls_privkey_import_url(gnutls_privkey_t key,
 			      const char *url, unsigned int flags);
 
+#if 0
+/* for documentation purposes */
+int gnutls_privkey_import_pkcs11_url(gnutls_privkey_t key, const char *url);
+#endif
+
 #define gnutls_privkey_import_pkcs11_url(key, url) gnutls_privkey_import_url(key, url, 0)
 
 int

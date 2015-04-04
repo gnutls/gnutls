@@ -216,7 +216,7 @@ gnutls_cipher_decrypt(gnutls_cipher_hd_t handle, void *ctext,
  * gnutls_cipher_encrypt2:
  * @handle: is a #gnutls_cipher_hd_t type
  * @ptext: the data to encrypt
- * @ptextlen: the length of data to encrypt
+ * @ptext_len: the length of data to encrypt
  * @ctext: the encrypted data
  * @ctext_len: the available length for encrypted data
  *

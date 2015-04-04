@@ -1229,6 +1229,7 @@ int
 gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key, const char *url,
 				unsigned int flags)
 {
+	int x;
 }
 #endif
 

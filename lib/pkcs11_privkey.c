@@ -614,9 +614,9 @@ gnutls_pkcs11_privkey_export_url(gnutls_pkcs11_privkey_t key,
 int
 gnutls_pkcs11_privkey_generate(const char *url, gnutls_pk_algorithm_t pk,
 			       unsigned int bits, const char *label,
-			       const gnutls_datum_t *cid,
 			       unsigned int flags)
 {
+	int x;
 }
 
 /**
@@ -651,6 +651,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 				gnutls_datum_t * pubkey,
 				unsigned int flags)
 {
+	int x;
 }
 #endif
 

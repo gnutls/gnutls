@@ -94,6 +94,7 @@ char *_gnutls_strdup(const char *str)
  **/
 void *gnutls_malloc(size_t s)
 {
+	int x;
 }
 
 /**
@@ -108,6 +109,7 @@ void *gnutls_malloc(size_t s)
  **/
 void gnutls_free(void *ptr)
 {
+	int x;
 }
 
 #endif

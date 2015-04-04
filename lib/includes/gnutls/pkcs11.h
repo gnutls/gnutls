@@ -204,6 +204,16 @@ int gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 				    const char *label,
 				    unsigned int key_usage,
 				    unsigned int flags);
+int
+gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
+				unsigned int bits, const char *label,
+				gnutls_x509_crt_fmt_t fmt,
+				gnutls_datum_t * pubkey,
+				unsigned int flags);
+int
+gnutls_pkcs11_privkey_generate(const char *url, gnutls_pk_algorithm_t pk,
+			       unsigned int bits, const char *label,
+			       unsigned int flags);
 #endif
 
 #define gnutls_pkcs11_copy_x509_crt(url, crt, label, flags) \
