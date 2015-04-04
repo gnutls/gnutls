@@ -2296,9 +2296,9 @@ int gnutls_supplemental_register(const char *name,
 				gnutls_supplemental_data_format_type_t type, 
 				supp_recv_func supp_recv_func, supp_send_func supp_send_func);
 
-void gnutls_do_recv_supplemental(gnutls_session_t session, int do_recv_supplemental);
+void gnutls_do_recv_supplemental(gnutls_session_t session, unsigned do_recv_supplemental);
 
-void gnutls_do_send_supplemental(gnutls_session_t session, int do_send_supplemental);
+void gnutls_do_send_supplemental(gnutls_session_t session, unsigned do_send_supplemental);
 
 /* FIPS140-2 related functions */
 int gnutls_fips140_mode_enabled(void);

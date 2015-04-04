@@ -271,14 +271,35 @@ gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_t
 	return _gnutls_supplemental_register(&tmp_entry);
 }
 
+/**
+ * gnutls_do_recv_supplemental:
+ * @session: is a #gnutls_session_t type.
+ * @do_recv_supplemental: non-zero in order to expect supplemental data
+ *
+ * This function is to be called by an extension handler to
+ * instruct gnutls to attempt to receive supplemental data
+ * during the handshake process.
+ *
+ * Since: 3.4.0
+ **/
 void
-gnutls_do_recv_supplemental(gnutls_session_t session, int do_recv_supplemental)
+gnutls_do_recv_supplemental(gnutls_session_t session, unsigned do_recv_supplemental)
 {
 	session->security_parameters.do_recv_supplemental = do_recv_supplemental;
 }
 
+/**
+ * gnutls_do_send_supplemental:
+ * @session: is a #gnutls_session_t type.
+ * @do_recv_supplemental: non-zero in order to expect supplemental data
+ *
+ * This function is to be called by an extension handler to
+ * instruct gnutls to send supplemental data during the handshake process.
+ *
+ * Since: 3.4.0
+ **/
 void
-gnutls_do_send_supplemental(gnutls_session_t session, int do_send_supplemental)
+gnutls_do_send_supplemental(gnutls_session_t session, unsigned do_send_supplemental)
 {
 	session->security_parameters.do_send_supplemental = do_send_supplemental;
 }
