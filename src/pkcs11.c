@@ -626,8 +626,8 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 	gnutls_x509_crt_t xcrt;
 	gnutls_x509_privkey_t xkey;
 	int ret;
-	unsigned int key_usage = 0;
 	gnutls_datum_t *secret_key;
+	unsigned key_usage = 0;
 	unsigned char raw_id[128];
 	size_t raw_id_size;
 	gnutls_datum_t cid = {NULL, 0};
@@ -656,7 +656,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 	if (secret_key != NULL) {
 		ret =
 		    gnutls_pkcs11_copy_secret_key(url, secret_key, label,
-						  key_usage,
+						  info->key_usage,
 						  flags |
 						  GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE);
 		if (ret < 0) {
@@ -685,7 +685,7 @@ pkcs11_write(FILE * outfile, const char *url, const char *label,
 	if (xkey != NULL) {
 		ret =
 		    gnutls_pkcs11_copy_x509_privkey2(url, xkey, label,
-						     &cid, key_usage,
+						     &cid, key_usage|info->key_usage,
 						     flags |
 						     GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE);
 		if (ret < 0) {
@@ -743,6 +743,7 @@ pkcs11_generate(FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
 	ret =
 	    gnutls_pkcs11_privkey_generate3(url, pk, bits, label, &cid,
 					    GNUTLS_X509_FMT_PEM, &pubkey,
+					    info->key_usage,
 					    flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__,

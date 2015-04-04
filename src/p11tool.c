@@ -68,9 +68,11 @@ int main(int argc, char **argv)
 }
 
 static
-unsigned opt_to_flags(void)
+unsigned opt_to_flags(unsigned *key_usage)
 {
 	unsigned flags = 0;
+	
+	*key_usage = 0;
 
 	if (HAVE_OPT(MARK_PRIVATE)) {
 		if (ENABLED_OPT(MARK_PRIVATE)) {
@@ -84,13 +86,11 @@ unsigned opt_to_flags(void)
 		flags |=
 		    GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
 
-	if (ENABLED_OPT(MARK_NO_SIGN))
-		flags |=
-		    GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN;
+	if (ENABLED_OPT(MARK_SIGN))
+		*key_usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
-	if (ENABLED_OPT(MARK_NO_DECRYPT))
-		flags |=
-		    GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT;
+	if (ENABLED_OPT(MARK_DECRYPT))
+		*key_usage |= GNUTLS_KEY_DECIPHER_ONLY;
 
 	if (ENABLED_OPT(MARK_CA))
 		flags |=
@@ -118,6 +118,7 @@ static void cmd_parser(int argc, char **argv)
 	unsigned int bits = 0;
 	const char *label = NULL, *sec_param = NULL, *id = NULL;
 	unsigned flags;
+	unsigned key_usage;
 
 	optct = optionProcess(&p11toolOptions, argc, argv);
 	argc += optct;
@@ -174,7 +175,8 @@ static void cmd_parser(int argc, char **argv)
 
 	memset(&cinfo, 0, sizeof(cinfo));
 
-	flags = opt_to_flags();
+	flags = opt_to_flags(&key_usage);
+	cinfo.key_usage = key_usage;
 
 	if (HAVE_OPT(SECRET_KEY))
 		cinfo.secret_key = OPT_ARG(SECRET_KEY);

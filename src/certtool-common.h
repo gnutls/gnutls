@@ -57,6 +57,7 @@ typedef struct common_info {
 	const char *so_pin;
 
 	int cprint;
+	unsigned key_usage;
 
 	unsigned int batch;
 	unsigned int verbose;
