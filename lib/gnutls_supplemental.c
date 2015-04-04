@@ -222,6 +222,12 @@ static int
 _gnutls_supplemental_register(gnutls_supplemental_entry *entry)
 {
 	gnutls_supplemental_entry *p;
+	unsigned i;
+
+	for (i = 0; i < suppfunc_size; i++) {
+		if (entry->type == suppfunc[i].type)
+			return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
+	}
 
 	p = gnutls_realloc_fast(suppfunc,
 				sizeof(*suppfunc) * (suppfunc_size + 1));
@@ -249,7 +255,9 @@ _gnutls_supplemental_register(gnutls_supplemental_entry *entry)
  * This function will register a new supplemental data type (rfc4680).
  * The registered data will remain until gnutls_global_deinit()
  * is called. The provided @type must be an unassigned type in
- * %gnutls_supplemental_data_format_type_t.
+ * %gnutls_supplemental_data_format_type_t. If the type is already
+ * registered or handled by GnuTLS internally %GNUTLS_E_ALREADY_REGISTERED
+ * will be returned.
  *
  * This function is not thread safe.
  *
@@ -262,13 +270,18 @@ gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_t
                              gnutls_supp_recv_func recv_func, gnutls_supp_send_func send_func)
 {
 	gnutls_supplemental_entry tmp_entry;
+	int ret;
 
 	tmp_entry.name = gnutls_strdup(name);
 	tmp_entry.type = type;
 	tmp_entry.supp_recv_func = recv_func;
 	tmp_entry.supp_send_func = send_func;
 	
-	return _gnutls_supplemental_register(&tmp_entry);
+	ret = _gnutls_supplemental_register(&tmp_entry);
+	if (ret < 0) {
+		gnutls_free(tmp_entry.name);
+	}
+	return ret;
 }
 
 /**
