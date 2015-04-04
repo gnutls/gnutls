@@ -2287,18 +2287,19 @@ int gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t pars
 
 /* Public supplemental data related functions */
 
-typedef int (*supp_recv_func) (gnutls_session_t session,
+typedef int (*gnutls_supp_recv_func) (gnutls_session_t session,
 			       const unsigned char * data, size_t data_size);
-typedef int (*supp_send_func) (gnutls_session_t session,
+typedef int (*gnutls_supp_send_func) (gnutls_session_t session,
 			       gnutls_buffer_t buf);
 
 int gnutls_supplemental_register(const char *name, 
 				gnutls_supplemental_data_format_type_t type, 
-				supp_recv_func supp_recv_func, supp_send_func supp_send_func);
+				gnutls_supp_recv_func supp_recv_func,
+				gnutls_supp_send_func supp_send_func);
 
-void gnutls_do_recv_supplemental(gnutls_session_t session, unsigned do_recv_supplemental);
+void gnutls_supplemental_recv(gnutls_session_t session, unsigned do_recv_supplemental);
 
-void gnutls_do_send_supplemental(gnutls_session_t session, unsigned do_send_supplemental);
+void gnutls_supplemental_send(gnutls_session_t session, unsigned do_send_supplemental);
 
 /* FIPS140-2 related functions */
 int gnutls_fips140_mode_enabled(void);

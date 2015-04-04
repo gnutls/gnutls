@@ -52,8 +52,8 @@
 typedef struct {
 	char *name;
 	gnutls_supplemental_data_format_type_t type;
-	supp_recv_func supp_recv_func;
-	supp_send_func supp_send_func;
+	gnutls_supp_recv_func supp_recv_func;
+	gnutls_supp_send_func supp_send_func;
 } gnutls_supplemental_entry;
 
 static size_t suppfunc_size = 0;
@@ -96,7 +96,7 @@ void _gnutls_supplemental_deinit(void)
 	suppfunc_size = 0;
 }
 
-static supp_recv_func
+static gnutls_supp_recv_func
 get_supp_func_recv(gnutls_supplemental_data_format_type_t type)
 {
 	size_t i;
@@ -125,7 +125,7 @@ _gnutls_gen_supplemental(gnutls_session_t session, gnutls_buffer_st * buf)
 
 	for (i = 0; i < suppfunc_size; i++) {
 		p = &suppfunc[i];
-		supp_send_func supp_send = p->supp_send_func;
+		gnutls_supp_send_func supp_send = p->supp_send_func;
 		size_t sizepos = buf->length;
 
 		/* Make room for supplement type and length byte length field. */
@@ -184,7 +184,7 @@ _gnutls_parse_supplemental(gnutls_session_t session,
 	do {
 		uint16_t supp_data_type;
 		uint16_t supp_data_length;
-		supp_recv_func recv_func;
+		gnutls_supp_recv_func recv_func;
 
 		DECR_LEN(dsize, 2);
 		supp_data_type = _gnutls_read_uint16(p);
@@ -259,7 +259,7 @@ _gnutls_supplemental_register(gnutls_supplemental_entry *entry)
  **/
 int
 gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_type_t type,
-                             supp_recv_func recv_func, supp_send_func send_func)
+                             gnutls_supp_recv_func recv_func, gnutls_supp_send_func send_func)
 {
 	gnutls_supplemental_entry tmp_entry;
 
@@ -272,7 +272,7 @@ gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_t
 }
 
 /**
- * gnutls_do_recv_supplemental:
+ * gnutls_supplemental_recv:
  * @session: is a #gnutls_session_t type.
  * @do_recv_supplemental: non-zero in order to expect supplemental data
  *
@@ -283,13 +283,13 @@ gnutls_supplemental_register(const char *name, gnutls_supplemental_data_format_t
  * Since: 3.4.0
  **/
 void
-gnutls_do_recv_supplemental(gnutls_session_t session, unsigned do_recv_supplemental)
+gnutls_supplemental_recv(gnutls_session_t session, unsigned do_recv_supplemental)
 {
 	session->security_parameters.do_recv_supplemental = do_recv_supplemental;
 }
 
 /**
- * gnutls_do_send_supplemental:
+ * gnutls_supplemental_send:
  * @session: is a #gnutls_session_t type.
  * @do_recv_supplemental: non-zero in order to expect supplemental data
  *
@@ -299,7 +299,7 @@ gnutls_do_recv_supplemental(gnutls_session_t session, unsigned do_recv_supplemen
  * Since: 3.4.0
  **/
 void
-gnutls_do_send_supplemental(gnutls_session_t session, unsigned do_send_supplemental)
+gnutls_supplemental_send(gnutls_session_t session, unsigned do_send_supplemental)
 {
 	session->security_parameters.do_send_supplemental = do_send_supplemental;
 }
