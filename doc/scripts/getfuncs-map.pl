@@ -52,6 +52,11 @@ my %known_false_positives = (
 # API functions that although documented as such, are simply
 # macros that expand to another function.
 my %known_false_negatives = (
+	'gnutls_pkcs11_copy_x509_crt' => 1,
+	'gnutls_pkcs11_copy_x509_privkey' => 1,
+	'gnutls_pkcs11_privkey_generate' => 1,
+	'gnutls_pkcs11_privkey_generate2' => 1,
+	'gnutls_privkey_import_pkcs11_url' => 1,
 	'gnutls_transport_set_int' => 1,
 );
 
