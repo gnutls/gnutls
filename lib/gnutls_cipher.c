@@ -236,12 +236,12 @@ calc_enc_length_block(gnutls_session_t session,
 inline static int
 calc_enc_length_stream(gnutls_session_t session, int data_size,
 		       int hash_size, unsigned auth_cipher,
-		       unsigned exp_iv_size, unsigned send_nonce)
+		       unsigned exp_iv_size)
 {
 	unsigned int length;
 
 	length = data_size + hash_size;
-	if (auth_cipher && send_nonce)
+	if (auth_cipher)
 		length += exp_iv_size;
 
 	return length;
@@ -340,7 +340,8 @@ compressed_to_ciphertext(gnutls_session_t session,
 		pad = 0;
 		length =
 		    calc_enc_length_stream(session, compressed->size,
-					   tag_size, auth_cipher, exp_iv_size, send_nonce);
+					   tag_size, auth_cipher,
+					   (send_nonce!=0)?exp_iv_size:0);
 	}
 
 	if (length < 0)
@@ -573,7 +574,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 			return
 			    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		if (unlikely(ciphertext->size < tag_size + (send_nonce!=0)?exp_iv_size:0))
+		if (unlikely(ciphertext->size < (tag_size + (send_nonce!=0)?exp_iv_size:0)))
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 		memcpy(nonce, params->read.IV.data,
