@@ -355,15 +355,9 @@ Another way is to run capabilities check with:
 TLS handshake extensions allow to send so called supplemental data
 handshake messages @xcite{RFC4680}. This short section explains how to 
 implement a supplemental data handshake message for a given TLS extension.
-Note that the rest of the section is about enhancing the GnuTLS library, to
-add support for supplemental data in your application check @funcref{gnutls_supplemental_register}.
 
-First of all, modify your extension @code{foobar} in the way, the that
-flags
-@code{session->security_parameters.@-do_send_supplemental}
-and
-@code{session->security_parameters.@-do_recv_supplemental}
-are set:
+First of all, modify your extension @code{foobar} in the way, to instruct
+the handshake process to send and receive supplemental data, as shown below.
 
 @example
 int
@@ -371,7 +365,7 @@ _gnutls_foobar_recv_params (gnutls_session_t session, const opaque * data,
                                  size_t _data_size)
 @{
    ...
-   session->security_parameters.do_recv_supplemental=1;
+   gnutls_supplemental_recv(session, 1);
    ...
 @}
 
@@ -379,15 +373,25 @@ int
 _gnutls_foobar_send_params (gnutls_session_t session, gnutls_buffer_st *extdata)
 @{
    ...
-   session->security_parameters.do_send_supplemental=1;
+   gnutls_supplemental_send(session, 1);
    ...
 @}
 @end example
 
-Furthermore add the functions @funcintref{_foobar_supp_recv_params}
-and @funcintref{_foobar_supp_send_params} to @code{_foobar.h} and
-@code{_foobar.c}. The following example code shows how to send a
-``Hello World'' string in the supplemental data handshake message:
+Furthermore you'll need two new functions @funcintref{_foobar_supp_recv_params}
+and @funcintref{_foobar_supp_send_params}, which must conform to the following 
+prototypes.
+
+@example
+typedef int (*gnutls_supp_recv_func)(gnutls_session_t session,
+                                     const unsigned char *data,
+                                     size_t data_size);
+typedef int (*gnutls_supp_send_func)(gnutls_session_t session,
+                                     gnutls_buffer_t buf);
+@end example
+
+The following example code shows how to send a
+``Hello World'' string in the supplemental data handshake message.
 
 @example
 int 
@@ -409,49 +413,19 @@ _foobar_supp_recv_params(gnutls_session_t session, const opaque *data, size_t _d
 @}
 
 int 
-_foobar_supp_send_params(gnutls_session_t session, gnutls_buffer_st *buf)
+_foobar_supp_send_params(gnutls_session_t session, gnutls_buffer_t buf)
 @{
    unsigned char *msg = "hello world";
    int len = strlen(msg);
 
-   _gnutls_buffer_append_data_prefix(buf, 8, msg, len);
+   gnutls_buffer_append_data(buf, msg, len);
 
    return len;
 @}
 @end example
 
-Afterwards, add the new supplemental data handshake message to
-@code{lib/gnutls_supplemental.c} by adding a new entry to the
-@code{_gnutls_supplemental[]} structure:
-
-@example
-gnutls_supplemental_entry _gnutls_supplemental[] = 
-@{
-  @{"foobar",
-   GNUTLS_SUPPLEMENTAL_FOOBAR_DATA,
-   _foobar_supp_recv_params,
-   _foobar_supp_send_params@},
-  @{0, 0, 0, 0@}
-@};
-@end example
-
-You have to include your @code{foobar.h} header file as well:
-
-@example
-#include "foobar.h"
-@end example
-
-Lastly, add the new supplemental data type to
-@code{lib/includes/gnutls/gnutls.h}:
-
-@example
-typedef enum
-@{
-    GNUTLS_SUPPLEMENTAL_USER_MAPPING_DATA = 0,
-    GNUTLS_SUPPLEMENTAL_FOOBAR_DATA = 1
-@} gnutls_supplemental_data_format_type_t;
-@end example
-
+Afterwards, register the new supplemental data using @funcref{gnutls_supplemental_register},
+at some point in your program.
 
 @node Cryptographic Backend
 @section Cryptographic Backend
