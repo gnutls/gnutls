@@ -111,8 +111,6 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
  * @GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT: When an issuer is requested, override its extensions with the ones present in the trust module (seek).
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH: Mark the key pair as requiring authentication (pin entry) before every operation (seek+store).
  * @GNUTLS_PKCS11_OBJ_FLAG_MARK_EXTRACTABLE: Mark the key pair as being extractable (store).
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN: When writing/generating a private key do not mark the key for signing
- * @GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT: When writing/generating a private key do not mark the key for decryption
  * @GNUTLS_PKCS11_OBJ_FLAG_NEVER_EXTRACTABLE: If set, the object was never marked as extractable (store).
  * @GNUTLS_PKCS11_OBJ_FLAG_CRT: When searching, restrict to certificates only (seek).
  * @GNUTLS_PKCS11_OBJ_FLAG_PUBKEY: When searching, restrict to public key objects only (seek).
@@ -146,8 +144,6 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY = (1<<19),
 	GNUTLS_PKCS11_OBJ_FLAG_PUBKEY = (1<<20),
 	GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY = (1<<21),
-	GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT = (1<<22),
-	GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN = (1<<23)
 	/* flags 1<<29 and later are reserved - see pkcs11_int.h */
 } gnutls_pkcs11_obj_flags;
 
@@ -195,6 +191,20 @@ int gnutls_pkcs11_get_raw_issuer_by_dn (const char *url, const gnutls_datum_t *d
 
 int gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 			     unsigned int flags);
+
+#if 0
+/* for documentation */
+int gnutls_pkcs11_copy_x509_crt(const char *token_url,
+				gnutls_x509_crt_t crt,
+				const char *label, unsigned int flags
+				/* GNUTLS_PKCS11_OBJ_FLAG_* */ );
+
+int gnutls_pkcs11_copy_x509_privkey(const char *token_url,
+				    gnutls_x509_privkey_t key,
+				    const char *label,
+				    unsigned int key_usage,
+				    unsigned int flags);
+#endif
 
 #define gnutls_pkcs11_copy_x509_crt(url, crt, label, flags) \
 	gnutls_pkcs11_copy_x509_crt2(url, crt, label, NULL, flags)
@@ -401,10 +411,10 @@ int gnutls_pkcs11_privkey_export_url(gnutls_pkcs11_privkey_t key,
 int gnutls_pkcs11_privkey_status(gnutls_pkcs11_privkey_t key);
 
 #define gnutls_pkcs11_privkey_generate(url, pk, bits, label, flags) \
-	gnutls_pkcs11_privkey_generate3(url, pk, bits, label, NULL, 0, NULL, flags)
+	gnutls_pkcs11_privkey_generate3(url, pk, bits, label, NULL, 0, NULL, 0, flags)
 
 #define gnutls_pkcs11_privkey_generate2(url, pk, bits, label, fmt, pubkey, flags) \
-	gnutls_pkcs11_privkey_generate3(url, pk, bits, label, NULL, fmt, pubkey, flags)
+	gnutls_pkcs11_privkey_generate3(url, pk, bits, label, NULL, fmt, pubkey, 0, flags)
 
 int
 gnutls_pkcs11_privkey_generate3(const char *url,
@@ -414,6 +424,7 @@ gnutls_pkcs11_privkey_generate3(const char *url,
 				const gnutls_datum_t *cid,
 				gnutls_x509_crt_fmt_t fmt,
 				gnutls_datum_t * pubkey,
+				unsigned int key_usage,
 				unsigned int flags);
 
 int

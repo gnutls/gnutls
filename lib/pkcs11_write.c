@@ -397,6 +397,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 	}
 
 	pk = gnutls_x509_privkey_get_pk_algorithm(key);
+	FIX_KEY_USAGE(pk, key_usage);
 
 	/* FIXME: copy key usage flags */
 	a_val = 0;
@@ -424,7 +425,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 	a_val++;
 
 	a[a_val].type = CKA_SIGN;
-	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN)) {
+	if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE) {
 		a[a_val].value = (void*)&tval;
 		a[a_val].value_len = sizeof(tval);
 	} else {
@@ -435,7 +436,7 @@ gnutls_pkcs11_copy_x509_privkey2(const char *token_url,
 
 	if (pk == GNUTLS_PK_RSA) {
 		a[a_val].type = CKA_DECRYPT;
-		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT)) {
+		if (key_usage & (GNUTLS_KEY_ENCIPHER_ONLY|GNUTLS_KEY_DECIPHER_ONLY)) {
 			a[a_val].value = (void*)&tval;
 			a[a_val].value_len = sizeof(tval);
 		} else {
@@ -1035,3 +1036,53 @@ gnutls_pkcs11_token_get_random(const char *token_url,
 	return ret;
 
 }
+
+#if 0
+/* For documentation purposes */
+
+/**
+ * gnutls_pkcs11_copy_x509_crt:
+ * @token_url: A PKCS #11 URL specifying a token
+ * @crt: A certificate
+ * @label: A name to be used for the stored data
+ * @flags: One of GNUTLS_PKCS11_OBJ_FLAG_*
+ *
+ * This function will copy a certificate into a PKCS #11 token specified by
+ * a URL. The certificate can be marked as trusted or not.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 2.12.0
+ **/
+gnutls_pkcs11_copy_x509_crt(const char *token_url,
+			    gnutls_x509_crt_t crt, const char *label,
+			    unsigned int flags)
+{
+}
+
+/**
+ * gnutls_pkcs11_copy_x509_privkey:
+ * @token_url: A PKCS #11 URL specifying a token
+ * @key: A private key
+ * @label: A name to be used for the stored data
+ * @key_usage: One of GNUTLS_KEY_*
+ * @flags: One of GNUTLS_PKCS11_OBJ_* flags
+ *
+ * This function will copy a private key into a PKCS #11 token specified by
+ * a URL. It is highly recommended flags to contain %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
+ * unless there is a strong reason not to.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 2.12.0
+ **/
+int
+gnutls_pkcs11_copy_x509_privkey(const char *token_url,
+				gnutls_x509_privkey_t key,
+				const char *label,
+				unsigned int key_usage, unsigned int flags)
+{
+}
+#endif

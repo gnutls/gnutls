@@ -663,6 +663,7 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
  * @cid: The CKA_ID to use for the new object
  * @fmt: the format of output params. PEM or DER
  * @pubkey: will hold the public key (may be %NULL)
+ * @key_usage: One of GNUTLS_KEY_*
  * @flags: zero or an OR'ed sequence of %GNUTLS_PKCS11_OBJ_FLAGs
  *
  * This function will generate a private key in the specified
@@ -686,6 +687,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 				const gnutls_datum_t *cid,
 				gnutls_x509_crt_fmt_t fmt,
 				gnutls_datum_t * pubkey,
+				unsigned int key_usage,
 				unsigned int flags)
 {
 	int ret;
@@ -707,6 +709,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 	uint8_t id[20];
 
 	PKCS11_CHECK_INIT;
+	FIX_KEY_USAGE(pk, key_usage);
 
 	memset(&sinfo, 0, sizeof(sinfo));
 
@@ -758,7 +761,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 	switch (pk) {
 	case GNUTLS_PK_RSA:
 		p[p_val].type = CKA_DECRYPT;
-		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_DECRYPT)) {
+		if (key_usage & (GNUTLS_KEY_DECIPHER_ONLY|GNUTLS_KEY_ENCIPHER_ONLY)) {
 			p[p_val].value = (void *) &tval;
 			p[p_val].value_len = sizeof(tval);
 		} else {
@@ -768,7 +771,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		p_val++;
 
 		p[p_val].type = CKA_SIGN;
-		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN)) {
+		if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE) {
 			p[p_val].value = (void *) &tval;
 			p[p_val].value_len = sizeof(tval);
 		} else {
@@ -800,7 +803,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		break;
 	case GNUTLS_PK_DSA:
 		p[p_val].type = CKA_SIGN;
-		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN)) {
+		if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE) {
 			p[p_val].value = (void *) &tval;
 			p[p_val].value_len = sizeof(tval);
 		} else {
@@ -821,7 +824,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		break;
 	case GNUTLS_PK_EC:
 		p[p_val].type = CKA_SIGN;
-		if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NO_SIGN)) {
+		if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE) {
 			p[p_val].value = (void *) &tval;
 			p[p_val].value_len = sizeof(tval);
 		} else {

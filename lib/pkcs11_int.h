@@ -63,6 +63,14 @@ struct gnutls_pkcs11_obj_st {
  * directly */
 int _gnutls_pkcs11_check_init(void);
 
+#define FIX_KEY_USAGE(pk, usage) \
+	if (usage == 0) { \
+		if (pk == GNUTLS_PK_RSA) \
+			usage = GNUTLS_KEY_DECIPHER_ONLY|GNUTLS_KEY_DIGITAL_SIGNATURE; \
+		else \
+			usage = GNUTLS_KEY_DIGITAL_SIGNATURE; \
+	}
+
 #define PKCS11_CHECK_INIT \
 	ret = _gnutls_pkcs11_check_init(); \
 	if (ret < 0) \
