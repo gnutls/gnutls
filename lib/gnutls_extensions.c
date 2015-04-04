@@ -732,12 +732,14 @@ _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
  * @unpack_func: a function which will deserialize the extension's private data
  *
  * This function will register a new extension type. The extension will remain
- * registered until gnutls_global_deinit() is called. This function is not
- * thread safe.
+ * registered until gnutls_global_deinit() is called. If the extension type
+ * is already registred then %GNUTLS_E_ALREADY_REGISTERED will be returned.
  *
  * Each registered extension can store temporary data into the gnutls_session_t
  * structure using gnutls_ext_set_data(), and they can be retrieved using
  * gnutls_ext_get_data().
+ *
+ * This function is not thread safe.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -750,6 +752,13 @@ gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_ty
 		    gnutls_ext_unpack_func unpack_func)
 {
 	extension_entry_st tmp_mod;
+	int ret;
+	unsigned i;
+
+	for (i = 0; i < extfunc_size; i++) {
+		if (extfunc[i].type == type)
+			return gnutls_assert_val(GNUTLS_E_ALREADY_REGISTERED);
+	}
 
 	memset(&tmp_mod, 0, sizeof(tmp_mod));
 
@@ -763,7 +772,11 @@ gnutls_ext_register(const char *name, int type, gnutls_ext_parse_type_t parse_ty
 	tmp_mod.pack_func = pack_func;
 	tmp_mod.unpack_func = unpack_func;
 
-	return _gnutls_ext_register(&tmp_mod);
+	ret = _gnutls_ext_register(&tmp_mod);
+	if (ret < 0) {
+		gnutls_free((void*)tmp_mod.name);
+	}
+	return ret;
 }
 
 /**
