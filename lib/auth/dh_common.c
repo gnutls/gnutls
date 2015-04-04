@@ -307,7 +307,7 @@ _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 	int ret;
 	unsigned q_bits = session->key.dh_params.flags;
 
-	if (q_bits < 192) {
+	if (q_bits < 192 && q_bits != 0) {
 		gnutls_assert();
 		_gnutls_debug_log("too small q_bits value for DH: %u\n", q_bits);
 		q_bits = 0; /* auto-detect */
