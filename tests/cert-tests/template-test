@@ -48,6 +48,7 @@ datefudge "2007-04-22" \
 
 diff $srcdir/template-test.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
+test $rc != 0 && sleep 3
 counter=`expr $counter + 1` 
 done
 
@@ -72,6 +73,7 @@ datefudge "2007-04-22" \
 
 diff $srcdir/template-utf8.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
+test $rc != 0 && sleep 3
 counter=`expr $counter + 1` 
 done
 
@@ -96,6 +98,7 @@ datefudge "2007-04-22" \
 
 diff $srcdir/template-dn.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
+test $rc != 0 && sleep 3
 counter=`expr $counter + 1` 
 done
 
@@ -134,6 +137,7 @@ datefudge "2007-04-22" \
 
 diff $srcdir/template-overflow.pem tmp-tt.pem >/dev/null 2>&1 
 rc=$?
+test $rc != 0 && sleep 3
 counter=`expr $counter + 1` 
 done
 
@@ -161,6 +165,7 @@ datefudge "2007-04-22" \
 
 diff $srcdir/template-overflow2.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
+test $rc != 0 && sleep 3
 counter=`expr $counter + 1` 
 done
 
@@ -186,6 +191,7 @@ datefudge "2007-04-22" \
 
 diff $srcdir/template-date.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
+test $rc != 0 && sleep 3
 counter=`expr $counter + 1` 
 done
 
@@ -212,6 +218,7 @@ datefudge "2007-04-22" \
 
 diff $srcdir/template-nc.pem tmp-tt.pem >/dev/null 2>&1
 rc=$?
+test $rc != 0 && sleep 3
 counter=`expr $counter + 1` 
 done
 
