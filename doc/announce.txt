@@ -1,13 +1,13 @@
-To: help-gnutls@gnu.org, gnutls-devel@gnu.org, info-gnu@gnu.org
+To: gnutls-help@lists.gnutls.org, gnutls-dev@lists.gnutls.org
 Bcc: coordinator@translationproject.org
-Subject: GnuTLS 3.0.0 released
+Subject: GnuTLS 3.4.0 released
 <#part sign=pgpmime>
-We are proud to announce a new stable GnuTLS release: Version 3.0.0.
+We are proud to announce a new GnuTLS release: Version 3.4.0.
 
 GnuTLS is a modern C library that implements the standard network
 security protocol Transport Layer Security (TLS), for use by network
 applications.  GnuTLS is developed for GNU/Linux, but works on many
-Unix-like systems and comes with a binary installer for Windows.
+Unix-like systems and as well as Windows.
 
 The GnuTLS library is distributed under the terms of the GNU Lesser
 General Public License version 2 (or later).  The "extra" GnuTLS
@@ -17,212 +17,255 @@ Public License version 3.0 (or later).  The manual is distributed
 under the GNU Free Documentation License version 1.3 (or later).
 
 The project page of the library is available at:
-  http://www.gnu.org/software/gnutls/
+  http://www.gnutls.org/
 
 What's New
 ==========
 
-Version 3.0.0 is the first stable release on the 3.0.x branch and is
-the result of 11 months of work on the experimental 2.99.x branch.  The
-GnuTLS 3.0.x branch replaces the GnuTLS 2.12.x branch as the supported
-stable branch, although we will continue to support GnuTLS 2.12.x for
-some time.
+Version 3.4.0 is the first stable release on the 3.4.x branch and is
+the result of a year of planning and work [0] on the git master branch. 
+The GnuTLS 3.4.x branch is marked as stable-next, meaning it is considered
+of stable quality but will not yet replace the current stable releases
+based on 3.3.0, which will continue to be supported.
 
-** libgnutls: license upgraded to LGPLv3
+[0]. https://gitlab.com/gnutls/gnutls/wikis/Plan3_4
 
-** libgnutls: depends on nettle 2.2.
 
-** libgnutls: Added Datagram TLS 1.0 support.
+* Version 3.4.0
 
-** libgnutls: Added Elliptic curve support. Requires priority strings:
-+CURVE-ALL: to add all supported curves
-+ECDHE-RSA: to add ephemeral ECDHE with an RSA-signed certificate
-+ECDHE-ECDSA: to add ephemeral ECDHE with an ECDSA-signed certificate
-+ANON-ECDHE: to add anonymous ECDH
+** libgnutls: Depend on nettle 3.1.
 
-** libgnutls: Added ECDHE-PSK ciphersuites for TLS (RFC 5489).
+** libgnutls: Added support for AES-CCM (RFC6655 and RFC7251) ciphersuites.
 
-** libgnutls: Added AES in GCM mode
+** libgnutls: Added support for Chacha20-Poly1305 ciphersuites following
+draft-mavrogiannopoulos-chacha-tls-05 and draft-irtf-cfrg-chacha20-poly1305-10.
+That is currently provided as technology preview and is not enabled by
+default, since there are no assigned ciphersuite points by IETF and there 
+is no guarrantee of compatibility between draft versions. The ciphersuite
+priority string to enable it is "+CHACHA20-POLY1305".
 
-** libgnutls: Added SUITEB128 and SUITEB192 priority
-strings to enable the NSA SuiteB cryptography ciphersuites.
+** libgnutls: Added support for encrypt-then-authenticate in CBC
+ciphersuites (RFC7366 -taking into account its errata text). This is
+enabled by default and can be disabled using the %NO_ETM priority
+string.
 
-** libgnutls: Added AES-GCM optimizations using the PCLMULQDQ
-instruction. Uses Andy Polyakov's assembly code.
+** libgnutls: Added support for the extended master secret
+(triple-handshake fix) following draft-ietf-tls-session-hash-02.
 
-** libgnutls: Added gnutls_global_set_audit_log_function() that allows
-to get important auditing information including the corresponding session.
-That might be useful to block DoS or other attacker from specific IPs.
+** libgnutls: Added a new simple and hard to misuse AEAD API (crypto.h).
 
-** libgnutls: gnutls_transport_set_lowat() is no more.
+** libgnutls: SSL 3.0 is no longer included in the default priorities
+list. It has to be explicitly enabled, e.g., with a string like
+"NORMAL:+VERS-SSL3.0".
 
-** libgnutls: Added gnutls_certificate_set_retrieve_function2()
-to set a callback to retrieve a certificate. The certificate is
-received in a format that requires no processing from gnutls thus
-it is suitable when performance is required.
+** libgnutls: ARCFOUR (RC4) is no longer included in the default priorities
+list. It has to be explicitly enabled, e.g., with a string like
+"NORMAL:+ARCFOUR-128".
 
-** libgnutls: Simplified the handling of handshake messages to 
-be hashed. Instead of hashing during the handshake process we now 
-keep the data until handshake is over and hash them on request. 
-This uses more memory but eliminates issues with TLS 1.2 and 
-simplifies code.
+** libgnutls: DSA signatures and DHE-DSS are no longer included in the
+default priorities list. They have to be explicitly enabled, e.g., with
+a string like "NORMAL:+DHE-DSS:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1". The
+DSA ciphersuites were dropped because they had no deployment at all
+on the internet, to justify their inclusion.
 
-** libgnutls: LZO support was removed.
+** libgnutls: The priority string EXPORT was completely removed. The string
+was already defunc as support for the EXPORT ciphersuites was removed in
+GnuTLS 3.2.0.
 
-** libgnutls: gnutls_srp_verifier() returns data allocated with 
-gnutls_malloc() for consistency.
+** libgnutls: Added API to utilize system specific private keys in
+"gnutls/system-keys.h". It is currently provided as technology preview
+and is restricted to windows CNG keys.
 
-** libgnutls-openssl: modified to use modern gnutls' functions.
-This introduces an ABI incompatibility with previous versions.
+** libgnutls: gnutls_x509_crt_check_hostname() and friends will use
+RFC6125 comparison of hostnames. That introduces a dependency on libidn.
 
-** libgnutls: gnutls_rsa_params_t is now identical to gnutls_x509_privkey_t
-to avoid thread-safety issues. Reported by Sam Varshavchik.
+** libgnutls: Depend on p11-kit 0.23.1 to comply with the final
+PKCS #11 URLs draft (draft-pechanec-pkcs11uri-21).
 
-** libgnutls: Added new PKCS #11 flags to force an object being private or
-not. (GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE and GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE)
+** libgnutls: Use getrandom() or getentropy() when available. That
+avoids the complexity of file descriptor handling and issues with
+applications closing all open file descriptors on startup.
 
-** libgnutls: Added gnutls_x509_crq_verify() to allow
-verification of the self signature in a certificate request.
-This allows verifying whether the owner of the private key
-is the generator of the request.
+** libgnutls: Use pthread_atfork() to detect fork when available.
 
-** libgnutls: gnutls_x509_crt_set_crq() implicitly verifies
-the self signature of the request.
+** libgnutls: The gnutls_handshake() process will enforce a timeout by
+default.
 
-** libgnutls: Added gnutls_pubkey_verify_data2() that will
-verify data provided the signature algorithm.
+** libgnutls: If a key purpose (extended key usage) is specified for verification,
+it is applied into intermediate certificates. The verification result
+GNUTLS_CERT_PURPOSE_MISMATCH is also introduced. 
 
-** libgnutls: Added gnutls_x509_trust_list_add_named_crt() and
-gnutls_x509_trust_list_verify_named_crt() that allow having a
-list of certificates in the trusted list that will be associated
-with a name (e.g. server name) and will not be used as CAs.
+** libgnutls: When gnutls_certificate_set_x509_key_file2() is used in
+combination with PKCS #11, or TPM URLs, it will utilize the provided
+password as PIN if required. That removes the requirement for the
+application to set a callback for PINs in that case.
 
-** libgnutls: PKCS #11 back-end rewritten to use p11-kit
-http://p11-glue.freedesktop.org/p11-kit.html. Rewrite by
-Stef Walter.
+** libgnutls: priority strings VERS-TLS-ALL and VERS-DTLS-ALL are 
+restricted to the corresponding protocols only, and the VERS-ALL
+string is introduced to catch all possible protocols.
 
-** libgnutls: Uses a single configure file and a single
-gnulib library to save space.
+** libgnutls: Added helper functions to obtain information on PKCS #8
+structures.
 
-** libgnutlsxx: The C++ interface returns exception on
-every error and not only on fatal ones. This allows easier
-handling of errors.
+** libgnutls: Certificate chains which are provided to gnutls_certificate_credentials_t
+will automatically be sorted instead of failing with GNUTLS_E_CERTIFICATE_LIST_UNSORTED.
 
-** libgnutls: Corrected issue in DHE-PSK ciphersuites that ignored    
-the PSK callback.
+** libgnutls: Added functions to export and set the record state. That
+allows for gnutls_record_send() and recv() to be offloaded (to kernel,
+hardware or any other subsystem).
 
-** libgnutls: SRP and PSK are no longer set on the default priorities. 
-They have to be explicitly set.
+** libgnutls: Added the ability to register application specific URL
+types, which express certificates and keys using gnutls_register_custom_url().
 
-** libgnutls: During handshake message verification using DSS
-use the hash algorithm required by it.
+** libgnutls: Added API to override existing ciphers, digests and MACs, e.g.,
+to override AES-GCM using a system-specific accelerator (crypto.h).
 
-** libgnutls: gnutls_recv() return GNUTLS_E_PREMATURE_TERMINATION
-on unexpected EOF, instead of GNUTLS_E_UNEXPECTED_PACKET_LENGTH.
+** libgnutls: Added gnutls_ext_register() to register custom extensions.
+Contributed by Thierry Quemerais.
 
-** libgnutls-extra: Inner application extension was removed.
-It was never standardized nor published as an RFC.
+** libgnutls: Added gnutls_supplemental_register() to register custom
+supplemental data handshake messages. Contributed by Thierry Quemerais.
 
-** libgnutls: Added new certificate verification functions, that
-can provide more details and are more efficient. Check 
-gnutls_x509_trust_list_*.
+** libgnutls-openssl: it is no longer built by default.
 
-** certtool: Uses the new certificate verification functions for
---verify-chain.
+** certtool: Added --p8-info option, which will print PKCS #8 information
+even if the password is not available.
 
-** certtool: Added new certificate verification functionality
-using the --verify option. Combined with --load-ca-certificate
-it can verify a certificate chain against a list of certificates.
+** certtool: --key-info option will print PKCS #8 encryption information
+when available.
 
+** certtool: Added the --key-id and --fingerprint options.
+
+** certtool: Added the --verify-hostname, --verify-email and --verify-purpose
+options to be used in certificate chain verification, to simulate verification
+for specific hostname and key purpose (extended key usage).
+
+** certtool: --p12-info option will print PKCS #12 MAC and cipher information
+when available.
+
+** certtool: it will print the A-label (ACE) names in addition to UTF-8.
+
+** p11tool: added options --set-id and --set-label.
+
+** gnutls-cli: added options --priority-list and --save-cert.
+
+** guile: Deprecated priority API has been removed. The old priority API, 
+which had been deprecated for some time, is now gone; use 'set-session-priorities!'
+instead.
+
+** guile: Remove RSA parameters and related procedures. This API had been 
+deprecated.  
+
+** guile: Fix compilation on MinGW. Previously only the static version of the 
+'guile-gnutls-v-2' library would be built, preventing dynamic loading from Guile.
 
 ** API and ABI modifications:
-gnutls_pubkey_verify_data2: ADDED
-gnutls_ecc_curve_get: ADDED
-gnutls_x509_trust_list_add_named_crt: ADDED
-gnutls_x509_trust_list_verify_named_crt: ADDED
-gnutls_x509_privkey_verify_data: REMOVED
-gnutls_crypto_bigint_register: REMOVED
-gnutls_crypto_cipher_register: REMOVED
-gnutls_crypto_digest_register: REMOVED
-gnutls_crypto_mac_register: REMOVED
-gnutls_crypto_pk_register: REMOVED
-gnutls_crypto_rnd_register: REMOVED
-gnutls_crypto_single_cipher_register: REMOVED
-gnutls_crypto_single_digest_register: REMOVED
-gnutls_crypto_single_mac_register: REMOVED
-gnutls_certificate_get_issuer: ADDED
-gnutls_x509_trust_list_get_issuer: ADDED
-gnutls_x509_crq_verify: ADDED
-gnutls_global_set_audit_log_function: ADDED
-gnutls_ecc_curve_get_name: ADDED
-gnutls_ecc_curve_get_size: ADDED
-gnutls_x509_privkey_import_ecc_raw: ADDED
-gnutls_x509_privkey_export_ecc_raw: ADDED
-gnutls_global_set_time_function: ADDED
-gnutls_dtls_set_timeouts: ADDED
-gnutls_dtls_get_mtu: ADDED
-gnutls_dtls_get_data_mtu: ADDED
-gnutls_dtls_set_mtu: ADDED
-gnutls_dtls_cookie_send: ADDED
-gnutls_dtls_cookie_verify: ADDED
-gnutls_dtls_prestate_set: ADDED
-gnutls_x509_trust_list_verify_crt: ADDED
-gnutls_x509_trust_list_add_crls: ADDED
-gnutls_x509_trust_list_add_cas: ADDED
-gnutls_x509_trust_list_init: ADDED
-gnutls_x509_trust_list_deinit: ADDED
-gnutls_cipher_add_auth: ADDED
-gnutls_cipher_tag: ADDED
-gnutls_psk_netconf_derive_key: REMOVED
-gnutls_certificate_verify_peers: REMOVED
-gnutls_session_set_finished_function: REMOVED
-gnutls_ext_register: REMOVED
-gnutls_certificate_get_x509_crls: REMOVED
-gnutls_certificate_get_x509_cas: REMOVED
-gnutls_certificate_get_openpgp_keyring: REMOVED
-gnutls_session_get_server_random: REMOVED
-gnutls_session_get_client_random: REMOVED
-gnutls_session_get_master_secret: REMOVED
-gnutls_ia_allocate_client_credentials: REMOVED
-gnutls_ia_allocate_server_credentials: REMOVED
-gnutls_ia_enable: REMOVED
-gnutls_ia_endphase_send: REMOVED
-gnutls_ia_extract_inner_secret: REMOVED
-gnutls_ia_free_client_credentials: REMOVED
-gnutls_ia_free_server_credentials: REMOVED
-gnutls_ia_generate_challenge: REMOVED
-gnutls_ia_get_client_avp_ptr: REMOVED
-gnutls_ia_get_server_avp_ptr: REMOVED
-gnutls_ia_handshake: REMOVED
-gnutls_ia_handshake_p: REMOVED
-gnutls_ia_permute_inner_secret: REMOVED
-gnutls_ia_recv: REMOVED
-gnutls_ia_send: REMOVED
-gnutls_ia_set_client_avp_function: REMOVED
-gnutls_ia_set_client_avp_ptr: REMOVED
-gnutls_ia_set_server_avp_function: REMOVED
-gnutls_ia_set_server_avp_ptr: REMOVED
-gnutls_ia_verify_endphase: REMOVED
-GNUTLS_E_ECC_NO_SUPPORTED_CURVES: New error code
-GNUTLS_E_ECC_UNSUPPORTED_CURVE: New error code
-GNUTLS_KX_ECDHE_RSA: New key exchange method
-GNUTLS_KX_ECDHE_ECDSA: New key exchange method
-GNUTLS_KX_ANON_ECDH: New key exchange method
-GNUTLS_KX_ECDHE_PSK: New key exchange method
-GNUTLS_PK_ECC: New public key algorithm
-GNUTLS_SIGN_ECDSA_SHA1: New signature algorithm
-GNUTLS_SIGN_ECDSA_SHA256: New signature algorithm
-GNUTLS_SIGN_ECDSA_SHA384: New signature algorithm
-GNUTLS_SIGN_ECDSA_SHA512: New signature algorithm 
-GNUTLS_SIGN_ECDSA_SHA224: New signature algorithm
-GNUTLS_ECC_CURVE_INVALID: New curve definition
-GNUTLS_ECC_CURVE_SECP224R1: New curve definition
-GNUTLS_ECC_CURVE_SECP256R1: New curve definition
-GNUTLS_ECC_CURVE_SECP384R1: New curve definition
-GNUTLS_ECC_CURVE_SECP521R1: New curve definition
-GNUTLS_VERIFY_DISABLE_CRL_CHECKS: New certificate verification flag.
-GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE: New PKCS#11 object flag.
-GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE: New PKCS#11 object flag.
+gnutls_record_get_state: Added
+gnutls_record_set_state: Added
+gnutls_aead_cipher_init: Added
+gnutls_aead_cipher_decrypt: Added
+gnutls_aead_cipher_encrypt: Added
+gnutls_aead_cipher_deinit: Added
+gnutls_pkcs12_generate_mac2: Added
+gnutls_pkcs12_mac_info: Added
+gnutls_pkcs12_bag_enc_info: Added
+gnutls_pkcs8_info: Added
+gnutls_pkcs_schema_get_name: Added
+gnutls_pkcs_schema_get_oid: Added
+gnutls_pcert_export_x509: Added
+gnutls_pcert_export_openpgp: Added
+gnutls_pcert_import_x509_list: Added
+gnutls_pkcs11_privkey_cpy: Added
+gnutls_x509_crq_get_signature_algorithm: Added
+gnutls_x509_trust_list_iter_get_ca: Added
+gnutls_x509_trust_list_iter_deinit: Added
+gnutls_x509_trust_list_get_issuer_by_dn: Added
+gnutls_pkcs11_get_raw_issuer_by_dn: Added
+gnutls_certificate_get_trust_list: Added
+gnutls_privkey_export_x509: Added
+gnutls_privkey_export_pkcs11: Added
+gnutls_privkey_export_openpgp: Added
+gnutls_privkey_import_ext3: Added
+gnutls_certificate_get_x509_key: Added
+gnutls_certificate_get_x509_crt: Added
+gnutls_certificate_get_openpgp_key: Added
+gnutls_certificate_get_openpgp_crt: Added
+gnutls_record_discard_queued: Added
+gnutls_session_ext_master_secret_status: Added
+gnutls_priority_string_list: Added
+gnutls_dh_params_import_raw2: Added
+gnutls_memset: Added
+gnutls_memcmp: Added
+gnutls_pkcs12_bag_set_privkey: Added
+gnutls_ocsp_resp_get_responder_raw_id: Added
+gnutls_system_key_iter_deinit: Added
+gnutls_system_key_iter_get_info: Added
+gnutls_system_key_delete: Added
+gnutls_system_key_add_x509: Added
+gnutls_system_recv_timeout: Added
+gnutls_register_custom_url: Added
+gnutls_pkcs11_obj_list_import_url3: Added
+gnutls_pkcs11_obj_list_import_url4: Added
+gnutls_pkcs11_obj_set_info: Added
+gnutls_crypto_register_cipher: Added
+gnutls_crypto_register_aead_cipher: Added
+gnutls_crypto_register_mac: Added
+gnutls_crypto_register_digest: Added
+gnutls_ext_register: Added
+gnutls_supplemental_register: Added
+gnutls_supplemental_recv: Added
+gnutls_supplemental_send: Added
+gnutls_openpgp_crt_check_email: Added
+gnutls_x509_crt_check_email: Added
+gnutls_handshake_set_hook_function: Modified
+gnutls_pkcs11_privkey_generate3: Added
+gnutls_pkcs11_copy_x509_crt2: Added
+gnutls_pkcs11_copy_x509_privkey2: Added
+gnutls_pkcs11_obj_list_import_url: Removed
+gnutls_pkcs11_obj_list_import_url2: Removed
+gnutls_certificate_client_set_retrieve_function: Removed
+gnutls_certificate_server_set_retrieve_function: Removed
+gnutls_certificate_set_rsa_export_params: Removed
+gnutls_certificate_type_set_priority: Removed
+gnutls_cipher_set_priority: Removed
+gnutls_compression_set_priority: Removed
+gnutls_kx_set_priority: Removed
+gnutls_mac_set_priority: Removed
+gnutls_protocol_set_priority: Removed
+gnutls_rsa_export_get_modulus_bits: Removed
+gnutls_rsa_export_get_pubkey: Removed
+gnutls_rsa_params_cpy: Removed
+gnutls_rsa_params_deinit: Removed
+gnutls_rsa_params_export_pkcs1: Removed
+gnutls_rsa_params_export_raw: Removed
+gnutls_rsa_params_generate2: Removed
+gnutls_rsa_params_import_pkcs1: Removed
+gnutls_rsa_params_import_raw: Removed
+gnutls_rsa_params_init: Removed
+gnutls_sign_callback_get: Removed
+gnutls_sign_callback_set: Removed
+gnutls_x509_crt_verify_data: Removed
+gnutls_x509_crt_verify_hash: Removed
+gnutls_pubkey_get_verify_algorithm: Removed
+gnutls_x509_crt_get_verify_algorithm: Removed
+gnutls_pubkey_verify_hash: Removed
+gnutls_pubkey_verify_data: Removed
+gnutls_record_set_max_empty_records: Removed
+
+guile:
+set-session-cipher-priority!: Removed
+set-session-mac-priority!: Removed
+set-session-compression-method-priority!: Removed
+set-session-kx-priority!: Removed
+set-session-protocol-priority!: Removed
+set-session-certificate-type-priority!: Removed
+set-session-default-priority!: Removed
+set-session-default-export-priority!: Removed
+make-rsa-parameters: Removed
+rsa-parameters?: Removed
+set-certificate-credentials-rsa-export-parameters!: Removed
+pkcs1-import-rsa-parameters: Removed
+pkcs1-export-rsa-parameters: Removed
 
 
 Community
@@ -231,12 +274,12 @@ Community
 If you need help to use GnuTLS, or want to help others, you are invited
 to join our help-gnutls mailing list, see:
 
-  http://lists.gnu.org/mailman/listinfo/help-gnutls
+  http://lists.gnutls.org/mailman/listinfo/gnutls-help
 
 If you wish to participate in the development of GnuTLS, you are invited
 to join our gnutls-dev mailing list, see:
 
-  http://lists.gnu.org/mailman/listinfo/gnutls-devel
+  http://lists.gnutls.org/mailman/listinfo/gnutls-dev
 
 Internationalization
 ====================
