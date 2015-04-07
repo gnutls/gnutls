@@ -125,6 +125,16 @@ This is the AES algorithm in the authenticated encryption GCM mode.
 This mode combines message authentication and encryption and can
 be extremely fast on CPUs that support hardware acceleration.
 
+@item AES_@-CCM @tab
+This is the AES algorithm in the authenticated encryption CCM mode.
+This mode combines message authentication and encryption and is
+often used by systems without AES or GCM acceleration support.
+
+@item AES_@-CCM_@-8 @tab
+This is the AES algorithm in the authenticated encryption CCM mode
+with a truncated to 64-bit authentication tag. This mode is for
+communication with restricted systems.
+
 @item CAMELLIA_@-CBC @tab
 This is an 128-bit block cipher developed by Mitsubishi and NTT. It
 is one of the approved ciphers of the European NESSIE and Japanese
