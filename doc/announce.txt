@@ -35,7 +35,9 @@ based on 3.3.0, which will continue to be supported.
 
 ** libgnutls: Depend on nettle 3.1.
 
-** libgnutls: Added support for AES-CCM (RFC6655 and RFC7251) ciphersuites.
+** libgnutls: Added support for AES-CCM and AES-CCM-8 (RFC6655 and RFC7251)
+ciphersuites. The former are enabled by default, the latter need to be
+explicitly enabled, since they reduce the overall security level.
 
 ** libgnutls: Added support for Chacha20-Poly1305 ciphersuites following
 draft-mavrogiannopoulos-chacha-tls-05 and draft-irtf-cfrg-chacha20-poly1305-10.
