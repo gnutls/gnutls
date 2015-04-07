@@ -45,7 +45,7 @@ cipher_override_LDFLAGS = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS) $(LDADD)
 mac_override_LDFLAGS = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS) $(LDADD)
 endif
 
-check_PROGRAMS = $(ctests) cipher-test cipher-override mac-override
+check_PROGRAMS = $(ctests) cipher-test cipher-override mac-override cipher-override2
 TESTS = $(ctests) test-ciphers override-ciphers
 
 EXTRA_DIST = README

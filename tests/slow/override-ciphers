@@ -39,6 +39,12 @@ if test $? != 0;then
 	exit 1
 fi
 
+$VALGRIND ./cipher-override2
+if test $? != 0;then
+	echo "overriden cipher tests 3 failed"
+	exit 1
+fi
+
 GNUTLS_NO_EXPLICIT_INIT=1 $VALGRIND ./mac-override
 if test $? != 0;then
 	echo "overriden mac tests failed"
