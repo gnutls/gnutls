@@ -72,6 +72,7 @@ To download the version controlled sources:
 ```
 $ git clone git://gitorious.org/gnutls/gnutls.git
 $ cd gnutls
+$ git submodule update --init
 ```
 
 The next step is to run autoreconf (etc) and then ./configure:
