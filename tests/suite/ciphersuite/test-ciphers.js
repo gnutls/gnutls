@@ -54,8 +54,11 @@ include('./registry-ciphers.js');
         console.log("Unofficial cipher:", cs.name, cs.id);
       }
     } else if (registry_ciphersuites[cs.id] !== cs.name) {
-      console.log("Name doesn't match official name for id:", cs.name, registry_ciphersuites[cs.id], cs.id);
-      process.exit(1);
+      if (cs.name !== "TLS_DHE_PSK_WITH_AES_128_CCM_8" &&
+          cs.name !== "TLS_DHE_PSK_WITH_AES_256_CCM_8") {
+        console.log("Name doesn't match official name for id:", cs.name, registry_ciphersuites[cs.id], cs.id);
+        process.exit(1);
+      }
     }
   }
   
