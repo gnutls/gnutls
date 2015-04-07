@@ -31,8 +31,11 @@
 #include <algorithms.h>
 
 #define SR_FB(x, cleanup) ret=(x); if ( ret<0 ) { \
-  if (ret == GNUTLS_E_NEED_FALLBACK) \
+  if (ret == GNUTLS_E_NEED_FALLBACK) { \
+    if (handle->handle) \
+	handle->deinit(handle->handle); \
     goto fallback; \
+  } \
   gnutls_assert(); \
   ret = GNUTLS_E_INTERNAL_ERROR; \
   goto cleanup; \
@@ -61,8 +64,8 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher)
 }
 
 int
-_gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
-		    const gnutls_datum_t * key, const gnutls_datum_t * iv,
+_gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
+		    const gnutls_datum_t *key, const gnutls_datum_t *iv,
 		    int enc)
 {
 	int ret = GNUTLS_E_INTERNAL_ERROR;
@@ -74,6 +77,7 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
         FAIL_IF_LIB_ERROR;
 
 	handle->e = e;
+	handle->handle = NULL;
 
 	/* check if a cipher has been registered
 	 */
@@ -91,7 +95,7 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 		/* if cc->init() returns GNUTLS_E_NEED_FALLBACK we
 		 * use the default ciphers */
 		SR_FB(cc->init(e->id, &handle->handle, enc), cc_cleanup);
-		SR(cc->setkey(handle->handle, key->data, key->size),
+		SR_FB(cc->setkey(handle->handle, key->data, key->size),
 		   cc_cleanup);
 		if (iv) {
 			SR(cc->setiv(handle->handle, iv->data, iv->size),
