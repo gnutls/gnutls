@@ -181,7 +181,11 @@ static void client(int fd, const char *prio)
 	gnutls_dtls_set_mtu(session, 1500);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, prio, NULL);
+	ret = gnutls_priority_set_direct(session, prio, NULL);
+	if (ret < 0) {
+		fail("error in priority '%s': %s\n", prio, gnutls_strerror(ret));
+		exit(1);
+	}
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -286,7 +290,11 @@ static void server(int fd, const char *prio)
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
 	 */
-	gnutls_priority_set_direct(session, prio, NULL);
+	ret = gnutls_priority_set_direct(session, prio, NULL);
+	if (ret < 0) {
+		fail("error in priority '%s': %s\n", prio, gnutls_strerror(ret));
+		exit(1);
+	}
 
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
@@ -381,6 +389,8 @@ static void start(const char *prio)
 #define AES_CBC "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 #define AES_CBC_SHA256 "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 #define AES_GCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_CCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_CCM_8 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-CCM-8:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 #define CHACHA_POLY1305 "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+CHACHA20-POLY1305:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ECDHE-RSA:+CURVE-ALL"
 
 static void ch_handler(int sig)
@@ -406,6 +416,8 @@ void doit(void)
 	start(AES_CBC);
 	start(AES_CBC_SHA256);
 	start(AES_GCM);
+	start(AES_CCM);
+	start(AES_CCM_8);
 #ifndef ENABLE_FIPS140
 	start(CHACHA_POLY1305);
 #endif
