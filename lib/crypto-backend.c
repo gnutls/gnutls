@@ -151,8 +151,8 @@ void _gnutls_crypto_deregister(void)
  * priority of 90 and CPU-assisted of 80.  The algorithm with the lowest priority will be
  * used by gnutls.
  *
- * In the case the registered init function return %GNUTLS_E_NEED_FALLBACK
- * then GnuTLS will attempt to use the next in priority registered cipher.
+ * In the case the registered init function returns %GNUTLS_E_NEED_FALLBACK,
+ * GnuTLS will attempt to use the next in priority registered cipher.
  *
  * This function should be called before gnutls_global_init().
  *
@@ -196,8 +196,8 @@ const gnutls_crypto_cipher_st
  * priority of 90 and CPU-assisted of 80.  The algorithm with the lowest priority will be
  * used by gnutls.
  *
- * In the case the registered init function return %GNUTLS_E_NEED_FALLBACK
- * then GnuTLS will attempt to use the next in priority registered cipher.
+ * In the case the registered init function returns %GNUTLS_E_NEED_FALLBACK,
+ * GnuTLS will attempt to use the next in priority registered cipher.
  *
  * The functions which are marked as non-AEAD they are not required when
  * registering a cipher to be used with the new AEAD API introduced in
