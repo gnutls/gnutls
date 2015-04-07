@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2014-2015 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -45,32 +45,15 @@ typedef struct ccm_x86_aes_ctx {
 /* CCM mode 
  */
 static void x86_aes_encrypt(const void *_ctx,
-				size_t length, uint8_t * dst,
-				const uint8_t * src)
+			    size_t length, uint8_t * dst,
+			    const uint8_t * src)
 {
 	AES_KEY *ctx = (void*)_ctx;
-
 	aesni_ecb_encrypt(src, dst, 16, ctx, 1);
 }
 
-static void x86_aes128_set_encrypt_key(void *_ctx,
-					const uint8_t * key)
-{
-	AES_KEY *ctx = _ctx;
-
-	aesni_set_encrypt_key(key, 16*8, ctx);
-}
-
-static void x86_aes256_set_encrypt_key(void *_ctx,
-					const uint8_t * key)
-{
-	AES_KEY *ctx = _ctx;
-
-	aesni_set_encrypt_key(key, 32*8, ctx);
-}
-
 static int
-aes_ccm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
+aes_ccm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **ctx,
 		    int enc)
 {
 	/* we use key size to distinguish */
@@ -80,8 +63,8 @@ aes_ccm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
 	    algorithm != GNUTLS_CIPHER_AES_256_CCM_8)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	*_ctx = gnutls_calloc(1, sizeof(ccm_x86_aes_ctx));
-	if (*_ctx == NULL) {
+	*ctx = gnutls_calloc(1, sizeof(ccm_x86_aes_ctx));
+	if (*ctx == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -93,12 +76,7 @@ static int
 aes_ccm_cipher_setkey(void *_ctx, const void *key, size_t length)
 {
 	struct ccm_x86_aes_ctx *ctx = _ctx;
-
-	if (length == 16) {
-		x86_aes128_set_encrypt_key(&ctx->key, key);
-	} else if (length == 32) {
-		x86_aes256_set_encrypt_key(&ctx->key, key);
-	} else abort();
+	aesni_set_encrypt_key(key, length*8, &ctx->key);
 
 	return 0;
 }
@@ -113,14 +91,15 @@ aes_ccm_aead_encrypt(void *_ctx,
 {
 	struct ccm_x86_aes_ctx *ctx = _ctx;
 	/* proper AEAD cipher */
-	if (encr_size < plain_size + tag_size)
+
+	if (unlikely(encr_size < plain_size + tag_size))
 		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	ccm_encrypt_message(&ctx->key, x86_aes_encrypt,
 			    nonce_size, nonce,
 			    auth_size, auth,
 			    tag_size,
-			    tag_size+plain_size, encr,
+			    plain_size+tag_size, encr,
 			    plain);
 	return 0;
 }
@@ -136,7 +115,7 @@ aes_ccm_aead_decrypt(void *_ctx,
 	struct ccm_x86_aes_ctx *ctx = _ctx;
 	int ret;
 
-	if (encr_size < tag_size)
+	if (unlikely(encr_size < tag_size))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 	ret = ccm_decrypt_message(&ctx->key, x86_aes_encrypt,
@@ -145,7 +124,7 @@ aes_ccm_aead_decrypt(void *_ctx,
 				  tag_size,
 				  encr_size-tag_size, plain,
 				  encr);
-	if (ret == 0)
+	if (unlikely(ret == 0))
 		return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
 	return 0;
