@@ -5,8 +5,6 @@ See the end for copying conditions.
 
 * Version 3.4.0 (unreleased)
 
-** libgnutls: Depend on nettle 3.1.
-
 ** libgnutls: Added support for AES-CCM and AES-CCM-8 (RFC6655 and RFC7251)
 ciphersuites. The former are enabled by default, the latter need to be
 explicitly enabled, since they reduce the overall security level.
@@ -56,6 +54,8 @@ RFC6125 comparison of hostnames. That introduces a dependency on libidn.
 ** libgnutls: Depend on p11-kit 0.23.1 to comply with the final
 PKCS #11 URLs draft (draft-pechanec-pkcs11uri-21).
 
+** libgnutls: Depend on nettle 3.1.
+
 ** libgnutls: Use getrandom() or getentropy() when available. That
 avoids the complexity of file descriptor handling and issues with
 applications closing all open file descriptors on startup.
@@ -92,7 +92,9 @@ hardware or any other subsystem).
 types, which express certificates and keys using gnutls_register_custom_url().
 
 ** libgnutls: Added API to override existing ciphers, digests and MACs, e.g.,
-to override AES-GCM using a system-specific accelerator (crypto.h).
+to override AES-GCM using a system-specific accelerator. That is, (crypto.h)
+gnutls_crypto_register_cipher(), gnutls_crypto_register_aead_cipher(),
+gnutls_crypto_register_mac(), and gnutls_crypto_register_digest().
 
 ** libgnutls: Added gnutls_ext_register() to register custom extensions.
 Contributed by Thierry Quemerais.
@@ -101,6 +103,7 @@ Contributed by Thierry Quemerais.
 supplemental data handshake messages. Contributed by Thierry Quemerais.
 
 ** libgnutls-openssl: it is no longer built by default.
+
 
 ** certtool: Added --p8-info option, which will print PKCS #8 information
 even if the password is not available.
