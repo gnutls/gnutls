@@ -285,7 +285,7 @@ flag = {
 flag = {
     name      = benchmark-ciphers;
     descrip   = "Benchmark individual ciphers";
-    doc      = "";
+    doc      = "By default the benchmarked ciphers will utilize any capabilities of the local CPU to improve performance. To test against the raw software implementation set the environment variable GNUTLS_CPUID_OVERRIDE to 0x1.";
 };
 
 flag = {
@@ -297,7 +297,7 @@ flag = {
 flag = {
     name      = benchmark-tls-ciphers;
     descrip   = "Benchmark TLS ciphers";
-    doc      = "";
+    doc      = "By default the benchmarked ciphers will utilize any capabilities of the local CPU to improve performance. To test against the raw software implementation set the environment variable GNUTLS_CPUID_OVERRIDE to 0x1.";
 };
 
 flag = {
