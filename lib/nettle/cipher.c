@@ -235,7 +235,35 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 
 	   .fips_allowed = 1
 	},
+	{  .algo = GNUTLS_CIPHER_AES_128_CCM_8,
+	   .block_size = AES_BLOCK_SIZE,
+	   .key_size = AES128_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)aes128_encrypt,
+	   .decrypt_block = (nettle_cipher_func*)aes128_decrypt,
+
+	   .ctx_size = sizeof(struct aes128_ctx),
+	   .aead_encrypt = _ccm_encrypt,
+	   .aead_decrypt = _ccm_decrypt,
+	   .set_encrypt_key = (nettle_set_key_func*)aes128_set_encrypt_key,
+	   .set_decrypt_key = (nettle_set_key_func*)aes128_set_encrypt_key,
+
+	   .fips_allowed = 1
+	},
 	{  .algo = GNUTLS_CIPHER_AES_256_CCM,
+	   .block_size = AES_BLOCK_SIZE,
+	   .key_size = AES256_KEY_SIZE,
+	   .encrypt_block = (nettle_cipher_func*)aes256_encrypt,
+	   .decrypt_block = (nettle_cipher_func*)aes256_decrypt,
+
+	   .ctx_size = sizeof(struct aes256_ctx),
+	   .aead_encrypt = _ccm_encrypt,
+	   .aead_decrypt = _ccm_decrypt,
+	   .set_encrypt_key = (nettle_set_key_func*)aes256_set_encrypt_key,
+	   .set_decrypt_key = (nettle_set_key_func*)aes256_set_encrypt_key,
+
+	   .fips_allowed = 1
+	},
+	{  .algo = GNUTLS_CIPHER_AES_256_CCM_8,
 	   .block_size = AES_BLOCK_SIZE,
 	   .key_size = AES256_KEY_SIZE,
 	   .encrypt_block = (nettle_cipher_func*)aes256_encrypt,

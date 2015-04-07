@@ -75,7 +75,9 @@ aes_ccm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
 {
 	/* we use key size to distinguish */
 	if (algorithm != GNUTLS_CIPHER_AES_128_CCM &&
-	    algorithm != GNUTLS_CIPHER_AES_256_CCM)
+	    algorithm != GNUTLS_CIPHER_AES_256_CCM &&
+	    algorithm != GNUTLS_CIPHER_AES_128_CCM_8 &&
+	    algorithm != GNUTLS_CIPHER_AES_256_CCM_8)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	*_ctx = gnutls_calloc(1, sizeof(ccm_x86_aes_ctx));
