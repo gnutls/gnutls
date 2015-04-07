@@ -30,6 +30,14 @@
 #include <fips.h>
 #include <algorithms.h>
 
+#define SR_FB(x, cleanup) ret=(x); if ( ret<0 ) { \
+  if (ret == GNUTLS_E_NEED_FALLBACK) \
+    goto fallback; \
+  gnutls_assert(); \
+  ret = GNUTLS_E_INTERNAL_ERROR; \
+  goto cleanup; \
+  }
+
 #define SR(x, cleanup) if ( (x)<0 ) { \
   gnutls_assert(); \
   ret = GNUTLS_E_INTERNAL_ERROR; \
@@ -80,7 +88,9 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 		handle->tag = cc->tag;
 		handle->setiv = cc->setiv;
 
-		SR(cc->init(e->id, &handle->handle, enc), cc_cleanup);
+		/* if cc->init() returns GNUTLS_E_NEED_FALLBACK we
+		 * use the default ciphers */
+		SR_FB(cc->init(e->id, &handle->handle, enc), cc_cleanup);
 		SR(cc->setkey(handle->handle, key->data, key->size),
 		   cc_cleanup);
 		if (iv) {
@@ -91,6 +101,7 @@ _gnutls_cipher_init(cipher_hd_st * handle, const cipher_entry_st * e,
 		return 0;
 	}
 
+ fallback:
 	handle->encrypt = _gnutls_cipher_ops.encrypt;
 	handle->decrypt = _gnutls_cipher_ops.decrypt;
 	handle->aead_encrypt = _gnutls_cipher_ops.aead_encrypt;
