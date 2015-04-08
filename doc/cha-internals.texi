@@ -486,44 +486,27 @@ source code in @code{lib/accelerated/}.
 @subsubheading Overriding specific algorithms
 When an optimized implementation of a single algorithm is available,
 say a hardware assisted version of @acronym{AES-CBC} then the
-following (internal) functions, from @code{crypto-backend.h}, can 
+following functions, from @code{crypto.h}, can 
 be used to register those algorithms.
 
 @itemize
 
-@item @code{gnutls_crypto_single_cipher_register}:
+@item @funcref{gnutls_crypto_register_cipher}:
 To register a cipher algorithm.
 
-@item @code{gnutls_crypto_single_digest_register}:
-To register a hash (digest) or MAC algorithm.
+@item @funcref{gnutls_crypto_register_aead_cipher}:
+To register an AEAD cipher algorithm.
+
+@item @funcref{gnutls_crypto_register_mac}:
+To register a MAC algorithm.
+
+@item @funcref{gnutls_crypto_register_digest}:
+To register a hash algorithm.
 
 @end itemize
 
 Those registration functions will only replace the specified algorithm
 and leave the rest of subsystem intact.
-
-@subsubheading Overriding the cryptographic library
-In some systems, that might contain a broad acceleration engine, it 
-might be desirable to override big parts of the cryptographic back-end, 
-or even all of them. The following functions are provided for this reason.
-
-@itemize
-
-@item @code{gnutls_crypto_cipher_register}:
-To override the cryptographic algorithms back-end.
-
-@item @code{gnutls_crypto_digest_register}:
-To override the digest algorithms back-end.
-
-@item @code{gnutls_crypto_rnd_register}:
-To override the random number generator back-end.
-
-@item @code{gnutls_crypto_bigint_register}:
-To override the big number number operations back-end.
-
-@item @code{gnutls_crypto_pk_register}:
-To override the public key encryption back-end. This is tied to the
-big number operations so either none or both of them should be overridden.
 
 @end itemize
 
