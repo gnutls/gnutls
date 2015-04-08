@@ -578,7 +578,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		/* Subject Key ID.
 		 */
 		size = lbuffer_size;
-		result = gnutls_x509_crt_get_key_id(crt, 0, lbuffer, &size);
+		result = gnutls_x509_crt_get_key_id(crt, GNUTLS_KEYID_USE_SHA1, lbuffer, &size);
 		if (result >= 0) {
 			result =
 			    gnutls_x509_crt_set_subject_key_id(crt, lbuffer,
@@ -1885,7 +1885,7 @@ static void privkey_info_int(common_info_st * cinfo,
 
 	size = lbuffer_size;
 	if ((ret =
-	     gnutls_x509_privkey_get_key_id(key, 0, lbuffer, &size)) < 0) {
+	     gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA1, lbuffer, &size)) < 0) {
 		fprintf(stderr, "Error in key id calculation: %s\n",
 			gnutls_strerror(ret));
 	} else {
@@ -2667,7 +2667,7 @@ void generate_pkcs12(common_info_st * cinfo)
 	const char *name;
 	unsigned int flags = 0, i;
 	gnutls_datum_t key_id;
-	unsigned char _key_id[32];
+	unsigned char _key_id[64];
 	int indx;
 	size_t ncrts;
 	size_t nkeys;
@@ -2727,7 +2727,7 @@ void generate_pkcs12(common_info_st * cinfo)
 
 		size = sizeof(_key_id);
 		result =
-		    gnutls_x509_crt_get_key_id(crts[i], 0, _key_id, &size);
+		    gnutls_x509_crt_get_key_id(crts[i], GNUTLS_KEYID_USE_SHA1, _key_id, &size);
 		if (result < 0) {
 			fprintf(stderr, "key_id[%d]: %s\n", i,
 				gnutls_strerror(result));
@@ -2838,7 +2838,7 @@ void generate_pkcs12(common_info_st * cinfo)
 
 		size = sizeof(_key_id);
 		result =
-		    gnutls_x509_privkey_get_key_id(keys[i], 0, _key_id,
+		    gnutls_x509_privkey_get_key_id(keys[i], GNUTLS_KEYID_USE_SHA1, _key_id,
 						   &size);
 		if (result < 0) {
 			fprintf(stderr, "key_id[%d]: %s\n", i,
@@ -3544,11 +3544,12 @@ static
 void pubkey_keyid(common_info_st * cinfo)
 {
 	gnutls_pubkey_t pubkey;
-	uint8_t fpr[32];
-	char txt[128];
+	uint8_t fpr[64];
+	char txt[256];
 	int ret;
 	size_t size, fpr_size;
 	gnutls_datum_t tmp;
+	unsigned flags;
 
 	pubkey = find_pubkey(NULL, cinfo);
 	if (pubkey == 0) {
@@ -3556,8 +3557,17 @@ void pubkey_keyid(common_info_st * cinfo)
 		exit(1);
 	}
 
+	if (default_dig == GNUTLS_DIG_SHA1 || default_dig == GNUTLS_DIG_UNKNOWN)
+		flags = GNUTLS_KEYID_USE_SHA1; /* be backwards compatible */
+	else if (default_dig == GNUTLS_DIG_SHA256)
+		flags = GNUTLS_KEYID_USE_SHA256;
+	else {
+		fprintf(stderr, "Cannot calculate key ID with the provided hash\n");
+		exit(1);
+	}
+
 	fpr_size = sizeof(fpr);
-	ret = gnutls_pubkey_get_key_id(pubkey, 0, fpr, &fpr_size);
+	ret = gnutls_pubkey_get_key_id(pubkey, flags, fpr, &fpr_size);
 	if (ret < 0) {
 		fprintf(stderr,
 			"get_key_id: %s\n",
