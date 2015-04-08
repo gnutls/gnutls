@@ -3,6 +3,14 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.4.1 (unreleased)
+
+** certtool: It can generate SHA256 key IDs.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.4.0 (released 2015-04-08)
 
 ** libgnutls: Added support for AES-CCM and AES-CCM-8 (RFC6655 and RFC7251)
