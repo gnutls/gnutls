@@ -186,7 +186,7 @@ as use these keys using a URL which starts with "system:". The format of the URL
 
 @showfuncdesc{gnutls_system_key_iter_get_info}
 
-@showfuncC{gnutls_system_key_iter_deinit, gnutls_system_key_add_x509, gnutls_system_key_delete}
+@showfuncC{gnutls_system_key_iter_deinit,gnutls_system_key_add_x509,gnutls_system_key_delete}
 
 @subsection Application-specific keys
 For systems where GnuTLS doesn't provide a system specific store,
