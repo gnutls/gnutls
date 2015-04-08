@@ -1498,7 +1498,7 @@ gnutls_record_discard_queued(gnutls_session_t session)
  *
  * This is a lower-level function than gnutls_record_recv() and allows
  * to directly receive the whole decrypted packet. That avoids a
- * memory copy, and is mostly applicable to applications seeking high
+ * memory copy, and is intended to be used by applications seeking high
  * performance.
  *
  * The received packet is accessed using gnutls_packet_get() and 
