@@ -68,7 +68,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   PKG_CHECK_MODULES(NETTLE, [nettle >= 3.1], [cryptolib="nettle"], [
 AC_MSG_ERROR([[
   *** 
-  *** Libnettle 3.0 was not found. 
+  *** Libnettle 3.1 was not found. 
 ]])
   ])
   PKG_CHECK_MODULES(HOGWEED, [hogweed >= 3.1], [], [
