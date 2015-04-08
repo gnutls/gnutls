@@ -1476,7 +1476,7 @@ void gnutls_packet_deinit(gnutls_packet_t packet)
  * gnutls_record_discard_queued:
  * @session: is a #gnutls_session_t type.
  *
- * This function discards all queued to be sent packets in a DTLS session.
+ * This function discards all queued to be sent packets in a TLS or DTLS session.
  * These are the packets queued after an interrupted gnutls_record_send().
  *
  * Returns: The number of bytes discarded.
