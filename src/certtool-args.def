@@ -214,7 +214,7 @@ flag = {
 flag = {
     name      = fingerprint;
     descrip   = "Print the fingerprint of the given certificate";
-    doc       = "This is a simple hash of the DER encoding of the certificate. It is always better to use the key-id.";
+    doc       = "This is a simple hash of the DER encoding of the certificate. It can be combined with the --hash parameter. However, it is recommended for identification to use the key-id which depends only on the certificate's key.";
 };
 
 flag = {
