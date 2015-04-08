@@ -1510,7 +1510,7 @@ int gnutls_x509_privkey_verify_params(gnutls_x509_privkey_t key)
 /**
  * gnutls_x509_privkey_get_key_id:
  * @key: a key
- * @flags: should be 0 for now
+ * @flags: should be one of the flags from %gnutls_keyid_flags_t
  * @output_data: will contain the key ID
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
@@ -1542,7 +1542,7 @@ gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
 
 	ret =
 	    _gnutls_get_key_id(key->pk_algorithm, &key->params,
-			       output_data, output_data_size);
+			       output_data, output_data_size, flags);
 	if (ret < 0) {
 		gnutls_assert();
 	}

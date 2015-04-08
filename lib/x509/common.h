@@ -168,7 +168,7 @@ int _gnutls_get_asn_mpis(ASN1_TYPE asn, const char *root,
 
 int _gnutls_get_key_id(gnutls_pk_algorithm_t pk, gnutls_pk_params_st *,
 		       unsigned char *output_data,
-		       size_t * output_data_size);
+		       size_t * output_data_size, unsigned flags);
 
 void _asnstr_append_name(char *name, size_t name_size, const char *part1,
 			 const char *part2);

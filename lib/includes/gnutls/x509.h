@@ -189,6 +189,22 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert);
 int gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
 				  char *sig, size_t * sizeof_sig);
 int gnutls_x509_crt_get_version(gnutls_x509_crt_t cert);
+
+
+/**
+ * gnutls_keyid_flags_t:
+ * @GNUTLS_KEYID_USE_SHA1: Use SHA1 as the key ID algorithm (default).
+ * @GNUTLS_KEYID_USE_SHA256: Use SHA256 as the key ID algorithm.
+ * @GNUTLS_KEYID_USE_BEST_KNOWN: Use the best known algorithm to calculate key ID. Using that option will make your program behavior depend on the version of gnutls linked with. That option has a cap of 64-bytes key IDs.
+ *
+ * Enumeration of different flags for the key ID functions.
+ 
+ */
+typedef enum {
+	GNUTLS_KEYID_USE_SHA1 = 0,
+	GNUTLS_KEYID_USE_SHA256 = (1<<0),
+	GNUTLS_KEYID_USE_BEST_KNOWN = (1<<30)
+} gnutls_keyid_flags_t;
 int gnutls_x509_crt_get_key_id(gnutls_x509_crt_t crt,
 			       unsigned int flags,
 			       unsigned char *output_data,

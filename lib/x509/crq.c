@@ -2439,7 +2439,7 @@ gnutls_x509_crq_set_key_purpose_oid(gnutls_x509_crq_t crq,
 /**
  * gnutls_x509_crq_get_key_id:
  * @crq: a certificate of type #gnutls_x509_crq_t
- * @flags: should be 0 for now
+ * @flags: should be one of the flags from %gnutls_keyid_flags_t
  * @output_data: will contain the key ID
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
@@ -2484,7 +2484,7 @@ gnutls_x509_crq_get_key_id(gnutls_x509_crq_t crq, unsigned int flags,
 	}
 
 	ret =
-	    _gnutls_get_key_id(pk, &params, output_data, output_data_size);
+	    _gnutls_get_key_id(pk, &params, output_data, output_data_size, flags);
 
 	gnutls_pk_params_release(&params);
 

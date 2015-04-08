@@ -2574,12 +2574,18 @@ gnutls_x509_crt_export2(gnutls_x509_crt_t cert,
 
 int
 _gnutls_get_key_id(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params,
-		   unsigned char *output_data, size_t * output_data_size)
+		   unsigned char *output_data, size_t * output_data_size,
+		   unsigned flags)
 {
 	int ret = 0;
 	gnutls_datum_t der = { NULL, 0 };
-	const gnutls_digest_algorithm_t hash = GNUTLS_DIG_SHA1;
-	unsigned int digest_len =
+	gnutls_digest_algorithm_t hash = GNUTLS_DIG_SHA1;
+	unsigned int digest_len;
+
+	if ((flags & GNUTLS_KEYID_USE_SHA256) || (flags & GNUTLS_KEYID_USE_BEST_KNOWN))
+		hash = GNUTLS_DIG_SHA256;
+
+	digest_len =
 	    _gnutls_hash_get_algo_len(hash_to_entry(hash));
 
 	if (output_data == NULL || *output_data_size < digest_len) {
@@ -2610,7 +2616,7 @@ _gnutls_get_key_id(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params,
 /**
  * gnutls_x509_crt_get_key_id:
  * @crt: Holds the certificate
- * @flags: should be 0 for now
+ * @flags: should be one of the flags from %gnutls_keyid_flags_t
  * @output_data: will contain the key ID
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
@@ -2653,7 +2659,7 @@ gnutls_x509_crt_get_key_id(gnutls_x509_crt_t crt, unsigned int flags,
 	}
 
 	ret =
-	    _gnutls_get_key_id(pk, &params, output_data, output_data_size);
+	    _gnutls_get_key_id(pk, &params, output_data, output_data_size, flags);
 
 	gnutls_pk_params_release(&params);
 
