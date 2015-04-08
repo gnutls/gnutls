@@ -460,16 +460,17 @@ Token 0:
 $ p11tool --login --list-certs "pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test"
 
 Object 0:
-	URL: pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;object-type=cert
+	URL: pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;type=cert
 	Type: X.509 Certificate
 	Label: client
 	ID: 2a:97:0d:58:d1:51:3c:23:07:ae:4e:0d:72:26:03:7d:99:06:02:6a
 
-$ export MYCERT="pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;object-type=cert"
-$ export MYKEY="pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;object-type=private"
+$ MYCERT="pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;type=cert"
+$ MYKEY="pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;type=private"
+$ export MYCERT MYKEY
 
-$ gnutls-cli www.example.com --x509keyfile $MYKEY --x509certfile MYCERT
+$ gnutls-cli www.example.com --x509keyfile $MYKEY --x509certfile $MYCERT
 @end example
-Notice that the private key only differs from the certificate in the object-type.
+Notice that the private key only differs from the certificate in the type.
 _EOF_;
 };
