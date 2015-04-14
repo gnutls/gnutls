@@ -1353,6 +1353,7 @@ and SRP authentication.
 @menu
 * Session resumption::
 * Certificate verification::
+* Re-authentication::
 * Parameter generation::
 * Deriving keys for other applications/protocols::
 * Channel Bindings::
@@ -1483,6 +1484,46 @@ In order to generate a DANE TLSA entry to use in a DNS server
 you may use danetool (see @ref{danetool Invocation}).
 
 
+
+@node Re-authentication
+@subsection Re-authentication
+@cindex renegotiation
+@cindex reauthentication
+
+In TLS there is no distinction between rekey, re-authentication, and re-negotiation.
+All of these use cases are handled by the TLS' rehandshake process. For that reason
+in GnuTLS rehandshake is not transparent to the application, and the application
+must take control of that process. The following paragraphs explain how to safely
+use the rehandshake process.
+
+@subsubsection Client side
+
+According to the TLS specification a client may initiate a rehandshake at any
+time. That can be achieved by calling @funcref{gnutls_handshake} and rely on its
+return value for the outcome of the handshake (the server may deny a rehandshake).
+If a server requests a re-handshake, then a call to @funcref{gnutls_record_recv} will
+return GNUTLS_E_REHANDSHAKE in the client, instructing it to call @funcref{gnutls_handshake}.
+To deny a rehandshake request by the server it is recommended to send a warning alert
+of type GNUTLS_A_NO_RENEGOTIATION.
+
+Due to limitations of early protocol versions, it is required to check whether
+safe renegotiation is in place, i.e., using @funcref{gnutls_safe_renegotiation_status},
+which ensures that the server remains the same as the initial. For older servers,
+which do not support renegotiation, it is required on the second handshake
+to verify that their certificate/credentials remained the same as in the initial
+session.
+
+@showfuncdesc{gnutls_safe_renegotiation_status}
+
+@subsubsection Server side
+
+A server which wants to instruct the client to re-authenticate, should call
+@funcref{gnutls_rehandshake} and wait for the client to re-authenticate.
+It is recommended to only request re-handshake when safe renegotiation is
+enabled for that session (see @funcref{gnutls_safe_renegotiation_status} and
+the discussion in @ref{Safe renegotiation}).
+
+@showfuncdesc{gnutls_rehandshake}
 
 @node Parameter generation
 @subsection Parameter generation
