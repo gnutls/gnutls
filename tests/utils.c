@@ -188,7 +188,7 @@ static int udp_socket(void)
 	};
 	int fd;
 
-	fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
         setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on));
 #if defined(SO_REUSEPORT)
         setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, (char*)&on, sizeof(on));
