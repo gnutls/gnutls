@@ -74,6 +74,7 @@ char *_gnutls_key_fingerprint_randomart(uint8_t * dgst_raw,
 	const char augmentation_string[] = " .o+=*BOX@%&#/^SE";
 	char *retval, *p;
 	uint8_t field[FLDSIZE_X][FLDSIZE_Y];
+	char size_txt[16];
 	unsigned int i, b;
 	int x, y;
 	const size_t len = sizeof(augmentation_string) - 2;
@@ -122,13 +123,18 @@ char *_gnutls_key_fingerprint_randomart(uint8_t * dgst_raw,
 	field[FLDSIZE_X / 2][FLDSIZE_Y / 2] = len - 1;
 	field[x][y] = len;
 
+	if (key_size > 0)
+		snprintf(size_txt, " %4u", key_size);
+	else
+		size_txt[0] = 0;
+
 	/* fill in retval */
 	if (prefix_len)
-		snprintf(retval, FLDSIZE_X + prefix_len, "%s+--[%4s %4u]",
-			 prefix, key_type, key_size);
+		snprintf(retval, FLDSIZE_X + prefix_len, "%s+--[%4s%s]",
+			 prefix, key_type, size_txt);
 	else
-		snprintf(retval, FLDSIZE_X, "+--[%4s %4u]", key_type,
-			 key_size);
+		snprintf(retval, FLDSIZE_X, "+--[%4s%s]", key_type,
+			 size_txt);
 	p = strchr(retval, '\0');
 
 	/* output upper border */
