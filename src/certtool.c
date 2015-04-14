@@ -1872,6 +1872,9 @@ static void privkey_info_int(common_info_st * cinfo,
 				"Error in key ECC data export: %s\n",
 				gnutls_strerror(ret));
 		else {
+			cprint = gnutls_ecc_curve_get_name(curve);
+			bits = 0;
+
 			print_ecc_pkey(outfile, curve, &k, &x, &y,
 				       HAVE_OPT(CPRINT));
 
