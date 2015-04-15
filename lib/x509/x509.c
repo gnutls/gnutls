@@ -3073,6 +3073,8 @@ gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt_t crt,
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.4.1
  **/
 int
 gnutls_x509_crt_get_pk_ecc_raw(gnutls_x509_crt_t crt,
