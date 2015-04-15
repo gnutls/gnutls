@@ -418,7 +418,8 @@ _foobar_supp_send_params(gnutls_session_t session, gnutls_buffer_t buf)
    unsigned char *msg = "hello world";
    int len = strlen(msg);
 
-   gnutls_buffer_append_data(buf, msg, len);
+   if (gnutls_buffer_append_data(buf, msg, len) < 0)
+       abort();
 
    return len;
 @}
