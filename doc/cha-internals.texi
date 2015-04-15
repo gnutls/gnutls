@@ -433,9 +433,8 @@ Today most new processors, either for embedded or desktop systems
 include either instructions  intended to speed up cryptographic operations,
 or a co-processor with cryptographic capabilities. Taking advantage of 
 those is a challenging task for every cryptographic  application or 
-library. Unfortunately the cryptographic library that GnuTLS is based 
-on takes no advantage of these capabilities. For this reason GnuTLS handles 
-this internally by following a layered approach to accessing
+library. GnuTLS handles the cryptographic provider in a modular
+way, following a layered approach to access
 cryptographic operations as in @ref{fig-crypto-layers}.
 
 @float Figure,fig-crypto-layers
