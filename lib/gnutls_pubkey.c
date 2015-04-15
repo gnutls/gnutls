@@ -815,6 +815,8 @@ gnutls_pubkey_get_key_id(gnutls_pubkey_t key, unsigned int flags,
  * the given structure.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
+ * This function allows for %NULL parameters since 3.4.1.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 3.3.0
@@ -867,6 +869,8 @@ gnutls_pubkey_export_rsa_raw(gnutls_pubkey_t key,
  * This function will export the DSA public key's parameters found in
  * the given certificate.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * This function allows for %NULL parameters since 3.4.1.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -944,6 +948,8 @@ gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
  * This function will export the ECC public key's parameters found in
  * the given key.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * This function allows for %NULL parameters since 3.4.1.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
