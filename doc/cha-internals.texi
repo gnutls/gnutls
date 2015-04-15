@@ -508,5 +508,4 @@ To register a hash algorithm.
 Those registration functions will only replace the specified algorithm
 and leave the rest of subsystem intact.
 
-@end itemize
 
