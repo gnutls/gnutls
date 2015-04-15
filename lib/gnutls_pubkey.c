@@ -932,7 +932,7 @@ gnutls_pubkey_export_dsa_raw(gnutls_pubkey_t key,
  * @y: will hold y
  *
  * This function will export the ECC public key's parameters found in
- * the given certificate.  The new parameters will be allocated using
+ * the given key.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
