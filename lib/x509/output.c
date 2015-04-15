@@ -1458,7 +1458,18 @@ static void print_keyid(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 	if (err < 0)
 		return;
 
-	name = gnutls_pk_get_name(err);
+	if (err == GNUTLS_PK_EC) {
+		gnutls_ecc_curve_t curve;
+
+		err = gnutls_x509_crt_get_pk_ecc_raw(cert, &curve, NULL, NULL);
+		if (err < 0)
+			return;
+
+		name = gnutls_ecc_curve_get_name(curve);
+		bits = 0;
+	} else {
+		name = gnutls_pk_get_name(err);
+	}
 	if (name == NULL)
 		return;
 
