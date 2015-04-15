@@ -124,7 +124,7 @@ char *_gnutls_key_fingerprint_randomart(uint8_t * dgst_raw,
 	field[x][y] = len;
 
 	if (key_size > 0)
-		snprintf(size_txt, " %4u", key_size);
+		snprintf(size_txt, sizeof(size_txt), " %4u", key_size);
 	else
 		size_txt[0] = 0;
 
