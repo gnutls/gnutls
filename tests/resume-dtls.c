@@ -48,6 +48,7 @@ int main(int argc, char **argv)
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
+#include <signal.h>
 
 #include "utils.h"
 
@@ -388,6 +389,8 @@ static void server(int sds[], struct params_res *params)
 void doit(void)
 {
 	int i;
+
+	signal(SIGPIPE, SIG_IGN);
 
 	for (i = 0; resume_tests[i].desc; i++) {
 		int client_sds[SESSIONS], server_sds[SESSIONS];
