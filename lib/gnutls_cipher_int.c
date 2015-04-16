@@ -98,6 +98,8 @@ _gnutls_cipher_init(cipher_hd_st *handle, const cipher_entry_st *e,
 		SR_FB(cc->setkey(handle->handle, key->data, key->size),
 		   cc_cleanup);
 		if (iv) {
+			if (unlikely(cc->setiv == NULL)) /* the API doesn't accept IV */
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 			SR(cc->setiv(handle->handle, iv->data, iv->size),
 			   cc_cleanup);
 		}
