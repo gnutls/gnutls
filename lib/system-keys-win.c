@@ -38,7 +38,7 @@
 #include <urls.h>
 
 #if !defined(_WIN32)
-# error shouldn't be included
+# error should not be included
 #endif
 
 #include <wincrypt.h>
