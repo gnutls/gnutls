@@ -18,6 +18,14 @@
  *
  */
 
+// Before including any Windows header we need to set _WIN32_WINNT to Vista
+// (or higher) so that the NCRYPT stuff can be used.
+#if _WIN32_WINNT < 0x600
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x600
+#endif
+
+
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls/gnutls.h>
