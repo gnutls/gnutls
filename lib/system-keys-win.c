@@ -46,10 +46,30 @@
 
 #define DYN_NCRYPT
 
-#ifndef DYN_NCRYPT
-# include <ncrypt.h>
+#include <ncrypt.h>
+
+// MinGW headers may not have these defines
+#ifndef NCRYPT_SHA1_ALGORITHM
+#define NCRYPT_SHA1_ALGORITHM           BCRYPT_SHA1_ALGORITHM
 #endif
-/* ncrypt.h and shlwapi.h not included to allow compilation in windows XP */
+#ifndef NCRYPT_SHA256_ALGORITHM
+#define NCRYPT_SHA256_ALGORITHM         BCRYPT_SHA256_ALGORITHM
+#endif
+#ifndef NCRYPT_SHA384_ALGORITHM
+#define NCRYPT_SHA384_ALGORITHM         BCRYPT_SHA384_ALGORITHM
+#endif
+#ifndef NCRYPT_SHA512_ALGORITHM
+#define NCRYPT_SHA512_ALGORITHM         BCRYPT_SHA512_ALGORITHM
+#endif
+#ifndef NCRYPT_PAD_PKCS1_FLAG
+#define NCRYPT_PAD_PKCS1_FLAG 2
+#endif
+#ifndef NCRYPT_ALGORITHM_PROPERTY
+#define NCRYPT_ALGORITHM_PROPERTY               L"Algorithm Name"
+#endif
+#ifndef CERT_NCRYPT_KEY_HANDLE_TRANSFER_PROP_ID
+#define CERT_NCRYPT_KEY_HANDLE_TRANSFER_PROP_ID 99
+#endif
 
 #define MAX_WID_SIZE 48
 
