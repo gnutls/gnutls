@@ -43,8 +43,8 @@
  * want to send any data, it is fine to return without doing anything.
  */
 
-#include <gnutls/gnutls.h>
 #include "gnutls_int.h"
+#include <gnutls/gnutls.h>
 #include "gnutls_supplemental.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
