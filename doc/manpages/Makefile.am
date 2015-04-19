@@ -925,6 +925,7 @@ APIMANS += gnutls_x509_crt_get_key_usage.3
 APIMANS += gnutls_x509_crt_get_name_constraints.3
 APIMANS += gnutls_x509_crt_get_pk_algorithm.3
 APIMANS += gnutls_x509_crt_get_pk_dsa_raw.3
+APIMANS += gnutls_x509_crt_get_pk_ecc_raw.3
 APIMANS += gnutls_x509_crt_get_pk_rsa_raw.3
 APIMANS += gnutls_x509_crt_get_policy.3
 APIMANS += gnutls_x509_crt_get_preferred_hash_algorithm.3
