@@ -115,8 +115,9 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 	gnutls_datum_t plaintext;
 	gnutls_datum_t ciphertext;
 	int ret, dsize;
-	int randomize_key = 0;
+	int use_rnd_key = 0;
 	ssize_t data_size = _data_size;
+	gnutls_datum_t rndkey = {NULL, 0};
 
 	if (get_num_version(session) == GNUTLS_SSL3) {
 		/* SSL 3.0 
@@ -137,6 +138,22 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 		ciphertext.size = dsize;
 	}
 
+	rndkey.size = GNUTLS_MASTER_SIZE;
+	rndkey.data = gnutls_malloc(rndkey.size);
+	if (rndkey.data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	/* we do not need strong random numbers here.
+	 */
+	ret = _gnutls_rnd(GNUTLS_RND_NONCE, rndkey.data,
+			  rndkey.size);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
 	ret =
 	    gnutls_privkey_decrypt_data(session->internals.selected_key, 0,
 					&ciphertext, &plaintext);
@@ -146,10 +163,8 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 		 * the peer. Just use a random key. (in order to avoid
 		 * attack against pkcs-1 formating).
 		 */
-		gnutls_assert();
-		_gnutls_audit_log(session,
-				  "auth_rsa: Possible PKCS #1 format attack\n");
-		randomize_key = 1;
+		_gnutls_debug_log("auth_rsa: Possible PKCS #1 format attack\n");
+		use_rnd_key = 1;
 	} else {
 		/* If the secret was properly formatted, then
 		 * check the version number.
@@ -165,31 +180,14 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 			 * "Attacking RSA-based sessions in SSL/TLS" by Vlastimil Klima,
 			 * Ondej Pokorny and Tomas Rosa.
 			 */
-			gnutls_assert();
-			_gnutls_audit_log
-			    (session,
-			     "auth_rsa: Possible PKCS #1 version check format attack\n");
+			_gnutls_debug_log("auth_rsa: Possible PKCS #1 version check format attack\n");
 		}
 	}
 
-	if (randomize_key != 0) {
-		session->key.key.size = GNUTLS_MASTER_SIZE;
-		session->key.key.data =
-		    gnutls_malloc(session->key.key.size);
-		if (session->key.key.data == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-
-		/* we do not need strong random numbers here.
-		 */
-		ret = _gnutls_rnd(GNUTLS_RND_NONCE, session->key.key.data,
-				  session->key.key.size);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-
+	if (use_rnd_key != 0) {
+		session->key.key.data = rndkey.data;
+		session->key.key.size = rndkey.size;
+		rndkey.data = NULL;
 	} else {
 		session->key.key.data = plaintext.data;
 		session->key.key.size = plaintext.size;
@@ -201,7 +199,10 @@ proc_rsa_client_kx(gnutls_session_t session, uint8_t * data,
 	session->key.key.data[0] = _gnutls_get_adv_version_major(session);
 	session->key.key.data[1] = _gnutls_get_adv_version_minor(session);
 
-	return 0;
+	ret = 0;
+ cleanup:
+	gnutls_free(rndkey.data);
+	return ret;
 }
 
 
