@@ -47,6 +47,7 @@ int main(int argc, char **argv)
 #include <sys/wait.h>
 #endif
 #include <unistd.h>
+#include <signal.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 
@@ -456,6 +457,8 @@ void doit(void)
 	int sockets[2];
 	int err;
 
+	signal(SIGPIPE, SIG_IGN);
+
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
 		perror("socketpair");
@@ -473,6 +476,7 @@ void doit(void)
 	if (child) {
 		int status;
 		/* parent */
+		close(sockets[1]);
 		server(sockets[0]);
 		wait(&status);
 
@@ -489,8 +493,10 @@ void doit(void)
 		}
 #endif
 
-	} else
+	} else {
+		close(sockets[0]);
 		client(sockets[1]);
+	}
 }
 
 #endif				/* _WIN32 */
