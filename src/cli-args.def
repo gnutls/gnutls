@@ -210,6 +210,7 @@ flag = {
     file-exists = yes;
     descrip   = "PGP Public Key (certificate) file to use";
     doc      = "";
+    flags-must = pgpkeyfile;
 };
 
 flag = {
@@ -224,6 +225,7 @@ flag = {
     arg-type  = string;
     descrip   = "X.509 Certificate file or PKCS #11 URL to use";
     doc      = "";
+    flags-must = x509keyfile;
 };
 
 flag = {
