@@ -1629,7 +1629,7 @@ static int do_handshake(socket_st * socket)
 
 	if (ret == 0) {
 		/* print some information */
-		print_info(socket->session, verbose, 0);
+		print_info(socket->session, verbose, (HAVE_OPT(X509CERTFILE)||HAVE_OPT(PGPCERTFILE))?P_WAIT_FOR_CERT:0);
 		socket->secure = 1;
 	} else {
 		gnutls_alert_send_appropriate(socket->session, ret);

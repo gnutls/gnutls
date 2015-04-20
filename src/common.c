@@ -433,7 +433,7 @@ static void print_ecdh_info(gnutls_session_t session, const char *str)
 
 }
 
-int print_info(gnutls_session_t session, int verbose, int print_cert)
+int print_info(gnutls_session_t session, int verbose, int flags)
 {
 	const char *tmp;
 	gnutls_credentials_type_t cred;
@@ -513,8 +513,11 @@ int print_info(gnutls_session_t session, int verbose, int print_cert)
 			}
 		}
 
-		if (print_cert)
-			print_cert_info(session, verbose, print_cert);
+		if ((flags & P_WAIT_FOR_CERT) && gnutls_certificate_get_ours(session) == 0)
+			printf("- No certificate was sent to peer\n");
+
+		if (flags& P_PRINT_CERT)
+			print_cert_info(session, verbose, (flags&P_PRINT_CERT));
 
 		if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
 			print_dh_info(session, "Ephemeral ", verbose);
