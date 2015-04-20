@@ -1858,7 +1858,7 @@ gnutls_ocsp_resp_get_certs(gnutls_ocsp_resp_t resp,
 static gnutls_x509_crt_t find_signercert(gnutls_ocsp_resp_t resp)
 {
 	int rc;
-	gnutls_x509_crt_t *certs;
+	gnutls_x509_crt_t *certs = NULL;
 	size_t ncerts = 0, i;
 	gnutls_datum_t riddn = {NULL, 0};
 	gnutls_datum_t keyid = {NULL, 0};
