@@ -744,7 +744,7 @@ int gnutls_x509_crt_get_version(gnutls_x509_crt_t cert)
 		return _gnutls_asn2err(result);
 	}
 
-	if (len == 0)
+	if (len != 1)
 		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
 
 	return (int) version[0] + 1;
