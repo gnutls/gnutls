@@ -30,13 +30,6 @@ if ENABLE_CRYWRAP
 SUBDIRS += crywrap
 endif
 
-if NEED_LIBOPTS
-LIBOPTS = libopts/libopts.la
-SUBDIRS += libopts
-else
-LIBOPTS = $(LIBOPTS_LDADD)
-endif
-
 EXTRA_DIST = args-std.def
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
@@ -48,6 +41,14 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../libdane/includes		\
 	-I$(srcdir)/../extra/includes	\
 	$(LIBOPTS_CFLAGS)
+
+if NEED_LIBOPTS
+LIBOPTS = libopts/libopts.la
+SUBDIRS += libopts
+AM_CPPFLAGS += -I$(srcdir)/libopts
+else
+LIBOPTS = $(LIBOPTS_LDADD)
+endif
 
 bin_PROGRAMS = psktool gnutls-cli-debug certtool
 if ENABLE_SRP
