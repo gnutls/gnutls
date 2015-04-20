@@ -344,7 +344,13 @@ gnutls_x509_crt_import(gnutls_x509_crt_t cert,
 	}
 
 	/* enforce the rule that only version 3 certificates carry extensions */
-	version = gnutls_x509_crt_get_version(cert);
+	result = gnutls_x509_crt_get_version(cert);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	version = result;
 	if (version < 3) {
 		gnutls_datum_t exts;
 		result = _gnutls_x509_get_raw_field2(cert->cert, &cert->der,
@@ -737,6 +743,9 @@ int gnutls_x509_crt_get_version(gnutls_x509_crt_t cert)
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
+
+	if (len == 0)
+		return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
 
 	return (int) version[0] + 1;
 }
