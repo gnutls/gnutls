@@ -410,6 +410,11 @@ const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
 	if (debug)
 		success("server: Handshake was completed\n");
 
+	if (gnutls_certificate_get_ours(session) == NULL) {
+		fail("our certificate was not sent!\n");
+		exit(1);
+	}
+
 	if (debug)
 		success("server: TLS version is: %s\n",
 			gnutls_protocol_get_name
