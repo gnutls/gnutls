@@ -8,9 +8,12 @@ See the end for copying conditions.
 ** libgnutls: gnutls_certificate_get_ours: will return the certificate even
 if a callback was used to send it.
 
-** Check for invalid length in the X.509 version field. Without the check
-certificates with invalid length would be detected as having an arbitrary
-version. Reported by Hanno Böck.
+** libgnutls: Check for invalid length in the X.509 version field. Without
+the check certificates with invalid length would be detected as having an
+arbitrary version. Reported by Hanno Böck.
+
+** libgnutls: updated system-keys support for windows to compile in more
+versions of mingw. Patch by Tim Kosse.
 
 ** certtool: It can generate SHA256 key IDs.
 
