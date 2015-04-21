@@ -435,7 +435,7 @@ static void start(const char *prio, int ign)
 
 static void ch_handler(int sig)
 {
-	int status;
+	int status = 0;
 	wait(&status);
 	if (WEXITSTATUS(status) != 0 ||
 	    (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)) {

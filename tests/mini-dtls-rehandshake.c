@@ -360,7 +360,7 @@ static void start(int server_initiated)
 	}
 
 	if (child) {
-		int status;
+		int status = 0;
 		/* parent */
 
 		server(fd[0], server_initiated);

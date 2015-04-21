@@ -242,7 +242,7 @@ static void client(int fd)
 
 static void terminate(void)
 {
-	int status;
+	int status = 0;
 
 	kill(child, SIGTERM);
 	wait(&status);

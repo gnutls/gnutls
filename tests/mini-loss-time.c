@@ -265,7 +265,7 @@ static void start(int server_packet, int client_packet)
 
 static void ch_handler(int sig)
 {
-	int status;
+	int status = 0;
 	wait(&status);
 	if (WEXITSTATUS(status) != 0)
 		fail("Child died with status %d\n", WEXITSTATUS(status));
