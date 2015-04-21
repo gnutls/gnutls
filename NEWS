@@ -5,7 +5,16 @@ See the end for copying conditions.
 
 * Version 3.4.1 (unreleased)
 
+** libgnutls: gnutls_certificate_get_ours: will return the certificate even
+if a callback was used to send it.
+
+** Check for invalid length in the X.509 version field. Without the check
+certificates with invalid length would be detected as having an arbitrary
+version. Reported by Hanno Böck.
+
 ** certtool: It can generate SHA256 key IDs.
+
+** configure: re-enabled the --enable-local-libopts flag
 
 ** API and ABI modifications:
 gnutls_x509_crt_get_pk_ecc_raw: Added
