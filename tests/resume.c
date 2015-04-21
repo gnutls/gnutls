@@ -427,12 +427,16 @@ void doit(void)
 		if (child) {
 			int status;
 			/* parent */
+			for (j = 0; j < SESSIONS; j++)
+				close(client_sds[j]);
 			server(server_sds, &resume_tests[i]);
 			wait(&status);
 			if (WEXITSTATUS(status) > 0)
 				error_count++;
 			global_stop();
 		} else {
+			for (j = 0; j < SESSIONS; j++)
+				close(server_sds[j]);
 			client(client_sds, &resume_tests[i]);
 			gnutls_global_deinit();
 			if (error_count)
