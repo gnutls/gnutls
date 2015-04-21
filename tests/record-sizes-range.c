@@ -45,7 +45,7 @@ static void tls_log_func(int level, const char *str)
 
 #define MAX_BUF 32*1024
 #define MAX_SEND 16384
-static char b1[MAX_BUF + 1];
+static char buffer1[MAX_BUF + 1];
 static char buffer[MAX_BUF + 1];
 
 static void try_send(gnutls_session_t client, gnutls_session_t server,
@@ -134,22 +134,22 @@ void doit(void)
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 
-	memset(b1, 0, sizeof(b1));
+	memset(buffer1, 0, sizeof(buffer1));
 	HANDSHAKE(client, server);
 
 	if (debug)
 		success("Handshake established\n");
 
-	memset(b1, 1, MAX_BUF);
+	memset(buffer1, 1, MAX_BUF);
 
 	range.low = 1024;
 	range.high = MAX_SEND;
 
 
-	try_send(client, server, b1, MAX_SEND, buffer, MAX_BUF, &range);
-	try_send(client, server, b1, 1024, buffer, MAX_BUF, &range);
-	try_send(client, server, b1, 4096, buffer, MAX_BUF, &range);
-	/*try_send(client, server, b1, 128, buffer, MAX_BUF, &range) */ ;
+	try_send(client, server, buffer1, MAX_SEND, buffer, MAX_BUF, &range);
+	try_send(client, server, buffer1, 1024, buffer, MAX_BUF, &range);
+	try_send(client, server, buffer1, 4096, buffer, MAX_BUF, &range);
+	/*try_send(client, server, buffer1, 128, buffer, MAX_BUF, &range) */ ;
 
 
 	if (debug)

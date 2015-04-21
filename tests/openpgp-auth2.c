@@ -46,7 +46,7 @@
  * addition it tests DSS signatures under that.
  */
 
-static const char message[] = "Hello, brave GNU world!";
+static const char g_message[] = "Hello, brave GNU world!";
 
 /* The OpenPGP key pair for use and the key ID in those keys.  */
 static const char pub_key_file[] = "../guile/tests/openpgp-pub.asc";
@@ -150,10 +150,10 @@ void doit()
 			printf("client handshake successful\n");
 
 		sent =
-		    gnutls_record_send(session, message, sizeof(message));
-		if (sent != sizeof(message))
+		    gnutls_record_send(session, g_message, sizeof(g_message));
+		if (sent != sizeof(g_message))
 			fail("client sent %li vs. %li\n",
-			     (long) sent, (long) sizeof(message));
+			     (long) sent, (long) sizeof(g_message));
 
 		err = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 		if (err != 0)
@@ -169,7 +169,7 @@ void doit()
 		gnutls_session_t session;
 		gnutls_dh_params_t dh_params;
 		gnutls_certificate_credentials_t cred;
-		char greetings[sizeof(message) * 2];
+		char greetings[sizeof(g_message) * 2];
 		ssize_t received;
 		pid_t done;
 		int status;
@@ -231,10 +231,10 @@ void doit()
 		received =
 		    gnutls_record_recv(session, greetings,
 				       sizeof(greetings));
-		if (received != sizeof(message)
-		    || memcmp(greetings, message, sizeof(message)))
+		if (received != sizeof(g_message)
+		    || memcmp(greetings, g_message, sizeof(g_message)))
 			fail("server received %li vs. %li\n",
-			     (long) received, (long) sizeof(message));
+			     (long) received, (long) sizeof(g_message));
 
 		err = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 		if (err != 0)

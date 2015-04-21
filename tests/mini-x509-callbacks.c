@@ -67,7 +67,7 @@ unsigned int msg_order[] = {
 };
 
 static int handshake_callback(gnutls_session_t session, unsigned int htype,
-			      unsigned post, unsigned int incoming)
+			      unsigned post, unsigned int incoming, const gnutls_datum_t *rawmsg)
 {
 	static unsigned idx = 0;
 	unsigned int msg;

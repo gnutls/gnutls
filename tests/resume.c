@@ -534,11 +534,9 @@ wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 {
 	gnutls_datum_t res = { NULL, 0 };
-	int i;
+	unsigned i;
 
 	if (debug) {
-		unsigned int i;
-
 		fprintf(stderr, "resume db looking for (%d): ", key.size);
 		for (i = 0; i < key.size; i++) {
 			fprintf(stderr, "%02x", key.data[i] & 0xFF);
@@ -567,12 +565,12 @@ static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 			       res.size);
 
 			if (debug) {
-				unsigned int i;
+				unsigned int j;
 				printf("data:\n");
-				for (i = 0; i < res.size; i++) {
+				for (j = 0; j < res.size; j++) {
 					printf("%02x ",
-					       res.data[i] & 0xFF);
-					if ((i + 1) % 16 == 0)
+					       res.data[j] & 0xFF);
+					if ((j + 1) % 16 == 0)
 						printf("\n");
 				}
 				printf("\n");

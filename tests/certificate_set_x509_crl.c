@@ -32,7 +32,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-static char crl[] =
+static char g_crl[] =
     "-----BEGIN X509 CRL-----\n"
     "MIIB9DCCAV8CAQEwCwYJKoZIhvcNAQEFMIIBCDEXMBUGA1UEChMOVmVyaVNpZ24s\n"
     "IEluYy4xHzAdBgNVBAsTFlZlcmlTaWduIFRydXN0IE5ldHdvcmsxRjBEBgNVBAsT\n"
@@ -54,7 +54,7 @@ int main(void)
 {
 	int rc;
 	gnutls_certificate_credentials_t crt;
-	gnutls_datum_t crldatum = { (uint8_t *) crl, strlen(crl) };
+	gnutls_datum_t crldatum = { (uint8_t *) g_crl, strlen(g_crl) };
 	gnutls_x509_crl_t crl;
 
 	rc = global_init();
