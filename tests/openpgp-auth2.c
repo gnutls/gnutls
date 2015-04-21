@@ -62,7 +62,7 @@ static void log_message(int level, const char *message)
 }
 
 
-void doit()
+void doit(void)
 {
 	int err;
 	int sockets[2];
