@@ -48,6 +48,7 @@ int main(int argc, char **argv)
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
+#include <sys/wait.h>
 #include <signal.h>
 
 #include "utils.h"
@@ -390,6 +391,7 @@ void doit(void)
 {
 	int i;
 
+	signal(SIGCHLD, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
 
 	for (i = 0; resume_tests[i].desc; i++) {
@@ -420,26 +422,22 @@ void doit(void)
 		}
 
 		if (child) {
-			int status;
+			int status = 0;
 			/* parent */
 			for (j = 0; j < SESSIONS; j++)
 				close(client_sds[j]);
 			server(server_sds, &resume_tests[i]);
 			wait(&status);
-			if (WEXITSTATUS(status) > 0)
-				error_count++;
+			if (WEXITSTATUS(status) != 0 || (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV))
+				exit(1);
 			global_stop();
 
-			if (error_count)
-				exit(1);
 
 		} else {
 			for (j = 0; j < SESSIONS; j++)
 				close(server_sds[j]);
 			client(client_sds, &resume_tests[i]);
 			gnutls_global_deinit();
-			if (error_count)
-				exit(1);
 			exit(0);
 		}
 	}
