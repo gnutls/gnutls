@@ -227,39 +227,6 @@ static void client(int sds[], struct params_res *params)
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_anon_server_credentials_t anoncred;
-static gnutls_datum_t session_ticket_key = { NULL, 0 };
-
-static gnutls_session_t initialize_tls_session(struct params_res *params)
-{
-	gnutls_session_t session;
-
-	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				   NULL);
-
-	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
-
-	gnutls_dh_set_prime_bits(session, DH_BITS);
-
-	if (params->enable_db) {
-		gnutls_db_set_retrieve_function(session, wrap_db_fetch);
-		gnutls_db_set_remove_function(session, wrap_db_delete);
-		gnutls_db_set_store_function(session, wrap_db_store);
-		gnutls_db_set_ptr(session, NULL);
-	}
-
-	if (params->enable_session_ticket_server)
-		gnutls_session_ticket_enable_server(session,
-						    &session_ticket_key);
-
-	return session;
-}
 
 static gnutls_dh_params_t dh_params;
 
@@ -276,18 +243,12 @@ static int generate_dh_params(void)
 					     GNUTLS_X509_FMT_PEM);
 }
 
-int err, ret;
-char topbuf[512];
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
-int optval = 1;
+static char buffer[MAX_BUF + 1];
 
 static void global_stop(void)
 {
 	if (debug)
 		success("global stop\n");
-
-	gnutls_anon_free_server_credentials(anoncred);
 
 	gnutls_dh_params_deinit(dh_params);
 
@@ -296,7 +257,11 @@ static void global_stop(void)
 
 static void server(int sds[], struct params_res *params)
 {
+	gnutls_anon_server_credentials_t anoncred;
+	static gnutls_datum_t session_ticket_key = { NULL, 0 };
+	int ret;
 	size_t t;
+	gnutls_session_t session;
 
 	/* this must be called once in the program, it is mostly for the server.
 	 */
@@ -311,8 +276,6 @@ static void server(int sds[], struct params_res *params)
 	if (debug)
 		success("Launched, generating DH parameters...\n");
 
-	generate_dh_params();
-
 	gnutls_anon_set_server_dh_params(anoncred, dh_params);
 
 	if (params->enable_db) {
@@ -325,14 +288,32 @@ static void server(int sds[], struct params_res *params)
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
 
-		session = initialize_tls_session(params);
+		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
+
+		gnutls_priority_set_direct(session,
+				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				   NULL);
+
+		gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
+		gnutls_dh_set_prime_bits(session, DH_BITS);
+
+		if (params->enable_db) {
+			gnutls_db_set_retrieve_function(session, wrap_db_fetch);
+			gnutls_db_set_remove_function(session, wrap_db_delete);
+			gnutls_db_set_store_function(session, wrap_db_store);
+			gnutls_db_set_ptr(session, NULL);
+		}
+
+		if (params->enable_session_ticket_server)
+			gnutls_session_ticket_enable_server(session,
+						    &session_ticket_key);
 
 		gnutls_transport_set_int(session, sd);
 		gnutls_dtls_set_timeouts(session, 1*1000, 120 * 1000);
 		
 		do {
 			ret = gnutls_handshake(session);
-		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+		} while (ret < 0 && (ret == GNUTLS_E_INTERRUPTED||ret == GNUTLS_E_AGAIN));
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(session);
@@ -382,6 +363,7 @@ static void server(int sds[], struct params_res *params)
 
 	gnutls_free(session_ticket_key.data);
 	session_ticket_key.data = NULL;
+	gnutls_anon_free_server_credentials(anoncred);
 
 	if (debug)
 		success("server: finished\n");
@@ -389,10 +371,12 @@ static void server(int sds[], struct params_res *params)
 
 void doit(void)
 {
-	int i;
+	int i, err;
 
 	signal(SIGCHLD, SIG_IGN);
 	signal(SIGPIPE, SIG_IGN);
+
+	generate_dh_params();
 
 	for (i = 0; resume_tests[i].desc; i++) {
 		int client_sds[SESSIONS], server_sds[SESSIONS];
@@ -430,9 +414,6 @@ void doit(void)
 			wait(&status);
 			if (WEXITSTATUS(status) != 0 || (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV))
 				exit(1);
-			global_stop();
-
-
 		} else {
 			for (j = 0; j < SESSIONS; j++)
 				close(server_sds[j]);
@@ -441,6 +422,7 @@ void doit(void)
 			exit(0);
 		}
 	}
+	global_stop();
 }
 
 /* Functions and other stuff needed for session resuming.
