@@ -69,8 +69,6 @@ static void client_log_func(int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-gnutls_session_t session;
-
 static ssize_t
 push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
@@ -84,6 +82,8 @@ static void client(int fd, int server_init)
 	int ret;
 	char buffer[MAX_BUF + 1];
 	gnutls_anon_client_credentials_t anoncred;
+	gnutls_session_t session;
+
 	/* Need to enable anonymous KX specifically. */
 
 	global_init();
@@ -194,27 +194,8 @@ static void client(int fd, int server_init)
 
 
 /* These are global */
-gnutls_anon_server_credentials_t anoncred;
 pid_t child;
 
-static gnutls_session_t initialize_tls_session(void)
-{
-	gnutls_session_t session;
-
-	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_dtls_set_mtu(session, 1500);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
-				   NULL);
-
-	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
-
-	return session;
-}
 
 static void terminate(void)
 {
@@ -229,6 +210,8 @@ static void server(int fd, int server_init)
 {
 	int ret;
 	char buffer[MAX_BUF + 1];
+	gnutls_anon_server_credentials_t anoncred;
+	gnutls_session_t session;
 	/* this must be called once in the program
 	 */
 	global_init();
@@ -240,7 +223,17 @@ static void server(int fd, int server_init)
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
-	session = initialize_tls_session();
+	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
+	gnutls_dtls_set_mtu(session, 1500);
+
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(session,
+				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
+				   NULL);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
 	gnutls_transport_set_int(session, fd);
 	gnutls_transport_set_push_function(session, push);
