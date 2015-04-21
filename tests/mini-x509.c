@@ -204,6 +204,17 @@ void doit(void)
 
 	HANDSHAKE(client, server);
 
+	/* check gnutls_certificate_get_ours() - client side */
+	{
+		const gnutls_datum_t *mcert;
+
+		mcert = gnutls_certificate_get_ours(client);
+		if (mcert != NULL) {
+			fail("gnutls_certificate_get_ours(): failed\n");
+			exit(1);
+		}
+	}
+
 	/* check the number of certificates received */
 	{
 		unsigned cert_list_size = 0;
