@@ -161,6 +161,8 @@ gnutls_credentials_set(gnutls_session_t session,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
+ *
+ * Since: 3.3.3
  **/
 int
 gnutls_credentials_get(gnutls_session_t session,

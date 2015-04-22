@@ -325,8 +325,8 @@ gnutls_certificate_server_set_request(gnutls_session_t session,
  *
  * @req_ca_dn is only used in X.509 certificates.
  * Contains a list with the CA names that the server considers trusted.
- * Normally we should send a certificate that is signed
- * by one of these CAs. These names are DER encoded. To get a more
+ * This is a hint and typically the client should send a certificate that is signed
+ * by one of these CAs. These names, when available, are DER encoded. To get a more
  * meaningful value use the function gnutls_x509_rdn_get().
  *
  * @pk_algos contains a list with server's acceptable signature algorithms.
@@ -348,7 +348,8 @@ gnutls_certificate_server_set_request(gnutls_session_t session,
  **/
 void gnutls_certificate_set_retrieve_function
     (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function * func) {
+     gnutls_certificate_retrieve_function * func)
+{
 	cred->get_cert_callback = func;
 }
 
@@ -367,8 +368,8 @@ void gnutls_certificate_set_retrieve_function
  *
  * @req_ca_dn is only used in X.509 certificates.
  * Contains a list with the CA names that the server considers trusted.
- * Normally we should send a certificate that is signed
- * by one of these CAs. These names are DER encoded. To get a more
+ * This is a hint and typically the client should send a certificate that is signed
+ * by one of these CAs. These names, when available, are DER encoded. To get a more
  * meaningful value use the function gnutls_x509_rdn_get().
  *
  * @pk_algos contains a list with server's acceptable signature algorithms.
@@ -396,7 +397,8 @@ void gnutls_certificate_set_retrieve_function
  **/
 void gnutls_certificate_set_retrieve_function2
     (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function2 * func) {
+     gnutls_certificate_retrieve_function2 * func) 
+{
 	cred->get_cert_callback2 = func;
 }
 
@@ -426,7 +428,8 @@ void gnutls_certificate_set_retrieve_function2
 void
  gnutls_certificate_set_verify_function
     (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_verify_function * func) {
+     gnutls_certificate_verify_function * func)
+{
 	cred->verify_callback = func;
 }
 
