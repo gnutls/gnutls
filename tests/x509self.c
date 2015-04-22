@@ -124,6 +124,7 @@ static void client(int sd)
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
 	gnutls_certificate_credentials_t xcred;
+	gnutls_certificate_credentials_t tst_cred;
 
 	global_init();
 
@@ -173,6 +174,14 @@ static void client(int sd)
 	/* see the Getting peer's information example */
 	if (debug)
 		print_info(session);
+
+	ret = gnutls_credentials_get(session, GNUTLS_CRD_CERTIFICATE, (void**)&tst_cred);
+	if (ret < 0) {
+		fail("client: gnutls_credentials_get failed: %s\n", gnutls_strerror(ret));
+	}
+	if (tst_cred != xcred) {
+		fail("client: gnutls_credentials_get returned invalid value\n");
+	}
 
 	ret = gnutls_record_send(session, MSG, strlen(MSG));
 
