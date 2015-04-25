@@ -315,7 +315,8 @@ gnutls_certificate_server_set_request(gnutls_session_t session,
  * @func: is the callback function
  *
  * This function sets a callback to be called in order to retrieve the
- * certificate to be used in the handshake. You are advised
+ * certificate to be used in the handshake. The callback will take control
+ * only if a certificate is requested by the peer. You are advised
  * to use gnutls_certificate_set_retrieve_function2() because it
  * is much more efficient in the processing it requires from gnutls.
  *
@@ -361,7 +362,8 @@ void gnutls_certificate_set_retrieve_function
  * @func: is the callback function
  *
  * This function sets a callback to be called in order to retrieve the
- * certificate to be used in the handshake.
+ * certificate to be used in the handshake. The callback will take control
+ * only if a certificate is requested by the peer.
  *
  * The callback's function prototype is:
  * int (*callback)(gnutls_session_t, const gnutls_datum_t* req_ca_dn, int nreqs,
