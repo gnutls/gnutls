@@ -17,6 +17,8 @@ versions of mingw. Patch by Tim Kosse.
 
 ** certtool: It can generate SHA256 key IDs.
 
+** gnutls-cli: fixed crash in --benchmark-ciphers. Reported by James Cloos.
+
 ** configure: re-enabled the --enable-local-libopts flag
 
 ** API and ABI modifications:
