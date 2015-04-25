@@ -193,6 +193,11 @@ cert_callback(gnutls_session_t session,
 	gnutls_pcert_st *p;
 	gnutls_privkey_t lkey;
 
+	if (gnutls_certificate_client_get_request_status(session) == 0) {
+		fail("gnutls_certificate_client_get_request_status failed\n");
+		return -1;
+	}
+
 	p = gnutls_malloc(sizeof(*p));
 	if (p==NULL)
 		return -1;
@@ -219,7 +224,11 @@ cert_callback(gnutls_session_t session,
 	} else {
 		*pcert = g_pcert;
 		*pcert_length = 1;
-		*pkey = g_pkey;
+		if (gnutls_certificate_client_get_request_status(session) == 0) {
+		fail("gnutls_certificate_client_get_request_status failed\n");
+		return -1;
+	}
+	*pkey = g_pkey;
 	}
 
 	return 0;
@@ -460,6 +469,11 @@ void doit(void)
 			fprintf(stderr, "could not verify certificate: %.4x\n", status);
 			exit(1);
 		}
+	}
+
+	if (gnutls_certificate_client_get_request_status(client) == 0) {
+		fail("gnutls_certificate_client_get_request_status - 2 failed\n");
+		exit(1);
 	}
 
 	gnutls_bye(client, GNUTLS_SHUT_RDWR);
