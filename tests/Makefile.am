@@ -84,7 +84,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-cert-status mini-rsa-psk global-init sec-params \
 	 fips-test mini-global-load name-constraints x509-extensions \
 	 long-session-id mini-x509-callbacks-intr \
-	 crlverify init_fds mini-rehandshake-2
+	 crlverify init_fds mini-rehandshake-2 sign-md5-rep
 
 if ENABLE_OCSP
 ctests += ocsp
