@@ -313,28 +313,12 @@ _gnutls_session_sign_algo_enabled(gnutls_session_t session,
 				  gnutls_sign_algorithm_t sig)
 {
 	unsigned i;
-	int ret;
 	const version_entry_st *ver = get_version(session);
-	sig_ext_st *priv;
-	extension_priv_data_t epriv;
 
 	if (unlikely(ver == NULL))
 		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-	ret =
-	    _gnutls_ext_get_session_data(session,
-					 GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
-					 &epriv);
-	if (ret < 0) {
-		gnutls_assert();
-		return 0;
-	}
-	priv = epriv;
-
-	if (!_gnutls_version_has_selectable_sighash(ver)
-	    || priv->sign_algorithms_size == 0)
-		/* none set, allow all */
-	{
+	if (!_gnutls_version_has_selectable_sighash(ver)) {
 		return 0;
 	}
 
