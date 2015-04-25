@@ -15,6 +15,9 @@ arbitrary version. Reported by Hanno Böck.
 ** libgnutls: updated system-keys support for windows to compile in more
 versions of mingw. Patch by Tim Kosse.
 
+** libgnutls: Fix for MD5 downgrade in TLS 1.2 signatures. Reported by
+Karthikeyan Bhargavan.
+
 ** certtool: It can generate SHA256 key IDs.
 
 ** gnutls-cli: fixed crash in --benchmark-ciphers. Reported by James Cloos.
