@@ -51,7 +51,8 @@ int main()
 
 static void terminate(void);
 
-/* This program tests whether EtM is negotiated as expected.
+/* This program tests whether MD5 is rejected by a client as a
+ * signature algorithm for the ServerKeyExchange.
  */
 
 static void server_log_func(int level, const char *str)
