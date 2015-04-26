@@ -752,3 +752,9 @@ tests/strict-der
 tests/mini-supplementaldata
 tests/mini-extension
 tests/mini-dtls0-9
+tests/mini-etm
+tests/mini-record-retvals
+tests/mini-server-name
+tests/mini-x509-cert-callback
+tests/sign-md5-rep
+tests/slow/cipher-override2
