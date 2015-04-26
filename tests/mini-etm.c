@@ -132,8 +132,7 @@ static void client(int fd, const char *prio, unsigned etm)
 
 	/* Initialize TLS session
 	 */
-	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
-	gnutls_dtls_set_mtu(session, 1500);
+	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session, prio, NULL);
@@ -243,8 +242,7 @@ static void server(int fd, const char *prio, unsigned etm)
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
-	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-	gnutls_dtls_set_mtu(session, 1500);
+	gnutls_init(&session, GNUTLS_SERVER);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
@@ -347,9 +345,9 @@ static void start(const char *prio, unsigned etm)
 	}
 }
 
-#define AES_CBC "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-#define AES_CBC_SHA256 "NONE:+VERS-DTLS1.0:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
-#define AES_GCM "NONE:+VERS-DTLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_CBC "NONE:+VERS-TLS1.0:-CIPHER-ALL:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_CBC_SHA256 "NONE:+VERS-TLS1.0:-CIPHER-ALL:+RSA:+AES-128-CBC:+AES-256-CBC:+SHA256:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
+#define AES_GCM "NONE:+VERS-TLS1.2:-CIPHER-ALL:+RSA:+AES-128-GCM:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL"
 
 static void ch_handler(int sig)
 {
