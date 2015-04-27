@@ -741,8 +741,8 @@ static int auto_load(void)
  * you to independently load PKCS 11 modules using gnutls_pkcs11_add_provider()
  * if %GNUTLS_PKCS11_FLAG_MANUAL is specified.
  *
- * Normally you don't need to call this function since it is being called
- * when the first PKCS 11 operation is requested using the %GNUTLS_PKCS11_FLAG_AUTO
+ * You don't need to call this function since GnuTLS 3.3.0 because it is being called
+ * during the first request PKCS 11 operation. That call will assume the %GNUTLS_PKCS11_FLAG_AUTO
  * flag. If another flags are required then it must be called independently
  * prior to any PKCS 11 operation.
  *
