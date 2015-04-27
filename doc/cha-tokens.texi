@@ -288,13 +288,12 @@ storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}
 @node PKCS11 Initialization
 @subsection Initialization
 To allow all @acronym{GnuTLS} applications to transparently access smard cards
-and tokens, @acronym{PKCS} #11 is automatically initialized during the global 
-initialization (see @funcref{gnutls_global_init}). The initialization function, to select
-which modules to load reads certain module configuration files.
-Those are stored in @code{/etc/pkcs11/modules/} and 
-are the configuration files of @acronym{p11-kit}@footnote{@url{http://p11-glue.freedesktop.org/}}.
-For example a file that will load the @acronym{OpenSC} module, could be named
-@code{/etc/pkcs11/modules/opensc.module} and contain the following:
+and tokens, @acronym{PKCS} #11 is automatically initialized during the first
+call of a @acronym{PKCS} #11 related function. The initialization process, based
+on p11-kit configuration, loads any appropriate modules. The p11-kit configuration
+files@footnote{@url{http://p11-glue.freedesktop.org/}} are typically stored in @code{/etc/pkcs11/modules/}.
+For example a file that will instruct GnuTLS to load the @acronym{OpenSC} module,
+could be named @code{/etc/pkcs11/modules/opensc.module} and contain the following:
 
 @example
 module: /usr/lib/opensc-pkcs11.so
