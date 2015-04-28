@@ -12,7 +12,10 @@ if a callback was used to send it.
 the check certificates with invalid length would be detected as having an
 arbitrary version. Reported by Hanno Böck.
 
-** libgnutls: updated system-keys support for windows to compile in more
+** libgnutls: Handle DNS name constraints with a leading dot. Patch by
+Fotis Loukos.
+
+** libgnutls: Updated system-keys support for windows to compile in more
 versions of mingw. Patch by Tim Kosse.
 
 ** libgnutls: Fix for MD5 downgrade in TLS 1.2 signatures. Reported by
