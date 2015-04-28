@@ -76,6 +76,7 @@ const gnutls_datum_t cert = { cert_pem, sizeof(cert_pem) };
 const gnutls_datum_t name1 = { (void*)"com", 3 };
 const gnutls_datum_t name2 = { (void*)"example.com", sizeof("example.com")-1 };
 const gnutls_datum_t name3 = { (void*)"another.example.com", sizeof("another.example.com")-1 };
+const gnutls_datum_t name4 = { (void*)".gr", 3 };
 
 const gnutls_datum_t mail1 = { (void*)"example.com", sizeof("example.com")-1 };
 const gnutls_datum_t mail2 = { (void*)".example.net", sizeof(".example.net")-1 };
@@ -168,6 +169,11 @@ void doit(void)
 	if (ret < 0)
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 
+	ret = gnutls_x509_name_constraints_add_permitted(nc, GNUTLS_SAN_DNSNAME,
+		&name4);
+	if (ret < 0)
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+
 	ret = gnutls_x509_name_constraints_add_excluded(nc, GNUTLS_SAN_URI,
 		&name3);
 	if (ret < 0)
@@ -210,8 +216,8 @@ void doit(void)
 		}
 	} while(ret == 0);
 
-	if (i-1 != 4) {
-		fail("Could not read all contraints; read %d, expected %d\n", i-1, 4);
+	if (i-1 != 5) {
+		fail("Could not read all contraints; read %d, expected %d\n", i-1, 5);
 	}
 
 	i = 0;
@@ -312,6 +318,12 @@ void doit(void)
 	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
 	if (ret != 0)
 		fail("Checking %s should have failed\n", name.data);
+
+	name.data = (unsigned char*)"www.example.gr";
+	name.size = strlen((char*)name.data);
+	ret = gnutls_x509_name_constraints_check(nc, GNUTLS_SAN_DNSNAME, &name);
+	if (ret == 0)
+		fail("Checking %s should have succeeded\n", name.data);
 
 	gnutls_x509_name_constraints_deinit(nc);
 	gnutls_x509_crt_deinit(crt);
