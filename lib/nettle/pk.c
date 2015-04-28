@@ -1560,6 +1560,11 @@ wrap_nettle_pk_verify_priv_params(gnutls_pk_algorithm_t algo,
 		      ecc_cleanup:
 			ecc_scalar_zclear(&priv);
 			ecc_point_clear(&pub);
+
+			mpz_clear(x1);
+			mpz_clear(y1);
+			mpz_clear(x2);
+			mpz_clear(y2);
 		}
 		break;
 	default:
