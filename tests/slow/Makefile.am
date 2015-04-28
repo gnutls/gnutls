@@ -38,7 +38,7 @@ else
 cipher_test_CPPFLAGS = $(AM_CPPFLAGS)
 endif
 
-ctests = gendh keygen
+ctests = gendh
 
 if ENABLE_NETTLE
 cipher_override_LDFLAGS = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS) $(LDADD)
