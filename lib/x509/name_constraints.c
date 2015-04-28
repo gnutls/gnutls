@@ -254,11 +254,6 @@ int name_constraints_add(gnutls_x509_name_constraints_t nc,
 		type != GNUTLS_SAN_DN && type != GNUTLS_SAN_URI && type != GNUTLS_SAN_IPADDRESS)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	if (type == GNUTLS_SAN_DNSNAME && name->size > 0 && name->data[0] == '.') {
-		_gnutls_debug_log("DNSNAME constraints cannot start with '.'. They must contain a domain name\n");
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-	}
-
 	if (permitted != 0)
 		prev = tmp = nc->permitted;
 	else
@@ -377,11 +372,21 @@ cleanup:
 static
 unsigned ends_with(const gnutls_datum_t * str, const gnutls_datum_t * suffix)
 {
+	unsigned char *tree;
+	unsigned int treelen;
+
 	if (suffix->size >= str->size)
 		return 0;
 
-	if (memcmp(str->data + str->size - suffix->size, suffix->data, suffix->size) == 0 &&
-		str->data[str->size - suffix->size -1] == '.')
+	tree = suffix->data;
+	treelen = suffix->size;
+	if((treelen > 0) && (tree[0] == '.')) {
+		tree++;
+		treelen--;
+	}
+
+	if (memcmp(str->data + str->size - treelen, tree, treelen) == 0 &&
+		str->data[str->size - treelen -1] == '.')
 		return 1;
 
 	return 0;
