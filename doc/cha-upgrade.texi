@@ -155,7 +155,7 @@ however, several deprecated functions were removed, and are listed below.
 @tab @funcref{gnutls_pubkey_verify_data2}.
 
 @item @funcintref{gnutls_x509_crt_get_verify_algorithm},
-No replacement; a similar function is @tab @funcref{gnutls_x509_crt_get_signature_algorithm}.
+@tab No replacement; a similar function is @funcref{gnutls_x509_crt_get_signature_algorithm}.
 
 @item @funcintref{gnutls_pubkey_get_verify_algorithm},
 @tab No replacement; a similar function is @funcref{gnutls_pubkey_get_preferred_hash_algorithm}.
