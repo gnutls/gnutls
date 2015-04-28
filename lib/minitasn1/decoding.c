@@ -732,6 +732,7 @@ _asn1_extract_der_octet (asn1_node node, const unsigned char *der,
     return ASN1_DER_ERROR;
 
   counter = len3 + 1;
+  DECR_LEN(der_len, len3);
 
   if (len2 == -1)
     counter_end = der_len - 2;
@@ -740,6 +741,7 @@ _asn1_extract_der_octet (asn1_node node, const unsigned char *der,
 
   while (counter < counter_end)
     {
+      DECR_LEN(der_len, 1);
       len2 = asn1_get_length_der (der + counter, der_len, &len3);
 
       if (IS_ERR(len2, flags))
@@ -764,7 +766,6 @@ _asn1_extract_der_octet (asn1_node node, const unsigned char *der,
 	  len2 = 0;
 	}
 
-      DECR_LEN(der_len, 1);
       counter += len2 + len3 + 1;
     }
 
