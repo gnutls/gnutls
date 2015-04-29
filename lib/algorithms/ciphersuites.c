@@ -1643,6 +1643,8 @@ _gnutls_supported_ciphersuites(gnutls_session_t session,
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
  * Returns: On success it returns %GNUTLS_E_SUCCESS (0), or a negative error value otherwise.
+ *
+ * Since: 3.0.9
  **/
 int
 gnutls_priority_get_cipher_suite_index(gnutls_priority_t pcache,
