@@ -101,7 +101,8 @@ gnutls_transport_set_pull_function(gnutls_session_t session,
  * int (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);
  *
  * The helper function gnutls_system_recv_timeout() is provided to
- * simplify writing suck callbacks.
+ * simplify writing callbacks. This callback is not used when
+ * using non-blocking sockets.
  *
  * Since: 3.0
  **/
