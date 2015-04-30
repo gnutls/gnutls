@@ -2549,7 +2549,7 @@ int gnutls_handshake(gnutls_session_t session)
                      session->internals.pull_func != system_read)) && 
 		     session->internals.handshake_timeout_ms != 0)) {
 			_gnutls_debug_log("Cannot enforce the handshake timeout; there is no pull_timeout function set.\n");
-            session->internals.handshake_timeout_ms = 0;
+			session->internals.handshake_timeout_ms = 0;
 		}
 
 		session->internals.handshake_in_progress = 1;

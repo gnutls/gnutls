@@ -731,8 +731,6 @@ typedef struct {
 
 	unsigned int hsk_hello_verify_requests;
 
-	/* non blocking stuff variables */
-	bool blocking;
 	/* starting time of current handshake */
 	struct timespec handshake_start_time;
 
@@ -996,6 +994,9 @@ typedef struct {
 	bool sc_random_set;
 	bool no_replay_protection;	/* DTLS replay protection */
 	bool try_ext_master_secret;	/* whether to try negotiating the ext master secret */
+
+	/* whether this session uses non-blocking sockets */
+	bool blocking;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

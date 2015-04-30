@@ -236,7 +236,7 @@ int _dtls_transmit(gnutls_session_t session)
 	 * return.
 	 */
 	if (session->internals.dtls.flight_init != 0
-	    && session->internals.dtls.blocking == 0) {
+	    && session->internals.blocking == 0) {
 		/* just in case previous run was interrupted */
 		ret = _gnutls_io_write_flush(session);
 		if (ret < 0) {
@@ -356,7 +356,7 @@ int _dtls_transmit(gnutls_session_t session)
 			goto cleanup;
 		} else {	/* all other messages -> implicit ack (receive of next flight) */
 
-			if (session->internals.dtls.blocking != 0)
+			if (session->internals.blocking != 0)
 				ret =
 				    _gnutls_io_check_recv(session,
 							  timeout);
@@ -423,7 +423,7 @@ int _dtls_wait_and_retransmit(gnutls_session_t session)
 {
 	int ret;
 
-	if (session->internals.dtls.blocking != 0)
+	if (session->internals.blocking != 0)
 		ret = _gnutls_io_check_recv(session, TIMER_WINDOW);
 	else
 		ret = _gnutls_io_check_recv(session, 0);

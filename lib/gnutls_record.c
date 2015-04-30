@@ -1153,7 +1153,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	record_state = &record_params->read;
 
 	/* receive headers */
-	ret = recv_headers(session, record_params, type, htype, &record, &ms);
+	ret = recv_headers(session, record_params, type, htype, &record, session->internals.blocking?&ms:0);
 	if (ret < 0) {
 		ret = gnutls_assert_val_fatal(ret);
 		goto recv_error;
@@ -1168,7 +1168,7 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
 	 */
 	ret =
 	    _gnutls_io_read_buffered(session, record.packet_size,
-				     record.type, &ms);
+				     record.type, session->internals.blocking?&ms:0);
 	if (ret != record.packet_size) {
 		gnutls_assert();
 		goto recv_error;

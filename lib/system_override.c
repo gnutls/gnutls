@@ -100,9 +100,15 @@ gnutls_transport_set_pull_function(gnutls_session_t session,
  * @gnutls_pull_timeout_func is of the form,
  * int (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);
  *
+ * This callback is necessary when gnutls_handshake_set_timeout() or 
+ * gnutls_record_set_timeout() are set. It will not be used when 
+ * non-blocking sockets are in use. That is, this function will
+ * not operate when %GNUTLS_NONBLOCK is specified in gnutls_init(), 
+ * or a custom pull function is registered without updating the 
+ * pull timeout function.
+ *
  * The helper function gnutls_system_recv_timeout() is provided to
- * simplify writing callbacks. This callback is not used when
- * using non-blocking sockets.
+ * simplify writing callbacks. 
  *
  * Since: 3.0
  **/

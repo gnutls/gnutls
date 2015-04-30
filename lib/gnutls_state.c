@@ -290,8 +290,8 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
  *
  * @flags can be one of %GNUTLS_CLIENT and %GNUTLS_SERVER. For a DTLS
  * entity, the flags %GNUTLS_DATAGRAM and  %GNUTLS_NONBLOCK are
- * also available. The latter flag will enable a non-blocking
- * operation of the DTLS timers. 
+ * also available. The latter flag will indicated non-blocking
+ * operation of the sockets provided to gnutls.
  *
  * The flag %GNUTLS_NO_REPLAY_PROTECTION will disable any 
  * replay protection in DTLS mode. That must only used when 
@@ -399,9 +399,9 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	}
 
 	if (flags & GNUTLS_NONBLOCK)
-		(*session)->internals.dtls.blocking = 0;
+		(*session)->internals.blocking = 0;
 	else
-		(*session)->internals.dtls.blocking = 1;
+		(*session)->internals.blocking = 1;
 
 	/* Enable useful extensions */
 	if ((flags & GNUTLS_CLIENT) && !(flags & GNUTLS_NO_EXTENSIONS)) {

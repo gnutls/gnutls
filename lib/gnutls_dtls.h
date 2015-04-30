@@ -52,7 +52,7 @@ void _dtls_reset_hsk_state(gnutls_session_t session);
       int _rr; \
       if (r != GNUTLS_E_INTERRUPTED) _rr = GNUTLS_E_AGAIN; \
       else _rr = r; \
-      if (session->internals.dtls.blocking != 0) \
+      if (session->internals.blocking != 0) \
         millisleep(50); \
       return gnutls_assert_val(_rr); \
     } \

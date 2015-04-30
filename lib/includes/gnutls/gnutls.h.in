@@ -321,7 +321,7 @@ typedef enum {
    * @GNUTLS_SERVER: Connection end is a server.
    * @GNUTLS_CLIENT: Connection end is a client.
    * @GNUTLS_DATAGRAM: Connection is datagram oriented (DTLS).
-   * @GNUTLS_NONBLOCK: Connection should not block (DTLS).
+   * @GNUTLS_NONBLOCK: Connection should not block.
    * @GNUTLS_NO_EXTENSIONS: Do not enable any TLS extensions by default.
    * @GNUTLS_NO_REPLAY_PROTECTION: Disable any replay protection in DTLS.
    *
