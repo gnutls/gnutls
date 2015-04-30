@@ -21,6 +21,9 @@ versions of mingw. Patch by Tim Kosse.
 ** libgnutls: Fix for MD5 downgrade in TLS 1.2 signatures. Reported by
 Karthikeyan Bhargavan.
 
+** libgnutls: Reverted: The gnutls_handshake() process will enforce a timeout
+by default. That caused issues with non-blocking programs.
+
 ** certtool: It can generate SHA256 key IDs.
 
 ** gnutls-cli: fixed crash in --benchmark-ciphers. Reported by James Cloos.
@@ -89,9 +92,6 @@ avoids the complexity of file descriptor handling and issues with
 applications closing all open file descriptors on startup.
 
 ** libgnutls: Use pthread_atfork() to detect fork when available.
-
-** libgnutls: The gnutls_handshake() process will enforce a timeout by
-default.
 
 ** libgnutls: If a key purpose (extended key usage) is specified for verification,
 it is applied into intermediate certificates. The verification result
