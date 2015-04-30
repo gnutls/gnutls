@@ -133,6 +133,7 @@ typedef struct {
 
 /* DTLS */
 #define DTLS_RECORD_WINDOW_SIZE 64
+#define DTLS_RETRANS_TIMEOUT 1000
 
 /* TLS Extensions */
 /* we can receive up to MAX_EXT_TYPES extensions.

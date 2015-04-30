@@ -384,6 +384,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	(*session)->internals.pull_func = system_read;
 	(*session)->internals.errno_func = system_errno;
 
+	/* heartbeat timeouts */
 	(*session)->internals.hb_retrans_timeout_ms = 1000;
 	(*session)->internals.hb_total_timeout_ms = 60000;
 
@@ -391,7 +392,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 		(*session)->internals.dtls.mtu = DTLS_DEFAULT_MTU;
 		(*session)->internals.transport = GNUTLS_DGRAM;
 
-		(*session)->internals.dtls.retrans_timeout_ms = 1000;
+		(*session)->internals.dtls.retrans_timeout_ms = DTLS_RETRANS_TIMEOUT;
 		(*session)->internals.dtls.total_timeout_ms = 60000;
 	} else {
 		(*session)->internals.transport = GNUTLS_STREAM;

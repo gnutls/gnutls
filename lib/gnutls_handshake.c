@@ -2617,7 +2617,7 @@ void
 gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 {
 	if (IS_DTLS(session)) {
-		gnutls_dtls_set_timeouts(session, 1000, ms);
+		gnutls_dtls_set_timeouts(session, DTLS_RETRANS_TIMEOUT, ms);
 		return;
 	}
 
