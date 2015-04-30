@@ -550,9 +550,6 @@ int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq)
  * The DTLS protocol recommends the values of 1 sec and 60 seconds
  * respectively.
  *
- * If the retransmission timeout is zero then the handshake will operate
- * in a non-blocking way, i.e., return %GNUTLS_E_AGAIN.
- *
  * To disable retransmissions set a @retrans_timeout larger than the @total_timeout.
  *
  * Since: 3.0
