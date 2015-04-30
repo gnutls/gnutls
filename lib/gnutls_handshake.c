@@ -2542,16 +2542,6 @@ int gnutls_handshake(gnutls_session_t session)
 		if (session->internals.priorities.protocol.algorithms == 0)
 			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
-		/* if no pull timeout has not been set, and a handshake timeout
-		 * is set, disable it */
-		if (unlikely((session->internals.pull_timeout_func == NULL || 
-		    (session->internals.pull_timeout_func == gnutls_system_recv_timeout && 
-                     session->internals.pull_func != system_read)) && 
-		     session->internals.handshake_timeout_ms != 0)) {
-			_gnutls_debug_log("Cannot enforce the handshake timeout; there is no pull_timeout function set.\n");
-			session->internals.handshake_timeout_ms = 0;
-		}
-
 		session->internals.handshake_in_progress = 1;
 		gettime(&session->internals.dtls.handshake_start_time);
 		if (session->internals.handshake_timeout_ms &&
@@ -2617,9 +2607,6 @@ int gnutls_handshake(gnutls_session_t session)
  * timeout, or %GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT for a reasonable
  * default value. For the DTLS protocol, the more detailed
  * gnutls_dtls_set_timeouts() is provided.
- *
- * The TLS handshake process always has the default timeout value since 
- * GnuTLS 3.4.0. To unset call this function with zero value.
  *
  * Since: 3.1.0
  **/
