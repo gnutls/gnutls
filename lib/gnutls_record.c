@@ -1741,6 +1741,9 @@ gnutls_record_recv_seq(gnutls_session_t session, void *data,
  * to the provided value. Use an @ms value of zero to disable
  * timeout (the default).
  *
+ * This function requires to set a pull timeout callback. See
+ * gnutls_transport_set_pull_timeout_function().
+ *
  * Since: 3.1.7
  **/
 void gnutls_record_set_timeout(gnutls_session_t session, unsigned int ms)

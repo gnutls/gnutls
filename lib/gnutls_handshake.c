@@ -2608,6 +2608,9 @@ int gnutls_handshake(gnutls_session_t session)
  * default value. For the DTLS protocol, the more detailed
  * gnutls_dtls_set_timeouts() is provided.
  *
+ * This function requires to set a pull timeout callback. See
+ * gnutls_transport_set_pull_timeout_function().
+ *
  * Since: 3.1.0
  **/
 void
