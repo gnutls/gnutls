@@ -34,7 +34,6 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/wait.h>
 #include "utils.h"
 
 #define SERVER_MTU  500
@@ -47,6 +46,8 @@ void doit(void)
 }
 
 #else
+
+#include <sys/wait.h>
 
 /* Tests whether packing multiple DTLS records in a single UDP packet
  * will be handled correctly.
