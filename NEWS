@@ -19,7 +19,7 @@ Fotis Loukos.
 versions of mingw. Patch by Tim Kosse.
 
 ** libgnutls: Fix for MD5 downgrade in TLS 1.2 signatures. Reported by
-Karthikeyan Bhargavan.
+Karthikeyan Bhargavan [GNUTLS-SA-2015-2].
 
 ** libgnutls: Reverted: The gnutls_handshake() process will enforce a timeout
 by default. That caused issues with non-blocking programs.
