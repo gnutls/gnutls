@@ -9,7 +9,7 @@ See the end for copying conditions.
 if a callback was used to send it.
 
 ** libgnutls: Fix for MD5 downgrade in TLS 1.2 signatures. Reported by
-Karthikeyan Bhargavan.
+Karthikeyan Bhargavan [GNUTLS-SA-2015-2].
 
 ** libgnutls: Check for invalid length in the X.509 version field. Without the check
 certificates with invalid length would be detected as having an arbitrary
