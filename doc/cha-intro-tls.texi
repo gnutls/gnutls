@@ -473,7 +473,7 @@ and is described in @xcite{RFC6520}. The extension is disabled by default and
 @funcref{gnutls_heartbeat_enable} can be used to enable it. A policy
 may be negotiated to only allow sending heartbeat messages or sending and receiving.
 The current session policy can be checked with @funcref{gnutls_heartbeat_allowed}. 
-The requests coming from the peer result to @code{GNUTLS_@-E_@-HERTBEAT_@-PING_@-RECEIVED}
+The requests coming from the peer result to @code{GNUTLS_@-E_@-HEARTBEAT_@-PING_@-RECEIVED}
 being returned from the receive function. Ping requests to peer can be send via
 @funcref{gnutls_heartbeat_ping}. 
 
