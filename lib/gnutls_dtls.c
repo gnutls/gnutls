@@ -290,7 +290,7 @@ int _dtls_transmit(gnutls_session_t session)
 		    timespec_sub_ms(&now,
 				    &session->internals.dtls.
 				    handshake_start_time);
-		if (diff >= session->internals.dtls.total_timeout_ms) {
+		if (diff >= session->internals.handshake_timeout_ms) {
 			_gnutls_dtls_log("Session timeout: %u ms\n", diff);
 			ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
 			goto end_flight;
@@ -559,7 +559,7 @@ void gnutls_dtls_set_timeouts(gnutls_session_t session,
 			      unsigned int total_timeout)
 {
 	session->internals.dtls.retrans_timeout_ms = retrans_timeout;
-	session->internals.dtls.total_timeout_ms = total_timeout;
+	session->internals.handshake_timeout_ms = total_timeout;
 }
 
 /**

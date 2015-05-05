@@ -42,7 +42,7 @@ void _dtls_reset_hsk_state(gnutls_session_t session);
   gettime(&_now); \
    \
   _diff = timespec_sub_ms(&_now, &session->internals.dtls.handshake_start_time); \
-  if (_diff > session->internals.dtls.total_timeout_ms) \
+  if (_diff > session->internals.handshake_timeout_ms) \
     { \
       _gnutls_dtls_log("Session timeout: %u ms\n", _diff); \
       return gnutls_assert_val(GNUTLS_E_TIMEDOUT); \

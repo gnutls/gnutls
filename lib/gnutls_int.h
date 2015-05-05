@@ -727,8 +727,6 @@ typedef struct {
 
 	/* the retransmission timeout in milliseconds */
 	unsigned int retrans_timeout_ms;
-	/* the connection timeout in milliseconds */
-	unsigned int total_timeout_ms;
 
 	unsigned int hsk_hello_verify_requests;
 

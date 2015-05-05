@@ -392,8 +392,7 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 		(*session)->internals.dtls.mtu = DTLS_DEFAULT_MTU;
 		(*session)->internals.transport = GNUTLS_DGRAM;
 
-		(*session)->internals.dtls.retrans_timeout_ms = DTLS_RETRANS_TIMEOUT;
-		(*session)->internals.dtls.total_timeout_ms = 60000;
+		gnutls_dtls_set_timeouts(*session, DTLS_RETRANS_TIMEOUT, 60000);
 	} else {
 		(*session)->internals.transport = GNUTLS_STREAM;
 	}
