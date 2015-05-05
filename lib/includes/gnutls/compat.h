@@ -240,6 +240,9 @@ gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
 				gnutls_realloc_function realloc_func,
 				gnutls_free_function free_func) _GNUTLS_GCC_ATTR_DEPRECATED;
 
+/* defined in old headers - unused nevertheless */
+#define GNUTLS_SUPPLEMENTAL_USER_MAPPING_DATA 0
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 }
