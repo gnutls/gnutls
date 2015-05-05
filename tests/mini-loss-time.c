@@ -159,6 +159,7 @@ static void client(int fd)
 	while (ret < 0 && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	gnutls_deinit(session);
+	gnutls_anon_free_client_credentials(anoncred);
 	gnutls_global_deinit();
 
 	if (ret < 0) {
@@ -193,7 +194,6 @@ static void server(int fd, int packet)
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
-
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
 	gnutls_dtls_set_timeouts(session, 1 * 1000, 30 * 1000);
@@ -219,6 +219,7 @@ static void server(int fd, int packet)
 	while (ret < 0 && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
 	gnutls_deinit(session);
+	gnutls_anon_free_server_credentials(anoncred);
 	gnutls_global_deinit();
 
 	if (ret < 0) {
