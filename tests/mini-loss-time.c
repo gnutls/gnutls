@@ -116,7 +116,7 @@ push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 	return send(fd, data, len, 0);
 }
 
-static void client(int fd, int packet)
+static void client(int fd)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
@@ -136,7 +136,7 @@ static void client(int fd, int packet)
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
-	gnutls_dtls_set_timeouts(session, 1 * 1000, 60 * 1000);
+	gnutls_dtls_set_timeouts(session, 1 * 1000, 30 * 1000);
 
 	/* Use default priorities */
 	gnutls_priority_set_direct(session,
@@ -148,10 +148,8 @@ static void client(int fd, int packet)
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
 
 	counter = 0;
-	packet_to_lose = packet;
 
 	gnutls_transport_set_int(session, fd);
-	gnutls_transport_set_push_function(session, push);
 
 	/* Perform the TLS handshake
 	 */
@@ -164,10 +162,12 @@ static void client(int fd, int packet)
 	gnutls_global_deinit();
 
 	if (ret < 0) {
-		if (ret == GNUTLS_E_TIMEDOUT)
+		if (ret == GNUTLS_E_TIMEDOUT) {
+			if (debug)
+				success("client: received timeout\n");
 			return;
-		if (debug)
-			success("client: Handshake failed with unexpected reason: %s\n", gnutls_strerror(ret));
+		}
+		fail("client: Handshake failed with unexpected reason: %s\n", gnutls_strerror(ret));
 	} else {
 		fail("client: Handshake was completed (unexpected)\n");
 	}
@@ -196,6 +196,7 @@ static void server(int fd, int packet)
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
 	gnutls_dtls_set_mtu(session, 1500);
+	gnutls_dtls_set_timeouts(session, 1 * 1000, 30 * 1000);
 
 	/* avoid calling all the priority functions, since the defaults
 	 * are adequate.
@@ -221,22 +222,32 @@ static void server(int fd, int packet)
 	gnutls_global_deinit();
 
 	if (ret < 0) {
+		if (ret == GNUTLS_E_TIMEDOUT) {
+			if (debug)
+				success("server received timeout\n");
+			return;
+		}
+		fail("server: Handshake failed with unexpected reason: %s\n", gnutls_strerror(ret));
+	} else {
+		fail("server: Handshake was completed (unexpected)\n");
+	}
+
+	if (ret < 0) {
 		return;
 	}
 }
 
-static void start(int server_packet, int client_packet)
+static void start(int server_packet, int wait_server)
 {
 	int fd[2];
 	int ret;
 
 	if (debug)
-		fprintf(stderr, "\nWill discard %s packet %d\n",
-			(client_packet != -1) ? "client" : "server",
-			(client_packet !=
-			 -1) ? client_packet : server_packet);
+		fprintf(stderr, "\nWill discard server packet %d\n",
+			server_packet);
 
-	ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
+	/* we need dgram in this test */
+	ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
 	if (ret < 0) {
 		perror("socketpair");
 		exit(1);
@@ -252,12 +263,18 @@ static void start(int server_packet, int client_packet)
 	if (child) {
 		/* parent */
 		close(fd[0]);
-		client(fd[1], client_packet);
+		if (wait_server)
+			server(fd[1], server_packet);
+		else
+			client(fd[1]);
 		close(fd[1]);
 		kill(child, SIGTERM);
 	} else {
 		close(fd[1]);
-		server(fd[0], server_packet);
+		if (wait_server)
+			client(fd[0]);
+		else
+			server(fd[0], server_packet);
 		close(fd[0]);
 		exit(0);
 	}
@@ -282,17 +299,33 @@ void doit(void)
 
 	for (;tries>=0;tries--) {
 		tstart = time(0);
-		start(2, -1);
+		start(2, 0);
 
 		tstop = time(0);
 
 		tstop = tstop - tstart;
 
-		if (!(tstop < 70 && tstop > 55)) {
+		if (!(tstop < 40 && tstop > 25)) {
 			if (tries == 0)
-				fail("Time difference: %u\n", (unsigned) tstop);
+				fail("Client wait time difference: %u\n", (unsigned) tstop);
 			else if (debug)
-				success("Time difference: %u\n", (unsigned) tstop);
+				success("Client wait time difference: %u\n", (unsigned) tstop);
+		} else break;
+	}
+
+	for (;tries>=0;tries--) {
+		tstart = time(0);
+		start(2, 1);
+
+		tstop = time(0);
+
+		tstop = tstop - tstart;
+
+		if (!(tstop < 40 && tstop > 25)) {
+			if (tries == 0)
+				fail("Server wait time difference: %u\n", (unsigned) tstop);
+			else if (debug)
+				success("Server wait time difference: %u\n", (unsigned) tstop);
 		} else break;
 	}
 }
