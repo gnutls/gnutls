@@ -34,8 +34,8 @@ fi
 
 echo ""
 echo "*** Testing good HTTPS hosts ***"
-# www.vulcano.cl 
-HOSTS="good.dane.verisignlabs.com www.freebsd.org www.kumari.net torproject.org fedoraproject.org dane.nox.su"
+# www.vulcano.cl dane.nox.su 
+HOSTS="good.dane.verisignlabs.com www.freebsd.org www.kumari.net torproject.org fedoraproject.org"
 HOSTS="$HOSTS nohats.ca"
 for i in $HOSTS;do
 echo -n "$i: "
