@@ -2543,10 +2543,10 @@ int gnutls_handshake(gnutls_session_t session)
 			return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
 		session->internals.handshake_in_progress = 1;
-		gettime(&session->internals.dtls.handshake_start_time);
+		gettime(&session->internals.handshake_start_time);
 		if (session->internals.handshake_timeout_ms &&
 		    session->internals.handshake_endtime == 0)
-			    session->internals.handshake_endtime = session->internals.dtls.handshake_start_time.tv_sec +
+			    session->internals.handshake_endtime = session->internals.handshake_start_time.tv_sec +
 			    	session->internals.handshake_timeout_ms / 1000;
 	}
 

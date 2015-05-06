@@ -730,9 +730,6 @@ typedef struct {
 
 	unsigned int hsk_hello_verify_requests;
 
-	/* starting time of current handshake */
-	struct timespec handshake_start_time;
-
 	/* The actual retrans_timeout for the next message (e.g. doubled or so) 
 	 */
 	unsigned int actual_retrans_timeout_ms;
@@ -970,6 +967,9 @@ typedef struct {
 
 	unsigned int cb_tls_unique_len;
 	unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
+
+	/* starting time of current handshake */
+	struct timespec handshake_start_time;
 
 	time_t handshake_endtime;	/* end time in seconds */
 	unsigned int handshake_timeout_ms;	/* timeout in milliseconds */
