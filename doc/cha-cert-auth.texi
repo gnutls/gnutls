@@ -80,6 +80,7 @@ acceptable.  The framework is illustrated on @ref{fig-x509}.
 @menu
 * X.509 certificate structure::
 * Importing an X.509 certificate::
+* X.509 certificate names::
 * X.509 distinguished names::
 * X.509 extensions::
 * X.509 public and private keys::
@@ -165,6 +166,25 @@ and import the following two functions are provided.
 In all cases after use a certificate must be deinitialized using @funcref{gnutls_x509_crt_deinit}.
 Note that although the functions above apply to @code{gnutls_x509_crt_t} structure, similar functions
 exist for the CRL structure @code{gnutls_x509_crl_t}.
+
+@node X.509 certificate names
+@subsubsection X.509 certificate names
+@cindex X.509 certificate name
+
+X.509 certificates allow for multiple names and types of names to be specified.
+CA certificates often rely on X.509 distinguished names (see @ref{X.509 distinguished names})
+for unique identification, while end-user and server certificates rely on the
+'subject alternative names'. The subject alternative names provide a typed name, e.g.,
+a DNS name, or an email address, which identifies the owner of the certificate.
+The following functions provide access to that names.
+
+@showfuncB{gnutls_x509_crt_get_subject_alt_name2,gnutls_x509_crt_set_subject_alt_name}
+@showfuncC{gnutls_subject_alt_names_init,gnutls_subject_alt_names_get,gnutls_subject_alt_names_set}
+
+Note however, that server certificates often used the Common Name (CN), part of the
+certificate DistinguishedName to place a single DNS address. That practice is discouraged
+(see @xcite{RFC6125}), because only a single address can be specified, and the CN field is
+free-form making matching ambiguous.
 
 @node X.509 distinguished names
 @subsubsection X.509 distinguished names
