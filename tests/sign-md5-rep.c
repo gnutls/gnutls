@@ -166,6 +166,7 @@ static void client(int fd)
 	}
 
 	if (ret < 0) {
+		terminate();
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
 		exit(1);
 	} else {
@@ -174,6 +175,7 @@ static void client(int fd)
 	}
 
 	if (gnutls_sign_algorithm_get(session) == GNUTLS_SIGN_RSA_MD5) {
+		terminate();
 		fail("client: MD5 was negotiated\n");
 		exit(1);
 	}
@@ -197,10 +199,9 @@ static void client(int fd)
 			    ("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
-		if (ret != 0) {
-			fail("client: Error: %s\n", gnutls_strerror(ret));
-			exit(1);
-		}
+		terminate();
+		fail("client: Error: %s\n", gnutls_strerror(ret));
+		exit(1);
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
@@ -232,7 +233,6 @@ static void server(int fd)
 	char buffer[MAX_BUF + 1];
 	gnutls_session_t session;
 	gnutls_certificate_credentials_t x509_cred;
-	unsigned to_send = sizeof(buffer)/4;
 
 	/* this must be called once in the program
 	 */
@@ -264,13 +264,9 @@ static void server(int fd)
 		ret = gnutls_handshake(session);
 	} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 	if (ret < 0) {
-		close(fd);
-		gnutls_deinit(session);
-		fail("server: Handshake has failed (%s)\n\n",
-		     gnutls_strerror(ret));
-		terminate();
+		/* failure is expected here */
+		goto end;
 	}
-
 
 	if (debug) {
 		success("server: Handshake was completed\n");
@@ -282,28 +278,11 @@ static void server(int fd)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	do {
-		do {
-			ret =
-			    gnutls_record_send(session, buffer,
-					       sizeof(buffer));
-		} while (ret == GNUTLS_E_AGAIN
-			 || ret == GNUTLS_E_INTERRUPTED);
-
-		if (ret < 0) {
-			fail("Error sending %d byte packet: %s\n", to_send,
-			     gnutls_strerror(ret));
-			terminate();
-		}
-		to_send++;
-	}
-	while (to_send < 64);
-
-	to_send = -1;
 	/* do not wait for the peer to close the connection.
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
+ end:
 	close(fd);
 	gnutls_deinit(session);
 
