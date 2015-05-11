@@ -1340,11 +1340,11 @@ gnutls_certificate_get_trust_list(gnutls_certificate_credentials_t res,
  * certificate/key pairs).
  *
  * This function can also accept URLs at @keyfile and @certfile. In that case it
- * will import the private key and certificate indicated by the URLs. Note
+ * will use the private key and certificate indicated by the URLs. Note
  * that the supported URLs are the ones indicated by gnutls_url_is_supported().
  *
  * In case the @certfile is provided as a PKCS #11 URL, then the certificate, and its
- * present issuers in the token are are imported (i.e., the required trust chain).
+ * present issuers in the token are imported (i.e., forming the required trust chain).
  *
  * If that function fails to load the @res structure is at an undefined state, it must
  * not be reused to load other keys or certificates.
@@ -1386,13 +1386,13 @@ gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t res,
  * certificate/key pairs).
  *
  * This function can also accept URLs at @keyfile and @certfile. In that case it
- * will import the private key and certificate indicated by the URLs. Note
+ * will use the private key and certificate indicated by the URLs. Note
  * that the supported URLs are the ones indicated by gnutls_url_is_supported().
  * Before GnuTLS 3.4.0 when a URL was specified, the @pass part was ignored and a
  * PIN callback had to be registered, this is no longer the case in current releases.
  *
  * In case the @certfile is provided as a PKCS #11 URL, then the certificate, and its
- * present issuers in the token are are imported (i.e., the required trust chain).
+ * present issuers in the token are imported (i.e., forming the required trust chain).
  *
  * If that function fails to load the @res structure is at an undefined state, it must
  * not be reused to load other keys or certificates.
