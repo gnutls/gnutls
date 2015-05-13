@@ -40,8 +40,11 @@ noinst_LTLIBRARIES = libcrypto.la
 
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c init.c egd.c egd.h \
 	gnettle.h rnd-common.h rnd-common.c \
-	int/gcm-camellia.h int/gcm-camellia.c \
 	rnd.c
+
+if !USE_NETTLE3
+libcrypto_la_SOURCES += int/gcm-camellia.h int/gcm-camellia.c
+endif
 
 if ENABLE_FIPS140
 libcrypto_la_SOURCES += rnd-fips.c int/drbg-aes-self-test.c \

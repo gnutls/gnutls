@@ -113,7 +113,11 @@ void x86_sha1_update(struct sha1_ctx *ctx, size_t length,
 		sha1_block_data_order(&octx, data, t2);
 
 		for (i=0;i<t2;i++)
+#ifdef USE_NETTLE3
+			ctx->count++;
+#else
 			MD_INCR(ctx);
+#endif
 		data += length;
 	}
 
@@ -166,7 +170,11 @@ void x86_sha256_update(struct sha256_ctx *ctx, size_t length,
 		sha256_block_data_order(&octx, data, t2);
 		
 		for (i=0;i<t2;i++)
+#ifdef USE_NETTLE3
+			ctx->count++;
+#else
 			MD_INCR(ctx);
+#endif
 		data += length;
 	}
 

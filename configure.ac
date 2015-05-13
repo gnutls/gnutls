@@ -837,6 +837,7 @@ AC_MSG_NOTICE([summary of build options:
   Local libopts:        ${enable_local_libopts}
   Local libtasn1:       ${included_libtasn1}
   Use nettle-mini:      ${mini_nettle}
+  nettle-version:       ${nettle_version}
 ])
 
 AC_MSG_NOTICE([External hardware support:

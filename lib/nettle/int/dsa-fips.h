@@ -31,6 +31,10 @@
 
 #define MAX_PVP_SEED_SIZE 256
 
+#ifdef USE_NETTLE3
+# define dsa_public_key dsa_params
+#endif
+
 #define div_ceil(x,y) ((x+(y)-1)/(y))
 
 struct dss_params_validation_seeds {
@@ -63,7 +67,12 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 
 int
 dsa_generate_dss_keypair(struct dsa_public_key *pub,
+#ifdef USE_NETTLE3
+		     mpz_t y,
+		     mpz_t x,
+#else
 		     struct dsa_private_key *key,
+#endif
 		     void *random_ctx, nettle_random_func *random,
 		     void *progress_ctx, nettle_progress_func *progress);
 
@@ -99,7 +108,12 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 
 void
 _dsa_generate_dss_xy(struct dsa_public_key *pub,
+#ifdef USE_NETTLE3
+		     mpz_t y,
+		     mpz_t x,
+#else
 		     struct dsa_private_key *key,
+#endif
 		     void *random_ctx, nettle_random_func *random);
 
 #define DIGEST_SIZE SHA384_DIGEST_SIZE

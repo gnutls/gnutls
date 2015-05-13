@@ -94,7 +94,11 @@ padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 			aes_set_decrypt_key(&nc, keysize, userkey);
 
 		memcpy(pce->ks.rd_key, nc.keys, sizeof(nc.keys));
+#ifdef USE_NETTLE3
+		pce->ks.rounds = nc.rounds;
+#else
 		pce->ks.rounds = nc.nrounds;
+#endif
 
 		pce->cword.b.keygen = 1;
 		break;

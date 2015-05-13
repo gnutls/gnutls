@@ -89,7 +89,11 @@ _dsa_validate_dss_g(struct dsa_public_key *pub,
 	}
 
 	mpz_init(r);
+#ifdef USE_NETTLE3
+	dsa_params_init(&pub2);
+#else
 	dsa_public_key_init(&pub2);
+#endif
 
 	mpz_set(pub2.p, pub->p);
 	mpz_set(pub2.q, pub->q);
@@ -132,7 +136,11 @@ _dsa_validate_dss_g(struct dsa_public_key *pub,
 	ret = 0;
 
  finish:
+#ifdef USE_NETTLE3
+	dsa_params_clear(&pub2);
+#else
 	dsa_public_key_clear(&pub2);
+#endif
 	mpz_clear(r);
 
 	return ret;
@@ -158,7 +166,11 @@ _dsa_validate_dss_pq(struct dsa_public_key *pub,
 
 	mpz_init(r);
 	mpz_init(s);
+#ifdef USE_NETTLE3
+	dsa_params_init(&pub2);
+#else
 	dsa_public_key_init(&pub2);
+#endif
 
 	nettle_mpz_set_str_256_u(s, cert->seed_length, cert->seed);
 
@@ -235,7 +247,11 @@ _dsa_validate_dss_pq(struct dsa_public_key *pub,
 	ret = 0;
 
  finish:
+#ifdef USE_NETTLE3
+	dsa_params_clear(&pub2);
+#else
 	dsa_public_key_clear(&pub2);
+#endif
 	mpz_clear(r);
 	mpz_clear(s);
 

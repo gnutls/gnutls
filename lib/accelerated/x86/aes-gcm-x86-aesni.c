@@ -43,15 +43,38 @@
  */
 struct gcm_x86_aes_ctx GCM_CTX(AES_KEY);
 
+#ifdef USE_NETTLE3
+static void x86_aes_encrypt(void *_ctx,
+				size_t length, uint8_t * dst,
+				const uint8_t * src)
+#else
 static void x86_aes_encrypt(void *_ctx,
 				unsigned length, uint8_t * dst,
 				const uint8_t * src)
+#endif
 {
 	AES_KEY *ctx = _ctx;
 
 	aesni_ecb_encrypt(src, dst, 16, ctx, 1);
 }
 
+#ifdef USE_NETTLE3
+static void x86_aes128_set_encrypt_key(void *_ctx,
+ 					const uint8_t * key)
+{
+	AES_KEY *ctx = _ctx;
+ 
+	aesni_set_encrypt_key(key, 16*8, ctx);
+}
+
+static void x86_aes256_set_encrypt_key(void *_ctx,
+ 					const uint8_t * key)
+{
+	AES_KEY *ctx = _ctx;
+ 
+	aesni_set_encrypt_key(key, 32*8, ctx);
+}
+#else
 static void x86_aes_set_encrypt_key(void *_ctx,
 					unsigned length,
 					const uint8_t * key)
@@ -60,6 +83,7 @@ static void x86_aes_set_encrypt_key(void *_ctx,
 
 	aesni_set_encrypt_key(key, length*8, ctx);
 }
+#endif
 
 static int
 aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
@@ -79,6 +103,23 @@ aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
 	return 0;
 }
 
+#ifdef USE_NETTLE3
+static int
+aes_gcm_cipher_setkey(void *_ctx, const void *key, size_t length)
+{
+	struct gcm_x86_aes_ctx *ctx = _ctx;
+
+	if (length == 16) {
+		GCM_SET_KEY(ctx, x86_aes128_set_encrypt_key, x86_aes_encrypt,
+			    key);
+	} else if (length == 32) {
+		GCM_SET_KEY(ctx, x86_aes256_set_encrypt_key, x86_aes_encrypt,
+			    key);
+	} else abort();
+
+	return 0;
+}
+#else
 static int
 aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
@@ -89,7 +130,7 @@ aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 
 	return 0;
 }
-
+#endif
 static int aes_gcm_setiv(void *_ctx, const void *iv, size_t iv_size)
 {
 	struct gcm_x86_aes_ctx *ctx = _ctx;

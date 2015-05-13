@@ -331,6 +331,25 @@ _dsa_generate_dss_g(struct dsa_public_key *pub,
 
 /* Generates the public and private DSA (or DH) keys
  */
+#ifdef USE_NETTLE3
+void
+_dsa_generate_dss_xy(struct dsa_params *params,
+		     mpz_t y, mpz_t x,
+		     void *random_ctx, nettle_random_func * random)
+{
+ 	mpz_t r;
+ 
+ 	mpz_init(r);
+	mpz_set(r, params->q);
+ 	mpz_sub_ui(r, r, 2);
+	nettle_mpz_random(x, random_ctx, random, r);
+	mpz_add_ui(x, x, 1);
+ 
+	mpz_powm(y, params->g, x, params->p);
+ 
+	mpz_clear(r);
+}
+#else
 void
 _dsa_generate_dss_xy(struct dsa_public_key *pub,
 		     struct dsa_private_key *key,
@@ -348,6 +367,7 @@ _dsa_generate_dss_xy(struct dsa_public_key *pub,
 
 	mpz_clear(r);
 }
+#endif
 
 /* This generates p, q, g params using the algorithms from FIPS 186-4.
  * For p, q, the Shawe-Taylor algorithm is used.
@@ -406,11 +426,20 @@ dsa_generate_dss_pqg(struct dsa_public_key *pub,
 
 int
 dsa_generate_dss_keypair(struct dsa_public_key *pub,
+#ifdef USE_NETTLE3
+			 mpz_t y,
+			 mpz_t x,
+#else
 			 struct dsa_private_key *key,
+#endif
 			 void *random_ctx, nettle_random_func * random,
 			 void *progress_ctx, nettle_progress_func * progress)
 {
+#ifdef USE_NETTLE3
+	_dsa_generate_dss_xy(pub, y, x, random_ctx, random);
+#else
 	_dsa_generate_dss_xy(pub, key, random_ctx, random);
+#endif
 
 	if (progress)
 		progress(progress_ctx, '\n');

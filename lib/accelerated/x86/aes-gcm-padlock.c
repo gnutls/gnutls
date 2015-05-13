@@ -45,11 +45,16 @@
  */
 struct gcm_padlock_aes_ctx GCM_CTX(struct padlock_ctx);
 
+#ifdef USE_NETTLE3
+static void padlock_aes_encrypt(const void *_ctx,
+				size_t length, uint8_t * dst,
+#else
 static void padlock_aes_encrypt(void *_ctx,
 				unsigned length, uint8_t * dst,
+#endif
 				const uint8_t * src)
 {
-	struct padlock_ctx *ctx = _ctx;
+	struct padlock_ctx *ctx = (void*)_ctx;
 	struct padlock_cipher_data *pce;
 
 	pce = ALIGN16(&ctx->expanded_key);
@@ -58,6 +63,25 @@ static void padlock_aes_encrypt(void *_ctx,
 		padlock_ecb_encrypt(dst, src, pce, length);
 }
 
+
+#ifdef USE_NETTLE3
+static void padlock_aes128_set_encrypt_key(struct padlock_ctx *_ctx,
+					const uint8_t * key)
+{
+	struct padlock_ctx *ctx = _ctx;
+	ctx->enc = 1;
+
+	padlock_aes_cipher_setkey(_ctx, key, 16);
+}
+static void padlock_aes256_set_encrypt_key(struct padlock_ctx *_ctx,
+					const uint8_t * key)
+{
+	struct padlock_ctx *ctx = _ctx;
+	ctx->enc = 1;
+
+	padlock_aes_cipher_setkey(_ctx, key, 32);
+}
+#else
 static void padlock_aes_set_encrypt_key(struct padlock_ctx *_ctx,
 					unsigned length,
 					const uint8_t * key)
@@ -67,6 +91,7 @@ static void padlock_aes_set_encrypt_key(struct padlock_ctx *_ctx,
 
 	padlock_aes_cipher_setkey(_ctx, key, length);
 }
+#endif
 
 static void aes_gcm_deinit(void *_ctx)
 {
@@ -94,6 +119,23 @@ aes_gcm_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx,
 	return 0;
 }
 
+#ifdef USE_NETTLE3
+static int
+aes_gcm_cipher_setkey(void *_ctx, const void *key, size_t keysize)
+{
+	struct gcm_padlock_aes_ctx *ctx = _ctx;
+ 
+	if (keysize == 16) {
+		GCM_SET_KEY(ctx, padlock_aes128_set_encrypt_key, padlock_aes_encrypt,
+			    key);
+	} else if (keysize == 32) {
+		GCM_SET_KEY(ctx, padlock_aes256_set_encrypt_key, padlock_aes_encrypt,
+			    key);
+	} else abort();
+
+	return 0;
+}
+#else
 static int
 aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
@@ -104,6 +146,7 @@ aes_gcm_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 
 	return 0;
 }
+#endif
 
 static int aes_gcm_setiv(void *_ctx, const void *iv, size_t iv_size)
 {

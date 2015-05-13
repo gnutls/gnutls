@@ -61,10 +61,10 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
   AC_SUBST(DLL_VERSION)
 
-  PKG_CHECK_MODULES(NETTLE, [nettle >= 2.7 nettle < 3.0], [cryptolib="nettle"], [
+  PKG_CHECK_MODULES(NETTLE, [nettle >= 2.7], [cryptolib="nettle"], [
 AC_MSG_ERROR([[
   *** 
-  *** Libnettle 2.7.1 was not found. Note that this version of gnutls doesn't support nettle 3.0.
+  *** Libnettle 2.7.1 was not found.
 ]])
   ])
   PKG_CHECK_MODULES(HOGWEED, [hogweed >= 2.7], [], [
@@ -75,6 +75,15 @@ AC_MSG_ERROR([[
   ])
   AM_CONDITIONAL(ENABLE_NETTLE, test "$cryptolib" = "nettle")
   AC_DEFINE([HAVE_LIBNETTLE], 1, [nettle is enabled])
+  nettle_version=`$PKG_CONFIG --modversion nettle`
+
+  if $PKG_CONFIG --atleast-version=3.0 nettle; then
+        AC_DEFINE([USE_NETTLE3], 1, [nettle 3.0 or later])
+	use_nettle3=yes
+  else
+	use_nettle3=no
+  fi
+  AM_CONDITIONAL(USE_NETTLE3, test "$use_nettle3" = "yes")
 
   GNUTLS_REQUIRES_PRIVATE="Requires.private: nettle, hogweed"
 
