@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: DTLS blocking API is more robust against infinite blocking,
 and will notify of more possible timeouts.
 
+** libgnutls: corrected regression with Camellia-256-GCM cipher. Reported
+by Manuel Pegourie-Gonnard.
+
 ** API and ABI modifications:
 No changes since last version.
 
