@@ -30,6 +30,7 @@
 #include <nettle/sha.h>
 #include <nettle/hmac.h>
 #include <nettle/macros.h>
+#include <nettle/memxor.h>
 #include <aes-padlock.h>
 #include <sha-padlock.h>
 #include <algorithms.h>

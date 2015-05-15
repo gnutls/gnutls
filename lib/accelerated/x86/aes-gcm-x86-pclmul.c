@@ -31,6 +31,7 @@
 #include <gnutls_errors.h>
 #include <aes-x86.h>
 #include <x86-common.h>
+#include <nettle/memxor.h>
 #include <byteswap.h>
 
 #define GCM_BLOCK_SIZE 16
