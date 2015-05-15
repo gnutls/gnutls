@@ -1402,9 +1402,13 @@ static void tcp_server(const char *name, int port)
 						} else {
 							j->http_state = HTTP_STATE_CLOSING;
 							if (r < 0) {
+								int ret;
 								check_alert(j->tls_session, r);
 								fprintf(stderr,
 								     "Error while receiving data\n");
+								do {
+									ret = gnutls_alert_send_appropriate(j->tls_session, r);
+								} while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 								GERR(r);
 							}
 						}
