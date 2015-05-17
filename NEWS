@@ -11,6 +11,9 @@ and will notify of more possible timeouts.
 ** libgnutls: corrected regression with Camellia-256-GCM cipher. Reported
 by Manuel Pegourie-Gonnard.
 
+** libgnutls: Introduced the GNUTLS_NO_SIGNAL flag to gnutls_init(). That
+allows to disable SIGPIPE for writes done within gnutls.
+
 ** API and ABI modifications:
 No changes since last version.
 
