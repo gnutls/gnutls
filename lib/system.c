@@ -110,15 +110,30 @@ int system_errno(gnutls_transport_ptr_t ptr)
 	return errno;
 }
 
+#ifdef MSG_NOSIGNAL
+ssize_t
+system_writev_nosignal(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
+	      int iovec_cnt)
+{
+	struct msghdr hdr;
+
+	memset(&hdr, 0, sizeof(hdr));
+	hdr.msg_iov = (struct iovec *)iovec;
+	hdr.msg_iovlen = iovec_cnt;
+
+	return sendmsg(GNUTLS_POINTER_TO_INT(ptr), &hdr, MSG_NOSIGNAL);
+}
+#endif
+
 ssize_t
 system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 	      int iovec_cnt)
 {
 	return writev(GNUTLS_POINTER_TO_INT(ptr), (struct iovec *) iovec,
 		      iovec_cnt);
-
 }
 #endif
+
 
 ssize_t
 system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)

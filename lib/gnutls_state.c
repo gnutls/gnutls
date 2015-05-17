@@ -288,10 +288,8 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
  * be allocated.  This function allocates structures which can only
  * be free'd by calling gnutls_deinit().  Returns %GNUTLS_E_SUCCESS (0) on success.
  *
- * @flags can be one of %GNUTLS_CLIENT and %GNUTLS_SERVER. For a DTLS
- * entity, the flags %GNUTLS_DATAGRAM and  %GNUTLS_NONBLOCK are
- * also available. The latter flag will indicated non-blocking
- * operation of the sockets provided to gnutls.
+ * @flags can be one of %GNUTLS_CLIENT, %GNUTLS_SERVER, %GNUTLS_DATAGRAM,
+ * %GNUTLS_NONBLOCK or %GNUTLS_NOSIGNAL (since 3.4.2).
  *
  * The flag %GNUTLS_NO_REPLAY_PROTECTION will disable any 
  * replay protection in DTLS mode. That must only used when 
@@ -376,7 +374,12 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	(*session)->internals.priorities.sr = SR_PARTIAL;
 
 #ifdef HAVE_WRITEV
-	gnutls_transport_set_vec_push_function(*session, system_writev);
+#ifdef MSG_NOSIGNAL
+	if (flags & GNUTLS_NO_SIGNAL)
+		gnutls_transport_set_vec_push_function(*session, system_writev_nosignal);
+	else
+#endif
+		gnutls_transport_set_vec_push_function(*session, system_writev);
 #else
 	gnutls_transport_set_push_function(*session, system_write);
 #endif
