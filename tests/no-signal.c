@@ -54,11 +54,15 @@ void sigpipe(int sig)
 	exit(1);
 }
 
+#define BUF_SIZE 64
+
 static void client(int fd)
 {
 	int ret;
 	gnutls_anon_client_credentials_t anoncred;
 	gnutls_session_t session;
+	char buf[BUF_SIZE];
+	char buf2[BUF_SIZE];
 	/* Need to enable anonymous KX specifically. */
 
 	global_init();
@@ -92,6 +96,20 @@ static void client(int fd)
 	}
 	while (ret < 0 && (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED));
 
+	ret = gnutls_record_recv(session, buf, sizeof(buf));
+	if (ret < 0 || ret != sizeof(buf)) {
+		kill(getppid(), SIGPIPE);
+		fail("client: recv failed");
+	}
+	if (debug)
+		success("client: received %d bytes\n", ret);
+
+	memset(buf2, 0, sizeof(buf));
+	if (memcmp(buf, buf2, sizeof(buf)) != 0) {
+		kill(getppid(), SIGPIPE);
+		fail("client: recv data failed");
+	}
+
 	close(fd);
 	gnutls_deinit(session);
 	gnutls_anon_free_client_credentials(anoncred);
@@ -114,7 +132,7 @@ static void server(int fd)
 	gnutls_anon_server_credentials_t anoncred;
 	gnutls_session_t session;
 	int ret;
-	char buf[64];
+	char buf[BUF_SIZE];
 	unsigned i;
 	/* this must be called once in the program
 	 */
