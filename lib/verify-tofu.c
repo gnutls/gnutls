@@ -641,7 +641,6 @@ gnutls_store_commitment(const char *db_name,
 			const gnutls_datum_t * hash,
 			time_t expiration, unsigned int flags)
 {
-	FILE *fd = NULL;
 	int ret;
 	char local_file[MAX_FILENAME];
 	const mac_entry_st *me = hash_to_entry(hash_algo);
@@ -677,9 +676,6 @@ gnutls_store_commitment(const char *db_name,
 		(gnutls_digest_algorithm_t)me->id, hash);
 
 	ret = 0;
-
-	if (fd != NULL)
-		fclose(fd);
 
 	return ret;
 }
