@@ -422,12 +422,11 @@ static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert,
 	}
 
 	rpubkey->data = gnutls_malloc(size);
-	if (rpubkey->data == NULL)
-		if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			ret = GNUTLS_E_MEMORY_ERROR;
-			gnutls_assert();
-			goto cleanup;
-		}
+	if (rpubkey->data == NULL) {
+		ret = GNUTLS_E_MEMORY_ERROR;
+		gnutls_assert();
+		goto cleanup;
+	}
 
 	ret =
 	    gnutls_pubkey_export(pubkey, GNUTLS_X509_FMT_DER,
