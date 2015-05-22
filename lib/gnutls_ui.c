@@ -124,6 +124,9 @@ void gnutls_dh_set_prime_bits(gnutls_session_t session, unsigned int bits)
  * anonymous and ephemeral Diffie-Hellman.  The output parameters must
  * be freed with gnutls_free().
  *
+ * Note, that the prime and generator are exported as non-negative
+ * integers and may include a leading zero byte.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  **/
@@ -188,6 +191,9 @@ gnutls_dh_get_group(gnutls_session_t session,
  * Diffie-Hellman key exchange.  This function should be used for both
  * anonymous and ephemeral Diffie-Hellman.  The output parameters must
  * be freed with gnutls_free().
+ *
+ * Note, that public key is exported as non-negative
+ * integer and may include a leading zero byte.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
