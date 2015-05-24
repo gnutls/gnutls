@@ -362,6 +362,9 @@ int gnutls_dh_get_prime_bits(gnutls_session_t session)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	if(dh->prime.size == 0)
+		return 0;
+
 	return mpi_buf2bits(&dh->prime);
 }
 
