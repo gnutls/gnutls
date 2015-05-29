@@ -306,6 +306,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Woverlength-strings"     # We use some in tests/
   nw="$nw -Wvla"                    # There is no point to avoid C99 variable length arrays
   nw="$nw -Wformat-nonliteral"      # Incompatible with gettext _()
+  nw="$nw -Wformat-signedness"      # Too many to handle
   nw="$nw -Wstrict-overflow"
   nw="$nw -Wmissing-noreturn"
   nw="$nw -Winline"                 # Too compiler dependent
