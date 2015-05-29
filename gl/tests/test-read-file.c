@@ -57,8 +57,7 @@ main (void)
               /* FILE1 is a regular file or a symlink to a regular file.  */
               if (len != statbuf.st_size)
                 {
-                  fprintf (stderr, "Read %lu from %s...\n",
-                           (unsigned long) len, FILE1);
+                  fprintf (stderr, "Read %ld from %s...\n", (unsigned long) len, FILE1);
                   err = 1;
                 }
             }
@@ -99,8 +98,7 @@ main (void)
              is not a regular file.  */
           if (len != 0)
             {
-              fprintf (stderr, "Read %lu from %s...\n",
-                       (unsigned long) len, FILE2);
+              fprintf (stderr, "Read %ld from %s...\n", (unsigned long) len, FILE2);
               err = 1;
             }
           free (out);
