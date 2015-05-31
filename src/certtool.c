@@ -3350,6 +3350,7 @@ void pkcs7_info(void)
 		fputs((void *) b64.data, outfile);
 		gnutls_free(b64.data);
 	}
+	gnutls_pkcs7_deinit(pkcs7);
 }
 
 void smime_to_pkcs7(void)
