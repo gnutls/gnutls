@@ -420,7 +420,7 @@ gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
  * encoded, depending on the certificate data.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. and a negative error code on error.
+ *   negative error value.
  *
  * Since: 3.1.10
  **/
@@ -564,7 +564,7 @@ gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
  * encoded, depending on the certificate data.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. and a negative error code on error.
+ *   negative error value.
  *
  * Since: 3.1.10
  **/
@@ -690,7 +690,7 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert)
  * This function will extract the signature field of a certificate.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value. and a negative error code on error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crt_get_signature(gnutls_x509_crt_t cert,
@@ -2452,6 +2452,34 @@ gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn,
 	ava->value.data = (void *) (ptr + lenlen);
 
 	return 0;
+}
+
+/**
+ * gnutls_x509_dn_get_str:
+ * @dn: a pointer to DN
+ * @str: a datum that will hold the name
+ *
+ * This function will allocate buffer and copy the name in the provided DN.
+ * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC4514. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.2
+ **/
+int
+gnutls_x509_dn_get_str(gnutls_x509_dn_t dn, gnutls_datum_t *str)
+{
+	ASN1_TYPE asn1 = dn;
+
+	if (dn == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn(asn1, "rdnSequence", str);
 }
 
 /**
