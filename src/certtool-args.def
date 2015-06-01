@@ -289,7 +289,7 @@ flag = {
 flag = {
     name      = p7-verify;
     descrip   = "Verify the provided PKCS #7 structure";
-    doc       = "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. no certificate list is provided, then the system's certificate list is used.";
+    doc       = "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. no certificate list is provided, then the system's certificate list is used. A key purpose can be enforced with the --verify-purpose option.";
 };
 
 

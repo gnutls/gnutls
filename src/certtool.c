@@ -2717,7 +2717,7 @@ void verify_crl(common_info_st * cinfo)
 	fprintf(outfile, "\n");
 }
 
-static void print_dn(const gnutls_datum_t *raw)
+static void print_dn(const char *prefix, const gnutls_datum_t *raw)
 {
 	gnutls_x509_dn_t dn = NULL;
 	gnutls_datum_t str = {NULL, 0};
@@ -2735,7 +2735,7 @@ static void print_dn(const gnutls_datum_t *raw)
 	if (ret < 0)
 		goto cleanup;
 
-	fprintf(stderr, "DN: %s\n", str.data);
+	fprintf(stderr, "%s: %s\n", prefix, str.data);
 
  cleanup:
  	gnutls_x509_dn_deinit(dn);
@@ -2792,17 +2792,17 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 		if (ret < 0)
 			break;
 
-		print_dn(&info.issuer_dn);
-		fprintf(stderr, "Algorithm: %s\n\n", gnutls_sign_get_name(info.algo));
+		print_dn("\tSigner's issuer DN", &info.issuer_dn);
+		fprintf(stderr, "\tSignature Algorithm: %s\n", gnutls_sign_get_name(info.algo));
 
 		gnutls_pkcs7_signature_info_deinit(&info);
 
 		ret = gnutls_pkcs7_verify(pkcs7, tl, vdata, vdata_size, i, NULL, 0);
 		if (ret < 0) {
-			fprintf(stderr, "Signature verification failed: %s\n", gnutls_strerror(ret));
+			fprintf(stderr, "\tSignature status: verification failed: %s\n", gnutls_strerror(ret));
 			ecode = 1;
 		} else {
-			fprintf(stderr, "Signature was verified\n");
+			fprintf(stderr, "\tSignature status: ok\n");
 			ecode = 0;
 		}
 	}
