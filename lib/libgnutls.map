@@ -1025,6 +1025,8 @@ GNUTLS_3_4
 	gnutls_pkcs11_privkey_generate3;
 	gnutls_x509_crt_get_pk_ecc_raw;
 	gnutls_x509_dn_get_str;
+	gnutls_pkcs11_get_raw_issuer_by_subject_key_id;
+	gnutls_x509_trust_list_get_issuer_by_subject_key_id;
  local:
 	*;
 };

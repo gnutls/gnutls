@@ -3754,6 +3754,98 @@ int gnutls_pkcs11_get_raw_issuer_by_dn (const char *url, const gnutls_datum_t *d
 }
 
 /**
+ * gnutls_pkcs11_get_raw_issuer_by_subject_key_id:
+ * @url: A PKCS 11 url identifying a token
+ * @dn: is the DN to search for (may be %NULL)
+ * @spki: is the subject key ID to search for
+ * @issuer: Will hold the issuer if any in an allocated buffer.
+ * @fmt: The format of the exported issuer.
+ * @flags: Use zero or flags from %GNUTLS_PKCS11_OBJ_FLAG.
+ *
+ * This function will return the certificate with the given DN and @spki, if it
+ * is stored in the token. By default only marked as trusted issuers
+ * are retuned. If any issuer should be returned specify
+ * %GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY in @flags.
+ *
+ * The name of the function includes issuer because it can
+ * be used to discover issuers of certificates.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.2
+ **/
+int gnutls_pkcs11_get_raw_issuer_by_subject_key_id (const char *url, 
+					const gnutls_datum_t *dn,
+					const gnutls_datum_t *spki,
+					gnutls_datum_t *issuer,
+					gnutls_x509_crt_fmt_t fmt,
+					unsigned int flags)
+{
+	int ret;
+	struct find_cert_st priv;
+	struct p11_kit_uri *info = NULL;
+
+	PKCS11_CHECK_INIT;
+
+	memset(&priv, 0, sizeof(priv));
+
+	if (url == NULL || url[0] == 0) {
+		url = "pkcs11:";
+	}
+
+	ret = pkcs11_url_to_info(url, &info, flags);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	if (dn) {
+		priv.dn.data = dn->data;
+		priv.dn.size = dn->size;
+	}
+
+	priv.key_id.data = spki->data;
+	priv.key_id.size = spki->size;
+
+	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY))
+		flags |= GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED;
+
+	priv.flags = flags;
+
+	ret = gnutls_pkcs11_obj_init(&priv.obj);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	priv.need_import = 1;
+
+	ret =
+	    _pkcs11_traverse_tokens(find_cert_cb, &priv, info,
+				    NULL, pkcs11_obj_flags_to_int(flags));
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_pkcs11_obj_export3(priv.obj, fmt, issuer);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = 0;
+
+      cleanup:
+	if (priv.obj)
+		gnutls_pkcs11_obj_deinit(priv.obj);
+	if (info)
+		p11_kit_uri_free(info);
+
+	return ret;
+}
+
+/**
  * gnutls_pkcs11_crt_is_known:
  * @url: A PKCS 11 url identifying a token
  * @cert: is the certificate to find issuer for

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2015 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -840,12 +841,15 @@ int trust_list_get_issuer(gnutls_x509_trust_list_t list,
 static
 int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 				      const gnutls_datum_t *dn,
+				      const gnutls_datum_t *spki,
 				      gnutls_x509_crt_t * issuer,
 				      unsigned int flags)
 {
 	int ret;
-	unsigned int i;
+	unsigned int i, j;
 	uint32_t hash;
+	uint8_t tmp[256];
+	size_t tmp_size;
 
 	hash =
 	    hash_pjw_bare(dn->data,
@@ -853,10 +857,38 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 	hash %= list->size;
 
 	for (i = 0; i < list->node[hash].trusted_ca_size; i++) {
-		ret = _gnutls_x509_compare_raw_dn(dn, &list->node[hash].trusted_cas[i]->raw_dn);
-		if (ret != 0) {
-			*issuer = crt_cpy(list->node[hash].trusted_cas[i]);
-			return 0;
+		if (dn) {
+			ret = _gnutls_x509_compare_raw_dn(dn, &list->node[hash].trusted_cas[i]->raw_dn);
+			if (ret != 0) {
+				if (spki && spki->size > 0) {
+					tmp_size = sizeof(tmp);
+
+					ret = gnutls_x509_crt_get_subject_key_id(list->node[hash].trusted_cas[i], tmp, &tmp_size, NULL);
+					if (ret < 0)
+						continue;
+					if (spki->size != tmp_size || memcmp(spki->data, tmp, spki->size) != 0)
+						continue;
+				}
+				*issuer = crt_cpy(list->node[hash].trusted_cas[i]);
+				return 0;
+			}
+		} else if (spki) {
+			/* search everything! */
+			for (i = 0; i < list->size; i++) {
+				for (j = 0; j < list->node[i].trusted_ca_size; j++) {
+					tmp_size = sizeof(tmp);
+
+					ret = gnutls_x509_crt_get_subject_key_id(list->node[i].trusted_cas[j], tmp, &tmp_size, NULL);
+					if (ret < 0)
+						continue;
+
+					if (spki->size != tmp_size || memcmp(spki->data, tmp, spki->size) != 0)
+						continue;
+
+					*issuer = crt_cpy(list->node[i].trusted_cas[j]);
+					return 0;
+				}
+			}
 		}
 	}
 
@@ -942,10 +974,10 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
  * gnutls_x509_trust_list_get_issuer_by_dn:
  * @list: The list
  * @dn: is the issuer's DN
- * @issuer: Will hold the issuer if any. Should be treated as constant.
+ * @issuer: Will hold the issuer if any. Should be deallocated after use.
  * @flags: Use zero
  *
- * This function will find the issuer of the given certificate, and
+ * This function will find the issuer with the given name, and
  * return a copy of the issuer, which must be freed using gnutls_x509_crt_deinit().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -960,7 +992,7 @@ int gnutls_x509_trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 {
 	int ret;
 
-	ret = trust_list_get_issuer_by_dn(list, dn, issuer, flags);
+	ret = trust_list_get_issuer_by_dn(list, dn, NULL, issuer, flags);
 	if (ret == 0) {
 		return 0;
 	}
@@ -971,6 +1003,67 @@ int gnutls_x509_trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 		gnutls_datum_t der = {NULL, 0};
 		/* use the token for verification */
 		ret = gnutls_pkcs11_get_raw_issuer_by_dn(list->pkcs11_token, dn, &der,
+			GNUTLS_X509_FMT_DER, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		ret = gnutls_x509_crt_init(&crt);
+		if (ret < 0) {
+			gnutls_free(der.data);
+			return gnutls_assert_val(ret);
+		}
+
+		ret = gnutls_x509_crt_import(crt, &der, GNUTLS_X509_FMT_DER);
+		gnutls_free(der.data);
+		if (ret < 0) {
+			gnutls_x509_crt_deinit(crt);
+			return gnutls_assert_val(ret);
+		}
+
+		*issuer = crt;
+		return 0;
+	}
+#endif
+	return ret;
+}
+
+/**
+ * gnutls_x509_trust_list_get_issuer_by_subject_key_id:
+ * @list: The list
+ * @dn: is the issuer's DN (may be %NULL)
+ * @spki: is the subject key ID
+ * @issuer: Will hold the issuer if any. Should be deallocated after use.
+ * @flags: Use zero
+ *
+ * This function will find the issuer with the given name and subject key ID, and
+ * return a copy of the issuer, which must be freed using gnutls_x509_crt_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.2
+ **/
+int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t list,
+				      const gnutls_datum_t *dn,
+				      const gnutls_datum_t *spki,
+				      gnutls_x509_crt_t *issuer,
+				      unsigned int flags)
+{
+	int ret;
+
+	ret = trust_list_get_issuer_by_dn(list, dn, spki, issuer, flags);
+	if (ret == 0) {
+		return 0;
+	}
+
+#ifdef ENABLE_PKCS11
+	if (ret < 0 && list->pkcs11_token) {
+		gnutls_x509_crt_t crt;
+		gnutls_datum_t der = {NULL, 0};
+		/* use the token for verification */
+		ret = gnutls_pkcs11_get_raw_issuer_by_subject_key_id(list->pkcs11_token, dn, spki, &der,
 			GNUTLS_X509_FMT_DER, 0);
 		if (ret < 0) {
 			gnutls_assert();

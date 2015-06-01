@@ -23,7 +23,6 @@
 #ifndef __GNUTLS_PKCS11_H
 #define __GNUTLS_PKCS11_H
 
-
 #include <stdarg.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -185,6 +184,13 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 			     unsigned int flags);
 
 int gnutls_pkcs11_get_raw_issuer_by_dn (const char *url, const gnutls_datum_t *dn,
+					gnutls_datum_t *issuer,
+					gnutls_x509_crt_fmt_t fmt,
+					unsigned int flags);
+
+int gnutls_pkcs11_get_raw_issuer_by_subject_key_id (const char *url, 
+					const gnutls_datum_t *dn,
+					const gnutls_datum_t *spki,
 					gnutls_datum_t *issuer,
 					gnutls_x509_crt_fmt_t fmt,
 					unsigned int flags);
