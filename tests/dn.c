@@ -89,6 +89,7 @@ void doit(void)
 	int ret;
 	gnutls_datum_t pem_cert = { (unsigned char *) pem, sizeof(pem) };
 	gnutls_x509_crt_t cert;
+	gnutls_datum_t strdn;
 	gnutls_x509_dn_t xdn;
 
 	ret = global_init();
@@ -115,6 +116,15 @@ void doit(void)
 	ret = gnutls_x509_crt_get_subject(cert, &xdn);
 	if (ret < 0)
 		fail("get_subject %d\n", ret);
+
+	ret = gnutls_x509_dn_get_str(xdn, &strdn);
+	if (ret < 0)
+		fail("gnutls_x509_dn_get_str %d\n", ret);
+
+	if (strdn.size != 44 || strcmp((char*)strdn.data, "CN=CAcert WoT User,EMAIL=simon@josefsson.org") != 0) {
+		fail("gnutls_x509_dn_get_str string comparison failed: '%s'/%d\n", strdn.data, strdn.size);
+	}
+	gnutls_free(strdn.data);
 
 	if (debug) {
 		printf("Subject:\n");
