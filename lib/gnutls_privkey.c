@@ -953,7 +953,7 @@ gnutls_privkey_export_openpgp(gnutls_privkey_t pkey,
  * @hash: should be a digest algorithm
  * @flags: Zero or one of %gnutls_privkey_flags_t
  * @data: holds the data to be signed
- * @signature: will contain the signature allocate with gnutls_malloc()
+ * @signature: will contain the signature allocated with gnutls_malloc()
  *
  * This function will sign the given data using a signature algorithm
  * supported by the private key. Signature algorithms are always used
@@ -1081,7 +1081,7 @@ gnutls_privkey_sign_hash(gnutls_privkey_t signer,
  * @key: Holds the key
  * @flags: should be zero
  * @data: holds the data to be signed
- * @signature: will contain the signature allocate with gnutls_malloc()
+ * @signature: will contain the signature allocated with gnutls_malloc()
  *
  * This function will sign the given data using a signature algorithm
  * supported by the private key. Note that this is a low-level function
