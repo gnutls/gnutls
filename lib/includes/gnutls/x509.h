@@ -615,7 +615,7 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum_t * idn,
 			       unsigned int raw_flag, void *buf,
 			       size_t * sizeof_buf);
 
-typedef void *gnutls_x509_dn_t;
+typedef struct gnutls_x509_dn_st *gnutls_x509_dn_t;
 
 typedef struct gnutls_x509_ava_st {
 	gnutls_datum_t oid;

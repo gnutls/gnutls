@@ -2291,8 +2291,12 @@ int gnutls_x509_crt_get_raw_dn(gnutls_x509_crt_t cert, gnutls_datum_t * dn)
 static int
 get_dn(gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t * dn)
 {
-	*dn = asn1_find_node(cert->cert, whom);
-	if (!*dn)
+	*dn = gnutls_calloc(1, sizeof(gnutls_x509_dn_st));
+	if (*dn == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+	(*dn)->asn = asn1_find_node(cert->cert, whom);
+	if (!(*dn)->asn)
 		return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
 	return 0;
 }
@@ -2381,7 +2385,7 @@ gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn,
 	irdn++;			/* 0->1, 1->2 etc */
 
 	snprintf(rbuf, sizeof(rbuf), "rdnSequence.?%d.?%d", irdn, iava);
-	rdn = asn1_find_node(dn, rbuf);
+	rdn = asn1_find_node(dn->asn, rbuf);
 	if (!rdn) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
@@ -2472,14 +2476,12 @@ gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn,
 int
 gnutls_x509_dn_get_str(gnutls_x509_dn_t dn, gnutls_datum_t *str)
 {
-	ASN1_TYPE asn1 = dn;
-
 	if (dn == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_get_dn(asn1, "rdnSequence", str);
+	return _gnutls_x509_get_dn(dn->asn, "rdnSequence", str);
 }
 
 /**

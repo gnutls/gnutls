@@ -74,6 +74,10 @@
 #define ASN1_NULL "\x05\x00"
 #define ASN1_NULL_SIZE 2
 
+typedef struct gnutls_x509_dn_st {
+	ASN1_TYPE asn;
+} gnutls_x509_dn_st;
+
 int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 			  int general);
 

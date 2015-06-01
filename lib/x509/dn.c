@@ -754,16 +754,16 @@ _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
 int gnutls_x509_dn_init(gnutls_x509_dn_t * dn)
 {
 	int result;
-	ASN1_TYPE tmpdn = ASN1_TYPE_EMPTY;
+
+	*dn = gnutls_calloc(1, sizeof(gnutls_x509_dn_st));
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				 "PKIX1.Name", &tmpdn)) != ASN1_SUCCESS) {
+				 "PKIX1.Name", &(*dn)->asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
+		gnutls_free(*dn);
 		return _gnutls_asn2err(result);
 	}
-
-	*dn = tmpdn;
 
 	return 0;
 }
@@ -791,7 +791,7 @@ int gnutls_x509_dn_import(gnutls_x509_dn_t dn, const gnutls_datum_t * data)
 	if (data->data == NULL || data->size == 0)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-	result = _asn1_strict_der_decode((ASN1_TYPE *) & dn,
+	result = _asn1_strict_der_decode(&dn->asn,
 				   data->data, data->size, err);
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
@@ -814,7 +814,8 @@ int gnutls_x509_dn_import(gnutls_x509_dn_t dn, const gnutls_datum_t * data)
  **/
 void gnutls_x509_dn_deinit(gnutls_x509_dn_t dn)
 {
-	asn1_delete_structure((ASN1_TYPE *) & dn);
+	asn1_delete_structure(&dn->asn);
+	gnutls_free(dn);
 }
 
 /**
@@ -1026,14 +1027,12 @@ gnutls_x509_dn_export(gnutls_x509_dn_t dn,
 		      gnutls_x509_crt_fmt_t format, void *output_data,
 		      size_t * output_data_size)
 {
-	ASN1_TYPE asn1 = dn;
-
-	if (asn1 == NULL) {
+	if (dn == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_export_int_named(asn1, "rdnSequence",
+	return _gnutls_x509_export_int_named(dn->asn, "rdnSequence",
 					     format, "NAME",
 					     output_data,
 					     output_data_size);
@@ -1061,13 +1060,11 @@ int
 gnutls_x509_dn_export2(gnutls_x509_dn_t dn,
 		       gnutls_x509_crt_fmt_t format, gnutls_datum_t * out)
 {
-	ASN1_TYPE asn1 = dn;
-
-	if (asn1 == NULL) {
+	if (dn == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_export_int_named2(asn1, "rdnSequence",
+	return _gnutls_x509_export_int_named2(dn->asn, "rdnSequence",
 					      format, "NAME", out);
 }
