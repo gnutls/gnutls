@@ -28,20 +28,35 @@ VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 OUTFILE=out-pkcs7.tmp
 
-$VALGRIND $CERTTOOL --inder --p7-info --infile $srcdir/single-ca.p7b >$OUTFILE
+for FILE in single-ca.p7b full.p7b;do
+$VALGRIND $CERTTOOL --inder --p7-info --infile $srcdir/$FILE >$OUTFILE
 rc=$?
 
 # We're done.
 if test "$rc" != "0"; then
-  echo "PKCS7 decoding failed"
+  echo "$FILE: PKCS7 decoding failed"
   exit $rc
 fi
 
-$DIFF $OUTFILE single-ca.p7b.out >/dev/null
+$DIFF $OUTFILE $FILE.out >/dev/null
 if test "$?" != "0"; then
-  echo "PKCS7 decoding didn't produce the correct file"
+  echo "$FILE: PKCS7 decoding didn't produce the correct file"
   exit 1
 fi
+done
+
+# check signatures
+
+for FILE in full.p7b;do
+$VALGRIND $CERTTOOL --inder --p7-verify --load-ca-certificate $srcdir/../../doc/credentials/x509/ca.pem --infile $srcdir/$FILE >$OUTFILE
+rc=$?
+
+# We're done.
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 verification failed"
+  exit $rc
+fi
+done
 
 rm -f $OUTFILE
 
