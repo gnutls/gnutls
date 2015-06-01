@@ -62,6 +62,7 @@ void generate_pkcs12(common_info_st *);
 void generate_pkcs8(common_info_st *);
 static void verify_chain(void);
 void verify_crl(common_info_st * cinfo);
+void verify_pkcs7(common_info_st * cinfo, const char *purpose);
 void pubkey_info(gnutls_x509_crt_t crt, common_info_st *);
 void pgp_privkey_info(void);
 void pgp_ring_info(void);
@@ -1128,6 +1129,9 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(LOAD_PRIVKEY))
 		cinfo.privkey = OPT_ARG(LOAD_PRIVKEY);
 
+	if (HAVE_OPT(LOAD_CRL))
+		cinfo.crl = OPT_ARG(LOAD_CRL);
+
 	cinfo.v1_cert = HAVE_OPT(V1);
 	if (HAVE_OPT(NO_CRQ_EXTENSIONS))
 		cinfo.crq_extensions = 0;
@@ -1231,6 +1235,8 @@ static void cmd_parser(int argc, char **argv)
 		crl_info();
 	else if (HAVE_OPT(P7_INFO))
 		pkcs7_info();
+	else if (HAVE_OPT(P7_VERIFY))
+		verify_pkcs7(&cinfo, OPT_ARG(VERIFY_PURPOSE));
 	else if (HAVE_OPT(P8_INFO))
 		pkcs8_info();
 	else if (HAVE_OPT(SMIME_TO_P7))
@@ -2282,6 +2288,96 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 	return 0;
 }
 
+static gnutls_x509_trust_list_t load_tl(common_info_st * cinfo)
+{
+	gnutls_x509_trust_list_t list;
+	int ret;
+	FILE *fp;
+	gnutls_datum_t tmp = {NULL, 0}, tmp2 = {NULL, 0};
+	char *cas, *crls;
+	size_t ca_size, crl_size;
+
+	ret = gnutls_x509_trust_list_init(&list, 0);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_x509_trust_list_init: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (cinfo->ca == NULL) { /* system */
+		ret = gnutls_x509_trust_list_add_system_trust(list, 0, 0);
+		if (ret < 0) {
+			fprintf(stderr, "Error loading system trust: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+		fprintf(stderr, "Loaded system trust (%d CAs available)\n", ret);
+	} else if (cinfo->ca != NULL) {
+		fp = fopen(cinfo->ca, "r");
+		if (fp == NULL) {
+			fprintf(stderr, "Could not open %s\n", cinfo->ca);
+			exit(1);
+		}
+
+		cas = (void *) fread_file(fp, &ca_size);
+		if (cas == NULL) {
+			fprintf(stderr, "reading CA list");
+			exit(1);
+		}
+
+		tmp.data = (void *) cas;
+		tmp.size = ca_size;
+		fclose(fp);
+
+		if (cinfo->crl) {
+			fp = fopen(cinfo->crl, "r");
+			if (fp == NULL) {
+				fprintf(stderr, "Could not open %s\n", cinfo->crl);
+				exit(1);
+			}
+
+			crls = (void *) fread_file(fp, &crl_size);
+			if (crls == NULL) {
+				fprintf(stderr, "reading CRL list");
+				exit(1);
+			}
+
+			fclose(fp);
+
+			tmp2.data = (void *) crls;
+			tmp2.size = crl_size;
+		}
+
+		ret =
+		    gnutls_x509_trust_list_add_trust_mem(list, &tmp, 
+		    				tmp2.data?&tmp2:NULL,
+						cinfo->incert_format,
+						0, 0);
+		if (ret < 0) {
+			int ret2 =
+			    gnutls_x509_trust_list_add_trust_mem(list, &tmp, 
+			    				tmp2.data?&tmp2:NULL,
+							GNUTLS_X509_FMT_PEM,
+							0, 0);
+			if (ret2 >= 0)
+				ret = ret2;
+		}
+
+		if (ret < 0) {
+			fprintf(stderr, "gnutls_x509_trust_add_trust_mem: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		free(tmp.data);
+		free(tmp2.data);
+
+		fprintf(stderr, "Loaded CAs (%d available)\n", ret);
+	}
+
+	return list;
+}
+
 /* Will verify a certificate chain. If no CA certificates
  * are provided, then the last certificate in the certificate
  * chain is used as a CA.
@@ -2621,6 +2717,101 @@ void verify_crl(common_info_st * cinfo)
 	fprintf(outfile, "\n");
 }
 
+static void print_dn(const gnutls_datum_t *raw)
+{
+	gnutls_x509_dn_t dn = NULL;
+	gnutls_datum_t str = {NULL, 0};
+	int ret;
+
+	ret = gnutls_x509_dn_init(&dn);
+	if (ret < 0)
+		return;
+
+	ret = gnutls_x509_dn_import(dn, raw);
+	if (ret < 0)
+		goto cleanup;
+
+	ret = gnutls_x509_dn_get_str(dn, &str);
+	if (ret < 0)
+		goto cleanup;
+
+	fprintf(stderr, "DN: %s\n", str.data);
+
+ cleanup:
+ 	gnutls_x509_dn_deinit(dn);
+ 	gnutls_free(str.data);
+}
+
+void verify_pkcs7(common_info_st * cinfo, const char *purpose)
+{
+	gnutls_pkcs7_t pkcs7;
+	int ret, ecode;
+	size_t size;
+	gnutls_datum_t data;
+	int i;
+	gnutls_pkcs7_signature_info_st info;
+	gnutls_x509_trust_list_t tl;
+	gnutls_typed_vdata_st vdata[2];
+	unsigned vdata_size = 0;
+
+	ret = gnutls_pkcs7_init(&pkcs7);
+	if (ret < 0) {
+		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	data.data = (void *) fread_file(infile, &size);
+	data.size = size;
+
+	ret = gnutls_pkcs7_import(pkcs7, &data, cinfo->incert_format);
+	free(data.data);
+	if (ret < 0) {
+		fprintf(stderr, "import error: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	tl = load_tl(cinfo);
+	if (tl == NULL) {
+		fprintf(stderr, "error loading trust list\n");
+	}
+
+	if (purpose) {
+		if (purpose) {
+			vdata[vdata_size].type = GNUTLS_DT_KEY_PURPOSE_OID;
+			vdata[vdata_size].data = (void*)purpose;
+			vdata[vdata_size].size = strlen(purpose);
+			vdata_size++;
+		}
+	}
+
+	fprintf(stderr, "Signers:\n");
+	ecode = 1;
+	for (i=0;;i++) {
+		ret = gnutls_pkcs7_get_signature_info(pkcs7, i, &info);
+		if (ret < 0)
+			break;
+
+		print_dn(&info.issuer_dn);
+		fprintf(stderr, "Algorithm: %s\n\n", gnutls_sign_get_name(info.algo));
+
+		gnutls_pkcs7_signature_info_deinit(&info);
+
+		ret = gnutls_pkcs7_verify(pkcs7, tl, vdata, vdata_size, i, NULL, 0);
+		if (ret < 0) {
+			fprintf(stderr, "Signature verification failed: %s\n", gnutls_strerror(ret));
+			ecode = 1;
+		} else {
+			fprintf(stderr, "Signature was verified\n");
+			ecode = 0;
+		}
+	}
+
+
+	gnutls_pkcs7_deinit(pkcs7);
+	gnutls_x509_trust_list_deinit(tl, 1);
+	exit(ecode);
+}
 
 
 void generate_pkcs8(common_info_st * cinfo)

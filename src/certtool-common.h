@@ -42,6 +42,7 @@ typedef struct common_info {
 	const char *cert;
 
 	const char *request;
+	const char *crl;
 	const char *ca;
 	const char *ca_privkey;
 	unsigned bits;

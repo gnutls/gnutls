@@ -110,7 +110,6 @@ flag = {
     doc = "This object identifier restricts the purpose of the certificates to be verified. Example purposes are 1.3.6.1.5.5.7.3.1 (TLS WWW), 1.3.6.1.5.5.7.3.4 (EMAIL) etc. Note that a CA certificate without a purpose set (extended key usage) is valid for any purpose.";
 };
 
-
 flag = {
     name      = generate-dh-params;
     descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters";
@@ -170,6 +169,13 @@ flag = {
     descrip   = "Loads the certificate authority's certificate file";
     arg-type  = string;
     doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-crl;
+    descrip   = "Loads the provided CRL";
+    arg-type  = string;
+    doc = "";
 };
 
 flag = {
@@ -279,6 +285,13 @@ flag = {
     descrip   = "Print information on a PKCS #7 structure";
     doc       = "";
 };
+
+flag = {
+    name      = p7-verify;
+    descrip   = "Verify the provided PKCS #7 structure";
+    doc       = "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. no certificate list is provided, then the system's certificate list is used.";
+};
+
 
 flag = {
     name      = p8-info;
