@@ -366,8 +366,33 @@ pkcs-7-CertificateChoices ::= CHOICE {
 
 pkcs-7-CertificateSet ::= SET OF pkcs-7-CertificateChoices
 
-pkcs-7-SignerInfos ::= SET OF ANY -- this is not correct but we don't use it
- -- anyway
+IssuerAndSerialNumber ::= SEQUENCE {
+	issuer Name,
+	serialNumber CertificateSerialNumber
+}
+
+pkcs-7-SignerInfo ::= SEQUENCE {
+     version INTEGER,
+     sid SignerIdentifier,
+     digestAlgorithm AlgorithmIdentifier,
+     signedAttrs [0] IMPLICIT SignedAttributes OPTIONAL,
+     signatureAlgorithm AlgorithmIdentifier,
+     signature OCTET STRING,
+     unsignedAttrs [1] IMPLICIT ANY OPTIONAL }
+
+SignedAttributes ::= SET SIZE (1..MAX) OF Attribute
+
+Attribute ::= SEQUENCE {
+	attrType OBJECT IDENTIFIER,
+	attrValues SET OF ANY
+}
+
+SignerIdentifier ::= CHOICE {
+	issuerAndSerialNumber IssuerAndSerialNumber,
+	subjectKeyIdentifier [0] SubjectKeyIdentifier
+}
+
+pkcs-7-SignerInfos ::= SET OF pkcs-7-SignerInfo
 
 
 -- BEGIN of RFC2986

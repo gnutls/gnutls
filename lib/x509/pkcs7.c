@@ -33,6 +33,7 @@
 #include <x509_b64.h>
 
 #define SIGNED_DATA_OID "1.2.840.113549.1.7.2"
+#define PLAIN_DATA_OID "1.2.840.113549.1.7.1"
 
 /* Decodes the PKCS #7 signed data, and returns an ASN1_TYPE, 
  * which holds them. If raw is non null then the raw decoded
@@ -87,6 +88,20 @@ _decode_pkcs7_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
+	}
+
+	/* read the encapsulated content */
+	len = sizeof(oid) - 1;
+	result = asn1_read_value(c2, "encapContentInfo.eContentType", oid, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if (strcmp(oid, PLAIN_DATA_OID) != 0) {
+		gnutls_assert();
+		_gnutls_debug_log("Unknown or unexpected PKCS7 Encapsulated Content OID '%s'\n", oid);
+		return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
 	}
 
 	*sdata = c2;
@@ -233,10 +248,7 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 		goto cleanup;
 	}
 
-	if (need_free)
-		_gnutls_free_datum(&_data);
-
-	return 0;
+	result = 0;
 
       cleanup:
 	if (need_free)
