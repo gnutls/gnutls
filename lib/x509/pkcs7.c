@@ -31,9 +31,17 @@
 #include <gnutls_errors.h>
 #include <common.h>
 #include <x509_b64.h>
+#include <gnutls/abstract.h>
+#include <gnutls/pkcs7.h>
 
 #define SIGNED_DATA_OID "1.2.840.113549.1.7.2"
 #define PLAIN_DATA_OID "1.2.840.113549.1.7.1"
+#define DIGESTED_DATA_OID "1.2.840.113549.1.7.5"
+
+#define ATTR_MESSAGE_DIGEST "1.2.840.113549.1.9.4"
+#define ATTR_SIGNING_TIME "1.2.840.113549.1.9.5"
+#define ATTR_CONTENT_TYPE "1.2.840.113549.1.9.3"
+
 
 /* Decodes the PKCS #7 signed data, and returns an ASN1_TYPE, 
  * which holds them. If raw is non null then the raw decoded
@@ -257,7 +265,7 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 }
 
 /**
- * gnutls_pkcs7_get_crt_raw:
+ * gnutls_pkcs7_get_crt_raw2:
  * @pkcs7: should contain a gnutls_pkcs7_t type
  * @indx: contains the index of the certificate to extract
  * @certificate: the contents of the certificate will be copied
@@ -274,18 +282,19 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
  *   negative error value.  If the provided buffer is not long enough,
  *   then @certificate_size is updated and
  *   %GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+ *
+ * Since: 3.4.2
  **/
 int
-gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7,
-			 int indx, void *certificate,
-			 size_t * certificate_size)
+gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
+			 int indx, gnutls_datum_t *cert)
 {
 	int result, len;
 	char root2[ASN1_MAX_NAME_SIZE];
 	char oid[MAX_OID_SIZE];
 	gnutls_datum_t tmp = { NULL, 0 };
 
-	if (certificate_size == NULL || pkcs7 == NULL)
+	if (pkcs7 == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	/* Step 2. Parse the CertificateSet 
@@ -329,19 +338,7 @@ gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7,
 
 		end = end - start + 1;
 
-		if ((unsigned) end > *certificate_size) {
-			*certificate_size = end;
-			result = GNUTLS_E_SHORT_MEMORY_BUFFER;
-			goto cleanup;
-		}
-
-		if (certificate)
-			memcpy(certificate, &tmp.data[start], end);
-
-		*certificate_size = end;
-
-		result = 0;
-
+		result = _gnutls_set_datum(cert, &tmp.data[start], end);
 	} else {
 		result = GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 	}
@@ -350,6 +347,53 @@ gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7,
 	_gnutls_free_datum(&tmp);
 	return result;
 }
+
+/**
+ * gnutls_pkcs7_get_crt_raw:
+ * @pkcs7: should contain a gnutls_pkcs7_t type
+ * @indx: contains the index of the certificate to extract
+ * @certificate: the contents of the certificate will be copied
+ *   there (may be null)
+ * @certificate_size: should hold the size of the certificate
+ *
+ * This function will return a certificate of the PKCS7 or RFC2630
+ * certificate set.
+ *
+ * After the last certificate has been read
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.  If the provided buffer is not long enough,
+ *   then @certificate_size is updated and
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+ **/
+int
+gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7,
+			 int indx, void *certificate,
+			 size_t * certificate_size)
+{
+	int ret;
+	gnutls_datum_t tmp = {NULL, 0};
+
+	ret = gnutls_pkcs7_get_crt_raw2(pkcs7, indx, &tmp);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if ((unsigned) tmp.size > *certificate_size) {
+		*certificate_size = tmp.size;
+		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+		goto cleanup;
+	}
+
+	*certificate_size = tmp.size;
+	if (certificate)
+		memcpy(certificate, tmp.data, tmp.size);
+
+      cleanup:
+	_gnutls_free_datum(&tmp);
+	return ret;
+}
+
 
 /**
  * gnutls_pkcs7_get_crt_count:
@@ -377,7 +421,535 @@ int gnutls_pkcs7_get_crt_count(gnutls_pkcs7_t pkcs7)
 	}
 
 	return count;
+}
 
+/**
+ * gnutls_pkcs7_signature_info_deinit:
+ * @info: should point to a #gnutls_pkcs7_signature_info_st structure
+ *
+ * This function will deinitialize any allocated value in the
+ * provided #gnutls_pkcs7_signature_info_st.
+ *
+ * Since: 3.4.2
+ **/
+void gnutls_pkcs7_signature_info_deinit(gnutls_pkcs7_signature_info_st *info)
+{
+	gnutls_free(info->sig.data);
+	gnutls_free(info->issuer_dn.data);
+	gnutls_free(info->signer_serial.data);
+	gnutls_free(info->issuer_keyid.data);
+	memset(info, 0, sizeof(*info));
+}
+
+/**
+ * gnutls_pkcs7_get_signature_info:
+ * @pkcs7: should contain a #gnutls_pkcs7_t type
+ * @idx: the index of the signature info to check
+ * @info: will contain the output signature
+ *
+ * This function will return information about the signature identified
+ * by idx in the provided PKCS #7 structure. The information should be
+ * deinitialized using gnutls_pkcs7_signature_info_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.2
+ **/
+int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_pkcs7_signature_info_st *info)
+{
+	int ret, count, len;
+	char root[256];
+	char oid[MAX_OID_SIZE];
+	gnutls_pk_algorithm_t pk;
+	gnutls_sign_algorithm_t sig;
+
+	if (pkcs7 == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	memset(info, 0, sizeof(*info));
+
+	ret = asn1_number_of_elements(pkcs7->signed_data, "signerInfos", &count);
+	if (ret != ASN1_SUCCESS || idx+1 > (unsigned)count) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+	snprintf(root, sizeof(root), "signerInfos.?%u.signatureAlgorithm.algorithm", idx + 1);
+
+	len = sizeof(oid)-1;
+	ret = asn1_read_value(pkcs7->signed_data, root, oid, &len);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		goto unsupp_algo;
+	}
+
+	sig = _gnutls_x509_oid2sign_algorithm(oid);
+	if (sig == GNUTLS_SIGN_UNKNOWN) {
+		/* great PKCS #7 allows to only specify a public key algo */
+		pk = _gnutls_x509_oid2pk_algorithm(oid);
+		if (pk == GNUTLS_PK_UNKNOWN) {
+			gnutls_assert();
+			goto unsupp_algo;
+		}
+
+		/* use the digests algorithm */
+		snprintf(root, sizeof(root), "signerInfos.?%u.digestAlgorithm.algorithm", idx + 1);
+
+		len = sizeof(oid)-1;
+		ret = asn1_read_value(pkcs7->signed_data, root, oid, &len);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			goto unsupp_algo;
+		}
+
+		ret = _gnutls_x509_oid_to_digest(oid);
+		if (ret == GNUTLS_DIG_UNKNOWN) {
+			gnutls_assert();
+			goto unsupp_algo;
+		}
+
+		sig = gnutls_pk_to_sign(pk, ret);
+		if (sig == GNUTLS_SIGN_UNKNOWN) {
+			gnutls_assert();
+			goto unsupp_algo;
+		}
+	}
+
+	info->algo = sig;
+
+	snprintf(root, sizeof(root), "signerInfos.?%u.signature", idx + 1);
+	/* read the signature */
+	ret = _gnutls_x509_read_value(pkcs7->signed_data, root, &info->sig);
+	if (ret < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	/* read the issuer info */
+	snprintf(root, sizeof(root), "signerInfos.?%u.sid.issuerAndSerialNumber.issuer.rdnSequence", idx + 1);
+	/* read the signature */
+	ret = _gnutls_x509_get_raw_field(pkcs7->signed_data, root, &info->issuer_dn);
+	if (ret >= 0) {
+		snprintf(root, sizeof(root), "signerInfos.?%u.sid.issuerAndSerialNumber.serialNumber", idx + 1);
+		/* read the signature */
+		ret = _gnutls_x509_read_value(pkcs7->signed_data, root, &info->signer_serial);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+	} else { /* keyid */
+		snprintf(root, sizeof(root), "signerInfos.?%u.sid.subjectKeyIdentifier", idx + 1);
+		/* read the signature */
+		ret = _gnutls_x509_read_value(pkcs7->signed_data, root, &info->issuer_keyid);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+	}
+
+	if (info->issuer_keyid.data == NULL && info->issuer_dn.data == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+		goto fail;
+	}
+
+ 	return 0;
+ fail:
+	gnutls_pkcs7_signature_info_deinit(info);
+ 	return ret;
+ unsupp_algo:
+	return GNUTLS_E_UNKNOWN_ALGORITHM;
+}
+
+/* Verifies that the hash attribute ATTR_MESSAGE_DIGEST is present
+ * and matches our calculated hash */
+static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
+			    gnutls_sign_algorithm_t algo,
+			    const gnutls_datum_t *data)
+{
+	unsigned hash;
+	gnutls_datum_t tmp = {NULL, 0};
+	gnutls_datum_t tmp2 = {NULL, 0};
+	uint8_t hash_output[MAX_HASH_SIZE];
+	unsigned hash_size, i;
+	char oid[MAX_OID_SIZE];
+	char name[256];
+	int ret;
+
+	hash = gnutls_sign_get_hash_algorithm(algo);
+
+	/* hash the data */
+	if (hash == GNUTLS_DIG_UNKNOWN)
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+	hash_size = gnutls_hash_get_len(hash);
+
+	if (data == NULL || data->data == NULL) {
+		ret = _gnutls_x509_read_value(pkcs7->signed_data, "encapContentInfo.eContent", &tmp);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		data = &tmp;
+	}
+
+	ret = gnutls_hash_fast(hash, data->data, data->size, hash_output);
+
+	gnutls_free(tmp.data);
+	tmp.data = NULL;
+
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	/* now verify that hash matches */
+	for (i=0;;i++) {
+		snprintf(name, sizeof(name), "%s.signedAttrs.?%u", root, i+1);
+
+		ret = _gnutls_x509_decode_and_read_attribute(pkcs7->signed_data,
+				name, oid, sizeof(oid), &tmp, 1, 0);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		if (strcmp(oid, ATTR_MESSAGE_DIGEST) == 0) {
+			ret = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING,
+				tmp.data, tmp.size, &tmp2, 0);
+			if (ret < 0) {
+				goto cleanup;
+			}
+
+			if (tmp2.size == hash_size && memcmp(hash_output, tmp2.data, tmp2.size) == 0) {
+				ret = 0;
+				goto cleanup;
+			}
+		}
+	 	gnutls_free(tmp.data);
+	 	tmp.data = NULL;
+	 	gnutls_free(tmp2.data);
+	 	tmp2.data = NULL;
+	}
+	
+	/* FIXME: verify that content info matches */
+
+ cleanup:
+ 	gnutls_free(tmp.data);
+ 	gnutls_free(tmp2.data);
+ 	return ret;
+}
+
+
+/* Returns the data to be used for signature verification. PKCS #7
+ * decided that this should not be an easy task.
+ */
+static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
+				const gnutls_datum_t *data,
+				gnutls_sign_algorithm_t algo,
+				gnutls_datum_t *sigdata)
+{
+	int ret;
+	char name[256];
+
+	snprintf(name, sizeof(name), "%s.signedAttrs", root);
+	/* read the signature */
+	ret = _gnutls_x509_get_raw_field(pkcs7->signed_data, name, sigdata);
+	if (ret == 0) {
+		/* verify that hash matches */
+		ret = verify_hash_attr(pkcs7, root, algo, data);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+
+		if (sigdata->size > 0)
+			sigdata->data[0] = 0x31;
+
+		return 0;
+	}
+
+	/* We have no signedAttrs. Use the provided data, or the encapsulated */
+	if (data == NULL || data->data == NULL) {
+		ret = _gnutls_x509_read_value(pkcs7->signed_data, "encapContentInfo.eContent", sigdata);
+		if (ret < 0) {
+			gnutls_assert();
+			return gnutls_assert_val(ret);
+		}
+		return 0;
+	}
+
+	return _gnutls_set_datum(sigdata, data->data, data->size);
+}
+
+/**
+ * gnutls_pkcs7_verify_direct:
+ * @pkcs7: should contain a #gnutls_pkcs7_t type
+ * @signer: the certificate believe to have signed the structure
+ * @idx: the index of the signature info to check
+ * @data: The data to be verified or %NULL
+ * @flags: Should be zero
+ *
+ * This function will verify the provided data against the signature
+ * present in the SignedData of the PKCS #7 structure. If the data
+ * provided are NULL then the data in the encapsulatedContent field
+ * will be used instead.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. A verification error results to a
+ *   %GNUTLS_E_PK_SIG_VERIFY_FAILED.
+ *
+ * Since: 3.4.2
+ **/
+int gnutls_pkcs7_verify_direct(gnutls_pkcs7_t pkcs7,
+			gnutls_x509_crt_t signer,
+			unsigned idx,
+			const gnutls_datum_t *data,
+			unsigned flags)
+{
+	int count, ret;
+	gnutls_datum_t tmpdata = {NULL, 0};
+	gnutls_pkcs7_signature_info_st info;
+	gnutls_datum_t sigdata = {NULL, 0};
+	char root[128];
+
+	memset(&info, 0, sizeof(info));
+
+	if (pkcs7 == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	ret = asn1_number_of_elements(pkcs7->signed_data, "signerInfos", &count);
+	if (ret != ASN1_SUCCESS || idx+1 > (unsigned)count) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	ret = gnutls_pkcs7_get_signature_info(pkcs7, idx, &info);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	snprintf(root, sizeof(root), "signerInfos.?%u", idx + 1);
+	ret = figure_pkcs7_sigdata(pkcs7, root, data, info.algo, &sigdata);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	ret = gnutls_x509_crt_verify_data2(signer, info.algo, 0, &sigdata, &info.sig);
+	if (ret < 0) {
+		gnutls_assert();
+	}
+
+ cleanup:
+	gnutls_free(tmpdata.data);
+	gnutls_free(sigdata.data);
+	gnutls_pkcs7_signature_info_deinit(&info);
+
+	return ret;
+}
+
+static
+gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
+			      gnutls_typed_vdata_st *vdata, unsigned vdata_size,
+			      gnutls_pkcs7_signature_info_st *info)
+{
+	gnutls_x509_crt_t issuer = NULL, crt = NULL;
+	int ret, count;
+	uint8_t serial[128];
+	size_t serial_size;
+	gnutls_datum_t tmp = {NULL, 0};
+	unsigned i, vtmp;
+
+	if (info->issuer_dn.data) {
+		ret = gnutls_x509_trust_list_get_issuer_by_dn(tl, &info->issuer_dn, &issuer, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			issuer = NULL;
+		}
+	}
+
+	if (info->issuer_keyid.data && issuer == NULL) {
+		ret = gnutls_x509_trust_list_get_issuer_by_subject_key_id(tl, NULL, &info->issuer_keyid, &issuer, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			issuer = NULL;
+		}
+	}
+
+	if (issuer == NULL) {
+		/* the issuer of the signer is not trusted. Too bad. */
+		return NULL;
+	}
+
+	/* check issuer's key purpose */
+	for (i=0;i<vdata_size;i++) {
+		if (vdata[i].type == GNUTLS_DT_KEY_PURPOSE_OID) {
+			ret = _gnutls_check_key_purpose(issuer, (char*)vdata[i].data, 0);
+			if (ret == 0) {
+				gnutls_assert();
+				goto fail;
+			} else {
+				break;
+			}
+		}
+	}
+
+	/* if the serial number of the issuer matches the one in the cert,
+	 * then the issuer is the signer */
+	if (info->signer_serial.data) {
+		serial_size = sizeof(serial);
+		ret = gnutls_x509_crt_get_serial(issuer, serial, &serial_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		if (serial_size == info->signer_serial.size && memcmp(info->signer_serial.data, serial, serial_size) == 0) {
+			/* issuer == signer */
+			return issuer;
+		}
+	}
+
+	count = gnutls_pkcs7_get_crt_count(pkcs7);
+	if (count < 0) {
+		gnutls_assert();
+		goto fail;
+	}
+
+	for (i=0;i<(unsigned)count;i++) {
+		/* Try to find the signer in the appended list. */
+		ret = gnutls_pkcs7_get_crt_raw2(pkcs7, 0, &tmp);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		ret = gnutls_x509_crt_init(&crt);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		ret = gnutls_x509_crt_import(crt, &tmp, GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		serial_size = sizeof(serial);
+		ret = gnutls_x509_crt_get_serial(crt, serial, &serial_size);
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		if (serial_size != info->signer_serial.size || memcmp(info->signer_serial.data, serial, serial_size) != 0) {
+			gnutls_assert();
+			goto skip;
+		}
+
+		ret = gnutls_x509_trust_list_verify_crt2(tl, &crt, 1, vdata, vdata_size, 0, &vtmp, NULL);
+		if (ret < 0 || vtmp != 0) {
+			gnutls_assert(); /* maybe next one is trusted */
+ skip:
+			gnutls_x509_crt_deinit(crt);
+			crt = NULL;
+			gnutls_free(tmp.data);
+			tmp.data = NULL;
+			continue;
+		}
+
+		/* we found a signer we trust. let's return it */
+		break;
+	}
+
+	/* ok a trusted certificate was found. This is the signer */
+	goto cleanup;
+
+ fail:
+	if (crt != NULL) {
+		gnutls_x509_crt_deinit(crt);
+		crt = NULL;
+	}
+
+ cleanup:
+	gnutls_free(tmp.data);
+	if (issuer)
+		gnutls_x509_crt_deinit(issuer);
+ 
+	return crt;
+}
+
+/**
+ * gnutls_pkcs7_verify:
+ * @pkcs7: should contain a #gnutls_pkcs7_t type
+ * @tl: A list of trusted certificates
+ * @vdata: an array of typed data
+ * @vdata_size: the number of data elements
+ * @idx: the index of the signature info to check
+ * @data: The data to be verified or %NULL
+ * @flags: Should be zero
+ *
+ * This function will verify the provided data against the signature
+ * present in the SignedData of the PKCS #7 structure. If the data
+ * provided are NULL then the data in the encapsulatedContent field
+ * will be used instead.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. A verification error results to a
+ *   %GNUTLS_E_PK_SIG_VERIFY_FAILED.
+ **/
+int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
+			gnutls_x509_trust_list_t tl,
+			gnutls_typed_vdata_st * vdata,
+			unsigned int vdata_size,
+			unsigned idx,
+			const gnutls_datum_t *data,
+			unsigned flags)
+{
+	int count, ret;
+	gnutls_datum_t tmpdata = {NULL, 0};
+	gnutls_pkcs7_signature_info_st info;
+	gnutls_x509_crt_t signer;
+	gnutls_datum_t sigdata = {NULL, 0};
+	char root[128];
+
+	memset(&info, 0, sizeof(info));
+
+	if (pkcs7 == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	ret = asn1_number_of_elements(pkcs7->signed_data, "signerInfos", &count);
+	if (ret != ASN1_SUCCESS || idx+1 > (unsigned)count) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	/* read data */
+	ret = gnutls_pkcs7_get_signature_info(pkcs7, idx, &info);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	snprintf(root, sizeof(root), "signerInfos.?%u", idx + 1);
+	ret = figure_pkcs7_sigdata(pkcs7, root, data, info.algo, &sigdata);
+	if (ret < 0) {
+		return gnutls_assert_val(ret);
+	}
+
+	signer = find_signer(pkcs7, tl, vdata, vdata_size, &info);
+	if (signer) {
+		ret = gnutls_x509_crt_verify_data2(signer, info.algo, 0, &sigdata, &info.sig);
+		if (ret < 0) {
+			gnutls_assert();
+		}
+		gnutls_x509_crt_deinit(signer);
+	} else {
+		gnutls_assert();
+		ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+	}
+
+
+ cleanup:
+	gnutls_free(tmpdata.data);
+	gnutls_free(sigdata.data);
+	gnutls_pkcs7_signature_info_deinit(&info);
+
+	return ret;
 }
 
 /**
@@ -474,7 +1046,7 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 	/* id-data */
 	result =
 	    asn1_write_value(*sdata, "encapContentInfo.eContentType",
-			     "1.2.840.113549.1.7.5", 1);
+			     DIGESTED_DATA_OID, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);

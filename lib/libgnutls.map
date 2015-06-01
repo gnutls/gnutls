@@ -1027,6 +1027,11 @@ GNUTLS_3_4
 	gnutls_x509_dn_get_str;
 	gnutls_pkcs11_get_raw_issuer_by_subject_key_id;
 	gnutls_x509_trust_list_get_issuer_by_subject_key_id;
+	gnutls_pkcs7_get_crt_raw2;
+	gnutls_pkcs7_signature_info_deinit;
+	gnutls_pkcs7_get_signature_info;
+	gnutls_pkcs7_verify_direct;
+	gnutls_pkcs7_verify;
  local:
 	*;
 };

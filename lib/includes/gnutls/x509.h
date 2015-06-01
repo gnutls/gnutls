@@ -630,6 +630,8 @@ int gnutls_x509_crt_get_issuer(gnutls_x509_crt_t cert,
 int gnutls_x509_dn_get_rdn_ava(gnutls_x509_dn_t dn, int irdn,
 			       int iava, gnutls_x509_ava_st * ava);
 
+int gnutls_x509_dn_get_str(gnutls_x509_dn_t dn, gnutls_datum_t *str);
+
 int gnutls_x509_dn_init(gnutls_x509_dn_t * dn);
 
 int gnutls_x509_dn_import(gnutls_x509_dn_t dn,
@@ -770,41 +772,6 @@ int gnutls_x509_crl_set_authority_key_id(gnutls_x509_crl_t crl,
 int gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
 			       const void *nr, size_t nr_size);
 
-
-/* PKCS7 structures handling
- */
-struct gnutls_pkcs7_int;
-typedef struct gnutls_pkcs7_int *gnutls_pkcs7_t;
-
-int gnutls_pkcs7_init(gnutls_pkcs7_t * pkcs7);
-void gnutls_pkcs7_deinit(gnutls_pkcs7_t pkcs7);
-int gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7,
-			const gnutls_datum_t * data,
-			gnutls_x509_crt_fmt_t format);
-int gnutls_pkcs7_export(gnutls_pkcs7_t pkcs7,
-			gnutls_x509_crt_fmt_t format,
-			void *output_data, size_t * output_data_size);
-int gnutls_pkcs7_export2(gnutls_pkcs7_t pkcs7,
-			 gnutls_x509_crt_fmt_t format,
-			 gnutls_datum_t * out);
-
-int gnutls_pkcs7_get_crt_count(gnutls_pkcs7_t pkcs7);
-int gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7, int indx,
-			     void *certificate, size_t * certificate_size);
-
-int gnutls_pkcs7_set_crt_raw(gnutls_pkcs7_t pkcs7,
-			     const gnutls_datum_t * crt);
-int gnutls_pkcs7_set_crt(gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt);
-int gnutls_pkcs7_delete_crt(gnutls_pkcs7_t pkcs7, int indx);
-
-int gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
-			     int indx, void *crl, size_t * crl_size);
-int gnutls_pkcs7_get_crl_count(gnutls_pkcs7_t pkcs7);
-
-int gnutls_pkcs7_set_crl_raw(gnutls_pkcs7_t pkcs7,
-			     const gnutls_datum_t * crl);
-int gnutls_pkcs7_set_crl(gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl);
-int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
 
 /* X.509 Certificate verification functions.
  */
@@ -1308,6 +1275,12 @@ int gnutls_x509_trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 				      gnutls_x509_crt_t *issuer,
 				      unsigned int flags);
 
+int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t list,
+				      const gnutls_datum_t *dn,
+				      const gnutls_datum_t *spki,
+				      gnutls_x509_crt_t *issuer,
+				      unsigned int flags);
+
 #define GNUTLS_TL_VERIFY_CRL 1
 #define GNUTLS_TL_USE_IN_TLS (1<<1)
 #define GNUTLS_TL_NO_DUPLICATES (1<<2)
@@ -1439,6 +1412,8 @@ int
 gnutls_x509_ext_print(gnutls_x509_ext_st *exts, unsigned int exts_size,
 		      gnutls_certificate_print_formats_t format,
 		      gnutls_datum_t * out);
+
+#include <gnutls/pkcs7.h>
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

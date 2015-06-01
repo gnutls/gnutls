@@ -788,6 +788,9 @@ int gnutls_x509_dn_import(gnutls_x509_dn_t dn, const gnutls_datum_t * data)
 	int result;
 	char err[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
 
+	if (data->data == NULL || data->size == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 	result = _asn1_strict_der_decode((ASN1_TYPE *) & dn,
 				   data->data, data->size, err);
 	if (result != ASN1_SUCCESS) {

@@ -382,11 +382,6 @@ pkcs-7-SignerInfo ::= SEQUENCE {
 
 SignedAttributes ::= SET SIZE (1..MAX) OF Attribute
 
-Attribute ::= SEQUENCE {
-	attrType OBJECT IDENTIFIER,
-	attrValues SET OF ANY
-}
-
 SignerIdentifier ::= CHOICE {
 	issuerAndSerialNumber IssuerAndSerialNumber,
 	subjectKeyIdentifier [0] SubjectKeyIdentifier
