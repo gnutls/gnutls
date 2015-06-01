@@ -267,7 +267,6 @@ int _gnutls_pkcs11_check_init(void)
 		return ret;
 	}
 
-	providers_initialized = 1;
 	_gnutls_debug_log("Initializing PKCS #11 modules\n");
 	ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
 
@@ -768,13 +767,18 @@ gnutls_pkcs11_init(unsigned int flags, const char *deprecated_config_file)
 				      p11_kit_pin_file_callback, NULL,
 				      NULL);
 
-	if (flags == GNUTLS_PKCS11_FLAG_MANUAL)
+	if (flags == GNUTLS_PKCS11_FLAG_MANUAL) {
+		/* if manual configuration is requested then don't
+		 * bother loading any other providers */
+		providers_initialized = 1;
 		return 0;
-	else if (flags & GNUTLS_PKCS11_FLAG_AUTO) {
+	 } else if (flags & GNUTLS_PKCS11_FLAG_AUTO) {
 		if (deprecated_config_file == NULL)
 			ret = auto_load();
 
 		compat_load(deprecated_config_file);
+
+		providers_initialized = 1;
 
 		return ret;
 	}
