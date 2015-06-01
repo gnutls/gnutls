@@ -173,16 +173,6 @@ int gnutls_openpgp_privkey_sign_hash(gnutls_openpgp_privkey_t key,
 				     gnutls_datum_t * signature)
     _GNUTLS_GCC_ATTR_DEPRECATED;
 
-/* we support the gnutls_privkey_sign_data() instead.
- */
-int gnutls_x509_privkey_sign_data(gnutls_x509_privkey_t key,
-				  gnutls_digest_algorithm_t digest,
-				  unsigned int flags,
-				  const gnutls_datum_t * data,
-				  void *signature,
-				  size_t * signature_size)
-    _GNUTLS_GCC_ATTR_DEPRECATED;
-
 	/* gnutls_pubkey_get_preferred_hash_algorithm() */
 int gnutls_x509_crt_get_preferred_hash_algorithm(gnutls_x509_crt_t
 						 crt,

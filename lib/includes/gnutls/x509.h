@@ -926,6 +926,13 @@ int gnutls_x509_crl_verify(gnutls_x509_crl_t crl,
 			   int CA_list_length, unsigned int flags,
 			   unsigned int *verify);
 
+int
+gnutls_x509_crt_verify_data2(gnutls_x509_crt_t crt,
+			   gnutls_sign_algorithm_t algo,
+			   unsigned int flags,
+			   const gnutls_datum_t * data,
+			   const gnutls_datum_t * signature);
+
 int gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 				     const gnutls_x509_crl_t *
 				     crl_list, int crl_list_length);
@@ -1115,6 +1122,14 @@ int gnutls_x509_privkey_export_ecc_raw(gnutls_x509_privkey_t key,
 				       gnutls_datum_t * x,
 				       gnutls_datum_t * y,
 				       gnutls_datum_t * k);
+
+int gnutls_x509_privkey_sign_data(gnutls_x509_privkey_t key,
+				  gnutls_digest_algorithm_t digest,
+				  unsigned int flags,
+				  const gnutls_datum_t * data,
+				  void *signature,
+				  size_t * signature_size);
+
 /* Certificate request stuff.
  */
 

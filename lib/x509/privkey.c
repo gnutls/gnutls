@@ -1677,8 +1677,6 @@ gnutls_x509_privkey_sign_hash(gnutls_x509_privkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
- *
- * Deprecated: Use gnutls_privkey_sign_data().
  */
 int
 gnutls_x509_privkey_sign_data(gnutls_x509_privkey_t key,

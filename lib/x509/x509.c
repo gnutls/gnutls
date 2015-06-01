@@ -3774,3 +3774,48 @@ gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
  cleanup:
 	return ret;
 }
+
+/**
+ * gnutls_x509_crt_verify_data2:
+ * @crt: Holds the certificate to verify with
+ * @algo: The signature algorithm used
+ * @flags: Must be zero
+ * @data: holds the signed data
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed data, using the
+ * parameters from the certificate.
+ *
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, and zero or positive code on success.
+ *
+ * Since: 3.4.0
+ **/
+int
+gnutls_x509_crt_verify_data2(gnutls_x509_crt_t crt,
+			   gnutls_sign_algorithm_t algo,
+			   unsigned int flags,
+			   const gnutls_datum_t * data,
+			   const gnutls_datum_t * signature)
+{
+	int ret;
+	gnutls_pubkey_t pubkey;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_pubkey_verify_data2(pubkey, algo, flags, data, signature);
+	gnutls_pubkey_deinit(pubkey);
+
+	return ret;
+}
