@@ -2847,6 +2847,9 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 		print_dn("\tSigner's issuer DN", &info.issuer_dn);
 		print_raw("\tSigner's serial", &info.signer_serial);
 		print_raw("\tSigner's issuer key ID", &info.issuer_keyid);
+		if (info.signing_time != -1)
+			fprintf(stderr, "\tSigning time: %s", ctime(&info.signing_time));
+
 		fprintf(stderr, "\tSignature Algorithm: %s\n", gnutls_sign_get_name(info.algo));
 
 		gnutls_pkcs7_signature_info_deinit(&info);
