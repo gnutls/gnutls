@@ -105,17 +105,20 @@ _decode_pkcs7_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 	result = asn1_read_value(c2, "encapContentInfo.eContentType", oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		result = _gnutls_asn2err(result);
+		goto cleanup;
 	}
 
 	if (strcmp(oid, PLAIN_DATA_OID) != 0 && strcmp(oid, DIGESTED_DATA_OID) != 0) {
 		gnutls_assert();
 		_gnutls_debug_log("Unknown or unexpected PKCS7 Encapsulated Content OID '%s'\n", oid);
-		return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
+		result = GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
+		goto cleanup;
 	}
 
 	*sdata = c2;
 
+	gnutls_free(tmp.data);
 	return 0;
 
       cleanup:
