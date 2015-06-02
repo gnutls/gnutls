@@ -1581,11 +1581,13 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 
 }
 
+#define OLD_PUBKEY_VERIFY_FLAG_TLS1_RSA 1
+
 /**
  * gnutls_pubkey_verify_data2:
  * @pubkey: Holds the public key
  * @algo: The signature algorithm used
- * @flags: Zero or one of %gnutls_pubkey_flags_t
+ * @flags: Zero or an OR list of #gnutls_certificate_verify_flags
  * @data: holds the signed data
  * @signature: contains the signature
  *
@@ -1593,7 +1595,9 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
  * parameters from the certificate.
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and zero or positive code on success.
+ * is returned, and zero or positive code on success. For known to be insecure
+ * signatures this function will return %GNUTLS_E_INSUFFICIENT_SECURITY unless
+ * the flag %GNUTLS_VERIFY_ALLOW_BROKEN is specified.
  *
  * Since: 3.0
  **/
@@ -1612,7 +1616,7 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA)
+	if (flags & OLD_PUBKEY_VERIFY_FLAG_TLS1_RSA || flags & GNUTLS_VERIFY_USE_TLS1_RSA)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
 	me = hash_to_entry(gnutls_sign_get_hash_algorithm(algo));
@@ -1623,6 +1627,13 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 				 data, signature, &pubkey->params);
 	if (ret < 0) {
 		gnutls_assert();
+		return ret;
+	}
+
+	if (!(flags & GNUTLS_VERIFY_ALLOW_BROKEN)) {
+		if (gnutls_sign_is_secure(algo) == 0) {
+			return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_SECURITY);
+		}
 	}
 
 	return ret;
@@ -1632,7 +1643,7 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
  * gnutls_pubkey_verify_hash2:
  * @key: Holds the public key
  * @algo: The signature algorithm used
- * @flags: Zero or one of %gnutls_pubkey_flags_t
+ * @flags: Zero or an OR list of #gnutls_certificate_verify_flags
  * @hash: holds the hash digest to be verified
  * @signature: contains the signature
  *
@@ -1660,7 +1671,7 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA) {
+	if (flags & OLD_PUBKEY_VERIFY_FLAG_TLS1_RSA || flags & GNUTLS_VERIFY_USE_TLS1_RSA) {
 		return _gnutls_pk_verify(GNUTLS_PK_RSA, hash, signature,
 					 &key->params);
 	} else {

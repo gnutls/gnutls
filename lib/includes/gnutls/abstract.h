@@ -40,8 +40,6 @@ extern "C" {
 #define GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA
 /**
  * gnutls_pubkey_flags:
- * @GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA: This indicates that a (raw) RSA signature is provided
- *   as in the TLS 1.0 protocol.
  * @GNUTLS_PUBKEY_DISABLE_CALLBACKS: The following flag disables call to PIN callbacks. Only
  *   relevant to TPM keys.
  * @GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT: request an OPENPGP fingerprint instead of the default.
@@ -49,10 +47,11 @@ extern "C" {
  * Enumeration of different certificate import flags.
  */
 typedef enum gnutls_pubkey_flags {
-	GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA = 1,
 	GNUTLS_PUBKEY_DISABLE_CALLBACKS = 1 << 2,
 	GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT = 1 << 3
 } gnutls_pubkey_flags_t;
+
+#define GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA GNUTLS_VERIFY_USE_TLS1_RSA
 
 typedef int (*gnutls_privkey_sign_func) (gnutls_privkey_t key,
 					 void *userdata,

@@ -802,6 +802,8 @@ int gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  *   using the broken MD2 algorithm.
  * @GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5: Allow certificates to be signed
  *   using the broken MD5 algorithm.
+ * @GNUTLS_VERIFY_ALLOW_BROKEN: Allow certificates to be signed
+ *   using any broken algorithm.
  * @GNUTLS_VERIFY_DISABLE_TIME_CHECKS: Disable checking of activation
  *   and expiration validity periods of certificate chains. Don't set
  *   this unless you understand the security implications.
@@ -809,6 +811,8 @@ int gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
  *   using certificate revocation lists or the available OCSP data.
  * @GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS: When including a hostname
  *   check in the verification, do not consider any wildcards.
+ * @GNUTLS_VERIFY_USE_TLS1_RSA: This indicates that a (raw) RSA signature is provided
+ *   as in the TLS 1.0 protocol. Not all functions accept this flag.
  *
  * Enumeration of different certificate verify flags. Additional
  * verification profiles can be set using GNUTLS_PROFILE_TO_VFLAGS()
@@ -827,8 +831,11 @@ typedef enum gnutls_certificate_verify_flags {
 	GNUTLS_VERIFY_ALLOW_UNSORTED_CHAIN = 1 << 10,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_UNSORTED_CHAIN = 1 << 11,
 	GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS = 1 << 12,
+	GNUTLS_VERIFY_USE_TLS1_RSA = 1 << 13
 	/* cannot exceed 2^24 due to GNUTLS_PROFILE_TO_VFLAGS() */
 } gnutls_certificate_verify_flags;
+
+#define GNUTLS_VERIFY_ALLOW_BROKEN (GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2|GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5)
 
 /**
  * gnutls_certificate_verification_profiles_t:

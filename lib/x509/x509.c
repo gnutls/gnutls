@@ -3815,7 +3815,7 @@ gnutls_x509_crt_import_url(gnutls_x509_crt_t crt,
  * gnutls_x509_crt_verify_data2:
  * @crt: Holds the certificate to verify with
  * @algo: The signature algorithm used
- * @flags: Must be zero
+ * @flags: Zero or an OR list of #gnutls_certificate_verify_flags
  * @data: holds the signed data
  * @signature: contains the signature
  *

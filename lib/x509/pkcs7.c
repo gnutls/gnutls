@@ -768,7 +768,7 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
  * @signer: the certificate believe to have signed the structure
  * @idx: the index of the signature info to check
  * @data: The data to be verified or %NULL
- * @flags: Should be zero
+ * @flags: Zero or an OR list of #gnutls_certificate_verify_flags
  *
  * This function will verify the provided data against the signature
  * present in the SignedData of the PKCS #7 structure. If the data
@@ -817,7 +817,7 @@ int gnutls_pkcs7_verify_direct(gnutls_pkcs7_t pkcs7,
 		return gnutls_assert_val(ret);
 	}
 
-	ret = gnutls_x509_crt_verify_data2(signer, info.algo, 0, &sigdata, &info.sig);
+	ret = gnutls_x509_crt_verify_data2(signer, info.algo, flags, &sigdata, &info.sig);
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -970,7 +970,7 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
  * @vdata_size: the number of data elements
  * @idx: the index of the signature info to check
  * @data: The data to be verified or %NULL
- * @flags: Should be zero
+ * @flags: Zero or an OR list of #gnutls_certificate_verify_flags
  *
  * This function will verify the provided data against the signature
  * present in the SignedData of the PKCS #7 structure. If the data
@@ -1025,7 +1025,7 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 
 	signer = find_signer(pkcs7, tl, vdata, vdata_size, &info);
 	if (signer) {
-		ret = gnutls_x509_crt_verify_data2(signer, info.algo, 0, &sigdata, &info.sig);
+		ret = gnutls_x509_crt_verify_data2(signer, info.algo, flags, &sigdata, &info.sig);
 		if (ret < 0) {
 			gnutls_assert();
 		}

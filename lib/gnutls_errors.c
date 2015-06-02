@@ -387,6 +387,8 @@ static const gnutls_error_entry non_fatal_error_entries[] = {
 	ERROR_ENTRY(N_("Function was interrupted."), GNUTLS_E_INTERRUPTED),
 	ERROR_ENTRY(N_("Rehandshake was requested by the peer."),
 		    GNUTLS_E_REHANDSHAKE),
+	ERROR_ENTRY(N_("One of the involved algorithms has insufficient security level."),
+		    GNUTLS_E_INSUFFICIENT_SECURITY),
 	{NULL, NULL, 0}
 };
 
