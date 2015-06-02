@@ -585,6 +585,8 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 	if (data == NULL || data->data == NULL) {
 		ret = _gnutls_x509_read_value(pkcs7->signed_data, "encapContentInfo.eContent", &tmp);
 		if (ret < 0) {
+			if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+				ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 			gnutls_assert();
 			return ret;
 		}
@@ -689,7 +691,8 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. A verification error results to a
- *   %GNUTLS_E_PK_SIG_VERIFY_FAILED.
+ *   %GNUTLS_E_PK_SIG_VERIFY_FAILED and the lack of encapsulated data
+ *   to verify to a %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
  *
  * Since: 3.4.2
  **/
@@ -890,7 +893,10 @@ gnutls_x509_crt_t find_signer(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. A verification error results to a
- *   %GNUTLS_E_PK_SIG_VERIFY_FAILED.
+ *   %GNUTLS_E_PK_SIG_VERIFY_FAILED and the lack of encapsulated data
+ *   to verify to a %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
+ *
+ * Since: 3.4.2
  **/
 int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 			gnutls_x509_trust_list_t tl,
@@ -971,7 +977,7 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
-  **/
+ **/
 int
 gnutls_pkcs7_export(gnutls_pkcs7_t pkcs7,
 		    gnutls_x509_crt_fmt_t format, void *output_data,
