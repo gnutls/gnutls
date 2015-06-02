@@ -2766,6 +2766,26 @@ static void print_dn(const char *prefix, const gnutls_datum_t *raw)
  	gnutls_free(str.data);
 }
 
+static void print_raw(const char *prefix, const gnutls_datum_t *raw)
+{
+	char data[512];
+	size_t data_size;
+	int ret;
+
+	if (raw->data == NULL || raw->size == 0)
+		return;
+
+	data_size = sizeof(data);
+	ret = gnutls_hex_encode(raw, data, &data_size);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_hex_encode: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(stderr, "%s: %s\n", prefix, data);
+}
+
 void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 {
 	gnutls_pkcs7_t pkcs7;
@@ -2825,6 +2845,8 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 			break;
 
 		print_dn("\tSigner's issuer DN", &info.issuer_dn);
+		print_raw("\tSigner's serial", &info.signer_serial);
+		print_raw("\tSigner's issuer key ID", &info.issuer_keyid);
 		fprintf(stderr, "\tSignature Algorithm: %s\n", gnutls_sign_get_name(info.algo));
 
 		gnutls_pkcs7_signature_info_deinit(&info);
