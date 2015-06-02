@@ -441,6 +441,42 @@ void gnutls_pkcs7_signature_info_deinit(gnutls_pkcs7_signature_info_st *info)
 	memset(info, 0, sizeof(*info));
 }
 
+static time_t parse_time(gnutls_pkcs7_t pkcs7, const char *root)
+{
+	char tval[128];
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	time_t ret;
+	int result, len;
+
+	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.Time", &c2);
+	if (result != ASN1_SUCCESS) {
+		ret = -1;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	len = sizeof(tval);
+	result = asn1_read_value(pkcs7->signed_data, root, tval, &len);
+	if (result != ASN1_SUCCESS) {
+		ret = -1;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _asn1_strict_der_decode(&c2, tval, len, NULL);
+	if (result != ASN1_SUCCESS) {
+		ret = -1;
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_x509_get_time(c2, "", 0);
+
+ cleanup:
+ 	asn1_delete_structure(&c2);
+ 	return ret;
+}
+
 /**
  * gnutls_pkcs7_get_signature_info:
  * @pkcs7: should contain a #gnutls_pkcs7_t type
@@ -463,11 +499,13 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_p
 	char oid[MAX_OID_SIZE];
 	gnutls_pk_algorithm_t pk;
 	gnutls_sign_algorithm_t sig;
+	unsigned i;
 
 	if (pkcs7 == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
 	memset(info, 0, sizeof(*info));
+	info->signing_time = -1;
 
 	ret = asn1_number_of_elements(pkcs7->signed_data, "signerInfos", &count);
 	if (ret != ASN1_SUCCESS || idx+1 > (unsigned)count) {
@@ -551,6 +589,20 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_p
 		goto fail;
 	}
 
+	/* read the signing time */
+	for (i=0;;i++) {
+		snprintf(root, sizeof(root), "signerInfos.?%u.signedAttrs.?%u.type", idx+1, i+1);
+		len = sizeof(oid)-1;
+		ret = asn1_read_value(pkcs7->signed_data, root, oid, &len);
+		if (ret != ASN1_SUCCESS) {
+			break;
+		}
+
+		if (strcmp(oid, ATTR_SIGNING_TIME) == 0) {
+			snprintf(root, sizeof(root), "signerInfos.?%u.signedAttrs.?%u.values.?1", idx+1, i+1);
+			info->signing_time = parse_time(pkcs7, root);
+		}
+	}
  	return 0;
  fail:
 	gnutls_pkcs7_signature_info_deinit(info);

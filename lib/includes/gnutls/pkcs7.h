@@ -78,6 +78,8 @@ typedef struct gnutls_pkcs7_signature_info_st {
 	gnutls_datum_t issuer_dn;
 	gnutls_datum_t signer_serial;
 	gnutls_datum_t issuer_keyid;
+	time_t signing_time;
+	char pad[64];
 } gnutls_pkcs7_signature_info_st;
 
 void gnutls_pkcs7_signature_info_deinit(gnutls_pkcs7_signature_info_st *info);

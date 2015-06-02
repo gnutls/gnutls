@@ -767,7 +767,7 @@ gtime2generalTime(time_t gtime, char *str_time, size_t str_time_size)
  * be something like "tbsCertList.thisUpdate".
  */
 #define MAX_TIME 64
-time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when, int nochoice)
+time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *where, int nochoice)
 {
 	char ttime[MAX_TIME];
 	char name[128];
@@ -775,7 +775,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when, int nochoice)
 	int len, result;
 
 	len = sizeof(ttime) - 1;
-	result = asn1_read_value(c2, when, ttime, &len);
+	result = asn1_read_value(c2, where, ttime, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return (time_t) (-1);
@@ -784,19 +784,26 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when, int nochoice)
 	if (nochoice != 0) {
 		c_time = _gnutls_x509_generalTime2gtime(ttime);
 	} else {
-		_gnutls_str_cpy(name, sizeof(name), when);
+		_gnutls_str_cpy(name, sizeof(name), where);
 
 		/* choice */
 		if (strcmp(ttime, "generalTime") == 0) {
-			_gnutls_str_cat(name, sizeof(name),
-					".generalTime");
+			if (name[0] == 0)
+				_gnutls_str_cpy(name, sizeof(name),
+						"generalTime");
+			else
+				_gnutls_str_cat(name, sizeof(name),
+						".generalTime");
 			len = sizeof(ttime) - 1;
 			result = asn1_read_value(c2, name, ttime, &len);
 			if (result == ASN1_SUCCESS)
 				c_time =
 				    _gnutls_x509_generalTime2gtime(ttime);
 		} else {	/* UTCTIME */
-			_gnutls_str_cat(name, sizeof(name), ".utcTime");
+			if (name[0] == 0)
+				_gnutls_str_cpy(name, sizeof(name), "utcTime");
+			else
+				_gnutls_str_cat(name, sizeof(name), ".utcTime");
 			len = sizeof(ttime) - 1;
 			result = asn1_read_value(c2, name, ttime, &len);
 			if (result == ASN1_SUCCESS)
