@@ -27,6 +27,7 @@ if ! test -z "${VALGRIND}";then
 VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 OUTFILE=out-pkcs7.tmp
+OUTFILE2=out2-pkcs7.tmp
 
 for FILE in single-ca.p7b full.p7b;do
 $VALGRIND $CERTTOOL --inder --p7-info --infile $srcdir/$FILE >$OUTFILE
@@ -93,7 +94,25 @@ if test "$rc" != "0"; then
   exit $rc
 fi
 
+# Test cert combination
+
+FILE="p7-combined"
+cat $srcdir/../certs/cert*.pem >$OUTFILE2
+$VALGRIND $CERTTOOL --p7-generate --load-certificate $OUTFILE2 >$OUTFILE
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 struct generation failed"
+  exit $rc
+fi
+
+$DIFF $OUTFILE p7-combined.out >/dev/null
+if test "$?" != "0"; then
+  echo "$FILE: PKCS7 generation didn't produce the correct file"
+  exit 1
+fi
 
 rm -f $OUTFILE
+rm -f $OUTFILE2
 
 exit 0
