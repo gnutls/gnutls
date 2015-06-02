@@ -91,6 +91,17 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 			gnutls_typed_vdata_st * vdata, unsigned int vdata_size,
 			unsigned idx, const gnutls_datum_t *data, unsigned flags);
 
+#define GNUTLS_PKCS7_EMBED_DATA 1
+#define GNUTLS_PKCS7_INCLUDE_TIME (1<<1)
+#define GNUTLS_PKCS7_INCLUDE_CERT (1<<2)
+#define GNUTLS_PKCS7_WRITE_SPKI (1<<3)
+int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
+		      gnutls_x509_crt_t signer,
+		      gnutls_privkey_t signer_key,
+		      const gnutls_datum_t *data,
+		      gnutls_digest_algorithm_t dig,
+		      unsigned flags);
+
 int
 gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
 			 int indx, gnutls_datum_t *cert);

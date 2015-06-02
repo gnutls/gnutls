@@ -124,6 +124,7 @@ static const struct oid_to_string _oid2str[] = {
 	ENTRY_ND("1.2.840.113549.1.9.20", NULL, ASN1_ETYPE_BMP_STRING),
 	/* local key id */
 	ENTRY_ND("1.2.840.113549.1.9.21", NULL, ASN1_ETYPE_OCTET_STRING),
+	ENTRY_ND("1.2.840.113549.1.9.4", NULL, ASN1_ETYPE_OCTET_STRING),
 
 	/* rfc3920 section 5.1.1 */
 	ENTRY("1.3.6.1.5.5.7.8.5", "XmppAddr", NULL, ASN1_ETYPE_UTF8_STRING),
