@@ -179,6 +179,13 @@ flag = {
 };
 
 flag = {
+    name      = load-data;
+    descrip   = "Loads auxilary data";
+    arg-type  = string;
+    doc = "";
+};
+
+flag = {
     name      = password;
     arg-type  = string;
     descrip   = "Password to use";
@@ -289,7 +296,7 @@ flag = {
 flag = {
     name      = p7-verify;
     descrip   = "Verify the provided PKCS #7 structure";
-    doc       = "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. no certificate list is provided, then the system's certificate list is used. A key purpose can be enforced with the --verify-purpose option.";
+    doc       = "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. no certificate list is provided, then the system's certificate list is used. A key purpose can be enforced with the --verify-purpose option, and the --load-data option will utilize detached data.";
 };
 
 

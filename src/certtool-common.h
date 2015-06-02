@@ -44,6 +44,7 @@ typedef struct common_info {
 	const char *request;
 	const char *crl;
 	const char *ca;
+	const char *data_file;
 	const char *ca_privkey;
 	unsigned bits;
 	const char *sec_param;
