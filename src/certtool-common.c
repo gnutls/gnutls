@@ -445,6 +445,98 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 	return crt;
 }
 
+/* Loads a CRL list
+ */
+gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
+				  common_info_st * info)
+{
+	FILE *fd;
+	static gnutls_x509_crl_t crl[MAX_CERTS];
+	char *ptr;
+	int ret, i;
+	gnutls_datum_t dat;
+	size_t size;
+	int ptr_size;
+
+	fix_lbuffer(0);
+
+	*crl_size = 0;
+	if (info->verbose)
+		fprintf(stderr, "Loading CRL list...\n");
+
+	if (info->crl == NULL) {
+		if (mand) {
+			fprintf(stderr, "missing --load-crl\n");
+			exit(1);
+		} else
+			return NULL;
+	}
+
+	fd = fopen(info->crl, "r");
+	if (fd == NULL) {
+		fprintf(stderr, "Could not open %s\n", info->crl);
+		exit(1);
+	}
+
+	size = fread(lbuffer, 1, lbuffer_size - 1, fd);
+	lbuffer[size] = 0;
+
+	fclose(fd);
+
+	ptr = (void *) lbuffer;
+	ptr_size = size;
+
+	for (i = 0; i < MAX_CERTS; i++) {
+		ret = gnutls_x509_crl_init(&crl[i]);
+		if (ret < 0) {
+			fprintf(stderr, "crl_init: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		dat.data = (void *) ptr;
+		dat.size = ptr_size;
+
+		ret =
+		    gnutls_x509_crl_import(crl[i], &dat,
+					   info->incert_format);
+		if (ret < 0) {
+			int ret2 = gnutls_x509_crl_import(crl[i], &dat,
+					   GNUTLS_X509_FMT_PEM);
+			if (ret2 >= 0)
+				ret = ret2;
+		}
+
+		if (ret < 0 && *crl_size > 0)
+			break;
+		if (ret < 0) {
+			fprintf(stderr, "crl_import: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		ptr = strstr(ptr, "---END");
+		if (ptr == NULL)
+			break;
+		ptr++;
+
+		ptr_size = size;
+		ptr_size -=
+		    (unsigned int) ((unsigned char *) ptr -
+				    (unsigned char *) lbuffer);
+
+		if (ptr_size < 0)
+			break;
+
+		(*crl_size)++;
+	}
+	if (info->verbose)
+		fprintf(stderr, "Loaded %d certificates.\n",
+			(int) *crl_size);
+
+	return crl;
+}
+
 /* Load the Certificate Request.
  */
 gnutls_x509_crq_t load_request(common_info_st * info)

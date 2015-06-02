@@ -52,6 +52,8 @@ static FILE *stdlog = NULL;
 static void privkey_info_int(common_info_st *, gnutls_x509_privkey_t key);
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out);
 void pkcs7_info(void);
+void pkcs7_sign(common_info_st *, unsigned embed);
+void pkcs7_generate(common_info_st *);
 void pkcs8_info(void);
 void pkcs8_info_int(gnutls_datum_t *data, unsigned format, 
 			unsigned ignore_err, FILE *out, const char *tab);
@@ -1238,6 +1240,12 @@ static void cmd_parser(int argc, char **argv)
 		crl_info();
 	else if (HAVE_OPT(P7_INFO))
 		pkcs7_info();
+	else if (HAVE_OPT(P7_GENERATE))
+		pkcs7_generate(&cinfo);
+	else if (HAVE_OPT(P7_SIGN))
+		pkcs7_sign(&cinfo, 1);
+	else if (HAVE_OPT(P7_DETACHED_SIGN))
+		pkcs7_sign(&cinfo, 0);
 	else if (HAVE_OPT(P7_VERIFY))
 		verify_pkcs7(&cinfo, OPT_ARG(VERIFY_PURPOSE));
 	else if (HAVE_OPT(P8_INFO))
@@ -2874,6 +2882,104 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 	else
 		gnutls_x509_trust_list_deinit(tl, 1);
 	exit(ecode);
+}
+
+void pkcs7_sign(common_info_st * cinfo, unsigned embed)
+{
+	gnutls_pkcs7_t pkcs7;
+	gnutls_privkey_t key;
+	int ret;
+	size_t size;
+	gnutls_datum_t data;
+	unsigned flags = 0;
+	gnutls_x509_crt_t signer;
+
+	ret = gnutls_pkcs7_init(&pkcs7);
+	if (ret < 0) {
+		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	data.data = (void *) fread_file(infile, &size);
+	data.size = size;
+
+	signer = load_cert(1, cinfo);
+	key = load_private_key(1, cinfo);
+
+	if (embed)
+		flags |= GNUTLS_PKCS7_EMBED_DATA;
+
+	ret = gnutls_pkcs7_sign(pkcs7, signer, key, &data, get_dig(signer), flags);
+	if (ret < 0) {
+		fprintf(stderr, "Error signing: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	size = lbuffer_size;
+	ret =
+	    gnutls_pkcs7_export(pkcs7, outcert_format, lbuffer, &size);
+	if (ret < 0) {
+		fprintf(stderr, "pkcs7_export: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fwrite(lbuffer, 1, size, outfile);
+
+	gnutls_privkey_deinit(key);
+	gnutls_x509_crt_deinit(signer);
+	gnutls_pkcs7_deinit(pkcs7);
+	exit(0);
+}
+
+void pkcs7_generate(common_info_st * cinfo)
+{
+	gnutls_pkcs7_t pkcs7;
+	int ret;
+	size_t crl_size = 0, crt_size = 0;
+	gnutls_x509_crt_t *crts;
+	gnutls_x509_crl_t *crls;
+	gnutls_datum_t tmp;
+	unsigned i;
+
+	crts = load_cert_list(1, &crt_size, cinfo);
+	crls = load_crl_list(0, &crl_size, cinfo);
+
+	ret = gnutls_pkcs7_init(&pkcs7);
+	if (ret < 0) {
+		fprintf(stderr, "p7_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	for (i=0;i<crt_size;i++) {
+		ret = gnutls_pkcs7_set_crt(pkcs7, crts[i]);
+		if (ret < 0) {
+			fprintf(stderr, "Error adding cert: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		gnutls_x509_crt_deinit(crts[i]);
+	}
+
+	for (i=0;i<crl_size;i++) {
+		ret = gnutls_pkcs7_set_crl(pkcs7, crls[i]);
+		if (ret < 0) {
+			fprintf(stderr, "Error adding CRL: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		gnutls_x509_crl_deinit(crls[i]);
+	}
+
+	ret =
+	    gnutls_pkcs7_export2(pkcs7, outcert_format, &tmp);
+	if (ret < 0) {
+		fprintf(stderr, "pkcs7_export: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fwrite(tmp.data, 1, tmp.size, outfile);
+	gnutls_free(tmp.data);
+
+	gnutls_pkcs7_deinit(pkcs7);
+	exit(0);
 }
 
 

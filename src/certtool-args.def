@@ -288,6 +288,24 @@ flag = {
 };
 
 flag = {
+    name      = p7-generate;
+    descrip   = "Generate a PKCS #7 structure";
+    doc       = "This option generates a PKCS #7 certificate container structure. To add certificates in the structure use --load-certificate and --load-crl.";
+};
+
+flag = {
+    name      = p7-sign;
+    descrip   = "Signs using a PKCS #7 structure";
+    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data. The data are stored within the structure. The signer certificate has to be specified using --load-certificate and --load-privkey.";
+};
+
+flag = {
+    name      = p7-detached-sign;
+    descrip   = "Signs using a detached PKCS #7 structure";
+    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data. The signer certificate has to be specified using --load-certificate and --load-privkey.";
+};
+
+flag = {
     name      = p7-info;
     descrip   = "Print information on a PKCS #7 structure";
     doc       = "";
@@ -298,7 +316,6 @@ flag = {
     descrip   = "Verify the provided PKCS #7 structure";
     doc       = "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. When no certificate list is provided, then the system's certificate list is used. Alternatively a direct signer can be provided using --load-certificate. A key purpose can be enforced with the --verify-purpose option, and the --load-data option will utilize detached data.";
 };
-
 
 flag = {
     name      = p8-info;
