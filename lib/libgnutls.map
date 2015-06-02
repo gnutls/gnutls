@@ -1032,6 +1032,7 @@ GNUTLS_3_4
 	gnutls_pkcs7_get_signature_info;
 	gnutls_pkcs7_verify_direct;
 	gnutls_pkcs7_verify;
+	gnutls_pkcs7_get_crl_raw2;
  local:
 	*;
 };

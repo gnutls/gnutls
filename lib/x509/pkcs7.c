@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2015 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1346,23 +1347,20 @@ int gnutls_pkcs7_delete_crt(gnutls_pkcs7_t pkcs7, int indx)
  */
 
 /**
- * gnutls_pkcs7_get_crl_raw:
+ * gnutls_pkcs7_get_crl_raw2:
  * @pkcs7: The pkcs7 type
  * @indx: contains the index of the crl to extract
- * @crl: the contents of the crl will be copied there (may be null)
- * @crl_size: should hold the size of the crl
+ * @crl: will contain the contents of the CRL in an allocated buffer
  *
- * This function will return a crl of the PKCS7 or RFC2630 crl set.
+ * This function will return a DER encoded CRL of the PKCS7 or RFC2630 crl set.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.  If the provided buffer is not long enough,
- *   then @crl_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER is
- *   returned.  After the last crl has been read
+ *   negative error value.  After the last crl has been read
  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  **/
 int
-gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
-			 int indx, void *crl, size_t * crl_size)
+gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
+			  int indx, gnutls_datum_t *crl)
 {
 	int result;
 	char root2[ASN1_MAX_NAME_SIZE];
@@ -1396,22 +1394,52 @@ gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
 
 	end = end - start + 1;
 
-	if ((unsigned) end > *crl_size) {
-		*crl_size = end;
-		result = GNUTLS_E_SHORT_MEMORY_BUFFER;
-		goto cleanup;
-	}
-
-	if (crl)
-		memcpy(crl, &tmp.data[start], end);
-
-	*crl_size = end;
-
-	result = 0;
+	result = _gnutls_set_datum(crl, &tmp.data[start], end);
 
       cleanup:
 	_gnutls_free_datum(&tmp);
 	return result;
+}
+
+/**
+ * gnutls_pkcs7_get_crl_raw:
+ * @pkcs7: The pkcs7 type
+ * @indx: contains the index of the crl to extract
+ * @crl: the contents of the crl will be copied there (may be null)
+ * @crl_size: should hold the size of the crl
+ *
+ * This function will return a crl of the PKCS7 or RFC2630 crl set.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.  If the provided buffer is not long enough,
+ *   then @crl_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER is
+ *   returned.  After the last crl has been read
+ *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ **/
+int
+gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
+			 int indx, void *crl, size_t * crl_size)
+{
+	int ret;
+	gnutls_datum_t tmp = {NULL, 0};
+
+	ret = gnutls_pkcs7_get_crl_raw2(pkcs7, indx, &tmp);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if ((unsigned) tmp.size > *crl_size) {
+		*crl_size = tmp.size;
+		ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+		goto cleanup;
+	}
+
+	*crl_size = tmp.size;
+	if (crl)
+		memcpy(crl, tmp.data, tmp.size);
+
+      cleanup:
+	_gnutls_free_datum(&tmp);
+	return ret;
 }
 
 /**

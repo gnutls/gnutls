@@ -94,6 +94,9 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 int
 gnutls_pkcs7_get_crt_raw2(gnutls_pkcs7_t pkcs7,
 			 int indx, gnutls_datum_t *cert);
+int
+gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
+			  int indx, gnutls_datum_t *crl);
 
 
 /* *INDENT-OFF* */
