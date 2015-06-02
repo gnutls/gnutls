@@ -2774,9 +2774,10 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 	gnutls_datum_t data, detached = {NULL,0};
 	int i;
 	gnutls_pkcs7_signature_info_st info;
-	gnutls_x509_trust_list_t tl;
+	gnutls_x509_trust_list_t tl = NULL;
 	gnutls_typed_vdata_st vdata[2];
 	unsigned vdata_size = 0;
+	gnutls_x509_crt_t signer = NULL;
 
 	ret = gnutls_pkcs7_init(&pkcs7);
 	if (ret < 0) {
@@ -2795,9 +2796,13 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 		exit(1);
 	}
 
-	tl = load_tl(cinfo);
-	if (tl == NULL) {
-		fprintf(stderr, "error loading trust list\n");
+	if (cinfo->cert != NULL) {
+		signer = load_cert(1, cinfo);
+	} else { /* trust list */
+		tl = load_tl(cinfo);
+		if (tl == NULL) {
+			fprintf(stderr, "error loading trust list\n");
+		}
 	}
 
 	if (cinfo->data_file)
@@ -2824,7 +2829,10 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 
 		gnutls_pkcs7_signature_info_deinit(&info);
 
-		ret = gnutls_pkcs7_verify(pkcs7, tl, vdata, vdata_size, i, detached.data!=NULL?&detached:NULL, 0);
+		if (signer)
+			ret = gnutls_pkcs7_verify_direct(pkcs7, signer, i, detached.data!=NULL?&detached:NULL, 0);
+		else
+			ret = gnutls_pkcs7_verify(pkcs7, tl, vdata, vdata_size, i, detached.data!=NULL?&detached:NULL, 0);
 		if (ret < 0) {
 			fprintf(stderr, "\tSignature status: verification failed: %s\n", gnutls_strerror(ret));
 			ecode = 1;
@@ -2836,7 +2844,10 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 
 
 	gnutls_pkcs7_deinit(pkcs7);
-	gnutls_x509_trust_list_deinit(tl, 1);
+	if (signer)
+		gnutls_x509_crt_deinit(signer);
+	else
+		gnutls_x509_trust_list_deinit(tl, 1);
 	exit(ecode);
 }
 

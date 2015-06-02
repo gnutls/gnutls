@@ -408,6 +408,13 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 		ret =
 		    gnutls_x509_crt_import(crt[i], &dat,
 					   info->incert_format);
+		if (ret < 0) {
+			int ret2 = gnutls_x509_crt_import(crt[i], &dat,
+					   GNUTLS_X509_FMT_PEM);
+			if (ret2 >= 0)
+				ret = ret2;
+		}
+
 		if (ret < 0 && *crt_size > 0)
 			break;
 		if (ret < 0) {
