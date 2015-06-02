@@ -572,6 +572,8 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 	unsigned hash_size, i;
 	char oid[MAX_OID_SIZE];
 	char name[256];
+	unsigned msg_digest_ok = 0;
+	unsigned num_cont_types = 0;
 	int ret;
 
 	hash = gnutls_sign_get_hash_algorithm(algo);
@@ -607,18 +609,42 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 
 		ret = _gnutls_x509_decode_and_read_attribute(pkcs7->signed_data,
 				name, oid, sizeof(oid), &tmp, 1, 0);
-		if (ret < 0)
+		if (ret < 0) {
+			if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+				break;
 			return gnutls_assert_val(ret);
+		}
 
 		if (strcmp(oid, ATTR_MESSAGE_DIGEST) == 0) {
 			ret = _gnutls_x509_decode_string(ASN1_ETYPE_OCTET_STRING,
 				tmp.data, tmp.size, &tmp2, 0);
 			if (ret < 0) {
+				gnutls_assert();
 				goto cleanup;
 			}
 
 			if (tmp2.size == hash_size && memcmp(hash_output, tmp2.data, tmp2.size) == 0) {
-				ret = 0;
+				msg_digest_ok = 1;
+			}
+		} else if (strcmp(oid, ATTR_CONTENT_TYPE) == 0) {
+			if (num_cont_types > 0) {
+				gnutls_assert();
+				ret = GNUTLS_E_PARSING_ERROR;
+				goto cleanup;
+			}
+
+			num_cont_types++;
+
+			/* check if it matches */
+			ret = _gnutls_x509_get_raw_field(pkcs7->signed_data, "encapContentInfo.eContentType", &tmp2);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			if (tmp2.size != tmp.size || memcmp(tmp.data, tmp2.data, tmp2.size) != 0) {
+				gnutls_assert();
+				ret = GNUTLS_E_PARSING_ERROR;
 				goto cleanup;
 			}
 		}
@@ -627,8 +653,11 @@ static int verify_hash_attr(gnutls_pkcs7_t pkcs7, const char *root,
 	 	gnutls_free(tmp2.data);
 	 	tmp2.data = NULL;
 	}
-	
-	/* FIXME: verify that content info matches */
+
+	if (msg_digest_ok)
+		ret = 0;
+	else
+		ret = gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
  cleanup:
  	gnutls_free(tmp.data);
