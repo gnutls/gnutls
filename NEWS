@@ -14,8 +14,23 @@ by Manuel Pegourie-Gonnard.
 ** libgnutls: Introduced the GNUTLS_NO_SIGNAL flag to gnutls_init(). That
 allows to disable SIGPIPE for writes done within gnutls.
 
+** libgnutls: Enhanced the PKCS #7 API to allow signing and verification
+of structures. API moved to gnutls/pkcs7.h header.
+
+** certtool: Added options to generate PKCS #7 bundles and signed
+structures.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_dn_get_str: Added
+gnutls_pkcs11_get_raw_issuer_by_subject_key_id: Added
+gnutls_x509_trust_list_get_issuer_by_subject_key_id: Added
+gnutls_pkcs7_get_crt_raw2: Added
+gnutls_pkcs7_signature_info_deinit: Added
+gnutls_pkcs7_get_signature_info: Added
+gnutls_pkcs7_verify_direct: Added
+gnutls_pkcs7_verify: Added
+gnutls_pkcs7_get_crl_raw2: Added
+gnutls_pkcs7_sign: Added
 
 
 * Version 3.4.1 (released 2015-05-03)
