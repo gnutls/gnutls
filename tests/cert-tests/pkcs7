@@ -112,6 +112,45 @@ if test "$?" != "0"; then
   exit 1
 fi
 
+# Test signing
+FILE=signing
+$VALGRIND $CERTTOOL --p7-sign --load-privkey  $srcdir/../../doc/credentials/x509/key-rsa.pem --load-certificate $srcdir/../../doc/credentials/x509/cert-rsa.pem --infile pkcs7-detached.txt >$OUTFILE
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 struct signing failed"
+  exit $rc
+fi
+
+FILE=signing-verify
+$VALGRIND $CERTTOOL --p7-verify --load-certificate $srcdir/../../doc/credentials/x509/cert-rsa.pem <$OUTFILE
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 struct signing failed"
+  exit $rc
+fi
+
+
+FILE=signing-detached
+$VALGRIND $CERTTOOL --p7-detached-sign --load-privkey  $srcdir/../../doc/credentials/x509/key-rsa.pem --load-certificate $srcdir/../../doc/credentials/x509/cert-rsa.pem --infile pkcs7-detached.txt >$OUTFILE
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 struct signing failed"
+  exit $rc
+fi
+
+FILE=signing-detached-verify
+$VALGRIND $CERTTOOL --p7-verify --load-certificate $srcdir/../../doc/credentials/x509/cert-rsa.pem --load-data pkcs7-detached.txt <$OUTFILE
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 struct signing failed"
+  exit $rc
+fi
+
+
 rm -f $OUTFILE
 rm -f $OUTFILE2
 
