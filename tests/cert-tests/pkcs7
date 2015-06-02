@@ -74,6 +74,26 @@ fi
 
 done
 
+# check signature with detached data
+
+FILE=detached.p7b
+$VALGRIND $CERTTOOL --inder --p7-verify --load-ca-certificate $srcdir/../../doc/credentials/x509/ca.pem --infile $srcdir/$FILE
+rc=$?
+
+if test "$rc" = "0"; then
+  echo "$FILE: PKCS7 verification succeeded without providing detached data"
+  exit 2
+fi
+
+$VALGRIND $CERTTOOL --inder --p7-verify --load-data pkcs7-detached.txt --load-ca-certificate $srcdir/../../doc/credentials/x509/ca.pem --infile $srcdir/$FILE
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 verification failed"
+  exit $rc
+fi
+
+
 rm -f $OUTFILE
 
 exit 0
