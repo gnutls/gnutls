@@ -61,6 +61,10 @@ typedef struct gnutls_x509_crl_int {
 	gnutls_datum_t raw_issuer_dn;
 } gnutls_x509_crl_int;
 
+typedef struct gnutls_x509_dn_st {
+	ASN1_TYPE asn;
+} gnutls_x509_dn_st;
+
 typedef struct gnutls_x509_crt_int {
 	ASN1_TYPE cert;
 	int use_extensions;
@@ -74,6 +78,11 @@ typedef struct gnutls_x509_crt_int {
 
 	gnutls_datum_t der;
 	struct pin_info_st pin;
+
+	/* backwards compatibility for gnutls_x509_crt_get_subject()
+	 * and gnutls_x509_crt_get_issuer() */
+	gnutls_x509_dn_st dn;
+	gnutls_x509_dn_st idn;
 } gnutls_x509_crt_int;
 
 typedef struct gnutls_x509_crq_int {

@@ -2289,15 +2289,21 @@ int gnutls_x509_crt_get_raw_dn(gnutls_x509_crt_t cert, gnutls_datum_t * dn)
 }
 
 static int
-get_dn(gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t * dn)
+get_dn(gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t * dn, unsigned subject)
 {
-	*dn = gnutls_calloc(1, sizeof(gnutls_x509_dn_st));
-	if (*dn == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+	gnutls_x509_dn_st *store;
 
-	(*dn)->asn = asn1_find_node(cert->cert, whom);
-	if (!(*dn)->asn)
+	if (subject)
+		store = &cert->dn;
+	else
+		store = &cert->idn;
+
+	store->asn = asn1_find_node(cert->cert, whom);
+	if (!store->asn)
 		return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+
+	*dn = store;
+
 	return 0;
 }
 
@@ -2318,7 +2324,7 @@ get_dn(gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t * dn)
 int
 gnutls_x509_crt_get_subject(gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
 {
-	return get_dn(cert, "tbsCertificate.subject.rdnSequence", dn);
+	return get_dn(cert, "tbsCertificate.subject.rdnSequence", dn, 1);
 }
 
 /**
@@ -2338,7 +2344,7 @@ gnutls_x509_crt_get_subject(gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
 int
 gnutls_x509_crt_get_issuer(gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
 {
-	return get_dn(cert, "tbsCertificate.issuer.rdnSequence", dn);
+	return get_dn(cert, "tbsCertificate.issuer.rdnSequence", dn, 0);
 }
 
 /**
