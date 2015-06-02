@@ -150,6 +150,24 @@ if test "$rc" != "0"; then
   exit $rc
 fi
 
+# Test signing with broken algorithms
+FILE=signing-broken
+$VALGRIND $CERTTOOL --hash md5 --p7-sign --load-privkey  $srcdir/../../doc/credentials/x509/key-rsa.pem --load-certificate $srcdir/../../doc/credentials/x509/cert-rsa.pem --infile pkcs7-detached.txt >$OUTFILE
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 struct signing failed"
+  exit $rc
+fi
+
+FILE=signing-verify-broken
+$VALGRIND $CERTTOOL --p7-verify --load-certificate $srcdir/../../doc/credentials/x509/cert-rsa.pem <$OUTFILE
+rc=$?
+
+if test "$rc" = "0"; then
+  echo "$FILE: PKCS7 struct verification succeeded with broken algo"
+  exit 1
+fi
 
 rm -f $OUTFILE
 rm -f $OUTFILE2
