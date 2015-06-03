@@ -53,6 +53,7 @@ void doit(void)
 	unsigned char buf1[64];
 	unsigned char buf2[64];
 	pid_t pid;
+	unsigned char *tmp;
 	int ret;
 	FILE *fp;
 	unsigned i;
@@ -119,6 +120,20 @@ void doit(void)
 			exit(1);
 		}
 	}
+#define TMP_SIZE (65*1024)
+	tmp = malloc(TMP_SIZE);
+	if (tmp == NULL) {
+		fail("memory error\n");
+		exit(1);
+	}
+	for (i = 0; i <= 65539; i++) {
+		ret = gnutls_rnd(GNUTLS_RND_RANDOM, tmp, TMP_SIZE);
+		if (ret < 0) {
+			fail("Error iterating RNG-random more than %u times for %d data\n", i, TMP_SIZE);
+			exit(1);
+		}
+	}
+	free(tmp);
 
 	gnutls_global_deinit();
 }
