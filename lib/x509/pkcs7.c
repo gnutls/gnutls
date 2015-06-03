@@ -866,7 +866,8 @@ int gnutls_pkcs7_verify_direct(gnutls_pkcs7_t pkcs7,
 	snprintf(root, sizeof(root), "signerInfos.?%u", idx + 1);
 	ret = figure_pkcs7_sigdata(pkcs7, root, data, info.algo, &sigdata);
 	if (ret < 0) {
-		return gnutls_assert_val(ret);
+		gnutls_assert();
+		goto cleanup;
 	}
 
 	ret = gnutls_x509_crt_verify_data2(signer, info.algo, flags, &sigdata, &info.sig);
@@ -1072,7 +1073,8 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 	snprintf(root, sizeof(root), "signerInfos.?%u", idx + 1);
 	ret = figure_pkcs7_sigdata(pkcs7, root, data, info.algo, &sigdata);
 	if (ret < 0) {
-		return gnutls_assert_val(ret);
+		gnutls_assert();
+		goto cleanup;
 	}
 
 	signer = find_signer(pkcs7, tl, vdata, vdata_size, &info);
