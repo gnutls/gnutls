@@ -1034,6 +1034,9 @@ GNUTLS_3_4
 	gnutls_pkcs7_verify;
 	gnutls_pkcs7_get_crl_raw2;
 	gnutls_pkcs7_sign;
+	gnutls_pkcs7_attrs_deinit;
+	gnutls_pkcs7_add_attr;
+	gnutls_pkcs7_get_attr;
  local:
 	*;
 };

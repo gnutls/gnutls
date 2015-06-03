@@ -443,6 +443,8 @@ void gnutls_pkcs7_signature_info_deinit(gnutls_pkcs7_signature_info_st *info)
 	gnutls_free(info->issuer_dn.data);
 	gnutls_free(info->signer_serial.data);
 	gnutls_free(info->issuer_keyid.data);
+	gnutls_pkcs7_attrs_deinit(info->signed_attrs);
+	gnutls_pkcs7_attrs_deinit(info->unsigned_attrs);
 	memset(info, 0, sizeof(*info));
 }
 
@@ -504,6 +506,7 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_p
 	char oid[MAX_OID_SIZE];
 	gnutls_pk_algorithm_t pk;
 	gnutls_sign_algorithm_t sig;
+	gnutls_datum_t tmp = {NULL, 0};
 	unsigned i;
 
 	if (pkcs7 == NULL)
@@ -603,13 +606,62 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_p
 			break;
 		}
 
+		snprintf(root, sizeof(root), "signerInfos.?%u.signedAttrs.?%u.values.?1", idx+1, i+1);
+		ret = _gnutls_x509_read_value(pkcs7->signed_data, root, &tmp);
+		if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
+			tmp.data = NULL;
+			tmp.size = 0;
+		} else if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		ret = gnutls_pkcs7_add_attr(&info->signed_attrs, oid, &tmp, 0);
+		gnutls_free(tmp.data);
+		tmp.data = NULL;
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
 		if (strcmp(oid, ATTR_SIGNING_TIME) == 0) {
-			snprintf(root, sizeof(root), "signerInfos.?%u.signedAttrs.?%u.values.?1", idx+1, i+1);
 			info->signing_time = parse_time(pkcs7, root);
 		}
 	}
+
+	/* read the unsigned attrs */
+	for (i=0;;i++) {
+		snprintf(root, sizeof(root), "signerInfos.?%u.unsignedAttrs.?%u.type", idx+1, i+1);
+		len = sizeof(oid)-1;
+		ret = asn1_read_value(pkcs7->signed_data, root, oid, &len);
+		if (ret != ASN1_SUCCESS) {
+			break;
+		}
+
+		snprintf(root, sizeof(root), "signerInfos.?%u.unsignedAttrs.?%u.values.?1", idx+1, i+1);
+		ret = _gnutls_x509_read_value(pkcs7->signed_data, root, &tmp);
+		if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND) {
+			tmp.data = NULL;
+			tmp.size = 0;
+		} else if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+
+		ret = gnutls_pkcs7_add_attr(&info->unsigned_attrs, oid, &tmp, 0);
+		gnutls_free(tmp.data);
+		tmp.data = NULL;
+
+		if (ret < 0) {
+			gnutls_assert();
+			goto fail;
+		}
+	}
+
  	return 0;
  fail:
+	gnutls_free(tmp.data);
 	gnutls_pkcs7_signature_info_deinit(info);
  	return ret;
  unsupp_algo:
@@ -1669,13 +1721,62 @@ static int write_signer_id(ASN1_TYPE c2, const char *root, gnutls_x509_crt_t sig
 	return 0;
 }
 
+static int add_attrs(ASN1_TYPE c2, const char *root, gnutls_pkcs7_attrs_t attrs, unsigned already_set)
+{
+	char name[256];
+	gnutls_pkcs7_attrs_st *p = attrs;
+	int result;
+
+	if (attrs == NULL) {
+		/* if there are no other attributes delete that field */
+		if (already_set == 0)
+			asn1_write_value(c2, root, NULL, 0);
+	} else {
+		while(p != NULL) {
+			result = asn1_write_value(c2, root, "NEW", 1);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				return _gnutls_asn2err(result);
+			}
+
+			snprintf(name, sizeof(name), "%s.?LAST.type", root);
+			result =
+			    asn1_write_value(c2, name, p->oid, 1);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				return _gnutls_asn2err(result);
+			}
+
+			snprintf(name, sizeof(name), "%s.?LAST.values", root);
+			result = asn1_write_value(c2, name, "NEW", 1);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				return _gnutls_asn2err(result);
+			}
+
+			snprintf(name, sizeof(name), "%s.?LAST.values.?LAST", root);
+			result = asn1_write_value(c2, name, p->data.data, p->data.size);
+			if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				return _gnutls_asn2err(result);
+			}
+
+			p = p->next;
+		}
+	}
+
+	return 0;
+}
+
 static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t *data,
-			    const mac_entry_st *me, unsigned flags)
+			    const mac_entry_st *me, gnutls_pkcs7_attrs_t other_attrs,
+			    unsigned flags)
 {
 	char name[256];
 	int result, ret;
 	uint8_t digest[MAX_HASH_SIZE];
 	unsigned digest_size;
+	unsigned already_set = 0;
 
 	if (flags & GNUTLS_PKCS7_INCLUDE_TIME) {
 		if (data == NULL || data->data == NULL) {
@@ -1683,23 +1784,15 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 			return GNUTLS_E_INVALID_REQUEST;
 		}
 
-		digest_size = _gnutls_hash_get_algo_len(me);
-		ret = gnutls_hash_fast(me->id, data->data, data->size, digest);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-
 		/* Add time */
-		snprintf(name, sizeof(name), "%s.signedAttrs", root);
-		result = asn1_write_value(c2, name, "NEW", 1);
+		result = asn1_write_value(c2, root, "NEW", 1);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(result);
 			return ret;
 		}
 
-		snprintf(name, sizeof(name), "%s.signedAttrs.?LAST.type", root);
+		snprintf(name, sizeof(name), "%s.?LAST.type", root);
 		result =
 		    asn1_write_value(c2, name, ATTR_SIGNING_TIME, 1);
 		if (result != ASN1_SUCCESS) {
@@ -1708,7 +1801,7 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 			return ret;
 		}
 
-		snprintf(name, sizeof(name), "%s.signedAttrs.?LAST.value", root);
+		snprintf(name, sizeof(name), "%s.?LAST.value", root);
 		result = asn1_write_value(c2, name, "NEW", 1);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
@@ -1716,7 +1809,7 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 			return ret;
 		}
 
-		snprintf(name, sizeof(name), "%s.signedAttrs.?LAST.value.?LAST", root);
+		snprintf(name, sizeof(name), "%s.?LAST.value.?LAST", root);
 		ret = _gnutls_x509_set_time(c2, name, gnutls_time(0), 1);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
@@ -1724,26 +1817,43 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 			return ret;
 		}
 
+		already_set = 1;
+	}
+
+	ret = add_attrs(c2, root, other_attrs, already_set);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	if (already_set != 0 || other_attrs != NULL) {
 		/* If we add any attribute we should add them all */
 		/* Add hash */
-		snprintf(name, sizeof(name), "%s.signedAttrs", root);
-		result = asn1_write_value(c2, name, "NEW", 1);
+
+		digest_size = _gnutls_hash_get_algo_len(me);
+		ret = gnutls_hash_fast(me->id, data->data, data->size, digest);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		result = asn1_write_value(c2, root, "NEW", 1);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(result);
 			return ret;
 		}
 
+		snprintf(name, sizeof(name), "%s.?LAST", root);
 		ret = _gnutls_x509_encode_and_write_attribute(ATTR_MESSAGE_DIGEST,
-					c2, "%s.signedAttrs.?LAST",
+					c2, name,
 					digest, digest_size, 1);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
-	} else {
-		asn1_write_value(c2, "signerInfos.?LAST.signedAttrs", NULL, 0);
 	}
+
 	return 0;
 }
 
@@ -1752,6 +1862,8 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
  * @pkcs7: should contain a #gnutls_pkcs7_t type
  * @signer: the certificate believe to have signed the structure
  * @data: The data to be signed or %NULL if the data are already embedded
+ * @signed_attrs: Any additional attributes to be included in the signed ones (or %NULL)
+ * @unsigned_attrs: Any additional attributes to be included in the unsigned ones (or %NULL)
  * @dig: The digest algorithm to use for signing
  * @flags: Should be zero or one of %GNUTLS_PKCS7 flags
  *
@@ -1774,6 +1886,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		      gnutls_x509_crt_t signer,
 		      gnutls_privkey_t signer_key,
 		      const gnutls_datum_t *data,
+		      gnutls_pkcs7_attrs_t signed_attrs,
+		      gnutls_pkcs7_attrs_t unsigned_attrs,
 		      gnutls_digest_algorithm_t dig,
 		      unsigned flags)
 {
@@ -1871,9 +1985,13 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		goto cleanup;
 	}
 
-	asn1_write_value(pkcs7->signed_data, "signerInfos.?LAST.unsignedAttrs", NULL, 0);
+	ret = add_attrs(pkcs7->signed_data, "signerInfos.?LAST.unsignedAttrs", unsigned_attrs, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
-	ret = write_attributes(pkcs7->signed_data, "signerInfos.?LAST", data, me, flags);
+	ret = write_attributes(pkcs7->signed_data, "signerInfos.?LAST.signedAttrs", data, me, signed_attrs, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

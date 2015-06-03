@@ -266,7 +266,7 @@ const asn1_static_node pkix_asn1_tab[] = {
   { NULL, 4104, "0"},
   { "signatureAlgorithm", 1073741826, "AlgorithmIdentifier"},
   { "signature", 1073741831, NULL },
-  { "unsignedAttrs", 536895501, NULL },
+  { "unsignedAttrs", 536895490, "SignedAttributes"},
   { NULL, 4104, "1"},
   { "SignedAttributes", 1612709903, NULL },
   { "MAX", 1074266122, "1"},

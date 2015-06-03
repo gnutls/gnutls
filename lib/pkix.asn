@@ -378,7 +378,7 @@ pkcs-7-SignerInfo ::= SEQUENCE {
      signedAttrs [0] IMPLICIT SignedAttributes OPTIONAL,
      signatureAlgorithm AlgorithmIdentifier,
      signature OCTET STRING,
-     unsignedAttrs [1] IMPLICIT ANY OPTIONAL }
+     unsignedAttrs [1] IMPLICIT SignedAttributes OPTIONAL }
 
 SignedAttributes ::= SET SIZE (1..MAX) OF Attribute
 

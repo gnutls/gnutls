@@ -29,6 +29,7 @@
 #define GNUTLS_PKCS7_H
 
 #include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
@@ -71,6 +72,7 @@ int gnutls_pkcs7_set_crl_raw(gnutls_pkcs7_t pkcs7,
 int gnutls_pkcs7_set_crl(gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl);
 int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
 
+typedef struct gnutls_pkcs7_attrs_st *gnutls_pkcs7_attrs_t;
 
 typedef struct gnutls_pkcs7_signature_info_st {
 	gnutls_sign_algorithm_t algo;
@@ -79,6 +81,8 @@ typedef struct gnutls_pkcs7_signature_info_st {
 	gnutls_datum_t signer_serial;
 	gnutls_datum_t issuer_keyid;
 	time_t signing_time;
+	gnutls_pkcs7_attrs_t signed_attrs;
+	gnutls_pkcs7_attrs_t unsigned_attrs;
 	char pad[64];
 } gnutls_pkcs7_signature_info_st;
 
@@ -91,6 +95,11 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7, gnutls_x509_trust_list_t tl,
 			gnutls_typed_vdata_st * vdata, unsigned int vdata_size,
 			unsigned idx, const gnutls_datum_t *data, unsigned flags);
 
+#define GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING 1
+int gnutls_pkcs7_add_attr(gnutls_pkcs7_attrs_t *list, const char *oid, gnutls_datum_t *data, unsigned flags);
+void gnutls_pkcs7_attrs_deinit(gnutls_pkcs7_attrs_t list);
+int gnutls_pkcs7_get_attr(gnutls_pkcs7_attrs_t list, unsigned idx, char **oid, gnutls_datum_t *data, unsigned flags);
+
 #define GNUTLS_PKCS7_EMBED_DATA 1
 #define GNUTLS_PKCS7_INCLUDE_TIME (1<<1)
 #define GNUTLS_PKCS7_INCLUDE_CERT (1<<2)
@@ -99,6 +108,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		      gnutls_x509_crt_t signer,
 		      gnutls_privkey_t signer_key,
 		      const gnutls_datum_t *data,
+		      gnutls_pkcs7_attrs_t signed_attrs,
+		      gnutls_pkcs7_attrs_t unsigned_attrs,
 		      gnutls_digest_algorithm_t dig,
 		      unsigned flags);
 
