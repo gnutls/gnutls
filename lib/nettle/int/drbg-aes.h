@@ -55,10 +55,13 @@ struct drbg_aes_ctx {
 	unsigned reseed_counter;
 };
 
+/* max_number_of_bits_per_request */
+#define MAX_DRBG_AES_GENERATE_SIZE 65536 /* 2^19 */
+
 /* This DRBG should be reseeded if reseed_counter exceeds
  * that number. Otherwise drbg_aes_random() will fail.
  */
-#define DRBG_AES_RESEED_TIME 65536
+#define DRBG_AES_RESEED_TIME 16777216
 
 /* The entropy provided in these functions should be of
  * size DRBG_AES_SEED_SIZE. Additional data and pers.
@@ -74,7 +77,10 @@ drbg_aes_reseed(struct drbg_aes_ctx *ctx,
 	unsigned entropy_size, const uint8_t *entropy, 
 	unsigned add_size, const uint8_t* add);
 
-#define drbg_aes_random(ctx, l, dst) drbg_aes_generate(ctx, l, dst, 0, NULL)
+/* our wrapper for the low-level drbg_aes_generate */
+int
+drbg_aes_random(struct drbg_aes_ctx *ctx, unsigned length,
+		uint8_t * dst);
 
 int
 drbg_aes_generate(struct drbg_aes_ctx *ctx, unsigned length,
