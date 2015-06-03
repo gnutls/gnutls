@@ -53,16 +53,21 @@ struct fips_ctx {
 
 static int _rngfips_ctx_reinit(struct fips_ctx *fctx);
 static int _rngfips_ctx_init(struct fips_ctx *fctx);
+static int drbg_reseed(struct drbg_aes_ctx *ctx);
 
 static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx *fctx,
 		      void *buffer, size_t length)
 {
 	int ret;
 
-	if (ctx->reseed_counter > DRBG_AES_RESEED_TIME
-	    || _gnutls_fork_detected(&fctx->dfork) != 0) {
-
+	if ( _gnutls_fork_detected(&fctx->dfork) != 0) {
 		ret = _rngfips_ctx_reinit(fctx);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
+	}
+
+	if (ctx->reseed_counter > DRBG_AES_RESEED_TIME) {
+		ret = drbg_reseed(ctx);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
