@@ -38,6 +38,7 @@ unsigned int _gnutls_lib_mode = LIB_STATE_POWERON;
 #define FIPS_SYSTEM_FILE "/etc/system-fips"
 
 static int _fips_mode = -1;
+static int _skip_integrity_checks = 0;
 
 /* Returns:
  * 0 - FIPS mode disabled
@@ -52,6 +53,11 @@ const char *p;
 
 	if (_fips_mode != -1)
 		return _fips_mode;
+
+	p = getenv("GNUTLS_SKIP_FIPS_INTEGRITY_CHECKS");
+	if (p && p[0] == '1') {
+		_skip_integrity_checks = 1;
+	}
 
 	p = getenv("GNUTLS_FORCE_FIPS_MODE");
 	if (p) {
@@ -353,28 +359,30 @@ int _gnutls_fips_perform_self_checks2(void)
 		goto error;
 	}
 
-	ret = check_binary_integrity(GNUTLS_LIBRARY_NAME, "gnutls_global_init");
-	if (ret == 0) {
-		gnutls_assert();
-		goto error;
-	}
+	if (_skip_integrity_checks == 0) {
+		ret = check_binary_integrity(GNUTLS_LIBRARY_NAME, "gnutls_global_init");
+		if (ret == 0) {
+			gnutls_assert();
+			goto error;
+		}
 
-	ret = check_binary_integrity(NETTLE_LIBRARY_NAME, "nettle_aes_set_encrypt_key");
-	if (ret == 0) {
-		gnutls_assert();
-		goto error;
-	}
+		ret = check_binary_integrity(NETTLE_LIBRARY_NAME, "nettle_aes_set_encrypt_key");
+		if (ret == 0) {
+			gnutls_assert();
+			goto error;
+		}
 
-	ret = check_binary_integrity(HOGWEED_LIBRARY_NAME, "nettle_mpz_sizeinbase_256_u");
-	if (ret == 0) {
-		gnutls_assert();
-		goto error;
-	}
+		ret = check_binary_integrity(HOGWEED_LIBRARY_NAME, "nettle_mpz_sizeinbase_256_u");
+		if (ret == 0) {
+			gnutls_assert();
+			goto error;
+		}
 
-	ret = check_binary_integrity(GMP_LIBRARY_NAME, "__gmpz_init");
-	if (ret == 0) {
-		gnutls_assert();
-		goto error;
+		ret = check_binary_integrity(GMP_LIBRARY_NAME, "__gmpz_init");
+		if (ret == 0) {
+			gnutls_assert();
+			goto error;
+		}
 	}
 	
 	return 0;
