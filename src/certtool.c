@@ -51,7 +51,7 @@ static FILE *stdlog = NULL;
 
 static void privkey_info_int(common_info_st *, gnutls_x509_privkey_t key);
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out);
-void pkcs7_info(void);
+void pkcs7_info(common_info_st *);
 void pkcs7_sign(common_info_st *, unsigned embed);
 void pkcs7_generate(common_info_st *);
 void pkcs8_info(void);
@@ -1239,7 +1239,7 @@ static void cmd_parser(int argc, char **argv)
 	else if (HAVE_OPT(CRL_INFO))
 		crl_info();
 	else if (HAVE_OPT(P7_INFO))
-		pkcs7_info();
+		pkcs7_info(&cinfo);
 	else if (HAVE_OPT(P7_GENERATE))
 		pkcs7_generate(&cinfo);
 	else if (HAVE_OPT(P7_SIGN))
@@ -2767,7 +2767,7 @@ static void print_dn(const char *prefix, const gnutls_datum_t *raw)
 	if (ret < 0)
 		goto cleanup;
 
-	fprintf(stderr, "%s: %s\n", prefix, str.data);
+	fprintf(outfile, "%s: %s\n", prefix, str.data);
 
  cleanup:
  	gnutls_x509_dn_deinit(dn);
@@ -2791,7 +2791,52 @@ static void print_raw(const char *prefix, const gnutls_datum_t *raw)
 		exit(1);
 	}
 
-	fprintf(stderr, "%s: %s\n", prefix, data);
+	fprintf(outfile, "%s: %s\n", prefix, data);
+}
+
+static void print_pkcs7_sig_info(gnutls_pkcs7_signature_info_st *info, common_info_st *cinfo)
+{
+	unsigned i;
+	char *oid;
+	gnutls_datum_t data;
+	char prefix[128];
+	int ret;
+
+	print_dn("\tSigner's issuer DN", &info->issuer_dn);
+	print_raw("\tSigner's serial", &info->signer_serial);
+	print_raw("\tSigner's issuer key ID", &info->issuer_keyid);
+	if (info->signing_time != -1)
+		fprintf(outfile, "\tSigning time: %s", ctime(&info->signing_time));
+
+	fprintf(outfile, "\tSignature Algorithm: %s\n", gnutls_sign_get_name(info->algo));
+
+	if (info->signed_attrs) {
+		for (i=0;;i++) {
+			ret = gnutls_pkcs7_get_attr(info->signed_attrs, i, &oid, &data, 0);
+			if (ret < 0)
+				break;
+			if (i==0)
+				fprintf(outfile, "\tSigned Attributes:\n");
+
+			snprintf(prefix, sizeof(prefix), "\t\t%s", oid);
+			print_raw(prefix, &data);
+			gnutls_free(data.data);
+		}
+	}
+	if (info->unsigned_attrs) {
+		for (i=0;;i++) {
+			ret = gnutls_pkcs7_get_attr(info->unsigned_attrs, i, &oid, &data, 0);
+			if (ret < 0)
+				break;
+			if (i==0)
+				fprintf(outfile, "\tUnsigned Attributes:\n");
+
+			snprintf(prefix, sizeof(prefix), "\t\t%s", oid);
+			print_raw(prefix, &data);
+			gnutls_free(data.data);
+		}
+	}
+	fprintf(outfile, "\n");
 }
 
 void verify_pkcs7(common_info_st * cinfo, const char *purpose)
@@ -2845,20 +2890,15 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 		}
 	}
 
-	fprintf(stderr, "Signers:\n");
 	ecode = 1;
 	for (i=0;;i++) {
 		ret = gnutls_pkcs7_get_signature_info(pkcs7, i, &info);
 		if (ret < 0)
 			break;
+		if (i==0)
+			fprintf(outfile, "Signers:\n");
 
-		print_dn("\tSigner's issuer DN", &info.issuer_dn);
-		print_raw("\tSigner's serial", &info.signer_serial);
-		print_raw("\tSigner's issuer key ID", &info.issuer_keyid);
-		if (info.signing_time != -1)
-			fprintf(stderr, "\tSigning time: %s", ctime(&info.signing_time));
-
-		fprintf(stderr, "\tSignature Algorithm: %s\n", gnutls_sign_get_name(info.algo));
+		print_pkcs7_sig_info(&info, cinfo);
 
 		gnutls_pkcs7_signature_info_deinit(&info);
 
@@ -2909,7 +2949,7 @@ void pkcs7_sign(common_info_st * cinfo, unsigned embed)
 	if (embed)
 		flags |= GNUTLS_PKCS7_EMBED_DATA;
 
-	ret = gnutls_pkcs7_sign(pkcs7, signer, key, &data, get_dig(signer), flags);
+	ret = gnutls_pkcs7_sign(pkcs7, signer, key, &data, NULL, NULL, get_dig(signer), flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error signing: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -3608,13 +3648,15 @@ void pkcs8_info(void)
 	pkcs8_info_int(&data, incert_format, 0, outfile, "");
 }
 
-void pkcs7_info(void)
+void pkcs7_info(common_info_st *cinfo)
 {
 	gnutls_pkcs7_t pkcs7;
 	int result;
 	size_t size;
 	gnutls_datum_t data, b64;
 	int indx, count;
+	unsigned i;
+	gnutls_pkcs7_signature_info_st info;
 
 	result = gnutls_pkcs7_init(&pkcs7);
 	if (result < 0) {
@@ -3631,6 +3673,19 @@ void pkcs7_info(void)
 		fprintf(stderr, "import error: %s\n",
 			gnutls_strerror(result));
 		exit(1);
+	}
+
+	for (i=0;;i++) {
+		result = gnutls_pkcs7_get_signature_info(pkcs7, i, &info);
+		if (result < 0)
+			break;
+
+		if (i==0)
+			fprintf(outfile, "Signers:\n");
+
+		print_pkcs7_sig_info(&info, cinfo);
+
+		gnutls_pkcs7_signature_info_deinit(&info);
 	}
 
 	/* Read and print the certificates.
