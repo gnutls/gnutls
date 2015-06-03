@@ -67,7 +67,6 @@ drbg_aes_update(struct drbg_aes_ctx *ctx,
 
 	memcpy(ctx->v, &tmp[DRBG_AES_KEY_SIZE], AES_BLOCK_SIZE);
 
-	ctx->reseed_counter = 1;
 	ctx->seeded = 1;
 }
 
@@ -93,6 +92,7 @@ drbg_aes_reseed(struct drbg_aes_ctx *ctx,
 	memxor(tmp, entropy, entropy_size);
 
 	drbg_aes_update(ctx, tmp);
+	ctx->reseed_counter = 1;
 
 	return 1;
 }
