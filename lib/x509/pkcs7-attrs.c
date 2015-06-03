@@ -43,6 +43,9 @@
  * This function will set a PKCS #7 attribute in the provided list.
  * If this function fails, the previous list would be deallocated.
  *
+ * Note that any attributes set with this function must either be
+ * DER or BER encoded, unless a special flag is present.
+ *
  * Returns: On success, the new list head, otherwise %NULL.
  *
  * Since: 3.4.2
