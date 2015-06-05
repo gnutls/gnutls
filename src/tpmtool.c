@@ -122,14 +122,14 @@ static void cmd_parser(int argc, char **argv)
 		printf("Setting log level to %d\n", debug);
 
 	if ((ret = gnutls_global_init()) < 0) {
-		fprintf(stderr, "global_init: %s", gnutls_strerror(ret));
+		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
 	if (HAVE_OPT(OUTFILE)) {
 		outfile = safe_open_rw(OPT_ARG(OUTFILE), 0);
 		if (outfile == NULL) {
-			fprintf(stderr, "%s", OPT_ARG(OUTFILE));
+			fprintf(stderr, "%s\n", OPT_ARG(OUTFILE));
 			exit(1);
 		}
 	} else
@@ -138,7 +138,7 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(INFILE)) {
 		infile = fopen(OPT_ARG(INFILE), "rb");
 		if (infile == NULL) {
-			fprintf(stderr, "%s", OPT_ARG(INFILE));
+			fprintf(stderr, "%s\n", OPT_ARG(INFILE));
 			exit(1);
 		}
 	} else
@@ -195,7 +195,7 @@ static void tpm_generate(FILE * outfile, unsigned int key_type,
 	free(srk_pass);
 
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_tpm_privkey_generate: %s",
+		fprintf(stderr, "gnutls_tpm_privkey_generate: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -218,7 +218,7 @@ static void tpm_delete(const char *url, FILE * outfile)
 
 	ret = gnutls_tpm_privkey_delete(url, srk_pass);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_tpm_privkey_delete: %s",
+		fprintf(stderr, "gnutls_tpm_privkey_delete: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -235,7 +235,7 @@ static void tpm_list(FILE * outfile)
 
 	ret = gnutls_tpm_get_registered(&list);
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_tpm_get_registered: %s",
+		fprintf(stderr, "gnutls_tpm_get_registered: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
@@ -246,7 +246,7 @@ static void tpm_list(FILE * outfile)
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;
 		else if (ret < 0) {
-			fprintf(stderr, "gnutls_tpm_key_list_get_url: %s",
+			fprintf(stderr, "gnutls_tpm_key_list_get_url: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -275,7 +275,7 @@ static void tpm_pubkey(const char *url, FILE * outfile)
 	free(srk_pass);
 
 	if (ret < 0) {
-		fprintf(stderr, "gnutls_pubkey_import_tpm_url: %s",
+		fprintf(stderr, "gnutls_pubkey_import_tpm_url: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	}
