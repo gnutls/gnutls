@@ -216,7 +216,6 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 
 	ret = gnutls_load_file(mac_file, &data);
 	if (ret < 0) {
-		_gnutls_debug_log("Could not open %s for MAC testing: %s\n", mac_file, gnutls_strerror(ret));
 		get_hmac_file2(mac_file, sizeof(mac_file), file);
 		ret = gnutls_load_file(mac_file, &data);
 		if (ret < 0) {
@@ -239,7 +238,7 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 		_gnutls_debug_log("Calculated MAC for %s does not match\n", libname);
 		return gnutls_assert_val(0);
 	}
-	_gnutls_debug_log("Successfully verified library MAC for %s\n", libname);
+	_gnutls_debug_log("Successfully verified MAC for %s (%s)\n", mac_file, libname);
 	
 	return 1;
 }
