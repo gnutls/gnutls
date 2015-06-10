@@ -512,10 +512,10 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 	case GNUTLS_CIPHER_CAMELLIA_256_CBC:
 #ifdef USE_NETTLE3
 		if (ctx->enc)
-			camellia192_set_encrypt_key(ctx->ctx_ptr,
+			camellia256_set_encrypt_key(ctx->ctx_ptr,
 						 key);
 		else
-			camellia192_set_decrypt_key(ctx->ctx_ptr,
+			camellia256_set_decrypt_key(ctx->ctx_ptr,
 						 key);
 		break;
 #else
