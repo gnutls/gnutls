@@ -45,10 +45,10 @@ fi
 . $srcdir/../scripts/common.sh
 
 PORT="${PORT:-$RPORT}"
-if test -x /usr/bin/polarssl_ssl_client2;then
-POLARSSL_CLI="/usr/bin/polarssl_ssl_client2"
+if test -x /usr/bin/mbedtls_ssl_client2;then
+POLARSSL_CLI="/usr/bin/mbedtls_ssl_client2"
 else
-POLARSSL_CLI="/usr/libexec/polarssl/ssl_client2"
+POLARSSL_CLI="/usr/libexec/mbedtls/ssl_client2"
 fi
 
 TXT=`$CLI --priority NORMAL --list|grep SECP224`
@@ -250,6 +250,26 @@ wait
 
 echo "Check TLS 1.2 with DHE-RSA ciphersuite"
 launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$POLARSSL_CLI  server_name=localhost min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.2 with CAMELLIA-128-GCM-DHE-RSA ciphersuite"
+launch_server $$  --priority "NONE:-CIPHER-ALL:+CAMELLIA-128-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$POLARSSL_CLI  server_name=localhost min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.2 with CAMELLIA-256-GCM-DHE-RSA ciphersuite"
+launch_server $$  --priority "NONE:-CIPHER-ALL:+CAMELLIA-256-GCM:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.2:+DHE-RSA$ADD" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
 wait_server $PID
 
 $POLARSSL_CLI  server_name=localhost min_version=tls1_2 max_version=tls1_2 server_port=$PORT crt_file=$CLI_CERT key_file=$CLI_KEY ca_file=$CA_CERT </dev/null >>$LOGFILE 2>&1 || \
