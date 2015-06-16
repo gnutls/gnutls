@@ -2043,3 +2043,4 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	gnutls_free(signature.data);
 	return ret;
 }
+

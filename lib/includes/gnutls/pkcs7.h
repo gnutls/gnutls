@@ -120,6 +120,9 @@ int
 gnutls_pkcs7_get_crl_raw2(gnutls_pkcs7_t pkcs7,
 			  int indx, gnutls_datum_t *crl);
 
+int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
+		       gnutls_certificate_print_formats_t format,
+		       gnutls_datum_t * out);
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus
