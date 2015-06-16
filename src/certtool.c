@@ -3653,10 +3653,8 @@ void pkcs7_info(common_info_st *cinfo)
 	gnutls_pkcs7_t pkcs7;
 	int result;
 	size_t size;
-	gnutls_datum_t data, b64;
+	gnutls_datum_t data, b64, str;
 	int indx, count;
-	unsigned i;
-	gnutls_pkcs7_signature_info_st info;
 
 	result = gnutls_pkcs7_init(&pkcs7);
 	if (result < 0) {
@@ -3675,18 +3673,15 @@ void pkcs7_info(common_info_st *cinfo)
 		exit(1);
 	}
 
-	for (i=0;;i++) {
-		result = gnutls_pkcs7_get_signature_info(pkcs7, i, &info);
-		if (result < 0)
-			break;
-
-		if (i==0)
-			fprintf(outfile, "Signers:\n");
-
-		print_pkcs7_sig_info(&info, cinfo);
-
-		gnutls_pkcs7_signature_info_deinit(&info);
+	result = gnutls_pkcs7_print(pkcs7, GNUTLS_CRT_PRINT_COMPACT, &str);
+	if (result < 0) {
+		fprintf(stderr, "printing error: %s\n",
+			gnutls_strerror(result));
+		exit(1);
 	}
+
+	fprintf(outfile, "%s", str.data);
+	gnutls_free(str.data);
 
 	/* Read and print the certificates.
 	 */
