@@ -1038,6 +1038,7 @@ GNUTLS_3_4
 	gnutls_pkcs7_add_attr;
 	gnutls_pkcs7_get_attr;
 	gnutls_pkcs7_print;
+	gnutls_x509_crt_verify_data2;
  local:
 	*;
 };

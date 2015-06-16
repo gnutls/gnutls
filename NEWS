@@ -24,6 +24,7 @@ structures.
 gnutls_x509_dn_get_str: Added
 gnutls_pkcs11_get_raw_issuer_by_subject_key_id: Added
 gnutls_x509_trust_list_get_issuer_by_subject_key_id: Added
+gnutls_x509_crt_verify_data2: Added
 gnutls_pkcs7_get_crt_raw2: Added
 gnutls_pkcs7_signature_info_deinit: Added
 gnutls_pkcs7_get_signature_info: Added
