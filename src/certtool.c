@@ -3653,8 +3653,7 @@ void pkcs7_info(common_info_st *cinfo)
 	gnutls_pkcs7_t pkcs7;
 	int result;
 	size_t size;
-	gnutls_datum_t data, b64, str;
-	int indx, count;
+	gnutls_datum_t data, str;
 
 	result = gnutls_pkcs7_init(&pkcs7);
 	if (result < 0) {
@@ -3673,7 +3672,7 @@ void pkcs7_info(common_info_st *cinfo)
 		exit(1);
 	}
 
-	result = gnutls_pkcs7_print(pkcs7, GNUTLS_CRT_PRINT_COMPACT, &str);
+	result = gnutls_pkcs7_print(pkcs7, GNUTLS_CRT_PRINT_FULL, &str);
 	if (result < 0) {
 		fprintf(stderr, "printing error: %s\n",
 			gnutls_strerror(result));
@@ -3683,83 +3682,6 @@ void pkcs7_info(common_info_st *cinfo)
 	fprintf(outfile, "%s", str.data);
 	gnutls_free(str.data);
 
-	/* Read and print the certificates.
-	 */
-	result = gnutls_pkcs7_get_crt_count(pkcs7);
-	if (result < 0) {
-		fprintf(stderr, "p7_crt_count: %s\n",
-			gnutls_strerror(result));
-		exit(1);
-	}
-
-	count = result;
-
-	if (count > 0)
-		fprintf(outfile, "Number of certificates: %u\n", count);
-
-	for (indx = 0; indx < count; indx++) {
-		fputs("\n", outfile);
-
-		size = lbuffer_size;
-		result =
-		    gnutls_pkcs7_get_crt_raw(pkcs7, indx, lbuffer, &size);
-		if (result < 0)
-			break;
-
-		data.data = lbuffer;
-		data.size = size;
-
-		result =
-		    gnutls_pem_base64_encode_alloc("CERTIFICATE", &data,
-						   &b64);
-		if (result < 0) {
-			fprintf(stderr, "encoding: %s\n",
-				gnutls_strerror(result));
-			exit(1);
-		}
-
-		fputs((void *) b64.data, outfile);
-		gnutls_free(b64.data);
-	}
-
-	/* Read the CRLs now.
-	 */
-	result = gnutls_pkcs7_get_crl_count(pkcs7);
-	if (result < 0) {
-		fprintf(stderr, "p7_crl_count: %s\n",
-			gnutls_strerror(result));
-		exit(1);
-	}
-
-	count = result;
-
-	if (count > 0)
-		fprintf(outfile, "\nNumber of CRLs: %u\n", count);
-
-	for (indx = 0; indx < count; indx++) {
-		fputs("\n", outfile);
-
-		size = lbuffer_size;
-		result =
-		    gnutls_pkcs7_get_crl_raw(pkcs7, indx, lbuffer, &size);
-		if (result < 0)
-			break;
-
-		data.data = lbuffer;
-		data.size = size;
-
-		result =
-		    gnutls_pem_base64_encode_alloc("X509 CRL", &data,
-						   &b64);
-		if (result < 0) {
-			fprintf(stderr, "encoding: %s\n",
-				gnutls_strerror(result));
-			exit(1);
-		}
-
-		fputs((void *) b64.data, outfile);
-		gnutls_free(b64.data);
-	}
 	gnutls_pkcs7_deinit(pkcs7);
 }
 
