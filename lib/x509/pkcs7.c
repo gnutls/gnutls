@@ -1803,7 +1803,7 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 			return ret;
 		}
 
-		snprintf(name, sizeof(name), "%s.?LAST.value", root);
+		snprintf(name, sizeof(name), "%s.?LAST.values", root);
 		result = asn1_write_value(c2, name, "NEW", 1);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
@@ -1811,7 +1811,7 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 			return ret;
 		}
 
-		snprintf(name, sizeof(name), "%s.?LAST.value.?LAST", root);
+		snprintf(name, sizeof(name), "%s.?LAST.values.?LAST", root);
 		ret = _gnutls_x509_set_time(c2, name, gnutls_time(0), 1);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
