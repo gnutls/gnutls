@@ -457,6 +457,7 @@ APIMANS += gnutls_pkcs11_delete_url.3
 APIMANS += gnutls_pkcs11_get_pin_function.3
 APIMANS += gnutls_pkcs11_get_raw_issuer.3
 APIMANS += gnutls_pkcs11_get_raw_issuer_by_dn.3
+APIMANS += gnutls_pkcs11_get_raw_issuer_by_subject_key_id.3
 APIMANS += gnutls_pkcs11_init.3
 APIMANS += gnutls_pkcs11_obj_deinit.3
 APIMANS += gnutls_pkcs11_obj_export.3
@@ -526,21 +527,32 @@ APIMANS += gnutls_pkcs12_mac_info.3
 APIMANS += gnutls_pkcs12_set_bag.3
 APIMANS += gnutls_pkcs12_simple_parse.3
 APIMANS += gnutls_pkcs12_verify_mac.3
+APIMANS += gnutls_pkcs7_add_attr.3
+APIMANS += gnutls_pkcs7_attrs_deinit.3
 APIMANS += gnutls_pkcs7_deinit.3
 APIMANS += gnutls_pkcs7_delete_crl.3
 APIMANS += gnutls_pkcs7_delete_crt.3
 APIMANS += gnutls_pkcs7_export.3
 APIMANS += gnutls_pkcs7_export2.3
+APIMANS += gnutls_pkcs7_get_attr.3
 APIMANS += gnutls_pkcs7_get_crl_count.3
 APIMANS += gnutls_pkcs7_get_crl_raw.3
+APIMANS += gnutls_pkcs7_get_crl_raw2.3
 APIMANS += gnutls_pkcs7_get_crt_count.3
 APIMANS += gnutls_pkcs7_get_crt_raw.3
+APIMANS += gnutls_pkcs7_get_crt_raw2.3
+APIMANS += gnutls_pkcs7_get_signature_info.3
 APIMANS += gnutls_pkcs7_import.3
 APIMANS += gnutls_pkcs7_init.3
+APIMANS += gnutls_pkcs7_print.3
 APIMANS += gnutls_pkcs7_set_crl.3
 APIMANS += gnutls_pkcs7_set_crl_raw.3
 APIMANS += gnutls_pkcs7_set_crt.3
 APIMANS += gnutls_pkcs7_set_crt_raw.3
+APIMANS += gnutls_pkcs7_sign.3
+APIMANS += gnutls_pkcs7_signature_info_deinit.3
+APIMANS += gnutls_pkcs7_verify.3
+APIMANS += gnutls_pkcs7_verify_direct.3
 APIMANS += gnutls_pkcs8_info.3
 APIMANS += gnutls_pkcs_schema_get_name.3
 APIMANS += gnutls_pkcs_schema_get_oid.3
@@ -987,10 +999,12 @@ APIMANS += gnutls_x509_crt_set_version.3
 APIMANS += gnutls_x509_crt_sign.3
 APIMANS += gnutls_x509_crt_sign2.3
 APIMANS += gnutls_x509_crt_verify.3
+APIMANS += gnutls_x509_crt_verify_data2.3
 APIMANS += gnutls_x509_dn_deinit.3
 APIMANS += gnutls_x509_dn_export.3
 APIMANS += gnutls_x509_dn_export2.3
 APIMANS += gnutls_x509_dn_get_rdn_ava.3
+APIMANS += gnutls_x509_dn_get_str.3
 APIMANS += gnutls_x509_dn_import.3
 APIMANS += gnutls_x509_dn_init.3
 APIMANS += gnutls_x509_dn_oid_known.3
@@ -1081,6 +1095,7 @@ APIMANS += gnutls_x509_trust_list_add_trust_mem.3
 APIMANS += gnutls_x509_trust_list_deinit.3
 APIMANS += gnutls_x509_trust_list_get_issuer.3
 APIMANS += gnutls_x509_trust_list_get_issuer_by_dn.3
+APIMANS += gnutls_x509_trust_list_get_issuer_by_subject_key_id.3
 APIMANS += gnutls_x509_trust_list_init.3
 APIMANS += gnutls_x509_trust_list_iter_deinit.3
 APIMANS += gnutls_x509_trust_list_iter_get_ca.3
@@ -1161,7 +1176,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1175,7 +1190,21 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
+		echo $(ECHO_N) "."; \
+	done
+	@echo ""
+	@echo $(ECHO_N) "Creating man pages for pkcs7.h..." && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs7.h`; do \
+		$(top_srcdir)/doc/scripts/gdoc -man \
+			-module $(PACKAGE) -sourceversion $(VERSION) \
+			-bugsto $(PACKAGE_BUGREPORT) \
+			-pkg-site "http://www.gnutls.org" \
+			-include "gnutls/pkcs7.h" \
+			-seeinfo $(PACKAGE) -verbatimcopying \
+			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
+			-function $$i \
+			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1189,7 +1218,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""
@@ -1217,7 +1246,7 @@ stamp_mans: $(HEADER_FILES)
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2001-$(YEAR) Free Software Foundation, Inc., and others" \
 			-function $$i \
-			$(C_SOURCE_FILES) > $$i.3 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) > $$i.3 2>/dev/null && \
 		echo $(ECHO_N) "."; \
 	done
 	@echo ""

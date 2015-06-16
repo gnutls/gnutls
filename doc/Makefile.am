@@ -267,7 +267,7 @@ pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -289,7 +289,7 @@ pkcs7-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs7.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -357,7 +357,7 @@ ocsp-api.texi: $(top_srcdir)/lib/includes/gnutls/ocsp.h
 		echo $(ECHO_N) "Creating documentation for $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
-			$(C_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
+			$(C_X509_SOURCE_FILES) >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
 	mv -f $@-tmp $@
@@ -1339,6 +1339,8 @@ FUNCS += functions/gnutls_pkcs11_get_raw_issuer
 FUNCS += functions/gnutls_pkcs11_get_raw_issuer.short
 FUNCS += functions/gnutls_pkcs11_get_raw_issuer_by_dn
 FUNCS += functions/gnutls_pkcs11_get_raw_issuer_by_dn.short
+FUNCS += functions/gnutls_pkcs11_get_raw_issuer_by_subject_key_id
+FUNCS += functions/gnutls_pkcs11_get_raw_issuer_by_subject_key_id.short
 FUNCS += functions/gnutls_pkcs11_init
 FUNCS += functions/gnutls_pkcs11_init.short
 FUNCS += functions/gnutls_pkcs11_obj_deinit
@@ -1477,6 +1479,10 @@ FUNCS += functions/gnutls_pkcs12_simple_parse
 FUNCS += functions/gnutls_pkcs12_simple_parse.short
 FUNCS += functions/gnutls_pkcs12_verify_mac
 FUNCS += functions/gnutls_pkcs12_verify_mac.short
+FUNCS += functions/gnutls_pkcs7_add_attr
+FUNCS += functions/gnutls_pkcs7_add_attr.short
+FUNCS += functions/gnutls_pkcs7_attrs_deinit
+FUNCS += functions/gnutls_pkcs7_attrs_deinit.short
 FUNCS += functions/gnutls_pkcs7_deinit
 FUNCS += functions/gnutls_pkcs7_deinit.short
 FUNCS += functions/gnutls_pkcs7_delete_crl
@@ -1487,18 +1493,28 @@ FUNCS += functions/gnutls_pkcs7_export
 FUNCS += functions/gnutls_pkcs7_export.short
 FUNCS += functions/gnutls_pkcs7_export2
 FUNCS += functions/gnutls_pkcs7_export2.short
+FUNCS += functions/gnutls_pkcs7_get_attr
+FUNCS += functions/gnutls_pkcs7_get_attr.short
 FUNCS += functions/gnutls_pkcs7_get_crl_count
 FUNCS += functions/gnutls_pkcs7_get_crl_count.short
 FUNCS += functions/gnutls_pkcs7_get_crl_raw
 FUNCS += functions/gnutls_pkcs7_get_crl_raw.short
+FUNCS += functions/gnutls_pkcs7_get_crl_raw2
+FUNCS += functions/gnutls_pkcs7_get_crl_raw2.short
 FUNCS += functions/gnutls_pkcs7_get_crt_count
 FUNCS += functions/gnutls_pkcs7_get_crt_count.short
 FUNCS += functions/gnutls_pkcs7_get_crt_raw
 FUNCS += functions/gnutls_pkcs7_get_crt_raw.short
+FUNCS += functions/gnutls_pkcs7_get_crt_raw2
+FUNCS += functions/gnutls_pkcs7_get_crt_raw2.short
+FUNCS += functions/gnutls_pkcs7_get_signature_info
+FUNCS += functions/gnutls_pkcs7_get_signature_info.short
 FUNCS += functions/gnutls_pkcs7_import
 FUNCS += functions/gnutls_pkcs7_import.short
 FUNCS += functions/gnutls_pkcs7_init
 FUNCS += functions/gnutls_pkcs7_init.short
+FUNCS += functions/gnutls_pkcs7_print
+FUNCS += functions/gnutls_pkcs7_print.short
 FUNCS += functions/gnutls_pkcs7_set_crl
 FUNCS += functions/gnutls_pkcs7_set_crl.short
 FUNCS += functions/gnutls_pkcs7_set_crl_raw
@@ -1507,6 +1523,14 @@ FUNCS += functions/gnutls_pkcs7_set_crt
 FUNCS += functions/gnutls_pkcs7_set_crt.short
 FUNCS += functions/gnutls_pkcs7_set_crt_raw
 FUNCS += functions/gnutls_pkcs7_set_crt_raw.short
+FUNCS += functions/gnutls_pkcs7_sign
+FUNCS += functions/gnutls_pkcs7_sign.short
+FUNCS += functions/gnutls_pkcs7_signature_info_deinit
+FUNCS += functions/gnutls_pkcs7_signature_info_deinit.short
+FUNCS += functions/gnutls_pkcs7_verify
+FUNCS += functions/gnutls_pkcs7_verify.short
+FUNCS += functions/gnutls_pkcs7_verify_direct
+FUNCS += functions/gnutls_pkcs7_verify_direct.short
 FUNCS += functions/gnutls_pkcs8_info
 FUNCS += functions/gnutls_pkcs8_info.short
 FUNCS += functions/gnutls_pkcs_schema_get_name
@@ -2397,6 +2421,8 @@ FUNCS += functions/gnutls_x509_crt_sign2
 FUNCS += functions/gnutls_x509_crt_sign2.short
 FUNCS += functions/gnutls_x509_crt_verify
 FUNCS += functions/gnutls_x509_crt_verify.short
+FUNCS += functions/gnutls_x509_crt_verify_data2
+FUNCS += functions/gnutls_x509_crt_verify_data2.short
 FUNCS += functions/gnutls_x509_dn_deinit
 FUNCS += functions/gnutls_x509_dn_deinit.short
 FUNCS += functions/gnutls_x509_dn_export
@@ -2405,6 +2431,8 @@ FUNCS += functions/gnutls_x509_dn_export2
 FUNCS += functions/gnutls_x509_dn_export2.short
 FUNCS += functions/gnutls_x509_dn_get_rdn_ava
 FUNCS += functions/gnutls_x509_dn_get_rdn_ava.short
+FUNCS += functions/gnutls_x509_dn_get_str
+FUNCS += functions/gnutls_x509_dn_get_str.short
 FUNCS += functions/gnutls_x509_dn_import
 FUNCS += functions/gnutls_x509_dn_import.short
 FUNCS += functions/gnutls_x509_dn_init
@@ -2585,6 +2613,8 @@ FUNCS += functions/gnutls_x509_trust_list_get_issuer
 FUNCS += functions/gnutls_x509_trust_list_get_issuer.short
 FUNCS += functions/gnutls_x509_trust_list_get_issuer_by_dn
 FUNCS += functions/gnutls_x509_trust_list_get_issuer_by_dn.short
+FUNCS += functions/gnutls_x509_trust_list_get_issuer_by_subject_key_id
+FUNCS += functions/gnutls_x509_trust_list_get_issuer_by_subject_key_id.short
 FUNCS += functions/gnutls_x509_trust_list_init
 FUNCS += functions/gnutls_x509_trust_list_init.short
 FUNCS += functions/gnutls_x509_trust_list_iter_deinit
