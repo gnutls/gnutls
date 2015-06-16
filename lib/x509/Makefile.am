@@ -62,7 +62,7 @@ libgnutls_x509_la_SOURCES =	\
 	verify-high.h		\
 	x509_ext.c		\
 	email-verify.c		\
-	pkcs7_output.c
+	pkcs7-output.c
 
 if ENABLE_OCSP
 libgnutls_x509_la_SOURCES += ocsp.c ocsp_output.c
