@@ -34,6 +34,7 @@ gnutls_pkcs7_sign: Added
 gnutls_pkcs7_attrs_deinit: Added
 gnutls_pkcs7_add_attr: Added
 gnutls_pkcs7_get_attr: Added
+gnutls_pkcs7_print: Added
 
 
 * Version 3.4.1 (released 2015-05-03)
