@@ -1756,7 +1756,7 @@ static int add_attrs(ASN1_TYPE c2, const char *root, gnutls_pkcs7_attrs_t attrs,
 				return _gnutls_asn2err(result);
 			}
 
-			snprintf(name, sizeof(name), "%s.?LAST.values.?LAST", root);
+			snprintf(name, sizeof(name), "%s.?LAST.values.?1", root);
 			result = asn1_write_value(c2, name, p->data.data, p->data.size);
 			if (result != ASN1_SUCCESS) {
 				gnutls_assert();
@@ -1811,8 +1811,8 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 			return ret;
 		}
 
-		snprintf(name, sizeof(name), "%s.?LAST.values.?LAST", root);
-		ret = _gnutls_x509_set_time(c2, name, gnutls_time(0), 1);
+		snprintf(name, sizeof(name), "%s.?LAST.values.?1", root);
+		ret = _gnutls_x509_set_raw_time(c2, name, gnutls_time(0));
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			ret = _gnutls_asn2err(result);

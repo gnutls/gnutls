@@ -872,6 +872,34 @@ _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 	return 0;
 }
 
+int
+_gnutls_x509_set_raw_time(ASN1_TYPE c2, const char *where, time_t tim)
+{
+	char str_time[MAX_TIME];
+	uint8_t buf[128];
+	int result, len, der_len;
+
+	result =
+	    gtime2generalTime(tim, str_time, sizeof(str_time));
+	if (result < 0)
+		return gnutls_assert_val(result);
+	len = strlen(str_time);
+
+	buf[0] = ASN1_TAG_GENERALIZEDTime;
+	asn1_length_der(len, buf+1, &der_len);
+
+	if ((unsigned)len > sizeof(buf)-der_len-1) {
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+	}
+
+	memcpy(buf+1+der_len, str_time, len);
+
+	result = asn1_write_value(c2, where, buf, len+1+der_len);
+	if (result != ASN1_SUCCESS)
+		return gnutls_assert_val(_gnutls_asn2err(result));
+	return 0;
+}
+
 
 gnutls_x509_subject_alt_name_t _gnutls_x509_san_find_type(char *str_type)
 {
