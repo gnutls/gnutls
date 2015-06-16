@@ -33,10 +33,11 @@
 #define addf _gnutls_buffer_append_printf
 #define adds _gnutls_buffer_append_str
 
-static void print_dn(gnutls_buffer_st *str, const char *prefix, const gnutls_datum_t *raw)
+static void print_dn(gnutls_buffer_st * str, const char *prefix,
+		     const gnutls_datum_t * raw)
 {
 	gnutls_x509_dn_t dn = NULL;
-	gnutls_datum_t output = {NULL, 0};
+	gnutls_datum_t output = { NULL, 0 };
 	int ret;
 
 	ret = gnutls_x509_dn_init(&dn);
@@ -60,11 +61,12 @@ static void print_dn(gnutls_buffer_st *str, const char *prefix, const gnutls_dat
 	addf(str, "%s: %s\n", prefix, output.data);
 
  cleanup:
- 	gnutls_x509_dn_deinit(dn);
- 	gnutls_free(output.data);
+	gnutls_x509_dn_deinit(dn);
+	gnutls_free(output.data);
 }
 
-static void print_raw(gnutls_buffer_st *str, const char *prefix, const gnutls_datum_t *raw)
+static void print_raw(gnutls_buffer_st * str, const char *prefix,
+		      const gnutls_datum_t * raw)
 {
 	char data[512];
 	size_t data_size;
@@ -83,7 +85,9 @@ static void print_raw(gnutls_buffer_st *str, const char *prefix, const gnutls_da
 	addf(str, "%s: %s\n", prefix, data);
 }
 
-static void print_pkcs7_info(gnutls_pkcs7_signature_info_st *info, gnutls_buffer_st *str)
+static void print_pkcs7_info(gnutls_pkcs7_signature_info_st * info,
+			     gnutls_buffer_st * str,
+			     gnutls_certificate_print_formats_t format)
 {
 	unsigned i;
 	char *oid;
@@ -99,43 +103,53 @@ static void print_pkcs7_info(gnutls_pkcs7_signature_info_st *info, gnutls_buffer
 	if (info->signing_time != -1) {
 		struct tm t;
 		if (gmtime_r(&info->signing_time, &t) == NULL) {
-			addf(str, "error: gmtime_r (%ld)\n", (unsigned long)info->signing_time);
+			addf(str, "error: gmtime_r (%ld)\n",
+			     (unsigned long)info->signing_time);
 		} else {
 			max = sizeof(s);
-			if (strftime(s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0) {
-				addf(str, "error: strftime (%ld)\n", (unsigned long)info->signing_time);
+			if (strftime(s, max, "%a %b %d %H:%M:%S UTC %Y", &t) ==
+			    0) {
+				addf(str, "error: strftime (%ld)\n",
+				     (unsigned long)info->signing_time);
 			} else {
 				addf(str, "\tSigning time: %s\n", s);
 			}
 		}
 	}
 
-	addf(str, "\tSignature Algorithm: %s\n", gnutls_sign_get_name(info->algo));
+	addf(str, "\tSignature Algorithm: %s\n",
+	     gnutls_sign_get_name(info->algo));
 
-	if (info->signed_attrs) {
-		for (i=0;;i++) {
-			ret = gnutls_pkcs7_get_attr(info->signed_attrs, i, &oid, &data, 0);
-			if (ret < 0)
-				break;
-			if (i==0)
-				addf(str, "\tSigned Attributes:\n");
+	if (format == GNUTLS_CRT_PRINT_FULL) {
+		if (info->signed_attrs) {
+			for (i = 0;; i++) {
+				ret =
+				    gnutls_pkcs7_get_attr(info->signed_attrs, i,
+							  &oid, &data, 0);
+				if (ret < 0)
+					break;
+				if (i == 0)
+					addf(str, "\tSigned Attributes:\n");
 
-			snprintf(prefix, sizeof(prefix), "\t\t%s", oid);
-			print_raw(str, prefix, &data);
-			gnutls_free(data.data);
+				snprintf(prefix, sizeof(prefix), "\t\t%s", oid);
+				print_raw(str, prefix, &data);
+				gnutls_free(data.data);
+			}
 		}
-	}
-	if (info->unsigned_attrs) {
-		for (i=0;;i++) {
-			ret = gnutls_pkcs7_get_attr(info->unsigned_attrs, i, &oid, &data, 0);
-			if (ret < 0)
-				break;
-			if (i==0)
-				addf(str, "\tUnsigned Attributes:\n");
+		if (info->unsigned_attrs) {
+			for (i = 0;; i++) {
+				ret =
+				    gnutls_pkcs7_get_attr(info->unsigned_attrs,
+							  i, &oid, &data, 0);
+				if (ret < 0)
+					break;
+				if (i == 0)
+					addf(str, "\tUnsigned Attributes:\n");
 
-			snprintf(prefix, sizeof(prefix), "\t\t%s", oid);
-			print_raw(str, prefix, &data);
-			gnutls_free(data.data);
+				snprintf(prefix, sizeof(prefix), "\t\t%s", oid);
+				print_raw(str, prefix, &data);
+				gnutls_free(data.data);
+			}
 		}
 	}
 	adds(str, "\n");
@@ -162,27 +176,86 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 		       gnutls_certificate_print_formats_t format,
 		       gnutls_datum_t * out)
 {
-	unsigned i;
+	unsigned i, count;
 	int ret;
 	gnutls_pkcs7_signature_info_st info;
 	gnutls_buffer_st str;
 
 	_gnutls_buffer_init(&str);
 
-	for (i=0;;i++) {
-		if (i==0)
+	for (i = 0;; i++) {
+		if (i == 0)
 			addf(&str, "Signers:\n");
 
 		ret = gnutls_pkcs7_get_signature_info(pkcs7, i, &info);
 		if (ret < 0)
 			break;
 
-		print_pkcs7_info(&info, &str);
+		print_pkcs7_info(&info, &str, format);
 	}
 
 	if (format == GNUTLS_CRT_PRINT_FULL) {
-		addf(&str, "Number of certificates present: %u\n", gnutls_pkcs7_get_crt_count(pkcs7));
-		addf(&str, "Number of CRLs present: %u\n", gnutls_pkcs7_get_crl_count(pkcs7));
+		gnutls_datum_t data, b64;
+
+		count = gnutls_pkcs7_get_crt_count(pkcs7);
+
+		if (count > 0) {
+			addf(&str, "Number of certificates: %u\n\n",
+			     count);
+
+			for (i = 0; i < count; i++) {
+				ret =
+				    gnutls_pkcs7_get_crt_raw2(pkcs7, i, &data);
+				if (ret < 0) {
+					addf(&str,
+					     "Error: cannot print certificate %d\n",
+					     i);
+					continue;
+				}
+
+				ret =
+				    gnutls_pem_base64_encode_alloc
+				    ("CERTIFICATE", &data, &b64);
+				if (ret < 0) {
+					gnutls_free(data.data);
+					continue;
+				}
+
+				adds(&str, (char*)b64.data);
+				adds(&str, "\n");
+				gnutls_free(b64.data);
+				gnutls_free(data.data);
+			}
+		}
+
+		count = gnutls_pkcs7_get_crl_count(pkcs7);
+		if (count > 0) {
+			addf(&str, "Number of CRLs: %u\n\n", count);
+
+			for (i = 0; i < count; i++) {
+				ret =
+				    gnutls_pkcs7_get_crl_raw2(pkcs7, i, &data);
+				if (ret < 0) {
+					addf(&str,
+					     "Error: cannot print certificate %d\n",
+					     i);
+					continue;
+				}
+
+				ret =
+				    gnutls_pem_base64_encode_alloc("X509 CRL",
+								   &data, &b64);
+				if (ret < 0) {
+					gnutls_free(data.data);
+					continue;
+				}
+
+				adds(&str, (char*)b64.data);
+				adds(&str, "\n");
+				gnutls_free(b64.data);
+				gnutls_free(data.data);
+			}
+		}
 	}
 
 	return _gnutls_buffer_to_datum(&str, out, 1);
