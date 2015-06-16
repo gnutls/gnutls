@@ -273,9 +273,7 @@ gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
  * gnutls_pkcs7_get_crt_raw2:
  * @pkcs7: should contain a gnutls_pkcs7_t type
  * @indx: contains the index of the certificate to extract
- * @certificate: the contents of the certificate will be copied
- *   there (may be null)
- * @certificate_size: should hold the size of the certificate
+ * @cert: will hold the contents of the certificate; must be deallocated with gnutls_free()
  *
  * This function will return a certificate of the PKCS7 or RFC2630
  * certificate set.
@@ -817,7 +815,7 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
 /**
  * gnutls_pkcs7_verify_direct:
  * @pkcs7: should contain a #gnutls_pkcs7_t type
- * @signer: the certificate believe to have signed the structure
+ * @signer: the certificate believed to have signed the structure
  * @idx: the index of the signature info to check
  * @data: The data to be verified or %NULL
  * @flags: Zero or an OR list of #gnutls_certificate_verify_flags
@@ -1862,7 +1860,8 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 /**
  * gnutls_pkcs7_sign:
  * @pkcs7: should contain a #gnutls_pkcs7_t type
- * @signer: the certificate believe to have signed the structure
+ * @signer: the certificate to sign the structure
+ * @signer_key: the key to sign the structure
  * @data: The data to be signed or %NULL if the data are already embedded
  * @signed_attrs: Any additional attributes to be included in the signed ones (or %NULL)
  * @unsigned_attrs: Any additional attributes to be included in the unsigned ones (or %NULL)

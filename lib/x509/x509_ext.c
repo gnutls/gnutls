@@ -3124,7 +3124,7 @@ int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
 /**
  * gnutls_x509_othername_to_virtual:
  * @oid: The othername object identifier
- * @data: The othername data
+ * @othername: The othername data
  * @virt_type: GNUTLS_SAN_OTHERNAME_XXX
  * @virt: allocated printable data
  *
