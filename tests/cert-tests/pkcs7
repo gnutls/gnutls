@@ -127,7 +127,7 @@ $VALGRIND $CERTTOOL --p7-verify --load-certificate $srcdir/../../doc/credentials
 rc=$?
 
 if test "$rc" != "0"; then
-  echo "$FILE: PKCS7 struct signing failed"
+  echo "$FILE: PKCS7 struct signing failed verification"
   exit $rc
 fi
 
@@ -137,7 +137,7 @@ $VALGRIND $CERTTOOL --p7-detached-sign --load-privkey  $srcdir/../../doc/credent
 rc=$?
 
 if test "$rc" != "0"; then
-  echo "$FILE: PKCS7 struct signing failed"
+  echo "$FILE: PKCS7 struct signing-detached failed"
   exit $rc
 fi
 
@@ -146,7 +146,7 @@ $VALGRIND $CERTTOOL --p7-verify --load-certificate $srcdir/../../doc/credentials
 rc=$?
 
 if test "$rc" != "0"; then
-  echo "$FILE: PKCS7 struct signing failed"
+  echo "$FILE: PKCS7 struct signing-detached failed verification"
   exit $rc
 fi
 
@@ -156,7 +156,7 @@ $VALGRIND $CERTTOOL --hash md5 --p7-sign --load-privkey  $srcdir/../../doc/crede
 rc=$?
 
 if test "$rc" != "0"; then
-  echo "$FILE: PKCS7 struct signing failed"
+  echo "$FILE: PKCS7 struct signing-broken failed"
   exit $rc
 fi
 
@@ -167,6 +167,30 @@ rc=$?
 if test "$rc" = "0"; then
   echo "$FILE: PKCS7 struct verification succeeded with broken algo"
   exit 1
+fi
+
+FILE=signing-time
+$VALGRIND $CERTTOOL --p7-detached-sign --p7-time --load-privkey  $srcdir/../../doc/credentials/x509/key-rsa.pem --load-certificate $srcdir/../../doc/credentials/x509/cert-rsa.pem --infile pkcs7-detached.txt >$OUTFILE
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 struct signing with time failed"
+  exit $rc
+fi
+
+$VALGRIND $CERTTOOL --p7-info <$OUTFILE|grep "Signing time:" $OUTFILE >/dev/null 2>&1
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 struct signing with time failed. No time was found."
+  exit $rc
+fi
+
+FILE=signing-time-verify
+$VALGRIND $CERTTOOL --p7-verify --load-certificate $srcdir/../../doc/credentials/x509/cert-rsa.pem --load-data pkcs7-detached.txt <$OUTFILE
+rc=$?
+
+if test "$rc" != "0"; then
+  echo "$FILE: PKCS7 struct signing with time failed verification"
+  exit $rc
 fi
 
 rm -f $OUTFILE
