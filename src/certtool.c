@@ -2931,7 +2931,7 @@ void pkcs7_sign(common_info_st * cinfo, unsigned embed)
 	int ret;
 	size_t size;
 	gnutls_datum_t data;
-	unsigned flags = 0;
+	unsigned flags = GNUTLS_PKCS7_INCLUDE_TIME;
 	gnutls_x509_crt_t signer;
 
 	ret = gnutls_pkcs7_init(&pkcs7);
