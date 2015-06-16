@@ -3,7 +3,7 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.4.2 (unreleased)
+* Version 3.4.2 (released 2015-06-16)
 
 ** libgnutls: DTLS blocking API is more robust against infinite blocking,
 and will notify of more possible timeouts.
