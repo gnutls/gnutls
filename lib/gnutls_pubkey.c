@@ -1636,6 +1636,8 @@ gnutls_pubkey_verify_data2(gnutls_pubkey_t pubkey,
 		}
 	}
 
+	if (ret >= 0)
+		return 0;
 	return ret;
 }
 
