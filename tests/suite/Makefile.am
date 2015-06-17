@@ -91,11 +91,11 @@ nodist_check_SCRIPTS = eagain testsrn chain invalid-cert testrandom \
 	testcompat-polarssl testcompat-openssl
 
 TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn chain invalid-cert \
-	testpkcs11 testrng testcompat-openssl testcompat-polarssl
+	testrng testcompat-openssl testcompat-polarssl
 
 if ENABLE_PKCS11
 check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer pkcs11-is-known pkcs11-combo pkcs11-privkey
-TESTS += pkcs11-chainverify pkcs11-get-issuer crl-test pkcs11-is-known pkcs11-combo pkcs11-privkey
+TESTS += testpkcs11 pkcs11-chainverify pkcs11-get-issuer crl-test pkcs11-is-known pkcs11-combo pkcs11-privkey
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
