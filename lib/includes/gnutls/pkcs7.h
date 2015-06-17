@@ -54,6 +54,8 @@ int gnutls_pkcs7_export2(gnutls_pkcs7_t pkcs7,
 			 gnutls_x509_crt_fmt_t format,
 			 gnutls_datum_t * out);
 
+int gnutls_pkcs7_get_signature_count(gnutls_pkcs7_t pkcs7);
+
 int gnutls_pkcs7_get_crt_count(gnutls_pkcs7_t pkcs7);
 int gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7, int indx,
 			     void *certificate, size_t * certificate_size);

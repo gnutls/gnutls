@@ -405,7 +405,7 @@ gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7,
  * This function will return the number of certifcates in the PKCS7
  * or RFC2630 certificate set.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ * Returns: On success, a positive number is returned, otherwise a
  *   negative error value.
  **/
 int gnutls_pkcs7_get_crt_count(gnutls_pkcs7_t pkcs7)
@@ -480,6 +480,34 @@ static time_t parse_time(gnutls_pkcs7_t pkcs7, const char *root)
  cleanup:
  	asn1_delete_structure(&c2);
  	return ret;
+}
+
+/**
+ * gnutls_pkcs7_get_signature_count:
+ * @pkcs7: should contain a #gnutls_pkcs7_t type
+ *
+ * This function will return the number of signatures in the PKCS7
+ * structure.
+ *
+ * Returns: On success, a positive number is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.4.3
+ **/
+int gnutls_pkcs7_get_signature_count(gnutls_pkcs7_t pkcs7)
+{
+	int ret, count;
+
+	if (pkcs7 == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	ret = asn1_number_of_elements(pkcs7->signed_data, "signerInfos", &count);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		return 0;
+	}
+
+	return count;
 }
 
 /**
