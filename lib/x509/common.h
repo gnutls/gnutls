@@ -75,7 +75,7 @@
 #define ASN1_NULL_SIZE 2
 
 int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
-			  int nochoice);
+			  int force_general);
 int
 _gnutls_x509_set_raw_time(ASN1_TYPE c2, const char *where, time_t tim);
 

@@ -739,7 +739,7 @@ gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsig
 {
 	size_t ret;
 	struct tm _tm;
-	
+
 	if (gtime == (time_t)-1
 #if SIZEOF_LONG == 8
 		|| gtime >= 253402210800
@@ -756,7 +756,7 @@ gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsig
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	if (_tm.tm_year >= 2050) {
+	if (_tm.tm_year >= 150) {
 		if (tag)
         		*tag = ASN1_TAG_GENERALIZEDTime;
 		ret = strftime(str_time, str_time_size, "%Y%m%d%H%M%SZ", &_tm);
@@ -807,7 +807,7 @@ gtime_to_generalTime(time_t gtime, char *str_time, size_t str_time_size)
  * be something like "tbsCertList.thisUpdate".
  */
 #define MAX_TIME 64
-time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *where, int nochoice)
+time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *where, int force_general)
 {
 	char ttime[MAX_TIME];
 	char name[128];
@@ -821,7 +821,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *where, int nochoice)
 		return (time_t) (-1);
 	}
 
-	if (nochoice != 0) {
+	if (force_general != 0) {
 		c_time = _gnutls_x509_generalTime2gtime(ttime);
 	} else {
 		_gnutls_str_cpy(name, sizeof(name), where);
@@ -867,13 +867,14 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *where, int nochoice)
  */
 int
 _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
-		      int nochoice)
+		      int force_general)
 {
 	char str_time[MAX_TIME];
 	char name[128];
 	int result, len;
+	unsigned tag;
 
-	if (nochoice != 0) {
+	if (force_general != 0) {
 		result =
 		    gtime_to_generalTime(tim, str_time, sizeof(str_time));
 		if (result < 0)
@@ -886,20 +887,26 @@ _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 		return 0;
 	}
 
-	_gnutls_str_cpy(name, sizeof(name), where);
-
-	if ((result = asn1_write_value(c2, name, "generalTime", 1)) < 0) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = gtime_to_generalTime(tim, str_time, sizeof(str_time));
+	result = gtime_to_suitable_time(tim, str_time, sizeof(str_time), &tag);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	_gnutls_str_cat(name, sizeof(name), ".generalTime");
+	_gnutls_str_cpy(name, sizeof(name), where);
+	if (tag == ASN1_TAG_UTCTime) {
+		if ((result = asn1_write_value(c2, where, "utcTime", 1)) < 0) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+		_gnutls_str_cat(name, sizeof(name), ".utcTime");
+	} else {
+		if ((result = asn1_write_value(c2, where, "generalTime", 1)) < 0) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+		_gnutls_str_cat(name, sizeof(name), ".generalTime");
+	}
 
 	len = strlen(str_time);
 	result = asn1_write_value(c2, name, str_time, len);
