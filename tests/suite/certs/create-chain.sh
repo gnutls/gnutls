@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../../src/certtool$EXEEXT}
@@ -12,7 +12,7 @@ if test "$NUM" = "";then
 	exit 1
 fi
 
-let LAST=`expr $NUM - 1`
+LAST=`expr $NUM - 1`
 
 rm -rf $OUTPUT
 mkdir -p $OUTPUT
@@ -74,11 +74,11 @@ while test $counter -lt $NUM; do
 	fi
 
 
-	let counter=`expr $counter+1`
+	counter=`expr $counter + 1`
 	prev_name=$name
 done
 
-let counter=`expr $NUM - 1`
+counter=`expr $NUM - 1`
 while test $counter -ge 0; do
 	if test $counter = $LAST;then
 		name="server-$counter"
@@ -88,6 +88,6 @@ while test $counter -ge 0; do
 
 	cat $OUTPUT/$name.crt >> $OUTPUT/chain
 	
-	let counter=`expr $counter-1`
+	counter=`expr $counter - 1`
 done
 
