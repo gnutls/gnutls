@@ -733,8 +733,48 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 	return time2gtime(ttime, year);
 }
 
+/* tag will contain ASN1_TAG_UTCTime or ASN1_TAG_GENERALIZEDTime */
 static int
-gtime2generalTime(time_t gtime, char *str_time, size_t str_time_size)
+gtime_to_suitable_time(time_t gtime, char *str_time, size_t str_time_size, unsigned *tag)
+{
+	size_t ret;
+	struct tm _tm;
+	
+	if (gtime == (time_t)-1
+#if SIZEOF_LONG == 8
+		|| gtime >= 253402210800
+#endif
+	 ) {
+        	if (tag)
+        		*tag = ASN1_TAG_GENERALIZEDTime;
+        	snprintf(str_time, str_time_size, "99991231235959Z");
+        	return 0;
+	}
+
+	if (!gmtime_r(&gtime, &_tm)) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	if (_tm.tm_year >= 2050) {
+		if (tag)
+        		*tag = ASN1_TAG_GENERALIZEDTime;
+		ret = strftime(str_time, str_time_size, "%Y%m%d%H%M%SZ", &_tm);
+	} else {
+		if (tag)
+        		*tag = ASN1_TAG_UTCTime;
+		ret = strftime(str_time, str_time_size, "%y%m%d%H%M%SZ", &_tm);
+	}
+	if (!ret) {
+		gnutls_assert();
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
+	return 0;
+}
+
+static int
+gtime_to_generalTime(time_t gtime, char *str_time, size_t str_time_size)
 {
 	size_t ret;
 	struct tm _tm;
@@ -758,7 +798,6 @@ gtime2generalTime(time_t gtime, char *str_time, size_t str_time_size)
 		gnutls_assert();
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
-
 
 	return 0;
 }
@@ -836,7 +875,7 @@ _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 
 	if (nochoice != 0) {
 		result =
-		    gtime2generalTime(tim, str_time, sizeof(str_time));
+		    gtime_to_generalTime(tim, str_time, sizeof(str_time));
 		if (result < 0)
 			return gnutls_assert_val(result);
 		len = strlen(str_time);
@@ -854,7 +893,7 @@ _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 		return _gnutls_asn2err(result);
 	}
 
-	result = gtime2generalTime(tim, str_time, sizeof(str_time));
+	result = gtime_to_generalTime(tim, str_time, sizeof(str_time));
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -872,20 +911,24 @@ _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim,
 	return 0;
 }
 
+/* This will set a DER encoded Time element. To be used in fields
+ * which are of the ANY.
+ */
 int
 _gnutls_x509_set_raw_time(ASN1_TYPE c2, const char *where, time_t tim)
 {
 	char str_time[MAX_TIME];
 	uint8_t buf[128];
 	int result, len, der_len;
+	unsigned tag;
 
 	result =
-	    gtime2generalTime(tim, str_time, sizeof(str_time));
+	    gtime_to_suitable_time(tim, str_time, sizeof(str_time), &tag);
 	if (result < 0)
 		return gnutls_assert_val(result);
 	len = strlen(str_time);
 
-	buf[0] = ASN1_TAG_GENERALIZEDTime;
+	buf[0] = tag;
 	asn1_length_der(len, buf+1, &der_len);
 
 	if ((unsigned)len > sizeof(buf)-der_len-1) {
