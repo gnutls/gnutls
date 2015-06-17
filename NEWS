@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.4.3 (unreleased)
 
+** libgnutls: Follow closely RFC5280 recommendations and use UTCTime for
+dates prior to 2050.
+
 ** API and ABI modifications:
 No changes since last version.
 
