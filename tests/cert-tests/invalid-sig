@@ -22,41 +22,41 @@
 
 #set -e
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
-DIFF=${DIFF:-diff}
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+DIFF="${DIFF:-diff}"
 if ! test -z "${VALGRIND}";then
 VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 #check whether a different PKCS #1 signature than the advertized in certificate is tolerated
-$VALGRIND $CERTTOOL -e --infile $srcdir/invalid-sig.pem
+${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/invalid-sig.pem"
 rc=$?
 
 # We're done.
-if test "$rc" = "0"; then
+if test "${rc}" = "0"; then
   echo "Verification of invalid signature (1) failed"
-  exit $rc
+  exit ${rc}
 fi
 
 #check whether a different tbsCertificate than the outer signature algorithm is tolerated
-$VALGRIND $CERTTOOL -e --infile $srcdir/invalid-sig2.pem
+${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/invalid-sig2.pem"
 rc=$?
 
 # We're done.
-if test "$rc" = "0"; then
+if test "${rc}" = "0"; then
   echo "Verification of invalid signature (2) failed"
-  exit $rc
+  exit ${rc}
 fi
 
 #check whether a different tbsCertificate than the outer signature algorithm is tolerated
-$VALGRIND $CERTTOOL -e --infile $srcdir/invalid-sig3.pem
+${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/invalid-sig3.pem"
 rc=$?
 
 # We're done.
-if test "$rc" = "0"; then
+if test "${rc}" = "0"; then
   echo "Verification of invalid signature (3) failed"
-  exit $rc
+  exit ${rc}
 fi
 
 exit 0

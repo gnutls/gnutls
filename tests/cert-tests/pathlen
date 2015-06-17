@@ -22,42 +22,42 @@
 
 set -e
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
-DIFF=${DIFF:-diff}
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+DIFF="${DIFF:-diff}"
 if ! test -z "${VALGRIND}";then
 VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-$VALGRIND $CERTTOOL --certificate-info --infile $srcdir/ca-no-pathlen.pem \
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/ca-no-pathlen.pem" \
 	  |grep -v "Algorithm Security Level" > new-ca-no-pathlen.pem
 rc=$?
 
-if test "$rc" != "0"; then
+if test "${rc}" != "0"; then
   echo "info 1 failed"
-  exit $rc
+  exit ${rc}
 fi
 
-$VALGRIND $CERTTOOL --certificate-info --infile $srcdir/no-ca-or-pathlen.pem \
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/no-ca-or-pathlen.pem" \
 	  |grep -v "Algorithm Security Level" > new-no-ca-or-pathlen.pem
 rc=$?
 
-if test "$rc" != "0"; then
+if test "${rc}" != "0"; then
   echo "info 2 failed"
-  exit $rc
+  exit ${rc}
 fi
 
-$DIFF $srcdir/ca-no-pathlen.pem new-ca-no-pathlen.pem
+${DIFF} "${srcdir}/ca-no-pathlen.pem" new-ca-no-pathlen.pem
 rc1=$?
-$DIFF $srcdir/no-ca-or-pathlen.pem new-no-ca-or-pathlen.pem
+${DIFF} "${srcdir}/no-ca-or-pathlen.pem" new-no-ca-or-pathlen.pem
 rc2=$?
 
 
 # We're done.
-if test "$rc1" != "0"; then
-  exit $rc1
+if test "${rc1}" != "0"; then
+  exit ${rc1}
 fi
 
 rm -f new-ca-no-pathlen.pem new-no-ca-or-pathlen.pem
 
-exit $rc2
+exit ${rc2}

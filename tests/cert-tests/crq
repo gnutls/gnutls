@@ -22,29 +22,29 @@
 
 #set -e
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
-DIFF=${DIFF:-diff}
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+DIFF="${DIFF:-diff}"
 if ! test -z "${VALGRIND}";then
 VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 OUTFILE=out.tmp
 
-$VALGRIND $CERTTOOL --inder --crq-info --infile $srcdir/csr-invalid.der >$OUTFILE 2>&1
+${VALGRIND} "${CERTTOOL}" --inder --crq-info --infile "${srcdir}/csr-invalid.der" >"${OUTFILE}" 2>&1
 rc=$?
 
 # We're done.
-if test "$rc" != "0"; then
+if test "${rc}" != "0"; then
   echo "Invalid crq decoding failed"
-  exit $rc
+  exit ${rc}
 fi
 
-grep "error: get_key_id" $OUTFILE >/dev/null 2>&1
+grep "error: get_key_id" "${OUTFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
   echo "crq decoding didn't fail as expected"
   exit 1
 fi
 
-rm -f $OUTFILE
+rm -f "${OUTFILE}"
 
 exit 0
