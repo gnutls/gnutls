@@ -234,6 +234,8 @@ fi
 rm -f tmp-tt.pem
 
 # Test the GeneralizedTime support
+if test "$(getconf LONG_BIT)" = "64";then
+# we should test that on systems which have 64-bit time_t.
 rc=1
 counter=1
 
@@ -256,6 +258,8 @@ done
 if test "$rc" != "0"; then
   echo "Test 8 (generalizedTime) failed"
   exit $rc
+fi
+
 fi
 
 rm -f tmp-tt.pem
