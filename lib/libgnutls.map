@@ -1078,19 +1078,7 @@ GNUTLS_FIPS140_3_4 {
 
 GNUTLS_PRIVATE_3_4 {
   global:
-	# Internal symbols needed by libgnutls-openssl:
-	_gnutls_pkix1_asn;
-	_gnutls_x509_parse_dn_oid;
-	_gnutls_asn2err;
-	_gnutls_ext_get_session_data;
-	_gnutls_ext_set_session_data;
-	_gnutls_ext_register;
-	_gnutls_buffer_append_prefix;
-	_gnutls_buffer_append_data;
-	_gnutls_buffer_clear;
-	_gnutls_buffer_append_data_prefix;
-	_gnutls_buffer_pop_data;
-	_gnutls_buffer_pop_prefix;
+	# Internal symbols needed by libgnutls-dane:
 	_gnutls_buffer_init;
 	_gnutls_buffer_append_str;
 	_gnutls_buffer_to_datum;
@@ -1113,6 +1101,6 @@ GNUTLS_PRIVATE_3_4 {
 	_gnutls_mpi_release;
 	# Internal symbols needed by tests/pkcs12_s2k:
 	_gnutls_pkcs12_string_to_key;
-	_gnutls_mac_to_entry;
 	_gnutls_bin2hex;
+	_gnutls_mac_to_entry;
 };
