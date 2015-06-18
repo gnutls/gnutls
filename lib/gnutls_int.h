@@ -64,9 +64,7 @@ typedef int ssize_t;
 #define memxor gl_memxor
 #endif
 
-#ifdef ENABLE_CRYPTODEV
-# define ENABLE_ALIGN16
-#endif
+#define ENABLE_ALIGN16
 
 #ifdef __GNUC__
 #ifndef _GNUTLS_GCC_VERSION
