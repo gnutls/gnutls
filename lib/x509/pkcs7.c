@@ -1708,7 +1708,7 @@ static int write_signer_id(ASN1_TYPE c2, const char *root, gnutls_x509_crt_t sig
 		}
 
 		serial_size = sizeof(serial);
-		result = gnutls_x509_crt_get_authority_key_id(signer, serial, &serial_size, NULL);
+		result = gnutls_x509_crt_get_subject_key_id(signer, serial, &serial_size, NULL);
 		if (result < 0)
 			return gnutls_assert_val(result);
 
