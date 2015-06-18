@@ -22,23 +22,23 @@
 
 set -e
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
 
-PARAMS="--generate-certificate --load-privkey $srcdir/key-user.pem --load-ca-privkey $srcdir/key-ca.pem --template tmpl"
+PARAMS="--generate-certificate --load-privkey '${srcdir}/key-user.pem' --load-ca-privkey '${srcdir}/key-ca.pem' --template tmpl"
 
 echo "serial = 0" > tmpl
 
-#$CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-gnutls-keyid.pem \
+#eval "${CERTTOOL}" ${PARAMS} --load-ca-certificate $srcdir/ca-gnutls-keyid.pem \
 #    --outfile user-gnutls-keyid.pem 2> /dev/null
 
-#$CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-no-keyid.pem \
+#eval "${CERTTOOL}" ${PARAMS} --load-ca-certificate $srcdir/ca-no-keyid.pem \
 #    --outfile user-no-keyid.pem 2> /dev/null
 
-$CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-weird-keyid.pem \
+eval "${CERTTOOL}" ${PARAMS} --load-ca-certificate "${srcdir}/ca-weird-keyid.pem" \
     --outfile user-weird-keyid.pem 2> /dev/null
 
-if $CERTTOOL -i < user-weird-keyid.pem \
+if "${CERTTOOL}" -i < user-weird-keyid.pem \
     | grep '7a2c7a6097460603cbfb28e8e219df18deeb4e0d' > /dev/null; then
     :
 else
