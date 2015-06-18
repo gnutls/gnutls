@@ -9,7 +9,16 @@ See the end for copying conditions.
 dates prior to 2050.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_ecc_curve_get_oid: Added
+gnutls_digest_get_oid: Added
+gnutls_pk_get_oid: Added
+gnutls_sign_get_oid: Added
+gnutls_ecc_curve_get_id: Added
+gnutls_oid_to_digest: Added
+gnutls_oid_to_pk: Added
+gnutls_oid_to_sign: Added
+gnutls_oid_to_ecc_curve: Added
+gnutls_pkcs7_get_signature_count: Added
 
 
 * Version 3.4.2 (released 2015-06-16)
