@@ -175,9 +175,11 @@ myaes_encrypt(void *_ctx, const void *src, size_t src_size,
 {
 	struct myaes_ctx *ctx = _ctx;
 
+#if 0 /* this is under the control of the caller */
 	if (((unsigned long)src)%16 != 0) {
 		fail("encrypt: source is not 16-byte aligned: %lu\n", ((unsigned long)src)%16);
 	}
+#endif
 
 	if (((unsigned long)dst)%16 != 0) {
 		fail("encrypt: dest is not 16-byte aligned: %lu\n", ((unsigned long)dst)%16);
@@ -197,9 +199,11 @@ myaes_decrypt(void *_ctx, const void *src, size_t src_size,
 		fail("decrypt: source is not 16-byte aligned: %lu\n", ((unsigned long)src)%16);
 	}
 
+#if 0 /* this is under the control of the caller */
 	if (((unsigned long)dst)%16 != 0) {
 		fail("decrypt: dest is not 16-byte aligned: %lu\n", ((unsigned long)dst)%16);
 	}
+#endif
 
 	cbc_decrypt(&ctx->aes, (nettle_cipher_func*)aes_decrypt, 16, ctx->iv, src_size, dst, src);
 
