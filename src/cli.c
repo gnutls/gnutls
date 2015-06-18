@@ -1714,6 +1714,7 @@ psk_callback(gnutls_session_t session, char **username,
 	if (ret < 0) {
 		fprintf(stderr, "Error deriving password: %s\n",
 			gnutls_strerror(ret));
+		gnutls_free(rawkey);
 		gnutls_free(*username);
 		return ret;
 	}
