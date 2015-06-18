@@ -298,7 +298,7 @@ _gnutls_privkey_decode_ecc_key(ASN1_TYPE* pkey_asn, const gnutls_datum_t * raw_k
 			goto error;
 		}
 
-		pkey->params.flags = _gnutls_oid_to_ecc_curve(oid);
+		pkey->params.flags = gnutls_oid_to_ecc_curve(oid);
 
 		if (pkey->params.flags == GNUTLS_ECC_CURVE_INVALID) {
 			_gnutls_debug_log("Curve %s is not supported\n", oid);

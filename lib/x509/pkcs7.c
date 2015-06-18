@@ -555,10 +555,10 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_p
 		goto unsupp_algo;
 	}
 
-	sig = _gnutls_x509_oid2sign_algorithm(oid);
+	sig = gnutls_oid_to_sign(oid);
 	if (sig == GNUTLS_SIGN_UNKNOWN) {
 		/* great PKCS #7 allows to only specify a public key algo */
-		pk = _gnutls_x509_oid2pk_algorithm(oid);
+		pk = gnutls_oid_to_pk(oid);
 		if (pk == GNUTLS_PK_UNKNOWN) {
 			gnutls_assert();
 			goto unsupp_algo;
@@ -574,7 +574,7 @@ int gnutls_pkcs7_get_signature_info(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_p
 			goto unsupp_algo;
 		}
 
-		ret = _gnutls_x509_oid_to_digest(oid);
+		ret = gnutls_oid_to_digest(oid);
 		if (ret == GNUTLS_DIG_UNKNOWN) {
 			gnutls_assert();
 			goto unsupp_algo;

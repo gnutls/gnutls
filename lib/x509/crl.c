@@ -353,7 +353,7 @@ int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl_t crl)
 		return result;
 	}
 
-	result = _gnutls_x509_oid2sign_algorithm((const char *) sa.data);
+	result = gnutls_oid_to_sign((const char *) sa.data);
 
 	_gnutls_free_datum(&sa);
 

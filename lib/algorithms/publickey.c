@@ -209,7 +209,18 @@ const char *gnutls_pk_get_name(gnutls_pk_algorithm_t algorithm)
 	return ret;
 }
 
-gnutls_pk_algorithm_t _gnutls_x509_oid2pk_algorithm(const char *oid)
+/**
+ * gnutls_oid_to_pk:
+ * @oid: is an object identifier
+ *
+ * Converts a textual object identifier to a #gnutls_pk_algorithm_t value.
+ *
+ * Returns: a #gnutls_pk_algorithm_t id of the specified digest
+ *   algorithm, or %GNUTLS_PK_UNKNOWN on failure.
+ *
+ * Since: 3.4.3
+ **/
+gnutls_pk_algorithm_t gnutls_oid_to_pk(const char *oid)
 {
 	gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
 	const gnutls_pk_entry *p;
@@ -223,7 +234,18 @@ gnutls_pk_algorithm_t _gnutls_x509_oid2pk_algorithm(const char *oid)
 	return ret;
 }
 
-const char *_gnutls_x509_pk_to_oid(gnutls_pk_algorithm_t algorithm)
+/**
+ * gnutls_pk_get_oid:
+ * @algorithm: is a public key algorithm
+ *
+ * Convert a #gnutls_pk_algorithm_t value to its object identifier string.
+ *
+ * Returns: a pointer to a string that contains the object identifier of the
+ *   specified public key algorithm, or %NULL.
+ *
+ * Since: 3.4.3
+ **/
+const char *gnutls_pk_get_oid(gnutls_pk_algorithm_t algorithm)
 {
 	const char *ret = NULL;
 	const gnutls_pk_entry *p;

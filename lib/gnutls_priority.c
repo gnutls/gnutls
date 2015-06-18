@@ -1201,7 +1201,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 						supported_ecc_normal);
 				} else {
 					if ((algo =
-					     _gnutls_ecc_curve_get_id
+					     gnutls_ecc_curve_get_id
 					     (&broken_list[i][7])) !=
 					    GNUTLS_ECC_CURVE_INVALID)
 						fn(&(*priority_cache)->

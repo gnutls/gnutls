@@ -834,6 +834,8 @@ gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param);
 
 /* Elliptic curves */
 const char *gnutls_ecc_curve_get_name(gnutls_ecc_curve_t curve);
+const char *gnutls_ecc_curve_get_oid(gnutls_ecc_curve_t curve);
+
 int gnutls_ecc_curve_get_size(gnutls_ecc_curve_t curve);
 gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
@@ -856,14 +858,20 @@ int gnutls_sign_algorithm_get_requested(gnutls_session_t session,
 /* the name of the specified algorithms */
 const char *gnutls_cipher_get_name(gnutls_cipher_algorithm_t algorithm);
 const char *gnutls_mac_get_name(gnutls_mac_algorithm_t algorithm);
+
 const char *gnutls_digest_get_name(gnutls_digest_algorithm_t algorithm);
+const char *gnutls_digest_get_oid(gnutls_digest_algorithm_t algorithm);
+
 const char *gnutls_compression_get_name(gnutls_compression_method_t
 					algorithm);
 const char *gnutls_kx_get_name(gnutls_kx_algorithm_t algorithm);
 const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t
 					     type);
 const char *gnutls_pk_get_name(gnutls_pk_algorithm_t algorithm);
+const char *gnutls_pk_get_oid(gnutls_pk_algorithm_t algorithm);
+
 const char *gnutls_sign_get_name(gnutls_sign_algorithm_t algorithm);
+const char *gnutls_sign_get_oid(gnutls_sign_algorithm_t algorithm);
 
 size_t gnutls_cipher_get_key_size(gnutls_cipher_algorithm_t algorithm);
 size_t gnutls_mac_get_key_size(gnutls_mac_algorithm_t algorithm);
@@ -881,6 +889,7 @@ gnutls_pk_to_sign(gnutls_pk_algorithm_t pk,
 
 gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name);
 gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name);
+
 gnutls_compression_method_t gnutls_compression_get_id(const char *name);
 gnutls_cipher_algorithm_t gnutls_cipher_get_id(const char *name);
 gnutls_kx_algorithm_t gnutls_kx_get_id(const char *name);
@@ -888,6 +897,12 @@ gnutls_protocol_t gnutls_protocol_get_id(const char *name);
 gnutls_certificate_type_t gnutls_certificate_type_get_id(const char *name);
 gnutls_pk_algorithm_t gnutls_pk_get_id(const char *name);
 gnutls_sign_algorithm_t gnutls_sign_get_id(const char *name);
+gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name);
+
+gnutls_digest_algorithm_t gnutls_oid_to_digest(const char *oid);
+gnutls_pk_algorithm_t gnutls_oid_to_pk(const char *oid);
+gnutls_sign_algorithm_t gnutls_oid_to_sign(const char *oid);
+gnutls_ecc_curve_t gnutls_oid_to_ecc_curve(const char *oid);
 
   /* list supported algorithms */
 const gnutls_ecc_curve_t *gnutls_ecc_curve_list(void);

@@ -245,7 +245,7 @@ _gnutls_x509_write_ecc_params(gnutls_ecc_curve_t curve,
 	der->data = NULL;
 	der->size = 0;
 
-	oid = _gnutls_ecc_curve_get_oid(curve);
+	oid = gnutls_ecc_curve_get_oid(curve);
 	if (oid == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
@@ -477,7 +477,7 @@ _gnutls_asn1_encode_ecc(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 	gnutls_datum pubkey = { NULL, 0 };
 	const char *oid;
 
-	oid = _gnutls_ecc_curve_get_oid(params->flags);
+	oid = gnutls_ecc_curve_get_oid(params->flags);
 
 	if (params->params_nr != ECC_PRIVATE_PARAMS || oid == NULL)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);

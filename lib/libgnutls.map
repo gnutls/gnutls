@@ -1040,6 +1040,15 @@ GNUTLS_3_4
 	gnutls_pkcs7_print;
 	gnutls_x509_crt_verify_data2;
 	gnutls_pkcs7_get_signature_count;
+	gnutls_ecc_curve_get_oid;
+	gnutls_digest_get_oid;
+	gnutls_pk_get_oid;
+	gnutls_sign_get_oid;
+	gnutls_ecc_curve_get_id;
+	gnutls_oid_to_digest;
+	gnutls_oid_to_pk;
+	gnutls_oid_to_sign;
+	gnutls_oid_to_ecc_curve;
  local:
 	*;
 };

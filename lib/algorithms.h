@@ -136,8 +136,7 @@ inline static int _gnutls_mac_get_key_size(const mac_entry_st * e)
 		return e->key_size;
 }
 
-#define _gnutls_x509_oid_to_mac(oid) (gnutls_mac_algorithm_t)_gnutls_x509_oid_to_digest(oid)
-gnutls_digest_algorithm_t _gnutls_x509_oid_to_digest(const char *oid);
+#define _gnutls_x509_oid_to_mac(oid) (gnutls_mac_algorithm_t)gnutls_oid_to_digest(oid)
 
 /* Functions for digests. */
 #define _gnutls_x509_digest_to_oid _gnutls_x509_mac_to_oid
@@ -283,8 +282,7 @@ gnutls_credentials_type_t _gnutls_map_kx_get_cred(gnutls_kx_algorithm_t
 #define GNUTLS_DISTINCT_PK_ALGORITHMS 3
 gnutls_pk_algorithm_t _gnutls_map_pk_get_pk(gnutls_kx_algorithm_t
 					    kx_algorithm);
-gnutls_pk_algorithm_t _gnutls_x509_oid2pk_algorithm(const char *oid);
-const char *_gnutls_x509_pk_to_oid(gnutls_pk_algorithm_t pk);
+const char *gnutls_pk_get_oid(gnutls_pk_algorithm_t pk);
 
 enum encipher_type { CIPHER_ENCRYPT = 0, CIPHER_SIGN = 1, CIPHER_IGN };
 
@@ -292,7 +290,6 @@ enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm_t
 					    algorithm);
 
 /* Functions for sign algorithms. */
-gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm(const char *oid);
 gnutls_pk_algorithm_t _gnutls_x509_sign_to_pk(gnutls_sign_algorithm_t
 					      sign);
 const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t,
@@ -323,11 +320,9 @@ typedef struct gnutls_ecc_curve_entry_st gnutls_ecc_curve_entry_st;
 
 const gnutls_ecc_curve_entry_st
     *_gnutls_ecc_curve_get_params(gnutls_ecc_curve_t curve);
-gnutls_ecc_curve_t _gnutls_ecc_curve_get_id(const char *name);
+gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name);
 int _gnutls_tls_id_to_ecc_curve(int num);
 int _gnutls_ecc_curve_get_tls_id(gnutls_ecc_curve_t supported_ecc);
-const char *_gnutls_ecc_curve_get_oid(gnutls_ecc_curve_t curve);
-gnutls_ecc_curve_t _gnutls_oid_to_ecc_curve(const char *oid);
 gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve(int bits);
 #define MAX_ECC_CURVE_SIZE 66
 

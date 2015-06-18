@@ -124,7 +124,7 @@ const char *gnutls_digest_get_name(gnutls_digest_algorithm_t algorithm)
  * compared in a case insensitive way.
  *
  * Returns: a #gnutls_digest_algorithm_t id of the specified MAC
- *   algorithm string, or %GNUTLS_DIG_UNKNOWN on failures.
+ *   algorithm string, or %GNUTLS_DIG_UNKNOWN on failure.
  **/
 gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
 {
@@ -149,7 +149,7 @@ gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name)
  * compared in a case insensitive way.
  *
  * Returns: a #gnutls_mac_algorithm_t id of the specified MAC
- *   algorithm string, or %GNUTLS_MAC_UNKNOWN on failures.
+ *   algorithm string, or %GNUTLS_MAC_UNKNOWN on failure.
  **/
 gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name)
 {
@@ -263,7 +263,18 @@ const gnutls_digest_algorithm_t *gnutls_digest_list(void)
 	return supported_digests;
 }
 
-gnutls_digest_algorithm_t _gnutls_x509_oid_to_digest(const char *oid)
+/**
+ * gnutls_oid_to_digest:
+ * @oid: is an object identifier
+ *
+ * Converts a textual object identifier to a #gnutls_digest_algorithm_t value.
+ *
+ * Returns: a #gnutls_digest_algorithm_t id of the specified digest
+ *   algorithm, or %GNUTLS_DIG_UNKNOWN on failure.
+ *
+ * Since: 3.4.3
+ **/
+gnutls_digest_algorithm_t gnutls_oid_to_digest(const char *oid)
 {
 	gnutls_digest_algorithm_t ret = 0;
 
@@ -276,5 +287,30 @@ gnutls_digest_algorithm_t _gnutls_x509_oid_to_digest(const char *oid)
 
 	if (ret == 0)
 		return GNUTLS_DIG_UNKNOWN;
+	return ret;
+}
+
+/**
+ * gnutls_digest_get_oid:
+ * @algorithm: is a digest algorithm
+ *
+ * Convert a #gnutls_digest_algorithm_t value to its object identifier.
+ *
+ * Returns: a string that contains the object identifier of the specified digest
+ *   algorithm, or %NULL.
+ *
+ * Since: 3.4.3
+ **/
+const char *gnutls_digest_get_oid(gnutls_digest_algorithm_t algorithm)
+{
+	const char *ret = NULL;
+
+	GNUTLS_HASH_LOOP(
+		if (algorithm == (unsigned) p->id && p->oid != NULL) {
+			ret = p->oid;
+			break;
+		}
+	);
+
 	return ret;
 }

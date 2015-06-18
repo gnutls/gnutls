@@ -214,7 +214,7 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 		goto cleanup;
 	}
 
-	*curve = _gnutls_oid_to_ecc_curve(oid);
+	*curve = gnutls_oid_to_ecc_curve(oid);
 	if (*curve == GNUTLS_ECC_CURVE_INVALID) {
 		_gnutls_debug_log("Curve %s is not supported\n", oid);
 		gnutls_assert();

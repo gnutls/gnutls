@@ -177,7 +177,7 @@ encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 	gnutls_datum_t algo_params = { NULL, 0 };
 	gnutls_datum_t algo_privkey = { NULL, 0 };
 
-	oid = _gnutls_x509_pk_to_oid(pkey->pk_algorithm);
+	oid = gnutls_pk_get_oid(pkey->pk_algorithm);
 	if (oid == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
@@ -1373,7 +1373,7 @@ decode_private_key_info(const gnutls_datum_t * der,
 	/* we only support RSA and DSA private keys.
 	 */
 
-	pkey->pk_algorithm = _gnutls_x509_oid2pk_algorithm(oid);
+	pkey->pk_algorithm = gnutls_oid_to_pk(oid);
 	if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN) {
 		gnutls_assert();
 		_gnutls_debug_log

@@ -195,7 +195,18 @@ gnutls_sign_algorithm_t gnutls_sign_get_id(const char *name)
 
 }
 
-gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm(const char *oid)
+/**
+ * gnutls_oid_to_sign:
+ * @oid: is an object identifier
+ *
+ * Converts a textual object identifier to a #gnutls_sign_algorithm_t value.
+ *
+ * Returns: a #gnutls_sign_algorithm_t id of the specified digest
+ *   algorithm, or %GNUTLS_SIGN_UNKNOWN on failure.
+ *
+ * Since: 3.4.3
+ **/
+gnutls_sign_algorithm_t gnutls_oid_to_sign(const char *oid)
 {
 	gnutls_sign_algorithm_t ret = 0;
 
@@ -238,15 +249,20 @@ gnutls_pk_to_sign(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash)
 	return ret;
 }
 
-const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t pk,
-				     gnutls_digest_algorithm_t mac)
+/**
+ * gnutls_sign_get_oid:
+ * @sign: is a sign algorithm
+ *
+ * Convert a #gnutls_sign_algorithm_t value to its object identifier.
+ *
+ * Returns: a string that contains the object identifier of the specified sign
+ *   algorithm, or %NULL.
+ *
+ * Since: 3.4.3
+ **/
+const char *gnutls_sign_get_oid(gnutls_sign_algorithm_t sign)
 {
-	gnutls_sign_algorithm_t sign;
 	const char *ret = NULL;
-
-	sign = gnutls_pk_to_sign(pk, mac);
-	if (sign == GNUTLS_SIGN_UNKNOWN)
-		return NULL;
 
 	GNUTLS_SIGN_ALG_LOOP(ret = p->oid);
 	return ret;

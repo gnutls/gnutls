@@ -449,7 +449,7 @@ gnutls_ocsp_req_get_cert_id(gnutls_ocsp_req_t req,
 		return ret;
 	}
 
-	ret = _gnutls_x509_oid_to_digest((char *) sa.data);
+	ret = gnutls_oid_to_digest((char *) sa.data);
 	_gnutls_free_datum(&sa);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1410,7 +1410,7 @@ gnutls_ocsp_resp_get_single(gnutls_ocsp_resp_t resp,
 		return ret;
 	}
 
-	ret = _gnutls_x509_oid_to_digest((char *) sa.data);
+	ret = gnutls_oid_to_digest((char *) sa.data);
 	_gnutls_free_datum(&sa);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1710,7 +1710,7 @@ int gnutls_ocsp_resp_get_signature_algorithm(gnutls_ocsp_resp_t resp)
 		return ret;
 	}
 
-	ret = _gnutls_x509_oid2sign_algorithm((char *) sa.data);
+	ret = gnutls_oid_to_sign((char *) sa.data);
 
 	_gnutls_free_datum(&sa);
 

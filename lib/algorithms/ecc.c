@@ -133,14 +133,16 @@ int _gnutls_ecc_curve_get_tls_id(gnutls_ecc_curve_t supported_ecc)
 	return ret;
 }
 
-/*-
- * _gnutls_oid_to_ecc_curve:
+/**
+ * gnutls_oid_to_ecc_curve:
  * @oid: is a curve's OID
  *
  * Returns: return a #gnutls_ecc_curve_t value corresponding to
  *   the specified OID, or %GNUTLS_ECC_CURVE_INVALID on error.
- -*/
-gnutls_ecc_curve_t _gnutls_oid_to_ecc_curve(const char *oid)
+ *
+ * Since: 3.4.3
+ **/
+gnutls_ecc_curve_t gnutls_oid_to_ecc_curve(const char *oid)
 {
 	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
 
@@ -154,16 +156,18 @@ gnutls_ecc_curve_t _gnutls_oid_to_ecc_curve(const char *oid)
 	return ret;
 }
 
-/*-
- * _gnutls_ecc_curve_get_id:
+/**
+ * gnutls_ecc_curve_get_id:
  * @name: is a curve name
  *
  * The names are compared in a case insensitive way.
  *
  * Returns: return a #gnutls_ecc_curve_t value corresponding to
  *   the specified curve, or %GNUTLS_ECC_CURVE_INVALID on error.
- -*/
-gnutls_ecc_curve_t _gnutls_ecc_curve_get_id(const char *name)
+ *
+ * Since: 3.4.3
+ **/
+gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name)
 {
 	gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
 
@@ -223,16 +227,18 @@ const char *gnutls_ecc_curve_get_name(gnutls_ecc_curve_t curve)
 	return ret;
 }
 
-/*-
- * _gnutls_ecc_curve_get_oid:
+/**
+ * gnutls_ecc_curve_get_oid:
  * @curve: is an ECC curve
  *
- * Convert a #gnutls_ecc_curve_t value to a string.
+ * Convert a #gnutls_ecc_curve_t value to its object identifier.
  *
- * Returns: a string that contains the name of the specified
+ * Returns: a string that contains the OID of the specified
  *   curve or %NULL.
- -*/
-const char *_gnutls_ecc_curve_get_oid(gnutls_ecc_curve_t curve)
+ *
+ * Since: 3.4.3
+ **/
+const char *gnutls_ecc_curve_get_oid(gnutls_ecc_curve_t curve)
 {
 	const char *ret = NULL;
 

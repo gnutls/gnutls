@@ -1458,7 +1458,7 @@ _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 	int result;
 	char name[128];
 
-	pk = _gnutls_x509_pk_to_oid(pk_algorithm);
+	pk = gnutls_pk_get_oid(pk_algorithm);
 	if (pk == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
@@ -1579,7 +1579,7 @@ _gnutls_x509_get_pk_algorithm(ASN1_TYPE src, const char *src_name,
 		return _gnutls_asn2err(result);
 	}
 
-	algo = _gnutls_x509_oid2pk_algorithm(oid);
+	algo = gnutls_oid_to_pk(oid);
 	if (algo == GNUTLS_PK_UNKNOWN) {
 		_gnutls_debug_log
 		    ("%s: unknown public key algorithm: %s\n", __func__,
@@ -1669,7 +1669,7 @@ _gnutls_x509_get_signature_algorithm(ASN1_TYPE src, const char *src_name)
 		return result;
 	}
 
-	result = _gnutls_x509_oid2sign_algorithm((char *) sa.data);
+	result = gnutls_oid_to_sign((char *) sa.data);
 
 	_gnutls_free_datum(&sa);
 

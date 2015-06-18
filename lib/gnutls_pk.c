@@ -343,7 +343,7 @@ decode_ber_digest_info(const gnutls_datum_t * info,
 		return _gnutls_asn2err(result);
 	}
 
-	*hash = _gnutls_x509_oid_to_digest(str);
+	*hash = gnutls_oid_to_digest(str);
 
 	if (*hash == GNUTLS_DIG_UNKNOWN) {
 
