@@ -104,6 +104,8 @@ if ENABLE_DANE
 ctests += dane
 endif
 
+mini_alignment_LDADD = $(LDADD) $(NETTLE_LIBS)
+
 if ENABLE_OPENSSL
 if !ENABLE_FIPS140
 ctests +=  openssl
