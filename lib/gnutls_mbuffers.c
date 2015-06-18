@@ -347,7 +347,7 @@ mbuffer_st *_mbuffer_alloc_align16(size_t maximum_size, unsigned align_pos)
 
 static unsigned is_aligned16(mbuffer_st * bufel, unsigned align_pos)
 {
-uint8_t * ptr = _mbuffer_get_udata_ptr(bufel);
+	uint8_t * ptr = _mbuffer_get_udata_ptr(bufel);
 
 	if (((size_t)(ptr+align_pos)) % ALIGN_SIZE == 0)
 		return 1;
