@@ -18,20 +18,21 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
 
-CERTTOOL=${CERTTOOL:-../../src/certtool}
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool}"
 
-test -d pkcs12 || unzip PKITS_data.zip
+test -d pkcs12 || unzip "${srcdir}/PKITS_data.zip"
 
 ret=0
-for p12 in pkcs12/*; do
-    $CERTTOOL --p12-info --inder --password password --infile $p12 > out 2>&1
-    rc=$?
-    if test $rc != 0; then
-	echo "PKCS12 FATAL $p12"
-	ret=1
-    fi
+for p12 in "${srcdir}/pkcs12"/*; do
+  "${CERTTOOL}" --p12-info --inder --password password --infile "${p12}" > out 2>&1
+  rc=$?
+  if test ${rc} != 0; then
+    echo "PKCS12 FATAL $p12"
+    ret=1
+  fi
 done
 rm -f out
 
-echo "Done (exit code $ret)"
-exit $ret
+echo "Done (exit code ${ret})"
+exit ${ret}

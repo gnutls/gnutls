@@ -20,19 +20,18 @@
 
 set -e
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool}
+srcdir="${srcdir:-.}"
 
 echo "Running PKITS CRT..."
-$srcdir/pkits_crt
+"${srcdir}/pkits_crt"
 
 echo "Running PKITS CRL..."
-$srcdir/pkits_crl
+"${srcdir}/pkits_crl"
 
 echo "Running PKITS PKCS#12..."
-$srcdir/pkits_pkcs12
+"${srcdir}/pkits_pkcs12"
 
 echo "Running PKITS S/MIME..."
-$srcdir/pkits_smime
+"${srcdir}/pkits_smime"
 
 echo "Done"
