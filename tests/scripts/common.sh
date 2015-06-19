@@ -48,7 +48,7 @@ launch_pkcs11_server() {
        shift
        PROVIDER="$1"
        shift
-       ${VALGRIND} ${SERV} "${PROVIDER}" ${DEBUG} -p "${PORT}" $* &
+       ${VALGRIND} ${SERV} ${PROVIDER} ${DEBUG} -p "${PORT}" $* &
        LOCALPID="$!"
        trap "[ ! -z \"${LOCALPID}\" ] && kill ${LOCALPID};" 15
        wait "${LOCALPID}"
