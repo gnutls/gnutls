@@ -77,5 +77,24 @@ if test "${id}" != "fc5b45b20c489393a457f177572920ac40bacba9d25cea51200822271eaf
 	exit 1
 fi
 
+export TZ="UTC"
+
+# Check for datefudge
+TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
+if test "$TSTAMP" != "1158969600"; then
+echo $TSTAMP
+    echo "You need datefudge to run this test"
+    exit 77
+fi
+
+cat "${srcdir}/../certs/cert-ecc256.pem" "${srcdir}/../certs/ca-cert-ecc.pem"|datefudge "2012-11-22" \
+${VALGRIND} "${CERTTOOL}" --verify-chain
+rc=$?
+
+if test "${rc}" != "0";then
+	echo "There was an issue verifying the chain"
+	exit 1
+fi
+
 
 exit 0
