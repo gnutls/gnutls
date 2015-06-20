@@ -36,8 +36,7 @@
 #include <fips.h>
 #include <atfork.h>
 #include <system-keys.h>
-
-#include "gettext.h"
+#include <gnutls_str.h>
 
 /* Minimum library versions we accept. */
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
@@ -236,7 +235,9 @@ int gnutls_global_init(void)
 		_gnutls_debug_log("Enabled GnuTLS logging...\n");
 	}
 
+#ifdef HAVE_DCGETTEXT
 	bindtextdomain(PACKAGE, LOCALEDIR);
+#endif
 
 	res = gnutls_crypto_init();
 	if (res != 0) {

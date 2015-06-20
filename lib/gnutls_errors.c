@@ -27,11 +27,7 @@
 #include <stdarg.h>
 #endif
 #include "vasprintf.h"
-
-/* I18n of error codes. */
-#include "gettext.h"
-#define _(String) dgettext (PACKAGE, String)
-#define N_(String) gettext_noop (String)
+#include <gnutls_str.h>
 
 #define ERROR_ENTRY(desc, name) \
 	{ desc, #name, name}

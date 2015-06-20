@@ -42,8 +42,7 @@
 #ifdef ENABLE_OPENPGP
 #include "openpgp/gnutls_openpgp.h"
 #endif
-#include "gettext.h"
-#define _(String) dgettext (PACKAGE, String)
+#include <gnutls_str.h>
 
 /**
  * gnutls_certificate_free_keys:

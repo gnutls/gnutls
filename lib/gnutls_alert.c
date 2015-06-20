@@ -24,11 +24,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_record.h>
 #include <debug.h>
-
-/* I18n of error codes. */
-#include "gettext.h"
-#define _(String) dgettext (PACKAGE, String)
-#define N_(String) gettext_noop (String)
+#include <gnutls_str.h>
 
 typedef struct {
 	gnutls_alert_description_t alert;

@@ -23,14 +23,17 @@
 #ifndef GNUTLS_STR_H
 #define GNUTLS_STR_H
 
+#include <config.h>
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
 
-#ifdef HAVE_DGETTEXT
+#ifdef HAVE_DCGETTEXT
 # include "gettext.h"
 # define _(String) dgettext (PACKAGE, String)
+# define N_(String) gettext_noop (String)
 #else
 # define _(String) String
+# define N_(String) String
 #endif
 
 void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src);
