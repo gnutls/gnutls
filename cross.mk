@@ -1,6 +1,6 @@
 SMP=-j4
 
-GNUTLS_VERSION:=3.4.1
+GNUTLS_VERSION:=3.4.2
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -157,7 +157,7 @@ $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 	cd $(GNUTLS_DIR) && \
 		$(CONFIG_ENV) LDFLAGS="$(LDFLAGS) -L$(LIB_DIR)" CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" \
 		./configure $(CONFIG_FLAGS) --enable-local-libopts --disable-cxx \
-		--without-zlib --disable-nls --enable-gcc-warnings --disable-libdane --disable-openssl-compatibility --with-included-libtasn1 && cd ..
+		--disable-doc --without-zlib --disable-nls --enable-gcc-warnings --disable-libdane --disable-openssl-compatibility --with-included-libtasn1 && cd ..
 	touch $@
 
 $(OPENCONNECT_DIR)/.installed: $(OPENCONNECT_DIR)/.configured
