@@ -124,18 +124,24 @@ endif
 endif
 
 gc_CPPFLAGS = $(CPPFLAGS) \
+	-I$(top_srcdir)/lib/includes		\
+	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl
 
 mpi_CPPFLAGS = $(CPPFLAGS) \
+	-I$(top_srcdir)/lib/includes		\
+	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/gl	\
 	-I$(top_builddir)/gl
 
 pkcs12_s2k_CPPFLAGS = $(CPPFLAGS) \
+	-I$(top_srcdir)/lib/includes		\
+	-I$(top_builddir)/lib/includes		\
 	-I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/gl	\
