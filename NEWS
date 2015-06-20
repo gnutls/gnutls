@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: Follow closely RFC5280 recommendations and use UTCTime for
 dates prior to 2050.
 
+* Force 16-byte alignment to all input to ciphers (previously it was
+done only when cryptodev was enabled).
+
 ** API and ABI modifications:
 gnutls_ecc_curve_get_oid: Added
 gnutls_digest_get_oid: Added
