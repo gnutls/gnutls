@@ -31,9 +31,11 @@
 #include <gnutls/dtls.h>
 #include <signal.h>
 #include <unistd.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+#ifndef _WIN32
+# include <netinet/in.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+#endif
 #include "utils.h"
 
 #define SERVER_MTU  500
@@ -285,8 +287,13 @@ static void server(int fd)
 void doit(void)
 {
 	int fd[2];
+	int err;
 
-	udp_socketpair(fd);
+	err = socketpair(AF_UNIX, SOCK_DGRAM, 0, fd);
+	if (err == -1) {
+		perror("socketpair");
+		fail("socketpair");
+	}
 
 	child = fork();
 	if (child < 0) {

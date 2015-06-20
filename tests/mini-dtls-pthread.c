@@ -33,11 +33,13 @@
 #include <gnutls/dtls.h>
 #include <signal.h>
 #include <unistd.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <pthread.h>
+#ifndef _WIN32
+# include <netinet/in.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <pthread.h>
+#endif
 #include "utils.h"
 
 #ifdef _WIN32

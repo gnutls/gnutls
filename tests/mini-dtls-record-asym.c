@@ -33,10 +33,6 @@
 #include <gnutls/dtls.h>
 #include <signal.h>
 #include <unistd.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
 #include "utils.h"
 
 #ifdef _WIN32
@@ -47,6 +43,11 @@ void doit(void)
 }
 
 #else
+
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
 
 /* Tests whether packing multiple DTLS records in a single UDP packet
  * will be handled correctly, as well as an asymmetry in MTU sizes

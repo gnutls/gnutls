@@ -29,7 +29,6 @@
 #include <gnutls/openpgp.h>
 
 #include "utils.h"
-#include <read-file.h>
 
 #include <unistd.h>
 #include <stdlib.h>

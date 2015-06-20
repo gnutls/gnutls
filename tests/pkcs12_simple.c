@@ -25,8 +25,8 @@
 #include <config.h>
 #endif
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <read-file.h>
 #include <gnutls/pkcs12.h>
 #include <gnutls/x509.h>
 #include "utils.h"
@@ -41,8 +41,6 @@ void doit(void)
 #ifdef ENABLE_NON_SUITEB_CURVES
 	const char *filename, *password = "1234";
 	gnutls_pkcs12_t pkcs12;
-	unsigned char *file_data;
-	size_t file_size;
 	gnutls_datum_t data;
 	gnutls_x509_crt_t *chain, *extras;
 	unsigned int chain_size = 0, extras_size = 0, i;
@@ -71,12 +69,10 @@ void doit(void)
 		    ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
 		     filename, password);
 
-	file_data = (void *) read_binary_file(filename, &file_size);
-	if (file_data == NULL)
+	ret = gnutls_load_file(filename, &data);
+	if (ret < 0)
 		fail("cannot open file");
 
-	data.data = file_data;
-	data.size = file_size;
 	ret = gnutls_pkcs12_import(pkcs12, &data, GNUTLS_X509_FMT_DER, 0);
 	if (ret < 0)
 		fail("pkcs12_import failed %d: %s\n", ret,
@@ -146,7 +142,7 @@ void doit(void)
 		     gnutls_strerror(ret));
 	gnutls_x509_privkey_deinit(pkey);
 
-	free(file_data);
+	free(data.data);
 
 	gnutls_global_deinit();
 #else

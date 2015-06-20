@@ -27,13 +27,12 @@
 #include <gnutls/openpgp.h>
 
 #include "utils.h"
-#include <read-file.h>
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #if !defined(_WIN32)
+# include <sys/types.h>
+# include <sys/socket.h>
 #include <sys/wait.h>
 #endif
 #include <string.h>
@@ -48,9 +47,9 @@ static const char priv_key_file[] = "../guile/tests/openpgp-sec.asc";
 static const char *key_id = NULL;
 static gnutls_datum_t stored_cli_cert = { NULL, 0 };
 
-static void log_message(int level, const char *message)
+static void log_message(int level, const char *msg)
 {
-	fprintf(stderr, "[%5d|%2d] %s", getpid(), level, message);
+	fprintf(stderr, "[%5d|%2d] %s", getpid(), level, msg);
 }
 
 static
@@ -107,7 +106,7 @@ void check_loaded_key(gnutls_certificate_credentials_t cred)
 	gnutls_openpgp_privkey_deinit(key);
 }
 
-void doit()
+void doit(void)
 {
 	int err, i;
 	int sockets[2];
