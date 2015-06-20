@@ -1,6 +1,4 @@
-eval '(exit $?0)' && eval 'exec perl -wST "$0" ${1+"$@"}'
-  & eval 'exec perl -wST "$0" $argv:q'
-    if 0;
+#!/usr/bin/perl
 
 # Copyright (C) 2011-2012 Free Software Foundation, Inc.
 # Copyright (C) 2013 Nikos Mavrogiannopoulos
