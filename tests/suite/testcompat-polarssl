@@ -32,6 +32,8 @@
 
 srcdir="${srcdir:-.}"
 
+export TZ="UTC"
+
 # Check for datefudge
 TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s 2>/dev/null`
 if test "${TSTAMP}" != "1158969600"; then
