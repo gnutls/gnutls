@@ -25,12 +25,12 @@ test -d crls || unzip "${srcdir}/PKITS_data.zip"
 
 ret=0
 for crl in "${srcdir}/crls"/*; do
-  "${CERTTOOL}" --crl-info --inder --infile "${crl}" > out 2>&1
-  rc=$?
-  if test ${rc} != 0; then
-    echo "CRL FATAL ${crl}"
-    ret=1
-  fi
+	"${CERTTOOL}" --crl-info --inder --infile "${crl}" > out 2>&1
+	rc=$?
+	if test ${rc} != 0; then
+		echo "CRL FATAL ${crl}"
+		ret=1
+	fi
 done
 rm -f out
 

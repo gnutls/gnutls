@@ -25,8 +25,8 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
-if ! test -z "${VALGRIND}";then
-  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 OUTFILE=out.tmp
 
@@ -35,14 +35,14 @@ rc=$?
 
 # We're done.
 if test "${rc}" != "0"; then
-  echo "Invalid crq decoding failed"
-  exit ${rc}
+	echo "Invalid crq decoding failed"
+	exit ${rc}
 fi
 
 grep "error: get_key_id" "${OUTFILE}" >/dev/null 2>&1
 if test "$?" != "0"; then
-  echo "crq decoding didn't fail as expected"
-  exit 1
+	echo "crq decoding didn't fail as expected"
+	exit 1
 fi
 
 rm -f "${OUTFILE}"

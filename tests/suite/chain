@@ -34,39 +34,39 @@ RET=0
 
 i=1
 while test -d X509tests/test${i}; do
-  find X509tests/test${i} -name *.crl -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --crl-info --inder --infile > chains/chain${i}.pem  2>/dev/null
-  find X509tests/test${i} -name E*.crt -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 2>/dev/null
-  if test "${i}" -gt 1; then
-    find X509tests/test${i} -name I*.crt -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 2>/dev/null
-  fi
-  find X509tests/test${i} -name T*.crt -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 2>/dev/null
-  "${CERTTOOL}" -e --infile chains/chain${i}.pem > out 2>&1
-  rc=$?
-  if test $rc != 0 && test $rc != 1; then
-    echo "Chain ${i} FATAL failure."
-    RET=1
-  else
-    if echo "$KNOWN_BUGS" | grep " ${i} " > /dev/null 2>&1; then
-        echo "Chain ${i} verification was skipped due to known bug."
-    elif echo "$SUCCESS" | grep " ${i} " > /dev/null 2>&1; then
-      if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null 2>&1; then
-        echo "Chain ${i} verification failure UNEXPECTED."
-        RET=1
-      else
-        echo "Chain ${i} verification success as expected."
-      fi
-    elif echo "$FAILURE" | grep " ${i} " >/dev/null 2>&1; then
-      if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null 2>&1; then
-        echo "Chain ${i} verification failure as expected."
-      else
-        echo "Chain ${i} verification success UNEXPECTED. "
-        RET=1
-      fi
-    else
-      echo "Chain ${i} unclassified."
-    fi
-  fi
-  i=`expr ${i} + 1`
+	find X509tests/test${i} -name *.crl -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --crl-info --inder --infile > chains/chain${i}.pem  2>/dev/null
+	find X509tests/test${i} -name E*.crt -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 2>/dev/null
+	if test "${i}" -gt 1; then
+		find X509tests/test${i} -name I*.crt -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 2>/dev/null
+	fi
+	find X509tests/test${i} -name T*.crt -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 2>/dev/null
+	"${CERTTOOL}" -e --infile chains/chain${i}.pem > out 2>&1
+	rc=$?
+	if test $rc != 0 && test $rc != 1; then
+		echo "Chain ${i} FATAL failure."
+		RET=1
+	else
+		if echo "$KNOWN_BUGS" | grep " ${i} " > /dev/null 2>&1; then
+				echo "Chain ${i} verification was skipped due to known bug."
+		elif echo "$SUCCESS" | grep " ${i} " > /dev/null 2>&1; then
+			if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null 2>&1; then
+				echo "Chain ${i} verification failure UNEXPECTED."
+				RET=1
+			else
+				echo "Chain ${i} verification success as expected."
+			fi
+		elif echo "$FAILURE" | grep " ${i} " >/dev/null 2>&1; then
+			if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null 2>&1; then
+				echo "Chain ${i} verification failure as expected."
+			else
+				echo "Chain ${i} verification success UNEXPECTED. "
+				RET=1
+			fi
+		else
+			echo "Chain ${i} unclassified."
+		fi
+	fi
+	i=`expr ${i} + 1`
 done
 rm -f out
 

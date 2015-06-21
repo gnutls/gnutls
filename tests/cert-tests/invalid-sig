@@ -25,8 +25,8 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
-if ! test -z "${VALGRIND}";then
-  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 #check whether a different PKCS #1 signature than the advertized in certificate is tolerated
@@ -35,8 +35,8 @@ rc=$?
 
 # We're done.
 if test "${rc}" = "0"; then
-  echo "Verification of invalid signature (1) failed"
-  exit ${rc}
+	echo "Verification of invalid signature (1) failed"
+	exit ${rc}
 fi
 
 #check whether a different tbsCertificate than the outer signature algorithm is tolerated
@@ -45,8 +45,8 @@ rc=$?
 
 # We're done.
 if test "${rc}" = "0"; then
-  echo "Verification of invalid signature (2) failed"
-  exit ${rc}
+	echo "Verification of invalid signature (2) failed"
+	exit ${rc}
 fi
 
 #check whether a different tbsCertificate than the outer signature algorithm is tolerated
@@ -55,8 +55,8 @@ rc=$?
 
 # We're done.
 if test "${rc}" = "0"; then
-  echo "Verification of invalid signature (3) failed"
-  exit ${rc}
+	echo "Verification of invalid signature (3) failed"
+	exit ${rc}
 fi
 
 exit 0

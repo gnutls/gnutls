@@ -25,12 +25,12 @@ test -d certs || unzip "${srcdir}/PKITS_data.zip"
 
 ret=0
 for crt in "${srcdir}/certs"/*; do
-  "${CERTTOOL}" --certificate-info --inder --infile "${crt}" > out 2>&1
-  rc=$?
-  if test ${rc} != 0; then
-    echo "Certificate FATAL ${crt}"
-    ret=1
-  fi
+	"${CERTTOOL}" --certificate-info --inder --infile "${crt}" > out 2>&1
+	rc=$?
+	if test ${rc} != 0; then
+		echo "Certificate FATAL ${crt}"
+		ret=1
+	fi
 done
 rm -f out
 

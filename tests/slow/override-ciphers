@@ -21,38 +21,38 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 unset RETCODE
-if ! test -z "${VALGRIND}";then
-  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./cipher-override
-if test $? != 0;then
-  echo "overriden cipher tests failed"
-  exit 1
+if test $? != 0; then
+	echo "overriden cipher tests failed"
+	exit 1
 fi
 
 ${VALGRIND} ./cipher-override
-if test $? != 0;then
-  echo "overriden cipher tests 2 failed"
-  exit 1
+if test $? != 0; then
+	echo "overriden cipher tests 2 failed"
+	exit 1
 fi
 
 ${VALGRIND} ./cipher-override2
-if test $? != 0;then
-  echo "overriden cipher tests 3 failed"
-  exit 1
+if test $? != 0; then
+	echo "overriden cipher tests 3 failed"
+	exit 1
 fi
 
 GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./mac-override
-if test $? != 0;then
-  echo "overriden mac tests failed"
-  exit 1
+if test $? != 0; then
+	echo "overriden mac tests failed"
+	exit 1
 fi
 
 ${VALGRIND} ./mac-override
-if test $? != 0;then
-  echo "overriden mac tests 2 failed"
-  exit 1
+if test $? != 0; then
+	echo "overriden mac tests 2 failed"
+	exit 1
 fi
 
 exit 0

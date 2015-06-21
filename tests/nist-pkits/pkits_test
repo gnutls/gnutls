@@ -7,8 +7,8 @@ srcdir="${srcdir:-.}"
 test -d certs || unzip "${srcdir}/PKITS_data.zip"
 
 if ! test -d pkits_test_list_generator; then
-  tar xfz "${srcdir}/pkits_test_list_generator.tgz"
-  patch -p 0 < pkits_test_list_generator.patch
+	tar xfz "${srcdir}/pkits_test_list_generator.tgz"
+	patch -p 0 < pkits_test_list_generator.patch
 fi
 
 make -C pkits_test_list_generator/src

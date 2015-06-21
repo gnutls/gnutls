@@ -10,19 +10,19 @@ certtool -e < chain.pem > output.txt
 rm -f chain.pem
 
 if grep 'Verification output:' output.txt > /dev/null; then
-  if grep 'Verification output' output.txt | grep -v 'Verification output: Verified.' > /dev/null; then
-    if test "${RESULT}" = "0"; then
-      echo "<font color=red>Unexpected reject</font>"
-    else
-      echo "<font color=green>Reject</font>"
-    fi
-  else
-    if test "${RESULT}" = "1"; then
-      echo "<font color=red>Unexpected success</font>"
-    else
-      echo "<font color=green>Success</font>"
-    fi
-  fi
+	if grep 'Verification output' output.txt | grep -v 'Verification output: Verified.' > /dev/null; then
+		if test "${RESULT}" = "0"; then
+			echo "<font color=red>Unexpected reject</font>"
+		else
+			echo "<font color=green>Reject</font>"
+		fi
+	else
+		if test "${RESULT}" = "1"; then
+			echo "<font color=red>Unexpected success</font>"
+		else
+			echo "<font color=green>Success</font>"
+		fi
+	fi
 fi
 
 rm -f output.txt

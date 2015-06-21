@@ -22,8 +22,8 @@
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-if ! test -z "${VALGRIND}";then
-  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 ${VALGRIND} "${CERTTOOL}" --certificate-info --inder --infile "${srcdir}/invalid-cert.der" 2>/dev/null
@@ -31,7 +31,7 @@ rc=$?
 
 # We're done.
 if test "${rc}" != "1"; then
-  exit ${rc}
+	exit ${rc}
 fi
 
 exit 0

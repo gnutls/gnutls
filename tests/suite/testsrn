@@ -25,8 +25,8 @@ SERV="${SERV:-../../src/gnutls-serv${EXEEXT}} -q"
 CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
 unset RETCODE
 
-if test "${WINDIR}" != "";then
-  exit 77
+if test "${WINDIR}" != ""; then
+	exit 77
 fi 
 
 . "${srcdir}/../scripts/common.sh"
@@ -40,19 +40,19 @@ PID=$!
 wait_server ${PID}
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NONE:+AES-128-CBC:+MD5:+SHA1:+VERS-TLS1.0:+ANON-DH:+COMP-NULL:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail ${PID} "0. Renegotiation should have succeeded!"
+	fail ${PID} "0. Renegotiation should have succeeded!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail ${PID} "1. Safe rehandshake should have succeeded!"
+	fail ${PID} "1. Safe rehandshake should have succeeded!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%UNSAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail ${PID} "2. Unsafe rehandshake should have succeeded!"
+	fail ${PID} "2. Unsafe rehandshake should have succeeded!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail ${PID} "3. Unsafe negotiation should have succeeded!"
+	fail ${PID} "3. Unsafe negotiation should have succeeded!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
-  fail ${PID} "4. Unsafe renegotiation should have failed!"
+	fail ${PID} "4. Unsafe renegotiation should have failed!"
 
 
 kill ${PID}
@@ -63,16 +63,16 @@ PID=$!
 wait_server ${PID}
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail ${PID} "5. Safe rehandshake should have succeeded!"
+	fail ${PID} "5. Safe rehandshake should have succeeded!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%UNSAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail ${PID} "6. Unsafe rehandshake should have succeeded!"
+	fail ${PID} "6. Unsafe rehandshake should have succeeded!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
-  fail ${PID} "7. Unsafe negotiation should have failed!"
+	fail ${PID} "7. Unsafe negotiation should have failed!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
-  fail ${PID} "8. Unsafe renegotiation should have failed!"
+	fail ${PID} "8. Unsafe renegotiation should have failed!"
 
 kill ${PID}
 wait
@@ -82,16 +82,16 @@ PID=$!
 wait_server ${PID}
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
-  fail ${PID} "9. Initial connection should have failed!"
+	fail ${PID} "9. Initial connection should have failed!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-DH:%UNSAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail ${PID} "10. Unsafe connection should have succeeded!"
+	fail ${PID} "10. Unsafe connection should have succeeded!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail ${PID} "11. Unsafe negotiation should have succeeded!"
+	fail ${PID} "11. Unsafe negotiation should have succeeded!"
 
 "${CLI}" -p "${PORT}" 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail ${PID} "12. Unsafe renegotiation should have succeeded!"
+	fail ${PID} "12. Unsafe renegotiation should have succeeded!"
 
 kill ${PID}
 wait

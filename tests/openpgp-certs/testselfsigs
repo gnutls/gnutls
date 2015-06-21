@@ -28,26 +28,26 @@ CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 unset RETCODE || true
 
 fail() {
-   echo "Failure: $1" >&2
-   RETCODE=${RETCODE:-${2:-1}}
+	 echo "Failure: $1" >&2
+	 RETCODE=${RETCODE:-${2:-1}}
 }
 
 echo "Checking OpenPGP certificate self verification"
 
 ("${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/selfsigs/alice.pub" \
-    | grep "^Self Signature verification: ok" > /dev/null) || \
-    fail "Self sig Verification should have succeeded!"
+	| grep "^Self Signature verification: ok" > /dev/null) || \
+	fail "Self sig Verification should have succeeded!"
 
 ("${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/selfsigs/alice-mallory-badsig18.pub" \
-    | grep "^Self Signature verification: failed" > /dev/null) || \
-    fail "Self sig Verification should have failed!"
+	| grep "^Self Signature verification: failed" > /dev/null) || \
+	fail "Self sig Verification should have failed!"
 
 ("${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/selfsigs/alice-mallory-irrelevantsig.pub" \
-    | grep "^Self Signature verification: failed" >/dev/null) || \
-    fail "Self sig Verification should have failed!"
+	| grep "^Self Signature verification: failed" >/dev/null) || \
+	fail "Self sig Verification should have failed!"
 
 ("${CERTTOOL}" --inraw --pgp-certificate-info --infile "${srcdir}/selfsigs/alice-mallory-nosig18.pub" \
-    | grep "^Self Signature verification: failed" >/dev/null) || \
-    fail "Self sig Verification should have failed!"
+	| grep "^Self Signature verification: failed" >/dev/null) || \
+	fail "Self sig Verification should have failed!"
 
 exit ${RETCODE:-0}

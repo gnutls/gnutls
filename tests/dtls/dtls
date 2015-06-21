@@ -22,8 +22,8 @@
 
 set -e
 
-if test "${WINDIR}" != "";then
-  exit 77
+if test "${WINDIR}" != ""; then
+	exit 77
 fi
 
 ./dtls-stress -full -shello 01234 -sfinished 01 -cfinished 01234 CCertificate CKeyExchange CCertificateVerify CChangeCipherSpec CFinished -d 6

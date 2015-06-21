@@ -25,8 +25,8 @@
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
-if ! test -z "${VALGRIND}";then
-  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 #check whether "funny" spaces can be interpreted
@@ -35,8 +35,8 @@ rc=$?
 
 # We're done.
 if test "${rc}" != "0"; then
-  echo "Funny-spacing cert decoding failed 1"
-  exit ${rc}
+	echo "Funny-spacing cert decoding failed 1"
+	exit ${rc}
 fi
 
 #check whether a BMPString attribute can be properly decoded
@@ -44,8 +44,8 @@ ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/bmpstring.pem" 
 rc=$?
 
 if test "${rc}" != "0"; then
-  echo "BMPString cert decoding failed 1"
-  exit ${rc}
+	echo "BMPString cert decoding failed 1"
+	exit ${rc}
 fi
 
 #Note that --strip-trailing-cr is used for the test
@@ -54,8 +54,8 @@ ${DIFF} "${srcdir}/bmpstring.pem" tmp-pem.pem || ${DIFF} --strip-trailing-cr "${
 rc=$?
 
 if test "${rc}" != "0"; then
-  echo "BMPString cert decoding failed 2"
-  exit ${rc}
+	echo "BMPString cert decoding failed 2"
+	exit ${rc}
 fi
 
 #check whether complex-cert is decoded as expected
@@ -63,8 +63,8 @@ ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/complex-cert.pe
 rc=$?
 
 if test "${rc}" != "0"; then
-  echo "Complex cert decoding failed 1"
-  exit ${rc}
+	echo "Complex cert decoding failed 1"
+	exit ${rc}
 fi
 
 cat "${srcdir}/complex-cert.pem" |grep -v "Not After:" >tmp1
@@ -73,8 +73,8 @@ ${DIFF} tmp1 tmp2 || ${DIFF} --strip-trailing-cr tmp1 tmp2
 rc=$?
 
 if test "${rc}" != "0"; then
-  echo "Complex cert decoding failed 2"
-  exit ${rc}
+	echo "Complex cert decoding failed 2"
+	exit ${rc}
 fi
 
 #check whether the cert with many othernames is decoded as expected
@@ -82,8 +82,8 @@ ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/xmpp-othername.
 rc=$?
 
 if test "${rc}" != "0"; then
-  echo "XMPP cert decoding failed 1"
-  exit ${rc}
+	echo "XMPP cert decoding failed 1"
+	exit ${rc}
 fi
 
 cat "${srcdir}/xmpp-othername.pem" |grep -v "Not After:" >tmp1
@@ -92,8 +92,8 @@ ${DIFF} tmp1 tmp2 || ${DIFF} --strip-trailing-cr tmp1 tmp2
 rc=$?
 
 if test "${rc}" != "0"; then
-  echo "XMPP cert decoding failed 2"
-  exit ${rc}
+	echo "XMPP cert decoding failed 2"
+	exit ${rc}
 fi
 
 rm -f tmp-pem.pem tmp1 tmp2
