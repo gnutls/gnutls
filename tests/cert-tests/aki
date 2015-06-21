@@ -23,14 +23,14 @@
 set -e
 
 srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 ${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/aki-cert.pem" \
-	  |grep -v "Algorithm Security Level" > tmp-aki.pem
+  |grep -v "Algorithm Security Level" > tmp-aki.pem
 rc=$?
 
 if test "${rc}" != "0"; then

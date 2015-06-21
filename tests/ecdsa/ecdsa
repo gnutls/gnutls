@@ -23,7 +23,7 @@
 #set -e
 
 srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 
 echo ca > template
 echo cn = "ECDSA SHA 256 CA" >> template
@@ -36,8 +36,8 @@ echo cn = "ECDSA SHA 256 CA" >> template
     --hash sha256 >out 2>&1
 
 if [ $? != 0 ];then
-	cat out
-	exit 1
+  cat out
+  exit 1
 fi
 
 echo ca > template
@@ -52,8 +52,8 @@ echo cn = "ECDSA SHA 224 Mid CA" >> template
     --hash sha224 >out 2>&1
 
 if [ $? != 0 ];then
-	cat out
-	exit 1
+  cat out
+  exit 1
 fi
 
 echo cn = "End-user" > template
@@ -67,16 +67,16 @@ echo cn = "End-user" > template
     --outfile new-user.pem >out 2>&1
 
 if [ $? != 0 ];then
-	cat out
-	exit 1
+  cat out
+  exit 1
 fi
 
 cat new-user.pem new-subca-ecdsa.pem new-ca-ecdsa.pem > out
 "${CERTTOOL}" --verify-chain <out > verify
 
 if [ $? != 0 ];then
-	cat verify
-	exit 1
+  cat verify
+  exit 1
 fi
 
 rm -f verify new-user.pem new-ca-ecdsa.pem new-subca-ecdsa.pem template out
@@ -84,8 +84,8 @@ rm -f key-subca-ecdsa.pem key-ca-ecdsa.pem key-ecdsa.pem
 
 "${CERTTOOL}" -k < "${srcdir}/bad-key.pem" | grep "validation failed" >/dev/null 2>&1
 if [ $? != 0 ];then
-	echo "certtool didn't detect a bad ECDSA key."
-	exit 1
+  echo "certtool didn't detect a bad ECDSA key."
+  exit 1
 fi
 
 exit 0

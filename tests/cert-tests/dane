@@ -23,7 +23,7 @@
 set -e
 
 srcdir="${srcdir:-.}"
-DANETOOL="${DANETOOL:-../../src/danetool$EXEEXT}"
+DANETOOL="${DANETOOL:-../../src/danetool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 
 test -e "${DANETOOL}" || exit 77

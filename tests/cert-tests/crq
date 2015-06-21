@@ -23,10 +23,10 @@
 #set -e
 
 srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 OUTFILE=out.tmp
 

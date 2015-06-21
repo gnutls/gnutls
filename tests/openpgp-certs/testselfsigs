@@ -23,7 +23,7 @@
 set -e
 
 srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 
 unset RETCODE || true
 

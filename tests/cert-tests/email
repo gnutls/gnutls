@@ -21,10 +21,10 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF=$"{DIFF:-diff}"
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 ${VALGRIND} "${CERTTOOL}" -e --infile "${srcdir}/email-certs/chain.exclude.test.example.com" --verify-email test@example.com

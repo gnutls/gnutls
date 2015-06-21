@@ -21,7 +21,7 @@
 #set -e
 
 srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 
 export TZ="UTC"
@@ -29,9 +29,9 @@ export TZ="UTC"
 # Check for datefudge
 TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
 if test "$TSTAMP" != "1158969600"; then
-echo $TSTAMP
-    echo "You need datefudge to run this test"
-    exit 77
+  echo $TSTAMP
+  echo "You need datefudge to run this test"
+  exit 77
 fi
 
 # Note that in rare cases this test may fail because the
@@ -43,16 +43,16 @@ counter=1
 
 while [ "${rc}" != "0" -a $counter -le 3 ]
 do
-datefudge "2007-04-22" \
+  datefudge "2007-04-22" \
     "${CERTTOOL}" --generate-self-signed \
     --load-privkey "${srcdir}/template-test.key" \
     --template "${srcdir}/template-test.tmpl" \
     --outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-test.pem" tmp-tt.pem >/dev/null 2>&1
-rc=$?
-test ${rc} != 0 && sleep 3
-counter=`expr $counter + 1`
+  ${DIFF} "${srcdir}/template-test.pem" tmp-tt.pem >/dev/null 2>&1
+  rc=$?
+  test ${rc} != 0 && sleep 3
+  counter=`expr $counter + 1`
 done
 
 # We're done.
@@ -68,16 +68,16 @@ counter=1
 
 while [ "${rc}" != "0" -a $counter -le 3 ]
 do
-datefudge "2007-04-22" \
+  datefudge "2007-04-22" \
     "${CERTTOOL}" --generate-self-signed \
     --load-privkey "${srcdir}/template-test.key" \
     --template "${srcdir}/template-utf8.tmpl" \
     --outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-utf8.pem" tmp-tt.pem >/dev/null 2>&1
-rc=$?
-test ${rc} != 0 && sleep 3
-counter=`expr $counter + 1`
+  ${DIFF} "${srcdir}/template-utf8.pem" tmp-tt.pem >/dev/null 2>&1
+  rc=$?
+  test ${rc} != 0 && sleep 3
+  counter=`expr $counter + 1`
 done
 
 # We're done.
@@ -93,16 +93,16 @@ counter=1
 
 while [ "${rc}" != "0" -a $counter -le 3 ]
 do
-datefudge "2007-04-22" \
+  datefudge "2007-04-22" \
     "${CERTTOOL}" --generate-self-signed \
     --load-privkey "${srcdir}/template-test.key" \
     --template "${srcdir}/template-dn.tmpl" \
     --outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-dn.pem" tmp-tt.pem >/dev/null 2>&1
-rc=$?
-test ${rc} != 0 && sleep 3
-counter=`expr $counter + 1`
+  ${DIFF} "${srcdir}/template-dn.pem" tmp-tt.pem >/dev/null 2>&1
+  rc=$?
+  test ${rc} != 0 && sleep 3
+  counter=`expr $counter + 1`
 done
 
 # We're done.
@@ -114,10 +114,10 @@ fi
 rm -f tmp-tt.pem
 
 datefudge "2007-04-22" \
-    "${CERTTOOL}" --generate-self-signed \
-    --load-privkey "${srcdir}/template-test.key" \
-    --template "${srcdir}/template-dn-err.tmpl" \
-    --outfile tmp-tt.pem 2>/dev/null
+  "${CERTTOOL}" --generate-self-signed \
+  --load-privkey "${srcdir}/template-test.key" \
+  --template "${srcdir}/template-dn-err.tmpl" \
+  --outfile tmp-tt.pem 2>/dev/null
 rc=$?
 
 if test "${rc}" = "0"; then
@@ -132,16 +132,16 @@ counter=1
 
 while [ "${rc}" != "0" -a $counter -le 3 ]
 do
-datefudge "2007-04-22" \
+  datefudge "2007-04-22" \
     "${CERTTOOL}" --generate-self-signed \
     --load-privkey "${srcdir}/template-test.key" \
     --template "${srcdir}/template-overflow.tmpl" \
     --outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-overflow.pem" tmp-tt.pem >/dev/null 2>&1
-rc=$?
-test ${rc} != 0 && sleep 3
-counter=`expr $counter + 1`
+  ${DIFF} "${srcdir}/template-overflow.pem" tmp-tt.pem >/dev/null 2>&1
+  rc=$?
+  test ${rc} != 0 && sleep 3
+  counter=`expr $counter + 1`
 done
 
 # We're done.
@@ -160,16 +160,16 @@ counter=1
 
 while [ "${rc}" != "0" -a $counter -le 3 ]
 do
-datefudge "2007-04-22" \
+  datefudge "2007-04-22" \
     "${CERTTOOL}" --generate-self-signed \
     --load-privkey "${srcdir}/template-test.key" \
     --template "${srcdir}/template-overflow2.tmpl" \
     --outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-overflow2.pem" tmp-tt.pem >/dev/null 2>&1
-rc=$?
-test ${rc} != 0 && sleep 3
-counter=`expr $counter + 1`
+  ${DIFF} "${srcdir}/template-overflow2.pem" tmp-tt.pem >/dev/null 2>&1
+  rc=$?
+  test ${rc} != 0 && sleep 3
+  counter=`expr $counter + 1`
 done
 
 # We're done.
@@ -186,16 +186,16 @@ counter=1
 
 while [ "${rc}" != "0" -a $counter -le 3 ]
 do
-datefudge "2007-04-22" \
+  datefudge "2007-04-22" \
     "${CERTTOOL}" --generate-self-signed \
     --load-privkey "${srcdir}/template-test.key" \
     --template "${srcdir}/template-date.tmpl" \
     --outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-date.pem" tmp-tt.pem >/dev/null 2>&1
-rc=$?
-test ${rc} != 0 && sleep 3
-counter=`expr $counter + 1`
+  ${DIFF} "${srcdir}/template-date.pem" tmp-tt.pem >/dev/null 2>&1
+  rc=$?
+  test ${rc} != 0 && sleep 3
+  counter=`expr $counter + 1`
 done
 
 # We're done.
@@ -213,16 +213,16 @@ counter=1
 
 while [ "${rc}" != "0" -a $counter -le 3 ]
 do
-datefudge "2007-04-22" \
+  datefudge "2007-04-22" \
     "${CERTTOOL}" --generate-self-signed \
     --load-privkey "${srcdir}/template-test.key" \
     --template "${srcdir}/template-nc.tmpl" \
     --outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-nc.pem" tmp-tt.pem >/dev/null 2>&1
-rc=$?
-test ${rc} != 0 && sleep 3
-counter=`expr $counter + 1`
+  ${DIFF} "${srcdir}/template-nc.pem" tmp-tt.pem >/dev/null 2>&1
+  rc=$?
+  test ${rc} != 0 && sleep 3
+  counter=`expr $counter + 1`
 done
 
 # We're done.
@@ -235,33 +235,31 @@ rm -f tmp-tt.pem
 
 # Test the GeneralizedTime support
 if test "$(getconf LONG_BIT)" = "64";then
-# we should test that on systems which have 64-bit time_t.
-rc=1
-counter=1
+  # we should test that on systems which have 64-bit time_t.
+  rc=1
+  counter=1
 
-while [ "${rc}" != "0" -a $counter -le 3 ]
-do
-datefudge "2051-04-22" \
-    "${CERTTOOL}" --generate-self-signed \
-    --load-privkey "${srcdir}/template-test.key" \
-    --template "${srcdir}/template-generalized.tmpl" \
-    --outfile tmp-tt.pem 2>/dev/null
+  while [ "${rc}" != "0" -a $counter -le 3 ]
+  do
+    datefudge "2051-04-22" \
+      "${CERTTOOL}" --generate-self-signed \
+      --load-privkey "${srcdir}/template-test.key" \
+      --template "${srcdir}/template-generalized.tmpl" \
+      --outfile tmp-tt.pem 2>/dev/null
 
-${DIFF} "${srcdir}/template-generalized.pem" tmp-tt.pem >/dev/null 2>&1
-rc=$?
-test ${rc} != 0 && sleep 3
-counter=`expr $counter + 1`
-done
+    ${DIFF} "${srcdir}/template-generalized.pem" tmp-tt.pem >/dev/null 2>&1
+    rc=$?
+    test ${rc} != 0 && sleep 3
+    counter=`expr $counter + 1`
+  done
 
-# We're done.
-if test "${rc}" != "0"; then
-  echo "Test 8 (generalizedTime) failed"
-  exit ${rc}
-fi
-
+  # We're done.
+  if test "${rc}" != "0"; then
+    echo "Test 8 (generalizedTime) failed"
+    exit ${rc}
+  fi
 fi
 
 rm -f tmp-tt.pem
-
 
 exit 0

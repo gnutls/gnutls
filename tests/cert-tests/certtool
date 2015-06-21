@@ -21,10 +21,10 @@
 #set -e
 
 srcdir="${srcdir:-.}"
-CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 #check whether "funny" spaces can be interpreted
@@ -32,32 +32,32 @@ id=`${VALGRIND} "${CERTTOOL}" --key-id --infile "${srcdir}/funny-spacing.pem" --
 rc=$?
 
 if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3";then
-	echo "Key-ID1 doesn't match the expected: ${id}"
-	exit 1
+  echo "Key-ID1 doesn't match the expected: ${id}"
+  exit 1
 fi
 
-id=`$VALGRIND "${CERTTOOL}" --key-id --infile "${srcdir}/funny-spacing.pem"`
+id=`${VALGRIND} "${CERTTOOL}" --key-id --infile "${srcdir}/funny-spacing.pem"`
 rc=$?
 
 if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3";then
-	echo "Default key-ID1 doesn't match the expected; did the defaults change? ID: ${id}"
-	exit 1
+  echo "Default key-ID1 doesn't match the expected; did the defaults change? ID: ${id}"
+  exit 1
 fi
 
 id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha1`
 rc=$?
 
 if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3";then
-	echo "Key-ID2 doesn't match the expected: ${id}"
-	exit 1
+  echo "Key-ID2 doesn't match the expected: ${id}"
+  exit 1
 fi
 
 id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha256`
 rc=$?
 
 if test "${id}" != "118e72e3655150c895ecbd19b3634179fb4a87c7a25abefcb11f5d66661d5a4d";then
-	echo "Key-ID3 doesn't match the expected: ${id}"
-	exit 1
+  echo "Key-ID3 doesn't match the expected: ${id}"
+  exit 1
 fi
 
 #fingerprint
@@ -65,16 +65,16 @@ id=`${VALGRIND} "${CERTTOOL}" --fingerprint --infile "${srcdir}/funny-spacing.pe
 rc=$?
 
 if test "${id}" != "8f735c5ddefd723f59b6a3bb2ac0522470c0182f";then
-	echo "Fingerprint doesn't match the expected: 3"
-	exit 1
+  echo "Fingerprint doesn't match the expected: 3"
+  exit 1
 fi
 
 id=`${VALGRIND} "${CERTTOOL}" --fingerprint --hash sha256 --infile "${srcdir}/funny-spacing.pem"`
 rc=$?
 
 if test "${id}" != "fc5b45b20c489393a457f177572920ac40bacba9d25cea51200822271eaf7d1f";then
-	echo "Fingerprint doesn't match the expected: 4"
-	exit 1
+  echo "Fingerprint doesn't match the expected: 4"
+  exit 1
 fi
 
 export TZ="UTC"
@@ -83,8 +83,8 @@ export TZ="UTC"
 TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
 if test "$TSTAMP" != "1158969600"; then
 echo $TSTAMP
-    echo "You need datefudge to run this test"
-    exit 77
+  echo "You need datefudge to run this test"
+  exit 77
 fi
 
 cat "${srcdir}/../certs/cert-ecc256.pem" "${srcdir}/../certs/ca-cert-ecc.pem"|datefudge "2012-11-22" \
@@ -92,8 +92,8 @@ ${VALGRIND} "${CERTTOOL}" --verify-chain
 rc=$?
 
 if test "${rc}" != "0";then
-	echo "There was an issue verifying the chain"
-	exit 1
+  echo "There was an issue verifying the chain"
+  exit 1
 fi
 
 
