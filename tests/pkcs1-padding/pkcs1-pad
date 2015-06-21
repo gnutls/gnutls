@@ -23,33 +23,33 @@
 
 set -e
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 
 # Check for datefudge
 TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
-if test "$TSTAMP" != "1158962400"; then
-    echo "You need datefudge to run this test"
-    exit 77
+if test "${TSTAMP}" != "1158962400"; then
+  echo "You need datefudge to run this test"
+  exit 77
 fi
 
 # Test 1, PKCS#1 pad digestAlgorithm.parameters
 
 EXPECT1=2002
 
-datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok.pem | tee out1 >/dev/null 2>&1
-datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken.pem | tee out2 >/dev/null 2>&1
+datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/pkcs1-pad-ok.pem" | tee out1 >/dev/null 2>&1
+datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/pkcs1-pad-broken.pem" | tee out2 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' out1 | wc -l | tr -d " "`
 out2oks=`grep 'Verified.' out2 | wc -l | tr -d " "`
 out1fails=`grep 'Not verified.' out1 | wc -l | tr -d " "`
 out2fails=`grep 'Not verified.' out2 | wc -l | tr -d " "`
 
-if test "$out1oks$out2oks$out1fails$out2fails" != "$EXPECT1"; then
-    echo out1 oks $out1oks fails $out1fails out2 oks $out2oks fails $out2fails
-    echo expected $EXPECT1
-    echo "PKCS1-PAD1 FAIL"
-    exit 1
+if test "${out1oks}${out2oks}${out1fails}${out2fails}" != "${EXPECT1}"; then
+  echo "out1 oks ${out1oks} fails ${out1fails} out2 oks ${out2oks} fails ${out2fails}"
+  echo "expected ${EXPECT1}"
+  echo "PKCS1-PAD1 FAIL"
+  exit 1
 fi
 
 rm -f out1 out2
@@ -60,19 +60,19 @@ echo "PKCS1-PAD1 OK"
 
 EXPECT2=2002
 
-datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok2.pem | tee out1 >/dev/null 2>&1
-datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken2.pem | tee out2 >/dev/null 2>&1
+datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/pkcs1-pad-ok2.pem" | tee out1 >/dev/null 2>&1
+datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/pkcs1-pad-broken2.pem" | tee out2 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' out1 | wc -l | tr -d " "`
 out2oks=`grep 'Verified.' out2 | wc -l | tr -d " "`
 out1fails=`grep 'Not verified.' out1 | wc -l | tr -d " "`
 out2fails=`grep 'Not verified.' out2 | wc -l | tr -d " "`
 
-if test "$out1oks$out2oks$out1fails$out2fails" != "$EXPECT2"; then
-    echo out1 oks $out1oks fails $out1fails out2 oks $out2oks fails $out2fails
-    echo expected $EXPECT2
-    echo "PKCS1-PAD2 FAIL"
-    exit 1
+if test "${out1oks}${out2oks}${out1fails}${out2fails}" != "${EXPECT2}"; then
+  echo "out1 oks ${out1oks} fails ${out1fails} out2 oks ${out2oks} fails ${out2fails}"
+  echo "expected ${EXPECT2}"
+  echo "PKCS1-PAD2 FAIL"
+  exit 1
 fi
 
 rm -f out1 out2
@@ -85,16 +85,16 @@ echo "PKCS1-PAD2 OK"
 
 EXPECT3=02
 
-datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken3.pem | tee out1 >/dev/null 2>&1
+datefudge "2006-09-23" "${CERTTOOL}" --verify-chain --infile "${srcdir}/pkcs1-pad-broken3.pem" | tee out1 >/dev/null 2>&1
 
 out1oks=`grep 'Verified.' out1 | wc -l | tr -d " "`
 out1fails=`grep 'Not verified.' out1 | wc -l | tr -d " "`
 
-if test "$out1oks$out1fails" != "$EXPECT3"; then
-    echo out1 oks $out1oks fails $out1fails
-    echo expected $EXPECT3
-    echo "PKCS1-PAD3 FAIL"
-    exit 1
+if test "${out1oks}${out1fails}" != "${EXPECT3}"; then
+  echo "out1 oks ${out1oks} fails ${out1fails}"
+  echo "expected ${EXPECT3}"
+  echo "PKCS1-PAD3 FAIL"
+  exit 1
 fi
 
 rm -f out1

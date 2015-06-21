@@ -20,41 +20,39 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir="${srcdir:-.}"
-CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
 unset RETCODE
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-GNUTLS_NO_EXPLICIT_INIT=1 $VALGRIND ./cipher-override
+GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./cipher-override
 if test $? != 0;then
-	echo "overriden cipher tests failed"
-	exit 1
+  echo "overriden cipher tests failed"
+  exit 1
 fi
 
-$VALGRIND ./cipher-override
+${VALGRIND} ./cipher-override
 if test $? != 0;then
-	echo "overriden cipher tests 2 failed"
-	exit 1
+  echo "overriden cipher tests 2 failed"
+  exit 1
 fi
 
-$VALGRIND ./cipher-override2
+${VALGRIND} ./cipher-override2
 if test $? != 0;then
-	echo "overriden cipher tests 3 failed"
-	exit 1
+  echo "overriden cipher tests 3 failed"
+  exit 1
 fi
 
-GNUTLS_NO_EXPLICIT_INIT=1 $VALGRIND ./mac-override
+GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./mac-override
 if test $? != 0;then
-	echo "overriden mac tests failed"
-	exit 1
+  echo "overriden mac tests failed"
+  exit 1
 fi
 
-$VALGRIND ./mac-override
+${VALGRIND} ./mac-override
 if test $? != 0;then
-	echo "overriden mac tests 2 failed"
-	exit 1
+  echo "overriden mac tests 2 failed"
+  exit 1
 fi
 
 exit 0

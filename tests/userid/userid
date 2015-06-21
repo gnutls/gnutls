@@ -20,15 +20,15 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 
-$CERTTOOL --certificate-info --infile $srcdir/userid.pem >out 2>&1
+$CERTTOOL --certificate-info --infile "${srcdir}/userid.pem" >out 2>&1
 RET=$?
-if [ $RET !=  0 ];then
-	echo "Error in userid:"
-	cat out
-	exit 1
+if [ ${RET} !=  0 ];then
+  echo "Error in userid:"
+  cat out
+  exit 1
 fi
 
 rm -f out
