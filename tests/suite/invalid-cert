@@ -20,19 +20,18 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-$VALGRIND $CERTTOOL --certificate-info --inder --infile $srcdir/invalid-cert.der 2>/dev/null
-
+${VALGRIND} "${CERTTOOL}" --certificate-info --inder --infile "${srcdir}/invalid-cert.der" 2>/dev/null
 rc=$?
 
 # We're done.
-if test "$rc" != "1"; then
-  exit $rc
+if test "${rc}" != "1"; then
+  exit ${rc}
 fi
 
 exit 0

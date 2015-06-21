@@ -30,9 +30,11 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+srcdir="${srcdir:-.}"
+
 # Check for datefudge
 TSTAMP=`datefudge "2006-09-23 00:00 UTC" date -u +%s 2>/dev/null`
-if test "$TSTAMP" != "1158969600"; then
+if test "${TSTAMP}" != "1158969600"; then
     echo "You need datefudge to run this test"
     exit 77
 fi
@@ -43,4 +45,4 @@ if test $? = 0;then
     exit 77
 fi
 
-datefudge "2012-09-2" ./testcompat-main-polarssl
+datefudge "2012-09-2" "${srcdir}/testcompat-main-polarssl"

@@ -21,23 +21,23 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-SERV="${SERV:-../../src/gnutls-serv$EXEEXT} -q"
+SERV="${SERV:-../../src/gnutls-serv${EXEEXT}} -q"
 PORT="${PORT:-5445}"
 
 
-$SERV -p $PORT --echo --priority "NORMAL:+ANON-DH" --dhparams $srcdir/params.dh >/dev/null 2>&1 &
+$SERV -p "${PORT}" --echo --priority "NORMAL:+ANON-DH" --dhparams "${srcdir}/params.dh" >/dev/null 2>&1 &
 pid=$!
 
 sleep 2
 
 ./eagain-cli
 if [ $? != 0 ];then
-	exit 1
+  exit 1
 fi
 
 if [ "$pid" != "" ];then
-kill $pid
-wait
+  kill $pid
+  wait
 fi
 
 exit 0

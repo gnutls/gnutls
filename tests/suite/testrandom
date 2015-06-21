@@ -20,10 +20,10 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 counter=0
@@ -32,58 +32,58 @@ file=test.out
 counter=0
 
 echo "Testing verification with randomly generated certificates..."
-while [ $counter -lt 400 ]
+while [ ${counter} -lt 400 ]
 do
-  $srcdir/x509random.pl > $srcdir/$file
-  $VALGRIND $CERTTOOL -i --inder --infile $srcdir/$file --outfile $srcdir/$file.pem >/dev/null 2>&1
+  "${srcdir}/x509random.pl" > "${file}"
+  ${VALGRIND} "${CERTTOOL}" -i --inder --infile "${file}" --outfile "${file}.pem" >/dev/null 2>&1
   if test $? != 0;then
-  	continue
+    continue
   fi
 
-  cat $srcdir/$file.pem $srcdir/../certs/ca-cert-ecc.pem > $srcdir/$file-chain.pem
+  cat "${file}.pem" "${srcdir}/../certs/ca-cert-ecc.pem" > "${file}-chain.pem"
 
-  $VALGRIND $CERTTOOL -e --infile $srcdir/$file-chain.pem >/dev/null 2>&1
+  ${VALGRIND} "${CERTTOOL}" -e --infile "${file}-chain.pem" >/dev/null 2>&1
   ret=$?
-  if [ $ret != 1 ];then
-  	echo "Succeeded verification with $file-chain.pem!"
-  	exit 1
+  if [ ${ret} != 1 ];then
+    echo "Succeeded verification with ${file}-chain.pem!"
+    exit 1
   fi
-  rm -f $srcdir/$file.pem $srcdir/$file-chain.pem
+  rm -f "${file}.pem" "${file}-chain.pem"
 
-  counter=`expr $counter + 1`
+  counter=`expr ${counter} + 1`
 done
 
 
 echo "Testing with randomly generated certificates..."
-while [ $counter -lt 200 ]
+while [ ${counter} -lt 200 ]
 do
-  $srcdir/x509random.pl > $srcdir/$file
-  $VALGRIND $CERTTOOL -i --inder --infile $srcdir/$file >/dev/null
+  "${srcdir}/x509random.pl" > "${file}"
+  ${VALGRIND} "${CERTTOOL}" -i --inder --infile "${file}" >/dev/null
   ret=$?
-  if [ $ret != 0 -a $ret != 1 ];then
-  	echo "Unknown exit code with $file"
-  	exit 1
+  if [ ${ret} != 0 -a ${ret} != 1 ];then
+    echo "Unknown exit code with ${file}"
+    exit 1
   fi
 
-  counter=`expr $counter + 1`
+  counter=`expr ${counter} + 1`
 done
 
 counter=0
 
 echo "Testing with random ASN.1 data..."
-while [ $counter -lt 200 ]
+while [ ${counter} -lt 200 ]
 do
-  $srcdir/asn1random.pl > $srcdir/$file
-  $VALGRIND $CERTTOOL -i --inder --infile $srcdir/$file >/dev/null 2>/dev/null
+  "${srcdir}/asn1random.pl" > "${file}"
+  ${VALGRIND} "${CERTTOOL}" -i --inder --infile "${file}" >/dev/null 2>/dev/null
   ret=$?
-  if [ $ret != 0 -a $ret != 1 ];then
-  	echo "Unknown exit code with $file"
-  	exit 1
+  if [ ${ret} != 0 -a ${ret} != 1 ];then
+    echo "Unknown exit code with ${file}"
+    exit 1
   fi
 
-  counter=`expr $counter + 1`
+  counter=`expr ${counter} + 1`
 done
 
-rm -f $srcdir/$file
+rm -f "${file}"
 
 exit 0

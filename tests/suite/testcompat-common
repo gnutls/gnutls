@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # Copyright (C) 2014 Red Hat, Inc.
 # All rights reserved.
 #
@@ -29,33 +27,32 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 # WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-DSA_CERT=$srcdir/../dsa/cert.dsa.1024.pem
-DSA_KEY=$srcdir/../dsa/dsa.1024.pem
+DSA_CERT="${srcdir}/../dsa/cert.dsa.1024.pem"
+DSA_KEY="${srcdir}/../dsa/dsa.1024.pem"
 
-RSA_CERT=$srcdir/../certs/cert-rsa-2432.pem
-RSA_KEY=$srcdir/../certs/rsa-2432.pem
+RSA_CERT="${srcdir}/../certs/cert-rsa-2432.pem"
+RSA_KEY="${srcdir}/../certs/rsa-2432.pem"
 
-CA_CERT=$srcdir/../../doc/credentials/x509/ca.pem
-CLI_CERT=$srcdir/../../doc/credentials/x509/clicert.pem
-CLI_KEY=$srcdir/../../doc/credentials/x509/clikey.pem
+CA_CERT="${srcdir}/../../doc/credentials/x509/ca.pem"
+CLI_CERT="${srcdir}/../../doc/credentials/x509/clicert.pem"
+CLI_KEY="${srcdir}/../../doc/credentials/x509/clikey.pem"
 
-CA_ECC_CERT=$srcdir/../certs/ca-cert-ecc.pem
-ECC224_CERT=$srcdir/../certs/cert-ecc.pem
-ECC224_KEY=$srcdir/../certs/ecc.pem
+CA_ECC_CERT="${srcdir}/../certs/ca-cert-ecc.pem"
+ECC224_CERT="${srcdir}/../certs/cert-ecc.pem"
+ECC224_KEY="${srcdir}/../certs/ecc.pem"
 
-ECC256_CERT=$srcdir/../certs/cert-ecc256.pem
-ECC256_KEY=$srcdir/../certs/ecc256.pem
+ECC256_CERT="${srcdir}/../certs/cert-ecc256.pem"
+ECC256_KEY="${srcdir}/../certs/ecc256.pem"
 
-ECC521_CERT=$srcdir/../certs/cert-ecc521.pem
-ECC521_KEY=$srcdir/../certs/ecc521.pem
+ECC521_CERT="${srcdir}/../certs/cert-ecc521.pem"
+ECC521_KEY="${srcdir}/../certs/ecc521.pem"
 
-ECC384_CERT=$srcdir/../certs/cert-ecc384.pem
-ECC384_KEY=$srcdir/../certs/ecc384.pem
+ECC384_CERT="${srcdir}/../certs/cert-ecc384.pem"
+ECC384_KEY="${srcdir}/../certs/ecc384.pem"
 
-SERV_CERT=$srcdir/../../doc/credentials/x509/cert-rsa.pem
-SERV_KEY=$srcdir/../../doc/credentials/x509/key-rsa.pem
-SERV_DSA_CERT=$srcdir/../../doc/credentials/x509/cert-dsa.pem
-SERV_DSA_KEY=$srcdir/../../doc/credentials/x509/key-dsa.pem
+SERV_CERT="${srcdir}/../../doc/credentials/x509/cert-rsa.pem"
+SERV_KEY="${srcdir}/../../doc/credentials/x509/key-rsa.pem"
+SERV_DSA_CERT="${srcdir}/../../doc/credentials/x509/cert-dsa.pem"
+SERV_DSA_KEY="${srcdir}/../../doc/credentials/x509/key-dsa.pem"
 
-SERV_PSK=$srcdir/../../doc/credentials/psk-passwd.txt 
-
+SERV_PSK="${srcdir}/../../doc/credentials/psk-passwd.txt"

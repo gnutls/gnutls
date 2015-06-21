@@ -20,29 +20,29 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-srcdir=${srcdir:-.}
-DIFF=${DIFF:-diff}
-CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+srcdir="${srcdir:-.}"
+DIFF="${DIFF:-diff}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 if ! test -z "${VALGRIND}";then
-VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+  VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 rm -f tmp-long.pem
-$VALGRIND $CERTTOOL --crl-info --inder --infile $srcdir/crl/long.crl --outfile tmp-long.pem
+${VALGRIND} "${CERTTOOL}" --crl-info --inder --infile "${srcdir}/crl/long.crl" --outfile tmp-long.pem
 rc=$?
 
 # We're done.
-if test "$rc" != "0"; then
+if test "${rc}" != "0"; then
   echo "CRL decoding failed 1!"
-  exit $rc
+  exit ${rc}
 fi
 
-$DIFF $srcdir/crl/long.pem tmp-long.pem || $DIFF --strip-trailing-cr $srcdir/crl/long.pem tmp-long.pem
+${DIFF} "${srcdir}/crl/long.pem tmp-long.pem" || ${DIFF} --strip-trailing-cr "${srcdir}/crl/long.pem" tmp-long.pem
 rc=$?
 
-if test "$rc" != "0"; then
+if test "${rc}" != "0"; then
   echo "CRL decoding failed 2!"
-  exit $rc
+  exit ${rc}
 fi
 
 rm -f tmp-long.pem

@@ -20,32 +20,31 @@
 
 
 init_card () {
-	PIN=$1
-	PUK=3537363231383830
-	export GNUTLS_SO_PIN=$PUK
+  PIN="$1"
+  PUK=3537363231383830
+  export GNUTLS_SO_PIN="${PUK}"
 
-	echo -n "* Erasing smart card... "
-	sc-hsm-tool --initialize --so-pin $PUK --pin $PIN --label=GnuTLS-Test >>$TMPFILE 2>&1
-	if test $? = 0;then
-		echo ok
-	else
-		echo failed
-		exit_error
-	fi
+  echo -n "* Erasing smart card... "
+  sc-hsm-tool --initialize --so-pin "${PUK}" --pin "${PIN}" --label=GnuTLS-Test >>"${TMPFILE}" 2>&1
+  if test $? = 0;then
+    echo ok
+  else
+    echo failed
+    exit_error
+  fi
 
-	echo -n "* Initializing smart card... "
-	TOKEN=`$P11TOOL $ADDITIONAL_PARAM --list-tokens pkcs11:token=Nikos|grep URL|grep token=GnuTLS-Test|sed 's/\s*URL\: //g'`
-	if test -z "$TOKEN";then
-		echo "Could not find initialized card"
-		exit_error
-	fi
+  echo -n "* Initializing smart card... "
+  TOKEN=`${P11TOOL} ${ADDITIONAL_PARAM} --list-tokens pkcs11:token=Nikos|grep URL|grep token=GnuTLS-Test|sed 's/\s*URL\: //g'`
+  if test -z "${TOKEN}";then
+    echo "Could not find initialized card"
+    exit_error
+  fi
 
-	$P11TOOL $ADDITIONAL_PARAM --initialize "$TOKEN" --set-so-pin $PUK --set-pin $PIN --label "GnuTLS-Test" >>$TMPFILE 2>&1
-	if test $? = 0;then
-		echo ok
-	else
-		echo failed
-		exit_error
-	fi
+  ${P11TOOL} ${ADDITIONAL_PARAM} --initialize "${TOKEN}" --set-so-pin "${PUK}" --set-pin "${PIN}" --label "GnuTLS-Test" >>"${TMPFILE}" 2>&1
+  if test $? = 0;then
+    echo ok
+  else
+    echo failed
+    exit_error
+  fi
 }
-

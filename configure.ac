@@ -89,7 +89,7 @@ if test "$use_cxx" != "no"; then
   AC_LANG_POP(C++)
 fi
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
-AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
+AM_CONDITIONAL(WANT_TEST_SUITE, [test -f "${srcdir}/tests/suite/mini-eagain2.c"])
 
 dnl Detect windows build
 use_accel=yes

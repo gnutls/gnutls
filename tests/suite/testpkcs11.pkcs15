@@ -20,27 +20,26 @@
 
 
 init_card () {
-	PIN=$1
-	PUK=$2
+  PIN="$1"
+  PUK="$2"
 
-	echo -n "* Erasing smart card... "
-	pkcs15-init -E >$TMPFILE 2>&1
-	if test $? = 0;then
-		echo ok
-	else
-		echo failed
-		cat $TMPFILE
-		exit_error
-	fi
+  echo -n "* Erasing smart card... "
+  pkcs15-init -E >"${TMPFILE}" 2>&1
+  if test $? = 0;then
+    echo ok
+  else
+    echo failed
+    cat "${TMPFILE}"
+    exit_error
+  fi
 
-	echo -n "* Initializing smart card... "
-	pkcs15-init --create-pkcs15 --profile pkcs15+onepin --use-default-transport-key --so-pin $PIN --pin $PIN --puk $PUK --label "GnuTLS-Test" >$TMPFILE 2>&1
-	if test $? = 0;then
-		echo ok
-	else
-		echo failed
-		cat $TMPFILE
-		exit_error
-	fi
+  echo -n "* Initializing smart card... "
+  pkcs15-init --create-pkcs15 --profile pkcs15+onepin --use-default-transport-key --so-pin "${PIN}" --pin "${PIN}" --puk "${PUK}" --label "GnuTLS-Test" >"${TMPFILE}" 2>&1
+  if test $? = 0;then
+    echo ok
+  else
+    echo failed
+    cat "${TMPFILE}"
+    exit_error
+  fi
 }
-
