@@ -90,7 +90,7 @@ nodist_check_SCRIPTS = eagain testsrn chain invalid-cert testrandom \
 	testrng testcompat-main-polarssl testcompat-main-openssl testcompat-common \
 	testcompat-polarssl testcompat-openssl
 
-TESTS = ciphersuite/test-ciphersuites.sh eagain testsrn chain invalid-cert \
+TESTS = test-ciphersuite-names eagain testsrn chain invalid-cert \
 	testrng testcompat-openssl testcompat-polarssl
 
 if ENABLE_PKCS11
