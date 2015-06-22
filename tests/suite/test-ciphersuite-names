@@ -20,5 +20,6 @@ fi
 
 set -e
 
+mkdir -p "${top_builddir}/tests/suite/ciphersuite"
 "${srcdir}/ciphersuite/scan-gnutls.sh" > "${top_builddir}/tests/suite/ciphersuite/gnutls-ciphers.js"
 srcdir="${srcdir}/ciphersuite" builddir="${top_builddir}/tests/suite/ciphersuite" ${NODEJS} "${srcdir}/ciphersuite/test-ciphers.js"
