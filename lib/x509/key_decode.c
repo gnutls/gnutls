@@ -204,7 +204,6 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 		goto cleanup;
 	}
 
-	/* Read curve */
 	/* read the curve */
 	oid_size = sizeof(oid);
 	ret = asn1_read_value(spk, "namedCurve", oid, &oid_size);
