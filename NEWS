@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** libgnutls: Allow compilation with nettle 3.0 or later
 
+** libgnutls: corrected failure when importing plain files in
+   with gnutls_x509_privkey_import2(), when a password was given.
+
 ** API and ABI modifications:
 No changes since last version.
 
