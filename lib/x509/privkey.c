@@ -651,9 +651,30 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 			    const char *password, unsigned int flags)
 {
 	int ret = 0;
+	unsigned head_enc = 1;
 
-	if (password == NULL && !(flags & GNUTLS_PKCS_NULL_PASSWORD)) {
+	if (format == GNUTLS_X509_FMT_PEM) {
+		unsigned size;
+		char *ptr = memmem(data->data, data->size, "-----BEGIN ", sizeof("-----BEGIN ")-1);
+		if (ptr != NULL) {
+			ptr += sizeof("-----BEGIN ")-1;
+			size = data->size - ((ptrdiff_t)ptr - (ptrdiff_t)data->data);
+
+			if (size > sizeof(PEM_KEY_RSA)) {
+				if (memcmp(ptr, PEM_KEY_RSA, sizeof(PEM_KEY_RSA)-1) == 0 ||
+				    memcmp(ptr, PEM_KEY_ECC, sizeof(PEM_KEY_ECC)-1) == 0 ||
+				    memcmp(ptr, PEM_KEY_DSA, sizeof(PEM_KEY_DSA)-1) == 0) {
+				    	head_enc = 0;
+				}
+			}
+		}
+	}
+
+	if (head_enc == 0 || (password == NULL && !(flags & GNUTLS_PKCS_NULL_PASSWORD))) {
 		ret = gnutls_x509_privkey_import(key, data, format);
+		if (ret >= 0)
+			return ret;
+
 		if (ret < 0) {
 			gnutls_assert();
 		}
