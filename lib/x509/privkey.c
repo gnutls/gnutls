@@ -470,33 +470,37 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 	/* If the Certificate is in PEM format then decode it
 	 */
 	if (format == GNUTLS_X509_FMT_PEM) {
-		/* Try the first header */
-		result =
-		    _gnutls_fbase64_decode(PEM_KEY_RSA, data->data,
-					   data->size, &_data);
+		unsigned size;
+		char *ptr = memmem(data->data, data->size, "-----BEGIN ", sizeof("-----BEGIN ")-1);
 
-		if (result >= 0)
-			key->pk_algorithm = GNUTLS_PK_RSA;
+		result = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
-		if (result == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR) {
-			/* try for the second header */
-			result =
-			    _gnutls_fbase64_decode(PEM_KEY_DSA, data->data,
-						   data->size, &_data);
+		if (ptr != NULL) {
+			ptr += sizeof("-----BEGIN ")-1;
+			size = data->size - ((ptrdiff_t)ptr - (ptrdiff_t)data->data);
 
-			if (result >= 0)
-				key->pk_algorithm = GNUTLS_PK_DSA;
-
-			if (result ==
-			    GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR) {
-				/* try for the second header */
-				result =
-				    _gnutls_fbase64_decode(PEM_KEY_ECC,
-							   data->data,
-							   data->size,
-							   &_data);
-				if (result >= 0)
-					key->pk_algorithm = GNUTLS_PK_EC;
+			if (size > sizeof(PEM_KEY_RSA)) {
+				if (memcmp(ptr, PEM_KEY_RSA, sizeof(PEM_KEY_RSA)-1) == 0) {
+					result =
+					    _gnutls_fbase64_decode(PEM_KEY_RSA, data->data,
+							   data->size, &_data);
+					if (result >= 0)
+						key->pk_algorithm = GNUTLS_PK_RSA;
+				} else if (memcmp(ptr, PEM_KEY_ECC, sizeof(PEM_KEY_ECC)-1) == 0) {
+					result =
+					    _gnutls_fbase64_decode(PEM_KEY_ECC,
+								   data->data,
+								   data->size,
+								   &_data);
+					if (result >= 0)
+						key->pk_algorithm = GNUTLS_PK_EC;
+				} else if (memcmp(ptr, PEM_KEY_DSA, sizeof(PEM_KEY_DSA)-1) == 0) {
+					result =
+					    _gnutls_fbase64_decode(PEM_KEY_DSA, data->data,
+								   data->size, &_data);
+					if (result >= 0)
+						key->pk_algorithm = GNUTLS_PK_DSA;
+				}
 			}
 		}
 
