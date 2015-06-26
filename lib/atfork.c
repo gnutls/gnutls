@@ -31,14 +31,14 @@
 #include <sys/types.h>
 #include <atfork.h>
 
-unsigned int gnutls_forkid = 0;
+unsigned int _gnutls_forkid = 0;
 
 #ifndef _WIN32
 
 # ifdef HAVE_ATFORK
 static void fork_handler(void)
 {
-	gnutls_forkid++;
+	_gnutls_forkid++;
 }
 # endif
 
@@ -81,7 +81,7 @@ int _gnutls_detect_fork(unsigned int forkid)
 /* we have to detect fork manually */
 int _gnutls_register_fork_handler(void)
 {
-	gnutls_forkid = getpid();
+	_gnutls_forkid = getpid();
 	return 0;
 }
 

@@ -26,7 +26,7 @@
 #include <config.h>
 #include <gnutls_int.h>
 
-extern unsigned int gnutls_forkid;
+extern unsigned int _gnutls_forkid;
 
 #if defined(HAVE___REGISTER_ATFORK) || defined(HAVE_PTHREAD_ATFORK)
 # define HAVE_ATFORK
@@ -40,14 +40,14 @@ int _gnutls_register_fork_handler(void); /* global init */
 # if defined(HAVE_ATFORK)
 inline static int _gnutls_detect_fork(unsigned int forkid)
 {
-	if (forkid == gnutls_forkid)
+	if (forkid == _gnutls_forkid)
 		return 0;
 	return 1;
 }
 
 inline static unsigned int _gnutls_get_forkid(void)
 {
-	return gnutls_forkid;
+	return _gnutls_forkid;
 }
 # else
 int _gnutls_detect_fork(unsigned int forkid);
