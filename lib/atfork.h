@@ -21,56 +21,44 @@
  */
 
 #ifndef ATFORK_H
-#define ATFORK_H
+# define ATFORK_H
 
 #include <config.h>
 #include <gnutls_int.h>
+
+extern unsigned int gnutls_forkid;
+
+#if defined(HAVE___REGISTER_ATFORK) || defined(HAVE_PTHREAD_ATFORK)
+# define HAVE_ATFORK
+#endif
 
 #ifndef _WIN32
 
 /* API */
 int _gnutls_register_fork_handler(void); /* global init */
 
-/* Each user of the API that needs to be notified registers
- * a pointer to an int */
-void _gnutls_fork_set_val(unsigned int *val);
-
-/* 
- * Each user, calls this function with the integer registered
- * to check whether a fork is detected
- *
- * unsigned _gnutls_fork_detected(unsigned int *v);
- */
-
-# if defined(HAVE___REGISTER_ATFORK) || defined(HAVE_PTHREAD_ATFORK)
-inline static
-unsigned _gnutls_fork_detected(unsigned int *v)
+# if defined(HAVE_ATFORK)
+inline static int _gnutls_detect_fork(unsigned int forkid)
 {
-	if (*v != 0) {
-		*v = 0;
-		return 1;
-	}
-	return 0;
+	if (forkid == gnutls_forkid)
+		return 0;
+	return 1;
+}
+
+inline static unsigned int _gnutls_get_forkid(void)
+{
+	return gnutls_forkid;
 }
 # else
-#  include <unistd.h>
-
-inline static
-unsigned _gnutls_fork_detected(unsigned int *v)
-{
-	if (getpid() != (pid_t)*v) {
-		*v = getpid();
-		return 1;
-	}
-	return 0;
-}
-
+int _gnutls_detect_fork(unsigned int forkid);
+unsigned int _gnutls_get_forkid(void);
 # endif
 
-#else /* _WIN32 */
-# define _gnutls_fork_set_val(x) 0
-# define _gnutls_register_fork_handler() 0
-# define _gnutls_fork_detected(x) 0
+#else
+
+# define _gnutls_detect_fork(x) 0
+# define _gnutls_get_forkid() 0
+
 #endif
 
 #endif

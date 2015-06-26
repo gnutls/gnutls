@@ -48,7 +48,7 @@ struct fips_ctx {
 	struct drbg_aes_ctx nonce_context;
 	struct drbg_aes_ctx normal_context;
 	struct drbg_aes_ctx strong_context;
-	unsigned int dfork;
+	unsigned int forkid;
 };
 
 static int _rngfips_ctx_reinit(struct fips_ctx *fctx);
@@ -60,7 +60,7 @@ static int get_random(struct drbg_aes_ctx *ctx, struct fips_ctx *fctx,
 {
 	int ret;
 
-	if ( _gnutls_fork_detected(&fctx->dfork) != 0) {
+	if ( _gnutls_detect_fork(fctx->forkid) != 0) {
 		ret = _rngfips_ctx_reinit(fctx);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -135,7 +135,8 @@ static int _rngfips_ctx_init(struct fips_ctx *fctx)
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	_gnutls_fork_set_val(&fctx->dfork);
+	fctx->forkid = _gnutls_get_forkid();
+
 	return 0;
 }
 
@@ -157,6 +158,8 @@ static int _rngfips_ctx_reinit(struct fips_ctx *fctx)
 	ret = drbg_reseed(&fctx->nonce_context);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
+
+	fctx->forkid = _gnutls_get_forkid();
 
 	return 0;
 }

@@ -54,7 +54,7 @@ struct nonce_ctx_st {
 	struct salsa20_ctx ctx;
 	unsigned int counter;
 	void *mutex;
-	unsigned int dfork;
+	unsigned int forkid;
 };
 
 struct rnd_ctx_st {
@@ -64,7 +64,7 @@ struct rnd_ctx_st {
 	time_t trivia_previous_time;
 	time_t trivia_time_count;
 	void *mutex;
-	unsigned dfork;	/* detect fork() */
+	unsigned forkid;
 };
 
 static struct rnd_ctx_st rnd_ctx;
@@ -178,7 +178,7 @@ static int nonce_rng_init(struct nonce_ctx_st *ctx,
 		 * from the old key */
 		salsa20r12_crypt(&ctx->ctx, nonce_key_size, nonce_key, nonce_key);
 	} else {
-		_gnutls_fork_set_val(&ctx->dfork);
+		ctx->forkid = _gnutls_get_forkid();
 
 		/* when initializing read the IV from the system randomness source */
 		ret = _rnd_get_system_entropy(iv, sizeof(iv));
@@ -229,7 +229,7 @@ static int wrap_nettle_rnd_init(void **ctx)
 
 	_rnd_get_event(&event);
 
-	_gnutls_fork_set_val(&rnd_ctx.dfork);
+	rnd_ctx.forkid = _gnutls_get_forkid();
 
 	ret = do_device_source(&rnd_ctx, 1, &event);
 	if (ret < 0) {
@@ -278,7 +278,7 @@ wrap_nettle_rnd_nonce(void *_ctx, void *data, size_t datasize)
 
 	RND_LOCK(&nonce_ctx);
 
-	if (_gnutls_fork_detected(&nonce_ctx.dfork)) {
+	if (_gnutls_detect_fork(nonce_ctx.forkid)) {
 		reseed = 1;
 	}
 
@@ -295,6 +295,8 @@ wrap_nettle_rnd_nonce(void *_ctx, void *data, size_t datasize)
 			gnutls_assert();
 			goto cleanup;
 		}
+
+		nonce_ctx.forkid = _gnutls_get_forkid();
 	}
 
 	salsa20r12_crypt(&nonce_ctx.ctx, datasize, data, data);
@@ -322,7 +324,7 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 
 	RND_LOCK(&rnd_ctx);
 
-	if (_gnutls_fork_detected(&rnd_ctx.dfork)) {	/* fork() detected */
+	if (_gnutls_detect_fork(rnd_ctx.forkid)) {	/* fork() detected */
 		memset(&rnd_ctx.device_last_read, 0, sizeof(rnd_ctx.device_last_read));
 		reseed = 1;
 	}
@@ -340,8 +342,10 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 		goto cleanup;
 	}
 
-	if (reseed != 0)
+	if (reseed != 0) {
 		yarrow256_slow_reseed(&rnd_ctx.yctx);
+		rnd_ctx.forkid = _gnutls_get_forkid();
+	}
 
 	yarrow256_random(&rnd_ctx.yctx, datasize, data);
 	ret = 0;
