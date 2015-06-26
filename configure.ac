@@ -229,7 +229,7 @@ fi
 
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
-AC_CHECK_FUNCS([pthread_atfork __register_atfork],,)
+AC_CHECK_FUNCS([__register_atfork],,)
 
 AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>
 #include <signal.h>

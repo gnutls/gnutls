@@ -28,7 +28,7 @@
 
 extern unsigned int _gnutls_forkid;
 
-#if defined(HAVE___REGISTER_ATFORK) || defined(HAVE_PTHREAD_ATFORK)
+#if defined(HAVE___REGISTER_ATFORK)
 # define HAVE_ATFORK
 #endif
 
