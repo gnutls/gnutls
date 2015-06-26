@@ -654,13 +654,29 @@ gnutls_x509_privkey_import2(gnutls_x509_privkey_t key,
 	unsigned head_enc = 1;
 
 	if (format == GNUTLS_X509_FMT_PEM) {
-		unsigned size;
-		char *ptr = memmem(data->data, data->size, "-----BEGIN ", sizeof("-----BEGIN ")-1);
-		if (ptr != NULL) {
-			ptr += sizeof("-----BEGIN ")-1;
-			size = data->size - ((ptrdiff_t)ptr - (ptrdiff_t)data->data);
+		size_t left;
+		char *ptr;
 
-			if (size > sizeof(PEM_KEY_RSA)) {
+		ptr = memmem(data->data, data->size, "PRIVATE KEY-----", sizeof("PRIVATE KEY-----")-1);
+
+		if (ptr != NULL) {
+			left = data->size - ((ptrdiff_t)ptr - (ptrdiff_t)data->data);
+
+			if (data->size - left > 15) {
+				ptr -= 15;
+				left += 15;
+			} else {
+				ptr = (char*)data->data;
+				left = data->size;
+			}
+
+			ptr = memmem(ptr, left, "-----BEGIN ", sizeof("-----BEGIN ")-1);
+			if (ptr != NULL) {
+				ptr += sizeof("-----BEGIN ")-1;
+				left = data->size - ((ptrdiff_t)ptr - (ptrdiff_t)data->data);
+			}
+
+			if (ptr != NULL && left > sizeof(PEM_KEY_RSA)) {
 				if (memcmp(ptr, PEM_KEY_RSA, sizeof(PEM_KEY_RSA)-1) == 0 ||
 				    memcmp(ptr, PEM_KEY_ECC, sizeof(PEM_KEY_ECC)-1) == 0 ||
 				    memcmp(ptr, PEM_KEY_DSA, sizeof(PEM_KEY_DSA)-1) == 0) {
