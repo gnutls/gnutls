@@ -8,8 +8,11 @@ See the end for copying conditions.
 ** libgnutls: Follow closely RFC5280 recommendations and use UTCTime for
 dates prior to 2050.
 
-* Force 16-byte alignment to all input to ciphers (previously it was
-done only when cryptodev was enabled).
+** libgnutls: Force 16-byte alignment to all input to ciphers (previously it
+was done only when cryptodev was enabled).
+
+** libgnutls: Removed support for pthread_atfork() as it has undefined
+semantics when used with dlopen(), and may lead to a crash.
 
 ** API and ABI modifications:
 gnutls_ecc_curve_get_oid: Added
