@@ -368,10 +368,10 @@ if [ test "$enable_fips" = "yes" ];then
   fi
 fi
 
-AC_ARG_WITH(idn, AS_HELP_STRING([--without-idn],
-                                 [disable support for libidn]),
+AC_ARG_WITH(idn, AS_HELP_STRING([--with-idn],
+                                 [enable support for libidn]),
             try_libidn="$withval", 
-            try_libidn=yes)
+            try_libidn=no)
 
 if test "$try_libidn" = yes;then
 PKG_CHECK_MODULES(LIBIDN, libidn >= 0.5.6, [with_libidn=yes], [with_libidn=no])
