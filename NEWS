@@ -10,6 +10,10 @@ See the end for copying conditions.
 ** libgnutls: corrected failure when importing plain files in
    with gnutls_x509_privkey_import2(), when a password was given.
 
+** libgnutls: Don't reject certificates if a CA has the URI or IPADDRESS
+   constraints, and the end certificate doesn't have an IPaddress name or
+   a URI set.
+
 ** API and ABI modifications:
 No changes since last version.
 
