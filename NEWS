@@ -6,13 +6,20 @@ See the end for copying conditions.
 * Version 3.4.3 (unreleased)
 
 ** libgnutls: Follow closely RFC5280 recommendations and use UTCTime for
-dates prior to 2050.
+   dates prior to 2050.
 
 ** libgnutls: Force 16-byte alignment to all input to ciphers (previously it
-was done only when cryptodev was enabled).
+   was done only when cryptodev was enabled).
 
 ** libgnutls: Removed support for pthread_atfork() as it has undefined
-semantics when used with dlopen(), and may lead to a crash.
+   semantics when used with dlopen(), and may lead to a crash.
+
+** libgnutls: corrected failure when importing plain files 
+   with gnutls_x509_privkey_import2(), and a password was provided.
+
+** libgnutls: Don't reject certificates if a CA has the URI or IP address
+   name constraints, and the end certificate doesn't have an IP address 
+   name or a URI set.
 
 ** API and ABI modifications:
 gnutls_ecc_curve_get_oid: Added
