@@ -749,6 +749,54 @@ unsigned found_one;
 			 */
 			return gnutls_assert_val(1);
 		}
+	} else if (type == GNUTLS_SAN_IPADDRESS) {
+		/* Only check whether the IPAddress is present */
+		idx = found_one = 0;
+		do {
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
+				idx++, name, &name_size, &san_type, NULL);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			else if (ret < 0)
+				return gnutls_assert_val(0);
+
+			if (san_type != GNUTLS_SAN_IPADDRESS)
+				continue;
+
+			found_one = 1;
+			break;
+		} while(ret >= 0);
+
+		if (found_one != 0)
+			return check_unsupported_constraint(nc, type);
+
+		/* no IPaddress was found in the certificate, so accept */
+		return 1;
+	} else if (type == GNUTLS_SAN_URI) {
+		/* Only check whether the URI is present */
+		idx = found_one = 0;
+		do {
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_subject_alt_name2(cert,
+				idx++, name, &name_size, &san_type, NULL);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				break;
+			else if (ret < 0)
+				return gnutls_assert_val(0);
+
+			if (san_type != GNUTLS_SAN_URI)
+				continue;
+
+			found_one = 1;
+			break;
+		} while(ret >= 0);
+
+		if (found_one != 0)
+			return check_unsupported_constraint(nc, type);
+
+		/* no IPaddress was found in the certificate, so accept */
+		return 1;
 	} else
 		return check_unsupported_constraint(nc, type);
 }
