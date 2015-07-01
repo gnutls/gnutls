@@ -46,9 +46,9 @@ int pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params)
 {
 	switch (pk) {
 	case GNUTLS_PK_RSA:
-		return _gnutls_mpi_get_nbits(params->params[0]);
+		return _gnutls_mpi_get_nbits(params->params[RSA_MODULUS]);
 	case GNUTLS_PK_DSA:
-		return _gnutls_mpi_get_nbits(params->params[3]);
+		return _gnutls_mpi_get_nbits(params->params[DSA_P]);
 	case GNUTLS_PK_EC:
 		return gnutls_ecc_curve_get_size(params->flags) * 8;
 	default:
