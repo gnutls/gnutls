@@ -7,15 +7,15 @@ See the end for copying conditions.
 
 ** libgnutls: Allow compilation with nettle 3.0 or later
 
-** libgnutls: corrected failure when importing plain files in
-   with gnutls_x509_privkey_import2(), when a password was given.
+** libgnutls: corrected failure when importing plain files 
+   with gnutls_x509_privkey_import2(), and a password was provided.
 
-** libgnutls: Don't reject certificates if a CA has the URI or IPADDRESS
-   constraints, and the end certificate doesn't have an IPaddress name or
-   a URI set.
+** libgnutls: Don't reject certificates if a CA has the URI or IP address
+   name constraints, and the end certificate doesn't have an IP address 
+   name or a URI set.
 
 ** API and ABI modifications:
-No changes since last version.
+   No changes since last version.
 
 
 * Version 3.3.15 (released 2015-05-03)
