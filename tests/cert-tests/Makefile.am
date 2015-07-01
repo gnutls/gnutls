@@ -32,12 +32,14 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	email-certs/chain.invalid.example.com email-certs/chain.test.example.com-2 \
 	single-ca.p7b single-ca.p7b.out full.p7b full.p7b.out detached.p7b \
 	pkcs7-detached.txt p7-combined.out template-generalized.pem \
-	template-generalized.tmpl privkey1.pem privkey2.pem privkey3.pem
+	template-generalized.tmpl privkey1.pem privkey2.pem privkey3.pem \
+	name-constraints-ip.pem
 
 dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane crq certtool invalid-sig email \
-	pkcs7 privkey-import
+	pkcs7 privkey-import name-constraints
 
-TESTS = pathlen aki pem-decoding certtool invalid-sig email pkcs7 privkey-import
+TESTS = pathlen aki pem-decoding certtool invalid-sig email pkcs7 privkey-import \
+	name-constraints
 
 if ENABLE_NON_SUITEB_CURVES
 TESTS += crq
