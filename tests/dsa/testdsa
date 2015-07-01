@@ -26,6 +26,11 @@ CLI="${CLI:-../../src/gnutls-cli}"
 DEBUG=""
 unset RETCODE
 
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+fi
+
 if test "${WINDIR}" != ""; then
 	exit 77
 fi 
@@ -33,6 +38,14 @@ fi
 . "${srcdir}/../scripts/common.sh"
 
 PORT="${PORT:-$RPORT}"
+
+size=`${VALGRIND} "${CERTTOOL}" -i --infile "${srcdir}/dsa-pubkey-1018.pem"|grep "Algorithm Secur"|cut -d '(' -f 2|cut -d ' ' -f 1`
+
+if test "${size}" != "1024"; then
+	echo "The prime size (${size}) doesn't match the expected: 1024"
+	exit 1
+fi
+
 
 echo "Checking various DSA key sizes (port ${PORT})"
 

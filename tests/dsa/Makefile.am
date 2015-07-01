@@ -19,7 +19,8 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = cert.dsa.1024.pem  cert.dsa.2048.pem  cert.dsa.3072.pem  dsa.1024.pem  dsa.2048.pem  dsa.3072.pem
+EXTRA_DIST = cert.dsa.1024.pem cert.dsa.2048.pem cert.dsa.3072.pem \
+	dsa.1024.pem dsa.2048.pem dsa.3072.pem dsa-pubkey-1018.pem
 
 dist_check_SCRIPTS = testdsa
 
