@@ -1337,10 +1337,10 @@ void pgp_certificate_info(void)
 	}
 
 	if (verify_status & GNUTLS_CERT_INVALID) {
-		fprintf(outfile,
+		fprintf(outcert_format == GNUTLS_OPENPGP_FMT_RAW ? stderr : outfile,
 			"Self Signature verification: failed\n\n");
 	} else {
-		fprintf(outfile,
+		fprintf(outcert_format == GNUTLS_OPENPGP_FMT_RAW ? stderr : outfile,
 			"Self Signature verification: ok (%x)\n\n",
 			verify_status);
 	}
@@ -1707,9 +1707,11 @@ static void print_crq_info(gnutls_x509_crq_t crq, FILE * out)
 
 	ret = gnutls_x509_crq_verify(crq, 0);
 	if (ret < 0) {
-		fprintf(out, "Self signature: FAILED\n\n");
+		fprintf(outcert_format == GNUTLS_X509_FMT_DER ? out : stderr,
+			"Self signature: FAILED\n\n");
 	} else {
-		fprintf(out, "Self signature: verified\n\n");
+		fprintf(outcert_format == GNUTLS_X509_FMT_DER ? out : stderr,
+			"Self signature: verified\n\n");
 	}
 
 	size = lbuffer_size;
