@@ -24,7 +24,7 @@ AC_DEFUN([gl_VALGRIND_TESTS],
   OPTS="-q --error-exitcode=1 --leak-check=full --suppressions=suppressions.valgrind"
 
   if test -n "$VALGRIND" \
-     && $VALGRIND $OPTS $SHELL -c 'exit 0' > /dev/null 2>&1; then
+     && $VALGRIND $OPTS /bin/true >/dev/null 2>&1; then
     opt_valgrind_tests=yes
     VALGRIND="$VALGRIND $OPTS"
   else
