@@ -33,13 +33,13 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	single-ca.p7b single-ca.p7b.out full.p7b full.p7b.out detached.p7b \
 	pkcs7-detached.txt p7-combined.out template-generalized.pem \
 	template-generalized.tmpl privkey1.pem privkey2.pem privkey3.pem \
-	name-constraints-ip.pem
+	name-constraints-ip.pem cert-invalid-utf8.der
 
 dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane crq certtool invalid-sig email \
-	pkcs7 privkey-import name-constraints
+	pkcs7 privkey-import name-constraints certtool-utf8
 
 TESTS = pathlen aki pem-decoding certtool invalid-sig email pkcs7 privkey-import \
-	name-constraints
+	name-constraints certtool-utf8
 
 if ENABLE_NON_SUITEB_CURVES
 TESTS += crq
@@ -55,7 +55,7 @@ endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"				\
-	VALGRIND="$(VALGRIND)"			\
+	VALGRIND="$(VALGRIND)" 			\
 	LIBTOOL="$(LIBTOOL)"			\
 	top_builddir="$(top_builddir)"		\
 	srcdir="$(srcdir)"
