@@ -66,13 +66,12 @@ _gnutls_dumbfw_send_params(gnutls_session_t session,
 	        memset(pad, 0, pad_size);
 
 		ret =
-		    _gnutls_buffer_append_data_prefix(extdata, 16,
-							      pad,
-							      pad_size);
+		    gnutls_buffer_append_data(extdata, pad,
+						       pad_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 
-		total_size += 2 + pad_size;
+		total_size += pad_size;
 	}
 
 	return total_size;
