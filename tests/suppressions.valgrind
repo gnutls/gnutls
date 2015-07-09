@@ -258,3 +258,13 @@
    fun:gnutls_server_name_get
    ...
 }
+
+{
+   bash leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:xmalloc
+   fun:set_default_locale
+   fun:main
+}
