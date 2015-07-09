@@ -39,7 +39,12 @@ dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane crq certtool in
 	pkcs7 privkey-import name-constraints certtool-utf8
 
 TESTS = pathlen aki pem-decoding certtool invalid-sig email pkcs7 privkey-import \
-	name-constraints certtool-utf8
+	name-constraints
+
+if !HAVE_BUGGY_LIBIDN
+TESTS += certtool-utf8
+endif
+
 
 if ENABLE_NON_SUITEB_CURVES
 TESTS += crq

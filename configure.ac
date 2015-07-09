@@ -376,6 +376,10 @@ AC_ARG_WITH(idn, AS_HELP_STRING([--without-idn],
 if test "$try_libidn" = yes;then
 PKG_CHECK_MODULES(LIBIDN, libidn >= 0.5.6, [with_libidn=yes], [with_libidn=no])
 if test "$with_libidn" != "no";then
+        if ! $PKG_CONFIG --atleast-version=1.31 libidn; then
+	    with_buggy_libidn=yes
+        fi
+
 	AC_DEFINE([HAVE_LIBIDN], 1, [Build IDNA support])
 	if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
 		GNUTLS_REQUIRES_PRIVATE="Requires.private: libidn"
@@ -394,6 +398,7 @@ else
 fi
 
 AM_CONDITIONAL(HAVE_LIBIDN, test "$with_libidn" != "no")
+AM_CONDITIONAL(HAVE_BUGGY_LIBIDN, test "$with_buggy_libidn" = "yes")
 
 AC_ARG_ENABLE(non-suiteb-curves,
   AS_HELP_STRING([--disable-non-suiteb-curves], [disable curves not in SuiteB]),
