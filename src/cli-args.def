@@ -52,10 +52,10 @@ This is disabled by default due to many servers not allowing DNSSEC.";
 
 flag = {
     name      = ca-verification;
-    descrip   = "Disable CA certificate verification";
+    descrip   = "Enable CA certificate verification";
     enabled;
     disable   = "no";
-    doc       = "This option will disable CA certificate verification. It is to be used with the --dane or --tofu options.";
+    doc       = "This option can be used to enable or disable CA certificate verification. It is to be used with the --dane or --tofu options.";
 };
 
 flag = {
