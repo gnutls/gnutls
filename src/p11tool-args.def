@@ -20,6 +20,7 @@ reorder-args;
 argument = "[url]";
 
 #define  OUTFILE_OPT   1
+#define  VERBOSE_OPT 1
 #include args-std.def
 
 flag = {
