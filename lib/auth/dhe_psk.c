@@ -189,6 +189,7 @@ gen_dhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 	int ret;
 	gnutls_dh_params_t dh_params;
 	gnutls_psk_server_credentials_t cred;
+	gnutls_datum_t hint = {NULL, 0};
 
 	cred = (gnutls_psk_server_credentials_t)
 	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
@@ -218,7 +219,12 @@ gen_dhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 
 	_gnutls_dh_set_group(session, g, p);
 
-	ret = _gnutls_buffer_append_prefix(data, 16, 0);
+	if (cred->hint) {
+		hint.data = (uint8_t *) cred->hint;
+		hint.size = strlen(cred->hint);
+	}
+
+	ret = _gnutls_buffer_append_data_prefix(data, 16, hint.data, hint.size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -238,6 +244,8 @@ static int
 gen_ecdhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 {
 	int ret;
+	gnutls_psk_server_credentials_t cred;
+	gnutls_datum_t hint = {NULL, 0};
 
 	if ((ret =
 	     _gnutls_auth_info_set(session, GNUTLS_CRD_PSK,
@@ -246,7 +254,20 @@ gen_ecdhe_psk_server_kx(gnutls_session_t session, gnutls_buffer_st * data)
 		return ret;
 	}
 
-	ret = _gnutls_buffer_append_prefix(data, 16, 0);
+	cred = (gnutls_psk_server_credentials_t)
+	    _gnutls_get_cred(session, GNUTLS_CRD_PSK);
+
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+	if (cred->hint) {
+		hint.data = (uint8_t *) cred->hint;
+		hint.size = strlen(cred->hint);
+	}
+
+	ret = _gnutls_buffer_append_data_prefix(data, 16, hint.data, hint.size);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -410,13 +431,37 @@ proc_ecdhe_psk_client_kx(gnutls_session_t session, uint8_t * data,
 	return ret;
 }
 
+static int copy_hint(gnutls_session_t session, gnutls_datum_t *hint)
+{
+	psk_auth_info_t info;
+
+	/* copy the hint to the auth info structures
+	 */
+	info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
+	if (info == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	if (hint->size > MAX_USERNAME_SIZE) {
+		gnutls_assert();
+		return GNUTLS_E_ILLEGAL_SRP_USERNAME;
+	}
+
+	memcpy(info->hint, hint->data, hint->size);
+	info->hint[hint->size] = 0;
+
+	return 0;
+}
+
 static int
 proc_dhe_psk_server_kx(gnutls_session_t session, uint8_t * data,
 		       size_t _data_size)
 {
 
-	int ret, psk_size;
+	int ret;
 	ssize_t data_size = _data_size;
+	gnutls_datum_t hint;
 
 	/* set auth_info */
 	if ((ret =
@@ -427,11 +472,20 @@ proc_dhe_psk_server_kx(gnutls_session_t session, uint8_t * data,
 	}
 
 	DECR_LEN(data_size, 2);
-	psk_size = _gnutls_read_uint16(data);
-	DECR_LEN(data_size, psk_size);
-	data += 2 + psk_size;
+
+	hint.size = _gnutls_read_uint16(&data[0]);
+	hint.data = &data[2];
+
+	DECR_LEN(data_size, hint.size);
+	data += 2 + hint.size;
 
 	ret = _gnutls_proc_dh_common_server_kx(session, data, data_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = copy_hint(session, &hint);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -445,8 +499,9 @@ proc_ecdhe_psk_server_kx(gnutls_session_t session, uint8_t * data,
 			 size_t _data_size)
 {
 
-	int ret, psk_size;
+	int ret;
 	ssize_t data_size = _data_size;
+	gnutls_datum_t hint;
 
 	/* set auth_info */
 	if ((ret =
@@ -457,11 +512,20 @@ proc_ecdhe_psk_server_kx(gnutls_session_t session, uint8_t * data,
 	}
 
 	DECR_LEN(data_size, 2);
-	psk_size = _gnutls_read_uint16(data);
-	DECR_LEN(data_size, psk_size);
-	data += 2 + psk_size;
+
+	hint.size = _gnutls_read_uint16(&data[0]);
+	hint.data = &data[2];
+
+	DECR_LEN(data_size, hint.size);
+	data += 2 + hint.size;
 
 	ret = _gnutls_proc_ecdh_common_server_kx(session, data, data_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = copy_hint(session, &hint);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
