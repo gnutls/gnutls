@@ -21,6 +21,9 @@ See the end for copying conditions.
    name constraints, and the end certificate doesn't have an IP address 
    name or a URI set.
 
+** p11tool: Added --list-token-urls option, and print the token module name
+   in list-tokens.
+
 ** API and ABI modifications:
 gnutls_ecc_curve_get_oid: Added
 gnutls_digest_get_oid: Added
