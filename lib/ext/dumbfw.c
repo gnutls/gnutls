@@ -66,7 +66,7 @@ _gnutls_dumbfw_send_params(gnutls_session_t session,
 	        memset(pad, 0, pad_size);
 
 		ret =
-		    gnutls_buffer_append_data(extdata, pad,
+		    _gnutls_buffer_append_data(extdata, pad,
 						       pad_size);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
