@@ -159,9 +159,9 @@ int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t 
 }
 
 static int
-find_ext_cb(struct pkcs11_session_info *sinfo,
-	     struct ck_token_info *tinfo, struct ck_info *lib_info,
-	     void *input)
+find_ext_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
+	    struct ck_token_info *tinfo, struct ck_info *lib_info,
+	    void *input)
 {
 	struct find_ext_data_st *find_data = input;
 	struct ck_attribute a[4];

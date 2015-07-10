@@ -85,7 +85,7 @@ int _gnutls_pkcs11_check_init(void);
  * function. Once everything is traversed it is called with NULL tinfo.
  * It should return 0 if found what it was looking for.
  */
-typedef int (*find_func_t) (struct pkcs11_session_info *,
+typedef int (*find_func_t) (struct ck_function_list *, struct pkcs11_session_info *,
 			    struct ck_token_info * tinfo, struct ck_info *,
 			    void *input);
 

@@ -79,6 +79,11 @@ struct find_token_num {
 	unsigned int current;	/* which one are we now */
 };
 
+struct find_token_modname {
+	struct p11_kit_uri *info;
+	char *modname;
+};
+
 struct find_pkey_list_st {
 	gnutls_buffer_st *key_ids;
 	size_t key_ids_size;
@@ -1366,7 +1371,7 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			}
 
 			ret =
-			    find_func(&sinfo, &l_tinfo, &providers[x].info, input);
+			    find_func(providers[x].module, &sinfo, &l_tinfo, &providers[x].info, input);
 
 			if (ret == 0) {
 				found = 1;
@@ -1385,7 +1390,7 @@ _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 		if (module) {
 			sinfo.module = module;
 			sinfo.pks = pks;
-			ret = find_func(&sinfo, NULL, NULL, input);
+			ret = find_func(providers[x].module, &sinfo, NULL, NULL, input);
 		} else
 			ret =
 			    gnutls_assert_val
@@ -1892,7 +1897,7 @@ pkcs11_import_object(ck_object_handle_t obj, ck_object_class_t class,
 }
 
 static int
-find_obj_url_cb(struct pkcs11_session_info *sinfo,
+find_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	     struct ck_token_info *tinfo, struct ck_info *lib_info,
 	     void *input)
 {
@@ -2022,9 +2027,9 @@ gnutls_pkcs11_obj_import_url(gnutls_pkcs11_obj_t obj, const char *url,
 }
 
 static int
-find_token_num_cb(struct pkcs11_session_info *sinfo,
-	       struct ck_token_info *tinfo,
-	       struct ck_info *lib_info, void *input)
+find_token_num_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
+	          struct ck_token_info *tinfo,
+	          struct ck_info *lib_info, void *input)
 {
 	struct find_token_num *find_data = input;
 
@@ -2046,6 +2051,29 @@ find_token_num_cb(struct pkcs11_session_info *sinfo,
 
 
 	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;	/* non zero is enough */
+}
+
+static int
+find_token_modname_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
+		      struct ck_token_info *tinfo,
+		      struct ck_info *lib_info, void *input)
+{
+	struct find_token_modname *find_data = input;
+
+	if (tinfo == NULL) {	/* we don't support multiple calls */
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if (!p11_kit_uri_match_token_info(find_data->info, tinfo)
+	    || !p11_kit_uri_match_module_info(find_data->info,
+					      lib_info)) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	find_data->modname = p11_kit_config_option(module, "module");
+	return 0;
 }
 
 /**
@@ -2092,7 +2120,6 @@ gnutls_pkcs11_token_get_url(unsigned int seq,
 	}
 
 	return 0;
-
 }
 
 /**
@@ -2146,10 +2173,27 @@ gnutls_pkcs11_token_get_info(const char *url,
 		str = p11_kit_uri_get_token_info(info)->model;
 		str_max = 16;
 		break;
+	case GNUTLS_PKCS11_TOKEN_MODNAME: {
+		struct find_token_modname tn;
+
+		memset(&tn, 0, sizeof(tn));
+		tn.info = info;
+
+		ret = _pkcs11_traverse_tokens(find_token_modname_cb, &tn, NULL, NULL, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		snprintf(output, *output_size, "%s", tn.modname);
+		*output_size = strlen(output);
+		ret = 0;
+		goto cleanup;
+	}
 	default:
-		p11_kit_uri_free(info);
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
 	}
 
 	len = p11_kit_space_strlen(str, str_max);
@@ -2166,6 +2210,7 @@ gnutls_pkcs11_token_get_info(const char *url,
 
 	ret = 0;
 
+ cleanup:
 	p11_kit_uri_free(info);
 	return ret;
 }
@@ -2620,7 +2665,7 @@ find_privkeys(struct pkcs11_session_info *sinfo,
 #define OBJECTS_A_TIME 8*1024
 
 static int
-find_objs_cb(struct pkcs11_session_info *sinfo,
+find_objs_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	  struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
 {
 	struct find_obj_data_st *find_data = input;
@@ -3144,7 +3189,7 @@ gnutls_x509_crt_list_import_pkcs11(gnutls_x509_crt_t * certs,
 }
 
 static int
-find_flags_cb(struct pkcs11_session_info *sinfo,
+find_flags_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	   struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
 {
 	struct find_flags_data_st *find_data = input;
@@ -3376,7 +3421,7 @@ cleanup:
 }
 
 static int
-find_cert_cb(struct pkcs11_session_info *sinfo,
+find_cert_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
 	    struct ck_token_info *tinfo, struct ck_info *lib_info, void *input)
 {
 	struct ck_attribute a[10];

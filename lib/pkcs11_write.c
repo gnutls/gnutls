@@ -701,9 +701,9 @@ struct delete_data_st {
 };
 
 static int
-delete_obj_url(struct pkcs11_session_info *sinfo,
-	       struct ck_token_info *tinfo,
-	       struct ck_info *lib_info, void *input)
+delete_obj_url_cb(struct ck_function_list *module, struct pkcs11_session_info *sinfo,
+	          struct ck_token_info *tinfo,
+	          struct ck_info *lib_info, void *input)
 {
 	struct delete_data_st *find_data = input;
 	struct ck_attribute a[4];
@@ -832,7 +832,7 @@ int gnutls_pkcs11_delete_url(const char *object_url, unsigned int flags)
 	}
 
 	ret =
-	    _pkcs11_traverse_tokens(delete_obj_url, &find_data,
+	    _pkcs11_traverse_tokens(delete_obj_url_cb, &find_data,
 				    find_data.info, NULL,
 				    SESSION_WRITE |
 				    pkcs11_obj_flags_to_int(flags));
