@@ -178,9 +178,6 @@ static void cmd_parser(int argc, char **argv)
 	flags = opt_to_flags(&key_usage);
 	cinfo.key_usage = key_usage;
 
-	if (HAVE_OPT(VERBOSE))
-		cinfo.verbose = 1;
-
 	if (HAVE_OPT(SECRET_KEY))
 		cinfo.secret_key = OPT_ARG(SECRET_KEY);
 
@@ -243,7 +240,9 @@ static void cmd_parser(int argc, char **argv)
 	/* handle actions 
 	 */
 	if (HAVE_OPT(LIST_TOKENS)) {
-		pkcs11_token_list(outfile, detailed_url, &cinfo, !cinfo.verbose);
+		pkcs11_token_list(outfile, detailed_url, &cinfo, 0);
+	} else if (HAVE_OPT(LIST_TOKEN_URLS)) {
+		pkcs11_token_list(outfile, detailed_url, &cinfo, 1);
 	} else if (HAVE_OPT(LIST_MECHANISMS)) {
 		pkcs11_mechanism_list(outfile, url, flags, &cinfo);
 	} else if (HAVE_OPT(GENERATE_RANDOM)) {

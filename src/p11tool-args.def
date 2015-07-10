@@ -20,13 +20,18 @@ reorder-args;
 argument = "[url]";
 
 #define  OUTFILE_OPT   1
-#define  VERBOSE_OPT 1
 #include args-std.def
 
 flag = {
     name      = list-tokens;
     descrip   = "List all available tokens";
     doc = "";
+};
+
+flag = {
+    name      = list-token-urls;
+    descrip   = "List the URLs available tokens";
+    doc = "This is a more compact version of --list-tokens.";
 };
 
 flag = {
