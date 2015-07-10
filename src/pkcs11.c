@@ -45,7 +45,7 @@ char *get_single_token_url(common_info_st * info);
 	if (url == NULL) { \
 		url = get_single_token_url(info); \
 		if (url == NULL) { \
-			fprintf(stderr, "warning: no token URL was provided for this operation; the available tokens are:\n"); \
+			fprintf(stderr, "warning: no token URL was provided for this operation; the available tokens are:\n\n"); \
 			pkcs11_token_list(out, det, info, 1); \
 			exit(1); \
 		} \
@@ -545,7 +545,7 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		}
 
 		if (brief != 0) {
-			fprintf(outfile, "Token %d: %s\n", i, url);
+			fprintf(outfile, "%s\n", url);
 			goto cont;
 		} else {
 			fprintf(outfile, "Token %d:\n\tURL: %s\n", i, url);
