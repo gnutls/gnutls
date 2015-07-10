@@ -262,9 +262,9 @@ int gnutls_pkcs11_copy_secret_key(const char *token_url,
  * @GNUTLS_PKCS11_OBJ_TOKEN_MANUFACTURER: The token's manufacturer.
  * @GNUTLS_PKCS11_OBJ_TOKEN_MODEL: The token's model.
  * @GNUTLS_PKCS11_OBJ_ID: The object ID.
- * @GNUTLS_PKCS11_OBJ_LIBRARY_VERSION: The library's used to access the object version.
- * @GNUTLS_PKCS11_OBJ_LIBRARY_DESCRIPTION: The library's used to access the object description (name).
- * @GNUTLS_PKCS11_OBJ_LIBRARY_MANUFACTURER: The library's used to access the object manufacturer name.
+ * @GNUTLS_PKCS11_OBJ_LIBRARY_VERSION: The library's version.
+ * @GNUTLS_PKCS11_OBJ_LIBRARY_DESCRIPTION: The library's description.
+ * @GNUTLS_PKCS11_OBJ_LIBRARY_MANUFACTURER: The library's manufacturer name.
  *
  * Enumeration of several object information types.
  */
