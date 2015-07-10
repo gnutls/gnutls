@@ -64,7 +64,7 @@ static void tls_log_func(int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-static void client(int sd)
+static void client(int sd, const char *prio)
 {
 	int ret, ii;
 	gnutls_session_t session;
@@ -72,6 +72,7 @@ static void client(int sd)
 	gnutls_psk_client_credentials_t pskcred;
 	/* Need to enable anonymous KX specifically. */
 	const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
+	const char *hint;
 
 	global_init();
 	gnutls_global_set_log_function(tls_log_func);
@@ -89,7 +90,7 @@ static void client(int sd)
 	gnutls_init(&session, GNUTLS_CLIENT);
 
 	/* Use default priorities */
-	gnutls_priority_set_direct(session, "NORMAL:+PSK", NULL);
+	gnutls_priority_set_direct(session, prio, NULL);
 
 	/* put the anonymous credentials to the current session
 	 */
@@ -108,6 +109,13 @@ static void client(int sd)
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
+	}
+
+	/* check the hint */
+	hint = gnutls_psk_client_get_hint(session);
+	if (hint == NULL || strcmp(hint, "hint") != 0) {
+		fail("client: hint is not the expected: %s\n", gnutls_psk_client_get_hint(session));
+		goto end;
 	}
 
 	gnutls_record_send(session, MSG, strlen(MSG));
@@ -150,23 +158,6 @@ static void client(int sd)
 #define MAX_BUF 1024
 
 /* These are global */
-gnutls_psk_server_credentials_t server_pskcred;
-
-static gnutls_session_t initialize_tls_session(void)
-{
-	gnutls_session_t session;
-
-	gnutls_init(&session, GNUTLS_SERVER);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session, "NORMAL:+PSK", NULL);
-
-	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
-
-	return session;
-}
 
 static int
 pskfunc(gnutls_session_t session, const char *username,
@@ -183,14 +174,29 @@ pskfunc(gnutls_session_t session, const char *username,
 	return 0;
 }
 
-int err, ret;
-char topbuf[512];
+static gnutls_dh_params_t dh_params;
+
+static int generate_dh_params(void)
+{
+	const gnutls_datum_t p3 = { (void *) pkcs3, strlen(pkcs3) };
+	/* Generate Diffie-Hellman parameters - for use with DHE
+	 * kx algorithms. These should be discarded and regenerated
+	 * once a day, once a week or once a month. Depending on the
+	 * security requirements.
+	 */
+	gnutls_dh_params_init(&dh_params);
+	return gnutls_dh_params_import_pkcs3(dh_params, &p3,
+					     GNUTLS_X509_FMT_PEM);
+}
+
+
+static void server(int sd, const char *prio)
+{
+gnutls_psk_server_credentials_t server_pskcred;
+int ret;
 gnutls_session_t session;
 char buffer[MAX_BUF + 1];
-int optval = 1;
 
-static void server(int sd)
-{
 	/* this must be called once in the program
 	 */
 	global_init();
@@ -200,12 +206,22 @@ static void server(int sd)
 
 	side = "server";
 
+
 	gnutls_psk_allocate_server_credentials(&server_pskcred);
 	gnutls_psk_set_server_credentials_hint(server_pskcred, "hint");
 	gnutls_psk_set_server_credentials_function(server_pskcred,
 						   pskfunc);
 
-	session = initialize_tls_session();
+	gnutls_psk_set_server_dh_params(server_pskcred, dh_params);
+
+	gnutls_init(&session, GNUTLS_SERVER);
+
+	/* avoid calling all the priority functions, since the defaults
+	 * are adequate.
+	 */
+	gnutls_priority_set_direct(session, prio, NULL);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_PSK, server_pskcred);
 
 	gnutls_transport_set_int(session, sd);
 	ret = gnutls_handshake(session);
@@ -224,6 +240,7 @@ static void server(int sd)
 
 	for (;;) {
 		memset(buffer, 0, MAX_BUF + 1);
+		gnutls_record_set_timeout(session, 10000);
 		ret = gnutls_record_recv(session, buffer, MAX_BUF);
 
 		if (ret == 0) {
@@ -256,9 +273,11 @@ static void server(int sd)
 		success("server: finished\n");
 }
 
-void doit(void)
+static
+void run_test(const char *prio)
 {
 	pid_t child;
+	int err;
 	int sockets[2];
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
@@ -278,10 +297,22 @@ void doit(void)
 	if (child) {
 		int status;
 		/* parent */
-		server(sockets[0]);
+		server(sockets[0], prio);
 		wait(&status);
-	} else
-		client(sockets[1]);
+	} else {
+		client(sockets[1], prio);
+	}
+}
+
+void doit(void)
+{
+	generate_dh_params();
+
+	run_test("NORMAL:-KX-ALL:+PSK");
+	run_test("NORMAL:-KX-ALL:+ECDHE-PSK");
+	run_test("NORMAL:-KX-ALL:+DHE-PSK");
+
+	gnutls_dh_params_deinit(dh_params);
 }
 
 #endif				/* _WIN32 */
