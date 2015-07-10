@@ -610,6 +610,15 @@ pkcs11_token_list(FILE * outfile, unsigned int detailed,
 		}
 
 		fprintf(outfile, "\tSerial: %s\n", buf);
+
+		size = sizeof(buf);
+		ret =
+		    gnutls_pkcs11_token_get_info(url,
+						 GNUTLS_PKCS11_TOKEN_MODNAME,
+						 buf, &size);
+		if (ret >= 0) {
+			fprintf(outfile, "\tModule: %s\n", buf);
+		}
 		fprintf(outfile, "\n\n");
  cont:
 		gnutls_free(url);
