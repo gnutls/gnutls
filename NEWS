@@ -21,6 +21,8 @@ See the end for copying conditions.
    name constraints, and the end certificate doesn't have an IP address 
    name or a URI set.
 
+** libgnutls: set and read the hint in DHE-PSK and ECDHE-PSK ciphersuites.
+
 ** p11tool: Added --list-token-urls option, and print the token module name
    in list-tokens.
 
