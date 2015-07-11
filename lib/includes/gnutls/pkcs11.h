@@ -305,7 +305,7 @@ int gnutls_pkcs11_obj_set_info(gnutls_pkcs11_obj_t crt,
  * @GNUTLS_PKCS11_TOKEN_SERIAL: The token's serial number (string)
  * @GNUTLS_PKCS11_TOKEN_MANUFACTURER: The token's manufacturer (string)
  * @GNUTLS_PKCS11_TOKEN_MODEL: The token's model (string)
- * @GNUTLS_PKCS11_TOKEN_MODNAME: The token's module name (string)
+ * @GNUTLS_PKCS11_TOKEN_MODNAME: The token's module name (string - since 3.4.3)
  *
  * Enumeration of types for retrieving token information.
  */
