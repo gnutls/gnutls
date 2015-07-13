@@ -3,6 +3,7 @@
  *
  * Copyright © 2012 Free Software Foundation.
  * Copyright © 2008-2012 Intel Corporation.
+ * Copyright © 2015 Red Hat, Inc.
  *
  * Author: David Woodhouse <dwmw2@infradead.org>
  * Author: Nikos Mavrogiannopoulos
