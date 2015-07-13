@@ -43,5 +43,6 @@ extern gnutls_audit_log_func _gnutls_audit_log_func;
 extern int _gnutls_log_level;
 extern int gnutls_crypto_init(void);
 extern void gnutls_crypto_deinit(void);
+extern void _gnutls_tpm_global_deinit(void);
 
 #endif

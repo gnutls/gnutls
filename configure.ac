@@ -529,6 +529,19 @@ fi
 
 AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
 
+if test -f "/usr/lib64/libtspi.so.1";then
+default_trousers_lib="/usr/lib64/libtspi.so.1"
+else
+default_trousers_lib="/usr/lib/libtspi.so.1"
+fi
+
+AC_ARG_WITH(trousers-lib, AS_HELP_STRING([--with-trousers-lib=LIB],
+                                 [set the location of the trousers library]),
+            ac_trousers_lib=$withval, ac_trousers_lib=$default_trousers_lib)
+
+AC_DEFINE_UNQUOTED(TROUSERS_LIB, ["$ac_trousers_lib"], [the location of the trousers library])
+AC_SUBST(TROUSERS_LIB)
+
 included_libopts=no
 if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
 	LIBOPTS_CHECK([src/libopts])
@@ -916,7 +929,7 @@ AC_MSG_NOTICE([External hardware support:
   Padlock accel:        $use_padlock
   getrandom variant:    $enable_getrandom
   PKCS#11 support:      $with_p11_kit
-  TPM support:          $with_tpm
+  TPM support:          $with_tpm ($ac_trousers_lib)
 ])
 
 AC_MSG_NOTICE([Optional features:
