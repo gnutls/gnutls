@@ -81,6 +81,15 @@ flag = {
 };
 
 flag = {
+    name      = test-sign;
+    arg-type  = string;
+    arg-name  = "url";
+    descrip   = "Tests the signature operation of the provided object";
+    doc = "It can be used to test the correct operation of the signature operation.
+This operation will sign and verify the signed data.";
+};
+
+flag = {
     name      = sec-param;
     arg-type  = string;
     arg-name  = "Security parameter";
