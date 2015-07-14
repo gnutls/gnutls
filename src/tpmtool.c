@@ -45,12 +45,14 @@
 
 #include "certtool-common.h"
 #include "tpmtool-args.h"
+#include "common.h"
 
 static void cmd_parser(int argc, char **argv);
 static void tpm_generate(FILE * outfile, unsigned int key_type,
 			 unsigned int bits, unsigned int flags);
 static void tpm_pubkey(const char *url, FILE * outfile);
 static void tpm_delete(const char *url, FILE * outfile);
+static void tpm_test_sign(const char *url, FILE * outfile);
 static void tpm_list(FILE * outfile);
 
 static gnutls_x509_crt_fmt_t incert_format, outcert_format;
@@ -160,6 +162,8 @@ static void cmd_parser(int argc, char **argv)
 		tpm_delete(OPT_ARG(DELETE), outfile);
 	} else if (HAVE_OPT(LIST)) {
 		tpm_list(outfile);
+	} else if (HAVE_OPT(TEST_SIGN)) {
+		tpm_test_sign(OPT_ARG(TEST_SIGN), outfile);
 	} else {
 		USAGE(1);
 	}
@@ -167,6 +171,75 @@ static void cmd_parser(int argc, char **argv)
 	fclose(outfile);
 
 	gnutls_global_deinit();
+}
+
+#define TEST_DATA "Test data to sign"
+
+static void
+tpm_test_sign(const char *url, FILE * out)
+{
+	gnutls_privkey_t privkey;
+	gnutls_pubkey_t pubkey;
+	int ret;
+	gnutls_datum_t data, sig = {NULL, 0};
+	int pk;
+
+	pkcs11_common(NULL);
+
+	data.data = (void*)TEST_DATA;
+	data.size = sizeof(TEST_DATA)-1;
+
+	ret = gnutls_privkey_init(&privkey);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+			__LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_pubkey_init(&pubkey);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__,
+			__LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_privkey_import_url(privkey, url, 0);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot import private key: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_pubkey_import_tpm_url(pubkey, url, NULL, 0);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot import public key: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_privkey_sign_data(privkey, GNUTLS_DIG_SHA1, 0, &data, &sig);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot sign data: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
+
+	fprintf(stderr, "Verifying against private key parameters... ");
+	ret = gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA1),
+		0, &data, &sig);
+	if (ret < 0) {
+		fprintf(stderr, "Cannot verify signed data: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf(stderr, "ok\n");
+
+	gnutls_free(sig.data);
+	gnutls_pubkey_deinit(pubkey);
+	gnutls_privkey_deinit(privkey);
 }
 
 static void tpm_generate(FILE * out, unsigned int key_type,
@@ -200,8 +273,7 @@ static void tpm_generate(FILE * out, unsigned int key_type,
 		exit(1);
 	}
 
-/*  fwrite (pubkey.data, 1, pubkey.size, outfile);
-  fputs ("\n", outfile);*/
+
 	fwrite(privkey.data, 1, privkey.size, out);
 	fputs("\n", out);
 
