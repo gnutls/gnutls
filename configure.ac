@@ -929,8 +929,13 @@ AC_MSG_NOTICE([External hardware support:
   Padlock accel:        $use_padlock
   getrandom variant:    $enable_getrandom
   PKCS#11 support:      $with_p11_kit
-  TPM support:          $with_tpm ($ac_trousers_lib)
+  TPM support:          $with_tpm
 ])
+if test -n "$ac_trousers_lib";then
+AC_MSG_NOTICE([
+  TPM library:          $ac_trousers_lib
+])
+fi
 
 AC_MSG_NOTICE([Optional features:
 (note that included applications might not compile properly
