@@ -256,7 +256,7 @@ separation subsystem.
 
 @acronym{PKCS} #11 is plugin API allowing applications to access cryptographic
 operations on a security module, as well as to objects residing on it. PKCS
-#11 modules exist for hardware tokens such as smart cards@footnote{@url{http://www.opensc-project.org}},
+#11 modules exist for hardware tokens such as smart cards@footnote{For example, OpenSC-supported cards.},
 cryptographic tokens, as well as for software modules like @acronym{Gnome Keyring}. 
 The objects residing on a security module may be certificates, public keys, 
 private keys or secret keys. Of those certificates and public/private key 
@@ -300,23 +300,30 @@ module: /usr/lib/opensc-pkcs11.so
 @end example
 
 If you use these configuration files, then there is no need for other initialization in
-@acronym{GnuTLS}, except for the PIN and token functions (see next section).  
-In several cases, however, it is desirable to limit badly behaving modules 
+@acronym{GnuTLS}, except for the PIN and token callbacks (see next section).
+In several cases, however, it is desirable to limit badly behaving modules
 (e.g., modules that add an unacceptable delay on initialization)
 to single applications. That can be done using the ``enable-in:'' option
 followed by the base name of applications that this module should be used.
 
-In all cases, you can also manually initialize the PKCS #11 subsystem if the 
+It is also possible to manually initialize the PKCS #11 subsystem if the 
 default settings are not desirable. To completely disable PKCS #11 support you
 need to call @funcref{gnutls_pkcs11_init} with the flag @code{GNUTLS_PKCS11_FLAG_MANUAL}
 prior to @funcref{gnutls_global_init}.
 
 @showfuncdesc{gnutls_pkcs11_init}
 
-Note that PKCS #11 modules must be reinitialized on the child processes
-after a @funcintref{fork}. In older versions of @acronym{GnuTLS} it was
-required to call @funcref{gnutls_pkcs11_reinit}; since 3.3.0 this is no
-longer required, as reinitialization occurs automatically.
+Note that, PKCS #11 modules behave in a peculiar way after a fork; they
+require a reinitialization of all the used PKCS #11 resources.
+While GnuTLS automates that process, there are corner cases where
+it is not possible to handle it correctly in an automated way@footnote{For
+example when an open session is to be reinitialized, but the PIN is not available
+to GnuTLS (e.g., it was entered at a pinpad).}. For that reasons it is
+recommended not to mix fork() and PKCS #11 module usage. It is recommended
+to initialize and use any PKCS #11 resources in a single process.
+
+Older versions of @acronym{GnuTLS} required to call @funcref{gnutls_pkcs11_reinit}
+after a fork() call; since 3.3.0 this is no longer required.
 
 @node Accessing objects that require a PIN
 @subsection Accessing objects that require a PIN
