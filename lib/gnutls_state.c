@@ -1063,6 +1063,65 @@ gnutls_prf_raw(gnutls_session_t session,
 }
 
 /**
+ * gnutls_prf_rfc5705:
+ * @session: is a #gnutls_session_t type.
+ * @label_size: length of the @label variable.
+ * @label: label used in PRF computation, typically a short string.
+ * @context_size: length of the @extra variable.
+ * @context: optional extra data to seed the PRF with.
+ * @outsize: size of pre-allocated output buffer to hold the output.
+ * @out: pre-allocated buffer to hold the generated data.
+ *
+ * Applies the TLS Pseudo-Random-Function (PRF) on the master secret
+ * and the provided data, seeded with the client and server random fields,
+ * as specified in RFC5705.
+ *
+ * The @label variable usually contains a string denoting the purpose
+ * for the generated data.  The @server_random_first indicates whether
+ * the client random field or the server random field should be first
+ * in the seed.  Non-zero indicates that the server random field is first,
+ * 0 that the client random field is first.
+ *
+ * The @context variable can be used to add more data to the seed, after
+ * the random variables.  It can be used to make sure the
+ * generated output is strongly connected to some additional data
+ * (e.g., a string used in user authentication). 
+ *
+ * The output is placed in @out, which must be pre-allocated.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
+int
+gnutls_prf_rfc5705(gnutls_session_t session,
+		   size_t label_size, const char *label,
+		   size_t context_size, const char *context,
+		   size_t outsize, char *out)
+{
+	char *pctx;
+	int ret;
+
+	if (context_size > 65535)  {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	pctx = gnutls_malloc(context_size+2);
+	if (!pctx) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	_gnutls_write_uint16(context_size, (void*)pctx);
+	if (context && context_size) {
+		memcpy(pctx+2, context, context_size);
+	}
+	ret = gnutls_prf(session, label_size, label, 0,
+			 context_size+2, pctx, outsize, out);
+	gnutls_free(pctx);
+	return ret;
+}
+
+/**
  * gnutls_prf:
  * @session: is a #gnutls_session_t type.
  * @label_size: length of the @label variable.
@@ -1074,8 +1133,8 @@ gnutls_prf_raw(gnutls_session_t session,
  * @out: pre-allocated buffer to hold the generated data.
  *
  * Applies the TLS Pseudo-Random-Function (PRF) on the master secret
- * and the provided data, seeded with the client and server random fields,
- * as specified in RFC5705.
+ * and the provided data, seeded with the client and server random fields.
+ * For the key expansion specified in RFC5705 see gnutls_prf_rfc5705().
  *
  * The @label variable usually contains a string denoting the purpose
  * for the generated data.  The @server_random_first indicates whether
@@ -1097,7 +1156,8 @@ gnutls_prf(gnutls_session_t session,
 	   size_t label_size,
 	   const char *label,
 	   int server_random_first,
-	   size_t extra_size, const char *extra, size_t outsize, char *out)
+	   size_t extra_size, const char *extra,
+	   size_t outsize, char *out)
 {
 	int ret;
 	uint8_t *seed;
@@ -1118,7 +1178,9 @@ gnutls_prf(gnutls_session_t session,
 	       client_random : session->security_parameters.server_random,
 	       GNUTLS_RANDOM_SIZE);
 
-	memcpy(seed + 2 * GNUTLS_RANDOM_SIZE, extra, extra_size);
+	if (extra && extra_size) {
+		memcpy(seed + 2 * GNUTLS_RANDOM_SIZE, extra, extra_size);
+	}
 
 	ret =
 	    _gnutls_PRF(session,

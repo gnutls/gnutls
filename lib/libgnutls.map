@@ -1049,6 +1049,7 @@ GNUTLS_3_4
 	gnutls_oid_to_pk;
 	gnutls_oid_to_sign;
 	gnutls_oid_to_ecc_curve;
+	gnutls_prf_rfc5705;
  local:
 	*;
 };
