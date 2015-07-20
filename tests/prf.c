@@ -198,6 +198,7 @@ static gnutls_datum_t sess_id =
 static void check_prfs(gnutls_session_t session)
 {
 	unsigned char key_material[512];
+	unsigned char key_material2[512];
 	int ret;
 
 	TRY(13, "key expansion", 0, NULL, 34, (uint8_t*)"\xcf\x3e\x1c\x03\x47\x1a\xdf\x4a\x8e\x74\xc6\xda\xcd\xda\x22\xa4\x8e\xa5\xf7\x62\xef\xd6\x47\xe7\x41\x20\xea\x44\xb8\x5d\x66\x87\x0a\x61");
@@ -206,6 +207,30 @@ static void check_prfs(gnutls_session_t session)
 
 	TRY_OLD(6, "hello", 0, NULL, 31, (uint8_t*)"\x53\x35\x9b\x1c\xbf\xf2\x50\x85\xa1\xbc\x42\xfb\x45\x92\xc3\xbe\x20\x24\x24\xe2\xeb\x6e\xf7\x4f\xc0\xee\xe3\xaa\x46\x36\xfd");
 	TRY_OLD(7, "context", 5, "abcd\xfa", 31, (uint8_t*)"\x5f\x75\xb7\x61\x76\x4c\x1e\x86\x4b\x7d\x2e\x6c\x09\x91\xfd\x1e\xe6\xe8\xee\xf9\x86\x6a\x80\xfe\xf3\xbe\x96\xd0\x47\xf5\x9e");
+
+	/* check whether gnutls_prf matches gnutls_prf_rfc5705 when no context is given */
+	ret = gnutls_prf(session, 4, "aaaa", 0, 0, NULL, 64,
+                         (void*)key_material);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_prf: error in %d\n", __LINE__);
+		gnutls_perror(ret);
+		exit(1);
+	}
+
+	ret = gnutls_prf_rfc5705(session, 4, "aaaa", 0, NULL, 64,
+                         (void*)key_material2);
+	if (ret < 0) {
+		fprintf(stderr, "gnutls_prf_rfc5705: error in %d\n", __LINE__);
+		gnutls_perror(ret);
+		exit(1);
+	}
+
+	if (memcmp(key_material, key_material2, 64) != 0) {
+		fprintf(stderr, "gnutls_prf: output doesn't match in cross-check\n");
+		dump("got1 ", key_material, 64);
+		dump("got2 ", key_material2, 64);
+		exit(1);
+	}
 }
 
 static void client(int fd)
