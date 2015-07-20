@@ -1089,6 +1089,9 @@ gnutls_prf_raw(gnutls_session_t session,
  *
  * The output is placed in @out, which must be pre-allocated.
  *
+ * Note that, to provide the RFC5705 context, the @contect variable
+ * must be non-null.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  *
  * Since: 3.4.4
@@ -1107,7 +1110,7 @@ gnutls_prf_rfc5705(gnutls_session_t session,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (context != NULL && context_size != 0) {
+	if (context != NULL) {
 		pctx = gnutls_malloc(context_size+2);
 		if (!pctx) {
 			gnutls_assert();
