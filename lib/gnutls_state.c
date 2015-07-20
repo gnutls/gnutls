@@ -1050,8 +1050,11 @@ gnutls_prf_raw(gnutls_session_t session,
  * @out: pre-allocated buffer to hold the generated data.
  *
  * Applies the TLS Pseudo-Random-Function (PRF) on the master secret
- * and the provided data, seeded with the client and server random fields,
- * as specified in RFC5705.
+ * and the provided data, seeded with the client and server random fields.
+ *
+ * The output of this function is identical to RFC5705 extractor if @extra
+ * and @extra_size are set to zero. Otherwise, @extra should contain the context
+ * value prefixed by a two-byte length.
  *
  * The @label variable usually contains a string denoting the purpose
  * for the generated data.  The @server_random_first indicates whether
