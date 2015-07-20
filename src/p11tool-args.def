@@ -119,13 +119,13 @@ flag = {
 
 flag = {
     name      = generate-dsa;
-    descrip   = "Generate an RSA private-public key pair";
-    doc = "Generates an RSA private-public key pair on the specified token.";
+    descrip   = "Generate a DSA private-public key pair";
+    doc = "Generates a DSA private-public key pair on the specified token.";
 };
 flag = {
     name      = generate-ecc;
-    descrip   = "Generate an RSA private-public key pair";
-    doc = "Generates an RSA private-public key pair on the specified token.";
+    descrip   = "Generate an ECDSA private-public key pair";
+    doc = "Generates an ECDSA private-public key pair on the specified token.";
 };
 
 
