@@ -51,7 +51,6 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = -no-install
 LDADD = ../lib/libgnutls.la \
 	libutils.la \
-	$(LTLIBGCRYPT)	\
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
 dane_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
