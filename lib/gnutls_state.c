@@ -1090,6 +1090,8 @@ gnutls_prf_raw(gnutls_session_t session,
  * The output is placed in @out, which must be pre-allocated.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 3.4.4
  **/
 int
 gnutls_prf_rfc5705(gnutls_session_t session,
