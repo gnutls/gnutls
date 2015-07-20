@@ -469,6 +469,7 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
 		if (ret < 0) {
 			gnutls_assert();
 			gnutls_free(str->data);
+			str->data = NULL;
 			return ret;
 		}
 		str->size = size;
