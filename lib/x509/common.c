@@ -35,7 +35,7 @@
 
 static int
 data2hex(const void *data, size_t data_size,
-	 void *_out, size_t * sizeof_out);
+	 gnutls_datum_t *out);
 
 struct oid_to_string {
 	const char *oid;
@@ -295,7 +295,6 @@ make_printable_string(unsigned etype, const gnutls_datum_t * input,
 	int printable = 0;
 	int ret;
 	unsigned int i;
-	size_t size;
 
 	if (etype == ASN1_ETYPE_BMP_STRING) {
 		ret = _gnutls_ucs2_to_utf8(input->data, input->size, out, 1);
@@ -331,25 +330,14 @@ make_printable_string(unsigned etype, const gnutls_datum_t * input,
 		return GNUTLS_E_INVALID_REQUEST;
 
 	if (printable == 0) {	/* need to allocate out */
-		out->size = input->size * 2 + 2;
-		out->data = gnutls_malloc(out->size);
-		if (out->data == NULL)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-		size = out->size;
-		ret = data2hex(input->data, input->size, out->data, &size);
+		ret = data2hex(input->data, input->size, out);
 		if (ret < 0) {
 			gnutls_assert();
-			goto cleanup;
+			return ret;
 		}
-		out->size = size;
 	}
 
 	return 0;
-
-      cleanup:
-	_gnutls_free_datum(out);
-	return ret;
 }
 
 static int
@@ -450,7 +438,6 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
 	const struct oid_to_string *oentry;
 	int ret;
 	gnutls_datum_t tmp;
-	size_t size;
 
 	if (value == NULL || value_size <= 0) {
 		gnutls_assert();
@@ -460,19 +447,11 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
 	oentry = get_oid_entry(oid);
 	if (oentry == NULL) {	/* unknown OID -> hex */
  unknown_oid:
-		str->size = value_size * 2 + 2;
-		str->data = gnutls_malloc(str->size);
-		if (str->data == NULL)
-			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-		size = str->size;
-		ret = data2hex(value, value_size, str->data, &size);
+		ret = data2hex(value, value_size, str);
 		if (ret < 0) {
 			gnutls_assert();
-			gnutls_free(str->data);
 			return ret;
 		}
-		str->size = size;
 		return 0;
 	}
 
@@ -507,39 +486,26 @@ _gnutls_x509_dn_to_string(const char *oid, void *value,
  */
 static int
 data2hex(const void *data, size_t data_size,
-	 void *_out, size_t * sizeof_out)
+	 gnutls_datum_t *out)
 {
 	char *res;
-	char escaped[MAX_STRING_LEN];
-	unsigned int size, res_size;
-	char *out = _out;
 
-	if (2 * data_size + 1 > MAX_STRING_LEN) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
+	out->size = data_size * 2 + 2; /* +1 for null +1 for '#' */
+	out->data = gnutls_malloc(out->size);
+	if (out->data == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
+	out->data[0] = '#';
 	res =
-	    _gnutls_bin2hex(data, data_size, escaped, sizeof(escaped),
+	    _gnutls_bin2hex(data, data_size,
+			    (char*)&out->data[1], (out->size)-2,
 			    NULL);
 	if (!res) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	res_size = strlen(res);
-	size = res_size + 1;	/* +1 for the '#' */
-	if (size + 1 > *sizeof_out) {
-		*sizeof_out = size + 1;
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
-	*sizeof_out = size;	/* -1 for the null +1 for the '#' */
 
-	if (out) {
-		out[0] = '#';
-		memcpy(&out[1], res, res_size);
-		out[size] = 0;
-	}
+	out->size = strlen(res);
 
 	return 0;
 }
