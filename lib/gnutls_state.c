@@ -1099,26 +1099,29 @@ gnutls_prf_rfc5705(gnutls_session_t session,
 		   size_t context_size, const char *context,
 		   size_t outsize, char *out)
 {
-	char *pctx;
+	char *pctx = NULL;
 	int ret;
 
-	if (context_size > 65535)  {
+	if (context != NULL && context_size > 65535)  {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	pctx = gnutls_malloc(context_size+2);
-	if (!pctx) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+	if (context != NULL && context_size != 0) {
+		pctx = gnutls_malloc(context_size+2);
+		if (!pctx) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		memcpy(pctx+2, context, context_size);
+		_gnutls_write_uint16(context_size, (void*)pctx);
+		context_size += 2;
 	}
 
-	_gnutls_write_uint16(context_size, (void*)pctx);
-	if (context && context_size) {
-		memcpy(pctx+2, context, context_size);
-	}
 	ret = gnutls_prf(session, label_size, label, 0,
-			 context_size+2, pctx, outsize, out);
+			 context_size, pctx, outsize, out);
+
 	gnutls_free(pctx);
 	return ret;
 }
