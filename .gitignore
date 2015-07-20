@@ -56,6 +56,7 @@ doc/doxygen/Doxyfile
 doc/doxygen/html/
 doc/doxygen/latex/
 doc/dtls-api.texi
+doc/pkcs7-api.texi
 doc/enums.texi
 doc/enums/
 doc/errcodes
@@ -504,6 +505,15 @@ tests/chainverify
 tests/cipher-test
 tests/crq_apis
 tests/crq_key_id
+tests/keygen
+tests/mini-alignment
+tests/prf
+tests/no-signal
+tests/pkcs7-gen
+tests/mini-tls-nonblock
+tests/atfork
+tests/oids
+tests/x509sign-verify2
 tests/crypto_rng
 tests/cve-2008-4989
 tests/cve-2009-1415
