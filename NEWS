@@ -6,11 +6,13 @@ See the end for copying conditions.
 * Version 3.4.4 (unreleased)
 
 ** libgnutls: added high level API (gnutls_prf_rfc5705) to access
-the PRF as specified by RFC5705. Suggestion and original patch
-by Rick van Rein.
+   the PRF as specified by RFC5705. Suggestion and original patch
+   by Rick van Rein.
 
 ** libgnutls: Link to trousers (TPM library) dynamically when this
    functionality is requested.
+
+** libgnutls: Allow the parsing of very long CNs.
 
 ** API and ABI modifications:
 gnutls_prf_rfc5705: Added
