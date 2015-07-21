@@ -3,19 +3,10 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.4.4 (unreleased)
+* Version 3.5.0 (unreleased)
 
-** libgnutls: added high level API (gnutls_prf_rfc5705) to access
-   the PRF as specified by RFC5705. Suggestion and original patch
-   by Rick van Rein.
-
-** libgnutls: Link to trousers (TPM library) dynamically when this
-   functionality is requested.
-
-** libgnutls: Allow the parsing of very long CNs.
 
 ** API and ABI modifications:
-gnutls_prf_rfc5705: Added
 
 
 * Version 3.4.3 (released 2015-07-12)
