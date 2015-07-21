@@ -30,6 +30,7 @@
 #include <gnutls_num.h>
 #include <x509_b64.h>
 #include "x509_int.h"
+#include "extras/hex.h"
 #include <common.h>
 #include <c-ctype.h>
 
@@ -488,24 +489,29 @@ static int
 data2hex(const void *data, size_t data_size,
 	 gnutls_datum_t *out)
 {
-	char *res;
+	gnutls_datum_t tmp;
+	int ret;
+	size_t size;
 
-	out->size = data_size * 2 + 2; /* +1 for null +1 for '#' */
+	out->size = hex_str_size(data_size) + 1; /* +1 for '#' */
 	out->data = gnutls_malloc(out->size);
 	if (out->data == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
+	tmp.data = (void*)data;
+	tmp.size = data_size;
+
 	out->data[0] = '#';
-	res =
-	    _gnutls_bin2hex(data, data_size,
-			    (char*)&out->data[1], (out->size)-2,
-			    NULL);
-	if (!res) {
+	size = out->size-1; /* don't include '#' */
+	ret =
+	    gnutls_hex_encode(&tmp,
+			    (char*)&out->data[1], &size);
+	if (ret < 0) {
 		gnutls_assert();
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	out->size = strlen(res);
+	out->size--; /* don't include null */
 
 	return 0;
 }
