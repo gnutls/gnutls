@@ -35,7 +35,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h test-chains.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
-	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem
+	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem psk.passwd
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -87,7 +87,7 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 strict-der mini-extension mini-supplementaldata mini-dtls0-9 \
 	 mini-record-retvals mini-server-name mini-etm mini-x509-cert-callback \
 	 sign-md5-rep keygen mini-tls-nonblock no-signal pkcs7-gen \
-	 x509sign-verify2 mini-alignment oids atfork prf
+	 x509sign-verify2 mini-alignment oids atfork prf psk-file
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 
@@ -169,6 +169,7 @@ TESTS_ENVIRONMENT =						\
 	PKCS12PASSWORD_2=""					\
 	PKCS12PATH=$(srcdir)/pkcs12-decode/			\
 	X509CERTDIR=$(srcdir)/x509cert-dir/			\
+	PSK_FILE=$(srcdir)/psk.passwd				\
 	EXEEXT=$(EXEEXT)					\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
