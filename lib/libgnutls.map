@@ -1050,6 +1050,8 @@ GNUTLS_3_4
 	gnutls_oid_to_sign;
 	gnutls_oid_to_ecc_curve;
 	gnutls_prf_rfc5705;
+	gnutls_hex_decode2;
+	gnutls_hex_encode2;
  local:
 	*;
 };
