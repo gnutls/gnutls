@@ -27,6 +27,7 @@
 #include <fips.h>
 #include <gnutls/self-test.h>
 #include <stdio.h>
+#include <extras/hex.h>
 #include <random.h>
 
 unsigned int _gnutls_lib_mode = LIB_STATE_POWERON;
@@ -224,8 +225,8 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 		}
 	}
 
-	hmac_size = sizeof(hmac);
-	ret = _gnutls_hex2bin((void*)data.data, data.size, hmac, &hmac_size);
+	hmac_size = hex_data_size(data->size);
+	ret = gnutls_hex_decode(&data, hmac, hmac_size);
 	gnutls_free(data.data);
 
 	if (ret < 0) {
