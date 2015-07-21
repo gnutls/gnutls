@@ -1873,6 +1873,9 @@ int gnutls_hex_encode(const gnutls_datum_t * data, char *result,
 int gnutls_hex_decode(const gnutls_datum_t * hex_data, void *result,
 		      size_t * result_size);
 
+int gnutls_hex_encode2(const gnutls_datum_t * data, gnutls_datum_t *result);
+int gnutls_hex_decode2(const gnutls_datum_t * data, gnutls_datum_t *result);
+
 void
 gnutls_psk_set_server_dh_params(gnutls_psk_server_credentials_t res,
 				gnutls_dh_params_t dh_params);

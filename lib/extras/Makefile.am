@@ -28,10 +28,12 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/..			\
 	-I$(srcdir)/../opencdk
 
+EXTRA_DIST = licenses/CC0
+
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../minitasn1
 endif
 
 noinst_LTLIBRARIES = libgnutls_extras.la
 
-libgnutls_extras_la_SOURCES = randomart.c randomart.h
+libgnutls_extras_la_SOURCES = randomart.c randomart.h hex.c hex.h

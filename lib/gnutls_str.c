@@ -28,6 +28,7 @@
 #include <c-ctype.h>
 #include <intprops.h>
 #include "vasprintf.h"
+#include "extras/hex.h"
 
 /* These functions are like strcat, strcpy. They only
  * do bound checking (they shouldn't cause buffer overruns),
@@ -476,7 +477,9 @@ char *_gnutls_bin2hex(const void *_old, size_t oldlen,
  * @bin_size: when calling should hold maximum size of @bin_data,
  *            on return will hold actual length of @bin_data.
  *
- * Convert a buffer with hex data to binary data.
+ * Convert a buffer with hex data to binary data. This function
+ * unlike gnutls_hex_decode() can parse hex data with separators
+ * between numbers. That is, it ignores any non-hex characters.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -529,6 +532,41 @@ _gnutls_hex2bin(const char *hex_data, size_t hex_size, uint8_t * bin_data,
 }
 
 /**
+ * gnutls_hex_decode2:
+ * @hex_data: contain the encoded data
+ * @result: the result in an allocated string
+ *
+ * This function will decode the given encoded data, using the hex
+ * encoding used by PSK password files.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
+ *   long enough, or 0 on success.
+ **/
+int
+gnutls_hex_decode2(const gnutls_datum_t * hex_data, gnutls_datum_t *result)
+{
+	int ret;
+	int size = hex_data_size(hex_data->size);
+
+	result->data = gnutls_malloc(size);
+	if (result->data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	result->size = size;
+	ret = hex_decode((char *) hex_data->data, hex_data->size,
+			 result->data, result->size);
+	if (ret == 0) {
+		gnutls_assert();
+		gnutls_free(result->data);
+		return GNUTLS_E_BASE64_DECODING_ERROR;
+	}
+
+	return 0;
+}
+
+/**
  * gnutls_hex_decode:
  * @hex_data: contain the encoded data
  * @result: the place where decoded data will be copied
@@ -537,7 +575,8 @@ _gnutls_hex2bin(const char *hex_data, size_t hex_size, uint8_t * bin_data,
  * This function will decode the given encoded data, using the hex
  * encoding used by PSK password files.
  *
- * Note that hex_data should be null terminated.
+ * Initially @result_size must hold the maximum size available in
+ * @result, and on return it will contain the number of bytes written.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
  *   long enough, or 0 on success.
@@ -547,12 +586,19 @@ gnutls_hex_decode(const gnutls_datum_t * hex_data, void *result,
 		  size_t * result_size)
 {
 	int ret;
+	size_t size = hex_data_size(hex_data->size);
 
-	ret =
-	    _gnutls_hex2bin((char *) hex_data->data, hex_data->size,
-			    (uint8_t *) result, result_size);
-	if (ret < 0)
-		return ret;
+	if (*result_size < size) {
+		gnutls_assert();
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
+	ret = hex_decode((char *) hex_data->data, hex_data->size,
+			 result, size);
+	if (ret == 0) {
+		return GNUTLS_E_BASE64_DECODING_ERROR;
+	}
+	*result_size = size;
 
 	return 0;
 }
@@ -575,16 +621,55 @@ int
 gnutls_hex_encode(const gnutls_datum_t * data, char *result,
 		  size_t * result_size)
 {
-	size_t res = data->size + data->size + 1;
+	int ret;
+	size_t size = hex_str_size(data->size);
 
-	if (*result_size < res) {
+	if (*result_size < size) {
 		gnutls_assert();
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	_gnutls_bin2hex(data->data, data->size, result, *result_size,
-			NULL);
-	*result_size = res;
+	ret = hex_encode(data->data, data->size, result, *result_size);
+	if (ret == 0) {
+		return gnutls_assert_val(GNUTLS_E_BASE64_ENCODING_ERROR);
+	}
+
+	*result_size = size;
+
+	return 0;
+}
+
+/**
+ * gnutls_hex_encode2:
+ * @data: contain the raw data
+ * @result: the result in an allocated string
+ *
+ * This function will convert the given data to printable data, using
+ * the hex encoding, as used in the PSK password files.
+ *
+ * Note that the size of the result does NOT include the null terminator.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ **/
+int
+gnutls_hex_encode2(const gnutls_datum_t * data, gnutls_datum_t *result)
+{
+	int ret;
+	int size = hex_str_size(data->size);
+
+	result->data = gnutls_malloc(size);
+	if (result->data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ret = hex_encode((char*)data->data, data->size, (char*)result->data, size); 
+	if (ret == 0) {
+		gnutls_free(result->data);
+		return gnutls_assert_val(GNUTLS_E_BASE64_ENCODING_ERROR);
+	}
+
+	result->size = size-1;
 
 	return 0;
 }
