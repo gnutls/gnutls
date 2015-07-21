@@ -382,14 +382,20 @@ gnutls_certificate_set_openpgp_key_file(gnutls_certificate_credentials_t
 static int get_keyid(gnutls_openpgp_keyid_t keyid, const char *str)
 {
 	size_t keyid_size = GNUTLS_OPENPGP_KEYID_SIZE;
+	size_t len = strlen(str);
+	gnutls_datum_t tmp;
+	int ret;
 
-	if (strlen(str) != 16) {
+	if (len != 16) {
 		_gnutls_debug_log
 		    ("The OpenPGP subkey ID has to be 16 hexadecimal characters.\n");
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (_gnutls_hex2bin(str, strlen(str), keyid, &keyid_size) < 0) {
+	tmp.data = (void*)str;
+	tmp.size = len;
+	ret = gnutls_hex_decode(&tmp, keyid, &keyid_size);
+	if (ret < 0) {
 		_gnutls_debug_log("Error converting hex string: %s.\n",
 				  str);
 		return GNUTLS_E_INVALID_REQUEST;
