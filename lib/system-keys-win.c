@@ -154,6 +154,7 @@ get_id(const char *url, uint8_t *bin, size_t *bin_size, unsigned cert)
 	int ret;
 	unsigned url_size = strlen(url);
 	const char *p = url, *p2;
+	gnutls_datum_t tmp;
 
 	if (cert != 0) {
 		if (url_size < sizeof(WIN_URL) || strncmp(url, WIN_URL, WIN_URL_SIZE) != 0)
@@ -177,7 +178,9 @@ get_id(const char *url, uint8_t *bin, size_t *bin_size, unsigned cert)
 		url_size = (p2-p);
 	}
 
-	ret = _gnutls_hex2bin(p, url_size, bin, bin_size);
+	tmp.data = p;
+	tmp.size = url_size;
+	ret = gnutls_hex_decode(&tmp, bin, bin_size);
 	if (ret < 0)
 		return ret;
 
