@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <base64.h>
+#include <nettle/base64.h>
 
 #include "opencdk.h"
 #include "main.h"
@@ -175,7 +175,13 @@ static cdk_error_t armor_encode(void *data, FILE * in, FILE * out)
 			return CDK_File_Error;
 		}
 		afx->crc = update_crc(afx->crc, (byte *) raw, nread);
-		base64_encode(raw, nread, buf, DIM(buf) - 1);
+		if (DIM(buf)-1 < BASE64_ENCODE_RAW_LENGTH(nread)) {
+			gnutls_assert();
+			return CDK_File_Error;
+		}
+
+		base64_encode_raw((uint8_t*)buf, nread, (uint8_t*)raw);
+		buf[BASE64_ENCODE_RAW_LENGTH(nread)] = 0;
 		fprintf(out, "%s%s", buf, lf);
 	}
 
@@ -216,11 +222,11 @@ static cdk_error_t armor_decode(void *data, FILE * in, FILE * out)
 	char buf[127];
 	byte raw[128], crcbuf[4];
 	u32 crc2 = 0;
-	ssize_t nread = 0;
-	int i, pgp_data = 0;
+	int i, pgp_data = 0, ret;
 	cdk_error_t rc = 0;
 	int len;
 	size_t raw_size, crcbuf_size;
+	struct base64_decode_ctx ctx;
 
 	if (!afx) {
 		gnutls_assert();
@@ -290,21 +296,41 @@ static cdk_error_t armor_decode(void *data, FILE * in, FILE * out)
 			buf[len] = '\0';
 		}
 		if (buf[0] == '=' && strlen(s) == 5) {	/* CRC */
+			base64_decode_init(&ctx);
+
 			memset(crcbuf, 0, sizeof(crcbuf));
 			crcbuf_size = sizeof(crcbuf);
-			base64_decode(buf + 1, len - 1, (char *) crcbuf,
-				      &crcbuf_size);
+			if ((ssize_t)crcbuf_size < BASE64_DECODE_LENGTH(len-1))
+				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
+
+			ret = base64_decode_update(&ctx, &crcbuf_size, crcbuf,
+					           len-1, (uint8_t*)buf+1);
+			if (ret == 0)
+				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
+
+			ret = base64_decode_final(&ctx);
+			if (ret != 1)
+				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
+
 			crc2 =
 			    (crcbuf[0] << 16) | (crcbuf[1] << 8) |
 			    crcbuf[2];
 			break;	/* stop here */
 		} else {
+			base64_decode_init(&ctx);
+
 			raw_size = sizeof(raw);
-			nread =
-			    base64_decode(buf, len, (char *) raw,
-					  &raw_size);
-			if (nread == 0)
-				break;
+			if ((ssize_t)raw_size < BASE64_DECODE_LENGTH(len))
+				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
+			ret = base64_decode_update(&ctx, &raw_size, raw,
+					           len, (uint8_t*)buf);
+			if (ret == 0)
+				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
+
+			ret = base64_decode_final(&ctx);
+			if (ret != 1)
+				return gnutls_assert_val(GNUTLS_E_BASE64_DECODING_ERROR);
+
 			afx->crc = update_crc(afx->crc, raw, raw_size);
 			fwrite(raw, 1, raw_size, out);
 		}
@@ -440,7 +466,15 @@ cdk_armor_encode_buffer(const byte * inbuf, size_t inlen,
 			len = rest;
 		}
 		rest -= len;
-		base64_encode(tempbuf, len, tempout, DIM(tempout) - 1);
+
+		if (DIM(tempout)-1 < BASE64_ENCODE_RAW_LENGTH(len)) {
+			gnutls_assert();
+			return CDK_File_Error;
+		}
+
+		base64_encode_raw((uint8_t*)tempout, len, (uint8_t*)tempbuf);
+		tempout[BASE64_ENCODE_RAW_LENGTH(len)] = 0;
+
 		memcpy(outbuf + pos, tempout, strlen(tempout));
 		pos += strlen(tempout);
 		memcpy(outbuf + pos, le, strlen(le));
