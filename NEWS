@@ -16,6 +16,8 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 gnutls_prf_rfc5705: Added
+gnutls_hex_encode2: Added
+gnutls_hex_decode2: Added
 
 
 * Version 3.4.3 (released 2015-07-12)
