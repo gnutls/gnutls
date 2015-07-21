@@ -46,7 +46,7 @@ static int pwd_put_values(gnutls_datum_t * psk, char *str)
 {
 	char *p;
 	int len, ret;
-	size_t size;
+	gnutls_datum_t tmp;
 
 	p = strchr(str, ':');
 	if (p == NULL) {
@@ -66,20 +66,13 @@ static int pwd_put_values(gnutls_datum_t * psk, char *str)
 	if (p[len - 1] == '\n' || p[len - 1] == ' ')
 		len--;
 
-	size = psk->size = len / 2;
-	psk->data = gnutls_malloc(size);
-	if (psk->data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	ret = _gnutls_hex2bin(p, len, psk->data, &size);
-	psk->size = (unsigned int) size;
+	tmp.data = (void*)p;
+	tmp.size = len;
+	ret = gnutls_hex_decode2(&tmp, psk);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
-
 
 	return 0;
 
