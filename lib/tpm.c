@@ -893,6 +893,7 @@ static int decode_tpmkey_url(const char *url, struct tpmkey_url_st *s)
 	} else if ((p = strstr(url, "uuid=")) != NULL) {
 		char tmp_uuid[33];
 		uint8_t raw_uuid[16];
+		gnutls_datum_t tmp;
 
 		p += sizeof("uuid=") - 1;
 		size = strlen(p);
@@ -906,10 +907,12 @@ static int decode_tpmkey_url(const char *url, struct tpmkey_url_st *s)
 		}
 		tmp_uuid[j] = 0;
 
+		tmp.data = tmp_uuid;
+		tmp.size = strlen(tmp_uuid);
 		size = sizeof(raw_uuid);
 		ret =
-		    _gnutls_hex2bin(tmp_uuid, strlen(tmp_uuid), raw_uuid,
-				    &size);
+		    gnutls_hex_decode(&tmp, raw_uuid,
+				      &size);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
