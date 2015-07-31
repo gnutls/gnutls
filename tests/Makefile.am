@@ -87,7 +87,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 strict-der mini-extension mini-supplementaldata mini-dtls0-9 \
 	 mini-record-retvals mini-server-name mini-etm mini-x509-cert-callback \
 	 sign-md5-rep keygen mini-tls-nonblock no-signal pkcs7-gen \
-	 x509sign-verify2 mini-alignment oids atfork prf psk-file
+	 x509sign-verify2 mini-alignment oids atfork prf psk-file \
+	 status-request status-request-ok
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 
