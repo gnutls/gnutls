@@ -2072,7 +2072,8 @@ static int send_client_hello(gnutls_session_t session, int again)
 			ret =
 			    copy_ciphersuites(session, &extdata,
 					      TRUE);
-			_gnutls_extension_list_add(session,
+			if (session->security_parameters.entity == GNUTLS_CLIENT)
+				_gnutls_extension_list_add(session,
 						   GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
 		} else
 			ret =
