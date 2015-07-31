@@ -907,7 +907,7 @@ static int decode_tpmkey_url(const char *url, struct tpmkey_url_st *s)
 		}
 		tmp_uuid[j] = 0;
 
-		tmp.data = tmp_uuid;
+		tmp.data = (void*)tmp_uuid;
 		tmp.size = strlen(tmp_uuid);
 		size = sizeof(raw_uuid);
 		ret =
