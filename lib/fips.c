@@ -225,8 +225,8 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 		}
 	}
 
-	hmac_size = hex_data_size(data->size);
-	ret = gnutls_hex_decode(&data, hmac, hmac_size);
+	hmac_size = hex_data_size(data.size);
+	ret = gnutls_hex_decode(&data, hmac, &hmac_size);
 	gnutls_free(data.data);
 
 	if (ret < 0) {
