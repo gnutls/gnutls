@@ -909,27 +909,31 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 							 * supported by the peer.
 							 */
 
-	/* First, check for safe renegotiation SCSV.
-	 */
-	if (session->internals.priorities.sr != SR_DISABLED) {
-		unsigned int offset;
-
-		for (offset = 0; offset < datalen; offset += 2) {
-			/* TLS_RENEGO_PROTECTION_REQUEST = { 0x00, 0xff } */
-			if (data[offset] ==
-			    GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR
-			    && data[offset + 1] ==
-			    GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR) {
-				_gnutls_handshake_log
-				    ("HSK[%p]: Received safe renegotiation CS\n",
-				     session);
-				retval = _gnutls_ext_sr_recv_cs(session);
-				if (retval < 0) {
-					gnutls_assert();
-					return retval;
-				}
-				break;
+	for (i = 0; i < datalen; i += 2) {
+		/* TLS_RENEGO_PROTECTION_REQUEST = { 0x00, 0xff } */
+		if (session->internals.priorities.sr != SR_DISABLED &&
+		    data[i] == GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR &&
+		    data[i + 1] == GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR) {
+			_gnutls_handshake_log
+			    ("HSK[%p]: Received safe renegotiation CS\n",
+			     session);
+			retval = _gnutls_ext_sr_recv_cs(session);
+			if (retval < 0) {
+				gnutls_assert();
+				return retval;
 			}
+		}
+
+		/* TLS_FALLBACK_SCSV */
+		if (data[i] == GNUTLS_FALLBACK_SCSV_MAJOR &&
+		    data[i + 1] == GNUTLS_FALLBACK_SCSV_MINOR) {
+			_gnutls_handshake_log
+			    ("HSK[%p]: Received fallback CS\n",
+			     session);
+
+			if (gnutls_protocol_get_version(session) !=
+			    GNUTLS_TLS_VERSION_MAX)
+				return GNUTLS_E_INAPPROPRIATE_FALLBACK;
 		}
 	}
 

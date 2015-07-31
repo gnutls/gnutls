@@ -73,6 +73,9 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_INVALID_SESSION),
 
 	ERROR_ENTRY(N_("GnuTLS internal error."), GNUTLS_E_INTERNAL_ERROR),
+	ERROR_ENTRY(N_(
+	            "A connection with inappropriate fallback was attempted."),
+	            GNUTLS_E_INAPPROPRIATE_FALLBACK),
 	ERROR_ENTRY(N_("An illegal TLS extension was received."),
 		    GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION),
 	ERROR_ENTRY(N_("A TLS fatal alert has been received."),
