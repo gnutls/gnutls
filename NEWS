@@ -12,6 +12,9 @@ See the end for copying conditions.
 ** libgnutls: Link to trousers (TPM library) dynamically when this
    functionality is requested.
 
+** libgnutls: Fix issue with server side sending the status request
+   extension even when not requested. Reported by Jeremy Harris.
+
 ** libgnutls: Allow the parsing of very long CNs.
 
 ** API and ABI modifications:
