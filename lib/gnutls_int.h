@@ -676,6 +676,9 @@ struct gnutls_priority_st {
 	 */
 	gnutls_sec_param_t level;
 	unsigned int dh_prime_bits;	/* old (deprecated) variable */
+
+	/* TLS_FALLBACK_SCSV */
+	bool fallback;
 };
 
 /* Allow around 50KB of length-hiding padding
