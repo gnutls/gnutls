@@ -1207,6 +1207,12 @@ will enforce safe renegotiation.  Clients and
 servers will refuse to talk to an insecure peer.  Currently this
 causes interoperability problems, but is required for full protection.
 
+@item %FALLBACK_SCSV @tab
+will enable the use of the fallback signaling cipher suite value in the
+client hello.  Note that this should be set only by applications that
+try to reconnect with a downgraded protocol version. See RFC7507 for
+details.
+
 @item %VERIFY_ALLOW_SIGN_RSA_MD5 @tab
 will allow RSA-MD5 signatures in certificate chains.
 

@@ -22,6 +22,7 @@ UNSAFE_RENEGOTIATION, enable_unsafe_renegotiation
 SAFE_RENEGOTIATION, enable_safe_renegotiation
 PARTIAL_RENEGOTIATION, enable_partial_safe_renegotiation
 DISABLE_SAFE_RENEGOTIATION, disable_safe_renegotiation
+FALLBACK_SCSV, enable_fallback_scsv
 DISABLE_WILDCARDS, disable_wildcards
 SERVER_PRECEDENCE, enable_server_precedence
 PROFILE_VERY_WEAK, enable_profile_very_weak
