@@ -489,29 +489,33 @@ static int
 data2hex(const void *data, size_t data_size,
 	 gnutls_datum_t *out)
 {
-	gnutls_datum_t tmp;
+	gnutls_datum_t tmp, td;
 	int ret;
 	size_t size;
 
-	out->size = hex_str_size(data_size) + 1; /* +1 for '#' */
-	out->data = gnutls_malloc(out->size);
-	if (out->data == NULL)
+	td.size = hex_str_size(data_size) + 1; /* +1 for '#' */
+	td.data = gnutls_malloc(td.size);
+	if (td.data == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	tmp.data = (void*)data;
 	tmp.size = data_size;
 
-	out->data[0] = '#';
-	size = out->size-1; /* don't include '#' */
+	td.data[0] = '#';
+	size = td.size-1; /* don't include '#' */
 	ret =
 	    gnutls_hex_encode(&tmp,
-			    (char*)&out->data[1], &size);
+			    (char*)&td.data[1], &size);
 	if (ret < 0) {
 		gnutls_assert();
+		gnutls_free(td.data);
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-	out->size--; /* don't include null */
+	td.size--; /* don't include null */
+
+	out->data = td.data;
+	out->size = td.size;
 
 	return 0;
 }
