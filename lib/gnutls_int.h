@@ -869,8 +869,8 @@ typedef struct {
 	struct gnutls_privkey_st *selected_key;
 	bool selected_need_free;
 
-	/* holds the extensions we sent to the peer
-	 * (in case of a client)
+	/* In case of a client holds the extensions we sent to the peer;
+	 * otherwise the extensions we received from the client.
 	 */
 	uint16_t extensions_sent[MAX_EXT_TYPES];
 	uint16_t extensions_sent_size;
