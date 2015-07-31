@@ -3,6 +3,15 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.17 (unreleased)
+
+** libgnutls: Fix issue with server side sending the status request
+   extension even when not requested. Reported by Jeremy Harris.
+
+** API and ABI modifications:
+   No changes since last version.
+
+
 * Version 3.3.16 (released 2015-07-12)
 
 ** libgnutls: Allow compilation with nettle 3.0 or later
