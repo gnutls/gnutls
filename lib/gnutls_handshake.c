@@ -927,13 +927,13 @@ _gnutls_server_select_suite(gnutls_session_t session, uint8_t * data,
 		/* TLS_FALLBACK_SCSV */
 		if (data[i] == GNUTLS_FALLBACK_SCSV_MAJOR &&
 		    data[i + 1] == GNUTLS_FALLBACK_SCSV_MINOR) {
+			unsigned max = _gnutls_version_max(session);
 			_gnutls_handshake_log
 			    ("HSK[%p]: Received fallback CS\n",
 			     session);
 
-			if (gnutls_protocol_get_version(session) !=
-			    GNUTLS_TLS_VERSION_MAX)
-				return GNUTLS_E_INAPPROPRIATE_FALLBACK;
+			if (gnutls_protocol_get_version(session) != max)
+				return gnutls_assert_val(GNUTLS_E_INAPPROPRIATE_FALLBACK);
 		}
 	}
 
