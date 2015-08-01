@@ -6,6 +6,10 @@ Adam Sampson <ats||offog.org>
 	16 Jul 2013 (received by personal mail by nmav)
 	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/6857
 
+Alessandro Ghedini <alessandro||ghedini.me>
+	1 Aug 2015
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/8266	
+
 Frank Morgner <morgner||informatik.hu-berlin.de>
 	30 Aug 2013
 	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/6960
