@@ -83,7 +83,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module getline:
   # Code from module getline-tests:
   # Code from module getpagesize:
-  # Code from module gettext:
   # Code from module gettext-h:
   # Code from module gettimeofday:
   # Code from module gettimeofday-tests:
@@ -248,8 +247,6 @@ AC_SUBST([LTALLOCA])
     gl_PREREQ_GETLINE
   fi
   gl_STDIO_MODULE_INDICATOR([getline])
-  dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
-  AM_GNU_GETTEXT_VERSION([0.18.1])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
   gl_FUNC_GETTIMEOFDAY
@@ -657,7 +654,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/alloca.m4
   m4/base64.m4
   m4/byteswap.m4
-  m4/codeset.m4
   m4/errno_h.m4
   m4/exponentd.m4
   m4/extensions.m4
@@ -675,30 +671,20 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getdelim.m4
   m4/getline.m4
   m4/getpagesize.m4
-  m4/gettext.m4
   m4/gettimeofday.m4
-  m4/glibc2.m4
-  m4/glibc21.m4
   m4/gnulib-common.m4
   m4/iconv.m4
   m4/include_next.m4
-  m4/intdiv0.m4
-  m4/intl.m4
-  m4/intldir.m4
-  m4/intlmacosx.m4
-  m4/intmax.m4
   m4/intmax_t.m4
   m4/inttypes-pri.m4
   m4/inttypes.m4
   m4/inttypes_h.m4
   m4/largefile.m4
-  m4/lcmessage.m4
   m4/ld-output-def.m4
   m4/ld-version-script.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
-  m4/lock.m4
   m4/longlong.m4
   m4/lseek.m4
   m4/malloc.m4
@@ -713,12 +699,8 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/multiarch.m4
   m4/netdb_h.m4
   m4/netinet_in_h.m4
-  m4/nls.m4
   m4/off_t.m4
-  m4/po.m4
-  m4/printf-posix.m4
   m4/printf.m4
-  m4/progtest.m4
   m4/read-file.m4
   m4/realloc.m4
   m4/size_max.m4
@@ -745,16 +727,13 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sys_time_h.m4
   m4/sys_types_h.m4
   m4/sys_uio_h.m4
-  m4/threadlib.m4
   m4/time_h.m4
   m4/time_r.m4
-  m4/uintmax_t.m4
   m4/ungetc.m4
   m4/unistd_h.m4
   m4/valgrind-tests.m4
   m4/vasnprintf.m4
   m4/vasprintf.m4
-  m4/visibility.m4
   m4/vsnprintf.m4
   m4/warn-on-use.m4
   m4/warnings.m4
