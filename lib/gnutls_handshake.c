@@ -1841,7 +1841,7 @@ read_server_hello(gnutls_session_t session,
 	return ret;
 }
 
-
+#define RESERVED_CIPHERSUITES 4
 /* This function copies the appropriate ciphersuites to a locally allocated buffer
  * Needed in client hello messages. Returns the new data length. If add_scsv is
  * true, add the special safe renegotiation CS.
@@ -1851,13 +1851,13 @@ copy_ciphersuites(gnutls_session_t session,
 		  gnutls_buffer_st * cdata, int add_scsv)
 {
 	int ret;
-	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE + 4]; /* allow space for SCSV */
+	uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE + RESERVED_CIPHERSUITES]; /* allow space for SCSV */
 	int cipher_suites_size;
 	size_t init_length = cdata->length;
 
 	ret =
 	    _gnutls_supported_ciphersuites(session, cipher_suites,
-					   sizeof(cipher_suites) - 2);
+					   sizeof(cipher_suites) - RESERVED_CIPHERSUITES);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
