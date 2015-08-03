@@ -18,6 +18,10 @@ See the end for copying conditions.
 ** libgnutls: Added support for RFC7507 by introducing the %FALLBACK_SCSV
    priority string option. Patch by Alessandro Ghedini.
 
+** libgnutls: gnutls_pkcs11_privkey_generate2() will store the generated
+   public key, unless the GNUTLS_PKCS11_OBJ_FLAG_NO_STORE_PUBKEY flag is
+   specified.
+
 ** libgnutls: Allow the parsing of very long CNs.
 
 ** API and ABI modifications:
