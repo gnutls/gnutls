@@ -8,6 +8,10 @@ See the end for copying conditions.
 ** libgnutls: Fix issue with server side sending the status request
    extension even when not requested. Reported by Jeremy Harris.
 
+** libgnutls: gnutls_pkcs11_privkey_generate2() will store the generated
+   public key, unless the GNUTLS_PKCS11_OBJ_FLAG_NO_STORE_PUBKEY flag is
+   specified.
+
 ** API and ABI modifications:
    No changes since last version.
 
