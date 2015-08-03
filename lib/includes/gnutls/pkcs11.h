@@ -114,7 +114,7 @@ void gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
  * @GNUTLS_PKCS11_OBJ_FLAG_CRT: When searching, restrict to certificates only (seek).
  * @GNUTLS_PKCS11_OBJ_FLAG_PUBKEY: When searching, restrict to public key objects only (seek).
  * @GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY: When searching, restrict to private key objects only (seek).
- * @GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY: When searching, restrict to objects which have a corresponding private key (seek).
+ * @GNUTLS_PKCS11_OBJ_FLAG_NO_STORE_PUBKEY: When generating a keypair don't store the public key (store).
  *
  * Enumeration of different PKCS #11 object flags. Some flags are used
  * to mark objects when storing, while others are also used while seeking
@@ -142,6 +142,7 @@ typedef enum gnutls_pkcs11_obj_flags {
 	GNUTLS_PKCS11_OBJ_FLAG_CRT = (1<<18),
 	GNUTLS_PKCS11_OBJ_FLAG_WITH_PRIVKEY = (1<<19),
 	GNUTLS_PKCS11_OBJ_FLAG_PUBKEY = (1<<20),
+	GNUTLS_PKCS11_OBJ_FLAG_NO_STORE_PUBKEY = GNUTLS_PKCS11_OBJ_FLAG_PUBKEY,
 	GNUTLS_PKCS11_OBJ_FLAG_PRIVKEY = (1<<21),
 	/* flags 1<<29 and later are reserved - see pkcs11_int.h */
 } gnutls_pkcs11_obj_flags;

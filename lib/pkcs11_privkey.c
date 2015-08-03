@@ -697,7 +697,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 	struct pkcs11_session_info sinfo;
 	struct p11_kit_uri *info = NULL;
 	ck_rv_t rv;
-	struct ck_attribute a[20], p[20];
+	struct ck_attribute a[22], p[22];
 	ck_object_handle_t pub, priv;
 	unsigned long _bits = bits;
 	int a_val, p_val;
@@ -737,6 +737,13 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 	mech.parameter = NULL;
 	mech.parameter_len = 0;
 	mech.mechanism = pk_to_genmech(pk, &key_type);
+
+	if (!(flags & GNUTLS_PKCS11_OBJ_FLAG_NO_STORE_PUBKEY)) {
+		a[a_val].type = CKA_TOKEN;
+		a[a_val].value = (void *) &tval;
+		a[a_val].value_len = sizeof(tval);
+		a_val++;
+	}
 
 	a[a_val].type = CKA_ID;
 	if (cid == NULL || cid->size == 0) {
