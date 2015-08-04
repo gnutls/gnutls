@@ -554,8 +554,10 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 		    gnutls_x509_privkey_import_pkcs8(key, data, format,
 						     NULL,
 						     GNUTLS_PKCS_PLAIN);
-		if (result < 0)
+		if (result < 0) {
 			gnutls_assert();
+			key->key = NULL;
+		}
 	} else if (key->pk_algorithm == GNUTLS_PK_RSA) {
 		key->key =
 		    _gnutls_privkey_decode_pkcs1_rsa_key(&_data, key);
