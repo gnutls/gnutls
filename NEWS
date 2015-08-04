@@ -22,6 +22,9 @@ See the end for copying conditions.
    public key, unless the GNUTLS_PKCS11_OBJ_FLAG_NO_STORE_PUBKEY flag is
    specified.
 
+** libgnutls: Corrected regression from 3.4.3 in loading PKCS #8 keys as
+   fallback. Reported by Daniel Berrange.
+
 ** libgnutls: Allow the parsing of very long CNs.
 
 ** API and ABI modifications:
