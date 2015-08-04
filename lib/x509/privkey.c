@@ -528,8 +528,8 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 					    _gnutls_fbase64_decode(PEM_KEY_PKCS8, begin_ptr,
 							   	   left, &_data);
 					if (result >= 0) {
-						need_free = 1;
-						result = GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR;
+						/* signal for PKCS #8 keys */
+						key->pk_algorithm = -1;
 					}
 				}
 			}
@@ -538,7 +538,7 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 
 		if (result < 0) {
 			gnutls_assert();
-			goto failover;
+			return result;
 		}
 
 		need_free = 1;
@@ -549,7 +549,14 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 	}
 	key->expanded = 1;
 
-	if (key->pk_algorithm == GNUTLS_PK_RSA) {
+	if (key->pk_algorithm == (gnutls_pk_algorithm_t)-1) {
+		result =
+		    gnutls_x509_privkey_import_pkcs8(key, data, format,
+						     NULL,
+						     GNUTLS_PKCS_PLAIN);
+		if (result < 0)
+			gnutls_assert();
+	} else if (key->pk_algorithm == GNUTLS_PK_RSA) {
 		key->key =
 		    _gnutls_privkey_decode_pkcs1_rsa_key(&_data, key);
 		if (key->key == NULL)
@@ -562,10 +569,10 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 		result = _gnutls_privkey_decode_ecc_key(&key->key, &_data, key, 0);
 		if (result < 0) {
 			gnutls_assert();
-			goto failover;
+			key->key = NULL;
 		}
 	} else {
-		/* Try decoding with both, and accept the one that
+		/* Try decoding each of the keys, and accept the one that
 		 * succeeds.
 		 */
 		key->pk_algorithm = GNUTLS_PK_RSA;
@@ -580,9 +587,16 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 				result =
 				    _gnutls_privkey_decode_ecc_key(&key->key, &_data, key, 0);
 				if (result < 0) {
-					gnutls_assert();
-					goto failover;
+					result =
+					    gnutls_x509_privkey_import_pkcs8(key, data, format,
+									     NULL,
+									     GNUTLS_PKCS_PLAIN);
+					if (result < 0) {
+						gnutls_assert();
+						key->key = NULL;
+					}
 				}
+
 			}
 		}
 	}
@@ -590,7 +604,8 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 	if (key->key == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_ASN1_DER_ERROR;
-		goto failover;
+	} else {
+		result = 0;
 	}
 
 	if (need_free)
@@ -598,22 +613,6 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 
 	/* The key has now been decoded.
 	 */
-
-	return 0;
-
-      failover:
-	/* Try PKCS #8 */
-	if (result == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR) {
-		_gnutls_debug_log
-		    ("Falling back to PKCS #8 key decoding\n");
-		result =
-		    gnutls_x509_privkey_import_pkcs8(key, data, format,
-						     NULL,
-						     GNUTLS_PKCS_PLAIN);
-	}
-
-	if (need_free)
-		_gnutls_free_datum(&_data);
 
 	return result;
 }
