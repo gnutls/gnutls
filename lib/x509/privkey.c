@@ -431,6 +431,7 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 #define PEM_KEY_DSA "DSA PRIVATE KEY"
 #define PEM_KEY_RSA "RSA PRIVATE KEY"
 #define PEM_KEY_ECC "EC PRIVATE KEY"
+#define PEM_KEY_PKCS8 "PRIVATE KEY"
 
 /**
  * gnutls_x509_privkey_import:
@@ -520,6 +521,19 @@ gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
 						key->pk_algorithm = GNUTLS_PK_DSA;
 				}
 			}
+
+			if (key->pk_algorithm == GNUTLS_PK_UNKNOWN && ptr != NULL && left >= sizeof(PEM_KEY_PKCS8)) {
+				if (memcmp(ptr, PEM_KEY_PKCS8, sizeof(PEM_KEY_PKCS8)-1) == 0) {
+					result =
+					    _gnutls_fbase64_decode(PEM_KEY_PKCS8, begin_ptr,
+							   	   left, &_data);
+					if (result >= 0) {
+						need_free = 1;
+						result = GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR;
+					}
+				}
+			}
+
 		}
 
 		if (result < 0) {
