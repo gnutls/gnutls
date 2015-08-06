@@ -312,6 +312,8 @@ pkcs11_test_sign(FILE * outfile, const char *url, unsigned int flags,
 	if (ret < 0) {
 		fprintf(stderr, "Cannot find a corresponding public key object in token: %s\n",
 			gnutls_strerror(ret));
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			exit(0);
 		exit(1);
 	}
 
