@@ -73,6 +73,14 @@ extern "C" {
 # define _SYM_EXPORT
 #endif
 
+#ifdef __GNUC__
+# define __GNUTLS_CONST__  __attribute__((const))
+# define __GNUTLS_PURE__  __attribute__((pure))
+#else
+# define __GNUTLS_CONST__
+# define __GNUTLS_PURE__
+#endif
+
 /**
  * gnutls_cipher_algorithm_t:
  * @GNUTLS_CIPHER_UNKNOWN: Unknown algorithm.
@@ -832,13 +840,16 @@ const char *gnutls_sec_param_get_name(gnutls_sec_param_t param);
 unsigned int gnutls_sec_param_to_pk_bits(gnutls_pk_algorithm_t algo,
 					 gnutls_sec_param_t param);
 unsigned int
-gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param);
+	gnutls_sec_param_to_symmetric_bits(gnutls_sec_param_t param) __GNUTLS_CONST__;
 
 /* Elliptic curves */
-const char *gnutls_ecc_curve_get_name(gnutls_ecc_curve_t curve);
-const char *gnutls_ecc_curve_get_oid(gnutls_ecc_curve_t curve);
+const char *
+	gnutls_ecc_curve_get_name(gnutls_ecc_curve_t curve) __GNUTLS_CONST__;
+const char *
+	gnutls_ecc_curve_get_oid(gnutls_ecc_curve_t curve) __GNUTLS_CONST__;
 
-int gnutls_ecc_curve_get_size(gnutls_ecc_curve_t curve);
+int
+	gnutls_ecc_curve_get_size(gnutls_ecc_curve_t curve) __GNUTLS_CONST__;
 gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
 /* get information on the current session */
@@ -858,79 +869,116 @@ int gnutls_sign_algorithm_get_requested(gnutls_session_t session,
 					gnutls_sign_algorithm_t * algo);
 
 /* the name of the specified algorithms */
-const char *gnutls_cipher_get_name(gnutls_cipher_algorithm_t algorithm);
-const char *gnutls_mac_get_name(gnutls_mac_algorithm_t algorithm);
+const char *
+	gnutls_cipher_get_name(gnutls_cipher_algorithm_t algorithm) __GNUTLS_CONST__;
+const char *
+	gnutls_mac_get_name(gnutls_mac_algorithm_t algorithm) __GNUTLS_CONST__;
 
-const char *gnutls_digest_get_name(gnutls_digest_algorithm_t algorithm);
-const char *gnutls_digest_get_oid(gnutls_digest_algorithm_t algorithm);
+const char *
+	gnutls_digest_get_name(gnutls_digest_algorithm_t algorithm) __GNUTLS_CONST__;
+const char *
+	gnutls_digest_get_oid(gnutls_digest_algorithm_t algorithm) __GNUTLS_CONST__;
 
-const char *gnutls_compression_get_name(gnutls_compression_method_t
-					algorithm);
-const char *gnutls_kx_get_name(gnutls_kx_algorithm_t algorithm);
-const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t
-					     type);
-const char *gnutls_pk_get_name(gnutls_pk_algorithm_t algorithm);
-const char *gnutls_pk_get_oid(gnutls_pk_algorithm_t algorithm);
+const char *
+gnutls_compression_get_name(gnutls_compression_method_t
+			    algorithm) __GNUTLS_CONST__;
+const char *
+	gnutls_kx_get_name(gnutls_kx_algorithm_t algorithm) __GNUTLS_CONST__;
+const char *
+	gnutls_certificate_type_get_name(gnutls_certificate_type_t
+					     type) __GNUTLS_CONST__;
+const char *
+	gnutls_pk_get_name(gnutls_pk_algorithm_t algorithm) __GNUTLS_CONST__;
+const char *
+	gnutls_pk_get_oid(gnutls_pk_algorithm_t algorithm) __GNUTLS_CONST__;
 
-const char *gnutls_sign_get_name(gnutls_sign_algorithm_t algorithm);
-const char *gnutls_sign_get_oid(gnutls_sign_algorithm_t algorithm);
+const char *
+	gnutls_sign_get_name(gnutls_sign_algorithm_t algorithm) __GNUTLS_CONST__;
+const char *
+	gnutls_sign_get_oid(gnutls_sign_algorithm_t algorithm) __GNUTLS_CONST__;
 
-size_t gnutls_cipher_get_key_size(gnutls_cipher_algorithm_t algorithm);
-size_t gnutls_mac_get_key_size(gnutls_mac_algorithm_t algorithm);
+size_t
+	gnutls_cipher_get_key_size(gnutls_cipher_algorithm_t algorithm) __GNUTLS_CONST__;
+size_t
+	gnutls_mac_get_key_size(gnutls_mac_algorithm_t algorithm) __GNUTLS_CONST__;
 
-int gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm);
+int gnutls_sign_is_secure(gnutls_sign_algorithm_t algorithm) __GNUTLS_CONST__;
+
 gnutls_digest_algorithm_t
-gnutls_sign_get_hash_algorithm(gnutls_sign_algorithm_t sign);
+	gnutls_sign_get_hash_algorithm(gnutls_sign_algorithm_t sign) __GNUTLS_CONST__;
 gnutls_pk_algorithm_t
-gnutls_sign_get_pk_algorithm(gnutls_sign_algorithm_t sign);
+	gnutls_sign_get_pk_algorithm(gnutls_sign_algorithm_t sign) __GNUTLS_CONST__;
 gnutls_sign_algorithm_t
-gnutls_pk_to_sign(gnutls_pk_algorithm_t pk,
-		  gnutls_digest_algorithm_t hash);
+	gnutls_pk_to_sign(gnutls_pk_algorithm_t pk,
+		  gnutls_digest_algorithm_t hash) __GNUTLS_CONST__;
 
 #define gnutls_sign_algorithm_get_name gnutls_sign_get_name
 
-gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name);
-gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name);
+gnutls_mac_algorithm_t gnutls_mac_get_id(const char *name) __GNUTLS_CONST__;
+gnutls_digest_algorithm_t gnutls_digest_get_id(const char *name) __GNUTLS_CONST__;
 
-gnutls_compression_method_t gnutls_compression_get_id(const char *name);
-gnutls_cipher_algorithm_t gnutls_cipher_get_id(const char *name);
-gnutls_kx_algorithm_t gnutls_kx_get_id(const char *name);
-gnutls_protocol_t gnutls_protocol_get_id(const char *name);
-gnutls_certificate_type_t gnutls_certificate_type_get_id(const char *name);
-gnutls_pk_algorithm_t gnutls_pk_get_id(const char *name);
-gnutls_sign_algorithm_t gnutls_sign_get_id(const char *name);
-gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name);
+gnutls_compression_method_t
+	gnutls_compression_get_id(const char *name) __GNUTLS_CONST__;
+gnutls_cipher_algorithm_t
+	gnutls_cipher_get_id(const char *name) __GNUTLS_CONST__;
 
-gnutls_digest_algorithm_t gnutls_oid_to_digest(const char *oid);
-gnutls_pk_algorithm_t gnutls_oid_to_pk(const char *oid);
-gnutls_sign_algorithm_t gnutls_oid_to_sign(const char *oid);
-gnutls_ecc_curve_t gnutls_oid_to_ecc_curve(const char *oid);
+gnutls_kx_algorithm_t
+	gnutls_kx_get_id(const char *name) __GNUTLS_CONST__;
+gnutls_protocol_t
+	gnutls_protocol_get_id(const char *name) __GNUTLS_CONST__;
+gnutls_certificate_type_t
+	gnutls_certificate_type_get_id(const char *name) __GNUTLS_CONST__;
+gnutls_pk_algorithm_t
+	gnutls_pk_get_id(const char *name) __GNUTLS_CONST__;
+gnutls_sign_algorithm_t
+	gnutls_sign_get_id(const char *name) __GNUTLS_CONST__;
+gnutls_ecc_curve_t gnutls_ecc_curve_get_id(const char *name)  __GNUTLS_CONST__;
+
+gnutls_digest_algorithm_t
+	gnutls_oid_to_digest(const char *oid)  __GNUTLS_CONST__;
+gnutls_pk_algorithm_t
+	gnutls_oid_to_pk(const char *oid) __GNUTLS_CONST__;
+gnutls_sign_algorithm_t
+	gnutls_oid_to_sign(const char *oid) __GNUTLS_CONST__;
+gnutls_ecc_curve_t
+	gnutls_oid_to_ecc_curve(const char *oid) __GNUTLS_CONST__;
 
   /* list supported algorithms */
-const gnutls_ecc_curve_t *gnutls_ecc_curve_list(void);
-const gnutls_cipher_algorithm_t *gnutls_cipher_list(void);
-const gnutls_mac_algorithm_t *gnutls_mac_list(void);
-const gnutls_digest_algorithm_t *gnutls_digest_list(void);
-const gnutls_compression_method_t *gnutls_compression_list(void);
-const gnutls_protocol_t *gnutls_protocol_list(void);
-const gnutls_certificate_type_t *gnutls_certificate_type_list(void);
-const gnutls_kx_algorithm_t *gnutls_kx_list(void);
-const gnutls_pk_algorithm_t *gnutls_pk_list(void);
-const gnutls_sign_algorithm_t *gnutls_sign_list(void);
-const char *gnutls_cipher_suite_info(size_t idx,
-				     unsigned char *cs_id,
-				     gnutls_kx_algorithm_t * kx,
-				     gnutls_cipher_algorithm_t * cipher,
-				     gnutls_mac_algorithm_t * mac,
-				     gnutls_protocol_t * min_version);
+const gnutls_ecc_curve_t *
+	gnutls_ecc_curve_list(void)  __GNUTLS_PURE__;
+const gnutls_cipher_algorithm_t *
+	gnutls_cipher_list(void) __GNUTLS_PURE__;
+const gnutls_mac_algorithm_t *
+	gnutls_mac_list(void) __GNUTLS_PURE__;
+const gnutls_digest_algorithm_t *
+	gnutls_digest_list(void) __GNUTLS_PURE__;
+const gnutls_compression_method_t *
+	gnutls_compression_list(void) __GNUTLS_PURE__;
+const gnutls_protocol_t *
+	gnutls_protocol_list(void) __GNUTLS_PURE__;
+const gnutls_certificate_type_t *
+	gnutls_certificate_type_list(void) __GNUTLS_PURE__;
+const gnutls_kx_algorithm_t *
+	gnutls_kx_list(void) __GNUTLS_PURE__;
+const gnutls_pk_algorithm_t *
+	gnutls_pk_list(void) __GNUTLS_PURE__;
+const gnutls_sign_algorithm_t *
+	gnutls_sign_list(void) __GNUTLS_PURE__;
+const char *
+	gnutls_cipher_suite_info(size_t idx,
+			         unsigned char *cs_id,
+				 gnutls_kx_algorithm_t * kx,
+				 gnutls_cipher_algorithm_t * cipher,
+				 gnutls_mac_algorithm_t * mac,
+				 gnutls_protocol_t * min_version);
 
   /* error functions */
-int gnutls_error_is_fatal(int error);
+int gnutls_error_is_fatal(int error) __GNUTLS_CONST__;
 int gnutls_error_to_alert(int err, int *level);
 
 void gnutls_perror(int error);
-const char *gnutls_strerror(int error);
-const char *gnutls_strerror_name(int error);
+const char * gnutls_strerror(int error) __GNUTLS_CONST__;
+const char * gnutls_strerror_name(int error) __GNUTLS_CONST__;
 
 /* Semi-internal functions.
  */
@@ -1006,11 +1054,12 @@ ssize_t gnutls_record_recv_seq(gnutls_session_t session, void *data,
 
 size_t gnutls_record_overhead_size(gnutls_session_t session);
 
-size_t gnutls_est_record_overhead_size(gnutls_protocol_t version,
-				       gnutls_cipher_algorithm_t cipher,
-				       gnutls_mac_algorithm_t mac,
-				       gnutls_compression_method_t comp,
-				       unsigned int flags);
+size_t
+	gnutls_est_record_overhead_size(gnutls_protocol_t version,
+				        gnutls_cipher_algorithm_t cipher,
+				        gnutls_mac_algorithm_t mac,
+				        gnutls_compression_method_t comp,
+				        unsigned int flags) __GNUTLS_CONST__;
 
 void gnutls_session_enable_compatibility_mode(gnutls_session_t session);
 #define gnutls_record_set_max_empty_records(session, x)
@@ -1193,17 +1242,16 @@ int gnutls_priority_mac_list(gnutls_priority_t pcache,
 int gnutls_set_default_priority(gnutls_session_t session);
 
 /* Returns the name of a cipher suite */
-const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm_t
-					 kx_algorithm,
-					 gnutls_cipher_algorithm_t
-					 cipher_algorithm,
-					 gnutls_mac_algorithm_t
-					 mac_algorithm);
+const char *
+	gnutls_cipher_suite_get_name(gnutls_kx_algorithm_t kx_algorithm,
+				     gnutls_cipher_algorithm_t cipher_algorithm,
+				     gnutls_mac_algorithm_t mac_algorithm) __GNUTLS_CONST__;
 
 /* get the currently used protocol version */
 gnutls_protocol_t gnutls_protocol_get_version(gnutls_session_t session);
 
-const char *gnutls_protocol_get_name(gnutls_protocol_t version);
+const char *
+	gnutls_protocol_get_name(gnutls_protocol_t version) __GNUTLS_CONST__;
 
 
 /* get/set session 
@@ -1307,7 +1355,7 @@ void gnutls_handshake_set_max_packet_length(gnutls_session_t session,
 
 /* returns libgnutls version (call it with a NULL argument)
  */
-const char *gnutls_check_version(const char *req_version);
+const char * gnutls_check_version(const char *req_version) __GNUTLS_CONST__;
 
 /* Functions for setting/clearing credentials
  */
