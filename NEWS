@@ -7,6 +7,7 @@ See the end for copying conditions.
 
 
 ** API and ABI modifications:
+gnutls_check_version_numeric: Added
 
 
 * Version 3.4.3 (released 2015-07-12)
