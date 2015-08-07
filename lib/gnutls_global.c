@@ -433,9 +433,11 @@ void gnutls_global_deinit(void)
  * gnutls_check_version:
  * @req_version: version string to compare with, or %NULL.
  *
- * Check GnuTLS Library version.
- *
+ * Check the GnuTLS Library version against the provided string.
  * See %GNUTLS_VERSION for a suitable @req_version string.
+ *
+ * See also gnutls_check_version_numeric(), which provides this
+ * functionality as a macro.
  *
  * Returns: Check that the version of the library is at
  *   minimum the one given as a string in @req_version and return the
