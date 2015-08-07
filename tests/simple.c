@@ -25,8 +25,23 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "utils.h"
+
+#define CHECK_OK(x,y,z) \
+	if (x >= 0 && y >= 0 && z >= 0) { \
+	if (!gnutls_check_version_numeric(x, y, z)) { \
+		fail("error in gnutls_check_version_numeric %d.%d.%d: %d\n", x, y, z, __LINE__); \
+		exit(1); \
+	} \
+	}
+
+#define CHECK_FAIL(x,y,z) \
+	if (gnutls_check_version_numeric(x, y, z)) { \
+		fail("error in neg gnutls_check_version_numeric %d.%d.%d: %d\n", x, y, z, __LINE__); \
+		exit(1); \
+	}
 
 void doit(void)
 {
@@ -35,6 +50,19 @@ void doit(void)
 		printf("GnuTLS library version %s.\n",
 		       gnutls_check_version(NULL));
 	}
+
+	if (!gnutls_check_version_numeric(GNUTLS_VERSION_MAJOR, GNUTLS_VERSION_MINOR, GNUTLS_VERSION_PATCH)) {
+		fail("error in gnutls_check_version_numeric 1\n");
+		exit(1);
+	}
+
+	CHECK_FAIL(99, 9, 9)
+	CHECK_FAIL(90, 1, 0)
+	CHECK_FAIL(90, 0, 0)
+
+	CHECK_OK(2, 0, 0)
+	CHECK_OK(2, 99, 99)
+	CHECK_OK(3, 0, 0)
 
 	if (!gnutls_check_version(GNUTLS_VERSION))
 		fail("gnutls_check_version ERROR\n");
