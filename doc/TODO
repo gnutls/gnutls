@@ -3,10 +3,6 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-* Add a check version macro that allows the compiler to optimize it out
-  when compiling with new gnutls versions. E.g.,
-  #define gnutls_check_version(x) ( x >= BUILD_TIME_GNUTLS_VERSION ||
-    gnutls_runtime_check_version(x) )
 * Add API to allow multiplexing multiple streams under DTLS. The streams
   should be identified by the application using the raw packet, via a
   callback.
@@ -42,7 +38,6 @@ Current list:
 - Clean up name space of helper functions in library (memmem,
    firstElement, bit_mask, ...) for platforms that libtool's
    -export-symbols-regex doesn't work.
-- Add Kerberos ciphersuites
 - Update the current test suite, using the newest NIST's PKI Test vectors,
   see http://csrc.nist.gov/pki/testing/x509paths.html
 - Make gnutls-cli-debug exit with better error messages if the
