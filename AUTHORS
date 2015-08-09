@@ -47,6 +47,9 @@ DTLS 0.9 implementation.
 Martin Storjo *martin [at] martin.st*
 DTLS-SRTP support.
 
+Alessandro Ghedini *alessandro [at] ghedini.me*
+TLS Fallback SCSV support (RFC7507).
+
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
