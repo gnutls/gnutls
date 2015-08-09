@@ -38,24 +38,23 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 dist_check_SCRIPTS = pathlen aki pem-decoding certtool invalid-sig email \
 	pkcs7 privkey-import name-constraints certtool-long-cn
 
-TESTS = $(dist_check_SCRIPTS)
-
 if !HAVE_BUGGY_LIBIDN
-TESTS += certtool-utf8
+dist_check_SCRIPTS += certtool-utf8
 endif
 
-
 if ENABLE_NON_SUITEB_CURVES
-TESTS += crq
+dist_check_SCRIPTS += crq
 endif
 
 if !WINDOWS
-TESTS += template-test
+dist_check_SCRIPTS += template-test
 endif
 
 if ENABLE_DANE
-TESTS += dane
+dist_check_SCRIPTS += dane
 endif
+
+TESTS = $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"				\
