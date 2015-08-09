@@ -114,8 +114,6 @@ _process_data(gnutls_session_t client, Ecore_Fd_Handler * fd_handler)
 	static int ret, lastret;
 	static unsigned int count = 0;
 
-	gnutls_handshake_set_timeout(client, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
-
 	if (!done) {
 		lastret = ret;
 		ret = gnutls_handshake(client);
@@ -183,6 +181,9 @@ int main(void)
 
 		gnutls_init(&client, GNUTLS_CLIENT);
 		/* set very specific priorities */
+
+		gnutls_handshake_set_timeout(client, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
+
 		gnutls_priority_set_direct(client, "NORMAL:+ANON-DH",
 					   NULL);
 		gnutls_credentials_set(client, GNUTLS_CRD_ANON,
