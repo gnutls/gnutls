@@ -231,7 +231,7 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	ck_rv_t rv;
 	size_t id_size;
 	uint8_t id[20];
-	struct ck_attribute a[16];
+	struct ck_attribute a[32];
 	ck_object_class_t class = CKO_PRIVATE_KEY;
 	ck_object_handle_t obj;
 	ck_key_type_t type;
