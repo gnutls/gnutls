@@ -85,4 +85,9 @@ dist-hook:
 	cd $(distdir)/src/ && for i in *-args.c *-args.h;do \
 		mv $$i $$i.bak; \
 	done
+	@echo "*****************************************************************"
+	@echo "Checking whether included libopts matches the system's. If the"
+	@echo "check fails upgrade the included libopts."
+	@echo "*****************************************************************"
+	test "`autoopts-config libsrc|cut -d '-' -f 2|sed 's/.tar.gz//'`" = "`cat src/libopts/autoopts/options.h |grep OPTIONS_VERSION_STRING|cut -d '"' -f 2|sed 's/:/./g'`"
 	touch $(distdir)/doc/*.html $(distdir)/doc/*.pdf $(distdir)/doc/*.info
