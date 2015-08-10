@@ -57,9 +57,9 @@ AC_ARG_ENABLE(tools,
 AM_CONDITIONAL(ENABLE_TOOLS, test "$enable_tools" != "no")
 
 if test "$enable_tools" != "no" || test "$enable_doc" != "no"; then
-  AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [/bin/true])
+  AC_CHECK_PROG([AUTOGEN], [autogen], [autogen], [:])
 
-  if test x"$AUTOGEN" = "x/bin/true"; then
+  if test x"$AUTOGEN" = "x:"; then
     AC_MSG_WARN([[
 ***
 *** autogen not found. Will not link against libopts.
