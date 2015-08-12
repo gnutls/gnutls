@@ -358,11 +358,19 @@ load_x509_private_key(int mand, common_info_st * info)
 gnutls_x509_crt_t load_cert(int mand, common_info_st * info)
 {
 	gnutls_x509_crt_t *crt;
-	size_t size;
+	gnutls_x509_crt_t ret_crt;
+	size_t size, i;
 
 	crt = load_cert_list(mand, &size, info);
+	if (crt) {
+		ret_crt = crt[0];
+		for (i=1;i<size;i++)
+			gnutls_x509_crt_deinit(crt[i]);
+		gnutls_free(crt);
+		return ret_crt;
+	}
 
-	return crt ? crt[0] : NULL;
+	return NULL;
 }
 
 /* Loads a certificate list
