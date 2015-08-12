@@ -47,20 +47,34 @@
 #include <read-file.h>
 
 unsigned char *lbuffer = NULL;
-int lbuffer_size = 0;
+unsigned long lbuffer_size = 0;
 
-void fix_lbuffer(unsigned size)
+static unsigned long file_size(FILE *fp)
+{
+	unsigned long size;
+	unsigned long cur = ftell(fp);
+	fseek(fp, 0, SEEK_END);
+	size = ftell(fp);
+	fseek(fp, cur, SEEK_SET);
+	return size;
+}
+
+void fix_lbuffer(unsigned long size)
 {
 	if (lbuffer_size == 0 || lbuffer == NULL) {
 		if (size == 0)
 			lbuffer_size = 64*1024;
 		else
-			lbuffer_size = MAX(64*1024,size);
+			lbuffer_size = MAX(64*1024,size+1);
 		lbuffer = malloc(lbuffer_size);
-		if (lbuffer == NULL) {
-			fprintf(stderr, "memory error");
-			exit(1);
-		}
+	} else if (size > lbuffer_size) {
+		lbuffer_size = MAX(64*1024,size+1);
+		lbuffer = realloc(lbuffer, lbuffer_size);
+	}
+
+	if (lbuffer == NULL) {
+		fprintf(stderr, "memory error");
+		exit(1);
 	}
 }
 
@@ -351,22 +365,17 @@ gnutls_x509_crt_t load_cert(int mand, common_info_st * info)
 	return crt ? crt[0] : NULL;
 }
 
-#define MAX_CERTS 256
-
 /* Loads a certificate list
  */
 gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 				  common_info_st * info)
 {
 	FILE *fd;
-	static gnutls_x509_crt_t crt[MAX_CERTS];
-	char *ptr;
-	int ret, i;
+	static gnutls_x509_crt_t *crt;
+	int ret;
 	gnutls_datum_t dat;
-	size_t size;
-	int ptr_size;
-
-	fix_lbuffer(0);
+	unsigned size;
+	unsigned int crt_max;
 
 	*crt_size = 0;
 	if (info->verbose)
@@ -386,61 +395,27 @@ gnutls_x509_crt_t *load_cert_list(int mand, size_t * crt_size,
 		exit(1);
 	}
 
+	fix_lbuffer(file_size(fd));
+
 	size = fread(lbuffer, 1, lbuffer_size - 1, fd);
 	lbuffer[size] = 0;
 
 	fclose(fd);
 
-	ptr = (void *) lbuffer;
-	ptr_size = size;
+	dat.data = (void *) lbuffer;
+	dat.size = size;
 
-	for (i = 0; i < MAX_CERTS; i++) {
-		ret = gnutls_x509_crt_init(&crt[i]);
-		if (ret < 0) {
-			fprintf(stderr, "crt_init: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		dat.data = (void *) ptr;
-		dat.size = ptr_size;
-
-		ret =
-		    gnutls_x509_crt_import(crt[i], &dat,
-					   info->incert_format);
-		if (ret < 0) {
-			int ret2 = gnutls_x509_crt_import(crt[i], &dat,
-					   GNUTLS_X509_FMT_PEM);
-			if (ret2 >= 0)
-				ret = ret2;
-		}
-
-		if (ret < 0 && *crt_size > 0)
-			break;
-		if (ret < 0) {
-			fprintf(stderr, "crt_import: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		ptr = strstr(ptr, "---END");
-		if (ptr == NULL)
-			break;
-		ptr++;
-
-		ptr_size = size;
-		ptr_size -=
-		    (unsigned int) ((unsigned char *) ptr -
-				    (unsigned char *) lbuffer);
-
-		if (ptr_size < 0)
-			break;
-
-		(*crt_size)++;
+	ret = gnutls_x509_crt_list_import2(&crt, &crt_max, &dat, GNUTLS_X509_FMT_PEM, 0);
+	if (ret < 0) {
+		fprintf(stderr, "Error loading certificates: %s\n", gnutls_strerror(ret));
+		exit(1);
 	}
+
+	*crt_size = crt_max;
+
 	if (info->verbose)
 		fprintf(stderr, "Loaded %d certificates.\n",
-			(int) *crt_size);
+			(int) crt_max);
 
 	return crt;
 }
@@ -451,14 +426,11 @@ gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
 				  common_info_st * info)
 {
 	FILE *fd;
-	static gnutls_x509_crl_t crl[MAX_CERTS];
-	char *ptr;
-	int ret, i;
+	static gnutls_x509_crl_t *crl;
+	unsigned int crl_max;
+	int ret;
 	gnutls_datum_t dat;
 	size_t size;
-	int ptr_size;
-
-	fix_lbuffer(0);
 
 	*crl_size = 0;
 	if (info->verbose)
@@ -478,60 +450,26 @@ gnutls_x509_crl_t *load_crl_list(int mand, size_t * crl_size,
 		exit(1);
 	}
 
+	fix_lbuffer(file_size(fd));
+
 	size = fread(lbuffer, 1, lbuffer_size - 1, fd);
 	lbuffer[size] = 0;
 
 	fclose(fd);
 
-	ptr = (void *) lbuffer;
-	ptr_size = size;
+	dat.data = (void *) lbuffer;
+	dat.size = size;
 
-	for (i = 0; i < MAX_CERTS; i++) {
-		ret = gnutls_x509_crl_init(&crl[i]);
-		if (ret < 0) {
-			fprintf(stderr, "crl_init: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		dat.data = (void *) ptr;
-		dat.size = ptr_size;
-
-		ret =
-		    gnutls_x509_crl_import(crl[i], &dat,
-					   info->incert_format);
-		if (ret < 0) {
-			int ret2 = gnutls_x509_crl_import(crl[i], &dat,
-					   GNUTLS_X509_FMT_PEM);
-			if (ret2 >= 0)
-				ret = ret2;
-		}
-
-		if (ret < 0 && *crl_size > 0)
-			break;
-		if (ret < 0) {
-			fprintf(stderr, "crl_import: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		ptr = strstr(ptr, "---END");
-		if (ptr == NULL)
-			break;
-		ptr++;
-
-		ptr_size = size;
-		ptr_size -=
-		    (unsigned int) ((unsigned char *) ptr -
-				    (unsigned char *) lbuffer);
-
-		if (ptr_size < 0)
-			break;
-
-		(*crl_size)++;
+	ret = gnutls_x509_crl_list_import2(&crl, &crl_max, &dat, GNUTLS_X509_FMT_PEM, 0);
+	if (ret < 0) {
+		fprintf(stderr, "Error loading CRLs: %s\n", gnutls_strerror(ret));
+		exit(1);
 	}
+
+	*crl_size = crl_max;
+
 	if (info->verbose)
-		fprintf(stderr, "Loaded %d certificates.\n",
+		fprintf(stderr, "Loaded %d CRLs.\n",
 			(int) *crl_size);
 
 	return crl;
