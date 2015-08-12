@@ -3,6 +3,15 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.4.5 (unreleased)
+
+** certtool: Removed any arbitrary limits imposed on input file sizes
+   and maximum number of certificates imported.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.4.4 (released 2015-08-10)
 
 ** libgnutls: added high level API (gnutls_prf_rfc5705) to access
