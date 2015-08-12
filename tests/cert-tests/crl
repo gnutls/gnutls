@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Copyright (C) 2015 Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+#set -e
+
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+DIFF="${DIFF:-diff}"
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+fi
+OUTFILE=out-crl.tmp
+TMPFILE=tmp.tmpl
+
+echo "crl_next_update = 43" >$TMPFILE
+echo "crl_number = 7" >>$TMPFILE
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
+	"${srcdir}/template-test.pem" --load-certificate "${srcdir}/ca-certs.pem" --template \
+	"${TMPFILE}" >${OUTFILE} 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "CRL generation failed"
+	exit ${rc}
+fi
+
+grep "Revoked certificates (152)" "${OUTFILE}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL generation didn't succeed as expected"
+	exit 1
+fi
+
+rm -f "${OUTFILE}"
+rm -f "${TMPFILE}"
+
+exit 0
