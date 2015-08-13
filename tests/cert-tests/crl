@@ -27,6 +27,7 @@ if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
 fi
 OUTFILE=out-crl.tmp
+OUTFILE2=out2-crl.tmp
 TMPFILE=tmp.tmpl
 
 echo "crl_next_update = 43" >$TMPFILE
@@ -49,7 +50,33 @@ if test "$?" != "0"; then
 	exit 1
 fi
 
+# check appending a certificate
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
+	"${srcdir}/template-test.pem" --load-crl "${OUTFILE}" --load-certificate "${srcdir}/cert-ecc256.pem" --template \
+	"${TMPFILE}" -d 9 >${OUTFILE2} 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "CRL appending failed"
+	exit ${rc}
+fi
+
+grep "Revoked certificates (153)" "${OUTFILE2}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL appending didn't succeed as expected"
+	exit 1
+fi
+
+grep "Serial Number (hex): 07" "${OUTFILE2}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL appending didn't succeed as expected (2)"
+	exit 1
+fi
+
 rm -f "${OUTFILE}"
+rm -f "${OUTFILE2}"
 rm -f "${TMPFILE}"
 
 exit 0
