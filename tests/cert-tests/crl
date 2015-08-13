@@ -20,6 +20,8 @@
 
 #set -e
 
+export TZ="UTC"
+
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
@@ -72,6 +74,42 @@ fi
 grep "Serial Number (hex): 07" "${OUTFILE2}" >/dev/null 2>&1
 if test "$?" != "0"; then
 	echo "CRL appending didn't succeed as expected (2)"
+	exit 1
+fi
+
+# check the dates
+
+echo "crl_this_update_date = \"2004-03-29 16:21:42\"" >$TMPFILE
+echo "crl_next_update_date = \"2006-03-29 13:21:42\"" >>$TMPFILE
+echo "crl_number = 8" >>$TMPFILE
+echo "crl_revocation_date = \"2003-02-01 10:00:00\"" >>$TMPFILE
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/template-test.key"  --load-ca-certificate \
+	"${srcdir}/template-test.pem" --load-certificate "${srcdir}/cert-ecc256.pem" --template \
+	"${TMPFILE}" -d 9 >${OUTFILE2} 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "CRL date setting failed"
+	exit ${rc}
+fi
+
+grep "Revoked at: Sat Feb 01 10:00:00 UTC 2003" "${OUTFILE2}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL date setting didn't succeed as expected"
+	exit 1
+fi
+
+grep "Issued: Mon Mar 29 16:21:42 UTC 2004" "${OUTFILE2}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL date setting didn't succeed as expected (2)"
+	exit 1
+fi
+
+grep "Next at: Wed Mar 29 13:21:42 UTC 2006" "${OUTFILE2}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL date setting didn't succeed as expected (3)"
 	exit 1
 fi
 
