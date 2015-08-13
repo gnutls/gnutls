@@ -888,6 +888,14 @@ encryption_key
 # Comment the field for a time-based number.
 #crl_number = 5
 
+# Specify the update dates more precisely.
+#crl_this_update_date = "2004-02-29 16:21:42"
+#crl_next_update_date = "2025-02-29 16:24:41"
+
+# The date that the certificates will be made seen as
+# being revoked.
+#crl_revocation_date = "2025-02-29 16:24:41"
+
 @end example
 
 _EOT_;

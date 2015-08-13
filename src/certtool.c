@@ -643,7 +643,7 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 	size_t size, crl_size;
 	int result;
 	unsigned int i;
-	time_t secs, now = time(0);
+	time_t secs, this_update, exp;
 
 	crls = load_crl_list(0, &crl_size, cinfo);
 	if (crls != NULL) {
@@ -663,8 +663,10 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 
 	crts = load_cert_list(0, &size, cinfo);
 
+	exp = get_crl_revocation_date();
+
 	for (i = 0; i < size; i++) {
-		result = gnutls_x509_crl_set_crt(crl, crts[i], now);
+		result = gnutls_x509_crl_set_crt(crl, crts[i], exp);
 		if (result < 0) {
 			fprintf(stderr, "crl_set_crt: %s\n",
 				gnutls_strerror(result));
@@ -674,7 +676,9 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 	}
 	gnutls_free(crts);
 
-	result = gnutls_x509_crl_set_this_update(crl, now);
+	this_update = get_crl_this_update_date();
+
+	result = gnutls_x509_crl_set_this_update(crl, this_update);
 	if (result < 0) {
 		fprintf(stderr, "this_update: %s\n",
 			gnutls_strerror(result));

@@ -103,6 +103,9 @@ static struct cfg_options available_options[] = {
 	{ .name = "country", .type = OPTION_STRING },
 	{ .name = "expiration_date", .type = OPTION_STRING },
 	{ .name = "activation_date", .type = OPTION_STRING },
+	{ .name = "crl_revocation_date", .type = OPTION_STRING },
+	{ .name = "crl_this_update_date", .type = OPTION_STRING },
+	{ .name = "crl_next_update_date", .type = OPTION_STRING },
 	{ .name = "policy*", .type = OPTION_MULTI_LINE }, /* not a multi-line but there are multi as it is a wildcard */
 	{ .name = "pkcs12_key_name", .type = OPTION_STRING },
 	{ .name = "proxy_policy_language", .type = OPTION_STRING },
@@ -157,6 +160,9 @@ typedef struct _cfg_ctx {
 	char *pkcs12_key_name;
 	char *expiration_date;
 	char *activation_date;
+	char *revocation_date;
+	char *this_update_date;
+	char *next_update_date;
 	int64_t serial;
 	int expiration_days;
 	int ca;
@@ -375,6 +381,18 @@ int template_parse(const char *template)
 	val = optionGetValue(pov, "activation_date");
 	if (val != NULL && val->valType == OPARG_TYPE_STRING)
 		cfg.activation_date = strdup(val->v.strVal);
+
+	val = optionGetValue(pov, "crl_revocation_date");
+	if (val != NULL && val->valType == OPARG_TYPE_STRING)
+		cfg.revocation_date = strdup(val->v.strVal);
+
+	val = optionGetValue(pov, "crl_this_update_date");
+	if (val != NULL && val->valType == OPARG_TYPE_STRING)
+		cfg.this_update_date = strdup(val->v.strVal);
+
+	val = optionGetValue(pov, "crl_next_update_date");
+	if (val != NULL && val->valType == OPARG_TYPE_STRING)
+		cfg.next_update_date = strdup(val->v.strVal);
 
 	for (i = 0; i < MAX_POLICIES; i++) {
 		snprintf(tmpstr, sizeof(tmpstr), "policy%d", i + 1);
@@ -1197,6 +1215,26 @@ time_t get_activation_date(void)
 	return time(NULL);
 }
 
+time_t get_crl_revocation_date(void)
+{
+
+	if (batch && cfg.revocation_date != NULL) {
+       		return get_date(cfg.revocation_date);
+	}
+
+	return time(NULL);
+}
+
+time_t get_crl_this_update_date(void)
+{
+
+	if (batch && cfg.this_update_date != NULL) {
+       		return get_date(cfg.this_update_date);
+	}
+
+	return time(NULL);
+}
+
 static
 time_t days_to_secs(int days)
 {
@@ -1853,7 +1891,7 @@ int get_ipsec_ike_status(void)
 
 time_t get_crl_next_update(void)
 {
-	return get_int_date(NULL, cfg.crl_next_update, "The next CRL will be issued in (days): ");
+	return get_int_date(cfg.next_update_date, cfg.crl_next_update, "The next CRL will be issued in (days): ");
 }
 
 const char *get_proxy_policy(char **policy, size_t * policylen)
