@@ -639,15 +639,26 @@ generate_crl(gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 {
 	gnutls_x509_crl_t crl;
 	gnutls_x509_crt_t *crts;
-	size_t size;
+	gnutls_x509_crl_t *crls;
+	size_t size, crl_size;
 	int result;
 	unsigned int i;
 	time_t secs, now = time(0);
 
-	result = gnutls_x509_crl_init(&crl);
-	if (result < 0) {
-		fprintf(stderr, "crl_init: %s\n", gnutls_strerror(result));
-		exit(1);
+	crls = load_crl_list(0, &crl_size, cinfo);
+	if (crls != NULL) {
+		if (crl_size > 1) {
+			fprintf(stderr, "load_crl: too many CRLs present\n");
+			exit(1);
+		}
+		crl = crls[0];
+		gnutls_free(crls);
+	} else {
+		result = gnutls_x509_crl_init(&crl);
+		if (result < 0) {
+			fprintf(stderr, "crl_init: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
 	}
 
 	crts = load_cert_list(0, &size, cinfo);
