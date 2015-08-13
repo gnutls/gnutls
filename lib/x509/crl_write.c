@@ -347,9 +347,9 @@ gnutls_x509_crl_set_authority_key_id(gnutls_x509_crl_t crl,
 	    _gnutls_x509_crl_get_extension(crl, "2.5.29.35", 0, &old_id,
 					   &critical);
 
-	if (result >= 0)
+	if (result >= 0) {
 		_gnutls_free_datum(&old_id);
-	if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	} else if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -411,9 +411,9 @@ gnutls_x509_crl_set_number(gnutls_x509_crl_t crl,
 	    _gnutls_x509_crl_get_extension(crl, "2.5.29.20", 0, &old_id,
 					   &critical);
 
-	if (result >= 0)
+	if (result >= 0) {
 		_gnutls_free_datum(&old_id);
-	if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	} else if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
