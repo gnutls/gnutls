@@ -40,7 +40,7 @@ flag = {
 flag = {
     name      = generate-crl;
     descrip   = "Generate a CRL";
-    doc = "";
+    doc = "This option generates a CRL. When combined with --load-crl it would use the loaded CRL as base for the generated (i.e., all revoked certificates in the base will be copied to the new CRL).";
 };
 
 flag = {
