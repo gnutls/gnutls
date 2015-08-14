@@ -242,7 +242,7 @@ gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t *
  * certificate. (Eg a certificate with RSA params, supports
  * GNUTLS_KX_RSA algorithm).
  * This function also uses the KeyUsage field of the certificate
- * extensions in order to disable unneded algorithms.
+ * extensions in order to disable unneeded algorithms.
  */
 int
 _gnutls_selected_cert_supported_kx(gnutls_session_t session,
