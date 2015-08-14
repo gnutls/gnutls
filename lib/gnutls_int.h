@@ -662,6 +662,7 @@ struct gnutls_priority_st {
 	safe_renegotiation_t sr;
 	bool min_record_version;
 	bool server_precedence;
+	bool allow_key_usage_violation;
 	bool allow_wrong_pms;
 	bool no_tickets;
 	bool no_etm;
@@ -690,6 +691,7 @@ struct gnutls_priority_st {
               (x)->allow_large_records = 1; \
               (x)->no_etm = 1; \
               (x)->no_ext_master_secret = 1; \
+              (x)->allow_key_usage_violation = 1; \
               (x)->allow_wrong_pms = 1; \
               (x)->dumbfw = 1
 

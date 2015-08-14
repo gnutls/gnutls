@@ -157,6 +157,25 @@ _gnutls_handshake_sign_data(gnutls_session_t session,
 
 }
 
+static
+int check_key_usage_for_sig(gnutls_session_t session, unsigned key_usage)
+{
+	if (key_usage != 0) {
+		if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
+			gnutls_assert();
+			if (session->internals.priorities.allow_key_usage_violation == 0) {
+				_gnutls_audit_log(session,
+					  "Peer's certificate does not allow digital signatures. Key usage violation detected.\n");
+				return GNUTLS_E_KEY_USAGE_VIOLATION;
+			} else {
+				_gnutls_audit_log(session,
+					  "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
+			}
+		}
+	}
+	return 0;
+}
+
 /* This will create a PKCS1 or DSA signature, as defined in the TLS protocol.
  * Cert is the certificate of the corresponding private key. It is only checked if
  * it supports signing.
@@ -169,19 +188,16 @@ sign_tls_hash(gnutls_session_t session, const mac_entry_st * hash_algo,
 {
 	const version_entry_st *ver = get_version(session);
 	unsigned int key_usage = 0;
+	int ret;
 
 	/* If our certificate supports signing
 	 */
 	if (cert != NULL) {
 		gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-		if (key_usage != 0) {
-			if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
-				gnutls_assert();
-				_gnutls_audit_log(session,
-						  "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
-			}
-		}
+		ret = check_key_usage_for_sig(session, key_usage);
+		if (ret < 0)
+			return gnutls_assert_val(ret);
 	}
 
 	if (!_gnutls_version_has_selectable_sighash(ver))
@@ -212,14 +228,9 @@ verify_tls_hash(gnutls_session_t session,
 
 	gnutls_pubkey_get_key_usage(cert->pubkey, &key_usage);
 
-	/* If the certificate supports signing continue.
-	 */
-	if (key_usage != 0)
-		if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)) {
-			gnutls_assert();
-			_gnutls_audit_log(session,
-					  "Peer's certificate does not allow digital signatures. Key usage violation detected (ignored).\n");
-		}
+	ret = check_key_usage_for_sig(session, key_usage);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	if (pk_algo == GNUTLS_PK_UNKNOWN)
 		pk_algo =
