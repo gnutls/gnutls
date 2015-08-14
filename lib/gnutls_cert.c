@@ -267,7 +267,8 @@ _gnutls_selected_cert_supported_kx(gnutls_session_t session,
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert_pk) {
 			/* then check key usage */
-			if (_gnutls_check_key_usage(cert, kx) == 0) {
+			if (_gnutls_check_key_usage(cert, kx) == 0 ||
+			    unlikely(session->internals.priorities.allow_server_key_usage_violation != 0)) {
 				alg[i] = kx;
 				i++;
 

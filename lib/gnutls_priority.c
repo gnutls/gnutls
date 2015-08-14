@@ -712,6 +712,10 @@ static void enable_compat(gnutls_priority_t c)
 {
 	ENABLE_COMPAT(c);
 }
+static void enable_server_key_usage_violations(gnutls_priority_t c)
+{
+	c->allow_server_key_usage_violation = 1;
+}
 static void enable_dumbfw(gnutls_priority_t c)
 {
 	c->dumbfw = 1;

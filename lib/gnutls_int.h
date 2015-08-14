@@ -663,6 +663,7 @@ struct gnutls_priority_st {
 	bool min_record_version;
 	bool server_precedence;
 	bool allow_key_usage_violation;
+	bool allow_server_key_usage_violation; /* for test suite purposes only */
 	bool allow_wrong_pms;
 	bool no_tickets;
 	bool no_etm;
