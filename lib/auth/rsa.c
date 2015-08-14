@@ -62,6 +62,25 @@ const mod_auth_st rsa_auth_struct = {
 	_gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
+static
+int check_key_usage_for_enc(gnutls_session_t session, unsigned key_usage)
+{
+	if (key_usage != 0) {
+		if (!(key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT) && !(key_usage & GNUTLS_KEY_KEY_AGREEMENT)) {
+			gnutls_assert();
+			if (session->internals.priorities.allow_key_usage_violation == 0) {
+				_gnutls_audit_log(session,
+					  "Peer's certificate does not allow encryption. Key usage violation detected.\n");
+				return GNUTLS_E_KEY_USAGE_VIOLATION;
+			} else {
+				_gnutls_audit_log(session,
+					  "Peer's certificate does not allow encryption. Key usage violation detected (ignored).\n");
+			}
+		}
+	}
+	return 0;
+}
+
 /* This function reads the RSA parameters from peer's certificate;
  */
 int
@@ -70,6 +89,7 @@ _gnutls_get_public_rsa_params(gnutls_session_t session,
 {
 	int ret;
 	cert_auth_info_t info;
+	unsigned key_usage;
 	gnutls_pcert_st peer_cert;
 
 	/* normal non export case */
@@ -89,6 +109,14 @@ _gnutls_get_public_rsa_params(gnutls_session_t session,
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
+	}
+
+	gnutls_pubkey_get_key_usage(peer_cert.pubkey, &key_usage);
+
+	ret = check_key_usage_for_enc(session, key_usage);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup2;
 	}
 
 	gnutls_pk_params_init(params);
