@@ -121,19 +121,22 @@ static void client(int sds[], struct params_res *params)
 		/* Initialize TLS session
 		 */
 		gnutls_init(&session,
-			    GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS);
+			    GNUTLS_CLIENT);
 
 		/* Use default priorities */
-		gnutls_priority_set_direct(session,
-					   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-					   NULL);
+		if (params->enable_session_ticket_client) {
+			gnutls_priority_set_direct(session,
+						   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+						   NULL);
+		} else {
+			gnutls_priority_set_direct(session,
+						   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH:%NO_TICKETS",
+						   NULL);
+		}
 
 		/* put the anonymous credentials to the current session
 		 */
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
-
-		if (params->enable_session_ticket_client)
-			gnutls_session_ticket_enable_client(session);
 
 		if (t > 0) {
 			/* if this is not the first time we connect */
@@ -161,12 +164,6 @@ static void client(int sds[], struct params_res *params)
 		}
 
 		if (t == 0) {	/* the first time we connect */
-			/* check whether using NO_EXTENSIONS had any effect */
-			ret = gnutls_session_ext_master_secret_status(session);
-			if (ret != 0) {
-				fail("Extended master secret should have not been negotiated by default (ret: %d)\n", ret);
-			}
-
 			/* get the session data size */
 			ret =
 			    gnutls_session_get_data2(session,
@@ -485,6 +482,7 @@ wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
 	time_t t, now = time(0);
 
+#ifdef DEBUG_CACHE
 	if (debug) {
 		unsigned int i;
 		fprintf(stderr, "resume db storing (%d-%d): ", key.size,
@@ -499,6 +497,7 @@ wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 		}
 		fprintf(stderr, "\n");
 	}
+#endif
 
 	/* check the correctness of gnutls_db_check_entry_time() */
 	t = gnutls_db_check_entry_time(&data);
@@ -565,6 +564,7 @@ static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 			memcpy(res.data, cache_db[i].session_data,
 			       res.size);
 
+#ifdef DEBUG_CACHE
 			if (debug) {
 				unsigned int j;
 				printf("data:\n");
@@ -576,7 +576,7 @@ static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 				}
 				printf("\n");
 			}
-
+#endif
 			return res;
 		}
 	}

@@ -120,20 +120,21 @@ static void client(int sds[], struct params_res *params)
 		/* Initialize TLS session
 		 */
 		gnutls_init(&session,
-			    GNUTLS_CLIENT | GNUTLS_DATAGRAM |
-			    GNUTLS_NO_EXTENSIONS);
+			    GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 
 		/* Use default priorities */
-		gnutls_priority_set_direct(session,
+		if (params->enable_session_ticket_client)
+			gnutls_priority_set_direct(session,
 					   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+					   NULL);
+		else
+			gnutls_priority_set_direct(session,
+					   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH:%NO_TICKETS",
 					   NULL);
 
 		/* put the anonymous credentials to the current session
 		 */
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
-
-		if (params->enable_session_ticket_client)
-			gnutls_session_ticket_enable_client(session);
 
 		if (t > 0) {
 			/* if this is not the first time we connect */
