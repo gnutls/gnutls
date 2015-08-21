@@ -104,7 +104,7 @@ gnutls_x509_trust_list_add_trust_mem(gnutls_x509_trust_list_t list,
 
 		ret =
 		    gnutls_x509_trust_list_add_crls(list, x509_crl_list,
-						    x509_ncrls, tl_flags,
+						    x509_ncrls, tl_flags|GNUTLS_TL_NO_DUPLICATES,
 						    tl_vflags);
 		gnutls_free(x509_crl_list);
 
