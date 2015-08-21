@@ -688,7 +688,10 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
  * during this structure's lifetime.
  *
  * This function must be called after gnutls_x509_trust_list_add_cas()
- * to allow verifying the CRLs for validity.
+ * to allow verifying the CRLs for validity. If the flag %GNUTLS_TL_NO_DUPLICATES
+ * is given, then any provided CRLs that are a duplicate, will be deinitialized
+ * and not added to the list (that assumes that gnutls_x509_trust_list_deinit()
+ * will be called with all=1).
  *
  * Returns: The number of added elements is returned.
  *
@@ -701,6 +704,7 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 				unsigned int verification_flags)
 {
 	int ret, i, j = 0;
+	unsigned x;
 	unsigned int vret = 0;
 	uint32_t hash;
 
@@ -726,8 +730,31 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 						   trusted_ca_size,
 						   verification_flags,
 						   &vret);
-			if (ret < 0 || vret != 0)
+			if (ret < 0 || vret != 0) {
+				_gnutls_debug_log("CRL verification failed, not adding it\n");
 				continue;
+			}
+		}
+
+		/* If the CRL added overrides a previous one, then overwrite
+		 * the old one */
+		if (flags & GNUTLS_TL_NO_DUPLICATES) {
+			for (x=0;x<list->node[hash].crl_size;x++) {
+				if (crl_list[i]->raw_issuer_dn.size == list->node[hash].crls[x]->raw_issuer_dn.size &&
+				    memcmp(crl_list[i]->raw_issuer_dn.data, list->node[hash].crls[x]->raw_issuer_dn.data, crl_list[i]->raw_issuer_dn.size) == 0) {
+					if (gnutls_x509_crl_get_this_update(crl_list[i]) >=
+					    gnutls_x509_crl_get_this_update(list->node[hash].crls[x])) {
+
+					    	gnutls_x509_crl_deinit(list->node[hash].crls[x]);
+					    	list->node[hash].crls[x] = crl_list[i];
+					    	goto next;
+					} else {
+						/* The new is older, discard it */
+						gnutls_x509_crl_deinit(crl_list[i]);
+						continue;
+					}
+				}
+			}
 		}
 
 		list->node[hash].crls =
@@ -744,6 +771,8 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
 		list->node[hash].crls[list->node[hash].crl_size] =
 		    crl_list[i];
 		list->node[hash].crl_size++;
+
+ next:
 		j++;
 	}
 
