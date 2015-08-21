@@ -1688,8 +1688,8 @@ print_certificate_info(gnutls_x509_crt_t crt, FILE * out, unsigned int all)
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out)
 {
 	gnutls_datum_t data;
+	gnutls_datum_t cout;
 	int ret;
-	size_t size;
 
 	if (outcert_format == GNUTLS_X509_FMT_PEM) {
 		ret = gnutls_x509_crl_print(crl, full_format, &data);
@@ -1702,16 +1702,15 @@ static void print_crl_info(gnutls_x509_crl_t crl, FILE * out)
 		gnutls_free(data.data);
 	}
 
-	size = lbuffer_size;
 	ret =
-	    gnutls_x509_crl_export(crl, outcert_format, lbuffer,
-				   &size);
+	    gnutls_x509_crl_export2(crl, outcert_format, &cout);
 	if (ret < 0) {
 		fprintf(stderr, "crl_export: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 
-	fwrite(lbuffer, 1, size, outfile);
+	fwrite(cout.data, 1, cout.size, outfile);
+	gnutls_free(cout.data);
 }
 
 void crl_info(void)
