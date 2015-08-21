@@ -301,11 +301,9 @@ _gnutls_server_restore_session(gnutls_session_t session,
 		return ret;
 	}
 
-	/* Do not allow the resumption of a session which switches the
-	 * state of ext_master_secret */
-	if (session->internals.resumed_security_parameters.ext_master_secret !=
-	    session->security_parameters.ext_master_secret)
-	    return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+	/* Force the state of ext_master_secret based on the resumed parameters */
+	if (session->internals.resumed_security_parameters.ext_master_secret != 0)
+	    session->security_parameters.ext_master_secret = 1;
 
 	return 0;
 }
