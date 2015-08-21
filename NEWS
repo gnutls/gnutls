@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.4.5 (unreleased)
 
+** libgnutls: When re-importing CRLs to a trust list ensure that there
+   no duplicate entries.
+
 ** certtool: Removed any arbitrary limits imposed on input file sizes
    and maximum number of certificates imported.
 
