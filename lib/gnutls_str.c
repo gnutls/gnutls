@@ -539,8 +539,7 @@ _gnutls_hex2bin(const char *hex_data, size_t hex_size, uint8_t * bin_data,
  * This function will decode the given encoded data, using the hex
  * encoding used by PSK password files.
  *
- * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
- *   long enough, or 0 on success.
+ * Returns: %GNUTLS_E_PARSING_ERROR on invalid hex data, or 0 on success.
  **/
 int
 gnutls_hex_decode2(const gnutls_datum_t * hex_data, gnutls_datum_t *result)
@@ -560,7 +559,7 @@ gnutls_hex_decode2(const gnutls_datum_t * hex_data, gnutls_datum_t *result)
 	if (ret == 0) {
 		gnutls_assert();
 		gnutls_free(result->data);
-		return GNUTLS_E_BASE64_DECODING_ERROR;
+		return GNUTLS_E_PARSING_ERROR;
 	}
 
 	return 0;
@@ -579,7 +578,7 @@ gnutls_hex_decode2(const gnutls_datum_t * hex_data, gnutls_datum_t *result)
  * @result, and on return it will contain the number of bytes written.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
- *   long enough, or 0 on success.
+ *   long enough, %GNUTLS_E_PARSING_ERROR on invalid hex data, or 0 on success.
  **/
 int
 gnutls_hex_decode(const gnutls_datum_t * hex_data, void *result,
@@ -596,7 +595,7 @@ gnutls_hex_decode(const gnutls_datum_t * hex_data, void *result,
 	ret = hex_decode((char *) hex_data->data, hex_data->size,
 			 result, size);
 	if (ret == 0) {
-		return GNUTLS_E_BASE64_DECODING_ERROR;
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 	}
 	*result_size = size;
 
@@ -631,7 +630,7 @@ gnutls_hex_encode(const gnutls_datum_t * data, char *result,
 
 	ret = hex_encode(data->data, data->size, result, *result_size);
 	if (ret == 0) {
-		return gnutls_assert_val(GNUTLS_E_BASE64_ENCODING_ERROR);
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 	}
 
 	*result_size = size;
@@ -666,7 +665,7 @@ gnutls_hex_encode2(const gnutls_datum_t * data, gnutls_datum_t *result)
 	ret = hex_encode((char*)data->data, data->size, (char*)result->data, size); 
 	if (ret == 0) {
 		gnutls_free(result->data);
-		return gnutls_assert_val(GNUTLS_E_BASE64_ENCODING_ERROR);
+		return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 	}
 
 	result->size = size-1;
