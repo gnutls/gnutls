@@ -635,3 +635,71 @@ int _gnutls_params_get_ecc_raw(const gnutls_pk_params_st* params,
 	return 0;
 
 }
+
+int
+pk_hash_data(gnutls_pk_algorithm_t pk, const mac_entry_st * hash,
+	     gnutls_pk_params_st * params,
+	     const gnutls_datum_t * data, gnutls_datum_t * digest)
+{
+	int ret;
+
+	digest->size = _gnutls_hash_get_algo_len(hash);
+	digest->data = gnutls_malloc(digest->size);
+	if (digest->data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ret =
+	    _gnutls_hash_fast((gnutls_digest_algorithm_t)hash->id, data->data, data->size,
+			      digest->data);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	return 0;
+
+      cleanup:
+	gnutls_free(digest->data);
+	return ret;
+}
+
+
+/* 
+ * This function will do RSA PKCS #1 1.5 encoding
+ * on the given digest. The given digest must be allocated
+ * and will be freed if replacement is required.
+ */
+int
+pk_prepare_hash(gnutls_pk_algorithm_t pk,
+		const mac_entry_st * hash, gnutls_datum_t * digest)
+{
+	int ret;
+	gnutls_datum_t old_digest = { digest->data, digest->size };
+
+	switch (pk) {
+	case GNUTLS_PK_RSA:
+		if (unlikely(hash == NULL))
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		/* Encode the digest as a DigestInfo
+		 */
+		if ((ret =
+		     encode_ber_digest_info(hash, &old_digest,
+					    digest)) != 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		_gnutls_free_datum(&old_digest);
+		break;
+	case GNUTLS_PK_DSA:
+	case GNUTLS_PK_EC:
+		break;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
+
+	return 0;
+}
