@@ -22,7 +22,7 @@
 #ifndef EXT_SERVER_NAME_H
 #define EXT_SERVER_NAME_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 typedef struct {
 	uint8_t name[MAX_SERVER_NAME_SIZE];

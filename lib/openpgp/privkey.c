@@ -23,15 +23,15 @@
 /* Functions on OpenPGP privkey parsing
  */
 
-#include <gnutls_int.h>
-#include <gnutls_datum.h>
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
-#include <gnutls_num.h>
+#include "gnutls_int.h"
+#include <datum.h>
+#include <global.h>
+#include "errors.h"
+#include <num.h>
 #include <openpgp_int.h>
-#include <gnutls_openpgp.h>
-#include <gnutls_sig.h>
-#include <gnutls_pk.h>
+#include <openpgp.h>
+#include <tls-sig.h>
+#include <pk.h>
 
 /**
  * gnutls_openpgp_privkey_init:

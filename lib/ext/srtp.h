@@ -22,7 +22,7 @@
 #ifndef EXT_SRTP_H
 #define EXT_SRTP_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 #define MAX_SRTP_PROFILES 4
 

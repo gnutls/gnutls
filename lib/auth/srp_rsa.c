@@ -20,24 +20,23 @@
  *
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #ifdef ENABLE_SRP
 
-#include "gnutls_errors.h"
+#include "errors.h"
 #include <auth/srp_passwd.h>
-#include "gnutls_auth.h"
-#include "gnutls_auth.h"
-#include "gnutls_srp.h"
+#include "auth.h"
+#include "auth.h"
+#include "srp.h"
 #include "debug.h"
-#include "gnutls_num.h"
-#include <auth/srp.h>
-#include <gnutls_str.h>
+#include "num.h"
+#include <auth/srp_kx.h>
+#include <str.h>
 #include <auth/cert.h>
-#include <gnutls_datum.h>
-#include <gnutls_sig.h>
-#include <auth/srp.h>
-#include <gnutls_x509.h>
+#include <datum.h>
+#include <tls-sig.h>
+#include <x509.h>
 #include <algorithms.h>
 
 static int gen_srp_cert_server_kx(gnutls_session_t, gnutls_buffer_st *);

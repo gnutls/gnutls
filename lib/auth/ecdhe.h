@@ -23,7 +23,7 @@
 #ifndef AUTH_ECDH_COMMON
 #define AUTH_ECDH_COMMON
 
-#include <gnutls_auth.h>
+#include <auth.h>
 
 int
 _gnutls_gen_ecdh_common_client_kx(gnutls_session_t session,

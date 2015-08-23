@@ -26,16 +26,16 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_auth.h"
-#include "gnutls_errors.h"
-#include "gnutls_dh.h"
-#include "gnutls_num.h"
-#include "gnutls_sig.h"
-#include <gnutls_datum.h>
+#include "auth.h"
+#include "errors.h"
+#include "dh.h"
+#include "num.h"
+#include "tls-sig.h"
+#include <datum.h>
 #include <algorithms.h>
 #include <auth/cert.h>
-#include <gnutls_x509.h>
-#include <gnutls_state.h>
+#include <x509.h>
+#include <state.h>
 #include <auth/dh_common.h>
 #include <auth/ecdhe.h>
 

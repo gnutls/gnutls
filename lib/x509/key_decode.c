@@ -21,15 +21,15 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_global.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <global.h>
 #include <libtasn1.h>
-#include <gnutls_datum.h>
+#include <datum.h>
 #include "common.h"
 #include "x509_int.h"
-#include <gnutls_num.h>
-#include <gnutls_ecc.h>
+#include <num.h>
+#include <ecc.h>
 
 static int _gnutls_x509_read_rsa_pubkey(uint8_t * der, int dersize,
 					gnutls_pk_params_st * params);

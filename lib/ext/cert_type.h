@@ -23,7 +23,7 @@
 #ifndef EXT_CERT_TYPE_H
 #define EXT_CERT_TYPE_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 extern extension_entry_st ext_mod_cert_type;
 

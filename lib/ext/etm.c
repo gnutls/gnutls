@@ -24,9 +24,9 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_errors.h"
-#include "gnutls_num.h"
-#include <gnutls_extensions.h>
+#include "errors.h"
+#include "num.h"
+#include <extensions.h>
 #include <ext/etm.h>
 
 static int _gnutls_ext_etm_recv_params(gnutls_session_t session,

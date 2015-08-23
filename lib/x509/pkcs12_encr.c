@@ -19,10 +19,10 @@
  *
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
-#include <gnutls_mpi.h>
-#include <gnutls_errors.h>
+#include <mpi.h>
+#include "errors.h"
 #include <x509_int.h>
 #include <c-ctype.h>
 #include <algorithms.h>

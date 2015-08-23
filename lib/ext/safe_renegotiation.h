@@ -23,7 +23,7 @@
 #ifndef EXT_SAFE_RENEGOTIATION_H
 #define EXT_SAFE_RENEGOTIATION_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 typedef struct {
 	uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE];

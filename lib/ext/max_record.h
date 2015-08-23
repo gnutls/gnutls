@@ -23,7 +23,7 @@
 #ifndef EXT_MAX_RECORD_H
 #define EXT_MAX_RECORD_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 extern extension_entry_st ext_mod_max_record_size;
 

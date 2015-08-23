@@ -24,7 +24,7 @@
 #ifndef EXT_HEARTBEAT_H
 #define EXT_HEARTBEAT_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 #define HEARTBEAT_REQUEST 1
 #define HEARTBEAT_RESPONSE 2

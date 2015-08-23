@@ -1,7 +1,7 @@
 #ifndef AES_PADLOCK_H
 #define AES_PADLOCK_H
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <aes-x86.h>
 
 struct padlock_cipher_data {

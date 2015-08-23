@@ -24,29 +24,29 @@
  * and are common to RSA and DHE key exchange, are in this file.
  */
 
-#include <gnutls_int.h>
-#include "gnutls_auth.h"
-#include "gnutls_errors.h"
+#include "gnutls_int.h"
+#include "auth.h"
+#include "errors.h"
 #include <auth/cert.h>
-#include "gnutls_dh.h"
-#include "gnutls_num.h"
+#include "dh.h"
+#include "num.h"
 #include "libtasn1.h"
-#include "gnutls_datum.h"
+#include "datum.h"
 #include "ext/signature.h"
-#include <gnutls_pk.h>
+#include <pk.h>
 #include <algorithms.h>
-#include <gnutls_global.h>
-#include <gnutls_record.h>
-#include <gnutls_sig.h>
-#include <gnutls_state.h>
-#include <gnutls_pk.h>
-#include <gnutls_x509.h>
+#include <global.h>
+#include <record.h>
+#include <tls-sig.h>
+#include <state.h>
+#include <pk.h>
+#include <x509.h>
 #include <x509/verify-high.h>
 #include <gnutls/abstract.h>
 #include "debug.h"
 
 #ifdef ENABLE_OPENPGP
-#include "openpgp/gnutls_openpgp.h"
+#include "openpgp/openpgp.h"
 
 static gnutls_privkey_t alloc_and_load_pgp_key(const
 					       gnutls_openpgp_privkey_t

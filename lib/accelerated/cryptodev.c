@@ -20,10 +20,10 @@
  *
  */
 
-#include <gnutls_errors.h>
-#include <gnutls_int.h>
+#include "errors.h"
+#include "gnutls_int.h"
 #include <gnutls/crypto.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <accelerated/cryptodev.h>
 
 #ifdef ENABLE_CRYPTODEV

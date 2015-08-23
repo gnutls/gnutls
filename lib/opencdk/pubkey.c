@@ -23,10 +23,10 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <gnutls_int.h>
-#include <gnutls_datum.h>
-#include <gnutls_pk.h>
-#include <gnutls_sig.h>
+#include "gnutls_int.h"
+#include <datum.h>
+#include <pk.h>
+#include <tls-sig.h>
 #include <x509/common.h>
 #include "opencdk.h"
 #include "main.h"

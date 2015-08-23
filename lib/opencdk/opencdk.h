@@ -24,13 +24,13 @@
 #define OPENCDK_H
 
 #include <config.h>
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <stddef.h>		/* for size_t */
 #include <stdarg.h>
-#include <gnutls_mem.h>
+#include <mem.h>
 #include <gnutls/gnutls.h>
-#include <gnutls_errors.h>
-#include <gnutls_hash_int.h>
+#include "errors.h"
+#include <hash_int.h>
 
 /* The OpenCDK version as a string. */
 #define OPENCDK_VERSION "0.6.6"

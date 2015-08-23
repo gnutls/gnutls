@@ -194,7 +194,7 @@ typedef enum record_flush_t {
 #define DEFAULT_MAX_VERIFY_BITS 16*1024
 #define MAX_VERIFY_DEPTH 4096
 
-#include <gnutls_mem.h>
+#include <mem.h>
 
 #define MEMSUB(x,y) ((ssize_t)((ptrdiff_t)x-(ptrdiff_t)y))
 
@@ -214,7 +214,7 @@ typedef struct {
 	uint8_t pint[3];
 } uint24;
 
-#include <gnutls_mpi.h>
+#include <mpi.h>
 
 typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
 	STATE3, STATE4, STATE5, STATE6, STATE7, STATE8,
@@ -236,7 +236,7 @@ typedef enum recv_state_t {
 	RECV_STATE_DTLS_RETRANSMIT,
 } recv_state_t;
 
-#include <gnutls_str.h>
+#include "str.h"
 
 /* This is the maximum number of algorithms (ciphers or macs etc).
  * keep it synced with GNUTLS_MAX_ALGORITHM_NUM in gnutls.h
@@ -495,9 +495,9 @@ typedef struct {
 
 /* STATE (cont) */
 
-#include <gnutls_hash_int.h>
-#include <gnutls_cipher_int.h>
-#include <gnutls_compress.h>
+#include <hash_int.h>
+#include <cipher_int.h>
+#include <compress.h>
 
 typedef struct {
 	uint8_t hash_algorithm;

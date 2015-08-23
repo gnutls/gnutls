@@ -23,11 +23,11 @@
 /* Here lie everything that has to do with large numbers, gmp.
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include "errors.h"
 #include <algorithms.h>
-#include <gnutls_num.h>
-#include <gnutls_mpi.h>
+#include <num.h>
+#include <mpi.h>
 #include <nettle/bignum.h> /* includes gmp.h */
 #include <gnettle.h>
 #include <random.h>

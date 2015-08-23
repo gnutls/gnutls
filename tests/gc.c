@@ -29,7 +29,7 @@
 #include "utils.h"
 
 #include "../lib/gnutls_int.h"
-#include "../lib/gnutls_hash_int.h"
+#include "../lib/hash_int.h"
 #include "../lib/debug.h"
 
 static void tls_log_func(int level, const char *str)

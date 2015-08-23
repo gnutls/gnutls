@@ -25,22 +25,22 @@
  * procedure of the certificate and anoymous authentication.
  */
 
-#include <gnutls_int.h>
-#include "gnutls_auth.h"
-#include "gnutls_errors.h"
-#include "gnutls_dh.h"
-#include "gnutls_num.h"
-#include "gnutls_sig.h"
-#include <gnutls_state.h>
-#include <gnutls_datum.h>
-#include <gnutls_x509.h>
+#include "gnutls_int.h"
+#include "auth.h"
+#include "errors.h"
+#include "dh.h"
+#include "num.h"
+#include "tls-sig.h"
+#include <state.h>
+#include <datum.h>
+#include <x509.h>
 #include <auth/ecdhe.h>
-#include <gnutls_ecc.h>
+#include <ecc.h>
 #include <ext/ecc.h>
 #include <algorithms.h>
 #include <auth/psk.h>
 #include <auth/cert.h>
-#include <gnutls_pk.h>
+#include <pk.h>
 
 static int gen_ecdhe_server_kx(gnutls_session_t, gnutls_buffer_st *);
 static int

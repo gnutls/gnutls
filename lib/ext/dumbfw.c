@@ -19,9 +19,9 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_auth.h"
-#include "gnutls_errors.h"
-#include "gnutls_num.h"
+#include "auth.h"
+#include "errors.h"
+#include "num.h"
 #include <ext/dumbfw.h>
 
 /* This extension adds additional padding data in the TLS client hello.

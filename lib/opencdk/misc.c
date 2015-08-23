@@ -31,8 +31,8 @@
 #include <opencdk.h>
 #include <main.h>
 #include <random.h>
-#include <gnutls_int.h>
-#include <gnutls_str.h>
+#include "gnutls_int.h"
+#include <str.h>
 
 
 u32 _cdk_buftou32(const byte * buf)

@@ -20,7 +20,7 @@
 #ifndef EXT_DUMBFW_H
 #define EXT_DUMBFW_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 extern extension_entry_st ext_mod_dumbfw;
 

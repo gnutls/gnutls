@@ -23,15 +23,15 @@
 /* Functions that relate to the X.509 extension parsing.
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_global.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <global.h>
 #include <libtasn1.h>
 #include <common.h>
 #include <gnutls/x509-ext.h>
 #include <gnutls/x509.h>
 #include <x509_int.h>
-#include <gnutls_datum.h>
+#include <datum.h>
 
 int
 _gnutls_get_extension(ASN1_TYPE asn, const char *root,

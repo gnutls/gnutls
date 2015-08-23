@@ -19,11 +19,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *
  */
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include <unistd.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <fips.h>
 #include <gnutls/self-test.h>
 #include <stdio.h>

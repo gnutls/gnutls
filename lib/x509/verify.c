@@ -26,17 +26,17 @@
  * included here
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include "errors.h"
 #include <libtasn1.h>
-#include <gnutls_global.h>
-#include <gnutls_num.h>		/* MAX */
-#include <gnutls_sig.h>
-#include <gnutls_str.h>
-#include <gnutls_datum.h>
+#include <global.h>
+#include <num.h>		/* MAX */
+#include <tls-sig.h>
+#include <str.h>
+#include <datum.h>
 #include <x509_int.h>
 #include <common.h>
-#include <gnutls_pk.h>
+#include <pk.h>
 #include <stdbool.h>
 
 /* Checks if two certs have the same name and the same key.  Return 1 on match. 

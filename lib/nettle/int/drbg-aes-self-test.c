@@ -21,7 +21,7 @@
  */
 
 #include <config.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <drbg-aes.h>
 #include <string.h>
 #include <stdio.h>

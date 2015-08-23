@@ -23,13 +23,13 @@
 /* Functions on OpenPGP key parsing
  */
 
-#include <gnutls_int.h>
-#include <gnutls_datum.h>
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include <datum.h>
+#include <global.h>
+#include "errors.h"
 #include <openpgp_int.h>
-#include <gnutls_str.h>
-#include <gnutls_num.h>
+#include <str.h>
+#include <num.h>
 #include <x509/common.h>
 
 /**

@@ -24,23 +24,23 @@
  * PSK authentication.  The functions here are used in the handshake.
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #ifdef ENABLE_PSK
 
 /* Contains PSK code for DHE and ECDHE
  */
 
-#include "gnutls_auth.h"
-#include "gnutls_errors.h"
-#include "gnutls_dh.h"
+#include "auth.h"
+#include "errors.h"
+#include "dh.h"
 #include <auth/psk.h>
-#include "gnutls_num.h"
-#include "gnutls_mpi.h"
-#include <gnutls_state.h>
+#include "num.h"
+#include "mpi.h"
+#include <state.h>
 #include <auth/dh_common.h>
 #include <auth/ecdhe.h>
-#include <gnutls_datum.h>
+#include <datum.h>
 #include <auth/psk_passwd.h>
 
 static int

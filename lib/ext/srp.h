@@ -23,7 +23,7 @@
 #ifndef EXT_SRP_H
 #define EXT_SRP_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 #ifdef ENABLE_SRP
 

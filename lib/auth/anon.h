@@ -21,7 +21,7 @@
  */
 
 /* this is not to be included by gnutls_anon.c */
-#include <gnutls_auth.h>
+#include <auth.h>
 #include <auth/dh_common.h>
 
 typedef struct gnutls_anon_server_credentials_st {

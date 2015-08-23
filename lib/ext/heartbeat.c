@@ -26,12 +26,12 @@
  * and later rewritten by Nikos Mavrogiannopoulos.
  */
 
-#include <gnutls_errors.h>
-#include <gnutls_int.h>
-#include <gnutls_dtls.h>
-#include <gnutls_record.h>
+#include "errors.h"
+#include "gnutls_int.h"
+#include <dtls.h>
+#include <record.h>
 #include <ext/heartbeat.h>
-#include <gnutls_extensions.h>
+#include <extensions.h>
 #include <random.h>
 
 #ifdef ENABLE_HEARTBEAT

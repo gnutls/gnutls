@@ -25,11 +25,11 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_errors.h"
-#include "gnutls_num.h"
+#include "errors.h"
+#include "num.h"
 #include <ext/ecc.h>
-#include <gnutls_state.h>
-#include <gnutls_num.h>
+#include <state.h>
+#include <num.h>
 #include <algorithms.h>
 
 static int _gnutls_supported_ecc_recv_params(gnutls_session_t session,

@@ -24,9 +24,9 @@
  * VIA Padlock hardware acceleration.
  */
 
-#include <gnutls_int.h>
-#include <gnutls_hash_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include <hash_int.h>
+#include "errors.h"
 #include <nettle/sha.h>
 #include <nettle/hmac.h>
 #include <nettle/macros.h>

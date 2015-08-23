@@ -24,8 +24,8 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_errors.h"
-#include <gnutls_datum.h>
+#include "errors.h"
+#include <datum.h>
 #include <x509_b64.h>
 #include <nettle/base64.h>
 

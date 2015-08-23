@@ -21,7 +21,7 @@
  *
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #ifdef HAVE_GETPID
 # include <unistd.h>		/* getpid */
 #endif

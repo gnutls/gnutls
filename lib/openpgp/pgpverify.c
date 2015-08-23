@@ -23,11 +23,11 @@
 /* Functions on OpenPGP key parsing
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <openpgp_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_openpgp.h>
-#include <gnutls_num.h>
+#include "errors.h"
+#include <openpgp.h>
+#include <num.h>
 
 /**
  * gnutls_openpgp_crt_verify_ring:

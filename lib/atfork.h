@@ -24,7 +24,7 @@
 # define ATFORK_H
 
 #include <config.h>
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 extern unsigned int _gnutls_forkid;
 

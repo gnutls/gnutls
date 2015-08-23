@@ -23,9 +23,9 @@
 /* Functions for printing X.509 Certificate structures
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <gnutls/openpgp.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <extras/randomart.h>
 
 #define addf _gnutls_buffer_append_printf

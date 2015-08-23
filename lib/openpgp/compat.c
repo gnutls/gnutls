@@ -23,9 +23,9 @@
 /* Compatibility functions on OpenPGP key parsing.
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_openpgp.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <openpgp.h>
 #include <openpgp_int.h>
 
 /*-

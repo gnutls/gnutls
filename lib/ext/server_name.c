@@ -21,9 +21,9 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_auth.h"
-#include "gnutls_errors.h"
-#include "gnutls_num.h"
+#include "auth.h"
+#include "errors.h"
+#include "num.h"
 #include <ext/server_name.h>
 #ifdef HAVE_LIBIDN
 # include <idna.h>

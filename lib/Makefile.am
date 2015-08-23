@@ -21,7 +21,7 @@
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
 EXTRA_DIST = priority_options.gperf
-BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
+BUILT_SOURCES = pkix_asn1_tab.c asn1_tab.c priority_options.h
 
 SUBDIRS = includes x509 auth ext algorithms extras accelerated
 
@@ -61,27 +61,19 @@ DISTCLEANFILES = $(pkgconfig_DATA)
 
 lib_LTLIBRARIES = libgnutls.la
 
-SRP_COBJECTS = gnutls_srp.c
+SRP_COBJECTS = srp.c
 
-PSK_COBJECTS = gnutls_psk.c
+PSK_COBJECTS = psk.c
 
-COBJECTS = gnutls_range.c gnutls_record.c \
-	gnutls_compress.c debug.c gnutls_cipher.c	\
-	gnutls_mbuffers.c gnutls_buffers.c gnutls_handshake.c		\
-	gnutls_num.c gnutls_errors.c gnutls_dh.c gnutls_kx.c		\
-	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c		\
-	gnutls_session.c gnutls_db.c x509_b64.c gnutls_extensions.c	\
-	gnutls_auth.c gnutls_v2_compat.c gnutls_datum.c			\
-	gnutls_session_pack.c gnutls_mpi.c gnutls_pk.c gnutls_cert.c	\
-	gnutls_global.c gnutls_constate.c gnutls_anon_cred.c		\
-	pkix_asn1_tab.c gnutls_asn1_tab.c				\
-	gnutls_mem.c gnutls_ui.c vasprintf.c vasprintf.h		\
-	gnutls_sig.c gnutls_ecc.c gnutls_alert.c gnutls_privkey_raw.c	\
-	system.c inet_ntop.c gnutls_str.c gnutls_state.c gnutls_x509.c \
-	gnutls_helper.c gnutls_supplemental.c	\
-	random.c crypto-api.c gnutls_privkey.c gnutls_pcert.c		\
-	gnutls_pubkey.c locks.c gnutls_dtls.c system_override.c	\
-	crypto-backend.c verify-tofu.c pin.c tpm.c fips.c \
+COBJECTS = range.c record.c compress.c debug.c cipher.c			\
+	mbuffers.c buffers.c handshake.c num.c errors.c dh.c kx.c	\
+	priority.c hash_int.c cipher_int.c session.c db.c x509_b64.c 	\
+	extensions.c auth.c sslv2_compat.c datum.c session_pack.c mpi.c \
+	pk.c cert.c global.c constate.c anon_cred.c pkix_asn1_tab.c asn1_tab.c	\
+	mem.c ui.c vasprintf.c vasprintf.h tls-sig.c ecc.c alert.c privkey_raw.c	\
+	system.c inet_ntop.c str.c state.c x509.c helper.c supplemental.c	\
+	random.c crypto-api.c privkey.c pcert.c	pubkey.c locks.c dtls.c 	\
+	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c fips.c	\
 	safe-memfuncs.c inet_pton.c atfork.c atfork.h \
 	system-keys.h urls.c urls.h prf.c
 
@@ -104,19 +96,19 @@ if ENABLE_NETTLE
 SUBDIRS += nettle
 endif
 
-HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
-	gnutls_buffers.h gnutls_errors.h gnutls_int.h gnutls_dtls.h	\
-	gnutls_handshake.h gnutls_num.h algorithms.h		\
-	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\
-	gnutls_db.h gnutls_auth.h gnutls_extensions.h	\
-	x509_b64.h gnutls_v2_compat.h gnutls_datum.h \
-	gnutls_mpi.h gnutls_pk.h gnutls_record.h		\
-	gnutls_constate.h gnutls_global.h gnutls_sig.h gnutls_mem.h	\
-	gnutls_session_pack.h gnutls_str.h gnutls_str_array.h		\
-	gnutls_state.h gnutls_x509.h crypto-backend.h			\
-	gnutls_srp.h auth/srp.h auth/srp_passwd.h	\
-	gnutls_helper.h gnutls_supplemental.h crypto.h random.h system.h\
-	locks.h gnutls_mbuffers.h gnutls_ecc.h pin.h fips.h \
+HFILES = abstract_int.h debug.h compress.h cipher.h	\
+	buffers.h errors.h gnutls_int.h dtls.h	\
+	handshake.h num.h algorithms.h		\
+	dh.h kx.h hash_int.h cipher_int.h	\
+	db.h auth.h extensions.h	\
+	x509_b64.h sslv2_compat.h datum.h \
+	mpi.h pk.h record.h		\
+	constate.h global.h tls-sig.h mem.h	\
+	session_pack.h str.h str_array.h		\
+	state.h x509.h crypto-backend.h			\
+	srp.h auth/srp.h auth/srp_passwd.h	\
+	helper.h supplemental.h crypto.h random.h system.h\
+	locks.h mbuffers.h ecc.h pin.h fips.h \
 	priority_options.h
 
 if ENABLE_PKCS11
@@ -219,7 +211,7 @@ pkix_asn1_tab.c: $(srcdir)/pkix.asn
 	-asn1Parser $(srcdir)/pkix.asn pkix_asn1_tab.c
 
 gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
-	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
+	-asn1Parser $(srcdir)/gnutls.asn asn1_tab.c
 
 priority_options.h: $(srcdir)/priority_options.gperf
 	-gperf --global-table -t $^ > $@-tmp && mv $@-tmp $@

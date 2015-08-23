@@ -23,11 +23,11 @@
 /* Functions that relate on PKCS7 attribute setting.
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
-#include <gnutls_datum.h>
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
+#include <datum.h>
+#include <global.h>
+#include "errors.h"
 #include <common.h>
 #include <x509_b64.h>
 #include <gnutls/abstract.h>

@@ -25,8 +25,8 @@
 #include <drbg-aes.h>
 #include <fips.h>
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include "errors.h"
 #include <nettle/aes.h>
 #include <nettle/memxor.h>
 #include <locks.h>

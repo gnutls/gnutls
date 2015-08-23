@@ -23,7 +23,7 @@
 #ifndef AUTH_DH_COMMON
 #define AUTH_DH_COMMON
 
-#include <gnutls_auth.h>
+#include <auth.h>
 
 typedef struct {
 	int secret_bits;

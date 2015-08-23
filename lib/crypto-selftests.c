@@ -20,13 +20,13 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_cipher_int.h>
-#include <gnutls_datum.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <cipher_int.h>
+#include <datum.h>
 #include <gnutls/crypto.h>
 #include <gnutls/self-test.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <random.h>
 #include <crypto.h>
 

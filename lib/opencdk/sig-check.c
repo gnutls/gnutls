@@ -24,7 +24,7 @@
 #include <config.h>
 #endif
 #include <stdio.h>
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <algorithms.h>
 
 #include "opencdk.h"

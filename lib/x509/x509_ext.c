@@ -21,12 +21,12 @@
 /* This file contains functions to handle X.509 certificate extensions (the x509-ext API)
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
-#include <gnutls_datum.h>
-#include <gnutls_errors.h>
+#include <datum.h>
+#include "errors.h"
 #include <common.h>
-#include <gnutls_x509.h>
+#include <x509.h>
 #include <x509_b64.h>
 #include <c-ctype.h>
 #include <gnutls/x509-ext.h>

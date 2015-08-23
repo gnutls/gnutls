@@ -1,15 +1,15 @@
 /** t-openpgp.c -- OpenPGP regression test **/
 
 #include "gnutls_int.h"
-#include "gnutls_errors.h"
-#include "gnutls_mpi.h"
-#include "gnutls_cert.h"
-#include "gnutls_datum.h"
-#include "gnutls_global.h"
-#include "auth_cert.h"
-#include "gnutls_openpgp.h"
+#include "errors.h"
+#include "mpi.h"
+#include "cert.h"
+#include "datum.h"
+#include "global.h"
+#include "auth/cert.h"
+#include "openpgp.h"
 
-#include <gnutls_str.h>
+#include <str.h>
 #include <stdio.h>
 #include <gcrypt.h>
 #include <time.h>

@@ -22,17 +22,17 @@
 /* Functions on X.509 Certificate parsing
  */
 
-#include <gnutls_int.h>
-#include <gnutls_datum.h>
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include <datum.h>
+#include <global.h>
+#include "errors.h"
 #include <common.h>
 #include <gnutls/x509-ext.h>
-#include <gnutls_x509.h>
+#include <x509.h>
 #include <x509_b64.h>
 #include <x509_int.h>
 #include <libtasn1.h>
-#include <gnutls_pk.h>
+#include <pk.h>
 #include <pkcs11_int.h>
 #include "urls.h"
 #include "system-keys.h"

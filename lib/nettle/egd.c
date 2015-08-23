@@ -33,9 +33,9 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include "egd.h"
-#include <gnutls_int.h>
-#include <gnutls_str.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include <str.h>
+#include "errors.h"
 
 #ifdef AF_UNIX
 #define LOCAL_SOCKET_TYPE AF_UNIX

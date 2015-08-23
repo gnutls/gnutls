@@ -20,9 +20,9 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_datum.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <datum.h>
 #include <auth/srp_passwd.h>
 
 #ifdef ENABLE_SRP

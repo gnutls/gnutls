@@ -22,7 +22,7 @@
 #ifndef EXT_ECC_H
 #define EXT_ECC_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 extern extension_entry_st ext_mod_supported_ecc;
 extern extension_entry_st ext_mod_supported_ecc_pf;

@@ -23,8 +23,8 @@
 /* This file handles all the internal functions that cope with random data.
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include "errors.h"
 #include <random.h>
 #include <fips.h>
 

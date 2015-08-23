@@ -24,13 +24,13 @@
 /* Functions that relate on PKCS12 packet parsing.
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <libtasn1.h>
 
-#include <gnutls_datum.h>
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
-#include <gnutls_num.h>
+#include <datum.h>
+#include <global.h>
+#include "errors.h"
+#include <num.h>
 #include <common.h>
 #include <x509_b64.h>
 #include "x509_int.h"

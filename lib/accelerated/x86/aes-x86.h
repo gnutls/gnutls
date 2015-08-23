@@ -1,7 +1,7 @@
 #ifndef AES_X86_H
 #define AES_X86_H
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 void register_x86_crypto(void);
 

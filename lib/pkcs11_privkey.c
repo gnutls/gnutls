@@ -18,15 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <gnutls/pkcs11.h>
 #include <stdio.h>
 #include <string.h>
-#include <gnutls_errors.h>
-#include <gnutls_datum.h>
+#include "errors.h"
+#include <datum.h>
 #include <pkcs11_int.h>
-#include <gnutls_sig.h>
-#include <gnutls_pk.h>
+#include <tls-sig.h>
+#include <pk.h>
 #include <fips.h>
 #include "urls.h"
 #include <p11-kit/uri.h>

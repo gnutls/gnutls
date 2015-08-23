@@ -23,12 +23,12 @@
 /* Functions for printing X.509 Certificate structures
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <common.h>
-#include <gnutls_x509.h>
+#include <x509.h>
 #include <x509_int.h>
-#include <gnutls_num.h>
-#include <gnutls_errors.h>
+#include <num.h>
+#include "errors.h"
 #include <extras/randomart.h>
 #include <c-ctype.h>
 #include <gnutls-idna.h>

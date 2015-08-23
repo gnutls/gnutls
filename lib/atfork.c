@@ -22,8 +22,8 @@
  */
 
 #include <config.h>
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include "errors.h"
 
 #include <sys/socket.h>
 #include <errno.h>

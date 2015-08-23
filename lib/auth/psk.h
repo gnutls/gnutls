@@ -23,7 +23,7 @@
 #ifndef AUTH_PSK_H
 #define AUTH_PSK_H
 
-#include <gnutls_auth.h>
+#include <auth.h>
 #include <auth/dh_common.h>
 
 typedef struct gnutls_psk_client_credentials_st {

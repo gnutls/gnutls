@@ -18,9 +18,9 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_str.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include "str.h"
 #include "urls.h"
 #include "system-keys.h"
 

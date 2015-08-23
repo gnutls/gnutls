@@ -25,17 +25,17 @@
  * handshake.
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #if defined(ENABLE_ANON) && defined(ENABLE_DHE)
 
-#include "gnutls_auth.h"
-#include "gnutls_errors.h"
-#include "gnutls_dh.h"
+#include "auth.h"
+#include "errors.h"
+#include "dh.h"
 #include "auth/anon.h"
-#include "gnutls_num.h"
-#include "gnutls_mpi.h"
-#include <gnutls_state.h>
+#include "num.h"
+#include "mpi.h"
+#include <state.h>
 #include <auth/dh_common.h>
 
 static int gen_anon_server_kx(gnutls_session_t, gnutls_buffer_st *);

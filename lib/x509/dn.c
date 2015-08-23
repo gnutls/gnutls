@@ -20,14 +20,14 @@
  *
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <libtasn1.h>
-#include <gnutls_datum.h>
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
-#include <gnutls_str.h>
+#include <datum.h>
+#include <global.h>
+#include "errors.h"
+#include <str.h>
 #include <common.h>
-#include <gnutls_num.h>
+#include <num.h>
 
 /* This file includes all the required to parse an X.509 Distriguished
  * Name (you need a parser just to read a name in the X.509 protocols!!!)

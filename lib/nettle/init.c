@@ -20,10 +20,10 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_num.h>
-#include <gnutls_mpi.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <num.h>
+#include <mpi.h>
 
 /* Functions that refer to the initialization of the nettle library.
  */

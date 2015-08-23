@@ -26,15 +26,15 @@
 #endif
 
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include "errors.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 #include <gnutls/pkcs12.h>
 #include <gnutls/system-keys.h>
 #include "system-keys.h"
-#include <gnutls_sig.h>
-#include <gnutls_pk.h>
+#include <tls-sig.h>
+#include <pk.h>
 #include <urls.h>
 
 #if !defined(_WIN32)

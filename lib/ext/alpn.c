@@ -19,9 +19,9 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_auth.h"
-#include "gnutls_errors.h"
-#include "gnutls_num.h"
+#include "auth.h"
+#include "errors.h"
+#include "num.h"
 #include <ext/alpn.h>
 
 static int _gnutls_alpn_recv_params(gnutls_session_t session,

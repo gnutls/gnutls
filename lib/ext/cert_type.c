@@ -25,11 +25,11 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_errors.h"
-#include "gnutls_num.h"
+#include "errors.h"
+#include "num.h"
 #include <ext/cert_type.h>
-#include <gnutls_state.h>
-#include <gnutls_num.h>
+#include <state.h>
+#include <num.h>
 
 #ifdef ENABLE_OPENPGP
 

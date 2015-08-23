@@ -24,14 +24,14 @@
  * default berkeley sockets API per session.
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_num.h>
-#include <gnutls_record.h>
-#include <gnutls_buffers.h>
-#include <gnutls_mbuffers.h>
-#include <gnutls_state.h>
-#include <gnutls_dtls.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <num.h>
+#include <record.h>
+#include <buffers.h>
+#include <mbuffers.h>
+#include <state.h>
+#include <dtls.h>
 #include <system.h>
 
 #include <errno.h>

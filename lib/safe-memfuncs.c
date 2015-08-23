@@ -21,7 +21,7 @@
 #ifdef TEST_SAFE_MEMSET
 # include <string.h>
 #else
-# include <gnutls_int.h>
+# include "gnutls_int.h"
 #endif
 
 /**

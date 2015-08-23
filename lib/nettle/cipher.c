@@ -24,9 +24,9 @@
 /* Here lie nettle's wrappers for cipher support.
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_cipher_int.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <cipher_int.h>
 #include <nettle/aes.h>
 #include <nettle/camellia.h>
 #include <nettle/arcfour.h>

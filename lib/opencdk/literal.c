@@ -27,8 +27,8 @@
 #include <opencdk.h>
 #include <main.h>
 #include <filters.h>
-#include <gnutls_int.h>
-#include <gnutls_str.h>
+#include "gnutls_int.h"
+#include <str.h>
 
 
 /* Duplicate the string @s but strip of possible

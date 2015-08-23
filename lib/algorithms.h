@@ -23,7 +23,7 @@
 #ifndef ALGORITHMS_H
 #define ALGORITHMS_H
 
-#include "gnutls_auth.h"
+#include "auth.h"
 
 #define GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR 0x00
 #define GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR 0xFF

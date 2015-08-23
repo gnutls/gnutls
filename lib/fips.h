@@ -23,7 +23,7 @@
 #ifndef FIPS_H
 # define FIPS_H
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <gnutls/gnutls.h>
 
 #define FIPS140_RND_KEY_SIZE 32

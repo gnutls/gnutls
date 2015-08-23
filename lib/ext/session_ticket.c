@@ -20,20 +20,20 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_datum.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <datum.h>
 #include <algorithms.h>
-#include <gnutls_handshake.h>
-#include <gnutls_num.h>
-#include <gnutls_constate.h>
-#include <gnutls_session_pack.h>
+#include <handshake.h>
+#include <num.h>
+#include <constate.h>
+#include <session_pack.h>
 #include <random.h>
 #include <ext/session_ticket.h>
-#include <gnutls_mbuffers.h>
-#include <gnutls_extensions.h>
-#include <gnutls_constate.h>
-#include <gnutls_dtls.h>
+#include <mbuffers.h>
+#include <extensions.h>
+#include <constate.h>
+#include <dtls.h>
 
 #ifdef ENABLE_SESSION_TICKETS
 

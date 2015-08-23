@@ -19,10 +19,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <gnutls/pkcs11.h>
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
+#include <global.h>
+#include "errors.h"
 #include "x509/common.h"
 
 #include <pkcs11_int.h>

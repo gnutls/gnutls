@@ -25,10 +25,10 @@
  * using intel's AES instruction set.
  */
 
-#include <gnutls_errors.h>
-#include <gnutls_int.h>
+#include "errors.h"
+#include "gnutls_int.h"
 #include <gnutls/crypto.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <aes-x86.h>
 #include <x86-common.h>
 #include <nettle/memxor.h>

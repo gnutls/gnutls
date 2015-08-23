@@ -25,13 +25,13 @@
  * using AESNI (without PCLMUL)
  */
 
-#include <gnutls_errors.h>
-#include <gnutls_int.h>
+#include "errors.h"
+#include "gnutls_int.h"
 
 #ifdef HAVE_LIBNETTLE
 
 #include <gnutls/crypto.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <aes-x86.h>
 #include <x86-common.h>
 #include <byteswap.h>

@@ -33,7 +33,7 @@
 #include "packet.h"
 #include "types.h"
 #include <algorithms.h>
-#include <gnutls_str.h>
+#include <str.h>
 #include <minmax.h>
 
 /* The version of the MDC packet considering the lastest OpenPGP draft. */

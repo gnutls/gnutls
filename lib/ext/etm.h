@@ -23,7 +23,7 @@
 #ifndef EXT_ETM_H
 #define EXT_ETM_H
 
-#include <gnutls_extensions.h>
+#include <extensions.h>
 
 extern extension_entry_st ext_mod_etm;
 

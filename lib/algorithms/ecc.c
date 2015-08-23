@@ -20,11 +20,11 @@
  *
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <algorithms.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <x509/common.h>
-#include <gnutls_pk.h>
+#include <pk.h>
 
 /* Supported ECC curves
  */

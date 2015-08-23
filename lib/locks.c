@@ -20,10 +20,10 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include "errors.h"
 #include <libtasn1.h>
-#include <gnutls_dh.h>
+#include <dh.h>
 #include <random.h>
 
 #include <locks.h>

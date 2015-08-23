@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <gnutls/pkcs11.h>
 #include <pin.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 
 gnutls_pin_callback_t _gnutls_pin_func;
 void *_gnutls_pin_data;

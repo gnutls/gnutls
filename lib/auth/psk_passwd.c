@@ -22,20 +22,20 @@
 
 /* Functions for operating in an PSK passwd file are included here */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #ifdef ENABLE_PSK
 
 #include "x509_b64.h"
-#include "gnutls_errors.h"
+#include "errors.h"
 #include <auth/psk_passwd.h>
 #include <auth/psk.h>
-#include "gnutls_auth.h"
-#include "gnutls_dh.h"
+#include "auth.h"
+#include "dh.h"
 #include "debug.h"
-#include <gnutls_str.h>
-#include <gnutls_datum.h>
-#include <gnutls_num.h>
+#include <str.h>
+#include <datum.h>
+#include <num.h>
 #include <random.h>
 
 

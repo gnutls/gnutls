@@ -32,11 +32,11 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
 #include <gnutls/tpm.h>
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #ifdef HAVE_TROUSERS
 
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <pkcs11_int.h>
 #include <x509/common.h>
 #include <x509_b64.h>

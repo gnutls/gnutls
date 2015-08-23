@@ -22,21 +22,21 @@
 
 /* Functions for operating in an SRP passwd file are included here */
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 
 #ifdef ENABLE_SRP
 
 #include "x509_b64.h"
-#include "gnutls_errors.h"
+#include "errors.h"
 #include <auth/srp_passwd.h>
-#include <auth/srp.h>
-#include "gnutls_auth.h"
-#include "gnutls_srp.h"
-#include "gnutls_dh.h"
+#include <auth/srp_kx.h>
+#include "auth.h"
+#include "srp.h"
+#include "dh.h"
 #include "debug.h"
-#include <gnutls_str.h>
-#include <gnutls_datum.h>
-#include <gnutls_num.h>
+#include <str.h>
+#include <datum.h>
+#include <num.h>
 #include <random.h>
 #include <algorithms.h>
 

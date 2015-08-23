@@ -19,11 +19,11 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_str.h>
+#include "gnutls_int.h"
+#include <str.h>
 #include <x509_int.h>
 #include <common.h>
-#include <gnutls_errors.h>
+#include "errors.h"
 #include <system.h>
 #include <gnutls-idna.h>
 

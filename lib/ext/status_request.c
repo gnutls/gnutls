@@ -26,13 +26,13 @@
 */
 
 #include "gnutls_int.h"
-#include "gnutls_errors.h"
-#include <gnutls_extensions.h>
+#include "errors.h"
+#include <extensions.h>
 #include <ext/status_request.h>
-#include <gnutls_mbuffers.h>
-#include <gnutls_auth.h>
+#include <mbuffers.h>
+#include <auth.h>
 #include <auth/cert.h>
-#include <gnutls_handshake.h>
+#include <handshake.h>
 
 #ifdef ENABLE_OCSP
 

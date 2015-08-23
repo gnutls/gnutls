@@ -23,7 +23,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <time.h>
 #include <sys/time.h>
 

@@ -24,7 +24,7 @@
 #define GNUTLS_LOCKS_H
 
 #include <gnutls/gnutls.h>
-#include <gnutls_int.h>
+#include "gnutls_int.h"
 #include <system.h>
 
 extern mutex_init_func gnutls_mutex_init;

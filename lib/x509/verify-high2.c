@@ -21,14 +21,14 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include "errors.h"
 #include <libtasn1.h>
-#include <gnutls_global.h>
-#include <gnutls_num.h>
-#include <gnutls_sig.h>
-#include <gnutls_str.h>
-#include <gnutls_datum.h>
+#include <global.h>
+#include <num.h>
+#include <tls-sig.h>
+#include <str.h>
+#include <datum.h>
 #include "x509_int.h"
 #include <common.h>
 #include "verify-high.h"

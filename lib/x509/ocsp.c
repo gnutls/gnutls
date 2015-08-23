@@ -22,11 +22,11 @@
 /* Online Certificate Status Protocol - RFC 2560
  */
 
-#include <gnutls_int.h>
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include <global.h>
+#include "errors.h"
 #include <libtasn1.h>
-#include <gnutls_pk.h>
+#include <pk.h>
 #include "common.h"
 #include "verify-high.h"
 

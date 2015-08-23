@@ -23,9 +23,9 @@
 /* This file provides the backend hash/mac API for nettle.
  */
 
-#include <gnutls_int.h>
-#include <gnutls_hash_int.h>
-#include <gnutls_errors.h>
+#include "gnutls_int.h"
+#include <hash_int.h>
+#include "errors.h"
 #include <nettle/md5.h>
 #include <nettle/md2.h>
 #include <nettle/sha.h>

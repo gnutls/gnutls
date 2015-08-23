@@ -24,10 +24,10 @@
 /* Functions for the TLS PRF handling.
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_num.h>
-#include <gnutls_state.h>
+#include "gnutls_int.h"
+#include "errors.h"
+#include <num.h>
+#include <state.h>
 #include <algorithms.h>
 
 #define MAX_PRF_BYTES 200

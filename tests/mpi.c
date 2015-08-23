@@ -28,8 +28,8 @@
 
 #include "utils.h"
 #include "../lib/gnutls_int.h"
-#include "../lib/gnutls_mpi.h"
-#include "../lib/gnutls_errors.h"
+#include "../lib/mpi.h"
+#include "../lib/errors.h"
 #include "../lib/debug.h"
 
 static void tls_log_func(int level, const char *str)

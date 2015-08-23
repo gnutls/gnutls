@@ -25,20 +25,20 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_auth.h"
-#include "gnutls_errors.h"
-#include "gnutls_dh.h"
-#include "gnutls_num.h"
-#include "gnutls_datum.h"
+#include "auth.h"
+#include "errors.h"
+#include "dh.h"
+#include "num.h"
+#include "datum.h"
 #include <auth/cert.h>
-#include <gnutls_pk.h>
+#include <pk.h>
 #include <algorithms.h>
-#include <gnutls_global.h>
+#include <global.h>
 #include "debug.h"
-#include <gnutls_sig.h>
-#include <gnutls_x509.h>
+#include <tls-sig.h>
+#include <x509.h>
 #include <random.h>
-#include <gnutls_mpi.h>
+#include <mpi.h>
 #include <abstract_int.h>
 #include <auth/rsa_common.h>
 

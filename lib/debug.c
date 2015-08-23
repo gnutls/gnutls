@@ -21,11 +21,11 @@
  */
 
 #include "gnutls_int.h"
-#include "gnutls_errors.h"
+#include "errors.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "debug.h"
-#include <gnutls_mpi.h>
+#include <mpi.h>
 
 #ifdef DEBUG
 void _gnutls_dump_mpi(const char *prefix, bigint_t a)

@@ -25,18 +25,18 @@
  * encryption and signatures. 
  */
 
-#include <gnutls_int.h>
-#include <gnutls_mpi.h>
-#include <gnutls_pk.h>
-#include <gnutls_errors.h>
-#include <gnutls_datum.h>
-#include <gnutls_global.h>
-#include <gnutls_sig.h>
-#include <gnutls_num.h>
+#include "gnutls_int.h"
+#include <mpi.h>
+#include <pk.h>
+#include "errors.h"
+#include <datum.h>
+#include <global.h>
+#include <tls-sig.h>
+#include <num.h>
 #include <x509/x509_int.h>
 #include <x509/common.h>
 #include <random.h>
-#include <gnutls_pk.h>
+#include <pk.h>
 #include <nettle/dsa.h>
 #ifdef ENABLE_FIPS140
 # include <dsa-fips.h>
