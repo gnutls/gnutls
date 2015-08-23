@@ -37,4 +37,4 @@ noinst_LTLIBRARIES = libgnutls_openpgp.la
 COBJECTS = pgp.c pgpverify.c extras.c compat.c privkey.c output.c	\
 	openpgp.c
 
-libgnutls_openpgp_la_SOURCES = $(COBJECTS) openpgp_int.h gnutls_openpgp.h
+libgnutls_openpgp_la_SOURCES = $(COBJECTS) openpgp_int.h openpgp.h

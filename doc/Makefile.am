@@ -385,7 +385,7 @@ printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 alert_printlist_SOURCES = alert-printlist.c common.c common.h
 alert_printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
-error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c
+error_codes.texi: $(top_srcdir)/lib/errors.c $(srcdir)/errcodes.c
 	$(MAKE) $(builddir)/errcodes
 	$(builddir)/errcodes > $@-tmp
 	mv -f $@-tmp $@
@@ -395,7 +395,7 @@ algorithms.texi: $(top_srcdir)/lib/algorithms/ciphers.c $(srcdir)/printlist.c
 	$(builddir)/printlist > $@-tmp
 	mv -f $@-tmp $@
 
-alerts.texi: $(top_srcdir)/lib/gnutls_alert.c $(srcdir)/alert-printlist.c
+alerts.texi: $(top_srcdir)/lib/alert.c $(srcdir)/alert-printlist.c
 	$(MAKE) $(builddir)/alert-printlist
 	$(builddir)/alert-printlist > $@-tmp
 	mv -f $@-tmp $@

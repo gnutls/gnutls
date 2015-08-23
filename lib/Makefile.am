@@ -106,7 +106,7 @@ HFILES = abstract_int.h debug.h compress.h cipher.h	\
 	constate.h global.h tls-sig.h mem.h	\
 	session_pack.h str.h str_array.h		\
 	state.h x509.h crypto-backend.h			\
-	srp.h auth/srp.h auth/srp_passwd.h	\
+	srp.h auth/srp_kx.h auth/srp_passwd.h	\
 	helper.h supplemental.h crypto.h random.h system.h\
 	locks.h mbuffers.h ecc.h pin.h fips.h \
 	priority_options.h

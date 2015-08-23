@@ -94,7 +94,7 @@ cha-errors.tex: ../cha-errors.texi
 cha-ciphersuites.tex: ../cha-ciphersuites.texi
 	../scripts/mytexi2latex $< > $@
 
-error_codes.tex: $(top_srcdir)/lib/gnutls_errors.c
+error_codes.tex: $(top_srcdir)/lib/errors.c
 	$(MAKE) -C .. errcodes printlist alert-printlist
 	$(builddir)/../errcodes --latex > $@-tmp
 	mv -f $@-tmp $@

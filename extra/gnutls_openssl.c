@@ -27,7 +27,7 @@
 #include <string.h>
 #include "../lib/gnutls_int.h"
 #include "../lib/random.h"
-#include "../lib/gnutls_hash_int.h"
+#include "../lib/hash_int.h"
 
 /* In win32 X509_NAME is defined in wincrypt.h.
  * undefine it to avoid the conflict with openssl.h.
