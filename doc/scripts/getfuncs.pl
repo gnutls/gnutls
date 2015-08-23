@@ -82,6 +82,10 @@ while ($line=<STDIN>) {
       next if ($line =~ m/\}/);
       $state = 4;
       next;
+    } elsif ($line =~ m/^\s*#define/) {
+      next if ($line !~ m/\\$/);
+      $state = 5;
+      next;
     } elsif ($line !~ m/^\s*extern/ && $line !~ m/^\s*typedef/ && $line !~ m/doc-skip/ && $line =~ m/^\s*\w/) {
       $state = 3;
 
@@ -114,6 +118,11 @@ while ($line=<STDIN>) {
     }
   } elsif ($state == 4) { #inline function to be skipped
     if ($line =~ m/\}/) {
+      $state = 0;
+      next;
+    }
+  } elsif ($state == 5) { # define
+    if ($line !~ m/\\$/) {
       $state = 0;
       next;
     }
