@@ -1319,6 +1319,37 @@ void gnutls_session_set_ptr(gnutls_session_t session, void *ptr)
 	session->internals.user_ptr = ptr;
 }
 
+/**
+ * gnutls_session_set_verify_function:
+ * @session: is a #gnutls_session_t type.
+ * @func: is the callback function
+ *
+ * This function sets a callback to be called when peer's certificate
+ * has been received in order to verify it on receipt rather than
+ * doing after the handshake is completed. This overrides any callback
+ * set using gnutls_certificate_set_verify_function().
+ *
+ * The callback's function prototype is:
+ * int (*callback)(gnutls_session_t);
+ *
+ * If the callback function is provided then gnutls will call it, in the
+ * handshake, just after the certificate message has been received.
+ * To verify or obtain the certificate the gnutls_certificate_verify_peers2(),
+ * gnutls_certificate_type_get(), gnutls_certificate_get_peers() functions
+ * can be used.
+ *
+ * The callback function should return 0 for the handshake to continue
+ * or non-zero to terminate.
+ *
+ * Since: 3.5.0
+ **/
+void
+ gnutls_session_set_verify_function
+    (gnutls_session_t session,
+     gnutls_certificate_verify_function * func)
+{
+	session->internals.verify_callback = func;
+}
 
 /**
  * gnutls_record_get_direction:

@@ -1220,6 +1220,9 @@ void gnutls_session_get_random(gnutls_session_t session,
 			       gnutls_datum_t * server);
 char *gnutls_session_get_desc(gnutls_session_t session);
 
+typedef int gnutls_certificate_verify_function(gnutls_session_t);
+void gnutls_session_set_verify_function(gnutls_session_t session, gnutls_certificate_verify_function * func);
+
 int gnutls_session_set_premaster(gnutls_session_t session,
 				 unsigned int entity,
 				 gnutls_protocol_t version,
@@ -2007,7 +2010,6 @@ gnutls_certificate_set_retrieve_function(gnutls_certificate_credentials_t
 					 gnutls_certificate_retrieve_function
 					 * func);
 
-typedef int gnutls_certificate_verify_function(gnutls_session_t);
 void
 gnutls_certificate_set_verify_function(gnutls_certificate_credentials_t
 				       cred,

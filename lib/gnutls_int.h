@@ -995,6 +995,10 @@ typedef struct {
 	bool no_replay_protection;	/* DTLS replay protection */
 	bool try_ext_master_secret;	/* whether to try negotiating the ext master secret */
 
+	/* a verify callback to override the verify callback from the credentials
+	 * structure */
+	gnutls_certificate_verify_function *verify_callback;
+
 	/* whether this session uses non-blocking sockets */
 	bool blocking;
 
