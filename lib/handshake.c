@@ -2684,14 +2684,18 @@ static int run_verify_callback(gnutls_session_t session, unsigned int side)
 	if (type != GNUTLS_CRD_CERTIFICATE)
 		return 0;
 
-	if (cred != NULL && cred->verify_callback != NULL &&
+	if (cred != NULL &&
+	    (cred->verify_callback != NULL || session->internals.verify_callback != NULL) &&
 	    (session->security_parameters.entity == GNUTLS_CLIENT ||
 	     session->internals.send_cert_req != GNUTLS_CERT_IGNORE)) {
-		ret = cred->verify_callback(session);
+		if (session->internals.verify_callback)
+			ret = session->internals.verify_callback(session);
+		else
+			ret = cred->verify_callback(session);
 		if (ret < -1)
-			return ret;
+			return gnutls_assert_val(ret);
 		else if (ret != 0)
-			return GNUTLS_E_CERTIFICATE_ERROR;
+			return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
 	}
 
 	return 0;
