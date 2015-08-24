@@ -1053,6 +1053,9 @@ GNUTLS_3_4
 	gnutls_hex_decode2;
 	gnutls_hex_encode2;
 	gnutls_session_set_verify_function;
+	gnutls_session_auto_verify_cert;
+	gnutls_session_auto_verify_cert2;
+	gnutls_session_get_verify_cert_status;
  local:
 	*;
 };

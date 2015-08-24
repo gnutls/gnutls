@@ -1001,6 +1001,10 @@ typedef struct {
 	/* a verify callback to override the verify callback from the credentials
 	 * structure */
 	gnutls_certificate_verify_function *verify_callback;
+	gnutls_typed_vdata_st *vc_data;
+	gnutls_typed_vdata_st vc_sdata;
+	unsigned vc_elements;
+	unsigned vc_status;
 
 	/* whether this session uses non-blocking sockets */
 	bool blocking;
