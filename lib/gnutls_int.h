@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2000-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2015 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1005,6 +1006,7 @@ typedef struct {
 	gnutls_typed_vdata_st vc_sdata;
 	unsigned vc_elements;
 	unsigned vc_status;
+	unsigned int additional_verify_flags; /* may be set by priorities or the vc functions */
 
 	/* whether this session uses non-blocking sockets */
 	bool blocking;

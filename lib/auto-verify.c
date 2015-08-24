@@ -57,7 +57,7 @@ static int auto_verify_cb(gnutls_session_t session)
  * gnutls_session_auto_verify_cert:
  * @session: is a gnutls session
  * @hostname: is the expected name of the peer; may be %NULL
- * @flags: should be zero
+ * @flags: flags for certificate verification -- #gnutls_certificate_verify_flags
  *
  * This function instructs GnuTLS to verify the peer's certificate
  * using the provided hostname. If the verification fails the handshake
@@ -86,6 +86,9 @@ void gnutls_session_auto_verify_cert(gnutls_session_t session,
 		session->internals.vc_elements = 0;
 	}
 
+	if (flags)
+		session->internals.additional_verify_flags |= flags;
+
 	gnutls_session_set_verify_function(session, auto_verify_cb);
 }
 
@@ -94,7 +97,7 @@ void gnutls_session_auto_verify_cert(gnutls_session_t session,
  * @session: is a gnutls session
  * @data: an array of typed data
  * @elements: the number of data elements
- * @flags: should be zero
+ * @flags: flags for certificate verification -- #gnutls_certificate_verify_flags
  *
  * This function instructs GnuTLS to verify the peer's certificate
  * using the provided typed data information. If the verification fails the handshake
@@ -113,6 +116,10 @@ void gnutls_session_auto_verify_cert2(gnutls_session_t session,
 {
 	session->internals.vc_data = data;
 	session->internals.vc_elements = elements;
+
+	if (flags)
+		session->internals.additional_verify_flags |= flags;
+
 	gnutls_session_set_verify_function(session, auto_verify_cb);
 }
 

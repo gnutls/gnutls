@@ -542,7 +542,7 @@ _gnutls_openpgp_crt_verify_peers(gnutls_session_t session,
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 
-	verify_flags = cred->verify_flags | session->internals.priorities.additional_verify_flags;
+	verify_flags = cred->verify_flags | session->internals.additional_verify_flags;
 
 	/* generate a list of gnutls_certs based on the auth info
 	 * raw certs.
