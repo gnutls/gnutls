@@ -22,9 +22,9 @@ extern const char *side;
   while ((cret == GNUTLS_E_AGAIN || (cret == 0 && sret == GNUTLS_E_AGAIN)) && (sret == GNUTLS_E_AGAIN || (sret == 0 && cret == GNUTLS_E_AGAIN))); \
   if (cret != clierr || sret != serverr) \
     { \
-      fprintf(stderr, "client: %s\n", gnutls_strerror(cret)); \
-      fprintf(stderr, "server: %s\n", gnutls_strerror(sret)); \
-      fail("Handshake failed\n"); \
+      fprintf(stderr, "client[%d]: %s\n", cret, gnutls_strerror(cret)); \
+      fprintf(stderr, "server[%d]: %s\n", sret, gnutls_strerror(sret)); \
+      fail("%s: Handshake failed\n", __func__); \
       exit(1); \
     }
 
