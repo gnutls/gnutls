@@ -64,9 +64,10 @@ static int auto_verify_cb(gnutls_session_t session)
  * will also fail. The verification result can be obtained using
  * gnutls_session_get_verify_cert_status().
  *
- * The hostname pointer provided must remain valid for the lifetime
+ * The @hostname pointer provided must remain valid for the lifetime
  * of the session. If not hostname is provided, no hostname verification
- * will be performed.
+ * will be performed. For a more advanced verification function check
+ * gnutls_session_auto_verify_cert2().
  *
  * That function is intended to be used by clients.
  *
