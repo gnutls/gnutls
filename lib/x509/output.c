@@ -1249,10 +1249,13 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 		int err;
 
 		err = gnutls_x509_crt_get_issuer_dn(cert, NULL, &dn_size);
-		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-			addf(str, "error: get_issuer_dn: %s\n",
-			     gnutls_strerror(err));
-		else {
+		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				addf(str, _("\tIssuer:\n"));
+			else
+				addf(str, "error: get_issuer_dn: %s\n",
+				     gnutls_strerror(err));
+		} else {
 			dn = gnutls_malloc(dn_size);
 			if (!dn)
 				addf(str, "error: malloc (%d): %s\n",
@@ -1324,10 +1327,13 @@ print_cert(gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 		int err;
 
 		err = gnutls_x509_crt_get_dn(cert, NULL, &dn_size);
-		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-			addf(str, "error: get_dn: %s\n",
-			     gnutls_strerror(err));
-		else {
+		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				addf(str, _("\tSubject:\n"));
+			else
+				addf(str, "error: get_dn: %s\n",
+				     gnutls_strerror(err));
+		} else {
 			dn = gnutls_malloc(dn_size);
 			if (!dn)
 				addf(str, "error: malloc (%d): %s\n",
@@ -1506,10 +1512,13 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 		size_t dn_size = 0;
 
 		err = gnutls_x509_crt_get_dn(cert, NULL, &dn_size);
-		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-			addf(str, "unknown subject (%s), ",
-			     gnutls_strerror(err));
-		else {
+		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				addf(str, _("no subject,"));
+			else
+				addf(str, "unknown subject (%s), ",
+				     gnutls_strerror(err));
+		} else {
 			dn = gnutls_malloc(dn_size);
 			if (!dn)
 				addf(str, "unknown subject (%s), ",
@@ -1535,10 +1544,13 @@ static void print_oneline(gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 		size_t dn_size = 0;
 
 		err = gnutls_x509_crt_get_issuer_dn(cert, NULL, &dn_size);
-		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-			addf(str, "unknown issuer (%s), ",
-			     gnutls_strerror(err));
-		else {
+		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				addf(str, _("no issuer,"));
+			else
+				addf(str, "unknown issuer (%s), ",
+				     gnutls_strerror(err));
+		} else {
 			dn = gnutls_malloc(dn_size);
 			if (!dn)
 				addf(str, "unknown issuer (%s), ",
@@ -1753,10 +1765,13 @@ print_crl(gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 		int err;
 
 		err = gnutls_x509_crl_get_issuer_dn(crl, NULL, &dn_size);
-		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-			addf(str, "error: get_issuer_dn: %s\n",
-			     gnutls_strerror(err));
-		else {
+		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				addf(str, _("\tIssuer:\n"));
+			else
+				addf(str, "error: get_issuer_dn: %s\n",
+				     gnutls_strerror(err));
+		} else {
 			dn = gnutls_malloc(dn_size);
 			if (!dn)
 				addf(str, "error: malloc (%d): %s\n",
@@ -2121,10 +2136,13 @@ print_crq(gnutls_buffer_st * str, gnutls_x509_crq_t cert,
 		int err;
 
 		err = gnutls_x509_crq_get_dn(cert, NULL, &dn_size);
-		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-			addf(str, "error: get_dn: %s\n",
-			     gnutls_strerror(err));
-		else {
+		if (err != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+				addf(str, _("\tSubject:\n"));
+			else
+				addf(str, "error: get_dn: %s\n",
+				     gnutls_strerror(err));
+		} else {
 			dn = gnutls_malloc(dn_size);
 			if (!dn)
 				addf(str, "error: malloc (%d): %s\n",
