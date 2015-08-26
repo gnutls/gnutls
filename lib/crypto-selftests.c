@@ -639,6 +639,42 @@ const struct hash_vectors_st sha512_vectors[] = {
 	 },
 };
 
+const struct hash_vectors_st sha3_224_vectors[] = {
+	{
+	 STR(plaintext, plaintext_size,
+	     "\xC1\xEC\xFD\xFC"),
+	 STR(output, output_size,
+	     "\xA3\x3C\x58\xDF\x8A\x80\x26\xF0\xF9\x59\x19\x66\xBD\x6D\x00\xEE\xD3\xB1\xE8\x29\x58\x0A\xB9\xBE\x26\x8C\xAF\x39"),
+	 },
+};
+
+const struct hash_vectors_st sha3_256_vectors[] = {
+	{
+	 STR(plaintext, plaintext_size,
+	     "\xC1\xEC\xFD\xFC"),
+	 STR(output, output_size,
+	     "\xC5\x85\x9B\xE8\x25\x60\xCC\x87\x89\x13\x3F\x7C\x83\x4A\x6E\xE6\x28\xE3\x51\xE5\x04\xE6\x01\xE8\x05\x9A\x06\x67\xFF\x62\xC1\x24"),
+	 }
+};
+
+const struct hash_vectors_st sha3_384_vectors[] = {
+	{
+	 STR(plaintext, plaintext_size,
+	     "\x4A\x4F\x20\x24\x84\x51\x25\x26"),
+	 STR(output, output_size,
+	     "\x89\xDB\xF4\xC3\x9B\x8F\xB4\x6F\xDF\x0A\x69\x26\xCE\xC0\x35\x5A\x4B\xDB\xF9\xC6\xA4\x46\xE1\x40\xB7\xC8\xBD\x08\xFF\x6F\x48\x9F\x20\x5D\xAF\x8E\xFF\xE1\x60\xF4\x37\xF6\x74\x91\xEF\x89\x7C\x23"),
+	 },
+};
+
+const struct hash_vectors_st sha3_512_vectors[] = {
+	{
+	 STR(plaintext, plaintext_size,
+	     "\x82\xE1\x92\xE4\x04\x3D\xDC\xD1\x2E\xCF\x52\x96\x9D\x0F\x80\x7E\xED"),
+	 STR(output, output_size,
+	     "\x96\x44\xE3\xC9\x0B\x67\xE2\x21\x24\xE9\x6D\xFE\xDC\xE5\x3D\x33\xC4\x60\xF1\x32\x86\x8F\x09\x75\xD1\x8B\x22\xCF\xD5\x9F\x63\x7D\xD8\x5A\xA4\x05\xE3\x98\x08\xA4\x55\x70\xA4\x98\xC0\xB8\xF2\xCB\xA5\x9F\x8E\x14\x37\xEA\xEF\x89\xF2\x0B\x88\x29\x8A\xDF\xA2\xDE"),
+	 },
+};
+
 #define HASH_DATA_SIZE 64
 
 /* SHA1 and other hashes */
@@ -651,6 +687,9 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 	int ret;
 	size_t data_size;
 	gnutls_hash_hd_t hd;
+
+	if (_gnutls_digest_exists(dig) == 0)
+		return 0;
 
 	for (i = 0; i < vectors_size; i++) {
 		ret = gnutls_hash_init(&hd, dig);
@@ -679,7 +718,6 @@ static int test_digest(gnutls_digest_algorithm_t dig,
 		if (data_size != vectors[i].output_size ||
 		    memcmp(data, vectors[i].output,
 			   vectors[i].output_size) != 0) {
-
 			_gnutls_debug_log("%s test vector %d failed!\n",
 					  gnutls_digest_get_name(dig), i);
 			return gnutls_assert_val(GNUTLS_E_SELF_TEST_ERROR);
@@ -933,6 +971,10 @@ int gnutls_digest_self_test(unsigned all, gnutls_digest_algorithm_t digest)
 		CASE(GNUTLS_DIG_SHA256, test_digest, sha256_vectors);
 		CASE(GNUTLS_DIG_SHA384, test_digest, sha384_vectors);
 		CASE(GNUTLS_DIG_SHA512, test_digest, sha512_vectors);
+		CASE(GNUTLS_DIG_SHA3_224, test_digest, sha3_224_vectors);
+		CASE(GNUTLS_DIG_SHA3_256, test_digest, sha3_256_vectors);
+		CASE(GNUTLS_DIG_SHA3_384, test_digest, sha3_384_vectors);
+		CASE(GNUTLS_DIG_SHA3_512, test_digest, sha3_512_vectors);
 
 		break;
 	default:

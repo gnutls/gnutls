@@ -41,6 +41,10 @@
 #define HASH_OID_SHA256 "2.16.840.1.101.3.4.2.1"
 #define HASH_OID_SHA384 "2.16.840.1.101.3.4.2.2"
 #define HASH_OID_SHA512 "2.16.840.1.101.3.4.2.3"
+#define HASH_OID_SHA3_224 "2.16.840.1.101.3.4.2.7"
+#define HASH_OID_SHA3_256 "2.16.840.1.101.3.4.2.8"
+#define HASH_OID_SHA3_384 "2.16.840.1.101.3.4.2.9"
+#define HASH_OID_SHA3_512 "2.16.840.1.101.3.4.2.10"
 
 struct gnutls_x509_crl_iter {
 	/* This is used to optimize reads by gnutls_x509_crl_iter_crt_serial() */
