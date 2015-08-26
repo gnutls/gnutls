@@ -288,7 +288,9 @@ gnutls_digest_algorithm_t gnutls_oid_to_digest(const char *oid)
 
 	GNUTLS_HASH_LOOP(
 		if (p->oid && strcmp(oid, p->oid) == 0) {
-			ret = (gnutls_digest_algorithm_t) p->id; 
+			if (_gnutls_digest_exists((gnutls_digest_algorithm_t)p->id)) {
+				ret = (gnutls_digest_algorithm_t) p->id;
+			}
 			break;
 		}
 	);
