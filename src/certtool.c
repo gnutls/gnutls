@@ -1090,6 +1090,14 @@ static void cmd_parser(int argc, char **argv)
 			default_dig = GNUTLS_DIG_SHA384;
 		else if (strcasecmp(OPT_ARG(HASH), "sha512") == 0)
 			default_dig = GNUTLS_DIG_SHA512;
+		else if (strcasecmp(OPT_ARG(HASH), "sha3-256") == 0)
+			default_dig = GNUTLS_DIG_SHA3_256;
+		else if (strcasecmp(OPT_ARG(HASH), "sha3-224") == 0)
+			default_dig = GNUTLS_DIG_SHA3_224;
+		else if (strcasecmp(OPT_ARG(HASH), "sha3-384") == 0)
+			default_dig = GNUTLS_DIG_SHA3_384;
+		else if (strcasecmp(OPT_ARG(HASH), "sha3-512") == 0)
+			default_dig = GNUTLS_DIG_SHA3_512;
 		else if (strcasecmp(OPT_ARG(HASH), "rmd160") == 0)
 			default_dig = GNUTLS_DIG_RMD160;
 		else {
