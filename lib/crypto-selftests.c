@@ -29,6 +29,7 @@
 #include "errors.h"
 #include <random.h>
 #include <crypto.h>
+#include <nettle/sha3.h>
 
 #define STR(tag, tag_size, val) \
 	.tag = (uint8_t*)val, \
@@ -971,11 +972,12 @@ int gnutls_digest_self_test(unsigned all, gnutls_digest_algorithm_t digest)
 		CASE(GNUTLS_DIG_SHA256, test_digest, sha256_vectors);
 		CASE(GNUTLS_DIG_SHA384, test_digest, sha384_vectors);
 		CASE(GNUTLS_DIG_SHA512, test_digest, sha512_vectors);
+#ifdef NETTLE_SHA3_FIPS202
 		CASE(GNUTLS_DIG_SHA3_224, test_digest, sha3_224_vectors);
 		CASE(GNUTLS_DIG_SHA3_256, test_digest, sha3_256_vectors);
 		CASE(GNUTLS_DIG_SHA3_384, test_digest, sha3_384_vectors);
 		CASE(GNUTLS_DIG_SHA3_512, test_digest, sha3_512_vectors);
-
+#endif
 		break;
 	default:
 		return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);

@@ -34,10 +34,6 @@
 #include <nettle/umac.h>
 #include <fips.h>
 
-#ifndef NETTLE_SHA3_FIPS202
-# include <nettle/version.h>
-#endif
-
 typedef void (*update_func) (void *, unsigned, const uint8_t *);
 typedef void (*digest_func) (void *, unsigned, uint8_t *);
 typedef void (*set_key_func) (void *, unsigned, const uint8_t *);
@@ -324,20 +320,6 @@ static void wrap_nettle_hash_deinit(void *hd)
 	gnutls_free(hd);
 }
 
-/* Version 3.1 of nettle had the Keccak algorithm as SHA3. We
- * detect that we are using nettle 3.2 before enabling SHA3.
- */
-static int nettle_has_sha3(void)
-{
-#ifdef NETTLE_SHA3_FIPS202
-	return 1;
-#else
-	if (nettle_version_major() > 3 || (nettle_version_major() == 3 && nettle_version_minor() >= 2))
-		return 1;
-#endif
-	return 0;
-}
-
 static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 {
 	switch (algo) {
@@ -353,7 +335,11 @@ static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
 	case GNUTLS_DIG_SHA3_256:
 	case GNUTLS_DIG_SHA3_384:
 	case GNUTLS_DIG_SHA3_512:
-		return nettle_has_sha3();
+#ifdef NETTLE_SHA3_FIPS202
+		return 1;
+#else
+		return 0;
+#endif
 	case GNUTLS_DIG_MD2:
 		if (_gnutls_fips_mode_enabled() != 0)
 			return 0;
@@ -410,10 +396,8 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->ctx_ptr = &ctx->ctx.sha512;
 		ctx->length = SHA512_DIGEST_SIZE;
 		break;
+#ifdef NETTLE_SHA3_FIPS202
 	case GNUTLS_DIG_SHA3_224:
-		if (nettle_has_sha3() == 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		sha3_224_init(&ctx->ctx.sha3_224);
 		ctx->update = (update_func) sha3_224_update;
 		ctx->digest = (digest_func) sha3_224_digest;
@@ -421,9 +405,6 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->length = SHA3_224_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA3_256:
-		if (nettle_has_sha3() == 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		sha3_256_init(&ctx->ctx.sha3_256);
 		ctx->update = (update_func) sha3_256_update;
 		ctx->digest = (digest_func) sha3_256_digest;
@@ -431,9 +412,6 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->length = SHA3_256_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA3_384:
-		if (nettle_has_sha3() == 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		sha3_384_init(&ctx->ctx.sha3_384);
 		ctx->update = (update_func) sha3_384_update;
 		ctx->digest = (digest_func) sha3_384_digest;
@@ -441,15 +419,13 @@ static int _ctx_init(gnutls_digest_algorithm_t algo,
 		ctx->length = SHA3_384_DIGEST_SIZE;
 		break;
 	case GNUTLS_DIG_SHA3_512:
-		if (nettle_has_sha3() == 0)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		sha3_512_init(&ctx->ctx.sha3_512);
 		ctx->update = (update_func) sha3_512_update;
 		ctx->digest = (digest_func) sha3_512_digest;
 		ctx->ctx_ptr = &ctx->ctx.sha3_512;
 		ctx->length = SHA3_512_DIGEST_SIZE;
 		break;
+#endif
 	case GNUTLS_DIG_MD2:
 		if (_gnutls_fips_mode_enabled() != 0)
 			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
