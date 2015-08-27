@@ -280,7 +280,7 @@ void test_failure(void)
 
 	gnutls_session_auto_verify_cert2(client, vdata, 2, 0);
 
-	HANDSHAKE_EXPECT(client, server, GNUTLS_E_CERTIFICATE_ERROR, GNUTLS_E_AGAIN);
+	HANDSHAKE_EXPECT(client, server, GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR, GNUTLS_E_AGAIN);
 
 	status = gnutls_session_get_verify_cert_status(client);
 

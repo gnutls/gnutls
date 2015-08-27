@@ -47,7 +47,7 @@ static int auto_verify_cb(gnutls_session_t session)
         session->internals.vc_status = status;
 
         if (status != 0)        /* Certificate is not trusted */
-                return gnutls_assert_val(GNUTLS_E_CERTIFICATE_ERROR);
+                return gnutls_assert_val(GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR);
 
         /* notify gnutls to continue handshake normally */
         return 0;
@@ -61,8 +61,8 @@ static int auto_verify_cb(gnutls_session_t session)
  *
  * This function instructs GnuTLS to verify the peer's certificate
  * using the provided hostname. If the verification fails the handshake
- * will also fail. The verification result can be obtained using
- * gnutls_session_get_verify_cert_status().
+ * will also fail with %GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR. In that
+ * case the verification result can be obtained using gnutls_session_get_verify_cert_status().
  *
  * The @hostname pointer provided must remain valid for the lifetime
  * of the session. More precisely it should be available during any subsequent
@@ -102,8 +102,8 @@ void gnutls_session_auto_verify_cert(gnutls_session_t session,
  *
  * This function instructs GnuTLS to verify the peer's certificate
  * using the provided typed data information. If the verification fails the handshake
- * will also fail. The verification result can be obtained using
- * gnutls_session_get_verify_cert_status().
+ * will also fail with %GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR. In that
+ * case the verification result can be obtained using gnutls_session_get_verify_cert_status().
  *
  * The acceptable typed data are the same as in gnutls_certificate_verify_peers(),
  * and once set must remain valid for the lifetime of the session. More precisely
