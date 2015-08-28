@@ -13,6 +13,9 @@ See the end for copying conditions.
 
 ** certtool: Allow specifying fixed dates on CRL generation.
 
+** gnutls-cli-debug: Added check for inappropriate fallback support
+   (RFC7507).
+
 ** API and ABI modifications:
 No changes since last version.
 
