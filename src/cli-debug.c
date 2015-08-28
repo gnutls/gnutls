@@ -103,6 +103,7 @@ static const TLS_TEST tls_tests[] = {
 	{"for TLS 1.2 (RFC5246) support", test_tls1_2, "yes", "no", "dunno"},
 	{"fallback from TLS 1.6 to", test_tls1_6_fallback, NULL,
 	 "failed (server requires fallback dance)", "dunno"},
+	{"for RFC7507 inappropriate fallback", test_rfc7507, "yes", "no", "dunno"},
 	{"for HTTPS server name", test_server, NULL, "failed", "not checked", 1},
 	{"for certificate information", test_certificate, NULL, "", ""},
 	{"for certificate chain order", test_chain_order, "sorted", "unsorted", "unknown"},
