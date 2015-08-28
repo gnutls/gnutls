@@ -2,7 +2,7 @@ Build with separate build dir:
   script:
   - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
     ../configure --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
-    make -j2 && make check -j3
+    make -j4 && make check -j4
   - cat tests/test-suite.log
   tags:
   - fast
@@ -43,7 +43,7 @@ Build and Check with asan:
 Build and Check:
   script:
   - git submodule update --init && make autoreconf && ./configure --with-included-libtasn1
-    --disable-doc --disable-valgrind-tests && make -j2 && make check -j3
+    --disable-doc --disable-valgrind-tests && make -j4 && make check -j4
   - cat tests/test-suite.log
   tags:
   - slow
