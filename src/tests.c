@@ -239,7 +239,7 @@ test_code_t test_rfc7507(gnutls_session_t session)
 	else if (tls1_1_ok && tls1_ok)
 		pstr = "-VERS-TLS-ALL:+VERS-TLS1.0:%FALLBACK_SCSV";
 	else if (tls1_ok && ssl3_ok)
-		pstr = "-VERS-TLS-ALL:+VERS-SSL3:%FALLBACK_SCSV";
+		pstr = "-VERS-TLS-ALL:+VERS-SSL3.0:%FALLBACK_SCSV";
 	else
 		return TEST_IGNORE;
 
