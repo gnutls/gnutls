@@ -2,6 +2,14 @@ Some things are mentioned here to help any potential gnutls coder.
 The rules here are not always used, although we try to stick to them.
 
 
+** Test suite:
+   New functionality should be accompanied by a test case which verifies
+ the correctness of GnuTLS' operation on successful use of the new
+ functionality, as well as on fail cases. An example test suite can be seen
+ in mini-x509-cas.c.  The GnuTLS test suite is run on "make check"
+ on every system GnuTLS is installed.
+
+
 *** File names:
   Files are split to directories according to the subsystem
  they belong to. Examples are x509/, minitasn1/, openpgp/,
@@ -43,7 +51,7 @@ the project's DCO.
  Internal structures should not be exported. Especially pointers to
  internal data. Doing so harms future reorganization/rewrite of subsystems.
 
- All exported functions must be listed in libgnutls.map and libgnutls-extra.map
+ All exported functions must be listed in libgnutls.map
  in order to be exported.
 
 
@@ -68,12 +76,14 @@ the project's DCO.
   When data and size is expected, a gnutls_datum structure should be
   used (or more precisely a pointer to the structure).
 
+
 *** Callback function parameters:
   Callback functions should be avoided, if this is possible. 
  Callbacks that refer to a TLS session should include the
  current session as a parameter, in order for the called function to
  be able to retrieve the data associated with the session.
  This is not always done though -- see the push/pull callbacks.
+
 
 *** Return values:
   Functions in gnutls return an int type, when possible. In that
