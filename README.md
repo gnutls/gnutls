@@ -6,30 +6,30 @@ want to build from version controlled sources.
 
 We require several tools to check out and build the software, including:
 
-* Make <http://www.gnu.org/software/make/>
-* Automake <http://www.gnu.org/software/automake/> (use 1.11.3 or later)
-* Autoconf <http://www.gnu.org/software/autoconf/>
-* Autogen <http://www.gnu.org/software/autogen/> (use 5.16 or later)
-* Libtool <http://www.gnu.org/software/libtool/>
-* Gettext <http://www.gnu.org/software/gettext/>
-* Texinfo <http://www.gnu.org/software/texinfo/>
-* Tar <http://www.gnu.org/software/tar/>
-* Gzip <http://www.gnu.org/software/gzip/>
-* Texlive & epsf <http://www.tug.org/texlive/> (for PDF manual)
-* GTK-DOC <http://www.gtk.org/gtk-doc/> (for API manual)
-* Git <http://git-scm.com/>
-* Perl <http://www.cpan.org/>
-* Nettle <http://www.lysator.liu.se/~nisse/nettle/>
-* Guile <http://www.gnu.org/software/guile/>
-* p11-kit <http://p11-glue.freedesktop.org/p11-kit.html>
-* gperf <http://www.gnu.org/software/gperf/>
-* libtasn1 <http://josefsson.org/libtasn1/> (optional)
-* Libidn <http://www.gnu.org/software/libidn/> (optional, for internationalization of DNS)
-* AWK <http://www.gnu.org/software/awk/> (for make dist, pmccabe2html)
-* git2cl <http://savannah.nongnu.org/projects/git2cl/> (for make dist, ChangeLog)
-* bison <http://www.gnu.org/software/bison> (for datetime parser in certtool)
-* libunbound <https://unbound.net/> (for DANE support)
-* abi-compliance-checker <http://ispras.linuxbase.org/index.php/ABI_compliance_checker> (for make dist)
+* [Make](http://www.gnu.org/software/make/)
+* [Automake](http://www.gnu.org/software/automake/) (use 1.11.3 or later)
+* [Autoconf](http://www.gnu.org/software/autoconf/)
+* [Autogen](http://www.gnu.org/software/autogen/) (use 5.16 or later)
+* [Libtool](http://www.gnu.org/software/libtool/)
+* [Gettext](http://www.gnu.org/software/gettext/)
+* [Texinfo](http://www.gnu.org/software/texinfo/)
+* [Tar](http://www.gnu.org/software/tar/)
+* [Gzip](http://www.gnu.org/software/gzip/)
+* [Texlive & epsf](http://www.tug.org/texlive/) (for PDF manual)
+* [GTK-DOC](http://www.gtk.org/gtk-doc/) (for API manual)
+* [Git](http://git-scm.com/)
+* [Perl](http://www.cpan.org/)
+* [Nettle](http://www.lysator.liu.se/~nisse/nettle/)
+* [Guile](http://www.gnu.org/software/guile/)
+* [p11-kit](http://p11-glue.freedesktop.org/p11-kit.html)
+* [gperf](http://www.gnu.org/software/gperf/)
+* [libtasn1](http://josefsson.org/libtasn1/) (optional)
+* [Libidn](http://www.gnu.org/software/libidn/) (optional, for internationalization of DNS)
+* [AWK](http://www.gnu.org/software/awk/) (for make dist, pmccabe2html)
+* [git2cl](http://savannah.nongnu.org/projects/git2cl/) (for make dist, ChangeLog)
+* [bison](http://www.gnu.org/software/bison) (for datetime parser in certtool)
+* [libunbound](https://unbound.net/) (for DANE support)
+* [abi-compliance-checker](http://ispras.linuxbase.org/index.php/ABI_compliance_checker) (for make dist)
 
 The required software is typically distributed with your operating
 system, and the instructions for installing them differ.  Here are
@@ -53,12 +53,12 @@ Dependencies that are used during make check are listed below. Moreover,
 for basic interoperability testing you may want to install openssl
 and polarssl.
 
-* Valgrind <http://valgrind.org/> (optional)
-* Libasan <https://gcc.gnu.org//> (optional)
-* datefudge <http://packages.debian.org/datefudge> (optional)
-* nodejs <http://nodejs.org/> (needed for certain test cases)
-* softhsm <http://www.opendnssec.org/softhsm/> (for testing smart card support)
-* dieharder <http://www.phy.duke.edu/~rgb/General/dieharder.php> (for testing PRNG)
+* [Valgrind](http://valgrind.org/) (optional)
+* [Libasan](https://gcc.gnu.org//) (optional)
+* [datefudge](http://packages.debian.org/datefudge) (optional)
+* [nodejs](http://nodejs.org/) (needed for certain test cases)
+* [softhsm](http://www.opendnssec.org/softhsm/) (for testing smart card support)
+* [dieharder](http://www.phy.duke.edu/~rgb/General/dieharder.php) (for testing PRNG)
 
 ```
 apt-get install valgrind libasan1
@@ -97,13 +97,13 @@ are:
 $ sh tests/suite/testpkcs11
 ```
 
-If you wish to contribute, you may read more about our coding style in
-doc/README.CODING_STYLE. Note that when contributing code that is not 
-assigned to FSF, you will need to assert that the contribution is in 
-accordance to the "Developer's Certificate of Origin" as found in the 
-file doc/DCO.txt. That can be done by sending a mail with your real name to 
-the gnutls-devel mailing list. Then just make sure that your contributions 
-(patches), contain a "Signed-off-by" line, with your name and e-mail address. 
+If you wish to contribute, you may read more about our [coding style](doc/README.CODING_STYLE).
+Note that when contributing code that is not assigned to FSF, you will
+need to assert that the contribution is in accordance to the "Developer's
+Certificate of Origin" as found in the file [DCO.txt](doc/DCO.txt).
+That can be done by sending a mail with your real name to the gnutls-devel
+mailing list. Then just make sure that your contributions (patches),
+contain a "Signed-off-by" line, with your name and e-mail address. 
 To automate the process use "git am -s" to produce patches.
 
 Happy hacking!
