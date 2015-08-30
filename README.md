@@ -1,4 +1,6 @@
-GnuTLS README-alpha -- Information for developers
+[![build status](https://ci.gitlab.com/projects/684/status.png?ref=master)](https://ci.gitlab.com/projects/684?ref=master)
+
+GnuTLS -- Information for developers
 =================================================
 
 This file contains instructions for developers and advanced users that
