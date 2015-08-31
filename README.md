@@ -86,7 +86,7 @@ $ make bootstrap
 When built this way, some developer defaults will be enabled.  See
 cfg.mk for details.
 
-Then build the project normally:
+Then build the project normally, and run the test suite.
 
 ```
 $ make
