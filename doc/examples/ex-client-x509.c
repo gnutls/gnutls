@@ -85,7 +85,7 @@ int main(void)
         /* put the x509 credentials to the current session
          */
         gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-        gnutls_session_auto_verify_cert(session, "my_host_name", 0);
+        gnutls_session_set_verify_cert(session, "my_host_name", 0);
 
         /* connect to the peer
          */

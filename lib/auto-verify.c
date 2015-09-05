@@ -54,7 +54,7 @@ static int auto_verify_cb(gnutls_session_t session)
 }
 
 /**
- * gnutls_session_auto_verify_cert:
+ * gnutls_session_set_verify_cert:
  * @session: is a gnutls session
  * @hostname: is the expected name of the peer; may be %NULL
  * @flags: flags for certificate verification -- #gnutls_certificate_verify_flags
@@ -68,13 +68,13 @@ static int auto_verify_cb(gnutls_session_t session)
  * of the session. More precisely it should be available during any subsequent
  * handshakes. If not hostname is provided, no hostname verification
  * will be performed. For a more advanced verification function check
- * gnutls_session_auto_verify_cert2().
+ * gnutls_session_set_verify_cert2().
  *
  * That function is intended to be used by clients.
  *
  * Since: 3.5.0
  **/
-void gnutls_session_auto_verify_cert(gnutls_session_t session,
+void gnutls_session_set_verify_cert(gnutls_session_t session,
 				     const char *hostname, unsigned flags)
 {
 	if (hostname) {
@@ -94,7 +94,7 @@ void gnutls_session_auto_verify_cert(gnutls_session_t session,
 }
 
 /**
- * gnutls_session_auto_verify_cert2:
+ * gnutls_session_set_verify_cert2:
  * @session: is a gnutls session
  * @data: an array of typed data
  * @elements: the number of data elements
@@ -111,7 +111,7 @@ void gnutls_session_auto_verify_cert(gnutls_session_t session,
  *
  * Since: 3.5.0
  **/
-void gnutls_session_auto_verify_cert2(gnutls_session_t session,
+void gnutls_session_set_verify_cert2(gnutls_session_t session,
 				     gnutls_typed_vdata_st * data,
 				     unsigned elements,
 				     unsigned flags)
@@ -130,8 +130,8 @@ void gnutls_session_auto_verify_cert2(gnutls_session_t session,
  * @session: is a gnutls session
  *
  * This function returns the status of the verification when initiated
- * via auto-verification, i.e., by gnutls_session_auto_verify_cert2() or
- * gnutls_session_auto_verify_cert(). If no certificate verification
+ * via auto-verification, i.e., by gnutls_session_set_verify_cert2() or
+ * gnutls_session_set_verify_cert(). If no certificate verification
  * was occurred then the return value would be set to ((unsigned int)-1).
  *
  * The certificate verification status is the same as in gnutls_certificate_verify_peers().

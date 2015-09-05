@@ -278,7 +278,7 @@ void test_failure(void)
 	vdata[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
 	vdata[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
 
-	gnutls_session_auto_verify_cert2(client, vdata, 2, 0);
+	gnutls_session_set_verify_cert2(client, vdata, 2, 0);
 
 	HANDSHAKE_EXPECT(client, server, GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR, GNUTLS_E_AGAIN);
 
@@ -403,7 +403,7 @@ void test_success1(void)
 	vdata[1].type = GNUTLS_DT_KEY_PURPOSE_OID;
 	vdata[1].data = (void*)GNUTLS_KP_TLS_WWW_SERVER;
 
-	gnutls_session_auto_verify_cert2(client, vdata, 2, 0);
+	gnutls_session_set_verify_cert2(client, vdata, 2, 0);
 
 	HANDSHAKE(client, server);
 
@@ -518,7 +518,7 @@ void test_success2(void)
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
 
-	gnutls_session_auto_verify_cert(client, "localhost", 0);
+	gnutls_session_set_verify_cert(client, "localhost", 0);
 
 	HANDSHAKE(client, server);
 

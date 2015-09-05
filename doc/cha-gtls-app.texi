@@ -575,7 +575,7 @@ the following functions, applicable to X.509 and OpenPGP certificates.
 @showfuncC{gnutls_certificate_set_x509_system_trust,gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_openpgp_keyring_file}
 
 The peer's certificate will be automatically verified if
-@funcref{gnutls_session_auto_verify_cert} is called prior to handshake.
+@funcref{gnutls_session_set_verify_cert} is called prior to handshake.
 
 Alternatively, one must set a callback function during the handshake
 using @funcref{gnutls_certificate_set_verify_function}, which
@@ -590,7 +590,7 @@ functions discussed in @ref{X.509 certificates}.
 In both the automatic and the manual cases, the verification status returned
 can be printed using @funcref{gnutls_certificate_verification_status_print}.
 
-@showfuncdesc{gnutls_session_auto_verify_cert}
+@showfuncdesc{gnutls_session_set_verify_cert}
 
 @showfuncB{gnutls_certificate_verify_peers3,gnutls_certificate_set_verify_function}
 
@@ -841,7 +841,7 @@ exchange.
 
 @showfuncdesc{gnutls_handshake_set_timeout}
 
-In GnuTLS 3.5.0 and later it is recommended to use @funcref{gnutls_session_auto_verify_cert}
+In GnuTLS 3.5.0 and later it is recommended to use @funcref{gnutls_session_set_verify_cert}
 for the handshake process to ensure the verification of the peer's identity.
 
 In older GnuTLS versions it is required to manually verify the peer's certificate
@@ -849,7 +849,7 @@ during the handshake by using @funcref{gnutls_certificate_set_verify_function}, 
 @funcref{gnutls_certificate_verify_peers2}. See @ref{Certificate authentication}
 for more information.
 
-@showfuncB{gnutls_session_auto_verify_cert,gnutls_certificate_verify_peers2}
+@showfuncB{gnutls_session_set_verify_cert,gnutls_certificate_verify_peers2}
 
 @node Data transfer and termination
 @section Data transfer and termination
