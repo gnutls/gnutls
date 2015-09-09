@@ -37,7 +37,7 @@ The required software is typically distributed with your operating
 system, and the instructions for installing them differ.  Here are
 some hints:
 
-gNewSense/Debian/Ubuntu:
+Debian/Ubuntu:
 ```
 apt-get install git-core autoconf libtool gettext autopoint
 apt-get install guile-2.0-dev libtasn1-6-dev
@@ -72,7 +72,7 @@ apt-get install libpolarssl-runtime openssl
 To download the version controlled sources:
 
 ```
-$ git clone git://gitorious.org/gnutls/gnutls.git
+$ git clone git@gitlab.com:gnutls/gnutls.git
 $ cd gnutls
 $ git submodule update --init
 ```
