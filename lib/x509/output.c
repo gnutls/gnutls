@@ -1137,17 +1137,17 @@ print_pubkey(gnutls_buffer_st * str, const char *key_name,
 								y.data,
 								y.size);
 					adds(str, "\n");
-					addf(str, _("\t\tP: "));
+					adds(str, _("\t\tP: "));
 					_gnutls_buffer_hexprint(str,
 								p.data,
 								p.size);
 					adds(str, "\n");
-					addf(str, _("\t\tQ: "));
+					adds(str, _("\t\tQ: "));
 					_gnutls_buffer_hexprint(str,
 								q.data,
 								q.size);
 					adds(str, "\n");
-					addf(str, _("\t\tG: "));
+					adds(str, _("\t\tG: "));
 					_gnutls_buffer_hexprint(str,
 								g.data,
 								g.size);
