@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 3.5.0 (unreleased)
 
+** libgnutls: Added new APIs to access the FIPS186-4 "provable" RSA
+   parameter generation from a seed.
+
 ** libgnutls: Added new simple verification functions. That avoids the need
    to install a callback to perform certificate verification. See
    doc/examples/ex-client-x509.c for usage.
@@ -16,6 +19,10 @@ gnutls_session_set_verify_function: Added
 gnutls_session_auto_verify_cert: Added
 gnutls_session_auto_verify_cert2: Added
 gnutls_session_get_verify_cert_status: Added
+gnutls_x509_privkey_generate2: Added
+gnutls_x509_privkey_get_seed: Added
+gnutls_privkey_generate2: Added
+gnutls_privkey_get_seed: Added
 
 
 * Version 3.4.3 (released 2015-07-12)
