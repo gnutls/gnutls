@@ -21,7 +21,7 @@
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
 EXTRA_DIST = priority_options.gperf
-BUILT_SOURCES = pkix_asn1_tab.c asn1_tab.c priority_options.h
+BUILT_SOURCES = pkix_asn1_tab.c gnutls_asn1_tab.c priority_options.h
 
 SUBDIRS = includes x509 auth ext algorithms extras accelerated
 
@@ -69,7 +69,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c			\
 	mbuffers.c buffers.c handshake.c num.c errors.c dh.c kx.c	\
 	priority.c hash_int.c cipher_int.c session.c db.c x509_b64.c 	\
 	extensions.c auth.c sslv2_compat.c datum.c session_pack.c mpi.c \
-	pk.c cert.c global.c constate.c anon_cred.c pkix_asn1_tab.c asn1_tab.c	\
+	pk.c cert.c global.c constate.c anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c	\
 	mem.c ui.c vasprintf.c vasprintf.h tls-sig.c ecc.c alert.c privkey_raw.c	\
 	system.c inet_ntop.c str.c state.c x509.c helper.c supplemental.c	\
 	random.c crypto-api.c privkey.c pcert.c	pubkey.c locks.c dtls.c 	\
@@ -211,7 +211,7 @@ pkix_asn1_tab.c: $(srcdir)/pkix.asn
 	-asn1Parser $(srcdir)/pkix.asn pkix_asn1_tab.c
 
 gnutls_asn1_tab.c: $(srcdir)/gnutls.asn
-	-asn1Parser $(srcdir)/gnutls.asn asn1_tab.c
+	-asn1Parser $(srcdir)/gnutls.asn gnutls_asn1_tab.c
 
 priority_options.h: $(srcdir)/priority_options.gperf
 	-gperf --global-table -t $^ > $@-tmp && mv $@-tmp $@
