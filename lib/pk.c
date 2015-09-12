@@ -186,6 +186,11 @@ int _gnutls_pk_params_copy(gnutls_pk_params_st * dst,
 		dst->params_nr++;
 	}
 
+	if (src->seed_size) {
+		dst->seed_size = src->seed_size;
+		memcpy(dst->seed, src->seed, src->seed_size);
+	}
+
 	return 0;
 
 fail:
@@ -215,6 +220,8 @@ void gnutls_pk_params_clear(gnutls_pk_params_st * p)
 		if (p->params[i] != NULL)
 			_gnutls_mpi_clear(p->params[i]);
 	}
+	gnutls_memset(p->seed, 0, p->seed_size);
+	p->seed_size = 0;
 }
 
 /* Writes the digest information and the digest in a DER encoded

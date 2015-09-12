@@ -41,6 +41,8 @@ rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 			       void *random_ctx, nettle_random_func * random,
 			       void *progress_ctx,
 			       nettle_progress_func * progress,
+			       unsigned *rseed_size,
+			       void *rseed,
 			       /* Desired size of modulo, in bits */
 			       unsigned n_size);
 

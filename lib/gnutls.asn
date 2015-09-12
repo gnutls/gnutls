@@ -26,7 +26,17 @@ RSAPrivateKey ::= SEQUENCE {
   exponent1        INTEGER, -- (Usually large) d mod (p-1)
   exponent2        INTEGER, -- (Usually large) d mod (q-1)
   coefficient      INTEGER, -- (Usually large) (inverse of q) mod p
-  otherPrimeInfos  OtherPrimeInfos OPTIONAL
+  otherInfo  	   RSAOtherInfo OPTIONAL
+}
+
+RSASeed ::= SEQUENCE {
+  algorithm OBJECT IDENTIFIER,
+  seed OCTET STRING
+}
+
+RSAOtherInfo ::= CHOICE {
+  otherPrimeInfos 	OtherPrimeInfos, -- the hash algorithm OID used for FIPS186-4 generation
+  seed 			[1] RSASeed
 }
 
 OtherPrimeInfos ::= SEQUENCE SIZE(1..MAX) OF OtherPrimeInfo

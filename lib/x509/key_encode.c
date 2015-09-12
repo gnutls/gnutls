@@ -442,11 +442,34 @@ _gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
-	if ((result = asn1_write_value(*c2, "otherPrimeInfos",
-				       NULL, 0)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		ret = _gnutls_asn2err(result);
-		goto cleanup;
+	if (params->flags & GNUTLS_PK_FLAG_PROVABLE && params->seed_size > 0) {
+		if ((result = asn1_write_value(*c2, "otherInfo",
+					       "seed", 1)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		if ((result = asn1_write_value(*c2, "otherInfo.seed.seed",
+					       params->seed, params->seed_size)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		if ((result = asn1_write_value(*c2, "otherInfo.seed.algorithm",
+					       gnutls_digest_get_oid(params->palgo), 1)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+	} else {
+		if ((result = asn1_write_value(*c2, "otherInfo",
+					       NULL, 0)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			goto cleanup;
+		}
 	}
 
 	if ((result =

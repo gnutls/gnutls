@@ -270,12 +270,17 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 
 	if (n_size == 2048) {
 		if (seed_length != 14 * 2) {
+			_gnutls_debug_log("Seed length must be 28 bytes\n");
+			return 0;
+		}
+	} else if (n_size == 3072) {
+		if (seed_length != 16 * 2) {
+			_gnutls_debug_log("Seed length must be 32 bytes\n");
 			return 0;
 		}
 	} else {
-		if (seed_length != 16 * 2) {
-			return 0;
-		}
+		_gnutls_debug_log("Unsupported size for modulus\n");
+		return 0;
 	}
 
 	if (!mpz_tstbit(pub->e, 0)) {
@@ -333,7 +338,6 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	} while (mpz_cmp(t, r) <= 0);
 
 	memset(&cert, 0, sizeof(cert));
-	memset(seed, 0, seed_length);
 
 	mpz_mul(pub->n, key->p, key->q);
 
@@ -385,11 +389,14 @@ rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 			       void *random_ctx, nettle_random_func * random,
 			       void *progress_ctx,
 			       nettle_progress_func * progress,
+			       unsigned *rseed_size,
+			       void *rseed,
 			       /* Desired size of modulo, in bits */
 			       unsigned n_size)
 {
 	uint8_t seed[32];
 	unsigned seed_length;
+	int ret;
 
 	if (n_size != 2048 && n_size != 3072) {
 		return 0;
@@ -402,6 +409,16 @@ rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 
 	random(random_ctx, seed_length, seed);
 
-	return _rsa_generate_fips186_4_keypair(pub, key, seed_length, seed,
+	if (rseed && rseed_size) {
+		if (*rseed_size < seed_length) {
+			return 0;
+		}
+		memcpy(rseed, seed, seed_length);
+		*rseed_size = seed_length;
+	}
+
+	ret = _rsa_generate_fips186_4_keypair(pub, key, seed_length, seed,
 					       progress_ctx, progress, n_size);
+	gnutls_memset(seed, 0, seed_length);
+	return ret;
 }

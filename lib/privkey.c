@@ -62,6 +62,29 @@ gnutls_privkey_type_t gnutls_privkey_get_type(gnutls_privkey_t key)
 }
 
 /**
+ * gnutls_privkey_get_seed:
+ * @key: should contain a #gnutls_privkey_t type
+ * @digest: if non-NULL it will contain the digest algorithm used for key generation (if applicable)
+ * @seed: where seed will be copied to
+ * @seed_size: originally holds the size of @seed, will be updated with actual size
+ *
+ * This function will return the seed that was used to generate the
+ * given private key. That function will succeed only if the key was generated
+ * as a provable key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.0
+ **/
+int gnutls_privkey_get_seed(gnutls_privkey_t key, gnutls_digest_algorithm_t *digest, void *seed, size_t *seed_size)
+{
+	if (key->type != GNUTLS_PRIVKEY_X509)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	return gnutls_x509_privkey_get_seed(key->key.x509, digest, seed, seed_size);
+}
+
+/**
  * gnutls_privkey_get_pk_algorithm:
  * @key: should contain a #gnutls_privkey_t type
  * @bits: If set will return the number of bits of the parameters (may be NULL)
@@ -735,10 +758,12 @@ gnutls_privkey_export_x509(gnutls_privkey_t pkey,
  * @pkey: The private key
  * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
  * @bits: the size of the modulus
- * @flags: unused for now.  Must be 0.
+ * @flags: Must be zero or flags from #gnutls_privkey_flags_t.
  *
  * This function will generate a random private key. Note that this
- * function must be called on an empty private key.
+ * function must be called on an empty private key. The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
+ * instructs the key generation process to use algorithms which generate
+ * provable parameters out of a seed.
  *
  * Note that when generating an elliptic curve key, the curve
  * can be substituted in the place of the bits parameter using the
@@ -756,13 +781,46 @@ gnutls_privkey_generate(gnutls_privkey_t pkey,
 			gnutls_pk_algorithm_t algo, unsigned int bits,
 			unsigned int flags)
 {
+	return gnutls_privkey_generate2(pkey, algo, bits, flags, NULL, 0);
+}
+
+/**
+ * gnutls_privkey_generate2:
+ * @pkey: The private key
+ * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
+ * @bits: the size of the modulus
+ * @flags: Must be zero or flags from #gnutls_privkey_flags_t.
+ * @seed: The seed to be used in case of %GNUTLS_PRIVKEY_FLAG_PROVABLE flag
+ * @seed_size: The size of the seed
+ *
+ * This function will generate a random private key. Note that this
+ * function must be called on an empty private key. The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
+ * instructs the key generation process to use algorithms which generate
+ * provable parameters out of a seed.
+ *
+ * Note that when generating an elliptic curve key, the curve
+ * can be substituted in the place of the bits parameter using the
+ * GNUTLS_CURVE_TO_BITS() macro.
+ *
+ * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.0
+ **/
+int
+gnutls_privkey_generate2(gnutls_privkey_t pkey,
+			 gnutls_pk_algorithm_t algo, unsigned int bits,
+			 unsigned int flags, void *seed, unsigned seed_size)
+{
 	int ret;
 
 	ret = gnutls_x509_privkey_init(&pkey->key.x509);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = gnutls_x509_privkey_generate(pkey->key.x509, algo, bits, flags);
+	ret = gnutls_x509_privkey_generate2(pkey->key.x509, algo, bits, flags, seed, seed_size);
 	if (ret < 0) {
 		gnutls_x509_privkey_deinit(pkey->key.x509);
 		pkey->key.x509 = NULL;

@@ -134,6 +134,8 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 {
 	int result;
 	ASN1_TYPE pkey_asn;
+	char tmp[64];
+	int tmp_size;
 
 	gnutls_pk_params_init(&pkey->params);
 
@@ -227,6 +229,29 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 	}
 
 	pkey->params.params_nr = RSA_PRIVATE_PARAMS;
+
+	tmp_size = sizeof(tmp);
+	result = asn1_read_value(pkey_asn, "otherInfo", tmp, &tmp_size);
+	if (result == ASN1_SUCCESS && strcmp(tmp, "seed") == 0) {
+		gnutls_datum_t v;
+		char oid[MAX_OID_SIZE];
+		int oid_size;
+
+		oid_size = sizeof(oid);
+		result = asn1_read_value(pkey_asn, "otherInfo.seed.algorithm", oid, &oid_size);
+		if (result >= 0) {
+			pkey->params.palgo = gnutls_oid_to_digest(oid);
+		}
+
+		result = _gnutls_x509_read_value(pkey_asn, "otherInfo.seed.seed", &v);
+		if (result >= 0) {
+			if (v.size <= sizeof(pkey->params.seed)) {
+				memcpy(pkey->params.seed, v.data, v.size);
+				pkey->params.seed_size = v.size;
+			}
+			gnutls_free(v.data);
+		}
+	}
 
 	return pkey_asn;
 
@@ -1482,10 +1507,12 @@ cleanup:
  * @key: a key
  * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
  * @bits: the size of the modulus
- * @flags: unused for now.  Must be 0.
+ * @flags: Must be zero or flags from #gnutls_privkey_flags_t.
  *
  * This function will generate a random private key. Note that this
- * function must be called on an empty private key.
+ * function must be called on an empty private key. The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
+ * instructs the key generation process to use algorithms which generate
+ * provable parameters out of a seed.
  *
  * Note that when generating an elliptic curve key, the curve
  * can be substituted in the place of the bits parameter using the
@@ -1504,6 +1531,40 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 			     gnutls_pk_algorithm_t algo, unsigned int bits,
 			     unsigned int flags)
 {
+	return gnutls_x509_privkey_generate2(key, algo, bits, flags, NULL, 0);   
+}
+
+/**
+ * gnutls_x509_privkey_generate2:
+ * @key: a key
+ * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
+ * @bits: the size of the modulus
+ * @flags: Must be zero or flags from #gnutls_privkey_flags_t.
+ * @seed: The seed to be used in case of %GNUTLS_PRIVKEY_FLAG_PROVABLE flag
+ * @seed_size: The size of the seed
+ *
+ * This function will generate a random private key. Note that this
+ * function must be called on an empty private key. The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
+ * instructs the key generation process to use algorithms which generate
+ * provable parameters out of a seed.
+ *
+ * Note that when generating an elliptic curve key, the curve
+ * can be substituted in the place of the bits parameter using the
+ * GNUTLS_CURVE_TO_BITS() macro.
+ *
+ * For DSA keys, if the subgroup size needs to be specified check
+ * the GNUTLS_SUBGROUP_TO_BITS() macro.
+ *
+ * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
+			      gnutls_pk_algorithm_t algo, unsigned int bits,
+			      unsigned int flags, void *seed, unsigned seed_size)
+{
 	int ret;
 
 	if (key == NULL) {
@@ -1520,6 +1581,14 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 			bits = _gnutls_ecc_bits_to_curve(bits);
 	}
 
+	if (flags & GNUTLS_PRIVKEY_FLAG_PROVABLE) {
+		key->params.flags |= GNUTLS_PK_FLAG_PROVABLE;
+		if (seed && seed_size < sizeof(key->params.seed)) {
+			key->params.seed_size = seed_size;
+			memcpy(key->params.seed, seed, seed_size);
+		}
+	}
+
 	ret = _gnutls_pk_generate_params(algo, bits, &key->params);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1531,7 +1600,6 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 		gnutls_assert();
 		goto cleanup;
 	}
-
 #ifndef ENABLE_FIPS140
 	ret = _gnutls_pk_verify_priv_params(algo, &key->params);
 #else
@@ -1557,6 +1625,40 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 	gnutls_pk_params_release(&key->params);
 
 	return ret;
+}
+
+/**
+ * gnutls_x509_privkey_get_seed:
+ * @key: should contain a #gnutls_x509_privkey_t type
+ * @digest: if non-NULL it will contain the digest algorithm used for key generation (if applicable)
+ * @seed: where seed will be copied to
+ * @seed_size: originally holds the size of @seed, will be updated with actual size
+ *
+ * This function will return the seed that was used to generate the
+ * given private key. That function will succeed only if the key was generated
+ * as a provable key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.0
+ **/
+int gnutls_x509_privkey_get_seed(gnutls_x509_privkey_t key, gnutls_digest_algorithm_t *digest, void *seed, size_t *seed_size)
+{
+	if (key->params.seed_size == 0)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	if (*seed_size < key->params.seed_size) {
+		*seed_size = key->params.seed_size;
+		return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+	}
+
+	if (digest)
+		*digest = key->params.palgo;
+
+	memcpy(seed, key->params.seed, key->params.seed_size);
+	*seed_size = key->params.seed_size; 
+	return 0;
 }
 
 /**

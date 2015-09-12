@@ -178,6 +178,9 @@ typedef enum record_flush_t {
 #define HANDSHAKE_HEADER_SIZE(session) (IS_DTLS(session) ? DTLS_HANDSHAKE_HEADER_SIZE : TLS_HANDSHAKE_HEADER_SIZE)
 #define MAX_HANDSHAKE_HEADER_SIZE DTLS_HANDSHAKE_HEADER_SIZE
 
+/* Maximum seed size for provable parameters */
+#define MAX_PVP_SEED_SIZE 256
+
 /* This is the maximum handshake message size we send without
    fragmentation. This currently ignores record layer overhead. */
 #define DTLS_DEFAULT_MTU 1200

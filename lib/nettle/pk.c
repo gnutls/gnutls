@@ -40,8 +40,8 @@
 #include <nettle/dsa.h>
 #ifdef ENABLE_FIPS140
 # include <dsa-fips.h>
-# include <rsa-fips.h>
 #endif
+#include <rsa-fips.h>
 #include <nettle/rsa.h>
 #include <gnutls/crypto.h>
 #include <nettle/bignum.h>
@@ -1132,6 +1132,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_DSA:
+		if (params->flags & GNUTLS_PK_FLAG_PROVABLE)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 #ifdef ENABLE_FIPS140
 		if (_gnutls_fips_mode_enabled() != 0) {
 			struct dsa_params pub;
@@ -1176,6 +1179,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		}
 #endif
 	case GNUTLS_PK_DH:
+		if (params->flags & GNUTLS_PK_FLAG_PROVABLE)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 		{
 			struct dsa_params pub;
 			mpz_t r;
@@ -1258,15 +1264,23 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			mpz_set_ui(pub.e, 65537);
 
-#ifdef ENABLE_FIPS140
-			if (_gnutls_fips_mode_enabled() != 0) {
-				ret =
-				    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
-						 rnd_func, NULL, NULL,
-						 level);
-			} else
-#endif
-			{
+			if ((params->flags & GNUTLS_PK_FLAG_PROVABLE) || _gnutls_fips_mode_enabled() != 0) {
+				params->flags |= GNUTLS_PK_FLAG_PROVABLE;
+				params->palgo = GNUTLS_DIG_SHA384;
+
+				if (params->seed_size) {
+					ret = _rsa_generate_fips186_4_keypair(&pub, &priv,
+						params->seed_size, params->seed,
+						NULL, NULL, level);
+				} else {
+					params->seed_size = sizeof(params->seed);
+					ret =
+					    rsa_generate_fips186_4_keypair(&pub, &priv, NULL,
+							 rnd_func, NULL, NULL,
+							 &params->seed_size, params->seed,
+							 level);
+				}
+			} else {
 				ret =
 				    rsa_generate_keypair(&pub, &priv, NULL,
 						 rnd_func, NULL, NULL,
@@ -1309,6 +1323,9 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 			break;
 		}
 	case GNUTLS_PK_EC:
+		if (params->flags & GNUTLS_PK_FLAG_PROVABLE)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
 		{
 			struct ecc_scalar key;
 			struct ecc_point pub;

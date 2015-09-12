@@ -29,8 +29,6 @@
 #include <nettle/sha2.h>
 #include <fips.h>
 
-#define MAX_PVP_SEED_SIZE 256
-
 #define div_ceil(x,y) ((x+(y)-1)/(y))
 
 struct dss_params_validation_seeds {
