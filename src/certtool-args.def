@@ -58,6 +58,19 @@ flag = {
 };
 
 flag = {
+    name      = generate-provable-privkey;
+    descrip   = "Generate a private key from a seed using a provable method";
+    doc = "This will use the FIPS-186-4 algorithms for provable key generation. You may specify --seed or allow GnuTLS to generate one (recommended).";
+};
+
+flag = {
+    name      = seed;
+    descrip   = "When generating a private key use the given hex-encoded seed";
+    arg-type  = string;
+    doc = "";
+};
+
+flag = {
     name      = generate-request;
     value     = q;
     descrip   = "Generate a PKCS #10 certificate request";

@@ -109,10 +109,11 @@ int main(int argc, char **argv)
 }
 
 static gnutls_x509_privkey_t
-generate_private_key_int(common_info_st * cinfo)
+generate_private_key_int(common_info_st * cinfo, unsigned provable)
 {
 	gnutls_x509_privkey_t key;
 	int ret, key_type, bits;
+	unsigned flags = 0;
 
 	key_type = req_key_type;
 
@@ -135,7 +136,20 @@ generate_private_key_int(common_info_st * cinfo)
 		fprintf(stderr,
 			"Note that DSA keys with size over 1024 may cause incompatibility problems when used with earlier than TLS 1.2 versions.\n\n");
 
-	ret = gnutls_x509_privkey_generate(key, key_type, bits, 0);
+	if (HAVE_OPT(SEED)) {
+		char seed[64];
+		size_t seed_size = sizeof(seed);
+		ret = gnutls_hex2bin(OPT_ARG(SEED), strlen(OPT_ARG(SEED)), seed, &seed_size);
+		if (ret < 0) {
+			fprintf(stderr, "Could not hex decode data: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		ret = gnutls_x509_privkey_generate2(key, key_type, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, seed, seed_size);
+	} else {
+		if (provable)
+			flags |= GNUTLS_PRIVKEY_FLAG_PROVABLE;
+		ret = gnutls_x509_privkey_generate(key, key_type, bits, flags);
+	}
 	if (ret < 0) {
 		fprintf(stderr, "privkey_generate: %s\n",
 			gnutls_strerror(ret));
@@ -227,11 +241,11 @@ print_private_key(common_info_st * cinfo, gnutls_x509_privkey_t key)
 	fwrite(lbuffer, 1, size, outfile);
 }
 
-static void generate_private_key(common_info_st * cinfo)
+static void generate_private_key(common_info_st * cinfo, unsigned provable)
 {
 	gnutls_x509_privkey_t key;
 
-	key = generate_private_key_int(cinfo);
+	key = generate_private_key_int(cinfo, provable);
 
 	print_private_key(cinfo, key);
 
@@ -1024,7 +1038,7 @@ static void cmd_parser(int argc, char **argv)
 		stdlog = stderr;
 	}
 
-	if (HAVE_OPT(GENERATE_PRIVKEY) || HAVE_OPT(GENERATE_REQUEST) ||
+	if (HAVE_OPT(GENERATE_PRIVKEY) || HAVE_OPT(GENERATE_PROVABLE_PRIVKEY) || HAVE_OPT(GENERATE_REQUEST) ||
 	    HAVE_OPT(KEY_INFO) || HAVE_OPT(PGP_KEY_INFO))
 		privkey_op = 1;
 
@@ -1204,7 +1218,7 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(PASSWORD)) {
 		cinfo.password = OPT_ARG(PASSWORD);
-		if (HAVE_OPT(GENERATE_PRIVKEY) && cinfo.pkcs8 == 0) {
+		if ((HAVE_OPT(GENERATE_PRIVKEY)||HAVE_OPT(GENERATE_PROVABLE_PRIVKEY)) && cinfo.pkcs8 == 0) {
 			fprintf(stderr, "Assuming PKCS #8 format...\n");
 			cinfo.pkcs8 = 1;
 		}
@@ -1231,7 +1245,9 @@ static void cmd_parser(int argc, char **argv)
 	else if (HAVE_OPT(UPDATE_CERTIFICATE))
 		update_signed_certificate(&cinfo);
 	else if (HAVE_OPT(GENERATE_PRIVKEY))
-		generate_private_key(&cinfo);
+		generate_private_key(&cinfo, 0);
+	else if (HAVE_OPT(GENERATE_PROVABLE_PRIVKEY))
+		generate_private_key(&cinfo, 1);
 	else if (HAVE_OPT(GENERATE_REQUEST))
 		generate_request(&cinfo);
 	else if (HAVE_OPT(VERIFY_CHAIN))
@@ -1922,6 +1938,13 @@ static void privkey_info_int(common_info_st * cinfo,
 	fprintf(outfile, "\n");
 
 	size = lbuffer_size;
+	ret = gnutls_x509_privkey_get_seed(key, NULL, lbuffer, &size);
+	if (ret >= 0) {
+		fprintf(outfile, "Seed: %s\n",
+			raw_to_string(lbuffer, size));
+	}
+
+	size = lbuffer_size;
 	if ((ret =
 	     gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA1, lbuffer, &size)) < 0) {
 		fprintf(stderr, "Error in key id calculation: %s\n",
@@ -1940,6 +1963,7 @@ static void privkey_info_int(common_info_st * cinfo,
 				art.data);
 			gnutls_free(art.data);
 		}
+
 	}
 	fprintf(outfile, "\n");
 
@@ -2036,7 +2060,7 @@ void generate_request(common_info_st * cinfo)
 			exit(1);
 		}
 
-		xkey = generate_private_key_int(cinfo);
+		xkey = generate_private_key_int(cinfo, 0);
 
 		print_private_key(cinfo, xkey);
 
