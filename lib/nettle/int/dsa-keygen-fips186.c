@@ -401,7 +401,49 @@ dsa_generate_dss_pqg(struct dsa_params *params,
 		return 0;
 
 	return 1;
+}
 
+int
+_dsa_generate_dss_pqg(struct dsa_params *params,
+			 struct dss_params_validation_seeds *cert,
+			 unsigned index,
+			 unsigned seed_size, void *seed,
+			 void *progress_ctx, nettle_progress_func * progress,
+			 unsigned p_bits /* = L */ , unsigned q_bits /* = N */ )
+{
+	int ret;
+	uint8_t domain_seed[MAX_PVP_SEED_SIZE*3];
+	unsigned domain_seed_size = 0;
+
+	ret = _dsa_check_qp_sizes(q_bits, p_bits, 1);
+	if (ret == 0)
+		return 0;
+
+	cert->seed_length = 2 * (q_bits / 8) + 1;
+
+	if (cert->seed_length > sizeof(cert->seed))
+		return 0;
+
+	if (cert->seed_length != seed_size)
+		return 0;
+
+	memcpy(cert->seed, seed, cert->seed_length);
+
+	ret = _dsa_generate_dss_pq(params, cert, cert->seed_length, cert->seed,
+				   progress_ctx, progress, p_bits, q_bits);
+	if (ret == 0)
+		return 0;
+
+	domain_seed_size = cert->seed_length + cert->qseed_length + cert->pseed_length;
+	memcpy(domain_seed, cert->seed, cert->seed_length);
+	memcpy(&domain_seed[cert->seed_length], cert->pseed, cert->pseed_length);
+	memcpy(&domain_seed[cert->seed_length+cert->pseed_length], cert->qseed, cert->qseed_length);
+	ret = _dsa_generate_dss_g(params, domain_seed_size, domain_seed,
+				  progress_ctx, progress, index);
+	if (ret == 0)
+		return 0;
+
+	return 1;
 }
 
 int

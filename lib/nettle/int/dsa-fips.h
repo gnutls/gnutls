@@ -60,6 +60,14 @@ dsa_generate_dss_pqg(struct dsa_params *params,
 		     unsigned p_bits /* = L */, unsigned q_bits /* = N */);
 
 int
+_dsa_generate_dss_pqg(struct dsa_params *params,
+			 struct dss_params_validation_seeds *cert,
+			 unsigned index,
+			 unsigned seed_size, void *seed,
+			 void *progress_ctx, nettle_progress_func * progress,
+			 unsigned p_bits /* = L */ , unsigned q_bits /* = N */ );
+
+int
 dsa_generate_dss_keypair(struct dsa_params *params,
 		     mpz_t y,
 		     mpz_t x,

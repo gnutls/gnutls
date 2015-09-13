@@ -643,6 +643,24 @@ _gnutls_asn1_encode_dsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
+	if (params->seed_size > 0) {
+		if ((result = asn1_write_value(*c2, "seed.seed",
+					       params->seed, params->seed_size)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		if ((result = asn1_write_value(*c2, "seed.algorithm",
+					       gnutls_digest_get_oid(params->palgo), 1)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+	} else {
+		asn1_write_value(*c2, "seed", NULL, 0);
+	}
+
 	if ((result =
 	     asn1_write_value(*c2, "version", &null, 1)) != ASN1_SUCCESS) {
 		gnutls_assert();

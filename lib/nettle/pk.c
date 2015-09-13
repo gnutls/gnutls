@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2010-2012 Free Software Foundation, Inc.
- * Copyright (C) 2013 Nikos Mavrogiannopoulos
+ * Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -38,9 +38,7 @@
 #include <random.h>
 #include <pk.h>
 #include <nettle/dsa.h>
-#ifdef ENABLE_FIPS140
-# include <dsa-fips.h>
-#endif
+#include <dsa-fips.h>
 #include <rsa-fips.h>
 #include <nettle/rsa.h>
 #include <gnutls/crypto.h>
@@ -771,10 +769,8 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 	case GNUTLS_PK_DH:
 		{
 			struct dsa_params pub;
-#ifdef ENABLE_FIPS140
 			struct dss_params_validation_seeds cert;
 			unsigned index;
-#endif
 
 			dsa_params_init(&pub);
 
@@ -788,23 +784,43 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 			if (q_bits == 0)
 				return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
 
-#ifdef ENABLE_FIPS140
-			if (_gnutls_fips_mode_enabled() != 0) {
+			if (_gnutls_fips_mode_enabled() != 0 || params->flags & GNUTLS_PK_FLAG_PROVABLE) {
 				if (algo==GNUTLS_PK_DSA)
 					index = 1;
 				else
 					index = 2;
 
-				ret =
-				    dsa_generate_dss_pqg(&pub, &cert,
-			    			 index,
-						 NULL, rnd_func, 
-						 NULL, NULL,
-						 level, q_bits);
+				if (params->palgo != 0 && params->palgo != GNUTLS_DIG_SHA384) {
+					ret = GNUTLS_E_INVALID_REQUEST;
+					goto dsa_fail;
+				}
+
+				params->palgo = GNUTLS_DIG_SHA384;
+
+				if (params->seed_size) {
+					ret =
+					    _dsa_generate_dss_pqg(&pub, &cert,
+				    			 index,
+							 params->seed_size, params->seed, 
+							 NULL, NULL,
+							 level, q_bits);
+				} else {
+					ret =
+					    dsa_generate_dss_pqg(&pub, &cert,
+				    			 index,
+							 NULL, rnd_func, 
+							 NULL, NULL,
+							 level, q_bits);
+				}
 				if (ret != 1) {
 					gnutls_assert();
 					ret = GNUTLS_E_PK_GENERATION_ERROR;
 					goto dsa_fail;
+				}
+
+				if (cert.seed_length && cert.seed_length < sizeof(params->seed)) {
+					params->seed_size = cert.seed_length;
+					memcpy(params->seed, cert.seed, cert.seed_length);
 				}
 
 				/* verify the generated parameters */
@@ -814,9 +830,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 					ret = GNUTLS_E_PK_GENERATION_ERROR;
 					goto dsa_fail;
 				}
-			} else 
-#endif
-			{
+			} else {
 				if (q_bits < 160)
 					q_bits = 160;
 
@@ -1132,9 +1146,6 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 	switch (algo) {
 	case GNUTLS_PK_DSA:
-		if (params->flags & GNUTLS_PK_FLAG_PROVABLE)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 #ifdef ENABLE_FIPS140
 		if (_gnutls_fips_mode_enabled() != 0) {
 			struct dsa_params pub;
@@ -1179,9 +1190,6 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 		}
 #endif
 	case GNUTLS_PK_DH:
-		if (params->flags & GNUTLS_PK_FLAG_PROVABLE)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		{
 			struct dsa_params pub;
 			mpz_t r;
@@ -1270,7 +1278,7 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 					ret = GNUTLS_E_INVALID_REQUEST;
 					goto rsa_fail;
 				}
-				
+
 				params->palgo = GNUTLS_DIG_SHA384;
 
 				if (params->seed_size) {

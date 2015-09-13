@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2012-2015 Nikos Mavrogiannopoulos
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -381,6 +382,9 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 {
 	int result;
 	ASN1_TYPE dsa_asn;
+	gnutls_datum_t seed = {NULL,0};
+	char oid[MAX_OID_SIZE];
+	int oid_size;
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_gnutls_asn(),
@@ -441,6 +445,21 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 		goto error;
 	}
 	pkey->params.params_nr++;
+
+	oid_size = sizeof(oid);
+	result = asn1_read_value(dsa_asn, "seed.algorithm", oid, &oid_size);
+	if (result >= 0) {
+		pkey->params.palgo = gnutls_oid_to_digest(oid);
+	}
+
+	result = _gnutls_x509_read_value(dsa_asn, "seed.seed", &seed);
+	if (result >= 0) {
+		if (seed.size <= sizeof(pkey->params.seed)) {
+			memcpy(pkey->params.seed, seed.data, seed.size);
+			pkey->params.seed_size = seed.size;
+		}
+		gnutls_free(seed.data);
+	}
 
 	return dsa_asn;
 
@@ -1667,70 +1686,20 @@ int gnutls_x509_privkey_get_seed(gnutls_x509_privkey_t key, gnutls_digest_algori
 	return 0;
 }
 
-/**
- * gnutls_x509_privkey_verify_seed:
- * @key: should contain a #gnutls_x509_privkey_t type
- * @digest: it contains the digest algorithm used for key generation (if applicable)
- * @seed: the seed of the key to be checked with
- * @seed_size: holds the size of @seed
- *
- * This function will verify that the given private key was generated from
- * the provided seed. If @seed is %NULL then the seed stored in the @key's structure
- * will be used for verification.
- *
- * Returns: In case of a verification failure %GNUTLS_E_PRIVKEY_VERIFICATION_ERROR
- * is returned, and zero or positive code on success.
- *
- * Since: 3.5.0
- **/
-int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_algorithm_t digest, const void *seed, size_t seed_size)
+static
+int cmp_rsa_key(gnutls_x509_privkey_t key1, gnutls_x509_privkey_t key2)
 {
-	int ret;
-	gnutls_x509_privkey_t okey;
-	unsigned bits;
 	gnutls_datum_t m1 = {NULL, 0}, e1 = {NULL, 0}, d1 = {NULL, 0}, p1 = {NULL, 0}, q1 = {NULL, 0};
 	gnutls_datum_t m2 = {NULL, 0}, e2 = {NULL, 0}, d2 = {NULL, 0}, p2 = {NULL, 0}, q2 = {NULL, 0};
-	gnutls_keygen_data_st data;
+	int ret;
 
-	if (key == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	if (key->pk_algorithm != GNUTLS_PK_RSA)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	ret = gnutls_x509_privkey_get_pk_algorithm2(key, &bits);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	ret = gnutls_x509_privkey_init(&okey);
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	if (seed == NULL) {
-		seed = key->params.seed;
-		seed_size = key->params.seed_size;
-	}
-
-	data.type = GNUTLS_KEYGEN_SEED;
-	data.data = (void*)seed;
-	data.size = seed_size;
-
-	ret = gnutls_x509_privkey_generate2(okey, key->pk_algorithm, bits,
-					    GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
+	ret = gnutls_x509_privkey_export_rsa_raw(key1, &m1, &e1, &d1, &p1, &q1, NULL);
 	if (ret < 0) {
 		gnutls_assert();
-		goto cleanup;
+		return ret;
 	}
 
-	ret = gnutls_x509_privkey_export_rsa_raw(okey, &m1, &e1, &d1, &p1, &q1, NULL);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_x509_privkey_export_rsa_raw(key, &m2, &e2, &d2, &p2, &q2, NULL);
+	ret = gnutls_x509_privkey_export_rsa_raw(key2, &m2, &e2, &d2, &p2, &q2, NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1767,8 +1736,7 @@ int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_alg
 	}
 
 	ret = 0;
-
-      cleanup:
+ cleanup:
       	gnutls_free(m1.data);
       	gnutls_free(e1.data);
       	gnutls_free(d1.data);
@@ -1779,10 +1747,123 @@ int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_alg
       	gnutls_free(d2.data);
       	gnutls_free(p2.data);
       	gnutls_free(q2.data);
+ 	return ret;
+}
+
+static
+int cmp_dsa_key(gnutls_x509_privkey_t key1, gnutls_x509_privkey_t key2)
+{
+	gnutls_datum_t p1 = {NULL, 0}, q1 = {NULL, 0}, g1 = {NULL, 0};
+	gnutls_datum_t p2 = {NULL, 0}, q2 = {NULL, 0}, g2 = {NULL, 0};
+	int ret;
+
+	ret = gnutls_x509_privkey_export_dsa_raw(key1, &p1, &q1, &g1, NULL, NULL);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = gnutls_x509_privkey_export_dsa_raw(key2, &p2, &q2, &g2, NULL, NULL);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (g1.size != g2.size || memcmp(g1.data, g2.data, g1.size) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_PRIVKEY_VERIFICATION_ERROR;
+		goto cleanup;
+	}
+
+	if (p1.size != p2.size || memcmp(p1.data, p2.data, p1.size) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_PRIVKEY_VERIFICATION_ERROR;
+		goto cleanup;
+	}
+
+	if (q1.size != q2.size || memcmp(q1.data, q2.data, q1.size) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_PRIVKEY_VERIFICATION_ERROR;
+		goto cleanup;
+	}
+
+	ret = 0;
+ cleanup:
+      	gnutls_free(g1.data);
+      	gnutls_free(p1.data);
+      	gnutls_free(q1.data);
+      	gnutls_free(g2.data);
+      	gnutls_free(p2.data);
+      	gnutls_free(q2.data);
+ 	return ret;
+}
+
+/**
+ * gnutls_x509_privkey_verify_seed:
+ * @key: should contain a #gnutls_x509_privkey_t type
+ * @digest: it contains the digest algorithm used for key generation (if applicable)
+ * @seed: the seed of the key to be checked with
+ * @seed_size: holds the size of @seed
+ *
+ * This function will verify that the given private key was generated from
+ * the provided seed. If @seed is %NULL then the seed stored in the @key's structure
+ * will be used for verification.
+ *
+ * Returns: In case of a verification failure %GNUTLS_E_PRIVKEY_VERIFICATION_ERROR
+ * is returned, and zero or positive code on success.
+ *
+ * Since: 3.5.0
+ **/
+int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_algorithm_t digest, const void *seed, size_t seed_size)
+{
+	int ret;
+	gnutls_x509_privkey_t okey;
+	unsigned bits;
+	gnutls_keygen_data_st data;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (key->pk_algorithm != GNUTLS_PK_RSA && key->pk_algorithm != GNUTLS_PK_DSA)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	ret = gnutls_x509_privkey_get_pk_algorithm2(key, &bits);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = gnutls_x509_privkey_init(&okey);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (seed == NULL) {
+		seed = key->params.seed;
+		seed_size = key->params.seed_size;
+	}
+
+	data.type = GNUTLS_KEYGEN_SEED;
+	data.data = (void*)seed;
+	data.size = seed_size;
+
+	ret = gnutls_x509_privkey_generate2(okey, key->pk_algorithm, bits,
+					    GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (key->pk_algorithm == GNUTLS_PK_RSA)
+		ret = cmp_rsa_key(key, okey);
+	else
+		ret = cmp_dsa_key(key, okey);
+
+	ret = 0;
+
+      cleanup:
         gnutls_x509_privkey_deinit(okey);
 
 	return ret;
-
 }
 
 /**
