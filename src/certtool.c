@@ -109,10 +109,11 @@ int main(int argc, char **argv)
 }
 
 static gnutls_x509_privkey_t
-generate_private_key_int(common_info_st * cinfo, unsigned provable)
+generate_private_key_int(common_info_st * cinfo)
 {
 	gnutls_x509_privkey_t key;
 	int ret, key_type, bits;
+	unsigned provable = cinfo->provable;
 	unsigned flags = 0;
 
 	key_type = req_key_type;
@@ -252,11 +253,11 @@ print_private_key(common_info_st * cinfo, gnutls_x509_privkey_t key)
 	fwrite(lbuffer, 1, size, outfile);
 }
 
-static void generate_private_key(common_info_st * cinfo, unsigned provable)
+static void generate_private_key(common_info_st * cinfo)
 {
 	gnutls_x509_privkey_t key;
 
-	key = generate_private_key_int(cinfo, provable);
+	key = generate_private_key_int(cinfo);
 
 	print_private_key(cinfo, key);
 
@@ -1080,7 +1081,7 @@ static void cmd_parser(int argc, char **argv)
 		stdlog = stderr;
 	}
 
-	if (HAVE_OPT(GENERATE_PRIVKEY) || HAVE_OPT(GENERATE_PROVABLE_PRIVKEY) || HAVE_OPT(GENERATE_REQUEST) ||
+	if (HAVE_OPT(GENERATE_PRIVKEY) || HAVE_OPT(GENERATE_REQUEST) ||
 	    HAVE_OPT(KEY_INFO) || HAVE_OPT(PGP_KEY_INFO))
 		privkey_op = 1;
 
@@ -1260,7 +1261,7 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(PASSWORD)) {
 		cinfo.password = OPT_ARG(PASSWORD);
-		if ((HAVE_OPT(GENERATE_PRIVKEY)||HAVE_OPT(GENERATE_PROVABLE_PRIVKEY)) && cinfo.pkcs8 == 0) {
+		if (HAVE_OPT(GENERATE_PRIVKEY) && cinfo.pkcs8 == 0) {
 			fprintf(stderr, "Assuming PKCS #8 format...\n");
 			cinfo.pkcs8 = 1;
 		}
@@ -1270,6 +1271,9 @@ static void cmd_parser(int argc, char **argv)
 		cinfo.null_password = 1;
 		cinfo.password = "";
 	}
+
+	if (HAVE_OPT(PROVABLE))
+		cinfo.provable = 1;
 
 	if (HAVE_OPT(EMPTY_PASSWORD)) {
 		cinfo.empty_password = 1;
@@ -1287,9 +1291,7 @@ static void cmd_parser(int argc, char **argv)
 	else if (HAVE_OPT(UPDATE_CERTIFICATE))
 		update_signed_certificate(&cinfo);
 	else if (HAVE_OPT(GENERATE_PRIVKEY))
-		generate_private_key(&cinfo, 0);
-	else if (HAVE_OPT(GENERATE_PROVABLE_PRIVKEY))
-		generate_private_key(&cinfo, 1);
+		generate_private_key(&cinfo);
 	else if (HAVE_OPT(GENERATE_REQUEST))
 		generate_request(&cinfo);
 	else if (HAVE_OPT(VERIFY_PROVABLE_PRIVKEY))
@@ -2104,7 +2106,7 @@ void generate_request(common_info_st * cinfo)
 			exit(1);
 		}
 
-		xkey = generate_private_key_int(cinfo, 0);
+		xkey = generate_private_key_int(cinfo);
 
 		print_private_key(cinfo, xkey);
 

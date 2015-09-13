@@ -54,6 +54,8 @@ typedef struct common_info {
 	int empty_password;
 	unsigned int crq_extensions;
 	unsigned int v1_cert;
+	/* for key generation */
+	unsigned provable;
 
 	const char *pin;
 	const char *so_pin;
