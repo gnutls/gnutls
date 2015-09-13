@@ -156,6 +156,7 @@ generate_private_key_int(common_info_st * cinfo)
 		data.type = GNUTLS_KEYGEN_SEED;
 		data.data = seed;
 		data.size = seed_size;
+
 		ret = gnutls_x509_privkey_generate2(key, key_type, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
 	} else {
 		if (provable)
@@ -216,7 +217,6 @@ print_private_key(common_info_st * cinfo, gnutls_x509_privkey_t key)
 	if (!key)
 		return;
 
-
 	if (!cinfo->pkcs8) {
 		/* Only print private key parameters when an unencrypted
 		 * format is used */
@@ -227,10 +227,26 @@ print_private_key(common_info_st * cinfo, gnutls_x509_privkey_t key)
 		ret = gnutls_x509_privkey_export(key, outcert_format,
 						 lbuffer, &size);
 		if (ret < 0) {
-			fprintf(stderr, "privkey_export: %s",
+			fprintf(stderr, "privkey_export: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
+
+		if (gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
+			gnutls_x509_privkey_set_flags(key, GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
+
+			fwrite(lbuffer, 1, size, outfile);
+
+			size = lbuffer_size;
+			ret = gnutls_x509_privkey_export(key, outcert_format,
+						 lbuffer, &size);
+			if (ret < 0) {
+				fprintf(stderr, "privkey_export: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
 	} else {
 		unsigned int flags = 0;
 		const char *pass;
@@ -2052,23 +2068,12 @@ void privkey_info(common_info_st * cinfo)
 		exit(1);
 	}
 
-	if (outcert_format == GNUTLS_X509_FMT_PEM)
-		privkey_info_int(cinfo, key);
+	print_private_key(cinfo, key);
 
 	ret = gnutls_x509_privkey_verify_params(key);
 	if (ret < 0)
 		fprintf(outfile,
 			"\n** Private key parameters validation failed **\n\n");
-
-	size = lbuffer_size;
-	ret =
-	    gnutls_x509_privkey_export(key, outcert_format, lbuffer, &size);
-	if (ret < 0) {
-		fprintf(stderr, "export error: %s\n", gnutls_strerror(ret));
-		exit(1);
-	}
-
-	fwrite(lbuffer, 1, size, outfile);
 
 	gnutls_x509_privkey_deinit(key);
 }
