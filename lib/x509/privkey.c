@@ -240,7 +240,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t * raw_key,
 
 		oid_size = sizeof(oid);
 		result = asn1_read_value(pkey_asn, "otherInfo.seed.algorithm", oid, &oid_size);
-		if (result >= 0) {
+		if (result == ASN1_SUCCESS) {
 			pkey->params.palgo = gnutls_oid_to_digest(oid);
 		}
 
@@ -448,17 +448,17 @@ decode_dsa_key(const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 
 	oid_size = sizeof(oid);
 	result = asn1_read_value(dsa_asn, "seed.algorithm", oid, &oid_size);
-	if (result >= 0) {
+	if (result == ASN1_SUCCESS) {
 		pkey->params.palgo = gnutls_oid_to_digest(oid);
-	}
 
-	result = _gnutls_x509_read_value(dsa_asn, "seed.seed", &seed);
-	if (result >= 0) {
-		if (seed.size <= sizeof(pkey->params.seed)) {
-			memcpy(pkey->params.seed, seed.data, seed.size);
-			pkey->params.seed_size = seed.size;
+		result = _gnutls_x509_read_value(dsa_asn, "seed.seed", &seed);
+		if (result == ASN1_SUCCESS) {
+			if (seed.size <= sizeof(pkey->params.seed)) {
+				memcpy(pkey->params.seed, seed.data, seed.size);
+				pkey->params.seed_size = seed.size;
+			}
+			gnutls_free(seed.data);
 		}
-		gnutls_free(seed.data);
 	}
 
 	return dsa_asn;
