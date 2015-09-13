@@ -1058,8 +1058,9 @@ int gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 int
 gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 			      gnutls_pk_algorithm_t algo, unsigned int bits,
-			      unsigned int flags, void *seed, unsigned size_size);
+			      unsigned int flags, const void *seed, unsigned size_size);
 
+int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_algorithm_t, const void *seed, size_t seed_size);
 int gnutls_x509_privkey_get_seed(gnutls_x509_privkey_t key, gnutls_digest_algorithm_t*, void *seed, size_t *seed_size);
 
 int gnutls_x509_privkey_verify_params(gnutls_x509_privkey_t key);

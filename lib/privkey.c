@@ -1,7 +1,7 @@
 /*
  * GnuTLS PKCS#11 support
  * Copyright (C) 2010-2014 Free Software Foundation, Inc.
- * Copyright (C) 2012-2014 Nikos Mavrogiannopoulos
+ * Copyright (C) 2012-2015 Nikos Mavrogiannopoulos
  * 
  * Author: Nikos Mavrogiannopoulos
  *
@@ -82,6 +82,28 @@ int gnutls_privkey_get_seed(gnutls_privkey_t key, gnutls_digest_algorithm_t *dig
 	if (key->type != GNUTLS_PRIVKEY_X509)
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 	return gnutls_x509_privkey_get_seed(key->key.x509, digest, seed, seed_size);
+}
+
+/**
+ * gnutls_privkey_verify_seed:
+ * @key: should contain a #gnutls_privkey_t type
+ * @digest: it contains the digest algorithm used for key generation (if applicable)
+ * @seed: the seed of the key to be checked with
+ * @seed_size: holds the size of @seed
+ *
+ * This function will verify that the given private key was generated from
+ * the provided seed.
+ *
+ * Returns: In case of a verification failure %GNUTLS_E_PRIVKEY_VERIFICATION_ERROR
+ * is returned, and zero or positive code on success.
+ *
+ * Since: 3.5.0
+ **/
+int gnutls_privkey_verify_seed(gnutls_privkey_t key, gnutls_digest_algorithm_t digest, const void *seed, size_t seed_size)
+{
+	if (key->type != GNUTLS_PRIVKEY_X509)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	return gnutls_x509_privkey_verify_seed(key->key.x509, digest, seed, seed_size);
 }
 
 /**
@@ -812,7 +834,7 @@ gnutls_privkey_generate(gnutls_privkey_t pkey,
 int
 gnutls_privkey_generate2(gnutls_privkey_t pkey,
 			 gnutls_pk_algorithm_t algo, unsigned int bits,
-			 unsigned int flags, void *seed, unsigned seed_size)
+			 unsigned int flags, const void *seed, unsigned seed_size)
 {
 	int ret;
 
