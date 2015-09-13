@@ -1,0 +1,80 @@
+#!/bin/sh
+
+# Copyright (C) 2014 Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+#set -e
+
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+DIFF="${DIFF:-diff}"
+OUTFILE=provable-privkey.tmp
+
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+fi
+
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/provable2048.pem"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not verify the 2048-bit key"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/provable3072.pem"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not verify the 3072-bit key"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --generate-provable-privkey --bits 2048 --seed "AF:BF:D6:96:BA:5D:05:E3:78:A9:4B:BF:E2:95:BA:F9:94:AC:B8:7F:BC:C8:ED:FF:7A:48:EE:4F" --outfile $OUTFILE
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not generate a 2048-bit key"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "$OUTFILE"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not verify the generated key 1"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "$OUTFILE" --seed "AF:BF:D6:96:BA:5D:05:E3:78:A9:4B:BF:E2:95:BA:F9:94:AC:B8:7F:BC:C8:ED:FF:7A:48:EE:4F"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not verify the generated key 2"
+	exit 1
+fi
+
+${VALGRIND} "${CERTTOOL}" --generate-provable-privkey --seed "AF:BF:D6:96:BA:5D:05:E3:78:A9:4B:BF:E2:95:BA:F9:94:AC:B8:7F:BC:C8:ED:FF:7A:48:EE:4F" --outfile $OUTFILE
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "Could not generate a default key"
+	exit 1
+fi
+
+exit 0

@@ -33,10 +33,11 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	single-ca.p7b single-ca.p7b.out full.p7b full.p7b.out detached.p7b \
 	pkcs7-detached.txt p7-combined.out template-generalized.pem \
 	template-generalized.tmpl privkey1.pem privkey2.pem privkey3.pem \
-	name-constraints-ip.pem cert-invalid-utf8.der very-long-dn.pem
+	name-constraints-ip.pem cert-invalid-utf8.der very-long-dn.pem \
+	provable3072.pem provable2048.pem
 
 dist_check_SCRIPTS = pathlen aki pem-decoding certtool invalid-sig email \
-	pkcs7 privkey-import name-constraints certtool-long-cn crl
+	pkcs7 privkey-import name-constraints certtool-long-cn crl provable-privkey
 
 if !HAVE_BUGGY_LIBIDN
 dist_check_SCRIPTS += certtool-utf8
