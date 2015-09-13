@@ -247,7 +247,7 @@ gnutls_privkey_generate (gnutls_privkey_t key,
 int
 gnutls_privkey_generate2(gnutls_privkey_t pkey,
 			 gnutls_pk_algorithm_t algo, unsigned int bits,
-			 unsigned int flags, const void *seed, unsigned seed_size);
+			 unsigned int flags, const gnutls_keygen_data_st *data, unsigned data_size);
 
 int gnutls_privkey_verify_seed(gnutls_privkey_t key, gnutls_digest_algorithm_t, const void *seed, size_t seed_size);
 int gnutls_privkey_get_seed(gnutls_privkey_t key, gnutls_digest_algorithm_t*, void *seed, size_t *seed_size);

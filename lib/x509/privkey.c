@@ -1540,8 +1540,8 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
  * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
  * @bits: the size of the modulus
  * @flags: Must be zero or flags from #gnutls_privkey_flags_t.
- * @seed: The seed to be used in case of %GNUTLS_PRIVKEY_FLAG_PROVABLE flag
- * @seed_size: The size of the seed
+ * @data: Allow specifying %gnutls_keygen_data_st types such as the seed to be used.
+ * @data_size: The number of @data available.
  *
  * This function will generate a random private key. Note that this
  * function must be called on an empty private key. The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
@@ -1563,9 +1563,10 @@ gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 int
 gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 			      gnutls_pk_algorithm_t algo, unsigned int bits,
-			      unsigned int flags, const void *seed, unsigned seed_size)
+			      unsigned int flags, const gnutls_keygen_data_st *data, unsigned data_size)
 {
 	int ret;
+	unsigned i;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -1573,6 +1574,15 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 	}
 
 	gnutls_pk_params_init(&key->params);
+
+	for (i=0;i<data_size;i++) {
+		if (data[i].type == GNUTLS_KEYGEN_SEED && data[i].size < sizeof(key->params.seed)) {
+			key->params.seed_size = data[i].size;
+			memcpy(key->params.seed, data[i].data, data[i].size);
+		} else if (data[i].type == GNUTLS_KEYGEN_DIGEST) {
+			key->params.palgo = data[i].size;
+		}
+	}
 
 	if (algo == GNUTLS_PK_EC) {
 		if (GNUTLS_BITS_ARE_CURVE(bits))
@@ -1583,10 +1593,6 @@ gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 
 	if (flags & GNUTLS_PRIVKEY_FLAG_PROVABLE) {
 		key->params.flags |= GNUTLS_PK_FLAG_PROVABLE;
-		if (seed && seed_size < sizeof(key->params.seed)) {
-			key->params.seed_size = seed_size;
-			memcpy(key->params.seed, seed, seed_size);
-		}
 	}
 
 	ret = _gnutls_pk_generate_params(algo, bits, &key->params);
@@ -1684,6 +1690,7 @@ int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_alg
 	unsigned bits;
 	gnutls_datum_t m1 = {NULL, 0}, e1 = {NULL, 0}, d1 = {NULL, 0}, p1 = {NULL, 0}, q1 = {NULL, 0};
 	gnutls_datum_t m2 = {NULL, 0}, e2 = {NULL, 0}, d2 = {NULL, 0}, p2 = {NULL, 0}, q2 = {NULL, 0};
+	gnutls_keygen_data_st data;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -1706,8 +1713,12 @@ int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_alg
 		seed_size = key->params.seed_size;
 	}
 
+	data.type = GNUTLS_KEYGEN_SEED;
+	data.data = (void*)seed;
+	data.size = seed_size;
+
 	ret = gnutls_x509_privkey_generate2(okey, key->pk_algorithm, bits,
-					    GNUTLS_PRIVKEY_FLAG_PROVABLE, seed, seed_size);
+					    GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1726,26 +1737,31 @@ int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_alg
 	}
 
 	if (m1.size != m2.size || memcmp(m1.data, m2.data, m1.size) != 0) {
+		gnutls_assert();
 		ret = GNUTLS_E_PRIVKEY_VERIFICATION_ERROR;
 		goto cleanup;
 	}
 
 	if (d1.size != d2.size || memcmp(d1.data, d2.data, d1.size) != 0) {
+		gnutls_assert();
 		ret = GNUTLS_E_PRIVKEY_VERIFICATION_ERROR;
 		goto cleanup;
 	}
 
 	if (e1.size != e2.size || memcmp(e1.data, e2.data, e1.size) != 0) {
+		gnutls_assert();
 		ret = GNUTLS_E_PRIVKEY_VERIFICATION_ERROR;
 		goto cleanup;
 	}
 
 	if (p1.size != p2.size || memcmp(p1.data, p2.data, p1.size) != 0) {
+		gnutls_assert();
 		ret = GNUTLS_E_PRIVKEY_VERIFICATION_ERROR;
 		goto cleanup;
 	}
 
 	if (q1.size != q2.size || memcmp(q1.data, q2.data, q1.size) != 0) {
+		gnutls_assert();
 		ret = GNUTLS_E_PRIVKEY_VERIFICATION_ERROR;
 		goto cleanup;
 	}

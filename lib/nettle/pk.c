@@ -1266,6 +1266,11 @@ wrap_nettle_pk_generate_keys(gnutls_pk_algorithm_t algo,
 
 			if ((params->flags & GNUTLS_PK_FLAG_PROVABLE) || _gnutls_fips_mode_enabled() != 0) {
 				params->flags |= GNUTLS_PK_FLAG_PROVABLE;
+				if (params->palgo != 0 && params->palgo != GNUTLS_DIG_SHA384) {
+					ret = GNUTLS_E_INVALID_REQUEST;
+					goto rsa_fail;
+				}
+				
 				params->palgo = GNUTLS_DIG_SHA384;
 
 				if (params->seed_size) {

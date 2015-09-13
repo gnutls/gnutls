@@ -1055,10 +1055,29 @@ int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
 int gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 				 gnutls_pk_algorithm_t algo,
 				 unsigned int bits, unsigned int flags);
+
+/**
+ * gnutls_keygen_types_t:
+ * @GNUTLS_KEYGEN_SEED: Specifies the seed to be used in key generation.
+ * @GNUTLS_KEYGEN_DIGEST: The size field specifies the hash algorithm to be used in key generation.
+ *
+ * Enumeration of different key exchange algorithms.
+ */
+typedef enum {
+	GNUTLS_KEYGEN_SEED = 1,
+	GNUTLS_KEYGEN_DIGEST = 2,
+} gnutls_keygen_types_t;
+
+typedef struct {
+	gnutls_keygen_types_t type;
+	unsigned char *data;
+	unsigned int size;
+} gnutls_keygen_data_st;
+
 int
 gnutls_x509_privkey_generate2(gnutls_x509_privkey_t key,
 			      gnutls_pk_algorithm_t algo, unsigned int bits,
-			      unsigned int flags, const void *seed, unsigned size_size);
+			      unsigned int flags, const gnutls_keygen_data_st *data, unsigned data_size);
 
 int gnutls_x509_privkey_verify_seed(gnutls_x509_privkey_t key, gnutls_digest_algorithm_t, const void *seed, size_t seed_size);
 int gnutls_x509_privkey_get_seed(gnutls_x509_privkey_t key, gnutls_digest_algorithm_t*, void *seed, size_t *seed_size);

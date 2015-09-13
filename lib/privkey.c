@@ -812,8 +812,8 @@ gnutls_privkey_generate(gnutls_privkey_t pkey,
  * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
  * @bits: the size of the modulus
  * @flags: Must be zero or flags from #gnutls_privkey_flags_t.
- * @seed: The seed to be used in case of %GNUTLS_PRIVKEY_FLAG_PROVABLE flag
- * @seed_size: The size of the seed
+ * @data: Allow specifying %gnutls_keygen_data_st types such as the seed to be used.
+ * @data_size: The number of @data available.
  *
  * This function will generate a random private key. Note that this
  * function must be called on an empty private key. The flag %GNUTLS_PRIVKEY_FLAG_PROVABLE
@@ -834,7 +834,7 @@ gnutls_privkey_generate(gnutls_privkey_t pkey,
 int
 gnutls_privkey_generate2(gnutls_privkey_t pkey,
 			 gnutls_pk_algorithm_t algo, unsigned int bits,
-			 unsigned int flags, const void *seed, unsigned seed_size)
+			 unsigned int flags, const gnutls_keygen_data_st *data, unsigned data_size)
 {
 	int ret;
 
@@ -842,7 +842,7 @@ gnutls_privkey_generate2(gnutls_privkey_t pkey,
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
-	ret = gnutls_x509_privkey_generate2(pkey->key.x509, algo, bits, flags, seed, seed_size);
+	ret = gnutls_x509_privkey_generate2(pkey->key.x509, algo, bits, flags, data, data_size);
 	if (ret < 0) {
 		gnutls_x509_privkey_deinit(pkey->key.x509);
 		pkey->key.x509 = NULL;
