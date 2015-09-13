@@ -254,6 +254,8 @@ int gnutls_privkey_get_seed(gnutls_privkey_t key, gnutls_digest_algorithm_t*, vo
 
 int gnutls_privkey_verify_params(gnutls_privkey_t key);
 
+void gnutls_privkey_set_flags(gnutls_privkey_t key, unsigned int flags);
+
 void gnutls_privkey_set_pin_function (gnutls_privkey_t key,
                                       gnutls_pin_callback_t fn, void *userdata);
 
@@ -270,6 +272,10 @@ int gnutls_privkey_status(gnutls_privkey_t key);
  * @GNUTLS_PRIVKEY_IMPORT_COPY: Copy required values during import.
  * @GNUTLS_PRIVKEY_DISABLE_CALLBACKS: The following flag disables call to PIN callbacks etc.
  *   Only relevant to TPM keys.
+ * @GNUTLS_PRIVKEY_FLAG_PROVABLE: When generating a key involving prime numbers, use provable primes; a seed may be required.
+ * @GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT: Keys generated or imported as provable require an extended format which cannot be read by previous versions
+ *   of gnutls or other applications. By setting this flag the key will be exported in a backwards compatible way,
+ *   even if the information about the seed used will be lost.
  *
  * Enumeration of different certificate import flags.
  */
@@ -278,7 +284,8 @@ typedef enum gnutls_privkey_flags {
 	GNUTLS_PRIVKEY_IMPORT_COPY = 1 << 1,
 	GNUTLS_PRIVKEY_DISABLE_CALLBACKS = 1 << 2,
 	GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA = 1 << 4,
-	GNUTLS_PRIVKEY_FLAG_PROVABLE = 1 << 5
+	GNUTLS_PRIVKEY_FLAG_PROVABLE = 1 << 5,
+	GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT = 1 << 6
 } gnutls_privkey_flags_t;
 
 int gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,

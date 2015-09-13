@@ -1401,6 +1401,26 @@ void gnutls_privkey_set_pin_function(gnutls_privkey_t key,
 }
 
 /**
+ * gnutls_privkey_set_flags:
+ * @key: A key of type #gnutls_privkey_t
+ * @flags: flags from the %gnutls_privkey_flags
+ *
+ * This function will set flags for the specified private key, after
+ * it is generated. Currently this is useful for the %GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT
+ * to allow exporting a "provable" private key in backwards compatible way.
+ *
+ * Since: 3.5.0
+ *
+ **/
+void gnutls_privkey_set_flags(gnutls_privkey_t key,
+			      unsigned int flags)
+{
+	key->flags |= flags;
+	if (key->type == GNUTLS_PRIVKEY_X509)
+		gnutls_x509_privkey_set_flags(key->key.x509, flags);
+}
+
+/**
  * gnutls_privkey_status:
  * @key: Holds the key
  *

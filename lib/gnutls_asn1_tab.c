@@ -59,7 +59,7 @@ const asn1_static_node gnutls_asn1_tab[] = {
   { "g", 1073741827, NULL },
   { "Y", 1073741827, NULL },
   { "priv", 1073741827, NULL },
-  { "seed", 536879106, "ProvableSeed"},
+  { "seed", 536895490, "ProvableSeed"},
   { NULL, 2056, "1"},
   { "DHParameter", 1610612741, NULL },
   { "prime", 1073741827, NULL },

@@ -87,7 +87,7 @@ DSAPrivateKey ::= SEQUENCE {
   g        INTEGER,
   Y        INTEGER, -- public
   priv     INTEGER,
-  seed [1] ProvableSeed
+  seed [1] ProvableSeed OPTIONAL
 }
 
 -- from PKCS#3

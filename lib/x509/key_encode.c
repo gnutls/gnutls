@@ -336,7 +336,7 @@ _gnutls_x509_write_dsa_pubkey(gnutls_pk_params_st * params,
 /* Encodes the RSA parameters into an ASN.1 RSA private key structure.
  */
 static int
-_gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
+_gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params, unsigned compat)
 {
 	int result, ret;
 	uint8_t null = '\0';
@@ -442,7 +442,7 @@ _gnutls_asn1_encode_rsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
-	if (params->flags & GNUTLS_PK_FLAG_PROVABLE && params->seed_size > 0) {
+	if (compat == 0 && (params->flags & GNUTLS_PK_FLAG_PROVABLE) && params->seed_size > 0) {
 		if ((result = asn1_write_value(*c2, "otherInfo",
 					       "seed", 1)) != ASN1_SUCCESS) {
 			gnutls_assert();
@@ -583,7 +583,7 @@ cleanup:
 /* Encodes the DSA parameters into an ASN.1 DSAPrivateKey structure.
  */
 static int
-_gnutls_asn1_encode_dsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
+_gnutls_asn1_encode_dsa(ASN1_TYPE * c2, gnutls_pk_params_st * params, unsigned compat)
 {
 	int result, ret;
 	const uint8_t null = '\0';
@@ -643,7 +643,7 @@ _gnutls_asn1_encode_dsa(ASN1_TYPE * c2, gnutls_pk_params_st * params)
 		goto cleanup;
 	}
 
-	if (params->seed_size > 0) {
+	if (params->seed_size > 0 && compat == 0) {
 		if ((result = asn1_write_value(*c2, "seed.seed",
 					       params->seed, params->seed_size)) != ASN1_SUCCESS) {
 			gnutls_assert();
@@ -677,13 +677,13 @@ cleanup:
 }
 
 int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
-				gnutls_pk_params_st * params)
+				gnutls_pk_params_st * params, unsigned compat)
 {
 	switch (pk) {
 	case GNUTLS_PK_RSA:
-		return _gnutls_asn1_encode_rsa(c2, params);
+		return _gnutls_asn1_encode_rsa(c2, params, compat);
 	case GNUTLS_PK_DSA:
-		return _gnutls_asn1_encode_dsa(c2, params);
+		return _gnutls_asn1_encode_dsa(c2, params, compat);
 	case GNUTLS_PK_EC:
 		return _gnutls_asn1_encode_ecc(c2, params);
 	default:

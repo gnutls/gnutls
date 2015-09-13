@@ -1056,6 +1056,8 @@ int gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 				 gnutls_pk_algorithm_t algo,
 				 unsigned int bits, unsigned int flags);
 
+void gnutls_x509_privkey_set_flags(gnutls_x509_privkey_t key, unsigned int flags);
+
 /**
  * gnutls_keygen_types_t:
  * @GNUTLS_KEYGEN_SEED: Specifies the seed to be used in key generation.

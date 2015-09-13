@@ -120,6 +120,7 @@ typedef struct gnutls_x509_privkey_int {
 
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned expanded;
+	unsigned flags;
 
 	ASN1_TYPE key;
 	struct pin_info_st pin;
@@ -224,7 +225,7 @@ _gnutls_x509_read_ecc_params(uint8_t * der, int dersize,
 			     unsigned int *curve);
 
 int _gnutls_asn1_encode_privkey(gnutls_pk_algorithm_t pk, ASN1_TYPE * c2,
-				gnutls_pk_params_st * params);
+				gnutls_pk_params_st * params, unsigned compat);
 
 /* extensions.c */
 int _gnutls_x509_crl_get_extension_oid(gnutls_x509_crl_t crl,
