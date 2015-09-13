@@ -2067,6 +2067,9 @@ void privkey_info(common_info_st * cinfo)
 		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+	/* On this option we may import from PKCS #8 but we are always exporting
+	 * to our format. */
+	cinfo->pkcs8 = 0;
 
 	print_private_key(cinfo, key);
 
