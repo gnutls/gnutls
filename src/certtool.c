@@ -136,15 +136,26 @@ generate_private_key_int(common_info_st * cinfo, unsigned provable)
 		fprintf(stderr,
 			"Note that DSA keys with size over 1024 may cause incompatibility problems when used with earlier than TLS 1.2 versions.\n\n");
 
+	if ((HAVE_OPT(SEED) || provable) && key_type == GNUTLS_PK_RSA) {
+		if (bits != 2048 && bits != 3072) {
+			fprintf(stderr, "Note that the FIPS 186-4 key generation restricts keys to 2048 and 3072 bits\n");
+		}
+	}
+
 	if (HAVE_OPT(SEED)) {
-		char seed[64];
+		gnutls_keygen_data_st data;
+		unsigned char seed[64];
 		size_t seed_size = sizeof(seed);
 		ret = gnutls_hex2bin(OPT_ARG(SEED), strlen(OPT_ARG(SEED)), seed, &seed_size);
 		if (ret < 0) {
 			fprintf(stderr, "Could not hex decode data: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
-		ret = gnutls_x509_privkey_generate2(key, key_type, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, seed, seed_size);
+
+		data.type = GNUTLS_KEYGEN_SEED;
+		data.data = seed;
+		data.size = seed_size;
+		ret = gnutls_x509_privkey_generate2(key, key_type, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
 	} else {
 		if (provable)
 			flags |= GNUTLS_PRIVKEY_FLAG_PROVABLE;
@@ -250,6 +261,37 @@ static void generate_private_key(common_info_st * cinfo, unsigned provable)
 	print_private_key(cinfo, key);
 
 	gnutls_x509_privkey_deinit(key);
+}
+
+static void verify_provable_privkey(common_info_st * cinfo)
+{
+	gnutls_privkey_t pkey;
+	int ret;
+
+	pkey = load_private_key(1, cinfo);
+
+	if (HAVE_OPT(SEED)) {
+		char seed[64];
+		size_t seed_size = sizeof(seed);
+		ret = gnutls_hex2bin(OPT_ARG(SEED), strlen(OPT_ARG(SEED)), seed, &seed_size);
+		if (ret < 0) {
+			fprintf(stderr, "Could not hex decode data: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		ret = gnutls_privkey_verify_seed(pkey, 0, seed, seed_size);
+	} else {
+		ret = gnutls_privkey_verify_seed(pkey, 0, NULL, 0);
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "Error verifying private key: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	printf("Key was verified\n");
+	gnutls_privkey_deinit(pkey);
+
+	return;
 }
 
 
@@ -1250,6 +1292,8 @@ static void cmd_parser(int argc, char **argv)
 		generate_private_key(&cinfo, 1);
 	else if (HAVE_OPT(GENERATE_REQUEST))
 		generate_request(&cinfo);
+	else if (HAVE_OPT(VERIFY_PROVABLE_PRIVKEY))
+		verify_provable_privkey(&cinfo);
 	else if (HAVE_OPT(VERIFY_CHAIN))
 		verify_chain();
 	else if (HAVE_OPT(VERIFY))

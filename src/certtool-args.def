@@ -64,6 +64,12 @@ flag = {
 };
 
 flag = {
+    name      = verify-provable-privkey;
+    descrip   = "Verify a private key generated from a seed using a provable method";
+    doc = "This will use the FIPS-186-4 algorithms for provable key generation. You may specify --seed or use the seed stored in the private key structure.";
+};
+
+flag = {
     name      = seed;
     descrip   = "When generating a private key use the given hex-encoded seed";
     arg-type  = string;
