@@ -145,7 +145,7 @@ generate_private_key_int(common_info_st * cinfo)
 
 	if (HAVE_OPT(SEED)) {
 		gnutls_keygen_data_st data;
-		unsigned char seed[64];
+		unsigned char seed[256];
 		size_t seed_size = sizeof(seed);
 		ret = gnutls_hex2bin(OPT_ARG(SEED), strlen(OPT_ARG(SEED)), seed, &seed_size);
 		if (ret < 0) {
@@ -288,7 +288,7 @@ static void verify_provable_privkey(common_info_st * cinfo)
 	pkey = load_private_key(1, cinfo);
 
 	if (HAVE_OPT(SEED)) {
-		char seed[64];
+		char seed[256];
 		size_t seed_size = sizeof(seed);
 		ret = gnutls_hex2bin(OPT_ARG(SEED), strlen(OPT_ARG(SEED)), seed, &seed_size);
 		if (ret < 0) {
