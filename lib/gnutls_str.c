@@ -483,8 +483,7 @@ _gnutls_hex2bin(const char *hex_data, size_t hex_size, uint8_t * bin_data,
 			i++;
 			continue;
 		}
-
-		if (j > *bin_size) {
+		if (j >= *bin_size) {
 			gnutls_assert();
 			return GNUTLS_E_SHORT_MEMORY_BUFFER;
 		}
