@@ -17,8 +17,8 @@ See the end for copying conditions.
 ** API and ABI modifications:
 gnutls_check_version_numeric: Added
 gnutls_session_set_verify_function: Added
-gnutls_session_auto_verify_cert: Added
-gnutls_session_auto_verify_cert2: Added
+gnutls_session_set_verify_cert: Added
+gnutls_session_set_verify_cert2: Added
 gnutls_session_get_verify_cert_status: Added
 gnutls_x509_privkey_generate2: Added
 gnutls_x509_privkey_get_seed: Added
