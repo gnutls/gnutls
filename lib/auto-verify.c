@@ -66,11 +66,12 @@ static int auto_verify_cb(gnutls_session_t session)
  *
  * The @hostname pointer provided must remain valid for the lifetime
  * of the session. More precisely it should be available during any subsequent
- * handshakes. If not hostname is provided, no hostname verification
+ * handshakes. If no hostname is provided, no hostname verification
  * will be performed. For a more advanced verification function check
  * gnutls_session_set_verify_cert2().
  *
- * That function is intended to be used by clients.
+ * The gnutls_session_set_verify_cert() function is intended to be used by TLS
+ * clients to verify the server's certificate.
  *
  * Since: 3.5.0
  **/
