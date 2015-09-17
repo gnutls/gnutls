@@ -114,7 +114,7 @@ static const TLS_TEST tls_tests[] = {
 	 test_safe_renegotiation_scsv,
 	 "yes", "no", "dunno"},
 	{"for encrypt-then-MAC (RFC7366) support", test_etm, "yes", "no", "dunno"},
-	{"for ext master secret (draft-ietf-tls-session-hash) support", test_ext_master_secret, "yes", "no", "dunno"},
+	{"for ext master secret (RFC7627) support", test_ext_master_secret, "yes", "no", "dunno"},
 	{"for heartbeat (RFC6520) support", test_heartbeat_extension, "yes", "no", "dunno"},
 	{"for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes",
 	 "dunno"},
