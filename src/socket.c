@@ -160,6 +160,9 @@ ssize_t wait_for_text(int fd, const char *txt, unsigned txt_size)
 		}
 		buf[ret] = 0;
 
+		if (txt == NULL)
+			break;
+
 		p = memmem(buf, ret, txt, txt_size);
 		if (p != NULL && p != buf) {
 			p--;
@@ -197,6 +200,12 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		wait_for_text(socket->fd, "a OK", 4);
 		send_line(socket->fd, "a STARTTLS\r\n");
 		wait_for_text(socket->fd, "a OK", 4);
+	} else if (strcasecmp(app_proto, "ldap") == 0) {
+		if (socket->verbose)
+			printf("Negotiating LDAP STARTTLS\n");
+#define LDAP_STR "\x30\x1d\x02\x01\x01\x77\x18\x80\x16\x31\x2e\x33\x2e\x36\x2e\x31\x2e\x34\x2e\x31\x2e\x31\x34\x36\x36\x2e\x32\x30\x30\x33\x37"
+		send(socket->fd, LDAP_STR, sizeof(LDAP_STR)-1, 0);
+		wait_for_text(socket->fd, NULL, 0);
 	} else if (strcasecmp(app_proto, "ftp") == 0 || strcasecmp(app_proto, "ftps") == 0) {
 		if (socket->verbose)
 			printf("Negotiating FTP STARTTLS\n");
