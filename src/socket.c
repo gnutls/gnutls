@@ -177,6 +177,8 @@ ssize_t wait_for_text(int fd, const char *txt, unsigned txt_size)
 void
 socket_starttls(socket_st * socket, const char *app_proto)
 {
+	char buf[512];
+
 	if (socket->secure)
 		return;
 
@@ -188,7 +190,8 @@ socket_starttls(socket_st * socket, const char *app_proto)
 			printf("Negotiating SMTP STARTTLS\n");
 
 		wait_for_text(socket->fd, "220 ", 4);
-		send_line(socket->fd, "EHLO mail.example.com\n");
+		snprintf(buf, sizeof(buf), "EHLO %s\n", socket->hostname);
+		send_line(socket->fd, buf);
 		wait_for_text(socket->fd, "250 ", 4);
 		send_line(socket->fd, "STARTTLS\n");
 		wait_for_text(socket->fd, "220 ", 4);
@@ -200,6 +203,15 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		wait_for_text(socket->fd, "a OK", 4);
 		send_line(socket->fd, "a STARTTLS\r\n");
 		wait_for_text(socket->fd, "a OK", 4);
+	} else if (strcasecmp(app_proto, "xmpp") == 0) {
+		if (socket->verbose)
+			printf("Negotiating XMPP STARTTLS\n");
+
+		snprintf(buf, sizeof(buf), "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='%s' version='1.0'>\n", socket->hostname);
+		send_line(socket->fd, buf);
+		wait_for_text(socket->fd, "<?", 2);
+		send_line(socket->fd, "<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+		wait_for_text(socket->fd, "<proceed", 8);
 	} else if (strcasecmp(app_proto, "ldap") == 0) {
 		if (socket->verbose)
 			printf("Negotiating LDAP STARTTLS\n");
