@@ -3,6 +3,14 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.4.6 (unreleased)
+
+** tools: Added support for LDAP and XMPP negotiation for STARTTLS.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.4.5 (released 2015-09-12)
 
 ** libgnutls: When re-importing CRLs to a trust list ensure that there
