@@ -43,7 +43,7 @@ Build and Check with asan:
 Build and Check:
   script:
   - git submodule update --init && make autoreconf && ./configure --with-included-libtasn1
-    --disable-doc --disable-valgrind-tests && make -j4 && make check -j4
+    --disable-doc --disable-valgrind-tests && make -j4 && make check -j2
   - cat tests/test-suite.log
   tags:
   - slow
