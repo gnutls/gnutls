@@ -821,7 +821,7 @@ typedef struct {
 						 * function.
 						 */
 
-	unsigned expire_time;	/* after expire_time seconds this session will expire */
+	time_t expire_time;	/* after expire_time seconds this session will expire */
 	struct mod_auth_st_int *auth_struct;	/* used in handshake packets and KX algorithms */
 
 	/* this is the highest version available
