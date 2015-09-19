@@ -8,7 +8,7 @@
 #include <gnutls/crypto.h>
 #include <gnutls/self-test.h>
 
-#ifndef HAVE_LIBNETTLE
+#if !defined(HAVE_LIBNETTLE) || defined(WIN32)
 int main(int argc, char **argv)
 {
 	exit(77);

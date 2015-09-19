@@ -14,6 +14,13 @@
  * cpu instructions (AES-NI or padlock).
  */
 
+#if defined(WIN32)
+int main(int argc, char **argv)
+{
+	exit(77);
+}
+#else
+
 static void handle_sigill(int sig)
 {
 	exit(0);
@@ -58,3 +65,5 @@ int main(int argc, char **argv)
 	gnutls_global_deinit();
 	return 0;
 }
+
+#endif
