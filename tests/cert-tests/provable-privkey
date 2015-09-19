@@ -70,7 +70,7 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-${VALGRIND} "${CERTTOOL}" --generate-privkey --provable --seed "AF:BF:D6:96:BA:5D:05:E3:78:A9:4B:BF:E2:95:BA:F9:94:AC:B8:7F:BC:C8:ED:FF:7A:48:EE:4F" --outfile $OUTFILE
+${VALGRIND} "${CERTTOOL}" --generate-privkey --provable --seed "A3:54:5C:B3:1D:70:56:1C:A0:BD:2C:C8:78:C1:9C:56:CD:69:75:50:0C:3A:FD:BF:E8:96:83:FA:52:BC:98:C5" --outfile $OUTFILE
 rc=$?
 
 if test "${rc}" != "0"; then
