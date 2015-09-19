@@ -157,6 +157,16 @@ generate_private_key_int(common_info_st * cinfo)
 		data.data = seed;
 		data.size = seed_size;
 
+		if (key_type == GNUTLS_PK_RSA) {
+			if ((bits == 3072 && seed_size != 32) || (bits == 2048 && seed_size != 28)) {
+				fprintf(stderr, "The seed size (%d) doesn't match the size of the request security level; use -d 2 for more information.\n", (int)seed_size);
+			}
+		} else if (key_type == GNUTLS_PK_DSA) {
+			if (seed_size != 65) {
+				fprintf(stderr, "The seed size (%d) doesn't match the size of the request security level; use -d 2 for more information.\n", (int)seed_size);
+			}
+		}
+
 		ret = gnutls_x509_privkey_generate2(key, key_type, bits, GNUTLS_PRIVKEY_FLAG_PROVABLE, &data, 1);
 	} else {
 		if (provable)
