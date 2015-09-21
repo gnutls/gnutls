@@ -40,12 +40,18 @@ some hints:
 Debian/Ubuntu:
 ```
 apt-get install git-core autoconf libtool gettext autopoint
-apt-get install guile-2.0-dev libtasn1-6-dev
-apt-get install libidn11-dev gawk gperf git2cl
-apt-get install libunbound-dev dns-root-data bison
 apt-get install automake autogen nettle-dev libp11-kit-dev
-apt-get install help2man gtk-doc-tools
+apt-get install guile-2.0-dev libtasn1-6-dev libidn11-dev gawk gperf git2cl
+apt-get install libunbound-dev dns-root-data bison help2man gtk-doc-tools
 apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
+```
+
+Fedora/RHEL:
+```
+yum install git autoconf libtool gettext-devel automake autogen
+yum install automake autogen nettle-devel p11-kit-devel
+yum install guile-devel libtasn1-devel libidn-devel gawk gperf git2cl
+yum install unbound-devel bison help2man gtk-doc texinfo texlive
 ```
 
 Sometimes, you may need to install more recent versions of Automake,
@@ -62,10 +68,16 @@ and polarssl.
 * [softhsm](http://www.opendnssec.org/softhsm/) (for testing smart card support)
 * [dieharder](http://www.phy.duke.edu/~rgb/General/dieharder.php) (for testing PRNG)
 
+Debian/Ubuntu:
 ```
-apt-get install valgrind libasan1
-apt-get install nodejs softhsm datefudge dieharder
-apt-get install libpolarssl-runtime openssl
+apt-get install valgrind libasan1 nodejs softhsm datefudge
+apt-get install dieharder libpolarssl-runtime openssl
+```
+
+Fedora/RHEL:
+```
+yum install valgrind libasan nodejs softhsm datefudge
+yum install dieharder mbedtls-utils openssl
 ```
 
 
