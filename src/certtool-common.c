@@ -739,8 +739,9 @@ print_hex_datum(FILE * outfile, gnutls_datum_t * dat, int cprint)
 		for (j = 0; j < dat->size; j++) {
 			fprintf(outfile, "\\x%.2x",
 				(unsigned char) dat->data[j]);
-			if ((j + 1) % 15 == 0)
+			if ((j + 1) % 16 == 0) {
 				fprintf(outfile, "\"\n" SPACE "\"");
+			}
 		}
 		fprintf(outfile, "\";\n\n");
 
@@ -749,9 +750,12 @@ print_hex_datum(FILE * outfile, gnutls_datum_t * dat, int cprint)
 
 	fprintf(outfile, "\n" SPACE);
 	for (j = 0; j < dat->size; j++) {
-		fprintf(outfile, "%.2x:", (unsigned char) dat->data[j]);
-		if ((j + 1) % 15 == 0)
+		if ((j + 1) % 16 == 0) {
+			fprintf(outfile, "%.2x", (unsigned char) dat->data[j]);
 			fprintf(outfile, "\n" SPACE);
+		} else {
+			fprintf(outfile, "%.2x:", (unsigned char) dat->data[j]);
+		}
 	}
 	fprintf(outfile, "\n\n");
 }
