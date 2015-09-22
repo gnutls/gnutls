@@ -356,8 +356,13 @@ if [ test "$enable_fips" = "yes" ];then
     enable_self_checks=yes
 
     AC_DEFINE([ENABLE_FIPS140], 1, [Enable FIPS140-2 mode])
-
     AC_SUBST([FIPS140_LIBS], $LIBDL)
+    AC_ARG_WITH(fips140-key, AS_HELP_STRING([--with-fips140-key],
+                                 [specify the FIPS140 HMAC key for integrity]),
+            fips_key="$withval", 
+            fips_key="orboDeJITITejsirpADONivirpUkvarP")
+
+    AC_DEFINE_UNQUOTED([FIPS_KEY], ["$fips_key"], [The FIPS140-2 integrity key])
   else
     enable_fips=no
     AC_MSG_WARN([[

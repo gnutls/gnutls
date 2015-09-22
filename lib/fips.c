@@ -114,8 +114,6 @@ void _gnutls_fips_mode_reset_zombie(void)
 #define HOGWEED_LIBRARY_NAME "libhogweed.so.2"
 #define GMP_LIBRARY_NAME "libgmp.so.10"
 
-static const char fips_key[] = "orboDeJITITejsirpADONivirpUkvarP";
-
 #define HMAC_SUFFIX ".hmac"
 #define HMAC_SIZE 32
 #define HMAC_ALGO GNUTLS_MAC_SHA256
@@ -203,7 +201,7 @@ static unsigned check_binary_integrity(const char* libname, const char* symbol)
 
 	prev = _gnutls_get_lib_state();
 	_gnutls_switch_lib_state(LIB_STATE_OPERATIONAL);
-	ret = gnutls_hmac_fast(HMAC_ALGO, fips_key, sizeof(fips_key)-1,
+	ret = gnutls_hmac_fast(HMAC_ALGO, FIPS_KEY, sizeof(FIPS_KEY)-1,
 		data.data, data.size, new_hmac);
 	_gnutls_switch_lib_state(prev);
 	
