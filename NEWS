@@ -5,13 +5,19 @@ See the end for copying conditions.
 
 * Version 3.4.6 (unreleased)
 
+** libgnutls: Backported the new verification functions from the
+   master branch.
+
 ** tools: Added support for LDAP and XMPP negotiation for STARTTLS.
 
 ** certtool: Key generation security level was switched to HIGH. That
    is, by default the tool generates 3072 bit keys for RSA and DSA.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_session_set_verify_function: Added
+gnutls_session_set_verify_cert: Added
+gnutls_session_set_verify_cert2: Added
+gnutls_session_get_verify_cert_status: Added
 
 
 * Version 3.4.5 (released 2015-09-12)
