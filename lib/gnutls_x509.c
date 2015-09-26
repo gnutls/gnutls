@@ -225,8 +225,7 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 	}
 
 	verify_flags =
-	    cred->verify_flags | session->internals.priorities.
-	    additional_verify_flags;
+	    cred->verify_flags | session->internals.additional_verify_flags;
 	/* generate a list of gnutls_certs based on the auth info
 	 * raw certs.
 	 */

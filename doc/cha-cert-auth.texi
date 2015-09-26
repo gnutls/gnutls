@@ -374,14 +374,19 @@ via a file, a directory or use the system-specified certificate authories.
 Unless the authorities are application specific, it is generally recommended
 to use the system trust storage (see @funcref{gnutls_certificate_set_x509_system_trust}).
 
-Unlike the previous section it is not required to setup a trusted list, and 
-the function @funcref{gnutls_certificate_verify_peers3} 
-is used to verify the peer's certificate chain and identity. The reported
-verification status is identical to the verification functions described 
+Unlike the previous section it is not required to setup a trusted list, and there
+are two approaches to verify the peer's certificate and identity.
+The recommended in GnuTLS 3.5.0 and later is via the @funcref{gnutls_session_set_verify_cert},
+but for older GnuTLS versions you may use an explicit callback set via
+@funcref{gnutls_certificate_set_verify_function} and then utilize
+@funcref{gnutls_certificate_verify_peers3} for verification.
+The reported verification status is identical to the verification functions described 
 in the previous section.
+
 Note that in certain cases it is required to check the marked purpose of
 the end certificate (e.g. @code{GNUTLS_KP_TLS_WWW_SERVER}); in these cases
-the more advanced @funcref{gnutls_certificate_verify_peers} should be used instead.
+the more advanced @funcref{gnutls_session_set_verify_cert2} and
+@funcref{gnutls_certificate_verify_peers} should be used instead.
 
 There is also the possibility to pass some input to the verification
 functions in the form of flags. For @funcref{gnutls_x509_trust_list_verify_crt2} the

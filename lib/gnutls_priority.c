@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2015 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -533,6 +534,8 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
 	    session->internals.priorities.kx.algorithms == 0 ||
 	    session->internals.priorities.compression.algorithms == 0)
 		return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+
+	session->internals.additional_verify_flags |= priority->additional_verify_flags;
 
 	return 0;
 }

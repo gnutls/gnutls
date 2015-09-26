@@ -154,6 +154,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_RECORD_LIMIT_REACHED),
 	ERROR_ENTRY(N_("Error in the certificate."),
 		    GNUTLS_E_CERTIFICATE_ERROR),
+	ERROR_ENTRY(N_("Error in the certificate verification."),
+		    GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR),
 	ERROR_ENTRY(N_("Could not authenticate peer."),
 		    GNUTLS_E_AUTH_ERROR),
 	ERROR_ENTRY(N_
