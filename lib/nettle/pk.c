@@ -954,6 +954,8 @@ int _gnutls_dh_generate_key(gnutls_dh_params_t dh_params,
  	return ret;
 }
 
+/* Note that the value of Z will have the leading bytes stripped if they are zero -
+ * which follows the TLS approach. */
 int _gnutls_dh_compute_key(gnutls_dh_params_t dh_params,
 			   const gnutls_datum_t *priv_key, const gnutls_datum_t *pub_key,
 			   const gnutls_datum_t *peer_key, gnutls_datum_t *Z)
