@@ -1677,19 +1677,18 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
  * This function has the similar semantics with recv().  The only
  * difference is that it accepts a GnuTLS session, and uses different
  * error codes.
- * In the special case that a server requests a renegotiation, the
- * client may receive an error code of %GNUTLS_E_REHANDSHAKE.  This
- * message may be simply ignored, replied with an alert
+ * In the special case that the peer requests a renegotiation, the
+ * caller will receive an error code of %GNUTLS_E_REHANDSHAKE.  In case
+ * of a client, this message may be simply ignored, replied with an alert
  * %GNUTLS_A_NO_RENEGOTIATION, or replied with a new handshake,
- * depending on the client's will.
+ * depending on the client's will. A server receiving this error code
+ * can only initiate a new handshake or terminate the session.
+ *
  * If %EINTR is returned by the internal push function (the default
  * is recv()) then %GNUTLS_E_INTERRUPTED will be returned.  If
  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
  * call this function again to get the data.  See also
  * gnutls_record_get_direction().
- * A server may also receive %GNUTLS_E_REHANDSHAKE when a client has
- * initiated a handshake. In that case the server can only initiate a
- * handshake or terminate the connection.
  *
  * Returns: The number of bytes received and zero on EOF (for stream
  * connections).  A negative error code is returned in case of an error.  
