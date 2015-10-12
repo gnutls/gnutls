@@ -8,6 +8,10 @@ See the end for copying conditions.
 ** libgnutls: Backported the new verification functions from the
    master branch.
 
+** libgnutls: Introduced the security parameter future which is at
+   the 256-bit level of security, and ultra was aligned to its documented
+   size at 192-bits.
+
 ** tools: Added support for LDAP and XMPP negotiation for STARTTLS.
 
 ** certtool: Key generation security level was switched to HIGH. That
