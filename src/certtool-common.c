@@ -679,6 +679,16 @@ gnutls_pubkey_t load_public_key_or_import(int mand,
 	return pubkey;
 }
 
+static const char *bits_to_sp(gnutls_pk_algorithm_t pk, unsigned int bits)
+{
+	gnutls_sec_param_t s = gnutls_pk_bits_to_sec_param(pk, bits);
+	if (s == GNUTLS_SEC_PARAM_UNKNOWN) {
+		return gnutls_sec_param_get_name(GNUTLS_SEC_PARAM_MEDIUM);
+	}
+
+	return gnutls_sec_param_get_name(s);
+}
+
 int
 get_bits(gnutls_pk_algorithm_t key_type, int info_bits,
 	 const char *info_sec_param, int warn)
@@ -691,7 +701,8 @@ get_bits(gnutls_pk_algorithm_t key_type, int info_bits,
 		if (warned == 0 && warn != 0 && GNUTLS_BITS_ARE_CURVE(info_bits)==0) {
 			warned = 1;
 			fprintf(stderr,
-				"** Note: Please use the --sec-param instead of --bits\n");
+				"** Note: You may use '--sec-param %s' instead of '--bits %d'\n",
+				bits_to_sp(key_type, info_bits), info_bits);
 		}
 		bits = info_bits;
 	} else {
