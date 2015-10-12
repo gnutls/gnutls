@@ -557,8 +557,12 @@ void gnutls_dtls_set_timeouts(gnutls_session_t session,
 			      unsigned int retrans_timeout,
 			      unsigned int total_timeout)
 {
+	if (total_timeout == GNUTLS_INDEFINITE_TIMEOUT)
+		session->internals.handshake_timeout_ms = 0;
+	else
+		session->internals.handshake_timeout_ms = total_timeout;
+
 	session->internals.dtls.retrans_timeout_ms = retrans_timeout;
-	session->internals.handshake_timeout_ms = total_timeout;
 }
 
 /**

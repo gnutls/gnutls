@@ -2630,6 +2630,11 @@ int gnutls_handshake(gnutls_session_t session)
 void
 gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 {
+	if (ms == GNUTLS_INDEFINITE_TIMEOUT) {
+		session->internals.handshake_timeout_ms = 0;
+		return;
+	}
+
 	if (ms == GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT)
 		ms = DEFAULT_HANDSHAKE_TIMEOUT_MS;
 

@@ -160,17 +160,20 @@ system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 int gnutls_system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 	fd_set rfds;
-	struct timeval tv;
+	struct timeval _tv, *tv = NULL;
 	int ret;
 	int fd = GNUTLS_POINTER_TO_INT(ptr);
 
 	FD_ZERO(&rfds);
 	FD_SET(fd, &rfds);
 
-	tv.tv_sec = ms/1000;
-	tv.tv_usec = (ms % 1000) * 1000;
+	if (ms != GNUTLS_INDEFINITE_TIMEOUT) {
+		_tv.tv_sec = ms/1000;
+		_tv.tv_usec = (ms % 1000) * 1000;
+		tv = &_tv;
+	}
 
-	ret = select(fd + 1, &rfds, NULL, NULL, &tv);
+	ret = select(fd + 1, &rfds, NULL, NULL, tv);
 	if (ret <= 0)
 		return ret;
 

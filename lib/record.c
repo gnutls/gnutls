@@ -1738,7 +1738,8 @@ gnutls_record_recv_seq(gnutls_session_t session, void *data,
  *
  * This function sets the receive timeout for the record layer
  * to the provided value. Use an @ms value of zero to disable
- * timeout (the default).
+ * timeout (the default), or %GNUTLS_INDEFINITE_TIMEOUT, to
+ * set an indefinite timeout.
  *
  * This function requires to set a pull timeout callback. See
  * gnutls_transport_set_pull_timeout_function().

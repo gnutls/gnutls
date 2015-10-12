@@ -834,6 +834,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how);
 int gnutls_handshake(gnutls_session_t session);
 
 #define GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT ((unsigned int)-1)
+#define GNUTLS_INDEFINITE_TIMEOUT ((unsigned int)-2)
 void gnutls_handshake_set_timeout(gnutls_session_t session,
 				  unsigned int ms);
 int gnutls_rehandshake(gnutls_session_t session);

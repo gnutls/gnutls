@@ -95,7 +95,9 @@ gnutls_transport_set_pull_function(gnutls_session_t session,
  * for the provided transport calls.
  *
  * As with select(), if the timeout value is zero the callback should return
- * zero if no data are immediately available.
+ * zero if no data are immediately available. The special value
+ * %GNUTLS_INDEFINITE_TIMEOUT indicates that the callback should wait indefinitely
+ * for data.
  *
  * @gnutls_pull_timeout_func is of the form,
  * int (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);

@@ -380,7 +380,7 @@ _gnutls_stream_read(gnutls_session_t session, mbuffer_st ** bufel,
 		left -= i;
 		(*bufel)->msg.size += i;
 
-		if (ms && *ms > 0) {
+		if (ms && *ms > 0 && *ms != GNUTLS_INDEFINITE_TIMEOUT) {
 			gettime(&t2);
 			diff = timespec_sub_ms(&t2, &t1);
 			if (diff < *ms)
