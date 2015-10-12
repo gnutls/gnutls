@@ -1980,7 +1980,8 @@ static int wrap_nettle_hash_algorithm(gnutls_pk_algorithm_t pk,
 		if (sig == NULL) {	/* return a sensible algorithm */
 			if (hash_algo)
 				*hash_algo = GNUTLS_DIG_SHA256;
-			return 0;
+			ret = 0;
+			break;
 		}
 
 		_rsa_params_to_pubkey(issuer_params, &pub);
