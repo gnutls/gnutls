@@ -18,6 +18,7 @@ See the end for copying conditions.
    is, by default the tool generates 3072 bit keys for RSA and DSA.
 
 ** API and ABI modifications:
+GNUTLS_INDEFINITE_TIMEOUT: Added
 gnutls_check_version_numeric: Added
 gnutls_session_set_verify_function: Added
 gnutls_session_set_verify_cert: Added
