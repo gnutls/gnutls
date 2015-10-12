@@ -731,6 +731,8 @@ gnutls_sec_param_t str_to_sec_param(const char *str)
 		return GNUTLS_SEC_PARAM_HIGH;
 	} else if (strcasecmp(str, "ultra") == 0) {
 		return GNUTLS_SEC_PARAM_ULTRA;
+	} else if (strcasecmp(str, "future") == 0) {
+		return GNUTLS_SEC_PARAM_FUTURE;
 	} else {
 		fprintf(stderr, "Unknown security parameter string: %s\n",
 			str);
