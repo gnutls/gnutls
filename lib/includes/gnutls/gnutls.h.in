@@ -757,6 +757,7 @@ typedef enum {
  * @GNUTLS_SEC_PARAM_MEDIUM: 112 bits of security (used to be %GNUTLS_SEC_PARAM_NORMAL)
  * @GNUTLS_SEC_PARAM_HIGH: 128 bits of security
  * @GNUTLS_SEC_PARAM_ULTRA: 192 bits of security
+ * @GNUTLS_SEC_PARAM_FUTURE: 256 bits of security
  *
  * Enumeration of security parameters for passive attacks.
  */
@@ -770,7 +771,8 @@ typedef enum {
 	GNUTLS_SEC_PARAM_LEGACY = 30,
 	GNUTLS_SEC_PARAM_MEDIUM = 35,
 	GNUTLS_SEC_PARAM_HIGH = 40,
-	GNUTLS_SEC_PARAM_ULTRA = 45
+	GNUTLS_SEC_PARAM_ULTRA = 45,
+	GNUTLS_SEC_PARAM_FUTURE = 50
 } gnutls_sec_param_t;
 
 /* old name */
