@@ -61,7 +61,7 @@ gnutls_sec_param_t p;
 	}
 
 	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_EC, 384);
-	if (p != GNUTLS_SEC_PARAM_HIGH) {
+	if (p != GNUTLS_SEC_PARAM_ULTRA) {
 		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
 		return 1;
 	}
@@ -78,6 +78,12 @@ gnutls_sec_param_t p;
 
 	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_RSA, 2048);
 	if (p != GNUTLS_SEC_PARAM_MEDIUM) {
+		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
+		return 1;
+	}
+
+	p = gnutls_pk_bits_to_sec_param(GNUTLS_PK_RSA, 3072);
+	if (p != GNUTLS_SEC_PARAM_HIGH) {
 		fprintf(stderr, "%d: error in sec param, p:%u\n", __LINE__, (unsigned)p);
 		return 1;
 	}
