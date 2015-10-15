@@ -124,6 +124,7 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 	{"ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, &ecdhe_psk_auth_struct, 0, GNUTLS_PK_UNKNOWN},
 #endif
 #endif
+	{"RSA-EXPORT", GNUTLS_KX_INVALID, NULL, 0, GNUTLS_PK_UNKNOWN},
 	{0, 0, 0, 0, 0}
 };
 
@@ -187,6 +188,24 @@ const char *gnutls_kx_get_name(gnutls_kx_algorithm_t algorithm)
  *   on error.
  **/
 gnutls_kx_algorithm_t gnutls_kx_get_id(const char *name)
+{
+	gnutls_kx_algorithm_t ret = GNUTLS_KX_UNKNOWN;
+
+	GNUTLS_KX_LOOP(
+		if (strcasecmp(p->name, name) == 0 && (int)p->algorithm != GNUTLS_KX_INVALID) {
+			ret = p->algorithm;
+			break;
+		}
+	);
+
+	return ret;
+}
+
+/* As with gnutls_kx_get_id(), but it returns all known
+ * key exchange algorithms (even legacy), with GNUTLS_KX_INVALID
+ * value.
+ */
+int _gnutls_kx_get_id(const char *name)
 {
 	gnutls_kx_algorithm_t ret = GNUTLS_KX_UNKNOWN;
 
