@@ -31,7 +31,7 @@
 static const ck_bool_t tval = 1;
 static const ck_bool_t fval = 0;
 
-#define MAX_ASIZE 16
+#define MAX_ASIZE 24
 
 static void mark_flags(unsigned flags, struct ck_attribute *a, unsigned *a_val)
 {
@@ -96,8 +96,9 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 	int ret;
 	struct p11_kit_uri *info = NULL;
 	ck_rv_t rv;
-	size_t der_size, id_size;
+	size_t der_size, id_size, serial_size;
 	uint8_t *der = NULL;
+	uint8_t serial[128];
 	uint8_t id[20];
 	struct ck_attribute a[MAX_ASIZE];
 	ck_object_class_t class = CKO_CERTIFICATE;
@@ -192,6 +193,19 @@ gnutls_pkcs11_copy_x509_crt2(const char *token_url,
 	a[a_val].value = crt->raw_dn.data;
 	a[a_val].value_len = crt->raw_dn.size;
 	a_val++;
+
+	a[a_val].type = CKA_ISSUER;
+	a[a_val].value = crt->raw_issuer_dn.data;
+	a[a_val].value_len = crt->raw_issuer_dn.size;
+	a_val++;
+
+	serial_size = sizeof(serial);
+	if (gnutls_x509_crt_get_serial(crt, serial, &serial_size) >= 0) {
+		a[a_val].type = CKA_SERIAL_NUMBER;
+		a[a_val].value = (void *) serial;
+		a[a_val].value_len = serial_size;
+		a_val++;
+	}
 
 	if (label) {
 		a[a_val].type = CKA_LABEL;
