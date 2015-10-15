@@ -87,15 +87,11 @@ static const cipher_entry_st algorithms[] = {
 	{"TWOFISH-PGP-CFB", GNUTLS_CIPHER_TWOFISH_PGP_CFB, 16, 16,
 	 CIPHER_BLOCK, 0, 16, 16, 0},
 #endif
-
-#ifndef ENABLE_FIPS140
 	/* All the other ciphers are disabled on the back-end library.
 	 * This needs to be disabled here as it is merely a placeholder
 	 * rather than an actual cipher.
 	 */
 	{"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0, 0},
-#endif
-
 	{0, 0, 0, 0, 0, 0, 0}
 };
 
