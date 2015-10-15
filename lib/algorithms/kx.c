@@ -192,7 +192,7 @@ gnutls_kx_algorithm_t gnutls_kx_get_id(const char *name)
 	gnutls_kx_algorithm_t ret = GNUTLS_KX_UNKNOWN;
 
 	GNUTLS_KX_LOOP(
-		if (strcasecmp(p->name, name) == 0 && p->algorithm != GNUTLS_KX_INVALID) {
+		if (strcasecmp(p->name, name) == 0 && (int)p->algorithm != GNUTLS_KX_INVALID) {
 			ret = p->algorithm;
 			break;
 		}
