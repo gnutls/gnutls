@@ -236,6 +236,8 @@ typedef enum record_flush_t {
 #define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
 #define GNUTLS_INT_TO_POINTER(_) ((void*) GNUTLS_POINTER_TO_INT_CAST (_))
 
+#define GNUTLS_KX_INVALID (-1)
+
 typedef struct {
 	uint8_t pint[3];
 } uint24;

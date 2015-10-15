@@ -174,6 +174,7 @@ _gnutls_cipher_suite_get_id(gnutls_kx_algorithm_t kx_algorithm,
 
 /* Functions for ciphers. */
 const cipher_entry_st *cipher_to_entry(gnutls_cipher_algorithm_t c);
+const cipher_entry_st *cipher_name_to_entry(const char *name);
 
 inline static int _gnutls_cipher_is_block(const cipher_entry_st * e)
 {
@@ -263,6 +264,8 @@ int _gnutls_kx_cert_pk_params(gnutls_kx_algorithm_t algorithm);
 int _gnutls_kx_needs_rsa_params(gnutls_kx_algorithm_t algorithm);
 mod_auth_st *_gnutls_kx_auth_struct(gnutls_kx_algorithm_t algorithm);
 int _gnutls_kx_is_ok(gnutls_kx_algorithm_t algorithm);
+
+int _gnutls_kx_get_id(const char *name);
 
 /* Type to KX mappings. */
 gnutls_kx_algorithm_t _gnutls_map_kx_get_kx(gnutls_credentials_type_t type,

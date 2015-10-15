@@ -1113,6 +1113,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 	int algo;
 	rmadd_func *fn;
 	bulk_rmadd_func *bulk_fn;
+	const cipher_entry_st *centry;
 
 	if (err_pos)
 		*err_pos = priorities;
@@ -1183,17 +1184,18 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 				continue;
 			} else if ((algo =
 				    gnutls_mac_get_id(&broken_list[i][1]))
-				   != GNUTLS_MAC_UNKNOWN)
+				   != GNUTLS_MAC_UNKNOWN) {
 				fn(&(*priority_cache)->mac, algo);
-			else if ((algo =
-				  gnutls_cipher_get_id(&broken_list[i][1]))
-				 != GNUTLS_CIPHER_UNKNOWN)
-				fn(&(*priority_cache)->cipher, algo);
-			else if ((algo =
-				  gnutls_kx_get_id(&broken_list[i][1])) !=
-				 GNUTLS_KX_UNKNOWN)
-				fn(&(*priority_cache)->kx, algo);
-			else if (strncasecmp
+			} else if ((centry = cipher_name_to_entry(&broken_list[i][1])) != NULL) {
+				if (_gnutls_cipher_exists(centry->id) || centry->id == GNUTLS_CIPHER_NULL) {
+					fn(&(*priority_cache)->cipher, centry->id);
+				}
+			} else if ((algo =
+				  _gnutls_kx_get_id(&broken_list[i][1])) !=
+				 GNUTLS_KX_UNKNOWN) {
+				if (algo != GNUTLS_KX_INVALID)
+					fn(&(*priority_cache)->kx, algo);
+			} else if (strncasecmp
 				 (&broken_list[i][1], "VERS-", 5) == 0) {
 				if (strncasecmp
 				    (&broken_list[i][1], "VERS-TLS-ALL",
