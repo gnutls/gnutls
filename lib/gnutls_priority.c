@@ -1140,7 +1140,7 @@ gnutls_priority_init(gnutls_priority_t * priority_cache,
 				   != GNUTLS_MAC_UNKNOWN) {
 				fn(&(*priority_cache)->mac, algo);
 			} else if ((centry = cipher_name_to_entry(&broken_list[i][1])) != NULL) {
-				if (_gnutls_cipher_exists(centry->id) || centry->id == GNUTLS_CIPHER_NULL) {
+				if (_gnutls_cipher_exists(centry->id)) {
 					fn(&(*priority_cache)->cipher, centry->id);
 					if (centry->type == CIPHER_BLOCK)
 						(*priority_cache)->have_cbc = 1;

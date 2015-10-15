@@ -200,18 +200,12 @@ static const cipher_entry_st algorithms[] = {
 	  .type = CIPHER_BLOCK,
 	  .explicit_iv = 8,
 	  .cipher_iv = 8},
-#ifndef ENABLE_FIPS140
-	/* All the other ciphers are disabled on the back-end library.
-	 * This needs to be disabled here as it is merely a placeholder
-	 * rather than an actual cipher.
-	 */
 	{ .name = "NULL",
 	  .id = GNUTLS_CIPHER_NULL,
 	  .blocksize = 1,
 	  .keysize = 0,
 	  .type = CIPHER_STREAM
 	},
-#endif
 	{0, 0, 0, 0, 0, 0, 0}
 };
 
