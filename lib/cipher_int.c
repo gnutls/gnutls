@@ -55,6 +55,17 @@ int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher)
 	const gnutls_crypto_cipher_st *cc;
 	int ret;
 
+	/* All the other ciphers are disabled on the back-end library.
+	 * The NULL needs to be detected here as it is merely a placeholder
+	 * rather than an actual cipher.
+	 */
+	if (cipher == GNUTLS_CIPHER_NULL) {
+		if (_gnutls_fips_mode_enabled() == 0)
+			return 1;
+		else
+			return 0;
+	}
+
 	cc = _gnutls_get_crypto_cipher(cipher);
 	if (cc != NULL)
 		return 1;
