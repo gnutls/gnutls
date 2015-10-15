@@ -1,13 +1,3 @@
-Build with separate build dir:
-  script:
-  - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
-    ../configure --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
-    make -j2 && make check -j3
-  - cat tests/test-suite.log
-  tags:
-  - fast
-  except:
-  - tags
 Build minimal:
   script:
   - git submodule update --init && make autoreconf && ./configure --with-included-libtasn1
@@ -40,10 +30,11 @@ Build and Check with asan:
   - fast
   except:
   - tags
-Build and Check:
+Build and Check with separate build dir:
   script:
-  - git submodule update --init && make autoreconf && ./configure --with-included-libtasn1
-    --disable-doc --disable-valgrind-tests && make -j2 && make check -j3
+  - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
+    ../configure --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
+    make -j4 && make check -j4
   - cat tests/test-suite.log
   tags:
   - slow
