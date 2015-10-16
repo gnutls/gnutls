@@ -173,7 +173,17 @@ static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
 		return CKM_RSA_PKCS;
 }
 
-static inline gnutls_pk_algorithm_t mech_to_pk(ck_key_type_t m)
+static inline int pk_to_key_type(gnutls_pk_algorithm_t pk)
+{
+	if (pk == GNUTLS_PK_DSA)
+		return CKK_DSA;
+	else if (pk == GNUTLS_PK_EC)
+		return CKK_ECDSA;
+	else
+		return CKK_RSA;
+}
+
+static inline gnutls_pk_algorithm_t key_type_to_pk(ck_key_type_t m)
 {
 	if (m == CKK_RSA)
 		return GNUTLS_PK_RSA;

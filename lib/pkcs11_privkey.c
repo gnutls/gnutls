@@ -451,7 +451,7 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 	if (pkcs11_get_attribute_value(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, a, 1)
 	    == CKR_OK) {
-		pkey->pk_algorithm = mech_to_pk(key_type);
+		pkey->pk_algorithm = key_type_to_pk(key_type);
 		if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN) {
 			_gnutls_debug_log
 			    ("Cannot determine PKCS #11 key algorithm\n");
