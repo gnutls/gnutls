@@ -239,6 +239,41 @@ socket_starttls(socket_st * socket, const char *app_proto)
 	return;
 }
 
+#define CANON_SERVICE(app_proto) \
+	if (strcasecmp(app_proto, "xmpp") == 0) \
+		app_proto = "xmpp-server"; \
+
+int
+starttls_proto_to_port(const char *app_proto)
+{
+	struct servent *s;
+
+	CANON_SERVICE(app_proto);
+
+	s = getservbyname(app_proto, NULL);
+	if (s != NULL) {
+		return s->s_port;
+	}
+	endservent();
+
+	return 443;
+}
+
+const char *starttls_proto_to_service(const char *app_proto)
+{
+	struct servent *s;
+
+	CANON_SERVICE(app_proto);
+
+	s = getservbyname(app_proto, NULL);
+	if (s != NULL) {
+		return s->s_name;
+	}
+	endservent();
+
+	return "443";
+}
+
 void socket_bye(socket_st * socket)
 {
 	int ret;

@@ -1528,7 +1528,10 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(PORT)) {
 		service = OPT_ARG(PORT);
 	} else {
-		service = "443";
+		if (HAVE_OPT(STARTTLS_PROTO))
+			service = starttls_proto_to_service(OPT_ARG(STARTTLS_PROTO));
+		else
+			service = "443";
 	}
 
 	record_max_size = OPT_VALUE_RECORDSIZE;

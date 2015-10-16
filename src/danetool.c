@@ -158,8 +158,12 @@ static void cmd_parser(int argc, char **argv)
 	if (HAVE_OPT(LOAD_CERTIFICATE))
 		cinfo.cert = OPT_ARG(LOAD_CERTIFICATE);
 
-	if (HAVE_OPT(PORT))
+	if (HAVE_OPT(PORT)) {
 		port = OPT_VALUE_PORT;
+	} else {
+		if (HAVE_OPT(STARTTLS_PROTO))
+			port = starttls_proto_to_port(OPT_ARG(STARTTLS_PROTO));
+	}
 	if (HAVE_OPT(PROTO))
 		proto = OPT_ARG(PROTO);
 
