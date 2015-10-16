@@ -638,22 +638,21 @@ gnutls_pubkey_t load_pubkey(int mand, common_info_st * info)
 	}
 
 	ret = gnutls_pubkey_import(key, &dat, info->incert_format);
-
-	free(dat.data);
-
 	if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR) {
-		fprintf(stderr,
-			"import error: could not find a valid PEM header; "
-			"check if your key has the PUBLIC KEY header\n");
-		exit(1);
-	}
-
-	if (ret < 0) {
+		ret = gnutls_pubkey_import_x509_raw(key, &dat, info->incert_format, 0);
+		if (ret < 0) {
+			fprintf(stderr,
+				"import error: could not find a valid PEM header; "
+				"check if your key has the PUBLIC KEY header\n");
+			exit(1);
+		}
+	} else if (ret < 0) {
 		fprintf(stderr, "importing --load-pubkey: %s: %s\n",
 			info->pubkey, gnutls_strerror(ret));
 		exit(1);
 	}
 
+	free(dat.data);
 	return key;
 }
 
