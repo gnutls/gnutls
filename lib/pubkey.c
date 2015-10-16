@@ -1356,8 +1356,6 @@ gnutls_pubkey_import_rsa_raw(gnutls_pubkey_t key,
 			     const gnutls_datum_t * m,
 			     const gnutls_datum_t * e)
 {
-	size_t siz = 0;
-
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -1366,14 +1364,12 @@ gnutls_pubkey_import_rsa_raw(gnutls_pubkey_t key,
 	gnutls_pk_params_release(&key->params);
 	gnutls_pk_params_init(&key->params);
 
-	siz = m->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[0], m->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[0], m->data, m->size)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	siz = e->size;
-	if (_gnutls_mpi_init_scan_nz(&key->params.params[1], e->data, siz)) {
+	if (_gnutls_mpi_init_scan_nz(&key->params.params[1], e->data, e->size)) {
 		gnutls_assert();
 		_gnutls_mpi_release(&key->params.params[0]);
 		return GNUTLS_E_MPI_SCAN_FAILED;
