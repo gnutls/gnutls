@@ -1513,7 +1513,7 @@ pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
 
 int pkcs11_read_pubkey(struct ck_function_list *module,
 		       ck_session_handle_t pks, ck_object_handle_t obj,
-		       ck_key_type_t key_type, gnutls_datum_t * pubkey)
+		       ck_key_type_t key_type, gnutls_datum_t pubkey[MAX_PUBLIC_PARAMS_SIZE])
 {
 	struct ck_attribute a[4];
 	uint8_t *tmp1;
@@ -1523,11 +1523,11 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 	ck_rv_t rv;
 
 	tmp1_size = tmp2_size = MAX_PK_PARAM_SIZE;
-	tmp1 = gnutls_malloc(tmp1_size);
+	tmp1 = gnutls_calloc(1, tmp1_size);
 	if (tmp1 == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-	tmp2 = gnutls_malloc(tmp2_size);
+	tmp2 = gnutls_calloc(1, tmp2_size);
 	if (tmp2 == NULL) {
 		ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 		goto cleanup;
