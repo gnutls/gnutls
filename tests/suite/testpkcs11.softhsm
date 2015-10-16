@@ -37,9 +37,10 @@ init_card () {
 	if test -x "/usr/bin/softhsm2-util"; then
 		export SOFTHSM2_CONF="softhsm-testpkcs11.config"
 		SOFTHSM_TOOL="/usr/bin/softhsm2-util"
-		${SOFTHSM_TOOL} --version|grep "2.0.0b1" >/dev/null 2>&1
+		${SOFTHSM_TOOL} --version|grep "2.0.0" >/dev/null 2>&1
 		if test $? = 0; then
-			echo "softhsm2-util 2.0.0b1 is broken"
+			echo "softhsm2-util 2.0.0 is broken"
+			export BROKEN_SOFTHSM2=1
 			exit 77
 		fi
 	fi
