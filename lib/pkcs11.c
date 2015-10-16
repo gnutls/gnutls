@@ -1671,7 +1671,7 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 	a[0].value_len = sizeof(key_type);
 
 	if (pkcs11_get_attribute_value(module, pks, ctx, a, 1) == CKR_OK) {
-		pobj->pk_algorithm = mech_to_pk(key_type);
+		pobj->pk_algorithm = key_type_to_pk(key_type);
 
 		ret =
 		    pkcs11_read_pubkey(module, pks, ctx, key_type,
