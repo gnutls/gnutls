@@ -339,8 +339,12 @@ static void cmd_parser(int argc, char **argv)
 
 	if (HAVE_OPT(PORT))
 		port = OPT_VALUE_PORT;
-	else
-		port = 443;
+	else {
+		if (HAVE_OPT(APP_PROTO))
+			port = starttls_proto_to_port(OPT_ARG(STARTTLS_PROTO));
+		else
+			port = 443;
+	}
 
 	if (rest == NULL)
 		hostname = "localhost";
