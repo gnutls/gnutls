@@ -1,4 +1,4 @@
-[![build status](https://ci.gitlab.com/projects/684/status.png?ref=master)](https://ci.gitlab.com/projects/684?ref=master)
+[![build status](https://ci.gitlab.com/projects/684/status.png?ref=master)](https://gitlab.com/gnutls/gnutls/builds)
 
 GnuTLS -- Information for developers
 =================================================
