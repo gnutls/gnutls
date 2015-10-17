@@ -18,7 +18,12 @@ See the end for copying conditions.
 ** libgnutls: Allow the presence of legacy ciphers and key exchanges in
    priority strings and consider them a no-op.
 
+** libgnutls: Added the ability to copy a public key into a PKCS #11
+   token.
+
 ** tools: Added support for LDAP and XMPP negotiation for STARTTLS.
+
+** p11tool: Allow writing a public key into a PKCS #11 token.
 
 ** certtool: Key generation security level was switched to HIGH. That
    is, by default the tool generates 3072 bit keys for RSA and DSA.
@@ -28,6 +33,7 @@ gnutls_session_set_verify_function: Added
 gnutls_session_set_verify_cert: Added
 gnutls_session_set_verify_cert2: Added
 gnutls_session_get_verify_cert_status: Added
+gnutls_pkcs11_copy_pubkey: Added
 
 
 * Version 3.4.5 (released 2015-09-12)
