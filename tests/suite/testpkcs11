@@ -546,7 +546,7 @@ write_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/ca.key
 write_serv_privkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/server.key"
 write_serv_cert "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/server.crt"
 
-write_serv_pubkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/server.crt"
+write_serv_pubkey "${TOKEN}" "${GNUTLS_PIN}" "${srcdir}/pkcs11-certs/server.pub"
 test_sign "${TOKEN}" "${GNUTLS_PIN}"
 
 use_certificate_test "${TOKEN}" "${GNUTLS_PIN}" "${TOKEN};object=serv-cert;object-type=cert" "${TOKEN};object=serv-key;object-type=private" "${srcdir}/pkcs11-certs/ca.crt" "full URLs"
