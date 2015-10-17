@@ -5,8 +5,9 @@ See the end for copying conditions.
 
 * Version 3.4.6 (unreleased)
 
-** libgnutls: Backported the new verification functions from the
-   master branch.
+** libgnutls: Added new simple verification functions. That avoids the need
+   to install a callback to perform certificate verification. See
+   doc/examples/ex-client-x509.c for usage.
 
 ** libgnutls: Introduced the security parameter future which is at
    the 256-bit level of security, and ultra was aligned to its documented
