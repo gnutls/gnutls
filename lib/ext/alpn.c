@@ -73,7 +73,7 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 	len = _gnutls_read_uint16(p);
 	p += 2;
 
-	if (len > data_size)
+	if (len > (size_t)data_size)
 		return
 		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
