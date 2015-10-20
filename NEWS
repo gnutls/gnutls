@@ -14,10 +14,15 @@ See the end for copying conditions.
    size at 192-bits.
 
 ** libgnutls: When writing a certificate into a PKCS #11 token, ensure
-   that CKA_SERIAL_NUMBER and CKA_ISSUER are written.
+   that CKA_SERIAL_NUMBER and CKA_ISSUER are written. Reported by Sumit
+   Bose.
 
 ** libgnutls: Allow the presence of legacy ciphers and key exchanges in
    priority strings and consider them a no-op.
+
+** libgnutls: Handle the extended master secret as a mandatory extension.
+   That fixes incompatibility issues with Chromium (#45). Reported by
+   Hubert Kario.
 
 ** libgnutls: Added the ability to copy a public key into a PKCS #11
    token.
