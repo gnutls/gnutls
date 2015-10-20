@@ -1322,10 +1322,16 @@ authentication.
 @tab @code{HIGH}
 @tab Long term protection (corresponds to ENISA future level)
 
+@item 192
+@tab 8192
+@tab 384
+@tab @code{ULTRA}
+@tab Even longer term protection
+
 @item 256
 @tab 15424
 @tab 512
-@tab @code{ULTRA}
+@tab @code{FUTURE}
 @tab Foreseeable future
 
 @end multitable
