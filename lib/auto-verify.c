@@ -73,7 +73,7 @@ static int auto_verify_cb(gnutls_session_t session)
  * The gnutls_session_set_verify_cert() function is intended to be used by TLS
  * clients to verify the server's certificate.
  *
- * Since: 3.5.0
+ * Since: 3.4.6
  **/
 void gnutls_session_set_verify_cert(gnutls_session_t session,
 				     const char *hostname, unsigned flags)
@@ -110,7 +110,7 @@ void gnutls_session_set_verify_cert(gnutls_session_t session,
  * and once set must remain valid for the lifetime of the session. More precisely
  * they should be available during any subsequent handshakes.
  *
- * Since: 3.5.0
+ * Since: 3.4.6
  **/
 void gnutls_session_set_verify_cert2(gnutls_session_t session,
 				     gnutls_typed_vdata_st * data,
@@ -139,7 +139,7 @@ void gnutls_session_set_verify_cert2(gnutls_session_t session,
  *
  * Returns: the certificate verification status.
  *
- * Since: 3.5.0
+ * Since: 3.4.6
  **/
 unsigned int gnutls_session_get_verify_cert_status(gnutls_session_t session)
 {
