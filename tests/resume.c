@@ -88,10 +88,43 @@ struct params_res resume_tests[] = {
 #define MAX_BUF 5*1024
 #define MSG "Hello TLS"
 
+#define HANDSHAKE_SESSION_ID_POS (2+32)
+
 static void tls_log_func(int level, const char *str)
 {
 	fprintf(stderr, "%s |<%d>| %s", child ? "server" : "client", level,
 		str);
+}
+
+static int hsk_hook_cb(gnutls_session_t session, unsigned int htype, unsigned post,
+		       unsigned int incoming, const gnutls_datum_t *_msg)
+{
+	unsigned size;
+	gnutls_datum msg = {_msg->data, _msg->size};
+
+	/* skip up to session ID */
+	if (msg.size <= HANDSHAKE_SESSION_ID_POS+6) {
+		fail("Cannot parse server hello\n");
+		return -1;
+	}
+
+	msg.data += HANDSHAKE_SESSION_ID_POS;
+	msg.size -= HANDSHAKE_SESSION_ID_POS;
+	size = msg.data[0];
+
+	if (msg.size <= size) {
+		fail("Cannot parse server hello 2\n");
+		return -1;
+	}
+
+	msg.data += size;
+	msg.size -= size;
+
+	if (memmem(msg.data, msg.size, "\x00\x17\x00\x00", 4) == 0) {
+		fail("Extended master secret extension was not found in resumed session hello\n");
+		exit(1);
+	}
+	return 0;
 }
 
 static void client(int sds[], struct params_res *params)
@@ -100,6 +133,8 @@ static void client(int sds[], struct params_res *params)
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
 	gnutls_anon_client_credentials_t anoncred;
+	unsigned int ext_master_secret = 0;
+
 	/* Need to enable anonymous KX specifically. */
 
 	/* variables used in session resuming
@@ -144,6 +179,8 @@ static void client(int sds[], struct params_res *params)
 						session_data.size);
 		}
 
+		if (ext_master_secret)
+			gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_SERVER_HELLO, GNUTLS_HOOK_PRE, hsk_hook_cb);
 		gnutls_transport_set_int(session, sd);
 
 		/* Perform the TLS handshake
@@ -163,7 +200,10 @@ static void client(int sds[], struct params_res *params)
 				    ("client: Handshake was completed\n");
 		}
 
-		if (t == 0) {	/* the first time we connect */
+		ext_master_secret = 0;
+		if (t == 0) {
+			ext_master_secret =  gnutls_session_ext_master_secret_status(session);
+
 			/* get the session data size */
 			ret =
 			    gnutls_session_get_data2(session,
