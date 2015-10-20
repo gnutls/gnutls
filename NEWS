@@ -3,7 +3,7 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 3.4.6 (unreleased)
+* Version 3.4.6 (released 2015-10-20)
 
 ** libgnutls: Added new simple verification functions. That avoids the need
    to install a callback to perform certificate verification. See
