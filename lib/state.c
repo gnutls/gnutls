@@ -917,7 +917,7 @@ void gnutls_session_set_ptr(gnutls_session_t session, void *ptr)
  * The callback function should return 0 for the handshake to continue
  * or non-zero to terminate.
  *
- * Since: 3.5.0
+ * Since: 3.4.6
  **/
 void
  gnutls_session_set_verify_function
