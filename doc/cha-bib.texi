@@ -90,6 +90,10 @@ Eric Rescorla, "HTTP Over TLS", May 2000, Available from
 Tom Wu, "The SRP Authentication and Key Exchange System", September
 2000, Available from @url{http://www.ietf.org/rfc/rfc2945.txt}.
 
+@item @anchor{RFC7301}[RFC7301]
+S. Friedl, A. Popov, A. Langley, E. Stephan, "Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension",
+July 2014, Available from @url{http://www.ietf.org/rfc/rfc7301.txt}.
+
 @item @anchor{RFC2986}[RFC2986]
 Magnus Nystrom and Burt Kaliski, "PKCS 10 v1.7: Certification Request
 Syntax Specification", November 2000, Available from
