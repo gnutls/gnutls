@@ -38,14 +38,17 @@ echo "*** Testing good HTTPS hosts ***"
 HOSTS="good.dane.verisignlabs.com www.freebsd.org www.kumari.net torproject.org fedoraproject.org"
 HOSTS="${HOSTS} nohats.ca"
 for host in ${HOSTS}; do
-	echo -n "${host}: "
 
-	"${DANETOOL}" --check "${host}" >/dev/null 2>&1
-	if [ $? != 0 ]; then
-		echo "Error checking ${host}"
-		exit 1
+	nc "${host}" 443 </dev/null
+	if test $? = 0;then
+		echo -n "${host}: "
+		"${DANETOOL}" --check "${host}" >/dev/null 2>&1
+		if [ $? != 0 ]; then
+			echo "Error checking ${host}"
+			exit 1
+		fi
+		echo "ok"
 	fi
-	echo "ok"
 done
 
 echo ""
@@ -53,14 +56,17 @@ echo "*** Testing good SMTP hosts ***"
 #HOSTS="dougbarton.us nlnetlabs.nl"
 HOSTS="nlnetlabs.nl"
 for host in ${HOSTS}; do
-	echo -n "${host}: "
 
-	"${DANETOOL}" --check "${host}" --port 25 >/dev/null 2>&1
-	if [ $? != 0 ]; then
-		echo "Error checking ${host}"
-		exit 1
+	nc "${host}" 25 </dev/null
+	if test $? = 0;then
+		echo -n "${host}: "
+		"${DANETOOL}" --check "${host}" --port 25 >/dev/null 2>&1
+		if [ $? != 0 ]; then
+			echo "Error checking ${host}"
+			exit 1
+		fi
+		echo "ok"
 	fi
-	echo "ok"
 done
 
 echo ""
@@ -70,13 +76,17 @@ echo "*** Testing bad HTTPS hosts ***"
 HOSTS="bad-hash.dane.verisignlabs.com bad-params.dane.verisignlabs.com"
 HOSTS="${HOSTS} bad-sig.dane.verisignlabs.com"
 for host in ${HOSTS}; do
-	echo -n "${host}: "
-	"${DANETOOL}" --check "${host}" >/dev/null 2>&1
-	if [ $? = 0 ]; then
-		echo "Checking ${host} should have failed"
-		exit 1
+
+	nc "${host}" 443 </dev/null
+	if test $? = 0;then
+		echo -n "${host}: "
+		"${DANETOOL}" --check "${host}" >/dev/null 2>&1
+		if [ $? = 0 ]; then
+			echo "Checking ${host} should have failed"
+			exit 1
+		fi
+		echo "ok"
 	fi
-	echo "ok"
 done
 
 
