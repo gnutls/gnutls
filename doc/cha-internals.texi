@@ -430,6 +430,7 @@ at some point in your program.
 
 @node Cryptographic Backend
 @section Cryptographic Backend
+
 Today most new processors, either for embedded or desktop systems
 include either instructions  intended to speed up cryptographic operations,
 or a co-processor with cryptographic capabilities. Taking advantage of 
@@ -508,4 +509,10 @@ To register a hash algorithm.
 Those registration functions will only replace the specified algorithm
 and leave the rest of subsystem intact.
 
+
+@subheading Protecting keys through isolation
+
+For asymmetric or public keys, GnuTLS supports PKCS #11 which allows
+operation without access to long term keys, in addition to CPU offloading.
+For more information see @ref{Hardware security modules and abstract key types}.
 
