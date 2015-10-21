@@ -32,7 +32,7 @@ noted otherwise.
 @end menu
 
 @node TLS layers
-@section TLS layers
+@section TLS Layers
 @cindex TLS layers
 
 @acronym{TLS} is a layered protocol, and consists of the record
@@ -56,7 +56,7 @@ protocol.  The protocol layering in TLS is shown in @ref{fig-tls-layers}.
 @end float
 
 @node The transport layer
-@section The transport layer
+@section The Transport Layer
 @cindex transport protocol
 @cindex transport layer
 
@@ -408,6 +408,7 @@ in @acronym{GnuTLS} are discussed in the subsections that follow.
 * OCSP status request::
 * SRTP::
 * Application Layer Protocol Negotiation (ALPN)::
+* Extensions and Supplemental Data::
 @end menu
 
 @node Maximum fragment length negotiation
@@ -638,7 +639,7 @@ Other helper functions are listed below.
 @cindex ALPN
 @cindex Application Layer Protocol Negotiation
 
-The TLS protocol was extended in @code{draft-ietf-tls-applayerprotoneg-00} 
+The TLS protocol was extended in @code{RFC7301} 
 to provide the application layer a method of
 negotiating the application protocol version. This allows for negotiation
 of the application protocol during the TLS handshake, thus reducing
@@ -651,6 +652,16 @@ Note that these functions are intended to be used with protocols that are
 registered in the Application Layer Protocol Negotiation IANA registry. While
 you can use them for other protocols (at the risk of collisions), it is preferable
 to register them.
+
+@node Extensions and Supplemental Data
+@subsection Extensions and Supplemental Data
+@cindex Supplemental data
+
+It is possible to transfer supplemental data during the TLS handshake, following
+@xcite{RFC4680}. This is for "custom" protocol modifications for applications which
+may want to transfer additional data (e.g. additional authentication messages). Such
+an exchange requires a custom extension to be registered. 
+The provided API for this functionality is low-level and described in @ref{TLS Extension Handling}.
 
 @include sec-tls-app.texi
 
