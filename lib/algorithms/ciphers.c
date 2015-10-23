@@ -32,8 +32,9 @@
  * protecting communications" by Hugo Krawczyk - CRYPTO 2001
  *
  * On update, make sure to update MAX_CIPHER_BLOCK_SIZE and MAX_CIPHER_KEY_SIZE
- * as well. If any ciphers are removed, modify the is_legacy() functions
- * in priority.c.
+ * as well. If any ciphers are removed, remove them from the back-end but
+ * keep them in that list to allow backwards compatibility with applications
+ * that specify them (they will be a no-op).
  */
 static const cipher_entry_st algorithms[] = {
 	{ .name = "AES-256-CBC",
