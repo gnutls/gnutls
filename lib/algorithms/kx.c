@@ -124,6 +124,10 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 	{"ECDHE-PSK", GNUTLS_KX_ECDHE_PSK, &ecdhe_psk_auth_struct, 0, GNUTLS_PK_UNKNOWN},
 #endif
 #endif
+	/* for deprecated and legacy algorithms no longer supported, use
+	 * GNUTLS_KX_INVALID as an entry. This will make them available
+	 * as priority strings, but they will be a no-op.
+	 */
 	{"RSA-EXPORT", GNUTLS_KX_INVALID, NULL, 0, GNUTLS_PK_UNKNOWN},
 	{0, 0, 0, 0, 0}
 };
