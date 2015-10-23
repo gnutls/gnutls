@@ -11,6 +11,9 @@ See the end for copying conditions.
 ** libgnutls: When writing a certificate into a PKCS #11 token, ensure
    that CKA_SERIAL_NUMBER and CKA_ISSUER are written.
 
+** libgnutls: Allow the presence of legacy ciphers and key exchanges in
+   priority strings and consider them a no-op.
+
 ** API and ABI modifications:
    No changes since last version.
 
