@@ -423,9 +423,6 @@ unsigned int gnutls_heartbeat_get_timeout(gnutls_session_t session)
  * be retransmitted. The total timeout is the time after which the
  * handshake will be aborted with %GNUTLS_E_TIMEDOUT.
  *
- * If the retransmission timeout is zero then the handshake will operate
- * in a non-blocking way, i.e., return %GNUTLS_E_AGAIN.
- *
  * Since: 3.1.2
  **/
 void gnutls_heartbeat_set_timeouts(gnutls_session_t session,
