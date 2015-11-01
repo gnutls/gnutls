@@ -57,11 +57,6 @@ int main()
 
 #include "utils.h"
 
-static void terminate(void);
-
-/* This program tests the client hello verify in DTLS
- */
-
 static void server_log_func(int level, const char *str)
 {
 	fprintf(stderr, "server|<%d>| %s", level, str);
@@ -71,9 +66,6 @@ static void client_log_func(int level, const char *str)
 {
 	fprintf(stderr, "client|<%d>| %s", level, str);
 }
-
-/* A very basic TLS client, with anonymous authentication.
- */
 
 #define MAX_BUF 1024
 
@@ -127,12 +119,12 @@ static void client(int fd)
 	while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
 	if (ret < 0) {
-		success("client: Handshake failed\n");
+		success("client: Handshake failed as expected\n");
 		gnutls_perror(ret);
 		goto exit;
 	} else {
-		fail("client: Handshake completed?\n");
-		pause();
+		fail("client: Handshake completed unexpectedly\n");
+		goto exit;
 	}
 
  exit:
@@ -146,15 +138,6 @@ static void client(int fd)
 
 /* These are global */
 pid_t child;
-
-static void terminate(void)
-{
-	int status;
-
-	kill(child, SIGTERM);
-	wait(&status);
-	exit(1);
-}
 
 #define CLI_ADDR (void*)"test"
 #define CLI_ADDR_LEN 4
@@ -188,7 +171,7 @@ fd_set set;
 
 static void server(int fd)
 {
-	int ret, csend = 0, status;
+	int ret, csend = 0;
 	gnutls_anon_server_credentials_t anoncred;
 	char buffer[MAX_BUF + 1];
 	gnutls_datum_t cookie_key;
@@ -208,7 +191,7 @@ static void server(int fd)
 	ret = gnutls_key_generate(&cookie_key, GNUTLS_COOKIE_KEY_SIZE);
 	if (ret < 0) {
 		fail("Cannot generate key: %s\n", gnutls_strerror(ret));
-		terminate();
+		exit(1);
 	}
 
 	gnutls_anon_allocate_server_credentials(&anoncred);
@@ -233,16 +216,7 @@ static void server(int fd)
 		ret = recv_timeout(fd, buffer, sizeof(buffer), MSG_PEEK, SERV_TIMEOUT);
 		if (ret < 0) {
 			if (try != 0) {
-				unsigned counter = 0;
-				do {
-					sleep(1);
-					counter++;
-					if (counter >= 15) {
-						fail("Child was blocked indefinitely!\n");
-						exit(1);
-					}
-				} while(waitpid(child, &status, WNOHANG) == 0);
-				success("Child was terminated as expected!\n");
+				success("Server was terminated as expected!\n");
 				goto exit;
 			} else {
 				fail("Error receiving first message\n");
@@ -270,7 +244,7 @@ static void server(int fd)
 						    (long) fd, push);
 			if (ret < 0) {
 				fail("Cannot send data\n");
-				terminate();
+				exit(1);
 			}
 
 			/* discard peeked data */
@@ -279,7 +253,7 @@ static void server(int fd)
 
 			if (csend > 2) {
 				fail("too many cookies sent\n");
-				terminate();
+				exit(1);
 			}
 
 			continue;
@@ -290,8 +264,10 @@ static void server(int fd)
 	}
 
 	fail("Shouldn't have reached here\n");
+	exit(1);
  exit:
 	gnutls_deinit(session);
+	gnutls_free(cookie_key.data);
 
 	gnutls_anon_free_server_credentials(anoncred);
 
@@ -322,14 +298,14 @@ void doit(void)
 		int status;
 		/* parent */
 
-		server(fd[0]);
+		client(fd[0]);
 		wait(&status);
 		if (WEXITSTATUS(status) != 0)
-			fail("Child died with status %d\n",
+			fail("Server died with status %d\n",
 			     WEXITSTATUS(status));
 	} else {
 		close(fd[0]);
-		client(fd[1]);
+		server(fd[1]);
 		exit(0);
 	}
 }
