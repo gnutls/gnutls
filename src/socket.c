@@ -232,7 +232,7 @@ socket_starttls(socket_st * socket, const char *app_proto)
 			printf("Negotiating FTP STARTTLS\n");
 
 		send_line(socket, "FEAT\n");
-		wait_for_text(socket, "211 End", 7);
+		wait_for_text(socket, "211 ", 4);
 		send_line(socket, "AUTH TLS\n");
 		wait_for_text(socket, "234", 3);
 	} else {
