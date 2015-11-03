@@ -120,15 +120,18 @@ socket_send_range(const socket_st * socket, const void *buffer,
 }
 
 static
-ssize_t send_line(int fd, const char *txt)
+ssize_t send_line(socket_st * socket, const char *txt)
 {
 	int len = strlen(txt);
 	int ret;
 
-	ret = send(fd, txt, len, 0);
+	if (socket->verbose > 2)
+		fprintf(stderr, "starttls: sending: \"%s\"\n", txt);
+
+	ret = send(socket->fd, txt, len, 0);
 
 	if (ret == -1) {
-		fprintf(stderr, "error sending %s\n", txt);
+		fprintf(stderr, "error sending \"%s\"\n", txt);
 		exit(1);
 	}
 
@@ -136,7 +139,7 @@ ssize_t send_line(int fd, const char *txt)
 }
 
 static
-ssize_t wait_for_text(int fd, const char *txt, unsigned txt_size)
+ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 {
 	char buf[512];
 	char *p;
@@ -144,16 +147,19 @@ ssize_t wait_for_text(int fd, const char *txt, unsigned txt_size)
 	fd_set read_fds;
 	struct timeval tv;
 
+	if (socket->verbose > 2 && txt != NULL)
+		fprintf(stderr, "starttls: waiting for: \"%.*s\"\n", txt_size, txt);
+
 	do {
 		FD_ZERO(&read_fds);
-		FD_SET(fd, &read_fds);
+		FD_SET(socket->fd, &read_fds);
 		tv.tv_sec = 10;
 		tv.tv_usec = 0;
-		ret = select(fd + 1, &read_fds, NULL, NULL, &tv);
+		ret = select(socket->fd + 1, &read_fds, NULL, NULL, &tv);
 		if (ret <= 0)
 			ret = -1;
 		else
-			ret = recv(fd, buf, sizeof(buf)-1, 0);
+			ret = recv(socket->fd, buf, sizeof(buf)-1, 0);
 		if (ret == -1) {
 			fprintf(stderr, "error receiving %s\n", txt);
 			exit(1);
@@ -162,6 +168,9 @@ ssize_t wait_for_text(int fd, const char *txt, unsigned txt_size)
 
 		if (txt == NULL)
 			break;
+
+		if (socket->verbose)
+			fprintf(stderr, "starttls: received: \"%s\"\n", buf);
 
 		p = memmem(buf, ret, txt, txt_size);
 		if (p != NULL && p != buf) {
@@ -189,43 +198,43 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		if (socket->verbose)
 			printf("Negotiating SMTP STARTTLS\n");
 
-		wait_for_text(socket->fd, "220 ", 4);
+		wait_for_text(socket, "220 ", 4);
 		snprintf(buf, sizeof(buf), "EHLO %s\n", socket->hostname);
-		send_line(socket->fd, buf);
-		wait_for_text(socket->fd, "250 ", 4);
-		send_line(socket->fd, "STARTTLS\n");
-		wait_for_text(socket->fd, "220 ", 4);
+		send_line(socket, buf);
+		wait_for_text(socket, "250 ", 4);
+		send_line(socket, "STARTTLS\n");
+		wait_for_text(socket, "220 ", 4);
 	} else if (strcasecmp(app_proto, "imap") == 0 || strcasecmp(app_proto, "imap2") == 0) {
 		if (socket->verbose)
 			printf("Negotiating IMAP STARTTLS\n");
 
-		send_line(socket->fd, "a CAPABILITY\r\n");
-		wait_for_text(socket->fd, "a OK", 4);
-		send_line(socket->fd, "a STARTTLS\r\n");
-		wait_for_text(socket->fd, "a OK", 4);
+		send_line(socket, "a CAPABILITY\r\n");
+		wait_for_text(socket, "a OK", 4);
+		send_line(socket, "a STARTTLS\r\n");
+		wait_for_text(socket, "a OK", 4);
 	} else if (strcasecmp(app_proto, "xmpp") == 0) {
 		if (socket->verbose)
 			printf("Negotiating XMPP STARTTLS\n");
 
 		snprintf(buf, sizeof(buf), "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='%s' version='1.0'>\n", socket->hostname);
-		send_line(socket->fd, buf);
-		wait_for_text(socket->fd, "<?", 2);
-		send_line(socket->fd, "<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
-		wait_for_text(socket->fd, "<proceed", 8);
+		send_line(socket, buf);
+		wait_for_text(socket, "<?", 2);
+		send_line(socket, "<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+		wait_for_text(socket, "<proceed", 8);
 	} else if (strcasecmp(app_proto, "ldap") == 0) {
 		if (socket->verbose)
 			printf("Negotiating LDAP STARTTLS\n");
 #define LDAP_STR "\x30\x1d\x02\x01\x01\x77\x18\x80\x16\x31\x2e\x33\x2e\x36\x2e\x31\x2e\x34\x2e\x31\x2e\x31\x34\x36\x36\x2e\x32\x30\x30\x33\x37"
 		send(socket->fd, LDAP_STR, sizeof(LDAP_STR)-1, 0);
-		wait_for_text(socket->fd, NULL, 0);
+		wait_for_text(socket, NULL, 0);
 	} else if (strcasecmp(app_proto, "ftp") == 0 || strcasecmp(app_proto, "ftps") == 0) {
 		if (socket->verbose)
 			printf("Negotiating FTP STARTTLS\n");
 
-		send_line(socket->fd, "FEAT\n");
-		wait_for_text(socket->fd, "211 End", 7);
-		send_line(socket->fd, "AUTH TLS\n");
-		wait_for_text(socket->fd, "234", 3);
+		send_line(socket, "FEAT\n");
+		wait_for_text(socket, "211 End", 7);
+		send_line(socket, "AUTH TLS\n");
+		wait_for_text(socket, "234", 3);
 	} else {
 		if (!c_isdigit(app_proto[0])) {
 			static int warned = 0;
