@@ -125,8 +125,8 @@ ssize_t send_line(socket_st * socket, const char *txt)
 	int len = strlen(txt);
 	int ret;
 
-	if (socket->verbose > 2)
-		fprintf(stderr, "starttls: sending: \"%s\"\n", txt);
+	if (socket->verbose)
+		fprintf(stderr, "starttls: sending: %s\n", txt);
 
 	ret = send(socket->fd, txt, len, 0);
 
@@ -141,13 +141,13 @@ ssize_t send_line(socket_st * socket, const char *txt)
 static
 ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 {
-	char buf[512];
+	char buf[1024];
 	char *p;
 	int ret;
 	fd_set read_fds;
 	struct timeval tv;
 
-	if (socket->verbose > 2 && txt != NULL)
+	if (socket->verbose && txt != NULL)
 		fprintf(stderr, "starttls: waiting for: \"%.*s\"\n", txt_size, txt);
 
 	do {
@@ -170,7 +170,7 @@ ssize_t wait_for_text(socket_st * socket, const char *txt, unsigned txt_size)
 			break;
 
 		if (socket->verbose)
-			fprintf(stderr, "starttls: received: \"%s\"\n", buf);
+			fprintf(stderr, "starttls: received: %s\n", buf);
 
 		p = memmem(buf, ret, txt, txt_size);
 		if (p != NULL && p != buf) {
@@ -231,9 +231,9 @@ socket_starttls(socket_st * socket, const char *app_proto)
 		if (socket->verbose)
 			printf("Negotiating FTP STARTTLS\n");
 
-		send_line(socket, "FEAT\n");
+		send_line(socket, "FEAT\r\n");
 		wait_for_text(socket, "211 ", 4);
-		send_line(socket, "AUTH TLS\n");
+		send_line(socket, "AUTH TLS\r\n");
 		wait_for_text(socket, "234", 3);
 	} else {
 		if (!c_isdigit(app_proto[0])) {
