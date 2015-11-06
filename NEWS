@@ -3,6 +3,17 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013-2015 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.4.7 (unreleased)
+
+** gnutls.pc: Don't include libtool specific options to link flags.
+   Reported by Dan Kegel.
+
+** tools: Better support for FTP AUTH TLS negotiation
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.4.6 (released 2015-10-20)
 
 ** libgnutls: Added new simple verification functions. That avoids the need
