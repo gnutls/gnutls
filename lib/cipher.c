@@ -302,7 +302,6 @@ compressed_to_ciphertext(gnutls_session_t session,
 	int explicit_iv = _gnutls_version_has_explicit_iv(ver);
 	int auth_cipher =
 	    _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
-	unsigned send_nonce = params->send_nonce;
 	uint8_t nonce[MAX_CIPHER_BLOCK_SIZE];
 	unsigned imp_iv_size = 0, exp_iv_size = 0;
 	bool etm = 0;
@@ -341,7 +340,7 @@ compressed_to_ciphertext(gnutls_session_t session,
 		length =
 		    calc_enc_length_stream(session, compressed->size,
 					   tag_size, auth_cipher,
-					   (send_nonce!=0)?exp_iv_size:0);
+					   exp_iv_size);
 	}
 
 	if (length < 0)
@@ -367,34 +366,41 @@ compressed_to_ciphertext(gnutls_session_t session,
 			data_ptr += blocksize;
 			cipher_data += blocksize;
 		}
-
 	} else { /* AEAD */
-		/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
-		 */
-		if (params->write.IV.data == NULL
-		    || params->write.IV.size !=
-		    imp_iv_size)
-			return
-			    gnutls_assert_val
-			    (GNUTLS_E_INTERNAL_ERROR);
+		if (params->cipher->xor_nonce == 0) {
+			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
+			 */
+			 if (params->write.IV.data == NULL
+			    || params->write.IV.size !=
+			    imp_iv_size)
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		/* Instead of generating a new nonce on every packet, we use the
-		 * write.sequence_number (It is a MAY on RFC 5288), and safer
-		 * as it will never reuse a value.
-		 */
-		memcpy(nonce, params->write.IV.data,
-		       params->write.IV.size);
-		memcpy(&nonce[imp_iv_size],
-		       UINT64DATA(params->write.sequence_number),
-		       8);
+			/* Instead of generating a new nonce on every packet, we use the
+			 * write.sequence_number (It is a MAY on RFC 5288), and safer
+			 * as it will never reuse a value.
+			 */
+			memcpy(nonce, params->write.IV.data,
+			       params->write.IV.size);
+			memcpy(&nonce[imp_iv_size],
+			       UINT64DATA(params->write.sequence_number),
+			       8);
 
-		if (send_nonce != 0) {
-			/* copy the explicit part */
 			memcpy(data_ptr, &nonce[imp_iv_size],
 			       exp_iv_size);
 
 			data_ptr += exp_iv_size;
 			cipher_data += exp_iv_size;
+		} else { /* XOR nonce with IV */
+			if (unlikely(params->write.IV.size != 12 || imp_iv_size != 12 || exp_iv_size != 0))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+			memset(nonce, 0, 4);
+			memcpy(&nonce[4],
+			       UINT64DATA(params->write.sequence_number),
+			       8);
+
+ 			memxor(nonce, params->write.IV.data, 12);
 		}
 	}
 
@@ -507,7 +513,6 @@ ciphertext_to_compressed(gnutls_session_t session,
 	const version_entry_st *ver = get_version(session);
 	unsigned int tag_size =
 	    _gnutls_auth_cipher_tag_len(&params->read.cipher_state);
-	unsigned send_nonce = params->send_nonce;
 	unsigned int explicit_iv = _gnutls_version_has_explicit_iv(ver);
 	unsigned imp_iv_size, exp_iv_size;
 	unsigned cipher_type = _gnutls_cipher_type(params->cipher);
@@ -566,29 +571,35 @@ ciphertext_to_compressed(gnutls_session_t session,
 						   cipher_state) == 0))
 			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
-		 */
-		if (unlikely
-		    (params->read.IV.data == NULL
-		     || params->read.IV.size != 4))
-			return
-			    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		if (unlikely(ciphertext->size < (tag_size + (send_nonce!=0)?exp_iv_size:0)))
+		if (unlikely(ciphertext->size < (tag_size + exp_iv_size)))
 			return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-		memcpy(nonce, params->read.IV.data,
-		       imp_iv_size);
+		if (params->cipher->xor_nonce == 0) {
+			/* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
+			 */
+			 if (unlikely
+			    (params->read.IV.data == NULL
+			     || params->read.IV.size != 4))
+				return
+				    gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-		if (send_nonce != 0) {
+			memcpy(nonce, params->read.IV.data,
+			       imp_iv_size);
+
 			memcpy(&nonce[imp_iv_size],
 			       ciphertext->data, exp_iv_size);
 
 			ciphertext->data += exp_iv_size;
 			ciphertext->size -= exp_iv_size;
-		} else {
-			memcpy(&nonce[imp_iv_size],
-			       UINT64DATA(*sequence), 8);
+		} else { /* XOR nonce with IV */
+			if (unlikely(params->read.IV.size != 12 || imp_iv_size != 12 || exp_iv_size != 0))
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+			memset(nonce, 0, 4);
+			memcpy(&nonce[4], UINT64DATA(*sequence), 8);
+
+ 			memxor(nonce, params->read.IV.data, 12);
 		}
 
 		length =

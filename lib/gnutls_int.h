@@ -448,12 +448,8 @@ typedef struct cipher_entry_st {
 	uint16_t explicit_iv;	/* the size of explicit IV - the IV stored in record */
 	uint16_t cipher_iv;	/* the size of IV needed by the cipher */
 	uint16_t tagsize;
+	bool	xor_nonce;	/* In this TLS AEAD cipher xor the implicit_iv with the nonce */
 } cipher_entry_st;
-
-typedef enum nonce_type_t {
-	NONCE_IS_SENT,
-	NONCE_IS_COUNTER,
-} nonce_type_t;
 
 typedef struct gnutls_cipher_suite_entry_st {
 	const char *name;
@@ -466,7 +462,6 @@ typedef struct gnutls_cipher_suite_entry_st {
 					 */
 	gnutls_protocol_t min_dtls_version;	/* DTLS min version */
 	gnutls_mac_algorithm_t prf;
-	nonce_type_t nonce_type;
 } gnutls_cipher_suite_entry_st;
 
 /* This structure is used both for MACs and digests
@@ -628,7 +623,6 @@ struct record_parameters_st {
 
 	record_state_st read;
 	record_state_st write;
-	unsigned send_nonce; /* whether explicit nonce is sent (in AEAD ciphers) */
 
 	/* Whether this state is in use, i.e., if there is
 	   a pending handshake message waiting to be encrypted
