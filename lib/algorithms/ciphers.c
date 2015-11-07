@@ -155,8 +155,9 @@ static const cipher_entry_st algorithms[] = {
 	  .blocksize = 64,
 	  .keysize = 32,
 	  .type = CIPHER_AEAD,
-	  .implicit_iv = 4,
-	  .explicit_iv = 8,
+	  .implicit_iv = 12,
+	  .explicit_iv = 0,
+	  .xor_nonce = 1,
 	  .cipher_iv = 12,
 	  .tagsize = 16
 	},

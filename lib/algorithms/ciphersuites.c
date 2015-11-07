@@ -32,11 +32,9 @@
 
 /* Cipher SUITES */
 #define ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version ) \
-	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, GNUTLS_MAC_SHA256, NONCE_IS_SENT}
+	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, GNUTLS_MAC_SHA256}
 #define ENTRY_PRF( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf ) \
-	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf, NONCE_IS_SENT}
-#define ENTRY_CNONCE( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version ) \
-	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, GNUTLS_MAC_SHA256, NONCE_IS_COUNTER}
+	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm, min_version, dtls_version, prf}
 
 /* RSA with NULL cipher and MD5 MAC
  * for test purposes.
@@ -105,15 +103,15 @@
 #define GNUTLS_DH_ANON_AES_128_CBC_SHA256 { 0x00, 0x6C }
 #define GNUTLS_DH_ANON_AES_256_CBC_SHA256 { 0x00, 0x6D }
 
-/* draft-mavrogiannopoulos-chacha-tls-04 */
-#define GNUTLS_RSA_CHACHA20_POLY1305          	{ 0xCC, 0xA0 }
-#define GNUTLS_ECDHE_RSA_CHACHA20_POLY1305      { 0xCC, 0xA1 }
-#define GNUTLS_ECDHE_ECDSA_CHACHA20_POLY1305	{ 0xCC, 0xA2 }
-#define GNUTLS_DHE_RSA_CHACHA20_POLY1305	{ 0xCC, 0xA3 }
-#define GNUTLS_DHE_PSK_CHACHA20_POLY1305	{ 0xCC, 0xA4 }
-#define GNUTLS_PSK_CHACHA20_POLY1305		{ 0xCC, 0xA5 }
-#define GNUTLS_ECDHE_PSK_CHACHA20_POLY1305	{ 0xCC, 0xA6 }
-#define GNUTLS_RSA_PSK_CHACHA20_POLY1305	{ 0xCC, 0xA7 }
+/* draft-ietf-tls-chacha20-poly1305-02 */
+#define GNUTLS_ECDHE_RSA_CHACHA20_POLY1305      { 0xCC, 0xA7 }
+#define GNUTLS_ECDHE_ECDSA_CHACHA20_POLY1305	{ 0xCC, 0xA8 }
+#define GNUTLS_DHE_RSA_CHACHA20_POLY1305	{ 0xCC, 0xA9 }
+
+#define GNUTLS_PSK_CHACHA20_POLY1305		{ 0xCC, 0xAA }
+#define GNUTLS_ECDHE_PSK_CHACHA20_POLY1305	{ 0xCC, 0xAB }
+#define GNUTLS_DHE_PSK_CHACHA20_POLY1305	{ 0xCC, 0xAC }
+#define GNUTLS_RSA_PSK_CHACHA20_POLY1305	{ 0xCC, 0xAD }
 
 /* PSK (not in TLS 1.0)
  * draft-ietf-tls-psk:
@@ -404,10 +402,6 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 		  GNUTLS_CIPHER_CAMELLIA_256_GCM, GNUTLS_KX_RSA,
 		  GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
 		  GNUTLS_DTLS1_2, GNUTLS_MAC_SHA384),
-	ENTRY_CNONCE(GNUTLS_RSA_CHACHA20_POLY1305,
-		GNUTLS_CIPHER_CHACHA20_POLY1305, GNUTLS_KX_RSA,
-		GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
-		GNUTLS_DTLS1_2),
 
 /* CCM */
 	ENTRY(GNUTLS_RSA_AES_128_CCM,
@@ -555,7 +549,7 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 		  GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
 		  GNUTLS_DTLS1_2, GNUTLS_MAC_SHA384),
 
-	ENTRY_CNONCE(GNUTLS_DHE_RSA_CHACHA20_POLY1305,
+	ENTRY(GNUTLS_DHE_RSA_CHACHA20_POLY1305,
 	      GNUTLS_CIPHER_CHACHA20_POLY1305, GNUTLS_KX_DHE_RSA,
 	      GNUTLS_MAC_AEAD, GNUTLS_TLS1_2, GNUTLS_DTLS1_2),
 
@@ -691,12 +685,12 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 		  GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
 		  GNUTLS_DTLS1_2, GNUTLS_MAC_SHA384),
 
-	ENTRY_CNONCE(GNUTLS_ECDHE_RSA_CHACHA20_POLY1305,
+	ENTRY(GNUTLS_ECDHE_RSA_CHACHA20_POLY1305,
 	      GNUTLS_CIPHER_CHACHA20_POLY1305, GNUTLS_KX_ECDHE_RSA,
 	      GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
 	      GNUTLS_DTLS1_2),
 
-	ENTRY_CNONCE(GNUTLS_ECDHE_ECDSA_CHACHA20_POLY1305,
+	ENTRY(GNUTLS_ECDHE_ECDSA_CHACHA20_POLY1305,
 	      GNUTLS_CIPHER_CHACHA20_POLY1305, GNUTLS_KX_ECDHE_ECDSA,
 	      GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
 	      GNUTLS_DTLS1_2),
@@ -989,18 +983,18 @@ static const gnutls_cipher_suite_entry_st cs_algorithms[] = {
 	      GNUTLS_CIPHER_AES_256_CCM_8, GNUTLS_KX_DHE_PSK,
 	      GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
 	      GNUTLS_DTLS1_2),
-	ENTRY_CNONCE(GNUTLS_DHE_PSK_CHACHA20_POLY1305,
+	ENTRY(GNUTLS_DHE_PSK_CHACHA20_POLY1305,
 	      GNUTLS_CIPHER_CHACHA20_POLY1305, GNUTLS_KX_DHE_PSK,
 	      GNUTLS_MAC_AEAD, GNUTLS_TLS1_2, GNUTLS_DTLS1_2),
-	ENTRY_CNONCE(GNUTLS_ECDHE_PSK_CHACHA20_POLY1305,
+	ENTRY(GNUTLS_ECDHE_PSK_CHACHA20_POLY1305,
 	      GNUTLS_CIPHER_CHACHA20_POLY1305, GNUTLS_KX_ECDHE_PSK,
 	      GNUTLS_MAC_AEAD, GNUTLS_TLS1_2, GNUTLS_DTLS1_2),
 
-	ENTRY_CNONCE(GNUTLS_RSA_PSK_CHACHA20_POLY1305,
+	ENTRY(GNUTLS_RSA_PSK_CHACHA20_POLY1305,
 	      GNUTLS_CIPHER_CHACHA20_POLY1305, GNUTLS_KX_RSA_PSK,
 	      GNUTLS_MAC_AEAD, GNUTLS_TLS1_2, GNUTLS_DTLS1_2),
 
-	ENTRY_CNONCE(GNUTLS_PSK_CHACHA20_POLY1305,
+	ENTRY(GNUTLS_PSK_CHACHA20_POLY1305,
 	      GNUTLS_CIPHER_CHACHA20_POLY1305, GNUTLS_KX_PSK,
 	      GNUTLS_MAC_AEAD, GNUTLS_TLS1_2, GNUTLS_DTLS1_2),
 

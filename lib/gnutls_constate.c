@@ -176,6 +176,18 @@ _gnutls_set_keys(gnutls_session_t session, record_parameters_st * params,
 		    (&server_write->IV, &key_block[pos], IV_size) < 0)
 			return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
+
+		_gnutls_hard_log("INT: CLIENT WRITE IV [%d]: %s\n",
+				 client_write->IV.size,
+				 _gnutls_bin2hex(client_write->IV.data,
+						 client_write->IV.size,
+						 buf, sizeof(buf), NULL));
+
+		_gnutls_hard_log("INT: SERVER WRITE IV [%d]: %s\n",
+				 server_write->IV.size,
+				 _gnutls_bin2hex(server_write->IV.data,
+						 server_write->IV.size,
+						 buf, sizeof(buf), NULL));
 	}
 
 	return 0;
@@ -251,10 +263,6 @@ _gnutls_epoch_set_cipher_suite(gnutls_session_t session,
 
 	params->cipher = cipher_algo;
 	params->mac = mac_algo;
-	if (cs->nonce_type == NONCE_IS_SENT)
-		params->send_nonce = 1;
-	else
-		params->send_nonce = 0;
 
 	return 0;
 }
