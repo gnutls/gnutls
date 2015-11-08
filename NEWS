@@ -14,6 +14,9 @@ See the end for copying conditions.
 ** libgnutls: Allow the presence of legacy ciphers and key exchanges in
    priority strings and consider them a no-op.
 
+** gnutls.pc: Don't include libtool specific options to link flags.
+   Reported by Dan Kegel.
+
 ** API and ABI modifications:
    No changes since last version.
 
