@@ -62,6 +62,8 @@ typedef struct common_info {
 	unsigned key_usage;
 
 	unsigned int batch;
+	/* when printing PKCS #11 objects, only print urls */
+	unsigned int only_urls;
 	unsigned int verbose;
 } common_info_st;
 
