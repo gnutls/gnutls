@@ -191,6 +191,10 @@ static void cmd_parser(int argc, char **argv)
 		batch = cinfo.batch = 1;
 	}
 
+	if (HAVE_OPT(ONLY_URLS)) {
+		batch = cinfo.only_urls = 1;
+	}
+
 	if (ENABLED_OPT(INDER) || ENABLED_OPT(INRAW))
 		cinfo.incert_format = GNUTLS_X509_FMT_DER;
 	else

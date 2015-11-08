@@ -157,7 +157,14 @@ pkcs11_list(FILE * outfile, const char *url, int type, unsigned int flags,
 			exit(1);
 		}
 
-		fprintf(outfile, "Object %d:\n\tURL: %s\n", i, output);
+		if (info->only_urls) {
+			fprintf(outfile, "%s\n", output);
+			gnutls_free(output);
+			continue;
+		} else {
+			fprintf(outfile, "Object %d:\n\tURL: %s\n", i, output);
+			gnutls_free(output);
+		}
 
 		otype = gnutls_pkcs11_obj_get_type(crt_list[i]);
 		fprintf(outfile, "\tType: %s\n",

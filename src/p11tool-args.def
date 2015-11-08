@@ -416,6 +416,12 @@ flag = {
 };
 
 flag = {
+    name      = only-urls;
+    descrip   = "Print a compact listing using only the URLs";
+    doc   = "";
+};
+
+flag = {
     name      = batch;
     descrip   = "Disable all interaction with the tool";
     doc = "In batch mode there will be no prompts, all parameters need to be specified on command line.";
