@@ -425,7 +425,7 @@ _dsa_generate_dss_pqg(struct dsa_params *params,
 		return 0;
 
 	if (cert->seed_length != seed_size) {
-		_gnutls_debug_log("Seed length must be %d bytes\n", cert->seed_length);
+		_gnutls_debug_log("Seed length must be %d bytes (it is %d)\n", cert->seed_length, seed_size);
 		return 0;
 	}
 
