@@ -405,7 +405,7 @@ void doit(void)
 	}
 	gnutls_x509_crt_deinit(issuer);
 
-	gnutls_x509_trust_list_deinit(tl, 0);
+	gnutls_x509_trust_list_deinit(tl, 1);
 
 
 
@@ -446,7 +446,7 @@ void doit(void)
 	}
 
 
-	gnutls_x509_trust_list_deinit(tl, 0);
+	gnutls_x509_trust_list_deinit(tl, 1);
 
 	/* deinit */
 	if (debug)
