@@ -20,7 +20,11 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-CERTTOOL="../../../src/certtool"
+CERTTOOL="${CERTTOOL:-../../../src/certtool${EXEEXT}}"
+
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+fi
 
 SUCCESS=" 1 4 7 12 15 16 17 18 24 26 27 30 33 56 57 62 63 "
 FAILURE=" 2 3 5 6 8 9 10 11 13 14 19 20 21 22 23 25 28 29 31 32 54 55 58 59 60 61 "
@@ -34,33 +38,33 @@ RET=0
 
 i=1
 while test -d X509tests/test${i}; do
-	find X509tests/test${i} -name *.crl -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --crl-info --inder --infile > chains/chain${i}.pem  2>/dev/null
-	find X509tests/test${i} -name E*.crt -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 2>/dev/null
+	find X509tests/test${i} -name *.crl -print0 |sort -r -z|xargs -n1 --null ${VALGRIND}  "${CERTTOOL}" --crl-info --inder --infile > chains/chain${i}.pem 
+	find X509tests/test${i} -name E*.crt -print0 |sort -r -z|xargs -n1 --null ${VALGRIND}  "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 
 	if test "${i}" -gt 1; then
-		find X509tests/test${i} -name I*.crt -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 2>/dev/null
+		find X509tests/test${i} -name I*.crt -print0 |sort -r -z|xargs -n1 --null ${VALGRIND}  "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 
 	fi
-	find X509tests/test${i} -name T*.crt -print0 |sort -r -z|xargs -n1 --null "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 2>/dev/null
-	"${CERTTOOL}" -e --infile chains/chain${i}.pem > out 2>&1
+	find X509tests/test${i} -name T*.crt -print0 |sort -r -z|xargs -n1 --null ${VALGRIND}  "${CERTTOOL}" --certificate-info --inder --infile >> chains/chain${i}.pem 
+	${VALGRIND} "${CERTTOOL}" -e --infile chains/chain${i}.pem > out
 	rc=$?
 	if test $rc != 0 && test $rc != 1; then
 		echo "Chain ${i} FATAL failure."
-		RET=1
+		exit 1
 	else
-		if echo "$KNOWN_BUGS" | grep " ${i} " > /dev/null 2>&1; then
+		if echo "$KNOWN_BUGS" | grep " ${i} " > /dev/null; then
 				echo "Chain ${i} verification was skipped due to known bug."
-		elif echo "$SUCCESS" | grep " ${i} " > /dev/null 2>&1; then
-			if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null 2>&1; then
+		elif echo "$SUCCESS" | grep " ${i} " > /dev/null; then
+			if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null; then
 				echo "Chain ${i} verification failure UNEXPECTED."
-				RET=1
+				exit 1
 			else
 				echo "Chain ${i} verification success as expected."
 			fi
-		elif echo "$FAILURE" | grep " ${i} " >/dev/null 2>&1; then
-			if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null 2>&1; then
+		elif echo "$FAILURE" | grep " ${i} " >/dev/null; then
+			if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.' > /dev/null; then
 				echo "Chain ${i} verification failure as expected."
 			else
 				echo "Chain ${i} verification success UNEXPECTED. "
-				RET=1
+				exit 1
 			fi
 		else
 			echo "Chain ${i} unclassified."

@@ -100,7 +100,6 @@ endif
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"					\
 	VALGRIND="$(VALGRIND)"				\
-	LIBTOOL="$(LIBTOOL)"				\
 	top_builddir="$(top_builddir)"			\
 	srcdir="$(srcdir)"
 
@@ -124,6 +123,6 @@ endif
 
 #pkcs11-chainverify cannot run under valgrind (or hell breaks loose)
 
-#if WANT_TEST_SUITE
-#LOG_COMPILER = $(VALGRIND)
-#endif
+if WANT_TEST_SUITE
+LOG_COMPILER = $(VALGRIND)
+endif
