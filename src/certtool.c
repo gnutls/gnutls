@@ -317,6 +317,7 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				gnutls_strerror(result));
 			exit(1);
 		}
+		gnutls_pubkey_deinit(pubkey);
 	} else {
 		result = gnutls_x509_crt_set_crq(crt, crq);
 		if (result < 0) {
@@ -877,6 +878,7 @@ static void generate_signed_certificate(common_info_st * cinfo)
 	fwrite(lbuffer, 1, size, outfile);
 
 	gnutls_x509_crt_deinit(crt);
+	gnutls_x509_crt_deinit(ca_crt);
 	gnutls_privkey_deinit(key);
 	gnutls_privkey_deinit(ca_key);
 }
