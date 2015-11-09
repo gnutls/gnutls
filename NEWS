@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 3.3.19 (unreleased)
 
+** libgnutls: Properly require TLS 1.2 to all the CBC-SHA256 and CBC-SHA384
+   ciphersuites. This solves an interoperability issue with openssl.
+   Reported by Viktor Dukhovni.
+
 ** libgnutls: Fixed memory leak in gnutls_pubkey_get_preferred_hash_algorithm(),
    patch by Lennert Buytenhek.
 
