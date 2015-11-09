@@ -3175,6 +3175,7 @@ void generate_pkcs12(common_info_st * cinfo)
 				gnutls_strerror(result));
 			exit(1);
 		}
+		gnutls_pkcs12_bag_deinit(bag);
 	}
 
 	/* Add the ca cert, if any */
@@ -3208,6 +3209,7 @@ void generate_pkcs12(common_info_st * cinfo)
 				gnutls_strerror(result));
 			exit(1);
 		}
+		gnutls_pkcs12_bag_deinit(bag);
 	}
 
 	for (i = 0; i < nkeys; i++) {
@@ -3280,6 +3282,7 @@ void generate_pkcs12(common_info_st * cinfo)
 				gnutls_strerror(result));
 			exit(1);
 		}
+		gnutls_pkcs12_bag_deinit(kbag);
 	}
 
 	result = gnutls_pkcs12_generate_mac(pkcs12, pass);
@@ -3299,7 +3302,11 @@ void generate_pkcs12(common_info_st * cinfo)
 	}
 
 	fwrite(lbuffer, 1, size, outfile);
+	for (i=0;i<ncrts;i++)
+		gnutls_x509_crt_deinit(crts[i]);
 	gnutls_free(crts);
+	gnutls_x509_crt_deinit(ca_crt);
+	gnutls_pkcs12_deinit(pkcs12);
 }
 
 static const char *BAGTYPE(gnutls_pkcs12_bag_type_t x)
@@ -3526,6 +3533,7 @@ void pkcs12_info(common_info_st * cinfo)
 		fprintf(outfile, "\tSalt size: %u\n", salt_size);
 		fprintf(outfile, "\tIteration count: %u\n\n", mac_iter);
 	}
+	gnutls_free(mac_oid);
 
 	pass = get_password(cinfo, NULL, 0);
 
@@ -3544,8 +3552,10 @@ void pkcs12_info(common_info_st * cinfo)
 		}
 
 		result = gnutls_pkcs12_get_bag(pkcs12, indx, bag);
-		if (result < 0)
+		if (result < 0) {
+			gnutls_pkcs12_bag_deinit(bag);
 			break;
+		}
 
 		result = gnutls_pkcs12_bag_get_count(bag);
 		if (result < 0) {
@@ -3589,6 +3599,8 @@ void pkcs12_info(common_info_st * cinfo)
 
 		gnutls_pkcs12_bag_deinit(bag);
 	}
+
+	gnutls_pkcs12_deinit(pkcs12);
 
 	if (fail) {
 		fprintf(stderr,
