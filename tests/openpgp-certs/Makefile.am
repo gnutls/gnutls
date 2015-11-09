@@ -22,7 +22,8 @@ EXTRA_DIST = ca-public.gpg srv-public-all-signed.gpg srv-secret.gpg	\
 	srv-public-localhost-signed.gpg					\
 	selfsigs/alice-mallory-badsig18.pub				\
 	selfsigs/alice-mallory-irrelevantsig.pub			\
-	selfsigs/alice-mallory-nosig18.pub selfsigs/alice.pub
+	selfsigs/alice-mallory-nosig18.pub selfsigs/alice.pub		\
+	suppressions.valgrind
 
 dist_check_SCRIPTS = testselfsigs testcerts
 
@@ -37,5 +38,6 @@ endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
+	VALGRIND="$(VALGRIND)" 			\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
