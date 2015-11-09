@@ -78,8 +78,16 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
+if test "${FIPS140}" = 1;then
+SEED="30:EC:33:4F:97:DB:C0:BA:9C:86:52:A7:B5:D3:F7:B2:DB:BB:48:A4:84:2E:19:0D:21:0E:01:DA:BD:53:59:81:50:37:55:EE:96:A2:70:A5:98:E9:D9:1B:22:54:66:91:69:EB:DF:45:99:D9:F7:2A:CA"
+DSAFILE=provable-dsa2048-fips.pem
+else
+SEED="5A:0E:A0:41:77:9B:0A:B7:65:BE:25:09:C4:DE:90:E5:A0:E7:DA:AD:AE:6E:49:D3:59:38:F9:13:33:A8:E1:FE:50:9D:D2:DF:E1:96:7C:D0:04:54:28:10:34:97:D0:03:88:C8:CE:36:29:0F:E9:37:9F:80:03:CB:F8:FD:A4:DA:27"
+DSAFILE=provable-dsa2048.pem
+fi
+
 #DSA keys
-${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/provable-dsa2048.pem"
+${VALGRIND} "${CERTTOOL}" --verify-provable-privkey --load-privkey "${srcdir}/${DSAFILE}"
 rc=$?
 
 if test "${rc}" != "0"; then
@@ -87,7 +95,6 @@ if test "${rc}" != "0"; then
 	exit 1
 fi
 
-SEED="5A:0E:A0:41:77:9B:0A:B7:65:BE:25:09:C4:DE:90:E5:A0:E7:DA:AD:AE:6E:49:D3:59:38:F9:13:33:A8:E1:FE:50:9D:D2:DF:E1:96:7C:D0:04:54:28:10:34:97:D0:03:88:C8:CE:36:29:0F:E9:37:9F:80:03:CB:F8:FD:A4:DA:27"
 ${VALGRIND} "${CERTTOOL}" --generate-privkey --provable --bits 2048 --dsa --seed "$SEED" --outfile "$OUTFILE"
 rc=$?
 

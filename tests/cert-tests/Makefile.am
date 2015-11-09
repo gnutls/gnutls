@@ -34,7 +34,7 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	pkcs7-detached.txt p7-combined.out template-generalized.pem \
 	template-generalized.tmpl privkey1.pem privkey2.pem privkey3.pem \
 	name-constraints-ip.pem cert-invalid-utf8.der very-long-dn.pem \
-	provable3072.pem provable2048.pem provable-dsa2048.pem
+	provable3072.pem provable2048.pem provable-dsa2048.pem provable-dsa2048-fips.pem
 
 dist_check_SCRIPTS = pathlen aki pem-decoding certtool invalid-sig email \
 	pkcs7 privkey-import name-constraints certtool-long-cn crl provable-privkey
@@ -64,3 +64,6 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	top_builddir="$(top_builddir)"		\
 	srcdir="$(srcdir)"
 
+if ENABLE_FIPS140
+TESTS_ENVIRONMENT += FIPS140=1
+endif
