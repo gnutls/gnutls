@@ -39,7 +39,11 @@ HOSTS="good.dane.verisignlabs.com www.freebsd.org www.kumari.net torproject.org 
 HOSTS="${HOSTS} nohats.ca"
 for host in ${HOSTS}; do
 
-	nc "${host}" 443 </dev/null
+	nc -w 5 "${host}" 443 >/dev/null <<_EOF
+GET / HTTP/1.0
+
+_EOF
+
 	if test $? = 0;then
 		echo -n "${host}: "
 		"${DANETOOL}" --check "${host}" >/dev/null 2>&1
@@ -57,7 +61,10 @@ echo "*** Testing good SMTP hosts ***"
 HOSTS="nlnetlabs.nl"
 for host in ${HOSTS}; do
 
-	nc "${host}" 25 </dev/null
+	nc -w 5 "${host}" 25 >/dev/null <<_EOF
+QUIT
+_EOF
+	
 	if test $? = 0;then
 		echo -n "${host}: "
 		"${DANETOOL}" --check "${host}" --port 25 >/dev/null 2>&1
@@ -77,7 +84,10 @@ HOSTS="bad-hash.dane.verisignlabs.com bad-params.dane.verisignlabs.com"
 HOSTS="${HOSTS} bad-sig.dane.verisignlabs.com"
 for host in ${HOSTS}; do
 
-	nc "${host}" 443 </dev/null
+	nc -w 5 "${host}" 443 >/dev/null <<_EOF
+GET / HTTP/1.0
+
+_EOF
 	if test $? = 0;then
 		echo -n "${host}: "
 		"${DANETOOL}" --check "${host}" >/dev/null 2>&1
