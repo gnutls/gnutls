@@ -9,6 +9,8 @@ See the end for copying conditions.
    ciphersuites. This solves an interoperability issue with openssl.
    Reported by Viktor Dukhovni.
 
+** libgnutls: Correctly the setting of salt size in gnutls_pkcs12_mac_info().
+
 ** gnutls.pc: Don't include libtool specific options to link flags.
    Reported by Dan Kegel.
 
