@@ -22,7 +22,7 @@
 EXTRA_DIST = README key-ca.pem key-user.pem \
 	ca-gnutls-keyid.pem ca-no-keyid.pem ca-weird-keyid.pem \
 	key-ca-1234.p8 key-ca-empty.p8 key-ca-null.p8 \
-	openssl-key-ecc.p8 key-ecc.p8 key-ecc.pem
+	openssl-key-ecc.p8 key-ecc.p8 key-ecc.pem suppressions.valgrind
 
 dist_check_SCRIPTS = key-id pkcs8
 
@@ -30,5 +30,10 @@ TESTS = key-id pkcs8
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	LC_ALL="C"						\
+	VALGRIND="$(VALGRIND)"					\
 	top_builddir="$(top_builddir)"				\
 	srcdir="$(srcdir)"
+
+if WANT_TEST_SUITE
+LOG_COMPILER = $(VALGRIND)
+endif
