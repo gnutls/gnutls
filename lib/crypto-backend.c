@@ -52,9 +52,12 @@ _algo_register(algo_list * al, int algorithm, int priority, void *s, int free_s)
 {
 	algo_list *cl;
 	algo_list *last_cl = al;
+	int ret;
 
-	if (al == NULL)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	if (al == NULL) {
+		ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		goto cleanup;
+	}
 
 	/* look if there is any cipher with lowest priority. In that case do not add.
 	 */
@@ -63,7 +66,8 @@ _algo_register(algo_list * al, int algorithm, int priority, void *s, int free_s)
 		if (cl->algorithm == algorithm) {
 			if (cl->priority < priority) {
 				gnutls_assert();
-				return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+				ret = GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+				goto cleanup;
 			} else {
 				/* the current has higher priority -> overwrite */
 				cl->algorithm = algorithm;
@@ -82,16 +86,20 @@ _algo_register(algo_list * al, int algorithm, int priority, void *s, int free_s)
 
 	if (cl == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
 	}
 
 	last_cl->algorithm = algorithm;
 	last_cl->priority = priority;
 	last_cl->alg_data = s;
+	last_cl->free_alg_data = free_s;
 	last_cl->next = cl;
 
 	return 0;
-
+ cleanup:
+ 	if (free_s) gnutls_free(s);
+ 	return ret;
 }
 
 static const void *_get_algo(algo_list * al, int algo)
