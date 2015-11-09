@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 3.4.7 (unreleased)
 
+** libgnutls: Properly require TLS 1.2 to all the CBC-SHA256 and CBC-SHA384
+   ciphersuites. This solves an interoperability issue with openssl.
+   Reported by Viktor Dukhovni.
+
 ** gnutls.pc: Don't include libtool specific options to link flags.
    Reported by Dan Kegel.
 
