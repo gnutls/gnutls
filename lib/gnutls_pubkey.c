@@ -1139,7 +1139,7 @@ gnutls_pubkey_import(gnutls_pubkey_t key,
  * @key: holds a public key
  *
  * This function will set the public parameters from the given public
- * key to the request.
+ * key to the request. The @key can be deallocated after that.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
