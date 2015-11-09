@@ -2639,7 +2639,6 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 			exit(1);
 		}
 
-		gnutls_free(x509_crl_list);
 	}
 
 	fprintf(stdout, "Loaded %d certificates, %d CAs and %d CRLs\n\n",
@@ -2699,6 +2698,9 @@ _verify_x509_mem(const void *cert, int cert_size, const void *ca,
 	for (i=0;i<x509_ncerts;i++)
 		gnutls_x509_crt_deinit(x509_cert_list[i]);
 	gnutls_free(x509_cert_list);
+	for (i=0;i<x509_ncrls;i++)
+		gnutls_x509_crl_deinit(x509_crl_list[i]);
+	gnutls_free(x509_crl_list);
 
 	if (output != 0)
 		exit(EXIT_FAILURE);
