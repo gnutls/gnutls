@@ -651,14 +651,14 @@ gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
 
 	/* ENC_DATA_OID needs decryption */
 
-	bag->element[0].type = GNUTLS_BAG_ENCRYPTED;
-	bag->bag_elements = 1;
-
 	result = _gnutls_x509_read_value(c2, root2, &bag->element[0].data);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
+
+	bag->element[0].type = GNUTLS_BAG_ENCRYPTED;
+	bag->bag_elements = 1;
 
 	result = 0;
 
@@ -1905,6 +1905,7 @@ gnutls_pkcs12_mac_info(gnutls_pkcs12_t pkcs12, unsigned int *mac,
 		}
 
 		if (*salt_size >= (unsigned)dsalt.size) {
+			*salt_size = dsalt.size;
 			memcpy(salt, dsalt.data, dsalt.size);
 		} else {
 			*salt_size = dsalt.size;

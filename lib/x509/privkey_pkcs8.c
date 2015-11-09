@@ -1140,9 +1140,10 @@ int pkcs8_key_info(const gnutls_datum_t * raw_key,
 		goto error;
 	}
 
-	return 0;
+	result = 0;
 
       error:
+	asn1_delete_structure2(&pkcs8_asn, ASN1_DELETE_FLAG_ZEROIZE);
 	return result;
 }
 
