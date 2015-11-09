@@ -216,5 +216,8 @@ int main(void)
 		tcp_close(sd);
 	}
 
+	gnutls_anon_free_client_credentials(c_anoncred);
+	gnutls_certificate_free_credentials(c_certcred);
+
 	return 0;
 }
