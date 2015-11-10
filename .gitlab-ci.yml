@@ -23,7 +23,7 @@ Build and Check with valgrind:
 Build and Check with asan:
   script:
   - git submodule update --init && make autoreconf &&CFLAGS="-fsanitize=address -g
-    -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves
+    -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make -j4 && make check -j4
   - cat tests/test-suite.log
   tags:
