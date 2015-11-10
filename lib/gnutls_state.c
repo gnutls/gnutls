@@ -222,6 +222,33 @@ _gnutls_session_cert_type_supported(gnutls_session_t session,
 	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 }
 
+static void deinit_keys(gnutls_session_t session)
+{
+	gnutls_pk_params_release(&session->key.ecdh_params);
+	gnutls_pk_params_release(&session->key.dh_params);
+	zrelease_temp_mpi_key(&session->key.ecdh_x);
+	zrelease_temp_mpi_key(&session->key.ecdh_y);
+
+	zrelease_temp_mpi_key(&session->key.client_Y);
+
+	/* SRP */
+	zrelease_temp_mpi_key(&session->key.srp_p);
+	zrelease_temp_mpi_key(&session->key.srp_g);
+	zrelease_temp_mpi_key(&session->key.srp_key);
+
+	zrelease_temp_mpi_key(&session->key.u);
+	zrelease_temp_mpi_key(&session->key.a);
+	zrelease_temp_mpi_key(&session->key.x);
+	zrelease_temp_mpi_key(&session->key.A);
+	zrelease_temp_mpi_key(&session->key.B);
+	zrelease_temp_mpi_key(&session->key.b);
+
+	/* RSA */
+	zrelease_temp_mpi_key(&session->key.rsa[0]);
+	zrelease_temp_mpi_key(&session->key.rsa[1]);
+
+	_gnutls_free_temp_key_datum(&session->key.key);
+}
 
 /* this function deinitializes all the internal parameters stored
  * in a session struct.
@@ -271,6 +298,7 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
 	_gnutls_handshake_internal_state_init(session);
 
 	deinit_internal_params(session);
+	deinit_keys(session);
 
 	_gnutls_epoch_gc(session);
 
@@ -473,30 +501,6 @@ void gnutls_deinit(gnutls_session_t session)
 
 	gnutls_credentials_clear(session);
 	_gnutls_selected_certs_deinit(session);
-
-	gnutls_pk_params_release(&session->key.ecdh_params);
-	gnutls_pk_params_release(&session->key.dh_params);
-	zrelease_temp_mpi_key(&session->key.ecdh_x);
-	zrelease_temp_mpi_key(&session->key.ecdh_y);
-
-	zrelease_temp_mpi_key(&session->key.client_Y);
-
-	zrelease_temp_mpi_key(&session->key.srp_p);
-	zrelease_temp_mpi_key(&session->key.srp_g);
-	zrelease_temp_mpi_key(&session->key.srp_key);
-
-	zrelease_temp_mpi_key(&session->key.u);
-	zrelease_temp_mpi_key(&session->key.a);
-	zrelease_temp_mpi_key(&session->key.x);
-	zrelease_temp_mpi_key(&session->key.A);
-	zrelease_temp_mpi_key(&session->key.B);
-	zrelease_temp_mpi_key(&session->key.b);
-
-	/* RSA */
-	zrelease_temp_mpi_key(&session->key.rsa[0]);
-	zrelease_temp_mpi_key(&session->key.rsa[1]);
-
-	_gnutls_free_temp_key_datum(&session->key.key);
 
 	gnutls_free(session);
 }
