@@ -84,17 +84,17 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
 
 
 
-nodist_check_SCRIPTS = eagain testsrn chain invalid-cert testrandom \
-	testpkcs11 testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm \
+nodist_check_SCRIPTS = eagain testsrn chain.sh invalid-cert testrandom \
+	testpkcs11.sh testpkcs11.pkcs15 testpkcs11.softhsm testpkcs11.sc-hsm \
 	testrng testcompat-main-polarssl testcompat-main-openssl testcompat-common \
 	testcompat-polarssl testcompat-openssl
 
-TESTS = test-ciphersuite-names eagain testsrn chain invalid-cert \
+TESTS = test-ciphersuite-names.sh eagain testsrn chain.sh invalid-cert \
 	testrng testcompat-openssl testcompat-polarssl
 
 if ENABLE_PKCS11
 check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer pkcs11-is-known pkcs11-combo pkcs11-privkey
-TESTS += testpkcs11 pkcs11-chainverify pkcs11-get-issuer crl-test pkcs11-is-known pkcs11-combo pkcs11-privkey
+TESTS += testpkcs11.sh pkcs11-chainverify pkcs11-get-issuer crl-test pkcs11-is-known pkcs11-combo pkcs11-privkey
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
@@ -124,5 +124,7 @@ endif
 #pkcs11-chainverify cannot run under valgrind (or hell breaks loose)
 
 if WANT_TEST_SUITE
+TEST_EXTENSIONS = .sh
 LOG_COMPILER = $(VALGRIND)
+SH_LOG_COMPILER =
 endif

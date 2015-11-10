@@ -27,7 +27,7 @@ CLI="${CLI:-../../src/gnutls-cli${EXEEXT}}"
 RETCODE=0
 
 if ! test -z "${VALGRIND}"; then
-	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --leak-check=no"
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute valgrind --leak-check=full"
 fi
 
 TMPFILE="testpkcs11.debug"
