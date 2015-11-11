@@ -90,7 +90,8 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 x509sign-verify2 mini-alignment oids atfork prf psk-file \
 	 status-request status-request-ok fallback-scsv pkcs8-key-decode \
 	 key-usage resume-psk mini-session-verify-function auto-verify \
-	 record-timeouts mini-dtls-hello-verify-48 mini-x509-default-prio
+	 record-timeouts mini-dtls-hello-verify-48 mini-x509-default-prio \
+	 mini-x509-dual
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 
