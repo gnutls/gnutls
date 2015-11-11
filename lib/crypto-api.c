@@ -221,7 +221,9 @@ gnutls_cipher_decrypt(gnutls_cipher_hd_t handle, void *ctext,
  * @ctext_len: the available length for encrypted data
  *
  * This function will encrypt the given data using the algorithm
- * specified by the context.
+ * specified by the context. For block ciphers the @ptext_len must be
+ * a multiple of the block size. For the supported ciphers the encrypted
+ * data length will equal the plaintext size.
  *
  * Returns: Zero or a negative error code on error.
  *
@@ -247,7 +249,9 @@ gnutls_cipher_encrypt2(gnutls_cipher_hd_t handle, const void *ptext,
  * @ptext_len: the available length for decrypted data
  *
  * This function will decrypt the given data using the algorithm
- * specified by the context.
+ * specified by the context. For block ciphers the @ctext_len must be
+ * a multiple of the block size. For the supported ciphers the plaintext
+ * data length will equal the ciphertext size.
  *
  * Note that in AEAD ciphers, this will not check the tag. You will
  * need to compare the tag sent with the value returned from gnutls_cipher_tag().
