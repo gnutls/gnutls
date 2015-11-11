@@ -14,6 +14,9 @@ See the end for copying conditions.
 ** libgnutls: Allow the presence of legacy ciphers and key exchanges in
    priority strings and consider them a no-op.
 
+** libgnutls: On a rehandshake allow switching from anonymous to ECDHE and
+   DHE ciphersuites.
+
 ** gnutls.pc: Don't include libtool specific options to link flags.
    Reported by Dan Kegel.
 
