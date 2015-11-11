@@ -290,7 +290,7 @@ library.
 @node Initialization
 @subsection Initialization
 
-The GnuTLS library is initialized on load; prior to 3.3.0 was initialized by calling @funcref{gnutls_global_init}. 
+The GnuTLS library is initialized on load; prior to 3.3.0 was initialized by calling @funcref{gnutls_global_init}@footnote{The original behavior of requiring explicit initialization can obtained by setting the GNUTLS_NO_EXPLICIT_INIT environment variable to 1.}. 
 The initialization typically enables CPU-specific acceleration, performs any required
 precalculations needed, opens any required system devices (e.g., /dev/urandom on Linux)
 and initializes subsystems that could be used later.
