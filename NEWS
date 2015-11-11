@@ -11,6 +11,9 @@ See the end for copying conditions.
 
 ** libgnutls: Correctly the setting of salt size in gnutls_pkcs12_mac_info().
 
+** libgnutls: On a rehandshake allow switching from anonymous to ECDHE and
+   DHE ciphersuites.
+
 ** gnutls.pc: Don't include libtool specific options to link flags.
    Reported by Dan Kegel.
 
