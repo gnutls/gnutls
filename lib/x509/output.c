@@ -674,7 +674,7 @@ print_unique_ids(gnutls_buffer_st * str, const gnutls_x509_crt_t cert)
 	result =
 	    gnutls_x509_crt_get_issuer_unique_id(cert, buf, &buf_size);
 	if (result >= 0) {
-		addf(str, ("\t\tIssuer Unique ID:\n"));
+		addf(str, ("\tIssuer Unique ID:\n"));
 		_gnutls_buffer_hexdump(str, buf, buf_size, "\t\t\t");
 		if (buf_size == 16) {	/* this could be a GUID */
 			guiddump(str, buf, buf_size, "\t\t\t");
@@ -685,7 +685,7 @@ print_unique_ids(gnutls_buffer_st * str, const gnutls_x509_crt_t cert)
 	result =
 	    gnutls_x509_crt_get_subject_unique_id(cert, buf, &buf_size);
 	if (result >= 0) {
-		addf(str, ("\t\tSubject Unique ID:\n"));
+		addf(str, ("\tSubject Unique ID:\n"));
 		_gnutls_buffer_hexdump(str, buf, buf_size, "\t\t\t");
 		if (buf_size == 16) {	/* this could be a GUID */
 			guiddump(str, buf, buf_size, "\t\t\t");
