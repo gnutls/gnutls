@@ -511,6 +511,14 @@ int gnutls_x509_crt_set_ca_status(gnutls_x509_crt_t crt, unsigned int ca);
 int gnutls_x509_crt_set_basic_constraints(gnutls_x509_crt_t crt,
 					  unsigned int ca,
 					  int pathLenConstraint);
+
+int
+gnutls_x509_crt_set_subject_unique_id(gnutls_x509_crt_t cert, const void *id,
+			   size_t id_size);
+int
+gnutls_x509_crt_set_issuer_unique_id(gnutls_x509_crt_t cert, const void *id,
+			   size_t id_size);
+
 int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt_t
 						 crt,
 						 gnutls_x509_subject_alt_name_t

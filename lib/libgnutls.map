@@ -1025,6 +1025,8 @@ GNUTLS_3_1_0 {
 	gnutls_x509_ext_print;
 	gnutls_x509_othername_to_virtual;
 	_gnutls_global_init_skip;
+	gnutls_x509_crt_set_subject_unique_id;
+	gnutls_x509_crt_set_issuer_unique_id;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {

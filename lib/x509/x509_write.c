@@ -1005,31 +1005,101 @@ gnutls_x509_crt_set_serial(gnutls_x509_crt_t cert, const void *serial,
 
 }
 
+/**
+ * gnutls_x509_crt_set_issuer_unique_id:
+ * @cert: a certificate of type #gnutls_x509_crt_t
+ * @id: The unique ID
+ * @id_size: Holds the size of the unique ID.
+ *
+ * This function will set the X.509 certificate's issuer unique ID field.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_set_issuer_unique_id(gnutls_x509_crt_t cert, const void *id,
+			   size_t id_size)
+{
+	int ret;
+
+	if (cert == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret =
+	    asn1_write_value(cert->cert, "tbsCertificate.issuerUniqueID",
+			     id, id_size*8);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(ret);
+	}
+
+	return 0;
+}
+
+/**
+ * gnutls_x509_crt_set_subject_unique_id:
+ * @cert: a certificate of type #gnutls_x509_crt_t
+ * @id: The unique ID
+ * @id_size: Holds the size of the unique ID.
+ *
+ * This function will set the X.509 certificate's subject unique ID field.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_set_subject_unique_id(gnutls_x509_crt_t cert, const void *id,
+			   size_t id_size)
+{
+	int ret;
+
+	if (cert == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret =
+	    asn1_write_value(cert->cert, "tbsCertificate.subjectUniqueID",
+			     id, id_size*8);
+	if (ret != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(ret);
+	}
+
+	return 0;
+}
+
 /* If OPTIONAL fields have not been initialized then
  * disable them.
  */
 static void disable_optional_stuff(gnutls_x509_crt_t cert)
 {
-	int ret;
-	gnutls_datum_t t = {NULL, 0};
+	asn1_data_node_st n;
+	asn1_node node;
+	unsigned remove_subject_unique_id = 1;
+	unsigned remove_issuer_unique_id = 1;
 
-	ret =
-	    _gnutls_x509_read_value(cert->cert,
-				    "tbsCertificate.subjectUniqueID",
-				    &t);
-	if (ret < 0) {
-		asn1_write_value(cert->cert, "tbsCertificate.subjectUniqueID", NULL, 0);
-	} else
-		gnutls_free(t.data);
+	node = asn1_find_node(cert->cert, "tbsCertificate.issuerUniqueID");
+	if (node) {
+		if (asn1_read_node_value(node, &n) == ASN1_SUCCESS && n.value_len != 0)
+			remove_issuer_unique_id = 0;
+	}
 
-	ret =
-	    _gnutls_x509_read_value(cert->cert,
-				    "tbsCertificate.issuerUniqueID",
-				    &t);
-	if (ret < 0) {
-		asn1_write_value(cert->cert, "tbsCertificate.issuerUniqueID", NULL, 0);
-	} else
-		gnutls_free(t.data);
+	node = asn1_find_node(cert->cert, "tbsCertificate.subjectUniqueID");
+	if (node) {
+		if (asn1_read_node_value(node, &n) == ASN1_SUCCESS && n.value_len != 0)
+			remove_subject_unique_id = 0;
+	}
+
+	if (remove_issuer_unique_id)
+		asn1_write_value(cert->cert, "tbsCertificate.issuerUniqueID", NULL,
+				 0);
+
+	if (remove_subject_unique_id)
+		asn1_write_value(cert->cert, "tbsCertificate.subjectUniqueID",
+				 NULL, 0);
 
 	if (cert->use_extensions == 0) {
 		_gnutls_debug_log("Disabling X.509 extensions.\n");
