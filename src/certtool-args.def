@@ -661,6 +661,12 @@ challenge_password = 123456
 # Whether this is a CA certificate or not
 #ca
 
+# Subject Unique ID (in hex)
+#subject_unique_id = 00153224
+
+# Issuer Unique ID (in hex)
+#issuer_unique_id = 00153225
+
 # for microsoft smart card logon
 # key_purpose_oid = 1.3.6.1.4.1.311.20.2.2
 

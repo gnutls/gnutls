@@ -428,6 +428,8 @@ generate_certificate(gnutls_privkey_t * ret_key,
 			}
 		}
 
+		crt_unique_ids_set(crt);
+
 		is_ike = get_ipsec_ike_status();
 		server = get_tls_server_status();
 

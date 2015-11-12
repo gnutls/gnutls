@@ -79,6 +79,7 @@ int get_ipsec_ike_status(void);
 void get_dc_set(int type, void *crt);
 void get_ca_issuers_set(gnutls_x509_crt_t crt);
 void get_ocsp_issuer_set(gnutls_x509_crt_t crt);
+void crt_unique_ids_set(gnutls_x509_crt_t crt);
 
 void get_cn_crq_set(gnutls_x509_crq_t crq);
 void get_uid_crq_set(gnutls_x509_crq_t crq);
