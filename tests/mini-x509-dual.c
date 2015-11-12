@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2008-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2015 Red Hat, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -149,6 +149,9 @@ static void try(const char *client_prio, gnutls_kx_algorithm_t client_kx)
 	/* Server stuff. */
 	gnutls_certificate_credentials_t serverx509cred;
 	gnutls_anon_server_credentials_t s_anoncred;
+	gnutls_dh_params_t dh_params;
+	const gnutls_datum_t p3 =
+	    { (unsigned char *) pkcs3, strlen(pkcs3) };
 	gnutls_session_t server;
 	int sret = GNUTLS_E_AGAIN;
 	/* Client stuff. */
@@ -169,13 +172,17 @@ static void try(const char *client_prio, gnutls_kx_algorithm_t client_kx)
 					    &server_cert, &server_key,
 					    GNUTLS_X509_FMT_PEM);
 
+	gnutls_dh_params_init(&dh_params);
+	gnutls_dh_params_import_pkcs3(dh_params, &p3, GNUTLS_X509_FMT_PEM);
+	gnutls_certificate_set_dh_params(serverx509cred, dh_params);
+
 	gnutls_init(&server, GNUTLS_SERVER);
 	gnutls_credentials_set(server, GNUTLS_CRD_CERTIFICATE,
 			       serverx509cred);
 	gnutls_credentials_set(server, GNUTLS_CRD_ANON, s_anoncred);
 
 	gnutls_priority_set_direct(server,
-				   "NORMAL:+ANON-ECDH:+ECDHE-RSA",
+				   "NORMAL:+ANON-ECDH:+ECDHE-RSA:+DHE-RSA",
 				   NULL);
 	gnutls_transport_set_push_function(server, server_push);
 	gnutls_transport_set_pull_function(server, server_pull);
@@ -278,16 +285,17 @@ static void try(const char *client_prio, gnutls_kx_algorithm_t client_kx)
 	gnutls_certificate_free_credentials(clientx509cred);
 	gnutls_anon_free_server_credentials(s_anoncred);
 	gnutls_anon_free_client_credentials(c_anoncred);
-
+	gnutls_dh_params_deinit(dh_params);
 }
 
 void doit(void)
 {
 	global_init();
 
+	try("NORMAL:-KX-ALL:+DHE-RSA:+ARCFOUR-128", GNUTLS_KX_DHE_RSA);
+	reset_buffers();
 	try("NORMAL:-KX-ALL:+ECDHE-RSA:+ARCFOUR-128", GNUTLS_KX_ECDHE_RSA);
 	reset_buffers();
 	try("NORMAL:-KX-ALL:+RSA:+ARCFOUR-128", GNUTLS_KX_RSA);
-
 	gnutls_global_deinit();
 }
