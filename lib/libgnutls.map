@@ -1057,6 +1057,8 @@ GNUTLS_3_4
 	gnutls_session_set_verify_cert2;
 	gnutls_session_get_verify_cert_status;
 	gnutls_pkcs11_copy_pubkey;
+	gnutls_x509_crt_set_subject_unique_id;
+	gnutls_x509_crt_set_issuer_unique_id;
  local:
 	*;
 };
