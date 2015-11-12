@@ -766,6 +766,12 @@ challenge_password = 123456
 # Whether this is a CA certificate or not
 #ca
 
+# Subject Unique ID (in hex)
+#subject_unique_id = 00153224
+
+# Issuer Unique ID (in hex)
+#issuer_unique_id = 00153225
+
 #### Key usage
 
 # The following key usage flags are used by CAs and end certificates
