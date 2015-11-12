@@ -22,6 +22,7 @@
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
+DIFF="${DIFF:-diff}"
 
 export TZ="UTC"
 
@@ -226,6 +227,7 @@ fi
 
 rm -f tmp-tt.pem
 
+
 # Test the GeneralizedTime support
 if test "$(getconf LONG_BIT)" = "64"; then
 
@@ -256,5 +258,31 @@ fi
 rm -f tmp-tt.pem
 
 fi
+
+# Test unique ID field generation
+
+rc=1
+counter=1
+
+while [ "${rc}" != "0" -a $counter -le 3 ]; do
+	datefudge "2007-04-22" \
+	"${CERTTOOL}" --generate-self-signed \
+		--load-privkey "${srcdir}/template-test.key" \
+		--template "${srcdir}/template-unique.tmpl" \
+		--outfile tmp-tt.pem 2>/dev/null
+
+	${DIFF} "${srcdir}/template-unique.pem" tmp-tt.pem >/dev/null 2>&1
+	rc=$?
+	test ${rc} != 0 && sleep 3
+	counter=`expr $counter + 1`
+done
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 9 (unique ID) failed"
+	exit ${rc}
+fi
+
+rm -f tmp-tt.pem
 
 exit 0

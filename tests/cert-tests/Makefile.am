@@ -28,7 +28,8 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	template-date.tmpl template-date.pem template-dn-err.tmpl \
 	template-nc.tmpl template-nc.pem xmpp-othername.pem \
 	suppressions.valgrind csr-invalid.der invalid-sig2.pem invalid-sig3.pem \
-	template-generalized.pem template-generalized.tmpl
+	template-generalized.pem template-generalized.tmpl \
+	template-unique.tmpl template-unique.pem
 
 dist_check_SCRIPTS = pathlen aki template-test pem-decoding dane crq invalid-sig \
 	crl
