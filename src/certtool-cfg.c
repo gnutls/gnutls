@@ -97,6 +97,8 @@ static struct cfg_options available_options[] = {
 	{ .name = "dn", .type = OPTION_STRING },
 	{ .name = "cn", .type = OPTION_STRING },
 	{ .name = "uid", .type = OPTION_STRING },
+	{ .name = "subject_unique_id", .type = OPTION_STRING },
+	{ .name = "issuer_unique_id", .type = OPTION_STRING },
 	{ .name = "challenge_password", .type = OPTION_STRING },
 	{ .name = "password", .type = OPTION_STRING },
 	{ .name = "pkcs9_email", .type = OPTION_STRING },
@@ -139,6 +141,10 @@ typedef struct _cfg_ctx {
 	char *dn;
 	char *cn;
 	char *uid;
+	uint8_t *subject_unique_id;
+	unsigned subject_unique_id_size;
+	uint8_t *issuer_unique_id;
+	unsigned issuer_unique_id_size;
 	char *challenge_password;
 	char *pkcs9_email;
 	char *country;
@@ -277,6 +283,18 @@ void cfg_init(void)
         s_name = strtol(val->v.strVal, NULL, 10); \
     }
 
+#define HEX_DECODE(hex, output, output_size) \
+	{ \
+		gnutls_datum_t _input = {(void*)hex, strlen(hex)}; \
+		gnutls_datum_t _output; \
+		ret = gnutls_hex_decode2(&_input, &_output); \
+		if (ret < 0) { \
+			fprintf(stderr, "error in hex ID: %s\n", hex); \
+			exit(1); \
+		} \
+		output = _output.data; \
+		output_size = _output.size; \
+	}
 
 static int handle_option(const tOptionValue* val)
 {
@@ -307,6 +325,7 @@ int template_parse(const char *template)
 {
 	/* Parsing return code */
 	unsigned int i;
+	int ret;
 	tOptionValue const *pov;
 	const tOptionValue *val, *prev;
 	char tmpstr[256];
@@ -357,6 +376,14 @@ int template_parse(const char *template)
 	val = optionGetValue(pov, "uid");
 	if (val != NULL && val->valType == OPARG_TYPE_STRING)
 		cfg.uid = strdup(val->v.strVal);
+
+	val = optionGetValue(pov, "issuer_unique_id");
+	if (val != NULL && val->valType == OPARG_TYPE_STRING)
+		HEX_DECODE(val->v.strVal, cfg.issuer_unique_id, cfg.issuer_unique_id_size);
+
+	val = optionGetValue(pov, "subject_unique_id");
+	if (val != NULL && val->valType == OPARG_TYPE_STRING)
+		HEX_DECODE(val->v.strVal, cfg.subject_unique_id, cfg.subject_unique_id_size);
 
 	val = optionGetValue(pov, "challenge_password");
 	if (val != NULL && val->valType == OPARG_TYPE_STRING)
@@ -959,6 +986,32 @@ void crt_constraints_set(gnutls_x509_crt_t crt)
 		}
 
 		gnutls_x509_name_constraints_deinit(nc);
+	}
+}
+
+void crt_unique_ids_set(gnutls_x509_crt_t crt)
+{
+	int ret;
+
+	if (batch) {
+		if (cfg.subject_unique_id == NULL && cfg.issuer_unique_id == NULL)
+			return; /* nothing to do */
+
+		if (cfg.subject_unique_id) {
+			ret = gnutls_x509_crt_set_subject_unique_id(crt, cfg.subject_unique_id, cfg.subject_unique_id_size);
+			if (ret < 0) {
+				fprintf(stderr, "error setting subject unique ID: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
+		if (cfg.issuer_unique_id) {
+			ret = gnutls_x509_crt_set_issuer_unique_id(crt, cfg.issuer_unique_id, cfg.issuer_unique_id_size);
+			if (ret < 0) {
+				fprintf(stderr, "error setting issuer unique ID: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		}
 	}
 }
 
