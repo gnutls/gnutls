@@ -1015,6 +1015,8 @@ gnutls_x509_crt_set_serial(gnutls_x509_crt_t cert, const void *serial,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.4.7
  **/
 int
 gnutls_x509_crt_set_issuer_unique_id(gnutls_x509_crt_t cert, const void *id,
@@ -1048,6 +1050,8 @@ gnutls_x509_crt_set_issuer_unique_id(gnutls_x509_crt_t cert, const void *id,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.4.7
  **/
 int
 gnutls_x509_crt_set_subject_unique_id(gnutls_x509_crt_t cert, const void *id,
