@@ -1901,10 +1901,9 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
  * signers.
  * 
  * The available flags are:
- *  - %GNUTLS_PKCS7_EMBED_DATA: the data will be embedded in the structure
- *  - %GNUTLS_PKCS7_INCLUDE_TIME: the signing time will be included
- *  - %GNUTLS_PKCS7_INCLUDE_CERT: the signer's certificate will be included in the cert list
- *  - %GNUTLS_PKCS7_WRITE_SPKI: store the issuer's ID instead of name
+ *  %GNUTLS_PKCS7_EMBED_DATA, %GNUTLS_PKCS7_INCLUDE_TIME, %GNUTLS_PKCS7_INCLUDE_CERT,
+ *  and %GNUTLS_PKCS7_WRITE_SPKI. They are explained in the #gnutls_pkcs7_sign_flags
+ *  definition.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. 
