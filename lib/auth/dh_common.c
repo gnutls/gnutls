@@ -214,6 +214,9 @@ _gnutls_proc_dh_common_server_kx(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 	
 	/* just in case we are resuming a session */
+	if (session->key.client_Y)
+		_gnutls_mpi_release(&session->key.client_Y);
+
 	gnutls_pk_params_release(&session->key.dh_params);
 
 	gnutls_pk_params_init(&session->key.dh_params);
