@@ -1010,12 +1010,26 @@ gnutls_x509_crt_set_serial(gnutls_x509_crt_t cert, const void *serial,
  */
 static void disable_optional_stuff(gnutls_x509_crt_t cert)
 {
+	int ret;
+	gnutls_datum_t t = {NULL, 0};
 
-	asn1_write_value(cert->cert, "tbsCertificate.issuerUniqueID", NULL,
-			 0);
+	ret =
+	    _gnutls_x509_read_value(cert->cert,
+				    "tbsCertificate.subjectUniqueID",
+				    &t);
+	if (ret < 0) {
+		asn1_write_value(cert->cert, "tbsCertificate.subjectUniqueID", NULL, 0);
+	} else
+		gnutls_free(t.data);
 
-	asn1_write_value(cert->cert, "tbsCertificate.subjectUniqueID",
-			 NULL, 0);
+	ret =
+	    _gnutls_x509_read_value(cert->cert,
+				    "tbsCertificate.issuerUniqueID",
+				    &t);
+	if (ret < 0) {
+		asn1_write_value(cert->cert, "tbsCertificate.issuerUniqueID", NULL, 0);
+	} else
+		gnutls_free(t.data);
 
 	if (cert->use_extensions == 0) {
 		_gnutls_debug_log("Disabling X.509 extensions.\n");
