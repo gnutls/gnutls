@@ -1,4 +1,4 @@
-Build minimal:
+Compile minimal library:
   script:
   - git submodule update --init && make autoreconf && ./configure --with-included-libtasn1
     --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
@@ -8,7 +8,8 @@ Build minimal:
     --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
     --without-zlib --disable-doc --disable-tests && make -j4
   tags:
-  - fast
+  - x86-64
+  - nettle3
   except:
   - tags
 Build and Check with valgrind:
@@ -17,7 +18,8 @@ Build and Check with valgrind:
     --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
   - cat tests/test-suite.log
   tags:
-  - fast
+  - x86-64
+  - nettle3
   except:
   - tags
 Build and Check with asan:
@@ -27,16 +29,28 @@ Build and Check with asan:
     && make -j4 && make check -j4
   - cat tests/test-suite.log
   tags:
-  - fast
+  - x86-64
+  - nettle3
   except:
   - tags
-Build and Check with separate build dir:
+Build and Check - separate build dir (x86-64):
+  script:
+  - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
+    --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-valgrind-tests --disable-doc && make -j4 && make check -j4
+  - cat tests/test-suite.log
+  tags:
+  - x86-64
+  - nettle3
+  except:
+  - tags
+Build and Check - separate build dir (x86):
   script:
   - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
-    ../configure --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
+    ../configure --with-included-libtasn1 --enable-seccomp-tests --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -j4
   - cat tests/test-suite.log
   tags:
-  - slow
+  - x86
+  - nettle3
   except:
   - tags
