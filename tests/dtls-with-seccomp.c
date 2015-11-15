@@ -144,7 +144,7 @@ static void client(int fd)
 		exit(1);
 	}
 
-	ret = gnutls_bye(session, GNUTLS_SHUT_WR);
+	ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	if (ret < 0) {
 		fail("server: error in closing session: %s\n", gnutls_strerror(ret));
 	}
