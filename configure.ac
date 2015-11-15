@@ -231,6 +231,16 @@ AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 AC_CHECK_FUNCS([__register_atfork],,)
 
+AC_ARG_ENABLE(seccomp-tests,
+  AS_HELP_STRING([--enable-seccomp-tests], [unconditionally enable tests with seccomp]),
+    seccomp_tests=$enableval, seccomp_tests=no)
+
+AM_CONDITIONAL(HAVE_SECCOMP_TESTS, test "$seccomp_tests" = "yes")
+
+# check for libseccomp - used in test programs
+AC_LIB_HAVE_LINKFLAGS(seccomp,, [#include <seccomp.h>  
+], [seccomp_init(0);])
+
 AC_LIB_HAVE_LINKFLAGS(rt,, [#include <time.h>
 #include <signal.h>
 ], [timer_create (0,0,0);])

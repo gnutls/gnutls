@@ -56,7 +56,7 @@ extern void success(const char *format, ...)
 extern void escapeprint(const char *str, size_t len);
 extern void hexprint(const void *str, size_t len);
 extern void binprint(const void *str, size_t len);
-
+int disable_system_calls(void);
 void sec_sleep(int sec);
 
 /* This must be implemented elsewhere. */

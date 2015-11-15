@@ -51,7 +51,7 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = -no-install
 LDADD = ../lib/libgnutls.la \
 	libutils.la \
-	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
+	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB) $(LIBSECCOMP)
 
 dane_LDADD = $(LDADD) ../libdane/libgnutls-dane.la
 
@@ -60,7 +60,7 @@ AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
 endif
 
 noinst_LTLIBRARIES = libutils.la
-libutils_la_SOURCES = utils.h utils.c
+libutils_la_SOURCES = utils.h utils.c seccomp.c
 
 ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 mpi certificate_set_x509_crl dn parse_ca moredn record-sizes \
@@ -92,6 +92,10 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 key-usage resume-psk mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 mini-x509-default-prio \
 	 mini-x509-dual mini-x509-kx
+
+if HAVE_SECCOMP_TESTS
+ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
+endif
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
 
