@@ -1024,6 +1024,7 @@ GNUTLS_3_1_0 {
 	gnutls_x509_ext_deinit;
 	gnutls_x509_ext_print;
 	gnutls_x509_othername_to_virtual;
+	gnutls_global_init_skip;
 } GNUTLS_3_0_0;
 
 GNUTLS_FIPS140 {
