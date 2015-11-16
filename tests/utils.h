@@ -59,5 +59,6 @@ extern void binprint(const void *str, size_t len);
 
 /* This must be implemented elsewhere. */
 extern void doit(void);
+void sec_sleep(int sec);
 
 #endif				/* UTILS_H */

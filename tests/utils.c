@@ -27,6 +27,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <time.h>
+#include <unistd.h>
+#include <errno.h>
+#ifndef _WIN32
+# include <netinet/in.h>
+# include <sys/socket.h>
+#else
+#ifdef _WIN32
+# include <windows.h>		/* for Sleep */
+# include <winbase.h>  
+#endif
+#endif
 
 #include "utils.h"
 
@@ -52,6 +64,26 @@ void fail(const char *format, ...)
 	fputs(str, stderr);
 	error_count++;
 	exit(1);
+}
+
+void sec_sleep(int sec)
+{
+	int ret;
+#ifdef HAVE_NANOSLEEP
+	struct timespec ts;
+
+	ts.tv_sec = sec;
+	ts.tv_nsec = 0;
+	do {
+		ret = nanosleep(&ts, NULL);
+	} while (ret == -1 && errno == EINTR);
+	if (ret == -1)
+		abort();
+#else
+	do {
+		ret = sleep(sec);
+	} while (ret == -1 && errno == EINTR);
+#endif
 }
 
 void success(const char *format, ...)
