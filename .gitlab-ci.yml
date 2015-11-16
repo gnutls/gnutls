@@ -54,3 +54,14 @@ Build and Check - separate build dir (x86):
   - nettle3
   except:
   - tags
+Build and Check in FIPS140-2 mode:
+  script:
+  - git submodule update --init && make autoreconf && mkdir -p build && cd build &&
+    ../configure --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
+    make -j4 && make check -j4
+  - cat tests/test-suite.log
+  tags:
+  - x86-64
+  - nettle3
+  except:
+  - tags
