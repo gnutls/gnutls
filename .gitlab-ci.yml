@@ -1,17 +1,3 @@
-Compile minimal library:
-  script:
-  - git submodule update --init && make autoreconf && ./configure --with-included-libtasn1
-    --disable-doc --disable-dtls-srtp-support --disable-alpn-support --disable-rsa-export
-    --disable-heartbeat-support --disable-srp-authentication --disable-psk-authentication
-    --disable-anon-authentication --disable-dhe --disable-ecdhe --disable-openpgp-authentication
-    --disable-ocsp --disable-session-tickets --disable-openssl-compatibility --disable-non-suiteb-curves
-    --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
-    --without-zlib --disable-doc --disable-tests && make -j4
-  tags:
-  - x86-64
-  - nettle2
-  except:
-  - tags
 Build and Check with valgrind:
   script:
   - git submodule update --init && make autoreconf && ./configure
