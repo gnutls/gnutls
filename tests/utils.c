@@ -34,12 +34,10 @@
 # include <netinet/in.h>
 # include <sys/socket.h>
 #else
-#ifdef _WIN32
 # include <windows.h>		/* for Sleep */
 # include <winbase.h>  
 #endif
 
-#endif
 #include <sys/types.h>
 
 #include "utils.h"
