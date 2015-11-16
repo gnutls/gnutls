@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2008-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2015 Red Hat, Inc.
  *
- * Author: Joe Orton
+ * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
