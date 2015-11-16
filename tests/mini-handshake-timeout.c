@@ -159,9 +159,9 @@ static void server(int fd, int wait)
 
 	gnutls_transport_set_int(session, fd);
 
-	if (wait)
-		sleep(25);
-	else {
+	if (wait) {
+		sec_sleep(25);
+	} else {
 		do {
 			ret = gnutls_handshake(session);
 		}
@@ -213,7 +213,7 @@ static void start(int wait)
 
 static void ch_handler(int sig)
 {
-	int status;
+	int status = 0;
 	wait(&status);
 	if (WEXITSTATUS(status) != 0)
 		fail("Child died with status %d\n", WEXITSTATUS(status));
