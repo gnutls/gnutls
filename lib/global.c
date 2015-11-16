@@ -51,6 +51,12 @@
 # define _DESTRUCTOR __attribute__((destructor))
 #endif
 
+int __attribute__((weak)) gnutls_global_init_skip(void);
+int gnutls_global_init_skip(void)
+{
+	return 0;
+}
+
 /* created by asn1c */
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
@@ -458,6 +464,9 @@ static void _CONSTRUCTOR lib_init(void)
 int ret;
 const char *e;
 
+	if (gnutls_global_init_skip() != 0)
+		return;
+
 	e = getenv("GNUTLS_NO_EXPLICIT_INIT");
 	if (e != NULL) {
 		ret = atoi(e);
@@ -475,6 +484,9 @@ const char *e;
 static void _DESTRUCTOR lib_deinit(void)
 {
 	const char *e;
+
+	if (gnutls_global_init_skip() != 0)
+		return;
 
 	e = getenv("GNUTLS_NO_EXPLICIT_INIT");
 	if (e != NULL) {
