@@ -117,14 +117,13 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		for (i = pos; i <= current; i++) {
 			if (stored_messages[msg_seq[i]] != NULL) {
 				do {
-
 					ret =
 					    send((long int)tr,
 						 stored_messages[msg_seq
 								 [i]],
 						 stored_sizes[msg_seq[i]], 0);
 				}
-				while (ret == -1 && errno == EAGAIN);
+				while (ret == -1 && (errno == EAGAIN || errno == EINTR));
 				pos++;
 			} else
 				break;
@@ -133,7 +132,7 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 		do {
 			ret = send((long int)tr, data, len, 0);
 		}
-		while (ret == -1 && errno == EAGAIN);
+		while (ret == -1 && (errno == EAGAIN || errno == EINTR));
 
 		current++;
 		pos++;
@@ -146,7 +145,7 @@ static ssize_t odd_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 				 stored_messages[msg_seq[current]],
 				 stored_sizes[msg_seq[current]], 0);
 		}
-		while (ret == -1 && errno == EAGAIN);
+		while (ret == -1 && (errno == EAGAIN || errno == EINTR));
 		current++;
 		pos++;
 		return ret;
@@ -176,8 +175,7 @@ static void client(int fd)
 	char buffer[MAX_BUF + 1];
 	gnutls_anon_client_credentials_t anoncred;
 	unsigned char seq[8];
-	uint64_t useq;
-	unsigned current = 0;
+	uint32_t useq;
 
 	memset(buffer, 0, sizeof(buffer));
 
@@ -196,6 +194,7 @@ static void client(int fd)
 	/* Initialize TLS session
 	 */
 	gnutls_init(&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
+	gnutls_dtls_set_timeouts(session, 50 * 1000, 600 * 1000);
 	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 	gnutls_dtls_set_mtu(session, 1500);
 
@@ -239,20 +238,20 @@ static void client(int fd)
 
 		if (ret > 0) {
 			useq =
-			    seq[3] | (seq[2] << 8) | (seq[1] << 16) |
-			    (seq[0] << 24);
-			useq <<= 32;
-			useq |=
 			    seq[7] | (seq[6] << 8) | (seq[5] << 16) |
 			    (seq[4] << 24);
+
+			if (debug)
+				success("received %u\n", (unsigned int)useq);
 
 			if (recv_msg_seq[current] == -1) {
 				fail("received message sequence differs\n");
 				terminate();
 			}
 
-			if ((uint32_t) recv_msg_seq[current] != (uint32_t) useq) {
-				fail("received message sequence differs (got: %u, expected: %u)\n", (unsigned)useq, (unsigned)recv_msg_seq[current]);
+			if (((uint32_t)recv_msg_seq[current]) != useq) {
+				fail("received message sequence differs (current: %u, got: %u, expected: %u)\n",
+				     (unsigned)current, (unsigned)useq, (unsigned)recv_msg_seq[current]);
 				terminate();
 			}
 
@@ -299,6 +298,7 @@ static void server(int fd)
 	gnutls_anon_allocate_server_credentials(&anoncred);
 
 	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
+	gnutls_dtls_set_timeouts(session, 50 * 1000, 600 * 1000);
 	gnutls_transport_set_push_function(session, odd_push);
 	gnutls_heartbeat_enable(session, GNUTLS_HB_PEER_ALLOWED_TO_SEND);
 	gnutls_dtls_set_mtu(session, 1500);

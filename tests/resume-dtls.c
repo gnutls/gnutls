@@ -47,6 +47,9 @@ int main(int argc, char **argv)
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
+#include <sys/wait.h>
+#include <signal.h>
 
 #include "utils.h"
 
@@ -117,20 +120,19 @@ static void client(int sds[], struct params_res *params)
 		/* Initialize TLS session
 		 */
 		gnutls_init(&session,
-			    GNUTLS_CLIENT | GNUTLS_DATAGRAM |
-			    GNUTLS_NO_EXTENSIONS);
+			    GNUTLS_CLIENT | GNUTLS_DATAGRAM | GNUTLS_NO_EXTENSIONS);
 
 		/* Use default priorities */
 		gnutls_priority_set_direct(session,
-					   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-					   NULL);
+				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				   NULL);
+
+		if (params->enable_session_ticket_client)
+			gnutls_session_ticket_enable_client(session);
 
 		/* put the anonymous credentials to the current session
 		 */
 		gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
-
-		if (params->enable_session_ticket_client)
-			gnutls_session_ticket_enable_client(session);
 
 		if (t > 0) {
 			/* if this is not the first time we connect */
@@ -143,7 +145,7 @@ static void client(int sds[], struct params_res *params)
 
 		/* Perform the TLS handshake
 		 */
-		gnutls_handshake_set_timeout(session, 20 * 1000);
+		gnutls_dtls_set_timeouts(session, 3*1000, 240 * 1000);
 		do {
 			ret = gnutls_handshake(session);
 		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
@@ -173,8 +175,9 @@ static void client(int sds[], struct params_res *params)
 					if (debug)
 						success
 						    ("- Previous session was resumed\n");
-				} else
+				} else {
 					fail("- Previous session was resumed\n");
+				}
 			} else {
 				if (params->expect_resume) {
 					fail("*** Previous session was NOT resumed\n");
@@ -224,39 +227,6 @@ static void client(int sds[], struct params_res *params)
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_anon_server_credentials_t anoncred;
-static gnutls_datum_t session_ticket_key = { NULL, 0 };
-
-static gnutls_session_t initialize_tls_session(struct params_res *params)
-{
-	gnutls_session_t session;
-
-	gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
-
-	/* avoid calling all the priority functions, since the defaults
-	 * are adequate.
-	 */
-	gnutls_priority_set_direct(session,
-				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-				   NULL);
-
-	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
-
-	gnutls_dh_set_prime_bits(session, DH_BITS);
-
-	if (params->enable_db) {
-		gnutls_db_set_retrieve_function(session, wrap_db_fetch);
-		gnutls_db_set_remove_function(session, wrap_db_delete);
-		gnutls_db_set_store_function(session, wrap_db_store);
-		gnutls_db_set_ptr(session, NULL);
-	}
-
-	if (params->enable_session_ticket_server)
-		gnutls_session_ticket_enable_server(session,
-						    &session_ticket_key);
-
-	return session;
-}
 
 static gnutls_dh_params_t dh_params;
 
@@ -273,18 +243,12 @@ static int generate_dh_params(void)
 					     GNUTLS_X509_FMT_PEM);
 }
 
-int err, ret;
-char topbuf[512];
-gnutls_session_t session;
-char buffer[MAX_BUF + 1];
-int optval = 1;
+static char buffer[MAX_BUF + 1];
 
 static void global_stop(void)
 {
 	if (debug)
 		success("global stop\n");
-
-	gnutls_anon_free_server_credentials(anoncred);
 
 	gnutls_dh_params_deinit(dh_params);
 
@@ -293,7 +257,11 @@ static void global_stop(void)
 
 static void server(int sds[], struct params_res *params)
 {
+	gnutls_anon_server_credentials_t anoncred;
+	static gnutls_datum_t session_ticket_key = { NULL, 0 };
+	int ret;
 	size_t t;
+	gnutls_session_t session;
 
 	/* this must be called once in the program, it is mostly for the server.
 	 */
@@ -308,8 +276,6 @@ static void server(int sds[], struct params_res *params)
 	if (debug)
 		success("Launched, generating DH parameters...\n");
 
-	generate_dh_params();
-
 	gnutls_anon_set_server_dh_params(anoncred, dh_params);
 
 	if (params->enable_db) {
@@ -322,14 +288,32 @@ static void server(int sds[], struct params_res *params)
 	for (t = 0; t < SESSIONS; t++) {
 		int sd = sds[t];
 
-		session = initialize_tls_session(params);
+		gnutls_init(&session, GNUTLS_SERVER | GNUTLS_DATAGRAM);
+
+		gnutls_priority_set_direct(session,
+				   "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
+				   NULL);
+
+		gnutls_credentials_set(session, GNUTLS_CRD_ANON, anoncred);
+		gnutls_dh_set_prime_bits(session, DH_BITS);
+
+		if (params->enable_db) {
+			gnutls_db_set_retrieve_function(session, wrap_db_fetch);
+			gnutls_db_set_remove_function(session, wrap_db_delete);
+			gnutls_db_set_store_function(session, wrap_db_store);
+			gnutls_db_set_ptr(session, NULL);
+		}
+
+		if (params->enable_session_ticket_server)
+			gnutls_session_ticket_enable_server(session,
+						    &session_ticket_key);
 
 		gnutls_transport_set_int(session, sd);
-		gnutls_handshake_set_timeout(session, 20 * 1000);
+		gnutls_dtls_set_timeouts(session, 3*1000, 240 * 1000);
 		
 		do {
 			ret = gnutls_handshake(session);
-		} while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+		} while (ret < 0 && (ret == GNUTLS_E_INTERRUPTED||ret == GNUTLS_E_AGAIN));
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(session);
@@ -379,6 +363,7 @@ static void server(int sds[], struct params_res *params)
 
 	gnutls_free(session_ticket_key.data);
 	session_ticket_key.data = NULL;
+	gnutls_anon_free_server_credentials(anoncred);
 
 	if (debug)
 		success("server: finished\n");
@@ -386,7 +371,12 @@ static void server(int sds[], struct params_res *params)
 
 void doit(void)
 {
-	int i;
+	int i, err;
+
+	signal(SIGCHLD, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
+
+	generate_dh_params();
 
 	for (i = 0; resume_tests[i].desc; i++) {
 		int client_sds[SESSIONS], server_sds[SESSIONS];
@@ -416,25 +406,23 @@ void doit(void)
 		}
 
 		if (child) {
-			int status;
+			int status = 0;
 			/* parent */
+			for (j = 0; j < SESSIONS; j++)
+				close(client_sds[j]);
 			server(server_sds, &resume_tests[i]);
 			wait(&status);
-			if (WEXITSTATUS(status) > 0)
-				error_count++;
-			global_stop();
-
-			if (error_count)
+			if (WEXITSTATUS(status) != 0 || (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV))
 				exit(1);
-
 		} else {
+			for (j = 0; j < SESSIONS; j++)
+				close(server_sds[j]);
 			client(client_sds, &resume_tests[i]);
 			gnutls_global_deinit();
-			if (error_count)
-				exit(1);
 			exit(0);
 		}
 	}
+	global_stop();
 }
 
 /* Functions and other stuff needed for session resuming.
@@ -519,12 +507,11 @@ wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 {
 	gnutls_datum_t res = { NULL, 0 };
-	int i;
+	unsigned i;
 
 	if (debug)
 		success("resume db fetch... (%d)\n", key.size);
 	if (debug) {
-		unsigned int i;
 		printf("key:\n");
 		for (i = 0; i < key.size; i++) {
 			printf("%02x ", key.data[i] & 0xFF);
@@ -555,12 +542,12 @@ static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 			       res.size);
 
 			if (debug) {
-				unsigned int i;
+				unsigned j;
 				printf("data:\n");
-				for (i = 0; i < res.size; i++) {
+				for (j = 0; j < res.size; j++) {
 					printf("%02x ",
-					       res.data[i] & 0xFF);
-					if ((i + 1) % 16 == 0)
+					       res.data[j] & 0xFF);
+					if ((j + 1) % 16 == 0)
 						printf("\n");
 				}
 				printf("\n");
