@@ -828,6 +828,9 @@ int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 	gnutls_datum_t sig = {NULL, 0};
 	int pk, pk2, ret;
 
+	if (res->flags & GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH)
+		return 0;
+
 	pk =
 	    gnutls_pubkey_get_pk_algorithm(res->certs[res->ncerts - 1].
 					   cert_list[0].pubkey, NULL);

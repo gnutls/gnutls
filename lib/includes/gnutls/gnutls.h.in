@@ -1470,6 +1470,19 @@ void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
 unsigned int
 gnutls_certificate_get_verify_flags(gnutls_certificate_credentials_t res);
 
+/**
+ * gnutls_certificate_flags:
+ * @GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH: Skip the key and certificate matching check.
+ *
+ * Enumeration of different certificate credentials flags.
+ */
+typedef enum gnutls_certificate_flags {
+	GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH = 1
+} gnutls_certificate_flags;
+
+void gnutls_certificate_set_flags(gnutls_certificate_credentials_t,
+				  unsigned flags);
+
 void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t
 					  res, unsigned int max_bits,
 					  unsigned int max_depth);

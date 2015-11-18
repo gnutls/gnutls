@@ -623,6 +623,23 @@ gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
 }
 
 /**
+ * gnutls_certificate_set_flags:
+ * @res: is a gnutls_certificate_credentials_t type
+ * @flags: are the flags of #gnutls_certificate_flags type
+ *
+ * This function will set flags to tweak the operation of
+ * the credentials structure. See the #gnutls_certificate_flags enumerations
+ * for more information on the available flags. 
+ *
+ **/
+void
+gnutls_certificate_set_flags(gnutls_certificate_credentials_t res,
+			     unsigned int flags)
+{
+	res->flags = flags;
+}
+
+/**
  * gnutls_certificate_set_verify_flags:
  * @res: is a gnutls_certificate_credentials_t type
  * @flags: are the flags
