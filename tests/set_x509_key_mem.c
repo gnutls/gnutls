@@ -113,6 +113,20 @@ void doit(void)
 
 	gnutls_certificate_free_credentials(x509_cred);
 
+	/* test gnutls_certificate_flags() */
+	gnutls_certificate_allocate_credentials(&x509_cred);
+	gnutls_certificate_set_flags(x509_cred, GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH);
+
+	ret = gnutls_certificate_set_x509_key_mem(x509_cred, &cert,
+					    &key,
+					    GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+		fail("error in error code\n");
+		exit(1);
+	}
+
+	gnutls_certificate_free_credentials(x509_cred);
+
 	gnutls_global_deinit();
 
 	if (debug)
