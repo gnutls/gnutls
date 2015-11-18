@@ -28,6 +28,8 @@ See the end for copying conditions.
 ** API and ABI modifications:
 gnutls_x509_crt_set_issuer_unique_id: Added
 gnutls_x509_crt_set_subject_unique_id: Added
+gnutls_certificate_set_flags: Added
+GNUTLS_CERTIFICATE_SKIP_KEY_CERT_MATCH: Added
 
 
 * Version 3.4.6 (released 2015-10-20)
