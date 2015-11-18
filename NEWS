@@ -14,6 +14,9 @@ See the end for copying conditions.
 ** libgnutls: On a rehandshake allow switching from anonymous to ECDHE and
    DHE ciphersuites.
 
+** libgnutls: Corrected regression from 3.3.x which prevented ARCFOUR128
+   from using arbitrary key sizes. Reported by Andreas Schneider.
+
 ** libgnutls: Added GNUTLS_SKIP_GLOBAL_INIT macro to allow programs skipping
    the implicit global initialization.
 
