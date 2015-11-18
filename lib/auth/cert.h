@@ -62,6 +62,7 @@ typedef struct gnutls_certificate_credentials_st {
 
 	/* X509 specific stuff */
 	gnutls_x509_trust_list_t tlist;
+	unsigned flags; /* gnutls_certificate_flags */
 	unsigned int verify_flags;	/* flags to be used at 
 					 * certificate verification.
 					 */
