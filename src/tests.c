@@ -930,10 +930,12 @@ test_code_t test_tls1_6_fallback(gnutls_session_t session)
 {
 	int ret;
 
+	/* we remove RSA as there is a version check in the key exchange
+	 * message we do not properly set in this test */
 	sprintf(prio_str,
 		INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
 		":+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0:" ALL_MACS ":"
-		ALL_KX ":%s", rest);
+		ALL_KX ":-RSA:%s", rest);
 	_gnutls_priority_set_direct(session, prio_str);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
