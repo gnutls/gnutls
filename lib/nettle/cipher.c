@@ -66,6 +66,7 @@ typedef int (*aead_decrypt_func) (struct nettle_cipher_ctx*,
 			      const uint8_t * src);
 
 typedef void (*setiv_func) (void *ctx, size_t length, const uint8_t *);
+typedef void (*gen_setkey_func) (void *ctx, size_t length, const uint8_t *);
 
 struct nettle_cipher_st {
 	gnutls_cipher_algorithm_t algo;
@@ -83,6 +84,7 @@ struct nettle_cipher_st {
 	nettle_hash_digest_func* tag;
 	nettle_set_key_func* set_encrypt_key;
 	nettle_set_key_func* set_decrypt_key;
+	gen_setkey_func gen_set_key; /* for arcfour which has variable key size */
 	setiv_func set_iv;
 	unsigned fips_allowed;
 };
@@ -423,13 +425,14 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	},
 	{  .algo = GNUTLS_CIPHER_ARCFOUR_128,
 	   .block_size = 1,
-	   .key_size = ARCFOUR_KEY_SIZE,
+	   .key_size = 0,
 	   .encrypt_block = (nettle_cipher_func*)arcfour_crypt,
 	   .decrypt_block = (nettle_cipher_func*)arcfour_crypt,
 
 	   .ctx_size = sizeof(struct arcfour_ctx),
 	   .encrypt = _stream_encrypt,
 	   .decrypt = _stream_encrypt,
+	   .gen_set_key = arcfour_set_key,
 	   .set_encrypt_key = (nettle_set_key_func*)arcfour128_set_key,
 	   .set_decrypt_key = (nettle_set_key_func*)arcfour128_set_key,
 	},
@@ -538,8 +541,12 @@ wrap_nettle_cipher_setkey(void *_ctx, const void *key, size_t keysize)
 {
 	struct nettle_cipher_ctx *ctx = _ctx;
 
-	if (unlikely(keysize != ctx->cipher->key_size))
+	if (ctx->cipher->key_size > 0 && unlikely(keysize != ctx->cipher->key_size)) {
 		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+	} else if (ctx->cipher->key_size == 0) {
+		ctx->cipher->gen_set_key(ctx->ctx_ptr, keysize, key);
+		return 0;
+	}
 
 	if (ctx->enc)
 		ctx->cipher->set_encrypt_key(ctx->ctx_ptr, key);
