@@ -206,8 +206,7 @@ gnutls_x509_crt_set_version(gnutls_x509_crt_t crt, unsigned int version)
  * @key: holds a private key
  *
  * This function will set the public parameters from the given
- * private key to the certificate. Only RSA keys are currently
- * supported.
+ * private key to the certificate.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

@@ -1688,7 +1688,7 @@ gnutls_pubkey_verify_hash2(gnutls_pubkey_t key,
  * @ciphertext: contains the encrypted data
  *
  * This function will encrypt the given data, using the public
- * key.
+ * key. On success the @ciphertext will be allocated using gnutls_malloc().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
