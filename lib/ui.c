@@ -631,6 +631,7 @@ gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
  * the credentials structure. See the #gnutls_certificate_flags enumerations
  * for more information on the available flags. 
  *
+ * Since: 3.4.7
  **/
 void
 gnutls_certificate_set_flags(gnutls_certificate_credentials_t res,
