@@ -208,6 +208,9 @@ gnutls_x509_crt_set_version(gnutls_x509_crt_t crt, unsigned int version)
  * This function will set the public parameters from the given
  * private key to the certificate.
  *
+ * To export the public key (i.e., the SubjectPublicKeyInfo part), check
+ * gnutls_pubkey_import_x509().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
