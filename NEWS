@@ -21,11 +21,14 @@ See the end for copying conditions.
 ** libgnutls: On a rehandshake allow switching from anonymous to ECDHE and
    DHE ciphersuites.
 
+** libgnutls: Added GNUTLS_SKIP_GLOBAL_INIT macro to allow programs skipping
+   the implicit global initialization.
+
 ** gnutls.pc: Don't include libtool specific options to link flags.
    Reported by Dan Kegel.
 
 ** API and ABI modifications:
-   No changes since last version.
+GNUTLS_SKIP_GLOBAL_INIT: Added
 
 
 * Version 3.3.18 (released 2015-09-12)
