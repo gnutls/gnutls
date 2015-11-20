@@ -1404,6 +1404,11 @@ void certificate_info(int pubkey, common_info_st * cinfo)
 	pem.data = (void *) fread_file(infile, &size);
 	pem.size = size;
 
+	if (!pem.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		exit(1);
+	}
+
 	ret =
 	    gnutls_x509_crt_list_import2(&crts, &crt_num, &pem, incert_format, 0);
 	if (ret < 0) {
@@ -1462,6 +1467,11 @@ void pgp_certificate_info(void)
 
 	pem.data = (void *) fread_file(infile, &size);
 	pem.size = size;
+
+	if (!pem.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		exit(1);
+	}
 
 	ret = gnutls_openpgp_crt_init(&crt);
 	if (ret < 0) {
@@ -1699,6 +1709,11 @@ void pgp_ring_info(void)
 
 	pem.data = (void *) fread_file(infile, &size);
 	pem.size = size;
+
+	if (!pem.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		exit(1);
+	}
 
 	ret = gnutls_openpgp_keyring_init(&ring);
 	if (ret < 0) {
@@ -2823,6 +2838,11 @@ void verify_crl(common_info_st * cinfo)
 	pem.data = (void *) fread_file(infile, &size);
 	pem.size = size;
 
+	if (!pem.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		exit(1);
+	}
+
 	ret = gnutls_x509_crl_import(crl, &pem, incert_format);
 	free(pem.data);
 	if (ret < 0) {
@@ -2973,6 +2993,11 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 	data.data = (void *) fread_file(infile, &size);
 	data.size = size;
 
+	if (!data.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		exit(1);
+	}
+
 	ret = gnutls_pkcs7_import(pkcs7, &data, cinfo->incert_format);
 	free(data.data);
 	if (ret < 0) {
@@ -3057,6 +3082,11 @@ void pkcs7_sign(common_info_st * cinfo, unsigned embed)
 
 	data.data = (void *) fread_file(infile, &size);
 	data.size = size;
+
+	if (!data.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		exit(1);
+	}
 
 	signer = load_cert(1, cinfo);
 	key = load_private_key(1, cinfo);
@@ -3603,6 +3633,11 @@ void pkcs12_info(common_info_st * cinfo)
 	data.data = (void *) fread_file(infile, &size);
 	data.size = size;
 
+	if (!data.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		exit(1);
+	}
+
 	result = gnutls_pkcs12_import(pkcs12, &data, incert_format, 0);
 	free(data.data);
 	if (result < 0) {
@@ -3774,6 +3809,11 @@ void pkcs8_info(void)
 	data.data = (void *) fread_file(infile, &size);
 	data.size = size;
 
+	if (!data.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		exit(1);
+	}
+
 	pkcs8_info_int(&data, incert_format, 0, outfile, "");
 }
 
@@ -3792,6 +3832,11 @@ void pkcs7_info(common_info_st *cinfo)
 
 	data.data = (void *) fread_file(infile, &size);
 	data.size = size;
+
+	if (!data.data) {
+		fprintf(stderr, "%s", infile ? "file" : "standard input");
+		exit(1);
+	}
 
 	result = gnutls_pkcs7_import(pkcs7, &data, incert_format);
 	free(data.data);
@@ -3919,6 +3964,11 @@ gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 			if (pubkey == NULL) { /* load from stdin */
 				pem.data = (void *) fread_file(infile, &size);
 				pem.size = size;
+
+				if (!pem.data) {
+					fprintf(stderr, "%s", infile ? "file" : "standard input");
+					exit(1);
+				}
 
 				ret = gnutls_pubkey_init(&pubkey);
 				if (ret < 0) {
@@ -4076,6 +4126,11 @@ void certificate_fpr(common_info_st * cinfo)
 	if (crt == NULL) {
 		pem.data = (void *) fread_file(infile, &size);
 		pem.size = size;
+
+		if (!pem.data) {
+			fprintf(stderr, "%s", infile ? "file" : "standard input");
+			exit(1);
+		}
 
 		crt_num = 1;
 		ret =
