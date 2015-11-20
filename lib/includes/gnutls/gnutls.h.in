@@ -75,8 +75,8 @@ extern "C" {
 
 /* Use the following definition globally in your program to disable
  * implicit initialization of gnutls. */
-#define GNUTLS_SKIP_GLOBAL_INIT int gnutls_global_init_skip(void); \
-    int gnutls_global_init_skip(void) {return 1;}
+#define GNUTLS_SKIP_GLOBAL_INIT int _gnutls_global_init_skip(void); \
+    int _gnutls_global_init_skip(void) {return 1;}
 
 /**
  * gnutls_cipher_algorithm_t:
