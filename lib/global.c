@@ -51,8 +51,8 @@
 # define _DESTRUCTOR __attribute__((destructor))
 #endif
 
-int __attribute__((weak)) gnutls_global_init_skip(void);
-int gnutls_global_init_skip(void)
+int __attribute__((weak)) _gnutls_global_init_skip(void);
+int _gnutls_global_init_skip(void)
 {
 	return 0;
 }
@@ -464,7 +464,7 @@ static void _CONSTRUCTOR lib_init(void)
 int ret;
 const char *e;
 
-	if (gnutls_global_init_skip() != 0)
+	if (_gnutls_global_init_skip() != 0)
 		return;
 
 	e = getenv("GNUTLS_NO_EXPLICIT_INIT");
@@ -485,7 +485,7 @@ static void _DESTRUCTOR lib_deinit(void)
 {
 	const char *e;
 
-	if (gnutls_global_init_skip() != 0)
+	if (_gnutls_global_init_skip() != 0)
 		return;
 
 	e = getenv("GNUTLS_NO_EXPLICIT_INIT");
