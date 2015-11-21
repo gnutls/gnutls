@@ -60,8 +60,8 @@ int _gnutls_ext_unpack(gnutls_session_t session,
 typedef gnutls_ext_priv_data_t extension_priv_data_t;
 
 typedef struct {
-	const char *name; /* const overriden when free_name is set */
-	unsigned free_name;
+	const char *name; /* const overriden when free_struct is set */
+	unsigned free_struct;
 
 	uint16_t type;
 	gnutls_ext_parse_type_t parse_type;
