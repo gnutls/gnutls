@@ -51,7 +51,7 @@ sub function_print {
   }
 
 #print STDERR "function: $prototype\n";
-  if ($func_name ne '' && ($func_name =~ m/gnutls_.*/ || $func_name =~ m/dane_.*/ || $func_name =~ m/xssl_.*/)) {
+  if ($func_name ne '' && ($func_name =~ m/^gnutls_.*/ || $func_name =~ m/dane_.*/ || $func_name =~ m/xssl_.*/)) {
     print $func_name . "\n";
   }
       
