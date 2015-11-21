@@ -25,6 +25,7 @@ _gnutls_ext_get_session_data@GNUTLS_PRIVATE
 _gnutls_ext_register@GNUTLS_PRIVATE
 _gnutls_ext_set_session_data@GNUTLS_PRIVATE
 _gnutls_get_cred@GNUTLS_PRIVATE
+_gnutls_global_init_skip@GNUTLS_3_1_0
 _gnutls_lib_simulate_error@GNUTLS_PRIVATE
 _gnutls_log@GNUTLS_PRIVATE
 _gnutls_log_level@GNUTLS_PRIVATE
