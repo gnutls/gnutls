@@ -519,7 +519,7 @@ _gnutls_status_request_unpack(gnutls_buffer_st * ps,
 	return ret;
 }
 
-extension_entry_st ext_mod_status_request = {
+const extension_entry_st ext_mod_status_request = {
 	.name = "STATUS REQUEST",
 	.type = GNUTLS_EXTENSION_STATUS_REQUEST,
 	.parse_type = GNUTLS_EXT_TLS,

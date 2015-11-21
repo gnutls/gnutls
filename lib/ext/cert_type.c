@@ -44,7 +44,7 @@ static int _gnutls_cert_type_recv_params(gnutls_session_t session,
 static int _gnutls_cert_type_send_params(gnutls_session_t session,
 					 gnutls_buffer_st * extdata);
 
-extension_entry_st ext_mod_cert_type = {
+const extension_entry_st ext_mod_cert_type = {
 	.name = "CERT TYPE",
 	.type = GNUTLS_EXTENSION_CERT_TYPE,
 	.parse_type = GNUTLS_EXT_TLS,

@@ -43,7 +43,7 @@ static int _gnutls_server_name_pack(extension_priv_data_t _priv,
 static void _gnutls_server_name_deinit_data(extension_priv_data_t priv);
 
 
-extension_entry_st ext_mod_server_name = {
+const extension_entry_st ext_mod_server_name = {
 	.name = "SERVER NAME",
 	.type = GNUTLS_EXTENSION_SERVER_NAME,
 	.parse_type = GNUTLS_EXT_APPLICATION,

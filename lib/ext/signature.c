@@ -48,7 +48,7 @@ static int signature_algorithms_pack(extension_priv_data_t epriv,
 static int signature_algorithms_unpack(gnutls_buffer_st * ps,
 				       extension_priv_data_t * _priv);
 
-extension_entry_st ext_mod_sig = {
+const extension_entry_st ext_mod_sig = {
 	.name = "SIGNATURE ALGORITHMS",
 	.type = GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
 	.parse_type = GNUTLS_EXT_TLS,

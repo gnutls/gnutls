@@ -315,83 +315,83 @@ int _gnutls_ext_init(void)
 {
 	int ret;
 
-	ret = ext_register(&ext_mod_max_record_size);
+	ret = ext_register((extension_entry_st*)&ext_mod_max_record_size);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 
-	ret = ext_register(&ext_mod_ext_master_secret);
+	ret = ext_register((extension_entry_st*)&ext_mod_ext_master_secret);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 
-	ret = ext_register(&ext_mod_etm);
+	ret = ext_register((extension_entry_st*)&ext_mod_etm);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 
 #ifdef ENABLE_OCSP
-	ret = ext_register(&ext_mod_status_request);
+	ret = ext_register((extension_entry_st*)&ext_mod_status_request);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 #endif
 
 #ifdef ENABLE_OPENPGP
-	ret = ext_register(&ext_mod_cert_type);
+	ret = ext_register((extension_entry_st*)&ext_mod_cert_type);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 #endif
 
-	ret = ext_register(&ext_mod_server_name);
+	ret = ext_register((extension_entry_st*)&ext_mod_server_name);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 
-	ret = ext_register(&ext_mod_sr);
+	ret = ext_register((extension_entry_st*)&ext_mod_sr);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 
 #ifdef ENABLE_SRP
-	ret = ext_register(&ext_mod_srp);
+	ret = ext_register((extension_entry_st*)&ext_mod_srp);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 #endif
 
 #ifdef ENABLE_HEARTBEAT
-	ret = ext_register(&ext_mod_heartbeat);
+	ret = ext_register((extension_entry_st*)&ext_mod_heartbeat);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 #endif
 
 #ifdef ENABLE_SESSION_TICKETS
-	ret = ext_register(&ext_mod_session_ticket);
+	ret = ext_register((extension_entry_st*)&ext_mod_session_ticket);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 #endif
 
-	ret = ext_register(&ext_mod_supported_ecc);
+	ret = ext_register((extension_entry_st*)&ext_mod_supported_ecc);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 
-	ret = ext_register(&ext_mod_supported_ecc_pf);
+	ret = ext_register((extension_entry_st*)&ext_mod_supported_ecc_pf);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 
-	ret = ext_register(&ext_mod_sig);
+	ret = ext_register((extension_entry_st*)&ext_mod_sig);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 
 #ifdef ENABLE_DTLS_SRTP
-	ret = ext_register(&ext_mod_srtp);
+	ret = ext_register((extension_entry_st*)&ext_mod_srtp);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 #endif
 
 #ifdef ENABLE_ALPN
-	ret = ext_register(&ext_mod_alpn);
+	ret = ext_register((extension_entry_st*)&ext_mod_alpn);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 #endif
 
 	/* This must be the last extension registered.
 	 */
-	ret = ext_register(&ext_mod_dumbfw);
+	ret = ext_register((extension_entry_st*)&ext_mod_dumbfw);
 	if (ret != GNUTLS_E_SUCCESS)
 		return ret;
 

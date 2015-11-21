@@ -45,7 +45,7 @@ static int _gnutls_supported_ecc_pf_send_params(gnutls_session_t session,
 						gnutls_buffer_st *
 						extdata);
 
-extension_entry_st ext_mod_supported_ecc = {
+const extension_entry_st ext_mod_supported_ecc = {
 	.name = "SUPPORTED ECC",
 	.type = GNUTLS_EXTENSION_SUPPORTED_ECC,
 	.parse_type = GNUTLS_EXT_TLS,
@@ -57,7 +57,7 @@ extension_entry_st ext_mod_supported_ecc = {
 	.deinit_func = NULL
 };
 
-extension_entry_st ext_mod_supported_ecc_pf = {
+const extension_entry_st ext_mod_supported_ecc_pf = {
 	.name = "SUPPORTED ECC POINT FORMATS",
 	.type = GNUTLS_EXTENSION_SUPPORTED_ECC_PF,
 	.parse_type = GNUTLS_EXT_TLS,

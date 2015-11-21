@@ -24,8 +24,8 @@
 
 #include <extensions.h>
 
-extern extension_entry_st ext_mod_supported_ecc;
-extern extension_entry_st ext_mod_supported_ecc_pf;
+extern const extension_entry_st ext_mod_supported_ecc;
+extern const extension_entry_st ext_mod_supported_ecc_pf;
 
 int
 _gnutls_session_supports_ecc_curve(gnutls_session_t session,

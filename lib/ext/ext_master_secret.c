@@ -35,7 +35,7 @@ static int _gnutls_ext_master_secret_recv_params(gnutls_session_t session,
 static int _gnutls_ext_master_secret_send_params(gnutls_session_t session,
 					  gnutls_buffer_st * extdata);
 
-extension_entry_st ext_mod_ext_master_secret = {
+const extension_entry_st ext_mod_ext_master_secret = {
 	.name = "EXT MASTER SECRET",
 	.type = GNUTLS_EXTENSION_EXT_MASTER_SECRET,
 	.parse_type = GNUTLS_EXT_MANDATORY,

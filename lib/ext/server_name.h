@@ -38,6 +38,6 @@ typedef struct {
 	unsigned server_names_size;
 } server_name_ext_st;
 
-extern extension_entry_st ext_mod_server_name;
+extern const extension_entry_st ext_mod_server_name;
 
 #endif

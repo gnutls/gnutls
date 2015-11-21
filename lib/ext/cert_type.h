@@ -25,6 +25,6 @@
 
 #include <extensions.h>
 
-extern extension_entry_st ext_mod_cert_type;
+extern const extension_entry_st ext_mod_cert_type;
 
 #endif

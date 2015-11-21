@@ -37,7 +37,7 @@ static int _gnutls_alpn_pack(extension_priv_data_t _priv,
 static void _gnutls_alpn_deinit_data(extension_priv_data_t priv);
 
 
-extension_entry_st ext_mod_alpn = {
+const extension_entry_st ext_mod_alpn = {
 	.name = "ALPN",
 	.type = GNUTLS_EXTENSION_ALPN,
 	.parse_type = GNUTLS_EXT_APPLICATION,

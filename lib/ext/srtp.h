@@ -35,6 +35,6 @@ typedef struct {
 	unsigned int mki_received;
 } srtp_ext_st;
 
-extern extension_entry_st ext_mod_srtp;
+extern const extension_entry_st ext_mod_srtp;
 
 #endif
