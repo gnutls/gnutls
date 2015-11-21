@@ -229,14 +229,13 @@ const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
 
-int err, ret;
-char topbuf[512];
-gnutls_session_t session;
-int optval = 1;
 
 static void server(int sd)
 {
 	gnutls_certificate_credentials_t serverx509cred;
+	int ret;
+	gnutls_session_t session;
+	unsigned i;
 
 	/* this must be called once in the program
 	 */
@@ -284,6 +283,15 @@ static void server(int sd)
 	 */
 	gnutls_bye(session, GNUTLS_SHUT_WR);
 
+	/* check whether we can crash the library by adding many extensions */
+	for (i=0;i<64;i++) {
+		ret = gnutls_ext_register("ext_serverxx", TLSEXT_TYPE_SAMPLE+i+1, GNUTLS_EXT_TLS, ext_recv_server_params, ext_send_server_params, NULL, NULL, NULL);
+		if (ret < 0) {
+			success("failed registering extension no %d (expected)\n", i+1);
+			break;
+		}
+	}
+
 	close(sd);
 	gnutls_deinit(session);
 
@@ -299,6 +307,7 @@ void doit(void)
 {
 	pid_t child;
 	int sockets[2];
+	int err;
 
 	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sockets);
 	if (err == -1) {
