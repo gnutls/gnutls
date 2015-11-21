@@ -1118,5 +1118,6 @@ void _gnutls_system_key_deinit(void)
 {
 	if (ncrypt_init != 0) {
 		FreeLibrary(ncrypt_lib);
+		ncrypt_init = 0;
 	}
 }
