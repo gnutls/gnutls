@@ -432,7 +432,7 @@ static const struct nettle_cipher_st builtin_ciphers[] = {
 	   .ctx_size = sizeof(struct arcfour_ctx),
 	   .encrypt = _stream_encrypt,
 	   .decrypt = _stream_encrypt,
-	   .gen_set_key = arcfour_set_key,
+	   .gen_set_key = (gen_setkey_func)arcfour_set_key,
 	   .set_encrypt_key = (nettle_set_key_func*)arcfour128_set_key,
 	   .set_decrypt_key = (nettle_set_key_func*)arcfour128_set_key,
 	},
