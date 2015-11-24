@@ -22,6 +22,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes \
 	-I$(top_srcdir)/tests/ \
 	-I$(top_srcdir)/lib \
+	-I$(top_builddir)/gl \
 	-I$(top_srcdir)/gl
 
 if ENABLE_MINITASN1
@@ -30,10 +31,11 @@ endif
 
 AM_LDFLAGS = -no-install
 LDADD = ../libutils.la \
+	../../gl/libgnu.la \
 	$(top_builddir)/lib/libgnutls.la $(LIBSOCKET)
 
 if !ENABLE_SELF_CHECKS
-cipher_test_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_builddir)/lib/ -I$(top_builddir)/gl/
+cipher_test_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_builddir)/lib/
 else
 cipher_test_CPPFLAGS = $(AM_CPPFLAGS)
 endif
