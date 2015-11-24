@@ -30,8 +30,17 @@ NETTLE_VERSION=3.1
 NETTLE_FILE:=nettle-$(NETTLE_VERSION).tar.gz
 NETTLE_DIR:=nettle-$(NETTLE_VERSION)
 
-PKG_CONFIG_DIR:=$(PWD)/win32/lib/pkgconfig/
+ifeq ($(BITS),64)
+HOST:=x86_64-w64-mingw64
+CROSS_DIR:=$(PWD)/win64
+ZIPNAME:=$(GNUTLS_DIR)-w64.zip
+else
+HOST:=i686-w64-mingw32
 CROSS_DIR:=$(PWD)/win32
+ZIPNAME:=$(GNUTLS_DIR)-w32.zip
+endif
+
+PKG_CONFIG_DIR:=$(CROSS_DIR)/lib/pkgconfig/
 BIN_DIR:=$(CROSS_DIR)/bin
 LIB_DIR:=$(CROSS_DIR)/lib
 HEADERS_DIR:=$(CROSS_DIR)/include
@@ -40,30 +49,31 @@ LDFLAGS=
 #doesn't seem to work
 #LDFLAGS=-static-libgcc
 
+
 all: update-gpg-keys gnutls-w32
 
 upload: gnutls-w32 devpak
-	../build-aux/gnupload --to ftp.gnu.org:gnutls/w32 $(GNUTLS_DIR)-w32.zip
+	../build-aux/gnupload --to ftp.gnu.org:gnutls/w32 $(ZIPNAME)
 	../build-aux/gnupload --to ftp.gnu.org:gnutls/w32 gnutls-$(GNUTLS_VERSION)-1gn.DevPak
 
 update-gpg-keys:
 	gpg --recv-keys 96865171 B565716F D92765AF A8F4C2FD DB899F46
 
-$(GNUTLS_DIR)-w32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
+$(ZIPNAME): $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
 	rm -rf $(CROSS_DIR)/etc $(CROSS_DIR)/share $(CROSS_DIR)/lib/include
 	cd $(CROSS_DIR) && zip -r $(PWD)/$@ *
-	gpg --sign --detach $(GNUTLS_DIR)-w32.zip
+	gpg --sign --detach $(ZIPNAME)
 
-gnutls-$(GNUTLS_VERSION)-1gn.DevPak: $(GNUTLS_DIR)-w32.zip devcpp.tar
+gnutls-$(GNUTLS_VERSION)-1gn.DevPak: $(ZIPNAME) devcpp.tar
 	rm -rf $(DEVCPP_DIR)
 	mkdir -p $(DEVCPP_DIR)
-	cd $(DEVCPP_DIR) && unzip ../$(GNUTLS_DIR)-w32.zip 
+	cd $(DEVCPP_DIR) && unzip ../$(ZIPNAME)
 	cd $(DEVCPP_DIR) && tar xf ../devcpp.tar && sed -i 's/@VERSION@/$(GNUTLS_VERSION)/g' gnutls.DevPackage
 	cd $(DEVCPP_DIR) && tar -cjf ../$@ .
 
 devpak: gnutls-$(GNUTLS_VERSION)-1gn.DevPak
 
-gnutls-w32: $(GNUTLS_DIR)-w32.zip
+gnutls-w32: $(ZIPNAME)
 
 openconnect-w32: $(OPENCONNECT_DIR)/.installed
 
@@ -81,7 +91,7 @@ CONFIG_ENV := PKG_CONFIG_PATH="$(PKG_CONFIG_DIR)"
 CONFIG_ENV += PKG_CONFIG_LIBDIR="$(PKG_CONFIG_DIR)"
 CONFIG_FLAGS1 := --prefix=$(CROSS_DIR) --enable-shared \
 	--libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR)
-CONFIG_FLAGS := --host=i686-w64-mingw32 $(CONFIG_FLAGS1) --disable-static --bindir=$(BIN_DIR) --sbindir=$(BIN_DIR) \
+CONFIG_FLAGS := --host=$(HOST) $(CONFIG_FLAGS1) --disable-static --bindir=$(BIN_DIR) --sbindir=$(BIN_DIR) \
 	 --enable-threads=win32 
 
 $(P11_KIT_DIR)/.configured:
@@ -135,7 +145,7 @@ $(NETTLE_DIR)/.installed: $(NETTLE_DIR)/.configured
 	cp $(NETTLE_DIR)/libnettle*.dll $(NETTLE_DIR)/libhogweed*.dll $(BIN_DIR)/
 	touch $@
 
-GCC_DLLS_PATH=/usr/i686-w64-mingw32/sys-root/mingw/bin/
+GCC_DLLS_PATH=/usr/$(HOST)/sys-root/mingw/bin/
 GCC_DLLS=libgcc_s_sjlj-1.dll libwinpthread-1.dll
 
 $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
