@@ -33,8 +33,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #ifndef _WIN32
-#include <arpa/inet.h>
-#include <signal.h>
+# include <arpa/inet.h>
+# include <signal.h>
+#else
+# undef endservent
+# define endservent()
 #endif
 #include <socket.h>
 #include <c-ctype.h>
