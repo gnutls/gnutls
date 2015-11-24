@@ -43,6 +43,10 @@ GNUTLS_SKIP_GLOBAL_INIT
 
 void doit(void)
 {
+#ifdef _WIN32
+	/* weak symbols don't seem to work in windows */
+	exit(77);
+#else
 	int ret;
 	gnutls_x509_crt_t crt;
 
@@ -60,4 +64,5 @@ void doit(void)
 	gnutls_x509_crt_deinit(crt);
 
 	gnutls_global_deinit();
+#endif
 }
