@@ -1,6 +1,6 @@
 SMP=-j4
 
-GNUTLS_VERSION:=3.4.2
+GNUTLS_VERSION:=3.4.7
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -135,13 +135,13 @@ $(NETTLE_DIR)/.installed: $(NETTLE_DIR)/.configured
 	cp $(NETTLE_DIR)/libnettle*.dll $(NETTLE_DIR)/libhogweed*.dll $(BIN_DIR)/
 	touch $@
 
-GCC_DLLS=/usr/lib/gcc/i686-w64-mingw32/4.9-win32/libgcc_s_sjlj-1.dll
+GCC_DLLS_PATH=/usr/i686-w64-mingw32/sys-root/mingw/bin/
+GCC_DLLS=libgcc_s_sjlj-1.dll libwinpthread-1.dll
 
 $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 	make -C $(GNUTLS_DIR) $(SMP)
-	-cp $(GCC_DLLS) $(GNUTLS_DIR)/tests
-	-cp $(GCC_DLLS) $(GNUTLS_DIR)/tests/safe-renegotiation
-	-cp $(GCC_DLLS) $(GNUTLS_DIR)/tests/slow
+	-for j in $(GNUTLS_DIR)/tests $(GNUTLS_DIR)/tests/safe-renegotiation $(GNUTLS_DIR)/tests/slow;do \
+	for i in $(GCC_DLLS);do cp $(GCC_DLLS_PATH)/$$i $$j;done;done
 	sed -i 's/^"$$@" >$$log_file/echo $$@|grep exe >\/dev\/null; if [ $$? == 0 ];then wine "$$@" >$$log_file;else \/bin\/true >$$log_file;fi/g' $(GNUTLS_DIR)/build-aux/test-driver
 	make -C $(GNUTLS_DIR)/tests check $(SMP)
 	make -C $(GNUTLS_DIR) install -i
