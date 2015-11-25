@@ -48,7 +48,7 @@ dist_check_SCRIPTS += crq
 endif
 
 if !WINDOWS
-dist_check_SCRIPTS += template-test
+dist_check_SCRIPTS += template-test pem-decoding
 endif
 
 if ENABLE_DANE

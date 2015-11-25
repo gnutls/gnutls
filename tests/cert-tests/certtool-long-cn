@@ -24,7 +24,7 @@
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+DIFF="${DIFF:-diff -b -B}"
 outfile=out.$$.pem
 
 if ! test -z "${VALGRIND}"; then
