@@ -24,38 +24,44 @@ unset RETCODE
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
+PROG=./cipher-override${EXEEXT}
 
-GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./cipher-override
-if test $? != 0; then
+GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "overriden cipher tests failed"
-	exit 1
+	exit $ret
 fi
 
-${VALGRIND} ./cipher-override
-if test $? != 0; then
+${VALGRIND} ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "overriden cipher tests 2 failed"
-	exit 1
+	exit $ret
 fi
 
-${VALGRIND} ./cipher-override2
-if test $? != 0; then
+${VALGRIND} ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "overriden cipher tests 3 failed"
-	exit 1
+	exit $ret
 fi
 
 if test "$WINDOWS" = 1;then
 	exit 77
 else
 	GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./mac-override
+	ret=$?
 	if test $? != 0; then
 		echo "overriden mac tests failed"
-		exit 1
+		exit $ret
 	fi
 
 	${VALGRIND} ./mac-override
+	ret=$?
 	if test $? != 0; then
 		echo "overriden mac tests 2 failed"
-		exit 1
+		exit $ret
 	fi
 fi
 
