@@ -20,57 +20,66 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+PROG=./cipher-test${EXEEXT}
 unset RETCODE
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
-./cipher-test
-if test $? != 0; then
+${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "default cipher tests failed"
-	exit 1
+	exit $ret
 fi
 
-GNUTLS_CPUID_OVERRIDE=0x1 ./cipher-test
-if test $? != 0; then
+GNUTLS_CPUID_OVERRIDE=0x1 ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "included cipher tests failed"
-	exit 1
+	exit $ret
 fi
 
-GNUTLS_CPUID_OVERRIDE=0x2 ./cipher-test
-if test $? != 0; then
+GNUTLS_CPUID_OVERRIDE=0x2 ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "AESNI cipher tests failed"
-	exit 1
+	exit $ret
 fi
 
-GNUTLS_CPUID_OVERRIDE=0x4 ./cipher-test
-if test $? != 0; then
+GNUTLS_CPUID_OVERRIDE=0x4 ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "SSSE3 cipher tests failed"
-	exit 1
+	exit $ret
 fi
 
-GNUTLS_CPUID_OVERRIDE=0x8 ./cipher-test
-if test $? != 0; then
+GNUTLS_CPUID_OVERRIDE=0x8 ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "PCLMUL cipher tests failed"
-	exit 1
+	exit $ret
 fi
 
-GNUTLS_CPUID_OVERRIDE=0x100000 ./cipher-test
-if test $? != 0; then
+GNUTLS_CPUID_OVERRIDE=0x100000 ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "padlock cipher tests failed"
-	exit 1
+	exit $ret
 fi
 
-GNUTLS_CPUID_OVERRIDE=0x200000 ./cipher-test
-if test $? != 0; then
+GNUTLS_CPUID_OVERRIDE=0x200000 ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "padlock PHE cipher tests failed"
-	exit 1
+	exit $ret
 fi
 
-GNUTLS_CPUID_OVERRIDE=0x400000 ./cipher-test
-if test $? != 0; then
+GNUTLS_CPUID_OVERRIDE=0x400000 ${PROG}
+ret=$?
+if test $ret != 0; then
 	echo "padlock PHE SHA512 cipher tests failed"
-	exit 1
+	exit $ret
 fi
 
 exit 0
