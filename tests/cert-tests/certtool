@@ -22,13 +22,13 @@
 
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
-DIFF="${DIFF:-diff}"
+DIFF="${DIFF:-diff -b -B}"
 if ! test -z "${VALGRIND}"; then
 	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
 fi
 
 #check whether "funny" spaces can be interpreted
-id=`${VALGRIND} "${CERTTOOL}" --key-id --infile "${srcdir}/funny-spacing.pem" --hash sha1`
+id=`${VALGRIND} "${CERTTOOL}" --key-id --infile "${srcdir}/funny-spacing.pem" --hash sha1| tr -d '\r'`
 rc=$?
 
 if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3"; then
@@ -36,7 +36,7 @@ if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3"; then
 	exit 1
 fi
 
-id=`${VALGRIND} "${CERTTOOL}" --key-id --infile "${srcdir}/funny-spacing.pem"`
+id=`${VALGRIND} "${CERTTOOL}" --key-id --infile "${srcdir}/funny-spacing.pem"| tr -d '\r'`
 rc=$?
 
 if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3"; then
@@ -44,7 +44,7 @@ if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3"; then
 	exit 1
 fi
 
-id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha1`
+id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha1| tr -d '\r'`
 rc=$?
 
 if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3"; then
@@ -61,7 +61,7 @@ if test "${id}" != "118e72e3655150c895ecbd19b3634179fb4a87c7a25abefcb11f5d66661d
 fi
 
 #fingerprint
-id=`${VALGRIND} "${CERTTOOL}" --fingerprint --infile "${srcdir}/funny-spacing.pem"`
+id=`${VALGRIND} "${CERTTOOL}" --fingerprint --infile "${srcdir}/funny-spacing.pem"| tr -d '\r'`
 rc=$?
 
 if test "${id}" != "8f735c5ddefd723f59b6a3bb2ac0522470c0182f"; then
@@ -69,7 +69,7 @@ if test "${id}" != "8f735c5ddefd723f59b6a3bb2ac0522470c0182f"; then
 	exit 1
 fi
 
-id=`${VALGRIND} "${CERTTOOL}" --fingerprint --hash sha256 --infile "${srcdir}/funny-spacing.pem"`
+id=`${VALGRIND} "${CERTTOOL}" --fingerprint --hash sha256 --infile "${srcdir}/funny-spacing.pem"| tr -d '\r'`
 rc=$?
 
 if test "${id}" != "fc5b45b20c489393a457f177572920ac40bacba9d25cea51200822271eaf7d1f"; then
