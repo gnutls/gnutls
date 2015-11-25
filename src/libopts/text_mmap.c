@@ -186,7 +186,9 @@ validate_mmap(char const * fname, int prot, int flags, tmap_info_t * mapinfo)
          *  write access.
          */
         int o_flag = FILE_WRITABLE(prot, flags) ? O_RDWR : O_RDONLY;
-
+#ifdef _WIN32
+        o_flag |= O_BINARY;
+#endif
         /*
          *  If you're not sharing the file and you are writing to it,
          *  then don't let anyone else have access to the file.
