@@ -222,6 +222,17 @@ gnutls_crypto_register_digest(gnutls_digest_algorithm_t digest,
 			   gnutls_digest_deinit_func deinit,
 			   gnutls_digest_fast_func hash_fast);
 
+/* RSA-PKCS#1 1.5 helper functions */
+int
+gnutls_encode_ber_digest_info(gnutls_digest_algorithm_t hash,
+			      const gnutls_datum_t * digest,
+			      gnutls_datum_t * output);
+
+int
+gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
+			      gnutls_digest_algorithm_t *hash,
+			      unsigned char *digest, unsigned int *digest_size);
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
 }

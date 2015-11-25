@@ -1069,6 +1069,8 @@ GNUTLS_3_4
 	gnutls_x509_crt_set_issuer_unique_id;
 	_gnutls_global_init_skip;
 	gnutls_certificate_set_flags;
+	gnutls_decode_ber_digest_info;
+	gnutls_encode_ber_digest_info;
  local:
 	*;
 };

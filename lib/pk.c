@@ -35,6 +35,7 @@
 #include <x509/x509_int.h>
 #include <x509/common.h>
 #include <random.h>
+#include <gnutls/crypto.h>
 
 /* encodes the Dss-Sig-Value structure
  */
@@ -229,8 +230,8 @@ void gnutls_pk_params_clear(gnutls_pk_params_st * p)
  */
 int
 encode_ber_digest_info(const mac_entry_st * e,
-		       const gnutls_datum_t * digest,
-		       gnutls_datum_t * output)
+		        const gnutls_datum_t * digest,
+		        gnutls_datum_t * output)
 {
 	ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
 	int result;
@@ -313,14 +314,54 @@ encode_ber_digest_info(const mac_entry_st * e,
 	return 0;
 }
 
-/* Reads the digest information.
- * we use DER here, although we should use BER. It works fine
- * anyway.
- */
+/**
+ * gnutls_encode_ber_digest_info:
+ * @info: an RSA BER encoded DigestInfo structure
+ * @hash: the hash algorithm that was used to get the digest
+ * @digest: must contain the digest data
+ * @output: will contain the allocated DigestInfo BER encoded data
+ *
+ * This function will encode the provided digest data, and its
+ * algorithm into an RSA PKCS#1 1.5 DigestInfo structure. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.5.0
+ *
+ **/
 int
-decode_ber_digest_info(const gnutls_datum_t * info,
+gnutls_encode_ber_digest_info(gnutls_digest_algorithm_t hash,
+			      const gnutls_datum_t * digest,
+			      gnutls_datum_t * output)
+{
+	const mac_entry_st *e = hash_to_entry(hash);
+	if (unlikely(e == NULL))
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	return encode_ber_digest_info(e , digest, output);
+}
+
+/**
+ * gnutls_decode_ber_digest_info:
+ * @info: an RSA BER encoded DigestInfo structure
+ * @hash: will contain the hash algorithm of the structure
+ * @digest: will contain the hash output of the structure
+ * @digest_size: will contain the hash size of the structure; initially must hold the maximum size of @digest
+ *
+ * This function will parse an RSA PKCS#1 1.5 DigestInfo structure
+ * and report the hash algorithm used as well as the digest data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 3.5.0
+ *
+ **/
+int
+gnutls_decode_ber_digest_info(const gnutls_datum_t * info,
 		       gnutls_digest_algorithm_t * hash,
-		       uint8_t * digest, unsigned int *digest_size)
+		       unsigned char * digest, unsigned int *digest_size)
 {
 	ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
 	int result;

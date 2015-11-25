@@ -69,10 +69,7 @@ encode_ber_digest_info(const mac_entry_st * e,
 		       const gnutls_datum_t * digest,
 		       gnutls_datum_t * output);
 
-int
-decode_ber_digest_info(const gnutls_datum_t * info,
-		       gnutls_digest_algorithm_t * hash,
-		       uint8_t * digest, unsigned int *digest_size);
+#define decode_ber_digest_info gnutls_decode_ber_digest_info
 
 int
 _gnutls_params_get_rsa_raw(const gnutls_pk_params_st* params,
