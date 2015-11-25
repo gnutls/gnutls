@@ -1,7 +1,6 @@
 [![build status](https://ci.gitlab.com/projects/684/status.png?ref=master)](https://gitlab.com/gnutls/gnutls/builds)
 
-GnuTLS -- Information for developers
-=================================================
+# GnuTLS -- Information for developers
 
 This file contains instructions for developers and advanced users that
 want to build from version controlled sources.
@@ -110,6 +109,25 @@ are:
 ```
 $ sh tests/suite/testpkcs11
 ```
+
+# Building for windows
+
+It is recommended to cross compile using Fedora and the following
+dependencies:
+
+```
+yum install -y wine mingw32-nettle mingw32-libtasn1 mingw32-gcc
+```
+
+and build as:
+
+```
+mingw32-configure --enable-local-libopts --disable-non-suiteb-curves --disable-doc --without-p11-kit
+mingw32-make
+mingw32-make check
+```
+
+# Contributing
 
 If you wish to contribute, you may read more about our [coding style](doc/README.CODING_STYLE).
 Note that when contributing code that is not assigned to FSF, you will
