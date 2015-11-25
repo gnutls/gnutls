@@ -900,6 +900,7 @@ AC_CONFIG_FILES([
   src/crywrap/Makefile
   src/gl/Makefile
   tests/Makefile
+  tests/windows/Makefile
   tests/cert-tests/Makefile
   tests/dsa/Makefile
   tests/dtls/Makefile

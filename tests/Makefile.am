@@ -21,7 +21,7 @@
 
 SUBDIRS = . rsa-md5-collision pkcs1-padding pkcs8-decode pkcs12-decode	\
 	userid cert-tests key-tests sha2 safe-renegotiation dsa scripts ecdsa \
-	slow dtls srp
+	slow dtls srp windows
 
 if ENABLE_OPENPGP
 SUBDIRS += openpgp-certs
@@ -31,7 +31,7 @@ if WANT_TEST_SUITE
 SUBDIRS += suite
 endif
 
-EXTRA_DIST = suppressions.valgrind eagain-common.h test-chains.h \
+EXTRA_DIST = suppressions.valgrind eagain-common.h cert-common.h test-chains.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
@@ -98,6 +98,7 @@ ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client
 endif
 
 mini_dtls_pthread_LDADD = $(LDADD) -lpthread
+
 
 if ENABLE_OCSP
 ctests += ocsp

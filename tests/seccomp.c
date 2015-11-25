@@ -19,13 +19,13 @@
 
 #include <config.h>
 #include <stdio.h>
+#include "utils.h"
 
 #ifdef HAVE_LIBSECCOMP
 
 #include <seccomp.h>
 #include <errno.h>
 #include <string.h>
-#include "utils.h"
 
 int disable_system_calls(void)
 {
