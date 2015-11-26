@@ -47,18 +47,23 @@ if test $ret != 0; then
 	exit $ret
 fi
 
-GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./mac-override
-ret=$?
-if test $ret != 0; then
-	echo "overriden mac tests failed"
-	exit $ret
-fi
 
-${VALGRIND} ./mac-override
-ret=$?
-if test $ret != 0; then
-	echo "overriden mac tests 2 failed"
-	exit $ret
+if test "$WINDOWS" = 1;then
+	exit 77
+else
+	GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./mac-override
+	ret=$?
+	if test $ret != 0; then
+		echo "overriden mac tests failed"
+		exit $ret
+	fi
+
+	${VALGRIND} ./mac-override
+	ret=$?
+	if test $ret != 0; then
+		echo "overriden mac tests 2 failed"
+		exit $ret
+	fi
 fi
 
 exit 0
