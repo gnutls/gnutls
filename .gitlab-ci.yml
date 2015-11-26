@@ -8,7 +8,6 @@ Compile minimal library:
     --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
     --without-zlib --disable-doc --disable-tests && make -j4
   tags:
-  - x86-64
   - nettle3
   except:
   - tags
