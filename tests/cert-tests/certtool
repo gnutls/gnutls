@@ -52,7 +52,7 @@ if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3"; then
 	exit 1
 fi
 
-id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha256`
+id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha256| tr -d '\r'`
 rc=$?
 
 if test "${id}" != "118e72e3655150c895ecbd19b3634179fb4a87c7a25abefcb11f5d66661d5a4d"; then
@@ -81,7 +81,7 @@ export TZ="UTC"
 
 # Check for datefudge
 TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
-if test "$TSTAMP" != "1158969600"; then
+if test "$TSTAMP" != "1158969600" || test "$WINDOWS" = 1; then
 echo $TSTAMP
 	echo "You need datefudge to run this test"
 	exit 77

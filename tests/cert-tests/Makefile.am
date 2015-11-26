@@ -64,3 +64,6 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	top_builddir="$(top_builddir)"		\
 	srcdir="$(srcdir)"
 
+if WINDOWS
+TESTS_ENVIRONMENT += WINDOWS=1
+endif
