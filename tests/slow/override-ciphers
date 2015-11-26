@@ -43,16 +43,20 @@ if test $? != 0; then
 	exit 1
 fi
 
-GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./mac-override
-if test $? != 0; then
-	echo "overriden mac tests failed"
-	exit 1
-fi
+if test "$WINDOWS" = 1;then
+	exit 77
+else
+	GNUTLS_NO_EXPLICIT_INIT=1 ${VALGRIND} ./mac-override
+	if test $? != 0; then
+		echo "overriden mac tests failed"
+		exit 1
+	fi
 
-${VALGRIND} ./mac-override
-if test $? != 0; then
-	echo "overriden mac tests 2 failed"
-	exit 1
+	${VALGRIND} ./mac-override
+	if test $? != 0; then
+		echo "overriden mac tests 2 failed"
+		exit 1
+	fi
 fi
 
 exit 0
