@@ -18,16 +18,9 @@ See the end for copying conditions.
 
 ** certtool: Added the --provable option.
 
-** certtool: Key generation security level was switched to HIGH. That
-   is, by default the tool generates 3072 bit keys for RSA and DSA.
-
 ** API and ABI modifications:
 GNUTLS_INDEFINITE_TIMEOUT: Added
 gnutls_check_version_numeric: Added
-gnutls_session_set_verify_function: Added
-gnutls_session_set_verify_cert: Added
-gnutls_session_set_verify_cert2: Added
-gnutls_session_get_verify_cert_status: Added
 gnutls_x509_privkey_generate2: Added
 gnutls_x509_privkey_get_seed: Added
 gnutls_x509_privkey_verify_seed: Added
