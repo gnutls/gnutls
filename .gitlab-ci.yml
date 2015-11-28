@@ -8,7 +8,6 @@ Compile minimal library:
     --disable-nls --disable-crywrap --disable-libdane --without-p11-kit --without-tpm
     --without-zlib --disable-doc --disable-tests && make -j4
   tags:
-  - x86-64
   - nettle3
   except:
   - tags
@@ -26,15 +25,6 @@ Build and Check with asan:
   - git submodule update --init && make autoreconf &&CFLAGS="-fsanitize=address -g
     -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make -j4 && make check -j4
-  tags:
-  - x86-64
-  - nettle3
-  except:
-  - tags
-Build and Check - separate build dir (x86-64):
-  script:
-  - git submodule update --init && make autoreconf && mkdir -p build && cd build && ../configure
-    --disable-non-suiteb-curves --with-included-libtasn1 --enable-seccomp-tests --disable-valgrind-tests --disable-doc && make -j4 && make check -j4
   tags:
   - x86-64
   - nettle3
@@ -66,11 +56,10 @@ Build and Check in FIPS140-2 mode:
     ../configure --disable-non-suiteb-curves --enable-fips140-mode --with-included-libtasn1 --disable-doc --disable-valgrind-tests &&
     make -j4 && make check -j4
   tags:
-  - x86-64
   - nettle3
   except:
   - tags
-Build and Check for windows:
+Build and Check for windows in separate build dir:
   script:
   - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && mkdir -p build && cd build &&
     mingw32-configure --enable-local-libopts --without-p11-kit --disable-non-suiteb-curves --disable-doc --disable-valgrind-tests &&
