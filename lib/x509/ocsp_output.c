@@ -442,18 +442,18 @@ print_resp(gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
 			size_t max = sizeof(s);
 			struct tm t;
 
-			if (next_update == (time_t) - 1)
-				addf(str, "error: next_update\n");
-			else if (gmtime_r(&next_update, &t) == NULL)
-				addf(str, "error: gmtime_r (%ld)\n",
-				     (unsigned long) next_update);
-			else if (strftime
-				 (s, max, "%a %b %d %H:%M:%S UTC %Y",
-				  &t) == 0)
-				addf(str, "error: strftime (%ld)\n",
-				     (unsigned long) next_update);
-			else
-				addf(str, _("\t\tNext Update: %s\n"), s);
+			if (next_update != (time_t) - 1) {
+				if (gmtime_r(&next_update, &t) == NULL)
+					addf(str, "error: gmtime_r (%ld)\n",
+					     (unsigned long) next_update);
+				else if (strftime
+					 (s, max, "%a %b %d %H:%M:%S UTC %Y",
+					  &t) == 0)
+					addf(str, "error: strftime (%ld)\n",
+					     (unsigned long) next_update);
+				else
+					addf(str, _("\t\tNext Update: %s\n"), s);
+			}
 		}
 
 		/* XXX singleRequestExtensions */
