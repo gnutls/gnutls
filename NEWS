@@ -12,6 +12,10 @@ See the end for copying conditions.
    to install a callback to perform certificate verification. See
    doc/examples/ex-client-x509.c for usage.
 
+** libgnutls: Be strict in TLS extension decoding. That is, do not tolerate
+   parsing errors in the extensions field and treat it as a typical Hello
+   message structure. Reported by Hubert Kario (#40)
+
 ** certtool: Added the --provable option.
 
 ** certtool: Key generation security level was switched to HIGH. That
