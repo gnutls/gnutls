@@ -190,14 +190,14 @@ _gnutls_parse_extensions(gnutls_session_t session,
 		}
 #endif
 
-	DECR_LENGTH_RET(data_size, 2, 0);
+	DECR_LENGTH_RET(data_size, 2, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 	next = _gnutls_read_uint16(data);
 	pos += 2;
 
-	DECR_LENGTH_RET(data_size, next, 0);
+	DECR_LENGTH_RET(data_size, next, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 
 	do {
-		DECR_LENGTH_RET(next, 2, 0);
+		DECR_LENGTH_RET(next, 2, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 		type = _gnutls_read_uint16(&data[pos]);
 		pos += 2;
 
@@ -211,11 +211,11 @@ _gnutls_parse_extensions(gnutls_session_t session,
 			_gnutls_extension_list_add(session, type);
 		}
 
-		DECR_LENGTH_RET(next, 2, 0);
+		DECR_LENGTH_RET(next, 2, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 		size = _gnutls_read_uint16(&data[pos]);
 		pos += 2;
 
-		DECR_LENGTH_RET(next, size, 0);
+		DECR_LENGTH_RET(next, size, GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH);
 		sdata = &data[pos];
 		pos += size;
 

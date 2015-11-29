@@ -374,6 +374,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_SOCKETS_INIT_ERROR),
 	ERROR_ENTRY(N_("Error in public key generation."),
 		    GNUTLS_E_PK_GENERATION_ERROR),
+	ERROR_ENTRY(N_("Invalid TLS extensions length field."),
+		    GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH),
 	{NULL, NULL, 0}
 };
 
