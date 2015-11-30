@@ -3574,7 +3574,6 @@ gnutls_x509_crt_get_subject_unique_id(gnutls_x509_crt_t crt, char *buf,
 
 	if (datum.size > *buf_size) {	/* then we're not going to fit */
 		*buf_size = datum.size;
-		buf[0] = '\0';
 		result = GNUTLS_E_SHORT_MEMORY_BUFFER;
 	} else {
 		*buf_size = datum.size;
@@ -3618,7 +3617,6 @@ gnutls_x509_crt_get_issuer_unique_id(gnutls_x509_crt_t crt, char *buf,
 
 	if (datum.size > *buf_size) {	/* then we're not going to fit */
 		*buf_size = datum.size;
-		buf[0] = '\0';
 		result = GNUTLS_E_SHORT_MEMORY_BUFFER;
 	} else {
 		*buf_size = datum.size;
