@@ -66,13 +66,15 @@ if ENABLE_DANE
 bin_PROGRAMS += danetool
 endif
 
+noinst_PROGRAMS = systemkey
+
+if ENABLE_PKCS11
+
+# TPM makes use of PKCS #11 callbacks
 if ENABLE_TROUSERS
 bin_PROGRAMS += tpmtool
 endif
 
-noinst_PROGRAMS = systemkey
-
-if ENABLE_PKCS11
 bin_PROGRAMS += p11tool
 endif
 
