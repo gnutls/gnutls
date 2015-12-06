@@ -959,7 +959,7 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
 		ret =
 		    pkcs11_read_pubkey(sinfo.module, sinfo.pks, pub,
-				       key_type, obj);
+				       key_type, obj, 0);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -1021,7 +1021,7 @@ _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, 
 	obj->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm(pkey, 0);
 	obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
 	pk_to_genmech(obj->pk_algorithm, &key_type);
-	ret = pkcs11_read_pubkey(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, key_type, obj);
+	ret = pkcs11_read_pubkey(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, key_type, obj, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
