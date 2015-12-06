@@ -35,7 +35,7 @@ EXTRA_DIST = suppressions.valgrind eagain-common.h test-chains.h \
 	certs/ca-cert-ecc.pem  certs/cert-ecc256.pem  certs/cert-ecc521.pem \
 	certs/cert-rsa-2432.pem certs/ecc384.pem certs/ecc.pem \
 	certs/ca-ecc.pem certs/cert-ecc384.pem certs/cert-ecc.pem certs/ecc256.pem \
-	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem
+	certs/ecc521.pem certs/rsa-2432.pem x509cert-dir/ca.pem cert-common.h
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
