@@ -192,10 +192,12 @@ typedef enum record_flush_t {
    processes before aborting. */
 #define MAX_HANDSHAKE_HELLO_VERIFY_REQUESTS 5
 
+#define MAX_PK_PARAM_SIZE 2048
+
 /* defaults for verification functions
  */
 #define DEFAULT_MAX_VERIFY_DEPTH 16
-#define DEFAULT_MAX_VERIFY_BITS 16*1024
+#define DEFAULT_MAX_VERIFY_BITS (MAX_PK_PARAM_SIZE*8)
 #define MAX_VERIFY_DEPTH 4096
 
 #include <mem.h>

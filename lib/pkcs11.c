@@ -1512,8 +1512,6 @@ pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
 	return 0;
 }
 
-#define MAX_PK_PARAM_SIZE 2048
-
 int pkcs11_read_pubkey(struct ck_function_list *module,
 		       ck_session_handle_t pks, ck_object_handle_t obj,
 		       ck_key_type_t key_type, gnutls_pkcs11_obj_t pobj)
