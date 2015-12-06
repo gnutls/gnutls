@@ -3,6 +3,19 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.20 (unreleased)
+
+** libgnutls: Corrected memory leak in gnutls_pubkey_import_privkey() when
+   used with PKCS #11 keys.
+
+** libgnutls: Do not allow importing public keys from PKCS #11 private keys
+   for DSA and ECDSA. That is, because they do not contain all the required
+   parameters for a direct import. Reported by Jan Vcelak.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.19 (released 2015-11-22)
 
 ** libgnutls: Properly require TLS 1.2 to all the CBC-SHA256 and CBC-SHA384
