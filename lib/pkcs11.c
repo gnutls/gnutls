@@ -855,6 +855,9 @@ gnutls_pkcs11_obj_set_pin_function(gnutls_pkcs11_obj_t obj,
  **/
 void gnutls_pkcs11_obj_deinit(gnutls_pkcs11_obj_t obj)
 {
+	unsigned i;
+	for (i=0;i<obj->pubkey_size;i++)
+		_gnutls_free_datum(&obj->pubkey[i]);
 	_gnutls_free_datum(&obj->raw);
 	p11_kit_uri_free(obj->info);
 	free(obj);
@@ -1307,7 +1310,7 @@ pkcs11_obj_import(ck_object_class_t class, gnutls_pkcs11_obj_t obj,
 
 int pkcs11_read_pubkey(struct ck_function_list *module,
 		       ck_session_handle_t pks, ck_object_handle_t obj,
-		       ck_key_type_t key_type, gnutls_datum_t * pubkey)
+		       ck_key_type_t key_type, gnutls_pkcs11_obj_t pobj)
 {
 	struct ck_attribute a[4];
 	uint8_t *tmp1;
@@ -1339,11 +1342,13 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 		if (pkcs11_get_attribute_value(module, pks, obj, a, 2) ==
 		    CKR_OK) {
 
-			pubkey[0].data = a[0].value;
-			pubkey[0].size = a[0].value_len;
+			pobj->pubkey[0].data = a[0].value;
+			pobj->pubkey[0].size = a[0].value_len;
 
-			pubkey[1].data = a[1].value;
-			pubkey[1].size = a[1].value_len;
+			pobj->pubkey[1].data = a[1].value;
+			pobj->pubkey[1].size = a[1].value_len;
+
+			pobj->pubkey_size = 2;
 		} else {
 			gnutls_assert();
 			ret = GNUTLS_E_PKCS11_ERROR;
@@ -1361,22 +1366,24 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 		if ((rv = pkcs11_get_attribute_value(module, pks, obj, a, 2)) ==
 		    CKR_OK) {
 			ret =
-			    _gnutls_set_datum(&pubkey[0], a[0].value,
+			    _gnutls_set_datum(&pobj->pubkey[0], a[0].value,
 					      a[0].value_len);
 
 			if (ret >= 0)
 				ret =
-				    _gnutls_set_datum(&pubkey
+				    _gnutls_set_datum(&pobj->pubkey
 						      [1], a[1].value,
 						      a[1].value_len);
 
 			if (ret < 0) {
 				gnutls_assert();
-				_gnutls_free_datum(&pubkey[1]);
-				_gnutls_free_datum(&pubkey[0]);
+				_gnutls_free_datum(&pobj->pubkey[1]);
+				_gnutls_free_datum(&pobj->pubkey[0]);
 				ret = GNUTLS_E_MEMORY_ERROR;
 				goto cleanup;
 			}
+
+			pobj->pubkey_size = 2;
 		} else {
 			gnutls_assert();
 			ret = pkcs11_rv_to_err(rv);
@@ -1392,12 +1399,13 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 
 		if ((rv = pkcs11_get_attribute_value(module, pks, obj, a, 2)) ==
 		    CKR_OK) {
-			pubkey[2].data = a[0].value;
-			pubkey[2].size = a[0].value_len;
+			pobj->pubkey[2].data = a[0].value;
+			pobj->pubkey[2].size = a[0].value_len;
 
-			pubkey[3].data = a[1].value;
-			pubkey[3].size = a[1].value_len;
+			pobj->pubkey[3].data = a[1].value;
+			pobj->pubkey[3].size = a[1].value_len;
 
+			pobj->pubkey_size = 4;
 		} else {
 			gnutls_assert();
 			ret = pkcs11_rv_to_err(rv);
@@ -1416,11 +1424,13 @@ int pkcs11_read_pubkey(struct ck_function_list *module,
 		if ((rv = pkcs11_get_attribute_value(module, pks, obj, a, 2)) ==
 		    CKR_OK) {
 
-			pubkey[0].data = a[0].value;
-			pubkey[0].size = a[0].value_len;
+			pobj->pubkey[0].data = a[0].value;
+			pobj->pubkey[0].size = a[0].value_len;
 
-			pubkey[1].data = a[1].value;
-			pubkey[1].size = a[1].value_len;
+			pobj->pubkey[1].data = a[1].value;
+			pobj->pubkey[1].size = a[1].value_len;
+
+			pobj->pubkey_size = 2;
 		} else {
 			gnutls_assert();
 
@@ -1469,7 +1479,7 @@ pkcs11_obj_import_pubkey(struct ck_function_list *module,
 
 		ret =
 		    pkcs11_read_pubkey(module, pks, ctx, key_type,
-				       pobj->pubkey);
+				       pobj);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
 	}
