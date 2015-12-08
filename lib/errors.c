@@ -376,6 +376,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_PK_GENERATION_ERROR),
 	ERROR_ENTRY(N_("Invalid TLS extensions length field."),
 		    GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH),
+	ERROR_ENTRY(N_("Peer's certificate has changed during a rehandshake."),
+		    GNUTLS_E_SESSION_CERTIFICATE_CHANGED),
 	{NULL, NULL, 0}
 };
 

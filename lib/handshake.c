@@ -2670,6 +2670,39 @@ gnutls_handshake_set_timeout(gnutls_session_t session, unsigned int ms)
 	} } while (0)
 
 
+static int check_if_cert_hash_is_same(gnutls_session_t session, gnutls_certificate_credentials_t cred)
+{
+	cert_auth_info_t ai;
+	char tmp[32];
+	int ret;
+
+	if (session->internals.allow_cert_change != 0)
+		return 0;
+
+	ai = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
+	if (ai == NULL || ai->ncerts == 0)
+		return 0;
+
+	ret = gnutls_hash_fast(GNUTLS_DIG_SHA256, 
+			       ai->raw_certificate_list[0].data,
+			       ai->raw_certificate_list[0].size,
+			       tmp);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	if (session->internals.cert_hash_set) {
+		if (memcmp(tmp, session->internals.cert_hash, 32) != 0) {
+			_gnutls_debug_log("Session certificate changed during rehandshake; aborting!\n");
+			return gnutls_assert_val(GNUTLS_E_SESSION_CERTIFICATE_CHANGED);
+		}
+	} else {
+		memcpy(session->internals.cert_hash, tmp, 32);
+		session->internals.cert_hash_set = 1;
+	}
+
+	return 0;
+}
+
 /* Runs the certificate verification callback.
  * side is either GNUTLS_CLIENT or GNUTLS_SERVER.
  */
@@ -2689,6 +2722,15 @@ static int run_verify_callback(gnutls_session_t session, unsigned int side)
 
 	if (type != GNUTLS_CRD_CERTIFICATE)
 		return 0;
+
+	/* verify whether the certificate of the peer remained the same
+	 * as with any previous handshakes */
+	if (cred != NULL) {
+		ret = check_if_cert_hash_is_same(session, cred);
+		if (ret < 0) {
+			return gnutls_assert_val(ret);
+		}
+	}
 
 	if (cred != NULL &&
 	    (cred->verify_callback != NULL || session->internals.verify_callback != NULL) &&

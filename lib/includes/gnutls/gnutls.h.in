@@ -351,6 +351,7 @@ typedef enum {
    * @GNUTLS_NO_SIGNAL: In systems where SIGPIPE is delivered on send, it will be disabled. That flag has effect in systems which support the MSG_NOSIGNAL sockets flag.
    * @GNUTLS_NO_EXTENSIONS: Do not enable any TLS extensions by default.
    * @GNUTLS_NO_REPLAY_PROTECTION: Disable any replay protection in DTLS.
+   * @GNUTLS_ALLOW_CERT_CHANGE: Allow the peer to replace its certificate during a rehandshake. This change is often used in attacks and thus prohibited by default.
    *
    */
 #define GNUTLS_SERVER 1
@@ -360,6 +361,7 @@ typedef enum {
 #define GNUTLS_NO_EXTENSIONS (1<<4)
 #define GNUTLS_NO_REPLAY_PROTECTION (1<<5)
 #define GNUTLS_NO_SIGNAL (1<<6)
+#define GNUTLS_ALLOW_CERT_CHANGE (1<<7)
 
 /**
  * gnutls_alert_level_t:
@@ -2651,6 +2653,7 @@ int gnutls_fips140_mode_enabled(void);
 #define GNUTLS_E_IDNA_ERROR -404
 
 #define GNUTLS_E_NEED_FALLBACK -405
+#define GNUTLS_E_SESSION_CERTIFICATE_CHANGED -406
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

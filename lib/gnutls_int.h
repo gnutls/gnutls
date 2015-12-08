@@ -998,6 +998,7 @@ typedef struct {
 
 	bool sc_random_set;
 	bool no_replay_protection;	/* DTLS replay protection */
+	bool allow_cert_change;		/* whether the peer is allowed to change certificate */
 	bool try_ext_master_secret;	/* whether to try negotiating the ext master secret */
 
 	/* a verify callback to override the verify callback from the credentials
@@ -1011,6 +1012,10 @@ typedef struct {
 
 	/* whether this session uses non-blocking sockets */
 	bool blocking;
+
+	/* the SHA256 hash of the peer's certificate */
+	uint8_t cert_hash[32];
+	bool cert_hash_set;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

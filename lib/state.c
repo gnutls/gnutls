@@ -450,6 +450,9 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	if (flags & GNUTLS_NO_REPLAY_PROTECTION)
 		(*session)->internals.no_replay_protection = 1;
 
+	if (flags & GNUTLS_ALLOW_CERT_CHANGE)
+		(*session)->internals.allow_cert_change = 1;
+
 	return 0;
 }
 
