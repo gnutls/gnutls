@@ -370,25 +370,16 @@ gnutls_pubkey_import_pkcs11(gnutls_pubkey_t key,
 
 	switch (obj->pk_algorithm) {
 	case GNUTLS_PK_RSA:
-		if (obj->pubkey_size != 2)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
 		ret = gnutls_pubkey_import_rsa_raw(key, &obj->pubkey[0],
 						   &obj->pubkey[1]);
 		break;
 	case GNUTLS_PK_DSA:
-		if (obj->pubkey_size != 4)
-			return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-
 		ret = gnutls_pubkey_import_dsa_raw(key, &obj->pubkey[0],
 						   &obj->pubkey[1],
 						   &obj->pubkey[2],
 						   &obj->pubkey[3]);
 		break;
 	case GNUTLS_PK_EC:
-		if (obj->pubkey_size != 2)
-			return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-
 		ret = gnutls_pubkey_import_ecc_x962(key, &obj->pubkey[0],
 						    &obj->pubkey[1]);
 		break;
