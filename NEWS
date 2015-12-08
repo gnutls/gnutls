@@ -16,6 +16,11 @@ See the end for copying conditions.
    parsing errors in the extensions field and treat it as a typical Hello
    message structure. Reported by Hubert Kario (#40)
 
+** libgnutls: On a rehandshake ensure that the certificate of the peer (if
+   available) is the same as in previous handshakes. That is to protect
+   applications which do not check user credentials on rehandshakes from
+   attacks related to unsafe renegotiation.
+
 ** certtool: Added the --provable option.
 
 ** API and ABI modifications:
