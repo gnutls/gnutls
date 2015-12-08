@@ -32,6 +32,8 @@
 #include "utils.h"
 #include "eagain-common.h"
 
+/* This program tests server initiated rehandshake */
+
 const char *side = "";
 
 static void tls_log_func(int level, const char *str)

@@ -51,8 +51,7 @@ int main()
 
 static void terminate(void);
 
-/* This program tests the robustness of record
- * decoding.
+/* This program tests client initiated rehandshake.
  */
 
 static void server_log_func(int level, const char *str)
@@ -105,9 +104,6 @@ static unsigned char server_key_pem[] =
 const gnutls_datum_t server_key = { server_key_pem,
 	sizeof(server_key_pem)
 };
-
-/* A very basic TLS client, with anonymous authentication.
- */
 
 #define MAX_BUF 1024
 
