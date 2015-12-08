@@ -907,6 +907,14 @@ _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, 
 	obj->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm(pkey, 0);
 	obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
 	pk_to_genmech(obj->pk_algorithm, &key_type);
+
+	/* we can only read the public key from RSA keys */
+	if (key_type != CKK_RSA) {
+		gnutls_assert();
+		ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		goto cleanup;
+	}
+
 	ret = pkcs11_read_pubkey(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, key_type, obj);
 	if (ret < 0) {
 		gnutls_assert();
