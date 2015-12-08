@@ -58,10 +58,6 @@ struct gnutls_pkcs11_obj_st {
 	/* only when pubkey */
 	gnutls_datum_t pubkey[MAX_PUBLIC_PARAMS_SIZE];
 	unsigned pubkey_size;
-	/* when converting from private key -> pubkey */
-	gnutls_datum_t privkey[1];
-	unsigned privkey_size;
-
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int key_usage;
 
@@ -98,7 +94,7 @@ pkcs11_find_slot(struct ck_function_list **module, ck_slot_id_t * slot,
 
 int pkcs11_read_pubkey(struct ck_function_list *module,
 		       ck_session_handle_t pks, ck_object_handle_t obj,
-		       ck_key_type_t key_type, gnutls_pkcs11_obj_t pobj, unsigned priv);
+		       ck_key_type_t key_type, gnutls_pkcs11_obj_t pobj);
 
 int pkcs11_override_cert_exts(struct pkcs11_session_info *sinfo, gnutls_datum_t *spki, gnutls_datum_t *der);
 
