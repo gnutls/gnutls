@@ -91,7 +91,9 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 status-request status-request-ok fallback-scsv pkcs8-key-decode \
 	 key-usage resume-psk mini-session-verify-function auto-verify \
 	 record-timeouts mini-dtls-hello-verify-48 mini-x509-default-prio \
-	 mini-x509-dual mini-x509-kx global-init-override tlsext-decoding
+	 mini-x509-dual mini-x509-kx global-init-override tlsext-decoding \
+	 rehandshake-switch-cert rehandshake-switch-cert-allow rehandshake-switch-cert-client \
+	 rehandshake-switch-cert-client-allow
 
 if HAVE_SECCOMP_TESTS
 ctests += dtls-with-seccomp tls-with-seccomp dtls-client-with-seccomp tls-client-with-seccomp
