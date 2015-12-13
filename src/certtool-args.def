@@ -308,8 +308,10 @@ flag = {
 
 flag = {
     name      = p7-include-cert;
+    disable   = "no";
+    enabled;
     descrip   = "The signer's certificate will be included in the cert list.";
-    doc       = "This options works with --p7-sign or --p7-detached-sign";
+    doc       = "This options works with --p7-sign or --p7-detached-sign and will include or exclude the signer's certificate into the generated signature.";
 };
 
 flag = {
