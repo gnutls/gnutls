@@ -11,15 +11,6 @@ Compile minimal library:
   - nettle3
   except:
   - tags
-Build and Check with valgrind:
-  script:
-  - git submodule update --init && make autoreconf && ./configure
-    --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
-  tags:
-  - x86-64
-  - nettle3
-  except:
-  - tags
 Build and Check with asan:
   script:
   - git submodule update --init && make autoreconf &&CFLAGS="-fsanitize=address -g
@@ -68,5 +59,14 @@ Build and Check for windows in separate build dir:
   - nettle3
   - wine
   - mingw
+  except:
+  - tags
+Build and Check with valgrind:
+  script:
+  - git submodule update --init && make autoreconf && ./configure
+    --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
+  tags:
+  - x86-64
+  - nettle3
   except:
   - tags
