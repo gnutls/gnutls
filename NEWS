@@ -12,6 +12,8 @@ See the end for copying conditions.
    for DSA and ECDSA. That is, because they do not contain all the required
    parameters for a direct import. Reported by Jan Vcelak.
 
+** certtool: Added the --p7-include-cert option and made it the default.
+
 ** API and ABI modifications:
 No changes since last version.
 
