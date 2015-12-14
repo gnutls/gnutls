@@ -94,7 +94,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	int ret = 0, sret = 0;
 	uint16_t sizeOfSuites;
 	gnutls_protocol_t adv_version;
-	uint8_t rnd[GNUTLS_RANDOM_SIZE];
+	uint8_t rnd[GNUTLS_RANDOM_SIZE], major, minor;
 	int len = datalen;
 	uint16_t challenge;
 	uint8_t session_id[GNUTLS_MAX_SESSION_ID_SIZE];
@@ -105,11 +105,13 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 	    ("HSK[%p]: SSL 2.0 Hello: Client's version: %d.%d\n", session,
 	     data[pos], data[pos + 1]);
 
-	set_adv_version(session, data[pos], data[pos + 1]);
+	major = data[pos];
+	minor = data[pos + 1];
+	set_adv_version(session, major, minor);
 
-	adv_version = _gnutls_version_get(data[pos], data[pos + 1]);
+	adv_version = _gnutls_version_get(major, minor);
 
-	ret = _gnutls_negotiate_version(session, adv_version);
+	ret = _gnutls_negotiate_version(session, adv_version, major, minor);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -144,7 +146,7 @@ _gnutls_read_client_hello_v2(gnutls_session_t session, uint8_t * data,
 
 	/* call the user hello callback
 	 */
-	ret = _gnutls_user_hello_func(session, adv_version);
+	ret = _gnutls_user_hello_func(session, adv_version, major, minor);
 	if (ret < 0) {
 		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) {
 			sret = GNUTLS_E_INT_RET_0;

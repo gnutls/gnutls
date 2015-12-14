@@ -398,12 +398,18 @@ _gnutls_finished(gnutls_session_t session, int type, void *ret,
  */
 int
 _gnutls_negotiate_version(gnutls_session_t session,
-			  gnutls_protocol_t adv_version)
+			  gnutls_protocol_t adv_version, uint8_t major, uint8_t minor)
 {
 	int ret;
 
+
 	/* if we do not support that version  */
-	if (_gnutls_version_is_supported(session, adv_version) == 0) {
+	if (adv_version == GNUTLS_VERSION_UNKNOWN || _gnutls_version_is_supported(session, adv_version) == 0) {
+		/* if we get an unknown/unsupported version, then fail if the version we
+		 * got is too low to be supported */
+		if (!_gnutls_version_is_too_high(session, major, minor))
+			return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_VERSION_PACKET);
+
 		/* If he requested something we do not support
 		 * then we send him the highest we support.
 		 */
@@ -431,7 +437,7 @@ _gnutls_negotiate_version(gnutls_session_t session,
  */
 int
 _gnutls_user_hello_func(gnutls_session_t session,
-			gnutls_protocol_t adv_version)
+			gnutls_protocol_t adv_version, uint8_t major, uint8_t minor)
 {
 	int ret, sret = 0;
 
@@ -449,7 +455,7 @@ _gnutls_user_hello_func(gnutls_session_t session,
 		/* Here we need to renegotiate the version since the callee might
 		 * have disabled some TLS versions.
 		 */
-		ret = _gnutls_negotiate_version(session, adv_version);
+		ret = _gnutls_negotiate_version(session, adv_version, major, minor);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -473,6 +479,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	gnutls_protocol_t adv_version;
 	int neg_version, sret = 0;
 	int len = datalen;
+	uint8_t major, minor;
 	uint8_t *suite_ptr, *comp_ptr, *session_id;
 
 	DECR_LEN(len, 2);
@@ -482,14 +489,17 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 	adv_version = _gnutls_version_get(data[pos], data[pos + 1]);
 
-	set_adv_version(session, data[pos], data[pos + 1]);
-	pos += 2;
+	major = data[pos];
+	minor = data[pos+1];
+	set_adv_version(session, major, minor);
 
-	neg_version = _gnutls_negotiate_version(session, adv_version);
+	neg_version = _gnutls_negotiate_version(session, adv_version, major, minor);
 	if (neg_version < 0) {
 		gnutls_assert();
 		return neg_version;
 	}
+
+	pos += 2;
 
 	_gnutls_handshake_log("HSK[%p]: Selected version %s\n",
 		     session, gnutls_protocol_get_name(neg_version));
@@ -572,7 +582,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 
 		session->internals.resumed = RESUME_TRUE;
 
-		return _gnutls_user_hello_func(session, adv_version);
+		return _gnutls_user_hello_func(session, adv_version, major, minor);
 	} else {
 		_gnutls_generate_session_id(session->security_parameters.
 					    session_id,
@@ -615,7 +625,7 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 	}
 
 	/* we cache this error code */
-	sret = _gnutls_user_hello_func(session, adv_version);
+	sret = _gnutls_user_hello_func(session, adv_version, major, minor);
 	if (sret < 0 && sret != GNUTLS_E_INT_RET_0) {
 		gnutls_assert();
 		return sret;

@@ -43,6 +43,7 @@ int _gnutls_version_priority(gnutls_session_t session,
 int _gnutls_version_is_supported(gnutls_session_t session,
 				 const gnutls_protocol_t version);
 gnutls_protocol_t _gnutls_version_get(uint8_t major, uint8_t minor);
+unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, uint8_t minor);
 
 /* Functions for feature checks */
 inline static int

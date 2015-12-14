@@ -110,6 +110,16 @@ const version_entry_st *_gnutls_version_lowest(gnutls_session_t session)
 
 /* Returns the maximum version in the priorities 
  */
+static const version_entry_st *version_max(gnutls_session_t session)
+{
+	int max_proto = _gnutls_version_max(session);
+
+	if (max_proto < 0)
+		return NULL;
+
+	return version_to_entry(max_proto);
+}
+
 gnutls_protocol_t _gnutls_version_max(gnutls_session_t session)
 {
 	unsigned int i, max = 0x00;
@@ -131,6 +141,32 @@ gnutls_protocol_t _gnutls_version_max(gnutls_session_t session)
 	return max;
 }
 
+/* Returns true (1) if the given version is higher than the highest supported
+ * and (0) otherwise */
+unsigned _gnutls_version_is_too_high(gnutls_session_t session, uint8_t major, uint8_t minor)
+{
+	const version_entry_st *e;
+
+	e = version_max(session);
+	if (e == NULL) /* we don't know; but that means something is unconfigured */
+		return 1;
+
+	if (e->transport == GNUTLS_DGRAM) {
+		if (major < e->major)
+			return 1;
+
+		if (e->major == major && minor < e->minor)
+			return 1;
+	} else {
+		if (major > e->major)
+			return 1;
+
+		if (e->major == major && minor > e->minor)
+			return 1;
+	}
+
+	return 0;
+}
 
 /**
  * gnutls_protocol_get_name:
