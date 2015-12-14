@@ -14,7 +14,11 @@ See the end for copying conditions.
 
 ** libgnutls: Be strict in TLS extension decoding. That is, do not tolerate
    parsing errors in the extensions field and treat it as a typical Hello
-   message structure. Reported by Hubert Kario (#40)
+   message structure. Reported by Hubert Kario (#40).
+
+** libgnutls: Old and unsupported version numbers in client hellos are
+   rejected with a "protocol_version" alert message. Reported by Hubert
+   Kario (#42).
 
 ** libgnutls: On a rehandshake ensure that the certificate of the peer (if
    available) is the same as in previous handshakes. That is to protect
