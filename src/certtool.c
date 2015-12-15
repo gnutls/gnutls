@@ -4049,14 +4049,14 @@ void certificate_fpr(common_info_st * cinfo)
 		} else if (ret >= 0 && crt_num == 0) {
 			fprintf(stderr, "no certificates were found.\n");
 		}
+
+		free(pem.data);
 	}
 
 	if (ret < 0) {
 		fprintf(stderr, "import error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
-
-	free(pem.data);
 
 	fpr_size = sizeof(fpr);
 
