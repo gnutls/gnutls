@@ -459,8 +459,6 @@ generate_certificate(gnutls_privkey_t * ret_key,
 		get_policy_set(crt);
 
 		if (server != 0) {
-			result = 0;
-
 			result =
 			    gnutls_x509_crt_set_key_purpose_oid(crt,
 								GNUTLS_KP_TLS_WWW_SERVER,
@@ -490,8 +488,12 @@ generate_certificate(gnutls_privkey_t * ret_key,
 				if (result)
 					usage |=
 					    GNUTLS_KEY_KEY_ENCIPHERMENT;
-			} else
+			} else {
+				if (get_encrypt_status(server))
+					fprintf(stderr, "warning: this algorithm does not support encryption; disabling the encryption flag\n");
+
 				usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+			}
 
 			if (is_ike) {
 				result =
@@ -2124,8 +2126,12 @@ void generate_request(common_info_st * cinfo)
 				usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
 			else
 				usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
-		} else		/* DSA and ECDSA are always signing */
+		} else {	/* DSA and ECDSA are always signing */
+			if (get_encrypt_status(1))
+				fprintf(stderr, "warning: this algorithm does not support encryption; disabling the encryption flag\n");
+
 			usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+		}
 
 		if (ca_status) {
 			ret = get_cert_sign_status();
