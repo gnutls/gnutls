@@ -521,7 +521,7 @@ int _gnutls_dh_set_peer_public(gnutls_session_t session, bigint_t public)
 			anon_auth_info_t info;
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 			if (info == NULL)
-				return GNUTLS_E_INTERNAL_ERROR;
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
@@ -531,7 +531,7 @@ int _gnutls_dh_set_peer_public(gnutls_session_t session, bigint_t public)
 			psk_auth_info_t info;
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 			if (info == NULL)
-				return GNUTLS_E_INTERNAL_ERROR;
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
@@ -542,14 +542,13 @@ int _gnutls_dh_set_peer_public(gnutls_session_t session, bigint_t public)
 
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 			if (info == NULL)
-				return GNUTLS_E_INTERNAL_ERROR;
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
 		}
 	default:
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
 	if (dh->public_key.data)
@@ -572,7 +571,7 @@ int _gnutls_dh_set_secret_bits(gnutls_session_t session, unsigned bits)
 			anon_auth_info_t info;
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 			if (info == NULL)
-				return GNUTLS_E_INTERNAL_ERROR;
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			info->dh.secret_bits = bits;
 			break;
 		}
@@ -581,7 +580,7 @@ int _gnutls_dh_set_secret_bits(gnutls_session_t session, unsigned bits)
 			psk_auth_info_t info;
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 			if (info == NULL)
-				return GNUTLS_E_INTERNAL_ERROR;
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 			info->dh.secret_bits = bits;
 			break;
 		}
@@ -591,13 +590,12 @@ int _gnutls_dh_set_secret_bits(gnutls_session_t session, unsigned bits)
 
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 			if (info == NULL)
-				return GNUTLS_E_INTERNAL_ERROR;
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			info->dh.secret_bits = bits;
 			break;
 	default:
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
+			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 		}
 	}
 
@@ -619,7 +617,7 @@ _gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
 			anon_auth_info_t info;
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_ANON);
 			if (info == NULL)
-				return GNUTLS_E_INTERNAL_ERROR;
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
@@ -629,7 +627,7 @@ _gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
 			psk_auth_info_t info;
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_PSK);
 			if (info == NULL)
-				return GNUTLS_E_INTERNAL_ERROR;
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
@@ -640,14 +638,13 @@ _gnutls_dh_set_group(gnutls_session_t session, bigint_t gen,
 
 			info = _gnutls_get_auth_info(session, GNUTLS_CRD_CERTIFICATE);
 			if (info == NULL)
-				return GNUTLS_E_INTERNAL_ERROR;
+				return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 			dh = &info->dh;
 			break;
 		}
 	default:
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 	}
 
 	if (dh->prime.data)
