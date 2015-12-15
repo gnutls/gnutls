@@ -29,7 +29,7 @@ endif
 
 SUBDIRS += po
 if ENABLE_TOOLS
-SUBDIRS += src
+SUBDIRS += src/gl src
 else
 SUBDIRS += src/gl
 endif

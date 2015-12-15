@@ -17,7 +17,8 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = gl
+# src/gl is being added by the top level makefile
+SUBDIRS = 
 
 BUILT_SOURCES = srptool-args.c srptool-args.h \
 	psktool-args.c psktool-args.h ocsptool-args.h ocsptool-args.c \
