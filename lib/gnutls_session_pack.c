@@ -136,7 +136,7 @@ _gnutls_session_pack(gnutls_session_t session,
 		}
 		break;
 	default:
-		return GNUTLS_E_INTERNAL_ERROR;
+		return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
 	}
 
