@@ -124,7 +124,7 @@ void doit(void)
 	gnutls_init(&client, GNUTLS_CLIENT);
 	gnutls_credentials_set(client, GNUTLS_CRD_CERTIFICATE,
 			       clientx509cred);
-	gnutls_priority_set_direct(client, "NORMAL", NULL);
+	gnutls_priority_set_direct(client, "NORMAL:+ARCFOUR-128", NULL);
 	gnutls_transport_set_push_function(client, client_push);
 	gnutls_transport_set_pull_function(client, client_pull);
 	gnutls_transport_set_ptr(client, client);
