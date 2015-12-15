@@ -3071,7 +3071,7 @@ void pkcs7_sign(common_info_st * cinfo, unsigned embed)
 	unsigned flags = 0;
 	gnutls_x509_crt_t signer;
 
-	if (HAVE_OPT(P7_TIME))
+	if (ENABLED_OPT(P7_TIME))
 		flags |= GNUTLS_PKCS7_INCLUDE_TIME;
 
 	if (ENABLED_OPT(P7_INCLUDE_CERT))

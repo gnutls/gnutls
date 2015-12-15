@@ -335,6 +335,8 @@ flag = {
 
 flag = {
     name      = p7-time;
+    disable   = "no";
+    disabled;
     descrip   = "Will include a timestamp in the PKCS #7 structure";
     doc       = "This option will include a timestamp in the generated signature";
 };
