@@ -1124,11 +1124,32 @@ int gnutls_pkcs7_verify(gnutls_pkcs7_t pkcs7,
 	return ret;
 }
 
+static void disable_opt_fields(gnutls_pkcs7_t pkcs7)
+{
+	int result;
+	int count;
+
+	/* disable the optional fields */
+	result = asn1_number_of_elements(pkcs7->signed_data, "crls", &count);
+	if (result != ASN1_SUCCESS || count == 0) {
+		asn1_write_value(pkcs7->signed_data, "crls", NULL, 0);
+	}
+
+	result = asn1_number_of_elements(pkcs7->signed_data, "certificates", &count);
+	if (result != ASN1_SUCCESS || count == 0) {
+		asn1_write_value(pkcs7->signed_data, "certificates", NULL, 0);
+	}
+
+	return;
+}
+
 static int reencode(gnutls_pkcs7_t pkcs7)
 {
 	int result;
 
 	if (pkcs7->signed_data != ASN1_TYPE_EMPTY) {
+		disable_opt_fields(pkcs7);
+
 		/* Replace the old content with the new
 		 */
 		result =
@@ -2024,6 +2045,8 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 		gnutls_assert();
 		goto cleanup;
 	}
+
+	disable_opt_fields(pkcs7);
 
 	/* write the signature algorithm */
 	pk = gnutls_x509_crt_get_pk_algorithm(signer, NULL);
