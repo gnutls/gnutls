@@ -178,6 +178,13 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
+${VALGRIND} "${CERTTOOL}" --p7-info --infile "${OUTFILE}" >"${OUTFILE2}"
+grep '1.2.840.113549.1.9.3: 06092a864886f70d010701' ${OUTFILE2} >/dev/null 2>&1
+if test $? != 0;then
+	echo "Content-Type was not set in attributes"
+	exit 1
+fi
+
 ${VALGRIND} "${CERTTOOL}" --p7-info <"${OUTFILE}"|grep "Signing time:" "${OUTFILE}" >/dev/null 2>&1
 if test "${rc}" != "0"; then
 	echo "${FILE}: PKCS7 struct signing with time failed. No time was found."
