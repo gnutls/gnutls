@@ -2051,7 +2051,12 @@ int gnutls_pkcs7_sign(gnutls_pkcs7_t pkcs7,
 	/* write the signature algorithm */
 	pk = gnutls_x509_crt_get_pk_algorithm(signer, NULL);
 
-	ret = _gnutls_x509_write_sig_params(pkcs7->signed_data, "signerInfos.?LAST.signatureAlgorithm", pk, dig);
+	/* RFC5652 is silent on what the values would be and initially I assumed that
+	 * typical signature algorithms should be set. However RFC2315 (PKCS#7) mentions
+	 * that a generic RSA OID should be used. We switch to this "unexpected" value
+	 * because some implementations cannot cope with the "expected" signature values.
+	 */
+	ret = _gnutls_x509_write_sig_params(pkcs7->signed_data, "signerInfos.?LAST.signatureAlgorithm", pk, dig, 1);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
