@@ -175,7 +175,19 @@ void doit(void)
 		exit(1);
 	}
 
-	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 1, &oid, &data, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 1, &oid, &data, 0);
+	if (ret < 0) {
+		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (strcmp(oid, "1.2.840.113549.1.9.3") != 0) {
+		fail("error in %d: %s\n", __LINE__, oid);
+		exit(1);
+	}
+	gnutls_free(data.data);
+
+	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 2, &oid, &data, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
@@ -187,7 +199,7 @@ void doit(void)
 	}
 	gnutls_free(data.data);
 
-	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 2, &oid, &data, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
+	ret = gnutls_pkcs7_get_attr(info.signed_attrs, 3, &oid, &data, GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING);
 	if (ret < 0) {
 		fail("error in %d: %s\n", __LINE__, gnutls_strerror(ret));
 		exit(1);
