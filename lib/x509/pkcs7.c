@@ -1824,6 +1824,7 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 	char name[256];
 	int result, ret;
 	uint8_t digest[MAX_HASH_SIZE];
+	gnutls_datum_t tmp = {NULL, 0};
 	unsigned digest_size;
 	unsigned already_set = 0;
 
@@ -1869,6 +1870,7 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 		already_set = 1;
 	}
 
+
 	ret = add_attrs(c2, root, other_attrs, already_set);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1876,9 +1878,51 @@ static int write_attributes(ASN1_TYPE c2, const char *root, const gnutls_datum_t
 	}
 
 	if (already_set != 0 || other_attrs != NULL) {
+		/* Add content type */
+		result = asn1_write_value(c2, root, "NEW", 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			return ret;
+		}
+
+		snprintf(name, sizeof(name), "%s.?LAST.type", root);
+		result =
+		    asn1_write_value(c2, name, ATTR_CONTENT_TYPE, 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			return ret;
+		}
+
+		snprintf(name, sizeof(name), "%s.?LAST.values", root);
+		result = asn1_write_value(c2, name, "NEW", 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			return ret;
+		}
+
+		ret = _gnutls_x509_get_raw_field(c2, "encapContentInfo.eContentType", &tmp);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		snprintf(name, sizeof(name), "%s.?LAST.values.?1", root);
+		result = asn1_write_value(c2, name, tmp.data, tmp.size);
+		gnutls_free(tmp.data);
+
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(result);
+			return ret;
+		}
+
+		already_set = 1;
+
 		/* If we add any attribute we should add them all */
 		/* Add hash */
-
 		digest_size = _gnutls_hash_get_algo_len(me);
 		ret = gnutls_hash_fast(me->id, data->data, data->size, digest);
 		if (ret < 0) {
