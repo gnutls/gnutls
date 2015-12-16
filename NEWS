@@ -15,6 +15,9 @@ See the end for copying conditions.
 ** libgnutls: The CHACHA20-POLY1305 ciphersuites were updated to conform to
    draft-ietf-tls-chacha20-poly1305-02.
 
+** libgnutls: Several fixes in PKCS #7 signing which improve compatibility
+   with the MacOSX tools. Reported by sskaje (#59).
+
 ** certtool: Added the --p7-include-cert option and made it the default.
 
 ** API and ABI modifications:
