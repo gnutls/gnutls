@@ -172,11 +172,14 @@ _gnutls_x509_crq_get_mpis(gnutls_x509_crq_t cert,
 /*
  * This function writes and encodes the parameters for DSS or RSA keys.
  * This is the "signatureAlgorithm" fields.
+ *
+ * If @legacy is non-zero then the legacy value for PKCS#7 signatures
+ * will be written for RSA signatures.
  */
 int
 _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
 			      gnutls_pk_algorithm_t pk_algorithm,
-			      gnutls_digest_algorithm_t dig)
+			      gnutls_digest_algorithm_t dig, unsigned legacy)
 {
 	int result;
 	char name[128];
@@ -185,7 +188,10 @@ _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
 	_gnutls_str_cpy(name, sizeof(name), dst_name);
 	_gnutls_str_cat(name, sizeof(name), ".algorithm");
 
-	oid = gnutls_sign_get_oid(gnutls_pk_to_sign(pk_algorithm, dig));
+	if (legacy && pk_algorithm == GNUTLS_PK_RSA)
+		oid = PK_PKIX1_RSA_OID;
+	else
+		oid = gnutls_sign_get_oid(gnutls_pk_to_sign(pk_algorithm, dig));
 	if (oid == NULL) {
 		gnutls_assert();
 		_gnutls_debug_log

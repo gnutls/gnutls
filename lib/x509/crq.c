@@ -2574,7 +2574,7 @@ gnutls_x509_crq_privkey_sign(gnutls_x509_crq_t crq, gnutls_privkey_t key,
 	result =
 	    _gnutls_x509_write_sig_params(crq->crq, "signatureAlgorithm",
 					  gnutls_privkey_get_pk_algorithm
-					  (key, NULL), dig);
+					  (key, NULL), dig, 0);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

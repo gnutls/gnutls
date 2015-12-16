@@ -119,7 +119,7 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 
 	result = _gnutls_x509_write_sig_params(src, name,
 					       gnutls_privkey_get_pk_algorithm
-					       (issuer_key, NULL), dig);
+					       (issuer_key, NULL), dig, 0);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -162,7 +162,7 @@ _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 
 	result = _gnutls_x509_write_sig_params(src, "signatureAlgorithm",
 					       gnutls_privkey_get_pk_algorithm
-					       (issuer_key, NULL), dig);
+					       (issuer_key, NULL), dig, 0);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

@@ -320,7 +320,7 @@ int _gnutls_x509_write_uint32(ASN1_TYPE node, const char *value,
 
 int _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
 				  gnutls_pk_algorithm_t pk_algorithm,
-				  gnutls_digest_algorithm_t);
+				  gnutls_digest_algorithm_t, unsigned legacy);
 
 /* pkcs12.h */
 #include <gnutls/pkcs12.h>
