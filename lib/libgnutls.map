@@ -1071,6 +1071,7 @@ GNUTLS_3_4
 	gnutls_certificate_set_flags;
 	gnutls_decode_ber_digest_info;
 	gnutls_encode_ber_digest_info;
+	gnutls_pkcs7_get_embedded_data;
  local:
 	*;
 };
