@@ -131,6 +131,22 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
+#check extraction of embedded data in signature
+FILE="signing-verify-data"
+${VALGRIND} "${CERTTOOL}" --p7-verify --p7-show-data --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --outfile "${OUTFILE2}" <"${OUTFILE}"
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "${FILE}: PKCS7 struct signing failed verification with data"
+	exit ${rc}
+fi
+
+cmp "${OUTFILE2}" "${srcdir}/pkcs7-detached.txt"
+rc=$?
+if test "${rc}" != "0"; then
+	echo "${FILE}: PKCS7 data detaching failed"
+	exit ${rc}
+fi
 
 FILE="signing-detached"
 ${VALGRIND} "${CERTTOOL}" --p7-detached-sign --load-privkey  "${srcdir}/../../doc/credentials/x509/key-rsa.pem" --load-certificate "${srcdir}/../../doc/credentials/x509/cert-rsa.pem" --infile "${srcdir}/pkcs7-detached.txt" >"${OUTFILE}"
