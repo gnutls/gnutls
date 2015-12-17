@@ -64,7 +64,7 @@ void generate_pkcs12(common_info_st *);
 void generate_pkcs8(common_info_st *);
 static void verify_chain(void);
 void verify_crl(common_info_st * cinfo);
-void verify_pkcs7(common_info_st * cinfo, const char *purpose);
+void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_data);
 void pubkey_info(gnutls_x509_crt_t crt, common_info_st *);
 void pgp_privkey_info(void);
 void pgp_ring_info(void);
@@ -1367,7 +1367,7 @@ static void cmd_parser(int argc, char **argv)
 	else if (HAVE_OPT(P7_DETACHED_SIGN))
 		pkcs7_sign(&cinfo, 0);
 	else if (HAVE_OPT(P7_VERIFY))
-		verify_pkcs7(&cinfo, OPT_ARG(VERIFY_PURPOSE));
+		verify_pkcs7(&cinfo, OPT_ARG(VERIFY_PURPOSE), ENABLED_OPT(P7_SHOW_DATA));
 	else if (HAVE_OPT(P8_INFO))
 		pkcs8_info();
 	else if (HAVE_OPT(SMIME_TO_P7))
@@ -2977,12 +2977,14 @@ static void print_pkcs7_sig_info(gnutls_pkcs7_signature_info_st *info, common_in
 	fprintf(outfile, "\n");
 }
 
-void verify_pkcs7(common_info_st * cinfo, const char *purpose)
+void verify_pkcs7(common_info_st * cinfo, const char *purpose, unsigned display_data)
 {
 	gnutls_pkcs7_t pkcs7;
 	int ret, ecode;
 	size_t size;
 	gnutls_datum_t data, detached = {NULL,0};
+	gnutls_datum_t tmp = {NULL,0};
+	gnutls_datum_t embdata = {NULL,0};
 	int i;
 	gnutls_pkcs7_signature_info_st info;
 	gnutls_x509_trust_list_t tl = NULL;
@@ -3038,10 +3040,42 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 		ret = gnutls_pkcs7_get_signature_info(pkcs7, i, &info);
 		if (ret < 0)
 			break;
-		if (i==0)
-			fprintf(outfile, "Signers:\n");
 
-		print_pkcs7_sig_info(&info, cinfo);
+		if (!display_data) {
+			if (i==0)
+				fprintf(outfile, "Signers:\n");
+			print_pkcs7_sig_info(&info, cinfo);
+		} else {
+			if (!detached.data) {
+				ret = gnutls_pkcs7_get_embedded_data(pkcs7, i, &tmp);
+				if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE || i == 0) {
+					if (ret < 0) {
+						fprintf(stderr, "error getting embedded data: %s\n", gnutls_strerror(ret));
+						exit(1);
+					}
+
+					/* check if the embedded data in subsequent calls remain the same */
+					if (i != 0) {
+						if (tmp.size != embdata.size || memcmp(embdata.data, tmp.data, tmp.size) != 0) {
+							fprintf(stderr, "error: the embedded data differ in signed data with index %d\n", i);
+							exit(1);
+						}
+					}
+
+					if (i == 0) {
+						fwrite(tmp.data, 1, tmp.size, outfile);
+						embdata.data = tmp.data;
+						embdata.size = tmp.size;
+						tmp.data = NULL;
+					} else {
+						gnutls_free(tmp.data);
+					}
+				}
+			} else {
+				if (i==0)
+					fwrite(detached.data, 1, detached.size, outfile);
+			}
+		}
 
 		gnutls_pkcs7_signature_info_deinit(&info);
 
@@ -3064,6 +3098,8 @@ void verify_pkcs7(common_info_st * cinfo, const char *purpose)
 		gnutls_x509_crt_deinit(signer);
 	else
 		gnutls_x509_trust_list_deinit(tl, 1);
+	free(detached.data);
+	gnutls_free(embdata.data);
 	exit(ecode);
 }
 
