@@ -18,10 +18,10 @@ See the end for copying conditions.
 ** libgnutls: Several fixes in PKCS #7 signing which improve compatibility
    with the MacOSX tools. Reported by sskaje (#59).
 
-** certtool: Added the --p7-include-cert option and made it the default.
+** certtool: Added the --p7-include-cert and --p7-show-data options.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs7_get_embedded_data: Added
 
 
 * Version 3.4.7 (released 2015-11-22)
