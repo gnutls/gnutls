@@ -399,6 +399,7 @@ lib/x509/x509-api.texi
 libopts/libopts.la
 libtool
 m4/codeset.m4
+m4/extern-inline.m4
 m4/fcntl-o.m4
 m4/gettext.m4
 m4/glibc2.m4
