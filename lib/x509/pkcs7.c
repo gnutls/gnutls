@@ -841,6 +841,66 @@ static int figure_pkcs7_sigdata(gnutls_pkcs7_t pkcs7, const char *root,
 }
 
 /**
+ * gnutls_pkcs7_get_embedded_data:
+ * @pkcs7: should contain a gnutls_pkcs7_t type
+ * @idx: the index of the signature info to get the data from
+ * @data: will hold the embedded data in the provided structure
+ *
+ * This function will return the data embedded in the signature of
+ * the PKCS7 structure. If no data are available then
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ * Note, that since a PKCS#7 structure may contain embedded data
+ * for each attached signature, this function accepts and index which
+ * corresponds to the signature index to get the data from.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. 
+ *
+ * Since: 3.4.8
+ **/
+int
+gnutls_pkcs7_get_embedded_data(gnutls_pkcs7_t pkcs7, unsigned idx, gnutls_datum_t *data)
+{
+	int count, ret;
+	gnutls_datum_t tmpdata = {NULL, 0};
+	gnutls_pkcs7_signature_info_st info;
+	char root[128];
+
+	memset(&info, 0, sizeof(info));
+
+	if (pkcs7 == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	ret = asn1_number_of_elements(pkcs7->signed_data, "signerInfos", &count);
+	if (ret != ASN1_SUCCESS || idx+1 > (unsigned)count) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	ret = gnutls_pkcs7_get_signature_info(pkcs7, idx, &info);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	snprintf(root, sizeof(root), "signerInfos.?%u", idx + 1);
+	ret = figure_pkcs7_sigdata(pkcs7, root, NULL, info.algo, data);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = 0;
+
+ cleanup:
+	gnutls_free(tmpdata.data);
+	gnutls_pkcs7_signature_info_deinit(&info);
+
+	return ret;
+}
+
+/**
  * gnutls_pkcs7_verify_direct:
  * @pkcs7: should contain a #gnutls_pkcs7_t type
  * @signer: the certificate believed to have signed the structure
