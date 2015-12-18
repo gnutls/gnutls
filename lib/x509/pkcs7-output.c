@@ -192,6 +192,7 @@ int gnutls_pkcs7_print(gnutls_pkcs7_t pkcs7,
 			break;
 
 		print_pkcs7_info(&info, &str, format);
+		gnutls_pkcs7_signature_info_deinit(&info);
 	}
 
 	if (format == GNUTLS_CRT_PRINT_FULL) {
