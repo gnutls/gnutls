@@ -25,6 +25,8 @@ See the end for copying conditions.
    applications which do not check user credentials on rehandshakes from
    attacks related to unsafe renegotiation.
 
+** libgnutls: Replaced writev() system call with sendmsg().
+
 ** certtool: Added the --provable option.
 
 ** API and ABI modifications:

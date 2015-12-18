@@ -258,7 +258,7 @@ operation.
 @item getrusage
 @item send
 @item recv
-@item writev
+@item sendmsg
 @item read (to read from /dev/urandom)
 @item getrandom (this is Linux-kernel specific)
 @item select
