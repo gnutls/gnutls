@@ -38,6 +38,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -102,6 +103,7 @@ static void tls_log_func(int level, const char *str)
 
 int main(int argc, char **argv)
 {
+	signal(SIGPIPE, SIG_IGN);
 	cfg_init();
 	cmd_parser(argc, argv);
 
