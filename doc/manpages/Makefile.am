@@ -1116,7 +1116,9 @@ APIMANS += gnutls_x509_trust_list_verify_crt.3
 APIMANS += gnutls_x509_trust_list_verify_crt2.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3
 
+if ENABLE_DOC
 dist_man_MANS += $(APIMANS)
+endif
 
 $(APIMANS): stamp_mans
 

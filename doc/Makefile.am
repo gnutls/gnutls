@@ -24,7 +24,7 @@ EXTRA_DIST = TODO certtool.cfg gnutls.pdf gnutls.html	\
 	gnutls-guile.pdf gnutls-guile.html stamp_enums stamp_functions \
 	doc.mk
 
-SUBDIRS = examples cyclo scripts manpages credentials latex
+SUBDIRS = examples cyclo scripts credentials latex
 if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif

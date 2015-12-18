@@ -51,6 +51,19 @@ AC_ARG_ENABLE(doc,
     enable_doc=$enableval, enable_doc=yes)
 AM_CONDITIONAL(ENABLE_DOC, test "$enable_doc" != "no")
 
+AC_ARG_ENABLE(manpages,
+  AS_HELP_STRING([--enable-manpages], [install manpages even if disable-doc is given]),
+    enable_manpages=$enableval,enable_manpages=auto)
+AM_CONDITIONAL(ENABLE_MANPAGES, test "$enable_manpages" != "no")
+
+if test "${enable_manpages}" = "auto";then
+  if test "$enable_doc" != "no";then
+    enable_manpages=yes
+  else
+    enable_manpages=no
+  fi
+fi
+
 AC_ARG_ENABLE(tools,
   AS_HELP_STRING([--disable-tools], [don't compile any tools]),
     enable_tools=$enableval, enable_tools=yes)
@@ -935,6 +948,7 @@ AC_MSG_NOTICE([summary of build options:
   Local libopts:        ${included_libopts}
   Local libtasn1:       ${included_libtasn1}
   Use nettle-mini:      ${mini_nettle}
+  Documentation:        ${enable_doc} (manpages: ${enable_manpages})
 ])
 
 AC_MSG_NOTICE([External hardware support:

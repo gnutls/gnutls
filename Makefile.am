@@ -42,6 +42,10 @@ if HAVE_GUILE
 SUBDIRS += guile
 endif
 
+if ENABLE_MANPAGES
+SUBDIRS += doc/manpages
+endif
+
 if ENABLE_DOC
 SUBDIRS += doc
 endif

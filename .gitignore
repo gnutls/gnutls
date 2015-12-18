@@ -135,6 +135,7 @@ doc/manpages/ocsptool.1
 doc/manpages/p11tool.1
 doc/manpages/psktool.1
 doc/manpages/srptool.1
+doc/manpages/tpmtool.1
 doc/ocsp-api.texi
 doc/pgp-api.texi
 doc/pkcs11-api.texi
