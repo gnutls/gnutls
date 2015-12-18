@@ -1387,7 +1387,8 @@ static void cmd_parser(int argc, char **argv)
 	else
 		USAGE(1);
 
-	fclose(outfile);
+	if (outfile != stdout)
+		fclose(outfile);
 
 #ifdef ENABLE_PKCS11
 	gnutls_pkcs11_deinit();
