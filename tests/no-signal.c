@@ -35,17 +35,26 @@ int main()
 
 #else
 
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/dtls.h>
-#include <signal.h>
+# include <sys/types.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <gnutls/gnutls.h>
+# include <gnutls/dtls.h>
+# include <signal.h>
 
-#include "utils.h"
+# ifndef MSG_NOSIGNAL
+
+int main()
+{
+	exit(77);
+}
+
+# else
+
+# include "utils.h"
 
 static
 void sigpipe(int sig)
@@ -233,4 +242,5 @@ void doit(void)
 	start();
 }
 
+# endif /* MSG_NOSIGNAL */
 #endif				/* _WIN32 */
