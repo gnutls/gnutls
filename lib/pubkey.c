@@ -227,6 +227,9 @@ gnutls_pubkey_import_x509_crq(gnutls_pubkey_t key, gnutls_x509_crq_t crq,
  * Imports the public key from a private.  This function will import
  * the given public key to the abstract #gnutls_pubkey_t type.
  *
+ * Note that in certain keys this operation may not be possible, e.g.,
+ * in other than RSA PKCS#11 keys.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
