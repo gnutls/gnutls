@@ -129,8 +129,13 @@ ssize_t
 system_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec,
 	      int iovec_cnt)
 {
-	return writev(GNUTLS_POINTER_TO_INT(ptr), (struct iovec *) iovec,
-		      iovec_cnt);
+	struct msghdr hdr;
+
+	memset(&hdr, 0, sizeof(hdr));
+	hdr.msg_iov = (struct iovec *)iovec;
+	hdr.msg_iovlen = iovec_cnt;
+
+	return sendmsg(GNUTLS_POINTER_TO_INT(ptr), &hdr, 0);
 }
 #endif
 

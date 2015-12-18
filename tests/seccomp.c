@@ -67,9 +67,6 @@ int disable_system_calls(void)
 	ADD_SYSCALL(sendto, 0);
 	ADD_SYSCALL(recvfrom, 0);
 
-	/* writev() is used explicitly */
-	ADD_SYSCALL(writev, 0);
-
 	/* to read from /dev/urandom */
 	ADD_SYSCALL(read, 0);
 	ADD_SYSCALL(getrandom, 0);
