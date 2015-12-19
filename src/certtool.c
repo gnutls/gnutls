@@ -38,7 +38,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <signal.h>
+#ifndef _WIN32
+# include <signal.h>
+#endif
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -103,7 +105,9 @@ static void tls_log_func(int level, const char *str)
 
 int main(int argc, char **argv)
 {
+#ifndef _WIN32
 	signal(SIGPIPE, SIG_IGN);
+#endif
 	cfg_init();
 	cmd_parser(argc, argv);
 
