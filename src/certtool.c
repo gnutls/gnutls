@@ -3990,6 +3990,7 @@ gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 				gnutls_strerror(ret));
 			exit(1);
 		}
+		gnutls_x509_crt_deinit(crt);
 	} else if (crq != NULL) {
 		ret = gnutls_pubkey_import_x509_crq(pubkey, crq, 0);
 		if (ret < 0) {
@@ -3997,6 +3998,7 @@ gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 				gnutls_strerror(ret));
 			exit(1);
 		}
+		gnutls_x509_crq_deinit(crq);
 	} else {
 		privkey = load_private_key(0, cinfo);
 
@@ -4010,6 +4012,7 @@ gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 					gnutls_strerror(ret));
 				exit(1);
 			}
+			gnutls_privkey_deinit(privkey);
 		} else {
 			gnutls_pubkey_deinit(pubkey);
 			pubkey = load_pubkey(0, cinfo);
@@ -4055,6 +4058,7 @@ gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 						gnutls_strerror(ret));
 						exit(1);
 					}
+					gnutls_x509_crt_deinit(crt);
 				} else {
 					ret = gnutls_pubkey_import(pubkey, &pem, incert_format);
 					if (ret < 0) {
@@ -4064,6 +4068,7 @@ gnutls_pubkey_t find_pubkey(gnutls_x509_crt_t crt, common_info_st * cinfo)
 						exit(1);
 					}
 				}
+				free(pem.data);
 			}
 
 		}
