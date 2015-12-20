@@ -3867,6 +3867,7 @@ void pkcs8_info(void)
 	}
 
 	pkcs8_info_int(&data, incert_format, 0, outfile, "");
+	free(data.data);
 }
 
 void pkcs7_info(common_info_st *cinfo)
