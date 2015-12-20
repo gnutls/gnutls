@@ -24,6 +24,7 @@
 #include "gnutls_int.h"
 #include "auth.h"
 #include "errors.h"
+#include "extensions.h"
 #include <auth/cert.h>
 #include "dh.h"
 #include "num.h"
@@ -174,6 +175,52 @@ check_ocsp_response(gnutls_session_t session, gnutls_x509_crt_t cert,
 	} \
 	gnutls_free( peer_certificate_list)
 
+#ifdef ENABLE_OCSP
+static int
+_gnutls_ocsp_verify_mandatory_stapling(gnutls_session_t session,
+				       gnutls_x509_crt_t cert,
+				       unsigned int * ocsp_status)
+{
+	gnutls_x509_tlsfeatures_t tlsfeatures;
+	int i, ret;
+	unsigned feature;
+
+	/* RFC 7633: If cert has TLS feature GNUTLS_EXTENSION_STATUS_REQUEST, stapling is mandatory.
+	 *
+	 * At this point, we know that we did not get the certificate status.
+	 *
+	 * To proceed, first check whether we have requested the certificate status
+	 */
+	if (_gnutls_extension_list_check(session, GNUTLS_EXTENSION_STATUS_REQUEST) < 0) {
+		return 0;
+	}
+
+	/* We have requested the status, now check whether the certificate mandates a response */
+	if (gnutls_x509_crt_get_tlsfeatures(cert, &tlsfeatures) == 0) {
+		for (i = 0;; ++i) {
+			ret = gnutls_x509_tlsfeatures_get(tlsfeatures, i, &feature);
+			if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+				break;
+			}
+
+			if (ret < 0) {
+				gnutls_assert();
+				gnutls_x509_tlsfeatures_deinit(tlsfeatures);
+				return ret;
+			}
+			if (feature == GNUTLS_EXTENSION_STATUS_REQUEST) {
+				/* We sent a status request, the certificate mandates a reply, but we did not get any. */
+				*ocsp_status |= GNUTLS_CERT_MISSING_OCSP_STATUS;
+				break;
+			}
+		}
+		gnutls_x509_tlsfeatures_deinit(tlsfeatures);
+	}
+
+	return 0;
+}
+#endif
+
 /*-
  * _gnutls_x509_cert_verify_peers - return the peer's certificate status
  * @session: is a gnutls session
@@ -264,8 +311,16 @@ _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 		goto skip_ocsp;
 
 	ret = gnutls_ocsp_status_request_get(session, &resp);
-	if (ret < 0)
+	if (ret < 0) {
+		ret = _gnutls_ocsp_verify_mandatory_stapling(session, peer_certificate_list[0], &ocsp_status);
+		if (ret < 0) {
+			gnutls_assert();
+			CLEAR_CERTS;
+			return ret;
+		}
+
 		goto skip_ocsp;
+	}
 
 	if (peer_certificate_list_size > 1) {
 		issuer = peer_certificate_list[1];

@@ -160,7 +160,7 @@ const char *gnutls_ext_get_name(unsigned int ext)
 /* Checks if the extension we just received is one of the 
  * requested ones. Otherwise it's a fatal error.
  */
-static int
+int
 _gnutls_extension_list_check(gnutls_session_t session, uint16_t type)
 {
 	int i;
