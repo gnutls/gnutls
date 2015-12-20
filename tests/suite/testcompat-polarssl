@@ -47,4 +47,10 @@ if test $? = 0; then
 	exit 77
 fi
 
-datefudge "2012-09-2" "${srcdir}/testcompat-main-polarssl"
+timeout 3600 datefudge "2012-09-2" "${srcdir}/testcompat-main-polarssl"
+ret=$?
+if test $ret = 124;then
+	exit 77
+fi
+
+exit $ret
