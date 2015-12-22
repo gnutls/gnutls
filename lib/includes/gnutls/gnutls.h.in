@@ -89,8 +89,8 @@ extern "C" {
 
 /**
  * gnutls_cipher_algorithm_t:
- * @GNUTLS_CIPHER_UNKNOWN: Unknown algorithm.
- * @GNUTLS_CIPHER_NULL: NULL algorithm.
+ * @GNUTLS_CIPHER_UNKNOWN: Value to identify an unknown/unsupported algorithm.
+ * @GNUTLS_CIPHER_NULL: The NULL (identity) encryption algorithm.
  * @GNUTLS_CIPHER_ARCFOUR_128: ARCFOUR stream cipher with 128-bit keys.
  * @GNUTLS_CIPHER_3DES_CBC: 3DES in CBC mode.
  * @GNUTLS_CIPHER_AES_128_CBC: AES in CBC mode with 128-bit keys.
@@ -113,15 +113,15 @@ extern "C" {
  * @GNUTLS_CIPHER_SALSA20_256: Salsa20 with 256-bit keys.
  * @GNUTLS_CIPHER_ESTREAM_SALSA20_256: Estream's Salsa20 variant with 256-bit keys.
  * @GNUTLS_CIPHER_CHACHA20_POLY1305: The Chacha20 cipher with the Poly1305 authenticator (AEAD).
- * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode.
- * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode.
- * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode.
- * @GNUTLS_CIPHER_BLOWFISH_PGP_CFB: Blowfish in CFB mode.
- * @GNUTLS_CIPHER_SAFER_SK128_PGP_CFB: Safer-SK in CFB mode with 128-bit keys.
- * @GNUTLS_CIPHER_AES128_PGP_CFB: AES in CFB mode with 128-bit keys.
- * @GNUTLS_CIPHER_AES192_PGP_CFB: AES in CFB mode with 192-bit keys.
- * @GNUTLS_CIPHER_AES256_PGP_CFB: AES in CFB mode with 256-bit keys.
- * @GNUTLS_CIPHER_TWOFISH_PGP_CFB: Twofish in CFB mode.
+ * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode (placeholder - unsupported).
+ * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode (placeholder - unsupported).
+ * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode (placeholder - unsupported).
+ * @GNUTLS_CIPHER_BLOWFISH_PGP_CFB: Blowfish in CFB mode (placeholder - unsupported).
+ * @GNUTLS_CIPHER_SAFER_SK128_PGP_CFB: Safer-SK in CFB mode with 128-bit keys (placeholder - unsupported).
+ * @GNUTLS_CIPHER_AES128_PGP_CFB: AES in CFB mode with 128-bit keys (placeholder - unsupported).
+ * @GNUTLS_CIPHER_AES192_PGP_CFB: AES in CFB mode with 192-bit keys (placeholder - unsupported).
+ * @GNUTLS_CIPHER_AES256_PGP_CFB: AES in CFB mode with 256-bit keys (placeholder - unsupported).
+ * @GNUTLS_CIPHER_TWOFISH_PGP_CFB: Twofish in CFB mode (placeholder - unsupported).
  *
  * Enumeration of different symmetric encryption algorithms.
  */
