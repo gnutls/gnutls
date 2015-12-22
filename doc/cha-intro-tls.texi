@@ -156,7 +156,7 @@ ARCFOUR-128 is a compatible algorithm with RSA's RC4 algorithm, which is conside
 secret. It is a fast cipher but considered weak today, and thus it is not enabled by default.
 
 @end multitable
-@caption{Supported ciphers.}
+@caption{Supported ciphers in TLS.}
 @end float
 
 
@@ -172,14 +172,17 @@ An HMAC based on the SHA1 cryptographic hash algorithm
 designed by NSA. Outputs 160 bits of data.
 
 @item MAC_@-SHA256 @tab
-An HMAC based on SHA256. Outputs 256 bits of data.
+An HMAC based on SHA2-256. Outputs 256 bits of data.
+
+@item MAC_@-SHA384 @tab
+An HMAC based on SHA2-384. Outputs 384 bits of data.
 
 @item MAC_@-AEAD @tab
 This indicates that an authenticated encryption algorithm, such as
 GCM, is in use.
 
 @end multitable
-@caption{Supported MAC algorithms.}
+@caption{Supported MAC algorithms in TLS.}
 @end float
 
 
