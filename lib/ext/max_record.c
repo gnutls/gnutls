@@ -78,6 +78,9 @@ _gnutls_max_record_recv_params(gnutls_session_t session,
 	extension_priv_data_t epriv;
 	int ret;
 
+	if (IS_DTLS(session))
+		return 0;
+
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
 			DECR_LEN(data_size, 1);
@@ -291,6 +294,9 @@ ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size)
 
 	if (session->security_parameters.entity == GNUTLS_SERVER)
 		return GNUTLS_E_INVALID_REQUEST;
+
+	if (IS_DTLS(session))
+		return 0;
 
 	new_size = _gnutls_mre_record2num(size);
 
