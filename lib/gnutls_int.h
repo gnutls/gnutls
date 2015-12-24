@@ -168,7 +168,7 @@ typedef enum record_flush_t {
  */
 #define MAX_RECORD_SEND_OVERHEAD(session) (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+((gnutls_compression_get(session)!=GNUTLS_COMP_NULL)?(EXTRA_COMP_SIZE):(0))+MAX_HASH_SIZE/*MAC*/)
 #define MAX_RECORD_SEND_SIZE(session) (IS_DTLS(session)? \
-	((size_t)gnutls_dtls_get_mtu(session)): \
+	(MIN((size_t)gnutls_dtls_get_mtu(session), (size_t)session->security_parameters.max_record_send_size+MAX_RECORD_SEND_OVERHEAD(session))): \
 	((size_t)session->security_parameters.max_record_send_size+MAX_RECORD_SEND_OVERHEAD(session)))
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
@@ -1087,9 +1087,9 @@ inline static size_t max_user_send_size(gnutls_session_t session,
 {
 	size_t max;
 
-	if (IS_DTLS(session))
-		max = gnutls_dtls_get_data_mtu(session);
-	else {
+	if (IS_DTLS(session)) {
+		max = MIN(gnutls_dtls_get_data_mtu(session), session->security_parameters.max_record_send_size);
+	} else {
 		max = session->security_parameters.max_record_send_size;
 	}
 

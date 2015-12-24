@@ -62,8 +62,13 @@ transmit_message(gnutls_session_t session,
 	uint8_t *data, *mtu_data;
 	int ret = 0;
 	unsigned int offset, frag_len, data_size;
-	const unsigned int mtu =
-	    gnutls_dtls_get_data_mtu(session) - DTLS_HANDSHAKE_HEADER_SIZE;
+	unsigned int mtu =
+	    gnutls_dtls_get_data_mtu(session);
+
+	if (session->security_parameters.max_record_recv_size < mtu)
+		mtu = session->security_parameters.max_record_recv_size;
+
+	mtu -= DTLS_HANDSHAKE_HEADER_SIZE;
 
 	if (bufel->type == GNUTLS_CHANGE_CIPHER_SPEC) {
 		_gnutls_dtls_log
