@@ -32,7 +32,7 @@ extern const char *side;
   HANDSHAKE_EXPECT(c,s,0,0)
 
 #define HANDSHAKE_DTLS_EXPECT(c, s, clierr, serverr) \
-  sret = cret = GNUTLS_E_LARGE_PACKET; \
+  sret = cret = GNUTLS_E_AGAIN; \
   do \
     { \
       if (cret == GNUTLS_E_LARGE_PACKET) \
@@ -248,6 +248,11 @@ server_push(gnutls_transport_ptr_t tr, const void *data, size_t len)
 #ifdef EAGAIN_DEBUG
 	fprintf(stderr, "eagain: pushed %d bytes to client (avail: %d)\n",
 		(int) len, (int) to_client_len);
+#endif
+
+
+#ifdef SERVER_PUSH_ADD
+	SERVER_PUSH_ADD
 #endif
 
 	return len;
