@@ -18,6 +18,9 @@ See the end for copying conditions.
 ** libgnutls: Several fixes in PKCS #7 signing which improve compatibility
    with the MacOSX tools. Reported by sskaje (#59).
 
+** libgnutls: The max-record extension not negotiated on DTLS. This resolves
+   issue with the max-record being negotiated but ignored.
+
 ** certtool: Added the --p7-include-cert and --p7-show-data options.
 
 ** API and ABI modifications:
