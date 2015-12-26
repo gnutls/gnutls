@@ -462,7 +462,7 @@ gnutls_srtp_set_profile(gnutls_session_t session,
  * @session: is a #gnutls_session_t type.
  * @profiles: is a string that contains the supported SRTP profiles,
  *   separated by colons.
- * @err_pos: In case of an error this will have the position in the string the error occured, may be NULL.
+ * @err_pos: In case of an error this will have the position in the string the error occurred, may be NULL.
  *
  * This function is to be used by both clients and servers, to declare
  * what SRTP profiles they support, to negotiate with the peer.
