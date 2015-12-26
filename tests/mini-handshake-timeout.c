@@ -114,7 +114,7 @@ static void client(int fd, int wait)
 			exit(1);
 		}
 		if (debug)
-			success("client: expected timeout occured\n");
+			success("client: expected timeout occurred\n");
 		return;
 	} else {
 		if (wait != 0) {

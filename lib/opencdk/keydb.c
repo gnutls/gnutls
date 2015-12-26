@@ -1338,7 +1338,7 @@ keydb_parse_allsigs(cdk_kbnode_t knode, cdk_keydb_hd_t hd, int check)
 					return CDK_Error_No_Key;
 				}
 			}
-			/* Revocation certifcates for user ID's */
+			/* Revocation certificates for user ID's */
 			else if (sig->sig_class == 0x30) {
 				if (sig->keyid[0] != keyid[0]
 				    || sig->keyid[1] != keyid[1])

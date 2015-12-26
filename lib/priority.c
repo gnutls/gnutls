@@ -1327,7 +1327,7 @@ void gnutls_priority_deinit(gnutls_priority_t priority_cache)
  * gnutls_priority_set_direct:
  * @session: is a #gnutls_session_t type.
  * @priorities: is a string describing priorities
- * @err_pos: In case of an error this will have the position in the string the error occured
+ * @err_pos: In case of an error this will have the position in the string the error occurred
  *
  * Sets the priorities to use on the ciphers, key exchange methods,
  * macs and compression methods.  This function avoids keeping a

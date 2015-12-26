@@ -402,7 +402,7 @@ gnutls_pkcs7_get_crt_raw(gnutls_pkcs7_t pkcs7,
  * gnutls_pkcs7_get_crt_count:
  * @pkcs7: should contain a #gnutls_pkcs7_t type
  *
- * This function will return the number of certifcates in the PKCS7
+ * This function will return the number of certificates in the PKCS7
  * or RFC2630 certificate set.
  *
  * Returns: On success, a positive number is returned, otherwise a
@@ -1613,7 +1613,7 @@ gnutls_pkcs7_get_crl_raw(gnutls_pkcs7_t pkcs7,
  * gnutls_pkcs7_get_crl_count:
  * @pkcs7: The pkcs7 type
  *
- * This function will return the number of certifcates in the PKCS7
+ * This function will return the number of certificates in the PKCS7
  * or RFC2630 crl set.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a

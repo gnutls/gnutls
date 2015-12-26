@@ -148,7 +148,7 @@ PATCHES
 
 Patches are welcome and encouraged. Patches can be submitted through the 
 bug tracking system or the mailing list.  When submitting patches, please 
-be sure to use sources from the git repository, and preferrably from the 
+be sure to use sources from the git repository, and preferably from the 
 master branch.  To create a patch for the project from a local git repository, 
 please use the following commands. 'gnutls' should be the local directory 
 of a previous git clone.

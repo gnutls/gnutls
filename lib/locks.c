@@ -39,7 +39,7 @@
  * With this function you are allowed to override the default mutex
  * locks used in some parts of gnutls and dependent libraries. This function
  * should be used if you have complete control of your program and libraries.
- * Do not call this function from a library, or preferrably from any application
+ * Do not call this function from a library, or preferably from any application
  * unless really needed to. GnuTLS will use the appropriate locks for the running
  * system.
  *
