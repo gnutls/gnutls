@@ -33,43 +33,7 @@
 #include <auth.h>
 #include <state.h>
 #include <datum.h>
-#include <extras/randomart.h>
 #include <algorithms.h>
-
-/**
- * gnutls_random_art:
- * @type: The type of the random art (for now only %GNUTLS_RANDOM_ART_OPENSSH is supported)
- * @key_type: The type of the key (RSA, DSA etc.)
- * @key_size: The size of the key in bits
- * @fpr: The fingerprint of the key
- * @fpr_size: The size of the fingerprint
- * @art: The returned random art
- *
- * This function will convert a given fingerprint to an "artistic"
- * image. The returned image is allocated using gnutls_malloc().
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
- *   an error code is returned.
- *
- **/
-int gnutls_random_art(gnutls_random_art_t type,
-		      const char *key_type, unsigned int key_size,
-		      void *fpr, size_t fpr_size, gnutls_datum_t * art)
-{
-	if (type != GNUTLS_RANDOM_ART_OPENSSH)
-		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-	art->data =
-	    (void *) _gnutls_key_fingerprint_randomart(fpr, fpr_size,
-						       key_type, key_size,
-						       NULL);
-	if (art->data == NULL)
-		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-	art->size = strlen((char *) art->data);
-
-	return 0;
-}
 
 /* ANON & DHE */
 
