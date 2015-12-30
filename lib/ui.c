@@ -20,10 +20,6 @@
  *
  */
 
-/* This file contains certificate authentication functions to be exported in the
- * API which did not fit elsewhere.
- */
-
 #include "gnutls_int.h"
 #include <auth/srp_kx.h>
 #include <auth/anon.h>
@@ -81,43 +77,4 @@ gnutls_fingerprint(gnutls_digest_algorithm_t algo,
 	return 0;
 }
 
-
-#ifdef ENABLE_OCSP
-/**
- * gnutls_ocsp_status_request_is_checked:
- * @session: is a gnutls session
- * @flags: should be zero or %GNUTLS_OCSP_SR_IS_AVAIL
- *
- * Check whether an OCSP status response was included in the handshake
- * and whether it was checked and valid (not too old or superseded). 
- * This is a helper function when needing to decide whether to perform an
- * OCSP validity check on the peer's certificate. Should be called after
- * any of gnutls_certificate_verify_peers*() are called.
- *
- * If the flag %GNUTLS_OCSP_SR_IS_AVAIL is specified, the return
- * value of the function indicates whether an OCSP status response have
- * been received (even if invalid).
- *
- * Returns: non zero if the response was valid, or a zero if it wasn't sent,
- * or sent and was invalid.
- **/
-int
-gnutls_ocsp_status_request_is_checked(gnutls_session_t session,
-				      unsigned int flags)
-{
-	int ret;
-	gnutls_datum_t data;
-
-	if (flags & GNUTLS_OCSP_SR_IS_AVAIL) {
-		ret = gnutls_ocsp_status_request_get(session, &data);
-		if (ret < 0)
-			return gnutls_assert_val(0);
-
-		if (data.data == NULL)
-			return gnutls_assert_val(0);
-		return 1;
-	}
-	return session->internals.ocsp_check_ok;
-}
-#endif
 
