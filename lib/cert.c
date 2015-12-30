@@ -985,3 +985,25 @@ gnutls_certificate_verification_status_print(unsigned int status,
 
 	return _gnutls_buffer_to_datum(&str, out, 1);
 }
+
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
+/**
+ * gnutls_certificate_set_dh_params:
+ * @res: is a gnutls_certificate_credentials_t type
+ * @dh_params: the Diffie-Hellman parameters.
+ *
+ * This function will set the Diffie-Hellman parameters for a
+ * certificate server to use. These parameters will be used in
+ * Ephemeral Diffie-Hellman cipher suites.  Note that only a pointer
+ * to the parameters are stored in the certificate handle, so you
+ * must not deallocate the parameters before the certificate is deallocated.
+ *
+ **/
+void
+gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
+				 gnutls_dh_params_t dh_params)
+{
+	res->dh_params = dh_params;
+}
+
+#endif				/* DH */
