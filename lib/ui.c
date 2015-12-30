@@ -34,7 +34,6 @@
 #include <state.h>
 #include <datum.h>
 #include <extras/randomart.h>
-#include <read-file.h>
 #include <algorithms.h>
 
 /**
@@ -729,41 +728,6 @@ gnutls_anon_set_params_function(gnutls_anon_server_credentials_t res,
 	res->params_func = func;
 }
 #endif
-
-/**
- * gnutls_load_file:
- * @filename: the name of the file to load
- * @data: Where the file will be stored
- *
- * This function will load a file into a datum. The data are
- * zero terminated but the terminating null is not included in length.
- * The returned data are allocated using gnutls_malloc().
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
- *   an error code is returned.
- *
- * Since 3.1.0
- **/
-int gnutls_load_file(const char *filename, gnutls_datum_t * data)
-{
-	size_t len;
-
-	data->data = (void *) read_binary_file(filename, &len);
-	if (data->data == NULL)
-		return GNUTLS_E_FILE_ERROR;
-
-	if (malloc != gnutls_malloc) {
-		void *tmp = gnutls_malloc(len);
-
-		memcpy(tmp, data->data, len);
-		free(data->data);
-		data->data = tmp;
-	}
-
-	data->size = len;
-
-	return 0;
-}
 
 #ifdef ENABLE_OCSP
 /**

@@ -31,7 +31,7 @@
 #include <auth/srp_passwd.h>
 #include <mpi.h>
 #include <num.h>
-#include <helper.h>
+#include <file.h>
 #include <algorithms.h>
 #include <random.h>
 
