@@ -82,24 +82,6 @@ gnutls_fingerprint(gnutls_digest_algorithm_t algo,
 }
 
 
-#ifdef ENABLE_ANON
-/**
- * gnutls_anon_set_params_function:
- * @res: is a gnutls_anon_server_credentials_t type
- * @func: is the function to be called
- *
- * This function will set a callback in order for the server to get
- * the Diffie-Hellman or RSA parameters for anonymous authentication.
- * The callback should return %GNUTLS_E_SUCCESS (0) on success.
- **/
-void
-gnutls_anon_set_params_function(gnutls_anon_server_credentials_t res,
-				gnutls_params_function * func)
-{
-	res->params_func = func;
-}
-#endif
-
 #ifdef ENABLE_OCSP
 /**
  * gnutls_ocsp_status_request_is_checked:
