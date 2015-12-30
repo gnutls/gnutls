@@ -70,7 +70,7 @@ COBJECTS = range.c record.c compress.c debug.c cipher.c			\
 	priority.c hash_int.c cipher_int.c session.c db.c x509_b64.c 	\
 	extensions.c auth.c sslv2_compat.c datum.c session_pack.c mpi.c \
 	pk.c cert.c global.c constate.c anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c	\
-	mem.c ui.c vasprintf.c vasprintf.h tls-sig.c ecc.c alert.c privkey_raw.c	\
+	mem.c fingerprint.c vasprintf.c vasprintf.h tls-sig.c ecc.c alert.c privkey_raw.c	\
 	system.c inet_ntop.c str.c state.c x509.c file.c supplemental.c	\
 	random.c crypto-api.c privkey.c pcert.c	pubkey.c locks.c dtls.c 	\
 	system_override.c crypto-backend.c verify-tofu.c pin.c tpm.c fips.c	\
