@@ -238,3 +238,130 @@ void gnutls_session_force_valid(gnutls_session_t session)
 {
 	session->internals.invalid_connection = 0;
 }
+
+#define DESC_SIZE 64
+
+/**
+ * gnutls_session_get_desc:
+ * @session: is a gnutls session
+ *
+ * This function returns a string describing the current session.
+ * The string is null terminated and allocated using gnutls_malloc().
+ *
+ * If initial negotiation is not complete when this function is called,
+ * %NULL will be returned.
+ *
+ * Returns: a description of the protocols and algorithms in the current session.
+ *
+ * Since: 3.1.10
+ **/
+char *gnutls_session_get_desc(gnutls_session_t session)
+{
+	gnutls_kx_algorithm_t kx;
+	const char *kx_str;
+	unsigned type;
+	char kx_name[32];
+	char proto_name[32];
+	const char *curve_name = NULL;
+	unsigned dh_bits = 0;
+	unsigned mac_id;
+	char *desc;
+
+	if (session->internals.initial_negotiation_completed == 0)
+		return NULL;
+
+	kx = session->security_parameters.kx_algorithm;
+
+	if (kx == GNUTLS_KX_ANON_ECDH || kx == GNUTLS_KX_ECDHE_PSK ||
+	    kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA) {
+		curve_name =
+		    gnutls_ecc_curve_get_name(gnutls_ecc_curve_get
+					      (session));
+#if defined(ENABLE_DHE) || defined(ENABLE_ANON)
+	} else if (kx == GNUTLS_KX_ANON_DH || kx == GNUTLS_KX_DHE_PSK
+		   || kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
+		dh_bits = gnutls_dh_get_prime_bits(session);
+#endif
+	}
+
+	kx_str = gnutls_kx_get_name(kx);
+	if (kx_str) {
+		if (curve_name != NULL)
+			snprintf(kx_name, sizeof(kx_name), "%s-%s",
+				 kx_str, curve_name);
+		else if (dh_bits != 0)
+			snprintf(kx_name, sizeof(kx_name), "%s-%u",
+				 kx_str, dh_bits);
+		else
+			snprintf(kx_name, sizeof(kx_name), "%s",
+				 kx_str);
+	} else {
+		strcpy(kx_name, "NULL");
+	}
+
+	type = gnutls_certificate_type_get(session);
+	if (type == GNUTLS_CRT_X509)
+		snprintf(proto_name, sizeof(proto_name), "%s",
+			 gnutls_protocol_get_name(get_num_version
+						  (session)));
+	else
+		snprintf(proto_name, sizeof(proto_name), "%s-%s",
+			 gnutls_protocol_get_name(get_num_version
+						  (session)),
+			 gnutls_certificate_type_get_name(type));
+
+	gnutls_protocol_get_name(get_num_version(session)),
+	    desc = gnutls_malloc(DESC_SIZE);
+	if (desc == NULL)
+		return NULL;
+
+	mac_id = gnutls_mac_get(session);
+	if (mac_id == GNUTLS_MAC_AEAD) { /* no need to print */
+		snprintf(desc, DESC_SIZE,
+			 "(%s)-(%s)-(%s)",
+			 proto_name,
+			 kx_name,
+			 gnutls_cipher_get_name(gnutls_cipher_get(session)));
+	} else {
+		snprintf(desc, DESC_SIZE,
+			 "(%s)-(%s)-(%s)-(%s)",
+			 proto_name,
+			 kx_name,
+			 gnutls_cipher_get_name(gnutls_cipher_get(session)),
+			 gnutls_mac_get_name(mac_id));
+	}
+
+	return desc;
+}
+
+/**
+ * gnutls_session_set_id:
+ * @session: is a #gnutls_session_t type.
+ * @sid: the session identifier
+ *
+ * This function sets the session ID to be used in a client hello.
+ * This is a function intended for exceptional uses. Do not use this
+ * function unless you are implementing a custom protocol.
+ *
+ * To set session resumption parameters use gnutls_session_set_data() instead.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
+int
+gnutls_session_set_id(gnutls_session_t session, const gnutls_datum_t * sid)
+{
+	if (session->security_parameters.entity == GNUTLS_SERVER ||
+	    sid->size > GNUTLS_MAX_SESSION_ID_SIZE)
+		return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+	memset(&session->internals.resumed_security_parameters, 0,
+	       sizeof(session->internals.resumed_security_parameters));
+
+	session->internals.resumed_security_parameters.session_id_size =
+	    sid->size;
+	memcpy(session->internals.resumed_security_parameters.session_id,
+	       sid->data, sid->size);
+
+	return 0;
+}
