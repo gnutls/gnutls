@@ -25,4 +25,4 @@ int _gnutls_server_restore_session(gnutls_session_t session,
 				   uint8_t * session_id,
 				   int session_id_size);
 
-#define PACKED_SESSION_MAGIC 0xfadebadd
+#define PACKED_SESSION_MAGIC ((0xfadebadd)+(GNUTLS_VERSION_NUMBER))
