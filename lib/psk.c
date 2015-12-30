@@ -394,4 +394,20 @@ gnutls_psk_set_server_params_function(gnutls_psk_server_credentials_t res,
 	res->params_func = func;
 }
 
+/**
+ * gnutls_psk_set_params_function:
+ * @res: is a gnutls_psk_server_credentials_t type
+ * @func: is the function to be called
+ *
+ * This function will set a callback in order for the server to get
+ * the Diffie-Hellman or RSA parameters for PSK authentication.  The
+ * callback should return %GNUTLS_E_SUCCESS (0) on success.
+ **/
+void
+gnutls_psk_set_params_function(gnutls_psk_server_credentials_t res,
+			       gnutls_params_function * func)
+{
+	res->params_func = func;
+}
+
 #endif				/* ENABLE_PSK */
