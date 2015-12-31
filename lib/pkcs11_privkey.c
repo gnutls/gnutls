@@ -655,6 +655,8 @@ gnutls_pkcs11_privkey_generate2(const char *url, gnutls_pk_algorithm_t pk,
 }
 #endif
 
+static const char def_rsa_pub_exp[3] = { 1,0,1 }; // 65537 = 0x10001
+
 /**
  * gnutls_pkcs11_privkey_generate3:
  * @url: a token URL
@@ -706,7 +708,6 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 	gnutls_pkcs11_obj_t obj = NULL;
 	gnutls_datum_t der = {NULL, 0};
 	ck_key_type_t key_type;
-	char pubEx[3] = { 1,0,1 }; // 65537 = 0x10001
 	uint8_t id[20];
 
 	PKCS11_CHECK_INIT;
@@ -809,8 +810,8 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 		a_val++;
 
 		a[a_val].type = CKA_PUBLIC_EXPONENT;
-		a[a_val].value = pubEx;
-		a[a_val].value_len = sizeof(pubEx);
+		a[a_val].value = (char*)def_rsa_pub_exp;
+		a[a_val].value_len = sizeof(def_rsa_pub_exp);
 		a_val++;
 
 		break;
