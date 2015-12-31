@@ -90,8 +90,8 @@ nodist_check_SCRIPTS = testsrn.sh chain.sh invalid-cert.sh \
 	testrandom.sh
 
 if ENABLE_PKCS11
-check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer pkcs11-is-known pkcs11-combo pkcs11-privkey pkcs11-pubkey-import
-nodist_check_SCRIPTS += testpkcs11.sh pkcs11-chainverify pkcs11-get-issuer crl-test pkcs11-is-known pkcs11-combo pkcs11-privkey pkcs11-pubkey-import
+check_PROGRAMS += pkcs11-chainverify pkcs11-get-issuer pkcs11-is-known pkcs11-combo pkcs11-privkey pkcs11-pubkey-import-rsa pkcs11-pubkey-import-ecdsa
+nodist_check_SCRIPTS += testpkcs11.sh pkcs11-chainverify pkcs11-get-issuer crl-test pkcs11-is-known pkcs11-combo pkcs11-privkey pkcs11-pubkey-import-ecdsa pkcs11-pubkey-import-rsa
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
