@@ -64,6 +64,7 @@ struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int flags;
 	struct p11_kit_uri *uinfo;
+	char *url;
 
 	struct pkcs11_session_info sinfo;
 	ck_object_handle_t ref;	/* the key in the session */
@@ -110,6 +111,7 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
 {
 	p11_kit_uri_free(key->uinfo);
+	gnutls_free(key->url);
 	if (key->sinfo.init != 0)
 		pkcs11_close_session(&key->sinfo);
 	gnutls_free(key);
@@ -379,6 +381,15 @@ gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 	PKCS11_CHECK_INIT;
 
 	memset(&pkey->sinfo, 0, sizeof(pkey->sinfo));
+
+	if (pkey->url) {
+		gnutls_free(pkey->url);
+		pkey->url = NULL;
+	}
+
+	pkey->url = gnutls_strdup(url);
+	if (pkey->url == NULL)
+		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
 	ret = pkcs11_url_to_info(url, &pkey->uinfo, flags|GNUTLS_PKCS11_OBJ_FLAG_EXPECT_PRIVKEY);
 	if (ret < 0) {
@@ -900,7 +911,7 @@ static int load_pubkey_obj(gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t pub)
 
 	gnutls_x509_crt_set_pin_function(crt, pkey->pin.cb, pkey->pin.data);
 
-	ret = gnutls_x509_crt_import_url(crt, pkey->url, pkey->flags);
+	ret = gnutls_x509_crt_import_pkcs11_url(crt, pkey->url, pkey->flags);
 	if (ret < 0) {
 		ret = iret;
 		goto cleanup;
