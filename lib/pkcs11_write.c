@@ -322,11 +322,6 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 		a_val++;
 	}
 
-	a[a_val].type = CKA_KEY_TYPE;
-	a[a_val].value = &type;
-	a[a_val].value_len = sizeof(type);
-	a_val++;
-
 	a[a_val].type = CKA_TOKEN;
 	a[a_val].value = (void *) &tval;
 	a[a_val].value_len = sizeof(tval);
@@ -496,6 +491,11 @@ gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 		ret = GNUTLS_E_INVALID_REQUEST;
 		goto cleanup;
 	}
+
+	a[a_val].type = CKA_KEY_TYPE;
+	a[a_val].value = &type;
+	a[a_val].value_len = sizeof(type);
+	a_val++;
 
 	rv = pkcs11_create_object(sinfo.module, sinfo.pks, a, a_val, &obj);
 	if (rv != CKR_OK) {
