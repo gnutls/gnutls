@@ -22,6 +22,32 @@
 
 #include <gnutls/gnutls.h>
 
+static char ecc_key[] =
+        "-----BEGIN EC PRIVATE KEY-----\n"
+	"MHgCAQEEIQDYIXKfQFhxL/5WqUL41NrzUw7Ky80985zhy5KPtwPX0qAKBggqhkjO\n"
+	"PQMBB6FEA0IABO4hyZG3JSK4evQm4wAKls6W5Z4FPvlJIZ7PRsmoy06Zz+c/KuR2\n"
+	"K1XaLclUxVwNnebzIPgPJcIz7XXZL9FMZMw=\n"
+	"-----END EC PRIVATE KEY-----\n";
+
+static char ecc_cert[] =
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBcDCCARWgAwIBAgIBADAKBggqhkjOPQQDAjATMREwDwYDVQQDEwhzZXJ2ZXIt\n"
+	"MDAgFw0xNTEyMzExMTA3MThaGA85OTk5MTIzMTIzNTk1OVowEzERMA8GA1UEAxMI\n"
+	"c2VydmVyLTAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATuIcmRtyUiuHr0JuMA\n"
+	"CpbOluWeBT75SSGez0bJqMtOmc/nPyrkditV2i3JVMVcDZ3m8yD4DyXCM+112S/R\n"
+	"TGTMo1gwVjAPBgNVHRMBAf8EBTADAQH/MBMGA1UdJQQMMAoGCCsGAQUFBwMJMA8G\n"
+	"A1UdDwEB/wQFAwMHBgAwHQYDVR0OBBYEFILbRHEo1GHks5cgZIyDtnX1UaUaMAoG\n"
+	"CCqGSM49BAMCA0kAMEYCIQCpqHCeb/orMzgKh6rl897blTpnUMqBAG2z6FMV3WgH\n"
+	"GQIhANOo0dRst4aBNXPCw1hSGNj7ObIB8jc214mcdInt/Dns\n"
+	"-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_ecc_cert =
+	{(void *) ecc_cert, sizeof(ecc_cert)};
+
+
+const gnutls_datum_t server_ecc_key =
+	{(void *) ecc_key, sizeof(ecc_key)};
+
 /* A cert-key pair */
 static char pem1_cert[] =
     "-----BEGIN CERTIFICATE-----\n"
