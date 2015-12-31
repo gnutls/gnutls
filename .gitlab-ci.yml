@@ -13,7 +13,7 @@ Compile minimal library:
   - tags
 Build and Check with asan:
   script:
-  - git submodule update --init && make autoreconf &&CFLAGS="-fsanitize=address -g
+  - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c &&CFLAGS="-fsanitize=address -g
     -O2" LDFLAGS="-static-libasan" ./configure --disable-doc --with-included-libtasn1 --disable-valgrind-tests --disable-non-suiteb-curves --disable-guile
     && make -j4 && make check -j4
   tags:
@@ -63,7 +63,7 @@ Build and Check for windows in separate build dir:
   - tags
 Build and Check with valgrind:
   script:
-  - git submodule update --init && make autoreconf && ./configure
+  - git submodule update --init && make autoreconf && rm -f tests/suite/mini-eagain2.c && ./configure
     --disable-non-suiteb-curves --with-included-libtasn1 --disable-doc && make -j4 && make check -j4
   tags:
   - x86-64
