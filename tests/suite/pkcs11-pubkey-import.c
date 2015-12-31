@@ -40,8 +40,6 @@
 /* Tests whether gnutls_pubkey_import_privkey works well for 
  * RSA keys under PKCS #11 */
 
-#define CONFIG_NAME "softhsm-privkey"
-#define CONFIG CONFIG_NAME".config"
 
 #include "../cert-common.h"
 
@@ -65,10 +63,9 @@ int pin_func(void* userdata, int attempt, const char* url, const char *label,
 	return -1;
 }
 
-void doit(void)
+void try(int rsa)
 {
 	char buf[128];
-	int exit_val = 0;
 	int ret, pk;
 	const char *lib, *bin;
 	gnutls_x509_crt_t crt;
@@ -76,6 +73,7 @@ void doit(void)
 	gnutls_datum_t tmp, sig;
 	gnutls_privkey_t pkey;
 	gnutls_pubkey_t pubkey;
+	gnutls_pubkey_t pubkey2;
 
 	bin = softhsm_bin();
 
@@ -112,7 +110,7 @@ void doit(void)
 	}
 
 	ret =
-	    gnutls_x509_crt_import(crt, &server_cert,
+	    gnutls_x509_crt_import(crt, rsa?&server_cert:&server_ecc_cert,
 				   GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr,
@@ -140,7 +138,7 @@ void doit(void)
 	}
 
 	ret =
-	    gnutls_x509_privkey_import(key, &server_key,
+	    gnutls_x509_privkey_import(key, rsa?&server_key:&server_ecc_key,
 				   GNUTLS_X509_FMT_PEM);
 	if (ret < 0) {
 		fprintf(stderr,
@@ -192,20 +190,27 @@ void doit(void)
 	assert(gnutls_pubkey_import_privkey(pubkey, pkey, 0, 0) == 0);
 
 	pk = gnutls_pubkey_get_pk_algorithm(pubkey, NULL);
-	/* check whether privkey and pubkey are operational */
+
+	/* check whether privkey and pubkey are operational
+	 * by signing and verifying */
 	assert(gnutls_privkey_sign_data(pkey, GNUTLS_DIG_SHA256, 0, &testdata, &sig) == 0);
+
+	/* verify against the raw pubkey */
+	assert(gnutls_pubkey_init(&pubkey2) == 0);
+	assert(gnutls_pubkey_import_x509_raw(pubkey2, rsa?&server_cert:&server_ecc_cert, GNUTLS_X509_FMT_PEM, 0) == 0);
+	assert(gnutls_pubkey_verify_data2(pubkey2, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256), 0, &testdata, &sig) == 0);
+
+	/* verify against the pubkey in PKCS #11 */
 	assert(gnutls_pubkey_verify_data2(pubkey, gnutls_pk_to_sign(pk, GNUTLS_DIG_SHA256), 0, &testdata, &sig) == 0);
 
 	gnutls_free(sig.data);
 
+	gnutls_pubkey_deinit(pubkey2);
 	gnutls_pubkey_deinit(pubkey);
 	gnutls_privkey_deinit(pkey);
 
 	gnutls_global_deinit();
 
-	if (debug)
-		printf("Exit status...%d\n", exit_val);
 	remove(CONFIG);
-
-	exit(exit_val);
 }
+
