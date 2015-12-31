@@ -991,6 +991,42 @@ gnutls_pkcs11_privkey_generate3(const char *url, gnutls_pk_algorithm_t pk,
 	return ret;
 }
 
+/* loads a the corresponding to the private key public key either from 
+ * a public key object or from a certificate.
+ */
+static int load_pubkey_obj(gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t pub)
+{
+	int ret, iret;
+	gnutls_x509_crt_t crt;
+
+	ret = gnutls_pubkey_import_url(pub, pkey->url, pkey->flags);
+	if (ret >= 0) {
+		return ret;
+	}
+	iret = ret;
+
+	/* else try certificate */
+	ret = gnutls_x509_crt_init(&crt);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	gnutls_x509_crt_set_pin_function(crt, pkey->pin.cb, pkey->pin.data);
+
+	ret = gnutls_x509_crt_import_url(crt, pkey->url, pkey->flags);
+	if (ret < 0) {
+		ret = iret;
+		goto cleanup;
+	}
+
+	ret = gnutls_pubkey_import_x509(pub, crt, 0);
+
+ cleanup:
+ 	gnutls_x509_crt_deinit(crt);
+	return ret;
+}
+
 int
 _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, unsigned flags)
 {
@@ -1022,23 +1058,28 @@ _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, 
 	obj->type = GNUTLS_PKCS11_OBJ_PUBKEY;
 	pk_to_genmech(obj->pk_algorithm, &key_type);
 
+	gnutls_pubkey_set_pin_function(pubkey, pkey->pin.cb, pkey->pin.data);
+
 	/* we can only read the public key from RSA keys */
 	if (key_type != CKK_RSA) {
-		gnutls_assert();
-		ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
-		goto cleanup;
-	}
+		/* try opening the public key object if it exists */
+		ret = load_pubkey_obj(pkey, pubkey);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	} else {
+		ret = pkcs11_read_pubkey(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, key_type, obj);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
-	ret = pkcs11_read_pubkey(pkey->sinfo.module, pkey->sinfo.pks, pkey->ref, key_type, obj);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	ret = gnutls_pubkey_import_pkcs11(pubkey, obj, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto cleanup;
+		ret = gnutls_pubkey_import_pkcs11(pubkey, obj, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
 	*pub = pubkey;
@@ -1046,7 +1087,7 @@ _pkcs11_privkey_get_pubkey (gnutls_pkcs11_privkey_t pkey, gnutls_pubkey_t *pub, 
 	pubkey = NULL;
 	ret = 0;
 
-      cleanup:
+ cleanup:
 	if (obj != NULL)
 		gnutls_pkcs11_obj_deinit(obj);
 	if (pubkey != NULL)
