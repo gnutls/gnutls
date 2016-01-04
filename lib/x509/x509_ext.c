@@ -1125,7 +1125,7 @@ int gnutls_x509_ext_export_key_usage(unsigned int usage, gnutls_datum_t * ext)
 	str[0] = usage & 0xff;
 	str[1] = usage >> 8;
 
-	result = asn1_write_value(c2, "", str, 9);
+	result = asn1_write_value(c2, "", str, 2);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
