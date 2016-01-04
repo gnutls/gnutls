@@ -16,6 +16,9 @@ See the end for copying conditions.
 ** libgnutls: Fixed issue when writing ECDSA private keys in PKCS #11
    tokens.
 
+** libgnutls: Fixed out-of-bounds read in gnutls_x509_ext_export_key_usage(),
+   report and patch by Tim Kosse.
+
 ** libgnutls: ARCFOUR-128 is disabled on the default priority strings. As it
    is known to be a broken cipher (theoretically and practically) it has to
    be explicitly enabled in configurations to be used.
