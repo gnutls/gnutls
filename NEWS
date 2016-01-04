@@ -16,6 +16,9 @@ See the end for copying conditions.
 ** libgnutls: Fixed issue when writing ECDSA private keys in PKCS #11
    tokens.
 
+** libgnutls: Fixed out-of-bounds read in gnutls_x509_ext_export_key_usage(),
+   report and patch by Tim Kosse.
+
 ** libgnutls: The CHACHA20-POLY1305 ciphersuites were updated to conform to
    draft-ietf-tls-chacha20-poly1305-02.
 
