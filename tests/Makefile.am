@@ -86,8 +86,6 @@ ctests = mini-record-2 simple gc set_pkcs12_cred certder certuniqueid	\
 	 long-session-id mini-x509-callbacks-intr \
 	 crlverify init_fds mini-rehandshake-2 sign-md5-rep global-init-override
 
-mini_dtls_pthread_LDADD = $(LDADD) -lpthread
-
 if ENABLE_OCSP
 ctests += ocsp
 endif
