@@ -880,13 +880,13 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 	uint8_t tmp[256];
 	size_t tmp_size;
 
-	hash =
-	    hash_pjw_bare(dn->data,
-			  dn->size);
-	hash %= list->size;
+	if (dn) {
+		hash =
+		    hash_pjw_bare(dn->data,
+				  dn->size);
+		hash %= list->size;
 
-	for (i = 0; i < list->node[hash].trusted_ca_size; i++) {
-		if (dn) {
+		for (i = 0; i < list->node[hash].trusted_ca_size; i++) {
 			ret = _gnutls_x509_compare_raw_dn(dn, &list->node[hash].trusted_cas[i]->raw_dn);
 			if (ret != 0) {
 				if (spki && spki->size > 0) {
@@ -901,22 +901,22 @@ int trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 				*issuer = crt_cpy(list->node[hash].trusted_cas[i]);
 				return 0;
 			}
-		} else if (spki) {
-			/* search everything! */
-			for (i = 0; i < list->size; i++) {
-				for (j = 0; j < list->node[i].trusted_ca_size; j++) {
-					tmp_size = sizeof(tmp);
+		}
+	} else if (spki) {
+		/* search everything! */
+		for (i = 0; i < list->size; i++) {
+			for (j = 0; j < list->node[i].trusted_ca_size; j++) {
+				tmp_size = sizeof(tmp);
 
-					ret = gnutls_x509_crt_get_subject_key_id(list->node[i].trusted_cas[j], tmp, &tmp_size, NULL);
-					if (ret < 0)
-						continue;
+				ret = gnutls_x509_crt_get_subject_key_id(list->node[i].trusted_cas[j], tmp, &tmp_size, NULL);
+				if (ret < 0)
+					continue;
 
-					if (spki->size != tmp_size || memcmp(spki->data, tmp, spki->size) != 0)
-						continue;
+				if (spki->size != tmp_size || memcmp(spki->data, tmp, spki->size) != 0)
+					continue;
 
-					*issuer = crt_cpy(list->node[i].trusted_cas[j]);
-					return 0;
-				}
+				*issuer = crt_cpy(list->node[i].trusted_cas[j]);
+				return 0;
 			}
 		}
 	}
