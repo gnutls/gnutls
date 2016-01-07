@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <certtool-cfg.h>
 #include <gnutls/x509.h>
+#include <gnutls/x509-ext.h>
 #include <string.h>
 #include <limits.h>
 #include <inttypes.h>
@@ -138,6 +139,7 @@ static struct cfg_options available_options[] = {
 	{ .name = "key_agreement", .type = OPTION_BOOLEAN },
 	{ .name = "data_encipherment", .type = OPTION_BOOLEAN },
 	{ .name = "non_repudiation", .type = OPTION_BOOLEAN },
+	{ .name = "tls_feature", .type = OPTION_MULTI_LINE },
 };
 
 typedef struct _cfg_ctx {
@@ -207,6 +209,7 @@ typedef struct _cfg_ctx {
 	char *proxy_policy_language;
 	char **ocsp_uris;
 	char **ca_issuers_uris;
+	char **tls_features;
 } cfg_ctx;
 
 cfg_ctx cfg;
@@ -521,6 +524,8 @@ int template_parse(const char *template)
 	READ_BOOLEAN("data_encipherment", cfg.data_encipherment);
 	READ_BOOLEAN("key_agreement", cfg.key_agreement);
 	READ_BOOLEAN("non_repudiation", cfg.non_repudiation);
+
+	READ_MULTI_LINE("tls_feature", cfg.tls_features);
 
 	optionUnloadNested(pov);
 
@@ -2573,4 +2578,52 @@ void get_oid_crq_set(gnutls_x509_crq_t crq)
 		}
 	}
 
+}
+
+void get_tlsfeatures_set(int type, void *crt)
+{
+	int ret, i;
+	unsigned int feature;
+
+	if (batch) {
+		if (!cfg.tls_features)
+			return;
+
+		gnutls_x509_tlsfeatures_t features;
+		ret = gnutls_x509_tlsfeatures_init(&features);
+		if (ret < 0) {
+			fprintf(stderr, "gnutls_x509_tlsfeatures_init: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		for (i = 0; cfg.tls_features[i]; ++i) {
+			feature = strtoul(cfg.tls_features[i], 0, 10);
+			ret = gnutls_x509_tlsfeatures_add(features, feature);
+			if (ret < 0) {
+				fprintf(stderr, "gnutls_x509_tlsfeatures_add: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
+		if (type == TYPE_CRT) {
+			ret = gnutls_x509_crt_set_tlsfeatures(crt, features);
+			if (ret < 0) {
+				fprintf(stderr, "gnutls_x509_crt_set_tlsfeatures: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+		else {
+			ret = gnutls_x509_crq_set_tlsfeatures(crt, features);
+			if (ret < 0) {
+				fprintf(stderr, "gnutls_x509_crq_set_tlsfeatures: %s\n",
+					gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+
+		gnutls_x509_tlsfeatures_deinit(features);
+	}
 }

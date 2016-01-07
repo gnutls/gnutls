@@ -83,6 +83,7 @@ void get_dc_set(int type, void *crt);
 void get_ca_issuers_set(gnutls_x509_crt_t crt);
 void get_ocsp_issuer_set(gnutls_x509_crt_t crt);
 void crt_unique_ids_set(gnutls_x509_crt_t crt);
+void get_tlsfeatures_set(int type, void *crt);
 
 int get_key_agreement_status(void);
 int get_non_repudiation_status(void);

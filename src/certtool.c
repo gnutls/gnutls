@@ -301,6 +301,8 @@ generate_certificate(gnutls_privkey_t * ret_key,
 					"This field should not be used in new certificates.\n");
 
 			get_pkcs9_email_crt_set(crt);
+
+			get_tlsfeatures_set(TYPE_CRT, crt);
 		}
 
 		result = gnutls_x509_crt_set_pubkey(crt, pubkey);
@@ -2112,6 +2114,8 @@ void generate_request(common_info_st * cinfo)
 		}
 
 		get_key_purpose_set(TYPE_CRQ, crq);
+
+		get_tlsfeatures_set(TYPE_CRQ, crq);
 	}
 
 	ret = gnutls_x509_crq_set_pubkey(crq, pubkey);
