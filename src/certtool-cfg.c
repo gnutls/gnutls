@@ -83,6 +83,9 @@ static struct cfg_options available_options[] = {
 	{ .name = "dns_name", .type = OPTION_MULTI_LINE },
 	{ .name = "ip_address", .type = OPTION_MULTI_LINE },
 	{ .name = "email", .type = OPTION_MULTI_LINE },
+	{ .name = "other_name", .type = OPTION_MULTI_LINE },
+	{ .name = "other_name_utf8", .type = OPTION_MULTI_LINE },
+	{ .name = "other_name_octet", .type = OPTION_MULTI_LINE },
 	{ .name = "key_purpose_oid", .type = OPTION_MULTI_LINE },
 	{ .name = "nc_exclude_dns", .type = OPTION_MULTI_LINE },
 	{ .name = "nc_exclude_email", .type = OPTION_MULTI_LINE },
@@ -156,6 +159,9 @@ typedef struct _cfg_ctx {
 	char **uri;
 	char **ip_addr;
 	char **email;
+	char **other_name;
+	char **other_name_utf8;
+	char **other_name_octet;
 	char **dn_oid;
 	char **permitted_nc_dns;
 	char **excluded_nc_dns;
@@ -448,6 +454,9 @@ int template_parse(const char *template)
 	READ_MULTI_LINE("dc", cfg.dc);
 	READ_MULTI_LINE("dns_name", cfg.dns_name);
 	READ_MULTI_LINE("uri", cfg.uri);
+	READ_MULTI_LINE_TOKENIZED("other_name", cfg.other_name);
+	READ_MULTI_LINE_TOKENIZED("other_name_octet", cfg.other_name_octet);
+	READ_MULTI_LINE_TOKENIZED("other_name_utf8", cfg.other_name_utf8);
 
 	READ_MULTI_LINE("ip_address", cfg.ip_addr);
 	READ_MULTI_LINE("email", cfg.email);
@@ -1704,6 +1713,160 @@ void get_dns_name_set(int type, void *crt)
 			gnutls_strerror(ret));
 		exit(1);
 	}
+}
+
+static int set_othername(int type, void *crt)
+{
+	int ret = 0, i;
+	uint8_t *binname = NULL;
+	unsigned binnamelen = 0;
+	const char *oid;
+
+	if (batch) {
+		if (!cfg.other_name)
+			return 0;
+
+		for (i = 0; cfg.other_name[i] != NULL; i += 2) {
+			oid = cfg.other_name[i];
+
+			if (cfg.other_name[i + 1] == NULL) {
+				fprintf(stderr,
+					"other_name: %s does not have an argument.\n",
+					cfg.other_name[i]);
+				exit(1);
+			}
+
+			HEX_DECODE (cfg.other_name[i+1], binname, binnamelen);
+			if (binnamelen == 0)
+				break;
+
+			if (type == TYPE_CRT)
+				ret =
+				    gnutls_x509_crt_set_subject_alt_othername
+				    (crt, oid,
+				     binname, binnamelen,
+				     GNUTLS_FSAN_APPEND);
+			else
+				ret =
+				    gnutls_x509_crq_set_subject_alt_othername
+				    (crt, oid,
+				     binname, binnamelen,
+				     GNUTLS_FSAN_APPEND);
+			free (binname);
+			binname = NULL;
+
+			if (ret < 0)
+				break;
+		}
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "set_subject_alt_othername: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	return ret;
+}
+
+static int set_othername_utf8(int type, void *crt)
+{
+	int ret = 0, i;
+	const char *oid;
+
+	if (batch) {
+		if (!cfg.other_name_utf8)
+			return 0;
+
+		for (i = 0; cfg.other_name_utf8[i] != NULL; i += 2) {
+			oid = cfg.other_name_utf8[i];
+
+			if (cfg.other_name_utf8[i + 1] == NULL) {
+				fprintf(stderr,
+					"other_name_utf8: %s does not have an argument.\n",
+					cfg.other_name_utf8[i]);
+				exit(1);
+			}
+
+			if (type == TYPE_CRT)
+				ret =
+				    gnutls_x509_crt_set_subject_alt_othername
+				    (crt, oid,
+				     cfg.other_name_utf8[i + 1], strlen(cfg.other_name_utf8[i + 1]),
+				     GNUTLS_FSAN_APPEND|GNUTLS_FSAN_ENCODE_UTF8_STRING);
+			else
+				ret =
+				    gnutls_x509_crq_set_subject_alt_othername
+				    (crt, oid,
+				     cfg.other_name_utf8[i + 1], strlen(cfg.other_name_utf8[i + 1]),
+				     GNUTLS_FSAN_APPEND|GNUTLS_FSAN_ENCODE_UTF8_STRING);
+
+			if (ret < 0)
+				break;
+		}
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "set_subject_alt_othername: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	return ret;
+}
+
+static int set_othername_octet(int type, void *crt)
+{
+	int ret = 0, i;
+	const char *oid;
+
+	if (batch) {
+		if (!cfg.other_name_octet)
+			return 0;
+
+		for (i = 0; cfg.other_name_octet[i] != NULL; i += 2) {
+			oid = cfg.other_name_octet[i];
+
+			if (cfg.other_name_octet[i + 1] == NULL) {
+				fprintf(stderr,
+					"other_name_octet: %s does not have an argument.\n",
+					cfg.other_name_octet[i]);
+				exit(1);
+			}
+
+			if (type == TYPE_CRT)
+				ret =
+				    gnutls_x509_crt_set_subject_alt_othername
+				    (crt, oid,
+				     cfg.other_name_octet[i + 1], strlen(cfg.other_name_octet[i + 1]),
+				     GNUTLS_FSAN_APPEND|GNUTLS_FSAN_ENCODE_OCTET_STRING);
+			else
+				ret =
+				    gnutls_x509_crq_set_subject_alt_othername
+				    (crt, oid,
+				     cfg.other_name_octet[i + 1], strlen(cfg.other_name_octet[i + 1]),
+				     GNUTLS_FSAN_APPEND|GNUTLS_FSAN_ENCODE_OCTET_STRING);
+
+			if (ret < 0)
+				break;
+		}
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "set_subject_alt_othername: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	return ret;
+}
+
+
+void get_other_name_set(int type, void *crt)
+{
+	set_othername(type, crt);
+	set_othername_octet(type, crt);
+	set_othername_utf8(type, crt);
 }
 
 void get_policy_set(gnutls_x509_crt_t crt)
