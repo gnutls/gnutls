@@ -734,8 +734,7 @@ gnutls_aead_cipher_decrypt(gnutls_aead_cipher_hd_t handle,
  *
  * This function will encrypt the given data using the algorithm
  * specified by the context. The output data will contain the
- * authentication tag. This function requires that 
- * gnutls_aead_cipher_set_nonce() is called before it.
+ * authentication tag.
  *
  * Returns: Zero or a negative error code on error.
  *
