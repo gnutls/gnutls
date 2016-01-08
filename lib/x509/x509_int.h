@@ -191,6 +191,11 @@ _gnutls_write_new_general_name(ASN1_TYPE ext, const char *ext_name,
 		       gnutls_x509_subject_alt_name_t type,
 		       const void *data, unsigned int data_size);
 
+int
+_gnutls_write_new_othername(ASN1_TYPE ext, const char *ext_name,
+		       const char *oid,
+		       const void *data, unsigned int data_size);
+
 /* dsa.c */
 
 
@@ -271,7 +276,9 @@ _gnutls_write_general_name(ASN1_TYPE ext, const char *ext_name,
 		       const void *data, unsigned int data_size);
 
 int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name_t
-					  type, const void *data,
+					  type,
+					  const char *othername_oid,
+					  const void *data,
 					  unsigned int data_size,
 					  const gnutls_datum_t * prev_der_ext,
 					  gnutls_datum_t * der_ext);

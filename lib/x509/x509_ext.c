@@ -318,13 +318,15 @@ int gnutls_x509_ext_export_subject_alt_names(gnutls_subject_alt_names_t sans,
 
 	for (i = 0; i < sans->size; i++) {
 		if (sans->names[i].type == GNUTLS_SAN_OTHERNAME) {
-			ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
-			goto cleanup;
+			ret = _gnutls_write_new_othername(c2, "", (char*)sans->names[i].othername_oid.data,
+					      sans->names[i].san.data, sans->names[i].san.size);
+		} else {
+			ret =
+			    _gnutls_write_new_general_name(c2, "", sans->names[i].type,
+							   sans->names[i].san.data,
+							   sans->names[i].san.size);
 		}
-		ret =
-		    _gnutls_write_new_general_name(c2, "", sans->names[i].type,
-						   sans->names[i].san.data,
-						   sans->names[i].san.size);
+
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;

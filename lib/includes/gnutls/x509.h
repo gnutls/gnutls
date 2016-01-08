@@ -563,11 +563,25 @@ int gnutls_x509_crt_set_subject_alt_name(gnutls_x509_crt_t crt,
 					 unsigned int data_size,
 					 unsigned int flags);
 
+int
+gnutls_x509_crt_set_subject_alt_othername(gnutls_x509_crt_t crt,
+				     const char *oid,
+				     const void *data,
+				     unsigned int data_size,
+				     unsigned int flags);
+
 int gnutls_x509_crt_set_issuer_alt_name(gnutls_x509_crt_t crt,
 					 gnutls_x509_subject_alt_name_t
 					 type, const void *data,
 					 unsigned int data_size,
 					 unsigned int flags);
+
+int
+gnutls_x509_crt_set_issuer_alt_othername(gnutls_x509_crt_t crt,
+				     const char *oid,
+				     const void *data,
+				     unsigned int data_size,
+				     unsigned int flags);
 
 int gnutls_x509_crt_sign(gnutls_x509_crt_t crt,
 			 gnutls_x509_crt_t issuer,
@@ -1227,6 +1241,13 @@ int gnutls_x509_crq_set_subject_alt_name(gnutls_x509_crq_t crq,
 					 nt, const void *data,
 					 unsigned int data_size,
 					 unsigned int flags);
+
+int
+gnutls_x509_crq_set_subject_alt_othername(gnutls_x509_crq_t crq,
+				     const char *oid,
+				     const void *data,
+				     unsigned int data_size,
+				     unsigned int flags);
 
 int gnutls_x509_crq_set_key_usage(gnutls_x509_crq_t crq,
 				  unsigned int usage);

@@ -629,7 +629,7 @@ gnutls_x509_crt_set_subject_alt_name(gnutls_x509_crt_t crt,
 	/* generate the extension.
 	 */
 	result =
-	    _gnutls_x509_ext_gen_subject_alt_name(type, data, data_size,
+	    _gnutls_x509_ext_gen_subject_alt_name(type, NULL, data, data_size,
 						  &prev_der_data,
 						  &der_data);
 
@@ -712,7 +712,179 @@ gnutls_x509_crt_set_issuer_alt_name(gnutls_x509_crt_t crt,
 	/* generate the extension.
 	 */
 	result =
-	    _gnutls_x509_ext_gen_subject_alt_name(type, data, data_size,
+	    _gnutls_x509_ext_gen_subject_alt_name(type, NULL, data, data_size,
+						  &prev_der_data,
+						  &der_data);
+
+	if (flags == GNUTLS_FSAN_APPEND)
+		_gnutls_free_datum(&prev_der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		goto finish;
+	}
+
+	result =
+	    _gnutls_x509_crt_set_extension(crt, "2.5.29.18", &der_data,
+					   critical);
+
+	_gnutls_free_datum(&der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	crt->use_extensions = 1;
+
+	return 0;
+
+      finish:
+	_gnutls_free_datum(&prev_der_data);
+	return result;
+}
+
+/**
+ * gnutls_x509_crt_set_subject_alt_othername:
+ * @crt: a certificate of type #gnutls_x509_crt_t
+ * @oid: The other name OID
+ * @data: The data to be set
+ * @data_size: The size of data to be set
+ * @flags: GNUTLS_FSAN_SET to clear previous data or GNUTLS_FSAN_APPEND to append. 
+ *
+ * This function will set an "othername" to the subject alternative name certificate
+ * extension.
+ *
+ * The values set are set as binary values and are expected to have the proper DER encoding.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.0
+ **/
+int
+gnutls_x509_crt_set_subject_alt_othername(gnutls_x509_crt_t crt,
+				     const char *oid,
+				     const void *data,
+				     unsigned int data_size,
+				     unsigned int flags)
+{
+	int result;
+	gnutls_datum_t der_data = { NULL, 0 };
+	gnutls_datum_t prev_der_data = { NULL, 0 };
+	unsigned int critical = 0;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+
+	if (flags == GNUTLS_FSAN_APPEND) {
+		result =
+		    _gnutls_x509_crt_get_extension(crt, "2.5.29.17", 0,
+						   &prev_der_data,
+						   &critical);
+		if (result < 0
+		    && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			gnutls_assert();
+			return result;
+		}
+	}
+
+	/* generate the extension.
+	 */
+	result =
+	    _gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid,
+	    					  data, data_size,
+						  &prev_der_data,
+						  &der_data);
+
+	if (flags == GNUTLS_FSAN_APPEND)
+		_gnutls_free_datum(&prev_der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		goto finish;
+	}
+
+	result =
+	    _gnutls_x509_crt_set_extension(crt, "2.5.29.17", &der_data,
+					   critical);
+
+	_gnutls_free_datum(&der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	crt->use_extensions = 1;
+
+	return 0;
+
+      finish:
+	_gnutls_free_datum(&prev_der_data);
+	return result;
+}
+
+/**
+ * gnutls_x509_crt_set_issuer_alt_othername:
+ * @crt: a certificate of type #gnutls_x509_crt_t
+ * @oid: The other name OID
+ * @data: The data to be set
+ * @data_size: The size of data to be set
+ * @flags: GNUTLS_FSAN_SET to clear previous data or GNUTLS_FSAN_APPEND to append. 
+ *
+ * This function will set an "othername" to the issuer alternative name certificate
+ * extension.
+ *
+ * The values set are set as binary values and are expected to have the proper DER encoding.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.0
+ **/
+int
+gnutls_x509_crt_set_issuer_alt_othername(gnutls_x509_crt_t crt,
+				     const char *oid,
+				     const void *data,
+				     unsigned int data_size,
+				     unsigned int flags)
+{
+	int result;
+	gnutls_datum_t der_data = { NULL, 0 };
+	gnutls_datum_t prev_der_data = { NULL, 0 };
+	unsigned int critical = 0;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+
+	if (flags == GNUTLS_FSAN_APPEND) {
+		result =
+		    _gnutls_x509_crt_get_extension(crt, "2.5.29.18", 0,
+						   &prev_der_data,
+						   &critical);
+		if (result < 0
+		    && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			gnutls_assert();
+			return result;
+		}
+	}
+
+	/* generate the extension.
+	 */
+	result =
+	    _gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid,
+	    					  data, data_size,
 						  &prev_der_data,
 						  &der_data);
 

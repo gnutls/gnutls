@@ -1072,6 +1072,9 @@ GNUTLS_3_4
 	gnutls_decode_ber_digest_info;
 	gnutls_encode_ber_digest_info;
 	gnutls_pkcs7_get_embedded_data;
+	gnutls_x509_crq_set_subject_alt_othername;
+	gnutls_x509_crt_set_subject_alt_othername;
+	gnutls_x509_crt_set_issuer_alt_othername;
  local:
 	*;
 };

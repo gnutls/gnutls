@@ -2089,7 +2089,116 @@ gnutls_x509_crq_set_subject_alt_name(gnutls_x509_crq_t crq,
 
 	/* generate the extension.
 	 */
-	result = _gnutls_x509_ext_gen_subject_alt_name(nt, data, data_size,
+	result = _gnutls_x509_ext_gen_subject_alt_name(nt, NULL, data, data_size,
+						       &prev_der_data,
+						       &der_data);
+	gnutls_free(prev_der_data.data);
+	if (result < 0) {
+		gnutls_assert();
+		goto finish;
+	}
+
+	result =
+	    _gnutls_x509_crq_set_extension(crq, "2.5.29.17", &der_data,
+					   critical);
+
+	_gnutls_free_datum(&der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+
+      finish:
+	return result;
+}
+
+/**
+ * gnutls_x509_crq_set_subject_alt_othername:
+ * @crq: a certificate request of type #gnutls_x509_crq_t
+ * @oid: is the othername OID
+ * @data: The data to be set
+ * @data_size: The size of data to be set
+ * @flags: %GNUTLS_FSAN_SET to clear previous data or
+ *   %GNUTLS_FSAN_APPEND to append.
+ *
+ * This function will set the subject alternative name certificate
+ * extension.  It can set the following types:
+ *
+ * The values set must be binary values and must be properly DER encoded.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.5.0
+ **/
+int
+gnutls_x509_crq_set_subject_alt_othername(gnutls_x509_crq_t crq,
+				     const char *oid,
+				     const void *data,
+				     unsigned int data_size,
+				     unsigned int flags)
+{
+	int result = 0;
+	gnutls_datum_t der_data = { NULL, 0 };
+	gnutls_datum_t prev_der_data = { NULL, 0 };
+	unsigned int critical = 0;
+	size_t prev_data_size = 0;
+
+	if (crq == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+	if (flags == GNUTLS_FSAN_APPEND) {
+		result =
+		    gnutls_x509_crq_get_extension_by_oid(crq, "2.5.29.17",
+							 0, NULL,
+							 &prev_data_size,
+							 &critical);
+		prev_der_data.size = prev_data_size;
+
+		switch (result) {
+		case GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE:
+			/* Replacing non-existing data means the same as set data. */
+			break;
+
+		case GNUTLS_E_SUCCESS:
+			prev_der_data.data =
+			    gnutls_malloc(prev_der_data.size);
+			if (prev_der_data.data == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+
+			result =
+			    gnutls_x509_crq_get_extension_by_oid(crq,
+								 "2.5.29.17",
+								 0,
+								 prev_der_data.
+								 data,
+								 &prev_data_size,
+								 &critical);
+			if (result < 0) {
+				gnutls_assert();
+				gnutls_free(prev_der_data.data);
+				return result;
+			}
+			break;
+
+		default:
+			gnutls_assert();
+			return result;
+		}
+	}
+
+	/* generate the extension.
+	 */
+	result = _gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid, data, data_size,
 						       &prev_der_data,
 						       &der_data);
 	gnutls_free(prev_der_data.data);
