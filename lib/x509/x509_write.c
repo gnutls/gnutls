@@ -614,7 +614,7 @@ gnutls_x509_crt_set_subject_alt_name(gnutls_x509_crt_t crt,
 	/* Check if the extension already exists.
 	 */
 
-	if (flags == GNUTLS_FSAN_APPEND) {
+	if (flags & GNUTLS_FSAN_APPEND) {
 		result =
 		    _gnutls_x509_crt_get_extension(crt, "2.5.29.17", 0,
 						   &prev_der_data,
@@ -632,9 +632,6 @@ gnutls_x509_crt_set_subject_alt_name(gnutls_x509_crt_t crt,
 	    _gnutls_x509_ext_gen_subject_alt_name(type, NULL, data, data_size,
 						  &prev_der_data,
 						  &der_data);
-
-	if (flags == GNUTLS_FSAN_APPEND)
-		_gnutls_free_datum(&prev_der_data);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -654,7 +651,7 @@ gnutls_x509_crt_set_subject_alt_name(gnutls_x509_crt_t crt,
 
 	crt->use_extensions = 1;
 
-	return 0;
+	result = 0;
 
       finish:
 	_gnutls_free_datum(&prev_der_data);
@@ -697,7 +694,7 @@ gnutls_x509_crt_set_issuer_alt_name(gnutls_x509_crt_t crt,
 	/* Check if the extension already exists.
 	 */
 
-	if (flags == GNUTLS_FSAN_APPEND) {
+	if (flags & GNUTLS_FSAN_APPEND) {
 		result =
 		    _gnutls_x509_crt_get_extension(crt, "2.5.29.18", 0,
 						   &prev_der_data,
@@ -716,9 +713,6 @@ gnutls_x509_crt_set_issuer_alt_name(gnutls_x509_crt_t crt,
 						  &prev_der_data,
 						  &der_data);
 
-	if (flags == GNUTLS_FSAN_APPEND)
-		_gnutls_free_datum(&prev_der_data);
-
 	if (result < 0) {
 		gnutls_assert();
 		goto finish;
@@ -737,11 +731,26 @@ gnutls_x509_crt_set_issuer_alt_name(gnutls_x509_crt_t crt,
 
 	crt->use_extensions = 1;
 
-	return 0;
+	result = 0;
 
       finish:
 	_gnutls_free_datum(&prev_der_data);
 	return result;
+}
+
+int _gnutls_encode_othername_data(unsigned flags, const void *data, unsigned data_size, gnutls_datum_t *output)
+{
+	int ret;
+	if (flags & GNUTLS_FSAN_ENCODE_OCTET_STRING) {
+		ret = _gnutls_x509_encode_string(ASN1_ETYPE_OCTET_STRING,
+			data, data_size, output);
+	} else if (flags & GNUTLS_FSAN_ENCODE_UTF8_STRING) {
+		ret = _gnutls_x509_encode_string(ASN1_ETYPE_UTF8_STRING,
+			data, data_size, output);
+	} else {
+		ret = _gnutls_set_datum(output, data, data_size);
+	}
+	return ret;
 }
 
 /**
@@ -756,6 +765,8 @@ gnutls_x509_crt_set_issuer_alt_name(gnutls_x509_crt_t crt,
  * extension.
  *
  * The values set are set as binary values and are expected to have the proper DER encoding.
+ * For convenience the flags %GNUTLS_FSAN_ENCODE_OCTET_STRING and %GNUTLS_FSAN_ENCODE_UTF8_STRING
+ * can be used to encode the provided data.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -772,6 +783,7 @@ gnutls_x509_crt_set_subject_alt_othername(gnutls_x509_crt_t crt,
 	int result;
 	gnutls_datum_t der_data = { NULL, 0 };
 	gnutls_datum_t prev_der_data = { NULL, 0 };
+	gnutls_datum_t encoded_data = { NULL, 0 };
 	unsigned int critical = 0;
 
 	if (crt == NULL) {
@@ -782,7 +794,7 @@ gnutls_x509_crt_set_subject_alt_othername(gnutls_x509_crt_t crt,
 	/* Check if the extension already exists.
 	 */
 
-	if (flags == GNUTLS_FSAN_APPEND) {
+	if (flags & GNUTLS_FSAN_APPEND) {
 		result =
 		    _gnutls_x509_crt_get_extension(crt, "2.5.29.17", 0,
 						   &prev_der_data,
@@ -794,16 +806,19 @@ gnutls_x509_crt_set_subject_alt_othername(gnutls_x509_crt_t crt,
 		}
 	}
 
+	result = _gnutls_encode_othername_data(flags, data, data_size, &encoded_data);
+	if (result < 0) {
+		gnutls_assert();
+		goto finish;
+	}
+
 	/* generate the extension.
 	 */
 	result =
 	    _gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid,
-	    					  data, data_size,
+	    					  encoded_data.data, encoded_data.size,
 						  &prev_der_data,
 						  &der_data);
-
-	if (flags == GNUTLS_FSAN_APPEND)
-		_gnutls_free_datum(&prev_der_data);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -814,19 +829,20 @@ gnutls_x509_crt_set_subject_alt_othername(gnutls_x509_crt_t crt,
 	    _gnutls_x509_crt_set_extension(crt, "2.5.29.17", &der_data,
 					   critical);
 
-	_gnutls_free_datum(&der_data);
 
 	if (result < 0) {
 		gnutls_assert();
-		return result;
+		goto finish;
 	}
 
 	crt->use_extensions = 1;
 
-	return 0;
+	result = 0;
 
       finish:
+	_gnutls_free_datum(&der_data);
 	_gnutls_free_datum(&prev_der_data);
+	_gnutls_free_datum(&encoded_data);
 	return result;
 }
 
@@ -842,6 +858,8 @@ gnutls_x509_crt_set_subject_alt_othername(gnutls_x509_crt_t crt,
  * extension.
  *
  * The values set are set as binary values and are expected to have the proper DER encoding.
+ * For convenience the flags %GNUTLS_FSAN_ENCODE_OCTET_STRING and %GNUTLS_FSAN_ENCODE_UTF8_STRING
+ * can be used to encode the provided data.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -858,6 +876,7 @@ gnutls_x509_crt_set_issuer_alt_othername(gnutls_x509_crt_t crt,
 	int result;
 	gnutls_datum_t der_data = { NULL, 0 };
 	gnutls_datum_t prev_der_data = { NULL, 0 };
+	gnutls_datum_t encoded_data = {NULL, 0};
 	unsigned int critical = 0;
 
 	if (crt == NULL) {
@@ -868,7 +887,7 @@ gnutls_x509_crt_set_issuer_alt_othername(gnutls_x509_crt_t crt,
 	/* Check if the extension already exists.
 	 */
 
-	if (flags == GNUTLS_FSAN_APPEND) {
+	if (flags & GNUTLS_FSAN_APPEND) {
 		result =
 		    _gnutls_x509_crt_get_extension(crt, "2.5.29.18", 0,
 						   &prev_der_data,
@@ -880,16 +899,19 @@ gnutls_x509_crt_set_issuer_alt_othername(gnutls_x509_crt_t crt,
 		}
 	}
 
+	result = _gnutls_encode_othername_data(flags, data, data_size, &encoded_data);
+	if (result < 0) {
+		gnutls_assert();
+		goto finish;
+	}
+
 	/* generate the extension.
 	 */
 	result =
 	    _gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid,
-	    					  data, data_size,
+	    					  encoded_data.data, encoded_data.size,
 						  &prev_der_data,
 						  &der_data);
-
-	if (flags == GNUTLS_FSAN_APPEND)
-		_gnutls_free_datum(&prev_der_data);
 
 	if (result < 0) {
 		gnutls_assert();
@@ -900,19 +922,19 @@ gnutls_x509_crt_set_issuer_alt_othername(gnutls_x509_crt_t crt,
 	    _gnutls_x509_crt_set_extension(crt, "2.5.29.18", &der_data,
 					   critical);
 
-	_gnutls_free_datum(&der_data);
-
 	if (result < 0) {
 		gnutls_assert();
-		return result;
+		goto finish;
 	}
 
 	crt->use_extensions = 1;
 
-	return 0;
+	result = 0;
 
       finish:
+	_gnutls_free_datum(&der_data);
 	_gnutls_free_datum(&prev_der_data);
+	_gnutls_free_datum(&encoded_data);
 	return result;
 }
 

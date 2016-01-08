@@ -2045,7 +2045,7 @@ gnutls_x509_crq_set_subject_alt_name(gnutls_x509_crq_t crq,
 
 	/* Check if the extension already exists.
 	 */
-	if (flags == GNUTLS_FSAN_APPEND) {
+	if (flags & GNUTLS_FSAN_APPEND) {
 		result =
 		    gnutls_x509_crq_get_extension_by_oid(crq, "2.5.29.17",
 							 0, NULL,
@@ -2143,6 +2143,7 @@ gnutls_x509_crq_set_subject_alt_othername(gnutls_x509_crq_t crq,
 {
 	int result = 0;
 	gnutls_datum_t der_data = { NULL, 0 };
+	gnutls_datum_t encoded_data = { NULL, 0 };
 	gnutls_datum_t prev_der_data = { NULL, 0 };
 	unsigned int critical = 0;
 	size_t prev_data_size = 0;
@@ -2154,7 +2155,7 @@ gnutls_x509_crq_set_subject_alt_othername(gnutls_x509_crq_t crq,
 
 	/* Check if the extension already exists.
 	 */
-	if (flags == GNUTLS_FSAN_APPEND) {
+	if (flags & GNUTLS_FSAN_APPEND) {
 		result =
 		    gnutls_x509_crq_get_extension_by_oid(crq, "2.5.29.17",
 							 0, NULL,
@@ -2185,8 +2186,7 @@ gnutls_x509_crq_set_subject_alt_othername(gnutls_x509_crq_t crq,
 								 &critical);
 			if (result < 0) {
 				gnutls_assert();
-				gnutls_free(prev_der_data.data);
-				return result;
+				goto finish;
 			}
 			break;
 
@@ -2196,12 +2196,18 @@ gnutls_x509_crq_set_subject_alt_othername(gnutls_x509_crq_t crq,
 		}
 	}
 
+	result = _gnutls_encode_othername_data(flags, data, data_size, &encoded_data);
+	if (result < 0) {
+		gnutls_assert();
+		goto finish;
+	}
+
 	/* generate the extension.
 	 */
-	result = _gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid, data, data_size,
+	result = _gnutls_x509_ext_gen_subject_alt_name(GNUTLS_SAN_OTHERNAME, oid,
+						       encoded_data.data, encoded_data.size,
 						       &prev_der_data,
 						       &der_data);
-	gnutls_free(prev_der_data.data);
 	if (result < 0) {
 		gnutls_assert();
 		goto finish;
@@ -2211,16 +2217,17 @@ gnutls_x509_crq_set_subject_alt_othername(gnutls_x509_crq_t crq,
 	    _gnutls_x509_crq_set_extension(crq, "2.5.29.17", &der_data,
 					   critical);
 
-	_gnutls_free_datum(&der_data);
-
 	if (result < 0) {
 		gnutls_assert();
-		return result;
+		goto finish;
 	}
 
-	return 0;
+	result = 0;
 
       finish:
+	_gnutls_free_datum(&prev_der_data);
+	_gnutls_free_datum(&der_data);
+	_gnutls_free_datum(&encoded_data);
 	return result;
 }
 

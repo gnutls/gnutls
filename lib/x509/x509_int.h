@@ -177,6 +177,8 @@ int _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
 			    const char *asn1_rdn_name,
 			    int indx, void *_oid, size_t * sizeof_oid);
 
+int _gnutls_encode_othername_data(unsigned flags, const void *data, unsigned data_size, gnutls_datum_t *output);
+
 int _gnutls_parse_general_name(ASN1_TYPE src, const char *src_name,
 			       int seq, void *name, size_t * name_size,
 			       unsigned int *ret_type, int othername_oid);
