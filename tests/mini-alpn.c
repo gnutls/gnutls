@@ -171,6 +171,7 @@ static void server(int fd, const char *protocol1, const char *protocol2)
 	gnutls_session_t session;
 	gnutls_anon_server_credentials_t anoncred;
 	gnutls_datum_t t[2];
+	gnutls_datum_t selected;
 
 	/* this must be called once in the program
 	 */
@@ -226,16 +227,21 @@ static void server(int fd, const char *protocol1, const char *protocol2)
 			gnutls_protocol_get_name
 			(gnutls_protocol_get_version(session)));
 
-	ret = gnutls_alpn_get_selected_protocol(session, &t[0]);
+	ret = gnutls_alpn_get_selected_protocol(session, &selected);
 	if (ret < 0) {
 		gnutls_perror(ret);
 		exit(1);
 	}
 #if 0
 	if (debug) {
-		success("Protocol: %.*s\n", (int) t[0].size, t[0].data);
+		success("Protocol: %.*s\n", (int) selected.size, selected.data);
 	}
 #endif
+
+	if (selected.size != strlen(protocol1) || memcmp(selected.data, protocol1, selected.size) != 0) {
+		fail("did not select the expected protocol (selected %.*s, expected %s)\n", selected.size, selected.data, protocol1);
+		exit(1);
+	}
 
 	/* do not wait for the peer to close the connection.
 	 */
