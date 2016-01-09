@@ -203,6 +203,9 @@ _gnutls_alpn_send_params(gnutls_session_t session,
  * returned protocol should be treated as opaque, constant value and
  * only valid during the session life.
  *
+ * The selected protocol is the first supported by the list sent
+ * by the client.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
  *
