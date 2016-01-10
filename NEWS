@@ -35,6 +35,9 @@ See the end for copying conditions.
 ** API and ABI modifications:
 GNUTLS_INDEFINITE_TIMEOUT: Added
 gnutls_check_version_numeric: Added
+gnutls_x509_crq_set_subject_alt_othername: Added
+gnutls_x509_crt_set_subject_alt_othername: Added
+gnutls_x509_crt_set_issuer_alt_othername: Added
 gnutls_x509_privkey_generate2: Added
 gnutls_x509_privkey_get_seed: Added
 gnutls_x509_privkey_verify_seed: Added
