@@ -86,6 +86,7 @@ static struct cfg_options available_options[] = {
 	{ .name = "other_name", .type = OPTION_MULTI_LINE },
 	{ .name = "other_name_utf8", .type = OPTION_MULTI_LINE },
 	{ .name = "other_name_octet", .type = OPTION_MULTI_LINE },
+	{ .name = "xmpp_name", .type = OPTION_MULTI_LINE },
 	{ .name = "key_purpose_oid", .type = OPTION_MULTI_LINE },
 	{ .name = "nc_exclude_dns", .type = OPTION_MULTI_LINE },
 	{ .name = "nc_exclude_email", .type = OPTION_MULTI_LINE },
@@ -162,6 +163,7 @@ typedef struct _cfg_ctx {
 	char **other_name;
 	char **other_name_utf8;
 	char **other_name_octet;
+	char **xmpp_name;
 	char **dn_oid;
 	char **permitted_nc_dns;
 	char **excluded_nc_dns;
@@ -458,6 +460,7 @@ int template_parse(const char *template)
 	READ_MULTI_LINE_TOKENIZED("other_name_octet", cfg.other_name_octet);
 	READ_MULTI_LINE_TOKENIZED("other_name_utf8", cfg.other_name_utf8);
 
+	READ_MULTI_LINE("xmpp_name", cfg.xmpp_name);
 	READ_MULTI_LINE("ip_address", cfg.ip_addr);
 	READ_MULTI_LINE("email", cfg.email);
 	READ_MULTI_LINE("key_purpose_oid", cfg.key_purpose_oids);
@@ -1861,12 +1864,49 @@ static int set_othername_octet(int type, void *crt)
 	return ret;
 }
 
+static int set_xmpp_name(int type, void *crt)
+{
+	int ret = 0, i;
+
+	if (batch) {
+		if (!cfg.xmpp_name)
+			return 0;
+
+		for (i = 0; cfg.xmpp_name[i] != NULL; i ++) {
+			if (type == TYPE_CRT)
+				ret =
+				    gnutls_x509_crt_set_subject_alt_name
+				    (crt, GNUTLS_SAN_OTHERNAME_XMPP,
+				     cfg.xmpp_name[i], strlen(cfg.xmpp_name[i]),
+				     GNUTLS_FSAN_APPEND);
+			else
+				ret =
+				    gnutls_x509_crq_set_subject_alt_name
+				    (crt, GNUTLS_SAN_OTHERNAME_XMPP,
+				     cfg.xmpp_name[i], strlen(cfg.xmpp_name[i]),
+				     GNUTLS_FSAN_APPEND);
+
+			if (ret < 0)
+				break;
+		}
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "set_subject_alt_name(XMPP): %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	return ret;
+}
+
 
 void get_other_name_set(int type, void *crt)
 {
 	set_othername(type, crt);
 	set_othername_octet(type, crt);
 	set_othername_utf8(type, crt);
+	set_xmpp_name(type, crt);
 }
 
 void get_policy_set(gnutls_x509_crt_t crt)

@@ -768,6 +768,9 @@ expiration_days = 700
 #other_name_utf8 = "1.2.4.5.6 A UTF8 string"
 #other_name_octet = "1.2.4.5.6 A string that will be encoded as ASN.1 octet string"
 
+# Allows writing an XmppAddr Identifier
+#xmpp_name = juliet@im.example.com
+
 # A subject alternative name URI
 #uri = "http://www.example.com"
 
