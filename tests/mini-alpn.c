@@ -67,7 +67,7 @@ static pid_t child;
 /* A very basic DTLS client, with anonymous authentication, that negotiates SRTP
  */
 
-static void client(int fd, const char *protocol0, const char *protocol1, const char *protocol2)
+static void client(int fd, const char *protocol0, const char *protocol2, const char *protocol1)
 {
 	gnutls_session_t session;
 	int ret;
