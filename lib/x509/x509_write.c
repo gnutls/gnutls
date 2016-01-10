@@ -587,7 +587,7 @@ gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt_t crt,
  *
  * %GNUTLS_SAN_IPADDRESS: as a binary IP address (4 or 16 bytes)
  *
- * %GNUTLS_SAN_OTHERNAME_XMPP: as a UTF8 string
+ * %GNUTLS_SAN_OTHERNAME_XMPP: as a UTF8 string (since 3.5.0)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
