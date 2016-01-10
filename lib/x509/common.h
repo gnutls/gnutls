@@ -228,6 +228,7 @@ int _gnutls_copy_string(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
 int _gnutls_copy_data(gnutls_datum_t* str, uint8_t *out, size_t *out_size);
 
 int _san_othername_to_virtual(const char *oid, size_t oid_size);
+const char *_virtual_to_othername_oid(unsigned type);
 
 int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out);
 int x509_raw_crt_to_raw_pubkey(const gnutls_datum_t * cert,

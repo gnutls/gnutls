@@ -142,7 +142,17 @@ int _san_othername_to_virtual(const char *oid, size_t size)
 	}
 
 	return GNUTLS_SAN_OTHERNAME;
-} 
+}
+
+const char * _virtual_to_othername_oid(unsigned type)
+{
+	switch(type) {
+		case GNUTLS_SAN_OTHERNAME_XMPP:
+			return XMPP_OID;
+		default:
+			return NULL;
+	}
+}
 
 static const struct oid_to_string *get_oid_entry(const char *oid)
 {

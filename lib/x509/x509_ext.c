@@ -129,15 +129,66 @@ int gnutls_subject_alt_names_get(gnutls_subject_alt_names_t sans,
 	return 0;
 }
 
+static
+int assign_virt_type(struct name_st *name, unsigned type, gnutls_datum_t *san, const char *othername_oid)
+{
+	gnutls_datum_t encoded = {NULL, 0};
+	int ret;
+
+	if (type < 1000) {
+		name->type = type;
+		name->san.data = san->data;
+		name->san.size = san->size;
+
+		if (othername_oid) {
+			name->othername_oid.data = (uint8_t *) othername_oid;
+			name->othername_oid.size = strlen(othername_oid);
+		} else {
+			name->othername_oid.data = NULL;
+			name->othername_oid.size = 0;
+		}
+
+	} else { /* virtual types */
+		const char *oid = _virtual_to_othername_oid(type);
+
+		if (oid == NULL)
+			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+		switch(type) {
+			case GNUTLS_SAN_OTHERNAME_XMPP:
+				ret = _gnutls_x509_encode_string(ASN1_ETYPE_UTF8_STRING,
+					san->data, san->size, &encoded);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
+				name->type = GNUTLS_SAN_OTHERNAME;
+				name->san.data = encoded.data;
+				name->san.size = encoded.size;
+				name->othername_oid.data = (void*)gnutls_strdup(oid);
+				name->othername_oid.size = strlen(oid);
+				break;
+
+			default:
+				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+		}
+
+		gnutls_free(san->data);
+	}
+
+	return 0;
+}
+
 /* This is the same as gnutls_subject_alt_names_set() but will not
- * copy the strings */
+ * copy the strings. It expects all the provided input to be already
+ * allocated by gnutls. */
 static
 int subject_alt_names_set(struct name_st **names,
 			  unsigned int *size,
 			  unsigned int san_type,
-			  const gnutls_datum_t * san, char *othername_oid)
+			  gnutls_datum_t * san, char *othername_oid)
 {
 	void *tmp;
+	int ret;
 
 	tmp = gnutls_realloc(*names, (*size + 1) * sizeof((*names)[0]));
 	if (tmp == NULL) {
@@ -145,17 +196,9 @@ int subject_alt_names_set(struct name_st **names,
 	}
 	*names = tmp;
 
-	(*names)[*size].type = san_type;
-	(*names)[*size].san.data = san->data;
-	(*names)[*size].san.size = san->size;
-
-	if (othername_oid) {
-		(*names)[*size].othername_oid.data = (uint8_t *) othername_oid;
-		(*names)[*size].othername_oid.size = strlen(othername_oid);
-	} else {
-		(*names)[*size].othername_oid.data = NULL;
-		(*names)[*size].othername_oid.size = 0;
-	}
+	ret = assign_virt_type(&(*names)[*size], san_type, san, othername_oid);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	(*size)++;
 	return 0;

@@ -2018,7 +2018,7 @@ gnutls_x509_crq_get_extension_by_oid2(gnutls_x509_crq_t crq,
  *
  * %GNUTLS_SAN_IPADDRESS: as a binary IP address (4 or 16 bytes)
  *
- * Other values can be set as binary values with the proper DER encoding.
+ * %GNUTLS_SAN_OTHERNAME_XMPP: as a UTF8 string
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

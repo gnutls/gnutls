@@ -586,8 +586,8 @@ gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt_t crt,
  * %GNUTLS_SAN_URI: as a text string
  *
  * %GNUTLS_SAN_IPADDRESS: as a binary IP address (4 or 16 bytes)
- * 
- * Other values can be set as binary values with the proper DER encoding.
+ *
+ * %GNUTLS_SAN_OTHERNAME_XMPP: as a UTF8 string
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
