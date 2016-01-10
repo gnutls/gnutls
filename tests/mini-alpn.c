@@ -67,7 +67,7 @@ static pid_t child;
 /* A very basic DTLS client, with anonymous authentication, that negotiates SRTP
  */
 
-static void client(int fd, const char *protocol1, const char *protocol2)
+static void client(int fd, const char *protocol0, const char *protocol1, const char *protocol2)
 {
 	gnutls_session_t session;
 	int ret;
@@ -93,13 +93,15 @@ static void client(int fd, const char *protocol1, const char *protocol2)
 				   "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-ECDH:+CURVE-ALL",
 				   NULL);
 	if (protocol1) {
-		gnutls_datum_t t[2];
-		t[0].data = (void *) protocol1;
-		t[0].size = strlen(protocol1);
-		t[1].data = (void *) protocol2;
-		t[1].size = strlen(protocol2);
+		gnutls_datum_t t[3];
+		t[0].data = (void *) protocol0;
+		t[0].size = strlen(protocol0);
+		t[1].data = (void *) protocol1;
+		t[1].size = strlen(protocol1);
+		t[2].data = (void *) protocol2;
+		t[2].size = strlen(protocol2);
 
-		ret = gnutls_alpn_set_protocols(session, t, 2, 0);
+		ret = gnutls_alpn_set_protocols(session, t, 3, 0);
 		if (ret < 0) {
 			gnutls_perror(ret);
 			exit(1);
@@ -232,11 +234,10 @@ static void server(int fd, const char *protocol1, const char *protocol2)
 		gnutls_perror(ret);
 		exit(1);
 	}
-#if 0
+
 	if (debug) {
 		success("Protocol: %.*s\n", (int) selected.size, selected.data);
 	}
-#endif
 
 	if (selected.size != strlen(protocol1) || memcmp(selected.data, protocol1, selected.size) != 0) {
 		fail("did not select the expected protocol (selected %.*s, expected %s)\n", selected.size, selected.data, protocol1);
@@ -287,13 +288,14 @@ static void start(const char *p1, const char *p2)
 			     WEXITSTATUS(status));
 	} else {
 		close(fd[0]);
-		client(fd[1], p2, p1);
+		client(fd[1], "unknown/1.4", p2, p1);
 		exit(0);
 	}
 }
 
 void doit(void)
 {
+	start("h2", "http/1.1");
 	start("spdy/2", "spdy/3");
 	start("spdy/3", "spdy/2");
 }
