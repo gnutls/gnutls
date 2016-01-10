@@ -22,20 +22,15 @@
  */
 
 #include "gnutls_int.h"
-
 #include <datum.h>
 #include "errors.h"
 #include <common.h>
 #include <x509.h>
 #include <x509_b64.h>
 #include <c-ctype.h>
+#include "x509_ext_int.h"
+#include "virt-san.h"
 #include <gnutls/x509-ext.h>
-
-struct name_st {
-	unsigned int type;
-	gnutls_datum_t san;
-	gnutls_datum_t othername_oid;
-};
 
 #define MAX_ENTRIES 64
 struct gnutls_subject_alt_names_st {
@@ -129,55 +124,6 @@ int gnutls_subject_alt_names_get(gnutls_subject_alt_names_t sans,
 	return 0;
 }
 
-static
-int assign_virt_type(struct name_st *name, unsigned type, gnutls_datum_t *san, const char *othername_oid)
-{
-	gnutls_datum_t encoded = {NULL, 0};
-	int ret;
-
-	if (type < 1000) {
-		name->type = type;
-		name->san.data = san->data;
-		name->san.size = san->size;
-
-		if (othername_oid) {
-			name->othername_oid.data = (uint8_t *) othername_oid;
-			name->othername_oid.size = strlen(othername_oid);
-		} else {
-			name->othername_oid.data = NULL;
-			name->othername_oid.size = 0;
-		}
-
-	} else { /* virtual types */
-		const char *oid = _virtual_to_othername_oid(type);
-
-		if (oid == NULL)
-			return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-
-		switch(type) {
-			case GNUTLS_SAN_OTHERNAME_XMPP:
-				ret = _gnutls_x509_encode_string(ASN1_ETYPE_UTF8_STRING,
-					san->data, san->size, &encoded);
-				if (ret < 0)
-					return gnutls_assert_val(ret);
-
-				name->type = GNUTLS_SAN_OTHERNAME;
-				name->san.data = encoded.data;
-				name->san.size = encoded.size;
-				name->othername_oid.data = (void*)gnutls_strdup(oid);
-				name->othername_oid.size = strlen(oid);
-				break;
-
-			default:
-				return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-		}
-
-		gnutls_free(san->data);
-	}
-
-	return 0;
-}
-
 /* This is the same as gnutls_subject_alt_names_set() but will not
  * copy the strings. It expects all the provided input to be already
  * allocated by gnutls. */
@@ -196,7 +142,7 @@ int subject_alt_names_set(struct name_st **names,
 	}
 	*names = tmp;
 
-	ret = assign_virt_type(&(*names)[*size], san_type, san, othername_oid);
+	ret = _gnutls_alt_name_assign_virt_type(&(*names)[*size], san_type, san, othername_oid);
 	if (ret < 0)
 		return gnutls_assert_val(ret);
 
@@ -3166,46 +3112,3 @@ int _gnutls_x509_decode_ext(const gnutls_datum_t *der, gnutls_x509_ext_st *out)
 	
 }
 
-/**
- * gnutls_x509_othername_to_virtual:
- * @oid: The othername object identifier
- * @othername: The othername data
- * @virt_type: GNUTLS_SAN_OTHERNAME_XXX
- * @virt: allocated printable data
- *
- * This function will parse and convert the othername data to a virtual
- * type supported by gnutls.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a negative error value.
- *
- * Since: 3.3.8
- **/
-int gnutls_x509_othername_to_virtual(const char *oid, 
-				     const gnutls_datum_t *othername,
-				     unsigned int *virt_type,
-				     gnutls_datum_t *virt)
-{
-	int ret;
-	unsigned type;
-
-	type = _san_othername_to_virtual(oid, strlen(oid));
-	if (type == GNUTLS_SAN_OTHERNAME)
-		return gnutls_assert_val(GNUTLS_E_X509_UNKNOWN_SAN);
-
-	if (virt_type)
-		*virt_type = type;
-
-	switch(type) {
-		case GNUTLS_SAN_OTHERNAME_XMPP:
-			ret = _gnutls_x509_decode_string
-				    (ASN1_ETYPE_UTF8_STRING, othername->data,
-				     othername->size, virt, 0);
-			if (ret < 0) {
-				gnutls_assert();
-				return ret;
-			}
-			return 0;
-		default:
-			return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
-	}
-}

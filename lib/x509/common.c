@@ -133,27 +133,6 @@ static const struct oid_to_string _oid2str[] = {
 	{NULL, 0, NULL, 0, NULL, 0}
 };
 
-int _san_othername_to_virtual(const char *oid, size_t size)
-{
-	if (oid) {
-		if ((unsigned) size == (sizeof(XMPP_OID)-1)
-		    && memcmp(oid, XMPP_OID, sizeof(XMPP_OID)-1) == 0)
-			return GNUTLS_SAN_OTHERNAME_XMPP;
-	}
-
-	return GNUTLS_SAN_OTHERNAME;
-}
-
-const char * _virtual_to_othername_oid(unsigned type)
-{
-	switch(type) {
-		case GNUTLS_SAN_OTHERNAME_XMPP:
-			return XMPP_OID;
-		default:
-			return NULL;
-	}
-}
-
 static const struct oid_to_string *get_oid_entry(const char *oid)
 {
 	unsigned int i = 0;
