@@ -3,6 +3,16 @@ Copyright (C) 2000-2015 Free Software Foundation, Inc.
 Copyright (C) 2013, 2014 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.3.21 (unreleased)
+
+** libgnutls: Corrected ALPN protocol negotiation. Before GnuTLS would negotiate
+   the last commonly supported protocol, rather than the first. Reported by
+   Remi Denis-Courmont (#63).
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.3.20 (released 2016-01-08)
 
 ** libgnutls: Corrected memory leak in gnutls_pubkey_import_privkey() when
