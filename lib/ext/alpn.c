@@ -92,7 +92,8 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 					    priv->protocols[i];
 					priv->selected_protocol_size =
 					    priv->protocol_size[i];
-					break;
+
+					return 0;
 				}
 			p += len1;
 		}
