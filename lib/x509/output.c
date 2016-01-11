@@ -143,6 +143,7 @@ unsigned i;
 	default:
 		addf(str,  _("%sUnknown name: "), prefix);
 		_gnutls_buffer_hexprint(str, name->data, name->size);
+		adds(str, "\n");
 		break;
 	}
 }
