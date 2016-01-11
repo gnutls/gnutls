@@ -83,6 +83,7 @@ static struct cfg_options available_options[] = {
 	{ .name = "dns_name", .type = OPTION_MULTI_LINE },
 	{ .name = "ip_address", .type = OPTION_MULTI_LINE },
 	{ .name = "email", .type = OPTION_MULTI_LINE },
+	{ .name = "krb5_principal", .type = OPTION_MULTI_LINE },
 	{ .name = "other_name", .type = OPTION_MULTI_LINE },
 	{ .name = "other_name_utf8", .type = OPTION_MULTI_LINE },
 	{ .name = "other_name_octet", .type = OPTION_MULTI_LINE },
@@ -160,6 +161,7 @@ typedef struct _cfg_ctx {
 	char **uri;
 	char **ip_addr;
 	char **email;
+	char **krb5_principal;
 	char **other_name;
 	char **other_name_utf8;
 	char **other_name_octet;
@@ -456,6 +458,7 @@ int template_parse(const char *template)
 	READ_MULTI_LINE("dc", cfg.dc);
 	READ_MULTI_LINE("dns_name", cfg.dns_name);
 	READ_MULTI_LINE("uri", cfg.uri);
+	READ_MULTI_LINE("krb5_principal", cfg.krb5_principal);
 	READ_MULTI_LINE_TOKENIZED("other_name", cfg.other_name);
 	READ_MULTI_LINE_TOKENIZED("other_name_octet", cfg.other_name_octet);
 	READ_MULTI_LINE_TOKENIZED("other_name_utf8", cfg.other_name_utf8);
@@ -1718,6 +1721,43 @@ void get_dns_name_set(int type, void *crt)
 	}
 }
 
+static int set_krb5_principal(int type, void *crt)
+{
+	int ret = 0, i;
+	gnutls_datum_t der;
+
+	if (batch) {
+		if (!cfg.krb5_principal)
+			return 0;
+
+		for (i = 0; cfg.krb5_principal[i] != NULL; i ++) {
+			if (type == TYPE_CRT)
+				ret =
+				    gnutls_x509_crt_set_subject_alt_name
+				    (crt, GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL,
+				     cfg.krb5_principal[i], strlen(cfg.krb5_principal[i]),
+				     GNUTLS_FSAN_APPEND);
+			else
+				ret =
+				    gnutls_x509_crq_set_subject_alt_name
+				    (crt, GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL,
+				     cfg.krb5_principal[i], strlen(cfg.krb5_principal[i]),
+				     GNUTLS_FSAN_APPEND);
+
+			if (ret < 0)
+				break;
+		}
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "set_subject_alt_name(GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL): %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	return ret;
+}
+
 static int set_othername(int type, void *crt)
 {
 	int ret = 0, i;
@@ -1907,6 +1947,7 @@ void get_other_name_set(int type, void *crt)
 	set_othername_octet(type, crt);
 	set_othername_utf8(type, crt);
 	set_xmpp_name(type, crt);
+	set_krb5_principal(type, crt);
 }
 
 void get_policy_set(gnutls_x509_crt_t crt)
