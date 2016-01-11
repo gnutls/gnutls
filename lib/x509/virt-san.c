@@ -26,6 +26,7 @@
 #include "gnutls_int.h"
 #include "x509_int.h"
 #include "common.h"
+#include "krb5.h"
 #include "virt-san.h"
 
 static
@@ -35,6 +36,9 @@ int san_othername_to_virtual(const char *oid, size_t size)
 		if ((unsigned) size == (sizeof(XMPP_OID)-1)
 		    && memcmp(oid, XMPP_OID, sizeof(XMPP_OID)-1) == 0)
 			return GNUTLS_SAN_OTHERNAME_XMPP;
+		else if ((unsigned) size == (sizeof(KRB5_PRINCIPAL_OID)-1)
+		    && memcmp(oid, KRB5_PRINCIPAL_OID, sizeof(KRB5_PRINCIPAL_OID)-1) == 0)
+			return GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL;
 	}
 
 	return GNUTLS_SAN_OTHERNAME;
@@ -46,6 +50,8 @@ const char * virtual_to_othername_oid(unsigned type)
 	switch(type) {
 		case GNUTLS_SAN_OTHERNAME_XMPP:
 			return XMPP_OID;
+		case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
+			return KRB5_PRINCIPAL_OID;
 		default:
 			return NULL;
 	}
@@ -87,6 +93,16 @@ int _gnutls_alt_name_assign_virt_type(struct name_st *name, unsigned type, gnutl
 				name->san.size = encoded.size;
 				name->othername_oid.data = (void*)gnutls_strdup(oid);
 				name->othername_oid.size = strlen(oid);
+				break;
+
+			case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
+				ret = _gnutls_krb5_principal_to_der((char*)san->data, &name->san);
+				if (ret < 0)
+					return gnutls_assert_val(ret);
+
+				name->othername_oid.data = (void*)gnutls_strdup(oid);
+				name->othername_oid.size = strlen(oid);
+				name->type = GNUTLS_SAN_OTHERNAME;
 				break;
 
 			default:
@@ -133,6 +149,13 @@ int gnutls_x509_othername_to_virtual(const char *oid,
 			ret = _gnutls_x509_decode_string
 				    (ASN1_ETYPE_UTF8_STRING, othername->data,
 				     othername->size, virt, 0);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			return 0;
+		case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
+			ret = _gnutls_krb5_der_to_principal(othername, virt);
 			if (ret < 0) {
 				gnutls_assert();
 				return ret;

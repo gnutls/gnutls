@@ -70,6 +70,7 @@
 #define ISO_SIG_RSA_SHA1_OID "1.3.14.3.2.29"
 
 #define XMPP_OID "1.3.6.1.5.5.7.8.5"
+#define KRB5_PRINCIPAL_OID "1.3.6.1.5.2.2"
 
 #define ASN1_NULL "\x05\x00"
 #define ASN1_NULL_SIZE 2

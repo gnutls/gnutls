@@ -65,7 +65,8 @@ libgnutls_x509_la_SOURCES =	\
 	pkcs7-output.c		\
 	virt-san.c		\
 	virt-san.h		\
-	x509_ext_int.h
+	x509_ext_int.h		\
+	krb5.c krb5.h
 
 if ENABLE_OCSP
 libgnutls_x509_la_SOURCES += ocsp.c ocsp_output.c

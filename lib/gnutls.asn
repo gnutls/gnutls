@@ -111,4 +111,15 @@ ECPrivateKey ::= SEQUENCE {
    publicKey     [1] BIT STRING OPTIONAL
 }
 
+-- Structures used for the PKINIT othername variables
+PrincipalName   ::= SEQUENCE {
+        name-type       [0] INTEGER,
+        name-string     [1] SEQUENCE OF GeneralString
+}
+
+KRB5PrincipalName ::= SEQUENCE {
+	realm                   [0] GeneralString,
+	principalName           [1] PrincipalName
+}
+
 END

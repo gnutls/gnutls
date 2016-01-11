@@ -81,6 +81,7 @@ unsigned i;
 #endif
 
 	if ((type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_OTHERNAME_XMPP
+	     || type == GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL
 	     || type == GNUTLS_SAN_RFC822NAME
 	     || type == GNUTLS_SAN_URI) && sname != NULL && strlen(sname) != name->size) {
 		adds(str,
@@ -140,6 +141,11 @@ unsigned i;
 	case GNUTLS_SAN_OTHERNAME_XMPP:
 		addf(str,  _("%sXMPP Address: %.*s\n"), prefix, name->size, NON_NULL(name->data));
 		break;
+
+	case GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL:
+		addf(str,  _("%sKRB5Principal: %.*s\n"), prefix, name->size, NON_NULL(name->data));
+		break;
+
 	default:
 		addf(str,  _("%sUnknown name: "), prefix);
 		_gnutls_buffer_hexprint(str, name->data, name->size);
