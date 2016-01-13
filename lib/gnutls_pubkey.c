@@ -2106,7 +2106,7 @@ int gnutls_pubkey_import_x509_raw(gnutls_pubkey_t pkey,
 		goto cleanup;
 	}
 
-	return 0;
+	ret = 0;
 
       cleanup:
 	gnutls_x509_crt_deinit(xpriv);
