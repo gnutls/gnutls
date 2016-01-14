@@ -54,7 +54,7 @@ ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4 -I src/gl/m4
 
 EXTRA_DIST = cfg.mk maint.mk .clcopying
 
-README-alpha: README.md
+README-alpha: README-alpha.md
 	cp $^ $@
 	chmod 444 $@
 
