@@ -9,6 +9,8 @@ See the end for copying conditions.
    the last commonly supported protocol, rather than the first. Reported by
    Remi Denis-Courmont (#63).
 
+** libgnutls: Tolerate empty DN fields in informational output functions.
+
 ** API and ABI modifications:
 No changes since last version.
 
