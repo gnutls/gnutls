@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2007-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2007-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
