@@ -58,6 +58,10 @@ README-alpha: README.md
 	cp $^ $@
 	chmod 444 $@
 
+README: README-install.md
+	cp $^ $@
+	chmod 444 $@
+
 dist-hook: 
 	make -C doc/ compare-makefile
 	make -C doc/ compare-exported
