@@ -51,8 +51,8 @@ int main()
 
 static void terminate(void);
 
-/* This program tests whether MD5 is rejected by a client as a
- * signature algorithm for the ServerKeyExchange.
+/* This program tests that the client does not send the
+ * status request extension if GNUTLS_NO_EXTENSIONS is set.
  */
 
 static void server_log_func(int level, const char *str)
