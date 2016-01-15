@@ -166,18 +166,16 @@ static void client(int fd)
 	}
 
 	if (ret < 0) {
-		terminate();
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
-		exit(1);
+		terminate();
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
 	}
 
 	if (gnutls_sign_algorithm_get(session) == GNUTLS_SIGN_RSA_MD5) {
-		terminate();
 		fail("client: MD5 was negotiated\n");
-		exit(1);
+		terminate();
 	}
 	success("client: %s was negotiated\n", gnutls_sign_get_name(gnutls_sign_algorithm_get(session)));
 
@@ -199,9 +197,8 @@ static void client(int fd)
 			    ("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
-		terminate();
 		fail("client: Error: %s\n", gnutls_strerror(ret));
-		exit(1);
+		terminate();
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);

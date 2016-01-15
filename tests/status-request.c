@@ -174,9 +174,8 @@ static void client(int fd)
 	}
 
 	if (ret < 0) {
-		terminate();
 		fail("client: Handshake failed: %s\n", gnutls_strerror(ret));
-		exit(1);
+		terminate();
 	} else {
 		if (debug)
 			success("client: Handshake was completed\n");
@@ -200,9 +199,8 @@ static void client(int fd)
 			    ("client: Peer has closed the TLS connection\n");
 		goto end;
 	} else if (ret < 0) {
-		terminate();
 		fail("client: Error: %s\n", gnutls_strerror(ret));
-		exit(1);
+		terminate();
 	}
 
 	gnutls_bye(session, GNUTLS_SHUT_WR);
