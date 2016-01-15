@@ -2915,3 +2915,108 @@ gnutls_x509_crq_set_private_key_usage_period(gnutls_x509_crq_t crq,
 
 	return result;
 }
+
+/**
+ * gnutls_x509_crq_get_tlsfeatures:
+ * @crt: A X.509 certificate request
+ * @features: If the function succeeds, the
+ *   features will be stored in this variable.
+ *
+ * This function will get the X.509 TLS features
+ * extension structure from the certificate request.
+ * The returned structure needs to be freed using
+ * gnutls_x509_tlsfeatures_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error value.
+ *
+ * Since: TBD
+ **/
+int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
+								   gnutls_x509_tlsfeatures_t *features)
+{
+	int ret;
+	gnutls_datum_t der;
+	unsigned int critical;
+
+	if (crq == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if ((ret =
+		 gnutls_x509_crq_get_extension_by_oid2(crq, GNUTLS_X509EXT_OID_TLSFEATURES, 0,
+						&der, &critical)) < 0)
+	{
+		return ret;
+	}
+
+	if (der.size == 0 || der.data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	ret = gnutls_x509_tlsfeatures_init(features);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = gnutls_x509_ext_import_tlsfeatures(&der, *features, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	gnutls_free(der.data);
+	return ret;
+
+ cleanup:
+	if (features != NULL)
+		gnutls_x509_tlsfeatures_deinit(*features);
+	gnutls_free(der.data);
+	return ret;
+}
+
+/**
+ * gnutls_x509_crq_set_tlsfeatures:
+ * @crt: A X.509 certificate request
+ * @features: If the function succeeds, the
+ *   features will be added to the certificate
+ *   request.
+ *
+ * This function will set the certificate request's
+ * X.509 TLS extention from the given structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error value.
+ *
+ * Since: TBD
+ **/
+int gnutls_x509_crq_set_tlsfeatures(gnutls_x509_crq_t crq,
+								   gnutls_x509_tlsfeatures_t features)
+{
+	int ret;
+	gnutls_datum_t der;
+
+	if (crq == NULL || features == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_x509_ext_export_tlsfeatures(features, &der);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = _gnutls_x509_crq_set_extension(crq, GNUTLS_X509EXT_OID_TLSFEATURES, &der, 0);
+
+	_gnutls_free_datum(&der);
+
+	if (ret < 0) {
+		gnutls_assert();
+	}
+
+	return ret;
+}

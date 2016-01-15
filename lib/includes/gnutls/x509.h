@@ -1341,6 +1341,12 @@ int gnutls_x509_crq_get_extension_by_oid(gnutls_x509_crq_t crq,
 					 void *buf,
 					 size_t * sizeof_buf,
 					 unsigned int *critical);
+
+int gnutls_x509_crq_get_tlsfeatures(gnutls_x509_crq_t crq,
+								   gnutls_x509_tlsfeatures_t * features);
+int gnutls_x509_crq_set_tlsfeatures(gnutls_x509_crq_t crq,
+								   gnutls_x509_tlsfeatures_t features);
+
 int
 gnutls_x509_crt_get_extension_by_oid2(gnutls_x509_crt_t cert,
 				     const char *oid, int indx,
