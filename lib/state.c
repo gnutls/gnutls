@@ -274,8 +274,6 @@ inline static void deinit_internal_params(gnutls_session_t session)
  */
 static void _gnutls_handshake_internal_state_init(gnutls_session_t session)
 {
-	session->internals.extensions_sent_size = 0;
-
 	/* by default no selected certificate */
 	session->internals.adv_version_major = 0;
 	session->internals.adv_version_minor = 0;
@@ -391,6 +389,8 @@ int gnutls_init(gnutls_session_t * session, unsigned int flags)
 	 */
 
 	_gnutls_handshake_internal_state_init(*session);
+
+	(*session)->internals.extensions_sent_size = 0;
 
 	/* emulate old gnutls behavior for old applications that do not use the priority_*
 	 * functions.

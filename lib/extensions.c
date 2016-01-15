@@ -157,8 +157,9 @@ const char *gnutls_ext_get_name(unsigned int ext)
 	return NULL;
 }
 
-/* Checks if the extension we just received is one of the 
- * requested ones. Otherwise it's a fatal error.
+/* Checks if the extension @type provided has been requested
+ * by us (in client side). In that case it returns zero, 
+ * otherwise a negative error value.
  */
 int
 _gnutls_extension_list_check(gnutls_session_t session, uint16_t type)
