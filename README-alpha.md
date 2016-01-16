@@ -39,7 +39,7 @@ some hints:
 Debian/Ubuntu:
 ```
 apt-get install -y git-core autoconf libtool gettext autopoint
-apt-get install -y automake autogen nettle-dev libp11-kit-dev
+apt-get install -y automake autogen nettle-dev libp11-kit-dev libtspi-dev
 apt-get install -y guile-2.0-dev libtasn1-6-dev libidn11-dev gawk gperf git2cl
 apt-get install -y libunbound-dev dns-root-data bison help2man gtk-doc-tools
 apt-get install -y texinfo texlive texlive-generic-recommended texlive-extra-utils
@@ -49,7 +49,7 @@ Fedora/RHEL:
 ```
 yum install -y git autoconf libtool gettext-devel automake autogen
 yum install -y automake autogen nettle-devel p11-kit-devel autogen-libopts-devel
-yum install -y guile-devel libtasn1-devel libidn-devel gawk gperf git2cl
+yum install -y trousers-devel guile-devel libtasn1-devel libidn-devel gawk gperf git2cl
 yum install -y unbound-devel bison help2man gtk-doc texinfo texlive
 ```
 
