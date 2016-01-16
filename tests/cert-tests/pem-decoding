@@ -95,6 +95,24 @@ if test "${rc}" != "0"; then
 	exit ${rc}
 fi
 
+${VALGRIND} "${CERTTOOL}" --certificate-info --infile "${srcdir}/template-krb5name.pem" >tmp-pem.pem
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "XMPP cert decoding failed 1"
+	exit ${rc}
+fi
+
+cat tmp-pem.pem |grep "KRB5Principal:" >tmp1
+cat "${srcdir}/template-krb5name-full.pem" |grep "KRB5Principal:" >tmp2
+${DIFF} -u tmp1 tmp2 || ${DIFF} -u --strip-trailing-cr tmp1 tmp2
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "KRB5 principalname cert decoding failed 1"
+	exit ${rc}
+fi
+
 rm -f tmp-pem.pem tmp1 tmp2
 
 exit 0

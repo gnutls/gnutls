@@ -37,7 +37,7 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
 	provable3072.pem provable2048.pem provable-dsa2048.pem provable-dsa2048-fips.pem \
 	template-unique.tmpl template-unique.pem template-othername.tmpl template-othername.pem \
 	template-othername-xmpp.tmpl template-othername-xmpp.pem template-krb5name.tmpl \
-	template-krb5name.pem
+	template-krb5name.pem template-krb5name-full.pem
 
 dist_check_SCRIPTS = pathlen aki certtool invalid-sig email \
 	pkcs7 privkey-import name-constraints certtool-long-cn crl provable-privkey
