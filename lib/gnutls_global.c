@@ -238,7 +238,7 @@ int gnutls_global_init(void)
 		gnutls_global_set_log_level(level);
 		if (_gnutls_log_func == NULL)
 			gnutls_global_set_log_function(default_log_func);
-		_gnutls_debug_log("Enabled GnuTLS logging...\n");
+		_gnutls_debug_log("Enabled GnuTLS "VERSION" logging...\n");
 	}
 
 #ifdef HAVE_DCGETTEXT
