@@ -264,7 +264,7 @@ operation.
 @item select
 @end itemize
 
-As well as an calls needed for memory allocation to work. Note however, that GnuTLS
+As well as any calls needed for memory allocation to work. Note however, that GnuTLS
 depends on libc for the system calls, and there is no guarrantee that libc will
 call the expected system call. For that it is recommended to test your
 program in all the targetted platforms when filters like seccomp are in place.
