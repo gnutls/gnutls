@@ -9,6 +9,10 @@ See the end for copying conditions.
    the last commonly supported protocol, rather than the first. Reported by
    Remi Denis-Courmont (#63).
 
+** libgnutls: ARCFOUR (RC4) is no longer included in the default priorities
+  list. It has to be explicitly enabled, e.g., with a string like
+  "NORMAL:+ARCFOUR-128".
+
 ** API and ABI modifications:
 No changes since last version.
 
