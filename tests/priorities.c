@@ -31,7 +31,7 @@
 
 #include "utils.h"
 
-#ifdef ENABLE_FIPS140
+#if defined(ENABLE_FIPS140) || defined(ENABLE_ARCFOUR128)
 void doit(void)
 {
 	exit(77);

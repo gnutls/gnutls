@@ -352,6 +352,9 @@ static const int cipher_priority_performance_default[] = {
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	GNUTLS_CIPHER_3DES_CBC,
+#ifdef ENABLE_ARCFOUR128
+	GNUTLS_CIPHER_ARCFOUR_128,
+#endif
 	0
 };
 
@@ -368,6 +371,9 @@ static const int cipher_priority_normal_default[] = {
 	GNUTLS_CIPHER_CAMELLIA_128_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	GNUTLS_CIPHER_3DES_CBC,
+#ifdef ENABLE_ARCFOUR128
+	GNUTLS_CIPHER_ARCFOUR_128,
+#endif
 	0
 };
 

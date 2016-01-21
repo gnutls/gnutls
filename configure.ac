@@ -350,6 +350,14 @@ if [ test "$enable_self_checks" = "yes" ];then
    AC_DEFINE([ENABLE_SELF_CHECKS], 1, [Self checks are included in the library])
 fi
 
+AC_ARG_WITH(arcfour128,
+  AS_HELP_STRING([--with-arcfour128], [include ARCFOUR128 in priority strings]),
+    enable_arcfour=$withval, enable_arcfour=no)
+if [ test "$enable_arcfour" = "yes" ];then
+  AC_DEFINE([ENABLE_ARCFOUR128], 1, [Enable ARCFOUR128])
+fi
+AM_CONDITIONAL(ENABLE_ARCFOUR128, test "$enable_arcfour" = "yes")
+
 AC_MSG_CHECKING([whether to build libdane])
 AC_ARG_ENABLE(libdane,
     AS_HELP_STRING([--disable-libdane],
