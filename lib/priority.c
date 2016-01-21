@@ -230,6 +230,7 @@ static const int* kx_priority_secure = _kx_priority_secure;
 static const int _cipher_priority_performance_default[] = {
 	GNUTLS_CIPHER_AES_128_GCM,
 	GNUTLS_CIPHER_AES_256_GCM,
+	GNUTLS_CIPHER_CHACHA20_POLY1305,
 	GNUTLS_CIPHER_CAMELLIA_128_GCM,
 	GNUTLS_CIPHER_CAMELLIA_256_GCM,
 	GNUTLS_CIPHER_AES_128_CBC,
@@ -248,6 +249,8 @@ static const int _cipher_priority_performance_default[] = {
 static const int _cipher_priority_normal_default[] = {
 	GNUTLS_CIPHER_AES_256_GCM,
 	GNUTLS_CIPHER_CAMELLIA_256_GCM,
+	GNUTLS_CIPHER_CHACHA20_POLY1305,
+
 	GNUTLS_CIPHER_AES_256_CBC,
 	GNUTLS_CIPHER_CAMELLIA_256_CBC,
 	GNUTLS_CIPHER_AES_256_CCM,
