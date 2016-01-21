@@ -772,8 +772,8 @@ expiration_days = 700
 #xmpp_name = juliet@im.example.com
 
 # Names used in PKINIT
-#krb5_principal = user@REALM.COM
-#krb5_principal = HTTP/user@REALM.COM
+#krb5_principal = user@@REALM.COM
+#krb5_principal = HTTP/user@@REALM.COM
 
 # A subject alternative name URI
 #uri = "http://www.example.com"
