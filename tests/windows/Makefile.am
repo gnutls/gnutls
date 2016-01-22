@@ -30,7 +30,7 @@ if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(top_builddir)/lib/minitasn1
 endif
 
-EXTRA_DIST = ncrypt-int.h
+EXTRA_DIST = ncrypt-int.h check-output
 
 AM_LDFLAGS = -no-install
 LDADD = $(top_builddir)/tests/libutils.la \
@@ -50,15 +50,19 @@ crypt32_la_LIBADD = ../../gl/libgnu.la ../../lib/libgnutls.la -lmsvcrt -lkernel3
 ncrypt_la_LDFLAGS = -module -no-undefined -avoid-version -Wl,--add-stdcall-alias
 crypt32_la_LDFLAGS = -module -no-undefined -avoid-version -Wl,--add-stdcall-alias
 
-ctests += cng-windows
 
 cng_windows_DEPENDENCIES = ncrypt.la crypt32.la
 cng_windows_CPPFLAGS = $(AM_CPPFLAGS)
 
+LOG_COMPILER = ./check-output
+
 endif
+
+ctests += cng-windows
 
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS =
+
 
 TESTS = $(ctests) $(dist_check_SCRIPTS)
 
