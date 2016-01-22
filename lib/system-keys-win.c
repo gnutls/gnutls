@@ -1,6 +1,6 @@
 /*
- * Copyright © 2014 Red Hat, Inc.
- * Copyright © 2015 Dyalog Ltd.
+ * Copyright © 2014-2016 Red Hat, Inc.
+ * Copyright © 2015-2016 Dyalog Ltd.
  *
  * Author: Nikos Mavrogiannopoulos, Bjørn Christensen
  *
@@ -767,6 +767,9 @@ _gnutls_privkey_import_system_url(gnutls_privkey_t pkey,
 
 	gnutls_free(kpi);
 
+	if (cert != 0)
+		CertFreeCertificateContext(cert);
+
 	CertCloseStore(store, 0);
 	return ret;
 }
@@ -828,6 +831,9 @@ _gnutls_x509_crt_import_system_url(gnutls_x509_crt_t crt, const char *url)
 
 	ret = 0;
  cleanup:
+	if (cert != 0)
+		CertFreeCertificateContext(cert);
+
 	CertCloseStore(store, 0);
 	return ret;
 }
