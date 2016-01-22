@@ -138,3 +138,72 @@ PCCERT_CONTEXT WINAPI CertEnumCertificatesInStore(HCERTSTORE hCertStore,
 {
 	return NULL;
 }
+
+__declspec(dllexport)
+BOOL WINAPI CertFreeCertificateContext(PCCERT_CONTEXT pCertContext)
+{
+	return 1;
+}
+
+/* These are for CAPI, and are placeholders */
+__declspec(dllexport)
+BOOL WINAPI CryptGetProvParam(HCRYPTPROV hProv, DWORD dwParam,
+			      BYTE *pbData, DWORD *pdwDataLen,
+			      DWORD dwFlags)
+{
+	return 0;
+}
+
+__declspec(dllexport)
+BOOL WINAPI CryptAcquireContextW(HCRYPTPROV *phProv, LPCWSTR szContainer,
+				 LPCWSTR szProvider, DWORD dwProvType, DWORD dwFlags)
+{
+	return 0;
+}
+
+__declspec(dllexport)
+BOOL WINAPI CryptDecrypt(HCRYPTKEY hKey, HCRYPTHASH hHash, BOOL Final,
+		         DWORD dwFlags, BYTE *pbData, DWORD *pdwDataLen)
+{
+	return 0;
+}
+
+__declspec(dllexport)
+BOOL WINAPI CryptDestroyHash(HCRYPTHASH hHash)
+{
+	return 1;
+}
+
+__declspec(dllexport)
+BOOL WINAPI CryptSignHash(
+  HCRYPTHASH hHash,
+  DWORD      dwKeySpec,
+  LPCTSTR    sDescription,
+  DWORD      dwFlags,
+  _Out_   BYTE       *pbSignature,
+  _Inout_ DWORD      *pdwSigLen)
+{
+	return 0;
+}
+
+__declspec(dllexport)
+BOOL WINAPI CryptGetHashParam(HCRYPTHASH hHash, DWORD dwParam,
+			      BYTE *pbData, DWORD *pdwDataLen, DWORD dwFlags)
+{
+	return 0;
+}
+
+__declspec(dllexport)
+BOOL WINAPI CryptSetHashParam(HCRYPTHASH hHash, DWORD dwParam,
+			      const BYTE *pbData, DWORD dwFlags)
+{
+	return 0;
+}
+
+
+__declspec(dllexport)
+BOOL WINAPI CryptCreateHash(HCRYPTPROV hProv, ALG_ID Algid, HCRYPTKEY hKey,
+			    DWORD dwFlags, HCRYPTHASH *phHash)
+{
+	return 0;
+}
