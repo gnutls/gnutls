@@ -54,7 +54,7 @@ crypt32_la_LDFLAGS = -module -no-undefined -avoid-version -Wl,--add-stdcall-alia
 cng_windows_DEPENDENCIES = ncrypt.la crypt32.la
 cng_windows_CPPFLAGS = $(AM_CPPFLAGS)
 
-LOG_COMPILER = ./check-output
+LOG_COMPILER = $(srcdir)/check-output
 
 endif
 
