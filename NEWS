@@ -30,6 +30,8 @@ See the end for copying conditions.
 
 ** libgnutls: Replaced writev() system call with sendmsg().
 
+** libgnutls: Replaced select() system call with poll() on POSIX systems.
+
 ** certtool: Added the --provable option.
 
 ** API and ABI modifications:

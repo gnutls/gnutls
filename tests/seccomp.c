@@ -76,9 +76,7 @@ int disable_system_calls(void)
 	ADD_SYSCALL(rt_sigprocmask, 0);
 
 	/* used in to detect reading timeouts */
-	ADD_SYSCALL(select, 0);
-	/* in x86, glibc uses _newselect() */
-	ADD_SYSCALL(_newselect, 0);
+	ADD_SYSCALL(poll, 0);
 
 	/* for memory allocation */
 	ADD_SYSCALL(brk, 0);

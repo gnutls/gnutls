@@ -45,8 +45,9 @@ static HMODULE Crypt32_dll;
 #  define pCertEnumCRLsInStore CertEnumCRLsInStore
 # endif
 
-#else /* _WIN32 */
-# include <sys/select.h>
+#else /* !_WIN32 */
+
+# include <poll.h>
 
 # ifdef HAVE_PTHREAD_LOCKS
 #  include <pthread.h>
@@ -164,10 +165,24 @@ system_read(gnutls_transport_ptr_t ptr, void *data, size_t data_size)
  **/
 int gnutls_system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
-	fd_set rfds;
-	struct timeval _tv, *tv = NULL;
 	int ret;
 	int fd = GNUTLS_POINTER_TO_INT(ptr);
+#ifndef _WIN32
+	int timeo;
+	struct pollfd pfd;
+
+	pfd.fd = fd;
+	pfd.events = POLLIN;
+	pfd.revents = 0;
+
+	if (ms == GNUTLS_INDEFINITE_TIMEOUT)
+		timeo = -1;
+	else
+		timeo = ms;
+	ret = poll(&pfd, 1, timeo);
+#else
+	fd_set rfds;
+	struct timeval _tv, *tv = NULL;
 
 	FD_ZERO(&rfds);
 	FD_SET(fd, &rfds);
@@ -179,6 +194,7 @@ int gnutls_system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 	}
 
 	ret = select(fd + 1, &rfds, NULL, NULL, tv);
+#endif
 	if (ret <= 0)
 		return ret;
 
@@ -437,7 +453,6 @@ static
 int add_system_trust(gnutls_x509_trust_list_t list, unsigned int tl_flags,
 		     unsigned int tl_vflags)
 {
-	char path[GNUTLS_PATH_MAX];
 	unsigned int i;
 	int r = 0;
 
