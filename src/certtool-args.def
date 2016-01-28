@@ -769,7 +769,7 @@ expiration_days = 700
 #other_name_octet = "1.2.4.5.6 A string that will be encoded as ASN.1 octet string"
 
 # Allows writing an XmppAddr Identifier
-#xmpp_name = juliet@im.example.com
+#xmpp_name = juliet@@im.example.com
 
 # Names used in PKINIT
 #krb5_principal = user@@REALM.COM
