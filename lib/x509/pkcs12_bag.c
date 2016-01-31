@@ -110,7 +110,7 @@ gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag_t bag, int indx)
  * gnutls_pkcs12_bag_get_count:
  * @bag: The bag
  *
- * This function will return the number of the elements withing the bag.
+ * This function will return the number of the elements within the bag.
  *
  * Returns: Number of elements in bag, or an negative error code on
  *   error.

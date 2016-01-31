@@ -2228,7 +2228,7 @@ int crl_dist_points_set(gnutls_x509_crl_dist_points_t cdp,
  * @san: The point name data
  * @reasons: Revocation reasons. An ORed sequence of flags from %gnutls_x509_crl_reason_flags_t.
  *
- * This function will store the specified CRL distibution point value
+ * This function will store the specified CRL distribution point value
  * the @cdp type.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0), otherwise a negative error value.

@@ -694,7 +694,7 @@ const char *get_confirmed_pass(bool empty_ok)
 		do {
 			if (pass)
 				fprintf(stderr,
-					"Password missmatch, try again.\n");
+					"Password mismatch, try again.\n");
 
 			free(copy);
 
