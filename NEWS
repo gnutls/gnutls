@@ -11,6 +11,9 @@ See the end for copying conditions.
 
 ** libgnutls: Tolerate empty DN fields in informational output functions.
 
+** libgnutls: Corrected regression causes by incorrect fix in
+   gnutls_x509_ext_export_key_usage() at 3.4.8 release.
+
 ** API and ABI modifications:
 No changes since last version.
 
