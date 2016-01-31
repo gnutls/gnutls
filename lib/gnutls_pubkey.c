@@ -253,7 +253,7 @@ gnutls_pubkey_import_privkey(gnutls_pubkey_t key, gnutls_privkey_t pkey,
  * @hash: The result of the call with the hash algorithm used for signature
  * @mand: If non zero it means that the algorithm MUST use this hash. May be NULL.
  *
- * This function will read the certifcate and return the appropriate digest
+ * This function will read the certificate and return the appropriate digest
  * algorithm to use for signing with this certificate. Some certificates (i.e.
  * DSA might not be able to sign without the preferred algorithm).
  *

@@ -339,7 +339,7 @@ gnutls_openpgp_get_key(gnutls_datum_t * key,
  * @key: the datum that contains the secret key.
  * @format: the format of the keys
  *
- * This funtion is used to load OpenPGP keys into the GnuTLS credential 
+ * This function is used to load OpenPGP keys into the GnuTLS credential 
  * structure. The datum should contain at least one valid non encrypted subkey.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -362,7 +362,7 @@ gnutls_certificate_set_openpgp_key_mem(gnutls_certificate_credentials_t
  * @keyfile: the file that contains the secret key.
  * @format: the format of the keys
  *
- * This funtion is used to load OpenPGP keys into the GnuTLS
+ * This function is used to load OpenPGP keys into the GnuTLS
  * credentials structure. The file should contain at least one valid non encrypted subkey.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -412,7 +412,7 @@ static int get_keyid(gnutls_openpgp_keyid_t keyid, const char *str)
  * @subkey_id: a hex encoded subkey id
  * @format: the format of the keys
  *
- * This funtion is used to load OpenPGP keys into the GnuTLS
+ * This function is used to load OpenPGP keys into the GnuTLS
  * credentials structure. The datum should contain at least one valid non encrypted subkey.
  *
  * The special keyword "auto" is also accepted as @subkey_id.  In that
@@ -509,7 +509,7 @@ gnutls_certificate_set_openpgp_key_mem2(gnutls_certificate_credentials_t
  * @subkey_id: a hex encoded subkey id
  * @format: the format of the keys
  *
- * This funtion is used to load OpenPGP keys into the GnuTLS credential 
+ * This function is used to load OpenPGP keys into the GnuTLS credential 
  * structure. The file should contain at least one valid non encrypted subkey.
  *
  * The special keyword "auto" is also accepted as @subkey_id.  In that
@@ -752,7 +752,7 @@ _gnutls_openpgp_request_key(gnutls_session_t session, gnutls_datum_t * ret,
  * @session: a TLS session
  * @func: the callback
  *
- * This funtion will set a key retrieval function for OpenPGP keys. This
+ * This function will set a key retrieval function for OpenPGP keys. This
  * callback is only useful in server side, and will be used if the peer
  * sent a key fingerprint instead of a full key.
  *
