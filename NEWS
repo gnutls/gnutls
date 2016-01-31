@@ -10,9 +10,12 @@ See the end for copying conditions.
    Remi Denis-Courmont (#63).
 
 ** libgnutls: ARCFOUR (RC4) is no longer included in the default priorities
-  list. It has to be explicitly enabled, e.g., with a string like
-  "NORMAL:+ARCFOUR-128". The previous behavior can be restored using
-  the flag --with-arcfour128 to configure.
+   list. It has to be explicitly enabled, e.g., with a string like
+   "NORMAL:+ARCFOUR-128". The previous behavior can be restored using
+   the flag --with-arcfour128 to configure.
+
+** libgnutls: Corrected regression causes by incorrect fix in
+   gnutls_x509_ext_export_key_usage() at 3.3.20 release.
 
 ** API and ABI modifications:
 No changes since last version.
