@@ -29,6 +29,7 @@
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
+#include "softhsm.h"
 
 #define CONFIG_NAME "softhsm-pubkey-import-ecdsa"
 #define CONFIG CONFIG_NAME".config"
@@ -37,6 +38,10 @@
 
 void doit(void)
 {
+#ifdef SOFTHSM_V1
+	exit(77);
+#else
 	success("Testing ECDSA key\n");
 	return try(0);
+#endif
 }
