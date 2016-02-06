@@ -475,8 +475,7 @@ with the credential types is shown in @ref{tab:key-exchange-cred}.
 @code{KX_DHE_RSA},
 @code{KX_DHE_DSS},
 @code{KX_ECDHE_RSA},
-@code{KX_ECDHE_ECDSA},
-@code{KX_RSA_EXPORT}
+@code{KX_ECDHE_ECDSA}
 @tab @code{CRD_CERTIFICATE}
 @tab @code{CRD_CERTIFICATE}
 

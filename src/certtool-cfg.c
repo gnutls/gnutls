@@ -1815,7 +1815,7 @@ int get_sign_status(int server)
 	} else {
 		if (server)
 			msg =
-			    "Will the certificate be used for signing (DHE and RSA-EXPORT ciphersuites)? (Y/n): ";
+			    "Will the certificate be used for signing (DHE ciphersuites)? (Y/n): ";
 		else
 			msg =
 			    "Will the certificate be used for signing (required for TLS)? (Y/n): ";
