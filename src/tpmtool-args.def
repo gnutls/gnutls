@@ -51,7 +51,7 @@ flag = {
 
 flag = {
     name      = system;
-    descrip   = "Any registred key will be a system key";
+    descrip   = "Any registered key will be a system key";
     flags_must = register;
     flags_cant = user;
     doc = "The generated key will be stored in system persistent storage.";

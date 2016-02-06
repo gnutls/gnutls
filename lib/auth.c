@@ -65,7 +65,7 @@ void gnutls_credentials_clear(gnutls_session_t session)
  * @type: is the type of the credentials
  * @cred: the credentials to set
  *
- * Sets the needed credentials for the specified type.  Eg username,
+ * Sets the needed credentials for the specified type.  E.g. username,
  * password - or public and private keys etc.  The @cred parameter is
  * a structure that depends on the specified type and on the current
  * session (client or server).

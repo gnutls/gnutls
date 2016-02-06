@@ -370,7 +370,7 @@ authority list may also be set using:
 @showfuncD{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_trust_dir,gnutls_certificate_set_x509_crl_file,gnutls_certificate_set_x509_system_trust}
 
 These functions allow the specification of the trusted certificate authorities, either
-via a file, a directory or use the system-specified certificate authories. 
+via a file, a directory or use the system-specified certificate authorities. 
 Unless the authorities are application specific, it is generally recommended
 to use the system trust storage (see @funcref{gnutls_certificate_set_x509_system_trust}).
 
