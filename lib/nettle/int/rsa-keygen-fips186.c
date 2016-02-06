@@ -268,26 +268,30 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	struct dss_params_validation_seeds cert;
 	unsigned l = n_size / 2;
 
-	if (n_size == 2048) {
-		if (seed_length != 14 * 2) {
-			_gnutls_debug_log("Seed length must be 28 bytes (it is %d)\n", seed_length);
+	if (_gnutls_fips_mode_enabled() != 0) {
+		if (n_size == 2048) {
+			if (seed_length != 14 * 2) {
+				_gnutls_debug_log("Seed length must be 28 bytes (it is %d)\n", seed_length);
+				return 0;
+			}
+		} else if (n_size == 3072) {
+			if (seed_length != 16 * 2) {
+				_gnutls_debug_log("Seed length must be 32 bytes (it is %d)\n", seed_length);
+				return 0;
+			}
+		} else {
+			_gnutls_debug_log("Unsupported size for modulus\n");
 			return 0;
 		}
-	} else if (n_size == 3072) {
-		if (seed_length != 16 * 2) {
-			_gnutls_debug_log("Seed length must be 32 bytes (it is %d)\n", seed_length);
-			return 0;
-		}
-	} else {
-		_gnutls_debug_log("Unsupported size for modulus\n");
-		return 0;
 	}
 
 	if (!mpz_tstbit(pub->e, 0)) {
+		_gnutls_debug_log("Unacceptable e (it is even)\n");
 		return 0;
 	}
 
 	if (mpz_cmp_ui(pub->e, 65536) <= 0) {
+		_gnutls_debug_log("Unacceptable e\n");
 		return 0;
 	}
 

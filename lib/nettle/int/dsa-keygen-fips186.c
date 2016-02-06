@@ -83,6 +83,7 @@ _dsa_generate_dss_pq(struct dsa_params *params,
 	}
 
 	if (seed_length < q_bits / 8) {
+		_gnutls_debug_log("Seed length must be larger than %d bytes (it is %d)\n", q_bits/8, seed_length);
 		return 0;
 	}
 
@@ -419,15 +420,20 @@ _dsa_generate_dss_pqg(struct dsa_params *params,
 	if (ret == 0)
 		return 0;
 
-	cert->seed_length = 2 * (q_bits / 8) + 1;
+	if (_gnutls_fips_mode_enabled() != 0) {
+		cert->seed_length = 2 * (q_bits / 8) + 1;
+
+		if (cert->seed_length != seed_size) {
+			_gnutls_debug_log("Seed length must be %d bytes (it is %d)\n", cert->seed_length, seed_size);
+			return 0;
+		}
+	} else {
+		cert->seed_length = seed_size;
+	}
 
 	if (cert->seed_length > sizeof(cert->seed))
 		return 0;
 
-	if (cert->seed_length != seed_size) {
-		_gnutls_debug_log("Seed length must be %d bytes (it is %d)\n", cert->seed_length, seed_size);
-		return 0;
-	}
 
 	memcpy(cert->seed, seed, cert->seed_length);
 
