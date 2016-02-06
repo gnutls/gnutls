@@ -741,7 +741,7 @@ _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
  *
  * This function will register a new extension type. The extension will remain
  * registered until gnutls_global_deinit() is called. If the extension type
- * is already registred then %GNUTLS_E_ALREADY_REGISTERED will be returned.
+ * is already registered then %GNUTLS_E_ALREADY_REGISTERED will be returned.
  *
  * Each registered extension can store temporary data into the gnutls_session_t
  * structure using gnutls_ext_set_data(), and they can be retrieved using

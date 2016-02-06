@@ -59,7 +59,7 @@ finished using @acronym{GnuTLS}.
 The credentials structures are used by the authentication methods, such
 as certificate authentication. They store certificates, privates keys,
 and other information that is needed to prove the identity to the peer,
-and/or verify the indentity of the peer. The information stored in
+and/or verify the identity of the peer. The information stored in
 the credentials structures is initialized once and then can be 
 shared by many @acronym{TLS} sessions.
 
@@ -162,7 +162,7 @@ error. Other available environment variables are shown in @ref{tab:environment}.
 @item @code{GNUTLS_CPUID_OVERRIDE}
 @tab That environment variable can be used to
 explicitly enable/disable the use of certain CPU capabilities. Note that CPU
-detection cannot be overriden, i.e., VIA options cannot be enabled on an Intel
+detection cannot be overridden, i.e., VIA options cannot be enabled on an Intel
 CPU. The currently available options are:
 @itemize
 @item 0x1: Disable all run-time detected optimizations
@@ -265,7 +265,7 @@ operation.
 @end itemize
 
 As well as any calls needed for memory allocation to work. Note however, that GnuTLS
-depends on libc for the system calls, and there is no guarrantee that libc will
+depends on libc for the system calls, and there is no guarantee that libc will
 call the expected system call. For that it is recommended to test your
 program in all the targetted platforms when filters like seccomp are in place.
 
@@ -338,7 +338,7 @@ precalculations needed, opens any required system devices (e.g., /dev/urandom on
 and initializes subsystems that could be used later.
 
 The resources allocated by the initialization process will be released 
-on library deinitialization, or explictly by calling @funcref{gnutls_global_deinit}.
+on library deinitialization, or explicitly by calling @funcref{gnutls_global_deinit}.
 
 Note that during initialization file descriptors may be kept open by
 GnuTLS (e.g. /dev/urandom) on library load. Applications closing all unknown file
@@ -822,7 +822,7 @@ call the @funcref{gnutls_init} function with the
 When in non-blocking mode the function, the @funcref{gnutls_init} function 
 must be called with the @code{GNUTLS_NONBLOCK} flag set (see @ref{Session initialization}). 
 
-In constrast with the TLS protocol, the pull timeout function is required,
+In contrast with the TLS protocol, the pull timeout function is required,
 but will only be called with a timeout of zero. In that case it should indicate
 whether there are data to be received or not. When not using the default pull function,
 then @funcref{gnutls_transport_set_pull_timeout_function} should be called.
@@ -1502,7 +1502,7 @@ the risk of a compromised CA being undetected.
 
 @subsubsection Trust on first use
 
-The GnuTLS library includes functionlity to use an SSH-like trust on first use authentication.
+The GnuTLS library includes functionality to use an SSH-like trust on first use authentication.
 The available functions to store and verify public keys are listed below.
 
 @showfuncdesc{gnutls_verify_stored_pubkey}

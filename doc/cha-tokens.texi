@@ -4,7 +4,7 @@
 In several cases storing the long term cryptographic keys in a hard disk or
 even in memory poses a significant risk. Once the system they are stored
 is compromised the keys must be replaced as the secrecy of future sessions
-is no longer guarranteed. Moreover, past sessions that were not protected by a
+is no longer guaranteed. Moreover, past sessions that were not protected by a
 perfect forward secrecy offering ciphersuite are also to be assumed compromised.
 
 If such threats need to be addressed, then it may be wise storing the keys in a security
@@ -287,7 +287,7 @@ storage module@footnote{@url{http://p11-glue.freedesktop.org/trust-module.html}}
 
 @node PKCS11 Initialization
 @subsection Initialization
-To allow all @acronym{GnuTLS} applications to transparently access smard cards
+To allow all @acronym{GnuTLS} applications to transparently access smart cards
 and tokens, @acronym{PKCS} #11 is automatically initialized during the first
 call of a @acronym{PKCS} #11 related function. The initialization process, based
 on p11-kit configuration, loads any appropriate modules. The p11-kit configuration

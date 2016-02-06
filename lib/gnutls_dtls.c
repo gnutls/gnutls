@@ -569,7 +569,7 @@ void gnutls_dtls_set_timeouts(gnutls_session_t session,
  * This function will set the maximum transfer unit of the transport
  * that DTLS packets are sent over. Note that this should exclude
  * the IP (or IPv6) and UDP headers. So for DTLS over IPv6 on an
- * Ethenet device with MTU 1500, the DTLS MTU set with this function
+ * Ethernet device with MTU 1500, the DTLS MTU set with this function
  * would be 1500 - 40 (IPV6 header) - 8 (UDP header) = 1452.
  *
  * Since: 3.0
