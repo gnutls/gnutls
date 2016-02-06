@@ -35,8 +35,7 @@
  * gnutls_anon_free_server_credentials:
  * @sc: is a #gnutls_anon_server_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to free (deallocate) it.
+ * Free a gnutls_anon_server_credentials_t structure.
  **/
 void
 gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t sc)
@@ -49,8 +48,7 @@ gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t sc)
  * gnutls_anon_allocate_server_credentials:
  * @sc: is a pointer to a #gnutls_anon_server_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to allocate it.
+ * Allocate a gnutls_anon_server_credentials_t structure.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
@@ -69,8 +67,7 @@ gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t *
  * gnutls_anon_free_client_credentials:
  * @sc: is a #gnutls_anon_client_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to free (deallocate) it.
+ * Free a gnutls_anon_client_credentials_t structure.
  **/
 void
 gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t sc)
@@ -85,8 +82,7 @@ static const gnutls_anon_client_credentials_t anon_dummy =
  * gnutls_anon_allocate_client_credentials:
  * @sc: is a pointer to a #gnutls_anon_client_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus
- * this helper function is provided in order to allocate it.
+ * Allocate a gnutls_anon_client_credentials_t structure.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/

@@ -408,8 +408,7 @@ _gnutls_calc_srp_S2(bigint_t B, bigint_t g, bigint_t x, bigint_t a,
  * gnutls_srp_free_client_credentials:
  * @sc: is a #gnutls_srp_client_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus
- * this helper function is provided in order to free (deallocate) it.
+ * Free a gnutls_srp_client_credentials_t structure.
  **/
 void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc)
 {
@@ -422,8 +421,7 @@ void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc)
  * gnutls_srp_allocate_client_credentials:
  * @sc: is a pointer to a #gnutls_srp_server_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus
- * this helper function is provided in order to allocate it.
+ * Allocate a gnutls_srp_client_credentials_t structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  *   error code.
@@ -483,8 +481,7 @@ gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res,
  * gnutls_srp_free_server_credentials:
  * @sc: is a #gnutls_srp_server_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus
- * this helper function is provided in order to free (deallocate) it.
+ * Free a gnutls_srp_server_credentials_t structure.
  **/
 void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
 {
@@ -511,8 +508,7 @@ void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
  * gnutls_srp_allocate_server_credentials:
  * @sc: is a pointer to a #gnutls_srp_server_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to allocate it.
+ * Allocate a gnutls_srp_server_credentials_t structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  *   error code.

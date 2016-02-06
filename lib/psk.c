@@ -39,8 +39,7 @@
  * gnutls_psk_free_client_credentials:
  * @sc: is a #gnutls_psk_client_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to free (deallocate) it.
+ * Free a gnutls_psk_client_credentials_t structure.
  **/
 void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc)
 {
@@ -53,8 +52,7 @@ void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc)
  * gnutls_psk_allocate_client_credentials:
  * @sc: is a pointer to a #gnutls_psk_server_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to allocate it.
+ * Allocate a gnutls_psk_client_credentials_t structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -152,8 +150,7 @@ gnutls_psk_set_client_credentials(gnutls_psk_client_credentials_t res,
  * gnutls_psk_free_server_credentials:
  * @sc: is a #gnutls_psk_server_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to free (deallocate) it.
+ * Free a gnutls_psk_server_credentials_t structure.
  **/
 void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc)
 {
@@ -166,8 +163,7 @@ void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc)
  * gnutls_psk_allocate_server_credentials:
  * @sc: is a pointer to a #gnutls_psk_server_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to allocate it.
+ * Allocate a gnutls_psk_server_credentials_t structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.

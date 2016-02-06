@@ -183,8 +183,7 @@ void gnutls_certificate_free_ca_names(gnutls_certificate_credentials_t sc)
  * gnutls_certificate_free_credentials:
  * @sc: is a #gnutls_certificate_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to free (deallocate) it.
+ * Free a gnutls_certificate_credentials_t structure.
  *
  * This function does not free any temporary parameters associated
  * with this structure (ie RSA and DH parameters are not freed by this
@@ -209,8 +208,7 @@ gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
  * gnutls_certificate_allocate_credentials:
  * @res: is a pointer to a #gnutls_certificate_credentials_t type.
  *
- * This structure is complex enough to manipulate directly thus this
- * helper function is provided in order to allocate it.
+ * Allocate a gnutls_certificate_credentials_t structure.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
