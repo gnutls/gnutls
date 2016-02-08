@@ -1212,7 +1212,22 @@ int gnutls_srtp_set_mki(gnutls_session_t session,
 int gnutls_srtp_get_mki(gnutls_session_t session, gnutls_datum_t * mki);
 
 /* ALPN TLS extension */
-#define GNUTLS_ALPN_MAND 1
+
+/**
+ * gnutls_alpn_flags_t:
+ * @GNUTLS_ALPN_MANDATORY: Require ALPN negotiation. The connection will be
+ *   aborted if no matching ALPN protocol is found.
+ * @GNUTLS_ALPN_SERVER_PRECEDENCE: The choices set by the server
+ *   will take precedence over the client's.
+ *
+ * Enumeration of different ALPN flags. These are used by gnutls_alpn_set_protocols().
+ */
+typedef enum {
+	GNUTLS_ALPN_MANDATORY = 1,
+	GNUTLS_ALPN_SERVER_PRECEDENCE = (1<<1)
+} gnutls_alpn_flags_t;
+
+#define GNUTLS_ALPN_MAND GNUTLS_ALPN_MANDATORY
 int gnutls_alpn_get_selected_protocol(gnutls_session_t session,
 				      gnutls_datum_t * protocol);
 int gnutls_alpn_set_protocols(gnutls_session_t session,

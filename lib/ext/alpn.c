@@ -60,6 +60,7 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 	ssize_t data_size = _data_size;
 	alpn_ext_st *priv;
 	extension_priv_data_t epriv;
+	int selected_protocol_index;
 
 	ret =
 	    _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_ALPN,
@@ -78,23 +79,37 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 		    gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		selected_protocol_index = MAX_ALPN_PROTOCOLS+1;
+
 		while (data_size > 0) {
 			DECR_LENGTH_RET(data_size, 1, 0);
 			len1 = *p;
 			p += 1;
 			DECR_LENGTH_RET(data_size, len1, 0);
 
-			for (i = 0; i < priv->size; i++)
+			for (i = 0; i < priv->size; i++) {
 				if (priv->protocol_size[i] == len1
 				    && memcmp(p, priv->protocols[i],
 					      len1) == 0) {
-					priv->selected_protocol =
-					    priv->protocols[i];
-					priv->selected_protocol_size =
-					    priv->protocol_size[i];
 
-					return 0;
+					if (priv->flags & GNUTLS_ALPN_SERVER_PRECEDENCE) {
+						if (selected_protocol_index > (int)i) {
+							selected_protocol_index = i;
+							priv->selected_protocol =
+							    priv->protocols[i];
+							priv->selected_protocol_size =
+							    priv->protocol_size[i];
+							break;
+						}
+					} else {
+						priv->selected_protocol =
+						    priv->protocols[i];
+						priv->selected_protocol_size =
+						    priv->protocol_size[i];
+						return 0;
+					}
 				}
+			}
 			p += len1;
 		}
 	} else {
@@ -103,7 +118,7 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 		p += 1;
 		DECR_LENGTH_RET(data_size, len1, 0);
 
-		for (i = 0; i < priv->size; i++)
+		for (i = 0; i < priv->size; i++) {
 			if (priv->protocol_size[i] == len1
 			    && memcmp(p, priv->protocols[i], len1) == 0) {
 				priv->selected_protocol =
@@ -112,6 +127,7 @@ _gnutls_alpn_recv_params(gnutls_session_t session,
 				    priv->protocol_size[i];
 				break;
 			}
+		}
 		p += len1;
 	}
 
@@ -246,13 +262,13 @@ gnutls_alpn_get_selected_protocol(gnutls_session_t session,
  * @session: is a #gnutls_session_t type.
  * @protocols: is the protocol names to add.
  * @protocols_size: the number of protocols to add.
- * @flags: zero or %GNUTLS_ALPN_*
+ * @flags: zero or a sequence of %gnutls_alpn_flags_t
  *
  * This function is to be used by both clients and servers, to declare
  * the supported ALPN protocols, which are used during negotiation with peer.
  *
- * If %GNUTLS_ALPN_MAND is specified the connection will be aborted
- * if no matching ALPN protocol is found.
+ * See %gnutls_alpn_flags_t description for the documentation of available
+ * flags.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
  *   otherwise a negative error code is returned.
