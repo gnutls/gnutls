@@ -1095,8 +1095,9 @@ are shown in @ref{tab:prio-algorithms}.
 To avoid collisions in order to specify a compression algorithm in
 the priority string you have to prefix it with "COMP-", protocol versions
 with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". 
-All other algorithms don't need a prefix. Each specified keyword can
-be prefixed with any of the following characters.
+All other algorithms don't need a prefix. Each specified keyword (except
+for @emph{special keywords}) can be prefixed with any of the following
+characters.
 
 @table @asis
 @item '!' or '-' 
