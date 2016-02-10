@@ -40,9 +40,11 @@ typedef struct {
 } files_st;
 
 files_st files[] = {
+#ifndef ENABLE_FIPS140
 	{"client.p12", "foobar"},
 	{"cert-ca.p12", "1234"}, /* 2 certs, one is a CA */
 	{"pkcs12_2certs.p12", ""}, /* 2 certs, on is unrelated */
+#endif
 	{NULL, NULL}
 };
 
