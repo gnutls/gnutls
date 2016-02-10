@@ -36,6 +36,7 @@ See the end for copying conditions.
 
 ** API and ABI modifications:
 GNUTLS_INDEFINITE_TIMEOUT: Added
+GNUTLS_ALPN_SERVER_PRECEDENCE: Added
 gnutls_check_version_numeric: Added
 gnutls_x509_crq_set_subject_alt_othername: Added
 gnutls_x509_crt_set_subject_alt_othername: Added
