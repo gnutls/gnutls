@@ -462,6 +462,7 @@ gnutls_certificate_set_ocsp_status_request_file
 {
 	sc->ocsp_func = file_ocsp_func;
 	sc->ocsp_func_ptr = sc;
+	gnutls_free(sc->ocsp_response_file);
 	sc->ocsp_response_file = gnutls_strdup(response_file);
 	if (sc->ocsp_response_file == NULL)
 		return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
