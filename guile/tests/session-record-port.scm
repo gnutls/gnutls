@@ -100,6 +100,7 @@
            ;; Make sure we got everything right.
            (and (eq? (session-record-port server)
                      (session-record-port server))
+                (zero? (cdr (waitpid pid)))
                 (= amount (u8vector-length %message))
                 (equal? buf %message)
                 (eof-object?
