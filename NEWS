@@ -60,6 +60,7 @@ See the end for copying conditions.
 ** API and ABI modifications:
 GNUTLS_INDEFINITE_TIMEOUT: Added
 GNUTLS_ALPN_SERVER_PRECEDENCE: Added
+GNUTLS_E_ASN1_EMBEDDED_NULL_IN_STRING: Added
 gnutls_check_version_numeric: Added
 gnutls_x509_crq_set_subject_alt_othername: Added
 gnutls_x509_crt_set_subject_alt_othername: Added

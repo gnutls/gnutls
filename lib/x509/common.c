@@ -408,7 +408,7 @@ decode_complex_string(const struct oid_to_string *oentry, void *value,
 	/* Refuse to deal with strings containing NULs. */
 	if (strlen((void *) out->data) != (size_t) out->size) {
 		_gnutls_free_datum(out);
-		return gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+		return gnutls_assert_val(GNUTLS_E_ASN1_EMBEDDED_NULL_IN_STRING);
 	}
 
 	return 0;
@@ -660,7 +660,7 @@ _gnutls_x509_decode_string(unsigned int etype,
 
 		if (len != (size_t) output->size) {
 			_gnutls_free_datum(output);
-			ret = gnutls_assert_val(GNUTLS_E_ASN1_DER_ERROR);
+			ret = gnutls_assert_val(GNUTLS_E_ASN1_EMBEDDED_NULL_IN_STRING);
 		}
 	}
 

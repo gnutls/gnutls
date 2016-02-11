@@ -378,6 +378,8 @@ static const gnutls_error_entry error_entries[] = {
 		    GNUTLS_E_UNEXPECTED_EXTENSIONS_LENGTH),
 	ERROR_ENTRY(N_("Peer's certificate has changed during a rehandshake."),
 		    GNUTLS_E_SESSION_CERTIFICATE_CHANGED),
+	ERROR_ENTRY(N_("The provided string has an embedded null."),
+		    GNUTLS_E_ASN1_EMBEDDED_NULL_IN_STRING),
 	{NULL, NULL, 0}
 };
 
