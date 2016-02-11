@@ -103,6 +103,47 @@ gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
 }
 
 /**
+ * gnutls_dh_params_import_dsa:
+ * @dh_params: The parameters
+ * @key: holds a DSA private key
+ *
+ * This function will import the prime and generator of the DSA key for use 
+ * in the Diffie-Hellman key exchange.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
+ **/
+int
+gnutls_dh_params_import_dsa(gnutls_dh_params_t dh_params, gnutls_x509_privkey_t key)
+{
+	gnutls_datum_t p, g, q;
+	bigint_t tmp_q;
+	int ret;
+
+	ret = gnutls_x509_privkey_export_dsa_raw(key, &p, &q, &g, NULL, NULL);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
+
+	ret = _gnutls_mpi_init_scan_nz(&tmp_q, q.data, q.size);
+	if (ret < 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_SCAN_FAILED;
+		goto cleanup;
+	}
+
+	ret = gnutls_dh_params_import_raw2(dh_params, &p, &g, _gnutls_mpi_get_nbits(tmp_q));
+
+	_gnutls_mpi_release(&tmp_q);
+
+ cleanup:
+	gnutls_free(p.data);
+	gnutls_free(g.data);
+	gnutls_free(q.data);
+
+	return ret;
+}
+
+/**
  * gnutls_dh_params_import_raw2:
  * @dh_params: The parameters
  * @prime: holds the new prime

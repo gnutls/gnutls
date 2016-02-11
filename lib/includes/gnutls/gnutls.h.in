@@ -1752,6 +1752,7 @@ void gnutls_dh_params_deinit(gnutls_dh_params_t dh_params);
 int gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
 				const gnutls_datum_t * prime,
 				const gnutls_datum_t * generator);
+int gnutls_dh_params_import_dsa(gnutls_dh_params_t dh_params, gnutls_x509_privkey_t key);
 int gnutls_dh_params_import_raw2(gnutls_dh_params_t dh_params,
 				 const gnutls_datum_t * prime,
 				 const gnutls_datum_t * generator,
