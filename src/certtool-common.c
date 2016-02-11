@@ -954,11 +954,32 @@ print_dh_info(FILE * outfile, gnutls_datum_t * p, gnutls_datum_t * g,
 
 }
 
+static
+int import_dsa_dh(gnutls_dh_params_t dh_params, gnutls_datum_t *params, gnutls_x509_crt_fmt_t format)
+{
+	gnutls_x509_privkey_t pkey;
+	int ret;
+
+	ret = gnutls_x509_privkey_init(&pkey);
+	if (ret < 0)
+		return ret;
+
+	ret = gnutls_x509_privkey_import(pkey, params, format);
+	if (ret < 0)
+		return ret;
+
+	ret = gnutls_dh_params_import_dsa(dh_params, pkey);
+
+	gnutls_x509_privkey_deinit(pkey);
+
+	return ret;
+}
+
 void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 {
 	gnutls_datum_t params;
 	size_t size;
-	int ret;
+	int ret, ret2;
 	gnutls_dh_params_t dh_params;
 	gnutls_datum_t p, g;
 	unsigned int q_bits = 0;
@@ -977,9 +998,13 @@ void dh_info(FILE * infile, FILE * outfile, common_info_st * ci)
 	    gnutls_dh_params_import_pkcs3(dh_params, &params,
 					  ci->incert_format);
 	if (ret < 0) {
-		fprintf(stderr, "Error parsing dh params: %s\n",
-			gnutls_strerror(ret));
-		exit(1);
+		/* Try DSA */
+		ret2 = import_dsa_dh(dh_params, &params, ci->incert_format);
+		if (ret2 < 0) {
+			fprintf(stderr, "Error parsing dh params: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
 	}
 
 	ret = gnutls_dh_params_export_raw(dh_params, &p, &g, &q_bits);
