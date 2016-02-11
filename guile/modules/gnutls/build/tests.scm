@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2011-2012 Free Software Foundation, Inc.
+;;; Copyright (C) 2011-2012, 2016 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,8 @@
 ;;; Written by Ludovic Courtès <ludo@gnu.org>.
 
 (define-module (gnutls build tests)
-  #:export (run-test))
+  #:export (run-test
+            with-child-process))
 
 (define (run-test thunk)
   "Call `(exit (THUNK))'.  If THUNK raises an exception, then call `(exit 1)' and
@@ -39,3 +40,39 @@ display a backtrace.  Otherwise, return THUNK's return value."
          (lambda ()
            (exit 1)))
        (exit 1)))))
+
+(define (call-with-child-process child parent)
+  "Run thunk CHILD in a child process and invoke PARENT from the parent
+process, passing it the PID of the child process.  Make sure the child
+process exits upon failure."
+  (let ((pid (primitive-fork)))
+    (if (zero? pid)
+        (dynamic-wind
+          (const #t)
+          (lambda ()
+            (primitive-exit (if (child) 0 1)))
+          (lambda ()
+            (primitive-exit 2)))
+        (parent pid))))
+
+(cond-expand
+  ((not guile-2)                                  ;1.8, yay!
+   (use-modules (ice-9 syncase))
+
+   (define-syntax define-syntax-rule
+     (syntax-rules ()
+       ((_ (name args ...) docstring body)
+        (define-syntax name
+          (syntax-rules ()
+            ((_ args ...) body))))))
+
+   (export define-syntax-rule))
+  (else
+   #t))
+
+(define-syntax-rule (with-child-process pid parent child)
+  "Fork and evaluate expression PARENT in the current process, with PID bound
+to the PID of its child process; the child process evaluated CHILD."
+  (call-with-child-process
+   (lambda () child)
+   (lambda (pid) parent)))
