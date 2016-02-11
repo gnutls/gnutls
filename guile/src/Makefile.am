@@ -1,5 +1,5 @@
 #  GnuTLS --- Guile bindings for GnuTLS.
-#  Copyright (C) 2007-2014 Free Software Foundation, Inc.
+#  Copyright (C) 2007-2014, 2016 Free Software Foundation, Inc.
 #
 #  GnuTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -88,20 +88,20 @@ endif HAVE_GCC
 
 
 enums.h: $(srcdir)/make-enum-header.scm
-	$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
-	mv "$@.tmp" "$@"
+	$(AM_V_GEN)$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
+	$(AM_V_at)mv "$@.tmp" "$@"
 
 enum-map.i.c: $(srcdir)/make-enum-map.scm
-	$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
-	mv "$@.tmp" "$@"
+	$(AM_V_GEN)$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
+	$(AM_V_at)mv "$@.tmp" "$@"
 
 smobs.h: $(srcdir)/make-smob-header.scm
-	$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
-	mv "$@.tmp" "$@"
+	$(AM_V_GEN)$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
+	$(AM_V_at)mv "$@.tmp" "$@"
 
 smob-types.i.c: $(srcdir)/make-smob-types.scm
-	$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
-	mv "$@.tmp" "$@"
+	$(AM_V_GEN)$(GUILE_FOR_BUILD) "$^" > "$@.tmp"
+	$(AM_V_at)mv "$@.tmp" "$@"
 
 
 # C file snarfing.
@@ -115,7 +115,7 @@ snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 # prerequisites to be ignored:
 # <http://lists.gnutls.org/pipermail/gnutls-devel/2013-September/006453.html>.
 %.x: %.c $(GENERATED_BINDINGS)
-	$(guile_snarf) -o $@ $< $(snarfcppopts)
+	$(AM_V_GEN)$(guile_snarf) -o $@ $< $(snarfcppopts)
 
 # Target used by doc/Makefile, to create all built sources necessary
 # for generating the manual.
