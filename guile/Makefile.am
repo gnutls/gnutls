@@ -44,9 +44,10 @@ EXTRA_DIST += modules/gnutls.in $(helper_modules) $(documentation_modules)
 CLEANFILES = modules/gnutls.scm
 
 .in.scm:
-	cat "$^" | $(SED) -e's|[@]guileextensiondir[@]|$(guileextensiondir)|g' \
+	$(AM_V_GEN)cat "$^" |						\
+	  $(SED) -e's|[@]guileextensiondir[@]|$(guileextensiondir)|g'	\
 	  > "$@.tmp"
-	mv "$@.tmp" "$@"
+	$(AM_V_at)mv "$@.tmp" "$@"
 
 
 #
