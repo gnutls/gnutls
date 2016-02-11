@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007-2014 Free Software Foundation, Inc.
+;;; Copyright (C) 2007-2014, 2016 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -55,56 +55,55 @@
 ;;                       (format #t "[~a|~a] ~a" (getpid) level str)))
 
 (run-test
-    (lambda ()
-      (let ((socket-pair (socketpair PF_UNIX SOCK_STREAM 0))
-            (pub         (import-key import-x509-certificate
-                                     "x509-certificate.pem"))
-            (sec         (import-key import-x509-private-key
-                                     "x509-key.pem")))
-        (let ((pid (primitive-fork)))
-          (if (= 0 pid)
+ (lambda ()
+   (let ((socket-pair (socketpair PF_UNIX SOCK_STREAM 0))
+         (pub         (import-key import-x509-certificate
+                                  "x509-certificate.pem"))
+         (sec         (import-key import-x509-private-key
+                                  "x509-key.pem")))
+     (with-child-process pid
 
-              (let ((client (make-session connection-end/client))
-                    (cred   (make-certificate-credentials)))
-                ;; client-side (child process)
-                (set-session-priorities! client priorities)
-                (set-certificate-credentials-x509-keys! cred (list pub) sec)
-                (set-session-credentials! client cred)
-                (set-session-dh-prime-bits! client 1024)
+       ;; server-side
+       (let ((server (make-session connection-end/server))
+             (dh     (import-dh-params "dh-parameters.pem")))
+         (set-session-priorities! server priorities)
+         (set-server-session-certificate-request! server
+                                                  certificate-request/require)
 
-                (set-session-transport-fd! client (port->fdes (car socket-pair)))
+         (set-session-transport-fd! server (port->fdes (cdr socket-pair)))
+         (let ((cred (make-certificate-credentials))
+               (trust-file (search-path %load-path
+                                        "x509-certificate.pem"))
+               (trust-fmt  x509-certificate-format/pem))
+           (set-certificate-credentials-dh-parameters! cred dh)
+           (set-certificate-credentials-x509-keys! cred (list pub) sec)
+           (set-certificate-credentials-x509-trust-file! cred
+                                                         trust-file
+                                                         trust-fmt)
+           (set-session-credentials! server cred))
+         (set-session-dh-prime-bits! server 1024)
 
-                (handshake client)
-                (write %message (session-record-port client))
-                (bye client close-request/rdwr)
+         (handshake server)
+         (let ((msg (read (session-record-port server)))
+               (auth-type (session-authentication-type server)))
+           (bye server close-request/rdwr)
+           (and (eq? auth-type credentials/certificate)
+                (equal? msg %message))))
 
-                (primitive-exit))
+       ;; client-side (child process)
+       (let ((client (make-session connection-end/client))
+             (cred   (make-certificate-credentials)))
+         (set-session-priorities! client priorities)
+         (set-certificate-credentials-x509-keys! cred (list pub) sec)
+         (set-session-credentials! client cred)
+         (set-session-dh-prime-bits! client 1024)
 
-              (let ((server (make-session connection-end/server))
-                    (dh     (import-dh-params "dh-parameters.pem")))
-                ;; server-side
-                (set-session-priorities! server priorities)
-                (set-server-session-certificate-request! server
-                         certificate-request/require)
+         (set-session-transport-fd! client (port->fdes (car socket-pair)))
 
-                (set-session-transport-fd! server (port->fdes (cdr socket-pair)))
-                (let ((cred (make-certificate-credentials))
-                      (trust-file (search-path %load-path
-                                               "x509-certificate.pem"))
-                      (trust-fmt  x509-certificate-format/pem))
-                  (set-certificate-credentials-dh-parameters! cred dh)
-                  (set-certificate-credentials-x509-keys! cred (list pub) sec)
-                  (set-certificate-credentials-x509-trust-file! cred
-                                                                trust-file
-                                                                trust-fmt)
-                  (set-session-credentials! server cred))
-                (set-session-dh-prime-bits! server 1024)
+         (handshake client)
+         (write %message (session-record-port client))
+         (bye client close-request/rdwr)
 
-                (handshake server)
-                (let ((msg (read (session-record-port server)))
-                      (auth-type (session-authentication-type server)))
-                  (bye server close-request/rdwr)
-                  (and (eq? auth-type credentials/certificate)
-                       (equal? msg %message)))))))))
+         (primitive-exit))))))
 
 ;;; arch-tag: 1f88f835-a5c8-4fd6-94b6-5a13571ba03d
