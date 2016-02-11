@@ -28,6 +28,9 @@ See the end for copying conditions.
    applications which do not check user credentials on rehandshakes from
    attacks related to unsafe renegotiation.
 
+** libgnutls: Enforce the RFC 7627 (extended master secret) requirements on
+   session resumption.
+
 ** libgnutls: Replaced writev() system call with sendmsg().
 
 ** libgnutls: Replaced select() system call with poll() on POSIX systems.
