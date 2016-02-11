@@ -1724,7 +1724,6 @@ void get_dns_name_set(int type, void *crt)
 static int set_krb5_principal(int type, void *crt)
 {
 	int ret = 0, i;
-	gnutls_datum_t der;
 
 	if (batch) {
 		if (!cfg.krb5_principal)
