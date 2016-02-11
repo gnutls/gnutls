@@ -81,7 +81,8 @@
          (let ((msg (read (session-record-port server)))
                (auth-type (session-authentication-type server)))
            (bye server close-request/rdwr)
-           (and (eq? auth-type credentials/certificate)
+           (and (zero? (cdr (waitpid pid)))
+                (eq? auth-type credentials/certificate)
                 (equal? msg %message))))
 
        ;; client-side (child process)

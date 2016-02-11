@@ -71,7 +71,8 @@
          (let* ((buf (make-u8vector (u8vector-length %message)))
                 (amount (record-receive! server buf)))
            (bye server close-request/rdwr)
-           (and (= amount (u8vector-length %message))
+           (and (zero? (cdr (waitpid pid)))
+                (= amount (u8vector-length %message))
                 (equal? buf %message))))
 
        ;; client-side (child process)
