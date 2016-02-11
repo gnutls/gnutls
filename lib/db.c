@@ -251,6 +251,15 @@ int _gnutls_server_register_current_session(gnutls_session_t session)
 	return ret;
 }
 
+int _gnutls_check_resumed_params(gnutls_session_t session)
+{
+	if (session->internals.resumed_security_parameters.ext_master_secret != 
+	    session->security_parameters.ext_master_secret)
+	    return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
+
+	return 0;
+}
+
 int
 _gnutls_server_restore_session(gnutls_session_t session,
 			       uint8_t * session_id, int session_id_size)
@@ -301,9 +310,9 @@ _gnutls_server_restore_session(gnutls_session_t session,
 		return ret;
 	}
 
-	/* Force the state of ext_master_secret based on the resumed parameters */
-	if (session->internals.resumed_security_parameters.ext_master_secret != 0)
-	    session->security_parameters.ext_master_secret = 1;
+	ret = _gnutls_check_resumed_params(session);
+	if (ret < 0)
+		return gnutls_assert_val(ret);
 
 	return 0;
 }

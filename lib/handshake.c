@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2000-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2015-2016 Red Hat, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -475,15 +476,14 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 {
 	uint8_t session_id_len;
 	int pos = 0, ret;
-	uint16_t suite_size, comp_size;
+	uint16_t suite_size, comp_size, ext_size;
 	gnutls_protocol_t adv_version;
 	int neg_version, sret = 0;
 	int len = datalen;
 	uint8_t major, minor;
-	uint8_t *suite_ptr, *comp_ptr, *session_id;
+	uint8_t *suite_ptr, *comp_ptr, *session_id, *ext_ptr;
 
 	DECR_LEN(len, 2);
-
 	_gnutls_handshake_log("HSK[%p]: Client's version: %d.%d\n",
 			      session, data[pos], data[pos + 1]);
 
@@ -541,6 +541,38 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		pos += cookie_size;
 	}
 
+	/* move forward to extensions and store other vals */
+	DECR_LEN(len, 2);
+	suite_size = _gnutls_read_uint16(&data[pos]);
+	pos += 2;
+
+	suite_ptr = &data[pos];
+	DECR_LEN(len, suite_size);
+	pos += suite_size;
+
+	DECR_LEN(len, 1);
+	comp_size = data[pos++]; /* the number of compression methods */
+
+	comp_ptr = &data[pos];
+	DECR_LEN(len, comp_size);
+	pos += comp_size;
+
+	ext_ptr = &data[pos];
+	ext_size = len;
+
+	/* Parse only the mandatory to read extensions for resumption.
+	 * We don't want to parse any other extensions since
+	 * we don't want new extension values to override the
+	 * resumed ones.
+	 */
+	ret =
+	    _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
+				     ext_ptr, ext_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	ret =
 	    _gnutls_server_restore_session(session, session_id,
 					   session_id_len);
@@ -549,33 +581,6 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		session->internals.resumption_requested = 1;
 
 	if (ret == 0) {		/* resumed using default TLS resumption! */
-		/* Parse only the safe renegotiation extension
-		 * We don't want to parse any other extensions since
-		 * we don't want new extension values to overwrite the
-		 * resumed ones.
-		 */
-
-		/* move forward to extensions */
-		DECR_LEN(len, 2);
-		suite_size = _gnutls_read_uint16(&data[pos]);
-		pos += 2;
-
-		DECR_LEN(len, suite_size);
-		pos += suite_size;
-
-		DECR_LEN(len, 1);
-		comp_size = data[pos++];	/* z is the number of compression methods */
-		DECR_LEN(len, comp_size);
-		pos += comp_size;
-
-		ret =
-		    _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
-					     &data[pos], len);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-
 		ret = resume_copy_required_values(session);
 		if (ret < 0)
 			return gnutls_assert_val(ret);
@@ -592,32 +597,13 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		session->internals.resumed = RESUME_FALSE;
 	}
 
-	/* Remember ciphersuites for later
-	 */
-	DECR_LEN(len, 2);
-	suite_size = _gnutls_read_uint16(&data[pos]);
-	pos += 2;
-
-	DECR_LEN(len, suite_size);
-	suite_ptr = &data[pos];
-	pos += suite_size;
-
-	/* Point to the compression methods
-	 */
-	DECR_LEN(len, 1);
-	comp_size = data[pos++];	/* z is the number of compression methods */
-
-	DECR_LEN(len, comp_size);
-	comp_ptr = &data[pos];
-	pos += comp_size;
-
 	/* Parse the extensions (if any)
 	 *
 	 * Unconditionally try to parse extensions; safe renegotiation uses them in
 	 * sslv3 and higher, even though sslv3 doesn't officially support them.
 	 */
 	ret = _gnutls_parse_extensions(session, GNUTLS_EXT_APPLICATION,
-				       &data[pos], len);
+				       ext_ptr, ext_size);
 	/* len is the rest of the parsed length */
 	if (ret < 0) {
 		gnutls_assert();
@@ -631,16 +617,9 @@ read_client_hello(gnutls_session_t session, uint8_t * data,
 		return sret;
 	}
 
-	ret = _gnutls_parse_extensions(session, GNUTLS_EXT_MANDATORY,
-				       &data[pos], len);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
+	/* Session tickets are parsed in this point */
 	ret =
-	    _gnutls_parse_extensions(session, GNUTLS_EXT_TLS, &data[pos],
-				     len);
+	    _gnutls_parse_extensions(session, GNUTLS_EXT_TLS, ext_ptr, ext_size);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
