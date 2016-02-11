@@ -18,6 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef INCLUDE_COMMON_H
+# define INCLUDE_COMMON_H
+
 #define SERVER "127.0.0.1"
 
 #include <config.h>
@@ -125,4 +128,6 @@ void set_read_funcs(gnutls_session_t session)
 }
 #else
 # define set_read_funcs(x)
+#endif
+
 #endif

@@ -52,7 +52,6 @@
 
 static FILE *stdlog = NULL;
 
-static void privkey_info_int(common_info_st *, gnutls_x509_privkey_t key);
 static void print_crl_info(gnutls_x509_crl_t crl, FILE * out);
 void pkcs7_info(common_info_st *);
 void pkcs7_sign(common_info_st *, unsigned embed);
@@ -195,95 +194,6 @@ generate_private_key_int(common_info_st * cinfo)
 	return key;
 }
 
-static int cipher_to_flags(const char *cipher)
-{
-	if (cipher == NULL) {
-#ifdef ENABLE_FIPS140
-		return GNUTLS_PKCS_USE_PBES2_AES_128;
-#else /* compatibility mode - most implementations don't support PBES2 with AES */
-		return GNUTLS_PKCS_USE_PKCS12_3DES;
-#endif
-	} else if (strcasecmp(cipher, "3des") == 0) {
-		return GNUTLS_PKCS_USE_PBES2_3DES;
-	} else if (strcasecmp(cipher, "3des-pkcs12") == 0) {
-		return GNUTLS_PKCS_USE_PKCS12_3DES;
-	} else if (strcasecmp(cipher, "arcfour") == 0) {
-		return GNUTLS_PKCS_USE_PKCS12_ARCFOUR;
-	} else if (strcasecmp(cipher, "aes-128") == 0) {
-		return GNUTLS_PKCS_USE_PBES2_AES_128;
-	} else if (strcasecmp(cipher, "aes-192") == 0) {
-		return GNUTLS_PKCS_USE_PBES2_AES_192;
-	} else if (strcasecmp(cipher, "aes-256") == 0) {
-		return GNUTLS_PKCS_USE_PBES2_AES_256;
-	} else if (strcasecmp(cipher, "rc2-40") == 0) {
-		return GNUTLS_PKCS_USE_PKCS12_RC2_40;
-	}
-
-	fprintf(stderr, "unknown cipher %s\n", cipher);
-	exit(1);
-}
-
-
-static void
-print_private_key(common_info_st * cinfo, gnutls_x509_privkey_t key)
-{
-	int ret;
-	size_t size;
-
-	if (!key)
-		return;
-
-	if (!cinfo->pkcs8) {
-		/* Only print private key parameters when an unencrypted
-		 * format is used */
-		if (outcert_format == GNUTLS_X509_FMT_PEM)
-			privkey_info_int(cinfo, key);
-
-		size = lbuffer_size;
-		ret = gnutls_x509_privkey_export(key, outcert_format,
-						 lbuffer, &size);
-		if (ret < 0) {
-			fprintf(stderr, "privkey_export: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-
-		if (gnutls_x509_privkey_get_seed(key, NULL, NULL, 0) != GNUTLS_E_INVALID_REQUEST) {
-			gnutls_x509_privkey_set_flags(key, GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT);
-
-			fwrite(lbuffer, 1, size, outfile);
-
-			size = lbuffer_size;
-			ret = gnutls_x509_privkey_export(key, outcert_format,
-						 lbuffer, &size);
-			if (ret < 0) {
-				fprintf(stderr, "privkey_export: %s\n",
-					gnutls_strerror(ret));
-				exit(1);
-			}
-		}
-
-	} else {
-		unsigned int flags = 0;
-		const char *pass;
-
-		pass = get_password(cinfo, &flags, 0);
-		flags |= cipher_to_flags(cinfo->pkcs_cipher);
-
-		size = lbuffer_size;
-		ret =
-		    gnutls_x509_privkey_export_pkcs8(key, outcert_format,
-						     pass, flags, lbuffer,
-						     &size);
-		if (ret < 0) {
-			fprintf(stderr, "privkey_export_pkcs8: %s\n",
-				gnutls_strerror(ret));
-			exit(1);
-		}
-	}
-
-	fwrite(lbuffer, 1, size, outfile);
-}
 
 static void generate_private_key(common_info_st * cinfo)
 {
@@ -291,7 +201,7 @@ static void generate_private_key(common_info_st * cinfo)
 
 	key = generate_private_key_int(cinfo);
 
-	print_private_key(cinfo, key);
+	print_private_key(outfile, cinfo, key);
 
 	gnutls_x509_privkey_deinit(key);
 }
@@ -1944,132 +1854,6 @@ void crq_info(void)
 	gnutls_x509_crq_deinit(crq);
 }
 
-static void privkey_info_int(common_info_st * cinfo,
-			     gnutls_x509_privkey_t key)
-{
-	int ret, key_type;
-	unsigned int bits = 0;
-	size_t size;
-	const char *cprint;
-
-	/* Public key algorithm
-	 */
-	fprintf(outfile, "Public Key Info:\n");
-	ret = gnutls_x509_privkey_get_pk_algorithm2(key, &bits);
-	fprintf(outfile, "\tPublic Key Algorithm: ");
-
-	key_type = ret;
-
-	cprint = gnutls_pk_algorithm_get_name(key_type);
-	fprintf(outfile, "%s\n", cprint ? cprint : "Unknown");
-	fprintf(outfile, "\tKey Security Level: %s (%u bits)\n\n",
-		gnutls_sec_param_get_name(gnutls_x509_privkey_sec_param
-					  (key)), bits);
-
-	/* Print the raw public and private keys
-	 */
-	if (key_type == GNUTLS_PK_RSA) {
-		gnutls_datum_t m, e, d, p, q, u, exp1, exp2;
-
-		ret =
-		    gnutls_x509_privkey_export_rsa_raw2(key, &m, &e, &d,
-							&p, &q, &u, &exp1,
-							&exp2);
-		if (ret < 0)
-			fprintf(stderr,
-				"Error in key RSA data export: %s\n",
-				gnutls_strerror(ret));
-		else {
-			print_rsa_pkey(outfile, &m, &e, &d, &p, &q, &u,
-				       &exp1, &exp2, HAVE_OPT(CPRINT));
-
-			gnutls_free(m.data);
-			gnutls_free(e.data);
-			gnutls_free(d.data);
-			gnutls_free(p.data);
-			gnutls_free(q.data);
-			gnutls_free(u.data);
-			gnutls_free(exp1.data);
-			gnutls_free(exp2.data);
-		}
-	} else if (key_type == GNUTLS_PK_DSA) {
-		gnutls_datum_t p, q, g, y, x;
-
-		ret =
-		    gnutls_x509_privkey_export_dsa_raw(key, &p, &q, &g, &y,
-						       &x);
-		if (ret < 0)
-			fprintf(stderr,
-				"Error in key DSA data export: %s\n",
-				gnutls_strerror(ret));
-		else {
-			print_dsa_pkey(outfile, &x, &y, &p, &q, &g,
-				       HAVE_OPT(CPRINT));
-
-			gnutls_free(x.data);
-			gnutls_free(y.data);
-			gnutls_free(p.data);
-			gnutls_free(q.data);
-			gnutls_free(g.data);
-		}
-	} else if (key_type == GNUTLS_PK_EC) {
-		gnutls_datum_t y, x, k;
-		gnutls_ecc_curve_t curve;
-
-		ret =
-		    gnutls_x509_privkey_export_ecc_raw(key, &curve, &x, &y,
-						       &k);
-		if (ret < 0)
-			fprintf(stderr,
-				"Error in key ECC data export: %s\n",
-				gnutls_strerror(ret));
-		else {
-			cprint = gnutls_ecc_curve_get_name(curve);
-			bits = 0;
-
-			print_ecc_pkey(outfile, curve, &k, &x, &y,
-				       HAVE_OPT(CPRINT));
-
-			gnutls_free(x.data);
-			gnutls_free(y.data);
-			gnutls_free(k.data);
-		}
-	}
-
-	fprintf(outfile, "\n");
-
-	size = lbuffer_size;
-	ret = gnutls_x509_privkey_get_seed(key, NULL, lbuffer, &size);
-	if (ret >= 0) {
-		fprintf(outfile, "Seed: %s\n",
-			raw_to_string(lbuffer, size));
-	}
-
-	size = lbuffer_size;
-	if ((ret =
-	     gnutls_x509_privkey_get_key_id(key, GNUTLS_KEYID_USE_SHA1, lbuffer, &size)) < 0) {
-		fprintf(stderr, "Error in key id calculation: %s\n",
-			gnutls_strerror(ret));
-	} else {
-		gnutls_datum_t art;
-
-		fprintf(outfile, "Public Key ID: %s\n",
-			raw_to_string(lbuffer, size));
-
-		ret =
-		    gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, cprint,
-				      bits, lbuffer, size, &art);
-		if (ret >= 0) {
-			fprintf(outfile, "Public key's random art:\n%s\n",
-				art.data);
-			gnutls_free(art.data);
-		}
-
-	}
-	fprintf(outfile, "\n");
-
-}
-
 void privkey_info(common_info_st * cinfo)
 {
 	gnutls_x509_privkey_t key;
@@ -2110,7 +1894,7 @@ void privkey_info(common_info_st * cinfo)
 	 * to our format. */
 	cinfo->pkcs8 = 0;
 
-	print_private_key(cinfo, key);
+	print_private_key(outfile, cinfo, key);
 
 	ret = gnutls_x509_privkey_verify_params(key);
 	if (ret < 0)
@@ -2155,7 +1939,7 @@ void generate_request(common_info_st * cinfo)
 
 		xkey = generate_private_key_int(cinfo);
 
-		print_private_key(cinfo, xkey);
+		print_private_key(outfile, cinfo, xkey);
 
 		ret =
 		    gnutls_privkey_import_x509(pkey, xkey,

@@ -209,7 +209,7 @@ libcmd_tpmtool_la_LIBADD += $(LTLIBREADLINE) $(INET_PTON_LIB) $(LIB_CLOCK_GETTIM
 
 endif # ENABLE_TROUSERS
 
-systemkey_SOURCES = systemkey.c certtool-common.c
+systemkey_SOURCES = systemkey.c certtool-common.c common.c
 systemkey_LDADD = ../lib/libgnutls.la
 systemkey_LDADD += libcmd-systemkey.la $(LIBOPTS) ../gl/libgnu.la gl/libgnu_gpl.la
 systemkey_LDADD += $(LTLIBINTL)
