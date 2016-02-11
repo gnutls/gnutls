@@ -66,7 +66,7 @@ static void cipher_mac_bench(int algo, int mac_algo, int size)
 	key.data = _key;
 	key.size = keysize;
 
-	printf("%16s-%s ", gnutls_cipher_get_name(algo),
+	printf("%19s-%s ", gnutls_cipher_get_name(algo),
 	       gnutls_mac_get_name(mac_algo));
 	fflush(stdout);
 
@@ -134,7 +134,7 @@ static void cipher_bench(int algo, int size, int aead)
 	key.data = _key;
 	key.size = keysize;
 
-	printf("%16s ", gnutls_cipher_get_name(algo));
+	printf("%24s ", gnutls_cipher_get_name(algo));
 	fflush(stdout);
 
 	start_benchmark(&st);
