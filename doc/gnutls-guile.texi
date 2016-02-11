@@ -95,9 +95,9 @@ something like this:
 
 @example
 $ guile
-guile> (use-modules (gnutls))
-<unnamed port>: no code for module (gnutls)
-guile>
+@dots{}
+scheme@@(guile-user)> (use-modules (gnutls))
+ERROR: no code for module (gnutls)
 @end example
 
 There are two ways to solve this.  The first is to make sure that when
@@ -134,8 +134,8 @@ Either use the @code{GUILE_LOAD_PATH} environment variable as follows:
 
 @example
 $ GUILE_LOAD_PATH="/usr/local/share/guile/site:$GUILE_LOAD_PATH" guile
-guile> (use-modules (gnutls))
-guile>
+scheme@@(guile-user)> (use-modules (gnutls))
+scheme@@(guile-user)>
 @end example
 
 Alternatively, you can modify Guile's @code{%load-path} variable
@@ -143,11 +143,11 @@ Alternatively, you can modify Guile's @code{%load-path} variable
 Reference Manual}).
 
 At this point, you might get an error regarding
-@file{libguile-gnutls-v-0} similar to:
+@file{guile-gnutls-v-2} similar to:
 
 @example
-gnutls.scm:361:1: In procedure dynamic-link in expression (load-extension "libguile-gnutls-v-0" "scm_init_gnutls"):
-gnutls.scm:361:1: file: "libguile-gnutls-v-0", message: "libguile-gnutls-v-0.so: cannot open shared object file: No such file or directory"
+gnutls.scm:361:1: In procedure dynamic-link in expression (load-extension "guile-gnutls-v-2" "scm_init_gnutls"):
+gnutls.scm:361:1: file: "guile-gnutls-v-2", message: "guile-gnutls-v-2.so: cannot open shared object file: No such file or directory"
 @end example
 
 In this case, you will need to modify the run-time linker path, for
@@ -155,8 +155,8 @@ example as follows:
 
 @example
 $ LD_LIBRARY_PATH=/usr/local/lib GUILE_LOAD_PATH=/usr/local/share/guile/site guile
-guile> (use-modules (gnutls))
-guile>
+scheme@@(guile-user)> (use-modules (gnutls))
+scheme@@(guile-user)>
 @end example
 
 To check that you got the intended GnuTLS library version, you may
@@ -164,10 +164,10 @@ print the version number of the loaded library as follows:
 
 @example
 $ guile
-guile> (use-modules (gnutls))
-guile> (gnutls-version)
+scheme@@(guile-user)> (use-modules (gnutls))
+scheme@@(guile-user)> (gnutls-version)
 "@value{VERSION}"
-guile> 
+scheme@@(guile-user)>
 @end example
 
 
