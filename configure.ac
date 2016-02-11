@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-# Copyright (C) 2000-2012 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012, 2016 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
 #
@@ -722,9 +722,14 @@ if test "$opt_guile_bindings" = "yes"; then
 
    AC_PATH_PROG([guile_snarf], [guile-snarf])
    if test "x$guile_snarf" = "x"; then
-      AC_MSG_WARN([`guile-snarf' from Guile 1.8 not found.  Guile bindings not built.])
+      AC_MSG_WARN([`guile-snarf' from Guile not found.  Guile bindings not built.])
       opt_guile_bindings=no
    else
+      dnl Check for 'guild', which can be used to compile Scheme code
+      dnl on Guile 2.x.
+      AC_PATH_PROG([GUILD], [guild])
+      AC_SUBST([GUILD])
+
       GUILE_PROGS
       GUILE_FLAGS
 
@@ -781,6 +786,10 @@ if test "$opt_guile_bindings" = "yes"; then
 	AC_MSG_RESULT([$guile_effective_version])
 	guileextensiondir="$libdir/guile/$guile_effective_version"
 	AC_SUBST([guileextensiondir])
+
+	# The location of .go files.
+	guileobjectdir="$libdir/guile/$guile_effective_version/site-ccache"
+	AC_SUBST([guileobjectdir])
       else
         AC_MSG_RESULT([no])
         AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])
@@ -788,7 +797,9 @@ if test "$opt_guile_bindings" = "yes"; then
       fi
    fi
 fi
-AM_CONDITIONAL(HAVE_GUILE, test "$opt_guile_bindings" = "yes")
+
+AM_CONDITIONAL([HAVE_GUILE], [test "$opt_guile_bindings" = "yes"])
+AM_CONDITIONAL([HAVE_GUILD], [test "x$GUILD" != "x"])
 
 LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
 LIBGNUTLS_CFLAGS="-I${includedir}"
@@ -878,9 +889,7 @@ AC_CONFIG_FILES([
   gl/Makefile
   gl/tests/Makefile
   guile/Makefile
-  guile/modules/Makefile
   guile/src/Makefile
-  guile/tests/Makefile
   lib/Makefile
   lib/accelerated/Makefile
   lib/accelerated/x86/Makefile
