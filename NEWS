@@ -49,6 +49,7 @@ gnutls_privkey_get_seed: Added
 gnutls_privkey_verify_seed: Added
 gnutls_decode_ber_digest_info: Added
 gnutls_encode_ber_digest_info: Added
+gnutls_dh_params_import_dsa: Added
 
 
 * Version 3.4.3 (released 2015-07-12)
