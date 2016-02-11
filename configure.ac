@@ -751,6 +751,10 @@ if test "$opt_guile_bindings" = "yes"; then
       CFLAGS="$save_CFLAGS"
       LIBS="$save_LIBS"
 
+      AC_MSG_CHECKING([the Guile effective version])
+      guile_effective_version="`$GUILE -c '(display (effective-version))'`"
+      AC_MSG_RESULT([$guile_effective_version])
+
       if test "$opt_guile_bindings" = "yes"; then
         AC_MSG_RESULT([yes])
 	case "x$with_guile_site_dir" in 
@@ -762,7 +766,7 @@ if test "$opt_guile_bindings" = "yes"; then
 		# Automatically derive $(GUILE_SITE) from $(pkgdatadir).  This
 		# hack is used to allow `distcheck' to work (see
 		# `DISTCHECK_CONFIGURE_FLAGS' in the top-level `Makefile.am').
-		GUILE_SITE="\$(datadir)/guile/site"
+		GUILE_SITE="\$(datadir)/guile/site/$guile_effective_version"
 		AC_SUBST(GUILE_SITE)
 		;;
 	     *)
@@ -789,9 +793,6 @@ if test "$opt_guile_bindings" = "yes"; then
 	LIBS="$save_LIBS"
 
 	# The place where guile-gnutls.la will go.
-	AC_MSG_CHECKING([the Guile effective version])
-	guile_effective_version="`$GUILE -c '(display (effective-version))'`"
-	AC_MSG_RESULT([$guile_effective_version])
 	guileextensiondir="$libdir/guile/$guile_effective_version"
 	AC_SUBST([guileextensiondir])
 
