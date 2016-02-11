@@ -69,6 +69,8 @@ struct params_res {
 	int enable_session_ticket_server;
 	int enable_session_ticket_client;
 	int expect_resume;
+	int first_no_ext_master;
+	int second_no_ext_master;
 };
 
 pid_t child;
@@ -79,11 +81,39 @@ struct params_res resume_tests[] = {
 	 .enable_session_ticket_server = 0,
 	 .enable_session_ticket_client = 0,
 	 .expect_resume = 1},
+	{.desc = "try to resume from db (ext master secret -> none)",
+	 .enable_db = 1,
+	 .enable_session_ticket_server = 0,
+	 .enable_session_ticket_client = 0,
+	 .expect_resume = 0,
+	 .first_no_ext_master = 0,
+	 .second_no_ext_master = 1},
+	{.desc = "try to resume from db (none -> ext master secret)",
+	 .enable_db = 1,
+	 .enable_session_ticket_server = 0,
+	 .enable_session_ticket_client = 0,
+	 .expect_resume = 0,
+	 .first_no_ext_master = 1,
+	 .second_no_ext_master = 0},
 	{.desc = "try to resume from session ticket", 
 	 .enable_db = 0, 
 	 .enable_session_ticket_server = 1,
 	 .enable_session_ticket_client = 1,
 	 .expect_resume = 1},
+	{.desc = "try to resume from session ticket (ext master secret -> none)", 
+	 .enable_db = 0, 
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .expect_resume = 0,
+	 .first_no_ext_master = 0,
+	 .second_no_ext_master = 1},
+	{.desc = "try to resume from session ticket (none -> ext master secret)", 
+	 .enable_db = 0, 
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .expect_resume = 0,
+	 .first_no_ext_master = 1,
+	 .second_no_ext_master = 0},
 	{.desc = "try to resume from session ticket (server only)",
 	  .enable_db = 0,
 	  .enable_session_ticket_server = 1,
@@ -154,7 +184,8 @@ static void client(int sds[], struct params_res *params)
 	gnutls_session_t session;
 	char buffer[MAX_BUF + 1];
 	gnutls_anon_client_credentials_t anoncred;
-	unsigned int ext_master_secret = 0;
+	unsigned int ext_master_secret_check = 0;
+	char prio_str[256];
 
 	/* Need to enable anonymous KX specifically. */
 
@@ -176,18 +207,28 @@ static void client(int sds[], struct params_res *params)
 
 		/* Initialize TLS session
 		 */
-		gnutls_init(&session,
-			    GNUTLS_CLIENT);
+		gnutls_init(&session, GNUTLS_CLIENT);
+
+		snprintf(prio_str, sizeof(prio_str), "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH");
 
 		/* Use default priorities */
-		if (params->enable_session_ticket_client) {
-			gnutls_priority_set_direct(session,
-						   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH",
-						   NULL);
-		} else {
-			gnutls_priority_set_direct(session,
-						   "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH:%NO_TICKETS",
-						   NULL);
+		if (params->enable_session_ticket_client == 0) {
+			strcat(prio_str, ":%NO_TICKETS");
+		}
+
+		if (params->first_no_ext_master && t == 0) {
+			strcat(prio_str, ":%NO_SESSION_HASH");
+			ext_master_secret_check = 0;
+		}
+
+		if (params->second_no_ext_master && t > 0) {
+			strcat(prio_str, ":%NO_SESSION_HASH");
+			ext_master_secret_check = 0;
+		}
+
+		ret = gnutls_priority_set_direct(session, prio_str, NULL);
+		if (ret < 0) {
+			fail("prio: %s\n", gnutls_strerror(ret));
 		}
 
 		/* put the anonymous credentials to the current session
@@ -200,7 +241,7 @@ static void client(int sds[], struct params_res *params)
 						session_data.size);
 		}
 
-		if (ext_master_secret)
+		if (ext_master_secret_check)
 			gnutls_handshake_set_hook_function(session, GNUTLS_HANDSHAKE_SERVER_HELLO, GNUTLS_HOOK_PRE, hsk_hook_cb);
 		gnutls_transport_set_int(session, sd);
 
@@ -221,9 +262,9 @@ static void client(int sds[], struct params_res *params)
 				    ("client: Handshake was completed\n");
 		}
 
-		ext_master_secret = 0;
+		ext_master_secret_check = 0;
 		if (t == 0) {
-			ext_master_secret =  gnutls_session_ext_master_secret_status(session);
+			ext_master_secret_check =  gnutls_session_ext_master_secret_status(session);
 
 			/* get the session data size */
 			ret =
@@ -240,7 +281,7 @@ static void client(int sds[], struct params_res *params)
 						success
 						    ("- Previous session was resumed\n");
 				} else
-					fail("- Previous session was resumed\n");
+					fail("- Previous session was resumed but NOT expected\n");
 			} else {
 				if (params->expect_resume) {
 					fail("*** Previous session was NOT resumed\n");
