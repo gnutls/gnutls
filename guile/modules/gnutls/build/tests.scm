@@ -67,8 +67,29 @@ process exits upon failure."
             ((_ args ...) body))))))
 
    (export define-syntax-rule))
-  (else
-   #t))
+
+  (else                                           ;2.0 and 2.2
+   (use-modules (rnrs io ports)
+                (rnrs bytevectors))
+
+   (define-syntax-rule (define-replacement (name args ...) body ...)
+     ;; Define a compatibility replacement for NAME, if needed.
+     (define-public name
+       (if (module-defined? the-scm-module 'name)
+           (module-ref the-scm-module 'name)
+           (lambda (args ...)
+             body ...))))
+
+   ;; 'uniform-vector-read!' and 'uniform-vector-write' are deprecated in 2.0
+   ;; and absent in 2.2.
+
+   (define-replacement (uniform-vector-read! buf port)
+     (get-bytevector-n! port buf
+                        0 (bytevector-length buf)))
+
+   (define-replacement (uniform-vector-write buf port)
+     (put-bytevector port buf))))
+
 
 (define-syntax-rule (with-child-process pid parent child)
   "Fork and evaluate expression PARENT in the current process, with PID bound
@@ -76,3 +97,7 @@ to the PID of its child process; the child process evaluated CHILD."
   (call-with-child-process
    (lambda () child)
    (lambda (pid) parent)))
+
+;;; Local Variables:
+;;; eval: (put 'define-replacement 'scheme-indent-function 1)
+;;; End:
