@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  * Copyright (C) 2013 Adam Sampson <ats@offog.org>
+ * Copyright (C) 2016 Red Hat, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -71,11 +72,31 @@ struct params_res {
 pid_t child;
 
 struct params_res resume_tests[] = {
-	{"try to resume from db", 1, 0, 0, 1},
-	{"try to resume from session ticket", 0, 1, 1, 1},
-	{"try to resume from session ticket (server only)", 0, 1, 0, 0},
-	{"try to resume from session ticket (client only)", 0, 0, 1, 0},
-	{"try to resume from db and ticket", 1, 1, 1, 1},
+	{.desc = "try to resume from db",
+	 .enable_db = 1,
+	 .enable_session_ticket_server = 0,
+	 .enable_session_ticket_client = 0,
+	 .expect_resume = 1},
+	{.desc = "try to resume from session ticket", 
+	 .enable_db = 0, 
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .expect_resume = 1},
+	{.desc = "try to resume from session ticket (server only)",
+	  .enable_db = 0,
+	  .enable_session_ticket_server = 1,
+	  .enable_session_ticket_client = 0,
+	  .expect_resume = 0},
+	{.desc = "try to resume from session ticket (client only)",
+	 .enable_db = 0,
+	 .enable_session_ticket_server = 0,
+	 .enable_session_ticket_client = 1,
+	 .expect_resume = 0},
+	{.desc = "try to resume from db and ticket",
+	 .enable_db = 1,
+	 .enable_session_ticket_server = 1,
+	 .enable_session_ticket_client = 1,
+	 .expect_resume = 1},
 	{NULL, -1}
 };
 
