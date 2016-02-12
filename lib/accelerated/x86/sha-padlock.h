@@ -18,11 +18,11 @@ int wrap_padlock_hash_fast(gnutls_digest_algorithm_t algo,
 			   void *digest);
 
 void padlock_sha1_update(struct sha1_ctx *ctx,
-			 unsigned length, const uint8_t * data);
+			 size_t length, const uint8_t * data);
 void padlock_sha256_update(struct sha256_ctx *ctx,
-			   unsigned length, const uint8_t * data);
+			   size_t length, const uint8_t * data);
 void padlock_sha512_update(struct sha512_ctx *ctx,
-			   unsigned length, const uint8_t * data);
+			   size_t length, const uint8_t * data);
 
 extern const struct nettle_hash padlock_sha1;
 extern const struct nettle_hash padlock_sha224;

@@ -35,9 +35,9 @@ void sha1_block_data_order(void *c, const void *p, size_t len);
 void sha256_block_data_order(void *c, const void *p, size_t len);
 void sha512_block_data_order(void *c, const void *p, size_t len);
 
-typedef void (*update_func) (void *, unsigned, const uint8_t *);
-typedef void (*digest_func) (void *, unsigned, uint8_t *);
-typedef void (*set_key_func) (void *, unsigned, const uint8_t *);
+typedef void (*update_func) (void *, size_t, const uint8_t *);
+typedef void (*digest_func) (void *, size_t, uint8_t *);
+typedef void (*set_key_func) (void *, size_t, const uint8_t *);
 typedef void (*init_func) (void *);
 
 struct x86_hash_ctx {
