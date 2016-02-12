@@ -48,8 +48,8 @@ mac_override_LDFLAGS = $(NETTLE_LIBS) $(HOGWEED_LIBS) $(GMP_LIBS) $(LDADD)
 endif
 
 dist_check_SCRIPTS = test-ciphers override-ciphers
-check_PROGRAMS = $(ctests) cipher-test cipher-override mac-override cipher-override2
-TESTS = $(ctests) test-ciphers override-ciphers
+check_PROGRAMS = $(ctests) cipher-test cipher-override mac-override cipher-override2 hash-large
+TESTS = $(ctests) test-ciphers override-ciphers test-hash-large
 
 EXTRA_DIST = README
 
