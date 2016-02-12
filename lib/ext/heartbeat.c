@@ -229,7 +229,7 @@ gnutls_heartbeat_ping(gnutls_session_t session, size_t data_size,
 
 	case SHB_RECV:
 		ret =
-		    _gnutls_recv_int(session, GNUTLS_HEARTBEAT, -1, NULL,
+		    _gnutls_recv_int(session, GNUTLS_HEARTBEAT, NULL,
 				     NULL, 0, NULL,
 				     session->internals.
 				     hb_actual_retrans_timeout_ms);

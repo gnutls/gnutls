@@ -301,7 +301,7 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 			do {
 				ret =
 				    _gnutls_recv_int(session, GNUTLS_ALERT,
-						     -1, NULL, NULL, 0, NULL,
+						     NULL, NULL, 0, NULL,
 						     session->internals.
 						     record_timeout_ms);
 			}
@@ -1360,12 +1360,9 @@ _gnutls_recv_in_buffers(gnutls_session_t session, content_type_t type,
  * that it accepts the gnutls_session_t and the content_type_t of data to
  * receive (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current session.
- *
- * The gnutls_handshake_description_t was introduced to support SSL V2.0 client hellos.
  */
 ssize_t
 _gnutls_recv_int(gnutls_session_t session, content_type_t type,
-		 gnutls_handshake_description_t htype,
 		 gnutls_packet_t *packet,
 		 uint8_t * data, size_t data_size, void *seq,
 		 unsigned int ms)
@@ -1405,7 +1402,7 @@ _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 			if (ret != 0)
 				return ret;
 
-			ret = _gnutls_recv_in_buffers(session, type, htype, ms);
+			ret = _gnutls_recv_in_buffers(session, type, -1, ms);
 			if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
 				return gnutls_assert_val(ret);
 
@@ -1514,7 +1511,7 @@ ssize_t
 gnutls_record_recv_packet(gnutls_session_t session, 
 		   	  gnutls_packet_t *packet)
 {
-	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, -1, packet,
+	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, packet,
 				NULL, 0, NULL,
 				session->internals.record_timeout_ms);
 }
@@ -1697,7 +1694,7 @@ int gnutls_record_uncork(gnutls_session_t session, unsigned int flags)
 ssize_t
 gnutls_record_recv(gnutls_session_t session, void *data, size_t data_size)
 {
-	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, -1, NULL,
+	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, NULL,
 				data, data_size, NULL,
 				session->internals.record_timeout_ms);
 }
@@ -1726,7 +1723,7 @@ ssize_t
 gnutls_record_recv_seq(gnutls_session_t session, void *data,
 		       size_t data_size, unsigned char *seq)
 {
-	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, -1, NULL,
+	return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, NULL,
 				data, data_size, seq,
 				session->internals.record_timeout_ms);
 }
