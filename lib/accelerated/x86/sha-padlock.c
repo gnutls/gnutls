@@ -34,9 +34,9 @@
 
 #ifdef HAVE_LIBNETTLE
 
-typedef void (*update_func) (void *, unsigned, const uint8_t *);
-typedef void (*digest_func) (void *, unsigned, uint8_t *);
-typedef void (*set_key_func) (void *, unsigned, const uint8_t *);
+typedef void (*update_func) (void *, size_t, const uint8_t *);
+typedef void (*digest_func) (void *, size_t, uint8_t *);
+typedef void (*set_key_func) (void *, size_t, const uint8_t *);
 typedef void (*init_func) (void *);
 
 struct padlock_hash_ctx {
@@ -77,21 +77,21 @@ static void wrap_padlock_hash_deinit(void *hd)
 
 void
 padlock_sha1_update(struct sha1_ctx *ctx,
-		    unsigned length, const uint8_t * data)
+		    size_t length, const uint8_t * data)
 {
 	MD_UPDATE(ctx, length, data, SHA1_COMPRESS, MD1_INCR(ctx));
 }
 
 void
 padlock_sha256_update(struct sha256_ctx *ctx,
-		      unsigned length, const uint8_t * data)
+		      size_t length, const uint8_t * data)
 {
 	MD_UPDATE(ctx, length, data, SHA256_COMPRESS, MD1_INCR(ctx));
 }
 
 void
 padlock_sha512_update(struct sha512_ctx *ctx,
-		      unsigned length, const uint8_t * data)
+		      size_t length, const uint8_t * data)
 {
 	MD_UPDATE(ctx, length, data, SHA512_COMPRESS, MD_INCR(ctx));
 }
@@ -132,7 +132,7 @@ _nettle_write_be32(unsigned length, uint8_t * dst, uint32_t * src)
 
 static void
 padlock_sha1_digest(struct sha1_ctx *ctx,
-		    unsigned length, uint8_t * digest)
+		    size_t length, uint8_t * digest)
 {
 	uint64_t bit_count;
 
@@ -152,7 +152,7 @@ padlock_sha1_digest(struct sha1_ctx *ctx,
 
 static void
 padlock_sha256_digest(struct sha256_ctx *ctx,
-		      unsigned length, uint8_t * digest)
+		      size_t length, uint8_t * digest)
 {
 	uint64_t bit_count;
 
@@ -174,7 +174,7 @@ padlock_sha256_digest(struct sha256_ctx *ctx,
 
 static void
 padlock_sha512_digest(struct sha512_ctx *ctx,
-		      unsigned length, uint8_t * digest)
+		      size_t length, uint8_t * digest)
 {
 	uint64_t high, low;
 

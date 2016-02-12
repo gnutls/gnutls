@@ -33,10 +33,10 @@
 #include <nettle/umac.h>
 #include <fips.h>
 
-typedef void (*update_func) (void *, unsigned, const uint8_t *);
-typedef void (*digest_func) (void *, unsigned, uint8_t *);
-typedef void (*set_key_func) (void *, unsigned, const uint8_t *);
-typedef void (*set_nonce_func) (void *, unsigned, const uint8_t *);
+typedef void (*update_func) (void *, size_t, const uint8_t *);
+typedef void (*digest_func) (void *, size_t, uint8_t *);
+typedef void (*set_key_func) (void *, size_t, const uint8_t *);
+typedef void (*set_nonce_func) (void *, size_t, const uint8_t *);
 
 static int wrap_nettle_hash_init(gnutls_digest_algorithm_t algo,
 				 void **_ctx);
@@ -80,7 +80,7 @@ struct nettle_mac_ctx {
 };
 
 static void
-_wrap_umac96_set_key(void *ctx, unsigned len, const uint8_t * key)
+_wrap_umac96_set_key(void *ctx, size_t len, const uint8_t * key)
 {
 	if (unlikely(len != 16))
 		abort();
@@ -88,7 +88,7 @@ _wrap_umac96_set_key(void *ctx, unsigned len, const uint8_t * key)
 }
 
 static void
-_wrap_umac128_set_key(void *ctx, unsigned len, const uint8_t * key)
+_wrap_umac128_set_key(void *ctx, size_t len, const uint8_t * key)
 {
 	if (unlikely(len != 16))
 		abort();
