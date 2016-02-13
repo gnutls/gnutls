@@ -86,6 +86,7 @@ void doit(void)
 	}
 
 	gnutls_hash_output(td, digest);
+	gnutls_hash_deinit(td, NULL);
 	if (memcmp(digest, SHA256_HASH, 32) == 0) {
 		if (debug)
 			success("gnutls_hash_fast(SHA256) %lu OK\n", (unsigned long)size);
