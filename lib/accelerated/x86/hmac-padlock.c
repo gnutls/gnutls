@@ -33,6 +33,7 @@
 #include <aes-padlock.h>
 #include <sha-padlock.h>
 #include <algorithms.h>
+#include <x86-common.h>
 
 #ifdef HAVE_LIBNETTLE
 
@@ -40,9 +41,9 @@
 #define OPAD 0x5c
 #define MAX_SHA_DIGEST_SIZE (512/8)
 
-typedef void (*update_func) (void *, unsigned, const uint8_t *);
-typedef void (*digest_func) (void *, unsigned, uint8_t *);
-typedef void (*set_key_func) (void *, unsigned, const uint8_t *);
+typedef void (*update_func) (void *, size_t, const uint8_t *);
+typedef void (*digest_func) (void *, size_t, uint8_t *);
+typedef void (*set_key_func) (void *, size_t, const uint8_t *);
 
 struct padlock_hmac_ctx {
 	union {
@@ -63,91 +64,91 @@ struct padlock_hmac_ctx {
 
 static void
 padlock_hmac_sha1_set_key(struct hmac_sha1_ctx *ctx,
-			  unsigned key_length, const uint8_t * key)
+			  size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &padlock_sha1, key_length, key);
 }
 
 static void
 padlock_hmac_sha1_update(struct hmac_sha1_ctx *ctx,
-			 unsigned length, const uint8_t * data)
+			 size_t length, const uint8_t * data)
 {
 	padlock_sha1_update(&ctx->state, length, data);
 }
 
 static void
 padlock_hmac_sha1_digest(struct hmac_sha1_ctx *ctx,
-			 unsigned length, uint8_t * digest)
+			 size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &padlock_sha1, length, digest);
 }
 
 static void
 padlock_hmac_sha256_set_key(struct hmac_sha256_ctx *ctx,
-			    unsigned key_length, const uint8_t * key)
+			    size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &padlock_sha256, key_length, key);
 }
 
 static void
 padlock_hmac_sha256_update(struct hmac_sha256_ctx *ctx,
-			   unsigned length, const uint8_t * data)
+			   size_t length, const uint8_t * data)
 {
 	padlock_sha256_update(&ctx->state, length, data);
 }
 
 static void
 padlock_hmac_sha256_digest(struct hmac_sha256_ctx *ctx,
-			   unsigned length, uint8_t * digest)
+			   size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &padlock_sha256, length, digest);
 }
 
 static void
 padlock_hmac_sha224_set_key(struct hmac_sha224_ctx *ctx,
-			    unsigned key_length, const uint8_t * key)
+			    size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &padlock_sha224, key_length, key);
 }
 
 static void
 padlock_hmac_sha224_digest(struct hmac_sha224_ctx *ctx,
-			   unsigned length, uint8_t * digest)
+			   size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &padlock_sha224, length, digest);
 }
 
 static void
 padlock_hmac_sha384_set_key(struct hmac_sha384_ctx *ctx,
-			    unsigned key_length, const uint8_t * key)
+			    size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &padlock_sha384, key_length, key);
 }
 
 static void
 padlock_hmac_sha384_digest(struct hmac_sha384_ctx *ctx,
-			   unsigned length, uint8_t * digest)
+			   size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &padlock_sha384, length, digest);
 }
 
 static void
 padlock_hmac_sha512_set_key(struct hmac_sha512_ctx *ctx,
-			    unsigned key_length, const uint8_t * key)
+			    size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &padlock_sha512, key_length, key);
 }
 
 static void
 padlock_hmac_sha512_update(struct hmac_sha512_ctx *ctx,
-			   unsigned length, const uint8_t * data)
+			   size_t length, const uint8_t * data)
 {
 	padlock_sha512_update(&ctx->state, length, data);
 }
 
 static void
 padlock_hmac_sha512_digest(struct hmac_sha512_ctx *ctx,
-			   unsigned length, uint8_t * digest)
+			   size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &padlock_sha512, length, digest);
 }
@@ -237,7 +238,7 @@ wrap_padlock_hmac_update(void *_ctx, const void *text, size_t textsize)
 {
 	struct padlock_hmac_ctx *ctx = _ctx;
 
-	ctx->update(ctx->ctx_ptr, textsize, text);
+	_NETTLE_UPDATE(ctx->update, ctx->ctx_ptr, textsize, text);
 
 	return GNUTLS_E_SUCCESS;
 }

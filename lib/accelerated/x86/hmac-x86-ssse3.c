@@ -33,12 +33,13 @@
 #include <aes-x86.h>
 #include <sha-x86.h>
 #include <algorithms.h>
+#include <x86-common.h>
 
 #ifdef HAVE_LIBNETTLE
 
-typedef void (*update_func) (void *, unsigned, const uint8_t *);
-typedef void (*digest_func) (void *, unsigned, uint8_t *);
-typedef void (*set_key_func) (void *, unsigned, const uint8_t *);
+typedef void (*update_func) (void *, size_t, const uint8_t *);
+typedef void (*digest_func) (void *, size_t, uint8_t *);
+typedef void (*set_key_func) (void *, size_t, const uint8_t *);
 
 struct x86_hmac_ctx {
 	union {
@@ -61,56 +62,56 @@ struct x86_hmac_ctx {
 
 static void
 x86_hmac_sha1_set_key(struct hmac_sha1_ctx *ctx,
-			  unsigned key_length, const uint8_t * key)
+			  size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &x86_sha1, key_length, key);
 }
 
 static void
 x86_hmac_sha1_update(struct hmac_sha1_ctx *ctx,
-			 unsigned length, const uint8_t * data)
+			 size_t length, const uint8_t * data)
 {
 	x86_sha1_update(&ctx->state, length, data);
 }
 
 static void
 x86_hmac_sha1_digest(struct hmac_sha1_ctx *ctx,
-			 unsigned length, uint8_t * digest)
+			 size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &x86_sha1, length, digest);
 }
 
 static void
 x86_hmac_sha256_set_key(struct hmac_sha256_ctx *ctx,
-			    unsigned key_length, const uint8_t * key)
+			    size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &x86_sha256, key_length, key);
 }
 
 static void
 x86_hmac_sha256_update(struct hmac_sha256_ctx *ctx,
-			   unsigned length, const uint8_t * data)
+			   size_t length, const uint8_t * data)
 {
 	x86_sha256_update(&ctx->state, length, data);
 }
 
 static void
 x86_hmac_sha256_digest(struct hmac_sha256_ctx *ctx,
-			   unsigned length, uint8_t * digest)
+			   size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &x86_sha256, length, digest);
 }
 
 static void
 x86_hmac_sha224_set_key(struct hmac_sha224_ctx *ctx,
-			    unsigned key_length, const uint8_t * key)
+			    size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &x86_sha224, key_length, key);
 }
 
 static void
 x86_hmac_sha224_digest(struct hmac_sha224_ctx *ctx,
-			   unsigned length, uint8_t * digest)
+			   size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &x86_sha224, length, digest);
 }
@@ -118,35 +119,35 @@ x86_hmac_sha224_digest(struct hmac_sha224_ctx *ctx,
 #ifdef ENABLE_SHA512
 static void
 x86_hmac_sha384_set_key(struct hmac_sha384_ctx *ctx,
-			    unsigned key_length, const uint8_t * key)
+			    size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &x86_sha384, key_length, key);
 }
 
 static void
 x86_hmac_sha384_digest(struct hmac_sha384_ctx *ctx,
-			   unsigned length, uint8_t * digest)
+			   size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &x86_sha384, length, digest);
 }
 
 static void
 x86_hmac_sha512_set_key(struct hmac_sha512_ctx *ctx,
-			    unsigned key_length, const uint8_t * key)
+			    size_t key_length, const uint8_t * key)
 {
 	HMAC_SET_KEY(ctx, &x86_sha512, key_length, key);
 }
 
 static void
 x86_hmac_sha512_update(struct hmac_sha512_ctx *ctx,
-			   unsigned length, const uint8_t * data)
+			   size_t length, const uint8_t * data)
 {
 	x86_sha512_update(&ctx->state, length, data);
 }
 
 static void
 x86_hmac_sha512_digest(struct hmac_sha512_ctx *ctx,
-			   unsigned length, uint8_t * digest)
+			   size_t length, uint8_t * digest)
 {
 	HMAC_DIGEST(ctx, &x86_sha512, length, digest);
 }
@@ -239,7 +240,7 @@ wrap_x86_hmac_update(void *_ctx, const void *text, size_t textsize)
 {
 	struct x86_hmac_ctx *ctx = _ctx;
 
-	ctx->update(ctx->ctx_ptr, textsize, text);
+	_NETTLE_UPDATE(ctx->update, ctx->ctx_ptr, textsize, text);
 
 	return GNUTLS_E_SUCCESS;
 }
@@ -279,7 +280,7 @@ static int wrap_x86_hmac_fast(gnutls_mac_algorithm_t algo,
 		return gnutls_assert_val(ret);
 
 	ctx.setkey(&ctx, key_size, key);
-	ctx.update(&ctx, text_size, text);
+	_NETTLE_UPDATE(ctx.update, &ctx, text_size, text);
 	ctx.digest(&ctx, ctx.length, digest);
 	
 	zeroize_temp_key(&ctx, sizeof(ctx));
