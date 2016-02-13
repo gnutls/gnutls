@@ -131,10 +131,9 @@ unsigned int _gnutls_pk_bits_to_subgroup_bits(unsigned int pk_bits)
 	unsigned int ret = 0;
 
 	GNUTLS_SEC_PARAM_LOOP(
-		if (p->pk_bits >= pk_bits) {
-			ret = p->subgroup_bits; 
+		ret = p->subgroup_bits; 
+		if (p->pk_bits >= pk_bits)
 			break;
-		}
 	);
 	return ret;
 }
