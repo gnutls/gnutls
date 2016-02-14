@@ -402,8 +402,11 @@ rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	unsigned seed_length;
 	int ret;
 
-	if (n_size != 2048 && n_size != 3072) {
-		return 0;
+	if (_gnutls_fips_mode_enabled() != 0) {
+		if (n_size != 2048 && n_size != 3072) {
+			_gnutls_debug_log("The size of a prime can only be 2048 or 3072\n");
+			return 0;
+		}
 	}
 
 	if (n_size == 2048)
