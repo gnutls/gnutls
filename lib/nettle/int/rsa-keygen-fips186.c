@@ -382,6 +382,10 @@ _rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 	return ret;
 }
 
+/* Not entirely accurate but a good precision
+ */
+#define SEED_LENGTH(bits) (_gnutls_pk_bits_to_subgroup_bits(bits)/8)
+
 /* This generates p,q params using the B.3.2.2 algorithm in FIPS 186-4.
  * 
  * The hash function used is SHA384.
@@ -398,7 +402,7 @@ rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 			       /* Desired size of modulo, in bits */
 			       unsigned n_size)
 {
-	uint8_t seed[32];
+	uint8_t seed[128];
 	unsigned seed_length;
 	int ret;
 
@@ -409,10 +413,9 @@ rsa_generate_fips186_4_keypair(struct rsa_public_key *pub,
 		}
 	}
 
-	if (n_size == 2048)
-		seed_length = 14 * 2;
-	else
-		seed_length = 16 * 2;
+	seed_length = SEED_LENGTH(n_size);
+	if (seed_length > sizeof(seed))
+		return 0;
 
 	random(random_ctx, seed_length, seed);
 
